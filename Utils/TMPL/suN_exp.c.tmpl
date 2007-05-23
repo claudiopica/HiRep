@@ -1,0 +1,55 @@
+#include "utils.h"
+
+#if (NG!=$N$) 
+#error : Mismatch between NG and ExpX!
+#endif
+
+/*
+*  U = (1+i*y.sigma/4)(1-i*y.sigma/4)^{-1}
+*  U = u[0] + i*u.sigma/4
+*/
+static void YtoU(double* u, double *y)
+{
+   double y2 = y[0]*y[0] + y[1]*y[1] +y[2]*y[2];
+   double detY = 1.0 + y2/16.;
+   u[0] = (1.0 - y2/16.)/detY;
+   u[1] = y[0]/(2.*detY);
+   u[2] = y[1]/(2.*detY);
+   u[3] = y[2]/(2.*detY);
+}
+
+
+/*
+*  Applica la rotazione di SU(2) definita da
+*  U = s[0] + i*s.sigma/4
+*  al vettore (v1,v2)
+*/
+static void su2_rotate(double *s,complex *v1,complex *v2)
+{
+   complex z1, z2;
+   z1.re=
+      s[0]*(*v1).re-s[1]*(*v2).im+s[2]*(*v2).re-s[3]*(*v1).im;
+   z1.im=
+      s[0]*(*v1).im+s[1]*(*v2).re+s[2]*(*v2).im+s[3]*(*v1).re;
+   z2.re=
+      s[0]*(*v2).re-s[1]*(*v1).im-s[2]*(*v1).re+s[3]*(*v2).im;
+   z2.im=
+      s[0]*(*v2).im+s[1]*(*v1).re-s[2]*(*v1).im-s[3]*(*v2).re;
+   (*v1)=z1;
+   (*v2)=z2;
+}
+
+
+/*
+*  Approssima
+*  V = exp(sum(A) iT(A)*h(A)*dt)
+*  con una matrice unitaria secondo l'algoritmo di Luscher
+*  e sostituisce
+*  V.U -> U
+*/
+void ExpX(double dt, suNg_algebra_vector *h, suNg *u)
+{
+$GROUP::EXPX:(dt):(*h):(*u)$
+}
+
+

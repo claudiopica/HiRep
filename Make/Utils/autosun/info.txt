@@ -1,0 +1,119 @@
+Il programma "autosun" genera un file .h che contiene le definizioni di sette ruotines utili per manipolare le rappresentazioni di SU(N):
+1) _group_represent(ru,u)
+2) _algebra_represent(m,h)
+3) _algebra_project(h,m)
+4) _fund_algebra_represent(m,h)
+5) _fund_algebra_project(h,m)
+6) _infinitesimal_evolution(v,h,u,dt)
+7) ExpX
+
+
+COME USARLO?
+
+1) Settare la variabile REPRESENTATION nel Makefile, con uno dei valori
+		FUNDAMENTAL|ADJOINT|ANTISYMMETRIC|SYMMETRIC
+2) make. L'eseguibile viene generato con il nome
+		write_${REPRESENTATION}
+3) Lanciare l'eseguibile, chiamando per esempio
+		./write_ADJOINT 5
+Viene generato il file
+		SU5_ADJOINT.h
+per la rappresentazione aggiunta di SU(5).
+
+
+NOTAZIONI E MATEMATICA
+
+Indico con
+*	iT(A) (A=1,...,N^2-1),	adj(iT) = -iT
+i generatori di SU(N). Essi sono definiti antihermitiani, in modo che un elemento del gruppo si puo' scrivere come
+*	U = exp[sum(A) h(A)*iT(A)]
+dove h(A) sono coefficienti reali. Questo è comodo, perchè in questo modo i generatori nella rappresentazione aggiunta sono reali.
+Indico con R la generica rappresentazione di SU(N) e con d(R) la dimensione della rappresentazione.
+Allora, dato U in SU(N), la sua rappresentazione sara' R(U). Dato un elemento dell'algebra T, indico la sua rappresentazione con la stessa notazione R(T). Definisco la normalizzazione dei generatori come
+*	Tr adj(R(iT(A))).R(iT(B)) = C(R) delta(A,B) .
+Un elemento dell'algebra puo' essere visto come una matrice NxN antihermitiana oppure come un vettore reale con N^2-1 componenti. Adottero' questo secondo modo di vedere, che rende piu' semplice il calcolo delle rappresentazioni.
+
+
+DETTAGLI SUI TIPI UTILIZZATI
+
+matrici NxN complesse. (Esempio: u.c12_3.im)
+vettori N^2-1 reali. (Esempio: h.c14)
+Per l'aggiunta:
+	matrici d(R)xd(R) reali
+Per l'antisimmetrica o la simmetrica:
+	matrici d(R)xd(R) complesse
+	
+
+COSA FANNO LE ROUTINES?
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+1) _group_represent(ru,u)
+calcola la rappresentazione del gruppo
+
+*	parametri
+u	elemento del gruppo - matrice NxN complessa.
+ru	elemento del gruppo rappresentato - matrice d(R)xd(R) (reale o complessa, dipende dalla rappresentazione)
+
+*	definizione
+ru <- R(u)
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2) _algebra_represent(m,h)
+calcola la rappresentazione dell'algebra
+
+*	parametri
+h	elemento dell'algebra - vettore con N^2-1 componenti reali
+m	elemento dell'algebra rappresentato - matrice d(R)xd(R) (reale o complessa, dipende dalla rappresentazione)
+
+*	definizione
+m <- sum(A) h(A)*R(iT(A))
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+3) _algebra_project
+e' l'operazione inversa della (2)
+
+*	parametri
+m	elemento dell'algebra rappresentato - matrice d(R)xd(R) (reale o complessa, dipende dalla rappresentazione)
+h	elemento dell'algebra - vettore con N^2-1 componenti reali
+
+*	definizione
+h(A) <- ReTr[adj(R(iT(A)).m]/C(R)
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+4) _fund_algebra_represent(m,h)
+come la 2, ma la rappresentazione e' la fondamentale.
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+5) _fund_algebra_project
+come la 3, ma la rappresentazione e' la fondamentale.
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+6) _infinitesimal_evolution(v,h,u,dt)
+calcola l'evoluzione al prim'ordine in dt del campo di gauge
+
+*	parametri
+u	elemento del gruppo - matrice NxN complessa.
+v	elemento del gruppo - matrice NxN complessa.
+h	elemento dell'algebra - vettore con N^2-1 componenti reali
+dt	numero reale
+
+*	definizione
+v <- v + dt*sum(A) h(A)iT(A).u
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+7) ExpX(dt,h,u)
+calcola l'evoluzione di tempo dt del campo di gauge, usando l'approssimazione di Luscher.
+
+*	parametri
+dt	numero reale
+h	elemento dell'algebra - vettore con N^2-1 componenti reali
+u	elemento del gruppo - matrice NxN complessa.
+
+*	definizione
+u <- LExp(dt*sum(A) h(A)iT(A)).u
+dove Lexp e' l'approssimazione di Luscher dell'esponenziale.
+
+
+DETTAGLI SULL'IMPLEMENTAZIONE
+
+Le routines sono implementate come macro in C, tranne ExpX che e' invece una funzione.

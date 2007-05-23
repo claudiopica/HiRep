@@ -1,0 +1,65 @@
+#ifndef LINEAR_ALGEBRA_H
+#define LINEAR_ALGEBRA_H
+
+#include "global.h"
+#include "suN.h"
+#define SPINOR_LEN VOLUME
+
+/* Re <s1,s2> */
+double spinor_field_prod_re_f(suNf_spinor *s1, suNf_spinor *s2);
+
+/* Im <s1,s2> */
+double spinor_field_prod_im_f(suNf_spinor *s1, suNf_spinor *s2);
+
+/* <s1,s2> */
+complex_dble spinor_field_prod_f(suNf_spinor *s1, suNf_spinor *s2);
+
+/* Re <g5*s1,s2> */
+double spinor_field_g5_prod_re_f(suNf_spinor *s1, suNf_spinor *s2);
+
+/* Re <s1,s1> */
+double spinor_field_sqnorm_f(suNf_spinor *s1);
+
+/* s1+=r*s2 */
+void spinor_field_mul_add_assign_f(suNf_spinor *s1, float r, suNf_spinor *s2);
+
+/* s1+=c*s2 c complex */
+void spinor_field_mulc_add_assign_f(suNf_spinor *s1, complex_dble c, suNf_spinor *s2);
+
+/* s1=r*s2 */
+void spinor_field_mul_f(suNf_spinor *s1, float r, suNf_spinor *s2);
+
+/* s1=c*s2 c complex */
+void spinor_field_mulc_f(suNf_spinor *s1, complex_dble c, suNf_spinor *s2);
+
+/* r=s1+s2 */
+void spinor_field_add_f(suNf_spinor *r, suNf_spinor *s1, suNf_spinor *s2);
+
+/* r=s1-s2 */
+void spinor_field_sub_f(suNf_spinor *r, suNf_spinor *s1, suNf_spinor *s2);
+
+/* s1+=s2 */
+void spinor_field_add_assign_f(suNf_spinor *s1, suNf_spinor *s2);
+
+/* s1=s2 */
+void spinor_field_copy_f(suNf_spinor *s1, suNf_spinor *s2);
+
+/* s1=0 */
+void spinor_field_zero_f(suNf_spinor *s1);
+
+/* s1=r1*s2+r2*s3 */
+void spinor_field_lc_f(suNf_spinor *s1, float r1, suNf_spinor *s2, float r2, suNf_spinor *s3);
+
+/* s1+=r1*s2+r2*s3 */
+void spinor_field_lc_add_assign_f(suNf_spinor *s1, float r1, suNf_spinor *s2, float r2, suNf_spinor *s3);
+
+/* s1=cd1*s2+cd2*s3 cd1, cd2 complex*/
+void spinor_field_clc_f(suNf_spinor *s1, complex_dble cd1, suNf_spinor *s2, complex_dble cd2, suNf_spinor *s3);
+
+/* s1+=cd1*s2+cd2*s3 cd1, cd2 complex*/
+void spinor_field_clc_add_assign_f(suNf_spinor *s1, complex_dble cd1, suNf_spinor *s2, complex_dble cd2, suNf_spinor *s3);
+
+/* s1=g5*s2  */
+void spinor_field_g5_f(suNf_spinor *s1, suNf_spinor *s2);
+
+#endif

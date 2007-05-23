@@ -1,0 +1,69 @@
+include $(MKDIR)/MkFlags
+
+.%.d: SRC=$(patsubst .%.d,%.c,$@)
+.%.d: %.c 
+	$(MAKE) -C $(INCDIR) all
+	echo -n Generating dependences for [$(SRC)]...
+	$(CC) -MM -MG -MT "$@ $(patsubst .%.d,%.o,$@)" $(CFLAGS) $(CPPFLAGS) $(SRC) > $@ &&\
+		echo "RBLD = rebuild" >> $@ &&\
+	echo " done." || echo " failed."
+
+#if test "$(findstring .d,$(lastword $(MAKEFILE_LIST)))" = ""; then \
+
+ifeq ($(RBLD),rebuild)
+  RBLD=
+else
+  RBLD=rebuild
+endif
+%.o: SRC=$(patsubst %.o,%.c,$@) 
+%.o: DEP=$(patsubst %.o,.%.d,$@)
+%.o: %.c $(RBLD)
+	if  test $(dir $@) = "./"; then \
+	  MAKEFILES="$(patsubst %.o,.%.d,$@)" $(MAKE) $(patsubst %.o,.%.d,$@) ;\
+	  if test "$(findstring .d,$(MAKEFILES))" = ""; then \
+	    MAKEFILES="$(patsubst %.o,.%.d,$@)" $(MAKE) $@ ;\
+	  else \
+	    echo -n Compiling [$(CURDIR)/$@]... ;\
+	    $(CC) -c $(CFLAGS) $(CPPFLAGS) $(SRC) &&\
+	    echo " done." || echo " failed.";\
+	  fi ;\
+	else \
+	  $(MAKE) -C $(dir $@) $(notdir $@) ;\
+	fi
+	
+%.h: $(MKDIR)/MkFlags rebuild
+	if  test $(dir $@) != "./"; then \
+	  $(MAKE) -C $(dir $@) $(notdir $@) ;\
+	else \
+	  if test ! -f $@ ; then $(MAKE) -C $(INCDIR) $@ ; fi \
+	fi
+
+.DEFAULT:
+	if  test $(dir $@) != "./"; then \
+	  $(MAKE) -C $(dir $@) $(notdir $@) ;\
+	fi
+
+OBJS = $(SRCS:.c=.o)
+_MkRules_default_target: $(OBJS)
+
+headers:
+	$(MAKE) -C $(INCDIR) all
+
+
+WRHEAD = $(MKDIR)/Utils/write_suN_headers.pl
+WRREPRDIR = $(MKDIR)/Utils/autosun
+WRREPR = $(WRREPRDIR)/writeREPR
+
+$(WRREPR): $(MKDIR)/MkFlags
+	REPRESENTATION=$(REPR) make -C $(WRREPRDIR) $(notdir $@)
+
+.PHONY: rebuild clean $(patsubst %,clean-%,$(SUBDIRS)) _MkRules_default_target
+
+$(patsubst %,clean-%,$(SUBDIRS)):
+	$(MAKE) -C $(patsubst clean-%,%,$@) clean
+
+clean:: $(patsubst %,clean-%,$(SUBDIRS))
+	echo -n Cleaning $(CURDIR)...
+	rm -f *.o *.rpo *~ *.il *.dyn *.ii *.s .*.d
+	echo " done."
+

@@ -1,0 +1,92 @@
+
+********************************************************************************
+
+              Random number generation and related programs
+
+********************************************************************************
+
+
+The basic random number generator used here is referred to as
+"ranlux". It is described in the associated notes in the doc
+directory. A convenient initialization program is included in the
+module start.c
+
+
+Files
+-----
+
+ranlxd.c       Double-precision generator plus utility programs
+
+ranlxs.c       Single-precision generator plus utility programs
+
+gauss.c        Generation of single- and double-precision Gaussian
+               random numbers 
+
+random_su2.c   Generates random SU(2) matrices with an exponential
+               distribution as required in the heatbath update program
+
+random_su3.c   Generates uniformly distributed SU(3) matrices
+
+
+Include file
+------------
+
+The file random.h defines the prototypes for all externally accessible
+functions that are defined in the *.c files listed above.
+
+
+List of functions
+-----------------
+
+void ranlxd(double r[],int n)
+     Computes the next n double-precision random numbers and 
+     assigns them to the elements r[0],...,r[n-1] of the array r[]
+ 
+void rlxd_init(int level,int seed)
+     Initialization of the ranlxd generator
+
+int rlxd_size(void)
+     Returns the number of integers required to save the state of
+     the ranlxd generator
+
+void rlxd_get(int state[])
+     Extracts the current state of the ranlxd generator and stores the 
+     information in the array state[N] where N>=rlxd_size()
+
+void rlxd_reset(int state[])
+     Resets the ranlxd generator to the state defined by the array state[N]
+
+void ranlxs(float r[],int n)
+     Computes the next n single-precision random numbers and 
+     assigns them to the elements r[0],...,r[n-1] of the array r[]
+ 
+void rlxs_init(int level,int seed)
+     Initialization of the ranlxs generator
+
+int rlxs_size(void)
+     Returns the number of integers required to save the state of
+     the ranlxs generator
+
+void rlxs_get(int state[])
+     Extracts the current state of the ranlxs generator and stores the 
+     information in the array state[N] where N>=rlxs_size()
+
+void rlxs_reset(int state[])
+     Resets the ranlxs generator to the state defined by the array state[N]
+
+void gauss(float r[],int n)
+     Generates n single-precision Gaussian random numbers x with distribution
+     proportional to exp(-x^2) and assigns them to r[0],..,r[n-1]
+
+void gauss_dble(double r[],int n)
+     Generates n double-precision Gaussian random numbers x with distribution
+     proportional to exp(-x^2) and assigns them to r[0],..,r[n-1]
+
+void random_su2(float rho,float s[])
+     Computes a random vector s[4] with probability density proportional
+     to exp(rho*s[0])*delta(1-s^2) assuming rho>=0
+
+void random_su3(su3 *u)
+     Generates a new random SU(3) matrix and assigns it to *u
+
+

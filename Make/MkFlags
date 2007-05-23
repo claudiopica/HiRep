@@ -1,0 +1,42 @@
+T = 4
+L = 4
+NG = 3
+#REPR = REPR_FUNDAMENTAL
+#REPR = REPR_SYMMETRIC
+#REPR = REPR_ANTISYMMETRIC
+REPR = REPR_ADJOINT
+
+MACRO += -DANTIPERIODIC_BC_T
+#MACRO += -DANTIPERIODIC_BC_X
+#MACRO += -DANTIPERIODIC_BC_Y
+#MACRO += -DANTIPERIODIC_BC_Z
+
+CFLAGS = -Wall -ansi -O2 -fomit-frame-pointer -mfpmath=sse -msse -msse2 
+
+##########################################################################
+# DO NOT EDIT BEYOND THIS POINT - OK, OK: EDIT AT YOUR OWN RISK !
+##########################################################################
+
+#Macros
+MACRO += -DNDEBUG
+MACRO += -DT=$(T) -DL=$(L)
+MACRO += -D$(REPR) -DREPR_NAME=\"$(REPR)\"
+
+#Include
+INCDIR = $(TOPDIR)/Include
+INC = -I $(INCDIR)
+
+#Compiler
+CC = gcc
+CPPFLAGS += $(MACRO)
+CFLAGS += $(INC)
+LDFLAGS = -lm
+
+#make related
+#export CFLAGS LDFLAGS CPPFLAGS
+ifndef REPR
+  $(error Error: must specify fermion representation!)
+endif
+
+MAKEFLAGS += -s 
+MAKEFLAGS += -r
