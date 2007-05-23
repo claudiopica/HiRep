@@ -28,7 +28,7 @@ void printfile(ostream& out, istream& tmpl)
 			cerr << "Writing fundamental_algebra_represent..... ";
 #endif
 
-			unsigned int start, end;
+			size_t start, end;
 			
 			start = tag.find(":", 8);
 			_PARAMETER_CHECK(start)
@@ -50,7 +50,7 @@ void printfile(ostream& out, istream& tmpl)
 			cerr << "Writing fundamental_algebra_project..... ";
 #endif
 
-			unsigned int start, end;
+			size_t start, end;
 			
 			start = tag.find(":", 8);
 			_PARAMETER_CHECK(start)
@@ -72,7 +72,7 @@ void printfile(ostream& out, istream& tmpl)
 			cerr << "Writing infinitesimal_evolution..... ";
 #endif
 
-			unsigned int start, end;
+			size_t start, end;
 			
 			start = tag.find(":", 8);
 			_PARAMETER_CHECK(start)
@@ -104,7 +104,7 @@ void printfile(ostream& out, istream& tmpl)
 			cerr << "Writing ExpX..... ";
 #endif
 
-			unsigned int start, end;
+			size_t start, end;
 			
 			start = tag.find(":", 8);
 			_PARAMETER_CHECK(start)
@@ -148,7 +148,7 @@ void printfile(ostream& out, istream& tmpl)
 			cerr << "Writing group_represent..... ";
 #endif
 
-			unsigned int start, end;
+			size_t start, end;
 			
 			start = tag.find(":", 8);
 			_PARAMETER_CHECK(start)
@@ -170,7 +170,7 @@ void printfile(ostream& out, istream& tmpl)
 			cerr << "Writing debug_group_represent..... ";
 #endif
 
-			unsigned int start, end;
+			size_t start, end;
 			
 			start = tag.find(":", 8);
 			_PARAMETER_CHECK(start)
@@ -191,7 +191,7 @@ void printfile(ostream& out, istream& tmpl)
 #ifndef NDEBUG
 			cerr << "Writing algebra_represent..... ";
 #endif
-			unsigned int start, end;
+			size_t start, end;
 			
 			start = tag.find(":", 8);
 			_PARAMETER_CHECK(start)
@@ -213,7 +213,7 @@ void printfile(ostream& out, istream& tmpl)
 			cerr << "Writing algebra_project..... ";
 #endif
 
-			unsigned int start, end;
+			size_t start, end;
 			
 			start = tag.find(":", 8);
 			_PARAMETER_CHECK(start)
