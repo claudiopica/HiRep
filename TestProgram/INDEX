@@ -1,0 +1,17 @@
+check0		Check that _group_represent is homomorphic
+
+check1		Check gauge covariance of the Dirac operator
+
+check2 		Action of the Dirac operator on plane waves
+
+check3 		Checks the old and the new implementation of the Dirac op
+
+check4 		Hermiticity of the Dirac op
+
+check5		Check of the CG inversion
+
+check6		Check of the MINRES inversion
+
+check7 		Check of QMR multishift
+
+check8		Check the generators
