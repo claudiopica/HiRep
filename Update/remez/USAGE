@@ -1,0 +1,17 @@
+remez a b reqp n low high prec
+
+Generate a sequence of optimal rational approximations for the same function
+(see below for details) of increasing order (>=n) in intervals having a common
+upper bound (high) and a lower bound such that the relative error of the 
+approximation is reqp. The sequence end when the order is such that the lower
+bound for the approximation is less than low.
+
+approximate the function f(x)=x^(+-a/b)
+reqp => every approx generated has the required precision (within 1%)
+n => start with an approximation of order n, and then increase n
+low => stop when an approximation has been found with lower bound < low
+high => common upper bound of all approximations
+
+prec => precision used in numerical computation (usually 100)
+
+

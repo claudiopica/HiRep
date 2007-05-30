@@ -1,4 +1,11 @@
 /*
+	Modified by C. Pica - 10 May 2007
+
+	In function search: increase delta if spread is decreasing to 
+	                    accelerate convergence
+	Using new initial approximation (or a user supplied guess)
+
+#####################################################################
 
   Mike Clark - 25th May 2005
 
@@ -28,8 +35,10 @@ AlgRemez::AlgRemez(double lower, double upper, long precision)
   apend = upper;
   apwidt = apend - apstrt;
 
+	/*
   printf("Approximation bounds are [%e,%e]\n", (double)apstrt,(double)apend);
   printf("Precision of arithmetic is %d\n", precision);
+	*/
 
   alloc = 0;
   n = 0;
@@ -38,7 +47,7 @@ AlgRemez::AlgRemez(double lower, double upper, long precision)
   foundRoots = 0;
 
   // Only require the approximation spread to be less than 1 ulp
-  tolerance = 1e-15;
+  tolerance = 1e-16;
 
 }
 
@@ -72,7 +81,7 @@ void AlgRemez::allocate(int num_degree, int den_degree)
   param = new bigfloat[num_degree+den_degree+1];
   roots = new bigfloat[num_degree];
   poles = new bigfloat[den_degree];
-  xx = new bigfloat[num_degree+den_degree+3];
+  xx = new bigfloat[num_degree+den_degree+2];
   mm = new bigfloat[num_degree+den_degree+2];
 
   if (!alloc) {
@@ -94,28 +103,30 @@ void AlgRemez::setBounds(double lower, double upper)
 
 // Generate the rational approximation x^(pnum/pden)
 double AlgRemez::generateApprox(int degree, unsigned long pnum, 
-				unsigned long pden)
+				unsigned long pden, bigfloat *dmm)
 {
-  return generateApprox(degree, degree, pnum, pden);
+  return generateApprox(degree, degree, pnum, pden, dmm);
 }
 
 double AlgRemez::generateApprox(int num_degree, int den_degree, 
-				unsigned long pnum, unsigned long pden)
+				unsigned long pnum, unsigned long pden, bigfloat *dmm)
 {
   double *a_param = 0;
   int *a_pow = 0;
-  return generateApprox(num_degree, den_degree, pnum, pden, 0, a_param, a_pow);
+  return generateApprox(num_degree, den_degree, pnum, pden, dmm, 0, a_param, a_pow);
 }
 
 // Generate the rational approximation x^(pnum/pden)
 double AlgRemez::generateApprox(int num_degree, int den_degree, 
 				unsigned long pnum, unsigned long pden,
-				int a_len, double *a_param, int *a_pow)
+				bigfloat *dmm, int a_len, double *a_param, int *a_pow)
 {
   char *fname = "generateApprox(int, unsigned long, unsigned long)";
 
+	/*
   printf("Degree of the approximation is (%d,%d)\n", num_degree, den_degree);
   printf("Approximating the function x^(%d/%d)\n", pnum, pden);
+	*/
 
   // Reallocate arrays, since degree has changed
   if (num_degree != n || den_degree != d) allocate(num_degree,den_degree);
@@ -142,18 +153,34 @@ double AlgRemez::generateApprox(int num_degree, int den_degree,
   d = den_degree;
   neq = n + d + 1;
 
-  initialGuess();
+	if(dmm!=0){
+		/*
+		for (int j=0;j<neq+1;++j)
+			mm[j]=apstrt+bigfloat(dmm[j])*(apend-apstrt);
+		for (int j=0;j<neq+2;++j)
+			xx[j]=apstrt+bigfloat(dmm[neq+1+j])*(apend-apstrt);
+		*/
+		for (int j=0;j<neq+1;++j)
+			mm[j]=exp_bf(log_bf(apstrt)+dmm[j]*(log_bf(apend)-log_bf(apstrt)));
+		for (int j=0;j<neq+1;++j)
+			xx[j]=exp_bf(log_bf(apstrt)+dmm[neq+1+j]*(log_bf(apend)-log_bf(apstrt)));
+	} else {
+		initialGuess();
+	}
   stpini(step);
 
   while (spread > tolerance) { //iterate until convergance
 
-    if (iter++%100==0) 
+		++iter;
+		/*
+    if (iter%100==0) 
       printf("Iteration %d, spread %e delta %e\n", 
 	     iter-1,(double)spread,(double)delta);
+		*/
 
     equations();
     if (delta < tolerance) {
-      printf("Delta too small, try increasing precision\n");
+      fprintf(stderr,"Delta too small, try increasing precision\n");
       exit(0);
     }
 
@@ -163,11 +190,11 @@ double AlgRemez::generateApprox(int num_degree, int den_degree,
 
   int sign;
   double error = (double)getErr(mm[0],&sign);
-  printf("Converged at %d iterations, error = %e\n",iter,error);
+  fprintf(stderr,"Converged at %d iterations, error = %e\n",iter,error);
 
   // Once the approximation has been generated, calculate the roots
   if(!root()) {
-    printf("Root finding failed\n");
+    fprintf(stderr,"Root finding failed\n");
   } else {
     foundRoots = 1;
   }
@@ -176,6 +203,33 @@ double AlgRemez::generateApprox(int num_degree, int den_degree,
 
   // Return the maximum error in the approximation
   return error;
+}
+
+void AlgRemez::getMM(bigfloat *dmm) {
+	/*
+	for (int i=0;i<neq+1;++i)
+		dmm[i]=(double)((mm[i]-apstrt)/(apend-apstrt));
+	for (int i=0;i<neq+2;++i)
+		dmm[neq+1+i]=(double)((xx[i]-apstrt)/(apend-apstrt));
+	*/
+	for (int i=0;i<neq+1;++i)
+		dmm[i]=(log_bf(mm[i])-log_bf(apstrt))/(log_bf(apend)-log_bf(apstrt));
+	for (int i=0;i<neq+1;++i)
+		dmm[neq+1+i]=(log_bf(xx[i])-log_bf(apstrt))/(log_bf(apend)-log_bf(apstrt));
+/*
+#define SCALE(x) ((x)/(log(apend)-log(apstrt)))
+#define SCALEO(x) (((x)-log(apstrt))/(log(apend)-log(apstrt)))
+
+	printf("ll+ %e %e\n",double(apstrt),double(apend));
+	printf("mm+0 %e %e\n",SCALEO(log(apstrt)),SCALE(log(mm[0])-log(apstrt)));
+	for (int i=0;i<neq;++i)
+		printf("mm+ %e %e\n",SCALEO(log(mm[i])),SCALE(log(mm[i+1])-log(mm[i])));
+	printf("mm+ %e %e\n",SCALEO(log(mm[neq])),SCALE(log(apend)-log(mm[neq])));
+	printf("xx+ %e %e\n",SCALEO(log(apstrt)),SCALE(log(xx[0])-log(apstrt)));
+	for (int i=0;i<neq+2;++i)
+		printf("xx+ %e %e\n",SCALEO(log(xx[i])),SCALE(log(xx[i+1])-log(xx[i])));
+	printf("xx+ %e %e\n",SCALEO(log(xx[neq+1])),SCALE(log(apend)-log(xx[neq+1])));
+	*/
 }
 
 // Return the partial fraction expansion of the approximation x^(pnum/pden)
@@ -316,7 +370,7 @@ void AlgRemez::initialGuess() {
   a = 2.0 * ncheb;
   st=(double)apstrt;
   st = exp(log(st)+ld/2.);
-  for (long i = 0; i <= ncheb; i++) {
+  for (long i = 0; i < ncheb; i++) {
     /* comment this for the original guess
     r = 0.5 * (1 - cos(M_PI * (2*i+1)/(double) a));
     r = (exp((double)r)-1.0)/(exp(1.0)-1.0);
@@ -326,11 +380,13 @@ void AlgRemez::initialGuess() {
     st = exp(log(st)+ld);
     //*/
   }
+	xx[ncheb]=apend;
+
 }
 
 // Initialise step sizes
 void AlgRemez::stpini(bigfloat *step) {
-  xx[neq+1] = apend;
+  //xx[neq+1] = apend;
   delta = 0.25;
   step[0] = xx[0] - apstrt;
   for (int i = 1; i < neq; i++) step[i] = xx[i] - xx[i-1];
@@ -353,8 +409,9 @@ void AlgRemez::search(bigfloat *step) {
 
   for (i = 0; i < meq; i++) {
     steps = 0;
-    xx1 = xx[i]; // Next zero
+		//xx1 = xx[i]; // Next zero
     if (i == meq-1) xx1 = apend;
+		else xx1 = xx[i];
     xm = mm[i];
     ym = getErr(xm,&emsign);
     q = step[i];
@@ -367,10 +424,10 @@ void AlgRemez::search(bigfloat *step) {
     } else {
       yn = getErr(xn,&ensign);
       if (yn < ym) {
-	q = -q;
-	xn = xm;
-	yn = ym;
-	ensign = emsign;
+				q = -q;
+				xn = xm;
+				yn = ym;
+				ensign = emsign;
       }
     }
   

@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define APP_ORD 2*20+1
+#define APP_ORD 2*25+1
 
 typedef double real;
 
-#define MAXREC 16
+#define MAXREC 50
 static real arithgeom3(real z, real a, real b) {
   real diff[MAXREC], sum[MAXREC], sn;
   real pb = -1.; int n=MAXREC;
@@ -220,9 +220,10 @@ int main()
   /* real k=.003; */
   real min=0.4;
   real min2, delta2, err, err2;
-  real max=1.0;
+  real max=64.0;
   int np, i, j;
   real threshold = 1.e-15;
+	real diff; /* for checks */
 
   /*
   k=sqrt(k);
@@ -242,7 +243,7 @@ int main()
   }
   */
 
-  min = 1.e-1;
+  min = 60.;
   min2 = 1.e-10;
   delta2 = min - min2;
 
@@ -255,7 +256,7 @@ int main()
   }
 
   do {
-    /*printf("[%g,%g]\t", min, max);*/
+    /* printf("[%g,%g]\t", min, max); */
     real err3;
     real mean = (min + min2)/2.;
     norm_coef(mean, max, np, a, b, &err3);
@@ -268,9 +269,9 @@ int main()
       err = err3;
     }
     delta2 = min - min2; 
-    /*    printf("Min = %g ; Min2 = %g ; Delta = %g\n", min, min2, delta2); */
+    printf("Min = %g ; Min2 = %g ; Delta = %g\n", min, min2, delta2);
 
-  } while (delta2>1.e-15);
+  } while (delta2>2.e-15);
   
   printf("[%1.16e,%g]\t", min, max);
   printf("%d\t%g\n", np>>1, err);
@@ -289,16 +290,17 @@ int main()
   }
 
    
+  printf("[%1.16e,%g]\t", min, max);
   delta = max-min;
   for (np=0; np<10000; ++np) {
-    x = min + ((real) np) / 9999. * delta;
+    x = min + ((real) np) / ((real)9999) * delta;
     fn = 1./ sqrt(x);
     /*  
     app = zolotarev_invsqrt(x, APP_ORD, a, b);
     app2 = zolotarev_sign(x, APP_ORD, a, b);
     */
-    delta = pfrac_eval(x, APP_ORD, a, b);
-    printf("%g\t%g\t%g\n", x, delta, (fn-delta)/fabs(fn));
+    diff = pfrac_eval(x, APP_ORD, a, b);
+    printf("%g\t%g\t%g\n", x, delta, (fn-diff)/fabs(fn));
   }
   
   return 0;

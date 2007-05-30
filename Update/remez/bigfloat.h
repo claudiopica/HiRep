@@ -185,6 +185,12 @@ public:
     return b;
   }
 
+  friend bigfloat log_bf(const bigfloat& a) {
+    bigfloat b;
+    mpfr_log(b.x,a.x,GMP_RNDN);
+    return b;
+  }
+
   /* Comparison Functions */
 
   friend int operator>(const bigfloat& x, const bigfloat& y) {

@@ -123,11 +123,13 @@ class AlgRemez
   // Generate the rational approximation x^(pnum/pden)
   double generateApprox(int num_degree, int den_degree, 
 			unsigned long power_num, unsigned long power_den, 
-			int a_len, double* a_param, int* a_pow);
+			bigfloat *dmm, int a_len, double* a_param, int* a_pow);
   double generateApprox(int num_degree, int den_degree, 
-			unsigned long power_num, unsigned long power_den);
+			unsigned long power_num, unsigned long power_den, bigfloat *dmm=0);
   double generateApprox(int degree, unsigned long power_num, 
-			unsigned long power_den);
+			unsigned long power_den, bigfloat *dmm=0);
+
+	void getMM(bigfloat *dmm);
 
   // Return the partial fraction expansion of the approximation x^(pnum/pden)
   int getPFE(double *Res, double *Pole, double *Norm);

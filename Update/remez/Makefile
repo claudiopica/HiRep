@@ -2,7 +2,7 @@ CC = gcc
 CXX = g++
 LDFLAGS =  -L$(HOME)/gmp/lib -lmpfr -lgmp 
 
-BIN = test
+BIN = remez
 
 INCLIST = -I$(HOME)/gmp/include
 
