@@ -8,5 +8,6 @@ void geometry_eo_lexi(void);
 
 void test_geometry(void);
 void print_geometry(void);
+void print_wdmatrix(char *filename);
 
 #endif
