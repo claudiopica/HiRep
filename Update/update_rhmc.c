@@ -23,7 +23,7 @@ rational_app r_HB;  /* used in pseudofermions heatbath */
 double minev, maxev; /* min and max eigenvalue of H^2 */
 /* END of State */
 
-static float *la;
+static double *la=0;
 
 /* this is the basic operator used in the update */
 void H2(suNf_spinor *out, suNf_spinor *in){
@@ -56,27 +56,43 @@ void init_rhmc(rhmc_par *par){
      pf=alloc_spinor_field_f();
 
      /* allocate memory for the local action */
-     la=(float*)malloc(sizeof(float)*VOLUME);
+		 if(la==0)
+			la=malloc(sizeof(*la)*VOLUME);
      
      /* represent gauge field and find min and max eigenvalue of H^2 */
      represent_gauge_field();
      find_spec_H2(&maxev,&minev, par->mass); /* find spectral interval of H^2 */
      
      /* set up rational approx needed for RHMC */
-     r_S.order=15;
-     r_S.a=(double*)malloc(sizeof(double)*(r_S.order+1));
-     r_S.b=(double*)malloc(sizeof(double)*r_S.order);
-     inv_fourrt_coef(&r_S, minev, maxev); /* for nf==1 */
+     r_S.order=1;
+		 r_S.n=-1;
+		 r_S.d=4; /* nf==1 */
+		 r_S.rel_error=1.e-12;
+		 r_app_alloc(&r_S);
+		 r_app_set(&r_S,minev,maxev);
+     /* inv_fourrt_coef(&r_S, minev, maxev); for nf==1 */
+     r_MD.order=1;
+		 r_MD.n=1;
+		 r_MD.d=-2; /* nf==1 */
+		 r_MD.rel_error=1.e-12;
+		 r_app_alloc(&r_MD);
+		 r_app_set(&r_MD,minev,maxev);
+     r_HB.order=1;
+		 r_HB.n=1;
+		 r_HB.d=4; /* nf==1 */
+		 r_HB.rel_error=1.e-12;
+		 r_app_alloc(&r_HB);
+		 r_app_set(&r_HB,minev,maxev);
      
-     r_MD.order=7;
-     r_MD.a=(double*)malloc(sizeof(double)*(r_MD.order+1));
-     r_MD.b=(double*)malloc(sizeof(double)*r_MD.order);
-     inv_sqrt_coef(&r_MD, minev, maxev); /* for nf==1 */
+		 /*
+     r_MD.order=1;
+		 r_app_alloc(&r_MD);
+     inv_sqrt_coef(&r_MD, minev, maxev);
      
-     r_HB.order=15;
-     r_HB.a=(double*)malloc(sizeof(double)*(r_HB.order+1));
-     r_HB.b=(double*)malloc(sizeof(double)*r_HB.order);
-     fourrt_coef(&r_HB, minev, maxev); /* for nf==1 */
+     r_HB.order=1;
+		 r_app_alloc(&r_HB);
+     fourrt_coef(&r_HB, minev, maxev);
+		 */
      /*} pure gauge */
 }
 
@@ -87,11 +103,11 @@ void free_rhmc(){
   /*  if (_update_par.nf!=0) { pure gauge */
   free_field(pf);
 
-  free(la);
+  if(la!=0) free(la);
   
-  free(r_S.a); free(r_S.b);
-  free(r_MD.a); free(r_MD.b);
-  free(r_HB.a); free(r_HB.b);
+  r_app_free(&r_S);
+  r_app_free(&r_MD);
+  r_app_free(&r_HB);
   /*} pure gauge*/
 }
 
@@ -112,8 +128,8 @@ int update_rhmc(){
    rational_func(&r_HB, &H2, pf, pf);
 
    /* integrate molecular dynamics */
-   /* leapfrog(momenta, _update_par.tlen, _update_par.nsteps); */
-   O2MN_multistep(momenta, _update_par.tlen, _update_par.nsteps, 3); 
+	 /* leapfrog(momenta, _update_par.tlen, _update_par.nsteps); */
+	 O2MN_multistep(momenta, _update_par.tlen, _update_par.nsteps, 3);
 
 	 /* project gauge field */
 	 project_gauge_field();
@@ -124,11 +140,16 @@ int update_rhmc(){
    oldmax = maxev; /* save old max */
    oldmin = minev; /* save old min */
    find_spec_H2(&maxev,&minev, _update_par.mass); /* find spectral interval of H^2 */
-   inv_fourrt_coef(&r_S, minev, maxev); /* for nf==1 */
-   inv_sqrt_coef(&r_MD, minev, maxev); /* for nf==1 */
-   fourrt_coef(&r_HB, minev, maxev); /* for nf==1 */
+	 r_app_set(&r_S,minev,maxev);
+	 r_app_set(&r_MD,minev,maxev);
+	 r_app_set(&r_HB,minev,maxev);
 
-   /* compute H2^{-a/2}*pf oppure H2^{-a}*pf */
+	 /*
+	 inv_fourrt_coef(&r_S, minev, maxev);
+   inv_sqrt_coef(&r_MD, minev, maxev);
+   fourrt_coef(&r_HB, minev, maxev);  */
+
+   /* compute H2^{-a/2}*pf or H2^{-a}*pf */
    /* here we choose the first strategy which is more symmetric */
    rational_func(&r_S, &H2, pf, pf);
 
@@ -157,9 +178,9 @@ int update_rhmc(){
 				/* revert the approx to the old one */
 				maxev=oldmax;
 				minev=oldmin;
-				inv_fourrt_coef(&r_S, minev, maxev); /* for nf==1 */
-				inv_sqrt_coef(&r_MD, minev, maxev); /* for nf==1 */
-				fourrt_coef(&r_HB, minev, maxev); /* for nf==1 */
+				r_app_set(&r_S,minev,maxev);
+				r_app_set(&r_MD,minev,maxev);
+				r_app_set(&r_HB,minev,maxev);
 
 				return 0;
       }

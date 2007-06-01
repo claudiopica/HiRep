@@ -48,7 +48,7 @@ typedef enum {
  * H = | momenta |^2 + S_g + < phi1, phi2>
  */
 void local_hmc_action(local_action_type type,
-                      float *loc_action,
+                      double *loc_action,
                       suNg_algebra_vector *momenta,
                       suNf_spinor *phi1,
                       suNf_spinor *phi2);

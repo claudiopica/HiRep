@@ -5,3 +5,7 @@ SRCS = cabmar.c staples.c update_hb.c random_su2.c Dphi.c Dphi_old.c Dphi_dble_o
 MKDIR = $(TOPDIR)/Make
 include $(MKDIR)/MkRules
 
+approx_data.db:
+	echo -n "Writing rational approximation database... "
+	( cd remez && cat approx_* | ./mkappdata.pl >../$@ && cd .. \
+		&& echo "done." ) || ( echo "failed." && false )

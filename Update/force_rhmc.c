@@ -71,93 +71,91 @@ extern rational_app r_MD; /* used in the action MD evolution */
 
 
 void Force_rhmc_f(float dt, suNg_algebra_vector *force){
-  int i, n;
-  static suNg_algebra_vector f;
-  static suNf_vector ptmp;
-  static suNf_spinor p;
-  static suNf s1;
-  static cg_mshift_par cg_par;
-  suNf_spinor **chi;
-  suNf_spinor *Hchi;
+	int i, n;
+	static suNg_algebra_vector f;
+	static suNf_vector ptmp;
+	static suNf_spinor p;
+	static suNf s1;
+	static cg_mshift_par cg_par;
+	suNf_spinor **chi;
+	suNf_spinor *Hchi;
 
-  /* allocate spinors */
-  chi = (suNf_spinor **)malloc(sizeof(suNf_spinor*)*(r_MD.order));
-  chi[0] = (suNf_spinor *)malloc(sizeof(suNf_spinor)*((r_MD.order+1)*VOLUME));
-  for (i=1; i<(r_MD.order); ++i) {
-    chi[i]=chi[i-1]+VOLUME;
-  } 
-  Hchi = chi[r_MD.order-1]+VOLUME;
+	/* allocate spinors */
+	chi = (suNf_spinor **)malloc(sizeof(suNf_spinor*)*(r_MD.order));
+	chi[0] = (suNf_spinor *)malloc(sizeof(suNf_spinor)*((r_MD.order+1)*VOLUME));
+	for (i=1; i<(r_MD.order); ++i) {
+		chi[i]=chi[i-1]+VOLUME;
+	} 
+	Hchi = chi[r_MD.order-1]+VOLUME;
 
-  /* Compute (H^2-b[n])^-1 * pf */
-  /* set up cg parameters */
-  cg_par.n = r_MD.order;
-  cg_par.shift = r_MD.b;
-  cg_par.err2= r_MD.error;
-  cg_par.max_iter=1000;
-    
-  /* compute inverse vectors chi[i] = (H^2 - b[i])^1 * pf */
-  cg_mshift(&cg_par, &H2, pf, chi);
+	/* Compute (H^2-b[n])^-1 * pf */
+	/* set up cg parameters */
+	cg_par.n = r_MD.order;
+	cg_par.shift = r_MD.b;
+	cg_par.err2= r_MD.rel_error;
+	cg_par.max_iter=1000;
 
-  for (n=0; n<r_MD.order; ++n) {
+	/* compute inverse vectors chi[i] = (H^2 - b[i])^1 * pf */
+	cg_mshift(&cg_par, &H2, pf, chi);
 
-    g5Dphi(_update_par.mass, Hchi, chi[n]);
+	for (n=0; n<r_MD.order; ++n) {
 
-    for (i=0;i<4*VOLUME;++i) {
-      int x,y, mu;
-      suNf_spinor *chi1, *chi2;
-      index_to_coord(i,x,mu);
-      _suNf_zero(s1);
-      switch (mu) {
-      case 0:
-	y=iup[x][0];
-	chi1=Hchi+x;
-	chi2=chi[n]+y;
-	_F_DIR0(s1,chi1,chi2);
-	chi1=chi[n]+x;
-	chi2=Hchi+y;
-	_F_DIR0(s1,chi1,chi2);
-	break;
-      case 1:
-	y=iup[x][1];
-	chi1=Hchi+x;
-	chi2=chi[n]+y;
-	_F_DIR1(s1,chi1,chi2);
-	chi1=chi[n]+x;
-	chi2=Hchi+y;
-	_F_DIR1(s1,chi1,chi2);
-	break;
-      case 2:
-	y=iup[x][2];
-	chi1=Hchi+x;
-	chi2=chi[n]+y;
-	_F_DIR2(s1,chi1,chi2);
-	chi1=chi[n]+x;
-	chi2=Hchi+y;
-	_F_DIR2(s1,chi1,chi2);
-	break;
-      default: /* DIR 3 */
-	y=iup[x][3];
-	chi1=Hchi+x;
-	chi2=chi[n]+y;
-	_F_DIR3(s1,chi1,chi2);
-	chi1=chi[n]+x;
-	chi2=Hchi+y;
-	_F_DIR3(s1,chi1,chi2);
-      }
+		g5Dphi(_update_par.mass, Hchi, chi[n]);
 
-      _algebra_project(f,s1);
-      /*_print_avect(f); */
-      _algebra_vector_mul_add_assign_g(force[i],dt*r_MD.a[n+1]*(_REPR_NORM2/_FUND_NORM2),f);	
-      
-    }
-    
+		for (i=0;i<4*VOLUME;++i) {
+			int x,y, mu;
+			suNf_spinor *chi1, *chi2;
+			index_to_coord(i,x,mu);
+			_suNf_zero(s1);
+			switch (mu) {
+				case 0:
+					y=iup[x][0];
+					chi1=Hchi+x;
+					chi2=chi[n]+y;
+					_F_DIR0(s1,chi1,chi2);
+					chi1=chi[n]+x;
+					chi2=Hchi+y;
+					_F_DIR0(s1,chi1,chi2);
+					break;
+				case 1:
+					y=iup[x][1];
+					chi1=Hchi+x;
+					chi2=chi[n]+y;
+					_F_DIR1(s1,chi1,chi2);
+					chi1=chi[n]+x;
+					chi2=Hchi+y;
+					_F_DIR1(s1,chi1,chi2);
+					break;
+				case 2:
+					y=iup[x][2];
+					chi1=Hchi+x;
+					chi2=chi[n]+y;
+					_F_DIR2(s1,chi1,chi2);
+					chi1=chi[n]+x;
+					chi2=Hchi+y;
+					_F_DIR2(s1,chi1,chi2);
+					break;
+				default: /* DIR 3 */
+					y=iup[x][3];
+					chi1=Hchi+x;
+					chi2=chi[n]+y;
+					_F_DIR3(s1,chi1,chi2);
+					chi1=chi[n]+x;
+					chi2=Hchi+y;
+					_F_DIR3(s1,chi1,chi2);
+			}
 
-  }  
-  
-  free(chi[0]);
-  free(chi);
-  
-   
+			_algebra_project(f,s1);
+			/*_print_avect(f); */
+			_algebra_vector_mul_add_assign_g(force[i],dt*r_MD.a[n+1]*(_REPR_NORM2/_FUND_NORM2),f);	
+
+		}
+
+
+	}  
+
+	free(chi[0]);
+	free(chi);
 
 }
 

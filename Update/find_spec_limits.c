@@ -303,8 +303,8 @@ void find_spec_H2(double *max, double *min, double mass) {
   /* Always use this for now */
   /* negative masses */
   /* if(mass<-2.) { */
-    max_H2(min, mass);
-    min_H2(min, *min, mass);
+    max_H2(max, mass);
+    min_H2(min, *max, mass);
     return;
   /* } */
   /* case: -2<mass<0 */
