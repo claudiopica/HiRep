@@ -252,5 +252,6 @@ void _FUNC(spinor_field_g5)(_SPINOR_TYPE *s1, _SPINOR_TYPE *s2)
    for(len=0;len<_spinor_len;++len){
      _spinor_g5_f(*s1,*s2);
       s1+=1;
+			s2+=1;
    }
 }
