@@ -1,3 +1,11 @@
+#define _ZERO_ (1e-10)
+
+bool equal(FLOATING a,FLOATING b)
+{
+	return fabs(a-b) < _ZERO_;
+}
+
+
 class rmonomial : public orderedlist<string,int>
 {
 public:
@@ -77,18 +85,18 @@ public:
 		
 		for(KEYTYPE i = 0; i < length; i++)
 		{
-			if(data[i]->value.re == 0.0) continue;
-			if(a != 0.0 && a != data[i]->value.re && a != -data[i]->value.re) a = 1.0;
+			if(equal(data[i]->value.re,0.0)) continue;
+			if(!equal(a,0.0) && !equal(a,data[i]->value.re) && !equal(a,-data[i]->value.re)) a = 1.0;
 			else a = data[i]->value.re;
 			counter++;
 		}
 		if(counter <= 1) a = 1.0;
 
-		if(a == -1.0) RET = "-(";
-		else if(a != 1.0) RET = ftos(a) + "*(";
+		if(equal(a,-1.0)) RET = "-(";
+		else if(!equal(a,1.0)) RET = ftos(a) + "*(";
 		
 		for(KEYTYPE i = 0; i < length; i++)
-			if(data[i]->value.re != 0.0)
+			if(!equal(data[i]->value.re,0.0))
 			{
 				FLOATING ct = data[i]->value.re/a;
 				string coeff = ftos(ct);
@@ -100,7 +108,7 @@ public:
 				RET += rmon;
 			}
 		
-		if(a != 1.0) RET += ")";
+		if(!equal(a,1.0)) RET += ")";
 		
 		if(RET == "") RET = "0.0";
 
@@ -114,18 +122,18 @@ public:
 
 		for(KEYTYPE i = 0; i < length; i++)
 		{
-			if(data[i]->value.im == 0.0) continue;
-			if(a != 0.0 && a != data[i]->value.im && a != -data[i]->value.im) a = 1.0;
+			if(equal(data[i]->value.im,0.0)) continue;
+			if(!equal(a,0.0) && !equal(a,data[i]->value.im) && !equal(a,-data[i]->value.im)) a = 1.0;
 			else a = data[i]->value.im;
 			counter++;
 		}
 		if(counter <= 1) a = 1.0;
 
-		if(a == -1.0) RET = "-(";
-		else if(a != 1.0) RET = ftos(a) + "*(";
+		if(equal(a,-1.0)) RET = "-(";
+		else if(!equal(a,1.0)) RET = ftos(a) + "*(";
 
 		for(KEYTYPE i = 0; i < length; i++)
-			if(data[i]->value.im != 0.0)
+			if(!equal(data[i]->value.im,0.0))
 			{
 				FLOATING ct = data[i]->value.im/a;
 				string coeff = ftos(ct);
@@ -137,7 +145,7 @@ public:
 				RET += rmon;
 			}
 		
-		if(a != 1.0) RET += ")";
+		if(!equal(a,1.0)) RET += ")";
 		
 		if(RET == "") RET = "0.0";
 
