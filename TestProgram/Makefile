@@ -1,6 +1,7 @@
 TOPDIR = ..
 
-MAIN := test check0 check1 check2 check3 check4 check5 check6 check7 check8
+MAIN := test check0 check1 check2 check3 check4 check5 check6 check7 check8 check9 check10 check11
+
 SRCS = $(addsuffix .c,$(MAIN))
 
 default: $(MAIN)
@@ -46,6 +47,10 @@ MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Inverters
 MODS := linear_algebra cg_mshift BiCGstab_mshift HBiCGstab_mshift MINRES_mshift g5QMR_mshift MINRES
+MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
+
+MODDIR := Eva
+MODS := eva jacobi
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 $(MAIN): %: %.o $(MOD_OBJS)

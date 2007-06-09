@@ -15,3 +15,12 @@ check6		Check of the MINRES inversion
 check7 		Check of QMR multishift
 
 check8		Check the generators
+
+check9		Check the eva module using a random field
+
+check10		Check the eva module using a free field
+
+check11		Check the consistency of spinor linear algebra
+
+check12		Initialization of the link momenta
+

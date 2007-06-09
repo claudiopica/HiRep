@@ -1,7 +1,8 @@
 #ifndef INVERTERS_H
 #define INVERTERS_H
 
-#include "suN.h"
+#include "suN_types.h"
+#include "complex.h"
 
 
 typedef void (*spinor_operator)(suNf_spinor *out, suNf_spinor *in);
@@ -54,5 +55,14 @@ typedef struct _MINRES_par {
   int max_iter; /* maximum number of iterations: 0 => infinity */
 } MINRES_par;
 int MINRES(MINRES_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor *out, suNf_spinor *trial);
+
+int eva(int vol,int nev,int nevt,int init,int kmax,
+               int imax,int ipr,float ubnd,float omega1,float omega2,
+               spinor_operator Op,
+               suNf_spinor *ws[],suNf_spinor *ev[],float d[],int *status);
+
+void jacobi1(int n,float a[],float d[],float v[]);
+void jacobi2(int n,complex a[],float d[],complex v[]);
+
 
 #endif
