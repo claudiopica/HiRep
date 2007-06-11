@@ -119,9 +119,7 @@ public:
 string ftos(FLOATING x)
 {
 	static char tmp[100];
-	//if(x >= 0.0) sprintf(tmp, "+%f", x);
-	//else sprintf(tmp, "%f", x);
-	if(x >= 0.0) sprintf(tmp, "+%1.15e", x);
-	else sprintf(tmp, "%1.15e", x);
+	if(x >= 0.0) sprintf(tmp, _PNUMBER_, x);
+	else sprintf(tmp, _NUMBER_, x);
 	return string(tmp);
 }

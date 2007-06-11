@@ -101,8 +101,8 @@ public:
 				FLOATING ct = data[i]->value.re/a;
 				string coeff = ftos(ct);
 				string rmon = data[i]->index.getstring();
-				if(ct == 1. && rmon != "") RET += "+";
-				else if(ct == -1 && rmon != "") RET += "-";
+				if(equal(ct,1.) && rmon != "") RET += "+";
+				else if(equal(ct,-1) && rmon != "") RET += "-";
 				else if (rmon != "") RET += coeff + "*";
 				else RET += coeff;
 				RET += rmon;
@@ -138,8 +138,8 @@ public:
 				FLOATING ct = data[i]->value.im/a;
 				string coeff = ftos(ct);
 				string rmon = data[i]->index.getstring();
-				if(ct == 1. && rmon != "") RET += "+";
-				else if(ct == -1 && rmon != "") RET += "-";
+				if(equal(ct,1.) && rmon != "") RET += "+";
+				else if(equal(ct,-1) && rmon != "") RET += "-";
 				else if (rmon != "") RET += coeff + "*";
 				else RET += coeff;
 				RET += rmon;
