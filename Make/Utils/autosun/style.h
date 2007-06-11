@@ -24,8 +24,8 @@
 
 #ifdef _PICA_STYLE_
 
-#define _MINDEX_ ".c" << a.row << "_" << a.col
-#define _VINDEX_ ".c" << a.row
+#define _MINDEX_ ".c" << (a.row+1) << "_" << (a.col+1)
+#define _VINDEX_ ".c" << (a.row+1)
 #define _INDENT_ "\t"
 #define _ENDL_ "; \\\n"
 #define _LASTENDL_ ";\n"
