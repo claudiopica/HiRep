@@ -11,7 +11,7 @@
 
 #include "suN_repr_func.h"
 
-
+void _group_represent2(suNf* v, suNg *u);
 void represent_gauge_field();
 
 
