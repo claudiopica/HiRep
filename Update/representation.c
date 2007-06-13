@@ -159,8 +159,7 @@ void _group_represent2(suNf* v, suNg *u) {
 
 #elif defined REPR_FUNDAMENTAL
 
-	*v = *u;
-
+	*v = *((suNf *)u); 
 #endif
 
 #undef XG
