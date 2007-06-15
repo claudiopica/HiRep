@@ -1,3 +1,4 @@
+
 /*******************************************************************************
 *
 * Test of modules
@@ -85,9 +86,15 @@ int main(int argc,char *argv[])
    float pi_corr[T];
    char propname[256];
    FILE *propfile;
-
-   float m[]={-1.0,-1.6,-1.9};
-   int nm=sizeof(m)/sizeof(float);
+   float *m;
+   
+   float kappa[]={0.161, 0.163};
+   int nm=sizeof(kappa)/sizeof(float);
+   m = (float *) malloc(sizeof(kappa));
+   for (i=0; i<nm; ++i)
+     {
+       m[i] = 0.5/kappa[i] - 4.0;
+     }
 
    read_cmdline(argc, argv); 
 
@@ -104,6 +111,9 @@ int main(int argc,char *argv[])
    printf("Computing quark prop for %d masses: ",nm);
    for(i=0;i<nm;++i)
     printf("%e ",m[i]);
+   printf("corresponding to the following kappa:");
+   for(i=0;i<nm;++i)
+    printf("%e ",kappa[i]);
    printf("\n\n");
 
    fflush(stdout);
@@ -160,26 +170,33 @@ int main(int argc,char *argv[])
      
      for (n=0;n<4*NF;++n){
        quark_propagator(n,nm,m,quark_prop);
+       /* pi correlator */
+       /*
        for (k=0;k<nm;++k){
          if(n==0) zero_picorr(picorr+k*T);
-         pi_correlator(pi_corr, quark_prop[k]);
+         g5_correlator(pi_corr, quark_prop[k]);
          add_picorr(picorr+k*T,pi_corr);
        }
-       
+       */
        /* write propagator on file */
        for (k=0;k<nm;++k) {
 	 error(fwrite(quark_prop[k],(size_t) sizeof(suNf_spinor),(size_t)(VOLUME),propfile)!=(VOLUME),1,"Main",
 	       "Failed to write quark propagator to file");
        }   
+       
      }
-     for(n=0;n<nm;++n){
+     
+     /* pi correlator */
+     /*
+       for(n=0;n<nm;++n){
        printf("[%d] mass=%2.4f pi_corr= ",i,m[n]);
        for(k=0;k<T;++k) {
 	 printf("%e ",picorr[k+n*T]);
        }
        printf("\n");
        fflush(stdout);
-     }
+       } 
+     */
 
      for (n=0;n<nit;n++) /* nit updates */
        update(beta,nhb,nor);
