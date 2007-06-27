@@ -1,6 +1,7 @@
 #include "global.h"
 #include "representation.h"
 #include "utils.h"
+#include <math.h>
 
 
 void _group_represent2(suNf* v, suNg *u) {
@@ -177,6 +178,7 @@ void represent_gauge_field() {
    suNg *u=u_gauge;
 
    for (i=0; i<VOLUME*4; ++i){
+      /*_group_represent2(Ru,u); */
       _group_represent(*Ru,*u);
       ++Ru;
       ++u;

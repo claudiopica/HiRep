@@ -65,26 +65,26 @@ static void O2MN_ms_gauge(suNg_algebra_vector *momenta, float dt, unsigned int n
     Force0(lambda*dt,momenta);
 }
 
-void O2MN_multistep(suNg_algebra_vector *momenta, float tlen, unsigned int nsteps, unsigned int gsteps){
+void O2MN_multistep(suNg_algebra_vector *momenta, int_par *traj_par){
 
-  if (nsteps>0) {
+  if (traj_par->nsteps>0) {
     int n;
-    float dt=tlen/((float)nsteps);
-    float gdt=dt/(double)(2*gsteps);
+    float dt=traj_par->tlen/((float)traj_par->nsteps);
+    float gdt=dt/(double)(2*traj_par->gsteps);
 		  
     /* Update of momenta */
     Force_rhmc_f(lambda*dt,momenta);
     
-    for(n=1;n<nsteps;++n) {
+    for(n=1;n<traj_par->nsteps;++n) {
       
       /* Update gfield */
-      O2MN_ms_gauge(momenta, gdt, gsteps);
+      O2MN_ms_gauge(momenta, gdt, traj_par->gsteps);
       
       /* Update of momenta */
       Force_rhmc_f((1.-2.*lambda)*dt,momenta);
       
       /* Update gfield */
-      O2MN_ms_gauge(momenta, gdt, gsteps);
+      O2MN_ms_gauge(momenta, gdt, traj_par->gsteps);
       
       /* Update of momenta */
       Force_rhmc_f(2.*lambda*dt,momenta);
@@ -92,13 +92,13 @@ void O2MN_multistep(suNg_algebra_vector *momenta, float tlen, unsigned int nstep
     }
     
     /* Update gfield */
-    O2MN_ms_gauge(momenta, gdt, gsteps);
+    O2MN_ms_gauge(momenta, gdt, traj_par->gsteps);
     
     /* Update of momenta */
     Force_rhmc_f((1.-2.*lambda)*dt,momenta);
     
     /* Update gfield */
-    O2MN_ms_gauge(momenta, gdt, gsteps);
+    O2MN_ms_gauge(momenta, gdt, traj_par->gsteps);
     
     /* Update of momenta */
     Force_rhmc_f(lambda*dt,momenta);

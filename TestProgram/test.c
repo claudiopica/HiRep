@@ -107,11 +107,8 @@ int main(int argc,char *argv[])
    suNf_spinor s8[VOLUME];
    suNf_spinor_dble s9[VOLUME],s10[VOLUME];
 
-   cg_mshift_par par;
-   BiCGstab_mshift_par BiCGpar;
-   MINRES_mshift_par MINRESpar;
+   mshift_par par;
    MINRES_par MINRESpar2;
-   QMR_mshift_par QMRpar;
    suNf_spinor **res;
    suNf_spinor_dble **resd;
    int cgiters;
@@ -255,16 +252,18 @@ int main(int argc,char *argv[])
 
    printf("Testing MINRES multishift\n");
 
+	 /*
    MINRESpar.spinorlen=VOLUME;
    MINRESpar.n = 6;
    MINRESpar.shift=par.shift;
    MINRESpar.err2=1.e-8;
    MINRESpar.max_iter=0;
-   
-   cgiters=MINRES_mshift(&MINRESpar, &H, s1, res);
+   */
+
+   cgiters=MINRES_mshift(&par, &H, s1, res);
    printf("Converged in %d iterations\n",cgiters);
 
-   for(i=0;i<MINRESpar.n;++i){
+   for(i=0;i<par.n;++i){
       H(s8,res[i]);
       if(i!=0)
 	spinor_field_mul_add_assign_f(s8,-par.shift[i-1],res[i]);
@@ -277,19 +276,18 @@ int main(int argc,char *argv[])
 
    printf("Testing MINRES \n");
 
-   MINRESpar2.spinorlen=VOLUME;
    MINRESpar2.err2=1.e-8;
    MINRESpar2.max_iter=0;
    
    cgiters=MINRES(&MINRESpar2, &H, s1, res[0],0);
-   for(i=1;i<MINRESpar.n;++i){
+   for(i=1;i<par.n;++i){
      hmass=0.1-par.shift[i-1];
      cgiters+=MINRES(&MINRESpar2, &H, s1, res[i],res[i-1]);
    }
    printf("Converged in %d iterations\n",cgiters);
 
    hmass=0.1;
-   for(i=0;i<MINRESpar.n;++i){
+   for(i=0;i<par.n;++i){
      if(i!=0)
        hmass=0.1-par.shift[i-1];
      H(s8,res[i]);
@@ -302,16 +300,18 @@ int main(int argc,char *argv[])
 
    printf("Testing g5QMR multishift\n");
 
+	 /*
    QMRpar.spinorlen=VOLUME;
    QMRpar.n = 6;
    QMRpar.shift=par.shift;
    QMRpar.err2=1.e-7;
    QMRpar.max_iter=0;
-   
-   cgiters=g5QMR_mshift(&QMRpar, &D, s1, resd);
+   */
+
+   cgiters=g5QMR_mshift(&par, &D, s1, resd);
    printf("Converged in %d iterations\n",cgiters);
 
-   for(i=0;i<QMRpar.n;++i){
+   for(i=0;i<par.n;++i){
      assign_sd2s(VOLUME,res[i],resd[i]);
       D(s8,res[i]);
       assign_s2sd(VOLUME,s9,s8);
@@ -329,16 +329,16 @@ int main(int argc,char *argv[])
 
    printf("Testing BiCGstab multishift\n");
 
-   BiCGpar.spinorlen=VOLUME;
+	 /*
    BiCGpar.n = 3;
    BiCGpar.shift=par.shift;
    BiCGpar.err2=1.e-8;
    BiCGpar.max_iter=0;
-   
-   cgiters=HBiCGstab_mshift(&BiCGpar, &M,s1, res);
+   */
+   cgiters=HBiCGstab_mshift(&par, &M,s1, res);
    printf("Converged in %d iterations\n",cgiters);
 
-   for(i=0;i<BiCGpar.n;++i){
+   for(i=0;i<par.n;++i){
       M(s8,res[i]);
       if(i!=0)
 	spinor_field_mul_add_assign_f(s8,-par.shift[i-1],res[i]);

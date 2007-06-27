@@ -7,7 +7,6 @@
 #include "representation.h"
 
 extern rhmc_par _update_par;
-extern unsigned int n_pf;
 
 /*
  * compute the local action at every site for the HMC
@@ -35,7 +34,7 @@ void local_hmc_action(local_action_type type,
 		a -= (_update_par.beta/((double)NG))*local_plaq(i);
 
 		/* Fermions */
-		for (j=0;j<n_pf;++j)
+		for (j=0;j<_update_par.n_pf;++j)
 			a += _spinor_prod_re_f(phi1[j][i],phi2[j][i]);
 
 		switch(type) {

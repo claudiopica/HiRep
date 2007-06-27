@@ -56,7 +56,7 @@ int main(int argc,char *argv[])
    suNf_spinor **res;
    suNf_spinor_dble **resd;
 
-   cg_mshift_par par;
+   mshift_par par;
 
    int cgiters;
 

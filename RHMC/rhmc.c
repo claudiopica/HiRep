@@ -62,6 +62,7 @@ int main(int argc,char *argv[])
 {
    int i,acc;
    rhmc_par rpar;
+	 int_par t_par;
    
    /* read_cmdline(argc, argv); */
 
@@ -98,7 +99,7 @@ int main(int argc,char *argv[])
    } */
 
    geometry_eo_lexi();
-   /*geometry_blocked();*/
+   /* geometry_blocked(); */
    test_geometry();
    u_gauge=alloc_gfield();
 #ifndef REPR_FUNDAMENTAL
@@ -114,12 +115,24 @@ int main(int argc,char *argv[])
    project_gauge_field();
    represent_gauge_field();
 
-   rpar.tlen = 5.;
-   rpar.nsteps = 30;
    rpar.beta = 5.6;
-   rpar.mass = -0.2;
-   rpar.nf = 1;
+   rpar.mass = -1.4;
+   rpar.nf = 2;
+	 rpar.MT_prec = 1.e-10;
+	 rpar.MD_prec = 1.e-6;
+	 rpar.HB_prec = 1.e-10;
+	 rpar.force_prec = 1.e-10;
+	 rpar.n_pf = 2;
+	 rpar.integrator=&O2MN_multistep;
+	 rpar.MD_par=&t_par;
+	 rpar.mshift_solver=&cg_mshift;
 
+	 t_par.tlen = 5.;
+	 t_par.nsteps = 30;
+	 t_par.gsteps = 3;
+
+
+	 /*
    printf("Thermalizing with CM.\n");
    for(i=0;i<50;i++) {
      update(rpar.beta,1,10);
@@ -132,8 +145,11 @@ int main(int argc,char *argv[])
    }
    represent_gauge_field();
    printf("Thermalization done.\n");
-
-   /* read_gauge_field_single("therm_conf_5.6"); */
+   */
+	 /*
+   read_gauge_field_single("therm_conf");
+	 represent_gauge_field();
+	 */
    test_staples();
 
 	 printf("Initializing RHMC...\n");
@@ -141,7 +157,7 @@ int main(int argc,char *argv[])
 	 printf("Initializing RHMC... done.\n");
 
    acc=0;
-	 for(i=0;i<1000;i++) {
+	 for(i=0;i<200;i++) {
 		 float perc=(acc==0)?0.:(float)(100*acc)/(float)i;
 		 printf("[Trajectory #%d: %d/%d (%3.4f%%)]\n",i,acc,i,perc);
      printf("[Plaq: %1.8e]\n",avr_plaquette());fflush(stdout);
@@ -151,6 +167,7 @@ int main(int argc,char *argv[])
        write_gauge_field_single("therm_conf_5.6"); 
 */  
    }
+   write_gauge_field_single("therm_conf"); 
 
 
 

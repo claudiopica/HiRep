@@ -224,7 +224,7 @@ void r_app_set(rational_app *app, double min, double max) {
  * This implementation uses CG_mshift => Q must be hertian positive definite!
  */
 void rational_func(rational_app *coef, spinor_operator Q, suNf_spinor *out, suNf_spinor *in) {
-   static cg_mshift_par cg_par;
+   static mshift_par cg_par;
    suNf_spinor **cg_out;
    int i;
 
@@ -237,8 +237,8 @@ void rational_func(rational_app *coef, spinor_operator Q, suNf_spinor *out, suNf
    /* set up cg parameters */
    cg_par.n = coef->order;
    cg_par.shift = coef->b;
-   cg_par.err2=coef->rel_error*0.1;    /* CAMBIARE: METTERE PARAMETRI COMUNI ALL'UPDATE */
-   cg_par.max_iter=1000;
+   cg_par.err2=coef->rel_error/coef->order;    /* CAMBIARE: METTERE PARAMETRI COMUNI ALL'UPDATE */
+   cg_par.max_iter=0; /* no limit */
    
    /* compute inverse vectors */
    cg_mshift(&cg_par, Q, in, cg_out);

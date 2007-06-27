@@ -14,7 +14,7 @@
  * out[i] = (M-(par->shift[i]))^-1 in
  * returns the number of cg iterations done.
  */
-int HBiCGstab_mshift(BiCGstab_mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor **out){
+int HBiCGstab_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor **out){
 
   suNf_spinor **s;
   suNf_spinor *r, *r1, *o, *Ms, *Mo, *o0;
@@ -28,6 +28,7 @@ int HBiCGstab_mshift(BiCGstab_mshift_par *par, spinor_operator M, suNf_spinor *i
   int cgiter;
   char *sflags;
   unsigned short notconverged;
+	unsigned int spinorlen;
    
   /* fare qualche check sugli input */
   /* par->n deve essere almeno 2! */
@@ -43,17 +44,18 @@ int HBiCGstab_mshift(BiCGstab_mshift_par *par, spinor_operator M, suNf_spinor *i
   /* implementation note: to minimize the number of malloc calls
    * objects of the same type are allocated together
    */
+	get_spinor_len(&spinorlen);
   s = (suNf_spinor **)malloc(sizeof(suNf_spinor*)*(par->n));
-  s[0] = (suNf_spinor *)malloc(sizeof(suNf_spinor)*((par->n)+6)*(par->spinorlen));
+  s[0] = (suNf_spinor *)malloc(sizeof(suNf_spinor)*((par->n)+6)*(spinorlen));
   for (i=1; i<(par->n); ++i) {
-    s[i] = s[i-i]+(par->spinorlen);
+    s[i] = s[i-i]+(spinorlen);
   }
-  r = s[par->n-1]+(par->spinorlen);
-  r1 = r+(par->spinorlen);
-  o = r1+(par->spinorlen);
-  Ms = o+(par->spinorlen);
-  Mo = Ms+(par->spinorlen);
-  o0 = Mo+(par->spinorlen);
+  r = s[par->n-1]+(spinorlen);
+  r1 = r+(spinorlen);
+  o = r1+(spinorlen);
+  Ms = o+(spinorlen);
+  Mo = Ms+(spinorlen);
+  o0 = Mo+(spinorlen);
 
   z1 = (double *)malloc(sizeof(double)*7*(par->n));
   z2 = z1+(par->n);

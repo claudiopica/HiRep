@@ -14,21 +14,20 @@
 extern rhmc_par _update_par;
 extern suNf_spinor **pf;
 extern rational_app r_MD; /* used in the action MD evolution */
-extern unsigned int n_pf;
 
 #define _print_avect(a) printf("(%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e)\n",(a).c1,(a).c2,(a).c3,(a).c4,(a).c5,(a).c6,(a).c7,(a).c8)
 
 #define _print_mat(a) printf("(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n",(a).c1_1.re,(a).c1_2.re,(a).c1_3.re,(a).c2_1.re,(a).c2_2.re,(a).c2_3.re,(a).c3_1.re,(a).c3_2.re,(a).c3_3.re);printf("(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n",(a).c1_1.im,(a).c1_2.im,(a).c1_3.im,(a).c2_1.im,(a).c2_2.im,(a).c2_3.im,(a).c3_1.im,(a).c3_2.im,(a).c3_3.im)
 
 /* we need to compute  Tr  U(x,mu) g_5*(1-g_mu) chi2 # chi1^+
- * where # denotes the tensor product and Tr is the trace on Lorentz space
+ * where # denotes the tensor product and Tr is the trace on Lorentz space.
  * the strategy is the following:
  * given the form of g_5(1-g_mu) one can compute only the first two lorentz
  * components of the spinor; so we first apply g_5(1-g_mu) to chi2 to find the first
  * two components; then we multiply these two vectors by U(x,mu) and
  * store the result in p.c1, p.c2; when computing the trace we can factorize p.c1 and p.c2
  * as they both multiply two components of chi1^+; we store these factors in p.c3 and p.c4.
- * the tensor product is perform by the macro 
+ * the tensor product is performed by the macro 
  * _suNf_FMAT(u,p): u = p.c1 # p.c3^+ + p.c2 # p.c4^+
  */
 
@@ -77,7 +76,7 @@ void Force_rhmc_f(float dt, suNg_algebra_vector *force){
 	static suNf_vector ptmp;
 	static suNf_spinor p;
 	static suNf s1;
-	static cg_mshift_par cg_par;
+	static mshift_par cg_par;
 	suNf_spinor **chi;
 	suNf_spinor *Hchi;
 
@@ -93,10 +92,10 @@ void Force_rhmc_f(float dt, suNg_algebra_vector *force){
 	/* set up cg parameters */
 	cg_par.n = r_MD.order;
 	cg_par.shift = r_MD.b;
-	cg_par.err2= r_MD.rel_error;
-	cg_par.max_iter=1000;
+	cg_par.err2= _update_par.force_prec; /* this should be high for reversibility */
+	cg_par.max_iter=0; /* no limit */
 
-	for (k=0; k<n_pf; ++k) {
+	for (k=0; k<_update_par.n_pf; ++k) {
 		/* compute inverse vectors chi[i] = (H^2 - b[i])^1 * pf */
 		cg_mshift(&cg_par, &H2, pf[k], chi);
 

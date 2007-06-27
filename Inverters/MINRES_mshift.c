@@ -15,7 +15,7 @@
  * out[i] = (M-(par->shift[i]))^-1 in
  * returns the number of cg iterations done.
  */
-int MINRES_mshift(MINRES_mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor **out){
+int MINRES_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor **out){
 
   suNf_spinor **q1,**q2;
   suNf_spinor *p1, *p2, *Mp;
@@ -27,6 +27,7 @@ int MINRES_mshift(MINRES_mshift_par *par, spinor_operator M, suNf_spinor *in, su
   int i;
   int cgiter;
   unsigned int notconverged;
+	unsigned int spinorlen;
 
   unsigned short *flags;
    
@@ -45,18 +46,19 @@ int MINRES_mshift(MINRES_mshift_par *par, spinor_operator M, suNf_spinor *in, su
   /* implementation note: to minimize the number of malloc calls
    * objects of the same type are allocated together
    */
+	get_spinor_len(&spinorlen);
   q1 = (suNf_spinor **)malloc(sizeof(suNf_spinor*)*2*(par->n));
   q2 = q1+(par->n);
-  q1[0] = (suNf_spinor *)malloc(sizeof(suNf_spinor)*(2*(par->n)+3)*(par->spinorlen));
-  q2[0] = q1[0]+(par->n)*(par->spinorlen);
+  q1[0] = (suNf_spinor *)malloc(sizeof(suNf_spinor)*(2*(par->n)+3)*(spinorlen));
+  q2[0] = q1[0]+(par->n)*(spinorlen);
   memall=q1[0];
   for (i=1; i<(par->n); ++i) {
-    q1[i] = q1[i-1]+(par->spinorlen);
-    q2[i] = q2[i-1]+(par->spinorlen);
+    q1[i] = q1[i-1]+(spinorlen);
+    q2[i] = q2[i-1]+(spinorlen);
   }
-  p1 = q2[par->n-1]+(par->spinorlen);
-  p2 = p1+(par->spinorlen);
-  Mp = p2+(par->spinorlen);
+  p1 = q2[par->n-1]+(spinorlen);
+  p2 = p1+(spinorlen);
+  Mp = p2+(spinorlen);
 
   r = (double *)malloc(sizeof(double)*8*(par->n));
   s1 = r+(par->n);

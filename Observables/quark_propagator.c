@@ -33,7 +33,7 @@ static void D_pre(suNf_spinor *out, suNf_spinor *in){
  * out is a vector of 4*NF spinor fields
  */
 void quark_propagator_QMR(unsigned int source, int nm, float *mass, suNf_spinor_dble **out) {
-  static QMR_mshift_par QMR_par;
+  mshift_par QMR_par;
   int i;
   double *shift;
   suNf_spinor *in;
@@ -51,7 +51,6 @@ void quark_propagator_QMR(unsigned int source, int nm, float *mass, suNf_spinor_
   hmass=4.+mass[0];
   hmass*=hmass;
 
-  QMR_par.spinorlen=VOLUME/2;
   QMR_par.n = nm;
   for(i=0;i<nm-1;++i){
     shift[i]=hmass-(4.+mass[i+1])*(4.+mass[i+1]);

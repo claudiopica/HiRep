@@ -27,6 +27,7 @@ int MINRES(MINRES_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor *out
 
   int cgiter;
   unsigned short notconverged;
+	unsigned int spinorlen;
 
   /* fare qualche check sugli input */
   /* par->n deve essere almeno 1! */
@@ -42,12 +43,13 @@ int MINRES(MINRES_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor *out
   /* implementation note: to minimize the number of malloc calls
    * objects of the same type are allocated together
    */
-  memall = (suNf_spinor *)malloc(sizeof(suNf_spinor)*(5)*(par->spinorlen));
+	get_spinor_len(&spinorlen);
+  memall = (suNf_spinor *)malloc(sizeof(suNf_spinor)*(5)*(spinorlen));
   q1=memall;
-  q2= q1+(par->spinorlen);
-  p1 = q2+(par->spinorlen);
-  p2 = p1+(par->spinorlen);
-  Mp = p2+(par->spinorlen);
+  q2= q1+(spinorlen);
+  p1 = q2+(spinorlen);
+  p2 = p1+(spinorlen);
+  Mp = p2+(spinorlen);
 
   /* init recursion */
   cgiter = 0;

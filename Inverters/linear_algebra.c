@@ -16,6 +16,10 @@ void set_spinor_len(unsigned int len) {
   _spinor_len=len;
 }
 
+void get_spinor_len(unsigned int *len) {
+  *len=_spinor_len;
+}
+
 /* single precision */
 #define _SPINOR_TYPE suNf_spinor
 #define _FUNC(a) a##_f

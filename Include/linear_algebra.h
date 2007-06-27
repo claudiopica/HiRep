@@ -11,6 +11,7 @@
 #include "suN.h"
 
 void set_spinor_len(unsigned int len);
+void get_spinor_len(unsigned int *len);
 
 /* single precision */
 #define _SPINOR_TYPE suNf_spinor

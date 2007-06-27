@@ -25,7 +25,7 @@
  * out[i] = (M-(par->shift[i]))^-1 in
  * returns the number of cg iterations done.
  */
-int g5QMR_mshift(QMR_mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor_dble **out){
+int g5QMR_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor_dble **out){
 
   suNf_spinor_dble **q1,**q2;
   suNf_spinor_dble *p1, *p2, *Mp, *sd;
@@ -37,6 +37,7 @@ int g5QMR_mshift(QMR_mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_s
   int i;
   int cgiter;
   unsigned int notconverged;
+	unsigned int spinorlen;
   
   unsigned short *flags;
   
@@ -55,19 +56,20 @@ int g5QMR_mshift(QMR_mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_s
   /* implementation note: to minimize the number of malloc calls
    * objects of the same type are allocated together
    */
+	get_spinor_len(&spinorlen);
   q1 = (suNf_spinor_dble **)malloc(sizeof(suNf_spinor_dble*)*2*(par->n));
   q2 = q1+(par->n);
-  q1[0] = (suNf_spinor_dble *)malloc(sizeof(suNf_spinor_dble)*(2*(par->n)+4)*(par->spinorlen));
-  q2[0] = q1[0]+(par->n)*(par->spinorlen);
+  q1[0] = (suNf_spinor_dble *)malloc(sizeof(suNf_spinor_dble)*(2*(par->n)+4)*(spinorlen));
+  q2[0] = q1[0]+(par->n)*(spinorlen);
   memall=q1[0];
   for (i=1; i<(par->n); ++i) {
-    q1[i] = q1[i-1]+(par->spinorlen);
-    q2[i] = q2[i-1]+(par->spinorlen);
+    q1[i] = q1[i-1]+(spinorlen);
+    q2[i] = q2[i-1]+(spinorlen);
   }
-  p1 = q2[par->n-1]+(par->spinorlen);
-  p2 = p1+(par->spinorlen);
-  Mp = p2+(par->spinorlen);
-  sd = Mp+(par->spinorlen);
+  p1 = q2[par->n-1]+(spinorlen);
+  p2 = p1+(spinorlen);
+  Mp = p2+(spinorlen);
+  sd = Mp+(spinorlen);
 
   r = (double *)malloc(sizeof(double)*5*(par->n));
   s1 = r+(par->n);
@@ -82,7 +84,7 @@ int g5QMR_mshift(QMR_mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_s
   notconverged=par->n;
 
   /* spinor_field_copy_dble_f(p2, in); */
-  assign_s2sd(par->spinorlen,p2, in); /* trial solution = 0 */
+  assign_s2sd(spinorlen,p2, in); /* trial solution = 0 */
   rho=sqrt(spinor_field_sqnorm_dble_f(p2));
   innorm2=rho*rho;
   spinor_field_mul_dble_f(p2,1./rho,p2);
@@ -104,9 +106,9 @@ int g5QMR_mshift(QMR_mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_s
   do {
     ++cgiter;
     
-    assign_sd2s(par->spinorlen,(suNf_spinor*)sd,p2);
+    assign_sd2s(spinorlen,(suNf_spinor*)sd,p2);
     M((suNf_spinor*)Mp,(suNf_spinor*)sd);
-    assign_s2sd(par->spinorlen,Mp,(suNf_spinor*)Mp);
+    assign_s2sd(spinorlen,Mp,(suNf_spinor*)Mp);
 
     /* compute alpha */
     alpha = spinor_field_g5_prod_re_dble_f(p2,Mp)/delta;

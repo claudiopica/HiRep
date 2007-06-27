@@ -2,7 +2,6 @@
 #include "linear_algebra.h"
 #include "suN.h"
 #include "observables.h"
-#include "inverters.h"
 #include <malloc.h>
 
 

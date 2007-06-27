@@ -6,19 +6,11 @@
 #include "global.h"
 
 /*
-typedef struct _cg_mshift_par {
-   int n;
-   float *shift;
-   float err2; 
-   int max_iter;
-} cg_mshift_par;
-*/
-/*
  * performs the multi-shifted CG inversion:
  * out[i] = (M-(par->shift[i]))^-1 in
  * returns the number of cg iterations done.
  */
-int cg_mshift(cg_mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor **out){
+int cg_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor **out){
 
    suNf_spinor *k,*r,*Mk;
    suNf_spinor **p;
@@ -31,6 +23,7 @@ int cg_mshift(cg_mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spino
    int cgiter;
    char *sflags;
    unsigned short notconverged;
+	 unsigned int spinorlen;
    
    /* fare qualche check sugli input */
    /*
@@ -42,14 +35,15 @@ int cg_mshift(cg_mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spino
    */
    
    /* allocate spinors fields and aux real variables */
+	 get_spinor_len(&spinorlen);
    p = (suNf_spinor **)malloc(sizeof(suNf_spinor*)*(par->n));
-   p[0] = (suNf_spinor *)malloc(sizeof(suNf_spinor)*(3+par->n)*VOLUME);
+   p[0] = (suNf_spinor *)malloc(sizeof(suNf_spinor)*(3+par->n)*spinorlen);
    for (i=1; i<(par->n); ++i) {
-      p[i] = p[i-1]+VOLUME;
+      p[i] = p[i-1]+spinorlen;
    }
-   k=p[par->n-1]+VOLUME;
-   r=k+VOLUME;
-   Mk=r+VOLUME;
+   k=p[par->n-1]+spinorlen;
+   r=k+spinorlen;
+   Mk=r+spinorlen;
 
    z1 = (double *)malloc(sizeof(double)*(par->n));
    z2 = (double *)malloc(sizeof(double)*(par->n));

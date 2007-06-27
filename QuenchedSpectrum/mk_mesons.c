@@ -128,9 +128,9 @@ int main(int argc,char *argv[])
         g5_correlator(tmpcorr, quark_prop[k]); /* misura pi */
         add_corr(corr[0][k],tmpcorr);
         
-        printf("[%d] mass=%2.4f pi_corr= ",i,m[n]);
-        for(k=0;k<T;++k) {
-          printf("%e ",tmpcorr[k]);
+        printf("[%d] mass=%2.4f pi_corr= ",i,m[k]);
+        for(n=0;n<T;++n) {
+          printf("%e ",tmpcorr[n]);
         }
         printf("\n");
         fflush(stdout);

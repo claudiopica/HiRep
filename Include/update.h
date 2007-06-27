@@ -2,6 +2,7 @@
 #define UPDATE_H
 
 #include "suN.h"
+#include "inverters.h"
 
 void staples(int ix,int mu,suNg *v);
 void test_staples();
@@ -12,25 +13,37 @@ void project_gauge_field(void);
 void update(float beta,int nhb,int nor);
 void random_su2(float rho,float s[]);
 
+
+void Force0(float dt, suNg_algebra_vector *force);
+void Force(float dt, suNg_algebra_vector *force);
+
+typedef struct {
+	float tlen; /* trajectory lenght */
+	unsigned int nsteps; /* number of step in the integration */
+	unsigned int gsteps; /* number of substeps for the gauge part every step */
+} int_par;
+
+void leapfrog(suNg_algebra_vector *momenta, int_par *traj_par);
+void O2MN_multistep(suNg_algebra_vector *momenta, int_par *traj_par);
+
+void gaussian_momenta(suNg_algebra_vector *momenta);
+void gaussian_spinor_field(suNf_spinor *s);
+
 typedef struct {
   /* sim parameters */
   float beta;
   int nf;
   float mass;
-  /* MD parametes */
-  float tlen;
-  int nsteps;
+	
+	double MT_prec; /* metropolis test precision */
+	double MD_prec; /* molecular dynamics precision */
+	double HB_prec; /* heatbath precision for pseudofermions */
+	double force_prec; /* precision used in the inversions in the force */
+	unsigned int n_pf; /* number of psudofermions used in the evolution */
+	void (*integrator)(suNg_algebra_vector *, int_par *); /* integrator used in MD */
+	int_par *MD_par;
+	int (*mshift_solver)(mshift_par *, spinor_operator, suNf_spinor *, suNf_spinor **);
 } rhmc_par;
-
-void Force0(float dt, suNg_algebra_vector *force);
-void Force(float dt, suNg_algebra_vector *force);
-
-void leapfrog(suNg_algebra_vector *momenta, float tlen, unsigned int nsteps);
-void O2MN_multistep(suNg_algebra_vector *momenta, float tlen, unsigned int nsteps, unsigned int gsteps);
-
-void gaussian_momenta(suNg_algebra_vector *momenta);
-void gaussian_spinor_field(suNf_spinor *s);
-
 void init_rhmc(rhmc_par *par);
 void free_rhmc();
 int update_rhmc();

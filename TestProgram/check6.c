@@ -56,8 +56,8 @@ int main(int argc,char *argv[])
    suNf_spinor **res;
    suNf_spinor_dble **resd;
 
-   cg_mshift_par par;
-   MINRES_mshift_par MINRESpar;
+   mshift_par par;
+   mshift_par MINRESpar;
    MINRES_par MINRESpar2;
 
    int cgiters;
@@ -120,7 +120,6 @@ int main(int argc,char *argv[])
    printf("Testing MINRES multishift\n");
    printf("-------------------------\n");
 
-   MINRESpar.spinorlen=VOLUME;
    MINRESpar.n = 6;
    MINRESpar.shift=par.shift;
    MINRESpar.err2=1.e-8;
@@ -144,7 +143,6 @@ int main(int argc,char *argv[])
    printf("Testing MINRES \n");
    printf("-------------- \n");
 
-   MINRESpar2.spinorlen=VOLUME;
    MINRESpar2.err2=1.e-8;
    MINRESpar2.max_iter=0;
    

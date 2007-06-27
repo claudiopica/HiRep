@@ -57,8 +57,8 @@ int main(int argc,char *argv[])
    suNf_spinor_dble s3[VOLUME],s4[VOLUME];
    suNf_spinor_dble **resd;
 
-   cg_mshift_par par;
-   QMR_mshift_par QMRpar;
+   mshift_par par;
+   mshift_par QMRpar;
 
    int cgiters;
 
@@ -120,7 +120,6 @@ int main(int argc,char *argv[])
    printf("Testing g5QMR multishift\n");
    printf("------------------------\n");
 
-   QMRpar.spinorlen=VOLUME;
    QMRpar.n = 6;
    QMRpar.shift=par.shift;
    QMRpar.err2=1.e-7;
