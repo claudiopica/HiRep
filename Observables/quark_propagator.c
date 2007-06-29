@@ -99,7 +99,6 @@ void quark_propagator(unsigned int source, int nm, float *mass, suNf_spinor **ou
 
   hmass=mass[0];
 
-  MINRESpar.spinorlen=VOLUME;
   MINRESpar.err2 = 1.e-10;
   MINRESpar.max_iter = 0;
 
