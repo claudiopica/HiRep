@@ -46,118 +46,118 @@ void print_usage(int argc,char *argv[]){
   printf("Usage: %s prop_file\n",argv[0]);
 }
 
+#define CORR(name) \
+				name(tmpcorr, quark_prop);\
+				printf("[%d] mass=%2.6f " #name "= ",i,m[k]);\
+				for(n=0;n<T;++n) {\
+					printf("%e ",tmpcorr[n]);\
+				}\
+				printf("\n");\
+				fflush(stdout)
+
 int main(int argc,char *argv[])
 {
-  int i,k,n;
+	int i,k,n;
 
-  const int ncorrs = 1;
-  
-  suNf_spinor ***quark_prop;
-  double **corr[ncorrs];
-  FILE *propfile;
+	suNf_spinor **quark_prop;
+	FILE *propfile;
+	long int start;
+	long int propsize;
+	long int cur_pos;
 
-  float *m;
-  int nm;
+	float *m;
+	int nm;
 
-  if(argc!=2) {
-    print_usage(argc,argv);
-    return 0;
-  }
+	if(argc!=2) {
+		print_usage(argc,argv);
+		return 0;
+	}
 
-  printf("Gauge group: SU(%d)\n",NG);
-  printf("Fermion representation: dim = %d\n",NF);
-  printf("The lattice size is %dx%d^3\n",T,L);
+	printf("Gauge group: SU(%d)\n",NG);
+	printf("Fermion representation: dim = %d\n",NF);
+	printf("The lattice size is %dx%d^3\n",T,L);
 
-  printf("Computing Mesons corr functions\nfrom file: [%s]\n",argv[1]);
+	printf("Computing Mesons corr functions\nfrom file: [%s]\n",argv[1]);
 
-  error((propfile = fopen(argv[1], "rb"))==NULL,1,"Main",
-  "Failed to open propagator file for reading");
-  fread(&nm,(size_t) sizeof(int),1,propfile);
-  m=(float*)malloc(sizeof(float)*nm);
-  for(i=0;i<nm;++i)
-  fread(m+i,(size_t) sizeof(float),1,propfile);
+	error((propfile = fopen(argv[1], "rb"))==NULL,1,"Main",
+			"Failed to open propagator file for reading");
+	fread(&nm,(size_t) sizeof(int),1,propfile);
+	m=(float*)malloc(sizeof(float)*nm);
+	for(i=0;i<nm;++i)
+		fread(m+i,(size_t) sizeof(float),1,propfile);
 
-  printf("Found %d masses: ",nm);
-  for(i=0;i<nm;++i)
-  printf("%e ",m[i]);
-  printf("\n\n");
+	printf("Found %d masses: ",nm);
+	for(i=0;i<nm;++i)
+		printf("%e ",m[i]);
+	printf("\n\n");
 
-  fflush(stdout);
+	fflush(stdout);
 
-  /*
-  rlxs_init(level,seed);
-  */
+	/*
+		 rlxs_init(level,seed);
+		 */
 
-  geometry_eo_lexi();
-  /*geometry_blocked();*/
-  test_geometry();
+	geometry_eo_lexi();
+	/*geometry_blocked();*/
+	test_geometry();
 
-  /* setup for quark propagators measures */
-  quark_prop=(suNf_spinor***)malloc(sizeof(suNf_spinor**)*nm);
-  for (k=0;k<nm;++k){
-    quark_prop[k]=(suNf_spinor**)malloc(sizeof(suNf_spinor*)*4*NF);
-    for (n=0;n<4*NF;++n)
-      quark_prop[k][n]=(suNf_spinor*)malloc(sizeof(suNf_spinor)*VOLUME);
-  }
-  
-  for (k=0;k<ncorrs;++k){
-    corr[k]=(double**)malloc(sizeof(double*)*nm);
-    for (n=0;n<nm;++n){
-      corr[k][n]=(double*)malloc(sizeof(double)*T);
-      zero_corr(corr[k][n]);
-    }
-  }
+	/* setup for quark propagators measures */
+	quark_prop=(suNf_spinor**)malloc(sizeof(suNf_spinor*)*4*NF);
+	for (n=0;n<4*NF;++n)
+		quark_prop[n]=(suNf_spinor*)malloc(sizeof(suNf_spinor)*VOLUME);
+
+	propsize=sizeof(suNf_spinor)*VOLUME;
+	start=ftell(propfile);
+
+	i=0;
+	/* Misure */
+	do {
+
+		float tmpcorr[T];
+
+		for (k=0;k<nm;++k){
+			/* read propagator for 1 mass from file */
+			for (n=0;n<4*NF;++n){
+				cur_pos=start+n*nm*propsize;
+				error(fseek(propfile,cur_pos,SEEK_SET)!=0,1,"Main","Fseek failed!");
+				error((fread(quark_prop[n],(size_t) sizeof(suNf_spinor),
+								(size_t)(VOLUME),propfile)!=(VOLUME))&&(!feof(propfile)),
+						1,"Main", "Failed to read form quark propagator!");
+			}
+			if (!feof(propfile)){
+				CORR(id_correlator);
+				CORR(g0_correlator);
+				CORR(g5_correlator);
+				CORR(g0g5_correlator);
+				CORR(g1_correlator);
+				CORR(g2_correlator);
+				CORR(g3_correlator);
+				CORR(g0g1_correlator);
+				CORR(g0g2_correlator);
+				CORR(g0g3_correlator);
+				CORR(g5g1_correlator);
+				CORR(g5g2_correlator);
+				CORR(g5g3_correlator);
+				CORR(g0g5g1_correlator);
+				CORR(g0g5g2_correlator);
+				CORR(g0g5g3_correlator);
+			}
+			start+=propsize;
+		}
+
+		start+=(nm)*(4*NF-1)*propsize;
+		++i;
+
+	} while(!feof(propfile));
+
+	fclose(propfile);
 
 
-  i=0;
-  /* Misure */
-  do {
-  
-    float tmpcorr[T];
-    
-    for (n=0;n<4*NF;++n){
-      for (k=0;k<nm;++k){
-        error((fread(quark_prop[k][n],(size_t) sizeof(suNf_spinor),
-            (size_t)(VOLUME),propfile)!=(VOLUME))&&(!feof(propfile)),
-            1,"Main", "Failed to read form quark propagator!");
-      }
-    }
-    
-    for (k=0;k<nm;++k){
-      if (!feof(propfile)){
-        g5_correlator(tmpcorr, quark_prop[k]); /* misura pi */
-        add_corr(corr[0][k],tmpcorr);
-        
-        printf("[%d] mass=%2.4f pi_corr= ",i,m[k]);
-        for(n=0;n<T;++n) {
-          printf("%e ",tmpcorr[n]);
-        }
-        printf("\n");
-        fflush(stdout);
-      }
-    }
-   
-    ++i;
-    
-  } while(!feof(propfile));
+	for (n=0;n<4*NF;++n)
+		free(quark_prop[n]);
+	free(quark_prop);
 
-  fclose(propfile);
+	free(m);
 
-
-  for (k=0;k<nm;++k){
-    for (n=0;n<4*NF;++n)
-      free(quark_prop[k][n]);
-    free(quark_prop[k]);
-  }
-  free(quark_prop);
-  
-  for (k=0;k<ncorrs;++k){
-    for (n=0;n<nm;++n)
-      free(corr[k][n]);
-    free(corr[k]);
-  }
-
-  free(m);
-
-  return 0;
+	return 0;
 }

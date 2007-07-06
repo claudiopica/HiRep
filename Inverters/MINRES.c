@@ -137,7 +137,6 @@ int MINRES(MINRES_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor *out
   } while ((par->max_iter==0 || cgiter<par->max_iter) && notconverged);
 
   /* test results */
-#ifndef NDEBUG
   {
     float norm;
     M(Mp,out);
@@ -146,6 +145,7 @@ int MINRES(MINRES_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor *out
     if (fabs(norm)>par->err2)
       printf("MINRES Failed: err2 = %e\n",norm);
   }
+#ifndef NDEBUG
   printf("MINRES: %d matrix multiplications\n",cgiter);
 #endif
   

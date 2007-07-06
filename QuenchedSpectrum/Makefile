@@ -2,7 +2,7 @@ TOPDIR = ..
 
 SRCS = qspectrum.c
 
-default: qspectrum
+default: qspectrum mk_mesons
 
 MKDIR=$(TOPDIR)/Make
 include $(MKDIR)/MkRules
