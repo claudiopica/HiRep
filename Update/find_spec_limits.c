@@ -13,43 +13,43 @@
 /* find a lower bound for the minimal eigenvalue of H(-1); */
 /*
 static void min_bound_H2(double *min) {
-  int ix,iy,iz,mu,nu;
-  suNg *v1,*v2,*v3,*v4,w1,w2,w3;
-  double eps;
-  const double c=(2.+sqrt(2.));
+	int ix,iy,iz,mu,nu;
+	suNg *v1,*v2,*v3,*v4,w1,w2,w3;
+	double eps,max;
+	const double c=(2.+sqrt(2.));
 
-  *min = 0.;
-  for (mu=1;mu<4;++mu) {
-    for (nu=0;nu<mu;++nu) {
-      eps=0.;
-      for (ix=0; ix<VOLUME; ++ix) {
-	iy=iup[ix][mu];
-	iz=iup[ix][nu];
-	  
-	v1=pu_gauge(ix,mu);
-	v2=pu_gauge(iy,nu);
-	v3=pu_gauge(iz,mu);
-	v4=pu_gauge(ix,nu);
-	  
-	_suNg_times_suNg(w1,(*v1),(*v2));
-	_suNg_times_suNg(w2,(*v4),(*v3));
-	_suNg_times_suNg_dagger(w3,w1,w2);
-	  
-	eps+=_suNg_sqnorm_m1(w3);
-  
-      }
-      *min+=sqrt(eps);
-    }
-  }
+	*min = 0.;
+	for (mu=1;mu<4;++mu) {
+		for (nu=0;nu<mu;++nu) {
+			max=0.;
+			for (ix=0; ix<VOLUME; ++ix) {
+				iy=iup[ix][mu];
+				iz=iup[ix][nu];
 
-  *min=1.-c*(*min);
-  if ((*min)<0.) *min=0.;
-  
+				v1=pu_gauge(ix,mu);
+				v2=pu_gauge(iy,nu);
+				v3=pu_gauge(iz,mu);
+				v4=pu_gauge(ix,nu);
+
+				_suNg_times_suNg(w1,(*v1),(*v2));
+				_suNg_times_suNg(w2,(*v4),(*v3));
+				_suNg_times_suNg_dagger(w3,w1,w2);
+
+				eps=sqrt(_suNg_sqnorm_m1(w3));
+				if(max<eps) max=eps;
+			}
+			*min+=max;
+		}
+	}
+
+	*min=1.-c*(*min);
+	if ((*min)<0.) *min=0.;
+
 }
 */
 
 /* use power method to find min eigvalue */
-void max_H2(double *max, double mass) {
+int max_H2(double *max, double mass) {
   double norm, oldmax, dt;
   int count;
   suNf_spinor *s1,*s2,*s3;
@@ -68,7 +68,7 @@ void max_H2(double *max, double mass) {
   g5Dphi(mass,s2,s1);
   g5Dphi(mass,s3,s2);
 
-  count=0;
+  count=1;
   do {
     /* multiply vector by H2 */
     ++count;
@@ -105,9 +105,10 @@ void max_H2(double *max, double mass) {
 
   free(s1);
   
+	return count;
 }
 
-void min_H2(double *min, double max, double mass) {
+int min_H2(double *min, double max, double mass) {
   double norm, oldmin;
   int count;
   suNf_spinor *s1,*s2,*s3;
@@ -128,7 +129,7 @@ void min_H2(double *min, double max, double mass) {
   g5Dphi(mass,s2,s1);
   g5Dphi(mass,s3,s2);
     
-  count=0;
+  count=1;
   do {
     /* multiply vector by max-H2 */
     ++count;
@@ -153,8 +154,9 @@ void min_H2(double *min, double max, double mass) {
 
   printf("[H2 Min_eig = %1.8e][H2 Min_count = %d]\n",*min,count); 
 
-  free(s1);
-  
+  free(s1);  
+
+	return count;
 }
 
 void new_min_H2(double *min, double mass) {
@@ -292,41 +294,43 @@ void test_min_H2(double *max, double mass) {
   
 }
 
-void find_spec_H2(double *max, double *min, double mass) {
-  /* trivial case mass>0 */
-	/*
-  if(mass>0.) {
-    *min=mass*mass;
-    return;
-  }
-	*/
-  /* Always use this for now */
-  /* negative masses */
-  /* if(mass<-2.) { */
-    max_H2(max, mass);
-    min_H2(min, *max, mass);
-    return;
-  /* } */
-  /* case: -2<mass<0 */
-  /* first try Neuberger limit hep-lat/9911004 - Phys.Rev.D61:085015,2000. */
-  /*
-  min_bound_H2(min);
-  printf("Min bound: %4.5e\n",*min);
-  *min-=fabs(mass+1.);
-  if (*min>0.) {
-    *min*=*min;
-    return;
-  }
-  */
-  /* if failed use default method */
-  /*
-  printf("Using default Method\n");
-  max_H2(min,mass);
-  min_H2(min,*min,mass);
-  */
-  /* new_min_H2(min,mass); */
-  /* test_min_H2(min,mass); */
 
+static suNf_spinor **ev;
+
+void find_spec_H2(double *max, double *min, double mass) {
+	const int nevt=5;
+	const int nev=1;
+	const int kmax=200;
+	const int maxiter=20;
+	static float *d1;
+	const float omega1=1.e-4; /* absolute precision */
+	const float omega2=1.e-1; /* relative precision */
+	int status,ie;
+	suNf_spinor **ws;
+
+	max_H2(max, mass);
+
+	d1=malloc(sizeof(*d1)*nevt);
+	ev=malloc(sizeof(*ev)*(nevt+2));
+	ev[0]=malloc(sizeof(**ev)*(nevt+2)*VOLUME);
+	for (status=1;status<nevt+2;++status) {
+		ev[status]=ev[status-1]+VOLUME;
+	}
+	ws=ev+nevt;
+
+	min_H2(min, *max, mass);
+
+	ie=eva(VOLUME,nev,nevt,0,kmax,maxiter,1,*max,omega1,omega2,&H2,ws,ev,d1,&status);
+	printf("[EVA] status: %d, ret: %d\n",status, ie);
+
+	*min=d1[0]*(1-omega2)-omega1;
+
+
+	free(d1);
+	free(ev[0]);
+	free(ev);
+
+	return;
 }
 
 

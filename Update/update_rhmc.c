@@ -28,11 +28,10 @@ double minev, maxev; /* min and max eigenvalue of H^2 */
 static double *la=0;
 
 /* this is the basic operator used in the update */
+static suNf_spinor *h2tmp;
 void H2(suNf_spinor *out, suNf_spinor *in){
-  suNf_spinor *tmp=(suNf_spinor*)malloc(sizeof(suNf_spinor)*VOLUME);
-  g5Dphi(_update_par.mass, tmp, in);
-  g5Dphi(_update_par.mass, out, tmp);
-  free(tmp);
+  g5Dphi(_update_par.mass, h2tmp, in);
+  g5Dphi(_update_par.mass, out, h2tmp);
 }
 
 /* this is the basic operator used in the update */
@@ -69,6 +68,9 @@ void init_rhmc(rhmc_par *par){
 	/* allocate space for the backup copy of gfield */
 	u_gauge_old=alloc_gfield();
 	suNg_field_copy(u_gauge_old,u_gauge);
+
+	/* allocate h2tmp for H2 */
+  h2tmp=alloc_spinor_field_f();
 
 	/* allocate momenta */
 	momenta = alloc_momenta();
@@ -120,6 +122,7 @@ void free_rhmc(){
    /* free momenta */
   free_field(u_gauge_old);
   free_field(momenta);
+	free_field(h2tmp);
 	for (i=0;i<_update_par.n_pf;++i)
 		free_field(pf[i]);
 	free(pf);
