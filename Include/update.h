@@ -69,9 +69,9 @@ void local_hmc_action(local_action_type type,
 void suNg_field_copy(suNg *g1, suNg *g2);
 
 /* use power method to find min eigvalue of H2 */
-void max_H2(double *min, double mass);
+int max_H2(double *min, double mass);
 /* use power method to find min eigvalue of H2 */
-void min_H2(double *min, double max, double mass);
+int min_H2(double *min, double max, double mass);
 
 void find_spec_H2(double *max, double *min, double mass);
 

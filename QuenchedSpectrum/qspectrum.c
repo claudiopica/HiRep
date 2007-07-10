@@ -135,7 +135,7 @@ int main(int argc,char *argv[])
 	for (i=0;i<nms;++i){ /* nms misure */
 		printf("[%d] <p> = %1.6f\n",i,avr_plaquette());
 		fflush(stdout);
-		quark_propagator_QMR(propfile,0,nm,m);
+		quark_propagator_QMR_eo(propfile,0,nm,m);
 
 		for (n=0;n<nit;n++) /* nit updates */
 			update(beta,nhb,nor);

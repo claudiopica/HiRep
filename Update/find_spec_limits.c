@@ -318,8 +318,6 @@ void find_spec_H2(double *max, double *min, double mass) {
 	}
 	ws=ev+nevt;
 
-	min_H2(min, *max, mass);
-
 	ie=eva(VOLUME,nev,nevt,0,kmax,maxiter,1,*max,omega1,omega2,&H2,ws,ev,d1,&status);
 	printf("[EVA] status: %d, ret: %d\n",status, ie);
 

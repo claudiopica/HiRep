@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SRCS = archive.c 
+SRCS = archive.c logger.c
 
 MKDIR = $(TOPDIR)/Make
 include $(MKDIR)/MkRules
