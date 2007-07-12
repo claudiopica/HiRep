@@ -18,7 +18,7 @@ void Force0(float dt, suNg_algebra_vector *force);
 void Force(float dt, suNg_algebra_vector *force);
 
 typedef struct {
-	float tlen; /* trajectory lenght */
+	double tlen; /* trajectory lenght */
 	unsigned int nsteps; /* number of step in the integration */
 	unsigned int gsteps; /* number of substeps for the gauge part every step */
 } int_par;
@@ -31,9 +31,9 @@ void gaussian_spinor_field(suNf_spinor *s);
 
 typedef struct {
   /* sim parameters */
-  float beta;
+  double beta;
   int nf;
-  float mass;
+  double mass;
 	
 	double MT_prec; /* metropolis test precision */
 	double MD_prec; /* molecular dynamics precision */
@@ -46,7 +46,16 @@ typedef struct {
 } rhmc_par;
 void init_rhmc(rhmc_par *par);
 void free_rhmc();
+
+/* update the gauge field using RHMC algorithm
+ * return code: (<0 means an error has occurred)
+ * 0 => conf correctly generated but has not passed metropolis test
+ * 1 => conf accepted
+ * 
+ * -1 => rhmc has not been initialized. call init_rhmc first.
+ */
 int update_rhmc();
+
 /* this is the basic operator used in the update */
 void H2(suNf_spinor *out, suNf_spinor *in);
 void Force_rhmc_f(float dt, suNg_algebra_vector *force);

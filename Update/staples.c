@@ -225,6 +225,7 @@ void staples(int ix,int mu,suNg *v)
 }
 
 #include "observables.h"
+#include "logger.h"
 void test_staples()
 {
   int ix,mu;
@@ -233,7 +234,6 @@ void test_staples()
   double ps=0.0, pl=0.;
   int fl;
 
-	printf("Staple test: "); fflush(stdout);
   fl = 0;
   pa = avr_plaquette();
   for (ix=0;ix<VOLUME;++ix){
@@ -249,9 +249,10 @@ void test_staples()
 
   ps /= 4.0*(double)(6*VOLUME*NG);
   pl/=(double)(6*VOLUME*NG);
+	lprintf("TESTING",50,"Staple test: ");
   if (fabs(pa-ps)<1.e-6)
-    printf("PASSED. ");
+		lprintf("TESTING",50,"PASSED.");
   else
-    printf("FAILED. ");
-  printf("[diff1 = %1.8e][diff2 = %1.8e]\n", pa-ps, pl-ps);
+		lprintf("TESTING",50,"FAILED.");
+	lprintf("TESTING",50," [diff1 = %1.8e][diff2 = %1.8e]\n", pa-ps, pl-ps);
 }

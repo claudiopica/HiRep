@@ -25,6 +25,7 @@
 #include "dirac.h"
 #include "representation.h"
 #include "global.h"
+#include "logger.h"
 
 static int iw;
 static float ms;
@@ -113,6 +114,8 @@ int main(int argc,char *argv[])
    
    rlxs_init(0,12345);
 
+	 logger_setlevel(0,1000);
+
    geometry_eo_lexi();
    u_gauge=alloc_gfield();
 #ifndef REPR_FUNDAMENTAL
@@ -135,7 +138,7 @@ int main(int argc,char *argv[])
    
    nev=4*NF+4;
    nevt=nev+4;
-   ubnd=1.05f*power(10,Op1,ws);   
+   ubnd=1.05f*power(30,Op1,ws);   
    printf("ubnd-test: %f\n",ubnd);
    omega1=1.0e-6f;
    omega2=1.0e-3f;
@@ -144,7 +147,7 @@ int main(int argc,char *argv[])
    printf("Accuracy parameters: omega1=%.1e, omega2=%.1e\n\n",
           omega1,omega2);
 
-   ie=eva(VOLUME,nev,nevt,0,100,20,1,ubnd,omega1,omega2,Op1,ws,ev,d1,&status);
+   ie=eva(VOLUME,nev,nevt,0,100,20,ubnd,omega1,omega2,Op1,ws,ev,d1,&status);
    
    printf("\nEigenvalues of Qnohat^2 (status = %d, ie = %d):\n\n",status,ie);
 
@@ -157,7 +160,7 @@ int main(int argc,char *argv[])
 
       if (i==nev)
          printf("\n");
-      printf("d[%2d] = % .3e, acc = %.1e\n",i,d1[i],res);
+      printf("d[%2d] = % .3e acc = %1.5e\n",i,d1[i],res);
    }
 
    printf("\n");

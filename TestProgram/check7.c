@@ -81,7 +81,7 @@ int main(int argc,char *argv[])
    u_gauge_f=alloc_gfield_f();
 #endif
    represent_gauge_field();
-   
+
    printf("Generating a random gauge field... ");
    fflush(stdout);
    random_u();
@@ -92,8 +92,8 @@ int main(int argc,char *argv[])
    
    par.n = 6;
    par.shift=(double*)malloc(sizeof(double)*(par.n));
-   par.err2=1e-8;
-   par.max_iter=0;
+   par.err2=1.e-8;
+	 par.max_iter=0;
    res=(suNf_spinor**)malloc(sizeof(suNf_spinor*)*(par.n));
    res[0]=(suNf_spinor*)malloc(sizeof(suNf_spinor)*par.n*VOLUME);
    for(i=1;i<par.n;++i)
@@ -122,7 +122,7 @@ int main(int argc,char *argv[])
 
    QMRpar.n = 6;
    QMRpar.shift=par.shift;
-   QMRpar.err2=1.e-7;
+   QMRpar.err2=1.e-8;
    QMRpar.max_iter=0;
    
    cgiters=g5QMR_mshift(&QMRpar, &D, s1, resd);
@@ -132,8 +132,7 @@ int main(int argc,char *argv[])
      assign_sd2s(VOLUME,res[i],resd[i]);
       D(s2,res[i]);
       assign_s2sd(VOLUME,s3,s2);
-      if(i!=0)
-	spinor_field_mul_add_assign_dble_f(s3,-par.shift[i-1],resd[i]);
+			spinor_field_mul_add_assign_dble_f(s3,-par.shift[i],resd[i]);
       assign_s2sd(VOLUME,s4,s1);
       spinor_field_mul_add_assign_dble_f(s3,-1.0,s4);
       tau=spinor_field_sqnorm_dble_f(s3)/(double)spinor_field_sqnorm_f(s1);

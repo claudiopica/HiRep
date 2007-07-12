@@ -11,6 +11,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include "logger.h"
 
 /* State quantities for RHMC */
 static suNg *u_gauge_old;
@@ -23,6 +24,7 @@ rational_app r_HB;  /* used in pseudofermions heatbath */
 double minev, maxev; /* min and max eigenvalue of H^2 */
 /* END of State */
 
+static short int init=0;
 
 /* local action array for metropolis test */
 static double *la=0;
@@ -62,8 +64,35 @@ static void reduce_fraction(int *a, int *b){
 void init_rhmc(rhmc_par *par){
 	int i;
 
+	lprintf("RHMC",0,"Initializing...\n");
+
 	/* fare test su input par e copiare in _update_par */
 	_update_par=*par;
+
+	lprintf("RHMC",10,
+			"Number of Flavors = %d\n"
+			"beta = %.8f\n"
+			"Mass = %.8f\n"
+			"Metropolis test precision = %.8e\n"
+			"MD precision = %.8e\n"
+			"PF heat-bath precision = %.8e\n"
+			"RHMC force precision = %.8e\n"
+			"Number of pseudofermions = %d\n"
+			"MD trajectory length = %.8f\n"
+			"MD steps = %d\n"
+			"MD gauge substeps = %d\n"
+			,_update_par.nf
+			,_update_par.beta
+			,_update_par.mass
+			,_update_par.MT_prec
+			,_update_par.MD_prec
+			,_update_par.HB_prec
+			,_update_par.force_prec
+			,_update_par.n_pf
+			,_update_par.MD_par->tlen
+			,_update_par.MD_par->nsteps
+			,_update_par.MD_par->gsteps
+			);
 
 	/* allocate space for the backup copy of gfield */
 	u_gauge_old=alloc_gfield();
@@ -115,6 +144,10 @@ void init_rhmc(rhmc_par *par){
 	r_app_alloc(&r_HB);
 	r_app_set(&r_HB,minev,maxev);
 
+	init = 1;
+
+	lprintf("RHMC",0,"Initialization done.\n");
+
 }
 
 void free_rhmc(){
@@ -132,6 +165,11 @@ void free_rhmc(){
   r_app_free(&r_S);
   r_app_free(&r_MD);
   r_app_free(&r_HB);
+
+	init = 0;
+
+	lprintf("RHMC",0,"Memory deallocated.\n");
+
 }
 
 int update_rhmc(){
@@ -139,20 +177,27 @@ int update_rhmc(){
    double deltaH;
    double oldmax,oldmin;
    int i;
-   
+  
+	 if(!init)
+		 return -1;
+
    /* generate new momenta and pseudofermions */
+	 lprintf("RHMC",30,"Generating gaussian momenta and pseudofermions...\n");
    gaussian_momenta(momenta);
 	 for (i=0;i<_update_par.n_pf;++i)
 		 gaussian_spinor_field(pf[i]);
 
    /* compute starting action */
+	 lprintf("RHMC",30,"Computing action density...\n");
    local_hmc_action(NEW, la, momenta, pf, pf);
    
    /* compute H2^{a/2}*pf */
+	 lprintf("RHMC",30,"Correcting pseudofermions distribution...\n");
 	 for (i=0;i<_update_par.n_pf;++i)
 		 rational_func(&r_HB, &H2, pf[i], pf[i]);
 
    /* integrate molecular dynamics */
+	 lprintf("RHMC",30,"MD integration...\n");
 	 _update_par.integrator(momenta,_update_par.MD_par);
 	 /*leapfrog(momenta, _update_par.tlen, _update_par.nsteps);
 	 O2MN_multistep(momenta, _update_par.tlen, _update_par.nsteps, 3);*/
@@ -170,6 +215,7 @@ int update_rhmc(){
 	 r_app_set(&r_MD,minev,maxev);
 	 r_app_set(&r_HB,minev,maxev);
 
+	 lprintf("RHMC",30,"Computing new action density...\n");
    /* compute H2^{-a/2}*pf or H2^{-a}*pf */
    /* here we choose the first strategy which is more symmetric */
 	 for (i=0;i<_update_par.n_pf;++i)
@@ -183,7 +229,7 @@ int update_rhmc(){
    for(i=0; i<VOLUME; ++i) {
       deltaH+=la[i];
    }
-   printf("[DeltaS = %1.8e][exp(-DS) = %1.8e]\n",deltaH,exp(-deltaH));
+   lprintf("RHMC",10,"[DeltaS = %1.8e][exp(-DS) = %1.8e]\n",deltaH,exp(-deltaH));
 
    if(deltaH<0.) {
       suNg_field_copy(u_gauge_old,u_gauge);
@@ -193,7 +239,7 @@ int update_rhmc(){
       if(r<exp(-deltaH)) {
 				suNg_field_copy(u_gauge_old,u_gauge);
       } else {
-				printf("NON Accettato\n");
+				lprintf("RHMC",10,"Configuration rejected.\n");
 				suNg_field_copy(u_gauge,u_gauge_old);
 				represent_gauge_field();
 
@@ -207,6 +253,8 @@ int update_rhmc(){
 				return 0;
       }
    }
+
+	 lprintf("RHMC",10,"Configuration accepted.\n");
 
 	 return 1;
 }

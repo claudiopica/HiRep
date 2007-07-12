@@ -25,6 +25,7 @@
 #include "dirac.h"
 #include "representation.h"
 #include "global.h"
+#include "logger.h"
 
 static int iw;
 static float hmass=-0.15f;
@@ -230,6 +231,8 @@ int main(int argc,char *argv[])
 
    rlxs_init(0,12345);
 
+	 logger_setlevel(0,1000);
+
    geometry_eo_lexi();
    u_gauge=alloc_gfield();
 #ifndef REPR_FUNDAMENTAL
@@ -251,23 +254,23 @@ int main(int argc,char *argv[])
    for (i=0;i<7;i++)
       ev[i]=alloc_spinor_field_f();
    
-   iw=6;
-   nev=4;
-   nevt=6;
+   iw=3;
+   nev=2;
+   nevt=3;
    ubnd=1.05f*power(20,Op1,ws);
    printf("test-ubnd: %f\n",ubnd);
    omega1=1.0e-6f;
-   omega2=1.0e-3f;
+   omega2=1.0e-2f;
 
    printf("Accuracy parameters: omega1=%.1e, omega2=%.1e\n\n",
           omega1,omega2);
 
-   ie=eva(VOLUME,nev,nevt,0,100,20,1,ubnd,omega1,omega2,Op1,ws,ev,d1,&status);
+   ie=eva(VOLUME,nev,nevt,0,100,20,ubnd,omega1,omega2,Op1,ws,ev,d1,&status);
 
    printf("\nEigenvalues of Q^2 (status = %d, ie = %d):\n\n",
           status,ie);
 
-   for (i=0;i<6;i++)
+   for (i=0;i<nevt;i++)
    {
       Op1(ws[0],ev[i]);
       z.re=-(double)d1[i];
@@ -276,17 +279,17 @@ int main(int argc,char *argv[])
       res=spinor_field_sqnorm_f(ws[0]);
       res=(float)(sqrt((double)(res)));
 
-      if (i==4)
+      if (i==nev)
          printf("\n");
       printf("d[%d] = % .3e, acc = %.1e\n",i,d1[i],res);
    }
 
-   eva_g5(4,d1,ev);
+   eva_g5(nev,d1,ev);
       
    printf("\n");
    printf("Eigenvalues of Q:\n\n");
 
-   for (i=0;i<4;i++)
+   for (i=0;i<nev;i++)
    {
       g5Dphi(hmass,ws[0],ev[i]);      
       z.re=-d1[i];

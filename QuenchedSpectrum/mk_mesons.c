@@ -26,6 +26,7 @@
 #include "inverters.h"
 #include "representation.h"
 #include "utils.h"
+#include "logger.h"
 
 int nhb,nor,nit,nth,nms,level,seed;
 float beta;
@@ -43,16 +44,16 @@ void add_corr(double *c1, float *c2){
 }
 
 void print_usage(int argc,char *argv[]){
-  printf("Usage: %s prop_file\n",argv[0]);
+  lprintf("MAIN",-100,"Usage: %s prop_file\n",argv[0]);
 }
 
 #define CORR(name) \
 				name(tmpcorr, quark_prop);\
-				printf("[%d] mass=%2.6f " #name "= ",i,m[k]);\
+				lprintf("MAIN",0,"conf #%d mass=%2.6f " #name "= ",i,m[k]);\
 				for(n=0;n<T;++n) {\
-					printf("%e ",tmpcorr[n]);\
+					lprintf("MAIN",0,"%e ",tmpcorr[n]);\
 				}\
-				printf("\n");\
+				lprintf("MAIN",0,"\n");\
 				fflush(stdout)
 
 int main(int argc,char *argv[])
@@ -73,11 +74,11 @@ int main(int argc,char *argv[])
 		return 0;
 	}
 
-	printf("Gauge group: SU(%d)\n",NG);
-	printf("Fermion representation: dim = %d\n",NF);
-	printf("The lattice size is %dx%d^3\n",T,L);
+	lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
+	lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
+	lprintf("MAIN",0,"The lattice size is %dx%d^3\n",T,L);
 
-	printf("Computing Mesons corr functions\nfrom file: [%s]\n",argv[1]);
+	lprintf("MAIN",0,"Computing Mesons corr functions\nPropagator file: [%s]\n",argv[1]);
 
 	error((propfile = fopen(argv[1], "rb"))==NULL,1,"Main",
 			"Failed to open propagator file for reading");
@@ -86,12 +87,9 @@ int main(int argc,char *argv[])
 	for(i=0;i<nm;++i)
 		fread(m+i,(size_t) sizeof(float),1,propfile);
 
-	printf("Found %d masses: ",nm);
+	lprintf("MAIN",0,"Found %d masses:\n",nm);
 	for(i=0;i<nm;++i)
-		printf("%e ",m[i]);
-	printf("\n\n");
-
-	fflush(stdout);
+		lprintf("MAIN",0,"m[%d] = %1.8e => kappa[%d] = %1.8e\n",i,m[i],i,1./(2.*m[i]+8.));
 
 	/*
 		 rlxs_init(level,seed);

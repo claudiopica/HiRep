@@ -15,6 +15,19 @@
 #include "error.h"
 #include "dirac.h"
 
+/* the following variable is used to keep trace of
+ * matrix-vector multoplication.
+ * we count how many time the function Dphi_ is called
+ */
+static unsigned long int MVMcounter=0;
+
+unsigned long int getMVM() {
+	unsigned long int res=MVMcounter>>1; /* divide by two */
+	MVMcounter=0; /* reset counter */
+
+	return res;
+}
+
 /*
  * NOTE :
  * here we are making the assumption that the geometry is such that
@@ -51,6 +64,8 @@ void Dphi_(block_selector B, suNf_spinor *out, suNf_spinor *in)
          error(1,1,"Dphi_ [Dphi.c]",
                "Invalid block parity selection");
    }
+
+	 ++MVMcounter; /* count matrix call */
 
    r=out;
   

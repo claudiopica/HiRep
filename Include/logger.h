@@ -52,7 +52,14 @@ int logger_map(char *name, char *filename);
  * 1 => invalid name
  */
 int logger_unmap(char *name);
-int logger_unmap_all();
+
+/* reset the logger:
+ * all mappings are deleted
+ * all verbosity levels are deleted
+ * default verbosity level is set to 0
+ * logger stdout is mapped to application stdout
+ */
+int logger_reset();
 
 /* set the logger stdout stream
  * if filename=0 this function reset the stream to the 
@@ -68,9 +75,13 @@ int logger_unmap_all();
  */
 int logger_stdout(char *filename);
 
-/* set verbosity level of the logger */
-void logger_setlevel(int v);
-int logger_getlevel();
+/* set verbosity level of the logger 
+ * if name==0 then set the default level
+ */
+void logger_setlevel(char *name, int v);
+int logger_getlevel(char *name);
+/* reset verbosity level for name to stardard level */
+void logger_rmlevel(char *name);
 
 /* log function 
  * write to the mapped stream if message level

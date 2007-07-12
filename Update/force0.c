@@ -3,8 +3,10 @@
 #include "suN.h"
 #include "utils.h"
 #include "representation.h"
+#include "logger.h"
 
 #include <stdio.h>
+#include <math.h>
 
 extern rhmc_par _update_par;
 
@@ -17,6 +19,8 @@ void Force0(float dt, suNg_algebra_vector *force){
   static suNg s1,s2;
   static suNg_algebra_vector f;
   int i;
+	double avrforce=0.,maxforce=0.;;
+
   for (i=0; i<4*VOLUME; ++i){
     int x, mu;
     index_to_coord(i,x,mu);
@@ -27,7 +31,16 @@ void Force0(float dt, suNg_algebra_vector *force){
     _fund_algebra_project(f,s2);
     
     _algebra_vector_mul_add_assign_g(force[i], dt*(-_update_par.beta/((double)(NG))), f);
+
+		avrforce+=sqrt(_algebra_vector_sqnorm_g(f));
+		for(x=0;x<NG*NG-1;++x){
+			if(maxforce<fabs(*(((float*)&f)+x))) maxforce=fabs(*(((float*)&f)+x));
+		}
   }
+	
+	avrforce*=dt*_update_par.beta/((double)(NG*4*VOLUME));
+	maxforce*=dt*_update_par.beta/((double)NG);
+	lprintf("FORCE0",50,"avr |force| = %1.8e maxforce = %1.8e\n",avrforce,maxforce);
 }
 
 void Force(float dt, suNg_algebra_vector *force){

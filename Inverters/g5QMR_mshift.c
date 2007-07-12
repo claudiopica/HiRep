@@ -4,6 +4,7 @@
 #include "malloc.h"
 #include "update.h"
 #include "utils.h"
+#include "logger.h"
 #include <stdio.h>
 #include <math.h>
 #include <assert.h>
@@ -159,15 +160,13 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
 				if(fabs(r[i]*r[i])*(double)(1+cgiter)<par->err2*innorm2){
 					flags[i]=0;
 					--notconverged;
-#ifndef NDEBUG
-					printf("[%d] converged at iter: %d\n",i,cgiter);
-#endif
+					lprintf("INVERTER",50,"g5QMR: vect %d converged at iter: %d\n",i,cgiter);
 				}
 
 			}    
 		}
 
-		if (fabs(rho)> 1.e-10) {
+		if (fabs(rho)> 1.e-13) {
 			double olddelta;
 
 			/*normalize p2 */
@@ -178,7 +177,7 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
 			delta = spinor_field_g5_prod_re_dble_f(p2,p2);
 
 			if(fabs(delta)<1.e-6) { /* the method has failed ! */
-				printf("g5QMR: Method failed! (delta=%e) (cgiter=%d)\n",delta,cgiter);
+				lprintf("INVERTER",40,"g5QMR: method failed! delta=%e [iter=%d]\n",delta,cgiter);
 				notconverged=0; /* exit loop */
 			}
 
@@ -187,13 +186,13 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
 
 		} else { /* system has converged */
 			notconverged=0;
-			printf("g5QMR: rho = 0 ! (system converged)\n");
+			lprintf("INVERTER",40,"g5QMR: rho < 1.e-13 ! (system converged)\n");
 		}
 
 
 #ifndef NDEBUG
 		if(cgiter%100==0){
-			printf("g5QMR: [%d] res[0]=%e notconverged=%d\n",cgiter,fabs(r[0]*r[0])*(double)(1+cgiter)/innorm2,notconverged);   
+			lprintf("INVERTER",40,"g5QMR: [%d] res[0]=%e notconverged=%d\n",cgiter,fabs(r[0]*r[0])*(double)(1+cgiter)/innorm2,notconverged);   
 		}
 #endif
 
@@ -204,25 +203,22 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
 		float norm;
 		assign_sd2s(spinorlen,(suNf_spinor*)sd,out[i]);
 		M((suNf_spinor*)Mp,(suNf_spinor*)sd);
+		++cgiter;
 		assign_s2sd(spinorlen,Mp,(suNf_spinor*)Mp);
 		if(par->shift[i]!=0.) {
 			spinor_field_mul_add_assign_dble_f(Mp,-par->shift[i],out[i]);
 		}
 		assign_s2sd(spinorlen,sd,in);
-		spinor_field_mul_add_assign_dble_f(Mp,-1.0,sd);
+		spinor_field_sub_dble_f(Mp,Mp,sd);
 		norm=spinor_field_sqnorm_dble_f(Mp)/((double)spinor_field_sqnorm_f(in));
+		valid[i]=1;
 		if (fabs(norm)>par->err2){
 			valid[i]=0;
-#ifndef NDEBUG
-			printf("g5QMR Failed: err2[%d] = %e  shift = %e\n",i,norm,par->shift[i]);
-#endif
+			lprintf("INVERTER",30,"g5QMR failed on vect %d: err2 = %1.8e > %1.8e\n",i,norm,par->err2);
 		} else {
-			valid[i]=1;
-		}
+			lprintf("INVERTER",20,"g5QMR inversion: err2 = %1.8e < %1.8e\n",norm,par->err2);
+		} 
 	}
-#ifndef NDEBUG
-	printf("g5QMR: %d matrix multiplications\n",cgiter);
-#endif
 
 	/* free memory */
 	free(memall);
@@ -232,7 +228,7 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
 	free(flags);
 
 	/* return number of cg iter */
-	if(par->n==1) cgiter++;
+	if(par->n==1) ++cgiter;
 	return cgiter;
 }
 
@@ -247,17 +243,17 @@ static void Herm(suNf_spinor *out, suNf_spinor *in){
 }
 
 int g5QMR_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor_dble **out){
-	int cgiter=0;
+	int cgiter;
 	int n;
 	mshift_par orig;
 	short *valid;
 	int loccg;
-	int debugint;
+	int msiter;
 
 	orig=*par; /* save par */
 	valid=malloc(sizeof(short)*orig.n);
-	cgiter+=g5QMR_mshift_core(valid,par,M,in,out);
-	debugint=cgiter;
+	cgiter=g5QMR_mshift_core(valid,par,M,in,out);
+	msiter=cgiter;
 
 	/* if some vector has not converged try non-multishift */
 	par->n=1;
@@ -276,6 +272,8 @@ int g5QMR_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spino
 				unsigned int spinorlen;
 				MINRES_par Mpar;
 				
+				lprintf("INVERTER",20,"g5QMR_mshift: using MINRES on vect %d\n",n);
+
 				get_spinor_len(&spinorlen);
 				Mpar.err2=par->err2;
 				Mpar.max_iter=0;
@@ -288,19 +286,20 @@ int g5QMR_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spino
 				loccg=MINRES(&Mpar,&Herm,in,(suNf_spinor*)out[n],(suNf_spinor*)out[n]);
 				spinor_field_g5_f(in,in);
 				assign_s2sd(spinorlen,out[n],(suNf_spinor*)out[n]);
-				/* give up */
-				printf("Used MINRES on vector %d [%d]\n",n,loccg);
+
 				cgiter+=loccg;
 			}
 		}
 	}
 
 	/* this is for debug purposes */
-	printf("g5QMR matrix mul: %d/%d\n",debugint,cgiter);
 	
 	*par=orig; /* restore par */
 
 	free(valid);
+
+	lprintf("INVERTER",10,"g5QMR_mshift: MVM = %d/%d\n",msiter,cgiter);
+	
 	return cgiter;
 
 }

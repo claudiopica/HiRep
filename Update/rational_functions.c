@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <math.h>
+#include "logger.h"
 
 /* include rational approximations database */
 #include "approx_data.db"
@@ -196,7 +197,8 @@ void r_app_set(rational_app *app, double min, double max) {
 	bmax= best[5];
 	app->order=bo;
 
-	printf("Best approx found: o=%d err=%1.5e bmin=%1.5e bmax=%1.5e\n",bo,berr,bmin,bmax);
+	lprintf("RAPPROX",0,"Best approx found: o=%d err=%1.5e bmin=%1.5e bmax=%1.5e\n",bo,berr,bmin,bmax);
+
 	r_app_realloc(app);
 	app->a[0]=best[6];
 	for(bn=0;bn<bo;) {
@@ -224,35 +226,35 @@ void r_app_set(rational_app *app, double min, double max) {
  * This implementation uses CG_mshift => Q must be hertian positive definite!
  */
 void rational_func(rational_app *coef, spinor_operator Q, suNf_spinor *out, suNf_spinor *in) {
-   static mshift_par cg_par;
-   suNf_spinor **cg_out;
+   static mshift_par inv_par;
+   suNf_spinor **inv_out;
    int i;
 
    /* allocate cg output vectors */
-   cg_out = malloc(sizeof(*cg_out)*(coef->order));
+   inv_out = malloc(sizeof(*inv_out)*(coef->order));
    for (i=0; i<(coef->order); ++i) {
-      cg_out[i] = malloc(sizeof(**cg_out)*VOLUME);
+      inv_out[i] = malloc(sizeof(**inv_out)*VOLUME);
    }
 
    /* set up cg parameters */
-   cg_par.n = coef->order;
-   cg_par.shift = coef->b;
-   cg_par.err2=coef->rel_error/coef->order;    /* CAMBIARE: METTERE PARAMETRI COMUNI ALL'UPDATE */
-   cg_par.max_iter=0; /* no limit */
+   inv_par.n = coef->order;
+   inv_par.shift = coef->b;
+   inv_par.err2=coef->rel_error/coef->order;    /* CAMBIARE: METTERE PARAMETRI COMUNI ALL'UPDATE */
+   inv_par.max_iter=0; /* no limit */
    
    /* compute inverse vectors */
-   cg_mshift(&cg_par, Q, in, cg_out);
+   cg_mshift(&inv_par, Q, in, inv_out);
 
    /* sum all the contributions */
    spinor_field_mul_f(out,coef->a[0],in);
    for (i=1; i<(coef->order)+1; ++i) {
-      spinor_field_mul_add_assign_f(out,coef->a[i],cg_out[i-1]);
+      spinor_field_mul_add_assign_f(out,coef->a[i],inv_out[i-1]);
    }
 
    /* free memory */
    for (i=0; i<(coef->order); ++i) {
-      free(cg_out[i]);
+      free(inv_out[i]);
    }
-   free(cg_out);
+   free(inv_out);
 
 }

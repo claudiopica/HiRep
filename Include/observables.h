@@ -17,10 +17,9 @@ float plaq(int ix,int mu,int nu);
 double avr_plaquette();
 double local_plaq(int ix);
 
-void quark_propagator(unsigned int source, int nm, float *mass, suNf_spinor **out);
-/*void quark_propagator_QMR(unsigned int source, int nm, float *mass, suNf_spinor_dble **out);*/
-void quark_propagator_QMR(FILE *propfile, unsigned int ssite, int nm, float *mass);
-void quark_propagator_QMR_eo(FILE *propfile, unsigned int ssite, int nm, float *mass);
+void quark_propagator(unsigned int source, int nm, float *mass, suNf_spinor **out, double acc);
+void quark_propagator_QMR(FILE *propfile, unsigned int ssite, int nm, float *mass, double acc);
+void quark_propagator_QMR_eo(FILE *propfile, unsigned int ssite, int nm, float *mass, double acc);
 
 void id_correlator(float *out, suNf_spinor **qp);
 void g0_correlator(float *out, suNf_spinor **qp);

@@ -27,6 +27,7 @@
 #include "inverters.h"
 #include "representation.h"
 #include "utils.h"
+#include "logger.h"
 
 int nhb,nor,nit,nth,nms,level,seed;
 float beta;
@@ -79,25 +80,23 @@ int main(int argc,char *argv[])
 
 	read_cmdline(argc, argv); 
 
-	printf("Gauge group: SU(%d)\n",NG);
-	printf("Fermion representation: dim = %d\n",NF);
-	printf("The lattice size is %dx%d^3\n",T,L);
-	printf("beta = %2.4f\n",beta);
-	printf("nth  = %d\tNumber of thermalization cycles\n",nth);
-	printf("nms  = %d\tNumber of measure cycles\n",nms);
-	printf("nit  = %d\tNumber of hb-or iterations per cycle\n",nit);
-	printf("nhb  = %d\tNumber of heatbaths per iteration\n",nhb);   
-	printf("nor  = %d\tNumber or overrelaxations per iteration\n",nor);
-	printf("ranlux: level = %d, seed = %d\n\n",level,seed); 
-	printf("Computing quark prop for %d masses: ",nm);
-	for(i=0;i<nm;++i)
-		printf("%e ",m[i]);
-	printf("corresponding to the following kappa:");
-	for(i=0;i<nm;++i)
-		printf("%e ",kappa[i]);
-	printf("\n\n");
+	logger_setlevel(0,10000);
+	/* uncomment the following if redirection of inverter output is desired */
+	/* logger_map("INVERTER","inverter.out"); */
 
-	fflush(stdout);
+	lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
+	lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
+	lprintf("MAIN",0,"The lattice size is %dx%d^3\n",T,L);
+	lprintf("MAIN",0,"beta = %2.4f\n",beta);
+	lprintf("MAIN",0,"nth  = %d\tNumber of thermalization cycles\n",nth);
+	lprintf("MAIN",0,"nms  = %d\tNumber of measure cycles\n",nms);
+	lprintf("MAIN",0,"nit  = %d\tNumber of hb-or iterations per cycle\n",nit);
+	lprintf("MAIN",0,"nhb  = %d\tNumber of heatbaths per iteration\n",nhb);   
+	lprintf("MAIN",0,"nor  = %d\tNumber or overrelaxations per iteration\n",nor);
+	lprintf("MAIN",0,"ranlux: level = %d, seed = %d\n",level,seed); 
+	lprintf("MAIN",0,"Computing quark prop for %d masses:\n",nm);
+	for(i=0;i<nm;++i)
+		lprintf("MAIN",0,"m[%d] = %1.8e => k[%d] = %1.8e\n",i,m[i],i,kappa[i]);
 
 	rlxs_init(level,seed);
 
@@ -123,26 +122,31 @@ int main(int argc,char *argv[])
 	for (i=0;i<nth;++i) {
 		update(beta,nhb,nor);
 		if ((i%10)==0)
-			printf("%d",i);
+			lprintf("MAIN",0,"%d",i);
 		else
-			printf(".");
+			lprintf("MAIN",0,".");
 		fflush(stdout);
 	}
-	if(i) printf("%d\nThemalization done.\n",i);
+	if(i) lprintf("MAIN",0,"%d\nThemalization done.\n",i);
+
+	/* or read configuration from file */
+	/* read_conf_single("confname"); */
+
 	represent_gauge_field();
 
 	/* Misure */
 	for (i=0;i<nms;++i){ /* nms misure */
-		printf("[%d] <p> = %1.6f\n",i,avr_plaquette());
-		fflush(stdout);
-		quark_propagator_QMR_eo(propfile,0,nm,m);
+		lprintf("MAIN",0,"conf #%d <p> = %1.6f\n",i,avr_plaquette());
+		quark_propagator_QMR_eo(propfile,0,nm,m,1.e-10);
+		lprintf("MAIN",0,"MVM for last propagator: %ld\n",getMVM());
 
 		for (n=0;n<nit;n++) /* nit updates */
 			update(beta,nhb,nor);
 		represent_gauge_field();
 
-	}
+   write_gauge_field_single("confname"); 
 
+	}
 
 	fclose(propfile);
 

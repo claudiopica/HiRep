@@ -8,6 +8,7 @@
 #include <math.h>
 #include <malloc.h>
 #include <stdio.h>
+#include <logger.h>
 
 /* Neuberger bound. See hep-lat/9911004 - Phys.Rev.D61:085015,2000. */
 /* find a lower bound for the minimal eigenvalue of H(-1); */
@@ -101,7 +102,7 @@ int max_H2(double *max, double mass) {
 
   *max*=1.1; /* do not know exact bound */
 
-  printf("[H2 Max_eig = %1.8e][H2 Max_count = %d]\n",*max,count); 
+  lprintf("MaxH2",10,"Max_eig = %1.8e [MVM = %d]\n",*max,count); 
 
   free(s1);
   
@@ -152,7 +153,7 @@ int min_H2(double *min, double max, double mass) {
 
   *min*=0.95; /* do not know exact bound */
 
-  printf("[H2 Min_eig = %1.8e][H2 Min_count = %d]\n",*min,count); 
+  lprintf("MinH2",10,"Min_eig = %1.8e [MVM = %d]\n",*min,count); 
 
   free(s1);  
 
@@ -210,87 +211,10 @@ void new_min_H2(double *min, double mass) {
     
   } while (fabs((oldl-lambda)/lambda)>1.e-4);
 
-  printf("NEW [H2 eig] %d Min: %e\n",count, lambda); 
   *min=0.95*lambda;
+  lprintf("New_MinH2",10,"NEW Min_eig = %1.8e [MVM = %d]\n",*min,count); 
 
   free(x);
-  
-}
-
-/* use power method to find min eigvalue */
-void test_min_H2(double *max, double mass) {
-  double norm, oldmax, dt, m;
-  int count;
-  suNf_spinor *s1,*s2,*s3, *s4;
-  s1=(suNf_spinor*)malloc(sizeof(suNf_spinor)*4*VOLUME);
-  s2=s1+VOLUME;
-  s3=s2+VOLUME;
-  s4=s3+VOLUME;
-
-  /* random spinor */
-  ranlxs((float*)s1,(sizeof(suNf_spinor)/sizeof(float))*VOLUME);
-  norm=sqrt(spinor_field_sqnorm_f(s1));
-  spinor_field_mul_f(s1,1./norm,s1);
-  norm=1.;
-
-  dt=1.;
-
-  m=64.;
-
-  g5Dphi(mass,s2,s1);
-  g5Dphi(mass,s3,s2);
-  spinor_field_mul_add_assign_f(s3,-m,s1);
-  g5Dphi(mass,s2,s3);
-  g5Dphi(mass,s1,s2);
-  spinor_field_mul_add_assign_f(s1,-m,s3);
-  g5Dphi(mass,s2,s1);
-  g5Dphi(mass,s3,s2);
-  spinor_field_mul_add_assign_f(s3,-m,s1);
-
-  count=3;
-  do {
-    /* multiply vector by H2 */
-    count+=3;
-
-    spinor_field_mul_f(s1,dt,s3);
-
-    /*
-    g5Dphi(mass,s2,s3);
-    g5Dphi(mass,s3,s2);
-    
-    spinor_field_mul_add_assign_f(s1,dt*dt*0.5,s3);
-
-    g5Dphi(mass,s2,s3);
-    g5Dphi(mass,s3,s2);
-    
-    spinor_field_mul_add_assign_f(s1,dt*dt*dt/6.,s3);
-    */
-
-    norm=sqrt(spinor_field_sqnorm_f(s1));
-    spinor_field_mul_f(s1,1./norm,s1);
-
-
-    oldmax=*max;
-    g5Dphi(mass,s2,s1);
-    g5Dphi(mass,s3,s2);
-    spinor_field_mul_add_assign_f(s3,-m,s1);
-    g5Dphi(mass,s2,s3);
-    g5Dphi(mass,s4,s2);
-    spinor_field_mul_add_assign_f(s4,-m,s3);
-    g5Dphi(mass,s2,s4);
-    g5Dphi(mass,s3,s2);
-    spinor_field_mul_add_assign_f(s3,-m,s4);
-
-    *max=spinor_field_prod_re_f(s1,s3);
-
-    /* printf("Iter %d: %4.5e\n",count,fabs(oldnorm-norm)); */
-  } while (fabs((*max-oldmax)/(*max))>1.e-4);
-
-  *max = m - pow(fabs(*max),1./3.);
-
-  printf("[H2 eig] %d Test Min: %e\n",count, *max); 
-
-  free(s1);
   
 }
 
@@ -298,17 +222,21 @@ void test_min_H2(double *max, double mass) {
 static suNf_spinor **ev;
 
 void find_spec_H2(double *max, double *min, double mass) {
-	const int nevt=5;
-	const int nev=1;
-	const int kmax=200;
-	const int maxiter=20;
+	/* EVA parameters */
+	const int nevt=5; /* use 5-dim space */
+	const int nev=1; /* require only the smallest to be accurate */
+	const int kmax=200; /* max degree of polynomial */
+	const int maxiter=20; /* max number of subiterations */
 	static float *d1;
 	const float omega1=1.e-4; /* absolute precision */
 	const float omega2=1.e-1; /* relative precision */
 	int status,ie;
 	suNf_spinor **ws;
+	/* END of EVA parameters */
+	int MVM=0; /* counter for matrix-vector multiplications */
 
-	max_H2(max, mass);
+
+	MVM+=max_H2(max, mass);
 
 	d1=malloc(sizeof(*d1)*nevt);
 	ev=malloc(sizeof(*ev)*(nevt+2));
@@ -318,11 +246,16 @@ void find_spec_H2(double *max, double *min, double mass) {
 	}
 	ws=ev+nevt;
 
-	ie=eva(VOLUME,nev,nevt,0,kmax,maxiter,1,*max,omega1,omega2,&H2,ws,ev,d1,&status);
-	printf("[EVA] status: %d, ret: %d\n",status, ie);
+	ie=eva(VOLUME,nev,nevt,0,kmax,maxiter,*max,omega1,omega2,&H2,ws,ev,d1,&status);
+	MVM+=status;
+	while (ie!=0) { /* if failed restart EVA */
+		ie=eva(VOLUME,nev,nevt,2,kmax,maxiter,*max,omega1,omega2,&H2,ws,ev,d1,&status);
+		MVM+=status;
+	}
 
 	*min=d1[0]*(1-omega2)-omega1;
 
+	lprintf("SPECLIMITS",0,"Range = [%1.8e,%1.8e] [MVM = %d]\n",*min,*max,MVM);
 
 	free(d1);
 	free(ev[0]);

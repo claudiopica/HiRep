@@ -6,9 +6,12 @@
 #include "inverters.h"
 #include "rational_functions.h"
 #include "representation.h"
+#include "logger.h"
+#include "linear_algebra.h"
 
 #include <malloc.h>
 #include <stdio.h>
+#include <math.h>
 
 /* declared in update_rhmc.c */
 extern rhmc_par _update_par;
@@ -76,9 +79,10 @@ void Force_rhmc_f(float dt, suNg_algebra_vector *force){
 	static suNf_vector ptmp;
 	static suNf_spinor p;
 	static suNf s1;
-	static mshift_par cg_par;
+	static mshift_par inv_par;
 	suNf_spinor **chi;
 	suNf_spinor *Hchi;
+	double avrforce,maxforce;
 
 	/* allocate spinors */
 	chi = (suNf_spinor **)malloc(sizeof(*chi)*(r_MD.order));
@@ -90,18 +94,26 @@ void Force_rhmc_f(float dt, suNg_algebra_vector *force){
 
 	/* Compute (H^2-b[n])^-1 * pf */
 	/* set up cg parameters */
-	cg_par.n = r_MD.order;
-	cg_par.shift = r_MD.b;
-	cg_par.err2= _update_par.force_prec; /* this should be high for reversibility */
-	cg_par.max_iter=0; /* no limit */
+	inv_par.n = r_MD.order;
+	inv_par.shift = r_MD.b;
+	inv_par.err2= _update_par.force_prec; /* this should be high for reversibility */
+	inv_par.max_iter=0; /* no limit */
 
 	for (k=0; k<_update_par.n_pf; ++k) {
 		/* compute inverse vectors chi[i] = (H^2 - b[i])^1 * pf */
-		cg_mshift(&cg_par, &H2, pf[k], chi);
+		cg_mshift(&inv_par, &H2, pf[k], chi);
 
 		for (n=0; n<r_MD.order; ++n) {
 
 			g5Dphi(_update_par.mass, Hchi, chi[n]);
+
+			lprintf("FORCE_RHMC",50,"[%d] |chi| = %1.8e |Hchi| = %1.8e\n",n,
+					sqrt(spinor_field_sqnorm_f(chi[n])),
+					sqrt(spinor_field_sqnorm_f(Hchi))
+					);
+
+			avrforce=0.;
+			maxforce=0.;
 
 			for (i=0;i<4*VOLUME;++i) {
 				int x,y, mu;
@@ -150,7 +162,15 @@ void Force_rhmc_f(float dt, suNg_algebra_vector *force){
 				/*_print_avect(f); */
 				_algebra_vector_mul_add_assign_g(force[i],dt*r_MD.a[n+1]*(_REPR_NORM2/_FUND_NORM2),f);	
 
+				avrforce+=sqrt(_algebra_vector_sqnorm_g(f));
+				for(x=0;x<NG*NG-1;++x){
+					if(maxforce<fabs(*(((float*)&f)+x))) maxforce=fabs(*(((float*)&f)+x));
+				}
 			}
+
+			avrforce*=dt*r_MD.a[n+1]*(_REPR_NORM2/_FUND_NORM2)/((double)(4*VOLUME));
+			maxforce*=dt*r_MD.a[n+1]*(_REPR_NORM2/_FUND_NORM2);
+			lprintf("FORCE_RHMC",50,"[%d] avr |force| = %1.8e maxforce = %1.8e a = %1.8e b = %1.8e\n",n,avrforce,maxforce,r_MD.a[n+1],r_MD.b[n]);
 		}  
 	}
 

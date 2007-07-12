@@ -3,6 +3,7 @@
 #include "utils.h"
 #include "update.h"
 #include "representation.h"
+#include "logger.h"
 
 #define _PROJ_BIT (1<<6) /* project gauge field every 2^_PROJ_BIT changes */
 #define _proj_leapfrog(c) if((c)&_PROJ_BIT){(c)=0;project_gauge_field();} else ++c
@@ -13,6 +14,10 @@ void leapfrog(suNg_algebra_vector *momenta, int_par *traj_par){
   if (traj_par->nsteps>0) {
     int i, n;
     float dt=traj_par->tlen/((float)traj_par->nsteps);
+
+		lprintf("MD_INT",10,"Starting new MD trajectory using leapfrog.\n");
+		lprintf("MD_INT",20,"MD parameters: len=%1.4f steps=%d => dt=%1.4f\n",
+				traj_par->tlen,traj_par->nsteps,dt);
 
     /* half step for the gauge field */
     for(i=0;i<4*VOLUME;++i){
@@ -31,6 +36,8 @@ void leapfrog(suNg_algebra_vector *momenta, int_par *traj_par){
       }
       _proj_leapfrog(count);
       represent_gauge_field();
+
+			lprintf("MD_INT",10,"MD step: %d/%d\n",n,traj_par->nsteps);
     }
    
     /* Update of momenta */
@@ -44,6 +51,8 @@ void leapfrog(suNg_algebra_vector *momenta, int_par *traj_par){
     _proj_leapfrog(count);
     represent_gauge_field();
   }
+
+	lprintf("MD_INT",10,"MD trajectory completed.\n");
 
 }
 

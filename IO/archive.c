@@ -11,6 +11,7 @@
 #include "io.h"
 #include "error.h"
 #include "global.h"
+#include "logger.h"
 
 
 void read_gauge_field_single(char filename[])

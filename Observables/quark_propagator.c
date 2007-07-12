@@ -10,6 +10,7 @@
 #include <malloc.h>
 #include <math.h>
 #include <assert.h>
+#include "logger.h"
 
 spinor_operator loc_H;
 static suNf_spinor tmpspinor[VOLUME];
@@ -39,7 +40,7 @@ static void D_pre(suNf_spinor *out, suNf_spinor *in){
  * like sources we add a background noise to the source which is then 
  * subtracted at the end at the cost of one more inversion.
  */
-void quark_propagator_QMR_eo(FILE *propfile, unsigned int ssite, int nm, float *mass) {
+void quark_propagator_QMR_eo(FILE *propfile, unsigned int ssite, int nm, float *mass, double acc) {
   mshift_par QMR_par;
   int i;
 	int source;
@@ -75,7 +76,7 @@ void quark_propagator_QMR_eo(FILE *propfile, unsigned int ssite, int nm, float *
   }
   QMR_par.n = nm;
   QMR_par.shift = shift;
-  QMR_par.err2 = .5e-10;
+  QMR_par.err2 = .5*acc;
   QMR_par.max_iter = 0;
 
   /* noisy background */
@@ -104,20 +105,22 @@ void quark_propagator_QMR_eo(FILE *propfile, unsigned int ssite, int nm, float *
 			assign_sd2s(VOLUME/2,res,(suNf_spinor_dble*)res);
 			assign_sd2s(VOLUME/2,(suNf_spinor*)resd[i],resd[i]);
 			Dphi_(OE,(res+(VOLUME/2)),(suNf_spinor *)resd[i]);
+			if(source&1) ++cgiter; /* count only half of calls. works because the number of sources is even */
 
 			/* this is a test of the solution */
 			set_spinor_len(VOLUME);
 			hmass=mass[i];
 			D(test,res);
+			++cgiter;
 			*(((float *) test)+(NF*8*ssite+2*source))-=1.;
 			norm=spinor_field_sqnorm_f(test);
-			if(norm>QMR_par.err2*2.)
-				printf("test of difference g5QMR_oe[%d] = %e\n",i,norm);
+			if(norm>acc)
+				lprintf("PROPAGATOR",0,"g5QMR_oe residuum of source [%d] = %e\n",i,norm);
 
 			/* write propagator on file */
 			/* multiply by g_5 to match the MINRES version */
 			spinor_field_g5_f(res,res);
-			error(fwrite(res,(size_t) sizeof(suNf_spinor),(size_t)(VOLUME),propfile)!=(VOLUME),1,"Main",
+			error(fwrite(res,(size_t) sizeof(suNf_spinor),(size_t)(VOLUME),propfile)!=(VOLUME),1,"quark_propagator_QMR_eo",
 					"Failed to write quark propagator to file");
 			set_spinor_len(VOLUME/2);
 		}
@@ -128,7 +131,7 @@ void quark_propagator_QMR_eo(FILE *propfile, unsigned int ssite, int nm, float *
 
   set_spinor_len(VOLUME);
 
-	printf("Quark Propagator QMR_eo: %d\n",cgiter);
+	lprintf("PROPAGATOR",10,"QMR_eo MVM = %d\n",cgiter);
   
   /* free memory */
   free(in);
@@ -149,7 +152,7 @@ void quark_propagator_QMR_eo(FILE *propfile, unsigned int ssite, int nm, float *
  * like sources we add a background noise to the source which is then 
  * subtracted at the end at the cost of one more inversion.
  */
-void quark_propagator_QMR(FILE *propfile, unsigned int ssite, int nm, float *mass) {
+void quark_propagator_QMR(FILE *propfile, unsigned int ssite, int nm, float *mass, double acc) {
   mshift_par QMR_par;
   int i;
 	int source;
@@ -183,7 +186,7 @@ void quark_propagator_QMR(FILE *propfile, unsigned int ssite, int nm, float *mas
   }
   QMR_par.n = nm;
   QMR_par.shift = shift;
-  QMR_par.err2 = .5e-10;
+  QMR_par.err2 = .5*acc;
   QMR_par.max_iter = 0;
 
   /* noisy background */
@@ -209,16 +212,17 @@ void quark_propagator_QMR(FILE *propfile, unsigned int ssite, int nm, float *mas
 
 			/* this is a test of the solution */
 			D(test,(suNf_spinor *)resd[i]);
+			++cgiter;
 			spinor_field_mul_add_assign_f(test,-QMR_par.shift[i],(suNf_spinor*)resd[i]);
 			*(((float *) test)+(NF*8*ssite+2*source))-=1.;
 			norm=spinor_field_sqnorm_f(test);
-			if(norm>QMR_par.err2*2.)
-				printf("test of difference g5QMR[%d] = %e\n",i,norm);
+			if(norm>acc)
+				lprintf("PROPAGATOR",0,"g5QMR residuum of source [%d] = %e\n",i,norm);
 
 			/* write propagator on file */
 			/* multiply by g_5 to match the MINRES version */
 			spinor_field_g5_f((suNf_spinor*)resd[i],(suNf_spinor*)resd[i]);
-			error(fwrite(resd[i],(size_t) sizeof(suNf_spinor),(size_t)(VOLUME),propfile)!=(VOLUME),1,"Main",
+			error(fwrite(resd[i],(size_t) sizeof(suNf_spinor),(size_t)(VOLUME),propfile)!=(VOLUME),1,"quark_propagator_QMR",
 					"Failed to write quark propagator to file");
 		}
 
@@ -226,7 +230,7 @@ void quark_propagator_QMR(FILE *propfile, unsigned int ssite, int nm, float *mas
 		*(((float *) in)+(NF*8*ssite+2*source))=0.;
 	}
 
-	printf("Quark Propagator QMR: %d\n",cgiter);
+	lprintf("PROPAGATOR",10,"QMR MVM = %d\n",cgiter);
   
   /* free memory */
   free(in);
@@ -245,7 +249,7 @@ void quark_propagator_QMR(FILE *propfile, unsigned int ssite, int nm, float *mas
  * H is the hermitean dirac operator
  * out is a vector of nm spinor fields
  */
-void quark_propagator(unsigned int source, int nm, float *mass, suNf_spinor **out) {
+void quark_propagator(unsigned int source, int nm, float *mass, suNf_spinor **out, double acc) {
   static MINRES_par MINRESpar;
   int i,cgiter;
   suNf_spinor *in;
@@ -261,7 +265,7 @@ void quark_propagator(unsigned int source, int nm, float *mass, suNf_spinor **ou
 
   hmass=mass[0];
 
-  MINRESpar.err2 = 1.e-10;
+  MINRESpar.err2 = acc;
   MINRESpar.max_iter = 0;
 
 	cgiter=0;
@@ -270,7 +274,7 @@ void quark_propagator(unsigned int source, int nm, float *mass, suNf_spinor **ou
     hmass=mass[i];
     cgiter+=MINRES(&MINRESpar, &H, in, out[i],out[i-1]);
   }
-	printf("Quark Propagator MINRES: %d\n",cgiter);
+	lprintf("PROPAGATOR",10,"MINRES MVM = %d",cgiter);
 
   /* free input spinor field */
   free(in);

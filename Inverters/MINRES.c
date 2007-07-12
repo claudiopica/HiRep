@@ -3,6 +3,7 @@
 #include "complex.h"
 #include "malloc.h"
 #include "update.h"
+#include "logger.h"
 #include <stdio.h>
 #include <math.h>
 #include <assert.h>
@@ -15,7 +16,7 @@
  * out[i] = (M-(par->shift[i]))^-1 in
  * returns the number of cg iterations done.
  */
-int MINRES(MINRES_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor *out, suNf_spinor *trial){
+static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor *out, suNf_spinor *trial){
 
   suNf_spinor *q1,*q2;
   suNf_spinor *p1, *p2, *Mp;
@@ -58,6 +59,7 @@ int MINRES(MINRES_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor *out
   spinor_field_copy_f(p2, in);
   if(trial!=0) {
     M(p1,trial);
+		++cgiter;
     spinor_field_sub_assign_f(p2,p1);
     if(out!=trial){
       spinor_field_copy_f(out,trial);
@@ -130,29 +132,43 @@ int MINRES(MINRES_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor *out
 
     if((r*r)<par->err2*innorm2){
       notconverged=0;
-      /* printf("[%d] converged at iter: %d\n",i,cgiter); */
     }
 	
 	
   } while ((par->max_iter==0 || cgiter<par->max_iter) && notconverged);
 
   /* test results */
-  {
-    float norm;
-    M(Mp,out);
-    spinor_field_mul_add_assign_f(Mp,-1.0,in);
-    norm=spinor_field_sqnorm_f(Mp)/spinor_field_sqnorm_f(in);
-    if (fabs(norm)>par->err2)
-      printf("MINRES Failed: err2 = %e\n",norm);
-  }
-#ifndef NDEBUG
-  printf("MINRES: %d matrix multiplications\n",cgiter);
-#endif
-  
+	M(Mp,out);
+	++cgiter;
+	spinor_field_sub_f(Mp,Mp,in);
+	innorm2=spinor_field_sqnorm_f(Mp)/innorm2;
+	*valid=1;
+	if (fabs(innorm2)>par->err2) {
+		*valid=0;
+		lprintf("INVERTER",30,"MINRES failed: err2 = %1.8e > %1.8e\n",innorm2,par->err2);
+	} else {
+		lprintf("INVERTER",20,"MINRES inversion: err2 = %1.8e < %1.8e\n",innorm2,par->err2);
+	} 
    
   /* free memory */
   free(memall);
 
   /* return number of cg iter */
   return cgiter;
+}
+
+int MINRES(MINRES_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor *out, suNf_spinor *trial){
+	int iter,rep=0;
+	short int valid;
+
+	iter=MINRES_core(&valid, par, M, in, out, trial);
+	while(!valid) {
+		iter+=MINRES_core(&valid, par, M, in, out, out);
+		if((++rep)%5==0)
+			lprintf("INVERTER",-10,"MINRES recursion = %d (precision too high?)\n",rep);
+	}
+
+	lprintf("INVERTER",10,"MINRES: MVM = %d\n",iter);
+
+	return iter;
 }

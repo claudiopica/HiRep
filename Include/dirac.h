@@ -1,7 +1,7 @@
 #ifndef DIRAC_H
 #define DIRAC_H
 
-#include "suN.h"
+#include "suN_types.h"
 
 typedef enum {
    EO=0,
@@ -11,6 +11,8 @@ typedef enum {
 void Dphi_(block_selector B, suNf_spinor *out, suNf_spinor *in);
 void Dphi(float m0, suNf_spinor *out, suNf_spinor *in);
 void g5Dphi(float m0, suNf_spinor *out, suNf_spinor *in);
+
+unsigned long int getMVM();
 
 /* p = out ; q = in */
 void Dphi_old(float m0, suNf_spinor *p, suNf_spinor *q);

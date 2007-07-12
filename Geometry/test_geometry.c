@@ -12,6 +12,7 @@
 #include "geometry.h"
 #include "global.h"
 #include "safe_mod.h"
+#include "logger.h"
 
 void test_geometry(void)
 {
@@ -25,24 +26,24 @@ void test_geometry(void)
 
   /* TEST safe_mod first */
   if (safe_mod(-1,T)!=(T-1)) {
-    printf("Error in safe_mod (test0)!\n");
+    lprintf("TESTING",50,"Error in safe_mod (test0)!\n");
     return;
   }
   if (safe_mod(-1,L)!=(L-1)) {
-    printf("Error in safe_mod (test1)!\n");
+    lprintf("TESTING",50,"Error in safe_mod (test1)!\n");
     return;
   }
   if (safe_mod(T,T)!=0) {
-    printf("Error in safe_mod (test2)!\n");
+    lprintf("TESTING",50,"Error in safe_mod (test2)!\n");
     return;
   }
   if (safe_mod(L,L)!=0) {
-    printf("Error in safe_mod (test3)!\n");
+    lprintf("TESTING",50,"Error in safe_mod (test3)!\n");
     return;
   }
 
 
-  printf("Geometry test: "); fflush(stdout);
+	lprintf("TESTING",50,"Checking geometry...");
   for (x0=0;x0<T;x0++){
     for (x1=0;x1<L;x1++){
       for (x2=0;x2<L;x2++){
@@ -55,7 +56,7 @@ void test_geometry(void)
 	  ckdir[3] = ipt[x0][x1][x2][safe_mod(x3+1,L)];
 	  for (mu=0;mu<4;++mu){
 	    if (ckdir[mu]!=iup[ix][mu]) {
-	      printf("FAILED. [site %d=(%d,%d,%d,%d) dir %d up]\n",ix,x0,x1,x2,x3,mu);
+	      lprintf("TESTING",50," FAILED. [site %d=(%d,%d,%d,%d) dir %d up]\n",ix,x0,x1,x2,x3,mu);
 	      return;
 	    }
 	  }
@@ -65,7 +66,7 @@ void test_geometry(void)
 	  ckdir[3] = ipt[x0][x1][x2][safe_mod(x3-1,L)];
 	  for (mu=0;mu<4;++mu){
 	    if (ckdir[mu]!=idn[ix][mu]) {
-	      printf("\nFAILED. [site %d=(%d,%d,%d,%d) dir %d dn]\n",ix,x0,x1,x2,x3,mu);
+	      lprintf("TESTING",50," FAILED. [site %d=(%d,%d,%d,%d) dir %d dn]\n",ix,x0,x1,x2,x3,mu);
 	      return;
 	    }
 	  }
@@ -76,13 +77,12 @@ void test_geometry(void)
 
   for (x0=0;x0<VOLUME;x0++){
     if(check[x0]!=1) {
-      printf("\nFAILED. [site %d counted %d times]\n",x0, check[x0]);
+      lprintf("TESTING",50," FAILED. [site %d counted %d times]\n",x0, check[x0]);
       return;
     }
   }
 
-
-  printf("PASSED.\n");
+  lprintf("TESTING",50," PASSED.\n");
 }
 
 static void find_coord(int ix, int *x0r, int *x1r, int *x2r, int *x3r)
@@ -96,7 +96,7 @@ static void find_coord(int ix, int *x0r, int *x1r, int *x2r, int *x3r)
 	for (x3=0;x3<L;x3++){
 	  if (ix == ipt[x0][x1][x2][x3]){
 	    if (found) {
-	      printf("Errore in find_coord sul sito %d", ix);
+	      lprintf("TESTING",50,"Geometry: errore in find_coord sul sito %d\n", ix);
 	    } else {
 	      ++found;
 	      *x0r = x0; 

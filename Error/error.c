@@ -9,14 +9,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "error.h"
+#include "logger.h"
 
 void error(int test,int no,char *name,char *text)
 {
    if (test!=0)
    {
-      printf("\n");
-      printf("Error in %s\n%s\n",name,text);
-      printf("Program aborted\n\n");
+      lprintf("ERROR",0,"%s:\n%s\n",name,text);
+      lprintf("ERROR",0,"Exiting program...\n");
       exit(no);
    }
 }

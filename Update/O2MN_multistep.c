@@ -3,6 +3,7 @@
 #include "utils.h"
 #include "update.h"
 #include "representation.h"
+#include "logger.h"
 
 #include <assert.h>
 
@@ -18,6 +19,8 @@ static void O2MN_ms_gauge(suNg_algebra_vector *momenta, float dt, unsigned int n
     int i, n;
 
     assert(nsteps>0);
+
+		lprintf("MD_INT_GAUGE",30,"GAUGE_INT starting. gauge_steps = %d\n",nsteps);
 
     /* Update of momenta */
     Force0(lambda*dt,momenta);
@@ -42,6 +45,8 @@ static void O2MN_ms_gauge(suNg_algebra_vector *momenta, float dt, unsigned int n
 
       /* Update of momenta */
       Force0(2.*lambda*dt,momenta);
+
+			lprintf("MD_INT_GAUGE",30,"GAUGE_INT step: %d/%d\n",n,nsteps);
     }
    
     /* update of the gauge field */
@@ -63,6 +68,8 @@ static void O2MN_ms_gauge(suNg_algebra_vector *momenta, float dt, unsigned int n
     
     /* Update of momenta */
     Force0(lambda*dt,momenta);
+
+		lprintf("MD_INT_GAUGE",30,"GAUGE_INT completed.\n");
 }
 
 void O2MN_multistep(suNg_algebra_vector *momenta, int_par *traj_par){
@@ -72,6 +79,10 @@ void O2MN_multistep(suNg_algebra_vector *momenta, int_par *traj_par){
     float dt=traj_par->tlen/((float)traj_par->nsteps);
     float gdt=dt/(double)(2*traj_par->gsteps);
 		  
+		lprintf("MD_INT",10,"Starting new MD trajectory with O2MN_multistep.\n");
+		lprintf("MD_INT",20,"MD parameters: len=%1.4f steps=%d gauge_steps=%d => dt=%1.4f gdt=%1.4f\n",
+				traj_par->tlen,traj_par->nsteps,traj_par->gsteps,dt,gdt);
+
     /* Update of momenta */
     Force_rhmc_f(lambda*dt,momenta);
     
@@ -88,6 +99,8 @@ void O2MN_multistep(suNg_algebra_vector *momenta, int_par *traj_par){
       
       /* Update of momenta */
       Force_rhmc_f(2.*lambda*dt,momenta);
+
+			lprintf("MD_INT",10,"MD step: %d/%d\n",n,traj_par->nsteps);
       
     }
     
@@ -102,6 +115,8 @@ void O2MN_multistep(suNg_algebra_vector *momenta, int_par *traj_par){
     
     /* Update of momenta */
     Force_rhmc_f(lambda*dt,momenta);
+
+		lprintf("MD_INT",10,"MD trajectory completed\n");
   }
 }
 

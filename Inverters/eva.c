@@ -16,7 +16,7 @@
 * The externally accessible function is
 *
 *   int eva(int vol,int nev,int nevt,int init,int kmax,
-*           int imax,int ipr,float ubnd,float omega1,float omega2,
+*           int imax,float ubnd,float omega1,float omega2,
 *           spinor_operator Op,
 *           suNf_spinor *ws[],suNf_spinor *ev[],float d[],int *status)
 *     Computes the lowest eigenvalues d[0],...,d[nevt-1] of the operator Op
@@ -37,9 +37,6 @@
 *              acceleration of the algorithm
 *
 *     imax     Maximal number of subspace iterations
-*
-*     ipr      If this parameter is set to 1, the program prints some
-*              progress information to stdout from process 0
 *
 *     ubnd     Upper bound on the eigenvalues of the operator
 *
@@ -76,6 +73,8 @@
 * in hep-lat/0512021
 *
 * Author: Luigi Del Debbio <luigi.del.debbio@ed.ac.uk>
+*	
+*	Modified: Claudio Pica 
 *
 *******************************************************************************/
 
@@ -88,6 +87,7 @@
 #include "malloc.h"
 #include "linear_algebra.h"
 #include "inverters.h"
+#include "logger.h"
 
 #define GAMMA 3.0
 #define MAX_ROTATE 50
@@ -486,7 +486,7 @@ static void apply_cheby(int k,float lbnd,float ubnd,
 
 
 int eva(int vol,int nev,int nevt,int init,int kmax,
-        int imax,int ipr,float ubnd,float omega1,float omega2,
+        int imax,float ubnd,float omega1,float omega2,
         spinor_operator Op,
         suNf_spinor *ws[],suNf_spinor *ev[],float d[],int *status)   
 {
@@ -511,11 +511,6 @@ int eva(int vol,int nev,int nevt,int init,int kmax,
    if (alloc_aux(nevt)!=0)
       return -3;
 
-   if (ipr==1)
-      printf("Progress report [program eva]:\n");
-
-   fflush(stdout);
-   
    init_subsp(nev,nupd,init,ev);
    ritz_subsp(nlock,nupd,Op,ws,ev,d);
    
@@ -552,34 +547,21 @@ int eva(int vol,int nev,int nevt,int init,int kmax,
       nlock=res_subsp(n,nev,omega1,omega2,Op,ws,ev,d);
       *status=nop;
       
-      if (ipr==1)
-      {
-         printf("i=%3d, k=%3d, d[%2d]=% .6e, d[%2d]=% .6e",
-                i,k,n,d[n],nlst-1,d[nlst-1]);
-         printf(", lbnd=% .6e, eps[%2d]=% .1e\n",lbnd,n,ee[n]);
-         fflush(stdout);
-      }      
+			lprintf("EVA",40,"i=%3d, k=%3d, d[%2d]=% .6e, d[%2d]=% .6e, lbnd=% .6e, eps[%2d]=% .1e\n",
+					i,k,n,d[n],nlst-1,d[nlst-1],lbnd,n,ee[n]);
       
       error(d[nlst-1]>ubnd,1,"eva [eva.c]",
             "Parameter ubnd is too low");
 
       if (nlock==nev)
       {
-         if (ipr==1)
-         {
-            printf("Computation of eigenvalues successfully completed\n");
-            fflush(stdout);
-         }
-         
-         return 0;
+				lprintf("EVA",10,"Computation succeded. MVM = %d\n",*status);
+				return 0;
       }
    }
+
+	 lprintf("EVA",10,"Unable to reach required precision. MVM = %d\n",*status);
    
-   if (ipr==1)
-   {
-      printf("Unable to reach the required precision\n");
-      fflush(stdout);
-   }
    
    return -1;
 }
