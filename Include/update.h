@@ -6,16 +6,16 @@
 
 void staples(int ix,int mu,suNg *v);
 void test_staples();
-void cabmar(float beta,suNg *u, suNg *v,int type);
+void cabmar(double beta,suNg *u, suNg *v,int type);
 
 void project_gauge_field(void);
 
-void update(float beta,int nhb,int nor);
-void random_su2(float rho,float s[]);
+void update(double beta,int nhb,int nor);
+void random_su2(double rho,double s[]);
 
 
-void Force0(float dt, suNg_algebra_vector *force);
-void Force(float dt, suNg_algebra_vector *force);
+void Force0(double dt, suNg_algebra_vector *force);
+void Force(double dt, suNg_algebra_vector *force);
 
 typedef struct {
 	double tlen; /* trajectory lenght */
@@ -59,7 +59,7 @@ int update_rhmc();
 
 /* this is the basic operator used in the update */
 void H2(suNf_spinor *out, suNf_spinor *in);
-void Force_rhmc_f(float dt, suNg_algebra_vector *force);
+void Force_rhmc_f(double dt, suNg_algebra_vector *force);
 
 typedef enum {
    NEW=1,

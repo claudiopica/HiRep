@@ -9,8 +9,8 @@ typedef enum {
 } block_selector;
 
 void Dphi_(block_selector B, suNf_spinor *out, suNf_spinor *in);
-void Dphi(float m0, suNf_spinor *out, suNf_spinor *in);
-void g5Dphi(float m0, suNf_spinor *out, suNf_spinor *in);
+void Dphi(double m0, suNf_spinor *out, suNf_spinor *in);
+void g5Dphi(double m0, suNf_spinor *out, suNf_spinor *in);
 
 void Dphi_dble_(block_selector B, suNf_spinor_dble *out, suNf_spinor_dble *in);
 void Dphi_dble(double m0, suNf_spinor_dble *out, suNf_spinor_dble *in);
