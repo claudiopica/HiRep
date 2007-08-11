@@ -24,7 +24,7 @@
 
 
 #define MESON_DEFINITION \
-void NAME(float *out, suNf_spinor **qp) { \
+void NAME(double *out, suNf_spinor **qp) { \
   int t,x,y,z, i; \
   suNf_spinor *s1; \
   suNf_spinor *s2; \

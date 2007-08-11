@@ -62,12 +62,12 @@ suNf* alloc_gfield_f()
 }
 
 
-suNg_dble* alloc_gfield_dble()
+suNg_flt* alloc_gfield_flt()
 {
    int ix;
-   suNg_dble unity,*p;
+   suNg_flt unity,*p;
 
-   p=amalloc(4*VOLUME*sizeof(suNg_dble),ALIGN);
+   p=amalloc(4*VOLUME*sizeof(suNg_flt),ALIGN);
    error(p==NULL,1,"alloc_ud [start.c]",
          "Could not allocate memory space for the gauge field");
 
@@ -81,12 +81,12 @@ suNg_dble* alloc_gfield_dble()
    return p;
 }
 
-suNf_dble* alloc_gfield_dble_f()
+suNf_flt* alloc_gfield_f_flt()
 {
    int ix;
-   suNf_dble unity,*p;
+   suNf_flt unity,*p;
  
-   p=amalloc(4*VOLUME*sizeof(suNf_dble),ALIGN);
+   p=amalloc(4*VOLUME*sizeof(suNf_flt),ALIGN);
    error(p==NULL,1,"alloc_ud [start.c]",
          "Could not allocate memory space for the gauge field");
 

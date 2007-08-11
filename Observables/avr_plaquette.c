@@ -9,7 +9,7 @@
 #include "global.h"
 #include "suN.h"
 
-float plaq(int ix,int mu,int nu)
+double plaq(int ix,int mu,int nu)
 {
    int iy,iz;
    suNg *v1,*v2,*v3,*v4,w1,w2,w3;
