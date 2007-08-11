@@ -17,13 +17,13 @@
 
 typedef struct
 {
-   float re,im;
+   double re,im;
 } complex;
 
 typedef struct
 {
-   double re,im;
-} complex_dble;
+   float re,im;
+} complex_flt;
 
 /*******************************************************************************
 *

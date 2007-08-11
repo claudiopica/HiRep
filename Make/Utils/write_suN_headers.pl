@@ -140,7 +140,7 @@ if ($complex eq "R") {
     write_suNr();
 } else {
     print "typedef $dataname ${dataname}c;\n\n";
-    print "typedef ${dataname}_dble ${dataname}c_dble;\n\n";
+    print "typedef ${dataname}_flt ${dataname}c_flt;\n\n";
 }
 write_spinor();
 write_suN_algebra_vector();
@@ -153,7 +153,7 @@ print <<END
 * The following macros are the same for single and double precision types
 *
 * Depending on the macro, arguments are variables of type suN_vector and suN
-* (or suN_vector_dble and suN_dble)
+* (or suN_vector_flt and suN_flt)
 *
 *******************************************************************************/
 
@@ -299,17 +299,17 @@ sub write_suN_vector {
   print "$cname$N;\n";
   print "} ${rdataname}_vector;\n\n";
   print $structdef;
-  print "   complex_dble ";
+  print "   complex_flt ";
   for(my $i=1;$i<$N;$i++){
     print "$cname$i,";
   }
   print "$cname$N;\n";
-  print "} ${rdataname}_vector_dble;\n\n";
+  print "} ${rdataname}_vector_flt;\n\n";
 }
 
 sub write_suN_algebra_vector {
   print $structdef;
-  print "   float ";
+  print "   double ";
   for(my $i=1;$i<($N*$N)-1;$i++){
     print "$cname$i,";
   }
@@ -317,12 +317,12 @@ sub write_suN_algebra_vector {
   print "$cname$last;\n";
   print "} ${rdataname}_algebra_vector;\n\n";
   print $structdef;
-  print "   double ";
+  print "   float ";
   for(my $i=1;$i<($N*$N)-1;$i++){
     print "$cname$i,";
   }
   print "$cname$last;\n";
-  print "} ${rdataname}_algebra_vector_dble;\n\n";
+  print "} ${rdataname}_algebra_vector_flt;\n\n";
 }
 
 sub write_suN {
@@ -341,7 +341,7 @@ sub write_suN {
   print "$cname$N\_$N;\n";
   print "} $dataname;\n\n";
   print $structdef;
-  print "   complex_dble ";
+  print "   complex_flt ";
   for(my $i=1;$i<$N;$i++){
     for(my $j=1;$j<$N;$j++){
       print "$cname$i\_$j, ";
@@ -353,12 +353,12 @@ sub write_suN {
     print "$cname$N\_$i, ";
   }
   print "$cname$N\_$N;\n";
-  print "} ${dataname}_dble;\n\n";
+  print "} ${dataname}_flt;\n\n";
 }
 
 sub write_suNr {
   print $structdef;
-  print "   float ";
+  print "   double";
   for(my $i=1;$i<$N;$i++){
     for(my $j=1;$j<$N;$j++){
       print "$cname$i\_$j, ";
@@ -372,7 +372,7 @@ sub write_suNr {
   print "$cname$N\_$N;\n";
   print "} $rdataname;\n\n";
   print $structdef;
-  print "   double ";
+  print "   float ";
   for(my $i=1;$i<$N;$i++){
     for(my $j=1;$j<$N;$j++){
       print "$cname$i\_$j, ";
@@ -384,7 +384,7 @@ sub write_suNr {
     print "$cname$N\_$i, ";
   }
   print "$cname$N\_$N;\n";
-  print "} ${rdataname}_dble;\n\n";
+  print "} ${rdataname}_flt;\n\n";
 }
 
 sub write_spinor {
@@ -397,12 +397,12 @@ sub write_spinor {
   print "$cname$slen;\n";
   print "} ${rdataname}_spinor;\n\n";
   print $structdef;
-  print "   ${rdataname}_vector_dble ";
+  print "   ${rdataname}_vector_flt ";
   for(my $i=1;$i<$slen;$i++){
     print "$cname$i, ";
   }
   print "$cname$slen;\n";
-  print "} ${rdataname}_spinor_dble;\n\n";
+  print "} ${rdataname}_spinor_flt;\n\n";
 }
 
 sub write_vector_copy {
@@ -1144,7 +1144,7 @@ sub write_suN_trace_im {
 sub write_suN_2TA {
   print "/* u=v - v^+ -1/N Tr(v - v^+)*I */\n";
   print "#define _${dataname}_2TA(u,v) \\\n";
-  print "  {float _trim = _suNg_trace_im(v)*(2./$N.);\\\n";
+  print "  {double _trim = _suNg_trace_im(v)*(2./$N.);\\\n";
   for(my $i=1;$i<=$N;$i++){
     for(my $j=$i;$j<=$N;$j++){
 	if($i==$j) {
@@ -1164,7 +1164,7 @@ sub write_suN_2TA {
 sub write_suN_TA {
   print "/* u=0.5(v - v^+) -1/(2N) Tr(v - v^+)*I */\n";
   print "#define _${dataname}_TA(u,v) \\\n";
-  print "  {float _trim = _suNg_trace_im(v)*(1./$N.);\\\n";
+  print "  {double _trim = _suNg_trace_im(v)*(1./$N.);\\\n";
   for(my $i=1;$i<=$N;$i++){
     for(my $j=$i;$j<=$N;$j++){
 	if($i==$j) {

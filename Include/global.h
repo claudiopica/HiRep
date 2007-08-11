@@ -36,9 +36,9 @@ EXTERN int idn[VOLUME][4];
 
 /* Gauge field pointer */
 EXTERN suNg *u_gauge;
-EXTERN suNg_dble *u_gauge_dble;
+EXTERN suNg_flt *u_gauge_flt;
 EXTERN suNf *u_gauge_f;
-EXTERN suNf_dble *u_gauge_f_dble;
+EXTERN suNf_flt *u_gauge_f_flt;
 
 #define gfield_ordering(ptr,ix,mu) (ptr+((ix)*4+(mu)))
 #define index_to_coord(i,ix,mu) (mu)=i&3;(ix)=i>>2

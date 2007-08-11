@@ -20,16 +20,16 @@ void get_spinor_len(unsigned int *len) {
   *len=_spinor_len;
 }
 
-/* single precision */
+/* double precision */
 #define _SPINOR_TYPE suNf_spinor
 #define _FUNC(a) a##_f
 #include "TMPL/linear_algebra.c.sdtmpl"
 #undef _SPINOR_TYPE
 #undef _FUNC
 
-/* double precision */
-#define _SPINOR_TYPE suNf_spinor_dble
-#define _FUNC(a) a##_dble_f
+/* single precision */
+#define _SPINOR_TYPE suNf_spinor_flt
+#define _FUNC(a) a##_flt_f
 #include "TMPL/linear_algebra.c.sdtmpl"
 #undef _SPINOR_TYPE
 #undef _FUNC
