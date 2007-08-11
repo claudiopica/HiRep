@@ -216,7 +216,7 @@ int HBiCGstab_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_s
   /* test results */
 #ifndef NDEBUG
   for(i=0;i<par->n;++i){
-    float norm;
+    double norm;
     M(Ms,out[i]);
     if(i!=0) {
       spinor_field_mul_add_assign_f(Ms,-par->shift[i-1],out[i]);

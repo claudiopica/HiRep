@@ -36,8 +36,8 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
    
    /* allocate spinors fields and aux real variables */
 	 get_spinor_len(&spinorlen);
-   p = (suNf_spinor **)malloc(sizeof(suNf_spinor*)*(par->n));
-   p[0] = (suNf_spinor *)malloc(sizeof(suNf_spinor)*(3+par->n)*spinorlen);
+   p = malloc(sizeof(suNf_spinor*)*(par->n));
+   p[0] = malloc(sizeof(suNf_spinor)*(3+par->n)*spinorlen);
    for (i=1; i<(par->n); ++i) {
       p[i] = p[i-1]+spinorlen;
    }
@@ -45,9 +45,9 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
    r=k+spinorlen;
    Mk=r+spinorlen;
 
-   z1 = (double *)malloc(sizeof(double)*(par->n));
-   z2 = (double *)malloc(sizeof(double)*(par->n));
-   z3 = (double *)malloc(sizeof(double)*(par->n));
+   z1 = malloc(sizeof(*z1)*(par->n));
+   z2 = malloc(sizeof(*z2)*(par->n));
+   z3 = malloc(sizeof(*z3)*(par->n));
    
    /* init recursion */
    cgiter = 0;
@@ -119,7 +119,7 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
 
    /* test results */
    for(i=0;i<par->n;++i){
-     float norm;
+     double norm;
      M(Mk,out[i]);
 		 ++cgiter;
      spinor_field_mul_add_assign_f(Mk,-par->shift[i],out[i]);

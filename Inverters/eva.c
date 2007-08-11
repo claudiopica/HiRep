@@ -88,6 +88,7 @@
 #include "linear_algebra.h"
 #include "inverters.h"
 #include "logger.h"
+#include "suN.h"
 
 #define GAMMA 3.0
 #define MAX_ROTATE 50
@@ -96,7 +97,7 @@ static int initr=0;
 static suNf_spinor *psi,*chi;
 
 static int nop,nsp,nvc=0;
-static float *dd,*ee;
+static double *dd,*ee;
 static complex *aa,*bb,*cc,*vv;
 
 static double EPSILON=1.e-12;
@@ -165,7 +166,7 @@ static int alloc_aux(int nevt)
       }
       
       aa=malloc(4*nevt*nevt*sizeof(complex));
-      dd=malloc(2*nevt*sizeof(float));
+      dd=malloc(2*nevt*sizeof(double));
 
       bb=aa+nevt*nevt;
       cc=bb+nevt*nevt;
@@ -180,7 +181,7 @@ static int alloc_aux(int nevt)
 }
 
 
-static void lc1(float c1,suNf_spinor *ps1,suNf_spinor *ps2)
+static void lc1(double c1,suNf_spinor *ps1,suNf_spinor *ps2)
 {
    suNf_spinor *psm;
 
@@ -194,7 +195,7 @@ static void lc1(float c1,suNf_spinor *ps1,suNf_spinor *ps2)
 }
 
 
-static void lc2(float c1,float c2,suNf_spinor *ps1,suNf_spinor *ps2)
+static void lc2(double c1,double c2,suNf_spinor *ps1,suNf_spinor *ps2)
 {
    suNf_spinor *psm;
 
@@ -207,7 +208,7 @@ static void lc2(float c1,float c2,suNf_spinor *ps1,suNf_spinor *ps2)
    }
 }
 
-static void lc3(float c1,float c2,suNf_spinor *ps1,suNf_spinor *ps2,suNf_spinor *ps3)
+static void lc3(double c1,double c2,suNf_spinor *ps1,suNf_spinor *ps2,suNf_spinor *ps3)
 {
    suNf_spinor *psm;
 
@@ -226,7 +227,7 @@ static void lc3(float c1,float c2,suNf_spinor *ps1,suNf_spinor *ps2,suNf_spinor 
 
 static void project(suNf_spinor *pk,suNf_spinor *pl)
 {
-   complex_dble sp;
+   complex sp;
 
    sp.re=-spinor_field_prod_re_f(pl,pk);
    sp.im=-spinor_field_prod_im_f(pl,pk);
@@ -235,7 +236,7 @@ static void project(suNf_spinor *pk,suNf_spinor *pl)
 }   
 
 
-static float normalize(suNf_spinor *ps)
+static double normalize(suNf_spinor *ps)
 {
    double r,ri;
 
@@ -246,7 +247,7 @@ static float normalize(suNf_spinor *ps)
    ri=1.0/r;
    spinor_field_mul_f(ps,ri,ps);
 
-   return (float)(r);
+   return (double)(r);
 }
 
 
@@ -277,10 +278,10 @@ static void init_subsp(int nev,int nevt,int init,suNf_spinor *ev[])
 
 
 static void ritz_subsp(int nlock,int nevt,spinor_operator Op,
-                       suNf_spinor *ws[],suNf_spinor *ev[],float d[])
+                       suNf_spinor *ws[],suNf_spinor *ev[],double d[])
 {
    int neff,i,j;
-   complex_dble z;
+   complex z;
 
    neff=nevt-nlock;
    
@@ -325,16 +326,16 @@ static void submat(int nev,int ia,int ib)
 }
 
 
-static float min_eva(int ia,int ib,float d[])
+static double min_eva(int ia,int ib,double d[])
 {
    int i;
-   float r0,r1;
+   double r0,r1;
 
-   r0=(float)fabs((double)(d[ia]));
+   r0=(double)fabs((double)(d[ia]));
 
    for (i=ia+1;i<ib;i++)
    {
-      r1=(float)fabs((double)(d[i]));
+      r1=(double)fabs((double)(d[i]));
       if (r1<r0)
          r0=r1;
    }
@@ -343,13 +344,13 @@ static float min_eva(int ia,int ib,float d[])
 }
 
 
-static int res_subsp(int nlock,int nev,float omega1,float omega2,
+static int res_subsp(int nlock,int nev,double omega1,double omega2,
                      spinor_operator Op,
-                     suNf_spinor *ws[],suNf_spinor *ev[],float d[])
+                     suNf_spinor *ws[],suNf_spinor *ev[],double d[])
 {
    int i,ia,ib;
-   float eps1,eps2,absd1,absd2;
-   complex_dble z;
+   double eps1,eps2,absd1,absd2;
+   complex z;
 
    eps1=0.0f;
    ia=nlock;
@@ -360,7 +361,7 @@ static int res_subsp(int nlock,int nev,float omega1,float omega2,
       {
          submat(nev,ia,ib);
          jacobi2(ib-ia,cc,dd,vv);
-         eps1=(float)sqrt((double)(dd[ib-ia-1]));
+         eps1=(double)sqrt((double)(dd[ib-ia-1]));
          absd1=min_eva(ia,ib,d);
 
          for (i=ia;i<ib;i++)
@@ -377,8 +378,8 @@ static int res_subsp(int nlock,int nev,float omega1,float omega2,
       bb[nev*ib+ib].re=spinor_field_sqnorm_f(ws[0]);
       bb[nev*ib+ib].im=0.0f;
 
-      eps2=(float)sqrt((double)(bb[nev*ib+ib].re));
-      absd2=(float)fabs((double)(d[ib]));
+      eps2=(double)sqrt((double)(bb[nev*ib+ib].re));
+      absd2=(double)fabs((double)(d[ib]));
       ee[ib]=eps2;
       
       if (ib>ia)
@@ -409,7 +410,7 @@ static int res_subsp(int nlock,int nev,float omega1,float omega2,
 
    submat(nev,ia,ib);
    jacobi2(ib-ia,cc,dd,vv);
-   eps1=(float)sqrt((double)(dd[ib-ia-1]));
+   eps1=(double)sqrt((double)(dd[ib-ia-1]));
    absd1=min_eva(ia,ib,d);
 
    for (i=ia;i<ib;i++)
@@ -422,18 +423,18 @@ static int res_subsp(int nlock,int nev,float omega1,float omega2,
 }
 
 
-static float set_lbnd(int nevt,int kmax,float ubnd,float d[],int *k)
+static double set_lbnd(int nevt,int kmax,double ubnd,double d[],int *k)
 {
-   float mu1,mu2,nu1,nu2,t;
+   double mu1,mu2,nu1,nu2,t;
 
    mu1=d[0];
    mu2=d[nevt-1];
    
    nu1=GAMMA*GAMMA;
-   nu1=(float)(log((double)(nu1)+sqrt((double)(nu1*nu1)-1.0)));
+   nu1=(double)(log((double)(nu1)+sqrt((double)(nu1*nu1)-1.0)));
 
    nu2=GAMMA;
-   nu2=(float)(log((double)(nu2)+sqrt((double)(nu2*nu2)-1.0)));
+   nu2=(double)(log((double)(nu2)+sqrt((double)(nu2*nu2)-1.0)));
    
    (*k)=(int)(0.5*sqrt((double)(((ubnd-mu1)*nu1*nu1-(ubnd-mu2)*nu2*nu2)/
                                 (mu2-mu1))));
@@ -444,18 +445,18 @@ static float set_lbnd(int nevt,int kmax,float ubnd,float d[],int *k)
    if ((*k)<2)
       (*k)=2;
 
-   t=(float)(tanh((double)(nu2)/(double)(2*(*k))));
+   t=(double)(tanh((double)(nu2)/(double)(2*(*k))));
 
    return mu2+(ubnd-mu2)*t*t;
 }
 
 
-static void apply_cheby(int k,float lbnd,float ubnd,
+static void apply_cheby(int k,double lbnd,double ubnd,
                         spinor_operator Op,
                         suNf_spinor *ws[],suNf_spinor *ev)
 {
    int j;
-   float c1,c2;
+   double c1,c2;
    suNf_spinor *psi0,*psi1,*psi2,*psi3;
 
    c1=2.0f/(ubnd-lbnd);
@@ -486,13 +487,13 @@ static void apply_cheby(int k,float lbnd,float ubnd,
 
 
 int eva(int vol,int nev,int nevt,int init,int kmax,
-        int imax,float ubnd,float omega1,float omega2,
+        int imax,double ubnd,double omega1,double omega2,
         spinor_operator Op,
-        suNf_spinor *ws[],suNf_spinor *ev[],float d[],int *status)   
+        suNf_spinor *ws[],suNf_spinor *ev[],double d[],int *status)   
 {
    int i,k,n;
    int nlock,nupd,nlst;
-   float lbnd;
+   double lbnd;
    
    *status=0;
    

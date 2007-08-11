@@ -43,10 +43,10 @@
 #define MAX_SWEEP 100
 
 
-static void sort1(int n,float d[],float v[])
+static void sort1(int n,double d[],double v[])
 {
    int i,j,k;
-   float p;
+   double p;
     
    for (i=0;i<n-1;i++)
    {
@@ -78,10 +78,10 @@ static void sort1(int n,float d[],float v[])
 }
 
 
-static void sort2(int n,float d[],complex v[])
+static void sort2(int n,double d[],complex v[])
 {
    int i,j,k;
-   float p;
+   double p;
    complex q;
    
    for (i=0;i<n-1;i++)
@@ -114,18 +114,18 @@ static void sort2(int n,float d[],complex v[])
 }
 
 
-void jacobi1(int n,float a[],float d[],float v[])
+void jacobi1(int n,double a[],double d[],double v[])
 {
    int k,l,j,sweep;
-   float tol,abs_sum,thresh_factor,sd_factor,thresh;
-   float r1,r2,r3,r4;
-   float t,e,s,c,tau;
-   float xn,xd0,xdh,xd1;
+   double tol,abs_sum,thresh_factor,sd_factor,thresh;
+   double r1,r2,r3,r4;
+   double t,e,s,c,tau;
+   double xn,xd0,xdh,xd1;
    
    xd0=0.0f;
    xdh=0.5f;
    xd1=1.0f;
-   xn=(float)n;
+   xn=(double)n;
    sd_factor=100.0f;
    thresh_factor=0.2f/(xn*xn);
 
@@ -136,7 +136,7 @@ void jacobi1(int n,float a[],float d[],float v[])
    {
       v[n*k+k]=xd1;
       d[k]=a[n*k+k];
-      tol+=(float)fabs((double)d[k]);
+      tol+=fabs(d[k]);
       
       for (l=k+1;l<n;l++)
       {
@@ -146,12 +146,12 @@ void jacobi1(int n,float a[],float d[],float v[])
 	 error(a[n*k+l]!=a[n*l+k],1,
                    "jacobi1 [jacobi.c]","Matrix is not symmetric");
 
-	 abs_sum+=(float)fabs((double)(a[n*k+l]));
+	 abs_sum+=fabs(a[n*k+l]);
       }
    }
 
    tol+=2.0f*abs_sum;
-   tol*=FLT_EPSILON;
+   tol*=DBL_EPSILON;
    
    for (sweep=0;(abs_sum>tol)&&(sweep<MAX_SWEEP);sweep++)
    {
@@ -163,21 +163,21 @@ void jacobi1(int n,float a[],float d[],float v[])
       {
 	 for (l=k+1;l<n;l++)
 	 {
-	    r1=sd_factor*((float)fabs((double)a[n*k+l]));
-	    r2=(float)fabs((double)d[k]);
-	    r3=(float)fabs((double)d[l]);
+	    r1=sd_factor*(fabs(a[n*k+l]));
+	    r2=fabs(d[k]);
+	    r3=fabs(d[l]);
 
-	    if ((sweep>3)&&(r1<=(r2*FLT_EPSILON))&&(r1<=(r3*FLT_EPSILON)))
+	    if ((sweep>3)&&(r1<=(r2*DBL_EPSILON))&&(r1<=(r3*DBL_EPSILON)))
 	       a[n*k+l]=xd0;
 	    
-	    r1=(float)fabs((double)a[n*k+l]);
+	    r1=fabs(a[n*k+l]);
 	    if (r1<=thresh)
 	       continue;
 
 	    r2=d[l]-d[k];
-	    r3=(float)fabs((double)r2);
+	    r3=fabs(r2);
 
-	    if ((sd_factor*r1)<(r3*FLT_EPSILON))
+	    if ((sd_factor*r1)<(r3*DBL_EPSILON))
 	    {
 	       t=r1/r2;
 	    }
@@ -186,11 +186,11 @@ void jacobi1(int n,float a[],float d[],float v[])
 	       r4=xdh*r2/r1;
 	       if (r4<xd0)
 	       {
-		  t=xd1/(r4-((float)sqrt((double)(xd1+r4*r4))));
+		  t=xd1/(r4-(sqrt(xd1+r4*r4)));
 	       }
 	       else
 	       {
-		  t=xd1/(r4+((float)sqrt((double)(xd1+r4*r4))));
+		  t=xd1/(r4+(sqrt(xd1+r4*r4)));
 	       }
 	    }
 
@@ -199,7 +199,7 @@ void jacobi1(int n,float a[],float d[],float v[])
 	       e=-xd1;
 	    a[n*k+l]=xd0;
 
-	    c=xd1/((float)sqrt((double)(xd1+t*t)));
+	    c=xd1/(sqrt(xd1+t*t));
 	    s=t*c;
 	    tau=s/(xd1+c);
 	    
@@ -245,7 +245,7 @@ void jacobi1(int n,float a[],float d[],float v[])
       {
 	 for (l=k+1;l<n;l++)
 	 {
-	    abs_sum+=(float)fabs((double)a[n*k+l]);
+	    abs_sum+=fabs(a[n*k+l]);
 	 }
       }
    }
@@ -265,13 +265,13 @@ void jacobi1(int n,float a[],float d[],float v[])
 }
 
 
-void jacobi2(int n,complex a[],float d[],complex v[])
+void jacobi2(int n,complex a[],double d[],complex v[])
 {
    int k,l,j,sweep;
-   float tol,abs_sum,thresh_factor,sd_factor,thresh;
-   float r1,r2,r3,r4;
-   float t,s,c,tau;
-   float xn,xd0,xdh,xd1;
+   double tol,abs_sum,thresh_factor,sd_factor,thresh;
+   double r1,r2,r3,r4;
+   double t,s,c,tau;
+   double xn,xd0,xdh,xd1;
    complex z1,z2;
    complex e;
    complex zd0,zd1;
@@ -279,7 +279,7 @@ void jacobi2(int n,complex a[],float d[],complex v[])
    xd0=0.0f;
    xdh=0.5f;
    xd1=1.0f;
-   xn=(float)n;
+   xn=(double)n;
    sd_factor=100.0f;
    thresh_factor=0.2f/(xn*xn);
 
@@ -295,7 +295,7 @@ void jacobi2(int n,complex a[],float d[],complex v[])
    {
       v[n*k+k]=zd1;
       d[k]=a[n*k+k].re;
-      tol+=(float)fabs((double)d[k]);
+      tol+=fabs(d[k]);
 
       for (l=k+1;l<n;l++)
       {
@@ -305,12 +305,12 @@ void jacobi2(int n,complex a[],float d[],complex v[])
 	 error((a[n*k+l].re!=a[n*l+k].re)||(a[n*k+l].im!=-a[n*l+k].im),1,
                    "jacobi2 [jacobi.c]","Matrix is not hermitian");
 	  
-         abs_sum+=(float)(fabs((double)a[n*k+l].re)+fabs((double)a[n*k+l].im));
+         abs_sum+=(fabs(a[n*k+l].re)+fabs(a[n*k+l].im));
       }
    }
 
    tol+=2.0f*abs_sum;
-   tol*=FLT_EPSILON;   
+   tol*=DBL_EPSILON;   
    
    for (sweep=0;(abs_sum>tol)&&(sweep<MAX_SWEEP);sweep++)
    {
@@ -323,38 +323,38 @@ void jacobi2(int n,complex a[],float d[],complex v[])
 	 for (l=k+1;l<n;l++)
 	 {
 	    r1=sd_factor*
-               ((float)(fabs((double)a[n*k+l].re)+fabs((double)a[n*k+l].im)));
-	    r2=(float)fabs((double)d[k]);
-	    r3=(float)fabs((double)d[l]);
+               (fabs(a[n*k+l].re)+fabs(a[n*k+l].im));
+	    r2=fabs(d[k]);
+	    r3=fabs(d[l]);
 
-	    if ((sweep>3)&&(r1<=(r2*FLT_EPSILON))&&(r1<=(r3*FLT_EPSILON)))
+	    if ((sweep>3)&&(r1<=(r2*DBL_EPSILON))&&(r1<=(r3*DBL_EPSILON)))
 	       a[n*k+l]=zd0;
 	
-	    r2=(float)fabs((double)a[n*k+l].re);
-	    r3=(float)fabs((double)a[n*k+l].im);
+	    r2=fabs(a[n*k+l].re);
+	    r3=fabs(a[n*k+l].im);
 
 	    if (r2>r3)
 	    {
 	       r3/=r2;
-	       r1=r2*((float)sqrt((double)(xd1+r3*r3)));
+	       r1=r2*(sqrt(xd1+r3*r3));
 	    }
 	    else if (r2<r3)
 	    {
 	       r2/=r3;
-	       r1=r3*((float)sqrt((double)(xd1+r2*r2)));
+	       r1=r3*(sqrt(xd1+r2*r2));
 	    }
 	    else
 	    {
-	       r1=r2*((float)sqrt((double)(xd1+xd1)));
+	       r1=r2*(sqrt(xd1+xd1));
 	    }
 
 	    if (r1<=thresh)
 	       continue;
 
 	    r2=d[l]-d[k];
-	    r3=(float)fabs((double)r2);
+	    r3=fabs(r2);
 
-	    if ((sd_factor*r1)<(r3*FLT_EPSILON))
+	    if ((sd_factor*r1)<(r3*DBL_EPSILON))
 	    {
 	       t=r1/r2;
 	    }
@@ -363,11 +363,11 @@ void jacobi2(int n,complex a[],float d[],complex v[])
 	       r4=xdh*r2/r1;
 	       if (r4<xd0)
 	       {
-		  t=xd1/(r4-((float)sqrt((double)(xd1+r4*r4))));
+		  t=xd1/(r4-(sqrt(xd1+r4*r4)));
 	       }
 	       else
 	       {
-		  t=xd1/(r4+((float)sqrt((double)(xd1+r4*r4))));
+		  t=xd1/(r4+(sqrt(xd1+r4*r4)));
 	       }
 	    }
 
@@ -375,7 +375,7 @@ void jacobi2(int n,complex a[],float d[],complex v[])
 	    e.im=a[n*k+l].im/r1;
 	    a[n*k+l]=zd0;
 
-	    c=xd1/((float)sqrt((double)(xd1+t*t)));
+	    c=xd1/(sqrt(xd1+t*t));
 	    s=t*c;
 	    tau=s/(xd1+c);
 
@@ -430,7 +430,7 @@ void jacobi2(int n,complex a[],float d[],complex v[])
 	 for (l=k+1;l<n;l++)
 	 {
 	    abs_sum+=
-               (float)(fabs((double)a[n*k+l].re)+fabs((double)a[n*k+l].im));
+               (fabs(a[n*k+l].re)+fabs(a[n*k+l].im));
 	 }
       }
    }

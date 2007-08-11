@@ -78,7 +78,7 @@ void _FUNC(spinor_field_mulc_add_assign)(_SPINOR_TYPE *s1, complex c, _SPINOR_TY
 {
    int len;
    complex c1;
-   c1.re=c.re; c1.im=c.im; /* conversion to float */
+   c1.re=c.re; c1.im=c.im; 
    for(len=0;len<_spinor_len;++len){
       _spinor_mulc_add_assign_f(*s1,c1,*s2);
       s1+=1;
@@ -102,7 +102,7 @@ void _FUNC(spinor_field_mulc)(_SPINOR_TYPE *s1, complex c, _SPINOR_TYPE *s2)
 {
    int len;
    complex c1;
-   c1.re=c.re; c1.im=c.im; /* conversion to float */
+   c1.re=c.re; c1.im=c.im;
    for(len=0;len<_spinor_len;++len){
       _spinor_mulc_f(*s1,c1,*s2);
       s1+=1;

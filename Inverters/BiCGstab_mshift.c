@@ -8,11 +8,11 @@
 
 /* _compute_z(z3+i,z1+i,z2+i,&ctmp1,beta,alpha,&(par->shift[i-1])); */
 /* res = (z1*betam1)/(beta*alpha*(z1-z2)+z1*betam1*(1+sigma*beta)) (abbiamo diviso per z2) */
-__inline static void _compute_z(complex_dble *res, complex_dble *z1, complex_dble *z2, 
-				complex_dble *betam1, complex_dble *beta, complex_dble *alpha,
+__inline static void _compute_z(complex *res, complex *z1, complex *z2, 
+				complex *betam1, complex *beta, complex *alpha,
 				double *sigma) 
 {
-  complex_dble ctmp1, ctmp2, ctmp3, ctmp4;
+  complex ctmp1, ctmp2, ctmp3, ctmp4;
   
   _complex_mul(ctmp1,*z1,*betam1);
   _complex_mul(ctmp2,*beta,*alpha); 
@@ -41,9 +41,9 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_sp
   suNf_spinor *r, *r1, *o, *Ms, *Mo, *o0;
   suNf_spinor *sptmp;
 
-  complex_dble delta, phi; 
-  complex_dble *z1, *z2, *z3, *alpha, *beta, *chi, *rho; /* alpha is unnecessary */
-  complex_dble ctmp1, ctmp2, ctmp3,ctmp4, ctmp5, oldalpha;
+  complex delta, phi; 
+  complex *z1, *z2, *z3, *alpha, *beta, *chi, *rho; /* alpha is unnecessary */
+  complex ctmp1, ctmp2, ctmp3,ctmp4, ctmp5, oldalpha;
   double rtmp1;
 
   int i;
@@ -79,7 +79,7 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_sp
   Mo = Ms+(spinorlen);
   o0 = Mo+(spinorlen);
 
-  z1 = (complex_dble *)malloc(sizeof(complex_dble)*7*(par->n));
+  z1 = (complex *)malloc(sizeof(complex)*7*(par->n));
   z2 = z1+(par->n);
   z3 = z2+(par->n);
   alpha = z3+(par->n);
@@ -255,7 +255,7 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_sp
   /* test results */
 #ifndef NDEBUG
   for(i=0;i<par->n;++i){
-    float norm;
+    double norm;
     M(Ms,out[i]);
     if(i!=0) {
       spinor_field_mul_add_assign_f(Ms,-par->shift[i-1],out[i]);

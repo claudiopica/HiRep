@@ -46,12 +46,9 @@ void jacobi1(int n,double a[],double d[],double v[]);
 void jacobi2(int n,complex a[],double d[],complex v[]);
 
 int eva_flt(int vol,int nev,int nevt,int init,int kmax,
-               int imax,float ubnd,float omega1,float omega2,
+               int imax,double ubnd,double omega1,double omega2,
                spinor_operator_flt Op,
-               suNf_spinor_flt *ws[],suNf_spinor_flt *ev[],float d[],int *status);
-
-void jacobi1_flt(int n,float a[],float d[],float v[]);
-void jacobi2_flt(int n,complex_flt a[],float d[],complex_flt v[]);
+               suNf_spinor_flt *ws[],suNf_spinor_flt *ev[],double d[],int *status);
 
 
 #endif
