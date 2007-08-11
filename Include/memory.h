@@ -19,8 +19,8 @@ void afree(void *addr);
 void free_field(void *u);
 suNg* alloc_gfield();
 suNf* alloc_gfield_f();
-suNg_dble* alloc_gfield_flt();
-suNf_dble* alloc_gfield_f_flt();
+suNg_flt* alloc_gfield_flt();
+suNf_flt* alloc_gfield_f_flt();
 suNf_spinor* alloc_spinor_field_f();
 suNg_algebra_vector* alloc_momenta();
 

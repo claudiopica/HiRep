@@ -18,22 +18,22 @@
 #define TWO_PI 6.2831854f
 
 static int i_vec=NVEC,i_y=NRAN,i_v=NRAN;
-static float vec1[NVEC],vec2[NVEC],vec3[NVEC];
-static float r[NRAN],u[NRAN],v[NRAN],y[NRAN];
+static double vec1[NVEC],vec2[NVEC],vec3[NVEC];
+static double r[NRAN],u[NRAN],v[NRAN],y[NRAN];
 
 
 static void update_vec(void)
 {
    int i;
-   float r1,r2,rsq;
+   double r1,r2,rsq;
      
-   ranlxs(r,NRAN);
+   ranlxd(r,NRAN);
       
    for (i=0;i<NVEC;i++)
    {
       r1=2.0f*r[i]-1.0f;
       r2=TWO_PI*r[NVEC+i]-PI;      
-      rsq=(float)(sqrt((double)(1.0f-r1*r1)));
+      rsq=sqrt(1.0f-r1*r1);
 
       vec1[i]=r1;
       vec2[i]=rsq*sin(r2);
@@ -47,18 +47,18 @@ static void update_vec(void)
 static void update_y(void)
 {
    int i;
-   float r1,r2,r3,r4,s,c;
+   double r1,r2,r3,r4,s,c;
 
-   ranlxs(y,NRAN);
-   ranlxs(u,NRAN);
-   ranlxs(r,NRAN);
+   ranlxd(y,NRAN);
+   ranlxd(u,NRAN);
+   ranlxd(r,NRAN);
       
    for (i=0;i<NVEC;i++)
    {
-      r1=-(float)(log((double)(1.0f-y[i])));
+      r1=-log(1.0f-y[i]);
       r2=PI_HALF*y[NVEC+i];
-      r3=(float)(log((double)(1.0f-u[i])));      
-      r4=(float)(log((double)(1.0f-u[NVEC+i])));
+      r3=log(1.0f-u[i]);      
+      r4=log(1.0f-u[NVEC+i]);
 
       s=sin(r2);
       s*=s;
@@ -76,14 +76,14 @@ static void update_y(void)
    i_y=0;   
 }
 
-void random_su2(float rho,float s[])
+void random_su2(double rho,double s[])
   /*
    *  Computes a random vector s[4] with probability density
    *  proportional to exp(rho*s[0])*delta(1-s^2) assuming rho>=0
    */
 {
-   float rhoinv,s0p1,ut,rt;
-   float s0,s1,s2,s3,sq;
+   double rhoinv,s0p1,ut,rt;
+   double s0,s1,s2,s3,sq;
 
    if (i_vec==NVEC)
       update_vec();
@@ -107,17 +107,17 @@ void random_su2(float rho,float s[])
    else if (rho>0.3f)
    {
       rhoinv=1.0f/rho;
-      rt=(float)(exp((double)(rho+rho))-1.0);
+      rt=exp(rho+rho)-1.0;
 
       for (;;)
       {
          if (i_v==NRAN)
          {
-            ranlxs(v,NRAN);
+            ranlxd(v,NRAN);
             i_v=0;
          }         
 
-         s0p1=rhoinv*(float)(log(1.0+(double)(rt*v[i_v++])));
+         s0p1=rhoinv*log(1.0+rt*v[i_v++]);
          ut=v[i_v++];
          
          if ((ut*ut)<=(s0p1*(2.0f-s0p1)))
@@ -130,12 +130,12 @@ void random_su2(float rho,float s[])
       {
          if (i_v==NRAN)
          {
-            ranlxs(v,NRAN);
+            ranlxd(v,NRAN);
             i_v=0;
          }
 
          s0p1=2.0f*v[i_v++];
-         rt=(float)(exp((double)(rho*(s0p1-2.0f))));
+         rt=exp(rho*(s0p1-2.0f));
          ut=v[i_v++];
          
          if ((ut*ut)<=(s0p1*(2.0f-s0p1)*rt*rt))
@@ -143,7 +143,7 @@ void random_su2(float rho,float s[])
       }
    }
 
-   sq=(float)(sqrt((double)(s0p1*(2.0f-s0p1))));   
+   sq=sqrt(s0p1*(2.0f-s0p1));   
    s0=s0p1-1.0f;   
    s1=sq*vec1[i_vec];
    s2=sq*vec2[i_vec];

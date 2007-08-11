@@ -1,9 +1,9 @@
 /*******************************************************************************
 *
-* File Dphi.c
+* File Dphi_flt.c
 *
 * Action of the Wilson-Dirac operator D and hermitian g5D on a given 
-* double-precision spinor field
+* single-precision spinor field
 *
 *******************************************************************************/
 
@@ -37,17 +37,17 @@ unsigned long int getMVM() {
  */
 
 /* prende 2 spinor lunghi VOLUME/2 definiti solo su siti con la stessa parita' */
-void Dphi_(block_selector B, suNf_spinor *out, suNf_spinor *in)
+void Dphi_flt_(block_selector B, suNf_spinor_flt *out, suNf_spinor_flt *in)
 {
    int ix,iy, smin=0, smax=0;
-   suNf *up,*um;
-   suNf_vector psi,chi;
-   suNf_spinor *r=0,*sp,*sm;
+   suNf_flt *up,*um;
+   suNf_vector_flt psi,chi;
+   suNf_spinor_flt *r=0,*sp,*sm;
 
-   error((in==NULL)||(out==NULL),1,"Dphi_ [Dphi.c]",
+   error((in==NULL)||(out==NULL),1,"Dphi_flt_ [Dphi_flt.c]",
          "Attempt to access unallocated memory space");
    
-   error(in==out,1,"Dphi_ [Dphi.c]",
+   error(in==out,1,"Dphi_flt_ [Dphi_flt.c]",
          "Input and output fields must be different");
 
    switch(B) {
@@ -62,7 +62,7 @@ void Dphi_(block_selector B, suNf_spinor *out, suNf_spinor *in)
          smax=VOLUME;
          break;
       default:
-         error(1,1,"Dphi_ [Dphi.c]",
+         error(1,1,"Dphi_flt_ [Dphi_flt.c]",
                "Invalid block parity selection");
    }
 
@@ -80,7 +80,7 @@ void Dphi_(block_selector B, suNf_spinor *out, suNf_spinor *in)
 
       iy=iup[ix][0];
       sp=in+iy;
-      up=pu_gauge_f(ix,0);
+      up=pu_gauge_f_flt(ix,0);
       
       _vector_add_f(psi,(*sp).c1,(*sp).c3);
       _suNf_multiply(chi,(*up),psi);
@@ -98,7 +98,7 @@ void Dphi_(block_selector B, suNf_spinor *out, suNf_spinor *in)
 
       iy=idn[ix][0];
       sm=in+iy;
-      um=pu_gauge_f(iy,0);
+      um=pu_gauge_f_flt(iy,0);
       
       _vector_sub_f(psi,(*sm).c1,(*sm).c3);
       _suNf_inverse_multiply(chi,(*um),psi);
@@ -116,7 +116,7 @@ void Dphi_(block_selector B, suNf_spinor *out, suNf_spinor *in)
 
       iy=iup[ix][1];
       sp=in+iy;
-      up=pu_gauge_f(ix,1);
+      up=pu_gauge_f_flt(ix,1);
       
       _vector_i_add_f(psi,(*sp).c1,(*sp).c4);
       _suNf_multiply(chi,(*up),psi);
@@ -134,7 +134,7 @@ void Dphi_(block_selector B, suNf_spinor *out, suNf_spinor *in)
 
       iy=idn[ix][1];
       sm=in+iy;
-      um=pu_gauge_f(iy,1);
+      um=pu_gauge_f_flt(iy,1);
       
       _vector_i_sub_f(psi,(*sm).c1,(*sm).c4);
       _suNf_inverse_multiply(chi,(*um),psi);
@@ -152,7 +152,7 @@ void Dphi_(block_selector B, suNf_spinor *out, suNf_spinor *in)
 
       iy=iup[ix][2];
       sp=in+iy;
-      up=pu_gauge_f(ix,2);
+      up=pu_gauge_f_flt(ix,2);
       
       _vector_add_f(psi,(*sp).c1,(*sp).c4);
       _suNf_multiply(chi,(*up),psi);
@@ -170,7 +170,7 @@ void Dphi_(block_selector B, suNf_spinor *out, suNf_spinor *in)
 
       iy=idn[ix][2];
       sm=in+iy;
-      um=pu_gauge_f(iy,2);
+      um=pu_gauge_f_flt(iy,2);
       
       _vector_sub_f(psi,(*sm).c1,(*sm).c4);
       _suNf_inverse_multiply(chi,(*um),psi);
@@ -188,7 +188,7 @@ void Dphi_(block_selector B, suNf_spinor *out, suNf_spinor *in)
 
       iy=iup[ix][3];
       sp=in+iy;
-      up=pu_gauge_f(ix,3);
+      up=pu_gauge_f_flt(ix,3);
       
       _vector_i_add_f(psi,(*sp).c1,(*sp).c3);
       _suNf_multiply(chi,(*up),psi);
@@ -206,7 +206,7 @@ void Dphi_(block_selector B, suNf_spinor *out, suNf_spinor *in)
 
       iy=idn[ix][3];
       sm=in+iy;
-      um=pu_gauge_f(iy,3);
+      um=pu_gauge_f_flt(iy,3);
       
       _vector_i_sub_f(psi,(*sm).c1,(*sm).c3);
       _suNf_inverse_multiply(chi,(*um),psi);
@@ -237,20 +237,20 @@ void Dphi_(block_selector B, suNf_spinor *out, suNf_spinor *in)
  * this function takes 2 spinors defined on the whole lattice
  * of size VOLUME
  */
-void Dphi(double m0, suNf_spinor *out, suNf_spinor *in)
+void Dphi_flt(double m0, suNf_spinor_flt *out, suNf_spinor_flt *in)
 {
    int ix;
    double rho;
-   suNf_spinor *r, *s;
+   suNf_spinor_flt *r, *s;
 
-   error((in==NULL)||(out==NULL),1,"Dphi [Dphi.c]",
+   error((in==NULL)||(out==NULL),1,"Dphi_flt [Dphi_flt.c]",
          "Attempt to access unallocated memory space");
    
-   error(in==out,1,"Dphi [Dphi.c]",
+   error(in==out,1,"Dphi_flt [Dphi_flt.c]",
          "Input and output fields must be different");
 
-   Dphi_(OE, out+(VOLUME/2), in);
-   Dphi_(EO, out, in+(VOLUME/2));
+   Dphi_flt_(OE, out+(VOLUME/2), in);
+   Dphi_flt_(EO, out, in+(VOLUME/2));
 
    rho=+4.0f+m0;
    r=out;
@@ -267,20 +267,20 @@ void Dphi(double m0, suNf_spinor *out, suNf_spinor *in)
 
 }
 
-void g5Dphi(double m0, suNf_spinor *out, suNf_spinor *in)
+void g5Dphi_flt(double m0, suNf_spinor_flt *out, suNf_spinor_flt *in)
 {
    int ix;
    double rho;
-   suNf_spinor *r, *s;
+   suNf_spinor_flt *r, *s;
 
-   error((in==NULL)||(out==NULL),1,"g5Dphi [Dphi.c]",
+   error((in==NULL)||(out==NULL),1,"g5Dphi_flt [Dphi_flt.c]",
          "Attempt to access unallocated memory space");
    
-   error(in==out,1,"g5Dphi [Dphi.c]",
+   error(in==out,1,"g5Dphi_flt [Dphi_flt.c]",
          "Input and output fields must be different");
 
-   Dphi_(OE, out+(VOLUME/2), in);
-   Dphi_(EO, out, in+(VOLUME/2));
+   Dphi_flt_(OE, out+(VOLUME/2), in);
+   Dphi_flt_(EO, out, in+(VOLUME/2));
    
    rho=4.0f+m0;
    r=out;

@@ -13,7 +13,7 @@ void leapfrog(suNg_algebra_vector *momenta, int_par *traj_par){
 
   if (traj_par->nsteps>0) {
     int i, n;
-    float dt=traj_par->tlen/((float)traj_par->nsteps);
+    double dt=traj_par->tlen/((double)traj_par->nsteps);
 
 		lprintf("MD_INT",10,"Starting new MD trajectory using leapfrog.\n");
 		lprintf("MD_INT",20,"MD parameters: len=%1.4f steps=%d => dt=%1.4f\n",

@@ -121,11 +121,9 @@ int main(int argc,char *argv[])
 	 t_par.nsteps = 10;
 	 t_par.gsteps = 10;
 
-   /* 
    printf("Generating a random gauge field... ");fflush(stdout);
    random_u();
    printf("done.\n");
-	 */
    
 	 /*
    printf("Thermalizing with CM.\n");
@@ -140,9 +138,9 @@ int main(int argc,char *argv[])
    }
    printf("Thermalization done.\n");
 	 */
-	 
+/*	 
    read_gauge_field_single("therm_conf");
-	 
+*/	 
    
    project_gauge_field();
    represent_gauge_field();

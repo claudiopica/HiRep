@@ -14,7 +14,7 @@ void _group_represent2(suNf* v, suNg *u) {
 
 	int A, C;
 	int a, b, i, j, k, c, d;
-	float* vf = (float*)v;
+	double* vf = (double*)v;
 	complex* uf = (complex*)u;
 	
 	suNg m;
@@ -78,7 +78,7 @@ void _group_represent2(suNf* v, suNg *u) {
 
 #elif defined REPR_SYMMETRIC
 
-	const float st = sqrt(2.);
+	const double st = sqrt(2.);
 	int A, C;
 	int a, b, i, j, c, d;
 	complex* vf = (complex*)v;
@@ -194,11 +194,11 @@ void represent_gauge_field() {
 #endif
 }
 
-void represent_gauge_field_dble() {
+void represent_gauge_field_flt() {
 #ifndef REPR_FUNDAMENTAL
    int i;
-   suNf_dble *Ru=u_gauge_f_dble;
-   suNg_dble *u=u_gauge_dble;
+   suNf_flt *Ru=u_gauge_f_flt;
+   suNg_flt *u=u_gauge_flt;
 
    for (i=0; i<VOLUME*4; ++i){
       /*_group_represent2(Ru,u); */
@@ -206,13 +206,13 @@ void represent_gauge_field_dble() {
       ++Ru;
       ++u;
    }
-	 apply_bc_dble();
+	 apply_bc_flt();
 #else
 	static short int first_time=1;
 	 if(first_time) {
 		 first_time=0;
-	   u_gauge_f_dble=(suNf_dble *)((void*)u_gauge_dble);
-		 apply_bc_dble();
+	   u_gauge_f_flt=(suNf_flt *)((void*)u_gauge_flt);
+		 apply_bc_flt();
 	 }
 #endif
 }

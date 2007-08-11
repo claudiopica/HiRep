@@ -10,10 +10,10 @@
 #define _PROJ_BIT (1<<6) /* project gauge field every 2^_PROJ_BIT changes */
 #define _proj_gfield(c) if((c)&_PROJ_BIT){(c)=0;project_gauge_field();} else ++(c)
 
-const float lambda = 0.1931833275037836; /* Omelyan et al */ 
+const double lambda = 0.1931833275037836; /* Omelyan et al */ 
                                          /* lamdba = 1./6. Sexton Weingarten */ 
 
-static void O2MN_ms_gauge(suNg_algebra_vector *momenta, float dt, unsigned int nsteps){
+static void O2MN_ms_gauge(suNg_algebra_vector *momenta, double dt, unsigned int nsteps){
   static unsigned int count=0; /*used to project gfield */
 
     int i, n;
@@ -76,8 +76,8 @@ void O2MN_multistep(suNg_algebra_vector *momenta, int_par *traj_par){
 
   if (traj_par->nsteps>0) {
     int n;
-    float dt=traj_par->tlen/((float)traj_par->nsteps);
-    float gdt=dt/(double)(2*traj_par->gsteps);
+    double dt=traj_par->tlen/((double)traj_par->nsteps);
+    double gdt=dt/(double)(2*traj_par->gsteps);
 		  
 		lprintf("MD_INT",10,"Starting new MD trajectory with O2MN_multistep.\n");
 		lprintf("MD_INT",20,"MD parameters: len=%1.4f steps=%d gauge_steps=%d => dt=%1.4f gdt=%1.4f\n",

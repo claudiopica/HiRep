@@ -13,36 +13,8 @@
 #include "update.h"
 
 
-static float s[4],w[4];
+static double s[4],w[4];
 static suNg_vector *pu1,*pu2,*pv1,*pv2;
-
-/*
-static void rotate(void)
-{
-   complex z1,z2;
-
-   z1.re=s[0]*(*pu1).c1.re-s[1]*(*pu2).c1.im+s[2]*(*pu2).c1.re-s[3]*(*pu1).c1.im;
-   z1.im=s[0]*(*pu1).c1.im+s[1]*(*pu2).c1.re+s[2]*(*pu2).c1.im+s[3]*(*pu1).c1.re;
-   z2.re=s[0]*(*pu2).c1.re-s[1]*(*pu1).c1.im-s[2]*(*pu1).c1.re+s[3]*(*pu2).c1.im;
-   z2.im=s[0]*(*pu2).c1.im+s[1]*(*pu1).c1.re-s[2]*(*pu1).c1.im-s[3]*(*pu2).c1.re;
-   (*pu1).c1=z1;
-   (*pu2).c1=z2;
-
-   z1.re=s[0]*(*pu1).c2.re-s[1]*(*pu2).c2.im+s[2]*(*pu2).c2.re-s[3]*(*pu1).c2.im;
-   z1.im=s[0]*(*pu1).c2.im+s[1]*(*pu2).c2.re+s[2]*(*pu2).c2.im+s[3]*(*pu1).c2.re;
-   z2.re=s[0]*(*pu2).c2.re-s[1]*(*pu1).c2.im-s[2]*(*pu1).c2.re+s[3]*(*pu2).c2.im;
-   z2.im=s[0]*(*pu2).c2.im+s[1]*(*pu1).c2.re-s[2]*(*pu1).c2.im-s[3]*(*pu2).c2.re;
-   (*pu1).c2=z1;
-   (*pu2).c2=z2;
-
-   z1.re=s[0]*(*pu1).c3.re-s[1]*(*pu2).c3.im+s[2]*(*pu2).c3.re-s[3]*(*pu1).c3.im;
-   z1.im=s[0]*(*pu1).c3.im+s[1]*(*pu2).c3.re+s[2]*(*pu2).c3.im+s[3]*(*pu1).c3.re;
-   z2.re=s[0]*(*pu2).c3.re-s[1]*(*pu1).c3.im-s[2]*(*pu1).c3.re+s[3]*(*pu2).c3.im;
-   z2.im=s[0]*(*pu2).c3.im+s[1]*(*pu1).c3.re-s[2]*(*pu1).c3.im-s[3]*(*pu2).c3.re;
-   (*pu1).c3=z1;
-   (*pu2).c3=z2;   
-}
-*/
 
 static void rotate(void)
 {
@@ -65,43 +37,6 @@ static void rotate(void)
   }
 }
 
-/*
-static void wmatrix(void)
-{
-   w[0]=
-      (*pu2).c1.re*(*pv2).c1.re+(*pu2).c1.im*(*pv2).c1.im+
-      (*pu2).c2.re*(*pv2).c2.re+(*pu2).c2.im*(*pv2).c2.im+
-      (*pu2).c3.re*(*pv2).c3.re+(*pu2).c3.im*(*pv2).c3.im+
-      (*pu1).c1.re*(*pv1).c1.re+(*pu1).c1.im*(*pv1).c1.im+
-      (*pu1).c2.re*(*pv1).c2.re+(*pu1).c2.im*(*pv1).c2.im+
-      (*pu1).c3.re*(*pv1).c3.re+(*pu1).c3.im*(*pv1).c3.im;
-
-   w[1]=
-      (*pu2).c1.re*(*pv1).c1.im-(*pu2).c1.im*(*pv1).c1.re+
-      (*pu2).c2.re*(*pv1).c2.im-(*pu2).c2.im*(*pv1).c2.re+
-      (*pu2).c3.re*(*pv1).c3.im-(*pu2).c3.im*(*pv1).c3.re+
-      (*pu1).c1.re*(*pv2).c1.im-(*pu1).c1.im*(*pv2).c1.re+
-      (*pu1).c2.re*(*pv2).c2.im-(*pu1).c2.im*(*pv2).c2.re+
-      (*pu1).c3.re*(*pv2).c3.im-(*pu1).c3.im*(*pv2).c3.re;   
-
-   w[2]=
-      (*pu2).c1.re*(*pv1).c1.re+(*pu2).c1.im*(*pv1).c1.im+
-      (*pu2).c2.re*(*pv1).c2.re+(*pu2).c2.im*(*pv1).c2.im+
-      (*pu2).c3.re*(*pv1).c3.re+(*pu2).c3.im*(*pv1).c3.im-
-      (*pu1).c1.re*(*pv2).c1.re-(*pu1).c1.im*(*pv2).c1.im-
-      (*pu1).c2.re*(*pv2).c2.re-(*pu1).c2.im*(*pv2).c2.im-
-      (*pu1).c3.re*(*pv2).c3.re-(*pu1).c3.im*(*pv2).c3.im;
-
-   w[3]=
-      (*pu1).c1.re*(*pv1).c1.im-(*pu1).c1.im*(*pv1).c1.re+
-      (*pu1).c2.re*(*pv1).c2.im-(*pu1).c2.im*(*pv1).c2.re+
-      (*pu1).c3.re*(*pv1).c3.im-(*pu1).c3.im*(*pv1).c3.re-
-      (*pu2).c1.re*(*pv2).c1.im+(*pu2).c1.im*(*pv2).c1.re-
-      (*pu2).c2.re*(*pv2).c2.im+(*pu2).c2.im*(*pv2).c2.re-
-      (*pu2).c3.re*(*pv2).c3.im+(*pu2).c3.im*(*pv2).c3.re;
-}
-*/
-
 static void wmatrix(void) 
 {
   w[0] = _vector_prod_re_g(*pu1, *pv1)+_vector_prod_re_g(*pu2,*pv2);
@@ -110,12 +45,12 @@ static void wmatrix(void)
   w[3] = _vector_prod_im_g(*pu1, *pv1)-_vector_prod_im_g(*pu2,*pv2);
 }
 
-void cabmar(float beta,suNg *u,suNg *v,int type)
+void cabmar(double beta,suNg *u,suNg *v,int type)
 {
   int i,j;
-  float b,bsq,wsq,rho,fact,r[4];
+  double b,bsq,wsq,rho,fact,r[4];
   
-  const float invng = 1. / (double) NG;
+  const double invng = 1. / (double) NG;
   
   pu1=(suNg_vector*)(u);
   pv1=(suNg_vector*)(v);

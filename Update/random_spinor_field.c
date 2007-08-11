@@ -6,17 +6,17 @@
 #include <math.h>
 
 void gaussian_spinor_field(suNf_spinor *s) {
-   const float c1=1./sqrt(2.);
+   const double c1=1./sqrt(2.);
 	 unsigned int len;
 	 get_spinor_len(&len);
-   gauss((float*)s,(sizeof(suNf_spinor)/sizeof(float))*len);
+   gauss((double*)s,(sizeof(suNf_spinor)/sizeof(double))*len);
    spinor_field_mul_f(s,c1,s);
 }
 
-void gaussian_spinor_field_dble(suNf_spinor_dble *s) {
+void gaussian_spinor_field_flt(suNf_spinor_flt *s) {
    const float c1=1./sqrt(2.);
 	 unsigned int len;
 	 get_spinor_len(&len);
-   gauss_dble((double*)s,(sizeof(suNf_spinor_dble)/sizeof(double))*len);
-   spinor_field_mul_dble_f(s,c1,s);
+   gauss_flt((float*)s,(sizeof(suNf_spinor_flt)/sizeof(float))*len);
+   spinor_field_mul_f_flt(s,c1,s);
 }

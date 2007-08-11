@@ -8,11 +8,11 @@
 void gaussian_momenta(suNg_algebra_vector *momenta) {
    int i;
 
-   const float c3=1./sqrt(_FUND_NORM2);
+   const double c3=1./sqrt(_FUND_NORM2);
    const int ngen=NG*NG-1;
    
-   gauss((float*)momenta,ngen*4*VOLUME);
+   gauss((double*)momenta,ngen*4*VOLUME);
    for (i=0; i<ngen*4*VOLUME; ++i) {
-	*(((float*)momenta)+i)*=c3;
+	*(((double*)momenta)+i)*=c3;
    }
 }

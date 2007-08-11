@@ -73,7 +73,7 @@ extern rational_app r_MD; /* used in the action MD evolution */
 
 
 
-void Force_rhmc_f(float dt, suNg_algebra_vector *force){
+void Force_rhmc_f(double dt, suNg_algebra_vector *force){
 	int i, n, k;
 	static suNg_algebra_vector f;
 	static suNf_vector ptmp;
@@ -164,7 +164,7 @@ void Force_rhmc_f(float dt, suNg_algebra_vector *force){
 
 				avrforce+=sqrt(_algebra_vector_sqnorm_g(f));
 				for(x=0;x<NG*NG-1;++x){
-					if(maxforce<fabs(*(((float*)&f)+x))) maxforce=fabs(*(((float*)&f)+x));
+					if(maxforce<fabs(*(((double*)&f)+x))) maxforce=fabs(*(((double*)&f)+x));
 				}
 			}
 

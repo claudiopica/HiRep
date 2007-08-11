@@ -27,8 +27,8 @@ void rlxd_reset(int state[]);
 void rlxd_read_random(char filename[]);
 void rlxd_write_random(char filename[]);
 
-void gauss(float r[],int n);
-void gauss_dble(double r[],int n);
+void gauss(double r[],int n);
+void gauss_flt(float r[],int n);
 
 void random_suNg_unit_vector(suNg_vector *v);
 void gaussian_suNg_vector(suNg_vector *v);

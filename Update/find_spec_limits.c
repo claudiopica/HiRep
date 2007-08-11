@@ -59,7 +59,7 @@ int max_H2(double *max, double mass) {
   s3=s2+VOLUME;
 
   /* random spinor */
-  ranlxs((float*)s1,(sizeof(suNf_spinor)/sizeof(float))*VOLUME);
+  ranlxd((double*)s1,(sizeof(suNf_spinor)/sizeof(double))*VOLUME);
   norm=sqrt(spinor_field_sqnorm_f(s1));
   spinor_field_mul_f(s1,1./norm,s1);
   norm=1.;
@@ -118,7 +118,7 @@ int min_H2(double *min, double max, double mass) {
   s3=s2+VOLUME;  
 
   /* random spinor */
-  ranlxs((float*)s1,(sizeof(suNf_spinor)/sizeof(float))*VOLUME);
+  ranlxd((double*)s1,(sizeof(suNf_spinor)/sizeof(double))*VOLUME);
   norm=sqrt(spinor_field_sqnorm_f(s1));
   spinor_field_mul_f(s1,1./norm,s1);
   
@@ -170,7 +170,7 @@ void new_min_H2(double *min, double mass) {
   s2=s1+VOLUME;  
 
   /* random spinor */
-  ranlxs((float*)x,(sizeof(suNf_spinor)/sizeof(float))*VOLUME);
+  ranlxd((double*)x,(sizeof(suNf_spinor)/sizeof(double))*VOLUME);
   norm=sqrt(spinor_field_sqnorm_f(x));
   spinor_field_mul_f(x,1./norm,x);
 
@@ -227,9 +227,9 @@ void find_spec_H2(double *max, double *min, double mass) {
 	const int nev=1; /* require only the smallest to be accurate */
 	const int kmax=200; /* max degree of polynomial */
 	const int maxiter=20; /* max number of subiterations */
-	static float *d1;
-	const float omega1=1.e-4; /* absolute precision */
-	const float omega2=1.e-1; /* relative precision */
+	static double *d1;
+	const double omega1=1.e-4; /* absolute precision */
+	const double omega2=1.e-1; /* relative precision */
 	int status,ie;
 	suNf_spinor **ws;
 	/* END of EVA parameters */

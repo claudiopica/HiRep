@@ -25,7 +25,7 @@ void project_gauge_field(void)
 }
 
 
-static void update_all(float beta,int type)
+static void update_all(double beta,int type)
 {
    int ix,mu;
    static int count=PROJECT_INTERVAL;
@@ -45,7 +45,7 @@ static void update_all(float beta,int type)
 } 
 
 
-void update(float beta,int nhb,int nor)
+void update(double beta,int nhb,int nor)
 {
    int n;
 

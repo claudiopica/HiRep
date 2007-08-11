@@ -15,7 +15,7 @@ extern rhmc_par _update_par;
 #define _print_mat(a) printf("(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n",(a).c1_1.re,(a).c1_2.re,(a).c1_3.re,(a).c2_1.re,(a).c2_2.re,(a).c2_3.re,(a).c3_1.re,(a).c3_2.re,(a).c3_3.re);printf("(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n",(a).c1_1.im,(a).c1_2.im,(a).c1_3.im,(a).c2_1.im,(a).c2_2.im,(a).c2_3.im,(a).c3_1.im,(a).c3_2.im,(a).c3_3.im)
 
 
-void Force0(float dt, suNg_algebra_vector *force){
+void Force0(double dt, suNg_algebra_vector *force){
   static suNg s1,s2;
   static suNg_algebra_vector f;
   int i;
@@ -34,7 +34,7 @@ void Force0(float dt, suNg_algebra_vector *force){
 
 		avrforce+=sqrt(_algebra_vector_sqnorm_g(f));
 		for(x=0;x<NG*NG-1;++x){
-			if(maxforce<fabs(*(((float*)&f)+x))) maxforce=fabs(*(((float*)&f)+x));
+			if(maxforce<fabs(*(((double*)&f)+x))) maxforce=fabs(*(((double*)&f)+x));
 		}
   }
 	
@@ -43,7 +43,7 @@ void Force0(float dt, suNg_algebra_vector *force){
 	lprintf("FORCE0",50,"avr |force| = %1.8e maxforce = %1.8e\n",avrforce,maxforce);
 }
 
-void Force(float dt, suNg_algebra_vector *force){
+void Force(double dt, suNg_algebra_vector *force){
   Force0(dt, force);
   Force_rhmc_f(dt, force);
 }

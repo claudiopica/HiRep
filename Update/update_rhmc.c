@@ -234,8 +234,8 @@ int update_rhmc(){
    if(deltaH<0.) {
       suNg_field_copy(u_gauge_old,u_gauge);
    } else {
-      float r;
-      ranlxs(&r,1);
+      double r;
+      ranlxd(&r,1);
       if(r<exp(-deltaH)) {
 				suNg_field_copy(u_gauge_old,u_gauge);
       } else {
