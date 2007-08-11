@@ -6,7 +6,7 @@
 
 
 typedef void (*spinor_operator)(suNf_spinor *out, suNf_spinor *in);
-typedef void (*spinor_operator_dble)(suNf_spinor_dble *out, suNf_spinor_dble *in);
+typedef void (*spinor_operator_flt)(suNf_spinor_flt *out, suNf_spinor_flt *in);
 
 typedef struct _mshift_par {
    int n; /* number of shifts */
@@ -26,8 +26,8 @@ int cg_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor *
 int BiCGstab_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor **out);
 int HBiCGstab_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor **out);
 
-int g5QMR_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor_dble **out);
-int g5QMR_mshiftd(mshift_par *par, spinor_operator_dble M, suNf_spinor_dble *in, suNf_spinor_dble **out);
+int g5QMR_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor **out);
+/*int g5QMR_mshift_flt(mshift_par *par, spinor_operator_flt M, suNf_spinor_flt *in, suNf_spinor_flt **out); */
 
 int MINRES_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor **out);
 
@@ -38,12 +38,20 @@ typedef struct _MINRES_par {
 int MINRES(MINRES_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor *out, suNf_spinor *trial);
 
 int eva(int vol,int nev,int nevt,int init,int kmax,
-               int imax,float ubnd,float omega1,float omega2,
+               int imax,double ubnd,double omega1,double omega2,
                spinor_operator Op,
-               suNf_spinor *ws[],suNf_spinor *ev[],float d[],int *status);
+               suNf_spinor *ws[],suNf_spinor *ev[],double d[],int *status);
 
-void jacobi1(int n,float a[],float d[],float v[]);
-void jacobi2(int n,complex a[],float d[],complex v[]);
+void jacobi1(int n,double a[],double d[],double v[]);
+void jacobi2(int n,complex a[],double d[],complex v[]);
+
+int eva_flt(int vol,int nev,int nevt,int init,int kmax,
+               int imax,float ubnd,float omega1,float omega2,
+               spinor_operator_flt Op,
+               suNf_spinor_flt *ws[],suNf_spinor_flt *ev[],float d[],int *status);
+
+void jacobi1_flt(int n,float a[],float d[],float v[]);
+void jacobi2_flt(int n,complex_flt a[],float d[],complex_flt v[]);
 
 
 #endif

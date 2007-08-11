@@ -20,7 +20,7 @@
 #error : The lattice size should be at least 2 in all directions
 #endif
 
-#include "suN.h"
+#include "suN_types.h"
 
 #ifdef MAIN_PROGRAM
 #  define EXTERN
@@ -45,9 +45,9 @@ EXTERN suNf_flt *u_gauge_f_flt;
 
 #define pu_gauge(ix,mu) gfield_ordering(u_gauge,ix,mu)
 #define pu_gauge_old(ix,mu) gfield_ordering(u_gauge_old,ix,mu)
-#define pu_gauge_dble(ix,mu) gfield_ordering(u_gauge_dble,ix,mu)
+#define pu_gauge_flt(ix,mu) gfield_ordering(u_gauge_flt,ix,mu)
 #define pu_gauge_f(ix,mu) gfield_ordering(u_gauge_f,ix,mu)
-#define pu_gauge_f_dble(ix,mu) gfield_ordering(u_gauge_f_dble,ix,mu)
+#define pu_gauge_f_flt(ix,mu) gfield_ordering(u_gauge_f_flt,ix,mu)
 
 #endif
 
