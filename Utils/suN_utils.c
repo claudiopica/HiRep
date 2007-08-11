@@ -15,13 +15,13 @@
 
 static void normalize(suNg_vector *v)
 {
-   float fact=_vector_prod_re_g(*v,*v);
-   fact=1.0f/(float)sqrt((double)(fact));
+   double fact=_vector_prod_re_g(*v,*v);
+   fact=1.0f/sqrt(fact);
    _vector_mul_g(*v, fact, *v);
 }
 
 
-static void normalize_dble(suNg_vector_dble *v)
+static void normalize_flt(suNg_vector_flt *v)
 {
    double fact=_vector_prod_re_g(*v,*v);
    fact=1.0/sqrt(fact);
@@ -49,7 +49,7 @@ void cross_prod(suNg_vector *v1,suNg_vector *v2,suNg_vector *v3)
 }
 
 
-void cross_prod_dble(suNg_vector_dble *v1,suNg_vector_dble *v2,suNg_vector_dble *v3)
+void cross_prod_flt(suNg_vector_flt *v1,suNg_vector_flt *v2,suNg_vector_flt *v3)
 {
    _vector_cross_prod_g(*v3,*v1,*v2);
 }
@@ -69,17 +69,17 @@ void project_to_suNg(suNg *u)
    _vector_cross_prod_g(*v2,*v3,*v1);   
 }
 
-void project_to_suNg_dble(suNg_dble *u)
+void project_to_suNg_flt(suNg_flt *u)
 {
-   suNg_vector_dble *v1,*v2,*v3;
+   suNg_vector_flt *v1,*v2,*v3;
    
-   v1=(suNg_vector_dble*)(u);
+   v1=(suNg_vector_flt*)(u);
    v2=v1+1;
    v3=v1+2;
    
-   normalize_dble(v1);
+   normalize_flt(v1);
    _vector_cross_prod_g(*v3,*v1,*v2);
-   normalize_dble(v3);
+   normalize_flt(v3);
    _vector_cross_prod_g(*v2,*v3,*v1);
 }
 
@@ -113,16 +113,16 @@ void project_to_suNg(suNg *u)
 
 }
 
-void project_to_suNg_dble(suNg_dble *u)
+void project_to_suNg_flt(suNg_flt *u)
 {
   int i,j;
-  suNg_vector_dble *v1,*v2;
-  complex_dble z;
+  suNg_vector_flt *v1,*v2;
+  complex_flt z;
 
-  v1=(suNg_vector_dble*)(u);
+  v1=(suNg_vector_flt*)(u);
   v2=v1+1;
    
-  normalize_dble(v1);
+  normalize_flt(v1);
   for (i=1; i<NG; ++i ) {
     for (j=i; j>0; --j) {
       z.re = _vector_prod_re_g(*v1, *v2);
@@ -130,9 +130,9 @@ void project_to_suNg_dble(suNg_dble *u)
       _vector_project_g(*v2, z, *v1);
       ++v1;
     }
-    normalize_dble(v2);
+    normalize_flt(v2);
     ++v2;
-    v1=(suNg_vector_dble*)(u);
+    v1=(suNg_vector_flt*)(u);
   }
 
 }

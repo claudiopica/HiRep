@@ -15,17 +15,17 @@
 #define M_PI 3.14159265358979323846264338327 
 #endif
 
-void gauss(float r[],int n)
+void gauss(double r[],int n)
 {
    int k;
-   float u[2];
+   double u[2];
    double x1,x2,rho,y1,y2;
 
    for (k=0;k<n;)
    {
-      ranlxs(u,2);
-      x1=(double)u[0];
-      x2=(double)u[1];
+      ranlxd(u,2);
+      x1=u[0];
+      x2=u[1];
 
       rho=-log(1.0-x1);
       rho=sqrt(2.*rho);
@@ -33,14 +33,14 @@ void gauss(float r[],int n)
       y1=rho*sin(x2);
       y2=rho*cos(x2);
       
-      r[k++]=(float)y1;
+      r[k++]=y1;
       if (k<n)
-         r[k++]=(float)y2;
+         r[k++]=y2;
    }
 }
 
 
-void gauss_dble(double rd[],int n)
+void gauss_flt(float rd[],int n)
 {
    int k;
    double ud[2];
@@ -60,7 +60,7 @@ void gauss_dble(double rd[],int n)
       
       rd[k++]=y1;
       if (k<n)
-         rd[k++]=y2;
+         rd[k++]=(float)y2;
    }
 }
 

@@ -15,26 +15,26 @@
 #include "update.h"
 
 /* static variables for random_suNg */
-static float s[4];
+static double s[4];
 static suNg_vector *pu1,*pu2;
 
 void random_suNg_unit_vector(suNg_vector *v)
 {
-   float norm=0.f,fact;
+   double norm=0.f,fact;
 
-   while ((1.0f+norm)==1.0f)   {
-     gauss((float*)v,(sizeof(suNg_vector)/sizeof(float)));
+   while ((1.0+norm)==1.0)   {
+     gauss((double*)v,(sizeof(suNg_vector)/sizeof(double)));
      norm=_vector_prod_re_g(*v,*v);
-     norm=(float)sqrt((double)norm);
+     norm=sqrt(norm);
    }
 
-   fact=1.0f/norm;
+   fact=1.0/norm;
    _vector_mul_g(*v,fact,*v);
 }
 
 void gaussian_suNg_vector(suNg_vector *v)
 {
-   gauss((float*)v,(sizeof(suNg_vector)/sizeof(float)));
+   gauss((double*)v,(sizeof(suNg_vector)/sizeof(double)));
 }
 
 
@@ -69,7 +69,7 @@ void random_suNg(suNg *u) {
   for (i=0; i<NG; ++i) {
     pu2 = pu1 + 1;
     for (j=i+1; j<NG; ++j) {
-		  random_su2(0.0f,s);
+		  random_su2(0.0,s);
       rotate();
       ++pu2; 
     } 
@@ -82,7 +82,7 @@ void random_suNg(suNg *u) {
 void random_suNg_old(suNg *u)
 {
   int i, j;
-  float norm=0.f,fact;
+  double norm=0.f,fact;
   suNg_vector *v1,*v2;
   complex z;
   
@@ -91,7 +91,7 @@ void random_suNg_old(suNg *u)
   
   random_suNg_unit_vector(v1);
   for (i=1; i<NG; ++i) {
-    while ((1.0f+norm)==1.0f) {
+    while ((1.0+norm)==1.0) {
       random_suNg_unit_vector(v2);
       for (j=i; j>0; --j) {
 	z.re = _vector_prod_re_g(*v1, *v2);
@@ -100,9 +100,9 @@ void random_suNg_old(suNg *u)
 	++v1;
       }
       norm=_vector_prod_re_g(*v2,*v2);
-      norm=(float)sqrt((double)norm);
+      norm=sqrt(norm);
     }        
-    fact=1.0f/norm;
+    fact=1.0/norm;
     _vector_mul_g(*v2,fact,*v2); /* normalize v2 */
     norm=0.;
     ++v2;
