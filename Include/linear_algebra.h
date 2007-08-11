@@ -22,7 +22,7 @@ void get_spinor_len(unsigned int *len);
 
 /* single precision */
 #define _SPINOR_TYPE suNf_spinor_flt
-#define _FUNC(a) a##_flt_f
+#define _FUNC(a) a##_f_flt
 #include "TMPL/linear_algebra.h.sdtmpl"
 #undef _SPINOR_TYPE
 #undef _FUNC
