@@ -6,6 +6,7 @@
 
 
 typedef void (*spinor_operator)(suNf_spinor *out, suNf_spinor *in);
+typedef void (*spinor_operator_dble)(suNf_spinor_dble *out, suNf_spinor_dble *in);
 
 typedef struct _mshift_par {
    int n; /* number of shifts */
@@ -26,6 +27,7 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_sp
 int HBiCGstab_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor **out);
 
 int g5QMR_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor_dble **out);
+int g5QMR_mshiftd(mshift_par *par, spinor_operator_dble M, suNf_spinor_dble *in, suNf_spinor_dble **out);
 
 int MINRES_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor **out);
 

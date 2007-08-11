@@ -81,6 +81,25 @@ suNg_dble* alloc_gfield_dble()
    return p;
 }
 
+suNf_dble* alloc_gfield_dble_f()
+{
+   int ix;
+   suNf_dble unity,*p;
+ 
+   p=amalloc(4*VOLUME*sizeof(suNf_dble),ALIGN);
+   error(p==NULL,1,"alloc_ud [start.c]",
+         "Could not allocate memory space for the gauge field");
+
+   _suNg_unit(unity);
+
+   for (ix=0;ix<4*VOLUME;ix+=2){
+       *(p+ix)=unity;
+       *(p+ix+1)=unity;
+   }
+   
+   return p;
+}
+
 suNf_spinor* alloc_spinor_field_f()
 {
    suNf_spinor *p;

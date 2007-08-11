@@ -70,7 +70,7 @@ int main(int argc,char *argv[])
 	FILE *propfile;
 	float *m;
 
-	float kappa[]={0.160,0.161,0.162,0.163,0.164};
+	float kappa[]={0.156,0.1575,0.159,0.160,0.161};
 	int nm=sizeof(kappa)/sizeof(float);
 	m = (float *) malloc(sizeof(kappa));
 	for (i=0; i<nm; ++i)
@@ -105,11 +105,11 @@ int main(int argc,char *argv[])
 	test_geometry();
 
 	u_gauge=alloc_gfield();
+	u_gauge_dble=alloc_gfield_dble();
 #ifndef REPR_FUNDAMENTAL
 	u_gauge_f=alloc_gfield_f();
+	u_gauge_dble_f=alloc_gfield_dble_f();
 #endif
-
-	represent_gauge_field();
 
 	sprintf(propname,"quark_prop_qmr_%3.5f_%d_%d_%d_%d",beta,T,L,L,L);
 	error((propfile = fopen(propname, "wb"))==NULL,1,"Main",
@@ -119,6 +119,7 @@ int main(int argc,char *argv[])
 		fwrite(m+i,(size_t) sizeof(float),1,propfile);
 
 	/* Termalizzazione */
+	/*
 	for (i=0;i<nth;++i) {
 		update(beta,nhb,nor);
 		if ((i%10)==0)
@@ -128,23 +129,25 @@ int main(int argc,char *argv[])
 		fflush(stdout);
 	}
 	if(i) lprintf("MAIN",0,"%d\nThemalization done.\n",i);
-
+	*/
 	/* or read configuration from file */
-	/* read_conf_single("confname"); */
+	read_gauge_field_single("confname");
+	assign_u2ud();
 
 	represent_gauge_field();
+	represent_gauge_field_dble();
 
 	/* Misure */
 	for (i=0;i<nms;++i){ /* nms misure */
 		lprintf("MAIN",0,"conf #%d <p> = %1.6f\n",i,avr_plaquette());
-		quark_propagator_QMR_eo(propfile,0,nm,m,1.e-10);
+		quark_propagator_QMR_eo(propfile,0,nm,m,1.e-9);
 		lprintf("MAIN",0,"MVM for last propagator: %ld\n",getMVM());
 
 		for (n=0;n<nit;n++) /* nit updates */
 			update(beta,nhb,nor);
 		represent_gauge_field();
 
-   write_gauge_field_single("confname"); 
+   write_gauge_field_single("confname.loc"); 
 
 	}
 
@@ -152,8 +155,9 @@ int main(int argc,char *argv[])
 
 
 	free_field(u_gauge);
-
+	free_field(u_gauge_dble);
 #ifndef REPR_FUNDAMENTAL
+	free_field(u_gauge_dble_f);
 	free_field(u_gauge_f);
 #endif
 

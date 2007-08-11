@@ -28,6 +28,7 @@ void O2MN_multistep(suNg_algebra_vector *momenta, int_par *traj_par);
 
 void gaussian_momenta(suNg_algebra_vector *momenta);
 void gaussian_spinor_field(suNf_spinor *s);
+void gaussian_spinor_field_dble(suNf_spinor_dble *s);
 
 typedef struct {
   /* sim parameters */

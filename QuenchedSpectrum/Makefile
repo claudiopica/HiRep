@@ -32,7 +32,7 @@ MODS := gauss random_suNg ranlxs ranlxd random_fields
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Update
-MODS := cabmar staples update_hb random_su2 Dphi representation random_momenta random_spinor_field
+MODS := cabmar staples update_hb random_su2 Dphi Dphi_dble representation random_momenta random_spinor_field
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Error

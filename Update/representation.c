@@ -194,5 +194,28 @@ void represent_gauge_field() {
 #endif
 }
 
+void represent_gauge_field_dble() {
+#ifndef REPR_FUNDAMENTAL
+   int i;
+   suNf_dble *Ru=u_gauge_f_dble;
+   suNg_dble *u=u_gauge_dble;
+
+   for (i=0; i<VOLUME*4; ++i){
+      /*_group_represent2(Ru,u); */
+      _group_represent(*Ru,*u);
+      ++Ru;
+      ++u;
+   }
+	 apply_bc_dble();
+#else
+	static short int first_time=1;
+	 if(first_time) {
+		 first_time=0;
+	   u_gauge_f_dble=(suNf_dble *)((void*)u_gauge_dble);
+		 apply_bc_dble();
+	 }
+#endif
+}
+
 
 

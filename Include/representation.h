@@ -13,6 +13,7 @@
 
 void _group_represent2(suNf* v, suNg *u);
 void represent_gauge_field();
+void represent_gauge_field_dble();
 
 
 #endif

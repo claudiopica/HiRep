@@ -132,7 +132,9 @@ static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, suN
 
     if((r*r)<par->err2*innorm2){
       notconverged=0;
-    }
+    } else {
+			 lprintf("INVERTER",30,"MINRES iter %d res: %1.8e\n",cgiter,(r*r)/innorm2);
+		}
 	
 	
   } while ((par->max_iter==0 || cgiter<par->max_iter) && notconverged);
@@ -162,7 +164,7 @@ int MINRES(MINRES_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor *out
 	short int valid;
 
 	iter=MINRES_core(&valid, par, M, in, out, trial);
-	while(!valid) {
+	while(!valid && (par->max_iter==0 || iter<par->max_iter)) {
 		iter+=MINRES_core(&valid, par, M, in, out, out);
 		if((++rep)%5==0)
 			lprintf("INVERTER",-10,"MINRES recursion = %d (precision too high?)\n",rep);

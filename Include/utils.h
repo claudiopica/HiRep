@@ -13,6 +13,7 @@
 
 void ExpX(double dt, suNg_algebra_vector *h, suNg *u);
 void apply_bc();
+void apply_bc_dble();
 
 void cross_prod(suNg_vector *v1,suNg_vector *v2,suNg_vector *v3);
 void cross_prod_dble(suNg_vector_dble *v1,suNg_vector_dble *v2,suNg_vector_dble *v3);

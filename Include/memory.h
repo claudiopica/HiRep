@@ -20,6 +20,7 @@ void free_field(void *u);
 suNg* alloc_gfield();
 suNf* alloc_gfield_f();
 suNg_dble* alloc_gfield_dble();
+suNf_dble* alloc_gfield_dble_f();
 suNf_spinor* alloc_spinor_field_f();
 suNg_algebra_vector* alloc_momenta();
 
