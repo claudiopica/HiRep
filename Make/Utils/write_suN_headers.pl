@@ -1152,9 +1152,9 @@ sub write_suN_dagger {
 				print "         ++_n; _k+=$N; _complex_star((u).$cname\[_n\],(v).$cname\[_k\]);\\\n";
 			}
 		} else {
-			print "         for (; _j<$md; ){ \\\n";
+			print "         for (_j=0; _j<$md; ){ \\\n";
 			for(my $i=0;$i<$unroll;$i++){
-				print "            ++_n; _k+=$N; _complex_star((u).$cname\[_n\],(v).$cname\[_k\]);\\\n";
+				print "            ++_n; _k+=$N; _complex_star((u).$cname\[_n\],(v).$cname\[_k\]); ++_j;\\\n";
 			}
 			print "         } \\\n";
 			for(my $i=0;$i<$mr;$i++){
@@ -1200,9 +1200,9 @@ sub write_suN_times_suN {
 				print "            ++_k; _l+=$N; _complex_mul_assign((u).$cname\[_n\],(v).$cname\[_k\],(w).$cname\[_l\]);\\\n";
 			}
 		} else {
-			print "            for (; _j<$md; ){ \\\n";
+			print "            for (_j=0; _j<$md; ){ \\\n";
 			for(my $i=0;$i<$unroll;$i++){
-				print "               ++_k; _l+=$N; _complex_mul_assign((u).$cname\[_n\],(v).$cname\[_k\],(w).$cname\[_l\]);\\\n";
+				print "               ++_k; _l+=$N; _complex_mul_assign((u).$cname\[_n\],(v).$cname\[_k\],(w).$cname\[_l\]); ++_j;\\\n";
 			}
 			print "            } \\\n";
 			for(my $i=0;$i<$mr;$i++){
@@ -1249,9 +1249,9 @@ sub write_suNr_times_suNr {
 				print "            ++_k; _l+=$N; (u).$cname\[_n\]+=(v).$cname\[_k\]*(w).$cname\[_l\];\\\n";
 			}
 		} else {
-			print "            for (; _j<$md; ){ \\\n";
+			print "            for (_j=0; _j<$md; ){ \\\n";
 			for(my $i=0;$i<$unroll;$i++){
-				print "               ++_k; _l+=$N; (u).$cname\[_n\]+=(v).$cname\[_k\]*(w).$cname\[_l\];\\\n";
+				print "               ++_k; _l+=$N; (u).$cname\[_n\]+=(v).$cname\[_k\]*(w).$cname\[_l\]; ++_j;\\\n";
 			}
 			print "            } \\\n";
 			for(my $i=0;$i<$mr;$i++){
@@ -1298,9 +1298,9 @@ sub write_suN_times_suN_dagger {
 				print "            ++_k; ++_l; _complex_mul_star_assign((u).$cname\[_n\],(v).$cname\[_k\],(w).$cname\[_l\]);\\\n";
 			}
 		} else {
-			print "            for (; _j<$md; ){ \\\n";
+			print "            for (_j=0; _j<$md; ){ \\\n";
 			for(my $i=0;$i<$unroll;$i++){
-				print "               ++_k; ++_l; _complex_mul_star_assign((u).$cname\[_n\],(v).$cname\[_k\],(w).$cname\[_l\]);\\\n";
+				print "               ++_k; ++_l; _complex_mul_star_assign((u).$cname\[_n\],(v).$cname\[_k\],(w).$cname\[_l\]); ++_j;\\\n";
 			}
 			print "            } \\\n";
 			for(my $i=0;$i<$mr;$i++){
