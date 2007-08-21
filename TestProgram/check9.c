@@ -26,9 +26,10 @@
 #include "representation.h"
 #include "global.h"
 #include "logger.h"
+#include "io.h"
 
 static int iw;
-static float hmass=-0.15f;
+static double hmass=-7.94871867e-01f;
 static suNf_spinor **ws,**ev;
 static double EPSILON=1.e-12;
 
@@ -36,7 +37,7 @@ static double EPSILON=1.e-12;
 #define MAX_ROTATE 50
 
 static int init=0;
-static const suNf_spinor s0={{{0.0f}}};
+static const suNf_spinor s0={{{{{0.0}}}}};
 static suNf_spinor *psi,*chi;
 
 static void alloc_ws_rotate(void)
@@ -78,20 +79,14 @@ static void rotate(int vol,int n,suNf_spinor **ppk,complex v[])
          pj=ppk[0]+ix;
          z=&v[k];
 
-         _vector_mulc_f((*pk).c1,*z,(*pj).c1);
-         _vector_mulc_f((*pk).c2,*z,(*pj).c2);
-         _vector_mulc_f((*pk).c3,*z,(*pj).c3);
-         _vector_mulc_f((*pk).c4,*z,(*pj).c4);
+				 _spinor_mulc_f(*pk,*z,*pj);
 
          for (j=1;j<n;j++)
          {
             pj=ppk[j]+ix;
             z+=n;
 
-            _vector_mulc_add_assign_f((*pk).c1,*z,(*pj).c1);
-            _vector_mulc_add_assign_f((*pk).c2,*z,(*pj).c2);
-            _vector_mulc_add_assign_f((*pk).c3,*z,(*pj).c3);
-            _vector_mulc_add_assign_f((*pk).c4,*z,(*pj).c4);
+						_spinor_mulc_add_assign_f(*pk,*z,*pj);
          }
       }
 
@@ -100,7 +95,7 @@ static void rotate(int vol,int n,suNf_spinor **ppk,complex v[])
    }
 }
 
-static float normalize(suNf_spinor *ps)
+static double normalize(suNf_spinor *ps)
 {
    double r;
 
@@ -111,13 +106,13 @@ static float normalize(suNf_spinor *ps)
    r=1.0/r;
    spinor_field_mul_f(ps,r,ps);
 
-   return (float)(1.0/r);
+   return (double)(1.0/r);
 }
 
-static void eva_sort(int n,float d[],complex v[])
+static void eva_sort(int n,double d[],complex v[])
 {
    int i,j,k;
-   float p;
+   double p;
    complex q;
     
    for (i=0;i<n-1;i++)
@@ -150,10 +145,10 @@ static void eva_sort(int n,float d[],complex v[])
 }
 
 
-static void eva_g5(int nev,float d[],suNf_spinor *ev[])
+static void eva_g5(int nev,double d[],suNf_spinor *ev[])
 {
    int i,j;
-   complex_dble z;
+   complex z;
    complex *aa,*vv;
 
    aa=malloc(2*nev*nev*sizeof(complex));
@@ -172,10 +167,10 @@ static void eva_g5(int nev,float d[],suNf_spinor *ev[])
       {
          z=spinor_field_prod_f(ev[iw],ev[j]);
 
-         aa[nev*i+j].re= (float)z.re;
-         aa[nev*i+j].im= (float)z.im;
-         aa[nev*j+i].re= (float)z.re;
-         aa[nev*j+i].im=-(float)z.im;
+         aa[nev*i+j].re= (double)z.re;
+         aa[nev*i+j].im= (double)z.im;
+         aa[nev*j+i].re= (double)z.re;
+         aa[nev*j+i].im=-(double)z.im;
       }
    }
 
@@ -193,10 +188,10 @@ static void Op1(suNf_spinor *out,suNf_spinor *in)
 }
 
 
-static float power(int nit,spinor_operator Op,suNf_spinor *ws[])
+static double power(int nit,spinor_operator Op,suNf_spinor *ws[])
 {
    int i;
-   float ubnd;
+   double ubnd;
 
    gaussian_spinor_field(ws[0]);
    normalize(ws[0]);
@@ -210,7 +205,7 @@ static float power(int nit,spinor_operator Op,suNf_spinor *ws[])
       Op(ws[0],ws[1]);
       ubnd=normalize(ws[0]);
    }
-   return (float)sqrt((double)(ubnd));
+   return (double)sqrt((double)(ubnd));
 }
 
 
@@ -218,8 +213,8 @@ int main(int argc,char *argv[])
 {
    int i;
    int nev,nevt,ie,status;
-   float omega1,omega2,d1[6],res,ubnd;
-   complex_dble z;
+   double omega1,omega2,d1[6],res,ubnd;
+   complex z;
    FILE *log=NULL;   
 
    log=freopen("check9.log","w",stdout);
@@ -229,7 +224,7 @@ int main(int argc,char *argv[])
 
    printf("The lattice size is %dx%d^3\n",T,L);
 
-   rlxs_init(0,12345);
+   rlxd_init(1,12345);
 
 	 logger_setlevel(0,1000);
 
@@ -253,11 +248,13 @@ int main(int argc,char *argv[])
    ev=malloc(7*sizeof(suNf_spinor*));
    for (i=0;i<7;i++)
       ev[i]=alloc_spinor_field_f();
+
+
    
    iw=3;
    nev=2;
    nevt=3;
-   ubnd=1.05f*power(20,Op1,ws);
+   ubnd=1.05f*power(30,Op1,ws);
    printf("test-ubnd: %f\n",ubnd);
    omega1=1.0e-6f;
    omega2=1.0e-2f;
@@ -277,7 +274,7 @@ int main(int argc,char *argv[])
       z.im=(double)0.0f;
       spinor_field_mulc_add_assign_f(ws[0],z,ev[i]);
       res=spinor_field_sqnorm_f(ws[0]);
-      res=(float)(sqrt((double)(res)));
+      res=(double)(sqrt((double)(res)));
 
       if (i==nev)
          printf("\n");
@@ -296,7 +293,7 @@ int main(int argc,char *argv[])
       z.im=0.0f;
       spinor_field_mulc_add_assign_f(ws[0],z,ev[i]);
       res=spinor_field_sqnorm_f(ws[0]);
-      res=(float)(sqrt((double)(res)));
+      res=(double)(sqrt((double)(res)));
       
       printf("d[%d] = % .3e, acc = %.1e\n",i,d1[i],res);
    }

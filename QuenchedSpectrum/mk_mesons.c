@@ -92,7 +92,7 @@ int main(int argc,char *argv[])
 		lprintf("MAIN",0,"m[%d] = %1.8e => kappa[%d] = %1.8e\n",i,m[i],i,1./(2.*m[i]+8.));
 
 	/*
-		 rlxs_init(level,seed);
+		 rlxd_init(level,seed);
 		 */
 
 	geometry_eo_lexi();

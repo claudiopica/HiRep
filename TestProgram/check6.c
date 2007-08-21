@@ -28,9 +28,9 @@
 #include "utils.h"
 
 int nhb,nor,nit,nth,nms,level,seed;
-float beta;
+double beta;
 
-static float hmass=0.1;
+static double hmass=0.1;
 
 
 void D(suNf_spinor *out, suNf_spinor *in){
@@ -52,9 +52,8 @@ int main(int argc,char *argv[])
 {
 	int i;
 	double tau;
-	suNf_spinor s1[VOLUME],s2[VOLUME];
+	suNf_spinor *s1, *s2;
 	suNf_spinor **res;
-	suNf_spinor_dble **resd;
 
 	mshift_par par;
 	MINRES_par MINRESpar2;
@@ -66,12 +65,12 @@ int main(int argc,char *argv[])
 	printf("The lattice size is %dx%d^3\n",T,L);
 	printf("\n");
 
-	level=0;
+	level=1;
 	seed=123;
 	printf("ranlux: level = %d, seed = %d\n\n",level,seed); 
 	fflush(stdout);
 
-	rlxs_init(level,seed);
+	rlxd_init(level,seed);
 
 	geometry_eo_lexi();
 	test_geometry();
@@ -91,18 +90,15 @@ int main(int argc,char *argv[])
 
 	par.n = 6;
 	par.shift=(double*)malloc(sizeof(double)*(par.n));
-	par.err2=1e-7;
+	par.err2=1.e-28;
 	par.max_iter=0;
 	res=(suNf_spinor**)malloc(sizeof(suNf_spinor*)*(par.n));
 	res[0]=(suNf_spinor*)malloc(sizeof(suNf_spinor)*par.n*VOLUME);
 	for(i=1;i<par.n;++i)
 		res[i]=res[i-1]+VOLUME;
 
-	resd=(suNf_spinor_dble**)malloc(sizeof(suNf_spinor_dble*)*(par.n));
-	resd[0]=(suNf_spinor_dble*)malloc(sizeof(suNf_spinor_dble)*par.n*VOLUME);
-	for(i=1;i<par.n;++i)
-		resd[i]=resd[i-1]+VOLUME;
-
+	s1=malloc(sizeof(*s1)*VOLUME);
+	s2=malloc(sizeof(*s2)*VOLUME);
 
 	par.shift[0]=+0.1;
 	par.shift[1]=-0.21;
@@ -111,7 +107,7 @@ int main(int argc,char *argv[])
 	par.shift[4]=-0.15;
 	par.shift[5]=-0.05;
 
-	gaussian_spinor_field(&(s1[0]));
+	gaussian_spinor_field(s1);
 
 	/* TEST MINRES_M */
 
@@ -125,9 +121,9 @@ int main(int argc,char *argv[])
 	for(i=0;i<par.n;++i){
 		H(s2,res[i]);
 		spinor_field_mul_add_assign_f(s2,-par.shift[i],res[i]);
-		spinor_field_sub_f(s2,s2,s1);
+		spinor_field_sub_assign_f(s2,s1);
 		tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
-		printf("test MINRES[%d] = %e\n",i,tau);
+		printf("test MINRES[%d] = %e (req. %e)\n",i,tau,par.err2);
 	}
 
 	/* TEST MINRES_M */
@@ -136,7 +132,7 @@ int main(int argc,char *argv[])
 	printf("Testing MINRES \n");
 	printf("-------------- \n");
 
-	MINRESpar2.err2=1.e-7;
+	MINRESpar2.err2=par.err2;
 	MINRESpar2.max_iter=0;
 
 	cgiters=MINRES(&MINRESpar2, &H, s1, res[0],0);
@@ -153,8 +149,13 @@ int main(int argc,char *argv[])
 		H(s2,res[i]);
 		spinor_field_sub_f(s2,s2,s1);
 		tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
-		printf("test MINRES[%d] = %e\n",i,tau);
+		printf("test MINRES[%d] = %e (req. %e)\n",i,tau,par.err2);
 	}
 
-   exit(0);
+	free(res[0]);
+	free(res);
+	free(s1);
+	free(s2);
+
+	exit(0);
 }

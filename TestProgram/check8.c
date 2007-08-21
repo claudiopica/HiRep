@@ -21,10 +21,7 @@
 #include "representation.h"
 #include "utils.h"
 
-#if NG!=3
-#error : check8 is written for NG=3
-#endif
-#if NF!=8
+#ifndef REPR_ADJOINT
 #error : check8 is written for REPR_ADJOINT
 #endif
 
@@ -35,7 +32,7 @@ int main(int argc,char *argv[])
    suNg_algebra_vector f[dAdj];
    suNg A,B,TMP,CAS;
    suNf a,b,tmp,cas;
-   float tau,fund,sym;
+   double tau,fund,sym,trace;
    int i,j;
    
    
@@ -46,16 +43,8 @@ int main(int argc,char *argv[])
    for (i=0;i<dAdj;i++)
    {
       _algebra_vector_zero_g(f[i]);
+			f[i].c[i]=1.;
    }
-
-   f[0].c1=1.0;
-   f[1].c2=1.0;
-   f[2].c3=1.0;
-   f[3].c4=1.0;
-   f[4].c5=1.0;
-   f[5].c6=1.0;
-   f[6].c7=1.0;
-   f[7].c8=1.0;
 
    for (i=0;i<dAdj;i++)
    {
@@ -65,8 +54,8 @@ int main(int argc,char *argv[])
          _algebra_represent(b,f[j]);
          
          _suNf_times_suNf(tmp,a,b);
-         printf("tr_R (T[%d] T[%d]): %.2f ", i, j,
-                _suNf_trace_re(tmp));
+				 _suNf_trace_re(trace,tmp);
+         printf("tr_R (T[%d] T[%d]): %.2f ", i, j,trace);
          if (i==j)
             printf("  [should be: 2.50]\n");
          else
@@ -76,8 +65,8 @@ int main(int argc,char *argv[])
          _fund_algebra_represent(B,f[j]);
          
          _suNg_times_suNg(TMP,A,B);
-         printf("tr_f (T[%d] T[%d]): %.2f ", i, j,
-                _suNg_trace_re(TMP));
+				 _suNg_trace_re(trace,TMP);
+         printf("tr_f (T[%d] T[%d]): %.2f ", i, j,trace);
          if (i==j)
             printf("  [should be: 0.50]\n");
          else
@@ -85,39 +74,35 @@ int main(int argc,char *argv[])
       }
    }
    
-   for (i=0;i<dAdj;i++)
+	 _algebra_represent(a,f[0]);
+	 _fund_algebra_represent(A,f[0]);
+	 _suNf_times_suNf(cas,a,a);
+	 _suNg_times_suNg(CAS,A,A);
+   for (i=1;i<dAdj;i++)
    {
       _algebra_represent(a,f[i]);
       _fund_algebra_represent(A,f[i]);
 
-      if (i==0)
-      {
-         _suNf_times_suNf(cas,a,a);
-         _suNg_times_suNg(CAS,A,A);
-      }
-      else
-      {
-         _suNf_times_suNf(tmp,a,a);
-         _suNf_add_assign(cas,tmp);
-         _suNg_times_suNg(TMP,A,A);
-         _suNg_add_assign(CAS,TMP);
-      }
+			_suNf_times_suNf(tmp,a,a);
+			_suNf_add_assign(cas,tmp);
+			_suNg_times_suNg(TMP,A,A);
+			_suNg_add_assign(CAS,TMP);
    }
 
-   sym=-4.0*((float)NG-1.0)*((float)NG+2.0)/((float)NG);
-   fund=-4.0*((float)NG*(float)NG-1.0)/(2.0*(float)NG);
+   sym=-4.0*((double)NG-1.0)*((double)NG+2.0)/((double)NG);
+   fund=-4.0*((double)NG*(double)NG-1.0)/(2.0*(double)NG);
       
    _suNf_unit(tmp);
    _suNf_mul(tmp,sym,tmp);
    _suNf_sub_assign(cas,tmp);
-   tau=_suNf_sqnorm(cas);
+   _suNf_sqnorm(tau,cas);
    printf("casimir check: %.3f\n",tau);
    printf("(should be 0.00)\n");
 
    _suNg_unit(TMP);
    _suNg_mul(TMP,fund,TMP);
    _suNg_sub_assign(CAS,TMP);
-   tau=_suNg_sqnorm(CAS);
+   _suNg_sqnorm(tau,CAS);
    printf("casimir check: %.3f\n",tau);
    printf("(should be 0.00)\n");
 

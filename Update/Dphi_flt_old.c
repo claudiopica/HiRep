@@ -1,9 +1,9 @@
 /*******************************************************************************
 *
-* File Dphi.c
+* File Dphi_dble.c
 *
 * Action of the Wilson-Dirac operator D and hermitian g5D on a given 
-* single-precision spinor field
+* double-precision spinor field
 *
 *******************************************************************************/
 
@@ -11,18 +11,18 @@
 #include <stdio.h>
 #include <math.h>
 #include "suN.h"
-#include "global.h"
 #include "error.h"
+#include "global.h"
 #include "dirac.h"
 
 /* p = out ; q = in */
-void Dphi_old(double m0, suNf_spinor *p, suNf_spinor *q)
+void Dphi_flt_old(double m0, suNf_spinor_flt *p, suNf_spinor_flt *q)
 {
    int ix,iy;
    double rho;
-   suNf *up,*um;
-   suNf_vector psi,chi;
-   suNf_spinor *r, *s,*sp,*sm;
+   suNf_flt *up,*um;
+   suNf_vector_flt psi,chi;
+   suNf_spinor_flt *r, *s,*sp,*sm;
 
    error((q==NULL)||(p==NULL),1,"Qphi [Qphi.c]",
          "Attempt to access unallocated memory space");
@@ -30,7 +30,7 @@ void Dphi_old(double m0, suNf_spinor *p, suNf_spinor *q)
    error(q==p,1,"Qphi [Qphi.c]",
          "Input and output fields must be different");
    
-   rho=-8.0f-2.0f*m0;
+   rho=-8.0-2.0*m0;
    r=p-1;
    s=q-1;
 
@@ -50,7 +50,7 @@ void Dphi_old(double m0, suNf_spinor *p, suNf_spinor *q)
 
       iy=iup[ix][0];
       sp=q+iy;
-      up=pu_gauge_f(ix,0);
+      up=pu_gauge_f_flt(ix,0);
       
       _vector_add_f(psi,(*sp).c[0],(*sp).c[2]);
       _suNf_multiply(chi,(*up),psi);
@@ -68,7 +68,7 @@ void Dphi_old(double m0, suNf_spinor *p, suNf_spinor *q)
 
       iy=idn[ix][0];
       sm=q+iy;
-      um=pu_gauge_f(iy,0);
+      um=pu_gauge_f_flt(iy,0);
       
       _vector_sub_f(psi,(*sm).c[0],(*sm).c[2]);
       _suNf_inverse_multiply(chi,(*um),psi);
@@ -86,7 +86,7 @@ void Dphi_old(double m0, suNf_spinor *p, suNf_spinor *q)
 
       iy=iup[ix][1];
       sp=q+iy;
-      up=pu_gauge_f(ix,1);      
+      up=pu_gauge_f_flt(ix,1);      
       
       _vector_i_add_f(psi,(*sp).c[0],(*sp).c[3]);
       _suNf_multiply(chi,(*up),psi);
@@ -104,7 +104,7 @@ void Dphi_old(double m0, suNf_spinor *p, suNf_spinor *q)
 
       iy=idn[ix][1];
       sm=q+iy;
-      um=pu_gauge_f(iy,1);
+      um=pu_gauge_f_flt(iy,1);
       
       _vector_i_sub_f(psi,(*sm).c[0],(*sm).c[3]);
       _suNf_inverse_multiply(chi,(*um),psi);
@@ -122,7 +122,7 @@ void Dphi_old(double m0, suNf_spinor *p, suNf_spinor *q)
 
       iy=iup[ix][2];
       sp=q+iy;
-      up=pu_gauge_f(ix,2);
+      up=pu_gauge_f_flt(ix,2);
       
       _vector_add_f(psi,(*sp).c[0],(*sp).c[3]);
       _suNf_multiply(chi,(*up),psi);
@@ -140,7 +140,7 @@ void Dphi_old(double m0, suNf_spinor *p, suNf_spinor *q)
 
       iy=idn[ix][2];
       sm=q+iy;
-      um=pu_gauge_f(iy,2);
+      um=pu_gauge_f_flt(iy,2);
       
       _vector_sub_f(psi,(*sm).c[0],(*sm).c[3]);
       _suNf_inverse_multiply(chi,(*um),psi);
@@ -158,7 +158,7 @@ void Dphi_old(double m0, suNf_spinor *p, suNf_spinor *q)
 
       iy=iup[ix][3];
       sp=q+iy;
-      up=pu_gauge_f(ix,3);
+      up=pu_gauge_f_flt(ix,3);
       
       _vector_i_add_f(psi,(*sp).c[0],(*sp).c[2]);
       _suNf_multiply(chi,(*up),psi);
@@ -176,7 +176,7 @@ void Dphi_old(double m0, suNf_spinor *p, suNf_spinor *q)
 
       iy=idn[ix][3];
       sm=q+iy;
-      um=pu_gauge_f(iy,3);
+      um=pu_gauge_f_flt(iy,3);
       
       _vector_i_sub_f(psi,(*sm).c[0],(*sm).c[2]);
       _suNf_inverse_multiply(chi,(*um),psi);
@@ -192,20 +192,20 @@ void Dphi_old(double m0, suNf_spinor *p, suNf_spinor *q)
       
 /******************************** end of loop *********************************/
 
-      _vector_mul_f((*r).c[0],-0.5f,(*r).c[0]);
-      _vector_mul_f((*r).c[1],-0.5f,(*r).c[1]);
-      _vector_mul_f((*r).c[2],-0.5f,(*r).c[2]);
-      _vector_mul_f((*r).c[3],-0.5f,(*r).c[3]);
+      _vector_mul_f((*r).c[0],-0.5,(*r).c[0]);
+      _vector_mul_f((*r).c[1],-0.5,(*r).c[1]);
+      _vector_mul_f((*r).c[2],-0.5,(*r).c[2]);
+      _vector_mul_f((*r).c[3],-0.5,(*r).c[3]);
    }
 }
 
-void g5Dphi_old(double m0, suNf_spinor *p, suNf_spinor *q)
+void g5Dphi_flt_old(double m0, suNf_spinor_flt *p, suNf_spinor_flt *q)
 {
    int ix,iy;
    double rho;
-   suNf *up,*um;
-   suNf_vector psi,chi;
-   suNf_spinor *r, *s,*sp,*sm;
+   suNf_flt *up,*um;
+   suNf_vector_flt psi,chi;
+   suNf_spinor_flt *r, *s,*sp,*sm;
 
    error((q==NULL)||(p==NULL),1,"Qphi [Qphi.c]",
          "Attempt to access unallocated memory space");
@@ -213,7 +213,7 @@ void g5Dphi_old(double m0, suNf_spinor *p, suNf_spinor *q)
    error(q==p,1,"Qphi [Qphi.c]",
          "Input and output fields must be different");
    
-   rho=-8.0f-2.0f*m0;
+   rho=-8.0-2.0*m0;
    r=p-1;
    s=q-1;
 
@@ -233,7 +233,7 @@ void g5Dphi_old(double m0, suNf_spinor *p, suNf_spinor *q)
 
       iy=iup[ix][0];
       sp=q+iy;
-      up=pu_gauge_f(ix,0);
+      up=pu_gauge_f_flt(ix,0);
       
       _vector_add_f(psi,(*sp).c[0],(*sp).c[2]);
       _suNf_multiply(chi,(*up),psi);
@@ -251,7 +251,7 @@ void g5Dphi_old(double m0, suNf_spinor *p, suNf_spinor *q)
 
       iy=idn[ix][0];
       sm=q+iy;
-      um=pu_gauge_f(iy,0);
+      um=pu_gauge_f_flt(iy,0);
       
       _vector_sub_f(psi,(*sm).c[0],(*sm).c[2]);
       _suNf_inverse_multiply(chi,(*um),psi);
@@ -269,7 +269,7 @@ void g5Dphi_old(double m0, suNf_spinor *p, suNf_spinor *q)
 
       iy=iup[ix][1];
       sp=q+iy;
-      up=pu_gauge_f(ix,1);      
+      up=pu_gauge_f_flt(ix,1);      
       
       _vector_i_add_f(psi,(*sp).c[0],(*sp).c[3]);
       _suNf_multiply(chi,(*up),psi);
@@ -287,7 +287,7 @@ void g5Dphi_old(double m0, suNf_spinor *p, suNf_spinor *q)
 
       iy=idn[ix][1];
       sm=q+iy;
-      um=pu_gauge_f(iy,1);
+      um=pu_gauge_f_flt(iy,1);
       
       _vector_i_sub_f(psi,(*sm).c[0],(*sm).c[3]);
       _suNf_inverse_multiply(chi,(*um),psi);
@@ -305,7 +305,7 @@ void g5Dphi_old(double m0, suNf_spinor *p, suNf_spinor *q)
 
       iy=iup[ix][2];
       sp=q+iy;
-      up=pu_gauge_f(ix,2);
+      up=pu_gauge_f_flt(ix,2);
       
       _vector_add_f(psi,(*sp).c[0],(*sp).c[3]);
       _suNf_multiply(chi,(*up),psi);
@@ -323,7 +323,7 @@ void g5Dphi_old(double m0, suNf_spinor *p, suNf_spinor *q)
 
       iy=idn[ix][2];
       sm=q+iy;
-      um=pu_gauge_f(iy,2);
+      um=pu_gauge_f_flt(iy,2);
       
       _vector_sub_f(psi,(*sm).c[0],(*sm).c[3]);
       _suNf_inverse_multiply(chi,(*um),psi);
@@ -341,7 +341,7 @@ void g5Dphi_old(double m0, suNf_spinor *p, suNf_spinor *q)
 
       iy=iup[ix][3];
       sp=q+iy;
-      up=pu_gauge_f(ix,3);
+      up=pu_gauge_f_flt(ix,3);
       
       _vector_i_add_f(psi,(*sp).c[0],(*sp).c[2]);
       _suNf_multiply(chi,(*up),psi);
@@ -359,7 +359,7 @@ void g5Dphi_old(double m0, suNf_spinor *p, suNf_spinor *q)
 
       iy=idn[ix][3];
       sm=q+iy;
-      um=pu_gauge_f(iy,3);
+      um=pu_gauge_f_flt(iy,3);
       
       _vector_i_sub_f(psi,(*sm).c[0],(*sm).c[2]);
       _suNf_inverse_multiply(chi,(*um),psi);
@@ -375,10 +375,10 @@ void g5Dphi_old(double m0, suNf_spinor *p, suNf_spinor *q)
       
 /******************************** end of loop *********************************/
 
-      _vector_mul_f((*r).c[0],-0.5f,(*r).c[0]);
-      _vector_mul_f((*r).c[1],-0.5f,(*r).c[1]);
-      _vector_mul_f((*r).c[2],0.5f,(*r).c[2]);
-      _vector_mul_f((*r).c[3],0.5f,(*r).c[3]);
+      _vector_mul_f((*r).c[0],-0.5,(*r).c[0]);
+      _vector_mul_f((*r).c[1],-0.5,(*r).c[1]);
+      _vector_mul_f((*r).c[2],0.5,(*r).c[2]);
+      _vector_mul_f((*r).c[3],0.5,(*r).c[3]);
    }
 }
 

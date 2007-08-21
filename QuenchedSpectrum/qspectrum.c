@@ -98,7 +98,7 @@ int main(int argc,char *argv[])
 	for(i=0;i<nm;++i)
 		lprintf("MAIN",0,"m[%d] = %1.8e => k[%d] = %1.8e\n",i,m[i],i,kappa[i]);
 
-	rlxs_init(level,seed);
+	rlxd_init(level,seed);
 
 	geometry_eo_lexi();
 	/*geometry_blocked();*/

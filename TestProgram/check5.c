@@ -28,9 +28,9 @@
 #include "utils.h"
 
 int nhb,nor,nit,nth,nms,level,seed;
-float beta;
+double beta;
 
-static float hmass=0.1;
+static double hmass=0.1;
 
 
 void D(suNf_spinor *out, suNf_spinor *in){
@@ -52,9 +52,8 @@ int main(int argc,char *argv[])
 {
    int i;
    double tau;
-   suNf_spinor s1[VOLUME],s2[VOLUME];
+   suNf_spinor *s1, *s2;
    suNf_spinor **res;
-   suNf_spinor_dble **resd;
 
    mshift_par par;
 
@@ -65,12 +64,12 @@ int main(int argc,char *argv[])
    printf("The lattice size is %dx%d^3\n",T,L);
    printf("\n");
    
-   level=0;
+   level=1;
    seed=123;
    printf("ranlux: level = %d, seed = %d\n\n",level,seed); 
    fflush(stdout);
    
-   rlxs_init(level,seed);
+   rlxd_init(level,seed);
 
    geometry_eo_lexi();
    test_geometry();
@@ -90,18 +89,14 @@ int main(int argc,char *argv[])
    
    par.n = 6;
    par.shift=(double*)malloc(sizeof(double)*(par.n));
-   par.err2=1e-8;
+   par.err2=1.e-28;
    par.max_iter=0;
    res=(suNf_spinor**)malloc(sizeof(suNf_spinor*)*(par.n));
    res[0]=(suNf_spinor*)malloc(sizeof(suNf_spinor)*par.n*VOLUME);
    for(i=1;i<par.n;++i)
      res[i]=res[i-1]+VOLUME;
-
-   resd=(suNf_spinor_dble**)malloc(sizeof(suNf_spinor_dble*)*(par.n));
-   resd[0]=(suNf_spinor_dble*)malloc(sizeof(suNf_spinor_dble)*par.n*VOLUME);
-   for(i=1;i<par.n;++i)
-     resd[i]=resd[i-1]+VOLUME;
-
+	 s1=malloc(sizeof(*s1)*VOLUME);
+	 s2=malloc(sizeof(*s2)*VOLUME);
 
    par.shift[0]=+0.1;
    par.shift[1]=-0.21;
@@ -124,10 +119,15 @@ int main(int argc,char *argv[])
    for(i=0;i<par.n;++i){
       M(s2,res[i]);
       spinor_field_mul_add_assign_f(s2,-par.shift[i],res[i]);
-      spinor_field_mul_add_assign_f(s2,-1.0,s1);
+      spinor_field_sub_assign_f(s2,s1);
       tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
-      printf("test cg[%d] = %e\n",i,tau);
+      printf("test cg[%d] = %e (req. %e)\n",i,tau,par.err2);
    }
+
+	 free(res[0]);
+	 free(res);
+	 free(s1);
+	 free(s2);
 
    exit(0);
 }

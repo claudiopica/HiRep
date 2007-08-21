@@ -28,9 +28,9 @@
 #include "utils.h"
 
 int nhb,nor,nit,nth,nms,level,seed;
-float beta;
+double beta;
 
-static float hmass=0.1;
+static double hmass=0.1;
 
 
 void D(suNf_spinor *out, suNf_spinor *in){
@@ -52,13 +52,10 @@ int main(int argc,char *argv[])
 {
    int i;
    double tau;
-   suNf_spinor s1[VOLUME],s2[VOLUME];
+   suNf_spinor *s1, *s2;
    suNf_spinor **res;
-   suNf_spinor_dble s3[VOLUME],s4[VOLUME];
-   suNf_spinor_dble **resd;
 
    mshift_par par;
-   mshift_par QMRpar;
 
    int cgiters;
 
@@ -73,6 +70,9 @@ int main(int argc,char *argv[])
    fflush(stdout);
    
    rlxs_init(level,seed);
+
+	 s1=malloc(sizeof(*s1)*VOLUME);
+	 s2=malloc(sizeof(*s2)*VOLUME);
 
    geometry_eo_lexi();
    test_geometry();
@@ -92,18 +92,12 @@ int main(int argc,char *argv[])
    
    par.n = 6;
    par.shift=(double*)malloc(sizeof(double)*(par.n));
-   par.err2=1.e-8;
+   par.err2=1.e-28;
 	 par.max_iter=0;
    res=(suNf_spinor**)malloc(sizeof(suNf_spinor*)*(par.n));
    res[0]=(suNf_spinor*)malloc(sizeof(suNf_spinor)*par.n*VOLUME);
    for(i=1;i<par.n;++i)
      res[i]=res[i-1]+VOLUME;
-
-   resd=(suNf_spinor_dble**)malloc(sizeof(suNf_spinor_dble*)*(par.n));
-   resd[0]=(suNf_spinor_dble*)malloc(sizeof(suNf_spinor_dble)*par.n*VOLUME);
-   for(i=1;i<par.n;++i)
-     resd[i]=resd[i-1]+VOLUME;
-
 
    par.shift[0]=+0.1;
    par.shift[1]=-0.21;
@@ -120,24 +114,22 @@ int main(int argc,char *argv[])
    printf("Testing g5QMR multishift\n");
    printf("------------------------\n");
 
-   QMRpar.n = 6;
-   QMRpar.shift=par.shift;
-   QMRpar.err2=1.e-8;
-   QMRpar.max_iter=0;
-   
-   cgiters=g5QMR_mshift(&QMRpar, &D, s1, resd);
+   cgiters=g5QMR_mshift(&par, &D, s1, res);
    printf("Converged in %d iterations\n",cgiters);
 
-   for(i=0;i<QMRpar.n;++i){
-     assign_sd2s(VOLUME,res[i],resd[i]);
+   for(i=0;i<par.n;++i){
       D(s2,res[i]);
-      assign_s2sd(VOLUME,s3,s2);
-			spinor_field_mul_add_assign_dble_f(s3,-par.shift[i],resd[i]);
-      assign_s2sd(VOLUME,s4,s1);
-      spinor_field_mul_add_assign_dble_f(s3,-1.0,s4);
-      tau=spinor_field_sqnorm_dble_f(s3)/(double)spinor_field_sqnorm_f(s1);
-      printf("test g5QMR[%d] = %e\n",i,tau);
+			spinor_field_mul_add_assign_f(s2,-par.shift[i],res[i]);
+      spinor_field_sub_assign_f(s2,s1);
+      tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
+      printf("test g5QMR[%d] = %e (req. %e)\n",i,tau,par.err2);
    }
+	 
+	 free(res[0]);
+	 free(res);
+
+	 free(s1);
+	 free(s2);
 
    exit(0);
 }

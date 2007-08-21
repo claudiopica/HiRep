@@ -20,12 +20,12 @@ unsigned long int getMVM();
 unsigned long int getMVM_flt();
 
 /* p = out ; q = in */
-/*
-void Dphi_old(float m0, suNf_spinor *p, suNf_spinor *q);
-void g5Dphi_old(float m0, suNf_spinor *p, suNf_spinor *q);
-void Dphi_dble_old(double m0, suNf_spinor_dble *p, suNf_spinor_dble *q);
-void g5Dphi_dble_old(double m0, suNf_spinor_dble *p, suNf_spinor_dble *q);
-*/
+
+void Dphi_old(double m0, suNf_spinor *p, suNf_spinor *q);
+void g5Dphi_old(double m0, suNf_spinor *p, suNf_spinor *q);
+void Dphi_flt_old(double m0, suNf_spinor_flt *p, suNf_spinor_flt *q);
+void g5Dphi_flt_old(double m0, suNf_spinor_flt *p, suNf_spinor_flt *q);
+
 
 #endif
 	

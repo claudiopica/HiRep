@@ -27,9 +27,9 @@
 #include "utils.h"
 
 int nhb,nor,nit,nth,nms,level,seed;
-float beta;
+double beta;
 
-static float hmass=0.1;
+static double hmass=0.1;
 static suNg g[VOLUME];
 
 
@@ -74,12 +74,12 @@ static void transform_s(suNf_spinor *out, suNf_spinor *in)
    {
       s=in[ix];
       
-      _group_represent(gfx,g[ix]);
+      _group_represent2(&gfx,&(g[ix]));
 
-      _suNf_multiply(r.c1,gfx,s.c1);
-      _suNf_multiply(r.c2,gfx,s.c2);
-      _suNf_multiply(r.c3,gfx,s.c3);
-      _suNf_multiply(r.c4,gfx,s.c4);
+      _suNf_multiply(r.c[0],gfx,s.c[0]);
+      _suNf_multiply(r.c[1],gfx,s.c[1]);
+      _suNf_multiply(r.c[2],gfx,s.c[2]);
+      _suNf_multiply(r.c[3],gfx,s.c[3]);
 
       out[ix]=r;
    }   
@@ -141,7 +141,7 @@ int main(int argc,char *argv[])
    sig=spinor_field_sqnorm_f(s1);
 
    printf("Maximal normalized difference = %.2e\n",sqrt(sig));
-   printf("(should be around 1*10^(-6) or so)\n\n");
+   printf("(should be around 1*10^(-15) or so)\n\n");
    
    free_field(u_gauge);
 #ifndef REPR_FUNDAMENTAL

@@ -71,7 +71,7 @@ int main(int argc,char *argv[])
    printf("ranlux: level = %d, seed = %d\n\n",level,seed); 
    fflush(stdout);
    
-   rlxs_init(level,seed);
+   rlxd_init(level,seed);
    /*   rlxd_init(level+1,seed); */
 
    geometry_blocked();

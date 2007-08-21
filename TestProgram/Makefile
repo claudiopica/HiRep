@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-MAIN := test check0 check1 check2 check3 check4 check5 check6 check7 check8 check9 check10 check11
+MAIN := check0 check1 check2 check3 check4 check5 check6 check7 check8 check9 check10 check11
 
 SRCS = $(addsuffix .c,$(MAIN))
 

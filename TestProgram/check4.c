@@ -28,9 +28,9 @@
 #include "utils.h"
 
 int nhb,nor,nit,nth,nms,level,seed;
-float beta;
+double beta;
 
-static float hmass=0.1;
+static double hmass=0.1;
 
 
 void D(suNf_spinor *out, suNf_spinor *in){
@@ -38,7 +38,7 @@ void D(suNf_spinor *out, suNf_spinor *in){
 }
 
 void H(suNf_spinor *out, suNf_spinor *in){
-   g5Dphi(hmass,out,in);
+   g5Dphi(-hmass,out,in);
 }
 
 void M(suNf_spinor *out, suNf_spinor *in){
@@ -48,12 +48,18 @@ void M(suNf_spinor *out, suNf_spinor *in){
 }
 
 void test_herm(spinor_operator S, char *name){
-   static suNf_spinor s1[VOLUME],s2[VOLUME],s3[VOLUME],s4[VOLUME];
+   suNf_spinor *s1, *s2, *s3, *s4;
    double tau;
+
+	 s1=malloc(sizeof(*s1)*VOLUME);
+	 s2=malloc(sizeof(*s2)*VOLUME);
+	 s3=malloc(sizeof(*s3)*VOLUME);
+	 s4=malloc(sizeof(*s4)*VOLUME);
+
    printf("Test if %s is hermitean: ",name);
 
-   gaussian_spinor_field(&(s1[0]));
-   gaussian_spinor_field(&(s2[0]));
+   gaussian_spinor_field(s1);
+   gaussian_spinor_field(s2);
    S(s3,s1);
    S(s4,s2);
 
@@ -69,26 +75,28 @@ void test_herm(spinor_operator S, char *name){
      printf("OK ");
    printf("[norm = %e]\n",tau);
 
+	 free(s1);
+	 free(s2);
+	 free(s3);
+	 free(s4);
 
 }
 
 
 int main(int argc,char *argv[])
 {
-   double tau;
-   suNf_spinor s1[VOLUME],s2[VOLUME];
-
    printf("Gauge group: SU(%d)\n",NG);
    printf("Fermion representation: dim = %d\n",NF);
    printf("The lattice size is %dx%d^3\n",T,L);
    printf("\n");
    
-   level=0;
+   level=1;
    seed=123;
    printf("ranlux: level = %d, seed = %d\n\n",level,seed); 
    fflush(stdout);
    
-   rlxs_init(level,seed);
+   rlxd_init(level,seed);
+
 
    geometry_eo_lexi();
    test_geometry();
@@ -105,6 +113,7 @@ int main(int argc,char *argv[])
 
    set_spinor_len(VOLUME);
    
+	 /*
    gaussian_spinor_field(&(s1[0]));
    gaussian_spinor_field(&(s2[0]));
    
@@ -112,6 +121,7 @@ int main(int argc,char *argv[])
    spinor_field_mul_f(s1,tau,s1);
    tau = 1./sqrt(spinor_field_sqnorm_f(s2));
    spinor_field_mul_f(s2,tau,s2);
+*/
 
    printf("Test hermiticity of the Dirac operator\n");
    printf("--------------------------------------\n");

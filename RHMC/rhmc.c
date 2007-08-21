@@ -90,9 +90,9 @@ int main(int argc,char *argv[])
    lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
    lprintf("MAIN",0,"The lattice size is %dx%d^3\n",T,L);
    
-   level=0;
+   level=1;
    seed=666;
-   rlxs_init(level,seed);
+   rlxd_init(level,seed);
    /*   rlxd_init(level+1,seed); */
    lprintf("MAIN",0,"ranlux: level = %d, seed = %d\n",level,seed); 
 

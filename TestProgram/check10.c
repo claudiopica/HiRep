@@ -28,12 +28,12 @@
 #include "logger.h"
 
 static int iw;
-static float ms;
+static double ms;
 static suNf_spinor **ws;
 static double EPSILON=1.e-12;
 
 
-static float low_ev(void)
+static double low_ev(void)
 {
    int l,lmax;
    double p,sp,cp,pi;
@@ -49,11 +49,11 @@ static float low_ev(void)
    sp=sin(p);
    cp=ms+1.0-cos(p);
 
-   return (float)(sp*sp+cp*cp);
+   return (double)(sp*sp+cp*cp);
 }
 
 
-static float normalize(suNf_spinor *ps)
+static double normalize(suNf_spinor *ps)
 {
    double r;
 
@@ -64,7 +64,7 @@ static float normalize(suNf_spinor *ps)
    r=1.0/r;
    spinor_field_mul_f(ps,r,ps);
 
-   return (float)(1.0/r);
+   return (double)(1.0/r);
 }
 
 
@@ -75,10 +75,10 @@ static void Op1(suNf_spinor *pl,suNf_spinor *pk)
 }
 
 
-static float power(int nit,spinor_operator Op,suNf_spinor *ws[])
+static double power(int nit,spinor_operator Op,suNf_spinor *ws[])
 {
    int i;
-   float ubnd;
+   double ubnd;
 
    gaussian_spinor_field(ws[0]);
    normalize(ws[0]);
@@ -93,7 +93,7 @@ static float power(int nit,spinor_operator Op,suNf_spinor *ws[])
       ubnd=normalize(ws[0]);
    }
 
-   return (float)sqrt((double)(ubnd));
+   return (double)sqrt((double)(ubnd));
 }
 
 
@@ -101,7 +101,7 @@ int main(int argc,char *argv[])
 {
    int i;
    int nev,nevt,ie,status;
-   float ubnd,omega1,omega2,d1[16],res,lev;
+   double ubnd,omega1,omega2,d1[16],res,lev;
    suNf_spinor **ev;
    FILE *log=NULL;   
 
@@ -112,7 +112,7 @@ int main(int argc,char *argv[])
    printf("The lattice size is %dx%d^3\n",T,L);
    printf("size of the gluon rep: %d, size of the fermion rep: %d\n",NG,NF);
    
-   rlxs_init(0,12345);
+   rlxd_init(1,12345);
 
 	 logger_setlevel(0,1000);
 
@@ -154,9 +154,9 @@ int main(int argc,char *argv[])
    for (i=0;i<(4*NF+8);i++)
    {
       if (i<4*NF)
-         res=(float)fabs((double)(d1[i]-ms*ms));
+         res=(double)fabs((double)(d1[i]-ms*ms));
       else
-         res=(float)fabs((double)(d1[i]-lev));
+         res=(double)fabs((double)(d1[i]-lev));
 
       if (i==nev)
          printf("\n");

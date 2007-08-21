@@ -42,10 +42,10 @@ int main(int argc,char *argv[])
    _suNg_unit(E);
    _suNf_unit(e);
    
-   _group_represent(tmp,E);
+   _group_represent2(&tmp,&E);
    _suNf_sub_assign(e,tmp);
 
-   tau=_suNf_sqnorm(e);
+   _suNf_sqnorm(tau,e);
    printf("checking that _group_represent works on E: %.3f\n",tau);
    printf("(should be 0.00)\n");
    
@@ -58,15 +58,15 @@ int main(int argc,char *argv[])
 
    _suNg_times_suNg(C,A,B);
 
-   _group_represent(a,A);
-   _group_represent(b,B);
+   _group_represent2(&a,&A);
+   _group_represent2(&b,&B);
 
    _suNf_times_suNf(c,a,b);
-   _group_represent(tmp,C);
+   _group_represent2(&tmp,&C);
 
    _suNf_sub_assign(c,tmp);
 
-   tau=_suNf_sqnorm(c);
+   _suNf_sqnorm(tau,c);
    printf("checking that _group_represent is a homo: %.3f\n",tau);
    printf("(should be 0.00)\n");
    

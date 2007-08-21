@@ -28,9 +28,9 @@
 #include "utils.h"
 
 int nhb,nor,nit,nth,nms,level,seed;
-float beta;
+double beta;
 
-static float hmass=0.1;
+static double hmass=0.1;
 
 
 int main(int argc,char *argv[])
@@ -43,12 +43,12 @@ int main(int argc,char *argv[])
    printf("The lattice size is %dx%d^3\n",T,L);
    printf("\n");
    
-   level=0;
+   level=1;
    seed=123;
    printf("ranlux: level = %d, seed = %d\n\n",level,seed); 
    fflush(stdout);
    
-   rlxs_init(level,seed);
+   rlxd_init(level,seed);
 
    geometry_eo_lexi();
    test_geometry();
@@ -79,9 +79,9 @@ int main(int argc,char *argv[])
    g5Dphi_old(hmass,s3,s1);
    g5Dphi(hmass,s4,s1);
 
-   spinor_field_mul_add_assign_f(s3,-1.0,s4);
-   tau=spinor_field_sqnorm_f(s3);
-   if (fabs(tau)>1.e-7) 
+   spinor_field_sub_assign_f(s3,s4);
+   tau=sqrt(spinor_field_sqnorm_f(s3));
+   if (fabs(tau)>1.e-15) 
      printf("FAILED ");
    else 
      printf("OK ");
