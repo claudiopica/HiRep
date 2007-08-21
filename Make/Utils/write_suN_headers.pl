@@ -1744,7 +1744,7 @@ sub write_suN_trace_re {
 		print "         _n+=$n;\\\n";
 		print "      }\\\n";
 		$n=0;
-		print "      (k)+=";
+		print "      (k)+=" unless ($vr==0);
 		for(my $i=0;$i<$vr;$i++){
 			if ($i==0) { print "_complex_re((u).$cname\[_n\])"; }
 			else { print "_complex_re((u).$cname\[_n+$n\])"; }
@@ -1782,7 +1782,7 @@ sub write_suNr_trace_re {
 		print "         _n+=$n;\\\n";
 		print "      }\\\n";
 		$n=0;
-		print "      (k)+=";
+		print "      (k)+=" unless ($vr==0);
 		for(my $i=0;$i<$vr;$i++){
 			if ($i==0) { print "(u).$cname\[_n\]"; }
 			else { print "(u).$cname\[_n+$n\]"; }
@@ -1820,7 +1820,7 @@ sub write_suN_trace_im {
 		print "         _n+=$n;\\\n";
 		print "      }\\\n";
 		$n=0;
-		print "      (k)+=";
+		print "      (k)+=" unless ($vr==0);
 		for(my $i=0;$i<$vr;$i++){
 			if ($i==0) { print "_complex_im((u).$cname\[_n\])"; }
 			else { print "_complex_im((u).$cname\[_n+$n\])"; }
