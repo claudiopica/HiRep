@@ -90,7 +90,7 @@ suNf_flt* alloc_gfield_f_flt()
    error(p==NULL,1,"alloc_gfield_f_flt [field_alloc.c]",
          "Could not allocate memory space for the gauge field");
 
-   _suNg_unit(unity);
+   _suNf_unit(unity);
 
    for (ix=0;ix<4*VOLUME;ix+=2){
        *(p+ix)=unity;

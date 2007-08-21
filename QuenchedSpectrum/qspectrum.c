@@ -68,11 +68,11 @@ int main(int argc,char *argv[])
 
 	char propname[256];
 	FILE *propfile;
-	float *m;
+	double *m;
 
-	float kappa[]={0.156,0.1575,0.159,0.160,0.161};
+	double kappa[]={0.156,0.1575,0.159,0.160,0.161};
 	int nm=sizeof(kappa)/sizeof(float);
-	m = (float *) malloc(sizeof(kappa));
+	m = malloc(sizeof(kappa));
 	for (i=0; i<nm; ++i)
 	{
 		m[i] = 0.5/kappa[i] - 4.0;
@@ -105,10 +105,8 @@ int main(int argc,char *argv[])
 	test_geometry();
 
 	u_gauge=alloc_gfield();
-	u_gauge_dble=alloc_gfield_dble();
 #ifndef REPR_FUNDAMENTAL
 	u_gauge_f=alloc_gfield_f();
-	u_gauge_dble_f=alloc_gfield_dble_f();
 #endif
 
 	sprintf(propname,"quark_prop_qmr_%3.5f_%d_%d_%d_%d",beta,T,L,L,L);
@@ -116,7 +114,7 @@ int main(int argc,char *argv[])
 			"Failed to open propagator file for writing");
 	fwrite(&nm,(size_t) sizeof(int),1,propfile);
 	for(i=0;i<nm;++i)
-		fwrite(m+i,(size_t) sizeof(float),1,propfile);
+		fwrite(m+i,(size_t) sizeof(*m),1,propfile);
 
 	/* Termalizzazione */
 	/*
@@ -131,11 +129,10 @@ int main(int argc,char *argv[])
 	if(i) lprintf("MAIN",0,"%d\nThemalization done.\n",i);
 	*/
 	/* or read configuration from file */
-	read_gauge_field_single("confname");
+	read_gauge_field("confname");
 	assign_u2ud();
 
 	represent_gauge_field();
-	represent_gauge_field_dble();
 
 	/* Misure */
 	for (i=0;i<nms;++i){ /* nms misure */
@@ -147,7 +144,7 @@ int main(int argc,char *argv[])
 			update(beta,nhb,nor);
 		represent_gauge_field();
 
-   write_gauge_field_single("confname.loc"); 
+   write_gauge_field("confname.loc"); 
 
 	}
 
@@ -155,9 +152,7 @@ int main(int argc,char *argv[])
 
 
 	free_field(u_gauge);
-	free_field(u_gauge_dble);
 #ifndef REPR_FUNDAMENTAL
-	free_field(u_gauge_dble_f);
 	free_field(u_gauge_f);
 #endif
 

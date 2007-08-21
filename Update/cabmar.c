@@ -22,8 +22,8 @@ static void rotate(void)
   complex z1,z2;
   complex *cu1, *cu2;
   
-  cu1 = &((*pu1).c1);
-  cu2 = &((*pu2).c1);
+  cu1 = &((*pu1).c[0]);
+  cu2 = &((*pu2).c[0]);
   
   for (i=0; i<NG; ++i) {
     z1.re=s[0]*(*cu1).re-s[1]*(*cu2).im+s[2]*(*cu2).re-s[3]*(*cu1).im;
@@ -39,10 +39,19 @@ static void rotate(void)
 
 static void wmatrix(void) 
 {
-  w[0] = _vector_prod_re_g(*pu1, *pv1)+_vector_prod_re_g(*pu2,*pv2);
-  w[1] = _vector_prod_im_g(*pu1, *pv2)+_vector_prod_im_g(*pu2,*pv1);
-  w[2] = _vector_prod_re_g(*pu2, *pv1)-_vector_prod_re_g(*pu1,*pv2);
-  w[3] = _vector_prod_im_g(*pu1, *pv1)-_vector_prod_im_g(*pu2,*pv2);
+	double prod1,prod2;
+  _vector_prod_re_g(prod1,*pu1,*pv1);
+	_vector_prod_re_g(prod2,*pu2,*pv2);
+	w[0] = prod1+prod2;
+  _vector_prod_im_g(prod1,*pu1,*pv2);
+	_vector_prod_im_g(prod2,*pu2,*pv1);
+	w[1] = prod1+prod2;
+  _vector_prod_re_g(prod1,*pu2,*pv1);
+	_vector_prod_re_g(prod2,*pu1,*pv2);
+	w[2] = prod1-prod2;
+  _vector_prod_im_g(prod1,*pu1,*pv1);
+	_vector_prod_im_g(prod2,*pu2,*pv2);
+	w[3] = prod1-prod2;
 }
 
 void cabmar(double beta,suNg *u,suNg *v,int type)

@@ -37,6 +37,6 @@ void g5g3_correlator(double *out, suNf_spinor **qp);
 void g0g5g1_correlator(double *out, suNf_spinor **qp);
 void g0g5g2_correlator(double *out, suNf_spinor **qp);
 void g0g5g3_correlator(double *out, suNf_spinor **qp);
-void g5_g0g5_correlator_im(float *out, suNf_spinor **qp);
+void g5_g0g5_correlator_im(double *out, suNf_spinor **qp);
 
 #endif 

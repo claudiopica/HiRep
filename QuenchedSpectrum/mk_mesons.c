@@ -66,7 +66,7 @@ int main(int argc,char *argv[])
 	long int propsize;
 	long int cur_pos;
 
-	float *m;
+	double *m;
 	int nm;
 
 	if(argc!=2) {
@@ -83,9 +83,9 @@ int main(int argc,char *argv[])
 	error((propfile = fopen(argv[1], "rb"))==NULL,1,"Main",
 			"Failed to open propagator file for reading");
 	fread(&nm,(size_t) sizeof(int),1,propfile);
-	m=(float*)malloc(sizeof(float)*nm);
+	m=malloc(sizeof(*m)*nm);
 	for(i=0;i<nm;++i)
-		fread(m+i,(size_t) sizeof(float),1,propfile);
+		fread(m+i,(size_t) sizeof(*m),1,propfile);
 
 	lprintf("MAIN",0,"Found %d masses:\n",nm);
 	for(i=0;i<nm;++i)
@@ -111,7 +111,7 @@ int main(int argc,char *argv[])
 	/* Misure */
 	do {
 
-		float tmpcorr[T];
+		double tmpcorr[T];
 
 		for (k=0;k<nm;++k){
 			/* read propagator for 1 mass from file */

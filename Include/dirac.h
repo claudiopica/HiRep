@@ -17,6 +17,7 @@ void Dphi_flt(double m0, suNf_spinor_flt *out, suNf_spinor_flt *in);
 void g5Dphi_flt(double m0, suNf_spinor_flt *out, suNf_spinor_flt *in);
 
 unsigned long int getMVM();
+unsigned long int getMVM_flt();
 
 /* p = out ; q = in */
 /*

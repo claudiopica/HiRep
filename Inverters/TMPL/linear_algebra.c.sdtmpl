@@ -2,9 +2,10 @@
 double _FUNC(spinor_field_prod_re)(_SPINOR_TYPE *s1, _SPINOR_TYPE *s2)
 {
    int len;
-   double res=0.;
+   double prod,res=0.;
    for(len=0;len<_spinor_len;++len){
-      res+=_spinor_prod_re_f(*s1,*s2);
+      _spinor_prod_re_f(prod,*s1,*s2);
+			res+=prod;
       s1+=1;
       s2+=1;
    }
@@ -15,9 +16,10 @@ double _FUNC(spinor_field_prod_re)(_SPINOR_TYPE *s1, _SPINOR_TYPE *s2)
 double _FUNC(spinor_field_prod_im)(_SPINOR_TYPE *s1, _SPINOR_TYPE *s2)
 {
    int len;
-   double res=0.;
+   double prod,res=0.;
    for(len=0;len<_spinor_len;++len){
-      res+=_spinor_prod_im_f(*s1,*s2);
+      _spinor_prod_im_f(prod,*s1,*s2);
+			res+=prod;
       s1+=1;
       s2+=1;
    }
@@ -41,9 +43,10 @@ complex _FUNC(spinor_field_prod)(_SPINOR_TYPE *s1, _SPINOR_TYPE *s2)
 double _FUNC(spinor_field_g5_prod_re)(_SPINOR_TYPE *s1, _SPINOR_TYPE *s2)
 {
    int len;
-   double res=0.;
+   double prod,res=0.;
    for(len=0;len<_spinor_len;++len){
-      res+=_spinor_g5_prod_re_f(*s1,*s2);
+			_spinor_g5_prod_re_f(prod,*s1,*s2);
+      res+=prod;
       s1+=1;
       s2+=1;
    }
@@ -54,9 +57,10 @@ double _FUNC(spinor_field_g5_prod_re)(_SPINOR_TYPE *s1, _SPINOR_TYPE *s2)
 double _FUNC(spinor_field_sqnorm)(_SPINOR_TYPE *s1)
 {
    int len;
-   double res=0.;
+   double prod,res=0.;
    for(len=_spinor_len;len>0;--len) {
-      res+=_spinor_prod_re_f(*s1,*s1);
+			_spinor_prod_re_f(prod,*s1,*s1);
+      res+=prod;
       s1+=1;
    }
    return res;

@@ -133,20 +133,20 @@ static void rotate(int vol,int n,suNf_spinor **pkk,complex v[])
          pj=pkk[0]+ix;
          z=&v[k];
 
-         _vector_mulc_f((*pk).c1,*z,(*pj).c1);
-         _vector_mulc_f((*pk).c2,*z,(*pj).c2);
-         _vector_mulc_f((*pk).c3,*z,(*pj).c3);
-         _vector_mulc_f((*pk).c4,*z,(*pj).c4);
+         _vector_mulc_f((*pk).c[0],*z,(*pj).c[0]);
+         _vector_mulc_f((*pk).c[1],*z,(*pj).c[1]);
+         _vector_mulc_f((*pk).c[2],*z,(*pj).c[2]);
+         _vector_mulc_f((*pk).c[3],*z,(*pj).c[3]);
 
          for (j=1;j<n;j++)
          {
             pj=pkk[j]+ix;
             z+=n;
 
-            _vector_mulc_add_assign_f((*pk).c1,*z,(*pj).c1);
-            _vector_mulc_add_assign_f((*pk).c2,*z,(*pj).c2);
-            _vector_mulc_add_assign_f((*pk).c3,*z,(*pj).c3);
-            _vector_mulc_add_assign_f((*pk).c4,*z,(*pj).c4);
+            _vector_mulc_add_assign_f((*pk).c[0],*z,(*pj).c[0]);
+            _vector_mulc_add_assign_f((*pk).c[1],*z,(*pj).c[1]);
+            _vector_mulc_add_assign_f((*pk).c[2],*z,(*pj).c[2]);
+            _vector_mulc_add_assign_f((*pk).c[3],*z,(*pj).c[3]);
          }
       }
 

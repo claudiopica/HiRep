@@ -28,47 +28,47 @@ extern rational_app r_MD; /* used in the action MD evolution */
  * given the form of g_5(1-g_mu) one can compute only the first two lorentz
  * components of the spinor; so we first apply g_5(1-g_mu) to chi2 to find the first
  * two components; then we multiply these two vectors by U(x,mu) and
- * store the result in p.c1, p.c2; when computing the trace we can factorize p.c1 and p.c2
- * as they both multiply two components of chi1^+; we store these factors in p.c3 and p.c4.
+ * store the result in p.c[0], p.c[1]; when computing the trace we can factorize p.c[0] and p.c[1]
+ * as they both multiply two components of chi1^+; we store these factors in p.c[2] and p.c[3].
  * the tensor product is performed by the macro 
- * _suNf_FMAT(u,p): u = p.c1 # p.c3^+ + p.c2 # p.c4^+
+ * _suNf_FMAT(u,p): u = p.c[0] # p.c[2]^+ + p.c[1] # p.c[3]^+
  */
 
 /* these macros use the variables ptmp, p */
 #define _F_DIR0(u,chi1,chi2)				      \
-  _vector_add_f(ptmp,(chi2)->c1,(chi2)->c3);		      \
-  _suNf_multiply(p.c1,*(pu_gauge_f(x,0)),ptmp);		      \
-  _vector_add_f(ptmp,(chi2)->c2,(chi2)->c4);		      \
-  _suNf_multiply(p.c2,*(pu_gauge_f(x,0)),ptmp);		      \
-  _vector_sub_f(p.c3,(chi1)->c1,(chi1)->c3);	      \
-  _vector_sub_f(p.c4,(chi1)->c2,(chi1)->c4);	      \
+  _vector_add_f(ptmp,(chi2)->c[0],(chi2)->c[2]);		      \
+  _suNf_multiply(p.c[0],*(pu_gauge_f(x,0)),ptmp);		      \
+  _vector_add_f(ptmp,(chi2)->c[1],(chi2)->c[3]);		      \
+  _suNf_multiply(p.c[1],*(pu_gauge_f(x,0)),ptmp);		      \
+  _vector_sub_f(p.c[2],(chi1)->c[0],(chi1)->c[2]);	      \
+  _vector_sub_f(p.c[3],(chi1)->c[1],(chi1)->c[3]);	      \
   _suNf_FMAT((u),p)
 
 #define _F_DIR1(u,chi1,chi2)				      \
-  _vector_i_add_f(ptmp,(chi2)->c1,(chi2)->c4);		      \
-  _suNf_multiply(p.c1,*(pu_gauge_f(x,1)),ptmp);		      \
-  _vector_i_add_f(ptmp,(chi2)->c2,(chi2)->c3);		      \
-  _suNf_multiply(p.c2,*(pu_gauge_f(x,1)),ptmp);		      \
-  _vector_i_sub_f(p.c3,(chi1)->c1,(chi1)->c4);	      \
-  _vector_i_sub_f(p.c4,(chi1)->c2,(chi1)->c3);	      \
+  _vector_i_add_f(ptmp,(chi2)->c[0],(chi2)->c[3]);		      \
+  _suNf_multiply(p.c[0],*(pu_gauge_f(x,1)),ptmp);		      \
+  _vector_i_add_f(ptmp,(chi2)->c[1],(chi2)->c[2]);		      \
+  _suNf_multiply(p.c[1],*(pu_gauge_f(x,1)),ptmp);		      \
+  _vector_i_sub_f(p.c[2],(chi1)->c[0],(chi1)->c[3]);	      \
+  _vector_i_sub_f(p.c[3],(chi1)->c[1],(chi1)->c[2]);	      \
   _suNf_FMAT((u),p)
 
 #define _F_DIR2(u,chi1,chi2)				      \
-  _vector_add_f(ptmp,(chi2)->c1,(chi2)->c4);		      \
-  _suNf_multiply(p.c1,*(pu_gauge_f(x,2)),ptmp);		      \
-  _vector_sub_f(ptmp,(chi2)->c2,(chi2)->c3);		      \
-  _suNf_multiply(p.c2,*(pu_gauge_f(x,2)),ptmp);		      \
-  _vector_sub_f(p.c3,(chi1)->c1,(chi1)->c4);	      \
-  _vector_add_f(p.c4,(chi1)->c2,(chi1)->c3);	      \
+  _vector_add_f(ptmp,(chi2)->c[0],(chi2)->c[3]);		      \
+  _suNf_multiply(p.c[0],*(pu_gauge_f(x,2)),ptmp);		      \
+  _vector_sub_f(ptmp,(chi2)->c[1],(chi2)->c[2]);		      \
+  _suNf_multiply(p.c[1],*(pu_gauge_f(x,2)),ptmp);		      \
+  _vector_sub_f(p.c[2],(chi1)->c[0],(chi1)->c[3]);	      \
+  _vector_add_f(p.c[3],(chi1)->c[1],(chi1)->c[2]);	      \
   _suNf_FMAT((u),p)
 
 #define _F_DIR3(u,chi1,chi2)				      \
-  _vector_i_add_f(ptmp,(chi2)->c1,(chi2)->c3);		      \
-  _suNf_multiply(p.c1,*(pu_gauge_f(x,3)),ptmp);		      \
-  _vector_i_sub_f(ptmp,(chi2)->c2,(chi2)->c4);		      \
-  _suNf_multiply(p.c2,*(pu_gauge_f(x,3)),ptmp);		      \
-  _vector_i_sub_f(p.c3,(chi1)->c1,(chi1)->c3);	      \
-  _vector_i_add_f(p.c4,(chi1)->c2,(chi1)->c4);	      \
+  _vector_i_add_f(ptmp,(chi2)->c[0],(chi2)->c[2]);		      \
+  _suNf_multiply(p.c[0],*(pu_gauge_f(x,3)),ptmp);		      \
+  _vector_i_sub_f(ptmp,(chi2)->c[1],(chi2)->c[3]);		      \
+  _suNf_multiply(p.c[1],*(pu_gauge_f(x,3)),ptmp);		      \
+  _vector_i_sub_f(p.c[2],(chi1)->c[0],(chi1)->c[2]);	      \
+  _vector_i_add_f(p.c[3],(chi1)->c[1],(chi1)->c[3]);	      \
   _suNf_FMAT((u),p)
 
 
@@ -83,6 +83,7 @@ void Force_rhmc_f(double dt, suNg_algebra_vector *force){
 	suNf_spinor **chi;
 	suNf_spinor *Hchi;
 	double avrforce,maxforce;
+	double nsq;
 
 	/* allocate spinors */
 	chi = (suNf_spinor **)malloc(sizeof(*chi)*(r_MD.order));
@@ -162,7 +163,8 @@ void Force_rhmc_f(double dt, suNg_algebra_vector *force){
 				/*_print_avect(f); */
 				_algebra_vector_mul_add_assign_g(force[i],dt*r_MD.a[n+1]*(_REPR_NORM2/_FUND_NORM2),f);	
 
-				avrforce+=sqrt(_algebra_vector_sqnorm_g(f));
+				_algebra_vector_sqnorm_g(nsq,f);
+				avrforce+=sqrt(nsq);
 				for(x=0;x<NG*NG-1;++x){
 					if(maxforce<fabs(*(((double*)&f)+x))) maxforce=fabs(*(((double*)&f)+x));
 				}

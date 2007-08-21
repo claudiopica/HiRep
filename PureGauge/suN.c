@@ -126,7 +126,7 @@ int main(int argc,char *argv[])
    printf("tau   = %1.2f [iterations]\n\n",tau);
 
 
-   write_gauge_field_single("Config");
+   write_gauge_field("Config");
 
    free_field(u_gauge);
 

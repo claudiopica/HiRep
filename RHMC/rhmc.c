@@ -29,7 +29,7 @@
 #include "logger.h"
 
 int nhb,nor,nit,nth,nms,level,seed;
-float beta;
+double beta;
 
 void read_cmdline(int argc, char*argv[])
 {
@@ -53,7 +53,7 @@ void read_cmdline(int argc, char*argv[])
    in=freopen(argv[ai],"r",stdin);
    error(in==NULL,1,"run1.c","Cannot open input file");
    
-   scanf("beta %f nhb %d nor %d nit %d nth %d nms %d level %d seed %d",
+   scanf("beta %lf nhb %d nor %d nit %d nth %d nms %d level %d seed %d",
          &beta,&nhb,&nor,&nit,&nth,&nms,&level,&seed);
    fclose(in);
  
@@ -107,10 +107,10 @@ int main(int argc,char *argv[])
    rpar.beta = 4.9;
    rpar.mass = -1.3045822102425876010; /* k=0.1855 */
    rpar.nf = 2;
-	 rpar.MT_prec = 1.e-8;
-	 rpar.MD_prec = 1.e-6;
-	 rpar.HB_prec = 1.e-8;
-	 rpar.force_prec = 1.e-8;
+	 rpar.MT_prec = 1.e-15;
+	 rpar.MD_prec = 1.e-15;
+	 rpar.HB_prec = 1.e-15;
+	 rpar.force_prec = 1.e-20;
 	 rpar.n_pf = 2;
 	 rpar.integrator=&O2MN_multistep;
 	 /*rpar.integrator=&leapfrog;*/
@@ -118,8 +118,8 @@ int main(int argc,char *argv[])
 	 rpar.mshift_solver=&cg_mshift; /* this is not used in the code now */
 
 	 t_par.tlen = 1.;
-	 t_par.nsteps = 10;
-	 t_par.gsteps = 10;
+	 t_par.nsteps = 7;
+	 t_par.gsteps = 5;
 
    printf("Generating a random gauge field... ");fflush(stdout);
    random_u();
@@ -139,7 +139,7 @@ int main(int argc,char *argv[])
    printf("Thermalization done.\n");
 	 */
 /*	 
-   read_gauge_field_single("therm_conf");
+   read_gauge_field("therm_conf");
 */	 
    
    project_gauge_field();
@@ -169,10 +169,10 @@ int main(int argc,char *argv[])
      lprintf("MAIN",0,"Plaquette: %1.8e\n",avr_plaquette());
 
      if(i%10==0)
-       write_gauge_field_single("therm_conf"); 
+       write_gauge_field("therm_conf"); 
   
    }
-   write_gauge_field_single("therm_conf"); 
+   write_gauge_field("therm_conf"); 
 
    free_rhmc();
 

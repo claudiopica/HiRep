@@ -14,7 +14,7 @@
 #include "logger.h"
 
 
-void read_gauge_field_single(char filename[])
+void read_gauge_field(char filename[])
 {
   FILE *fp;
 
@@ -28,7 +28,7 @@ void read_gauge_field_single(char filename[])
   fclose(fp);
 }
 
-void write_gauge_field_single(char filename[])
+void write_gauge_field(char filename[])
 {
   FILE *fp;
 

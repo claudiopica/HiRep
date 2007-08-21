@@ -10,17 +10,21 @@
 
 #define _spinor_c_(r,i) (*((suNf_vector*)(&r)+i-1))
 
-#define _spinor_perm_prod_re(r,s) \
-  ((_S1_)*_vector_prod_re_f(_spinor_c_(r,_C1_),(s).c1) \
-  +(_S2_)*_vector_prod_re_f(_spinor_c_(r,_C2_),(s).c2) \
-  +(_S3_)*_vector_prod_re_f(_spinor_c_(r,_C3_),(s).c3) \
-  +(_S4_)*_vector_prod_re_f(_spinor_c_(r,_C4_),(s).c4))
+#define _spinor_perm_prod_re(k,r,s) \
+  { double _ptmp;\
+		_vector_prod_re_f(_ptmp,_spinor_c_(r,_C1_),(s).c[0]); (k)=(_S1_)*_ptmp; \
+		_vector_prod_re_f(_ptmp,_spinor_c_(r,_C2_),(s).c[1]); (k)+=(_S2_)*_ptmp; \
+		_vector_prod_re_f(_ptmp,_spinor_c_(r,_C3_),(s).c[2]); (k)+=(_S3_)*_ptmp; \
+		_vector_prod_re_f(_ptmp,_spinor_c_(r,_C4_),(s).c[3]); (k)+=(_S4_)*_ptmp; \
+	} while(0)
 
-#define _spinor_perm_prod_im(r,s) \
-  ((_S1_)*_vector_prod_im_f(_spinor_c_(r,_C1_),(s).c1) \
-  +(_S2_)*_vector_prod_im_f(_spinor_c_(r,_C2_),(s).c2) \
-  +(_S3_)*_vector_prod_im_f(_spinor_c_(r,_C3_),(s).c3) \
-  +(_S4_)*_vector_prod_im_f(_spinor_c_(r,_C4_),(s).c4))
+#define _spinor_perm_prod_im(k,r,s) \
+  { double _ptmp;\
+		_vector_prod_im_f(_ptmp,_spinor_c_(r,_C1_),(s).c[0]); (k)=(_S1_)*_ptmp; \
+		_vector_prod_im_f(_ptmp,_spinor_c_(r,_C2_),(s).c[1]); (k)+=(_S2_)*_ptmp; \
+		_vector_prod_im_f(_ptmp,_spinor_c_(r,_C3_),(s).c[2]); (k)+=(_S3_)*_ptmp; \
+		_vector_prod_im_f(_ptmp,_spinor_c_(r,_C4_),(s).c[3]); (k)+=(_S4_)*_ptmp; \
+	} while(0)
 
 
 #define MESON_DEFINITION \
@@ -29,21 +33,25 @@ void NAME(double *out, suNf_spinor **qp) { \
   suNf_spinor *s1; \
   suNf_spinor *s2; \
   for (t=0; t<T; ++t) { \
-    double hc=0.; \
+    double _tmp,hc=0.; \
     for (x=0; x<L; ++x) for (y=0; y<L; ++y) for (z=0; z<L; ++z) { \
       for (i=0; i<NF; ++i) { \
         s1 = &(qp[_INDEX_(i,1)][ipt[t][x][y][z]]); \
         s2 = &(qp[_INDEX_(i,_C1_)][ipt[t][x][y][z]]); \
-        hc += (_S1_)*_spinor_perm_prod_re(*s1,*s2); \
+				_spinor_perm_prod_re(_tmp,*s1,*s2); \
+        hc += (_S1_)*_tmp; \
         s1 = &(qp[_INDEX_(i,2)][ipt[t][x][y][z]]); \
         s2 = &(qp[_INDEX_(i,_C2_)][ipt[t][x][y][z]]); \
-        hc += (_S2_)*_spinor_perm_prod_re(*s1,*s2); \
+				_spinor_perm_prod_re(_tmp,*s1,*s2); \
+        hc += (_S2_)*_tmp; \
         s1 = &(qp[_INDEX_(i,3)][ipt[t][x][y][z]]); \
         s2 = &(qp[_INDEX_(i,_C3_)][ipt[t][x][y][z]]); \
-        hc += (_S3_)*_spinor_perm_prod_re(*s1,*s2); \
+				_spinor_perm_prod_re(_tmp,*s1,*s2); \
+        hc += (_S3_)*_tmp; \
         s1 = &(qp[_INDEX_(i,4)][ipt[t][x][y][z]]); \
         s2 = &(qp[_INDEX_(i,_C4_)][ipt[t][x][y][z]]); \
-        hc += (_S4_)*_spinor_perm_prod_re(*s1,*s2); \
+				_spinor_perm_prod_re(_tmp,*s1,*s2); \
+        hc += (_S4_)*_tmp; \
       } \
     } \
     out[t] = (_S0_)*hc; \
@@ -52,26 +60,30 @@ void NAME(double *out, suNf_spinor **qp) { \
 
 
 #define MESON_DEFINITION_TWO_RE \
-void NAME(float *out, suNf_spinor **qp) { \
+void NAME(double *out, suNf_spinor **qp) { \
   int t,x,y,z, i; \
   suNf_spinor *s1; \
   suNf_spinor *s2; \
   for (t=0; t<T; ++t) { \
-    double hc=0.; \
+    double _tmp,hc=0.; \
     for (x=0; x<L; ++x) for (y=0; y<L; ++y) for (z=0; z<L; ++z) { \
       for (i=0; i<NF; ++i) { \
         s1 = &(qp[_INDEX_(i,1)][ipt[t][x][y][z]]); \
         s2 = &(qp[_INDEX_(i,_D1_)][ipt[t][x][y][z]]); \
-        hc += (_T1_)*_spinor_perm_prod_re(*s1,*s2); \
+				_spinor_perm_prod_re(_tmp,*s1,*s2); \
+        hc += (_T1_)*_tmp; \
         s1 = &(qp[_INDEX_(i,2)][ipt[t][x][y][z]]); \
         s2 = &(qp[_INDEX_(i,_D2_)][ipt[t][x][y][z]]); \
-        hc += (_T2_)*_spinor_perm_prod_re(*s1,*s2); \
+				_spinor_perm_prod_re(_tmp,*s1,*s2); \
+        hc += (_T2_)*_tmp; \
         s1 = &(qp[_INDEX_(i,3)][ipt[t][x][y][z]]); \
         s2 = &(qp[_INDEX_(i,_D3_)][ipt[t][x][y][z]]); \
-        hc += (_T3_)*_spinor_perm_prod_re(*s1,*s2); \
+				_spinor_perm_prod_re(_tmp,*s1,*s2); \
+        hc += (_T3_)*_tmp; \
         s1 = &(qp[_INDEX_(i,4)][ipt[t][x][y][z]]); \
         s2 = &(qp[_INDEX_(i,_D4_)][ipt[t][x][y][z]]); \
-        hc += (_T4_)*_spinor_perm_prod_re(*s1,*s2); \
+				_spinor_perm_prod_re(_tmp,*s1,*s2); \
+        hc += (_T4_)*_tmp; \
       } \
     } \
     out[t] = (_S0_)*hc; \
@@ -80,26 +92,30 @@ void NAME(float *out, suNf_spinor **qp) { \
 
 
 #define MESON_DEFINITION_TWO_IM \
-void NAME(float *out, suNf_spinor **qp) { \
+void NAME(double *out, suNf_spinor **qp) { \
   int t,x,y,z, i; \
   suNf_spinor *s1; \
   suNf_spinor *s2; \
   for (t=0; t<T; ++t) { \
-    double hc=0.; \
+    double _tmp,hc=0.; \
     for (x=0; x<L; ++x) for (y=0; y<L; ++y) for (z=0; z<L; ++z) { \
       for (i=0; i<NF; ++i) { \
         s1 = &(qp[_INDEX_(i,1)][ipt[t][x][y][z]]); \
         s2 = &(qp[_INDEX_(i,_D1_)][ipt[t][x][y][z]]); \
-        hc += (_T1_)*_spinor_perm_prod_im(*s1,*s2); \
+				_spinor_perm_prod_im(_tmp,*s1,*s2); \
+        hc += (_T1_)*_tmp; \
         s1 = &(qp[_INDEX_(i,2)][ipt[t][x][y][z]]); \
         s2 = &(qp[_INDEX_(i,_D2_)][ipt[t][x][y][z]]); \
-        hc += (_T2_)*_spinor_perm_prod_im(*s1,*s2); \
+				_spinor_perm_prod_im(_tmp,*s1,*s2); \
+        hc += (_T2_)*_tmp; \
         s1 = &(qp[_INDEX_(i,3)][ipt[t][x][y][z]]); \
         s2 = &(qp[_INDEX_(i,_D3_)][ipt[t][x][y][z]]); \
-        hc += (_T3_)*_spinor_perm_prod_im(*s1,*s2); \
+				_spinor_perm_prod_im(_tmp,*s1,*s2); \
+        hc += (_T3_)*_tmp; \
         s1 = &(qp[_INDEX_(i,4)][ipt[t][x][y][z]]); \
         s2 = &(qp[_INDEX_(i,_D4_)][ipt[t][x][y][z]]); \
-        hc += (_T4_)*_spinor_perm_prod_im(*s1,*s2); \
+				_spinor_perm_prod_im(_tmp,*s1,*s2); \
+        hc += (_T4_)*_tmp; \
       } \
     } \
     out[t] = (_S0_)*hc; \

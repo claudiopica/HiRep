@@ -22,7 +22,7 @@
  */
 static unsigned long int MVMcounter=0;
 
-unsigned long int getMVM() {
+unsigned long int getMVM_flt() {
 	unsigned long int res=MVMcounter>>1; /* divide by two */
 	MVMcounter=0; /* reset counter */
 
@@ -82,17 +82,17 @@ void Dphi_flt_(block_selector B, suNf_spinor_flt *out, suNf_spinor_flt *in)
       sp=in+iy;
       up=pu_gauge_f_flt(ix,0);
       
-      _vector_add_f(psi,(*sp).c1,(*sp).c3);
+      _vector_add_f(psi,(*sp).c[0],(*sp).c[2]);
       _suNf_multiply(chi,(*up),psi);
       
-      (*r).c1=chi;
-      (*r).c3=chi;
+      (*r).c[0]=chi;
+      (*r).c[2]=chi;
 
-      _vector_add_f(psi,(*sp).c2,(*sp).c4);
+      _vector_add_f(psi,(*sp).c[1],(*sp).c[3]);
       _suNf_multiply(chi,(*up),psi);
             
-      (*r).c2=chi;
-      (*r).c4=chi;
+      (*r).c[1]=chi;
+      (*r).c[3]=chi;
 
 /******************************* direction -0 *********************************/
 
@@ -100,17 +100,17 @@ void Dphi_flt_(block_selector B, suNf_spinor_flt *out, suNf_spinor_flt *in)
       sm=in+iy;
       um=pu_gauge_f_flt(iy,0);
       
-      _vector_sub_f(psi,(*sm).c1,(*sm).c3);
+      _vector_sub_f(psi,(*sm).c[0],(*sm).c[2]);
       _suNf_inverse_multiply(chi,(*um),psi);
 
-      _vector_add_assign_f((*r).c1,chi);
-      _vector_sub_assign_f((*r).c3,chi);
+      _vector_add_assign_f((*r).c[0],chi);
+      _vector_sub_assign_f((*r).c[2],chi);
 
-      _vector_sub_f(psi,(*sm).c2,(*sm).c4);
+      _vector_sub_f(psi,(*sm).c[1],(*sm).c[3]);
       _suNf_inverse_multiply(chi,(*um),psi);
       
-      _vector_add_assign_f((*r).c2,chi);
-      _vector_sub_assign_f((*r).c4,chi);
+      _vector_add_assign_f((*r).c[1],chi);
+      _vector_sub_assign_f((*r).c[3],chi);
 
 /******************************* direction +1 *********************************/
 
@@ -118,17 +118,17 @@ void Dphi_flt_(block_selector B, suNf_spinor_flt *out, suNf_spinor_flt *in)
       sp=in+iy;
       up=pu_gauge_f_flt(ix,1);
       
-      _vector_i_add_f(psi,(*sp).c1,(*sp).c4);
+      _vector_i_add_f(psi,(*sp).c[0],(*sp).c[3]);
       _suNf_multiply(chi,(*up),psi);
 
-      _vector_add_assign_f((*r).c1,chi);
-      _vector_i_sub_assign_f((*r).c4,chi);
+      _vector_add_assign_f((*r).c[0],chi);
+      _vector_i_sub_assign_f((*r).c[3],chi);
 
-      _vector_i_add_f(psi,(*sp).c2,(*sp).c3);
+      _vector_i_add_f(psi,(*sp).c[1],(*sp).c[2]);
       _suNf_multiply(chi,(*up),psi);
 
-      _vector_add_assign_f((*r).c2,chi);
-      _vector_i_sub_assign_f((*r).c3,chi);
+      _vector_add_assign_f((*r).c[1],chi);
+      _vector_i_sub_assign_f((*r).c[2],chi);
 
 /******************************* direction -1 *********************************/
 
@@ -136,17 +136,17 @@ void Dphi_flt_(block_selector B, suNf_spinor_flt *out, suNf_spinor_flt *in)
       sm=in+iy;
       um=pu_gauge_f_flt(iy,1);
       
-      _vector_i_sub_f(psi,(*sm).c1,(*sm).c4);
+      _vector_i_sub_f(psi,(*sm).c[0],(*sm).c[3]);
       _suNf_inverse_multiply(chi,(*um),psi);
 
-      _vector_add_assign_f((*r).c1,chi);
-      _vector_i_add_assign_f((*r).c4,chi);
+      _vector_add_assign_f((*r).c[0],chi);
+      _vector_i_add_assign_f((*r).c[3],chi);
 
-      _vector_i_sub_f(psi,(*sm).c2,(*sm).c3);
+      _vector_i_sub_f(psi,(*sm).c[1],(*sm).c[2]);
       _suNf_inverse_multiply(chi,(*um),psi);
 
-      _vector_add_assign_f((*r).c2,chi);
-      _vector_i_add_assign_f((*r).c3,chi);
+      _vector_add_assign_f((*r).c[1],chi);
+      _vector_i_add_assign_f((*r).c[2],chi);
 
 /******************************* direction +2 *********************************/
 
@@ -154,17 +154,17 @@ void Dphi_flt_(block_selector B, suNf_spinor_flt *out, suNf_spinor_flt *in)
       sp=in+iy;
       up=pu_gauge_f_flt(ix,2);
       
-      _vector_add_f(psi,(*sp).c1,(*sp).c4);
+      _vector_add_f(psi,(*sp).c[0],(*sp).c[3]);
       _suNf_multiply(chi,(*up),psi);
 
-      _vector_add_assign_f((*r).c1,chi);
-      _vector_add_assign_f((*r).c4,chi);
+      _vector_add_assign_f((*r).c[0],chi);
+      _vector_add_assign_f((*r).c[3],chi);
 
-      _vector_sub_f(psi,(*sp).c2,(*sp).c3);
+      _vector_sub_f(psi,(*sp).c[1],(*sp).c[2]);
       _suNf_multiply(chi,(*up),psi);
       
-      _vector_add_assign_f((*r).c2,chi);
-      _vector_sub_assign_f((*r).c3,chi);
+      _vector_add_assign_f((*r).c[1],chi);
+      _vector_sub_assign_f((*r).c[2],chi);
 
 /******************************* direction -2 *********************************/
 
@@ -172,17 +172,17 @@ void Dphi_flt_(block_selector B, suNf_spinor_flt *out, suNf_spinor_flt *in)
       sm=in+iy;
       um=pu_gauge_f_flt(iy,2);
       
-      _vector_sub_f(psi,(*sm).c1,(*sm).c4);
+      _vector_sub_f(psi,(*sm).c[0],(*sm).c[3]);
       _suNf_inverse_multiply(chi,(*um),psi);
 
-      _vector_add_assign_f((*r).c1,chi);
-      _vector_sub_assign_f((*r).c4,chi);
+      _vector_add_assign_f((*r).c[0],chi);
+      _vector_sub_assign_f((*r).c[3],chi);
 
-      _vector_add_f(psi,(*sm).c2,(*sm).c3);
+      _vector_add_f(psi,(*sm).c[1],(*sm).c[2]);
       _suNf_inverse_multiply(chi,(*um),psi);
       
-      _vector_add_assign_f((*r).c2,chi);
-      _vector_add_assign_f((*r).c3,chi);
+      _vector_add_assign_f((*r).c[1],chi);
+      _vector_add_assign_f((*r).c[2],chi);
 
 /******************************* direction +3 *********************************/
 
@@ -190,17 +190,17 @@ void Dphi_flt_(block_selector B, suNf_spinor_flt *out, suNf_spinor_flt *in)
       sp=in+iy;
       up=pu_gauge_f_flt(ix,3);
       
-      _vector_i_add_f(psi,(*sp).c1,(*sp).c3);
+      _vector_i_add_f(psi,(*sp).c[0],(*sp).c[2]);
       _suNf_multiply(chi,(*up),psi);
 
-      _vector_add_assign_f((*r).c1,chi);
-      _vector_i_sub_assign_f((*r).c3,chi);
+      _vector_add_assign_f((*r).c[0],chi);
+      _vector_i_sub_assign_f((*r).c[2],chi);
 
-      _vector_i_sub_f(psi,(*sp).c2,(*sp).c4);
+      _vector_i_sub_f(psi,(*sp).c[1],(*sp).c[3]);
       _suNf_multiply(chi,(*up),psi);
 
-      _vector_add_assign_f((*r).c2,chi);
-      _vector_i_add_assign_f((*r).c4,chi);
+      _vector_add_assign_f((*r).c[1],chi);
+      _vector_i_add_assign_f((*r).c[3],chi);
 
 /******************************* direction -3 *********************************/
 
@@ -208,17 +208,17 @@ void Dphi_flt_(block_selector B, suNf_spinor_flt *out, suNf_spinor_flt *in)
       sm=in+iy;
       um=pu_gauge_f_flt(iy,3);
       
-      _vector_i_sub_f(psi,(*sm).c1,(*sm).c3);
+      _vector_i_sub_f(psi,(*sm).c[0],(*sm).c[2]);
       _suNf_inverse_multiply(chi,(*um),psi);
       
-      _vector_add_assign_f((*r).c1,chi);
-      _vector_i_add_assign_f((*r).c3,chi);
+      _vector_add_assign_f((*r).c[0],chi);
+      _vector_i_add_assign_f((*r).c[2],chi);
 
-      _vector_i_add_f(psi,(*sm).c2,(*sm).c4);
+      _vector_i_add_f(psi,(*sm).c[1],(*sm).c[3]);
       _suNf_inverse_multiply(chi,(*um),psi);
 
-      _vector_add_assign_f((*r).c2,chi);
-      _vector_i_sub_assign_f((*r).c4,chi);
+      _vector_add_assign_f((*r).c[1],chi);
+      _vector_i_sub_assign_f((*r).c[3],chi);
       
 /******************************** end of loop *********************************/
 

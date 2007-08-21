@@ -35,6 +35,18 @@ typedef struct
 
 
 /*
+* Re(a) (a complex)
+*/
+#define _complex_re(a) \
+   (a).re
+
+/*
+* Im(a) (a complex)
+*/
+#define _complex_im(a) \
+   (a).im
+
+/*
 * a=0 (a complex)
 */
 #define _complex_0(a) \
@@ -60,6 +72,19 @@ typedef struct
 #define _complex_i(a) \
    (a).re=0.;	\
    (a).im=1.
+
+/*
+* a=b^+ (a,b complex)
+*/
+#define _complex_star(a,b) \
+   (a).re=(b).re;	\
+   (a).im=-(b).im
+
+/*
+* a=a^+ (a complex)
+*/
+#define _complex_star_assign(a) \
+   (a).im=-(a).im
 
 /*
 * a=b*c (a,b,c complex)
@@ -106,16 +131,29 @@ typedef struct
    (a).im=(-(b).im/(a).im)
 
 /*
-* Re(a^*b) (a,b,c complex)
+* Re(a^*b) (a,b complex)
 */
 #define _complex_prod_re(a,b) \
    ((a).re*(b).re+(a).im*(b).im)
 
 /*
-* Im(a^*b) (a,b,c complex)
+* Re((1-a)^*(1-b)) (a,b complex)
+*/
+#define _complex_prod_m1_re(a,b) \
+   ((1.-(a).re)*(1.-(b).re)+(a).im*(b).im)
+
+/*
+* Im(a^*b) (a,b complex)
 */
 #define _complex_prod_im(a,b) \
    ((a).re*(b).im-(a).im*(b).re)
+
+/*
+* c+=Im(a^*b) (a,b,c complex)
+*/
+#define _complex_prod_assign(c,a,b) \
+   (c).re+=((a).re*(b).re+(a).im*(b).im);\
+   (c).im+=((a).re*(b).im-(a).im*(b).re)
 
 /*
 * a=-b (a complex)
@@ -172,6 +210,13 @@ typedef struct
 #define _complex_mul_assign(a,b,c) \
    (a).re+=((b).re*(c).re-(b).im*(c).im); \
    (a).im+=((b).re*(c).im+(b).im*(c).re)
+
+/*
+* a=b*(c^+) (a,b,c complex)
+*/
+#define _complex_mul_star(a,b,c) \
+   (a).re=((b).re*(c).re+(b).im*(c).im); \
+   (a).im=((b).im*(c).re-(b).re*(c).im)
 
 /*
 * a+=b*(c^+) (a,b,c complex)

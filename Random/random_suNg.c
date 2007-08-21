@@ -24,7 +24,7 @@ void random_suNg_unit_vector(suNg_vector *v)
 
    while ((1.0+norm)==1.0)   {
      gauss((double*)v,(sizeof(suNg_vector)/sizeof(double)));
-     norm=_vector_prod_re_g(*v,*v);
+     _vector_prod_re_g(norm,*v,*v);
      norm=sqrt(norm);
    }
 
@@ -45,8 +45,8 @@ static void rotate(void) /* same as in cabmar */
 	  complex z1,z2;
 	  complex *cu1, *cu2;
 				  
-	  cu1 = &((*pu1).c1);
-	  cu2 = &((*pu2).c1);
+	  cu1 = &((*pu1).c[0]);
+	  cu2 = &((*pu2).c[0]);
 						  
 	  for (i=0; i<NG; ++i) {
 		    z1.re=s[0]*(*cu1).re-s[1]*(*cu2).im+s[2]*(*cu2).re-s[3]*(*cu1).im;
@@ -94,12 +94,12 @@ void random_suNg_old(suNg *u)
     while ((1.0+norm)==1.0) {
       random_suNg_unit_vector(v2);
       for (j=i; j>0; --j) {
-	z.re = _vector_prod_re_g(*v1, *v2);
-	z.im = _vector_prod_im_g(*v1, *v2);
+	_vector_prod_re_g(z.re,*v1, *v2);
+	_vector_prod_im_g(z.im,*v1, *v2);
 	_vector_project_g(*v2, z, *v1); 
 	++v1;
       }
-      norm=_vector_prod_re_g(*v2,*v2);
+      _vector_prod_re_g(norm,*v2,*v2);
       norm=sqrt(norm);
     }        
     fact=1.0/norm;

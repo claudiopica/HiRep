@@ -20,6 +20,7 @@ void Force0(double dt, suNg_algebra_vector *force){
   static suNg_algebra_vector f;
   int i;
 	double avrforce=0.,maxforce=0.;;
+	double nsq;
 
   for (i=0; i<4*VOLUME; ++i){
     int x, mu;
@@ -32,7 +33,8 @@ void Force0(double dt, suNg_algebra_vector *force){
     
     _algebra_vector_mul_add_assign_g(force[i], dt*(-_update_par.beta/((double)(NG))), f);
 
-		avrforce+=sqrt(_algebra_vector_sqnorm_g(f));
+		_algebra_vector_sqnorm_g(nsq,f);
+		avrforce+=sqrt(nsq);
 		for(x=0;x<NG*NG-1;++x){
 			if(maxforce<fabs(*(((double*)&f)+x))) maxforce=fabs(*(((double*)&f)+x));
 		}

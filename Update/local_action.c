@@ -19,14 +19,15 @@ void local_hmc_action(local_action_type type,
                       suNf_spinor **phi2) {
 
 	int i,j;
-	double a;
+	double a,tmp;
 	for(i=0; i<VOLUME; ++i){
 
 		/* Momenta */
 		a=0.;
 		for (j=0;j<4;++j) {
 			suNg_algebra_vector *cmom=gfield_ordering(momenta,i,j);
-			a+=_algebra_vector_sqnorm_g(*cmom); /* this must be positive */
+			_algebra_vector_sqnorm_g(tmp,*cmom); 
+			a+=tmp; /* this must be positive */
 		}
 		a*=0.5*_FUND_NORM2;
 
@@ -34,8 +35,10 @@ void local_hmc_action(local_action_type type,
 		a -= (_update_par.beta/((double)NG))*local_plaq(i);
 
 		/* Fermions */
-		for (j=0;j<_update_par.n_pf;++j)
-			a += _spinor_prod_re_f(phi1[j][i],phi2[j][i]);
+		for (j=0;j<_update_par.n_pf;++j) {
+			_spinor_prod_re_f(tmp,phi1[j][i],phi2[j][i]);
+			a += tmp;
+		}
 
 		switch(type) {
 			case NEW:
