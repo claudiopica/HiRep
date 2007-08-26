@@ -1,4 +1,5 @@
 #include "utils.h"
+#include <math.h>
 
 #if (NG!=$N$) 
 #error : Mismatch between NG and ExpX!
@@ -51,5 +52,52 @@ void ExpX(double dt, suNg_algebra_vector *h, suNg *u)
 {
 $GROUP::EXPX:(dt):(*h):(*u)$
 }
+
+
+
+#define XG(m,a,b) ((m)+(a)*NG+(b))
+#define XA(h,a) ((h)+(a))
+#define TI(a,b) ((a)*NG+(b)-1)
+
+
+void ExpX2(double dt, suNg_algebra_vector *h, suNg *u)
+{
+	int i, j, k, n;
+	double y[3];
+	double d[NG];
+	double s[NG*(NG-1)/2][4];
+	double tmp;
+	double *hf = (double*)h;
+	complex *uf = (complex*)u;
+	
+	d[0] = 0.0;
+	for(i = 1; i < NG; i++) {
+		tmp = sqrt( 2./(i*(i+1)) ) * (*XA(hf,i));
+		d[i] = -i *tmp;
+		for(j = 0; j < i; j++)
+			d[j] += tmp;
+	}
+	
+	k = 0;
+	for(j = 1; NG; j++)
+	for(i = 0; i < j; i++) {
+		y[0] = dt * (*XA(hf,TI(j,i)));
+		y[1] = -dt * (*XA(hf,TI(i,j)));
+		y[2] = dt * (d[i]-d[j]) / NG;
+		YtoU(s[k],y);
+		for(n = 0; n < NG; n++)
+			su2_rotate(s[k],XG(uf,i,n),XG(uf,j,n));
+		k++;
+	}
+
+	k = NG*(NG-1)/2 - 1;
+	for(j = NG-1; j >= 1; j--)
+	for(i = j-1; i >= 0; i--) {
+		for(n = 0; n < NG; n++)
+			su2_rotate(s[k],XG(uf,i,n),XG(uf,j,n));
+		k--;
+	}
+}
+
 
 
