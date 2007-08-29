@@ -251,11 +251,12 @@ Il \textit{noise recycling} in questo caso sostituisce l'ultimo termine nella fo
 \section{Implementazione}
 
 Tutte le funzioni necessarie per il calcolo dei correlatori con la tecnica ibrida di Dublino sono definite in \verb|Observables/dublin_mesons.c|. Di queste, l'unica visibile dall'esterno \`{e} \\
-\verb|   void dublin_meson_correlators(complex*** correlator,|\\
+\verb|   void dublin_meson_correlators(double** correlator[], char corr_name[][256]|\\
 \verb|               int n_corr, int n_masses, double *mass, double acc)|\\
 dove:\\
-\verb|*  complex*** correlator[n_corr][T]| punta a un array tridimensionale \verb|[n_corr][n_masses][T]| che conterr\'{a} i correlatori calcolati dalla funzione;\\
-\verb|*  double *mass| \`{e} un array di dimensione \verb|[n_masses]| che contiene i valori delle masse dei quarks;\\
+\verb|*  correlator| punta a un array tridimensionale \verb|[n_corr][n_masses][T]| che conterr\'{a} i correlatori calcolati dalla funzione;\\
+\verb|*  corr_name| punta a un array \verb|[n_corr]| di stringhe che conterr\'{a} i nomi dei correlatori calcolati dalla funzione;\\
+\verb|*  mass| \`{e} un array di dimensione \verb|[n_masses]| che contiene i valori delle masse dei quarks;\\
 \verb|*  double acc| \`{e} l'errore da utilizzare nell'inversione dell'operatore di Dirac.
 \verb| |\\
 
@@ -287,7 +288,7 @@ Se il reticolo \`{e} un $ 16^3 \times 32 $, e se $N_{ev}=100$, $N_d=N_T=32$, $N_
 \item Vengono generate le $N_{gns}$ sorgenti random diluite $\eta_{[r]}^{(d)}$, appartenenti al sottospazio ortogonale ai primi $N_{ev}$ autovalori, e immagazzinate nell'array \verb|noisy_sources|. Questo viene fatto chiamando la funzione\\
 \verb|   static void get_time_diluted_sources(suNf_spinor **source)|\\
 che genera una sorgente random definita su tutto il reticolo e poi la diluisce; ogni sorgente diluita viene proiettata e scritta in \verb|source|. La funzione presuppone che l'array \verb|ev| sia gi\`{a} stato riempito. Le sorgenti random sono generate con un noise $Z_2$, chiamando la funzione\\
-\verb|   static void z2_spinor(suNf_spinor *source)|.\\
+\verb|   static void z2_spinor(suNf_spinor *source)|.
 
 \item Vengono calcolati gli  $N_{gns}$ pozzi $\xi_{[r]}^{(d)}$ per ogni valore della massa, e immagazzinati nell'array \verb|noisy_sinks|. Questo viene fatto chiamando la funzione\\
 \verb|   static void get_sinks(suNf_spinor *source, suNf_spinor **sink,|\\
@@ -313,15 +314,20 @@ e vengono scritte temporaneamente nella matrice \verb|complex ss[T][16]|.
 usando le funzioni tipo\\
 \verb|   static void *_trace_H(complex* out, complex* smat)|.\\
 Gli operatori $\mathcal{O}^\Gamma(t)$ vengono immagazzinati nell'array\\
-\verb|   complex meson[n_gamma_matrices][n_sources*n_sources][T]|.
+\verb|   complex meson[n_gamma_matrices][n_sources*n_sources][T]|.\\
+Nel codice sono state inserite tutte le possibili matrici gamma. \`{E} necessario solo decommentare quelle utili e commentare le altre, e settare \verb|n_gamma_matrices| pari al numero di matrici decommentate.
 
-\item Vengono calcolati i correlatori secondo le formule (\ref{correlator}, \ref{correlator_with_nr}), chiamando la funzione\\
-\verb|   static void triplet_correlator(complex* out,|\\
-\verb|               complex A[][T], complex B[][T])|.\\
-Infine vengono calcolati i termini di hairpin secondo le formule (\ref{hairpin}, \ref{hairpin_with_nr}), chiamando la funzione\\
-\verb|   static void hairpin(complex* out,|\\
-\verb|               complex A[][T], complex B[][T])|.\\
-
+\item Vengono calcolati i correlatori secondo le formule (\ref{correlator}, \ref{correlator_with_nr}), chiamando le funzioni (per parte reale e immaginaria)\\
+\verb|   static void triplet_correlator_re(double* out,|\\
+\verb|          complex A[][T], complex B[][T], double x)|;\\
+\verb|   static void triplet_correlator_im(double* out,|\\
+\verb|          complex A[][T], complex B[][T], double x)|.\\
+Infine vengono calcolati i termini di hairpin secondo le formule (\ref{hairpin}, \ref{hairpin_with_nr}), chiamando le funzioni (per parte reale e immaginaria)\\
+\verb|   static void hairpin_re(double* out,|\\
+\verb|          complex A[][T], complex B[][T], double x)|;\\
+\verb|   static void hairpin_im(double* out,|\\
+\verb|          complex A[][T], complex B[][T], double x)|.\\
+Nel codice sono stati inseriti tutti i correlatori mesonici, pi\`{u} l'ampiezza di decadimento del pione. \`{E} necessario solo decommentare i correlatori utili e commentare gli altri, e settare \verb|n_correlators| pari al numero di correlatori decommentati.
 
 \end{enumerate}
 
