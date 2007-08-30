@@ -139,6 +139,7 @@ int main(int argc,char *argv[])
 				CORR(g0g5g1_correlator);
 				CORR(g0g5g2_correlator);
 				CORR(g0g5g3_correlator);
+				CORR(g5_g0g5_correlator_im);
 			}
 			start+=propsize;
 		}
