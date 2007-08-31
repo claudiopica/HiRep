@@ -252,12 +252,11 @@ Il \textit{noise recycling} in questo caso sostituisce l'ultimo termine nella fo
 
 Tutte le funzioni necessarie per il calcolo dei correlatori con la tecnica ibrida di Dublino sono definite in \verb|Observables/dublin_mesons.c|. Di queste, l'unica visibile dall'esterno \`{e} \\
 \verb|   void dublin_meson_correlators(double** correlator[], char corr_name[][256]|\\
-\verb|               int n_corr, int n_masses, double *mass, double acc)|\\
+\verb|               int n_corr, int n_masses, double *mass)|\\
 dove:\\
 \verb|*  correlator| punta a un array tridimensionale \verb|[n_corr][n_masses][T]| che conterr\'{a} i correlatori calcolati dalla funzione;\\
 \verb|*  corr_name| punta a un array \verb|[n_corr]| di stringhe che conterr\'{a} i nomi dei correlatori calcolati dalla funzione;\\
-\verb|*  mass| \`{e} un array di dimensione \verb|[n_masses]| che contiene i valori delle masse dei quarks;\\
-\verb|*  double acc| \`{e} l'errore da utilizzare nell'inversione dell'operatore di Dirac.
+\verb|*  mass| \`{e} un array di dimensione \verb|[n_masses]| che contiene i valori delle masse dei quarks.\\
 \verb| |\\
 
 Nel file \verb|Observables/dublin_mesons.c| sono definite alcune costanti globali, che definiscono i parametri dell'algoritmo.\\

@@ -138,7 +138,7 @@ int main(int argc,char *argv[]) {
 	for (i=0;i<nms;++i){ /* nms misure */
 		lprintf("MAIN",0,"conf #%d <p> = %1.6f\n",i,avr_plaquette());
 
-		dublin_meson_correlators(correlator, corr_name, n_correlators, nm, m, 1e-6); /* ??? */
+		dublin_meson_correlators(correlator, corr_name, n_correlators, nm, m);
 		for (j=0;j<n_correlators;++j){
 			for (k=0;k<nm;++k){
 				lprintf("MAIN",0,"conf #%d mass=%2.6f %s = ",i,m[k],corr_name[j]);

@@ -23,7 +23,7 @@
 static double hmass;
 
 enum{ n_eigenvalues = 100 }; /* N_{ev} */
-enum{ n_hp_eigenvalues = 50 };
+enum{ n_hp_eigenvalues = 100 };
 
 enum{ n_global_noisy_sources_per_point = 1 }; /* N_r */
 enum{ n_points = 2 };
@@ -52,7 +52,8 @@ static void D(suNf_spinor *out, suNf_spinor *in);
 static void all_to_all_quark_propagator_init(int n_masses);
 static void z2_spinor(suNf_spinor *source);
 static void get_time_diluted_sources(suNf_spinor **source);
-static void get_sinks(suNf_spinor *source, suNf_spinor **sink, int n_masses, double *mass, double acc);
+static void get_sinks_QMR(suNf_spinor *source, suNf_spinor **sink, int n_masses, double *mass, double acc);
+static void get_sinks_MINRES(suNf_spinor *source, suNf_spinor **sink, int n_masses, double *mass, double acc);
 static void source_sink_contraction(complex out[][16], suNf_spinor *source, suNf_spinor *sink, double z);
 static void triplet_correlator_re(double* out, complex A[][T], complex B[][T], double x);
 static void triplet_correlator_im(double* out, complex A[][T], complex B[][T], double x);
@@ -78,11 +79,11 @@ static void g0g5g2_trace_H(complex* out, complex* smat); static int G0G5G2 = -1;
 static void g0g5g3_trace_H(complex* out, complex* smat); static int G0G5G3 = -1;
 
 
-void dublin_meson_correlators(double** correlator[], char corr_name[][256], int n_corr, int n_masses, double *mass, double acc) {
+void dublin_meson_correlators(double** correlator[], char corr_name[][256], int n_corr, int n_masses, double *mass) {
 	int i, j, k, t, counter, maxh2iter;
 
 	int ie, status;
-	float omega1, omega2;
+	float omega1, omega2, acc;
 	double ubnd;
 	
 	suNf_spinor *source;
@@ -93,8 +94,10 @@ void dublin_meson_correlators(double** correlator[], char corr_name[][256], int 
 
 	maxh2iter = max_H2(&ubnd,mass[0]);
 	ubnd = sqrt(ubnd);
-	omega1 = 1.0e-6f;
-	omega2 = 1.0e-2f;
+	omega1 = 1.0e-9f;
+	omega2 = 1.0e-6f;
+	
+	acc = 1.0e-9f;
 
 	error(n_corr < n_correlators,1,"meson_correlators [all_to_all_quark_propagator.c]","Bad dimension for correlator[][]");
 
@@ -116,7 +119,7 @@ void dublin_meson_correlators(double** correlator[], char corr_name[][256], int 
 	for(i = 0; i < n_global_noisy_sources; i++) {
 		get_time_diluted_sources(noisy_sources + NOISY_INDEX(i,0));
 		for(j = 0; j < n_dilution_slices; j++)
-			get_sinks(noisy_sources[NOISY_INDEX(i,j)], noisy_sinks[NOISY_INDEX(i,j)], n_masses, mass, acc);
+			get_sinks_QMR(noisy_sources[NOISY_INDEX(i,j)], noisy_sinks[NOISY_INDEX(i,j)], n_masses, mass, acc);
 	}
 
 
@@ -506,7 +509,56 @@ static void get_time_diluted_sources(suNf_spinor **source) {
 
 
 
-static void get_sinks(suNf_spinor *source, suNf_spinor **sink, int n_masses, double *mass, double acc) {
+static void get_sinks_QMR(suNf_spinor *source, suNf_spinor **sink, int n_masses, double *mass, double acc) {
+  mshift_par QMR_par;
+  int i;
+  double *shift;
+	int cgiter=0;
+	double norm;
+  suNf_spinor *test=0;
+
+  /* allocate test spinor field */
+  test = (suNf_spinor *)malloc(sizeof(suNf_spinor)*VOLUME);
+
+	/* set_spinor_len(VOLUME); */
+
+	/* set up inverters parameters */
+  shift=(double*)malloc(sizeof(double)*n_masses);
+  hmass=mass[0]; /* we can put any number here!!! */
+  for(i=0;i<n_masses;++i){
+    shift[i]=hmass-mass[i];
+  }
+  QMR_par.n = n_masses;
+  QMR_par.shift = shift;
+  QMR_par.err2 = .5*acc;
+  QMR_par.max_iter = 0;
+
+	cgiter+=g5QMR_mshift(&QMR_par, &D, source, sink);
+
+	for(i=0;i<QMR_par.n;++i){
+		/* this is a test of the solution */
+		D(test,sink[i]);
+		++cgiter;
+		spinor_field_mul_add_assign_f(test,-QMR_par.shift[i],sink[i]);
+		spinor_field_sub_f(test,test,sink[i]);
+		norm=spinor_field_sqnorm_f(test);
+		if(norm>acc)
+			lprintf("PROPAGATOR",0,"g5QMR residuum of source [%d] = %e\n",i,norm);
+
+		/* multiply by g_5 to match the MINRES version */
+		spinor_field_g5_f(sink[i],sink[i]);
+		
+		/* convert to single precision */
+		/* assign_sd2s(VOLUME,(suNf_spinor_flt*)resd[i],resd[i]);
+		error(
+				fwrite(resd[i],(size_t) sizeof(suNf_spinor_flt),(size_t)(VOLUME),propfile)!=(VOLUME),
+				1,"quark_propagator_QMR","Failed to write quark propagator to file"); */
+	}
+}
+
+
+
+static void get_sinks_MINRES(suNf_spinor *source, suNf_spinor **sink, int n_masses, double *mass, double acc) {
 	static MINRES_par MINRESpar;
 	int i, cgiter;
 	
