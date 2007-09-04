@@ -20,10 +20,12 @@
 #define NOISY_INDEX(r,d) ( (r)*n_dilution_slices + (d) )
 
 
+static int loglevel = 0;
+
 static double hmass;
 
-enum{ n_eigenvalues = 100 }; /* N_{ev} */
-enum{ n_hp_eigenvalues = 100 };
+enum{ n_eigenvalues = 50 }; /* N_{ev} */
+enum{ n_hp_eigenvalues = 50 };
 
 enum{ n_global_noisy_sources_per_point = 1 }; /* N_r */
 enum{ n_points = 2 };
@@ -33,8 +35,8 @@ enum{ n_diluted_noisy_sources = n_global_noisy_sources*n_dilution_slices };
 
 enum{ n_sources = n_eigenvalues + n_diluted_noisy_sources };
 
-enum{ n_gamma_matrices = 9 };
-enum{  n_correlators = 9 };
+enum{ n_gamma_matrices = 16 };
+enum{  n_correlators = 17 };
 
 static double d[n_eigenvalues];
 static suNf_spinor *ev[n_eigenvalues];
@@ -112,15 +114,18 @@ void dublin_meson_correlators(double** correlator[], char corr_name[][256], int 
 
 	ie = eva(VOLUME,n_hp_eigenvalues,n_eigenvalues,0,100,20,ubnd,omega1,omega2,&H,ws,ev,d,&status);
 	error(ie!=0,1,"all_to_all_quark_propagator","Failed to compute Dirac eigenvectors");
+	lprintf("DUBLIN_MESON_CORRELATORS",loglevel,"Computed %d eigenvetors\n",n_eigenvalues);
 
 
 	/* generate random sources & sinks */
 
 	for(i = 0; i < n_global_noisy_sources; i++) {
+	lprintf("DUBLIN_MESON_CORRELATORS",loglevel+1,"New noisy source.\n");
 		get_time_diluted_sources(noisy_sources + NOISY_INDEX(i,0));
 		for(j = 0; j < n_dilution_slices; j++)
 			get_sinks_QMR(noisy_sources[NOISY_INDEX(i,j)], noisy_sinks[NOISY_INDEX(i,j)], n_masses, mass, acc);
 	}
+	lprintf("DUBLIN_MESON_CORRELATORS",loglevel,"Generated %d noisy sources and sinks.\n",n_diluted_noisy_sources);
 
 
 	/* two-point functions */
@@ -148,11 +153,11 @@ void dublin_meson_correlators(double** correlator[], char corr_name[][256], int 
 					id_trace_H(meson[counter][SOUCE_SINK_INDEX(j,k)]+t, ss[t]);
 					ID = counter;
 					counter++;
-/*
+
 					g0_trace_H(meson[counter][SOUCE_SINK_INDEX(j,k)]+t, ss[t]);
 					G0 = counter;
 					counter++;
-*/
+
 					g5_trace_H(meson[counter][SOUCE_SINK_INDEX(j,k)]+t, ss[t]);
 					G5 = counter;
 					counter++;
@@ -172,7 +177,7 @@ void dublin_meson_correlators(double** correlator[], char corr_name[][256], int 
 					g3_trace_H(meson[counter][SOUCE_SINK_INDEX(j,k)]+t, ss[t]);
 					G3 = counter;
 					counter++;
-/*
+
 					g0g1_trace_H(meson[counter][SOUCE_SINK_INDEX(j,k)]+t, ss[t]);
 					G0G1 = counter;
 					counter++;
@@ -196,7 +201,7 @@ void dublin_meson_correlators(double** correlator[], char corr_name[][256], int 
 					g5g3_trace_H(meson[counter][SOUCE_SINK_INDEX(j,k)]+t, ss[t]);
 					G5G3 = counter;
 					counter++;
-*/
+
 					g0g5g1_trace_H(meson[counter][SOUCE_SINK_INDEX(j,k)]+t, ss[t]);
 					G0G5G1 = counter;
 					counter++;
@@ -300,7 +305,7 @@ void dublin_meson_correlators(double** correlator[], char corr_name[][256], int 
 
 		
 		/* another pseudoscalar C=+1; isotriplet=pi isosinglet=eta */
-		/*
+		
 		if(i == 0) strcpy(corr_name[counter],"pi2");
 		triplet_correlator_re(correlator[counter][i], meson[G0G5], meson[G0G5], -1.0);
 		counter++;
@@ -310,10 +315,10 @@ void dublin_meson_correlators(double** correlator[], char corr_name[][256], int 
 		for(t = 0; t < T; t++)
 			correlator[counter][i][t] = correlator[counter-1][i][t] - correlator[counter][i][t];
 		counter++;
-		*/
+		
 		
 		/* another vector C=-1; isotriplet=rho isosinglet=phi */
-		/*
+		
 		if(i == 0) strcpy(corr_name[counter],"rho2");
 		triplet_correlator_re(correlator[counter][i], meson[G0G1], meson[G0G1], -1.0);
 		triplet_correlator_re(tmpcorr, meson[G0G2], meson[G0G2], -1.0);
@@ -338,10 +343,10 @@ void dublin_meson_correlators(double** correlator[], char corr_name[][256], int 
 			correlator[counter][i][t] = correlator[counter-1][i][t] - correlator[counter][i][t];
 		}		
 		counter++;
-		*/
+		
 		
 		/* scalar C=-1; forbidden Minkowski mesons */
-		/*
+		
 		if(i == 0) strcpy(corr_name[counter],"forbidden triplet 0+-");
 		triplet_correlator_re(correlator[counter][i], meson[G0], meson[G0], -1.0);
 		counter++;
@@ -351,10 +356,10 @@ void dublin_meson_correlators(double** correlator[], char corr_name[][256], int 
 		for(t = 0; t < T; t++)
 			correlator[counter][i][t] = correlator[counter-1][i][t] - correlator[counter][i][t];
 		counter++;
-		*/
+		
 		
 		/* pseudovector C=+1; forbidden Minkowski mesons */
-		/*
+		
 		if(i == 0) strcpy(corr_name[counter],"forbidden triplet 1++");
 		triplet_correlator_re(correlator[counter][i], meson[G5G1], meson[G5G1], 1.0);
 		triplet_correlator_re(tmpcorr, meson[G5G2], meson[G5G2], 1.0);
@@ -380,7 +385,7 @@ void dublin_meson_correlators(double** correlator[], char corr_name[][256], int 
 			correlator[counter][i][t] = correlator[counter-1][i][t] - correlator[counter][i][t];
 		}		
 		counter++;
-		*/
+		
 		
 		/* pion decay amplitude */
 		
@@ -449,7 +454,7 @@ static void all_to_all_quark_propagator_init(int n_masses) {
 	requiredmemory += sizeof(suNf_spinor)*VOLUME*n_diluted_noisy_sources*n_masses;
 	
 	requiredmemory /= 1024.0*1024.0;
-	lprintf("ALL_TO_ALL_QUARK_PROPAGATOR_INIT",0,"Required memory = %f Mb\n",requiredmemory);
+	lprintf("ALL_TO_ALL_QUARK_PROPAGATOR_INIT",loglevel,"Required memory = %f Mb\n",requiredmemory);
 	
 	init_flag = 1;
 }
@@ -543,7 +548,7 @@ static void get_sinks_QMR(suNf_spinor *source, suNf_spinor **sink, int n_masses,
 		spinor_field_sub_f(test,test,sink[i]);
 		norm=spinor_field_sqnorm_f(test);
 		if(norm>acc)
-			lprintf("PROPAGATOR",0,"g5QMR residuum of source [%d] = %e\n",i,norm);
+			lprintf("GET_SINKS_QMR",loglevel+1,"g5QMR residuum of source [%d] = %e\n",i,norm);
 
 		/* multiply by g_5 to match the MINRES version */
 		spinor_field_g5_f(sink[i],sink[i]);
@@ -573,7 +578,7 @@ static void get_sinks_MINRES(suNf_spinor *source, suNf_spinor **sink, int n_mass
 		cgiter += MINRES(&MINRESpar, &H, source, sink[i], sink[i-1]);
 	}
 	
-	lprintf("GET_SINKS",10,"MINRES MVM = %d",cgiter);
+	lprintf("GET_SINKS_MINRES",loglevel+1,"MINRES MVM = %d",cgiter);
 }
 
 

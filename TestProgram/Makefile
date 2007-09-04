@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-MAIN := check0 check1 check2 check3 check4 check5 check6 check7 check8 check9 check10 check11
+MAIN := check0 check1 check2 check3 check4 check5 check6 check7 check8 check9 check10 check11 check13
 
 SRCS = $(addsuffix .c,$(MAIN))
 
@@ -26,7 +26,7 @@ MODS := amalloc field_alloc
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Observables
-MODS := avr_plaquette
+MODS := avr_plaquette dublin_mesons
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Random
@@ -34,7 +34,7 @@ MODS := gauss random_suNg ranlxs ranlxd random_fields
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Update
-MODS := cabmar staples update_hb random_su2 Dphi Dphi_old representation random_momenta random_spinor_field
+MODS := cabmar staples update_hb random_su2 Dphi Dphi_old representation random_momenta random_spinor_field find_spec_limits
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Error
