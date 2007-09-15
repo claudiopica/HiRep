@@ -34,9 +34,10 @@ static int index_eo_lexi(int x0,int x1,int x2,int x3)
 
 void geometry_eo_lexi(void)
 {
-   int x0,x1,x2,x3,ix;
+   int x0,x1,x2,x3,ix,iy;
 
    for (x0=0;x0<T;x0++){
+     iy=0;
      for (x1=0;x1<L;x1++){
        for (x2=0;x2<L;x2++){
 	 for (x3=0;x3<L;x3++){
@@ -51,7 +52,9 @@ void geometry_eo_lexi(void)
 	   idn[ix][2]=index_eo_lexi(x0,x1,x2-1,x3);
 	   iup[ix][3]=index_eo_lexi(x0,x1,x2,x3+1);
 	   idn[ix][3]=index_eo_lexi(x0,x1,x2,x3-1);
-	   /* tslice[ix]=x0; */
+	   tslice[ix]=x0;
+	   ipt_4d[x0][iy]=ix;
+	   iy++;
 	 }
        }
      }

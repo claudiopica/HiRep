@@ -33,6 +33,7 @@ EXTERN int ipt[T][L][L][L];
 EXTERN int ipt_4d[T][VOL3];
 EXTERN int iup[VOLUME][4];
 EXTERN int idn[VOLUME][4];
+EXTERN int tslice[VOLUME];
 
 /* Gauge field pointer */
 EXTERN suNg *u_gauge;

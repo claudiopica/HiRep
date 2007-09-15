@@ -44,7 +44,7 @@ MODS := base_stat jacknife
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Inverters
-MODS := linear_algebra cg_mshift MINRES_mshift g5QMR_mshift MINRES eva jacobi
+MODS := linear_algebra cg_mshift MINRES_mshift g5QMR_mshift MINRES eva jacobi dirac_eva
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 qspectrum: $(OBJS) $(MOD_OBJS)

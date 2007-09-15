@@ -49,6 +49,12 @@ int eva_flt(int vol,int nev,int nevt,int init,int kmax,
                int imax,double ubnd,double omega1,double omega2,
                spinor_operator_flt Op,
                suNf_spinor_flt *ws[],suNf_spinor_flt *ev[],double d[],int *status);
+void dirac_eva_onemass(int nev,int nevt,int kmax,
+        int imax,double omega1,double omega2,double mass,
+        suNf_spinor *ev[],double d[],int *status);
+void dirac_eva(int nev,int nevt,int kmax,
+        int imax,double omega1,double omega2,int n_masses,double *mass,
+        suNf_spinor *ev[],double d[],int *status);
 
 
 #endif

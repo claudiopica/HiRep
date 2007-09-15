@@ -91,7 +91,7 @@
 #include "suN.h"
 
 #define GAMMA 3.0
-#define MAX_ROTATE 50
+#define MAX_ROTATE 1000 /*50*/
 
 static int initr=0;
 static suNf_spinor *psi,*chi;
