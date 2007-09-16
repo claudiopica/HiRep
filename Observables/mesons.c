@@ -54,7 +54,7 @@ void NAME(double *out, suNf_spinor **qp) { \
         hc += (_S4_)*_tmp; \
       } \
     } \
-    out[t] = (_S0_)*hc; \
+    out[t] = (_S0_)*hc/(VOL3); \
   } \
 }
 
@@ -86,7 +86,7 @@ void NAME(double *out, suNf_spinor **qp) { \
         hc += (_T4_)*_tmp; \
       } \
     } \
-    out[t] = (_S0_)*hc; \
+    out[t] = -(_S0_)*hc/(VOL3); \
   } \
 }
 
@@ -118,7 +118,7 @@ void NAME(double *out, suNf_spinor **qp) { \
         hc += (_T4_)*_tmp; \
       } \
     } \
-    out[t] = (_S0_)*hc; \
+    out[t] = -(_S0_)*hc/(VOL3); \
   } \
 }
 

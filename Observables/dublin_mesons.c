@@ -1,3 +1,49 @@
+/******************************************************************************
+*
+* File dublin_mesons.c
+*
+* This program computes the generic two-point mesonic correlation function.
+* It uses the algorithm of the group of Doublin (see Foley, Juge, O'Cais,
+* Peardon, Ryan, Skullerud, hep-lat/0505023), for the all-to-all propagators.
+* The inverse of g5D is splitted in the contribution of the low-lying
+* eigenvalues and the rest. The former part is exactly computed. The latter
+* one is stochastically estimated.
+* The technique of time-dilution is implemeted, in order to reduce the
+* stochastic fluctuations.
+*
+*
+* Parameters.
+* n_eigenvalues : the number of eigenvalues needed to compute the firts part
+*                 of the quark propagator
+* n_hp_eigenvalues : the number of eigenvalues (it must be less or equal than
+*                 n_eigenvalues) to be computed with the given precision
+*                 (see omega1, omega2)
+* n_global_noisy_sources_per_point : the number of stochastic sources needed
+*                 to estimate the second part of the quark propagator
+* omega1 : the absolute precision required to compute 'n_hp_eigenvalues'
+*                 eigenvalues (see eva.c)
+* omega2 : the relative precision required to compute 'n_hp_eigenvalues'
+*                 eigenvalues (see eva.c)
+* acc : the precision to be used in the inversion routines
+*
+*
+* Only the function
+*       void dublin_meson_correlators(double** correlator[],
+*            char corr_name[][256], int n_corr, int nm, double *mass)
+* is accessible from the extern.
+* It computes the correlators defined in the program, for all the masses
+* mass[0]...mass[nm]. The correlators are stored in the array
+* correlator[0...n_corr-1][0...nm-1][0...T-1]. The first index identify
+* which correlator (pi, rho, eta ...). The string array corr_name[0...n_corr]
+* contains the name of the computed correlators.
+*
+*
+* Author: Agostino Patella
+*
+******************************************************************************/
+
+
+
 #include "global.h"
 #include "linear_algebra.h"
 #include "inverters.h"
@@ -16,11 +62,14 @@
 
 
 
-#define NO_DILUTION
-/* #define TIME_DILUTION */
-#define TESTINGMODE
-#define NO_NOISERECYCLING
+#define TIME_DILUTION
+/* #define TESTINGMODE */
+/* #define NO_NOISERECYCLING */
 
+
+#ifndef TIME_DILUTION
+#define NO_DILUTION
+#endif
 
 #define SOUCE_SINK_INDEX(p,q) ( (p)*n_sources + (q) )
 #define SPIN_2D_INDEX(i,j) ( (i)*4 + (j) )
@@ -37,10 +86,14 @@ static double hmass;
 static double *shift;
 static double *mass;
 
-enum{ n_eigenvalues = 0 }; /* N_{ev} */
-enum{ n_hp_eigenvalues = 0 };
+static const float omega1 = 1e-6;
+static const float omega2 = 1e-3;
+static const float acc = 1e-9;
 
-enum{ n_global_noisy_sources_per_point = 4 }; /* N_r */
+enum{ n_eigenvalues = 12 }; /* N_{ev} */
+enum{ n_hp_eigenvalues = 12 };
+
+enum{ n_global_noisy_sources_per_point = 2 }; /* N_r */
 enum{ n_points = 2 };
 enum{ n_global_noisy_sources = n_global_noisy_sources_per_point * n_points }; /* N_{gns} */
 #ifdef TIME_DILUTION
@@ -75,8 +128,8 @@ static void z2_spinor(suNf_spinor *source);
 
 static void get_sources(suNf_spinor **source);
 static void get_time_diluted_sources(suNf_spinor **source);
-static void get_sinks_QMR(suNf_spinor *source, suNf_spinor **sink, double acc);
-static void get_sinks_MINRES(suNf_spinor *source, suNf_spinor **sink, double acc);
+static void get_sinks_QMR(suNf_spinor *source, suNf_spinor **sink);
+static void get_sinks_MINRES(suNf_spinor *source, suNf_spinor **sink);
 static void project_sources(suNf_spinor **source, suNf_spinor **vectors);
 static void project_time_diluted_sources(suNf_spinor **source, suNf_spinor **vectors);
 static void project_sinks(suNf_spinor *sink, suNf_spinor **vectors);
@@ -121,7 +174,6 @@ void dublin_meson_correlators(double** correlator[], char corr_name[][256], int 
 	complex ctmp, trace, mesonID[T], mesonG5[T];
 #endif
 	int status;
-	float omega1, omega2, acc;
 	
 	suNf_spinor *source;
 	suNf_spinor *sink;
@@ -161,16 +213,11 @@ void dublin_meson_correlators(double** correlator[], char corr_name[][256], int 
 	/* compute the lowest n_eigenvalues eigenvalues/vectors */
 
 	if(n_eigenvalues > 0) {
-		omega1 = 1.0e-6f; /*1.0e-9f;*/
-		omega2 = 1.0e-3f; /*1.0e-6f;*/
-
 		dirac_eva(n_hp_eigenvalues,n_eigenvalues,100,10*n_eigenvalues,omega1,omega2,n_masses,mass,ev,d,&status);
 	}
 
 	
 	/* generate random sources & sinks */
-
-	acc = 1.0e-9f;
 
 	for(r = 0; r < n_global_noisy_sources; r++) {
 
@@ -198,7 +245,7 @@ void dublin_meson_correlators(double** correlator[], char corr_name[][256], int 
 #endif
 		
 #ifdef NO_DILUTION
-		get_sinks_MINRES(noisy_sources[SOURCE_INDEX(0,r,0)], noisy_sinks+SINK_INDEX(0,r,0), acc);
+		get_sinks_MINRES(noisy_sources[SOURCE_INDEX(0,r,0)], noisy_sinks+SINK_INDEX(0,r,0));
 		
 		if(n_eigenvalues > 0) {
 			for(m = 0; m < n_masses; m++) {
@@ -209,13 +256,13 @@ void dublin_meson_correlators(double** correlator[], char corr_name[][256], int 
 #endif
 #ifdef TIME_DILUTION
 		for(t = 0; t < n_dilution_slices; t++)
-			get_sinks_MINRES(noisy_sources[SOURCE_INDEX(0,r,t)], noisy_sinks+SINK_INDEX(0,r,t), acc);
+			get_sinks_MINRES(noisy_sources[SOURCE_INDEX(0,r,t)], noisy_sinks+SINK_INDEX(0,r,t));
 		
 		if(n_eigenvalues > 0) {
-			for(m = 0; m < n_masses; m++)
-			for(t = 0; t < n_dilution_slices; t++) {
-				project_time_diluted_sources(noisy_sources + SOURCE_INDEX(m,r,t), ev + EV_INDEX(m,0));
-				project_sinks(noisy_sinks[SINK_INDEX(m,r,t)], ev + EV_INDEX(m,0));
+			for(m = 0; m < n_masses; m++) {
+				project_time_diluted_sources(noisy_sources + SOURCE_INDEX(m,r,0), ev + EV_INDEX(m,0));
+				for(t = 0; t < n_dilution_slices; t++)
+					project_sinks(noisy_sinks[SINK_INDEX(m,r,t)], ev + EV_INDEX(m,0));
 			}
 		}
 #endif
@@ -762,7 +809,7 @@ static void get_time_diluted_sources(suNf_spinor **source) {
 
 
 
-static void get_sinks_QMR(suNf_spinor *source, suNf_spinor **sink, double acc) {
+static void get_sinks_QMR(suNf_spinor *source, suNf_spinor **sink) {
 	mshift_par QMR_par;
 	int m;
 	int cgiter=0;
@@ -831,7 +878,7 @@ static void get_sinks_QMR(suNf_spinor *source, suNf_spinor **sink, double acc) {
 
 
 
-static void get_sinks_MINRES(suNf_spinor *source, suNf_spinor **sink, double acc) {
+static void get_sinks_MINRES(suNf_spinor *source, suNf_spinor **sink) {
 	static MINRES_par MINRESpar;
 	int m;
 	int cgiter=0;

@@ -3,7 +3,7 @@
 *
 * File check13.c
 *
-* Check of the mesons with the Dublin algorithm (free case)
+* Check of the mesons (both mesons.c and dublin_mesons.c) (free case)
 *
 * Author: Agostino Patella
 *
@@ -39,12 +39,12 @@
 static double mass = .5;
 static const double EPSILON = 1.e-12;
 
-enum MesonT {A, Pi, Rho, B, Pi2, Rho2, X, Y};
+enum MesonT {A=0, Pi, Rho, B, Pi2, Rho2, X, Y};
 static int g0[8] = {1, -1, -1, 1, -1, -1, 1, 1};
 static int gs[8] = {3, -3, -1, -1, 3, 1, -3, 1};
 static int gb[8] = {1, -1, -1, -1, 1, 1, 1, -1};
 static char nameT[8][256] = {"a", "pi", "rho", "b", "pi2", "rho2", "forbidden triplet 0+-", "forbidden triplet 1++" };
-enum MesonS {F, Eta, Phi, H, Eta2, Phi2, Xs, Ys};
+enum MesonS {F=8, Eta, Phi, H, Eta2, Phi2, Xs, Ys};
 static int p[8] = {1, 0, 0, 0, 0, 0, 0, 0 };
 static char nameS[8][256] = {"f", "eta", "phi", "h", "eta2", "phi2", "forbidden singlet 0+-", "forbidden singlet 1++" };
 
@@ -55,131 +55,211 @@ void stat(int ndata, double *data, double *ave, double *error);
 
 int main(int argc,char *argv[])
 {
-	int i, n, t, counter;
-   FILE *log=NULL;   
+	int i, n, t, x, counter;
+  FILE *log=NULL;   
 	double m[1];
-	double error;
 	int nm=1;
-   double triplets[8][T], singlets[8][T];
-   double *currcorr;
+  double triplets[8][T], singlets[8][T];
 
 	enum{  n_correlators = 17 };
-	double ***corrhisto[n_correlators];
-	double **corr[n_correlators];
-	double **dcorr[n_correlators];
-	double **tmpcorr[n_correlators];
-	char corr_name[n_correlators][256];
+	double ***dcorr_histo[n_correlators];
+	double **dcorr_ave[n_correlators];
+	double **dcorr_err[n_correlators];
+	double **dcorr_tmp[n_correlators];
+	char dcorr_name[n_correlators][256];
+
+/* 	FILE *propfile; */
+	suNf_spinor **quark_prop;
+	double ptacorr[8][T];
+	long int propsize;
+	double norm;
+	suNf_spinor *test;
 	
-	int nmeasures = 1000;
+	int nmeasures = 100;
 	
 	for(i=0; i<n_correlators; i++) {
-		tmpcorr[i] = (double**)malloc(sizeof(double*)*nm);
-		corr[i] = (double**)malloc(sizeof(double*)*nm);
-		dcorr[i] = (double**)malloc(sizeof(double*)*nm);
-		corrhisto[i] = (double***)malloc(sizeof(double**)*nm);
-		tmpcorr[i][0] = (double*)malloc(sizeof(double)*nm*T);
-		corr[i][0] = (double*)malloc(sizeof(double)*nm*T);
-		dcorr[i][0] = (double*)malloc(sizeof(double)*nm*T);
-		corrhisto[i][0] = (double**)malloc(sizeof(double*)*nm*T);
-		corrhisto[i][0][0] = (double*)malloc(sizeof(double)*nm*T*nmeasures);
+		dcorr_tmp[i] = (double**)malloc(sizeof(double*)*nm);
+		dcorr_ave[i] = (double**)malloc(sizeof(double*)*nm);
+		dcorr_err[i] = (double**)malloc(sizeof(double*)*nm);
+		dcorr_histo[i] = (double***)malloc(sizeof(double**)*nm);
+		dcorr_tmp[i][0] = (double*)malloc(sizeof(double)*nm*T);
+		dcorr_ave[i][0] = (double*)malloc(sizeof(double)*nm*T);
+		dcorr_err[i][0] = (double*)malloc(sizeof(double)*nm*T);
+		dcorr_histo[i][0] = (double**)malloc(sizeof(double*)*nm*T);
+		dcorr_histo[i][0][0] = (double*)malloc(sizeof(double)*nm*T*nmeasures);
 		for(n=0;n<nm;n++) {
-			tmpcorr[i][n] = tmpcorr[i][0] + n*T;
-			corr[i][n] = corr[i][0] + n*T;
-			dcorr[i][n] = dcorr[i][0] + n*T;
-			corrhisto[i][n] = corrhisto[i][0] + n*T;
+			dcorr_tmp[i][n] = dcorr_tmp[i][0] + n*T;
+			dcorr_ave[i][n] = dcorr_ave[i][0] + n*T;
+			dcorr_err[i][n] = dcorr_err[i][0] + n*T;
+			dcorr_histo[i][n] = dcorr_histo[i][0] + n*T;
 			for(t = 0; t < T; t++) {
-			   corrhisto[i][n][t] = corrhisto[i][0][0] + (n*T+t)*nmeasures;
+			   dcorr_histo[i][n][t] = dcorr_histo[i][0][0] + (n*T+t)*nmeasures;
 			}
 		}
 	}
 	
 	m[0] = mass;
 
-   log=freopen("check13.log","w",stdout);
-   printf("\n");
-   printf("Dubliner mesons (free case)\n");
-   printf("---------------------------------------\n\n");
-   printf("The lattice size is %dx%d^3\n",T,L);
-   printf("size of the gluon rep: %d, size of the fermion rep: %d\n",NG,NF);
-   printf("mass of the fermion: %f\n",mass);
-   
-   rlxd_init(1,12345);
-   rlxd_init(1,time(NULL));
+  log=freopen("check13.log","w",stdout);
+  printf("\n");
+  printf("Mesons (free case)\n");
+  printf("---------------------------------------\n\n");
+  printf("The lattice size is %dx%d^3\n",T,L);
+  printf("size of the gluon rep: %d, size of the fermion rep: %d\n",NG,NF);
+  printf("mass of the fermion: %f\n",mass);
+  
+  rlxd_init(1,12345);
 
 	logger_setlevel(0,15);
 
-   geometry_eo_lexi();
-   u_gauge=alloc_gfield();
+  geometry_eo_lexi();
+  u_gauge=alloc_gfield();
 #ifndef REPR_FUNDAMENTAL
-   u_gauge_f=alloc_gfield_f();
+  u_gauge_f=alloc_gfield_f();
 #endif
-   represent_gauge_field();
+  represent_gauge_field();
 
-   set_spinor_len(VOLUME);
+  set_spinor_len(VOLUME);
 
-   free_correlators(triplets, singlets);
-   for(i=0; i<8; i++) {
-   	for(t = 0; t < T; t++) {
-   	   triplets[i][t] *= gb[i];
-   	   singlets[i][t] *= gb[i];
-   	}
-   }
-	
+/* CALCOLO ESPLICITO */
+  free_correlators(triplets, singlets);
+  for(i=0; i<8; i++) {
+  	for(t = 0; t < T; t++) {
+  	   triplets[i][t] *= gb[i];
+  	   singlets[i][t] *= gb[i];
+  	}
+  }
+
+/* MESONI DUBLINESI */	
 	for(counter = 0; counter < nmeasures; counter++) {
       printf("Counter = %d\n", counter);
-   	dublin_meson_correlators(tmpcorr, corr_name, n_correlators, nm, m);
+   	dublin_meson_correlators(dcorr_tmp, dcorr_name, n_correlators, nm, m);
 	   for(i=0; i<n_correlators; i++) {
 		   for(n=0;n<nm;n++) {
 		   	for(t = 0; t < T; t++)
-		   	   corrhisto[i][n][t][counter] = tmpcorr[i][n][t];
+		   	   dcorr_histo[i][n][t][counter] = dcorr_tmp[i][n][t];
 		   }
 	   }
 	}
 	
 	
 	
-   for(i=0; i<n_correlators; i++) {
-	   for(n=0;n<nm;n++) {
-	   	for(t = 0; t < T; t++)
-	   	   stat(nmeasures, corrhisto[i][n][t], corr[i][n]+t, dcorr[i][n]+t);
-	   }
-   }
-   
-   error = 0.;
-   
-   for(i = 0; i < n_correlators; i++) {
-      currcorr = 0;
-      for(n = 0; n < 8; n++)
-         if(strcmp(corr_name[i],nameT[n])==0) {
-            currcorr = triplets[n];
-            printf("CORRELATOR TRIPLET %s %d(%p)\n", corr_name[i], n, currcorr);
-         }
-      for(n = 0; n < 8; n++)
-         if(strcmp(corr_name[i],nameS[n])==0) {
-            currcorr = singlets[n];
-            printf("CORRELATOR SINGLET %s %d(%p)\n", corr_name[i], n, currcorr);
-         }
-      
-      if(currcorr==0) {
-         printf("CORRELATOR %s\n", corr_name[i]);
-         for(t = 0; t < T; t++)
-            printf("%f %f\n", corr[i][0][t],dcorr[i][0][t]);
-      } else {
-         for(t = 0; t < T; t++)
-           printf("%.8f %.8f\t( %.8f ) %f %f\n", corr[i][0][t], dcorr[i][0][t], currcorr[t], corr[i][0][t]/currcorr[t], fabs(dcorr[i][0][t]/currcorr[t]));
-         
-         error += (corr[i][0][t]-currcorr[t])*(corr[i][0][t]-currcorr[t]);
-      }
-   }
-   
-   error = sqrt(error);
-   printf("Error = %f\n", error);
+	for(i=0; i<n_correlators; i++) {
+	  for(n=0;n<nm;n++) {
+	  	for(t = 0; t < T; t++)
+	  	   stat(nmeasures, dcorr_histo[i][n][t], dcorr_ave[i][n]+t, dcorr_err[i][n]+t);
+	  }
+	}
+
+/* MESONI CON PROPAGATORE POINT-TO-ALL */
+
+/*
+	error((propfile = fopen("check13.prop", "wb"))==NULL,1,"Main",
+			"Failed to open propagator file for writing");
+	quark_propagator_QMR(propfile,0,nm,m,1.e-9);
+	lprintf("MAIN",0,"MVM for last propagator: %ld\n",getMVM());
+
+	fclose(propfile);
+
+	error((propfile = fopen("check13.prop", "rb"))==NULL,1,"Main",
+			"Failed to open propagator file for reading");
+*/
+	
+	test = alloc_spinor_field_f();
+	quark_prop = (suNf_spinor**)malloc(sizeof(suNf_spinor*)*4*NF);
+	for(n = 0; n < 4*NF; n++)
+		quark_prop[n] = alloc_spinor_field_f();
+
+	propsize=sizeof(suNf_spinor)*VOLUME;
+
+	for(n = 0; n < 4*NF; n++) {
+		quark_propagator(n, nm, m, &(quark_prop[n]), 1e-9);
+
+/*
+		error((fread(quark_prop[n],(size_t) sizeof(suNf_spinor),
+			(size_t)(VOLUME),propfile)!=(VOLUME))&&(!feof(propfile)),
+			1,"Main", "Failed to read form quark propagator!");
+*/		
+		norm = spinor_field_sqnorm_f(quark_prop[n]);
+		lprintf("MAIN",10,"Propagator norm [n=%d] = %e\n",n,norm);
+		
+		g5Dphi(m[0],test,quark_prop[n]);
+		norm = 0.;
+		for(x = 0; x < VOLUME; x++) {
+			double *tf = (double*)(test+x);
+			for(i = 0; i < sizeof(suNf_spinor)/sizeof(double); i++) {
+				if(x == 0 && i == 2*n) norm = (tf[i]-1.)*(tf[i]-1.);
+				else norm += tf[i]*tf[i];
+			}
+		}
+		norm = sqrt(norm);
+		lprintf("MAIN",10,"Testing inversion [n=%d] = %e\n",n,norm);
+
+	}
+	
+	id_correlator(ptacorr[A], quark_prop);
+	g0_correlator(ptacorr[X], quark_prop);
+	g5_correlator(ptacorr[Pi], quark_prop);
+	g0g5_correlator(ptacorr[Pi2], quark_prop);
+	g1_correlator(ptacorr[Rho], quark_prop);
+	g0g1_correlator(ptacorr[Rho2], quark_prop);
+	g5g1_correlator(ptacorr[Y], quark_prop);
+	g0g5g1_correlator(ptacorr[B], quark_prop);
+/* 	CORR(g5_g0g5_correlator_im); */
+
+/* 	fclose(propfile); */
 
 
-   printf("\n");
-   fclose(log);
+/* STAMPA */
    
-   exit(0);
+/* 	error = 0.; */
+
+	printf("\nANALITICO\tPOINT-TO-ALL\tALL_TO_ALL\n");
+	for(n = 0; n < 8; n++) {
+		for(i = 0; i < n_correlators; i++)
+			if(strcmp(dcorr_name[i],nameT[n])==0) break;
+
+		printf("CORRELATOR TRIPLET %s\n", nameT[n]);
+		if(i < n_correlators) {
+			for(t = 0; t < T; t++)
+				printf("%.8f\t%.8f\t%.8f (%.8f)\n",
+							triplets[n][t],
+							ptacorr[n][t],
+							dcorr_ave[i][0][t], dcorr_err[i][0][t]);
+		} else {
+			for(t = 0; t < T; t++)
+				printf("%.8f\t%.8f\n",
+							triplets[n][t],
+							ptacorr[n][t]);
+		}
+	}
+
+
+	printf("\nANALITICO\tALL_TO_ALL\n");
+	for(n = 0; n < 8; n++) {
+		for(i = 0; i < n_correlators; i++)
+			if(strcmp(dcorr_name[i],nameS[n])==0) break;
+
+		printf("CORRELATOR SINGLET %s\n", nameS[n]);
+		if(i < n_correlators) {
+			for(t = 0; t < T; t++)
+				printf("%.8f\t%.8f (%.8f)\n",
+							singlets[n][t],
+							dcorr_ave[i][0][t], dcorr_err[i][0][t]);
+		} else {
+				printf("%.8f\n",
+							singlets[n][t]);
+		}
+	}
+
+/*   error = sqrt(error); */
+/*   printf("Error = %f\n", error); */
+
+
+  printf("\n");
+  fclose(log);
+  
+  exit(0);
 }
 
 
@@ -242,7 +322,7 @@ void free_correlators(double triplets[8][T], double singlets[8][T]) {
             
             A[t] += re * ct / norm2;
             B[0][t] += sin((2.0*M_PI*k[0])/T) * st / norm2;
-            B[1][t] += sin((2.0*M_PI*k[1])/L) * st / norm2;
+            B[1][t] += sin((2.0*M_PI*k[1])/L) * ct / norm2;
          }
       }
       for(t = 0; t < T; t++) {
@@ -255,10 +335,16 @@ void free_correlators(double triplets[8][T], double singlets[8][T]) {
    
    lprintf("FREE_CORRELATORS",0,"Abar = %f\n",Abar);
    A2bar = Abar * Abar;
+   lprintf("FREE_CORRELATORS",10,"A2[0] = %f\n",A2[0]);
+   lprintf("FREE_CORRELATORS",10,"B2[0][0] = %f\n",B2[0][0]);
+   lprintf("FREE_CORRELATORS",10,"B2[1][0] = %f\n",B2[1][0]);
    
-   for(t = 0; t < T; t++) for(i = 0; i < 8; i++) {
-      triplets[i][t] = - 4*NF*g0[i] * (A2[t] - g0[i]*B2[0][t] - gs[i]*B2[1][t]) / (VOLUME*VOLUME);
-      singlets[i][t] = triplets[i][t] + 16*p[i] * NF*NF* A2bar / (VOLUME*VOLUME);
+   for(i = 0; i < 8; i++) {
+      lprintf("FREE_CORRELATORS",10,"i=%d  g0=%d  gs=%d\n",i,g0[i],gs[i]);
+      for(t = 0; t < T; t++) {
+         triplets[i][t] = - 4*NF*g0[i] * (A2[t] - g0[i]*B2[0][t] - gs[i]*B2[1][t]) / (VOLUME*VOLUME);
+         singlets[i][t] = triplets[i][t] + 16*p[i] * NF*NF* A2bar / (VOLUME*VOLUME);
+      }
    }
 
    lprintf("FREE_CORRELATORS",0,"Exact free correlators computed.\n");
