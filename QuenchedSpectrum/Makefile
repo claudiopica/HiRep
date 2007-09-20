@@ -59,7 +59,7 @@ mk_mesons: mk_mesons.o $(MOD_OBJS)
 
 mk_dmesons: mk_dmesons.o $(MOD_OBJS)
 	echo -n Linking [$@]... 
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ mk_mesons.o $(MOD_OBJS) &&\
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ mk_dmesons.o $(MOD_OBJS) &&\
 	echo " done." || echo " failed."
 
 .PHONY: default

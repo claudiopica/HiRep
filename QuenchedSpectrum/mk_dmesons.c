@@ -48,11 +48,11 @@ void read_cmdline(int argc, char*argv[]) {
 	else
 		out=stdout;
 
-	error(ai==0,1,"suN.c",
-				"Syntax: suN -i <input file> [-o <output file>]");
+	error(ai==0,1,"mk_dmesons.c",
+				"Syntax: mk_dmesons -i <input file> [-o <output file>]");
 
 	in=freopen(argv[ai],"r",stdin);
-	error(in==NULL,1,"run1.c","Cannot open input file");
+	error(in==NULL,1,"mk_dmesons.c","Cannot open input file");
 
 	scanf("beta %f nhb %d nor %d nit %d nth %d nms %d level %d seed %d",
 	&beta,&nhb,&nor,&nit,&nth,&nms,&level,&seed);
@@ -66,7 +66,7 @@ int main(int argc,char *argv[]) {
 	double *m;
 
 	double kappa[]={0.156,0.1575,0.159,0.160,0.161};
-	int nm=sizeof(kappa)/sizeof(float);
+	int nm=sizeof(kappa)/sizeof(double);
 	
 	enum{  n_correlators = 9 };
 	double **correlator[n_correlators];
@@ -87,7 +87,7 @@ int main(int argc,char *argv[]) {
 
 	read_cmdline(argc, argv); 
 
-	logger_setlevel(0,10000);
+	logger_setlevel(0,1000);
 	/* uncomment the following if redirection of inverter output is desired */
 	/* logger_map("INVERTER","inverter.out"); */
 
@@ -117,7 +117,6 @@ int main(int argc,char *argv[]) {
 #endif
 
 	/* Termalizzazione */
-	/*
 	for (i=0;i<nth;++i) {
 		update(beta,nhb,nor);
 		if ((i%10)==0)
@@ -127,10 +126,9 @@ int main(int argc,char *argv[]) {
 		fflush(stdout);
 	}
 	if(i) lprintf("MAIN",0,"%d\nThemalization done.\n",i);
-	*/
 	/* or read configuration from file */
-	read_gauge_field("confname");
-	assign_u2ud();
+/* 	read_gauge_field("confname"); */
+/* 	assign_u2ud(); */
 
 	represent_gauge_field();
 
