@@ -65,10 +65,15 @@
 #define TIME_DILUTION
 /* #define TESTINGMODE */
 /* #define NO_NOISERECYCLING */
+#define QMR_INVERTER
 
 
 #ifndef TIME_DILUTION
 #define NO_DILUTION
+#endif
+
+#ifndef QMR_INVERTER
+#define MINRES_INVERTER
 #endif
 
 #define SOUCE_SINK_INDEX(p,q) ( (p)*n_sources + (q) )
@@ -81,7 +86,7 @@
 
 static int loglevel = 0;
 
-static int n_masses;
+static int n_masses = 0;
 static double hmass;
 static double *shift;
 static double *mass;
@@ -117,21 +122,45 @@ static suNf_spinor **noisy_sinks;   /* [i*n_masses+j], i<n_masses, j<n_diluted_n
 
 static complex meson[n_gamma_matrices][n_sources*n_sources][T];
 
+#ifdef QMR_INVERTER
+static suNf_spinor *QMR_source;
+static suNf_spinor **QMR_sinks;
+#endif
+
 
 
 static void H(suNf_spinor *out, suNf_spinor *in);
+#ifdef QMR_INVERTER
 static void D(suNf_spinor *out, suNf_spinor *in);
+#endif
 
 static void all_to_all_quark_propagator_init();
+#ifdef QMR_INVERTER
+static void QMR_init(int flag);
+#endif
 
 static void z2_spinor(suNf_spinor *source);
 
+#ifdef NO_DILUTION
 static void get_sources(suNf_spinor **source);
+#endif
+#ifdef TIME_DILUTION
 static void get_time_diluted_sources(suNf_spinor **source);
+#endif
+#ifdef QMR_INVERTER
 static void get_sinks_QMR(suNf_spinor *source, suNf_spinor **sink);
+#define GET_SINKS get_sinks_QMR
+#endif
+#ifdef MINRES_INVERTER
 static void get_sinks_MINRES(suNf_spinor *source, suNf_spinor **sink);
+#define GET_SINKS get_sinks_MINRES
+#endif
+#ifdef NO_DILUTION
 static void project_sources(suNf_spinor **source, suNf_spinor **vectors);
+#endif
+#ifdef TIME_DILUTION
 static void project_time_diluted_sources(suNf_spinor **source, suNf_spinor **vectors);
+#endif
 static void project_sinks(suNf_spinor *sink, suNf_spinor **vectors);
 
 static void source_sink_contraction(complex out[][16], suNf_spinor *source, suNf_spinor *sink, double z);
@@ -186,6 +215,8 @@ void dublin_meson_correlators(double** correlator[], char corr_name[][256], int 
 
 	/* static parameters */
 
+	error(nm != n_masses && n_masses != 0,1,"dublin_meson_correlators [dublin_mesons.c]",
+			"Bad number of masses");
 	n_masses = nm;
 	shift=(double*)malloc(sizeof(double)*n_masses);
 	mass = mptr;
@@ -200,7 +231,7 @@ void dublin_meson_correlators(double** correlator[], char corr_name[][256], int 
 		lprintf("DUBLIN_MESON_CORRELATORS",loglevel+1,"Shifts: %f\n",shift[m]);
 	}
 
-	error(n_corr < n_correlators,1,"meson_correlators [dublin_mesons.c]","Bad dimension for correlator[][]");
+	error(n_corr < n_correlators,1,"dublin_meson_correlators [dublin_mesons.c]","Bad dimension for correlator[][]");
 
 
 	/* allocate memory */
@@ -208,7 +239,9 @@ void dublin_meson_correlators(double** correlator[], char corr_name[][256], int 
 	set_spinor_len(VOLUME);
 	test = alloc_spinor_field_f();
 	all_to_all_quark_propagator_init();
-
+#ifdef QMR_INVERTER
+	QMR_init(0);
+#endif
 
 	/* compute the lowest n_eigenvalues eigenvalues/vectors */
 
@@ -245,7 +278,7 @@ void dublin_meson_correlators(double** correlator[], char corr_name[][256], int 
 #endif
 		
 #ifdef NO_DILUTION
-		get_sinks_MINRES(noisy_sources[SOURCE_INDEX(0,r,0)], noisy_sinks+SINK_INDEX(0,r,0));
+		GET_SINKS (noisy_sources[SOURCE_INDEX(0,r,0)], noisy_sinks+SINK_INDEX(0,r,0));
 		
 		if(n_eigenvalues > 0) {
 			for(m = 0; m < n_masses; m++) {
@@ -256,7 +289,7 @@ void dublin_meson_correlators(double** correlator[], char corr_name[][256], int 
 #endif
 #ifdef TIME_DILUTION
 		for(t = 0; t < n_dilution_slices; t++)
-			get_sinks_MINRES(noisy_sources[SOURCE_INDEX(0,r,t)], noisy_sinks+SINK_INDEX(0,r,t));
+			GET_SINKS (noisy_sources[SOURCE_INDEX(0,r,t)], noisy_sinks+SINK_INDEX(0,r,t));
 		
 		if(n_eigenvalues > 0) {
 			for(m = 0; m < n_masses; m++) {
@@ -706,9 +739,11 @@ static void H(suNf_spinor *out, suNf_spinor *in){
 
 
 
+#ifdef QMR_INVERTER
 static void D(suNf_spinor *out, suNf_spinor *in){
 	Dphi(hmass,out,in);
 }
+#endif
 
 
 
@@ -740,6 +775,14 @@ static void all_to_all_quark_propagator_init() {
 		noisy_sinks[m] = alloc_spinor_field_f();
 	}
 	requiredmemory += 2*sizeof(suNf_spinor)*VOLUME*n_masses*n_diluted_noisy_sources;
+
+#ifdef QMR_INVERTER
+	QMR_source = alloc_spinor_field_f();
+	QMR_sinks = (suNf_spinor**)malloc(sizeof(suNf_spinor*)*n_masses);
+	for(m = 0; m < n_masses; m++)
+		QMR_sinks[m] = alloc_spinor_field_f();
+	requiredmemory += (1+n_masses)*sizeof(suNf_spinor)*VOLUME;
+#endif
 	
 	requiredmemory /= 1024.0*1024.0;
 	lprintf("ALL_TO_ALL_QUARK_PROPAGATOR_INIT",loglevel,"Required memory = %f Mb\n",requiredmemory);
@@ -757,6 +800,40 @@ static void all_to_all_quark_propagator_init() {
 	
 	init_flag = 1;
 }
+
+
+
+#ifdef QMR_INVERTER
+static void QMR_init(int flag) {
+	static int init_flag = 0;
+	mshift_par QMR_par;
+	int m;
+	int cgiter=0;
+	
+	if(init_flag == 0 || flag != 0) {
+		gaussian_spinor_field(QMR_source);
+		init_flag = 1;
+	}
+
+	/* set_spinor_len(VOLUME); */
+
+	/* set up inverters parameters */
+	QMR_par.n = n_masses;
+	QMR_par.shift = shift;
+	QMR_par.err2 = .5*acc;
+	QMR_par.max_iter = 0;
+
+	for(m = 0; m < n_masses; m++)
+		spinor_field_zero_f(QMR_sinks[m]);
+
+	cgiter+=g5QMR_mshift(&QMR_par, &D, QMR_source, QMR_sinks);
+
+	for(m = 0; m < n_masses; m++)
+		spinor_field_g5_f(QMR_sinks[m],QMR_sinks[m]);
+	
+	lprintf("QMR_INIT",loglevel+1,"QMR MVM = %d\n",cgiter);	
+}
+#endif
 
 
 
@@ -786,15 +863,18 @@ static void z2_spinor(suNf_spinor *source) {
 
 
 
+#ifdef NO_DILUTION
 static void get_sources(suNf_spinor **source) {
 	int x;
 	
 	for(x = 0; x < VOLUME; x++)
 		z2_spinor(source[0]+x);
 }
+#endif
 
 
 
+#ifdef TIME_DILUTION
 static void get_time_diluted_sources(suNf_spinor **source) {
 	int t, x, index;
 	
@@ -806,18 +886,15 @@ static void get_time_diluted_sources(suNf_spinor **source) {
 		}
 	}
 }
+#endif
 
 
 
+#ifdef QMR_INVERTER
 static void get_sinks_QMR(suNf_spinor *source, suNf_spinor **sink) {
 	mshift_par QMR_par;
 	int m;
 	int cgiter=0;
-	double norm;
-	suNf_spinor *test=0;
-
-	/* allocate test spinor field */
-	test = alloc_spinor_field_f();
 
 	/* set_spinor_len(VOLUME); */
 
@@ -827,57 +904,26 @@ static void get_sinks_QMR(suNf_spinor *source, suNf_spinor **sink) {
 	QMR_par.err2 = .5*acc;
 	QMR_par.max_iter = 0;
 
-	lprintf("GET_SINKS_QMR",loglevel+3,"Number of masses = %d\n",n_masses);
-	lprintf("GET_SINKS_QMR",loglevel+3,"Highest mass = %f\n",hmass);
-	for(m = 0; m < n_masses; m++){
-		lprintf("GET_SINKS_QMR",loglevel+3,"Shifts: %f\n",shift[m]);
-	}
-
-	norm = sqrt(spinor_field_sqnorm_f(source));
-	lprintf("GET_SINKS_QMR",loglevel+3,"Source norm = %f\n",norm);
-
-	for(m=0;m<QMR_par.n;++m){
+	for(m = 0; m < n_masses; m++)
 		spinor_field_zero_f(sink[m]);
-	}
 
-	D(test,source);
-	++cgiter;
-	norm=sqrt(spinor_field_sqnorm_f(test));
-	lprintf("GET_SINKS_QMR",loglevel+3,"Test norm = %f\n",norm);
-	for(m=0;m<QMR_par.n;++m){
-		D(test,sink[m]);
-		++cgiter;
-		norm=sqrt(spinor_field_sqnorm_f(test));
-		lprintf("GET_SINKS_QMR",loglevel+3,"Test norm = %f\n",norm);
-	}
-
+	spinor_field_add_assign_f(source, QMR_source);
 	cgiter+=g5QMR_mshift(&QMR_par, &D, source, sink);
 
-	for(m=0;m<QMR_par.n;++m){
-		/* this is a test of the solution */
-		D(test,sink[m]);
-		++cgiter;
-		spinor_field_mul_add_assign_f(test,-QMR_par.shift[m],sink[m]);
-		spinor_field_sub_f(test,test,sink[m]);
-		norm=spinor_field_sqnorm_f(test);
-		/*if(norm>acc)*/
-		lprintf("GET_SINKS_QMR",loglevel+1,"g5QMR residuum of source [%d] = %e\n",m,norm);
-
-		/* multiply by g_5 to match the MINRES version */
+	for(m = 0; m < n_masses; m++)
 		spinor_field_g5_f(sink[m],sink[m]);
-		
-		/* convert to single precision */
-		/* assign_sd2s(VOLUME,(suNf_spinor_flt*)resd[m],resd[m]);
-		error(
-				fwrite(resd[m],(size_t) sizeof(suNf_spinor_flt),(size_t)(VOLUME),propfile)!=(VOLUME),
-				1,"quark_propagator_QMR","Failed to write quark propagator to file"); */
-	}
+
+	for(m = 0; m < n_masses; m++)
+		spinor_field_sub_assign_f(sink[m], QMR_sinks[m]);
+	spinor_field_sub_assign_f(source, QMR_source);
 	
-	free_field(test);
+	lprintf("GET_SINKS_QMR",loglevel+1,"QMR MVM = %d\n",cgiter);	
 }
+#endif
 
 
 
+#ifdef MINRES_INVERTER
 static void get_sinks_MINRES(suNf_spinor *source, suNf_spinor **sink) {
 	static MINRES_par MINRESpar;
 	int m;
@@ -906,9 +952,11 @@ static void get_sinks_MINRES(suNf_spinor *source, suNf_spinor **sink) {
 
 	hmass = oldhmass;
 }
+#endif
 
 
 
+#ifdef NO_DILUTION
 static void project_sources(suNf_spinor **source, suNf_spinor **vectors) {
 	int a, x;
 	static complex alpha[n_eigenvalues];
@@ -928,9 +976,11 @@ static void project_sources(suNf_spinor **source, suNf_spinor **vectors) {
 		}
 	}
 }
+#endif
 
 
 
+#ifdef TIME_DILUTION
 static void project_time_diluted_sources(suNf_spinor **source, suNf_spinor **vectors) {
 	int a, t, x, index;
 	static complex alpha[n_eigenvalues];
@@ -953,6 +1003,7 @@ static void project_time_diluted_sources(suNf_spinor **source, suNf_spinor **vec
 		}
 	}
 }
+#endif
 
 
 
