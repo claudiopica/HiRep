@@ -92,13 +92,13 @@ static double *shift;
 static double *mass;
 
 static const float omega1 = 1e-6;
-static const float omega2 = 1e-3;
+static const float omega2 = 1e-6;
 static const float acc = 1e-9;
 
-enum{ n_eigenvalues = 12 }; /* N_{ev} */
-enum{ n_hp_eigenvalues = 12 };
+enum{ n_eigenvalues = 100 }; /* N_{ev} */
+enum{ n_hp_eigenvalues = 100 };
 
-enum{ n_global_noisy_sources_per_point = 2 }; /* N_r */
+enum{ n_global_noisy_sources_per_point = 1 }; /* N_r */
 enum{ n_points = 2 };
 enum{ n_global_noisy_sources = n_global_noisy_sources_per_point * n_points }; /* N_{gns} */
 #ifdef TIME_DILUTION
@@ -129,7 +129,9 @@ static suNf_spinor **QMR_sinks;
 
 
 
+#ifdef TESTING_MODE
 static void H(suNf_spinor *out, suNf_spinor *in);
+#endif
 #ifdef QMR_INVERTER
 static void D(suNf_spinor *out, suNf_spinor *in);
 #endif
@@ -246,7 +248,7 @@ void dublin_meson_correlators(double** correlator[], char corr_name[][256], int 
 	/* compute the lowest n_eigenvalues eigenvalues/vectors */
 
 	if(n_eigenvalues > 0) {
-		dirac_eva(n_hp_eigenvalues,n_eigenvalues,100,10*n_eigenvalues,omega1,omega2,n_masses,mass,ev,d,&status);
+		dirac_eva(n_hp_eigenvalues,n_eigenvalues,50,5*n_eigenvalues,omega1,omega2,n_masses,mass,ev,d,&status);
 	}
 
 	
@@ -733,9 +735,11 @@ void dublin_meson_correlators(double** correlator[], char corr_name[][256], int 
 
 
 
+#ifdef TESTING_MODE
 static void H(suNf_spinor *out, suNf_spinor *in){
 	g5Dphi(hmass,out,in);
 }
+#endif
 
 
 

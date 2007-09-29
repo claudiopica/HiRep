@@ -296,10 +296,10 @@ Attualmente questa funzione usa l'invertitore \verb|MINRES|.
 
 \item Vengono calcolate le matrici $\mathcal{O}^{\alpha\beta}(t)$ nello spazio di spin, contraendo in tutte le possibili sorgenti con tutti i possibili pozzi. Schematicamente:
 \begin{eqnarray*}
-&& \mathcal{O}^{\alpha\beta}(t) = \frac{1}{V_3} \sum_{\mathbf{x}} \frac{1}{\lambda_b} v^{\alpha\dagger}_a(\mathbf{x},t) v^\beta_b(\mathbf{x},t) \\
-&& \mathcal{O}^{\alpha\beta}(t) = \frac{1}{V_3} \sum_{\mathbf{x}} \frac{1}{\lambda_b} \eta^{\alpha\dagger(d)}_{[r]}(\mathbf{x},t) v^\beta_b(\mathbf{x},t) \\
-&& \mathcal{O}^{\alpha\beta}(t) = \frac{1}{V_3} \sum_{\mathbf{x}} \frac{1}{N_r} v^{\alpha\dagger}_a(\mathbf{x},t) \xi^{\beta(d)}_{[r]}(\mathbf{x},t) \\
-&& \mathcal{O}^{\alpha\beta}(t) = \frac{1}{V_3} \sum_{\mathbf{x}} \frac{1}{N_r} \eta^{\alpha\dagger(d)}_{[r]}(\mathbf{x},t) \xi^{\beta(f)}_{[s]}(\mathbf{x},t) \point
+&& \mathcal{O}^{\beta\alpha}(t) = \frac{1}{V_3} \sum_{\mathbf{x}} \frac{1}{\lambda_b} v^{\alpha\dagger}_a(\mathbf{x},t) v^\beta_b(\mathbf{x},t) \\
+&& \mathcal{O}^{\beta\alpha}(t) = \frac{1}{V_3} \sum_{\mathbf{x}} \frac{1}{\lambda_b} \eta^{\alpha\dagger(d)}_{[r]}(\mathbf{x},t) v^\beta_b(\mathbf{x},t) \\
+&& \mathcal{O}^{\beta\alpha}(t) = \frac{1}{V_3} \sum_{\mathbf{x}} \frac{1}{N_r} v^{\alpha\dagger}_a(\mathbf{x},t) \xi^{\beta(d)}_{[r]}(\mathbf{x},t) \\
+&& \mathcal{O}^{\beta\alpha}(t) = \frac{1}{V_3} \sum_{\mathbf{x}} \frac{1}{N_r} \eta^{\alpha\dagger(d)}_{[r]}(\mathbf{x},t) \xi^{\beta(f)}_{[s]}(\mathbf{x},t) \point
 \end{eqnarray*}
 Tutte queste contrazioni tra pozzi e sorgenti sono ottenute con la funzione\\
 \verb|   static void source_sink_contraction(complex out[][16],|\\

@@ -69,11 +69,11 @@ int main(int argc,char *argv[]) {
   /* a relative precision omega2 (whichever is reached first). */
 
 
-  nev = 50;
-  nevt = 50;
+  nev = 100;
+  nevt = 100;
   kmax = 50;
-  imax = nevt*10;
-  omega1 = 1e-9;
+  imax = nevt*5;
+  omega1 = 1e-6;
   omega2 = 1e-6;
 
 
