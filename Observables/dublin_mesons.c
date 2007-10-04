@@ -15,16 +15,12 @@
 * Parameters.
 * n_eigenvalues : the number of eigenvalues needed to compute the firts part
 *                 of the quark propagator
-* n_hp_eigenvalues : the number of eigenvalues (it must be less or equal than
-*                 n_eigenvalues) to be computed with the given precision
-*                 (see omega1, omega2)
+* nevt :          nevt parameter of eva
 * n_global_noisy_sources_per_point : the number of stochastic sources needed
 *                 to estimate the second part of the quark propagator
-* omega1 : the absolute precision required to compute 'n_hp_eigenvalues'
-*                 eigenvalues (see eva.c)
-* omega2 : the relative precision required to compute 'n_hp_eigenvalues'
-*                 eigenvalues (see eva.c)
-* acc : the precision to be used in the inversion routines
+* omega1 :        the absolute precision required to compute the eigenvalues
+* omega2 :        the relative precision required to compute the eigenvalues
+* acc :           the precision to be used in the inversion routines
 *
 *
 * Only the function
@@ -81,7 +77,7 @@
 #define SOURCE_INDEX(m,r,t) ( (m)*n_diluted_noisy_sources + (r)*n_dilution_slices + (t) )
 #define SINK_INDEX(m,r,t) ( ((r)*n_dilution_slices + (t))*n_masses + (m) )
 #define DILUTION_INDEX(r,t) ( (r)*n_dilution_slices + (t) )
-#define EV_INDEX(m,a) ( (m)*n_eigenvalues + (a) )
+#define EV_INDEX(m,a) ( (m)*nevt + (a) )
 
 
 static int loglevel = 0;
@@ -95,10 +91,10 @@ static const float omega1 = 1e-6;
 static const float omega2 = 1e-6;
 static const float acc = 1e-9;
 
-enum{ n_eigenvalues = 100 }; /* N_{ev} */
-enum{ n_hp_eigenvalues = 100 };
+enum{ n_eigenvalues = 4 }; /* N_{ev} */
+enum{ nevt = 12 };
 
-enum{ n_global_noisy_sources_per_point = 1 }; /* N_r */
+enum{ n_global_noisy_sources_per_point = 2 }; /* N_r */
 enum{ n_points = 2 };
 enum{ n_global_noisy_sources = n_global_noisy_sources_per_point * n_points }; /* N_{gns} */
 #ifdef TIME_DILUTION
@@ -114,8 +110,9 @@ enum{ n_sources = n_eigenvalues + n_diluted_noisy_sources };
 enum{ n_gamma_matrices = 16 };
 enum{ n_correlators = 17 };
 
-static double *d;          /* [i*n_eigenvalues+j], i<n_masses, j<n_eigenvalues */
-static suNf_spinor **ev;   /* [i*n_eigenvalues+j], i<n_masses, j<n_eigenvalues */
+static double *d;              /* [i*nevt+j], i<n_masses, j<n_eigenvalues */
+static suNf_spinor **ev;       /* [i*nevt+j], i<n_masses, j<n_eigenvalues */
+static suNf_spinor **trash_ev; /* [i], i<nevt-n_eigenvalues */
 
 static suNf_spinor **noisy_sources; /* [i*n_diluted_noisy_sources+j], i<n_masses, j<n_diluted_noisy_sources */
 static suNf_spinor **noisy_sinks;   /* [i*n_masses+j], i<n_masses, j<n_diluted_noisy_sources */
@@ -248,7 +245,7 @@ void dublin_meson_correlators(double** correlator[], char corr_name[][256], int 
 	/* compute the lowest n_eigenvalues eigenvalues/vectors */
 
 	if(n_eigenvalues > 0) {
-		dirac_eva(n_hp_eigenvalues,n_eigenvalues,50,5*n_eigenvalues,omega1,omega2,n_masses,mass,ev,d,&status);
+		dirac_eva(n_eigenvalues,nevt,50,5*n_eigenvalues,omega1,omega2,n_masses,mass,ev,d,&status);
 	}
 
 	
@@ -752,7 +749,7 @@ static void D(suNf_spinor *out, suNf_spinor *in){
 
 
 static void all_to_all_quark_propagator_init() {
-	int m;
+	int m, a;
 	static int init_flag = 0;
 	double requiredmemory = 0.0;
 #ifdef TESTINGMODE
@@ -766,10 +763,18 @@ static void all_to_all_quark_propagator_init() {
 	/* static complex meson[n_gamma_matrices][n_sources*n_sources][T]; */
 	requiredmemory += sizeof(complex)*n_gamma_matrices*n_sources*n_sources*T;
 	
-	d = (double*)malloc(sizeof(double)*n_masses*n_eigenvalues);
-	ev = (suNf_spinor**)malloc(sizeof(suNf_spinor*)*n_masses*n_eigenvalues);
-	for(m = 0; m < n_masses*n_eigenvalues; m++)
-		ev[m] = alloc_spinor_field_f();
+	trash_ev = (suNf_spinor**)malloc(sizeof(suNf_spinor*)*(nevt-n_eigenvalues));
+	for(a = 0; a < nevt-n_eigenvalues; a++)
+		trash_ev[a] = alloc_spinor_field_f();
+		
+	d = (double*)malloc(sizeof(double)*n_masses*nevt);
+	ev = (suNf_spinor**)malloc(sizeof(suNf_spinor*)*n_masses*nevt);
+	for(m = 0; m < n_masses*n_eigenvalues; m++) {
+		for(a = 0; a < n_eigenvalues; a++)
+			ev[EV_INDEX(m,a)] = alloc_spinor_field_f();
+		for(a = n_eigenvalues; a < nevt; a++)
+			ev[EV_INDEX(m,a)] = trash_ev[a-n_eigenvalues];
+	}
 	requiredmemory += sizeof(suNf_spinor)*VOLUME*n_eigenvalues*n_masses;
 	
 	noisy_sources = (suNf_spinor**)malloc(sizeof(suNf_spinor*)*n_masses*n_diluted_noisy_sources);

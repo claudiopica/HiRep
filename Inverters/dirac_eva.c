@@ -264,7 +264,7 @@ void dirac_eva_onemass(int nev,int nevt,int kmax,
 	
 	ie = eva(VOLUME,nev,nevt,init,kmax,imax,ubnd,omega1,omega2,&H2,ws,ev,d,status);
 
-	lprintf("DIRAC_EVA_ONEMASS",10,"Computed %d eigenvetors of H2.\n",nevt);
+	lprintf("DIRAC_EVA_ONEMASS",10,"Computed %d eigenvetors of H2.\n",nev);
 
 #ifdef TESTINGMODE	
 	for(i = 0; i < nevt; i++) {
@@ -275,8 +275,8 @@ void dirac_eva_onemass(int nev,int nevt,int kmax,
 	}
 
 	norm = 0.;
-	for(i = 0; i < nevt; i++)
-	for(j = 0; j < nevt; j++) {
+	for(i = 0; i < nev; i++)
+	for(j = 0; j < nev; j++) {
 	   prod.re = spinor_field_prod_re_f(ev[i],ev[j]);
 	   prod.im = spinor_field_prod_im_f(ev[i],ev[j]);
 	   if(i == j) norm += (prod.re-1.)*(prod.re-1.);
@@ -288,13 +288,14 @@ void dirac_eva_onemass(int nev,int nevt,int kmax,
 
 #endif
 
-	for(i = 0; i < nevt; i++) {
+	for(i = 0; i < nev; i++) {
 		double nplus, nminus;
-		H(plus,ev[i]);
-		spinor_field_lc_f(minus, 1., ev[i], -1./sqrt(d[i]), plus);
-		spinor_field_lc_f(plus, 1., ev[i], 1./sqrt(d[i]), plus);
+		H(test,ev[i]);
+		spinor_field_lc_f(minus, 1., ev[i], -1./sqrt(d[i]), test);
+		spinor_field_lc_f(plus, 1., ev[i], 1./sqrt(d[i]), test);
 		nplus = sqrt(spinor_field_sqnorm_f(plus));
 		nminus = sqrt(spinor_field_sqnorm_f(minus));
+
 		if(nplus > nminus) {
 			spinor_field_mul_f(ev[i],1./nplus,plus);
 			d[i] = sqrt(d[i]);
@@ -302,7 +303,7 @@ void dirac_eva_onemass(int nev,int nevt,int kmax,
 			spinor_field_mul_f(ev[i],1./nminus,minus);
 			d[i] = -sqrt(d[i]);
 		}
-		for(j = i+1; j < nevt; j++) {
+		for(j = i+1; j < nev; j++) {
 	 		prod.re = -spinor_field_prod_re_f(ev[i],ev[j]);
 	 		prod.im = -spinor_field_prod_im_f(ev[i],ev[j]);
 	 		spinor_field_mulc_add_assign_f(ev[j],prod,ev[i]);
@@ -312,7 +313,7 @@ void dirac_eva_onemass(int nev,int nevt,int kmax,
 	}
 
 
-	for(i = 0; i < nevt; i++) {
+	for(i = 0; i < nev; i++) {
 		H(test,ev[i]);
 		spinor_field_mul_add_assign_f(test,-d[i],ev[i]);
 		norm=spinor_field_sqnorm_f(test);
