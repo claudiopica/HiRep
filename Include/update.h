@@ -80,9 +80,8 @@ void suNg_field_copy(suNg *g1, suNg *g2);
 
 /* use power method to find min eigvalue of H2 */
 int max_H2(double *min, double mass);
-/* use power method to find min eigvalue of H2 */
-int min_H2(double *min, double max, double mass);
 
+/* find spectral interval using eva */
 void find_spec_H2(double *max, double *min, double mass);
 
 #endif

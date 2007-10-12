@@ -5,12 +5,14 @@
 #include "observables.h"
 #include "dirac.h"
 #include "utils.h"
+#include "memory.h"
 #include "update.h"
 #include "error.h"
 #include <malloc.h>
 #include <math.h>
 #include <assert.h>
 #include "logger.h"
+
 
 spinor_operator loc_H;
 static suNf_spinor tmpspinor[VOLUME];
@@ -54,19 +56,20 @@ void quark_propagator_QMR_eo(FILE *propfile, unsigned int ssite, int nm, double 
   suNf_spinor *test=0; /*doppia o singola? */
 
   /* allocate input spinor field */
-  in = (suNf_spinor *)malloc(sizeof(suNf_spinor)*VOLUME/2);
-	resdn=(suNf_spinor**)malloc(sizeof(suNf_spinor*)*nm);
-	resdn[0]=(suNf_spinor*)malloc(sizeof(suNf_spinor)*nm*VOLUME/2);
-	for(i=1;i<nm;++i)
-		resdn[i]=resdn[i-1]+VOLUME/2;
-	resd=(suNf_spinor**)malloc(sizeof(suNf_spinor*)*nm);
-	resd[0]=(suNf_spinor*)malloc(sizeof(suNf_spinor)*nm*VOLUME/2);
-	for(i=1;i<nm;++i)
-		resd[i]=resd[i-1]+VOLUME/2;
-  res = (suNf_spinor*)malloc(sizeof(suNf_spinor)*VOLUME);
-  test = (suNf_spinor *)malloc(sizeof(suNf_spinor)*VOLUME);
+	set_spinor_len(VOLUME);
+  res = alloc_spinor_field_f(1);
+  test = alloc_spinor_field_f(1);
 
   set_spinor_len(VOLUME/2);
+	resdn=(suNf_spinor**)malloc(sizeof(suNf_spinor*)*nm*2);
+	resd=resdn+nm;
+	in = alloc_spinor_field_f(2*nm+1);
+	resdn[0] = in+VOLUME/2;
+	for(i=1;i<nm;++i)
+		resdn[i]=resdn[i-1]+VOLUME/2;
+	resd[0]=resdn[nm-1];
+	for(i=1;i<nm;++i)
+		resd[i]=resd[i-1]+VOLUME/2;
 
 	/* set up inverters parameters */
   shift=(double*)malloc(sizeof(double)*(nm));
@@ -134,10 +137,7 @@ void quark_propagator_QMR_eo(FILE *propfile, unsigned int ssite, int nm, double 
 	lprintf("PROPAGATOR",10,"QMR_eo MVM = %d\n",cgiter);
   
   /* free memory */
-  free(in);
-	free(resd[0]);
-	free(resd);
-	free(resdn[0]);
+  free_field(in);
 	free(resdn);
   free(shift);
 	free(test);

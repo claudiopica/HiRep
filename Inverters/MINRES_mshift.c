@@ -2,6 +2,7 @@
 #include "linear_algebra.h"
 #include "complex.h"
 #include "malloc.h"
+#include "memory.h"
 #include "update.h"
 #include "logger.h"
 #include <stdio.h>
@@ -48,9 +49,9 @@ int MINRES_mshift_core(short int *flags,mshift_par *par, spinor_operator M, suNf
 	get_spinor_len(&spinorlen);
 	q1 = (suNf_spinor **)malloc(sizeof(suNf_spinor*)*2*(par->n));
 	q2 = q1+(par->n);
-	q1[0] = (suNf_spinor *)malloc(sizeof(suNf_spinor)*(2*(par->n)+3)*(spinorlen));
+	memall = alloc_spinor_field_f(2*(par->n)+3);
+	q1[0] = memall;
 	q2[0] = q1[0]+(par->n)*(spinorlen);
-	memall=q1[0];
 	for (i=1; i<(par->n); ++i) {
 		q1[i] = q1[i-1]+(spinorlen);
 		q2[i] = q2[i-1]+(spinorlen);
@@ -182,7 +183,7 @@ int MINRES_mshift_core(short int *flags,mshift_par *par, spinor_operator M, suNf
 
 
 	/* free memory */
-	free(memall);
+	free_field(memall);
 	free(q1);
 	free(r);
 

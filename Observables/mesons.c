@@ -2,9 +2,6 @@
 #include "linear_algebra.h"
 #include "suN.h"
 #include "observables.h"
-#include <malloc.h>
-
-
 
 #define _INDEX_(i,s) ( (s-1)*NF+(i) )
 

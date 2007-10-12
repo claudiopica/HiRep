@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "global.h"
+#include "memory.h"
 #include "logger.h"
 
 /*
@@ -37,7 +38,7 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
    /* allocate spinors fields and aux real variables */
 	 get_spinor_len(&spinorlen);
    p = malloc(sizeof(suNf_spinor*)*(par->n));
-   p[0] = malloc(sizeof(suNf_spinor)*(3+par->n)*spinorlen);
+   p[0] = alloc_spinor_field_f(3+par->n);
    for (i=1; i<(par->n); ++i) {
       p[i] = p[i-1]+spinorlen;
    }
@@ -135,7 +136,7 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
    }
    
    /* free memory */
-   free(p[0]);
+   free_field(p[0]);
    free(p);
    free(z1); free(z2); free(z3);
 

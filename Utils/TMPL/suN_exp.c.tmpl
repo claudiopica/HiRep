@@ -79,7 +79,7 @@ void ExpX2(double dt, suNg_algebra_vector *h, suNg *u)
 	}
 	
 	k = 0;
-	for(j = 1; NG; j++)
+	for(j = 1; j<NG; j++) /* Aggiunto il j< testare. Claudio */
 	for(i = 0; i < j; i++) {
 		y[0] = dt * (*XA(hf,TI(j,i)));
 		y[1] = -dt * (*XA(hf,TI(i,j)));

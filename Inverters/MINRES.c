@@ -2,6 +2,7 @@
 #include "linear_algebra.h"
 #include "complex.h"
 #include "malloc.h"
+#include "memory.h"
 #include "update.h"
 #include "logger.h"
 #include <stdio.h>
@@ -45,7 +46,7 @@ static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, suN
    * objects of the same type are allocated together
    */
 	get_spinor_len(&spinorlen);
-  memall = (suNf_spinor *)malloc(sizeof(suNf_spinor)*(5)*(spinorlen));
+  memall = alloc_spinor_field_f(5);
   q1=memall;
   q2= q1+(spinorlen);
   p1 = q2+(spinorlen);
@@ -153,7 +154,7 @@ static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, suN
 	} 
    
   /* free memory */
-  free(memall);
+  free_field(memall);
 
   /* return number of cg iter */
   return cgiter;

@@ -21,7 +21,8 @@ suNg* alloc_gfield();
 suNf* alloc_gfield_f();
 suNg_flt* alloc_gfield_flt();
 suNf_flt* alloc_gfield_f_flt();
-suNf_spinor* alloc_spinor_field_f();
+suNf_spinor* alloc_spinor_field_f(unsigned int n);
+suNf_spinor_flt* alloc_spinor_field_f_flt(unsigned int n);
 suNg_algebra_vector* alloc_momenta();
 
 

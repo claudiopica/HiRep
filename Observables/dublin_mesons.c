@@ -236,7 +236,7 @@ void dublin_meson_correlators(double** correlator[], char corr_name[][256], int 
 	/* allocate memory */
 
 	set_spinor_len(VOLUME);
-	test = alloc_spinor_field_f();
+	test = alloc_spinor_field_f(1);
 	all_to_all_quark_propagator_init();
 #ifdef QMR_INVERTER
 	QMR_init(0);
@@ -765,13 +765,13 @@ static void all_to_all_quark_propagator_init() {
 	
 	trash_ev = (suNf_spinor**)malloc(sizeof(suNf_spinor*)*(nevt-n_eigenvalues));
 	for(a = 0; a < nevt-n_eigenvalues; a++)
-		trash_ev[a] = alloc_spinor_field_f();
+		trash_ev[a] = alloc_spinor_field_f(1);
 		
 	d = (double*)malloc(sizeof(double)*n_masses*nevt);
 	ev = (suNf_spinor**)malloc(sizeof(suNf_spinor*)*n_masses*nevt);
 	for(m = 0; m < n_masses*n_eigenvalues; m++) {
 		for(a = 0; a < n_eigenvalues; a++)
-			ev[EV_INDEX(m,a)] = alloc_spinor_field_f();
+			ev[EV_INDEX(m,a)] = alloc_spinor_field_f(1);
 		for(a = n_eigenvalues; a < nevt; a++)
 			ev[EV_INDEX(m,a)] = trash_ev[a-n_eigenvalues];
 	}
@@ -780,16 +780,16 @@ static void all_to_all_quark_propagator_init() {
 	noisy_sources = (suNf_spinor**)malloc(sizeof(suNf_spinor*)*n_masses*n_diluted_noisy_sources);
 	noisy_sinks = (suNf_spinor**)malloc(sizeof(suNf_spinor*)*n_masses*n_diluted_noisy_sources);
 	for(m = 0; m < n_masses*n_diluted_noisy_sources; m++) {
-		noisy_sources[m] = alloc_spinor_field_f();
-		noisy_sinks[m] = alloc_spinor_field_f();
+		noisy_sources[m] = alloc_spinor_field_f(1);
+		noisy_sinks[m] = alloc_spinor_field_f(1);
 	}
 	requiredmemory += 2*sizeof(suNf_spinor)*VOLUME*n_masses*n_diluted_noisy_sources;
 
 #ifdef QMR_INVERTER
-	QMR_source = alloc_spinor_field_f();
+	QMR_source = alloc_spinor_field_f(1);
 	QMR_sinks = (suNf_spinor**)malloc(sizeof(suNf_spinor*)*n_masses);
 	for(m = 0; m < n_masses; m++)
-		QMR_sinks[m] = alloc_spinor_field_f();
+		QMR_sinks[m] = alloc_spinor_field_f(1);
 	requiredmemory += (1+n_masses)*sizeof(suNf_spinor)*VOLUME;
 #endif
 	

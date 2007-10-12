@@ -20,8 +20,6 @@
 #error : The lattice size should be at least 2 in all directions
 #endif
 
-#include "suN_types.h"
-
 #ifdef MAIN_PROGRAM
 #  define EXTERN
 #else
@@ -33,7 +31,9 @@ EXTERN int ipt[T][L][L][L];
 EXTERN int ipt_4d[T][VOL3];
 EXTERN int iup[VOLUME][4];
 EXTERN int idn[VOLUME][4];
-EXTERN int tslice[VOLUME];
+/* EXTERN int tslice[VOLUME]; */
+
+#include "suN_types.h"
 
 /* Gauge field pointer */
 EXTERN suNg *u_gauge;

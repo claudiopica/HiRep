@@ -4,6 +4,7 @@
 #include "dirac.h"
 #include "suN.h"
 #include "random.h"
+#include "memory.h"
 #include "global.h"
 #include <math.h>
 #include <malloc.h>
@@ -49,14 +50,17 @@ static void min_bound_H2(double *min) {
 }
 */
 
-/* use power method to find min eigvalue */
+/* use power method to find max eigvalue */
 int max_H2(double *max, double mass) {
   double norm, oldmax, dt;
   int count;
   suNf_spinor *s1,*s2,*s3;
-  s1=(suNf_spinor*)malloc(sizeof(suNf_spinor)*3*VOLUME);
-  s2=s1+VOLUME;
-  s3=s2+VOLUME;
+	unsigned int len;
+
+	get_spinor_len(&len);
+  s1=alloc_spinor_field_f(3);
+  s2=s1+len;
+  s3=s2+len;
 
   /* random spinor */
   ranlxd((double*)s1,(sizeof(suNf_spinor)/sizeof(double))*VOLUME);
@@ -104,120 +108,10 @@ int max_H2(double *max, double mass) {
 
   lprintf("MaxH2",10,"Max_eig = %1.8e [MVM = %d]\n",*max,count); 
 
-  free(s1);
+  free_field(s1);
   
 	return count;
 }
-
-int min_H2(double *min, double max, double mass) {
-  double norm, oldmin;
-  int count;
-  suNf_spinor *s1,*s2,*s3;
-  s1=(suNf_spinor*)malloc(sizeof(suNf_spinor)*4*VOLUME);
-  s2=s1+VOLUME;
-  s3=s2+VOLUME;  
-
-  /* random spinor */
-  ranlxd((double*)s1,(sizeof(suNf_spinor)/sizeof(double))*VOLUME);
-  norm=sqrt(spinor_field_sqnorm_f(s1));
-  spinor_field_mul_f(s1,1./norm,s1);
-  
-  if(max==0.) {
-    max=4.+fabs(4.+mass);
-    max*=max;
-  }
-  
-  g5Dphi(mass,s2,s1);
-  g5Dphi(mass,s3,s2);
-    
-  count=1;
-  do {
-    /* multiply vector by max-H2 */
-    ++count;
-
-    spinor_field_mul_f(s1,max,s1);
-    spinor_field_sub_assign_f(s1,s3);
-
-    norm=sqrt(spinor_field_sqnorm_f(s1));
-    spinor_field_mul_f(s1,1./norm,s1);
-    
-    /* check the eigen value */
-    g5Dphi(mass,s2,s1);
-    g5Dphi(mass,s3,s2);
-
-    oldmin=*min;
-    *min = spinor_field_prod_re_f(s1,s3);
-
-    /* printf("Iter %d: %4.5e\n",count,fabs(oldnorm-norm)); */
-  } while (fabs((oldmin-*min)/(*min))>1.e-4);
-
-  *min*=0.95; /* do not know exact bound */
-
-  lprintf("MinH2",10,"Min_eig = %1.8e [MVM = %d]\n",*min,count); 
-
-  free(s1);  
-
-	return count;
-}
-
-void new_min_H2(double *min, double mass) {
-  int count;
-  double lambda, a, b, g, delta, norm, oldl;
-  suNf_spinor *x,*z,*s1,*s2;
-  x=(suNf_spinor*)malloc(sizeof(suNf_spinor)*4*VOLUME);
-  z=x+VOLUME;
-  s1=z+VOLUME;  
-  s2=s1+VOLUME;  
-
-  /* random spinor */
-  ranlxd((double*)x,(sizeof(suNf_spinor)/sizeof(double))*VOLUME);
-  norm=sqrt(spinor_field_sqnorm_f(x));
-  spinor_field_mul_f(x,1./norm,x);
-
-  g5Dphi(mass,s2,x);
-  g5Dphi(mass,s1,s2);
-  
-  lambda=spinor_field_prod_re_f(x,s1);
-
-  spinor_field_mul_f(z,lambda,x);
-  spinor_field_sub_assign_f(z,s1);
-
-  delta=sqrt(spinor_field_sqnorm_f(z));
-
-  count=1;
-  do{
-    g5Dphi(mass,s2,s1);
-    g5Dphi(mass,s1,s2);
-    a=spinor_field_prod_re_f(x,s1)-lambda*lambda;
-    g5Dphi(mass,s2,s1);
-    g5Dphi(mass,s1,s2);
-    b=spinor_field_prod_re_f(x,s1)-(3.*a+lambda*lambda)*lambda;
-    g=b/(2.*a);
-    g=(sqrt(g*g+a)-g)/a;
-    spinor_field_mul_add_assign_f(x,g,z);
-    norm=sqrt(spinor_field_sqnorm_f(x));
-    spinor_field_mul_f(x,1./norm,x);
-    
-    g5Dphi(mass,s2,x);
-    g5Dphi(mass,s1,s2);
-    oldl=lambda;
-    lambda=spinor_field_prod_re_f(x,s1);
-
-    spinor_field_mul_f(z,lambda,x);
-    spinor_field_sub_assign_f(z,s1);
-
-    delta=sqrt(spinor_field_sqnorm_f(z));
-    count+=3;
-    
-  } while (fabs((oldl-lambda)/lambda)>1.e-4);
-
-  *min=0.95*lambda;
-  lprintf("New_MinH2",10,"NEW Min_eig = %1.8e [MVM = %d]\n",*min,count); 
-
-  free(x);
-  
-}
-
 
 static suNf_spinor **ev;
 
@@ -234,22 +128,25 @@ void find_spec_H2(double *max, double *min, double mass) {
 	suNf_spinor **ws;
 	/* END of EVA parameters */
 	int MVM=0; /* counter for matrix-vector multiplications */
+	unsigned int len;
 
 
 	MVM+=max_H2(max, mass);
 
+	get_spinor_len(&len);
+
 	d1=malloc(sizeof(*d1)*nevt);
 	ev=malloc(sizeof(*ev)*(nevt+2));
-	ev[0]=malloc(sizeof(**ev)*(nevt+2)*VOLUME);
+	ev[0]=alloc_spinor_field_f((nevt+2));
 	for (status=1;status<nevt+2;++status) {
-		ev[status]=ev[status-1]+VOLUME;
+		ev[status]=ev[status-1]+len;
 	}
 	ws=ev+nevt;
 
-	ie=eva(VOLUME,nev,nevt,0,kmax,maxiter,*max,omega1,omega2,&H2,ws,ev,d1,&status);
+	ie=eva(len,nev,nevt,0,kmax,maxiter,*max,omega1,omega2,&H2,ws,ev,d1,&status);
 	MVM+=status;
 	while (ie!=0) { /* if failed restart EVA */
-		ie=eva(VOLUME,nev,nevt,2,kmax,maxiter,*max,omega1,omega2,&H2,ws,ev,d1,&status);
+		ie=eva(len,nev,nevt,2,kmax,maxiter,*max,omega1,omega2,&H2,ws,ev,d1,&status);
 		MVM+=status;
 	}
 
@@ -258,7 +155,7 @@ void find_spec_H2(double *max, double *min, double mass) {
 	lprintf("SPECLIMITS",0,"Range = [%1.8e,%1.8e] [MVM = %d]\n",*min,*max,MVM);
 
 	free(d1);
-	free(ev[0]);
+	free_field(ev[0]);
 	free(ev);
 
 	return;

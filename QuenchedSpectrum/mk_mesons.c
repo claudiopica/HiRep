@@ -99,10 +99,13 @@ int main(int argc,char *argv[])
 	/*geometry_blocked();*/
 	test_geometry();
 
+	set_spinor_len(VOLUME);
+
 	/* setup for quark propagators measures */
 	quark_prop=(suNf_spinor**)malloc(sizeof(suNf_spinor*)*4*NF);
-	for (n=0;n<4*NF;++n)
-		quark_prop[n]=(suNf_spinor*)malloc(sizeof(suNf_spinor)*VOLUME);
+	quark_prop[0]=alloc_spinor_field_f(4*NF);
+	for (n=1;n<4*NF;++n)
+		quark_prop[n]=quark_prop[n-1]+VOLUME;
 
 	propsize=sizeof(suNf_spinor)*VOLUME;
 	start=ftell(propfile);
@@ -152,8 +155,7 @@ int main(int argc,char *argv[])
 	fclose(propfile);
 
 
-	for (n=0;n<4*NF;++n)
-		free(quark_prop[n]);
+	free_field(quark_prop[0]);
 	free(quark_prop);
 
 	free(m);

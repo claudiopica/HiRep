@@ -3,6 +3,7 @@
 #include "linear_algebra.h"
 #include "rational_functions.h"
 #include "error.h"
+#include "memory.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <malloc.h>
@@ -229,17 +230,24 @@ void rational_func(rational_app *coef, spinor_operator Q, suNf_spinor *out, suNf
    static mshift_par inv_par;
    suNf_spinor **inv_out;
    int i;
+	 unsigned int len;
 
+	 get_spinor_len(&len);
    /* allocate cg output vectors */
    inv_out = malloc(sizeof(*inv_out)*(coef->order));
-   for (i=0; i<(coef->order); ++i) {
-      inv_out[i] = malloc(sizeof(**inv_out)*VOLUME);
+	 inv_out[0] = alloc_spinor_field_f(coef->order);
+   for (i=1; i<(coef->order); ++i) {
+      inv_out[i] = inv_out[i-1]+len;
    }
 
    /* set up cg parameters */
    inv_par.n = coef->order;
    inv_par.shift = coef->b;
    inv_par.err2=coef->rel_error/coef->order;    /* CAMBIARE: METTERE PARAMETRI COMUNI ALL'UPDATE */
+   inv_par.err2*=inv_par.err2;
+#define EPSILON 1.e-29
+	 if(inv_par.err2<EPSILON) inv_par.err2=EPSILON;
+#undef EPSILON
    inv_par.max_iter=0; /* no limit */
    
    /* compute inverse vectors */
@@ -252,9 +260,7 @@ void rational_func(rational_app *coef, spinor_operator Q, suNf_spinor *out, suNf
    }
 
    /* free memory */
-   for (i=0; i<(coef->order); ++i) {
-      free(inv_out[i]);
-   }
+	 free_field(inv_out[0]);
    free(inv_out);
 
 }

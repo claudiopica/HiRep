@@ -8,6 +8,7 @@
 #include "representation.h"
 #include "logger.h"
 #include "linear_algebra.h"
+#include "memory.h"
 
 #include <malloc.h>
 #include <stdio.h>
@@ -84,14 +85,16 @@ void Force_rhmc_f(double dt, suNg_algebra_vector *force){
 	suNf_spinor *Hchi;
 	double avrforce,maxforce;
 	double nsq;
+	unsigned int len;
 
+	get_spinor_len(&len);
 	/* allocate spinors */
 	chi = (suNf_spinor **)malloc(sizeof(*chi)*(r_MD.order));
-	chi[0] = (suNf_spinor *)malloc(sizeof(**chi)*((r_MD.order+1)*VOLUME));
+	chi[0] = alloc_spinor_field_f(r_MD.order+1);
 	for (i=1; i<(r_MD.order); ++i) {
-		chi[i]=chi[i-1]+VOLUME;
+		chi[i]=chi[i-1]+len;
 	} 
-	Hchi = chi[r_MD.order-1]+VOLUME;
+	Hchi = chi[r_MD.order-1]+len;
 
 	/* Compute (H^2-b[n])^-1 * pf */
 	/* set up cg parameters */
@@ -176,7 +179,7 @@ void Force_rhmc_f(double dt, suNg_algebra_vector *force){
 		}  
 	}
 
-	free(chi[0]);
+	free_field(chi[0]);
 	free(chi);
 
 }

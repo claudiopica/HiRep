@@ -387,7 +387,7 @@ sub write_vector_zero {
 		for(my $i=0;$i<$vr;$i++){
 			print "      _complex_0((r).$cname\[_i\]); ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -409,7 +409,7 @@ sub write_vector_minus {
 		for(my $i=0;$i<$vr;$i++){
 			print "      _complex_minus((r).$cname\[_i\],(s).$cname\[_i\]); ++_i; \\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -431,7 +431,7 @@ sub write_vector_mul {
 		for(my $i=0;$i<$vr;$i++){
 			print "      _complex_mulr((r).$cname\[_i\],(k),(s).$cname\[_i\]); ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -453,7 +453,7 @@ sub write_vector_mulc {
 		for(my $i=0;$i<$vr;$i++){
 			print "      _complex_mul((r).$cname\[_i\],(z),(s).$cname\[_i\]); ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -475,7 +475,7 @@ sub write_vector_add {
 		for(my $i=0;$i<$vr;$i++){
 			print "      _complex_add((r).$cname\[_i\],(s1).$cname\[_i\],(s2).$cname\[_i\]); ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -497,7 +497,7 @@ sub write_vector_sub {
 		for(my $i=0;$i<$vr;$i++){
 			print "      _complex_sub((r).$cname\[_i\],(s1).$cname\[_i\],(s2).$cname\[_i\]); ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -519,7 +519,7 @@ sub write_vector_i_add {
 		for(my $i=0;$i<$vr;$i++){
 			print "      _complex_i_add((r).$cname\[_i\],(s1).$cname\[_i\],(s2).$cname\[_i\]); ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -541,7 +541,7 @@ sub write_vector_i_sub {
 		for(my $i=0;$i<$vr;$i++){
 			print "      _complex_i_sub((r).$cname\[_i\],(s1).$cname\[_i\],(s2).$cname\[_i\]); ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -563,7 +563,7 @@ sub write_vector_add_assign {
 		for(my $i=0;$i<$vr;$i++){
 			print "      _complex_add_assign((r).$cname\[_i\],(s).$cname\[_i\]); ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -585,7 +585,7 @@ sub write_vector_sub_assign {
 		for(my $i=0;$i<$vr;$i++){
 			print "      _complex_sub_assign((r).$cname\[_i\],(s).$cname\[_i\]); ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -607,7 +607,7 @@ sub write_vector_i_add_assign {
 		for(my $i=0;$i<$vr;$i++){
 			print "      _complex_i_add_assign((r).$cname\[_i\],(s).$cname\[_i\]); ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -629,7 +629,7 @@ sub write_vector_i_sub_assign {
 		for(my $i=0;$i<$vr;$i++){
 			print "      _complex_i_sub_assign((r).$cname\[_i\],(s).$cname\[_i\]); ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -654,7 +654,7 @@ sub write_vector_prod_re {
 		for(my $i=0;$i<$mr;$i++){
 			print "      (k)+=_complex_prod_re((r).$cname\[_i\],(s).$cname\[_i\]); ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -679,7 +679,7 @@ sub write_vector_prod_im {
 		for(my $i=0;$i<$mr;$i++){
 			print "      (k)+=_complex_prod_im((r).$cname\[_i\],(s).$cname\[_i\]); ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -701,7 +701,7 @@ sub write_vector_mulc_add_assign {
 		for(my $i=0;$i<$vr;$i++){
 			print "      _complex_mul_assign((r).$cname\[_i\],(z),(s).$cname\[_i\]); ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -723,7 +723,7 @@ sub write_vector_mul_add_assign {
 		for(my $i=0;$i<$vr;$i++){
 			print "      _complex_mulr_assign((r).$cname\[_i\],(k),(s).$cname\[_i\]); ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -746,7 +746,7 @@ sub write_algebra_vector_mul_add_assign {
 		for(my $i=0;$i<$avr;$i++){
 			print "      (r).$cname\[_i\]+=(k)*(s).$cname\[_i\]; ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -769,7 +769,7 @@ sub write_algebra_vector_mul {
 		for(my $i=0;$i<$avr;$i++){
 			print "      (r).$cname\[_i\]=(k)*(s).$cname\[_i\]; ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -792,7 +792,7 @@ sub write_algebra_vector_zero {
 		for(my $i=0;$i<$avr;$i++){
 			print "      (r).$cname\[_i\]=0.; ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -828,7 +828,7 @@ sub write_algebra_vector_sqnorm {
 			else { print "((r).$cname\[_i+$i\]*(r).$cname\[_i+$i\])"; }
 			if($i==$avr-1) { print ";\\\n"; } else { print "+ \\\n           "; }
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -850,7 +850,7 @@ sub write_vector_lc {
 		for(my $i=0;$i<$vr;$i++){
 			print "      _complex_rlc((r).$cname\[_i\],(k1),(s1).$cname\[_i\],(k2),(s2).$cname\[_i\]); ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -872,7 +872,7 @@ sub write_vector_lc_add_assign {
 		for(my $i=0;$i<$vr;$i++){
 			print "      _complex_rlc_assign((r).$cname\[_i\],(k1),(s1).$cname\[_i\],(k2),(s2).$cname\[_i\]); ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -894,7 +894,7 @@ sub write_vector_clc {
 		for(my $i=0;$i<$vr;$i++){
 			print "      _complex_clc((r).$cname\[_i\],(z1),(s1).$cname\[_i\],(z2),(s2).$cname\[_i\]); ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -916,7 +916,7 @@ sub write_vector_clc_add_assign {
 		for(my $i=0;$i<$vr;$i++){
 			print "      _complex_clc_assign((r).$cname\[_i\],(z1),(s1).$cname\[_i\],(z2),(s2).$cname\[_i\]); ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -938,7 +938,7 @@ sub write_vector_prod_assign {
 		for(my $i=0;$i<$vr;$i++){
 			print "      _complex_prod_assign((z),(r).$cname\[_i\],(s).$cname\[_i\]); ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -960,7 +960,7 @@ sub write_vector_project {
 		for(my $i=0;$i<$vr;$i++){
 			print "      _complex_mul_sub_assign((r).$cname\[_i\],(z),(s).$cname\[_i\]); ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -1002,7 +1002,7 @@ sub write_suN_multiply {
 			}
 		}
 		print "      }\\\n";
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -1040,7 +1040,7 @@ sub write_suNr_multiply {
 			}
 		}
 		print "      }\\\n";
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -1080,7 +1080,7 @@ sub write_suN_inverse_multiply {
 		}
 		print "         _k-=$shift;\\\n";
 		print "      }\\\n";
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -1120,7 +1120,7 @@ sub write_suNr_inverse_multiply {
 		}
 		print "         _k-=$shift;\\\n";
 		print "      }\\\n";
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -1163,7 +1163,7 @@ sub write_suN_dagger {
 		}
 		print "         ++_n; _k-=$shift;\\\n";
 		print "      }\\\n";
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -1212,7 +1212,7 @@ sub write_suN_times_suN {
 		print "            ++_n; _k-=$shift2; _l-=$shift;\\\n";
 		print "         } _k+=$N; _l=0;\\\n";
 		print "      }\\\n";
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -1261,7 +1261,7 @@ sub write_suNr_times_suNr {
 		print "            ++_n; _k-=$shift2; _l-=$shift;\\\n";
 		print "         } _k+=$N; _l=0;\\\n";
 		print "      }\\\n";
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -1310,7 +1310,7 @@ sub write_suN_times_suN_dagger {
 		print "            ++_n; _k-=$shift2; ++_l;\\\n";
 		print "         } _k+=$N; _l=0;\\\n";
 		print "      }\\\n";
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -1333,7 +1333,7 @@ sub write_suN_zero {
 		for(my $i=0;$i<$mr2;$i++){
 			print "      _complex_0((u).$cname\[_i\]); ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -1356,7 +1356,7 @@ sub write_suNr_zero {
 		for(my $i=0;$i<$mr2;$i++){
 			print "      (u).$cname\[_i\]=0.; ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -1396,7 +1396,7 @@ sub write_suN_unit {
 				print "      _complex_1((u).$cname\[_n\]); _n+=$shift;\\\n";
 			}
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -1465,7 +1465,7 @@ sub write_suN_minus {
 		for(my $i=0;$i<$mr2;$i++){
 			print "      _complex_minus((u).$cname\[_i\],(v).$cname\[_i\]); ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -1488,7 +1488,7 @@ sub write_suNr_minus {
 		for(my $i=0;$i<$mr2;$i++){
 			print "      (u).$cname\[_i\]=-(v).$cname\[_i\]; ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -1511,7 +1511,7 @@ sub write_suN_mul {
 		for(my $i=0;$i<$mr2;$i++){
 			print "      _complex_mulr((u).$cname\[_i\],(r),(v).$cname\[_i\]); ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -1534,7 +1534,7 @@ sub write_suNr_mul {
 		for(my $i=0;$i<$mr2;$i++){
 			print "      (u).$cname\[_i\]=(r)*(v).$cname\[_i\]; ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -1557,7 +1557,7 @@ sub write_suN_add_assign {
 		for(my $i=0;$i<$mr2;$i++){
 			print "      _complex_add_assign((u).$cname\[_i\],(v).$cname\[_i\]); ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -1580,7 +1580,7 @@ sub write_suNr_add_assign {
 		for(my $i=0;$i<$mr2;$i++){
 			print "      (u).$cname\[_i\]+=(v).$cname\[_i\]; ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -1603,7 +1603,7 @@ sub write_suN_sub_assign {
 		for(my $i=0;$i<$mr2;$i++){
 			print "      _complex_sub_assign((u).$cname\[_i\],(v).$cname\[_i\]); ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -1626,7 +1626,7 @@ sub write_suNr_sub_assign {
 		for(my $i=0;$i<$mr2;$i++){
 			print "      (u).$cname\[_i\]-=(v).$cname\[_i\]; ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -1652,7 +1652,7 @@ sub write_suN_sqnorm {
 		for(my $i=0;$i<$mr2;$i++){
 			print "      (k)+=_complex_prod_re((u).$cname\[_i\],(u).$cname\[_i\]); ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -1678,7 +1678,7 @@ sub write_suNr_sqnorm {
 		for(my $i=0;$i<$mr2;$i++){
 			print "      (k)+=(u).$cname\[_i\]*(u).$cname\[_i\]; ++_i;\\\n";
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -1713,7 +1713,7 @@ sub write_suN_sqnorm_m1 {
 		print "         }\\\n";
 		print "         ++_i; _s2+=$N; _n+=_i; _l-=$shift-_s2; \\\n";
 		print "      }\\\n";
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -1751,7 +1751,7 @@ sub write_suN_trace_re {
 			$n+=$N+1;
 			if($i==$vr-1) { print ";\\\n"; } else { print "+ \\\n           "; }
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -1789,7 +1789,7 @@ sub write_suNr_trace_re {
 			$n+=$N+1;
 			if($i==$vr-1) { print ";\\\n"; } else { print "+ \\\n           "; }
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -1827,7 +1827,7 @@ sub write_suN_trace_im {
 			$n+=$N+1;
 			if($i==$vr-1) { print ";\\\n"; } else { print "+ \\\n           "; }
 		}
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -1874,7 +1874,7 @@ sub write_suN_2TA {
 		print "         ++_i; _s2+=$N; _n+=_i; _k-=$shift-_s2; \\\n";
 		print "      }\\\n";
 	}
-	print "   }while(0) \n\n";
+	print "   }((void)0) \n\n";
 }
 
 sub write_suN_TA {
@@ -1920,7 +1920,7 @@ sub write_suN_TA {
 		print "         ++_i; _s2+=$N; _n+=_i; _k-=$shift-_s2; \\\n";
 		print "      }\\\n";
 	}
-	print "   }while(0) \n\n";
+	print "   }((void)0) \n\n";
 }
 
 sub write_suN_FMAT {
@@ -1963,7 +1963,7 @@ sub write_suN_FMAT {
 			}
 		}
 		print "      }\\\n";
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -2007,7 +2007,7 @@ sub write_suNr_FMAT {
 			}
 		}
 		print "      }\\\n";
-		print "   }while(0) \n\n";
+		print "   }((void)0) \n\n";
 	}
 }
 
@@ -2173,7 +2173,7 @@ sub write_spinor_prod_re {
   for (my $k=0; $k<4; $k++){
     print "      _vector_prod_re_${suff}(_tmp,(r).$cname\[$k\],(s).$cname\[$k\]); (k)+=_tmp;\\\n";
   }
-	print "   }while(0) \n\n";
+	print "   }((void)0) \n\n";
 }
 
 sub write_spinor_prod_im {
@@ -2184,7 +2184,7 @@ sub write_spinor_prod_im {
   for (my $k=0; $k<4; $k++){
     print "      _vector_prod_im_${suff}(_tmp,(r).$cname\[$k\],(s).$cname\[$k\]); (k)+=_tmp;\\\n";
   }
-	print "   }while(0) \n\n";
+	print "   }((void)0) \n\n";
 }
 
 sub write_spinor_prod_assign {
@@ -2207,7 +2207,7 @@ sub write_spinor_g5_prod_re {
   for (my $k=2; $k<4; $k++){
     print "      _vector_prod_re_${suff}(_tmp,(r).$cname\[$k\],(s).$cname\[$k\]); (k)-=_tmp;\\\n";
   }
-	print "   }while(0) \n\n";
+	print "   }((void)0) \n\n";
 }
 
 sub write_spinor_project {

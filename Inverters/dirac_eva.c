@@ -250,12 +250,12 @@ void dirac_eva_onemass(int nev,int nevt,int kmax,
 	get_spinor_len(&volume);
 	error(volume!=VOLUME,1,"dirac_eva_onemass","The spinors must be defined in each site");
 	
-	test = alloc_spinor_field_f();
-	ws[0] = alloc_spinor_field_f();
-	ws[1] = alloc_spinor_field_f();
-	plus = alloc_spinor_field_f();
-	minus = alloc_spinor_field_f();
-	h2tmp = alloc_spinor_field_f();
+	test = alloc_spinor_field_f(1);
+	ws[0] = alloc_spinor_field_f(1);
+	ws[1] = alloc_spinor_field_f(1);
+	plus = alloc_spinor_field_f(1);
+	minus = alloc_spinor_field_f(1);
+	h2tmp = alloc_spinor_field_f(1);
 	
 	maxh2iter = max_H2(&ubnd,mass);
 	init = 0;

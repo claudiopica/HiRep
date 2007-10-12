@@ -149,7 +149,7 @@ typedef struct
    ((a).re*(b).im-(a).im*(b).re)
 
 /*
-* c+=Im(a^*b) (a,b,c complex)
+* c+=(a^*b) (a,b,c complex)
 */
 #define _complex_prod_assign(c,a,b) \
    (c).re+=((a).re*(b).re+(a).im*(b).im);\

@@ -2,6 +2,7 @@
 #include "linear_algebra.h"
 #include "complex.h"
 #include "malloc.h"
+#include "memory.h"
 #include "update.h"
 #include <stdio.h>
 #include <math.h>
@@ -46,7 +47,7 @@ int HBiCGstab_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_s
    */
 	get_spinor_len(&spinorlen);
   s = (suNf_spinor **)malloc(sizeof(suNf_spinor*)*(par->n));
-  s[0] = (suNf_spinor *)malloc(sizeof(suNf_spinor)*((par->n)+6)*(spinorlen));
+  s[0] = alloc_spinor_field_f((par->n)+6);
   for (i=1; i<(par->n); ++i) {
     s[i] = s[i-i]+(spinorlen);
   }
@@ -229,7 +230,7 @@ int HBiCGstab_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_s
 #endif
    
   /* free memory */
-  free(s[0]);
+  free_field(s[0]);
   free(s);
   free(z1);
   free(sflags);

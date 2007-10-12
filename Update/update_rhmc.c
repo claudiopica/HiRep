@@ -63,6 +63,7 @@ static void reduce_fraction(int *a, int *b){
 
 void init_rhmc(rhmc_par *par){
 	int i;
+	unsigned int len;
 
 	lprintf("RHMC",0,"Initializing...\n");
 
@@ -99,15 +100,17 @@ void init_rhmc(rhmc_par *par){
 	suNg_field_copy(u_gauge_old,u_gauge);
 
 	/* allocate h2tmp for H2 */
-  h2tmp=alloc_spinor_field_f();
+  h2tmp=alloc_spinor_field_f(1);
 
 	/* allocate momenta */
 	momenta = alloc_momenta();
 
 	/* allocate pseudofermions */
+	get_spinor_len(&len);
 	pf=malloc(_update_par.n_pf*sizeof(*pf));
-	for(i=0;i<_update_par.n_pf;++i) {
-		pf[i]=alloc_spinor_field_f();
+	pf[0]=alloc_spinor_field_f(_update_par.n_pf);
+	for(i=1;i<_update_par.n_pf;++i) {
+		pf[i]=pf[i-1]+len;
 	}
 
 	/* allocate memory for the local action */
@@ -151,13 +154,11 @@ void init_rhmc(rhmc_par *par){
 }
 
 void free_rhmc(){
-	int i;
-   /* free momenta */
+	/* free momenta */
   free_field(u_gauge_old);
   free_field(momenta);
 	free_field(h2tmp);
-	for (i=0;i<_update_par.n_pf;++i)
-		free_field(pf[i]);
+	free_field(pf[0]);
 	free(pf);
 
   if(la!=0) free(la);
