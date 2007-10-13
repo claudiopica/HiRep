@@ -890,7 +890,7 @@ static void get_time_diluted_sources(suNf_spinor **source) {
 	for(t = 0; t < T; t++) {
 		spinor_field_zero_f(source[t]);
 		for(x = 0; x < VOL3; x++) {
-			index = ipt_4d[t][x];
+			index = ipt_4d(t,x);
 			z2_spinor(source[t] + index);
 		}
 	}
@@ -999,7 +999,7 @@ static void project_time_diluted_sources(suNf_spinor **source, suNf_spinor **vec
 			alpha[a].re = alpha[a].im = 0.0;
 
 		for(x = 0; x < VOL3; x++) {
-			index = ipt_4d[t][x];
+			index = ipt_4d(t,x);
 			for(a = 0; a < n_eigenvalues; a++) {
 				_spinor_prod_assign_f(alpha[a],vectors[a][index],source[t][index]);
 			}
@@ -1047,7 +1047,7 @@ static void source_sink_contraction(complex out[][16], suNf_spinor *source, suNf
 		}
 		
 		for(x = 0; x < VOL3; x++) {
-			index = ipt_4d[t][x];
+			index = ipt_4d(t,x);
 			
 			for(i = 0; i < 4; i++) {
 				csi = (suNf_vector*)(sink+index) + i;

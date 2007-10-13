@@ -1,6 +1,8 @@
 #ifndef SAFE_MOD_H
 #define SAFE_MOD_H
 
+#include <stdlib.h>
+
 static int safe_mod(int x,int y)
 {
    if (x>=0)

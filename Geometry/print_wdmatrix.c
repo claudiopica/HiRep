@@ -29,8 +29,8 @@ void print_wdmatrix(char *filename)
   for (x0=0;x0<VOLUME;x0++){ /* loop over rows */
     int nei[8];
 		for (x1=0;x1<4;++x1){
-			nei[2*x1]=iup[x0][x1];
-			nei[2*x1+1]=idn[x0][x1];
+			nei[2*x1]=iup(x0,x1);
+			nei[2*x1+1]=idn(x0,x1);
 		}
 		for(x2=0;x2<VOLUME;++x2){ /* loop over columns */
 			char c='0';

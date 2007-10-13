@@ -15,8 +15,8 @@ double plaq(int ix,int mu,int nu)
 	 double p;
    suNg *v1,*v2,*v3,*v4,w1,w2,w3;
 
-   iy=iup[ix][mu];
-   iz=iup[ix][nu];
+   iy=iup(ix,mu);
+   iz=iup(ix,nu);
 
    v1=pu_gauge(ix,mu);
    v2=pu_gauge(iy,nu);

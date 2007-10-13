@@ -9,7 +9,7 @@ void apply_bc(){
 		for (ix=0;ix<L;++ix){
 			for (iy=0;iy<L;++iy){
 				for (iz=0;iz<L;++iz){
-					suNf *u=pu_gauge_f(ipt[T-1][ix][iy][iz],0);
+					suNf *u=pu_gauge_f(ipt(T-1,ix,iy,iz),0);
 					_suNf_minus(*u,*u);
 				}
 			}
@@ -22,7 +22,7 @@ void apply_bc(){
 		for (it=0;it<T;++it){
 			for (iy=0;iy<L;++iy){
 				for (iz=0;iz<L;++iz){
-					suNf *u=pu_gauge_f(ipt[it][L-1][iy][iz],1);
+					suNf *u=pu_gauge_f(ipt(it,L-1,iy,iz),1);
 					_suNf_minus(*u,*u);
 				}
 			}
@@ -35,7 +35,7 @@ void apply_bc(){
 		for (it=0;it<T;++it){
 			for (ix=0;ix<L;++ix){
 				for (iz=0;iz<L;++iz){
-					suNf *u=pu_gauge_f(ipt[it][ix][L-1][iz],2);
+					suNf *u=pu_gauge_f(ipt(it,ix,L-1,iz),2);
 					_suNf_minus(*u,*u);
 				}
 			}
@@ -48,7 +48,7 @@ void apply_bc(){
 		for (it=0;it<T;++it){
 			for (ix=0;ix<L;++ix){
 				for (iy=0;iy<L;++iy){
-					suNf *u=pu_gauge_f(ipt[it][ix][iy][L-1],3);
+					suNf *u=pu_gauge_f(ipt(it,ix,iy,L-1),3);
 					_suNf_minus(*u,*u);
 				}
 			}
@@ -64,7 +64,7 @@ void apply_bc_flt(){
 		for (ix=0;ix<L;++ix){
 			for (iy=0;iy<L;++iy){
 				for (iz=0;iz<L;++iz){
-					suNf_flt *u=pu_gauge_f_flt(ipt[T-1][ix][iy][iz],0);
+					suNf_flt *u=pu_gauge_f_flt(ipt(T-1,ix,iy,iz),0);
 					_suNf_minus(*u,*u);
 				}
 			}
@@ -77,7 +77,7 @@ void apply_bc_flt(){
 		for (it=0;it<T;++it){
 			for (iy=0;iy<L;++iy){
 				for (iz=0;iz<L;++iz){
-					suNf_flt *u=pu_gauge_f_flt(ipt[it][L-1][iy][iz],1);
+					suNf_flt *u=pu_gauge_f_flt(ipt(it,L-1,iy,iz),1);
 					_suNf_minus(*u,*u);
 				}
 			}
@@ -90,7 +90,7 @@ void apply_bc_flt(){
 		for (it=0;it<T;++it){
 			for (ix=0;ix<L;++ix){
 				for (iz=0;iz<L;++iz){
-					suNf_flt *u=pu_gauge_f_flt(ipt[it][ix][L-1][iz],2);
+					suNf_flt *u=pu_gauge_f_flt(ipt(it,ix,L-1,iz),2);
 					_suNf_minus(*u,*u);
 				}
 			}
@@ -103,7 +103,7 @@ void apply_bc_flt(){
 		for (it=0;it<T;++it){
 			for (ix=0;ix<L;++ix){
 				for (iy=0;iy<L;++iy){
-					suNf_flt *u=pu_gauge_f_flt(ipt[it][ix][iy][L-1],3);
+					suNf_flt *u=pu_gauge_f_flt(ipt(it,ix,iy,L-1),3);
 					_suNf_minus(*u,*u);
 				}
 			}

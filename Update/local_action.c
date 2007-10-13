@@ -25,7 +25,7 @@ void local_hmc_action(local_action_type type,
 		/* Momenta */
 		a=0.;
 		for (j=0;j<4;++j) {
-			suNg_algebra_vector *cmom=gfield_ordering(momenta,i,j);
+			suNg_algebra_vector *cmom=momenta+coord_to_index(i,j);
 			_algebra_vector_sqnorm_g(tmp,*cmom); 
 			a+=tmp; /* this must be positive */
 		}

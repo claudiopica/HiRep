@@ -29,25 +29,27 @@ void geometry_lexi(void)
 {
    int x0,x1,x2,x3,ix,iy;
 
+	 geometry_init();
+
    for (x0=0;x0<T;x0++){
-		 y=0;
+		 iy=0;
      for (x1=0;x1<L;x1++){
        for (x2=0;x2<L;x2++){
 				 for (x3=0;x3<L;x3++){
 					 ix=index_lexi(x0,x1,x2,x3);
-					 ipt[x0][x1][x2][x3]=ix;
-					 ipt_4d[x0][y]=ix;
+					 ipt(x0,x1,x2,x3)=ix;
+					 ipt_4d(x0,iy)=ix;
 
-					 iup[ix][0]=index_lexi(x0+1,x1,x2,x3);
-					 idn[ix][0]=index_lexi(x0-1,x1,x2,x3);
-					 iup[ix][1]=index_lexi(x0,x1+1,x2,x3);
-					 idn[ix][1]=index_lexi(x0,x1-1,x2,x3);
-					 iup[ix][2]=index_lexi(x0,x1,x2+1,x3);
-					 idn[ix][2]=index_lexi(x0,x1,x2-1,x3);
-					 iup[ix][3]=index_lexi(x0,x1,x2,x3+1);
-					 idn[ix][3]=index_lexi(x0,x1,x2,x3-1);
+					 iup(ix,0)=index_lexi(x0+1,x1,x2,x3);
+					 idn(ix,0)=index_lexi(x0-1,x1,x2,x3);
+					 iup(ix,1)=index_lexi(x0,x1+1,x2,x3);
+					 idn(ix,1)=index_lexi(x0,x1-1,x2,x3);
+					 iup(ix,2)=index_lexi(x0,x1,x2+1,x3);
+					 idn(ix,2)=index_lexi(x0,x1,x2-1,x3);
+					 iup(ix,3)=index_lexi(x0,x1,x2,x3+1);
+					 idn(ix,3)=index_lexi(x0,x1,x2,x3-1);
 
-					 ++y;
+					 ++iy;
 				 }
 			 }
      }

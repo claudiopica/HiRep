@@ -44,14 +44,14 @@ void staples(int ix,int mu,suNg *v)
 
    _suNg_zero(*v);
 
-   ixpmu=iup[ix][mu];
+   ixpmu=iup(ix,mu);
 
    for (i=1;i<4;i++)
    {
       nu=(mu+i)&0x3;
-      ixpnu=iup[ix][nu];
-      ixmnu=idn[ix][nu];
-      ixpmumnu=idn[ixpmu][nu];
+      ixpnu=iup(ix,nu);
+      ixmnu=idn(ix,nu);
+      ixpmumnu=idn(ixpmu,nu);
       
       u1up=pu_gauge(ix,nu);
       u2up=pu_gauge(ixpnu,mu);

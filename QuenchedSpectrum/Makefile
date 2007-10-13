@@ -8,7 +8,7 @@ MKDIR=$(TOPDIR)/Make
 include $(MKDIR)/MkRules
 
 MODDIR := Geometry
-MODS := blocked eo_lexi test_geometry
+MODS := geometry_init blocked eo_lexi test_geometry
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := IO
@@ -20,7 +20,7 @@ MODS := suN_utils suN_exp single_double_utils boundary_conditions
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Memory
-MODS := amalloc field_alloc
+MODS := amalloc field_alloc spinor_field_alloc
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Observables

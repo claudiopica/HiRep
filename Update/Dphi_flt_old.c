@@ -48,7 +48,7 @@ void Dphi_flt_old(double m0, suNf_spinor_flt *p, suNf_spinor_flt *q)
 
 /******************************* direction +0 *********************************/
 
-      iy=iup[ix][0];
+      iy=iup(ix,0);
       sp=q+iy;
       up=pu_gauge_f_flt(ix,0);
       
@@ -66,7 +66,7 @@ void Dphi_flt_old(double m0, suNf_spinor_flt *p, suNf_spinor_flt *q)
 
 /******************************* direction -0 *********************************/
 
-      iy=idn[ix][0];
+      iy=idn(ix,0);
       sm=q+iy;
       um=pu_gauge_f_flt(iy,0);
       
@@ -84,7 +84,7 @@ void Dphi_flt_old(double m0, suNf_spinor_flt *p, suNf_spinor_flt *q)
 
 /******************************* direction +1 *********************************/
 
-      iy=iup[ix][1];
+      iy=iup(ix,1);
       sp=q+iy;
       up=pu_gauge_f_flt(ix,1);      
       
@@ -102,7 +102,7 @@ void Dphi_flt_old(double m0, suNf_spinor_flt *p, suNf_spinor_flt *q)
 
 /******************************* direction -1 *********************************/
 
-      iy=idn[ix][1];
+      iy=idn(ix,1);
       sm=q+iy;
       um=pu_gauge_f_flt(iy,1);
       
@@ -120,7 +120,7 @@ void Dphi_flt_old(double m0, suNf_spinor_flt *p, suNf_spinor_flt *q)
 
 /******************************* direction +2 *********************************/
 
-      iy=iup[ix][2];
+      iy=iup(ix,2);
       sp=q+iy;
       up=pu_gauge_f_flt(ix,2);
       
@@ -138,7 +138,7 @@ void Dphi_flt_old(double m0, suNf_spinor_flt *p, suNf_spinor_flt *q)
 
 /******************************* direction -2 *********************************/
 
-      iy=idn[ix][2];
+      iy=idn(ix,2);
       sm=q+iy;
       um=pu_gauge_f_flt(iy,2);
       
@@ -156,7 +156,7 @@ void Dphi_flt_old(double m0, suNf_spinor_flt *p, suNf_spinor_flt *q)
 
 /******************************* direction +3 *********************************/
 
-      iy=iup[ix][3];
+      iy=iup(ix,3);
       sp=q+iy;
       up=pu_gauge_f_flt(ix,3);
       
@@ -174,7 +174,7 @@ void Dphi_flt_old(double m0, suNf_spinor_flt *p, suNf_spinor_flt *q)
 
 /******************************* direction -3 *********************************/
 
-      iy=idn[ix][3];
+      iy=idn(ix,3);
       sm=q+iy;
       um=pu_gauge_f_flt(iy,3);
       
@@ -231,7 +231,7 @@ void g5Dphi_flt_old(double m0, suNf_spinor_flt *p, suNf_spinor_flt *q)
 
 /******************************* direction +0 *********************************/
 
-      iy=iup[ix][0];
+      iy=iup(ix,0);
       sp=q+iy;
       up=pu_gauge_f_flt(ix,0);
       
@@ -249,7 +249,7 @@ void g5Dphi_flt_old(double m0, suNf_spinor_flt *p, suNf_spinor_flt *q)
 
 /******************************* direction -0 *********************************/
 
-      iy=idn[ix][0];
+      iy=idn(ix,0);
       sm=q+iy;
       um=pu_gauge_f_flt(iy,0);
       
@@ -267,7 +267,7 @@ void g5Dphi_flt_old(double m0, suNf_spinor_flt *p, suNf_spinor_flt *q)
 
 /******************************* direction +1 *********************************/
 
-      iy=iup[ix][1];
+      iy=iup(ix,1);
       sp=q+iy;
       up=pu_gauge_f_flt(ix,1);      
       
@@ -285,7 +285,7 @@ void g5Dphi_flt_old(double m0, suNf_spinor_flt *p, suNf_spinor_flt *q)
 
 /******************************* direction -1 *********************************/
 
-      iy=idn[ix][1];
+      iy=idn(ix,1);
       sm=q+iy;
       um=pu_gauge_f_flt(iy,1);
       
@@ -303,7 +303,7 @@ void g5Dphi_flt_old(double m0, suNf_spinor_flt *p, suNf_spinor_flt *q)
 
 /******************************* direction +2 *********************************/
 
-      iy=iup[ix][2];
+      iy=iup(ix,2);
       sp=q+iy;
       up=pu_gauge_f_flt(ix,2);
       
@@ -321,7 +321,7 @@ void g5Dphi_flt_old(double m0, suNf_spinor_flt *p, suNf_spinor_flt *q)
 
 /******************************* direction -2 *********************************/
 
-      iy=idn[ix][2];
+      iy=idn(ix,2);
       sm=q+iy;
       um=pu_gauge_f_flt(iy,2);
       
@@ -339,7 +339,7 @@ void g5Dphi_flt_old(double m0, suNf_spinor_flt *p, suNf_spinor_flt *q)
 
 /******************************* direction +3 *********************************/
 
-      iy=iup[ix][3];
+      iy=iup(ix,3);
       sp=q+iy;
       up=pu_gauge_f_flt(ix,3);
       
@@ -357,7 +357,7 @@ void g5Dphi_flt_old(double m0, suNf_spinor_flt *p, suNf_spinor_flt *q)
 
 /******************************* direction -3 *********************************/
 
-      iy=idn[ix][3];
+      iy=idn(ix,3);
       sm=q+iy;
       um=pu_gauge_f_flt(iy,3);
       

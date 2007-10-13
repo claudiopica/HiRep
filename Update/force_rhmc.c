@@ -126,7 +126,7 @@ void Force_rhmc_f(double dt, suNg_algebra_vector *force){
 				_suNf_zero(s1);
 				switch (mu) {
 					case 0:
-						y=iup[x][0];
+						y=iup(x,0);
 						chi1=Hchi+x;
 						chi2=chi[n]+y;
 						_F_DIR0(s1,chi1,chi2);
@@ -135,7 +135,7 @@ void Force_rhmc_f(double dt, suNg_algebra_vector *force){
 						_F_DIR0(s1,chi1,chi2);
 						break;
 					case 1:
-						y=iup[x][1];
+						y=iup(x,1);
 						chi1=Hchi+x;
 						chi2=chi[n]+y;
 						_F_DIR1(s1,chi1,chi2);
@@ -144,7 +144,7 @@ void Force_rhmc_f(double dt, suNg_algebra_vector *force){
 						_F_DIR1(s1,chi1,chi2);
 						break;
 					case 2:
-						y=iup[x][2];
+						y=iup(x,2);
 						chi1=Hchi+x;
 						chi2=chi[n]+y;
 						_F_DIR2(s1,chi1,chi2);
@@ -153,7 +153,7 @@ void Force_rhmc_f(double dt, suNg_algebra_vector *force){
 						_F_DIR2(s1,chi1,chi2);
 						break;
 					default: /* DIR 3 */
-						y=iup[x][3];
+						y=iup(x,3);
 						chi1=Hchi+x;
 						chi2=chi[n]+y;
 						_F_DIR3(s1,chi1,chi2);

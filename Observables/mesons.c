@@ -33,20 +33,20 @@ void NAME(double *out, suNf_spinor **qp) { \
     double _tmp,hc=0.; \
     for (x=0; x<L; ++x) for (y=0; y<L; ++y) for (z=0; z<L; ++z) { \
       for (i=0; i<NF; ++i) { \
-        s1 = &(qp[_INDEX_(i,1)][ipt[t][x][y][z]]); \
-        s2 = &(qp[_INDEX_(i,_C1_)][ipt[t][x][y][z]]); \
+        s1 = &(qp[_INDEX_(i,1)][ipt(t,x,y,z)]); \
+        s2 = &(qp[_INDEX_(i,_C1_)][ipt(t,x,y,z)]); \
 				_spinor_perm_prod_re(_tmp,*s1,*s2); \
         hc += (_S1_)*_tmp; \
-        s1 = &(qp[_INDEX_(i,2)][ipt[t][x][y][z]]); \
-        s2 = &(qp[_INDEX_(i,_C2_)][ipt[t][x][y][z]]); \
+        s1 = &(qp[_INDEX_(i,2)][ipt(t,x,y,z)]); \
+        s2 = &(qp[_INDEX_(i,_C2_)][ipt(t,x,y,z)]); \
 				_spinor_perm_prod_re(_tmp,*s1,*s2); \
         hc += (_S2_)*_tmp; \
-        s1 = &(qp[_INDEX_(i,3)][ipt[t][x][y][z]]); \
-        s2 = &(qp[_INDEX_(i,_C3_)][ipt[t][x][y][z]]); \
+        s1 = &(qp[_INDEX_(i,3)][ipt(t,x,y,z)]); \
+        s2 = &(qp[_INDEX_(i,_C3_)][ipt(t,x,y,z)]); \
 				_spinor_perm_prod_re(_tmp,*s1,*s2); \
         hc += (_S3_)*_tmp; \
-        s1 = &(qp[_INDEX_(i,4)][ipt[t][x][y][z]]); \
-        s2 = &(qp[_INDEX_(i,_C4_)][ipt[t][x][y][z]]); \
+        s1 = &(qp[_INDEX_(i,4)][ipt(t,x,y,z)]); \
+        s2 = &(qp[_INDEX_(i,_C4_)][ipt(t,x,y,z)]); \
 				_spinor_perm_prod_re(_tmp,*s1,*s2); \
         hc += (_S4_)*_tmp; \
       } \
@@ -65,20 +65,20 @@ void NAME(double *out, suNf_spinor **qp) { \
     double _tmp,hc=0.; \
     for (x=0; x<L; ++x) for (y=0; y<L; ++y) for (z=0; z<L; ++z) { \
       for (i=0; i<NF; ++i) { \
-        s1 = &(qp[_INDEX_(i,1)][ipt[t][x][y][z]]); \
-        s2 = &(qp[_INDEX_(i,_D1_)][ipt[t][x][y][z]]); \
+        s1 = &(qp[_INDEX_(i,1)][ipt(t,x,y,z)]); \
+        s2 = &(qp[_INDEX_(i,_D1_)][ipt(t,x,y,z)]); \
 				_spinor_perm_prod_re(_tmp,*s1,*s2); \
         hc += (_T1_)*_tmp; \
-        s1 = &(qp[_INDEX_(i,2)][ipt[t][x][y][z]]); \
-        s2 = &(qp[_INDEX_(i,_D2_)][ipt[t][x][y][z]]); \
+        s1 = &(qp[_INDEX_(i,2)][ipt(t,x,y,z)]); \
+        s2 = &(qp[_INDEX_(i,_D2_)][ipt(t,x,y,z)]); \
 				_spinor_perm_prod_re(_tmp,*s1,*s2); \
         hc += (_T2_)*_tmp; \
-        s1 = &(qp[_INDEX_(i,3)][ipt[t][x][y][z]]); \
-        s2 = &(qp[_INDEX_(i,_D3_)][ipt[t][x][y][z]]); \
+        s1 = &(qp[_INDEX_(i,3)][ipt(t,x,y,z)]); \
+        s2 = &(qp[_INDEX_(i,_D3_)][ipt(t,x,y,z)]); \
 				_spinor_perm_prod_re(_tmp,*s1,*s2); \
         hc += (_T3_)*_tmp; \
-        s1 = &(qp[_INDEX_(i,4)][ipt[t][x][y][z]]); \
-        s2 = &(qp[_INDEX_(i,_D4_)][ipt[t][x][y][z]]); \
+        s1 = &(qp[_INDEX_(i,4)][ipt(t,x,y,z)]); \
+        s2 = &(qp[_INDEX_(i,_D4_)][ipt(t,x,y,z)]); \
 				_spinor_perm_prod_re(_tmp,*s1,*s2); \
         hc += (_T4_)*_tmp; \
       } \
@@ -97,20 +97,20 @@ void NAME(double *out, suNf_spinor **qp) { \
     double _tmp,hc=0.; \
     for (x=0; x<L; ++x) for (y=0; y<L; ++y) for (z=0; z<L; ++z) { \
       for (i=0; i<NF; ++i) { \
-        s1 = &(qp[_INDEX_(i,1)][ipt[t][x][y][z]]); \
-        s2 = &(qp[_INDEX_(i,_D1_)][ipt[t][x][y][z]]); \
+        s1 = &(qp[_INDEX_(i,1)][ipt(t,x,y,z)]); \
+        s2 = &(qp[_INDEX_(i,_D1_)][ipt(t,x,y,z)]); \
 				_spinor_perm_prod_im(_tmp,*s1,*s2); \
         hc += (_T1_)*_tmp; \
-        s1 = &(qp[_INDEX_(i,2)][ipt[t][x][y][z]]); \
-        s2 = &(qp[_INDEX_(i,_D2_)][ipt[t][x][y][z]]); \
+        s1 = &(qp[_INDEX_(i,2)][ipt(t,x,y,z)]); \
+        s2 = &(qp[_INDEX_(i,_D2_)][ipt(t,x,y,z)]); \
 				_spinor_perm_prod_im(_tmp,*s1,*s2); \
         hc += (_T2_)*_tmp; \
-        s1 = &(qp[_INDEX_(i,3)][ipt[t][x][y][z]]); \
-        s2 = &(qp[_INDEX_(i,_D3_)][ipt[t][x][y][z]]); \
+        s1 = &(qp[_INDEX_(i,3)][ipt(t,x,y,z)]); \
+        s2 = &(qp[_INDEX_(i,_D3_)][ipt(t,x,y,z)]); \
 				_spinor_perm_prod_im(_tmp,*s1,*s2); \
         hc += (_T3_)*_tmp; \
-        s1 = &(qp[_INDEX_(i,4)][ipt[t][x][y][z]]); \
-        s2 = &(qp[_INDEX_(i,_D4_)][ipt[t][x][y][z]]); \
+        s1 = &(qp[_INDEX_(i,4)][ipt(t,x,y,z)]); \
+        s2 = &(qp[_INDEX_(i,_D4_)][ipt(t,x,y,z)]); \
 				_spinor_perm_prod_im(_tmp,*s1,*s2); \
         hc += (_T4_)*_tmp; \
       } \
