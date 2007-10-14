@@ -103,7 +103,7 @@ int main(int argc,char *argv[]) {
 
   set_spinor_len(VOLUME);
 
-  test = alloc_spinor_field_f();
+  test = alloc_spinor_field_f(1);
 
   d = (double*)malloc(sizeof(double)*nevt);
   ev = (suNf_spinor**)malloc(sizeof(suNf_spinor*)*nevt);

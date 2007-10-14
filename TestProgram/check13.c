@@ -165,10 +165,10 @@ int main(int argc,char *argv[])
 			"Failed to open propagator file for reading");
 */
 	
-	test = alloc_spinor_field_f();
+	test = alloc_spinor_field_f(1);
 	quark_prop = (suNf_spinor**)malloc(sizeof(suNf_spinor*)*4*NF);
 	for(n = 0; n < 4*NF; n++)
-		quark_prop[n] = alloc_spinor_field_f();
+		quark_prop[n] = alloc_spinor_field_f(1);
 
 	propsize=sizeof(suNf_spinor)*VOLUME;
 
