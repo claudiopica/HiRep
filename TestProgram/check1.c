@@ -54,7 +54,7 @@ static void transform_u(void)
    {
       for (mu=0;mu<4;mu++)
       {
-         iy=iup[ix][mu];
+         iy=iup(ix,mu);
          u=pu_gauge(ix,mu);
          _suNg_times_suNg_dagger(v,*u,g[iy]);
          _suNg_times_suNg(*u,g[ix],v);

@@ -110,7 +110,7 @@ int main(int argc,char *argv[])
   
   rlxd_init(1,12345);
 
-	logger_setlevel(0,15);
+	logger_setlevel(0,10015);
 
   geometry_eo_lexi();
   u_gauge=alloc_gfield();

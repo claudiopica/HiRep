@@ -165,7 +165,7 @@ int main(int argc,char *argv[])
             {
                for (x3=0;x3<L;x3++)
                {
-                  ix=ipt[x0][x1][x2][x3];
+                  ix=ipt(x0,x1,x2,x3);
                   
                   px=p[0]*(double)(x0)+p[1]*(double)(x1)
                      +p[2]*(double)(x2)+p[3]*(double)(x3);

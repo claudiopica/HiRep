@@ -125,10 +125,10 @@ int main(int argc,char *argv[])
 
    ws=malloc(3*sizeof(suNf_spinor*));
    for (i=0;i<3;i++)
-      ws[i]=alloc_spinor_field_f();
+      ws[i]=alloc_spinor_field_f(1);
    ev=malloc((4*NF+8)*sizeof(suNf_spinor*));
    for (i=0;i<(4*NF+8);i++)
-      ev[i]=alloc_spinor_field_f();
+      ev[i]=alloc_spinor_field_f(1);
 
    set_spinor_len(VOLUME);
    

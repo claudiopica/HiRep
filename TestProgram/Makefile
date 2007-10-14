@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-MAIN := check0 check1 check2 check3 check4 check5 check6 check7 check8 check9 check10 check11 check13 check14 check15
+MAIN := check0 check1 check2 check3 check4 check5 check6 check7 check8 check9 check10 check11 check13 check14 check15 checkInverseIter
 
 SRCS = $(addsuffix .c,$(MAIN))
 
@@ -10,7 +10,7 @@ MKDIR=$(TOPDIR)/Make
 include $(MKDIR)/MkRules
 
 MODDIR := Geometry
-MODS := blocked eo_lexi test_geometry
+MODS := geometry_init blocked eo_lexi test_geometry
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := IO
@@ -22,7 +22,7 @@ MODS := suN_utils suN_exp single_double_utils boundary_conditions
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Memory
-MODS := amalloc field_alloc
+MODS := amalloc field_alloc spinor_field_alloc
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Observables

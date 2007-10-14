@@ -210,7 +210,7 @@ int main(int argc,char *argv[])
 
    ws=malloc(10*sizeof(suNf_spinor*));
    for (i=0;i<10;i++)
-      ws[i]=alloc_spinor_field_f();
+      ws[i]=alloc_spinor_field_f(1);
 
 
    for (i=0;i<10;i++)

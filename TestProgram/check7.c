@@ -26,6 +26,7 @@
 #include "inverters.h"
 #include "representation.h"
 #include "utils.h"
+#include "logger.h"
 
 int nhb,nor,nit,nth,nms,level,seed;
 double beta;
@@ -45,6 +46,17 @@ void M(suNf_spinor *out, suNf_spinor *in){
    static suNf_spinor tmp[VOLUME];
    g5Dphi(-hmass,tmp,in); 
    g5Dphi(-hmass,out,tmp);
+}
+
+
+static void z2_spinor(suNf_spinor *source) {	
+	double plus = sqrt(.5);
+	double minus = -sqrt(.5);
+	unsigned int i;
+	double *sf = (double*)source;
+	for(i = 0; i < sizeof(suNf_spinor)/sizeof(double); i++) {
+		sf[i] = ((rand() & 1) == 0) ? plus : minus;
+	}
 }
 
 
@@ -71,6 +83,8 @@ int main(int argc,char *argv[])
    
    rlxs_init(level,seed);
 
+	 logger_setlevel(0,10015);
+
 	 s1=malloc(sizeof(*s1)*VOLUME);
 	 s2=malloc(sizeof(*s2)*VOLUME);
 
@@ -90,7 +104,7 @@ int main(int argc,char *argv[])
 
    set_spinor_len(VOLUME);
    
-   par.n = 6;
+   par.n = 1;
    par.shift=(double*)malloc(sizeof(double)*(par.n));
    par.err2=1.e-28;
 	 par.max_iter=0;
@@ -100,13 +114,18 @@ int main(int argc,char *argv[])
      res[i]=res[i-1]+VOLUME;
 
    par.shift[0]=+0.1;
+	 /*
    par.shift[1]=-0.21;
    par.shift[2]=+0.05;
    par.shift[3]=-0.01;
    par.shift[4]=-0.15;
    par.shift[5]=-0.05;
+   */
 
-   gaussian_spinor_field(&(s1[0]));
+	 z2_spinor(&(s1[0]));
+  /*   gaussian_spinor_field(&(s1[0])); */
+	 tau=spinor_field_sqnorm_f(s1);
+	 printf("Norma iniziale: %e\n",tau);
 
    /* TEST g5QMR_M */
 

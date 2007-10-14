@@ -108,7 +108,7 @@ int main(int argc,char *argv[]) {
   d = (double*)malloc(sizeof(double)*nevt);
   ev = (suNf_spinor**)malloc(sizeof(suNf_spinor*)*nevt);
   for(i = 0; i < nevt; i++)
-    ev[i] = alloc_spinor_field_f();
+    ev[i] = alloc_spinor_field_f(1);
 
 
   dirac_eva_onemass(nev,nevt,kmax,imax,omega1,omega2,mass,ev,d,&status);
