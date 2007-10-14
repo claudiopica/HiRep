@@ -49,17 +49,6 @@ void M(suNf_spinor *out, suNf_spinor *in){
 }
 
 
-static void z2_spinor(suNf_spinor *source) {	
-	double plus = sqrt(.5);
-	double minus = -sqrt(.5);
-	unsigned int i;
-	double *sf = (double*)source;
-	for(i = 0; i < sizeof(suNf_spinor)/sizeof(double); i++) {
-		sf[i] = ((rand() & 1) == 0) ? plus : minus;
-	}
-}
-
-
 int main(int argc,char *argv[])
 {
    int i;
@@ -83,7 +72,7 @@ int main(int argc,char *argv[])
    
    rlxs_init(level,seed);
 
-	 logger_setlevel(0,10015);
+	 /* logger_setlevel(0,10015); */
 
 	 s1=malloc(sizeof(*s1)*VOLUME);
 	 s2=malloc(sizeof(*s2)*VOLUME);
@@ -104,7 +93,7 @@ int main(int argc,char *argv[])
 
    set_spinor_len(VOLUME);
    
-   par.n = 1;
+   par.n = 6;
    par.shift=(double*)malloc(sizeof(double)*(par.n));
    par.err2=1.e-28;
 	 par.max_iter=0;
@@ -114,16 +103,14 @@ int main(int argc,char *argv[])
      res[i]=res[i-1]+VOLUME;
 
    par.shift[0]=+0.1;
-	 /*
    par.shift[1]=-0.21;
    par.shift[2]=+0.05;
    par.shift[3]=-0.01;
    par.shift[4]=-0.15;
    par.shift[5]=-0.05;
-   */
+   
 
-	 z2_spinor(&(s1[0]));
-  /*   gaussian_spinor_field(&(s1[0])); */
+	 gaussian_spinor_field(&(s1[0])); 
 	 tau=spinor_field_sqnorm_f(s1);
 	 printf("Norma iniziale: %e\n",tau);
 
