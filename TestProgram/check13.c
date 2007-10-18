@@ -75,7 +75,7 @@ int main(int argc,char *argv[])
 	double norm;
 	suNf_spinor *test;
 	
-	int nmeasures = 100;
+	int nmeasures = 20;
 	
 	for(i=0; i<n_correlators; i++) {
 		dcorr_tmp[i] = (double**)malloc(sizeof(double*)*nm);
@@ -110,7 +110,7 @@ int main(int argc,char *argv[])
   
   rlxd_init(1,12345);
 
-	logger_setlevel(0,10015);
+	logger_setlevel(0,10);
 
   geometry_eo_lexi();
   u_gauge=alloc_gfield();
@@ -133,7 +133,7 @@ int main(int argc,char *argv[])
 /* MESONI DUBLINESI */	
 	for(counter = 0; counter < nmeasures; counter++) {
       printf("Counter = %d\n", counter);
-   	dublin_meson_correlators(dcorr_tmp, dcorr_name, n_correlators, nm, m);
+   	dublin_mesons_correlators(dcorr_tmp, dcorr_name, n_correlators, nm, m);
 	   for(i=0; i<n_correlators; i++) {
 		   for(n=0;n<nm;n++) {
 		   	for(t = 0; t < T; t++)
@@ -141,7 +141,7 @@ int main(int argc,char *argv[])
 		   }
 	   }
 	}
-	
+	dublin_mesons_free_memory();
 	
 	
 	for(i=0; i<n_correlators; i++) {

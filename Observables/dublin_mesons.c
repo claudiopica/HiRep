@@ -55,6 +55,12 @@
 #include <math.h>
 #include <assert.h>
 #include <string.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <errno.h>
+#include <dirent.h>
 
 
 
@@ -81,18 +87,19 @@
 
 
 static int loglevel = 0;
+static int init_flag = 0;
 
 static int n_masses = 0;
 static double hmass;
 static double *shift;
 static double *mass;
 
-static const float omega1 = 1e-6;
+static const float omega1 = 1e-9;
 static const float omega2 = 1e-6;
 static const float acc = 1e-9;
 
-enum{ n_eigenvalues = 4 }; /* N_{ev} */
-enum{ nevt = 12 };
+enum{ n_eigenvalues = 10 }; /* N_{ev} */
+enum{ nevt = 15 };
 
 enum{ n_global_noisy_sources_per_point = 2 }; /* N_r */
 enum{ n_points = 2 };
@@ -112,7 +119,6 @@ enum{ n_correlators = 17 };
 
 static double *d;              /* [i*nevt+j], i<n_masses, j<n_eigenvalues */
 static suNf_spinor **ev;       /* [i*nevt+j], i<n_masses, j<n_eigenvalues */
-static suNf_spinor **trash_ev; /* [i], i<nevt-n_eigenvalues */
 
 static suNf_spinor **noisy_sources; /* [i*n_diluted_noisy_sources+j], i<n_masses, j<n_diluted_noisy_sources */
 static suNf_spinor **noisy_sinks;   /* [i*n_masses+j], i<n_masses, j<n_diluted_noisy_sources */
@@ -126,7 +132,7 @@ static suNf_spinor **QMR_sinks;
 
 
 
-#ifdef TESTING_MODE
+#ifdef TESTINGMODE
 static void H(suNf_spinor *out, suNf_spinor *in);
 #endif
 #ifdef QMR_INVERTER
@@ -141,18 +147,18 @@ static void QMR_init(int flag);
 static void z2_spinor(suNf_spinor *source);
 
 #ifdef NO_DILUTION
-static void get_sources(suNf_spinor **source);
+static void create_sources(suNf_spinor **source);
 #endif
 #ifdef TIME_DILUTION
-static void get_time_diluted_sources(suNf_spinor **source);
+static void create_time_diluted_sources(suNf_spinor **source);
 #endif
 #ifdef QMR_INVERTER
-static void get_sinks_QMR(suNf_spinor *source, suNf_spinor **sink);
-#define GET_SINKS get_sinks_QMR
+static void create_sinks_QMR(suNf_spinor *source, suNf_spinor **sink);
+#define GET_SINKS create_sinks_QMR
 #endif
 #ifdef MINRES_INVERTER
-static void get_sinks_MINRES(suNf_spinor *source, suNf_spinor **sink);
-#define GET_SINKS get_sinks_MINRES
+static void create_sinks_MINRES(suNf_spinor *source, suNf_spinor **sink);
+#define GET_SINKS create_sinks_MINRES
 #endif
 #ifdef NO_DILUTION
 static void project_sources(suNf_spinor **source, suNf_spinor **vectors);
@@ -194,7 +200,30 @@ static int static_counter = 0;
 #endif
 
 
-void dublin_meson_correlators(double** correlator[], char corr_name[][256], int n_corr, int nm, double *mptr) {
+/* memory tools */
+
+typedef struct {
+	size_t nfiles;
+	char **filename;
+	int *file;
+	size_t *size;
+	size_t total_size;
+	suNf_spinor** address;
+} big_spinor_array;
+
+enum{ MAXBYTES = 1024*1024*512 };
+/* enum{ MAXBYTES = 1024*1024/2 }; */
+static big_spinor_array trashevs_array;
+static big_spinor_array goodevs_array;
+static big_spinor_array sources_array;
+static big_spinor_array sinks_array;
+#ifdef QMR_INVERTER
+static big_spinor_array QMRsinks_array;
+#endif
+
+
+
+void dublin_mesons_correlators(double** correlator[], char corr_name[][256], int n_corr, int nm, double *mptr) {
 	int m, r, p, q, t, counter;
 #ifdef TESTINGMODE
 	int x, i;
@@ -253,13 +282,15 @@ void dublin_meson_correlators(double** correlator[], char corr_name[][256], int 
 
 	for(r = 0; r < n_global_noisy_sources; r++) {
 
+		/* generate random sources */
+
 #ifdef NO_DILUTION
-		get_sources(noisy_sources + SOURCE_INDEX(0,r,0));
+		create_sources(noisy_sources + SOURCE_INDEX(0,r,0));
 		for(m = 1; m < n_masses; m++)
 			memcpy(noisy_sources[SOURCE_INDEX(m,r,0)],noisy_sources[SOURCE_INDEX(0,r,0)],sizeof(suNf_spinor)*VOLUME);
 #endif
 #ifdef TIME_DILUTION
-		get_time_diluted_sources(noisy_sources + SOURCE_INDEX(0,r,0));
+		create_time_diluted_sources(noisy_sources + SOURCE_INDEX(0,r,0));
 		for(m = 1; m < n_masses; m++)
 		for(t = 0; t < n_dilution_slices; t++)
 			memcpy(noisy_sources[SOURCE_INDEX(m,r,t)],noisy_sources[SOURCE_INDEX(0,r,t)],sizeof(suNf_spinor)*VOLUME);
@@ -275,6 +306,8 @@ void dublin_meson_correlators(double** correlator[], char corr_name[][256], int 
 			lprintf("DUBLIN_MESON_CORRELATORS",loglevel,"Testing noisy sources [m=%d,r=%d,t=%d]. norm/(4*Nf*VOL3)=%f ave=%e\n",m,r,t,norm/(4*VOL3*NF),.5*ave/norm);
 		}
 #endif
+
+		/* generate sinks; project sources and sinks */
 		
 #ifdef NO_DILUTION
 		GET_SINKS (noisy_sources[SOURCE_INDEX(0,r,0)], noisy_sinks+SINK_INDEX(0,r,0));
@@ -732,7 +765,7 @@ void dublin_meson_correlators(double** correlator[], char corr_name[][256], int 
 
 
 
-#ifdef TESTING_MODE
+#ifdef TESTINGMODE
 static void H(suNf_spinor *out, suNf_spinor *in){
 	g5Dphi(hmass,out,in);
 }
@@ -747,11 +780,182 @@ static void D(suNf_spinor *out, suNf_spinor *in){
 #endif
 
 
+void generate_filename(char name[256]) {
+	int fd;
+	static char vmpath[] = "./";
+	static int checked = 0;
+	DIR *dd;
+	
+	/* check the path */
+	if(checked == 0) {
+/* 		while(1 != 0) { */
+/* 			sprintf(name, "%sdmvm%d", vmpath, rand()); */
+/* 			fd = open(name, O_RDONLY); */
+/* 			if(fd == -1 && errno == ENOENT) break; */
+/* 			if(fd != -1) close(fd); */
+/* 		} */
+/* 		fd = open(name, O_RDWR|O_CREAT|O_EXCL, S_IRUSR|S_IWUSR); */
+/* 		error(fd==-1,1,"generate_filename [dublin_mesons.c]","Bad path"); */
+/* 		close(fd); */
+/* 		remove(name); */
+		dd = opendir(vmpath);
+		error(dd==NULL,1,"generate_filename [dublin_mesons.c]","Bad path");
+		closedir(dd);
+		lprintf("GENERATE_FILENAME",loglevel+10,"Checked path: %s\n", vmpath);
+		checked = 1;
+	}
+	
+	/* generate a filename */
+	while(1 != 0) {
+		sprintf(name, "%sdmvm%d", vmpath, rand());
+		fd = open(name, O_RDONLY);
+		if(fd == -1 && errno == ENOENT) {
+			lprintf("GENERATE_FILENAME",loglevel+10,"Generated filename: %s\n",name);
+			return;
+		}
+		if(fd != -1) close(fd);
+	}
+	
+}
+
+
+
+/*
+typedef struct {
+	size_t nfiles;
+	char **filename;
+	int *file;
+	size_t *size;
+	size_t total_size;
+	suNf_spinor** address;
+} big_spinor_array;
+*/
+
+void allocate_big_spinor_array(big_spinor_array* array, size_t size) {
+	int a, b;
+	suNf_spinor* initspinor;
+	size_t written;
+	
+	if( (double)size * VOLUME * sizeof(suNf_spinor) < (double)MAXBYTES ) {
+		array->nfiles = 0;
+		array->filename = NULL;
+		array->file = NULL;
+		array->size = NULL;
+		array->total_size = size;
+
+		array->address = (suNf_spinor**)malloc(sizeof(suNf_spinor*)*size);
+		array->address[0] = alloc_spinor_field_f(size);
+		for(a = 1; a < size; a++)
+			array->address[a] = array->address[a-1] + VOLUME;
+
+		lprintf("ALLOCATE_BIG_SPINOR_ARRAY",loglevel,"Allocated small array.\n");
+		lprintf("ALLOCATE_BIG_SPINOR_ARRAY",loglevel,"Number of elements: %d\n", array->total_size);
+		lprintf("ALLOCATE_BIG_SPINOR_ARRAY",loglevel,"Dimension: %d Mb\n",
+				  array->total_size*sizeof(suNf_spinor)*VOLUME/(1024*1024));
+
+		return;
+	}
+	
+	size_t onefilemaxsize = MAXBYTES / (sizeof(suNf_spinor)*VOLUME);
+	
+	initspinor = alloc_spinor_field_f(1);
+	lprintf("ALLOCATE_BIG_SPINOR_ARRAY",loglevel,"Size of one spinor %d bytes\n", sizeof(suNf_spinor)*VOLUME);
+	lprintf("ALLOCATE_BIG_SPINOR_ARRAY",loglevel,"onefilemaxsize = %d \n", onefilemaxsize);
+	
+	array->total_size = size;
+	array->nfiles = size/onefilemaxsize + 1;
+	array->size = (size_t*)malloc(sizeof(size_t)*array->nfiles);
+	for(a = 0; a < array->nfiles-1; a++)
+		array->size[a] = onefilemaxsize;
+	array->size[array->nfiles-1] = size % onefilemaxsize;
+	
+	array->filename = (char**)malloc(sizeof(char*)*array->nfiles);
+	array->filename[0] = (char*)malloc(sizeof(char)*array->nfiles*256);
+	array->file = (int*)malloc(sizeof(int)*array->nfiles);
+	for(a = 0; a < array->nfiles; a++) {
+		array->filename[a] = array->filename[0] + 256*a;
+		generate_filename(array->filename[a]);
+		array->file[a] = open(array->filename[a], O_RDWR|O_CREAT|O_EXCL, S_IRUSR|S_IWUSR);
+		error(array->file[a]==-1,1,"allocate_big_spinor_array [dublin_mesons.c]",
+				"Error opening file for memory-mapping");
+		for(b = 0; b < onefilemaxsize; b++) {
+			written = write(array->file[a],initspinor,sizeof(suNf_spinor)*VOLUME);
+			error(written!=sizeof(suNf_spinor)*VOLUME,1,"allocate_big_spinor_array [dublin_mesons.c]",
+				"Error initializing file for memory-mapping");
+		}
+	}
+	
+	array->address = (suNf_spinor**)malloc(sizeof(suNf_spinor*)*size);
+	for(a = 0; a < array->nfiles; a++) {
+		array->address[a*onefilemaxsize] =
+			(suNf_spinor*)mmap(NULL, array->size[a]*sizeof(suNf_spinor)*VOLUME,
+									 PROT_READ | PROT_WRITE, MAP_SHARED,
+									 array->file[a], 0);
+		error(array->address[a*onefilemaxsize]==NULL,1,"allocate_big_spinor_array [dublin_mesons.c]",
+				"mmap error");
+		for(b = 1; b < array->size[a]; b++)
+			array->address[a*onefilemaxsize + b] = array->address[a*onefilemaxsize + b-1] + VOLUME;
+	}
+
+	lprintf("ALLOCATE_BIG_SPINOR_ARRAY",loglevel,"Allocated big array at address %x\n", array->address);
+	lprintf("ALLOCATE_BIG_SPINOR_ARRAY",loglevel,"Total number of elements: %d\n", array->total_size);
+	lprintf("ALLOCATE_BIG_SPINOR_ARRAY",loglevel,"Total dimension: %d Mb\n",
+			  array->total_size*sizeof(suNf_spinor)*VOLUME/(1024*1024));
+	lprintf("ALLOCATE_BIG_SPINOR_ARRAY",loglevel,"Number of files: %d\n", array->nfiles);
+	for(a = 0; a < array->nfiles; a++) {
+		lprintf("ALLOCATE_BIG_SPINOR_ARRAY",loglevel,"File: %s\n", array->filename[a]);
+		lprintf("ALLOCATE_BIG_SPINOR_ARRAY",loglevel,"Number of elements in file: %d\n", array->size[a]);
+		lprintf("ALLOCATE_BIG_SPINOR_ARRAY",loglevel,"Dimension of file: %d Mb\n",
+				  array->size[a]*sizeof(suNf_spinor)*VOLUME/(1024*1024));
+	}
+
+	free_field(initspinor);
+}
+
+
+
+void free_big_spinor_array(big_spinor_array* array) {
+	int a;
+	
+	if(array->nfiles == 0) {
+		free_field(array->address[0]);
+		free(array->address);
+		array->address = NULL;
+		array->nfiles = 0;
+		array->filename = NULL;
+		array->file = NULL;
+		array->size = NULL;
+		array->total_size = 0;
+		return;
+	}
+	
+	size_t onefilemaxsize = MAXBYTES / (sizeof(suNf_spinor)*VOLUME);
+	for(a = 0; a < array->nfiles; a++) {
+		munmap(array->address[a*onefilemaxsize], array->size[a]*sizeof(suNf_spinor)*VOLUME);
+		close(array->file[a]);
+		remove(array->filename[a]);
+	}
+	free(array->address);
+	free(array->filename[0]);
+	free(array->filename);
+	free(array->file);
+	free(array->size);
+	array->address = NULL;
+	array->nfiles = 0;
+	array->filename = NULL;
+	array->file = NULL;
+	array->size = NULL;
+	array->total_size = 0;
+}
+	
+
 
 static void all_to_all_quark_propagator_init() {
 	int m, a;
-	static int init_flag = 0;
 	double requiredmemory = 0.0;
+	double reqmem_for_evs = 0.0;
+	double reqmem_for_sources = 0.0;
+	double reqmem_for_sinks = 0.0;
 #ifdef TESTINGMODE
 	int t;
 #endif
@@ -760,36 +964,42 @@ static void all_to_all_quark_propagator_init() {
 
 	set_spinor_len(VOLUME);
 
+	reqmem_for_evs = sizeof(suNf_spinor)*VOLUME*n_eigenvalues*n_masses
+						  +sizeof(suNf_spinor)*VOLUME*(nevt-n_eigenvalues);
+	reqmem_for_sources = sizeof(suNf_spinor)*VOLUME*n_masses*n_diluted_noisy_sources;
+	reqmem_for_sinks = sizeof(suNf_spinor)*VOLUME*n_masses*n_diluted_noisy_sources;
+	requiredmemory = reqmem_for_evs + reqmem_for_sources + reqmem_for_sinks;
+
 	/* static complex meson[n_gamma_matrices][n_sources*n_sources][T]; */
-	requiredmemory += sizeof(complex)*n_gamma_matrices*n_sources*n_sources*T;
+	requiredmemory += sizeof(complex)*n_gamma_matrices*n_sources*n_sources*T;	
 	
-	trash_ev = (suNf_spinor**)malloc(sizeof(suNf_spinor*)*(nevt-n_eigenvalues));
-	for(a = 0; a < nevt-n_eigenvalues; a++)
-		trash_ev[a] = alloc_spinor_field_f(1);
-		
+	/* eigenvalues */
 	d = (double*)malloc(sizeof(double)*n_masses*nevt);
-	ev = (suNf_spinor**)malloc(sizeof(suNf_spinor*)*n_masses*nevt);
-	for(m = 0; m < n_masses*n_eigenvalues; m++) {
-		for(a = 0; a < n_eigenvalues; a++)
-			ev[EV_INDEX(m,a)] = alloc_spinor_field_f(1);
-		for(a = n_eigenvalues; a < nevt; a++)
-			ev[EV_INDEX(m,a)] = trash_ev[a-n_eigenvalues];
-	}
-	requiredmemory += sizeof(suNf_spinor)*VOLUME*n_eigenvalues*n_masses;
 	
-	noisy_sources = (suNf_spinor**)malloc(sizeof(suNf_spinor*)*n_masses*n_diluted_noisy_sources);
-	noisy_sinks = (suNf_spinor**)malloc(sizeof(suNf_spinor*)*n_masses*n_diluted_noisy_sources);
-	for(m = 0; m < n_masses*n_diluted_noisy_sources; m++) {
-		noisy_sources[m] = alloc_spinor_field_f(1);
-		noisy_sinks[m] = alloc_spinor_field_f(1);
+	/* eigenvectors */
+	allocate_big_spinor_array(&trashevs_array, nevt-n_eigenvalues);
+	allocate_big_spinor_array(&goodevs_array, n_masses*n_eigenvalues);
+		
+	ev = (suNf_spinor**)malloc(sizeof(suNf_spinor*)*n_masses*nevt);
+	for(m = 0; m < n_masses; m++) {
+		for(a = 0; a < n_eigenvalues; a++)
+			ev[EV_INDEX(m,a)] = goodevs_array.address[m*n_eigenvalues+a];
+		for(a = n_eigenvalues; a < nevt; a++)
+			ev[EV_INDEX(m,a)] = trashevs_array.address[a-n_eigenvalues];
 	}
-	requiredmemory += 2*sizeof(suNf_spinor)*VOLUME*n_masses*n_diluted_noisy_sources;
+
+	/* sources */
+	allocate_big_spinor_array(&sources_array, n_masses*n_diluted_noisy_sources);
+	noisy_sources = sources_array.address;
+
+	/* sinks */
+	allocate_big_spinor_array(&sinks_array, n_masses*n_diluted_noisy_sources);
+	noisy_sinks = sinks_array.address;
 
 #ifdef QMR_INVERTER
 	QMR_source = alloc_spinor_field_f(1);
-	QMR_sinks = (suNf_spinor**)malloc(sizeof(suNf_spinor*)*n_masses);
-	for(m = 0; m < n_masses; m++)
-		QMR_sinks[m] = alloc_spinor_field_f(1);
+	allocate_big_spinor_array(&QMRsinks_array, n_masses);
+	QMR_sinks = QMRsinks_array.address;
 	requiredmemory += (1+n_masses)*sizeof(suNf_spinor)*VOLUME;
 #endif
 	
@@ -808,6 +1018,41 @@ static void all_to_all_quark_propagator_init() {
 #endif
 	
 	init_flag = 1;
+}
+
+
+
+void dublin_mesons_free_memory() {
+	if(init_flag != 1) return;
+	
+	/* eigenvalues */
+	free(d);
+	lprintf("DUBLIN_MESONS_FREE_MEMORY",loglevel+10,"Freed eigenvalues\n");
+	
+	/* eigenvectors */
+	free_big_spinor_array(&trashevs_array);
+	lprintf("DUBLIN_MESONS_FREE_MEMORY",loglevel+10,"Freed trash eigenvectors\n");
+	free_big_spinor_array(&goodevs_array);
+	lprintf("DUBLIN_MESONS_FREE_MEMORY",loglevel+10,"Freed good eigenvectors\n");
+	free(ev);
+	lprintf("DUBLIN_MESONS_FREE_MEMORY",loglevel+10,"Freed eigenvectors\n");
+
+	/* sources */
+	free_big_spinor_array(&sources_array);
+	lprintf("DUBLIN_MESONS_FREE_MEMORY",loglevel+10,"Freed noisy sources\n");
+
+	/* sinks */
+	free_big_spinor_array(&sinks_array);
+	lprintf("DUBLIN_MESONS_FREE_MEMORY",loglevel+10,"Freed noisy sinks\n");
+
+#ifdef QMR_INVERTER
+	free_field(QMR_source);
+	lprintf("DUBLIN_MESONS_FREE_MEMORY",loglevel+10,"Freed QMR sources\n");
+	free_big_spinor_array(&QMRsinks_array);
+	lprintf("DUBLIN_MESONS_FREE_MEMORY",loglevel+10,"Freed QMR sinks\n");
+#endif
+	
+	init_flag = 0;
 }
 
 
@@ -847,13 +1092,13 @@ static void QMR_init(int flag) {
 
 
 /*
-suNf_spinor* get_stored_source(int random_index, int dilution_index) {
+suNf_spinor* create_stored_source(int random_index, int dilution_index) {
 	return noisy_sources[random_index*T+dilution_index];
 }
 
 
 
-suNf_spinor** get_stored_sinks(int random_index, int dilution_index) {
+suNf_spinor** create_stored_sinks(int random_index, int dilution_index) {
 	return noisy_sinks[random_index*T+dilution_index];
 }
 */
@@ -873,7 +1118,7 @@ static void z2_spinor(suNf_spinor *source) {
 
 
 #ifdef NO_DILUTION
-static void get_sources(suNf_spinor **source) {
+static void create_sources(suNf_spinor **source) {
 	int x;
 	
 	for(x = 0; x < VOLUME; x++)
@@ -884,7 +1129,7 @@ static void get_sources(suNf_spinor **source) {
 
 
 #ifdef TIME_DILUTION
-static void get_time_diluted_sources(suNf_spinor **source) {
+static void create_time_diluted_sources(suNf_spinor **source) {
 	int t, x, index;
 	
 	for(t = 0; t < T; t++) {
@@ -900,7 +1145,7 @@ static void get_time_diluted_sources(suNf_spinor **source) {
 
 
 #ifdef QMR_INVERTER
-static void get_sinks_QMR(suNf_spinor *source, suNf_spinor **sink) {
+static void create_sinks_QMR(suNf_spinor *source, suNf_spinor **sink) {
 	mshift_par QMR_par;
 	int m;
 	int cgiter=0;
@@ -933,7 +1178,7 @@ static void get_sinks_QMR(suNf_spinor *source, suNf_spinor **sink) {
 
 
 #ifdef MINRES_INVERTER
-static void get_sinks_MINRES(suNf_spinor *source, suNf_spinor **sink) {
+static void create_sinks_MINRES(suNf_spinor *source, suNf_spinor **sink) {
 	static MINRES_par MINRESpar;
 	int m;
 	int cgiter=0;
