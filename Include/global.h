@@ -11,6 +11,22 @@
 
 #include <stddef.h>
 
+#ifdef MAIN_PROGRAM
+#  define GLB_PTR(type,name) type *name=NULL
+#  define GLB_VAR(type,name,value) type name=(value)
+#else
+#  define GLB_PTR(type,name) extern type *name
+#  define GLB_VAR(type,name,value) extern type name
+#endif
+
+GLB_VAR(int,T,0);
+GLB_VAR(int,X,0);
+GLB_VAR(int,Y,0);
+GLB_VAR(int,Z,0);
+/*GLB_VAR(int,L,0);*/
+GLB_VAR(int,VOL3,0);
+GLB_VAR(int,VOLUME,0);
+/*
 #define VOLUME (T*L*L*L)
 #define VOL3   (L*L*L)
 
@@ -21,14 +37,7 @@
 #if ((T<2)||(L<2))
 #error : The lattice size should be at least 2 in all directions
 #endif
-
-#ifdef MAIN_PROGRAM
-#  define GLB_PTR(type,name) type *name=NULL;
-#define EXTERN
-#else
-#  define GLB_PTR(type,name) extern type *name;
-#define EXTERN extern
-#endif
+*/
 
 /* Geometry indexes */
 GLB_PTR(int, ipt);
@@ -36,7 +45,7 @@ GLB_PTR(int, ipt_4d);
 GLB_PTR(int, iup);
 GLB_PTR(int, idn);
 
-#define ipt(t,x,y,z) ipt[(t)*(VOL3)+(x)*(L*L)+(y)*(L)+(z)]
+#define ipt(t,x,y,z) ipt[(t)*(VOL3)+(x)*(Y*Z)+(y)*(Z)+(z)]
 #define ipt_4d(t,x) ipt_4d[(t)*(VOL3)+(x)]
 #define iup(site,dir) iup[(site)*4+(dir)]
 #define idn(site,dir) idn[(site)*4+(dir)]

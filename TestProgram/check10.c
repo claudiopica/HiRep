@@ -35,14 +35,16 @@ static double EPSILON=1.e-12;
 
 static double low_ev(void)
 {
-   int l,lmax;
+   int lmax;
    double p,sp,cp,pi;
 
    lmax=T;   
-
-   l=L;
-   if (l>lmax)
-      lmax=l;
+   if (X>lmax)
+      lmax=X;
+   if (Y>lmax)
+      lmax=Y;
+   if (Z>lmax)
+      lmax=Z;
 
    pi=4.0*atan(1.0);
    p=(2.0*pi)/(double)(lmax);
@@ -109,20 +111,21 @@ int main(int argc,char *argv[])
    printf("\n");
    printf("Diagonalization of Qnohat^2 (free case)\n");
    printf("---------------------------------------\n\n");
-   printf("The lattice size is %dx%d^3\n",T,L);
+   geometry_eo_lexi();
+   printf("The lattice size is %dx%dx%dx%d\n",T,X,Y,Z);
    printf("size of the gluon rep: %d, size of the fermion rep: %d\n",NG,NF);
    
    rlxd_init(1,12345);
 
 	 logger_setlevel(0,1000);
 
-   geometry_eo_lexi();
    u_gauge=alloc_gfield();
 #ifndef REPR_FUNDAMENTAL
    u_gauge_f=alloc_gfield_f();
 #endif
    represent_gauge_field();
 
+   set_spinor_len(VOLUME);
    ws=malloc(3*sizeof(suNf_spinor*));
    for (i=0;i<3;i++)
       ws[i]=alloc_spinor_field_f(1);
@@ -130,7 +133,6 @@ int main(int argc,char *argv[])
    for (i=0;i<(4*NF+8);i++)
       ev[i]=alloc_spinor_field_f(1);
 
-   set_spinor_len(VOLUME);
    
    iw=2;
 

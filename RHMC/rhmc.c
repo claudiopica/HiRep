@@ -88,7 +88,6 @@ int main(int argc,char *argv[])
 
    lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
    lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
-   lprintf("MAIN",0,"The lattice size is %dx%d^3\n",T,L);
    
    level=1;
    seed=666;
@@ -96,13 +95,17 @@ int main(int argc,char *argv[])
    /*   rlxd_init(level+1,seed); */
    lprintf("MAIN",0,"ranlux: level = %d, seed = %d\n",level,seed); 
 
-   geometry_eo_lexi();
-   /* geometry_blocked(); */
+   geometry_eo_lexi(); 
+   /*geometry_blocked(); */
+   /*geometry_lexi(); */
    test_geometry();
+   lprintf("MAIN",0,"The lattice size is %dx%dx%dx%d\n",T,X,Y,Z);
+
    u_gauge=alloc_gfield();
 #ifndef REPR_FUNDAMENTAL
    u_gauge_f=alloc_gfield_f();
 #endif
+	 set_spinor_len(VOLUME);
 
    rpar.beta = 4.9;
    rpar.mass = -1.3045822102425876010; /* k=0.1855 */

@@ -10,7 +10,7 @@
  */
 
 
-static unsigned int _spinor_len=VOLUME;
+static unsigned int _spinor_len=0;
 
 void set_spinor_len(unsigned int len) {
   _spinor_len=len;

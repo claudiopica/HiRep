@@ -6,9 +6,9 @@ void apply_bc(){
 #ifdef ANTIPERIODIC_BC_T
 	{
 		int ix,iy,iz;
-		for (ix=0;ix<L;++ix){
-			for (iy=0;iy<L;++iy){
-				for (iz=0;iz<L;++iz){
+		for (ix=0;ix<X;++ix){
+			for (iy=0;iy<Y;++iy){
+				for (iz=0;iz<Z;++iz){
 					suNf *u=pu_gauge_f(ipt(T-1,ix,iy,iz),0);
 					_suNf_minus(*u,*u);
 				}
@@ -20,9 +20,9 @@ void apply_bc(){
 	{
 		int it,iy,iz;
 		for (it=0;it<T;++it){
-			for (iy=0;iy<L;++iy){
-				for (iz=0;iz<L;++iz){
-					suNf *u=pu_gauge_f(ipt(it,L-1,iy,iz),1);
+			for (iy=0;iy<Y;++iy){
+				for (iz=0;iz<Z;++iz){
+					suNf *u=pu_gauge_f(ipt(it,X-1,iy,iz),1);
 					_suNf_minus(*u,*u);
 				}
 			}
@@ -33,9 +33,9 @@ void apply_bc(){
 	{
 		int it,ix,iz;
 		for (it=0;it<T;++it){
-			for (ix=0;ix<L;++ix){
-				for (iz=0;iz<L;++iz){
-					suNf *u=pu_gauge_f(ipt(it,ix,L-1,iz),2);
+			for (ix=0;ix<X;++ix){
+				for (iz=0;iz<Z;++iz){
+					suNf *u=pu_gauge_f(ipt(it,ix,Y-1,iz),2);
 					_suNf_minus(*u,*u);
 				}
 			}
@@ -46,9 +46,9 @@ void apply_bc(){
 	{
 		int it,ix,iy;
 		for (it=0;it<T;++it){
-			for (ix=0;ix<L;++ix){
-				for (iy=0;iy<L;++iy){
-					suNf *u=pu_gauge_f(ipt(it,ix,iy,L-1),3);
+			for (ix=0;ix<X;++ix){
+				for (iy=0;iy<Y;++iy){
+					suNf *u=pu_gauge_f(ipt(it,ix,iy,Z-1),3);
 					_suNf_minus(*u,*u);
 				}
 			}
@@ -61,9 +61,9 @@ void apply_bc_flt(){
 #ifdef ANTIPERIODIC_BC_T
 	{
 		int ix,iy,iz;
-		for (ix=0;ix<L;++ix){
-			for (iy=0;iy<L;++iy){
-				for (iz=0;iz<L;++iz){
+		for (ix=0;ix<X;++ix){
+			for (iy=0;iy<Y;++iy){
+				for (iz=0;iz<Z;++iz){
 					suNf_flt *u=pu_gauge_f_flt(ipt(T-1,ix,iy,iz),0);
 					_suNf_minus(*u,*u);
 				}
@@ -75,9 +75,9 @@ void apply_bc_flt(){
 	{
 		int it,iy,iz;
 		for (it=0;it<T;++it){
-			for (iy=0;iy<L;++iy){
-				for (iz=0;iz<L;++iz){
-					suNf_flt *u=pu_gauge_f_flt(ipt(it,L-1,iy,iz),1);
+			for (iy=0;iy<Y;++iy){
+				for (iz=0;iz<Z;++iz){
+					suNf_flt *u=pu_gauge_f_flt(ipt(it,X-1,iy,iz),1);
 					_suNf_minus(*u,*u);
 				}
 			}
@@ -88,9 +88,9 @@ void apply_bc_flt(){
 	{
 		int it,ix,iz;
 		for (it=0;it<T;++it){
-			for (ix=0;ix<L;++ix){
-				for (iz=0;iz<L;++iz){
-					suNf_flt *u=pu_gauge_f_flt(ipt(it,ix,L-1,iz),2);
+			for (ix=0;ix<X;++ix){
+				for (iz=0;iz<Z;++iz){
+					suNf_flt *u=pu_gauge_f_flt(ipt(it,ix,Y-1,iz),2);
 					_suNf_minus(*u,*u);
 				}
 			}
@@ -101,9 +101,9 @@ void apply_bc_flt(){
 	{
 		int it,ix,iy;
 		for (it=0;it<T;++it){
-			for (ix=0;ix<L;++ix){
-				for (iy=0;iy<L;++iy){
-					suNf_flt *u=pu_gauge_f_flt(ipt(it,ix,iy,L-1),3);
+			for (ix=0;ix<X;++ix){
+				for (iy=0;iy<Y;++iy){
+					suNf_flt *u=pu_gauge_f_flt(ipt(it,ix,iy,Z-1),3);
 					_suNf_minus(*u,*u);
 				}
 			}

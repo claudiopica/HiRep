@@ -28,6 +28,14 @@ void geometry_init() {
 	if (init) {
 		int *cur;
 		size_t req_mem=0;
+
+		T=2;
+		X=4;
+		Y=2;
+		Z=6;
+		VOL3=X*Y*Z;
+		VOLUME=VOL3*T;
+
 		req_mem+=2*4*VOLUME; /* for iup and idn */
 		req_mem+=VOLUME;     /* for ipt */
 		req_mem+=VOLUME;     /* for ipt_4d */

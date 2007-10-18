@@ -222,13 +222,13 @@ int main(int argc,char *argv[])
    printf("Diagonalization of Q^2 (random fields)\n");
    printf("--------------------------------------\n\n");
 
-   printf("The lattice size is %dx%d^3\n",T,L);
+   geometry_eo_lexi();
+   printf("The lattice size is %dx%dx%dx%d\n",T,X,Y,Z);
 
    rlxd_init(1,12345);
 
 	 logger_setlevel(0,1000);
 
-   geometry_eo_lexi();
    u_gauge=alloc_gfield();
 #ifndef REPR_FUNDAMENTAL
    u_gauge_f=alloc_gfield_f();

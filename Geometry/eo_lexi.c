@@ -19,11 +19,11 @@ static int index_eo_lexi(int x0,int x1,int x2,int x3)
    int ix;
    
    y0=safe_mod(x0,T);
-   y1=safe_mod(x1,L);
-   y2=safe_mod(x2,L);
-   y3=safe_mod(x3,L);
+   y1=safe_mod(x1,X);
+   y2=safe_mod(x2,Y);
+   y3=safe_mod(x3,Z);
 
-   ix = (y3+L*(y2+L*(y1+L*y0)))/2;
+   ix = (y3+Z*(y2+Y*(y1+X*y0)))/2;
    if((x0+x1+x2+x3)&1){
       ix+=VOLUME/2;
    }
@@ -40,9 +40,9 @@ void geometry_eo_lexi(void)
 
    for (x0=0;x0<T;x0++){
      iy=0;
-     for (x1=0;x1<L;x1++){
-			 for (x2=0;x2<L;x2++){
-				 for (x3=0;x3<L;x3++){
+     for (x1=0;x1<X;x1++){
+			 for (x2=0;x2<Y;x2++){
+				 for (x3=0;x3<Z;x3++){
 					 ix=index_eo_lexi(x0,x1,x2,x3);
 					 ipt(x0,x1,x2,x3)=ix;
 					 ipt_4d(x0,iy)=ix;

@@ -42,19 +42,20 @@ void H(suNf_spinor *out, suNf_spinor *in){
 }
 
 void M(suNf_spinor *out, suNf_spinor *in){
-   static suNf_spinor tmp[VOLUME];
+   suNf_spinor *tmp=alloc_spinor_field_f(1);
    g5Dphi(-hmass,tmp,in); 
    g5Dphi(-hmass,out,tmp);
+	 free_field(tmp);
 }
 
 void test_herm(spinor_operator S, char *name){
    suNf_spinor *s1, *s2, *s3, *s4;
    double tau;
 
-	 s1=malloc(sizeof(*s1)*VOLUME);
-	 s2=malloc(sizeof(*s2)*VOLUME);
-	 s3=malloc(sizeof(*s3)*VOLUME);
-	 s4=malloc(sizeof(*s4)*VOLUME);
+	 s1=alloc_spinor_field_f(4);
+	 s2=s1+VOLUME;
+	 s3=s2+VOLUME;
+	 s4=s3+VOLUME;
 
    printf("Test if %s is hermitean: ",name);
 
@@ -75,10 +76,7 @@ void test_herm(spinor_operator S, char *name){
      printf("OK ");
    printf("[norm = %e]\n",tau);
 
-	 free(s1);
-	 free(s2);
-	 free(s3);
-	 free(s4);
+	 free_field(s1);
 
 }
 
@@ -87,7 +85,9 @@ int main(int argc,char *argv[])
 {
    printf("Gauge group: SU(%d)\n",NG);
    printf("Fermion representation: dim = %d\n",NF);
-   printf("The lattice size is %dx%d^3\n",T,L);
+   geometry_eo_lexi();
+   test_geometry();
+   printf("The lattice size is %dx%dx%dx%d\n",T,X,Y,Z);
    printf("\n");
    
    level=1;
@@ -98,8 +98,6 @@ int main(int argc,char *argv[])
    rlxd_init(level,seed);
 
 
-   geometry_eo_lexi();
-   test_geometry();
    u_gauge=alloc_gfield();
 #ifndef REPR_FUNDAMENTAL
    u_gauge_f=alloc_gfield_f();

@@ -15,7 +15,7 @@
 
 
 spinor_operator loc_H;
-static suNf_spinor tmpspinor[VOLUME];
+static suNf_spinor *tmpspinor;
 
 static double hmass;
 static double hmass_eo;
@@ -61,13 +61,14 @@ void quark_propagator_QMR_eo(FILE *propfile, unsigned int ssite, int nm, double 
   test = alloc_spinor_field_f(1);
 
   set_spinor_len(VOLUME/2);
+	tmpspinor=alloc_spinor_field_f(1);
 	resdn=(suNf_spinor**)malloc(sizeof(suNf_spinor*)*nm*2);
 	resd=resdn+nm;
 	in = alloc_spinor_field_f(2*nm+1);
 	resdn[0] = in+VOLUME/2;
 	for(i=1;i<nm;++i)
 		resdn[i]=resdn[i-1]+VOLUME/2;
-	resd[0]=resdn[nm-1];
+	resd[0]=resdn[nm-1]+VOLUME/2;
 	for(i=1;i<nm;++i)
 		resd[i]=resd[i-1]+VOLUME/2;
 
@@ -138,10 +139,11 @@ void quark_propagator_QMR_eo(FILE *propfile, unsigned int ssite, int nm, double 
   
   /* free memory */
   free_field(in);
+	free_field(tmpspinor);
 	free(resdn);
   free(shift);
-	free(test);
-	free(res);
+	free_field(test);
+	free_field(res);
 
 }
 
@@ -165,18 +167,18 @@ void quark_propagator_QMR(FILE *propfile, unsigned int ssite, int nm, double *ma
   suNf_spinor *test=0;
 
   /* allocate input spinor field */
-  in = (suNf_spinor *)malloc(sizeof(suNf_spinor)*VOLUME);
-	resdn=(suNf_spinor**)malloc(sizeof(suNf_spinor*)*nm);
-	resdn[0]=(suNf_spinor*)malloc(sizeof(suNf_spinor)*nm*VOLUME);
+  set_spinor_len(VOLUME);
+	in = alloc_spinor_field_f(2*nm+1);
+	resdn=(suNf_spinor**)malloc(sizeof(suNf_spinor*)*nm*2);
+	resd=resdn+nm;
+	resdn[0]=in+VOLUME;
 	for(i=1;i<nm;++i)
 		resdn[i]=resdn[i-1]+VOLUME;
-	resd=(suNf_spinor**)malloc(sizeof(suNf_spinor*)*nm);
-	resd[0]=(suNf_spinor*)malloc(sizeof(suNf_spinor)*nm*VOLUME);
+	resd[0]=resdn[nm-1]+VOLUME;
 	for(i=1;i<nm;++i)
 		resd[i]=resd[i-1]+VOLUME;
-  test = (suNf_spinor *)malloc(sizeof(suNf_spinor)*VOLUME);
+	test=alloc_spinor_field_f(1);
 
-  set_spinor_len(VOLUME);
 
 	/* set up inverters parameters */
   shift=(double*)malloc(sizeof(double)*(nm));
@@ -234,13 +236,10 @@ void quark_propagator_QMR(FILE *propfile, unsigned int ssite, int nm, double *ma
 	lprintf("PROPAGATOR",10,"QMR MVM = %d\n",cgiter);
   
   /* free memory */
-  free(in);
-	free(resd[0]);
-	free(resd);
-	free(resdn[0]);
+  free_field(in);
 	free(resdn);
   free(shift);
-	free(test);
+	free_field(test);
 
 }
 
@@ -256,9 +255,9 @@ void quark_propagator(unsigned int source, int nm, double *mass, suNf_spinor **o
   suNf_spinor *in;
 
   /* allocate input spinor field */
-  in = (suNf_spinor *)malloc(sizeof(suNf_spinor)*VOLUME);
-
   set_spinor_len(VOLUME);
+  in = alloc_spinor_field_f(1);
+
 
   /* the source is on the first even site */
   spinor_field_zero_f(in);
@@ -278,6 +277,6 @@ void quark_propagator(unsigned int source, int nm, double *mass, suNf_spinor **o
 	lprintf("PROPAGATOR",10,"MINRES MVM = %d",cgiter);
 
   /* free input spinor field */
-  free(in);
+  free_field(in);
 
 }

@@ -177,7 +177,7 @@ static complex sp(int vol,suNf_spinor *pk,suNf_spinor *pl)
 
 int main(int argc,char *argv[])
 {
-   int i,j,vol=VOLUME,off=0;
+   int i,j,vol,off=0;
    double r;
    double rd,zsqd;
    double d,dmax;
@@ -185,7 +185,7 @@ int main(int argc,char *argv[])
    complex zd,wd;
    suNf_spinor **ws;
    suNf_spinor *pk,*pl;
-   suNf_spinor tmp[VOLUME];
+   suNf_spinor *tmp;
    FILE *log=NULL;   
 
    log=freopen("check11.log","w",stdout);
@@ -193,13 +193,13 @@ int main(int argc,char *argv[])
    printf("\n");
    printf("Consistency of the programs in the module linalg\n");
    printf("------------------------------------------------\n\n");   
-   printf("The lattice size is %dx%d^3\n",T,L);
+   geometry_eo_lexi();
+   printf("The lattice size is %dx%dx%dx%d\n",T,X,Y,Z);
 
-   nsp=VOLUME;
+   vol=nsp=VOLUME;
    
    rlxs_init(0,12345);
 
-   geometry_eo_lexi();
    u_gauge=alloc_gfield();
 #ifndef REPR_FUNDAMENTAL
    u_gauge_f=alloc_gfield_f();
@@ -207,14 +207,14 @@ int main(int argc,char *argv[])
    represent_gauge_field();
 
    set_spinor_len(VOLUME);
-
+	 tmp=alloc_spinor_field_f(1);
    ws=malloc(10*sizeof(suNf_spinor*));
    for (i=0;i<10;i++)
       ws[i]=alloc_spinor_field_f(1);
 
 
    for (i=0;i<10;i++)
-      gaussian_spinor_field(&(ws[i][0]));
+      gaussian_spinor_field(ws[i]);
 
    dmax=0.0;
    

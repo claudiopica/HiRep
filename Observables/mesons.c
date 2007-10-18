@@ -31,7 +31,7 @@ void NAME(double *out, suNf_spinor **qp) { \
   suNf_spinor *s2; \
   for (t=0; t<T; ++t) { \
     double _tmp,hc=0.; \
-    for (x=0; x<L; ++x) for (y=0; y<L; ++y) for (z=0; z<L; ++z) { \
+    for (x=0; x<X; ++x) for (y=0; y<Y; ++y) for (z=0; z<Z; ++z) { \
       for (i=0; i<NF; ++i) { \
         s1 = &(qp[_INDEX_(i,1)][ipt(t,x,y,z)]); \
         s2 = &(qp[_INDEX_(i,_C1_)][ipt(t,x,y,z)]); \
@@ -63,7 +63,7 @@ void NAME(double *out, suNf_spinor **qp) { \
   suNf_spinor *s2; \
   for (t=0; t<T; ++t) { \
     double _tmp,hc=0.; \
-    for (x=0; x<L; ++x) for (y=0; y<L; ++y) for (z=0; z<L; ++z) { \
+    for (x=0; x<X; ++x) for (y=0; y<Y; ++y) for (z=0; z<Z; ++z) { \
       for (i=0; i<NF; ++i) { \
         s1 = &(qp[_INDEX_(i,1)][ipt(t,x,y,z)]); \
         s2 = &(qp[_INDEX_(i,_D1_)][ipt(t,x,y,z)]); \
@@ -95,7 +95,7 @@ void NAME(double *out, suNf_spinor **qp) { \
   suNf_spinor *s2; \
   for (t=0; t<T; ++t) { \
     double _tmp,hc=0.; \
-    for (x=0; x<L; ++x) for (y=0; y<L; ++y) for (z=0; z<L; ++z) { \
+    for (x=0; x<X; ++x) for (y=0; y<Y; ++y) for (z=0; z<Z; ++z) { \
       for (i=0; i<NF; ++i) { \
         s1 = &(qp[_INDEX_(i,1)][ipt(t,x,y,z)]); \
         s2 = &(qp[_INDEX_(i,_D1_)][ipt(t,x,y,z)]); \

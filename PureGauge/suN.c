@@ -18,6 +18,7 @@
 #include "statistics.h"
 #include "update.h"
 #include "global.h"
+#include "logger.h"
 #include "observables.h"
 
 
@@ -59,8 +60,13 @@ int main(int argc,char *argv[])
 
    read_cmdline(argc, argv);
 
+	 logger_setlevel(0,10000);
+
    printf("Gauge group: SU(%d)\n",NG);
-   printf("The lattice size is %dx%d^3\n",T,L);
+
+   geometry_blocked();
+   test_geometry();
+   printf("The lattice size is %dx%dx%dx%d\n",T,X,Y,Z);
    printf("\n");
    printf("beta = %2.4f\n",beta);
    printf("nth  = %d\tNumber of thermalization cycles\n",nth);
@@ -74,8 +80,6 @@ int main(int argc,char *argv[])
    rlxd_init(level,seed);
    /*   rlxd_init(level+1,seed); */
 
-   geometry_blocked();
-   test_geometry();
 
    u_gauge=alloc_gfield();
 

@@ -8,7 +8,7 @@ MKDIR=$(TOPDIR)/Make
 include $(MKDIR)/MkRules
 
 MODDIR := Geometry
-MODS := geometry_init blocked eo_lexi test_geometry
+MODS := geometry_init blocked eo_lexi test_geometry lexi
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := IO

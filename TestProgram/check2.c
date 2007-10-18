@@ -91,11 +91,12 @@ int main(int argc,char *argv[])
    double pi,p[4];
    double *rs,r,mp,sig,px;
    complex z;
-   suNf_spinor s,s0,s1,s2,s3,ps0[VOLUME],ps1[VOLUME],ps2[VOLUME];
+   suNf_spinor s,s0,s1,s2,s3,*ps0,*ps1,*ps2;
 
    printf("Gauge group: SU(%d)\n",NG);
    printf("Fermion representation: dim = %d\n",NF);
-   printf("The lattice size is %dx%d^3\n",T,L);
+   geometry_eo_lexi();
+   printf("The lattice size is %dx%dx%dx%d\n",T,X,Y,Z);
    printf("\n");
    printf("\n");
    printf("Action of Qhat on plane waves\n");
@@ -107,13 +108,17 @@ int main(int argc,char *argv[])
    printf("ranlux: level = %d, seed = %d\n\n",level,seed); 
    fflush(stdout);
  
-   geometry_eo_lexi();
    u_gauge=alloc_gfield();
 #ifndef REPR_FUNDAMENTAL
    printf("allocating gfield_f\n");
    u_gauge_f=alloc_gfield_f();
 #endif
    represent_gauge_field();
+	 
+	 set_spinor_len(VOLUME);
+	 ps0=alloc_spinor_field_f(3);
+	 ps1=ps0+VOLUME;
+	 ps2=ps1+VOLUME;
 
    pi=4.0*atan(1.0);
    n=10;
@@ -125,14 +130,14 @@ int main(int argc,char *argv[])
       ranlxd(ran,4);
       
       np[0]=(int)(ran[0]*(double)(T));
-      np[1]=(int)(ran[1]*(double)(L));
-      np[2]=(int)(ran[2]*(double)(L));
-      np[3]=(int)(ran[3]*(double)(L));
+      np[1]=(int)(ran[1]*(double)(X));
+      np[2]=(int)(ran[2]*(double)(Y));
+      np[3]=(int)(ran[3]*(double)(Z));
 
       p[0]=((double)(np[0])*2.0+bc)*pi/(double)(T);
-      p[1]=(double)(np[1])*2.0*pi/(double)(L);
-      p[2]=(double)(np[2])*2.0*pi/(double)(L);
-      p[3]=(double)(np[3])*2.0*pi/(double)(L);
+      p[1]=(double)(np[1])*2.0*pi/(double)(X);
+      p[2]=(double)(np[2])*2.0*pi/(double)(Y);
+      p[3]=(double)(np[3])*2.0*pi/(double)(Z);
 
       mp=(double)(hmass);
       mp+=(double)(1.0-cos(p[0]));
@@ -159,11 +164,11 @@ int main(int argc,char *argv[])
       
       for (x0=0;x0<T;x0++)
       {
-         for (x1=0;x1<L;x1++)
+         for (x1=0;x1<X;x1++)
          {
-            for (x2=0;x2<L;x2++)
+            for (x2=0;x2<Y;x2++)
             {
-               for (x3=0;x3<L;x3++)
+               for (x3=0;x3<Z;x3++)
                {
                   ix=ipt(x0,x1,x2,x3);
                   
@@ -225,6 +230,7 @@ int main(int argc,char *argv[])
 #ifndef REPR_FUNDAMENTAL
    free_field(u_gauge_f);
 #endif
+	 free_field(ps0);
 
    exit(0);
 }

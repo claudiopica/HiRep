@@ -1,5 +1,3 @@
-T = 4
-L = 4
 NG = 3
 REPR = REPR_FUNDAMENTAL
 #REPR = REPR_SYMMETRIC
@@ -20,7 +18,6 @@ CFLAGS = -Wall -ansi -O2 -fomit-frame-pointer -mfpmath=sse -msse -msse2
 
 #Macros
 MACRO += -DNDEBUG
-MACRO += -DT=$(T) -DL=$(L)
 MACRO += -D$(REPR) -DREPR_NAME=\"$(REPR)\"
 
 #Include

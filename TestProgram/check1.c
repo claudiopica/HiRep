@@ -30,7 +30,7 @@ int nhb,nor,nit,nth,nms,level,seed;
 double beta;
 
 static double hmass=0.1;
-static suNg g[VOLUME];
+static suNg *g;
 
 
 static void D(suNf_spinor *out, suNf_spinor *in){
@@ -89,11 +89,12 @@ static void transform_s(suNf_spinor *out, suNf_spinor *in)
 int main(int argc,char *argv[])
 {
    double sig,tau;
-   suNf_spinor s0[VOLUME],s1[VOLUME],s2[VOLUME],s3[VOLUME];
+   suNf_spinor *s0,*s1,*s2,*s3;
 
    printf("Gauge group: SU(%d)\n",NG);
    printf("Fermion representation: dim = %d\n",NF);
-   printf("The lattice size is %dx%d^3\n",T,L);
+   geometry_eo_lexi();
+   printf("The lattice size is %dx%dx%dx%d\n",T,X,Y,Z);
    printf("\n");
    
    level=0;
@@ -102,14 +103,21 @@ int main(int argc,char *argv[])
    printf("ranlux: level = %d, seed = %d\n\n",level,seed); 
    fflush(stdout);
  
-   geometry_eo_lexi();
    u_gauge=alloc_gfield();
 #ifndef REPR_FUNDAMENTAL
    printf("allocating gfield_f\n");
    u_gauge_f=alloc_gfield_f();
 #endif
    represent_gauge_field();
-   
+
+   /* allocate memory */
+	 g=malloc(sizeof(suNg)*VOLUME);
+	 set_spinor_len(VOLUME);
+	 s0=alloc_spinor_field_f(4);
+	 s1=s0+VOLUME;
+	 s2=s1+VOLUME;
+	 s3=s2+VOLUME;
+
    printf("Generating a random gauge field... ");
    fflush(stdout);
    random_u();
@@ -147,6 +155,8 @@ int main(int argc,char *argv[])
 #ifndef REPR_FUNDAMENTAL
    free_field(u_gauge_f);
 #endif
+	 free_field(s0);
 
+	 free(g);
    exit(0);
 }

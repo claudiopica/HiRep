@@ -41,8 +41,8 @@ void H(suNf_spinor *out, suNf_spinor *in){
    g5Dphi(hmass,out,in);
 }
 
+static suNf_spinor *tmp;
 void M(suNf_spinor *out, suNf_spinor *in){
-   static suNf_spinor tmp[VOLUME];
    g5Dphi(-hmass,tmp,in); 
    g5Dphi(-hmass,out,tmp);
 }
@@ -61,7 +61,9 @@ int main(int argc,char *argv[])
 
    printf("Gauge group: SU(%d)\n",NG);
    printf("Fermion representation: dim = %d\n",NF);
-   printf("The lattice size is %dx%d^3\n",T,L);
+   geometry_eo_lexi();
+   test_geometry();
+   printf("The lattice size is %dx%dx%dx%d\n",T,X,Y,Z);
    printf("\n");
    
    level=1;
@@ -71,8 +73,6 @@ int main(int argc,char *argv[])
    
    rlxd_init(level,seed);
 
-   geometry_eo_lexi();
-   test_geometry();
    u_gauge=alloc_gfield();
 #ifndef REPR_FUNDAMENTAL
    u_gauge_f=alloc_gfield_f();
@@ -92,11 +92,12 @@ int main(int argc,char *argv[])
    par.err2=1.e-28;
    par.max_iter=0;
    res=(suNf_spinor**)malloc(sizeof(suNf_spinor*)*(par.n));
-   res[0]=(suNf_spinor*)malloc(sizeof(suNf_spinor)*par.n*VOLUME);
+	 res[0]=alloc_spinor_field_f(par.n+3);
    for(i=1;i<par.n;++i)
      res[i]=res[i-1]+VOLUME;
-	 s1=malloc(sizeof(*s1)*VOLUME);
-	 s2=malloc(sizeof(*s2)*VOLUME);
+	 s1=res[par.n-1]+VOLUME;
+	 s2=s1+VOLUME;
+	 tmp=s2+VOLUME;
 
    par.shift[0]=+0.1;
    par.shift[1]=-0.21;
@@ -105,7 +106,7 @@ int main(int argc,char *argv[])
    par.shift[4]=-0.15;
    par.shift[5]=-0.05;
 
-   gaussian_spinor_field(&(s1[0]));
+   gaussian_spinor_field(s1);
    
 
    /* TEST CG_M */
@@ -124,10 +125,9 @@ int main(int argc,char *argv[])
       printf("test cg[%d] = %e (req. %e)\n",i,tau,par.err2);
    }
 
-	 free(res[0]);
+	 free_field(res[0]);
 	 free(res);
-	 free(s1);
-	 free(s2);
+	 free(par.shift);
 
    exit(0);
 }
