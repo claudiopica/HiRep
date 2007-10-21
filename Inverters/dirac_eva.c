@@ -28,10 +28,10 @@ static void H(suNf_spinor *out, suNf_spinor *in){
 }
 
 
-void H2(suNf_spinor *out, suNf_spinor *in){
-  g5Dphi(hmass, h2tmp, in);
-  g5Dphi(hmass, out, h2tmp);
-}
+/* void H2(suNf_spinor *out, suNf_spinor *in){ */
+/*   g5Dphi(hmass, h2tmp, in); */
+/*   g5Dphi(hmass, out, h2tmp); */
+/* } */
 
 
 

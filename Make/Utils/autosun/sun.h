@@ -56,6 +56,11 @@ void group::init(int n)
 		
 	Tnorm = 2.0;
 
+        //my changes below
+        for (A=0;A<group::DIM;A++)
+           T[A].scale(1.0/(Tnorm));
+        Tnorm=0.5;
+        
 #ifndef NDEBUG 
 	cerr << "OK\n";
 #endif

@@ -61,6 +61,20 @@ static void reduce_fraction(int *a, int *b){
 	}
 }
 
+void flip_mom()
+{
+   suNg_algebra_vector *mom,*momm;
+
+   mom=momenta;
+   momm=momenta+4*VOLUME;
+
+   for(;mom<momm;)
+   {
+      _algebra_vector_mul_g(*mom,-1.0,*mom);
+      mom++;
+   }
+}
+
 void init_rhmc(rhmc_par *par){
 	int i;
 	unsigned int len;
@@ -187,6 +201,88 @@ int update_rhmc(){
    gaussian_momenta(momenta);
 	 for (i=0;i<_update_par.n_pf;++i)
 		 gaussian_spinor_field(pf[i]);
+
+   /* compute starting action */
+	 lprintf("RHMC",30,"Computing action density...\n");
+   local_hmc_action(NEW, la, momenta, pf, pf);
+   
+   /* compute H2^{a/2}*pf */
+	 lprintf("RHMC",30,"Correcting pseudofermions distribution...\n");
+	 for (i=0;i<_update_par.n_pf;++i)
+		 rational_func(&r_HB, &H2, pf[i], pf[i]);
+
+   /* integrate molecular dynamics */
+	 lprintf("RHMC",30,"MD integration...\n");
+	 _update_par.integrator(momenta,_update_par.MD_par);
+	 /*leapfrog(momenta, _update_par.tlen, _update_par.nsteps);
+	 O2MN_multistep(momenta, _update_par.tlen, _update_par.nsteps, 3);*/
+
+	 /* project gauge field */
+	 project_gauge_field();
+	 represent_gauge_field();
+
+   /* test min and max eigenvalue of H2 and update approx if necessary */
+   /* now it just tests the approx !!! */
+   oldmax = maxev; /* save old max */
+   oldmin = minev; /* save old min */
+   find_spec_H2(&maxev,&minev, _update_par.mass); /* find spectral interval of H^2 */
+	 r_app_set(&r_S,minev,maxev);
+	 r_app_set(&r_MD,minev,maxev);
+	 r_app_set(&r_HB,minev,maxev);
+
+	 lprintf("RHMC",30,"Computing new action density...\n");
+   /* compute H2^{-a/2}*pf or H2^{-a}*pf */
+   /* here we choose the first strategy which is more symmetric */
+	 for (i=0;i<_update_par.n_pf;++i)
+		 rational_func(&r_S, &H2, pf[i], pf[i]);
+
+   /* compute new action */
+   local_hmc_action(DELTA, la, momenta, pf, pf);
+
+   /* Metropolis test */
+   deltaH=0.;
+   for(i=0; i<VOLUME; ++i) {
+      deltaH+=la[i];
+   }
+   lprintf("RHMC",10,"[DeltaS = %1.8e][exp(-DS) = %1.8e]\n",deltaH,exp(-deltaH));
+
+   if(deltaH<0.) {
+      suNg_field_copy(u_gauge_old,u_gauge);
+   } else {
+      double r;
+      ranlxd(&r,1);
+      if(r<exp(-deltaH)) {
+				suNg_field_copy(u_gauge_old,u_gauge);
+      } else {
+				lprintf("RHMC",10,"Configuration rejected.\n");
+				suNg_field_copy(u_gauge,u_gauge_old);
+				represent_gauge_field();
+
+				/* revert the approx to the old one */
+				maxev=oldmax;
+				minev=oldmin;
+				r_app_set(&r_S,minev,maxev);
+				r_app_set(&r_MD,minev,maxev);
+				r_app_set(&r_HB,minev,maxev);
+
+				return 0;
+      }
+   }
+
+	 lprintf("RHMC",10,"Configuration accepted.\n");
+
+	 return 1;
+}
+
+
+int update_rhmc_o(){
+
+   double deltaH;
+   double oldmax,oldmin;
+   int i;
+  
+	 if(!init)
+		 return -1;
 
    /* compute starting action */
 	 lprintf("RHMC",30,"Computing action density...\n");

@@ -45,6 +45,7 @@ typedef struct {
 	int_par *MD_par;
 	int (*mshift_solver)(mshift_par *, spinor_operator, suNf_spinor *, suNf_spinor **);
 } rhmc_par;
+void flip_mom();
 void init_rhmc(rhmc_par *par);
 void free_rhmc();
 
@@ -56,6 +57,7 @@ void free_rhmc();
  * -1 => rhmc has not been initialized. call init_rhmc first.
  */
 int update_rhmc();
+int update_rhmc_o();
 
 /* this is the basic operator used in the update */
 void H2(suNf_spinor *out, suNf_spinor *in);

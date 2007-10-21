@@ -24,6 +24,11 @@ check11		Check the consistency of spinor linear algebra
 
 check12		Initialization of the link momenta
 
-check13 	Check the mesons (both mesons.c and dublin_mesons.c) using a free field
+check13 	Check the mesons (both mesons.c and dublin_mesons.c) 
+                using a free field
 
-check14   Check the dirac_eva module using a random field
+check14         Check the dirac_eva module using a random field
+
+check15 	Check that the 2AS is equivalent to fund^* for SU(3)
+
+check16 	Reversibility of the molecular dynamics
