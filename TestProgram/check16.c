@@ -59,9 +59,9 @@ int main(int argc,char *argv[])
    rpar.beta = 4.9;
    rpar.mass = -1.3045822102425876010; /* k=0.1855 */
    rpar.nf = 2;
-   rpar.MT_prec = 1.e-15;
-   rpar.MD_prec = 1.e-15;
-   rpar.HB_prec = 1.e-15;
+   rpar.MT_prec = 1.e-10;
+   rpar.MD_prec = 1.e-10;
+   rpar.HB_prec = 1.e-10;
    rpar.force_prec = 1.e-20;
    rpar.n_pf = 2;
    rpar.integrator=&O2MN_multistep;
@@ -69,7 +69,7 @@ int main(int argc,char *argv[])
    rpar.mshift_solver=&cg_mshift; /* this is not used in the code now */
    
    t_par.tlen = 1.;
-   t_par.nsteps = 7;
+   t_par.nsteps = 2;
    t_par.gsteps = 5;
    
    printf("Generating a random gauge field... ");fflush(stdout);
@@ -85,11 +85,11 @@ int main(int argc,char *argv[])
    printf("MVM during RHMC initialzation: %ld\n",getMVM());
    printf("Initial plaquette: %1.8e\n",avr_plaquette());
 
-   rr=update_rhmc();
-   if(rr<0) {
-      printf("Error in updating the gauge field!!\n");
-      return 1;
-   }
+	 rr=update_rhmc_o();
+	 if(rr<0) {
+		 printf("Error in updating the gauge field!!\n");
+		 return 1;
+	 }
    printf("Plaquette: %1.8e\n",avr_plaquette());
 
    flip_mom();

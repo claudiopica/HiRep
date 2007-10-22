@@ -280,9 +280,19 @@ int update_rhmc_o(){
    double deltaH;
    double oldmax,oldmin;
    int i;
+
+	 static unsigned int calln=0;
   
 	 if(!init)
 		 return -1;
+
+	 if((calln++&1)==0 ) {
+		 /* generate new momenta and pseudofermions */
+		 lprintf("RHMC",30,"Generating gaussian momenta and pseudofermions...\n");
+		 gaussian_momenta(momenta);
+		 for (i=0;i<_update_par.n_pf;++i)
+			 gaussian_spinor_field(pf[i]);
+	 }
 
    /* compute starting action */
 	 lprintf("RHMC",30,"Computing action density...\n");
@@ -312,6 +322,7 @@ int update_rhmc_o(){
 	 r_app_set(&r_MD,minev,maxev);
 	 r_app_set(&r_HB,minev,maxev);
 
+	 /* from here to FINISH is not necessary for the test */
 	 lprintf("RHMC",30,"Computing new action density...\n");
    /* compute H2^{-a/2}*pf or H2^{-a}*pf */
    /* here we choose the first strategy which is more symmetric */
@@ -327,31 +338,9 @@ int update_rhmc_o(){
       deltaH+=la[i];
    }
    lprintf("RHMC",10,"[DeltaS = %1.8e][exp(-DS) = %1.8e]\n",deltaH,exp(-deltaH));
+	 /* FINISH */
 
-   if(deltaH<0.) {
-      suNg_field_copy(u_gauge_old,u_gauge);
-   } else {
-      double r;
-      ranlxd(&r,1);
-      if(r<exp(-deltaH)) {
-				suNg_field_copy(u_gauge_old,u_gauge);
-      } else {
-				lprintf("RHMC",10,"Configuration rejected.\n");
-				suNg_field_copy(u_gauge,u_gauge_old);
-				represent_gauge_field();
-
-				/* revert the approx to the old one */
-				maxev=oldmax;
-				minev=oldmin;
-				r_app_set(&r_S,minev,maxev);
-				r_app_set(&r_MD,minev,maxev);
-				r_app_set(&r_HB,minev,maxev);
-
-				return 0;
-      }
-   }
-
-	 lprintf("RHMC",10,"Configuration accepted.\n");
+	 suNg_field_copy(u_gauge_old,u_gauge);
 
 	 return 1;
 }
