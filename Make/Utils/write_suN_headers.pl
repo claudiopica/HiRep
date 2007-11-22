@@ -52,6 +52,8 @@ print "#define NF $Nf\n";
 #system("./write_suN_def.pl $Nf f $c2 T");
 write_suN_h($Nf,"f",$c2,"T");
 
+print '#include "spinor_field.h"';
+
 write_epilog();
 
 open STDOUT, ">suN.h";

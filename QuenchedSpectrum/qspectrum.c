@@ -86,7 +86,7 @@ int main(int argc,char *argv[])
 
 	lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
 	lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
-	lprintf("MAIN",0,"The lattice size is %dx%d^3\n",T,L);
+	lprintf("MAIN",0,"The lattice size is %dx%dx%dx%d\n",T,X,Y,Z);
 	lprintf("MAIN",0,"beta = %2.4f\n",beta);
 	lprintf("MAIN",0,"nth  = %d\tNumber of thermalization cycles\n",nth);
 	lprintf("MAIN",0,"nms  = %d\tNumber of measure cycles\n",nms);
@@ -109,7 +109,7 @@ int main(int argc,char *argv[])
 	u_gauge_f=alloc_gfield_f();
 #endif
 
-	sprintf(propname,"quark_prop_qmr_%3.5f_%d_%d_%d_%d",beta,T,L,L,L);
+	sprintf(propname,"quark_prop_qmr_%3.5f_%d_%d_%d_%d",beta,T,X,Y,Z);
 	error((propfile = fopen(propname, "wb"))==NULL,1,"Main",
 			"Failed to open propagator file for writing");
 	fwrite(&nm,(size_t) sizeof(int),1,propfile);

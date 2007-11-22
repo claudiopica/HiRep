@@ -10,21 +10,35 @@
 
 #include "suN.h"
 
+
+/*
+typedef struct {
+	enum { ALL=0 };
+	suNf_spinor *array;
+} spinor_field;
+
+typedef struct {
+	enum { ALL=0 };
+	suNf_spinor_flt *array;
+} spinor_field_flt;
+*/
+
+
 void set_spinor_len(unsigned int len);
 void get_spinor_len(unsigned int *len);
 
 /* double precision */
-#define _SPINOR_TYPE suNf_spinor
+#define _SPINOR_FIELD_TYPE spinor_field
 #define _FUNC(a) a##_f
 #include "TMPL/linear_algebra.h.sdtmpl"
-#undef _SPINOR_TYPE
+#undef _SPINOR_FIELD_TYPE
 #undef _FUNC
 
 /* single precision */
-#define _SPINOR_TYPE suNf_spinor_flt
+#define _SPINOR_FIELD_TYPE spinor_field_flt
 #define _FUNC(a) a##_f_flt
 #include "TMPL/linear_algebra.h.sdtmpl"
-#undef _SPINOR_TYPE
+#undef _SPINOR_FIELD_TYPE
 #undef _FUNC
 
 #endif

@@ -17,11 +17,11 @@
  * out[i] = (M-(par->shift[i]))^-1 in
  * returns the number of cg iterations done.
  */
-int MINRES_mshift_core(short int *flags,mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor **out){
+int MINRES_mshift_core(short int *flags,mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out){
 
-	suNf_spinor **q1,**q2;
-	suNf_spinor *p1, *p2, *Mp;
-	suNf_spinor *sptmp, *memall;
+	spinor_field **q1,**q2;
+	spinor_field *p1, *p2, *Mp;
+	spinor_field *sptmp, *memall;
 
 	double alpha, beta, oldbeta,innorm2; 
 	double *r, *s1, *s2, *c1, *c2, *rho1, *rho2, *rp;
@@ -47,18 +47,16 @@ int MINRES_mshift_core(short int *flags,mshift_par *par, spinor_operator M, suNf
 	 * objects of the same type are allocated together
 	 */
 	get_spinor_len(&spinorlen);
-	q1 = (suNf_spinor **)malloc(sizeof(suNf_spinor*)*2*(par->n));
-	q2 = q1+(par->n);
 	memall = alloc_spinor_field_f(2*(par->n)+3);
-	q1[0] = memall;
-	q2[0] = q1[0]+(par->n)*(spinorlen);
-	for (i=1; i<(par->n); ++i) {
-		q1[i] = q1[i-1]+(spinorlen);
-		q2[i] = q2[i-1]+(spinorlen);
+	q1 = (spinor_field**)malloc(sizeof(spinor_field*)*par->n);
+	q2 = (spinor_field**)malloc(sizeof(spinor_field*)*par->n);
+	for(i=0; i<par->n; i++) {
+		q1[i] = memall+i;
+		q2[i] = memall+par->n+i;
 	}
-	p1 = q2[par->n-1]+(spinorlen);
-	p2 = p1+(spinorlen);
-	Mp = p2+(spinorlen);
+	p1 = memall+2*par->n;
+	p2 = p1+1;
+	Mp = p2+1;
 
 	r = (double *)malloc(sizeof(double)*8*(par->n));
 	s1 = r+(par->n);
@@ -75,8 +73,8 @@ int MINRES_mshift_core(short int *flags,mshift_par *par, spinor_operator M, suNf
 
 	if (par->n==1){ /* non multishift case */
 		spinor_field_copy_f(p2, in);
-    M(p1,out[0]);
-		spinor_field_mul_add_assign_f(p1,-par->shift[0],out[0]);
+    M(p1,&out[0]);
+		spinor_field_mul_add_assign_f(p1,-par->shift[0],&out[0]);
 		++cgiter;
     spinor_field_sub_assign_f(p2,p1);
 		/* use out[0] as trial solution */
@@ -92,7 +90,7 @@ int MINRES_mshift_core(short int *flags,mshift_par *par, spinor_operator M, suNf
 		rho1[i]=1.;
 		c2[i]=-1.;
 		rp[i]=s1[i]=s2[i]=c1[i]=0.;
-		if(par->n!=1) spinor_field_zero_f(out[i]);
+		if(par->n!=1) spinor_field_zero_f(&out[i]);
 		spinor_field_zero_f(q1[i]);
 		spinor_field_zero_f(q2[i]);
 		flags[i]=1;
@@ -147,7 +145,7 @@ int MINRES_mshift_core(short int *flags,mshift_par *par, spinor_operator M, suNf
 				rho2[i]=k;
 
 				/* update solution */
-				spinor_field_mul_add_assign_f(out[i],r[i]*c2[i]/k,q2[i]);
+				spinor_field_mul_add_assign_f(&out[i],r[i]*c2[i]/k,q2[i]);
 
 				/* update residuum */
 				r[i]*=s2[i];
@@ -167,9 +165,9 @@ int MINRES_mshift_core(short int *flags,mshift_par *par, spinor_operator M, suNf
 	/* test results */
 	for(i=0;i<par->n;++i){
 		double norm;
-		M(Mp,out[i]);
+		M(Mp,&out[i]);
 		++cgiter;
-		spinor_field_mul_add_assign_f(Mp,-par->shift[i],out[i]);
+		spinor_field_mul_add_assign_f(Mp,-par->shift[i],&out[i]);
 		spinor_field_sub_f(Mp,Mp,in);
 		norm=spinor_field_sqnorm_f(Mp)/innorm2;
 		flags[i]=1;
@@ -185,13 +183,14 @@ int MINRES_mshift_core(short int *flags,mshift_par *par, spinor_operator M, suNf
 	/* free memory */
 	free_field(memall);
 	free(q1);
+	free(q2);
 	free(r);
 
 	/* return number of cg iter */
 	return cgiter;
 }
 
-int MINRES_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor **out){
+int MINRES_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out){
 	int iter,msiter;
 	int i;
 	mshift_par par_save=*par;

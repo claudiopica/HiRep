@@ -24,7 +24,7 @@ MODS := amalloc field_alloc spinor_field_alloc
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Observables
-MODS := avr_plaquette quark_propagator mesons dublin_mesons
+MODS := avr_plaquette quark_propagator mesons
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Random
@@ -55,11 +55,6 @@ qspectrum: $(OBJS) $(MOD_OBJS)
 mk_mesons: mk_mesons.o $(MOD_OBJS)
 	echo -n Linking [$@]... 
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ mk_mesons.o $(MOD_OBJS) &&\
-	echo " done." || echo " failed."
-
-mk_dmesons: mk_dmesons.o $(MOD_OBJS)
-	echo -n Linking [$@]... 
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ mk_dmesons.o $(MOD_OBJS) &&\
 	echo " done." || echo " failed."
 
 .PHONY: default

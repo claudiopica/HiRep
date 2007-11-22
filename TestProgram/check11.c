@@ -28,54 +28,12 @@
 
 static complex v[25];
 static double EPSILON=1.e-12;
-static suNf_spinor *ppk[5];
+static spinor_field *ppk[5];
 
 static int nsp,initr=0;
 static const suNf_spinor s0={{{{{0.0f}}}}};
 static suNf_spinor *psi,*chi;
 
-static void lc1(double c1,suNf_spinor *ps1,suNf_spinor *ps2)
-{
-   suNf_spinor *psm;
-
-   psm=ps1+nsp;
-
-   for (;ps1<psm;ps1++)
-   {
-      _spinor_mul_add_assign_f(*ps1,c1,*ps2);
-      ps2+=1;
-   }
-}
-
-
-static void lc2(double c1,double c2,suNf_spinor *ps1,suNf_spinor *ps2)
-{
-   suNf_spinor *psm;
-
-   psm=ps1+nsp;
-
-   for (;ps1<psm;ps1++)
-   {
-      _spinor_lc_f(*ps1,c1,*ps1,c2,*ps2);
-      ps2+=1;
-   }
-}
-
-static void lc3(double c1,double c2,suNf_spinor *ps1,suNf_spinor *ps2,suNf_spinor *ps3)
-{
-   suNf_spinor *psm;
-
-   psm=ps1+nsp;
-
-   c1=-c1; c2=-c2;
-   for (;ps1<psm;ps1++)
-   {
-      _spinor_lc_add_assign_f(*ps3,c1,*ps1,c2,*ps2);
-      _spinor_minus_f(*ps3,*ps3);
-      ps2+=1;
-      ps3+=1;
-   }
-}
 
 static void alloc_ws_rotate(void)
 {
@@ -88,7 +46,7 @@ static void alloc_ws_rotate(void)
    initr=1;
 }
 
-static void rotate(int vol,int n,suNf_spinor **pkk,complex v[])
+static void rotate_ptr(int vol,int n,spinor_field *pkk[],complex v[])
 {
    int k,j,ix;
    complex *z;
@@ -105,14 +63,14 @@ static void rotate(int vol,int n,suNf_spinor **pkk,complex v[])
       for (k=0;k<n;k++)
       {
          pk=&(psi[k]);
-         pj=pkk[0]+ix;
+         pj=_SPINOR_AT_SITE(pkk[0],ix);
          z=&v[k];
 
 				 _spinor_mulc_f(*pk,*z,*pj);
 
          for (j=1;j<n;j++)
          {
-            pj=pkk[j]+ix;
+            pj=_SPINOR_AT_SITE(pkk[j],ix);
             z+=n;
 
 						_spinor_mulc_add_assign_f(*pk,*z,*pj);
@@ -120,11 +78,11 @@ static void rotate(int vol,int n,suNf_spinor **pkk,complex v[])
       }
 
       for (k=0;k<n;k++)
-         *(pkk[k]+ix)=psi[k];
+         *_SPINOR_AT_SITE(pkk[k],ix)=psi[k];
    }
 }
 
-static void project(suNf_spinor *pk,suNf_spinor *pl)
+static void project(spinor_field *pk,spinor_field *pl)
 {
    complex sp;
 
@@ -134,7 +92,7 @@ static void project(suNf_spinor *pk,suNf_spinor *pl)
    spinor_field_mulc_add_assign_f(pk,sp,pl);
 }   
 
-static double normalize(suNf_spinor *ps)
+static double normalize(spinor_field *ps)
 {
    double r,ri;
 
@@ -148,7 +106,7 @@ static double normalize(suNf_spinor *ps)
    return (double)(r);
 }
 
-static complex sp(int vol,suNf_spinor *pk,suNf_spinor *pl)
+static complex sp(int vol,spinor_field *pk,spinor_field *pl)
 {
    int ix;
    double x,y;
@@ -157,8 +115,8 @@ static complex sp(int vol,suNf_spinor *pk,suNf_spinor *pl)
    x=0.0;
    y=0.0;
 
-   rpk=(complex*)(pk);
-   rpl=(complex*)(pl);
+   rpk=(complex*)_SPINOR_ADDR(pk);
+   rpl=(complex*)_SPINOR_ADDR(pl);
    
    for (ix=0;ix<(4*NF*vol);ix++)
    {
@@ -177,15 +135,15 @@ static complex sp(int vol,suNf_spinor *pk,suNf_spinor *pl)
 
 int main(int argc,char *argv[])
 {
-   int i,j,vol,off=0;
+   int i,j,vol;
    double r;
    double rd,zsqd;
    double d,dmax;
    complex w;
    complex zd,wd;
-   suNf_spinor **ws;
-   suNf_spinor *pk,*pl;
-   suNf_spinor *tmp;
+   spinor_field *ws;
+   spinor_field *pk,*pl;
+   spinor_field *tmp;
    FILE *log=NULL;   
 
    log=freopen("check11.log","w",stdout);
@@ -207,21 +165,19 @@ int main(int argc,char *argv[])
    represent_gauge_field();
 
    set_spinor_len(VOLUME);
-	 tmp=alloc_spinor_field_f(1);
-   ws=malloc(10*sizeof(suNf_spinor*));
-   for (i=0;i<10;i++)
-      ws[i]=alloc_spinor_field_f(1);
+	tmp=alloc_spinor_field_f(1);
+   ws=alloc_spinor_field_f(10);
 
 
    for (i=0;i<10;i++)
-      gaussian_spinor_field(ws[i]);
+      gaussian_spinor_field(&ws[i]);
 
    dmax=0.0;
    
    for (i=0;i<10;i++)
    {
-      pk=&ws[i][off];
-      pl=&ws[9-i][off];
+      pk=&ws[i];
+      pl=&ws[9-i];
       w=sp(vol,pk,pl);
       
       zd=spinor_field_prod_f(pk,pl);
@@ -259,8 +215,8 @@ int main(int argc,char *argv[])
    
    for (i=0;i<9;i++)
    {
-      pk=&ws[i][off];
-      pl=&ws[i+1][off];
+      pk=&ws[i];
+      pl=&ws[i+1];
       
       wd=spinor_field_prod_f(pk,pl);
       rd=spinor_field_sqnorm_f(pk)+zsqd*spinor_field_sqnorm_f(pl)
@@ -277,17 +233,17 @@ int main(int argc,char *argv[])
    printf("and mulc_spinor_add: %.2e\n\n",dmax);
    
    for (i=0;i<10;i++)
-      gaussian_spinor_field(&(ws[i][0]));
+      gaussian_spinor_field(&ws[i]);
 
    dmax=0.0;
    
    for (i=0;i<10;i++)
    {
-      pk=&ws[i][off];
+      pk=&ws[i];
       
       if (i>0)
       {
-         pl=&ws[i-1][off];
+         pl=&ws[i-1];
          project(pk,pl);
          zd=spinor_field_prod_f(pk,pl);
          
@@ -312,8 +268,8 @@ int main(int argc,char *argv[])
    
    for (i=0;i<5;i++)
    {
-      pk=&ws[i][off];
-      pl=&ws[i+5][off];
+      pk=&ws[i];
+      pl=&ws[i+5];
       
       gaussian_spinor_field(pk);
       spinor_field_copy_f(pl,pk);
@@ -327,19 +283,19 @@ int main(int argc,char *argv[])
       ppk[i]=pl;
    }
    
-   rotate(vol,5,ppk,v);
+   rotate_ptr(vol,5,ppk,v);
    dmax=0.0;
    
    for (i=5;i<10;i++)
    {
-      pk=&ws[i][off];
+      pk=&ws[i];
       
       for (j=0;j<5;j++)
       {
          zd.re=-(double)v[5*j+(i-5)].re;
          zd.im=-(double)v[5*j+(i-5)].im;
          
-         pl=&ws[j][off];
+         pl=&ws[j];
          spinor_field_mulc_add_assign_f(pk,zd,pl);
       }
       
@@ -350,7 +306,7 @@ int main(int argc,char *argv[])
          dmax=d;
    }
    
-   dmax/=spinor_field_sqnorm_f(&ws[0][off]);
+   dmax/=spinor_field_sqnorm_f(&ws[0]);
    dmax=sqrt(dmax);
    
    printf("Consistency of mulc_spinor_add\n");
@@ -360,8 +316,8 @@ int main(int argc,char *argv[])
    
    for (i=0;i<5;i++)
    {
-      pk=&ws[i][off];
-      pl=&ws[9-i][off];
+      pk=&ws[i];
+      pl=&ws[9-i];
       gaussian_spinor_field(pk);
       spinor_field_copy_f(pl,pk);
       spinor_field_g5_f(tmp,pk);
@@ -394,12 +350,12 @@ int main(int argc,char *argv[])
    
    for (i=0;i<5;i++)
    {
-      pk=&ws[i][off];
-      pl=&ws[9-i][off];
+      pk=&ws[i];
+      pl=&ws[9-i];
       gaussian_spinor_field(pk);
       spinor_field_copy_f(pl,pk);
       d=-2.5;
-      lc1(d,pk,pl);
+      spinor_field_lc1_f(d,pk,pl);
 
       zd.re=1.5;
       zd.im=0.0;
@@ -416,13 +372,13 @@ int main(int argc,char *argv[])
    
    for (i=0;i<5;i++)
    {
-      pk=&ws[i][off];
-      pl=&ws[9-i][off];
+      pk=&ws[i];
+      pl=&ws[9-i];
       gaussian_spinor_field(pk);
       spinor_field_copy_f(pl,pk);
       d=1.0;
       r=2.5;
-      lc2(d,r,pk,pl);
+      spinor_field_lc2_f(d,r,pk,pl);
 
       zd.re=-3.5;
       zd.im=0.0;
@@ -439,13 +395,13 @@ int main(int argc,char *argv[])
    
    for (i=0;i<5;i++)
    {
-      pk=&ws[i][off];
-      pl=&ws[9-i][off];
+      pk=&ws[i];
+      pl=&ws[9-i];
       gaussian_spinor_field(pk);
       spinor_field_copy_f(pl,pk);
       d=3.5;
       r=-1.5;
-      lc3(d,r,pk,pl,pk);
+      spinor_field_lc3_f(d,r,pk,pl,pk);
 
       zd.re=-1.0;
       zd.im=0.0;

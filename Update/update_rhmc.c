@@ -16,7 +16,7 @@
 /* State quantities for RHMC */
 static suNg *u_gauge_old;
 suNg_algebra_vector *momenta;
-suNf_spinor **pf;
+spinor_field *pf;
 rhmc_par _update_par;
 rational_app r_S;  /* used for computing the action S in the metropolis test */
 rational_app r_MD; /* used in the action MD evolution */
@@ -30,8 +30,8 @@ static short int init=0;
 static double *la=0;
 
 /* this is the basic operator used in the update */
-static suNf_spinor *h2tmp;
-void H2(suNf_spinor *out, suNf_spinor *in){
+static spinor_field *h2tmp;
+void H2(spinor_field *out, spinor_field *in){
   g5Dphi(_update_par.mass, h2tmp, in);
   g5Dphi(_update_par.mass, out, h2tmp);
 }
@@ -62,7 +62,6 @@ static void reduce_fraction(int *a, int *b){
 }
 
 void init_rhmc(rhmc_par *par){
-	int i;
 	unsigned int len;
 
 	lprintf("RHMC",0,"Initializing...\n");
@@ -100,18 +99,14 @@ void init_rhmc(rhmc_par *par){
 	suNg_field_copy(u_gauge_old,u_gauge);
 
 	/* allocate h2tmp for H2 */
-  h2tmp=alloc_spinor_field_f(1);
+	h2tmp=alloc_spinor_field_f(1);
 
 	/* allocate momenta */
 	momenta = alloc_momenta();
 
 	/* allocate pseudofermions */
 	get_spinor_len(&len);
-	pf=malloc(_update_par.n_pf*sizeof(*pf));
-	pf[0]=alloc_spinor_field_f(_update_par.n_pf);
-	for(i=1;i<_update_par.n_pf;++i) {
-		pf[i]=pf[i-1]+len;
-	}
+	pf=alloc_spinor_field_f(_update_par.n_pf);
 
 	/* allocate memory for the local action */
 	if(la==0)
@@ -158,8 +153,7 @@ void free_rhmc(){
   free_field(u_gauge_old);
   free_field(momenta);
 	free_field(h2tmp);
-	free_field(pf[0]);
-	free(pf);
+	free_spinor_field(pf);
 
   if(la!=0) free(la);
   
@@ -186,7 +180,7 @@ int update_rhmc(){
 	 lprintf("RHMC",30,"Generating gaussian momenta and pseudofermions...\n");
    gaussian_momenta(momenta);
 	 for (i=0;i<_update_par.n_pf;++i)
-		 gaussian_spinor_field(pf[i]);
+		 gaussian_spinor_field(&pf[i]);
 
    /* compute starting action */
 	 lprintf("RHMC",30,"Computing action density...\n");
@@ -195,7 +189,7 @@ int update_rhmc(){
    /* compute H2^{a/2}*pf */
 	 lprintf("RHMC",30,"Correcting pseudofermions distribution...\n");
 	 for (i=0;i<_update_par.n_pf;++i)
-		 rational_func(&r_HB, &H2, pf[i], pf[i]);
+		 rational_func(&r_HB, &H2, &pf[i], &pf[i]);
 
    /* integrate molecular dynamics */
 	 lprintf("RHMC",30,"MD integration...\n");
@@ -220,7 +214,7 @@ int update_rhmc(){
    /* compute H2^{-a/2}*pf or H2^{-a}*pf */
    /* here we choose the first strategy which is more symmetric */
 	 for (i=0;i<_update_par.n_pf;++i)
-		 rational_func(&r_S, &H2, pf[i], pf[i]);
+		 rational_func(&r_S, &H2, &pf[i], &pf[i]);
 
    /* compute new action */
    local_hmc_action(DELTA, la, momenta, pf, pf);

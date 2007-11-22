@@ -30,7 +30,7 @@
 
 static int iw;
 static double hmass=-7.94871867e-01f;
-static suNf_spinor **ws,**ev;
+static spinor_field *ws,*ev;
 static double EPSILON=1.e-12;
 
 
@@ -59,7 +59,7 @@ static void alloc_ws_rotate(void)
    init=1;
 }
 
-static void rotate(int vol,int n,suNf_spinor **ppk,complex v[])
+static void rotate(int vol,int n,spinor_field *ppk,complex v[])
 {
    int k,j,ix;
    complex *z;
@@ -76,7 +76,7 @@ static void rotate(int vol,int n,suNf_spinor **ppk,complex v[])
       for (k=0;k<n;k++)
       {
          pk=&(psi[k]);
-         pj=ppk[0]+ix;
+         pj = _SPINOR_AT_SITE(&ppk[0],ix);
          z=&v[k];
 
 				 _spinor_mulc_f(*pk,*z,*pj);
@@ -91,11 +91,11 @@ static void rotate(int vol,int n,suNf_spinor **ppk,complex v[])
       }
 
       for (k=0;k<n;k++)
-         *(ppk[k]+ix)=psi[k];
+         *_SPINOR_AT_SITE(&ppk[k],ix) = psi[k];
    }
 }
 
-static double normalize(suNf_spinor *ps)
+static double normalize(spinor_field *ps)
 {
    double r;
 
@@ -145,7 +145,7 @@ static void eva_sort(int n,double d[],complex v[])
 }
 
 
-static void eva_g5(int nev,double d[],suNf_spinor *ev[])
+static void eva_g5(int nev,double d[],spinor_field *ev)
 {
    int i,j;
    complex z;
@@ -158,14 +158,14 @@ static void eva_g5(int nev,double d[],suNf_spinor *ev[])
    
    for (i=0;i<nev;i++)
    {
-      g5Dphi(hmass,ev[iw],ev[i]);
+      g5Dphi(hmass,&ev[iw],&ev[i]);
 
-      aa[nev*i+i].re=spinor_field_prod_re_f(ev[iw],ev[i]);
+      aa[nev*i+i].re=spinor_field_prod_re_f(&ev[iw],&ev[i]);
       aa[nev*i+i].im=0.0f;
 
       for (j=(i+1);j<nev;j++)
       {
-         z=spinor_field_prod_f(ev[iw],ev[j]);
+         z=spinor_field_prod_f(&ev[iw],&ev[j]);
 
          aa[nev*i+j].re= (double)z.re;
          aa[nev*i+j].im= (double)z.im;
@@ -181,29 +181,29 @@ static void eva_g5(int nev,double d[],suNf_spinor *ev[])
 }
 
 
-static void Op1(suNf_spinor *out,suNf_spinor *in)
+static void Op1(spinor_field *out,spinor_field *in)
 {
-   g5Dphi(hmass,ev[iw],in);
-   g5Dphi(hmass,out,ev[iw]);
+   g5Dphi(hmass,&ev[iw],in);
+   g5Dphi(hmass,out,&ev[iw]);
 }
 
 
-static double power(int nit,spinor_operator Op,suNf_spinor *ws[])
+static double power(int nit,spinor_operator Op,spinor_field *ws)
 {
    int i;
    double ubnd;
 
-   gaussian_spinor_field(ws[0]);
-   normalize(ws[0]);
-   Op(ws[1],ws[0]);
-   Op(ws[0],ws[1]);
-   ubnd=normalize(ws[0]);   
+   gaussian_spinor_field(&ws[0]);
+   normalize(&ws[0]);
+   Op(&ws[1],&ws[0]);
+   Op(&ws[0],&ws[1]);
+   ubnd=normalize(&ws[0]);   
 
    for (i=1;i<nit;i++)
    {
-      Op(ws[1],ws[0]);
-      Op(ws[0],ws[1]);
-      ubnd=normalize(ws[0]);
+      Op(&ws[1],&ws[0]);
+      Op(&ws[0],&ws[1]);
+      ubnd=normalize(&ws[0]);
    }
    return (double)sqrt((double)(ubnd));
 }
@@ -242,12 +242,8 @@ int main(int argc,char *argv[])
    
    set_spinor_len(VOLUME);
 
-   ws=malloc(2*sizeof(suNf_spinor*));
-   for (i=0;i<2;i++)
-      ws[i]=alloc_spinor_field_f(1);
-   ev=malloc(7*sizeof(suNf_spinor*));
-   for (i=0;i<7;i++)
-      ev[i]=alloc_spinor_field_f(1);
+   ws=alloc_spinor_field_f(2);
+   ev=alloc_spinor_field_f(7);
 
 
    
@@ -269,11 +265,11 @@ int main(int argc,char *argv[])
 
    for (i=0;i<nevt;i++)
    {
-      Op1(ws[0],ev[i]);
+      Op1(&ws[0],&ev[i]);
       z.re=-(double)d1[i];
       z.im=(double)0.0f;
-      spinor_field_mulc_add_assign_f(ws[0],z,ev[i]);
-      res=spinor_field_sqnorm_f(ws[0]);
+      spinor_field_mulc_add_assign_f(&ws[0],z,&ev[i]);
+      res=spinor_field_sqnorm_f(&ws[0]);
       res=(double)(sqrt((double)(res)));
 
       if (i==nev)
@@ -288,11 +284,11 @@ int main(int argc,char *argv[])
 
    for (i=0;i<nev;i++)
    {
-      g5Dphi(hmass,ws[0],ev[i]);      
+      g5Dphi(hmass,&ws[0],&ev[i]);      
       z.re=-d1[i];
       z.im=0.0f;
-      spinor_field_mulc_add_assign_f(ws[0],z,ev[i]);
-      res=spinor_field_sqnorm_f(ws[0]);
+      spinor_field_mulc_add_assign_f(&ws[0],z,&ev[i]);
+      res=spinor_field_sqnorm_f(&ws[0]);
       res=(double)(sqrt((double)(res)));
       
       printf("d[%d] = % .3e, acc = %.1e\n",i,d1[i],res);

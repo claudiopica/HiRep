@@ -27,8 +27,8 @@ void leapfrog(suNg_algebra_vector *momenta, int_par *traj_par);
 void O2MN_multistep(suNg_algebra_vector *momenta, int_par *traj_par);
 
 void gaussian_momenta(suNg_algebra_vector *momenta);
-void gaussian_spinor_field(suNf_spinor *s);
-void gaussian_spinor_field_flt(suNf_spinor_flt *s);
+void gaussian_spinor_field(spinor_field *s);
+void gaussian_spinor_field_flt(spinor_field_flt *s);
 
 typedef struct {
   /* sim parameters */
@@ -43,7 +43,7 @@ typedef struct {
 	unsigned int n_pf; /* number of psudofermions used in the evolution */
 	void (*integrator)(suNg_algebra_vector *, int_par *); /* integrator used in MD */
 	int_par *MD_par;
-	int (*mshift_solver)(mshift_par *, spinor_operator, suNf_spinor *, suNf_spinor **);
+	int (*mshift_solver)(mshift_par *, spinor_operator, spinor_field *, spinor_field *);
 } rhmc_par;
 void init_rhmc(rhmc_par *par);
 void free_rhmc();
@@ -58,7 +58,7 @@ void free_rhmc();
 int update_rhmc();
 
 /* this is the basic operator used in the update */
-void H2(suNf_spinor *out, suNf_spinor *in);
+void H2(spinor_field *out, spinor_field *in);
 void Force_rhmc_f(double dt, suNg_algebra_vector *force);
 
 typedef enum {

@@ -29,7 +29,7 @@
 
 static int iw;
 static double ms;
-static suNf_spinor **ws;
+static spinor_field *ws;
 static double EPSILON=1.e-12;
 
 
@@ -55,7 +55,7 @@ static double low_ev(void)
 }
 
 
-static double normalize(suNf_spinor *ps)
+static double normalize(spinor_field *ps)
 {
    double r;
 
@@ -70,29 +70,29 @@ static double normalize(suNf_spinor *ps)
 }
 
 
-static void Op1(suNf_spinor *pl,suNf_spinor *pk)
+static void Op1(spinor_field *pl,spinor_field *pk)
 {
-   g5Dphi(ms,ws[iw],pk);
-   g5Dphi(ms,pl,ws[iw]);
+   g5Dphi(ms,&ws[iw],pk);
+   g5Dphi(ms,pl,&ws[iw]);
 }
 
 
-static double power(int nit,spinor_operator Op,suNf_spinor *ws[])
+static double power(int nit,spinor_operator Op,spinor_field *ws)
 {
    int i;
    double ubnd;
 
-   gaussian_spinor_field(ws[0]);
-   normalize(ws[0]);
-   Op(ws[1],ws[0]);
-   Op(ws[0],ws[1]);
-   ubnd=normalize(ws[0]);   
+   gaussian_spinor_field(&ws[0]);
+   normalize(&ws[0]);
+   Op(&ws[1],&ws[0]);
+   Op(&ws[0],&ws[1]);
+   ubnd=normalize(&ws[0]);   
 
    for (i=1;i<nit;i++)
    {
-      Op(ws[1],ws[0]);
-      Op(ws[0],ws[1]);
-      ubnd=normalize(ws[0]);
+      Op(&ws[1],&ws[0]);
+      Op(&ws[0],&ws[1]);
+      ubnd=normalize(&ws[0]);
    }
 
    return (double)sqrt((double)(ubnd));
@@ -104,7 +104,7 @@ int main(int argc,char *argv[])
    int i;
    int nev,nevt,ie,status;
    double ubnd,omega1,omega2,d1[16],res,lev;
-   suNf_spinor **ev;
+   spinor_field *ev;
    FILE *log=NULL;   
 
    log=freopen("check10.log","w",stdout);
@@ -126,12 +126,8 @@ int main(int argc,char *argv[])
    represent_gauge_field();
 
    set_spinor_len(VOLUME);
-   ws=malloc(3*sizeof(suNf_spinor*));
-   for (i=0;i<3;i++)
-      ws[i]=alloc_spinor_field_f(1);
-   ev=malloc((4*NF+8)*sizeof(suNf_spinor*));
-   for (i=0;i<(4*NF+8);i++)
-      ev[i]=alloc_spinor_field_f(1);
+   ws=alloc_spinor_field_f(3);
+   ev=alloc_spinor_field_f(4*NF+8);
 
    
    iw=2;

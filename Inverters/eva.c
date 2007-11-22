@@ -9,25 +9,23 @@
 * The program for the operator must be externally defined and is assumed to
 * have the following properties:
 *
-*   spinor_operator Op(suNf_spinor *pk,suNf_spinor *pl)
+*   spinor_operator Op(spinor_field *pk,spinor_field *pl)
 *     Application of the operator Op to the field pk[] and assignement of the
 *     result to pl[]. On exit the field pk[] is unchanged
 *
 * The externally accessible function is
 *
-*   int eva(int vol,int nev,int nevt,int init,int kmax,
+*   int eva(int nev,int nevt,int init,int kmax,
 *           int imax,float ubnd,float omega1,float omega2,
 *           spinor_operator Op,
-*           suNf_spinor *ws[],suNf_spinor *ev[],float d[],int *status)
+*           spinor_field *ws,spinor_field *ev,float d[],int *status)
 *     Computes the lowest eigenvalues d[0],...,d[nevt-1] of the operator Op
-*     and the corresponding eigenvectors ev[0][],..,ev[nevt-1][]. The first
+*     and the corresponding eigenvectors ev[0],..,ev[nevt-1]. The first
 *     nev of the eigenvalues are obtained to an absolute precision omega1 or
 *     a relative precision omega2 (whichever is reached first), while the
 *     other eigenvalues may be less accurate. On exit the program returns 0
 *     if the eigenvalues are obtained to the desired precision or a negative
 *     value if this was not possible. The other parameters are
-*
-*     vol      Number of spinors in the spinor fields on which Op acts
 *
 *     init     Specifies whether all eigenvectors should be initialized
 *              (init=0), or only the last nevt-nev eigenvectors (init=1)
@@ -40,7 +38,7 @@
 *
 *     ubnd     Upper bound on the eigenvalues of the operator
 *
-*     ws[2][]  Workspace of 2 single-precision spinor fields
+*     ws       Workspace of 2 double-precision spinor fields
 *
 *     status   On exit this variable reports the number of times the
 *              operator was applied
@@ -75,6 +73,7 @@
 * Author: Luigi Del Debbio <luigi.del.debbio@ed.ac.uk>
 *	
 *	Modified: Claudio Pica 
+*	Modified: Agostino Patella 
 *
 *******************************************************************************/
 
@@ -96,7 +95,7 @@
 static int initr=0;
 static suNf_spinor *psi,*chi;
 
-static int nop,nsp,nvc=0;
+static int nop,nvc=0,VOLUME;
 static double *dd,*ee;
 static complex *aa,*bb,*cc,*vv;
 
@@ -113,11 +112,13 @@ static void alloc_ws_rotate(void)
    initr=1;
 }
 
-static void rotate(int vol,int n,suNf_spinor **pkk,complex v[])
+static void rotate(int n,spinor_field *pkk,complex v[])
 {
    int k,j,ix;
    complex *z;
    suNf_spinor *pk,*pj;
+
+   int vol = VOLUME;
 
    if (initr==0)
       alloc_ws_rotate();
@@ -130,7 +131,7 @@ static void rotate(int vol,int n,suNf_spinor **pkk,complex v[])
       for (k=0;k<n;k++)
       {
          pk=&(psi[k]);
-         pj=pkk[0]+ix;
+         pj=_SPINOR_AT_SITE(&pkk[0],ix);
          z=&v[k];
 
          _vector_mulc_f((*pk).c[0],*z,(*pj).c[0]);
@@ -151,7 +152,7 @@ static void rotate(int vol,int n,suNf_spinor **pkk,complex v[])
       }
 
       for (k=0;k<n;k++)
-         *(pkk[k]+ix)=psi[k];
+         *_SPINOR_AT_SITE(&pkk[k],ix)=psi[k];
    }
 }
 
@@ -181,51 +182,7 @@ static int alloc_aux(int nevt)
 }
 
 
-static void lc1(double c1,suNf_spinor *ps1,suNf_spinor *ps2)
-{
-   suNf_spinor *psm;
-
-   psm=ps1+nsp;
-
-   for (;ps1<psm;ps1++)
-   {
-      _spinor_mul_add_assign_f(*ps1,c1,*ps2);
-      ps2+=1;
-   }
-}
-
-
-static void lc2(double c1,double c2,suNf_spinor *ps1,suNf_spinor *ps2)
-{
-   suNf_spinor *psm;
-
-   psm=ps1+nsp;
-
-   for (;ps1<psm;ps1++)
-   {
-      _spinor_lc_f(*ps1,c1,*ps1,c2,*ps2);
-      ps2+=1;
-   }
-}
-
-static void lc3(double c1,double c2,suNf_spinor *ps1,suNf_spinor *ps2,suNf_spinor *ps3)
-{
-   suNf_spinor *psm;
-
-   psm=ps1+nsp;
-   c1=-c1; c2=-c2;
-
-   for (;ps1<psm;ps1++)
-   {
-      _spinor_lc_add_assign_f(*ps3,c1,*ps1,c2,*ps2);
-      _spinor_minus_f(*ps3,*ps3);
-      ps2+=1;
-      ps3+=1;
-   }
-}
-
-
-static void project(suNf_spinor *pk,suNf_spinor *pl)
+static void project(spinor_field *pk,spinor_field *pl)
 {
    complex sp;
 
@@ -236,7 +193,7 @@ static void project(suNf_spinor *pk,suNf_spinor *pl)
 }   
 
 
-static double normalize(suNf_spinor *ps)
+static double normalize(spinor_field *ps)
 {
    double r,ri;
 
@@ -251,18 +208,18 @@ static double normalize(suNf_spinor *ps)
 }
 
 
-static void mgm_subsp(int n,suNf_spinor *ev[])
+static void mgm_subsp(int n, spinor_field *ev)
 {
    int k;
    
    for (k=0;k<n;k++)
-      project(ev[n],ev[k]);
+      project(&ev[n],&ev[k]);
 
-   normalize(ev[n]);
+   normalize(&ev[n]);
 }
 
 
-static void init_subsp(int nev,int nevt,int init,suNf_spinor *ev[])
+static void init_subsp(int nev,int nevt,int init,spinor_field *ev)
 {
    int n;
 
@@ -270,7 +227,7 @@ static void init_subsp(int nev,int nevt,int init,suNf_spinor *ev[])
    {
 
       if ((init==0)||((init==1)&&(n>=nev)))
-         gaussian_spinor_field(ev[n]);
+         gaussian_spinor_field(&ev[n]);
 
       mgm_subsp(n,ev);
    }
@@ -278,7 +235,7 @@ static void init_subsp(int nev,int nevt,int init,suNf_spinor *ev[])
 
 
 static void ritz_subsp(int nlock,int nevt,spinor_operator Op,
-                       suNf_spinor *ws[],suNf_spinor *ev[],double d[])
+                       spinor_field *ws,spinor_field *ev,double d[])
 {
    int neff,i,j;
    complex z;
@@ -287,15 +244,15 @@ static void ritz_subsp(int nlock,int nevt,spinor_operator Op,
    
    for (i=0;i<neff;i++) 
    {
-      Op(ws[0],ev[nlock+i]);
+      Op(&ws[0],&ev[nlock+i]);
       nop+=1;      
       
-      aa[neff*i+i].re=spinor_field_prod_re_f(ev[nlock+i],ws[0]);
+      aa[neff*i+i].re=spinor_field_prod_re_f(&ev[nlock+i],&ws[0]);
       aa[neff*i+i].im=0.0f;
 
       for (j=0;j<i;j++) 
       {
-         z=spinor_field_prod_f(ws[0],ev[nlock+j]);
+         z=spinor_field_prod_f(&ws[0],&ev[nlock+j]);
 
          aa[neff*i+j].re= z.re;
          aa[neff*i+j].im= z.im;
@@ -305,7 +262,7 @@ static void ritz_subsp(int nlock,int nevt,spinor_operator Op,
    }
 
    jacobi2(neff,aa,d+nlock,vv);
-   rotate(nsp,neff,ev+nlock,vv);
+   rotate(neff,ev+nlock,vv);
 }
 
 
@@ -346,7 +303,7 @@ static double min_eva(int ia,int ib,double d[])
 
 static int res_subsp(int nlock,int nev,double omega1,double omega2,
                      spinor_operator Op,
-                     suNf_spinor *ws[],suNf_spinor *ev[],double d[])
+                     spinor_field *ws,spinor_field *ev,double d[])
 {
    int i,ia,ib;
    double eps1,eps2,absd1,absd2;
@@ -371,11 +328,11 @@ static int res_subsp(int nlock,int nev,double omega1,double omega2,
             return ia;
       }
 
-      Op(ws[0],ev[ib]);
+      Op(&ws[0],&ev[ib]);
       nop+=1;
-      lc1(-d[ib],ws[0],ev[ib]);
+      spinor_field_lc1_f(-d[ib],&ws[0],&ev[ib]);
 
-      bb[nev*ib+ib].re=spinor_field_sqnorm_f(ws[0]);
+      bb[nev*ib+ib].re=spinor_field_sqnorm_f(&ws[0]);
       bb[nev*ib+ib].im=0.0f;
 
       eps2=(double)sqrt((double)(bb[nev*ib+ib].re));
@@ -393,12 +350,12 @@ static int res_subsp(int nlock,int nev,double omega1,double omega2,
 
       if (ib>ia)
       {
-         Op(ws[1],ws[0]);
+         Op(&ws[1],&ws[0]);
          nop+=1;      
 
          for (i=ia;i<ib;i++) 
          {
-            z=spinor_field_prod_f(ws[1],ev[i]);
+            z=spinor_field_prod_f(&ws[1],&ev[i]);
 
             bb[nev*ib+i].re= z.re;
             bb[nev*ib+i].im= z.im;
@@ -453,21 +410,21 @@ static double set_lbnd(int nevt,int kmax,double ubnd,double d[],int *k)
 
 static void apply_cheby(int k,double lbnd,double ubnd,
                         spinor_operator Op,
-                        suNf_spinor *ws[],suNf_spinor *ev)
+                        spinor_field *ws,spinor_field *ev)
 {
    int j;
    double c1,c2;
-   suNf_spinor *psi0,*psi1,*psi2,*psi3;
+   spinor_field *psi0,*psi1,*psi2,*psi3;
 
    c1=2.0f/(ubnd-lbnd);
    c2=-(ubnd+lbnd)/(ubnd-lbnd);
 
    psi0=ev;
-   psi1=ws[0];
-   psi2=ws[1];
+   psi1=&ws[0];
+   psi2=&ws[1];
 
    Op(psi1,psi0);
-   lc2(c1,c2,psi1,psi0);
+   spinor_field_lc2_f(c1,c2,psi1,psi0);
 
    c1*=2.0f;
    c2*=2.0f;
@@ -475,7 +432,7 @@ static void apply_cheby(int k,double lbnd,double ubnd,
    for (j=1;j<k;j++)
    {
       Op(psi2,psi1);
-      lc3(c1,c2,psi2,psi1,psi0);
+      spinor_field_lc3_f(c1,c2,psi2,psi1,psi0);
 
       psi3=psi0;
       psi0=psi1;
@@ -486,26 +443,27 @@ static void apply_cheby(int k,double lbnd,double ubnd,
 }
 
 
-int eva(int vol,int nev,int nevt,int init,int kmax,
+int eva(int len, int nev,int nevt,int init,int kmax,
         int imax,double ubnd,double omega1,double omega2,
         spinor_operator Op,
-        suNf_spinor *ws[],suNf_spinor *ev[],double d[],int *status)   
+        spinor_field *ws,spinor_field *ev,double d[],int *status)   
 {
    int i,k,n;
    int nlock,nupd,nlst;
    double lbnd;
-   
+  
    *status=0;
    
-   error((vol<=0)||(nev<=0)||(nevt<nev)||(kmax<2)||(imax<1),1,
+   VOLUME=len;
+   
+   error((nev<=0)||(nevt<nev)||(kmax<2)||(imax<1),1,
          "eva [eva.c]",
-         "Improper parameters vol,nev,nevt,kmax or imax");
+         "Improper parameters nev,nevt,kmax or imax");
    error((omega1<(ubnd*EPSILON))&&(omega2<EPSILON),1,
          "eva [eva.c]",
          "Improper parameters omega1 or omega2");
 
    nop=0;
-   nsp=vol;
    nlock=0;
    nupd=(nevt+nev)/2;
    
@@ -522,7 +480,7 @@ int eva(int vol,int nev,int nevt,int init,int kmax,
          lbnd=set_lbnd(nupd,kmax,ubnd,d,&k);
 
          for (n=nupd;n<nevt;n++)
-            spinor_field_copy_f(ev[n],ev[n+nupd-nevt]);
+            spinor_field_copy_f(&ev[n],&ev[n+nupd-nevt]);
       }
       else
          lbnd=set_lbnd(nupd,10,ubnd,d,&k);
@@ -531,7 +489,7 @@ int eva(int vol,int nev,int nevt,int init,int kmax,
       {
          if (n<nupd)
          {
-            apply_cheby(k,lbnd,ubnd,Op,ws,ev[n]);
+            apply_cheby(k,lbnd,ubnd,Op,ws,&ev[n]);
             mgm_subsp(n,ev);
          }
          else if (i>0)

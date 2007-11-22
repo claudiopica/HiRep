@@ -38,7 +38,7 @@
 static double mass = .1;
 
 
-static void H(suNf_spinor *out, suNf_spinor *in){
+static void H(spinor_field *out, spinor_field *in){
 	g5Dphi(mass,out,in);
 }
 
@@ -48,8 +48,8 @@ int main(int argc,char *argv[]) {
   FILE *log=NULL;   
   double norm;
   complex prod;
-  suNf_spinor *test;
-  suNf_spinor **ev;
+  spinor_field *test;
+  spinor_field *ev;
   double *d;
   int nevt, nev;
 
@@ -69,8 +69,8 @@ int main(int argc,char *argv[]) {
   /* a relative precision omega2 (whichever is reached first). */
 
 
-  nev = 100;
-  nevt = 100;
+  nev = 20;
+  nevt = 30;
   kmax = 50;
   imax = nevt*5;
   omega1 = 1e-6;
@@ -81,7 +81,8 @@ int main(int argc,char *argv[]) {
   printf("\n");
   printf("Diagonalization of the g5D operator.\n");
   printf("---------------------------------------\n\n");
-  printf("The lattice size is %dx%d^3\n",T,L);
+  geometry_eo_lexi();
+  printf("The lattice size is %dx%dx%dx%d\n",T,X,Y,Z);
   printf("size of the gluon rep: %d, size of the fermion rep: %d\n",NG,NF);
   printf("mass of the fermion: %f\n",mass);
 
@@ -89,7 +90,6 @@ int main(int argc,char *argv[]) {
 
   logger_setlevel(0,1000);
 
-  geometry_eo_lexi();
   u_gauge=alloc_gfield();
   #ifndef REPR_FUNDAMENTAL
   u_gauge_f=alloc_gfield_f();
@@ -99,6 +99,7 @@ int main(int argc,char *argv[]) {
   fflush(stdout);
   random_u();
   printf("done.\n");
+  fflush(stdout);
   represent_gauge_field();
 
   set_spinor_len(VOLUME);
@@ -106,9 +107,7 @@ int main(int argc,char *argv[]) {
   test = alloc_spinor_field_f(1);
 
   d = (double*)malloc(sizeof(double)*nevt);
-  ev = (suNf_spinor**)malloc(sizeof(suNf_spinor*)*nevt);
-  for(i = 0; i < nevt; i++)
-    ev[i] = alloc_spinor_field_f(1);
+  ev = alloc_spinor_field_f(nevt);
 
 
   dirac_eva_onemass(nev,nevt,kmax,imax,omega1,omega2,mass,ev,d,&status);
@@ -116,8 +115,8 @@ int main(int argc,char *argv[]) {
   printf("\n");
 
   for(i = 0; i < nevt; i++) {
-    H(test,ev[i]);
-    spinor_field_mul_add_assign_f(test,-d[i],ev[i]);
+    H(test,&ev[i]);
+    spinor_field_mul_add_assign_f(test,-d[i],&ev[i]);
     norm=spinor_field_sqnorm_f(test);
     printf("Eigenvector test [%d,%e,%e] = %e\n",i,d[i],d[i]*d[i],norm);
   }
@@ -127,8 +126,8 @@ int main(int argc,char *argv[]) {
   norm = 0.;
   for(i = 0; i < nevt; i++)
   for(j = 0; j < nevt; j++) {
-    prod.re = spinor_field_prod_re_f(ev[i],ev[j]);
-    prod.im = spinor_field_prod_im_f(ev[i],ev[j]);
+    prod.re = spinor_field_prod_re_f(&ev[i],&ev[j]);
+    prod.im = spinor_field_prod_im_f(&ev[i],&ev[j]);
     if(i == j) norm += (prod.re-1.)*(prod.re-1.);
     else norm += prod.re*prod.re;
     norm += prod.im*prod.im;

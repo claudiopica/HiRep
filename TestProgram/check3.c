@@ -36,7 +36,7 @@ static double hmass=0.1;
 int main(int argc,char *argv[])
 {
    double tau;
-   suNf_spinor *s1,*s2,*s3,*s4;
+   spinor_field *s1,*s2,*s3,*s4;
 
    printf("Gauge group: SU(%d)\n",NG);
    printf("Fermion representation: dim = %d\n",NF);
@@ -65,9 +65,9 @@ int main(int argc,char *argv[])
 
    set_spinor_len(VOLUME);
    s1=alloc_spinor_field_f(4);
-	 s2=s1+VOLUME;
-	 s3=s2+VOLUME;
-	 s4=s3+VOLUME;
+	 s2=s1+1;
+	 s3=s2+1;
+	 s4=s3+1;
 
    gaussian_spinor_field(&(s1[0]));
    gaussian_spinor_field(&(s2[0]));
@@ -80,7 +80,7 @@ int main(int argc,char *argv[])
    
    printf("Test new Dirac implementation: ");
    
-   g5Dphi_old(hmass,s3,s1);
+   g5Dphi_old(hmass,_SPINOR_ADDR(s3),_SPINOR_ADDR(s1));
    g5Dphi(hmass,s4,s1);
 
    spinor_field_sub_assign_f(s3,s4);
@@ -95,7 +95,7 @@ int main(int argc,char *argv[])
 #ifndef REPR_FUNDAMENTAL
    free_field(u_gauge_f);
 #endif
-	 free_field(s1);
+	free_spinor_field(s1);
 
    exit(0);
 }

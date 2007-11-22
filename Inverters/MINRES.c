@@ -17,11 +17,11 @@
  * out[i] = (M-(par->shift[i]))^-1 in
  * returns the number of cg iterations done.
  */
-static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor *out, suNf_spinor *trial){
+static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field *out, spinor_field *trial){
 
-  suNf_spinor *q1,*q2;
-  suNf_spinor *p1, *p2, *Mp;
-  suNf_spinor *sptmp, *memall;
+  spinor_field *q1,*q2;
+  spinor_field *p1, *p2, *Mp;
+  spinor_field *sptmp, *memall;
 
   double alpha, beta, oldbeta, innorm2; 
   double r, s1, s2, c1, c2, rho1, rho2, rp;
@@ -48,10 +48,10 @@ static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, suN
 	get_spinor_len(&spinorlen);
   memall = alloc_spinor_field_f(5);
   q1=memall;
-  q2= q1+(spinorlen);
-  p1 = q2+(spinorlen);
-  p2 = p1+(spinorlen);
-  Mp = p2+(spinorlen);
+  q2= q1+1;
+  p1 = q2+1;
+  p2 = p1+1;
+  Mp = p2+1;
 
   /* init recursion */
   cgiter = 0;
@@ -154,13 +154,13 @@ static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, suN
 	} 
    
   /* free memory */
-  free_field(memall);
+  free_spinor_field(memall);
 
   /* return number of cg iter */
   return cgiter;
 }
 
-int MINRES(MINRES_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor *out, suNf_spinor *trial){
+int MINRES(MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field *out, spinor_field *trial){
 	int iter,rep=0;
 	short int valid;
 

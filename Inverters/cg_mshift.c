@@ -12,10 +12,10 @@
  * out[i] = (M-(par->shift[i]))^-1 in
  * returns the number of cg iterations done.
  */
-static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor **out){
+static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out){
 
-   suNf_spinor *k,*r,*Mk;
-   suNf_spinor **p;
+   spinor_field *k,*r,*Mk;
+   spinor_field *p;
    double omega, oldomega, gamma;
    double alpha, lambda, delta;
    double innorm2;
@@ -37,14 +37,10 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
    
    /* allocate spinors fields and aux real variables */
 	 get_spinor_len(&spinorlen);
-   p = malloc(sizeof(suNf_spinor*)*(par->n));
-   p[0] = alloc_spinor_field_f(3+par->n);
-   for (i=1; i<(par->n); ++i) {
-      p[i] = p[i-1]+spinorlen;
-   }
-   k=p[par->n-1]+spinorlen;
-   r=k+spinorlen;
-   Mk=r+spinorlen;
+   p = alloc_spinor_field_f(3+par->n);
+   k=p+par->n;
+   r=k+1;
+   Mk=r+1;
 
    z1 = malloc(sizeof(*z1)*(par->n));
    z2 = malloc(sizeof(*z2)*(par->n));
@@ -57,9 +53,9 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
    innorm2=spinor_field_sqnorm_f(in);
 	 if(par->n==1) { /* non multishift case */
 		 /* use out[0] as initial guess */
-		 M(Mk,out[0]);
+		 M(Mk,&out[0]);
 		 ++cgiter;
-		 spinor_field_mul_add_assign_f(Mk,-par->shift[0],out[0]);
+		 spinor_field_mul_add_assign_f(Mk,-par->shift[0],&out[0]);
 		 spinor_field_sub_f(r,in,Mk);
 			
 	 } else { /* initial guess = 0 for multishift */
@@ -69,8 +65,8 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
 	 delta=spinor_field_sqnorm_f(r);
    for (i=0; i<(par->n); ++i) {
       z1[i]=z2[i]=1.;
-      spinor_field_copy_f(p[i], r);
-      if(par->n!=1) spinor_field_zero_f(out[i]);
+      spinor_field_copy_f(&p[i], r);
+      if(par->n!=1) spinor_field_zero_f(&out[i]);
       sflags[i]=1;
    }
    
@@ -83,7 +79,7 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
       for (i=0; i<(par->n); ++i) {
          if(sflags[i]) {
             z3[i] = oldomega*z1[i]*z2[i]/(omega*gamma*(z1[i]-z2[i])+z1[i]*oldomega*(1.+par->shift[i]*omega));
-            spinor_field_mul_add_assign_f(out[i],-omega*z3[i]/z2[i],p[i]);
+            spinor_field_mul_add_assign_f(&out[i],-omega*z3[i]/z2[i],&p[i]);
          }
       }
       spinor_field_mul_add_assign_f(r,omega,Mk);
@@ -99,8 +95,8 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
          if(delta*z3[i]<par->err2*innorm2) sflags[i]=0;
          if(sflags[i]){
             notconverged++;
-            spinor_field_mul_f(p[i],gamma*z3[i]*z3[i]/(z2[i]*z2[i]),p[i]);
-            spinor_field_mul_add_assign_f(p[i],z3[i],r);
+            spinor_field_mul_f(&p[i],gamma*z3[i]*z3[i]/(z2[i]*z2[i]),&p[i]);
+            spinor_field_mul_add_assign_f(&p[i],z3[i],r);
             z1[i]=z2[i];
             z2[i]=z3[i];
          }
@@ -121,9 +117,9 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
    /* test results */
    for(i=0;i<par->n;++i){
      double norm;
-     M(Mk,out[i]);
+     M(Mk,&out[i]);
 		 ++cgiter;
-     spinor_field_mul_add_assign_f(Mk,-par->shift[i],out[i]);
+     spinor_field_mul_add_assign_f(Mk,-par->shift[i],&out[i]);
      spinor_field_sub_f(Mk,Mk,in);
      norm=spinor_field_sqnorm_f(Mk)/spinor_field_sqnorm_f(in);
 		 sflags[i]=1;
@@ -136,15 +132,14 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
    }
    
    /* free memory */
-   free_field(p[0]);
-   free(p);
+   free_spinor_field(p);
    free(z1); free(z2); free(z3);
 
    /* return number of cg iter */
    return cgiter;
 }
 
-int cg_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor **out){ 
+int cg_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out){ 
 	int cgiter,msiter;
 	int i;
 	mshift_par par_save=*par;

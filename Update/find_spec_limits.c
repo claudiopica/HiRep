@@ -53,17 +53,20 @@ static void min_bound_H2(double *min) {
 /* use power method to find max eigvalue */
 int max_H2(double *max, double mass) {
   double norm, oldmax, dt;
-  int count;
-  suNf_spinor *s1,*s2,*s3;
+  int count, ix, sx;
+  spinor_field *s1,*s2,*s3;
 	unsigned int len;
 
 	get_spinor_len(&len);
   s1=alloc_spinor_field_f(3);
-  s2=s1+len;
-  s3=s2+len;
+  s2=s1+1;
+  s3=s2+1;
 
   /* random spinor */
-  ranlxd((double*)s1,(sizeof(suNf_spinor)/sizeof(double))*VOLUME);
+   FOR_LOCAL_SC(ix,sx) {
+      suNf_spinor* sptr=_SPINOR_AT(s1,sx);
+      ranlxd((double*)sptr,sizeof(suNf_spinor)/sizeof(double));
+   }
   norm=sqrt(spinor_field_sqnorm_f(s1));
   spinor_field_mul_f(s1,1./norm,s1);
   norm=1.;
@@ -113,7 +116,7 @@ int max_H2(double *max, double mass) {
 	return count;
 }
 
-static suNf_spinor **ev;
+static spinor_field *ev;
 
 void find_spec_H2(double *max, double *min, double mass) {
 	/* EVA parameters */
@@ -136,11 +139,7 @@ void find_spec_H2(double *max, double *min, double mass) {
 	get_spinor_len(&len);
 
 	d1=malloc(sizeof(*d1)*nevt);
-	ev=malloc(sizeof(*ev)*(nevt+2));
-	ev[0]=alloc_spinor_field_f((nevt+2));
-	for (status=1;status<nevt+2;++status) {
-		ev[status]=ev[status-1]+len;
-	}
+	ev=alloc_spinor_field_f((nevt+2));
 	ws=ev+nevt;
 
 	ie=eva(len,nev,nevt,0,kmax,maxiter,*max,omega1,omega2,&H2,ws,ev,d1,&status);
@@ -155,8 +154,7 @@ void find_spec_H2(double *max, double *min, double mass) {
 	lprintf("SPECLIMITS",0,"Range = [%1.8e,%1.8e] [MVM = %d]\n",*min,*max,MVM);
 
 	free(d1);
-	free_field(ev[0]);
-	free(ev);
+	free_spinor_field(ev);
 
 	return;
 }

@@ -33,29 +33,29 @@ double beta;
 static double hmass=0.1;
 
 
-void D(suNf_spinor *out, suNf_spinor *in){
+void D(spinor_field *out, spinor_field *in){
    Dphi(hmass,out,in);
 }
 
-void H(suNf_spinor *out, suNf_spinor *in){
+void H(spinor_field *out, spinor_field *in){
    g5Dphi(-hmass,out,in);
 }
 
-void M(suNf_spinor *out, suNf_spinor *in){
-   suNf_spinor *tmp=alloc_spinor_field_f(1);
+void M(spinor_field *out, spinor_field *in){
+   spinor_field *tmp=alloc_spinor_field_f(1);
    g5Dphi(-hmass,tmp,in); 
    g5Dphi(-hmass,out,tmp);
-	 free_field(tmp);
+   free_field(tmp);
 }
 
 void test_herm(spinor_operator S, char *name){
-   suNf_spinor *s1, *s2, *s3, *s4;
+   spinor_field *s1, *s2, *s3, *s4;
    double tau;
 
 	 s1=alloc_spinor_field_f(4);
-	 s2=s1+VOLUME;
-	 s3=s2+VOLUME;
-	 s4=s3+VOLUME;
+	 s2=s1+1;
+	 s3=s2+1;
+	 s4=s3+1;
 
    printf("Test if %s is hermitean: ",name);
 
@@ -76,7 +76,7 @@ void test_herm(spinor_operator S, char *name){
      printf("OK ");
    printf("[norm = %e]\n",tau);
 
-	 free_field(s1);
+	free_spinor_field(s1);
 
 }
 

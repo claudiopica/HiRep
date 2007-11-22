@@ -91,7 +91,8 @@ int main(int argc,char *argv[])
    double pi,p[4];
    double *rs,r,mp,sig,px;
    complex z;
-   suNf_spinor s,s0,s1,s2,s3,*ps0,*ps1,*ps2;
+   suNf_spinor s,s0,s1,s2,s3;
+   spinor_field *ps0,*ps1,*ps2;
 
    printf("Gauge group: SU(%d)\n",NG);
    printf("Fermion representation: dim = %d\n",NF);
@@ -117,8 +118,8 @@ int main(int argc,char *argv[])
 	 
 	 set_spinor_len(VOLUME);
 	 ps0=alloc_spinor_field_f(3);
-	 ps1=ps0+VOLUME;
-	 ps2=ps1+VOLUME;
+	 ps1=ps0+1;
+	 ps2=ps1+1;
 
    pi=4.0*atan(1.0);
    n=10;
@@ -183,7 +184,7 @@ int main(int argc,char *argv[])
                   _vector_mulc_f(s0.c[2],z,s.c[2]);
                   _vector_mulc_f(s0.c[3],z,s.c[3]);
                   
-                  ps0[ix]=s0;
+                  *_SPINOR_AT_SITE(ps0,ix) = s0;
                   
                   z.re=mp;
                   z.im=0.0f;
@@ -210,7 +211,7 @@ int main(int argc,char *argv[])
                      _vector_add_assign_f(s1.c[2],s3.c[2]);
                      _vector_add_assign_f(s1.c[3],s3.c[3]);
                   }
-                  ps1[ix]=s1;
+                  *_SPINOR_AT_SITE(ps1,ix) = s1;
                }
             }
          }

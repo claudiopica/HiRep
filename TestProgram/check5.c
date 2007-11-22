@@ -26,6 +26,7 @@
 #include "inverters.h"
 #include "representation.h"
 #include "utils.h"
+#include "logger.h"
 
 int nhb,nor,nit,nth,nms,level,seed;
 double beta;
@@ -33,16 +34,16 @@ double beta;
 static double hmass=0.1;
 
 
-void D(suNf_spinor *out, suNf_spinor *in){
+void D(spinor_field *out, spinor_field *in){
    Dphi(hmass,out,in);
 }
 
-void H(suNf_spinor *out, suNf_spinor *in){
+void H(spinor_field *out, spinor_field *in){
    g5Dphi(hmass,out,in);
 }
 
-static suNf_spinor *tmp;
-void M(suNf_spinor *out, suNf_spinor *in){
+static spinor_field *tmp;
+void M(spinor_field *out, spinor_field *in){
    g5Dphi(-hmass,tmp,in); 
    g5Dphi(-hmass,out,tmp);
 }
@@ -52,12 +53,14 @@ int main(int argc,char *argv[])
 {
    int i;
    double tau;
-   suNf_spinor *s1, *s2;
-   suNf_spinor **res;
+   spinor_field *s1, *s2;
+   spinor_field *res;
 
    mshift_par par;
 
    int cgiters;
+
+	logger_setlevel(0,1000);
 
    printf("Gauge group: SU(%d)\n",NG);
    printf("Fermion representation: dim = %d\n",NF);
@@ -91,13 +94,10 @@ int main(int argc,char *argv[])
    par.shift=(double*)malloc(sizeof(double)*(par.n));
    par.err2=1.e-28;
    par.max_iter=0;
-   res=(suNf_spinor**)malloc(sizeof(suNf_spinor*)*(par.n));
-	 res[0]=alloc_spinor_field_f(par.n+3);
-   for(i=1;i<par.n;++i)
-     res[i]=res[i-1]+VOLUME;
-	 s1=res[par.n-1]+VOLUME;
-	 s2=s1+VOLUME;
-	 tmp=s2+VOLUME;
+   res=alloc_spinor_field_f(par.n+3);
+	s1=res+par.n;
+	s2=s1+1;
+	tmp=s2+1;
 
    par.shift[0]=+0.1;
    par.shift[1]=-0.21;
@@ -118,16 +118,15 @@ int main(int argc,char *argv[])
    printf("Converged in %d iterations\n",cgiters);
 
    for(i=0;i<par.n;++i){
-      M(s2,res[i]);
-      spinor_field_mul_add_assign_f(s2,-par.shift[i],res[i]);
+      M(s2,&res[i]);
+      spinor_field_mul_add_assign_f(s2,-par.shift[i],&res[i]);
       spinor_field_sub_assign_f(s2,s1);
       tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
       printf("test cg[%d] = %e (req. %e)\n",i,tau,par.err2);
    }
 
-	 free_field(res[0]);
-	 free(res);
-	 free(par.shift);
+	free_spinor_field(res);
+	free(par.shift);
 
    exit(0);
 }

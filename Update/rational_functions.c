@@ -226,19 +226,15 @@ void r_app_set(rational_app *app, double min, double max) {
  * where Q is a linear operator acting on spinor in
  * This implementation uses CG_mshift => Q must be hertian positive definite!
  */
-void rational_func(rational_app *coef, spinor_operator Q, suNf_spinor *out, suNf_spinor *in) {
+void rational_func(rational_app *coef, spinor_operator Q, spinor_field *out, spinor_field *in) {
    static mshift_par inv_par;
-   suNf_spinor **inv_out;
+   spinor_field *inv_out;
    int i;
-	 unsigned int len;
+	unsigned int len;
 
-	 get_spinor_len(&len);
+	get_spinor_len(&len);
    /* allocate cg output vectors */
-   inv_out = malloc(sizeof(*inv_out)*(coef->order));
-	 inv_out[0] = alloc_spinor_field_f(coef->order);
-   for (i=1; i<(coef->order); ++i) {
-      inv_out[i] = inv_out[i-1]+len;
-   }
+	inv_out = alloc_spinor_field_f(coef->order);
 
    /* set up cg parameters */
    inv_par.n = coef->order;
@@ -246,7 +242,7 @@ void rational_func(rational_app *coef, spinor_operator Q, suNf_spinor *out, suNf
    inv_par.err2=coef->rel_error/coef->order;    /* CAMBIARE: METTERE PARAMETRI COMUNI ALL'UPDATE */
    inv_par.err2*=inv_par.err2;
 #define EPSILON 1.e-29
-	 if(inv_par.err2<EPSILON) inv_par.err2=EPSILON;
+	if(inv_par.err2<EPSILON) inv_par.err2=EPSILON;
 #undef EPSILON
    inv_par.max_iter=0; /* no limit */
    
@@ -256,11 +252,10 @@ void rational_func(rational_app *coef, spinor_operator Q, suNf_spinor *out, suNf
    /* sum all the contributions */
    spinor_field_mul_f(out,coef->a[0],in);
    for (i=1; i<(coef->order)+1; ++i) {
-      spinor_field_mul_add_assign_f(out,coef->a[i],inv_out[i-1]);
+      spinor_field_mul_add_assign_f(out,coef->a[i],&inv_out[i-1]);
    }
 
    /* free memory */
-	 free_field(inv_out[0]);
-   free(inv_out);
+	free_spinor_field(inv_out);
 
 }

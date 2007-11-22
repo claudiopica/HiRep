@@ -33,7 +33,7 @@ static double hmass=0.1;
 static suNg *g;
 
 
-static void D(suNf_spinor *out, suNf_spinor *in){
+static void D(spinor_field *out, spinor_field *in){
    Dphi(hmass,out,in);
 }
 
@@ -64,7 +64,7 @@ static void transform_u(void)
    represent_gauge_field();
 }
 
-static void transform_s(suNf_spinor *out, suNf_spinor *in)
+static void transform_s(spinor_field *out, spinor_field *in)
 {
    int ix;
    suNf gfx;
@@ -72,7 +72,7 @@ static void transform_s(suNf_spinor *out, suNf_spinor *in)
 
    for (ix=0;ix<VOLUME;ix++)
    {
-      s=in[ix];
+      s = *_SPINOR_AT_SITE(in,ix);
       
       _group_represent2(&gfx,&(g[ix]));
 
@@ -81,7 +81,7 @@ static void transform_s(suNf_spinor *out, suNf_spinor *in)
       _suNf_multiply(r.c[2],gfx,s.c[2]);
       _suNf_multiply(r.c[3],gfx,s.c[3]);
 
-      out[ix]=r;
+      *_SPINOR_AT_SITE(out,ix) = r;
    }   
 }
 
@@ -89,7 +89,7 @@ static void transform_s(suNf_spinor *out, suNf_spinor *in)
 int main(int argc,char *argv[])
 {
    double sig,tau;
-   suNf_spinor *s0,*s1,*s2,*s3;
+   spinor_field *s0,*s1,*s2,*s3;
 
    printf("Gauge group: SU(%d)\n",NG);
    printf("Fermion representation: dim = %d\n",NF);
@@ -114,9 +114,9 @@ int main(int argc,char *argv[])
 	 g=malloc(sizeof(suNg)*VOLUME);
 	 set_spinor_len(VOLUME);
 	 s0=alloc_spinor_field_f(4);
-	 s1=s0+VOLUME;
-	 s2=s1+VOLUME;
-	 s3=s2+VOLUME;
+	 s1=s0+1;
+	 s2=s1+1;
+	 s3=s2+1;
 
    printf("Generating a random gauge field... ");
    fflush(stdout);
