@@ -1,0 +1,549 @@
+\documentclass{article}[12pt]
+
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+
+\def\bfx{{\bf x}}
+
+\bibliographystyle{JHEP}
+
+\begin{document}
+
+
+\section{Notation}
+This section summarizes the main formulae that are used for
+implementing the HMC for dynamical Wilson fermions in higher
+representations. The Dirac operator is constructed following 
+Ref.~\cite{Luscher:1996sc}, but using Hermitian generators 
+%
+\begin{equation}
+T^{a\dagger}=T^a.
+\end{equation}
+%
+For the fundamental representation, the normalization of the
+generators is such that:
+%
+\begin{equation}
+\mathrm{tr } \left(T^a T^b \right) = \frac12 \delta^{ab}.
+\end{equation}
+%
+For a generic representation $R$, we define:
+%
+\begin{eqnarray}
+\mathrm{tr }_R \left(T^a T^b \right) &=& T_R \delta^{ab}, \\
+\sum_a \left(T^a T^a \right)_{AB} &=& C_2(R) \delta_{AB},
+\end{eqnarray}
+%
+which implies: 
+%
+\begin{equation}
+T_R = \frac{1}{N^2-1} C_2(R) d_R
+\end{equation}
+%
+where $d_R$ is the dimension of the representation $R$.
+The relevant group factors may be computed from the Young tableaux of the
+representation of $SU(N)$ by using the formula:
+%
+\begin{equation}
+C_2(R) =\frac{1}{2}\left(nN+ \sum_{i=1}^{m} n_i \left( n_i+1-2i
+\right) - \frac{n^2}{N}\right)
+\end{equation}
+%
+where $n$ is the number of boxes in the diagram, $i$ ranges over the
+rows of the Young tableau, $m$ is the number of rows, and $n_i$ is the
+number of boxes in the $i$-th row. 
+
+\begin{table}[htp]
+\begin{center}
+\caption{Group invariants \textbf{(Nota x Luigi: questi invarianti fanno uso delle 
+		convenzioni spiegate nella sezione sulla forza e della normalizzazione $T_f=1/2$.)}}
+\label{table1}
+\begin{tabular}{r|c|c|c}
+R    & $d_R$               & $T_R$           & $C_2(R)$            \\
+\hline
+fund & $N$                 & $\frac12$       & $\frac{N^2-1}{2 N}$ \\        
+Adj  & $N^2-1$             & $N$             & $N$ \\
+2S   & $\frac{1}{2}N(N+1)$ & $\frac{N+2}{2}$ & $C_2(f) \frac{2(N+2)}{N+1}$ \\
+2AS  & $\frac{1}{2}N(N-1)$ & $\frac{N-2}{2}$ & $C_2(f)
+\frac{2(N-2)}{N-1}$ \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\noindent
+A generic element of the algebra is written as: $X=i X^a T^a$, and the
+scalar product of two elements of the algebra is defined as:
+%
+\begin{equation}
+(X,Y)= \mathrm{tr\ } \left(X^\dagger Y\right) = T_f X^a Y^a,
+\end{equation}
+%
+\begin{equation}
+\Vert X \Vert^2 = \mathrm{tr } \left(X^\dagger X\right)
+ = \sum_{ij} \left| X_{ij} \right|^2
+\end{equation}
+
+\section{The Dirac operator}
+The massless Dirac operator is written as in Ref.~\cite{Luscher:1996sc}:
+%
+\begin{equation}
+D = \frac12 \left\{\gamma_\mu \left(\nabla_\mu + \nabla^*_\mu \right) 
+- \nabla^*_\mu \nabla_\mu \right\}
+\end{equation}
+%
+with
+%
+\begin{eqnarray}
+\nabla_\mu\phi(x) &=& U^R (x,\mu)\phi(x+\mu) - \phi(x) \\
+\nabla_\mu^*\phi(x) &=& \phi(x) - U^R (x-\mu,\mu)^\dagger\phi(x-\mu)
+\end{eqnarray}
+%
+and therefore the action of the massive Dirac operator yields:
+%
+\begin{eqnarray}
+D_m \phi(x) &=& (D+m) \phi(x) \nonumber \\
+&=& - \frac12 \left\{ \left(1-\gamma_\mu\right) U^R(x,\mu) \phi(x+\mu) +
+\left(1+\gamma_\mu\right) U^R(x-\mu,\mu)^\dagger \phi(x-\mu) - \right. 
+\nonumber \\
+& & \left. -(8+2m) \phi(x) \right\}, \label{DM}
+\end{eqnarray}
+%
+where $U^R$ are the link variables in the representation $R$.
+
+\textbf{(Nota per Luigi: non usiamo mai questo rescaling nel codice: a che ci serve? se vogliamo usare questa convenzione devo cambiare il dirac nel codice)}
+Rescaling the fermion fields by
+$\sqrt{\kappa}=\left(\frac{2}{8+2m}\right)^{1/2}$, we can write the
+fermionic action as:
+%
+\begin{equation}
+S_f = \sum_{x,y} \phi^\dagger(x) D_m(x,y) \phi(y), 
+\end{equation}
+%
+where
+%
+\begin{equation}
+D_m(x,y) = \delta_{x,y} - \frac{\kappa}{2}
+\left[(1-\gamma_\mu) U^R(x,\mu) \delta_{y,x+\mu} + 
+(1+\gamma_\mu) U^R(x-\mu,\mu)^\dagger \delta_{y,x-\mu} \right],
+\end{equation}
+%
+and the Hermitian Dirac operator is obtained as:
+%
+\begin{equation}
+Q_m = \gamma_5 D_m. \label{QM}
+\end{equation}
+The fermionic determinant in the path integral can be represented by
+introducing complex pseudofermionic fields:
+\begin{equation}
+\left(\det D_m\right)^{N_f} = 
+\int \mathcal D \phi \mathcal D \phi^\dagger e^{-\phi^\dagger
+  Q_m^{-N_f} \phi} \equiv
+\int \mathcal D \phi \mathcal D \phi^\dagger e^{-S_\mathrm{pf}}.
+\end{equation}
+\textbf{(Nota per Luigi: l'equazione di sopra e` vera solo se $Q_m$ e` definita positiva altrimenti si usa $Q_m^2$)}
+
+\section{Force for the HMC molecular dynamics}
+The HMC Hamiltonian is given by:
+\begin{equation}
+\mathcal{H}=\mathcal{H}_\pi+\mathcal{H}_G+\mathcal{H}_F \, ,
+\end{equation}
+where
+\begin{eqnarray}
+\mathcal{H}_\pi &=& \frac{1}{2} \sum_{x,\mu} ( \pi(x,\mu) , \pi(x,\mu) ) = \frac{1}{2} T_f \sum_{a,x,\mu} \pi^a(x,\mu)^2 \, ,\\
+\mathcal{H}_G &=& \beta \sum_{\mu<\nu} \left( 1- \frac{1}{N} \mathrm{Re\ tr\ } \mathcal{P}_{\mu\nu}\right) \, ,\\
+\mathcal{H}_F &=& \phi^\dagger ( Q_m^2 - \beta )^{-l} \phi \, , \,\,\,\, l=\frac{N_f}{2}>0 \, ,
+\end{eqnarray}
+and we have introduced for each link variable a conjugate momentum in the algebra of the gauge group: $\pi(x,\mu)=i \pi^a(x,\mu) T_f^a$.
+In the expression of $\mathcal{H}_F$ we omitted the sum over position, spin and color indices and we have also introduced an arbitrary shift $\beta$ for the matrix $Q_m^2$, as this will be useful in the discussion
+for the RHMC algorithm.
+\textbf{(Nota per Luigi: La notazione per $\mathcal{H}_F$ e l'uso degli indici soppresso e` in conflitto con quella usata da te nella sezione 2 per l'azione fermionica, ma a me piaceva di piu' cosi' :) che si fa??)}
+
+The equation of motion for the link variables are given by (the $\dot{\square}$ indicates the derivative with respect to the molecular dynamics time):
+\begin{equation}
+\dot U(x\mu) = \pi(x,\mu) U(x,\mu)\, ,
+\end{equation}
+while the equation of motion for the momenta can be obtain as follows from the requirement that the hamiltonian
+$\mathcal{H}$ is a conserved quantity:
+\begin{equation}
+0 = \dot{\mathcal{H}} = \dot{\mathcal{H}}_\pi + \dot{\mathcal{H}}_G + \dot{\mathcal{H}_F} \, . \label{HCONS}
+\end{equation}
+\textbf{(Nota per Luigi: Il lettore smaliziato potrebbe dire che data l'hamil\-toniana di sopra uno dovrebbe essere in grado di scrivere le eq. del moto "a botta".
+		In realta' io non so come si faccia a vedere che quello che si fa in questo paragrafo ha un'interpretazione come flusso hamil\-toniano sul fibrato cotangente al gruppo
+		di gauge ovvero come interpretare l'hamiltoniana di sopra in senso "geometrico". Suggerimenti?? ps: dovrebbe servire una qualche riduzione su $T_e$=l'algebra... )}
+
+For the first two derivatives we have:
+\begin{eqnarray}
+\dot{\mathcal{H}}_\pi &=& \sum_{x,\mu} ( \pi(x,\mu) , \dot\pi(x,\mu) ) = T_f \sum_{x,\mu} \sum_a \pi^a(x,\mu) \dot\pi^a(x,\mu) \, \label{HDOTPI}\\
+		\dot{\mathcal{H}}_G &=& \sum_{x,\mu} -\frac{\beta}{N} \mathrm{Re\ tr\ } \left[ \dot U(x,\mu) V^\dagger(x,\mu) \right] = \nonumber \\
+	&=& \sum_{x,\mu} -\frac{\beta}{N} \mathrm{Re\ tr\ } \left[ \pi(x,\mu) U(x,\mu) V^\dagger(x,\mu) \right] \nonumber = \\
+	&=& \sum_{x,\mu} \sum_a -\frac{\beta}{N} \pi^a(x,\mu) \mathrm{Re\ tr\ } \left[ i T^a_f U(x,\mu) V^\dagger(x,\mu) \right] \, , \label{HDOTG}
+\end{eqnarray}
+where $V(x,\mu)$ is the sum of the staples around the link $U(x,\mu)$.
+
+The computation of the fermionic force goes as follows:
+\begin{eqnarray}
+\dot{\mathcal{H}}_F = -l\ \phi^\dagger (Q_m^2 - \beta)^{-(l+1)/2} \dot{(Q_m^2)} (Q_m^2 - \beta)^{-(l+1)/2} \phi \, . \label{FF1}
+\end{eqnarray}
+Defining:
+\begin{eqnarray}
+\eta &=& (Q_m^2 - \beta)^{-(l+1)/2} \phi \, , \\
+\xi &=& Q_m \eta \, ,
+\end{eqnarray}
+and using the fact that the matrix $(Q_m^2-\beta)$ is hermitean, we can rewrite Eq.(\ref{FF1}) as
+\begin{eqnarray}
+\dot{\mathcal{H}}_F = - 2 l\ \xi^\dagger \dot{(Q_m)} \eta \, . \label{FF2}
+\end{eqnarray}
+Inserting the explicit form of $Q_m$, Eq.s~(\ref{QM}) and (\ref{DM}), into Eq.(\ref{FF2}) we obtain
+\begin{multline}
+\dot{\mathcal{H}}_F = l\ \mathrm{Re\ }\sum_{x,\mu} \xi(x)^\dagger \dot U^R(x,\mu) \gamma_5 (1-\gamma_\mu) \eta(x+\mu) \\ 
++ \xi(x+\mu)^\dagger \dot U^R(x,\mu)^\dagger \gamma_5 (1+\gamma_\mu) \eta(x) = \nonumber 
+\end{multline}
+\begin{multline}
+\phantom{\dot{\mathcal{H}}_F} =  l\ \mathrm{Re\ }\sum_{x,\mu} \xi(x)^\dagger \dot U^R(x,\mu) \gamma_5 (1-\gamma_\mu) \eta(x+\mu) \\ 
++ \eta(x)^\dagger \dot U^R(x,\mu) \gamma_5 (1-\gamma_\mu) \xi(x+\mu)
+\end{multline}
+where the sum over spin and color indices is intended and we made explicit the fact the the whole 
+expression is real.
+We now use the fact that 
+\begin{equation}
+\dot U^R (x,\mu) = \pi^R(x,\mu) U^R(x,\mu) = i \pi^a(x,\mu) T^a_R U^R(x,\mu) \label{URDOT}
+\end{equation}
+Notice that, since we define $T^a_R(x,\mu) = R_* T^a(x,\mu)$, the $\pi^a(x,\mu)$ in the above 
+equation are the same as those appearing in the expressions for $\dot{\mathcal{H}}_{\pi,G}$.
+Using Eq.(\ref{URDOT}) in the expression for $\dot{\mathcal{H}}_{F}$ we find
+(capitalized $Tr$ indicates the trace over color \textit{and} spin indices as opposed to the lower
+ case $tr$ which is the trace over color only)
+\begin{multline}
+\dot{\mathcal{H}}_F = l\ \sum_{x,\mu} \sum_a \pi^a(x,\mu) \mathrm{Re\ Tr\ } \left[ iT^a_R U^R(x,\mu) \gamma_5 (1-\gamma_\mu) \right. \\
+		\left. \left\{ \eta(x+\mu)\otimes\xi(x)^\dagger + \xi(x+\mu)\otimes\eta(x)^\dagger \right\} \right] \, . \label{HDOTF}
+\end{multline}
+
+Inserting Eq.s~(\ref{HDOTPI}),(\ref{HDOTG}),(\ref{HDOTF}) into Eq.~(\ref{HCONS}) we obtain the equation of motion
+for the momenta $\pi^a(x,\mu)$
+\begin{align}
+\dot\pi^a(x,\mu) &= \dot\pi^a_G(x,\mu) + \dot\pi^a_F(x,\mu) \, , \label{PIDOT1}\\
+\dot\pi^a_G(x,\mu) &= \frac{\beta}{N} \frac{1}{T_f} \mathrm{Re\ tr\ } \left[ i T^a_f U(x,\mu) V^\dagger(x,\mu) \right] \, ,\label{PIDOT2}\\
+\dot\pi^a_F(x,\mu) &=- l \frac{1}{T_f} \mathrm{Re\ Tr\ } \left[ iT^a_R U^R(x,\mu) \gamma_5 (1-\gamma_\mu) \right. \nonumber\\
+										&\quad\quad\quad	\left. \left\{ \eta(x+\mu)\otimes\xi(x)^\dagger + \xi(x+\mu)\otimes\eta(x)^\dagger \right\} \right]\, . \label{PIDOT3}
+\end{align}
+
+For sake of convenience we introduce the following projectors $P^a_R$ over the algebra in the rapresentation $R$:
+\begin{equation}
+P^a_R ( F ) = - \frac{1}{T_R} \mathrm{Re\ tr\ } \left[ i T^a_R F \right] \, ,
+\end{equation}
+we can be used to rewrite Eq.s~(\ref{PIDOT2})-(\ref{PIDOT3}) in a more compact form:
+\begin{align}
+\dot\pi^a_G(x,\mu) &= - \frac{\beta}{N} P^a_f \left( U(x,\mu) V^\dagger(x,\mu) \right) \, ,\\
+\dot\pi^a_F(x,\mu) &= l \frac{T_R}{T_f} P^a_R \left( U^R(x,\mu) \mathrm{tr_{spin}} \left[ \gamma_5 (1-\gamma_\mu) \right. \right. \nonumber\\
+										&\quad\quad\quad	\left. \left. \left\{ \eta(x+\mu)\otimes\xi(x)^\dagger + \xi(x+\mu)\otimes\eta(x)^\dagger \right\} \right] \right)\, . 
+\end{align}
+
+\noindent\textbf{(Nota per Luigi: questa e` la forma effettivamente usata nel codice come puoi facilemente riconoscere dal sorgente. Nota inoltre che prendere la prioezione fa automaticamente il TA, visto che i generatori sono antihermitiani a traccia nulla.)}
+
+
+
+\section{HMC molecular dynamics}
+
+\noindent\textbf{(Nota per Luigi: questo e` il paragrafo per la forza che mi avevi mandato. E` formalmente corretto
+		a parte un $U^R$ che manca nell'eq(\ref{VARUR}), ma come avrai visto di sopra ho preferito riscriverlo per un paio
+		motivi: 1) perche' mi sembrava che ci fossero passaggi inutili (come il passaggio per $\mathcal{C}_R$ che e` anche dannoso...) 
+	 e la logica del tutto non risultava chiarissima (almeno a me); 2) perche' volevo rifare il conto in modo dettagliato e unificato anche per 
+	 la parte di pura gauge a futura referenza per i posteri (se lo mettiamo sull'articolo) perche' non si trova facilmente fatto cosi' ed ha il vantaggio di essere semplice
+	 e di generalizzarsi a tutto quello che ti puo' venire in mente (azioni con rappresentazioni miste, etc.) )}
+
+The pseudofermionic action contributes to the force that determines
+the time evolution of the conjugate momenta in the molecular
+dynamics. Consider a variation of a link variable:
+%
+\begin{equation}
+\delta U(x,\mu) = \omega(x,\mu) U(x,\mu),
+\end{equation}
+where $\omega$ is an element of the algebra $\mathcal G$; the
+corresponding variation of the action defines the fermionic force,
+$F(x,\mu)$:
+%
+\begin{equation}
+\delta S_\mathrm{pf} = \left(\omega,F\right).
+\end{equation}
+%
+The variation $\delta S_\mathrm{pf}$ can always be cast in the form:
+%
+\begin{equation}
+\delta S_\mathrm{pf} = \sum_{x,y} \eta(x)^\dagger \delta Q_m(x,y)
+\xi(y) + \xi(x)^\dagger \delta Q_m(x,y) \eta(y)
+\end{equation}
+%
+where $\eta$ and $\xi$ are functions of $\phi$ that depend on the
+number of flavours that we are considering. The expression needed for
+the RHMC is considered in detail later. For fermions in a generic
+representation $R$, and for an infinitesimal variation of the field
+variable $U(z,\mu)$, we obtain:
+%
+\begin{align}
+\delta Q_m(x,y) = &-\gamma_5 \left[(1-\gamma_\mu) \delta U^R(z,\mu)
+\delta_{y,x+\mu} \delta_{x-\nu,z} \delta_{\mu\nu} \right. \nonumber \\ 
+&~~~~~~~~~~~~~~~~~\left. + (1+\gamma_\mu) \delta U^R(z,\mu)^\dagger 
+\delta_{y,x-\mu} \delta_{x-\nu,z} \delta_{\mu\nu} \right] \nonumber.
+\end{align}
+%
+Using this expression for $\delta Q_m$, the variation of the fermionic
+action is:
+%
+\begin{equation}
+\delta S_\mathrm{pf} = \mathrm{Re} \left\{ \eta^\dagger(x) \gamma_5
+\left(1-\gamma_\mu\right) \delta U^R(x,\mu) \xi(x+\mu) +
+\eta^\dagger(x+\mu) \gamma_5
+\left(1+\gamma_\mu\right) \delta U^R(x,\mu) \xi(x) \right\}
+\end{equation}
+%
+In the following we denote by upper--case letters,
+$A,B,\ldots=1,\ldots,d_R$, the colour indices in the representation
+$R$, and by lower--case letters, $a,b,\ldots=1,\ldots,N$, the colour
+indices in the fundamental representation.  The variation of the link
+variable $U$ induces a variation of the field $U^R$:
+%
+\begin{eqnarray}
+\delta U^R(x,\mu)^{AB} &=& {\mathcal C}_R(x,\mu)^{AB}_{ab} 
+\delta U(x,\mu)_{ba}\\
+\mathrm{or, }~~ \delta U^R(x,\mu) \hspace{15truept}&=& \mathrm{tr }_f 
+\left[{\mathcal C}_R(x,\mu) \delta U(x,\mu) \right]\label{eq:dUR}.
+\end{eqnarray}
+%
+The above equation defines the transition function ${\mathcal C}_R$,
+which connects the variation of the field in the fundamental
+representation to the variation of the field in the $R$
+representation, and which needs to be computed for each representation
+that we are interested in. In the second line, we have omitted the
+open indices $A,B$, and the trace runs over the indices in the
+fundamental representation, as suggested by the
+subscript. The variation of the link variable in the $R$
+representation can be rewritten as:
+%
+\begin{align}
+\delta U^R &\equiv i \omega^a T^a_R \nonumber \\
+&= i \omega^a \mathrm{tr}_f\left[T^a U \mathcal{C}_R \right] \label{VARUR}
+\end{align}
+%
+and therefore:
+%
+\begin{equation}
+\mathrm{tr}_f\left[T^a U \mathcal{C}_R \right] = T^a_R U^R.
+\end{equation}
+%
+%% By introducing a new field:
+%% %
+%% \begin{equation}
+%% {\mathcal U}^\prime(x,\mu)^{AB}_{ab} = U(x,\mu)_{ac} 
+%% {\mathcal C}_R(x,\mu)^{AB}_{cb},
+%% \end{equation}
+%% the variations of the field $U^R$ can be rewritten as:
+%% %
+%% \begin{eqnarray}
+%% \delta U^R(x,\mu) &=& -\left(\omega(x,\mu),{\mathcal U}^\prime(x,\mu)\right) \\
+%% \delta U^R(x,\mu)^\dagger &=&
+%% \left(\omega(x,\mu), {\mathcal U}^\prime(x,\mu)^\dagger
+%% \right). 
+%% \end{eqnarray}
+%% %
+%% The expressions above are particularly useful since they allow the
+%% force to be readily written as:
+%% %
+%% \begin{eqnarray}
+%% F(x,\mu)_{ab} &=&\eta(x)^\dagger \gamma_5 (1-\gamma_\mu)
+%% {\mathcal U}^\prime(x,\mu)_{ab} \xi(x+\mu) - \nonumber \\
+%% && - \eta(x+\mu)^\dagger \gamma_5 (1+\gamma_\mu)
+%% {\mathcal U}^\prime(x,\mu)^\dagger_{ab} \xi(x).
+%% \end{eqnarray}
+%% %
+%% where the open indices in the fundamental representation are written
+%% explicitly, while the indices in the higher representation are
+%% contracted and omitted in the equation. \\
+Introducing a $d_R \times d_R$ matrix:  
+%
+\begin{equation}
+P(x,y)^{AB} = \mathrm{tr}_\mathrm{Dirac}\, \left[
+\gamma_5 \left(1-\gamma_\mu\right) \xi(x)^A \eta^\dagger(y)^B +
+\gamma_5 \left(1-\gamma_\mu\right) \eta(x)^A \xi^\dagger(y)^B 
+\right],
+\end{equation}
+%
+where the $\mathrm{tr}_\mathrm{Dirac}$ indicates that Dirac indices
+are contracted, the final expression for the force can be written
+as a trace over colour indices in the $R$ representation:
+%
+\begin{equation}
+\label{eq:force}
+F^a(x,\mu) = -\frac{1}{T_f} \mathrm{Im}\, \mathrm{tr}_R \left[ T^a_R\, 
+U^R(x,\mu) P(x+\mu,x) \right].
+\end{equation}
+
+\section{Checks of the MD force}
+The formulae derived in the previous Section can be checked against two
+known examples. The first, and almost trivial, check is obtained by
+assuming that the representation $R$ is again the fundamental
+representation. The well-known expression for the MD force for the
+usual HMC is then recovered. 
+
+The second case that has already been studied in the literature is the
+case of fermions in the adjoint representationof the gauge group
+SU($2$)~\cite{Donini:1996nr}. We agree with Eq.~(16) in
+Ref.~~\cite{Donini:1996nr}, provided that we exchange the indices $a$
+and $b$ in that formula.
+
+\noindent\textbf{(Nota per Luigi: le formule (12) e (16) nel papero di Donini e Guagnelli sono
+		simili e non proprio uguali come giustamente dici tu perche' usano convenzioni diverse (scambiano il croce nel definire 
+			la matrice rappresentata nell'aggiunta e hanno anche una diversa normalizzazione del Dirac). Loro pero'
+		usina il metodo piu' convenzionale di derivare le forze guardando ai momenti come matrici invece che in componenti, che
+		come dicevo sopra ha lo svantaggio di essere generalizzabile meno facilmente.)}
+
+
+\section{HMC Algorithm}
+
+We briefly review the construction of the HMC algorithm \cite{??}.
+
+Given the action $S(\phi)$ of a system of scalar fields $\phi$, our goal is to generate a Markov process with 
+fixed probability distribution $P_S(\phi) = 1/Z \exp[-S(\phi) ]$. A sufficient condition to have such a 
+Markov process is that it is ergodic and it satifies detailed balance:
+\begin{equation}
+P_S(\phi)P_M(\phi\rightarrow \phi') = P_S(\phi')P_M(\phi' \rightarrow \phi) \, .
+\end{equation}
+We define $P_M(\phi \rightarrow \phi')$ with the following three-step process:
+\begin{enumerate}
+\item we expand the configuration space with additional fields, the ``momenta" $\pi$ randomly chosen with probability
+$P_k(\pi)$ such that $P_k(\pi)=P_k(-\pi)$ -- usually one takes $P_k(\pi)\propto \exp[-\pi^2/2]$; 
+\item in the extended configuration space $(\phi, \pi)$, we generate a new configuration $(\phi',\pi')$ with probability
+$P_h((\phi,\pi)\rightarrow(\phi',\pi'))$ such that 
+\[P_h((\phi,\pi)\rightarrow(\phi',\pi')) = P_h((\phi',-\pi')\rightarrow(\phi,-\pi))\]
+(reversibility condition);
+\item we accept the new configuration $\phi'$ with probability 
+\[P_A((\phi,\pi)\rightarrow(\phi',\pi')) = min \left\{ 1, \frac{P_S(\phi')P_k(\pi')}{P_S(\phi)P_k(\pi)} \right\} \, .\]
+\end{enumerate}
+It is easy to see that the resulting probability
+\begin{equation}
+P_M(\phi\rightarrow\phi') = \int d\pi d\pi' P_k(\pi) P_h((\phi,\pi)\rightarrow(\phi',\pi')) P_A((\phi,\pi)\rightarrow(\phi',\pi')) \, ,
+\end{equation}
+satisfies detailed balance. Care must be taken to ensure ergodicity.
+
+As already stated, the distribution $P_k(\pi)$ is generally taken to be gaussian (this should also garantee ergodicity).
+The process $P_h$ is instead identified with the hamiltonian flow of a yet unspecified Hamiltonian $H$ in the phase
+space $(\phi,\pi)$ (giving to $\pi$ the meaning of ``momenta"). The time reversal symmetry of classical dynamics equation of motion
+garantees the reversibility condition. The resulting probability $P_h$ is then a delta function (the process is completly deterministic).
+Numerical integration to a given accuracy will result in a broader distribution and care must be taken to garantee the reversibility condition 
+in this case.
+Since we want a high acceptance rate (low correlation among the configurations), we must carefully choose the Hamiltonian $H$.
+One simple way is to take $P_k$ to be gaussian and to define $H(\pi,\phi)=-\ln [P_k(\pi) P_S(\phi)] = \pi^2/2 + S(\phi)$ 
+(omitting irrelevant constants). If $H$ is exactly conserved by the process $P_h$ then the acceptance probability is 1.
+
+When fermionic degrees of freedom are present in the action $S$, we can first integrate them out, resulting in a non
+local bosonic action and then apply the above scheme. In practice, to deal with a non-local action is not convienent
+from a numerical point a view and stocastic extimate are used.
+
+Consider a quadratic fermionic term  in the action: $S(\bar\psi,\psi) = \bar\psi M \psi$ with a generic interaction
+matrix $M$ possibly function of the other bosonic fields $\phi$. The contribution of this term to the partition function
+is $\int d\bar\psi d\psi \exp [ -S(\bar\psi,\psi)] = det[M]$. Assuming that the matrix $M$ is positive definite,
+we can rewrite $det[M]=\int d\bar\eta d\eta \exp[ \bar\eta (M)^{-1} \eta ]$, where $\bar\eta$,$\eta$ are two new 
+complex bosonic fields, called pseudofermions.
+This term can be taken into account generating random pseudofermions $\bar\phi$, $\phi$ with the desidered probability
+distribution and keeping then fixed during the above HMC configuration generation for the remaining bosonic fields $\phi$.
+
+
+
+\section{RHMC formulation}
+\noindent\textbf{(Nota per Luigi: Ho fatto qualche correzione, ma devo integrarlo meglio con il resto.)}
+
+In order to discuss the RHMC implementation we follow the notation in
+Ref.~\cite{Clark:2005sq}: starting from a fermionic action:
+%
+\begin{equation}
+S_\mathrm{pf}=-\sum_{x,y} \phi^\dagger(x) \mathcal F(Q^2_m)_{x,y} \phi(y),
+\end{equation}
+%
+where $\mathcal F$ is a generic function of $Q^2_m$, we construct two
+rational approximations:
+%
+\begin{align}
+r(Q^2_m) &= \sum_k \frac{\alpha_k}{Q^2_m + \beta_k} 
+\nonumber \\
+\bar r(Q^2_m) &= \sum_k \frac{\bar \alpha_k}{Q^2_m + \bar \beta_k}, \nonumber
+\end{align}
+%
+such that:
+%
+\begin{equation}
+r^2(x) \approx \bar r(x) \approx \mathcal F.
+\end{equation}
+%
+The number of terms appearing in each approximation depends on the
+degree of accuracy that is required. \\
+The first approximation, $r$, is used to generate pseudofermionic fields at
+the beginning of the trajectories using an heat--baht, while the
+second approximation, $\bar r$ is used during the MD evolution. \\
+The explicit expression for the action:
+%
+\begin{equation}
+S_\mathrm{pf}= - \sum_k \bar \alpha_k \phi^\dagger \left[Q^2_m + \bar
+  \beta_k \right]^{-1} \phi
+\end{equation} 
+%
+yields the following variation:
+%
+\begin{equation}
+\delta S_\mathrm{pf} = \sum_k \bar\alpha_k \phi_k^\dagger
+\left\{Q_m \delta Q_m + \delta Q_m Q_m \right\} \phi_k,
+\end{equation}
+%
+where $\phi_k=\left[Q^2_m + \bar
+  \beta_k \right]^{-1} \phi$.
+
+\section{Two--point functions}
+This is a summary of the formulae used for the mesonic two--pt
+functions. 
+
+\bigskip
+
+\noindent
+Let $\Gamma$ and $\Gamma^\prime$ be two generic matrices in the
+Clifford algebra, we define the two--pt function:
+%
+\begin{equation}
+f_{\Gamma\Gamma^\prime}(t) = \sum_\bfx \langle \bar\psi(\bfx,t) \Gamma
+\psi(\bfx,t) \bar\psi(0) \Gamma^\prime \psi(0) \rangle
+\end{equation}
+%
+Performing the Wick contractions yields:
+%
+\begin{eqnarray}
+\langle \bar\psi(\bfx,t) \Gamma
+\psi(\bfx,t) \bar\psi(0) \Gamma^\prime \psi(0) \rangle &=&
+- \mathrm{tr} \left[ \Gamma S(x-y) \Gamma^\prime S(y-x) \right] 
+\nonumber \\
+&=& - \mathrm{tr} \left[ \Gamma S(x-y) \Gamma^\prime \gamma_5 
+S^\dagger(x-y) \gamma_5 \right] \nonumber 
+\end{eqnarray}
+%
+In practice we invert the Hermitean Dirac operator $\gamma_5 D$ by
+solving the equation:
+%
+\begin{equation}
+Q_{AB}(x-y) \eta^{\bar A,x_0}_B(y) = \delta_{A,\bar A} \delta_{x,x_0}
+\end{equation}
+%
+where $A=\{a,\alpha\}$ is a collective index for colour and spin, and
+$\bar A$, $x_0$ are the position of the source for the inverter. 
+
+Using the field $\eta$ that we obtain from the inverter, the
+correlator above becomes:
+%
+\begin{equation}
+\langle \ldots \rangle = - \tilde \Gamma_{AB} \eta^{C,y}_B(x)
+\tilde \Gamma^\prime_{CD} \eta^{D,y}_A(x)^*
+\end{equation}
+where $\tilde \Gamma= \gamma_5 \Gamma$, and $\tilde \Gamma^\prime =
+\gamma_5 \Gamma^\prime$.
+
+\bibliography{hirep}
+
+\end{document}

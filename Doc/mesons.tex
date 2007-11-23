@@ -1,0 +1,353 @@
+\documentclass[a4paper]{article}
+
+\usepackage{bm}
+\usepackage{amsmath}
+\usepackage{latexsym}
+
+
+\newcommand{\tr}{\mathrm{tr}}
+\newcommand{\gR}{\mathbf{R}}
+\newcommand{\gr}{\mathbf{r}}
+\newcommand{\point}{\; .}
+\newcommand{\comma}{\; ,}
+
+
+\begin{document}
+
+
+\section{Correlatori mesonici di isotripletto}
+
+\subsection{Formule generali}
+
+Indico con $u$ e $d$ i due flavours fermionici. Sono interessato al calcolo dei correlatori mesonici:
+\begin{eqnarray}
+&& C_{\Gamma_1,\Gamma_2}(x-y) = \left<
+\left( \bar{u} \Gamma_1 d \right)^\dagger(x)
+\left( \bar{u} \Gamma_2 d \right)(y)
+\right> = \nonumber \\
+&& \quad = \left<
+\left( \bar{d} \gamma_0 \Gamma_1^\dagger \gamma_0 u \right)(x)
+\left( \bar{u} \Gamma_2 d \right)(y)
+\right>
+\end{eqnarray}
+dove $\Gamma_i$ sono generici prodotti di matrici $\gamma$.
+
+Se indico con $G(x,y)$ la matrice inversa dell'operatore di Dirac, se definisco la matrice hermitiana $H(x,y) = G(x,y) \gamma_5$, i campi fermionici possono essere integrati esplicitamente e resta
+\begin{eqnarray}
+&& C_{\Gamma_1,\Gamma_2}(x-y) = - \left< \tr
+\left[ \gamma_0 \Gamma_1^\dagger \gamma_0 G(x,y) \Gamma_2 G(y,x) \right]
+\right> = \nonumber \\
+&& \quad = - \left< \tr
+\left[ \gamma_0 \Gamma_1^\dagger \gamma_0 G(x,y) \Gamma_2 \gamma_5 G(x,y)^\dagger \gamma_5 \right]
+\right> = \nonumber \\
+&& \quad = - \left< \tr
+\left[ \gamma_0 \Gamma_1^\dagger \gamma_0 H(x,y) \gamma_5 \Gamma_2 H(x,y)^\dagger \gamma_5 \right]
+\right> \point
+\end{eqnarray}
+
+Grazie alle regole di anticommutazione delle matrici $\gamma$, \`{e} facile vedere che la matrice $\gamma_0 \Gamma^\dagger \gamma_0$ \`{e} uguale a $\Gamma$, a meno di un segno:
+\begin{equation} \label{gamma0_adj}
+\gamma_0 \Gamma^\dagger \gamma_0 = s(\Gamma) \Gamma \qquad \textrm{con } s(\Gamma) = \pm 1 \point
+\end{equation}
+
+Inoltre, una matrice $\Gamma$ generica ha le seguenti propriet\`{a}:
+\begin{enumerate}
+\item i suoi elementi di matrice possono essere $0$, $\pm 1$, $\pm i$;
+\item \`{e} o completamente reale o completamente immaginaria;
+\item per ogni riga esiste un solo elemento non nullo;
+\item per ogni colonna esiste un solo elemento non nullo.
+\end{enumerate}
+Quindi, data una matrice $\Gamma$, \`{e} possibile scrivere:
+\begin{equation} \label{gamma_ab}
+\Gamma_{\alpha\beta} = t_\alpha(\Gamma) \delta_{\sigma_\alpha(\Gamma), \beta}
+\end{equation}
+dove $\sigma(\Gamma)$ \`{e} una permutazione di $4$ elementi e $t_\alpha(\Gamma)$ assume valori $\pm 1$ per le matrici $\Gamma$ reali e $\pm i$ per le matrici $\Gamma$ immaginarie.
+
+Mettendo tutto insieme:
+\begin{eqnarray}
+&& C_{\Gamma_1,\Gamma_2}(x-y) = - s(\Gamma_1) \left< \tr
+\left[ \gamma_5 \Gamma_1 H(x,y) \gamma_5 \Gamma_2 H(x,y)^\dagger \right]
+\right> = \nonumber \\
+&& \quad = - s(\Gamma_1) \sum_{\alpha\beta} t_\alpha(\gamma_5 \Gamma_1) t_\beta(\gamma_5 \Gamma_2) \times \nonumber \\
+&& \qquad \times \left< \tr
+\left[ H_{\sigma_\alpha(\gamma_5 \Gamma_1), \beta}(x,y) H_{\alpha, \sigma_\beta(\gamma_5 \Gamma_2)}(x,y)^\dagger \right]
+\right> \point \label{triplet_corr}
+\end{eqnarray}
+
+
+\subsection{Implementazione point-to-all propagator}
+
+Per il calcolo delle masse mesoniche sono interessato ai correlatori con $\Gamma_1=\Gamma_2$. Usando l'invarianza traslazionale, posso scegliere $y=0$. In questo caso la formula \ref{triplet_corr} si specializza:
+\begin{eqnarray}
+&& C_{\Gamma}(x) = - s(\Gamma) \sum_{\alpha\beta} t_\alpha(\gamma_5 \Gamma) t_\beta(\gamma_5 \Gamma) \times \nonumber \\
+&& \qquad \times \left< \tr
+\left[ H_{\sigma_\alpha(\gamma_5 \Gamma), \beta}(x,0) H_{\alpha, \sigma_\beta(\gamma_5 \Gamma)}(x,0)^\dagger \right]
+\right> \point \label{triplet_point_to_all_corr}
+\end{eqnarray}
+
+Alla \textbf{revision 27 di HiRep} \`{e} implementata questa formula.
+\begin{itemize}
+\item Data la sorgente puntiforme $ \xi^{(\alpha,a)} $ definita da:
+$$ \xi^{(\alpha,a)}_{\beta b}(x) = \delta_{\alpha,\beta} \delta_{a,b} \delta_{x,0} \comma $$
+la funzione \verb|quark_propagator| applica l'inverso dell'operatore di Dirac hermitiano alla sorgente:
+$$ \eta^{(\alpha,a)} = H \xi^{(\alpha,a)} \qquad \eta^{(\alpha,a)}_{\beta b}(x) = H_{\beta \alpha}^{b a}(x,0) \point $$
+\item Le funzioni\\
+\verb|      |\\
+\verb|      void *_correlator(float *out, suNf_spinor **qp)|\\
+\verb|      |\\
+in \verb|Observables/mesons.c| implementano la formula \ref{triplet_point_to_all_corr}, essendo \verb|out| il correlatore e \verb|qp| l'array degli spinori $\eta^{(\alpha,a)}$. Le funzioni $s(\Gamma)$, $t_\alpha(\gamma_5 \Gamma)$, $\sigma_\alpha(\gamma_5 \Gamma)$ sono state calcolate con \verb|Mathematica| (vedi file \verb|mesons.nb|) ed implementate nel codice attraverso delle macro, definite come segue:\\
+\verb|      |\\
+\verb|      _C1_ = |$\sigma_1(\gamma_5 \Gamma)$\\
+\verb|      _C2_ = |$\sigma_2(\gamma_5 \Gamma)$\\
+\verb|      _C3_ = |$\sigma_3(\gamma_5 \Gamma)$\\
+\verb|      _C4_ = |$\sigma_4(\gamma_5 \Gamma)$\\
+\verb|      |\\
+se i $t_\alpha(\gamma_5 \Gamma)$ sono reali:\\
+\verb|      |\\
+\verb|      _S0_ = |$-s(\Gamma)$\\
+\verb|      _S1_ = |$t_1(\gamma_5 \Gamma)$\\
+\verb|      _S2_ = |$t_2(\gamma_5 \Gamma)$\\
+\verb|      _S3_ = |$t_3(\gamma_5 \Gamma)$\\
+\verb|      _S4_ = |$t_4(\gamma_5 \Gamma)$\\
+\verb|      |\\
+mentre se i $t_\alpha(\gamma_5 \Gamma)$ sono immaginari:\\
+\verb|      |\\
+\verb|      _S0_ = |$s(\Gamma)$\\
+\verb|      _S1_ = |$-i t_1(\gamma_5 \Gamma)$\\
+\verb|      _S2_ = |$-i t_2(\gamma_5 \Gamma)$\\
+\verb|      _S3_ = |$-i t_3(\gamma_5 \Gamma)$\\
+\verb|      _S4_ = |$-i t_4(\gamma_5 \Gamma)$\\
+\verb|      |\\
+\end{itemize}
+
+
+\section{Correlatori mesonici di isosingoletto}
+
+\subsection{Formule generali}
+
+Sono interessato in questo caso ad un singolo flavour $u$. Il generico correlatore mesonico \`{e} dato da:
+\begin{eqnarray}
+C_{\Gamma_1,\Gamma_2}(x-y) &=& \left<
+\left( \bar{u} \gamma_0 \Gamma_1^\dagger \gamma_0 u \right)(x)
+\left( \bar{u} \Gamma_2 u \right)(y)
+\right>
+\end{eqnarray}
+
+L'integrazione dei campi fermionici d\`{a} luogo ad un termine in pi\`{u} (il diagramma \textit{hairpin}):
+\begin{eqnarray}
+C_{\Gamma_1,\Gamma_2}(x-y) &=&
+- \left< \tr
+\left[ \gamma_0 \Gamma_1^\dagger \gamma_0 G(x,y) \Gamma_2 G(y,x) \right]
+\right> + \nonumber \\
+&& + \left< \tr
+\left[ \gamma_0 \Gamma_1^\dagger \gamma_0 G(x,x) \right]
+\tr \left[ \Gamma_2 G(y,y) \right]
+\right>
+= \nonumber \\
+&=& - \left< \tr
+\left[ \gamma_0 \Gamma_1^\dagger \gamma_0 H(x,y) \gamma_5 \Gamma_2 H(x,y)^\dagger \gamma_5 \right]
+\right> + \nonumber \\
+&& + \left< \tr
+\left[ \gamma_5 \gamma_0 \Gamma_1^\dagger \gamma_0 H(x,x) \right]
+\tr \left[ \gamma_5 \Gamma_2 H(y,y) \right]
+\right>
+\point
+\end{eqnarray}
+
+Il primo contributo \`{e} identico a quello di correlatore di isotripletto. Mi concentro quindi sul secondo contributo. Usando le formule \ref{gamma0_adj}, \ref{gamma_ab} posso scrivere:
+\begin{eqnarray}
+&& \left< \tr
+\left[ \gamma_0 \Gamma_1^\dagger \gamma_0 G(x,x) \right]
+\tr \left[ \Gamma_2 G(y,y) \right] \right> = \nonumber \\
+&& \quad = s(\Gamma_1) \sum_{\alpha \beta} t_\alpha(\Gamma_1) t_\beta(\Gamma_2) \times \nonumber \\
+&& \qquad \times \left<
+\tr G_{\sigma_\alpha(\gamma_5 \Gamma_1),\alpha}(x,x) \;
+\tr G_{\sigma_\beta(\gamma_5 \Gamma_2),\beta}(y,y)
+\right>
+\point \label{hairpin}
+\end{eqnarray}
+
+
+
+\subsection{Propagatore all-to-all}
+
+\`{E} chiaro dalla formula \ref{hairpin} che, anche ponendo $y=0$, volendo usare sorgenti puntiformi, bisogna calcolare tutta la matrice inversa dell'operatore di Dirac. L'alternativa consiste nell'utilizzare una stima statistica per $H$ ed utilizzare procedure di riduzione della varianza.
+
+Supponiamo di avere a dosposizione $N_s$ sorgenti fermioniche random $\xi^{(i)}$ tali che gli unici correlatori non nulli siano:
+$$ \left< \xi^{(i)}_{\alpha a}(x)^\dagger \xi^{(j)}_{\beta b}(y) \right> = \delta_{\alpha,\beta} \delta_{a,b} \delta_{x,y} \delta_{i,j} \point $$
+In letteratura sono presi in considerazione essenzialmente il noise gaussiano e il noise $Z_2$. Sceglier\`{o} un noise $Z_2$, seguendo Foster\&Michael \cite{Foster:1998vw}. Ogni componente (parte reale e parte immaginaria sono indipendenti) dello spinore \`{e} scelta casualmente tra i valori $\pm 1/\sqrt{2}$. 
+
+% Questo generatore verr\`{a} implementato in una funzione \\
+% \verb|      |\\
+% \verb|      void z2_random_f(suNf_spinor *csi)|\\
+% \verb|      |\\
+% nel file \verb|Random/random_fields.c|
+
+La matrice $H$ pu\`{o} essere stimata nel seguente modo:
+\begin{eqnarray}
+&& H_{\alpha \beta}^{a b}(x,y) \simeq \sum_{i=1}^{N_s} \eta^{(i)}_{\alpha a}(x) \xi^{(i)}_{\beta b}(y)^\dagger \label{naive_noisy_estimate} \\
+&& \eta^{(i)} \equiv H \xi^{(i)} \nonumber
+\end{eqnarray}
+
+La stima stocastica pu\`{o} essere quindi usata per calcolare le tracce rilevanti per i correlatori:
+\begin{eqnarray}
+&& \tr \left[ \Gamma_1 G(x,y) \Gamma_2 G(y,x) \right] = \sum_{ij} \xi^{(i)}(x)^\dagger \gamma_5 \Gamma_1 \eta^{(j)}(x) \times \xi^{(j)}(y)^\dagger \gamma_5 \Gamma_2 \eta^{(i)}(y) \\
+&& \tr \left[ \Gamma G(x,x) \right] = \sum_i \xi^{(i)}(x)^\dagger \gamma_5 \Gamma \eta^{(i)}(x)
+\end{eqnarray}
+
+
+
+\subsection{Variance reduction}
+
+Il rumore ottenuto dalla stima stocastica della matrice $G$ nella formula \ref{naive_noisy_estimate} pu\`{o} essere ridotto utilizzando il trucco di McNeile\&Michael \cite{McNeile:2000xx} per i fermioni di Wilson.
+
+L'operatore di Dirac $D$ ha la forma $ D = 1 - K $. Per la matrice $G$ vale la seguente formula:
+\begin{eqnarray*}
+&& G = D^{-1} = \left( 1 - K \right)^{-1} = \\
+&& \quad = 1 + K + \dots + K^m + K^{n_1} G K^{n_2}
+\end{eqnarray*}
+con $ n_1 + n_2 = n = m+1 $. In particolare, per il calcolo del diagramma \textit{hairpin}:
+\begin{eqnarray*}
+\tr \left[ \Gamma G(x,x) \right] &=& \tr \Gamma + \tr \left[ \Gamma K^4 \right](x,x) + \tr \left[ \Gamma K^6 \right](x,x) + \dots + \\
+&& + \tr \left[ \Gamma K^{2k} \right](x,x) + \tr \left[ \Gamma K^{n_1} G K^{n_2} \right](x,x)
+\end{eqnarray*}
+con $m = 2k$. Qui ho usato il fatto che la matrice $K$ connette solo siti primi vicini e quindi $ K^p(x,x) \neq 0 $ solo se $p$ \`{e} pari; inoltre se $r_0=1$ allora anche $ K^2(x,x) = 0 $. I primi $k+1$ termini possono essere calcolati esplicitamente, mentre l'ultimo termine pu\`{o} essere stimato stocasticamente.
+\begin{eqnarray}
+\tr \left[ \Gamma G(x,x) \right] &=& \tr \Gamma + \tr \left[ \Gamma K^4 \right](x,x) + \tr \left[ \Gamma K^6 \right](x,x) + \dots + \nonumber \\
+&& + \tr \left[ \Gamma K^{2k} \right](x,x) + \sum_{iy} \xi^{(i)}(y)^\dagger \gamma_5 K^{n_2}(y,x) \Gamma K^{n_1}(x,y) \eta^{(i)}(y) \nonumber \\
+&& \label{hairpin_with_variance_reduction}
+\end{eqnarray}
+
+McNeile\&Michael utilizzano questo trucco solo per il calcolo del diagramma \textit{hairpin}. C'\`{e} da chiedersi se vale la pena di generalizzarlo anche alla parte di isotripletto, in alternativa al propagatore point-to-all. Per ora questo non sar\`{a} fatto.
+
+
+
+\subsection{Time dilution}
+
+Questo \`{e} un trucco introdotto da Foley\&C \cite{Foley:2005ac} per la riduzione del rumore nel calcolo di propagatori a momento nullo. Ogni qual volta si richiede una stima stocastica della matrice $H$, tipo nella formula \ref{naive_noisy_estimate}, \`{e} possibile sostituire ogni sorgente stocastica $\xi^{(i)}$ con un set di sorgenti, ognuna con supporto su una time-slice diversa:
+\begin{eqnarray} \label{time_dilution}
+&& \xi^{(i)} \rightarrow \xi^{(i,\tau)}(\mathbf{x},t) = \xi^{(i)}(\mathbf{x},t) \delta_{t,\tau}
+\end{eqnarray}
+
+La stima stocastica si ottiene ora in maniera analoga al caso naive:
+\begin{eqnarray}
+&& H_{\alpha \beta}^{a b}(x,y) \simeq \sum_{i=1}^{N_s} \sum_{\tau=1}^{N_t} \eta^{(i,\tau)}_{\alpha a}(x) \xi^{(i,\tau)}_{\beta b}(y)^\dagger \label{diluted_noisy_estimate} \\
+&& \eta^{(i,\tau)} \equiv H \xi^{(i,\tau)} \nonumber
+\end{eqnarray}
+
+
+
+\subsection{Schema di implementazione}
+
+Saranno implementate le seguenti funzioni.
+
+\begin{itemize}
+
+\item Calcolo dei termini esatti della formula \ref{hairpin_with_variance_reduction}.\\
+\verb| |\\
+\verb| void GAMMA_variance_reduction_exact_terms(float *out, int k)|\\
+\verb| out | = vettore reale con numero di componenti pari al volume = $h_k(x)$ \\
+\verb| GAMMA | = \verb|g5|, \verb|g0|, \verb|gi|... \\
+\verb| |\\
+
+La funzione calcola:
+\begin{eqnarray}
+h_k(x) &=& \tr \left[ \Gamma K^{2k} \right](x,x) = \nonumber \\
+&=& \left( \frac{\kappa}{2} \right)^{2k} \sum_{\mathcal{C}_x} \tr \left( \Gamma \tilde{\gamma}(\mathcal{C}_x) \right) \mathcal{W}(\mathcal{C}_x)
+\end{eqnarray}
+dove $\mathcal{C}_x = (x,\hat{\mu}_1,\hat{\mu}_2,\dots,\hat{\mu}_{2k})$ \`{e} il generico cammino chiuso in $x$ di lunghezza $2k$ ottenuto muovendosi da $x$ nelle direzioni $\hat{\mu}_i$; $\mathcal{W}(\mathcal{C}_x)$ \`{e} la traccia del trasporto parallelo attraverso $\mathcal{C}_x$ nella rappresentazione fermionica; $\tilde{\gamma}(\mathcal{C}_x)$ \`{e} la matrice definita come:
+$$
+\tilde{\gamma}(\mathcal{C}_x) = (1-\gamma_{\hat{\mu}_1})(1-\gamma_{\hat{\mu}_2})\cdots(1-\gamma_{\hat{\mu}_{2k}})
+$$
+avendo definito $ \gamma_{-\hat{\mu}_i} = - \gamma_{\hat{\mu}_i} $.
+
+Va notato che, siccome $(1-\gamma_{\hat{\mu}_i})(1-\gamma_{-\hat{\mu}_i}) = 0$, si possono escludere dalla somma i cammini in cui compare una coppia di successivi $(\dots, \hat{\mu}_i,-\hat{\mu}_i, \dots)$. Inoltre la matrice $\tilde{\gamma}(\mathcal{C}_x)$ non dipende da $x$; \`{e} conveniente quindi colcolare la lista dei cammini e la matrice $\tilde{\gamma}(\mathcal{C}_x)$ una sola volta.
+
+\item Conviene avere a disposizione una funzione che calcoli le tracce dei trasporti paralleli.\\
+\verb| |\\
+\verb| void tr_r_pexp(complex *out, int *path, int length)|\\
+\verb| out | = vettore complesso con num. di componenti pari al volume = $\phi(x)$ \\
+\verb| path | = lista delle \verb|length| direzioni di cui \`{e} composto il cammino \\
+\verb| |\\
+
+Restituisce:
+$$
+\phi(x) = \tr \mathbf{R} \left[ U_{x, \hat{\mu}_1} U_{x+\hat{\mu}_1, \hat{\mu}_2} \cdots \right]
+$$
+
+\item Calcolo degli estimatori time-diluted.\\
+\verb| |\\
+\verb| void time_diluted_stochastic_estimate|\\
+\verb|      (suNf_spinor *csi, suNf_spinor **eta,|\\
+\verb|      int nm, float *mass, double ac)|\\
+\verb| csi | = spinore  = $\xi$\\
+\verb| path | = lista di $N_t \times \textrm{nm}$ spinori = $\eta^{(\tau,m)}$ \\
+\verb| |\\
+
+Genera lo spinore $\xi$ con noise $Z_2$. Definisce gli spinori:
+$$
+\xi^{(\tau)}(\mathbf{x},t) = \xi(\mathbf{x},t) \delta_{t,\tau}
+$$
+e restituisce gli spinori:
+$$
+\eta^{(\tau,m)} \equiv H_m \xi^{(\tau)}
+$$
+usando un invertitore dell'operatore di Dirac con parametri \verb|nm|, \verb|mass|, \verb|acc|.
+
+\item Calcolo del termine di \textit{hairpin}.\\
+\verb| |\\
+\verb| void GAMMA_hairpin_VR_TD(float **out,|\\
+\verb|      int n1, int n2, int nrs,|\\
+\verb|      int nm, float *mass, double acc)|\\
+\verb| out | = lista di \verb|nm| vettori reali con num. di componenti pari al volume \\
+\verb| n1, n2 | = parametri dell'algoritmo di variance reduction \\
+\verb| nrs | = numero di sorgenti random per la stima statistica \\
+\verb| nm, mass | = numero e lista delle masse \\
+\verb| acc | = parametro dell'invertitore \\
+\verb| |\\
+
+Usando tutte le funzioni definite sopra, implementa la formula \ref{hairpin_with_variance_reduction}, sommando termini esatti e termine statistico (generato con \verb|nrs| sorgenti da diluire, per un totale di \verb|nrs|$\times N_t$ inversioni di matrice), per ogni valore della massa e restituisce il risultato in \verb|out|.
+
+\end{itemize}
+
+
+\begin{thebibliography}{99}
+
+%\cite{Foley:2005ac}
+\bibitem{Foley:2005ac}
+  J.~Foley, K.~Jimmy Juge, A.~O'Cais, M.~Peardon, S.~M.~Ryan and J.~I.~Skullerud,
+  %``Practical all-to-all propagators for lattice QCD,''
+  Comput.\ Phys.\ Commun.\  {\bf 172}, 145 (2005)
+  [arXiv:hep-lat/0505023].
+  %%CITATION = CPHCB,172,145;%%
+
+%\cite{McNeile:2000xx}
+\bibitem{McNeile:2000xx}
+  C.~McNeile and C.~Michael  [UKQCD Collaboration],
+  %``Mixing of scalar glueballs and flavour-singlet scalar mesons,''
+  Phys.\ Rev.\  D {\bf 63}, 114503 (2001)
+  [arXiv:hep-lat/0010019].
+  %%CITATION = PHRVA,D63,114503;%%
+
+%\cite{Foster:1998vw}
+\bibitem{Foster:1998vw}
+  M.~Foster and C.~Michael  [UKQCD Collaboration],
+  %``Quark mass dependence of hadron masses from lattice QCD,''
+  Phys.\ Rev.\  D {\bf 59}, 074503 (1999)
+  [arXiv:hep-lat/9810021].
+  %%CITATION = PHRVA,D59,074503;%%
+
+%\cite{Hart:2006ps}
+\bibitem{Hart:2006ps}
+  A.~Hart, C.~McNeile, C.~Michael and J.~Pickavance  [UKQCD Collaboration],
+  %``A lattice study of the masses of singlet 0++ mesons,''
+  Phys.\ Rev.\  D {\bf 74}, 114504 (2006)
+  [arXiv:hep-lat/0608026].
+  %%CITATION = PHRVA,D74,114504;%%
+
+\end{thebibliography}
+
+
+\end{document}
+
+
