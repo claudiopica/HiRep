@@ -60,7 +60,7 @@ int main(int argc,char *argv[])
 {
 	int i,k,n;
 
-	suNf_spinor **quark_prop;
+	spinor_field *quark_prop;
 	FILE *propfile;
 	long int start;
 	long int propsize;
@@ -103,10 +103,7 @@ int main(int argc,char *argv[])
 	set_spinor_len(VOLUME);
 
 	/* setup for quark propagators measures */
-	quark_prop=(suNf_spinor**)malloc(sizeof(suNf_spinor*)*4*NF);
-	quark_prop[0]=alloc_spinor_field_f(4*NF);
-	for (n=1;n<4*NF;++n)
-		quark_prop[n]=quark_prop[n-1]+VOLUME;
+	quark_prop=alloc_spinor_field_f(4*NF);
 
 	propsize=sizeof(suNf_spinor)*VOLUME;
 	start=ftell(propfile);
@@ -122,7 +119,7 @@ int main(int argc,char *argv[])
 			for (n=0;n<4*NF;++n){
 				cur_pos=start+n*nm*propsize;
 				error(fseek(propfile,cur_pos,SEEK_SET)!=0,1,"Main","Fseek failed!");
-				error((fread(quark_prop[n],(size_t) sizeof(suNf_spinor),
+				error((fread(_SPINOR_ADDR(&quark_prop[n]),(size_t) sizeof(suNf_spinor),
 								(size_t)(VOLUME),propfile)!=(VOLUME))&&(!feof(propfile)),
 						1,"Main", "Failed to read form quark propagator!");
 			}
@@ -156,8 +153,7 @@ int main(int argc,char *argv[])
 	fclose(propfile);
 
 
-	free_field(quark_prop[0]);
-	free(quark_prop);
+	free_spinor_field(quark_prop);
 
 	free(m);
 

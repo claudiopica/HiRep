@@ -117,8 +117,8 @@ void quark_propagator_QMR_eo(FILE *propfile, unsigned int ssite, int nm, double 
 			/* multiply by g_5 to match the MINRES version */
 			spinor_field_g5_f(res,res);
 			/* convert res to single precision */
-			assign_sd2s(VOLUME,(suNf_spinor_flt*)res,res);
-			error(fwrite(res,(size_t) sizeof(suNf_spinor_flt),(size_t)(VOLUME),propfile)!=(VOLUME),1,"quark_propagator_QMR_eo",
+			assign_sd2s(VOLUME,(suNf_spinor_flt*)_SPINOR_ADDR(res),_SPINOR_ADDR(res));
+			error(fwrite(_SPINOR_ADDR(res),(size_t) sizeof(suNf_spinor_flt),(size_t)(VOLUME),propfile)!=(VOLUME),1,"quark_propagator_QMR_eo",
 					"Failed to write quark propagator to file");
 			set_spinor_len(VOLUME/2);
 		}
@@ -213,8 +213,8 @@ void quark_propagator_QMR(FILE *propfile, unsigned int ssite, int nm, double *ma
 			/* multiply by g_5 to match the MINRES version */
 			spinor_field_g5_f(&resd[i],&resd[i]);
 			/* convert to single precision */
-			assign_sd2s(VOLUME,(suNf_spinor_flt*)(&resd[i]),(&resd[i]));
-			error(fwrite(resd[i],(size_t) sizeof(suNf_spinor_flt),(size_t)(VOLUME),propfile)!=(VOLUME),1,"quark_propagator_QMR",
+			assign_sd2s(VOLUME,(suNf_spinor_flt*)_SPINOR_ADDR(&resd[i]),_SPINOR_ADDR(&resd[i]));
+			error(fwrite(_SPINOR_ADDR(&resd[i]),(size_t) sizeof(suNf_spinor_flt),(size_t)(VOLUME),propfile)!=(VOLUME),1,"quark_propagator_QMR",
 					"Failed to write quark propagator to file");
 		}
 
@@ -239,7 +239,7 @@ void quark_propagator_QMR(FILE *propfile, unsigned int ssite, int nm, double *ma
  * H is the hermitean dirac operator
  * out is a vector of nm spinor fields
  */
-void quark_propagator(unsigned int source, int nm, double *mass, suNf_spinor **out, double acc) {
+void quark_propagator(unsigned int source, int nm, double *mass, spinor_field *out, double acc) {
   static MINRES_par MINRESpar;
   int i,cgiter;
   spinor_field *in;

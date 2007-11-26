@@ -1,11 +1,16 @@
-typedef suNf_spinor* spinor_field;
-typedef suNf_spinor_flt* spinor_field_flt;
+typedef struct {
+	suNf_spinor* ptr;
+} spinor_field;
 
-#define _SPINOR_ADDR(s) (*(s))
+typedef struct {
+	suNf_spinor_flt* ptr;
+} spinor_field_flt;
+
+#define _SPINOR_ADDR(s) ((s)->ptr)
 
 /* x e' l'indice di sito, i e' l'indice di componente */
-#define _SPINOR_AT_SITE(s,x) ((*(s))+x)
-#define _SPINOR_AT(s,i) ((*(s))+i)
+#define _SPINOR_AT_SITE(s,x) (((s)->ptr)+x)
+#define _SPINOR_AT(s,i) (((s)->ptr)+i)
 #define _SITE2SC(x) (x)
 #define _SC2SITE(i) (i)
 

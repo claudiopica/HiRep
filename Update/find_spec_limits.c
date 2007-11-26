@@ -128,7 +128,7 @@ void find_spec_H2(double *max, double *min, double mass) {
 	const double omega1=1.e-4; /* absolute precision */
 	const double omega2=1.e-1; /* relative precision */
 	int status,ie;
-	suNf_spinor **ws;
+	spinor_field *ws;
 	/* END of EVA parameters */
 	int MVM=0; /* counter for matrix-vector multiplications */
 	unsigned int len;

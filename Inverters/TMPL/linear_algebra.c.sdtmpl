@@ -5,52 +5,25 @@
 
 #define _ONE_SPINOR_FOR(s,i)	\
 	for(								\
-		i=0,_SPINOR(s)=*s;			\
+		i=0,_SPINOR(s)=(s)->ptr;			\
 		i<_spinor_len;				\
 		i++,_SPINOR(s)++			\
 	)
 
 #define _TWO_SPINORS_FOR(s1,s2,i) 			\
 	for(												\
-		i=0,_SPINOR(s1)=*s1,_SPINOR(s2)=*s2;	\
+		i=0,_SPINOR(s1)=(s1)->ptr,_SPINOR(s2)=(s2)->ptr;	\
 		i<_spinor_len;								\
 		i++,_SPINOR(s1)++,_SPINOR(s2)++		\
 	)
 
 #define _THREE_SPINORS_FOR(s1,s2,s3,i) 						\
 	for(																	\
-		i=0,_SPINOR(s1)=*s1,_SPINOR(s2)=*s2,_SPINOR(s3)=*s3;	\
+		i=0,_SPINOR(s1)=(s1)->ptr,_SPINOR(s2)=(s2)->ptr,_SPINOR(s3)=(s3)->ptr;	\
 		i<_spinor_len;													\
 		i++,_SPINOR(s1)++,_SPINOR(s2)++,_SPINOR(s3)++		\
 	)
 
-
-/*****  spinor_field = suNf_spinor
-#define _SPINOR(s) s##_ptr
-
-#define _TWO_SPINORS_MATCHING(s1,s2)
-
-#define _ONE_SPINOR_FOR(s,i)	\
-	for(								\
-		i=0,_SPINOR(s)=s;			\
-		i<_spinor_len;				\
-		i++,_SPINOR(s)++			\
-	)
-
-#define _TWO_SPINORS_FOR(s1,s2,i) 			\
-	for(												\
-		i=0,_SPINOR(s1)=s1,_SPINOR(s2)=s2;	\
-		i<_spinor_len;								\
-		i++,_SPINOR(s1)++,_SPINOR(s2)++		\
-	)
-
-#define _THREE_SPINORS_FOR(s1,s2,s3,i) 						\
-	for(																	\
-		i=0,_SPINOR(s1)=s1,_SPINOR(s2)=s2,_SPINOR(s3)=s3;	\
-		i<_spinor_len;													\
-		i++,_SPINOR(s1)++,_SPINOR(s2)++,_SPINOR(s3)++		\
-	)
-*/
 
 /* Re <s1,s2> */
 double _FUNC(spinor_field_prod_re)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)

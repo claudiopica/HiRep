@@ -29,7 +29,7 @@ void get_spinor_len(unsigned int *len) {
 
 #include "TMPL/linear_algebra.c.sdtmpl"
 void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
-	memcpy(*s1,*s2,_spinor_len*sizeof(suNf_spinor));
+	memcpy(s1->ptr,s2->ptr,_spinor_len*sizeof(suNf_spinor));
 }
 
 #undef _SPINOR_FIELD_TYPE
@@ -45,7 +45,7 @@ void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
 
 #include "TMPL/linear_algebra.c.sdtmpl"
 void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
-	memcpy(*s1,*s2,_spinor_len*sizeof(suNf_spinor));
+	memcpy(s1->ptr,s2->ptr,_spinor_len*sizeof(suNf_spinor));
 }
 
 #undef _SPINOR_FIELD_TYPE

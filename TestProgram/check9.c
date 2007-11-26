@@ -83,7 +83,7 @@ static void rotate(int vol,int n,spinor_field *ppk,complex v[])
 
          for (j=1;j<n;j++)
          {
-            pj=ppk[j]+ix;
+            pj = _SPINOR_AT_SITE(&ppk[j],ix);
             z+=n;
 
 						_spinor_mulc_add_assign_f(*pk,*z,*pj);

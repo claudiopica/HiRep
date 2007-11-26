@@ -15,8 +15,8 @@ extern rhmc_par _update_par;
 void local_hmc_action(local_action_type type,
                       double *loc_action,
                       suNg_algebra_vector *momenta,
-                      suNf_spinor **phi1,
-                      suNf_spinor **phi2) {
+                      spinor_field *phi1,
+                      spinor_field *phi2) {
 
 	int i,j;
 	double a,tmp;
@@ -36,7 +36,7 @@ void local_hmc_action(local_action_type type,
 
 		/* Fermions */
 		for (j=0;j<_update_par.n_pf;++j) {
-			_spinor_prod_re_f(tmp,phi1[j][i],phi2[j][i]);
+			_spinor_prod_re_f(tmp,*_SPINOR_AT_SITE(&phi1[j],i),*_SPINOR_AT_SITE(&phi2[j],i));
 			a += tmp;
 		}
 

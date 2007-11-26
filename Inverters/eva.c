@@ -141,7 +141,7 @@ static void rotate(int n,spinor_field *pkk,complex v[])
 
          for (j=1;j<n;j++)
          {
-            pj=pkk[j]+ix;
+            pj=_SPINOR_AT_SITE(&pkk[j],ix);
             z+=n;
 
             _vector_mulc_add_assign_f((*pk).c[0],*z,(*pj).c[0]);

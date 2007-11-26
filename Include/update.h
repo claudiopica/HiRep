@@ -73,8 +73,8 @@ typedef enum {
 void local_hmc_action(local_action_type type,
                       double *loc_action,
                       suNg_algebra_vector *momenta,
-                      suNf_spinor **phi1,
-                      suNf_spinor **phi2);
+                      spinor_field *phi1,
+                      spinor_field *phi2);
 
 void suNg_field_copy(suNg *g1, suNg *g2);
 
