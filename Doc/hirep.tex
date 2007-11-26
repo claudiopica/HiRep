@@ -57,8 +57,7 @@ number of boxes in the $i$-th row.
 
 \begin{table}[htp]
 \begin{center}
-\caption{Group invariants \textbf{(Nota x Luigi: questi invarianti fanno uso delle 
-		convenzioni spiegate nella sezione sulla forza e della normalizzazione $T_f=1/2$.)}}
+\caption{Group invariants}
 \label{table1}
 \begin{tabular}{r|c|c|c}
 R    & $d_R$               & $T_R$           & $C_2(R)$            \\
@@ -113,7 +112,6 @@ D_m \phi(x) &=& (D+m) \phi(x) \nonumber \\
 %
 where $U^R$ are the link variables in the representation $R$.
 
-\textbf{(Nota per Luigi: non usiamo mai questo rescaling nel codice: a che ci serve? se vogliamo usare questa convenzione devo cambiare il dirac nel codice)}
 Rescaling the fermion fields by
 $\sqrt{\kappa}=\left(\frac{2}{8+2m}\right)^{1/2}$, we can write the
 fermionic action as:
@@ -143,7 +141,6 @@ introducing complex pseudofermionic fields:
   Q_m^{-N_f} \phi} \equiv
 \int \mathcal D \phi \mathcal D \phi^\dagger e^{-S_\mathrm{pf}}.
 \end{equation}
-\textbf{(Nota per Luigi: l'equazione di sopra e` vera solo se $Q_m$ e` definita positiva altrimenti si usa $Q_m^2$)}
 
 \section{Force for the HMC molecular dynamics}
 The HMC Hamiltonian is given by:
@@ -159,7 +156,6 @@ where
 and we have introduced for each link variable a conjugate momentum in the algebra of the gauge group: $\pi(x,\mu)=i \pi^a(x,\mu) T_f^a$.
 In the expression of $\mathcal{H}_F$ we omitted the sum over position, spin and color indices and we have also introduced an arbitrary shift $\beta$ for the matrix $Q_m^2$, as this will be useful in the discussion
 for the RHMC algorithm.
-\textbf{(Nota per Luigi: La notazione per $\mathcal{H}_F$ e l'uso degli indici soppresso e` in conflitto con quella usata da te nella sezione 2 per l'azione fermionica, ma a me piaceva di piu' cosi' :) che si fa??)}
 
 The equation of motion for the link variables are given by (the $\dot{\square}$ indicates the derivative with respect to the molecular dynamics time):
 \begin{equation}
@@ -170,9 +166,6 @@ $\mathcal{H}$ is a conserved quantity:
 \begin{equation}
 0 = \dot{\mathcal{H}} = \dot{\mathcal{H}}_\pi + \dot{\mathcal{H}}_G + \dot{\mathcal{H}_F} \, . \label{HCONS}
 \end{equation}
-\textbf{(Nota per Luigi: Il lettore smaliziato potrebbe dire che data l'hamil\-toniana di sopra uno dovrebbe essere in grado di scrivere le eq. del moto "a botta".
-		In realta' io non so come si faccia a vedere che quello che si fa in questo paragrafo ha un'interpretazione come flusso hamil\-toniano sul fibrato cotangente al gruppo
-		di gauge ovvero come interpretare l'hamiltoniana di sopra in senso "geometrico". Suggerimenti?? ps: dovrebbe servire una qualche riduzione su $T_e$=l'algebra... )}
 
 For the first two derivatives we have:
 \begin{eqnarray}
@@ -241,18 +234,9 @@ we can be used to rewrite Eq.s~(\ref{PIDOT2})-(\ref{PIDOT3}) in a more compact f
 										&\quad\quad\quad	\left. \left. \left\{ \eta(x+\mu)\otimes\xi(x)^\dagger + \xi(x+\mu)\otimes\eta(x)^\dagger \right\} \right] \right)\, . 
 \end{align}
 
-\noindent\textbf{(Nota per Luigi: questa e` la forma effettivamente usata nel codice come puoi facilemente riconoscere dal sorgente. Nota inoltre che prendere la prioezione fa automaticamente il TA, visto che i generatori sono antihermitiani a traccia nulla.)}
-
 
 
 \section{HMC molecular dynamics}
-
-\noindent\textbf{(Nota per Luigi: questo e` il paragrafo per la forza che mi avevi mandato. E` formalmente corretto
-		a parte un $U^R$ che manca nell'eq(\ref{VARUR}), ma come avrai visto di sopra ho preferito riscriverlo per un paio
-		motivi: 1) perche' mi sembrava che ci fossero passaggi inutili (come il passaggio per $\mathcal{C}_R$ che e` anche dannoso...) 
-	 e la logica del tutto non risultava chiarissima (almeno a me); 2) perche' volevo rifare il conto in modo dettagliato e unificato anche per 
-	 la parte di pura gauge a futura referenza per i posteri (se lo mettiamo sull'articolo) perche' non si trova facilmente fatto cosi' ed ha il vantaggio di essere semplice
-	 e di generalizzarsi a tutto quello che ti puo' venire in mente (azioni con rappresentazioni miste, etc.) )}
 
 The pseudofermionic action contributes to the force that determines
 the time evolution of the conjugate momenta in the molecular
@@ -393,13 +377,6 @@ SU($2$)~\cite{Donini:1996nr}. We agree with Eq.~(16) in
 Ref.~~\cite{Donini:1996nr}, provided that we exchange the indices $a$
 and $b$ in that formula.
 
-\noindent\textbf{(Nota per Luigi: le formule (12) e (16) nel papero di Donini e Guagnelli sono
-		simili e non proprio uguali come giustamente dici tu perche' usano convenzioni diverse (scambiano il croce nel definire 
-			la matrice rappresentata nell'aggiunta e hanno anche una diversa normalizzazione del Dirac). Loro pero'
-		usina il metodo piu' convenzionale di derivare le forze guardando ai momenti come matrici invece che in componenti, che
-		come dicevo sopra ha lo svantaggio di essere generalizzabile meno facilmente.)}
-
-
 \section{HMC Algorithm}
 
 We briefly review the construction of the HMC algorithm \cite{??}.
@@ -439,20 +416,19 @@ One simple way is to take $P_k$ to be gaussian and to define $H(\pi,\phi)=-\ln [
 
 When fermionic degrees of freedom are present in the action $S$, we can first integrate them out, resulting in a non
 local bosonic action and then apply the above scheme. In practice, to deal with a non-local action is not convienent
-from a numerical point a view and stocastic extimate are used.
+from a numerical point a view and stocastic extimates are used.
 
 Consider a quadratic fermionic term  in the action: $S(\bar\psi,\psi) = \bar\psi M \psi$ with a generic interaction
 matrix $M$ possibly function of the other bosonic fields $\phi$. The contribution of this term to the partition function
 is $\int d\bar\psi d\psi \exp [ -S(\bar\psi,\psi)] = det[M]$. Assuming that the matrix $M$ is positive definite,
 we can rewrite $det[M]=\int d\bar\eta d\eta \exp[ \bar\eta (M)^{-1} \eta ]$, where $\bar\eta$,$\eta$ are two new 
 complex bosonic fields, called pseudofermions.
-This term can be taken into account generating random pseudofermions $\bar\phi$, $\phi$ with the desidered probability
+This term can be taken into account generating random pseudofermions $\bar\eta$, $\eta$ with the desidered probability
 distribution and keeping then fixed during the above HMC configuration generation for the remaining bosonic fields $\phi$.
 
 
 
 \section{RHMC formulation}
-\noindent\textbf{(Nota per Luigi: Ho fatto qualche correzione, ma devo integrarlo meglio con il resto.)}
 
 In order to discuss the RHMC implementation we follow the notation in
 Ref.~\cite{Clark:2005sq}: starting from a fermionic action:
@@ -497,6 +473,124 @@ yields the following variation:
 %
 where $\phi_k=\left[Q^2_m + \bar
   \beta_k \right]^{-1} \phi$.
+
+\section{Conventions used in the code}
+
+\subsection{Representations}
+
+The hermitean generators $T^a_f$ for the fundamental representation used are of the form:
+\begin{equation}
+\begin{pmatrix} 
+0&1&0&\dots\\
+1&0&0&\dots\\
+0&0&0&\dots\\
+\hdotsfor{4}
+\end{pmatrix}\, ,
+\begin{pmatrix} 
+0&i&0&\dots\\
+-i&0&0&\dots\\
+0&0&0&\dots\\
+\hdotsfor{4}
+\end{pmatrix}\, ,
+\begin{pmatrix} 
+1&0&0&\dots\\
+0&1&0&\dots\\
+0&0&-2&\dots\\
+\hdotsfor{4}
+\end{pmatrix}\, ,
+\end{equation}
+normalized so that $T_f=1/2$. The generators in for the other representations 
+will be obtained in the following.
+
+We first give the explicit form for the representation functions $R$ which map 
+$U\rightarrow U^R$. We define for each representation an orthonormal base $e_R$ for 
+the appropriate vector space of matrices. 
+
+For the Adjoint representation we define the base $e_{Adj}$ for the $N\times N$ 
+traceless hemitean matrices to be $e_{Adj}^a=T^a_f/\sqrt{T_f}$, $a=1,\dots,N^2-1$ 
+(i.e. proportional to the generators of the fundamental representation and 
+normalized to 1.)
+
+For the two-index Symmetric representation the base $e^{(ij)}_{S}$, with $i\le j$, for 
+the $N\times N$ symmetric matrices is given by:
+\begin{eqnarray}
+i\neq j \, ,\,\,\,&e^{(ij)}_S&=\frac{1}{\sqrt{2}}\begin{pmatrix} 
+0&1&0&\dots\\
+1&0&0&\dots\\
+0&0&0&\dots\\
+\hdotsfor{4}
+\end{pmatrix}\, , \\
+i=j \, ,\,\,\,&e^{(ii)}_S&=\begin{pmatrix} 
+0&0&0&\dots\\
+0&1&0&\dots\\
+0&0&0&\dots\\
+\hdotsfor{4}
+\end{pmatrix}\, , 
+\end{eqnarray}
+where the non zero entries are at position $(i,j)$, etc.
+
+For the two-index Antisymmetric representation the base $e^{(ij)}_{AS}$, with $i<j$, for 
+the $N\times N$ symmetric matrices is given by:
+\begin{equation}
+e^{(ij)}_{AS}=\frac{1}{\sqrt{2}}\begin{pmatrix} 
+0&1&0&\dots\\
+-1&0&0&\dots\\
+0&0&0&\dots\\
+\hdotsfor{4}
+\end{pmatrix}\, , 
+\end{equation}
+where, as above, the non zero entries are at position $(i,j)$.
+
+The maps $R$ are explicitly given by:
+\begin{eqnarray}
+(R^{Adj} U)_{ab} &=& U^{Adj}_{ab} = \mathrm{tr\ }\left[ e^a_{Adj} U e^b_{Adj} U^\dagger\right]\,\, , a,b=1,\dots,N^2-1\, ,\\ 
+(R^{S} U)_{(ij)(lk)} &=& U^{S}_{(ij)(lk)} = \mathrm{tr\ }\left[ (e^{(ij)}_{S})^\dagger U e^{(lk)}_S U^T\right]\,\, , i\le j, l\le k\, ,\\ 
+(R^{A} U)_{(ij)(lk)} &=& U^{A}_{(ij)(lk)} = \mathrm{tr\ }\left[ (e^{(ij)}_{A})^\dagger U e^{(lk)}_A U^T\right]\,\, , i< j, l< k\, .
+\end{eqnarray}
+
+The generators $T_R^a$ used are defined as the image of the generators in the fundamental
+under the differential of the maps $R$ defined above: $T^a_R = R_* T^a_f$.
+Explicit expression can easily be worked out form the definition above.
+The invariants $T_R$ and $C_2(R)$ for the generators defined in this way are given in 
+Table~(\ref{table1}).
+
+\subsection{$\gamma$ matrices}
+We use the chiral representation for the Dirac $\gamma$ matrices:
+\begin{equation}
+\gamma_\mu=
+\begin{pmatrix}
+0&e_\mu\\
+e_\mu^\dagger&0
+\end{pmatrix}\, ,
+\end{equation}
+where $e_\mu$ are $2\times 2$ matrices given by: $e_0=-1$, $e_k=-i\sigma_k$,
+\begin{equation}
+\sigma_1=
+\begin{pmatrix}
+0&1\\
+1&0
+\end{pmatrix},\,\,
+\sigma_2=
+\begin{pmatrix}
+0&-i\\
+i&0
+\end{pmatrix},\,\,
+\sigma_3=
+\begin{pmatrix}
+1&0\\
+0&-1
+\end{pmatrix}\, .
+\end{equation}
+We have:
+\begin{equation}
+\gamma_5=\gamma_0\gamma_1\gamma_2\gamma_3=
+\begin{pmatrix}
+1&0\\
+0&-1
+\end{pmatrix}\, .
+\end{equation}
+
+
 
 \section{Two--point functions}
 This is a summary of the formulae used for the mesonic two--pt
