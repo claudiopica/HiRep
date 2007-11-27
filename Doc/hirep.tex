@@ -142,7 +142,7 @@ introducing complex pseudofermionic fields:
 \int \mathcal D \phi \mathcal D \phi^\dagger e^{-S_\mathrm{pf}}.
 \end{equation}
 
-\section{Force for the HMC molecular dynamics}
+\section{Force for the HMC molecular dynamics} \label{SHMC}
 The HMC Hamiltonian is given by:
 \begin{equation}
 \mathcal{H}=\mathcal{H}_\pi+\mathcal{H}_G+\mathcal{H}_F \, ,
@@ -151,7 +151,7 @@ where
 \begin{eqnarray}
 \mathcal{H}_\pi &=& \frac{1}{2} \sum_{x,\mu} ( \pi(x,\mu) , \pi(x,\mu) ) = \frac{1}{2} T_f \sum_{a,x,\mu} \pi^a(x,\mu)^2 \, ,\\
 \mathcal{H}_G &=& \beta \sum_{\mu<\nu} \left( 1- \frac{1}{N} \mathrm{Re\ tr\ } \mathcal{P}_{\mu\nu}\right) \, ,\\
-\mathcal{H}_F &=& \phi^\dagger ( Q_m^2 - \beta )^{-l} \phi \, , \,\,\,\, l=\frac{N_f}{2}>0 \, ,
+\mathcal{H}_F &=& \phi^\dagger ( Q_m^2 - \beta )^{-l} \phi \, , \,\,\,\, l=\frac{N_f}{2}>0 \, , \label{HF}
 \end{eqnarray}
 and we have introduced for each link variable a conjugate momentum in the algebra of the gauge group: $\pi(x,\mu)=i \pi^a(x,\mu) T_f^a$.
 In the expression of $\mathcal{H}_F$ we omitted the sum over position, spin and color indices and we have also introduced an arbitrary shift $\beta$ for the matrix $Q_m^2$, as this will be useful in the discussion
@@ -182,7 +182,7 @@ The computation of the fermionic force goes as follows:
 \end{eqnarray}
 Defining:
 \begin{eqnarray}
-\eta &=& (Q_m^2 - \beta)^{-(l+1)/2} \phi \, , \\
+\eta &=& (Q_m^2 - \beta)^{-(l+1)/2} \phi \, , \label{HMCETA}\\
 \xi &=& Q_m \eta \, ,
 \end{eqnarray}
 and using the fact that the matrix $(Q_m^2-\beta)$ is hermitean, we can rewrite Eq.(\ref{FF1}) as
@@ -231,7 +231,7 @@ we can be used to rewrite Eq.s~(\ref{PIDOT2})-(\ref{PIDOT3}) in a more compact f
 \begin{align}
 \dot\pi^a_G(x,\mu) &= - \frac{\beta}{N} P^a_f \left( U(x,\mu) V^\dagger(x,\mu) \right) \, ,\\
 \dot\pi^a_F(x,\mu) &= l \frac{T_R}{T_f} P^a_R \left( U^R(x,\mu) \mathrm{tr_{spin}} \left[ \gamma_5 (1-\gamma_\mu) \right. \right. \nonumber\\
-										&\quad\quad\quad	\left. \left. \left\{ \eta(x+\mu)\otimes\xi(x)^\dagger + \xi(x+\mu)\otimes\eta(x)^\dagger \right\} \right] \right)\, . 
+										&\quad\quad\quad	\left. \left. \left\{ \eta(x+\mu)\otimes\xi(x)^\dagger + \xi(x+\mu)\otimes\eta(x)^\dagger \right\} \right] \right)\, . \label{HFFORCE}
 \end{align}
 
 
@@ -381,7 +381,7 @@ and $b$ in that formula.
 
 We briefly review the construction of the HMC algorithm \cite{??}.
 
-Given the action $S(\phi)$ of a system of scalar fields $\phi$, our goal is to generate a Markov process with 
+Given the action $S(\phi)$ of a system of bosonic fields $\phi$, our goal is to generate a Markov process with 
 fixed probability distribution $P_S(\phi) = 1/Z \exp[-S(\phi) ]$. A sufficient condition to have such a 
 Markov process is that it is ergodic and it satifies detailed balance:
 \begin{equation}
@@ -419,8 +419,10 @@ local bosonic action and then apply the above scheme. In practice, to deal with 
 from a numerical point a view and stocastic extimates are used.
 
 Consider a quadratic fermionic term  in the action: $S(\bar\psi,\psi) = \bar\psi M \psi$ with a generic interaction
-matrix $M$ possibly function of the other bosonic fields $\phi$. The contribution of this term to the partition function
-is $\int d\bar\psi d\psi \exp [ -S(\bar\psi,\psi)] = det[M]$. Assuming that the matrix $M$ is positive definite,
+matrix $M(\phi)$ function of the bosonic fields $\phi$. The contribution of this term to the partition function
+is $\int d\bar\psi d\psi \exp [ -S(\bar\psi,\psi)] = det[M(\phi)]$. 
+
+Assuming that the matrix $M(\phi)$ is positive definite,
 we can rewrite $det[M]=\int d\bar\eta d\eta \exp[ \bar\eta (M)^{-1} \eta ]$, where $\bar\eta$,$\eta$ are two new 
 complex bosonic fields, called pseudofermions.
 This term can be taken into account generating random pseudofermions $\bar\eta$, $\eta$ with the desidered probability
@@ -430,49 +432,73 @@ distribution and keeping then fixed during the above HMC configuration generatio
 
 \section{RHMC formulation}
 
-In order to discuss the RHMC implementation we follow the notation in
-Ref.~\cite{Clark:2005sq}: starting from a fermionic action:
+The fermionic part of the HMC hamiltonian, for $N_f$ degenerate 
+quarks and $N_{pf}$ pseudofermions, can be written as:
 %
 \begin{equation}
-S_\mathrm{pf}=-\sum_{x,y} \phi^\dagger(x) \mathcal F(Q^2_m)_{x,y} \phi(y),
+\mathcal{H}_F = \sum_{k=1}^{N_{pf}} \phi_k^\dagger ( Q_m^2 )^{-l_k} \phi_k \,\, ;\,\, \sum_k l_k = \frac{N_f}{2}\, , \label{HFN}
 \end{equation}
-%
-where $\mathcal F$ is a generic function of $Q^2_m$, we construct two
-rational approximations:
-%
-\begin{align}
-r(Q^2_m) &= \sum_k \frac{\alpha_k}{Q^2_m + \beta_k} 
-\nonumber \\
-\bar r(Q^2_m) &= \sum_k \frac{\bar \alpha_k}{Q^2_m + \bar \beta_k}, \nonumber
-\end{align}
-%
-such that:
-%
+and $l_k>0$. For the sake of simplicity we will pose all the $l_k$ to be equal:
 \begin{equation}
-r^2(x) \approx \bar r(x) \approx \mathcal F.
+\forall k,\,\, l_k = \frac{N_f}{2N_{pf}}\, .
 \end{equation}
-%
-The number of terms appearing in each approximation depends on the
-degree of accuracy that is required. \\
-The first approximation, $r$, is used to generate pseudofermionic fields at
-the beginning of the trajectories using an heat--baht, while the
-second approximation, $\bar r$ is used during the MD evolution. \\
-The explicit expression for the action:
-%
+
+In the RHMC algorithm~\cite{Clark:2005sq} rational approximations are used whenever we need to take some 
+fractional power of the positive definite fermion matrix $Q_m^2$.
+
+In this implementation we use three different rational approximations.
+
+The first one is used to approximate Eq.~(\ref{HFN}) (we need only one approximation because all $l_k$ are equal):
+\begin{eqnarray}
+\mathcal{H}_F &=& \sum_{k=1}^{N_{pf}} \phi_k^\dagger r_{a}( Q_m^2 )\phi_k \, , \label{HFRHMC}\\ 
+( Q_m^2 )^{-\frac{N_f}{2N_{pf}}} \simeq r_{a}(Q_m^2) &=& \alpha_0^a + \sum_{n=1}^{d_{1}} \alpha_n^a ( Q^2_m - \beta_n^a )^{-1} \, .
+\end{eqnarray}
+Using the formulas derived in Section~\ref{SHMC}, it is easy to write the force corresponding to Eq.~(\ref{HFRHMC}).
+In fact, Eq.~(\ref{HFRHMC}) is nothing but a sum of terms of the form Eq.~(\ref{HFRHMC}) once we put $l=1$, $\beta=\beta_n^a$.
+The RHMC force will be then given by a sum over $n=1,\dots,d_1$ of terms given by Eq.(\ref{HFFORCE}) multiplied by a factor $\alpha_n^a$.
+Notice that since $l=1$, to compute $\eta$ as in Eq.(\ref{HMCETA}) a simple shifted inversion is required.
+
+The second rational approxmation is required in the heatbath update of pseudofermions.
+In order to generate pseudofermions distributed as in Eq.~(\ref{HFN}), a simple two-step process is used.
+For each pseudofermion we first generate a gaussian distributed field $\tilde\phi_k$:
 \begin{equation}
-S_\mathrm{pf}= - \sum_k \bar \alpha_k \phi^\dagger \left[Q^2_m + \bar
-  \beta_k \right]^{-1} \phi
-\end{equation} 
-%
-yields the following variation:
-%
-\begin{equation}
-\delta S_\mathrm{pf} = \sum_k \bar\alpha_k \phi_k^\dagger
-\left\{Q_m \delta Q_m + \delta Q_m Q_m \right\} \phi_k,
+P(\tilde\phi_k)\propto \exp [ -\tilde\phi_k^\dagger \tilde\phi_k ] \, ,
 \end{equation}
-%
-where $\phi_k=\left[Q^2_m + \bar
-  \beta_k \right]^{-1} \phi$.
+and then we set:
+\begin{equation}
+\phi_k = (Q_m^2)^{\frac{l_k}{2}} \tilde\phi_k \, ,
+\end{equation}
+(notice the plus sign in the exponent.) 
+The RHMC algorithm uses a rational approximation to compute the above quantities (again we need only one 
+approximation since all $l_k$ are equal):
+\begin{eqnarray}
+( Q_m^2 )^{\frac{l_k}{2}} \simeq r_{b}(Q_m^2) &=& \alpha_0^b + \sum_{n=1}^{d_{2}} \alpha_n^b ( Q^2_m - \beta_n^b )^{-1} \, .
+\end{eqnarray}
+
+The third rational approximation is used in the code for the Metropolis test.
+Starting from Eq.~(\ref{HFN}), for each pseudofermion we can rewrite:
+\begin{equation}
+\phi_k^\dagger ( Q_m^2 )^{-l_k}\phi_k = \left\| (Q_m^2)^{-\frac{l_k}{2}} \phi_k \right\|^2\, ,
+\end{equation}
+where we used the property that $Q_m^2$ is hermitean.
+The rational approximation needed in this case is:
+\begin{eqnarray}
+( Q_m^2 )^{-\frac{l_k}{2}} \simeq r_{c}(Q_m^2) &=& \alpha_0^c + \sum_{n=1}^{d_{3}} \alpha_n^c ( Q^2_m - \beta_n^c )^{-1} \, .
+\end{eqnarray}
+Notice that if $d_2=d_3$ the coefficients for the two approximations $r_b$ and $r_c$ can each be obtained from the other.
+
+In order to compute the coefficients $\alpha_n$, $\beta_n$ appearing in the rational approximations 
+the Remez algorithm is needed. In this implementation we do not compute those coefficients ``on the fly'', but rather
+we use a precomputation step to generate a table of coefficients form which we pick up the right values when needed.
+The generation of this table goes as follows.
+
+First note that we need to compute rational approximations for a function $f(x)$ of the form $f(x)=x^l$ and the approximation
+must be accurate over the spectral range of the operator $Q_m^2$.
+
+
+
+
+
 
 \section{Conventions used in the code}
 
@@ -499,7 +525,7 @@ The hermitean generators $T^a_f$ for the fundamental representation used are of 
 \hdotsfor{4}
 \end{pmatrix}\, ,
 \end{equation}
-normalized so that $T_f=1/2$. The generators in for the other representations 
+normalized so that $T_f=1/2$. The generators for the other representations 
 will be obtained in the following.
 
 We first give the explicit form for the representation functions $R$ which map 
