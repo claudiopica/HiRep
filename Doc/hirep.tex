@@ -438,7 +438,7 @@ quarks and $N_{pf}$ pseudofermions, can be written as:
 \begin{equation}
 \mathcal{H}_F = \sum_{k=1}^{N_{pf}} \phi_k^\dagger ( Q_m^2 )^{-l_k} \phi_k \,\, ;\,\, \sum_k l_k = \frac{N_f}{2}\, , \label{HFN}
 \end{equation}
-and $l_k>0$. For the sake of simplicity we will pose all the $l_k$ to be equal:
+and $l_k>0$. For the sake of simplicity we will set all the $l_k$ to be equal:
 \begin{equation}
 \forall k,\,\, l_k = \frac{N_f}{2N_{pf}}\, .
 \end{equation}
@@ -468,7 +468,7 @@ and then we set:
 \begin{equation}
 \phi_k = (Q_m^2)^{\frac{l_k}{2}} \tilde\phi_k \, ,
 \end{equation}
-(notice the plus sign in the exponent.) 
+making use of the fact that $(Q_m^2)$ is hermitean (notice the plus sign in the exponent.) 
 The RHMC algorithm uses a rational approximation to compute the above quantities (again we need only one 
 approximation since all $l_k$ are equal):
 \begin{eqnarray}
@@ -494,6 +494,28 @@ The generation of this table goes as follows.
 
 First note that we need to compute rational approximations for a function $f(x)$ of the form $f(x)=x^l$ and the approximation
 must be accurate over the spectral range of the operator $Q_m^2$.
+To simplify the computation of the table we note that the following proposition holds:
+if $f(x)$ is a homogeneous function of degree $l$ and $r(x)$ is an optimal (in the sense of relative error) 
+rational approximation to $f(x)$ over the interval $[\epsilon,\mathrm{h}]$ to a given accuracy 
+then $r(kx)/k^l$ is an optimal rational approximation for the same function and the same accuracy 
+over the interval $[\epsilon/k,\mathrm{h}/k]$. Notice that the coefficients of the ``rescaled'' rational
+approximation are easily obtained from that of the original approximation.
+A simple corollary is that, given a homogeneuos function $f(x)$, we can divide the rational approximations
+with the same accuracy in classes distinguished by the ratio $\epsilon/\mathrm{h}$; within each class
+the coefficients of the rational approximations are easily related to each other, so that we only need
+to compute one rational approximation in each class. This is what is done in our implementation.
+
+In detail: we generate a table containing the coefficients for the rational approximations
+ belonging in different classes distinguished by the function $f(x)$ which we want to approximate and 
+ the accuracy which is required. We arbitrary set $\mathrm{h}$ to a fixed value equal to the absolute
+ upper bound on the spectrum of the matrix $Q_m^2$. This choice fixes the representative of each class, 
+because the lower bound of the approximation is now a function of $\mathrm{h}$.
+
+At run-time this table is used to generate optimal rational approximations rescaling the 
+precomputed coefficients to the desired interval containing the spectrum of the matrix $Q_m^2$.
+This interval is obtained by computing the maximum and minimum eigenvalue of $Q_m^2$ on 
+each configuration when needed. In our code we update this interval only before the 
+metropolis test, while we keep it fixed during the molecular dinamics.
 
 
 
