@@ -27,17 +27,17 @@ MT_prec      1.e-15             r.a. used in the Metropolis test
 MD_prec      1.e-15             r.a. used in the molecular dynamics
 HB_prec      1.e-15             r.a. used in the pseudofermions heatbath
 force_prec   1.e-20             precision for the inversions in the computation of fermion force 
-n_pf         2									number of pseudofermions
+n_pf         2			number of pseudofermions
 tlen         1.                 trajectory length
-nsteps       7									number of steps for the fermion force
-gsteps       5									number of sub-steps for the gauge force
+nsteps       7			number of steps for the fermion force
+gsteps       5			number of sub-steps for the gauge force
 level        1                  ranlux level
 seed         667                ranlux seed
 ntraj        3                  total number of trajectories
 wrt_cnfg     1                  frequency of configuration saves
 log_dir      ../Data/RHMC/log   log file directory
 dat_dir      ../Data/RHMC/dat   data file directory
-cnfg_dir     ../Data//cnfg      configuration directory
+cnfg_dir     ../Data/cnfg       configuration directory
 
 The program stores the results to a number of files with names such as
 
