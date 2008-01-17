@@ -1,0 +1,84 @@
+Main program run3
+
+SYNTAX
+
+rhmc -i <filename> [-c <filename> [-a]]
+
+
+DESCRIPTION
+
+This program generates an ensemble of representative gauge field
+configurations for a generic SU(N) gauge theory with Wilson fermions
+in an arbitrary representation, chosen at compiling time.  Various
+quantities are measured, including the average plaquette <tr{U(p)}>,
+and the field configurations are written to files in specified
+directories.
+
+The lattice size, the gauge group, the boundary conditions, and the
+fermionic representation must be defined in the file ../Make/MkFlags. 
+All other parameters are read from the input file and the command 
+line. An example of a valid input file is rhmc.in in this
+directory. It has the following lines:
+
+beta         4.90               inverse gauge coupling
+mass         -1.1751424294      bare mass
+nf           2                  number of flavours
+MT_prec      1.e-15             r.a. used in the Metropolis test
+MD_prec      1.e-15             r.a. used in the molecular dynamics
+HB_prec      1.e-15             r.a. used in the pseudofermions heatbath
+force_prec   1.e-20             precision for the inversions in the computation of fermion force 
+n_pf         2									number of pseudofermions
+tlen         1.                 trajectory length
+nsteps       7									number of steps for the fermion force
+gsteps       5									number of sub-steps for the gauge force
+level        1                  ranlux level
+seed         667                ranlux seed
+ntraj        3                  total number of trajectories
+wrt_cnfg     1                  frequency of configuration saves
+log_dir      ../Data/RHMC/log   log file directory
+dat_dir      ../Data/RHMC/dat   data file directory
+cnfg_dir     ../Data//cnfg      configuration directory
+
+The program stores the results to a number of files with names such as
+
+  "lattice size"p"no of processes"b"beta"k"kappa"c"csw"id"run id""extension"
+
+If the program runs a 8x8^3 lattice, for example, for SU(3) and with
+the input file as given above, the files are
+
+  8x8x8x8Nc3Nf2b4.90k0.17700.log     log file
+  8x8x8x8Nc3Nf2b4.90k0.17700.dat     data file
+
+  8x8x8x8Nc3Nf2b4.90k0.17700.log~    backup log file
+  8x8x8x8Nc3Nf2b4.90k0.17700.dat~    backup data file
+
+  8x8x8x8Nc3Nf2b4.90k0.17700n3       exported configuration file
+
+where n3 identifies configuration number 3. The directories in which
+these files are stored are the ones specified in the input file.
+
+The command line options are
+
+-c <filename> This instructs the program to read the initial configuration
+              from the specified file. <filename> must be a valid name of
+              a saved configuration that is searched for in the corresponding 
+              directories.
+
+-a            This option specifies that the run is a continuation of a
+              previous run. The -c <filename> option is required in this
+              case and must point to the last configuration saved by
+              the previous run. All output data are appended to the
+              previous output files.
+
+The command
+
+   rhmc -i rhmc.in -c 8x8x8x8Nc3Nf2b4.90k0.17700n3
+
+thus starts a new run from the imported configuration with the
+specified name. If instead the run should be a continuation run,
+starting from the last configuration of a previous run, the command
+would be
+
+   rhmc -i rhmc.in -c 8x8x8x8Nc3Nf2b4.90k0.17700n3 -a
+
+
