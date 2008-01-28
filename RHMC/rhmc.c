@@ -283,7 +283,7 @@ int main(int argc,char *argv[])
      } else {
        acc+=rr;
      }
-     perc=(acc==0)?0.:(float)(100*acc)/(float)(i-icnfg-1);
+     perc=(acc==0)?0.:(float)(100*acc)/(float)(i-icnfg+1);
      
      lprintf("MAIN",0,"Trajectory #%d: %d/%d (%3.4f%%) MVM = %ld\n",i,acc,i,perc,getMVM());
      lprintf("MAIN",0,"Plaquette: %1.8e\n",avr_plaquette());
