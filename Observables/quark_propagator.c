@@ -67,7 +67,7 @@ void quark_propagator_QMR_eo(FILE *propfile, unsigned int ssite, int nm, double 
 	resdn[0] = in+VOLUME/2;
 	for(i=1;i<nm;++i)
 		resdn[i]=resdn[i-1]+VOLUME/2;
-	resd[0]=resdn[nm-1];
+	resd[0]=resdn[nm-1]+VOLUME/2;
 	for(i=1;i<nm;++i)
 		resd[i]=resd[i-1]+VOLUME/2;
 
@@ -122,8 +122,9 @@ void quark_propagator_QMR_eo(FILE *propfile, unsigned int ssite, int nm, double 
 			/* multiply by g_5 to match the MINRES version */
 			spinor_field_g5_f(res,res);
 			/* convert res to single precision */
-			assign_sd2s(VOLUME,(suNf_spinor_flt*)res,res);
-			error(fwrite(res,(size_t) sizeof(suNf_spinor_flt),(size_t)(VOLUME),propfile)!=(VOLUME),1,"quark_propagator_QMR_eo",
+			/* assign_sd2s(VOLUME,(suNf_spinor_flt*)res,res); */
+			/* NOW WE WRITE THE PROPAGATOR IN DOUBLE PRECISION!! */
+			error(fwrite(res,(size_t) sizeof(suNf_spinor),(size_t)(VOLUME),propfile)!=(VOLUME),1,"quark_propagator_QMR_eo",
 					"Failed to write quark propagator to file");
 			set_spinor_len(VOLUME/2);
 		}
@@ -138,10 +139,9 @@ void quark_propagator_QMR_eo(FILE *propfile, unsigned int ssite, int nm, double 
   
   /* free memory */
   free_field(in);
-	free(resdn);
   free(shift);
-	free(test);
-	free(res);
+	free_field(test);
+	free_field(res);
 
 }
 
