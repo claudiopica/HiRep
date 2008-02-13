@@ -1,41 +1,15 @@
 /*****  spinor_field = suNf_spinor*  *****/
-#define _SPINOR(s) s##_ptr
-
-#define _TWO_SPINORS_MATCHING(s1,s2)
-
-#define _ONE_SPINOR_FOR(s,i)	\
-	for(								\
-		i=0,_SPINOR(s)=(s)->ptr;			\
-		i<_spinor_len;				\
-		i++,_SPINOR(s)++			\
-	)
-
-#define _TWO_SPINORS_FOR(s1,s2,i) 			\
-	for(												\
-		i=0,_SPINOR(s1)=(s1)->ptr,_SPINOR(s2)=(s2)->ptr;	\
-		i<_spinor_len;								\
-		i++,_SPINOR(s1)++,_SPINOR(s2)++		\
-	)
-
-#define _THREE_SPINORS_FOR(s1,s2,s3,i) 						\
-	for(																	\
-		i=0,_SPINOR(s1)=(s1)->ptr,_SPINOR(s2)=(s2)->ptr,_SPINOR(s3)=(s3)->ptr;	\
-		i<_spinor_len;													\
-		i++,_SPINOR(s1)++,_SPINOR(s2)++,_SPINOR(s3)++		\
-	)
-
 
 /* Re <s1,s2> */
 double _FUNC(spinor_field_prod_re)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
-   int len;
-	_SPINOR_TYPE *_SPINOR(s1), *_SPINOR(s2);
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(s1), *_SPINOR_PTR(s2);
+	spinor_descriptor *type;
    double prod,res=0.;
    
-   _TWO_SPINORS_MATCHING(s1,s2);
-   
-   _TWO_SPINORS_FOR(s1,s2,len) {
-      _spinor_prod_re_f(prod,*_SPINOR(s1),*_SPINOR(s2));
+   _TWO_SPINORS_FOR(s1,s2,i,type) {
+      _spinor_prod_re_f(prod,*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
 		res+=prod;
    }
    return res;
@@ -44,14 +18,13 @@ double _FUNC(spinor_field_prod_re)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s
 /* Im <s1,s2> */
 double _FUNC(spinor_field_prod_im)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
-   int len;
-	_SPINOR_TYPE *_SPINOR(s1), *_SPINOR(s2);
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(s1), *_SPINOR_PTR(s2);
+	spinor_descriptor *type;
    double prod,res=0.;
    
-   _TWO_SPINORS_MATCHING(s1,s2);
-   
-   _TWO_SPINORS_FOR(s1,s2,len) {
-      _spinor_prod_im_f(prod,*_SPINOR(s1),*_SPINOR(s2));
+   _TWO_SPINORS_FOR(s1,s2,i,type) {
+      _spinor_prod_im_f(prod,*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
 		res+=prod;
    }
    return res;
@@ -60,14 +33,13 @@ double _FUNC(spinor_field_prod_im)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s
 /* <s1,s2> */
 complex _FUNC(spinor_field_prod)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
-   int len;
-	_SPINOR_TYPE *_SPINOR(s1), *_SPINOR(s2);
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(s1), *_SPINOR_PTR(s2);
+	spinor_descriptor *type;
    complex res={0.,0.};
    
-   _TWO_SPINORS_MATCHING(s1,s2);
-   
-   _TWO_SPINORS_FOR(s1,s2,len) {
-		_spinor_prod_assign_f(res,*_SPINOR(s1),*_SPINOR(s2));
+   _TWO_SPINORS_FOR(s1,s2,i,type) {
+		_spinor_prod_assign_f(res,*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
    }
    return res;
 }
@@ -75,14 +47,13 @@ complex _FUNC(spinor_field_prod)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 /* Re <g5*s1,s2> */
 double _FUNC(spinor_field_g5_prod_re)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
-   int len;
-	_SPINOR_TYPE *_SPINOR(s1), *_SPINOR(s2);
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(s1), *_SPINOR_PTR(s2);
+	spinor_descriptor *type;
    double prod,res=0.;
    
-   _TWO_SPINORS_MATCHING(s1,s2);
-   
-   _TWO_SPINORS_FOR(s1,s2,len) {
-		_spinor_g5_prod_re_f(prod,*_SPINOR(s1),*_SPINOR(s2));
+   _TWO_SPINORS_FOR(s1,s2,i,type) {
+		_spinor_g5_prod_re_f(prod,*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
       res+=prod;
    }
    return res;
@@ -91,12 +62,13 @@ double _FUNC(spinor_field_g5_prod_re)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE
 /* Re <s1,s1> */
 double _FUNC(spinor_field_sqnorm)(_SPINOR_FIELD_TYPE *s1)
 {
-   int len;
-	_SPINOR_TYPE *_SPINOR(s1);
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(s1);
+	spinor_descriptor *type;
    double prod,res=0.;
    
-   _ONE_SPINOR_FOR(s1,len) {
-		_spinor_prod_re_f(prod,*_SPINOR(s1),*_SPINOR(s1));
+   _ONE_SPINOR_FOR(s1,i,type) {
+		_spinor_prod_re_f(prod,*_SPINOR_PTR(s1),*_SPINOR_PTR(s1));
       res+=prod;
    }
    return res;
@@ -105,208 +77,190 @@ double _FUNC(spinor_field_sqnorm)(_SPINOR_FIELD_TYPE *s1)
 /* s1+=r*s2 r real */
 void _FUNC(spinor_field_mul_add_assign)(_SPINOR_FIELD_TYPE *s1, double r, _SPINOR_FIELD_TYPE *s2)
 {
-   int len;
-	_SPINOR_TYPE *_SPINOR(s1), *_SPINOR(s2);
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(s1), *_SPINOR_PTR(s2);
+	spinor_descriptor *type;
    
-   _TWO_SPINORS_MATCHING(s1,s2);
-   
-   _TWO_SPINORS_FOR(s1,s2,len) {
-      _spinor_mul_add_assign_f(*_SPINOR(s1),r,*_SPINOR(s2));
+   _TWO_SPINORS_FOR(s1,s2,i,type) {
+      _spinor_mul_add_assign_f(*_SPINOR_PTR(s1),r,*_SPINOR_PTR(s2));
    }
 }
 
 /* s1+=c*s2 c complex */
 void _FUNC(spinor_field_mulc_add_assign)(_SPINOR_FIELD_TYPE *s1, complex c, _SPINOR_FIELD_TYPE *s2)
 {
-   int len;
-	_SPINOR_TYPE *_SPINOR(s1), *_SPINOR(s2);
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(s1), *_SPINOR_PTR(s2);
+	spinor_descriptor *type;
    complex c1;
    c1.re=c.re; c1.im=c.im; 
    
-   _TWO_SPINORS_MATCHING(s1,s2);
-   
-   _TWO_SPINORS_FOR(s1,s2,len) {
-      _spinor_mulc_add_assign_f(*_SPINOR(s1),c1,*_SPINOR(s2));
+   _TWO_SPINORS_FOR(s1,s2,i,type) {
+      _spinor_mulc_add_assign_f(*_SPINOR_PTR(s1),c1,*_SPINOR_PTR(s2));
    }
 }
 
 /* s1=r*s2 */
 void _FUNC(spinor_field_mul)(_SPINOR_FIELD_TYPE *s1, double r, _SPINOR_FIELD_TYPE *s2)
 {
-   int len;
-	_SPINOR_TYPE *_SPINOR(s1), *_SPINOR(s2);
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(s1), *_SPINOR_PTR(s2);
+	spinor_descriptor *type;
    
-   _TWO_SPINORS_MATCHING(s1,s2);
-   
-   _TWO_SPINORS_FOR(s1,s2,len) {
-      _spinor_mul_f(*_SPINOR(s1),r,*_SPINOR(s2));
+   _TWO_SPINORS_FOR(s1,s2,i,type) {
+      _spinor_mul_f(*_SPINOR_PTR(s1),r,*_SPINOR_PTR(s2));
    }
 }
 
 /* s1=c*s2 c complex */
 void _FUNC(spinor_field_mulc)(_SPINOR_FIELD_TYPE *s1, complex c, _SPINOR_FIELD_TYPE *s2)
 {
-   int len;
-	_SPINOR_TYPE *_SPINOR(s1), *_SPINOR(s2);
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(s1), *_SPINOR_PTR(s2);
+	spinor_descriptor *type;
    complex c1;
    c1.re=c.re; c1.im=c.im;
    
-   _TWO_SPINORS_MATCHING(s1,s2);
-   
-   _TWO_SPINORS_FOR(s1,s2,len) {
-      _spinor_mulc_f(*_SPINOR(s1),c1,*_SPINOR(s2));
+   _TWO_SPINORS_FOR(s1,s2,i,type) {
+      _spinor_mulc_f(*_SPINOR_PTR(s1),c1,*_SPINOR_PTR(s2));
    }
 }
 
 /* r=s1+s2 */
 void _FUNC(spinor_field_add)(_SPINOR_FIELD_TYPE *r, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
-   int len;
-	_SPINOR_TYPE *_SPINOR(r), *_SPINOR(s1), *_SPINOR(s2);
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(r), *_SPINOR_PTR(s1), *_SPINOR_PTR(s2);
+	spinor_descriptor *type;
    
-   _TWO_SPINORS_MATCHING(s1,s2);
-    _TWO_SPINORS_MATCHING(s1,r);
-  
-   _THREE_SPINORS_FOR(s1,s2,r,len) {
-      _spinor_add_f(*_SPINOR(r),*_SPINOR(s1),*_SPINOR(s2));
+   _THREE_SPINORS_FOR(s1,s2,r,i,type) {
+      _spinor_add_f(*_SPINOR_PTR(r),*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
     }
 }
 
 /* r=s1-s2 */
 void _FUNC(spinor_field_sub)(_SPINOR_FIELD_TYPE *r, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
-   int len;
-	_SPINOR_TYPE *_SPINOR(r), *_SPINOR(s1), *_SPINOR(s2);
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(r), *_SPINOR_PTR(s1), *_SPINOR_PTR(s2);
+	spinor_descriptor *type;
    
-   _TWO_SPINORS_MATCHING(s1,s2);
-   _TWO_SPINORS_MATCHING(s1,r);
-   
-   _THREE_SPINORS_FOR(s1,s2,r,len) {
-      _spinor_sub_f(*_SPINOR(r),*_SPINOR(s1),*_SPINOR(s2));
+   _THREE_SPINORS_FOR(s1,s2,r,i,type) {
+      _spinor_sub_f(*_SPINOR_PTR(r),*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
    }
 }
 
 /* s1+=s2 */
 void _FUNC(spinor_field_add_assign)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
-   int len;
-	_SPINOR_TYPE *_SPINOR(s1), *_SPINOR(s2);
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(s1), *_SPINOR_PTR(s2);
+	spinor_descriptor *type;
    
-   _TWO_SPINORS_MATCHING(s1,s2);
-   
-   _TWO_SPINORS_FOR(s1,s2,len) {
-      _spinor_add_assign_f(*_SPINOR(s1),*_SPINOR(s2));
+   _TWO_SPINORS_FOR(s1,s2,i,type) {
+      _spinor_add_assign_f(*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
    }
 }
 
 /* s1-=s2 */
 void _FUNC(spinor_field_sub_assign)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
-   int len;
-	_SPINOR_TYPE *_SPINOR(s1), *_SPINOR(s2);
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(s1), *_SPINOR_PTR(s2);
+	spinor_descriptor *type;
    
-   _TWO_SPINORS_MATCHING(s1,s2);
-   
-   _TWO_SPINORS_FOR(s1,s2,len) {
-      _spinor_sub_assign_f(*_SPINOR(s1),*_SPINOR(s2));
+   _TWO_SPINORS_FOR(s1,s2,i,type) {
+      _spinor_sub_assign_f(*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
    }
 }
 
 /* s1=0 */
 void _FUNC(spinor_field_zero)(_SPINOR_FIELD_TYPE *s1)
 {
-   int len;
-	_SPINOR_TYPE *_SPINOR(s1);
-   _ONE_SPINOR_FOR(s1,len) {
-      _spinor_zero_f(*_SPINOR(s1));
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(s1);
+	spinor_descriptor *type;
+
+   _ONE_SPINOR_FOR(s1,i,type) {
+      _spinor_zero_f(*_SPINOR_PTR(s1));
   }
 }
 
 /* s1=-s2 */
 void _FUNC(spinor_field_minus)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
-   int len;
-	_SPINOR_TYPE *_SPINOR(s1), *_SPINOR(s2);
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(s1), *_SPINOR_PTR(s2);
+	spinor_descriptor *type;
    
-   _TWO_SPINORS_MATCHING(s1,s2);
-   
-   _TWO_SPINORS_FOR(s1,s2,len) {
-      _spinor_minus_f(*_SPINOR(s1),*_SPINOR(s2));
+   _TWO_SPINORS_FOR(s1,s2,i,type) {
+      _spinor_minus_f(*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
    }
 }
 
 /* s1=r1*s2+r2*s3 */
 void _FUNC(spinor_field_lc)(_SPINOR_FIELD_TYPE *s1, double r1, _SPINOR_FIELD_TYPE *s2, double r2, _SPINOR_FIELD_TYPE *s3)
 {
-   int len;
-	_SPINOR_TYPE *_SPINOR(s1), *_SPINOR(s2), *_SPINOR(s3);
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(s1), *_SPINOR_PTR(s2), *_SPINOR_PTR(s3);
+	spinor_descriptor *type;
    
-   _TWO_SPINORS_MATCHING(s1,s2);
-   _TWO_SPINORS_MATCHING(s1,s3);
-   
-   _THREE_SPINORS_FOR(s1,s2,s3,len) {
-     _spinor_lc_f(*_SPINOR(s1),r1,*_SPINOR(s2),r2,*_SPINOR(s3));
+   _THREE_SPINORS_FOR(s1,s2,s3,i,type) {
+     _spinor_lc_f(*_SPINOR_PTR(s1),r1,*_SPINOR_PTR(s2),r2,*_SPINOR_PTR(s3));
    }
 }
 
 /* s1+=r1*s2+r2*s3 */
 void _FUNC(spinor_field_lc_add_assign)(_SPINOR_FIELD_TYPE *s1, double r1, _SPINOR_FIELD_TYPE *s2, double r2, _SPINOR_FIELD_TYPE *s3)
 {
-   int len;
-	_SPINOR_TYPE *_SPINOR(s1), *_SPINOR(s2), *_SPINOR(s3);
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(s1), *_SPINOR_PTR(s2), *_SPINOR_PTR(s3);
+	spinor_descriptor *type;
    
-   _TWO_SPINORS_MATCHING(s1,s2);
-   _TWO_SPINORS_MATCHING(s1,s3);
-   
-   _THREE_SPINORS_FOR(s1,s2,s3,len) {
-     _spinor_lc_add_assign_f(*_SPINOR(s1),r1,*_SPINOR(s2),r2,*_SPINOR(s3));
+   _THREE_SPINORS_FOR(s1,s2,s3,i,type) {
+     _spinor_lc_add_assign_f(*_SPINOR_PTR(s1),r1,*_SPINOR_PTR(s2),r2,*_SPINOR_PTR(s3));
    }
 }
 
 /* s1=cd1*s2+cd2*s3 cd1, cd2 complex*/
 void _FUNC(spinor_field_clc)(_SPINOR_FIELD_TYPE *s1, complex cd1, _SPINOR_FIELD_TYPE *s2, complex cd2, _SPINOR_FIELD_TYPE *s3)
 {
-   int len;
-	_SPINOR_TYPE *_SPINOR(s1), *_SPINOR(s2), *_SPINOR(s3);
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(s1), *_SPINOR_PTR(s2), *_SPINOR_PTR(s3);
+	spinor_descriptor *type;
    complex c1, c2;
    c1.re=cd1.re; c1.im=cd1.im; 
    c2.re=cd2.re; c2.im=cd2.im;
    
-   _TWO_SPINORS_MATCHING(s1,s2);
-   _TWO_SPINORS_MATCHING(s1,s3);
-   
-   _THREE_SPINORS_FOR(s1,s2,s3,len) {
-     _spinor_clc_f(*_SPINOR(s1),c1,*_SPINOR(s2),c2,*_SPINOR(s3));
+   _THREE_SPINORS_FOR(s1,s2,s3,i,type) {
+     _spinor_clc_f(*_SPINOR_PTR(s1),c1,*_SPINOR_PTR(s2),c2,*_SPINOR_PTR(s3));
    }
 }
 
 /* s1+=cd1*s2+cd2*s3 cd1, cd2 complex*/
 void _FUNC(spinor_field_clc_add_assign)(_SPINOR_FIELD_TYPE *s1, complex cd1, _SPINOR_FIELD_TYPE *s2, complex cd2, _SPINOR_FIELD_TYPE *s3)
 {
-   int len;
-	_SPINOR_TYPE *_SPINOR(s1), *_SPINOR(s2), *_SPINOR(s3);
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(s1), *_SPINOR_PTR(s2), *_SPINOR_PTR(s3);
+	spinor_descriptor *type;
    complex c1, c2;
    c1.re=cd1.re; c1.im=cd1.im; 
    c2.re=cd2.re; c2.im=cd2.im;
    
-   _TWO_SPINORS_MATCHING(s1,s2);
-   _TWO_SPINORS_MATCHING(s1,s3);
-   
-   _THREE_SPINORS_FOR(s1,s2,s3,len) {
-     _spinor_clc_add_assign_f(*_SPINOR(s1),c1,*_SPINOR(s2),c2,*_SPINOR(s3));
+   _THREE_SPINORS_FOR(s1,s2,s3,i,type) {
+     _spinor_clc_add_assign_f(*_SPINOR_PTR(s1),c1,*_SPINOR_PTR(s2),c2,*_SPINOR_PTR(s3));
    }
 }
 
 /* s1=g5*s2  */
 void _FUNC(spinor_field_g5)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
-   int len;
-	_SPINOR_TYPE *_SPINOR(s1), *_SPINOR(s2);
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(s1), *_SPINOR_PTR(s2);
+	spinor_descriptor *type;
    
-   _TWO_SPINORS_MATCHING(s1,s2);
-   
-   _TWO_SPINORS_FOR(s1,s2,len) {
-     _spinor_g5_f(*_SPINOR(s1),*_SPINOR(s2));
+   _TWO_SPINORS_FOR(s1,s2,i,type) {
+     _spinor_g5_f(*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
    }
 }
 
@@ -316,53 +270,39 @@ void _FUNC(spinor_field_g5)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 /* tools per eva.c  */
 void _FUNC(spinor_field_lc1)(double c1, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
-   int len;
-	_SPINOR_TYPE *_SPINOR(s1), *_SPINOR(s2);
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(s1), *_SPINOR_PTR(s2);
+	spinor_descriptor *type;
    
-   _TWO_SPINORS_MATCHING(s1,s2);
-   
-   _TWO_SPINORS_FOR(s1,s2,len) {
-       _spinor_mul_add_assign_f(*_SPINOR(s1),c1,*_SPINOR(s2));
+   _TWO_SPINORS_FOR(s1,s2,i,type) {
+       _spinor_mul_add_assign_f(*_SPINOR_PTR(s1),c1,*_SPINOR_PTR(s2));
    }
 }
 
 
 void _FUNC(spinor_field_lc2)(double c1, double c2, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
-   int len;
-	_SPINOR_TYPE *_SPINOR(s1), *_SPINOR(s2);
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(s1), *_SPINOR_PTR(s2);
+	spinor_descriptor *type;
    
-   _TWO_SPINORS_MATCHING(s1,s2);
-   
-   _TWO_SPINORS_FOR(s1,s2,len) {
-       _spinor_lc_f(*_SPINOR(s1),c1,*_SPINOR(s1),c2,*_SPINOR(s2));
+   _TWO_SPINORS_FOR(s1,s2,i,type) {
+       _spinor_lc_f(*_SPINOR_PTR(s1),c1,*_SPINOR_PTR(s1),c2,*_SPINOR_PTR(s2));
    }
 }
 
 
 void _FUNC(spinor_field_lc3)(double c1, double c2, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2, _SPINOR_FIELD_TYPE *s3)
 {
-   int len;
-	_SPINOR_TYPE *_SPINOR(s1), *_SPINOR(s2), *_SPINOR(s3);
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(s1), *_SPINOR_PTR(s2), *_SPINOR_PTR(s3);
+	spinor_descriptor *type;
    
-   _TWO_SPINORS_MATCHING(s1,s2);
-   _TWO_SPINORS_MATCHING(s1,s3);
-
    c1=-c1; c2=-c2;
    
-   _THREE_SPINORS_FOR(s1,s2,s3,len) {
-      _spinor_lc_add_assign_f(*_SPINOR(s3),c1,*_SPINOR(s1),c2,*_SPINOR(s2));
-      _spinor_minus_f(*_SPINOR(s3),*_SPINOR(s3));
+   _THREE_SPINORS_FOR(s1,s2,s3,i,type) {
+      _spinor_lc_add_assign_f(*_SPINOR_PTR(s3),c1,*_SPINOR_PTR(s1),c2,*_SPINOR_PTR(s2));
+      _spinor_minus_f(*_SPINOR_PTR(s3),*_SPINOR_PTR(s3));
    }
 }
-
-
-
-
-
-#undef _SPINOR
-#undef _TWO_SPINORS_MATCHING
-#undef _ONE_SPINOR_FOR
-#undef _TWO_SPINORS_FOR
-#undef _THREE_SPINORS_FOR
 

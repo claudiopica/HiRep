@@ -1,6 +1,7 @@
 #include "linear_algebra.h"
 #include "global.h"
 #include <string.h>
+#include "spinor_field.h"
 
 /* 
  * LINEAR ALGEBRA FUNCTIONS ARE DEFINED IN THE TEMPLATE
@@ -8,17 +9,6 @@
  * TMPL/linear_algebra.c.sdtmpl
  *
  */
-
-
-static unsigned int _spinor_len=0;
-
-void set_spinor_len(unsigned int len) {
-  _spinor_len=len;
-}
-
-void get_spinor_len(unsigned int *len) {
-  *len=_spinor_len;
-}
 
 
 /* double precision */
@@ -29,7 +19,8 @@ void get_spinor_len(unsigned int *len) {
 
 #include "TMPL/linear_algebra.c.sdtmpl"
 void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
-	memcpy(s1->ptr,s2->ptr,_spinor_len*sizeof(suNf_spinor));
+	_TWO_SPINORS_MATCHING(s1,s2);
+	memcpy(s1->ptr,s2->ptr,s1->type->size*sizeof(suNf_spinor));
 }
 
 #undef _SPINOR_FIELD_TYPE
@@ -45,7 +36,8 @@ void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
 
 #include "TMPL/linear_algebra.c.sdtmpl"
 void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
-	memcpy(s1->ptr,s2->ptr,_spinor_len*sizeof(suNf_spinor));
+	_TWO_SPINORS_MATCHING(s1,s2);
+	memcpy(s1->ptr,s2->ptr,s1->type->size*sizeof(suNf_spinor));
 }
 
 #undef _SPINOR_FIELD_TYPE

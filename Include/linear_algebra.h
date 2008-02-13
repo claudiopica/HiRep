@@ -24,9 +24,6 @@ typedef struct {
 */
 
 
-void set_spinor_len(unsigned int len);
-void get_spinor_len(unsigned int *len);
-
 /* double precision */
 #define _SPINOR_FIELD_TYPE spinor_field
 #define _FUNC(a) a##_f

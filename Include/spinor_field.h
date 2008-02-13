@@ -1,34 +1,58 @@
+#ifndef SPINOR_FIELD_H
+#define SPINOR_FIELD_H
+
+#include "geometry.h"
+#include "error.h"
+
 typedef struct {
+	spinor_descriptor* type;
 	suNf_spinor* ptr;
 } spinor_field;
 
 typedef struct {
+	spinor_descriptor* type;
 	suNf_spinor_flt* ptr;
 } spinor_field_flt;
 
-#define _SPINOR_ADDR(s) ((s)->ptr)
 
-/* x e' l'indice di sito, i e' l'indice di componente */
-#define _SPINOR_AT_SITE(s,x) (((s)->ptr)+x)
-#define _SPINOR_AT(s,i) (((s)->ptr)+i)
-#define _SITE2SC(x) (x)
-#define _SC2SITE(i) (i)
+#define _LAT_INDEX(i) i##_latindex
+#define _SPINOR_PTR(s) s##_ptr
 
-#define EVENSITES 0
-#define ODDSITES 1
-#define ALLSITES 2
+#define _DECLARE_INT_ITERATOR(i) int i, _LAT_INDEX(i)
+#define _DECLARE_SPINOR_ITERATOR(s) suNf_spinor _SPINOR_PTR(s)
 
-#define FOR_LOCAL_SC(x,i) for((i)=0,(x)=(i);(i)<VOLUME;(i)++,(x)=(i))
-#define FOR_EVEN_LOCAL_SC(x,i) for((i)=0,(x)=(i);(i)<VOLUME/2;(i)++,(x)=(i))
-#define FOR_ODD_LOCAL_SC(x,i) for((i)=VOLUME/2,(x)=(i);(i)<VOLUME;(i)++,(x)=(i))
+#define _TWO_SPINORS_MATCHING(s1,s2) \
+	error((s1)->type!=(s2)->type,1,"not available", "Spinors don't match!");
 
-#define FOR_SOME_SC(block,x,i)                                  \
-	for( (i) = ( ((block)==ODDSITES) ? VOLUME/2 : 0 ), (x)=(i); \
-	     (i) < ( ((block)==EVENSITES) ? VOLUME/2 : VOLUME );    \
-	     (i)++, (x)=(i)                                         \
+#define _ONE_SPINOR_FOR(s,i,type) \
+	for(i=0,type=(s)->type;i<type->local_pieces;i++) \
+	for(_LAT_INDEX(i)=type->start[i], _SPINOR_PTR(s)=(s)->ptr+type->start[i]; \
+	    _LAT_INDEX(i)<=type->end[i]; \
+	    _LAT_INDEX(i)++, _SPINOR_PTR(s)++ \
 	   )
 
-#define FOR_BOUNDARY_SC
-#define FOR_BUFFER_SC
+#define _TWO_SPINORS_FOR(s1,s2,i,type) \
+	_TWO_SPINORS_MATCHING(s1,s2); \
+	for(i=0,type=(s1)->type;i<type->local_pieces;i++) \
+	for(_LAT_INDEX(i)=type->start[i], _SPINOR_PTR(s1)=(s1)->ptr+type->start[i], \
+	              _SPINOR_PTR(s2)=(s2)->ptr+type->start[i]; \
+	    _LAT_INDEX(i)<=type->end[i]; \
+	    _LAT_INDEX(i)++, _SPINOR_PTR(s1)++, _SPINOR_PTR(s2)++ \
+	   )
+
+#define _THREE_SPINORS_FOR(s1,s2,s3,i,type) \
+	_TWO_SPINORS_MATCHING(s1,s2); \
+	_TWO_SPINORS_MATCHING(s1,s3); \
+	for(i=0,type=(s1)->type;i<type->local_pieces;i++) \
+	for(_LAT_INDEX(i)=type->start[i], _SPINOR_PTR(s1)=(s1)->ptr+type->start[i], \
+	              _SPINOR_PTR(s2)=(s2)->ptr+type->start[i], \
+	              _SPINOR_PTR(s3)=(s3)->ptr+type->start[i]; \
+	    _LAT_INDEX(i)<=type->end[i]; \
+	    _LAT_INDEX(i)++, _SPINOR_PTR(s1)++, _SPINOR_PTR(s2)++, _SPINOR_PTR(s3)++ \
+	   )
+
+#define _SPINOR_AT(s,i) (((s)->ptr)+i)
+#define _SPINOR_ADDR(s) ((s)->ptr)
 
 
+#endif
