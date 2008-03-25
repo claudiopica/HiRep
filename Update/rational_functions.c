@@ -189,7 +189,7 @@ void r_app_set(rational_app *app, double min, double max) {
 	}
 	/* if we cannot find a rational approx give an error! */
   error((best==0),1,"r_app_set",
-        "Failed to find a suitable rational approximation.\nPlease adjust database and try again.\n");
+        "Failed to find a suitable rational approximation.\nPlease adjust the database and try again.\n");
 
 	/* now set up coefficients in app */
 	bo=(int) best[2];
@@ -245,7 +245,7 @@ void rational_func(rational_app *coef, spinor_operator Q, suNf_spinor *out, suNf
    inv_par.shift = coef->b;
    inv_par.err2=coef->rel_error/coef->order;    /* CAMBIARE: METTERE PARAMETRI COMUNI ALL'UPDATE */
    inv_par.err2*=inv_par.err2;
-#define EPSILON 1.e-29
+#define EPSILON 1.e-28
 	 if(inv_par.err2<EPSILON) inv_par.err2=EPSILON;
 #undef EPSILON
    inv_par.max_iter=0; /* no limit */

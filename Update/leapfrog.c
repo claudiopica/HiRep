@@ -5,7 +5,7 @@
 #include "representation.h"
 #include "logger.h"
 
-#define _PROJ_BIT (1<<6) /* project gauge field every 2^_PROJ_BIT changes */
+#define _PROJ_BIT (1<<2) /* project gauge field every 2^_PROJ_BIT changes */
 #define _proj_leapfrog(c) if((c)&_PROJ_BIT){(c)=0;project_gauge_field();} else ++c
 
 void leapfrog(suNg_algebra_vector *momenta, int_par *traj_par){

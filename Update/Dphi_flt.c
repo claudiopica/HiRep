@@ -14,6 +14,8 @@
 #include "global.h"
 #include "error.h"
 #include "dirac.h"
+#include "linear_algebra.h"
+#include "memory.h"
 
 /*
  * the following variable is used to keep trace of
@@ -297,3 +299,113 @@ void g5Dphi_flt(double m0, suNf_spinor_flt *out, suNf_spinor_flt *in)
    }
 }
 
+
+static suNf_spinor_flt *sftmp_pre=NULL;
+
+void free_tmp() {
+	if(sftmp_pre!=NULL) {
+		free_field(sftmp_pre);
+		sftmp_pre=NULL;
+	}
+}
+
+/*
+ * this function takes 2 spinors defined on the even lattice
+ * of size VOLUME/2
+ * Dphi in = (4+m0)^2*in - D_EO D_OE in
+ *
+ */
+void Dphi_eopre_flt(double m0, suNf_spinor_flt *out, suNf_spinor_flt *in)
+{
+   int ix;
+   double rho;
+   suNf_spinor_flt *r, *s;
+
+   error((in==NULL)||(out==NULL),1,"Dphi_eopre [Dphi.c]",
+         "Attempt to access unallocated memory space");
+   
+   error(in==out,1,"Dphi_eopre [Dphi.c]",
+         "Input and output fields must be different");
+
+	 /* alloc memory for temporary spinor field */
+	 if (sftmp_pre==NULL) {
+		 unsigned int slen;
+		 get_spinor_len(&slen);
+		 set_spinor_len(VOLUME/2);
+		 sftmp_pre=alloc_spinor_field_f_flt(1);
+		 error(sftmp_pre==NULL,1,"Dphi_eopre [Dphi.c]",
+				 "cannot allocate memory space for temporary storage");
+		 set_spinor_len(slen);
+		 atexit(&free_tmp);
+	 }
+
+   Dphi_flt_(OE, sftmp_pre, in);
+   Dphi_flt_(EO, out, sftmp_pre);
+
+   rho=+4.0f+m0;
+	 rho*=-rho; /* this minus sign is taken into account below */
+
+/************************ loop over all lattice sites *************************/
+
+	 r=out;
+	 s=in;
+   for (ix=0;ix<VOLUME/2;ix++) 
+   {
+      _spinor_mul_add_assign_f(*r,rho,*s);
+			_spinor_minus_f(*r,*r);
+      ++r;
+      ++s;
+   }
+
+}
+
+/*
+ * this function takes 2 spinors defined on the even lattice
+ * of size VOLUME/2
+ * Dphi in = (4+m0)^2*in - D_EO D_OE in
+ *
+ */
+void g5Dphi_eopre_flt(double m0, suNf_spinor_flt *out, suNf_spinor_flt *in)
+{
+   int ix;
+   double rho;
+   suNf_spinor_flt *r, *s;
+
+   error((in==NULL)||(out==NULL),1,"Dphi_eopre [Dphi.c]",
+         "Attempt to access unallocated memory space");
+   
+   error(in==out,1,"Dphi_eopre [Dphi.c]",
+         "Input and output fields must be different");
+
+	 /* alloc memory for temporary spinor field */
+	 if (sftmp_pre==NULL) {
+		 unsigned int slen;
+		 get_spinor_len(&slen);
+		 set_spinor_len(VOLUME/2);
+		 sftmp_pre=alloc_spinor_field_f_flt(1);
+		 error(sftmp_pre==NULL,1,"Dphi_eopre [Dphi.c]",
+				 "cannot allocate memory space for temporary storage");
+		 set_spinor_len(slen);
+		 atexit(&free_tmp);
+	 }
+
+   Dphi_flt_(OE, sftmp_pre, in);
+   Dphi_flt_(EO, out, sftmp_pre);
+
+   rho=+4.0f+m0;
+	 rho*=-rho; /* this minus sign is taken into account below */
+
+/************************ loop over all lattice sites *************************/
+
+	 r=out;
+	 s=in;
+   for (ix=0;ix<VOLUME/2;ix++) 
+   {
+      _spinor_mul_add_assign_f(*r,rho,*s);
+			_spinor_minus_f(*r,*r);
+      _spinor_g5_assign_f(*r);
+      ++r;
+      ++s;
+   }
+
+}

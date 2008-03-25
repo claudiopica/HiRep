@@ -20,6 +20,9 @@ void local_hmc_action(local_action_type type,
 
 	int i,j;
 	double a,tmp;
+	unsigned int slen;
+	get_spinor_len(&slen);
+
 	for(i=0; i<VOLUME; ++i){
 
 		/* Momenta */
@@ -35,9 +38,11 @@ void local_hmc_action(local_action_type type,
 		a -= (_update_par.beta/((double)NG))*local_plaq(i);
 
 		/* Fermions */
-		for (j=0;j<_update_par.n_pf;++j) {
-			_spinor_prod_re_f(tmp,phi1[j][i],phi2[j][i]);
-			a += tmp;
+		if (i<slen) { /* this is for cases like the e/o preconditioning */
+			for (j=0;j<_update_par.n_pf;++j) {
+				_spinor_prod_re_f(tmp,phi1[j][i],phi2[j][i]);
+				a += tmp;
+			}
 		}
 
 		switch(type) {

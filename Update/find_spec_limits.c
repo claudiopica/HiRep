@@ -51,7 +51,7 @@ static void min_bound_H2(double *min) {
 */
 
 /* use power method to find max eigvalue */
-int max_H2(double *max, double mass) {
+int max_H2(double *max) {
   double norm, oldmax, dt;
   int count;
   suNf_spinor *s1,*s2,*s3;
@@ -70,8 +70,11 @@ int max_H2(double *max, double mass) {
 
   dt=1.;
 
+	H2(s3,s1);
+	/*
   g5Dphi(mass,s2,s1);
   g5Dphi(mass,s3,s2);
+  */
 
   count=1;
   do {
@@ -97,8 +100,11 @@ int max_H2(double *max, double mass) {
 
 
     oldmax=*max;
+		H2(s3,s1);
+		/*
     g5Dphi(mass,s2,s1);
     g5Dphi(mass,s3,s2);
+		*/
     *max=spinor_field_prod_re_f(s1,s3);
     
     /* printf("Iter %d: %4.5e\n",count,fabs(oldnorm-norm)); */
@@ -131,7 +137,7 @@ void find_spec_H2(double *max, double *min, double mass) {
 	unsigned int len;
 
 
-	MVM+=max_H2(max, mass);
+	MVM+=max_H2(max);
 
 	get_spinor_len(&len);
 

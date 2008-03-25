@@ -267,6 +267,10 @@ int main(int argc,char *argv[])
 
    test_staples();
 
+	 set_spinor_len(VOLUME);
+#ifdef UPDATE_EO
+	 set_spinor_len(VOLUME/2);
+#endif
    init_rhmc(&rpar);
    
    lprintf("MAIN",0,"MVM during RHMC initialzation: %ld\n",getMVM());

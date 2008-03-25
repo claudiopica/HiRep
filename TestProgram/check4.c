@@ -41,10 +41,19 @@ void H(suNf_spinor *out, suNf_spinor *in){
    g5Dphi(-hmass,out,in);
 }
 
+void H_eo(suNf_spinor *out, suNf_spinor *in){
+   g5Dphi_eopre(-hmass,out,in);
+}
+
 void M(suNf_spinor *out, suNf_spinor *in){
    static suNf_spinor tmp[VOLUME];
    g5Dphi(-hmass,tmp,in); 
    g5Dphi(-hmass,out,tmp);
+}
+void M_eo(suNf_spinor *out, suNf_spinor *in){
+   static suNf_spinor tmp[VOLUME];
+   g5Dphi_eopre(-hmass,tmp,in); 
+   g5Dphi_eopre(-hmass,out,tmp);
 }
 
 void test_herm(spinor_operator S, char *name){
@@ -82,7 +91,6 @@ void test_herm(spinor_operator S, char *name){
 
 }
 
-
 int main(int argc,char *argv[])
 {
    printf("Gauge group: SU(%d)\n",NG);
@@ -105,29 +113,23 @@ int main(int argc,char *argv[])
    u_gauge_f=alloc_gfield_f();
 #endif
    represent_gauge_field();
-   
+	 
+
    printf("Generating a random gauge field... ");fflush(stdout);
    random_u();
    printf("done.\n");
    represent_gauge_field();
 
-   set_spinor_len(VOLUME);
    
-	 /*
-   gaussian_spinor_field(&(s1[0]));
-   gaussian_spinor_field(&(s2[0]));
-   
-   tau = 1./sqrt(spinor_field_sqnorm_f(s1));
-   spinor_field_mul_f(s1,tau,s1);
-   tau = 1./sqrt(spinor_field_sqnorm_f(s2));
-   spinor_field_mul_f(s2,tau,s2);
-*/
-
    printf("Test hermiticity of the Dirac operator\n");
    printf("--------------------------------------\n");
    
+   set_spinor_len(VOLUME);
    test_herm(&M,"M");
    test_herm(&H,"H");
+   set_spinor_len(VOLUME/2);
+   test_herm(&H_eo,"H_eo");
+   test_herm(&M_eo,"M_eo");
 
    exit(0);
 }

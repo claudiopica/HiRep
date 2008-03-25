@@ -11,10 +11,14 @@ typedef enum {
 void Dphi_(block_selector B, suNf_spinor *out, suNf_spinor *in);
 void Dphi(double m0, suNf_spinor *out, suNf_spinor *in);
 void g5Dphi(double m0, suNf_spinor *out, suNf_spinor *in);
+void Dphi_eopre(double m0, suNf_spinor *out, suNf_spinor *in);
+void g5Dphi_eopre(double m0, suNf_spinor *out, suNf_spinor *in);
 
 void Dphi_flt_(block_selector B, suNf_spinor_flt *out, suNf_spinor_flt *in);
 void Dphi_flt(double m0, suNf_spinor_flt *out, suNf_spinor_flt *in);
 void g5Dphi_flt(double m0, suNf_spinor_flt *out, suNf_spinor_flt *in);
+void Dphi_eopre_flt(double m0, suNf_spinor_flt *out, suNf_spinor_flt *in);
+void g5Dphi_eopre_flt(double m0, suNf_spinor_flt *out, suNf_spinor_flt *in);
 
 unsigned long int getMVM();
 unsigned long int getMVM_flt();

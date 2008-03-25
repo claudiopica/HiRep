@@ -4,9 +4,8 @@
 #include "suN_types.h"
 #include "complex.h"
 
-
-typedef void (*spinor_operator)(suNf_spinor *out, suNf_spinor *in);
-typedef void (*spinor_operator_flt)(suNf_spinor_flt *out, suNf_spinor_flt *in);
+typedef	void (*spinor_operator)(suNf_spinor *out, suNf_spinor *in);
+typedef	void (*spinor_operator_flt)(suNf_spinor_flt *out, suNf_spinor_flt *in);
 
 typedef struct _mshift_par {
    int n; /* number of shifts */

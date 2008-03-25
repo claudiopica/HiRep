@@ -31,11 +31,17 @@ static double *la=0;
 
 /* this is the basic operator used in the update */
 static suNf_spinor *h2tmp;
+#ifdef UPDATE_EO
+void H2(suNf_spinor *out, suNf_spinor *in){
+  g5Dphi_eopre(_update_par.mass, h2tmp, in);
+  g5Dphi_eopre(_update_par.mass, out, h2tmp);
+}
+#else
 void H2(suNf_spinor *out, suNf_spinor *in){
   g5Dphi(_update_par.mass, h2tmp, in);
   g5Dphi(_update_par.mass, out, h2tmp);
 }
-
+#endif
 /* this is the basic operator used in the update */
 /*
 void H(suNf_spinor *out, suNf_spinor *in){
@@ -81,6 +87,12 @@ void init_rhmc(rhmc_par *par){
 
 	lprintf("RHMC",0,"Initializing...\n");
 
+#ifdef UPDATE_EO
+	set_spinor_len(VOLUME/2);
+#else
+	set_spinor_len(VOLUME);
+#endif
+
 	/* fare test su input par e copiare in _update_par */
 	_update_par=*par;
 
@@ -113,9 +125,6 @@ void init_rhmc(rhmc_par *par){
 	u_gauge_old=alloc_gfield();
 	suNg_field_copy(u_gauge_old,u_gauge);
 
-	/* allocate h2tmp for H2 */
-  h2tmp=alloc_spinor_field_f(1);
-
 	/* allocate momenta */
 	momenta = alloc_momenta();
 
@@ -126,6 +135,9 @@ void init_rhmc(rhmc_par *par){
 	for(i=1;i<_update_par.n_pf;++i) {
 		pf[i]=pf[i-1]+len;
 	}
+
+	/* allocate h2tmp for H2 */
+  h2tmp=alloc_spinor_field_f(1);
 
 	/* allocate memory for the local action */
 	if(la==0)
@@ -144,7 +156,7 @@ void init_rhmc(rhmc_par *par){
 	r_S.rel_error=_update_par.MT_prec;
 	r_app_alloc(&r_S);
 	r_app_set(&r_S,minev,maxev);
-	/* r_D = x^{-Nf/(2*NPf)} is used in the molecula dynamics */
+	/* r_MD = x^{-Nf/(2*NPf)} is used in the molecular dynamics */
 	r_MD.order=1;
 	r_MD.n=-_update_par.nf;
 	r_MD.d=2*_update_par.n_pf; 
@@ -152,7 +164,7 @@ void init_rhmc(rhmc_par *par){
 	r_MD.rel_error=_update_par.MD_prec;
 	r_app_alloc(&r_MD);
 	r_app_set(&r_MD,minev,maxev);
-	/* r_D = x^{+Nf/(4*NPf)} is used in the heat bath for pseudofermions */
+	/* r_HB = x^{+Nf/(4*NPf)} is used in the heat bath for pseudofermions */
 	r_HB.order=1;
 	r_HB.n=_update_par.nf;
 	r_HB.d=4*_update_par.n_pf; 
@@ -214,18 +226,15 @@ int update_rhmc(){
    /* integrate molecular dynamics */
 	 lprintf("RHMC",30,"MD integration...\n");
 	 _update_par.integrator(momenta,_update_par.MD_par);
-	 /*leapfrog(momenta, _update_par.tlen, _update_par.nsteps);
-	 O2MN_multistep(momenta, _update_par.tlen, _update_par.nsteps, 3);*/
 
 	 /* project gauge field */
 	 project_gauge_field();
 	 represent_gauge_field();
 
-   /* test min and max eigenvalue of H2 and update approx if necessary */
-   /* now it just tests the approx !!! */
+   /* update rational approximations */
    oldmax = maxev; /* save old max */
    oldmin = minev; /* save old min */
-   find_spec_H2(&maxev,&minev, _update_par.mass); /* find spectral interval of H^2 */
+   find_spec_H2(&maxev,&minev, _update_par.mass); 
 	 r_app_set(&r_S,minev,maxev);
 	 r_app_set(&r_MD,minev,maxev);
 	 r_app_set(&r_HB,minev,maxev);

@@ -176,26 +176,27 @@ For the first two derivatives we have:
 \end{eqnarray}
 where $V(x,\mu)$ is the sum of the staples around the link $U(x,\mu)$.
 
-The computation of the fermionic force goes as follows:
+The computation of the fermionic force goes as follows. We only consider the case $l=1$ since this is the
+only case relevant both for the HMC algorithm and the RHMC algorithm (see below). We have:
 \begin{eqnarray}
-\dot{\mathcal{H}}_F = -l\ \phi^\dagger (Q_m^2 - \beta)^{-(l+1)/2} \dot{(Q_m^2)} (Q_m^2 - \beta)^{-(l+1)/2} \phi \, . \label{FF1}
+\dot{\mathcal{H}}_F = -\ \phi^\dagger (Q_m^2 - \beta)^{-1} \dot{(Q_m^2)} (Q_m^2 - \beta)^{-1} \phi \, . \label{FF1}
 \end{eqnarray}
 Defining:
 \begin{eqnarray}
-\eta &=& (Q_m^2 - \beta)^{-(l+1)/2} \phi \, , \label{HMCETA}\\
+\eta &=& (Q_m^2 - \beta)^{-1} \phi \, , \label{HMCETA}\\
 \xi &=& Q_m \eta \, ,
 \end{eqnarray}
 and using the fact that the matrix $(Q_m^2-\beta)$ is hermitean, we can rewrite Eq.(\ref{FF1}) as
 \begin{eqnarray}
-\dot{\mathcal{H}}_F = - 2 l\ \xi^\dagger \dot{(Q_m)} \eta \, . \label{FF2}
+\dot{\mathcal{H}}_F = - 2 \ \xi^\dagger \dot{(Q_m)} \eta \, . \label{FF2}
 \end{eqnarray}
 Inserting the explicit form of $Q_m$, Eq.s~(\ref{QM}) and (\ref{DM}), into Eq.(\ref{FF2}) we obtain
 \begin{multline}
-\dot{\mathcal{H}}_F = l\ \mathrm{Re\ }\sum_{x,\mu} \xi(x)^\dagger \dot U^R(x,\mu) \gamma_5 (1-\gamma_\mu) \eta(x+\mu) \\ 
+\dot{\mathcal{H}}_F = \mathrm{Re\ }\sum_{x,\mu} \xi(x)^\dagger \dot U^R(x,\mu) \gamma_5 (1-\gamma_\mu) \eta(x+\mu) \\ 
 + \xi(x+\mu)^\dagger \dot U^R(x,\mu)^\dagger \gamma_5 (1+\gamma_\mu) \eta(x) = \nonumber 
 \end{multline}
 \begin{multline}
-\phantom{\dot{\mathcal{H}}_F} =  l\ \mathrm{Re\ }\sum_{x,\mu} \xi(x)^\dagger \dot U^R(x,\mu) \gamma_5 (1-\gamma_\mu) \eta(x+\mu) \\ 
+\phantom{\dot{\mathcal{H}}_F} = \mathrm{Re\ }\sum_{x,\mu} \xi(x)^\dagger \dot U^R(x,\mu) \gamma_5 (1-\gamma_\mu) \eta(x+\mu) \\ 
 + \eta(x)^\dagger \dot U^R(x,\mu) \gamma_5 (1-\gamma_\mu) \xi(x+\mu)
 \end{multline}
 where the sum over spin and color indices is intended and we made explicit the fact the the whole 
@@ -210,7 +211,7 @@ Using Eq.(\ref{URDOT}) in the expression for $\dot{\mathcal{H}}_{F}$ we find
 (capitalized $Tr$ indicates the trace over color \textit{and} spin indices as opposed to the lower
  case $tr$ which is the trace over color only)
 \begin{multline}
-\dot{\mathcal{H}}_F = l\ \sum_{x,\mu} \sum_a \pi^a(x,\mu) \mathrm{Re\ Tr\ } \left[ iT^a_R U^R(x,\mu) \gamma_5 (1-\gamma_\mu) \right. \\
+\dot{\mathcal{H}}_F = \sum_{x,\mu} \sum_a \pi^a(x,\mu) \mathrm{Re\ Tr\ } \left[ iT^a_R U^R(x,\mu) \gamma_5 (1-\gamma_\mu) \right. \\
 		\left. \left\{ \eta(x+\mu)\otimes\xi(x)^\dagger + \xi(x+\mu)\otimes\eta(x)^\dagger \right\} \right] \, . \label{HDOTF}
 \end{multline}
 
@@ -219,7 +220,7 @@ for the momenta $\pi^a(x,\mu)$
 \begin{align}
 \dot\pi^a(x,\mu) &= \dot\pi^a_G(x,\mu) + \dot\pi^a_F(x,\mu) \, , \label{PIDOT1}\\
 \dot\pi^a_G(x,\mu) &= \frac{\beta}{N} \frac{1}{T_f} \mathrm{Re\ tr\ } \left[ i T^a_f U(x,\mu) V^\dagger(x,\mu) \right] \, ,\label{PIDOT2}\\
-\dot\pi^a_F(x,\mu) &=- l \frac{1}{T_f} \mathrm{Re\ Tr\ } \left[ iT^a_R U^R(x,\mu) \gamma_5 (1-\gamma_\mu) \right. \nonumber\\
+\dot\pi^a_F(x,\mu) &=-\frac{1}{T_f} \mathrm{Re\ Tr\ } \left[ iT^a_R U^R(x,\mu) \gamma_5 (1-\gamma_\mu) \right. \nonumber\\
 										&\quad\quad\quad	\left. \left\{ \eta(x+\mu)\otimes\xi(x)^\dagger + \xi(x+\mu)\otimes\eta(x)^\dagger \right\} \right]\, . \label{PIDOT3}
 \end{align}
 
@@ -230,139 +231,9 @@ P^a_R ( F ) = - \frac{1}{T_R} \mathrm{Re\ tr\ } \left[ i T^a_R F \right] \, ,
 we can be used to rewrite Eq.s~(\ref{PIDOT2})-(\ref{PIDOT3}) in a more compact form:
 \begin{align}
 \dot\pi^a_G(x,\mu) &= - \frac{\beta}{N} P^a_f \left( U(x,\mu) V^\dagger(x,\mu) \right) \, ,\\
-\dot\pi^a_F(x,\mu) &= l \frac{T_R}{T_f} P^a_R \left( U^R(x,\mu) \mathrm{tr_{spin}} \left[ \gamma_5 (1-\gamma_\mu) \right. \right. \nonumber\\
+\dot\pi^a_F(x,\mu) &= \frac{T_R}{T_f} P^a_R \left( U^R(x,\mu) \mathrm{tr_{spin}} \left[ \gamma_5 (1-\gamma_\mu) \right. \right. \nonumber\\
 										&\quad\quad\quad	\left. \left. \left\{ \eta(x+\mu)\otimes\xi(x)^\dagger + \xi(x+\mu)\otimes\eta(x)^\dagger \right\} \right] \right)\, . \label{HFFORCE}
 \end{align}
-
-
-
-\section{HMC molecular dynamics}
-
-The pseudofermionic action contributes to the force that determines
-the time evolution of the conjugate momenta in the molecular
-dynamics. Consider a variation of a link variable:
-%
-\begin{equation}
-\delta U(x,\mu) = \omega(x,\mu) U(x,\mu),
-\end{equation}
-where $\omega$ is an element of the algebra $\mathcal G$; the
-corresponding variation of the action defines the fermionic force,
-$F(x,\mu)$:
-%
-\begin{equation}
-\delta S_\mathrm{pf} = \left(\omega,F\right).
-\end{equation}
-%
-The variation $\delta S_\mathrm{pf}$ can always be cast in the form:
-%
-\begin{equation}
-\delta S_\mathrm{pf} = \sum_{x,y} \eta(x)^\dagger \delta Q_m(x,y)
-\xi(y) + \xi(x)^\dagger \delta Q_m(x,y) \eta(y)
-\end{equation}
-%
-where $\eta$ and $\xi$ are functions of $\phi$ that depend on the
-number of flavours that we are considering. The expression needed for
-the RHMC is considered in detail later. For fermions in a generic
-representation $R$, and for an infinitesimal variation of the field
-variable $U(z,\mu)$, we obtain:
-%
-\begin{align}
-\delta Q_m(x,y) = &-\gamma_5 \left[(1-\gamma_\mu) \delta U^R(z,\mu)
-\delta_{y,x+\mu} \delta_{x-\nu,z} \delta_{\mu\nu} \right. \nonumber \\ 
-&~~~~~~~~~~~~~~~~~\left. + (1+\gamma_\mu) \delta U^R(z,\mu)^\dagger 
-\delta_{y,x-\mu} \delta_{x-\nu,z} \delta_{\mu\nu} \right] \nonumber.
-\end{align}
-%
-Using this expression for $\delta Q_m$, the variation of the fermionic
-action is:
-%
-\begin{equation}
-\delta S_\mathrm{pf} = \mathrm{Re} \left\{ \eta^\dagger(x) \gamma_5
-\left(1-\gamma_\mu\right) \delta U^R(x,\mu) \xi(x+\mu) +
-\eta^\dagger(x+\mu) \gamma_5
-\left(1+\gamma_\mu\right) \delta U^R(x,\mu) \xi(x) \right\}
-\end{equation}
-%
-In the following we denote by upper--case letters,
-$A,B,\ldots=1,\ldots,d_R$, the colour indices in the representation
-$R$, and by lower--case letters, $a,b,\ldots=1,\ldots,N$, the colour
-indices in the fundamental representation.  The variation of the link
-variable $U$ induces a variation of the field $U^R$:
-%
-\begin{eqnarray}
-\delta U^R(x,\mu)^{AB} &=& {\mathcal C}_R(x,\mu)^{AB}_{ab} 
-\delta U(x,\mu)_{ba}\\
-\mathrm{or, }~~ \delta U^R(x,\mu) \hspace{15truept}&=& \mathrm{tr }_f 
-\left[{\mathcal C}_R(x,\mu) \delta U(x,\mu) \right]\label{eq:dUR}.
-\end{eqnarray}
-%
-The above equation defines the transition function ${\mathcal C}_R$,
-which connects the variation of the field in the fundamental
-representation to the variation of the field in the $R$
-representation, and which needs to be computed for each representation
-that we are interested in. In the second line, we have omitted the
-open indices $A,B$, and the trace runs over the indices in the
-fundamental representation, as suggested by the
-subscript. The variation of the link variable in the $R$
-representation can be rewritten as:
-%
-\begin{align}
-\delta U^R &\equiv i \omega^a T^a_R \nonumber \\
-&= i \omega^a \mathrm{tr}_f\left[T^a U \mathcal{C}_R \right] \label{VARUR}
-\end{align}
-%
-and therefore:
-%
-\begin{equation}
-\mathrm{tr}_f\left[T^a U \mathcal{C}_R \right] = T^a_R U^R.
-\end{equation}
-%
-%% By introducing a new field:
-%% %
-%% \begin{equation}
-%% {\mathcal U}^\prime(x,\mu)^{AB}_{ab} = U(x,\mu)_{ac} 
-%% {\mathcal C}_R(x,\mu)^{AB}_{cb},
-%% \end{equation}
-%% the variations of the field $U^R$ can be rewritten as:
-%% %
-%% \begin{eqnarray}
-%% \delta U^R(x,\mu) &=& -\left(\omega(x,\mu),{\mathcal U}^\prime(x,\mu)\right) \\
-%% \delta U^R(x,\mu)^\dagger &=&
-%% \left(\omega(x,\mu), {\mathcal U}^\prime(x,\mu)^\dagger
-%% \right). 
-%% \end{eqnarray}
-%% %
-%% The expressions above are particularly useful since they allow the
-%% force to be readily written as:
-%% %
-%% \begin{eqnarray}
-%% F(x,\mu)_{ab} &=&\eta(x)^\dagger \gamma_5 (1-\gamma_\mu)
-%% {\mathcal U}^\prime(x,\mu)_{ab} \xi(x+\mu) - \nonumber \\
-%% && - \eta(x+\mu)^\dagger \gamma_5 (1+\gamma_\mu)
-%% {\mathcal U}^\prime(x,\mu)^\dagger_{ab} \xi(x).
-%% \end{eqnarray}
-%% %
-%% where the open indices in the fundamental representation are written
-%% explicitly, while the indices in the higher representation are
-%% contracted and omitted in the equation. \\
-Introducing a $d_R \times d_R$ matrix:  
-%
-\begin{equation}
-P(x,y)^{AB} = \mathrm{tr}_\mathrm{Dirac}\, \left[
-\gamma_5 \left(1-\gamma_\mu\right) \xi(x)^A \eta^\dagger(y)^B +
-\gamma_5 \left(1-\gamma_\mu\right) \eta(x)^A \xi^\dagger(y)^B 
-\right],
-\end{equation}
-%
-where the $\mathrm{tr}_\mathrm{Dirac}$ indicates that Dirac indices
-are contracted, the final expression for the force can be written
-as a trace over colour indices in the $R$ representation:
-%
-\begin{equation}
-\label{eq:force}
-F^a(x,\mu) = -\frac{1}{T_f} \mathrm{Im}\, \mathrm{tr}_R \left[ T^a_R\, 
-U^R(x,\mu) P(x+\mu,x) \right].
-\end{equation}
 
 \section{Checks of the MD force}
 The formulae derived in the previous Section can be checked against two
@@ -518,6 +389,87 @@ each configuration when needed. In our code we update this interval only before 
 metropolis test, while we keep it fixed during the molecular dinamics.
 
 
+\section{Even-Odd preconditioning}
+It is a very well know fact that the time spend for a simulation with dynamical fermions
+is dominated by the time required for the inversions of the Dirac operator. 
+The convergence of such inversions can be improved using an appropriate precondining.
+The idea is to rewrite the fermionic determinant as a determinant 
+(or product of determinants) of better conditioned matrix (matrices) than the original
+Dirac operator.
+For the non-improved Wilson action this can be easily done using the \textit{even-odd} 
+preconditioning. We start rewriting the Dirac operator $D_m$ as a block matrix:
+\begin{equation}
+D_m = \begin{pmatrix}
+4+m& D_{eo}\\
+D_{oe} &4+m
+\end{pmatrix}\,\,\, ,
+\end{equation}
+where each block has a dimension half that of the original Dirac matrix. The diagonal 
+blocks connecting sites with the same parity are proportional to the identity matrix, 
+while off-diagonal blocks connect sites with opposite parity. We have (since $D_m$
+is $\gamma_5$-hermitean):
+\begin{equation}
+\gamma_5 D_{eo} \gamma_5 = D_{oe}^\dagger\,\, . 
+\end{equation}
+The determinant of the Dirac matrix $D_m$ can be rewritten as:
+\begin{equation}
+{\rm det\ } D_m = {\rm det\ } ( (4+m)^2 - D_{oe} D_{eo} ) = {\rm det\ } ( (4+m)^2 - D_{eo} D_{oe} ) \equiv {\rm det\ } D^{eo}_m\,\, , 
+\end{equation}
+using the well known formula for the determinant of a block matrix.
+Since the determinant of $D_m$ and of $D_m^{eo}$ are the same the latter can be used 
+in numercal simulations. Note that the even-odd preconditioned matrix only connects sites 
+with the same parity thus it have only half of the size of the original Dirac matrix and 
+as $D_m$ it is $\gamma_5$-hermitean. We define as before the hermitean matrix 
+$Q_m^{eo}\equiv \gamma_5 D_m^{eo}$, which will be used in practice.
+
+The formulation of the HMC algorithm does not change and the only difference is that pseudofermions fields 
+are now only defined on half of the lattice sites, conventionally the even sites in what follows.
+We now give the explicit expression for the fermionic force for the preconditioned system described by 
+the hamiltonian:
+\begin{eqnarray}
+\mathcal{H}_F &=& \phi_e^\dagger ( (Q^{eo}_m)^2 - \beta )^{-1} \phi_e \,\, ,
+\end{eqnarray}
+where as before we are assuming $N_f=2$ or a rational approximation 
+of the actual fractional power function, and where we made explicit that $\phi_e$ is 
+only defined on even sites.
+Eq.(\ref{FF2}) is unchanged :
+\begin{eqnarray}
+\dot{\mathcal{H}}_F = - 2 \ \xi_e^\dagger \dot{(Q^{eo}_m)} \eta_e \, ,\label{FFPRE}
+\end{eqnarray}
+where as before we have defined:
+\begin{eqnarray}
+\eta_e &=& ((Q^{eo}_m)^2 - \beta)^{-1} \phi_e \, , \\
+\xi_e &=& Q^{eo}_m \eta_e \, .
+\end{eqnarray}
+The explicit form of $Q_m^{eo}$ must be used at this point. We have:
+\begin{eqnarray}
+\dot{(Q^{eo}_m)} = -\gamma_5 (\dot{D_{eo}} D_{oe} + D_{eo}\dot{D_{oe}} )\,\, .\label{QPREDOT}
+\end{eqnarray}
+Defining
+\begin{eqnarray}
+\sigma_o &=& D_{oe} \eta_e \, , \\
+\rho_o &=& D_{oe} \xi_e \, ,
+\end{eqnarray}
+and inserting Eq.(\ref{QPREDOT}) into Eq.(\ref{FFPRE}), we find:
+\begin{multline}
+\dot{\mathcal{H}}_F =  - \sum_{\mu,x\in even} {\rm Tr}_{x,\mu}	\left[ \sigma_o(x+\mu)\otimes\xi_e(x)^\dagger + \rho_o(x+\mu)\otimes\eta_e(x)^\dagger \right] - \\
+- \sum_{\mu,x\in odd} {\rm Tr}_{x,\mu}	\left[ \xi_e(x+\mu)\otimes\sigma_o(x)^\dagger + \eta_e(x+\mu)\otimes\rho_o(x)^\dagger \right] \label{FORPRE}
+\end{multline}
+and for convenience we use the shorthand notation:
+\begin{equation}
+{\rm Tr}_{x,\mu} \left[ \Phi \right] \equiv \mathrm{Re\ Tr\ } \left[ \dot U^R(x,\mu) \gamma_5 (1-\gamma_\mu) \Phi \right]\,\, .
+\end{equation}
+From Eq.(\ref{FORPRE}) it is clear that the fermionic force has a different expression on sites of different parities.
+Proceeding as before we arrive at the final expressions. For $x\in even$:
+\begin{align}
+\dot\pi^a_F(x,\mu) &= - \frac{T_R}{T_f} P^a_R \left( U^R(x,\mu) \mathrm{tr_{spin}} \left[ \gamma_5 (1-\gamma_\mu) \right. \right. \nonumber\\
+										&\quad\quad\quad	\left. \left. \left\{  \sigma_o(x+\mu)\otimes\xi_e(x)^\dagger + \rho_o(x+\mu)\otimes\eta_e(x)^\dagger \right\} \right] \right)\, ,
+\end{align}
+while for $x\in odd$:
+\begin{align}
+\dot\pi^a_F(x,\mu) &= - \frac{T_R}{T_f} P^a_R \left( U^R(x,\mu) \mathrm{tr_{spin}} \left[ \gamma_5 (1-\gamma_\mu) \right. \right. \nonumber\\
+										&\quad\quad\quad	\left. \left. \left\{\xi_e(x+\mu)\otimes\sigma_o(x)^\dagger + \eta_e(x+\mu)\otimes\rho_o(x)^\dagger   \right\} \right] \right)\, .
+\end{align}
 
 
 

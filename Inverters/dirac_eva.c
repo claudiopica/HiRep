@@ -257,7 +257,7 @@ void dirac_eva_onemass(int nev,int nevt,int kmax,
 	minus = alloc_spinor_field_f(1);
 	h2tmp = alloc_spinor_field_f(1);
 	
-	maxh2iter = max_H2(&ubnd,mass);
+	maxh2iter = max_H2(&ubnd);
 	init = 0;
 
 	hmass = mass;
