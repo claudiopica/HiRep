@@ -133,9 +133,12 @@ static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, suN
 
     if((r*r)<par->err2*innorm2){
       notconverged=0;
-    } else {
+    }
+		/* just for debug 
+		else {
 			 lprintf("INVERTER",30,"MINRES iter %d res: %1.8e\n",cgiter,(r*r)/innorm2);
 		}
+		*/
 	
 	
   } while ((par->max_iter==0 || cgiter<par->max_iter) && notconverged);

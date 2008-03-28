@@ -13,41 +13,22 @@
 #include <math.h>
 #include "logger.h"
 
-/* State quantities for RHMC */
-static suNg *u_gauge_old;
-suNg_algebra_vector *momenta;
-suNf_spinor **pf;
-rhmc_par _update_par;
-rational_app r_S;  /* used for computing the action S in the metropolis test */
-rational_app r_MD; /* used in the action MD evolution */
-rational_app r_HB;  /* used in pseudofermions heatbath */
-double minev, maxev; /* min and max eigenvalue of H^2 */
+/* State quantities for RHMC declared in fermions_update_common.c */
+extern suNg_algebra_vector *momenta;
+extern suNf_spinor **pf;
+extern rhmc_par _update_par;
+extern rational_app r_S;  /* used for computing the action S in the metropolis test */
+extern rational_app r_MD; /* used in the action MD evolution */
+extern rational_app r_HB;  /* used in pseudofermions heatbath */
+extern double minev, maxev; /* min and max eigenvalue of H^2 */
 /* END of State */
 
 static short int init=0;
 
 /* local action array for metropolis test */
-static double *la=0;
-
-/* this is the basic operator used in the update */
-static suNf_spinor *h2tmp;
-#ifdef UPDATE_EO
-void H2(suNf_spinor *out, suNf_spinor *in){
-  g5Dphi_eopre(_update_par.mass, h2tmp, in);
-  g5Dphi_eopre(_update_par.mass, out, h2tmp);
-}
-#else
-void H2(suNf_spinor *out, suNf_spinor *in){
-  g5Dphi(_update_par.mass, h2tmp, in);
-  g5Dphi(_update_par.mass, out, h2tmp);
-}
-#endif
-/* this is the basic operator used in the update */
-/*
-void H(suNf_spinor *out, suNf_spinor *in){
-  g5Dphi(_update_par.mass, out, in);
-}
-*/
+static double *la=NULL;
+/* gauge field copy */
+static suNg *u_gauge_old=NULL;
 
 static int gcd(int a, int b) {
 	while (b!=0){
@@ -84,6 +65,11 @@ void flip_mom()
 void init_rhmc(rhmc_par *par){
 	int i;
 	unsigned int len;
+
+	if (init) /* already initialized */
+		return;
+
+	init_fermions_common();
 
 	lprintf("RHMC",0,"Initializing...\n");
 
@@ -136,9 +122,6 @@ void init_rhmc(rhmc_par *par){
 		pf[i]=pf[i-1]+len;
 	}
 
-	/* allocate h2tmp for H2 */
-  h2tmp=alloc_spinor_field_f(1);
-
 	/* allocate memory for the local action */
 	if(la==0)
 		la=malloc(sizeof(*la)*VOLUME);
@@ -180,14 +163,17 @@ void init_rhmc(rhmc_par *par){
 }
 
 void free_rhmc(){
-	/* free momenta */
-  free_field(u_gauge_old);
-  free_field(momenta);
-	free_field(h2tmp);
-	free_field(pf[0]);
-	free(pf);
 
-  if(la!=0) free(la);
+	if (!init) /* not initialized */
+		return;
+
+	/* free momenta */
+  free_field(u_gauge_old); u_gauge_old=NULL;
+  free_field(momenta); momenta=NULL;
+	free_field(pf[0]);
+	free(pf); pf=NULL;
+
+  if(la!=NULL) free(la); la=NULL;
   
   r_app_free(&r_S);
   r_app_free(&r_MD);

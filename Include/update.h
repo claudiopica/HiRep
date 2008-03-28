@@ -16,6 +16,7 @@ void random_su2(double rho,double s[]);
 
 void Force0(double dt, suNg_algebra_vector *force);
 void Force(double dt, suNg_algebra_vector *force);
+void Force_rhmc_f(double dt, suNg_algebra_vector *force);
 
 typedef struct {
 	double tlen; /* trajectory lenght */
@@ -45,6 +46,8 @@ typedef struct {
 	int_par *MD_par;
 	int (*mshift_solver)(mshift_par *, spinor_operator, suNf_spinor *, suNf_spinor **);
 } rhmc_par;
+
+
 void flip_mom();
 void init_rhmc(rhmc_par *par);
 void free_rhmc();
@@ -59,9 +62,18 @@ void free_rhmc();
 int update_rhmc();
 int update_rhmc_o();
 
+/* HMC algorithm */
+void init_hmc(rhmc_par *par);
+void free_hmc();
+int update_hmc();
+
+
+/* common fermion update */
+void init_fermions_common();
+
 /* this is the basic operator used in the update */
 void H2(suNf_spinor *out, suNf_spinor *in);
-void Force_rhmc_f(double dt, suNg_algebra_vector *force);
+void H(suNf_spinor *out, suNf_spinor *in);
 
 typedef enum {
    NEW=1,

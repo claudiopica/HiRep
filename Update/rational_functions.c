@@ -188,6 +188,10 @@ void r_app_set(rational_app *app, double min, double max) {
 		cur_app += 2*bo+7;
 	}
 	/* if we cannot find a rational approx give an error! */
+	if(best==0) {
+		lprintf("RAPPROX",0,"Requested approximation was:\nnum=%d ; den=%d\nrelerr=%e ; min/max=%e\n",
+				app->n,app->d,app->rel_error,req_e);
+	}
   error((best==0),1,"r_app_set",
         "Failed to find a suitable rational approximation.\nPlease adjust the database and try again.\n");
 
@@ -254,7 +258,7 @@ void rational_func(rational_app *coef, spinor_operator Q, suNf_spinor *out, suNf
    cg_mshift(&inv_par, Q, in, inv_out);
 
    /* sum all the contributions */
-   spinor_field_mul_f(out,coef->a[0],in);
+   if (coef->a[0]!=0.) spinor_field_mul_f(out,coef->a[0],in);
    for (i=1; i<(coef->order)+1; ++i) {
       spinor_field_mul_add_assign_f(out,coef->a[i],inv_out[i-1]);
    }

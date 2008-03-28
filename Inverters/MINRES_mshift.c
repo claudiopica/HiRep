@@ -197,6 +197,7 @@ int MINRES_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spin
 	mshift_par par_save=*par;
 	short int *valid = malloc(sizeof(*valid)*(par->n));
 	
+	if (par->n==1) spinor_field_zero_f(out[0]);
 	iter=MINRES_mshift_core(valid, par, M, in, out);
 	msiter=iter;
 

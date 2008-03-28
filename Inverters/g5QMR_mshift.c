@@ -255,6 +255,7 @@ int g5QMR_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spino
 
 	orig=*par; /* save par */
 	valid=malloc(sizeof(short)*orig.n);
+	if (par->n==1) spinor_field_zero_f(out[0]);
 	cgiter=g5QMR_mshift_core(valid,par,M,in,out);
 	msiter=cgiter;
 

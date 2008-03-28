@@ -150,6 +150,7 @@ int cg_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor *
 	mshift_par par_save=*par;
 	short int *sflags = malloc(sizeof(*sflags)*(par->n));
 
+	if (par->n==1) spinor_field_zero_f(out[0]);
 	cgiter=cg_mshift_core(sflags, par, M, in, out);
 	msiter=cgiter; /* save multishift iterations for logging */
 
