@@ -7,22 +7,18 @@
 
 void gaussian_spinor_field(spinor_field *s) {
 	const double c1=1./sqrt(2.);
-	unsigned int ix,sx;
-/*	get_spinor_len(&len); */
-   FOR_LOCAL_SC(ix,sx) {
-      suNf_spinor* sptr=_SPINOR_AT(s,sx);
- 	  gauss((double*)sptr,sizeof(suNf_spinor)/sizeof(double));
-   }
+	unsigned int i;
+	spinor_descriptor *type = s->type;
+	for(i=0;i<type->local_pieces;i++)
+ 	  gauss((double*)(s->ptr+type->start[i]),type->len[i]*sizeof(suNf_spinor)/sizeof(double));
 	spinor_field_mul_f(s,c1,s);
 }
 
 void gaussian_spinor_field_flt(spinor_field_flt *s) {
 	const float c1=1./sqrt(2.);
-	unsigned int ix,sx;
-/*	get_spinor_len(&len); */
-   FOR_LOCAL_SC(ix,sx) {
-      suNf_spinor_flt* sptr=_SPINOR_AT(s,sx);
- 	  gauss_flt((float*)sptr,sizeof(suNf_spinor)/sizeof(float));
-   }
+	unsigned int i;
+	spinor_descriptor *type = s->type;
+	for(i=0;i<type->local_pieces;i++)
+ 	  gauss_flt((float*)(s->ptr+type->start[i]),type->len[i]*sizeof(suNf_spinor_flt)/sizeof(float));
 	spinor_field_mul_f_flt(s,c1,s);
 }
