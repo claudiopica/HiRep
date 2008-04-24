@@ -75,8 +75,7 @@
  *  ipt iup idown (as usual)
  * 
  * memory_map_counter: integer that counts the number of contiguos region of non redundant informations of the total array;
- * memory_map_adress: the starting point of every non reduntat zone
- * memory_map_length: the related length of every non reduntat zone
+ * memory_map_address: the starting point of every non reduntat zone
  *
  *
  * function_copy_length: integer that counts the number of sites that are redundant
@@ -94,21 +93,52 @@
 #include "error.h"
 
 
-#define np_x 2
-#define np_y 2
-#define np_z 2
-#define np_t 2
+
 #define true 1
 #define false 0
-#define myid 18
-#define proc_up(id,dir) 32
-#define proc_down(id,dir) 32
 
 
-#define local_index(nt,nx, ny, nz)  (nt+2*T_BORDER+T)%(2*T_BORDER+T)+\
-    (T+2*T_BORDER)*((nx+2*X_BORDER+X)%(2*X_BORDER+X))+\
-    (T+2*T_BORDER)*(X+2*X_BORDER)*((ny+2*Y_BORDER+Y)%(2*Y_BORDER+Y))+\
-    (T+2*T_BORDER)*(X+2*X_BORDER)*(Y+2*Y_BORDER)*((nz+2*Z_BORDER+Z)%(2*Z_BORDER+Z))
+static int proc_up(int id, int dir) 
+{
+  int ix,iy,iz,it;
+  
+  it = id%np_t;
+  ix = (id/np_t)%np_x;
+  iy = (id/(np_t*np_x))%np_y;
+  iz = id/(np_t*np_x*np_y);
+  
+  if(dir == 0) it = (it +1)%np_t;
+  if(dir == 1) ix = (ix +1)%np_x;
+  if(dir == 2) iy = (iy +1)%np_y;
+  if(dir == 3) iz = (iz +1)%np_z;
+  
+  return it + ix*np_t + iy*np_x*np_t + iz*np_y*np_x*np_t;
+}
+
+static int proc_down(int id, int dir)
+{
+  int ix,iy,iz,it;
+  
+  it = id%np_t;
+  ix = (id/np_t)%np_x;
+  iy = (id/(np_t*np_x))%np_y;
+  iz = id/(np_t*np_x*np_y);
+  
+  if(dir == 0) it = (it -1+np_t)%np_t;
+  if(dir == 1) ix = (ix -1+np_x)%np_x;
+  if(dir == 2) iy = (iy -1+np_y)%np_y;
+  if(dir == 3) iz = (iz -1+np_z)%np_z;
+  
+  return it + ix*np_t + iy*np_x*np_t + iz*np_y*np_x*np_t;
+}
+
+
+
+
+#define local_index(nt,nx,ny,nz)  ((nt+2*T_BORDER+T)%(2*T_BORDER+T)+	\
+  (T+2*T_BORDER)*((nx+2*X_BORDER+X)%(2*X_BORDER+X))+			\
+  (T+2*T_BORDER)*(X+2*X_BORDER)*((ny+2*Y_BORDER+Y)%(2*Y_BORDER+Y))+	\
+  (T+2*T_BORDER)*(X+2*X_BORDER)*(Y+2*Y_BORDER)*((nz+2*Z_BORDER+Z)%(2*Z_BORDER+Z)))
 
 typedef struct
 {
@@ -127,31 +157,28 @@ typedef struct
 } border_id;
 
 
-static int X_BORDER=1;
-static int Y_BORDER=1;
-static int Z_BORDER=1;
-static int T_BORDER=1;
-       
+
 static int OVERSIZE_VOLUME;
 static int TOTAL_VOLUME;
 static int N_BORDER;
 
-int memory_map_counter=0;
-int *memory_map_adress=NULL;
-int *memory_map_length=NULL;
+static int memory_map_counter=0;
+static int local_memory_map_counter=0;
+static unsigned int *memory_map_address=NULL;
+static unsigned int *memory_map_end=NULL;
 
 
-geometry_descriptor glattice; /* global lattice */
-
-unsigned int * function_copy_list_from=NULL;
-unsigned int * function_copy_list_to=NULL;
-int function_copy_length=0;
+static unsigned int * function_copy_list_from=NULL;
+static unsigned int * function_copy_list_to=NULL;
+static unsigned int * function_copy_list_len=NULL;
+static int function_copy_length=0;
 
 
 static int blx_start,bly_start,blz_start,blt_start;
 static int blx_width,bly_width,blz_width,blt_width;
 
 static int index_position=0;
+static int index_start_buffer=0;
 static int index_eval_border=-1;
 
 static int *map_true2oversize=NULL;
@@ -178,47 +205,68 @@ static void print_test()
 /*       printf("\t Z(su,giu') %d,%d\n",map_oversize2true[local_index(ax,ay,az+1,at)],map_oversize2true[local_index(ax,ay,az-1,at)]); */
 
     } 
-}
+/*   ax = ipt(3,3,3,0); */
+/*   printf("\t ipt(3,3,3,0)= %d,%d\n",ax,map_oversize2true[local_index(4,4,4,1)]);  */
+/*   ay=idn(ax,3); */
+/*   printf("\t idn(%d,3)= %d,%d\n",ax,ay,map_oversize2true[local_index(4,4,4,0)]);  */
+/*   ax=iup(ay,3); */
+/*   printf("\t iup(%d,3)= %d\n",ay,ax);  */
+   
+  
+  
+} 
+
+
+
 
 static void fix_geometry_descriptor()
 {
+  /*Setting glattice values*/
   int i;
-  glattice.local_pieces=N_BORDER + 1;
-  glattice.tot_pieces=(2*N_BORDER+1);
+  glattice.local_master_pieces=local_memory_map_counter;
+  glattice.total_master_pieces=memory_map_counter;
+  glattice.master_start=memory_map_address;
+  glattice.master_end=memory_map_end;
 
-  glattice.start=malloc((2*N_BORDER+1)*sizeof(unsigned int));
-  error((glattice.start==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
-	"Cannot allocate memory");
-
-  glattice.tlen=malloc((2*N_BORDER+1)*sizeof(unsigned int));
-  error((glattice.tlen==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
+  glattice.buf_len=malloc((N_BORDER)*sizeof(unsigned int));
+  error((glattice.buf_len==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	"Cannot allocate memory");
 
-  glattice.sid=malloc((N_BORDER)*sizeof(unsigned int));
-  error((glattice.sid==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
+  glattice.sbuf_to_proc=malloc((N_BORDER)*sizeof(unsigned int));
+  error((glattice.sbuf_to_proc==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	"Cannot allocate memory");
   
-  glattice.rid=malloc((N_BORDER)*sizeof(unsigned int));
-  error((glattice.rid==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
+  glattice.sbuf_start=malloc((N_BORDER)*sizeof(unsigned int));
+  error((glattice.sbuf_start==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	"Cannot allocate memory");
   
-  for(i=0;i<(2*N_BORDER+1);i++) (glattice.start)[i] = border[i].index_start;
+  glattice.rbuf_from_proc=malloc((N_BORDER)*sizeof(unsigned int));
+  error((glattice.rbuf_from_proc==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
+	"Cannot allocate memory");
+
+  glattice.rbuf_start=malloc((N_BORDER)*sizeof(unsigned int));
+  error((glattice.rbuf_start==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
+	"Cannot allocate memory");
   
-  
+  glattice.nbuffers = N_BORDER;
   for(i=0;i<N_BORDER;i++)
     {
-      (glattice.sid)[i] = border[i+1].id_proc;
-      (glattice.rid)[i] = border[i+1+N_BORDER].id_proc;
+      (glattice.sbuf_to_proc)[i] = border[i+1].id_proc;
+      (glattice.rbuf_from_proc)[i] = border[i+1+N_BORDER].id_proc;
+      (glattice.sbuf_start)[i] = border[i+1].index_start;
+      (glattice.rbuf_start)[i] = border[i+1+N_BORDER].index_start;
+      (glattice.buf_len)[i] = border[i+1].index_end - border[i+1].index_start;
+
     }
 
   
   glattice.copy_from=function_copy_list_from;
-  
   glattice.copy_to=function_copy_list_to;
-  
-  glattice.ncopy=function_copy_length;
+  glattice.copy_len=function_copy_list_len;
+  glattice.ncopies=function_copy_length;
   
   glattice.gsize=index_position;
+
 }
 
 static void geometry_mpi_init()
@@ -318,7 +366,7 @@ static void  fix_next_neightbours()
       for (x1=0;x1<X+2*X_BORDER;x1++)
 	for (x0=0;x0<T+2*T_BORDER;x0++)
 	  {
-
+	    
 	    ix = map_oversize2true[local_index(x0,x1,x2,x3)];
 	    
 	    if(x3 >= Z_BORDER && x3 <Z+ Z_BORDER)
@@ -327,17 +375,20 @@ static void  fix_next_neightbours()
 		  if(x0 >= T_BORDER && x0 <T+ T_BORDER)
 		    ipt(x0-T_BORDER,x1-X_BORDER,x2-Y_BORDER,x3-Z_BORDER)=ix ;
 	    
-	    
-	    iup(ix,0)=map_oversize2true[local_index(x0,x1,x2,x3+1)];
-	    idn(ix,0)=map_oversize2true[local_index(x0,x1,x2,x3-1)];
-	    iup(ix,1)=map_oversize2true[local_index(x0+1,x1,x2,x3)];
-	    idn(ix,1)=map_oversize2true[local_index(x0-1,x1,x2,x3)];
-	    iup(ix,2)=map_oversize2true[local_index(x0,x1+1,x2,x3)];
-	    idn(ix,2)=map_oversize2true[local_index(x0,x1-1,x2,x3)];
-	    iup(ix,3)=map_oversize2true[local_index(x0,x1,x2+1,x3)];
-	    idn(ix,3)=map_oversize2true[local_index(x0,x1,x2-1,x3)];
-	    
+	    if(ix != -1)
+	      {
+		iup(ix,0)=map_oversize2true[local_index(x0+1,x1,x2,x3)];
+		idn(ix,0)=map_oversize2true[local_index(x0-1,x1,x2,x3)];
+		iup(ix,1)=map_oversize2true[local_index(x0,x1+1,x2,x3)];
+		idn(ix,1)=map_oversize2true[local_index(x0,x1-1,x2,x3)];
+		iup(ix,2)=map_oversize2true[local_index(x0,x1,x2+1,x3)];
+		idn(ix,2)=map_oversize2true[local_index(x0,x1,x2-1,x3)];
+		iup(ix,3)=map_oversize2true[local_index(x0,x1,x2,x3+1)];
+		idn(ix,3)=map_oversize2true[local_index(x0,x1,x2,x3-1)];
+	      }
+	   	    
 	  }
+  
 }
 
 
@@ -386,7 +437,7 @@ static int check_evaluated_border(int level)
   
   if(retval) 
     {
-/*       printf("CALCOLO BORDO L%d %d,%d,%d,%d,%d,%d,%d,%d\n",level,blt_start,blx_start,bly_start,blz_start,blt_width,blx_width,bly_width,blz_width); */
+     /*  printf("CALCOLO BORDO L%d %d,%d,%d,%d,\t%d,%d,%d,%d\n",level,blt_start,blx_start,bly_start,blz_start,blt_width,blx_width,bly_width,blz_width); */
       index_eval_border++;
       border[index_eval_border].bt_start = blt_start;
       border[index_eval_border].bx_start = blx_start;
@@ -436,25 +487,20 @@ static void walk_on_lattice(int level)
   int x0,x1,x2,x3;
   if(check_evaluated_border(level))
     {
-      for (x3=blz_start;x3<blz_start+blz_width;x3++) 
-	for (x2=bly_start;x2<bly_start+bly_width;x2++) 
-	  for (x1=blx_start;x1<blx_start+blx_width;x1++) 
-	    for (x0=blt_start;x0<blt_start+blt_width;x0++)
-	      if(local_index(x0,x1,x2,x3)%2)
-		set_border_pointer(local_index(x0,x1,x2,x3),level);
+      
       
       for (x3=blz_start;x3<blz_start+blz_width;x3++) 
 	for (x2=bly_start;x2<bly_start+bly_width;x2++) 
 	  for (x1=blx_start;x1<blx_start+blx_width;x1++) 
 	    for (x0=blt_start;x0<blt_start+blt_width;x0++)
-	      if(!(local_index(x0,x1,x2,x3)%2))
-		set_border_pointer(local_index(x0,x1,x2,x3),level);
+	      set_border_pointer(local_index(x0,x1,x2,x3),level);
       
     }
 }
 
 static void fix_buffer()
 {
+  index_start_buffer=index_position;
   int i,done_border=index_eval_border+1,id;
   int x0,x1,x2,x3;
   
@@ -484,7 +530,8 @@ static void fix_buffer()
 	      border[index_eval_border].bt_start= 0;
 	    }
 	}
-      
+      else
+	border[index_eval_border].bt_start = border[i].bt_start;
       
       if(blx_width == X_BORDER )
 	{
@@ -499,7 +546,9 @@ static void fix_buffer()
 	      border[index_eval_border].bx_start= 0;
 	    }
 	}
-      
+       else
+	 border[index_eval_border].bx_start = border[i].bx_start;
+     
       if(bly_width == Y_BORDER )
 	{
 	  if( border[i].by_start == Y_BORDER )
@@ -513,31 +562,39 @@ static void fix_buffer()
 	      border[index_eval_border].by_start= 0;
 	    }
 	}
-      
+       else
+	 border[index_eval_border].by_start = border[i].by_start;
+     
       if(blz_width == Z_BORDER )
 	{
 	  if( border[i].bz_start == Z_BORDER )
 	    {
-	      id = proc_up(id,2);
+	      id = proc_up(id,3);
 	      border[index_eval_border].bz_start= Z+Z_BORDER;
 	    }
 	  else if( border[i].bz_start == Z) 
 	    {
-	      id = proc_down(id,2);
+	      id = proc_down(id,3);
 	      border[index_eval_border].bz_start= 0;
 	    }
 	}
+       else
+	 border[index_eval_border].bz_start = border[i].bz_start;
       
       border[index_eval_border].id_proc = id;
- 
+      
       set_block_start(border[index_eval_border].bt_start,border[index_eval_border].bx_start,border[index_eval_border].by_start,border[index_eval_border].bz_start);
- 
+      
+      border[index_eval_border].index_start = index_position ;
+      border[index_eval_border].index_end = index_position +blt_width*blx_width*bly_width*blz_width;
+
+      /* printf("CALCOLO BUFFER L%d %d,%d,%d,%d\t,%d,%d,%d,%d\n",border[index_eval_border].level,blt_start,blx_start,bly_start,blz_start,blt_width,blx_width,bly_width,blz_width); */
+
       for (x3=blz_start;x3<blz_start+blz_width;x3++) 
 	for (x2=bly_start;x2<bly_start+bly_width;x2++) 
 	  for (x1=blx_start;x1<blx_start+blx_width;x1++) 
 	    for (x0=blt_start;x0<blt_start+blt_width;x0++) 
 	      set_border_pointer(local_index(x0,x1,x2,x3),border[index_eval_border].level);
-      
       
     }
 }
@@ -730,85 +787,134 @@ static void set_border(int dir){
 
 static void set_memory_order()
 {
-  int i1,i2;
-  int check[index_position];
-  int oversize_zone_addr_list[index_position];
-  int oversize_zone_length_list[index_position];
+  int i1,i2=0;
+  int check[OVERSIZE_VOLUME];
+  unsigned int oversize_zone_addr_list[index_position];
+  unsigned int oversize_zone_length_list[index_position];
   
   int counter_zone=0;
-  int test=1,zone_length=0,zone_addr=0;
-  
+  int test_white=1,test_black=1,zone_length=0,zone_addr=0;
   int tmp_function_copy_list_from[index_position];
   int tmp_function_copy_list_to[index_position];
-  int tmp_function_copy_length=0;
+  int tmp_function_copy_list_len[index_position];
+  int tmp_function_copy_length=-1;
   
-  for (i1=0;i1<index_position;i1++) check[i1]=0;
-  
-  for (i1=0;i1<index_position;i1++)
-    {
-      i2 = map_true2oversize[i1];
-      if(check[i2]==0) 
-	{
-	  check[i2]=1;
-	  zone_length++;
-	  if(test==1)
-	    {
-	      zone_addr=i1; 
-	      test=0;
-	    }
-	}
-      else
-	{
-	  if(test==0)
-	    {
-	      oversize_zone_addr_list[counter_zone]=zone_addr;
-	      oversize_zone_length_list[counter_zone]=zone_length;
-	      counter_zone++;
-	    }
-	  
-	  test=1;
-	  zone_length=0;
-	  
-	  tmp_function_copy_list_from[tmp_function_copy_length]=map_oversize2true[i2];
-	  tmp_function_copy_list_to[tmp_function_copy_length]=i1;
-	  tmp_function_copy_length++;
+  for (i1=0;i1<OVERSIZE_VOLUME;i1++) check[i1]=0;
 
-	}
-	  
-    }
-  if(counter_zone!=0)
+  /*The inner lattice*/
+  oversize_zone_addr_list[counter_zone]=border[counter_zone].index_start;
+  oversize_zone_length_list[counter_zone]=border[counter_zone].index_end-border[counter_zone].index_start;
+  counter_zone++;
+
+  /*Border & Buffer*/
+  for (i1=border[0].index_end;i1<index_position;i1++)
+  {
+    if( i1==index_start_buffer ) local_memory_map_counter=counter_zone;
+    i2 = map_true2oversize[i1];
+    if(check[i2]==0)
     {
-      memory_map_adress=malloc(counter_zone*sizeof(int));
-      error((memory_map_adress==NULL),1,"set_memory_order [geometry_mpi.c]", 
-	    "Cannot allocate memory"); 
-      
-      memory_map_length=malloc(counter_zone*sizeof(int)); 
-      error((memory_map_length==NULL),1,"set_memory_order [geometry_mpi.c]", 
-	    "Cannot allocate memory"); 
-      
-      for (i1=0;i1<counter_zone;i1++) 
-	{ 
-	  memory_map_adress[i1]=oversize_zone_addr_list[i1]; 
-	  memory_map_length[i1]=oversize_zone_length_list[i1]; 
-	} 
-      memory_map_counter=counter_zone; 
+      check[i2]=1;
+      zone_length++;
+      if(test_white==1)
+      {
+        zone_addr=i1; 
+        test_white=0;
+      }
+      test_black=0;
     }
- if(tmp_function_copy_length!=0)
-   {
-     function_copy_list_from=malloc(tmp_function_copy_length*2*sizeof(int));
-     error((function_copy_list_from==NULL),1,"set_memory_order [geometry_mpi.c]",
-	   "Cannot allocate memory");
-     function_copy_list_to=malloc(tmp_function_copy_length*2*sizeof(int));
-     error((function_copy_list_to==NULL),1,"set_memory_order [geometry_mpi.c]", 
-	   "Cannot allocate memory"); 
-     
-     for (i1=0;i1<tmp_function_copy_length;i1++) 
-       { 
-	 function_copy_list_from[i1]=tmp_function_copy_list_from[i1]; 
-	 function_copy_list_to[i1]=tmp_function_copy_list_to[i1]; 
-       } 
-     function_copy_length=tmp_function_copy_length;
+    else
+    {
+      if(test_white==0)
+      {
+        oversize_zone_addr_list[counter_zone]=zone_addr;
+        oversize_zone_length_list[counter_zone]=zone_length;
+        counter_zone++;
+      }
+
+      test_white=1;
+      zone_length=0;
+
+      if(map_oversize2true[i2]==map_oversize2true[map_true2oversize[i1-1]]+1 && test_black==1)
+      {
+        tmp_function_copy_list_len[tmp_function_copy_length]++; 
+      }
+      else
+      {
+        tmp_function_copy_length++;
+        tmp_function_copy_list_from[tmp_function_copy_length]=map_oversize2true[i2];
+        tmp_function_copy_list_to[tmp_function_copy_length]=i1;
+        tmp_function_copy_list_len[tmp_function_copy_length]=1;
+        test_black=1;
+      }
+
     }
+
+  }
+  
+  
+  if(map_oversize2true[i2]==map_oversize2true[map_true2oversize[i1-1]]+1 && test_black==1)
+  {
+    tmp_function_copy_list_len[tmp_function_copy_length]++; 
+  }
+  else
+  {
+    tmp_function_copy_length++;
+    tmp_function_copy_list_from[tmp_function_copy_length]=map_oversize2true[i2];
+    tmp_function_copy_list_to[tmp_function_copy_length]=i1;
+    tmp_function_copy_list_len[tmp_function_copy_length]=1;
+    test_black=1;
+  }
+
+
+  if(test_white==0)
+  {
+    oversize_zone_addr_list[counter_zone]=zone_addr;
+    oversize_zone_length_list[counter_zone]=zone_length;
+    counter_zone++;
+  }
+
+
+  if(counter_zone!=0)
+  {
+    memory_map_address=malloc(counter_zone*sizeof(unsigned int));
+    error((memory_map_address==NULL),1,"set_memory_order [geometry_mpi.c]", 
+    "Cannot allocate memory"); 
+
+    memory_map_end=malloc(counter_zone*sizeof(unsigned int)); 
+    error((memory_map_end==NULL),1,"set_memory_order [geometry_mpi.c]", 
+    "Cannot allocate memory"); 
+
+    for (i1=0;i1<counter_zone;i1++) 
+    { 
+      memory_map_address[i1]=oversize_zone_addr_list[i1]; 
+      memory_map_end[i1]=memory_map_address[i1]+oversize_zone_length_list[i1]-1;
+    } 
+    memory_map_counter=counter_zone; 
+  }
+
+  if(tmp_function_copy_length!=0)
+  {
+    function_copy_list_from=malloc(tmp_function_copy_length*sizeof(int));
+    error((function_copy_list_from==NULL),1,"set_memory_order [geometry_mpi.c]",
+    "Cannot allocate memory");
+
+    function_copy_list_to=malloc(tmp_function_copy_length*sizeof(int));
+    error((function_copy_list_to==NULL),1,"set_memory_order [geometry_mpi.c]", 
+    "Cannot allocate memory"); 
+
+    function_copy_list_len=malloc(tmp_function_copy_length*sizeof(int));
+    error((function_copy_list_len==NULL),1,"set_memory_order [geometry_mpi.c]", 
+    "Cannot allocate memory"); 
+
+
+    for (i1=0;i1<tmp_function_copy_length;i1++) 
+    { 
+      function_copy_list_from[i1]=tmp_function_copy_list_from[i1]; 
+      function_copy_list_to[i1]=tmp_function_copy_list_to[i1]; 
+      function_copy_list_len[i1]=tmp_function_copy_list_len[i1]; 
+    } 
+    function_copy_length=tmp_function_copy_length;
+  }
 }
 
 
@@ -837,22 +943,20 @@ void geometry_mpi(void)
   set_border(3);
 
   fix_buffer(); 
-
-  print_test();
   
   set_memory_order();
 
   fix_geometry_descriptor(); 
   
-  geometry_mem_alloc(&glattice);
+  geometry_mem_alloc();
   
   fix_next_neightbours(); 
   
+  print_test();
+
   geometry_mpi_finalize(); 
-  
+ 
 }
-
-
 
 
 

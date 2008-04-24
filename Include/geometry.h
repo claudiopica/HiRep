@@ -2,17 +2,17 @@
 #define GEOMETRY_H
 
 typedef struct {
-  unsigned int local_pieces; /* reticolo ristretto + output buffers */
-  unsigned int tot_pieces; /* above + input buffers */
-  unsigned int *start; /* starting index for each piece. len=tot_pieces */
-  unsigned int *len; /* length for each local piece for unique points. len=local_pieces */
-  unsigned int *tlen; /* total lenght for each piece. len=tot_pieces */
-  unsigned int ncopy; /* tot number of buffer copies needed to fill the holes. */
-  unsigned int *copy_from, *copy_to, *copy_len; /* len=ncopy */
-  int *sid; /* cartesian id of the node to which the local buffers must be sent. len=local_pieces*/
-  int *rid; /* cartesian id of the node from which the input buffers are received. len=tot_pieces-local_pieces*/
-  unsigned int gsize; /* global size of the associated array = \sum_i tlen_i */
+  unsigned int local_master_pieces, total_master_pieces;
+  unsigned int *master_start, *master_end;
+  unsigned int ncopies;
+  unsigned int *copy_from, *copy_to, *copy_len;
+  unsigned int nbuffers;
+  unsigned int *buf_len;
+  unsigned int *rbuf_from_proc, *rbuf_start;
+  unsigned int *sbuf_to_proc, *sbuf_start;
+  unsigned int gsize;
 } geometry_descriptor;
+
 
 typedef struct {
   int size;
@@ -22,20 +22,39 @@ typedef struct {
   int *len; /* length for each local piece for unique points. len=local_pieces */
 } spinor_descriptor;
 
-#define LOCAL_SD_FOR(sd,i,j) \
-	for(i=0;i<sd->local_pieces;i++) for(j=sd->start[i];j<sd->start[i]+sd->len[i];j++)
+
+
+
+#define LOCAL_GD_FOR(gd,i,j) \
+	for(i=0;i<(gd)->local_pieces;i++) for(j=(gd)->start[i];j<(gd)->start[i]+(gd)->len[i];j++)
 
 void geometry_mpi(void);
-void geometry_init(void);
+void geometry_mpi_eo(void);
 void geometry_set(void);
-void geometry_mem_alloc(geometry_descriptor*);
-void geometry_blocked(void);
-void geometry_blocked_noT(void);
-void geometry_lexi(void);
-void geometry_eo_lexi(void);
+void geometry_mem_alloc(void);
 
-void test_geometry(void);
-void print_geometry(void);
+void test_geometry_mpi(void);
 void print_wdmatrix(char *filename);
+
+
+
+
+
+
+
+
+
+
+/* THESE STUFF ARE SUPPOSED OT BE REMOVED IN A NEAR FUTURE */
+
+#define np_x 3
+#define np_y 3
+#define np_z 3
+#define np_t 3
+#define myid 1 + np_t + np_x*np_t + np_y*np_x*np_t
+#define myid_sign 0
+
+/* THESE STUFF ARE SUPPOSED OT BE REMOVED IN A NEAR FUTURE  (UP TO HERE)*/
+
 
 #endif

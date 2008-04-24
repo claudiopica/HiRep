@@ -1,3 +1,7 @@
+check_algebra_1		Check the generators
+
+check_geometry_1	Check the geometry
+
 check0		Check that _group_represent is homomorphic
 
 check1		Check gauge covariance of the Dirac operator
@@ -14,8 +18,6 @@ check6		Check of the MINRES inversion
 
 check7 		Check of QMR multishift
 
-check8		Check the generators
-
 check9		Check the eva module using a random field
 
 check10		Check the eva module using a free field
@@ -26,4 +28,4 @@ check12		Initialization of the link momenta
 
 check13 	Check the mesons (both mesons.c and dublin_mesons.c) using a free field
 
-check14   Check the dirac_eva module using a random field
+check14   	Check the dirac_eva module using a random field

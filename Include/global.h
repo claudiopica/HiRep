@@ -14,9 +14,11 @@
 #ifdef MAIN_PROGRAM
 #  define GLB_PTR(type,name) type *name=NULL
 #  define GLB_VAR(type,name,value) type name=(value)
+#  define GLB_STR(type,name) type name
 #else
 #  define GLB_PTR(type,name) extern type *name
 #  define GLB_VAR(type,name,value) extern type name
+#  define GLB_STR(type,name) extern type name
 #endif
 
 GLB_VAR(int,T,0);
@@ -26,6 +28,12 @@ GLB_VAR(int,Z,0);
 /*GLB_VAR(int,L,0);*/
 GLB_VAR(int,VOL3,0);
 GLB_VAR(int,VOLUME,0);
+
+GLB_VAR(int,T_BORDER,1);
+GLB_VAR(int,X_BORDER,1);
+GLB_VAR(int,Y_BORDER,1);
+GLB_VAR(int,Z_BORDER,1);
+
 /*
 #define VOLUME (T*L*L*L)
 #define VOL3   (L*L*L)
@@ -45,10 +53,19 @@ GLB_PTR(int, ipt_4d);
 GLB_PTR(int, iup);
 GLB_PTR(int, idn);
 
+/* Geometry structures */
 #define ipt(t,x,y,z) ipt[(t)*(VOL3)+(x)*(Y*Z)+(y)*(Z)+(z)]
 #define ipt_4d(t,x) ipt_4d[(t)*(VOL3)+(x)]
 #define iup(site,dir) iup[(site)*4+(dir)]
 #define idn(site,dir) idn[(site)*4+(dir)]
+
+/* Geometry structures */
+#include "geometry.h"
+
+GLB_STR(geometry_descriptor,glattice); /* global lattice */
+GLB_STR(geometry_descriptor,glat_even); /* global even lattice */
+GLB_STR(geometry_descriptor,glat_odd); /* global odd lattice */
+
 
 /* Gauge field */
 #include "suN_types.h"
@@ -67,8 +84,11 @@ GLB_PTR(suNf_flt, u_gauge_f_flt);
 #define pu_gauge_f_flt(ix,mu) (u_gauge_f_flt+coord_to_index(ix,mu))
 
 #undef GLB_PTR
+#undef GLB_STR
 #undef EXTERN
 #undef INIT
 
+
 #endif
+
 
