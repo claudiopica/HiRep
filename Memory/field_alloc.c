@@ -8,7 +8,6 @@
 
 #include <stdlib.h>
 #include "suN.h"
-#include "linear_algebra.h"
 #include "error.h"
 #include "memory.h"
 #include "global.h"

@@ -9,7 +9,7 @@
  */
 
 #include "suN.h"
-
+#include "spinor_field.h"
 
 /*
 typedef struct {

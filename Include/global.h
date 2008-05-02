@@ -69,6 +69,7 @@ GLB_STR(geometry_descriptor,glat_odd); /* global odd lattice */
 
 /* Gauge field */
 #include "suN_types.h"
+#include "spinor_field.h"
 
 GLB_PTR(suNg, u_gauge);
 GLB_PTR(suNg_flt, u_gauge_flt);

@@ -163,6 +163,17 @@ static int local_memory_map_counter=0;
 static unsigned int *memory_map_address=NULL;
 static unsigned int *memory_map_end=NULL;
 
+static int memory_map_counter_e=0;
+static int local_memory_map_counter_e=0;
+static unsigned int *memory_map_address_e=NULL;
+static unsigned int *memory_map_end_e=NULL;
+static int index_counter_e=0;
+
+static int memory_map_counter_o=0;
+static int local_memory_map_counter_o=0;
+static unsigned int *memory_map_address_o=NULL;
+static unsigned int *memory_map_end_o=NULL;
+static int index_counter_o=0;
 
 static unsigned int * function_copy_list_from=NULL;
 static unsigned int * function_copy_list_to=NULL;
@@ -222,8 +233,12 @@ static void fix_geometry_descriptor()
   glattice.master_end=memory_map_end;
   glattice.gsize=index_position;
 
-  glattice.buf_len=malloc((N_BORDER)*sizeof(unsigned int));
-  error((glattice.buf_len==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
+  glattice.rbuf_len=malloc((N_BORDER)*sizeof(unsigned int));
+  error((glattice.rbuf_len==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
+	"Cannot allocate memory");
+
+  glattice.sbuf_len=malloc((N_BORDER)*sizeof(unsigned int));
+  error((glattice.sbuf_len==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	"Cannot allocate memory");
 
   glattice.sbuf_to_proc=malloc((N_BORDER)*sizeof(unsigned int));
@@ -250,7 +265,7 @@ static void fix_geometry_descriptor()
       (glattice.rbuf_from_proc)[i] = border[i+1+N_BORDER].id_proc;
       (glattice.sbuf_start)[i] = border[i+1].index_start;
       (glattice.rbuf_start)[i] = border[i+1+N_BORDER].index_start;
-      (glattice.buf_len)[i] = border[i+1].index_end - border[i+1].index_start;
+      (glattice.sbuf_len)[i] = (glattice.rbuf_len)[i] = border[i+1].index_end - border[i+1].index_start;
 
     }
 
@@ -262,50 +277,12 @@ static void fix_geometry_descriptor()
 
   /*Setting glat_even & glat_odd values*/
 
+  glat_even.rbuf_len=malloc((N_BORDER)*sizeof(unsigned int));
+  error((glat_even.rbuf_len==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
+	"Cannot allocate memory");
 
-  int test_q=true,point;
-  for(i=0;i< N_BORDER+1;i++)
-    {
-      if(  site_sign(border[i].index_start)  ==  site_sign(border[i].index_end-1) )
- 	{
- 	  test_q=false;
- 	  printf("WRONG INDEX START %d, END %d \n",site_sign(border[i].index_start), site_sign(border[i].index_end-1));
- 	}
-      if(border[i].index_end-border[i].index_start>2)
-	{
-	  point = find_change_point(border[i].index_start,border[i].index_end-1);
-	  
-	  /* 	printf("PUNTO DI MEZZO %d \n",site_sign(point)); */
-	  /* 	printf("PUNTO DI MEZZO -1 %d \n",site_sign(point-1)); */
-	  
-	  if(site_sign(point) == site_sign(point-1))
-	    {
-	      printf("BORDO BASTARDO %d \n",i);
-	      printf("\tSTART %d \n",border[i].index_start);
-	      printf("\tEND   %d \n",border[i].index_end-1);
-	      printf("\tMIDDLE POINT ROUITNE   %d \n",find_change_point(border[i].index_start,border[i].index_end-1));
-	      
-	      printf("\tPUNTO DI INIZIO -1 %d:%d \n",border[i].index_start-1,site_sign(border[i].index_start-1)); 
-	      printf("\tPUNTO DI INIZIO    %d:%d \n",border[i].index_start,site_sign(border[i].index_start)); 
-	      printf("\tPUNTO DI MEZZO -1  %d:%d \n",point-1,site_sign(point-1));
-	      printf("\tPUNTO DI MEZZO     %d:%d \n",point,site_sign(point)); 
-	      printf("\tPUNTO DI MEZZO +1  %d:%d \n",point+1,site_sign(point+1));
-	      printf("\tPUNTO DI FINE      %d:%d \n",border[i].index_end-1,site_sign(border[i].index_end-1));
-	      printf("\tPUNTO DI FINE +1   %d:%d \n\n\n",border[i].index_end,site_sign(border[i].index_end));
-	      
-	      
-	    }
-	  
-	}
-      
-    }
-  
-  error(!test_q,1,"geometry_mpi.c","Test whether the buffer start always with even and end always with odd... NOT PASSED");
-  
-  
-
-  glat_even.buf_len=malloc((N_BORDER)*sizeof(unsigned int));
-  error((glat_even.buf_len==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
+  glat_even.sbuf_len=malloc((N_BORDER)*sizeof(unsigned int));
+  error((glat_even.sbuf_len==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	"Cannot allocate memory");
 
   glat_even.sbuf_to_proc=malloc((N_BORDER)*sizeof(unsigned int));
@@ -324,8 +301,12 @@ static void fix_geometry_descriptor()
   error((glat_even.rbuf_start==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	"Cannot allocate memory");
 
-  glat_odd.buf_len=malloc((N_BORDER)*sizeof(unsigned int));
-  error((glat_odd.buf_len==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
+  glat_odd.rbuf_len=malloc((N_BORDER)*sizeof(unsigned int));
+  error((glat_odd.rbuf_len==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
+	"Cannot allocate memory");
+
+  glat_odd.sbuf_len=malloc((N_BORDER)*sizeof(unsigned int));
+  error((glat_odd.sbuf_len==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	"Cannot allocate memory");
 
   glat_odd.sbuf_to_proc=malloc((N_BORDER)*sizeof(unsigned int));
@@ -346,7 +327,7 @@ static void fix_geometry_descriptor()
   
   glat_odd.nbuffers = N_BORDER;
 
-  glattice.nbuffers = N_BORDER;
+  glat_even.nbuffers = N_BORDER;
 
   for(i=0;i<N_BORDER;i++)
     {
@@ -355,24 +336,45 @@ static void fix_geometry_descriptor()
       (glat_odd.sbuf_to_proc)[i] = border[i+1].id_proc;
       (glat_odd.rbuf_from_proc)[i] = border[i+1+N_BORDER].id_proc;
 
+
       if(site_sign(border[i+1].index_start))
 	{
 	  (glat_even.sbuf_start)[i] = border[i+1].index_start;
 	  (glat_odd.sbuf_start)[i] = find_change_point(border[i+1].index_start,border[i+1].index_end-1);
-	  (glat_even.rbuf_start)[i] = border[i+1+N_BORDER].index_start;
-	  (glat_odd.rbuf_start)[i] = find_change_point(border[i+1+N_BORDER].index_start,border[i+1+N_BORDER].index_end-1);
-	  (glat_even.buf_len)[i] = find_change_point(border[i+1].index_start,border[i+1].index_end-1) - border[i+1].index_end;
-	  (glat_odd.buf_len)[i] = border[i+1].index_end - find_change_point(border[i+1].index_start,border[i+1].index_end-1) + 1;
+	  (glat_even.sbuf_len)[i] = find_change_point(border[i+1].index_start,border[i+1].index_end-1) - border[i+1].index_start;
+	  (glat_odd.sbuf_len)[i] = border[i+1].index_end - find_change_point(border[i+1].index_start,border[i+1].index_end-1) + 1;
+	  
 	}
       else
 	{
 	  (glat_odd.sbuf_start)[i] = border[i+1].index_start;
 	  (glat_even.sbuf_start)[i] = find_change_point(border[i+1].index_start,border[i+1].index_end-1);
+	  (glat_odd.sbuf_len)[i] = find_change_point(border[i+1].index_start,border[i+1].index_end-1) - border[i+1].index_start;
+	  (glat_even.sbuf_len)[i] = border[i+1].index_end - find_change_point(border[i+1].index_start,border[i+1].index_end-1) + 1;
+	}
+
+
+      if(site_sign(border[i+1+N_BORDER].index_start))
+	{
+	  (glat_even.rbuf_start)[i] = border[i+1+N_BORDER].index_start;
+	  (glat_odd.rbuf_start)[i] = find_change_point(border[i+1+N_BORDER].index_start,border[i+1+N_BORDER].index_end-1);
+	  (glat_even.rbuf_len)[i] = (glat_odd.rbuf_start)[i] - border[i+1+N_BORDER].index_start; 
+	  (glat_odd.rbuf_len)[i] = border[i+1+N_BORDER].index_end -(glat_odd.rbuf_start)[i];
+
+	}
+      else
+	{
 	  (glat_odd.rbuf_start)[i] = border[i+1+N_BORDER].index_start;
 	  (glat_even.rbuf_start)[i] = find_change_point(border[i+1+N_BORDER].index_start,border[i+1+N_BORDER].index_end-1);
-	  (glat_odd.buf_len)[i] = find_change_point(border[i+1].index_start,border[i+1].index_end-1) - border[i+1].index_end;
-	  (glat_even.buf_len)[i] = border[i+1].index_end - find_change_point(border[i+1].index_start,border[i+1].index_end-1) + 1;
+	  (glat_odd.rbuf_len)[i] = (glat_even.rbuf_start)[i] - border[i+1+N_BORDER].index_start; 
+	  (glat_even.rbuf_len)[i] = border[i+1+N_BORDER].index_end -(glat_even.rbuf_start)[i];
+
 	}
+      
+   /*    printf("Both index %d sbuf start & len %d %d rbuf start & len %d %d \n",i,(glattice.sbuf_start)[i],(glattice.sbuf_len)[i],(glattice.rbuf_start)[i],(glattice.sbuf_len)[i]); */
+/*       printf("Even index %d sbuf start & len %d %d rbuf start & len %d %d \n",i,(glat_even.sbuf_start)[i],(glat_even.sbuf_len)[i],(glat_even.rbuf_start)[i],(glat_even.rbuf_len)[i]); */
+/*       printf("Odd index %d sbuf start & len %d %d rbuf start & len %d %d \n",i,(glat_odd.sbuf_start)[i],(glat_odd.sbuf_len)[i],(glat_odd.rbuf_start)[i],(glat_odd.rbuf_len)[i]); */
+     
 
     }
 
@@ -387,7 +389,18 @@ static void fix_geometry_descriptor()
   glat_odd.copy_to=function_copy_list_to_o;
   glat_odd.copy_len=function_copy_list_len_o;
   glat_odd.ncopies=function_copy_length_o;
- 
+
+  glat_even.local_master_pieces=local_memory_map_counter_e;
+  glat_even.total_master_pieces=memory_map_counter_e;
+  glat_even.master_start=memory_map_address_e;
+  glat_even.master_end=memory_map_end_e;
+  glat_even.gsize=index_counter_e;
+
+  glat_odd.local_master_pieces=local_memory_map_counter_o;
+  glat_odd.total_master_pieces=memory_map_counter_o;
+  glat_odd.master_start=memory_map_address_o;
+  glat_odd.master_end=memory_map_end_o;
+  glat_odd.gsize=index_counter_o;
 
 }
 
@@ -618,7 +631,7 @@ static void walk_on_lattice(int level)
 	    for (x0=blt_start;x0<blt_start+blt_width;x0++)
 	      if((x0+x1+x2+x3+myid_sign)&1)
 		set_border_pointer(local_index(x0,x1,x2,x3),level);
-      
+		  
       for (x3=blz_start;x3<blz_start+blz_width;x3++) 
 	for (x2=bly_start;x2<bly_start+bly_width;x2++) 
 	  for (x1=blx_start;x1<blx_start+blx_width;x1++) 
@@ -1075,39 +1088,45 @@ static void set_memory_order()
   int tmp_function_copy_to_o[index_position];
   int tmp_function_copy_len_o[index_position];
   int tmp_function_copy_length_o=0;
-
+  int start=0;
   int sign,end,pt,length,diff;
 
   for(i1=0;i1<function_copy_length;i1++)
     {
+ /*      printf("\n\nINDICE COPIA %d \n",i1); */
+     
       pt = function_copy_list_from[i1];
       end = function_copy_list_from[i1]  + function_copy_list_len[i1] - 1;
-      diff=0;
+      start=pt;
+      diff=length=0;
+ /*      printf("ZONE FROM %d TO %d LENGTH %d\n",pt,function_copy_list_to[i1],function_copy_list_len[i1]); */
+
       while(pt <= end)
 	{
 	  sign = site_sign(pt);
-	  length=0;
-  	  while(site_sign(pt)==sign && pt < end)
+  	  while(site_sign(pt)==sign && pt <= end)
 	    {
+/* 	      printf("segno %d sito %d\n",site_sign(pt),pt);   */
 	      pt++;
-	      length++;
-	      diff++;
 	    }
 
-	  if(sign)
+	  if((sign)&1)
 	    {
-	      tmp_function_copy_from_e[tmp_function_copy_length_e]=function_copy_list_from[i1]+diff;
-	      tmp_function_copy_len_e[tmp_function_copy_length_e]=length;
-	      tmp_function_copy_to_e[tmp_function_copy_length_e]=function_copy_list_to[i1]+diff;
+	      tmp_function_copy_from_e[tmp_function_copy_length_e]=start;
+	      tmp_function_copy_len_e[tmp_function_copy_length_e]=pt-start;
+	      tmp_function_copy_to_e[tmp_function_copy_length_e]=function_copy_list_to[i1]+start-function_copy_list_from[i1];
+/* 	      printf("SCRIVO from %d to %d Len %d E \n",start,function_copy_list_to[i1]+start-function_copy_list_from[i1],pt-start); */
 	      tmp_function_copy_length_e++;
 	      }
 	  else
 	    {
-	      tmp_function_copy_from_o[tmp_function_copy_length_o]=function_copy_list_from[i1]+diff;
-	      tmp_function_copy_len_o[tmp_function_copy_length_o]=length;
-	      tmp_function_copy_to_o[tmp_function_copy_length_o]=function_copy_list_to[i1]+diff;
+	      tmp_function_copy_from_o[tmp_function_copy_length_o]=start;
+	      tmp_function_copy_len_o[tmp_function_copy_length_o]=pt-start;
+	      tmp_function_copy_to_o[tmp_function_copy_length_o]=function_copy_list_to[i1]+start-function_copy_list_from[i1];
+/* 	      printf("SCRIVO from %d to %d Len %d O \n",start,function_copy_list_to[i1]+start-function_copy_list_from[i1],pt-start); */
 	      tmp_function_copy_length_o++;
 	    }
+	  start=pt;
 	  pt++;
 	}
     }
@@ -1159,7 +1178,119 @@ static void set_memory_order()
 	} 
       function_copy_length_e=tmp_function_copy_length_e;
     }
-    
+  
+  
+   int counter_e=0,counter_o=0;
+   int tmp_master_start_e[index_position];
+   int tmp_master_end_e[index_position];
+   int tmp_master_start_o[index_position];
+   int tmp_master_end_o[index_position];
+   start=0;
+ 
+
+   for(i1=0; i1< memory_map_counter;i1++)
+     {
+       
+/*        printf("\n\nINDICE I1 %d Local %d \n",i1,local_memory_map_counter); */
+       if(i1==local_memory_map_counter) 
+	 {
+	   local_memory_map_counter_e=counter_e;
+
+	   local_memory_map_counter_o=counter_o;
+/*   	   printf("INDICE Local E %d ed O  %d \n",local_memory_map_counter_e,local_memory_map_counter_o); */
+	 }
+
+       pt = memory_map_address[i1];
+       start=pt;
+       end = memory_map_end[i1];
+/*        printf("ZONE START %d END %d\n",pt,end); */
+     
+        
+       while(pt <= end)
+	 {
+	   sign = site_sign(pt);
+	   while(site_sign(pt)==sign && pt <= end)
+	     {
+
+
+	       int ax,ay,az,at;
+	       
+	       at = map_true2oversize[pt]%(T+2*T_BORDER);
+	       ax = (map_true2oversize[pt]/(T+2*T_BORDER))%(X+2*X_BORDER);
+	       ay = (map_true2oversize[pt]/((T+2*T_BORDER)*(X+2*X_BORDER)))%(Y+2*Y_BORDER);
+	       az = map_true2oversize[pt]/((T+2*T_BORDER)*(X+2*X_BORDER)*(Y+2*Y_BORDER));
+	       
+	       
+
+/*    	       printf("segno %d sito %d coord(%d,%d,%d,%d)\n",site_sign(pt),pt,at,ax,ay,az); */
+	       pt++;
+	     }
+	   
+
+	   if((sign)&1)
+	     {
+/*    	       printf("SCRIVO sito %d-%d index E %d\n",start,pt-1,counter_e);  */
+	       tmp_master_start_e[counter_e]=start;
+	       tmp_master_end_e[counter_e]=pt-1;     
+	       index_counter_e += tmp_master_end_e[counter_e]-tmp_master_start_e[counter_e]+1;	       
+/*    	       printf("COUNTER E TOTALE %d PARZIALE %d \n",index_counter_e,tmp_master_end_e[counter_e]-tmp_master_start_e[counter_e]+1); */
+	       counter_e++;
+	     }
+	   else
+	     {
+/*   	       printf("SCRIVO sito %d-%d index O %d\n",start,pt-1,counter_o); */
+	       tmp_master_start_o[counter_o]=start;
+	       tmp_master_end_o[counter_o]=pt-1;     
+	       index_counter_o += tmp_master_end_o[counter_o]-tmp_master_start_o[counter_o]+1;	       
+/* 	       printf("COUNTER O TOTALE %d PARZIALE %d \n",index_counter_o,tmp_master_end_o[counter_o]-tmp_master_start_o[counter_o]+1); */
+	       counter_o++;
+	     }
+	   start=pt;
+	   pt++;
+	 }
+       
+     }
+
+  if(counter_o!=0)
+    {
+      memory_map_address_o=malloc(counter_o*sizeof(unsigned int));
+      error((memory_map_address_o==NULL),1,"set_memory_order [geometry_mpi.c]", 
+	    "Cannot allocate memory"); 
+
+      memory_map_end_o=malloc(counter_o*sizeof(unsigned int)); 
+      error((memory_map_end_o==NULL),1,"set_memory_order [geometry_mpi.c]", 
+	    "Cannot allocate memory"); 
+
+      for (i1=0;i1<counter_o;i1++) 
+	{ 
+	  memory_map_address_o[i1]=tmp_master_start_o[i1]; 
+	  memory_map_end_o[i1]=tmp_master_end_o[i1];
+	} 
+      memory_map_counter_o=counter_o;
+ 
+    }
+   
+   if(counter_e!=0)
+    {
+      memory_map_address_e=malloc(counter_e*sizeof(unsigned int));
+      error((memory_map_address_e==NULL),1,"set_memory_order [geometry_mpi.c]", 
+	    "Cannot allocate memory"); 
+
+      memory_map_end_e=malloc(counter_e*sizeof(unsigned int)); 
+      error((memory_map_end_e==NULL),1,"set_memory_order [geometry_mpi.c]", 
+	    "Cannot allocate memory"); 
+
+      for (i1=0;i1<counter_e;i1++) 
+	{ 
+	  memory_map_address_e[i1]=tmp_master_start_e[i1]; 
+	  memory_map_end_e[i1]=tmp_master_end_e[i1];
+	} 
+      memory_map_counter_e=counter_e;
+ 
+    }
+   
+  
+   
 }
 
 

@@ -37,7 +37,7 @@ typedef struct _MINRES_par {
 } MINRES_par;
 int MINRES(MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field *out, spinor_field *trial);
 
-int eva(int len, int nev,int nevt,int init,int kmax,
+int eva(int nev,int nevt,int init,int kmax,
                int imax,double ubnd,double omega1,double omega2,
                spinor_operator Op,
                spinor_field *ws,spinor_field *ev,double d[],int *status);

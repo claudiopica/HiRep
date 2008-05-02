@@ -228,8 +228,12 @@ static void fix_geometry_descriptor()
   glattice.master_start=memory_map_address;
   glattice.master_end=memory_map_end;
 
-  glattice.buf_len=malloc((N_BORDER)*sizeof(unsigned int));
-  error((glattice.buf_len==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
+  glattice.rbuf_len=malloc((N_BORDER)*sizeof(unsigned int));
+  error((glattice.rbuf_len==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
+	"Cannot allocate memory");
+
+  glattice.sbuf_len=malloc((N_BORDER)*sizeof(unsigned int));
+  error((glattice.sbuf_len==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	"Cannot allocate memory");
 
   glattice.sbuf_to_proc=malloc((N_BORDER)*sizeof(unsigned int));
@@ -255,7 +259,7 @@ static void fix_geometry_descriptor()
       (glattice.rbuf_from_proc)[i] = border[i+1+N_BORDER].id_proc;
       (glattice.sbuf_start)[i] = border[i+1].index_start;
       (glattice.rbuf_start)[i] = border[i+1+N_BORDER].index_start;
-      (glattice.buf_len)[i] = border[i+1].index_end - border[i+1].index_start;
+      (glattice.sbuf_len)[i] = (glattice.rbuf_len)[i] = border[i+1].index_end - border[i+1].index_start;
 
     }
 

@@ -2,7 +2,7 @@ check_algebra_1		Check the generators
 
 check_geometry_1	Check the geometry
 
-check0		Check that _group_represent is homomorphic
+check_puregauge_1	Check that _group_represent is homomorphic
 
 check1		Check gauge covariance of the Dirac operator
 

@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* File test_geometry.c
+* File test_geometry_mpi.c
 *
 * Test geometry_mpi
 *
@@ -14,6 +14,7 @@
 #include "global.h"
 #include "safe_mod.h"
 #include "logger.h"
+#include "error.h"
 
 #define true 1
 #define false 0
@@ -169,15 +170,359 @@ static void set_coordinates(int x, int *test_q) {
 
 }
 
-void test_geometry_mpi() {
+
+int even_q(int c[4]) {
+  return (c[0]+c[1]+c[2]+c[3]+myid_sign)&1;
+}
+
+int odd_q(int c[4]) {
+  return !((c[0]+c[1]+c[2]+c[3]+myid_sign)&1);
+}
+
+
+
+void test_geometry_descriptor(geometry_descriptor *gd, int(*in_subset_q)(int*)) {
+	int i, j;
+	int x, y;
+	int *cx, *cy;
+	int test_q;
+	int origin[4] = {0,0,0,0};
+
+	lprintf("TEST_GEOMETRY.C",loglevel,"gsize = %d\n", gd->gsize);
+
+  if((*in_subset_q)(origin))
+    lprintf("TEST_GEOMETRY.C",loglevel,"(*in_subset_q)(origin) = true\n");
+  else
+    lprintf("TEST_GEOMETRY.C",loglevel,"(*in_subset_q)(origin) = false\n");
+
+
+	/* TEST: gd->gsize <= glattice.gsize */
+
+	error(gd->gsize>glattice.gsize,1,"test_geometry.c","gd->gsize <= glattice.gsize... FAILED");
+	lprintf("TEST_GEOMETRY.C",loglevel,"gd->gsize <= glattice.gsize... OK\n");
+
+
+	lprintf("TEST_GEOMETRY.C",loglevel,"local_master_pieces = %d\n", gd->local_master_pieces);
+	lprintf("TEST_GEOMETRY.C",loglevel,"total_master_pieces = %d\n", gd->total_master_pieces);
+	lprintf("TEST_GEOMETRY.C",loglevel,"master_start = %p ... %p\n", gd->master_start, gd->master_start+gd->local_master_pieces-1);
+	lprintf("TEST_GEOMETRY.C",loglevel,"master_end = %p ... %p\n", gd->master_end, gd->master_end+gd->local_master_pieces-1);
+
+
+	/* TEST: Members master_start[0],master_end[0] describes all and only the inner sites */
+
+	int inner_pieces = 1;
+
+	for(x=0; x<glattice.gsize; x++)
+		descr[x].t_flag = 0;
+	
+	test_q = true;
+	for(i=0; i<inner_pieces; i++) {
+		for(x=gd->master_start[i]; x<= gd->master_end[i] ; x++) {
+			if(x<0 || x>=glattice.gsize) {
+				lprintf("TEST_GEOMETRY.C",0,"x = %d in [%d,%d] (i=%d).\n",x,gd->master_start[i],gd->master_end[i],i);
+				test_q = false;
+			} else {
+				if(descr[x].t_flag == 1) {
+					lprintf("TEST_GEOMETRY.C",loglevel,"Index %d is included twice in the inner pieces.\n",x);
+					test_q = false;
+				}
+				descr[x].t_flag = 1;
+			}
+		}
+	}
+	
+	for(i=0; i<inner_pieces; i++)
+		for(x=glattice.master_start[i]; x<= glattice.master_end[i] ; x++)
+		  descr[x].t_flag += 2;
+	
+	for(x=0; x<glattice.gsize; x++) {
+		cx = coord[x];
+		if(descr[x].t_flag == 1) {
+			lprintf("TEST_GEOMETRY.C",loglevel,"Index %d is included in gd inner pieces, but not in glattice inner pieces.\n",x);
+			test_q = false;
+		} else if(descr[x].t_flag == 2 && (*in_subset_q)(cx)) {
+		  lprintf("TEST_GEOMETRY.C",loglevel,"Index %d of coordinates (%d,%d,%d,%d) is not included in the inner pieces.\n",x,cx[0],cx[1],cx[2],cx[3]);
+			test_q = false;
+		} else if(descr[x].t_flag == 3 && !(*in_subset_q)(cx)) {
+		  lprintf("TEST_GEOMETRY.C",loglevel,"Index %d of coordinates (%d,%d,%d,%d) is included in the inner pieces.\n",x,cx[0],cx[1],cx[2],cx[3]);
+			test_q = false;
+		}
+	}
+	
+	error(!test_q,1,"test_geometry.c","Members master_start[0],master_end[0] describes all and only the inner sites... FAILED");
+	lprintf("TEST_GEOMETRY.C",loglevel,"Members master_start[0],master_end[0] describes all and only the inner sites... OK\n");
+
+
+	/* TEST: Members local_master_pieces,master_start,master_end describes all and only the local sites */
+
+	for(x=0; x<glattice.gsize; x++)
+		descr[x].t_flag = 0;
+	
+	test_q = true;
+	for(i=0; i<gd->local_master_pieces; i++) {
+/* 	  if(gd->master_end[i]<3000) */
+/* 			lprintf("TEST_GEOMETRY.C",0,"[%d,%d] (i=%d) [%d,%d].\n",gd->master_start[i],gd->master_end[i],i,glattice.master_start[i],glattice.master_end[i]); */
+
+		for(x=gd->master_start[i]; x<= gd->master_end[i] ; x++) {
+		
+			if(x<0 || x>=glattice.gsize) {
+				lprintf("TEST_GEOMETRY.C",0,"x = %d in [%d,%d] (i=%d).\n",x,gd->master_start[i],gd->master_end[i],i);
+				test_q = false;
+			} else {
+				if(descr[x].t_flag == 1) {
+					lprintf("TEST_GEOMETRY.C",loglevel,"Index %d is included twice in the local pieces.\n",x);
+					test_q = false;
+				}
+				descr[x].t_flag = 1;
+			}
+		}
+	}
+	
+	for(i=0; i<glattice.local_master_pieces; i++)
+		for(x=glattice.master_start[i]; x<= glattice.master_end[i] ; x++)
+		  descr[x].t_flag += 2;
+	
+	for(x=0; x<glattice.gsize; x++) {
+		cx = coord[x];
+		if(descr[x].t_flag == 1) {
+			lprintf("TEST_GEOMETRY.C",loglevel,"Index %d is included in gd local pieces, but not in glattice local pieces.\n",x);
+			test_q = false;
+		} else if(descr[x].t_flag == 2 && (*in_subset_q)(cx)) {
+		  lprintf("TEST_GEOMETRY.C",loglevel,"Index %d of coordinates (%d,%d,%d,%d) is not included in the local pieces.\n",x,cx[0],cx[1],cx[2],cx[3]);
+			test_q = false;
+		} else if(descr[x].t_flag == 3 && !(*in_subset_q)(cx)) {
+		  lprintf("TEST_GEOMETRY.C",loglevel,"Index %d of coordinates (%d,%d,%d,%d) is included in the local pieces.\n",x,cx[0],cx[1],cx[2],cx[3]);
+			test_q = false;
+		}
+	}
+	
+	error(!test_q,1,"test_geometry.c","Members local_master_pieces,master_start,master_end describes all and only the local sites... FAILED");
+	lprintf("TEST_GEOMETRY.C",loglevel,"Members local_master_pieces,master_start,master_end describes all and only the local sites... OK\n");
+
+
+	/* TEST: Members total_master_pieces,master_start,master_end describes all the sites */
+
+	for(x=0; x<glattice.gsize; x++)
+		descr[x].t_flag = 0;
+	
+	test_q = true;
+	for(i=0; i<gd->total_master_pieces; i++) {
+		for(x=gd->master_start[i]; x<= gd->master_end[i] ; x++) {
+			if(x<0 || x>=glattice.gsize) {
+				lprintf("TEST_GEOMETRY.C",0,"x = %d in [%d,%d] (i=%d).\n",x,gd->master_start[i],gd->master_end[i],i);
+				test_q = false;
+			} else {
+				if(descr[x].t_flag == 1) {
+					lprintf("TEST_GEOMETRY.C",loglevel,"Index %d is included twice in the total pieces.\n",x);
+					test_q = false;
+				}
+				descr[x].t_flag = 1;
+			}
+		}
+	}
+	
+	for(i=0; i<glattice.total_master_pieces; i++)
+		for(x=glattice.master_start[i]; x<= glattice.master_end[i] ; x++)
+		  descr[x].t_flag += 2;
+	
+	for(x=0; x<glattice.gsize; x++) {
+		cx = coord[x];
+		if(descr[x].t_flag == 1) {
+			lprintf("TEST_GEOMETRY.C",loglevel,"Index %d is included in gd total pieces, but not in glattice total pieces.\n",x);
+			test_q = false;
+		} else if(descr[x].t_flag == 2 && (*in_subset_q)(cx)) {
+		  lprintf("TEST_GEOMETRY.C",loglevel,"Index %d of coordinates (%d,%d,%d,%d) is not included in the total pieces.\n",x,cx[0],cx[1],cx[2],cx[3]);
+			test_q = false;
+		} else if(descr[x].t_flag == 3 && !(*in_subset_q)(cx)) {
+		  lprintf("TEST_GEOMETRY.C",loglevel,"Index %d of coordinates (%d,%d,%d,%d) is included in the total pieces.\n",x,cx[0],cx[1],cx[2],cx[3]);
+			test_q = false;
+		}
+	}
+	
+	error(!test_q,1,"test_geometry.c","Members total_master_pieces,master_start,master_end describes all the sites... FAILED");
+	lprintf("TEST_GEOMETRY.C",loglevel,"Members total_master_pieces,master_start,master_end describes all the sites... OK\n");
+
+
+  /* TEST: Members ncopies,copy_from,copy_to,copy_len describes all the copy indexes */
+	lprintf("TEST_GEOMETRY.C",loglevel,"ncopies = %d\n", gd->ncopies);
+	lprintf("TEST_GEOMETRY.C",loglevel,"copy_len = %p ... %p\n", gd->copy_len, gd->copy_len+gd->ncopies-1);
+	lprintf("TEST_GEOMETRY.C",loglevel,"copy_from = %p ... %p\n", gd->copy_from, gd->copy_from+gd->ncopies-1);
+	lprintf("TEST_GEOMETRY.C",loglevel,"copy_to = %p ... %p\n", gd->copy_to, gd->copy_to+gd->ncopies-1);
+  
+	for(x=0; x<glattice.gsize; x++)
+		descr[x].t_flag = 0;
+	
+	test_q = true;
+	for(i=0; i<gd->ncopies; i++) {
+		for(j=0; j<gd->copy_len[i]; j++) {
+		  x=gd->copy_from[i]+j;
+		  y=gd->copy_to[i]+j;
+			if(x<0 || x>=glattice.gsize) {
+				lprintf("TEST_GEOMETRY.C",0,"x = %d (i=%d, j=%d).\n",x,i,j);
+				test_q = false;
+			} else if(y<0 || x>=glattice.gsize) {
+				lprintf("TEST_GEOMETRY.C",0,"y = %d (i=%d, j=%d).\n",y,i,j);
+				test_q = false;
+			} else {
+				if(descr[y].t_flag == 1) {
+					lprintf("TEST_GEOMETRY.C",loglevel,"Index %d is written twice in the copy process.\n",y);
+					test_q = false;
+				}
+				descr[y].t_flag = 1;
+				cx=coord[x];
+				cy=coord[y];
+				if(cx[0]!=cy[0] || cx[1]!=cy[1] || cx[2]!=cy[2] || cx[3]!=cy[3]) {
+					lprintf("TEST_GEOMETRY.C",loglevel,"Index %d (%d,%d,%d,%d) is copied in index %d (%d,%d,%d,%d).\n",
+					        x,cx[0],cx[1],cx[2],cx[3],
+					        y,cy[0],cy[1],cy[2],cy[3]);
+					test_q = false;
+				}
+			}
+		}
+	}
+	
+	for(i=0; i<glattice.ncopies; i++)
+		for(j=0; j<glattice.copy_len[i]; j++) {
+		  y=glattice.copy_to[i]+j;
+		  descr[y].t_flag += 2;
+		}
+	
+	for(x=0; x<glattice.gsize; x++) {
+		cx = coord[x];
+		if(descr[x].t_flag == 1) {
+			lprintf("TEST_GEOMETRY.C",loglevel,"Index %d is a gd copy index, but not a glattice copy index.\n",x);
+			test_q = false;
+		} else if(descr[x].t_flag == 2 && (*in_subset_q)(cx)) {
+		  lprintf("TEST_GEOMETRY.C",loglevel,"Index %d of coordinates (%d,%d,%d,%d) is not a gd copy index.\n",x,cx[0],cx[1],cx[2],cx[3]);
+			test_q = false;
+		} else if(descr[x].t_flag == 3 && !(*in_subset_q)(cx)) {
+		  lprintf("TEST_GEOMETRY.C",loglevel,"Index %d of coordinates (%d,%d,%d,%d) is a gd copy index.\n",x,cx[0],cx[1],cx[2],cx[3]);
+			test_q = false;
+		}
+	}
+	
+	error(!test_q,1,"test_geometry.c","Members ncopies,copy_from,copy_to,copy_len describes all the copy indexes... FAILED");
+	lprintf("TEST_GEOMETRY.C",loglevel,"Members ncopies,copy_from,copy_to,copy_len describes all the copy indexes... OK\n");
+
+ 	/* TEST: Members nbuffers,rbuf*,sbuf* describes the sending/receiving buffers */
+	lprintf("TEST_GEOMETRY.C",loglevel,"nbuffers = %d\n", gd->nbuffers);
+	lprintf("TEST_GEOMETRY.C",loglevel,"rbuf_len = %p ... %p\n", gd->rbuf_len, gd->rbuf_len+gd->nbuffers-1);
+	lprintf("TEST_GEOMETRY.C",loglevel,"sbuf_len = %p ... %p\n", gd->sbuf_len, gd->sbuf_len+gd->nbuffers-1);
+	lprintf("TEST_GEOMETRY.C",loglevel,"rbuf_from_proc = %p ... %p\n", gd->rbuf_from_proc, gd->rbuf_from_proc+gd->nbuffers-1);
+	lprintf("TEST_GEOMETRY.C",loglevel,"rbuf_start = %p ... %p\n", gd->rbuf_start, gd->rbuf_start+gd->nbuffers-1);
+	lprintf("TEST_GEOMETRY.C",loglevel,"sbuf_to_proc = %p ... %p\n", gd->sbuf_to_proc, gd->sbuf_to_proc+gd->nbuffers-1);
+	lprintf("TEST_GEOMETRY.C",loglevel,"sbuf_start = %p ... %p\n", gd->sbuf_start, gd->sbuf_start+gd->nbuffers-1);
+  
+ 	test_q = true;
+  for(i=0; i<gd->nbuffers; i++) {
+    if(gd->rbuf_from_proc[i] != glattice.rbuf_from_proc[i]) {
+				lprintf("TEST_GEOMETRY.C",0,"gd->rbuf_from_proc[%d] = %d  but glattice.rbuf_from_proc[%d] = %d\n",
+				        i,gd->rbuf_from_proc[i],i,glattice.rbuf_from_proc[i]);
+				test_q = false;
+    } else if(gd->sbuf_to_proc[i] != glattice.sbuf_to_proc[i]) {
+				lprintf("TEST_GEOMETRY.C",0,"gd->sbuf_to_proc[%d] = %d  but glattice.sbuf_to_proc[%d] = %d\n",
+				        i,gd->sbuf_to_proc[i],i,glattice.sbuf_to_proc[i]);
+				test_q = false;
+    }
+  }
+
+  for(i=0; i<gd->nbuffers; i++) {
+  
+   	for(x=0; x<glattice.gsize; x++)
+    	descr[x].t_flag = 0;
+
+		for(j=0; j<gd->sbuf_len[i]; j++) {
+			x=gd->sbuf_start[i]+j;
+			if(x<0 || x>=glattice.gsize) {
+				lprintf("TEST_GEOMETRY.C",0,"x = %d sbuf*(i=%d, j=%d).\n",x,i,j);
+				test_q = false;
+			} else {
+				if(descr[x].t_flag == 1) {
+					lprintf("TEST_GEOMETRY.C",loglevel,"Index %d is twice in the gd->sbuf*[%d].\n",x,i);
+					test_q = false;
+				}
+				descr[x].t_flag = 1;
+			}
+		}
+
+		for(j=0; j<glattice.sbuf_len[i]; j++) {
+		  x=glattice.sbuf_start[i]+j;
+		  descr[x].t_flag += 2;
+		}
+
+		for(j=0; j<glattice.sbuf_len[i]; j++) {
+		  x=glattice.sbuf_start[i]+j;
+		  cx = coord[x];
+		  if(descr[x].t_flag == 1) {
+			  lprintf("TEST_GEOMETRY.C",loglevel,"Index %d is in gd->sbuf*[%d], but not in glattice.sbuf*[%i].\n",x,i,i);
+			  test_q = false;
+		  } else if(descr[x].t_flag == 2 && (*in_subset_q)(cx)) {
+		    lprintf("TEST_GEOMETRY.C",loglevel,"Index %d of coordinates (%d,%d,%d,%d) is not in gd->sbuf*[%d].\n",x,cx[0],cx[1],cx[2],cx[3],i);
+			  test_q = false;
+		  } else if(descr[x].t_flag == 3 && !(*in_subset_q)(cx)) {
+		    lprintf("TEST_GEOMETRY.C",loglevel,"Index %d of coordinates (%d,%d,%d,%d) is in gd->sbuf*[%d].\n",x,cx[0],cx[1],cx[2],cx[3],i);
+			  test_q = false;
+		  }
+	  }
+
+	}
+	
+  for(i=0; i<gd->nbuffers; i++) {
+  
+   	for(x=0; x<glattice.gsize; x++)
+    	descr[x].t_flag = 0;
+
+		for(j=0; j<gd->rbuf_len[i]; j++) {
+			x=gd->rbuf_start[i]+j;
+			if(x<0 || x>=glattice.gsize) {
+				lprintf("TEST_GEOMETRY.C",0,"x = %d rbuf*(i=%d, j=%d).\n",x,i,j);
+				test_q = false;
+			} else {
+				if(descr[x].t_flag == 1) {
+					lprintf("TEST_GEOMETRY.C",loglevel,"Index %d is twice in the gd->rbuf*[%d].\n",x,i);
+					test_q = false;
+				}
+				descr[x].t_flag = 1;
+			}
+		}
+
+		for(j=0; j<glattice.rbuf_len[i]; j++) {
+		  x=glattice.rbuf_start[i]+j;
+		  descr[x].t_flag += 2;
+		}
+
+		for(j=0; j<glattice.rbuf_len[i]; j++) {
+		  x=glattice.rbuf_start[i]+j;
+		  cx = coord[x];
+		  if(descr[x].t_flag == 1) {
+			  lprintf("TEST_GEOMETRY.C",loglevel,"Index %d is in gd->rbuf*[%d], but not in glattice.rbuf*[%i].\n",x,i,i);
+			  test_q = false;
+		  } else if(descr[x].t_flag == 2 && (*in_subset_q)(cx)) {
+		    lprintf("TEST_GEOMETRY.C",loglevel,"Index %d of coordinates (%d,%d,%d,%d) is not in gd->rbuf*[%d].\n",x,cx[0],cx[1],cx[2],cx[3],i);
+			  test_q = false;
+		  } else if(descr[x].t_flag == 3 && !(*in_subset_q)(cx)) {
+		    lprintf("TEST_GEOMETRY.C",loglevel,"Index %d of coordinates (%d,%d,%d,%d) is in gd->rbuf*[%d].\n",x,cx[0],cx[1],cx[2],cx[3],i);
+			  test_q = false;
+		  }
+	  }
+
+	}
+	
+	error(!test_q,1,"test_geometry.c","Members nbuffers,rbuf*,sbuf* describes the sending/receiving buffers... FAILED");
+	lprintf("TEST_GEOMETRY.C",loglevel,"Members nbuffers,rbuf*,sbuf* describes the sending/receiving buffers... OK\n");
+
+}
+
+
+void test_glattice() {
 	int i, j, k;
 	int x, y;
 	int *cx, *cy;
 	int test_q;
 	
-	initialize_test();
 	lprintf("TEST_GEOMETRY.C",loglevel,"Memory allocation... OK\n");
 	lprintf("TEST_GEOMETRY.C",loglevel,"gsize = %d\n", glattice.gsize);
+	lprintf("TEST_GEOMETRY.C",loglevel,"myid_sign = %d\n", myid_sign);
 	lprintf("TEST_GEOMETRY.C",loglevel,"local_size = {%d,%d,%d,%d}\n", local_size[0], local_size[1], local_size[2], local_size[3]);
 	lprintf("TEST_GEOMETRY.C",loglevel,"buffer_thickness = {%d,%d,%d,%d}\n", buffer_thickness[0], buffer_thickness[1], buffer_thickness[2], buffer_thickness[3]);
 	lprintf("TEST_GEOMETRY.C",loglevel,"periodic_q = {%d,%d,%d,%d}\n", periodic_q[0], periodic_q[1], periodic_q[2], periodic_q[3]);
@@ -402,11 +747,11 @@ void test_geometry_mpi() {
 	for(i=0; i<inner_pieces; i++) {
 		for(x=glattice.master_start[i]; x<= glattice.master_end[i] ; x++) {
 			if(x<0 || x>=glattice.gsize) {
-				lprintf("TEST_GEOMETRY.C",0,"glattice.master_start[%d]+%d = %d (glattice.len[%d]=%d).\n",i,j,x,i,glattice.master_end[i]- glattice.master_start[i] + 1);
+				lprintf("TEST_GEOMETRY.C",0,"x = %d in [%d,%d] (i=%d).\n",x,glattice.master_start[i],glattice.master_end[i],i);
 				test_q = false;
 			} else {
 				if(descr[x].t_flag == 1) {
-					lprintf("TEST_GEOMETRY.C",loglevel,"Index %d is included twice in the local pieces.\n",x);
+					lprintf("TEST_GEOMETRY.C",loglevel,"Index %d is included twice in the inner pieces.\n",x);
 					test_q = false;
 				}
 				descr[x].t_flag = 1;
@@ -464,7 +809,8 @@ void test_geometry_mpi() {
 	error(!test_q,1,"test_geometry.c","Members local_master_pieces,master_start,master_end describes all and only the local site... FAILED");
 	lprintf("TEST_GEOMETRY.C",loglevel,"Members local_master_pieces,master_start,master_end describes all and only the local site... OK\n");
 
-	/* TEST: Members total_master_pieces,master_start,master_end describes all the local site */
+
+	/* TEST: Members total_master_pieces,master_start,master_end describes all the sites */
 
 	for(x=0; x<glattice.gsize; x++)
 		descr[x].t_flag = 0;
@@ -496,16 +842,18 @@ void test_geometry_mpi() {
 			test_q = false;
 		}
 	}
-	error(!test_q,1,"test_geometry.c","Members total_master_pieces,master_start,master_end describes all the local sit... FAILED");
-	lprintf("TEST_GEOMETRY.C",loglevel,"Members total_master_pieces,master_start,master_end describes all the local sit... OK\n");
+	error(!test_q,1,"test_geometry.c","Members total_master_pieces,master_start,master_end describes all the sites... FAILED");
+	lprintf("TEST_GEOMETRY.C",loglevel,"Members total_master_pieces,master_start,master_end describes all the sites... OK\n");
 
-	/* TEST: Members nbuffers,buf_len,rbuf*,sbuf* describes the sending/receiving buffers */
+	/* TEST: Members nbuffers,rbuf*,sbuf* describes the sending/receiving buffers */
 	lprintf("TEST_GEOMETRY.C",loglevel,"nbuffers = %d\n", glattice.nbuffers);
-	lprintf("TEST_GEOMETRY.C",loglevel,"buf_len = %p ... %p\n", glattice.buf_len, glattice.buf_len+glattice.nbuffers-1);
+	lprintf("TEST_GEOMETRY.C",loglevel,"rbuf_len = %p ... %p\n", glattice.rbuf_len, glattice.rbuf_len+glattice.nbuffers-1);
+	lprintf("TEST_GEOMETRY.C",loglevel,"sbuf_len = %p ... %p\n", glattice.sbuf_len, glattice.sbuf_len+glattice.nbuffers-1);
 	lprintf("TEST_GEOMETRY.C",loglevel,"rbuf_from_proc = %p ... %p\n", glattice.rbuf_from_proc, glattice.rbuf_from_proc+glattice.nbuffers-1);
 	lprintf("TEST_GEOMETRY.C",loglevel,"rbuf_start = %p ... %p\n", glattice.rbuf_start, glattice.rbuf_start+glattice.nbuffers-1);
 	lprintf("TEST_GEOMETRY.C",loglevel,"sbuf_to_proc = %p ... %p\n", glattice.sbuf_to_proc, glattice.sbuf_to_proc+glattice.nbuffers-1);
 	lprintf("TEST_GEOMETRY.C",loglevel,"sbuf_start = %p ... %p\n", glattice.sbuf_start, glattice.sbuf_start+glattice.nbuffers-1);
+
 
 	test_q = true;
 	for(i=0; i<glattice.nbuffers; i++) {
@@ -513,6 +861,13 @@ void test_geometry_mpi() {
 #define LOCAL 100
 		int sbuf_mask[4], rbuf_mask[4];
 		int dimension = 0;
+
+		/* glattice.rbuf_len[i] must be equal to glattice.sbuf_len[i] */
+
+    if(glattice.rbuf_len[i] != glattice.sbuf_len[i]) {
+			lprintf("TEST_GEOMETRY.C",loglevel,"glattice.rbuf_len[%d]=%d ; glattice.sbuf_len[%d]=%d .\n",i,glattice.rbuf_len[i],i,glattice.sbuf_len[i]);
+			test_q = false;
+    }
 		
 		/* Determine which border is described by sbuf*[i] - result in sbuf_mask, dimension */
 		
@@ -520,7 +875,7 @@ void test_geometry_mpi() {
 		for(k=0;k<4;k++)
 			sbuf_mask[k] = descr[x].b_type[k];
 
-		for(j=0; j<glattice.buf_len[i]; j++) {
+		for(j=0; j<glattice.sbuf_len[i]; j++) {
 			x = glattice.sbuf_start[i]+j;
 			for(k=0;k<4;k++) {
 				if(descr[x].b_type[k] == LBUFFER || descr[x].b_type[k] == RBUFFER) {
@@ -549,7 +904,7 @@ void test_geometry_mpi() {
 		}
 
 		/* TEST: rbuf*[i] describes the right buffer, accordingly to rbuf_mask */
-		for(j=0; j<glattice.buf_len[i]; j++) {
+		for(j=0; j<glattice.rbuf_len[i]; j++) {
 			x = glattice.rbuf_start[i]+j;
 			cx = coord[x];
 			for(k=0;k<4;k++) {
@@ -589,7 +944,7 @@ void test_geometry_mpi() {
 		for(c2=sid_crange[0][2]; c2<=sid_crange[1][2]; c2++)
 		for(c3=sid_crange[0][3]; c3<=sid_crange[1][3]; c3++) {
 			int isthere_q = false;
-			for(j=0; j<glattice.buf_len[i] && isthere_q == false; j++) {
+			for(j=0; j<glattice.sbuf_len[i] && isthere_q == false; j++) {
 				x = glattice.sbuf_start[i]+j;
 				cx = coord[x];
 				if(c0 == cx[0] && c1 == cx[1] && c2 == cx[2] && c3 == cx[3])
@@ -610,7 +965,7 @@ void test_geometry_mpi() {
 			else shift[k] = 0;
 		}
 
-		for(j=0; j<glattice.buf_len[i]; j++) {
+		for(j=0; j<glattice.rbuf_len[i]; j++) {
 			x = glattice.sbuf_start[i]+j;
 			y = glattice.rbuf_start[i]+j;
 			cx = coord[x];
@@ -669,10 +1024,49 @@ void test_geometry_mpi() {
 #undef LOCAL		
 		
 	}
-	error(!test_q,1,"test_geometry.c","Members nbuffers,buf_len,rbuf*,sbuf* describes the sending/receiving buffers... FAILED");
-	lprintf("TEST_GEOMETRY.C",loglevel,"Members nbuffers,buf_len,rbuf*,sbuf* describes the sending/receiving buffers... OK\n");
+	error(!test_q,1,"test_geometry.c","Members nbuffers,rbuf*,sbuf* describes the sending/receiving buffers... FAILED");
+	lprintf("TEST_GEOMETRY.C",loglevel,"Members nbuffers,rbuf*,sbuf* describes the sending/receiving buffers... OK\n");
 
+}
+
+
+void test_geometry_mpi() {
+
+	initialize_test();
+
+
+	/* TEST: ipt, iup, idown, glattice */
+	
+	lprintf("TEST_GEOMETRY.C",loglevel,"\nTESTING ipt, iup, idown, glattice\n");
+	test_glattice();
+	
 	
 	finalize_test();
 }
 
+
+void test_geometry_mpi_eo() {
+
+	initialize_test();
+
+
+	/* TEST: ipt, iup, idown, glattice */
+	
+	lprintf("TEST_GEOMETRY.C",loglevel,"\nTESTING ipt, iup, idown, glattice\n");
+	test_glattice();
+
+
+	/* TEST: glat_even */
+	
+	lprintf("TEST_GEOMETRY.C",loglevel,"\nTESTING glat_even\n");
+	test_geometry_descriptor(&glat_even, &even_q);
+	
+	
+	/* TEST: glat_odd */
+	
+	lprintf("TEST_GEOMETRY.C",loglevel,"\nTESTING glat_odd\n");
+	test_geometry_descriptor(&glat_odd, &odd_q);
+
+	
+	finalize_test();
+}

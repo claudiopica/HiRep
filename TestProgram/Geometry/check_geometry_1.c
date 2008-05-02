@@ -21,7 +21,7 @@ int main(int argc,char *argv[])
 	printf("The lattice size is %dx%dx%dx%d\n",T,X,Y,Z);
 	printf("\n");
 	
-	test_geometry_mpi();
+	test_geometry_mpi_eo();
 
 	exit(0);
 }
