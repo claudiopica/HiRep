@@ -3,16 +3,11 @@
 
 #include "suN_types.h"
 
-typedef enum {
-   EO=0,
-   OE=1
-} block_selector;
-
-void Dphi_(block_selector B, spinor_field *out, spinor_field *in);
+void Dphi_(spinor_field *out, spinor_field *in);
 void Dphi(double m0, spinor_field *out, spinor_field *in);
 void g5Dphi(double m0, spinor_field *out, spinor_field *in);
 
-void Dphi_flt_(block_selector B, spinor_field_flt *out, spinor_field_flt *in);
+void Dphi_flt_(spinor_field_flt *out, spinor_field_flt *in);
 void Dphi_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
 void g5Dphi_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
 

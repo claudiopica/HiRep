@@ -61,6 +61,9 @@ void _FUNC(spinor_field_clc_add_assign)(_SPINOR_FIELD_TYPE *s1, complex cd1, _SP
 /* s1=g5*s2  */
 void _FUNC(spinor_field_g5)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2);
 
+/* s1=g5*s1  */
+void _FUNC(spinor_field_g5_assign)(_SPINOR_FIELD_TYPE *s1);
+
 /* tools per eva.c  */
 void _FUNC(spinor_field_lc1)(double c1, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2);
 void _FUNC(spinor_field_lc2)(double c1, double c2, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2);

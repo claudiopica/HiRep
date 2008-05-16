@@ -331,22 +331,26 @@ void _group_represent2_flt(suNf_flt* v, suNg_flt *u) {
 
 void represent_gauge_field() {
 #ifndef REPR_FUNDAMENTAL
-   int i;
-   suNf *Ru=u_gauge_f;
-   suNg *u=u_gauge;
+   int ix, ip;
+   int mu;
+   suNf *Ru;
+   suNg *u;
 
-   for (i=0; i<VOLUME*4; ++i){
-      _group_represent2(Ru,u); 
+	/* TOTAL LOOP */
+	for(ip=0;ip<glattice.total_master_pieces;ip++)
+	for(ix=glattice.master_start[ip];ix<=glattice.master_end[ip];ix++)
+   for (mu=0;mu<4;mu++) {
+	   u=pu_gauge(ix,mu);
+      Ru=pu_gauge_f(ix,mu);
+ 	   _group_represent2(Ru,u); 
       /*_group_represent(*Ru,*u);*/
-      ++Ru;
-      ++u;
    }
-	 apply_bc();
+	apply_bc();
 #else
 	static short int first_time=1;
 	 if(first_time) {
 		 first_time=0;
-	   u_gauge_f=(suNf *)((void*)u_gauge);
+	    u_gauge_f=(suNf *)((void*)u_gauge);
 		 apply_bc();
 	 }
 #endif
@@ -354,22 +358,26 @@ void represent_gauge_field() {
 
 void represent_gauge_field_flt() {
 #ifndef REPR_FUNDAMENTAL
-   int i;
+   int ix, ip;
+   int mu;
    suNf_flt *Ru=u_gauge_f_flt;
    suNg_flt *u=u_gauge_flt;
 
-   for (i=0; i<VOLUME*4; ++i){
+	/* TOTAL LOOP */
+	for(ip=0;ip<glattice.total_master_pieces;ip++)
+	for(ix=glattice.master_start[ip];ix<=glattice.master_end[ip];ix++)
+   for (mu=0;mu<4;mu++) {
+	   u=pu_gauge_flt(ix,mu);
+      Ru=pu_gauge_f_flt(ix,mu);
       _group_represent2_flt(Ru,u); 
       /*_group_represent(*Ru,*u);*/
-      ++Ru;
-      ++u;
    }
 	 apply_bc_flt();
 #else
 	static short int first_time=1;
 	 if(first_time) {
 		 first_time=0;
-	   u_gauge_f_flt=(suNf_flt *)((void*)u_gauge_flt);
+	    u_gauge_f_flt=(suNf_flt *)((void*)u_gauge_flt);
 		 apply_bc_flt();
 	 }
 #endif

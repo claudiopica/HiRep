@@ -14,6 +14,7 @@
 #include "global.h"
 #include "error.h"
 #include "dirac.h"
+#include "linear_algebra.h"
 
 /*
  * the following variable is used to keep trace of
@@ -36,10 +37,10 @@ unsigned long int getMVM_flt() {
  * in the range [VOLUME/2,VOLUME[
  */
 
-/* prende 2 spinor lunghi VOLUME/2 definiti solo su siti con la stessa parita' */
-void Dphi_flt_(block_selector B, spinor_field_flt *out, spinor_field_flt *in)
+void Dphi_flt_(spinor_field_flt *out, spinor_field_flt *in)
 {
-   int ix,iy,sx,block=0;
+   int iy;
+   _DECLARE_INT_ITERATOR(ix);
    suNf_flt *up,*um;
    suNf_vector_flt psi,chi;
    suNf_spinor_flt *r=0,*sp,*sm;
@@ -50,30 +51,24 @@ void Dphi_flt_(block_selector B, spinor_field_flt *out, spinor_field_flt *in)
    error(in==out,1,"Dphi_flt_ [Dphi_flt.c]",
          "Input and output fields must be different");
 
-   switch(B) {
-      case EO:
-         block=EVENSITES;
-         break;
-      case OE:
-         block=ODDSITES;
-         break;
-      default:
-         error(1,1,"Dphi_flt_ [Dphi_flt.c]",
-               "Invalid block parity selection");
-   }
+#ifdef CHECK_SPINOR_MATCHING
+   error(out->type==&glat_even && in->type!=&glat_odd,1,"Dphi_ [Dphi.c]", "Spinors don't match!");
+   error(out->type==&glat_odd && in->type!=&glat_even,1,"Dphi_ [Dphi.c]", "Spinors don't match!");
+   error(out->type==&glattice && in->type!=&glattice,1,"Dphi_ [Dphi.c]", "Spinors don't match!");
+#endif /* CHECK_SPINOR_MATCHING */
 
-	 ++MVMcounter; /* count matrix call */
+   ++MVMcounter; /* count matrix call */
+   if(out->type==&glattice) ++MVMcounter;
+ 
+/************************ loop over all lattice sites *************************/
 
- /************************ loop over all lattice sites *************************/
-
-   FOR_SOME_SC(block,ix,sx)
-   {
-      r=_SPINOR_AT(out,sx);
+   _MASTER_FOR(out->type,ix) {
+      r=_SPINOR_AT(out,ix);
 
 /******************************* direction +0 *********************************/
 
       iy=iup(ix,0);
-      sp=_SPINOR_AT_SITE(in,iy);
+      sp=_SPINOR_AT(in,iy);
       up=pu_gauge_f_flt(ix,0);
       
       _vector_add_f(psi,(*sp).c[0],(*sp).c[2]);
@@ -91,7 +86,7 @@ void Dphi_flt_(block_selector B, spinor_field_flt *out, spinor_field_flt *in)
 /******************************* direction -0 *********************************/
 
       iy=idn(ix,0);
-      sm=_SPINOR_AT_SITE(in,iy);
+      sm=_SPINOR_AT(in,iy);
       um=pu_gauge_f_flt(iy,0);
       
       _vector_sub_f(psi,(*sm).c[0],(*sm).c[2]);
@@ -109,7 +104,7 @@ void Dphi_flt_(block_selector B, spinor_field_flt *out, spinor_field_flt *in)
 /******************************* direction +1 *********************************/
 
       iy=iup(ix,1);
-      sp=_SPINOR_AT_SITE(in,iy);
+      sp=_SPINOR_AT(in,iy);
       up=pu_gauge_f_flt(ix,1);
       
       _vector_i_add_f(psi,(*sp).c[0],(*sp).c[3]);
@@ -127,7 +122,7 @@ void Dphi_flt_(block_selector B, spinor_field_flt *out, spinor_field_flt *in)
 /******************************* direction -1 *********************************/
 
       iy=idn(ix,1);
-      sm=_SPINOR_AT_SITE(in,iy);
+      sm=_SPINOR_AT(in,iy);
       um=pu_gauge_f_flt(iy,1);
       
       _vector_i_sub_f(psi,(*sm).c[0],(*sm).c[3]);
@@ -145,7 +140,7 @@ void Dphi_flt_(block_selector B, spinor_field_flt *out, spinor_field_flt *in)
 /******************************* direction +2 *********************************/
 
       iy=iup(ix,2);
-      sp=_SPINOR_AT_SITE(in,iy);
+      sp=_SPINOR_AT(in,iy);
       up=pu_gauge_f_flt(ix,2);
       
       _vector_add_f(psi,(*sp).c[0],(*sp).c[3]);
@@ -163,7 +158,7 @@ void Dphi_flt_(block_selector B, spinor_field_flt *out, spinor_field_flt *in)
 /******************************* direction -2 *********************************/
 
       iy=idn(ix,2);
-      sm=_SPINOR_AT_SITE(in,iy);
+      sm=_SPINOR_AT(in,iy);
       um=pu_gauge_f_flt(iy,2);
       
       _vector_sub_f(psi,(*sm).c[0],(*sm).c[3]);
@@ -181,7 +176,7 @@ void Dphi_flt_(block_selector B, spinor_field_flt *out, spinor_field_flt *in)
 /******************************* direction +3 *********************************/
 
       iy=iup(ix,3);
-      sp=_SPINOR_AT_SITE(in,iy);
+      sp=_SPINOR_AT(in,iy);
       up=pu_gauge_f_flt(ix,3);
       
       _vector_i_add_f(psi,(*sp).c[0],(*sp).c[2]);
@@ -199,7 +194,7 @@ void Dphi_flt_(block_selector B, spinor_field_flt *out, spinor_field_flt *in)
 /******************************* direction -3 *********************************/
 
       iy=idn(ix,3);
-      sm=_SPINOR_AT_SITE(in,iy);
+      sm=_SPINOR_AT(in,iy);
       um=pu_gauge_f_flt(iy,3);
       
       _vector_i_sub_f(psi,(*sm).c[0],(*sm).c[2]);
@@ -226,9 +221,7 @@ void Dphi_flt_(block_selector B, spinor_field_flt *out, spinor_field_flt *in)
  */
 void Dphi_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
 {
-   int ix,sx;
    double rho;
-   suNf_spinor_flt *r, *s;
 
    error((in==NULL)||(out==NULL),1,"Dphi_flt [Dphi_flt.c]",
          "Attempt to access unallocated memory space");
@@ -236,26 +229,20 @@ void Dphi_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
    error(in==out,1,"Dphi_flt [Dphi_flt.c]",
          "Input and output fields must be different");
 
-   Dphi_flt_(OE, out, in);
-   Dphi_flt_(EO, out, in);
+#ifdef CHECK_SPINOR_MATCHING
+   error(out->type!=&glattice || in->type!=&glattice,1,"Dphi [Dphi.c]", "Spinors are not defined on all the lattice!");
+#endif /* CHECK_SPINOR_MATCHING */
+
+   Dphi_flt_(out, in);
 
    rho=+4.0f+m0;
-
-/************************ loop over all lattice sites *************************/
-
-   FOR_LOCAL_SC(ix,sx) {
-      r=_SPINOR_AT(out,sx);
-      s=_SPINOR_AT(in,sx);
-      _spinor_mul_add_assign_f(*r,rho,*s);
-   }
+   spinor_field_mul_add_assign_f_flt(out,rho,in);
 
 }
 
 void g5Dphi_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
 {
-   int ix,sx;
    double rho;
-   suNf_spinor_flt *r, *s;
 
    error((in==NULL)||(out==NULL),1,"g5Dphi_flt [Dphi_flt.c]",
          "Attempt to access unallocated memory space");
@@ -263,18 +250,15 @@ void g5Dphi_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
    error(in==out,1,"g5Dphi_flt [Dphi_flt.c]",
          "Input and output fields must be different");
 
-   Dphi_flt_(OE, out, in);
-   Dphi_flt_(EO, out, in);
+#ifdef CHECK_SPINOR_MATCHING
+   error(out->type!=&glattice || in->type!=&glattice,1,"g5Dphi [Dphi.c]", "Spinors are not defined on all the lattice!");
+#endif /* CHECK_SPINOR_MATCHING */
+
+   Dphi_flt_(out, in);
    
    rho=4.0f+m0;
 
-/************************ loop over all lattice sites *************************/
-
-   FOR_LOCAL_SC(ix,sx) {
-      r=_SPINOR_AT(out,sx);
-      s=_SPINOR_AT(in,sx);
-      _spinor_mul_add_assign_f(*r,rho,*s);
-      _spinor_g5_assign_f(*r);
-   }
+   spinor_field_mul_add_assign_f_flt(out,rho,in);
+   spinor_field_g5_assign_f_flt(out);
 }
 

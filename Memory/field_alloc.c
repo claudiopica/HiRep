@@ -23,16 +23,14 @@ suNg* alloc_gfield()
    int ix;
    suNg unity,*p;
 
-   p=amalloc(4*VOLUME*sizeof(suNg),ALIGN);
+   p=amalloc(4*glattice.gsize*sizeof(suNg),ALIGN);
    error(p==NULL,1,"alloc_gfield [field_alloc.c]",
          "Could not allocate memory space for the gauge field");
 
    _suNg_unit(unity);
 
-   for (ix=0;ix<4*VOLUME;ix+=2){
-       *(p+ix)=unity;
-       *(p+ix+1)=unity;
-   }
+   for (ix=0;ix<4*glattice.gsize;ix++)
+      *(p+ix)=unity;
    
    return p;
 }
@@ -42,15 +40,15 @@ suNf* alloc_gfield_f()
    int ix;
    suNf unity,*p;
 
-   p=amalloc(4*VOLUME*sizeof(suNf),ALIGN);
+   p=amalloc(4*glattice.gsize*sizeof(suNf),ALIGN);
    error(p==NULL,1,"alloc_gfield_f [field_alloc.c]",
          "Could not allocate memory space for the gauge field");
 
    _suNf_unit(unity);
 
-   for (ix=0;ix<4*VOLUME;ix+=2){
-       *(p+ix)=unity;
-       *(p+ix+1)=unity;
+   for (ix=0;ix<4*glattice.gsize;ix+=2){
+      *(p+ix)=unity;
+      *(p+ix+1)=unity;
    }
    
    return p;
@@ -62,15 +60,15 @@ suNg_flt* alloc_gfield_flt()
    int ix;
    suNg_flt unity,*p;
 
-   p=amalloc(4*VOLUME*sizeof(suNg_flt),ALIGN);
+   p=amalloc(4*glattice.gsize*sizeof(suNg_flt),ALIGN);
    error(p==NULL,1,"alloc_gfield_flt [field_alloc.c]",
          "Could not allocate memory space for the gauge field");
 
    _suNg_unit(unity);
 
-   for (ix=0;ix<4*VOLUME;ix+=2){
-       *(p+ix)=unity;
-       *(p+ix+1)=unity;
+   for (ix=0;ix<4*glattice.gsize;ix+=2){
+      *(p+ix)=unity;
+      *(p+ix+1)=unity;
    }
    
    return p;
@@ -81,15 +79,15 @@ suNf_flt* alloc_gfield_f_flt()
    int ix;
    suNf_flt unity,*p;
  
-   p=amalloc(4*VOLUME*sizeof(suNf_flt),ALIGN);
+   p=amalloc(4*glattice.gsize*sizeof(suNf_flt),ALIGN);
    error(p==NULL,1,"alloc_gfield_f_flt [field_alloc.c]",
          "Could not allocate memory space for the gauge field");
 
    _suNf_unit(unity);
 
-   for (ix=0;ix<4*VOLUME;ix+=2){
-       *(p+ix)=unity;
-       *(p+ix+1)=unity;
+   for (ix=0;ix<4*glattice.gsize;ix+=2){
+      *(p+ix)=unity;
+      *(p+ix+1)=unity;
    }
    
    return p;

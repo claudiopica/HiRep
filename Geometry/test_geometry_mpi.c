@@ -172,11 +172,15 @@ static void set_coordinates(int x, int *test_q) {
 
 
 int even_q(int c[4]) {
-  return (c[0]+c[1]+c[2]+c[3]+myid_sign)&1;
+   return ((c[0]+c[1]+c[2]+c[3]
+           +buffer_thickness[0]+buffer_thickness[1]+buffer_thickness[2]+buffer_thickness[3]
+           +myid_sign)&1);
 }
 
 int odd_q(int c[4]) {
-  return !((c[0]+c[1]+c[2]+c[3]+myid_sign)&1);
+   return !((c[0]+c[1]+c[2]+c[3]
+           +buffer_thickness[0]+buffer_thickness[1]+buffer_thickness[2]+buffer_thickness[3]
+           +myid_sign)&1);
 }
 
 
@@ -206,6 +210,9 @@ void test_geometry_descriptor(geometry_descriptor *gd, int(*in_subset_q)(int*)) 
 	lprintf("TEST_GEOMETRY.C",loglevel,"total_master_pieces = %d\n", gd->total_master_pieces);
 	lprintf("TEST_GEOMETRY.C",loglevel,"master_start = %p ... %p\n", gd->master_start, gd->master_start+gd->local_master_pieces-1);
 	lprintf("TEST_GEOMETRY.C",loglevel,"master_end = %p ... %p\n", gd->master_end, gd->master_end+gd->local_master_pieces-1);
+	lprintf("TEST_GEOMETRY.C",loglevel,"master_start[0] = %d\n", gd->master_start[0]);
+	lprintf("TEST_GEOMETRY.C",loglevel,"master_end[0] = %d\n", gd->master_end[0]);
+	
 
 
 	/* TEST: Members master_start[0],master_end[0] describes all and only the inner sites */
@@ -735,10 +742,22 @@ void test_glattice() {
 	lprintf("TEST_GEOMETRY.C",loglevel,"total_master_pieces = %d\n", glattice.total_master_pieces);
 	lprintf("TEST_GEOMETRY.C",loglevel,"master_start = %p ... %p\n", glattice.master_start, glattice.master_start+glattice.local_master_pieces-1);
 	lprintf("TEST_GEOMETRY.C",loglevel,"master_end = %p ... %p\n", glattice.master_end, glattice.master_end+glattice.local_master_pieces-1);
+	lprintf("TEST_GEOMETRY.C",loglevel,"master_start[0] = %d\n", glattice.master_start[0]);
+	lprintf("TEST_GEOMETRY.C",loglevel,"master_end[0] = %d\n", glattice.master_end[0]);
 
 	/* TEST: Members master_start[0],master_end[0] describes all and only the inner sites */
 
 	int inner_pieces = 1;
+	
+	test_q = true;
+	int inner_volume = (local_size[0]-2*buffer_thickness[0])*(local_size[1]-2*buffer_thickness[1])*
+	                   (local_size[2]-2*buffer_thickness[2])*(local_size[3]-2*buffer_thickness[3]);
+	if(glattice.master_end[0]-glattice.master_start[0]+1 != inner_volume) {
+	   test_q = false;
+	   lprintf("TEST_GEOMETRY.C",loglevel,"master_end[0]-master_start[0]+1 = %d but it should be %d\n",
+	           glattice.master_end[0]-glattice.master_start[0]+1,inner_volume);
+	}
+	error(!test_q,1,"test_geometry.c","Members master_start[0],master_end[0] describes all and only the inner sites... FAILED");
 
 	for(x=0; x<glattice.gsize; x++)
 		descr[x].t_flag = 0;
@@ -775,6 +794,18 @@ void test_glattice() {
 
 
 	/* TEST: Members local_master_pieces,master_start,master_end describes all and only the local sites */
+	
+	test_q = true;
+	int local_volume = local_size[0]*local_size[1]*local_size[2]*local_size[3];
+	int sum_local_len = 0;
+	for(i=0; i<glattice.local_master_pieces; i++)
+		sum_local_len += glattice.master_end[i]-glattice.master_start[i]+1;
+	
+	if(sum_local_len != local_volume) {
+	   test_q = false;
+	   lprintf("TEST_GEOMETRY.C",loglevel,"The sum of the lengths of all the local pieces is %d but should be %d\n",sum_local_len,local_volume);
+	}
+	error(!test_q,1,"test_geometry.c","Members local_master_pieces,master_start,master_end describes all and only the local site... FAILED");
 
 	for(x=0; x<glattice.gsize; x++)
 		descr[x].t_flag = 0;
@@ -811,6 +842,28 @@ void test_glattice() {
 
 
 	/* TEST: Members total_master_pieces,master_start,master_end describes all the sites */
+
+	test_q = true;
+	int total_volume = local_size[0]*local_size[1]*local_size[2]*local_size[3]+
+	                   2*buffer_thickness[0]*local_size[1]*local_size[2]*local_size[3]+
+	                   2*local_size[0]*buffer_thickness[1]*local_size[2]*local_size[3]+
+	                   2*local_size[0]*local_size[1]*buffer_thickness[2]*local_size[3]+
+	                   2*local_size[0]*local_size[1]*local_size[2]*buffer_thickness[3]+
+	                   4*buffer_thickness[0]*buffer_thickness[1]*local_size[2]*local_size[3]+
+	                   4*buffer_thickness[0]*local_size[1]*buffer_thickness[2]*local_size[3]+
+	                   4*buffer_thickness[0]*local_size[1]*local_size[2]*buffer_thickness[3]+
+	                   4*local_size[0]*buffer_thickness[1]*buffer_thickness[2]*local_size[3]+
+	                   4*local_size[0]*buffer_thickness[1]*local_size[2]*buffer_thickness[3]+
+	                   4*local_size[0]*local_size[1]*buffer_thickness[2]*buffer_thickness[3];
+	int sum_total_len = 0;
+	for(i=0; i<glattice.total_master_pieces; i++)
+		sum_total_len += glattice.master_end[i]-glattice.master_start[i]+1;
+	
+	if(sum_total_len != total_volume) {
+	   test_q = false;
+	   lprintf("TEST_GEOMETRY.C",loglevel,"The sum of the lengths of all the total pieces is %d but should be %d\n",sum_total_len,total_volume);
+	}
+	error(!test_q,1,"test_geometry.c","Members total_master_pieces,master_start,master_end describes all the sites... FAILED");
 
 	for(x=0; x<glattice.gsize; x++)
 		descr[x].t_flag = 0;

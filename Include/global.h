@@ -29,10 +29,20 @@ GLB_VAR(int,Z,0);
 GLB_VAR(int,VOL3,0);
 GLB_VAR(int,VOLUME,0);
 
-GLB_VAR(int,T_BORDER,1);
-GLB_VAR(int,X_BORDER,1);
-GLB_VAR(int,Y_BORDER,1);
-GLB_VAR(int,Z_BORDER,1);
+GLB_VAR(int,T_BORDER,0);
+GLB_VAR(int,X_BORDER,0);
+GLB_VAR(int,Y_BORDER,0);
+GLB_VAR(int,Z_BORDER,0);
+
+GLB_VAR(int,T_EXT,0);
+GLB_VAR(int,X_EXT,0);
+GLB_VAR(int,Y_EXT,0);
+GLB_VAR(int,Z_EXT,0);
+
+GLB_VAR(int,GLOBAL_T,0);
+GLB_VAR(int,GLOBAL_X,0);
+GLB_VAR(int,GLOBAL_Y,0);
+GLB_VAR(int,GLOBAL_Z,0);
 
 /*
 #define VOLUME (T*L*L*L)
@@ -54,7 +64,9 @@ GLB_PTR(int, iup);
 GLB_PTR(int, idn);
 
 /* Geometry structures */
-#define ipt(t,x,y,z) ipt[(t)*(VOL3)+(x)*(Y*Z)+(y)*(Z)+(z)]
+/*#define ipt(t,x,y,z) ipt[(t)*(VOL3)+(x)*(Y*Z)+(y)*(Z)+(z)]*/
+#define ipt(t,x,y,z) ipt[((((t)+T_BORDER)*(X_EXT)+((x)+X_BORDER))*(Y_EXT)+((y)+Y_BORDER))*(Z_EXT)+((z)+Z_BORDER)]
+#define ipt_ext(t,x,y,z) ipt[(((t)*(X_EXT)+(x))*(Y_EXT)+(y))*(Z_EXT)+(z)]
 #define ipt_4d(t,x) ipt_4d[(t)*(VOL3)+(x)]
 #define iup(site,dir) iup[(site)*4+(dir)]
 #define idn(site,dir) idn[(site)*4+(dir)]

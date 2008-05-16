@@ -34,4 +34,4 @@ $(MAIN): %: %.o $(MOD_OBJS)
 .PHONY: default
 
 cleanall: clean
-	rm -rf $(MAIN)
+	rm -rf $(MAIN) *~

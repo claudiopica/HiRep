@@ -244,6 +244,16 @@ void _FUNC(spinor_field_g5)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
    }
 }
 
+/* s1=g5*s1  */
+void _FUNC(spinor_field_g5_assign)(_SPINOR_FIELD_TYPE *s1)
+{
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(s1);
+   
+   _ONE_SPINOR_FOR(s1,i) {
+     _spinor_g5_assign_f(*_SPINOR_PTR(s1));
+   }
+}
 
 
 
