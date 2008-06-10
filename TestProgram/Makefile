@@ -4,7 +4,7 @@ MAIN :=
 
 SRCS = $(addsuffix .c,$(MAIN))
 
-SUBDIRS = Algebra Geometry PureGauge SpinorField DiracOperator
+SUBDIRS = Algebra Geometry PureGauge SpinorField DiracOperator Inverters
 
 default: $(MAIN)
 

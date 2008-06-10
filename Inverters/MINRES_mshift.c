@@ -29,7 +29,6 @@ int MINRES_mshift_core(short int *flags,mshift_par *par, spinor_operator M, spin
 	int i;
 	int cgiter;
 	unsigned int notconverged;
-	unsigned int spinorlen;
 
 	/* fare qualche check sugli input */
 	/* par->n deve essere almeno 1! */
@@ -42,12 +41,15 @@ int MINRES_mshift_core(short int *flags,mshift_par *par, spinor_operator M, spin
 		 }
 	*/
 
+#ifdef CHECK_SPINOR_MATCHING
+   error(out->type!=in->type,1,"MINRES_mshift_core [MINRES_mshift.c]", "Spinors don't match!");
+#endif /* CHECK_SPINOR_MATCHING */
+
 	/* allocate spinors fields and aux real variables */
 	/* implementation note: to minimize the number of malloc calls
 	 * objects of the same type are allocated together
 	 */
-	get_spinor_len(&spinorlen);
-	memall = alloc_spinor_field_f(2*(par->n)+3);
+	memall = alloc_spinor_field_f(2*(par->n)+3,in->type);
 	q1 = (spinor_field**)malloc(sizeof(spinor_field*)*par->n);
 	q2 = (spinor_field**)malloc(sizeof(spinor_field*)*par->n);
 	for(i=0; i<par->n; i++) {
@@ -195,6 +197,10 @@ int MINRES_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_f
 	int i;
 	mshift_par par_save=*par;
 	short int *valid = malloc(sizeof(*valid)*(par->n));
+
+#ifdef CHECK_SPINOR_MATCHING
+   error(out->type!=in->type,1,"MINRES_mshift [MINRES_mshift.c]", "Spinors don't match!");
+#endif /* CHECK_SPINOR_MATCHING */
 	
 	iter=MINRES_mshift_core(valid, par, M, in, out);
 	msiter=iter;

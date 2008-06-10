@@ -9,15 +9,15 @@ MACRO += -DANTIPERIODIC_BC_T
 #MACRO += -DANTIPERIODIC_BC_Y
 #MACRO += -DANTIPERIODIC_BC_Z
 
-CFLAGS = -Wall -ansi -O2 -fomit-frame-pointer -mfpmath=sse -msse -msse2 
-#CFLAGS = -Wall -ansi -O2 -pg -mfpmath=sse -msse -msse2 
+CFLAGS = -Wall -ansi -O2 -fomit-frame-pointer -mfpmath=sse -msse -msse2
+#CFLAGS = -Wall -ansi -g
 
 ##########################################################################
 # DO NOT EDIT BEYOND THIS POINT - OK, OK: EDIT AT YOUR OWN RISK !
 ##########################################################################
 
 #Macros
-MACRO += -DNDEBUG
+MACRO += -DNDEBUG -DCHECK_SPINOR_MATCHING
 MACRO += -D$(REPR) -DREPR_NAME=\"$(REPR)\"
 
 #Include
@@ -28,7 +28,7 @@ INC = -I $(INCDIR)
 CC = gcc
 CPPFLAGS += $(MACRO)
 CFLAGS += $(INC)
-LDFLAGS = -lm
+LDFLAGS = -lm -lefence
 
 #make related
 #export CFLAGS LDFLAGS CPPFLAGS

@@ -12,18 +12,18 @@ check_diracoperator_2      Action of the Dirac operator on plane waves
 
 check_diracoperator_3      Hermiticity of the Dirac op
 
+check_inverters_1          Check of the CG inversion
+
+check_inverters_2          Check of the MINRES inversion
+
+check_inverters_3          Check of QMR multishift
+
+check_inverters_4          Check the eva module using a random field
+
+check_inverters_5          Check the eva module using a free field
+
+check_inverters_6          Check the dirac_eva module using a random field
+
 check3 		Checks the old and the new implementation of the Dirac op
 
-check5		Check of the CG inversion
-
-check6		Check of the MINRES inversion
-
-check7 		Check of QMR multishift
-
-check9		Check the eva module using a random field
-
-check10		Check the eva module using a free field
-
 check13 	Check the mesons (both mesons.c and dublin_mesons.c) using a free field
-
-check14   	Check the dirac_eva module using a random field

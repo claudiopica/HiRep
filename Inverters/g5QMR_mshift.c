@@ -1,3 +1,4 @@
+#include "global.h"
 #include "inverters.h"
 #include "linear_algebra.h"
 #include "complex.h"
@@ -40,7 +41,6 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
 	int i;
 	int cgiter;
 	unsigned int notconverged;
-	unsigned int spinorlen;
 
 	unsigned short *flags;
 
@@ -55,12 +55,16 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
 		 }
 		 */
 
+#ifdef CHECK_SPINOR_MATCHING
+   error(in->type!=&glattice,1,"g5QMR_mshift_core [g5QMR_mshift.c]", "Spinors don't match!");
+   error(out->type!=&glattice,1,"g5QMR_mshift_core [g5QMR_mshift.c]", "Spinors don't match!");
+#endif /* CHECK_SPINOR_MATCHING */
+
 	/* allocate spinors fields and aux real variables */
 	/* implementation note: to minimize the number of malloc calls
 	 * objects of the same type are allocated together
 	 */
-	get_spinor_len(&spinorlen);
-	memall = alloc_spinor_field_f(2*(par->n)+4);
+	memall = alloc_spinor_field_f(2*(par->n)+4,&glattice);
 	q1 = (spinor_field**)malloc(sizeof(spinor_field*)*par->n);
 	q2 = (spinor_field**)malloc(sizeof(spinor_field*)*par->n);
 	for(i=0; i<par->n; i++) {
@@ -252,6 +256,11 @@ int g5QMR_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_fi
 	int loccg;
 	int msiter;
 
+#ifdef CHECK_SPINOR_MATCHING
+   error(in->type!=&glattice,1,"g5QMR_mshift [g5QMR_mshift.c]", "Spinors don't match!");
+   error(out->type!=&glattice,1,"g5QMR_mshift [g5QMR_mshift.c]", "Spinors don't match!");
+#endif /* CHECK_SPINOR_MATCHING */
+
 	orig=*par; /* save par */
 	valid=malloc(sizeof(short)*orig.n);
 	cgiter=g5QMR_mshift_core(valid,par,M,in,out);
@@ -271,12 +280,10 @@ int g5QMR_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_fi
 
 			if (valid[n]==0) {
 				/* revert to MINRES */
-				unsigned int spinorlen;
 				MINRES_par Mpar;
 				
 				lprintf("INVERTER",20,"g5QMR_mshift: using MINRES on vect %d\n",n);
 
-				get_spinor_len(&spinorlen);
 				Mpar.err2=par->err2;
 				Mpar.max_iter=0;
 

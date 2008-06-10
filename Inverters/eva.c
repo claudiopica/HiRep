@@ -95,7 +95,7 @@
 static int initr=0;
 static suNf_spinor *psi,*chi;
 
-static int nop,nvc=0,VOLUME;
+static int nop,nvc=0;
 static double *dd,*ee;
 static complex *aa,*bb,*cc,*vv;
 
@@ -114,11 +114,10 @@ static void alloc_ws_rotate(void)
 
 static void rotate(int n,spinor_field *pkk,complex v[])
 {
-   int k,j,ix;
+   int k,j;
+   _DECLARE_INT_ITERATOR(ix);
    complex *z;
    suNf_spinor *pk,*pj;
-
-   int vol = VOLUME;
 
    if (initr==0)
       alloc_ws_rotate();
@@ -126,12 +125,12 @@ static void rotate(int n,spinor_field *pkk,complex v[])
    error((n<1)||(n>MAX_ROTATE),1,"rotate [eva.c]",
          "Parameter n is out of range");
 
-   for (ix=0;ix<vol;ix++)
+   _MASTER_FOR(pkk->type,ix)
    {
       for (k=0;k<n;k++)
       {
          pk=&(psi[k]);
-         pj=_SPINOR_AT_SITE(&pkk[0],ix);
+         pj=_SPINOR_AT(&pkk[0],ix);
          z=&v[k];
 
          _vector_mulc_f((*pk).c[0],*z,(*pj).c[0]);
@@ -141,7 +140,7 @@ static void rotate(int n,spinor_field *pkk,complex v[])
 
          for (j=1;j<n;j++)
          {
-            pj=_SPINOR_AT_SITE(&pkk[j],ix);
+            pj=_SPINOR_AT(&pkk[j],ix);
             z+=n;
 
             _vector_mulc_add_assign_f((*pk).c[0],*z,(*pj).c[0]);
@@ -152,7 +151,7 @@ static void rotate(int n,spinor_field *pkk,complex v[])
       }
 
       for (k=0;k<n;k++)
-         *_SPINOR_AT_SITE(&pkk[k],ix)=psi[k];
+         *_SPINOR_AT(&pkk[k],ix)=psi[k];
    }
 }
 
@@ -443,7 +442,7 @@ static void apply_cheby(int k,double lbnd,double ubnd,
 }
 
 
-int eva(int len, int nev,int nevt,int init,int kmax,
+int eva(int nev,int nevt,int init,int kmax,
         int imax,double ubnd,double omega1,double omega2,
         spinor_operator Op,
         spinor_field *ws,spinor_field *ev,double d[],int *status)   
@@ -453,15 +452,17 @@ int eva(int len, int nev,int nevt,int init,int kmax,
    double lbnd;
   
    *status=0;
-   
-   VOLUME=len;
-   
+      
    error((nev<=0)||(nevt<nev)||(kmax<2)||(imax<1),1,
          "eva [eva.c]",
          "Improper parameters nev,nevt,kmax or imax");
    error((omega1<(ubnd*EPSILON))&&(omega2<EPSILON),1,
          "eva [eva.c]",
          "Improper parameters omega1 or omega2");
+
+#ifdef CHECK_SPINOR_MATCHING
+   error(ws->type!=ev->type,1,"eva [eva.c]", "Spinors don't match!");
+#endif /* CHECK_SPINOR_MATCHING */
 
    nop=0;
    nlock=0;

@@ -121,54 +121,60 @@ static int in_glattice_q(int c[4]) {
 	return false;
 }
 
-static void set_coordinates(int x, int *test_q) {
-	if(x<0 || x >= glattice.gsize) {
-		lprintf("TEST_GEOMETRY.C",0,"set_coordinates(%d,%p).\n",x,test_q);
-		error(1,1,"set_coordinates","I should not be here.");
-	}
-	
-	int i, nb;
-	int c[4];
-	
-	for(i=0; i<4; i++) {
-		nb = iup(x,i);
-		memcpy(c,coord[x],sizeof(int)*4);
-		c[i]++;
-		if(periodic_q[i]) c[i] = safe_mod(c[i],local_size[i]);
-		if(!in_glattice_q(c)) continue;
-		if(nb >= 0 && nb < glattice.gsize) {
-			if(descr[nb].c_type == NOT_ASSIGNED) {
-				descr[nb].c_type = ORIGINAL;
-				memcpy(coord[nb],c,sizeof(int)*4);
-				set_coordinates(nb, test_q);
-			}
-		} else {
-			lprintf("TEST_GEOMETRY.C",0,"Bad candidate index %d for coordinates (%d,%d,%d,%d), reached from (%d,%d,%d,%d) with iup[%d].\n",
-			        nb,c[0],c[1],c[2],c[3],coord[x][0],coord[x][1],coord[x][2],coord[x][3],i);
-			*test_q = false;
-		}
-	}
-	
-	for(i=0; i<4; i++) {
-		nb = idn(x,i);
-		memcpy(c,coord[x],sizeof(int)*4);
-		c[i]--;
-		if(periodic_q[i]) c[i] = safe_mod(c[i],local_size[i]);
-		if(!in_glattice_q(c)) continue;
-		if(nb >= 0 && nb < glattice.gsize) {
-			if(descr[nb].c_type == NOT_ASSIGNED) {
-				descr[nb].c_type = ORIGINAL;
-				memcpy(coord[nb],c,sizeof(int)*4);
-				set_coordinates(nb, test_q);
-			}
-		} else {
-			lprintf("TEST_GEOMETRY.C",0,"Bad candidate index %d for coordinates (%d,%d,%d,%d), reached from (%d,%d,%d,%d) with idn[%d].\n",
-			        nb,c[0],c[1],c[2],c[3],coord[x][0],coord[x][1],coord[x][2],coord[x][3],i);
-			*test_q = false;
-		}
-	}
 
+static int set_nb_coordinates(int x) {
+   int i, nb;
+   int c[4];
+   int counter = 0;
+
+   if(x<0 || x >= glattice.gsize) {
+      lprintf("TEST_GEOMETRY.C",0,"set_nb_coordinates(%d)\n",x);
+      error(1,1,"set_nb_coordinates","I should not be here.");
+   }
+
+   if(descr[x].c_type == NOT_ASSIGNED) return 0;
+   
+   for(i=0; i<4; i++) {
+      nb = iup(x,i);
+      memcpy(c,coord[x],sizeof(int)*4);
+      c[i]++;
+      if(periodic_q[i]) c[i] = safe_mod(c[i],local_size[i]);
+      if(!in_glattice_q(c)) continue;
+      if(nb >= 0 && nb < glattice.gsize) {
+         if(descr[nb].c_type == NOT_ASSIGNED) {
+            descr[nb].c_type = ORIGINAL;
+            memcpy(coord[nb],c,sizeof(int)*4);
+            counter++;
+         }
+      } else {
+         lprintf("TEST_GEOMETRY.C",0,"Bad candidate index %d for coordinates (%d,%d,%d,%d), reached from (%d,%d,%d,%d) with iup[%d].\n",
+                 nb,c[0],c[1],c[2],c[3],coord[x][0],coord[x][1],coord[x][2],coord[x][3],i);
+         return -1;
+      }
+   }
+
+   for(i=0; i<4; i++) {
+      nb = idn(x,i);
+      memcpy(c,coord[x],sizeof(int)*4);
+      c[i]--;
+      if(periodic_q[i]) c[i] = safe_mod(c[i],local_size[i]);
+      if(!in_glattice_q(c)) continue;
+      if(nb >= 0 && nb < glattice.gsize) {
+         if(descr[nb].c_type == NOT_ASSIGNED) {
+            descr[nb].c_type = ORIGINAL;
+            memcpy(coord[nb],c,sizeof(int)*4);
+            counter++;
+         }
+      } else {
+         lprintf("TEST_GEOMETRY.C",0,"Bad candidate index %d for coordinates (%d,%d,%d,%d), reached from (%d,%d,%d,%d) with idn[%d].\n",
+                 nb,c[0],c[1],c[2],c[3],coord[x][0],coord[x][1],coord[x][2],coord[x][3],i);
+         return -1;
+      }
+   }
+   
+   return counter;
 }
+
 
 
 int even_q(int c[4]) {
@@ -548,9 +554,18 @@ void test_glattice() {
 	descr[origin].c_type = ORIGINAL;
 	lprintf("TEST_GEOMETRY.C",loglevel,"Origin found at index %d.\n",origin);
 	
-	/* Set the coordinates for the points reached by iup, idn - iteratively */
-	test_q = true;
-	set_coordinates(origin, &test_q);
+	/* Set the coordinates for the points reached by iup, idn */
+   int howmany;
+   test_q=true;
+   do {
+      howmany=0;
+      for(x=0; x<glattice.gsize; x++) {
+         int ret = set_nb_coordinates(x);
+         if(ret==-1) test_q = false;
+         else howmany += ret;
+      }
+   } while(howmany != 0 && test_q == true);
+	
 	error(!test_q,1,"test_geometry.c","Set the coordinates for the points reached by iup, idn... FAILED");
 	lprintf("TEST_GEOMETRY.C",loglevel,"Set the coordinates for the points reached by iup, idn... OK\n");
 	

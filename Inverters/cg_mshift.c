@@ -24,8 +24,7 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
    int i;
    int cgiter;
    unsigned short notconverged;
-	 unsigned int spinorlen;
-   
+
    /* fare qualche check sugli input */
    /*
    printf("numero vettori n=%d\n",par->n);
@@ -34,10 +33,13 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
       printf("out[%d]=%p\n",i,out[i]);      
    }
    */
+
+#ifdef CHECK_SPINOR_MATCHING
+   error(out->type!=in->type,1,"cg_mshift_core [cg_mshift.c]", "Spinors don't match!");
+#endif /* CHECK_SPINOR_MATCHING */
    
    /* allocate spinors fields and aux real variables */
-	 get_spinor_len(&spinorlen);
-   p = alloc_spinor_field_f(3+par->n);
+   p = alloc_spinor_field_f(3+par->n,in->type);
    k=p+par->n;
    r=k+1;
    Mk=r+1;
@@ -144,6 +146,10 @@ int cg_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field
 	int i;
 	mshift_par par_save=*par;
 	short int *sflags = malloc(sizeof(*sflags)*(par->n));
+
+#ifdef CHECK_SPINOR_MATCHING
+   error(out->type!=in->type,1,"cg_mshift [cg_mshift.c]", "Spinors don't match!");
+#endif /* CHECK_SPINOR_MATCHING */
 
 	cgiter=cg_mshift_core(sflags, par, M, in, out);
 	msiter=cgiter; /* save multishift iterations for logging */

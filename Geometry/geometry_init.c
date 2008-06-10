@@ -30,10 +30,10 @@ static void free_memory() {
 void geometry_set()
 {
   if (init) {
-    T=5;
-    X=7;
-    Y=7;
-    Z=8;
+    T=18;
+    X=18;
+    Y=18;
+    Z=18;
     T_BORDER=1;
     X_BORDER=1;  
     Y_BORDER=1;

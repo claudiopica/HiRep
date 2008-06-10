@@ -416,10 +416,10 @@ static void geometry_mpi_init()
   if(np_z==1) Z_BORDER=0;
   if(np_t==1) T_BORDER=0;
 
-  error(T-2*T_BORDER<0,1,"geometry_mpi_init [geometry_mpi.c]","Too large T Border in the geometry");
-  error(X-2*X_BORDER<0,1,"geometry_mpi_init [geometry_mpi.c]","Too large X Border in the geometry");
-  error(Y-2*Y_BORDER<0,1,"geometry_mpi_init [geometry_mpi.c]","Too large Y Border in the geometry");
-  error(Z-2*Z_BORDER<0,1,"geometry_mpi_init [geometry_mpi.c]","Too large Z Border in the geometry");
+  error(T-2*T_BORDER<=0,1,"geometry_mpi_init [geometry_mpi_eo.c]","Too large T Border in the geometry");
+  error(X-2*X_BORDER<=0,1,"geometry_mpi_init [geometry_mpi_eo.c]","Too large X Border in the geometry");
+  error(Y-2*Y_BORDER<=0,1,"geometry_mpi_init [geometry_mpi_eo.c]","Too large Y Border in the geometry");
+  error(Z-2*Z_BORDER<=0,1,"geometry_mpi_init [geometry_mpi_eo.c]","Too large Z Border in the geometry");
 
   X_EXT=X+2*X_BORDER;
   Y_EXT=Y+2*Y_BORDER;
@@ -942,15 +942,18 @@ static void set_border(int dir){
 static void set_memory_order()
 {
   int i1,i2=0;
-  int check[OVERSIZE_VOLUME];
-  unsigned int oversize_zone_addr_list[index_position];
-  unsigned int oversize_zone_length_list[index_position];
+
+  int * check=malloc(OVERSIZE_VOLUME*sizeof(int));
+  unsigned int * oversize_zone_addr_list=malloc(index_position*sizeof(unsigned int));
+  unsigned int * oversize_zone_length_list=malloc(index_position*sizeof(unsigned int));
   
   int counter_zone=0;
   int test_master=1;
-  int tmp_function_copy_list_from[index_position];
-  int tmp_function_copy_list_to[index_position];
-  int tmp_function_copy_list_len[index_position];
+
+  int * tmp_function_copy_list_from=malloc(index_position*sizeof(int));
+  int * tmp_function_copy_list_to=malloc(index_position*sizeof(int));
+  int * tmp_function_copy_list_len=malloc(index_position*sizeof(int));
+
   int tmp_function_copy_length=0;
   
   for (i1=0;i1<OVERSIZE_VOLUME;i1++) check[i1]=0;
@@ -1056,13 +1059,16 @@ static void set_memory_order()
     }
   /*even odd*/
   
-  int tmp_function_copy_from_e[index_position];
-  int tmp_function_copy_to_e[index_position];
-  int tmp_function_copy_len_e[index_position];
+  int * tmp_function_copy_from_e=malloc(index_position*sizeof(int));
+  int * tmp_function_copy_to_e=malloc(index_position*sizeof(int));
+  int * tmp_function_copy_len_e=malloc(index_position*sizeof(int));
+
   int tmp_function_copy_length_e=0;
-  int tmp_function_copy_from_o[index_position];
-  int tmp_function_copy_to_o[index_position];
-  int tmp_function_copy_len_o[index_position];
+
+  int * tmp_function_copy_from_o=malloc(index_position*sizeof(int));
+  int * tmp_function_copy_to_o=malloc(index_position*sizeof(int));
+  int * tmp_function_copy_len_o=malloc(index_position*sizeof(int));
+
   int tmp_function_copy_length_o=0;
   int start=0;
   int sign,end,pt,length,diff;
@@ -1161,12 +1167,14 @@ static void set_memory_order()
 /*    printf("FINE ALLOCAZIONI\n"); */
 
    int counter_e=0,counter_o=0;
-   int tmp_master_start_e[index_position];
-   int tmp_master_end_e[index_position];
-   int tmp_master_start_o[index_position];
-   int tmp_master_end_o[index_position];
+   int * tmp_master_start_e=malloc(index_position*sizeof(int));
+   int * tmp_master_end_e=malloc(index_position*sizeof(int));
+   int * tmp_master_start_o=malloc(index_position*sizeof(int));
+   int * tmp_master_end_o=malloc(index_position*sizeof(int));
+   
+   
    start=0;
- 
+   
 
 /* ANTONIO */
 
@@ -1270,8 +1278,25 @@ static void set_memory_order()
     }
    
 /*     printf("FINE ALLOCAZIONI EO\n"); */
- 
+   free(oversize_zone_addr_list);
+   free(oversize_zone_length_list);
    
+   free(tmp_function_copy_list_from);
+   free(tmp_function_copy_list_to);
+   free(tmp_function_copy_list_len);
+   free(check);
+   free(tmp_function_copy_from_e);
+   free(tmp_function_copy_to_e);
+   free(tmp_function_copy_len_e);
+   free(tmp_function_copy_from_o);
+   free(tmp_function_copy_to_o);
+   free(tmp_function_copy_len_o);
+   free(tmp_master_start_e);
+   free(tmp_master_end_e);
+   free(tmp_master_start_o);
+   free(tmp_master_end_o);
+   
+
 }
 
 

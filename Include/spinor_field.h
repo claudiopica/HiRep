@@ -15,10 +15,14 @@ typedef struct {
 } spinor_field_flt;
 
 
+#ifndef _PIECE_INDEX
 #define _PIECE_INDEX(i) i##_pindex
+#endif
 #define _SPINOR_PTR(s) s##_ptr
 
+#ifndef _DECLARE_INT_ITERATOR
 #define _DECLARE_INT_ITERATOR(i) int i, _PIECE_INDEX(i)
+#endif
 #define _DECLARE_SPINOR_ITERATOR(s) suNf_spinor* _SPINOR_PTR(s)
 
 

@@ -29,7 +29,6 @@ static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, spi
 
   int cgiter;
   unsigned short notconverged;
-	unsigned int spinorlen;
 
   /* fare qualche check sugli input */
   /* par->n deve essere almeno 1! */
@@ -40,13 +39,17 @@ static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, spi
     printf("out[%d]=%p\n",i,out[i]);      
     }
   */
+
+#ifdef CHECK_SPINOR_MATCHING
+   error(out->type!=in->type,1,"MINRES_core [MINRES.c]", "Spinors don't match!");
+   error(out->type!=trial->type,1,"MINRES_core [MINRES.c]", "Spinors don't match!");
+#endif /* CHECK_SPINOR_MATCHING */
    
   /* allocate spinors fields and aux real variables */
   /* implementation note: to minimize the number of malloc calls
    * objects of the same type are allocated together
    */
-	get_spinor_len(&spinorlen);
-  memall = alloc_spinor_field_f(5);
+  memall = alloc_spinor_field_f(5,in->type);
   q1=memall;
   q2= q1+1;
   p1 = q2+1;
@@ -163,6 +166,11 @@ static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, spi
 int MINRES(MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field *out, spinor_field *trial){
 	int iter,rep=0;
 	short int valid;
+
+#ifdef CHECK_SPINOR_MATCHING
+   error(out->type!=in->type,1,"MINRES [MINRES.c]", "Spinors don't match!");
+   error(out->type!=trial->type,1,"MINRES [MINRES.c]", "Spinors don't match!");
+#endif /* CHECK_SPINOR_MATCHING */
 
 	iter=MINRES_core(&valid, par, M, in, out, trial);
 	while(!valid && (par->max_iter==0 || iter<par->max_iter)) {

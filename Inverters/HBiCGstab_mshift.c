@@ -1,3 +1,4 @@
+#include "global.h"
 #include "inverters.h"
 #include "linear_algebra.h"
 #include "complex.h"
@@ -29,7 +30,6 @@ int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spino
   int cgiter;
   char *sflags;
   unsigned short notconverged;
-	unsigned int spinorlen;
    
   /* fare qualche check sugli input */
   /* par->n deve essere almeno 2! */
@@ -40,13 +40,17 @@ int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spino
     printf("out[%d]=%p\n",i,out[i]);      
     }
   */
+
+#ifdef CHECK_SPINOR_MATCHING
+   error(in->type!=&glattice,1,"HBiCGstab_mshift [HBiCGstab_mshift.c]", "Spinors don't match!");
+   error(out->type!=&glattice,1,"HBiCGstab_mshift [HBiCGstab_mshift.c]", "Spinors don't match!");
+#endif /* CHECK_SPINOR_MATCHING */
    
   /* allocate spinors fields and aux real variables */
   /* implementation note: to minimize the number of malloc calls
    * objects of the same type are allocated together
    */
-	get_spinor_len(&spinorlen);
-  s = alloc_spinor_field_f((par->n)+6);
+  s = alloc_spinor_field_f((par->n)+6,&glattice);
   r = s+par->n;
   r1 = r+1;
   o = r1+1;

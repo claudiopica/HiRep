@@ -2,6 +2,7 @@
 #define INVERTERS_H
 
 #include "suN_types.h"
+#include "spinor_field.h"
 #include "complex.h"
 
 
