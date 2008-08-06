@@ -4,7 +4,7 @@ include $(MKDIR)/MkFlags
 .%.d: %.c 
 	$(MAKE) -C $(INCDIR) all
 	echo -n Generating dependences for [$(SRC)]...
-	$(CC) -MM -MG -MT "$@ $(patsubst .%.d,%.o,$@)" $(CFLAGS) $(CPPFLAGS) $(SRC) > $@ &&\
+	$(GCC) -MM -MG -MT "$@ $(patsubst .%.d,%.o,$@)" $(CPPFLAGS) $(SRC) > $@ &&\
 		echo "RBLD = rebuild" >> $@ &&\
 	echo " done." || echo " failed."
 

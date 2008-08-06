@@ -162,6 +162,10 @@ int cg_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor *
 			cgiter+=cg_mshift_core(sflags+i, par, M, in, out+i);
 			if((++rep)%5==0)
 				lprintf("INVERTER",-10,"CG_mshift recursion = %d (precision too high?)\n",rep);
+			if((rep)>10) {
+				lprintf("INVERTER",-10,"CG_mshift failed on vector %d (precision too high?)\n",i);
+				sflags[i]=1;
+			}
 		}
 	}
 
