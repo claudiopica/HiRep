@@ -615,7 +615,7 @@ static void walk_on_lattice(int level)
   if(check_evaluated_border(level))
     {
 /*       printf("Start of the L%d border (%d,%d,%d,%d) and width (%d,%d,%d,%d)\n",level,blt_start-T_BORDER,blx_start-X_BORDER,bly_start-Y_BORDER,blz_start-Z_BORDER,blt_width,blx_width,bly_width,blz_width); */
-      
+/*       printf("Starting point lattice index %d\n",index_position); */
       
       for (x3=blz_start;x3<blz_start+blz_width;x3++) 
 	for (x2=bly_start;x2<bly_start+bly_width;x2++) 
@@ -623,7 +623,9 @@ static void walk_on_lattice(int level)
 	    for (x0=blt_start;x0<blt_start+blt_width;x0++)
 	      if((x0+x1+x2+x3+myid_sign)&1)
 		set_border_pointer(local_index(x0,x1,x2,x3),level);
-		  
+      
+/*       printf("Middle point lattice index %d\n",index_position); */
+      
       for (x3=blz_start;x3<blz_start+blz_width;x3++) 
 	for (x2=bly_start;x2<bly_start+bly_width;x2++) 
 	  for (x1=blx_start;x1<blx_start+blx_width;x1++) 
@@ -631,6 +633,7 @@ static void walk_on_lattice(int level)
 	      if(!((x0+x1+x2+x3+myid_sign)&1) )
 		set_border_pointer(local_index(x0,x1,x2,x3),level);
       
+/*       printf("End point lattice index %d\n",index_position); */
       
     }
 }
@@ -1179,28 +1182,31 @@ static void set_memory_order()
 /* ANTONIO */
 
 
+
+
+
    for(i1=0; i1< memory_map_counter;i1++)
      {
        
-/*        printf("\n\nINDICE I1 %d Local %d \n",i1,local_memory_map_counter); */
+/*        printf("\n\nINDICE I1 %d Local %d \n",i1,local_memory_map_counter);  */
 
        pt = memory_map_address[i1];
        start=pt;
        end = memory_map_end[i1];
-       /*        printf("ZONE START %d END %d\n",pt,end); */
+/*        printf("ZONE START %d END %d\n",pt,end); */
        
        
        while(pt <= end)
 	 {
-	   sign = site_sign(pt);
+	   sign = site_sign(start);
 	   while(site_sign(pt)==sign)
 	     {
-	       int ax,ay,az,at;
-	       at = map_true2oversize[pt]%(T+2*T_BORDER);
-	       ax = (map_true2oversize[pt]/(T+2*T_BORDER))%(X+2*X_BORDER);
-	       ay = (map_true2oversize[pt]/((T+2*T_BORDER)*(X+2*X_BORDER)))%(Y+2*Y_BORDER);
-	       az = map_true2oversize[pt]/((T+2*T_BORDER)*(X+2*X_BORDER)*(Y+2*Y_BORDER));
-/* 	       printf("segno %d sito %d coord(%d,%d,%d,%d)\n",site_sign(pt),pt,at-T_BORDER,ax-X_BORDER,ay-Y_BORDER,az-Z_BORDER);  */
+/* 	       int ax,ay,az,at; */
+/* 	       at = map_true2oversize[pt]%(T+2*T_BORDER); */
+/* 	       ax = (map_true2oversize[pt]/(T+2*T_BORDER))%(X+2*X_BORDER); */
+/* 	       ay = (map_true2oversize[pt]/((T+2*T_BORDER)*(X+2*X_BORDER)))%(Y+2*Y_BORDER); */
+/* 	       az = map_true2oversize[pt]/((T+2*T_BORDER)*(X+2*X_BORDER)*(Y+2*Y_BORDER)); */
+/*  	       printf("segno %d sito %d coord(%d,%d,%d,%d)\n",site_sign(pt),pt,at-T_BORDER,ax-X_BORDER,ay-Y_BORDER,az-Z_BORDER); */
 	       pt++;
 	       if(pt == end+1)  break;
 	     }
@@ -1208,24 +1214,24 @@ static void set_memory_order()
 
 	   if((sign)&1)
 	     {
-/*    	       printf("SCRIVO sito %d-%d index E %d\n",start,pt-1,counter_e); */
+/* 	       printf("SCRIVO sito %d-%d index E %d\n",start,pt-1,counter_e); */
 	       tmp_master_start_e[counter_e]=start;
 	       tmp_master_end_e[counter_e]=pt-1;     
 	       index_counter_e += tmp_master_end_e[counter_e]-tmp_master_start_e[counter_e]+1;	       
-/*    	       printf("COUNTER E TOTALE %d PARZIALE %d \n",index_counter_e,tmp_master_end_e[counter_e]-tmp_master_start_e[counter_e]+1); */
+/*     	       printf("COUNTER E TOTALE %d PARZIALE %d \n",index_counter_e,tmp_master_end_e[counter_e]-tmp_master_start_e[counter_e]+1); */
 	       counter_e++;
 	     }
 	   else
 	     {
-/*   	       printf("SCRIVO sito %d-%d index O %d\n",start,pt-1,counter_o); */
+/*    	       printf("SCRIVO sito %d-%d index O %d\n",start,pt-1,counter_o);  */
 	       tmp_master_start_o[counter_o]=start;
 	       tmp_master_end_o[counter_o]=pt-1;     
 	       index_counter_o += tmp_master_end_o[counter_o]-tmp_master_start_o[counter_o]+1;	       
-/* 	       printf("COUNTER O TOTALE %d PARZIALE %d \n",index_counter_o,tmp_master_end_o[counter_o]-tmp_master_start_o[counter_o]+1); */
+/*  	       printf("COUNTER O TOTALE %d PARZIALE %d \n",index_counter_o,tmp_master_end_o[counter_o]-tmp_master_start_o[counter_o]+1);  */
 	       counter_o++;
 	     }
 	   start=pt;
-	   pt++;
+	   
 	 }
        
        if(i1+1==local_memory_map_counter) 

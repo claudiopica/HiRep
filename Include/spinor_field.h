@@ -3,6 +3,7 @@
 
 #include "geometry.h"
 #include "error.h"
+#include "suN_types.h"
 
 typedef struct {
 	geometry_descriptor* type;
