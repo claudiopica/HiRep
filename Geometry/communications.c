@@ -43,6 +43,27 @@ void global_sum(double *d, int n) {
 #endif
 }
 
+void bcast(double *d, int n) {
+#ifdef WITH_MPI
+	int mpiret;
+
+	mpiret=MPI_Bcast(d, n, MPI_DOUBLE, 0,MPI_COMM_WORLD);
+#ifndef NDEBUG
+	if (mpiret != MPI_SUCCESS) {
+		char mesg[MPI_MAX_ERROR_STRING];
+		int mesglen;
+		MPI_Error_string(mpiret,mesg,&mesglen);
+		lprintf("MPI",0,"ERROR: %s\n",mesg);
+		error(1,1,"bcast " __FILE__,"Cannot perform global_sum");
+	}
+#endif
+
+#else
+	/* for non mpi do nothing */
+	return;
+#endif
+}
+
 /* functions for filling sending buffer */
 static void sync_gauge_field(suNg_field *gf) {
   int i;

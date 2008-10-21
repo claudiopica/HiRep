@@ -224,14 +224,16 @@ int update_rhmc(){
   _MASTER_FOR(la->type,i) {
     deltaH+=*_FIELD_AT(la,i);
   }
+  global_sum(&deltaH, 1);
   lprintf("RHMC",10,"[DeltaS = %1.8e][exp(-DS) = %1.8e]\n",deltaH,exp(-deltaH));
 
   if(deltaH<0.) {
     suNg_field_copy(u_gauge_old,u_gauge);
   } else {
     double r;
-    ranlxd(&r,1);
-    if(r<exp(-deltaH)) {
+    if (PID==0) { ranlxd(&r,1); if(r<exp(-deltaH)) r=1.0; else r=-1.0;}  /* make test on on PID 0 */
+    bcast(&r,1);
+    if(r>0.) {
       suNg_field_copy(u_gauge_old,u_gauge);
     } else {
       lprintf("RHMC",10,"Configuration rejected.\n");
