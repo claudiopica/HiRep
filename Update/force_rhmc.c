@@ -1,3 +1,8 @@
+/***************************************************************************\
+* Copyright (c) 2008, Claudio Pica                                          *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
 #include "global.h"
 #include "update.h"
 #include "suN.h"
@@ -9,8 +14,9 @@
 #include "logger.h"
 #include "linear_algebra.h"
 #include "memory.h"
+#include "communications.h"
 
-#include <malloc.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 
@@ -24,7 +30,7 @@ extern rational_app r_MD; /* used in the action MD evolution */
 #define _print_mat(a) printf("(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n",(a).c1_1.re,(a).c1_2.re,(a).c1_3.re,(a).c2_1.re,(a).c2_2.re,(a).c2_3.re,(a).c3_1.re,(a).c3_2.re,(a).c3_3.re);printf("(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n",(a).c1_1.im,(a).c1_2.im,(a).c1_3.im,(a).c2_1.im,(a).c2_2.im,(a).c2_3.im,(a).c3_1.im,(a).c3_2.im,(a).c3_3.im)
 
 /* we need to compute  Tr  U(x,mu) g_5*(1-g_mu) chi2 # chi1^+
- * where # denotes the tensor product and Tr is the trace on Lorentz space.
+ * where # indicates the tensor product and Tr is the trace on Lorentz space.
  * the strategy is the following:
  * given the form of g_5(1-g_mu) one can compute only the first two lorentz
  * components of the spinor; so we first apply g_5(1-g_mu) to chi2 to find the first
@@ -74,108 +80,164 @@ extern rational_app r_MD; /* used in the action MD evolution */
 
 
 
-void Force_rhmc_f(double dt, suNg_algebra_vector *force){
-	int i, n, k;
-	static suNg_algebra_vector f;
-	static suNf_vector ptmp;
-	static suNf_spinor p;
-	static suNf s1;
-	static mshift_par inv_par;
-	spinor_field *chi;
-	spinor_field *Hchi;
-	double avrforce,maxforce;
-	double nsq;
-	unsigned int len;
+void Force_rhmc_f(double dt, suNg_av_field *force){
+  _DECLARE_INT_ITERATOR(x);
+  int mu, n, k;
+  static suNg_algebra_vector f;
+  static suNf_vector ptmp;
+  static suNf_spinor p;
+  static suNf s1;
+  static mshift_par inv_par;
+  spinor_field *chi, *Hchi;
+#ifdef UPDATE_EO
+  spinor_field delta, sigma;
+#endif
+  double forcestat[2]; /* used for computation of avr and max force */
+  double nsq;
 
-	get_spinor_len(&len);
-	/* allocate spinors */
-	chi = alloc_spinor_field_f(r_MD.order+1);
-	Hchi = chi+r_MD.order;
+  /* check input types */
+#ifndef CHECK_SPINOR_MATCHING
+   _TWO_SPINORS_MATCHING(u_gauge,force);
+#endif
 
-	/* Compute (H^2-b[n])^-1 * pf */
-	/* set up cg parameters */
-	inv_par.n = r_MD.order;
-	inv_par.shift = r_MD.b;
-	inv_par.err2= _update_par.force_prec; /* this should be high for reversibility */
-	inv_par.max_iter=0; /* no limit */
+  /* allocate spinors */
+#ifdef UPDATE_EO
+  chi = alloc_spinor_field_f(r_MD.order+1,&glattice);
+  Hchi = chi+r_MD.order;
+#else
+  chi = alloc_spinor_field_f(r_MD.order+1,&glattice);
+  Hchi = chi+r_MD.order;
+#endif
 
-	for (k=0; k<_update_par.n_pf; ++k) {
-		/* compute inverse vectors chi[i] = (H^2 - b[i])^1 * pf */
-		cg_mshift(&inv_par, &H2, &pf[k], chi);
+  /* Compute (H^2-b[n])^-1 * pf */
+  /* set up cg parameters */
+  inv_par.n = r_MD.order;
+  inv_par.shift = r_MD.b;
+  inv_par.err2= _update_par.force_prec; /* this should be high for reversibility */
+  inv_par.max_iter=0; /* no limit */
 
-		for (n=0; n<r_MD.order; ++n) {
+#ifdef UPDATE_EO
+      /* change the type of chi[n] */
+    for (n=0; n<r_MD.order; ++n) {
+      chi[n].type=&glat_even;
+    }
+    Hchi->type=&glat_even; 
+#endif
 
-			g5Dphi(_update_par.mass, Hchi, &chi[n]);
 
-			lprintf("FORCE_RHMC",50,"[%d] |chi| = %1.8e |Hchi| = %1.8e\n",n,
-					sqrt(spinor_field_sqnorm_f(&chi[n])),
-					sqrt(spinor_field_sqnorm_f(Hchi))
-					);
+  for (k=0; k<_update_par.n_pf; ++k) {
+    /* compute inverse vectors chi[i] = (H^2 - b[i])^1 * pf */
+    cg_mshift(&inv_par, &H2, &pf[k], chi);
 
-			avrforce=0.;
-			maxforce=0.;
+    for (n=0; n<r_MD.order; ++n) {
+#ifdef UPDATE_EO
+      /* change temporarely the type of chi[n] and Hchi */
+      g5Dphi_eopre(_update_par.mass, Hchi, &chi[n]);
+      /* start_sf_sendrecv(Hchi); this is not needed since it is done by the following Dphi_ call*/
+      /* copy the spinor field structures of chi[n] and Hchi */
+      /* in this way we can reuse the odd part of the fields with new names */
+      delta=*Hchi; delta.type=&glat_odd;
+      sigma=chi[n]; sigma.type=&glat_odd;
+      Dphi_(&delta,Hchi);
+      Dphi_(&sigma,&chi[n]);
 
-			for (i=0;i<4*VOLUME;++i) {
-				int x,y, mu;
-				suNf_spinor *chi1, *chi2;
-				index_to_coord(i,x,mu);
-				_suNf_zero(s1);
-				switch (mu) {
-					case 0:
-						y=iup(x,0);
-						chi1 =_SPINOR_AT_SITE(Hchi,x);
-						chi2=_SPINOR_AT_SITE(&chi[n],y);
-						_F_DIR0(s1,chi1,chi2);
-						chi1=_SPINOR_AT_SITE(&chi[n],x);
-						chi2=_SPINOR_AT_SITE(Hchi,y);
-						_F_DIR0(s1,chi1,chi2);
-						break;
-					case 1:
-						y=iup(x,1);
-						chi1=_SPINOR_AT_SITE(Hchi,x);
-						chi2=_SPINOR_AT_SITE(&chi[n],y);
-						_F_DIR1(s1,chi1,chi2);
-						chi1=_SPINOR_AT_SITE(&chi[n],x);
-						chi2=_SPINOR_AT_SITE(Hchi,y);
-						_F_DIR1(s1,chi1,chi2);
-						break;
-					case 2:
-						y=iup(x,2);
-						chi1=_SPINOR_AT_SITE(Hchi,x);
-						chi2=_SPINOR_AT_SITE(&chi[n],y);
-						_F_DIR2(s1,chi1,chi2);
-						chi1=_SPINOR_AT_SITE(&chi[n],x);
-						chi2=_SPINOR_AT_SITE(Hchi,y);
-						_F_DIR2(s1,chi1,chi2);
-						break;
-					default: /* DIR 3 */
-						y=iup(x,3);
-						chi1=_SPINOR_AT_SITE(Hchi,x);
-						chi2=_SPINOR_AT_SITE(&chi[n],y);
-						_F_DIR3(s1,chi1,chi2);
-						chi1=_SPINOR_AT_SITE(&chi[n],x);
-						chi2=_SPINOR_AT_SITE(Hchi,y);
-						_F_DIR3(s1,chi1,chi2);
-				}
+      start_sf_sendrecv(&delta);
+      start_sf_sendrecv(&sigma);
+#else
+      g5Dphi(_update_par.mass, Hchi, &chi[n]);
+      start_sf_sendrecv(Hchi);
+#endif
 
-				_algebra_project(f,s1);
-				/*_print_avect(f); */
-				_algebra_vector_mul_add_assign_g(force[i],dt*r_MD.a[n+1]*(_REPR_NORM2/_FUND_NORM2),f);	
+      lprintf("FORCE_RHMC",50,"[%d] |chi| = %1.8e |Hchi| = %1.8e\n",n,
+	      sqrt(spinor_field_sqnorm_f(&chi[n])),
+	      sqrt(spinor_field_sqnorm_f(Hchi))
+	      );
 
-				_algebra_vector_sqnorm_g(nsq,f);
-				avrforce+=sqrt(nsq);
-				for(x=0;x<NG*NG-1;++x){
-					if(maxforce<fabs(*(((double*)&f)+x))) maxforce=fabs(*(((double*)&f)+x));
-				}
-			}
+      /* reset force stat counters */
+      forcestat[1]=forcestat[0]=0.;
 
-			avrforce*=dt*r_MD.a[n+1]*(_REPR_NORM2/_FUND_NORM2)/((double)(4*VOLUME));
-			maxforce*=dt*r_MD.a[n+1]*(_REPR_NORM2/_FUND_NORM2);
-			lprintf("FORCE_RHMC",50,"[%d] avr |force| = %1.8e maxforce = %1.8e a = %1.8e b = %1.8e\n",n,avrforce,maxforce,r_MD.a[n+1],r_MD.b[n]);
-		}  
+      _PIECE_FOR(&glattice,x) { 
+	_SITE_FOR(&glattice,x) {
+
+	  for (mu=0; mu<4; ++mu) {
+	    int y;
+	    suNf_spinor *chi1, *chi2;
+	    _suNf_zero(s1);
+	    switch (mu) {
+	    case 0:
+	      y=iup(x,0);
+	      chi1=_FIELD_AT(Hchi,x);
+	      chi2=_FIELD_AT(&chi[n],y);
+	      _F_DIR0(s1,chi1,chi2);
+	      chi1=_FIELD_AT(&chi[n],x);
+	      chi2=_FIELD_AT(Hchi,y);
+	      _F_DIR0(s1,chi1,chi2);
+	      break;
+	    case 1:
+	      y=iup(x,1);
+	      chi1=_FIELD_AT(Hchi,x);
+	      chi2=_FIELD_AT(&chi[n],y);
+	      _F_DIR1(s1,chi1,chi2);
+	      chi1=_FIELD_AT(&chi[n],x);
+	      chi2=_FIELD_AT(Hchi,y);
+	      _F_DIR1(s1,chi1,chi2);
+	      break;
+	    case 2:
+	      y=iup(x,2);
+	      chi1=_FIELD_AT(Hchi,x);
+	      chi2=_FIELD_AT(&chi[n],y);
+	      _F_DIR2(s1,chi1,chi2);
+	      chi1=_FIELD_AT(&chi[n],x);
+	      chi2=_FIELD_AT(Hchi,y);
+	      _F_DIR2(s1,chi1,chi2);
+	      break;
+	    default: /* DIR 3 */
+	      y=iup(x,3);
+	      chi1=_FIELD_AT(Hchi,x);
+	      chi2=_FIELD_AT(&chi[n],y);
+	      _F_DIR3(s1,chi1,chi2);
+	      chi1=_FIELD_AT(&chi[n],x);
+	      chi2=_FIELD_AT(Hchi,y);
+	      _F_DIR3(s1,chi1,chi2);
+	    }
+	  
+	    _algebra_project(f,s1);
+	    /*_print_avect(f); */
+#ifdef UPDATE_EO
+	    _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),-dt*r_MD.a[n+1]*(_REPR_NORM2/_FUND_NORM2),f);	
+#else
+	    _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),dt*r_MD.a[n+1]*(_REPR_NORM2/_FUND_NORM2),f);	
+#endif
+	  
+	    _algebra_vector_sqnorm_g(nsq,f);
+	    forcestat[0]+=sqrt(nsq);
+	    for(y=0;y<NG*NG-1;++y){
+	      if(forcestat[1]<fabs(*(((double*)&f)+y))) forcestat[1]=fabs(*(((double*)&f)+y));
+	    }
+	  }
 	}
+	if(_PIECE_INDEX(x)==0) {
+	  /* wait for spinor to be transfered */
+#ifdef UPDATE_EO
+	  complete_sf_sendrecv(&delta);
+	  complete_sf_sendrecv(&sigma);
+#else
+	  complete_sf_sendrecv(Hchi);
+#endif
+	}
+      }
 
-	free_spinor_field(chi);
+      global_sum(forcestat,2);
+      forcestat[0]*=dt*r_MD.a[n+1]*(_REPR_NORM2/_FUND_NORM2)/((double)(4*GLB_T*GLB_X*GLB_Y*GLB_Z));
+      forcestat[1]*=dt*r_MD.a[n+1]*(_REPR_NORM2/_FUND_NORM2);
+      lprintf("FORCE_RHMC",50,"[%d] avr |force| = %1.8e maxforce = %1.8e a = %1.8e b = %1.8e\n",n,forcestat[0],forcestat[1],r_MD.a[n+1],r_MD.b[n]);
+    }  
+  }
+
+#ifdef UPDATE_EO
+  chi[0].type=&glattice;
+#endif
+  free_spinor_field(chi);
 
 }
 

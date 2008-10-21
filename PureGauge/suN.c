@@ -1,3 +1,8 @@
+/***************************************************************************\
+* Copyright (c) 2008, Claudio Pica                                          *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
 /*******************************************************************************
 *
 * Computation of the average plaquette
@@ -64,8 +69,14 @@ int main(int argc,char *argv[])
 
    printf("Gauge group: SU(%d)\n",NG);
 
+	 /*
    geometry_blocked();
-   test_geometry();
+	 */
+	 read_input("test_input");
+	 setup_process();
+	 define_geometry();
+   /*test_geometry();*/
+
    printf("The lattice size is %dx%dx%dx%d\n",T,X,Y,Z);
    printf("\n");
    printf("beta = %2.4f\n",beta);

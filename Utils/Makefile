@@ -1,6 +1,9 @@
 TOPDIR = ..
 
-SRCS = suN_utils.c suN_exp.c boundary_conditions.c single_double_utils.c
+SRCS = suN_utils.c suN_exp.c boundary_conditions.c 
+
+# these are not yet modified 
+# single_double_utils.c
 
 MKDIR = $(TOPDIR)/Make
 include $(MKDIR)/MkRules

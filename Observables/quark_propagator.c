@@ -1,3 +1,8 @@
+/***************************************************************************\
+* Copyright (c) 2008, Claudio Pica                                          *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
 #include "global.h"
 #include "linear_algebra.h"
 #include "inverters.h"
@@ -8,7 +13,7 @@
 #include "memory.h"
 #include "update.h"
 #include "error.h"
-#include <malloc.h>
+#include <stdlib.h>
 #include <math.h>
 #include <assert.h>
 #include "logger.h"

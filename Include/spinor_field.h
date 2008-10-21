@@ -1,19 +1,82 @@
+/***************************************************************************\
+* Copyright (c) 2008, Claudio Pica                                          *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
 #ifndef SPINOR_FIELD_H
 #define SPINOR_FIELD_H
 
 #include "geometry.h"
-#include "error.h"
 #include "suN_types.h"
+#include "error.h"
+#ifdef WITH_MPI
+#include <mpi.h>
+#endif
 
-typedef struct {
-	geometry_descriptor* type;
-	suNf_spinor* ptr;
+typedef struct _suNg_field {
+  suNg *ptr;
+  geometry_descriptor *type;
+#ifdef WITH_MPI
+  MPI_Request *comm_req; 
+#endif
+} suNg_field;
+
+typedef struct _suNg_field_flt {
+  suNg_flt *ptr;
+  geometry_descriptor *type;
+#ifdef WITH_MPI
+  MPI_Request *comm_req; 
+#endif
+} suNg_field_flt;
+
+
+typedef struct _suNf_field {
+  suNf *ptr;
+  geometry_descriptor *type;
+#ifdef WITH_MPI
+  MPI_Request *comm_req; 
+#endif
+} suNf_field;
+
+typedef struct _suNf_field_flt {
+  suNf_flt *ptr;
+  geometry_descriptor *type;
+#ifdef WITH_MPI
+  MPI_Request *comm_req; 
+#endif
+} suNf_field_flt;
+
+typedef struct _spinor_field {
+  suNf_spinor* ptr;
+  geometry_descriptor* type;
+#ifdef WITH_MPI
+  MPI_Request *comm_req; 
+#endif
 } spinor_field;
 
-typedef struct {
-	geometry_descriptor* type;
-	suNf_spinor_flt* ptr;
+typedef struct _spinor_field_flt {
+  suNf_spinor_flt *ptr;
+  geometry_descriptor *type;
+#ifdef WITH_MPI
+  MPI_Request *comm_req; 
+#endif
 } spinor_field_flt;
+
+typedef struct _suNg_av_field {
+  suNg_algebra_vector *ptr;
+  geometry_descriptor *type;
+#ifdef WITH_MPI
+  MPI_Request *comm_req; 
+#endif
+} suNg_av_field;
+
+typedef struct _scalar_field {
+  double *ptr;
+  geometry_descriptor *type;
+#ifdef WITH_MPI
+  MPI_Request *comm_req; 
+#endif
+} scalar_field;
 
 
 #ifndef _PIECE_INDEX
@@ -30,11 +93,11 @@ typedef struct {
 #ifdef CHECK_SPINOR_MATCHING
 
 #define _TWO_SPINORS_MATCHING(s1,s2) \
-	error((s1)->type!=(s2)->type,1,"not available", "Spinors don't match!");
+	error((s1)->type!=(s2)->type,1,__FILE__ ": ", "Spinors don't match!");
 
 #define _ARRAY_SPINOR_MATCHIN(s,i,n) \
 	for(i=0; i<n; i++) \
-		error((s)->type!=((s)+i)->type,1,"not available", "Spinors don't match!");
+		error((s)->type!=((s)+i)->type,1,__FILE__ ": ", "Spinors don't match!");
 
 #else /* CHECK_SPINOR_MATCHING */
 
@@ -73,7 +136,10 @@ typedef struct {
 	    i++, _SPINOR_PTR(s1)++, _SPINOR_PTR(s2)++, _SPINOR_PTR(s3)++ \
 	   )
 
-#define _SPINOR_AT(s,i) (((s)->ptr)+i)
+#include "field_ordering.h"
+
+#define _FIELD_AT(s,i) (((s)->ptr)+i)
+#define _4FIELD_AT(s,i,mu) (((s)->ptr)+coord_to_index(i,mu))
 /*
 #define _SPINOR_ADDR(s) ((s)->ptr)
 */

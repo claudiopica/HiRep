@@ -1,0 +1,24 @@
+   // Comment
+GLB_T = 2 //Global T size
+GLB_X = 2
+GLB_Y = 2
+GLB_Z = 2
+NP_T = 1
+NP_X = 1
+NP_Y = 1
+NP_Z = 1
+
+beta = 2.0
+mass = -1.31
+nf = 2
+MT_prec = 1.e-14
+MD_prec = 1.e-8
+HB_prec = 1.e-14
+force_prec = 1.e-14
+n_pf = 2
+tlen = 1.0
+nsteps = 14
+gsteps = 15
+
+level = 1  seed = 12345
+

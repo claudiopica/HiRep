@@ -1,3 +1,8 @@
+/***************************************************************************\
+* Copyright (c) 2008, Claudio Pica                                          *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
 /*******************************************************************************
 *
 * Diagonalization of a square matrix using the Jacobi method
@@ -113,42 +118,6 @@ static void sort2(int n,double d[],complex v[])
    }
 }
 
-/*
-static void sort3(int n,double d[],spinor_field *v[])
-{
-   int i,j,k;
-   double p;
-   spinor_field *q;
-   
-   for (i=0;i<n-1;i++)
-   {
-      k=i;
-      p=d[i];
-      
-      for (j=i+1;j<n;j++)
-      {
-	 if (d[j]<p)
-	 {
-	    k=j;
-	    p=d[j];
-	 }
-      }
-      
-      if (k!=i)
-      {
-	 d[k]=d[i];
-	 d[i]=p;
-	 
-	 for (j=0;j<n;j++)
-	 {
-	    q=v[n*j+i];
-	    v[n*j+i]=v[n*j+k];
-	    v[n*j+k]=q;
-	 }
-      }
-   }
-}
-*/
 
 void jacobi1(int n,double a[],double d[],double v[])
 {

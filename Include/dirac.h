@@ -1,3 +1,8 @@
+/***************************************************************************\
+* Copyright (c) 2008, Claudio Pica                                          *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
 #ifndef DIRAC_H
 #define DIRAC_H
 
@@ -6,6 +11,7 @@
 void Dphi_(spinor_field *out, spinor_field *in);
 void Dphi(double m0, spinor_field *out, spinor_field *in);
 void g5Dphi(double m0, spinor_field *out, spinor_field *in);
+void g5Dphi_sq(double m0, spinor_field *out, spinor_field *in);
 
 void Dphi_flt_(spinor_field_flt *out, spinor_field_flt *in);
 void Dphi_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
@@ -13,6 +19,11 @@ void g5Dphi_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
 
 unsigned long int getMVM();
 unsigned long int getMVM_flt();
+
+/* Even/Odd preconditioned matrix */
+void g5Dphi_eopre(double m0, spinor_field *out, spinor_field *in);
+void g5Dphi_eopre_sq(double m0, spinor_field *out, spinor_field *in);
+
 
 /* p = out ; q = in */
 

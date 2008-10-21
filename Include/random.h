@@ -1,3 +1,8 @@
+/***************************************************************************\
+* Copyright (c) 2008, Claudio Pica                                          *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
 /*******************************************************************************
 *
 * File random.h
@@ -10,6 +15,7 @@
 #define RANDOM_H
 
 #include "suN.h"
+#include "spinor_field.h"
 
 void ranlxs(float r[],int n);
 void rlxs_init(int level,int seed);
@@ -35,7 +41,7 @@ void gaussian_suNg_vector(suNg_vector *v);
 
 void random_suNg(suNg *u);
 
-void random_u(void);
+void random_u(suNg_field *gf);
 
 
 #endif

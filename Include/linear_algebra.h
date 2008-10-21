@@ -1,3 +1,8 @@
+/***************************************************************************\
+* Copyright (c) 2008, Claudio Pica                                          *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
 #ifndef LINEAR_ALGEBRA_H
 #define LINEAR_ALGEBRA_H
 
@@ -10,19 +15,6 @@
 
 #include "suN.h"
 #include "spinor_field.h"
-
-/*
-typedef struct {
-	enum { ALL=0 };
-	suNf_spinor *array;
-} spinor_field;
-
-typedef struct {
-	enum { ALL=0 };
-	suNf_spinor_flt *array;
-} spinor_field_flt;
-*/
-
 
 /* double precision */
 #define _SPINOR_FIELD_TYPE spinor_field

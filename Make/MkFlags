@@ -1,23 +1,26 @@
-NG = 3
-REPR = REPR_FUNDAMENTAL
+NG = 2
+#REPR = REPR_FUNDAMENTAL
 #REPR = REPR_SYMMETRIC
 #REPR = REPR_ANTISYMMETRIC
-#REPR = REPR_ADJOINT
+REPR = REPR_ADJOINT
 
-MACRO += -DANTIPERIODIC_BC_T
+#MACRO += -DANTIPERIODIC_BC_T
 #MACRO += -DANTIPERIODIC_BC_X
 #MACRO += -DANTIPERIODIC_BC_Y
 #MACRO += -DANTIPERIODIC_BC_Z
 
-CFLAGS = -Wall -ansi -O2 -fomit-frame-pointer -mfpmath=sse -msse -msse2
-#CFLAGS = -Wall -ansi -g
+CFLAGS = -Wall -std=c99 -O2 -fomit-frame-pointer -mfpmath=sse -msse -msse2 
+#CFLAGS = -Wall -ansi -O2 -pg -mfpmath=sse -msse -msse2 
 
 ##########################################################################
 # DO NOT EDIT BEYOND THIS POINT - OK, OK: EDIT AT YOUR OWN RISK !
 ##########################################################################
 
 #Macros
-MACRO += -DNDEBUG -DCHECK_SPINOR_MATCHING
+MACRO += -DUPDATE_EO
+#MACRO += -DWITH_MPI
+#MACRO += -DNDEBUG
+#MACRO += CHECK_SPINOR_MATCHING
 MACRO += -D$(REPR) -DREPR_NAME=\"$(REPR)\"
 
 #Include
@@ -26,9 +29,11 @@ INC = -I $(INCDIR)
 
 #Compiler
 CC = gcc
+#CC = /usr/lib/lam/bin/mpicc
+GCC = gcc
 CPPFLAGS += $(MACRO)
-CFLAGS += $(INC)
-LDFLAGS = -lm -lefence
+CPPFLAGS += $(INC)
+LDFLAGS = -lm
 
 #make related
 #export CFLAGS LDFLAGS CPPFLAGS

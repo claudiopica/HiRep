@@ -1,9 +1,14 @@
+/***************************************************************************\
+* Copyright (c) 2008, Claudio Pica                                          *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
 #ifndef INVERTERS_H
 #define INVERTERS_H
 
 #include "suN_types.h"
-#include "spinor_field.h"
 #include "complex.h"
+#include "spinor_field.h"
 
 
 typedef void (*spinor_operator)(spinor_field *out, spinor_field *in);

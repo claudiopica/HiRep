@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SRCS = geometry_init.c print_wdmatrix.c test_geometry_mpi.c geometry_mpi_eo.c geometry_mpi.c
+SRCS = geometry_init.c print_wdmatrix.c test_geometry_mpi.c geometry_mpi_eo.c communications.c geometry_mpi_pica.c
 
 MKDIR = $(TOPDIR)/Make
 include $(MKDIR)/MkRules

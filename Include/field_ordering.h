@@ -3,17 +3,11 @@
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
-/*******************************************************************************
-*
-* File error.h
-* 
-* Error handling functions
-*
-*******************************************************************************/
+#ifndef FIELD_ORDERING_H
+#define FIELD_ORDERING_H
 
-#ifndef ERROR_H
-#define ERROR_H
+/* NB: it is assumed in the code that different directions are contiguous in memory */
+#define coord_to_index(ix,mu) ((ix<<2)|(mu))
+#define index_to_coord(i,ix,mu) (mu)=(i&3);(ix)=(i>>2)
 
-void error(int test,int no,char *name,char *text);
-
-#endif
+#endif /* FIELD_ORDERING_H */

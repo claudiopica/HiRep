@@ -19,38 +19,36 @@
 #define true 1
 #define false 0
 
-static int proc_up(int id, int dir)
+static int proc_up(int id, int dir) 
 {
-  int ix,iy,iz,it;
+#ifdef WITH_MPI
+  int coords[4];
+	int outid;
+	
+	MPI_Cart_coords(cart_comm, id, 4, coords);
+	++coords[dir];
+	MPI_Cart_rank(cart_comm, coords, &outid);
   
-  it = id%np_t;
-  ix = (id/np_t)%np_x;
-  iy = (id/(np_t*np_x))%np_y;
-  iz = id/(np_t*np_x*np_y);
-  
-  if(dir == 0) it = (it +1)%np_t;
-  if(dir == 1) ix = (ix +1)%np_x;
-  if(dir == 2) iy = (iy +1)%np_y;
-  if(dir == 3) iz = (iz +1)%np_z;
-  
-  return it + ix*np_t + iy*np_x*np_t + iz*np_y*np_x*np_t;
+	return outid;
+#else
+	return 0;
+#endif
 }
 
 static int proc_down(int id, int dir)
 {
-  int ix,iy,iz,it;
+#ifdef WITH_MPI
+  int coords[4];
+	int outid;
+	
+	MPI_Cart_coords(cart_comm, id, 4, coords);
+	--coords[dir];
+	MPI_Cart_rank(cart_comm, coords, &outid);
   
-  it = id%np_t;
-  ix = (id/np_t)%np_x;
-  iy = (id/(np_t*np_x))%np_y;
-  iz = id/(np_t*np_x*np_y);
-  
-  if(dir == 0) it = (it -1+np_t)%np_t;
-  if(dir == 1) ix = (ix -1+np_x)%np_x;
-  if(dir == 2) iy = (iy -1+np_y)%np_y;
-  if(dir == 3) iz = (iz -1+np_z)%np_z;
-  
-  return it + ix*np_t + iy*np_x*np_t + iz*np_y*np_x*np_t;
+	return outid;
+#else
+	return 0;
+#endif
 }
 
 /* glattice is the geometry_descriptor instance fo the global lattice */
@@ -87,7 +85,7 @@ static void initialize_test() {
 	
 	local_size[0] = T; local_size[1] = X; local_size[2] = Y; local_size[3] = Z;
 	buffer_thickness[0] = T_BORDER; buffer_thickness[1] = X_BORDER; buffer_thickness[2] = Y_BORDER; buffer_thickness[3] = Z_BORDER;
-	periodic_q[0] = (np_t==1) ? true : false; periodic_q[1] = (np_x==1) ? true : false; periodic_q[2] = (np_y==1) ? true : false; periodic_q[3] = (np_z==1) ? true : false; 
+	periodic_q[0] = (NP_T==1) ? true : false; periodic_q[1] = (NP_X==1) ? true : false; periodic_q[2] = (NP_Y==1) ? true : false; periodic_q[3] = (NP_Z==1) ? true : false; 
 	
 	coord = (int**)malloc(sizeof(int*)*glattice.gsize);
 	coord[0] = (int*)malloc(sizeof(int)*glattice.gsize*4);
@@ -121,72 +119,66 @@ static int in_glattice_q(int c[4]) {
 	return false;
 }
 
+static void set_coordinates(int x, int *test_q) {
+	if(x<0 || x >= glattice.gsize) {
+		lprintf("TEST_GEOMETRY.C",0,"set_coordinates(%d,%p).\n",x,test_q);
+		error(1,1,"set_coordinates","I should not be here.");
+	}
+	
+	int i, nb;
+	int c[4];
+	
+	for(i=0; i<4; i++) {
+		nb = iup(x,i);
+		memcpy(c,coord[x],sizeof(int)*4);
+		c[i]++;
+		if(periodic_q[i]) c[i] = safe_mod(c[i],local_size[i]);
+		if(!in_glattice_q(c)) continue;
+		if(nb >= 0 && nb < glattice.gsize) {
+			if(descr[nb].c_type == NOT_ASSIGNED) {
+				descr[nb].c_type = ORIGINAL;
+				memcpy(coord[nb],c,sizeof(int)*4);
+				set_coordinates(nb, test_q);
+			}
+		} else {
+			lprintf("TEST_GEOMETRY.C",0,"Bad candidate index %d for coordinates (%d,%d,%d,%d), reached from (%d,%d,%d,%d) with iup[%d].\n",
+			        nb,c[0],c[1],c[2],c[3],coord[x][0],coord[x][1],coord[x][2],coord[x][3],i);
+			*test_q = false;
+		}
+	}
+	
+	for(i=0; i<4; i++) {
+		nb = idn(x,i);
+		memcpy(c,coord[x],sizeof(int)*4);
+		c[i]--;
+		if(periodic_q[i]) c[i] = safe_mod(c[i],local_size[i]);
+		if(!in_glattice_q(c)) continue;
+		if(nb >= 0 && nb < glattice.gsize) {
+			if(descr[nb].c_type == NOT_ASSIGNED) {
+				descr[nb].c_type = ORIGINAL;
+				memcpy(coord[nb],c,sizeof(int)*4);
+				set_coordinates(nb, test_q);
+			}
+		} else {
+			lprintf("TEST_GEOMETRY.C",0,"Bad candidate index %d for coordinates (%d,%d,%d,%d), reached from (%d,%d,%d,%d) with idn[%d].\n",
+			        nb,c[0],c[1],c[2],c[3],coord[x][0],coord[x][1],coord[x][2],coord[x][3],i);
+			*test_q = false;
+		}
+	}
 
-static int set_nb_coordinates(int x) {
-   int i, nb;
-   int c[4];
-   int counter = 0;
-
-   if(x<0 || x >= glattice.gsize) {
-      lprintf("TEST_GEOMETRY.C",0,"set_nb_coordinates(%d)\n",x);
-      error(1,1,"set_nb_coordinates","I should not be here.");
-   }
-
-   if(descr[x].c_type == NOT_ASSIGNED) return 0;
-   
-   for(i=0; i<4; i++) {
-      nb = iup(x,i);
-      memcpy(c,coord[x],sizeof(int)*4);
-      c[i]++;
-      if(periodic_q[i]) c[i] = safe_mod(c[i],local_size[i]);
-      if(!in_glattice_q(c)) continue;
-      if(nb >= 0 && nb < glattice.gsize) {
-         if(descr[nb].c_type == NOT_ASSIGNED) {
-            descr[nb].c_type = ORIGINAL;
-            memcpy(coord[nb],c,sizeof(int)*4);
-            counter++;
-         }
-      } else {
-         lprintf("TEST_GEOMETRY.C",0,"Bad candidate index %d for coordinates (%d,%d,%d,%d), reached from (%d,%d,%d,%d) with iup[%d].\n",
-                 nb,c[0],c[1],c[2],c[3],coord[x][0],coord[x][1],coord[x][2],coord[x][3],i);
-         return -1;
-      }
-   }
-
-   for(i=0; i<4; i++) {
-      nb = idn(x,i);
-      memcpy(c,coord[x],sizeof(int)*4);
-      c[i]--;
-      if(periodic_q[i]) c[i] = safe_mod(c[i],local_size[i]);
-      if(!in_glattice_q(c)) continue;
-      if(nb >= 0 && nb < glattice.gsize) {
-         if(descr[nb].c_type == NOT_ASSIGNED) {
-            descr[nb].c_type = ORIGINAL;
-            memcpy(coord[nb],c,sizeof(int)*4);
-            counter++;
-         }
-      } else {
-         lprintf("TEST_GEOMETRY.C",0,"Bad candidate index %d for coordinates (%d,%d,%d,%d), reached from (%d,%d,%d,%d) with idn[%d].\n",
-                 nb,c[0],c[1],c[2],c[3],coord[x][0],coord[x][1],coord[x][2],coord[x][3],i);
-         return -1;
-      }
-   }
-   
-   return counter;
 }
-
 
 
 int even_q(int c[4]) {
    return ((c[0]+c[1]+c[2]+c[3]
            +buffer_thickness[0]+buffer_thickness[1]+buffer_thickness[2]+buffer_thickness[3]
-           +myid_sign)&1);
+           +PSIGN)&1);
 }
 
 int odd_q(int c[4]) {
    return !((c[0]+c[1]+c[2]+c[3]
            +buffer_thickness[0]+buffer_thickness[1]+buffer_thickness[2]+buffer_thickness[3]
-           +myid_sign)&1);
+           +PSIGN)&1);
 }
 
 
@@ -535,7 +527,7 @@ void test_glattice() {
 	
 	lprintf("TEST_GEOMETRY.C",loglevel,"Memory allocation... OK\n");
 	lprintf("TEST_GEOMETRY.C",loglevel,"gsize = %d\n", glattice.gsize);
-	lprintf("TEST_GEOMETRY.C",loglevel,"myid_sign = %d\n", myid_sign);
+	lprintf("TEST_GEOMETRY.C",loglevel,"PSIGN = %d\n", PSIGN);
 	lprintf("TEST_GEOMETRY.C",loglevel,"local_size = {%d,%d,%d,%d}\n", local_size[0], local_size[1], local_size[2], local_size[3]);
 	lprintf("TEST_GEOMETRY.C",loglevel,"buffer_thickness = {%d,%d,%d,%d}\n", buffer_thickness[0], buffer_thickness[1], buffer_thickness[2], buffer_thickness[3]);
 	lprintf("TEST_GEOMETRY.C",loglevel,"periodic_q = {%d,%d,%d,%d}\n", periodic_q[0], periodic_q[1], periodic_q[2], periodic_q[3]);
@@ -554,18 +546,9 @@ void test_glattice() {
 	descr[origin].c_type = ORIGINAL;
 	lprintf("TEST_GEOMETRY.C",loglevel,"Origin found at index %d.\n",origin);
 	
-	/* Set the coordinates for the points reached by iup, idn */
-   int howmany;
-   test_q=true;
-   do {
-      howmany=0;
-      for(x=0; x<glattice.gsize; x++) {
-         int ret = set_nb_coordinates(x);
-         if(ret==-1) test_q = false;
-         else howmany += ret;
-      }
-   } while(howmany != 0 && test_q == true);
-	
+	/* Set the coordinates for the points reached by iup, idn - iteratively */
+	test_q = true;
+	set_coordinates(origin, &test_q);
 	error(!test_q,1,"test_geometry.c","Set the coordinates for the points reached by iup, idn... FAILED");
 	lprintf("TEST_GEOMETRY.C",loglevel,"Set the coordinates for the points reached by iup, idn... OK\n");
 	
@@ -1051,15 +1034,15 @@ void test_glattice() {
 		/* TEST: rid*[i] is received from the right processor */
 		int id;
 		
-		if(glattice.rbuf_from_proc[i] == myid && !periodic_q[i]) {
-			lprintf("TEST_GEOMETRY.C",loglevel,"rbuf_from_proc[%d]=myid=%d (rbuf_mask={%d,%d,%d,%d}) but not periodic BC.\n",i,myid,rbuf_mask[0],rbuf_mask[1],rbuf_mask[2],rbuf_mask[3]);
+		if(glattice.rbuf_from_proc[i] == CID && !periodic_q[i]) {
+			lprintf("TEST_GEOMETRY.C",loglevel,"rbuf_from_proc[%d]=CID=%d (rbuf_mask={%d,%d,%d,%d}) but not periodic BC.\n",i,CID,rbuf_mask[0],rbuf_mask[1],rbuf_mask[2],rbuf_mask[3]);
 			test_q = false;
 		}
-		if(glattice.rbuf_from_proc[i] < 0 || glattice.rbuf_from_proc[i] >= np_x*np_y*np_z*np_t) {
+		if(glattice.rbuf_from_proc[i] < 0 || glattice.rbuf_from_proc[i] >= NP_X*NP_Y*NP_Z*NP_T) {
 			lprintf("TEST_GEOMETRY.C",loglevel,"rbuf_from_proc[%d]=%d (rbuf_mask={%d,%d,%d,%d}) out of range.\n", i,glattice.rbuf_from_proc[i],rbuf_mask[0],rbuf_mask[1],rbuf_mask[2],rbuf_mask[3]);
 			test_q = false;
 		}
-		id = myid;
+		id = CID;
 		for(k=0; k<4; k++) {
 			if(shift[k] > 0) id = proc_up(id,k);
 			else if(shift[k] < 0) id = proc_down(id,k);
@@ -1070,15 +1053,15 @@ void test_glattice() {
 		}
 
 		/* TEST: sid*[i] is sent to the right processor */
-		if(glattice.sbuf_to_proc[i] == myid && !periodic_q[i]) {
-			lprintf("TEST_GEOMETRY.C",loglevel,"sbuf_to_proc[%d]=myid=%d (sbuf_mask={%d,%d,%d,%d}) but not periodic BC.\n",i,myid,sbuf_mask[0],sbuf_mask[1],sbuf_mask[2],sbuf_mask[3]);
+		if(glattice.sbuf_to_proc[i] == CID && !periodic_q[i]) {
+			lprintf("TEST_GEOMETRY.C",loglevel,"sbuf_to_proc[%d]=CID=%d (sbuf_mask={%d,%d,%d,%d}) but not periodic BC.\n",i,CID,sbuf_mask[0],sbuf_mask[1],sbuf_mask[2],sbuf_mask[3]);
 			test_q = false;
 		}
-		if(glattice.sbuf_to_proc[i] < 0 || glattice.sbuf_to_proc[i] >= np_x*np_y*np_z*np_t) {
+		if(glattice.sbuf_to_proc[i] < 0 || glattice.sbuf_to_proc[i] >= NP_X*NP_Y*NP_Z*NP_T) {
 			lprintf("TEST_GEOMETRY.C",loglevel,"sbuf_to_proc[%d]=%d (sbuf_mask={%d,%d,%d,%d}) out of range.\n", i,glattice.sbuf_to_proc[i],sbuf_mask[0],sbuf_mask[1],sbuf_mask[2],sbuf_mask[3]);
 			test_q = false;
 		}
-		id = myid;
+		id = CID;
 		for(k=0; k<4; k++) {
 			if(shift[k] > 0) id = proc_down(id,k);
 			else if(shift[k] < 0) id = proc_up(id,k);

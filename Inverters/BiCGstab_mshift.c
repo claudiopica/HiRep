@@ -1,12 +1,16 @@
-#include "global.h"
+/***************************************************************************\
+* Copyright (c) 2008, Claudio Pica                                          *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
 #include "inverters.h"
 #include "linear_algebra.h"
 #include "complex.h"
-#include "malloc.h"
 #include "update.h"
 #include "memory.h"
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h>
 
 /* _compute_z(z3+i,z1+i,z2+i,&ctmp1,beta,alpha,&(par->shift[i-1])); */
 /* res = (z1*betam1)/(beta*alpha*(z1-z2)+z1*betam1*(1+sigma*beta)) (abbiamo diviso per z2) */
@@ -52,6 +56,7 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor
   int cgiter;
   char *sflags;
   unsigned short notconverged;
+	unsigned int spinorlen;
    
   /* fare qualche check sugli input */
   /* par->n deve essere almeno 2! */
@@ -62,17 +67,13 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor
     printf("out[%d]=%p\n",i,out[i]);      
     }
   */
-
-#ifdef CHECK_SPINOR_MATCHING
-   error(in->type!=&glattice,1,"BiCGstab_mshift [BiCGstab_mshift.c]", "Spinors don't match!");
-   error(out->type!=&glattice,1,"BiCGstab_mshift [BiCGstab_mshift.c]", "Spinors don't match!");
-#endif /* CHECK_SPINOR_MATCHING */
    
   /* allocate spinors fields and aux real variables */
   /* implementation note: to minimize the number of malloc calls
    * objects of the same type are allocated together
    */
-  s = alloc_spinor_field_f((par->n)+6,&glattice);
+	get_spinor_len(&spinorlen);
+  s = alloc_spinor_field_f((par->n)+6);
   r = s+par->n;
   r1 = r+1;
   o = r1+1;

@@ -91,47 +91,62 @@
 #include "geometry.h" 
 #include "global.h" 
 #include "error.h"
+#include "logger.h"
 
 
 
 #define true 1
 #define false 0
 
-
-static int proc_up(int id, int dir)
+static int proc_up(int id, int dir) 
 {
-  int ix,iy,iz,it;
+#ifdef WITH_MPI
+  int coords[4];
+	int outid;
+	
+	MPI_Cart_coords(cart_comm, id, 4, coords);
+	++coords[dir];
+	MPI_Cart_rank(cart_comm, coords, &outid);
   
-  it = id%np_t;
-  ix = (id/np_t)%np_x;
-  iy = (id/(np_t*np_x))%np_y;
-  iz = id/(np_t*np_x*np_y);
-  
-  if(dir == 0) it = (it +1)%np_t;
-  if(dir == 1) ix = (ix +1)%np_x;
-  if(dir == 2) iy = (iy +1)%np_y;
-  if(dir == 3) iz = (iz +1)%np_z;
-  
-  return it + ix*np_t + iy*np_x*np_t + iz*np_y*np_x*np_t;
+	return outid;
+#else
+	return 0;
+#endif
 }
 
 static int proc_down(int id, int dir)
 {
-  int ix,iy,iz,it;
+#ifdef WITH_MPI
+  int coords[4];
+	int outid;
+	
+	MPI_Cart_coords(cart_comm, id, 4, coords);
+	--coords[dir];
+	MPI_Cart_rank(cart_comm, coords, &outid);
   
-  it = id%np_t;
-  ix = (id/np_t)%np_x;
-  iy = (id/(np_t*np_x))%np_y;
-  iz = id/(np_t*np_x*np_y);
-  
-  if(dir == 0) it = (it -1+np_t)%np_t;
-  if(dir == 1) ix = (ix -1+np_x)%np_x;
-  if(dir == 2) iy = (iy -1+np_y)%np_y;
-  if(dir == 3) iz = (iz -1+np_z)%np_z;
-  
-  return it + ix*np_t + iy*np_x*np_t + iz*np_y*np_x*np_t;
+	return outid;
+#else
+	return 0;
+#endif
 }
 
+static void test_pud() {
+	int id,iup,idn;
+	id=CID;
+  iup=proc_up(id,0);
+  idn=proc_down(id,0);
+  /* lprintf("CPTEST",0,"dir 0: up %d dn %d\n",iup,idn); */
+  iup=proc_up(id,1);
+  idn=proc_down(id,1);
+  /* lprintf("CPTEST",0,"dir 1: up %d dn %d\n",iup,idn); */
+  iup=proc_up(id,2);
+  idn=proc_down(id,2);
+  /* lprintf("CPTEST",0,"dir 2: up %d dn %d\n",iup,idn); */
+  iup=proc_up(id,3);
+  idn=proc_down(id,3);
+  /* lprintf("CPTEST",0,"dir 3: up %d dn %d\n",iup,idn); */
+
+}
 
 #define local_index(nt,nx,ny,nz)  (((nt)+2*T_BORDER+T)%(2*T_BORDER+T)+	\
 				   (T+2*T_BORDER)*(((nx)+2*X_BORDER+X)%(2*X_BORDER+X))+ \
@@ -213,7 +228,7 @@ static int site_sign(int i)
   ax = (map_true2oversize[i]/(T+2*T_BORDER))%(X+2*X_BORDER);
   ay = (map_true2oversize[i]/((T+2*T_BORDER)*(X+2*X_BORDER)))%(Y+2*Y_BORDER);
   az = map_true2oversize[i]/((T+2*T_BORDER)*(X+2*X_BORDER)*(Y+2*Y_BORDER));
-  return ((ax+ay+az+at+myid_sign)&1);
+  return ((ax+ay+az+at+PSIGN)&1);
 }
 
 static int find_change_point(int start, int end)
@@ -344,7 +359,7 @@ static void fix_geometry_descriptor()
 	  (glat_even.sbuf_start)[i] = border[i+1].index_start;
 	  (glat_odd.sbuf_start)[i] = find_change_point(border[i+1].index_start,border[i+1].index_end-1);
 	  (glat_even.sbuf_len)[i] = find_change_point(border[i+1].index_start,border[i+1].index_end-1) - border[i+1].index_start;
-	  (glat_odd.sbuf_len)[i] = border[i+1].index_end - find_change_point(border[i+1].index_start,border[i+1].index_end-1) + 1;
+	  (glat_odd.sbuf_len)[i] = border[i+1].index_end - find_change_point(border[i+1].index_start,border[i+1].index_end-1) ;
 	  
 	}
       else
@@ -352,7 +367,7 @@ static void fix_geometry_descriptor()
 	  (glat_odd.sbuf_start)[i] = border[i+1].index_start;
 	  (glat_even.sbuf_start)[i] = find_change_point(border[i+1].index_start,border[i+1].index_end-1);
 	  (glat_odd.sbuf_len)[i] = find_change_point(border[i+1].index_start,border[i+1].index_end-1) - border[i+1].index_start;
-	  (glat_even.sbuf_len)[i] = border[i+1].index_end - find_change_point(border[i+1].index_start,border[i+1].index_end-1) + 1;
+	  (glat_even.sbuf_len)[i] = border[i+1].index_end - find_change_point(border[i+1].index_start,border[i+1].index_end-1) ;
 	}
 
 
@@ -396,13 +411,15 @@ static void fix_geometry_descriptor()
   glat_even.total_master_pieces=memory_map_counter_e;
   glat_even.master_start=memory_map_address_e;
   glat_even.master_end=memory_map_end_e;
-  glat_even.gsize=index_counter_e;
+  /* glat_even.gsize=index_counter_e; */
+  glat_even.gsize=glattice.gsize;
 
   glat_odd.local_master_pieces=local_memory_map_counter_o;
   glat_odd.total_master_pieces=memory_map_counter_o;
   glat_odd.master_start=memory_map_address_o;
   glat_odd.master_end=memory_map_end_o;
-  glat_odd.gsize=index_counter_o;
+  /* glat_odd.gsize=index_counter_o; */
+  glat_odd.gsize=glattice.gsize;
 
 }
 
@@ -410,16 +427,15 @@ static void geometry_mpi_init()
 {
   int i,BOR_CUBE,BOR_SQUARE,L3_BORDER;
   
-  
-  if(np_x==1) X_BORDER=0;
-  if(np_y==1) Y_BORDER=0;
-  if(np_z==1) Z_BORDER=0;
-  if(np_t==1) T_BORDER=0;
+	X_BORDER=(NP_X>1)?BORDERSIZE:0;
+	Y_BORDER=(NP_Y>1)?BORDERSIZE:0;
+	Z_BORDER=(NP_Z>1)?BORDERSIZE:0;
+	T_BORDER=(NP_T>1)?BORDERSIZE:0;
 
-  error(T-2*T_BORDER<=0,1,"geometry_mpi_init [geometry_mpi_eo.c]","Too large T Border in the geometry");
-  error(X-2*X_BORDER<=0,1,"geometry_mpi_init [geometry_mpi_eo.c]","Too large X Border in the geometry");
-  error(Y-2*Y_BORDER<=0,1,"geometry_mpi_init [geometry_mpi_eo.c]","Too large Y Border in the geometry");
-  error(Z-2*Z_BORDER<=0,1,"geometry_mpi_init [geometry_mpi_eo.c]","Too large Z Border in the geometry");
+  error(T-2*T_BORDER<0,1,"geometry_mpi_init [geometry_mpi.c]","Too large T Border in the geometry");
+  error(X-2*X_BORDER<0,1,"geometry_mpi_init [geometry_mpi.c]","Too large X Border in the geometry");
+  error(Y-2*Y_BORDER<0,1,"geometry_mpi_init [geometry_mpi.c]","Too large Y Border in the geometry");
+  error(Z-2*Z_BORDER<0,1,"geometry_mpi_init [geometry_mpi.c]","Too large Z Border in the geometry");
 
   X_EXT=X+2*X_BORDER;
   Y_EXT=Y+2*Y_BORDER;
@@ -545,7 +561,7 @@ static void set_border_pointer(int actualn,int level)
 
 static int check_evaluated_border(int level)
 {
-  int i,retval,id=myid;
+  int i,retval,id=CID;
   retval=true;
   for(i=0;i<(2*N_BORDER+1);i++)
     {
@@ -615,25 +631,22 @@ static void walk_on_lattice(int level)
   if(check_evaluated_border(level))
     {
 /*       printf("Start of the L%d border (%d,%d,%d,%d) and width (%d,%d,%d,%d)\n",level,blt_start-T_BORDER,blx_start-X_BORDER,bly_start-Y_BORDER,blz_start-Z_BORDER,blt_width,blx_width,bly_width,blz_width); */
-/*       printf("Starting point lattice index %d\n",index_position); */
+      
       
       for (x3=blz_start;x3<blz_start+blz_width;x3++) 
 	for (x2=bly_start;x2<bly_start+bly_width;x2++) 
 	  for (x1=blx_start;x1<blx_start+blx_width;x1++) 
 	    for (x0=blt_start;x0<blt_start+blt_width;x0++)
-	      if((x0+x1+x2+x3+myid_sign)&1)
+	      if((x0+x1+x2+x3+PSIGN)&1)
 		set_border_pointer(local_index(x0,x1,x2,x3),level);
-      
-/*       printf("Middle point lattice index %d\n",index_position); */
-      
+		  
       for (x3=blz_start;x3<blz_start+blz_width;x3++) 
 	for (x2=bly_start;x2<bly_start+bly_width;x2++) 
 	  for (x1=blx_start;x1<blx_start+blx_width;x1++) 
 	    for (x0=blt_start;x0<blt_start+blt_width;x0++)
-	      if(!((x0+x1+x2+x3+myid_sign)&1) )
+	      if(!((x0+x1+x2+x3+PSIGN)&1) )
 		set_border_pointer(local_index(x0,x1,x2,x3),level);
       
-/*       printf("End point lattice index %d\n",index_position); */
       
     }
 }
@@ -648,7 +661,7 @@ static void fix_buffer()
   for(i=1;i<done_border;i++)
     {
       buffer_sign=0;
-      id = myid;
+      id = CID;
       index_eval_border++;
       
       set_block_width(border[i].bt_width,border[i].bx_width,border[i].by_width,border[i].bz_width);
@@ -741,7 +754,7 @@ static void fix_buffer()
 	for (x2=bly_start;x2<bly_start+bly_width;x2++) 
 	  for (x1=blx_start;x1<blx_start+blx_width;x1++) 
 	    for (x0=blt_start;x0<blt_start+blt_width;x0++) 
-	      if((x0+x1+x2+x3+myid_sign+buffer_sign)&1)
+	      if((x0+x1+x2+x3+PSIGN+buffer_sign)&1)
 		set_border_pointer(local_index(x0,x1,x2,x3),border[index_eval_border].level);
       
       
@@ -749,7 +762,7 @@ static void fix_buffer()
 	for (x2=bly_start;x2<bly_start+bly_width;x2++) 
 	  for (x1=blx_start;x1<blx_start+blx_width;x1++) 
 	    for (x0=blt_start;x0<blt_start+blt_width;x0++)
-	      if(!((x0+x1+x2+x3+myid_sign+buffer_sign)&1) )
+	      if(!((x0+x1+x2+x3+PSIGN+buffer_sign)&1) )
 		set_border_pointer(local_index(x0,x1,x2,x3),border[index_eval_border].level);
       
       
@@ -945,14 +958,12 @@ static void set_border(int dir){
 static void set_memory_order()
 {
   int i1,i2=0;
+  int *check=malloc(OVERSIZE_VOLUME*sizeof(int));
+  unsigned int *oversize_zone_addr_list=malloc(index_position*sizeof(unsigned int));
+  unsigned int *oversize_zone_length_list=malloc(index_position*sizeof(unsigned int));
 
-  int * check=malloc(OVERSIZE_VOLUME*sizeof(int));
-  unsigned int * oversize_zone_addr_list=malloc(index_position*sizeof(unsigned int));
-  unsigned int * oversize_zone_length_list=malloc(index_position*sizeof(unsigned int));
-  
   int counter_zone=0;
   int test_master=1;
-
   int * tmp_function_copy_list_from=malloc(index_position*sizeof(int));
   int * tmp_function_copy_list_to=malloc(index_position*sizeof(int));
   int * tmp_function_copy_list_len=malloc(index_position*sizeof(int));
@@ -1062,15 +1073,14 @@ static void set_memory_order()
     }
   /*even odd*/
   
-  int * tmp_function_copy_from_e=malloc(index_position*sizeof(int));
-  int * tmp_function_copy_to_e=malloc(index_position*sizeof(int));
-  int * tmp_function_copy_len_e=malloc(index_position*sizeof(int));
+  int *tmp_function_copy_from_e=malloc(index_position*sizeof(int));
+  int *tmp_function_copy_to_e=malloc(index_position*sizeof(int));
+  int *tmp_function_copy_len_e=malloc(index_position*sizeof(int));
 
   int tmp_function_copy_length_e=0;
-
-  int * tmp_function_copy_from_o=malloc(index_position*sizeof(int));
-  int * tmp_function_copy_to_o=malloc(index_position*sizeof(int));
-  int * tmp_function_copy_len_o=malloc(index_position*sizeof(int));
+  int *tmp_function_copy_from_o=malloc(index_position*sizeof(int));
+  int *tmp_function_copy_to_o=malloc(index_position*sizeof(int));
+  int *tmp_function_copy_len_o=malloc(index_position*sizeof(int));
 
   int tmp_function_copy_length_o=0;
   int start=0;
@@ -1174,26 +1184,22 @@ static void set_memory_order()
    int * tmp_master_end_e=malloc(index_position*sizeof(int));
    int * tmp_master_start_o=malloc(index_position*sizeof(int));
    int * tmp_master_end_o=malloc(index_position*sizeof(int));
-   
-   
+
    start=0;
-   
+ 
 
 /* ANTONIO */
-
-
-
 
 
    for(i1=0; i1< memory_map_counter;i1++)
      {
        
-/*        printf("\n\nINDICE I1 %d Local %d \n",i1,local_memory_map_counter);  */
+/*        printf("\n\nINDICE I1 %d Local %d \n",i1,local_memory_map_counter); */
 
        pt = memory_map_address[i1];
        start=pt;
        end = memory_map_end[i1];
-/*        printf("ZONE START %d END %d\n",pt,end); */
+       /*        printf("ZONE START %d END %d\n",pt,end); */
        
        
        while(pt <= end)
@@ -1214,25 +1220,41 @@ static void set_memory_order()
 
 	   if((sign)&1)
 	     {
-/* 	       printf("SCRIVO sito %d-%d index E %d\n",start,pt-1,counter_e); */
+/*    	       printf("SCRIVO sito %d-%d index E %d\n",start,pt-1,counter_e); */
 	       tmp_master_start_e[counter_e]=start;
 	       tmp_master_end_e[counter_e]=pt-1;     
 	       index_counter_e += tmp_master_end_e[counter_e]-tmp_master_start_e[counter_e]+1;	       
-/*     	       printf("COUNTER E TOTALE %d PARZIALE %d \n",index_counter_e,tmp_master_end_e[counter_e]-tmp_master_start_e[counter_e]+1); */
+/*    	       printf("COUNTER E TOTALE %d PARZIALE %d \n",index_counter_e,tmp_master_end_e[counter_e]-tmp_master_start_e[counter_e]+1); */
 	       counter_e++;
 	     }
 	   else
 	     {
-/*    	       printf("SCRIVO sito %d-%d index O %d\n",start,pt-1,counter_o);  */
+/*   	       printf("SCRIVO sito %d-%d index O %d\n",start,pt-1,counter_o); */
 	       tmp_master_start_o[counter_o]=start;
 	       tmp_master_end_o[counter_o]=pt-1;     
 	       index_counter_o += tmp_master_end_o[counter_o]-tmp_master_start_o[counter_o]+1;	       
-/*  	       printf("COUNTER O TOTALE %d PARZIALE %d \n",index_counter_o,tmp_master_end_o[counter_o]-tmp_master_start_o[counter_o]+1);  */
+/* 	       printf("COUNTER O TOTALE %d PARZIALE %d \n",index_counter_o,tmp_master_end_o[counter_o]-tmp_master_start_o[counter_o]+1); */
 	       counter_o++;
 	     }
 	   start=pt;
-	   
 	 }
+
+       if(i1==0 && counter_e==0)
+	 {
+	   tmp_master_start_e[counter_e]=start;
+	   tmp_master_end_e[counter_e]=start-1;    
+	   index_counter_e += tmp_master_end_e[counter_e]-tmp_master_start_e[counter_e]+1;
+	   counter_e++;
+	 }
+       
+       if(i1==0 && counter_o==0)
+	 {
+	   tmp_master_start_o[counter_o]=start;
+	   tmp_master_end_o[counter_o]=start-1;    
+	   index_counter_o += tmp_master_end_o[counter_o]-tmp_master_start_o[counter_o]+1;
+	   counter_o++;
+	 }
+
        
        if(i1+1==local_memory_map_counter) 
 	 {
@@ -1301,8 +1323,8 @@ static void set_memory_order()
    free(tmp_master_end_e);
    free(tmp_master_start_o);
    free(tmp_master_end_o);
-   
 
+   
 }
 
 
@@ -1310,8 +1332,11 @@ static void set_memory_order()
 
 void geometry_mpi_eo(void)
 {
+/* the call to setup_process is done before this function is called 
   geometry_set();
+	*/
   
+  test_pud();
   geometry_mpi_init();
 
   set_inner();
@@ -1325,7 +1350,7 @@ void geometry_mpi_eo(void)
   set_border(3);
 
   fix_buffer(); 
-  
+    
   set_memory_order();
 
   fix_geometry_descriptor(); 

@@ -1,3 +1,8 @@
+/***************************************************************************\
+* Copyright (c) 2008, Claudio Pica                                          *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
 #ifndef RATIONAL_FUNCTIONS_H
 #define RATIONAL_FUNCTIONS_H
 
