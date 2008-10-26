@@ -9,27 +9,27 @@ REPR = REPR_ADJOINT
 #MACRO += -DANTIPERIODIC_BC_Y
 #MACRO += -DANTIPERIODIC_BC_Z
 
+MACRO += -DUPDATE_EO
+MACRO += -DWITH_MPI
+#MACRO += -DNDEBUG
+#MACRO += CHECK_SPINOR_MATCHING
+
+#Compiler
+#CC = gcc
+CC = mpicc
 CFLAGS = -Wall -std=c99 -O2 -fomit-frame-pointer -mfpmath=sse -msse -msse2 
-#CFLAGS = -Wall -ansi -O2 -pg -mfpmath=sse -msse -msse2 
 
 ##########################################################################
-# DO NOT EDIT BEYOND THIS POINT - OK, OK: EDIT AT YOUR OWN RISK !
+# DO NOT EDIT BEYOND THIS POINT
 ##########################################################################
 
 #Macros
-MACRO += -DUPDATE_EO
-#MACRO += -DWITH_MPI
-#MACRO += -DNDEBUG
-#MACRO += CHECK_SPINOR_MATCHING
 MACRO += -D$(REPR) -DREPR_NAME=\"$(REPR)\"
 
 #Include
 INCDIR = $(TOPDIR)/Include
 INC = -I $(INCDIR)
 
-#Compiler
-CC = gcc
-#CC = /usr/lib/lam/bin/mpicc
 GCC = gcc
 CPPFLAGS += $(MACRO)
 CPPFLAGS += $(INC)

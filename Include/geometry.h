@@ -1,7 +1,7 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
-\***************************************************************************/
+ * Copyright (c) 2008, Claudio Pica                                          *   
+ * All rights reserved.                                                      * 
+ \***************************************************************************/
 
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
@@ -24,21 +24,24 @@ typedef struct _geometry_descriptor {
 } geometry_descriptor;
 
 #define _PIECE_FOR(type,i) \
-	for(_PIECE_INDEX(i)=0;_PIECE_INDEX(i)<(type)->local_master_pieces;_PIECE_INDEX(i)++)
+  for(_PIECE_INDEX(i)=0;_PIECE_INDEX(i)<(type)->local_master_pieces;_PIECE_INDEX(i)++)
 
 #define _SITE_FOR(type,i) \
-	for(i=(type)->master_start[_PIECE_INDEX(i)]; \
-	    i<=(type)->master_end[_PIECE_INDEX(i)]; \
-	    i++ \
-	   )
+  for(i=(type)->master_start[_PIECE_INDEX(i)]; \
+      i<=(type)->master_end[_PIECE_INDEX(i)]; \
+      i++ \
+     )
 
 #define _MASTER_FOR(type,i) \
   _PIECE_FOR((type),i)    \
-    _SITE_FOR((type),i)
+_SITE_FOR((type),i)
 
 
 int setup_process(int *argc, char ***argv);
 int finalize_process(void);
+
+void origin_coord(int *c);
+void glb_to_proc(int *g, int *p);
 
 int geometry_init(void);
 void geometry_mpi_eo(void);

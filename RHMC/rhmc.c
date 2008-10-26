@@ -1,13 +1,13 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
-\***************************************************************************/
+ * Copyright (c) 2008, Claudio Pica                                          *   
+ * All rights reserved.                                                      * 
+ \***************************************************************************/
 
 /*******************************************************************************
-*
-* Main RHMC program
-*
-*******************************************************************************/
+ *
+ * Main RHMC program
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 
@@ -34,29 +34,6 @@
 #include "logger.h"
 
 #include "communications.h"
-
-int nhb,nor,nit,nth,nms,level,seed;
-double beta;
-
-spinor_field *stmp=NULL;
-
-void D(spinor_field *out, spinor_field *in) {
-  const double m=-1.2;
-  Dphi(m,out,in);
-}
-
-void H(spinor_field *out, spinor_field *in) {
-  const double m=-1.2;
-  g5Dphi(m,out,in);
-}
-
-void M(spinor_field *out, spinor_field *in) {
-  const double m=-1.2;
-  
-  g5Dphi(m,stmp,in);
-  g5Dphi(m,out,stmp);
-
-}
 
 int main(int argc,char *argv[])
 {
@@ -91,7 +68,7 @@ int main(int argc,char *argv[])
 
   /* setup lattice geometry */
   geometry_mpi_eo();
-  test_geometry_mpi_eo();
+  /* test_geometry_mpi_eo(); */
 
   lprintf("MAIN",0,"local size is %dx%dx%dx%d\n",T,X,Y,Z);
   lprintf("MAIN",0,"extended local size is %dx%dx%dx%d\n",T_EXT,X_EXT,Y_EXT,Z_EXT);
@@ -117,15 +94,21 @@ int main(int argc,char *argv[])
   lprintf("CPTEST",0,"ncopies=%d\n",glat_odd.ncopies);
 
   /* disable logger for MPI processes != 0 */
-  if (PID!=0) { logger_disable(); }
+  //if (PID!=0) { logger_disable(); }
 
   /* alloc global gauge fields */
   u_gauge=alloc_gfield(&glattice);
 #ifndef REPR_FUNDAMENTAL
   u_gauge_f=alloc_gfield_f(&glattice);
 #endif
-  random_u(u_gauge);
+  random_u(u_gauge); 
   represent_gauge_field();
+
+  /* read gauge config from file */
+  /*
+     read_gauge_field("gauge_conf");
+     represent_gauge_field();
+     */
 
 
   /* init RHMC */
@@ -133,10 +116,10 @@ int main(int argc,char *argv[])
   input_p.rhmc_p.mshift_solver=&cg_mshift; /* this is not used in the code now */
   input_p.rhmc_p.MD_par=&input_p.int_p;
   init_rhmc(&input_p.rhmc_p);
-  
+
   lprintf("MAIN",0,"MVM during RHMC initialzation: %ld\n",getMVM());
   lprintf("MAIN",0,"Initial plaquette: %1.8e\n",avr_plaquette());
-  
+
   acc=0;
   for(i=1;i<(10+1);++i) {
     int rr;
@@ -150,14 +133,15 @@ int main(int argc,char *argv[])
       acc+=rr;
     }
     perc=(acc==0)?0.:(float)(100*acc)/(float)(i);
-    
+
     lprintf("MAIN",0,"Trajectory #%d: %d/%d (%3.4f%%) MVM = %ld\n",i,acc,i,perc,getMVM());
     lprintf("MAIN",0,"Plaquette: %1.8e\n",avr_plaquette());
   }
-  
-  
-   free_rhmc();
 
+  /* write gauge config to file */
+  write_gauge_field("gauge_conf");
+
+  free_rhmc();
 
   /* free memory */
   free_gfield(u_gauge);
