@@ -20,19 +20,17 @@
 #include "logger.h"
 #include "observables.h"
 #include "communications.h"
-
-#include <time.h>
+#include "utils.h"
 
 void write_gauge_field(char filename[]) 
 {
   FILE *fp=NULL;
   int g[4], p[4];
-  time_t start, end;
-  double etime;
   double *buff=NULL;
   int pid=0;
   int zsize, rz;
   double plaq;
+  struct timeval start, end, etime;
 
 
 #ifdef WITH_MPI
@@ -63,7 +61,7 @@ void write_gauge_field(char filename[])
   MPI_Comm_group(cart_comm,&cg);
 #endif
 
-  start=time(NULL);
+  gettimeofday(&start,0);
 
   zsize=GLB_Z/NP_Z; rz=GLB_Z-zsize*NP_Z;
   buff=malloc(sizeof(suNg)*4*(GLB_Z/NP_Z+((rz>0)?1:0)));
@@ -159,9 +157,9 @@ void write_gauge_field(char filename[])
   if (PID==0) fclose(fp); 
   free(buff);
 
-  end=time(NULL);
-  etime=difftime(end,start);
-  lprintf("IO",0,"Configuration [%s] saved [%.2f sec]\n",filename,etime);
+  gettimeofday(&end,0);
+  timeval_subtract(&etime,&end,&start);
+  lprintf("IO",0,"Configuration [%s] saved [%ld sec %ld usec]\n",filename,etime.tv_sec,etime.tv_usec);
 
 }
 
@@ -169,12 +167,11 @@ void read_gauge_field(char filename[])
 {
   FILE *fp=NULL;
   int g[4], p[4];
-  time_t start, end;
-  double etime;
   double *buff=NULL;
   int pid=0;
   int zsize, rz;
   double plaq, testplaq;
+  struct timeval start, end, etime;
 
 
 #ifdef WITH_MPI
@@ -184,6 +181,8 @@ void read_gauge_field(char filename[])
   int cid;
   int mpiret;
 #endif
+  
+  gettimeofday(&start,0);
 
   if(PID==0) {
     int d[5]={0}; /* contains NG,GLB_T,GLB_X,GLB_Y,GLB_Z */
@@ -212,8 +211,6 @@ void read_gauge_field(char filename[])
   MPI_Comm_group(MPI_COMM_WORLD,&wg);
   MPI_Comm_group(cart_comm,&cg);
 #endif
-
-  start=time(NULL);
 
   zsize=GLB_Z/NP_Z; rz=GLB_Z-zsize*NP_Z;
   buff=malloc(sizeof(suNg)*4*(GLB_Z/NP_Z+((rz>0)?1:0)));
@@ -323,10 +320,9 @@ void read_gauge_field(char filename[])
     }
   }
 
-  end=time(NULL);
-  etime=difftime(end,start);
-  lprintf("IO",0,"Configuration [%s] read [%.2f sec] Plaquette=%e\n",filename,etime,testplaq);
-
+  gettimeofday(&end,0);
+  timeval_subtract(&etime,&end,&start);
+  lprintf("IO",0,"Configuration [%s] read [%ld sec %ld usec] Plaquette=%e\n",filename,etime.tv_sec,etime.tv_usec,testplaq);
 
 }
 
