@@ -274,3 +274,49 @@ scalar_field *alloc_sfield(geometry_descriptor* type)
 
    return af;
 }
+
+
+suNg_field *alloc_gtransf(geometry_descriptor* type)
+{
+   int ix;
+   suNg unity;
+   suNg_field *gf;
+
+   gf=amalloc(sizeof(suNg_field),ALIGN);
+   error(gf==NULL,1,"alloc_gtransf [field_alloc.c]",
+         "Could not allocate memory space for the gauge transformation (1)");
+   gf->ptr=amalloc(type->gsize*sizeof(suNg),ALIGN);
+   error((gf->ptr)==NULL,1,"alloc_gtransf [field_alloc.c]",
+         "Could not allocate memory space for the gauge transformation (2)");
+
+   gf->type=type;
+
+#ifdef WITH_MPI
+   if (type->nbuffers>0) {
+     gf->comm_req=amalloc(2*type->nbuffers*sizeof(MPI_Request),ALIGN);
+     error((gf->comm_req)==NULL,1,"alloc_gtransf [field_alloc.c]",
+	   "Could not allocate memory space for the gauge transformation (3)");
+     for (ix=0; ix<2*type->nbuffers; ++ix)
+       gf->comm_req[ix]=MPI_REQUEST_NULL;
+   } else {
+     gf->comm_req=NULL;
+   }
+#endif
+
+   /* set gauge field to unity */
+   _suNg_unit(unity);
+   for (ix=0;ix<type->gsize;++ix)
+     *((gf->ptr)+ix)=unity;
+
+   return gf;
+}
+
+void free_gtransf(suNg_field *u)
+{
+  afree(u->ptr);
+#ifdef WITH_MPI
+  afree(u->comm_req);   
+#endif
+  afree(u);
+}
+

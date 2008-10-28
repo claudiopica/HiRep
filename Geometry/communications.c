@@ -100,6 +100,16 @@ static void sync_spinor_field(spinor_field *p) {
   }
 }
 
+static void sync_gauge_transf(suNg_field *gf) {
+  int i;
+  geometry_descriptor *gd=gf->type;
+
+  for(i=0; i<gd->ncopies; ++i) {
+    memcpy(((gf->ptr)+gd->copy_to[i]),((gf->ptr)+gd->copy_from[i]),(gd->copy_len[i])*sizeof(*(gf->ptr)));
+  }
+}
+
+
 void test_spinor_field(spinor_field *p) {
   sync_spinor_field(p);
 }
@@ -318,3 +328,96 @@ void start_sf_sendrecv(spinor_field *sf) {
 
 #endif /* WITH_MPI */
 }
+
+
+void complete_gt_sendrecv(suNg_field *gf) {
+#ifdef WITH_MPI
+  int mpiret;
+  int nreq=2*gf->type->nbuffers;
+
+  if(nreq>0) {
+    MPI_Status status[nreq];
+
+    mpiret=MPI_Waitall(nreq, gf->comm_req, status);
+
+#ifndef NDEBUG
+    if (mpiret != MPI_SUCCESS) {
+      char mesg[MPI_MAX_ERROR_STRING];
+      int mesglen, k;
+      MPI_Error_string(mpiret,mesg,&mesglen);
+      lprintf("MPI",0,"ERROR: %s\n",mesg);
+      for (k=0; k<nreq; ++k) {
+	if (status[k].MPI_ERROR != MPI_SUCCESS) {
+	  MPI_Error_string(status[k].MPI_ERROR,mesg,&mesglen);
+	  lprintf("MPI",0,"Req [%d] Source [%d] Tag [%] ERROR: %s\n",
+	      k, 
+	      status[k].MPI_SOURCE, 
+	      status[k].MPI_TAG, 
+	      mesg);
+	}
+      }
+      error(1,1,"complete_gt_sendrecv " __FILE__,"Cannot complete communications");
+    }
+#endif
+  }
+
+#endif /* WITH_MPI */
+}
+
+void start_gt_sendrecv(suNg_field *gf) {
+#ifdef WITH_MPI
+  int i, mpiret;
+  geometry_descriptor *gd=gf->type;
+
+  /* check communication status */
+  /* questo credo che non sia il modo piu' efficiente!!! */
+  /* bisognerebbe forse avere una variabile di stato nei campi?? */
+  complete_gt_sendrecv(gf);
+
+  /* fill send buffers */
+  sync_gauge_transf(gf);
+
+  for (i=0; i<(gd->nbuffers); ++i) {
+    /* send ith buffer */
+    mpiret=MPI_Isend((gf->ptr)+gd->sbuf_start[i], /* buffer */
+	(gd->sbuf_len[i])*sizeof(suNg)/sizeof(double), /* lenght in units of doubles */
+	MPI_DOUBLE, /* basic datatype */
+	gd->sbuf_to_proc[i], /* cid of destination */
+	i, /* tag of communication */
+	cart_comm, /* use the cartesian communicator */
+	&(gf->comm_req[2*i]) /* handle to communication request */
+	);
+#ifndef NDEBUG
+    if (mpiret != MPI_SUCCESS) {
+      char mesg[MPI_MAX_ERROR_STRING];
+      int mesglen;
+      MPI_Error_string(mpiret,mesg,&mesglen);
+      lprintf("MPI",0,"ERROR: %s\n",mesg);
+      error(1,1,"start_gt_sendrecv " __FILE__,"Cannot start send buffer");
+    }
+#endif
+
+    /* receive ith buffer */
+    mpiret=MPI_Irecv((gf->ptr)+gd->rbuf_start[i], /* buffer */
+	(gd->rbuf_len[i])*sizeof(suNg)/sizeof(double), /* lenght in units of doubles */
+	MPI_DOUBLE, /* basic datatype */
+	gd->rbuf_from_proc[i], /* cid of origin */
+	i, /* tag of communication */
+	cart_comm, /* use the cartesian communicator */
+	&(gf->comm_req[2*i+1]) /* handle to communication request */
+	);
+#ifndef NDEBUG
+    if (mpiret != MPI_SUCCESS) {
+      char mesg[MPI_MAX_ERROR_STRING];
+      int mesglen;
+      MPI_Error_string(mpiret,mesg,&mesglen);
+      lprintf("MPI",0,"ERROR: %s\n",mesg);
+      error(1,1,"start_gt_sendrecv " __FILE__,"Cannot start receive buffer");
+    }
+#endif
+
+  }
+
+#endif /* WITH_MPI */
+}
+

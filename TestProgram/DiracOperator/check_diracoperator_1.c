@@ -11,26 +11,18 @@
 #include <string.h>
 #include <math.h>
 #include "io.h"
-#include "random.h"
-#include "error.h"
 #include "geometry.h"
-#include "memory.h"
-#include "statistics.h"
-#include "update.h"
 #include "global.h"
-#include "suN.h"
-#include "suN_types.h"
+#include "logger.h"
+#include "random.h"
+#include "memory.h"
 #include "dirac.h"
 #include "linear_algebra.h"
-#include "inverters.h"
 #include "representation.h"
-#include "utils.h"
-
-int nhb,nor,nit,nth,nms,level,seed;
-double beta;
+#include "communications.h"
 
 static double hmass=0.1;
-static suNg *g;
+static suNg_field *g;
 
 
 static void D(spinor_field *out, spinor_field *in){
@@ -42,7 +34,7 @@ static void random_g(void)
    _DECLARE_INT_ITERATOR(ix);
 
    _MASTER_FOR(&glattice,ix)
-      random_suNg(g+ix);
+      random_suNg(_FIELD_AT(g,ix));
 }
 
 static void transform_u(void)
@@ -55,11 +47,12 @@ static void transform_u(void)
       for (mu=0;mu<4;mu++) {
          iy=iup(ix,mu);
          u=pu_gauge(ix,mu);
-         _suNg_times_suNg_dagger(v,*u,g[iy]);
-         _suNg_times_suNg(*u,g[ix],v);
+         _suNg_times_suNg_dagger(v,*u,*_FIELD_AT(g,iy));
+         _suNg_times_suNg(*u,*_FIELD_AT(g,ix),v);
       }
    }
    
+   start_gf_sendrecv(u_gauge);
    represent_gauge_field();
 }
 
@@ -70,10 +63,10 @@ static void transform_s(spinor_field *out, spinor_field *in)
    suNf_spinor *r,*s;
 
    _MASTER_FOR(&glattice,ix) {
-      s = _SPINOR_AT(in,ix);
-      r = _SPINOR_AT(out,ix);
+      s = _FIELD_AT(in,ix);
+      r = _FIELD_AT(out,ix);
       
-      _group_represent2(&gfx,&(g[ix]));
+      _group_represent2(&gfx,_FIELD_AT(g,ix));
 
       _suNf_multiply(r->c[0],gfx,s->c[0]);
       _suNf_multiply(r->c[1],gfx,s->c[1]);
@@ -85,54 +78,75 @@ static void transform_s(spinor_field *out, spinor_field *in)
 
 int main(int argc,char *argv[])
 {
+   char tmp[256];
    double sig,tau;
    spinor_field *s0,*s1,*s2,*s3;
 
-   printf("Gauge group: SU(%d)\n",NG);
-   printf("Fermion representation: dim = %d\n",NF);
-   geometry_mpi_eo();
-   printf("The lattice size is %dx%dx%dx%d\n",T,X,Y,Z);
-   printf("The lattice global size is %dx%dx%dx%d\n",GLOBAL_T,GLOBAL_X,GLOBAL_Y,GLOBAL_Z);
-   printf("The lattice borders are (%d,%d,%d,%d)\n",T_BORDER,X_BORDER,Y_BORDER,Z_BORDER);
-   printf("\n");
-   
-   level=0;
-   seed=1243;
-   rlxs_init(level,seed);
-   printf("ranlux: level = %d, seed = %d\n\n",level,seed); 
+   setup_process(&argc,&argv);
+  
+   logger_setlevel(0,10000); /* log all */
+   logger_map("DEBUG","debug");
+#ifdef WITH_MPI
+   sprintf(tmp,">out_%d",PID); logger_stdout(tmp);
+   sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
+#endif
+
+   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
+
+   read_input("test_input");
+   lprintf("MAIN",0,"RLXD [%d,%d]\n",input_p.rlxd_level,input_p.rlxd_seed);
+   rlxd_init(input_p.rlxd_level,input_p.rlxd_seed+PID);
+
+   /* setup communication geometry */
+   if (geometry_init() == 1) {
+      finalize_process();
+      return 0;
+   }
+
+	 geometry_mpi_eo();
+
+
+   lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
+   lprintf("MAIN",0,"Fermion representation: dim = %d\n",NF);
+   lprintf("MAIN",0,"The lattice size is %dx%dx%dx%d\n",T,X,Y,Z);
+   lprintf("MAIN",0,"The lattice global size is %dx%dx%dx%d\n",GLB_T,GLB_X,GLB_Y,GLB_Z);
+   lprintf("MAIN",0,"The lattice borders are (%d,%d,%d,%d)\n",T_BORDER,X_BORDER,Y_BORDER,Z_BORDER);
+   lprintf("MAIN",0,"\n");
    fflush(stdout);
  
-   u_gauge=alloc_gfield();
+   u_gauge=alloc_gfield(&glattice);
 #ifndef REPR_FUNDAMENTAL
-   printf("allocating gfield_f\n");
-   u_gauge_f=alloc_gfield_f();
+   u_gauge_f=alloc_gfield_f(&glattice);
 #endif
    represent_gauge_field();
 
    /* allocate memory */
-	 g=malloc(sizeof(suNg)*glattice.gsize);
+	 g=alloc_gtransf(&glattice);
 	 s0=alloc_spinor_field_f(4,&glattice);
 	 s1=s0+1;
 	 s2=s1+1;
 	 s3=s2+1;
 
-   printf("Generating a random gauge field... ");
+   lprintf("MAIN",0,"Generating a random gauge field... ");
    fflush(stdout);
-   random_u();
+   random_u(u_gauge);
+   start_gf_sendrecv(u_gauge);
    represent_gauge_field();
-   printf("done.\n");
+   lprintf("MAIN",0,"done.\n");
 
    spinor_field_zero_f(s0);
    gaussian_spinor_field(&(s0[0]));
    tau = 1./sqrt(spinor_field_sqnorm_f(s0));
    spinor_field_mul_f(s0,tau,s0);
    
-   printf("Generating a random gauge transf... ");
+   lprintf("MAIN",0,"Generating a random gauge transf... ");
    fflush(stdout);
    random_g();
-   printf("done.\n");
+   start_gt_sendrecv(g);
+   complete_gt_sendrecv(g);
+   lprintf("MAIN",0,"done.\n");
 
-   printf("Gauge covariance of the Dirac operator:\n");
+   lprintf("MAIN",0,"Gauge covariance of the Dirac operator:\n");
 
    D(s1,s0);
 
@@ -150,15 +164,17 @@ int main(int argc,char *argv[])
    spinor_field_mul_add_assign_f(s1,-1.0,s2);
    sig=spinor_field_sqnorm_f(s1);
 
-   printf("Maximal normalized difference = %.2e\n",sqrt(sig));
-   printf("(should be around 1*10^(-15) or so)\n\n");
+   lprintf("MAIN",0,"Maximal normalized difference = %.2e\n",sqrt(sig));
+   lprintf("MAIN",0,"(should be around 1*10^(-15) or so)\n\n");
    
-   free_field(u_gauge);
+   free_gfield(u_gauge);
 #ifndef REPR_FUNDAMENTAL
-   free_field(u_gauge_f);
+   free_gfield_f(u_gauge_f);
 #endif
-	 free_field(s0);
+	 free_spinor_field(s0);
 
-	 free(g);
-   exit(0);
+	 free_gtransf(g);
+
+   finalize_process();
+	 exit(0);
 }

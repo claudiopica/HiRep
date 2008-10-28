@@ -36,6 +36,8 @@ void free_gfield_flt(suNg_field_flt *u);
 suNg_field_flt* alloc_gfield_flt(geometry_descriptor* type);
 void free_gfield_f_flt(suNf_field_flt *u);
 suNf_field_flt* alloc_gfield_f_flt(geometry_descriptor* type);
+void free_gtransf(suNg_field *u);
+suNg_field* alloc_gtransf(geometry_descriptor* type);
 
 spinor_field* alloc_spinor_field_f(unsigned int n, geometry_descriptor *type);
 spinor_field_flt* alloc_spinor_field_f_flt(unsigned int n, geometry_descriptor *type);
