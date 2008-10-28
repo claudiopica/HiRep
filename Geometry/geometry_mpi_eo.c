@@ -167,7 +167,6 @@ typedef struct
   int index_end;
   int level;
   int id_proc; /*id of the processor to which i should send or from whom i would like to recive data*/
-  int sign;
 } border_id;
 
 static int OVERSIZE_VOLUME;
@@ -618,7 +617,6 @@ static int check_evaluated_border(int level)
 	}
       
       border[index_eval_border].id_proc = id;
-      border[index_eval_border].sign = 0;
       
     }
   /*   else printf("GIA' CALCOLATO BORDO %d,%d,%d,%d,%d,%d,%d,%d\n",blt_start,blx_start,bly_start,blz_start,blt_width,blx_width,bly_width,blz_width); */
@@ -656,11 +654,9 @@ static void fix_buffer()
   index_start_buffer=index_position;
   int i,done_border=index_eval_border+1,id;
   int x0,x1,x2,x3;
-  int buffer_sign;
   
   for(i=1;i<done_border;i++)
     {
-      buffer_sign=0;
       id = CID;
       index_eval_border++;
       
@@ -684,7 +680,6 @@ static void fix_buffer()
 	      id = proc_down(id,0);
 	      border[index_eval_border].bt_start= 0;
 	    }
-	  buffer_sign+=T;
 	}
       else
 	border[index_eval_border].bt_start = border[i].bt_start;
@@ -701,7 +696,6 @@ static void fix_buffer()
 	      id = proc_down(id,1);
 	      border[index_eval_border].bx_start= 0;
 	    }
-	  buffer_sign+=X;
 	}
       else
 	border[index_eval_border].bx_start = border[i].bx_start;
@@ -718,7 +712,6 @@ static void fix_buffer()
 	      id = proc_down(id,2);
 	      border[index_eval_border].by_start= 0;
 	    }
-	  buffer_sign+=Y;
 	}
       else
 	border[index_eval_border].by_start = border[i].by_start;
@@ -735,7 +728,6 @@ static void fix_buffer()
 	      id = proc_down(id,3);
 	      border[index_eval_border].bz_start= 0;
 	    }
-	  buffer_sign+=Z;
 	}
       else
 	border[index_eval_border].bz_start = border[i].bz_start;
@@ -747,14 +739,14 @@ static void fix_buffer()
       border[index_eval_border].index_start = index_position ;
       border[index_eval_border].index_end = index_position +blt_width*blx_width*bly_width*blz_width;
       
-      border[index_eval_border].sign =  buffer_sign;
       /* printf("CALCOLO BUFFER L%d %d,%d,%d,%d\t,%d,%d,%d,%d\n",border[index_eval_border].level,blt_start,blx_start,bly_start,blz_start,blt_width,blx_width,bly_width,blz_width); */
+      
       
       for (x3=blz_start;x3<blz_start+blz_width;x3++) 
 	for (x2=bly_start;x2<bly_start+bly_width;x2++) 
 	  for (x1=blx_start;x1<blx_start+blx_width;x1++) 
 	    for (x0=blt_start;x0<blt_start+blt_width;x0++) 
-	      if((x0+x1+x2+x3+PSIGN+buffer_sign)&1)
+	      if((x0+x1+x2+x3+PSIGN)&1)
 		set_border_pointer(local_index(x0,x1,x2,x3),border[index_eval_border].level);
       
       
@@ -762,7 +754,7 @@ static void fix_buffer()
 	for (x2=bly_start;x2<bly_start+bly_width;x2++) 
 	  for (x1=blx_start;x1<blx_start+blx_width;x1++) 
 	    for (x0=blt_start;x0<blt_start+blt_width;x0++)
-	      if(!((x0+x1+x2+x3+PSIGN+buffer_sign)&1) )
+	      if(!((x0+x1+x2+x3+PSIGN)&1) )
 		set_border_pointer(local_index(x0,x1,x2,x3),border[index_eval_border].level);
       
       
