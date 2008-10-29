@@ -10,7 +10,7 @@ MKDIR=$(TOPDIR)/Make
 include $(MKDIR)/MkRules
 
 MODDIR := IO
-MODS := archive logger
+MODS := logger
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Memory

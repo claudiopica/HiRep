@@ -122,6 +122,7 @@ int main(int argc,char *argv[])
   geometry_mpi_eo();
   /* test_geometry_mpi_eo(); */
 
+
   lprintf("MAIN",0,"local size is %dx%dx%dx%d\n",T,X,Y,Z);
   lprintf("MAIN",0,"extended local size is %dx%dx%dx%d\n",T_EXT,X_EXT,Y_EXT,Z_EXT);
 
@@ -155,5 +156,6 @@ int main(int argc,char *argv[])
   
    test_herm(&M,"M");
    /* test_herm(&H,"H"); */
-  
+
+  finalize_process();
 }

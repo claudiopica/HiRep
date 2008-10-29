@@ -14,7 +14,7 @@ MODS := geometry_init  geometry_mpi_eo test_geometry_mpi geometry_mpi
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := IO
-MODS := archive logger
+MODS := logger
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Utils

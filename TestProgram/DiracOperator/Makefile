@@ -1,6 +1,6 @@
 TOPDIR = ../..
 
-MAIN = check_diracoperator_1 #check_diracoperator_2 check_diracoperator_3
+MAIN = check_diracoperator_1 check_diracoperator_2 check_diracoperator_3
 
 SRCS = $(addsuffix .c,$(MAIN))
 
