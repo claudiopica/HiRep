@@ -110,7 +110,7 @@ GLB_VAR(suNf_field_flt,*u_gauge_f_flt,=NULL);
 
 /* input parameters */
 #include "input_par.h"
-GLB_VAR(input_par,input_p,={0});
+GLB_VAR(input_glb,glb_var,=init_input_glb(glb_var));
 
 #undef GLB_VAR
 

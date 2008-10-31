@@ -73,10 +73,10 @@ static void sync_gauge_field(suNg_field *gf) {
     /* this assumes that the 4 directions are contiguous in memory !!! */
     memcpy(((gf->ptr)+4*gd->copy_to[i]),((gf->ptr)+4*gd->copy_from[i]),4*(gd->copy_len[i])*sizeof(*(gf->ptr)));
     /*   
-	 for(j=0; j<gd->copy_len[i]; j++) {
-	 x=gd->copy_from[i]+j;
-	 y=gd->copy_to[i]+j;
-	 for(mu=0; mu<4; mu++)
+         for(j=0; j<gd->copy_len[i]; j++) {
+         x=gd->copy_from[i]+j;
+         y=gd->copy_to[i]+j;
+         for(mu=0; mu<4; mu++)
      *pu_gauge(y,mu) = *pu_gauge(x,mu);
      }
      */
@@ -107,11 +107,6 @@ static void sync_gauge_transf(suNg_field *gf) {
   for(i=0; i<gd->ncopies; ++i) {
     memcpy(((gf->ptr)+gd->copy_to[i]),((gf->ptr)+gd->copy_from[i]),(gd->copy_len[i])*sizeof(*(gf->ptr)));
   }
-}
-
-
-void test_spinor_field(spinor_field *p) {
-  sync_spinor_field(p);
 }
 
 static void sync_spinor_field_flt(spinor_field_flt *p) {
@@ -155,14 +150,14 @@ void complete_gf_sendrecv(suNg_field *gf) {
       MPI_Error_string(mpiret,mesg,&mesglen);
       lprintf("MPI",0,"ERROR: %s\n",mesg);
       for (k=0; k<nreq; ++k) {
-	if (status[k].MPI_ERROR != MPI_SUCCESS) {
-	  MPI_Error_string(status[k].MPI_ERROR,mesg,&mesglen);
-	  lprintf("MPI",0,"Req [%d] Source [%d] Tag [%] ERROR: %s\n",
-	      k, 
-	      status[k].MPI_SOURCE, 
-	      status[k].MPI_TAG, 
-	      mesg);
-	}
+        if (status[k].MPI_ERROR != MPI_SUCCESS) {
+          MPI_Error_string(status[k].MPI_ERROR,mesg,&mesglen);
+          lprintf("MPI",0,"Req [%d] Source [%d] Tag [%] ERROR: %s\n",
+              k, 
+              status[k].MPI_SOURCE, 
+              status[k].MPI_TAG, 
+              mesg);
+        }
       }
       error(1,1,"complete_gf_sendrecv " __FILE__,"Cannot complete communications");
     }
@@ -188,13 +183,13 @@ void start_gf_sendrecv(suNg_field *gf) {
   for (i=0; i<(gd->nbuffers); ++i) {
     /* send ith buffer */
     mpiret=MPI_Isend((gf->ptr)+4*gd->sbuf_start[i], /* buffer */
-	(gd->sbuf_len[i])*sizeof(suNg)/sizeof(double)*4, /* lenght in units of doubles */
-	MPI_DOUBLE, /* basic datatype */
-	gd->sbuf_to_proc[i], /* cid of destination */
-	i, /* tag of communication */
-	cart_comm, /* use the cartesian communicator */
-	&(gf->comm_req[2*i]) /* handle to communication request */
-	);
+        (gd->sbuf_len[i])*sizeof(suNg)/sizeof(double)*4, /* lenght in units of doubles */
+        MPI_DOUBLE, /* basic datatype */
+        gd->sbuf_to_proc[i], /* cid of destination */
+        i, /* tag of communication */
+        cart_comm, /* use the cartesian communicator */
+        &(gf->comm_req[2*i]) /* handle to communication request */
+        );
 #ifndef NDEBUG
     if (mpiret != MPI_SUCCESS) {
       char mesg[MPI_MAX_ERROR_STRING];
@@ -207,13 +202,13 @@ void start_gf_sendrecv(suNg_field *gf) {
 
     /* receive ith buffer */
     mpiret=MPI_Irecv((gf->ptr)+4*gd->rbuf_start[i], /* buffer */
-	(gd->rbuf_len[i])*sizeof(suNg)/sizeof(double)*4, /* lenght in units of doubles */
-	MPI_DOUBLE, /* basic datatype */
-	gd->rbuf_from_proc[i], /* cid of origin */
-	i, /* tag of communication */
-	cart_comm, /* use the cartesian communicator */
-	&(gf->comm_req[2*i+1]) /* handle to communication request */
-	);
+        (gd->rbuf_len[i])*sizeof(suNg)/sizeof(double)*4, /* lenght in units of doubles */
+        MPI_DOUBLE, /* basic datatype */
+        gd->rbuf_from_proc[i], /* cid of origin */
+        i, /* tag of communication */
+        cart_comm, /* use the cartesian communicator */
+        &(gf->comm_req[2*i+1]) /* handle to communication request */
+        );
 #ifndef NDEBUG
     if (mpiret != MPI_SUCCESS) {
       char mesg[MPI_MAX_ERROR_STRING];
@@ -246,14 +241,14 @@ void complete_sf_sendrecv(spinor_field *sf) {
       MPI_Error_string(mpiret,mesg,&mesglen);
       lprintf("MPI",0,"ERROR: %s\n",mesg);
       for (k=0; k<nreq; ++k) {
-	if (status[k].MPI_ERROR != MPI_SUCCESS) {
-	  MPI_Error_string(status[k].MPI_ERROR,mesg,&mesglen);
-	  lprintf("MPI",0,"Req [%d] Source [%d] Tag [%] ERROR: %s\n",
-	      k, 
-	      status[k].MPI_SOURCE, 
-	      status[k].MPI_TAG, 
-	      mesg);
-	}
+        if (status[k].MPI_ERROR != MPI_SUCCESS) {
+          MPI_Error_string(status[k].MPI_ERROR,mesg,&mesglen);
+          lprintf("MPI",0,"Req [%d] Source [%d] Tag [%] ERROR: %s\n",
+              k, 
+              status[k].MPI_SOURCE, 
+              status[k].MPI_TAG, 
+              mesg);
+        }
       }
       error(1,1,"complete_gf_sendrecv " __FILE__,"Cannot complete communications");
     }
@@ -278,23 +273,15 @@ void start_sf_sendrecv(spinor_field *sf) {
   sync_spinor_field(sf);
 
   for (i=0; i<(gd->nbuffers); ++i) {
-
-    /*
-       lprintf("TESTCOMM",0,"Buf %d len = %d [%d,%d] %d->%d\n",i,gd->sbuf_len[i],gd->sbuf_start[i],gd->rbuf_start[i],gd->rbuf_from_proc[i],gd->sbuf_to_proc[i]);
-       if(gd->sbuf_len[i]!=gd->rbuf_len[i]) {
-       lprintf("TESTCOMM",0,"Errore: buffer send/recv non coincidono!!!\n");
-       }
-       */
-
     /* send ith buffer */
     mpiret=MPI_Isend((sf->ptr)+(gd->sbuf_start[i]), /* buffer */
-	(gd->sbuf_len[i])*(sizeof(suNf_spinor)/sizeof(double)), /* lenght in units of doubles */
-	MPI_DOUBLE, /* basic datatype */
-	gd->sbuf_to_proc[i], /* cid of destination */
-	i, /* tag of communication */
-	cart_comm, /* use the cartesian communicator */
-	&(sf->comm_req[2*i]) /* handle to communication request */
-	);
+        (gd->sbuf_len[i])*(sizeof(suNf_spinor)/sizeof(double)), /* lenght in units of doubles */
+        MPI_DOUBLE, /* basic datatype */
+        gd->sbuf_to_proc[i], /* cid of destination */
+        i, /* tag of communication */
+        cart_comm, /* use the cartesian communicator */
+        &(sf->comm_req[2*i]) /* handle to communication request */
+        );
 #ifndef NDEBUG
     if (mpiret != MPI_SUCCESS) {
       char mesg[MPI_MAX_ERROR_STRING];
@@ -307,13 +294,13 @@ void start_sf_sendrecv(spinor_field *sf) {
 
     /* receive ith buffer */
     mpiret=MPI_Irecv((sf->ptr)+(gd->rbuf_start[i]), /* buffer */
-	(gd->rbuf_len[i])*(sizeof(suNf_spinor)/sizeof(double)), /* lenght in units of doubles */
-	MPI_DOUBLE, /* basic datatype */
-	gd->rbuf_from_proc[i], /* cid of origin */
-	i, /* tag of communication */
-	cart_comm, /* use the cartesian communicator */
-	&(sf->comm_req[2*i+1]) /* handle to communication request */
-	);
+        (gd->rbuf_len[i])*(sizeof(suNf_spinor)/sizeof(double)), /* lenght in units of doubles */
+        MPI_DOUBLE, /* basic datatype */
+        gd->rbuf_from_proc[i], /* cid of origin */
+        i, /* tag of communication */
+        cart_comm, /* use the cartesian communicator */
+        &(sf->comm_req[2*i+1]) /* handle to communication request */
+        );
 #ifndef NDEBUG
     if (mpiret != MPI_SUCCESS) {
       char mesg[MPI_MAX_ERROR_STRING];
@@ -347,14 +334,14 @@ void complete_gt_sendrecv(suNg_field *gf) {
       MPI_Error_string(mpiret,mesg,&mesglen);
       lprintf("MPI",0,"ERROR: %s\n",mesg);
       for (k=0; k<nreq; ++k) {
-	if (status[k].MPI_ERROR != MPI_SUCCESS) {
-	  MPI_Error_string(status[k].MPI_ERROR,mesg,&mesglen);
-	  lprintf("MPI",0,"Req [%d] Source [%d] Tag [%] ERROR: %s\n",
-	      k, 
-	      status[k].MPI_SOURCE, 
-	      status[k].MPI_TAG, 
-	      mesg);
-	}
+        if (status[k].MPI_ERROR != MPI_SUCCESS) {
+          MPI_Error_string(status[k].MPI_ERROR,mesg,&mesglen);
+          lprintf("MPI",0,"Req [%d] Source [%d] Tag [%] ERROR: %s\n",
+              k, 
+              status[k].MPI_SOURCE, 
+              status[k].MPI_TAG, 
+              mesg);
+        }
       }
       error(1,1,"complete_gt_sendrecv " __FILE__,"Cannot complete communications");
     }
@@ -380,13 +367,13 @@ void start_gt_sendrecv(suNg_field *gf) {
   for (i=0; i<(gd->nbuffers); ++i) {
     /* send ith buffer */
     mpiret=MPI_Isend((gf->ptr)+gd->sbuf_start[i], /* buffer */
-	(gd->sbuf_len[i])*sizeof(suNg)/sizeof(double), /* lenght in units of doubles */
-	MPI_DOUBLE, /* basic datatype */
-	gd->sbuf_to_proc[i], /* cid of destination */
-	i, /* tag of communication */
-	cart_comm, /* use the cartesian communicator */
-	&(gf->comm_req[2*i]) /* handle to communication request */
-	);
+        (gd->sbuf_len[i])*sizeof(suNg)/sizeof(double), /* lenght in units of doubles */
+        MPI_DOUBLE, /* basic datatype */
+        gd->sbuf_to_proc[i], /* cid of destination */
+        i, /* tag of communication */
+        cart_comm, /* use the cartesian communicator */
+        &(gf->comm_req[2*i]) /* handle to communication request */
+        );
 #ifndef NDEBUG
     if (mpiret != MPI_SUCCESS) {
       char mesg[MPI_MAX_ERROR_STRING];
@@ -399,13 +386,13 @@ void start_gt_sendrecv(suNg_field *gf) {
 
     /* receive ith buffer */
     mpiret=MPI_Irecv((gf->ptr)+gd->rbuf_start[i], /* buffer */
-	(gd->rbuf_len[i])*sizeof(suNg)/sizeof(double), /* lenght in units of doubles */
-	MPI_DOUBLE, /* basic datatype */
-	gd->rbuf_from_proc[i], /* cid of origin */
-	i, /* tag of communication */
-	cart_comm, /* use the cartesian communicator */
-	&(gf->comm_req[2*i+1]) /* handle to communication request */
-	);
+        (gd->rbuf_len[i])*sizeof(suNg)/sizeof(double), /* lenght in units of doubles */
+        MPI_DOUBLE, /* basic datatype */
+        gd->rbuf_from_proc[i], /* cid of origin */
+        i, /* tag of communication */
+        cart_comm, /* use the cartesian communicator */
+        &(gf->comm_req[2*i+1]) /* handle to communication request */
+        );
 #ifndef NDEBUG
     if (mpiret != MPI_SUCCESS) {
       char mesg[MPI_MAX_ERROR_STRING];

@@ -282,3 +282,34 @@ void geometry_mem_alloc() {
 }
 
 
+int proc_up(int id, int dir) 
+{
+#ifdef WITH_MPI
+  int coords[4];
+	int outid;
+	
+	MPI_Cart_coords(cart_comm, id, 4, coords);
+	++coords[dir];
+	MPI_Cart_rank(cart_comm, coords, &outid);
+  
+	return outid;
+#else
+	return 0;
+#endif
+}
+
+int proc_dn(int id, int dir)
+{
+#ifdef WITH_MPI
+  int coords[4];
+	int outid;
+	
+	MPI_Cart_coords(cart_comm, id, 4, coords);
+	--coords[dir];
+	MPI_Cart_rank(cart_comm, coords, &outid);
+  
+	return outid;
+#else
+	return 0;
+#endif
+}

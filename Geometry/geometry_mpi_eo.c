@@ -98,55 +98,6 @@
 #define true 1
 #define false 0
 
-static int proc_up(int id, int dir) 
-{
-#ifdef WITH_MPI
-  int coords[4];
-	int outid;
-	
-	MPI_Cart_coords(cart_comm, id, 4, coords);
-	++coords[dir];
-	MPI_Cart_rank(cart_comm, coords, &outid);
-  
-	return outid;
-#else
-	return 0;
-#endif
-}
-
-static int proc_down(int id, int dir)
-{
-#ifdef WITH_MPI
-  int coords[4];
-	int outid;
-	
-	MPI_Cart_coords(cart_comm, id, 4, coords);
-	--coords[dir];
-	MPI_Cart_rank(cart_comm, coords, &outid);
-  
-	return outid;
-#else
-	return 0;
-#endif
-}
-
-static void test_pud() {
-	int id,iup,idn;
-	id=CID;
-  iup=proc_up(id,0);
-  idn=proc_down(id,0);
-  /* lprintf("CPTEST",0,"dir 0: up %d dn %d\n",iup,idn); */
-  iup=proc_up(id,1);
-  idn=proc_down(id,1);
-  /* lprintf("CPTEST",0,"dir 1: up %d dn %d\n",iup,idn); */
-  iup=proc_up(id,2);
-  idn=proc_down(id,2);
-  /* lprintf("CPTEST",0,"dir 2: up %d dn %d\n",iup,idn); */
-  iup=proc_up(id,3);
-  idn=proc_down(id,3);
-  /* lprintf("CPTEST",0,"dir 3: up %d dn %d\n",iup,idn); */
-
-}
 
 #define local_index(nt,nx,ny,nz)  (((nt)+2*T_BORDER+T)%(2*T_BORDER+T)+	\
 				   (T+2*T_BORDER)*(((nx)+2*X_BORDER+X)%(2*X_BORDER+X))+ \
@@ -594,25 +545,25 @@ static int check_evaluated_border(int level)
 
       if(blt_width == T_BORDER )
 	{
-	  if(blt_start == T_BORDER ) id = proc_down(id,0);
+	  if(blt_start == T_BORDER ) id = proc_dn(id,0);
 	  else if(blt_start == T) id = proc_up(id,0);
 	}
 
       if(blx_width == X_BORDER )
 	{
-	  if(blx_start == X_BORDER ) id = proc_down(id,1);
+	  if(blx_start == X_BORDER ) id = proc_dn(id,1);
 	  else if(blx_start == X) id = proc_up(id,1);
 	}
 
       if(bly_width == Y_BORDER )
 	{
-	  if(bly_start == Y_BORDER ) id = proc_down(id,2);
+	  if(bly_start == Y_BORDER ) id = proc_dn(id,2);
 	  else if(bly_start == Y) id = proc_up(id,2);
 	}
 
       if(blz_width == Z_BORDER )
 	{
-	  if(blz_start == Z_BORDER ) id = proc_down(id,3);
+	  if(blz_start == Z_BORDER ) id = proc_dn(id,3);
 	  else if(blz_start == Z) id = proc_up(id,3);
 	}
       
@@ -677,7 +628,7 @@ static void fix_buffer()
 	    }
 	  else if( border[i].bt_start == T) 
 	    {
-	      id = proc_down(id,0);
+	      id = proc_dn(id,0);
 	      border[index_eval_border].bt_start= 0;
 	    }
 	}
@@ -693,7 +644,7 @@ static void fix_buffer()
 	    }
 	  else if( border[i].bx_start == X) 
 	    {
-	      id = proc_down(id,1);
+	      id = proc_dn(id,1);
 	      border[index_eval_border].bx_start= 0;
 	    }
 	}
@@ -709,7 +660,7 @@ static void fix_buffer()
 	    }
 	  else if( border[i].by_start == Y) 
 	    {
-	      id = proc_down(id,2);
+	      id = proc_dn(id,2);
 	      border[index_eval_border].by_start= 0;
 	    }
 	}
@@ -725,7 +676,7 @@ static void fix_buffer()
 	    }
 	  else if( border[i].bz_start == Z) 
 	    {
-	      id = proc_down(id,3);
+	      id = proc_dn(id,3);
 	      border[index_eval_border].bz_start= 0;
 	    }
 	}
@@ -1324,11 +1275,7 @@ static void set_memory_order()
 
 void geometry_mpi_eo(void)
 {
-/* the call to setup_process is done before this function is called 
-  geometry_set();
-	*/
   
-  test_pud();
   geometry_mpi_init();
 
   set_inner();

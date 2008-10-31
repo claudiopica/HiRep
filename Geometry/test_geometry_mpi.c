@@ -20,38 +20,6 @@
 #define true 1
 #define false 0
 
-static int proc_up(int id, int dir) 
-{
-#ifdef WITH_MPI
-  int coords[4];
-	int outid;
-	
-	MPI_Cart_coords(cart_comm, id, 4, coords);
-	++coords[dir];
-	MPI_Cart_rank(cart_comm, coords, &outid);
-  
-	return outid;
-#else
-	return 0;
-#endif
-}
-
-static int proc_down(int id, int dir)
-{
-#ifdef WITH_MPI
-  int coords[4];
-	int outid;
-	
-	MPI_Cart_coords(cart_comm, id, 4, coords);
-	--coords[dir];
-	MPI_Cart_rank(cart_comm, coords, &outid);
-  
-	return outid;
-#else
-	return 0;
-#endif
-}
-
 /* glattice is the geometry_descriptor instance fo the global lattice */
 static int local_size[4];
 static int global_size[4];
@@ -1067,7 +1035,7 @@ void test_glattice() {
 		id = CID;
 		for(k=0; k<4; k++) {
 			if(shift[k] > 0) id = proc_up(id,k);
-			else if(shift[k] < 0) id = proc_down(id,k);
+			else if(shift[k] < 0) id = proc_dn(id,k);
 		}
 		if(id != glattice.rbuf_from_proc[i]) {
 			lprintf("TEST_GEOMETRY",loglevel,"rbuf_from_proc[%d]=%d (rbuf_mask={%d,%d,%d,%d}) , expected %d.\n", i,glattice.rbuf_from_proc[i],rbuf_mask[0],rbuf_mask[1],rbuf_mask[2],rbuf_mask[3],id);
@@ -1085,7 +1053,7 @@ void test_glattice() {
 		}
 		id = CID;
 		for(k=0; k<4; k++) {
-			if(shift[k] > 0) id = proc_down(id,k);
+			if(shift[k] > 0) id = proc_dn(id,k);
 			else if(shift[k] < 0) id = proc_up(id,k);
 		}
 		if(id != glattice.sbuf_to_proc[i]) {

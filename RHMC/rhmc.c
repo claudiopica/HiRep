@@ -35,6 +35,38 @@
 
 #include "communications.h"
 
+/* RHMC variables */
+typedef struct _input_rhmc {
+  /* rhmc parameters */
+  rhmc_par rhmc_p;
+  /* integrator parameters */
+  int_par int_p;
+
+  /* for the reading function */
+  input_record_t read[12];
+  
+} input_rhmc;
+
+#define init_input_rhmc(varname) \
+{ \
+  .read={\
+    {"beta", "beta = %lf", DOUBLE_T, &(varname).rhmc_p.beta},\
+    {"nf", "nf = %d", INT_T, &(varname).rhmc_p.nf},\
+    {"mass", "mass = %lf", DOUBLE_T, &(varname).rhmc_p.mass},\
+    {"MT_prec", "MT_prec = %lf", DOUBLE_T, &(varname).rhmc_p.MT_prec},\
+    {"MD_prec", "MD_prec = %lf", DOUBLE_T, &(varname).rhmc_p.MD_prec},\
+    {"HB_prec", "HB_prec = %lf", DOUBLE_T, &(varname).rhmc_p.HB_prec},\
+    {"force_prec", "force_prec = %lf", DOUBLE_T, &(varname).rhmc_p.force_prec},\
+    {"n_pf", "n_pf = %u", UNSIGNED_T, &(varname).rhmc_p.n_pf},\
+    {"tlen", "tlen = %lf", DOUBLE_T, &(varname).int_p.tlen},\
+    {"nsteps", "nsteps = %u", UNSIGNED_T, &(varname).int_p.nsteps},\
+    {"gsteps", "gsteps = %u", UNSIGNED_T, &(varname).int_p.gsteps},\
+    {NULL, NULL, 0, NULL}\
+  }\
+}
+
+input_rhmc rhmc_var = init_input_rhmc(rhmc_var);
+
 int main(int argc,char *argv[])
 {
   int i, acc;
@@ -51,9 +83,10 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
 
   /* read input file */
-  read_input("input_file");
-  lprintf("MAIN",0,"RLXD [%d,%d]\n",input_p.rlxd_level,input_p.rlxd_seed);
-  rlxd_init(input_p.rlxd_level,input_p.rlxd_seed+PID);
+  read_input(glb_var.read,"input_file");
+  lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed+PID);
+  rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
+  read_input(rhmc_var.read,"input_file");
 
   /* setup communication geometry */
   if (geometry_init() == 1) {
@@ -112,10 +145,10 @@ int main(int argc,char *argv[])
 
 
   /* init RHMC */
-  input_p.rhmc_p.integrator=&O2MN_multistep;
-  input_p.rhmc_p.mshift_solver=&cg_mshift; /* this is not used in the code now */
-  input_p.rhmc_p.MD_par=&input_p.int_p;
-  init_rhmc(&input_p.rhmc_p);
+  rhmc_var.rhmc_p.integrator=&O2MN_multistep;
+  rhmc_var.rhmc_p.mshift_solver=&cg_mshift; /* this is not used in the code now */
+  rhmc_var.rhmc_p.MD_par=&rhmc_var.int_p;
+  init_rhmc(&rhmc_var.rhmc_p);
 
   lprintf("MAIN",0,"MVM during RHMC initialzation: %ld\n",getMVM());
   lprintf("MAIN",0,"Initial plaquette: %1.8e\n",avr_plaquette());

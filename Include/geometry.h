@@ -46,6 +46,8 @@ void glb_to_proc(int *g, int *p);
 int geometry_init(void);
 void geometry_mpi_eo(void);
 void geometry_mem_alloc(void);
+int proc_up(int id, int dir);
+int proc_dn(int id, int dir);
 
 void test_geometry_mpi(void);
 void test_geometry_mpi_eo(void);

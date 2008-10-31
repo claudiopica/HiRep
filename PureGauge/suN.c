@@ -25,126 +25,141 @@
 #include "global.h"
 #include "logger.h"
 #include "observables.h"
+#include "representation.h"
 
 
-int nhb,nor,nit,nth,nms,level,seed;
-float beta;
+/* Input file variables */
+typedef struct _input_pg {
 
-void read_cmdline(int argc, char*argv[])
-{
-  int i, ai=0, ao=0;
-  FILE *in=NULL, *out=NULL;
-  for (i=1;i<argc;i++){
-      if (strcmp(argv[i],"-i")==0)
-         ai=i+1;
-      else if (strcmp(argv[i],"-o")==0)
-         ao=i+1;
-   }
+  double beta;
+  int nth, nms, nit, nhb, nor;
 
-   if (ao!=0)
-      out=freopen(argv[ao],"w",stdout);
-   else
-      out=stdout;
-   
-   error(ai==0,1,"suN.c",
-         "Syntax: suN -i <input file> [-o <output file>]");
+  /* for the reading function */
+  input_record_t read[7];
+  
+} input_pg;
 
-   in=freopen(argv[ai],"r",stdin);
-   error(in==NULL,1,"run1.c","Cannot open input file");
-   
-   scanf("beta %f nhb %d nor %d nit %d nth %d nms %d level %d seed %d",
-         &beta,&nhb,&nor,&nit,&nth,&nms,&level,&seed);
-   fclose(in);
- 
+#define init_input_pg(varname) \
+{ \
+  .read={\
+    {"beta", "beta = %lf", DOUBLE_T, &(varname).beta},\
+    {"nth", "nth = %d", INT_T, &(varname).nth},\
+    {"nms", "nms = %d", INT_T, &(varname).nms},\
+    {"nit", "nit = %d", INT_T, &(varname).nit},\
+    {"nhb", "nhb = %d", INT_T, &(varname).nhb},\
+    {"nor", "nor = %d", INT_T, &(varname).nor},\
+    {NULL, NULL, 0, NULL}\
+  }\
 }
+
+input_pg pg_var = init_input_pg(pg_var);
 
 int main(int argc,char *argv[])
 {
-   int i,n,flag;
-   double *p,pbar,sig,tau;
+  char tmp[256];
+  int i,n,flag;
+  double *p,pbar,sig,tau;
 
-   read_cmdline(argc, argv);
+  /* setup process id and communications */
+  setup_process(&argc,&argv);
 
-	 logger_setlevel(0,10000);
+  /* logger setup */
+  logger_setlevel(0,40);
+  sprintf(tmp,">out_%d",PID); logger_stdout(tmp);
+  sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
 
-   printf("Gauge group: SU(%d)\n",NG);
+  lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
 
-	 /*
-   geometry_blocked();
-	 */
-	 read_input("test_input");
-	 setup_process();
-	 define_geometry();
-   /*test_geometry();*/
+  /* read input file */
+  read_input(glb_var.read,"common_input");
+  lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed+PID);
+  rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
+  read_input(pg_var.read,"input_file");
 
-   printf("The lattice size is %dx%dx%dx%d\n",T,X,Y,Z);
-   printf("\n");
-   printf("beta = %2.4f\n",beta);
-   printf("nth  = %d\tNumber of thermalization cycles\n",nth);
-   printf("nms  = %d\tNumber of measure cycles\n",nms);
-   printf("nit  = %d\tNumber of hb-or iterations per cycle\n",nit);
-   printf("nhb  = %d\tNumber of heatbaths per iteration\n",nhb);   
-   printf("nor  = %d\tNumber or overrelaxations per iteration\n",nor);
-   printf("ranlux: level = %d, seed = %d\n\n",level,seed); 
-   fflush(stdout);
-   
-   rlxd_init(level,seed);
-   /*   rlxd_init(level+1,seed); */
+  /* setup communication geometry */
+  if (geometry_init() == 1) {
+    finalize_process();
+    return 0;
+  }
 
+  lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
+  lprintf("MAIN",1,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
+  lprintf("MAIN",0,"global size is %dx%dx%dx%d\n",GLB_T,GLB_X,GLB_Y,GLB_Z);
+  lprintf("MAIN",0,"proc grid is %dx%dx%dx%d\n",NP_T,NP_X,NP_Y,NP_Z);
 
-   u_gauge=alloc_gfield();
+  /* setup lattice geometry */
+  geometry_mpi_eo();
+  /* test_geometry_mpi_eo(); */
 
-   /*read_gauge_field_single_biagio("Config_biagio"); */
+  /* disable logger for MPI processes != 0 */
+  //if (PID!=0) { logger_disable(); }
 
-   /* random_u(); */
+  /* alloc global gauge fields */
+  u_gauge=alloc_gfield(&glattice);
+#ifndef REPR_FUNDAMENTAL
+  u_gauge_f=alloc_gfield_f(&glattice);
+#endif
+  random_u(u_gauge); 
+  represent_gauge_field();
 
-   p=malloc(nms*sizeof(double)); /* array per le misure */
+  lprintf("MAIN",0,"beta = %2.4f\n",pg_var.beta);
+  lprintf("MAIN",0,"nth  = %d\tNumber of thermalization cycles\n",pg_var.nth);
+  lprintf("MAIN",0,"nms  = %d\tNumber of measure cycles\n",pg_var.nms);
+  lprintf("MAIN",0,"nit  = %d\tNumber of hb-or iterations per cycle\n",pg_var.nit);
+  lprintf("MAIN",0,"nhb  = %d\tNumber of heatbaths per iteration\n",pg_var.nhb);   
+  lprintf("MAIN",0,"nor  = %d\tNumber or overrelaxations per iteration\n",pg_var.nor);
 
-   /* Termalizzazione */
-   for (i=0;i<nth;++i) {
-      update(beta,nhb,nor);
-      if ((i%10)==0)
-              printf("%d",i);
-      else
-              printf(".");
-      fflush(stdout);
-   }
-   if(i) printf("%d\nThemalization done.\n",i);
+  /* random_u(); */
 
-   
-   /* Misure */
-   for (i=0;i<nms;i++){ /* nms misure */
-     p[i]=avr_plaquette();
-     printf("[%d] <p> = %1.6f\n",i,p[i]);
-     fflush(stdout);
+  p=malloc(pg_var.nms*sizeof(double)); /* array per le misure */
 
-     for (n=0;n<nit;n++) /* nit updates */
-       update(beta,nhb,nor);
-     
-     /* Plaquette media */
-   }
-
-   printf("[%d] <p> = %1.6f\n",i,avr_plaquette());
-   fflush(stdout);
-
-   pbar=average(nms,p);
-   sig=sigma(nms,p,&tau,&flag);
-
-   if (flag!=0)
-   {
-      printf("Warning: unreliable error estimation ");
-      printf("(data series is too short)\n\n");
-   }
-   
-   printf("<p>   = %1.6f\n",pbar);
-   printf("sigma = %1.6f\n",sig);
-   printf("tau   = %1.2f [iterations]\n\n",tau);
+  /* Termalizzazione */
+  for (i=0;i<pg_var.nth;++i) {
+    update(pg_var.beta,pg_var.nhb,pg_var.nor);
+    if ((i%10)==0)
+      lprintf("MAIN",0,"%d",i);
+    else
+      lprintf("MAIN",0,".");
+  }
+  if(i) lprintf("MAIN",0,"%d\nThemalization done.\n",i);
 
 
-   write_gauge_field("Config");
+  /* Misure */
+  for (i=0;i<pg_var.nms;i++){ /* nms misure */
+    p[i]=avr_plaquette();
+    lprintf("MAIN",0,"[%d] <p> = %1.6f\n",i,p[i]);
 
-   free_field(u_gauge);
+    for (n=0;n<pg_var.nit;n++) /* nit updates */
+      update(pg_var.beta,pg_var.nhb,pg_var.nor);
+
+    /* Plaquette media */
+  }
+
+  lprintf("MAIN",0,"[%d] <p> = %1.6f\n",i,avr_plaquette());
+
+  pbar=average(pg_var.nms,p);
+  sig=sigma(pg_var.nms,p,&tau,&flag);
+
+  if (flag!=0)
+  {
+    lprintf("MAIN",0,"Warning: unreliable error estimation ");
+    lprintf("MAIN",0,"(data series is too short)\n\n");
+  }
+
+  lprintf("MAIN",0,"<p>   = %1.6f\n",pbar);
+  lprintf("MAIN",0,"sigma = %1.6f\n",sig);
+  lprintf("MAIN",0,"tau   = %1.2f [iterations]\n\n",tau);
 
 
-   return 0;
+  write_gauge_field("Config");
+
+  /* free memory */
+  free_gfield(u_gauge);
+#ifndef REPR_FUNDAMENTAL
+  free_gfield_f(u_gauge_f);
+#endif
+  /* close communications */
+  finalize_process();
+
+  return 0;
 }
