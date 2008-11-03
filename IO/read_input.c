@@ -7,6 +7,7 @@
 #include "error.h"
 #include "global.h"
 #include "logger.h"
+#include <string.h>
 #include <stdio.h>
 
 static void mpi_broadcast_parameters(input_record_t crec[]) {
@@ -23,7 +24,7 @@ static void mpi_broadcast_parameters(input_record_t crec[]) {
           MPI_Bcast(crec->ptr,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
           break;
         case STRING_T:
-          /* do not broad cast string as they are only needed on PID 0 */
+          MPI_Bcast(crec->ptr,strlen(crec->ptr)+1,MPI_CHAR,0,MPI_COMM_WORLD);
           break;
         default:
           error(1,1,"read_input " __FILE__, "Unknown type in input descriptor\n");
