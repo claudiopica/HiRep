@@ -442,6 +442,7 @@ void read_ranlxd_state(char filename[])
   FILE *fp=NULL;
   const int nproc=NP_T*NP_X*NP_Y*NP_Z;
   int hproc=0; /* number of states in the file */
+  int cproc=0; 
   int p[4];
   int *buff=NULL;
   int pid=0;
@@ -542,6 +543,14 @@ void read_ranlxd_state(char filename[])
 
           if (pid==PID) { /* reset state */
             rlxd_reset(buff);
+          }
+
+          /* check if there are more states available */
+          cproc++;
+          if (hproc<=cproc) { 
+            /* exit loops */
+            p[0]=NP_T; p[1]=NP_X;
+            p[2]=NP_Y; p[3]=NP_Z;
           }
 
         } /* end loop over processors in Z direction */

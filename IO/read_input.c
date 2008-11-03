@@ -12,26 +12,29 @@
 
 static void mpi_broadcast_parameters(input_record_t crec[]) {
 #ifdef WITH_MPI
-    for (; crec->descr!=NULL; ++crec) {
-      switch(crec->type) {
-        case INT_T:
-          MPI_Bcast(crec->ptr,1,MPI_INT,0,MPI_COMM_WORLD);
-          break;
-        case UNSIGNED_T:
-          MPI_Bcast(crec->ptr,1,MPI_UNSIGNED,0,MPI_COMM_WORLD);
-          break;
-        case DOUBLE_T:
-          MPI_Bcast(crec->ptr,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
-          break;
-        case STRING_T:
-          MPI_Bcast(crec->ptr,strlen(crec->ptr)+1,MPI_CHAR,0,MPI_COMM_WORLD);
-          break;
-        default:
-          error(1,1,"read_input " __FILE__, "Unknown type in input descriptor\n");
-      }
+  int stringlen=0;
+  for (; crec->descr!=NULL; ++crec) {
+    switch(crec->type) {
+      case INT_T:
+        MPI_Bcast(crec->ptr,1,MPI_INT,0,MPI_COMM_WORLD);
+        break;
+      case UNSIGNED_T:
+        MPI_Bcast(crec->ptr,1,MPI_UNSIGNED,0,MPI_COMM_WORLD);
+        break;
+      case DOUBLE_T:
+        MPI_Bcast(crec->ptr,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
+        break;
+      case STRING_T:
+        stringlen=strlen(crec->ptr)+1;
+        MPI_Bcast(&stringlen,1,MPI_INT,0,MPI_COMM_WORLD);
+        MPI_Bcast(crec->ptr,stringlen,MPI_CHAR,0,MPI_COMM_WORLD);
+        break;
+      default:
+        error(1,1,"read_input " __FILE__, "Unknown type in input descriptor\n");
     }
+  }
 #endif
-  
+
 }
 
 void read_input(input_record_t irec[], char *filename) {
