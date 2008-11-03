@@ -41,11 +41,10 @@ MODDIR := Inverters
 MODS := linear_algebra cg_mshift
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
-$(MAIN): $(OBJS) $(MOD_OBJS)
+$(MAIN): %: %.o $(MOD_OBJS)
 	echo -n Linking [$@]... 
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< $(MOD_OBJS) &&\
 	echo " done." || echo " failed."
-
 
 .PHONY: default
 

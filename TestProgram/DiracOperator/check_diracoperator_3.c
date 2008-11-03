@@ -139,23 +139,15 @@ int main(int argc,char *argv[])
 
   lprintf("MAIN",0,"Generating a random gauge field... ");
   random_u(u_gauge);
-  /* questo va rimosso quando la geometria viene sistemata! */
   lprintf("MAIN",0,"done.\n");
+ 
+  start_gf_sendrecv(u_gauge);
+
   represent_gauge_field();
    
-	 /*
-   gaussian_spinor_field(&(s1[0]));
-   gaussian_spinor_field(&(s2[0]));
-   
-   tau = 1./sqrt(spinor_field_sqnorm_f(s1));
-   spinor_field_mul_f(s1,tau,s1);
-   tau = 1./sqrt(spinor_field_sqnorm_f(s2));
-   spinor_field_mul_f(s2,tau,s2);
-*/
 
   
-   test_herm(&M,"M");
-   /* test_herm(&H,"H"); */
-
+  test_herm(&M,"M");
+ 
   finalize_process();
 }

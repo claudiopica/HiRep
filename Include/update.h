@@ -62,6 +62,8 @@ void free_rhmc();
  */
 int update_rhmc();
 
+int update_rhmc_o();
+
 /* this is the basic operator used in the update */
 void H2(spinor_field *out, spinor_field *in);
 void Force_rhmc_f(double dt, suNg_av_field *force);

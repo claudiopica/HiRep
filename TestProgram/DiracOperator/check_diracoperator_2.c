@@ -152,6 +152,8 @@ int main(int argc,char *argv[])
 #ifndef REPR_FUNDAMENTAL
    u_gauge_f=alloc_gfield_f(&glattice);
 #endif
+   start_gf_sendrecv(u_gauge);
+
    represent_gauge_field();
    
    ps0=alloc_spinor_field_f(3,&glattice);

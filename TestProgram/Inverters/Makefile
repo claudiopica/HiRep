@@ -1,6 +1,6 @@
-TOPDIR = ../../
+TOPDIR = ../..
 
-MAIN := check_algebra_1 check_algebra_2
+MAIN := check_inverters_1 check_inverters_2 check_inverters_3 check_inverters_4
 
 SRCS = $(addsuffix .c,$(MAIN))
 
@@ -10,11 +10,11 @@ MKDIR=$(TOPDIR)/Make
 include $(MKDIR)/MkRules
 
 MODDIR := Geometry
-MODS := communications
+MODS := geometry_init geometry_mpi_eo test_geometry_mpi communications
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := IO
-MODS := logger
+MODS := logger read_input
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Utils
@@ -22,19 +22,23 @@ MODS := boundary_conditions
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Memory
-MODS := amalloc 
+MODS := amalloc field_alloc spinor_field_alloc
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Random
-MODS := gauss ranlxs ranlxd random_suNg
+MODS := gauss random_suNg ranlxs ranlxd random_fields
+MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
+
+MODDIR := Update
+MODS := Dphi random_spinor_field random_su2 representation
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Error
 MODS := error
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
-MODDIR := Update
-MODS := random_su2 representation
+MODDIR := Inverters
+MODS := linear_algebra cg_mshift MINRES_mshift MINRES g5QMR_mshift eva jacobi
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 $(MAIN): %: %.o $(MOD_OBJS)
@@ -45,5 +49,3 @@ $(MAIN): %: %.o $(MOD_OBJS)
 
 .PHONY: default
 
-cleanall: clean
-	rm -rf $(MAIN) *~

@@ -258,3 +258,78 @@ int update_rhmc(){
 }
 
 
+
+int update_rhmc_o(){
+
+  double deltaH;
+  double oldmax,oldmin;
+  _DECLARE_INT_ITERATOR(i);
+
+  if(!init)
+    return -1;
+
+  /* generate new momenta and pseudofermions */
+  static unsigned int calln=0;
+  
+  if((calln++&1)==0){
+    lprintf("RHMC",30,"Generating gaussian momenta and pseudofermions...\n");
+    gaussian_momenta(momenta);
+    for (i=0;i<_update_par.n_pf;++i)
+      gaussian_spinor_field(&pf[i]);
+  }
+  else
+    lprintf("RHMC",30,"NOT Generating momenta and pseudofermions...\n");
+   /* compute starting action */
+  lprintf("RHMC",30,"Computing action density...\n");
+  local_hmc_action(NEW, la, momenta, pf, pf);
+   
+  /* compute H2^{a/2}*pf */
+  lprintf("RHMC",30,"Correcting pseudofermions distribution...\n");
+  for (i=0;i<_update_par.n_pf;++i)
+    rational_func(&r_HB, &H2, &pf[i], &pf[i]);
+
+  /* integrate molecular dynamics */
+  lprintf("RHMC",30,"MD integration...\n");
+  _update_par.integrator(momenta,_update_par.MD_par);
+  /*leapfrog(momenta, _update_par.tlen, _update_par.nsteps);
+    O2MN_multistep(momenta, _update_par.tlen, _update_par.nsteps, 3);*/
+
+  /* project gauge field */
+  project_gauge_field();
+  represent_gauge_field();
+
+  /* test min and max eigenvalue of H2 and update approx if necessary */
+  /* now it just tests the approx !!! */
+  oldmax = maxev; /* save old max */
+  oldmin = minev; /* save old min */
+  find_spec_H2(&maxev,&minev, _update_par.mass); /* find spectral interval of H^2 */
+  r_app_set(&r_S,minev,maxev);
+  r_app_set(&r_MD,minev,maxev);
+  r_app_set(&r_HB,minev,maxev);
+
+  lprintf("RHMC",30,"Computing new action density...\n");
+  /* compute H2^{-a/2}*pf or H2^{-a}*pf */
+  /* here we choose the first strategy which is more symmetric */
+  for (i=0;i<_update_par.n_pf;++i)
+    rational_func(&r_S, &H2, &pf[i], &pf[i]);
+
+  /* compute new action */
+  local_hmc_action(DELTA, la, momenta, pf, pf);
+
+  /* Metropolis test */
+  deltaH=0.;
+  _MASTER_FOR(la->type,i) {
+    deltaH+=*_FIELD_AT(la,i);
+  }
+  global_sum(&deltaH, 1);
+  lprintf("RHMC",10,"[DeltaS = %1.8e][exp(-DS) = %1.8e]\n",deltaH,exp(-deltaH));
+
+  suNg_field_copy(u_gauge_old,u_gauge);
+ 
+  return 1;
+}
+
+
+
+
+
