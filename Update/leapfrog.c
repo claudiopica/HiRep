@@ -15,12 +15,12 @@
 #define _proj_gfield(c) if((c)&_PROJ_BIT){(c)=0;project_gauge_field();} else {++(c); start_gf_sendrecv(u_gauge);} (void*)0
 
 void leapfrog(suNg_av_field *momenta, int_par *traj_par){
-  static unsigned int count=0;
+  unsigned int count=0;
   _DECLARE_INT_ITERATOR(i);
 
   /* check input types */
 #ifndef CHECK_SPINOR_MATCHING
-   _TWO_SPINORS_MATCHING(u_gauge,momenta);
+  _TWO_SPINORS_MATCHING(u_gauge,momenta);
 #endif
 
   if (traj_par->nsteps>0) {
@@ -29,7 +29,7 @@ void leapfrog(suNg_av_field *momenta, int_par *traj_par){
 
     lprintf("MD_INT",10,"Starting new MD trajectory using leapfrog.\n");
     lprintf("MD_INT",20,"MD parameters: len=%1.4f steps=%d => dt=%1.4f\n",
-	    traj_par->tlen,traj_par->nsteps,dt);
+        traj_par->tlen,traj_par->nsteps,dt);
 
     /* half step for the gauge field */
     _MASTER_FOR(&glattice,i) {
@@ -47,17 +47,17 @@ void leapfrog(suNg_av_field *momenta, int_par *traj_par){
 
       /* update of the gauge field */
       _MASTER_FOR(&glattice,i) {
-	ExpX(dt,_4FIELD_AT(momenta,i,0), _4FIELD_AT(u_gauge,i,0));
-	ExpX(dt,_4FIELD_AT(momenta,i,1), _4FIELD_AT(u_gauge,i,1));
-	ExpX(dt,_4FIELD_AT(momenta,i,2), _4FIELD_AT(u_gauge,i,2));
-	ExpX(dt,_4FIELD_AT(momenta,i,3), _4FIELD_AT(u_gauge,i,3));
+        ExpX(dt,_4FIELD_AT(momenta,i,0), _4FIELD_AT(u_gauge,i,0));
+        ExpX(dt,_4FIELD_AT(momenta,i,1), _4FIELD_AT(u_gauge,i,1));
+        ExpX(dt,_4FIELD_AT(momenta,i,2), _4FIELD_AT(u_gauge,i,2));
+        ExpX(dt,_4FIELD_AT(momenta,i,3), _4FIELD_AT(u_gauge,i,3));
       }
       _proj_gfield(count);
       represent_gauge_field();
 
       lprintf("MD_INT",10,"MD step: %d/%d\n",n,traj_par->nsteps);
     }
-   
+
     /* Update of momenta */
     Force(dt,momenta);
 

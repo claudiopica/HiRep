@@ -21,6 +21,7 @@
 #include "observables.h"
 #include "communications.h"
 #include "utils.h"
+#include "ranlux.h"
 
 void write_gauge_field(char filename[]) 
 {
@@ -45,15 +46,15 @@ void write_gauge_field(char filename[])
   if(PID==0) {
     int d[5]={NG,GLB_T,GLB_X,GLB_Y,GLB_Z};
     error((fp=fopen(filename,"wb"))==NULL,1,"write_gauge_field",
-	"Failed to open file for writing");
+        "Failed to open file for writing");
     /* write NG and global size */
     error(fwrite(d,(size_t) sizeof(int),(size_t)(5),fp)!=(5),
-	1,"write_gauge_field",
-	"Failed to gauge field geometry");
+        1,"write_gauge_field",
+        "Failed to write gauge field geometry");
     /* write average plaquette */
     error(fwrite(&plaq,(size_t) sizeof(double),(size_t)(1),fp)!=(1),
-	1,"write_gauge_field",
-	"Failed to gauge field plaquette");
+        1,"write_gauge_field",
+        "Failed to write gauge field plaquette");
   }
 
 #ifdef WITH_MPI
@@ -71,85 +72,85 @@ void write_gauge_field(char filename[])
     for (g[1]=0;g[1]<GLB_X;++g[1]) {
       for (g[2]=0;g[2]<GLB_Y;++g[2]) {
 #ifdef WITH_MPI
-	glb_to_proc(g, p); /* get the processor coordinate */
+        glb_to_proc(g, p); /* get the processor coordinate */
 #endif
-	for (p[3]=0;p[3]<NP_Z;++p[3]) { /* loop over processors in Z direction */
-	  int bsize=sizeof(suNg)/sizeof(double)*4*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
+        for (p[3]=0;p[3]<NP_Z;++p[3]) { /* loop over processors in Z direction */
+          int bsize=sizeof(suNg)/sizeof(double)*4*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
 #ifdef WITH_MPI
-	  MPI_Cart_rank(cart_comm, p, &cid);
-	  MPI_Group_translate_ranks(cg, 1, &cid, wg, &pid);
+          MPI_Cart_rank(cart_comm, p, &cid);
+          MPI_Group_translate_ranks(cg, 1, &cid, wg, &pid);
 #endif
-	  if (pid==PID) { /* fill link buffer */
-	    int lsite[4];
-	    suNg *cm;
+          if (pid==PID) { /* fill link buffer */
+            int lsite[4];
+            suNg *cm;
 
-	    /* convert global to local coordinate */
-	    origin_coord(lsite);
-	    lsite[0]=g[0]-lsite[0];
-	    lsite[1]=g[1]-lsite[1];
-	    lsite[2]=g[2]-lsite[2];
+            /* convert global to local coordinate */
+            origin_coord(lsite);
+            lsite[0]=g[0]-lsite[0];
+            lsite[1]=g[1]-lsite[1];
+            lsite[2]=g[2]-lsite[2];
 
-	    /* fill buffer */
-	    cm=(suNg*)buff;
-	    for (lsite[3]=0; lsite[3]<Z; ++lsite[3]) { /* loop on local Z */
-	      int ix=ipt(lsite[0],lsite[1],lsite[2],lsite[3]);
-	      suNg *pm=pu_gauge(ix,0);
-	      *(cm++)=*(pm++); /* copy 4 directions */
-	      *(cm++)=*(pm++);
-	      *(cm++)=*(pm++);
-	      *(cm++)=*(pm);
-	    }
-	  }
+            /* fill buffer */
+            cm=(suNg*)buff;
+            for (lsite[3]=0; lsite[3]<Z; ++lsite[3]) { /* loop on local Z */
+              int ix=ipt(lsite[0],lsite[1],lsite[2],lsite[3]);
+              suNg *pm=pu_gauge(ix,0);
+              *(cm++)=*(pm++); /* copy 4 directions */
+              *(cm++)=*(pm++);
+              *(cm++)=*(pm++);
+              *(cm++)=*(pm);
+            }
+          }
 #ifdef WITH_MPI
-	  MPI_Barrier(MPI_COMM_WORLD); 
-	  if (pid!=0) { /* do send/receive only if the data is not on PID 0 */ 
-	    /* send buffer */
-	    if (pid==PID) {
+          MPI_Barrier(MPI_COMM_WORLD); 
+          if (pid!=0) { /* do send/receive only if the data is not on PID 0 */ 
+            /* send buffer */
+            if (pid==PID) {
 #ifndef NDEBUG
-	      error(Z!=(GLB_Z/NP_Z+((p[3]<rz)?1:0)),1,"write_gauge_field", "Local lattice size mismatch!");
+              error(Z!=(GLB_Z/NP_Z+((p[3]<rz)?1:0)),1,"write_gauge_field", "Local lattice size mismatch!");
 #endif
-	      mpiret=MPI_Send(buff, bsize, MPI_DOUBLE, 0, 999, MPI_COMM_WORLD);
+              mpiret=MPI_Send(buff, bsize, MPI_DOUBLE, 0, 999, MPI_COMM_WORLD);
 #ifndef NDEBUG
-	      if (mpiret != MPI_SUCCESS) {
-		char mesg[MPI_MAX_ERROR_STRING];
-		int mesglen;
-		MPI_Error_string(mpiret,mesg,&mesglen);
-		lprintf("MPI",0,"ERROR: %s\n",mesg);
-		error(1,1,"write_gauge_field " __FILE__,"Cannot send buffer");
-	      }
+              if (mpiret != MPI_SUCCESS) {
+                char mesg[MPI_MAX_ERROR_STRING];
+                int mesglen;
+                MPI_Error_string(mpiret,mesg,&mesglen);
+                lprintf("MPI",0,"ERROR: %s\n",mesg);
+                error(1,1,"write_gauge_field " __FILE__,"Cannot send buffer");
+              }
 #endif
-	    }
-	    /* receive buffer */
-	    if (PID==0) {
-	      mpiret=MPI_Recv(buff, bsize, MPI_DOUBLE, pid, 999, MPI_COMM_WORLD, &st);
+            }
+            /* receive buffer */
+            if (PID==0) {
+              mpiret=MPI_Recv(buff, bsize, MPI_DOUBLE, pid, 999, MPI_COMM_WORLD, &st);
 #ifndef NDEBUG
-	      if (mpiret != MPI_SUCCESS) {
-		char mesg[MPI_MAX_ERROR_STRING];
-		int mesglen;
-		MPI_Error_string(mpiret,mesg,&mesglen);
-		lprintf("MPI",0,"ERROR: %s\n",mesg);
-		if (st.MPI_ERROR != MPI_SUCCESS) {
-		  MPI_Error_string(st.MPI_ERROR,mesg,&mesglen);
-		  lprintf("MPI",0,"Source [%d] Tag [%] ERROR: %s\n",
-		      st.MPI_SOURCE,
-		      st.MPI_TAG,
-		      mesg);
-		}
-		error(1,1,"write_gauge_field " __FILE__,"Cannot receive buffer");
-	      }
+              if (mpiret != MPI_SUCCESS) {
+                char mesg[MPI_MAX_ERROR_STRING];
+                int mesglen;
+                MPI_Error_string(mpiret,mesg,&mesglen);
+                lprintf("MPI",0,"ERROR: %s\n",mesg);
+                if (st.MPI_ERROR != MPI_SUCCESS) {
+                  MPI_Error_string(st.MPI_ERROR,mesg,&mesglen);
+                  lprintf("MPI",0,"Source [%d] Tag [%] ERROR: %s\n",
+                      st.MPI_SOURCE,
+                      st.MPI_TAG,
+                      mesg);
+                }
+                error(1,1,"write_gauge_field " __FILE__,"Cannot receive buffer");
+              }
 #endif
-	    }
-	  }
+            }
+          }
 #endif
 
-	  /* write buffer to file */
-	  if (PID==0) {
-	    error(fwrite(buff,(size_t) sizeof(double),(size_t)(bsize),fp)!=(bsize),
-		1,"write_gauge_field",
-		"Failed to write gauge field to file");
-	  }
+          /* write buffer to file */
+          if (PID==0) {
+            error(fwrite(buff,(size_t) sizeof(double),(size_t)(bsize),fp)!=(bsize),
+                1,"write_gauge_field",
+                "Failed to write gauge field to file");
+          }
 
-	} /* end loop over processors in Z direction */
+        } /* end loop over processors in Z direction */
       }
     }
   } /* end loop over T, X and Y direction */
@@ -181,17 +182,17 @@ void read_gauge_field(char filename[])
   int cid;
   int mpiret;
 #endif
-  
+
   gettimeofday(&start,0);
 
   if(PID==0) {
     int d[5]={0}; /* contains NG,GLB_T,GLB_X,GLB_Y,GLB_Z */
     error((fp=fopen(filename,"rb"))==NULL,1,"read_gauge_field",
-	"Failed to open file for reading");
+        "Failed to open file for reading");
     /* write NG and global size */
     error(fread(d,(size_t) sizeof(int),(size_t)(5),fp)!=(5),
-	1,"write_gauge_field",
-	"Failed to gauge field geometry");
+        1,"write_gauge_field",
+        "Failed to read gauge field geometry");
     /* Check Gauge group and Lattice dimesions */
     if (NG!=d[0]) {
       lprintf("ERROR",0,"Read value of NG [%d] do not match this code [NG=%d].\nPlease recompile.\n",d[0],NG);
@@ -199,12 +200,12 @@ void read_gauge_field(char filename[])
     }
     if (GLB_T!=d[1] ||GLB_X!=d[2] ||GLB_Y!=d[3] ||GLB_Z!=d[4]) {
       lprintf("ERROR",0,"Read value of global lattice size (%d,%d,%d,%d) do not match input file (%d,%d,%d,%d).\n",
-	  d[1],d[2],d[3],d[4],GLB_T,GLB_X,GLB_Y,GLB_Z);
+          d[1],d[2],d[3],d[4],GLB_T,GLB_X,GLB_Y,GLB_Z);
       error(1,1,"read_gauge_field " __FILE__,"Gauge group mismatch");
     }
     error(fread(&plaq,(size_t) sizeof(double),(size_t)(1),fp)!=(1),
-	1,"write_gauge_field",
-	"Failed to gauge field plaquette");
+        1,"write_gauge_field",
+        "Failed to read gauge field plaquette");
   }
 
 #ifdef WITH_MPI
@@ -220,86 +221,86 @@ void read_gauge_field(char filename[])
     for (g[1]=0;g[1]<GLB_X;++g[1]) {
       for (g[2]=0;g[2]<GLB_Y;++g[2]) {
 #ifdef WITH_MPI
-	glb_to_proc(g, p); /* get the processor coordinate */
+        glb_to_proc(g, p); /* get the processor coordinate */
 #endif
-	for (p[3]=0;p[3]<NP_Z;++p[3]) { /* loop over processors in Z direction */
-	  int bsize=sizeof(suNg)/sizeof(double)*4*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
+        for (p[3]=0;p[3]<NP_Z;++p[3]) { /* loop over processors in Z direction */
+          int bsize=sizeof(suNg)/sizeof(double)*4*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
 #ifdef WITH_MPI
-	  MPI_Cart_rank(cart_comm, p, &cid);
-	  MPI_Group_translate_ranks(cg, 1, &cid, wg, &pid);
+          MPI_Cart_rank(cart_comm, p, &cid);
+          MPI_Group_translate_ranks(cg, 1, &cid, wg, &pid);
 #endif
-	  /* read buffer from file */
-	  if (PID==0) {
-	    error(fread(buff,(size_t) sizeof(double),(size_t)(bsize),fp)!=(bsize),
-		1,"read_gauge_field",
-		"Failed to read gauge field from file");
-	  }
+          /* read buffer from file */
+          if (PID==0) {
+            error(fread(buff,(size_t) sizeof(double),(size_t)(bsize),fp)!=(bsize),
+                1,"read_gauge_field",
+                "Failed to read gauge field from file");
+          }
 
 #ifdef WITH_MPI
-	  /* MPI_Barrier(MPI_COMM_WORLD); */
-	  if (pid!=0) { /* do send/receive only if the data is not on PID 0 */ 
-	    /* send buffer */
-	    if (PID==0) {
-	      mpiret=MPI_Send(buff, bsize, MPI_DOUBLE, pid, 999, MPI_COMM_WORLD);
+          /* MPI_Barrier(MPI_COMM_WORLD); */
+          if (pid!=0) { /* do send/receive only if the data is not on PID 0 */ 
+            /* send buffer */
+            if (PID==0) {
+              mpiret=MPI_Send(buff, bsize, MPI_DOUBLE, pid, 999, MPI_COMM_WORLD);
 #ifndef NDEBUG
-	      if (mpiret != MPI_SUCCESS) {
-		char mesg[MPI_MAX_ERROR_STRING];
-		int mesglen;
-		MPI_Error_string(mpiret,mesg,&mesglen);
-		lprintf("MPI",0,"ERROR: %s\n",mesg);
-		error(1,1,"read_gauge_field " __FILE__,"Cannot send buffer");
-	      }
+              if (mpiret != MPI_SUCCESS) {
+                char mesg[MPI_MAX_ERROR_STRING];
+                int mesglen;
+                MPI_Error_string(mpiret,mesg,&mesglen);
+                lprintf("MPI",0,"ERROR: %s\n",mesg);
+                error(1,1,"read_gauge_field " __FILE__,"Cannot send buffer");
+              }
 #endif
-	    }
-	    /* receive buffer */
-	    if (PID==pid) {
+            }
+            /* receive buffer */
+            if (PID==pid) {
 #ifndef NDEBUG
-	      error(Z!=(GLB_Z/NP_Z+((p[3]<rz)?1:0)),1,"read_gauge_field", "Local lattice size mismatch!");
+              error(Z!=(GLB_Z/NP_Z+((p[3]<rz)?1:0)),1,"read_gauge_field", "Local lattice size mismatch!");
 #endif
-	      mpiret=MPI_Recv(buff, bsize, MPI_DOUBLE, 0, 999, MPI_COMM_WORLD, &st);
+              mpiret=MPI_Recv(buff, bsize, MPI_DOUBLE, 0, 999, MPI_COMM_WORLD, &st);
 #ifndef NDEBUG
-	      if (mpiret != MPI_SUCCESS) {
-		char mesg[MPI_MAX_ERROR_STRING];
-		int mesglen;
-		MPI_Error_string(mpiret,mesg,&mesglen);
-		lprintf("MPI",0,"ERROR: %s\n",mesg);
-		if (st.MPI_ERROR != MPI_SUCCESS) {
-		  MPI_Error_string(st.MPI_ERROR,mesg,&mesglen);
-		  lprintf("MPI",0,"Source [%d] Tag [%] ERROR: %s\n",
-		      st.MPI_SOURCE,
-		      st.MPI_TAG,
-		      mesg);
-		}
-		error(1,1,"read_gauge_field " __FILE__,"Cannot receive buffer");
-	      }
+              if (mpiret != MPI_SUCCESS) {
+                char mesg[MPI_MAX_ERROR_STRING];
+                int mesglen;
+                MPI_Error_string(mpiret,mesg,&mesglen);
+                lprintf("MPI",0,"ERROR: %s\n",mesg);
+                if (st.MPI_ERROR != MPI_SUCCESS) {
+                  MPI_Error_string(st.MPI_ERROR,mesg,&mesglen);
+                  lprintf("MPI",0,"Source [%d] Tag [%] ERROR: %s\n",
+                      st.MPI_SOURCE,
+                      st.MPI_TAG,
+                      mesg);
+                }
+                error(1,1,"read_gauge_field " __FILE__,"Cannot receive buffer");
+              }
 #endif
-	    }
-	  }
+            }
+          }
 #endif
 
-	  if (pid==PID) { /* copy buffer into memory */
-	    int lsite[4];
-	    suNg *cm;
+          if (pid==PID) { /* copy buffer into memory */
+            int lsite[4];
+            suNg *cm;
 
-	    /* convert global to local coordinate */
-	    origin_coord(lsite);
-	    lsite[0]=g[0]-lsite[0];
-	    lsite[1]=g[1]-lsite[1];
-	    lsite[2]=g[2]-lsite[2];
+            /* convert global to local coordinate */
+            origin_coord(lsite);
+            lsite[0]=g[0]-lsite[0];
+            lsite[1]=g[1]-lsite[1];
+            lsite[2]=g[2]-lsite[2];
 
-	    /* copy buffer in place */
-	    cm=(suNg*)buff;
-	    for (lsite[3]=0; lsite[3]<Z; ++lsite[3]) { /* loop on local Z */
-	      int ix=ipt(lsite[0],lsite[1],lsite[2],lsite[3]);
-	      suNg *pm=pu_gauge(ix,0);
-	      *(pm++)=*(cm++); /* copy 4 directions */
-	      *(pm++)=*(cm++);
-	      *(pm++)=*(cm++);
-	      *(pm)=*(cm++);
-	    }
-	  }
+            /* copy buffer in place */
+            cm=(suNg*)buff;
+            for (lsite[3]=0; lsite[3]<Z; ++lsite[3]) { /* loop on local Z */
+              int ix=ipt(lsite[0],lsite[1],lsite[2],lsite[3]);
+              suNg *pm=pu_gauge(ix,0);
+              *(pm++)=*(cm++); /* copy 4 directions */
+              *(pm++)=*(cm++);
+              *(pm++)=*(cm++);
+              *(pm)=*(cm++);
+            }
+          }
 
-	} /* end loop over processors in Z direction */
+        } /* end loop over processors in Z direction */
       }
     }
   } /* end loop over T, X and Y direction */
@@ -323,6 +324,237 @@ void read_gauge_field(char filename[])
   gettimeofday(&end,0);
   timeval_subtract(&etime,&end,&start);
   lprintf("IO",0,"Configuration [%s] read [%ld sec %ld usec] Plaquette=%e\n",filename,etime.tv_sec,etime.tv_usec,testplaq);
+
+}
+
+void write_ranlxd_state(char filename[]) 
+{
+  FILE *fp=NULL;
+  const int nproc=NP_T*NP_X*NP_Y*NP_Z;
+  int p[4];
+  int *buff=NULL;
+  int pid=0;
+  int rsize=0;
+  struct timeval start, end, etime;
+#ifdef WITH_MPI
+  /* MPI variables */
+  MPI_Group wg, cg;
+  MPI_Status st;
+  int cid;
+  int mpiret;
+#endif
+
+  rsize=rlxd_size();
+
+  if(PID==0) {
+    int d[2]={nproc,rsize};
+    error((fp=fopen(filename,"wb"))==NULL,1,"write_ranlxd_state",
+        "Failed to open file for writing");
+    /* write nproc and rsize */
+    error(fwrite(d,(size_t) sizeof(int),(size_t)(2),fp)!=(2),
+        1,"write_ranlxd_state",
+        "Failed to write header");
+  }
+
+#ifdef WITH_MPI
+  MPI_Comm_group(MPI_COMM_WORLD,&wg);
+  MPI_Comm_group(cart_comm,&cg);
+#endif
+
+  gettimeofday(&start,0);
+
+  buff=malloc(sizeof(*buff)*rsize);
+
+  for (p[0]=0;p[0]<NP_T;++p[0]) { /* loop over processor grid */
+    for (p[1]=0;p[1]<NP_X;++p[1]) {
+      for (p[2]=0;p[2]<NP_Y;++p[2]) {
+        for (p[3]=0;p[3]<NP_Z;++p[3]) { 
+#ifdef WITH_MPI
+          MPI_Cart_rank(cart_comm, p, &cid);
+          MPI_Group_translate_ranks(cg, 1, &cid, wg, &pid);
+#endif
+          if (pid==PID) { /* get state */
+            rlxd_get(buff);
+          }
+#ifdef WITH_MPI
+          MPI_Barrier(MPI_COMM_WORLD); 
+          if (pid!=0) { /* do send/receive only if the data is not on PID 0 */ 
+            /* send buffer */
+            if (pid==PID) {
+              mpiret=MPI_Send(buff, rsize, MPI_INT, 0, 999, MPI_COMM_WORLD);
+#ifndef NDEBUG
+              if (mpiret != MPI_SUCCESS) {
+                char mesg[MPI_MAX_ERROR_STRING];
+                int mesglen;
+                MPI_Error_string(mpiret,mesg,&mesglen);
+                lprintf("MPI",0,"ERROR: %s\n",mesg);
+                error(1,1,"write_ranlxd_state " __FILE__,"Cannot send buffer");
+              }
+#endif
+            }
+            /* receive buffer */
+            if (PID==0) {
+              mpiret=MPI_Recv(buff, rsize, MPI_INT, pid, 999, MPI_COMM_WORLD, &st);
+#ifndef NDEBUG
+              if (mpiret != MPI_SUCCESS) {
+                char mesg[MPI_MAX_ERROR_STRING];
+                int mesglen;
+                MPI_Error_string(mpiret,mesg,&mesglen);
+                lprintf("MPI",0,"ERROR: %s\n",mesg);
+                if (st.MPI_ERROR != MPI_SUCCESS) {
+                  MPI_Error_string(st.MPI_ERROR,mesg,&mesglen);
+                  lprintf("MPI",0,"Source [%d] Tag [%] ERROR: %s\n",
+                      st.MPI_SOURCE,
+                      st.MPI_TAG,
+                      mesg);
+                }
+                error(1,1,"write_ranlxd_state " __FILE__,"Cannot receive buffer");
+              }
+#endif
+            }
+          }
+#endif
+
+          /* write buffer to file */
+          if (PID==0) {
+            error(fwrite(buff,(size_t) sizeof(int),(size_t)(rsize),fp)!=(rsize),
+                1,"write_ranlxd_state",
+                "Failed to write gauge field to file");
+          }
+
+        } /* end loop over processors in Z direction */
+      }
+    }
+  } /* end loop over T, X and Y direction */
+
+  if (PID==0) fclose(fp); 
+  free(buff);
+
+  gettimeofday(&end,0);
+  timeval_subtract(&etime,&end,&start);
+  lprintf("IO",0,"Ranlxd state [%s] saved [%ld sec %ld usec]\n",filename,etime.tv_sec,etime.tv_usec);
+
+}
+
+
+void read_ranlxd_state(char filename[]) 
+{
+  FILE *fp=NULL;
+  const int nproc=NP_T*NP_X*NP_Y*NP_Z;
+  int hproc=0; /* number of states in the file */
+  int p[4];
+  int *buff=NULL;
+  int pid=0;
+  int rsize=0;
+  struct timeval start, end, etime;
+#ifdef WITH_MPI
+  /* MPI variables */
+  MPI_Group wg, cg;
+  MPI_Status st;
+  int cid;
+  int mpiret;
+#endif
+
+  gettimeofday(&start,0);
+
+  rsize=rlxd_size();
+
+  if(PID==0) {
+    int d[2]={0};
+    error((fp=fopen(filename,"rb"))==NULL,1,"read_ranlxd_state",
+        "Failed to open file for reading");
+    /* read number of states in the file */
+    error(fread(d,(size_t) sizeof(int),(size_t)(2),fp)!=(2),
+        1,"write_ranlxd_state",
+        "Failed to read header");
+    /* give a warning if hproc != nproc */
+    hproc=d[0];
+    if (hproc!=nproc) {
+      lprintf("IO",50,"WARNING: the number of ranlxd states read [%d] doesn't match the number of processes [%nproc].\n",hproc,nproc);
+    }
+    /* check if ranlxd size is the same as in the header */
+    if (rsize!=d[1]) {
+      lprintf("ERROR",0,"Read value of ranlxd size [%d] do not match this code [%d].\n",d[1],rsize);
+      error(1,1,"read_ranlxd_state " __FILE__,"ranlxd size mismatch");
+    }
+  }
+
+#ifdef WITH_MPI
+  MPI_Comm_group(MPI_COMM_WORLD,&wg);
+  MPI_Comm_group(cart_comm,&cg);
+#endif
+
+  buff=malloc(sizeof(*buff)*rsize);
+
+  for (p[0]=0;p[0]<NP_T;++p[0]) { /* loop over processor grid */
+    for (p[1]=0;p[1]<NP_X;++p[1]) {
+      for (p[2]=0;p[2]<NP_Y;++p[2]) {
+        for (p[3]=0;p[3]<NP_Z;++p[3]) { 
+#ifdef WITH_MPI
+          MPI_Cart_rank(cart_comm, p, &cid);
+          MPI_Group_translate_ranks(cg, 1, &cid, wg, &pid);
+#endif
+          /* read buffer from file */
+          if (PID==0) {
+            error(fread(buff,(size_t) sizeof(int),(size_t)(rsize),fp)!=(rsize),
+                1,"read_ranlxd_state",
+                "Failed to read ranlxd state from file");
+          }
+
+#ifdef WITH_MPI
+          /* MPI_Barrier(MPI_COMM_WORLD); */
+          if (pid!=0) { /* do send/receive only if the data is not on PID 0 */ 
+            /* send buffer */
+            if (PID==0) {
+              mpiret=MPI_Send(buff, rsize, MPI_INT, pid, 999, MPI_COMM_WORLD);
+#ifndef NDEBUG
+              if (mpiret != MPI_SUCCESS) {
+                char mesg[MPI_MAX_ERROR_STRING];
+                int mesglen;
+                MPI_Error_string(mpiret,mesg,&mesglen);
+                lprintf("MPI",0,"ERROR: %s\n",mesg);
+                error(1,1,"read_ranlxd_state " __FILE__,"Cannot send buffer");
+              }
+#endif
+            }
+            /* receive buffer */
+            if (PID==pid) {
+              mpiret=MPI_Recv(buff, rsize, MPI_INT, 0, 999, MPI_COMM_WORLD, &st);
+#ifndef NDEBUG
+              if (mpiret != MPI_SUCCESS) {
+                char mesg[MPI_MAX_ERROR_STRING];
+                int mesglen;
+                MPI_Error_string(mpiret,mesg,&mesglen);
+                lprintf("MPI",0,"ERROR: %s\n",mesg);
+                if (st.MPI_ERROR != MPI_SUCCESS) {
+                  MPI_Error_string(st.MPI_ERROR,mesg,&mesglen);
+                  lprintf("MPI",0,"Source [%d] Tag [%] ERROR: %s\n",
+                      st.MPI_SOURCE,
+                      st.MPI_TAG,
+                      mesg);
+                }
+                error(1,1,"read_ranlxd_state " __FILE__,"Cannot receive buffer");
+              }
+#endif
+            }
+          }
+#endif
+
+          if (pid==PID) { /* reset state */
+            rlxd_reset(buff);
+          }
+
+        } /* end loop over processors in Z direction */
+      }
+    }
+  } /* end loop over T, X and Y direction */
+
+  if (PID==0) fclose(fp); 
+  free(buff);
+
+  gettimeofday(&end,0);
+  timeval_subtract(&etime,&end,&start);
+  lprintf("IO",0,"Ranlxd state [%s] read [%ld sec %ld usec]\n",filename,etime.tv_sec,etime.tv_usec);
 
 }
 

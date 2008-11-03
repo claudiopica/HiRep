@@ -18,8 +18,9 @@
 const double lambda = 0.1931833275037836; /* Omelyan et al */ 
                                          /* lamdba = 1./6. Sexton Weingarten */ 
 
+static unsigned int count=0; /*used to project gfield */
+
 static void O2MN_ms_gauge(suNg_av_field *momenta, double dt, unsigned int nsteps){
-  static unsigned int count=0; /*used to project gfield */
   _DECLARE_INT_ITERATOR(i);
 
   int n;
@@ -96,6 +97,8 @@ void O2MN_multistep(suNg_av_field *momenta, int_par *traj_par){
 #ifndef CHECK_SPINOR_MATCHING
    _TWO_SPINORS_MATCHING(u_gauge,momenta);
 #endif
+
+  count = 0; /* reset counter */
 
   if (traj_par->nsteps>0) {
     int n;

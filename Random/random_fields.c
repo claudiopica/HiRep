@@ -15,7 +15,8 @@
 
 #include "random.h"
 #include "error.h"
-#include "global.h"
+#include "field_ordering.h"
+#include "spinor_field.h"
 #include "communications.h"
 
 void random_u(suNg_field *gf)

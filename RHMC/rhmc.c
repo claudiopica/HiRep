@@ -139,10 +139,10 @@ int main(int argc,char *argv[])
 
   /* read gauge config from file */
   /*
-     read_gauge_field("gauge_conf");
-     represent_gauge_field();
-     */
-
+  read_gauge_field("gauge_conf");
+  represent_gauge_field();
+  read_ranlxd_state("ranlxd_state");
+  */
 
   /* init RHMC */
   rhmc_var.rhmc_p.integrator=&O2MN_multistep;
@@ -153,8 +153,9 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"MVM during RHMC initialzation: %ld\n",getMVM());
   lprintf("MAIN",0,"Initial plaquette: %1.8e\n",avr_plaquette());
 
+
   acc=0;
-  for(i=1;i<(10+1);++i) {
+  for(i=1;i<(50+1);++i) {
     int rr;
     double perc;
     lprintf("MAIN",0,"Trajectory #%d...\n",i);
@@ -172,7 +173,8 @@ int main(int argc,char *argv[])
   }
 
   /* write gauge config to file */
-  write_gauge_field("gauge_conf");
+  write_gauge_field("gauge_conf_2");
+  write_ranlxd_state("ranlxd_state");
 
   free_rhmc();
 
