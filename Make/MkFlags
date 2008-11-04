@@ -35,6 +35,11 @@ CPPFLAGS += $(MACRO)
 CPPFLAGS += $(INC)
 LDFLAGS = -lm
 
+ifeq ($(strip $(CXX)),)
+  CXX = g++
+endif
+
+
 #make related
 #export CFLAGS LDFLAGS CPPFLAGS
 ifndef REPR

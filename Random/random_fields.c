@@ -38,3 +38,25 @@ void random_u(suNg_field *gf)
   start_gf_sendrecv(gf);
 
 }
+
+void unit_u(suNg_field *gf)
+{
+  _DECLARE_INT_ITERATOR(ix);
+  suNg unity;
+
+  error(gf==NULL,1,"unit_u [random_fields.c]",
+	"Attempt to access unallocated memory space");   
+  
+   _suNg_unit(unity);
+  _MASTER_FOR(gf->type,ix) {
+    /* unroll 4 directions */
+    suNg *ptr=(gf->ptr)+coord_to_index(ix,0);
+    *(ptr++)=unity;
+    *(ptr++)=unity;
+    *(ptr++)=unity;
+    *(ptr)=unity;
+  }
+
+  start_gf_sendrecv(gf);
+
+}

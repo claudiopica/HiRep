@@ -47,6 +47,10 @@ MODDIR := Inverters
 MODS := linear_algebra cg_mshift MINRES_mshift g5QMR_mshift MINRES eva jacobi
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
+MODDIR := RHMC
+MODS := rhmc_utils
+MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
+
 rhmc: $(OBJS) $(MOD_OBJS)
 	echo -n Linking [$@]... 
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(MOD_OBJS) &&\

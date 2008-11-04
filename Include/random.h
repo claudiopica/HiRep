@@ -28,6 +28,7 @@ void gaussian_suNg_vector(suNg_vector *v);
 void random_suNg(suNg *u);
 
 void random_u(suNg_field *gf);
+void unit_u(suNg_field *gf);
 
 
 #endif
