@@ -372,7 +372,7 @@ void represent_gauge_field() {
 
   if(first_time) {
     first_time=0;
-    u_gauge_f=(suNf *)((void*)u_gauge);
+    u_gauge_f=(suNf_field *)((void*)u_gauge);
     apply_bc();
   }
 #endif
@@ -417,7 +417,7 @@ void represent_gauge_field_flt() {
   static int first_time=1;
   if(first_time) {
     first_time=0;
-    u_gauge_f_flt=(suNf_flt *)((void*)u_gauge_flt);
+    u_gauge_f_flt=(suNf_field_flt *)((void*)u_gauge_flt);
     apply_bc_flt();
   }
 #endif
