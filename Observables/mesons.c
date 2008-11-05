@@ -7,6 +7,7 @@
 #include "linear_algebra.h"
 #include "suN.h"
 #include "observables.h"
+#include "communications.h"
 
 #define _INDEX_(i,s) ( (s-1)*NF+(i) )
 
@@ -34,30 +35,32 @@ void NAME(double *out, spinor_field *qp) { \
   int t,x,y,z, i; \
   suNf_spinor *s1; \
   suNf_spinor *s2; \
-  for (t=0; t<T; ++t) { \
+  for (t=0; t<GLB_T; t++) out[t] = 0.; \
+  for (t=0; t<T; t++) { \
     double _tmp,hc=0.; \
-    for (x=0; x<X; ++x) for (y=0; y<Y; ++y) for (z=0; z<Z; ++z) { \
+    for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) { \
       for (i=0; i<NF; ++i) { \
-        s1 = _SPINOR_AT_SITE(&qp[_INDEX_(i,1)],ipt(t,x,y,z)); \
-        s2 = _SPINOR_AT_SITE(&qp[_INDEX_(i,_C1_)],ipt(t,x,y,z)); \
+        s1 = _FIELD_AT(&qp[_INDEX_(i,1)],ipt(t,x,y,z)); \
+        s2 = _FIELD_AT(&qp[_INDEX_(i,_C1_)],ipt(t,x,y,z)); \
 				_spinor_perm_prod_re(_tmp,*s1,*s2); \
         hc += (_S1_)*_tmp; \
-        s1 = _SPINOR_AT_SITE(&qp[_INDEX_(i,2)],ipt(t,x,y,z)); \
-        s2 = _SPINOR_AT_SITE(&qp[_INDEX_(i,_C2_)],ipt(t,x,y,z)); \
+        s1 = _FIELD_AT(&qp[_INDEX_(i,2)],ipt(t,x,y,z)); \
+        s2 = _FIELD_AT(&qp[_INDEX_(i,_C2_)],ipt(t,x,y,z)); \
 				_spinor_perm_prod_re(_tmp,*s1,*s2); \
         hc += (_S2_)*_tmp; \
-        s1 = _SPINOR_AT_SITE(&qp[_INDEX_(i,3)],ipt(t,x,y,z)); \
-        s2 = _SPINOR_AT_SITE(&qp[_INDEX_(i,_C3_)],ipt(t,x,y,z)); \
+        s1 = _FIELD_AT(&qp[_INDEX_(i,3)],ipt(t,x,y,z)); \
+        s2 = _FIELD_AT(&qp[_INDEX_(i,_C3_)],ipt(t,x,y,z)); \
 				_spinor_perm_prod_re(_tmp,*s1,*s2); \
         hc += (_S3_)*_tmp; \
-        s1 = _SPINOR_AT_SITE(&qp[_INDEX_(i,4)],ipt(t,x,y,z)); \
-        s2 = _SPINOR_AT_SITE(&qp[_INDEX_(i,_C4_)],ipt(t,x,y,z)); \
+        s1 = _FIELD_AT(&qp[_INDEX_(i,4)],ipt(t,x,y,z)); \
+        s2 = _FIELD_AT(&qp[_INDEX_(i,_C4_)],ipt(t,x,y,z)); \
 				_spinor_perm_prod_re(_tmp,*s1,*s2); \
         hc += (_S4_)*_tmp; \
       } \
     } \
-    out[t] = (_S0_)*hc/(VOL3); \
+    out[COORD[0]*T+t] = (_S0_)*hc/(GLB_X*GLB_Y*GLB_Z); \
   } \
+  global_sum(out,GLB_T); \
 }
 
 
@@ -66,30 +69,32 @@ void NAME(double *out, spinor_field *qp) { \
   int t,x,y,z, i; \
   suNf_spinor *s1; \
   suNf_spinor *s2; \
-  for (t=0; t<T; ++t) { \
+  for (t=0; t<GLB_T; t++) out[t] = 0.; \
+  for (t=0; t<T; t++) { \
     double _tmp,hc=0.; \
-    for (x=0; x<X; ++x) for (y=0; y<Y; ++y) for (z=0; z<Z; ++z) { \
+    for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) { \
       for (i=0; i<NF; ++i) { \
-        s1 = _SPINOR_AT_SITE(&qp[_INDEX_(i,1)],ipt(t,x,y,z)); \
-        s2 = _SPINOR_AT_SITE(&qp[_INDEX_(i,_D1_)],ipt(t,x,y,z)); \
+        s1 = _FIELD_AT(&qp[_INDEX_(i,1)],ipt(t,x,y,z)); \
+        s2 = _FIELD_AT(&qp[_INDEX_(i,_D1_)],ipt(t,x,y,z)); \
 				_spinor_perm_prod_re(_tmp,*s1,*s2); \
         hc += (_T1_)*_tmp; \
-        s1 = _SPINOR_AT_SITE(&qp[_INDEX_(i,2)],ipt(t,x,y,z)); \
-        s2 = _SPINOR_AT_SITE(&qp[_INDEX_(i,_D2_)],ipt(t,x,y,z)); \
+        s1 = _FIELD_AT(&qp[_INDEX_(i,2)],ipt(t,x,y,z)); \
+        s2 = _FIELD_AT(&qp[_INDEX_(i,_D2_)],ipt(t,x,y,z)); \
 				_spinor_perm_prod_re(_tmp,*s1,*s2); \
         hc += (_T2_)*_tmp; \
-        s1 = _SPINOR_AT_SITE(&qp[_INDEX_(i,3)],ipt(t,x,y,z)); \
-        s2 = _SPINOR_AT_SITE(&qp[_INDEX_(i,_D3_)],ipt(t,x,y,z)); \
+        s1 = _FIELD_AT(&qp[_INDEX_(i,3)],ipt(t,x,y,z)); \
+        s2 = _FIELD_AT(&qp[_INDEX_(i,_D3_)],ipt(t,x,y,z)); \
 				_spinor_perm_prod_re(_tmp,*s1,*s2); \
         hc += (_T3_)*_tmp; \
-        s1 = _SPINOR_AT_SITE(&qp[_INDEX_(i,4)],ipt(t,x,y,z)); \
-        s2 = _SPINOR_AT_SITE(&qp[_INDEX_(i,_D4_)],ipt(t,x,y,z)); \
+        s1 = _FIELD_AT(&qp[_INDEX_(i,4)],ipt(t,x,y,z)); \
+        s2 = _FIELD_AT(&qp[_INDEX_(i,_D4_)],ipt(t,x,y,z)); \
 				_spinor_perm_prod_re(_tmp,*s1,*s2); \
         hc += (_T4_)*_tmp; \
       } \
     } \
-    out[t] = -(_S0_)*hc/(VOL3); \
+    out[COORD[0]*T+t] = -(_S0_)*hc/(GLB_X*GLB_Y*GLB_Z); \
   } \
+  global_sum(out,GLB_T); \
 }
 
 
@@ -98,30 +103,32 @@ void NAME(double *out, spinor_field *qp) { \
   int t,x,y,z, i; \
   suNf_spinor *s1; \
   suNf_spinor *s2; \
-  for (t=0; t<T; ++t) { \
+  for (t=0; t<GLB_T; t++) out[t] = 0.; \
+  for (t=0; t<T; t++) { \
     double _tmp,hc=0.; \
-    for (x=0; x<X; ++x) for (y=0; y<Y; ++y) for (z=0; z<Z; ++z) { \
+    for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) { \
       for (i=0; i<NF; ++i) { \
-        s1 = _SPINOR_AT_SITE(&qp[_INDEX_(i,1)],ipt(t,x,y,z)); \
-        s2 = _SPINOR_AT_SITE(&qp[_INDEX_(i,_D1_)],ipt(t,x,y,z)); \
+        s1 = _FIELD_AT(&qp[_INDEX_(i,1)],ipt(t,x,y,z)); \
+        s2 = _FIELD_AT(&qp[_INDEX_(i,_D1_)],ipt(t,x,y,z)); \
 				_spinor_perm_prod_im(_tmp,*s1,*s2); \
         hc += (_T1_)*_tmp; \
-        s1 = _SPINOR_AT_SITE(&qp[_INDEX_(i,2)],ipt(t,x,y,z)); \
-        s2 = _SPINOR_AT_SITE(&qp[_INDEX_(i,_D2_)],ipt(t,x,y,z)); \
+        s1 = _FIELD_AT(&qp[_INDEX_(i,2)],ipt(t,x,y,z)); \
+        s2 = _FIELD_AT(&qp[_INDEX_(i,_D2_)],ipt(t,x,y,z)); \
 				_spinor_perm_prod_im(_tmp,*s1,*s2); \
         hc += (_T2_)*_tmp; \
-        s1 = _SPINOR_AT_SITE(&qp[_INDEX_(i,3)],ipt(t,x,y,z)); \
-        s2 = _SPINOR_AT_SITE(&qp[_INDEX_(i,_D3_)],ipt(t,x,y,z)); \
+        s1 = _FIELD_AT(&qp[_INDEX_(i,3)],ipt(t,x,y,z)); \
+        s2 = _FIELD_AT(&qp[_INDEX_(i,_D3_)],ipt(t,x,y,z)); \
 				_spinor_perm_prod_im(_tmp,*s1,*s2); \
         hc += (_T3_)*_tmp; \
-        s1 = _SPINOR_AT_SITE(&qp[_INDEX_(i,4)],ipt(t,x,y,z)); \
-        s2 = _SPINOR_AT_SITE(&qp[_INDEX_(i,_D4_)],ipt(t,x,y,z)); \
+        s1 = _FIELD_AT(&qp[_INDEX_(i,4)],ipt(t,x,y,z)); \
+        s2 = _FIELD_AT(&qp[_INDEX_(i,_D4_)],ipt(t,x,y,z)); \
 				_spinor_perm_prod_im(_tmp,*s1,*s2); \
         hc += (_T4_)*_tmp; \
       } \
     } \
-    out[t] = -(_S0_)*hc/(VOL3); \
+    out[COORD[0]*T+t] = -(_S0_)*hc/(GLB_X*GLB_Y*GLB_Z); \
   } \
+  global_sum(out,GLB_T); \
 }
 
 
@@ -590,7 +597,54 @@ MESON_DEFINITION
 
 
 
-#define NAME g5_g0g5_correlator_im
+#define NAME g5_g0g5_re_correlator
+
+#define _C1_ 1
+#define _C2_ 2
+#define _C3_ 3
+#define _C4_ 4
+
+#define _D1_ 3
+#define _D2_ 4
+#define _D3_ 1
+#define _D4_ 2
+
+#define _S1_ 1
+#define _S2_ 1
+#define _S3_ 1
+#define _S4_ 1
+
+#define _T1_ 1
+#define _T2_ 1
+#define _T3_ 1
+#define _T4_ 1
+
+#define _S0_ -1
+
+MESON_DEFINITION_TWO_RE
+
+#undef NAME
+#undef _C1_
+#undef _C2_
+#undef _C3_
+#undef _C4_
+#undef _D1_
+#undef _D2_
+#undef _D3_
+#undef _D4_
+#undef _S1_
+#undef _S2_
+#undef _S3_
+#undef _S4_
+#undef _T1_
+#undef _T2_
+#undef _T3_
+#undef _T4_
+#undef _S0_
+
+
+
+#define NAME g5_g0g5_im_correlator
 
 #define _C1_ 1
 #define _C2_ 2

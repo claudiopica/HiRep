@@ -53,4 +53,23 @@ typedef struct _input_glb {
   }\
 }
 
+
+/* Mesons parameters */
+typedef struct _input_mesons {
+  char mstring[256];
+
+  /* for the reading function */
+  input_record_t read[2];
+  
+} input_mesons;
+
+#define init_input_mesons(varname) \
+{ \
+  .read={\
+    {"quark quenched masses", "mes:masses = %s", STRING_T, (varname).mstring},\
+    {NULL, NULL, 0, NULL}\
+  }\
+}
+
+
 #endif /* INPUT_PAR_H */

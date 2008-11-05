@@ -7,13 +7,15 @@
 #include "error.h"
 #include "global.h"
 #include "logger.h"
+#include <memory.h>
 #include <string.h>
 #include <stdio.h>
 
 static void mpi_broadcast_parameters(input_record_t crec[]) {
 #ifdef WITH_MPI
   int stringlen=0;
-  for (; crec->descr!=NULL; ++crec) {
+  for (; crec->name!=NULL; ++crec) {
+    if(crec->descr==NULL) continue;
     switch(crec->type) {
       case INT_T:
         MPI_Bcast(crec->ptr,1,MPI_INT,0,MPI_COMM_WORLD);
@@ -34,7 +36,7 @@ static void mpi_broadcast_parameters(input_record_t crec[]) {
     }
   }
 #endif
-
+  
 }
 
 void read_input(input_record_t irec[], char *filename) {
@@ -44,7 +46,7 @@ void read_input(input_record_t irec[], char *filename) {
   int npar=0, *found=NULL;
   input_record_t *crec=NULL;
 
-  if (irec==NULL || irec->descr==NULL) return; /* no input parameter specified */
+  if (irec==NULL || irec->name==NULL) return; /* no input parameter specified */
 
   /* when using mpi only PID==0 reads the input file */
   if (PID!=0) {
@@ -56,7 +58,7 @@ void read_input(input_record_t irec[], char *filename) {
       "Failed to open input file\n");
 
   /* count the input parameters */
-  for (crec=irec, npar=0; crec->descr!=NULL; ++crec) { ++npar; }
+  for (crec=irec, npar=0; crec->name!=NULL; ++crec) { ++npar; }
   found=calloc(npar,sizeof(*found)); /* set found to zero */
 
   do {
@@ -73,6 +75,7 @@ void read_input(input_record_t irec[], char *filename) {
 
     /* read variables as described in irec */
     for (count=0; count<npar; ++count) {
+      if(irec[count].descr==NULL) continue;
       if(fscanf(inputfile, irec[count].descr, irec[count].ptr)==1) {
         found[count]=1;
         goto NEXTLOOP;
@@ -99,7 +102,7 @@ ENDLOOP:
 
   while(npar>0) {
     --npar;
-    if (found[npar]==0) 
+    if (found[npar]==0 && irec[npar].descr!=NULL) 
       lprintf("READINPUT",0,
           "Warning: input parameter [%s] not found in [%s]!\n",
           irec[npar].name, filename );

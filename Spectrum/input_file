@@ -1,0 +1,8 @@
+NP_T = 2
+NP_X = 2
+NP_Y = 1
+NP_Z = 1
+
+level = 1  seed = 12345
+
+mes:masses = 5

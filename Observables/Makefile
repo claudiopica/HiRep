@@ -1,9 +1,6 @@
 TOPDIR = ..
 
-SRCS = avr_plaquette.c 
-
-# Not yet updated
-#quark_propagator.c mesons.c
+SRCS = avr_plaquette.c pta_qprop.c mesons.c
 
 MKDIR = $(TOPDIR)/Make
 include $(MKDIR)/MkRules
