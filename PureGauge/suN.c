@@ -5,7 +5,7 @@
 
 /*******************************************************************************
 *
-* Computation of the average plaquette
+* Main pure gauge program
 *
 *******************************************************************************/
 
@@ -26,39 +26,14 @@
 #include "logger.h"
 #include "observables.h"
 #include "representation.h"
+#include "suN_utils.h"
 
-
-/* Input file variables */
-typedef struct _input_pg {
-
-  double beta;
-  int nth, nms, nit, nhb, nor;
-
-  /* for the reading function */
-  input_record_t read[7];
-  
-} input_pg;
-
-#define init_input_pg(varname) \
-{ \
-  .read={\
-    {"beta", "beta = %lf", DOUBLE_T, &(varname).beta},\
-    {"nth", "nth = %d", INT_T, &(varname).nth},\
-    {"nms", "nms = %d", INT_T, &(varname).nms},\
-    {"nit", "nit = %d", INT_T, &(varname).nit},\
-    {"nhb", "nhb = %d", INT_T, &(varname).nhb},\
-    {"nor", "nor = %d", INT_T, &(varname).nor},\
-    {NULL, NULL, 0, NULL}\
-  }\
-}
-
-input_pg pg_var = init_input_pg(pg_var);
+pg_flow flow=init_pg_flow(flow);
 
 int main(int argc,char *argv[])
 {
   char tmp[256];
-  int i,n,flag;
-  double *p,pbar,sig,tau;
+  int i,n;
 
   /* setup process id and communications */
   setup_process(&argc,&argv);
@@ -71,10 +46,9 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
 
   /* read input file */
-  read_input(glb_var.read,"common_input");
+  read_input(glb_var.read,"input_file");
   lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed+PID);
   rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
-  read_input(pg_var.read,"input_file");
 
   /* setup communication geometry */
   if (geometry_init() == 1) {
@@ -91,31 +65,14 @@ int main(int argc,char *argv[])
   geometry_mpi_eo();
   /* test_geometry_mpi_eo(); */
 
-  /* disable logger for MPI processes != 0 */
-  //if (PID!=0) { logger_disable(); }
+  /* Init Monte Carlo */
+  init_mc(&flow, "input_file");
+  lprintf("MAIN",0,"Initial plaquette: %1.8e\n",avr_plaquette());
 
-  /* alloc global gauge fields */
-  u_gauge=alloc_gfield(&glattice);
-#ifndef REPR_FUNDAMENTAL
-  u_gauge_f=alloc_gfield_f(&glattice);
-#endif
-  random_u(u_gauge); 
-  represent_gauge_field();
-
-  lprintf("MAIN",0,"beta = %2.4f\n",pg_var.beta);
-  lprintf("MAIN",0,"nth  = %d\tNumber of thermalization cycles\n",pg_var.nth);
-  lprintf("MAIN",0,"nms  = %d\tNumber of measure cycles\n",pg_var.nms);
-  lprintf("MAIN",0,"nit  = %d\tNumber of hb-or iterations per cycle\n",pg_var.nit);
-  lprintf("MAIN",0,"nhb  = %d\tNumber of heatbaths per iteration\n",pg_var.nhb);   
-  lprintf("MAIN",0,"nor  = %d\tNumber or overrelaxations per iteration\n",pg_var.nor);
-
-  /* random_u(); */
-
-  p=malloc(pg_var.nms*sizeof(double)); /* array per le misure */
 
   /* Termalizzazione */
-  for (i=0;i<pg_var.nth;++i) {
-    update(pg_var.beta,pg_var.nhb,pg_var.nor);
+  for (i=0;i<flow.therm;++i) {
+    update(flow.pg_v->beta,flow.pg_v->nhb,flow.pg_v->nor);
     if ((i%10)==0)
       lprintf("MAIN",0,"%d",i);
     else
@@ -125,39 +82,26 @@ int main(int argc,char *argv[])
 
 
   /* Misure */
-  for (i=0;i<pg_var.nms;i++){ /* nms misure */
-    p[i]=avr_plaquette();
-    lprintf("MAIN",0,"[%d] <p> = %1.6f\n",i,p[i]);
+  for(i=flow.start;i<flow.end;++i) {
+    lprintf("MAIN",0,"Trajectory #%d...\n",i);
 
-    for (n=0;n<pg_var.nit;n++) /* nit updates */
-      update(pg_var.beta,pg_var.nhb,pg_var.nor);
+    for (n=0;n<flow.pg_v->nit;n++) /* nit updates */
+      update(flow.pg_v->beta,flow.pg_v->nhb,flow.pg_v->nor);
 
-    /* Plaquette media */
+    if((i%flow.save_freq)==0) {
+      save_conf(&flow, i);
+    }
+
+    if((i%flow.meas_freq)==0) {
+      lprintf("MAIN",0,"Plaquette: %1.8e\n",avr_plaquette());
+      /* do something */
+    }
   }
 
-  lprintf("MAIN",0,"[%d] <p> = %1.6f\n",i,avr_plaquette());
 
-  pbar=average(pg_var.nms,p);
-  sig=sigma(pg_var.nms,p,&tau,&flag);
+  /* finalize Monte Carlo */
+  end_mc();
 
-  if (flag!=0)
-  {
-    lprintf("MAIN",0,"Warning: unreliable error estimation ");
-    lprintf("MAIN",0,"(data series is too short)\n\n");
-  }
-
-  lprintf("MAIN",0,"<p>   = %1.6f\n",pbar);
-  lprintf("MAIN",0,"sigma = %1.6f\n",sig);
-  lprintf("MAIN",0,"tau   = %1.2f [iterations]\n\n",tau);
-
-
-  write_gauge_field("Config");
-
-  /* free memory */
-  free_gfield(u_gauge);
-#ifndef REPR_FUNDAMENTAL
-  free_gfield_f(u_gauge_f);
-#endif
   /* close communications */
   finalize_process();
 

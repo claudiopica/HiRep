@@ -1,9 +1,30 @@
+// Global variables
+GLB_T = 8
+GLB_X = 2
+GLB_Y = 2
+GLB_Z = 2
+NP_T = 2
+NP_X = 1
+NP_Y = 1
+NP_Z = 1
+
+level = 1  seed = 12345
+
+// Pure gauge variables
 beta  =   5.6
 nhb   =   1
 nor   =   4
 nit   =   1 
-nth   =   100
-nms   =   1000
-level =   1
-seed  =   23
+
+// Run control variables
+therm = 10
+run name = run1
+save freq = 1
+meas freq = 1 
+conf dir = cnfg
+gauge start = ranDoM
+//gauge start = Unit
+//gauge start = run1_8x2x2x2nc2rADJnf2b2.000000m1.310000n10
+//ranlxd start =
+last conf = 15
 

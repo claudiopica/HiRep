@@ -29,11 +29,6 @@
 #include "logger.h"
 
 
-char cnfg_filename[256];
-char list_filename[256];
-char input_filename[256] = "input_file";
-char output_filename[256] = "mesons.out";
-enum { UNKNOWN_CNFG, DYNAMICAL_CNFG, QUENCHED_CNFG };
 
 /* Mesons parameters */
 typedef struct _input_mesons {
@@ -52,8 +47,14 @@ typedef struct _input_mesons {
   }\
 }
 
-input_glb glb_ip = init_input_glb(glb_ip);
-input_mesons mes_ip = init_input_mesons(mes_ip);
+
+char cnfg_filename[256];
+char list_filename[256];
+char input_filename[256] = "input_file";
+char output_filename[256] = "mesons.out";
+enum { UNKNOWN_CNFG, DYNAMICAL_CNFG, QUENCHED_CNFG };
+
+input_mesons mes_var = init_input_mesons(mes_var);
 
 
 typedef struct {
@@ -176,23 +177,23 @@ int main(int argc,char *argv[]) {
   } \
 }
   
-  remove_parameter(GLB_T,glb_ip);
-  remove_parameter(GLB_X,glb_ip);
-  remove_parameter(GLB_Y,glb_ip);
-  remove_parameter(GLB_Z,glb_ip);
-  if(fpars.type==DYNAMICAL_CNFG) remove_parameter(quark quenched masses,mes_ip);
+  remove_parameter(GLB_T,glb_var);
+  remove_parameter(GLB_X,glb_var);
+  remove_parameter(GLB_Y,glb_var);
+  remove_parameter(GLB_Z,glb_var);
+  if(fpars.type==DYNAMICAL_CNFG) remove_parameter(quark quenched masses,mes_var);
 
 #undef remove_parameter
 
-  read_input(glb_ip.read,input_filename);
-  read_input(mes_ip.read,input_filename);
+  read_input(glb_var.read,input_filename);
+  read_input(mes_var.read,input_filename);
 
   nm=0;
   if(fpars.type==DYNAMICAL_CNFG) {
     nm=1;
 	  m[0] = 0.5/fpars.k - 4.0;
 	} else if(fpars.type==QUENCHED_CNFG) {
-    strcpy(tmp,mes_ip.mstring);
+    strcpy(tmp,mes_var.mstring);
     cptr = strtok(tmp, ";");
     nm=0;
     while(cptr != NULL) {
@@ -221,8 +222,8 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"local size is %dx%dx%dx%d\n",T,X,Y,Z);
   lprintf("MAIN",0,"extended local size is %dx%dx%dx%d\n",T_EXT,X_EXT,Y_EXT,Z_EXT);
 
-  lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_ip.rlxd_level,glb_ip.rlxd_seed);
-  rlxd_init(glb_ip.rlxd_level,glb_ip.rlxd_seed+PID);
+  lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed);
+  rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
  
   /* alloc global gauge fields */
   u_gauge=alloc_gfield(&glattice);

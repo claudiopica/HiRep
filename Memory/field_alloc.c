@@ -210,7 +210,9 @@ void free_avfield(suNg_av_field *u)
 
 suNg_av_field *alloc_avfield(geometry_descriptor* type)
 {
+#ifdef WITH_MPI
    int ix;
+#endif
    suNg_av_field *af;
 
    af=amalloc(sizeof(*af),ALIGN);
@@ -248,7 +250,9 @@ void free_sfield(scalar_field *u)
 
 scalar_field *alloc_sfield(geometry_descriptor* type)
 {
+#ifdef WITH_MPI
    int ix;
+#endif
    scalar_field *af;
 
    af=amalloc(sizeof(*af),ALIGN);

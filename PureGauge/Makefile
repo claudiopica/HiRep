@@ -43,6 +43,10 @@ MODDIR := Statistics
 MODS := base_stat jacknife
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
+MODDIR := PureGauge
+MODS := suN_utils
+MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
+
 suN: $(OBJS) $(MOD_OBJS)
 	echo -n Linking [$@]... 
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(MOD_OBJS) &&\
