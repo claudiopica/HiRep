@@ -1,10 +1,15 @@
+/***************************************************************************\
+* Copyright (c) 2008, Claudio Pica                                          *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
 #include "inverters.h"
 #include "linear_algebra.h"
 #include "complex.h"
-#include "malloc.h"
 #include "memory.h"
 #include "update.h"
 #include "logger.h"
+#include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 #include <assert.h>
@@ -17,11 +22,11 @@
  * out[i] = (M-(par->shift[i]))^-1 in
  * returns the number of cg iterations done.
  */
-static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor *out, suNf_spinor *trial){
+static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field *out, spinor_field *trial){
 
-  suNf_spinor *q1,*q2;
-  suNf_spinor *p1, *p2, *Mp;
-  suNf_spinor *sptmp, *memall;
+  spinor_field *q1,*q2;
+  spinor_field *p1, *p2, *Mp;
+  spinor_field *sptmp, *memall;
 
   double alpha, beta, oldbeta, innorm2; 
   double r, s1, s2, c1, c2, rho1, rho2, rp;
@@ -29,10 +34,11 @@ static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, suN
 
   int cgiter;
   unsigned short notconverged;
-	unsigned int spinorlen;
 
   /* fare qualche check sugli input */
-  /* par->n deve essere almeno 1! */
+  _TWO_SPINORS_MATCHING(in,out);
+  if(trial!=NULL) _TWO_SPINORS_MATCHING(in,trial);
+
   /*
     printf("numero vettori n=%d\n",par->n);
     for (i=0; i<(par->n); ++i) {
@@ -45,22 +51,22 @@ static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, suN
   /* implementation note: to minimize the number of malloc calls
    * objects of the same type are allocated together
    */
-	get_spinor_len(&spinorlen);
-  memall = alloc_spinor_field_f(5);
+
+  memall = alloc_spinor_field_f(5,in->type);
   q1=memall;
-  q2= q1+(spinorlen);
-  p1 = q2+(spinorlen);
-  p2 = p1+(spinorlen);
-  Mp = p2+(spinorlen);
+  q2= q1+1;
+  p1 = q2+1;
+  p2 = p1+1;
+  Mp = p2+1;
 
   /* init recursion */
   cgiter = 0;
   notconverged=1;
 
   spinor_field_copy_f(p2, in);
-  if(trial!=0) {
+  if(trial!=NULL) {
     M(p1,trial);
-		++cgiter;
+    ++cgiter;
     spinor_field_sub_assign_f(p2,p1);
     if(out!=trial){
       spinor_field_copy_f(out,trial);
@@ -136,45 +142,45 @@ static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, suN
     }
 		/* just for debug 
 		else {
-			 lprintf("INVERTER",30,"MINRES iter %d res: %1.8e\n",cgiter,(r*r)/innorm2);
-		}
+      lprintf("INVERTER",30,"MINRES iter %d res: %1.8e\n",cgiter,(r*r)/innorm2);
+    }
 		*/
 	
 	
   } while ((par->max_iter==0 || cgiter<par->max_iter) && notconverged);
 
   /* test results */
-	M(Mp,out);
-	++cgiter;
-	spinor_field_sub_f(Mp,Mp,in);
-	innorm2=spinor_field_sqnorm_f(Mp)/innorm2;
-	*valid=1;
-	if (fabs(innorm2)>par->err2) {
-		*valid=0;
-		lprintf("INVERTER",30,"MINRES failed: err2 = %1.8e > %1.8e\n",innorm2,par->err2);
-	} else {
-		lprintf("INVERTER",20,"MINRES inversion: err2 = %1.8e < %1.8e\n",innorm2,par->err2);
-	} 
+  M(Mp,out);
+  ++cgiter;
+  spinor_field_sub_f(Mp,Mp,in);
+  innorm2=spinor_field_sqnorm_f(Mp)/innorm2;
+  *valid=1;
+  if (fabs(innorm2)>par->err2) {
+    *valid=0;
+    lprintf("INVERTER",30,"MINRES failed: err2 = %1.8e > %1.8e\n",innorm2,par->err2);
+  } else {
+    lprintf("INVERTER",20,"MINRES inversion: err2 = %1.8e < %1.8e\n",innorm2,par->err2);
+  } 
    
   /* free memory */
-  free_field(memall);
+  free_spinor_field(memall);
 
   /* return number of cg iter */
   return cgiter;
 }
 
-int MINRES(MINRES_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor *out, suNf_spinor *trial){
-	int iter,rep=0;
-	short int valid;
+int MINRES(MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field *out, spinor_field *trial){
+  int iter,rep=0;
+  short int valid;
 
-	iter=MINRES_core(&valid, par, M, in, out, trial);
-	while(!valid && (par->max_iter==0 || iter<par->max_iter)) {
-		iter+=MINRES_core(&valid, par, M, in, out, out);
-		if((++rep)%5==0)
-			lprintf("INVERTER",-10,"MINRES recursion = %d (precision too high?)\n",rep);
-	}
+  iter=MINRES_core(&valid, par, M, in, out, trial);
+  while(!valid && (par->max_iter==0 || iter<par->max_iter)) {
+    iter+=MINRES_core(&valid, par, M, in, out, out);
+    if((++rep)%5==0)
+      lprintf("INVERTER",-10,"MINRES recursion = %d (precision too high?)\n",rep);
+  }
 
-	lprintf("INVERTER",10,"MINRES: MVM = %d\n",iter);
+  lprintf("INVERTER",10,"MINRES: MVM = %d\n",iter);
 
-	return iter;
+  return iter;
 }

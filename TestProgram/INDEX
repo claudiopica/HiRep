@@ -1,34 +1,29 @@
-check0		Check that _group_represent is homomorphic
+check_algebra_1            Check the generators
 
-check1		Check gauge covariance of the Dirac operator
+check_algebra_2            Check that the 2AS is equivalent to fund^* for SU(3)
 
-check2 		Action of the Dirac operator on plane waves
+check_geometry_1           Check the geometry
 
-check3 		Checks the old and the new implementation of the Dirac op
+check_puregauge_1          Check that _group_represent is homomorphic
 
-check4 		Hermiticity of the Dirac op
+check_spinorfield_1        Check the consistency of spinor linear algebra
 
-check5		Check of the CG inversion
+check_diracoperator_1      Check gauge covariance of the Dirac operator
 
-check6		Check of the MINRES inversion
+check_diracoperator_2      Action of the Dirac operator on plane waves
 
-check7 		Check of QMR multishift
+check_diracoperator_3      Hermiticity of the Dirac op
 
-check8		Check the generators
+check_inverters_1          Check of the CG inversion
 
-check9		Check the eva module using a random field
+check_inverters_2          Check of the MINRES inversion
 
-check10		Check the eva module using a free field
+check_inverters_3          Check of QMR multishift
 
-check11		Check the consistency of spinor linear algebra
+check_inverters_4          Check the eva module
 
-check12		Initialization of the link momenta
+check_update_1		   Reversibility of the molecular dynamics (NEED TO BE FIXED THE READ FORM FILE)
 
-check13 	Check the mesons (both mesons.c and dublin_mesons.c) 
-                using a free field
+check13 	Check the mesons (both mesons.c and dublin_mesons.c) using a free field (STILL TO BE FIXED)
 
-check14         Check the dirac_eva module using a random field
-
-check15 	Check that the 2AS is equivalent to fund^* for SU(3)
-
-check16 	Reversibility of the molecular dynamics
+check14          Check the dirac_eva module using a random field(STILL TO BE FIXED)	

@@ -1,11 +1,18 @@
+/***************************************************************************\
+* Copyright (c) 2008, Claudio Pica                                          *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
 #ifndef INVERTERS_H
 #define INVERTERS_H
 
 #include "suN_types.h"
 #include "complex.h"
+#include "spinor_field.h"
 
-typedef	void (*spinor_operator)(suNf_spinor *out, suNf_spinor *in);
-typedef	void (*spinor_operator_flt)(suNf_spinor_flt *out, suNf_spinor_flt *in);
+
+typedef void (*spinor_operator)(spinor_field *out, spinor_field *in);
+typedef void (*spinor_operator_flt)(spinor_field_flt *out, spinor_field_flt *in);
 
 typedef struct _mshift_par {
    int n; /* number of shifts */
@@ -20,40 +27,36 @@ typedef struct _mshift_par {
  * out[i] = (M-(par->shift[i]))^-1 in
  * returns the number of cg iterations done.
  */
-int cg_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor **out);
+int cg_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
 
-int BiCGstab_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor **out);
-int HBiCGstab_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor **out);
+int BiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
+int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
 
-int g5QMR_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor **out);
+int g5QMR_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
 /*int g5QMR_mshift_flt(mshift_par *par, spinor_operator_flt M, suNf_spinor_flt *in, suNf_spinor_flt **out); */
 
-int MINRES_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor **out);
+int MINRES_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
 
 typedef struct _MINRES_par {
   double err2; /* maximum error on the solutions */
   int max_iter; /* maximum number of iterations: 0 => infinity */
 } MINRES_par;
-int MINRES(MINRES_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor *out, suNf_spinor *trial);
+int MINRES(MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field *out, spinor_field *trial);
 
-int eva(int vol,int nev,int nevt,int init,int kmax,
+int eva(int nev,int nevt,int init,int kmax,
                int imax,double ubnd,double omega1,double omega2,
                spinor_operator Op,
-               suNf_spinor *ws[],suNf_spinor *ev[],double d[],int *status);
+               spinor_field *ws,spinor_field *ev,double d[],int *status);
 
 void jacobi1(int n,double a[],double d[],double v[]);
 void jacobi2(int n,complex a[],double d[],complex v[]);
 
-int eva_flt(int vol,int nev,int nevt,int init,int kmax,
-               int imax,double ubnd,double omega1,double omega2,
-               spinor_operator_flt Op,
-               suNf_spinor_flt *ws[],suNf_spinor_flt *ev[],double d[],int *status);
 void dirac_eva_onemass(int nev,int nevt,int kmax,
         int imax,double omega1,double omega2,double mass,
-        suNf_spinor *ev[],double d[],int *status);
+        spinor_field *ev,double d[],int *status);
 void dirac_eva(int nev,int nevt,int kmax,
         int imax,double omega1,double omega2,int n_masses,double *mass,
-        suNf_spinor *ev[],double d[],int *status);
+        spinor_field *ev,double d[],int *status);
 
 
 #endif

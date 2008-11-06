@@ -1,11 +1,16 @@
+/***************************************************************************\
+* Copyright (c) 2008, Claudio Pica                                          *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
 #include "inverters.h"
 #include "linear_algebra.h"
 #include "complex.h"
-#include "malloc.h"
 #include "update.h"
 #include "memory.h"
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h>
 
 /* _compute_z(z3+i,z1+i,z2+i,&ctmp1,beta,alpha,&(par->shift[i-1])); */
 /* res = (z1*betam1)/(beta*alpha*(z1-z2)+z1*betam1*(1+sigma*beta)) (abbiamo diviso per z2) */
@@ -36,11 +41,11 @@ __inline static void _compute_z(complex *res, complex *z1, complex *z2,
  * out[i] = (M-(par->shift[i]))^-1 in
  * returns the number of cg iterations done.
  */
-int BiCGstab_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_spinor **out){
+int BiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out){
 
-  suNf_spinor **s;
-  suNf_spinor *r, *r1, *o, *Ms, *Mo, *o0;
-  suNf_spinor *sptmp;
+  spinor_field *s;
+  spinor_field *r, *r1, *o, *Ms, *Mo, *o0;
+  spinor_field *sptmp;
 
   complex delta, phi; 
   complex *z1, *z2, *z3, *alpha, *beta, *chi, *rho; /* alpha is unnecessary */
@@ -68,17 +73,13 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_sp
    * objects of the same type are allocated together
    */
 	get_spinor_len(&spinorlen);
-  s = (suNf_spinor **)malloc(sizeof(suNf_spinor*)*(par->n));
-  s[0] = alloc_spinor_field_f((par->n)+6);
-  for (i=1; i<(par->n); ++i) {
-    s[i] = s[i-i]+(spinorlen);
-  }
-  r = s[par->n-1]+(spinorlen);
-  r1 = r+(spinorlen);
-  o = r1+(spinorlen);
-  Ms = o+(spinorlen);
-  Mo = Ms+(spinorlen);
-  o0 = Mo+(spinorlen);
+  s = alloc_spinor_field_f((par->n)+6);
+  r = s+par->n;
+  r1 = r+1;
+  o = r1+1;
+  Ms = o+1;
+  Mo = Ms+1;
+  o0 = Mo+1;
 
   z1 = (complex *)malloc(sizeof(complex)*7*(par->n));
   z2 = z1+(par->n);
@@ -98,8 +99,8 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_sp
   for (i=0; i<(par->n); ++i) {
     rho[i]=z1[i]=z2[i]=beta[0];
     _complex_0(alpha[i]);
-    spinor_field_copy_f(s[i], in);
-    spinor_field_zero_f(out[i]);
+    spinor_field_copy_f(&s[i], in);
+    spinor_field_zero_f(&out[i]);
     sflags[i]=1;
   }
   /* choose omega so that delta and phi are not zero */
@@ -109,7 +110,7 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_sp
   spinor_field_copy_f(o, o0);
   delta = spinor_field_prod_f(o, r);
 
-  M(Ms,s[0]);
+  M(Ms,&s[0]);
   ctmp1 = spinor_field_prod_f(o0, Ms); /* o = in (see above) */
   _complex_div(phi,ctmp1,delta);
 
@@ -132,7 +133,7 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_sp
     spinor_field_mulc_f(o,beta[0],Ms);
     spinor_field_add_assign_f(o,r);
     
-    M(Mo, o);
+    M(Mo,o);
 
     ctmp2=spinor_field_prod_f(Mo,o);
     rtmp1=1./spinor_field_sqnorm_f(Mo);
@@ -152,13 +153,13 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_sp
 
     /* compute new out[0] */
     _complex_minus(ctmp2,beta[0]);
-    spinor_field_clc_add_assign_f(out[0],ctmp2,s[0],chi[0],o);
+    spinor_field_clc_add_assign_f(&out[0],ctmp2,&s[0],chi[0],o);
 
     /* compute new s[0] */
     _complex_mul(ctmp2,alpha[0],chi[0]);
     _complex_minus(ctmp2,ctmp2);
-    spinor_field_clc_f(Mo,alpha[0],s[0],ctmp2,Ms); /* use Mo as temporary storage */
-    spinor_field_add_f(s[0],r1,Mo);
+    spinor_field_clc_f(Mo,alpha[0],&s[0],ctmp2,Ms); /* use Mo as temporary storage */
+    spinor_field_add_f(&s[0],r1,Mo);
 
     /* assign r<-r1 */
     sptmp=r;
@@ -166,7 +167,7 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_sp
     r1=sptmp; /*exchange pointers */
 
     /* update phi */
-    M(Ms,s[0]);
+    M(Ms,&s[0]);
     ctmp2 = spinor_field_prod_f(o0, Ms); /* in=o al passo 0 (see above) */
     _complex_div(phi,ctmp2,delta);
 
@@ -201,7 +202,7 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_sp
 	_complex_mul(ctmp2,z3[i],rho[i]);
 	_complex_mul(ctmp3,ctmp2,chi[i]);
 	_complex_minus(ctmp4,beta[i]);
-	spinor_field_clc_add_assign_f(out[i],ctmp4,s[i],ctmp3,o);
+	spinor_field_clc_add_assign_f(&out[i],ctmp4,&s[i],ctmp3,o);
 	/*spinor_field_clc_add_assign_f(Mo,ctmp4,s[i],ctmp3,o);
 	spinor_field_add_f(out[i],out[0],Mo);*/
 	/* update s[i] */
@@ -210,7 +211,7 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_sp
 	_complex_minus(ctmp3,ctmp3);
 	_complex_mul(ctmp2,z2[i],rho[i]);
 	_complex_mul(ctmp5,ctmp2,ctmp4);
-	spinor_field_clc_add_assign_f(s[i],ctmp3,o,ctmp5,r1); /* not done yet */
+	spinor_field_clc_add_assign_f(&s[i],ctmp3,o,ctmp5,r1); /* not done yet */
 	
 	ctmp3=rho[i];
 	_complex_mulr(ctmp2,-par->shift[i-1],chi[0]);
@@ -219,8 +220,8 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_sp
 	_print_complex(rho[i]);
 
 	_complex_mul(ctmp2,z3[i],rho[i]);
-	spinor_field_clc_f(Mo,ctmp2,r,alpha[i],s[i]); /* use Mo as temporary storage */
-	 spinor_field_copy_f(s[i],Mo); 
+	spinor_field_clc_f(Mo,ctmp2,r,alpha[i],&s[i]); /* use Mo as temporary storage */
+	 spinor_field_copy_f(&s[i],Mo); 
 	/* change pointers instead */
 	/*
 	  sptmp=s[i];
@@ -269,8 +270,7 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, suNf_spinor *in, suNf_sp
 #endif
    
   /* free memory */
-  free_field(s[0]);
-  free(s);
+  free_spinor_field(s);
   free(z1);
   free(sflags);
 

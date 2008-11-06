@@ -1,29 +1,44 @@
+/***************************************************************************\
+* Copyright (c) 2008, Claudio Pica                                          *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
 #include "global.h"
 #include "suN.h"
 #include "utils.h"
 #include "update.h"
 #include "representation.h"
 #include "logger.h"
+#include "communications.h"
 
-#define _PROJ_BIT (1<<2) /* project gauge field every 2^_PROJ_BIT changes */
-#define _proj_leapfrog(c) if((c)&_PROJ_BIT){(c)=0;project_gauge_field();} else ++c
+#define _PROJ_BIT (1<<4) /* project gauge field every 2^_PROJ_BIT changes */
+#define _proj_gfield(c) if((c)&_PROJ_BIT){(c)=0;project_gauge_field();} else {++(c); start_gf_sendrecv(u_gauge);} (void*)0
 
-void leapfrog(suNg_algebra_vector *momenta, int_par *traj_par){
-  static unsigned int count=0;
+void leapfrog(suNg_av_field *momenta, int_par *traj_par){
+  unsigned int count=0;
+  _DECLARE_INT_ITERATOR(i);
+
+  /* check input types */
+#ifndef CHECK_SPINOR_MATCHING
+  _TWO_SPINORS_MATCHING(u_gauge,momenta);
+#endif
 
   if (traj_par->nsteps>0) {
-    int i, n;
+    int n;
     double dt=traj_par->tlen/((double)traj_par->nsteps);
 
-		lprintf("MD_INT",10,"Starting new MD trajectory using leapfrog.\n");
-		lprintf("MD_INT",20,"MD parameters: len=%1.4f steps=%d => dt=%1.4f\n",
-				traj_par->tlen,traj_par->nsteps,dt);
+    lprintf("MD_INT",10,"Starting new MD trajectory using leapfrog.\n");
+    lprintf("MD_INT",20,"MD parameters: len=%1.4f steps=%d => dt=%1.4f\n",
+        traj_par->tlen,traj_par->nsteps,dt);
 
     /* half step for the gauge field */
-    for(i=0;i<4*VOLUME;++i){
-      ExpX(dt/2.,momenta+i, u_gauge+i);
+    _MASTER_FOR(&glattice,i) {
+      ExpX(dt*0.5,_4FIELD_AT(momenta,i,0), _4FIELD_AT(u_gauge,i,0));
+      ExpX(dt*0.5,_4FIELD_AT(momenta,i,1), _4FIELD_AT(u_gauge,i,1));
+      ExpX(dt*0.5,_4FIELD_AT(momenta,i,2), _4FIELD_AT(u_gauge,i,2));
+      ExpX(dt*0.5,_4FIELD_AT(momenta,i,3), _4FIELD_AT(u_gauge,i,3));
     }
-    _proj_leapfrog(count);
+    _proj_gfield(count);
     represent_gauge_field();
 
     for(n=1;n<traj_par->nsteps;++n) {
@@ -31,28 +46,33 @@ void leapfrog(suNg_algebra_vector *momenta, int_par *traj_par){
       Force(dt,momenta);
 
       /* update of the gauge field */
-      for(i=0;i<4*VOLUME;++i){
-				ExpX(dt,momenta+i, u_gauge+i);
+      _MASTER_FOR(&glattice,i) {
+        ExpX(dt,_4FIELD_AT(momenta,i,0), _4FIELD_AT(u_gauge,i,0));
+        ExpX(dt,_4FIELD_AT(momenta,i,1), _4FIELD_AT(u_gauge,i,1));
+        ExpX(dt,_4FIELD_AT(momenta,i,2), _4FIELD_AT(u_gauge,i,2));
+        ExpX(dt,_4FIELD_AT(momenta,i,3), _4FIELD_AT(u_gauge,i,3));
       }
-      _proj_leapfrog(count);
+      _proj_gfield(count);
       represent_gauge_field();
 
-			lprintf("MD_INT",10,"MD step: %d/%d\n",n,traj_par->nsteps);
+      lprintf("MD_INT",10,"MD step: %d/%d\n",n,traj_par->nsteps);
     }
-   
+
     /* Update of momenta */
     Force(dt,momenta);
 
-
     /* half step for the gauge field */
-    for(i=0;i<4*VOLUME;++i){
-      ExpX(dt/2.,momenta+i, u_gauge+i);
+    _MASTER_FOR(&glattice,i) {
+      ExpX(dt*0.5,_4FIELD_AT(momenta,i,0), _4FIELD_AT(u_gauge,i,0));
+      ExpX(dt*0.5,_4FIELD_AT(momenta,i,1), _4FIELD_AT(u_gauge,i,1));
+      ExpX(dt*0.5,_4FIELD_AT(momenta,i,2), _4FIELD_AT(u_gauge,i,2));
+      ExpX(dt*0.5,_4FIELD_AT(momenta,i,3), _4FIELD_AT(u_gauge,i,3));
     }
-    _proj_leapfrog(count);
+    _proj_gfield(count);
     represent_gauge_field();
   }
 
-	lprintf("MD_INT",10,"MD trajectory completed.\n");
+  lprintf("MD_INT",10,"MD trajectory completed.\n");
 
 }
 

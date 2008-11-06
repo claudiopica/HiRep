@@ -1,3 +1,8 @@
+/***************************************************************************\
+* Copyright (c) 2008, Claudio Pica                                          *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
 /*******************************************************************************
 *
 * File global.h
@@ -11,55 +16,105 @@
 
 #include <stddef.h>
 
-#define VOLUME (T*L*L*L)
-#define VOL3   (L*L*L)
-
-#if ((T%2)!=0)
-#error : The temporal lattice size T must be even
-#endif
-
-#if ((T<2)||(L<2))
-#error : The lattice size should be at least 2 in all directions
-#endif
-
 #ifdef MAIN_PROGRAM
-#  define GLB_PTR(type,name) type *name=NULL;
-#define EXTERN
+#  define GLB_VAR(type,name,init) type name init
 #else
-#  define GLB_PTR(type,name) extern type *name;
-#define EXTERN extern
+#  define GLB_VAR(type,name,init) extern type name
 #endif
+
+/* local lattice attributes */
+GLB_VAR(int,T,=0); /* local lattice size in direction T */ 
+GLB_VAR(int,X,=0); /* local lattice size in direction X */
+GLB_VAR(int,Y,=0); /* local lattice size in direction Y */
+GLB_VAR(int,Z,=0); /* local lattice size in direction Z */
+/* this two probably are not more needed... */
+GLB_VAR(int,VOL3,=0); 
+GLB_VAR(int,VOLUME,=0);
+
+/* Nodes attributes
+ * NP = number of processes in each direction 
+ * 1 => local direction
+ */
+GLB_VAR(int,NP_T,=1); /* number of processes in direction T */
+GLB_VAR(int,NP_X,=1); /* number of processes in direction X */
+GLB_VAR(int,NP_Y,=1); /* number of processes in direction Y */
+GLB_VAR(int,NP_Z,=1); /* number of processes in direction Z */
+
+/* global lattice attributes */
+GLB_VAR(int,GLB_T,=0); /* global size of the lattice in direction T */
+GLB_VAR(int,GLB_X,=0); /* global size of the lattice in direction X */
+GLB_VAR(int,GLB_Y,=0); /* global size of the lattice in direction Y */
+GLB_VAR(int,GLB_Z,=0); /* global size of the lattice in direction Z */
+
+GLB_VAR(int,T_BORDER,=0);
+GLB_VAR(int,X_BORDER,=0);
+GLB_VAR(int,Y_BORDER,=0);
+GLB_VAR(int,Z_BORDER,=0);
+
+GLB_VAR(int,T_EXT,=0);
+GLB_VAR(int,X_EXT,=0);
+GLB_VAR(int,Y_EXT,=0);
+GLB_VAR(int,Z_EXT,=0);
+
+/* MPI stuff */
+GLB_VAR(int,WORLD_SIZE,=1); /* mpi rank for this process */
+GLB_VAR(int,CART_SIZE,=1); /* mpi rank for this process */
+#ifdef WITH_MPI
+#include <mpi.h>
+GLB_VAR(MPI_Comm,cart_comm,=MPI_COMM_NULL);
+#endif
+
+/* ID for this process */
+GLB_VAR(int,PID,=0); /* ID of this process */
+
+GLB_VAR(int,CID,=0); /* cartesian ID for this process */
+GLB_VAR(int,COORD[4],={0}); /* cartesian coordinates for this process */
+GLB_VAR(int,PSIGN,=0); /* parity of this process */
 
 /* Geometry indexes */
-GLB_PTR(int, ipt);
-GLB_PTR(int, ipt_4d);
-GLB_PTR(int, iup);
-GLB_PTR(int, idn);
+GLB_VAR(int,*ipt, =NULL);
+GLB_VAR(int,*ipt_4d,=NULL);
+GLB_VAR(int,*iup,=NULL);
+GLB_VAR(int,*idn,=NULL);
 
-#define ipt(t,x,y,z) ipt[(t)*(VOL3)+(x)*(L*L)+(y)*(L)+(z)]
+/* Geometry structures */
+#define ipt(t,x,y,z) ipt[((((t)+T_BORDER)*(X_EXT)+((x)+X_BORDER))*(Y_EXT)+((y)+Y_BORDER))*(Z_EXT)+((z)+Z_BORDER)]
+#define ipt_ext(t,x,y,z) ipt[(((t)*(X_EXT)+(x))*(Y_EXT)+(y))*(Z_EXT)+(z)]
 #define ipt_4d(t,x) ipt_4d[(t)*(VOL3)+(x)]
 #define iup(site,dir) iup[(site)*4+(dir)]
 #define idn(site,dir) idn[(site)*4+(dir)]
 
+/* Geometry structures */
+#include "geometry.h"
+
+GLB_VAR(geometry_descriptor,glattice,={0}); /* global lattice */
+GLB_VAR(geometry_descriptor,glat_even,={0}); /* global even lattice */
+GLB_VAR(geometry_descriptor,glat_odd,={0}); /* global odd lattice */
+
+
 /* Gauge field */
+#include "field_ordering.h"
 #include "suN_types.h"
+#include "spinor_field.h"
 
-GLB_PTR(suNg, u_gauge);
-GLB_PTR(suNg_flt, u_gauge_flt);
-GLB_PTR(suNf, u_gauge_f);
-GLB_PTR(suNf_flt, u_gauge_f_flt);
+GLB_VAR(suNg_field,*u_gauge,=NULL);
+GLB_VAR(suNg_field_flt,*u_gauge_flt,=NULL);
+GLB_VAR(suNf_field,*u_gauge_f,=NULL);
+GLB_VAR(suNf_field_flt,*u_gauge_f_flt,=NULL);
 
-#define coord_to_index(ix,mu) ((ix)*4+(mu))
-#define index_to_coord(i,ix,mu) (mu)=(i&3);(ix)=(i>>2)
+#define pu_gauge(ix,mu) ((u_gauge->ptr)+coord_to_index(ix,mu))
+#define pu_gauge_flt(ix,mu) ((u_gauge_flt->ptr)+coord_to_index(ix,mu))
+#define pu_gauge_f(ix,mu) ((u_gauge_f->ptr)+coord_to_index(ix,mu))
+#define pu_gauge_f_flt(ix,mu) ((u_gauge_f_flt->ptr)+coord_to_index(ix,mu))
 
-#define pu_gauge(ix,mu) (u_gauge+coord_to_index(ix,mu))
-#define pu_gauge_flt(ix,mu) (u_gauge_flt+coord_to_index(ix,mu))
-#define pu_gauge_f(ix,mu) (u_gauge_f+coord_to_index(ix,mu))
-#define pu_gauge_f_flt(ix,mu) (u_gauge_f_flt+coord_to_index(ix,mu))
 
-#undef GLB_PTR
-#undef EXTERN
-#undef INIT
+/* input parameters */
+#include "input_par.h"
+GLB_VAR(input_glb,glb_var,=init_input_glb(glb_var));
+
+#undef GLB_VAR
+
 
 #endif
+
 

@@ -1,3 +1,8 @@
+/***************************************************************************\
+* Copyright (c) 2008, Claudio Pica                                          *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
 /*******************************************************************************
 *
 * File random_suNg.c
@@ -12,11 +17,14 @@
 #include "suN.h"
 #include "random.h"
 #include "utils.h"
-#include "update.h"
 
 /* static variables for random_suNg */
 static double s[4];
 static suNg_vector *pu1,*pu2;
+
+
+void random_su2(double rho,double s[]);
+
 
 void random_suNg_unit_vector(suNg_vector *v)
 {

@@ -1,9 +1,9 @@
-beta      160.0
-nhb       1
-nor       4
-nit       1 
-nth       100
-nms       1000
-level     1
-seed      23
+beta  =   5.6
+nhb   =   1
+nor   =   4
+nit   =   1 
+nth   =   100
+nms   =   1000
+level =   1
+seed  =   23
 

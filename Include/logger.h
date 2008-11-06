@@ -1,3 +1,8 @@
+/***************************************************************************\
+* Copyright (c) 2008, Claudio Pica                                          *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
 #ifndef LOGGER_H
 #define LOGGER_H
 
@@ -82,6 +87,10 @@ void logger_setlevel(char *name, int v);
 int logger_getlevel(char *name);
 /* reset verbosity level for name to stardard level */
 void logger_rmlevel(char *name);
+
+/* Global enable/disable functions */
+void logger_enable();
+void logger_disable();
 
 /* log function 
  * write to the mapped stream if message level

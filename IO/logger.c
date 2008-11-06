@@ -1,8 +1,12 @@
+/***************************************************************************\
+* Copyright (c) 2008, Claudio Pica                                          *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <malloc.h>
 #include <stdarg.h>
 #include "logger.h"
 
@@ -443,6 +447,15 @@ static int mycpytonl(char **dst, char **src){
 	return 0;
 }
 
+static int logger_inactive=0;
+
+void logger_enable() {
+  logger_inactive=0;
+}
+
+void logger_disable() {
+  logger_inactive=1;
+}
 
 int lprintf(char *name, int level, char *format, ...) {
 	va_list args;
@@ -458,7 +471,7 @@ int lprintf(char *name, int level, char *format, ...) {
 	static int newline=1;
 	int islast=1;
 
-	if(name==0) /* no name: print nothing and return and error */
+	if(logger_inactive || name==0) /* no name: print nothing and return and error */
 		return -1;
 
 	/* compare current name with last name if map has not changed */
@@ -483,18 +496,6 @@ int lprintf(char *name, int level, char *format, ...) {
 		return 0;
 
 	va_start(args, format);
-
-	/* compare current name with last name if map has not changed */
-	if(mapchanged || strcmp(name,lastname)!=0) {
-		mapchanged=0;
-		lastrec=findname(filemap,name);
-		if(lastrec==0){
-			lastfd=(default_out==0)?stdout:default_out->file;
-		} else {
-			lastfd=lastrec->file;
-		}
-		strcpy(&lastname[0],name);
-	}
 
 	sprintf(alevel,"%d",level);
 	if(newline) {

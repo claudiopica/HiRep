@@ -1,3 +1,8 @@
+/***************************************************************************\
+* Copyright (c) 2008, Claudio Pica                                          *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
 #ifndef RATIONAL_FUNCTIONS_H
 #define RATIONAL_FUNCTIONS_H
 
@@ -20,7 +25,7 @@ void r_app_realloc(rational_app *app);
 void r_app_rescale(rational_app *app, double k);
 void r_app_set(rational_app *app, double min, double max);
 
-void rational_func(rational_app *coef, spinor_operator Q, suNf_spinor *out, suNf_spinor *in);
+void rational_func(rational_app *coef, spinor_operator Q, spinor_field *out, spinor_field *in);
 
 
 #endif

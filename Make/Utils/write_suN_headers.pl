@@ -242,6 +242,7 @@ if ($complex eq "R") { # we only need these functions at the moment...
     write_suNr_FMAT();
     write_suNr_unit();
     write_suNr_times_suNr();
+    write_suNr_times_suNr_dagger();
     write_suNr_add_assign();
     write_suNr_sub_assign();
     write_suNr_mul();
@@ -1305,6 +1306,55 @@ sub write_suN_times_suN_dagger {
 			print "            } \\\n";
 			for(my $i=0;$i<$mr;$i++){
 				print "            ++_k; ++_l; _complex_mul_star_assign((u).$cname\[_n\],(v).$cname\[_k\],(w).$cname\[_l\]);\\\n";
+			}
+		}
+		print "            ++_n; _k-=$shift2; ++_l;\\\n";
+		print "         } _k+=$N; _l=0;\\\n";
+		print "      }\\\n";
+		print "   }((void)0) \n\n";
+	}
+}
+
+sub write_suNr_times_suNr_dagger {
+  print "/* u=v*w^t */\n";
+  print "#define _${rdataname}_times_${rdataname}_dagger(u,v,w) \\\n";
+	##my $shift=$N*$N-$N-1;
+	my $shift2=$N-1;
+	if ($N<$Nmax) { #unroll all 
+	my ($n,$k,$l)=(0,0,0);
+	for(my $i=0;$i<$N;$i++){
+		for(my $y=0;$y<$N;$y++){
+			print "      (u).$cname\[$n\]=(v).$cname\[$k\]*(w).$cname\[$l\];\\\n";
+			for(my $j=1;$j<$N;$j++){
+				$k++; $l++;
+				print "      (u).$cname\[$n\]+=(v).$cname\[$k\]*(w).$cname\[$l\]";
+				if($i==$N-1 and $y==$N-1 and $j==$N-1) { print "\n\n"; } else { print "; \\\n"; }
+			}
+			$n++;
+			$k-=$shift2;
+			$l++;
+		}
+		$k+=$N;
+		$l=0;
+	}
+	} else { #partial unroll
+		print "   {\\\n";
+		print "      int _i,_y,_j,_n=0,_k=0,_l=0;\\\n";
+		print "      for (_i=0; _i<$N; ++_i){\\\n";
+		print "         for (_y=0; _y<$N; ++_y){\\\n";
+		print "            (u).$cname\[_n\]=(v).$cname\[_k\]*(w).$cname\[_l\];\\\n";
+		if($N<(2*$unroll+1)) {
+			for(my $j=1;$j<$N;$j++){
+				print "            ++_k; ++_l; (u).$cname\[_n\]+=(v).$cname\[_k\]*(w).$cname\[_l\];\\\n";
+			}
+		} else {
+			print "            for (_j=0; _j<$md; ){ \\\n";
+			for(my $i=0;$i<$unroll;$i++){
+				print "               ++_k; ++_l; (u).$cname\[_n\]+=(v).$cname\[_k\]*(w).$cname\[_l\]; ++_j;\\\n";
+			}
+			print "            } \\\n";
+			for(my $i=0;$i<$mr;$i++){
+				print "            ++_k; ++_l; (u).$cname\[_n\]+=(v).$cname\[_k\]*(w).$cname\[_l\];\\\n";
 			}
 		}
 		print "            ++_n; _k-=$shift2; ++_l;\\\n";
