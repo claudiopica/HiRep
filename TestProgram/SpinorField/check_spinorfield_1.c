@@ -178,9 +178,9 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
 
   /* read input file */
-  read_input("test_input");
+  read_input(glb_var.read,"test_input");
+  rlxd_init(glb_var.rlxd_seed,glb_var.rlxd_level*(PID + 1));
 
-  rlxd_init(1,12345*(PID+1));
 
   /* setup communication geometry */
   if (geometry_init() == 1) {

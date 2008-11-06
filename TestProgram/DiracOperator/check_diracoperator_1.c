@@ -11,6 +11,7 @@
 #include <string.h>
 #include <math.h>
 #include "io.h"
+#include "update.h"
 #include "geometry.h"
 #include "global.h"
 #include "logger.h"
@@ -93,9 +94,12 @@ int main(int argc,char *argv[])
   
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
   
-  read_input("test_input");
-  lprintf("MAIN",0,"RLXD [%d,%d]\n",input_p.rlxd_level,input_p.rlxd_seed);
-  rlxd_init(input_p.rlxd_level,input_p.rlxd_seed+PID);
+  read_input(glb_var.read,"test_input");
+  rlxd_init(glb_var.rlxd_seed,glb_var.rlxd_level);
+  
+  
+  lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed);
+  
   
   /* setup communication geometry */
   if (geometry_init() == 1) {

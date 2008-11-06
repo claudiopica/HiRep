@@ -48,6 +48,23 @@ static int g3[8] = {1,  1,  1,  1,  1,  1, -1, -1}; /* g3 = tr gamma_3 \bar{Gamm
 static int gb[8] = {1,  1,  1, -1, -1, -1,  1, -1};
 static char nameT[8][256] = {"a", "pi", "rho", "b", "pi2", "rho2", "forbidden triplet 0+-", "forbidden triplet 1++" };
 
+/* Mesons parameters */
+typedef struct _input_mesons {
+  char mstring[256];
+
+  /* for the reading function */
+  input_record_t read[2];
+  
+} input_mesons;
+
+#define init_input_mesons(varname) \
+{ \
+  .read={\
+    {"quark quenched masses", "mes:masses = %s", STRING_T, (varname).mstring},\
+    {NULL, NULL, 0, NULL}\
+  }\
+}
+
 
 static double mass;
 void free_correlators(double **triplets);

@@ -10,7 +10,7 @@ MKDIR=$(TOPDIR)/Make
 include $(MKDIR)/MkRules
 
 MODDIR := Geometry
-MODS := geometry_init  geometry_mpi_eo test_geometry_mpi geometry_mpi
+MODS := geometry_init  geometry_mpi_eo test_geometry_mpi communications
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := IO

@@ -88,7 +88,8 @@ void test_herm(spinor_operator S, char *name){
 
 int main(int argc,char *argv[])
 {
-  char tmp[256];
+
+
 
   /* setup process id and communications */
   setup_process(&argc,&argv);
@@ -97,15 +98,16 @@ int main(int argc,char *argv[])
   logger_setlevel(0,10000); /* log all */
   logger_map("DEBUG","debug");
 #ifdef WITH_MPI
-  sprintf(tmp,">out_%d",PID); logger_stdout(tmp);
+  char tmp[256];
+  sprintf(tmp,"out_%d",PID); logger_stdout(tmp);
   sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
 #endif
 
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
 
   /* read input file */
-  read_input("test_input");
-  rlxd_init(1,12345);
+  read_input(glb_var.read,"test_input");
+  rlxd_init(glb_var.rlxd_seed,glb_var.rlxd_level);
 
   /* setup communication geometry */
   if (geometry_init() == 1) {
