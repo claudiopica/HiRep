@@ -37,7 +37,7 @@ int main(int argc,char *argv[])
   setup_process(&argc,&argv);
 
   /* logger setup */
-  logger_setlevel(0,0);
+  logger_setlevel(0,10);
   /* disable logger for MPI processes != 0 */
   if (PID!=0) { logger_disable(); }
 
@@ -82,7 +82,7 @@ int main(int argc,char *argv[])
     if(rr<0) {
       lprintf("MAIN",0,"Error in updating the gauge field!!\n");
       return 1;
-    } else {
+    } else if(rr!=0) {
       acc++;
     }
     rc++;

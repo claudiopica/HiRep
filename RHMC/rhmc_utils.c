@@ -77,7 +77,7 @@ static int parse_gstart(rhmc_flow *rf) {
     rf->start++;
 
     /* do some check */
-    if(t!=GLB_T || x!=GLB_X || y!=GLB_Y || z!=GLB_X) {
+    if(t!=GLB_T || x!=GLB_X || y!=GLB_Y || z!=GLB_Z) {
       lprintf("WARNING", 0, "Size read from config name (%d,%d,%d,%d) is different from the lattice size!\n",t,x,y,z);
     }
     if(ng!=NG) {

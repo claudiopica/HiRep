@@ -1,5 +1,5 @@
 // Global variables 
-GLB_T = 8 //Global T size
+GLB_T = 2 //Global T size
 GLB_X = 2
 GLB_Y = 2
 GLB_Z = 2
@@ -30,7 +30,7 @@ meas freq = 1
 conf dir = cnfg
 gauge start = ranDoM
 //gauge start = Unit
-gauge start = run1_8x2x2x2nc2rADJnf2b2.000000m1.310000n10
+//gauge start = run1_8x2x2x2nc2rADJnf2b2.000000m1.310000n10
 //ranlxd start =
 last conf = 15
 
