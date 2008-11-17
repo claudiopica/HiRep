@@ -1,8 +1,13 @@
+GLB_T = 8
+GLB_X = 4
+GLB_Y = 4
+GLB_Z = 4
 NP_T = 2
-NP_X = 2
+NP_X = 1
 NP_Y = 1
 NP_Z = 1
 
+//level = 1  seed = 1
 level = 1  seed = 12345
 
-mes:masses = 5
+mes:masses = 2

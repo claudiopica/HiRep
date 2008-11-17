@@ -21,6 +21,7 @@
 double plaq(int ix,int mu,int nu);
 double avr_plaquette();
 double local_plaq(int ix);
+void full_plaquette();
 
 void pta_qprop_QMR_eo(spinor_field **pta_qprop, int nm, double *m, double acc);
 void pta_qprop_QMR(spinor_field **pta_qprop, int nm, double *m, double acc);

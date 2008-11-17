@@ -28,9 +28,8 @@
 #include "utils.h"
 #include "logger.h"
 
-
 char input_filename[256] = "input_file";
-char output_filename[256] = "random_cnfg.out";
+char output_filename[256] = "random_spinor.out";
 
 input_glb glb_ip = init_input_glb(glb_ip);
 
@@ -51,6 +50,7 @@ void read_cmdline(int argc, char* argv[]) {
 int main(int argc,char *argv[]) {
   char cnfg_filename[256];
   char tmp[256];
+  spinor_field* sp;
 
   /* setup process id and communications */
   setup_process(&argc,&argv);
@@ -92,20 +92,15 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_ip.rlxd_level,glb_ip.rlxd_seed);
   rlxd_init(glb_ip.rlxd_level,glb_ip.rlxd_seed+PID);
  
-  /* alloc global gauge fields */
-  u_gauge=alloc_gfield(&glattice);
-#ifndef REPR_FUNDAMENTAL
-  u_gauge_f=alloc_gfield_f(&glattice);
-#endif
-  random_u(u_gauge);
+  /* alloc fields */
+  sp=alloc_spinor_field_f(1,&glattice);
+  gaussian_spinor_field(sp);
 
-  sprintf(cnfg_filename,"%dx%dx%dx%dNc%d",GLB_T,GLB_X,GLB_Y,GLB_Z,NG);
-  write_gauge_field_eo_lexi(cnfg_filename);
+  sprintf(cnfg_filename,"sp_%dx%dx%dx%dNc%dNf%d",GLB_T,GLB_X,GLB_Y,GLB_Z,NG,NF);
+/*  write_spinor_field_eo_lexi(cnfg_filename,sp);*/
+  write_spinor_field(cnfg_filename,sp);
 
-	free_gfield(u_gauge);
-#ifndef REPR_FUNDAMENTAL
-	free_gfield_f(u_gauge_f);
-#endif
+	free_spinor_field(sp);
 
 	return 0;
 }

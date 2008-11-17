@@ -52,7 +52,7 @@ char cnfg_filename[256];
 char list_filename[256];
 char input_filename[256] = "input_file";
 char output_filename[256] = "mesons.out";
-enum { UNKNOWN_CNFG, DYNAMICAL_CNFG, QUENCHED_CNFG };
+enum { UNKNOWN_CNFG, DYNAMICAL_CNFG, QUENCHED_CNFG, HENTY_CNFG };
 
 input_mesons mes_var = init_input_mesons(mes_var);
 
@@ -91,6 +91,13 @@ int parse_cnfg_filename(char* filename, filename_t* fn) {
   if(hm==7) {
     fn->type=QUENCHED_CNFG;
     return QUENCHED_CNFG;
+  }
+
+  if(strlen(basename)>6) {
+    if(strcmp(basename+strlen(basename)-6,".henty")==0) {
+      fn->type=HENTY_CNFG;
+      return HENTY_CNFG;
+    }
   }
 	
 	fn->type=UNKNOWN_CNFG;
@@ -162,9 +169,11 @@ int main(int argc,char *argv[]) {
   /* read & broadcast parameters */
   read_cmdline(argc, argv);
   parse_cnfg_filename(cnfg_filename,&fpars);
-  GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
-  error(fpars.type==UNKNOWN_CNFG,1,"mk_mesons.c","Bad name for a configuration file");
-  error(fpars.nc!=NG,1,"mk_mesons.c","Bad NG");
+  if(fpars.type!=HENTY_CNFG){
+    GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
+    error(fpars.type==UNKNOWN_CNFG,1,"mk_mesons.c","Bad name for a configuration file");
+    error(fpars.nc!=NG,1,"mk_mesons.c","Bad NG");
+  }
 
 
 #define remove_parameter(NAME,PAR) \
@@ -177,10 +186,12 @@ int main(int argc,char *argv[]) {
   } \
 }
   
-  remove_parameter(GLB_T,glb_var);
-  remove_parameter(GLB_X,glb_var);
-  remove_parameter(GLB_Y,glb_var);
-  remove_parameter(GLB_Z,glb_var);
+  if(fpars.type==DYNAMICAL_CNFG || fpars.type==QUENCHED_CNFG) {
+    remove_parameter(GLB_T,glb_var);
+    remove_parameter(GLB_X,glb_var);
+    remove_parameter(GLB_Y,glb_var);
+    remove_parameter(GLB_Z,glb_var);
+  }
   if(fpars.type==DYNAMICAL_CNFG) remove_parameter(quark quenched masses,mes_var);
 
 #undef remove_parameter
@@ -192,7 +203,7 @@ int main(int argc,char *argv[]) {
   if(fpars.type==DYNAMICAL_CNFG) {
     nm=1;
 	  m[0] = 0.5/fpars.k - 4.0;
-	} else if(fpars.type==QUENCHED_CNFG) {
+	} else if(fpars.type==QUENCHED_CNFG || fpars.type==HENTY_CNFG) {
     strcpy(tmp,mes_var.mstring);
     cptr = strtok(tmp, ";");
     nm=0;
@@ -258,10 +269,15 @@ int main(int argc,char *argv[]) {
     
 	  lprintf("MAIN",0,"Configuration from %s\n", cnfg_filename);
 	  /* NESSUN CHECK SULLA CONSISTENZA CON I PARAMETRI DEFINITI !!! */
-    read_gauge_field(cnfg_filename);
+	  if(fpars.type==HENTY_CNFG)
+      read_gauge_field_for_henty(cnfg_filename);
+    else
+      read_gauge_field(cnfg_filename);
     represent_gauge_field();
 
 	  lprintf("TEST",0,"<p> %1.6f\n",avr_plaquette());
+  
+    full_plaquette();
 
 	  pta_qprop_QMR_eo(pta_qprop, nm, m, 1e-9);
 	

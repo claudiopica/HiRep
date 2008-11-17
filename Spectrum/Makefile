@@ -1,8 +1,8 @@
 TOPDIR = ..
 
-SRCS = mk_mesons.c random_cnfg.c
+SRCS = mk_mesons.c random_cnfg.c random_spinor.c
 
-default: mk_mesons random_cnfg
+default: mk_mesons random_cnfg random_spinor
 
 MKDIR=$(TOPDIR)/Make
 include $(MKDIR)/MkRules
@@ -12,7 +12,7 @@ MODS := geometry_init geometry_mpi_eo communications
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := IO
-MODS := archive logger read_input
+MODS := archive logger read_input archive_henty archive_old
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Utils
@@ -56,6 +56,11 @@ mk_mesons: mk_mesons.o $(MOD_OBJS)
 random_cnfg: random_cnfg.o $(MOD_OBJS)
 	echo -n Linking [$@]... 
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ random_cnfg.o $(MOD_OBJS) &&\
+	echo " done." || echo " failed."
+
+random_spinor: random_spinor.o $(MOD_OBJS)
+	echo -n Linking [$@]... 
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ random_spinor.o $(MOD_OBJS) &&\
 	echo " done." || echo " failed."
 
 

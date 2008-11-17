@@ -17,6 +17,7 @@
 #include <math.h>
 #include <assert.h>
 #include "logger.h"
+#include "io.h"
 
 
 
@@ -30,8 +31,8 @@ static void D(spinor_field *out, spinor_field *in){
   Dphi(hmass,out,in);
 }
 
-static void g5D_pre(spinor_field *out, spinor_field *in){
-  g5Dphi_eopre(hmass_pre,out,in);
+static void D_pre(spinor_field *out, spinor_field *in){
+  Dphi_eopre(hmass_pre,out,in);
 }
 
 /*
@@ -54,7 +55,7 @@ void pta_qprop_QMR_eo(spinor_field **pta_qprop, int nm, double *mass, double acc
 	int cgiter=0;
 	double norm;
 
-#ifdef NDEBUG
+#ifndef NDEBUG
   spinor_field *test=0;
   test=alloc_spinor_field_f(1,&glattice);
   spinor_field *test_e=0;
@@ -92,9 +93,16 @@ void pta_qprop_QMR_eo(spinor_field **pta_qprop, int nm, double *mass, double acc
 	}
 	norm=sqrt(spinor_field_sqnorm_f(in));
 	spinor_field_mul_f(in,1./norm,in);
-
+  
 	/* invert noise */
-	cgiter+=g5QMR_mshift(&QMR_par, &g5D_pre, in, resdn);
+	for(i=0;i<QMR_par.n;++i){
+#ifndef NDEBUG
+	  norm=spinor_field_sqnorm_f(&resdn[i]);
+	  lprintf("PROPAGATOR",0,"Sqnorm resdn[%d] = %e\n",i,norm);
+#endif /* NDEBUG */
+	  spinor_field_zero_f(&resdn[i]);
+	}
+	cgiter+=g5QMR_mshift(&QMR_par, &D_pre, in, resdn);
 
 	/* now loop over sources */
 	for (source=0;source<4*NF;++source){
@@ -102,14 +110,21 @@ void pta_qprop_QMR_eo(spinor_field **pta_qprop, int nm, double *mass, double acc
 	  if(COORD[0]==0 && COORD[1]==0 && COORD[2]==0 && COORD[3]==0)
 	    *( (double *)_FIELD_AT(in,x0) + 2*source ) =1.;
 
-		cgiter+=g5QMR_mshift(&QMR_par, &g5D_pre, in, resd);
+	  for(i=0;i<QMR_par.n;++i){
+#ifndef NDEBUG
+	    norm=spinor_field_sqnorm_f(&resd[i]);
+	    lprintf("PROPAGATOR",0,"Sqnorm resd[%d] = %e\n",i,norm);
+#endif /* NDEBUG */
+  	  spinor_field_zero_f(&resd[i]);
+	  }
+		cgiter+=g5QMR_mshift(&QMR_par, &D_pre, in, resd);
 
 		for(i=0;i<QMR_par.n;++i){
 
-#ifdef NDEBUG
+#ifndef NDEBUG
 			/* this is a test of the solution */
 			hmass_pre=mass[i];
-			g5D_pre(test_e,&resd[i]);
+			D_pre(test_e,&resd[i]);
 			++cgiter;
 			spinor_field_sub_f(test_e,test_e,in);
 			norm=spinor_field_sqnorm_f(test_e);
@@ -128,7 +143,7 @@ void pta_qprop_QMR_eo(spinor_field **pta_qprop, int nm, double *mass, double acc
       spinor_field_minus_f(&qprop_mask,&qprop_mask);
 			if(source&1) ++cgiter; /* count only half of calls. works because the number of sources is even */
 
-#ifdef NDEBUG
+#ifndef NDEBUG
 			/* this is a test of the solution */
 			hmass=mass[i];
 			H(test,&pta_qprop[i][source]);
@@ -153,7 +168,7 @@ void pta_qprop_QMR_eo(spinor_field **pta_qprop, int nm, double *mass, double acc
 	free_spinor_field(in);
 	free_spinor_field(res);
 	free(shift);
-#ifdef NDEBUG
+#ifndef NDEBUG
 	free_spinor_field(test);
 	free_spinor_field(test_e);
 #endif
@@ -179,7 +194,7 @@ void pta_qprop_QMR(spinor_field **pta_qprop, int nm, double *mass, double acc) {
 	int cgiter=0;
 	double norm;
 
-#ifdef NDEBUG
+#ifndef NDEBUG
   spinor_field *test=0;
   test=alloc_spinor_field_f(1,&glattice);
 #endif
@@ -226,7 +241,7 @@ void pta_qprop_QMR(spinor_field **pta_qprop, int nm, double *mass, double acc) {
 
 		for(i=0;i<QMR_par.n;++i){
 
-#ifdef NDEBUG
+#ifndef NDEBUG
 			/* this is a test of the solution */
 			hmass=mass[i];
 			D(test,&resd[i]);
@@ -239,7 +254,7 @@ void pta_qprop_QMR(spinor_field **pta_qprop, int nm, double *mass, double acc) {
 
 			spinor_field_sub_f(&pta_qprop[i][source],&resd[i],&resdn[i]); /* compute difference */
 
-#ifdef NDEBUG
+#ifndef NDEBUG
 			/* this is a test of the solution */
 			hmass=mass[i];
 			H(test,&pta_qprop[i][source]);
@@ -263,7 +278,7 @@ void pta_qprop_QMR(spinor_field **pta_qprop, int nm, double *mass, double acc) {
   /* free memory */
 	free_spinor_field(in);
   free(shift);
-#ifdef NDEBUG
+#ifndef NDEBUG
 	free_spinor_field(test);
 #endif
 }
@@ -278,7 +293,7 @@ void pta_qprop_MINRES(spinor_field **pta_qprop, int nm, double *mass, double acc
   static MINRES_par MINRESpar;
   int i,x0,cgiter,source;
   spinor_field *in;
-#ifdef NDEBUG
+#ifndef NDEBUG
   double norm;
 #endif
 
@@ -297,7 +312,7 @@ void pta_qprop_MINRES(spinor_field **pta_qprop, int nm, double *mass, double acc
 	  if(COORD[0]==0 && COORD[1]==0 && COORD[2]==0 && COORD[3]==0)
 	    *( (double *)_FIELD_AT(in,x0) + 2*source ) =1.;
 
-#ifdef NDEBUG
+#ifndef NDEBUG
     norm=spinor_field_sqnorm_f(in);
     lprintf("PROPAGATOR",0,"norm of source [%d] = %e\n",source,norm);
 #endif

@@ -309,6 +309,35 @@ void init_Dirac() {
  * Dphi in = (4+m0)^2*in - D_EO D_OE in
  *
  */
+void Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
+{
+  double rho;
+  
+  error((in==NULL)||(out==NULL),1,"Dphi_eopre [Dphi.c]",
+	"Attempt to access unallocated memory space");
+  
+  error(in==out,1,"Dphi_eopre [Dphi.c]",
+	"Input and output fields must be different");
+  
+#ifdef CHECK_SPINOR_MATCHING
+  error(out->type!=&glat_even || in->type!=&glat_even,1,"Dphi_eopre " __FILE__, "Spinors are not defined on even lattice!");
+#endif /* CHECK_SPINOR_MATCHING */
+
+  /* alloc memory for temporary spinor field */
+  if (init) { init_Dirac(); init=0; }
+  
+  Dphi_(otmp, in);
+  Dphi_(out, otmp);
+  
+  rho=4.0+m0;
+  rho*=-rho; /* this minus sign is taken into account below */
+  
+  spinor_field_mul_add_assign_f(out,rho,in);
+  spinor_field_minus_f(out,out);
+}
+
+
+
 void g5Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
 {
   double rho;
