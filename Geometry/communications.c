@@ -11,18 +11,37 @@
 #include "spinor_field.h"
 #include "suN_types.h"
 #include "global.h"
+#include "utils.h"
 #include <string.h>
 #ifdef WITH_MPI
 #include <mpi.h>
 #endif
 #include "logger.h"
 
+#ifdef MPI_TIMING
+struct timeval gfstart, gfend, gfetime,sfstart, sfend, sfetime;
+int gf_control=0,sf_control=0;
+#endif
+
 void global_sum(double *d, int n) {
 #ifdef WITH_MPI
   int mpiret;
   double pres[n];
 
+#ifdef MPI_TIMING
+  struct timeval start, end, etime;
+  gettimeofday(&start,0);  
+#endif
+  
   mpiret=MPI_Allreduce(d,pres,n,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
+
+  
+#ifdef MPI_TIMING
+  gettimeofday(&end,0);
+  timeval_subtract(&etime,&end,&start);
+  lprintf("MPI TIMING",0,"global_sum " __FILE__ " %ld sec %ld usec\n",etime.tv_sec,etime.tv_usec);
+#endif
+
 #ifndef NDEBUG
   if (mpiret != MPI_SUCCESS) {
     char mesg[MPI_MAX_ERROR_STRING];
@@ -46,7 +65,19 @@ void bcast(double *d, int n) {
 #ifdef WITH_MPI
   int mpiret;
 
+#ifdef MPI_TIMING
+  struct timeval start, end, etime;
+  gettimeofday(&start,0);  
+#endif
+
   mpiret=MPI_Bcast(d, n, MPI_DOUBLE, 0,MPI_COMM_WORLD);
+
+#ifdef MPI_TIMING
+  gettimeofday(&end,0);
+  timeval_subtract(&etime,&end,&start);
+  lprintf("MPI TIMING",0,"bcast " __FILE__ " %ld sec %ld usec\n",etime.tv_sec,etime.tv_usec);
+#endif
+
 #ifndef NDEBUG
   if (mpiret != MPI_SUCCESS) {
     char mesg[MPI_MAX_ERROR_STRING];
@@ -143,6 +174,16 @@ void complete_gf_sendrecv(suNg_field *gf) {
 
     mpiret=MPI_Waitall(nreq, gf->comm_req, status);
 
+#ifdef MPI_TIMING
+    if(gf_control>0)
+      {
+	gettimeofday(&gfend,0);
+	timeval_subtract(&gfetime,&gfend,&gfstart);
+	lprintf("MPI TIMING",0,"complete_gf_sendrecv" __FILE__ " %ld sec %ld usec\n",gfetime.tv_sec,gfetime.tv_usec);
+	gf_control=0;
+      }
+#endif
+
 #ifndef NDEBUG
     if (mpiret != MPI_SUCCESS) {
       char mesg[MPI_MAX_ERROR_STRING];
@@ -179,6 +220,12 @@ void start_gf_sendrecv(suNg_field *gf) {
 
   /* fill send buffers */
   sync_gauge_field(gf);
+
+#ifdef MPI_TIMING
+  error(gf_control>0,1,"start_gf_sendrecv " __FILE__,"Multiple send without receive");
+  gettimeofday(&gfstart,0);  
+  gf_control=1;
+#endif
 
   for (i=0; i<(gd->nbuffers); ++i) {
     /* send ith buffer */
@@ -234,6 +281,16 @@ void complete_sf_sendrecv(spinor_field *sf) {
 
     mpiret=MPI_Waitall(nreq, sf->comm_req, status);
 
+#ifdef MPI_TIMING
+    if(sf_control>0)
+      {
+	gettimeofday(&sfend,0);
+	timeval_subtract(&sfetime,&sfend,&sfstart);
+	lprintf("MPI TIMING",0,"complete_sf_sendrecv" __FILE__ " %ld sec %ld usec\n",sfetime.tv_sec,sfetime.tv_usec);
+	sf_control=0;
+      }
+#endif
+
 #ifndef NDEBUG
     if (mpiret != MPI_SUCCESS) {
       char mesg[MPI_MAX_ERROR_STRING];
@@ -271,6 +328,11 @@ void start_sf_sendrecv(spinor_field *sf) {
 
   /* fill send buffers */
   sync_spinor_field(sf);
+#ifdef MPI_TIMING
+  error(sf_control>0,1,"start_sf_sendrecv " __FILE__,"Multiple send without receive");
+  gettimeofday(&sfstart,0);  
+  sf_control=1;
+#endif
 
   for (i=0; i<(gd->nbuffers); ++i) {
     /* send ith buffer */
