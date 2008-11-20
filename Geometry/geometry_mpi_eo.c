@@ -178,7 +178,7 @@ static int site_sign(int i)
   ax = (map_true2oversize[i]/(T+2*T_BORDER))%(X+2*X_BORDER);
   ay = (map_true2oversize[i]/((T+2*T_BORDER)*(X+2*X_BORDER)))%(Y+2*Y_BORDER);
   az = map_true2oversize[i]/((T+2*T_BORDER)*(X+2*X_BORDER)*(Y+2*Y_BORDER));
-  return ((ax+ay+az+at+T_BORDER+X_BORDER+Y_BORDER+Z_BORDER+PSIGN)&1);
+  return ((ax+ay+az+at+T_BORDER+X_BORDER+Y_BORDER+Z_BORDER+PSIGN+1)&1);
 }
 
 static int find_change_point(int start, int end)
@@ -586,14 +586,14 @@ static void walk_on_lattice(int level)
 	for (x2=bly_start;x2<bly_start+bly_width;x2++) 
 	  for (x1=blx_start;x1<blx_start+blx_width;x1++) 
 	    for (x0=blt_start;x0<blt_start+blt_width;x0++)
-	      if((x0+x1+x2+x3+T_BORDER+X_BORDER+Y_BORDER+Z_BORDER+PSIGN)&1)
+	      if((x0+x1+x2+x3+T_BORDER+X_BORDER+Y_BORDER+Z_BORDER+PSIGN+1)&1)
 		set_border_pointer(local_index(x0,x1,x2,x3),level);
 		  
       for (x3=blz_start;x3<blz_start+blz_width;x3++) 
 	for (x2=bly_start;x2<bly_start+bly_width;x2++) 
 	  for (x1=blx_start;x1<blx_start+blx_width;x1++) 
 	    for (x0=blt_start;x0<blt_start+blt_width;x0++)
-	      if(!((x0+x1+x2+x3+T_BORDER+X_BORDER+Y_BORDER+Z_BORDER+PSIGN)&1) )
+	      if(!((x0+x1+x2+x3+T_BORDER+X_BORDER+Y_BORDER+Z_BORDER+PSIGN+1)&1) )
 		set_border_pointer(local_index(x0,x1,x2,x3),level);
       
       
@@ -697,7 +697,7 @@ static void fix_buffer()
 	for (x2=bly_start;x2<bly_start+bly_width;x2++) 
 	  for (x1=blx_start;x1<blx_start+blx_width;x1++) 
 	    for (x0=blt_start;x0<blt_start+blt_width;x0++) 
-	      if((x0+x1+x2+x3+T_BORDER+X_BORDER+Y_BORDER+Z_BORDER+PSIGN)&1)
+	      if((x0+x1+x2+x3+T_BORDER+X_BORDER+Y_BORDER+Z_BORDER+PSIGN+1)&1)
 		set_border_pointer(local_index(x0,x1,x2,x3),border[index_eval_border].level);
       
       
@@ -705,7 +705,7 @@ static void fix_buffer()
 	for (x2=bly_start;x2<bly_start+bly_width;x2++) 
 	  for (x1=blx_start;x1<blx_start+blx_width;x1++) 
 	    for (x0=blt_start;x0<blt_start+blt_width;x0++)
-	      if(!((x0+x1+x2+x3+T_BORDER+X_BORDER+Y_BORDER+Z_BORDER+PSIGN)&1) )
+	      if(!((x0+x1+x2+x3+T_BORDER+X_BORDER+Y_BORDER+Z_BORDER+PSIGN+1)&1) )
 		set_border_pointer(local_index(x0,x1,x2,x3),border[index_eval_border].level);
       
       
