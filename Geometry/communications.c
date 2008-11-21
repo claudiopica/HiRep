@@ -174,16 +174,6 @@ void complete_gf_sendrecv(suNg_field *gf) {
 
     mpiret=MPI_Waitall(nreq, gf->comm_req, status);
 
-#ifdef MPI_TIMING
-    if(gf_control>0)
-      {
-	gettimeofday(&gfend,0);
-	timeval_subtract(&gfetime,&gfend,&gfstart);
-	lprintf("MPI TIMING",0,"complete_gf_sendrecv" __FILE__ " %ld sec %ld usec\n",gfetime.tv_sec,gfetime.tv_usec);
-	gf_control=0;
-      }
-#endif
-
 #ifndef NDEBUG
     if (mpiret != MPI_SUCCESS) {
       char mesg[MPI_MAX_ERROR_STRING];
@@ -204,6 +194,16 @@ void complete_gf_sendrecv(suNg_field *gf) {
     }
 #endif
   }
+
+#ifdef MPI_TIMING
+    if(gf_control>0)
+      {
+	gettimeofday(&gfend,0);
+	timeval_subtract(&gfetime,&gfend,&gfstart);
+	lprintf("MPI TIMING",0,"complete_gf_sendrecv" __FILE__ " %ld sec %ld usec\n",gfetime.tv_sec,gfetime.tv_usec);
+	gf_control=0;
+      }
+#endif
 
 #endif /* WITH_MPI */
 }
@@ -281,16 +281,6 @@ void complete_sf_sendrecv(spinor_field *sf) {
 
     mpiret=MPI_Waitall(nreq, sf->comm_req, status);
 
-#ifdef MPI_TIMING
-    if(sf_control>0)
-      {
-	gettimeofday(&sfend,0);
-	timeval_subtract(&sfetime,&sfend,&sfstart);
-	lprintf("MPI TIMING",0,"complete_sf_sendrecv" __FILE__ " %ld sec %ld usec\n",sfetime.tv_sec,sfetime.tv_usec);
-	sf_control=0;
-      }
-#endif
-
 #ifndef NDEBUG
     if (mpiret != MPI_SUCCESS) {
       char mesg[MPI_MAX_ERROR_STRING];
@@ -311,6 +301,16 @@ void complete_sf_sendrecv(spinor_field *sf) {
     }
 #endif
   }
+
+#ifdef MPI_TIMING
+    if(sf_control>0)
+      {
+	gettimeofday(&sfend,0);
+	timeval_subtract(&sfetime,&sfend,&sfstart);
+	lprintf("MPI TIMING",0,"complete_sf_sendrecv" __FILE__ " %ld sec %ld usec\n",sfetime.tv_sec,sfetime.tv_usec);
+	sf_control=0;
+      }
+#endif
 
 #endif /* WITH_MPI */
 }

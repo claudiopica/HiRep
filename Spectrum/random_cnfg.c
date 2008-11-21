@@ -100,7 +100,8 @@ int main(int argc,char *argv[]) {
   random_u(u_gauge);
 
   sprintf(cnfg_filename,"%dx%dx%dx%dNc%d",GLB_T,GLB_X,GLB_Y,GLB_Z,NG);
-  write_gauge_field_eo_lexi(cnfg_filename);
+/*  write_gauge_field_eo_lexi(cnfg_filename);*/
+  write_gauge_field(cnfg_filename);
 
 	free_gfield(u_gauge);
 #ifndef REPR_FUNDAMENTAL

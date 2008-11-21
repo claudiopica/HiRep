@@ -158,12 +158,12 @@ static void set_coordinates(int x, int *test_q) {
 
 int even_q(int c[4]) {
    return ((c[0]+c[1]+c[2]+c[3]
-           +PSIGN)&1);
+           +PSIGN+1)&1);
 }
 
 int odd_q(int c[4]) {
    return !((c[0]+c[1]+c[2]+c[3]
-           +PSIGN)&1);
+           +PSIGN+1)&1);
 }
 
 
