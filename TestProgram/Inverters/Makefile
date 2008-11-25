@@ -1,6 +1,6 @@
 TOPDIR = ../..
 
-MAIN := check_inverters_1 check_inverters_2 check_inverters_3 check_inverters_4
+MAIN := check_inverters_1 check_inverters_2 check_inverters_3 check_inverters_4 check_inverters_5
 
 SRCS = $(addsuffix .c,$(MAIN))
 
@@ -39,6 +39,10 @@ MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Inverters
 MODS := linear_algebra cg_mshift MINRES_mshift MINRES g5QMR_mshift eva jacobi
+MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
+
+MODDIR := Observables
+MODS := g5QMR_trunc
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 $(MAIN): %: %.o $(MOD_OBJS)

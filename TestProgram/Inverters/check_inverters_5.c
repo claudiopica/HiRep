@@ -54,9 +54,9 @@ int main(int argc,char *argv[])
 {
   char pame[256];
   int i;
-  double tau;
-  spinor_field *s1, *s2;
-  spinor_field *res;
+  double tau1, tau2;
+  spinor_field *s1, *s2, *s3;
+  spinor_field *res, *res_trunc;
 
   mshift_par par;
 
@@ -114,10 +114,12 @@ int main(int argc,char *argv[])
   par.shift=(double*)malloc(sizeof(double)*(par.n));
   par.err2=1.e-28;
   par.max_iter=0;
-  res=alloc_spinor_field_f(par.n+3,&glattice);
-  s1=res+par.n;
+  res=alloc_spinor_field_f(par.n*2+3,&glattice);
+  res_trunc=res+par.n;
+  s1=res_trunc+par.n;
   s2=s1+1;
-  tmp=s2+1;
+  s3=s2+1;
+  tmp=s3+1;
 
 
   par.shift[0]=+0.1;
@@ -129,8 +131,8 @@ int main(int argc,char *argv[])
    
 
   gaussian_spinor_field(s1); 
-  tau=spinor_field_sqnorm_f(s1);
-  lprintf("QMR TEST",0,"Norma iniziale: %e\n",tau);
+  tau1=spinor_field_sqnorm_f(s1);
+  lprintf("QMR TEST",0,"Norma iniziale: %e\n",tau1);
 
   /* TEST g5QMR_M */
 
@@ -138,15 +140,19 @@ int main(int argc,char *argv[])
   lprintf("QMR TEST",0,"Testing g5QMR multishift\n");
   lprintf("QMR TEST",0,"------------------------\n");
 
-  cgiters=g5QMR_mshift(&par, &D, s1, res);
+  cgiters=g5QMR_mshift_trunc(&par, 20, &D, s1, res_trunc, res);
   lprintf("QMR TEST",0,"Converged in %d iterations\n",cgiters);
 
   for(i=0;i<par.n;++i){
     D(s2,&res[i]);
+    D(s3,&res_trunc[i]);
     spinor_field_mul_add_assign_f(s2,-par.shift[i],&res[i]);
+    spinor_field_mul_add_assign_f(s3,-par.shift[i],&res_trunc[i]);
     spinor_field_sub_assign_f(s2,s1);
-    tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
-    lprintf("QMR TEST",0,"test g5QMR[%d] = %e (req. %e)\n",i,tau,par.err2);
+    spinor_field_sub_assign_f(s3,s1);
+    tau1=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
+    tau2=spinor_field_sqnorm_f(s3)/spinor_field_sqnorm_f(s1);
+    printf("test g5QMR[%d] = %e, trunc = %e (req. %e)\n",i,tau1,tau2,par.err2);
   }
 	 
   free_spinor_field(res);

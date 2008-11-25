@@ -33,6 +33,7 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor
 int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
 
 int g5QMR_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
+int g5QMR_mshift_trunc(mshift_par *par, int trunc_iter, spinor_operator M, spinor_field *in, spinor_field *out_trunc, spinor_field *out);
 /*int g5QMR_mshift_flt(mshift_par *par, spinor_operator_flt M, suNf_spinor_flt *in, suNf_spinor_flt **out); */
 
 int MINRES_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);

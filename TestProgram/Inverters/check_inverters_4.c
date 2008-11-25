@@ -102,7 +102,7 @@ int main(int argc,char *argv[])
   
   /* read input file */
   read_input(glb_var.read,"test_input");
-  rlxd_init(glb_var.rlxd_seed,glb_var.rlxd_level+PID);
+  rlxd_init(glb_var.rlxd_level+PID,glb_var.rlxd_seed);
   
   /* setup communication geometry */
   if (geometry_init() == 1) {
