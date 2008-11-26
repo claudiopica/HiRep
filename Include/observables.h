@@ -46,6 +46,23 @@ void g0g5g3_correlator(double *out, spinor_field *qp);
 void g5_g0g5_re_correlator(double *out, spinor_field *qp);
 void g5_g0g5_im_correlator(double *out, spinor_field *qp);
 
+void id_debug(complex Gamma[4][4], int* sign);
+void g0_debug(complex Gamma[4][4], int* sign);
+void g5_debug(complex Gamma[4][4], int* sign);
+void g0g5_debug(complex Gamma[4][4], int* sign);
+void g1_debug(complex Gamma[4][4], int* sign);
+void g2_debug(complex Gamma[4][4], int* sign);
+void g3_debug(complex Gamma[4][4], int* sign);
+void g0g1_debug(complex Gamma[4][4], int* sign);
+void g0g2_debug(complex Gamma[4][4], int* sign);
+void g0g3_debug(complex Gamma[4][4], int* sign);
+void g5g1_debug(complex Gamma[4][4], int* sign);
+void g5g2_debug(complex Gamma[4][4], int* sign);
+void g5g3_debug(complex Gamma[4][4], int* sign);
+void g0g5g1_debug(complex Gamma[4][4], int* sign);
+void g0g5g2_debug(complex Gamma[4][4], int* sign);
+void g0g5g3_debug(complex Gamma[4][4], int* sign);
+
 /* void dublin_meson_correlators(double** correlator[], char corr_name[][256], int n_corr, int n_masses, double *mass); */
 
 #endif 
