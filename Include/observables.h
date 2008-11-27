@@ -18,6 +18,8 @@
 #include "inverters.h"
 #include <stdio.h>
 
+#define SPIN_2D_INDEX(i,j) ( (i)*4 + (j) )
+
 double plaq(int ix,int mu,int nu);
 double avr_plaquette();
 double local_plaq(int ix);
@@ -46,6 +48,23 @@ void g0g5g3_correlator(double *out, spinor_field *qp);
 void g5_g0g5_re_correlator(double *out, spinor_field *qp);
 void g5_g0g5_im_correlator(double *out, spinor_field *qp);
 
+void id_trace_H(complex* out, complex* smat);
+void g0_trace_H(complex* out, complex* smat);
+void g5_trace_H(complex* out, complex* smat);
+void g0g5_trace_H(complex* out, complex* smat);
+void g1_trace_H(complex* out, complex* smat);
+void g2_trace_H(complex* out, complex* smat);
+void g3_trace_H(complex* out, complex* smat);
+void g0g1_trace_H(complex* out, complex* smat);
+void g0g2_trace_H(complex* out, complex* smat);
+void g0g3_trace_H(complex* out, complex* smat);
+void g5g1_trace_H(complex* out, complex* smat);
+void g5g2_trace_H(complex* out, complex* smat);
+void g5g3_trace_H(complex* out, complex* smat);
+void g0g5g1_trace_H(complex* out, complex* smat);
+void g0g5g2_trace_H(complex* out, complex* smat);
+void g0g5g3_trace_H(complex* out, complex* smat);
+
 void id_debug(complex Gamma[4][4], int* sign);
 void g0_debug(complex Gamma[4][4], int* sign);
 void g5_debug(complex Gamma[4][4], int* sign);
@@ -62,7 +81,5 @@ void g5g3_debug(complex Gamma[4][4], int* sign);
 void g0g5g1_debug(complex Gamma[4][4], int* sign);
 void g0g5g2_debug(complex Gamma[4][4], int* sign);
 void g0g5g3_debug(complex Gamma[4][4], int* sign);
-
-/* void dublin_meson_correlators(double** correlator[], char corr_name[][256], int n_corr, int n_masses, double *mass); */
 
 #endif 
