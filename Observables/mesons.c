@@ -31,7 +31,7 @@
 
 
 #define MESON_DEFINITION \
-void NAME(double *out, spinor_field *qp) { \
+void NAME_correlator(double *out, spinor_field *qp) { \
   int t,x,y,z, i; \
   suNf_spinor *s1; \
   suNf_spinor *s2; \
@@ -65,7 +65,7 @@ void NAME(double *out, spinor_field *qp) { \
 
 
 #define MESON_DEFINITION_TWO_RE \
-void NAME(double *out, spinor_field *qp) { \
+void NAME_correlator(double *out, spinor_field *qp) { \
   int t,x,y,z, i; \
   suNf_spinor *s1; \
   suNf_spinor *s2; \
@@ -99,7 +99,7 @@ void NAME(double *out, spinor_field *qp) { \
 
 
 #define MESON_DEFINITION_TWO_IM \
-void NAME(double *out, spinor_field *qp) { \
+void NAME_correlator(double *out, spinor_field *qp) { \
   int t,x,y,z, i; \
   suNf_spinor *s1; \
   suNf_spinor *s2; \
@@ -162,7 +162,36 @@ void name##_debug(complex Gamma[4][4], int* sign) { \
 
 
 
-#define NAME id_correlator
+#define GAMMA_TRACE_RE_DEFINITION \
+void NAME_trace_H(complex* out, complex* smat) { \
+        out->re = _S0_*smat[SPIN_2D_INDEX(0,_C0_)].re \
+                + _S1_*smat[SPIN_2D_INDEX(1,_C1_)].re \
+                + _S2_*smat[SPIN_2D_INDEX(2,_C2_)].re \
+                + _S3_*smat[SPIN_2D_INDEX(3,_C3_)].re; \
+        out->im = _S0_*smat[SPIN_2D_INDEX(0,_C0_)].im \
+                + _S1_*smat[SPIN_2D_INDEX(1,_C1_)].im \
+                + _S2_*smat[SPIN_2D_INDEX(2,_C2_)].im \
+                + _S3_*smat[SPIN_2D_INDEX(3,_C3_)].im; \
+}
+
+
+
+#define GAMMA_TRACE_IM_DEFINITION \
+void NAME_trace_H(complex* out, complex* smat) { \
+        out->im = _S0_*smat[SPIN_2D_INDEX(0,_C0_)].re \
+                + _S1_*smat[SPIN_2D_INDEX(1,_C1_)].re \
+                + _S2_*smat[SPIN_2D_INDEX(2,_C2_)].re \
+                + _S3_*smat[SPIN_2D_INDEX(3,_C3_)].re; \
+        out->re = - _S0_*smat[SPIN_2D_INDEX(0,_C0_)].im \
+                - _S1_*smat[SPIN_2D_INDEX(1,_C1_)].im \
+                - _S2_*smat[SPIN_2D_INDEX(2,_C2_)].im \
+                - _S3_*smat[SPIN_2D_INDEX(3,_C3_)].im; \
+}
+
+
+
+
+#define NAME id
 
 #define _C0_ 0
 #define _C1_ 1
@@ -179,6 +208,7 @@ void name##_debug(complex Gamma[4][4], int* sign) { \
 #define _REAL_ 1
 
 MESON_DEFINITION
+GAMMA_TRACE_RE_DEFINITION
 SINGLE_TRACE_DEBUG(id)
 
 #undef NAME
@@ -194,7 +224,7 @@ SINGLE_TRACE_DEBUG(id)
 #undef _REAL_
 
 
-#define NAME g0_correlator
+#define NAME g0
 
 #define _C0_ 2
 #define _C1_ 3
@@ -211,6 +241,7 @@ SINGLE_TRACE_DEBUG(id)
 #define _REAL_ 1
 
 MESON_DEFINITION
+GAMMA_TRACE_RE_DEFINITION
 SINGLE_TRACE_DEBUG(g0)
 
 #undef NAME
@@ -227,7 +258,7 @@ SINGLE_TRACE_DEBUG(g0)
 
 
 
-#define NAME g5_correlator
+#define NAME g5
 
 #define _C0_ 0
 #define _C1_ 1
@@ -244,6 +275,7 @@ SINGLE_TRACE_DEBUG(g0)
 #define _REAL_ 1
 
 MESON_DEFINITION
+GAMMA_TRACE_RE_DEFINITION
 SINGLE_TRACE_DEBUG(g5)
 
 #undef NAME
@@ -260,7 +292,7 @@ SINGLE_TRACE_DEBUG(g5)
 
 
 
-#define NAME g0g5_correlator
+#define NAME g0g5
 
 #define _C0_ 2
 #define _C1_ 3
@@ -277,6 +309,7 @@ SINGLE_TRACE_DEBUG(g5)
 #define _REAL_ 1
 
 MESON_DEFINITION
+GAMMA_TRACE_RE_DEFINITION
 SINGLE_TRACE_DEBUG(g0g5)
 
 #undef NAME
@@ -293,7 +326,7 @@ SINGLE_TRACE_DEBUG(g0g5)
 
 
 
-#define NAME g1_correlator
+#define NAME g1
 
 #define _C0_ 3
 #define _C1_ 2
@@ -310,6 +343,7 @@ SINGLE_TRACE_DEBUG(g0g5)
 #define _REAL_ 0
 
 MESON_DEFINITION
+GAMMA_TRACE_IM_DEFINITION
 SINGLE_TRACE_DEBUG(g1)
 
 #undef NAME
@@ -326,7 +360,7 @@ SINGLE_TRACE_DEBUG(g1)
 
 
 
-#define NAME g2_correlator
+#define NAME g2
 
 #define _C0_ 3
 #define _C1_ 2
@@ -343,6 +377,7 @@ SINGLE_TRACE_DEBUG(g1)
 #define _REAL_ 1
 
 MESON_DEFINITION
+GAMMA_TRACE_RE_DEFINITION
 SINGLE_TRACE_DEBUG(g2)
 
 #undef NAME
@@ -359,7 +394,7 @@ SINGLE_TRACE_DEBUG(g2)
 
 
 
-#define NAME g3_correlator
+#define NAME g3
 
 #define _C0_ 2
 #define _C1_ 3
@@ -376,6 +411,7 @@ SINGLE_TRACE_DEBUG(g2)
 #define _REAL_ 0
 
 MESON_DEFINITION
+GAMMA_TRACE_IM_DEFINITION
 SINGLE_TRACE_DEBUG(g3)
 
 #undef NAME
@@ -392,7 +428,7 @@ SINGLE_TRACE_DEBUG(g3)
 
 
 
-#define NAME g0g1_correlator
+#define NAME g0g1
 
 #define _C0_ 1
 #define _C1_ 0
@@ -409,6 +445,7 @@ SINGLE_TRACE_DEBUG(g3)
 #define _REAL_ 0
 
 MESON_DEFINITION
+GAMMA_TRACE_IM_DEFINITION
 SINGLE_TRACE_DEBUG(g0g1)
 
 #undef NAME
@@ -425,7 +462,7 @@ SINGLE_TRACE_DEBUG(g0g1)
 
 
 
-#define NAME g0g2_correlator
+#define NAME g0g2
 
 #define _C0_ 1
 #define _C1_ 0
@@ -442,6 +479,7 @@ SINGLE_TRACE_DEBUG(g0g1)
 #define _REAL_ 1
 
 MESON_DEFINITION
+GAMMA_TRACE_RE_DEFINITION
 SINGLE_TRACE_DEBUG(g0g2)
 
 #undef NAME
@@ -458,7 +496,7 @@ SINGLE_TRACE_DEBUG(g0g2)
 
 
 
-#define NAME g0g3_correlator
+#define NAME g0g3
 
 #define _C0_ 0
 #define _C1_ 1
@@ -475,6 +513,7 @@ SINGLE_TRACE_DEBUG(g0g2)
 #define _REAL_ 0
 
 MESON_DEFINITION
+GAMMA_TRACE_IM_DEFINITION
 SINGLE_TRACE_DEBUG(g0g3)
 
 #undef NAME
@@ -491,7 +530,7 @@ SINGLE_TRACE_DEBUG(g0g3)
 
 
 
-#define NAME g5g1_correlator
+#define NAME g5g1
 
 #define _C0_ 3
 #define _C1_ 2
@@ -508,6 +547,7 @@ SINGLE_TRACE_DEBUG(g0g3)
 #define _REAL_ 0
 
 MESON_DEFINITION
+GAMMA_TRACE_IM_DEFINITION
 SINGLE_TRACE_DEBUG(g5g1)
 
 #undef NAME
@@ -524,7 +564,7 @@ SINGLE_TRACE_DEBUG(g5g1)
 
 
 
-#define NAME g5g2_correlator
+#define NAME g5g2
 
 #define _C0_ 3
 #define _C1_ 2
@@ -541,6 +581,7 @@ SINGLE_TRACE_DEBUG(g5g1)
 #define _REAL_ 1
 
 MESON_DEFINITION
+GAMMA_TRACE_RE_DEFINITION
 SINGLE_TRACE_DEBUG(g5g2)
 
 #undef NAME
@@ -557,7 +598,7 @@ SINGLE_TRACE_DEBUG(g5g2)
 
 
 
-#define NAME g5g3_correlator
+#define NAME g5g3
 
 #define _C0_ 2
 #define _C1_ 3
@@ -574,6 +615,7 @@ SINGLE_TRACE_DEBUG(g5g2)
 #define _REAL_ 0
 
 MESON_DEFINITION
+GAMMA_TRACE_IM_DEFINITION
 SINGLE_TRACE_DEBUG(g5g3)
 
 #undef NAME
@@ -590,7 +632,7 @@ SINGLE_TRACE_DEBUG(g5g3)
 
 
 
-#define NAME g0g5g1_correlator
+#define NAME g0g5g1
 
 #define _C0_ 1
 #define _C1_ 0
@@ -607,6 +649,7 @@ SINGLE_TRACE_DEBUG(g5g3)
 #define _REAL_ 0
 
 MESON_DEFINITION
+GAMMA_TRACE_IM_DEFINITION
 SINGLE_TRACE_DEBUG(g0g5g1)
 
 #undef NAME
@@ -623,7 +666,7 @@ SINGLE_TRACE_DEBUG(g0g5g1)
 
 
 
-#define NAME g0g5g2_correlator
+#define NAME g0g5g2
 
 #define _C0_ 1
 #define _C1_ 0
@@ -640,6 +683,7 @@ SINGLE_TRACE_DEBUG(g0g5g1)
 #define _REAL_ 1
 
 MESON_DEFINITION
+GAMMA_TRACE_RE_DEFINITION
 SINGLE_TRACE_DEBUG(g0g5g2)
 
 #undef NAME
@@ -656,7 +700,7 @@ SINGLE_TRACE_DEBUG(g0g5g2)
 
 
 
-#define NAME g0g5g3_correlator
+#define NAME g0g5g3
 
 #define _C0_ 0
 #define _C1_ 1
@@ -673,6 +717,7 @@ SINGLE_TRACE_DEBUG(g0g5g2)
 #define _REAL_ 0
 
 MESON_DEFINITION
+GAMMA_TRACE_IM_DEFINITION
 SINGLE_TRACE_DEBUG(g0g5g3)
 
 #undef NAME
