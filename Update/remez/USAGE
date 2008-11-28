@@ -14,4 +14,13 @@ high => common upper bound of all approximations
 
 prec => precision used in numerical computation (usually 100)
 
+Example: 
+To generate rational approximations to the function x^(1/4) accurate to 10^-10
+starting with an order 5 approximation and covering the range [1.e-6, 64.] type:
+
+./remez 1 4 1.e-10 5 1.e-6 64. 100 >approx 2>log
+
+the file approx will contain the coefficients of the rational approximations found, and the file log is to monitor the convergence of the process. It may happen that at some point the given computational precision used (100 digits in the example) is not enough, in which case the program will exit with an error message. A restart is required in this case with increased precision, and the starting order of the approximation may be increased to the last one found and written in the file approx.
+
+NB: in order for the approximations to be included in the main code, the files produced with remez must be named approx_*.
 
