@@ -12,7 +12,7 @@ MODS := geometry_init geometry_mpi_eo communications
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := IO
-MODS := archive logger read_input archive_henty
+MODS := archive logger read_input archive_spinors
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Utils
@@ -46,6 +46,10 @@ MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Inverters
 MODS := linear_algebra cg_mshift MINRES_mshift g5QMR_mshift MINRES #eva jacobi
+MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
+
+MODDIR := Converter
+MODS := archive_eolexi archive_henty
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 mk_mesons: mk_mesons.o $(MOD_OBJS)

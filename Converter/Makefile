@@ -1,50 +1,49 @@
-TOPDIR = ../..
+TOPDIR = ..
 
-MAIN = check_diracoperator_1 check_diracoperator_2 check_diracoperator_3 check_diracoperator_4
+SRCS = converter.c
 
-SRCS = $(addsuffix .c,$(MAIN))
-
-default: $(MAIN)
+default: converter
 
 MKDIR=$(TOPDIR)/Make
 include $(MKDIR)/MkRules
 
 MODDIR := Geometry
-MODS := geometry_init geometry_mpi_eo test_geometry_mpi communications
+MODS := geometry_init geometry_mpi_eo communications
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := IO
-MODS := logger read_input
+MODS := archive logger read_input
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Utils
-MODS := boundary_conditions time
+MODS := suN_utils time boundary_conditions
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Memory
-MODS := amalloc field_alloc spinor_field_alloc
+MODS := amalloc field_alloc
+MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
+
+MODDIR := Observables
+MODS := avr_plaquette
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Random
-MODS := gauss random_suNg ranlxs ranlxd random_fields
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
-
-MODDIR := Update
-MODS := Dphi random_spinor_field random_su2 representation
+MODS := gauss ranlxs ranlxd
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Error
 MODS := error
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
-MODDIR := Inverters
-MODS := linear_algebra cg_mshift
+MODDIR := Converter
+MODS := archive_eolexi archive_henty
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
-$(MAIN): %: %.o $(MOD_OBJS)
+converter: $(OBJS) $(MOD_OBJS)
 	echo -n Linking [$@]... 
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< $(MOD_OBJS) &&\
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(MOD_OBJS) &&\
 	echo " done." || echo " failed."
+
 
 .PHONY: default
 

@@ -52,7 +52,7 @@ char cnfg_filename[256]="";
 char list_filename[256]="";
 char input_filename[256] = "input_file";
 char output_filename[256] = "mesons.out";
-enum { UNKNOWN_CNFG, DYNAMICAL_CNFG, QUENCHED_CNFG, HENTY_CNFG };
+enum { UNKNOWN_CNFG, DYNAMICAL_CNFG, QUENCHED_CNFG };
 
 input_mesons mes_var = init_input_mesons(mes_var);
 
@@ -94,18 +94,11 @@ int parse_cnfg_filename(char* filename, filename_t* fn) {
   }
 #undef repr_name
 
-  hm=sscanf(basename,"%dx%dx%dx%dNc%db%lfn%d",
+  hm=sscanf(basename,"%dx%dx%dx%d%*[Nn]c%db%lfn%d",
       &(fn->t),&(fn->x),&(fn->y),&(fn->z),&(fn->nc),&(fn->b),&(fn->n));
   if(hm==7) {
     fn->type=QUENCHED_CNFG;
     return QUENCHED_CNFG;
-  }
-
-  if(strlen(basename)>6) {
-    if(strcmp(basename+strlen(basename)-6,".henty")==0) {
-      fn->type=HENTY_CNFG;
-      return HENTY_CNFG;
-    }
   }
 
   fn->type=UNKNOWN_CNFG;
@@ -204,18 +197,16 @@ int main(int argc,char *argv[]) {
 
   read_input(glb_var.read,input_filename);
   read_input(mes_var.read,input_filename);
-  if(fpars.type!=HENTY_CNFG){
-    GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
-    error(fpars.type==UNKNOWN_CNFG,1,"mk_mesons.c","Bad name for a configuration file");
-    error(fpars.nc!=NG,1,"mk_mesons.c","Bad NG");
-  }
+  GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
+  error(fpars.type==UNKNOWN_CNFG,1,"mk_mesons.c","Bad name for a configuration file");
+  error(fpars.nc!=NG,1,"mk_mesons.c","Bad NG");
 
 
   nm=0;
   if(fpars.type==DYNAMICAL_CNFG) {
     nm=1;
     m[0] = fpars.m;
-  } else if(fpars.type==QUENCHED_CNFG || fpars.type==HENTY_CNFG) {
+  } else if(fpars.type==QUENCHED_CNFG) {
     strcpy(tmp,mes_var.mstring);
     cptr = strtok(tmp, ";");
     nm=0;
@@ -281,10 +272,7 @@ int main(int argc,char *argv[]) {
 
     lprintf("MAIN",0,"Configuration from %s\n", cnfg_filename);
     /* NESSUN CHECK SULLA CONSISTENZA CON I PARAMETRI DEFINITI !!! */
-    if(fpars.type==HENTY_CNFG)
-      read_gauge_field_for_henty(cnfg_filename);
-    else
-      read_gauge_field(cnfg_filename);
+    read_gauge_field(cnfg_filename);
     represent_gauge_field();
 
     lprintf("TEST",0,"<p> %1.6f\n",avr_plaquette());

@@ -1,3 +1,8 @@
+/***************************************************************************\
+ * Copyright (c) 2008, Agostino Patella, Claudio Pica                        *   
+ * All rights reserved.                                                      * 
+ \***************************************************************************/
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -5,16 +10,15 @@
 #include "error.h"
 #include "global.h"
 #include "logger.h"
-#include "observables.h"
 #include "communications.h"
+#include "moreio.h"
 #include "utils.h"
-#include "ranlux.h"
 
 /*
 u(row,col,x,y,z,t,dir)
 */
 
-void read_gauge_field_for_henty(char filename[]) 
+void read_gauge_field_henty(char filename[]) 
 {
   FILE *fp=NULL;
   int g[5], p[4], c[4];

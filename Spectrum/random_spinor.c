@@ -27,6 +27,7 @@
 #include "representation.h"
 #include "utils.h"
 #include "logger.h"
+#include "moreio.h"
 
 char input_filename[256] = "input_file";
 char output_filename[256] = "random_spinor.out";
