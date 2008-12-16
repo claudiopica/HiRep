@@ -28,6 +28,11 @@ void full_plaquette();
 void pta_qprop_QMR_eo(spinor_field **pta_qprop, int nm, double *m, double acc);
 void pta_qprop_QMR(spinor_field **pta_qprop, int nm, double *m, double acc);
 void pta_qprop_MINRES(spinor_field **pta_qprop, int nm, double *m, double acc);
+void traced_ata_qprop_dublin_trunc(complex** ev_prop, complex*** prop, int n_points);
+void ata_qprop_dublin_trunc_init(int nm, double *mptr, int pnev, int pnevt, int ord, int trnc, int pgns, int pgnsh, int pgnsc, int pdil, int pdilh, int pdilc);
+void ata_qprop_dublin_trunc_modify_par(int ord, int trnc, int pgns, int pgnsh, int pgnsc, int pdil, int pdilh, int pdilc);
+void ata_qprop_dublin_trunc_free();
+
 
 void id_correlator(double *out, spinor_field *qp);
 void g0_correlator(double *out, spinor_field *qp);

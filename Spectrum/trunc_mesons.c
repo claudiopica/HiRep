@@ -1,0 +1,503 @@
+/*******************************************************************************
+*
+* Computation of the mesonic spectrum
+*
+*******************************************************************************/
+
+#define MAIN_PROGRAM
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include "io.h"
+#include "random.h"
+#include "error.h"
+#include "geometry.h"
+#include "memory.h"
+#include "statistics.h"
+#include "update.h"
+#include "global.h"
+#include "observables.h"
+#include "suN.h"
+#include "suN_types.h"
+#include "dirac.h"
+#include "linear_algebra.h"
+#include "inverters.h"
+#include "representation.h"
+#include "utils.h"
+#include "logger.h"
+
+
+int nev=0,nevt=0,ord=1,trnc=5,gns=100,gnsh=3,gnsc=20,dil=0,dilh=3,dilc=0;
+
+float beta;
+
+float mass;
+
+float _KAPPA_;
+
+
+/* Mesons parameters */
+typedef struct _input_mesons {
+  char mstring[256];
+
+  /* for the reading function */
+  input_record_t read[2];
+
+} input_mesons;
+
+#define init_input_mesons(varname) \
+{ \
+  .read={\
+    {"quark quenched masses", "mes:masses = %s", STRING_T, (varname).mstring},\
+    {NULL, NULL, 0, NULL}\
+  }\
+}
+
+
+char cnfg_filename[256]="";
+char list_filename[256]="";
+char input_filename[256] = "input_file";
+char output_filename[256] = "mesons.out";
+enum { UNKNOWN_CNFG, DYNAMICAL_CNFG, QUENCHED_CNFG };
+
+input_mesons mes_var = init_input_mesons(mes_var);
+
+
+typedef struct {
+  char string[256];
+  int t, x, y, z;
+  int nc, nf;
+  double b, m;
+  int n;
+  int type;
+} filename_t;
+
+
+int parse_cnfg_filename(char* filename, filename_t* fn) {
+  int hm;
+  char *tmp = NULL;
+  char *basename;
+
+  basename = filename;
+  while ((tmp = strchr(basename, '/')) != NULL) {
+    basename = tmp+1;
+  }            
+
+#ifdef REPR_FUNDAMENTAL
+#define repr_name "FUN"
+#elif defined REPR_SYMMETRIC
+#define repr_name "SYM"
+#elif defined REPR_ANTISYMMETRIC
+#define repr_name "ASY"
+#elif defined REPR_ADJOINT
+#define repr_name "ADJ"
+#endif
+  hm=sscanf(basename,"%*[^_]_%dx%dx%dx%dnc%dr" repr_name "nf%db%lfm%lfn%d",
+      &(fn->t),&(fn->x),&(fn->y),&(fn->z),&(fn->nc),&(fn->nf),&(fn->b),&(fn->m),&(fn->n));
+  if(hm==9) {
+    fn->type=DYNAMICAL_CNFG;
+    return DYNAMICAL_CNFG;
+  }
+#undef repr_name
+
+  hm=sscanf(basename,"%dx%dx%dx%d%*[Nn]c%db%lfn%d",
+	    &(fn->t),&(fn->x),&(fn->y),&(fn->z),&(fn->nc),&(fn->b),&(fn->n));
+  if(hm==7) {
+    fn->type=QUENCHED_CNFG;
+    return QUENCHED_CNFG;
+  }
+
+  fn->type=UNKNOWN_CNFG;
+  return UNKNOWN_CNFG;
+}
+
+
+void read_cmdline(int argc, char* argv[]) {
+  int i, ai=0, ao=0, ac=0, al=0;
+  FILE *list=NULL;
+
+  for (i=1;i<argc;i++) {
+    if (strcmp(argv[i],"-i")==0) ai=i+1;
+    else if (strcmp(argv[i],"-o")==0) ao=i+1;
+    else if (strcmp(argv[i],"-c")==0) ac=i+1;
+    else if (strcmp(argv[i],"-l")==0) al=i+1;
+  }
+
+  if (ao!=0) strcpy(output_filename,argv[ao]);
+  if (ai!=0) strcpy(input_filename,argv[ai]);
+
+  error((ac==0 && al==0) || (ac!=0 && al!=0),1,"parse_cmdline [mk_mesons.c]",
+      "Syntax: mk_mesons { -c <config file> | -l <list file> } [-i <input file>] [-o <output file>]");
+
+  if(ac != 0) {
+    strcpy(cnfg_filename,argv[ac]);
+    strcpy(list_filename,"");
+  } else if(al != 0) {
+    strcpy(list_filename,argv[al]);
+    error((list=fopen(list_filename,"r"))==NULL,1,"parse_cmdline [mk_mesons.c]" ,
+	"Failed to open list file\n");
+    error(fscanf(list,"%s",cnfg_filename)==0,1,"parse_cmdline [mk_mesons.c]" ,
+	"Empty list file\n");
+    fclose(list);
+  }
+
+
+}
+
+static int safe_mod(int x,int y)
+{
+  if (x>=0)
+    return(x%y);
+  else
+    return((y-(abs(x)%y))%y);
+}
+
+
+int main(int argc,char *argv[]) {
+  int i,k,dt,n,nm;
+  char tmp[256], *cptr;
+  FILE* list;
+  spinor_field **pta_qprop=0;
+  complex **ata_qprop[2], **ev_qprop;
+  double *tricorr, *haircorr, disc;
+  filename_t fpars;
+  double m[256];
+  complex *ctmp[3];
+
+  spinor_field *test;
+
+  /* setup process id and communications */
+  read_cmdline(argc, argv);
+  setup_process(&argc,&argv);
+
+  /* logger setup */
+  /* disable logger for MPI processes != 0 */
+  if (PID!=0) { logger_disable(); }
+  if (PID==0) { sprintf(tmp,">%s",output_filename); logger_stdout(tmp); }
+  logger_setlevel(0,30);
+  sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
+
+  lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
+  lprintf("MAIN",0,"input file [%s]\n",input_filename); 
+  lprintf("MAIN",0,"output file [%s]\n",output_filename); 
+  if (list_filename!=NULL) lprintf("MAIN",0,"list file [%s]\n",list_filename); 
+  else lprintf("MAIN",0,"cnfg file [%s]\n",cnfg_filename); 
+
+
+  /* read & broadcast parameters */
+  parse_cnfg_filename(cnfg_filename,&fpars);
+
+/*
+ * x Agostino: Serve veramente??
+ * Claudio
+
+#define remove_parameter(NAME,PAR) \
+  { \
+    for(i=0;(PAR).read[i].name!=NULL;i++) { \
+      if(strcmp((PAR).read[i].name,#NAME)==0) { \
+	(PAR).read[i].descr=NULL; \
+	break; \
+      } \
+    } \
+  }
+
+  if(fpars.type==DYNAMICAL_CNFG || fpars.type==QUENCHED_CNFG) {
+    remove_parameter(GLB_T,glb_var);
+    remove_parameter(GLB_X,glb_var);
+    remove_parameter(GLB_Y,glb_var);
+    remove_parameter(GLB_Z,glb_var);
+  }
+  if(fpars.type==DYNAMICAL_CNFG) remove_parameter(quark quenched masses,mes_var);
+#undef remove_parameter
+*/
+
+  read_input(glb_var.read,input_filename);
+  read_input(mes_var.read,input_filename);
+  GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
+  error(fpars.type==UNKNOWN_CNFG,1,"mk_mesons.c","Bad name for a configuration file");
+  error(fpars.nc!=NG,1,"mk_mesons.c","Bad NG");
+
+
+  nm=0;
+  if(fpars.type==DYNAMICAL_CNFG) {
+    nm=1;
+    m[0] = fpars.m;
+  } else if(fpars.type==QUENCHED_CNFG) {
+    strcpy(tmp,mes_var.mstring);
+    cptr = strtok(tmp, ";");
+    nm=0;
+    while(cptr != NULL) {
+      m[nm]=atof(cptr);
+      nm++;
+      cptr = strtok(NULL, ";");
+    }            
+  }
+
+
+  /* setup communication geometry */
+  if (geometry_init() == 1) {
+    finalize_process();
+    return 0;
+  }
+
+  lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
+  lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
+  lprintf("MAIN",0,"global size is %dx%dx%dx%d\n",GLB_T,GLB_X,GLB_Y,GLB_Z);
+  lprintf("MAIN",0,"proc grid is %dx%dx%dx%d\n",NP_T,NP_X,NP_Y,NP_Z);
+
+  /* setup lattice geometry */
+  geometry_mpi_eo();
+  /* test_geometry_mpi_eo(); */
+
+  lprintf("MAIN",0,"local size is %dx%dx%dx%d\n",T,X,Y,Z);
+  lprintf("MAIN",0,"extended local size is %dx%dx%dx%d\n",T_EXT,X_EXT,Y_EXT,Z_EXT);
+
+  lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed);
+  rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
+  rz2_init(glb_var.rlxd_seed); /* use same seed as above? */
+
+  /* alloc global gauge fields */
+  u_gauge=alloc_gfield(&glattice);
+#ifndef REPR_FUNDAMENTAL
+  u_gauge_f=alloc_gfield_f(&glattice);
+#endif
+
+  for(k=0;k<nm;k++)
+    lprintf("MAIN",0,"Mass[%d] = %f\n",k,m[k]);
+
+  /* alloc correlators */
+  tricorr=(double*)malloc(GLB_T*sizeof(double));
+  haircorr=(double*)malloc(GLB_T*sizeof(double));
+  pta_qprop=(spinor_field**)malloc(sizeof(spinor_field*)*nm);
+  pta_qprop[0]=alloc_spinor_field_f(4*NF*nm,&glattice);
+  for(k=0;k<nm;++k)
+    pta_qprop[k]=pta_qprop[0]+4*NF*k;
+
+  ata_qprop[0]=(complex**)malloc(sizeof(complex*)*nm);
+  ata_qprop[1]=(complex**)malloc(sizeof(complex*)*nm);
+  ev_qprop=(complex**)malloc(sizeof(complex*)*nm);
+  for (i=0; i<nm; ++i) {
+    ata_qprop[0][i]=(complex*)malloc(sizeof(complex)*16*T);
+    ata_qprop[1][i]=(complex*)malloc(sizeof(complex)*16*T);
+    ev_qprop[i]=(complex*)malloc(sizeof(complex)*16*T);
+  }
+
+
+  list=NULL;
+  if(strcmp(list_filename,"")!=0) {
+    error((list=fopen(list_filename,"r"))==NULL,1,"main [mk_mesons.c]" ,
+	"Failed to open list file\n");
+  }
+
+  test=alloc_spinor_field_f(1,&glattice);
+
+  ata_qprop_dublin_trunc_init(nm,m,nev,nevt,ord,trnc,gns,gnsh,gnsc,dil,dilh,dilc);
+
+  i=0;
+
+  ctmp[0]=(complex*)malloc(GLB_T*sizeof(complex));
+  ctmp[1]=(complex*)malloc(GLB_T*sizeof(complex));
+  ctmp[2]=(complex*)malloc(GLB_T*sizeof(complex));
+
+  while(1) {
+
+    if(list!=NULL)
+      if(fscanf(list,"%s",cnfg_filename)==0 || feof(list)) break;
+
+    i++;
+
+    lprintf("MAIN",0,"Configuration from %s\n", cnfg_filename);
+    /* NESSUN CHECK SULLA CONSISTENZA CON I PARAMETRI DEFINITI !!! */
+    read_gauge_field(cnfg_filename);
+    represent_gauge_field();
+
+    lprintf("TEST",0,"<p> %1.6f\n",avr_plaquette());
+
+    full_plaquette();
+
+    pta_qprop_QMR_eo(pta_qprop, nm, m, 1e-9);
+
+    traced_ata_qprop_dublin_trunc(ev_qprop, ata_qprop, 2);
+
+    /*    for (i=0; i<16*T; i++){
+      if (i%4==0) printf("\n");
+      if(i%16==0) printf("\nt=%d\n",i/16);
+      printf("%e\t",ata_qprop[0][0][i].re);
+    }
+    printf("\n\n");
+    */
+
+    for (k=0;k<nm;++k){
+
+      lprintf("MAIN",0,"conf #%d mass=%2.6f \n",i,m[k]);
+
+#define CORR(name) \
+      name##_correlator(tricorr, pta_qprop[k]);\
+      lprintf("MAIN",0,"conf #%d mass=%2.6f TRIPLET " #name "= ",i,m[k]);\
+      for(n=0;n<GLB_T;++n) {\
+	lprintf("MAIN",0,"%e ",tricorr[n]);\
+      }\
+      lprintf("MAIN",0,"\n");\
+      fflush(stdout)
+
+#define HAIRPIN(name) \
+        for(n=0;n<GLB_T;++n) {\
+                name##_trace_H(ctmp[0]+n, ata_qprop[0][k]+16*n);\
+                name##_trace_H(ctmp[1]+n, ata_qprop[1][k]+16*n);\
+                name##_trace_H(ctmp[2]+n, ev_qprop[k]+16*n);\
+        }\
+        disc=0.;\
+        for(dt=0;dt<GLB_T;++dt) {\
+                disc += (ctmp[0][dt].re + ctmp[1][dt].re)/(2.*GLB_T);\
+                haircorr[dt]=0.;\
+                for(n=0;n<GLB_T;++n)\
+                        haircorr[dt] += ctmp[0][n].re*ctmp[1][safe_mod(n+dt,GLB_T)].re/GLB_T;\
+        }\
+        lprintf("MAIN",0,"\n");\
+        lprintf("MAIN",0,"conf #%d mass=%2.6f HAIRPIN " #name "= ",i,m[k]);\
+        for(n=0;n<GLB_T;++n) {\
+                lprintf("MAIN",0,"%e ",haircorr[n]);\
+        }\
+        lprintf("MAIN",0,"\n");\
+        lprintf("MAIN",0,"conf #%d mass=%2.6f SINGLETRACE " #name "= %e\n",i,m[k],disc);\
+        disc=0.;\
+        for(dt=0;dt<GLB_T;++dt) {\
+                disc += ctmp[2][dt].re/GLB_T;\
+                haircorr[dt]=0.;\
+                for(n=0;n<GLB_T;++n)\
+                        haircorr[dt] += ctmp[2][n].re*ctmp[2][safe_mod(n+dt,GLB_T)].re/GLB_T;\
+        }\
+        lprintf("MAIN",0,"\n");\
+        lprintf("MAIN",0,"conf #%d mass=%2.6f EVHAIRPIN " #name "= ",i,m[k]);\
+        for(n=0;n<GLB_T;++n) {\
+                lprintf("MAIN",0,"%e ",haircorr[n]);\
+        }\
+        lprintf("MAIN",0,"\n");\
+        lprintf("MAIN",0,"conf #%d mass=%2.6f EVSINGLETRACE " #name "= %e\n",i,m[k],disc);\
+        fflush(stdout)
+
+
+#define IDHAIRPIN \
+        for(n=0;n<GLB_T;++n) {\
+        (ctmp[0]+n)->re = (ata_qprop[0][k]+16*n)[SPIN_2D_INDEX(0,1-1)].re \
+                + (ata_qprop[0][k]+16*n)[SPIN_2D_INDEX(1,2-1)].re \
+                + -1*(ata_qprop[0][k]+16*n)[SPIN_2D_INDEX(2,3-1)].re \
+                + -1*(ata_qprop[0][k]+16*n)[SPIN_2D_INDEX(3,4-1)].re; \
+        (ctmp[0]+n)->im = (ata_qprop[0][k]+16*n)[SPIN_2D_INDEX(0,1-1)].im \
+                + (ata_qprop[0][k]+16*n)[SPIN_2D_INDEX(1,2-1)].im \
+                + -1*(ata_qprop[0][k]+16*n)[SPIN_2D_INDEX(2,3-1)].im \
+                + -1*(ata_qprop[0][k]+16*n)[SPIN_2D_INDEX(3,4-1)].im; \
+        (ctmp[1]+n)->re = (ata_qprop[1][k]+16*n)[SPIN_2D_INDEX(0,1-1)].re \
+                + (ata_qprop[1][k]+16*n)[SPIN_2D_INDEX(1,2-1)].re \
+                + -1*(ata_qprop[1][k]+16*n)[SPIN_2D_INDEX(2,3-1)].re \
+                + -1*(ata_qprop[1][k]+16*n)[SPIN_2D_INDEX(3,4-1)].re; \
+        (ctmp[1]+n)->im = (ata_qprop[1][k]+16*n)[SPIN_2D_INDEX(0,1-1)].im \
+                + (ata_qprop[1][k]+16*n)[SPIN_2D_INDEX(1,2-1)].im \
+                + -1*(ata_qprop[1][k]+16*n)[SPIN_2D_INDEX(2,3-1)].im \
+                + -1*(ata_qprop[1][k]+16*n)[SPIN_2D_INDEX(3,4-1)].im; \
+        }\
+        disc=0.;\
+        for(dt=0;dt<T;++dt) {\
+                disc += (ctmp[0][dt].re + ctmp[1][dt].re)/(2.*T);\
+                haircorr[dt]=0.;\
+                for(n=0;n<T;++n)\
+                        haircorr[dt] += ctmp[0][n].re*ctmp[1][safe_mod(n+dt,T)].re/T;\
+        }\
+        lprintf("MAIN",0,"\n");\
+        lprintf("MAIN",0,"conf #%d mass=%2.6f HAIRPIN id = ",i,m[k]);\
+        for(n=0;n<T;++n) {\
+                lprintf("MAIN",0,"%e ",haircorr[n]);\
+        }\
+        lprintf("MAIN",0,"\n");\
+        lprintf("MAIN",0,"conf #%d mass=%2.6f SINGLETRACE id = %e\n",i,m[k],disc);\
+        disc=0.;\
+        for(dt=0;dt<T;++dt) {\
+                disc += ctmp[2][dt].re/T;\
+                haircorr[dt]=0.;\
+                for(n=0;n<T;++n)\
+                        haircorr[dt] += ctmp[2][n].re*ctmp[2][safe_mod(n+dt,T)].re/T;\
+        }\
+        lprintf("MAIN",0,"\n");\
+        lprintf("MAIN",0,"conf #%d mass=%2.6f EVHAIRPIN id = ",i,m[k]);\
+        for(n=0;n<T;++n) {\
+                lprintf("MAIN",0,"%e ",haircorr[n]);\
+        }\
+        lprintf("MAIN",0,"\n");\
+        lprintf("MAIN",0,"conf #%d mass=%2.6f EVSINGLETRACE id = %e\n",i,m[k],disc);\
+        fflush(stdout)
+
+
+
+      CORR(id);
+      HAIRPIN(id);
+      CORR(g5);
+      HAIRPIN(g5);
+      CORR(g0);
+      HAIRPIN(g0);
+      CORR(g0g5);
+      HAIRPIN(g0g5);
+      CORR(g1);
+      HAIRPIN(g1);
+      CORR(g2);
+      HAIRPIN(g2);
+      CORR(g3);
+      HAIRPIN(g3);
+      CORR(g0g1);
+      HAIRPIN(g0g1);
+      CORR(g0g2);
+      HAIRPIN(g0g2);
+      CORR(g0g3);
+      HAIRPIN(g0g3);
+      CORR(g5g1);
+      HAIRPIN(g5g1);
+      CORR(g5g2);
+      HAIRPIN(g5g2);
+      CORR(g5g3);
+      HAIRPIN(g5g3);
+      CORR(g0g5g1);
+      HAIRPIN(g0g5g1);
+      CORR(g0g5g2);
+      HAIRPIN(g0g5g2);
+      CORR(g0g5g3);
+      HAIRPIN(g0g5g3);
+      CORR(g5_g0g5_re);
+      CORR(g5_g0g5_im);
+      
+    }
+
+    if(list==NULL) break;
+  }
+
+  if(list!=NULL) fclose(list);
+
+  ata_qprop_dublin_trunc_free();
+
+  free_spinor_field(pta_qprop[0]);
+  free(pta_qprop);
+
+  for (i=0; i<nm; ++i) {
+    free(ata_qprop[0][i]);
+    free(ata_qprop[1][i]);
+  }
+  free(ata_qprop[0]);
+  free(ata_qprop[1]);
+
+  free(tricorr);
+  free(haircorr);
+
+  free(ctmp[0]);
+  free(ctmp[1]);
+  free(ctmp[2]);
+
+  free_spinor_field(test);
+
+  free_gfield(u_gauge);
+#ifndef REPR_FUNDAMENTAL
+  free_gfield_f(u_gauge_f);
+#endif
+
+  return 0;
+}
+

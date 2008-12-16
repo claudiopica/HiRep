@@ -30,5 +30,7 @@ void random_suNg(suNg *u);
 void random_u(suNg_field *gf);
 void unit_u(suNg_field *gf);
 
+void rz2_init(int seed);
+void ranz2(double r[],int n);
 
 #endif
