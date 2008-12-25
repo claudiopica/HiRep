@@ -185,6 +185,8 @@ void read_gauge_field_eolexi(char filename[])
   start_gf_sendrecv(u_gauge);
   complete_gf_sendrecv(u_gauge);
 
+  free(eolexi_field);
+
   lprintf("IO",0,"Configuration [%s] read\n",filename);
 
 }
