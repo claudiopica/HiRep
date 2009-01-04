@@ -29,7 +29,7 @@
 #include "logger.h"
 
 
-int nev=0,nevt=0,ord=1,trnc=5,gns=100,gnsh=3,gnsc=20,dil=0,dilh=3,dilc=0;
+int nev=0,nevt=0,ord=-1,trnc=3,gns=1,gnsc=1,dil=3;
 
 float beta;
 
@@ -293,7 +293,7 @@ int main(int argc,char *argv[]) {
 
   test=alloc_spinor_field_f(1,&glattice);
 
-  ata_qprop_dublin_trunc_init(nm,m,nev,nevt,ord,trnc,gns,gnsh,gnsc,dil,dilh,dilc);
+  ata_qprop_dublin_trunc_init(nm,m,nev,nevt,ord,trnc,gns,gnsc,dil);
 
   i=0;
 

@@ -337,6 +337,39 @@ void Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
 }
 
 
+/* Even/Odd preconditioned dirac operator
+ * this function takes 2 spinors defined on the odd lattice
+ * Dphi in = (4+m0)^2*in - D_OE D_EO in
+ *
+ */
+void Dphi_oepre(double m0, spinor_field *out, spinor_field *in)
+{
+  double rho;
+  
+  error((in==NULL)||(out==NULL),1,"Dphi_oepre [Dphi.c]",
+	"Attempt to access unallocated memory space");
+  
+  error(in==out,1,"Dphi_oepre [Dphi.c]",
+	"Input and output fields must be different");
+  
+#ifdef CHECK_SPINOR_MATCHING
+  error(out->type!=&glat_odd || in->type!=&glat_odd,1,"Dphi_oepre " __FILE__, "Spinors are not defined on odd lattice!");
+#endif /* CHECK_SPINOR_MATCHING */
+
+  /* alloc memory for temporary spinor field */
+  if (init) { init_Dirac(); init=0; }
+  
+  Dphi_(etmp, in);
+  Dphi_(out, etmp);
+  
+  rho=4.0+m0;
+  rho*=-rho; /* this minus sign is taken into account below */
+  
+  spinor_field_mul_add_assign_f(out,rho,in);
+  spinor_field_minus_f(out,out);
+}
+
+
 
 void g5Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
 {

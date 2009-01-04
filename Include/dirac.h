@@ -22,6 +22,7 @@ unsigned long int getMVM_flt();
 
 /* Even/Odd preconditioned matrix */
 void Dphi_eopre(double m0, spinor_field *out, spinor_field *in);
+void Dphi_oepre(double m0, spinor_field *out, spinor_field *in);
 void g5Dphi_eopre(double m0, spinor_field *out, spinor_field *in);
 void g5Dphi_eopre_sq(double m0, spinor_field *out, spinor_field *in);
 

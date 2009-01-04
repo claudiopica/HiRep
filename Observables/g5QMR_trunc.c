@@ -95,7 +95,13 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, int trunc_iter, spin
   cgiter = 0;
   notconverged=par->n;
 
-  spinor_field_copy_f(p2, in); /* trial solution = 0 */
+  /* trial solution = 0 */
+
+/*  NOT OK -> spinor_field_copy_f(p2, in);     */
+/*  SLOW?  -> spinor_field_mul_f(p2, 1.0, in); */ 
+  spinor_field_zero_f(p2);
+  spinor_field_add_assign_f(p2, in);
+
   innorm2=spinor_field_sqnorm_f(in);
   if(par->n==1) { /* in this case is not a multishift and we use as starting vector out[0] */
     M(Mp,&out[0]);
@@ -206,12 +212,14 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, int trunc_iter, spin
 
     if ((cgiter==trunc_iter) && (!truncated)){
       lprintf("INVERTER",40,"g5QMR: Saving truncation at iteration %d\n",cgiter);
-      for (i=0; i<(par->n); ++i)
-	spinor_field_copy_f(&out_trunc[i],&out[i]);
+      for (i=0; i<(par->n); ++i) {
+	/* NOT OK -> spinor_field_copy_f(&out_trunc[i],&out[i]); */
+	/* SLOW?  -> spinor_field_mul_f(&out_trunc[i], 1.0, &out[i]); */
+	spinor_field_zero_f(&out_trunc[i]);
+	spinor_field_add_assign_f(&out_trunc[i], &out[i]);
+      }
       truncated = 1;
     }
-
-
 
 #ifndef NDEBUG
     if(cgiter%100==0){
