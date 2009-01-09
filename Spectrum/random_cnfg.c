@@ -52,6 +52,7 @@ void read_cmdline(int argc, char* argv[]) {
 int main(int argc,char *argv[]) {
   char cnfg_filename[256];
   char tmp[256];
+  double plaq;
 
   /* setup process id and communications */
   setup_process(&argc,&argv);
@@ -100,9 +101,24 @@ int main(int argc,char *argv[]) {
 #endif
   random_u(u_gauge);
 
+  plaq=avr_plaquette();
+  lprintf("IO",0,"Configuration generated.  Plaquette=%e\n",plaq);
+
+  if(PID==0) {
+    int i,j;
+    int ix=ipt(0,0,0,0);
+    lprintf("IO",20,"x=(0,0,0,0) mu=0 pu_gauge =\n");
+    for(i=0; i<NG; i++) {
+      lprintf("IO",20,"[ ");
+      for(j=0; j<NG; j++)
+        lprintf("IO",20,"(%.2f , %.2f) ",pu_gauge(ix,0)->c[i*NG+j].re,pu_gauge(ix,0)->c[i*NG+j].im);
+      lprintf("IO",20,"]\n");
+    }
+  }
+
   sprintf(cnfg_filename,"%dx%dx%dx%dNc%d",GLB_T,GLB_X,GLB_Y,GLB_Z,NG);
-/*  write_gauge_field_eolexi(cnfg_filename);*/
-  write_gauge_field(cnfg_filename);
+  write_gauge_field_eolexi(cnfg_filename);
+/*  write_gauge_field(cnfg_filename);*/
 
 	free_gfield(u_gauge);
 #ifndef REPR_FUNDAMENTAL

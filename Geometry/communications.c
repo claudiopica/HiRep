@@ -95,6 +95,7 @@ void bcast(double *d, int n) {
 }
 
 /* functions for filling sending buffer */
+#ifdef WITH_MPI
 static void sync_gauge_field(suNg_field *gf) {
   int i;
   geometry_descriptor *gd=gf->type;
@@ -156,6 +157,7 @@ static void sync_spinor_field_flt(spinor_field_flt *p) {
        */
   }
 }
+#endif /* WITH_MPI */
 
 /* This variable contains the information of the current status of communications
  * Values:

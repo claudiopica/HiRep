@@ -13,6 +13,7 @@
 #include "logger.h"
 #include "communications.h"
 #include "moreio.h"
+#include "observables.h"
 
 
 static int index_eolexi(int x0,int x1,int x2,int x3)
@@ -79,20 +80,20 @@ void write_gauge_field_eolexi(char filename[])
     ix_eolexi=index_eolexi(g[0],g[1],g[2],g[3]);
     ix_mpieo=ipt(c[0],c[1],c[2],c[3]);
 
-    if(pid == 0) {
+    if(pid==0) {
       for(mu=0; mu<4;mu++)
-        eolexi_field[4*ix_eolexi+mu]=*pu_gauge(ipt(c[0],c[1],c[2],c[3]),mu);
+        eolexi_field[4*ix_eolexi+mu]=*pu_gauge(ix_mpieo,mu);
     }
 
 #ifdef WITH_MPI
     MPI_Barrier(MPI_COMM_WORLD); 
 
-    if(pid != 0) {
+    if(pid!=0) {
 
       /* send buffer */
-      if (PID==pid) {
+      if(PID==pid) {
 
-        mpiret=MPI_Send(pu_gauge(ipt(c[0],c[1],c[2],c[3]),0), 2*4*NG*NG, MPI_DOUBLE, pid, 999, MPI_COMM_WORLD);
+        mpiret=MPI_Send(pu_gauge(ix_mpieo,0), 2*4*NG*NG, MPI_DOUBLE, pid, 999, MPI_COMM_WORLD);
 #ifndef NDEBUG
         if (mpiret != MPI_SUCCESS) {
           char mesg[MPI_MAX_ERROR_STRING];
@@ -135,7 +136,10 @@ void write_gauge_field_eolexi(char filename[])
         1,"write_gauge_field_eolexi",
         "Failed to write gauge field to file");
     fclose(fp);
+    free(eolexi_field);
   }
+
+  lprintf("IO",0,"Configuration [%s] saved\n",filename);
 }
 
 
@@ -146,6 +150,7 @@ void read_gauge_field_eolexi(char filename[])
   int g[4], c[4];
   int mu;
   int ix_eolexi, ix_mpieo;
+  double plaq;
  
   suNg *eolexi_field = malloc(sizeof(suNg)*4*GLB_T*GLB_X*GLB_Y*GLB_Z);
 
@@ -185,9 +190,23 @@ void read_gauge_field_eolexi(char filename[])
   start_gf_sendrecv(u_gauge);
   complete_gf_sendrecv(u_gauge);
 
-  free(eolexi_field);
+  plaq=avr_plaquette();
+  lprintf("IO",0,"Configuration [%s] read.  Plaquette=%e\n",filename,plaq);
 
-  lprintf("IO",0,"Configuration [%s] read\n",filename);
+  if(PID==0) {
+    int i,j;
+    int ix=ipt(0,0,0,0);
+    for(mu=0;mu<4;mu++) {
+      lprintf("IO",20,"x=(0,0,0,0) mu=%d pu_gauge =\n",mu);
+      for(i=0; i<NG; i++) {
+        lprintf("IO",20,"[ ");
+        for(j=0; j<NG; j++)
+          lprintf("IO",20,"(%.2f , %.2f) ",pu_gauge(ix,mu)->c[i*NG+j].re,pu_gauge(ix,mu)->c[i*NG+j].im);
+        lprintf("IO",20,"]\n");
+      }
+    }
+    free(eolexi_field);
+  }
 
 }
 

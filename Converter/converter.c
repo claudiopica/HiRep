@@ -40,13 +40,14 @@
 typedef struct _format_type {
   char name[256];
   void (*read)(char*);
+  void (*write)(char*);
 } format_type;
 
 int nformats=3;
 format_type format[3] = {
-  { .name="eolexi" , .read=read_gauge_field_eolexi },
-  { .name="henty" ,  .read=read_gauge_field_henty },
-  { .name="mpieo" ,  .read=read_gauge_field }
+  { .name="eolexi" , .read=read_gauge_field_eolexi , .write=write_gauge_field_eolexi },
+  { .name="henty" ,  .read=read_gauge_field_henty , .write=NULL },
+  { .name="mpieo" ,  .read=read_gauge_field , .write=write_gauge_field }
 };
 
 typedef struct _filename_type {
@@ -65,7 +66,8 @@ typedef struct _filename_type {
 filename_type input_filename;
 char output_filename[256];
 format_type* input_format;
-
+format_type* output_format;
+int swapendian=false;
 
 
 int parse_cnfg_filename(char* filename, filename_type* fn) {
@@ -129,17 +131,20 @@ int parse_cnfg_filename(char* filename, filename_type* fn) {
 
 void read_cmdline(int argc, char* argv[]) {
   int i;
-  int ai=0, ao=0, af=0, av=0;
+  int ai=0, ao=0, aif=0, aof=0, ase=0, av=0;
+  char def[256]="mpieo";
 
   for (i=1;i<argc;i++) {
-    if (strcmp(argv[i],"-i")==0) ai=i+1;
-    else if (strcmp(argv[i],"-o")==0) ao=i+1;
-    else if (strcmp(argv[i],"-f")==0) af=i+1;
-    else if (strcmp(argv[i],"-v")==0) av=i+1;
+    if (strcmp(argv[i],"-i")==0) ai=(i+1<argc)?i+1:0;
+    else if (strcmp(argv[i],"-o")==0) ao=(i+1<argc)?i+1:0;
+    else if (strcmp(argv[i],"-v")==0) av=(i+1<argc)?i+1:0;
+    else if (strcmp(argv[i],"--swapendian")==0) ase=i;
   }
+  if(ai+1<argc) if(argv[ai+1][0]!='-') aif=ai+1;
+  if(ao+1<argc) if(argv[ao+1][0]!='-') aof=ao+1;
 
-  error(ao==0 || ai==0 || af==0,1,"parse_cmdline [converter.c]",
-      "Syntax: converter -f <format input file> -i <input file> -o <output file> [-v <volume>]");
+  error(ao==0 || ai==0 || aif==0,1,"parse_cmdline [converter.c]",
+      "Syntax: converter -i <input file> <input format> -o <output file> [<output format>] [-v <volume>] [--swapendian]");
 
   strcpy(output_filename,argv[ao]);
   
@@ -163,16 +168,37 @@ void read_cmdline(int argc, char* argv[]) {
   
   input_format=NULL;
   for(i=0; i<nformats; i++) {
-    if(strcmp(argv[af],format[i].name)==0) {
+    if(strcmp(argv[aif],format[i].name)==0) {
       input_format = &format[i];
       break;
     }
   }
-
   error(input_format==NULL,1,"parse_cmdline [converter.c]",
-      "Invalid format");
-}
+      "Invalid input format (eolexi, henty, mpieo)");
 
+  output_format=NULL;
+  if(aof!=0) {
+    for(i=0; i<nformats; i++) {
+      if(strcmp(argv[aof],format[i].name)==0) {
+        output_format = &format[i];
+        break;
+      }
+    }
+  } else {
+    for(i=0; i<nformats; i++) {
+      if(strcmp(def,format[i].name)==0) {
+        output_format = &format[i];
+        break;
+      }
+    }
+  }
+  error(output_format==NULL,1,"parse_cmdline [converter.c]",
+      "Invalid output format (eolexi, henty, mpieo)");
+  error(output_format->write==NULL,1,"parse_cmdline [converter.c]",
+      "Output format not yet available");
+
+  if(ase!=0) swapendian=true;
+}
 
 int main(int argc,char *argv[]) {
 
@@ -182,7 +208,7 @@ int main(int argc,char *argv[]) {
   setup_process(&argc,&argv);
 
   /* logger setup */
-  logger_setlevel(0,1000);
+  logger_setlevel(0,10);
 
   /* setup communication geometry */
   if (geometry_init() == 1) {
@@ -198,7 +224,8 @@ int main(int argc,char *argv[]) {
   u_gauge=alloc_gfield(&glattice);
 
   input_format->read(input_filename.string);
-  write_gauge_field(output_filename);
+  if(swapendian) gaugefield_swapendian();
+  output_format->write(output_filename);
 
   free_gfield(u_gauge);
 

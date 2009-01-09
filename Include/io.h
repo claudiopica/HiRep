@@ -10,6 +10,9 @@
 void read_gauge_field(char filename[]);
 void write_gauge_field(char filename[]);
 
+void gaugefield_swapendian();
+void gaugefield_swapendian_auto();
+
 void write_ranlxd_state(char filename[]);
 void read_ranlxd_state(char filename[]);
 
