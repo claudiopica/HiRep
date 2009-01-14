@@ -28,14 +28,16 @@
 #include "utils.h"
 #include "logger.h"
 
+#include "cinfo.c"
 
 
 /* Mesons parameters */
 typedef struct _input_mesons {
   char mstring[256];
+  double precision;
 
   /* for the reading function */
-  input_record_t read[2];
+  input_record_t read[3];
 
 } input_mesons;
 
@@ -43,6 +45,7 @@ typedef struct _input_mesons {
 { \
   .read={\
     {"quark quenched masses", "mes:masses = %s", STRING_T, (varname).mstring},\
+    {"inverter precision", "mes:precision = %lf", DOUBLE_T, &(varname).precision},\
     {NULL, NULL, 0, NULL}\
   }\
 }
@@ -107,7 +110,7 @@ int parse_cnfg_filename(char* filename, filename_t* fn) {
 
 
 void read_cmdline(int argc, char* argv[]) {
-  int i, ai=0, ao=0, ac=0, al=0;
+  int i, ai=0, ao=0, ac=0, al=0, am=0;
   FILE *list=NULL;
 
   for (i=1;i<argc;i++) {
@@ -115,13 +118,19 @@ void read_cmdline(int argc, char* argv[]) {
     else if (strcmp(argv[i],"-o")==0) ao=i+1;
     else if (strcmp(argv[i],"-c")==0) ac=i+1;
     else if (strcmp(argv[i],"-l")==0) al=i+1;
+    else if (strcmp(argv[i],"-m")==0) am=i;
+  }
+
+  if (am != 0) {
+    print_compiling_info();
+    exit(0);
   }
 
   if (ao!=0) strcpy(output_filename,argv[ao]);
   if (ai!=0) strcpy(input_filename,argv[ai]);
 
   error((ac==0 && al==0) || (ac!=0 && al!=0),1,"parse_cmdline [mk_mesons.c]",
-      "Syntax: mk_mesons { -c <config file> | -l <list file> } [-i <input file>] [-o <output file>]");
+      "Syntax: mk_mesons { -c <config file> | -l <list file> } [-i <input file>] [-o <output file>] [-m]");
 
   if(ac != 0) {
     strcpy(cnfg_filename,argv[ac]);
@@ -161,6 +170,7 @@ int main(int argc,char *argv[]) {
   logger_setlevel(0,30);
   sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
 
+  lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS); 
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
   lprintf("MAIN",0,"input file [%s]\n",input_filename); 
   lprintf("MAIN",0,"output file [%s]\n",output_filename); 
@@ -228,6 +238,7 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
   lprintf("MAIN",0,"global size is %dx%dx%dx%d\n",GLB_T,GLB_X,GLB_Y,GLB_Z);
   lprintf("MAIN",0,"proc grid is %dx%dx%dx%d\n",NP_T,NP_X,NP_Y,NP_Z);
+  lprintf("MAIN",0,"Fermion boundary conditions: %.2f,%.2f,%.2f,%.2f\n",bc[0],bc[1],bc[2],bc[3]);
 
   /* setup lattice geometry */
   geometry_mpi_eo();

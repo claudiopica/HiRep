@@ -52,7 +52,7 @@ MODDIR := Converter
 MODS := archive_eolexi archive_henty
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
-mk_mesons: mk_mesons.o $(MOD_OBJS)
+mk_mesons: cinfo.c mk_mesons.o $(MOD_OBJS)
 	echo -n Linking [$@]... 
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ mk_mesons.o $(MOD_OBJS) &&\
 	echo " done." || echo " failed."

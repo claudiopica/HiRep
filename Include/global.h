@@ -108,6 +108,42 @@ GLB_VAR(suNf_field_flt,*u_gauge_f_flt,=NULL);
 #define pu_gauge_f_flt(ix,mu) ((u_gauge_f_flt->ptr)+coord_to_index(ix,mu))
 
 
+/* Boundary conditions */
+#ifdef ANTIPERIODIC_BC_T
+#define BC_T 1.
+#else
+#define BC_T 0.
+#endif
+
+#ifdef ANTIPERIODIC_BC_X
+#define BC_X 1.
+#else
+#define BC_X 0.
+#endif
+
+#ifdef ANTIPERIODIC_BC_Y
+#define BC_Y 1.
+#else
+#define BC_Y 0.
+#endif
+
+#ifdef ANTIPERIODIC_BC_Z
+#define BC_Z 1.
+#else
+#define BC_Z 0.
+#endif
+
+#ifdef MAIN_PROGRAM
+double bc[4]={BC_T,BC_X,BC_Y,BC_Z};
+#else
+extern double bc[4];
+#endif
+
+#undef BC_T
+#undef BC_x
+#undef BC_Y
+#undef BC_Z
+
 /* input parameters */
 #include "input_par.h"
 GLB_VAR(input_glb,glb_var,=init_input_glb(glb_var));

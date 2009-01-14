@@ -25,8 +25,27 @@
 #include "logger.h"
 #include "rhmc_utils.h"
 
+#include "cinfo.c"
+
+
 /* flow control variable */
 rhmc_flow flow=init_rhmc_flow(flow);
+
+
+void read_cmdline(int argc, char* argv[]) {
+  int i, am=0;
+
+  for (i=1;i<argc;i++) {
+    if (strcmp(argv[i],"-m")==0) am=i;
+  }
+
+  if (am != 0) {
+    print_compiling_info();
+    exit(0);
+  }
+
+}
+
 
 int main(int argc,char *argv[])
 {
@@ -46,6 +65,7 @@ int main(int argc,char *argv[])
     sprintf(sbuf,"err_%d",PID); freopen(sbuf,"w",stderr);
   }
 
+  lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS); 
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
 
   /* read input file */
@@ -63,6 +83,7 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
   lprintf("MAIN",0,"global size is %dx%dx%dx%d\n",GLB_T,GLB_X,GLB_Y,GLB_Z);
   lprintf("MAIN",0,"proc grid is %dx%dx%dx%d\n",NP_T,NP_X,NP_Y,NP_Z);
+  lprintf("MAIN",0,"Fermion boundary conditions: %.2f,%.2f,%.2f,%.2f\n",bc[0],bc[1],bc[2],bc[3]);
 
   /* setup lattice geometry */
   geometry_mpi_eo();

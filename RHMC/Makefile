@@ -51,7 +51,7 @@ MODDIR := RHMC
 MODS := rhmc_utils
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
-rhmc: $(OBJS) $(MOD_OBJS)
+rhmc: cinfo.c $(OBJS) $(MOD_OBJS)
 	echo -n Linking [$@]... 
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(MOD_OBJS) &&\
 	echo " done." || echo " failed."

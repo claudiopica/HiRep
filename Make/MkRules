@@ -72,3 +72,6 @@ clean:: $(patsubst %,clean-%,$(SUBDIRS))
 	rm -f *.o *.rpo *~ *.il *.dyn *.ii *.s .*.d
 	echo " done."
 
+cinfo.c: $(MKDIR)/MkFlags $(MKDIR)/MkRules $(MKDIR)/Utils/cinfo.sh
+	$(MKDIR)/Utils/cinfo.sh $(MKDIR) $(TOPDIR) $(MACRO)
+

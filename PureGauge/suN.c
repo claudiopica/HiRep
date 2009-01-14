@@ -28,19 +28,26 @@
 #include "representation.h"
 #include "suN_utils.h"
 
+#include "cinfo.c"
+
 pg_flow flow=init_pg_flow(flow);
 char input_filename[256] = "input_file";
 char output_filename[256] = "puregauge.out";
 char ranxld_filename[256] = "";
 
 void read_cmdline(int argc, char* argv[]) {
-  int i, ai=0, ao=0, ar=0;
-  FILE *list=NULL;
+  int i, ai=0, ao=0, ar=0, am=0;
 
   for (i=1;i<argc;i++) {
     if (strcmp(argv[i],"-i")==0) ai=i+1;
     else if (strcmp(argv[i],"-o")==0) ao=i+1;
     else if (strcmp(argv[i],"-r")==0) ar=i+1;
+    else if (strcmp(argv[i],"-m")==0) am=i;
+  }
+
+  if (am != 0) {
+    print_compiling_info();
+    exit(0);
   }
 
   if (ao!=0) strcpy(output_filename,argv[ao]);
@@ -65,11 +72,12 @@ int main(int argc,char *argv[])
   logger_setlevel(0,40);
   sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
 
+  lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS); 
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
 
   /* read input file */
   read_input(glb_var.read,input_filename);
-  FILE *fp;
+  FILE *fp=NULL;
   if(strlen(ranxld_filename)==0 || (fp=fopen(ranxld_filename,"rb"))==NULL) {
     lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed+PID);
     rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
