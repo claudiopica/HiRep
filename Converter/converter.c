@@ -29,6 +29,8 @@
 #include "logger.h"
 #include "moreio.h"
 
+#include "cinfo.c"
+
 
 #ifdef WITH_MPI
 #error Please compile without MPI!
@@ -88,7 +90,7 @@ int parse_cnfg_filename(char* filename, filename_type* fn) {
   fn->mass_f=false;
   fn->n_f=false;
 
-  strcpy(fn->string,basename);
+  strcpy(fn->string,filename);
   
   
   hm=sscanf(basename,"%*[^_]_%dx%dx%dx%d%*[Nn]c%dr%[A-Z]%*[Nn]f%db%lfm%lfn%d",
@@ -131,7 +133,7 @@ int parse_cnfg_filename(char* filename, filename_type* fn) {
 
 void read_cmdline(int argc, char* argv[]) {
   int i;
-  int ai=0, ao=0, aif=0, aof=0, ase=0, av=0;
+  int ai=0, ao=0, aif=0, aof=0, ase=0, av=0, am=0;
   char def[256]="mpieo";
 
   for (i=1;i<argc;i++) {
@@ -139,12 +141,18 @@ void read_cmdline(int argc, char* argv[]) {
     else if (strcmp(argv[i],"-o")==0) ao=(i+1<argc)?i+1:0;
     else if (strcmp(argv[i],"-v")==0) av=(i+1<argc)?i+1:0;
     else if (strcmp(argv[i],"--swapendian")==0) ase=i;
+    else if (strcmp(argv[i],"-m")==0) am=i;
   }
   if(ai+1<argc) if(argv[ai+1][0]!='-') aif=ai+1;
   if(ao+1<argc) if(argv[ao+1][0]!='-') aof=ao+1;
 
+  if (am != 0) {
+    print_compiling_info();
+    exit(0);
+  }
+
   error(ao==0 || ai==0 || aif==0,1,"parse_cmdline [converter.c]",
-      "Syntax: converter -i <input file> <input format> -o <output file> [<output format>] [-v <volume>] [--swapendian]");
+      "Syntax: converter -i <input file> <input format> -o <output file> [<output format>] [-v <volume>] [--swapendian] [-m]");
 
   strcpy(output_filename,argv[ao]);
   

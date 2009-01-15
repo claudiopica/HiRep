@@ -11,3 +11,4 @@ NP_Z = 1
 level = 1  seed = 12345
 
 mes:masses = 2
+mes:precision = 1e-20

@@ -89,13 +89,22 @@ int parse_cnfg_filename(char* filename, filename_t* fn) {
 #elif defined REPR_ADJOINT
 #define repr_name "ADJ"
 #endif
-  hm=sscanf(basename,"%*[^_]_%dx%dx%dx%dnc%dr" repr_name "nf%db%lfm%lfn%d",
+  hm=sscanf(basename,"%*[^_]_%dx%dx%dx%d%*[Nn]c%dr" repr_name "%*[Nn]f%db%lfm%lfn%d",
       &(fn->t),&(fn->x),&(fn->y),&(fn->z),&(fn->nc),&(fn->nf),&(fn->b),&(fn->m),&(fn->n));
   if(hm==9) {
     fn->type=DYNAMICAL_CNFG;
     return DYNAMICAL_CNFG;
   }
 #undef repr_name
+
+  double kappa;
+  hm=sscanf(basename,"%dx%dx%dx%d%*[Nn]c%d%*[Nn]f%db%lfk%lfn%d",
+      &(fn->t),&(fn->x),&(fn->y),&(fn->z),&(fn->nc),&(fn->nf),&(fn->b),&kappa,&(fn->n));
+  if(hm==9) {
+    fn->m = .5/kappa-4.;
+    fn->type=DYNAMICAL_CNFG;
+    return DYNAMICAL_CNFG;
+  }
 
   hm=sscanf(basename,"%dx%dx%dx%d%*[Nn]c%db%lfn%d",
       &(fn->t),&(fn->x),&(fn->y),&(fn->z),&(fn->nc),&(fn->b),&(fn->n));
@@ -256,6 +265,7 @@ int main(int argc,char *argv[]) {
   u_gauge_f=alloc_gfield_f(&glattice);
 #endif
 
+  lprintf("MAIN",0,"Inverter precision = %e\n",mes_var.precision);
   for(k=0;k<nm;k++)
     lprintf("MAIN",0,"Mass[%d] = %f\n",k,m[k]);
 
@@ -290,7 +300,7 @@ int main(int argc,char *argv[]) {
 
     full_plaquette();
 
-    pta_qprop_QMR_eo(pta_qprop, nm, m, 1e-9);
+    pta_qprop_QMR_eo(pta_qprop, nm, m, mes_var.precision);
 
     for (k=0;k<nm;++k){
 
