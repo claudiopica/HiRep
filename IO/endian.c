@@ -39,6 +39,7 @@ void swapendian64(double* fl) {
 void gaugefield_swapendian() {
   _DECLARE_INT_ITERATOR(ix);
   int a;
+  double plaq;
 
   if(sizeof(double)*CHAR_BIT==32) {
     _MASTER_FOR(&glattice,ix) {
@@ -65,6 +66,9 @@ void gaugefield_swapendian() {
   /* start sendrecv of global gauge field */
   start_gf_sendrecv(u_gauge);
   complete_gf_sendrecv(u_gauge);
+
+  plaq=avr_plaquette();
+  lprintf("IO",0,"Swap endian.  New plaquette=%e\n",plaq);
 }
 
 void gaugefield_swapendian_auto() {

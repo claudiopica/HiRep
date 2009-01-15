@@ -100,7 +100,7 @@ void write_gauge_field_eolexi(char filename[])
           int mesglen;
           MPI_Error_string(mpiret,mesg,&mesglen);
           lprintf("MPI",0,"ERROR: %s\n",mesg);
-          error(1,1,"read_gauge_field_eolexi " __FILE__,"Cannot send u_gauge buffer");
+          error(1,1,"write_gauge_field_eolexi " __FILE__,"Cannot send u_gauge buffer");
         }
 #endif
       }
