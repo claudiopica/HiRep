@@ -28,10 +28,29 @@ void full_plaquette();
 void pta_qprop_QMR_eo(spinor_field **pta_qprop, int nm, double *m, double acc);
 void pta_qprop_QMR(spinor_field **pta_qprop, int nm, double *m, double acc);
 void pta_qprop_MINRES(spinor_field **pta_qprop, int nm, double *m, double acc);
-void traced_ata_qprop_dublin_trunc(complex** ev_prop, complex*** prop, int n_points);
-void ata_qprop_dublin_trunc_init(int nm, double *mptr, int pnev, int pnevt, int ord, int trnc, int pgns, int pgnsc, int pdil);
-void ata_qprop_dublin_trunc_modify_par(int ord, int trnc, int pgns, int pgnsc, int pdil);
-void ata_qprop_dublin_trunc_free();
+
+
+typedef enum {NO_DILUTION, TIME_DILUTION, TIME_SPIN_DILUTION, EXACT} dilution_mode;
+typedef struct _ata_qprop_pars {
+  int n_masses;
+  double mass[256];
+  int n_eigenvalues;
+  int eva_nevt;
+  double eva_omega1;
+  double eva_omega2;
+  int eva_imax;
+  int eva_kmax;
+  int hopping_order;
+  int n_truncation_steps;
+  int n_sources_truncation;
+  int n_sources_correction;
+  dilution_mode dilution;
+  double inverter_precision;
+} ata_qprop_pars;
+
+void traced_ata_qprop(complex*** prop, int n_points);
+void ata_qprop_init(ata_qprop_pars* p);
+void ata_qprop_free();
 
 
 void id_correlator(double *out, spinor_field *qp);

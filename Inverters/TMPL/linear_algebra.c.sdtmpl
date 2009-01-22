@@ -72,6 +72,23 @@ double _FUNC(spinor_field_g5_prod_re)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE
    return res;
 }
 
+/* Im <g5*s1,s2> */
+double _FUNC(spinor_field_g5_prod_im)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
+{
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(s1), *_SPINOR_PTR(s2);
+   double prod,res=0.;
+   
+   _TWO_SPINORS_FOR(s1,s2,i) {
+		_spinor_g5_prod_im_f(prod,*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
+      res+=prod;
+   }
+#ifdef WITH_MPI
+	global_sum(&res,1);
+#endif
+   return res;
+}
+
 /* Re <s1,s1> */
 double _FUNC(spinor_field_sqnorm)(_SPINOR_FIELD_TYPE *s1)
 {

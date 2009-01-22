@@ -282,6 +282,7 @@ write_spinor_prod_re();
 write_spinor_prod_im();
 write_spinor_prod_assign();
 write_spinor_g5_prod_re();
+write_spinor_g5_prod_im();
 write_spinor_project();
 
 # COMMENTATO
@@ -2256,6 +2257,20 @@ sub write_spinor_g5_prod_re {
   }
   for (my $k=2; $k<4; $k++){
     print "      _vector_prod_re_${suff}(_tmp,(r).$cname\[$k\],(s).$cname\[$k\]); (k)-=_tmp;\\\n";
+  }
+	print "   }((void)0) \n\n";
+}
+
+sub write_spinor_g5_prod_im {
+  print "/* k=Imaginary part of the scalar product (g5*r)*s (r,s spinors) */\n";
+  print "#define _spinor_g5_prod_im_${suff}(k,r,s) \\\n";
+	print "   { \\\n";
+	print "      double _tmp; (k)=0.; \\\n";
+  for (my $k=0; $k<2; $k++){
+    print "      _vector_prod_im_${suff}(_tmp,(r).$cname\[$k\],(s).$cname\[$k\]); (k)+=_tmp;\\\n";
+  }
+  for (my $k=2; $k<4; $k++){
+    print "      _vector_prod_im_${suff}(_tmp,(r).$cname\[$k\],(s).$cname\[$k\]); (k)-=_tmp;\\\n";
   }
 	print "   }((void)0) \n\n";
 }
