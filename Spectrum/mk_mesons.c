@@ -92,6 +92,8 @@ int parse_cnfg_filename(char* filename, filename_t* fn) {
   hm=sscanf(basename,"%*[^_]_%dx%dx%dx%d%*[Nn]c%dr" repr_name "%*[Nn]f%db%lfm%lfn%d",
       &(fn->t),&(fn->x),&(fn->y),&(fn->z),&(fn->nc),&(fn->nf),&(fn->b),&(fn->m),&(fn->n));
   if(hm==9) {
+    /* ATTENTIONE!!!!! Nel nome del file dopo m c'e' -massa e non massa !!!!! */
+    fn->m = -fn->m;
     fn->type=DYNAMICAL_CNFG;
     return DYNAMICAL_CNFG;
   }
