@@ -222,7 +222,7 @@ void Dphi_(spinor_field *out, spinor_field *in)
       
        /******************************** end of loop *********************************/
 
-       _spinor_mul_f(*r,-0.5f,*r);
+       _spinor_mul_f(*r,-0.5,*r);
 
      } /* SITE_FOR */
      if(_PIECE_INDEX(ix)==0) {

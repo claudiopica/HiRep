@@ -326,21 +326,6 @@ void read_gauge_field(char filename[])
   timeval_subtract(&etime,&end,&start);
   lprintf("IO",0,"Configuration [%s] read [%ld sec %ld usec] Plaquette=%e\n",filename,etime.tv_sec,etime.tv_usec,testplaq);
 
-  if(PID==0) {
-    int i,j;
-    int ix=ipt(0,0,0,0);
-    int mu;
-    for(mu=0;mu<4;mu++) {
-      lprintf("IO",20,"x=(0,0,0,0) mu=%d pu_gauge =\n",mu);
-      for(i=0; i<NG; i++) {
-        lprintf("IO",20,"[ ");
-        for(j=0; j<NG; j++)
-          lprintf("IO",20,"(%.2f , %.2f) ",pu_gauge(ix,mu)->c[i*NG+j].re,pu_gauge(ix,mu)->c[i*NG+j].im);
-        lprintf("IO",20,"]\n");
-      }
-    }
-  }
-
 }
 
 void write_ranlxd_state(char filename[]) 

@@ -1,3 +1,8 @@
+/***************************************************************************\
+ * Copyright (c) 2009, Claudio Pica                                          *   
+ * All rights reserved.                                                      * 
+ \***************************************************************************/
+
 /*******************************************************************************
 *
 * Computation of the mesonic spectrum
@@ -32,20 +37,31 @@
 
 
 /* Mesons parameters */
-typedef struct _input_mesons {
-  char mstring[256];
-  double precision;
+typedef struct _input_eigval {
+  /* EVA parameters */
+  int nevt; /* search space dimension */
+  int nev; /* number of accurate eigenvalues */
+  int kmax; /* max degree of polynomial */
+  int maxiter; /* max number of subiterations */
+  double omega1; /* absolute precision */
+  double omega2; /* relative precision */
+  char mstring[256]; /* for the quenched masses */
 
   /* for the reading function */
-  input_record_t read[3];
+  input_record_t read[8];
 
-} input_mesons;
+} input_eigval;
 
-#define init_input_mesons(varname) \
+#define init_input_eigval(varname) \
 { \
   .read={\
-    {"quark quenched masses", "mes:masses = %s", STRING_T, (varname).mstring},\
-    {"inverter precision", "mes:precision = %lf", DOUBLE_T, &(varname).precision},\
+    {"search space dimension", "eva:nevt = %d", INT_T, &(varname).nevt},\
+    {"number of accurate eigenvalues", "eva:nev = %d", INT_T, &(varname).nev},\
+    {"max degree of polynomial", "eva:kmax = %d", INT_T, &(varname).kmax},\
+    {"max number of subiterations", "eva:maxiter = %d", INT_T, &(varname).maxiter},\
+    {"absolute precision", "eva:omega1 = %lf", DOUBLE_T, &(varname).omega1},\
+    {"relative precision", "eva:omega2 = %lf", DOUBLE_T, &(varname).omega2},\
+    {"quark quenched masses", "eva:masses = %s", STRING_T, (varname).mstring},\
     {NULL, NULL, 0, NULL}\
   }\
 }
@@ -54,10 +70,10 @@ typedef struct _input_mesons {
 char cnfg_filename[256]="";
 char list_filename[256]="";
 char input_filename[256] = "input_file";
-char output_filename[256] = "mesons.out";
+char output_filename[256] = "eigval.out";
 enum { UNKNOWN_CNFG, DYNAMICAL_CNFG, QUENCHED_CNFG };
 
-input_mesons mes_var = init_input_mesons(mes_var);
+input_eigval eig_var = init_input_eigval(eig_var);
 
 
 typedef struct {
@@ -84,6 +100,8 @@ int parse_cnfg_filename(char* filename, filename_t* fn) {
 #define repr_name "FUN"
 #elif defined REPR_SYMMETRIC
 #define repr_name "SYM"
+  for(k=0;k<nm;k++)
+    lprintf("MAIN",0,"Mass[%d] = %f\n",k,m[k]);
 #elif defined REPR_ANTISYMMETRIC
 #define repr_name "ASY"
 #elif defined REPR_ADJOINT
@@ -139,17 +157,17 @@ void read_cmdline(int argc, char* argv[]) {
   if (ao!=0) strcpy(output_filename,argv[ao]);
   if (ai!=0) strcpy(input_filename,argv[ai]);
 
-  error((ac==0 && al==0) || (ac!=0 && al!=0),1,"parse_cmdline [mk_mesons.c]",
-      "Syntax: mk_mesons { -c <config file> | -l <list file> } [-i <input file>] [-o <output file>] [-m]");
+  error((ac==0 && al==0) || (ac!=0 && al!=0),1,"parse_cmdline [eigval.c]",
+      "Syntax: eigval { -c <config file> | -l <list file> } [-i <input file>] [-o <output file>] [-m]");
 
   if(ac != 0) {
     strcpy(cnfg_filename,argv[ac]);
     strcpy(list_filename,"");
   } else if(al != 0) {
     strcpy(list_filename,argv[al]);
-    error((list=fopen(list_filename,"r"))==NULL,1,"parse_cmdline [mk_mesons.c]" ,
+    error((list=fopen(list_filename,"r"))==NULL,1,"parse_cmdline [eigval.c]" ,
 	"Failed to open list file\n");
-    error(fscanf(list,"%s",cnfg_filename)==0,1,"parse_cmdline [mk_mesons.c]" ,
+    error(fscanf(list,"%s",cnfg_filename)==0,1,"parse_cmdline [eigval.c]" ,
 	"Empty list file\n");
     fclose(list);
   }
@@ -157,17 +175,61 @@ void read_cmdline(int argc, char* argv[]) {
 
 }
 
+double hevamass=0.;
+void HEVA(spinor_field *out, spinor_field *in){
+  g5Dphi_sq(hevamass, out, in);
+}
+
+/* use power method to find max eigvalue */
+int max_HEVA(double *max) {
+  double norm, oldmax, dt;
+  spinor_field *s1,*s2;
+  int count;
+
+  s1=alloc_spinor_field_f(2,&glattice);
+  s2=s1+1;
+
+  /* random spinor */
+  gaussian_spinor_field(s1);
+  norm=sqrt(spinor_field_sqnorm_f(s1));
+  spinor_field_mul_f(s1,1./norm,s1);
+  norm=1.;
+
+  dt=1.;
+
+  HEVA(s2,s1);
+
+  count=1;
+  do {
+    /* multiply vector by H2 */
+    ++count;
+
+    spinor_field_copy_f(s1,s2);
+
+    norm=sqrt(spinor_field_sqnorm_f(s1));
+    spinor_field_mul_f(s1,1./norm,s1);
+
+
+    oldmax=*max;
+    HEVA(s2,s1);
+    *max=spinor_field_prod_re_f(s1,s2);
+    
+  } while (fabs((*max-oldmax)/(*max))>1.e-3);
+
+  lprintf("MaxHEVA",10,"Max_eig = %1.8e [MVM = %d]\n",*max,count); 
+
+  free_spinor_field(s1);
+  
+  return count;
+}
 
 int main(int argc,char *argv[]) {
   int i,k,n;
   char tmp[256], *cptr;
   FILE* list;
-  spinor_field **pta_qprop=0;
-  double* tricorr;
   filename_t fpars;
   int nm;
   double m[256];
-  spinor_field *test;
 
   /* setup process id and communications */
   read_cmdline(argc, argv);
@@ -193,43 +255,18 @@ int main(int argc,char *argv[]) {
   /* read & broadcast parameters */
   parse_cnfg_filename(cnfg_filename,&fpars);
 
-/*
- * x Agostino: Serve veramente??
- * Claudio
-
-#define remove_parameter(NAME,PAR) \
-  { \
-    for(i=0;(PAR).read[i].name!=NULL;i++) { \
-      if(strcmp((PAR).read[i].name,#NAME)==0) { \
-	(PAR).read[i].descr=NULL; \
-	break; \
-      } \
-    } \
-  }
-
-  if(fpars.type==DYNAMICAL_CNFG || fpars.type==QUENCHED_CNFG) {
-    remove_parameter(GLB_T,glb_var);
-    remove_parameter(GLB_X,glb_var);
-    remove_parameter(GLB_Y,glb_var);
-    remove_parameter(GLB_Z,glb_var);
-  }
-  if(fpars.type==DYNAMICAL_CNFG) remove_parameter(quark quenched masses,mes_var);
-#undef remove_parameter
-*/
-
   read_input(glb_var.read,input_filename);
-  read_input(mes_var.read,input_filename);
+  read_input(eig_var.read,input_filename);
   GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
-  error(fpars.type==UNKNOWN_CNFG,1,"mk_mesons.c","Bad name for a configuration file");
-  error(fpars.nc!=NG,1,"mk_mesons.c","Bad NG");
-
+  error(fpars.type==UNKNOWN_CNFG,1,"eigval.c","Bad name for a configuration file");
+  error(fpars.nc!=NG,1,"eigval.c","Bad NG");
 
   nm=0;
   if(fpars.type==DYNAMICAL_CNFG) {
     nm=1;
     m[0] = fpars.m;
   } else if(fpars.type==QUENCHED_CNFG) {
-    strcpy(tmp,mes_var.mstring);
+    strcpy(tmp,eig_var.mstring);
     cptr = strtok(tmp, ";");
     nm=0;
     while(cptr != NULL) {
@@ -268,23 +305,21 @@ int main(int argc,char *argv[]) {
   u_gauge_f=alloc_gfield_f(&glattice);
 #endif
 
-  lprintf("MAIN",0,"Inverter precision = %e\n",mes_var.precision);
-  for(k=0;k<nm;k++)
-    lprintf("MAIN",0,"Mass[%d] = %f\n",k,m[k]);
 
-  tricorr=(double*)malloc(GLB_T*sizeof(double));
-  pta_qprop=(spinor_field**)malloc(sizeof(spinor_field*)*nm);
-  pta_qprop[0]=alloc_spinor_field_f(4*NF*nm,&glattice);
-  for(k=0;k<nm;++k)
-    pta_qprop[k]=pta_qprop[0]+4*NF*k;
+  lprintf("MAIN",0,"EVA Parameters:\n");
+  lprintf("MAIN",0,"search space dimension  (eva:nevt) = %d\n",eig_var.nevt);
+  lprintf("MAIN",0,"number of accurate eigenvalues (eva:nev) = %d\n",eig_var.nev);
+  lprintf("MAIN",0,"max degree of polynomial (eva:kmax) = %d\n",eig_var.kmax);
+  lprintf("MAIN",0,"max number of subiterations (eva:maxiter) = %d\n",eig_var.maxiter);
+  lprintf("MAIN",0,"absolute precision  (eva:omega1) = %e\n",eig_var.omega1);
+  lprintf("MAIN",0,"relative precision (eva:omega2) = %e\n",eig_var.omega2);
+
 
   list=NULL;
   if(strcmp(list_filename,"")!=0) {
-    error((list=fopen(list_filename,"r"))==NULL,1,"main [mk_mesons.c]" ,
+    error((list=fopen(list_filename,"r"))==NULL,1,"main [eigval.c]" ,
 	"Failed to open list file\n");
   }
-
-  test=alloc_spinor_field_f(1,&glattice);
 
   i=0;
   while(1) {
@@ -301,42 +336,49 @@ int main(int argc,char *argv[]) {
 
     lprintf("TEST",0,"<p> %1.6f\n",avr_plaquette());
 
-    full_plaquette();
-
-    pta_qprop_QMR_eo(pta_qprop, nm, m, mes_var.precision);
+    //full_plaquette();
 
     for (k=0;k<nm;++k){
 
+      /* EVA parameters */
+
+      double max, mupp;
+      double *d1;
+      int status,ie;
+      spinor_field *ev, *ws;
+      /* END of EVA parameters */
+      int MVM=0; /* counter for matrix-vector multiplications */
+
       lprintf("MAIN",0,"conf #%d mass=%2.6f \n",i,m[k]);
 
-#define CORR(name) \
-      name##_correlator(tricorr, pta_qprop[k]);\
-      lprintf("MAIN",0,"conf #%d mass=%2.6f TRIPLET " #name "= ",i,m[k]);\
-      for(n=0;n<GLB_T;++n) {\
-	lprintf("MAIN",0,"%e ",tricorr[n]);\
-      }\
-      lprintf("MAIN",0,"\n");\
-      fflush(stdout)
+      hevamass=m[k];
+      mupp=fabs(m[k]+4)+4;
+      mupp*=mupp;
 
-      CORR(id);
-      CORR(g5);
-      CORR(g0);
-      CORR(g0g5);
-      CORR(g1);
-      CORR(g2);
-      CORR(g3);
-      CORR(g0g1);
-      CORR(g0g2);
-      CORR(g0g3);
-      CORR(g5g1);
-      CORR(g5g2);
-      CORR(g5g3);
-      CORR(g0g5g1);
-      CORR(g0g5g2);
-      CORR(g0g5g3);
-      CORR(g5_g0g5_re);
-      CORR(g5_g0g5_im);
+      max_HEVA(&max);
+      lprintf("MAIN",0,"MAXCHECK: cnfg=%e  uppbound=%e diff=%e %s\n",max,mupp,mupp-max,(mupp-max)<0?"[FAILED]":"[OK]");
 
+      max*=1.1;
+
+      d1=malloc(sizeof(*d1)*eig_var.nevt);
+      ev=alloc_spinor_field_f((eig_var.nevt+2),&glattice);
+      ws=ev+eig_var.nevt;
+
+      ie=eva(eig_var.nev,eig_var.nevt,0,eig_var.kmax,eig_var.maxiter,max,eig_var.omega1,eig_var.omega2,&HEVA,ws,ev,d1,&status);
+      MVM+=status;
+      while (ie!=0) { /* if failed restart EVA */
+        lprintf("MAIN",0,"Restarting EVA!\n");
+        ie=eva(eig_var.nev,eig_var.nevt,2,eig_var.kmax,eig_var.maxiter,max,eig_var.omega1,eig_var.omega2,&HEVA,ws,ev,d1,&status);
+        MVM+=status;
+      }
+
+      lprintf("MAIN",0,"EVA MVM = %d\n",MVM);
+      for (n=0;n<eig_var.nev;++n) {
+        lprintf("RESULT",0,"Eig %d = %1.15e\n",n,d1[n]);
+      }
+
+      free(d1);
+      free_spinor_field(ev);
     }
 
     if(list==NULL) break;
@@ -344,9 +386,6 @@ int main(int argc,char *argv[]) {
 
   if(list!=NULL) fclose(list);
 
-  free_spinor_field(pta_qprop[0]);
-  free(pta_qprop);
-  free(tricorr);
 
   free_gfield(u_gauge);
 #ifndef REPR_FUNDAMENTAL
