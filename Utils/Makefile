@@ -1,6 +1,6 @@
 TOPDIR = ..
 
-SRCS = suN_utils.c suN_exp.c boundary_conditions.c time.c
+SRCS = suN_utils.c suN_exp.c boundary_conditions.c time.c single_double_utils.c
 
 # these are not yet modified 
 # single_double_utils.c

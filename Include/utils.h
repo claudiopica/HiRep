@@ -15,6 +15,7 @@
 #define UTILS_H
 
 #include "suN_types.h"
+#include "spinor_field.h"
 
 void ExpX(double dt, suNg_algebra_vector *h, suNg *u);
 void apply_bc();
@@ -28,8 +29,11 @@ void project_to_suNg_flt(suNg_flt *u);
 void assign_u2ud(void);
 void assign_ud2u(void);
 
-void assign_s2sd(int len, suNf_spinor *out, suNf_spinor_flt *in);
-void assign_sd2s(int len, suNf_spinor_flt *out, suNf_spinor *in);
+/* void assign_s2sd(int len, suNf_spinor *out, suNf_spinor_flt *in); */
+/* void assign_sd2s(int len, suNf_spinor_flt *out, suNf_spinor *in); */
+
+void assign_s2sd(spinor_field *out, spinor_field_flt *in);
+void assign_sd2s(spinor_field_flt *out, spinor_field *in);
 
 /* Timing */
 #include <sys/time.h>

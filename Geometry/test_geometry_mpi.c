@@ -1079,8 +1079,8 @@ void set_global_coordinates() {
 
 
 void test_communication_buffers(geometry_descriptor *gd) {
-  int test_q=true;
 #ifdef WITH_MPI
+  int test_q=true;
   int x, i, mpiret;
   MPI_Request *comm_req;
   int nreq=2*gd->nbuffers;

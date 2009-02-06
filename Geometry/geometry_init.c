@@ -73,12 +73,14 @@ void origin_coord(int *c) {
  * OUTPUTS:
  * PSIGN
  */
+#ifdef WITH_MPI
 static void compute_psign() {
   int c[4];
 
   origin_coord(c);
   PSIGN=(c[0]+c[1]+c[2]+c[3])&1;
 }
+#endif
 
 
 /* given the global coordinate of a site, this function returns the cartesian coordinates 
