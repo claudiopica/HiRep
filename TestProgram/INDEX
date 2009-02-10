@@ -22,6 +22,8 @@ check_inverters_3          Check of QMR multishift
 
 check_inverters_4          Check the eva module
 
+check_inverters_6          Check the single precision accelerated CG_mshift
+
 check_update_1		   Reversibility of the molecular dynamics (NEED TO BE FIXED THE READ FORM FILE)
 
 check13 	Check the mesons (both mesons.c and dublin_mesons.c) using a free field (STILL TO BE FIXED)

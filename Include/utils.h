@@ -28,6 +28,7 @@ void project_to_suNg_flt(suNg_flt *u);
 
 void assign_u2ud(void);
 void assign_ud2u(void);
+void assign_ud2u_f(void);
 
 /* void assign_s2sd(int len, suNf_spinor *out, suNf_spinor_flt *in); */
 /* void assign_sd2s(int len, suNf_spinor_flt *out, suNf_spinor *in); */

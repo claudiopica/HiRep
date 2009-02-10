@@ -88,6 +88,7 @@ typedef struct _scalar_field {
 #define _DECLARE_INT_ITERATOR(i) int i, _PIECE_INDEX(i)
 #endif
 #define _DECLARE_SPINOR_ITERATOR(s) suNf_spinor* _SPINOR_PTR(s)
+#define _DECLARE_SPINOR_FLT_ITERATOR(s) suNf_spinor_flt* _SPINOR_PTR(s)
 
 
 #ifdef CHECK_SPINOR_MATCHING
@@ -95,7 +96,7 @@ typedef struct _scalar_field {
 #define _TWO_SPINORS_MATCHING(s1,s2) \
 	error((s1)->type!=(s2)->type,1,__FILE__ ": ", "Spinors don't match!");
 
-#define _ARRAY_SPINOR_MATCHIN(s,i,n) \
+#define _ARRAY_SPINOR_MATCHING(s,i,n) \
 	for(i=0; i<n; i++) \
 		error((s)->type!=((s)+i)->type,1,__FILE__ ": ", "Spinors don't match!");
 

@@ -28,6 +28,7 @@ typedef struct _mshift_par {
  * returns the number of cg iterations done.
  */
 int cg_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
+int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_operator_flt F, spinor_field *in, spinor_field *out);
 
 int BiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
 int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
