@@ -61,7 +61,7 @@ int main(int argc,char *argv[]) {
   /* logger setup */
   /* disable logger for MPI processes != 0 */
   if (PID!=0) { logger_disable(); }
-  logger_setlevel(0,40);
+  logger_setlevel(0,30);
   sprintf(tmp,">%s",output_filename); logger_stdout(tmp);
   sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
 
@@ -117,8 +117,8 @@ int main(int argc,char *argv[]) {
   }
 
   sprintf(cnfg_filename,"%dx%dx%dx%dNc%d",GLB_T,GLB_X,GLB_Y,GLB_Z,NG);
-  write_gauge_field_eolexi(cnfg_filename);
-/*  write_gauge_field(cnfg_filename);*/
+/*  write_gauge_field_eolexi(cnfg_filename);*/
+  write_gauge_field(cnfg_filename);
 
 	free_gfield(u_gauge);
 #ifndef REPR_FUNDAMENTAL

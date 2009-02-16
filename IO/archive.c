@@ -49,11 +49,11 @@ void write_gauge_field(char filename[])
     error((fp=fopen(filename,"wb"))==NULL,1,"write_gauge_field",
         "Failed to open file for writing");
     /* write NG and global size */
-    error(fwrite(d,(size_t) sizeof(int),(size_t)(5),fp)!=(5),
+    error(fwrite_BE_int(d,(size_t)(5),fp)!=(5),
         1,"write_gauge_field",
         "Failed to write gauge field geometry");
     /* write average plaquette */
-    error(fwrite(&plaq,(size_t) sizeof(double),(size_t)(1),fp)!=(1),
+    error(fwrite_BE_double(&plaq,(size_t)(1),fp)!=(1),
         1,"write_gauge_field",
         "Failed to write gauge field plaquette");
   }
@@ -146,7 +146,7 @@ void write_gauge_field(char filename[])
 
           /* write buffer to file */
           if (PID==0) {
-            error(fwrite(buff,(size_t) sizeof(double),(size_t)(bsize),fp)!=(bsize),
+            error(fwrite_BE_double(buff,(size_t)(bsize),fp)!=(bsize),
                 1,"write_gauge_field",
                 "Failed to write gauge field to file");
           }
@@ -191,7 +191,7 @@ void read_gauge_field(char filename[])
     error((fp=fopen(filename,"rb"))==NULL,1,"read_gauge_field",
         "Failed to open file for reading");
     /* read NG and global size */
-    error(fread(d,(size_t) sizeof(int),(size_t)(5),fp)!=(5),
+    error(fread_BE_int(d,(size_t)(5),fp)!=(5),
         1,"read_gauge_field",
         "Failed to read gauge field geometry");
     /* Check Gauge group and Lattice dimesions */
@@ -204,7 +204,7 @@ void read_gauge_field(char filename[])
           d[1],d[2],d[3],d[4],GLB_T,GLB_X,GLB_Y,GLB_Z);
       error(1,1,"read_gauge_field " __FILE__,"Gauge group mismatch");
     }
-    error(fread(&plaq,(size_t) sizeof(double),(size_t)(1),fp)!=(1),
+    error(fread_BE_double(&plaq,(size_t)(1),fp)!=(1),
         1,"read_gauge_field",
         "Failed to read gauge field plaquette");
   }
@@ -232,7 +232,7 @@ void read_gauge_field(char filename[])
 #endif
           /* read buffer from file */
           if (PID==0) {
-            error(fread(buff,(size_t) sizeof(double),(size_t)(bsize),fp)!=(bsize),
+            error(fread_BE_double(buff,(size_t)(bsize),fp)!=(bsize),
                 1,"read_gauge_field",
                 "Failed to read gauge field from file");
           }
@@ -352,7 +352,7 @@ void write_ranlxd_state(char filename[])
     error((fp=fopen(filename,"wb"))==NULL,1,"write_ranlxd_state",
         "Failed to open file for writing");
     /* write nproc and rsize */
-    error(fwrite(d,(size_t) sizeof(int),(size_t)(2),fp)!=(2),
+    error(fwrite_BE_int(d,(size_t)(2),fp)!=(2),
         1,"write_ranlxd_state",
         "Failed to write header");
   }
@@ -418,7 +418,7 @@ void write_ranlxd_state(char filename[])
 
           /* write buffer to file */
           if (PID==0) {
-            error(fwrite(buff,(size_t) sizeof(int),(size_t)(rsize),fp)!=(rsize),
+            error(fwrite_BE_int(buff,(size_t)(rsize),fp)!=(rsize),
                 1,"write_ranlxd_state",
                 "Failed to write gauge field to file");
           }
@@ -466,7 +466,7 @@ void read_ranlxd_state(char filename[])
     error((fp=fopen(filename,"rb"))==NULL,1,"read_ranlxd_state",
         "Failed to open file for reading");
     /* read number of states in the file */
-    error(fread(d,(size_t) sizeof(int),(size_t)(2),fp)!=(2),
+    error(fread_BE_int(d,(size_t)(2),fp)!=(2),
         1,"read_ranlxd_state",
         "Failed to read header");
     /* give a warning if hproc != nproc */
@@ -498,7 +498,7 @@ void read_ranlxd_state(char filename[])
 #endif
           /* read buffer from file */
           if (PID==0) {
-            error(fread(buff,(size_t) sizeof(int),(size_t)(rsize),fp)!=(rsize),
+            error(fread_BE_int(buff,(size_t)(rsize),fp)!=(rsize),
                 1,"read_ranlxd_state",
                 "Failed to read ranlxd state from file");
           }
