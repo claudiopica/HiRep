@@ -45,31 +45,39 @@ typedef struct _format_type {
   void (*write)(char*);
 } format_type;
 
-int nformats=3;
-format_type format[3] = {
-  { .name="eolexi" , .read=read_gauge_field_eolexi , .write=write_gauge_field_eolexi },
-  { .name="henty" ,  .read=read_gauge_field_henty , .write=NULL },
-  { .name="mpieo" ,  .read=read_gauge_field , .write=write_gauge_field }
+int nformats=6;
+format_type format[6] = {
+  { .name="henty" ,     .read=read_gauge_field_henty ,     .write=NULL },
+  { .name="mpieo" ,     .read=read_gauge_field ,           .write=write_gauge_field },
+  { .name="eolexi:be" , .read=read_gauge_field_eolexi_BE , .write=write_gauge_field_eolexi_BE },
+  { .name="mpieo:be" ,  .read=read_gauge_field_mpieo_BE ,  .write=write_gauge_field_mpieo_BE },
+  { .name="eolexi:le" , .read=read_gauge_field_eolexi_LE , .write=write_gauge_field_eolexi_LE },
+  { .name="mpieo:le" ,  .read=read_gauge_field_mpieo_LE ,  .write=write_gauge_field_mpieo_LE }
 };
 
+enum {QUENCHED_CNFG, DYNAMICAL_CNFG, UNKNOWN_CNFG};
+
 typedef struct _filename_type {
-  char string[256];
+  char string[1024];
+  char label[256];int label_f;
   int size[4];    int size_f;
   int ng;         int ng_f;
   int nf;         int nf_f;
   char repr[256]; int repr_f;
   double beta;    int beta_f;
   double mass;    int mass_f;
+  double kappa;   int kappa_f;
   int n;          int n_f;
+  int cnfg_type;
 } filename_type;
 
 
 
 filename_type input_filename;
-char output_filename[256];
+char output_filename[1024];
 format_type* input_format;
 format_type* output_format;
-int swapendian=false;
+int check=false;
 
 
 int parse_cnfg_filename(char* filename, filename_type* fn) {
@@ -82,6 +90,7 @@ int parse_cnfg_filename(char* filename, filename_type* fn) {
     basename = tmp+1;
   }            
 
+  fn->label_f=false;
   fn->size_f=false;
   fn->ng_f=false;
   fn->nf_f=false;
@@ -93,9 +102,10 @@ int parse_cnfg_filename(char* filename, filename_type* fn) {
   strcpy(fn->string,filename);
   
   
-  hm=sscanf(basename,"%*[^_]_%dx%dx%dx%d%*[Nn]c%dr%[A-Z]%*[Nn]f%db%lfm%lfn%d",
-      &(fn->size[0]),&(fn->size[1]),&(fn->size[2]),&(fn->size[3]),&(fn->ng),fn->repr,&(fn->nf),&(fn->beta),&(fn->mass),&(fn->n));
-  if(hm==10) {
+  hm=sscanf(basename,"%[^_]_%dx%dx%dx%d%*[Nn]c%dr%[A-Z]%*[Nn]f%db%lfm%lfn%d",
+      fn->label,&(fn->size[0]),&(fn->size[1]),&(fn->size[2]),&(fn->size[3]),&(fn->ng),fn->repr,&(fn->nf),&(fn->beta),&(fn->mass),&(fn->n));
+  if(hm==11) {
+    fn->label_f=true;
     fn->size_f=true;
     fn->ng_f=true;
     fn->nf_f=true;
@@ -103,9 +113,35 @@ int parse_cnfg_filename(char* filename, filename_type* fn) {
     fn->beta_f=true;
     fn->mass_f=true;
     fn->n_f=true;
+    fn->cnfg_type=DYNAMICAL_CNFG;
     return hm;
   }
 
+  hm=sscanf(basename,"%dx%dx%dx%d%*[Nn]c%d%*[Nn]f%db%lfk%lfn%d",
+      &(fn->size[0]),&(fn->size[1]),&(fn->size[2]),&(fn->size[3]),&(fn->ng),&(fn->nf),&(fn->beta),&(fn->kappa),&(fn->n));
+  if(hm==11) {
+    fn->size_f=true;
+    fn->ng_f=true;
+    fn->nf_f=true;
+    fn->beta_f=true;
+    fn->kappa_f=true;
+    fn->n_f=true;
+    fn->cnfg_type=DYNAMICAL_CNFG;
+    return hm;
+  }
+
+
+  hm=sscanf(basename,"%[^_]_%dx%dx%dx%d%*[Nn]c%db%lfn%d",
+      fn->label,&(fn->size[0]),&(fn->size[1]),&(fn->size[2]),&(fn->size[3]),&(fn->ng),&(fn->beta),&(fn->n));
+  if(hm==8) {
+    fn->label_f=true;
+    fn->size_f=true;
+    fn->ng_f=true;
+    fn->beta_f=true;
+    fn->n_f=true;
+    fn->cnfg_type=QUENCHED_CNFG;
+    return hm;
+  }
 
   hm=sscanf(basename,"%dx%dx%dx%d%*[Nn]c%db%lfn%d",
       &(fn->size[0]),&(fn->size[1]),&(fn->size[2]),&(fn->size[3]),&(fn->ng),&(fn->beta),&(fn->n));
@@ -114,6 +150,7 @@ int parse_cnfg_filename(char* filename, filename_type* fn) {
     fn->ng_f=true;
     fn->beta_f=true;
     fn->n_f=true;
+    fn->cnfg_type=QUENCHED_CNFG;
     return hm;
   }
 
@@ -123,44 +160,74 @@ int parse_cnfg_filename(char* filename, filename_type* fn) {
   if(hm==5) {
     fn->size_f=true;
     fn->ng_f=true;
+    fn->cnfg_type=UNKNOWN_CNFG;
     return hm;
   }
 
-
+  fn->cnfg_type=UNKNOWN_CNFG;
   return 0;
+}
+
+
+void print_cmdline_info() {
+  error(1,1,"parse_cmdline [converter.c]",
+"\n\
+Syntax (1): converter -m\n\
+* Show compilation information.\n\n\
+Syntax (2): converter -i <input file> [<input format>] -d <output directory> [<output format>] [-l <label>] [-n <n>] [-r <repr>]\n\
+* Convert the input file from the input format to the output format. The output file is saved in the output directory, its name is generated automatically. Label, number and representation can be overridden.\n\n\
+Syntax (3): converter -i <input file> [<input format>] -o <output file> [<output format>] [-v <volume>]\n\
+* Convert the input file from the input format to the output format. The volume must be provided if it cannot be extracted from the input file name.\n\n\
+Syntax (4): converter -i <input file> [<input format>] [-v <volume>] --check\n\
+* Open the input file assuming the given format and print, if possible, plaquettes and average distance from unitarity for the link variables.\n\n\
+Input formats = mpieo (be,default) | mpieo:be | mpieo:le | eolexi:be | eolexi:le | henty\n\
+Output formats = mpieo (be,default) | mpieo:be | mpieo:le | eolexi:be | eolexi:le\
+");
 }
 
 
 void read_cmdline(int argc, char* argv[]) {
   int i;
-  int ai=0, ao=0, aif=0, aof=0, ase=0, av=0, am=0;
+  int ai=0, ao=0, ad=0, ade=0, av=0, al=0, an=0, ar=0, am=0;
+  char *str;
   char def[256]="mpieo";
 
   for (i=1;i<argc;i++) {
-    if (strcmp(argv[i],"-i")==0) ai=(i+1<argc)?i+1:0;
-    else if (strcmp(argv[i],"-o")==0) ao=(i+1<argc)?i+1:0;
-    else if (strcmp(argv[i],"-v")==0) av=(i+1<argc)?i+1:0;
-    else if (strcmp(argv[i],"--swapendian")==0) ase=i;
+    if (strcmp(argv[i],"-i")==0) ai=i;
+    else if (strcmp(argv[i],"-o")==0) ao=i;
+    else if (strcmp(argv[i],"-d")==0) ad=i;
+    else if (strcmp(argv[i],"-v")==0) av=i;
+    else if (strcmp(argv[i],"-l")==0) al=i;
+    else if (strcmp(argv[i],"-r")==0) ar=i;
+    else if (strcmp(argv[i],"-n")==0) an=i;
+    else if (strcmp(argv[i],"--check")==0) ade=i;
     else if (strcmp(argv[i],"-m")==0) am=i;
   }
-  if(ai+1<argc) if(argv[ai+1][0]!='-') aif=ai+1;
-  if(ao+1<argc) if(argv[ao+1][0]!='-') aof=ao+1;
 
   if (am != 0) {
     print_compiling_info();
     exit(0);
   }
 
-  error(ao==0 || ai==0 || aif==0,1,"parse_cmdline [converter.c]",
-      "Syntax: converter -i <input file> <input format> -o <output file> [<output format>] [-v <volume>] [--swapendian] [-m]");
+  if(ai==0 || ai+1>=argc) {
+    lprintf("ERROR",0,"Input file missing.\n");
+    print_cmdline_info();
+  }
+  parse_cnfg_filename(argv[ai+1],&input_filename);
 
-  strcpy(output_filename,argv[ao]);
+  if(input_filename.ng_f==true && NG!=input_filename.ng) {
+    lprintf("ERROR",0,"You must compile with NG=%d!!!",input_filename.ng);
+    print_cmdline_info();
+  }
   
-  parse_cnfg_filename(argv[ai],&input_filename);
-
-  error(input_filename.size_f==false && av==0,1,"parse_cmdline [converter.c]",
-      "Volume required with this input file");
-  
+  if(input_filename.size_f==false && av==0) {
+    lprintf("ERROR",0,"Since I cannot read the volume from the input file name, you must use the -v option.\n");
+    print_cmdline_info();
+  }
+  if(input_filename.size_f==true && av!=0) {
+    lprintf("ERROR",0,"You cannot override the volume read from the input file name.\n");
+    print_cmdline_info();
+  }
   if(input_filename.size_f==false) {
     error(sscanf(argv[av],"%dx%dx%dx%d",&GLB_T,&GLB_X,&GLB_Y,&GLB_Z)!=4,1,"parse_cmdline [converter.c]",
       "Wrong format for volume");
@@ -171,41 +238,179 @@ void read_cmdline(int argc, char* argv[]) {
     GLB_Z=input_filename.size[3];
   }
 
-  error(input_filename.ng_f==true && NG!=input_filename.ng,1,"parse_cmdline [converter.c]",
-      "Wrong number of colours in file name");
-  
   input_format=NULL;
+  str=def;
+  if(ai+2<argc)
+  if(argv[ai+2][0]!='-')
+    str=argv[ai+2];
   for(i=0; i<nformats; i++) {
-    if(strcmp(argv[aif],format[i].name)==0) {
+    if(strcmp(str,format[i].name)==0) {
       input_format = &format[i];
       break;
     }
   }
-  error(input_format==NULL,1,"parse_cmdline [converter.c]",
-      "Invalid input format (eolexi, henty, mpieo)");
-
-  output_format=NULL;
-  if(aof!=0) {
-    for(i=0; i<nformats; i++) {
-      if(strcmp(argv[aof],format[i].name)==0) {
-        output_format = &format[i];
-        break;
-      }
-    }
-  } else {
-    for(i=0; i<nformats; i++) {
-      if(strcmp(def,format[i].name)==0) {
-        output_format = &format[i];
-        break;
-      }
-    }
+  if(input_format==NULL) {
+    lprintf("ERROR",0,"Invalid input format.\n");
+    print_cmdline_info();
   }
-  error(output_format==NULL,1,"parse_cmdline [converter.c]",
-      "Invalid output format (eolexi, henty, mpieo)");
-  error(output_format->write==NULL,1,"parse_cmdline [converter.c]",
-      "Output format not yet available");
 
-  if(ase!=0) swapendian=true;
+  if(ao!=0 && ad==0 && ade==0) {
+
+    if(ao+1>=argc) {
+      lprintf("ERROR",0,"Output file missing.\n");
+      print_cmdline_info();
+    }
+    strcpy(output_filename,argv[ao+1]);
+  
+    output_format=NULL;
+    str=def;
+    if(ao+2<argc)
+    if(argv[ao+2][0]!='-')
+      str=argv[ao+2];
+    for(i=0; i<nformats; i++) {
+      if(strcmp(str,format[i].name)==0) {
+        output_format = &format[i];
+        break;
+      }
+    }
+    if(output_format==NULL) {
+      lprintf("ERROR",0,"Invalid output format.\n");
+      print_cmdline_info();
+    }
+    
+    if(ar!=0) lprintf("WARNING",0,"-r option ignored.\n");
+    if(al!=0) lprintf("WARNING",0,"-l option ignored.\n");
+    if(an!=0) lprintf("WARNING",0,"-n option ignored.\n");
+
+  } else if(ao==0 && ad!=0 && ade==0) {
+
+    if(input_filename.cnfg_type==UNKNOWN_CNFG) {
+      lprintf("ERROR",0,"Since the input file name is not in one of the standard formats, you cannot use the -d option.\n");
+      print_cmdline_info();
+    }
+
+    if(input_filename.repr_f==true && ar!=0) {
+      lprintf("ERROR",0,"You cannot override the representation read from the input file name.\n");
+      print_cmdline_info();
+    }
+
+    char tmp[1024];
+
+    if(ad+1>=argc) {
+      lprintf("ERROR",0,"Output directory missing.\n");
+      print_cmdline_info();
+    }
+    sprintf(tmp,"%s/",argv[ad+1]);
+    
+    if(al!=0) {
+      if(al+1>=argc) {
+        lprintf("ERROR",0,"Label missing.\n");
+        print_cmdline_info();
+      }
+      sprintf(output_filename,"%s%s_",tmp,argv[al+1]);
+    } else {
+      if(input_filename.label_f==false) {
+        lprintf("ERROR",0,"Since I cannot read the label from the input file name, you must use the -l option.\n");
+        print_cmdline_info();
+      }
+      sprintf(output_filename,"%s%s_",tmp,input_filename.label);
+    }
+    
+    sprintf(tmp,"%s%dx%dx%dx%dnc%d",output_filename,GLB_T,GLB_X,GLB_Y,GLB_Z,NG);
+    
+    if(input_filename.cnfg_type==QUENCHED_CNFG) {
+
+      if(input_filename.beta_f==false) {
+        lprintf("ERROR",0,"beta missing in input file. This is strange!!!\n");
+        print_cmdline_info();
+      }
+      sprintf(output_filename,"%sb%.6f",tmp,input_filename.beta);
+      strcpy(tmp,output_filename);
+      
+    } else if(input_filename.cnfg_type==DYNAMICAL_CNFG) {
+    
+      if(ar!=0) {
+        if(ar+1>=argc) {
+          lprintf("ERROR",0,"Representation missing.\n");
+          print_cmdline_info();
+        }
+        sprintf(output_filename,"%sr%s",tmp,argv[ar+1]);
+      } else {
+        if(input_filename.repr_f==false) {
+          lprintf("ERROR",0,"Since I cannot read the representation from the input file name, you must use the -r option.\n");
+          print_cmdline_info();
+        }
+        sprintf(output_filename,"%sr%s",tmp,input_filename.repr);
+      }
+      
+      if(input_filename.nf_f==false) {
+        lprintf("ERROR",0,"nf missing in input file. This is strange!!!\n");
+        print_cmdline_info();
+      }
+      sprintf(tmp,"%snf%d",output_filename,input_filename.nf);
+
+      if(input_filename.beta_f==false) {
+        lprintf("ERROR",0,"beta missing in input file. This is strange!!!\n");
+        print_cmdline_info();
+      }
+      sprintf(output_filename,"%sb%.6f",tmp,input_filename.beta);
+
+      if(input_filename.mass_f==false && input_filename.kappa_f==false) {
+        lprintf("ERROR",0,"mass and kappa missing in input file. This is strange!!!\n");
+        print_cmdline_info();
+      }
+      if(input_filename.mass_f==true)
+        sprintf(tmp,"%sm%.6f",output_filename,input_filename.mass);
+      else if(input_filename.kappa_f==true)
+        sprintf(tmp,"%sm%.6f",output_filename,-.5/input_filename.kappa+4.);
+      
+    }
+    
+    if(an!=0) {
+      if(an+1>=argc) {
+        lprintf("ERROR",0,"Number missing.\n");
+        print_cmdline_info();
+      }
+      sprintf(output_filename,"%sn%d",tmp,atoi(argv[an+1]));
+    } else {
+      if(input_filename.n_f==false) {
+        lprintf("ERROR",0,"Since I cannot read the number from the input file name, you must use the -n option.\n");
+        print_cmdline_info();
+      }
+      sprintf(output_filename,"%sn%d",tmp,input_filename.n);
+    }
+
+    output_format=NULL;
+    str=def;
+    if(ad+2<argc)
+    if(argv[ad+2][0]!='-')
+      str=argv[ad+2];
+    for(i=0; i<nformats; i++) {
+      if(strcmp(str,format[i].name)==0) {
+        output_format = &format[i];
+        break;
+      }
+    }
+    if(output_format==NULL) {
+      lprintf("ERROR",0,"Invalid output format.\n");
+      print_cmdline_info();
+    }
+  
+  } else if(ao==0 && ad==0 && ade!=0) {
+    
+    if(ar!=0) lprintf("WARNING",0,"-r option ignored.\n");
+    if(al!=0) lprintf("WARNING",0,"-l option ignored.\n");
+    if(an!=0) lprintf("WARNING",0,"-n option ignored.\n");
+    
+    check=true;
+  
+  } else {
+
+    lprintf("ERROR",0,"One option among -o -d --check must be used.\n");
+    print_cmdline_info();
+
+  }
+
 }
 
 int main(int argc,char *argv[]) {
@@ -232,8 +437,28 @@ int main(int argc,char *argv[]) {
   u_gauge=alloc_gfield(&glattice);
 
   input_format->read(input_filename.string);
-  if(swapendian) gaugefield_swapendian();
-  output_format->write(output_filename);
+  
+  if(check) {
+    full_plaquette();
+    
+    _DECLARE_INT_ITERATOR(ix);
+    int mu;
+    suNg A;
+    double norm=0., tmp;
+    
+    _MASTER_FOR(&glattice,ix) {
+      for(mu=0; mu<4; mu++) {
+        _suNg_times_suNg_dagger(A,*pu_gauge(ix,mu),*pu_gauge(ix,mu));
+        _suNg_sqnorm_m1(tmp,A);
+        norm+=tmp;
+      }
+    }
+    norm=sqrt(norm/(4*GLB_T*GLB_X*GLB_Y*GLB_Z*NG*NG*2));
+    
+    lprintf("MAIN",0,"Average distance from unitarity = %e\n",norm);
+  } else {
+    output_format->write(output_filename);
+  }
 
   free_gfield(u_gauge);
 

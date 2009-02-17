@@ -1736,19 +1736,19 @@ sub write_suNr_sqnorm {
 sub write_suN_sqnorm_m1 {
   print "/* k=| 1 - u |2 ) */\n";
   print "#define _${dataname}_sqnorm_m1(k,u) \\\n";
-	print "   (k)=0.;\\\n    ";
+	print "   (k)=\\\n    ";
 	my $shift=$N*$N-1;
 	if ($N<2*$Nmax) { #unroll all : here we use an higher Nmax because we cannot unroll this
 		my $n=0;
 		for(my $i=1;$i<=$N;$i++){
 			for(my $j=1;$j<=$N;$j++){
 				if ($i==$j) {
-					print "(k)+=_complex_prod_m1_re((u).$cname\[$n\],(u).$cname\[$n\])";
+					print "+_complex_prod_m1_re((u).$cname\[$n\],(u).$cname\[$n\])";
 				} else {
-					print "(k)+=_complex_prod_re((u).$cname\[$n\],(u).$cname\[$n\])";
+					print "+_complex_prod_re((u).$cname\[$n\],(u).$cname\[$n\])";
 				}
 				$n++;
-				if($j==$N and $i==$N) {print ")\n\n";} else {print "+ \\\n    ";}
+				if($j==$N and $i==$N) {print "\n\n";} else {print "\\\n    ";}
 			}
 		}
 	} else {

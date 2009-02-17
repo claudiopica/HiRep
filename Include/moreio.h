@@ -7,11 +7,17 @@
 #define MOREIO_H
 #include "input_par.h"
 
-void read_gauge_field(char filename[]);
-void write_gauge_field(char filename[]);
+void read_gauge_field_mpieo_BE(char filename[]);
+void write_gauge_field_mpieo_BE(char filename[]);
 
-void read_gauge_field_eolexi(char filename[]);
-void write_gauge_field_eolexi(char filename[]);
+void read_gauge_field_mpieo_LE(char filename[]);
+void write_gauge_field_mpieo_LE(char filename[]);
+
+void read_gauge_field_eolexi_BE(char filename[]);
+void write_gauge_field_eolexi_BE(char filename[]);
+
+void read_gauge_field_eolexi_LE(char filename[]);
+void write_gauge_field_eolexi_LE(char filename[]);
 
 void read_gauge_field_henty(char filename[]);
 

@@ -36,7 +36,7 @@ MODS := error
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Converter
-MODS := archive_eolexi archive_henty
+MODS := archive_eolexi archive_henty archive_more_mpieo
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 converter: cinfo.c $(OBJS) $(MOD_OBJS)
