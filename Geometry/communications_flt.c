@@ -44,6 +44,25 @@ static void sync_spinor_field_flt(spinor_field_flt *p) {
        */
   }
 }
+
+static void sync_gauge_field_flt(suNg_field_flt *gf) {
+  int i;
+  geometry_descriptor *gd=gf->type;
+  /* int j, mu, x, y; */
+
+  for(i=0; i<gd->ncopies; ++i) {
+    /* this assumes that the 4 directions are contiguous in memory !!! */
+    memcpy(((gf->ptr)+4*gd->copy_to[i]),((gf->ptr)+4*gd->copy_from[i]),4*(gd->copy_len[i])*sizeof(*(gf->ptr)));
+    /*   
+         for(j=0; j<gd->copy_len[i]; j++) {
+         x=gd->copy_from[i]+j;
+         y=gd->copy_to[i]+j;
+         for(mu=0; mu<4; mu++)
+     *pu_gauge(y,mu) = *pu_gauge(x,mu);
+     }
+     */
+  }
+}
 #endif /* WITH_MPI */
 
 
@@ -73,7 +92,7 @@ void complete_gf_sendrecv_flt(suNg_field_flt *gf) {
               mesg);
         }
       }
-      error(1,1,"complete_gf_sendrecv " __FILE__,"Cannot complete communications");
+      error(1,1,"complete_gf_sendrecv_flt" __FILE__,"Cannot complete communications");
     }
 #endif
   }
@@ -99,13 +118,13 @@ void start_gf_sendrecv_flt(suNg_field_flt *gf) {
   /* check communication status */
   /* questo credo che non sia il modo piu' efficiente!!! */
   /* bisognerebbe forse avere una variabile di stato nei campi?? */
-  complete_gf_sendrecv(gf);
+  complete_gf_sendrecv_flt(gf);
 
   /* fill send buffers */
-  sync_gauge_field(gf);
+  sync_gauge_field_flt(gf);
 
 #ifdef MPI_TIMING
-  error(gf_control>0,1,"start_gf_sendrecv " __FILE__,"Multiple send without receive");
+  error(gf_control>0,1,"start_gf_sendrecv_flt" __FILE__,"Multiple send without receive");
   gettimeofday(&gfstart,0);  
   gf_control=1;
 #endif
@@ -126,7 +145,7 @@ void start_gf_sendrecv_flt(suNg_field_flt *gf) {
       int mesglen;
       MPI_Error_string(mpiret,mesg,&mesglen);
       lprintf("MPI",0,"ERROR: %s\n",mesg);
-      error(1,1,"start_gf_sendrecv " __FILE__,"Cannot start send buffer");
+      error(1,1,"start_gf_sendrecv_flt" __FILE__,"Cannot start send buffer");
     }
 #endif
 
@@ -145,7 +164,7 @@ void start_gf_sendrecv_flt(suNg_field_flt *gf) {
       int mesglen;
       MPI_Error_string(mpiret,mesg,&mesglen);
       lprintf("MPI",0,"ERROR: %s\n",mesg);
-      error(1,1,"start_gf_sendrecv " __FILE__,"Cannot start receive buffer");
+      error(1,1,"start_gf_sendrecv_flt" __FILE__,"Cannot start receive buffer");
     }
 #endif
 
@@ -181,7 +200,7 @@ void complete_sf_sendrecv_flt(spinor_field_flt *sf) {
               mesg);
         }
       }
-      error(1,1,"complete_gf_sendrecv " __FILE__,"Cannot complete communications");
+      error(1,1,"complete_sf_sendrecv_flt" __FILE__,"Cannot complete communications");
     }
 #endif
   }
@@ -191,7 +210,7 @@ void complete_sf_sendrecv_flt(spinor_field_flt *sf) {
       {
 	gettimeofday(&sfend,0);
 	timeval_subtract(&sfetime,&sfend,&sfstart);
-	lprintf("MPI TIMING",0,"complete_sf_sendrecv" __FILE__ " %ld sec %ld usec\n",sfetime.tv_sec,sfetime.tv_usec);
+	lprintf("MPI TIMING",0,"complete_sf_sendrecv_flt" __FILE__ " %ld sec %ld usec\n",sfetime.tv_sec,sfetime.tv_usec);
 	sf_control=0;
       }
 #endif
@@ -216,7 +235,7 @@ void start_sf_sendrecv_flt(spinor_field_flt *sf) {
   /* fill send buffers */
   sync_spinor_field_flt(sf);
 #ifdef MPI_TIMING
-  error(sf_control>0,1,"start_sf_sendrecv " __FILE__,"Multiple send without receive");
+  error(sf_control>0,1,"start_sf_sendrecv_flt" __FILE__,"Multiple send without receive");
   gettimeofday(&sfstart,0);  
   sf_control=1;
 #endif
@@ -237,7 +256,7 @@ void start_sf_sendrecv_flt(spinor_field_flt *sf) {
       int mesglen;
       MPI_Error_string(mpiret,mesg,&mesglen);
       lprintf("MPI",0,"ERROR: %s\n",mesg);
-      error(1,1,"start_gf_sendrecv " __FILE__,"Cannot start send buffer");
+      error(1,1,"start_gf_sendrecv_flt" __FILE__,"Cannot start send buffer");
     }
 #endif
 
@@ -256,7 +275,7 @@ void start_sf_sendrecv_flt(spinor_field_flt *sf) {
       int mesglen;
       MPI_Error_string(mpiret,mesg,&mesglen);
       lprintf("MPI",0,"ERROR: %s\n",mesg);
-      error(1,1,"start_gf_sendrecv " __FILE__,"Cannot start receive buffer");
+      error(1,1,"start_gf_sendrecv_flt" __FILE__,"Cannot start receive buffer");
     }
 #endif
 

@@ -351,6 +351,8 @@ int main(int argc,char *argv[]) {
 
   if(list!=NULL) fclose(list);
 
+  finalize_process();
+ 
   free_spinor_field(pta_qprop[0]);
   free(pta_qprop);
   free(tricorr);

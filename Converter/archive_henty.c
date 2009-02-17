@@ -59,6 +59,7 @@ void read_gauge_field_henty(char filename[])
       /* u( row , col , x , y , z , t , dir) = (re,im) */
       int hm=fscanf(fp," u( %d , %d , %d , %d , %d , %d , %d ) =  (%f,%f)\n",
         &row,&col,&g[1],&g[2],&g[3],&g[0],&g[4],&re,&im);
+      g[4]=(g[4]+1)%4; /*This is for fixing with the henty's convection on the directions*/
       if(hm != 9) break;
       counter++;
       tmpmat.c[row*NG+col].re=(double)re;
