@@ -119,7 +119,7 @@ int parse_cnfg_filename(char* filename, filename_type* fn) {
 
   hm=sscanf(basename,"%dx%dx%dx%d%*[Nn]c%d%*[Nn]f%db%lfk%lfn%d",
       &(fn->size[0]),&(fn->size[1]),&(fn->size[2]),&(fn->size[3]),&(fn->ng),&(fn->nf),&(fn->beta),&(fn->kappa),&(fn->n));
-  if(hm==11) {
+  if(hm==9) {
     fn->size_f=true;
     fn->ng_f=true;
     fn->nf_f=true;
@@ -174,7 +174,7 @@ void print_cmdline_info() {
 "\n\
 Syntax (1): converter -m\n\
 * Show compilation information.\n\n\
-Syntax (2): converter -i <input file> [<input format>] -d <output directory> [<output format>] [-l <label>] [-n <n>] [-r <repr>]\n\
+Syntax (2): converter -i <input file> [<input format>] -d <output directory> [<output format>] [-l <label>] [-n <n>] [-r <repr>] [-M mass]\n\
 * Convert the input file from the input format to the output format. The output file is saved in the output directory, its name is generated automatically. Label, number and representation can be overridden.\n\n\
 Syntax (3): converter -i <input file> [<input format>] -o <output file> [<output format>] [-v <volume>]\n\
 * Convert the input file from the input format to the output format. The volume must be provided if it cannot be extracted from the input file name.\n\n\
@@ -188,7 +188,7 @@ Output formats = mpieo (be,default) | mpieo:be | mpieo:le | eolexi:be | eolexi:l
 
 void read_cmdline(int argc, char* argv[]) {
   int i;
-  int ai=0, ao=0, ad=0, ade=0, av=0, al=0, an=0, ar=0, am=0;
+  int ai=0, ao=0, ad=0, ade=0, av=0, al=0, an=0, ar=0, aM=0, am=0;
   char *str;
   char def[256]="mpieo";
 
@@ -200,6 +200,7 @@ void read_cmdline(int argc, char* argv[]) {
     else if (strcmp(argv[i],"-l")==0) al=i;
     else if (strcmp(argv[i],"-r")==0) ar=i;
     else if (strcmp(argv[i],"-n")==0) an=i;
+    else if (strcmp(argv[i],"-M")==0) aM=i;
     else if (strcmp(argv[i],"--check")==0) ade=i;
     else if (strcmp(argv[i],"-m")==0) am=i;
   }
@@ -281,6 +282,7 @@ void read_cmdline(int argc, char* argv[]) {
     if(ar!=0) lprintf("WARNING",0,"-r option ignored.\n");
     if(al!=0) lprintf("WARNING",0,"-l option ignored.\n");
     if(an!=0) lprintf("WARNING",0,"-n option ignored.\n");
+    if(aM!=0) lprintf("WARNING",0,"-M option ignored.\n");
 
   } else if(ao==0 && ad!=0 && ade==0) {
 
@@ -326,6 +328,8 @@ void read_cmdline(int argc, char* argv[]) {
       }
       sprintf(output_filename,"%sb%.6f",tmp,input_filename.beta);
       strcpy(tmp,output_filename);
+
+      if(aM!=0) lprintf("WARNING",0,"-M option ignored.\n");
       
     } else if(input_filename.cnfg_type==DYNAMICAL_CNFG) {
     
@@ -355,14 +359,22 @@ void read_cmdline(int argc, char* argv[]) {
       }
       sprintf(output_filename,"%sb%.6f",tmp,input_filename.beta);
 
-      if(input_filename.mass_f==false && input_filename.kappa_f==false) {
-        lprintf("ERROR",0,"mass and kappa missing in input file. This is strange!!!\n");
-        print_cmdline_info();
+      if(aM!=0) {
+        if(aM+1>=argc) {
+          lprintf("ERROR",0,"Mass missing.\n");
+          print_cmdline_info();
+        }
+        sprintf(tmp,"%sm%s",output_filename,argv[aM+1]);
+      } else {
+        if(input_filename.mass_f==false && input_filename.kappa_f==false) {
+          lprintf("ERROR",0,"mass and kappa missing in input file. This is strange!!!\n");
+          print_cmdline_info();
+        }
+        if(input_filename.mass_f==true)
+          sprintf(tmp,"%sm%.6f",output_filename,input_filename.mass);
+        else if(input_filename.kappa_f==true)
+          sprintf(tmp,"%sm%.6f",output_filename,-.5/input_filename.kappa+4.);
       }
-      if(input_filename.mass_f==true)
-        sprintf(tmp,"%sm%.6f",output_filename,input_filename.mass);
-      else if(input_filename.kappa_f==true)
-        sprintf(tmp,"%sm%.6f",output_filename,-.5/input_filename.kappa+4.);
       
     }
     
@@ -401,6 +413,7 @@ void read_cmdline(int argc, char* argv[]) {
     if(ar!=0) lprintf("WARNING",0,"-r option ignored.\n");
     if(al!=0) lprintf("WARNING",0,"-l option ignored.\n");
     if(an!=0) lprintf("WARNING",0,"-n option ignored.\n");
+    if(aM!=0) lprintf("WARNING",0,"-M option ignored.\n");
     
     check=true;
   
