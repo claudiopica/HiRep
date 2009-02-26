@@ -25,6 +25,7 @@ void cross_prod(suNg_vector *v1,suNg_vector *v2,suNg_vector *v3);
 void cross_prod_flt(suNg_vector_flt *v1,suNg_vector_flt *v2,suNg_vector_flt *v3);
 void project_to_suNg(suNg *u);
 void project_to_suNg_flt(suNg_flt *u);
+void project_cooling_to_suNg(suNg* g_out, suNg* g_in, int cooling);
 
 void assign_u2ud(void);
 void assign_ud2u(void);

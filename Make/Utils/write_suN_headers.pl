@@ -221,6 +221,7 @@ END
 write_suN_dagger();
 write_suN_times_suN();
 write_suN_times_suN_dagger();
+write_suN_dagger_times_suN();
 write_suN_zero();
 write_suN_unit();
 write_suN_minus();
@@ -1146,7 +1147,11 @@ sub write_suN_dagger {
 		}
 	} else { #partial unroll
 		print "   {\\\n";
-		print "      int _i,_j,_n=0,_k=0;\\\n";
+		if($N<(2*$unroll+1)) {
+		    print "      int _i,_n=0,_k=0;\\\n";
+		} else {
+		    print "      int _i,_j,_n=0,_k=0;\\\n";
+		}
 		print "      for (_i=0; _i<$N; ++_i){\\\n";
 		print "         _complex_star((u).$cname\[_n\],(v).$cname\[_k\]);\\\n";
 		if($N<(2*$unroll+1)) {
@@ -1193,7 +1198,13 @@ sub write_suN_times_suN {
 	}
 	} else { #partial unroll
 		print "   {\\\n";
-		print "      int _i,_y,_j,_n=0,_k=0,_l=0;\\\n";
+
+		if($N<(2*$unroll+1)) {	
+		    print "      int _i,_y,_n=0,_k=0,_l=0;\\\n"; 
+		} else {
+		    print "      int _i,_y,_j,_n=0,_k=0,_l=0;\\\n"; 
+		}
+
 		print "      for (_i=0; _i<$N; ++_i){\\\n";
 		print "         for (_y=0; _y<$N; ++_y){\\\n";
 		print "            _complex_mul((u).$cname\[_n\],(v).$cname\[_k\],(w).$cname\[_l\]);\\\n";
@@ -1242,7 +1253,11 @@ sub write_suNr_times_suNr {
 	}
 	} else { #partial unroll
 		print "   {\\\n";
-		print "      int _i,_y,_j,_n=0,_k=0,_l=0;\\\n";
+		if($N<(2*$unroll+1)) {
+		    print "      int _i,_y,_n=0,_k=0,_l=0;\\\n";
+		} else {
+		    print "      int _i,_y,_j,_n=0,_k=0,_l=0;\\\n";
+		}		    
 		print "      for (_i=0; _i<$N; ++_i){\\\n";
 		print "         for (_y=0; _y<$N; ++_y){\\\n";
 		print "            (u).$cname\[_n\]=(v).$cname\[_k\]*(w).$cname\[_l\];\\\n";
@@ -1291,7 +1306,11 @@ sub write_suN_times_suN_dagger {
 	}
 	} else { #partial unroll
 		print "   {\\\n";
-		print "      int _i,_y,_j,_n=0,_k=0,_l=0;\\\n";
+		if($N<(2*$unroll+1)) {
+		    print "      int _i,_y,_n=0,_k=0,_l=0;\\\n";
+		} else {
+		    print "      int _i,_y,_j,_n=0,_k=0,_l=0;\\\n";
+		}		    
 		print "      for (_i=0; _i<$N; ++_i){\\\n";
 		print "         for (_y=0; _y<$N; ++_y){\\\n";
 		print "            _complex_mul_star((u).$cname\[_n\],(v).$cname\[_k\],(w).$cname\[_l\]);\\\n";
@@ -1311,6 +1330,60 @@ sub write_suN_times_suN_dagger {
 		}
 		print "            ++_n; _k-=$shift2; ++_l;\\\n";
 		print "         } _k+=$N; _l=0;\\\n";
+		print "      }\\\n";
+		print "   }((void)0) \n\n";
+	}
+}
+
+sub write_suN_dagger_times_suN {
+  print "/* u=v^+*w */\n";
+  print "#define _${dataname}_dagger_times_${dataname}(u,v,w) \\\n";
+	my $shift=$N*$N-$N-1;
+	my $shift2=$N-1;
+	if ($N<$Nmax) { #unroll all 
+	my ($n,$k,$l)=(0,0,0);
+	my ($v,$w,$u)=(0,0,0);
+	for(my $i=0;$i<$N;$i++){
+		for(my $y=0;$y<$N;$y++){
+		    $u=$i*$N+$y;
+		    $v=$i;
+		    $w=$y;		    
+			print "      _complex_mul_star((u).$cname\[$u\],(w).$cname\[$w\],(v).$cname\[$v\]);\\\n";
+			for(my $j=1;$j<$N;$j++){
+			    $v=$j*$N+$i;
+			    $w=$j*$N+$y;
+			    print "      _complex_mul_star_assign((u).$cname\[$u\],(w).$cname\[$w\],(v).$cname\[$v\])";
+			    if($i==$N-1 and $y==$N-1 and $j==$N-1) { print "\n\n"; } else { print "; \\\n"; }
+			}
+		}
+	}
+	} else { #partial unroll
+		print "   {\\\n";
+		if($N<(2*$unroll+1)) {
+		    print "      int _i,_y,_n=0,_k=0,_l=0;\\\n";
+		} else {
+		    print "      int _i,_y,_j,_n=0,_k=0,_l=0;\\\n";
+		}		    
+		print "      for (_i=0; _i<$N; ++_i){\\\n";
+		print "         for (_y=0; _y<$N; ++_y){\\\n";
+ 		print "            _k=_y; _l=_i;\\\n";
+		print "            _complex_mul_star((u).$cname\[_n\],(w).$cname\[_k\],(v).$cname\[_l\]);\\\n";
+		if($N<(2*$unroll+1)) {
+			for(my $j=1;$j<$N;$j++){
+				print "            _k+=$N; _l+=$N; _complex_mul_star_assign((u).$cname\[_n\],(w).$cname\[_k\],(v).$cname\[_l\]);\\\n";
+			}
+		} else {
+			print "            for (_j=0; _j<$md; ){ \\\n";
+			for(my $i=0;$i<$unroll;$i++){
+				print "               _k+=$N; _l+=$N; _complex_mul_star_assign((u).$cname\[_n\],(w).$cname\[_k\],(v).$cname\[_l\]); ++_j;\\\n";
+			}
+			print "            } \\\n";
+			for(my $i=0;$i<$mr;$i++){
+				print "            _k+=$N; _l+=$N; _complex_mul_star_assign((u).$cname\[_n\],(w).$cname\[_k\],(v).$cname\[_l\]);\\\n";
+			}
+		}
+		print "            ++_n;\\\n";
+		print "         }\\\n";
 		print "      }\\\n";
 		print "   }((void)0) \n\n";
 	}
@@ -1340,7 +1413,11 @@ sub write_suNr_times_suNr_dagger {
 	}
 	} else { #partial unroll
 		print "   {\\\n";
-		print "      int _i,_y,_j,_n=0,_k=0,_l=0;\\\n";
+		if($N<(2*$unroll+1)) {
+		    print "      int _i,_y,_n=0,_k=0,_l=0;\\\n";
+		} else { 
+		    print "      int _i,_y,_j,_n=0,_k=0,_l=0;\\\n";
+		}
 		print "      for (_i=0; _i<$N; ++_i){\\\n";
 		print "         for (_y=0; _y<$N; ++_y){\\\n";
 		print "            (u).$cname\[_n\]=(v).$cname\[_k\]*(w).$cname\[_l\];\\\n";
@@ -1736,10 +1813,10 @@ sub write_suNr_sqnorm {
 sub write_suN_sqnorm_m1 {
   print "/* k=| 1 - u |2 ) */\n";
   print "#define _${dataname}_sqnorm_m1(k,u) \\\n";
-	print "   (k)=\\\n    ";
 	my $shift=$N*$N-1;
 	if ($N<2*$Nmax) { #unroll all : here we use an higher Nmax because we cannot unroll this
-		my $n=0;
+	    print "   (k)=\\\n    ";
+	    my $n=0;
 		for(my $i=1;$i<=$N;$i++){
 			for(my $j=1;$j<=$N;$j++){
 				if ($i==$j) {
@@ -1753,11 +1830,12 @@ sub write_suN_sqnorm_m1 {
 		}
 	} else {
 		print "   {\\\n";
-	  print "      int _i,_j,_n=0,_l=0,_s2=0;\\\n";
-    print "      for(_i=0;_i<$N;){\\\n";
+		print "      (k)=0.;\\\n";
+		print "      int _i,_j,_n=0,_l=0,_s2=0;\\\n";
+		print "      for(_i=0;_i<$N;){\\\n";
 		print "         (k)+=_complex_prod_m1_re((u).$cname\[_n\],(u).$cname\[_n\]);\\\n";
 		print "         ++_n; _l+=$N; \\\n";
-    print "         for(_j=_i+1;_j<$N;++_j){\\\n";
+		print "         for(_j=_i+1;_j<$N;++_j){\\\n";
 		print "            (k)+=_complex_prod_re((u).$cname\[_n\],(u).$cname\[_n\]);\\\n";
 		print "            (k)+=_complex_prod_re((u).$cname\[_l\],(u).$cname\[_l\]);\\\n";
 		print "            ++_n; _l+=$N; \\\n";

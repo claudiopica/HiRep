@@ -85,3 +85,96 @@ void project_to_suNg_flt(suNg_flt *u)
 }
 
 
+
+void project_cooling_to_suNg(suNg* g_out, suNg* g_in, int cooling)
+{
+  suNg Ug[3];
+  suNg tmp[2];
+  int k,l;
+  int j,i,ncool;
+  double c[NG];
+  complex f[2];
+  double norm;
+
+  Ug[0]=*g_in;
+  
+      
+  for (j=0; j<NG; j++){					
+    c[j]=0.0;
+
+    for (i=0; i<NG; i++){					
+      _complex_0(f[1]);
+      
+      for (k=0; k<j; k++){
+	_complex_0(f[0]);
+	
+	for (l=0; l<NG; l++){
+	  _complex_mul_star_assign(f[0],(Ug[0]).c[l*NG+j], (Ug[1]).c[l*NG+k]); 
+	}
+	_complex_mulcr_assign(f[1],c[k],(Ug[1]).c[i*NG+k],f[0]);
+
+      }
+      
+      _complex_sub(Ug[1].c[i*NG+j],Ug[0].c[i*NG+j],f[1]);
+      _complex_mul_star_assign_re(c[j],Ug[1].c[i*NG+j],Ug[1].c[i*NG+j]);
+
+    }
+
+    c[j]= 1.0/c[j];
+  }
+
+  for(i=0;i<NG;i++)
+    {
+      norm=0.0;
+      for(j=0;j<NG;j++){
+	_complex_mul_star_assign_re(norm,Ug[1].c[i+NG*j],Ug[1].c[i+NG*j]);
+      }
+      
+      for(j=0;j<NG;j++){
+	_complex_mulr(Ug[1].c[i+NG*j],1.0/sqrt(norm),Ug[1].c[i+NG*j]);
+	
+      }
+    }
+
+  
+  
+  _suNg_dagger(Ug[2],*g_in);
+ 
+  for (ncool=0; ncool<cooling; ncool++) 
+    {
+      
+      _suNg_times_suNg(Ug[0],Ug[2],Ug[1]);
+      
+      for (i=0; i<NG; i++) {
+	for (j=i+1; j<NG; j++) {
+	  
+	  _complex_add_star(f[0],Ug[0].c[i+NG*i],Ug[0].c[j+NG*j]);
+	  _complex_sub_star(f[1],Ug[0].c[j+NG*i],Ug[0].c[i+NG*j]);
+	  
+	  norm = 1.0/sqrt( _complex_prod_re(f[0],f[0]) + _complex_prod_re(f[1],f[1]) );
+	  
+	  _complex_mulr(f[0],norm,f[0]);
+	  _complex_mulr(f[1],norm,f[1]);
+	  
+	  _suNg_unit(tmp[0]);
+	  
+	  _complex_star(tmp[0].c[i+NG*i],f[0]);
+	  _complex_star(tmp[0].c[i+NG*j],f[1]);
+	  tmp[0].c[j+NG*j]=f[0];
+	  _complex_minus(tmp[0].c[j+NG*i],f[1]);
+	  
+	  
+	  
+	  _suNg_times_suNg(tmp[1],Ug[1],tmp[0]);
+	  Ug[1]=tmp[1];
+	  
+	  _suNg_times_suNg(tmp[1],Ug[0],tmp[0]);
+	  Ug[0]=tmp[1];
+	  
+	}
+      }
+    }
+  
+  *g_out = Ug[1]; 
+  
+}

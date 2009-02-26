@@ -120,6 +120,20 @@ typedef struct
    (a).im=((b).im-(c).im)
 
 /*
+* a=b+c^(+) (a,b,c complex)
+*/
+#define _complex_add_star(a,b,c) \
+   (a).re=((b).re+(c).re); \
+   (a).im=((b).im-(c).im)
+
+/*
+* a=b-c^(+) (a,b,c complex)
+*/
+#define _complex_sub_star(a,b,c) \
+   (a).re=((b).re-(c).re); \
+   (a).im=((b).im+(c).im)
+
+/*
 * a=b/c (a,b,c complex)
 */
 #define _complex_div(a,b,c) \
@@ -215,6 +229,13 @@ typedef struct
 #define _complex_mul_assign(a,b,c) \
    (a).re+=((b).re*(c).re-(b).im*(c).im); \
    (a).im+=((b).re*(c).im+(b).im*(c).re)
+
+/*
+* a+=r*b*c (a,b,c complex, r real)
+*/
+#define _complex_mulcr_assign(a,r,b,c)	  \
+  (a).re+=(r*((b).re*(c).re-(b).im*(c).im));	\
+  (a).im+=(r*((b).re*(c).im+(b).im*(c).re))
 
 /*
 * a=b*(c^+) (a,b,c complex)
