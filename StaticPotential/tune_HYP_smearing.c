@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Computation of the Wilson loops for the static potential
+* Search the best parameters for the HYP smearing
 *
 *******************************************************************************/
 
@@ -31,31 +31,10 @@
 #include "cinfo.c"
 
 
-/* HYP smearing parameters */
-typedef struct _input_HYP {
-  double weight[3];
-
-  /* for the reading function */
-  input_record_t read[4];
-
-} input_HYP;
-
-#define init_input_HYP(varname) \
-{ \
-  .read={\
-    {"HYP smearing weight[0]", "HYP:weight0 = %lf", DOUBLE_T, &((varname).weight[0])},\
-    {"HYP smearing weight[1]", "HYP:weight1 = %lf", DOUBLE_T, &((varname).weight[1])},\
-    {"HYP smearing weight[2]", "HYP:weight2 = %lf", DOUBLE_T, &((varname).weight[2])},\
-    {NULL, NULL, 0, NULL}\
-  }\
-}
-
-input_HYP HYP_var = init_input_HYP(HYP_var);
-
 char cnfg_filename[256]="";
 char list_filename[256]="";
 char input_filename[256] = "input_file";
-char output_filename[256] = "wilson.out";
+char output_filename[256] = "HYPsmearing.out";
 enum { UNKNOWN_CNFG, DYNAMICAL_CNFG, QUENCHED_CNFG };
 
 
@@ -145,17 +124,17 @@ void read_cmdline(int argc, char* argv[]) {
   if (ao!=0) strcpy(output_filename,argv[ao]);
   if (ai!=0) strcpy(input_filename,argv[ai]);
 
-  error((ac==0 && al==0) || (ac!=0 && al!=0),1,"parse_cmdline [mk_wilsonloops.c]",
-      "Syntax: mk_wilsonloops { -c <config file> | -l <list file> } [-i <input file>] [-o <output file>] [-m]");
+  error((ac==0 && al==0) || (ac!=0 && al!=0),1,"parse_cmdline [tune_HYP_smearing.c]",
+      "Syntax: tune_HYP_smearing { -c <config file> | -l <list file> } [-i <input file>] [-o <output file>] [-m]");
 
   if(ac != 0) {
     strcpy(cnfg_filename,argv[ac]);
     strcpy(list_filename,"");
   } else if(al != 0) {
     strcpy(list_filename,argv[al]);
-    error((list=fopen(list_filename,"r"))==NULL,1,"parse_cmdline [mk_wilsonloops.c]" ,
+    error((list=fopen(list_filename,"r"))==NULL,1,"parse_cmdline [tune_HYP_smearing.c]" ,
 	"Failed to open list file\n");
-    error(fscanf(list,"%s",cnfg_filename)==0,1,"parse_cmdline [mk_wilsonloops.c]" ,
+    error(fscanf(list,"%s",cnfg_filename)==0,1,"parse_cmdline [tune_HYP_smearing.c]" ,
 	"Empty list file\n");
     fclose(list);
   }
@@ -165,12 +144,13 @@ void read_cmdline(int argc, char* argv[]) {
 
 
 int main(int argc,char *argv[]) {
-  int i,t;
+  int i;
   char tmp[256];
   FILE* list;
   filename_t fpars;
-  int c[3];
-  suNg_field* smeared_g;
+  double mtp[6859], mtp0, mtp1;
+  double weight[3];
+  int ibest;
 
   /* setup process id and communications */
   read_cmdline(argc, argv);
@@ -178,7 +158,7 @@ int main(int argc,char *argv[]) {
 
   /* logger setup */
   /* disable logger for MPI processes != 0 */
-  logger_setlevel(0,70);
+  logger_setlevel(0,10);
   if (PID!=0) { logger_disable(); }
   if (PID==0) { 
     sprintf(tmp,">%s",output_filename); logger_stdout(tmp);
@@ -196,12 +176,10 @@ int main(int argc,char *argv[]) {
   /* read & broadcast parameters */
   parse_cnfg_filename(cnfg_filename,&fpars);
 
-  HYP_var.weight[0]=HYP_var.weight[1]=HYP_var.weight[2]=0.;
   read_input(glb_var.read,input_filename);
-  read_input(HYP_var.read,input_filename);
   GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
-  error(fpars.type==UNKNOWN_CNFG,1,"mk_wilsonloops.c","Bad name for a configuration file");
-  error(fpars.nc!=NG,1,"mk_wilsonloops.c","Bad NG");
+  error(fpars.type==UNKNOWN_CNFG,1,"tune_HYP_smearing.c","Bad name for a configuration file");
+  error(fpars.nc!=NG,1,"tune_HYP_smearing.c","Bad NG");
 
 
   /* setup communication geometry */
@@ -226,17 +204,20 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed);
   rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
 
-  lprintf("MAIN",0,"HYP smearing weights: %f %f %f\n",HYP_var.weight[0],HYP_var.weight[1],HYP_var.weight[2]);
-
   /* alloc global gauge fields */
   u_gauge=alloc_gfield(&glattice);
-  smeared_g=alloc_gfield(&glattice);
+#ifndef REPR_FUNDAMENTAL
+  u_gauge_f=alloc_gfield_f(&glattice);
+#endif
 
   list=NULL;
   if(strcmp(list_filename,"")!=0) {
     error((list=fopen(list_filename,"r"))==NULL,1,"main [mk_mesons.c]" ,
 	"Failed to open list file\n");
   }
+
+  for(i=0;i<6859;i++) mtp[i]=0.;
+  mtp0=0.;
 
   i=0;
   while(1) {
@@ -249,46 +230,39 @@ int main(int argc,char *argv[]) {
     lprintf("MAIN",0,"Configuration from %s\n", cnfg_filename);
     /* NESSUN CHECK SULLA CONSISTENZA CON I PARAMETRI DEFINITI !!! */
     read_gauge_field(cnfg_filename);
+    represent_gauge_field();
 
     lprintf("TEST",0,"<p> %1.6f\n",avr_plaquette());
 
-    full_plaquette();
+    HYP_span_parameters(mtp);
+    mtp0+=min_tplaq(u_gauge);
 
-    HYP_smearing(smeared_g,u_gauge,HYP_var.weight);
+    ibest=HYP_best_parameters(mtp,weight);
+    lprintf("MAIN",0,"Best weights for HYP smearing: %.2f %.2f %.2f\n",weight[0],weight[1],weight[2]);
+    lprintf("MAIN",0,"The smallest plaquette has been increased from %e to %e\n",mtp0/i,mtp[ibest]/i);
 
-/*    for(t=1;t<GLB_T;t++)*/
-/*      wilsonloops(0,t,smeared_g);*/
-    
-    c[0]=1;c[1]=c[2]=0;
-    for(t=1;t<GLB_T;t++)
-      ara_temporalwilsonloops(t,c,smeared_g);
-
-    c[0]=1;c[1]=1;c[2]=0;
-    for(t=1;t<GLB_T;t++)
-      ara_temporalwilsonloops(t,c,smeared_g);
-
-/*    c[0]=1;c[1]=1;c[2]=1;*/
-/*    for(t=1;t<GLB_T;t++)*/
-/*      ara_temporalwilsonloops(t,c,smeared_g);*/
-
-    c[0]=2;c[1]=1;c[2]=0;
-    for(t=1;t<GLB_T;t++)
-      ara_temporalwilsonloops(t,c,smeared_g);
-
-/*    c[0]=2;c[1]=1;c[2]=1;*/
-/*    for(t=1;t<GLB_T;t++)*/
-/*      ara_temporalwilsonloops(t,c,smeared_g);*/
     
     if(list==NULL) break;
   }
 
   if(list!=NULL) fclose(list);
 
+
+  ibest=HYP_best_parameters(mtp,weight);
+  mtp0/=i;
+  mtp1=mtp[ibest]/i;
+
+  lprintf("MAIN",0,"Best weights for HYP smearing: %.2f %.2f %.2f\n",weight[0],weight[1],weight[2]);
+  lprintf("MAIN",0,"The smallest plaquette has been increased from %e to %e\n",mtp0,mtp1);
+
+
   finalize_process();
  
   free_gfield(u_gauge);
-  free_gfield(smeared_g);
-  
+#ifndef REPR_FUNDAMENTAL
+  free_gfield_f(u_gauge_f);
+#endif
+
   return 0;
 }
 

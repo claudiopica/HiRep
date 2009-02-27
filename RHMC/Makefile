@@ -12,7 +12,7 @@ MODS := geometry_init geometry_mpi_eo test_geometry_mpi blocked eo_lexi lexi com
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := IO
-MODS := archive logger read_input
+MODS := archive logger read_input endian
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Utils

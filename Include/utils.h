@@ -37,6 +37,14 @@ void assign_ud2u_f(void);
 void assign_s2sd(spinor_field *out, spinor_field_flt *in);
 void assign_sd2s(spinor_field_flt *out, spinor_field *in);
 
+
+/* HYP smearing */
+void HYP_smearing(suNg_field* out, suNg_field* in, double weight[3]);
+double min_tplaq(suNg_field* g);
+void HYP_span_parameters(double mtp[6859]);
+int HYP_best_parameters(double mtp[6859], double w[3]);
+
+
 /* Timing */
 #include <sys/time.h>
 int timeval_subtract (struct timeval *result, struct timeval *x, struct timeval *y);

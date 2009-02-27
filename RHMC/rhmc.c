@@ -55,6 +55,8 @@ int main(int argc,char *argv[])
   /* setup process id and communications */
   setup_process(&argc,&argv);
 
+  read_cmdline(argc,argv);
+
   /* logger setup */
   logger_setlevel(0,10);
   /* disable logger for MPI processes != 0 */

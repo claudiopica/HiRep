@@ -1,8 +1,8 @@
 TOPDIR = ..
 
-SRCS = mk_wilsonloops.c
+SRCS = mk_wilsonloops.c tune_HYP_smearing.c
 
-default: mk_wilsonloops
+default: mk_wilsonloops tune_HYP_smearing
 
 MKDIR=$(TOPDIR)/Make
 include $(MKDIR)/MkRules
@@ -16,7 +16,7 @@ MODS := archive logger read_input endian
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Utils
-MODS := suN_utils time boundary_conditions
+MODS := suN_utils time boundary_conditions HYP_smearing
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Memory
@@ -43,9 +43,15 @@ MODDIR := Statistics
 MODS := base_stat jacknife
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
+
 mk_wilsonloops: cinfo.c $(OBJS) $(MOD_OBJS)
 	echo -n Linking [$@]... 
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(MOD_OBJS) &&\
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ mk_wilsonloops.o $(MOD_OBJS) &&\
+	echo " done." || echo " failed."
+
+tune_HYP_smearing: cinfo.c $(OBJS) $(MOD_OBJS)
+	echo -n Linking [$@]... 
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ tune_HYP_smearing.o $(MOD_OBJS) &&\
 	echo " done." || echo " failed."
 
 
