@@ -1,6 +1,6 @@
 TOPDIR = ../..
 
-MAIN := check_puregauge_1
+MAIN := check_puregauge_1 check_puregauge_2
 
 SRCS = $(addsuffix .c,$(MAIN))
 
@@ -18,7 +18,7 @@ MODS := logger
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Utils
-MODS := boundary_conditions #suN_utils suN_exp single_double_utils
+MODS := suN_utils time boundary_conditions HYP_smearing # suN_exp single_double_utils
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Memory

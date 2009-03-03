@@ -9,6 +9,11 @@
 #include <math.h>
 
 
+#ifdef WITH_MPI
+#error Please compile without MPI!
+#endif
+
+
 #if NG==2
 static void project_on_suN(suNg *A) {
   project_cooling_to_suNg(A,A,0);

@@ -256,8 +256,8 @@ int main(int argc,char *argv[]) {
 
     HYP_smearing(smeared_g,u_gauge,HYP_var.weight);
 
-/*    for(t=1;t<GLB_T;t++)*/
-/*      wilsonloops(0,t,smeared_g);*/
+    for(t=1;t<GLB_T;t++)
+      wilsonloops(0,t,smeared_g);
     
     c[0]=1;c[1]=c[2]=0;
     for(t=1;t<GLB_T;t++)
@@ -267,17 +267,17 @@ int main(int argc,char *argv[]) {
     for(t=1;t<GLB_T;t++)
       ara_temporalwilsonloops(t,c,smeared_g);
 
-/*    c[0]=1;c[1]=1;c[2]=1;*/
-/*    for(t=1;t<GLB_T;t++)*/
-/*      ara_temporalwilsonloops(t,c,smeared_g);*/
+    c[0]=1;c[1]=1;c[2]=1;
+    for(t=1;t<GLB_T;t++)
+      ara_temporalwilsonloops(t,c,smeared_g);
 
     c[0]=2;c[1]=1;c[2]=0;
     for(t=1;t<GLB_T;t++)
       ara_temporalwilsonloops(t,c,smeared_g);
 
-/*    c[0]=2;c[1]=1;c[2]=1;*/
-/*    for(t=1;t<GLB_T;t++)*/
-/*      ara_temporalwilsonloops(t,c,smeared_g);*/
+    c[0]=2;c[1]=1;c[2]=1;
+    for(t=1;t<GLB_T;t++)
+      ara_temporalwilsonloops(t,c,smeared_g);
     
     if(list==NULL) break;
   }

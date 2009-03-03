@@ -6,6 +6,8 @@ check_geometry_1           Check the geometry
 
 check_puregauge_1          Check that _group_represent is homomorphic
 
+check_puregauge_2          Check the gauge covariance of the HYP smearing
+
 check_spinorfield_1        Check the consistency of spinor linear algebra
 
 check_diracoperator_1      Check gauge covariance of the Dirac operator
@@ -24,8 +26,8 @@ check_inverters_4          Check the eva module
 
 check_inverters_6          Check the single precision accelerated CG_mshift
 
-check_update_1		   Reversibility of the molecular dynamics (NEED TO BE FIXED THE READ FORM FILE)
+check_update_1             Reversibility of the molecular dynamics (NEED TO BE FIXED THE READ FORM FILE)
 
-check13 	Check the mesons (both mesons.c and dublin_mesons.c) using a free field (STILL TO BE FIXED)
+check13                    Check the mesons (both mesons.c and dublin_mesons.c) using a free field (STILL TO BE FIXED)
 
-check14          Check the dirac_eva module using a random field(STILL TO BE FIXED)	
+check14                    Check the dirac_eva module using a random field(STILL TO BE FIXED)	
