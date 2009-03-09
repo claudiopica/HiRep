@@ -100,8 +100,6 @@ int parse_cnfg_filename(char* filename, filename_t* fn) {
 #define repr_name "FUN"
 #elif defined REPR_SYMMETRIC
 #define repr_name "SYM"
-  for(k=0;k<nm;k++)
-    lprintf("MAIN",0,"Mass[%d] = %f\n",k,m[k]);
 #elif defined REPR_ANTISYMMETRIC
 #define repr_name "ASY"
 #elif defined REPR_ADJOINT
@@ -123,6 +121,13 @@ int parse_cnfg_filename(char* filename, filename_t* fn) {
     fn->m = .5/kappa-4.;
     fn->type=DYNAMICAL_CNFG;
     return DYNAMICAL_CNFG;
+  }
+
+  hm=sscanf(basename,"%*[^_]_%dx%dx%dx%d%*[Nn]c%db%lfn%d",
+      &(fn->t),&(fn->x),&(fn->y),&(fn->z),&(fn->nc),&(fn->b),&(fn->n));
+  if(hm==7) {
+    fn->type=QUENCHED_CNFG;
+    return QUENCHED_CNFG;
   }
 
   hm=sscanf(basename,"%dx%dx%dx%d%*[Nn]c%db%lfn%d",
@@ -313,6 +318,8 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"max number of subiterations (eva:maxiter) = %d\n",eig_var.maxiter);
   lprintf("MAIN",0,"absolute precision  (eva:omega1) = %e\n",eig_var.omega1);
   lprintf("MAIN",0,"relative precision (eva:omega2) = %e\n",eig_var.omega2);
+  for(k=0;k<nm;k++)
+    lprintf("MAIN",0,"Mass[%d] = %f\n",k,m[k]);
 
 
   list=NULL;

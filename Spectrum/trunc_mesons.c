@@ -118,6 +118,13 @@ int parse_cnfg_filename(char* filename, filename_t* fn) {
     return DYNAMICAL_CNFG;
   }
 
+  hm=sscanf(basename,"%*[^_]_%dx%dx%dx%d%*[Nn]c%db%lfn%d",
+      &(fn->t),&(fn->x),&(fn->y),&(fn->z),&(fn->nc),&(fn->b),&(fn->n));
+  if(hm==7) {
+    fn->type=QUENCHED_CNFG;
+    return QUENCHED_CNFG;
+  }
+
   hm=sscanf(basename,"%dx%dx%dx%d%*[Nn]c%db%lfn%d",
       &(fn->t),&(fn->x),&(fn->y),&(fn->z),&(fn->nc),&(fn->b),&(fn->n));
   if(hm==7) {

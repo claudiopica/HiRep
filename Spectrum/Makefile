@@ -1,8 +1,8 @@
 TOPDIR = ..
 
-SRCS = mk_mesons.c trunk_mesons.c random_cnfg.c random_spinor.c eigval.c
+SRCS = mk_mesons.c trunc_mesons.c random_cnfg.c random_spinor.c eigval.c
 
-default: mk_mesons trunk_mesons random_cnfg random_spinor eigval
+default: mk_mesons trunc_mesons random_cnfg random_spinor eigval
 
 MKDIR=$(TOPDIR)/Make
 include $(MKDIR)/MkRules
@@ -57,9 +57,9 @@ mk_mesons: cinfo.c mk_mesons.o $(MOD_OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ mk_mesons.o $(MOD_OBJS) &&\
 	echo " done." || echo " failed."
 
-trunk_mesons: trunk_mesons.o $(MOD_OBJS)
+trunc_mesons: trunc_mesons.o $(MOD_OBJS)
 	echo -n Linking [$@]... 
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ trunk_mesons.o $(MOD_OBJS) &&\
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ trunc_mesons.o $(MOD_OBJS) &&\
 	echo " done." || echo " failed."
 
 random_cnfg: random_cnfg.o $(MOD_OBJS)

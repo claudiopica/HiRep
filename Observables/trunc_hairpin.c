@@ -248,7 +248,6 @@ static int max_H2_ev(double *max) {
   } while (fabs((*max-oldmax)/(*max))>1.e-3);
 
   *max*=1.1; /* do not know exact bound */
-  free_spinor_field(s1);
   
   return count;
 }
@@ -269,11 +268,11 @@ static void compute_evs() {
 
 	if(pars.n_eigenvalues<=0) return;
 	
-  ev_mask=amalloc(sizeof(spinor_field),pars.eva_nevt);
+  ev_mask=malloc(sizeof(spinor_field)*pars.eva_nevt);
   for(p=pars.n_eigenvalues; p<pars.eva_nevt; p++)
     ev_mask[p]=compute_evs_ws[p-pars.n_eigenvalues];
   eva_ws=compute_evs_ws+pars.eva_nevt-pars.n_eigenvalues;
-  d=amalloc(sizeof(double),pars.eva_nevt);
+  d=malloc(sizeof(double)*pars.eva_nevt);
   
 	for(m=0; m<pars.n_masses; m++) {
     for(p=0; p<pars.n_eigenvalues; p++)
