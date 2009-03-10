@@ -200,7 +200,7 @@ int main(int argc,char *argv[]) {
   /* disable logger for MPI processes != 0 */
   if (PID!=0) { logger_disable(); }
   if (PID==0) { sprintf(tmp,">%s",output_filename); logger_stdout(tmp); }
-  logger_setlevel(0,30);
+  logger_setlevel(0,0); /*0,30*/
   sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
 
   lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS); 
@@ -257,6 +257,20 @@ int main(int argc,char *argv[]) {
 
   lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed);
   rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
+
+  /* Print inversion/truncation parameters */
+  lprintf("MAIN",0,"Simulation masses:");
+  for(i=0; i<ata_qprop_var.pars.n_masses; i++)
+    lprintf("MAIN",0," %e",ata_qprop_var.pars.mass[i]);
+  lprintf("MAIN",0,"\n");
+  lprintf("MAIN",0,"Eigenvalues parameters (nev, nevt, omega1, omega2, kmax, imax): %d, %d, %e, %e, %d, %d\n",ata_qprop_var.pars.n_eigenvalues,ata_qprop_var.pars.eva_nevt,ata_qprop_var.pars.eva_omega1,ata_qprop_var.pars.eva_omega2,ata_qprop_var.pars.eva_kmax,ata_qprop_var.pars.eva_imax);
+  lprintf("MAIN",0,"Hopping parameter expansion order (Disabled = -1): %d\n",ata_qprop_var.pars.hopping_order);
+  lprintf("MAIN",0,"Truncate after # steps: %d\n",ata_qprop_var.pars.n_truncation_steps);
+  lprintf("MAIN",0,"Number of truncation sources: %d\n",ata_qprop_var.pars.n_sources_truncation);
+  lprintf("MAIN",0,"Number of correction sources: %d\n",ata_qprop_var.pars.n_sources_correction);
+  lprintf("MAIN",0,"Inverter precision: %e\n",ata_qprop_var.pars.inverter_precision);
+  lprintf("MAIN",0,"Dilution: %d\n",ata_qprop_var.pars.dilution);
+
 
   /* alloc global gauge fields */
   u_gauge=alloc_gfield(&glattice);

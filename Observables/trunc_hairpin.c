@@ -87,7 +87,7 @@
 
 
 #define QMR_INVERTER
-/*#define EO_PRE*/
+#define EO_PRE
 
 static int loglevel = 0;
 static int init_flag = 0;
@@ -166,30 +166,39 @@ void traced_ata_qprop(complex*** prop, int n_points) {
 	int m, xp;
 
 #ifdef QMR_INVERTER
-	QMR_init();
+        if(pars.n_sources_truncation > 0) QMR_init();
 #endif /* QMR_INVERTER */
 
 	for(xp = 0; xp < n_points; xp++)
 	for(m = 0; m < pars.n_masses; m++)
 		memset(prop[xp][m], '\0', sizeof(complex)*T*16);
 
-  compute_evs();
-  ev_propagator(prop[0]);
-  if(pars.hopping_order>=0) hopping_propagator(prop[0]);
+	/* If performing exact calculation (dilution==3) just invert fully
+           using point sources. Otherwise, use ev, hopexp, truncation, etc. */
+	if (pars.dilution==3) {
+	  stoc_propagator(prop[0],pars.n_sources_truncation,INVERSION);
+	  for(xp = 1; xp < n_points; xp++)
+	    for(m = 0; m < pars.n_masses; m++)
+	      memcpy(prop[xp][m], prop[0][m], sizeof(complex)*T*16);
+	} else {
+
+	compute_evs();
+	ev_propagator(prop[0]);
+	if(pars.hopping_order>=0) hopping_propagator(prop[0]);
 
 	for(xp = 1; xp < n_points; xp++)
 	for(m = 0; m < pars.n_masses; m++) {
 		memcpy(prop[xp][m], prop[0][m], sizeof(complex)*T*16);
 	}
   
-	for(xp = 1; xp < n_points; xp++) {
+	for(xp = 0; xp < n_points; xp++) {
 	  if(pars.n_truncation_steps>0) {
       stoc_propagator(prop[xp],pars.n_sources_truncation,TRUNCATION);
       stoc_propagator(prop[xp],pars.n_sources_correction,CORRECTION);
     } else
       stoc_propagator(prop[xp],pars.n_sources_truncation,INVERSION);
   }
-
+	}
 }
 
 
@@ -423,6 +432,8 @@ static void stoc_propagator(complex** prop, int n_src, int mode) {
 *
 * required workspace: 3
 *
+* NB: Routine correct only for global L,T >= 4
+* 
 ******************************************************************************/
 static void hopping_propagator(complex** prop) {
   if (pars.hopping_order<0) return;
@@ -443,7 +454,8 @@ static void hopping_propagator(complex** prop) {
     prop[m][16*i+15].re += -NF*(1.0/(4.0+pars.mass[m]));
   }
 
-  /* 1st, 2nd, 3rd order are zero, start calculating if order>=3 */
+  /* 1st, 2nd, 3rd order are zero, start calculating if order>=3
+     NB. Only correct if L, T > 2                                  */
   if (pars.hopping_order>3) {
 
     int di=0;
