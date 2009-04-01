@@ -33,10 +33,12 @@
 
 /* HYP smearing parameters */
 typedef struct _input_HYP {
+  int nsteps;
   double weight[3];
+  char type[256]; /* alldirections ; spatialonly */
 
   /* for the reading function */
-  input_record_t read[4];
+  input_record_t read[6];
 
 } input_HYP;
 
@@ -46,6 +48,8 @@ typedef struct _input_HYP {
     {"HYP smearing weight[0]", "HYP:weight0 = %lf", DOUBLE_T, &((varname).weight[0])},\
     {"HYP smearing weight[1]", "HYP:weight1 = %lf", DOUBLE_T, &((varname).weight[1])},\
     {"HYP smearing weight[2]", "HYP:weight2 = %lf", DOUBLE_T, &((varname).weight[2])},\
+    {"HYP smearing number of steps", "HYP:nsteps = %d", INT_T, &((varname).nsteps)},\
+    {"HYP smearing type", "HYP:type = %s", STRING_T, (varname).type},\
     {NULL, NULL, 0, NULL}\
   }\
 }
@@ -165,7 +169,7 @@ void read_cmdline(int argc, char* argv[]) {
 
 
 int main(int argc,char *argv[]) {
-  int i,t;
+  int i,t,p;
   char tmp[256];
   FILE* list;
   filename_t fpars;
@@ -202,6 +206,8 @@ int main(int argc,char *argv[]) {
   GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
   error(fpars.type==UNKNOWN_CNFG,1,"mk_wilsonloops.c","Bad name for a configuration file");
   error(fpars.nc!=NG,1,"mk_wilsonloops.c","Bad NG");
+  error(HYP_var.nsteps<1,1,"mk_wilsonloops.c","Bad HYP:nsteps value");
+  error(strcmp(HYP_var.type,"alldirections")!=0 && strcmp(HYP_var.type,"spatialonly")!=0,1,"mk_wilsonloops.c","Bad HYP:type value");
 
 
   /* setup communication geometry */
@@ -227,6 +233,8 @@ int main(int argc,char *argv[]) {
   rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
 
   lprintf("MAIN",0,"HYP smearing weights: %f %f %f\n",HYP_var.weight[0],HYP_var.weight[1],HYP_var.weight[2]);
+  lprintf("MAIN",0,"HYP smearing number of steps: %d\n",HYP_var.nsteps);
+  lprintf("MAIN",0,"HYP smearing type: %s\n",HYP_var.type);
 
   /* alloc global gauge fields */
   u_gauge=alloc_gfield(&glattice);
@@ -254,7 +262,25 @@ int main(int argc,char *argv[]) {
 
     full_plaquette();
 
-    HYP_smearing(smeared_g,u_gauge,HYP_var.weight);
+    if(strcmp(HYP_var.type,"alldirections")==0) {
+      for(p=0;p<HYP_var.nsteps/2;p++) {
+        HYP_smearing(smeared_g,u_gauge,HYP_var.weight);
+        HYP_smearing(u_gauge,smeared_g,HYP_var.weight);
+      }
+      if(HYP_var.nsteps%2==1)
+        HYP_smearing(smeared_g,u_gauge,HYP_var.weight);
+      else
+        suNg_field_copy(smeared_g,u_gauge);
+    } else {
+      for(p=0;p<HYP_var.nsteps/2;p++) {
+        spatialHYP_smearing(smeared_g,u_gauge,HYP_var.weight);
+        spatialHYP_smearing(u_gauge,smeared_g,HYP_var.weight);
+      }
+      if(HYP_var.nsteps%2==1)
+        spatialHYP_smearing(smeared_g,u_gauge,HYP_var.weight);
+      else
+        suNg_field_copy(smeared_g,u_gauge);
+    }
 
 /*    for(t=1;t<GLB_T;t++)*/
 /*      wilsonloops(0,t,smeared_g);*/
@@ -278,7 +304,11 @@ int main(int argc,char *argv[]) {
     c[0]=2;c[1]=1;c[2]=1;
     for(t=1;t<GLB_T;t++)
       ara_temporalwilsonloops(t,c,smeared_g);
-    
+ 
+    c[0]=2;c[1]=2;c[2]=1;
+    for(t=1;t<GLB_T;t++)
+      ara_temporalwilsonloops(t,c,smeared_g);
+   
     if(list==NULL) break;
   }
 

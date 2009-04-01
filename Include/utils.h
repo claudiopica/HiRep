@@ -39,6 +39,7 @@ void assign_sd2s(spinor_field_flt *out, spinor_field *in);
 
 
 /* HYP smearing */
+void spatialHYP_smearing(suNg_field* out, suNg_field* in, double weight[3]);
 void HYP_smearing(suNg_field* out, suNg_field* in, double weight[3]);
 double min_tplaq(suNg_field* g);
 void HYP_span_parameters(double mtp[6859]);

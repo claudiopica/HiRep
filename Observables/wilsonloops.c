@@ -90,9 +90,9 @@ static int perm_abb[3][3]={{0,1,2},{1,2,0},{2,0,1}};
 static int perm_aaa[1][3]={{0,1,2}};
 
 
-void ara_temporalwilsonloops(int t, int c[3], suNg_field* g) {
+void ara_temporalwilsonloops(const int t, const int cc[3], const suNg_field* g) {
   int i, j, k, m;
-  int d[3];
+  int c[3], d[3];
   _DECLARE_INT_ITERATOR(ix);
   int iy;
   int* iz;
@@ -100,22 +100,25 @@ void ara_temporalwilsonloops(int t, int c[3], suNg_field* g) {
   int max_size;
   int* perm=NULL;
   int n, nperms=0;
+  int rotinv;
+  int nave;
   int p, nsteps;
   int chi1, chi2;
 
   suNg *t_llinks=malloc(sizeof(suNg)*glattice.gsize);
   suNg *s_llinks=malloc(sizeof(suNg)*glattice.gsize);
   
-  complex wilson_fund;
-  complex ctmp;
-  double wilson_adj;
-
-
   error(g->type!=&glattice,1,"wilsonloops.c","The gauge field must be defined on the whole lattice");
   error(t<=0,1,"wilsonloops.c","The length must be > 0");
 
-  max_size=(GLB_X>GLB_Y)?GLB_X:GLB_Y;
-  max_size=(GLB_Z>max_size)?GLB_Z:max_size;
+  if(GLB_X==GLB_Y && GLB_Y==GLB_Z && bc[1]==bc[2] && bc[2]==bc[3]) {
+    rotinv=(1==1);
+    lprintf("ARA WILSON LOOPS",0,"Spatial rotational invariance found.\n");
+  } else
+    lprintf("ARA WILSON LOOPS",0,"No spatial rotational invariance found.\n");
+
+  max_size=(GLB_X-2>GLB_Y-2)?GLB_X-2:GLB_Y-2;
+  max_size=(GLB_Z-2>max_size)?GLB_Z-2:max_size;
 
 
   _MASTER_FOR(&glattice,ix) {
@@ -129,9 +132,9 @@ void ara_temporalwilsonloops(int t, int c[3], suNg_field* g) {
   }
 
   d[0]=d[1]=d[2]=0;
-  c[0]=(c[0]>=0)?c[0]:-c[0];
-  c[1]=(c[1]>=0)?c[1]:-c[1];
-  c[2]=(c[2]>=0)?c[2]:-c[2];
+  c[0]=(cc[0]>=0)?cc[0]:-cc[0];
+  c[1]=(cc[1]>=0)?cc[1]:-cc[1];
+  c[2]=(cc[2]>=0)?cc[2]:-cc[2];
 
   for(i=0;i<3;i++)
   for(j=0;j<3;j++) {
@@ -161,7 +164,20 @@ void ara_temporalwilsonloops(int t, int c[3], suNg_field* g) {
   lprintf("ARA WILSON LOOPS",50,"n permutations = %d\n",nperms);
   
   iz=malloc(glattice.gsize*sizeof(int));
-  
+
+  double wilson_adj;
+  complex wilson_fund;
+  complex ctmp;
+  nsteps=(int)(max_size/sqrt(d[0]*d[0]+d[1]*d[1]+d[2]*d[2]));
+  complex wilson_fund_ave[nsteps];
+  double wilson_adj_ave[nsteps];
+
+  for(p=1;p<=nsteps;p++) {
+    wilson_fund_ave[p].re=wilson_fund_ave[p].im=0.0;
+    wilson_adj_ave[p]=0.0;
+  }
+  nave=0;
+
   for(n=0;n<nperms;n++) {
   
     c[perm[3*n+0]]=d[0];
@@ -169,9 +185,17 @@ void ara_temporalwilsonloops(int t, int c[3], suNg_field* g) {
     c[perm[3*n+2]]=d[2];
     
     nsteps=(int)(max_size/sqrt(c[0]*c[0]+c[1]*c[1]+c[2]*c[2]));
-    if(c[0]!=0) nsteps=(GLB_X/c[0]<nsteps)?(GLB_X/c[0]):nsteps;
-    if(c[1]!=0) nsteps=(GLB_Y/c[1]<nsteps)?(GLB_Y/c[1]):nsteps;
-    if(c[2]!=0) nsteps=(GLB_Z/c[2]<nsteps)?(GLB_Z/c[2]):nsteps;
+    if(c[0]!=0) nsteps=((GLB_X-2)/c[0]<nsteps)?((GLB_X-2)/c[0]):nsteps;
+    if(c[1]!=0) nsteps=((GLB_Y-2)/c[1]<nsteps)?((GLB_Y-2)/c[1]):nsteps;
+    if(c[2]!=0) nsteps=((GLB_Z-2)/c[2]<nsteps)?((GLB_Z-2)/c[2]):nsteps;
+
+    if(!rotinv) {
+      for(p=1;p<=nsteps;p++) {
+        wilson_fund_ave[p].re=wilson_fund_ave[p].im=0.0;
+        wilson_adj_ave[p]=0.0;
+      }
+      nave=0;
+    }
 
     for(m=0;m<4;m++) {
 
@@ -189,7 +213,7 @@ void ara_temporalwilsonloops(int t, int c[3], suNg_field* g) {
         else c[2]=-c[2];
       }
 
-      lprintf("ARA WILSON LOOPS",50,"c={ %d , %d , %d }\n",c[0],c[1],c[2]);
+/*      lprintf("ARA WILSON LOOPS",50,"c={ %d , %d , %d }\n",c[0],c[1],c[2]);*/
 
       _MASTER_FOR(&glattice,ix) {
         iz[ix]=ix;
@@ -264,8 +288,9 @@ void ara_temporalwilsonloops(int t, int c[3], suNg_field* g) {
         }
         
         /* compute the Wilson loops */
-        wilson_fund.re=wilson_fund.im=0.0;
-        wilson_adj=0.0;
+        wilson_fund.re=wilson_fund.im=0.;
+        wilson_adj=0.;
+        
         _MASTER_FOR(&glattice,ix) {
           _suNg_times_suNg(tmp[0],s_llinks[ix],t_llinks[iz[ix]]);
           _suNg_times_suNg_dagger(tmp[1],tmp[0],s_llinks[multistep(ix,0,t)]);
@@ -278,14 +303,51 @@ void ara_temporalwilsonloops(int t, int c[3], suNg_field* g) {
         _complex_mulr(wilson_fund,1./(GLB_T*GLB_X*GLB_Y*GLB_Z*NG),wilson_fund);
         wilson_adj /= GLB_T*GLB_X*GLB_Y*GLB_Z*(NG*NG-1);
         
+        nave++;
+        wilson_fund_ave[p].re+=wilson_fund.re;
+        wilson_fund_ave[p].im+=wilson_fund.im;
+        wilson_adj_ave[p]+=wilson_adj;
+
+      } /* for(p=1;p<=nsteps;p++) */
+    
+    } /* for(m=0;m<4;m++) */
+
+    if(!rotinv) {
+      for(p=1;p<=nsteps;p++) {
+        wilson_fund_ave[p].re/=nave;
+        wilson_fund_ave[p].im/=nave;
+        wilson_adj_ave[p]/=nave;
+
+        c[0]=(c[0]>0)?c[0]:-c[0];
+        c[1]=(c[1]>0)?c[1]:-c[1];
+        c[2]=(c[2]>0)?c[2]:-c[2];
         lprintf("ARA WILSON LOOPS",0,"(T,dx,dy,dz,R,f.re,f.im,adj) = %d %d %d %d %.8e %.8e %.8e %.8e\n",
-                t,p*c[0],p*c[1],p*c[2],p*sqrt(c[0]*c[0]+c[1]*c[1]+c[2]*c[2]),wilson_fund.re,wilson_fund.im,wilson_adj);
+                t,p*c[0],p*c[1],p*c[2],p*sqrt(c[0]*c[0]+c[1]*c[1]+c[2]*c[2]),
+                wilson_fund_ave[p].re,wilson_fund_ave[p].im,
+                wilson_adj_ave[p]);
 
       }
-    
     }
 
+  } /* for(n=0;n<nperms;n++) */
+
+  if(rotinv) {
+    for(p=1;p<=nsteps;p++) {
+      wilson_fund_ave[p].re/=nave;
+      wilson_fund_ave[p].im/=nave;
+      wilson_adj_ave[p]/=nave;
+
+      c[0]=(c[0]>0)?c[0]:-c[0];
+      c[1]=(c[1]>0)?c[1]:-c[1];
+      c[2]=(c[2]>0)?c[2]:-c[2];
+      lprintf("ARA WILSON LOOPS",0,"(T,dx,dy,dz,R,f.re,f.im,adj) = %d %d %d %d %.8e %.8e %.8e %.8e\n",
+              t,p*d[0],p*d[1],p*d[2],p*sqrt(d[0]*d[0]+d[1]*d[1]+d[2]*d[2]),
+                wilson_fund_ave[p].re,wilson_fund_ave[p].im,
+                wilson_adj_ave[p]);
+
+    }
   }
+
   
   free(t_llinks);
   free(s_llinks);

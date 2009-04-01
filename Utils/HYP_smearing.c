@@ -30,6 +30,145 @@ static int index2[4][4]={
 };
 
 
+void spatialHYP_smearing(suNg_field* out, suNg_field* in, double weight[3]) {
+  _DECLARE_INT_ITERATOR(ix);
+  int mu,nu,rho,eta;
+  int iy;
+  int i;
+  suNg tmp[3];
+  suNg_field* Vbar[6];
+  suNg_field* Vtilde[4];
+
+  error(out->type!=&glattice,1,"spatialHYP_smearing.c","'out' in HYP_core must be defined on the whole lattice");
+  error(in->type!=&glattice,1,"spatialHYP_smearing.c","'in' in HYP_core must be defined on the whole lattice");
+
+  lprintf("HYP",30,"Spatial HYP smearing with weights %f %f %f\n",weight[0],weight[1],weight[2]);
+
+  for(i=0;i<6;i++) Vbar[i]=alloc_gfield(&glattice);
+  for(i=0;i<4;i++) Vtilde[i]=alloc_gfield(&glattice);
+
+
+  for(nu=1;nu<4;nu++)
+  for(rho=nu+1;rho<4;rho++) {
+    i=index2[nu][rho];
+    
+    _MASTER_FOR(&glattice,ix) {
+      for(mu=1;mu<4;mu++) {
+        if(mu==nu || mu==rho) continue;
+
+        _suNg_zero(tmp[0]);
+        for(eta=1;eta<4;eta++){
+          if(eta==mu || eta==nu || eta==rho) continue;
+          
+          iy=iup(ix,eta);
+          _suNg_times_suNg(tmp[1],*_4FIELD_AT(in,ix,eta),*_4FIELD_AT(in,iy,mu));
+          iy=iup(ix,mu);
+          _suNg_times_suNg_dagger(tmp[2],tmp[1],*_4FIELD_AT(in,iy,eta));
+          _suNg_add_assign(tmp[0],tmp[2]);
+          
+          iy=idn(ix,eta);
+          _suNg_dagger(tmp[2],*_4FIELD_AT(in,iy,eta));
+          _suNg_times_suNg(tmp[1],tmp[2],*_4FIELD_AT(in,iy,mu));
+          iy=iup(iy,mu);
+          _suNg_times_suNg(tmp[2],tmp[1],*_4FIELD_AT(in,iy,eta));
+          _suNg_add_assign(tmp[0],tmp[2]);
+        }
+
+        *_4FIELD_AT(Vbar[i],ix,mu)=*_4FIELD_AT(in,ix,mu);
+        if(mu!=nu && mu!=rho) {
+          _suNg_mul(*_4FIELD_AT(Vbar[i],ix,mu),(1.-weight[2]),*_4FIELD_AT(Vbar[i],ix,mu));
+          _suNg_mul(tmp[0],weight[2]/2.,tmp[0]);
+          _suNg_add_assign(*_4FIELD_AT(Vbar[i],ix,mu),tmp[0]);
+          
+          project_on_suN(_4FIELD_AT(Vbar[i],ix,mu));
+        }
+          
+      }
+    }
+    
+  }
+
+
+  for(nu=1;nu<4;nu++) {
+
+    _MASTER_FOR(&glattice,ix) {
+      for(mu=1;mu<4;mu++) {
+        if(mu==nu) continue;
+
+        _suNg_zero(tmp[0]);
+        for(rho=1;rho<4;rho++){
+          if(rho==mu || rho==nu) continue;
+          
+          iy=iup(ix,rho);
+          _suNg_times_suNg(tmp[1],*_4FIELD_AT(Vbar[index2[nu][mu]],ix,rho),*_4FIELD_AT(Vbar[index2[rho][nu]],iy,mu));
+          iy=iup(ix,mu);
+          _suNg_times_suNg_dagger(tmp[2],tmp[1],*_4FIELD_AT(Vbar[index2[nu][mu]],iy,rho));
+          _suNg_add_assign(tmp[0],tmp[2]);
+          
+          iy=idn(ix,rho);
+          _suNg_dagger(tmp[2],*_4FIELD_AT(Vbar[index2[nu][mu]],iy,rho));
+          _suNg_times_suNg(tmp[1],tmp[2],*_4FIELD_AT(Vbar[index2[rho][nu]],iy,mu));
+          iy=iup(iy,mu);
+          _suNg_times_suNg(tmp[2],tmp[1],*_4FIELD_AT(Vbar[index2[nu][mu]],iy,rho));
+          _suNg_add_assign(tmp[0],tmp[2]);
+        }
+
+        *_4FIELD_AT(Vtilde[nu],ix,mu)=*_4FIELD_AT(in,ix,mu);
+        if(mu!=nu) {
+          _suNg_mul(*_4FIELD_AT(Vtilde[nu],ix,mu),(1.-weight[1]),*_4FIELD_AT(Vtilde[nu],ix,mu));
+          _suNg_mul(tmp[0],weight[1]/4.,tmp[0]);
+          _suNg_add_assign(*_4FIELD_AT(Vtilde[nu],ix,mu),tmp[0]);
+          
+          project_on_suN(_4FIELD_AT(Vtilde[nu],ix,mu));
+        }
+          
+      }
+    }
+  
+  }
+
+
+  _MASTER_FOR(&glattice,ix) {
+    for(mu=0;mu<4;mu++) {
+
+      *_4FIELD_AT(out,ix,mu)=*_4FIELD_AT(in,ix,mu);
+      if(mu==0) continue;
+
+      _suNg_zero(tmp[0]);
+      for(nu=1;nu<4;nu++){
+        if(nu==mu) continue;
+        
+        iy=iup(ix,nu);
+        _suNg_times_suNg(tmp[1],*_4FIELD_AT(Vtilde[mu],ix,nu),*_4FIELD_AT(Vtilde[nu],iy,mu));
+        iy=iup(ix,mu);
+        _suNg_times_suNg_dagger(tmp[2],tmp[1],*_4FIELD_AT(Vtilde[mu],iy,nu));
+        _suNg_add_assign(tmp[0],tmp[2]);
+        
+        iy=idn(ix,nu);
+        _suNg_dagger(tmp[2],*_4FIELD_AT(Vtilde[mu],iy,nu));
+        _suNg_times_suNg(tmp[1],tmp[2],*_4FIELD_AT(Vtilde[nu],iy,mu));
+        iy=iup(iy,mu);
+        _suNg_times_suNg(tmp[2],tmp[1],*_4FIELD_AT(Vtilde[mu],iy,nu));
+        _suNg_add_assign(tmp[0],tmp[2]);
+      }
+
+      _suNg_mul(*_4FIELD_AT(out,ix,mu),(1.-weight[0]),*_4FIELD_AT(out,ix,mu));
+      _suNg_mul(tmp[0],weight[0]/6.,tmp[0]);
+      _suNg_add_assign(*_4FIELD_AT(out,ix,mu),tmp[0]);
+      
+      project_on_suN(_4FIELD_AT(out,ix,mu));
+        
+    }
+  }
+
+
+  for(i=0;i<6;i++) free_gfield(Vbar[i]);
+  for(i=0;i<4;i++) free_gfield(Vtilde[i]);
+
+}
+
+
+
 void HYP_smearing(suNg_field* out, suNg_field* in, double weight[3]) {
   _DECLARE_INT_ITERATOR(ix);
   int mu,nu,rho,eta;

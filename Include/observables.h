@@ -107,9 +107,8 @@ void g0g5g2_debug(complex Gamma[4][4], int* sign);
 void g0g5g3_debug(complex Gamma[4][4], int* sign);
 
 
-
 void wilsonloops(int mu, int x, suNg_field* g);
-void ara_temporalwilsonloops(int t, int c[3], suNg_field* g);
+void ara_temporalwilsonloops(const int t, const int c[3], const suNg_field* g);
 
 
 #endif 

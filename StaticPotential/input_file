@@ -13,3 +13,5 @@ level = 1  seed = 12345
 HYP:weight0 = 0.70
 HYP:weight1 = 0.60
 HYP:weight2 = 2.00
+HYP:nsteps = 1
+HYP:type = spatialonly // alldirections spatialonly
