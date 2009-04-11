@@ -69,8 +69,8 @@ void pta_qprop_QMR_eo(int g0[4], spinor_field **pta_qprop, int nm, double *mass,
 	resdn=in+1;
 	resd=resdn+nm;
 
-	C0[0]=g0[0]/NP_T; C0[1]=g0[1]/NP_X; C0[2]=g0[2]/NP_Y; C0[3]=g0[3]/NP_Z;
-	c0[0]=g0[0]%NP_T; c0[1]=g0[1]%NP_X; c0[2]=g0[2]%NP_Y; c0[3]=g0[3]%NP_Z;
+	C0[0]=g0[0]/T; C0[1]=g0[1]/X; C0[2]=g0[2]/Y; C0[3]=g0[3]/Z;
+	c0[0]=g0[0]%T; c0[1]=g0[1]%X; c0[2]=g0[2]%Y; c0[3]=g0[3]%Z;
 	x0=ipt(c0[0],c0[1],c0[2],c0[3]);
 	
 	/* set up inverters parameters */
