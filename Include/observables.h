@@ -25,7 +25,7 @@ double avr_plaquette();
 double local_plaq(int ix);
 void full_plaquette();
 
-void pta_qprop_QMR_eo(spinor_field **pta_qprop, int nm, double *m, double acc);
+void pta_qprop_QMR_eo(int g0[4], spinor_field **pta_qprop, int nm, double *m, double acc);
 void pta_qprop_QMR(spinor_field **pta_qprop, int nm, double *m, double acc);
 void pta_qprop_MINRES(spinor_field **pta_qprop, int nm, double *m, double acc);
 
@@ -53,24 +53,24 @@ void ata_qprop_init(ata_qprop_pars* p);
 void ata_qprop_free();
 
 
-void id_correlator(double *out, spinor_field *qp);
-void g0_correlator(double *out, spinor_field *qp);
-void g5_correlator(double *out, spinor_field *qp);
-void g0g5_correlator(double *out, spinor_field *qp);
-void g1_correlator(double *out, spinor_field *qp);
-void g2_correlator(double *out, spinor_field *qp);
-void g3_correlator(double *out, spinor_field *qp);
-void g0g1_correlator(double *out, spinor_field *qp);
-void g0g2_correlator(double *out, spinor_field *qp);
-void g0g3_correlator(double *out, spinor_field *qp);
-void g5g1_correlator(double *out, spinor_field *qp);
-void g5g2_correlator(double *out, spinor_field *qp);
-void g5g3_correlator(double *out, spinor_field *qp);
-void g0g5g1_correlator(double *out, spinor_field *qp);
-void g0g5g2_correlator(double *out, spinor_field *qp);
-void g0g5g3_correlator(double *out, spinor_field *qp);
-void g5_g0g5_re_correlator(double *out, spinor_field *qp);
-void g5_g0g5_im_correlator(double *out, spinor_field *qp);
+void id_correlator(double *out, int t0, spinor_field *qp);
+void g0_correlator(double *out, int t0, spinor_field *qp);
+void g5_correlator(double *out, int t0, spinor_field *qp);
+void g0g5_correlator(double *out, int t0, spinor_field *qp);
+void g1_correlator(double *out, int t0, spinor_field *qp);
+void g2_correlator(double *out, int t0, spinor_field *qp);
+void g3_correlator(double *out, int t0, spinor_field *qp);
+void g0g1_correlator(double *out, int t0, spinor_field *qp);
+void g0g2_correlator(double *out, int t0, spinor_field *qp);
+void g0g3_correlator(double *out, int t0, spinor_field *qp);
+void g5g1_correlator(double *out, int t0, spinor_field *qp);
+void g5g2_correlator(double *out, int t0, spinor_field *qp);
+void g5g3_correlator(double *out, int t0, spinor_field *qp);
+void g0g5g1_correlator(double *out, int t0, spinor_field *qp);
+void g0g5g2_correlator(double *out, int t0, spinor_field *qp);
+void g0g5g3_correlator(double *out, int t0, spinor_field *qp);
+void g5_g0g5_re_correlator(double *out, int t0, spinor_field *qp);
+void g5_g0g5_im_correlator(double *out, int t0, spinor_field *qp);
 
 void id_trace_H(complex* out, complex* smat);
 void g0_trace_H(complex* out, complex* smat);

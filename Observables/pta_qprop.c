@@ -36,15 +36,15 @@ static void D_pre(spinor_field *out, spinor_field *in){
 }
 
 /*
- * Computes the matrix elements (H^-1)_{x,0}
+ * Computes the matrix elements (H^-1)_{x,x0}
  * using the QMR inverter with even/odd preconditioning
  * In order to use this inverter without look-ahead on point
  * like sources we add a background noise to the source which is then 
  * subtracted at the end at the cost of one more inversion.
  */
-void pta_qprop_QMR_eo(spinor_field **pta_qprop, int nm, double *mass, double acc) {
+void pta_qprop_QMR_eo(int g0[4], spinor_field **pta_qprop, int nm, double *mass, double acc) {
 	mshift_par QMR_par;
-	int i, x0;
+	int i, x0, C0[0], c0[4];
 	int source;
 	double *shift;
 	spinor_field *in=0;
@@ -54,14 +54,14 @@ void pta_qprop_QMR_eo(spinor_field **pta_qprop, int nm, double *mass, double acc
 	spinor_field qprop_mask;
 	int cgiter=0;
 	double norm;
-  spinor_field *test_e=0;
+	spinor_field *test_e=0;
 
 #ifndef NDEBUG
-  spinor_field *test=0;
-  test=alloc_spinor_field_f(1,&glattice);
+	spinor_field *test=0;
+	test=alloc_spinor_field_f(1,&glattice);
 #endif
 
-  test_e=alloc_spinor_field_f(1,&glat_even);
+	test_e=alloc_spinor_field_f(1,&glat_even);
 
 	res = alloc_spinor_field_f(1,&glattice);
 
@@ -69,6 +69,10 @@ void pta_qprop_QMR_eo(spinor_field **pta_qprop, int nm, double *mass, double acc
 	resdn=in+1;
 	resd=resdn+nm;
 
+	C0[0]=g0[0]/NP_T; C0[1]=g0[1]/NP_X; C0[2]=g0[2]/NP_Y; C0[3]=g0[3]/NP_Z;
+	c0[0]=g0[0]%NP_T; c0[1]=g0[1]%NP_X; c0[2]=g0[2]%NP_Y; c0[3]=g0[3]%NP_Z;
+	x0=ipt(c0[0],c0[1],c0[2],c0[3]);
+	
 	/* set up inverters parameters */
 	shift=(double*)malloc(sizeof(double)*(nm));
 	hmass_pre=mass[0]; /* we can put any number here!!! */
@@ -83,26 +87,25 @@ void pta_qprop_QMR_eo(spinor_field **pta_qprop, int nm, double *mass, double acc
 	/* noisy background */
 	gaussian_spinor_field(in);
 	spinor_field_zero_f(test_e);
-  x0 = ipt(0,0,0,0);
-	if(COORD[0]==0 && COORD[1]==0 && COORD[2]==0 && COORD[3]==0) {
-    for (source=0;source<NF*4*2;++source) {
-	  	*( (double *)_FIELD_AT(in,x0) + source ) =0.; /* zero in source */
-	  	*( (double *)_FIELD_AT(test_e,x0) + source ) =1.;
-	  }
+	if(COORD[0]==C0[0] && COORD[1]==C0[1] && COORD[2]==C0[2] && COORD[3]==C0[3]) {
+		for (source=0;source<NF*4*2;++source) {
+			*( (double *)_FIELD_AT(in,x0) + source ) =0.; /* zero in source */
+			*( (double *)_FIELD_AT(test_e,x0) + source ) =1.;
+		}
 	}
 	norm=sqrt(spinor_field_sqnorm_f(in));
 	spinor_field_mul_f(in,1./norm,in);
 	norm=sqrt(spinor_field_sqnorm_f(test_e));
-  error(norm==0.,1,"pta_qprop_QMR_eo [pta_qprop.c]",
+	error(norm==0.,1,"pta_qprop_QMR_eo [pta_qprop.c]",
         "The origin is an odd point.");
   
 	/* invert noise */
 	for(i=0;i<QMR_par.n;++i){
 #ifndef NDEBUG
-	  norm=spinor_field_sqnorm_f(&resdn[i]);
-	  lprintf("PROPAGATOR",0,"Sqnorm resdn[%d] = %e\n",i,norm);
+		norm=spinor_field_sqnorm_f(&resdn[i]);
+		lprintf("PROPAGATOR",0,"Sqnorm resdn[%d] = %e\n",i,norm);
 #endif /* NDEBUG */
-	  spinor_field_zero_f(&resdn[i]);
+		spinor_field_zero_f(&resdn[i]);
 	}
 	spinor_field_g5_assign_f(in);
 	cgiter+=g5QMR_mshift(&QMR_par, &D_pre, in, resdn);
@@ -111,17 +114,17 @@ void pta_qprop_QMR_eo(spinor_field **pta_qprop, int nm, double *mass, double acc
 	/* now loop over sources */
 	for (source=0;source<4*NF;++source){
 		/* put in source on an EVEN site */
-	  if(COORD[0]==0 && COORD[1]==0 && COORD[2]==0 && COORD[3]==0)
-	    *( (double *)_FIELD_AT(in,x0) + 2*source ) =1.;
-  	spinor_field_g5_assign_f(in);
+		if(COORD[0]==C0[0] && COORD[1]==C0[1] && COORD[2]==C0[2] && COORD[3]==C0[3])
+			*( (double *)_FIELD_AT(in,x0) + 2*source ) =1.;
+		spinor_field_g5_assign_f(in);
 
-	  for(i=0;i<QMR_par.n;++i){
+		for(i=0;i<QMR_par.n;++i){
 #ifndef NDEBUG
-	    norm=spinor_field_sqnorm_f(&resd[i]);
-	    lprintf("PROPAGATOR",0,"Sqnorm resd[%d] = %e\n",i,norm);
+	  		norm=spinor_field_sqnorm_f(&resd[i]);
+			lprintf("PROPAGATOR",0,"Sqnorm resd[%d] = %e\n",i,norm);
 #endif /* NDEBUG */
-  	  spinor_field_zero_f(&resd[i]);
-	  }
+  	  		spinor_field_zero_f(&resd[i]);
+		}
 		cgiter+=g5QMR_mshift(&QMR_par, &D_pre, in, resd);
 
 		for(i=0;i<QMR_par.n;++i){
@@ -145,7 +148,7 @@ void pta_qprop_QMR_eo(spinor_field **pta_qprop, int nm, double *mass, double acc
 			spinor_field_mul_f(&qprop_mask,(4.+mass[i]),&resd[i]);
 			qprop_mask.type=&glat_odd;
 			Dphi_(&qprop_mask,&resd[i]);
-      spinor_field_minus_f(&qprop_mask,&qprop_mask);
+			spinor_field_minus_f(&qprop_mask,&qprop_mask);
 			if(source&1) ++cgiter; /* count only half of calls. works because the number of sources is even */
 
 #ifndef NDEBUG
@@ -153,7 +156,7 @@ void pta_qprop_QMR_eo(spinor_field **pta_qprop, int nm, double *mass, double acc
 			hmass=mass[i];
 			H(test,&pta_qprop[i][source]);
 			++cgiter;
-			if(COORD[0]==0 && COORD[1]==0 && COORD[2]==0 && COORD[3]==0)
+			if(COORD[0]==C0[0] && COORD[1]==C0[1] && COORD[2]==C0[2] && COORD[3]==C0[3])
 			  *( (double *)_FIELD_AT(test,x0) + 2*source ) -=1.;
 			norm=spinor_field_sqnorm_f(test);
 			lprintf("PROPAGATOR",0,"g5QMR_eo residuum of source [%d,%d] = %e\n",i,source,norm);
@@ -162,9 +165,9 @@ void pta_qprop_QMR_eo(spinor_field **pta_qprop, int nm, double *mass, double acc
 		}
 
 		/* remove source */
-    spinor_field_g5_assign_f(in);
-		if(COORD[0]==0 && COORD[1]==0 && COORD[2]==0 && COORD[3]==0)
-		  *( (double *)_FIELD_AT(in,x0) + 2*source ) =0.;
+		spinor_field_g5_assign_f(in);
+		if(COORD[0]==C0[0] && COORD[1]==C0[1] && COORD[2]==C0[2] && COORD[3]==C0[3])
+			*( (double *)_FIELD_AT(in,x0) + 2*source ) =0.;
 	}
 
 	lprintf("PROPAGATOR",10,"QMR_eo MVM = %d\n",cgiter);
@@ -179,7 +182,6 @@ void pta_qprop_QMR_eo(spinor_field **pta_qprop, int nm, double *mass, double acc
 	free_spinor_field(test);
 #endif
 }
-
 
 
 /*

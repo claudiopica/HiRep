@@ -31,7 +31,7 @@
 
 
 #define MESON_DEFINITION(name) \
-void name##_correlator(double *out, spinor_field *qp) { \
+void name##_correlator(double *out, int t0, spinor_field *qp) { \
   int t,x,y,z, i; \
   suNf_spinor *s1; \
   suNf_spinor *s2; \
@@ -58,14 +58,14 @@ void name##_correlator(double *out, spinor_field *qp) { \
         hc += (_S3_)*_tmp; \
       } \
     } \
-    out[COORD[0]*T+t] = (_SIGN_)*hc/(GLB_X*GLB_Y*GLB_Z); \
+    out[(COORD[0]*T+t+GLB_T-t0)%GLB_T] = (_SIGN_)*hc/(GLB_X*GLB_Y*GLB_Z); \
   } \
   global_sum(out,GLB_T); \
 }
 
 
 #define MESON_DEFINITION_TWO_RE(name) \
-void name##_re_correlator(double *out, spinor_field *qp) { \
+void name##_re_correlator(double *out, int t0, spinor_field *qp) { \
   int t,x,y,z, i; \
   suNf_spinor *s1; \
   suNf_spinor *s2; \
@@ -92,14 +92,14 @@ void name##_re_correlator(double *out, spinor_field *qp) { \
         hc += (_T3_)*_tmp; \
       } \
     } \
-    out[COORD[0]*T+t] = -(_SIGN_)*hc/(GLB_X*GLB_Y*GLB_Z); \
+    out[(COORD[0]*T+t+GLB_T-t0)%GLB_T] = -(_SIGN_)*hc/(GLB_X*GLB_Y*GLB_Z); \
   } \
   global_sum(out,GLB_T); \
 }
 
 
 #define MESON_DEFINITION_TWO_IM(name) \
-void name##_im_correlator(double *out, spinor_field *qp) { \
+void name##_im_correlator(double *out, int t0, spinor_field *qp) { \
   int t,x,y,z, i; \
   suNf_spinor *s1; \
   suNf_spinor *s2; \
@@ -126,7 +126,7 @@ void name##_im_correlator(double *out, spinor_field *qp) { \
         hc += (_T3_)*_tmp; \
       } \
     } \
-    out[COORD[0]*T+t] = -(_SIGN_)*hc/(GLB_X*GLB_Y*GLB_Z); \
+    out[(COORD[0]*T+t+GLB_T-t0)%GLB_T] = -(_SIGN_)*hc/(GLB_X*GLB_Y*GLB_Z); \
   } \
   global_sum(out,GLB_T); \
 }

@@ -166,7 +166,7 @@ void read_cmdline(int argc, char* argv[]) {
 
 
 int main(int argc,char *argv[]) {
-  int i,k,n;
+  int i,k,n,g0[4];
   char tmp[256], *cptr;
   FILE* list;
   spinor_field **pta_qprop=0;
@@ -310,14 +310,17 @@ int main(int argc,char *argv[]) {
 
     full_plaquette();
 
-    pta_qprop_QMR_eo(pta_qprop, nm, m, mes_var.precision);
+    g0[0]=rand()%GLB_T; g0[1]=rand()%GLB_X; g0[2]=rand()%GLB_Y; g0[3]=rand()%GLB_Z;
+    lprintf("MAIN",0,"PTA meson source in (%d,%d,%d,%d)",g0[0],g0[1],g0[2],g0[3]);\
+    
+    pta_qprop_QMR_eo(g0, pta_qprop, nm, m, mes_var.precision);
 
     for (k=0;k<nm;++k){
 
       lprintf("MAIN",0,"conf #%d mass=%2.6f \n",i,m[k]);
 
 #define CORR(name) \
-      name##_correlator(tricorr, pta_qprop[k]);\
+      name##_correlator(tricorr, g0[0], pta_qprop[k]);\
       lprintf("MAIN",0,"conf #%d mass=%2.6f TRIPLET " #name "= ",i,m[k]);\
       for(n=0;n<GLB_T;++n) {\
 	lprintf("MAIN",0,"%e ",tricorr[n]);\
