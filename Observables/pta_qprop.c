@@ -44,7 +44,7 @@ static void D_pre(spinor_field *out, spinor_field *in){
  */
 void pta_qprop_QMR_eo(int g0[4], spinor_field **pta_qprop, int nm, double *mass, double acc) {
 	mshift_par QMR_par;
-	int i, x0, C0[0], c0[4];
+	int i, x0, C0[4], c0[4];
 	int source;
 	double *shift;
 	spinor_field *in=0;
