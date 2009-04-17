@@ -1,8 +1,8 @@
 TOPDIR = ..
 
-SRCS = mk_wilsonloops.c tune_HYP_smearing.c
+SRCS = mk_wilsonloops.c tune_HYP_smearing.c polyakov_loops.c
 
-default: mk_wilsonloops tune_HYP_smearing
+default: mk_wilsonloops tune_HYP_smearing polyakov_loops
 
 MKDIR=$(TOPDIR)/Make
 include $(MKDIR)/MkRules
@@ -24,7 +24,7 @@ MODS := amalloc field_alloc
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Observables
-MODS := avr_plaquette wilsonloops
+MODS := avr_plaquette wilsonloops polyakov
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Random
@@ -52,6 +52,11 @@ mk_wilsonloops: cinfo.c $(OBJS) $(MOD_OBJS)
 tune_HYP_smearing: cinfo.c $(OBJS) $(MOD_OBJS)
 	echo -n Linking [$@]... 
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ tune_HYP_smearing.o $(MOD_OBJS) &&\
+	echo " done." || echo " failed."
+
+polyakov_loops: cinfo.c $(OBJS) $(MOD_OBJS)
+	echo -n Linking [$@]... 
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ polyakov_loops.o $(MOD_OBJS) &&\
 	echo " done." || echo " failed."
 
 

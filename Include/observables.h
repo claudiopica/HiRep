@@ -25,6 +25,8 @@ double avr_plaquette();
 double local_plaq(int ix);
 void full_plaquette();
 
+void polyakov(int mu);
+
 void pta_qprop_QMR_eo(int g0[4], spinor_field **pta_qprop, int nm, double *m, double acc);
 void pta_qprop_QMR(spinor_field **pta_qprop, int nm, double *m, double acc);
 void pta_qprop_MINRES(spinor_field **pta_qprop, int nm, double *m, double acc);
