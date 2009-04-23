@@ -28,8 +28,8 @@ void full_plaquette();
 void polyakov(int mu);
 
 void pta_qprop_QMR_eo(int g0[4], spinor_field **pta_qprop, int nm, double *m, double acc);
-void pta_qprop_QMR(spinor_field **pta_qprop, int nm, double *m, double acc);
-void pta_qprop_MINRES(spinor_field **pta_qprop, int nm, double *m, double acc);
+void pta_qprop_QMR(int g0[4], spinor_field **pta_qprop, int nm, double *m, double acc);
+void pta_qprop_MINRES(int g0[4], spinor_field **pta_qprop, int nm, double *m, double acc);
 
 
 typedef enum {NO_DILUTION, TIME_DILUTION, TIME_SPIN_DILUTION, EXACT} dilution_mode;

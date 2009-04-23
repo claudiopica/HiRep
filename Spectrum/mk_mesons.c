@@ -310,11 +310,9 @@ int main(int argc,char *argv[]) {
 
     full_plaquette();
 
-    g0[0]=rand()%GLB_T; g0[1]=rand()%GLB_X; g0[2]=rand()%GLB_Y;
-    if((g0[0]+g0[1]+g0[2])%2==0)
-	    g0[3]=(2*rand())%GLB_Z;
-    else
-	    g0[3]=(2*rand()+1)%GLB_Z;
+    g0[0]=rand()%GLB_T; g0[1]=rand()%GLB_X; g0[2]=rand()%GLB_Y; g0[3]=rand()%GLB_Z;
+    if((g0[0]+g0[1]+g0[2])%2!=0)
+	    g0[3]=(g0[3]+1)%GLB_Z;
 
     lprintf("MAIN",0,"PTA meson source in (%d,%d,%d,%d)\n",g0[0],g0[1],g0[2],g0[3]);\
     

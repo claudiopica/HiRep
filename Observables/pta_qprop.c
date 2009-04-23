@@ -191,9 +191,9 @@ void pta_qprop_QMR_eo(int g0[4], spinor_field **pta_qprop, int nm, double *mass,
  * like sources we add a background noise to the source which is then 
  * subtracted at the end at the cost of one more inversion.
  */
-void pta_qprop_QMR(spinor_field **pta_qprop, int nm, double *mass, double acc) {
+void pta_qprop_QMR(int g0[4], spinor_field **pta_qprop, int nm, double *mass, double acc) {
   mshift_par QMR_par;
-  int i, x0;
+	int i, x0, C0[4], c0[4];
 	int source;
   double *shift;
   spinor_field *in=0;
@@ -212,6 +212,10 @@ void pta_qprop_QMR(spinor_field **pta_qprop, int nm, double *mass, double acc) {
 	resdn=in+1;
 	resd=resdn+nm;
 
+	C0[0]=g0[0]/T; C0[1]=g0[1]/X; C0[2]=g0[2]/Y; C0[3]=g0[3]/Z;
+	c0[0]=g0[0]%T; c0[1]=g0[1]%X; c0[2]=g0[2]%Y; c0[3]=g0[3]%Z;
+	x0=ipt(c0[0],c0[1],c0[2],c0[3]);
+
 	/* set up inverters parameters */
   shift=(double*)malloc(sizeof(double)*(nm));
   hmass=mass[0]; /* we can put any number here!!! */
@@ -225,8 +229,7 @@ void pta_qprop_QMR(spinor_field **pta_qprop, int nm, double *mass, double acc) {
 
   /* noisy background */
 	gaussian_spinor_field(in);
-  x0 = ipt(0,0,0,0);
-	if(COORD[0]==0 && COORD[1]==0 && COORD[2]==0 && COORD[3]==0) {
+	if(COORD[0]==C0[0] && COORD[1]==C0[1] && COORD[2]==C0[2] && COORD[3]==C0[3]) {
     for (source=0;source<NF*4*2;++source)
 	  	*( (double *)_FIELD_AT(in,x0) + source ) =0.; /* zero in source */
 	}
@@ -241,7 +244,7 @@ void pta_qprop_QMR(spinor_field **pta_qprop, int nm, double *mass, double acc) {
 	/* now loop over sources */
 	for (source=0;source<4*NF;++source){
 		/* put in source */
-	  if(COORD[0]==0 && COORD[1]==0 && COORD[2]==0 && COORD[3]==0)
+	  if(COORD[0]==C0[0] && COORD[1]==C0[1] && COORD[2]==C0[2] && COORD[3]==C0[3])
 	    *( (double *)_FIELD_AT(in,x0) + 2*source ) =1.;
 		spinor_field_g5_assign_f(in);
 
@@ -267,7 +270,7 @@ void pta_qprop_QMR(spinor_field **pta_qprop, int nm, double *mass, double acc) {
 			hmass=mass[i];
 			H(test,&pta_qprop[i][source]);
 			++cgiter;
-			if(COORD[0]==0 && COORD[1]==0 && COORD[2]==0 && COORD[3]==0)
+    	if(COORD[0]==C0[0] && COORD[1]==C0[1] && COORD[2]==C0[2] && COORD[3]==C0[3])
 			  *( (double *)_FIELD_AT(test,x0) + 2*source ) -=1.;
 			norm=spinor_field_sqnorm_f(test);
 			lprintf("PROPAGATOR",0,"g5QMR residuum of source [%d,%d] = %e\n",i,source,norm);
@@ -277,7 +280,7 @@ void pta_qprop_QMR(spinor_field **pta_qprop, int nm, double *mass, double acc) {
 
 		/* remove source */
 		spinor_field_g5_assign_f(in);
-		if(COORD[0]==0 && COORD[1]==0 && COORD[2]==0 && COORD[3]==0)
+  	if(COORD[0]==C0[0] && COORD[1]==C0[1] && COORD[2]==C0[2] && COORD[3]==C0[3])
 		  *( (double *)_FIELD_AT(in,x0) + 2*source ) =0.;
 	}
 
@@ -297,9 +300,10 @@ void pta_qprop_QMR(spinor_field **pta_qprop, int nm, double *mass, double acc) {
  * H is the hermitean dirac operator
  * out is a vector of nm spinor fields
  */
-void pta_qprop_MINRES(spinor_field **pta_qprop, int nm, double *mass, double acc) {
+void pta_qprop_MINRES(int g0[4], spinor_field **pta_qprop, int nm, double *mass, double acc) {
   static MINRES_par MINRESpar;
-  int i,x0,cgiter,source;
+	int i, x0, C0[4], c0[4];
+  int cgiter,source;
   spinor_field *in;
 #ifndef NDEBUG
   double norm;
@@ -308,16 +312,18 @@ void pta_qprop_MINRES(spinor_field **pta_qprop, int nm, double *mass, double acc
   /* allocate input spinor field */
   in = alloc_spinor_field_f(1,&glattice);
 
-
   /* the source is on the first even site */
   spinor_field_zero_f(in);
-  x0 = ipt(0,0,0,0);
+  
+	C0[0]=g0[0]/T; C0[1]=g0[1]/X; C0[2]=g0[2]/Y; C0[3]=g0[3]/Z;
+	c0[0]=g0[0]%T; c0[1]=g0[1]%X; c0[2]=g0[2]%Y; c0[3]=g0[3]%Z;
+	x0=ipt(c0[0],c0[1],c0[2],c0[3]);
 
   cgiter=0;
 
 	for (source=0;source<4*NF;++source){
 		/* put in source */
-	  if(COORD[0]==0 && COORD[1]==0 && COORD[2]==0 && COORD[3]==0)
+  	if(COORD[0]==C0[0] && COORD[1]==C0[1] && COORD[2]==C0[2] && COORD[3]==C0[3])
 	    *( (double *)_FIELD_AT(in,x0) + 2*source ) =1.;
 
 #ifndef NDEBUG
@@ -337,7 +343,7 @@ void pta_qprop_MINRES(spinor_field **pta_qprop, int nm, double *mass, double acc
     }
 
 		/* remove source */
-		if(COORD[0]==0 && COORD[1]==0 && COORD[2]==0 && COORD[3]==0)
+	  if(COORD[0]==C0[0] && COORD[1]==C0[1] && COORD[2]==C0[2] && COORD[3]==C0[3])
 		  *( (double *)_FIELD_AT(in,x0) + 2*source ) =0.;
   }
   
