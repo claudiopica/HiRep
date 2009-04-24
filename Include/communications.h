@@ -8,6 +8,7 @@
 
 void global_sum(double *d, int n);
 void bcast(double *d, int n);
+void bcast_int(int *i, int n);
 
 #include "spinor_field.h"
 void complete_gf_sendrecv(suNg_field *gf);

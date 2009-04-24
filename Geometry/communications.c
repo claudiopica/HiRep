@@ -94,6 +94,40 @@ void bcast(double *d, int n) {
 #endif
 }
 
+
+void bcast_int(int *i, int n) {
+#ifdef WITH_MPI
+  int mpiret;
+
+#ifdef MPI_TIMING
+  struct timeval start, end, etime;
+  gettimeofday(&start,0);  
+#endif
+
+  mpiret=MPI_Bcast(i, n, MPI_INT, 0,MPI_COMM_WORLD);
+
+#ifdef MPI_TIMING
+  gettimeofday(&end,0);
+  timeval_subtract(&etime,&end,&start);
+  lprintf("MPI TIMING",0,"bcast " __FILE__ " %ld sec %ld usec\n",etime.tv_sec,etime.tv_usec);
+#endif
+
+#ifndef NDEBUG
+  if (mpiret != MPI_SUCCESS) {
+    char mesg[MPI_MAX_ERROR_STRING];
+    int mesglen;
+    MPI_Error_string(mpiret,mesg,&mesglen);
+    lprintf("MPI",0,"ERROR: %s\n",mesg);
+    error(1,1,"bcast " __FILE__,"Cannot perform global_sum");
+  }
+#endif
+
+#else
+  /* for non mpi do nothing */
+  return;
+#endif
+}
+
 /* functions for filling sending buffer */
 #ifdef WITH_MPI
 static void sync_gauge_field(suNg_field *gf) {

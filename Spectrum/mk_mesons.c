@@ -27,6 +27,7 @@
 #include "representation.h"
 #include "utils.h"
 #include "logger.h"
+#include "communications.h"
 
 #include "cinfo.c"
 
@@ -268,6 +269,7 @@ int main(int argc,char *argv[]) {
 
   lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed);
   rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
+  srand(glb_var.rlxd_seed+PID);
 
   /* alloc global gauge fields */
   u_gauge=alloc_gfield(&glattice);
@@ -311,8 +313,10 @@ int main(int argc,char *argv[]) {
     full_plaquette();
 
     g0[0]=rand()%GLB_T; g0[1]=rand()%GLB_X; g0[2]=rand()%GLB_Y; g0[3]=rand()%GLB_Z;
-    if((g0[0]+g0[1]+g0[2])%2!=0)
-	    g0[3]=(g0[3]+1)%GLB_Z;
+    if((g0[0]+g0[1]+g0[2]+g0[3])%2!=0)
+      g0[3]=(g0[3]+1)%GLB_Z;
+
+    bcast_int(g0,4);
 
     lprintf("MAIN",0,"PTA meson source in (%d,%d,%d,%d)\n",g0[0],g0[1],g0[2],g0[3]);\
     
