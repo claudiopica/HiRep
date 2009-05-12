@@ -23,6 +23,34 @@
 #include "ranlux.h"
 
 
+#define RESTRICTED_SET
+
+
+
+#ifdef RESTRICTED_SET
+  #define G1_CHANNEL
+  #define PCAC_CHANNEL
+#else
+  #define ID_CHANNEL
+  #define G0_CHANNEL
+  #define G1_CHANNEL
+  #define G2_CHANNEL
+  #define G3_CHANNEL
+  #define G0G5_CHANNEL
+  #define G5G1_CHANNEL
+  #define G5G2_CHANNEL
+  #define G5G3_CHANNEL
+  #define G0G1_CHANNEL
+  #define G0G2_CHANNEL
+  #define G0G3_CHANNEL
+  #define G0G5G1_CHANNEL
+  #define G0G5G2_CHANNEL
+  #define G0G5G3_CHANNEL
+  #define PCAC_CHANNEL
+#endif
+
+
+
 /*static void create_diluted_source(spinor_field *source, int tau, int beta) {*/
 /*  int c[4];*/
 /*  spinor_field_zero_f(source);*/
@@ -239,100 +267,115 @@ void z2semwall_mesons(int conf, int nm, double *mass, double acc) {
   } \
   global_sum(corr,GLB_T)
 
+#ifdef ID_CHANNEL
   COMPUTE_CORR(id);
   PRINT_CORR(id);
+#endif
 
+#ifdef G0_CHANNEL
   COMPUTE_CORR(g0);
   PRINT_CORR(g0);
+#endif
   
+#ifdef G1_CHANNEL
   COMPUTE_CORR(g1);
   for(i=0; i<nm*GLB_T; i++)
     corr[i] = -corr[i];
   PRINT_CORR(g1);
+#endif
    
+#ifdef G2_CHANNEL
   COMPUTE_CORR(g2);
   for(i=0; i<nm*GLB_T; i++)
     corr[i] = -corr[i];
   PRINT_CORR(g2);
+#endif
   
+#ifdef G3_CHANNEL
   COMPUTE_CORR(g3);
   for(i=0; i<nm*GLB_T; i++)
     corr[i] = -corr[i];
   PRINT_CORR(g3);
+#endif
   
+#ifdef G0G5_CHANNEL
   COMPUTE_CORR(g0g5);
   for(i=0; i<nm*GLB_T; i++)
     corr[i] = -corr[i];
   PRINT_CORR(g0g5);
+#endif
   
+#ifdef G5G1_CHANNEL
   COMPUTE_CORR(g5g1);
   PRINT_CORR(g5g1);
+#endif
   
+#ifdef G5G2_CHANNEL
   COMPUTE_CORR(g5g2);
   PRINT_CORR(g5g2);
+#endif
   
+#ifdef G5G3_CHANNEL
   COMPUTE_CORR(g5g3);
   PRINT_CORR(g5g3);
+#endif
   
+#ifdef G0G1_CHANNEL
   COMPUTE_CORR(g0g1);
   for(i=0; i<nm*GLB_T; i++)
     corr[i] = -corr[i];
   PRINT_CORR(g0g1);
+#endif
   
+#ifdef G0G2_CHANNEL
   COMPUTE_CORR(g0g2);
   for(i=0; i<nm*GLB_T; i++)
     corr[i] = -corr[i];
   PRINT_CORR(g0g2);
+#endif
   
+#ifdef G0G3_CHANNEL
   COMPUTE_CORR(g0g3);
   for(i=0; i<nm*GLB_T; i++)
     corr[i] = -corr[i];
   PRINT_CORR(g0g3);
+#endif
   
+#ifdef G0G5G1_CHANNEL
   COMPUTE_CORR(g0g5g1);
   PRINT_CORR(g0g5g1);
+#endif
   
+#ifdef G0G5G2_CHANNEL
   COMPUTE_CORR(g0g5g2);
   PRINT_CORR(g0g5g2);
+#endif
   
+#ifdef G0G5G3_CHANNEL
   COMPUTE_CORR(g0g5g3);
   PRINT_CORR(g0g5g3);
+#endif
 
 
+#ifdef PCAC_CHANNEL
   for(i=0; i<nm*GLB_T; i++)
     corr[i] = 0.;
   for(beta=0;beta<4;beta++) {
-    z2semwall_qprop_QMR_eo(&g0g5_eval_g5GammaDag_times_spinor,psi,&eta[beta],nm,mass,acc);
     for(i=0; i<nm; i++) {
       for (t=0; t<T; t++) {
         for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) {
           ix=ipt(t,x,y,z);
-          _spinor_prod_re_f(tmp,*_FIELD_AT(&psi0[beta*nm+i],ix),*_FIELD_AT(&psi0[beta*nm+i],ix));
-          corr[(COORD[0]*T+t+GLB_T-tau)%GLB_T+i*GLB_T]+=tmp;
+          _spinor_zero_f(sp);
+          g0g5_eval_g5GammaDag_times_spinor(&sp,_FIELD_AT(&psi0[beta*nm+i],ix));
+          _spinor_prod_re_f(tmp,*_FIELD_AT(&psi0[beta*nm+i],ix),sp);
+          corr[(COORD[0]*T+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
         }
       }
     }
   }
   global_sum(corr,GLB_T);
   PRINT_CORR(g5_g0g5_re);
-
-
-/*  for(i=0; i<nm*GLB_T; i++)*/
-/*    corr[i] = 0.;*/
-/*  for(beta=0;beta<4;beta++) {*/
-/*    z2semwall_qprop_QMR_eo(&g0g5_eval_g5GammaDag_times_spinor,psi,&eta[beta],nm,mass,acc);*/
-/*    for(i=0; i<nm; i++) {*/
-/*      for (t=0; t<T; t++) {*/
-/*        for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) {*/
-/*          ix=ipt(t,x,y,z);*/
-/*          _spinor_prod_im_f(tmp,*_FIELD_AT(&psi0[beta*nm+i],ix),*_FIELD_AT(&psi0[beta*nm+i],ix));*/
-/*          corr[(COORD[0]*T+t+GLB_T-tau)%GLB_T+i*GLB_T]+=tmp;*/
-/*        }*/
-/*      }*/
-/*    }*/
-/*  }*/
-/*  global_sum(corr,GLB_T);*/
-/*  PRINT_CORR(g5_g0g5_im);*/
+#endif
 
 
 }
