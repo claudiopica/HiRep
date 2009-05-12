@@ -54,6 +54,7 @@ void traced_ata_qprop(complex*** prop, int n_points);
 void ata_qprop_init(ata_qprop_pars* p);
 void ata_qprop_free();
 
+void z2semwall_mesons(int conf, int nm, double *mass, double acc);
 
 void id_correlator(double *out, int t0, spinor_field *qp);
 void g0_correlator(double *out, int t0, spinor_field *qp);
@@ -107,6 +108,24 @@ void g5g3_debug(complex Gamma[4][4], int* sign);
 void g0g5g1_debug(complex Gamma[4][4], int* sign);
 void g0g5g2_debug(complex Gamma[4][4], int* sign);
 void g0g5g3_debug(complex Gamma[4][4], int* sign);
+
+
+void id_eval_g5GammaDag_times_spinor(suNf_spinor* out, suNf_spinor* in);
+void g0_eval_g5GammaDag_times_spinor(suNf_spinor* out, suNf_spinor* in);
+void g1_eval_g5GammaDag_times_spinor(suNf_spinor* out, suNf_spinor* in);
+void g2_eval_g5GammaDag_times_spinor(suNf_spinor* out, suNf_spinor* in);
+void g3_eval_g5GammaDag_times_spinor(suNf_spinor* out, suNf_spinor* in);
+void g5_eval_g5GammaDag_times_spinor(suNf_spinor* out, suNf_spinor* in);
+void g0g5_eval_g5GammaDag_times_spinor(suNf_spinor* out, suNf_spinor* in);
+void g5g1_eval_g5GammaDag_times_spinor(suNf_spinor* out, suNf_spinor* in);
+void g5g2_eval_g5GammaDag_times_spinor(suNf_spinor* out, suNf_spinor* in);
+void g5g3_eval_g5GammaDag_times_spinor(suNf_spinor* out, suNf_spinor* in);
+void g0g1_eval_g5GammaDag_times_spinor(suNf_spinor* out, suNf_spinor* in);
+void g0g2_eval_g5GammaDag_times_spinor(suNf_spinor* out, suNf_spinor* in);
+void g0g3_eval_g5GammaDag_times_spinor(suNf_spinor* out, suNf_spinor* in);
+void g0g5g1_eval_g5GammaDag_times_spinor(suNf_spinor* out, suNf_spinor* in);
+void g0g5g2_eval_g5GammaDag_times_spinor(suNf_spinor* out, suNf_spinor* in);
+void g0g5g3_eval_g5GammaDag_times_spinor(suNf_spinor* out, suNf_spinor* in);
 
 
 void wilsonloops(int mu, int x, suNg_field* g);

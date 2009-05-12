@@ -81,6 +81,23 @@ void print_mat(complex mat[4][4], const char name[]) {
     } \
   }
 
+#define adj_mat(A) \
+  { \
+    int _i, _j; \
+    for(_i=0; _i<4; _i++) { \
+      A[_i][_i].im=-A[_i][_i].im; \
+      for(_j=_i+1; _j<4; _j++) { \
+        double _tmp; \
+        _tmp=A[_i][_j].re; \
+        A[_i][_j].re=A[_j][_i].re; \
+        A[_j][_i].re=_tmp; \
+        _tmp=A[_i][_j].im; \
+        A[_i][_j].im=-A[_j][_i].im; \
+        A[_j][_i].im=-_tmp; \
+      } \
+    } \
+  }
+
 #define CMA(x,y,z) \
   (x).re += (y).re*(z).re-(y).im*(z).im; \
   (x).im += (y).re*(z).im+(y).im*(z).re;
@@ -114,6 +131,18 @@ void print_mat(complex mat[4][4], const char name[]) {
     } \
   }
 
+#define mult_mat_spinor(out, A, in) \
+  { \
+    int _a,_i,_j; \
+    for(_a=0;_a<NF;_a++) \
+    for(_i=0; _i<4; _i++) { \
+      out.c[_i].c[_a].re=out.c[_i].c[_a].im=0.; \
+      for(_j=0; _j<4; _j++) { \
+        CMA(out.c[_i].c[_a],A[_i][_j],in.c[_j].c[_a]); \
+      } \
+    } \
+  }
+
 
 int main(int argc,char *argv[])
 {
@@ -124,9 +153,15 @@ int main(int argc,char *argv[])
 	complex trace, ctest;
 	int sign;
 	double norm2;
+	suNf_spinor in, out, stest;
 
   rlxd_init(1,time(NULL));
   gauss((double*)rmat,32);
+
+  lprintf("MAIN",0,"*********************************************************\n");
+  lprintf("MAIN",0,"Checking GAMMA_trace_H functions...\n");
+  lprintf("MAIN",0,"*********************************************************\n");
+
 
   g5_debug(gamma[4],&sign);
   if(sign != -1) lprintf("MAIN",0,"ERROR! Bad sign for gamma_5!\n");
@@ -403,7 +438,238 @@ int main(int argc,char *argv[])
     lprintf("MAIN",0,"ERROR! Trace mismatch for g0g5g3! trace=(%f,%f) ctest=(%e,%e)\n",trace.re,trace.im,ctest.re,ctest.im);
   }
 
- 
+
+
+
+
+  lprintf("MAIN",0,"*********************************************************\n");
+  lprintf("MAIN",0,"Checking GAMMA_eval_g5GammaDag_times_spinor functions...\n");
+  lprintf("MAIN",0,"*********************************************************\n");
+
+  ranlxd((double*)(&in),sizeof(suNf_spinor)/sizeof(double));
+  _spinor_zero_f(out);
+  id_eval_g5GammaDag_times_spinor(&out,&in);
+  set_unit_mat(Gamma);
+  mult_mat(Gamma,gamma[4]);
+  adj_mat(Gamma);
+  mult_mat_spinor(stest,Gamma,in);
+  _spinor_sub_assign_f(stest,out);
+  _spinor_prod_re_f(norm2,stest,stest);
+  if(norm2 > 1e-15) {
+    lprintf("MAIN",0,"ERROR! Mismatch for id! norm2=%e\n",norm2);
+  }
+
+  ranlxd((double*)(&in),sizeof(suNf_spinor)/sizeof(double));
+  _spinor_zero_f(out);
+  g0_eval_g5GammaDag_times_spinor(&out,&in);
+  copy_mat(Gamma,gamma[0]);
+  mult_mat(Gamma,gamma[4]);
+  adj_mat(Gamma);
+  mult_mat_spinor(stest,Gamma,in);
+  _spinor_sub_assign_f(stest,out);
+  _spinor_prod_re_f(norm2,stest,stest);
+  if(norm2 > 1e-15) {
+    lprintf("MAIN",0,"ERROR! Mismatch for g0! norm2=%e\n",norm2);
+  }
+
+  ranlxd((double*)(&in),sizeof(suNf_spinor)/sizeof(double));
+  _spinor_zero_f(out);
+  g1_eval_g5GammaDag_times_spinor(&out,&in);
+  copy_mat(Gamma,gamma[1]);
+  mult_mat(Gamma,gamma[4]);
+  adj_mat(Gamma);
+  mult_mat_spinor(stest,Gamma,in);
+  _spinor_sub_assign_f(stest,out);
+  _spinor_prod_re_f(norm2,stest,stest);
+  if(norm2 > 1e-15) {
+    lprintf("MAIN",0,"ERROR! Mismatch for g1! norm2=%e\n",norm2);
+  }
+
+  ranlxd((double*)(&in),sizeof(suNf_spinor)/sizeof(double));
+  _spinor_zero_f(out);
+  g2_eval_g5GammaDag_times_spinor(&out,&in);
+  copy_mat(Gamma,gamma[2]);
+  mult_mat(Gamma,gamma[4]);
+  adj_mat(Gamma);
+  mult_mat_spinor(stest,Gamma,in);
+  _spinor_sub_assign_f(stest,out);
+  _spinor_prod_re_f(norm2,stest,stest);
+  if(norm2 > 1e-15) {
+    lprintf("MAIN",0,"ERROR! Mismatch for g2! norm2=%e\n",norm2);
+  }
+
+  ranlxd((double*)(&in),sizeof(suNf_spinor)/sizeof(double));
+  _spinor_zero_f(out);
+  g3_eval_g5GammaDag_times_spinor(&out,&in);
+  copy_mat(Gamma,gamma[3]);
+  mult_mat(Gamma,gamma[4]);
+  adj_mat(Gamma);
+  mult_mat_spinor(stest,Gamma,in);
+  _spinor_sub_assign_f(stest,out);
+  _spinor_prod_re_f(norm2,stest,stest);
+  if(norm2 > 1e-15) {
+    lprintf("MAIN",0,"ERROR! Mismatch for g3! norm2=%e\n",norm2);
+  }
+
+  ranlxd((double*)(&in),sizeof(suNf_spinor)/sizeof(double));
+  _spinor_zero_f(out);
+  g5_eval_g5GammaDag_times_spinor(&out,&in);
+  copy_mat(Gamma,gamma[4]);
+  mult_mat(Gamma,gamma[4]);
+  adj_mat(Gamma);
+  mult_mat_spinor(stest,Gamma,in);
+  _spinor_sub_assign_f(stest,out);
+  _spinor_prod_re_f(norm2,stest,stest);
+  if(norm2 > 1e-15) {
+    lprintf("MAIN",0,"ERROR! Mismatch for g5! norm2=%e\n",norm2);
+  }
+
+  ranlxd((double*)(&in),sizeof(suNf_spinor)/sizeof(double));
+  _spinor_zero_f(out);
+  g0g1_eval_g5GammaDag_times_spinor(&out,&in);
+  copy_mat(Gamma,gamma[0]);
+  mult_mat(Gamma,gamma[1]);
+  mult_mat(Gamma,gamma[4]);
+  adj_mat(Gamma);
+  mult_mat_spinor(stest,Gamma,in);
+  _spinor_sub_assign_f(stest,out);
+  _spinor_prod_re_f(norm2,stest,stest);
+  if(norm2 > 1e-15) {
+    lprintf("MAIN",0,"ERROR! Mismatch for g0g1! norm2=%e\n",norm2);
+  }
+
+  ranlxd((double*)(&in),sizeof(suNf_spinor)/sizeof(double));
+  _spinor_zero_f(out);
+  g0g2_eval_g5GammaDag_times_spinor(&out,&in);
+  copy_mat(Gamma,gamma[0]);
+  mult_mat(Gamma,gamma[2]);
+  mult_mat(Gamma,gamma[4]);
+  adj_mat(Gamma);
+  mult_mat_spinor(stest,Gamma,in);
+  _spinor_sub_assign_f(stest,out);
+  _spinor_prod_re_f(norm2,stest,stest);
+  if(norm2 > 1e-15) {
+    lprintf("MAIN",0,"ERROR! Mismatch for g0g2! norm2=%e\n",norm2);
+  }
+
+  ranlxd((double*)(&in),sizeof(suNf_spinor)/sizeof(double));
+  _spinor_zero_f(out);
+  g0g3_eval_g5GammaDag_times_spinor(&out,&in);
+  copy_mat(Gamma,gamma[0]);
+  mult_mat(Gamma,gamma[3]);
+  mult_mat(Gamma,gamma[4]);
+  adj_mat(Gamma);
+  mult_mat_spinor(stest,Gamma,in);
+  _spinor_sub_assign_f(stest,out);
+  _spinor_prod_re_f(norm2,stest,stest);
+  if(norm2 > 1e-15) {
+    lprintf("MAIN",0,"ERROR! Mismatch for g0g3! norm2=%e\n",norm2);
+  }
+
+  ranlxd((double*)(&in),sizeof(suNf_spinor)/sizeof(double));
+  _spinor_zero_f(out);
+  g0g5_eval_g5GammaDag_times_spinor(&out,&in);
+  copy_mat(Gamma,gamma[0]);
+  mult_mat(Gamma,gamma[4]);
+  mult_mat(Gamma,gamma[4]);
+  adj_mat(Gamma);
+  mult_mat_spinor(stest,Gamma,in);
+  _spinor_sub_assign_f(stest,out);
+  _spinor_prod_re_f(norm2,stest,stest);
+  if(norm2 > 1e-15) {
+    lprintf("MAIN",0,"ERROR! Mismatch for g0g5! norm2=%e\n",norm2);
+  }
+
+  ranlxd((double*)(&in),sizeof(suNf_spinor)/sizeof(double));
+  _spinor_zero_f(out);
+  g5g1_eval_g5GammaDag_times_spinor(&out,&in);
+  copy_mat(Gamma,gamma[4]);
+  mult_mat(Gamma,gamma[1]);
+  mult_mat(Gamma,gamma[4]);
+  adj_mat(Gamma);
+  mult_mat_spinor(stest,Gamma,in);
+  _spinor_sub_assign_f(stest,out);
+  _spinor_prod_re_f(norm2,stest,stest);
+  if(norm2 > 1e-15) {
+    lprintf("MAIN",0,"ERROR! Mismatch for g5g1! norm2=%e\n",norm2);
+  }
+
+  ranlxd((double*)(&in),sizeof(suNf_spinor)/sizeof(double));
+  _spinor_zero_f(out);
+  g5g2_eval_g5GammaDag_times_spinor(&out,&in);
+  copy_mat(Gamma,gamma[4]);
+  mult_mat(Gamma,gamma[2]);
+  mult_mat(Gamma,gamma[4]);
+  adj_mat(Gamma);
+  mult_mat_spinor(stest,Gamma,in);
+  _spinor_sub_assign_f(stest,out);
+  _spinor_prod_re_f(norm2,stest,stest);
+  if(norm2 > 1e-15) {
+    lprintf("MAIN",0,"ERROR! Mismatch for g5g2! norm2=%e\n",norm2);
+  }
+
+  ranlxd((double*)(&in),sizeof(suNf_spinor)/sizeof(double));
+  _spinor_zero_f(out);
+  g5g3_eval_g5GammaDag_times_spinor(&out,&in);
+  copy_mat(Gamma,gamma[4]);
+  mult_mat(Gamma,gamma[3]);
+  mult_mat(Gamma,gamma[4]);
+  adj_mat(Gamma);
+  mult_mat_spinor(stest,Gamma,in);
+  _spinor_sub_assign_f(stest,out);
+  _spinor_prod_re_f(norm2,stest,stest);
+  if(norm2 > 1e-15) {
+    lprintf("MAIN",0,"ERROR! Mismatch for g5g3! norm2=%e\n",norm2);
+  }
+
+  ranlxd((double*)(&in),sizeof(suNf_spinor)/sizeof(double));
+  _spinor_zero_f(out);
+  g0g5g1_eval_g5GammaDag_times_spinor(&out,&in);
+  copy_mat(Gamma,gamma[0]);
+  mult_mat(Gamma,gamma[4]);
+  mult_mat(Gamma,gamma[1]);
+  mult_mat(Gamma,gamma[4]);
+  adj_mat(Gamma);
+  mult_mat_spinor(stest,Gamma,in);
+  _spinor_sub_assign_f(stest,out);
+  _spinor_prod_re_f(norm2,stest,stest);
+  if(norm2 > 1e-15) {
+    lprintf("MAIN",0,"ERROR! Mismatch for g0g5g1! norm2=%e\n",norm2);
+  }
+
+  ranlxd((double*)(&in),sizeof(suNf_spinor)/sizeof(double));
+  _spinor_zero_f(out);
+  g0g5g2_eval_g5GammaDag_times_spinor(&out,&in);
+  copy_mat(Gamma,gamma[0]);
+  mult_mat(Gamma,gamma[4]);
+  mult_mat(Gamma,gamma[2]);
+  mult_mat(Gamma,gamma[4]);
+  adj_mat(Gamma);
+  mult_mat_spinor(stest,Gamma,in);
+  _spinor_sub_assign_f(stest,out);
+  _spinor_prod_re_f(norm2,stest,stest);
+  if(norm2 > 1e-15) {
+    lprintf("MAIN",0,"ERROR! Mismatch for g0g5g2! norm2=%e\n",norm2);
+  }
+
+  ranlxd((double*)(&in),sizeof(suNf_spinor)/sizeof(double));
+  _spinor_zero_f(out);
+  g0g5g3_eval_g5GammaDag_times_spinor(&out,&in);
+  copy_mat(Gamma,gamma[0]);
+  mult_mat(Gamma,gamma[4]);
+  mult_mat(Gamma,gamma[3]);
+  mult_mat(Gamma,gamma[4]);
+  adj_mat(Gamma);
+  mult_mat_spinor(stest,Gamma,in);
+  _spinor_sub_assign_f(stest,out);
+  _spinor_prod_re_f(norm2,stest,stest);
+  if(norm2 > 1e-15) {
+    lprintf("MAIN",0,"ERROR! Mismatch for g0g5g3! norm2=%e\n",norm2);
+  }
+
+
+
+
   exit(0);
 }
 

@@ -1,8 +1,8 @@
 TOPDIR = ..
 
-SRCS = mk_mesons.c trunc_mesons.c random_cnfg.c random_spinor.c eigval.c
+SRCS = mk_mesons.c trunc_mesons.c random_cnfg.c random_spinor.c eigval.c mk_mesons_with_z2semwall.c
 
-default: mk_mesons trunc_mesons random_cnfg random_spinor eigval
+default: mk_mesons trunc_mesons random_cnfg random_spinor eigval mk_mesons_with_z2semwall
 
 MKDIR=$(TOPDIR)/Make
 include $(MKDIR)/MkRules
@@ -24,7 +24,7 @@ MODS := amalloc field_alloc spinor_field_alloc
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Observables
-MODS := avr_plaquette mesons trunc_hairpin g5QMR_trunc pta_qprop
+MODS := avr_plaquette mesons trunc_hairpin g5QMR_trunc pta_qprop z2semwall
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Random
@@ -75,6 +75,11 @@ random_spinor: random_spinor.o $(MOD_OBJS)
 eigval: cinfo.c eigval.o $(MOD_OBJS)
 	echo -n Linking [$@]... 
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ eigval.o $(MOD_OBJS) &&\
+	echo " done." || echo " failed."
+
+mk_mesons_with_z2semwall: cinfo.c mk_mesons_with_z2semwall.o $(MOD_OBJS)
+	echo -n Linking [$@]... 
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ mk_mesons_with_z2semwall.o $(MOD_OBJS) &&\
 	echo " done." || echo " failed."
 
 

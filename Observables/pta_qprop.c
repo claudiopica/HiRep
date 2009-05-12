@@ -54,14 +54,14 @@ void pta_qprop_QMR_eo(int g0[4], spinor_field **pta_qprop, int nm, double *mass,
 	spinor_field qprop_mask;
 	int cgiter=0;
 	double norm;
-	spinor_field *test_e=0;
 
 #ifndef NDEBUG
+	spinor_field *test_e=0;
 	spinor_field *test=0;
 	test=alloc_spinor_field_f(1,&glattice);
+	test_e=alloc_spinor_field_f(1,&glat_even);
 #endif
 
-	test_e=alloc_spinor_field_f(1,&glat_even);
 
 	res = alloc_spinor_field_f(1,&glattice);
 
@@ -86,18 +86,25 @@ void pta_qprop_QMR_eo(int g0[4], spinor_field **pta_qprop, int nm, double *mass,
 
 	/* noisy background */
 	gaussian_spinor_field(in);
-	spinor_field_zero_f(test_e);
 	if(COORD[0]==C0[0] && COORD[1]==C0[1] && COORD[2]==C0[2] && COORD[3]==C0[3]) {
 		for (source=0;source<NF*4*2;++source) {
 			*( (double *)_FIELD_AT(in,x0) + source ) =0.; /* zero in source */
-			*( (double *)_FIELD_AT(test_e,x0) + source ) =1.;
 		}
 	}
 	norm=sqrt(spinor_field_sqnorm_f(in));
 	spinor_field_mul_f(in,1./norm,in);
+
+#ifndef NDEBUG
+	spinor_field_zero_f(test_e);
+	if(COORD[0]==C0[0] && COORD[1]==C0[1] && COORD[2]==C0[2] && COORD[3]==C0[3]) {
+		for (source=0;source<NF*4*2;++source) {
+			*( (double *)_FIELD_AT(test_e,x0) + source ) =1.;
+		}
+	}
 	norm=sqrt(spinor_field_sqnorm_f(test_e));
 	error(norm==0.,1,"pta_qprop_QMR_eo [pta_qprop.c]",
         "The origin is an odd point.");
+#endif /* NDEBUG */
   
 	/* invert noise */
 	for(i=0;i<QMR_par.n;++i){
@@ -177,8 +184,8 @@ void pta_qprop_QMR_eo(int g0[4], spinor_field **pta_qprop, int nm, double *mass,
 	free_spinor_field(in);
 	free_spinor_field(res);
 	free(shift);
-	free_spinor_field(test_e);
 #ifndef NDEBUG
+	free_spinor_field(test_e);
 	free_spinor_field(test);
 #endif
 }

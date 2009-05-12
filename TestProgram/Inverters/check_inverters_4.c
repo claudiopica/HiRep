@@ -83,7 +83,7 @@ int main(int argc,char *argv[])
 {
   int i;
   int nev,nevt,ie,status;
-  double omega1,omega2,d1[6],res,ubnd;
+  double omega1,omega2,res,ubnd;
   complex z;
   char pame[256];
 
@@ -136,26 +136,26 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"Diagonalization of Q^2 (random fields)\n");
   lprintf("MAIN",0,"--------------------------------------\n\n");
 
+
+  iw=50;
+  nev=8;
+  nevt=20;
  
   
   ws=alloc_spinor_field_f(2,&glattice);
-  ev=alloc_spinor_field_f(7,&glattice);
+  ev=alloc_spinor_field_f(iw+1,&glattice);
+  double d1[iw+1];
 
 
-   
-
-  iw=4;
-  nev=3;
-  nevt=4;
   ubnd=1.05f*power(30,Op1,ws);
   lprintf("MAIN",0,"test-ubnd: %f\n",ubnd);
-  omega1=1.0e-6f;
-  omega2=1.0e-3f;
+  omega1=1.0e-16f;
+  omega2=1.0e-8f;
 
   lprintf("MAIN",0,"Accuracy parameters: omega1=%.1e, omega2=%.1e\n\n",
 	 omega1,omega2);
 
-  ie=eva(nev,nevt,0,100,20,ubnd,omega1,omega2,Op1,ws,ev,d1,&status);
+  ie=eva(nev,nevt,0,100,200,ubnd,omega1,omega2,Op1,ws,ev,d1,&status);
 
   lprintf("MAIN",0,"\nEigenvalues of Q^2 (status = %d, ie = %d):\n\n",
 	 status,ie);

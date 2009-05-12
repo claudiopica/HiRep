@@ -77,6 +77,7 @@ input_mesons mes_ip = init_input_mesons(mes_ip);
 int main(int argc,char *argv[])
 {
 	int i, t;
+	int g[4];
   double *ex_triplets[8];
   double *pta_triplets[8];
   char tmp[256];
@@ -150,16 +151,17 @@ int main(int argc,char *argv[])
 
 /* MESONI CON PROPAGATORE POINT-TO-ALL */
 
-  pta_qprop_QMR(pta_qprop, 1, &mass, 1e-9);
+  g[0]=g[1]=g[2]=g[3]=0;
+  pta_qprop_QMR(g,pta_qprop, 1, &mass, 1e-9);
 	
-	id_correlator(pta_triplets[A], pta_qprop[0]);
-	g0_correlator(pta_triplets[Xt], pta_qprop[0]);
-	g5_correlator(pta_triplets[Pi], pta_qprop[0]);
-	g0g5_correlator(pta_triplets[Pi2], pta_qprop[0]);
-	g1_correlator(pta_triplets[Rho], pta_qprop[0]);
-	g0g1_correlator(pta_triplets[Rho2], pta_qprop[0]);
-	g5g1_correlator(pta_triplets[Yt], pta_qprop[0]);
-	g0g5g1_correlator(pta_triplets[B], pta_qprop[0]);
+	id_correlator(pta_triplets[A], g[0], pta_qprop[0]);
+	g0_correlator(pta_triplets[Xt], g[0], pta_qprop[0]);
+	g5_correlator(pta_triplets[Pi], g[0], pta_qprop[0]);
+	g0g5_correlator(pta_triplets[Pi2], g[0], pta_qprop[0]);
+	g1_correlator(pta_triplets[Rho], g[0], pta_qprop[0]);
+	g0g1_correlator(pta_triplets[Rho2], g[0], pta_qprop[0]);
+	g5g1_correlator(pta_triplets[Yt], g[0], pta_qprop[0]);
+	g0g5g1_correlator(pta_triplets[B], g[0], pta_qprop[0]);
 
 
 /* STAMPA */
