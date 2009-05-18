@@ -54,7 +54,8 @@ void traced_ata_qprop(complex*** prop, int n_points);
 void ata_qprop_init(ata_qprop_pars* p);
 void ata_qprop_free();
 
-void z2semwall_mesons(int conf, int nm, double *mass, double acc);
+void z2semwall_qprop_free();
+void z2semwall_mesons(int conf, int nhits, int nm, double *m, double acc);
 
 void id_correlator(double *out, int t0, spinor_field *qp);
 void g0_correlator(double *out, int t0, spinor_field *qp);

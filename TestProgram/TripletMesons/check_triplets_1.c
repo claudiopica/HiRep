@@ -172,7 +172,7 @@ int main(int argc,char *argv[])
 	for(i=0; i<8; i++) {
 		lprintf("TEST",0,"TRIPLET CORRELATOR %s\n", nameT[i]);
 		for(t=0; t<GLB_T; t++)
-			lprintf("TEST",0,"%.8f\t%.8f\t%e\n",
+			lprintf("TEST",0,"%e\t%e\t%e\n",
 						ex_triplets[i][t],
 						pta_triplets[i][t],
 						fabs(ex_triplets[i][t]-pta_triplets[i][t]));
@@ -229,7 +229,7 @@ void free_correlators(double **triplets) {
   
    z = - 4.*NF / square(GLB_T*GLB_X*GLB_Y*GLB_Z);
    
-   lprintf("FREE",0,"sigma = (%f,%f,%f<%f)\n",sigma[0],sigma[1],sigma[2],sigma[3]);
+   lprintf("FREE",0,"sigma = (%f,%f,%f,%f)\n",sigma[0],sigma[1],sigma[2],sigma[3]);
    for(t = 0; t < GLB_T; t++) {
       A2[t] = 0.;
       B2[0][t] = B2[1][t] = B2[2][t] = B2[3][t] = 0.;
@@ -282,7 +282,7 @@ void free_correlators(double **triplets) {
 
    lprintf("FREE",10,"A2\tB2[0]\tB2[1]\tB2[2]\tB[3]\n",A2[0]);
    for(t = 0; t < GLB_T; t++)
-      lprintf("FREE",10,"%f\t%f\t%f\t%f\t%f\n",A2[t],B2[0][t],B2[1][t],B2[2][t],B2[3][t]);
+      lprintf("FREE",10,"%e\t%e\t%e\t%e\t%e\n",A2[t],B2[0][t],B2[1][t],B2[2][t],B2[3][t]);
    
    for(i = 0; i < 8; i++) {
       for(t = 0; t < GLB_T; t++) {

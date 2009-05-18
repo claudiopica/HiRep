@@ -194,14 +194,14 @@ void name##_trace_H(complex* out, complex* smat) { \
 void name##_eval_g5GammaDag_times_spinor(suNf_spinor* out, suNf_spinor* in) { \
   int a; \
   for(a=0; a<NF; a++) { \
-    out->c[0].c[a].re += _SIGN_DAG_ * _S0_ * in->c[_C0_].c[a].re; \
-    out->c[1].c[a].re += _SIGN_DAG_ * _S1_ * in->c[_C1_].c[a].re; \
-    out->c[2].c[a].re += _SIGN_DAG_ * _S2_ * in->c[_C2_].c[a].re; \
-    out->c[3].c[a].re += _SIGN_DAG_ * _S3_ * in->c[_C3_].c[a].re; \
-    out->c[0].c[a].im += _SIGN_DAG_ * _S0_ * in->c[_C0_].c[a].im; \
-    out->c[1].c[a].im += _SIGN_DAG_ * _S1_ * in->c[_C1_].c[a].im; \
-    out->c[2].c[a].im += _SIGN_DAG_ * _S2_ * in->c[_C2_].c[a].im; \
-    out->c[3].c[a].im += _SIGN_DAG_ * _S3_ * in->c[_C3_].c[a].im; \
+    out->c[0].c[a].re = _SIGN_DAG_ * _S0_ * in->c[_C0_].c[a].re; \
+    out->c[1].c[a].re = _SIGN_DAG_ * _S1_ * in->c[_C1_].c[a].re; \
+    out->c[2].c[a].re = _SIGN_DAG_ * _S2_ * in->c[_C2_].c[a].re; \
+    out->c[3].c[a].re = _SIGN_DAG_ * _S3_ * in->c[_C3_].c[a].re; \
+    out->c[0].c[a].im = _SIGN_DAG_ * _S0_ * in->c[_C0_].c[a].im; \
+    out->c[1].c[a].im = _SIGN_DAG_ * _S1_ * in->c[_C1_].c[a].im; \
+    out->c[2].c[a].im = _SIGN_DAG_ * _S2_ * in->c[_C2_].c[a].im; \
+    out->c[3].c[a].im = _SIGN_DAG_ * _S3_ * in->c[_C3_].c[a].im; \
   } \
 }
 
@@ -210,14 +210,14 @@ void name##_eval_g5GammaDag_times_spinor(suNf_spinor* out, suNf_spinor* in) { \
 void name##_eval_g5GammaDag_times_spinor(suNf_spinor* out, suNf_spinor* in) { \
   int a; \
   for(a=0; a<NF; a++) { \
-    out->c[0].c[a].re += -_SIGN_DAG_ * _S0_ * in->c[_C0_].c[a].im; \
-    out->c[1].c[a].re += -_SIGN_DAG_ * _S1_ * in->c[_C1_].c[a].im; \
-    out->c[2].c[a].re += -_SIGN_DAG_ * _S2_ * in->c[_C2_].c[a].im; \
-    out->c[3].c[a].re += -_SIGN_DAG_ * _S3_ * in->c[_C3_].c[a].im; \
-    out->c[0].c[a].im += _SIGN_DAG_ * _S0_ * in->c[_C0_].c[a].re; \
-    out->c[1].c[a].im += _SIGN_DAG_ * _S1_ * in->c[_C1_].c[a].re; \
-    out->c[2].c[a].im += _SIGN_DAG_ * _S2_ * in->c[_C2_].c[a].re; \
-    out->c[3].c[a].im += _SIGN_DAG_ * _S3_ * in->c[_C3_].c[a].re; \
+    out->c[0].c[a].re = -_SIGN_DAG_ * _S0_ * in->c[_C0_].c[a].im; \
+    out->c[1].c[a].re = -_SIGN_DAG_ * _S1_ * in->c[_C1_].c[a].im; \
+    out->c[2].c[a].re = -_SIGN_DAG_ * _S2_ * in->c[_C2_].c[a].im; \
+    out->c[3].c[a].re = -_SIGN_DAG_ * _S3_ * in->c[_C3_].c[a].im; \
+    out->c[0].c[a].im = _SIGN_DAG_ * _S0_ * in->c[_C0_].c[a].re; \
+    out->c[1].c[a].im = _SIGN_DAG_ * _S1_ * in->c[_C1_].c[a].re; \
+    out->c[2].c[a].im = _SIGN_DAG_ * _S2_ * in->c[_C2_].c[a].re; \
+    out->c[3].c[a].im = _SIGN_DAG_ * _S3_ * in->c[_C3_].c[a].re; \
   } \
 }
 

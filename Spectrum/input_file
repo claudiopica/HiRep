@@ -10,13 +10,14 @@ NP_Z = 1
 //level = 1  seed = 1
 level = 1  seed = 12345
 
-//mes:masses = 2
-//mes:precision = 1e-20
+mes:masses = 0
+mes:precision = 1e-20
+mes:nhits = 9
 
 masses = 2.0
 
-n_eigenvalues = 0
-eva_nevt = 0
+n_eigenvalues = 128
+eva_nevt = 128
 eva_omega1 = 1e-16
 eva_omega2 = 1e-10
 eva_kmax = 50
@@ -24,7 +25,7 @@ eva_imax = 500
 
 hopping_order = -1
 
-n_truncation_steps = 50
+n_truncation_steps = 0
 n_sources_truncation = 1
 n_sources_correction = 1
 inverter_precision = 1e-20

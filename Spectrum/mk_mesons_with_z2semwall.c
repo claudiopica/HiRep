@@ -36,9 +36,10 @@
 typedef struct _input_mesons {
   char mstring[256];
   double precision;
+  int nhits;
 
   /* for the reading function */
-  input_record_t read[3];
+  input_record_t read[4];
 
 } input_mesons;
 
@@ -47,6 +48,7 @@ typedef struct _input_mesons {
   .read={\
     {"quark quenched masses", "mes:masses = %s", STRING_T, (varname).mstring},\
     {"inverter precision", "mes:precision = %lf", DOUBLE_T, &(varname).precision},\
+    {"number of noisy sources per cnfg", "mes:nhits = %d", INT_T, &(varname).nhits},\
     {NULL, NULL, 0, NULL}\
   }\
 }
@@ -277,6 +279,7 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"Inverter precision = %e\n",mes_var.precision);
   for(k=0;k<nm;k++)
     lprintf("MAIN",0,"Mass[%d] = %f\n",k,m[k]);
+  lprintf("MAIN",0,"Number of noisy sources per cnfg = %d\n",mes_var.nhits);
 
   list=NULL;
   if(strcmp(list_filename,"")!=0) {
@@ -301,12 +304,14 @@ int main(int argc,char *argv[]) {
 
     full_plaquette();
     
-    z2semwall_mesons(i, nm, m, mes_var.precision);
+    z2semwall_mesons(i,mes_var.nhits,nm, m, mes_var.precision);
 
     if(list==NULL) break;
   }
 
   if(list!=NULL) fclose(list);
+
+  z2semwall_qprop_free();
 
   finalize_process();
  

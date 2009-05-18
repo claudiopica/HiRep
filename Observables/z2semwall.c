@@ -30,6 +30,8 @@
 #ifdef RESTRICTED_SET
   #define G1_CHANNEL
   #define PCAC_CHANNEL
+  #define NCHANNELS 3
+  enum { _g5=0, _g1, _g5_g0g5_re };
 #else
   #define ID_CHANNEL
   #define G0_CHANNEL
@@ -47,6 +49,8 @@
   #define G0G5G2_CHANNEL
   #define G0G5G3_CHANNEL
   #define PCAC_CHANNEL
+  #define NCHANNELS 17
+  enum { _id=0, _g0, _g1, _g2, _g3, _g5, _g0g1, _g0g2, _g0g3, _g0g5, _g5g1, _g5g2, _g5g3, _g0g5g1, _g0g5g2, _g0g5g3, _g5_g0g5_re };
 #endif
 
 
@@ -88,58 +92,125 @@ static void D_pre(spinor_field *out, spinor_field *in){
 }
 
 
-/*enum { ID, G0, G1, G2, G3, G5, G0G1, G0G2, G0G3, G0G5, G5G1, G5G2, G5G3, G0G5G1, G0G5G2, G0G5G3 };*/
 
-static void z2semwall_qprop_QMR_eo(void (*Gamma)(suNf_spinor*,suNf_spinor*), spinor_field *psi, spinor_field *eta, int nm, double *mass, double acc) {
-	mshift_par QMR_par;
-	double *shift;
-  spinor_field *eta2, *resd, *resdn;
+static int init=0;
+static mshift_par QMR_par;
+static double *shift;
+static double *mass;
+static spinor_field *QMR_noise;
+static spinor_field *QMR_resdn;
+static void z2semwall_qprop_init(int nm, double *m, double acc) {
+  int i, cgiter=0;
+  double norm;
+
+#ifndef NDEBUG
+ 	spinor_field *test_e=0;
+	test_e=alloc_spinor_field_f(1,&glat_even);
+#endif
+  
+  if(init==0) {
+   	shift=(double*)malloc(sizeof(double)*(nm));
+   	mass=(double*)malloc(sizeof(double)*(nm));
+	  hmass_pre=m[0]; /* we can put any number here!!! */
+	  hmass=m[0]; /* we can put any number here!!! */
+	  for(i=0;i<nm;++i){
+	    mass[i]=m[i];
+		  shift[i]=(4.+hmass_pre)*(4.+hmass_pre)-(4.+m[i])*(4.+m[i]);
+	  }
+	  QMR_par.n = nm;
+	  QMR_par.shift = shift;
+	  QMR_par.err2 = .5*acc;
+	  QMR_par.max_iter = 0;
+	
+    QMR_noise=alloc_spinor_field_f(nm+1,&glat_even);
+    QMR_resdn=QMR_noise+1;
+
+	  /* noisy background */
+	  gaussian_spinor_field(QMR_noise);
+	  norm=sqrt(spinor_field_sqnorm_f(QMR_noise));
+	  spinor_field_mul_f(QMR_noise,1./norm,QMR_noise);
+	}
+
+	/* invert noise */
+	for(i=0;i<QMR_par.n;++i)
+		spinor_field_zero_f(&QMR_resdn[i]);
+	cgiter+=g5QMR_mshift(&QMR_par, &D_pre, QMR_noise, QMR_resdn);
+
+#ifndef NDEBUG
+	for(i=0;i<QMR_par.n;++i){
+	  hmass_pre=mass[i];
+	  D_pre(test_e,&QMR_resdn[i]);
+	  ++cgiter;
+	  spinor_field_sub_assign_f(test_e,QMR_noise);
+	  norm=spinor_field_sqnorm_f(test_e);
+	  lprintf("Z2SEMWALL",0,"g5QMR_eo residuum of source [%d] = %e\n",i,norm);
+	  hmass_pre=mass[0];
+	}
+#endif /* NDEBUG */
+
+	lprintf("Z2SEMWALL",10,"QMR_eo MVM = %d\n",cgiter);
+
+  init=1;
+
+#ifndef NDEBUG
+ 	free_spinor_field(test_e);
+#endif
+}
+
+void z2semwall_qprop_free() {
+  error(init==0,1,"z2semwall.c","z2semwall method not initialized!");
+
+  free(shift);
+  free(mass);
+	free_spinor_field(QMR_noise);
+	init=0;
+}
+
+
+static void z2semwall_qprop_QMR_eo(void (*Gamma)(suNf_spinor*,suNf_spinor*), spinor_field *psi, spinor_field *eta) {
+  spinor_field *eta2, *resd;
   _DECLARE_INT_ITERATOR(ix);
- 	double norm;
 	spinor_field qprop_mask;
 	int i, cgiter=0;
 
+  error(init==0,1,"z2semwall.c","z2semwall method not initialized!");
+
 #ifndef NDEBUG
+ 	double norm;
 	spinor_field *test=0;
  	spinor_field *test_e=0;
 	test=alloc_spinor_field_f(2,&glattice);
 	test_e=alloc_spinor_field_f(1,&glat_even);
 #endif
 
-	eta2=alloc_spinor_field_f(2*nm+1,&glat_even);
-	resdn=eta2+1;
-	resd=resdn+nm;
 
-
-	/* set up inverters parameters */
-	shift=(double*)malloc(sizeof(double)*(nm));
-	hmass_pre=mass[0]; /* we can put any number here!!! */
-	for(i=0;i<nm;++i){
-		shift[i]=(4.+hmass_pre)*(4.+hmass_pre)-(4.+mass[i])*(4.+mass[i]);
-	}
-	QMR_par.n = nm;
-	QMR_par.shift = shift;
-	QMR_par.err2 = .5*acc;
-	QMR_par.max_iter = 0;
-
-	/* noisy background */
-	gaussian_spinor_field(eta2);
-	norm=sqrt(spinor_field_sqnorm_f(eta2));
-	spinor_field_mul_f(eta2,1./norm,eta2);
-
-	/* invert noise */
 	for(i=0;i<QMR_par.n;++i){
-		spinor_field_zero_f(&resdn[i]);
-	}
-	cgiter+=g5QMR_mshift(&QMR_par, &D_pre, eta2, resdn);
+
+#ifndef NDEBUG
+		/* this is a test of the solution */
+		hmass_pre=mass[i];
+		D_pre(test_e,&QMR_resdn[i]);
+		++cgiter;
+		spinor_field_sub_assign_f(test_e,QMR_noise);
+		norm=spinor_field_sqnorm_f(test_e);
+		lprintf("Z2SEMWALL",0,"g5QMR_eo residuum of source QMR_noise [%d] = %e\n",i,norm);
+		hmass_pre=mass[0];
+#endif /* NDEBUG */
+  }
+
+
+	eta2=alloc_spinor_field_f(QMR_par.n+1,&glat_even);
+	resd=eta2+1;
 
 	/* add source */
   _MASTER_FOR(&glat_even,ix)
     (*Gamma)(_FIELD_AT(eta2,ix),_FIELD_AT(eta,ix));
+	spinor_field_add_assign_f(eta2,QMR_noise);
+
 
   /* invert source */
 	for(i=0;i<QMR_par.n;++i){
-	  		spinor_field_zero_f(&resd[i]);
+	  spinor_field_zero_f(&resd[i]);
 	}
 	cgiter+=g5QMR_mshift(&QMR_par, &D_pre, eta2, resd);
 
@@ -150,14 +221,29 @@ static void z2semwall_qprop_QMR_eo(void (*Gamma)(suNf_spinor*,suNf_spinor*), spi
 		hmass_pre=mass[i];
 		D_pre(test_e,&resd[i]);
 		++cgiter;
-		spinor_field_sub_f(test_e,test_e,eta2);
+		spinor_field_sub_assign_f(test_e,eta2);
 		norm=spinor_field_sqnorm_f(test_e);
-		lprintf("PROPAGATOR",0,"g5QMR_eo residuum of source [%d] = %e\n",i,norm);
+		lprintf("Z2SEMWALL",0,"g5QMR_eo residuum of source Gamma(eta)+QMR_noise [%d] = %e\n",i,norm);
 		hmass_pre=mass[0];
 #endif /* NDEBUG */
 
     /* substract noise */
-		spinor_field_sub_f(&resd[i],&resd[i],&resdn[i]);
+		spinor_field_sub_assign_f(&resd[i],&QMR_resdn[i]);
+#ifndef NDEBUG
+		spinor_field_sub_assign_f(eta2,QMR_noise);
+#endif /* NDEBUG */
+
+
+#ifndef NDEBUG
+		/* this is a test of the solution */
+		hmass_pre=mass[i];
+		D_pre(test_e,&resd[i]);
+		++cgiter;
+		spinor_field_sub_assign_f(test_e,eta2);
+		norm=spinor_field_sqnorm_f(test_e);
+		lprintf("Z2SEMWALL",0,"g5QMR_eo residuum of source Gamma(eta) [%d] = %e\n",i,norm);
+		hmass_pre=mass[0];
+#endif /* NDEBUG */
 
 		/* compute solution */
 		qprop_mask=psi[i];
@@ -173,20 +259,19 @@ static void z2semwall_qprop_QMR_eo(void (*Gamma)(suNf_spinor*,suNf_spinor*), spi
 		hmass=mass[i];
 		D(&test[0],&psi[i]);
 		++cgiter;
-		spinor_field_zero_f(&test[1]);
-    _MASTER_FOR(&glat_even,ix)
+ 		spinor_field_zero_f(&test[1]);
+   _MASTER_FOR(&glat_even,ix)
       (*Gamma)(_FIELD_AT(&test[1],ix),_FIELD_AT(eta,ix));
-		spinor_field_sub_f(&test[0],&test[0],&test[1]);
+		spinor_field_sub_assign_f(&test[0],&test[1]);
 		norm=spinor_field_sqnorm_f(&test[0]);
-		lprintf("PROPAGATOR",0,"g5QMR_eo residuum of source [%d] = %e\n",i,norm);
+		lprintf("Z2SEMWALL",0,"g5QMR_eo residuum of source Gamma(eta) (2) [%d] = %e\n",i,norm);
 		hmass=mass[0];
 #endif /* NDEBUG */
   }
 
-	lprintf("PROPAGATOR",10,"QMR_eo MVM = %d\n",cgiter);
+	lprintf("Z2SEMWALL",10,"QMR_eo MVM = %d\n",cgiter);
 	
 	free_spinor_field(eta2);
-	free(shift);
 #ifndef NDEBUG
 	free_spinor_field(test_e);
 	free_spinor_field(test);
@@ -194,186 +279,246 @@ static void z2semwall_qprop_QMR_eo(void (*Gamma)(suNf_spinor*,suNf_spinor*), spi
 }
 
 
-void z2semwall_mesons(int conf, int nm, double *mass, double acc) {
+
+void z2semwall_mesons(int conf, int nhits, int nm, double *m, double acc) {
   spinor_field *eta;
   spinor_field *psi0;
   spinor_field *psi;
   suNf_spinor sp;
-  int ix, i;
+  int ix, i, k, n;
   int beta, tau;
   int t,x,y,z;
   double ran, tmp;
-  double corr[GLB_T*nm];
-  
+  double corr[NCHANNELS][GLB_T*nm];
+
+  error(nhits<1,1,"z2semwall.c","Bad value for nhits!");
+
+  z2semwall_qprop_init(nm, m, acc);
+ 
   eta=alloc_spinor_field_f(4,&glat_even);
   psi0=alloc_spinor_field_f(5*nm,&glattice);
   psi=psi0+4*nm;
-  
-  ranlxd(&ran,1);
-  tau=(int)(ran*GLB_T);
 
-  for(beta=0;beta<4;beta++) {
-    create_diluted_source_even(&eta[beta], tau, beta);
-    z2semwall_qprop_QMR_eo(&g5_eval_g5GammaDag_times_spinor,&psi0[beta*nm],&eta[beta],nm,mass,acc);
-  }
 
   for(i=0; i<nm*GLB_T; i++)
-    corr[i] = 0.;
+  for(k=0; k<NCHANNELS; k++)
+    corr[k][i] = 0.;
 
-  for(beta=0;beta<4;beta++) {
-    for(i=0; i<nm; i++) {  
-      for (t=0; t<T; t++) {
-        for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) {
-          ix=ipt(t,x,y,z);
-          _spinor_prod_re_f(tmp,*_FIELD_AT(&psi0[beta*nm+i],ix),*_FIELD_AT(&psi0[beta*nm+i],ix));
-          corr[(COORD[0]*T+t+GLB_T-tau)%GLB_T+i*GLB_T]+=tmp;
+
+  for(n=0; n<nhits; n++) {
+  
+    ranlxd(&ran,1);
+    tau=(int)(ran*GLB_T);
+
+    for(beta=0;beta<4;beta++) {
+      create_diluted_source_even(&eta[beta], tau, beta);
+      z2semwall_qprop_QMR_eo(&g5_eval_g5GammaDag_times_spinor,&psi0[beta*nm],&eta[beta]);
+    }
+
+
+    for(beta=0;beta<4;beta++) {
+      for(i=0; i<nm; i++) {  
+        for (t=0; t<T; t++) {
+          for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) {
+            ix=ipt(t,x,y,z);
+            _spinor_prod_re_f(tmp,*_FIELD_AT(&psi0[beta*nm+i],ix),*_FIELD_AT(&psi0[beta*nm+i],ix));
+            corr[_g5][(COORD[0]*T+t+GLB_T-tau)%GLB_T+i*GLB_T]+=tmp;
+          }
         }
       }
     }
+
+#define COMPUTE_CORR(name) \
+    for(beta=0;beta<4;beta++) { \
+      z2semwall_qprop_QMR_eo(& name##_eval_g5GammaDag_times_spinor,psi,&eta[beta]); \
+      for(i=0; i<nm; i++) { \
+        for (t=0; t<T; t++) { \
+          for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) { \
+            ix=ipt(t,x,y,z); \
+            _spinor_zero_f(sp); \
+            name##_eval_g5GammaDag_times_spinor(&sp,_FIELD_AT(&psi0[beta*nm+i],ix)); \
+            _spinor_prod_re_f(tmp,*_FIELD_AT(&psi[i],ix),sp); \
+            corr[ _##name ][(COORD[0]*T+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; \
+          } \
+        } \
+      } \
+    }
+
+#ifdef ID_CHANNEL
+    COMPUTE_CORR(id);
+#endif
+
+#ifdef G0_CHANNEL
+    COMPUTE_CORR(g0);
+#endif
+  
+#ifdef G1_CHANNEL
+    COMPUTE_CORR(g1);
+#endif
+   
+#ifdef G2_CHANNEL
+    COMPUTE_CORR(g2);
+#endif
+  
+#ifdef G3_CHANNEL
+    COMPUTE_CORR(g3);
+#endif
+  
+#ifdef G0G5_CHANNEL
+    COMPUTE_CORR(g0g5);
+#endif
+  
+#ifdef G5G1_CHANNEL
+    COMPUTE_CORR(g5g1);
+#endif
+  
+#ifdef G5G2_CHANNEL
+    COMPUTE_CORR(g5g2);
+#endif
+  
+#ifdef G5G3_CHANNEL
+    COMPUTE_CORR(g5g3);
+#endif
+  
+#ifdef G0G1_CHANNEL
+    COMPUTE_CORR(g0g1);
+#endif
+  
+#ifdef G0G2_CHANNEL
+    COMPUTE_CORR(g0g2);
+#endif
+  
+#ifdef G0G3_CHANNEL
+    COMPUTE_CORR(g0g3);
+#endif
+  
+#ifdef G0G5G1_CHANNEL
+    COMPUTE_CORR(g0g5g1);
+#endif
+  
+#ifdef G0G5G2_CHANNEL
+    COMPUTE_CORR(g0g5g2);
+#endif
+  
+#ifdef G0G5G3_CHANNEL
+    COMPUTE_CORR(g0g5g3);
+#endif
+
+#ifdef PCAC_CHANNEL
+     for(beta=0;beta<4;beta++) {
+      for(i=0; i<nm; i++) {
+        for (t=0; t<T; t++) {
+          for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) {
+            ix=ipt(t,x,y,z);
+            _spinor_zero_f(sp);
+            g0g5_eval_g5GammaDag_times_spinor(&sp,_FIELD_AT(&psi0[beta*nm+i],ix));
+            _spinor_prod_re_f(tmp,*_FIELD_AT(&psi0[beta*nm+i],ix),sp);
+            corr[_g5_g0g5_re][(COORD[0]*T+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
+          }
+        }
+      }
+    }
+#endif
+
   }
 
-  global_sum(corr,GLB_T);
+
+  for(k=0; k<NCHANNELS; k++) {
+    global_sum(corr[_g5],GLB_T);
+    for(i=0; i<nm*GLB_T; i++)
+      corr[k][i] *= -2./(GLB_X*GLB_Y*GLB_Z*GLB_X*GLB_Y*GLB_Z*nhits);
+  }
 
   
 #define PRINT_CORR(name) \
   for(i=0; i<nm; i++) { \
     lprintf("MAIN",0,"conf #%d mass=%2.6f TRIPLET " #name "= ",conf,mass[i]); \
     for(t=0;t<GLB_T;++t) { \
-      lprintf("MAIN",0,"%e ",corr[t]); \
+      lprintf("MAIN",0,"%e ",corr[ _##name ][t]); \
     } \
     lprintf("MAIN",0,"\n"); \
     fflush(stdout); \
   } \
 
+  for(i=0; i<nm*GLB_T; i++)
+    corr[_g5][i] *= -1.;
   PRINT_CORR(g5);
 
-
-#define COMPUTE_CORR(name) \
-  for(i=0; i<nm*GLB_T; i++) \
-    corr[i] = 0.; \
-  for(beta=0;beta<4;beta++) { \
-    z2semwall_qprop_QMR_eo(& name##_eval_g5GammaDag_times_spinor,psi,&eta[beta],nm,mass,acc); \
-    for(i=0; i<nm; i++) { \
-      for (t=0; t<T; t++) { \
-        for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) { \
-          ix=ipt(t,x,y,z); \
-          _spinor_zero_f(sp); \
-          name##_eval_g5GammaDag_times_spinor(&sp,_FIELD_AT(&psi0[beta*nm+i],ix)); \
-          _spinor_prod_re_f(tmp,*_FIELD_AT(&psi[i],ix),sp); \
-          corr[(COORD[0]*T+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; \
-        } \
-      } \
-    } \
-  } \
-  global_sum(corr,GLB_T)
-
 #ifdef ID_CHANNEL
-  COMPUTE_CORR(id);
   PRINT_CORR(id);
 #endif
 
 #ifdef G0_CHANNEL
-  COMPUTE_CORR(g0);
   PRINT_CORR(g0);
 #endif
   
 #ifdef G1_CHANNEL
-  COMPUTE_CORR(g1);
   for(i=0; i<nm*GLB_T; i++)
-    corr[i] = -corr[i];
+    corr[_g1][i] *= -1.;
   PRINT_CORR(g1);
 #endif
    
 #ifdef G2_CHANNEL
-  COMPUTE_CORR(g2);
   for(i=0; i<nm*GLB_T; i++)
-    corr[i] = -corr[i];
+    corr[_g2][i] *= -1.;
   PRINT_CORR(g2);
 #endif
   
 #ifdef G3_CHANNEL
-  COMPUTE_CORR(g3);
   for(i=0; i<nm*GLB_T; i++)
-    corr[i] = -corr[i];
+    corr[_g3][i] *= -1.;
   PRINT_CORR(g3);
 #endif
   
 #ifdef G0G5_CHANNEL
-  COMPUTE_CORR(g0g5);
   for(i=0; i<nm*GLB_T; i++)
-    corr[i] = -corr[i];
+    corr[_g0g5][i] *= -1.;
   PRINT_CORR(g0g5);
 #endif
   
 #ifdef G5G1_CHANNEL
-  COMPUTE_CORR(g5g1);
   PRINT_CORR(g5g1);
 #endif
   
 #ifdef G5G2_CHANNEL
-  COMPUTE_CORR(g5g2);
   PRINT_CORR(g5g2);
 #endif
   
 #ifdef G5G3_CHANNEL
-  COMPUTE_CORR(g5g3);
   PRINT_CORR(g5g3);
 #endif
   
 #ifdef G0G1_CHANNEL
-  COMPUTE_CORR(g0g1);
   for(i=0; i<nm*GLB_T; i++)
-    corr[i] = -corr[i];
+    corr[_g0g1][i] *= -1.;
   PRINT_CORR(g0g1);
 #endif
   
 #ifdef G0G2_CHANNEL
-  COMPUTE_CORR(g0g2);
   for(i=0; i<nm*GLB_T; i++)
-    corr[i] = -corr[i];
+    corr[_g0g2][i] *= -1.;
   PRINT_CORR(g0g2);
 #endif
   
 #ifdef G0G3_CHANNEL
-  COMPUTE_CORR(g0g3);
   for(i=0; i<nm*GLB_T; i++)
-    corr[i] = -corr[i];
+    corr[_g0g3][i] *= -1.;
   PRINT_CORR(g0g3);
 #endif
   
 #ifdef G0G5G1_CHANNEL
-  COMPUTE_CORR(g0g5g1);
   PRINT_CORR(g0g5g1);
 #endif
   
 #ifdef G0G5G2_CHANNEL
-  COMPUTE_CORR(g0g5g2);
   PRINT_CORR(g0g5g2);
 #endif
   
 #ifdef G0G5G3_CHANNEL
-  COMPUTE_CORR(g0g5g3);
   PRINT_CORR(g0g5g3);
 #endif
 
-
 #ifdef PCAC_CHANNEL
-  for(i=0; i<nm*GLB_T; i++)
-    corr[i] = 0.;
-  for(beta=0;beta<4;beta++) {
-    for(i=0; i<nm; i++) {
-      for (t=0; t<T; t++) {
-        for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) {
-          ix=ipt(t,x,y,z);
-          _spinor_zero_f(sp);
-          g0g5_eval_g5GammaDag_times_spinor(&sp,_FIELD_AT(&psi0[beta*nm+i],ix));
-          _spinor_prod_re_f(tmp,*_FIELD_AT(&psi0[beta*nm+i],ix),sp);
-          corr[(COORD[0]*T+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
-        }
-      }
-    }
-  }
-  global_sum(corr,GLB_T);
   PRINT_CORR(g5_g0g5_re);
 #endif
 
