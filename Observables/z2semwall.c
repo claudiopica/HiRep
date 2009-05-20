@@ -23,6 +23,8 @@
 #include "ranlux.h"
 
 
+/*#define POINT_TO_ALL*/
+
 #define RESTRICTED_SET
 
 
@@ -67,6 +69,16 @@
 /*  }*/
 /*}*/
 
+
+#ifdef POINT_TO_ALL
+static void create_point_source_even(spinor_field *source, int beta, int b) {
+  spinor_field_zero_f(source);
+  if(COORD[0]==0 && COORD[1]==0 && COORD[2]==0 && COORD[3]==0) {
+    int ix=ipt(0,0,0,0);
+    _FIELD_AT(source,ix)->c[beta].c[b].re = 1.;
+  }
+}
+#else
 static void create_diluted_source_even(spinor_field *source, int tau, int beta) {
   int c[4];
   spinor_field_zero_f(source);
@@ -78,7 +90,14 @@ static void create_diluted_source_even(spinor_field *source, int tau, int beta) 
       if(((tau+COORD[1]*X+c[1]+COORD[2]*Y+c[2]+COORD[3]*Z+c[3])&1)==0)
         ranz2((double*)(&(_FIELD_AT(source,ipt(c[0],c[1],c[2],c[3])))->c[beta]),sizeof(suNf_vector)/sizeof(double));
   }
+  
+#ifndef NDEBUG
+  double norm=spinor_field_sqnorm_f(source);
+  lprintf("Z2SEMWALL",0,"Source sqnorm (must be %d) = %e\n",NF*GLB_X*GLB_Y*GLB_Z/2,norm);
+#endif
 }
+#endif
+
 
 
 static double hmass, hmass_pre;
@@ -287,8 +306,11 @@ void z2semwall_mesons(int conf, int nhits, int nm, double *m, double acc) {
   suNf_spinor sp;
   int ix, i, k, n;
   int beta, tau;
+#ifndef POINT_TO_ALL
+  double ran;
+#endif
   int t,x,y,z;
-  double ran, tmp;
+  double tmp;
   double corr[NCHANNELS][GLB_T*nm];
 
   error(nhits<1,1,"z2semwall.c","Bad value for nhits!");
@@ -304,14 +326,27 @@ void z2semwall_mesons(int conf, int nhits, int nm, double *m, double acc) {
   for(k=0; k<NCHANNELS; k++)
     corr[k][i] = 0.;
 
+#ifdef POINT_TO_ALL
+  nhits=NF;
+#endif
 
   for(n=0; n<nhits; n++) {
   
-    ranlxd(&ran,1);
-    tau=(int)(ran*GLB_T);
+#ifdef POINT_TO_ALL
+    tau=0;
+#else
+    do{
+      ranlxd(&ran,1);
+      tau=(int)(ran*GLB_T);
+    } while(tau==GLB_T);
+#endif
 
     for(beta=0;beta<4;beta++) {
+#ifdef POINT_TO_ALL
+      create_point_source_even(&eta[beta], beta, n);
+#else
       create_diluted_source_even(&eta[beta], tau, beta);
+#endif
       z2semwall_qprop_QMR_eo(&g5_eval_g5GammaDag_times_spinor,&psi0[beta*nm],&eta[beta]);
     }
 
@@ -426,7 +461,11 @@ void z2semwall_mesons(int conf, int nhits, int nm, double *m, double acc) {
   for(k=0; k<NCHANNELS; k++) {
     global_sum(corr[_g5],GLB_T);
     for(i=0; i<nm*GLB_T; i++)
+#ifdef POINT_TO_ALL
+      corr[k][i] *= -1./(GLB_X*GLB_Y*GLB_Z);
+#else
       corr[k][i] *= -2./(GLB_X*GLB_Y*GLB_Z*GLB_X*GLB_Y*GLB_Z*nhits);
+#endif
   }
 
   
