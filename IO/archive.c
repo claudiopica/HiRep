@@ -316,7 +316,7 @@ void read_gauge_field(char filename[])
   /* check average plaquette */
   testplaq=avr_plaquette();
   if (PID==0) {
-    if (fabs(testplaq-plaq)>1.e-14) {
+    if (fabs(testplaq-plaq)>1.e-12) {
       lprintf("ERROR",0,"Stored plaquette value [%e] do not match the configuration! [diff=%e]\n",plaq,fabs(testplaq-plaq));
       error(1,1,"read_gauge_field " __FILE__,"Plaquette value mismatch");
     }

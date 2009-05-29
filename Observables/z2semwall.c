@@ -339,6 +339,7 @@ void z2semwall_mesons(int conf, int nhits, int nm, double *m, double acc) {
       ranlxd(&ran,1);
       tau=(int)(ran*GLB_T);
     } while(tau==GLB_T);
+    bcast_int(&tau,1);
 #endif
 
     for(beta=0;beta<4;beta++) {
@@ -351,17 +352,17 @@ void z2semwall_mesons(int conf, int nhits, int nm, double *m, double acc) {
     }
 
 
-    for(beta=0;beta<4;beta++) {
-      for(i=0; i<nm; i++) {  
-        for (t=0; t<T; t++) {
-          for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) {
-            ix=ipt(t,x,y,z);
-            _spinor_prod_re_f(tmp,*_FIELD_AT(&psi0[beta*nm+i],ix),*_FIELD_AT(&psi0[beta*nm+i],ix));
-            corr[_g5][(COORD[0]*T+t+GLB_T-tau)%GLB_T+i*GLB_T]+=tmp;
-          }
-        }
-      }
-    }
+    for(beta=0;beta<4;beta++)
+      for(i=0; i<nm; i++)
+        for (t=0; t<T; t++)
+          for (x=0; x<X; x++)
+	    for (y=0; y<Y; y++) 
+	      for (z=0; z<Z; z++) {
+		ix=ipt(t,x,y,z);
+		_spinor_prod_re_f(tmp,*_FIELD_AT(&psi0[beta*nm+i],ix),*_FIELD_AT(&psi0[beta*nm+i],ix));
+		corr[_g5][(COORD[0]*T+t+GLB_T-tau)%GLB_T+i*GLB_T]+=tmp;
+	      }
+    
 
 #define COMPUTE_CORR(name) \
     for(beta=0;beta<4;beta++) { \
@@ -459,7 +460,7 @@ void z2semwall_mesons(int conf, int nhits, int nm, double *m, double acc) {
 
 
   for(k=0; k<NCHANNELS; k++) {
-    global_sum(corr[_g5],GLB_T);
+    global_sum(corr[k],GLB_T);
     for(i=0; i<nm*GLB_T; i++)
 #ifdef POINT_TO_ALL
       corr[k][i] *= -1./(GLB_X*GLB_Y*GLB_Z);
