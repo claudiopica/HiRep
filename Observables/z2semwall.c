@@ -460,7 +460,7 @@ void z2semwall_mesons(int conf, int nhits, int nm, double *m, double acc) {
 
 
   for(k=0; k<NCHANNELS; k++) {
-    global_sum(corr[k],GLB_T);
+    global_sum(corr[k],GLB_T*nm);
     for(i=0; i<nm*GLB_T; i++)
 #ifdef POINT_TO_ALL
       corr[k][i] *= -1./(GLB_X*GLB_Y*GLB_Z);
@@ -474,7 +474,7 @@ void z2semwall_mesons(int conf, int nhits, int nm, double *m, double acc) {
   for(i=0; i<nm; i++) { \
     lprintf("MAIN",0,"conf #%d mass=%2.6f TRIPLET " #name "= ",conf,mass[i]); \
     for(t=0;t<GLB_T;++t) { \
-      lprintf("MAIN",0,"%e ",corr[ _##name ][t]); \
+      lprintf("MAIN",0,"%e ",corr[ _##name ][t+i*GLB_T]); \
     } \
     lprintf("MAIN",0,"\n"); \
     fflush(stdout); \
