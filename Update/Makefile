@@ -6,6 +6,6 @@ MKDIR = $(TOPDIR)/Make
 include $(MKDIR)/MkRules
 
 approx_data.db:
-	echo -n "Writing rational approximation database... "
+	echo "Writing rational approximation database... \c"
 	( cd remez && cat approx_* | ./mkappdata.pl >../$@ && cd .. \
 		&& echo "done." ) || ( echo "failed." && false )

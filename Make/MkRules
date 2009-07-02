@@ -8,7 +8,7 @@ include $(MKDIR)/MkFlags
 .%.d: SRC=$(patsubst .%.d,%.c,$@)
 .%.d: %.c 
 	$(MAKE) -C $(INCDIR) all
-	echo -n Generating dependences for [$(SRC)]...
+	echo "Generating dependences for [$(SRC)]...\c"
 	$(GCC) -MM -MG -MT "$@ $(patsubst .%.d,%.o,$@)" $(CPPFLAGS) $(SRC) > $@ &&\
 		echo "RBLD = rebuild" >> $@ &&\
 	echo " done." || echo " failed."
@@ -28,9 +28,9 @@ endif
 	  if test "$(findstring .d,$(MAKEFILES))" = ""; then \
 	    MAKEFILES="$(patsubst %.o,.%.d,$@)" $(MAKE) $@ ;\
 	  else \
-	    echo -n Compiling [$(CURDIR)/$@]... ;\
+	    echo "Compiling [$(CURDIR)/$@]...\c" ;\
 	    $(CC) -c $(CFLAGS) $(CPPFLAGS) $(SRC) &&\
-	    echo " done." || echo " failed.";\
+	    echo " done." || ( echo " failed." && false) ;\
 	  fi ;\
 	else \
 	  $(MAKE) -C $(dir $@) $(notdir $@) ;\
@@ -68,7 +68,7 @@ $(patsubst %,clean-%,$(SUBDIRS)):
 	$(MAKE) -C $(patsubst clean-%,%,$@) clean
 
 clean:: $(patsubst %,clean-%,$(SUBDIRS))
-	echo -n Cleaning $(CURDIR)...
+	echo "Cleaning $(CURDIR)...\c"
 	rm -f *.o *.rpo *~ *.il *.dyn *.ii *.s .*.d
 	echo " done."
 
