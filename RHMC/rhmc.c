@@ -24,9 +24,96 @@
 #include "dirac.h"
 #include "logger.h"
 #include "rhmc_utils.h"
+#include "memory.h"
+#include "communications.h"
+#include "observables.h"
 
 #include "cinfo.c"
 
+/* Mesons parameters */
+typedef struct _input_mesons {
+  int domes;
+  double precision;
+  int nmeas;
+
+  /* for the reading function */
+  input_record_t read[4];
+
+} input_mesons;
+
+#define init_input_mesons(varname) \
+{ \
+  .domes=0,\
+  .read={\
+    {"do mesons", "mes:domes = %d", INT_T, &(varname).domes},\
+    {"inverter precision", "mes:precision = %lf", DOUBLE_T, &(varname).precision},\
+    {"number of measures", "mes:nmeas = %d", INT_T, &(varname).nmeas},\
+    {NULL, NULL, 0, NULL}\
+  }\
+}
+
+input_mesons mes_var = init_input_mesons(mes_var);
+
+void inline_mk_mesons(double *m, int nm, double prec) {
+    int k, n, g0[4];
+    spinor_field **pta_qprop=0;
+    double* tricorr;
+
+    tricorr=(double*)malloc(GLB_T*sizeof(double));
+    pta_qprop=(spinor_field**)malloc(sizeof(spinor_field*)*nm);
+    pta_qprop[0]=alloc_spinor_field_f(4*NF*nm,&glattice);
+
+    for(k=0;k<nm;++k)
+	    pta_qprop[k]=pta_qprop[0]+4*NF*k;
+
+    g0[0]=rand()%GLB_T; g0[1]=rand()%GLB_X; g0[2]=rand()%GLB_Y; g0[3]=rand()%GLB_Z;
+    if((g0[0]+g0[1]+g0[2]+g0[3])%2!=0)
+	    g0[3]=(g0[3]+1)%GLB_Z;
+
+    bcast_int(g0,4);
+
+    lprintf("MAIN",0,"PTA meson source in (%d,%d,%d,%d)\n",g0[0],g0[1],g0[2],g0[3]);
+
+    pta_qprop_QMR_eo(g0, pta_qprop, nm, m, prec);
+
+    for (k=0;k<nm;++k){
+
+#define CORR(name) \
+	    name##_correlator(tricorr, g0[0], pta_qprop[k]);\
+	    lprintf("MAIN",0,"conf #0 mass=%2.6f TRIPLET " #name "= ",m[k]);\
+	    for(n=0;n<GLB_T;++n) {\
+		    lprintf("MAIN",0,"%e ",tricorr[n]);\
+	    }\
+	    lprintf("MAIN",0,"\n");\
+	    fflush(stdout)
+
+	    CORR(id);
+	    CORR(g5);
+	    CORR(g0);
+	    CORR(g0g5);
+	    CORR(g1);
+	    CORR(g2);
+	    CORR(g3);
+	    CORR(g0g1);
+	    CORR(g0g2);
+	    CORR(g0g3);
+	    CORR(g5g1);
+	    CORR(g5g2);
+	    CORR(g5g3);
+	    CORR(g0g5g1);
+	    CORR(g0g5g2);
+	    CORR(g0g5g3);
+	    CORR(g5_g0g5_re);
+	    CORR(g5_g0g5_im);
+
+    }
+#undef CORR
+
+  free_spinor_field(pta_qprop[0]);
+  free(pta_qprop);
+  free(tricorr);
+
+}
 
 /* flow control variable */
 rhmc_flow flow=init_rhmc_flow(flow);
@@ -51,6 +138,7 @@ int main(int argc,char *argv[])
 {
   int i, acc, rc;
   char sbuf[128];
+  double mass;
 
   /* setup process id and communications */
   setup_process(&argc,&argv);
@@ -63,8 +151,8 @@ int main(int argc,char *argv[])
   if (PID!=0) { logger_disable(); }
 
   if (PID==0) {
-    sprintf(sbuf,">>out_%d",PID); logger_stdout(sbuf);
-    sprintf(sbuf,"err_%d",PID); freopen(sbuf,"w",stderr);
+    sprintf(sbuf,">>out_%d",PID);  logger_stdout(sbuf); 
+    /* sprintf(sbuf,"err_%d",PID); freopen(sbuf,"w",stderr);  */
   }
 
   lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS); 
@@ -72,6 +160,7 @@ int main(int argc,char *argv[])
 
   /* read input file */
   read_input(glb_var.read,"input_file");
+  read_input(mes_var.read,"input_file");
   lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed+PID);
   rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
 
@@ -90,11 +179,14 @@ int main(int argc,char *argv[])
   /* setup lattice geometry */
   geometry_mpi_eo();
   /* test_geometry_mpi_eo(); */
+  lprintf("MAIN",0,"Geometry buffers: %d\n",glattice.nbuffers);
 
   /* Init Monte Carlo */
   init_mc(&flow, "input_file");
   lprintf("MAIN",0,"MVM during RHMC initialzation: %ld\n",getMVM());
   lprintf("MAIN",0,"Initial plaquette: %1.8e\n",avr_plaquette());
+
+  mass=flow.rhmc_v->rhmc_p.mass;
 
   rc=acc=0;
   for(i=flow.start;i<flow.end;++i) {
@@ -118,11 +210,22 @@ int main(int argc,char *argv[])
     }
 
     if((i%flow.meas_freq)==0) {
+      /* plaquette */
       lprintf("MAIN",0,"Plaquette: %1.8e\n",avr_plaquette());
-      /* do something */
+      /* Mesons */
+      if (mes_var.domes) {
+        int nn;
+        for (nn=0;nn<mes_var.nmeas;++nn) {
+          inline_mk_mesons(&mass,1,mes_var.precision);
+        }
+      }
     }
   }
-
+  /* save final configuration */
+  if(((--i)%flow.save_freq)!=0) {
+    save_conf(&flow, i);
+  }
+  
   /* finalize Monte Carlo */
   end_mc();
 

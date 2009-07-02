@@ -1,9 +1,9 @@
 // Global variables 
-GLB_T = 2 //Global T size
+GLB_T = 8 //Global T size
 GLB_X = 2
 GLB_Y = 2
 GLB_Z = 2
-NP_T = 1
+NP_T = 2
 NP_X = 1
 NP_Y = 1
 NP_Z = 1
@@ -25,12 +25,17 @@ gsteps = 15
 
 // Run control variables
 run name = run1
-save freq = 1
+save freq = 10
 meas freq = 1 
 conf dir = cnfg
-gauge start = ranDoM
+//gauge start = ranDoM
 //gauge start = Unit
-//gauge start = run1_8x2x2x2nc2rADJnf2b2.000000m1.310000n10
+gauge start = run1_8x2x2x2nc2rADJnf2b2.000000m1.310000n15
 //ranlxd start =
-last conf = 15
+last conf = +5
+
+//Mesons
+mes:domes = 0
+mes:precision = 1.e-20
+mes:nmeas = 3
 
