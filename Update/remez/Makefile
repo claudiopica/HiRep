@@ -1,10 +1,12 @@
 CC = gcc
 CXX = g++
-LDFLAGS =  -L$(HOME)/gmp/lib -lmpfr -lgmp 
+GMPHOME = /opt/local
+
+LDFLAGS =  -L$(GMPHOME)/lib -lmpfr -lgmp 
+INCLIST = -I$(GMPHOME)/include
 
 BIN = remez
 
-INCLIST = -I$(HOME)/gmp/include
 
 CFLAGS=  -O3
 CXXFLAGS=  -O3
