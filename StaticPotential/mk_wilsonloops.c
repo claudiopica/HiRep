@@ -54,7 +54,37 @@ typedef struct _input_HYP {
   }\
 }
 
+typedef struct _input_wilson {
+  int Tmax;
+  int steps_1_0_0;
+  int steps_1_1_0;
+  int steps_1_1_1;
+  int steps_2_1_0;
+  int steps_2_1_1;
+  int steps_2_2_1;
+
+  /* for the reading function */
+  input_record_t read[8];
+
+} input_wilson;
+
+#define init_input_wilson(varname) \
+{ \
+  .read={\
+    {"Max temporal separation", "SP:Tmax = %d", INT_T, &((varname).Tmax)},\
+    {"Number of steps for (1,0,0) loops", "SP:steps_1_0_0 = %d", INT_T, &((varname).steps_1_0_0)},\
+    {"Number of steps for (1,1,0) loops", "SP:steps_1_1_0 = %d", INT_T, &((varname).steps_1_1_0)},\
+    {"Number of steps for (1,1,1) loops", "SP:steps_1_1_1 = %d", INT_T, &((varname).steps_1_1_1)},\
+    {"Number of steps for (2,1,0) loops", "SP:steps_2_1_0 = %d", INT_T, &((varname).steps_2_1_0)},\
+    {"Number of steps for (2,1,1) loops", "SP:steps_2_1_1 = %d", INT_T, &((varname).steps_2_1_1)},\
+    {"Number of steps for (2,2,1) loops", "SP:steps_2_2_1 = %d", INT_T, &((varname).steps_2_2_1)},\
+    {NULL, NULL, 0, NULL}\
+  }\
+}
+
+
 input_HYP HYP_var = init_input_HYP(HYP_var);
+input_wilson wilson_var = init_input_wilson(wilson_var);
 
 char cnfg_filename[256]="";
 char list_filename[256]="";
@@ -201,9 +231,18 @@ int main(int argc,char *argv[]) {
   parse_cnfg_filename(cnfg_filename,&fpars);
 
   HYP_var.weight[0]=HYP_var.weight[1]=HYP_var.weight[2]=0.;
+  wilson_var.Tmax=GLB_T;
+  wilson_var.steps_1_0_0=0;
+  wilson_var.steps_1_1_0=0;
+  wilson_var.steps_1_1_1=0;
+  wilson_var.steps_2_1_0=0;
+  wilson_var.steps_2_1_1=0;
+  wilson_var.steps_2_2_1=0;
   read_input(glb_var.read,input_filename);
   read_input(HYP_var.read,input_filename);
+  read_input(wilson_var.read,input_filename);
   GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
+  
   error(fpars.type==UNKNOWN_CNFG,1,"mk_wilsonloops.c","Bad name for a configuration file");
   error(fpars.nc!=NG,1,"mk_wilsonloops.c","Bad NG");
   error(HYP_var.nsteps<1,1,"mk_wilsonloops.c","Bad HYP:nsteps value");
@@ -235,6 +274,15 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"HYP smearing weights: %f %f %f\n",HYP_var.weight[0],HYP_var.weight[1],HYP_var.weight[2]);
   lprintf("MAIN",0,"HYP smearing number of steps: %d\n",HYP_var.nsteps);
   lprintf("MAIN",0,"HYP smearing type: %s\n",HYP_var.type);
+
+  lprintf("MAIN",0,"Maximum temporal extension of wilson loops: %d\n",wilson_var.Tmax);
+  lprintf("MAIN",0,"Number of steps for (1,0,0) wilson loops: %d\n",wilson_var.steps_1_0_0);
+  lprintf("MAIN",0,"Number of steps for (1,1,0) wilson loops: %d\n",wilson_var.steps_1_1_0);
+  lprintf("MAIN",0,"Number of steps for (1,1,1) wilson loops: %d\n",wilson_var.steps_1_1_1);
+  lprintf("MAIN",0,"Number of steps for (2,1,0) wilson loops: %d\n",wilson_var.steps_2_1_0);
+  lprintf("MAIN",0,"Number of steps for (2,1,1) wilson loops: %d\n",wilson_var.steps_2_1_1);
+  lprintf("MAIN",0,"Number of steps for (2,2,1) wilson loops: %d\n",wilson_var.steps_2_2_1);
+    
 
   /* alloc global gauge fields */
   u_gauge=alloc_gfield(&glattice);
@@ -285,29 +333,41 @@ int main(int argc,char *argv[]) {
 /*    for(t=1;t<GLB_T;t++)*/
 /*      wilsonloops(0,t,smeared_g);*/
     
-    c[0]=1;c[1]=c[2]=0;
-    for(t=1;t<GLB_T;t++)
-      ara_temporalwilsonloops(t,c,smeared_g);
+    if(wilson_var.steps_1_0_0 != 0) {
+      c[0]=1;c[1]=c[2]=0;
+      for(t=1;t<wilson_var.Tmax;t++)
+        ara_temporalwilsonloops(t,c,wilson_var.steps_1_0_0,smeared_g);
+    }
 
-    c[0]=1;c[1]=1;c[2]=0;
-    for(t=1;t<GLB_T;t++)
-      ara_temporalwilsonloops(t,c,smeared_g);
+    if(wilson_var.steps_1_1_0 != 0) {
+      c[0]=1;c[1]=1;c[2]=0;
+      for(t=1;t<wilson_var.Tmax;t++)
+        ara_temporalwilsonloops(t,c,wilson_var.steps_1_1_0,smeared_g);
+    }
 
-    c[0]=1;c[1]=1;c[2]=1;
-    for(t=1;t<GLB_T;t++)
-      ara_temporalwilsonloops(t,c,smeared_g);
+    if(wilson_var.steps_1_1_1 != 0) {
+      c[0]=1;c[1]=1;c[2]=1;
+      for(t=1;t<wilson_var.Tmax;t++)
+        ara_temporalwilsonloops(t,c,wilson_var.steps_1_1_1,smeared_g);
+    }
 
-    c[0]=2;c[1]=1;c[2]=0;
-    for(t=1;t<GLB_T;t++)
-      ara_temporalwilsonloops(t,c,smeared_g);
+    if(wilson_var.steps_2_1_0 != 0) {
+      c[0]=2;c[1]=1;c[2]=0;
+      for(t=1;t<GLB_T;t++)
+        ara_temporalwilsonloops(t,c,wilson_var.steps_2_1_0,smeared_g);
+    }
 
-    c[0]=2;c[1]=1;c[2]=1;
-    for(t=1;t<GLB_T;t++)
-      ara_temporalwilsonloops(t,c,smeared_g);
+    if(wilson_var.steps_2_1_1 != 0) {
+      c[0]=2;c[1]=1;c[2]=1;
+      for(t=1;t<wilson_var.Tmax;t++)
+        ara_temporalwilsonloops(t,c,wilson_var.steps_2_1_1,smeared_g);
+    }
  
-    c[0]=2;c[1]=2;c[2]=1;
-    for(t=1;t<GLB_T;t++)
-      ara_temporalwilsonloops(t,c,smeared_g);
+    if(wilson_var.steps_2_2_1 != 0) {
+      c[0]=2;c[1]=2;c[2]=1;
+      for(t=1;t<wilson_var.Tmax;t++)
+        ara_temporalwilsonloops(t,c,wilson_var.steps_2_2_1,smeared_g);
+    }
    
     if(list==NULL) break;
   }

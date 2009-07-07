@@ -90,7 +90,7 @@ static int perm_abb[3][3]={{0,1,2},{1,2,0},{2,0,1}};
 static int perm_aaa[1][3]={{0,1,2}};
 
 
-void ara_temporalwilsonloops(const int t, const int cc[3], const suNg_field* g) {
+void ara_temporalwilsonloops(const int t, const int cc[3], const int nsteps, const suNg_field* g) {
   int i, j, k, m;
   int c[3], d[3];
   _DECLARE_INT_ITERATOR(ix);
@@ -102,7 +102,7 @@ void ara_temporalwilsonloops(const int t, const int cc[3], const suNg_field* g) 
   int n, nperms=0;
   int rotinv;
   int nave;
-  int p, nsteps;
+  int p;
   int chi1, chi2;
 
   suNg *t_llinks=malloc(sizeof(suNg)*glattice.gsize);
@@ -168,7 +168,6 @@ void ara_temporalwilsonloops(const int t, const int cc[3], const suNg_field* g) 
   double wilson_adj;
   complex wilson_fund;
   complex ctmp;
-  nsteps=(int)(max_size/sqrt(d[0]*d[0]+d[1]*d[1]+d[2]*d[2]));
   complex wilson_fund_ave[nsteps];
   double wilson_adj_ave[nsteps];
 
@@ -184,11 +183,6 @@ void ara_temporalwilsonloops(const int t, const int cc[3], const suNg_field* g) 
     c[perm[3*n+1]]=d[1];
     c[perm[3*n+2]]=d[2];
     
-    nsteps=(int)(max_size/sqrt(c[0]*c[0]+c[1]*c[1]+c[2]*c[2]));
-    if(c[0]!=0) nsteps=((GLB_X-2)/c[0]<nsteps)?((GLB_X-2)/c[0]):nsteps;
-    if(c[1]!=0) nsteps=((GLB_Y-2)/c[1]<nsteps)?((GLB_Y-2)/c[1]):nsteps;
-    if(c[2]!=0) nsteps=((GLB_Z-2)/c[2]<nsteps)?((GLB_Z-2)/c[2]):nsteps;
-
     if(!rotinv) {
       for(p=1;p<=nsteps;p++) {
         wilson_fund_ave[p].re=wilson_fund_ave[p].im=0.0;

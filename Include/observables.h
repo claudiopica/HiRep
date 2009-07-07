@@ -130,7 +130,7 @@ void g0g5g3_eval_g5GammaDag_times_spinor(suNf_spinor* out, suNf_spinor* in);
 
 
 void wilsonloops(int mu, int x, suNg_field* g);
-void ara_temporalwilsonloops(const int t, const int c[3], const suNg_field* g);
+void ara_temporalwilsonloops(const int t, const int c[3], const int nsteps, const suNg_field* g);
 
 
 #endif 
