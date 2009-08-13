@@ -74,7 +74,7 @@
 #include "memory.h"
 #include "random.h"
 #include "update.h"
-#include <malloc.h>
+#include <stdlib.h>
 #include <math.h>
 #include <assert.h>
 #include <string.h>

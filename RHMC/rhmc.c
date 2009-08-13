@@ -34,7 +34,7 @@
 typedef struct _input_mesons {
   int domes;
   double precision;
-  int nmeas;
+  int nhits;
 
   /* for the reading function */
   input_record_t read[4];
@@ -47,7 +47,7 @@ typedef struct _input_mesons {
   .read={\
     {"do mesons", "mes:domes = %d", INT_T, &(varname).domes},\
     {"inverter precision", "mes:precision = %lf", DOUBLE_T, &(varname).precision},\
-    {"number of measures", "mes:nmeas = %d", INT_T, &(varname).nmeas},\
+    {"number of inversions per cnfg", "mes:nhits = %d", INT_T, &(varname).nhits},\
     {NULL, NULL, 0, NULL}\
   }\
 }
@@ -215,7 +215,7 @@ int main(int argc,char *argv[])
       /* Mesons */
       if (mes_var.domes) {
         int nn;
-        for (nn=0;nn<mes_var.nmeas;++nn) {
+        for (nn=0;nn<mes_var.nhits;++nn) {
           inline_mk_mesons(&mass,1,mes_var.precision);
         }
       }

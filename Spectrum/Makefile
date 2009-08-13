@@ -24,7 +24,7 @@ MODS := amalloc field_alloc spinor_field_alloc
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Observables
-MODS := avr_plaquette mesons trunc_hairpin g5QMR_trunc pta_qprop z2semwall
+MODS := avr_plaquette mesons g5QMR_trunc pta_qprop z2semwall
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Random
@@ -53,32 +53,32 @@ MODS := archive_eolexi archive_henty
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 mk_mesons: cinfo.c mk_mesons.o $(MOD_OBJS)
-	echo -n Linking [$@]... 
+	echo "Linking [$@]...\c" 
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ mk_mesons.o $(MOD_OBJS) &&\
 	echo " done." || echo " failed."
 
 trunc_mesons: trunc_mesons.o $(MOD_OBJS)
-	echo -n Linking [$@]... 
+	echo "Linking [$@]...\c"
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ trunc_mesons.o $(MOD_OBJS) &&\
 	echo " done." || echo " failed."
 
 random_cnfg: random_cnfg.o $(MOD_OBJS)
-	echo -n Linking [$@]... 
+	echo "Linking [$@]...\c" 
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ random_cnfg.o $(MOD_OBJS) &&\
 	echo " done." || echo " failed."
 
 random_spinor: random_spinor.o $(MOD_OBJS)
-	echo -n Linking [$@]... 
+	echo "Linking [$@]...\c"
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ random_spinor.o $(MOD_OBJS) &&\
 	echo " done." || echo " failed."
 
 eigval: cinfo.c eigval.o $(MOD_OBJS)
-	echo -n Linking [$@]... 
+	echo "Linking [$@]...\c" 
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ eigval.o $(MOD_OBJS) &&\
 	echo " done." || echo " failed."
 
 mk_mesons_with_z2semwall: cinfo.c mk_mesons_with_z2semwall.o $(MOD_OBJS)
-	echo -n Linking [$@]... 
+	echo "Linking [$@]...\c"
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ mk_mesons_with_z2semwall.o $(MOD_OBJS) &&\
 	echo " done." || echo " failed."
 

@@ -36,9 +36,10 @@
 typedef struct _input_mesons {
   char mstring[256];
   double precision;
+  int nhits;
 
   /* for the reading function */
-  input_record_t read[3];
+  input_record_t read[4];
 
 } input_mesons;
 
@@ -47,6 +48,7 @@ typedef struct _input_mesons {
   .read={\
     {"quark quenched masses", "mes:masses = %s", STRING_T, (varname).mstring},\
     {"inverter precision", "mes:precision = %lf", DOUBLE_T, &(varname).precision},\
+    {"number of inversions per cnfg", "mes:nhits = %d", INT_T, &(varname).nhits},\
     {NULL, NULL, 0, NULL}\
   }\
 }
@@ -60,6 +62,66 @@ enum { UNKNOWN_CNFG, DYNAMICAL_CNFG, QUENCHED_CNFG };
 
 input_mesons mes_var = init_input_mesons(mes_var);
 
+void inline_mk_mesons(double *m, int nm, double prec) {
+    int k, n, g0[4];
+    spinor_field **pta_qprop=0;
+    double* tricorr;
+
+    tricorr=(double*)malloc(GLB_T*sizeof(double));
+    pta_qprop=(spinor_field**)malloc(sizeof(spinor_field*)*nm);
+    pta_qprop[0]=alloc_spinor_field_f(4*NF*nm,&glattice);
+
+    for(k=0;k<nm;++k)
+	    pta_qprop[k]=pta_qprop[0]+4*NF*k;
+
+    g0[0]=rand()%GLB_T; g0[1]=rand()%GLB_X; g0[2]=rand()%GLB_Y; g0[3]=rand()%GLB_Z;
+    if((g0[0]+g0[1]+g0[2]+g0[3])%2!=0)
+	    g0[3]=(g0[3]+1)%GLB_Z;
+
+    bcast_int(g0,4);
+
+    lprintf("MAIN",0,"PTA meson source in (%d,%d,%d,%d)\n",g0[0],g0[1],g0[2],g0[3]);
+
+    pta_qprop_QMR_eo(g0, pta_qprop, nm, m, prec);
+
+    for (k=0;k<nm;++k){
+
+#define CORR(name) \
+	    name##_correlator(tricorr, g0[0], pta_qprop[k]);\
+	    lprintf("MAIN",0,"conf #0 mass=%2.6f TRIPLET " #name "= ",m[k]);\
+	    for(n=0;n<GLB_T;++n) {\
+		    lprintf("MAIN",0,"%e ",tricorr[n]);\
+	    }\
+	    lprintf("MAIN",0,"\n");\
+	    fflush(stdout)
+
+	    CORR(id);
+	    CORR(g5);
+	    CORR(g0);
+	    CORR(g0g5);
+	    CORR(g1);
+	    CORR(g2);
+	    CORR(g3);
+	    CORR(g0g1);
+	    CORR(g0g2);
+	    CORR(g0g3);
+	    CORR(g5g1);
+	    CORR(g5g2);
+	    CORR(g5g3);
+	    CORR(g0g5g1);
+	    CORR(g0g5g2);
+	    CORR(g0g5g3);
+	    CORR(g5_g0g5_re);
+	    CORR(g5_g0g5_im);
+
+    }
+#undef CORR
+
+  free_spinor_field(pta_qprop[0]);
+  free(pta_qprop);
+  free(tricorr);
+
+}
 
 typedef struct {
   char string[256];
@@ -167,15 +229,12 @@ void read_cmdline(int argc, char* argv[]) {
 
 
 int main(int argc,char *argv[]) {
-  int i,k,n,g0[4];
+  int i,k;
   char tmp[256], *cptr;
   FILE* list;
-  spinor_field **pta_qprop=0;
-  double* tricorr;
   filename_t fpars;
   int nm;
   double m[256];
-  spinor_field *test;
 
   /* setup process id and communications */
   read_cmdline(argc, argv);
@@ -281,11 +340,13 @@ int main(int argc,char *argv[]) {
   for(k=0;k<nm;k++)
     lprintf("MAIN",0,"Mass[%d] = %f\n",k,m[k]);
 
+/*
   tricorr=(double*)malloc(GLB_T*sizeof(double));
   pta_qprop=(spinor_field**)malloc(sizeof(spinor_field*)*nm);
   pta_qprop[0]=alloc_spinor_field_f(4*NF*nm,&glattice);
   for(k=0;k<nm;++k)
     pta_qprop[k]=pta_qprop[0]+4*NF*k;
+*/
 
   list=NULL;
   if(strcmp(list_filename,"")!=0) {
@@ -293,79 +354,42 @@ int main(int argc,char *argv[]) {
 	"Failed to open list file\n");
   }
 
-  test=alloc_spinor_field_f(1,&glattice);
 
   i=0;
   while(1) {
+	  int nn;
 
-    if(list!=NULL)
-      if(fscanf(list,"%s",cnfg_filename)==0 || feof(list)) break;
+	  if(list!=NULL)
+		  if(fscanf(list,"%s",cnfg_filename)==0 || feof(list)) break;
 
-    i++;
+	  i++;
 
-    lprintf("MAIN",0,"Configuration from %s\n", cnfg_filename);
-    /* NESSUN CHECK SULLA CONSISTENZA CON I PARAMETRI DEFINITI !!! */
-    read_gauge_field(cnfg_filename);
-    represent_gauge_field();
+	  lprintf("MAIN",0,"Configuration from %s\n", cnfg_filename);
+	  /* NESSUN CHECK SULLA CONSISTENZA CON I PARAMETRI DEFINITI !!! */
+	  read_gauge_field(cnfg_filename);
+	  represent_gauge_field();
 
-    lprintf("TEST",0,"<p> %1.6f\n",avr_plaquette());
+	  lprintf("TEST",0,"<p> %1.6f\n",avr_plaquette());
 
-    full_plaquette();
+	  full_plaquette();
 
-    g0[0]=rand()%GLB_T; g0[1]=rand()%GLB_X; g0[2]=rand()%GLB_Y; g0[3]=rand()%GLB_Z;
-    if((g0[0]+g0[1]+g0[2]+g0[3])%2!=0)
-      g0[3]=(g0[3]+1)%GLB_Z;
+	  for (nn=0;nn<mes_var.nhits;++nn) {
+		  lprintf("MAIN",0,"Configuration #%d hit %d\n",i,nn);
+		  inline_mk_mesons(m,nm,mes_var.precision);
+	  }
 
-    bcast_int(g0,4);
-
-    lprintf("MAIN",0,"PTA meson source in (%d,%d,%d,%d)\n",g0[0],g0[1],g0[2],g0[3]);\
-    
-    pta_qprop_QMR_eo(g0, pta_qprop, nm, m, mes_var.precision);
-
-    for (k=0;k<nm;++k){
-
-      lprintf("MAIN",0,"conf #%d mass=%2.6f \n",i,m[k]);
-
-#define CORR(name) \
-      name##_correlator(tricorr, g0[0], pta_qprop[k]);\
-      lprintf("MAIN",0,"conf #%d mass=%2.6f TRIPLET " #name "= ",i,m[k]);\
-      for(n=0;n<GLB_T;++n) {\
-	lprintf("MAIN",0,"%e ",tricorr[n]);\
-      }\
-      lprintf("MAIN",0,"\n");\
-      fflush(stdout)
-
-      CORR(id);
-      CORR(g5);
-      CORR(g0);
-      CORR(g0g5);
-      CORR(g1);
-      CORR(g2);
-      CORR(g3);
-      CORR(g0g1);
-      CORR(g0g2);
-      CORR(g0g3);
-      CORR(g5g1);
-      CORR(g5g2);
-      CORR(g5g3);
-      CORR(g0g5g1);
-      CORR(g0g5g2);
-      CORR(g0g5g3);
-      CORR(g5_g0g5_re);
-      CORR(g5_g0g5_im);
-
-    }
-
-    if(list==NULL) break;
+	  if(list==NULL) break;
   }
 
   if(list!=NULL) fclose(list);
 
   finalize_process();
- 
-  free_spinor_field(pta_qprop[0]);
-  free(pta_qprop);
-  free(tricorr);
+
+  /*
+     free_spinor_field(pta_qprop[0]);
+     free(pta_qprop);
+     free(tricorr);
+   */
 
   free_gfield(u_gauge);
 #ifndef REPR_FUNDAMENTAL

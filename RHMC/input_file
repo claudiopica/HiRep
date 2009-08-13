@@ -25,14 +25,14 @@ gsteps = 15
 
 // Run control variables
 run name = run1
-save freq = 10
+save freq = 5
 meas freq = 1 
 conf dir = cnfg
-//gauge start = ranDoM
+gauge start = ranDoM
 //gauge start = Unit
-gauge start = run1_8x2x2x2nc2rADJnf2b2.000000m1.310000n15
+//gauge start = run1_8x2x2x2nc2rADJnf2b2.000000m1.310000n15
 //ranlxd start =
-last conf = +5
+last conf = +15
 
 //Mesons
 mes:domes = 0
