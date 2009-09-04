@@ -9,9 +9,9 @@ MKDIR = $(TOPDIR)/Make
 include $(MKDIR)/MkRules
 
 suN_exp.c: $(MKDIR)/MkFlags $(WRREPR) TMPL/suN_exp.c.tmpl
-	echo "Writing representation code...\c"
+	echo -n "Writing representation code..."
 	$(WRREPR) $(NG) TMPL/suN_exp.c.tmpl > $@ &&\
-	  echo " done." || echo " failed."
+	  echo " done." || ( echo " failed." && false )
 
 clean::
 	rm -f suN_exp.c
