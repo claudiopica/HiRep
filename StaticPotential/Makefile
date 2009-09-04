@@ -1,11 +1,10 @@
 TOPDIR = ..
-
-SRCS = mk_wilsonloops.c tune_HYP_smearing.c polyakov_loops.c
-
-default: mk_wilsonloops tune_HYP_smearing polyakov_loops
-
 MKDIR=$(TOPDIR)/Make
-include $(MKDIR)/MkRules
+
+EXES = mk_wilsonloops tune_HYP_smearing polyakov_loops
+
+default: $(EXES)
+
 
 MODDIR := Geometry
 MODS := geometry_init geometry_mpi_eo communications
@@ -43,22 +42,10 @@ MODDIR := Statistics
 MODS := base_stat jacknife
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
+COMMON_OBJS = $(MOD_OBJS)
 
-mk_wilsonloops: cinfo.c $(OBJS) $(MOD_OBJS)
-	echo -n Linking [$@]... 
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ mk_wilsonloops.o $(MOD_OBJS) &&\
-	echo " done." || echo " failed."
 
-tune_HYP_smearing: cinfo.c $(OBJS) $(MOD_OBJS)
-	echo -n Linking [$@]... 
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ tune_HYP_smearing.o $(MOD_OBJS) &&\
-	echo " done." || echo " failed."
-
-polyakov_loops: cinfo.c $(OBJS) $(MOD_OBJS)
-	echo -n Linking [$@]... 
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ polyakov_loops.o $(MOD_OBJS) &&\
-	echo " done." || echo " failed."
-
+include $(MKDIR)/MkRules
 
 .PHONY: default
 

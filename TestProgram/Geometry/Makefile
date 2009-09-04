@@ -1,13 +1,10 @@
-TOPDIR = ../../
-
-MAIN := check_geometry_1
-
-SRCS = $(addsuffix .c,$(MAIN))
-
-default: $(MAIN)
-
+TOPDIR = ../..
 MKDIR=$(TOPDIR)/Make
-include $(MKDIR)/MkRules
+
+EXES = check_geometry_1
+
+default: $(EXES)
+
 
 MODDIR := Geometry
 MODS := geometry_init geometry_mpi_eo test_geometry_mpi
@@ -25,13 +22,9 @@ MODDIR := Error
 MODS := error
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
-$(MAIN): %: %.o $(MOD_OBJS)
-	echo -n Linking [$@]... 
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< $(MOD_OBJS) &&\
-	echo " done." || ( echo " failed." && false )
+COMMON_OBJS = $(MOD_OBJS)
 
+
+include $(MKDIR)/MkRules
 
 .PHONY: default
-
-cleanall: clean
-	rm -rf $(MAIN) *~

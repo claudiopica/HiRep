@@ -1,13 +1,10 @@
-TOPDIR = ../../
-
-MAIN := check_algebra_1 check_algebra_2
-
-SRCS = $(addsuffix .c,$(MAIN))
-
-default: $(MAIN)
-
+TOPDIR = ../..
 MKDIR=$(TOPDIR)/Make
-include $(MKDIR)/MkRules
+
+EXES = check_algebra_1 check_algebra_2
+
+default: $(EXES)
+
 
 MODDIR := Geometry
 MODS := communications
@@ -37,13 +34,9 @@ MODDIR := Update
 MODS := random_su2 representation
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
-$(MAIN): %: %.o $(MOD_OBJS)
-	echo -n Linking [$@]... 
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< $(MOD_OBJS) &&\
-	echo " done." || ( echo " failed." && false )
+COMMON_OBJS = $(MOD_OBJS)
 
+include $(MKDIR)/MkRules
 
 .PHONY: default
 
-cleanall: clean
-	rm -rf $(MAIN) *~

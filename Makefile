@@ -6,5 +6,3 @@ SUBDIRS = Include Geometry IO Memory Observables Random Statistics Update Utils 
 MKDIR = $(TOPDIR)/Make
 include $(MKDIR)/MkRules
 
-
-

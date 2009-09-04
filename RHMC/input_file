@@ -20,19 +20,19 @@ HB_prec = 1.e-14
 force_prec = 1.e-14
 n_pf = 2
 tlen = 1.0
-nsteps = 14
-gsteps = 15
+nsteps = 10
+gsteps = 20
 
 // Run control variables
 run name = run1
 save freq = 5
 meas freq = 1 
 conf dir = cnfg
-gauge start = ranDoM
-//gauge start = Unit
+//gauge start = ranDoM
+gauge start = Unit
 //gauge start = run1_8x2x2x2nc2rADJnf2b2.000000m1.310000n15
 //ranlxd start =
-last conf = +15
+last conf = +100
 
 //Mesons
 mes:domes = 0

@@ -1,11 +1,10 @@
 TOPDIR = ..
-
-SRCS = suN.c
-
-default: suN
-
 MKDIR=$(TOPDIR)/Make
-include $(MKDIR)/MkRules
+
+EXES = suN
+
+default: $(EXES)
+
 
 MODDIR := Geometry
 MODS := geometry_init geometry_mpi_eo communications
@@ -47,11 +46,10 @@ MODDIR := PureGauge
 MODS := suN_utils
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
-suN: cinfo.c $(OBJS) $(MOD_OBJS)
-	echo -n Linking [$@]... 
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(MOD_OBJS) &&\
-	echo " done." || echo " failed."
+suN_OBJS = $(MOD_OBJS)
 
+
+include $(MKDIR)/MkRules
 
 .PHONY: default
 

@@ -4,6 +4,9 @@ SRCS =
 
 all: suN.h suN_types.h suN_repr_func.h
 
+.autoheaders.h: all
+	echo done > $@
+
 MKDIR = $(TOPDIR)/Make
 include $(MKDIR)/MkRules
 
@@ -11,7 +14,7 @@ include $(MKDIR)/MkRules
 suN.h suN_types.h: $(MKDIR)/MkFlags $(WRHEAD)
 	echo -n "Writing suN headers..."
 	$(WRHEAD) $(NG) $(REPR) &&\
-		echo " done." || echo " failed."
+		echo " done." || ( echo " failed." && false )
 
 suN_repr_func.h: $(MKDIR)/MkFlags $(WRREPR) TMPL/suN_repr_func.h.tmpl
 	echo -n "Writing representation header..."
@@ -20,6 +23,6 @@ suN_repr_func.h: $(MKDIR)/MkFlags $(WRREPR) TMPL/suN_repr_func.h.tmpl
 
 
 clean::
-	rm -f *~ suN.h suN_types.h suN_repr_func.h HEADERS.DONE.h
+	rm -f *~ suN.h suN_types.h suN_repr_func.h .autoheaders.h
 
 .PHONY: all

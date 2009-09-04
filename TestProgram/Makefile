@@ -1,15 +1,7 @@
 TOPDIR = ..
-
-MAIN :=
-
-SRCS = $(addsuffix .c,$(MAIN))
+MKDIR=$(TOPDIR)/Make
 
 SUBDIRS = Algebra Geometry PureGauge SpinorField DiracOperator Inverters Update Random
-
-default: $(MAIN)
-
-MKDIR=$(TOPDIR)/Make
-include $(MKDIR)/MkRules
 
 # MODDIR := Geometry
 # MODS := geometry_init  geometry_mpi_eo test_geometry_mpi geometry_mpi
@@ -51,11 +43,8 @@ include $(MKDIR)/MkRules
 # MODS := linear_algebra cg_mshift BiCGstab_mshift HBiCGstab_mshift MINRES_mshift g5QMR_mshift MINRES eva jacobi dirac_eva
 # MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
-$(MAIN): %: %.o $(MOD_OBJS)
-	echo -n Linking [$@]... 
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< $(MOD_OBJS) &&\
-	echo " done." || echo " failed."
 
+include $(MKDIR)/MkRules
 
 .PHONY: default
 

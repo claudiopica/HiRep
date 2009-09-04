@@ -8,27 +8,26 @@ include $(MKDIR)/MkFlags
 SHELL = /bin/bash
 
 .%.d: SRC=$(patsubst .%.d,%.c,$@)
-.%.d: %.c 
-	$(MAKE) -C $(INCDIR) all
-	echo -n "Generating dependences for [$(SRC)]..."
-	$(GCC) -MM -MG -MT "$@ $(patsubst .%.d,%.o,$@)" $(CPPFLAGS) $(SRC) > $@ &&\
-		echo "RBLD = rebuild" >> $@ &&\
-	echo " done." || ( echo " failed." && false )
+.%.d: %.c $(INCDIR)/.autoheaders.h
+	if test $(dir $@) = "./"; then \
+	  echo -n "Generating dependences for [$(SRC)]..." ;\
+	  $(GCC) -MM -MG -MT "$@ $(patsubst .%.d,%.o,$@)" $(CPPFLAGS) $(SRC) > $@ &&\
+	  echo " done." || ( echo " failed." && false ) ;\
+	  MAKEFILES="$@" $(MAKE) $@ ;\
+	else \
+	  $(MAKE) -C $(dir $@) $(notdir $@) ;\
+	fi
 
-#if test "$(findstring .d,$(lastword $(MAKEFILE_LIST)))" = ""; then \
+DFILES = $(findstring .d,$(MAKEFILES))
+RBLD = $(if $(DFILES),,rebuild)
 
-ifeq ($(RBLD),rebuild)
-  RBLD=
-else
-  RBLD=rebuild
-endif
 %.o: SRC=$(patsubst %.o,%.c,$@) 
 %.o: DEP=$(patsubst %.o,.%.d,$@)
-%.o: %.c $(RBLD)
+%.o: %.c $(MKDIR)/MkFlags $(RBLD)
 	if  test $(dir $@) = "./"; then \
-	  MAKEFILES="$(patsubst %.o,.%.d,$@)" $(MAKE) $(patsubst %.o,.%.d,$@) ;\
-	  if test "$(findstring .d,$(MAKEFILES))" = ""; then \
-	    MAKEFILES="$(patsubst %.o,.%.d,$@)" $(MAKE) $@ ;\
+	  if test "$(DFILES)" = ""; then \
+	    $(MAKE) $(DEP) ;\
+	    MAKEFILES="$(DEP)" $(MAKE) $@ ;\
 	  else \
 	    echo -n "Compiling [$(CURDIR)/$@]..." ;\
 	    $(CC) -c $(CFLAGS) $(CPPFLAGS) $(SRC) &&\
@@ -38,24 +37,19 @@ endif
 	  $(MAKE) -C $(dir $@) $(notdir $@) ;\
 	fi
 	
-%.h: $(MKDIR)/MkFlags rebuild
+$(INCDIR)/.autoheaders.h: $(MKDIR)/MkFlags  
 	if  test $(dir $@) != "./"; then \
 	  $(MAKE) -C $(dir $@) $(notdir $@) ;\
-	else \
-	  if test ! -f $@ ; then $(MAKE) -C $(INCDIR) $@ ; fi \
-	fi
+	fi 
 
 .DEFAULT:
 	if  test $(dir $@) != "./"; then \
 	  $(MAKE) -C $(dir $@) $(notdir $@) ;\
 	fi
 
+SRCS += $(patsubst %,%.c,$(EXES))
 OBJS = $(SRCS:.c=.o)
 _MkRules_default_target: $(OBJS)
-
-headers:
-	$(MAKE) -C $(INCDIR) all
-
 
 WRHEAD = $(MKDIR)/Utils/write_suN_headers.pl
 WRREPRDIR = $(MKDIR)/Utils/autosun
@@ -64,7 +58,7 @@ WRREPR = $(WRREPRDIR)/writeREPR
 $(WRREPR): $(MKDIR)/MkFlags
 	REPRESENTATION=$(REPR) make -C $(WRREPRDIR) $(notdir $@)
 
-.PHONY: rebuild clean $(patsubst %,clean-%,$(SUBDIRS)) _MkRules_default_target
+.PHONY: rebuild clean $(patsubst %,clean-%,$(SUBDIRS)) cleanall $(patsubst %,cleanall-%,$(SUBDIRS)) _MkRules_default_target
 
 $(patsubst %,clean-%,$(SUBDIRS)):
 	$(MAKE) -C $(patsubst clean-%,%,$@) clean
@@ -74,6 +68,26 @@ clean:: $(patsubst %,clean-%,$(SUBDIRS))
 	rm -f *.o *.rpo *~ *.il *.dyn *.ii *.s .*.d
 	echo " done."
 
+$(patsubst %,cleanall-%,$(SUBDIRS)):
+	$(MAKE) -C $(patsubst cleanall-%,%,$@) cleanall
+
+cleanall:: $(patsubst %,cleanall-%,$(SUBDIRS))
+	echo -n "Cleaning $(CURDIR)..."
+	rm -f *.o *.rpo *~ *.il *.dyn *.ii *.s .*.d
+	echo " done."
+	echo -n "Removing EXEs in $(CURDIR)..."
+	rm -f $(EXES)
+	echo " done."
+
 cinfo.c: $(MKDIR)/MkFlags $(MKDIR)/MkRules $(MKDIR)/Utils/cinfo.sh
 	$(MKDIR)/Utils/cinfo.sh $(MKDIR) $(TOPDIR) $(MACRO)
+
+define LINK_template
+$(1): $(1).o $$($(1)_OBJS) $$(COMMON_OBJS)
+	echo -n Linking [$$@]... 
+	$$(CC) $$(CFLAGS) $$(LDFLAGS) -o $$@ $$< $$($(1)_OBJS) $$(COMMON_OBJS) &&\
+	echo " done." || ( echo " failed." && false )
+endef
+
+$(foreach prog,$(EXES),$(eval $(call LINK_template,$(prog))))
 

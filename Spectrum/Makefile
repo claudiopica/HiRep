@@ -1,11 +1,10 @@
 TOPDIR = ..
-
-SRCS = mk_mesons.c trunc_mesons.c random_cnfg.c random_spinor.c eigval.c mk_mesons_with_z2semwall.c
-
-default: mk_mesons trunc_mesons random_cnfg random_spinor eigval mk_mesons_with_z2semwall
-
 MKDIR=$(TOPDIR)/Make
-include $(MKDIR)/MkRules
+
+EXES = mk_mesons trunc_mesons random_cnfg random_spinor eigval mk_mesons_with_z2semwall
+
+default: $(EXES)
+
 
 MODDIR := Geometry
 MODS := geometry_init geometry_mpi_eo communications
@@ -24,7 +23,7 @@ MODS := amalloc field_alloc spinor_field_alloc
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Observables
-MODS := avr_plaquette mesons g5QMR_trunc pta_qprop z2semwall
+MODS := avr_plaquette mesons g5QMR_trunc pta_qprop z2semwall trunc_hairpin
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Random
@@ -52,36 +51,10 @@ MODDIR := Converter
 MODS := archive_eolexi archive_henty
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
-mk_mesons: cinfo.c mk_mesons.o $(MOD_OBJS)
-	echo "Linking [$@]...\c" 
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ mk_mesons.o $(MOD_OBJS) &&\
-	echo " done." || echo " failed."
+COMMON_OBJS = $(MOD_OBJS)
 
-trunc_mesons: trunc_mesons.o $(MOD_OBJS)
-	echo "Linking [$@]...\c"
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ trunc_mesons.o $(MOD_OBJS) &&\
-	echo " done." || echo " failed."
 
-random_cnfg: random_cnfg.o $(MOD_OBJS)
-	echo "Linking [$@]...\c" 
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ random_cnfg.o $(MOD_OBJS) &&\
-	echo " done." || echo " failed."
-
-random_spinor: random_spinor.o $(MOD_OBJS)
-	echo "Linking [$@]...\c"
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ random_spinor.o $(MOD_OBJS) &&\
-	echo " done." || echo " failed."
-
-eigval: cinfo.c eigval.o $(MOD_OBJS)
-	echo "Linking [$@]...\c" 
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ eigval.o $(MOD_OBJS) &&\
-	echo " done." || echo " failed."
-
-mk_mesons_with_z2semwall: cinfo.c mk_mesons_with_z2semwall.o $(MOD_OBJS)
-	echo "Linking [$@]...\c"
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ mk_mesons_with_z2semwall.o $(MOD_OBJS) &&\
-	echo " done." || echo " failed."
-
+include $(MKDIR)/MkRules
 
 .PHONY: default
 

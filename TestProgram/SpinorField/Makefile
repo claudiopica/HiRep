@@ -1,13 +1,10 @@
 TOPDIR = ../..
-
-MAIN := check_spinorfield_1
-
-SRCS = $(addsuffix .c,$(MAIN))
-
-default: $(MAIN)
-
 MKDIR=$(TOPDIR)/Make
-include $(MKDIR)/MkRules
+
+EXES = check_spinorfield_1
+
+default: $(EXES)
+
 
 MODDIR := Geometry
 MODS := geometry_init  geometry_mpi_eo test_geometry_mpi communications
@@ -49,14 +46,9 @@ MODDIR := Inverters
 MODS := linear_algebra # cg_mshift BiCGstab_mshift HBiCGstab_mshift MINRES_mshift g5QMR_mshift MINRES eva jacobi dirac_eva
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
-$(MAIN): %: %.o $(MOD_OBJS)
-	echo -n Linking [$@]... 
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< $(MOD_OBJS) &&\
-	echo " done." || ( echo " failed." && false )
+COMMON_OBJS = $(MOD_OBJS)
 
+include $(MKDIR)/MkRules
 
 .PHONY: default
 
-
-cleanall: clean
-	rm -rf $(MAIN) *~

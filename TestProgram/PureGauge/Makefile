@@ -1,13 +1,10 @@
 TOPDIR = ../..
-
-MAIN := check_puregauge_1 check_puregauge_2
-
-SRCS = $(addsuffix .c,$(MAIN))
-
-default: $(MAIN)
-
 MKDIR=$(TOPDIR)/Make
-include $(MKDIR)/MkRules
+
+EXES = check_puregauge_1 check_puregauge_2
+
+default: $(EXES)
+
 
 MODDIR := Geometry
 MODS := geometry_init  geometry_mpi_eo test_geometry_mpi communications
@@ -41,13 +38,10 @@ MODDIR := Error
 MODS := error
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
-$(MAIN): %: %.o $(MOD_OBJS)
-	echo -n Linking [$@]... 
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< $(MOD_OBJS) &&\
-	echo " done." || ( echo " failed." && false )
+COMMON_OBJS = $(MOD_OBJS)
 
+
+include $(MKDIR)/MkRules
 
 .PHONY: default
 
-cleanall: clean
-	rm -rf $(MAIN) *~

@@ -1,13 +1,10 @@
 TOPDIR = ../..
-
-MAIN := check_inverters_1 check_inverters_2 check_inverters_3 check_inverters_4 check_inverters_5 check_inverters_6
-
-SRCS = $(addsuffix .c,$(MAIN))
-
-default: $(MAIN)
-
 MKDIR=$(TOPDIR)/Make
-include $(MKDIR)/MkRules
+
+EXES = check_inverters_1 check_inverters_2 check_inverters_3 check_inverters_4 check_inverters_5 check_inverters_6
+
+default: $(EXES)
+
 
 MODDIR := Geometry
 MODS := geometry_init geometry_mpi_eo test_geometry_mpi communications communications_flt
@@ -45,11 +42,10 @@ MODDIR := Observables
 MODS := g5QMR_trunc trunc_hairpin
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
-$(MAIN): %: %.o $(MOD_OBJS)
-	echo -n Linking [$@]... 
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $< $(MOD_OBJS) &&\
-	echo " done." || ( echo " failed." && false )
+COMMON_OBJS = $(MOD_OBJS)
 
+
+include $(MKDIR)/MkRules
 
 .PHONY: default
 

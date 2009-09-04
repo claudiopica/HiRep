@@ -1,11 +1,9 @@
 TOPDIR = ..
-
-SRCS = rhmc.c
-
-default: rhmc
-
 MKDIR=$(TOPDIR)/Make
-include $(MKDIR)/MkRules
+
+EXES = rhmc
+
+default: $(EXES)
 
 MODDIR := Geometry
 MODS := geometry_init geometry_mpi_eo test_geometry_mpi blocked eo_lexi lexi communications
@@ -51,11 +49,15 @@ MODDIR := RHMC
 MODS := rhmc_utils
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
-rhmc: cinfo.c $(OBJS) $(MOD_OBJS)
-	echo -n "Linking [$@]..." 
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(MOD_OBJS) &&\
-	echo " done." || ( echo " failed." && false )
+rhmc_OBJS = $(MOD_OBJS)
 
+#rhmc: $(OBJS) $(MOD_OBJS)
+#	echo -n "Linking [$@]..." 
+#	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(MOD_OBJS) &&\
+#	echo " done." || ( echo " failed." && false )
+
+
+include $(MKDIR)/MkRules
 
 .PHONY: default
 
