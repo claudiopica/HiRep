@@ -1,11 +1,10 @@
 TOPDIR = ..
-
-SRCS = converter.c
-
-default: converter
-
 MKDIR=$(TOPDIR)/Make
-include $(MKDIR)/MkRules
+
+EXES = converter
+
+default: $(EXES)
+
 
 MODDIR := Geometry
 MODS := geometry_init geometry_mpi_eo communications
@@ -39,11 +38,10 @@ MODDIR := Converter
 MODS := archive_eolexi archive_henty archive_more_mpieo
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
-converter: cinfo.c $(OBJS) $(MOD_OBJS)
-	echo -n Linking [$@]... 
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(MOD_OBJS) &&\
-	echo " done." || echo " failed."
+COMMON_OBJS = $(MOD_OBJS)
 
+
+include $(MKDIR)/MkRules
 
 .PHONY: default
 

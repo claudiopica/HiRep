@@ -1,16 +1,13 @@
 FC = ifort -cxxlib -O2 -align -Zp16 -r8
 #FC = gfortran -O2
 
-TOPDIR = ../
-
-MAIN = su4dbl
-
-SRCS = $(addsuffix .c,$(MAIN))
-
-default: $(MAIN)
-
+TOPDIR = ..
 MKDIR=$(TOPDIR)/Make
-include $(MKDIR)/MkRules
+
+EXES = su4dbl
+
+default: $(EXES)
+
 
 MODDIR := Random
 MODS := ranlxd
@@ -44,10 +41,13 @@ MODDIR := Observables
 MODS := avr_plaquette
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
-$(MAIN): %: %.o $(MOD_OBJS)
+$(EXES): %: %.o $(MOD_OBJS)
 	echo -n Linking [$@]... 
 	$(FC) -o $@ luesher.f $< $(MOD_OBJS) &&\
 	echo " done." || echo " failed."
+
+
+include $(MKDIR)/MkRules
 
 .PHONY: default
 

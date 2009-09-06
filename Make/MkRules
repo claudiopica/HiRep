@@ -3,9 +3,15 @@
 # All rights reserved.                                                        #
 ###############################################################################
 
-include $(MKDIR)/MkFlags
 
 SHELL = /bin/bash
+
+SRCS += $(patsubst %,%.c,$(EXES))
+OBJS = $(SRCS:.c=.o)
+_MkRules_default_target: $(OBJS)
+
+
+include $(MKDIR)/MkFlags
 
 .%.d: SRC=$(patsubst .%.d,%.c,$@)
 .%.d: %.c $(INCDIR)/.autoheaders.h
@@ -47,9 +53,6 @@ $(INCDIR)/.autoheaders.h: $(MKDIR)/MkFlags
 	  $(MAKE) -C $(dir $@) $(notdir $@) ;\
 	fi
 
-SRCS += $(patsubst %,%.c,$(EXES))
-OBJS = $(SRCS:.c=.o)
-_MkRules_default_target: $(OBJS)
 
 WRHEAD = $(MKDIR)/Utils/write_suN_headers.pl
 WRREPRDIR = $(MKDIR)/Utils/autosun
@@ -58,7 +61,7 @@ WRREPR = $(WRREPRDIR)/writeREPR
 $(WRREPR): $(MKDIR)/MkFlags
 	REPRESENTATION=$(REPR) make -C $(WRREPRDIR) $(notdir $@)
 
-.PHONY: rebuild clean $(patsubst %,clean-%,$(SUBDIRS)) cleanall $(patsubst %,cleanall-%,$(SUBDIRS)) _MkRules_default_target
+.PHONY: rebuild clean $(patsubst %,clean-%,$(SUBDIRS)) cleanall $(patsubst %,cleanall-%,$(SUBDIRS)) _MkRules_default_target default
 
 $(patsubst %,clean-%,$(SUBDIRS)):
 	$(MAKE) -C $(patsubst clean-%,%,$@) clean

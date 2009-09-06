@@ -1,7 +1,7 @@
 TOPDIR = ..
+MKDIR = $(TOPDIR)/Make
 
 SRCS = error.c 
 
-MKDIR = $(TOPDIR)/Make
 include $(MKDIR)/MkRules
 
