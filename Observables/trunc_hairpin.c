@@ -270,7 +270,7 @@ static int max_H2_ev(double *max) {
 ******************************************************************************/
 static void compute_evs() {
   int m, p;
-  spinor_field *ev_mask, *eva_ws;
+  spinor_field *ev_mask;
   double *d;
 	int status;
 	double ubnd=0.;
@@ -280,7 +280,6 @@ static void compute_evs() {
   ev_mask=malloc(sizeof(spinor_field)*pars.eva_nevt);
   for(p=pars.n_eigenvalues; p<pars.eva_nevt; p++)
     ev_mask[p]=compute_evs_ws[p-pars.n_eigenvalues];
-  eva_ws=compute_evs_ws+pars.eva_nevt-pars.n_eigenvalues;
   d=malloc(sizeof(double)*pars.eva_nevt);
   
 	for(m=0; m<pars.n_masses; m++) {
@@ -295,7 +294,7 @@ static void compute_evs() {
 	  }
   	hmass=pars.mass[m];
   	max_H2_ev(&ubnd);
-		eva(pars.n_eigenvalues,pars.eva_nevt,init,pars.eva_kmax,pars.eva_imax,ubnd,pars.eva_omega1,pars.eva_omega2,locH2,eva_ws,ev_mask,d,&status);
+		eva(pars.n_eigenvalues,pars.eva_nevt,init,pars.eva_kmax,pars.eva_imax,ubnd,pars.eva_omega1,pars.eva_omega2,locH2,ev_mask,d,&status);
   }
   
   afree(ev_mask);
@@ -903,7 +902,7 @@ void ata_qprop_init(ata_qprop_pars *p) {
     ev[0] = alloc_spinor_field_f(pars.n_masses*pars.n_eigenvalues,&glattice);
     for(m = 0; m < pars.n_masses; m++)
       ev[m] = ev[0]+m*pars.n_eigenvalues;
-    compute_evs_ws = alloc_spinor_field_f(pars.eva_nevt-pars.n_eigenvalues+2,&glattice);
+    compute_evs_ws = alloc_spinor_field_f(pars.eva_nevt-pars.n_eigenvalues,&glattice);
     max_H2_ev_ws = alloc_spinor_field_f(3,&glattice);
     ev_propagator_ws = alloc_spinor_field_f(3,&glattice);
 	} else {

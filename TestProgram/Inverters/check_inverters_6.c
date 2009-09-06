@@ -32,7 +32,7 @@
 int nhb,nor,nit,nth,nms,level,seed;
 double beta;
 
-static double hmass=0.1;
+static double hmass=1.2;
 
 
 void D(spinor_field *out, spinor_field *in){
@@ -47,13 +47,11 @@ static spinor_field *tmp;
 static spinor_field_flt *tmp_flt;
 
 void M(spinor_field *out, spinor_field *in){
-   g5Dphi(-hmass,tmp,in); 
-   g5Dphi(-hmass,out,tmp);
+  g5Dphi_eopre_sq(-hmass,out,in);
 }
 
 void M_flt(spinor_field_flt *out, spinor_field_flt *in){
-   g5Dphi_flt(-hmass,tmp_flt,in); 
-   g5Dphi_flt(-hmass,out,tmp_flt);
+  g5Dphi_eopre_sq_flt(-hmass,out,in);
 }
 
 
@@ -64,6 +62,7 @@ int main(int argc,char *argv[])
    double tau;
    spinor_field *s1, *s2;
    spinor_field *res, *res2;
+   struct timeval start, end, etime;
 
    mshift_par par;
 
@@ -73,7 +72,7 @@ int main(int argc,char *argv[])
    setup_process(&argc,&argv);
    
    /* logger setup */
-   logger_setlevel(0,10000); /* log all */
+   logger_setlevel(0,50); /* log all */
    logger_map("DEBUG","debug");
 #ifdef WITH_MPI
    sprintf(pame,">out_%d",PID); logger_stdout(pame);
@@ -111,31 +110,28 @@ int main(int argc,char *argv[])
    lprintf("MAIN",0,"Generating a random gauge field... ");
    fflush(stdout);
    random_u(u_gauge);
-   start_gf_sendrecv(u_gauge);
-   complete_gf_sendrecv(u_gauge);
    lprintf("MAIN",0,"done.\n");
    represent_gauge_field();
    assign_ud2u_f();
    
    par.n = 6;
    par.shift=(double*)malloc(sizeof(double)*(par.n));
-   par.err2=1.e-24;
+   par.err2=1.e-20;
    par.max_iter=0;
-   res=alloc_spinor_field_f(2*par.n+3,&glattice);
+   res=alloc_spinor_field_f(2*par.n+3,&glat_even);
    s1=res+par.n;
    s2=s1+1;
    tmp=s2+1;
    res2=tmp+1;
-   tmp_flt=alloc_spinor_field_f_flt(1,&glattice);
+   tmp_flt=alloc_spinor_field_f_flt(1,&glat_even);
 
-   
-   par.shift[0]=+0.;
-   par.shift[1]=-0.21;
-   par.shift[2]=+0.05;
-   par.shift[3]=-0.01;
-   par.shift[4]=-0.15;
-   par.shift[5]=-0.05;
-   
+   par.shift[0]=-0.0;
+   par.shift[1]=-0.1;
+   par.shift[2]=-0.2;
+   par.shift[3]=+0.1;
+   par.shift[4]=+0.2;
+   par.shift[5]=+0.3;
+
    gaussian_spinor_field(s1);
    
    
@@ -144,7 +140,11 @@ int main(int argc,char *argv[])
    lprintf("CG TEST",0,"Testing CG multishift FLOAT\n");
    lprintf("CG TEST",0,"---------------------\n");
 
+   gettimeofday(&start,0);
    cgiters = cg_mshift_flt(&par, &M, &M_flt, s1, res);
+   gettimeofday(&end,0);
+   timeval_subtract(&etime,&end,&start);
+   lprintf("CG TEST",0,"Inversion took: %ld sec %ld usec\n",etime.tv_sec,etime.tv_usec);
    lprintf("CG TEST",0,"Converged in %d iterations\n",cgiters);
    for(i=0;i<par.n;++i){
      M(s2,&res[i]);
@@ -157,7 +157,11 @@ int main(int argc,char *argv[])
    lprintf("cg test",0,"testing CG multishift DOUBLE\n");
    lprintf("cg test",0,"---------------------\n");
 
+   gettimeofday(&start,0);
    cgiters = cg_mshift(&par, &M, s1, res2);
+   gettimeofday(&end,0);
+   timeval_subtract(&etime,&end,&start);
+   lprintf("CG TEST",0,"Inversion took: %ld sec %ld usec\n",etime.tv_sec,etime.tv_usec);
    lprintf("CG TEST",0,"Converged in %d iterations\n",cgiters);
    for(i=0;i<par.n;++i){
      M(s2,&res2[i]);

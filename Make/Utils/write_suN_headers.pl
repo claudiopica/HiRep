@@ -800,7 +800,7 @@ sub write_algebra_vector_zero {
 }
 
 sub write_algebra_vector_sqnorm {
-  print "/* k,|v|^2  */\n";
+  print "/* k=|v|^2  */\n";
   print "#define _algebra_vector_sqnorm_${suff}(k,r) \\\n";
   my $last=$N*$N-1;
   if ($N<$Nmax or $last<(4*$unroll+1) ) { #unroll all 

@@ -137,7 +137,7 @@ void pta_qprop_QMR_eo(int g0[4], spinor_field **pta_qprop, int nm, double *mass,
 		for(i=0;i<QMR_par.n;++i){
 
 #ifndef NDEBUG
-			/* this is a test of the solution */
+			/* this is a test of the inverter on the difference vector */
 			hmass_pre=mass[i];
 			D_pre(test_e,&resd[i]);
 			++cgiter;
@@ -260,7 +260,7 @@ void pta_qprop_QMR(int g0[4], spinor_field **pta_qprop, int nm, double *mass, do
 		for(i=0;i<QMR_par.n;++i){
 
 #ifndef NDEBUG
-			/* this is a test of the solution */
+			/* this is a test of the inverter on the difference vector */
 			hmass=mass[i];
 			D(test,&resd[i]);
 			++cgiter;

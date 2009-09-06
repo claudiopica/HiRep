@@ -1,7 +1,7 @@
 
 /*******************************************************************************
 *
-* File check9.c
+* File check_inverters_4.c
 *
 * Check of the program eva (random field)
 *
@@ -155,7 +155,7 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"Accuracy parameters: omega1=%.1e, omega2=%.1e\n\n",
 	 omega1,omega2);
 
-  ie=eva(nev,nevt,0,100,200,ubnd,omega1,omega2,Op1,ws,ev,d1,&status);
+  ie=eva(nev,nevt,0,100,20,ubnd,omega1,omega2,Op1,ev,d1,&status);
 
   lprintf("MAIN",0,"\nEigenvalues of Q^2 (status = %d, ie = %d):\n\n",
 	 status,ie);

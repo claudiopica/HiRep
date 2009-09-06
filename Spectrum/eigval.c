@@ -5,7 +5,7 @@
 
 /*******************************************************************************
 *
-* Computation of the mesonic spectrum
+* Computation of the lowest eigenvalues of H^2
 *
 *******************************************************************************/
 
@@ -185,49 +185,6 @@ void HEVA(spinor_field *out, spinor_field *in){
   g5Dphi_sq(hevamass, out, in);
 }
 
-/* use power method to find max eigvalue */
-int max_HEVA(double *max) {
-  double norm, oldmax, dt;
-  spinor_field *s1,*s2;
-  int count;
-
-  s1=alloc_spinor_field_f(2,&glattice);
-  s2=s1+1;
-
-  /* random spinor */
-  gaussian_spinor_field(s1);
-  norm=sqrt(spinor_field_sqnorm_f(s1));
-  spinor_field_mul_f(s1,1./norm,s1);
-  norm=1.;
-
-  dt=1.;
-
-  HEVA(s2,s1);
-
-  count=1;
-  do {
-    /* multiply vector by H2 */
-    ++count;
-
-    spinor_field_copy_f(s1,s2);
-
-    norm=sqrt(spinor_field_sqnorm_f(s1));
-    spinor_field_mul_f(s1,1./norm,s1);
-
-
-    oldmax=*max;
-    HEVA(s2,s1);
-    *max=spinor_field_prod_re_f(s1,s2);
-    
-  } while (fabs((*max-oldmax)/(*max))>1.e-3);
-
-  lprintf("MaxHEVA",10,"Max_eig = %1.8e [MVM = %d]\n",*max,count); 
-
-  free_spinor_field(s1);
-  
-  return count;
-}
-
 int main(int argc,char *argv[]) {
   int i,k,n;
   char tmp[256], *cptr;
@@ -352,7 +309,7 @@ int main(int argc,char *argv[]) {
       double max, mupp;
       double *d1;
       int status,ie;
-      spinor_field *ev, *ws;
+      spinor_field *ev;
       /* END of EVA parameters */
       int MVM=0; /* counter for matrix-vector multiplications */
 
@@ -362,20 +319,19 @@ int main(int argc,char *argv[]) {
       mupp=fabs(m[k]+4)+4;
       mupp*=mupp;
 
-      max_HEVA(&max);
+      max_H(&HEVA, &glattice, &max);
       lprintf("MAIN",0,"MAXCHECK: cnfg=%e  uppbound=%e diff=%e %s\n",max,mupp,mupp-max,(mupp-max)<0?"[FAILED]":"[OK]");
 
       max*=1.1;
 
       d1=malloc(sizeof(*d1)*eig_var.nevt);
-      ev=alloc_spinor_field_f((eig_var.nevt+2),&glattice);
-      ws=ev+eig_var.nevt;
+      ev=alloc_spinor_field_f(eig_var.nevt,&glattice);
 
-      ie=eva(eig_var.nev,eig_var.nevt,0,eig_var.kmax,eig_var.maxiter,max,eig_var.omega1,eig_var.omega2,&HEVA,ws,ev,d1,&status);
+      ie=eva(eig_var.nev,eig_var.nevt,0,eig_var.kmax,eig_var.maxiter,max,eig_var.omega1,eig_var.omega2,&HEVA,ev,d1,&status);
       MVM+=status;
       while (ie!=0) { /* if failed restart EVA */
         lprintf("MAIN",0,"Restarting EVA!\n");
-        ie=eva(eig_var.nev,eig_var.nevt,2,eig_var.kmax,eig_var.maxiter,max,eig_var.omega1,eig_var.omega2,&HEVA,ws,ev,d1,&status);
+        ie=eva(eig_var.nev,eig_var.nevt,2,eig_var.kmax,eig_var.maxiter,max,eig_var.omega1,eig_var.omega2,&HEVA,ev,d1,&status);
         MVM+=status;
       }
 

@@ -281,7 +281,7 @@ void g5Dphi(double m0, spinor_field *out, spinor_field *in)
 
 }
 
-int init=1;
+static int init=1;
 static spinor_field *gtmp=NULL;
 static spinor_field *etmp=NULL;
 static spinor_field *otmp=NULL;
@@ -293,7 +293,7 @@ static void free_mem() {
   init=1;
 }
 
-void init_Dirac() {
+static void init_Dirac() {
   if (init) {
     gtmp=alloc_spinor_field_f(1,&glattice);
     etmp=alloc_spinor_field_f(1,&glat_even);

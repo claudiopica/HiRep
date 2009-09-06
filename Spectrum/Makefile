@@ -15,7 +15,7 @@ MODS := archive logger read_input archive_spinors endian
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Utils
-MODS := boundary_conditions time #suN_utils suN_exp single_double_utils
+MODS := boundary_conditions time max_eig #suN_utils suN_exp single_double_utils
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Memory

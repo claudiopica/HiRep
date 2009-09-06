@@ -1,0 +1,393 @@
+\documentclass[10pt]{article}
+
+\begin{document}
+
+\section{Simple data types}
+
+The following data types are defined as C structures containing a single array of elements.
+
+\begin{center}
+\begin{tabular}{llcc}
+\hline
+Name & array of & size & members name \\  
+\hline
+\hline
+complex & double & 2 & re, im \\
+\hline
+suNg\_vector & complex & Nc & c[]\\
+suNg & complex & Nc$\times$Nc & c[]\\
+suNg\_spinor & suNg\_vector  & 4 & c[]\\
+suNg\_algebra\_vector & double & Nc$\times$Nc-1 & c[]\\
+\hline
+suNf\_vector & complex & dr & c[]\\
+suNf & complex or double & dr$\times$dr & c[]\\
+suNfc & complex & dr$\times$dr & c[]\\
+suNf\_spinor & suNf\_vector  & 4 & c[]
+\end{tabular}
+\end{center}
+Legend: Nc=number of colors ; dr=dimension of the fermion representation
+
+The data type ``suNf'' can be real or complex depending on the representation being real or complex.
+
+Every data type has a corresponding single precision data type the name of which is obtained adding the suffix ``\_flt''. 
+
+
+\section{Operations on simple data types}
+The following linear algebra operations are defined as C preprocessor macros and can act on both double and single precision data types.
+
+\subsection{Vector operations\label{vop}}
+
+Vector operations act on one or more suNg\_vectors or suNf\_vectors. The suffix ``\_g'' or ``\_f'' indicates the appropriate data type.\\
+
+\noindent\textbf{\_vector\_zero\_[gf](r) } : r=0 
+
+suN[gf]\_vector r \\
+
+
+\noindent\textbf{\_vector\_minus\_[gf](r,s) } : r-=s
+
+suN[gf]\_vector r,s \\
+
+
+\noindent\textbf{\_vector\_mul\_[gf](r,k,s) } : r=k$*$s 
+
+suN[gf]\_vector r,s ; 
+
+double k\\
+
+
+\noindent\textbf{\_vector\_mulc\_[gf](r,z,s) } : r=z$*$s 
+
+suN[gf]\_vector r,s; 
+
+complex z\\
+
+
+\noindent\textbf{\_vector\_add\_[gf](r,s1,s2) } : r=s1+s2 
+
+suN[gf]\_vector r,s1,s2\\
+
+
+\noindent\textbf{\_vector\_sub\_[gf](r,s1,s2) } : r=s1-s2 
+
+suN[gf]\_vector r,s1,s2\\
+
+
+\noindent\textbf{\_vector\_i\_add\_[gf](r,s1,s2) } : r=s1+i$*$s2 
+
+suN[gf]\_vector r,s1,s2\\
+
+
+\noindent\textbf{\_vector\_i\_sub\_[gf](r,s1,s2) } : r=s1-i$*$s2 
+
+suN[gf]\_vector r,s1,s2\\
+
+
+\noindent\textbf{\_vector\_add\_assign\_[gf](r,s) } : r+=s 
+
+suN[gf]\_vector r,s\\
+
+
+\noindent\textbf{\_vector\_sub\_assign\_[gf](r,s) } : r-=s 
+
+suN[gf]\_vector r,s\\
+
+
+\noindent\textbf{\_vector\_i\_add\_assign\_[gf](r,s) } : r+=i$*$s 
+
+suN[gf]\_vector r,s\\
+
+
+\noindent\textbf{\_vector\_i\_sub\_assign\_[gf](r,s) } : r-=i$*$s 
+
+suN[gf]\_vector r,s\\
+
+
+\noindent\textbf{\_vector\_prod\_re\_[gf](k,r,s) } : k=Re(r$^\dagger$$*$s) 
+
+suN[gf]\_vector r,s; 
+
+double k\\
+
+
+\noindent\textbf{\_vector\_prod\_im\_[gf](k,r,s) } : k=Im(r$^\dagger$$*$s) 
+
+suN[gf]\_vector r,s; 
+
+double k\\
+
+
+\noindent\textbf{\_vector\_mulc\_add\_assign\_[gf](r,z,s) } : r+=z$*$s (z complex) 
+
+suN[gf]\_vector r,s; 
+
+complex z\\
+
+
+\noindent\textbf{\_vector\_mul\_add\_assign\_[gf](r,k,s) } :  r+=k$*$s (k real) 
+
+suN[gf]\_vector r,s;
+
+double k\\
+
+
+\noindent\textbf{\_vector\_lc\_[gf](r,k1,s1,k2,s2) } : r=k1$*$s1+k2$*$s2 
+
+suN[gf]\_vector r,s1,s2; 
+
+double k1,k2\\
+
+
+\noindent\textbf{\_vector\_lc\_add\_assign\_[gf](r,k1,s1,k2,s2) } : r+=k1$*$s1+k2$*$s2 
+
+suN[gf]\_vector r,s1,s2; 
+
+double k1,k2\\
+
+
+\noindent\textbf{\_vector\_clc\_[gf](r,z1,s1,z2,s2) } : r=z1$*$s1+z2$*$s2 
+
+suN[gf]\_vector r,s1,s2; 
+
+complex z1,z2\\
+
+
+\noindent\textbf{\_vector\_clc\_add\_assign\_[gf](r,z1,s1,z2,s2) } : r=z1$*$s1+z2$*$s2 
+
+suN[gf]\_vector r,s1,s2; 
+
+complex z1,z2\\
+
+
+\noindent\textbf{\_vector\_prod\_assign\_[gf](z,r,s) } : z+=r$^\dagger$$*$s 
+
+suN[gf]\_vector z,r,s\\
+
+
+\noindent\textbf{\_vector\_project\_[gf](r,z,s) } : r-=z$*$s 
+
+suN[gf]\_vector r,z,s
+
+
+\subsection{Algebra vectors operations}
+
+\noindent\textbf{\_algebra\_vector\_mul\_add\_assign\_g(r,k,s) } : r+=k$*$s 
+
+suNg\_algebra\_vector r,s
+
+double k\\
+
+
+\noindent\textbf{\_algebra\_vector\_mul\_g(r,k,s) } : r=k$*$s 
+
+suNg\_algebra\_vector r,s
+
+double k\\
+
+
+\noindent\textbf{\_algebra\_vector\_zero\_g(r) } : r=0
+
+suNg\_algebra\_vector r\\
+
+
+\noindent\textbf{\_algebra\_vector\_sqnorm\_g(k,r) } : k=$|$v$|$$^2$
+
+suNg\_algebra\_vector r
+
+double k
+
+\subsection{Matrix-Vector operations}
+
+\noindent\textbf{\_suN[gf]\_multiply(r,u,s) } : r=u$*$s  
+
+suN[gf]\_vector r,s
+
+suN[gf] u\\
+
+
+\noindent\textbf{\_suN[gf]\_inverse\_multiply(r,u,s) } : r=u$^\dagger$$*$s
+
+suN[gf]\_vector r,s
+
+suN[gf] u
+
+
+\subsection{Matrix operations}
+
+\noindent\textbf{\_suN[gf]\_dagger(u,v) } : u=v$^\dagger$
+
+suN[gf] u,v\\
+
+
+\noindent\textbf{\_suN[gf]\_times\_suN[gf](u,v,w) } : u=v$*$w 
+
+suN[gf] u,v,w\\
+
+
+\noindent\textbf{\_suN[gf]\_times\_suN[gf]\_dagger(u,v,w) } : u=v$*$w$^\dagger$
+
+suN[gf] u,v,w\\
+
+
+\noindent\textbf{\_suN[gf]\_dagger\_times\_suN[gf](u,v,w) } : u=v$^\dagger$$*$w 
+
+suN[gf] u,v,w\\
+
+
+\noindent\textbf{\_suN[gf]\_zero(u) } : u=0 
+
+suN[gf] u\\
+
+
+\noindent\textbf{\_suN[gf]\_unit(u) } : u=1 
+
+suN[gf] u\\
+
+
+\noindent\textbf{\_suN[gf]\_minus(u,v) } : u=-v  
+
+suN[gf] u,v\\
+
+
+\noindent\textbf{\_suN[gf]\_mul(u,r,v) } : u=r$*$v 
+
+suN[gf] u,v
+double r\\
+
+
+\noindent\textbf{\_suN[gf]\_add\_assign(u,v) } : u+=v 
+
+suN[gf] u,v\\
+
+
+\noindent\textbf{\_suN[gf]\_sub\_assign(u,v) } : u-=v  
+
+suN[gf] u,v\\
+
+
+\noindent\textbf{\_suN[gf]\_sqnorm(k,u) } : k=$|$u$|$$^2$
+
+double  k
+suN[gf] u\\
+
+
+\noindent\textbf{\_suN[gf]\_sqnorm\_m1(k,u) } : k=$|$ 1 - u $|$$^2$
+
+double  k
+suN[gf] u\\
+
+
+\noindent\textbf{\_suN[gf]\_trace\_re(k,u) } : k=Re Tr (u) 
+
+suN[gf] k,u\\
+
+
+\noindent\textbf{\_suN[gf]\_trace\_im(k,u) } : k=Im Tr (u) 
+
+suN[gf] k,u\\
+
+
+\noindent\textbf{\_suN[gf]\_2TA(u,v) } : u=v - v$^\dagger$ -1/N Tr(v - v$^\dagger$)$*$I 
+
+suN[gf] u,v\\
+
+
+\noindent\textbf{\_suN[gf]\_TA(u,v) } : u=(v - v$^\dagger$ -1/N Tr(v - v$^\dagger$)$*$I)/2
+
+suN[gf] u,v
+
+
+\subsection{Spinor operations}
+
+Vector operations defined in Sec.~\ref{vop} naturally define spinor operations componentwise, since a spinor a just 4 copies of a vector.
+The name convention for spinor operations is to replace the prefix ``\_vector'' with ``\_spinor''. For example:
+
+\noindent\textbf{\_spinor\_mul\_[gf](r,k,s) } : r=k$*$s
+
+suN[gf]\_spinor r,s
+
+double k\\
+
+In addition to the above spinor operations which act trivially on the Dirac structure, the following are also defined:
+
+
+\noindent\textbf{\_spinor\_g5\_[gf](s,r) } : s=$\gamma_5$$*$r 
+
+suN[gf]\_spinor s,r\\
+
+
+\noindent\textbf{\_spinor\_g5\_assign\_[gf](r) } : r=$\gamma_5$$*$r 
+
+suN[gf]\_spinor r\\
+
+
+\noindent\textbf{\_spinor\_g5\_prod\_re\_[gf](k,r,s) } : k=Re [ ($\gamma_5$$*$r)$^\dagger$$*$s ]
+
+double k
+
+suN[gf]\_spinor r,s\\
+
+
+\noindent\textbf{\_spinor\_g5\_prod\_im\_[gf](k,r,s) } : k=Im [ ($\gamma_5$$*$r)$^\dagger$$*$s ]
+
+double k
+
+suN[gf]\_spinor r,s
+
+\section{Fields data types\label{fields}}
+
+A field data type is defined as a C structure containing the following members:
+\begin{enumerate}
+\item a pointer to an array of elements named ``ptr'';
+\item a pointer to a geometry\_descriptor defining the geometry on which the field lives named ``type'';
+\item IF compiled for MPI: a pointer to an array of MPI\_request for communication requests named ``comm\_req''.
+\end{enumerate}
+The following field types are defined:
+\begin{center}
+\begin{tabular}{ll}
+\hline
+Name & field of \\  
+\hline
+\hline
+suNg\_field & suNg \\
+suNf\_field & suNf \\
+spinor\_field & suNf\_spinor \\
+suNg\_av\_field & suNg\_algebra\_vector \\
+scalar\_field & double
+\end{tabular}
+\end{center}
+
+\section{Geometry}
+
+Fields living on the 4-dimesional lattice are defined to be C arrays of elements (see Sec.\ref{fields}). 
+The geometry of the lattice is defined by assigning an index $n$ of the array to each site $(t,x,y,z)$. The mapping between the cartesian coordinates of the local lattice and the array index is given by the macro ``ipt(t,x,y,z)=n''. Neighboring relations between the sites are given by the macros ``iup(n,dir)'' and ``idn(n,dir)'' which, given the index n of the current site,  return the index of the site whose cartesian coordinate in direction dir is increased or decreased by one respectively.
+
+In the MPI version of the code, the set of indeces which correspond to the local lattice are NOT all contiguous, instead the lattice is divided into different blocks. Each of these blocks then corresponds to a contiguous set of indeces. In the MPI version, each field also contain the send/receive buffers necessary for communications. Before a communication to another MPI process can be made, the send buffer must be filled.
+The division of the local lattice into blocks, the location of the send/receive buffers, and the copies to fill the send buffers are described by the following C structure:
+
+\begin{verbatim}
+typedef struct _geometry_descriptor {
+  unsigned int local_master_pieces, total_master_pieces;
+  unsigned int *master_start, *master_end;
+  unsigned int ncopies;
+  unsigned int *copy_from, *copy_to, *copy_len;
+  unsigned int nbuffers;
+  unsigned int *rbuf_len, *sbuf_len;
+  unsigned int *rbuf_from_proc, *rbuf_start;
+  unsigned int *sbuf_to_proc, *sbuf_start;
+  unsigned int gsize;
+} geometry_descriptor;
+\end{verbatim}
+
+\begin{description}
+\item[local\_master\_pieces:] number of pieces in which the local lattice is divided. We call ``master'' a piece of the array which does not contain copies of other sites.
+\item[total\_master\_pieces:] local\_master\_pieces + number of receive buffers. The latter can be though of as an extension of the local lattice in those directions which are parallelized (i.e. the global lattice is split in that direction).
+\item[master\_start, master\_end:] these two array contain the start and end index for each master piece in the lattice.
+\item[ncopies:] this is the number of copies necessary to fill the send buffers.
+\item[copy\_from, copy\_to, copy\_len:] these three array contain the origin and destination index for each copy and the length in sites.
+\item[]
+\end{description}
+
+
+
+\end{document}

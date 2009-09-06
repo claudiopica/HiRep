@@ -16,6 +16,7 @@ void g5Dphi_sq(double m0, spinor_field *out, spinor_field *in);
 void Dphi_flt_(spinor_field_flt *out, spinor_field_flt *in);
 void Dphi_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
 void g5Dphi_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
+void g5Dphi_sq_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
 
 unsigned long int getMVM();
 unsigned long int getMVM_flt();
@@ -26,6 +27,10 @@ void Dphi_oepre(double m0, spinor_field *out, spinor_field *in);
 void g5Dphi_eopre(double m0, spinor_field *out, spinor_field *in);
 void g5Dphi_eopre_sq(double m0, spinor_field *out, spinor_field *in);
 
+void Dphi_eopre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
+void Dphi_oepre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
+void g5Dphi_eopre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
+void g5Dphi_eopre_sq_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
 
 /* p = out ; q = in */
 

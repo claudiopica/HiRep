@@ -1,7 +1,7 @@
 TOPDIR = ..
 MKDIR=$(TOPDIR)/Make
 
-SUBDIRS = Algebra Geometry PureGauge SpinorField DiracOperator Inverters Update Random
+SUBDIRS = Algebra Geometry PureGauge SpinorField DiracOperator Inverters Update Random TripletMesons
 
 # MODDIR := Geometry
 # MODS := geometry_init  geometry_mpi_eo test_geometry_mpi geometry_mpi

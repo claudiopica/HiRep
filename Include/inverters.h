@@ -13,6 +13,7 @@
 
 typedef void (*spinor_operator)(spinor_field *out, spinor_field *in);
 typedef void (*spinor_operator_flt)(spinor_field_flt *out, spinor_field_flt *in);
+typedef void (*spinor_operator_m)(spinor_field *out, spinor_field *in, double m);
 
 typedef struct _mshift_par {
    int n; /* number of shifts */
@@ -28,6 +29,7 @@ typedef struct _mshift_par {
  * returns the number of cg iterations done.
  */
 int cg_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
+int cg_mshift_def(mshift_par *par, spinor_operator M, spinor_operator P, spinor_operator_m Pinv, spinor_field *in, spinor_field *out);
 int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_operator_flt F, spinor_field *in, spinor_field *out);
 
 int BiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
@@ -48,7 +50,7 @@ int MINRES(MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field *o
 int eva(int nev,int nevt,int init,int kmax,
                int imax,double ubnd,double omega1,double omega2,
                spinor_operator Op,
-               spinor_field *ws,spinor_field *ev,double d[],int *status);
+               spinor_field *ev,double d[],int *status);
 
 void jacobi1(int n,double a[],double d[],double v[]);
 void jacobi2(int n,complex a[],double d[],complex v[]);
