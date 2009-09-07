@@ -48,10 +48,19 @@ $(INCDIR)/.autoheaders.h: $(MKDIR)/MkFlags
 	  $(MAKE) -C $(dir $@) $(notdir $@) ;\
 	fi 
 
-.DEFAULT:
+%.c:
 	if  test $(dir $@) != "./"; then \
 	  $(MAKE) -C $(dir $@) $(notdir $@) ;\
 	fi
+
+%.h:
+	echo Missing header: $@
+	false
+
+.PRECIOUS: %.c
+
+#avoid the use of implicit suffix rules!
+.SUFFIXES:
 
 
 WRHEAD = $(MKDIR)/Utils/write_suN_headers.pl
