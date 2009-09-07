@@ -1,9 +1,10 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
-#include <string>
 #include <sstream>
-#include <math.h>
+#include <cmath>
+#include <cstring>
+#include <cstdlib>
 
 using namespace std;
 
