@@ -1,7 +1,7 @@
 /***************************************************************************\
- * Copyright (c) 2008, Claudio Pica                                         *   
- * All rights reserved.                                                     * 
- \***************************************************************************/
+* Copyright (c) 2008, Claudio Pica                                          *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
 
 #include "inverters.h"
 #include "linear_algebra.h"
@@ -10,7 +10,6 @@
 #include <math.h>
 #include "global.h"
 #include "memory.h"
-#include "utils.h"
 #include "logger.h"
 #include <assert.h>
 
@@ -70,7 +69,7 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
     z1[i]=z2[i]=1.;
     spinor_field_copy_f(&p[i], r);
     if(par->n!=1) spinor_field_zero_f(&out[i]);
-/*    sflags[i]=1; */
+    sflags[i]=1;
   }
 
   /* cg recursion */
@@ -95,8 +94,9 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
     notconverged=0; /* assume that all vectors have converged */
     for (i=0; i<(par->n); ++i) {
       /* check convergence of vectors */
-      if(delta*z3[i]*z3[i]>par->err2*innorm2) ++notconverged;
+      if(delta*z3[i]*z3[i]<par->err2*innorm2) sflags[i]=0; 
       if(sflags[i]){
+        notconverged++;
         spinor_field_mul_f(&p[i],gamma*z3[i]*z3[i]/(z2[i]*z2[i]),&p[i]);
         spinor_field_mul_add_assign_f(&p[i],z3[i],r);
         z1[i]=z2[i];
@@ -108,14 +108,30 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
        lprintf("CGTEST",0,"[ %d ] alpha=%e\n",cgiter,alpha);
        lprintf("CGTEST",0,"[ %d ] omega=%e\n",cgiter,omega);
        lprintf("CGTEST",0,"[ %d ] still runnning=%d\n",cgiter,notconverged);
-       for (i=0;i<par->n;++i) lprintf("CGTEST",0,"z3[%d]=%e; ",i,z3[i]);
+	   for (i=0;i<par->n;++i) lprintf("CGTEST",0,"z3[%d]=%e; test=[%e,%e]\n",i,z3[i],delta*z3[i]*z3[i],par->err2*innorm2);
        lprintf("CGTEST",0,"\n[ %d ] gamma=%e\n",cgiter,gamma);
        lprintf("CGTEST",0,"[ %d ] delta=%e\n",cgiter,delta);
        */
-    /* lprintf("CGTEST",0,"[ %d ] still runnning=%d\n",cgiter,notconverged); */
 
     ++cgiter;
   } while ((par->max_iter==0 || cgiter<par->max_iter) && notconverged);
+
+  /* test results */
+  for(i=0;i<par->n;++i){
+    double norm;
+    M(Mk,&out[i]);
+    ++cgiter;
+    spinor_field_mul_add_assign_f(Mk,-par->shift[i],&out[i]);
+    spinor_field_sub_f(Mk,Mk,in);
+    norm=spinor_field_sqnorm_f(Mk)/spinor_field_sqnorm_f(in);
+    sflags[i]=1;
+    if (fabs(norm)>par->err2){
+      sflags[i]=0;
+      lprintf("INVERTER",30,"CG failed on vect %d: err2 = %1.8e > %1.8e\n",i,norm,par->err2);
+    } else {
+      lprintf("INVERTER",20,"CG inversion: err2 = %1.8e < %1.8e\n",norm,par->err2);
+    }
+  }
 
   /* free memory */
   free_spinor_field(p);
@@ -125,114 +141,29 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
   return cgiter;
 }
 
-
 int cg_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out){ 
-  int siter=0,diter=0;
+  int cgiter,msiter;
   int i;
-  mshift_par local_par=*par;
+  mshift_par par_save=*par;
   short int sflags[par->n];
-  double norm[par->n];
 
-  double innorm2;
-  int notconverged;
-  
-  spinor_field *out_core;
-  spinor_field *res, *res2, *tmp;
+  cgiter=cg_mshift_core(sflags, par, M, in, out);
+  msiter=cgiter; /* save multishift iterations for logging */
 
-  /* check types */
-  _TWO_SPINORS_MATCHING(in,out); 
-  _ARRAY_SPINOR_MATCHING(out,i,par->n);
-
-  /* allocate memory for single-precision solutions and residual vectors */
-  res = alloc_spinor_field_f(3+par->n,in->type);
-  res2 = res + 1;
-  tmp = res2 + 1;
-  out_core = tmp + 1;
-
-  /* set all flags to 1=> not converged
-   * set all out to zero exept if par->n==1
-   */
-  for (i=0; i<(par->n); ++i) {
-    sflags[i]=1;
-    if(par->n!=1) spinor_field_zero_f(&out[i]);
+  par->n=1;
+  for(i=0;i<par_save.n;++i) {
+    int rep=0;
+    while (sflags[i]==0) {
+      par->shift=par_save.shift+i;
+      cgiter+=cg_mshift_core(sflags+i, par, M, in, out+i);
+      if((++rep)%5==0)
+        lprintf("INVERTER",-10,"CG_mshift recursion = %d (precision too high?)\n",rep);
+    }
   }
 
-  /* compute input norm2 */
-  innorm2=spinor_field_sqnorm_f(in);
+  *par=par_save;
 
-  /* This implements iterative refinement */
-  /* begin external loop */
-  do {
-    int first=1;
-    notconverged=0;
+  lprintf("INVERTER",10,"CG_mshift: MVM = %d/%d\n",msiter,cgiter);
 
-    for (i=0; i<par->n; ++i) {
-      if (sflags[i]!=0) {
-        /* compute residual vector */
-        M(tmp,&out[i]); ++diter;
-        spinor_field_sub_f(res2,in,tmp);
-        spinor_field_mul_add_assign_f(res2,par->shift[i],&out[i]);
-        /* test for convergence */
-        norm[i]=spinor_field_sqnorm_f(res2);
-        lprintf("CGDEBUG",20,"norm %d = %e relerr=%e\n",i,norm[i],norm[i]/innorm2);
-        if (norm[i]<innorm2*par->err2) {
-          /* this shift has reached convergence */
-          sflags[i]=0;
-          norm[i]/=innorm2;
-          lprintf("CGDEBUG",20,"shift %d converged. (%d)\n",i,siter);
-        } else {
-          /* this shift has not yet converged */
-          ++notconverged;
-          /* prepare input residual vector */
-          if(first){
-            /* we take the residual vector from the first non-converged shift */
-            first=0;
-            local_par.err2=norm[i]/innorm2;
-            norm[i]=sqrt(norm[i]);
-            spinor_field_mul_f(res,1./norm[i],res2); /* normalize input res vector */
-          } else {
-            /* take the scalar product of current residual vector with the 
-             * normalized first one as residual norm */
-            norm[i]=spinor_field_prod_im_f(res, res2);
-            lprintf("CGDEBUG",20,"Im=%e check norm=%e\n",norm[i],spinor_field_sqnorm_f(res));
-            norm[i]=spinor_field_prod_re_f(res, res2);
-            //norm[i]=sqrt(spinor_field_sqnorm_f(res2));
-
-          }
-        }
-      }
-    }
-            lprintf("CGDEBUG",20,"==============================================\n");
-
-
-    if (notconverged) {
-      /* Do inversion */
-      local_par.err2=par->err2/local_par.err2*0.9;
-#define MAX_PREC 1.e-26
-      if(local_par.err2<MAX_PREC) local_par.err2=MAX_PREC;
-#undef MAX_PREC
-      lprintf("CGDEBUG",20,"err2 = %e\n",local_par.err2);
-      siter+=cg_mshift_core(sflags, &local_par, M, res, out_core); 
-
-      /* accumulate solution */
-      for(i=0;i<par->n; ++i) {
-        if(sflags[i]!=0){
-          spinor_field_mul_add_assign_f(&out[i],norm[i],&out_core[i]);
-        }
-      }
-    }
-
-  } while(notconverged);
-
-  
-  for (i=0;i<par->n;++i){
-    lprintf("INVERTER",20,"CG inversion: err2 = %1.8e < %1.8e\n",norm[i],par->err2);
-  }
-
-  free_spinor_field(res);
-
-  lprintf("INVERTER",10,"CG_mshift: MVM = %d (inner) - %d (outer)\n",siter,diter);
-
-  return siter+diter;
+  return cgiter;
 }
-
