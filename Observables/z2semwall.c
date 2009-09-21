@@ -562,5 +562,8 @@ void z2semwall_mesons(int conf, int nhits, int nm, double *m, double acc) {
   PRINT_CORR(g5_g0g5_re);
 #endif
 
+	free_spinor_field(eta);
+	free_spinor_field(psi0);
+
 
 }
