@@ -61,6 +61,10 @@ static void slower(char *str) {
  * 0 => g_start is a valid file name which should be used as starting config
  * 1 => use unit gauge config
  * 2 => use a random config
+ * 3 = unit with UNIT bcs
+ * 4 = unit with SF bcs
+ * 5 = random with UNIT bcs
+ * 6 = random with SF bcs
  */
 static int parse_gstart(rhmc_flow *rf) {
 
@@ -112,6 +116,26 @@ static int parse_gstart(rhmc_flow *rf) {
   if (ret==0) {
     lprintf("FLOW",0,"Starting a new run from a random conf!\n");
     return 2;
+  }
+  ret=strcmp(buf,"unit_unit");
+  if (ret==0) {
+    lprintf("FLOW",0,"Starting a new run from a unit conf with UNIT bcs!\n");
+    return 3;
+  }
+  ret=strcmp(buf,"unit_sf");
+  if (ret==0) {
+    lprintf("FLOW",0,"Starting a new run from a unit conf with SF bcs!\n");
+    return 4;
+  }
+  ret=strcmp(buf,"random_unit");
+  if (ret==0) {
+    lprintf("FLOW",0,"Starting a new run from a random conf with UNIT bcs!\n");
+    return 5;
+  }
+  ret=strcmp(buf,"random_sf");
+  if (ret==0) {
+    lprintf("FLOW",0,"Starting a new run from a random conf with SF bcs!\n");
+    return 6;
   }
   
   lprintf("ERROR",0,"Invalid starting gauge conf specified [%s]\n",rf->g_start);
@@ -206,6 +230,22 @@ int init_mc(rhmc_flow *rf, char *ifile) {
     case 2:
       random_u(u_gauge);
       break;
+    case 3:
+      unit_u(u_gauge);
+      SF_gauge_bcs(u_gauge,0);
+      break;
+    case 4:
+      unit_u(u_gauge);
+      SF_gauge_bcs(u_gauge,1);
+      break;
+    case 5:
+      random_u(u_gauge);
+      SF_gauge_bcs(u_gauge,0);
+      break;
+    case 6:
+      random_u(u_gauge);
+      SF_gauge_bcs(u_gauge,1);
+      break;
   }
   represent_gauge_field();
   
@@ -243,7 +283,6 @@ int end_mc() {
 
   return 0;
 }
-
 
 #undef repr_name
 

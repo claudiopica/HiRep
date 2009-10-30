@@ -56,6 +56,11 @@ void Force0(double dt, suNg_av_field *force){
   forcestat[0]*=dt*_update_par.beta/((double)(NG*4*GLB_T*GLB_X*GLB_Y*GLB_Z));
   forcestat[1]*=dt*_update_par.beta/((double)NG);
   lprintf("FORCE0",50,"avr |force| = %1.8e maxforce = %1.8e\n",forcestat[0],forcestat[1]);
+  
+   #ifdef SCHRODINGER_FUNCTIONAL
+       	SF_force_bcs(force);
+   #endif
+
   }
 
 void Force(double dt, suNg_av_field *force){
@@ -63,3 +68,67 @@ void Force(double dt, suNg_av_field *force){
   Force_rhmc_f(dt, force);
 }
 
+void SF_force_bcs(suNg_av_field *force)
+{
+  _DECLARE_INT_ITERATOR(i);
+  int ix,iy,iz,mu;
+
+  /* check input types */
+#ifndef CHECK_SPINOR_MATCHING
+  _TWO_SPINORS_MATCHING(u_gauge,force);
+#endif
+
+if(COORD[0]==0)
+{
+  _MASTER_FOR(&glattice,i)
+  {
+       	for (ix=0; ix<GLB_X/NP_X; ++ix)
+        for (iy=0; iy<GLB_Y/NP_Y; ++iy)
+        for (iz=0; iz<GLB_Z/NP_Z; ++iz)
+	{
+	{
+	{
+		if (ipt(0,ix,iy,iz)==i)
+		{
+			for (mu=0; mu<4; ++mu)
+			{
+				_algebra_vector_zero_g(*_4FIELD_AT(force,i,mu));
+      			}
+    		}
+		if (ipt(1,ix,iy,iz)==i)
+		{
+			for (mu=1; mu<4; ++mu)
+			{
+				_algebra_vector_zero_g(*_4FIELD_AT(force,i,mu));
+      			}
+    		}
+	}
+	}
+	}
+   }
+}
+
+if(COORD[0]==NP_T-1)
+{
+  _MASTER_FOR(&glattice,i)
+  {
+       	for (ix=0; ix<GLB_X/NP_X; ++ix)
+        for (iy=0; iy<GLB_Y/NP_Y; ++iy)
+        for (iz=0; iz<GLB_Z/NP_Z; ++iz)
+	{
+	{
+	{
+		if (ipt((GLB_T/NP_T)-1,ix,iy,iz)==i)
+		{
+			for (mu=0; mu<4; ++mu)
+			{
+				_algebra_vector_zero_g(*_4FIELD_AT(force,i,mu));
+      			}
+    		}
+	}
+	}
+	}
+   }
+}
+
+}

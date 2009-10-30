@@ -4,6 +4,7 @@
 \***************************************************************************/
 
 #include "global.h"
+#include "dirac.h"
 #include "suN.h"
 #include "random.h"
 #include "linear_algebra.h"
@@ -17,6 +18,9 @@ void gaussian_spinor_field(spinor_field *s) {
 	for(i=0;i<type->local_master_pieces;i++)
  	  gauss((double*)(s->ptr+type->master_start[i]),(type->master_end[i]-type->master_start[i]+1)*sizeof(suNf_spinor)/sizeof(double));
 	spinor_field_mul_f(s,c1,s);
+   #ifdef SCHRODINGER_FUNCTIONAL
+        SF_spinor_bcs(s);
+   #endif
 }
 
 void gaussian_spinor_field_flt(spinor_field_flt *s) {

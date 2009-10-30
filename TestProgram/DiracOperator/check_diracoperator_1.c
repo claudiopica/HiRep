@@ -95,10 +95,12 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
   
   read_input(glb_var.read,"test_input");
-  rlxd_init(glb_var.rlxd_seed,glb_var.rlxd_level);
-  
-  
   lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed);
+
+
+  rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed);
+  
+  
   
   
   /* setup communication geometry */

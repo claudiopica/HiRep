@@ -6,6 +6,7 @@
 #include "spinor_field.h"
 #include "suN_repr_func.h"
 #include "random.h"
+#include "update.h"
 #include <math.h>
 
 void gaussian_momenta(suNg_av_field *momenta) {
@@ -25,4 +26,9 @@ void gaussian_momenta(suNg_av_field *momenta) {
       *(dptr)*=c3;
     }
   }
+  
+   #ifdef SCHRODINGER_FUNCTIONAL
+        SF_force_bcs(momenta);
+   #endif
+
 }

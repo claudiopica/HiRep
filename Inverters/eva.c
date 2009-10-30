@@ -89,6 +89,7 @@
 #include "suN.h"
 #include "memory.h"
 #include "global.h"
+#include "dirac.h"
 
 #define GAMMA 3.0
 #define MAX_ROTATE 1000 /*50*/
@@ -205,6 +206,10 @@ static double normalize(spinor_field *ps)
   error(r<EPSILON,1,"normalize [eva.c]","vector has vanishing norm");
 
   spinor_field_mul_f(ps,1./r,ps);
+
+  #ifdef SCHRODINGER_FUNCTIONAL
+       SF_spinor_bcs(ps);
+  #endif
 
   return r;
 }

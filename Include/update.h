@@ -22,6 +22,9 @@ void random_su2(double rho,double s[]);
 void Force0(double dt, suNg_av_field *force);
 void Force(double dt, suNg_av_field *force);
 
+void SF_force_bcs(suNg_av_field *force);
+double SF_test_force_bcs(suNg_av_field *force);
+
 typedef struct _int_par {
 	double tlen; /* trajectory lenght */
 	unsigned int nsteps; /* number of step in the integration */

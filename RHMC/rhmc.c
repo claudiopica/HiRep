@@ -133,7 +133,6 @@ void read_cmdline(int argc, char* argv[]) {
 
 }
 
-
 int main(int argc,char *argv[])
 {
   int i, acc, rc;
@@ -161,9 +160,19 @@ int main(int argc,char *argv[])
   /* read input file */
   read_input(glb_var.read,"input_file");
   read_input(mes_var.read,"input_file");
+  
+  if(glb_var.rlxd_state[0]=='\0')
+  {
+  	/*load saved state*/
+	lprintf("MAIN",0,"Loading rlxd state from file %s\n",glb_var.rlxd_state);
+	read_ranlxd_state(glb_var.rlxd_state);
+  }
+  else
+  {
   lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed+PID);
   rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
-
+  }
+  
   /* setup communication geometry */
   if (geometry_init() == 1) {
     finalize_process();
@@ -185,7 +194,10 @@ int main(int argc,char *argv[])
   init_mc(&flow, "input_file");
   lprintf("MAIN",0,"MVM during RHMC initialzation: %ld\n",getMVM());
   lprintf("MAIN",0,"Initial plaquette: %1.8e\n",avr_plaquette());
-
+#ifdef SCHRODINGER_FUNCTIONAL
+  lprintf("MAIN",0,"Initial SF_test_gauge_bcs: %1.8e\n",sf_test_gauge_bcs());
+  lprintf("MAIN",0,"Initial S_F_action: %1.8e\n",sf_action((&flow)->rhmc_v->rhmc_p.beta));
+#endif
   mass=flow.rhmc_v->rhmc_p.mass;
 
   rc=acc=0;
@@ -209,9 +221,17 @@ int main(int argc,char *argv[])
       save_conf(&flow, i);
     }
 
+#ifdef SCHRODINGER_FUNCTIONAL
+    lprintf("MAIN",0,"SF action: %1.8e\n",sf_action((&flow)->rhmc_v->rhmc_p.beta));
+#endif
+
     if((i%flow.meas_freq)==0) {
       /* plaquette */
       lprintf("MAIN",0,"Plaquette: %1.8e\n",avr_plaquette());
+#ifdef SCHRODINGER_FUNCTIONAL
+      lprintf("MAIN",0,"SF_test_gauge_bcs: %1.8e\n",sf_test_gauge_bcs());
+      lprintf("MAIN",0,"PCAC mass: %1.8e\n",sf_PCAC_wall_mass((&flow)->rhmc_v->rhmc_p.mass));
+#endif
       /* Mesons */
       if (mes_var.domes) {
         int nn;
@@ -226,6 +246,9 @@ int main(int argc,char *argv[])
     save_conf(&flow, i);
   }
   
+  lprintf("MAIN",0,"Saving rlxd state to file %s\n",glb_var.rlxd_state);
+  write_ranlxd_state(glb_var.rlxd_state);
+
   /* finalize Monte Carlo */
   end_mc();
 
