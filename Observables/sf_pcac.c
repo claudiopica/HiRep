@@ -11,7 +11,7 @@
 #include "error.h"
 #include "geometry.h"
 #include "spinor_field.h"
-#include <malloc.h>
+#include <stdlib.h>
 #include <math.h>
 #include <assert.h>
 #include "logger.h"
