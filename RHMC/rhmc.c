@@ -145,7 +145,7 @@ int main(int argc,char *argv[])
   read_cmdline(argc,argv);
 
   /* logger setup */
-  logger_setlevel(0,10);
+  logger_setlevel(0,50);
   /* disable logger for MPI processes != 0 */
   if (PID!=0) { logger_disable(); }
 
@@ -161,7 +161,7 @@ int main(int argc,char *argv[])
   read_input(glb_var.read,"input_file");
   read_input(mes_var.read,"input_file");
   
-  if(glb_var.rlxd_state[0]=='\0')
+  if(glb_var.rlxd_state[0]!='\0')
   {
   	/*load saved state*/
 	lprintf("MAIN",0,"Loading rlxd state from file %s\n",glb_var.rlxd_state);
