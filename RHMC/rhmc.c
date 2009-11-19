@@ -245,10 +245,13 @@ int main(int argc,char *argv[])
   if(((--i)%flow.save_freq)!=0) {
     save_conf(&flow, i);
   }
-  
-  lprintf("MAIN",0,"Saving rlxd state to file %s\n",glb_var.rlxd_state);
-  write_ranlxd_state(glb_var.rlxd_state);
 
+ /* Only save state if we have a file to save to */
+  if(glb_var.rlxd_state[0]!='\0') {
+      lprintf("MAIN",0,"Saving rlxd state to file %s\n",glb_var.rlxd_state);
+      write_ranlxd_state(glb_var.rlxd_state);
+  }
+  
   /* finalize Monte Carlo */
   end_mc();
 
