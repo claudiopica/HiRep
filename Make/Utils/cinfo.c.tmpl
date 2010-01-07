@@ -2,20 +2,20 @@
 
 void print_compiling_info() {
   printf("MkFlags\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
-  printf(mkflags);
+  printf("%s",CI_mkflags);
   printf("\n\n");
   printf("svn info\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
-  printf(svninfo);
+  printf("%s",CI_svninfo);
   printf("\n\n");
   printf("svn st -q\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
-  printf(svnstatus);
+  printf("%s",CI_svnstatus);
   printf("\n\n");
   printf("/proc/cpuinfo\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
-  printf(cpuinfo);
+  printf("%s",CI_cpuinfo);
   printf("\n\n");
   printf("/proc/version\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
-  printf(linux);
+  printf("%s",CI_linux);
   printf("\n\n");
   printf("gcc -v\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
-  printf(gcc);
+  printf("%s",CI_gcc);
 }

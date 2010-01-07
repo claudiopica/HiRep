@@ -46,19 +46,19 @@ void swapendian64(void* ptr) {
   memcpy(ptr,&x,64/CHAR_BIT);
 }
 
-enum { _BIG_ENDIAN, _LITTLE_ENDIAN };
+enum { _BIG_ENDIAN_HRP, _LITTLE_ENDIAN_HRP };
 
 static int which_endian() {
   uint16_t one=1;
   char c=*((char*)(&one));
   if(c==0) lprintf("IO",100,"Big Endian on machine.\n");
   else lprintf("IO",100,"Little Endian on machine.\n");
-  return (c==0)?_BIG_ENDIAN:_LITTLE_ENDIAN;
+  return (c==0)?_BIG_ENDIAN_HRP:_LITTLE_ENDIAN_HRP;
 }
 
 int fwrite_BE_int(int* ptr, size_t n, FILE* fp) {
   int ret;
-  if(which_endian()==_BIG_ENDIAN) {
+  if(which_endian()==_BIG_ENDIAN_HRP) {
     ret=fwrite(ptr,sizeof(int),n,fp);
     lprintf("IO",100,"Written %d integers.\n",n);
   } else {
@@ -80,7 +80,7 @@ int fwrite_BE_int(int* ptr, size_t n, FILE* fp) {
 
 int fwrite_LE_int(int* ptr, size_t n, FILE* fp) {
   int ret;
-  if(which_endian()==_LITTLE_ENDIAN) {
+  if(which_endian()==_LITTLE_ENDIAN_HRP) {
     ret=fwrite(ptr,sizeof(int),n,fp);
     lprintf("IO",100,"Written %d integers.\n",n);
   } else {
@@ -102,7 +102,7 @@ int fwrite_LE_int(int* ptr, size_t n, FILE* fp) {
 
 int fwrite_BE_double(double* ptr, size_t n, FILE* fp) {
   int ret;
-  if(which_endian()==_BIG_ENDIAN) {
+  if(which_endian()==_BIG_ENDIAN_HRP) {
     ret=fwrite(ptr,sizeof(double),n,fp);
     lprintf("IO",100,"Written %d doubles.\n",n);
   } else {
@@ -124,7 +124,7 @@ int fwrite_BE_double(double* ptr, size_t n, FILE* fp) {
 
 int fwrite_LE_double(double* ptr, size_t n, FILE* fp) {
   int ret;
-  if(which_endian()==_LITTLE_ENDIAN) {
+  if(which_endian()==_LITTLE_ENDIAN_HRP) {
     ret=fwrite(ptr,sizeof(double),n,fp);
     lprintf("IO",100,"Written %d doubles.\n",n);
   } else {
@@ -146,7 +146,7 @@ int fwrite_LE_double(double* ptr, size_t n, FILE* fp) {
 
 int fread_BE_int(int* ptr, size_t n, FILE* fp) {
   int ret;
-  if(which_endian()==_BIG_ENDIAN) {
+  if(which_endian()==_BIG_ENDIAN_HRP) {
     ret=fread(ptr,sizeof(int),n,fp);
     lprintf("IO",100,"Read %d integers.\n",n);
   } else {
@@ -165,7 +165,7 @@ int fread_BE_int(int* ptr, size_t n, FILE* fp) {
 
 int fread_LE_int(int* ptr, size_t n, FILE* fp) {
   int ret;
-  if(which_endian()==_LITTLE_ENDIAN) {
+  if(which_endian()==_LITTLE_ENDIAN_HRP) {
     ret=fread(ptr,sizeof(int),n,fp);
     lprintf("IO",100,"Read %d integers.\n",n);
   } else {
@@ -184,7 +184,7 @@ int fread_LE_int(int* ptr, size_t n, FILE* fp) {
 
 int fread_BE_double(double* ptr, size_t n, FILE* fp) {
   int ret;
-  if(which_endian()==_BIG_ENDIAN) {
+  if(which_endian()==_BIG_ENDIAN_HRP) {
     ret=fread(ptr,sizeof(double),n,fp);
     lprintf("IO",100,"Read %d doubles.\n",n);
   } else {
@@ -203,7 +203,7 @@ int fread_BE_double(double* ptr, size_t n, FILE* fp) {
 
 int fread_LE_double(double* ptr, size_t n, FILE* fp) {
   int ret;
-  if(which_endian()==_LITTLE_ENDIAN) {
+  if(which_endian()==_LITTLE_ENDIAN_HRP) {
     ret=fread(ptr,sizeof(double),n,fp);
     lprintf("IO",100,"Read %d doubles.\n",n);
   } else {
