@@ -29,7 +29,7 @@
 #include "logger.h"
 
 #include "cinfo.c"
-
+#include <time.h>
 
 
 /* Mesons parameters */
@@ -104,6 +104,7 @@ int parse_cnfg_filename(char* filename, filename_t* fn) {
   hm=sscanf(basename,"%*[^_]_%dx%dx%dx%d%*[Nn]c%dr" repr_name "%*[Nn]f%db%lfm%lfn%d",
       &(fn->t),&(fn->x),&(fn->y),&(fn->z),&(fn->nc),&(fn->nf),&(fn->b),&(fn->m),&(fn->n));
   if(hm==9) {
+    fn->m=-fn->m; /* invert sign of mass */
     fn->type=DYNAMICAL_CNFG;
     return DYNAMICAL_CNFG;
   }
@@ -200,7 +201,7 @@ int main(int argc,char *argv[]) {
   /* disable logger for MPI processes != 0 */
   if (PID!=0) { logger_disable(); }
   if (PID==0) { sprintf(tmp,">%s",output_filename); logger_stdout(tmp); }
-  logger_setlevel(0,0); /*0,30*/
+  logger_setlevel(0,40);
   sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
 
   lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS); 
@@ -300,6 +301,9 @@ int main(int argc,char *argv[]) {
   }
 
   i=0;
+
+  unsigned long start_time = clock();
+
   while(1) {
 
     if(list!=NULL)
@@ -322,6 +326,22 @@ int main(int argc,char *argv[]) {
 
       lprintf("MAIN",0,"conf #%d mass=%2.6f \n",i,ata_qprop_var.pars.mass[k]);
 
+
+/*******************************************************************************
+* disc = +/- tr Gamma D^{-1}(0,0)
+* 
+* (we are not sure about the sign, but it doesn't matter when you square it)
+*
+* haircorr[t] = 
+*       1
+*      ---  sum    tr [GammaBar D^{-1}(0,0)] tr [Gamma D^{-1}(t,x,y,z;t,x,y,z)]
+*       V3  x,y,z
+*
+* GammaBar = g0 Gamma^dag g0
+*
+*******************************************************************************/
+
+
 #define HAIRPIN(name) \
       for(n=0;n<GLB_T;++n) {\
               name##_trace_H(ctmp[0]+n, ata_qprop[0][k]+16*n);\
@@ -334,6 +354,8 @@ int main(int argc,char *argv[]) {
               for(n=0;n<GLB_T;++n)\
                       haircorr[dt] += ctmp[0][n].re*ctmp[1][safe_mod(n+dt,GLB_T)].re/GLB_T;\
       }\
+      for(dt=0;dt<GLB_T;++dt) \
+        haircorr[dt] *= _BAR_SIGN_; \
       lprintf("MAIN",0,"\n");\
       lprintf("MAIN",0,"conf #%d mass=%2.6f HAIRPIN " #name "= ",i,ata_qprop_var.pars.mass[k]);\
       for(n=0;n<GLB_T;++n) {\
@@ -341,31 +363,79 @@ int main(int argc,char *argv[]) {
       }\
       lprintf("MAIN",0,"\n");\
       lprintf("MAIN",0,"conf #%d mass=%2.6f SINGLETRACE " #name "= %e\n",i,ata_qprop_var.pars.mass[k],disc);\
-      disc=0.;\
-      for(dt=0;dt<GLB_T;++dt) {\
-              disc += ctmp[2][dt].re/GLB_T;\
-              haircorr[dt]=0.;\
-              for(n=0;n<GLB_T;++n)\
-                      haircorr[dt] += ctmp[2][n].re*ctmp[2][safe_mod(n+dt,GLB_T)].re/GLB_T;\
-      }\
       fflush(stdout)
 
+/*      disc=0.;\*/
+/*      for(dt=0;dt<GLB_T;++dt) {\*/
+/*              disc += ctmp[2][dt].re/GLB_T;\*/
+/*              haircorr[dt]=0.;\*/
+/*              for(n=0;n<GLB_T;++n)\*/
+/*                      haircorr[dt] += ctmp[2][n].re*ctmp[2][safe_mod(n+dt,GLB_T)].re/GLB_T;\*/
+/*      }\*/
+
+      #define _BAR_SIGN_ 1
       HAIRPIN(id);
+      #undef _BAR_SIGN_
+
+      #define _BAR_SIGN_ -1
       HAIRPIN(g5);
+      #undef _BAR_SIGN_
+
+      #define _BAR_SIGN_ 1
       HAIRPIN(g0);
+      #undef _BAR_SIGN_
+
+      #define _BAR_SIGN_ 1
       HAIRPIN(g0g5);
+      #undef _BAR_SIGN_
+
+      #define _BAR_SIGN_ -1
       HAIRPIN(g1);
+      #undef _BAR_SIGN_
+
+      #define _BAR_SIGN_ -1
       HAIRPIN(g2);
+      #undef _BAR_SIGN_
+
+      #define _BAR_SIGN_ -1
       HAIRPIN(g3);
+      #undef _BAR_SIGN_
+
+      #define _BAR_SIGN_ 1
       HAIRPIN(g0g1);
+      #undef _BAR_SIGN_
+
+      #define _BAR_SIGN_ 1
       HAIRPIN(g0g2);
+      #undef _BAR_SIGN_
+
+      #define _BAR_SIGN_ 1
       HAIRPIN(g0g3);
+      #undef _BAR_SIGN_
+
+      #define _BAR_SIGN_ -1
       HAIRPIN(g5g1);
+      #undef _BAR_SIGN_
+
+      #define _BAR_SIGN_ -1
       HAIRPIN(g5g2);
+      #undef _BAR_SIGN_
+
+      #define _BAR_SIGN_ -1
       HAIRPIN(g5g3);
+      #undef _BAR_SIGN_
+
+      #define _BAR_SIGN_ -1
       HAIRPIN(g0g5g1);
+      #undef _BAR_SIGN_
+
+      #define _BAR_SIGN_ -1
       HAIRPIN(g0g5g2);
+      #undef _BAR_SIGN_
+
+      #define _BAR_SIGN_ -1
       HAIRPIN(g0g5g3);
+      #undef _BAR_SIGN_
 
     }
 
@@ -394,6 +464,9 @@ int main(int argc,char *argv[]) {
   free_gfield_f(u_gauge_f);
 #endif
 
+  lprintf("MAIN",0,"Execution time    = %f hours\n", (clock()-start_time)*1.0/CLOCKS_PER_SEC/3600);
+  lprintf("MAIN",0,"Average time/cnfg = %f hours\n", (clock()-start_time)*1.0/CLOCKS_PER_SEC/3600/i);
+
+
   return 0;
 }
-
