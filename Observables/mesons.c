@@ -1,7 +1,8 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
+* Copyright (c) 2008, Agostino Patella, Claudio Pica                        *   
 * All rights reserved.                                                      * 
 \***************************************************************************/
+
 
 #include "global.h"
 #include "linear_algebra.h"
@@ -29,6 +30,19 @@
 		_vector_prod_im_f(_ptmp,_spinor_c_(r,_C3_),(s).c[3]); (k)+=(_S3_)*_ptmp; \
 	} while(0)
 
+
+
+/***************************************************************************\
+
+qp[_INDEX_(i,a)] is supposed to be \psi^{i,a}=(g5 D)^{-1}\eta^{i,a} where
+\eta^{i,a} is a point source:
+\eta^{i,a}_{j,b}(t,x) = \delta_{ij} \delta_{ab} \delta_{t,t0} \delta_{x,x0}
+
+out[t] = 1/L^3 \sum_x \sum_{a,b,i}
+         \psi^{a,i}(x,t0+t)^\dag g5 \bar{\Gamma} \psi^{b,i}(x,t0+t)
+         (g5 \Gamma)_{ba}
+
+\***************************************************************************/
 
 #define MESON_DEFINITION(name) \
 void name##_correlator(double *out, int t0, spinor_field *qp) { \
@@ -64,6 +78,20 @@ void name##_correlator(double *out, int t0, spinor_field *qp) { \
 }
 
 
+/***************************************************************************\
+
+qp[_INDEX_(i,a)] is supposed to be \psi^{i,a}=(g5 D)^{-1}\eta^{i,a} where
+\eta^{i,a} is a point source:
+\eta^{i,a}_{j,b}(t,x) = \delta_{ij} \delta_{ab} \delta_{t,t0} \delta_{x,x0}
+
+out[t] = Re{
+         1/L^3 \sum_x \sum_{a,b,i}
+         \psi^{a,i}(x,t0+t)^\dag g5 \bar{\Gamma}_1 \psi^{b,i}(x,t0+t)
+         (g5 \Gamma_2)_{ba}
+         }
+
+\***************************************************************************/
+
 #define MESON_DEFINITION_TWO_RE(name) \
 void name##_re_correlator(double *out, int t0, spinor_field *qp) { \
   int t,x,y,z, i; \
@@ -97,6 +125,20 @@ void name##_re_correlator(double *out, int t0, spinor_field *qp) { \
   global_sum(out,GLB_T); \
 }
 
+
+/***************************************************************************\
+
+qp[_INDEX_(i,a)] is supposed to be \psi^{i,a}=(g5 D)^{-1}\eta^{i,a} where
+\eta^{i,a} is a point source:
+\eta^{i,a}_{j,b}(t,x) = \delta_{ij} \delta_{ab} \delta_{t,t0} \delta_{x,x0}
+
+out[t] = Im{
+         1/L^3 \sum_x \sum_{a,b,i}
+         \psi^{a,i}(x,t0+t)^\dag g5 \bar{\Gamma}_1 \psi^{b,i}(x,t0+t)
+         (g5 \Gamma_2)_{ba}
+         }
+
+\***************************************************************************/
 
 #define MESON_DEFINITION_TWO_IM(name) \
 void name##_im_correlator(double *out, int t0, spinor_field *qp) { \
@@ -132,6 +174,14 @@ void name##_im_correlator(double *out, int t0, spinor_field *qp) { \
 }
 
 
+/***************************************************************************\
+
+Build the Gamma matrix (in Gamma[4][4]) from the MACROS, and compute the
+sign defined as
+g0 Gamma^\dag g0 = sign Gamma
+
+\***************************************************************************/
+
 #define SINGLE_TRACE_DEBUG(name) \
 void name##_debug(complex Gamma[4][4], int* sign) { \
   int i,j; \
@@ -161,6 +211,11 @@ void name##_debug(complex Gamma[4][4], int* sign) { \
 }
 
 
+/***************************************************************************\
+
+out = Re tr (g5 Gamma smat)
+
+\***************************************************************************/
 
 #define GAMMA_TRACE_RE_DEFINITION(name) \
 void name##_trace_H(complex* out, complex* smat) { \
@@ -175,6 +230,11 @@ void name##_trace_H(complex* out, complex* smat) { \
 }
 
 
+/***************************************************************************\
+
+out = Im tr (g5 Gamma smat)
+
+\***************************************************************************/
 
 #define GAMMA_TRACE_IM_DEFINITION(name) \
 void name##_trace_H(complex* out, complex* smat) { \
@@ -189,6 +249,11 @@ void name##_trace_H(complex* out, complex* smat) { \
 }
 
 
+/***************************************************************************\
+
+out = g5 Gamma^\dag in
+
+\***************************************************************************/
 
 #define GAMMA_G5GAMMADAG_RE_DEFINITION(name) \
 void name##_eval_g5GammaDag_times_spinor(suNf_spinor* out, suNf_spinor* in) { \
@@ -206,6 +271,12 @@ void name##_eval_g5GammaDag_times_spinor(suNf_spinor* out, suNf_spinor* in) { \
 }
 
 
+/***************************************************************************\
+
+out = i g5 Gamma^\dag in
+
+\***************************************************************************/
+
 #define GAMMA_G5GAMMADAG_IM_DEFINITION(name) \
 void name##_eval_g5GammaDag_times_spinor(suNf_spinor* out, suNf_spinor* in) { \
   int a; \
@@ -222,6 +293,27 @@ void name##_eval_g5GammaDag_times_spinor(suNf_spinor* out, suNf_spinor* in) { \
 }
 
 
+
+
+/***************************************************************************\
+
+Single Gamma matrix MACROS
+
+If Gamma has real elements then:
+  NAME = Gamma
+  _REAL_ = 1
+  - g0 Gamma^\dag g0 = _SIGN_ Gamma
+  (g5 Gamma)_{ab} = _Sa_ \delta_{_Ca_, b}
+  Gamma^\dag = _SIGN_DAG_ \Gamma
+
+If Gamma has imaginary elements then:
+  NAME = Gamma
+  _REAL_ = 0
+  g0 Gamma^\dag g0 = _SIGN_ Gamma
+  (g5 Gamma)_{ab} = i _Sa_ \delta_{_Ca_, b}
+  Gamma^\dag = _SIGN_DAG_ \Gamma
+
+\***************************************************************************/
 
 
 #define NAME id
