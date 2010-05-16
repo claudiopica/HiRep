@@ -27,6 +27,7 @@
 #include "memory.h"
 #include "communications.h"
 #include "observables.h"
+#include "utils.h"
 
 #include "cinfo.c"
 
@@ -145,7 +146,7 @@ int main(int argc,char *argv[])
   read_cmdline(argc,argv);
 
   /* logger setup */
-  logger_setlevel(0,50);
+    logger_setlevel(0,10);
   /* disable logger for MPI processes != 0 */
   if (PID!=0) { logger_disable(); }
 
@@ -204,8 +205,17 @@ int main(int argc,char *argv[])
   for(i=flow.start;i<flow.end;++i) {
     int rr;
     double perc;
+    struct timeval start, end, etime; //for trajectory timing
     lprintf("MAIN",0,"Trajectory #%d...\n",i);
+    
+    gettimeofday(&start,0);
+    
     rr=update_rhmc();
+
+    gettimeofday(&end,0);
+    timeval_subtract(&etime,&end,&start);
+    lprintf("MAIN",0,"Trajectory #%d: generated in [%ld sec %ld usec]\n",i,etime.tv_sec,etime.tv_usec);
+      
     if(rr<0) {
       lprintf("MAIN",0,"Error in updating the gauge field!!\n");
       return 1;
