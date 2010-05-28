@@ -514,7 +514,9 @@ int lprintf(char *name, int level, char *format, ...) {
 	*cur='\0';
 
 	ret=vfprintf(lastfd,&buf[0],args);
+#ifdef IO_FLUSH
 	fflush(lastfd);
+#endif
 
 	va_end(args);
 
