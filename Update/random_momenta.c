@@ -7,6 +7,7 @@
 #include "suN_repr_func.h"
 #include "random.h"
 #include "update.h"
+#include "utils.h"
 #include <math.h>
 
 void gaussian_momenta(suNg_av_field *momenta) {
@@ -27,8 +28,8 @@ void gaussian_momenta(suNg_av_field *momenta) {
     }
   }
   
-   #ifdef SCHRODINGER_FUNCTIONAL
-        SF_force_bcs(momenta);
-   #endif
+#if defined(BASIC_SF) || defined(ROTATED_SF)
+  SF_force_bcs(momenta);
+#endif /* BASIC_SF || ROTATED_SF */
 
 }

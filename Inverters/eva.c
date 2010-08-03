@@ -207,9 +207,9 @@ static double normalize(spinor_field *ps)
 
   spinor_field_mul_f(ps,1./r,ps);
 
-  #ifdef SCHRODINGER_FUNCTIONAL
+  #ifdef BASIC_SF
        SF_spinor_bcs(ps);
-  #endif
+  #endif /* BASIC_SF */
 
   return r;
 }

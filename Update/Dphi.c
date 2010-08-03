@@ -25,6 +25,11 @@
 #include "communications.h"
 #include "memory.h"
 
+#ifdef ROTATED_SF
+#include "update.h"
+extern rhmc_par _update_par; /* Update/update_rhmc.c */
+#endif /* ROTATED_SF */
+
 /*
  * the following variable is used to keep trace of
  * matrix-vector multiplication.
@@ -240,16 +245,22 @@ void Dphi_(spinor_field *out, spinor_field *in)
 void Dphi(double m0, spinor_field *out, spinor_field *in)
 {
    double rho;
-
+#ifdef ROTATED_SF
+   int ix,iy,iz,index;
+   suNf_spinor *r, *sp;
+   double SFrho;
+   suNf_spinor tmp;
+#endif /* ROTATED_SF */
+   
    error((in==NULL)||(out==NULL),1,"Dphi [Dphi.c]",
          "Attempt to access unallocated memory space");
    
    error(in==out,1,"Dphi [Dphi.c]",
          "Input and output fields must be different");
 
-   #ifdef SCHRODINGER_FUNCTIONAL
-        SF_spinor_bcs(in);
-   #endif
+#ifdef BASIC_SF
+   SF_spinor_bcs(out);
+#endif /* BASIC_SF */
 
 #ifdef CHECK_SPINOR_MATCHING
    error(out->type!=&glattice || in->type!=&glattice,1,"Dphi [Dphi.c]", "Spinors are not defined on all the lattice!");
@@ -259,16 +270,60 @@ void Dphi(double m0, spinor_field *out, spinor_field *in)
 
    rho=4.+m0;
    spinor_field_mul_add_assign_f(out,rho,in);
+   
+#ifdef ROTATED_SF
+   SFrho=3.*_update_par.SF_ds+_update_par.SF_zf-4.;
 
-   #ifdef SCHRODINGER_FUNCTIONAL
-        SF_spinor_bcs(out);
-   #endif
+	if(COORD[0] == 0) {
+		for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
+			index=ipt(1,ix,iy,iz);
+			r=_FIELD_AT(out,index);
+      sp=_FIELD_AT(in,index);
+			_spinor_mul_add_assign_f(*r,SFrho,*sp);
+			
+			_spinor_pminus_f(tmp,*sp);
+			_spinor_g5_assign_f(tmp);
+			if(_update_par.SF_sign==1) {
+				_spinor_i_add_assign_f(*r,tmp);
+			} else {
+				_spinor_i_sub_assign_f(*r,tmp);
+			}
+		}
+	}
+	if(COORD[0] == NP_T-1) {
+		for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
+			index=ipt(T-1,ix,iy,iz);
+			r=_FIELD_AT(out,index);
+      sp=_FIELD_AT(in,index);
+			_spinor_mul_add_assign_f(*r,SFrho,*sp);
+			
+			_spinor_pplus_f(tmp,*sp);
+			_spinor_g5_assign_f(tmp);
+			if(_update_par.SF_sign==1) {
+				_spinor_i_add_assign_f(*r,tmp);
+			} else {
+				_spinor_i_sub_assign_f(*r,tmp);
+			}
+		}
+	}
+#endif /* ROTATED_SF */
+
+
+#ifdef BASIC_SF
+   SF_spinor_bcs(out);
+#endif /* BASIC_SF */
 
 }
 
 void g5Dphi(double m0, spinor_field *out, spinor_field *in)
 {
    double rho;
+#ifdef ROTATED_SF
+   int ix,iy,iz,index;
+   suNf_spinor *r, *sp;
+   double SFrho;
+   suNf_spinor tmp;
+#endif /* ROTATED_SF */
 
    error((in==NULL)||(out==NULL),1,"g5Dphi [Dphi.c]",
          "Attempt to access unallocated memory space");
@@ -280,20 +335,57 @@ void g5Dphi(double m0, spinor_field *out, spinor_field *in)
    error(out->type!=&glattice || in->type!=&glattice,1,"g5Dphi [Dphi.c]", "Spinors are not defined on all the lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
-   #ifdef SCHRODINGER_FUNCTIONAL
-        SF_spinor_bcs(in);
-   #endif
+#ifdef BASIC_SF
+   SF_spinor_bcs(out);
+#endif /* BASIC_SF */
 
    Dphi_(out, in);
-   
-   rho=4.+m0;
 
+   rho=4.+m0;
    spinor_field_mul_add_assign_f(out,rho,in);
+   
+#ifdef ROTATED_SF
+   SFrho=3.*_update_par.SF_ds+_update_par.SF_zf-4.;
+
+	if(COORD[0] == 0) {
+		for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
+			index=ipt(1,ix,iy,iz);
+			r=_FIELD_AT(out,index);
+      sp=_FIELD_AT(in,index);
+			_spinor_mul_add_assign_f(*r,SFrho,*sp);
+			
+			_spinor_pminus_f(tmp,*sp);
+			_spinor_g5_assign_f(tmp);
+			if(_update_par.SF_sign==1) {
+				_spinor_i_add_assign_f(*r,tmp);
+			} else {
+				_spinor_i_sub_assign_f(*r,tmp);
+			}
+		}
+	}
+	if(COORD[0] == NP_T-1) {
+		for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
+			index=ipt(T-1,ix,iy,iz);
+			r=_FIELD_AT(out,index);
+      sp=_FIELD_AT(in,index);
+			_spinor_mul_add_assign_f(*r,SFrho,*sp);
+			
+			_spinor_pplus_f(tmp,*sp);
+			_spinor_g5_assign_f(tmp);
+			if(_update_par.SF_sign==1) {
+				_spinor_i_add_assign_f(*r,tmp);
+			} else {
+				_spinor_i_sub_assign_f(*r,tmp);
+			}
+		}
+	}
+#endif /* ROTATED_SF */
+
    spinor_field_g5_assign_f(out);
 
-   #ifdef SCHRODINGER_FUNCTIONAL
-        SF_spinor_bcs(out);
-   #endif
+#ifdef BASIC_SF
+   SF_spinor_bcs(out);
+#endif /* BASIC_SF */
 
 }
 
@@ -339,17 +431,17 @@ void Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
   error(out->type!=&glat_even || in->type!=&glat_even,1,"Dphi_eopre " __FILE__, "Spinors are not defined on even lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
-   #ifdef SCHRODINGER_FUNCTIONAL
-        SF_spinor_bcs(in);
-   #endif
+#ifdef BASIC_SF
+  SF_spinor_bcs(out);
+#endif /* BASIC_SF */
 
   /* alloc memory for temporary spinor field */
   if (init) { init_Dirac(); init=0; }
   
   Dphi_(otmp, in);
-   #ifdef SCHRODINGER_FUNCTIONAL
-        SF_spinor_bcs(otmp);
-   #endif
+#ifdef BASIC_SF
+  SF_spinor_bcs(out);
+#endif /* BASIC_SF */
   Dphi_(out, otmp);
   
   rho=4.0+m0;
@@ -357,9 +449,9 @@ void Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
   
   spinor_field_mul_add_assign_f(out,rho,in);
   spinor_field_minus_f(out,out);
-   #ifdef SCHRODINGER_FUNCTIONAL
-       	SF_spinor_bcs(out);
-   #endif
+#ifdef BASIC_SF
+  SF_spinor_bcs(out);
+#endif /* BASIC_SF */
 
 }
 
@@ -383,17 +475,17 @@ void Dphi_oepre(double m0, spinor_field *out, spinor_field *in)
   error(out->type!=&glat_odd || in->type!=&glat_odd,1,"Dphi_oepre " __FILE__, "Spinors are not defined on odd lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
-   #ifdef SCHRODINGER_FUNCTIONAL
-        SF_spinor_bcs(in);
-   #endif
+#ifdef BASIC_SF
+  SF_spinor_bcs(out);
+#endif /* BASIC_SF */
 
   /* alloc memory for temporary spinor field */
   if (init) { init_Dirac(); init=0; }
   
   Dphi_(etmp, in);
-   #ifdef SCHRODINGER_FUNCTIONAL
-        SF_spinor_bcs(etmp);
-   #endif
+#ifdef BASIC_SF
+  SF_spinor_bcs(out);
+#endif /* BASIC_SF */
   Dphi_(out, etmp);
   
   rho=4.0+m0;
@@ -402,9 +494,9 @@ void Dphi_oepre(double m0, spinor_field *out, spinor_field *in)
   spinor_field_mul_add_assign_f(out,rho,in);
   spinor_field_minus_f(out,out);
 
-   #ifdef SCHRODINGER_FUNCTIONAL
-       	SF_spinor_bcs(out);
-   #endif
+#ifdef BASIC_SF
+  SF_spinor_bcs(out);
+#endif /* BASIC_SF */
 
 }
 
@@ -424,17 +516,17 @@ void g5Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
   error(out->type!=&glat_even || in->type!=&glat_even,1,"g5Dphi_eopre " __FILE__, "Spinors are not defined on even lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
-   #ifdef SCHRODINGER_FUNCTIONAL
-        SF_spinor_bcs(in);
-   #endif
+#ifdef BASIC_SF
+  SF_spinor_bcs(out);
+#endif /* BASIC_SF */
 
   /* alloc memory for temporary spinor field */
   if (init) { init_Dirac(); init=0; }
   
   Dphi_(otmp, in);
-   #ifdef SCHRODINGER_FUNCTIONAL
-        SF_spinor_bcs(otmp);
-   #endif
+#ifdef BASIC_SF
+  SF_spinor_bcs(out);
+#endif /* BASIC_SF */
   Dphi_(out, otmp);
   
   rho=4.0+m0;
@@ -444,9 +536,9 @@ void g5Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
   spinor_field_minus_f(out,out);
   spinor_field_g5_assign_f(out);
 
-   #ifdef SCHRODINGER_FUNCTIONAL
-       	SF_spinor_bcs(out);
-   #endif
+#ifdef BASIC_SF
+  SF_spinor_bcs(out);
+#endif /* BASIC_SF */
   
 }
 
@@ -467,177 +559,5 @@ void g5Dphi_sq(double m0, spinor_field *out, spinor_field *in) {
   
   g5Dphi(m0, gtmp, in);
   g5Dphi(m0, out, gtmp);
-
-}
-
-void SF_spinor_bcs(spinor_field *sp)
-{
-	_DECLARE_INT_ITERATOR(i);
-	int ix, iy, iz;
-	suNf_spinor *sp_temp;
-	start_sf_sendrecv(sp);
-
-	if(COORD[0]==0)
-	{
-	_PIECE_FOR(sp->type,i)
-	{
-		_SITE_FOR(sp->type,i)
-		{
-		       	for (ix=0; ix<GLB_X/NP_X; ++ix)
-		        for (iy=0; iy<GLB_Y/NP_Y; ++iy)
-		        for (iz=0; iz<GLB_Z/NP_Z; ++iz)
-		        {
-			{
-			{
-			if (ipt(0,ix,iy,iz)==i||ipt(1,ix,iy,iz)==i)
-			{
-			sp_temp=_FIELD_AT(sp,i);
-	               	_vector_zero_f((*sp_temp).c[0]);
-	                _vector_zero_f((*sp_temp).c[1]);
-        	        _vector_zero_f((*sp_temp).c[2]);
-                	_vector_zero_f((*sp_temp).c[3]);
-			}
-			}
-			}
-			}
-		}
-		if(_PIECE_INDEX(i)==0)
-		{
-			complete_sf_sendrecv(sp);
-		}
-	}
-	}
-
-	if(COORD[0]==NP_T-1)
-	{
-	_PIECE_FOR(sp->type,i)
-	{
-		_SITE_FOR(sp->type,i)
-		{
-		       	for (ix=0; ix<GLB_X/NP_X; ++ix)
-		        for (iy=0; iy<GLB_Y/NP_Y; ++iy)
-		        for (iz=0; iz<GLB_Z/NP_Z; ++iz)
-		        {
-			{
-			{
-			if (ipt((GLB_T/NP_T)-1,ix,iy,iz)==i)
-			{
-			sp_temp=_FIELD_AT(sp,i);
-	               	_vector_zero_f((*sp_temp).c[0]);
-	                _vector_zero_f((*sp_temp).c[1]);
-        	        _vector_zero_f((*sp_temp).c[2]);
-                	_vector_zero_f((*sp_temp).c[3]);
-			}
-			}
-			}
-			}
-		}
-		if(_PIECE_INDEX(i)==0)
-		{
-			complete_sf_sendrecv(sp);
-		}
-	}
-	}
-
-}
-
-double SF_test_spinor_bcs(spinor_field *sp)
-{
-	_DECLARE_INT_ITERATOR(i);
-	int ix, iy, iz;
-	double temp = 0;
-	double total = 0;
-	suNf_spinor *sp_temp;
-	start_sf_sendrecv(sp);
-
-	if(COORD[0]==0)
-	{
-	_PIECE_FOR(sp->type,i)
-	{
-		_SITE_FOR(sp->type,i)
-		{
-		       	for (ix=0; ix<GLB_X/NP_X; ++ix)
-		        for (iy=0; iy<GLB_Y/NP_Y; ++iy)
-		        for (iz=0; iz<GLB_Z/NP_Z; ++iz)
-		        {
-			{
-			{
-			if (ipt(0,ix,iy,iz)==i||ipt(1,ix,iy,iz)==i)
-			{
-			sp_temp=_FIELD_AT(sp,i);
-		_vector_prod_re_f(temp,(*sp_temp).c[0],(*sp_temp).c[0]);
-		total+=temp;
-		_vector_prod_re_f(temp,(*sp_temp).c[1],(*sp_temp).c[1]);
-		total+=temp;
-		_vector_prod_re_f(temp,(*sp_temp).c[2],(*sp_temp).c[2]);
-		total+=temp;
-		_vector_prod_re_f(temp,(*sp_temp).c[3],(*sp_temp).c[3]);
-		total+=temp;
-
-		_vector_prod_im_f(temp,(*sp_temp).c[0],(*sp_temp).c[0]);
-		total+=temp;
-		_vector_prod_im_f(temp,(*sp_temp).c[1],(*sp_temp).c[1]);
-		total+=temp;
-		_vector_prod_im_f(temp,(*sp_temp).c[2],(*sp_temp).c[2]);
-		total+=temp;
-		_vector_prod_im_f(temp,(*sp_temp).c[3],(*sp_temp).c[3]);
-		total+=temp;
-			}
-			}
-			}
-			}
-		}
-		if(_PIECE_INDEX(i)==0)
-		{
-			complete_sf_sendrecv(sp);
-		}
-	}
-	}
-
-	if(COORD[0]==NP_T-1)
-	{
-	_PIECE_FOR(sp->type,i)
-	{
-		_SITE_FOR(sp->type,i)
-		{
-		       	for (ix=0; ix<GLB_X/NP_X; ++ix)
-		        for (iy=0; iy<GLB_Y/NP_Y; ++iy)
-		        for (iz=0; iz<GLB_Z/NP_Z; ++iz)
-		        {
-			{
-			{
-			if (ipt((GLB_T/NP_T)-1,ix,iy,iz)==i)
-			{
-			sp_temp=_FIELD_AT(sp,i);
-		_vector_prod_re_f(temp,(*sp_temp).c[0],(*sp_temp).c[0]);
-		total+=temp;
-		_vector_prod_re_f(temp,(*sp_temp).c[1],(*sp_temp).c[1]);
-		total+=temp;
-		_vector_prod_re_f(temp,(*sp_temp).c[2],(*sp_temp).c[2]);
-		total+=temp;
-		_vector_prod_re_f(temp,(*sp_temp).c[3],(*sp_temp).c[3]);
-		total+=temp;
-
-		_vector_prod_im_f(temp,(*sp_temp).c[0],(*sp_temp).c[0]);
-		total+=temp;
-		_vector_prod_im_f(temp,(*sp_temp).c[1],(*sp_temp).c[1]);
-		total+=temp;
-		_vector_prod_im_f(temp,(*sp_temp).c[2],(*sp_temp).c[2]);
-		total+=temp;
-		_vector_prod_im_f(temp,(*sp_temp).c[3],(*sp_temp).c[3]);
-		total+=temp;
-			}
-			}
-			}
-			}
-		}
-		if(_PIECE_INDEX(i)==0)
-		{
-			complete_sf_sendrecv(sp);
-		}
-	}
-	}
-
-	return total;
 
 }

@@ -31,6 +31,16 @@
 
 #include "cinfo.c"
 
+
+#if defined(ROTATED_SF) && defined(REPR_FUNDAMENTAL)
+#error ROTATED_SF CAN BE PROBLEMATIC WITH THE FUNDAMENTAL REPRESENTATION
+#endif
+
+#if defined(ROTATED_SF) && defined(UPDATE_EO)
+#error ROTATED_SF DOES NOT WORK WITH E/O PRECONDITIONING
+#endif
+
+
 /* Mesons parameters */
 typedef struct _input_mesons {
   int domes;
@@ -195,10 +205,11 @@ int main(int argc,char *argv[])
   init_mc(&flow, "input_file");
   lprintf("MAIN",0,"MVM during RHMC initialzation: %ld\n",getMVM());
   lprintf("MAIN",0,"Initial plaquette: %1.8e\n",avr_plaquette());
-#ifdef SCHRODINGER_FUNCTIONAL
+#ifdef BASIC_SF
   lprintf("MAIN",0,"Initial SF_test_gauge_bcs: %1.8e\n",sf_test_gauge_bcs());
   lprintf("MAIN",0,"Initial S_F_action: %1.8e\n",sf_action((&flow)->rhmc_v->rhmc_p.beta));
-#endif
+#endif /* BASIC_SF */
+
   mass=flow.rhmc_v->rhmc_p.mass;
 
   rc=acc=0;
@@ -231,17 +242,18 @@ int main(int argc,char *argv[])
       save_conf(&flow, i);
     }
 
-#ifdef SCHRODINGER_FUNCTIONAL
+#ifdef BASIC_SF
     lprintf("MAIN",0,"SF action: %1.8e\n",sf_action((&flow)->rhmc_v->rhmc_p.beta));
-#endif
+#endif /* BASIC_SF */
 
     if((i%flow.meas_freq)==0) {
       /* plaquette */
       lprintf("MAIN",0,"Plaquette: %1.8e\n",avr_plaquette());
-#ifdef SCHRODINGER_FUNCTIONAL
+#ifdef BASIC_SF
       lprintf("MAIN",0,"SF_test_gauge_bcs: %1.8e\n",sf_test_gauge_bcs());
       lprintf("MAIN",0,"PCAC mass: %1.8e\n",sf_PCAC_wall_mass((&flow)->rhmc_v->rhmc_p.mass));
-#endif
+#endif /* BASIC_SF */
+
       /* Mesons */
       if (mes_var.domes) {
         int nn;

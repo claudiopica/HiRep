@@ -20,8 +20,22 @@
 #include "geometry.h"
 
 void ExpX(double dt, suNg_algebra_vector *h, suNg *u);
+
 void apply_bc();
 void apply_bc_flt();
+
+#ifdef BASIC_SF
+void SF_spinor_bcs(spinor_field *sp);
+double SF_test_spinor_bcs(spinor_field *sp);
+#endif /* BASIC_SF */
+
+void SF_gauge_bcs(suNg_field *gf, int strength);
+
+#if defined(BASIC_SF) || defined(ROTATED_SF)
+void SF_force_bcs(suNg_av_field *force);
+double SF_test_force_bcs(suNg_av_field *force);
+#endif /* BASIC_SF || ROTATED_SF */
+
 
 void cross_prod(suNg_vector *v1,suNg_vector *v2,suNg_vector *v3);
 void cross_prod_flt(suNg_vector_flt *v1,suNg_vector_flt *v2,suNg_vector_flt *v3);

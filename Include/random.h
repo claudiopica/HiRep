@@ -29,7 +29,6 @@ void random_suNg(suNg *u);
 
 void random_u(suNg_field *gf);
 void unit_u(suNg_field *gf);
-void SF_gauge_bcs(suNg_field *gf, int strength);
 
 void ranz2(double r[],int n);
 

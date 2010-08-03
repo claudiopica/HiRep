@@ -232,9 +232,9 @@ void Force_rhmc_f(double dt, suNg_av_field *force){
       forcestat[1]*=dt*r_MD.a[n+1]*(_REPR_NORM2/_FUND_NORM2);
       lprintf("FORCE_RHMC",50,"[%d] avr |force| = %1.8e maxforce = %1.8e a = %1.8e b = %1.8e\n",n,forcestat[0],forcestat[1],r_MD.a[n+1],r_MD.b[n]);
       
-   #ifdef SCHRODINGER_FUNCTIONAL
+#if defined(BASIC_SF) || defined(ROTATED_SF)
        	SF_force_bcs(force);
-   #endif
+#endif /* BASIC_SF || ROTATED_SF*/
 
     }  
   }

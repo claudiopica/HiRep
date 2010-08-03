@@ -279,12 +279,16 @@ write_spinor_add();
 write_spinor_sub();
 write_spinor_add_assign();
 write_spinor_sub_assign();
+write_spinor_i_add_assign();
+write_spinor_i_sub_assign();
 write_spinor_prod_re();
 write_spinor_prod_im();
 write_spinor_prod_assign();
 write_spinor_g5_prod_re();
 write_spinor_g5_prod_im();
 write_spinor_project();
+write_spinor_pminus();
+write_spinor_pplus();
 
 # COMMENTATO
 
@@ -2294,6 +2298,24 @@ sub write_spinor_sub_assign {
   }
 }
 
+sub write_spinor_i_add_assign {
+  print "/*  r+=i*s (r,s spinors) */\n";
+  print "#define _spinor_i_add_assign_${suff}(r,s) \\\n";
+  for (my $k=0; $k<4; $k++){
+    print "  _vector_i_add_assign_${suff}((r).$cname\[$k\],(s).$cname\[$k\])";
+    if($k==3) {print"\n\n";} else {print "; \\\n"}
+  }
+}
+
+sub write_spinor_i_sub_assign {
+  print "/*  r-=i*s (r,s spinors) */\n";
+  print "#define _spinor_i_sub_assign_${suff}(r,s) \\\n";
+  for (my $k=0; $k<4; $k++){
+    print "  _vector_i_sub_assign_${suff}((r).$cname\[$k\],(s).$cname\[$k\])";
+    if($k==3) {print"\n\n";} else {print "; \\\n"}
+  }
+}
+
 sub write_spinor_prod_re {
   print "/* k=Real part of the scalar product r*s (r,s spinors) */\n";
   print "#define _spinor_prod_re_${suff}(k,r,s) \\\n";
@@ -2360,6 +2382,29 @@ sub write_spinor_project {
     print "  _vector_project_${suff}((r).$cname\[$k\],z,(s).$cname\[$k\])";
     if($k==3) {print"\n\n";} else {print "; \\\n"}
   }
+}
+
+
+sub write_spinor_pminus {
+  print "/* r=(1-g0)/2 * s (r,s spinors) */\n";
+  print "#define _spinor_pminus_${suff}(r,s) \\\n";
+  print "  _vector_add_${suff}((r).$cname\[0\],(s).$cname\[0\],(s).$cname\[2\]); \\\n";
+  print "  _vector_add_${suff}((r).$cname\[1\],(s).$cname\[1\],(s).$cname\[3\]); \\\n";
+  print "  _vector_mul_${suff}((r).$cname\[0\],0.5,(r).$cname\[0\]); \\\n";
+  print "  _vector_mul_${suff}((r).$cname\[1\],0.5,(r).$cname\[1\]); \\\n";
+  print "  (r).$cname\[2\] = (r).$cname\[0\]; \\\n";
+  print "  (r).$cname\[3\] = (r).$cname\[1\]\n\n";
+}
+
+sub write_spinor_pplus {
+  print "/* r=(1+g0)/2 * s (r,s spinors) */\n";
+  print "#define _spinor_pplus_${suff}(r,s) \\\n";
+  print "  _vector_sub_${suff}((r).$cname\[0\],(s).$cname\[0\],(s).$cname\[2\]); \\\n";
+  print "  _vector_sub_${suff}((r).$cname\[1\],(s).$cname\[1\],(s).$cname\[3\]); \\\n";
+  print "  _vector_mul_${suff}((r).$cname\[0\],0.5,(r).$cname\[0\]); \\\n";
+  print "  _vector_mul_${suff}((r).$cname\[1\],0.5,(r).$cname\[1\]); \\\n";
+  print "  _vector_mul_${suff}((r).$cname\[2\],-1.,(r).$cname\[0\]); \\\n";
+  print "  _vector_mul_${suff}((r).$cname\[3\],-1.,(r).$cname\[1\])\n\n";
 }
 
 

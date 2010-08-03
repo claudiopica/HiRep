@@ -7,9 +7,9 @@
 #define DIRAC_H
 
 #include "suN_types.h"
+#include "utils.h"
 
-void SF_spinor_bcs(spinor_field *sp);
-double SF_test_spinor_bcs(spinor_field *sp);
+
 void Dphi_(spinor_field *out, spinor_field *in);
 void Dphi(double m0, spinor_field *out, spinor_field *in);
 void g5Dphi(double m0, spinor_field *out, spinor_field *in);

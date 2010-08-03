@@ -22,8 +22,6 @@ void random_su2(double rho,double s[]);
 void Force0(double dt, suNg_av_field *force);
 void Force(double dt, suNg_av_field *force);
 
-void SF_force_bcs(suNg_av_field *force);
-double SF_test_force_bcs(suNg_av_field *force);
 
 typedef struct _int_par {
 	double tlen; /* trajectory lenght */
@@ -43,6 +41,10 @@ typedef struct _rhmc_par {
   double beta;
   int nf;
   double mass;
+  
+	double SF_zf;
+	double SF_ds;
+	int SF_sign;
 	
   double MT_prec; /* metropolis test precision */
   double MD_prec; /* molecular dynamics precision */

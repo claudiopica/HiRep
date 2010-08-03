@@ -11,6 +11,7 @@
 #include "representation.h"
 #include "update.h"
 #include "memory.h"
+#include "utils.h"
 
 #include <stdio.h>
 #include <string.h>

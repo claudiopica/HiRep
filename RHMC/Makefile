@@ -6,7 +6,7 @@ EXES = rhmc
 default: $(EXES)
 
 MODDIR := Geometry
-MODS := geometry_init geometry_mpi_eo test_geometry_mpi blocked eo_lexi lexi communications
+MODS := geometry_init geometry_mpi_eo test_geometry_mpi communications
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := IO
