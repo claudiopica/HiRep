@@ -16,14 +16,11 @@ extern rhmc_par _update_par; /* Update/update_rhmc.c */
 
 
 void apply_bc(){
-#if defined(ANTIPERIODIC_BC_X) || defined(ANTIPERIODIC_BC_Y) || defined(ANTIPERIODIC_BC_Z) || (defined(ANTIPERIODIC_BC_T) && !defined(ROTATED_SF) && !defined(BASIC_SF)) || defined(ROTATED_SF)
-	int index;
-	int ix,iy,iz;
-	suNf *u;
-#endif
-
 #if defined(ANTIPERIODIC_BC_T) && !defined(ROTATED_SF) && !defined(BASIC_SF)
 	if(COORD[0]==0) {
+		int index;
+		int ix,iy,iz;
+		suNf *u;
 		for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
 			index=ipt_ext(2*T_BORDER,ix,iy,iz);
 			if(index!=-1) {
@@ -35,6 +32,9 @@ void apply_bc(){
 #elif defined(ROTATED_SF)
 #warning SCRIVERE UN TEST PER VERIFICARE CHE QUESTO EE CONSISTENTE CON I BORDI
 	if(COORD[0] == 0) {
+		int index;
+		int ix,iy,iz;
+		suNf *u;
 		for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
 			index=ipt_ext(T_BORDER+1,ix,iy,iz);
 			if(index!=-1) {
@@ -54,6 +54,9 @@ void apply_bc(){
 		}
 	}
 	if(COORD[0] == NP_T-1) {
+		int index;
+		int ix,iy,iz;
+		suNf *u;
 		for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
 			index=ipt_ext(T+T_BORDER-1,ix,iy,iz);
 			if(index!=-1) {
@@ -76,6 +79,9 @@ void apply_bc(){
 
 #ifdef ANTIPERIODIC_BC_X
 	if(COORD[1]==0) {
+		int index;
+		int it,iy,iz;
+		suNf *u;
 		for (it=0;it<T_EXT;++it)
 		for (iy=0;iy<Y_EXT;++iy)
 		for (iz=0;iz<Z_EXT;++iz){
@@ -90,6 +96,9 @@ void apply_bc(){
 
 #ifdef ANTIPERIODIC_BC_Y
 	if(COORD[2]==0) {
+		int index;
+		int ix,it,iz;
+		suNf *u;
 		for (it=0;it<T_EXT;++it)
 		for (ix=0;ix<X_EXT;++ix)
 		for (iz=0;iz<Z_EXT;++iz){
@@ -104,6 +113,9 @@ void apply_bc(){
 
 #ifdef ANTIPERIODIC_BC_Z
 	if(COORD[3]==0) {
+		int index;
+		int ix,iy,it;
+		suNf *u;
 		for (it=0;it<T_EXT;++it)
 		for (ix=0;ix<X_EXT;++ix)
 		for (iy=0;iy<Y_EXT;++iy){
@@ -119,14 +131,11 @@ void apply_bc(){
 
 
 void apply_bc_flt(){
-#if defined(ANTIPERIODIC_BC_X) || defined(ANTIPERIODIC_BC_Y) || defined(ANTIPERIODIC_BC_Z) || (defined(ANTIPERIODIC_BC_T) && !defined(ROTATED_SF) && !defined(BASIC_SF)) || defined(ROTATED_SF)
-	int index;
-	int ix,iy,iz;
-	suNf_flt *u;
-#endif
-
 #if defined(ANTIPERIODIC_BC_T) && !defined(ROTATED_SF) && !defined(BASIC_SF)
 	if(COORD[0]==0) {
+		int index;
+		int ix,iy,iz;
+		suNf_flt *u;
 		for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
 			index=ipt_ext(2*T_BORDER,ix,iy,iz);
 			if(index!=-1) {
@@ -138,6 +147,9 @@ void apply_bc_flt(){
 #elif defined(ROTATED_SF)
 #warning SCRIVERE UN TEST PER VERIFICARE CHE QUESTO EE CONSISTENTE CON I BORDI
 	if(COORD[0] == 0) {
+		int index;
+		int ix,iy,iz;
+		suNf_flt *u;
 		for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
 			index=ipt_ext(T_BORDER+1,ix,iy,iz);
 			if(index!=-1) {
@@ -157,6 +169,9 @@ void apply_bc_flt(){
 		}
 	}
 	if(COORD[0] == NP_T-1) {
+		int index;
+		int ix,iy,iz;
+		suNf_flt *u;
 		for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
 			index=ipt_ext(T+T_BORDER-1,ix,iy,iz);
 			if(index!=-1) {
@@ -179,6 +194,9 @@ void apply_bc_flt(){
 
 #ifdef ANTIPERIODIC_BC_X
 	if(COORD[1]==0) {
+		int index;
+		int it,iy,iz;
+		suNf_flt *u;
 		for (it=0;it<T_EXT;++it) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
 			index=ipt_ext(it,2*X_BORDER,iy,iz);
 			if(index!=-1) {
@@ -191,6 +209,9 @@ void apply_bc_flt(){
 
 #ifdef ANTIPERIODIC_BC_Y
 	if(COORD[2]==0) {
+		int index;
+		int ix,it,iz;
+		suNf_flt *u;
 		for (it=0;it<T_EXT;++it) for (ix=0;ix<X_EXT;++ix) for (iz=0;iz<Z_EXT;++iz){
 			index=ipt_ext(it,ix,2*Y_BORDER,iz);
 			if(index!=-1) {
@@ -203,6 +224,9 @@ void apply_bc_flt(){
 
 #ifdef ANTIPERIODIC_BC_Z
 	if(COORD[3]==0) {
+		int index;
+		int ix,iy,it;
+		suNf_flt *u;
 		for (it=0;it<T_EXT;++it) for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy){
 			index=ipt_ext(it,ix,iy,2*Z_BORDER);
 			if(index!=-1) {
