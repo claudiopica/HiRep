@@ -18,9 +18,12 @@ void project_gauge_field(void);
 void update(double beta,int nhb,int nor);
 void random_su2(double rho,double s[]);
 
-
-void Force0(double dt, suNg_av_field *force);
-void Force(double dt, suNg_av_field *force);
+/* forces for the update */
+void Force(double dt, suNg_av_field *force); /* total force */
+void Force0(double dt, suNg_av_field *force); /* gauge forces */
+/* fermionic forces for RHMC/HMC */
+void Force_rhmc_f(double dt, suNg_av_field *force);
+/* SF forces */
 
 
 typedef struct _int_par {
@@ -57,6 +60,8 @@ typedef struct _rhmc_par {
 } rhmc_par;
 void init_rhmc(rhmc_par *par);
 void free_rhmc();
+void init_hmc(rhmc_par *par);
+void free_hmc();
 
 /* update the gauge field using RHMC algorithm
  * return code: (<0 means an error has occurred)
@@ -66,13 +71,16 @@ void free_rhmc();
  * -1 => rhmc has not been initialized. call init_rhmc first.
  */
 int update_rhmc();
-
+int update_hmc();
 int update_rhmc_o();
 
 /* this is the basic operator used in the update */
+/* defined in update_rhmc.c */
 void H2(spinor_field *out, spinor_field *in);
-void Force_rhmc_f(double dt, suNg_av_field *force);
+void H(spinor_field *out, spinor_field *in);
 
+
+/* local action */
 typedef enum {
    NEW=1,
    DELTA=2

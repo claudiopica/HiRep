@@ -101,13 +101,8 @@ void Force_rhmc_f(double dt, suNg_av_field *force){
 #endif
 
   /* allocate spinors */
-#ifdef UPDATE_EO
   chi = alloc_spinor_field_f(r_MD.order+1,&glattice);
   Hchi = chi+r_MD.order;
-#else
-  chi = alloc_spinor_field_f(r_MD.order+1,&glattice);
-  Hchi = chi+r_MD.order;
-#endif
 
   /* Compute (H^2-b[n])^-1 * pf */
   /* set up cg parameters */
@@ -127,6 +122,7 @@ void Force_rhmc_f(double dt, suNg_av_field *force){
 
   for (k=0; k<_update_par.n_pf; ++k) {
     /* compute inverse vectors chi[i] = (H^2 - b[i])^1 * pf */
+    if (inv_par.n==1) { spinor_field_zero_f(chi); }
     cg_mshift(&inv_par, &H2, &pf[k], chi);
 
     for (n=0; n<r_MD.order; ++n) {

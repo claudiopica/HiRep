@@ -178,10 +178,9 @@ void r_app_set(rational_app *app, double min, double max) {
        * 1) the approximation function must match ;
        * 2) the relative error must be less than the required rel_error;
        * 3) the approx interval must contain the required one.
-       * We are not considering the approximation interval.
        */
       if (best==0 || ((int)best[2])>bo) {
-	/* this is a better approx: either the first found or
+	/* this is a better approx: either the first approx found or
 	 * one with greater error (i.e. smaller order) but still 
 	 * the required precision
 	 */
@@ -191,7 +190,7 @@ void r_app_set(rational_app *app, double min, double max) {
     /* go to next approx */
     cur_app += 2*bo+7;
   }
-  /* if we cannot find a rational approx give an error! */
+  /* if we cannot find a rational approx give an error */
   error((best==0),1,"r_app_set",
         "Failed to find a suitable rational approximation.\nPlease adjust database and try again.\n");
 
@@ -227,7 +226,7 @@ void r_app_set(rational_app *app, double min, double max) {
 /*
  * computes: out = (a[0]*I + \sum_i a[i]*(Q-b[i])^-1 ) in
  * this MUST work in the case: out==in 
- * where Q is a linear operator acting on spinor in
+ * where Q is a linear operator acting on spinors
  * This implementation uses CG_mshift => Q must be hermitean and positive definite!
  */
 void rational_func(rational_app *coef, spinor_operator Q, spinor_field *out, spinor_field *in) {
@@ -254,6 +253,7 @@ void rational_func(rational_app *coef, spinor_operator Q, spinor_field *out, spi
   inv_par.max_iter=0; /* no limit */
    
   /* compute inverse vectors */
+  if (inv_par.n==1) { spinor_field_zero_f(inv_out); }
   cg_mshift(&inv_par, Q, in, inv_out);
 
   /* sum all the contributions */

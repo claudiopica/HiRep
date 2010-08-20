@@ -1,7 +1,7 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
-\***************************************************************************/
+ * Copyright (c) 2008, Claudio Pica                                          *   
+ * All rights reserved.                                                      * 
+ \***************************************************************************/
 
 #include "global.h"
 #include "suN.h"
@@ -39,34 +39,44 @@ static scalar_field *la=NULL; /* local action field for Metropolis test */
 /* this is the basic operator used in the update */
 void H2(spinor_field *out, spinor_field *in){
 #ifdef UPDATE_EO
-  g5Dphi_eopre_sq(_update_par.mass, out, in);
+    g5Dphi_eopre_sq(_update_par.mass, out, in);
 #else
-  g5Dphi_sq(_update_par.mass, out, in);
+    g5Dphi_sq(_update_par.mass, out, in);
 #endif
 }
 
-/*
-void H(suNf_spinor *out, suNf_spinor *in){
-  g5Dphi(_update_par.mass, out, in);
+void H(spinor_field *out, spinor_field *in){
+#ifdef UPDATE_EO
+    g5Dphi_eopre(_update_par.mass, out, in);
+#else
+    g5Dphi(_update_par.mass, out, in);
+#endif
 }
-*/
+
 
 static int gcd(int a, int b) {
-  while (b!=0){ int t=b; b=a%t; a=t; }
-  return a;
+    while (b!=0){ int t=b; b=a%t; a=t; }
+    return a;
 }
 
 static void reduce_fraction(int *a, int *b){
-  int f=gcd(abs(*a),abs(*b));
-  if (*b!=0 && f!=1){ *a/=f; *b/=f; }
+    int f=gcd(abs(*a),abs(*b));
+    if (*b!=0 && f!=1){ *a/=f; *b/=f; }
 }
 
 void init_rhmc(rhmc_par *par){
 
+	if (init) {
+        /* already initialized */
+        lprintf("RHMC",0,"WARNING: RHMC already initialized!\nWARNNG: Ignoring call to init_hmc.\n");
+		return;
+    }
+    
   lprintf("RHMC",0,"Initializing...\n");
   
-  /* fare test su input par e copiare in _update_par */
-  _update_par=*par;
+    /* copy input parameters into the internal variable and make some tests */
+    _update_par=*par;
+    /* no tests yet... */
   
   lprintf("RHMC",10,
 	  "Number of Flavors = %d\n"
@@ -103,241 +113,249 @@ void init_rhmc(rhmc_par *par){
 	  ,_update_par.MD_par->gsteps
 	  );
   
-  /* allocate space for the backup copy of gfield */
-  if(u_gauge_old==NULL) u_gauge_old=alloc_gfield(&glattice);
-  suNg_field_copy(u_gauge_old,u_gauge);
+    /* allocate space for the backup copy of gfield */
+    if(u_gauge_old==NULL) u_gauge_old=alloc_gfield(&glattice);
+    suNg_field_copy(u_gauge_old,u_gauge);
     
-  /* allocate momenta */
-  if(momenta==NULL) momenta = alloc_avfield(&glattice);
-  
-  /* allocate pseudofermions */
-  if(pf==NULL) {
-    pf=alloc_spinor_field_f(_update_par.n_pf,
+    /* allocate momenta */
+    if(momenta==NULL) momenta = alloc_avfield(&glattice);
+    
+    /* allocate pseudofermions */
+    if(pf==NULL) {
+        pf=alloc_spinor_field_f(_update_par.n_pf,
 #ifdef UPDATE_EO
-			    &glat_even /* even lattice for preconditioned dynamics */
+                                &glat_even /* even lattice for preconditioned dynamics */
 #else
-			    &glattice /* global lattice */
+                                &glattice /* global lattice */
 #endif 
-			    );
-  }
-  
-  /* allocate memory for the local action */
-  if(la==NULL) la=alloc_sfield(&glattice);
-  
-  /* represent gauge field and find min and max eigenvalue of H^2 */
-  represent_gauge_field();
-  find_spec_H2(&maxev,&minev, par->mass); /* find spectral interval of H^2 */
-  
-  /* set up rational approx needed for RHMC */
-  /* r_S = x^{-Nf/(4*NPf)} is used in the metropolis test */
-  r_S.order=1;
-  r_S.n=-_update_par.nf;
-  r_S.d=4*_update_par.n_pf; 
-  reduce_fraction(&r_S.n,&r_S.d);
-  r_S.rel_error=_update_par.MT_prec;
-  r_app_alloc(&r_S);
-  r_app_set(&r_S,minev,maxev);
-  /* r_D = x^{-Nf/(2*NPf)} is used in the molecula dynamics */
-  r_MD.order=1;
-  r_MD.n=-_update_par.nf;
-  r_MD.d=2*_update_par.n_pf; 
-  reduce_fraction(&r_MD.n,&r_MD.d);
-  r_MD.rel_error=_update_par.MD_prec;
-  r_app_alloc(&r_MD);
-  r_app_set(&r_MD,minev,maxev);
-  /* r_D = x^{+Nf/(4*NPf)} is used in the heat bath for pseudofermions */
-  r_HB.order=1;
-  r_HB.n=_update_par.nf;
-  r_HB.d=4*_update_par.n_pf; 
-  reduce_fraction(&r_HB.n,&r_HB.d);
-  r_HB.rel_error=_update_par.HB_prec;
-  r_app_alloc(&r_HB);
-  r_app_set(&r_HB,minev,maxev);
-  
-  init = 1;
-  
-  lprintf("RHMC",0,"Initialization done.\n");
-
+                                );
+    }
+    
+    /* allocate memory for the local action */
+    if(la==NULL) la=alloc_sfield(&glattice);
+    
+    /* represent gauge field and find min and max eigenvalue of H^2 */
+    represent_gauge_field();
+    find_spec_H2(&maxev,&minev, par->mass); /* find spectral interval of H^2 */
+    
+    /* set up rational approx needed for RHMC */
+    /* r_S = x^{-Nf/(4*NPf)} is used in the metropolis test */
+    r_S.order=1;
+    r_S.n=-_update_par.nf;
+    r_S.d=4*_update_par.n_pf; 
+    reduce_fraction(&r_S.n,&r_S.d);
+    r_S.rel_error=_update_par.MT_prec;
+    r_app_alloc(&r_S);
+    r_app_set(&r_S,minev,maxev);
+    /* r_D = x^{-Nf/(2*NPf)} is used in the molecula dynamics */
+    r_MD.order=1;
+    r_MD.n=-_update_par.nf;
+    r_MD.d=2*_update_par.n_pf; 
+    reduce_fraction(&r_MD.n,&r_MD.d);
+    r_MD.rel_error=_update_par.MD_prec;
+    r_app_alloc(&r_MD);
+    r_app_set(&r_MD,minev,maxev);
+    /* r_HB = x^{+Nf/(4*NPf)} is used in the heat bath for pseudofermions */
+    r_HB.order=1;
+    r_HB.n=_update_par.nf;
+    r_HB.d=4*_update_par.n_pf; 
+    reduce_fraction(&r_HB.n,&r_HB.d);
+    r_HB.rel_error=_update_par.HB_prec;
+    r_app_alloc(&r_HB);
+    r_app_set(&r_HB,minev,maxev);
+    
+    init = 1;
+    
+    lprintf("RHMC",0,"Initialization done.\n");
+    
 }
 
 void free_rhmc(){
-  /* free momenta */
-  if(u_gauge_old!=NULL) free_gfield(u_gauge_old); u_gauge_old=NULL;
-  if(momenta!=NULL) free_avfield(momenta); momenta=NULL;
-  if(pf!=NULL) free_spinor_field(pf); pf=NULL;
-  
-  if(la!=NULL) free_sfield(la); la=NULL;
-  
-  r_app_free(&r_S);
-  r_app_free(&r_MD);
-  r_app_free(&r_HB);
 
-  init = 0;
-  
-  lprintf("RHMC",0,"Memory deallocated.\n");
-
+    if (!init) {
+        /* not initialized */
+        lprintf("RHMC",0,"WARNING: RHMC not initialized!\nWARNNG: Ignoring call to free_rhmc.\n");
+		return;
+    }
+    
+    /* free momenta */
+    if(u_gauge_old!=NULL) free_gfield(u_gauge_old); u_gauge_old=NULL;
+    if(momenta!=NULL) free_avfield(momenta); momenta=NULL;
+    if(pf!=NULL) free_spinor_field(pf); pf=NULL;
+    
+    if(la!=NULL) free_sfield(la); la=NULL;
+    
+    r_app_free(&r_S);
+    r_app_free(&r_MD);
+    r_app_free(&r_HB);
+    
+    init = 0;
+    
+    lprintf("RHMC",0,"Memory deallocated.\n");
+    
 }
 
 int update_rhmc(){
-
-  double deltaH;
-  double oldmax,oldmin;
-  _DECLARE_INT_ITERATOR(i);
-
-  if(!init)
-    return -1;
-
-  /* generate new momenta and pseudofermions */
-  lprintf("RHMC",30,"Generating gaussian momenta and pseudofermions...\n");
-  gaussian_momenta(momenta);
-  for (i=0;i<_update_par.n_pf;++i)
-    gaussian_spinor_field(&pf[i]);
-
-  /* compute starting action */
-  lprintf("RHMC",30,"Computing action density...\n");
-  local_hmc_action(NEW, la, momenta, pf, pf);
-   
-  /* compute H2^{a/2}*pf */
-  lprintf("RHMC",30,"Correcting pseudofermions distribution...\n");
-  for (i=0;i<_update_par.n_pf;++i)
-    rational_func(&r_HB, &H2, &pf[i], &pf[i]);
-
-  /* integrate molecular dynamics */
-  lprintf("RHMC",30,"MD integration...\n");
-  _update_par.integrator(momenta,_update_par.MD_par);
-  /*leapfrog(momenta, _update_par.tlen, _update_par.nsteps);
-    O2MN_multistep(momenta, _update_par.tlen, _update_par.nsteps, 3);*/
-
-  /* project gauge field */
-  project_gauge_field();
-  represent_gauge_field();
-
-  /* test min and max eigenvalue of H2 and update approx if necessary */
-  /* now it just tests the approx !!! */
-  oldmax = maxev; /* save old max */
-  oldmin = minev; /* save old min */
-  find_spec_H2(&maxev,&minev, _update_par.mass); /* find spectral interval of H^2 */
-  r_app_set(&r_S,minev,maxev);
-  r_app_set(&r_MD,minev,maxev);
-  r_app_set(&r_HB,minev,maxev);
-
-  lprintf("RHMC",30,"Computing new action density...\n");
-  /* compute H2^{-a/2}*pf or H2^{-a}*pf */
-  /* here we choose the first strategy which is more symmetric */
-  for (i=0;i<_update_par.n_pf;++i)
-    rational_func(&r_S, &H2, &pf[i], &pf[i]);
-
-  /* compute new action */
-  local_hmc_action(DELTA, la, momenta, pf, pf);
-
-  /* Metropolis test */
-  deltaH=0.;
-  _MASTER_FOR(la->type,i) {
-    deltaH+=*_FIELD_AT(la,i);
-  }
-  global_sum(&deltaH, 1);
-  lprintf("RHMC",10,"[DeltaS = %1.8e][exp(-DS) = %1.8e]\n",deltaH,exp(-deltaH));
-
-  if(deltaH<0.) {
-    suNg_field_copy(u_gauge_old,u_gauge);
-  } else {
-    double r;
-    if (PID==0) { ranlxd(&r,1); if(r<exp(-deltaH)) r=1.0; else r=-1.0;}  /* make test on on PID 0 */
-    bcast(&r,1);
-    if(r>0.) {
-      suNg_field_copy(u_gauge_old,u_gauge);
-    } else {
-      lprintf("RHMC",10,"Configuration rejected.\n");
-      suNg_field_copy(u_gauge,u_gauge_old);
-      start_gf_sendrecv(u_gauge); /* this may nt be needed if we always guarantee that we copy also the buffers */
-      represent_gauge_field();
-
-      /* revert the approx to the old one */
-      maxev=oldmax;
-      minev=oldmin;
-      r_app_set(&r_S,minev,maxev);
-      r_app_set(&r_MD,minev,maxev);
-      r_app_set(&r_HB,minev,maxev);
-
-      return 0;
+    
+    double deltaH;
+    double oldmax,oldmin;
+    _DECLARE_INT_ITERATOR(i);
+    
+    if (!init) {
+        /* not initialized */
+        lprintf("RHMC",0,"WARNING: RHMC not initialized!\nWARNNG: Ignoring call to update_rhmc.\n");
+		return -1;
     }
-  }
-
-  lprintf("RHMC",10,"Configuration accepted.\n");
-
-  return 1;
+    
+    /* generate new momenta and pseudofermions */
+    lprintf("RHMC",30,"Generating gaussian momenta and pseudofermions...\n");
+    gaussian_momenta(momenta);
+    for (i=0;i<_update_par.n_pf;++i)
+        gaussian_spinor_field(&pf[i]);
+    
+    /* compute starting action */
+    lprintf("RHMC",30,"Computing action density...\n");
+    local_hmc_action(NEW, la, momenta, pf, pf);
+    
+    /* compute H2^{a/2}*pf */
+    lprintf("RHMC",30,"Correcting pseudofermions distribution...\n");
+    for (i=0;i<_update_par.n_pf;++i)
+        rational_func(&r_HB, &H2, &pf[i], &pf[i]);
+    
+    /* integrate molecular dynamics */
+    lprintf("RHMC",30,"MD integration...\n");
+    _update_par.integrator(momenta,_update_par.MD_par);
+    
+    /* project gauge field */
+    project_gauge_field();
+    represent_gauge_field();
+    
+    /* test min and max eigenvalue of H2 and update approx if necessary */
+    /* now it just tests the approx !!! */
+    oldmax = maxev; /* save old max */
+    oldmin = minev; /* save old min */
+    find_spec_H2(&maxev,&minev, _update_par.mass); /* find spectral interval of H^2 */
+    r_app_set(&r_S,minev,maxev);
+    r_app_set(&r_MD,minev,maxev);
+    r_app_set(&r_HB,minev,maxev);
+    
+    lprintf("RHMC",30,"Computing new action density...\n");
+    /* compute H2^{-a/2}*pf or H2^{-a}*pf */
+    /* here we choose the first strategy which is more symmetric */
+    for (i=0;i<_update_par.n_pf;++i)
+        rational_func(&r_S, &H2, &pf[i], &pf[i]);
+    
+    /* compute new action */
+    local_hmc_action(DELTA, la, momenta, pf, pf);
+    
+    /* Metropolis test */
+    deltaH=0.;
+    _MASTER_FOR(la->type,i) {
+        deltaH+=*_FIELD_AT(la,i);
+    }
+    global_sum(&deltaH, 1);
+    lprintf("RHMC",10,"[DeltaS = %1.8e][exp(-DS) = %1.8e]\n",deltaH,exp(-deltaH));
+    
+    if(deltaH<0.) {
+        suNg_field_copy(u_gauge_old,u_gauge);
+    } else {
+        double r;
+        if (PID==0) { ranlxd(&r,1); if(r<exp(-deltaH)) r=1.0; else r=-1.0;}  /* make test on on PID 0 */
+        bcast(&r,1);
+        if(r>0.) {
+            suNg_field_copy(u_gauge_old,u_gauge);
+        } else {
+            lprintf("RHMC",10,"Configuration rejected.\n");
+            suNg_field_copy(u_gauge,u_gauge_old);
+            start_gf_sendrecv(u_gauge); /* this may not be needed if we always guarantee that we copy also the buffers */
+            represent_gauge_field();
+            
+            /* revert the approx to the old one */
+            maxev=oldmax;
+            minev=oldmin;
+            r_app_set(&r_S,minev,maxev);
+            r_app_set(&r_MD,minev,maxev);
+            r_app_set(&r_HB,minev,maxev);
+            
+            return 0;
+        }
+    }
+    
+    lprintf("RHMC",10,"Configuration accepted.\n");
+    
+    return 1;
 }
 
 
 
 int update_rhmc_o(){
-
-  double deltaH;
-  double oldmax,oldmin;
-  _DECLARE_INT_ITERATOR(i);
-
-  if(!init)
-    return -1;
-
-  /* generate new momenta and pseudofermions */
-  static unsigned int calln=0;
-  
-  if((calln++&1)==0){
-    lprintf("RHMC",30,"Generating gaussian momenta and pseudofermions...\n");
-    gaussian_momenta(momenta);
+    
+    double deltaH;
+    double oldmax,oldmin;
+    _DECLARE_INT_ITERATOR(i);
+    
+    if(!init)
+        return -1;
+    
+    /* generate new momenta and pseudofermions */
+    static unsigned int calln=0;
+    
+    if((calln++&1)==0){
+        lprintf("RHMC",30,"Generating gaussian momenta and pseudofermions...\n");
+        gaussian_momenta(momenta);
+        for (i=0;i<_update_par.n_pf;++i)
+            gaussian_spinor_field(&pf[i]);
+    }
+    else
+        lprintf("RHMC",30,"NOT Generating momenta and pseudofermions...\n");
+    /* compute starting action */
+    lprintf("RHMC",30,"Computing action density...\n");
+    local_hmc_action(NEW, la, momenta, pf, pf);
+    
+    /* compute H2^{a/2}*pf */
+    lprintf("RHMC",30,"Correcting pseudofermions distribution...\n");
     for (i=0;i<_update_par.n_pf;++i)
-      gaussian_spinor_field(&pf[i]);
-  }
-  else
-    lprintf("RHMC",30,"NOT Generating momenta and pseudofermions...\n");
-   /* compute starting action */
-  lprintf("RHMC",30,"Computing action density...\n");
-  local_hmc_action(NEW, la, momenta, pf, pf);
-   
-  /* compute H2^{a/2}*pf */
-  lprintf("RHMC",30,"Correcting pseudofermions distribution...\n");
-  for (i=0;i<_update_par.n_pf;++i)
-    rational_func(&r_HB, &H2, &pf[i], &pf[i]);
-
-  /* integrate molecular dynamics */
-  lprintf("RHMC",30,"MD integration...\n");
-  _update_par.integrator(momenta,_update_par.MD_par);
-  /*leapfrog(momenta, _update_par.tlen, _update_par.nsteps);
-    O2MN_multistep(momenta, _update_par.tlen, _update_par.nsteps, 3);*/
-
-  /* project gauge field */
-  project_gauge_field();
-  represent_gauge_field();
-
-  /* test min and max eigenvalue of H2 and update approx if necessary */
-  /* now it just tests the approx !!! */
-  oldmax = maxev; /* save old max */
-  oldmin = minev; /* save old min */
-  find_spec_H2(&maxev,&minev, _update_par.mass); /* find spectral interval of H^2 */
-  r_app_set(&r_S,minev,maxev);
-  r_app_set(&r_MD,minev,maxev);
-  r_app_set(&r_HB,minev,maxev);
-
-  lprintf("RHMC",30,"Computing new action density...\n");
-  /* compute H2^{-a/2}*pf or H2^{-a}*pf */
-  /* here we choose the first strategy which is more symmetric */
-  for (i=0;i<_update_par.n_pf;++i)
-    rational_func(&r_S, &H2, &pf[i], &pf[i]);
-
-  /* compute new action */
-  local_hmc_action(DELTA, la, momenta, pf, pf);
-
-  /* Metropolis test */
-  deltaH=0.;
-  _MASTER_FOR(la->type,i) {
-    deltaH+=*_FIELD_AT(la,i);
-  }
-  global_sum(&deltaH, 1);
-  lprintf("RHMC",10,"[DeltaS = %1.8e][exp(-DS) = %1.8e]\n",deltaH,exp(-deltaH));
-
-  suNg_field_copy(u_gauge_old,u_gauge);
- 
-  return 1;
+        rational_func(&r_HB, &H2, &pf[i], &pf[i]);
+    
+    /* integrate molecular dynamics */
+    lprintf("RHMC",30,"MD integration...\n");
+    _update_par.integrator(momenta,_update_par.MD_par);
+    /*leapfrog(momenta, _update_par.tlen, _update_par.nsteps);
+     O2MN_multistep(momenta, _update_par.tlen, _update_par.nsteps, 3);*/
+    
+    /* project gauge field */
+    project_gauge_field();
+    represent_gauge_field();
+    
+    /* test min and max eigenvalue of H2 and update approx if necessary */
+    /* now it just tests the approx !!! */
+    oldmax = maxev; /* save old max */
+    oldmin = minev; /* save old min */
+    find_spec_H2(&maxev,&minev, _update_par.mass); /* find spectral interval of H^2 */
+    r_app_set(&r_S,minev,maxev);
+    r_app_set(&r_MD,minev,maxev);
+    r_app_set(&r_HB,minev,maxev);
+    
+    lprintf("RHMC",30,"Computing new action density...\n");
+    /* compute H2^{-a/2}*pf or H2^{-a}*pf */
+    /* here we choose the first strategy which is more symmetric */
+    for (i=0;i<_update_par.n_pf;++i)
+        rational_func(&r_S, &H2, &pf[i], &pf[i]);
+    
+    /* compute new action */
+    local_hmc_action(DELTA, la, momenta, pf, pf);
+    
+    /* Metropolis test */
+    deltaH=0.;
+    _MASTER_FOR(la->type,i) {
+        deltaH+=*_FIELD_AT(la,i);
+    }
+    global_sum(&deltaH, 1);
+    lprintf("RHMC",10,"[DeltaS = %1.8e][exp(-DS) = %1.8e]\n",deltaH,exp(-deltaH));
+    
+    suNg_field_copy(u_gauge_old,u_gauge);
+    
+    return 1;
 }
 
 

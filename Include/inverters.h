@@ -20,6 +20,7 @@ typedef struct _mshift_par {
    double *shift;
    double err2; /* relative error of the solutions */
    int max_iter; /* maximum number of iterations: 0 => infinity */
+    spinor_operator_flt M_flt;
 	 void *add_par; /* additional parameters for specific inverters */
 } mshift_par;
 

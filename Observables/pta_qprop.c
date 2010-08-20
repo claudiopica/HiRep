@@ -23,15 +23,15 @@
 
 static double hmass, hmass_pre;
 
-static void H(spinor_field *out, spinor_field *in){
+static void H_pta(spinor_field *out, spinor_field *in){
   g5Dphi(hmass,out,in);
 }
 
-static void D(spinor_field *out, spinor_field *in){
+static void D_pta(spinor_field *out, spinor_field *in){
   Dphi(hmass,out,in);
 }
 
-static void D_pre(spinor_field *out, spinor_field *in){
+static void D_pta_pre(spinor_field *out, spinor_field *in){
   Dphi_eopre(hmass_pre,out,in);
 }
 
@@ -115,7 +115,7 @@ void pta_qprop_QMR_eo(int g0[4], spinor_field **pta_qprop, int nm, double *mass,
 		spinor_field_zero_f(&resdn[i]);
 	}
 	spinor_field_g5_assign_f(in);
-	cgiter+=g5QMR_mshift(&QMR_par, &D_pre, in, resdn);
+	cgiter+=g5QMR_mshift(&QMR_par, &D_pta_pre, in, resdn);
 	spinor_field_g5_assign_f(in);
 
 	/* now loop over sources */
@@ -132,14 +132,14 @@ void pta_qprop_QMR_eo(int g0[4], spinor_field **pta_qprop, int nm, double *mass,
 #endif /* NDEBUG */
   	  		spinor_field_zero_f(&resd[i]);
 		}
-		cgiter+=g5QMR_mshift(&QMR_par, &D_pre, in, resd);
+		cgiter+=g5QMR_mshift(&QMR_par, &D_pta_pre, in, resd);
 
 		for(i=0;i<QMR_par.n;++i){
 
 #ifndef NDEBUG
 			/* this is a test of the inverter on the difference vector */
 			hmass_pre=mass[i];
-			D_pre(test_e,&resd[i]);
+			D_pta_pre(test_e,&resd[i]);
 			++cgiter;
 			spinor_field_sub_f(test_e,test_e,in);
 			norm=spinor_field_sqnorm_f(test_e);
@@ -161,7 +161,7 @@ void pta_qprop_QMR_eo(int g0[4], spinor_field **pta_qprop, int nm, double *mass,
 #ifndef NDEBUG
 			/* this is a test of the solution */
 			hmass=mass[i];
-			H(test,&pta_qprop[i][source]);
+			H_pta(test,&pta_qprop[i][source]);
 			++cgiter;
 			if(COORD[0]==C0[0] && COORD[1]==C0[1] && COORD[2]==C0[2] && COORD[3]==C0[3])
 			  *( (double *)_FIELD_AT(test,x0) + 2*source ) -=1.;
@@ -245,7 +245,7 @@ void pta_qprop_QMR(int g0[4], spinor_field **pta_qprop, int nm, double *mass, do
 	
 	/* invert noise */
 	spinor_field_g5_assign_f(in);
-  cgiter+=g5QMR_mshift(&QMR_par, &D, in, resdn);
+  cgiter+=g5QMR_mshift(&QMR_par, &D_pta, in, resdn);
   spinor_field_g5_assign_f(in);
 
 	/* now loop over sources */
@@ -255,14 +255,14 @@ void pta_qprop_QMR(int g0[4], spinor_field **pta_qprop, int nm, double *mass, do
 	    *( (double *)_FIELD_AT(in,x0) + 2*source ) =1.;
 		spinor_field_g5_assign_f(in);
 
-		cgiter+=g5QMR_mshift(&QMR_par, &D, in, resd);
+		cgiter+=g5QMR_mshift(&QMR_par, &D_pta, in, resd);
 
 		for(i=0;i<QMR_par.n;++i){
 
 #ifndef NDEBUG
 			/* this is a test of the inverter on the difference vector */
 			hmass=mass[i];
-			D(test,&resd[i]);
+			D_pta(test,&resd[i]);
 			++cgiter;
 			spinor_field_sub_f(test,test,in);
 			norm=spinor_field_sqnorm_f(test);
@@ -275,7 +275,7 @@ void pta_qprop_QMR(int g0[4], spinor_field **pta_qprop, int nm, double *mass, do
 #ifndef NDEBUG
 			/* this is a test of the solution */
 			hmass=mass[i];
-			H(test,&pta_qprop[i][source]);
+			H_pta(test,&pta_qprop[i][source]);
 			++cgiter;
     	if(COORD[0]==C0[0] && COORD[1]==C0[1] && COORD[2]==C0[2] && COORD[3]==C0[3])
 			  *( (double *)_FIELD_AT(test,x0) + 2*source ) -=1.;
@@ -343,10 +343,10 @@ void pta_qprop_MINRES(int g0[4], spinor_field **pta_qprop, int nm, double *mass,
     MINRESpar.err2 = acc;
     MINRESpar.max_iter = 0;
 
-    cgiter+=MINRES(&MINRESpar, &H, in, &pta_qprop[0][source],0);
+    cgiter+=MINRES(&MINRESpar, &H_pta, in, &pta_qprop[0][source],0);
     for(i=1;i<nm;++i){
       hmass=mass[i];
-      cgiter+=MINRES(&MINRESpar, &H, in, &pta_qprop[i][source],&pta_qprop[i-1][source]);
+      cgiter+=MINRES(&MINRESpar, &H_pta, in, &pta_qprop[i][source],&pta_qprop[i-1][source]);
     }
 
 		/* remove source */

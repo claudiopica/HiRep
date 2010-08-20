@@ -13,6 +13,7 @@
 #include "logger.h"
 #include <assert.h>
 
+
 /*
  * performs the multi-shifted CG inversion:
  * out[i] = (M-(par->shift[i]))^-1 in
@@ -111,7 +112,7 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
 	   for (i=0;i<par->n;++i) lprintf("CGTEST",0,"z3[%d]=%e; test=[%e,%e]\n",i,z3[i],delta*z3[i]*z3[i],par->err2*innorm2);
        lprintf("CGTEST",0,"\n[ %d ] gamma=%e\n",cgiter,gamma);
        lprintf("CGTEST",0,"[ %d ] delta=%e\n",cgiter,delta);
-       */
+    */
 
     ++cgiter;
   } while ((par->max_iter==0 || cgiter<par->max_iter) && notconverged);

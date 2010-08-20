@@ -105,7 +105,7 @@ static int parse_gstart(rhmc_flow *rf) {
 
   rf->start=1; /* reset rf->start */
 
-  /* try if it match a unit or random start */
+  /* try other matches */
   strcpy(buf,rf->g_start);
   slower(buf);
   ret=strcmp(buf,"unit");
@@ -179,10 +179,10 @@ static int parse_lastconf(rhmc_flow *rf) {
 }
 
 /* Initialize the Monte Carlo.
- * his performs the following operations:
+ * This performs the following operations:
  * 1) read from the specified input file the flow variables 
  *    and the rhmc parameters;
- * 2) set the specified gauge field
+ * 2) set the starting gauge field
  * 3) init the rhmc update
  */
 int init_mc(rhmc_flow *rf, char *ifile) {
@@ -208,7 +208,7 @@ int init_mc(rhmc_flow *rf, char *ifile) {
   read_input(rhmc_var.read,ifile);
   read_input(rf->read,ifile);
 
-  /* fix conf_dir: put a / at the end of it */
+  /* fix conf_dir name: put a / at the end of string */
   start_t=strlen(rf->conf_dir);
   if (rf->conf_dir[start_t-1]!='/') {
     rf->conf_dir[start_t]='/';
@@ -251,11 +251,11 @@ int init_mc(rhmc_flow *rf, char *ifile) {
   represent_gauge_field();
   
 
-  /* init RHMC */
-  
+  /* init RHMC */  
   rhmc_var.rhmc_p.integrator=&O2MN_multistep;
   rhmc_var.rhmc_p.mshift_solver=&cg_mshift; 
   rhmc_var.rhmc_p.MD_par=&rhmc_var.int_p;
+
   init_rhmc(&rhmc_var.rhmc_p);
 
   return 0;

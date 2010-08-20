@@ -7,7 +7,6 @@
 #include "dirac.h"
 #include "utils.h"
 #include "memory.h"
-#include "update.h"
 #include "error.h"
 #include "geometry.h"
 #include "spinor_field.h"
@@ -17,7 +16,7 @@
 #include "logger.h"
 
 static double hmass;
-static void H(spinor_field *out, spinor_field *in){
+static void H_sf(spinor_field *out, spinor_field *in){
   g5Dphi(hmass,out,in);
 }
 
@@ -29,7 +28,7 @@ void sf_quark_propagator(spinor_field *in, double mass, spinor_field *out, doubl
   MINRESpar.err2 = acc;
   MINRESpar.max_iter = 0;
   cgiter=0;
-  cgiter+=MINRES(&MINRESpar, &H, in, out, 0);
+  cgiter+=MINRES(&MINRESpar, &H_sf, in, out, 0);
 	  lprintf("PROPAGATOR",10,"MINRES MVM = %d",cgiter);
 }
 
