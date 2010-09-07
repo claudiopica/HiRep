@@ -259,7 +259,7 @@ void Dphi(double m0, spinor_field *out, spinor_field *in)
          "Input and output fields must be different");
 
 #ifdef BASIC_SF
-   SF_spinor_bcs(out);
+   SF_spinor_bcs(in);
 #endif /* BASIC_SF */
 
 #ifdef CHECK_SPINOR_MATCHING
@@ -336,7 +336,7 @@ void g5Dphi(double m0, spinor_field *out, spinor_field *in)
 #endif /* CHECK_SPINOR_MATCHING */
 
 #ifdef BASIC_SF
-   SF_spinor_bcs(out);
+   SF_spinor_bcs(in);
 #endif /* BASIC_SF */
 
    Dphi_(out, in);
@@ -432,7 +432,7 @@ void Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
 #endif /* CHECK_SPINOR_MATCHING */
 
 #ifdef BASIC_SF
-  SF_spinor_bcs(out);
+  SF_spinor_bcs(in);
 #endif /* BASIC_SF */
 
   /* alloc memory for temporary spinor field */
@@ -440,7 +440,7 @@ void Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
   
   Dphi_(otmp, in);
 #ifdef BASIC_SF
-  SF_spinor_bcs(out);
+  SF_spinor_bcs(otmp);
 #endif /* BASIC_SF */
   Dphi_(out, otmp);
   
@@ -476,7 +476,7 @@ void Dphi_oepre(double m0, spinor_field *out, spinor_field *in)
 #endif /* CHECK_SPINOR_MATCHING */
 
 #ifdef BASIC_SF
-  SF_spinor_bcs(out);
+  SF_spinor_bcs(in);
 #endif /* BASIC_SF */
 
   /* alloc memory for temporary spinor field */
@@ -484,7 +484,7 @@ void Dphi_oepre(double m0, spinor_field *out, spinor_field *in)
   
   Dphi_(etmp, in);
 #ifdef BASIC_SF
-  SF_spinor_bcs(out);
+  SF_spinor_bcs(etmp);
 #endif /* BASIC_SF */
   Dphi_(out, etmp);
   
@@ -517,7 +517,7 @@ void g5Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
 #endif /* CHECK_SPINOR_MATCHING */
 
 #ifdef BASIC_SF
-  SF_spinor_bcs(out);
+  SF_spinor_bcs(in);
 #endif /* BASIC_SF */
 
   /* alloc memory for temporary spinor field */
@@ -525,7 +525,7 @@ void g5Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
   
   Dphi_(otmp, in);
 #ifdef BASIC_SF
-  SF_spinor_bcs(out);
+  SF_spinor_bcs(otmp);
 #endif /* BASIC_SF */
   Dphi_(out, otmp);
   
