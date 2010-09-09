@@ -522,6 +522,7 @@ int eva(int nev,int nevt,int init,int kmax,
       if (nlock==nev)
 	{
 	  lprintf("EVA",10,"Computation succeded. MVM = %d\n",*status);
+  free_spinor_field(ws);
 	  return 0;
 	}
     }
