@@ -1,0 +1,102 @@
+###############################################################################
+# Copyright (c) 2008, Claudio Pica                                            #   
+# All rights reserved.                                                        #
+###############################################################################
+
+
+SHELL = /bin/bash
+
+SRCS += $(patsubst %,%.c,$(EXES))
+OBJS = $(SRCS:.c=.o)
+_MkRules_default_target: $(OBJS)
+
+
+include $(MKDIR)/MkFlags
+
+.%.d: SRC=$(patsubst .%.d,%.c,$@)
+.%.d: %.c $(INCDIR)/.autoheaders.h
+	if test $(dir $@) = "./"; then \
+	  echo -n "Generating dependences for [$(SRC)]..." ;\
+	  $(GCC) -MM -MG -MT "$@ $(patsubst .%.d,%.o,$@)" $(CPPFLAGS) $(SRC) > $@ &&\
+	  echo " done." || ( echo " failed." && false ) ;\
+	  MAKEFILES="$@" $(MAKE) $@ ;\
+	else \
+	  $(MAKE) -C $(dir $@) $(notdir $@) ;\
+	fi
+
+DFILES = $(findstring .d,$(MAKEFILES))
+RBLD = $(if $(DFILES),,rebuild)
+
+%.o: SRC=$(patsubst %.o,%.c,$@) 
+%.o: DEP=$(patsubst %.o,.%.d,$@)
+%.o: %.c $(MKDIR)/MkFlags $(RBLD)
+	if  test $(dir $@) = "./"; then \
+	  if test "$(DFILES)" = ""; then \
+	    $(MAKE) $(DEP) ;\
+	    MAKEFILES="$(DEP)" $(MAKE) $@ ;\
+	  else \
+	    echo -n "Compiling [$(CURDIR)/$@]..." ;\
+	    $(CC) -c $(CFLAGS) $(CPPFLAGS) $(SRC) &&\
+	    echo " done." || ( echo " failed." && false) ;\
+	  fi ;\
+	else \
+	  $(MAKE) -C $(dir $@) $(notdir $@) ;\
+	fi
+	
+$(INCDIR)/.autoheaders.h: $(MKDIR)/MkFlags  
+	if  test $(dir $@) != "./"; then \
+	  $(MAKE) -C $(dir $@) $(notdir $@) ;\
+	fi 
+
+%.c:
+	if  test $(dir $@) != "./"; then \
+	  $(MAKE) -C $(dir $@) $(notdir $@) ;\
+	fi
+
+%.h:
+	echo Missing header: $@
+	false
+
+.PRECIOUS: %.c
+
+#avoid the use of implicit suffix rules!
+.SUFFIXES:
+
+
+WRHEAD = $(MKDIR)/Utils/write_suN_headers.pl
+WRREPRDIR = $(MKDIR)/Utils/autosun
+WRREPR = $(WRREPRDIR)/writeREPR
+
+$(WRREPR): $(MKDIR)/MkFlags
+	REPRESENTATION=$(REPR) make -C $(WRREPRDIR) $(notdir $@)
+
+.PHONY: rebuild clean $(patsubst %,clean-%,$(SUBDIRS)) cleanall _MkRules_default_target default
+
+$(patsubst %,clean-%,$(SUBDIRS)):
+	$(MAKE) -C $(patsubst clean-%,%,$@) clean
+
+clean:: $(patsubst %,clean-%,$(SUBDIRS))
+	echo -n "Cleaning $(CURDIR)..."
+	rm -f *.o *.rpo *~ *.il *.dyn *.ii *.s .*.d cinfo.c
+	echo " done."
+	if test "$(EXES)" != "" -a "$(CEXE)" != "" ; then \
+	  echo -n "Removing EXEs in $(CURDIR)..." ;\
+	  rm -f $(EXES) ;\
+	  echo " done." ;\
+	fi
+
+cleanall::
+	CEXE="all" $(MAKE) clean
+
+cinfo.c: $(MKDIR)/MkFlags $(MKDIR)/MkRules $(MKDIR)/Utils/cinfo.sh
+	$(MKDIR)/Utils/cinfo.sh $(MKDIR) $(TOPDIR) $(MACRO)
+
+define LINK_template
+$(1): $(1).o $$($(1)_OBJS) $$(COMMON_OBJS)
+	echo -n Linking [$$@]... 
+	$$(CC) $$(CFLAGS) $$(LDFLAGS) -o $$@ $$< $$($(1)_OBJS) $$(COMMON_OBJS) &&\
+	echo " done." || ( echo " failed." && false )
+endef
+
+#$(foreach prog,$(EXES),$(eval $(call LINK_template,$(prog))))
+

@@ -45,7 +45,7 @@ static void O2MN_ms_gauge(suNg_av_field *momenta, double dt, unsigned int nsteps
       ExpX(dt*0.5,_4FIELD_AT(momenta,i,3), _4FIELD_AT(u_gauge,i,3));
     }
     _proj_gfield(count);
-    //represent_gauge_field(); /* not needed in intermediate steps */
+    /* //represent_gauge_field(); /\* not needed in intermediate steps *\/ */
     
     /* Update of momenta */
     Force0((1.-2.*lambda)*dt,momenta);
@@ -58,7 +58,7 @@ static void O2MN_ms_gauge(suNg_av_field *momenta, double dt, unsigned int nsteps
       ExpX(dt*0.5,_4FIELD_AT(momenta,i,3), _4FIELD_AT(u_gauge,i,3));
     }
     _proj_gfield(count);
-    //represent_gauge_field(); /* not needed in intermediate steps */
+/*     //represent_gauge_field(); /\* not needed in intermediate steps *\/ */
 
     /* Update of momenta */
     Force0(2.*lambda*dt,momenta);
@@ -74,7 +74,7 @@ static void O2MN_ms_gauge(suNg_av_field *momenta, double dt, unsigned int nsteps
     ExpX(dt*0.5,_4FIELD_AT(momenta,i,3), _4FIELD_AT(u_gauge,i,3));
   }
   _proj_gfield(count);
-  //represent_gauge_field(); /* not needed in intermediate steps */
+/*   //represent_gauge_field(); /\* not needed in intermediate steps *\/ */
     
   /* Update of momenta */
   Force0((1.-2.*lambda)*dt,momenta);

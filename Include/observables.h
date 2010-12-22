@@ -22,11 +22,10 @@
 
 double plaq(int ix,int mu,int nu);
 double avr_plaquette();
-double sf_action(double beta);
-double sf_test_gauge_bcs();
+double SF_action(double beta);
 double local_plaq(int ix);
 void full_plaquette();
-double sf_PCAC_wall_mass(double mass);
+double SF_PCAC_wall_mass(double mass);
 
 void polyakov(int mu);
 

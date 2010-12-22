@@ -212,7 +212,13 @@ int update_rhmc(){
     gaussian_momenta(momenta);
     for (i=0;i<_update_par.n_pf;++i)
         gaussian_spinor_field(&pf[i]);
-    
+
+#ifdef BASIC_SF
+    lprintf("MAIN",0,"SF_test_force_bcs(START): %1.8e\n",SF_test_force_bcs(momenta));
+    for (i=0;i<_update_par.n_pf;++i)
+    	lprintf("MAIN",0,"SF_test_spinor_bcs(START,%d): %1.8e\n",i,SF_test_spinor_bcs(&pf[i]));
+#endif /* BASIC_SF */
+      
     /* compute starting action */
     lprintf("RHMC",30,"Computing action density...\n");
     local_hmc_action(NEW, la, momenta, pf, pf);
@@ -247,6 +253,13 @@ int update_rhmc(){
     
     /* compute new action */
     local_hmc_action(DELTA, la, momenta, pf, pf);
+ 
+#ifdef BASIC_SF
+    lprintf("MAIN",0,"SF_test_force_bcs(END): %1.8e\n",SF_test_force_bcs(momenta));
+    for (i=0;i<_update_par.n_pf;++i)
+    	lprintf("MAIN",0,"SF_test_spinor_bcs(END,%d): %1.8e\n",i,SF_test_spinor_bcs(&pf[i]));
+#endif /* BASIC_SF */
+    
     
     /* Metropolis test */
     deltaH=0.;

@@ -20,7 +20,7 @@ static void H_sf(spinor_field *out, spinor_field *in){
   g5Dphi(hmass,out,in);
 }
 
-void sf_quark_propagator(spinor_field *in, double mass, spinor_field *out, double acc) {
+void SF_quark_propagator(spinor_field *in, double mass, spinor_field *out, double acc) {
   static MINRES_par MINRESpar;
   int cgiter;
   hmass = mass;
@@ -32,7 +32,7 @@ void sf_quark_propagator(spinor_field *in, double mass, spinor_field *out, doubl
 	  lprintf("PROPAGATOR",10,"MINRES MVM = %d",cgiter);
 }
 
-double sf_PCAC_wall_mass(double mass)
+double SF_PCAC_wall_mass(double mass)
 {
 	int j,ix0,ix1,ix2,ix3,source;
 	double f_P[GLB_T], f_A[GLB_T], f_Pt[GLB_T], f_At[GLB_T], f_1=0, f_1t=0, temp;
@@ -154,7 +154,7 @@ double sf_PCAC_wall_mass(double mass)
 	for(source=0; source<4*NF; source++)
 	{
 		spinor_field_zero_f(&prop[source]);
-		sf_quark_propagator(&prop_source[source], mass, &prop[source], acc); 
+		SF_quark_propagator(&prop_source[source], mass, &prop[source], acc); 
 	}
 
 	/*get time averaged correlators for each timeslice*/
@@ -372,7 +372,7 @@ double sf_PCAC_wall_mass(double mass)
 	for(i=0; i<4*NF; i++)
 	{
 		spinor_field_zero_f(&prop[i]);
-		sf_quark_propagator(&prop_source[i], mass, &prop[i], acc); 
+		SF_quark_propagator(&prop_source[i], mass, &prop[i], acc); 
 	}
    /*get time averaged correlators for each timeslice (going back from T in time)*/
    for(source=0;source<4*NF;source++)

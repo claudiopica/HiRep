@@ -110,13 +110,23 @@ static int parse_gstart(rhmc_flow *rf) {
   slower(buf);
   ret=strcmp(buf,"unit");
   if (ret==0) {
+#if defined(BASIC_SF) || defined(ROTATED_SF)
+    lprintf("FLOW",0,"Starting a new run from a unit conf with SF bcs!\n");
+    return 4;
+#else
     lprintf("FLOW",0,"Starting a new run from a unit conf!\n");
     return 1;
+#endif
   }
   ret=strcmp(buf,"random");
   if (ret==0) {
+#if defined(BASIC_SF) || defined(ROTATED_SF)
+    lprintf("FLOW",0,"Starting a new run from a random conf with SF bcs!\n");
+    return 6;
+#else
     lprintf("FLOW",0,"Starting a new run from a random conf!\n");
     return 2;
+#endif
   }
   ret=strcmp(buf,"unit_unit");
   if (ret==0) {

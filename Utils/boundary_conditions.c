@@ -8,8 +8,14 @@
 #include "global.h"
 #include "utils.h"
 #include "suN.h"
+#include "communications.h"
+
+#ifdef BASIC_SF
+#include "observables.h"
+#endif
 
 #ifdef ROTATED_SF
+#include "observables.h"
 #include "update.h"
 extern rhmc_par _update_par; /* Update/update_rhmc.c */
 #endif /* ROTATED_SF */
@@ -30,7 +36,6 @@ void apply_bc(){
 		}
 	}
 #elif defined(ROTATED_SF)
-#warning SCRIVERE UN TEST PER VERIFICARE CHE QUESTO EE CONSISTENTE CON I BORDI
 	if(COORD[0] == 0) {
 		int index;
 		int ix,iy,iz;
@@ -38,18 +43,12 @@ void apply_bc(){
 		for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
 			index=ipt_ext(T_BORDER+1,ix,iy,iz);
 			if(index!=-1) {
-				if(ix!=X_EXT-1){
-					u=pu_gauge_f(index,1);
-					_suNf_mul(*u,_update_par.SF_ds,*u);
-				}
-				if(iy!=Y_EXT-1){
-					u=pu_gauge_f(index,2);
-					_suNf_mul(*u,_update_par.SF_ds,*u);
-				}
-				if(iz!=Z_EXT-1){
-					u=pu_gauge_f(index,3);
-					_suNf_mul(*u,_update_par.SF_ds,*u);
-				}
+				u=pu_gauge_f(index,1);
+				_suNf_mul(*u,_update_par.SF_ds,*u);
+				u=pu_gauge_f(index,2);
+				_suNf_mul(*u,_update_par.SF_ds,*u);
+				u=pu_gauge_f(index,3);
+				_suNf_mul(*u,_update_par.SF_ds,*u);
 			}
 		}
 	}
@@ -60,18 +59,12 @@ void apply_bc(){
 		for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
 			index=ipt_ext(T+T_BORDER-1,ix,iy,iz);
 			if(index!=-1) {
-				if(ix!=X_EXT-1){
-					u=pu_gauge_f(index,1);
-					_suNf_mul(*u,_update_par.SF_ds,*u);
-				}
-				if(iy!=Y_EXT-1){
-					u=pu_gauge_f(index,2);
-					_suNf_mul(*u,_update_par.SF_ds,*u);
-				}
-				if(iz!=Z_EXT-1){
-					u=pu_gauge_f(index,3);
-					_suNf_mul(*u,_update_par.SF_ds,*u);
-				}
+				u=pu_gauge_f(index,1);
+				_suNf_mul(*u,_update_par.SF_ds,*u);
+				u=pu_gauge_f(index,2);
+				_suNf_mul(*u,_update_par.SF_ds,*u);
+				u=pu_gauge_f(index,3);
+				_suNf_mul(*u,_update_par.SF_ds,*u);
 			}
 		}
 	}
@@ -145,7 +138,6 @@ void apply_bc_flt(){
 		}
 	}
 #elif defined(ROTATED_SF)
-#warning SCRIVERE UN TEST PER VERIFICARE CHE QUESTO EE CONSISTENTE CON I BORDI
 	if(COORD[0] == 0) {
 		int index;
 		int ix,iy,iz;
@@ -153,18 +145,12 @@ void apply_bc_flt(){
 		for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
 			index=ipt_ext(T_BORDER+1,ix,iy,iz);
 			if(index!=-1) {
-				if(ix!=X_EXT-1){
-					u=pu_gauge_f_flt(index,1);
-					_suNf_mul(*u,((float)_update_par.SF_ds),*u);
-				}
-				if(iy!=Y_EXT-1){
-					u=pu_gauge_f_flt(index,2);
-					_suNf_mul(*u,((float)_update_par.SF_ds),*u);
-				}
-				if(iz!=Z_EXT-1){
-					u=pu_gauge_f_flt(index,3);
-					_suNf_mul(*u,((float)_update_par.SF_ds),*u);
-				}
+				u=pu_gauge_f_flt(index,1);
+				_suNf_mul(*u,((float)_update_par.SF_ds),*u);
+				u=pu_gauge_f_flt(index,2);
+				_suNf_mul(*u,((float)_update_par.SF_ds),*u);
+				u=pu_gauge_f_flt(index,3);
+				_suNf_mul(*u,((float)_update_par.SF_ds),*u);
 			}
 		}
 	}
@@ -175,18 +161,12 @@ void apply_bc_flt(){
 		for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
 			index=ipt_ext(T+T_BORDER-1,ix,iy,iz);
 			if(index!=-1) {
-				if(ix!=X_EXT-1){
-					u=pu_gauge_f_flt(index,1);
-					_suNf_mul(*u,((float)_update_par.SF_ds),*u);
-				}
-				if(iy!=Y_EXT-1){
-					u=pu_gauge_f_flt(index,2);
-					_suNf_mul(*u,((float)_update_par.SF_ds),*u);
-				}
-				if(iz!=Z_EXT-1){
-					u=pu_gauge_f_flt(index,3);
-					_suNf_mul(*u,((float)_update_par.SF_ds),*u);
-				}
+				u=pu_gauge_f_flt(index,1);
+				_suNf_mul(*u,((float)_update_par.SF_ds),*u);
+				u=pu_gauge_f_flt(index,2);
+				_suNf_mul(*u,((float)_update_par.SF_ds),*u);
+				u=pu_gauge_f_flt(index,3);
+				_suNf_mul(*u,((float)_update_par.SF_ds),*u);
 			}
 		}
 	}
@@ -246,26 +226,25 @@ void apply_bc_flt(){
 
 void SF_spinor_bcs(spinor_field *sp)
 {
-	int ix,iy,iz,index;
+	int it,ix,iy,iz,index;
 
-#warning SCRIVERE UN TEST PER VERIFICARE CHE QUESTO EE CONSISTENTE CON I BORDI
 	if(COORD[0] == 0) {
 		for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
-			index=ipt_ext(T_BORDER,ix,iy,iz);
-			if(index!=-1 && index<sp->type->gsize) {
-				_spinor_zero_g(*_FIELD_AT(sp,index));
-			}
-			index=ipt_ext(T_BORDER+1,ix,iy,iz);
-			if(index!=-1 && index<sp->type->gsize) {
-				_spinor_zero_g(*_FIELD_AT(sp,index));
+			for(it=0;it<=T_BORDER+1;it++) {
+				index=ipt_ext(it,ix,iy,iz);
+				if(index!=-1 && index<sp->type->gsize) {
+					_spinor_zero_g(*_FIELD_AT(sp,index));
+				}
 			}
 		}
 	}
 	if(COORD[0] == NP_T-1) {
 		for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
-			index=ipt_ext(T+T_BORDER-1,ix,iy,iz);
-			if(index!=-1 && index<sp->type->gsize) {
-				_spinor_zero_g(*_FIELD_AT(sp,index));
+			for(it=T+T_BORDER-1;it<T+2*T_BORDER;it++) {
+				index=ipt_ext(it,ix,iy,iz);
+				if(index!=-1 && index<sp->type->gsize) {
+					_spinor_zero_g(*_FIELD_AT(sp,index));
+				}
 			}
 		}
 	}
@@ -273,105 +252,27 @@ void SF_spinor_bcs(spinor_field *sp)
 }
 
 
-double SF_test_spinor_bcs(spinor_field *sp)
-{
-	_DECLARE_INT_ITERATOR(i);
-	int ix, iy, iz;
-	double temp = 0;
-	double total = 0;
-	suNf_spinor *sp_temp;
-	start_sf_sendrecv(sp);
+double SF_test_spinor_bcs(spinor_field *sp) {
+/*should be zero*/
+	double pa=0., k;
+	int ix,iy,iz,index;
 
-	if(COORD[0]==0)
-	{
-	_PIECE_FOR(sp->type,i)
-	{
-		_SITE_FOR(sp->type,i)
-		{
-		       	for (ix=0; ix<GLB_X/NP_X; ++ix)
-		        for (iy=0; iy<GLB_Y/NP_Y; ++iy)
-		        for (iz=0; iz<GLB_Z/NP_Z; ++iz)
-		        {
-			{
-			{
-			if (ipt(0,ix,iy,iz)==i||ipt(1,ix,iy,iz)==i)
-			{
-			sp_temp=_FIELD_AT(sp,i);
-		_vector_prod_re_f(temp,(*sp_temp).c[0],(*sp_temp).c[0]);
-		total+=temp;
-		_vector_prod_re_f(temp,(*sp_temp).c[1],(*sp_temp).c[1]);
-		total+=temp;
-		_vector_prod_re_f(temp,(*sp_temp).c[2],(*sp_temp).c[2]);
-		total+=temp;
-		_vector_prod_re_f(temp,(*sp_temp).c[3],(*sp_temp).c[3]);
-		total+=temp;
-
-		_vector_prod_im_f(temp,(*sp_temp).c[0],(*sp_temp).c[0]);
-		total+=temp;
-		_vector_prod_im_f(temp,(*sp_temp).c[1],(*sp_temp).c[1]);
-		total+=temp;
-		_vector_prod_im_f(temp,(*sp_temp).c[2],(*sp_temp).c[2]);
-		total+=temp;
-		_vector_prod_im_f(temp,(*sp_temp).c[3],(*sp_temp).c[3]);
-		total+=temp;
-			}
-			}
-			}
-			}
-		}
-		if(_PIECE_INDEX(i)==0)
-		{
-			complete_sf_sendrecv(sp);
+	if(COORD[0] == 0) {
+		for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
+			index=ipt(0,ix,iy,iz);
+			_spinor_prod_re_g(k,*_FIELD_AT(sp,index),*_FIELD_AT(sp,index)); pa+=k;
+			index=ipt(1,ix,iy,iz);
+			_spinor_prod_re_g(k,*_FIELD_AT(sp,index),*_FIELD_AT(sp,index)); pa+=k;
 		}
 	}
-	}
-
-	if(COORD[0]==NP_T-1)
-	{
-	_PIECE_FOR(sp->type,i)
-	{
-		_SITE_FOR(sp->type,i)
-		{
-		       	for (ix=0; ix<GLB_X/NP_X; ++ix)
-		        for (iy=0; iy<GLB_Y/NP_Y; ++iy)
-		        for (iz=0; iz<GLB_Z/NP_Z; ++iz)
-		        {
-			{
-			{
-			if (ipt((GLB_T/NP_T)-1,ix,iy,iz)==i)
-			{
-			sp_temp=_FIELD_AT(sp,i);
-		_vector_prod_re_f(temp,(*sp_temp).c[0],(*sp_temp).c[0]);
-		total+=temp;
-		_vector_prod_re_f(temp,(*sp_temp).c[1],(*sp_temp).c[1]);
-		total+=temp;
-		_vector_prod_re_f(temp,(*sp_temp).c[2],(*sp_temp).c[2]);
-		total+=temp;
-		_vector_prod_re_f(temp,(*sp_temp).c[3],(*sp_temp).c[3]);
-		total+=temp;
-
-		_vector_prod_im_f(temp,(*sp_temp).c[0],(*sp_temp).c[0]);
-		total+=temp;
-		_vector_prod_im_f(temp,(*sp_temp).c[1],(*sp_temp).c[1]);
-		total+=temp;
-		_vector_prod_im_f(temp,(*sp_temp).c[2],(*sp_temp).c[2]);
-		total+=temp;
-		_vector_prod_im_f(temp,(*sp_temp).c[3],(*sp_temp).c[3]);
-		total+=temp;
-			}
-			}
-			}
-			}
-		}
-		if(_PIECE_INDEX(i)==0)
-		{
-			complete_sf_sendrecv(sp);
+	if(COORD[0] == NP_T-1) {
+		for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
+			index=ipt(T-1,ix,iy,iz);
+			_spinor_prod_re_g(k,*_FIELD_AT(sp,index),*_FIELD_AT(sp,index)); pa+=k;
 		}
 	}
-	}
-
-	return total;
-
+  global_sum(&pa, 1);
+  return pa/(double)(GLB_X*GLB_Y*GLB_Z*(4*NF)*(3));
 }
 
 #endif /* BASIC_SF */
@@ -383,55 +284,75 @@ double SF_test_spinor_bcs(spinor_field *sp)
 #if defined(BASIC_SF) || defined(ROTATED_SF)
 
 void SF_force_bcs(suNg_av_field *force) {
-	int ix,iy,iz,index;
+	int it,ix,iy,iz,index;
 
-#warning SCRIVERE UN TEST PER VERIFICARE CHE QUESTO EE CONSISTENTE CON I BORDI
 	if(COORD[0] == 0) {
 		for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
-			index=ipt_ext(T_BORDER,ix,iy,iz);
-			if(index!=-1 && index<force->type->gsize) {
-				_algebra_vector_zero_g(*_4FIELD_AT(force,index,0));
-				if(ix!=X_EXT-1){
+			for(it=0;it<=T_BORDER;it++) {
+				index=ipt_ext(it,ix,iy,iz);
+				if(index!=-1 && index<force->type->gsize) {
+					_algebra_vector_zero_g(*_4FIELD_AT(force,index,0));
 					_algebra_vector_zero_g(*_4FIELD_AT(force,index,1));
-				}
-				if(iy!=Y_EXT-1){
 					_algebra_vector_zero_g(*_4FIELD_AT(force,index,2));
-				}
-				if(iz!=Z_EXT-1){
 					_algebra_vector_zero_g(*_4FIELD_AT(force,index,3));
 				}
 			}
 			index=ipt_ext(T_BORDER+1,ix,iy,iz);
 			if(index!=-1 && index<force->type->gsize) {
-				if(ix!=X_EXT-1){
-					_algebra_vector_zero_g(*_4FIELD_AT(force,index,1));
-				}
-				if(iy!=Y_EXT-1){
-					_algebra_vector_zero_g(*_4FIELD_AT(force,index,2));
-				}
-				if(iz!=Z_EXT-1){
-					_algebra_vector_zero_g(*_4FIELD_AT(force,index,3));
-				}
+				_algebra_vector_zero_g(*_4FIELD_AT(force,index,1));
+				_algebra_vector_zero_g(*_4FIELD_AT(force,index,2));
+				_algebra_vector_zero_g(*_4FIELD_AT(force,index,3));
 			}
 		}
 	}
 	if(COORD[0] == NP_T-1) {
 		for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
-			index=ipt_ext(T+T_BORDER-1,ix,iy,iz);
-			if(index!=-1 && index<force->type->gsize) {
-				if(ix!=X_EXT-1){
+			for(it=T+T_BORDER-1;it<T+2*T_BORDER;it++) {
+				index=ipt_ext(it,ix,iy,iz);
+				if(index!=-1 && index<force->type->gsize) {
+					_algebra_vector_zero_g(*_4FIELD_AT(force,index,0));
 					_algebra_vector_zero_g(*_4FIELD_AT(force,index,1));
-				}
-				if(iy!=Y_EXT-1){
 					_algebra_vector_zero_g(*_4FIELD_AT(force,index,2));
-				}
-				if(iz!=Z_EXT-1){
 					_algebra_vector_zero_g(*_4FIELD_AT(force,index,3));
 				}
 			}
 		}
 	}
 
+}
+
+
+
+
+double SF_test_force_bcs(suNg_av_field *force) {
+/*should be zero*/
+	double pa=0., k;
+	int ix,iy,iz,index;
+
+	if(COORD[0] == 0) {
+		for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
+			index=ipt(0,ix,iy,iz);
+			_algebra_vector_sqnorm_g(k,*_4FIELD_AT(force,index,0)); pa+=k;
+			_algebra_vector_sqnorm_g(k,*_4FIELD_AT(force,index,1)); pa+=k;
+			_algebra_vector_sqnorm_g(k,*_4FIELD_AT(force,index,2)); pa+=k;
+			_algebra_vector_sqnorm_g(k,*_4FIELD_AT(force,index,3)); pa+=k;
+			index=ipt(1,ix,iy,iz);
+			_algebra_vector_sqnorm_g(k,*_4FIELD_AT(force,index,1)); pa+=k;
+			_algebra_vector_sqnorm_g(k,*_4FIELD_AT(force,index,2)); pa+=k;
+			_algebra_vector_sqnorm_g(k,*_4FIELD_AT(force,index,3)); pa+=k;
+		}
+	}
+	if(COORD[0] == NP_T-1) {
+		for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
+			index=ipt(T-1,ix,iy,iz);
+			_algebra_vector_sqnorm_g(k,*_4FIELD_AT(force,index,0)); pa+=k;
+			_algebra_vector_sqnorm_g(k,*_4FIELD_AT(force,index,1)); pa+=k;
+			_algebra_vector_sqnorm_g(k,*_4FIELD_AT(force,index,2)); pa+=k;
+			_algebra_vector_sqnorm_g(k,*_4FIELD_AT(force,index,3)); pa+=k;
+		}
+	}
+  global_sum(&pa, 1);
+  return pa/(double)(GLB_X*GLB_Y*GLB_Z*(NG*NG-1)*(4+4+3));
 }
 
 
@@ -479,7 +400,7 @@ double SF_phi1_up[NG] = {.5, .5, -.5, -.5};
 void SF_gauge_bcs(suNg_field *gf, int strength)
 {
   int index;
-  int ix, iy, iz;
+  int it, ix, iy, iz;
   int k;
   suNg *u;
 
@@ -505,47 +426,29 @@ void SF_gauge_bcs(suNg_field *gf, int strength)
 	}	
   
 	
-#warning SCRIVERE UN TEST PER VERIFICARE CHE QUESTO EE CONSISTENTE CON I BORDI
 	if(COORD[0] == 0) {
 		for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
-			if(T_BORDER>0) {
-				index=ipt_ext(T_BORDER-1,ix,iy,iz);
+			for(it=0;it<=T_BORDER;it++) {
+				index=ipt_ext(it,ix,iy,iz);
 				if(index!=-1) {
 					u=pu_gauge(index,0);
 					_suNg_unit(*u);
-				}
-			}
-			index=ipt_ext(T_BORDER,ix,iy,iz);
-			if(index!=-1) {
-				u=pu_gauge(index,0);
-				_suNg_unit(*u);
-				if(ix!=X_EXT-1){
 					u=pu_gauge(index,1);
 					_suNg_unit(*u);
-				}
-				if(iy!=Y_EXT-1){
 					u=pu_gauge(index,2);
 					_suNg_unit(*u);
-				}
-				if(iz!=Z_EXT-1){
 					u=pu_gauge(index,3);
 					_suNg_unit(*u);
 				}
 			}
 			index=ipt_ext(T_BORDER+1,ix,iy,iz);
 			if(index!=-1) {
-				if(ix!=X_EXT-1){
-					u=pu_gauge(index,1);
-					*u = Bound0;
-				}
-				if(iy!=Y_EXT-1){
-					u=pu_gauge(index,2);
-					*u = Bound0;
-				}
-				if(iz!=Z_EXT-1){
-					u=pu_gauge(index,3);
-					*u = Bound0;
-				}
+				u=pu_gauge(index,1);
+				*u = Bound0;
+				u=pu_gauge(index,2);
+				*u = Bound0;
+				u=pu_gauge(index,3);
+				*u = Bound0;
 			}
 		}
 	}
@@ -555,17 +458,24 @@ void SF_gauge_bcs(suNg_field *gf, int strength)
 			if(index!=-1) {
 				u=pu_gauge(index,0);
 				_suNg_unit(*u);
-				if(ix!=X_EXT-1){
+				u=pu_gauge(index,1);
+				*u = BoundT;
+				u=pu_gauge(index,2);
+				*u = BoundT;
+				u=pu_gauge(index,3);
+				*u = BoundT;
+			}
+			for(it=T+T_BORDER-1;it<T+2*T_BORDER;it++) {
+				index=ipt_ext(it,ix,iy,iz);
+				if(index!=-1) {
+					u=pu_gauge(index,0);
+					_suNg_unit(*u);
 					u=pu_gauge(index,1);
-					*u = BoundT;
-				}
-				if(iy!=Y_EXT-1){
+					_suNg_unit(*u);
 					u=pu_gauge(index,2);
-					*u = BoundT;
-				}
-				if(iz!=Z_EXT-1){
+					_suNg_unit(*u);
 					u=pu_gauge(index,3);
-					*u = BoundT;
+					_suNg_unit(*u);
 				}
 			}
 		}
@@ -573,3 +483,42 @@ void SF_gauge_bcs(suNg_field *gf, int strength)
 	
 }
 
+
+
+
+double SF_test_gauge_bcs()
+{
+/*calculates average of all plaquettes that should remain fixed for SF*/
+	double pa=0.;
+	int ix, iy, iz,index;
+
+	complete_gf_sendrecv(u_gauge);
+	if(COORD[0] == 0) {
+		for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
+			index=ipt(0,ix,iy,iz);
+			pa+=(double)(plaq(index,1,0));
+			pa+=(double)(plaq(index,2,0));
+			pa+=(double)(plaq(index,2,1));
+			pa+=(double)(plaq(index,3,0));
+			pa+=(double)(plaq(index,3,1));
+			pa+=(double)(plaq(index,3,2));
+			index=ipt(1,ix,iy,iz);
+			pa+=(double)(plaq(index,2,1));
+			pa+=(double)(plaq(index,3,1));
+			pa+=(double)(plaq(index,3,2));
+		}
+	}
+	if(COORD[0] == NP_T-1) {
+		for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
+			index=ipt(T-1,ix,iy,iz);
+			pa+=(double)(plaq(index,1,0));
+			pa+=(double)(plaq(index,2,0));
+			pa+=(double)(plaq(index,3,0));
+			pa+=(double)(plaq(index,2,1));
+			pa+=(double)(plaq(index,3,1));
+			pa+=(double)(plaq(index,3,2));
+		}
+	}
+  global_sum(&pa, 1);
+  return pa/(double)(GLB_X*GLB_Y*GLB_Z*NG*(6+6+3));
+}

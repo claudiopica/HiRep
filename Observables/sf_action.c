@@ -207,164 +207,29 @@ else
 
  */
 
-double sf_action(double beta)
+double SF_action(double beta)
 {
-/*single processor method*/
-/*
-  int x, y, z, k;
-  double pa=0.0;
-  
-	for (x=0;x<GLB_X;x++)
-	for (y=0;y<GLB_Y;y++)
-	for (z=0;z<GLB_Z;z++)
-		for (k=1;k<4;k++)
-			pa+=(double)(E_8(ipt(0,x,y,z),k) + E_8_top(ipt(GLB_T-2,x,y,z),k));
+	double pa=0.;
+	int ix, iy, iz,index;
 
-  return pa*(double)(beta/(NG*GLB_X));
-*/
-/*mpi method*/
-  _DECLARE_INT_ITERATOR(i);
-  double pa=0.;
-  int ix, iy, iz, k;
-
-if(COORD[0]==0)
-{
-  _PIECE_FOR(&glattice,i) {
-    _SITE_FOR(&glattice,i) {
-    
-	for (ix=0; ix<GLB_X/NP_X; ++ix)
-        for (iy=0; iy<GLB_Y/NP_Y; ++iy)
-        for (iz=0; iz<GLB_Z/NP_Z; ++iz)
-	{
-	{
-	{
-		if (ipt(1,ix,iy,iz)==i)/*TEMP ix,iy,iz->0,0,0 etc*/
-		{
-			for (k=1;k<4;k++)
-			{
-				pa+=(double)(E_8(i,k));
-			}
-    		}
+	complete_gf_sendrecv(u_gauge);
+	if(COORD[0] == 0) {
+		for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
+			index=ipt(1,ix,iy,iz);
+			pa+=(double)(E_8(index,1));
+			pa+=(double)(E_8(index,2));
+			pa+=(double)(E_8(index,3));
+		}
 	}
+	if(COORD[0] == NP_T-1) {
+		for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
+			index=ipt(T-2,ix,iy,iz);
+			pa+=(double)(E_8_top(index,1));
+			pa+=(double)(E_8_top(index,2));
+			pa+=(double)(E_8_top(index,3));
+		}
 	}
-	}
-
-    }
-    if(_PIECE_INDEX(i)==0) {
-      complete_gf_sendrecv(u_gauge);
-    }
-  }
-}
-if(COORD[0]==NP_T-1)
-{
-  _PIECE_FOR(&glattice,i) {
-    _SITE_FOR(&glattice,i) {
-    
-	for (ix=0; ix<GLB_X/NP_X; ++ix)
-        for (iy=0; iy<GLB_Y/NP_Y; ++iy)
-        for (iz=0; iz<GLB_Z/NP_Z; ++iz)
-	{
-	{
-	{
-		if (ipt((GLB_T/NP_T)-2,ix,iy,iz)==i)
-		{
-			for (k=1;k<4;k++)
-			{
-				pa+=(double)(E_8_top(i,k));
-			}
-    		}
-	}
-	}
-	}
-
-    }
-    if(_PIECE_INDEX(i)==0) {
-      complete_gf_sendrecv(u_gauge);
-    }
-  }
-}
   global_sum(&pa, 1);
-
   return pa*(double)(beta/(NG*GLB_X));
-
 }
 
-double sf_test_gauge_bcs()
-{
-/*calculates average of all plaquettes that should remain fixed for SF*/
-  _DECLARE_INT_ITERATOR(i);
-  double pa=0.;
-  int ix, iy, iz;
-
-if(COORD[0]==0)
-{
-  _PIECE_FOR(&glattice,i) {
-    _SITE_FOR(&glattice,i) {
-    
-	for (ix=0; ix<GLB_X/NP_X; ++ix)
-        for (iy=0; iy<GLB_Y/NP_Y; ++iy)
-        for (iz=0; iz<GLB_Z/NP_Z; ++iz)
-	{
-	{
-	{
-		if (ipt(1,ix,iy,iz)==i)
-		{
-			pa+=(double)(plaq(i,2,1));
-			pa+=(double)(plaq(i,3,1));
-			pa+=(double)(plaq(i,3,2));
-    		}
-/*		if (ipt(0,ix,iy,iz)==i)
-		{
-			pa+=(double)(plaq(i,1,0));
-			pa+=(double)(plaq(i,2,0));
-			pa+=(double)(plaq(i,2,1));
-			pa+=(double)(plaq(i,3,0));
-			pa+=(double)(plaq(i,3,1));
-			pa+=(double)(plaq(i,3,2));
-    		}
-*/		
-	}
-	}
-	}
-
-    }
-    if(_PIECE_INDEX(i)==0) {
-      complete_gf_sendrecv(u_gauge);
-    }
-  }
-}
-if(COORD[0]==NP_T-1)
-{
-  _PIECE_FOR(&glattice,i) {
-    _SITE_FOR(&glattice,i) {
-    
-	for (ix=0; ix<GLB_X/NP_X; ++ix)
-        for (iy=0; iy<GLB_Y/NP_Y; ++iy)
-        for (iz=0; iz<GLB_Z/NP_Z; ++iz)
-	{
-	{
-	{
-		if (ipt((GLB_T/NP_T)-1,ix,iy,iz)==i)
-		{
-/*			pa+=(double)(plaq(i,1,0));
-			pa+=(double)(plaq(i,2,0));
-			pa+=(double)(plaq(i,2,1));
-*/			pa+=(double)(plaq(i,3,0));
-			pa+=(double)(plaq(i,3,1));
-			pa+=(double)(plaq(i,3,2));
-    		}
-	}
-	}
-	}
-
-    }
-    if(_PIECE_INDEX(i)==0) {
-      complete_gf_sendrecv(u_gauge);
-    }
-  }
-}
-  global_sum(&pa, 1);
-
-  return pa/(double)(GLB_X*GLB_Y*GLB_Z*NG*(6+6+3));
-
-}

@@ -1,7 +1,7 @@
 TOPDIR = ..
 MKDIR=$(TOPDIR)/Make
 
-EXES = mk_mesons trunc_mesons random_cnfg random_spinor eigval mk_mesons_with_z2semwall
+#EXES = mk_mesons random_cnfg random_spinor eigval mk_mesons_with_z2semwall
 
 default: $(EXES)
 
@@ -52,6 +52,12 @@ MODS := archive_eolexi archive_henty
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 COMMON_OBJS = $(MOD_OBJS)
+
+
+mk_mesons_with_z2semwall: cinfo.c $(OBJS) $(MOD_OBJS) mk_mesons_with_z2semwall.o
+	echo -n Linking [$@]... 
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(MOD_OBJS) mk_mesons_with_z2semwall.o &&\
+	echo " done." || echo " failed."
 
 
 include $(MKDIR)/MkRules

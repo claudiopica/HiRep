@@ -25,7 +25,7 @@
 
 /*#define POINT_TO_ALL*/
 
-#define RESTRICTED_SET
+/* #define RESTRICTED_SET */
 
 
 
