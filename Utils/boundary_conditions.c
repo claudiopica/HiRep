@@ -10,12 +10,10 @@
 #include "suN.h"
 #include "communications.h"
 
-#ifdef BASIC_SF
+
 #include "observables.h"
-#endif
 
 #ifdef ROTATED_SF
-#include "observables.h"
 #include "update.h"
 extern rhmc_par _update_par; /* Update/update_rhmc.c */
 #endif /* ROTATED_SF */
@@ -403,84 +401,65 @@ void SF_gauge_bcs(suNg_field *gf, int strength)
   int it, ix, iy, iz;
   int k;
   suNg *u;
-
+  
   error(gf==NULL,1,"SF_gauge_bcs [random_fields.c]",
 	"Attempt to access unallocated memory space");   
-
-  /*Boundary gauge fields*/
-	suNg Bound0, BoundT;
-	if(strength==1) {  /*SF bcs*/
-		_suNg_zero(Bound0);
-		for(k=0; k<NG; k++) {
-			Bound0.c[(1+NG)*k].re = cos((SF_phi0_dn[k]+SF_phi1_dn[k]*SF_eta)/(GLB_T-2));
-			Bound0.c[(1+NG)*k].im = sin((SF_phi0_dn[k]+SF_phi1_dn[k]*SF_eta)/(GLB_T-2));
-		}
-		_suNg_zero(BoundT);
-		for(k=0; k<NG; k++) {
-			BoundT.c[(1+NG)*k].re = cos((SF_phi0_up[k]+SF_phi1_up[k]*SF_eta)/(GLB_T-2));
-			BoundT.c[(1+NG)*k].im = sin((SF_phi0_up[k]+SF_phi1_up[k]*SF_eta)/(GLB_T-2));
-		}
-	} else { /*UNIT bcs*/
-		_suNg_unit(Bound0);
-		_suNg_unit(BoundT);
-	}	
   
-	
-	if(COORD[0] == 0) {
-		for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
-			for(it=0;it<=T_BORDER;it++) {
-				index=ipt_ext(it,ix,iy,iz);
-				if(index!=-1) {
-					u=pu_gauge(index,0);
-					_suNg_unit(*u);
-					u=pu_gauge(index,1);
-					_suNg_unit(*u);
-					u=pu_gauge(index,2);
-					_suNg_unit(*u);
-					u=pu_gauge(index,3);
-					_suNg_unit(*u);
-				}
-			}
-			index=ipt_ext(T_BORDER+1,ix,iy,iz);
-			if(index!=-1) {
-				u=pu_gauge(index,1);
-				*u = Bound0;
-				u=pu_gauge(index,2);
-				*u = Bound0;
-				u=pu_gauge(index,3);
-				*u = Bound0;
-			}
-		}
-	}
-	if(COORD[0] == NP_T-1) {
-		for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
-			index=ipt_ext(T+T_BORDER-1,ix,iy,iz);
-			if(index!=-1) {
-				u=pu_gauge(index,0);
-				_suNg_unit(*u);
-				u=pu_gauge(index,1);
-				*u = BoundT;
-				u=pu_gauge(index,2);
-				*u = BoundT;
-				u=pu_gauge(index,3);
-				*u = BoundT;
-			}
-			for(it=T+T_BORDER-1;it<T+2*T_BORDER;it++) {
-				index=ipt_ext(it,ix,iy,iz);
-				if(index!=-1) {
-					u=pu_gauge(index,0);
-					_suNg_unit(*u);
-					u=pu_gauge(index,1);
-					_suNg_unit(*u);
-					u=pu_gauge(index,2);
-					_suNg_unit(*u);
-					u=pu_gauge(index,3);
-					_suNg_unit(*u);
-				}
-			}
-		}
-	}
-	
+  /*Boundary gauge fields*/
+  suNg Bound0, BoundT;
+  if(strength==1) {  /*SF bcs*/
+    _suNg_zero(Bound0);
+    for(k=0; k<NG; k++) {
+      Bound0.c[(1+NG)*k].re = cos((SF_phi0_dn[k]+SF_phi1_dn[k]*SF_eta)/(GLB_T-2));
+      Bound0.c[(1+NG)*k].im = sin((SF_phi0_dn[k]+SF_phi1_dn[k]*SF_eta)/(GLB_T-2));
+    }
+    _suNg_zero(BoundT);
+    for(k=0; k<NG; k++) {
+      BoundT.c[(1+NG)*k].re = cos((SF_phi0_up[k]+SF_phi1_up[k]*SF_eta)/(GLB_T-2));
+      BoundT.c[(1+NG)*k].im = sin((SF_phi0_up[k]+SF_phi1_up[k]*SF_eta)/(GLB_T-2));
+    }
+  } else { /*UNIT bcs*/
+    _suNg_unit(Bound0);
+    _suNg_unit(BoundT);
+  }	
+  
+  if(COORD[0] == 0) {
+    for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
+      index=ipt(0,ix,iy,iz);
+      u=((gf->ptr)+coord_to_index(index,0));
+      _suNg_unit(*u);
+      u=((gf->ptr)+coord_to_index(index,1));
+      _suNg_unit(*u);
+      u=((gf->ptr)+coord_to_index(index,2));
+      _suNg_unit(*u);
+      u=((gf->ptr)+coord_to_index(index,3));
+      _suNg_unit(*u);
+      
+      index=ipt(1,ix,iy,iz);
+      u=((gf->ptr)+coord_to_index(index,1));
+      *u = Bound0;
+      u=((gf->ptr)+coord_to_index(index,2));
+      *u = Bound0;
+      u=((gf->ptr)+coord_to_index(index,3));
+      *u = Bound0;
+    }
+  }
+  if(COORD[0] == NP_T-1) {
+    for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
+      index=ipt(T-1,ix,iy,iz);
+      u=((gf->ptr)+coord_to_index(index,0));
+      _suNg_unit(*u);
+      u=((gf->ptr)+coord_to_index(index,1));
+      *u = BoundT;
+      u=((gf->ptr)+coord_to_index(index,2));
+      *u = BoundT;
+      u=((gf->ptr)+coord_to_index(index,3));
+      *u = BoundT;
+    }
+    
+  }
+  
+  start_gf_sendrecv(gf);
 }
 
 
@@ -492,7 +471,9 @@ double SF_test_gauge_bcs()
 	double pa=0.;
 	int ix, iy, iz,index;
 
+	start_gf_sendrecv(u_gauge);
 	complete_gf_sendrecv(u_gauge);
+
 	if(COORD[0] == 0) {
 		for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
 			index=ipt(0,ix,iy,iz);

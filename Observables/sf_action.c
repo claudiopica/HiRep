@@ -209,26 +209,25 @@ else
 
 double SF_action(double beta)
 {
-	double pa=0.;
-	int ix, iy, iz,index;
-
-	complete_gf_sendrecv(u_gauge);
-	if(COORD[0] == 0) {
-		for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
-			index=ipt(1,ix,iy,iz);
-			pa+=(double)(E_8(index,1));
-			pa+=(double)(E_8(index,2));
-			pa+=(double)(E_8(index,3));
-		}
-	}
-	if(COORD[0] == NP_T-1) {
-		for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
-			index=ipt(T-2,ix,iy,iz);
-			pa+=(double)(E_8_top(index,1));
-			pa+=(double)(E_8_top(index,2));
-			pa+=(double)(E_8_top(index,3));
-		}
-	}
+  double pa=0.;
+  int ix, iy, iz,index;
+  complete_gf_sendrecv(u_gauge);
+  if(COORD[0] == 0) {
+    for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
+      index=ipt(1,ix,iy,iz);
+      pa+=(double)(E_8(index,1));
+      pa+=(double)(E_8(index,2));
+      pa+=(double)(E_8(index,3));
+    }
+  }
+  if(COORD[0] == NP_T-1) {
+    for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
+      index=ipt(T-2,ix,iy,iz);
+      pa+=(double)(E_8_top(index,1));
+      pa+=(double)(E_8_top(index,2));
+      pa+=(double)(E_8_top(index,3));
+    }
+  }
   global_sum(&pa, 1);
   return pa*(double)(beta/(NG*GLB_X));
 }
