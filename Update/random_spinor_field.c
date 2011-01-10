@@ -30,4 +30,7 @@ void gaussian_spinor_field_flt(spinor_field_flt *s) {
 	for(i=0;i<type->local_master_pieces;i++)
  	  gauss_flt((float*)(s->ptr+type->master_start[i]),(type->master_end[i]-type->master_start[i]+1)*sizeof(suNf_spinor_flt)/sizeof(float));
 	spinor_field_mul_f_flt(s,c1,s);
+   #ifdef BASIC_SF
+        SF_spinor_bcs_flt(s);
+   #endif /* BASIC_SF */
 }

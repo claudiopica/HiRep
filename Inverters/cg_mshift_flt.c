@@ -197,7 +197,7 @@ int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_operator_flt F, spi
             norm[i]=spinor_field_prod_im_f(res, res2);
             lprintf("CGDEBUG",20,"Im=%e check norm=%e\n",norm[i],spinor_field_sqnorm_f(res));
             norm[i]=spinor_field_prod_re_f(res, res2);
-            //norm[i]=sqrt(spinor_field_sqnorm_f(res2));
+            /* norm[i]=sqrt(spinor_field_sqnorm_f(res2)); */
 
           }
         }
@@ -213,7 +213,7 @@ int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_operator_flt F, spi
 #define MAX_PREC 1.e-10
       if(local_par.err2<MAX_PREC) local_par.err2=MAX_PREC;
 #undef MAX_PREC
-      //local_par.err2=1.e-10;
+      /* local_par.err2=1.e-10; */
       lprintf("CGDEBUG",20,"err2 = %e\n",local_par.err2);
       /* should not be needed since core do not modify flags */
       for(i=0;i<par->n;++i) loc_flags[i]=sflags[i]; /* set core flags */ 

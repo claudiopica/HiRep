@@ -107,7 +107,8 @@ int main(int argc,char *argv[])
 
   /* read input file */
   read_input(glb_var.read,"test_input");
-  rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed);
+  lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed+PID);
+  rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
 
   /* setup communication geometry */
   if (geometry_init() == 1) {

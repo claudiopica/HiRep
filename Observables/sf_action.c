@@ -17,21 +17,6 @@
 #include "observables.h"
 #include <stdio.h>
 
-void print_matrix(suNg v, char label[])
-{
-   int i;
-   printf("\n\n SuNg Matrix:\n");
-   printf(label);
-   for(i=0;i<NG*NG;i++)
-   {
-      if((i%NG)==0)
-      {
-         printf("\n");
-      }
-      printf("[%+.5f,%+.5f] ",((v).c[i]).re,((v).c[i]).im);
-   }
-}
-
 /*! \ingroup sfgauge
  * Bottom E_8 component
  *
@@ -46,10 +31,8 @@ double E_8(int ix,int k)
    double p;
    suNg *v1,*v2,*v3,*v4,w1,w2,w3,w4,ilambda8;
    int iy, iz;
-/*   printf("\n\n E_8: ix=%d, k=%d \n\n",ix,k);*/
 
-if(NG==4)
-{
+#if NG==4
    _suNg_zero(ilambda8);
    ((ilambda8).c[0]).re = 0.0;
    ((ilambda8).c[0]).im = 0.5;
@@ -59,9 +42,7 @@ if(NG==4)
    ((ilambda8).c[10]).im = -0.5;
    ((ilambda8).c[15]).re = 0.0;
    ((ilambda8).c[15]).im = -0.5;
-}
-else if(NG==3)
-{
+#elif NG==3
    _suNg_zero(ilambda8);
    ((ilambda8).c[0]).re = 0.0;
    ((ilambda8).c[0]).im = 1.0;
@@ -69,46 +50,30 @@ else if(NG==3)
    ((ilambda8).c[4]).im = -0.5;
    ((ilambda8).c[8]).re = 0.0;
    ((ilambda8).c[8]).im = -0.5;
-}
-else if (NG==2)
-{
+#elif NG==2
    _suNg_zero(ilambda8);
    ((ilambda8).c[0]).re = 0.0;
    ((ilambda8).c[0]).im = 1.0;
    ((ilambda8).c[3]).re = 0.0;
    ((ilambda8).c[3]).im = -1.0;
-}
-else
-{
-   error(1,1,"E [SF_action.c]",
-         "No explicit form for observable for given NG");
-}  
-
+#else
+#error  "No explicit generator for observable for given NG"
+#endif 
+   
    iy=iup(ix,k);
    iz=iup(ix,0);
-
+   
    v1=pu_gauge(ix,k);
-/*   print_matrix((*v1),"v1\n");*/
    v2=pu_gauge(iy,0);
-/*   print_matrix((*v2),"v2\n");*/
    v3=pu_gauge(iz,k);
-/*   print_matrix((*v3),"v3\n");*/
    v4=pu_gauge(ix,0);
-/*   print_matrix((*v4),"v4\n");*/
 
    _suNg_times_suNg(w1,(*v1),(*v2));
-/*   print_matrix(w1,"w1=v1v2\n");*/
    _suNg_times_suNg(w2,(*v4),(*v3));
-/*   print_matrix(w2,"w2=v4v3\n");*/
-
    _suNg_times_suNg_dagger(w3,w1,w2);      
-/*   print_matrix(w3,"w3=w1(w2)'=v1v2(v3)'(v4)'\n");*/
-      
    _suNg_times_suNg(w4,ilambda8,w3);
-/*   print_matrix((*v4),"i lambda_8 w3\n");*/
 
    _suNg_trace_re(p,w4);
-/*   printf("Re Tr = %f \n",p);*/
 
    return p;
 }
@@ -124,71 +89,51 @@ else
 
 double E_8_top(int ix,int k)
 {
-   double p;
-   suNg *v1,*v2,*v3,*v4,w1,w2,w3,w4,ilambda8;
-   int iy, iz;
-/*   printf("\n\n E_8: ix=%d, k=%d \n\n",ix,k);*/
-
-if(NG==4)
-{
-   _suNg_zero(ilambda8);
-   ((ilambda8).c[0]).re = 0.0;
-   ((ilambda8).c[0]).im = 0.5;
-   ((ilambda8).c[5]).re = 0.0;
-   ((ilambda8).c[5]).im = 0.5;
-   ((ilambda8).c[10]).re = 0.0;
-   ((ilambda8).c[10]).im = -0.5;
-   ((ilambda8).c[15]).re = 0.0;
-   ((ilambda8).c[15]).im = -0.5;
-}
-else if(NG==3)
-{
-   _suNg_zero(ilambda8);
-   ((ilambda8).c[0]).re = 0.0;
-   ((ilambda8).c[0]).im = 1.0;
-   ((ilambda8).c[4]).re = 0.0;
-   ((ilambda8).c[4]).im = -0.5;
-   ((ilambda8).c[8]).re = 0.0;
-   ((ilambda8).c[8]).im = -0.5;
-}
-else if (NG==2)
-{
-   _suNg_zero(ilambda8);
-   ((ilambda8).c[0]).re = 0.0;
-   ((ilambda8).c[0]).im = 1.0;
-   ((ilambda8).c[3]).re = 0.0;
-   ((ilambda8).c[3]).im = -1.0;
-}
-else
-{
-   error(1,1,"E [SF_action.c]",
-         "No explicit form for observable for given NG");
-}  
-   iy=iup(ix,k);
-   iz=iup(ix,0);
-
-   v1=pu_gauge(ix,k);
-/*   print_matrix((*v1),"v1\n");*/
-   v2=pu_gauge(iy,0);
-/*   print_matrix((*v2),"v2\n");*/
-   v3=pu_gauge(iz,k);
-/*   print_matrix((*v3),"v3\n");*/
-   v4=pu_gauge(ix,0);
-/*   print_matrix((*v4),"v4\n");*/
-
-   _suNg_times_suNg(w1,(*v1),(*v2));
-/*   print_matrix(w1,"w1=v1v2\n");*/
-   _suNg_times_suNg(w2,ilambda8,(*v3));
-/*   print_matrix(w2,"w2=v4v3\n");*/
-
-   _suNg_times_suNg_dagger(w3,w2,w1);      
-/*   print_matrix(w3,"w3=w1(w2)'=v1v2(v3)'(v4)'\n");*/
-      
-   _suNg_times_suNg(w4,(*v4),w3);
-/*   print_matrix((*v4),"i lambda_8 w3\n");*/
+  double p;
+  suNg *v1,*v2,*v3,*v4,w1,w2,w3,w4,ilambda8;
+  int iy, iz;
+#if NG==4
+  _suNg_zero(ilambda8);
+  ((ilambda8).c[0]).re = 0.0;
+  ((ilambda8).c[0]).im = 0.5;
+  ((ilambda8).c[5]).re = 0.0;
+  ((ilambda8).c[5]).im = 0.5;
+  ((ilambda8).c[10]).re = 0.0;
+  ((ilambda8).c[10]).im = -0.5;
+  ((ilambda8).c[15]).re = 0.0;
+  ((ilambda8).c[15]).im = -0.5;
+#elif NG==3
+  _suNg_zero(ilambda8);
+  ((ilambda8).c[0]).re = 0.0;
+  ((ilambda8).c[0]).im = 1.0;
+  ((ilambda8).c[4]).re = 0.0;
+  ((ilambda8).c[4]).im = -0.5;
+  ((ilambda8).c[8]).re = 0.0;
+  ((ilambda8).c[8]).im = -0.5;
+#elif NG==2
+  _suNg_zero(ilambda8);
+  ((ilambda8).c[0]).re = 0.0;
+  ((ilambda8).c[0]).im = 1.0;
+  ((ilambda8).c[3]).re = 0.0;
+  ((ilambda8).c[3]).im = -1.0;
+#else
+#error "No explicit generator for observable for given NG"
+#endif
+  iy=iup(ix,k);
+  iz=iup(ix,0);
+  
+  v1=pu_gauge(ix,k);
+  v2=pu_gauge(iy,0);
+  v3=pu_gauge(iz,k);
+  v4=pu_gauge(ix,0);
+  
+  _suNg_times_suNg(w1,(*v1),(*v2));
+  _suNg_times_suNg(w2,ilambda8,(*v3));
+  _suNg_times_suNg_dagger(w3,w2,w1);      
+  _suNg_times_suNg(w4,(*v4),w3);
 
    _suNg_trace_re(p,w4);
-/*   printf("Re Tr = %f \n",p);*/
+
    return -p;
 }
 

@@ -27,6 +27,9 @@
 #define true (0==0)
 #define false (0==1)
 
+#ifdef WITH_MPI
+#error Please compile without MPI!
+#endif
 
 int lattice_size[NDIM] = { 16, 16, 16, 32 };
 char output_filename[256];

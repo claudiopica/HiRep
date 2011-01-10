@@ -206,7 +206,9 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"MVM during RHMC initialzation: %ld\n",getMVM());
   lprintf("MAIN",0,"Initial plaquette: %1.8e\n",avr_plaquette());
 #ifdef BASIC_SF
+#ifndef NDEBUG
   lprintf("MAIN",0,"Initial SF_test_gauge_bcs: %1.8e\n",SF_test_gauge_bcs());
+#endif /*NDEBUG*/
   lprintf("MAIN",0,"Initial SF_action: %1.8e\n",SF_action((&flow)->rhmc_v->rhmc_p.beta));
 #endif /* BASIC_SF */
 

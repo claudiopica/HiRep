@@ -26,6 +26,7 @@ void apply_bc_flt();
 
 #ifdef BASIC_SF
 void SF_spinor_bcs(spinor_field *sp);
+void SF_spinor_bcs_flt(spinor_field_flt *sp);
 double SF_test_spinor_bcs(spinor_field *sp);
 #endif /* BASIC_SF */
 

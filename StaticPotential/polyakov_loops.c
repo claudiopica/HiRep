@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Computation of the Wilson loops for the static potential
+* Computation of the Polyakov loops
 *
 *******************************************************************************/
 
@@ -99,6 +99,13 @@ int parse_cnfg_filename(char* filename, filename_t* fn) {
     return QUENCHED_CNFG;
   }
 
+  hm=sscanf(basename,"%dx%dx%dx%d%*[Nn]c%d",
+      &(fn->t),&(fn->x),&(fn->y),&(fn->z),&(fn->nc));
+  if(hm==5) {
+    fn->type=QUENCHED_CNFG;
+    return QUENCHED_CNFG;
+  }
+
   fn->type=UNKNOWN_CNFG;
   return UNKNOWN_CNFG;
 }
@@ -125,7 +132,7 @@ void read_cmdline(int argc, char* argv[]) {
   if (ai!=0) strcpy(input_filename,argv[ai]);
 
   error((ac==0 && al==0) || (ac!=0 && al!=0),1,"parse_cmdline [polyakov_loops.c]",
-      "Syntax: mk_wilsonloops { -c <config file> | -l <list file> } [-i <input file>] [-o <output file>] [-m]");
+      "Syntax: polyakov_loops { -c <config file> | -l <list file> } [-i <input file>] [-o <output file>] [-m]");
 
   if(ac != 0) {
     strcpy(cnfg_filename,argv[ac]);

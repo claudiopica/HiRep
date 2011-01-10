@@ -22,11 +22,11 @@ int max_H(spinor_operator H, geometry_descriptor *type, double *max) {
   int count;
 
   s1=alloc_spinor_field_f(3,type);
-/* //#ifdef UPDATE_EO */
-/* // s1=alloc_spinor_field_f(3,&glat_even); */
-/* //#else */
-/* //  s1=alloc_spinor_field_f(3,&glattice); */
-/* //#endif */
+/* #ifdef UPDATE_EO */
+/*  s1=alloc_spinor_field_f(3,&glat_even); */
+/* #else */
+/*   s1=alloc_spinor_field_f(3,&glattice); */
+/* #endif */
   s2=s1+1;
   s3=s2+1;
 

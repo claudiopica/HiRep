@@ -300,7 +300,7 @@ int main(int argc,char *argv[]) {
 
     lprintf("TEST",0,"<p> %1.6f\n",avr_plaquette());
 
-    //full_plaquette();
+    /* full_plaquette(); */
 
     for (k=0;k<nm;++k){
 

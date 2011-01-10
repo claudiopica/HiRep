@@ -12,7 +12,7 @@
 #include "communications.h"
 
 #define _PROJ_BIT (1<<4) /* project gauge field every 2^_PROJ_BIT changes */
-#define _proj_gfield(c) if((c)&_PROJ_BIT){(c)=0;project_gauge_field();} else {++(c); start_gf_sendrecv(u_gauge);} (void*)0
+#define _proj_gfield(c) if((c)&_PROJ_BIT){(c)=0;project_gauge_field();} else {++(c); start_gf_sendrecv(u_gauge);}
 
 void leapfrog(suNg_av_field *momenta, int_par *traj_par){
   unsigned int count=0;

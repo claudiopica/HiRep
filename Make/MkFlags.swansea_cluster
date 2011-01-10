@@ -19,8 +19,8 @@ MACRO += -DNDEBUG
 #MACRO += -DMPI_TIMING
 
 #Compiler
-#CC = /opt/gcc-4.2.1/bin/gcc-4.2.1
-CC = /opt/mvapich-1.0.1/bin/mpicc
+#CC = gcc
+CC = mpicc
 CFLAGS = -Wall -std=c99 -O2
 
 ##########################################################################
@@ -32,13 +32,12 @@ MACRO += -D$(REPR) -DREPR_NAME=\"$(REPR)\"
 
 #Include
 INCDIR = $(TOPDIR)/Include
-INC = -I $(INCDIR) -I/opt/mvapich-1.0.1/include/
+INC = -I $(INCDIR) -I/usr/lib64/openmpi/1.2.5-gcc/include
 
-GCC = gcc-4.2.1
+GCC = gcc
 CPPFLAGS += $(MACRO)
 CPPFLAGS += $(INC)
-#LDFLAGS = -lm
-LDFLAGS = -lm -L/opt/mvapich-1.0.1/lib/
+LDFLAGS = -lm
 
 ifeq ($(strip $(CXX)),)
   CXX = g++

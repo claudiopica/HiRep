@@ -21,17 +21,17 @@
 
 /* these are all alredy defined in update_rhmc.c */
 /* State quantities for HMC */
-//suNg_av_field *momenta=NULL;
-//spinor_field *pf=NULL;
-//rhmc_par _update_par={0};
-//rational_app r_MD={0}; /* used in the action MD evolution */
-//double minev, maxev; /* min and max eigenvalue of H^2 */
+/* suNg_av_field *momenta=NULL; */
+/* spinor_field *pf=NULL; */
+/* rhmc_par _update_par={0}; */
+/* rational_app r_MD={0}; /\* used in the action MD evolution *\/ */
+/* double minev, maxev; /\* min and max eigenvalue of H^2 *\/ */
 /* END of State */
 extern suNg_av_field *momenta;
 extern spinor_field *pf;
 extern rhmc_par _update_par;
 extern rational_app r_MD; /* used in the action MD evolution */
-//extern double minev, maxev; /* min and max eigenvalue of H^2 */
+/* extern double minev, maxev; */ /* min and max eigenvalue of H^2 */
 
 
 static short int init=0;
@@ -154,7 +154,7 @@ void free_hmc(){
 
 int update_hmc(){
     double deltaH;
-    double maxev,minev;
+    /* double maxev,minev; */
     _DECLARE_INT_ITERATOR(i);
     
     if(!init) {
@@ -163,7 +163,7 @@ int update_hmc(){
         return -1;
     }
     
-    //find_spec_H2(&maxev,&minev, _update_par.mass); /* find spectral interval of H^2 */
+    /* find_spec_H2(&maxev,&minev, _update_par.mass); /\* find spectral interval of H^2 *\/ */
     
     /* generate new momenta and pseudofermions */
     lprintf("HMC",30,"Generating gaussian momenta and pseudofermions...\n");
