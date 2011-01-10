@@ -89,8 +89,10 @@ double SF_PCAC_wall_mass(double mass)
 	U1 = pu_gauge_f(idn(i,0),0);
 	S_y = _FIELD_AT(&prop_source[source],i);
 	S1 = (*S_y);
-	for(j=0;j<4;j++)
-	  _suNf_inverse_multiply(Stmp1P.c[j],(*U1),(*S_y).c[j]);
+	_suNf_inverse_multiply(Stmp1P.c[0],(*U1),(*S_y).c[0]); 
+	_suNf_inverse_multiply(Stmp1P.c[1],(*U1),(*S_y).c[1]); 
+	_suNf_inverse_multiply(Stmp1P.c[2],(*U1),(*S_y).c[2]); 
+	_suNf_inverse_multiply(Stmp1P.c[3],(*U1),(*S_y).c[3]); 
 	_vector_lc_f((*S_y).c[0],0.5,Stmp1P.c[0],+0.5,Stmp1P.c[2]);
 	_vector_lc_f((*S_y).c[1],0.5,Stmp1P.c[1],+0.5,Stmp1P.c[3]);
 	_vector_lc_f((*S_y).c[2],+0.5,Stmp1P.c[0],0.5,Stmp1P.c[2]);
@@ -145,8 +147,11 @@ double SF_PCAC_wall_mass(double mass)
 	U1 = pu_gauge_f(i,0);
 	S_y = _FIELD_AT(&prop[source],i);
 	S1 = (*S_y);
-	for(j=0;j<4;j++)
-	  _suNf_inverse_multiply(Stmp1P.c[j],(*U1),(*S_y).c[j]);
+	_suNf_inverse_multiply(Stmp1P.c[0],(*U1),(*S_y).c[0]); 
+	_suNf_inverse_multiply(Stmp1P.c[1],(*U1),(*S_y).c[1]); 
+	_suNf_inverse_multiply(Stmp1P.c[2],(*U1),(*S_y).c[2]); 
+	_suNf_inverse_multiply(Stmp1P.c[3],(*U1),(*S_y).c[3]); 
+
 	_vector_lc_f((*S_y).c[0],0.5,Stmp1P.c[0],-0.5,Stmp1P.c[2]);
 	_vector_lc_f((*S_y).c[1],0.5,Stmp1P.c[1],-0.5,Stmp1P.c[3]);
 	_vector_lc_f((*S_y).c[2],-0.5,Stmp1P.c[0],0.5,Stmp1P.c[2]);
@@ -196,8 +201,11 @@ double SF_PCAC_wall_mass(double mass)
 	U1 = pu_gauge_f(i,0);
 	S_y = _FIELD_AT(&prop_source[source],i);
 	S1 = (*S_y);
-	for(j=0;j<4;j++)
-	  _suNf_multiply(Stmp1P.c[j],(*U1),(*S_y).c[j]);
+	_suNf_inverse_multiply(Stmp1P.c[0],(*U1),(*S_y).c[0]); 
+	_suNf_inverse_multiply(Stmp1P.c[1],(*U1),(*S_y).c[1]); 
+	_suNf_inverse_multiply(Stmp1P.c[2],(*U1),(*S_y).c[2]); 
+	_suNf_inverse_multiply(Stmp1P.c[3],(*U1),(*S_y).c[3]); 
+
 	_vector_lc_f((*S_y).c[0],0.5,Stmp1P.c[0],-0.5,Stmp1P.c[2]);
 	_vector_lc_f((*S_y).c[1],0.5,Stmp1P.c[1],-0.5,Stmp1P.c[3]);
 	_vector_lc_f((*S_y).c[2],-0.5,Stmp1P.c[0],0.5,Stmp1P.c[2]);
@@ -246,12 +254,14 @@ double SF_PCAC_wall_mass(double mass)
   for(source=0;source<4*NF;source++){
     if(COORD[0]==0){
 	for(ix1=0;ix1<X;ix1++) for(ix2=0;ix2<Y;ix2++) for(ix3=0;ix3<Z;ix3++)
-	  i=ipt(2,ix1,ix2,ix3);
+							i=ipt(2,ix1,ix2,ix3);
 	U1 = pu_gauge_f(idn(i,0),0);
 	S_y = _FIELD_AT(&prop[source],i);
 	S1 = (*S_y);
-	for(j=0;j<4;j++)
-	  _suNf_multiply(Stmp1P.c[j],(*U1),(*S_y).c[j]);
+	_suNf_inverse_multiply(Stmp1P.c[0],(*U1),(*S_y).c[0]); 
+	_suNf_inverse_multiply(Stmp1P.c[1],(*U1),(*S_y).c[1]); 
+	_suNf_inverse_multiply(Stmp1P.c[2],(*U1),(*S_y).c[2]); 
+	_suNf_inverse_multiply(Stmp1P.c[3],(*U1),(*S_y).c[3]); 
 	_vector_lc_f((*S_y).c[0],0.5,Stmp1P.c[0],+0.5,Stmp1P.c[2]);
 	_vector_lc_f((*S_y).c[1],0.5,Stmp1P.c[1],+0.5,Stmp1P.c[3]);
 	_vector_lc_f((*S_y).c[2],+0.5,Stmp1P.c[0],0.5,Stmp1P.c[2]);
