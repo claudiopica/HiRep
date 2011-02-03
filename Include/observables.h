@@ -21,6 +21,7 @@
 #define SPIN_2D_INDEX(i,j) ( (i)*4 + (j) )
 
 double plaq(int ix,int mu,int nu);
+void cplaq(complex *ret,int ix,int mu,int nu);
 double avr_plaquette();
 double SF_action(double beta);
 double local_plaq(int ix);
@@ -131,8 +132,13 @@ void g0g5g2_eval_g5GammaDag_times_spinor(suNf_spinor* out, suNf_spinor* in);
 void g0g5g3_eval_g5GammaDag_times_spinor(suNf_spinor* out, suNf_spinor* in);
 
 
-void wilsonloops(int mu, int x, suNg_field* g);
-void ara_temporalwilsonloops(const int t, const int c[3], const int nsteps, const suNg_field* g);
-
+#define _WL_3VOL_INDEX(x,y,z) ((x)+(y)*X+(z)*X*Y)
+void WL_initialize();
+void WL_free();
+void WL_load_path(int c[3], int nsteps);
+void WL_Hamiltonian_gauge(suNg_field* out, suNg_field* in);
+void WL_broadcast_polyakov(suNg* poly, suNg_field* gf);
+void WL_correlators(double** ret, const suNg_field* gf, const suNg* poly, const int nsteps, const int* path, const int length, const int perm[3], int sign[3]);
+void WL_wilsonloops(double HYP_weight[3]);
 
 #endif 
