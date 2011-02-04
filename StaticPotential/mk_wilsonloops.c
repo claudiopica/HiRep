@@ -33,12 +33,11 @@
 
 /* HYP smearing parameters */
 typedef struct _input_HYP {
-  int nsteps;
+/*  int nsteps;*/
   double weight[3];
-  char type[256]; /* alldirections ; spatialonly */
 
   /* for the reading function */
-  input_record_t read[6];
+  input_record_t read[4];
 
 } input_HYP;
 
@@ -48,49 +47,75 @@ typedef struct _input_HYP {
     {"HYP smearing weight[0]", "HYP:weight0 = %lf", DOUBLE_T, &((varname).weight[0])},\
     {"HYP smearing weight[1]", "HYP:weight1 = %lf", DOUBLE_T, &((varname).weight[1])},\
     {"HYP smearing weight[2]", "HYP:weight2 = %lf", DOUBLE_T, &((varname).weight[2])},\
-    {"HYP smearing number of steps", "HYP:nsteps = %d", INT_T, &((varname).nsteps)},\
-    {"HYP smearing type", "HYP:type = %s", STRING_T, (varname).type},\
     {NULL, NULL, 0, NULL}\
   }\
 }
 
 typedef struct _input_wilson {
-  int Tmax;
-  int steps_1_0_0;
-  int steps_1_1_0;
-  int steps_1_1_1;
-  int steps_2_1_0;
-  int steps_2_1_1;
-  int steps_2_2_1;
+  int c[10][3];
+  int nsteps[10];
 
   /* for the reading function */
-  input_record_t read[8];
+  input_record_t read[41];
 
-} input_wilson;
+} input_WL;
 
-#define init_input_wilson(varname) \
+#define init_input_WL(varname) \
 { \
   .read={\
-    {"Max temporal separation", "SP:Tmax = %d", INT_T, &((varname).Tmax)},\
-    {"Number of steps for (1,0,0) loops", "SP:steps_1_0_0 = %d", INT_T, &((varname).steps_1_0_0)},\
-    {"Number of steps for (1,1,0) loops", "SP:steps_1_1_0 = %d", INT_T, &((varname).steps_1_1_0)},\
-    {"Number of steps for (1,1,1) loops", "SP:steps_1_1_1 = %d", INT_T, &((varname).steps_1_1_1)},\
-    {"Number of steps for (2,1,0) loops", "SP:steps_2_1_0 = %d", INT_T, &((varname).steps_2_1_0)},\
-    {"Number of steps for (2,1,1) loops", "SP:steps_2_1_1 = %d", INT_T, &((varname).steps_2_1_1)},\
-    {"Number of steps for (2,2,1) loops", "SP:steps_2_2_1 = %d", INT_T, &((varname).steps_2_2_1)},\
+    {"WL load path[0] delta(x)", "WL[0]:delta.x = %d", INT_T, &((varname).c[0][0])},\
+    {"WL load path[0] delta(y)", "WL[0]:delta.y = %d", INT_T, &((varname).c[0][1])},\
+    {"WL load path[0] delta(z)", "WL[0]:delta.z = %d", INT_T, &((varname).c[0][2])},\
+    {"WL load path[0] nsteps", "WL[0]:nsteps = %d", INT_T, &((varname).nsteps[0])},\
+    {"WL load path[1] delta(x)", "WL[1]:delta.x = %d", INT_T, &((varname).c[1][0])},\
+    {"WL load path[1] delta(y)", "WL[1]:delta.y = %d", INT_T, &((varname).c[1][1])},\
+    {"WL load path[1] delta(z)", "WL[1]:delta.z = %d", INT_T, &((varname).c[1][2])},\
+    {"WL load path[1] nsteps", "WL[1]:nsteps = %d", INT_T, &((varname).nsteps[1])},\
+    {"WL load path[2] delta(x)", "WL[2]:delta.x = %d", INT_T, &((varname).c[2][0])},\
+    {"WL load path[2] delta(y)", "WL[2]:delta.y = %d", INT_T, &((varname).c[2][1])},\
+    {"WL load path[2] delta(z)", "WL[2]:delta.z = %d", INT_T, &((varname).c[2][2])},\
+    {"WL load path[2] nsteps", "WL[2]:nsteps = %d", INT_T, &((varname).nsteps[2])},\
+    {"WL load path[3] delta(x)", "WL[3]:delta.x = %d", INT_T, &((varname).c[3][0])},\
+    {"WL load path[3] delta(y)", "WL[3]:delta.y = %d", INT_T, &((varname).c[3][1])},\
+    {"WL load path[3] delta(z)", "WL[3]:delta.z = %d", INT_T, &((varname).c[3][2])},\
+    {"WL load path[3] nsteps", "WL[3]:nsteps = %d", INT_T, &((varname).nsteps[3])},\
+    {"WL load path[4] delta(x)", "WL[4]:delta.x = %d", INT_T, &((varname).c[4][0])},\
+    {"WL load path[4] delta(y)", "WL[4]:delta.y = %d", INT_T, &((varname).c[4][1])},\
+    {"WL load path[4] delta(z)", "WL[4]:delta.z = %d", INT_T, &((varname).c[4][2])},\
+    {"WL load path[4] nsteps", "WL[4]:nsteps = %d", INT_T, &((varname).nsteps[4])},\
+    {"WL load path[5] delta(x)", "WL[5]:delta.x = %d", INT_T, &((varname).c[5][0])},\
+    {"WL load path[5] delta(y)", "WL[5]:delta.y = %d", INT_T, &((varname).c[5][1])},\
+    {"WL load path[5] delta(z)", "WL[5]:delta.z = %d", INT_T, &((varname).c[5][2])},\
+    {"WL load path[5] nsteps", "WL[5]:nsteps = %d", INT_T, &((varname).nsteps[5])},\
+    {"WL load path[6] delta(x)", "WL[6]:delta.x = %d", INT_T, &((varname).c[6][0])},\
+    {"WL load path[6] delta(y)", "WL[6]:delta.y = %d", INT_T, &((varname).c[6][1])},\
+    {"WL load path[6] delta(z)", "WL[6]:delta.z = %d", INT_T, &((varname).c[6][2])},\
+    {"WL load path[6] nsteps", "WL[6]:nsteps = %d", INT_T, &((varname).nsteps[6])},\
+    {"WL load path[7] delta(x)", "WL[7]:delta.x = %d", INT_T, &((varname).c[7][0])},\
+    {"WL load path[7] delta(y)", "WL[7]:delta.y = %d", INT_T, &((varname).c[7][1])},\
+    {"WL load path[7] delta(z)", "WL[7]:delta.z = %d", INT_T, &((varname).c[7][2])},\
+    {"WL load path[7] nsteps", "WL[7]:nsteps = %d", INT_T, &((varname).nsteps[7])},\
+    {"WL load path[8] delta(x)", "WL[8]:delta.x = %d", INT_T, &((varname).c[8][0])},\
+    {"WL load path[8] delta(y)", "WL[8]:delta.y = %d", INT_T, &((varname).c[8][1])},\
+    {"WL load path[8] delta(z)", "WL[8]:delta.z = %d", INT_T, &((varname).c[8][2])},\
+    {"WL load path[8] nsteps", "WL[8]:nsteps = %d", INT_T, &((varname).nsteps[8])},\
+    {"WL load path[9] delta(x)", "WL[9]:delta.x = %d", INT_T, &((varname).c[9][0])},\
+    {"WL load path[9] delta(y)", "WL[9]:delta.y = %d", INT_T, &((varname).c[9][1])},\
+    {"WL load path[9] delta(z)", "WL[9]:delta.z = %d", INT_T, &((varname).c[9][2])},\
+    {"WL load path[9] nsteps", "WL[9]:nsteps = %d", INT_T, &((varname).nsteps[9])},\
     {NULL, NULL, 0, NULL}\
   }\
 }
 
 
 input_HYP HYP_var = init_input_HYP(HYP_var);
-input_wilson wilson_var = init_input_wilson(wilson_var);
+input_WL WL_var = init_input_WL(WL_var);
 
 char cnfg_filename[256]="";
 char list_filename[256]="";
 char input_filename[256] = "input_file";
 char output_filename[256] = "wilson.out";
-enum { UNKNOWN_CNFG, DYNAMICAL_CNFG, QUENCHED_CNFG };
+enum { UNKNOWN_CNFG=0, DYNAMICAL_CNFG, QUENCHED_CNFG };
 
 
 typedef struct {
@@ -113,23 +138,23 @@ int parse_cnfg_filename(char* filename, filename_t* fn) {
     basename = tmp+1;
   }            
 
-#ifdef REPR_FUNDAMENTAL
-#define repr_name "FUN"
-#elif defined REPR_SYMMETRIC
-#define repr_name "SYM"
-#elif defined REPR_ANTISYMMETRIC
-#define repr_name "ASY"
-#elif defined REPR_ADJOINT
-#define repr_name "ADJ"
-#endif
-  hm=sscanf(basename,"%*[^_]_%dx%dx%dx%d%*[Nn]c%dr" repr_name "%*[Nn]f%db%lfm%lfn%d",
+/*#ifdef REPR_FUNDAMENTAL*/
+/*#define repr_name "FUN"*/
+/*#elif defined REPR_SYMMETRIC*/
+/*#define repr_name "SYM"*/
+/*#elif defined REPR_ANTISYMMETRIC*/
+/*#define repr_name "ASY"*/
+/*#elif defined REPR_ADJOINT*/
+/*#define repr_name "ADJ"*/
+/*#endif*/
+  hm=sscanf(basename,"%*[^_]_%dx%dx%dx%d%*[Nn]c%dr%*[FSA]%*[UYSD]%*[NMYJ]%*[Nn]f%db%lfm%lfn%d",
       &(fn->t),&(fn->x),&(fn->y),&(fn->z),&(fn->nc),&(fn->nf),&(fn->b),&(fn->m),&(fn->n));
   if(hm==9) {
     fn->m=-fn->m; /* invert sign of mass */
     fn->type=DYNAMICAL_CNFG;
     return DYNAMICAL_CNFG;
   }
-#undef repr_name
+/*#undef repr_name*/
 
   double kappa;
   hm=sscanf(basename,"%dx%dx%dx%d%*[Nn]c%d%*[Nn]f%db%lfk%lfn%d",
@@ -199,12 +224,10 @@ void read_cmdline(int argc, char* argv[]) {
 
 
 int main(int argc,char *argv[]) {
-  int i,t,p;
+  int i;
   char tmp[256];
   FILE* list;
   filename_t fpars;
-  int c[3];
-  suNg_field* smeared_g;
 
   /* setup process id and communications */
   read_cmdline(argc, argv);
@@ -223,7 +246,7 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
   lprintf("MAIN",0,"input file [%s]\n",input_filename); 
   lprintf("MAIN",0,"output file [%s]\n",output_filename); 
-  if (list_filename!=NULL) lprintf("MAIN",0,"list file [%s]\n",list_filename); 
+  if (strcmp(list_filename,"")!=0) lprintf("MAIN",0,"list file [%s]\n",list_filename); 
   else lprintf("MAIN",0,"cnfg file [%s]\n",cnfg_filename); 
 
 
@@ -231,22 +254,14 @@ int main(int argc,char *argv[]) {
   parse_cnfg_filename(cnfg_filename,&fpars);
 
   HYP_var.weight[0]=HYP_var.weight[1]=HYP_var.weight[2]=0.;
-  wilson_var.Tmax=GLB_T;
-  wilson_var.steps_1_0_0=0;
-  wilson_var.steps_1_1_0=0;
-  wilson_var.steps_1_1_1=0;
-  wilson_var.steps_2_1_0=0;
-  wilson_var.steps_2_1_1=0;
-  wilson_var.steps_2_2_1=0;
+  for(i=0;i<10;i++) { WL_var.c[i][0]=WL_var.c[i][1]=WL_var.c[i][2]=WL_var.nsteps[i]=0; }
   read_input(glb_var.read,input_filename);
   read_input(HYP_var.read,input_filename);
-  read_input(wilson_var.read,input_filename);
+  read_input(WL_var.read,input_filename);
   GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
-  
+ 
   error(fpars.type==UNKNOWN_CNFG,1,"mk_wilsonloops.c","Bad name for a configuration file");
   error(fpars.nc!=NG,1,"mk_wilsonloops.c","Bad NG");
-  error(HYP_var.nsteps<1,1,"mk_wilsonloops.c","Bad HYP:nsteps value");
-  error(strcmp(HYP_var.type,"alldirections")!=0 && strcmp(HYP_var.type,"spatialonly")!=0,1,"mk_wilsonloops.c","Bad HYP:type value");
 
 
   /* setup communication geometry */
@@ -272,21 +287,10 @@ int main(int argc,char *argv[]) {
   rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
 
   lprintf("MAIN",0,"HYP smearing weights: %f %f %f\n",HYP_var.weight[0],HYP_var.weight[1],HYP_var.weight[2]);
-  lprintf("MAIN",0,"HYP smearing number of steps: %d\n",HYP_var.nsteps);
-  lprintf("MAIN",0,"HYP smearing type: %s\n",HYP_var.type);
-
-  lprintf("MAIN",0,"Maximum temporal extension of wilson loops: %d\n",wilson_var.Tmax);
-  lprintf("MAIN",0,"Number of steps for (1,0,0) wilson loops: %d\n",wilson_var.steps_1_0_0);
-  lprintf("MAIN",0,"Number of steps for (1,1,0) wilson loops: %d\n",wilson_var.steps_1_1_0);
-  lprintf("MAIN",0,"Number of steps for (1,1,1) wilson loops: %d\n",wilson_var.steps_1_1_1);
-  lprintf("MAIN",0,"Number of steps for (2,1,0) wilson loops: %d\n",wilson_var.steps_2_1_0);
-  lprintf("MAIN",0,"Number of steps for (2,1,1) wilson loops: %d\n",wilson_var.steps_2_1_1);
-  lprintf("MAIN",0,"Number of steps for (2,2,1) wilson loops: %d\n",wilson_var.steps_2_2_1);
-    
+/*  lprintf("MAIN",0,"HYP smearing number of steps: %d\n",HYP_var.nsteps);*/
 
   /* alloc global gauge fields */
   u_gauge=alloc_gfield(&glattice);
-  smeared_g=alloc_gfield(&glattice);
 
   list=NULL;
   if(strcmp(list_filename,"")!=0) {
@@ -294,6 +298,12 @@ int main(int argc,char *argv[]) {
 	"Failed to open list file\n");
   }
 
+  WL_initialize();
+  for(i=0;i<10;i++){
+    if(WL_var.c[i][0]*WL_var.c[i][0]+WL_var.c[i][1]*WL_var.c[i][1]+WL_var.c[i][2]*WL_var.c[i][2]!=0 && WL_var.nsteps[i]!=0)
+      WL_load_path(WL_var.c[i], WL_var.nsteps[i]);
+  }
+  
   i=0;
   while(1) {
 
@@ -310,64 +320,7 @@ int main(int argc,char *argv[]) {
 
     full_plaquette();
 
-    if(strcmp(HYP_var.type,"alldirections")==0) {
-      for(p=0;p<HYP_var.nsteps/2;p++) {
-        HYP_smearing(smeared_g,u_gauge,HYP_var.weight);
-        HYP_smearing(u_gauge,smeared_g,HYP_var.weight);
-      }
-      if(HYP_var.nsteps%2==1)
-        HYP_smearing(smeared_g,u_gauge,HYP_var.weight);
-      else
-        suNg_field_copy(smeared_g,u_gauge);
-    } else {
-      for(p=0;p<HYP_var.nsteps/2;p++) {
-        spatialHYP_smearing(smeared_g,u_gauge,HYP_var.weight);
-        spatialHYP_smearing(u_gauge,smeared_g,HYP_var.weight);
-      }
-      if(HYP_var.nsteps%2==1)
-        spatialHYP_smearing(smeared_g,u_gauge,HYP_var.weight);
-      else
-        suNg_field_copy(smeared_g,u_gauge);
-    }
-
-/*    for(t=1;t<GLB_T;t++)*/
-/*      wilsonloops(0,t,smeared_g);*/
-    
-    if(wilson_var.steps_1_0_0 != 0) {
-      c[0]=1;c[1]=c[2]=0;
-      for(t=1;t<wilson_var.Tmax;t++)
-        ara_temporalwilsonloops(t,c,wilson_var.steps_1_0_0,smeared_g);
-    }
-
-    if(wilson_var.steps_1_1_0 != 0) {
-      c[0]=1;c[1]=1;c[2]=0;
-      for(t=1;t<wilson_var.Tmax;t++)
-        ara_temporalwilsonloops(t,c,wilson_var.steps_1_1_0,smeared_g);
-    }
-
-    if(wilson_var.steps_1_1_1 != 0) {
-      c[0]=1;c[1]=1;c[2]=1;
-      for(t=1;t<wilson_var.Tmax;t++)
-        ara_temporalwilsonloops(t,c,wilson_var.steps_1_1_1,smeared_g);
-    }
-
-    if(wilson_var.steps_2_1_0 != 0) {
-      c[0]=2;c[1]=1;c[2]=0;
-      for(t=1;t<GLB_T;t++)
-        ara_temporalwilsonloops(t,c,wilson_var.steps_2_1_0,smeared_g);
-    }
-
-    if(wilson_var.steps_2_1_1 != 0) {
-      c[0]=2;c[1]=1;c[2]=1;
-      for(t=1;t<wilson_var.Tmax;t++)
-        ara_temporalwilsonloops(t,c,wilson_var.steps_2_1_1,smeared_g);
-    }
- 
-    if(wilson_var.steps_2_2_1 != 0) {
-      c[0]=2;c[1]=2;c[2]=1;
-      for(t=1;t<wilson_var.Tmax;t++)
-        ara_temporalwilsonloops(t,c,wilson_var.steps_2_2_1,smeared_g);
-    }
+    WL_wilsonloops(HYP_var.weight);
    
     if(list==NULL) break;
   }
@@ -377,7 +330,6 @@ int main(int argc,char *argv[]) {
   finalize_process();
  
   free_gfield(u_gauge);
-  free_gfield(smeared_g);
   
   return 0;
 }

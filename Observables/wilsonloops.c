@@ -620,15 +620,21 @@ void WL_correlators(double** ret, const suNg_field* gf, const suNg* poly, const 
 
 
 void WL_wilsonloops(double HYP_weight[3]) {
-  error(WL_npaths!=0,1,"WL_wilsonloops [wilsonloops.c]","No path has been loaded");
+  error(WL_npaths==0,1,"WL_wilsonloops [wilsonloops.c]","No path has been loaded");
   
-  WL_initialize();
+/*  HYP_smearing(HYP,u_gauge,HYP_weight);*/
+/*  */
+/*  WL_Hamiltonian_gauge(HYP,HYP);*/
+/*  */
+/*  WL_broadcast_polyakov(Polyakov,HYP);*/
+
+
+  WL_Hamiltonian_gauge(u_gauge,u_gauge);
   
+  WL_broadcast_polyakov(Polyakov,u_gauge);
+
   HYP_smearing(HYP,u_gauge,HYP_weight);
-  
-  WL_Hamiltonian_gauge(HYP,HYP);
-  
-  WL_broadcast_polyakov(Polyakov,HYP);
+
   
   double** WL;
   WL=amalloc(sizeof(double*)*WL_max_nsteps,ALIGN);

@@ -38,11 +38,9 @@ MODDIR := Error
 MODS := error
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
-MODDIR := Statistics
-MODS := base_stat jacknife
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
+#COMMON_OBJS = $(MOD_OBJS)
 
-COMMON_OBJS = $(MOD_OBJS)
+mk_wilsonloops_OBJS = $(MOD_OBJS)
 
 
 include $(MKDIR)/MkRules
