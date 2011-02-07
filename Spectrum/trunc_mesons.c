@@ -31,6 +31,10 @@
 #include "cinfo.c"
 #include <time.h>
 
+#if defined(ROTATED_SF) && defined(BASIC_SF)
+#error The implementation of the Schroedinger functional has not been tested on this code
+#endif
+
 
 /* Mesons parameters */
 typedef struct _input_ata_qprop {

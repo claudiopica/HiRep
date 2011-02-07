@@ -31,11 +31,6 @@
 
 #include "cinfo.c"
 
-
-#if defined(ROTATED_SF) && defined(REPR_FUNDAMENTAL)
-#error ROTATED_SF CAN BE PROBLEMATIC WITH THE FUNDAMENTAL REPRESENTATION
-#endif
-
 #if defined(ROTATED_SF) && defined(UPDATE_EO)
 #error ROTATED_SF DOES NOT WORK WITH E/O PRECONDITIONING
 #endif

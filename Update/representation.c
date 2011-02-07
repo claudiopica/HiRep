@@ -335,7 +335,7 @@ void _group_represent2_flt(suNf_flt* v, suNg_flt *u) {
 #include "communications.h"
 
 void represent_gauge_field() {
-#ifndef REPR_FUNDAMENTAL
+#if !defined(REPR_FUNDAMENTAL) || defined(ROTATED_SF)
   int ix, ip;
   int mu;
   suNf *Ru;

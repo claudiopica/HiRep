@@ -201,7 +201,7 @@ int init_mc(rhmc_flow *rf, char *ifile) {
 
   /* alloc global gauge fields */
   u_gauge=alloc_gfield(&glattice);
-#ifndef REPR_FUNDAMENTAL
+#if !defined(REPR_FUNDAMENTAL) || defined(ROTATED_SF)
   u_gauge_f=alloc_gfield_f(&glattice);
 #endif
 
@@ -288,7 +288,7 @@ int end_mc() {
 
   /* free memory */
   free_gfield(u_gauge);
-#ifndef REPR_FUNDAMENTAL
+#if !defined(REPR_FUNDAMENTAL) || defined(ROTATED_SF)
   free_gfield_f(u_gauge_f);
 #endif
 
