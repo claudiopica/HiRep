@@ -622,19 +622,19 @@ void WL_correlators(double** ret, const suNg_field* gf, const suNg* poly, const 
 void WL_wilsonloops(double HYP_weight[3]) {
   error(WL_npaths==0,1,"WL_wilsonloops [wilsonloops.c]","No path has been loaded");
   
-/*  HYP_smearing(HYP,u_gauge,HYP_weight);*/
-/*  */
-/*  WL_Hamiltonian_gauge(HYP,HYP);*/
-/*  */
-/*  WL_broadcast_polyakov(Polyakov,HYP);*/
+  HYP_smearing(HYP,u_gauge,HYP_weight);
 
+  WL_Hamiltonian_gauge(HYP,HYP);
 
+  WL_broadcast_polyakov(Polyakov,HYP);
+
+/*
   WL_Hamiltonian_gauge(u_gauge,u_gauge);
   
   WL_broadcast_polyakov(Polyakov,u_gauge);
 
   HYP_smearing(HYP,u_gauge,HYP_weight);
-
+*/
   
   double** WL;
   WL=amalloc(sizeof(double*)*WL_max_nsteps,ALIGN);
@@ -673,8 +673,8 @@ void WL_wilsonloops(double HYP_weight[3]) {
 
       for(int t=0;t<GLB_T;t++) {
         lprintf("WILSON LOOPS",0,"(T,dx,dy,dz,R,WL) = %d %d %d %d %.8e %.8e\n",
-                t,s*WL_path[n].c[0],s*WL_path[n].c[1],s*WL_path[n].c[2],
-                s*sqrt(WL_path[n].c[0]*WL_path[n].c[0]+WL_path[n].c[1]*WL_path[n].c[1]+WL_path[n].c[2]*WL_path[n].c[2]),
+                t,(s+1)*WL_path[n].c[0],(s+1)*WL_path[n].c[1],(s+1)*WL_path[n].c[2],
+                (s+1)*sqrt(WL_path[n].c[0]*WL_path[n].c[0]+WL_path[n].c[1]*WL_path[n].c[1]+WL_path[n].c[2]*WL_path[n].c[2]),
                 WL[s][t]);
       }
     }
