@@ -303,7 +303,7 @@ void SF_force_bcs(suNg_av_field *force) {
       _algebra_vector_zero_g(*_4FIELD_AT(force,index,2));
       _algebra_vector_zero_g(*_4FIELD_AT(force,index,3));
       
-      index=ipt_ext(1,ix,iy,iz);
+      index=ipt(1,ix,iy,iz);
       _algebra_vector_zero_g(*_4FIELD_AT(force,index,1));
       _algebra_vector_zero_g(*_4FIELD_AT(force,index,2));
       _algebra_vector_zero_g(*_4FIELD_AT(force,index,3));
@@ -311,7 +311,7 @@ void SF_force_bcs(suNg_av_field *force) {
   }
   if(COORD[0] == NP_T-1) {
     for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
-	index=ipt_ext(T-1,ix,iy,iz);
+	index=ipt(T-1,ix,iy,iz);
 	_algebra_vector_zero_g(*_4FIELD_AT(force,index,0));
 	_algebra_vector_zero_g(*_4FIELD_AT(force,index,1));
 	_algebra_vector_zero_g(*_4FIELD_AT(force,index,2));

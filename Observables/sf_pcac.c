@@ -80,9 +80,9 @@ double SF_PCAC_wall_mass(double mass)
       	uptr=pu_gauge_f(idn(i,0),0);
       	for(j=0;j<4;j++) {
       	  _suNf_inverse_multiply(stmp[1].c[j],*uptr,stmp[0].c[j]);
-    	  }
+	}
       	sptr = _FIELD_AT(&source[s],i);
-      	_spinor_pplus_f(*sptr,stmp[1]);
+      	_spinor_pminus_f(*sptr,stmp[1]);
       }
     }
   }
@@ -118,15 +118,15 @@ double SF_PCAC_wall_mass(double mass)
 
   global_sum((double*)f_P,GLB_T);
   for(ix0=0;ix0<GLB_T-1;ix0++)
-    lprintf("PC_wall_AC",10,"f_Ppost%d = %.15f\n",ix0,f_P[ix0]/(double)(GLB_X*GLB_Y*GLB_Z));	
+    lprintf("PC_wall_AC",10,"f_Ppost%d = %.10e\n",ix0,f_P[ix0]/(double)(GLB_X*GLB_Y*GLB_Z));	
 
   global_sum((double*)f_A,GLB_T);
   for(ix0=0;ix0<GLB_T-1;ix0++)
-    lprintf("PC_wall_AC",10,"f_Apost%d = %.15f\n",ix0,f_A[ix0]/(double)(GLB_X*GLB_Y*GLB_Z));	
+    lprintf("PC_wall_AC",10,"f_Apost%d = %.10e\n",ix0,f_A[ix0]/(double)(GLB_X*GLB_Y*GLB_Z));	
   
 
   /*f_1 - NEED TO DO EACH color/dirac component separately, then combine at the end*/
-  /*U' and P+ on prop at T-2 (actually P- since there is a g5 that needs to be commuted through)*/
+  /*U' and P- on prop at T-2 (actually P+ since there is a g5 that needs to be commuted through)*/
 
   for(int s=0;s<4*NF;s++){
     _spinor_zero_f(sbord[s]);
@@ -138,7 +138,7 @@ double SF_PCAC_wall_mass(double mass)
       	for(j=0;j<4;j++) {
       	  _suNf_inverse_multiply(stmp[0].c[j],*uptr,sptr->c[j]);
       	}
-      	_spinor_pminus_f(stmp[1],stmp[0]);
+      	_spinor_pplus_f(stmp[1],stmp[0]);
       	_spinor_add_assign_f(sbord[s],stmp[1]);
       }
     }
@@ -153,8 +153,8 @@ double SF_PCAC_wall_mass(double mass)
       f_1+=temp;
     }
   }
-  lprintf("PC_wall_AC",0,"f1 = %.15f\n",f_1/((double)(GLB_X*GLB_Y*GLB_Z*GLB_X*GLB_Y*GLB_Z)));
-  lprintf("PC_wall_AC",0,"ZP_pos = %.15f\n",(sqrt(f_1)/(f_P[(int)(GLB_X/2)])));
+  lprintf("PC_wall_AC",0,"f1 = %.10e\n",f_1/((double)(GLB_X*GLB_Y*GLB_Z*GLB_X*GLB_Y*GLB_Z)));
+  lprintf("PC_wall_AC",0,"ZP_pos = %.10e\n",(sqrt(f_1)/(f_P[(int)(GLB_X/2)])));
   
   for (ix0=2;ix0<GLB_T-3;ix0++)
     lprintf("PC_wall_AC",0,"PCACpost%d = %f\n",ix0,(double)(f_A[(int)(ix0)+1] - f_A[(int)(ix0)-1])/(4*f_P[(int)(ix0)]));
@@ -176,7 +176,7 @@ double SF_PCAC_wall_mass(double mass)
       	  _suNf_multiply(stmp[1].c[j],*uptr,stmp[0].c[j]);
     	  }
       	sptr = _FIELD_AT(&source[s],i);
-      	_spinor_pminus_f(*sptr,stmp[1]);
+      	_spinor_pplus_f(*sptr,stmp[1]);
       }
     }
   }
@@ -208,15 +208,15 @@ double SF_PCAC_wall_mass(double mass)
   
   global_sum((double*)f_Pt,GLB_T);
   for(ix0=0;ix0<GLB_T-1;ix0++)
-    lprintf("PC_wall_AC",10,"f_Pnegt%d = %.15f\n",ix0,f_Pt[ix0]/(double)(GLB_X*GLB_Y*GLB_Z));	
+    lprintf("PC_wall_AC",10,"f_Pnegt%d = %.10e\n",ix0,f_Pt[ix0]/(double)(GLB_X*GLB_Y*GLB_Z));	
 
   global_sum((double*)f_At,GLB_T);
   for(ix0=0;ix0<GLB_T-1;ix0++)
-    lprintf("PC_wall_AC",10,"f_Anegt%d = %.15f\n",ix0,f_At[ix0]/(double)(GLB_X*GLB_Y*GLB_Z));	
+    lprintf("PC_wall_AC",10,"f_Anegt%d = %.10e\n",ix0,f_At[ix0]/(double)(GLB_X*GLB_Y*GLB_Z));	
 
-  lprintf("PC_wall_AC",0,"ZP_neg = %.15f\n",(sqrt(f_1)/(f_Pt[(int)(GLB_X/2)])));
+  lprintf("PC_wall_AC",0,"ZP_neg = %.10e\n",(sqrt(f_1)/(f_Pt[(int)(GLB_X/2)])));
   
-  lprintf("PC_wall_AC",0,"Z_P = %.15f\n",0.5*(sqrt(f_1)/(f_Pt[(int)(GLB_X/2)]))+0.5*(sqrt(f_1)/(f_P[(int)(GLB_X/2)])));
+  lprintf("PC_wall_AC",0,"Z_P = %.10e\n",0.5*(sqrt(f_1)/(f_Pt[(int)(GLB_X/2)]))+0.5*(sqrt(f_1)/(f_P[(int)(GLB_X/2)])));
   
   for (ix0=2;ix0<GLB_T-3;ix0++)
     lprintf("PC_wall_AC",0,"PCACnegt%d = %f\n",ix0,(double)(f_At[(int)(ix0)+1] - f_At[(int)(ix0)-1])/(4*f_Pt[(int)(ix0)]));
@@ -326,11 +326,11 @@ Q+ = (1 + i gamma_0 gamma_5)/2
   
   global_sum((double*)f_P,GLB_T);
   for(ix0=0;ix0<GLB_T-1;ix0++)
-    lprintf("PC_wall_AC",10,"f_Ppost%d = %.15f\n",ix0,f_P[ix0]/(double)(GLB_X*GLB_Y*GLB_Z));	
+    lprintf("PC_wall_AC",10,"f_Ppost%d = %.10e\n",ix0,f_P[ix0]/(double)(GLB_X*GLB_Y*GLB_Z));	
 
   global_sum((double*)f_A,GLB_T);
   for(ix0=0;ix0<GLB_T-1;ix0++)
-    lprintf("PC_wall_AC",10,"f_Apost%d = %.15f\n",ix0,f_A[ix0]/(double)(GLB_X*GLB_Y*GLB_Z));	
+    lprintf("PC_wall_AC",10,"f_Apost%d = %.10e\n",ix0,f_A[ix0]/(double)(GLB_X*GLB_Y*GLB_Z));	
   
 
   /*
@@ -378,8 +378,8 @@ Q+ = (1 + i gamma_0 gamma_5)/2
       f_1+=temp;
     }
   }
-  lprintf("PC_wall_AC",0,"f1 = %.15f\n",f_1/((double)(GLB_X*GLB_Y*GLB_Z*GLB_X*GLB_Y*GLB_Z)));
-  lprintf("PC_wall_AC",0,"ZP_pos = %.15f\n",(sqrt(f_1)/(f_P[(int)(GLB_X/2)])));
+  lprintf("PC_wall_AC",0,"f1 = %.10e\n",f_1/((double)(GLB_X*GLB_Y*GLB_Z*GLB_X*GLB_Y*GLB_Z)));
+  lprintf("PC_wall_AC",0,"ZP_pos = %.10e\n",(sqrt(f_1)/(f_P[(int)(GLB_X/2)])));
   
   for (ix0=2;ix0<GLB_T-3;ix0++)
     lprintf("PC_wall_AC",0,"PCACpost%d = %f\n",ix0,(double)(f_A[(int)(ix0)+1] - f_A[(int)(ix0)-1])/(4*f_P[(int)(ix0)]));
@@ -457,15 +457,15 @@ Q- = (1 - i gamma_0 gamma_5)/2
    
   global_sum((double*)f_Pt,GLB_T);
   for(ix0=0;ix0<GLB_T-1;ix0++)
-    lprintf("PC_wall_AC",10,"f_Pnegt%d = %.15f\n",ix0,f_Pt[ix0]/(double)(GLB_X*GLB_Y*GLB_Z));	
+    lprintf("PC_wall_AC",10,"f_Pnegt%d = %.10e\n",ix0,f_Pt[ix0]/(double)(GLB_X*GLB_Y*GLB_Z));	
 
   global_sum((double*)f_At,GLB_T);
   for(ix0=0;ix0<GLB_T-1;ix0++)
-    lprintf("PC_wall_AC",10,"f_Anegt%d = %.15f\n",ix0,f_At[ix0]/(double)(GLB_X*GLB_Y*GLB_Z));	
+    lprintf("PC_wall_AC",10,"f_Anegt%d = %.10e\n",ix0,f_At[ix0]/(double)(GLB_X*GLB_Y*GLB_Z));	
 
-  lprintf("PC_wall_AC",0,"ZP_neg = %.15f\n",(sqrt(f_1)/(f_Pt[(int)(GLB_X/2)])));
+  lprintf("PC_wall_AC",0,"ZP_neg = %.10e\n",(sqrt(f_1)/(f_Pt[(int)(GLB_X/2)])));
   
-  lprintf("PC_wall_AC",0,"Z_P = %.15f\n",0.5*(sqrt(f_1)/(f_Pt[(int)(GLB_X/2)]))+0.5*(sqrt(f_1)/(f_P[(int)(GLB_X/2)])));
+  lprintf("PC_wall_AC",0,"Z_P = %.10e\n",0.5*(sqrt(f_1)/(f_Pt[(int)(GLB_X/2)]))+0.5*(sqrt(f_1)/(f_P[(int)(GLB_X/2)])));
   
   for (ix0=2;ix0<GLB_T-3;ix0++)
     lprintf("PC_wall_AC",0,"PCACnegt%d = %f\n",ix0,(double)(f_At[(int)(ix0)+1] - f_At[(int)(ix0)-1])/(4*f_Pt[(int)(ix0)]));
