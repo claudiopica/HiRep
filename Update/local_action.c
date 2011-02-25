@@ -41,10 +41,12 @@ void local_hmc_action(local_action_type type,
     _MASTER_FOR(&glattice,i) {
       *_FIELD_AT(loc_action,i)=0.;
     }
+    break;
   case DELTA:
     _MASTER_FOR(&glattice,i) {
       *_FIELD_AT(loc_action,i)= -*_FIELD_AT(loc_action,i);
     }
+    break;
   default:
     error(1,1,"local_hmc_action","Invalid type");
   }
