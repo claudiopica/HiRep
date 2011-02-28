@@ -20,6 +20,7 @@ void read_gauge_field_eolexi_LE(char filename[]);
 void write_gauge_field_eolexi_LE(char filename[]);
 
 void read_gauge_field_henty(char filename[]);
+void read_gauge_field_ascii(char filename[]);
 
 #include "spinor_field.h"
 /* void write_spinor_field_eo_lexi(char filename[],spinor_field *sp); */
