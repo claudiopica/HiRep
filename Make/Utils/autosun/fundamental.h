@@ -39,7 +39,7 @@ void representation::init()
 		iT[A].scale(complex(0.0,1.0));
 	}
 	
-	iTnorm = 2.0;
+	iTnorm = group::Tnorm;
 
 #ifndef NDEBUG
 	cerr << "OK\n";
