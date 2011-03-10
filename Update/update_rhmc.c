@@ -73,8 +73,8 @@ void init_rhmc(rhmc_par *par){
     }
     
   lprintf("RHMC",0,"Initializing...\n");
-  
-    /* copy input parameters into the internal variable and make some tests */
+
+   /* copy input parameters into the internal variable and make some tests */
     _update_par=*par;
     /* no tests yet... */
   
@@ -85,7 +85,7 @@ void init_rhmc(rhmc_par *par){
 #ifdef ROTATED_SF
 	  "rotatedSF zf = %.8f\n"
 	  "rotatedSF ds = %.8f\n"
-	  "rotatedSF sign = %.8f\n"
+	  "rotatedSF sign = %d\n"
 #endif /* ROTATED_SF */
 	  "Metropolis test precision = %.8e\n"
 	  "MD precision = %.8e\n"
@@ -112,7 +112,7 @@ void init_rhmc(rhmc_par *par){
 	  ,_update_par.MD_par->nsteps
 	  ,_update_par.MD_par->gsteps
 	  );
-  
+   
     /* allocate space for the backup copy of gfield */
     if(u_gauge_old==NULL) u_gauge_old=alloc_gfield(&glattice);
     suNg_field_copy(u_gauge_old,u_gauge);
@@ -130,7 +130,7 @@ void init_rhmc(rhmc_par *par){
 #endif 
                                 );
     }
-    
+
     /* allocate memory for the local action */
     if(la==NULL) la=alloc_sfield(&glattice);
     

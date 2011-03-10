@@ -25,8 +25,6 @@ void apply_bc();
 void apply_bc_flt();
 
 #ifdef BASIC_SF
-void SF_spinor_bcs(spinor_field *sp);
-void SF_spinor_bcs_flt(spinor_field_flt *sp);
 double SF_test_spinor_bcs(spinor_field *sp);
 #endif /* BASIC_SF */
 
@@ -34,6 +32,8 @@ void SF_gauge_bcs(suNg_field *gf, int strength);
 double SF_test_gauge_bcs();
 
 #if defined(BASIC_SF) || defined(ROTATED_SF)
+void SF_spinor_bcs(spinor_field *sp);
+void SF_spinor_bcs_flt(spinor_field_flt *sp);
 void SF_force_bcs(suNg_av_field *force);
 double SF_test_force_bcs(suNg_av_field *force);
 #endif /* BASIC_SF || ROTATED_SF */

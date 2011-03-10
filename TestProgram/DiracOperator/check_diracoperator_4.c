@@ -30,6 +30,15 @@
 
 #include "communications.h"
 
+
+#if defined(ANTIPERIODIC_BC_T) || defined(ANTIPERIODIC_BC_X) || defined(ANTIPERIODIC_BC_Y) || defined(ANTIPERIODIC_BC_Z)
+#error This test does not work with antiperiodic boundary conditions
+#endif
+
+#if defined(BASIC_SF) || defined(ROTATED_SF)
+#error This test does not work with SF
+#endif
+
 void D(spinor_field *out, spinor_field *in){
    Dphi_(out,in);
 }

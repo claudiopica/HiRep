@@ -22,6 +22,11 @@
 /* #define TESTINGMODE */
 
 
+#ifdef ROTATED_SF
+#error dirac_eva diagonalizes the operator H. But H is not normal with the rotated SF
+#endif
+
+
 static double hmass;
 static spinor_field *h2tmp;
 

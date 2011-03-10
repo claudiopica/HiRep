@@ -15,21 +15,54 @@
 #include <assert.h>
 #include "logger.h"
 
+
+#ifdef ROTATED_SF
+#include "update.h"
+extern rhmc_par _update_par; /* Update/update_rhmc.c */
+#endif /* ROTATED_SF */
+
+
 static double hmass;
 static void H_sf(spinor_field *out, spinor_field *in){
   g5Dphi(hmass,out,in);
 }
+static void H2_sf(spinor_field *out, spinor_field *in){
+  g5Dphi_sq(hmass,out,in);
+}
 
 void SF_quark_propagator(spinor_field *in, double mass, spinor_field *out, double acc) {
+#ifdef BASIC_SF
+
   static MINRES_par MINRESpar;
   int cgiter;
   hmass = mass;
   
   MINRESpar.err2 = acc;
   MINRESpar.max_iter = 0;
-  cgiter=0;
-  cgiter+=MINRES(&MINRESpar, &H_sf, in, out, 0);
-	  lprintf("PROPAGATOR",10,"MINRES MVM = %d",cgiter);
+  cgiter=MINRES(&MINRESpar, &H_sf, in, out, 0);
+	lprintf("PROPAGATOR",10,"MINRES MVM = %d",cgiter);
+	
+#else
+	  
+  int cgiter;
+  static mshift_par inv_par;
+  static spinor_field *chi=NULL;
+  if(chi==NULL) chi=alloc_spinor_field_f(1,&glattice);
+  hmass = mass;
+
+  inv_par.n = 1;
+  inv_par.shift = malloc(sizeof(double));
+  inv_par.shift[0] = 0.;
+  inv_par.err2= acc;
+  inv_par.max_iter=0; /* no limit */
+  _update_par.SF_sign = -_update_par.SF_sign;
+   g5Dphi(mass, chi, in);
+  _update_par.SF_sign = -_update_par.SF_sign;
+  cgiter=cg_mshift(&inv_par, &H2_sf, chi, out);
+	lprintf("PROPAGATOR",10,"cg_mshift MVM = %d",cgiter);
+	free(inv_par.shift);
+
+#endif
 }
 
 
@@ -234,7 +267,7 @@ double SF_PCAC_wall_mass(double mass)
 #elif defined(ROTATED_SF)
 
   int i,j,ix0,ix1,ix2,ix3;
-  double f_P[GLB_T], f_A[GLB_T], f_Pt[GLB_T], f_At[GLB_T], f_1=0, temp;
+  double f_P[GLB_T], f_A[GLB_T], f_1=0, temp;
   double acc = 1.e-10;
   spinor_field* prop[2];	
   spinor_field *source;
@@ -252,15 +285,19 @@ double SF_PCAC_wall_mass(double mass)
   for(ix0=0;ix0<GLB_T;ix0++)
     {
       f_A[ix0]=0;
-      f_At[ix0]=0;
       f_P[ix0]=0;
-      f_Pt[ix0]=0;
     }
 
 /*
-[eta_(a0,alpha0)](t,x)_{a,alpha} = \delta_{a,a0} \delta_{alpha,alpha0) \delta_{t,1}
-source_s = gamma_5 Q- U_0(1,y)^\dag \eta_s = Q+ U_0(1,y)^\dag gamma_5 \eta_s
-Q+ = (1 + i gamma_0 gamma_5)/2
+[eta_(a0,alpha0)]_{a,alpha} = \delta_{a,a0} \delta_{alpha,alpha0) 
+source_s(t,x) = Q- U_0(1,y)^\dag gamma_5 \eta_s \delta_{t,1}
+Q- = (1 - i gamma_0 gamma_5)/2 
+
+     | Id    -i Id |
+Q- = |             | * 1/2
+     | i Id     Id |
+   
+
 */
   for(int s=0;s<4*NF;s++){
     spinor_field_zero_f(&source[s]);
@@ -301,9 +338,8 @@ Q+ = (1 + i gamma_0 gamma_5)/2
   }
   
   /*
-  f_P(x) \propto \sum_s prop[1][s]^dag(x) gamma_5 prop[0][s](x)
-  f_A(x) \propto \sum_s prop[1][s]^dag(x) gamma_0 prop[0][s](x)
-  CONTROLLARE IN PARTICOLARE SE SERVE LA PARTE REALE O IMMAGINARIA
+  f_P(x) = -1/2 \sum_s prop[0][s]^dag(x) gamma_5 prop[1][s](x)
+  f_A(x) = -1/2 \sum_s prop[0][s]^dag(x) gamma_0 prop[1][s](x)
   */
   for(int s=0;s<4*NF;s++){
     for(ix0=0;ix0<T;ix0++) for(ix1=0;ix1<X;ix1++) for(ix2=0;ix2<Y;ix2++) for(ix3=0;ix3<Z;ix3++) {
@@ -311,32 +347,32 @@ Q+ = (1 + i gamma_0 gamma_5)/2
       sptr[0] = _FIELD_AT(&prop[0][s],i);
       sptr[1] = _FIELD_AT(&prop[1][s],i);
       /*f_P*/
-      _spinor_g5_prod_re_f(temp,*sptr[1],*sptr[0]);
-      f_P[(COORD[0]*T+ix0-1+GLB_T)%GLB_T]+=temp;
+      _spinor_g5_prod_re_f(temp,*sptr[0],*sptr[1]);
+      f_P[(COORD[0]*T+ix0-1+GLB_T)%GLB_T] += -.5*temp;
       /*f_A*/
       /*gamma_0*/
-      stmp[0].c[0]=sptr[0]->c[2];
-      stmp[0].c[1]=sptr[0]->c[3];
-      stmp[0].c[2]=sptr[0]->c[0];
-      stmp[0].c[3]=sptr[0]->c[1];
-      _spinor_prod_re_f(temp,*sptr[1],stmp[0]);
-      f_A[(COORD[0]*T+ix0-1+GLB_T)%GLB_T]+=temp;
+      stmp[0].c[0]=sptr[1]->c[2];
+      stmp[0].c[1]=sptr[1]->c[3];
+      stmp[0].c[2]=sptr[1]->c[0];
+      stmp[0].c[3]=sptr[1]->c[1];
+      _spinor_prod_re_f(temp,*sptr[0],stmp[0]);
+      f_A[(COORD[0]*T+ix0-1+GLB_T)%GLB_T] += .5*temp;
     }
   }
   
   global_sum((double*)f_P,GLB_T);
   for(ix0=0;ix0<GLB_T-1;ix0++)
-    lprintf("PC_wall_AC",10,"f_Ppost%d = %.10e\n",ix0,f_P[ix0]/(double)(GLB_X*GLB_Y*GLB_Z));	
+    lprintf("PC_wall_AC",10,"f_Ppost%d = %.10e\n",ix0,f_P[ix0]);	
 
   global_sum((double*)f_A,GLB_T);
   for(ix0=0;ix0<GLB_T-1;ix0++)
-    lprintf("PC_wall_AC",10,"f_Apost%d = %.10e\n",ix0,f_A[ix0]/(double)(GLB_X*GLB_Y*GLB_Z));	
+    lprintf("PC_wall_AC",10,"f_Apost%d = %.10e\n",ix0,f_A[ix0]);	
   
 
   /*
-  f_1 \propto  \sum_s sum_u prop[1][s]^dag(T-2,u) U_0(T-2,u) gamma_5 Q+ \sum_v U_0(T-2,v)^dag prop[0][s](T-2,v)
-  sbord[0][s] = \sum_v gamma_5 Q+ U_0(T-2,v)^dag prop[0][s](T-2,v)
+  sbord[0][s] = \sum_v gamma_5 Q- U_0(T-2,v)^dag prop[0][s](T-2,v)
   sbord[1][s] = \sum_v U_0(T-2,v)^dag prop[1][s](T-2,v)
+  f1 = 1/(2*VOL^2) \sum_s sbord[0][s]^dag sbord[1][s]
   */
 
   for(int s=0;s<4*NF;s++){
@@ -374,102 +410,19 @@ Q+ = (1 + i gamma_0 gamma_5)/2
   if(PID==0){
     f_1=0;
     for(int s=0;s<4*NF;s++){
-      _spinor_prod_re_f(temp,sbord[1][s],sbord[0][s]);
-      f_1+=temp;
+      _spinor_prod_re_f(temp,sbord[0][s],sbord[1][s]);
+      f_1+=.5*temp/((double)(GLB_X*GLB_Y*GLB_Z*GLB_X*GLB_Y*GLB_Z));
     }
   }
-  lprintf("PC_wall_AC",0,"f1 = %.10e\n",f_1/((double)(GLB_X*GLB_Y*GLB_Z*GLB_X*GLB_Y*GLB_Z)));
-  lprintf("PC_wall_AC",0,"ZP_pos = %.10e\n",(sqrt(f_1)/(f_P[(int)(GLB_X/2)])));
+  lprintf("PC_wall_AC",0,"f1 = %.10e\n",f_1);
+  lprintf("PC_wall_AC",0,"ZP_pos = %.10e\n",(sqrt(f_1)/(f_P[(int)(GLB_T/2-1)])));
   
   for (ix0=2;ix0<GLB_T-3;ix0++)
     lprintf("PC_wall_AC",0,"PCACpost%d = %f\n",ix0,(double)(f_A[(int)(ix0)+1] - f_A[(int)(ix0)-1])/(4*f_P[(int)(ix0)]));
   
 
 
-
-/*
-[eta_(a0,alpha0)](t,x)_{a,alpha} = \delta_{a,a0} \delta_{alpha,alpha0) \delta_{t,T-1}
-source_s = gamma_5 Q+ U_0(T-2,y) \eta_s = Q- U_0(T-2,y) gamma_5 \eta_s
-Q- = (1 - i gamma_0 gamma_5)/2
-*/
-  for(int s=0;s<4*NF;s++){
-    spinor_field_zero_f(&source[s]);
-    if(COORD[0]==NP_T-1){
-      _spinor_zero_f(stmp[0]);
-      stmp[0].c[s%4].c[s/4].re=1.;
-      stmp[0].c[s%4].c[s/4].im=0.;
-      _spinor_g5_assign_f(stmp[0]);
-
-      for(ix1=0;ix1<X;ix1++) for(ix2=0;ix2<Y;ix2++) for(ix3=0;ix3<Z;ix3++) {
-      	i=ipt(T-2,ix1,ix2,ix3);
-      	uptr=pu_gauge_f(i,0);
-      	for(j=0;j<4;j++) {
-      	  _suNf_multiply(stmp[1].c[j],*uptr,stmp[0].c[j]);
-    	  }
-      	sptr[0] = _FIELD_AT(&source[s],i);
-      	*sptr[0]=stmp[1];
-      	_vector_i_add_assign_f(sptr[0]->c[0],stmp[1].c[2]);
-      	_vector_i_add_assign_f(sptr[0]->c[1],stmp[1].c[3]);
-      	_vector_i_sub_assign_f(sptr[0]->c[2],stmp[1].c[0]);
-      	_vector_i_sub_assign_f(sptr[0]->c[3],stmp[1].c[1]);
-        _spinor_mul_f(*sptr[0],.5,*sptr[0]);
-      }
-    }
-  }
-
-  
-  /*
-  prop[0][s] = H^{-1} source[s]
-  prop[1][s] = H^{-1} gamma_5 source[s]
-  */
-  for(int s=0; s<4*NF; s++){
-    spinor_field_zero_f(&prop[0][s]);
-    SF_quark_propagator(&source[s], mass, &prop[0][s], acc);
-    spinor_field_zero_f(&prop[1][s]);
-    spinor_field_g5_assign_f(&source[s]);
-    SF_quark_propagator(&source[s], mass, &prop[1][s], acc);
-    spinor_field_g5_assign_f(&source[s]);
-  }
-  
-  /*
-  f_P(x) \propto \sum_s prop[1][s]^dag(x) gamma_5 prop[0][s](x)
-  f_A(x) \propto \sum_s prop[1][s]^dag(x) gamma_0 prop[0][s](x)
-  CONTROLLARE IN PARTICOLARE SE SERVE LA PARTE REALE O IMMAGINARIA
-  */
-  for(int s=0;s<4*NF;s++){
-    for(ix0=0;ix0<T;ix0++) for(ix1=0;ix1<X;ix1++) for(ix2=0;ix2<Y;ix2++) for(ix3=0;ix3<Z;ix3++) {
-      i=ipt(ix0,ix1,ix2,ix3);
-      sptr[0] = _FIELD_AT(&prop[0][s],i);
-      sptr[1] = _FIELD_AT(&prop[1][s],i);
-      /*f_P*/
-      _spinor_g5_prod_re_f(temp,*sptr[1],*sptr[0]);
-      f_P[(COORD[0]*T+ix0-1+GLB_T)%GLB_T]+=temp;
-      /*f_A*/
-      /*gamma_0*/
-      stmp[0].c[0]=sptr[0]->c[2];
-      stmp[0].c[1]=sptr[0]->c[3];
-      stmp[0].c[2]=sptr[0]->c[0];
-      stmp[0].c[3]=sptr[0]->c[1];
-      _spinor_prod_re_f(temp,*sptr[1],stmp[0]);
-      f_A[(COORD[0]*T+ix0-1+GLB_T)%GLB_T]+=temp;
-    }
-  }
-   
-  global_sum((double*)f_Pt,GLB_T);
-  for(ix0=0;ix0<GLB_T-1;ix0++)
-    lprintf("PC_wall_AC",10,"f_Pnegt%d = %.10e\n",ix0,f_Pt[ix0]/(double)(GLB_X*GLB_Y*GLB_Z));	
-
-  global_sum((double*)f_At,GLB_T);
-  for(ix0=0;ix0<GLB_T-1;ix0++)
-    lprintf("PC_wall_AC",10,"f_Anegt%d = %.10e\n",ix0,f_At[ix0]/(double)(GLB_X*GLB_Y*GLB_Z));	
-
-  lprintf("PC_wall_AC",0,"ZP_neg = %.10e\n",(sqrt(f_1)/(f_Pt[(int)(GLB_X/2)])));
-  
-  lprintf("PC_wall_AC",0,"Z_P = %.10e\n",0.5*(sqrt(f_1)/(f_Pt[(int)(GLB_X/2)]))+0.5*(sqrt(f_1)/(f_P[(int)(GLB_X/2)])));
-  
-  for (ix0=2;ix0<GLB_T-3;ix0++)
-    lprintf("PC_wall_AC",0,"PCACnegt%d = %f\n",ix0,(double)(f_At[(int)(ix0)+1] - f_At[(int)(ix0)-1])/(4*f_Pt[(int)(ix0)]));
-  
+/*As question of principle it  could be added also the calculation of the correlator with the upper border, these would leade to a double measure of the mpcac, in this moment we are not implemting it, but in case of need should be easy to use the different definition of the upper border to add it*/  
  
   return (double)(f_A[(int)(GLB_T/2)] - f_A[(int)(GLB_T/2)-2])/(4*f_P[(int)((GLB_T/2)-1)]);
   
@@ -477,7 +430,7 @@ Q- = (1 - i gamma_0 gamma_5)/2
   free(sbord[0]);
   free_spinor_field(prop[0]);
   free_spinor_field(prop[1]);
-  free_spinor_field(source);
+  free_spinor_field(source );
  
 #else
 

@@ -216,10 +216,11 @@ void apply_bc_flt(){
 #endif
 }
 
-#ifdef BASIC_SF
+#if defined(BASIC_SF) || defined(ROTATED_SF)
 
 void SF_spinor_bcs(spinor_field *sp)
 {
+#ifdef BASIC_SF
   int it,ix,iy,iz,index;
   
   if(COORD[0] == 0) {
@@ -236,12 +237,22 @@ void SF_spinor_bcs(spinor_field *sp)
       _spinor_zero_g(*_FIELD_AT(sp,index));
     }
   }
-
+#else 
+  int ix,iy,iz,index;
+  
+  if(COORD[0] == 0) {
+    for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
+      index=ipt(0,ix,iy,iz);
+      _spinor_zero_g(*_FIELD_AT(sp,index));
+    }
+  }
+#endif
 }
 
 void SF_spinor_bcs_flt(spinor_field_flt *sp)
 {
-  int it,ix,iy,iz,index;
+#ifdef BASIC_SF
+ int it,ix,iy,iz,index;
   
   if(COORD[0] == 0) {
     for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
@@ -258,6 +269,16 @@ void SF_spinor_bcs_flt(spinor_field_flt *sp)
     }
   }
 
+#else 
+  int ix,iy,iz,index;
+  
+  if(COORD[0] == 0) {
+    for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
+      index=ipt(0,ix,iy,iz);
+      _spinor_zero_g(*_FIELD_AT(sp,index));
+    }
+  }
+#endif
 }
 
 

@@ -207,9 +207,9 @@ static double normalize(spinor_field *ps)
 
   spinor_field_mul_f(ps,1./r,ps);
 
-  #ifdef BASIC_SF
-       SF_spinor_bcs(ps);
-  #endif /* BASIC_SF */
+#if defined(BASIC_SF) || defined(ROTATED_SF)
+  SF_spinor_bcs(ps);
+#endif /* defined(BASIC_SF) || defined(ROTATED_SF) */
 
   return r;
 }

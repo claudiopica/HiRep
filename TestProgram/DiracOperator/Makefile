@@ -38,6 +38,10 @@ MODDIR := Inverters
 MODS := linear_algebra cg_mshift
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
+MODDIR := Observables
+MODS := avr_plaquette
+MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
+
 COMMON_OBJS = $(MOD_OBJS)
 
 include $(MKDIR)/MkRules
