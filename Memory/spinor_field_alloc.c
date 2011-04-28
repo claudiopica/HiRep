@@ -22,6 +22,9 @@ spinor_field* alloc_spinor_field_f(unsigned int n, geometry_descriptor* type)
 #ifdef WITH_MPI /* MPI variables */
 	MPI_Request *r;
 #endif 
+    
+    if (n==0) return NULL;
+    
 	s=amalloc(n*sizeof(spinor_field),ALIGN);
 	error(s==NULL,1,"alloc_spinor_field_f [field_alloc.c]",
 		  "Could not allocate memory space for the spinor field (1)");
@@ -64,6 +67,8 @@ spinor_field_flt* alloc_spinor_field_f_flt(unsigned int n, geometry_descriptor *
 #ifdef WITH_MPI /* MPI variables */
 	MPI_Request *r;
 #endif 
+    
+    if (n==0) return NULL;
 
 	s=amalloc(n*sizeof(spinor_field_flt),ALIGN);
 	error(s==NULL,1,"alloc_spinor_field_f_flt [field_alloc.c]",
