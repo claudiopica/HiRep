@@ -22,7 +22,7 @@ MODS := amalloc field_alloc spinor_field_alloc
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Observables
-MODS := avr_plaquette pta_qprop mesons sf_action sf_pcac
+MODS := avr_plaquette pta_qprop mesons 
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Random
