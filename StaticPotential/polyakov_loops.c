@@ -229,10 +229,7 @@ int main(int argc,char *argv[]) {
     lprintf("TEST",0,"<p> %1.6f\n",avr_plaquette());
 
     full_plaquette();
-    polyakov(0);
-    polyakov(1);
-    polyakov(2);
-    polyakov(3);
+    polyakov();
    
     if(list==NULL) break;
   }

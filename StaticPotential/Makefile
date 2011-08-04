@@ -41,6 +41,7 @@ MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 #COMMON_OBJS = $(MOD_OBJS)
 
 mk_wilsonloops_OBJS = $(MOD_OBJS)
+polyakov_loops_OBJS = $(MOD_OBJS)
 
 
 include $(MKDIR)/MkRules
