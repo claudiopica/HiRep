@@ -200,11 +200,11 @@ int main(int argc,char *argv[])
   init_mc(&flow, "input_file");
   lprintf("MAIN",0,"MVM during RHMC initialzation: %ld\n",getMVM());
   lprintf("MAIN",0,"Initial plaquette: %1.8e\n",avr_plaquette());
+  lprintf("MAIN",0,"Initial SF_action: %1.8e\n",SF_action((&flow)->rhmc_v->rhmc_p.beta));
 #ifdef BASIC_SF
 #ifndef NDEBUG
   lprintf("MAIN",0,"Initial SF_test_gauge_bcs: %1.8e\n",SF_test_gauge_bcs());
 #endif /*NDEBUG*/
-  lprintf("MAIN",0,"Initial SF_action: %1.8e\n",SF_action((&flow)->rhmc_v->rhmc_p.beta));
 #endif /* BASIC_SF */
 
   mass=flow.rhmc_v->rhmc_p.mass;
@@ -241,14 +241,24 @@ int main(int argc,char *argv[])
 
 #ifdef BASIC_SF
     lprintf("MAIN",0,"SF action: %1.8e\n",SF_action((&flow)->rhmc_v->rhmc_p.beta));
+#ifndef NDEBUG
+      lprintf("MAIN",0,"SF_test_gauge_bcs: %1.8e\n",SF_test_gauge_bcs());
+#endif /*NDEBUG*/
 #endif /* BASIC_SF */
 
     if((i%flow.meas_freq)==0) {
       /* plaquette */
       lprintf("MAIN",0,"Plaquette: %1.8e\n",avr_plaquette());
 #ifdef BASIC_SF
-      lprintf("MAIN",0,"SF_test_gauge_bcs: %1.8e\n",SF_test_gauge_bcs());
-      lprintf("MAIN",0,"PCAC mass: %1.8e\n",SF_PCAC_wall_mass((&flow)->rhmc_v->rhmc_p.mass));
+
+    gettimeofday(&start,0);
+	    
+    lprintf("MAIN",0,"PCAC mass: %1.8e\n",SF_PCAC_wall_mass((&flow)->rhmc_v->rhmc_p.mass));
+	    
+    gettimeofday(&end,0);
+    timeval_subtract(&etime,&end,&start);
+    lprintf("MAIN",0,"SF Propagators generated in [%ld sec %ld usec]\n",etime.tv_sec,etime.tv_usec);
+
 #endif /* BASIC_SF */
 
       /* Mesons */

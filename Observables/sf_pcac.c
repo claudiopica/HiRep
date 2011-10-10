@@ -14,36 +14,16 @@
 #include <math.h>
 #include <assert.h>
 #include "logger.h"
-
-
-#ifdef ROTATED_SF
 #include "update.h"
-extern rhmc_par _update_par; /* Update/update_rhmc.c */
-#endif /* ROTATED_SF */
 
+extern rhmc_par _update_par; /* Update/update_rhmc.c */
 
 static double hmass;
-static void H_sf(spinor_field *out, spinor_field *in){
-  g5Dphi(hmass,out,in);
-}
 static void H2_sf(spinor_field *out, spinor_field *in){
   g5Dphi_sq(hmass,out,in);
 }
 
 void SF_quark_propagator(spinor_field *in, double mass, spinor_field *out, double acc) {
-#ifdef BASIC_SF
-
-  static MINRES_par MINRESpar;
-  int cgiter;
-  hmass = mass;
-  
-  MINRESpar.err2 = acc;
-  MINRESpar.max_iter = 0;
-  cgiter=MINRES(&MINRESpar, &H_sf, in, out, 0);
-	lprintf("PROPAGATOR",10,"MINRES MVM = %d",cgiter);
-	
-#else
-	  
   int cgiter;
   static mshift_par inv_par;
   static spinor_field *chi=NULL;
@@ -61,8 +41,6 @@ void SF_quark_propagator(spinor_field *in, double mass, spinor_field *out, doubl
   cgiter=cg_mshift(&inv_par, &H2_sf, chi, out);
 	lprintf("PROPAGATOR",10,"cg_mshift MVM = %d",cgiter);
 	free(inv_par.shift);
-
-#endif
 }
 
 
@@ -190,7 +168,7 @@ double SF_PCAC_wall_mass(double mass)
   lprintf("PC_wall_AC",0,"ZP_pos = %.10e\n",(sqrt(f_1)/(f_P[(int)(GLB_X/2)])));
   
   for (ix0=2;ix0<GLB_T-3;ix0++)
-    lprintf("PC_wall_AC",0,"PCACpost%d = %f\n",ix0,(double)(f_A[(int)(ix0)+1] - f_A[(int)(ix0)-1])/(4*f_P[(int)(ix0)]));
+    lprintf("PC_wall_AC",0,"PCACpost%d = %10e\n",ix0,(double)(f_A[(int)(ix0)+1] - f_A[(int)(ix0)-1])/(4*f_P[(int)(ix0)]));
   
   /*Create wall source with g5 factor at t=T-2*/
   /*U and P- on source (again actually use P+ to account for commuting with g5 in source)*/
@@ -252,7 +230,7 @@ double SF_PCAC_wall_mass(double mass)
   lprintf("PC_wall_AC",0,"Z_P = %.10e\n",0.5*(sqrt(f_1)/(f_Pt[(int)(GLB_X/2)]))+0.5*(sqrt(f_1)/(f_P[(int)(GLB_X/2)])));
   
   for (ix0=2;ix0<GLB_T-3;ix0++)
-    lprintf("PC_wall_AC",0,"PCACnegt%d = %f\n",ix0,(double)(f_At[(int)(ix0)+1] - f_At[(int)(ix0)-1])/(4*f_Pt[(int)(ix0)]));
+    lprintf("PC_wall_AC",0,"PCACnegt%d = %10e\n",ix0,(double)(f_At[(int)(ix0)+1] - f_At[(int)(ix0)-1])/(4*f_Pt[(int)(ix0)]));
   
   free_spinor_field(source);
   free_spinor_field(prop);

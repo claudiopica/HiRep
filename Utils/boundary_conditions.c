@@ -227,14 +227,14 @@ void SF_spinor_bcs(spinor_field *sp)
     for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
       for(it=0;it<=1;it++) {
 	index=ipt(it,ix,iy,iz);
-	_spinor_zero_g(*_FIELD_AT(sp,index));
+	_spinor_zero_f(*_FIELD_AT(sp,index));
       }
     }
   }
   if(COORD[0] == NP_T-1) {
     for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
       index=ipt(T-1,ix,iy,iz);
-      _spinor_zero_g(*_FIELD_AT(sp,index));
+      _spinor_zero_f(*_FIELD_AT(sp,index));
     }
   }
 #else 
@@ -258,14 +258,14 @@ void SF_spinor_bcs_flt(spinor_field_flt *sp)
     for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
       for(it=0;it<=1;it++) {
 	index=ipt(it,ix,iy,iz);
-	_spinor_zero_g(*_FIELD_AT(sp,index));
+	_spinor_zero_f(*_FIELD_AT(sp,index));
       }
     }
   }
   if(COORD[0] == NP_T-1) {
     for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
       index=ipt(T-1,ix,iy,iz);
-      _spinor_zero_g(*_FIELD_AT(sp,index));
+      _spinor_zero_f(*_FIELD_AT(sp,index));
     }
   }
 
@@ -290,15 +290,18 @@ double SF_test_spinor_bcs(spinor_field *sp) {
 	if(COORD[0] == 0) {
 		for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
 			index=ipt(0,ix,iy,iz);
-			_spinor_prod_re_g(k,*_FIELD_AT(sp,index),*_FIELD_AT(sp,index)); pa+=k;
+			_spinor_prod_re_f(k,*_FIELD_AT(sp,index),*_FIELD_AT(sp,index)); pa+=k;
+			_spinor_prod_im_f(k,*_FIELD_AT(sp,index),*_FIELD_AT(sp,index)); pa+=k;
 			index=ipt(1,ix,iy,iz);
-			_spinor_prod_re_g(k,*_FIELD_AT(sp,index),*_FIELD_AT(sp,index)); pa+=k;
+			_spinor_prod_re_f(k,*_FIELD_AT(sp,index),*_FIELD_AT(sp,index)); pa+=k;
+			_spinor_prod_im_f(k,*_FIELD_AT(sp,index),*_FIELD_AT(sp,index)); pa+=k;
 		}
 	}
 	if(COORD[0] == NP_T-1) {
 		for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
 			index=ipt(T-1,ix,iy,iz);
-			_spinor_prod_re_g(k,*_FIELD_AT(sp,index),*_FIELD_AT(sp,index)); pa+=k;
+			_spinor_prod_re_f(k,*_FIELD_AT(sp,index),*_FIELD_AT(sp,index)); pa+=k;
+			_spinor_prod_im_f(k,*_FIELD_AT(sp,index),*_FIELD_AT(sp,index)); pa+=k;
 		}
 	}
   global_sum(&pa, 1);
