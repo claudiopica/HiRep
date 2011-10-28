@@ -27,16 +27,19 @@ include $(MKDIR)/MkFlags
 DFILES = $(findstring .d,$(MAKEFILES))
 RBLD = $(if $(DFILES),,rebuild)
 
+
 %.o: SRC=$(patsubst %.o,%.c,$@) 
 %.o: DEP=$(patsubst %.o,.%.d,$@)
+%.o: GPUOPT=$(patsubst %,--x cu,$(findstring $(patsubst %.o,%.c,$@),$(GPUFILES))) 
 %.o: %.c $(MKDIR)/MkFlags $(RBLD)
 	if  test $(dir $@) = "./"; then \
 	  if test "$(DFILES)" = ""; then \
 	    $(MAKE) $(DEP) ;\
 	    MAKEFILES="$(DEP)" $(MAKE) $@ ;\
 	  else \
+	    echo "GPUOPT = [$(GPUOPT)]..." ;\
 	    echo -n "Compiling [$(CURDIR)/$@]..." ;\
-	    $(CC) -c $(CFLAGS) $(CPPFLAGS) $(SRC) &&\
+	    $(CC) $(GPUOPT) -c $(CFLAGS) $(CPPFLAGS) $(SRC) &&\
 	    echo " done." || ( echo " failed." && false) ;\
 	  fi ;\
 	else \
