@@ -44,6 +44,11 @@ spinor_field_flt* alloc_spinor_field_f_flt(unsigned int n, geometry_descriptor *
 void free_spinor_field(spinor_field *s);
 void free_spinor_field_flt(spinor_field_flt *s);
 
+#ifdef WITH_GPU
+void free_spinor_field_gpu(spinor_field *field);
+void alloc_spinor_field_f_gpu(unsigned int n, spinor_field *field);
+#endif
+
 void free_avfield(suNg_av_field *u);
 suNg_av_field *alloc_avfield(geometry_descriptor* type);
 void free_sfield(scalar_field *u);

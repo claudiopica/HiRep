@@ -13,6 +13,11 @@
 #include <mpi.h>
 #endif
 
+#ifdef WITH_GPU
+#include "spinor_field_alloc_gpu.c"
+#endif
+
+
 
 spinor_field* alloc_spinor_field_f(unsigned int n, geometry_descriptor* type)
 {
