@@ -15,6 +15,9 @@
 
 typedef struct _suNg_field {
   suNg *ptr;
+#ifdef WITH_GPU
+  suNg *gpu_ptr;
+#endif
   geometry_descriptor *type;
 #ifdef WITH_MPI
   MPI_Request *comm_req; 
@@ -23,6 +26,9 @@ typedef struct _suNg_field {
 
 typedef struct _suNg_field_flt {
   suNg_flt *ptr;
+#ifdef WITH_GPU
+    suNg_flt *gpu_ptr;
+#endif
   geometry_descriptor *type;
 #ifdef WITH_MPI
   MPI_Request *comm_req; 
@@ -32,6 +38,9 @@ typedef struct _suNg_field_flt {
 
 typedef struct _suNf_field {
   suNf *ptr;
+#ifdef WITH_GPU
+    suNf *gpu_ptr;
+#endif
   geometry_descriptor *type;
 #ifdef WITH_MPI
   MPI_Request *comm_req; 
@@ -40,7 +49,10 @@ typedef struct _suNf_field {
 
 typedef struct _suNf_field_flt {
   suNf_flt *ptr;
-  geometry_descriptor *type;
+#ifdef WITH_GPU
+    suNf_flt *gpu_ptr;
+#endif
+    geometry_descriptor *type;
 #ifdef WITH_MPI
   MPI_Request *comm_req; 
 #endif
@@ -48,7 +60,10 @@ typedef struct _suNf_field_flt {
 
 typedef struct _spinor_field {
   suNf_spinor* ptr;
-  geometry_descriptor* type;
+#ifdef WITH_GPU
+    suNf_spinor *gpu_ptr;
+#endif
+    geometry_descriptor* type;
 #ifdef WITH_MPI
   MPI_Request *comm_req; 
 #endif
@@ -56,7 +71,10 @@ typedef struct _spinor_field {
 
 typedef struct _spinor_field_flt {
   suNf_spinor_flt *ptr;
-  geometry_descriptor *type;
+#ifdef WITH_GPU
+    suNf_spinor_flt *gpu_ptr;
+#endif
+    geometry_descriptor *type;
 #ifdef WITH_MPI
   MPI_Request *comm_req; 
 #endif
@@ -64,7 +82,10 @@ typedef struct _spinor_field_flt {
 
 typedef struct _suNg_av_field {
   suNg_algebra_vector *ptr;
-  geometry_descriptor *type;
+#ifdef WITH_GPU
+    suNg_algebra_vector *gpu_ptr;
+#endif
+    geometry_descriptor *type;
 #ifdef WITH_MPI
   MPI_Request *comm_req; 
 #endif
@@ -72,6 +93,9 @@ typedef struct _suNg_av_field {
 
 typedef struct _scalar_field {
   double *ptr;
+#ifdef WITH_GPU
+    double *gpu_ptr;
+#endif    
   geometry_descriptor *type;
 #ifdef WITH_MPI
   MPI_Request *comm_req; 
