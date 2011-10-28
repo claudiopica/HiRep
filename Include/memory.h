@@ -46,7 +46,9 @@ void free_spinor_field_flt(spinor_field_flt *s);
 
 #ifdef WITH_GPU
 void free_spinor_field_gpu(spinor_field *field);
+void free_spinor_field_flt_gpu(spinor_field_flt *field);
 void alloc_spinor_field_f_gpu(unsigned int n, spinor_field *field);
+void alloc_spinor_field_f_flt_gpu(unsigned int n, spinor_field_flt *field);
 #endif
 
 void free_avfield(suNg_av_field *u);
