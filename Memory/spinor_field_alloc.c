@@ -47,6 +47,9 @@ spinor_field* alloc_spinor_field_f(unsigned int n, geometry_descriptor* type)
 	for(i=0; i<n; ++i) {
 	  s[i].ptr=p+i*type->gsize;
 	  s[i].type=type;
+#ifdef WITH_GPU
+      s[i]->gpu_ptr=NULL;
+#endif
 #ifdef WITH_MPI
 	  if (r==NULL) {
 	    s[i].comm_req=NULL;
@@ -92,6 +95,9 @@ spinor_field_flt* alloc_spinor_field_f_flt(unsigned int n, geometry_descriptor *
 	for(i=0; i<n; ++i) {
 	  s[i].ptr=p+i*type->gsize;
 	  s[i].type=type;
+#ifdef WITH_GPU
+      s[i]->gpu_ptr=NULL;
+#endif
 #ifdef WITH_MPI
 	  if (r==NULL) {
 	    s[i].comm_req=NULL;

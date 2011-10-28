@@ -44,6 +44,10 @@ suNg_field *alloc_gfield(geometry_descriptor* type)
    error((gf->ptr)==NULL,1,"alloc_gfield [field_alloc.c]",
          "Could not allocate memory space for the gauge field (2)");
 
+#ifdef WITH_GPU
+    gf->gpu_ptr=NULL;
+#endif
+    
    gf->type=type;
 
 #ifdef WITH_MPI
@@ -88,7 +92,11 @@ suNf_field* alloc_gfield_f(geometry_descriptor* type)
   error((gf->ptr)==NULL,1,"alloc_gfield [field_alloc.c]",
 	"Could not allocate memory space for the gauge field (2)");
 
-  gf->type=type;
+#ifdef WITH_GPU
+    gf->gpu_ptr=NULL;
+#endif
+
+    gf->type=type;
 
 #ifdef WITH_MPI
   if (type->nbuffers>0) {
@@ -132,6 +140,10 @@ suNg_field_flt* alloc_gfield_flt(geometry_descriptor* type)
   error((gf->ptr)==NULL,1,"alloc_gfield [field_alloc.c]",
 	"Could not allocate memory space for the gauge field (2)");
 
+#ifdef WITH_GPU
+    gf->gpu_ptr=NULL;
+#endif
+    
   gf->type=type;
 
 #ifdef WITH_MPI
@@ -177,7 +189,11 @@ suNf_field_flt* alloc_gfield_f_flt(geometry_descriptor* type)
   error((gf->ptr)==NULL,1,"alloc_gfield [field_alloc.c]",
 	"Could not allocate memory space for the gauge field (2)");
 
-  gf->type=type;
+#ifdef WITH_GPU
+    gf->gpu_ptr=NULL;
+#endif
+
+    gf->type=type;
 
 #ifdef WITH_MPI
   if (type->nbuffers>0) {
@@ -222,7 +238,11 @@ suNg_av_field *alloc_avfield(geometry_descriptor* type)
    error((af->ptr)==NULL,1,"alloc_avfield [field_alloc.c]",
          "Could not allocate memory space for the av field (2)");
 
-   af->type=type;
+#ifdef WITH_GPU
+    af->gpu_ptr=NULL;
+#endif
+
+    af->type=type;
 
 #ifdef WITH_MPI
    if (type->nbuffers>0) {
@@ -262,7 +282,11 @@ scalar_field *alloc_sfield(geometry_descriptor* type)
    error((af->ptr)==NULL,1,"alloc_avfield [field_alloc.c]",
          "Could not allocate memory space for the av field (2)");
 
-   af->type=type;
+#ifdef WITH_GPU
+    af->gpu_ptr=NULL;
+#endif
+
+    af->type=type;
 
 #ifdef WITH_MPI
    if (type->nbuffers>0) {
@@ -293,6 +317,10 @@ suNg_field *alloc_gtransf(geometry_descriptor* type)
    error((gf->ptr)==NULL,1,"alloc_gtransf [field_alloc.c]",
          "Could not allocate memory space for the gauge transformation (2)");
 
+#ifdef WITH_GPU
+    gf->gpu_ptr=NULL;
+#endif
+    
    gf->type=type;
 
 #ifdef WITH_MPI
