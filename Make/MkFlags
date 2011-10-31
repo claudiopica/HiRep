@@ -13,7 +13,7 @@ MACRO += -DANTIPERIODIC_BC_T
 #MACRO += -DROTATED_SF
 
 MACRO += -DUPDATE_EO
-MACRO += -DWITH_MPI
+#MACRO += -DWITH_MPI
 MACRO += -DWITH_GPU
 MACRO += -DNDEBUG
 #MACRO += -DCHECK_SPINOR_MATCHING
@@ -21,8 +21,8 @@ MACRO += -DNDEBUG
 
 #Compiler
 #export OMPI_CC = ccache gcc
-CC = mpicc
-CFLAGS = -Wall -std=c99 -O2 -fomit-frame-pointer -mfpmath=sse -msse -msse2 
+CC = nvcc
+CFLAGS = -O2 -arch sm_13
 
 ##########################################################################
 # DO NOT EDIT BEYOND THIS POINT

@@ -30,7 +30,7 @@
 #include "TMPL/linear_algebra_gpu.c.sdtmpl"
 void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
 	_TWO_SPINORS_MATCHING(s1,s2);
-	memcpy(s1->ptr,s2->ptr,s1->type->gsize*sizeof(suNf_spinor));
+	cudaMemcpy(s1->gpu_ptr,s2->gpu_ptr,s1->type->gsize*sizeof(suNf_spinor),cudaMemcpyDeviceToDevice);
 }
 #undef _FUNC
 #define _FUNC(a) a##_f_cpu
@@ -62,7 +62,7 @@ void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
 #include "TMPL/linear_algebra_gpu.c.sdtmpl"
 void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
 	_TWO_SPINORS_MATCHING(s1,s2);
-	memcpy(s1->ptr,s2->ptr,s1->type->gsize*sizeof(suNf_spinor));
+	cudaMemcpy(s1->gpu_ptr,s2->gpu_ptr,s1->type->gsize*sizeof(suNf_spinor),cudaMemcpyDeviceToDevice);
 }
 #undef _FUNC
 #define _FUNC(a) a##_f_flt_cpu

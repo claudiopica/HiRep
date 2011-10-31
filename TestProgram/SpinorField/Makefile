@@ -19,7 +19,7 @@ MODS := boundary_conditions # suN_utils suN_exp single_double_utils
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Memory
-MODS := amalloc field_alloc spinor_field_alloc
+MODS := amalloc field_alloc spinor_field_alloc 
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 # MODDIR := Observables

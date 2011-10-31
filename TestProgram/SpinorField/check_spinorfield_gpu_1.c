@@ -43,6 +43,7 @@ int main(int argc,char *argv[])
   int sfsize = 10;
   double norm_cpu;
   double norm_gpu;
+  int i;
 
   /* setup process id and communications */
   setup_process(&argc,&argv);
@@ -93,7 +94,7 @@ int main(int argc,char *argv[])
   
   
   for (i=0;i<sfsize;i++){
-    gaussian_spinor_field(sf1[i]);
+    gaussian_spinor_field(&sf1[i]);
   }
 
   for (i=0;i<sfsize;i++){
@@ -102,24 +103,24 @@ int main(int argc,char *argv[])
 
 
   for (i=0;i<sfsize;i++){
-    spinor_field_copy(&sf2[i],&sf1[i]);
-    spinor_field_copy_cpu(&sf2[i],&sf1[i]);
+    spinor_field_copy_f(&sf2[i],&sf1[i]);
+    spinor_field_copy_f_cpu(&sf2[i],&sf1[i]);
   }  
 
-  spinor_field_mul_add_assign(sf1,2.0,sf2);
-  spinor_field_mul_add_assign_cpu(sf1,2.0,sf2);
+  spinor_field_mul_add_assign_f(sf1,2.0,sf2);
+  spinor_field_mul_add_assign_f_cpu(sf1,2.0,sf2);
   
   spinor_field_copy_cpu(&sf1[0],&sf1[1]);
   spinor_field_copy_from_gpu_f(sf1);
 
-  norm_gpu = spinor_field_sqnorm(&sf1[0]);
-  norm_cpu = spinor_field_sqnorm(&sf1[1]);
+  norm_gpu = spinor_field_sqnorm_f(&sf1[0]);
+  norm_cpu = spinor_field_sqnorm_f(&sf1[1]);
   
   lprintf("LA TEST",0,"Check spinor_field_mul_add_assign gpu=%1.10g, cpu=%1.10g, gpu-cpu= %1.10g",norm_gpu,norm_cpu,norm_gpu-norm_cpu);
 
 
   
-  lprintf("LA TEST",0,"Check of lc3: %.2e\n\n",dmax);
+  //  lprintf("LA TEST",0,"Check of lc3: %.2e\n\n",dmax);
   
   finalize_process();
 
