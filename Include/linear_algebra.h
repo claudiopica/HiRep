@@ -6,6 +6,10 @@
 #ifndef LINEAR_ALGEBRA_H
 #define LINEAR_ALGEBRA_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* 
  * LINEAR ALGEBRA FUNCTIONS ARE DEFINED IN THE TEMPLATE
  *
@@ -44,4 +48,11 @@
 #undef _SPINOR_FIELD_TYPE
 #undef _FUNC
 
+#ifdef __cplusplus
+}
 #endif
+	
+	
+#endif
+
+

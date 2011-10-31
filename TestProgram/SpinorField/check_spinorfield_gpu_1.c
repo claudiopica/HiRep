@@ -61,7 +61,7 @@ int main(int argc,char *argv[])
 
   /* read input file */
   read_input(glb_var.read,"test_input");
-  rlxd_init(glb_var.rlxd_seed,glb_var.rlxd_level*(PID + 1));
+  rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed);
 
 
   /* setup communication geometry */
@@ -110,7 +110,7 @@ int main(int argc,char *argv[])
   spinor_field_mul_add_assign_f(sf1,2.0,sf2);
   spinor_field_mul_add_assign_f_cpu(sf1,2.0,sf2);
   
-  spinor_field_copy_cpu(&sf1[0],&sf1[1]);
+  spinor_field_copy_f_cpu(&sf1[0],&sf1[1]);
   spinor_field_copy_from_gpu_f(sf1);
 
   norm_gpu = spinor_field_sqnorm_f(&sf1[0]);
