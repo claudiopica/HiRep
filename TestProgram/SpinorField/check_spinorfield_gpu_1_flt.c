@@ -39,7 +39,7 @@ static spinor_field *ppk[5];
 int main(int argc,char *argv[])
 {
   
-  spinor_field *sf1,*sf2;
+  spinor_field_flt *sf1,*sf2;
   int sfsize = 10;
   double norm_cpu;
   double norm_gpu;
@@ -95,8 +95,7 @@ alloc_spinor_field_f_flt_gpu(sfsize, sf1);
 alloc_spinor_field_f_flt_gpu(sfsize,sf2);
 	
 // CPU part set to gaussian
-  for (i=0;i<sfsize;i++){
-	  
+  for (i=0;i<sfsize;i++){	  
     gaussian_spinor_field_flt(&sf1[i]);
   }
 	
@@ -114,7 +113,7 @@ alloc_spinor_field_f_flt_gpu(sfsize,sf2);
 
 // Same (hopefully) operation on sf1gpu and cpu fields	
   spinor_field_mul_add_assign_f_flt(sf1,2.0,sf2);
-  //spinor_field_mul_add_assign_f_flt_cpu(sf1,2.0,sf2);
+  spinor_field_mul_add_assign_f_flt_cpu(sf1,2.0,sf2);
 
   spinor_field_copy_f_flt_cpu(&sf1[3],&sf1[0]);// Copy from 2nd arg to 1st 															// Why does it work if the order is (&sf1[0],&sf1[1])?
   spinor_field_copy_from_gpu_f_flt(&sf1[0]);	     		
@@ -129,10 +128,10 @@ alloc_spinor_field_f_flt_gpu(sfsize,sf2);
   //  lprintf("LA TEST",0,"Check of lc3: %.2e\n\n",dmax);
   
 
-	free_spinor_field_gpu(sf1);
-	free_spinor_field_gpu(sf2);
-	free_spinor_field(sf1);
-	free_spinor_field(sf2);	
+	free_spinor_field_flt_gpu(sf1);
+	free_spinor_field_flt_gpu(sf2);
+	free_spinor_field_flt(sf1);
+	free_spinor_field_flt(sf2);	
 
 	
 	

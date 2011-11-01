@@ -1,7 +1,7 @@
 TOPDIR = ../..
 MKDIR=$(TOPDIR)/Make
 
-EXES = check_spinorfield_gpu_1
+EXES = check_spinorfield_gpu_1 check_spinorfield_gpu_1_flt 
 
 default: $(EXES)
 
