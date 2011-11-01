@@ -115,7 +115,8 @@ int main(int argc,char *argv[])
   spinor_field_mul_add_assign_f(sf1,2.0,sf2);
   spinor_field_mul_add_assign_f_cpu(sf1,2.0,sf2);
 
-  spinor_field_copy_f_cpu(&sf1[3],&sf1[0]);// Copy from 2nd arg to 1st 															// Why does it work if the order is (&sf1[0],&sf1[1])?
+  spinor_field_copy_f_cpu(&sf1[3],&sf1[0]);// Copy from 2nd arg to 1st 									
+  gaussian_spinor_field(&sf1[0]);
   spinor_field_copy_from_gpu_f(&sf1[0]);	     		
 	
   norm_gpu = spinor_field_sqnorm_f(&sf1[0]);
