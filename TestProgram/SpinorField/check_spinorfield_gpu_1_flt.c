@@ -128,13 +128,12 @@ alloc_spinor_field_f_flt_gpu(sfsize,sf2);
   
   //  lprintf("LA TEST",0,"Check of lc3: %.2e\n\n",dmax);
   
-	// No freeing of memory
-	for (i=0;i<sfsize;i++){
-		free_spinor_field_gpu(&sf1[i]);
-		free_spinor_field_gpu(&sf2[i]);
-		free_spinor_field(&sf1[i]);
-		free_spinor_field(&sf2[i]);		
-	}
+
+	free_spinor_field_gpu(sf1);
+	free_spinor_field_gpu(sf2);
+	free_spinor_field(sf1);
+	free_spinor_field(sf2);	
+
 	
 	
   finalize_process();
