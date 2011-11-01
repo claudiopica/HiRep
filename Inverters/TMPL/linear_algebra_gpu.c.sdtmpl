@@ -5,6 +5,7 @@
 
 #include "communications.h"
 #include "linear_algebra_gpu.cu"
+#include "gpu.h"
 
 /* Re <s1,s2> */
 double _FUNC(spinor_field_prod_re)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
@@ -117,7 +118,9 @@ void _FUNC(spinor_field_mul_add_assign)(_SPINOR_FIELD_TYPE *s1, double r, _SPINO
 {
   _REAL rr=(_REAL)r;
   int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
+  
   spinor_field_mul_add_assign_gpu<<<N/BLOCK_SIZE+1,BLOCK_SIZE>>>(s1->gpu_ptr,rr,s2->gpu_ptr,N);
+  CudaCheckError();
 }
 
 /* s1+=c*s2 c complex */
@@ -139,7 +142,7 @@ void _FUNC(spinor_field_mul)(_SPINOR_FIELD_TYPE *s1, double r, _SPINOR_FIELD_TYP
   _REAL rr=(_REAL)r;
    _DECLARE_INT_ITERATOR(i);
 	_SPINOR_TYPE *_SPINOR_PTR(s1), *_SPINOR_PTR(s2);
-   
+	
    _TWO_SPINORS_FOR(s1,s2,i) {
       _spinor_mul_f(*_SPINOR_PTR(s1),rr,*_SPINOR_PTR(s2));
    }
