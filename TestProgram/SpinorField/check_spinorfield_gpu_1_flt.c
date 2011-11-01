@@ -89,38 +89,38 @@ int main(int argc,char *argv[])
   lprintf("CPTEST",0,"ncopies=%d\n",glattice.ncopies);
   
 //	Allocates memory for cpu spinor field. GPU pointer = NULL
-  sf1=alloc_spinor_field_f(sfsize, &glattice);
-  sf2=alloc_spinor_field_f(sfsize, &glattice);
-alloc_spinor_field_f_gpu(sfsize, sf1);
-alloc_spinor_field_f_gpu(sfsize,sf2);
+  sf1=alloc_spinor_field_f_flt(sfsize, &glattice);
+  sf2=alloc_spinor_field_f_flt(sfsize, &glattice);
+alloc_spinor_field_f_flt_gpu(sfsize, sf1);
+alloc_spinor_field_f_flt_gpu(sfsize,sf2);
 	
 // CPU part set to gaussian
   for (i=0;i<sfsize;i++){
 	  
-    gaussian_spinor_field(&sf1[i]);
+    gaussian_spinor_field_flt(&sf1[i]);
   }
 	
 
 // Copy content of CPU field to GPU field
   for (i=0;i<sfsize;i++){
-    spinor_field_copy_to_gpu_f(&sf1[i]);
+    spinor_field_copy_to_gpu_f_flt(&sf1[i]);
   }
 
 // Copying to the other spinor field... Now all fields are equal,    Copy from 2nd arg to 1st
   for (i=0;i<sfsize;i++){
-    spinor_field_copy_f(&sf2[i],&sf1[i]);
-    spinor_field_copy_f_cpu(&sf2[i],&sf1[i]);
+    spinor_field_copy_f_flt(&sf2[i],&sf1[i]);
+    spinor_field_copy_f_flt_cpu(&sf2[i],&sf1[i]);
   }  
 
 // Same (hopefully) operation on sf1gpu and cpu fields	
-  spinor_field_mul_add_assign_f(sf1,2.0,sf2);
-  spinor_field_mul_add_assign_f_cpu(sf1,2.0,sf2);
+  spinor_field_mul_add_assign_f_flt(sf1,2.0,sf2);
+  //spinor_field_mul_add_assign_f_flt_cpu(sf1,2.0,sf2);
 
-  spinor_field_copy_f_cpu(&sf1[3],&sf1[0]);// Copy from 2nd arg to 1st 															// Why does it work if the order is (&sf1[0],&sf1[1])?
-  spinor_field_copy_from_gpu_f(&sf1[0]);	     		
+  spinor_field_copy_f_flt_cpu(&sf1[3],&sf1[0]);// Copy from 2nd arg to 1st 															// Why does it work if the order is (&sf1[0],&sf1[1])?
+  spinor_field_copy_from_gpu_f_flt(&sf1[0]);	     		
 	
-  norm_gpu = spinor_field_sqnorm_f(&sf1[0]);
-  norm_cpu = spinor_field_sqnorm_f(&sf1[3]);
+  norm_gpu = spinor_field_sqnorm_f_flt(&sf1[0]);
+  norm_cpu = spinor_field_sqnorm_f_flt(&sf1[3]);
   
   lprintf("LA TEST",0,"Check spinor_field_mul_add_assign \n gpu=%1.10g, cpu=%1.10g, \n gpu-cpu= %1.10g\n\n",norm_gpu,norm_cpu,norm_gpu-norm_cpu);
 
@@ -129,11 +129,13 @@ alloc_spinor_field_f_gpu(sfsize,sf2);
   //  lprintf("LA TEST",0,"Check of lc3: %.2e\n\n",dmax);
   
 	// No freeing of memory
-
-	free_spinor_field_gpu(sf1);
-	free_spinor_field_gpu(sf2);
-	free_spinor_field(sf1);
-	free_spinor_field(sf2);
+	for (i=0;i<sfsize;i++){
+		free_spinor_field_gpu(&sf1[i]);
+		free_spinor_field_gpu(&sf2[i]);
+		free_spinor_field(&sf1[i]);
+		free_spinor_field(&sf2[i]);		
+	}
+	
 	
   finalize_process();
 
