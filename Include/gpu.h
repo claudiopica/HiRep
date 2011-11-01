@@ -5,6 +5,7 @@
 
 #ifndef GPU_H
 #define GPU_H
+#include <stdio.h>
 
 // Enable this for error checking
 #define CUDA_CHECK_ERROR

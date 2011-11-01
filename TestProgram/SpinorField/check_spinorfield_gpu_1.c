@@ -91,12 +91,11 @@ int main(int argc,char *argv[])
 //	Allocates memory for cpu spinor field. GPU pointer = NULL
   sf1=alloc_spinor_field_f(sfsize, &glattice);
   sf2=alloc_spinor_field_f(sfsize, &glattice);
-alloc_spinor_field_f_gpu(sfsize, sf1);
-alloc_spinor_field_f_gpu(sfsize,sf2);
+  alloc_spinor_field_f_gpu(sfsize, sf1);
+  alloc_spinor_field_f_gpu(sfsize,sf2);
 	
 // CPU part set to gaussian
-  for (i=0;i<sfsize;i++){
-	  
+  for (i=0;i<sfsize;i++){	  
     gaussian_spinor_field(&sf1[i]);
   }
 	
