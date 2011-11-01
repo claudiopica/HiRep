@@ -118,7 +118,8 @@ void _FUNC(spinor_field_mul_add_assign)(_SPINOR_FIELD_TYPE *s1, double r, _SPINO
 {
   _REAL rr=(_REAL)r;
   int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
-  spinor_field_mul_add_assign_gpu<<<N/BLOCK_SIZE+1,BLOCK_SIZE>>>(s1->gpu_ptr,rr,s2->gpu_ptr,N);
+  unsigned int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
+  spinor_field_mul_add_assign_gpu<<<grid,BLOCK_SIZE>>>(s1->gpu_ptr,rr,s2->gpu_ptr,N);
   CudaCheckError();
 }
 

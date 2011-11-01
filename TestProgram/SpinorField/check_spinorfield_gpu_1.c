@@ -124,16 +124,13 @@ alloc_spinor_field_f_gpu(sfsize,sf2);
   
   lprintf("LA TEST",0,"Check spinor_field_mul_add_assign \n gpu=%1.10g, cpu=%1.10g, \n gpu-cpu= %1.10g\n\n",norm_gpu,norm_cpu,norm_gpu-norm_cpu);
 
-// No freeing of memory
   
   //  lprintf("LA TEST",0,"Check of lc3: %.2e\n\n",dmax);
   
-	// No freeing of memory
-
-	free_spinor_field_gpu(sf1);
-	free_spinor_field_gpu(sf2);
-	free_spinor_field(sf1);
-	free_spinor_field(sf2);
+  free_spinor_field_gpu(sf1);
+  free_spinor_field_gpu(sf2);
+  free_spinor_field(sf1);
+  free_spinor_field(sf2);
 	
   finalize_process();
 

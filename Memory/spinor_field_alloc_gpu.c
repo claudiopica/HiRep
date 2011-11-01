@@ -28,12 +28,11 @@
 
 
 void free_spinor_field_gpu(spinor_field *field) {
-    if (field[0].gpu_ptr!=NULL) {
-        cudaFree(field[0].gpu_ptr);
-        field[0].gpu_ptr=NULL;
-    }
+  if (field[0].gpu_ptr!=NULL) {
+    cudaFree(field[0].gpu_ptr);
+    field[0].gpu_ptr=NULL;
+  }
 }
-
 
 void alloc_spinor_field_f_gpu(unsigned int n, spinor_field *field) {
 
@@ -48,7 +47,7 @@ void alloc_spinor_field_f_gpu(unsigned int n, spinor_field *field) {
           "Could not allocate GPU memory space for the spinor fields");
     
     for(i=0; i<n; ++i) {
-        field[i].gpu_ptr=p+i*field->type->gsize;
+      field[i].gpu_ptr=p+i*field->type->gsize;
     }
     
 }
@@ -63,8 +62,8 @@ void spinor_field_copy_from_gpu_f(spinor_field *field){
 
 void free_spinor_field_flt_gpu(spinor_field_flt *field) {
     if (field[0].gpu_ptr!=NULL) {
-        cudaFree(field[0].gpu_ptr);
-        field[0].gpu_ptr=NULL;
+      cudaFree(field[0].gpu_ptr);
+      field[0].gpu_ptr=NULL;
     }
 }
 

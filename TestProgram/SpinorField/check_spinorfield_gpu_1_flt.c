@@ -91,21 +91,21 @@ int main(int argc,char *argv[])
 //	Allocates memory for cpu spinor field. GPU pointer = NULL
   sf1=alloc_spinor_field_f_flt(sfsize, &glattice);
   sf2=alloc_spinor_field_f_flt(sfsize, &glattice);
-alloc_spinor_field_f_flt_gpu(sfsize, sf1);
-alloc_spinor_field_f_flt_gpu(sfsize,sf2);
+  alloc_spinor_field_f_flt_gpu(sfsize, sf1);
+  alloc_spinor_field_f_flt_gpu(sfsize,sf2);
 	
-// CPU part set to gaussian
+  //  CPU part set to gaussian
   for (i=0;i<sfsize;i++){	  
     gaussian_spinor_field_flt(&sf1[i]);
   }
 	
 
-// Copy content of CPU field to GPU field
+  //Copy content of CPU field to GPU field
   for (i=0;i<sfsize;i++){
     spinor_field_copy_to_gpu_f_flt(&sf1[i]);
   }
 
-// Copying to the other spinor field... Now all fields are equal,    Copy from 2nd arg to 1st
+  // Copying to the other spinor field... Now all fields are equal,    Copy from 2nd arg to 1st
   for (i=0;i<sfsize;i++){
     spinor_field_copy_f_flt(&sf2[i],&sf1[i]);
     spinor_field_copy_f_flt_cpu(&sf2[i],&sf1[i]);
@@ -116,6 +116,8 @@ alloc_spinor_field_f_flt_gpu(sfsize,sf2);
   spinor_field_mul_add_assign_f_flt_cpu(sf1,2.0,sf2);
 
   spinor_field_copy_f_flt_cpu(&sf1[3],&sf1[0]);// Copy from 2nd arg to 1st 															// Why does it work if the order is (&sf1[0],&sf1[1])?
+  
+  gaussian_spinor_field_flt(&sf1[0]);
   spinor_field_copy_from_gpu_f_flt(&sf1[0]);	     		
 	
   norm_gpu = spinor_field_sqnorm_f_flt(&sf1[0]);
@@ -123,18 +125,15 @@ alloc_spinor_field_f_flt_gpu(sfsize,sf2);
   
   lprintf("LA TEST",0,"Check spinor_field_mul_add_assign \n gpu=%1.10g, cpu=%1.10g, \n gpu-cpu= %1.10g\n\n",norm_gpu,norm_cpu,norm_gpu-norm_cpu);
 
-// No freeing of memory
   
-  //  lprintf("LA TEST",0,"Check of lc3: %.2e\n\n",dmax);
+  //lprintf("LA TEST",0,"Check of lc3: %.2e\n\n",dmax);
   
-
-	free_spinor_field_flt_gpu(sf1);
-	free_spinor_field_flt_gpu(sf2);
-	free_spinor_field_flt(sf1);
-	free_spinor_field_flt(sf2);	
-
-	
-	
-  finalize_process();
+  // Now freeing of memory
+  free_spinor_field_flt_gpu(sf1);
+  free_spinor_field_flt_gpu(sf2);
+  free_spinor_field_flt(sf1);
+  free_spinor_field_flt(sf2);		
+  
+  //  finalize_process();
 
 }
