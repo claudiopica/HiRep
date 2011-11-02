@@ -19,16 +19,30 @@
 * Definitions of type complex
 *
 *******************************************************************************/
+#ifdef __cplusplus
+struct complex
+{
+  double re,im;
+}; 
 
+struct complex_flt
+{
+  float re,im;
+};
+
+#else
 typedef struct
 {
-   double re,im;
+  double re,im;
 } complex;
-
+  
 typedef struct
 {
-   float re,im;
+  float re,im;
 } complex_flt;
+#endif
+
+
 
 /*******************************************************************************
 *
