@@ -43,6 +43,7 @@ int main(int argc,char *argv[])
   int sfsize = 10;
   double norm_cpu;
   double norm_gpu;
+  double res_cpu,res_gpu;
   int i;
 
   /* setup process id and communications */
@@ -122,9 +123,13 @@ alloc_spinor_field_f_gpu(sfsize,sf2);
   norm_gpu = spinor_field_sqnorm_f(&sf1[0]);
   norm_cpu = spinor_field_sqnorm_f(&sf1[3]);
   
-  lprintf("LA TEST",0,"Check spinor_field_mul_add_assign \n gpu=%1.10g, cpu=%1.10g, \n gpu-cpu= %1.10g\n\n",norm_gpu,norm_cpu,norm_gpu-norm_cpu);
+  lprintf("LA TEST",0,"Check spinor_field_mul_add_assign\n gpu=%1.10g, cpu=%1.10g, \n gpu-cpu= %1.10g\n\n",norm_gpu,norm_cpu,norm_gpu-norm_cpu);
 
+  res_gpu = spinor_field_prod_im_f(&sf1[0],&sf1[1]);
+  res_cpu = spinor_field_prod_im_f_cpu(&sf1[0],&sf1[1]);
   
+  lprintf("LA TEST",0,"Check spinor_field_prod_im\n gpu=%1.10g, cpu=%1.10g, \n gpu-cpu= %1.10g\n\n",res_gpu,res_cpu,res_gpu-res_cpu);
+
   //  lprintf("LA TEST",0,"Check of lc3: %.2e\n\n",dmax);
   
   free_spinor_field_gpu(sf1);
