@@ -30,7 +30,7 @@ RBLD = $(if $(DFILES),,rebuild)
 
 %.o: SRC=$(patsubst %.o,%.c,$@) 
 %.o: DEP=$(patsubst %.o,.%.d,$@)
-%.o: GPUOPT=$(patsubst %,--x cu,$(findstring $(patsubst %.o,%.c,$@),$(GPUFILES))) 
+%.o: GPUOPT=$(if $(findstring "-DWITH_GPU",$(MACRO)),$(patsubst %,--x cu,$(findstring $(patsubst %.o,%.c,$@),$(GPUFILES)))) 
 %.o: %.c $(MKDIR)/MkFlags $(RBLD)
 	if  test $(dir $@) = "./"; then \
 	  if test "$(DFILES)" = ""; then \
