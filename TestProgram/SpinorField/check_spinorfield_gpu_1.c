@@ -127,7 +127,6 @@ int main(int argc,char *argv[])
     spinor_field_copy_f_cpu(&sf2[i],&sf1[i]);
   }  
 
-
   //Check spinor_field_prod_im
   res_gpu = spinor_field_prod_im_f(&sf1[0],&sf1[1]);
   res_cpu = spinor_field_prod_im_f_cpu(&sf1[0],&sf1[1]);
