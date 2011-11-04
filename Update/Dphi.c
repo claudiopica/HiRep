@@ -578,13 +578,7 @@ void (*Dphi) (double m0, spinor_field *out, spinor_field *in)=Dphi_cpu;
 void (*g5Dphi) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_cpu;
 void (*g5Dphi_sq) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_sq_cpu;
 
-void (*Dphi_flt_) (spinor_field_flt *out, spinor_field_flt *in)=Dphi_flt__cpu;
-void (*Dphi_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in)=Dphi_flt_cpu;
-void (*g5Dphi_flt)(double m0, spinor_field_flt *out, spinor_field_flt *in)=g5Dphi_flt_cpu;
-void (*g5Dphi_sq_flt)(double m0, spinor_field_flt *out, spinor_field_flt *in)=g5Dphi_sq_flt_cpu;
-
 unsigned long int (*getMVM)()=getMVM_cpu;
-unsigned long int (*getMVM_flt)()=getMVM_flt_cpu;
 
 /* Even/Odd preconditioned matrix */
 void (*Dphi_eopre) (double m0, spinor_field *out, spinor_field *in)=Dphi_eopre_cpu;
@@ -592,9 +586,5 @@ void (*Dphi_oepre) (double m0, spinor_field *out, spinor_field *in)=Dphi_oepre_c
 void (*g5Dphi_eopre) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_eopre_cpu;
 void (*g5Dphi_eopre_sq) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_eopre_sq_cpu;
 
-void (*Dphi_eopre_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in)=Dphi_eopre_flt_cpu;
-void (*Dphi_oepre_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in)=Dphi_oepre_flt_cpu;
-void (*g5Dphi_eopre_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in)=g5Dphi_eopre_flt_cpu;
-void (*g5Dphi_eopre_sq_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in)=g5Dphi_eopre_sq_flt_cpu;
 #endif //WITH_GPU
 

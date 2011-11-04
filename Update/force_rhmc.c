@@ -86,7 +86,7 @@ void Force_rhmc_f(double dt, suNg_av_field *force){
   static suNg_algebra_vector f;
   static suNf_vector ptmp;
   static suNf_spinor p;
-  static suNf s1;
+  static suNf_FMAT s1;
   static mshift_par inv_par;
   spinor_field *chi, *Hchi;
 #ifdef UPDATE_EO
@@ -158,7 +158,7 @@ void Force_rhmc_f(double dt, suNg_av_field *force){
 	  for (mu=0; mu<4; ++mu) {
 	    int y;
 	    suNf_spinor *chi1, *chi2;
-	    _suNf_zero(s1);
+	    _suNf_FMAT_zero(s1);
 	    switch (mu) {
 	    case 0:
 	      y=iup(x,0);

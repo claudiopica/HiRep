@@ -32,6 +32,13 @@
  */
 static unsigned long int MVMcounter=0;
 
+unsigned long int getMVM_flt_cpu() {
+	unsigned long int res=MVMcounter>>1; /* divide by two */
+	MVMcounter=0; /* reset counter */
+    
+	return res;
+}
+
 /*
  * NOTE :
  * here we are making the assumption that the geometry is such that
@@ -39,7 +46,7 @@ static unsigned long int MVMcounter=0;
  * in the range [VOLUME/2,VOLUME[
  */
 
-void Dphi_flt_(spinor_field_flt *out, spinor_field_flt *in)
+void Dphi_flt__cpu(spinor_field_flt *out, spinor_field_flt *in)
 {
    int iy;
    _DECLARE_INT_ITERATOR(ix);
@@ -230,7 +237,7 @@ void Dphi_flt_(spinor_field_flt *out, spinor_field_flt *in)
  * this function takes 2 spinors defined on the whole lattice
  * of size VOLUME
  */
-void Dphi_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
+void Dphi_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
 {
    double rho;
 
@@ -244,14 +251,14 @@ void Dphi_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
    error(out->type!=&glattice || in->type!=&glattice,1,"Dphi [Dphi.c]", "Spinors are not defined on all the lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
-   Dphi_flt_(out, in);
+   Dphi_flt__cpu(out, in);
 
    rho=4.+m0;
-   spinor_field_mul_add_assign_f_flt(out,rho,in);
+   spinor_field_mul_add_assign_f_flt_cpu(out,rho,in);
 
 }
 
-void g5Dphi_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
+void g5Dphi_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
 {
    double rho;
 
@@ -265,12 +272,12 @@ void g5Dphi_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
    error(out->type!=&glattice || in->type!=&glattice,1,"g5Dphi [Dphi.c]", "Spinors are not defined on all the lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
-   Dphi_flt_(out, in);
+   Dphi_flt__cpu(out, in);
    
    rho=4.+m0;
 
-   spinor_field_mul_add_assign_f_flt(out,rho,in);
-   spinor_field_g5_assign_f_flt(out);
+   spinor_field_mul_add_assign_f_flt_cpu(out,rho,in);
+   spinor_field_g5_assign_f_flt_cpu(out);
 }
 
 
@@ -302,7 +309,7 @@ static void init_Dirac() {
  * Dphi in = (4+m0)^2*in - D_EO D_OE in
  *
  */
-void Dphi_eopre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
+void Dphi_eopre_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
 {
   double rho;
   
@@ -319,14 +326,14 @@ void Dphi_eopre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
   /* alloc memory for temporary spinor field */
   if (init) { init_Dirac(); init=0; }
   
-  Dphi_flt_(otmp, in);
-  Dphi_flt_(out, otmp);
+  Dphi_flt__cpu(otmp, in);
+  Dphi_flt__cpu(out, otmp);
   
   rho=4.0+m0;
   rho*=-rho; /* this minus sign is taken into account below */
   
-  spinor_field_mul_add_assign_f_flt(out,rho,in);
-  spinor_field_minus_f_flt(out,out);
+  spinor_field_mul_add_assign_f_flt_cpu(out,rho,in);
+  spinor_field_minus_f_flt_cpu(out,out);
 }
 
 
@@ -335,7 +342,7 @@ void Dphi_eopre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
  * Dphi in = (4+m0)^2*in - D_OE D_EO in
  *
  */
-void Dphi_oepre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
+void Dphi_oepre_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
 {
   double rho;
   
@@ -352,19 +359,19 @@ void Dphi_oepre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
   /* alloc memory for temporary spinor field */
   if (init) { init_Dirac(); init=0; }
   
-  Dphi_flt_(etmp, in);
-  Dphi_flt_(out, etmp);
+  Dphi_flt__cpu(etmp, in);
+  Dphi_flt__cpu(out, etmp);
   
   rho=4.0+m0;
   rho*=-rho; /* this minus sign is taken into account below */
   
-  spinor_field_mul_add_assign_f_flt(out,rho,in);
-  spinor_field_minus_f_flt(out,out);
+  spinor_field_mul_add_assign_f_flt_cpu(out,rho,in);
+  spinor_field_minus_f_flt_cpu(out,out);
 }
 
 
 
-void g5Dphi_eopre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
+void g5Dphi_eopre_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
 {
   double rho;
   
@@ -381,37 +388,54 @@ void g5Dphi_eopre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
   /* alloc memory for temporary spinor field */
   if (init) { init_Dirac(); init=0; }
   
-  Dphi_flt_(otmp, in);
-  Dphi_flt_(out, otmp);
+  Dphi_flt__cpu(otmp, in);
+  Dphi_flt__cpu(out, otmp);
   
   rho=4.0+m0;
   rho*=-rho; /* this minus sign is taken into account below */
   
-  spinor_field_mul_add_assign_f_flt(out,rho,in);
-  spinor_field_minus_f_flt(out,out);
-  spinor_field_g5_assign_f_flt(out);
+  spinor_field_mul_add_assign_f_flt_cpu(out,rho,in);
+  spinor_field_minus_f_flt_cpu(out,out);
+  spinor_field_g5_assign_f_flt_cpu(out);
   
 }
 
 /* g5Dphi_eopre ^2 */
-void g5Dphi_eopre_sq_flt(double m0, spinor_field_flt *out, spinor_field_flt *in) {
+void g5Dphi_eopre_sq_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in) {
   /* alloc memory for temporary spinor field */
   if (init) { init_Dirac(); init=0; }
 
-  g5Dphi_eopre_flt(m0, etmp, in);
-  g5Dphi_eopre_flt(m0, out, etmp);
+  g5Dphi_eopre_flt_cpu(m0, etmp, in);
+  g5Dphi_eopre_flt_cpu(m0, out, etmp);
   
 }
 
 /* g5Dhi ^2 */
-void g5Dphi_sq_flt(double m0, spinor_field_flt *out, spinor_field_flt *in) {
+void g5Dphi_sq_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in) {
   /* alloc memory for temporary spinor field */
   if (init) { init_Dirac(); init=0; }
   
-  g5Dphi_flt(m0, gtmp, in);
-  g5Dphi_flt(m0, out, gtmp);
+  g5Dphi_flt_cpu(m0, gtmp, in);
+  g5Dphi_flt_cpu(m0, out, gtmp);
 
 }
+
+#ifndef WITH_GPU
+
+void (*Dphi_flt_) (spinor_field_flt *out, spinor_field_flt *in)=Dphi_flt__cpu;
+void (*Dphi_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in)=Dphi_flt_cpu;
+void (*g5Dphi_flt)(double m0, spinor_field_flt *out, spinor_field_flt *in)=g5Dphi_flt_cpu;
+void (*g5Dphi_sq_flt)(double m0, spinor_field_flt *out, spinor_field_flt *in)=g5Dphi_sq_flt_cpu;
+
+unsigned long int (*getMVM_flt)()=getMVM_flt_cpu;
+
+/* Even/Odd preconditioned matrix */
+void (*Dphi_eopre_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in)=Dphi_eopre_flt_cpu;
+void (*Dphi_oepre_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in)=Dphi_oepre_flt_cpu;
+void (*g5Dphi_eopre_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in)=g5Dphi_eopre_flt_cpu;
+void (*g5Dphi_eopre_sq_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in)=g5Dphi_eopre_sq_flt_cpu;
+
+#endif //WITH_GPU
 
 
 
