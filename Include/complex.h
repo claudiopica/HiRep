@@ -182,6 +182,13 @@ typedef struct
    ((a).re*(b).im-(a).im*(b).re)
 
 /*
+ * c=(a^*b) (a,b,c complex)
+ */
+#define _complex_prod(c,a,b) \
+(c).re=((a).re*(b).re+(a).im*(b).im);\
+(c).im=((a).re*(b).im-(a).im*(b).re)
+
+/*
 * c+=(a^*b) (a,b,c complex)
 */
 #define _complex_prod_assign(c,a,b) \

@@ -490,7 +490,7 @@ void SF_gauge_bcs(suNg_field *gf, int strength)
 
 
 
-
+#if defined(BASIC_SF) || defined(ROTATED_SF)
 double SF_test_gauge_bcs()
 {
   /*calculates average of all plaquettes that should remain fixed for SF*/
@@ -529,4 +529,4 @@ double SF_test_gauge_bcs()
   global_sum(&pa, 1);
   return pa/(double)(GLB_X*GLB_Y*GLB_Z*NG*(6+6+3));
 }
-
+#endif

@@ -24,6 +24,14 @@
 #define _REAL double
 #define _COMPLEX complex
 
+#define _FUNC(a) a##_f_cpu
+#include "TMPL/linear_algebra.c.sdtmpl"
+void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
+	_TWO_SPINORS_MATCHING(s1,s2);
+	memcpy(s1->ptr,s2->ptr,s1->type->gsize*sizeof(suNf_spinor));
+}
+
+#undef _FUNC
 #define _FUNC(a) a##_f
 
 #ifdef WITH_GPU
@@ -32,15 +40,14 @@ void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
 	_TWO_SPINORS_MATCHING(s1,s2);
 	cudaMemcpy(s1->gpu_ptr,s2->gpu_ptr,s1->type->gsize*sizeof(suNf_spinor),cudaMemcpyDeviceToDevice);
 }
-#undef _FUNC
-#define _FUNC(a) a##_f_cpu
-#endif //ifdef WITH_GPU
-
+#else
 #include "TMPL/linear_algebra.c.sdtmpl"
 void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
 	_TWO_SPINORS_MATCHING(s1,s2);
 	memcpy(s1->ptr,s2->ptr,s1->type->gsize*sizeof(suNf_spinor));
 }
+#endif //ifdef WITH_GPU
+
 
 #undef _SPINOR_FIELD_TYPE
 #undef _SPINOR_TYPE
@@ -56,6 +63,14 @@ void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
 #define _REAL float
 #define _COMPLEX complex_flt
 
+#define _FUNC(a) a##_f_flt_cpu
+#include "TMPL/linear_algebra.c.sdtmpl"
+void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
+	_TWO_SPINORS_MATCHING(s1,s2);
+	memcpy(s1->ptr,s2->ptr,s1->type->gsize*sizeof(suNf_spinor_flt));
+}
+
+#undef _FUNC
 #define _FUNC(a) a##_f_flt
 
 #ifdef WITH_GPU
@@ -64,15 +79,14 @@ void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
 	_TWO_SPINORS_MATCHING(s1,s2);
 	cudaMemcpy(s1->gpu_ptr,s2->gpu_ptr,s1->type->gsize*sizeof(suNf_spinor_flt),cudaMemcpyDeviceToDevice);
 }
-#undef _FUNC
-#define _FUNC(a) a##_f_flt_cpu
-#endif //ifdef WITH_GPU
-
+#else //WITH_GPU
 #include "TMPL/linear_algebra.c.sdtmpl"
 void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
 	_TWO_SPINORS_MATCHING(s1,s2);
 	memcpy(s1->ptr,s2->ptr,s1->type->gsize*sizeof(suNf_spinor_flt));
 }
+#endif //ifdef WITH_GPU
+
 
 #undef _SPINOR_FIELD_TYPE
 #undef _SPINOR_TYPE
