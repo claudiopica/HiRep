@@ -111,7 +111,6 @@ int main(int argc,char *argv[])
 	
 // CPU part set to gaussian
   for (i=0;i<sfsize;i++){
-	  
     gaussian_spinor_field(&sf1[i]);
   }
 	
@@ -127,14 +126,29 @@ int main(int argc,char *argv[])
     spinor_field_copy_f_cpu(&sf2[i],&sf1[i]);
   }  
 
+  //Check spinor_field_prod_re
+  res_gpu = spinor_field_prod_re_f(&sf1[0],&sf1[1]);
+  res_cpu = spinor_field_prod_re_f_cpu(&sf1[0],&sf1[1]);
+  lprintf("LA TEST",0,"Check spinor_field_prod_im\n gpu=%1.10g, cpu=%1.10g, \n gpu-cpu= %1.10g\n\n",res_gpu,res_cpu,res_gpu-res_cpu);
+
   //Check spinor_field_prod_im
   res_gpu = spinor_field_prod_im_f(&sf1[0],&sf1[1]);
   res_cpu = spinor_field_prod_im_f_cpu(&sf1[0],&sf1[1]);
   lprintf("LA TEST",0,"Check spinor_field_prod_im\n gpu=%1.10g, cpu=%1.10g, \n gpu-cpu= %1.10g\n\n",res_gpu,res_cpu,res_gpu-res_cpu);
 
+  //Check spinor_field_prod
+  c1 = spinor_field_prod_f(&sf1[0],&sf1[1]);
+  c2 = spinor_field_prod_f_cpu(&sf1[0],&sf1[1]);
+  lprintf("LA TEST",0,"Check spinor_field_prod\n gpu=%1.10g %1.10g, cpu=%1.10g %1.10g, \n gpu-cpu= %1.10g %1.10g\n\n",c1.re,c1.im,c2.re,c2.im,c1.re-c2.re,c1.im-c2.im);
+
   //Check spinor_field_g5_prod_re
   res_gpu = spinor_field_g5_prod_re_f(&sf1[0],&sf1[1]);
   res_cpu = spinor_field_g5_prod_re_f_cpu(&sf1[0],&sf1[1]);
+  lprintf("LA TEST",0,"Check spinor_field_g5_prod_re\n gpu=%1.10g, cpu=%1.10g, \n gpu-cpu= %1.10g\n\n",res_gpu,res_cpu,res_gpu-res_cpu);
+
+  //Check spinor_field_g5_prod_im
+  res_gpu = spinor_field_g5_prod_im_f(&sf1[0],&sf1[1]);
+  res_cpu = spinor_field_g5_prod_im_f_cpu(&sf1[0],&sf1[1]);
   lprintf("LA TEST",0,"Check spinor_field_g5_prod_re\n gpu=%1.10g, cpu=%1.10g, \n gpu-cpu= %1.10g\n\n",res_gpu,res_cpu,res_gpu-res_cpu);
 
   //Check spinor_field_sqnorm
@@ -163,6 +177,15 @@ int main(int argc,char *argv[])
   
   lprintf("LA TEST",0,"Check spinor_field_mulc_add_assign\n sqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g, \n sqnorm(gpu-cpu)= %1.10g\n\n",res_gpu,res_cpu,sfdiff(&sf1[0]));
 
+  //Check spinor_field_mul
+  spinor_field_mul_f(&sf1[0],7.8,&sf1[1]);
+  spinor_field_mul_f_cpu(&sf1[0],7.8,&sf1[1]);
+  
+  res_gpu = spinor_field_sqnorm_f(&sf1[0]);
+  res_cpu = spinor_field_sqnorm_f_cpu(&sf1[0]);
+  
+  lprintf("LA TEST",0,"Check spinor_field_mul\nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g, \nsqnorm(gpu-cpu)= %1.10g\n\n",res_gpu,res_cpu,sfdiff(&sf1[0]));
+
 
   //Check spinor_field_mulc
   c1.re = -2.3334;
@@ -176,6 +199,16 @@ int main(int argc,char *argv[])
   
   lprintf("LA TEST",0,"Check spinor_field_mulc\nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g, \nsqnorm(gpu-cpu)= %1.10g\n\n",res_gpu,res_cpu,sfdiff(&sf1[0]));
 
+  //Check spinor_field_add
+  spinor_field_add_f(&sf1[0],&sf1[1],&sf1[2]);
+  spinor_field_add_f_cpu(&sf1[0],&sf1[1],&sf1[2]);
+  
+  res_gpu = spinor_field_sqnorm_f(&sf1[0]);
+  res_cpu = spinor_field_sqnorm_f_cpu(&sf1[0]);
+  
+  lprintf("LA TEST",0,"Check spinor_field_add\nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g, \nsqnorm(gpu-cpu)= %1.10g\n\n",res_gpu,res_cpu,sfdiff(&sf1[0]));
+
+
   //Check spinor_field_sub
   spinor_field_sub_f(&sf1[0],&sf1[1],&sf1[2]);
   spinor_field_sub_f_cpu(&sf1[0],&sf1[1],&sf1[2]);
@@ -184,6 +217,35 @@ int main(int argc,char *argv[])
   res_cpu = spinor_field_sqnorm_f_cpu(&sf1[0]);
   
   lprintf("LA TEST",0,"Check spinor_field_sub\nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g, \nsqnorm(gpu-cpu)= %1.10g\n\n",res_gpu,res_cpu,sfdiff(&sf1[0]));
+
+
+  //Check spinor_field_add_assign
+  spinor_field_add_assign_f(&sf1[0],&sf1[1]);
+  spinor_field_add_assign_f_cpu(&sf1[0],&sf1[1]);
+  
+  res_gpu = spinor_field_sqnorm_f(&sf1[0]);
+  res_cpu = spinor_field_sqnorm_f_cpu(&sf1[0]);
+  
+  lprintf("LA TEST",0,"Check spinor_field_add_assign\nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g, \nsqnorm(gpu-cpu)= %1.10g\n\n",res_gpu,res_cpu,sfdiff(&sf1[0]));
+
+  //Check spinor_field_sub_assign
+  spinor_field_sub_assign_f(&sf1[0],&sf1[1]);
+  spinor_field_sub_assign_f_cpu(&sf1[0],&sf1[1]);
+  
+  res_gpu = spinor_field_sqnorm_f(&sf1[0]);
+  res_cpu = spinor_field_sqnorm_f_cpu(&sf1[0]);
+  
+  lprintf("LA TEST",0,"Check spinor_field_sub_assign\nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g, \nsqnorm(gpu-cpu)= %1.10g\n\n",res_gpu,res_cpu,sfdiff(&sf1[0]));
+
+  
+  //Check spinor_field_zero
+  spinor_field_zero_f(&sf1[2]);
+  spinor_field_zero_f_cpu(&sf1[2]);
+  
+  res_gpu = spinor_field_sqnorm_f(&sf1[2]);
+  res_cpu = spinor_field_sqnorm_f_cpu(&sf1[2]);
+  
+  lprintf("LA TEST",0,"Check spinor_field_zero\nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g, \nsqnorm(gpu-cpu)= %1.10g\n\n",res_gpu,res_cpu,sfdiff(&sf1[2]));
 
   //Check spinor_field_minus
   spinor_field_minus_f(&sf1[0],&sf1[1]);
@@ -194,6 +256,16 @@ int main(int argc,char *argv[])
   
   lprintf("LA TEST",0,"Check spinor_field_minus\nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g, \nsqnorm(gpu-cpu)= %1.10g\n\n",res_gpu,res_cpu,sfdiff(&sf1[0]));
 
+  //Check spinor_field_lc
+  spinor_field_lc_f(&sf1[0],1.1,&sf1[1],-1.5,&sf2[2]);
+  spinor_field_lc_f_cpu(&sf1[0],1.1,&sf1[1],-1.5,&sf2[2]);
+  
+  res_gpu = spinor_field_sqnorm_f(&sf1[0]);
+  res_cpu = spinor_field_sqnorm_f_cpu(&sf1[0]);
+  
+  lprintf("LA TEST",0,"Check spinor_field_lc_f\nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g, \nsqnorm(gpu-cpu)= %1.10g\n\n",res_gpu,res_cpu,sfdiff(&sf1[0]));
+
+
   //Check spinor_field_lc_add_assing_f
   spinor_field_lc_add_assign_f(&sf1[0],1.1,&sf1[1],-1.5,&sf2[2]);
   spinor_field_lc_add_assign_f_cpu(&sf1[0],1.1,&sf1[1],-1.5,&sf2[2]);
@@ -202,6 +274,18 @@ int main(int argc,char *argv[])
   res_cpu = spinor_field_sqnorm_f_cpu(&sf1[0]);
   
   lprintf("LA TEST",0,"Check spinor_field_lc_add_assing_f\nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g, \nsqnorm(gpu-cpu)= %1.10g\n\n",res_gpu,res_cpu,sfdiff(&sf1[0]));
+
+ //Check spinor_field_clc_f
+  c1.re = 5.34;c1.im = -1.11;
+  c2.re = 0.34;c1.im = -0.11;
+  
+  spinor_field_clc_f(&sf1[0],c1,&sf1[1],c2,&sf2[2]);
+  spinor_field_clc_f_cpu(&sf1[0],c1,&sf1[1],c2,&sf2[2]);
+  
+  res_gpu = spinor_field_sqnorm_f(&sf1[0]);
+  res_cpu = spinor_field_sqnorm_f_cpu(&sf1[0]);
+  
+  lprintf("LA TEST",0,"Check spinor_field_clc_f\nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g, \nsqnorm(gpu-cpu)= %1.10g\n\n",res_gpu,res_cpu,sfdiff(&sf1[0]));
 
 
   //Check spinor_field_clc_add_assing_f
@@ -216,6 +300,15 @@ int main(int argc,char *argv[])
   
   lprintf("LA TEST",0,"Check spinor_field_clc_add_assing_f\nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g, \nsqnorm(gpu-cpu)= %1.10g\n\n",res_gpu,res_cpu,sfdiff(&sf1[0]));
 
+  //Check spinor_field_g5
+  spinor_field_g5_assign_f(&sf1[0]);
+  spinor_field_g5_assign_f_cpu(&sf1[0]);
+  
+  res_gpu = spinor_field_sqnorm_f(&sf1[0]);
+  res_cpu = spinor_field_sqnorm_f_cpu(&sf1[0]);
+  
+  lprintf("LA TEST",0,"Check spinor_field_g5_assign\nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g, \nsqnorm(gpu-cpu)= %1.10g\n\n",res_gpu,res_cpu,sfdiff(&sf1[0]));
+
 
   //Check spinor_field_g5_assign
   spinor_field_g5_assign_f(&sf1[0]);
@@ -226,16 +319,36 @@ int main(int argc,char *argv[])
   
   lprintf("LA TEST",0,"Check spinor_field_g5_assign\nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g, \nsqnorm(gpu-cpu)= %1.10g\n\n",res_gpu,res_cpu,sfdiff(&sf1[0]));
 
+//Check spinor_field_lc1
+
+  spinor_field_lc1_f(1.9,&sf1[0],&sf1[1]);
+  spinor_field_lc1_f_cpu(1.9,&sf1[0],&sf1[1]);
+
+  res_gpu = spinor_field_sqnorm_f(&sf1[0]);
+  res_cpu = spinor_field_sqnorm_f_cpu(&sf1[0]);
+  
+  lprintf("LA TEST",0,"Check spinor_field_lc_f\nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g, \nsqnorm(gpu-cpu)= %1.10g\n\n",res_gpu,res_cpu,sfdiff(&sf1[0]));
+
+
   //Check spinor_field_lc2
 
-  
-  spinor_field_lc2_f(1.1,-5.5,&sf1[0],&sf1[1]);
+    spinor_field_lc2_f(1.1,-5.5,&sf1[0],&sf1[1]);
   spinor_field_lc2_f_cpu(1.1,-5.5, &sf1[0],&sf1[1]);
 
   res_gpu = spinor_field_sqnorm_f(&sf1[0]);
   res_cpu = spinor_field_sqnorm_f_cpu(&sf1[0]);
   
-  lprintf("LA TEST",0,"Check spinor_field_clc_add_assing_f\nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g, \nsqnorm(gpu-cpu)= %1.10g\n\n",res_gpu,res_cpu,sfdiff(&sf1[0]));
+  lprintf("LA TEST",0,"Check spinor_field_lc2_f\nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g, \nsqnorm(gpu-cpu)= %1.10g\n\n",res_gpu,res_cpu,sfdiff(&sf1[0]));
+
+//Check spinor_field_lc2
+
+  spinor_field_lc3_f(-2.2,-9.9,&sf1[0],&sf1[1],&sf1[2]);
+  spinor_field_lc3_f_cpu(-2.2,-9.9, &sf1[0],&sf1[1],&sf1[2]);
+
+  res_gpu = spinor_field_sqnorm_f(&sf1[0]);
+  res_cpu = spinor_field_sqnorm_f_cpu(&sf1[0]);
+  
+  lprintf("LA TEST",0,"Check spinor_field_lc3_f\nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g, \nsqnorm(gpu-cpu)= %1.10g\n\n",res_gpu,res_cpu,sfdiff(&sf1[0]));
   
   
   lprintf("LA TEST",0,"DONE!\n");

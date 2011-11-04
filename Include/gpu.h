@@ -7,6 +7,9 @@
 #define GPU_H
 #include <stdio.h>
 
+
+#define START_SP_ADDRESS_GPU(sf) (sf->gpu_ptr + sf->type->master_start[0])
+
 // Enable this for error checking
 #define CUDA_CHECK_ERROR
 
