@@ -160,9 +160,14 @@ write_suN_vector();
 
 if ($su2quat==0) {
 write_suN();
-if ($complex eq "R") {
+print "typedef $dataname ${dataname}_FMAT;\n\n";
+print "typedef ${dataname}_flt ${dataname}_FMAT_flt;\n\n";
+
+    if ($complex eq "R") {
     write_suNr();
-} else {
+    print "typedef $rdataname ${rdataname}_FMAT;\n\n";
+    print "typedef ${rdataname}_flt ${rdataname}_FMAT_flt;\n\n";
+    } else {
     print "typedef $dataname ${dataname}c;\n\n";
     print "typedef ${dataname}_flt ${dataname}c_flt;\n\n";
 }
@@ -170,6 +175,19 @@ if ($complex eq "R") {
     write_su2($su2quat);
     print "typedef $dataname ${dataname}c;\n\n";
     print "typedef ${dataname}_flt ${dataname}c_flt;\n\n";
+    my ($ldn,$lrdn)=($dataname,$rdataname);
+    $dataname="${dataname}_FMAT";
+    $rdataname="${rdataname}_FMAT";
+    write_suN();
+    if ($complex eq "R") {
+        write_suNr();
+    } else {
+        print "typedef $dataname ${dataname}c;\n\n";
+        print "typedef ${dataname}_flt ${dataname}c_flt;\n\n";
+    }    
+    $dataname=$ldn;
+    $rdataname=$lrdn;
+    
 }
 
 write_spinor();
@@ -298,9 +316,22 @@ if ($su2quat==0) {
     write_su2_trace_im();
     #write_su2_2TA();
     #write_su2_TA();
-   
+    write_suN_FMAT(); #this is the same as before
+    if ($complex eq "R") {
+        write_suNr_FMAT(); #this is the same as before
+    }   
 }
 
+    my ($ldn,$lrdn)=($dataname,$rdataname);
+    $dataname="${dataname}_FMAT";
+    $rdataname="${rdataname}_FMAT";
+    write_suN_zero();
+    if ($complex eq "R") { # we only need these functions at the moment...
+        write_suNr_zero();
+    }
+    $dataname=$ldn;
+    $rdataname=$lrdn;
+    
 print <<END
 /*******************************************************************************
 *
@@ -1141,21 +1172,21 @@ if ($N==2) {
   print "#define _${rdataname}_adj_decode(_tmp,u) \\\n";
   print "      _REAL _tmp[10];  \\\n";
   print "      _tmp[4]=-2.*(u).$cname\[3\]*(u).$cname\[3\];  \\\n";
-  print "      _tmp[8]=-2.*(u).$cname\[2\]*(u).$cname\[2\];  \\\n";
+  print "      _tmp[8]=-2.*(u).$cname\[1\]*(u).$cname\[1\];  \\\n";
   print "      _tmp[0]=1.+_tmp[8]+_tmp[4];  \\\n";
-  print "      _tmp[1]=2.*(u).$cname\[1\]*(u).$cname\[1\];  \\\n";
+  print "      _tmp[1]=2.*(u).$cname\[2\]*(u).$cname\[2\];  \\\n";
   print "      _tmp[4]+=1.-_tmp[1];  \\\n";
   print "      _tmp[8]+=1.-_tmp[1];  \\\n";
   print "      _tmp[3]=-2.*(u).$cname\[0\]*(u).$cname\[3\];  \\\n";
-  print "      _tmp[7]=-2.*(u).$cname\[1\]*(u).$cname\[2\];  \\\n";
+  print "      _tmp[7]=2.*(u).$cname\[1\]*(u).$cname\[2\];  \\\n";
   print "      _tmp[1]=_tmp[7]-_tmp[3];  \\\n";
   print "      _tmp[3]+=_tmp[7];  \\\n";
-  print "      _tmp[6]=-2.*(u).$cname\[0\]*(u).$cname\[2\];  \\\n";
-  print "      _tmp[7]=2.*(u).$cname\[1\]*(u).$cname\[3\];  \\\n";
+  print "      _tmp[6]=2.*(u).$cname\[0\]*(u).$cname\[1\];  \\\n";
+  print "      _tmp[7]=2.*(u).$cname\[2\]*(u).$cname\[3\];  \\\n";
   print "      _tmp[2]=_tmp[7]-_tmp[6];  \\\n";
   print "      _tmp[6]+=_tmp[7];  \\\n";
-  print "      _tmp[9]=-2.*(u).$cname\[0\]*(u).$cname\[1\];  \\\n";
-  print "      _tmp[7]=-2.*(u).$cname\[2\]*(u).$cname\[3\];  \\\n";
+  print "      _tmp[9]=-2.*(u).$cname\[0\]*(u).$cname\[2\];  \\\n";
+  print "      _tmp[7]=2.*(u).$cname\[1\]*(u).$cname\[3\];  \\\n";
   print "      _tmp[5]=_tmp[7]-_tmp[9];  \\\n";
   print "      _tmp[7]+=_tmp[9]";
   print "\n\n";
