@@ -97,11 +97,11 @@ template<typename SPINOR_TYPE, typename REAL>
 }
 
 /* <s1,s2> */
-template<typename SPINOR_TYPE, typename COMPLEX>
+template< typename SPINOR_TYPE, typename COMPLEX >
   __global__ void spinor_field_prod_gpu(SPINOR_TYPE* s1, SPINOR_TYPE* s2, COMPLEX* resField,int N){
   int i = blockIdx.x*BLOCK_SIZE + threadIdx.x;
   if (i<N){
-    _spinor_prod_assign_f(resField[i],s1[i],s2[i]);
+    _spinor_prod_f(resField[i],s1[i],s2[i]);
   }
 }
 
@@ -306,6 +306,7 @@ __global__ void spinor_field_lc3_gpu(REAL r1,REAL r2, SPINOR_TYPE *s1, SPINOR_TY
 }
 
 /* c1=0 */
+/*
 template< typename COMPLEX>
 __global__ void complex_field_zero_gpu(COMPLEX *c1,int N){
   int i = blockIdx.x*BLOCK_SIZE + threadIdx.x;
@@ -314,7 +315,7 @@ __global__ void complex_field_zero_gpu(COMPLEX *c1,int N){
     c1[i].im=0;
   }
 }
-
+*/
 
 
 #endif
