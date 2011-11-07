@@ -363,6 +363,7 @@ write_spinor_i_add_assign();
 write_spinor_i_sub_assign();
 write_spinor_prod_re();
 write_spinor_prod_im();
+write_spinor_prod();
 write_spinor_prod_assign();
 write_spinor_g5_prod_re();
 write_spinor_g5_prod_im();
@@ -2558,6 +2559,17 @@ sub write_spinor_prod_im {
     print "      _vector_prod_im_${suff}(_tmp,(r).$cname\[$k\],(s).$cname\[$k\]); (k)+=_tmp;\\\n";
   }
 	print "   }((void)0) \n\n";
+}
+
+sub write_spinor_prod {
+  print "/* z=r*s (r,s spinors, z complex) */\n";
+  print "#define _spinor_prod_${suff}(z,r,s) \\\n";	
+  	print "   { \\\n";
+	print "      (z).re=0.;(z).im=0.; \\\n";
+  for (my $k=0; $k<4; $k++){
+    print "  _vector_prod_assign_${suff}((z),(r).$cname\[$k\],(s).$cname\[$k\])";
+    if($k==3) {print"; \\\n}((void)0) \n\n";} else {print "; \\\n"}
+  }
 }
 
 sub write_spinor_prod_assign {
