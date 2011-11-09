@@ -44,6 +44,7 @@ unsigned long int getMVM_cpu() {
 	return res;
 }
 
+
 /*
  * This function defines the massless Dirac operator
  * It can act on spinors defined on the whole lattice 
@@ -587,4 +588,5 @@ void (*g5Dphi_eopre) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_eop
 void (*g5Dphi_eopre_sq) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_eopre_sq_cpu;
 
 #endif //WITH_GPU
+
 

@@ -18,9 +18,9 @@
 
 #define NVEC (32)
 #define NRAN (2*NVEC)
-#define PI_HALF 1.5707964f
-#define PI 3.1415927f
-#define TWO_PI 6.2831854f
+#define PI_HALF 1.570796326794897f
+#define PI 3.141592653589793f
+#define TWO_PI 6.283185307179586f
 
 static int i_vec=NVEC,i_y=NRAN,i_v=NRAN;
 static double vec1[NVEC],vec2[NVEC],vec3[NVEC];

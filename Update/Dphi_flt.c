@@ -39,6 +39,7 @@ unsigned long int getMVM_flt_cpu() {
 	return res;
 }
 
+
 /*
  * NOTE :
  * here we are making the assumption that the geometry is such that
@@ -436,13 +437,6 @@ void (*g5Dphi_eopre_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in
 void (*g5Dphi_eopre_sq_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in)=g5Dphi_eopre_sq_flt_cpu;
 
 #endif //WITH_GPU
-
-
-
-
-
-
-
 
 
 

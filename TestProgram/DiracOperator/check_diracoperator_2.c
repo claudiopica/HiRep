@@ -149,7 +149,7 @@ int main(int argc,char *argv[])
    
    
    u_gauge=alloc_gfield(&glattice);
-#ifndef REPR_FUNDAMENTAL
+#if (!defined(REPR_FUNDAMENTAL) && !defined(WITH_QUATERNIONS)) || defined(ROTATED_SF) 
    u_gauge_f=alloc_gfield_f(&glattice);
 #endif
    start_gf_sendrecv(u_gauge);

@@ -201,7 +201,7 @@ int init_mc(rhmc_flow *rf, char *ifile) {
 
   /* alloc global gauge fields */
   u_gauge=alloc_gfield(&glattice);
-#if !defined(REPR_FUNDAMENTAL) || defined(ROTATED_SF)
+#if (!defined(REPR_FUNDAMENTAL) && !defined(WITH_QUATERNIONS)) || defined(ROTATED_SF) 
   u_gauge_f=alloc_gfield_f(&glattice);
 #endif
 
@@ -241,6 +241,7 @@ int init_mc(rhmc_flow *rf, char *ifile) {
     case 2:
       random_u(u_gauge);
       break;
+#if defined(BASIC_SF) || defined(ROTATED_SF)
     case 3:
       unit_u(u_gauge);
       SF_gauge_bcs(u_gauge,0);
@@ -257,9 +258,11 @@ int init_mc(rhmc_flow *rf, char *ifile) {
       random_u(u_gauge);
       SF_gauge_bcs(u_gauge,1);
       break;
+#endif
+    default:
+      error(1,1,"init_mc " __FILE__,"invalid choice of initial configuration");
   }
-  represent_gauge_field();
-  
+  represent_gauge_field();  
 
   /* init RHMC */  
   rhmc_var.rhmc_p.integrator=&O2MN_multistep;

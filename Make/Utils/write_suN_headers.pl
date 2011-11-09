@@ -173,8 +173,8 @@ print "typedef ${dataname}_flt ${dataname}_FMAT_flt;\n\n";
 }
 } else {
     write_su2($su2quat);
-    print "typedef $dataname ${dataname}c;\n\n";
-    print "typedef ${dataname}_flt ${dataname}c_flt;\n\n";
+    #print "typedef $dataname ${dataname}c;\n\n";
+    #print "typedef ${dataname}_flt ${dataname}c_flt;\n\n";
     my ($ldn,$lrdn)=($dataname,$rdataname);
     $dataname="${dataname}_FMAT";
     $rdataname="${rdataname}_FMAT";
@@ -319,7 +319,9 @@ if ($su2quat==0) {
     write_suN_FMAT(); #this is the same as before
     if ($complex eq "R") {
         write_suNr_FMAT(); #this is the same as before
-    }   
+    }
+    
+    write_su2_exp();
 }
 
     my ($ldn,$lrdn)=($dataname,$rdataname);
@@ -1158,6 +1160,7 @@ sub write_su2_decode {
   print "/* this declares and uses the temporary array _tmp  */\n";
 
 if ($N==2) {
+  print "/* _tmp is a complex 2x2 matrix  */\n";
   print "#define _${dataname}_fun_decode(_tmp,u) \\\n";
   print "      _COMPLEX _tmp[4]; \\\n";
   print "      _tmp[0].re = (u).$cname\[0\]; \\\n";
@@ -1170,6 +1173,7 @@ if ($N==2) {
   print "      _tmp[3].im = -(u).$cname\[3\]";
   print "\n\n";
 } elsif ($N==3) {
+  print "/* _tmp is a real 3x3 matrix  */\n";
   print "#define _${rdataname}_adj_decode(_tmp,u) \\\n";
   print "      _REAL _tmp[10];  \\\n";
   print "      _tmp[4]=-2.*(u).$cname\[3\]*(u).$cname\[3\];  \\\n";
@@ -1195,7 +1199,7 @@ if ($N==2) {
 
 }
 
-sub write_su2_multiply {
+sub old_write_su2_multiply {
   print "/* SU(2) matrix u times SU(2) vector s */\n";
   print "/* r=u*s */\n";
   print "/* using quaternionic representations for SU(2) matrices */\n";
@@ -1212,7 +1216,6 @@ if ($N==2) { #fundamental representation
   $localrn="adj";
   $localdn=$rdataname;
   $real="r";
-  print "   }((void)0) \n\n";
 } else {
   die("Undefined fermion representation in quaternionic code. Exiting...\n");
 }
@@ -1232,9 +1235,9 @@ if ($N==2) { #fundamental representation
   print "   }((void)0) \n\n";
 }
 
-sub write_su2_inverse_multiply {
+sub old_write_su2_inverse_multiply {
   print "/* SU(2) matrix u^dagger times SU(2) vector s */\n";
-  print "/* r=u*s */\n";
+  print "/* r=u^(dagger)*s */\n";
   print "/* using quaternionic representations for SU(2) matrices */\n";
 
   my $localdn;
@@ -1246,20 +1249,10 @@ if ($N==2) { #fundamental representation
   $localrn="fun";
   $localdn=$dataname;
   $real="_star";
-} elsif ($N==3) { #adjoint representation
-  $localrn="adj";
-  $localdn=$rdataname;
-  $real="r";
-  print "   }((void)0) \n\n";
-} else {
-  die("Undefined fermion representation in quaternionic code. Exiting...\n");
-}
 
   print "#define _${localdn}_inverse_multiply(r,u,s) \\\n";
   print "   {\\\n";
   print "      _${localdn}_${localrn}_decode(_tmp,(u));  \\\n";
-
-
   my ($k)=(0);
   for(my $i=0;$i<$N;$i++){
     print "      _complex_mul${real}((r).$cname\[$i\],(s).$cname\[0\],_tmp\[$k\]);\\\n";
@@ -1269,7 +1262,31 @@ if ($N==2) { #fundamental representation
     }
     $k-=$shift;
   }
+
+} elsif ($N==3) { #adjoint representation
+  $localrn="adj";
+  $localdn=$rdataname;
+  $real="r";
+
+  print "#define _${localdn}_inverse_multiply(r,u,s) \\\n";
+  print "   {\\\n";
+  print "      _${localdn}_${localrn}_decode(_tmp,(u));  \\\n";
+  my ($k)=(0);
+  for(my $i=0;$i<$N;$i++){
+    print "      _complex_mul${real}((r).$cname\[$i\],_tmp\[$k\],(s).$cname\[0\]);\\\n";
+    for(my $j=1;$j<$N;$j++){
+      $k+=$N;
+      print "      _complex_mul${real}_assign((r).$cname\[$i\],_tmp\[$k\],(s).$cname\[$j\]);\\\n";
+    }
+    $k-=$shift;
+  }
+
+} else {
+  die("Undefined fermion representation in quaternionic code. Exiting...\n");
+}
+
   print "   }((void)0) \n\n";
+
 }
 
 
@@ -2679,6 +2696,85 @@ sub write_su3_myrandom {
 # SU2  OPERATIONS
 #
 
+
+sub write_su2_multiply {
+    print "/* SU(2) matrix u times SU(2) vector s */\n";
+    print "/* r=u*s */\n";
+    print "/* using quaternionic representations for SU(2) matrices */\n";
+        
+    if ($N==2) { #fundamental representation
+        print "#define _${dataname}_multiply(r,u,s) \\\n";
+        print "   (r).$cname\[0\].re=(u).$cname\[0\]*(s).$cname\[0\].re-(u).$cname\[1\]*(s).$cname\[1\].im-(u).$cname\[2\]*(s).$cname\[1\].re-(u).$cname\[3\]*(s).$cname\[0\].im; \\\n";
+        print "   (r).$cname\[0\].im=(u).$cname\[0\]*(s).$cname\[0\].im+(u).$cname\[1\]*(s).$cname\[1\].re-(u).$cname\[2\]*(s).$cname\[1\].im+(u).$cname\[3\]*(s).$cname\[0\].re; \\\n";
+        print "   (r).$cname\[1\].re=(u).$cname\[0\]*(s).$cname\[1\].re-(u).$cname\[1\]*(s).$cname\[0\].im+(u).$cname\[2\]*(s).$cname\[0\].re+(u).$cname\[3\]*(s).$cname\[1\].im; \\\n";
+        print "   (r).$cname\[1\].im=(u).$cname\[0\]*(s).$cname\[1\].im+(u).$cname\[1\]*(s).$cname\[0\].re+(u).$cname\[2\]*(s).$cname\[0\].im-(u).$cname\[3\]*(s).$cname\[1\].re \n\n";
+        
+    } elsif ($N==3) { #adjoint representation
+        print "#define _${rdataname}_multiply(r,u,s) \\\n";
+        print "   (r).$cname\[0\].re=((u).$cname\[0\]*(u).$cname\[0\]-(u).$cname\[1\]*(u).$cname\[1\]+(u).$cname\[2\]*(u).$cname\[2\]-(u).$cname\[3\]*(u).$cname\[3\])*(s).$cname\[0\].re; \\\n";
+        print "   (r).$cname\[0\].re+=2.*((u).$cname\[0\]*(u).$cname\[3\]+(u).$cname\[1\]*(u).$cname\[2\])*(s).$cname\[1\].re; \\\n";
+        print "   (r).$cname\[0\].re+=2.*((u).$cname\[2\]*(u).$cname\[3\]-(u).$cname\[0\]*(u).$cname\[1\])*(s).$cname\[2\].re; \\\n";
+        print "   (r).$cname\[0\].im=((u).$cname\[0\]*(u).$cname\[0\]-(u).$cname\[1\]*(u).$cname\[1\]+(u).$cname\[2\]*(u).$cname\[2\]-(u).$cname\[3\]*(u).$cname\[3\])*(s).$cname\[0\].im; \\\n";
+        print "   (r).$cname\[0\].im+=2.*((u).$cname\[0\]*(u).$cname\[3\]+(u).$cname\[1\]*(u).$cname\[2\])*(s).$cname\[1\].im; \\\n";
+        print "   (r).$cname\[0\].im+=2.*((u).$cname\[2\]*(u).$cname\[3\]-(u).$cname\[0\]*(u).$cname\[1\])*(s).$cname\[2\].im; \\\n";
+        print "   (r).$cname\[1\].re=2.*((u).$cname\[1\]*(u).$cname\[2\]-(u).$cname\[0\]*(u).$cname\[3\])*(s).$cname\[0\].re; \\\n";
+        print "   (r).$cname\[1\].re+=((u).$cname\[0\]*(u).$cname\[0\]+(u).$cname\[1\]*(u).$cname\[1\]-(u).$cname\[2\]*(u).$cname\[2\]-(u).$cname\[3\]*(u).$cname\[3\])*(s).$cname\[1\].re; \\\n";
+        print "   (r).$cname\[1\].re+=2.*((u).$cname\[0\]*(u).$cname\[2\]+(u).$cname\[1\]*(u).$cname\[3\])*(s).$cname\[2\].re; \\\n";
+        print "   (r).$cname\[1\].im=2.*((u).$cname\[1\]*(u).$cname\[2\]-(u).$cname\[0\]*(u).$cname\[3\])*(s).$cname\[0\].im; \\\n";
+        print "   (r).$cname\[1\].im+=((u).$cname\[0\]*(u).$cname\[0\]+(u).$cname\[1\]*(u).$cname\[1\]-(u).$cname\[2\]*(u).$cname\[2\]-(u).$cname\[3\]*(u).$cname\[3\])*(s).$cname\[1\].im; \\\n";
+        print "   (r).$cname\[1\].im+=2.*((u).$cname\[0\]*(u).$cname\[2\]+(u).$cname\[1\]*(u).$cname\[3\])*(s).$cname\[2\].im; \\\n";
+        print "   (r).$cname\[2\].re=2.*((u).$cname\[0\]*(u).$cname\[1\]+(u).$cname\[2\]*(u).$cname\[3\])*(s).$cname\[0\].re; \\\n";
+        print "   (r).$cname\[2\].re+=2.*((u).$cname\[1\]*(u).$cname\[3\]-(u).$cname\[0\]*(u).$cname\[2\])*(s).$cname\[1\].re; \\\n";
+        print "   (r).$cname\[2\].re+=((u).$cname\[0\]*(u).$cname\[0\]-(u).$cname\[1\]*(u).$cname\[1\]-(u).$cname\[2\]*(u).$cname\[2\]+(u).$cname\[3\]*(u).$cname\[3\])*(s).$cname\[2\].re; \\\n";
+        print "   (r).$cname\[2\].im=2.*((u).$cname\[0\]*(u).$cname\[1\]+(u).$cname\[2\]*(u).$cname\[3\])*(s).$cname\[0\].im; \\\n";
+        print "   (r).$cname\[2\].im+=2.*((u).$cname\[1\]*(u).$cname\[3\]-(u).$cname\[0\]*(u).$cname\[2\])*(s).$cname\[1\].im; \\\n";
+        print "   (r).$cname\[2\].im+=((u).$cname\[0\]*(u).$cname\[0\]-(u).$cname\[1\]*(u).$cname\[1\]-(u).$cname\[2\]*(u).$cname\[2\]+(u).$cname\[3\]*(u).$cname\[3\])*(s).$cname\[2\].im \n\n";
+    } else {
+        die("Undefined fermion representation in quaternionic code. Exiting...\n");
+    }
+    
+}
+
+sub write_su2_inverse_multiply {
+    print "/* SU(2) matrix u^dagger times SU(2) vector s */\n";
+    print "/* r=u^(dagger)*s */\n";
+    print "/* using quaternionic representations for SU(2) matrices */\n";
+    
+    if ($N==2) { #fundamental representation
+        print "#define _${dataname}_inverse_multiply(r,u,s) \\\n";
+        print "   (r).$cname\[0\].re=(u).$cname\[0\]*(s).$cname\[0\].re+(u).$cname\[1\]*(s).$cname\[1\].im+(u).$cname\[2\]*(s).$cname\[1\].re+(u).$cname\[3\]*(s).$cname\[0\].im; \\\n";
+        print "   (r).$cname\[0\].im=(u).$cname\[0\]*(s).$cname\[0\].im-(u).$cname\[1\]*(s).$cname\[1\].re+(u).$cname\[2\]*(s).$cname\[1\].im-(u).$cname\[3\]*(s).$cname\[0\].re; \\\n";
+        print "   (r).$cname\[1\].re=(u).$cname\[0\]*(s).$cname\[1\].re+(u).$cname\[1\]*(s).$cname\[0\].im-(u).$cname\[2\]*(s).$cname\[0\].re-(u).$cname\[3\]*(s).$cname\[1\].im; \\\n";
+        print "   (r).$cname\[1\].im=(u).$cname\[0\]*(s).$cname\[1\].im-(u).$cname\[1\]*(s).$cname\[0\].re-(u).$cname\[2\]*(s).$cname\[0\].im+(u).$cname\[3\]*(s).$cname\[1\].re \n\n";
+        
+    } elsif ($N==3) { #adjoint representation
+        print "#define _${rdataname}_inverse_multiply(r,u,s) \\\n";
+        print "   (r).$cname\[0\].re=((u).$cname\[0\]*(u).$cname\[0\]-(u).$cname\[1\]*(u).$cname\[1\]+(u).$cname\[2\]*(u).$cname\[2\]-(u).$cname\[3\]*(u).$cname\[3\])*(s).$cname\[0\].re; \\\n";
+        print "   (r).$cname\[0\].re+=2.*((u).$cname\[1\]*(u).$cname\[2\]-(u).$cname\[0\]*(u).$cname\[3\])*(s).$cname\[1\].re; \\\n";
+        print "   (r).$cname\[0\].re+=2.*((u).$cname\[0\]*(u).$cname\[1\]+(u).$cname\[2\]*(u).$cname\[3\])*(s).$cname\[2\].re; \\\n";
+        print "   (r).$cname\[0\].im=((u).$cname\[0\]*(u).$cname\[0\]-(u).$cname\[1\]*(u).$cname\[1\]+(u).$cname\[2\]*(u).$cname\[2\]-(u).$cname\[3\]*(u).$cname\[3\])*(s).$cname\[0\].im; \\\n";
+        print "   (r).$cname\[0\].im+=2.*((u).$cname\[1\]*(u).$cname\[2\]-(u).$cname\[0\]*(u).$cname\[3\])*(s).$cname\[1\].im; \\\n";
+        print "   (r).$cname\[0\].im+=2.*((u).$cname\[0\]*(u).$cname\[1\]+(u).$cname\[2\]*(u).$cname\[3\])*(s).$cname\[2\].im; \\\n";
+        print "   (r).$cname\[1\].re=2.*((u).$cname\[0\]*(u).$cname\[3\]+(u).$cname\[1\]*(u).$cname\[2\])*(s).$cname\[0\].re; \\\n";
+        print "   (r).$cname\[1\].re+=((u).$cname\[0\]*(u).$cname\[0\]+(u).$cname\[1\]*(u).$cname\[1\]-(u).$cname\[2\]*(u).$cname\[2\]-(u).$cname\[3\]*(u).$cname\[3\])*(s).$cname\[1\].re; \\\n";
+        print "   (r).$cname\[1\].re+=2.*((u).$cname\[1\]*(u).$cname\[3\]-(u).$cname\[0\]*(u).$cname\[2\])*(s).$cname\[2\].re; \\\n";
+        print "   (r).$cname\[1\].im=2.*((u).$cname\[0\]*(u).$cname\[3\]+(u).$cname\[1\]*(u).$cname\[2\])*(s).$cname\[0\].im; \\\n";
+        print "   (r).$cname\[1\].im+=((u).$cname\[0\]*(u).$cname\[0\]+(u).$cname\[1\]*(u).$cname\[1\]-(u).$cname\[2\]*(u).$cname\[2\]-(u).$cname\[3\]*(u).$cname\[3\])*(s).$cname\[1\].im; \\\n";
+        print "   (r).$cname\[1\].im+=2.*((u).$cname\[1\]*(u).$cname\[3\]-(u).$cname\[0\]*(u).$cname\[2\])*(s).$cname\[2\].im; \\\n";
+        print "   (r).$cname\[2\].re=2.*((u).$cname\[2\]*(u).$cname\[3\]-(u).$cname\[0\]*(u).$cname\[1\])*(s).$cname\[0\].re; \\\n";
+        print "   (r).$cname\[2\].re+=2.*((u).$cname\[0\]*(u).$cname\[2\]+(u).$cname\[1\]*(u).$cname\[3\])*(s).$cname\[1\].re; \\\n";
+        print "   (r).$cname\[2\].re+=((u).$cname\[0\]*(u).$cname\[0\]-(u).$cname\[1\]*(u).$cname\[1\]-(u).$cname\[2\]*(u).$cname\[2\]+(u).$cname\[3\]*(u).$cname\[3\])*(s).$cname\[2\].re; \\\n";
+        print "   (r).$cname\[2\].im=2.*((u).$cname\[2\]*(u).$cname\[3\]-(u).$cname\[0\]*(u).$cname\[1\])*(s).$cname\[0\].im; \\\n";
+        print "   (r).$cname\[2\].im+=2.*((u).$cname\[0\]*(u).$cname\[2\]+(u).$cname\[1\]*(u).$cname\[3\])*(s).$cname\[1\].im; \\\n";
+        print "   (r).$cname\[2\].im+=((u).$cname\[0\]*(u).$cname\[0\]-(u).$cname\[1\]*(u).$cname\[1\]-(u).$cname\[2\]*(u).$cname\[2\]+(u).$cname\[3\]*(u).$cname\[3\])*(s).$cname\[2\].im \n\n";
+    } else {
+        die("Undefined fermion representation in quaternionic code. Exiting...\n");
+    }
+    
+}
+
+
+
 sub write_su2_dagger {
     print "/* u=v^dagger */\n";
     if ($N==2) {
@@ -2864,6 +2960,23 @@ sub write_su2_sqnorm_m1 {
     }    
 }
 
+sub write_su2_exp{
+    print "/* u=Exp(dt*iT[n]h[n]) */\n";
+    print "/* dt real; T[n] are the generators; h[n] is an algebra vector */\n";
+    print "/* tmp is a temporary real */\n";
+    if ($N==2) {
+        print "#define _${dataname}_exp(dt,h,u) \\\n";
+        print "   _algebra_vector_sqnorm_g((u).$cname\[0\],(h)); \\\n";
+        print "   (u).$cname\[0\]=sqrt((u).$cname\[0\]); \\\n";
+        print "   (u).$cname\[1\]=sin((dt)*0.5*(u).$cname\[0\])/((u).$cname\[0\]); \\\n";
+        print "   (u).$cname\[2\]=(h).$cname\[0\]*(u).$cname\[1\]; \\\n";
+        print "   (u).$cname\[3\]=(h).$cname\[2\]*(u).$cname\[1\]; \\\n";
+        print "   (u).$cname\[1\]*=(h).$cname\[1\]; \\\n";
+        print "   (u).$cname\[0\]=cos((dt)*0.5*(u).$cname\[0\]) \n\n";
+    } else {
+    	print "#define _${basename}${repsuff}_exp(dt,h,u) _${basename}${fundsuff}_exp((dt),(h),(u))\n\n";
+    }
+}
 
 
 

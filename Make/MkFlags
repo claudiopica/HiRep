@@ -14,15 +14,18 @@ MACRO += -DANTIPERIODIC_BC_T
 
 MACRO += -DUPDATE_EO
 #MACRO += -DWITH_MPI
-MACRO += -DWITH_GPU
+#MACRO += -DWITH_GPU
 MACRO += -DNDEBUG
 #MACRO += -DCHECK_SPINOR_MATCHING
 #MACRO += -DMPI_TIMING
 
+#MACRO += -DWITH_QUATERNIONS
+#MACRO += -DIO_FLUSH
+
 #Compiler
 #export OMPI_CC = ccache gcc
-CC = nvcc
-CFLAGS = -O2 -arch sm_13
+CC = gcc
+CFLAGS = -O2
 
 ##########################################################################
 # DO NOT EDIT BEYOND THIS POINT
@@ -30,6 +33,10 @@ CFLAGS = -O2 -arch sm_13
 
 #Macros
 MACRO += -D$(REPR) -DREPR_NAME=\"$(REPR)\"
+
+CFLAGS += -std=c99
+
+WQUAT = $(if $(findstring -DWITH_QUATERNIONS,$(MACRO)),1,0)
 
 #Include
 INCDIR = $(TOPDIR)/Include

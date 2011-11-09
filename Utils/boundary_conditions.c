@@ -419,7 +419,7 @@ double SF_phi1_up[NG] = {.5, .5, -.5, -.5};
 #endif
 
 
-
+#if defined(BASIC_SF) || defined(ROTATED_SF)
 
 void SF_gauge_bcs(suNg_field *gf, int strength)
 {
@@ -490,7 +490,7 @@ void SF_gauge_bcs(suNg_field *gf, int strength)
 
 
 
-#if defined(BASIC_SF) || defined(ROTATED_SF)
+
 double SF_test_gauge_bcs()
 {
   /*calculates average of all plaquettes that should remain fixed for SF*/

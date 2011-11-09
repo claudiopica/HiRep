@@ -9,12 +9,13 @@
 #include <math.h>
 
 
-
 #define XG(m,a,b) ((m)+(a)*NG+(b))
 #define XF(m,a,b) ((m)+(a)*NF+(b))
 
 void _group_represent2(suNf* v, suNg *u) {
-
+#ifdef WITH_QUATERNIONS
+    *v = *((suNf *)u); 
+#else //WITH_QUATERNIONS
 #ifdef REPR_ADJOINT
 
   int A, C;
@@ -167,12 +168,18 @@ void _group_represent2(suNf* v, suNg *u) {
 
   *v = *((suNf *)u); 
 #endif
+    
+#endif //WITH_QUATERNIONS
+
 
 }
 
 
 void _group_represent2_flt(suNf_flt* v, suNg_flt *u) {
-
+#ifdef WITH_QUATERNIONS
+    *v = *((suNf_flt *)u); 
+#else //WITH_QUATERNIONS
+    
 #ifdef REPR_ADJOINT
 
   int A, C;
@@ -325,6 +332,9 @@ void _group_represent2_flt(suNf_flt* v, suNg_flt *u) {
 
   *v = *((suNf_flt *)u); 
 #endif
+    
+#endif //WITH_QUATERNIONS
+
 
 }
 
@@ -335,7 +345,7 @@ void _group_represent2_flt(suNf_flt* v, suNg_flt *u) {
 #include "communications.h"
 
 void represent_gauge_field() {
-#if !defined(REPR_FUNDAMENTAL) || defined(ROTATED_SF)
+#if (!defined(REPR_FUNDAMENTAL) && !defined(WITH_QUATERNIONS)) || defined(ROTATED_SF) 
   int ix, ip;
   int mu;
   suNf *Ru;
@@ -367,7 +377,7 @@ void represent_gauge_field() {
   apply_bc();
 #else
   static int first_time=1;
-  /* wait gauge field transfer */
+   /* wait gauge field transfer */
   complete_gf_sendrecv(u_gauge);
 
   if(first_time) {
@@ -379,7 +389,7 @@ void represent_gauge_field() {
 }
 
 void represent_gauge_field_flt() {
-#ifndef REPR_FUNDAMENTAL
+#if (!defined(REPR_FUNDAMENTAL) && !defined(WITH_QUATERNIONS)) || defined(ROTATED_SF) 
   int ix, ip;
   int mu;
   suNf_flt *Ru;
@@ -395,9 +405,8 @@ void represent_gauge_field_flt() {
         /*_group_represent(*Ru,*u);*/
       }
 
-  /* TO BE IMPLEMENTED */
   /* wait gauge field transfer */
-  /* complete_gf_sendrecv_flt(u_gauge_flt); */
+  complete_gf_sendrecv_flt(u_gauge_flt);
 
   /* loop on the rest of master sites */
   for(ip=glattice.local_master_pieces;ip<glattice.total_master_pieces;ip++)
@@ -412,7 +421,7 @@ void represent_gauge_field_flt() {
   apply_bc_flt();
 #else
   /* wait gauge field transfer */
-  /* complete_gf_sendrecv_flt(u_gauge_flt); */
+  complete_gf_sendrecv_flt(u_gauge_flt);
 
   static int first_time=1;
   if(first_time) {

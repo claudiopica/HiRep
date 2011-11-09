@@ -69,6 +69,9 @@ static void rotate(void) /* same as in cabmar */
 }
 
 void random_suNg(suNg *u) {
+#ifdef WITH_QUATERNIONS
+    random_su2(0.,u->c);
+#else
   int i,j;
 
 	_suNg_unit(*u);
@@ -83,7 +86,7 @@ void random_suNg(suNg *u) {
     } 
 	  ++pu1; 
   }
-
+#endif //WITH_QUATERNIONS
 }
 
 /* this generates a U(N) matrix but not necessarely in SU(N) */
