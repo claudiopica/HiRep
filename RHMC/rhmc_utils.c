@@ -291,7 +291,7 @@ int end_mc() {
 
   /* free memory */
   free_gfield(u_gauge);
-#if !defined(REPR_FUNDAMENTAL) || defined(ROTATED_SF)
+#if (!defined(REPR_FUNDAMENTAL) && !defined(WITH_QUATERNIONS)) || defined(ROTATED_SF) 
   free_gfield_f(u_gauge_f);
 #endif
 
