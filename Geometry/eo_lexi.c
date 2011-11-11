@@ -69,8 +69,8 @@ void geometry_eo_lexi(void)
    }
     
 #ifdef WITH_GPU
-    cudaMemcpy(iup_gpu,iup,4*VOL_SIZE*sizeof(int),cudaMemcpyHostToDevice);
-    cudaMemcpy(idn_gpu,idn,4*VOL_SIZE*sizeof(int),cudaMemcpyHostToDevice);
+    cudaMemcpy(iup_gpu,iup,4*(glattice.gsize)*sizeof(int),cudaMemcpyHostToDevice);
+    cudaMemcpy(idn_gpu,idn,4*(glattice.gsize)*sizeof(int),cudaMemcpyHostToDevice);
 #endif //WITH_GPU
     
 }
