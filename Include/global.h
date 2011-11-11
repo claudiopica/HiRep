@@ -77,8 +77,8 @@ GLB_VAR(int,*ipt_4d,=NULL);
 GLB_VAR(int,*iup,=NULL);
 GLB_VAR(int,*idn,=NULL);
 #ifdef WITH_GPU
-GLB_VAR(int,*iup,=NULL);
-GLB_VAR(int,*idn,=NULL);
+GLB_VAR(int,*iup_gpu,=NULL);
+GLB_VAR(int,*idn_gpu,=NULL);
 #endif //WITH_GPU
 
 /* Geometry structures */
