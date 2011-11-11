@@ -21,11 +21,7 @@
 #ifdef WITH_MPI
 #include <mpi.h>
 #endif
-
-#ifdef WITH_GPU
-#include <cuda.h>
-#include <driver_types.h>
-#endif
+#include "gpu.h"
 
 
 void free_gfield_gpu(suNg_field *field) {

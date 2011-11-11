@@ -17,6 +17,7 @@
 #include "geometry.h"
 #include "global.h"
 #include "safe_mod.h"
+#include "gpu.h"
 
 static int index_eo_lexi(int x0,int x1,int x2,int x3)
 {
@@ -66,5 +67,11 @@ void geometry_eo_lexi(void)
 			 }
      }
    }
+    
+#ifdef WITH_GPU
+    cudaMemcpy(iup_gpu,iup,4*VOL_SIZE*sizeof(int),cudaMemcpyHostToDevice);
+    cudaMemcpy(idn_gpu,idn,4*VOL_SIZE*sizeof(int),cudaMemcpyHostToDevice);
+#endif //WITH_GPU
+    
 }
 

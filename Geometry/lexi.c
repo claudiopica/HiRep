@@ -18,6 +18,8 @@
 #include "global.h"
 #include "safe_mod.h"
 
+/* THIS FILE IS OBSOLETE AND DOES NOT WORK WIT?H DYNAMICAL FERMIONS!!!! */
+
 static int index_lexi(int x0,int x1,int x2,int x3)
 {
    int y0,y1,y2,y3;

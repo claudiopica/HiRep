@@ -1,8 +1,8 @@
 #ifndef LINEAR_ALGEBRA_GPU_CU
 #define LINEAR_ALGEBRA_GPU_CU
 
-#include <cuda.h>
 #include "global.h"
+#include "gpu.h"
 
 
 

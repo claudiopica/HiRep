@@ -21,11 +21,7 @@
 #ifdef WITH_MPI
 #include <mpi.h>
 #endif
-#ifdef WITH_GPU
-#include <cuda.h>
-#include <driver_types.h>
-#endif
-
+#include "gpu.h"
 
 void free_spinor_field_gpu(spinor_field *field) {
   if (field[0].gpu_ptr!=NULL) {

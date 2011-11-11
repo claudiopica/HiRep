@@ -5,7 +5,13 @@
 
 #ifndef GPU_H
 #define GPU_H
+#ifdef WITH_GPU
+
 #include <stdio.h>
+#include <cuda.h>
+#include <driver_types.h>
+#include "error.h"
+
 
 
 #define START_SP_ADDRESS_GPU(sf) (sf->gpu_ptr + sf->type->master_start[0])
@@ -27,9 +33,10 @@ inline void __cudaSafeCall( cudaError err, const char *file, const int line )
     {
         if ( cudaSuccess != err )
         {
-            fprintf( stderr, "cudaSafeCall() failed at %s:%i : %s\n",
-                     file, line, cudaGetErrorString( err ) );
-            exit( -1 );
+            lprintf("CUDA",0,"cudaSafeCall() failed at %s:%i\n",
+                     file, line);
+            error((cudaSuccess != err),1,"CudaSafeCall", 
+                  cudaGetErrorString( err ));
         }
     } while ( 0 );
 
@@ -52,9 +59,12 @@ inline void __cudaCheckError( const char *file, const int line )
         cudaError_t err = cudaGetLastError();
         if ( cudaSuccess != err )
         {
-            fprintf( stderr, "cudaCheckError() failed at %s:%i : %s.\n",
-                     file, line, cudaGetErrorString( err ) );
-            exit( -1 );
+            lprintf("CUDA",0,"cudaCheckError() failed at %s:%i\n",
+                    file, line);
+
+            error((cudaSuccess != err),1,"CudaCheckError", 
+                  cudaGetErrorString( err ));
+            
         }
 
         // More careful checking. However, this will affect performance.
@@ -62,9 +72,11 @@ inline void __cudaCheckError( const char *file, const int line )
         err = cudaThreadSynchronize();
         if( cudaSuccess != err )
         {
-            fprintf( stderr, "cudaCheckError() with sync failed at %s:%i : %s.\n",
-                     file, line, cudaGetErrorString( err ) );
-            exit( -1 );
+            lprintf("CUDA",0,"cudaCheckError() with sync failed at %s:%i\n",
+                    file, line);
+            
+            error((cudaSuccess != err),1,"CudaCheckError with sync", 
+                  cudaGetErrorString( err ));
         }
     } while ( 0 );
 
@@ -75,4 +87,7 @@ inline void __cudaCheckError( const char *file, const int line )
     return;
 }
 
+#undef CUDA_CHECK_ERROR
+
+#endif //WITH_GPU
 #endif

@@ -92,6 +92,8 @@
 #include "global.h" 
 #include "error.h"
 #include "logger.h"
+#include "gpu.h"
+
 
 
 
@@ -1300,6 +1302,12 @@ void geometry_mpi_eo(void)
  
   geometry_mpi_finalize(); 
  
+#ifdef WITH_GPU
+    cudaMemcpy(iup_gpu,iup,4*VOL_SIZE*sizeof(int),cudaMemcpyHostToDevice);
+    cudaMemcpy(idn_gpu,idn,4*VOL_SIZE*sizeof(int),cudaMemcpyHostToDevice);
+#endif //WITH_GPU
+    
+    
 }
 
 

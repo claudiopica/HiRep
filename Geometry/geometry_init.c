@@ -16,8 +16,17 @@
 #include "error.h"
 #include "logger.h"
 #include <stdlib.h>
+#ifdef WITH_GPU
+#include <cuda.h>
+#include <driver_types.h>
+#endif
+
 
 static int *alloc_mem=NULL;
+
+#ifdef WITH_GPU
+static int *alloc_mem_gpu=NULL;
+#endif //WITH_GPU
 
 static void free_memory() {
   if(alloc_mem!=NULL) {
@@ -26,6 +35,12 @@ static void free_memory() {
     iup=idn=NULL;
     ipt=NULL;
   }
+#ifdef WITH_GPU
+  if(alloc_mem_gpu!=NULL) {
+      cudeFree(alloc_mem_gpu);
+      iup_gpu=idn_gpu=NULL;
+  }
+#endif //WITH_GPU
 }
 
 /* compute the size of the local lattice in the given direction given 
@@ -256,7 +271,7 @@ void geometry_mem_alloc() {
     size_t req_mem=0;
     unsigned int VOL_SIZE=glattice.gsize;
 
-    req_mem+=2*4*VOL_SIZE; /* for iup and idn */
+    req_mem+=2*4*VOL_SIZE; /* for iup and idn */      
     req_mem+=(X+2*X_BORDER)*(Y+2*Y_BORDER)*(Z+2*Z_BORDER)*(T+2*T_BORDER);     /* for ipt */
 
     alloc_mem=malloc(req_mem*sizeof(int));
@@ -274,6 +289,16 @@ void geometry_mem_alloc() {
     ALLOC(ipt,(X+2*X_BORDER)*(Y+2*Y_BORDER)*(Z+2*Z_BORDER)*(T+2*T_BORDER));
     /* ipt_4d */
 
+#ifdef WITH_GPU
+    {
+      cudaError_t err;
+      err = cudaMalloc(&alloc_mem_gpu, 2*4*VOL_SIZE*sizeof(int)); /* for iup and idn */
+      error(err!=cudaSuccess,1,"geometry_mem_alloc" __FILE__,
+            "Could not allocate GPU memory space for the iup and idn");
+    }
+    iup_gpu=alloc_mem_gpu;
+    idn_gpu=iup_gpu+4*VOL_SIZE;
+#endif //WITH_GPU      
 
     atexit(&free_memory);
 
