@@ -31,8 +31,6 @@
 extern rhmc_par _update_par; /* Update/update_rhmc.c */
 #endif /* ROTATED_SF */
 
-int *iup_gpu, *idn_gpu;
-
 /*
  * the following variable is used to keep trace of
  * matrix-vector multiplication.
@@ -204,6 +202,7 @@ __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in, suNf* gauge, int *iu
        /******************************** end of directions *********************************/      
 
        _spinor_mul_f(r,-0.5,r);
+       out[ix]=r;
     }
  }
  
@@ -224,7 +223,7 @@ void Dphi_(spinor_field *out, spinor_field *in)
    error(out->type==&glattice && in->type!=&glattice,1,"Dphi_ [Dphi.c]", "Spinors don't match! (3)");
 #endif
    
-   N = out->type->master_end[0] -out->type->master_start[0] + 1 ;
+   N = out->type->master_end[0] - out->type->master_start[0] + 1 ;
    grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
    
    Dphi_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f->gpu_ptr,iup_gpu,idn_gpu,N);

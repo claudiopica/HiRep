@@ -26,8 +26,8 @@ MACRO += -DNDEBUG
 #export OMPI_CC = ccache gcc
 #CC = gcc
 #CFLAGS = -O2
-CC = nvcc
-CFLAGS = -O2 -arch sm_13
+CC = nvcc 
+CFLAGS = -O2 -arch sm_13 -Xcompiler "-std=c99"
 
 ##########################################################################
 # DO NOT EDIT BEYOND THIS POINT

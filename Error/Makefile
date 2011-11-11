@@ -1,7 +1,7 @@
 TOPDIR = ..
 MKDIR = $(TOPDIR)/Make
 
-SRCS = error.c 
+SRCS = error.c error_gpu.c
 
 include $(MKDIR)/MkRules
 

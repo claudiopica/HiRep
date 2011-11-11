@@ -34,6 +34,9 @@
  *
  * ***********************************************/
 
+#ifdef __cplusplus
+extern "C" {
+#endif //__cplusplus
 
 /* map the ID name to the file with name filename 
  * filename can start with ">>" in which case the file
@@ -106,6 +109,11 @@ void logger_disable();
  *
  */
 int lprintf(char *name, int level, char *format, ...);
+
+#ifdef __cplusplus
+}
+#endif //__cplusplus
+
 
 
 #endif
