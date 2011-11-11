@@ -22,6 +22,12 @@
 #include <mpi.h>
 #endif
 
+#ifdef WITH_GPU
+#include "field_alloc_gpu.c"
+#endif
+
+
+
 void free_gfield(suNg_field *u)
 {
    afree(u->ptr);

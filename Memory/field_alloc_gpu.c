@@ -22,21 +22,121 @@
 #include <mpi.h>
 #endif
 
-void gpu_free_gfield(suNg_field *field) {
+#ifdef WITH_GPU
+#include <cuda.h>
+#include <driver_types.h>
+#endif
 
+
+void free_gfield_gpu(suNg_field *field) {
+  if (field->gpu_ptr!=NULL){
+    cudaFree(field->gpu_ptr);
+  }
 }
 
-
-void gpu_alloc_gfield(suNg_field *field) {
-
+void alloc_gfield_gpu(suNg_field *field) {
+  
     cudaError_t err;
     
 	if (field->gpu_ptr!=NULL) {
-        gpu_free_gfield(field);
+        free_gfield_gpu(field);
     }
     
-    err = cudaMalloc(&field->gpu_prt, 4*type->gsize*sizeof(suNg));
+    err = cudaMalloc(&field->gpu_ptr, 4*field->type->gsize*sizeof(suNg));
     error(err!=cudaSuccess,1,"gpu_alloc_gfield [gpu_field_alloc.c]",
           "Could not allocate GPU memory space for the gauge field");
     
 }
+
+void free_gfield_f_gpu(suNf_field *field) {
+  if (field->gpu_ptr!=NULL){
+    cudaFree(field->gpu_ptr);
+  }
+}
+
+void alloc_gfield_f_gpu(suNf_field *field) {
+  
+    cudaError_t err;
+    
+	if (field->gpu_ptr!=NULL) {
+	  free_gfield_f_gpu(field);
+    }
+    
+    err = cudaMalloc(&field->gpu_ptr, 4*field->type->gsize*sizeof(suNf));
+    error(err!=cudaSuccess,1,"gpu_alloc_gfield [gpu_field_alloc.c]",
+          "Could not allocate GPU memory space for the gauge field");
+    
+}
+
+void free_gfield_flt_gpu(suNg_field_flt *field) {
+  if (field->gpu_ptr!=NULL){
+    cudaFree(field->gpu_ptr);
+  }
+}
+
+void alloc_gfield_flt_gpu(suNg_field_flt *field) {
+  
+    cudaError_t err;
+    
+	if (field->gpu_ptr!=NULL) {
+        free_gfield_flt_gpu(field);
+    }
+    
+    err = cudaMalloc(&field->gpu_ptr, 4*field->type->gsize*sizeof(suNg_flt));
+    error(err!=cudaSuccess,1,"gpu_alloc_gfield [gpu_field_alloc.c]",
+          "Could not allocate GPU memory space for the gauge field");
+    
+}
+
+void free_gfield_f_flt_gpu(suNf_field_flt *field) {
+  if (field->gpu_ptr!=NULL){
+    cudaFree(field->gpu_ptr);
+  }
+}
+
+void alloc_gfield_f_flt_gpu(suNf_field_flt *field) {
+  
+    cudaError_t err;
+    
+	if (field->gpu_ptr!=NULL) {
+        free_gfield_f_flt_gpu(field);
+    }
+    
+    err = cudaMalloc(&field->gpu_ptr, 4*field->type->gsize*sizeof(suNf_flt));
+    error(err!=cudaSuccess,1,"gpu_alloc_gfield [gpu_field_alloc.c]",
+          "Could not allocate GPU memory space for the gauge field");
+    
+}
+
+void gfield_copy_to_gpu(suNg_field *field){
+  cudaMemcpy(field->gpu_ptr,field->ptr,field->type->gsize*4*sizeof(suNg),cudaMemcpyHostToDevice);
+}
+
+void gfield_copy_from_gpu(suNg_field *field){
+  cudaMemcpy(field->ptr,field->gpu_ptr,field->type->gsize*4*sizeof(suNg),cudaMemcpyDeviceToHost);
+}
+
+void gfield_copy_to_gpu_f(suNf_field *field){
+  cudaMemcpy(field->gpu_ptr,field->ptr,field->type->gsize*4*sizeof(suNf),cudaMemcpyHostToDevice);
+}
+
+void gfield_copy_from_gpu_f(suNf_field *field){
+  cudaMemcpy(field->ptr,field->gpu_ptr,field->type->gsize*4*sizeof(suNf),cudaMemcpyDeviceToHost);
+}
+
+void gfield_copy_to_gpu_flt(suNg_field_flt *field){
+  cudaMemcpy(field->gpu_ptr,field->ptr,field->type->gsize*4*sizeof(suNg_flt),cudaMemcpyHostToDevice);
+}
+
+void gfield_copy_from_gpu_flt(suNg_field_flt *field){
+  cudaMemcpy(field->ptr,field->gpu_ptr,field->type->gsize*4*sizeof(suNg_flt),cudaMemcpyDeviceToHost);
+}
+
+void gfield_copy_to_gpu_f_flt(suNf_field_flt *field){
+  cudaMemcpy(field->gpu_ptr,field->ptr,field->type->gsize*4*sizeof(suNf_flt),cudaMemcpyHostToDevice);
+}
+
+void gfield_copy_from_gpu_f_flt(suNf_field_flt *field){
+  cudaMemcpy(field->ptr,field->gpu_ptr,field->type->gsize*4*sizeof(suNf_flt),cudaMemcpyDeviceToHost);
+}
+

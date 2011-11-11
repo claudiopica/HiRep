@@ -9,6 +9,9 @@
 #include "suN_types.h"
 #include "utils.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void Dphi__cpu(spinor_field *out, spinor_field *in);
 void Dphi_cpu(double m0, spinor_field *out, spinor_field *in);
@@ -95,7 +98,9 @@ void Dphi_old(double m0, suNf_spinor *p, suNf_spinor *q);
 void g5Dphi_old(double m0, suNf_spinor *p, suNf_spinor *q);
 void Dphi_flt_old(double m0, suNf_spinor_flt *p, suNf_spinor_flt *q);
 void g5Dphi_flt_old(double m0, suNf_spinor_flt *p, suNf_spinor_flt *q);
-
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 	

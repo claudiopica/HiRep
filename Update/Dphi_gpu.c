@@ -5,7 +5,7 @@
 
 /*******************************************************************************
 *
-* File Dphi.c
+* File Dphi_gpu.c
 *
 * Action of the Wilson-Dirac operator D and hermitian g5D on a given 
 * double-precision spinor field
@@ -24,11 +24,14 @@
 #include "geometry.h"
 #include "communications.h"
 #include "memory.h"
+#include "gpu.h"
 
 #ifdef ROTATED_SF
 #include "update.h"
 extern rhmc_par _update_par; /* Update/update_rhmc.c */
 #endif /* ROTATED_SF */
+
+int *iup_gpu, *idn_gpu;
 
 /*
  * the following variable is used to keep trace of
@@ -51,9 +54,9 @@ unsigned long int getMVM() {
  */
 
 
-__global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in, suNf* gauge, int N){
+__global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in, suNf* gauge, int *iup, int *idn, int N){
   suNf_spinor r,sn;
-  SuNf_vector psi,chi;
+  suNf_vector psi,chi;
   suNf u;
   int iy;
   int ix = blockIdx.x*BLOCK_SIZE + threadIdx.x;
@@ -96,7 +99,7 @@ __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in, suNf* gauge, int N){
 
       /******************************* direction +1 *********************************/
 
-       iy=iun(ix,1);
+       iy=iup(ix,1);
        u = gauge[coord_to_index(iy,1)];
        sn = in[iy];
       
@@ -205,6 +208,29 @@ __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in, suNf* gauge, int N){
  }
  
 
+void Dphi_(spinor_field *out, spinor_field *in)
+{
+   int N,grid;
+
+   error((in==NULL)||(out==NULL),1,"Dphi_ [Dphi.c]",
+         "Attempt to access unallocated memory space");
+   
+   error(in==out,1,"Dphi_ [Dphi.c]",
+         "Input and output fields must be different");
+
+#ifndef CHECK_SPINOR_MATCHING
+   error(out->type==&glat_even && in->type!=&glat_odd,1,"Dphi_ [Dphi.c]", "Spinors don't match! (1)");
+   error(out->type==&glat_odd && in->type!=&glat_even,1,"Dphi_ [Dphi.c]", "Spinors don't match! (2)");
+   error(out->type==&glattice && in->type!=&glattice,1,"Dphi_ [Dphi.c]", "Spinors don't match! (3)");
+#endif
+   
+   N = out->type->master_end[0] -out->type->master_start[0] + 1 ;
+   grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
+   
+   Dphi_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f->gpu_ptr,iup_gpu,idn_gpu,N);
+   
+}
+
 
 /*
  * this function takes 2 spinors defined on the whole lattice
@@ -228,7 +254,7 @@ __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in, suNf* gauge, int N){
    N = out->type->master_end[0] -out->type->master_start[0] + 1 ;
    grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
    
-   Dphi_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge->gpu_ptr,N);
+   Dphi_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f->gpu_ptr,iup_gpu,idn_gpu,N);
    rho=4.+m0;
    spinor_field_mul_add_assign_f(out,rho,in);
    
@@ -249,10 +275,10 @@ void g5Dphi(double m0, spinor_field *out, spinor_field *in)
    error(out->type!=&glattice || in->type!=&glattice,1,"g5Dphi [Dphi.cu]", "Spinors are not defined on all the lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
-   N = out->master_end[0] -out->type->master_start[0] + 1 ;
+   N = out->type->master_end[0] - out->type->master_start[0] + 1 ;
    grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
    
-   Dphi_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out), START_SP_ADDRESS(in),u_gauge->gpu_ptr,N);
+   Dphi_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out), START_SP_ADDRESS_GPU(in),u_gauge_f->gpu_ptr,iup_gpu,idn_gpu,N);
 
    rho=4.+m0;
    spinor_field_mul_add_assign_f(out,rho,in);
@@ -319,13 +345,11 @@ void Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
   /* alloc memory for temporary spinor field */
   if (init) { init_Dirac(); }
   
-  start1 = out->type->master_start[0];
-  start2 = otmp->type->master_start[0];
   N = out->type->master_end[0] -out->type->master_start[0] + 1 ;
   grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
   
-  Dphi_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(otmp), START_SP_ADDRESS_GPU(in), u_gauge->gpu_ptr,N);
-  Dphi_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out), START(SP_ADDRESS_GPU(otmp), u_gauge->gpu_ptr,N);
+  Dphi_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(otmp), START_SP_ADDRESS_GPU(in), u_gauge_f->gpu_ptr,iup_gpu,idn_gpu,N);
+  Dphi_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out), START_SP_ADDRESS_GPU(otmp), u_gauge_f->gpu_ptr,iup_gpu,idn_gpu,N);
   rho=4.0+m0;
   rho*=-rho; /* this minus sign is taken into account below */
   
@@ -361,8 +385,8 @@ void Dphi_oepre(double m0, spinor_field *out, spinor_field *in)
   N = out->type->master_end[0] -out->type->master_start[0] + 1 ;
   grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
   
-  Dphi_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(etmp), START_SP_ADDRESS_GPU(in), u_gauge->gpu_ptr,N);
-  Dphi_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out), START_SP_ADDRESS_GPU(etmp), u_gauge->gpu_ptr,N);
+  Dphi_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(etmp), START_SP_ADDRESS_GPU(in), u_gauge_f->gpu_ptr,iup_gpu,idn_gpu,N);
+  Dphi_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out), START_SP_ADDRESS_GPU(etmp), u_gauge_f->gpu_ptr,iup_gpu,idn_gpu,N);
 
   rho=4.0+m0;
   rho*=-rho; /* this minus sign is taken into account below */
@@ -400,8 +424,8 @@ void g5Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
   N = out->type->master_end[0] -out->type->master_start[0] + 1 ;
   grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
   
-  Dphi_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(otmp), START_SP_ADDRESS_GPU(in), u_gauge->gpu_ptr,N);
-  Dphi_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out), START_SP_ADDRESS_GPU(otmp), u_gauge->gpu_ptr,N);
+  Dphi_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(otmp), START_SP_ADDRESS_GPU(in), u_gauge_f->gpu_ptr,iup_gpu,idn_gpu,N);
+  Dphi_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out), START_SP_ADDRESS_GPU(otmp), u_gauge_f->gpu_ptr,iup_gpu,idn_gpu,N);
 
   rho=4.0+m0;
   rho*=-rho; /* this minus sign is taken into account below */

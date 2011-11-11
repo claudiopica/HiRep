@@ -25,6 +25,9 @@
 #  define ALIGN 5 
 #endif  
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 void *amalloc(size_t size,int p);
 void afree(void *addr);
 
@@ -45,6 +48,16 @@ void free_spinor_field(spinor_field *s);
 void free_spinor_field_flt(spinor_field_flt *s);
 
 #ifdef WITH_GPU
+
+void free_gfield_gpu(suNg_field *field);
+void alloc_gfield_gpu(suNg_field *field);
+void free_gfield_f_gpu(suNf_field *field);
+void alloc_gfield_f_gpu(suNf_field *field);
+void free_gfield_flt_gpu(suNg_field_flt *field);
+void alloc_gfield_flt_gpu(suNg_field_flt *field);
+void free_gfield_f_flt_gpu(suNf_field_flt *field);
+void alloc_gfield_f_flt_gpu(suNf_field_flt *field);
+
 void free_spinor_field_gpu(spinor_field *field);
 void free_spinor_field_flt_gpu(spinor_field_flt *field);
 void alloc_spinor_field_f_gpu(unsigned int n, spinor_field *field);
@@ -53,6 +66,15 @@ void spinor_field_copy_to_gpu_f(spinor_field *field);
 void spinor_field_copy_from_gpu_f(spinor_field *field);
 void spinor_field_copy_to_gpu_f_flt(spinor_field_flt *field);
 void spinor_field_copy_from_gpu_f_flt(spinor_field_flt *field);
+
+void gfield_copy_to_gpu(suNg_field *field);
+void gfield_copy_from_gpu(suNg_field *field);
+void gfield_copy_to_gpu_f(suNf_field *field);
+void gfield_copy_from_gpu_f(suNf_field *field);
+void gfield_copy_to_gpu_flt(suNg_field_flt *field);
+void gfield_copy_from_gpu_flt(suNg_field_flt *field);
+void gfield_copy_to_gpu_f_flt(suNf_field_flt *field);
+void gfield_copy_from_gpu_f_flt(suNf_field_flt *field);
 #endif
 
 void free_avfield(suNg_av_field *u);
@@ -62,6 +84,9 @@ scalar_field *alloc_sfield(geometry_descriptor* type);
 
 spinor_field* create_spinor_mask(spinor_field* s, geometry_descriptor* masktype);
 void free_spinor_mask(spinor_field* s);
+#ifdef __cplusplus
+}
+#endif
 
 
 #endif
