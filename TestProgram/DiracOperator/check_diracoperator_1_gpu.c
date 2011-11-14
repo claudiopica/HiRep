@@ -163,18 +163,31 @@ int main(int argc,char *argv[])
 
   lprintf("MAIN",0,"done.\n");
 
-  res_gpu = spinor_field_sqnorm_f(s1);
   
-  Dphi(hmass,s1,s0);
-  Dphi_cpu(hmass,s1,s0);
+  Dphi_(s1,s0);
+  Dphi__cpu(s1,s0);
   
   res1 = sfdiff(s0);
   res2 = sfdiff(s1);
 
+  res_gpu = spinor_field_sqnorm_f(s1);
+  res_cpu = spinor_field_sqnorm_f_cpu(s1);
 
-  res_cpu = spinor_field_sqnorm_f(s1);
+  lprintf("LA TEST",0,"Check diracoperator, mass=0, \nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g,\nsqnorm(gpu-cpu)= %1.10g (check %1.10g=0?) \n\n",res_gpu,res_cpu,res2,res1);
 
-  lprintf("LA TEST",0,"Check diracoperator, \nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g,\nsqnorm(gpu-cpu)= %1.10g (check %1.10g=0?) \n\n",res_gpu,res_cpu,res2,res1);
+
+  Dphi(hmass,s1,s0);
+  Dphi_cpu(hmass,s1,s0);
+
+  res1 = sfdiff(s0);
+  res2 = sfdiff(s1);
+
+  res_gpu = spinor_field_sqnorm_f(s1);
+  res_cpu = spinor_field_sqnorm_f_cpu(s1);
+
+  lprintf("LA TEST",0,"Check diracoperator, mass=%1.2g, \nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g,\nsqnorm(gpu-cpu)= %1.10g (check %1.10g=0?) \n\n",hmass,res_gpu,res_cpu,res2,res1);
+
+
 
   free_spinor_field(s0);
   free_spinor_field_gpu(s0);

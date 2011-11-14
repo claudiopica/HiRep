@@ -37,7 +37,7 @@ static void free_memory() {
   }
 #ifdef WITH_GPU
   if(alloc_mem_gpu!=NULL) {
-      cudeFree(alloc_mem_gpu);
+      cudaFree(alloc_mem_gpu);
       iup_gpu=idn_gpu=NULL;
   }
 #endif //WITH_GPU

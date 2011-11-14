@@ -62,8 +62,8 @@ __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in, suNf* gauge, int *iu
   if (ix < N){
       /******************************* direction +0 *********************************/
       iy=iup(ix,0);
-      u = gauge[coord_to_index(ix,0)];
       sn= in[iy];
+      u = gauge[coord_to_index(ix,0)];
       
       _vector_add_f(psi,sn.c[0],sn.c[2]);
       _suNf_multiply(chi,u,psi);
@@ -80,8 +80,8 @@ __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in, suNf* gauge, int *iu
        /******************************* direction -0 *********************************/
 
        iy=idn(ix,0);
-       u = gauge[coord_to_index(iy,0)];
        sn = in[iy];
+       u = gauge[coord_to_index(iy,0)];
 
        _vector_sub_f(psi,sn.c[0],sn.c[2]);
        _suNf_inverse_multiply(chi,u,psi);
@@ -98,8 +98,8 @@ __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in, suNf* gauge, int *iu
       /******************************* direction +1 *********************************/
 
        iy=iup(ix,1);
-       u = gauge[coord_to_index(iy,1)];
        sn = in[iy];
+       u = gauge[coord_to_index(ix,1)];
       
        _vector_i_add_f(psi,sn.c[0],sn.c[3]);
        _suNf_multiply(chi,u,psi);
@@ -116,8 +116,9 @@ __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in, suNf* gauge, int *iu
        /******************************* direction -1 *********************************/
 
        iy=idn(ix,1);
-       u = gauge[coord_to_index(iy,1)];
        sn = in[iy];
+       u = gauge[coord_to_index(iy,1)];
+
 
        _vector_i_sub_f(psi,sn.c[0],sn.c[3]);
        _suNf_inverse_multiply(chi,u,psi);
@@ -133,8 +134,9 @@ __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in, suNf* gauge, int *iu
 
        /******************************* direction +2 *********************************/
        iy= iup(ix,2);
-       u = gauge[coord_to_index(iy,2)];
        sn = in[iy];
+       u = gauge[coord_to_index(ix,2)];
+
 
        _vector_add_f(psi,sn.c[0],sn.c[3]);
        _suNf_multiply(chi,u,psi);
@@ -150,8 +152,8 @@ __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in, suNf* gauge, int *iu
 
        /******************************* direction -2 *********************************/
        iy = idn(ix,2);
-       u  = gauge[coord_to_index(iy,2)];
        sn = in[iy];
+       u  = gauge[coord_to_index(iy,2)];
 
        _vector_sub_f(psi,sn.c[0],sn.c[3]);
        _suNf_inverse_multiply(chi,u,psi);
@@ -167,8 +169,9 @@ __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in, suNf* gauge, int *iu
 
        /******************************* direction +3 *********************************/
        iy = iup(ix,3);
-       u  = gauge[coord_to_index(iy,3)];
        sn = in[iy];
+       u  = gauge[coord_to_index(ix,3)];
+
       
        _vector_i_add_f(psi,sn.c[0],sn.c[2]);
        _suNf_multiply(chi,u,psi);
@@ -185,8 +188,8 @@ __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in, suNf* gauge, int *iu
        /******************************* direction -3 *********************************/
 
        iy = idn(ix,3);
-       u  = gauge[coord_to_index(iy,3)];
        sn = in[iy];
+       u  = gauge[coord_to_index(iy,3)];
       
        _vector_i_sub_f(psi,sn.c[0],sn.c[2]);
        _suNf_inverse_multiply(chi,u,psi);
