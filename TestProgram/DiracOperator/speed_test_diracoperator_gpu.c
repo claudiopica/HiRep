@@ -98,7 +98,7 @@ int main(int argc,char *argv[])
   double res1,res2,res_cpu,res_gpu;
   spinor_field *s0,*s1,*s2,*s3;
   gpu_timer t1;
-  float elapsed;
+  float elapsed, gflops;
   int i;
   int n_times=50;
   
@@ -189,8 +189,12 @@ int main(int argc,char *argv[])
   }
 
   elapsed = gpuTimerStop(t1);
-  lprintf("LA TEST",0,"Time: %1.10gms\n\n",elapsed);
+  lprintf("LA TEST",0,"Time: %1.10gms\n",elapsed);
 
+    gflops=n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*532./elapsed/1.e6; 
+    lprintf("LA TEST",0,"GFLOPS: %1.4gms\n\n",gflops);
+    
+    
   elapsed = gpuTimerStop(t1);
   lprintf("LA TEST",0,"DONE!\n\n");
 
