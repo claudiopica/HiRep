@@ -18,6 +18,7 @@
 #include "spinor_field.h"
 #include "inverters.h"
 #include "geometry.h"
+#include "gpu.h"
 
 void ExpX(double dt, suNg_algebra_vector *h, suNg *u);
 
@@ -85,5 +86,13 @@ int HYP_best_parameters(double mtp[6859], double w[3]);
 /* Timing */
 #include <sys/time.h>
 int timeval_subtract (struct timeval *result, struct timeval *x, struct timeval *y);
+
+/* gpu Timer */
+#ifdef WITH_GPU
+typedef cudaEvent_t gpu_timer;
+cudaEvent_t gpuTimerStart();
+float gpuTimerMeasure(cudaEvent_t e);
+float gpuTimerStop(cudaEvent_t e);
+#endif
 
 #endif 

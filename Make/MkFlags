@@ -19,15 +19,16 @@ MACRO += -DNDEBUG
 #MACRO += -DCHECK_SPINOR_MATCHING
 #MACRO += -DMPI_TIMING
 
-#MACRO += -DWITH_QUATERNIONS
+MACRO += -DWITH_QUATERNIONS
 #MACRO += -DIO_FLUSH
 
 #Compiler
 #export OMPI_CC = ccache gcc
 #CC = gcc
-#CFLAGS = -O2
+#CFLAGS = -Wall -std=c99 -O2 -fomit-frame-pointer -mfpmath=sse -msse -msse2 
 CC = nvcc 
-CFLAGS = -O2 -arch sm_13 -Xcompiler "-std=c99"
+CFLAGS = -O3 -Xcompiler -std=c99
+GPUFLAGS = --x cu -arch sm_20 --use_fast_math -Xptxas -v
 
 ##########################################################################
 # DO NOT EDIT BEYOND THIS POINT

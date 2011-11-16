@@ -99,6 +99,8 @@ int main(int argc,char *argv[])
   spinor_field *s0,*s1,*s2,*s3;
   gpu_timer t1;
   float elapsed;
+  int i;
+  int n_times=50;
   
   setup_process(&argc,&argv);
   
@@ -165,10 +167,9 @@ int main(int argc,char *argv[])
   gfield_copy_to_gpu_f(u_gauge_f);
 
   lprintf("MAIN",0,"done.\n");
+  lprintf("LA TEST",0,"Checking the diracoperator..\n");
 
-  t1 = gpuTimerStart();
   Dphi_(s1,s0);
-  elapsed = gpuTimerStop(t1);
   Dphi__cpu(s1,s0);
   
   res1 = sfdiff(s0);
@@ -177,32 +178,21 @@ int main(int argc,char *argv[])
   res_gpu = spinor_field_sqnorm_f(s1);
   res_cpu = spinor_field_sqnorm_f_cpu(s1);
 
-  lprintf("LA TEST",0,"Check diracoperator, mass=0, \nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g,\nsqnorm(gpu-cpu)= %1.10g (check %1.10g=0?),\n time gpu: %1.5gms\n\n",res_gpu,res_cpu,res2,res1,elapsed);
+  lprintf("LA TEST",0,"Result, mass=0, \nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g,\nsqnorm(gpu-cpu)= %1.10g (check %1.10g=0?),\n",res_gpu,res_cpu,res2,res1);
 
+  t1 = gpuTimerStart();
 
-  Dphi(hmass,s1,s0);
-  Dphi_cpu(hmass,s1,s0);
+  lprintf("LA TEST",0,"Calculating Diracoperator %d times.\n",n_times);
 
-  res1 = sfdiff(s0);
-  res2 = sfdiff(s1);
+  for (i=0;i<n_times;++i){
+    Dphi_(s1,s0);
+  }
 
-  res_gpu = spinor_field_sqnorm_f(s1);
-  res_cpu = spinor_field_sqnorm_f_cpu(s1);
+  elapsed = gpuTimerStop(t1);
+  lprintf("LA TEST",0,"Time: %1.10gms\n\n",elapsed);
 
-  lprintf("LA TEST",0,"Check diracoperator, mass=%1.2g, \nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g,\nsqnorm(gpu-cpu)= %1.10g (check %1.10g=0?) \n\n",hmass,res_gpu,res_cpu,res2,res1);
-
-
-  g5Dphi(hmass,s1,s0);
-  g5Dphi_cpu(hmass,s1,s0);
-
-  res1 = sfdiff(s0);
-  res2 = sfdiff(s1);
-
-  res_gpu = spinor_field_sqnorm_f(s1);
-  res_cpu = spinor_field_sqnorm_f_cpu(s1);
-
-  lprintf("LA TEST",0,"Check gamma_5xDiracoperator, mass=%1.2g, \nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g,\nsqnorm(gpu-cpu)= %1.10g (check %1.10g=0?) \n\n",hmass,res_gpu,res_cpu,res2,res1);
-
+  elapsed = gpuTimerStop(t1);
+  lprintf("LA TEST",0,"DONE!\n\n");
 
 
   free_spinor_field(s0);

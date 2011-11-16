@@ -292,7 +292,7 @@ void geometry_mem_alloc() {
 #ifdef WITH_GPU
     {
       cudaError_t err;
-      err = cudaMalloc(&alloc_mem_gpu, 2*4*VOL_SIZE*sizeof(int)); /* for iup and idn */
+      err = cudaMalloc((void**) &alloc_mem_gpu, 2*4*VOL_SIZE*sizeof(int)); /* for iup and idn */
       error(err!=cudaSuccess,1,"geometry_mem_alloc" __FILE__,
             "Could not allocate GPU memory space for the iup and idn");
     }

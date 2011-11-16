@@ -1,7 +1,7 @@
 TOPDIR = ../..
 MKDIR=$(TOPDIR)/Make
 
-EXES = check_diracoperator_1 check_diracoperator_2 check_diracoperator_3 check_diracoperator_1_gpu check_diracoperator_4
+EXES = check_diracoperator_1 check_diracoperator_2 check_diracoperator_3 check_diracoperator_1_gpu speed_test_diracoperator_gpu #check_diracoperator_4
 
 default: $(EXES)
 
@@ -15,7 +15,7 @@ MODS := logger read_input
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Utils
-MODS := boundary_conditions time
+MODS := boundary_conditions time timer_gpu
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Memory

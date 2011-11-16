@@ -11,6 +11,7 @@
 //		... Call another kernel ...
 //
 //		float elapsedTime=gpuTimerStop(gpu_event);
+#include "gpu.h"
 
 
 cudaEvent_t gpuTimerStart(){
@@ -19,6 +20,7 @@ cudaEvent_t gpuTimerStart(){
 	cudaEventRecord(e,0);
 	return e;
 }
+
 float gpuTimerMeasure(cudaEvent_t e){
 	float t;
 	cudaEvent_t stop;	
@@ -29,6 +31,7 @@ float gpuTimerMeasure(cudaEvent_t e){
 	cudaEventDestroy(stop);	
 	return t;
 }
+
 float gpuTimerStop(cudaEvent_t e){
 	float t;
 	cudaEvent_t stop;	

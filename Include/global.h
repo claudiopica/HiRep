@@ -155,7 +155,7 @@ GLB_VAR(input_glb,glb_var,=init_input_glb(glb_var));
 #undef GLB_VAR
 
 #ifdef WITH_GPU
-#define BLOCK_SIZE 512
+#define BLOCK_SIZE 256
 #endif
 
 

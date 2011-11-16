@@ -41,6 +41,9 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
 
   /* allocate spinors fields and aux real variables */
   p = alloc_spinor_field_f(3+par->n,in->type);
+#ifdef WITH_GPU
+  alloc_spinor_field_f_gpu(3+par->n,p);
+#endif //WITH_GPU
   k=p+par->n;
   r=k+1;
   Mk=r+1;
@@ -136,6 +139,9 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
 
   /* free memory */
   free_spinor_field(p);
+#ifdef WITH_GPU
+  free_spinor_field_gpu(p);
+#endif //WITH_GPU
   free(z1); free(z2); free(z3);
 
   /* return number of cg iter */
