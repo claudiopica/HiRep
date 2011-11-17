@@ -8,7 +8,7 @@
 #include "gpu.h"
 
 #define _TOCOMPLEX(sp) (COMPLEX *(sp))
-#define _NCOM (sizeof(_SPINOR_FIELD_TYPE)/sizeof(COMPLEX))
+#define _NCOM (sizeof(_SPINOR_TYPE)/sizeof(COMPLEX))
 
 /* Re <s1,s2> */
 double _FUNC(spinor_field_prod_re)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)

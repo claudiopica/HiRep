@@ -178,7 +178,7 @@ __global__ void spinor_field_add_gpu(SPINOR_TYPE *r, SPINOR_TYPE *s1, SPINOR_TYP
 }
 
 /* r=s1-s2 */
-template< typename SPINOR_TYPE >
+template< typename COMPLEX >
 __global__ void spinor_field_sub_gpu(COMPLEX *r, COMPLEX* s1, COMPLEX *s2,int N){
   int i = blockIdx.x*BLOCK_SIZE + threadIdx.x;
   if (i<N) {
