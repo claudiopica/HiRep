@@ -106,11 +106,14 @@ template< typename SPINOR_TYPE, typename COMPLEX >
 }
 
 /* Re <g5*s1,s2> */
-template<typename SPINOR_TYPE, typename REAL>
-  __global__ void spinor_field_g5_prod_re_gpu(SPINOR_TYPE* s1, SPINOR_TYPE* s2, REAL* resField,int N){
+template<typename COMPLEX, typename REAL>
+  __global__ void spinor_field_g5_prod_re_gpu(COMPLEX* s1, COMPLEX* s2, REAL* resField,int N){
   int i = blockIdx.x*BLOCK_SIZE + threadIdx.x;
-  if (i<N){
-    _spinor_g5_prod_re_f(resField[i],s1[i],s2[i]);
+  i=min(i,N-1);
+  
+  resField[i]=_complex_prod_re(s1[i],s2[i]);
+  if (i>((N>>1)-1)){
+  	resField[i]=-resField[i];
   }
 }
 
@@ -178,8 +181,8 @@ __global__ void spinor_field_add_gpu(SPINOR_TYPE *r, SPINOR_TYPE *s1, SPINOR_TYP
 }
 
 /* r=s1-s2 */
-template< typename COMPLEX >
-__global__ void spinor_field_sub_gpu(COMPLEX *r, COMPLEX* s1, COMPLEX *s2,int N){
+template< typename TYPE >
+__global__ void spinor_field_sub_gpu(TYPE *r, TYPE * s1, TYPE *s2,int N){
   int i = blockIdx.x*BLOCK_SIZE + threadIdx.x;
   if (i<N) {
     _complex_sub(r[i],s1[i],s2[i]);

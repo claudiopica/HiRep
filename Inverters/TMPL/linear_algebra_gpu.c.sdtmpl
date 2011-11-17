@@ -97,11 +97,12 @@ double _FUNC(spinor_field_g5_prod_re)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE
   _REAL* resField;
   
   int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
+  N*=_NCOM;
   int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
   cudaMalloc((void **) &resField,N*sizeof(_REAL));
   cudaMalloc((void **) &resGPU,sizeof(_REAL));
 
-  spinor_field_g5_prod_re_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(s1),START_SP_ADDRESS_GPU(s2),resField,N);
+  spinor_field_g5_prod_re_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),resField,N);
   global_sum_gpu<<<1,BLOCK_SIZE>>>(resField,resGPU,N);  
   cudaMemcpy(&res,resGPU,sizeof(_REAL),cudaMemcpyDeviceToHost);
   cudaFree(resField);
