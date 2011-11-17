@@ -168,7 +168,7 @@ int main(int argc,char *argv[])
 
   lprintf("MAIN",0,"done.\n");
   lprintf("LA TEST",0,"Checking the diracoperator..\n");
-
+/*
   Dphi_(s1,s0);
   Dphi__cpu(s1,s0);
   
@@ -192,11 +192,17 @@ int main(int argc,char *argv[])
   lprintf("LA TEST",0,"Time: %1.10gms\n",elapsed);
 
     gflops=n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*532./elapsed/1.e6; 
-    lprintf("LA TEST",0,"GFLOPS: %1.4gms\n\n",gflops);
-    
-    
+    lprintf("LA TEST",0,"GFLOPS: %1.4g\n\n",gflops);
+*/    
+  t1 = gpuTimerStart();
+  for (i=0;i<n_times;++i){
+    res_gpu = spinor_field_sub_f(s2,s0,s1);
+  }
   elapsed = gpuTimerStop(t1);
-  lprintf("LA TEST",0,"DONE!\n\n");
+  gflops=n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*24.*2./elapsed/1.e6; 
+    lprintf("LA TEST",0,"SQnorm GFLOPS: %1.4g\n\n",gflops);
+ 
+    lprintf("LA TEST",0,"DONE!\n\n");
 
 
   free_spinor_field(s0);

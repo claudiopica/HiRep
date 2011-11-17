@@ -15,10 +15,8 @@ void __cudaSafeCall( cudaError_t err, const char *file, const int line )
     {
         if ( cudaSuccess != err )
         {
-            lprintf("CUDA",0,"cudaSafeCall() failed at %s:%i\n",
-                     file, line);
-            error((cudaSuccess != err),1,"CudaSafeCall", 
-                  cudaGetErrorString( err ));
+            lprintf("CUDA",0,"cudaSafeCall() failed at %s:%i\n", file, line);
+            error((cudaSuccess != err),1,"CudaSafeCall", cudaGetErrorString( err ));
         }
     } while ( 0 );
 
@@ -41,11 +39,8 @@ inline void __cudaCheckError( const char *file, const int line )
         cudaError_t err = cudaGetLastError();
         if ( cudaSuccess != err )
         {
-            lprintf("CUDA",0,"cudaCheckError() failed at %s:%i\n",
-                    file, line);
-
+            lprintf("CUDA",0,"cudaCheckError() failed at %s:%i\n", file, line);
             error((cudaSuccess != err),1,"CudaCheckError", cudaGetErrorString( err ));
-          
         }
 
         // More careful checking. However, this will affect performance.
@@ -53,11 +48,8 @@ inline void __cudaCheckError( const char *file, const int line )
         err = cudaThreadSynchronize();
         if( cudaSuccess != err )
         {
-            lprintf("CUDA",0,"cudaCheckError() with sync failed at %s:%i\n",
-                    file, line);
-            
-            error((cudaSuccess != err),1,"CudaCheckError with sync",
-                  cudaGetErrorString( err ));
+            lprintf("CUDA",0,"cudaCheckError() with sync failed at %s:%i\n", file, line);
+            error((cudaSuccess != err),1,"CudaCheckError with sync", cudaGetErrorString( err ));
         }
     } while ( 0 );
 
