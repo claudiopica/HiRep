@@ -7,8 +7,8 @@
 #include "linear_algebra_gpu.cu"
 #include "gpu.h"
 
-#define _TOCOMPLEX(sp) (COMPLEX *(sp))
-#define _NCOM (sizeof(_SPINOR_TYPE)/sizeof(COMPLEX))
+#define _TOCOMPLEX(sp) ((_COMPLEX *)(sp))
+#define _NCOM (sizeof(_SPINOR_TYPE)/sizeof(_COMPLEX))
 
 /* Re <s1,s2> */
 double _FUNC(spinor_field_prod_re)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
@@ -26,7 +26,7 @@ double _FUNC(spinor_field_prod_re)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s
   cudaMalloc((void **) &resField,N*sizeof(_REAL));
   cudaMalloc((void **) &resGPU,sizeof(_REAL));
   
-  spinor_field_prod_re_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),resField,N);
+  spinor_field_prod_re_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(s1),START_SP_ADDRESS_GPU(s2),resField,N);
   global_sum_gpu<<<1,BLOCK_SIZE>>>(resField,resGPU,N);
   
   // Copy result to device
