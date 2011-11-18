@@ -51,162 +51,211 @@ unsigned long int getMVM() {
  * or on spinors with definite parity
  */
 
+typedef struct _suNf_hspinor
+{
+    suNf_vector c[2];
+} suNf_hspinor;
+
 
 __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in, suNf* gauge, int *iup, int *idn, int N){
-  suNf_spinor r,sn;
-  suNf_vector psi,chi;
+    suNf_spinor r;
+    suNf_hspinor sn;
   suNf u;
   int iy;
   int ix = blockIdx.x*BLOCK_SIZE + threadIdx.x;
+    ix = min (ix,N-1);
 
-  if (ix < N){
       /******************************* direction +0 *********************************/
       iy=iup(ix,0);
-      sn= in[iy];
+      sn.c[0]= in[iy].c[0];
+      sn.c[1]= in[iy].c[2];
+    
       u = gauge[coord_to_index(ix,0)];
       
-      _vector_add_f(psi,sn.c[0],sn.c[2]);
-      _suNf_multiply(chi,u,psi);
+      _vector_add_assign_f(sn.c[0],sn.c[1]);
+      _suNf_multiply(r.c[0],u,sn.c[0]);
       
-      r.c[0]=chi;
-      r.c[2]=chi;
+      r.c[2]=r.c[0]
 
-      _vector_add_f(psi,sn.c[1],sn.c[3]);
-      _suNf_multiply(chi,u,psi);
+    sn.c[0]= in[iy].c[1];
+    sn.c[1]= in[iy].c[3];
+    
+    
+      _vector_add_assign_f(sn.c[0],sn.c[1]);
+      _suNf_multiply(r.c[1],u,psi);
       
-       r.c[1]=chi;
-       r.c[3]=chi;
+       r.c[3]=r.c[1];
 
        /******************************* direction -0 *********************************/
 
        iy=idn(ix,0);
-       sn = in[iy];
+       
+    sn.c[0]= in[iy].c[0];
+    sn.c[1]= in[iy].c[2];
+    
        u = gauge[coord_to_index(iy,0)];
 
-       _vector_sub_f(psi,sn.c[0],sn.c[2]);
-       _suNf_inverse_multiply(chi,u,psi);
+       _vector_sub_assign_f(sn.c[0],sn.c[1]);
+       _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
 
-       _vector_add_assign_f(r.c[0],chi);
-       _vector_sub_assign_f(r.c[2],chi);
+       _vector_add_assign_f(r.c[0],sn.c[1]);
+       _vector_sub_assign_f(r.c[2],sn.c[1]);
 
-       _vector_sub_f(psi,sn.c[1],sn.c[3]);
-       _suNf_inverse_multiply(chi,u,psi);
+    sn.c[0]= in[iy].c[1];
+    sn.c[1]= in[iy].c[3];
+
+       _vector_sub_assign_f(sn.c[0],sn.c[1]);
+       _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
       
-       _vector_add_assign_f(r.c[1],chi);
-       _vector_sub_assign_f(r.c[3],chi);       
+       _vector_add_assign_f(r.c[1],sn.c[1]);
+       _vector_sub_assign_f(r.c[3],sn.c[1]);       
 
       /******************************* direction +1 *********************************/
 
        iy=iup(ix,1);
-       sn = in[iy];
+       
+    sn.c[0]= in[iy].c[0];
+    sn.c[1]= in[iy].c[3];
+
        u = gauge[coord_to_index(ix,1)];
       
-       _vector_i_add_f(psi,sn.c[0],sn.c[3]);
-       _suNf_multiply(chi,u,psi);
+       _vector_i_add_assign_f(sn.c[0],sn.c[1]);
+       _suNf_multiply(sn.c[1],u,sn.c[0]);
 
-       _vector_add_assign_f(r.c[0],chi);
-       _vector_i_sub_assign_f(r.c[3],chi);
+       _vector_add_assign_f(r.c[0],sn.c[1]);
+       _vector_i_sub_assign_f(r.c[3],sn.c[1]);
 
-       _vector_i_add_f(psi,sn.c[1],sn.c[2]);
-       _suNf_multiply(chi,u,psi);
+    sn.c[0]= in[iy].c[1];
+    sn.c[1]= in[iy].c[2];
 
-       _vector_add_assign_f(r.c[1],chi);
-       _vector_i_sub_assign_f(r.c[2],chi);
+       _vector_i_add_assign_f(sn.c[0],sn.c[1]);
+       _suNf_multiply(sn.c[1],u,sn.c[0]);
+
+       _vector_add_assign_f(r.c[1],sn.c[1]);
+       _vector_i_sub_assign_f(r.c[2],sn.c[1]);
 
        /******************************* direction -1 *********************************/
 
        iy=idn(ix,1);
-       sn = in[iy];
+    
+    sn.c[0]= in[iy].c[0];
+    sn.c[1]= in[iy].c[3];
+    
        u = gauge[coord_to_index(iy,1)];
 
+       _vector_i_sub_assign_f(sn.c[0],sn.c[1]);
+       _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
 
-       _vector_i_sub_f(psi,sn.c[0],sn.c[3]);
-       _suNf_inverse_multiply(chi,u,psi);
+       _vector_add_assign_f(r.c[0],sn.c[1]);
+       _vector_i_add_assign_f(r.c[3],sn.c[1]);
 
-       _vector_add_assign_f(r.c[0],chi);
-       _vector_i_add_assign_f(r.c[3],chi);
+    sn.c[0]= in[iy].c[1];
+    sn.c[1]= in[iy].c[2];
+    
+       _vector_i_sub_assign_f(sn.c[0],sn.c[1]);
+       _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
 
-       _vector_i_sub_f(psi,sn.c[1],sn.c[2]);
-       _suNf_inverse_multiply(chi,u,psi);
-
-       _vector_add_assign_f(r.c[1],chi);
-       _vector_i_add_assign_f(r.c[2],chi);
+       _vector_add_assign_f(r.c[1],sn.c[1]);
+       _vector_i_add_assign_f(r.c[2],sn.c[1]);
 
        /******************************* direction +2 *********************************/
        iy= iup(ix,2);
-       sn = in[iy];
+    
+    sn.c[0]= in[iy].c[0];
+    sn.c[1]= in[iy].c[3];
+    
        u = gauge[coord_to_index(ix,2)];
 
+       _vector_add_assign_f(sn.c[0],sn.c[1]);
+       _suNf_multiply(sn.c[1],u,sn.c[0]);
 
-       _vector_add_f(psi,sn.c[0],sn.c[3]);
-       _suNf_multiply(chi,u,psi);
+       _vector_add_assign_f(r.c[0],sn.c[1]);
+       _vector_add_assign_f(r.c[3],sn.c[1]);
 
-       _vector_add_assign_f(r.c[0],chi);
-       _vector_add_assign_f(r.c[3],chi);
+    sn.c[0]= in[iy].c[1];
+    sn.c[1]= in[iy].c[2];
 
-       _vector_sub_f(psi,sn.c[1],sn.c[2]);
-       _suNf_multiply(chi,u,psi);
+       _vector_sub_assign_f(sn.c[0],sn.c[1]);
+       _suNf_multiply(sn.c[1],u,sn.c[0]);
       
-       _vector_add_assign_f(r.c[1],chi);
-       _vector_sub_assign_f(r.c[2],chi);
+       _vector_add_assign_f(r.c[1],sn.c[1]);
+       _vector_sub_assign_f(r.c[2],sn.c[1]);
 
        /******************************* direction -2 *********************************/
        iy = idn(ix,2);
-       sn = in[iy];
+       
+    sn.c[0]= in[iy].c[0];
+    sn.c[1]= in[iy].c[3];
+
        u  = gauge[coord_to_index(iy,2)];
 
-       _vector_sub_f(psi,sn.c[0],sn.c[3]);
-       _suNf_inverse_multiply(chi,u,psi);
+       _vector_sub_assign_f(sn.c[0],sn.c[1]);
+       _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
 
-       _vector_add_assign_f(r.c[0],chi);
-       _vector_sub_assign_f(r.c[3],chi);
+       _vector_add_assign_f(r.c[0],sn.c[1]);
+       _vector_sub_assign_f(r.c[3],sn.c[1]);
 
-       _vector_add_f(psi,sn.c[1],sn.c[2]);
-       _suNf_inverse_multiply(chi,u,psi);
+    sn.c[0]= in[iy].c[1];
+    sn.c[1]= in[iy].c[2];
+
+       _vector_add_assign_f(sn.c[0],sn.c[1]);
+       _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
       
-       _vector_add_assign_f(r.c[1],chi);
-       _vector_add_assign_f(r.c[2],chi);
+       _vector_add_assign_f(r.c[1],sn.c[1]);
+       _vector_add_assign_f(r.c[2],sn.c[1]);
 
        /******************************* direction +3 *********************************/
        iy = iup(ix,3);
-       sn = in[iy];
+       
+    sn.c[0]= in[iy].c[0];
+    sn.c[1]= in[iy].c[2];
+       
        u  = gauge[coord_to_index(ix,3)];
 
       
-       _vector_i_add_f(psi,sn.c[0],sn.c[2]);
-       _suNf_multiply(chi,u,psi);
+       _vector_i_add_assign_f(sn.c[0],sn.c[1]);
+       _suNf_multiply(sn.c[1],u,sn.c[0]);
 
-       _vector_add_assign_f(r.c[0],chi);
-       _vector_i_sub_assign_f(r.c[2],chi);
+       _vector_add_assign_f(r.c[0],sn.c[1]);
+       _vector_i_sub_assign_f(r.c[2],sn.c[1]);
 
-       _vector_i_sub_f(psi,sn.c[1],sn.c[3]);
-       _suNf_multiply(chi,u,psi);
+    sn.c[0]= in[iy].c[1];
+    sn.c[1]= in[iy].c[3];
 
-       _vector_add_assign_f(r.c[1],chi);
-       _vector_i_add_assign_f(r.c[3],chi);
+       _vector_i_sub_assign_f(sn.c[0],sn.c[1]);
+       _suNf_multiply(sn.c[1],u,sn.c[0]);
+
+       _vector_add_assign_f(r.c[1],sn.c[1]);
+       _vector_i_add_assign_f(r.c[3],sn.c[1]);
 
        /******************************* direction -3 *********************************/
 
        iy = idn(ix,3);
-       sn = in[iy];
+       
+    sn.c[0]= in[iy].c[0];
+    sn.c[1]= in[iy].c[2];
+
        u  = gauge[coord_to_index(iy,3)];
       
-       _vector_i_sub_f(psi,sn.c[0],sn.c[2]);
-       _suNf_inverse_multiply(chi,u,psi);
+       _vector_i_sub_assign_f(sn.c[0],sn.c[1]);
+       _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
       
-       _vector_add_assign_f(r.c[0],chi);
-       _vector_i_add_assign_f(r.c[2],chi);
+       _vector_add_assign_f(r.c[0],sn.c[1]);
+       _vector_i_add_assign_f(r.c[2],sn.c[1]);
 
-       _vector_i_add_f(psi,sn.c[1],sn.c[3]);
-       _suNf_inverse_multiply(chi,u,psi);
+    sn.c[0]= in[iy].c[1];
+    sn.c[1]= in[iy].c[3];
 
-       _vector_add_assign_f(r.c[1],chi);
-       _vector_i_sub_assign_f(r.c[3],chi);
+       _vector_i_add_assign_f(sn.c[0],sn.c[1]);
+       _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+
+       _vector_add_assign_f(r.c[1],sn.c[1]);
+       _vector_i_sub_assign_f(r.c[3],sn.c[1]);
        /******************************** end of directions *********************************/      
 
        _spinor_mul_f(r,-0.5,r);
        out[ix]=r;
-    }
+    
  }
  
 
