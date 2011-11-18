@@ -333,6 +333,7 @@ void _FUNC(spinor_field_clc_add_assign)(_SPINOR_FIELD_TYPE *s1, complex cd1, _SP
 void _FUNC(spinor_field_g5)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
   int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
+  N *= _NCOM;
   int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
   spinor_field_g5_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),N);
   CudaCheckError(); 
