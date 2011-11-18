@@ -75,14 +75,14 @@ __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in, suNf* gauge, int *iu
       _vector_add_assign_f(sn.c[0],sn.c[1]);
       _suNf_multiply(r.c[0],u,sn.c[0]);
       
-      r.c[2]=r.c[0]
+      r.c[2]=r.c[0];
 
     sn.c[0]= in[iy].c[1];
     sn.c[1]= in[iy].c[3];
     
     
       _vector_add_assign_f(sn.c[0],sn.c[1]);
-      _suNf_multiply(r.c[1],u,psi);
+      _suNf_multiply(r.c[1],u,sn.c[0]);
       
        r.c[3]=r.c[1];
 
