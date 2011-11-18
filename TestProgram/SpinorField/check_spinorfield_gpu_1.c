@@ -322,13 +322,13 @@ int main(int argc,char *argv[])
 
   //Check spinor_field_g5
   for (i=0;i<sfsize;i++){ spinor_field_copy_to_gpu_f(&sf1[i]); }
-  spinor_field_g5_assign_f(&sf1[0]);
-  spinor_field_g5_assign_f_cpu(&sf1[0]);
+  spinor_field_g5_f(&sf1[0],&sf1[1]);
+  spinor_field_g5_f_cpu(&sf1[0],&sf1[1]);
   
   res_gpu = spinor_field_sqnorm_f(&sf1[0]);
   res_cpu = spinor_field_sqnorm_f_cpu(&sf1[0]);
   
-  lprintf("LA TEST",0,"Check spinor_field_g5_assign\nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g, \nsqnorm(gpu-cpu)= %1.10g\n\n",res_gpu,res_cpu,sfdiff(&sf1[0]));
+  lprintf("LA TEST",0,"Check spinor_field_g5\nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g, \nsqnorm(gpu-cpu)= %1.10g\n\n",res_gpu,res_cpu,sfdiff(&sf1[0]));
 
 
   //Check spinor_field_g5_assign

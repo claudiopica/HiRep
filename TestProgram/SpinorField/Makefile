@@ -19,7 +19,7 @@ MODS := boundary_conditions # suN_utils suN_exp single_double_utils
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Memory
-MODS := amalloc field_alloc spinor_field_alloc 
+MODS := amalloc field_alloc spinor_field_alloc field_pack_gpu
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Observables
@@ -35,7 +35,7 @@ MODS := random_su2 representation random_spinor_field # cabmar staples update_hb
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Error
-MODS := error
+MODS := error error_gpu
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 # MODDIR := Statistics

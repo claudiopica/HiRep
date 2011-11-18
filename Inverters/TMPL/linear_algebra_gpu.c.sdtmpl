@@ -17,16 +17,15 @@ double _FUNC(spinor_field_prod_re)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s
   _REAL * resGPU; // one number
   _REAL * resField; // resulting scalar field when dotting each spinor
   
-  int start_add = s1->type->master_start[0];
-
   int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1; 
+  N *= _NCOM;
   int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
   
   // Allocate temp field
   cudaMalloc((void **) &resField,N*sizeof(_REAL));
   cudaMalloc((void **) &resGPU,sizeof(_REAL));
   
-  spinor_field_prod_re_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(s1),START_SP_ADDRESS_GPU(s2),resField,N);
+  spinor_field_prod_re_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),resField,N);
   global_sum_gpu<<<1,BLOCK_SIZE>>>(resField,resGPU,N);
   
   // Copy result to device
@@ -47,11 +46,12 @@ double _FUNC(spinor_field_prod_im)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s
   _REAL* resField;
   
   int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
+  N *= _NCOM;
   int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
   cudaMalloc((void **) &resField,N*sizeof(_REAL));
   cudaMalloc((void **) &resGPU,sizeof(_REAL));
   
-  spinor_field_prod_im_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(s1),START_SP_ADDRESS_GPU(s2),resField,N);
+  spinor_field_prod_im_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),resField,N);
   global_sum_gpu<<<1,BLOCK_SIZE>>>(resField,resGPU,N);
   cudaMemcpy(&res,resGPU,sizeof(_REAL),cudaMemcpyDeviceToHost);
   cudaFree(resField);
@@ -68,6 +68,7 @@ complex _FUNC(spinor_field_prod)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
   _COMPLEX * resField; 	// resulting scalar field when dotting each spinor
 
   int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1; 
+  N *= _NCOM;
   int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
  
   // Allocate temp field
@@ -78,7 +79,7 @@ complex _FUNC(spinor_field_prod)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 //  complex_field_zero_gpu<<<grid,BLOCK_SIZE>>>(resField,N);
  
   // Calling kernel
-  spinor_field_prod_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(s1),START_SP_ADDRESS_GPU(s2),resField,N);
+  spinor_field_prod_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),resField,N);
   global_sum_complex_gpu<<<1,BLOCK_SIZE>>>(resField,resGPU,N);
     
   // Copy result to device
@@ -119,7 +120,8 @@ double _FUNC(spinor_field_g5_prod_im)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE
   _REAL * resGPU; // one number
   _REAL * resField; // resulting scalar field when dotting each spinor
 
-  int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1; 
+  int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
+  N *= _NCOM;
   int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
 
   // Allocate temp field
@@ -127,7 +129,7 @@ double _FUNC(spinor_field_g5_prod_im)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE
   cudaMalloc((void **) &resGPU,sizeof(_REAL));
 
   // Invoke kernel
-  spinor_field_g5_prod_im_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(s1),START_SP_ADDRESS_GPU(s2),resField,N);
+  spinor_field_g5_prod_im_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),resField,N);
   global_sum_gpu<<<1,BLOCK_SIZE>>>(resField,resGPU,N);
     
   // Copy result to device
@@ -149,11 +151,12 @@ double _FUNC(spinor_field_sqnorm)(_SPINOR_FIELD_TYPE *s1)
   _REAL* resField;
   
   int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
+  N *= _NCOM;
   int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
   cudaMalloc((void **) &resField,N*sizeof(_REAL));
   cudaMalloc((void **) &resGPU,sizeof(_REAL));
 
-  spinor_field_sqnorm_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(s1),resField,N);
+  spinor_field_sqnorm_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),resField,N);
   global_sum_gpu<<<1,BLOCK_SIZE>>>(resField,resGPU,N);  
   cudaMemcpy(&res,resGPU,sizeof(_REAL),cudaMemcpyDeviceToHost);
   cudaFree(resField);
@@ -167,9 +170,10 @@ void _FUNC(spinor_field_mul_add_assign)(_SPINOR_FIELD_TYPE *s1, double r, _SPINO
 {
   _REAL rr=(_REAL) r;
   int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
+  N *= _NCOM;
   int grid=N/BLOCK_SIZE + ((N%BLOCK_SIZE == 0) ? 0 : 1);
 
-  spinor_field_mul_add_assign_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(s1),rr,START_SP_ADDRESS_GPU(s2),N);
+  spinor_field_mul_add_assign_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),rr,_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),N);
 
   CudaCheckError();
 }
@@ -180,8 +184,9 @@ void _FUNC(spinor_field_mulc_add_assign)(_SPINOR_FIELD_TYPE *s1, complex c, _SPI
   _COMPLEX c1;
   c1.re=(_REAL)c.re; c1.im=(_REAL)c.im; 
   int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
+  N *= _NCOM;
   int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
-  spinor_field_mulc_add_assign_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(s1),c1,START_SP_ADDRESS_GPU(s2),N);
+  spinor_field_mulc_add_assign_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),c1,_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),N);
   CudaCheckError();
 }
 
@@ -191,9 +196,10 @@ void _FUNC(spinor_field_mul)(_SPINOR_FIELD_TYPE *s1, double r, _SPINOR_FIELD_TYP
   _REAL rr=(_REAL) r;
   
   int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
+  N *= _NCOM;
   int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
   
-  spinor_field_mul_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(s1),rr,START_SP_ADDRESS_GPU(s2),N);
+  spinor_field_mul_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),rr,_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),N);
   CudaCheckError();
 }
 
@@ -203,8 +209,9 @@ void _FUNC(spinor_field_mulc)(_SPINOR_FIELD_TYPE *s1, complex c, _SPINOR_FIELD_T
   _COMPLEX c1;
   c1.re=(_REAL)c.re; c1.im=(_REAL)c.im; 
   int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
+  N *= _NCOM;
   int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
-  spinor_field_mulc_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(s1),c1,START_SP_ADDRESS_GPU(s2),N);
+  spinor_field_mulc_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),c1,_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),N);
   CudaCheckError();
 }
 
@@ -212,15 +219,17 @@ void _FUNC(spinor_field_mulc)(_SPINOR_FIELD_TYPE *s1, complex c, _SPINOR_FIELD_T
 void _FUNC(spinor_field_add)(_SPINOR_FIELD_TYPE *r, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
   int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
+  N *= _NCOM;
   int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
-  spinor_field_add_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(r),START_SP_ADDRESS_GPU(s1),START_SP_ADDRESS_GPU(s2),N);
+  spinor_field_add_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(r)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),N);
   CudaCheckError();
 }
 
 /* r=s1-s2 */
 void _FUNC(spinor_field_sub)(_SPINOR_FIELD_TYPE *r, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
-  int N = _NCOM*(s1->type->master_end[0] -  s1->type->master_start[0] + 1);
+  int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
+  N *= _NCOM;
   int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
   spinor_field_sub_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(r)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),N);
   CudaCheckError();
@@ -230,9 +239,10 @@ void _FUNC(spinor_field_sub)(_SPINOR_FIELD_TYPE *r, _SPINOR_FIELD_TYPE *s1, _SPI
 void _FUNC(spinor_field_add_assign)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
   int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
+  N *= _NCOM;
   int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
   
-  spinor_field_add_assign_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(s1),START_SP_ADDRESS_GPU(s2),N);
+  spinor_field_add_assign_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),N);
   CudaCheckError();
 }
 
@@ -240,8 +250,9 @@ void _FUNC(spinor_field_add_assign)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *
 void _FUNC(spinor_field_sub_assign)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
   int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
+  N *= _NCOM;
   int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
-  spinor_field_sub_assign_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(s1),START_SP_ADDRESS_GPU(s2),N);
+  spinor_field_sub_assign_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),N);
   CudaCheckError();
 }
 
@@ -249,8 +260,9 @@ void _FUNC(spinor_field_sub_assign)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *
 void _FUNC(spinor_field_zero)(_SPINOR_FIELD_TYPE *s1)
 {
   int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
+  N *= _NCOM;
   int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
-  spinor_field_zero_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(s1),N);
+  spinor_field_zero_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),N);
   CudaCheckError();
 }
 
@@ -258,8 +270,9 @@ void _FUNC(spinor_field_zero)(_SPINOR_FIELD_TYPE *s1)
 void _FUNC(spinor_field_minus)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
   int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
+  N *= _NCOM;
   int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
-  spinor_field_minus_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(s1),START_SP_ADDRESS_GPU(s2),N);
+  spinor_field_minus_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),N);
   CudaCheckError();
 }
 
@@ -270,8 +283,9 @@ void _FUNC(spinor_field_lc)(_SPINOR_FIELD_TYPE *s1, double r1, _SPINOR_FIELD_TYP
   _REAL rr2= (_REAL) r2;
 
   int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
+  N *= _NCOM;
   int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
-  spinor_field_lc_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(s1),rr1,START_SP_ADDRESS_GPU(s2),rr2,START_SP_ADDRESS_GPU(s3),N);
+  spinor_field_lc_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),rr1,_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),rr2,_TOCOMPLEX(START_SP_ADDRESS_GPU(s3)),N);
   CudaCheckError();
 }
 
@@ -281,8 +295,9 @@ void _FUNC(spinor_field_lc_add_assign)(_SPINOR_FIELD_TYPE *s1, double r1, _SPINO
   _REAL rr1=(_REAL)r1;
   _REAL rr2=(_REAL)r2;
   int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
+  N *= _NCOM;
   int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
-  spinor_field_lc_add_assign_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(s1),rr1,START_SP_ADDRESS_GPU(s2),rr2,START_SP_ADDRESS_GPU(s3),N);
+  spinor_field_lc_add_assign_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),rr1,_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),rr2,_TOCOMPLEX(START_SP_ADDRESS_GPU(s3)),N);
   CudaCheckError();
 }
 
@@ -294,8 +309,9 @@ void _FUNC(spinor_field_clc)(_SPINOR_FIELD_TYPE *s1, complex cd1, _SPINOR_FIELD_
   c2.re=(_REAL)cd2.re; c2.im=(_REAL)cd2.im;
    
   int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
+  N *= _NCOM;
   int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
-  spinor_field_clc_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(s1),c1,START_SP_ADDRESS_GPU(s2),c2,START_SP_ADDRESS_GPU(s3),N);
+  spinor_field_clc_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),c1,_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),c2,_TOCOMPLEX(START_SP_ADDRESS_GPU(s3)),N);
   CudaCheckError();
 }
 
@@ -307,8 +323,9 @@ void _FUNC(spinor_field_clc_add_assign)(_SPINOR_FIELD_TYPE *s1, complex cd1, _SP
   c2.re=(_REAL)cd2.re; c2.im=(_REAL)cd2.im;
    
   int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
+  N *= _NCOM;
   int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
-  spinor_field_clc_add_assign_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(s1),c1,START_SP_ADDRESS_GPU(s2),c2,START_SP_ADDRESS_GPU(s3),N);
+  spinor_field_clc_add_assign_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),c1,_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),c2,_TOCOMPLEX(START_SP_ADDRESS_GPU(s3)),N);
   CudaCheckError(); 
 }
 
@@ -317,7 +334,7 @@ void _FUNC(spinor_field_g5)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
   int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
   int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
-  spinor_field_g5_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(s1),START_SP_ADDRESS_GPU(s2),N);
+  spinor_field_g5_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),N);
   CudaCheckError(); 
 }
 
@@ -325,9 +342,10 @@ void _FUNC(spinor_field_g5)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 void _FUNC(spinor_field_g5_assign)(_SPINOR_FIELD_TYPE *s1)
 {
   int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
+  N *= _NCOM;
   int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
   
-  spinor_field_g5_assign_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(s1),N);
+  spinor_field_g5_assign_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),N);
   CudaCheckError(); 
 
 }
@@ -339,9 +357,10 @@ void _FUNC(spinor_field_lc1)(double c1, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TY
   _REAL cc1=(_REAL)c1;
   
   int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
+  N *= _NCOM;
   int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
   
-  spinor_field_lc1_gpu<<<grid,BLOCK_SIZE>>>(cc1,START_SP_ADDRESS_GPU(s1),START_SP_ADDRESS_GPU(s2),N);
+  spinor_field_lc1_gpu<<<grid,BLOCK_SIZE>>>(cc1,_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),N);
   CudaCheckError(); 
 
 }
@@ -353,9 +372,10 @@ void _FUNC(spinor_field_lc2)(double c1, double c2, _SPINOR_FIELD_TYPE *s1, _SPIN
   _REAL r2=(_REAL)c2;
 
   int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
+  N *= _NCOM;
   int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
   
-  spinor_field_lc2_gpu<<<grid,BLOCK_SIZE>>>(r1,r2,START_SP_ADDRESS_GPU(s1),START_SP_ADDRESS_GPU(s2),N);
+  spinor_field_lc2_gpu<<<grid,BLOCK_SIZE>>>(r1,r2,_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),N);
   CudaCheckError(); 
 }
 
@@ -368,9 +388,10 @@ void _FUNC(spinor_field_lc3)(double c1, double c2, _SPINOR_FIELD_TYPE *s1, _SPIN
    
 
   int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
+  N *= _NCOM;  
   int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
   
-  spinor_field_lc3_gpu<<<grid,BLOCK_SIZE>>>(cc1,cc2,START_SP_ADDRESS_GPU(s1),START_SP_ADDRESS_GPU(s2),START_SP_ADDRESS_GPU(s3),N);
+  spinor_field_lc3_gpu<<<grid,BLOCK_SIZE>>>(cc1,cc2,_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s3)),N);
   CudaCheckError(); 
    
 }

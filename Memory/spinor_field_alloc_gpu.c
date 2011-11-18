@@ -38,7 +38,7 @@ void alloc_spinor_field_f_gpu(unsigned int n, spinor_field *field) {
     
 // DO SOME TESTS, e.g. deallocate memory if gpu_ptr != NULL
     
-    err = cudaMalloc(&p, n*field->type->gsize*sizeof(suNf_spinor));
+    err = cudaMalloc((void**) &p, n*field->type->gsize*sizeof(suNf_spinor));
     error(err!=cudaSuccess,1,"alloc_spinor_field_f_gpu [spinor_field_alloc_gpu.c]",
           "Could not allocate GPU memory space for the spinor fields");
     
@@ -50,15 +50,15 @@ void alloc_spinor_field_f_gpu(unsigned int n, spinor_field *field) {
 
 void spinor_field_copy_to_gpu_f(spinor_field *field){
     spinor_field *tmp = alloc_spinor_field_f(1, field->type);
-    spinor_field_togpuformat(tmp, field)
-  	cudaMemcpy(field->gpu_ptr,tmp->ptr,field->type->gsize*sizeof(suNf_spinor),cudaMemcpyHostToDevice);
+    spinor_field_togpuformat(tmp, field);
+    cudaMemcpy((void**) field->gpu_ptr,tmp->ptr,field->type->gsize*sizeof(suNf_spinor),cudaMemcpyHostToDevice);
     free_spinor_field(tmp);
 }
 
 void spinor_field_copy_from_gpu_f(spinor_field *field){
     spinor_field *tmp = alloc_spinor_field_f(1, field->type);
     cudaMemcpy(tmp->ptr,field->gpu_ptr,field->type->gsize*sizeof(suNf_spinor),cudaMemcpyDeviceToHost);
-	spinor_field_tocpuformat(field,tmp);
+    spinor_field_tocpuformat(field,tmp);
     free_spinor_field(tmp);
 }
 
@@ -78,7 +78,7 @@ void alloc_spinor_field_f_flt_gpu(unsigned int n, spinor_field_flt *field) {
     
     // DO SOME TESTS, e.g. deallocate memory if gpu_ptr != NULL
     
-    err = cudaMalloc(&p, n*field->type->gsize*sizeof(suNf_spinor_flt));
+    err = cudaMalloc((void **) &p, n*field->type->gsize*sizeof(suNf_spinor_flt));
     error(err!=cudaSuccess,1,"alloc_spinor_field_f_gpu [spinor_field_alloc_gpu.c]",
           "Could not allocate GPU memory space for the spinor fields");
     
