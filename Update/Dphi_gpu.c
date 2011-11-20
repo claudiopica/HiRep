@@ -82,11 +82,11 @@ __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in, suNf* gauge, int *iu
  */
 #define _suNf_read_spinor_gpu(v,in,x)\
 	(v).c[0]=(in)[iy+((x)*3)*stride]; \
-  (v).c[0]=(in)[iy+((x)*3+1)*stride]; \
-  (v).c[0]=(in)[iy+((x)*3+2)*stride]; 
+  (v).c[1]=(in)[iy+((x)*3+1)*stride]; \
+  (v).c[2]=(in)[iy+((x)*3+2)*stride]; 
 
 __global__ void Dphi_gpu_old(suNf_spinor* out, const suNf_spinor* in, 
-                             const suNf* gauge, const int *iup, onst int *idn, 
+                             const suNf* gauge, const int *iup, const int *idn, 
                              const int N, 
                              const int vol4h, const int stride)
 {
