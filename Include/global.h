@@ -17,9 +17,9 @@
 #include <stddef.h>
 
 #ifdef MAIN_PROGRAM
-#  define GLB_VAR(type,name,init) type name init
+#  define GLB_VAR(type,name,init...) type name init
 #else
-#  define GLB_VAR(type,name,init) extern type name
+#  define GLB_VAR(type,name,init...) extern type name
 #endif
 
 /* local lattice attributes */
@@ -76,10 +76,6 @@ GLB_VAR(int,*ipt, =NULL);
 GLB_VAR(int,*ipt_4d,=NULL);
 GLB_VAR(int,*iup,=NULL);
 GLB_VAR(int,*idn,=NULL);
-#ifdef WITH_GPU
-GLB_VAR(int,*iup_gpu,=NULL);
-GLB_VAR(int,*idn_gpu,=NULL);
-#endif //WITH_GPU
 
 /* Geometry structures */
 #define ipt(t,x,y,z) ipt[((((t)+T_BORDER)*(X_EXT)+((x)+X_BORDER))*(Y_EXT)+((y)+Y_BORDER))*(Z_EXT)+((z)+Z_BORDER)]
@@ -137,11 +133,7 @@ GLB_VAR(suNf_field_flt,*u_gauge_f_flt,=NULL);
 #define BC_Z 0.
 #endif
 
-#ifdef MAIN_PROGRAM
-double bc[4]={BC_T,BC_X,BC_Y,BC_Z};
-#else
-extern double bc[4];
-#endif
+GLB_VAR(double,bc[4],={BC_T,BC_X,BC_Y,BC_Z});
 
 #undef BC_T
 #undef BC_x
@@ -152,13 +144,15 @@ extern double bc[4];
 #include "input_par.h"
 GLB_VAR(input_glb,glb_var,=init_input_glb(glb_var));
 
-#undef GLB_VAR
+
 
 #ifdef WITH_GPU
 #define BLOCK_SIZE 256
-#endif
+GLB_VAR(int,*iup_gpu,=NULL);
+GLB_VAR(int,*idn_gpu,=NULL);
+#endif //WITH_GPU
 
-
+#undef GLB_VAR
 #endif
 
 
