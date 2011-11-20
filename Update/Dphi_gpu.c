@@ -58,7 +58,7 @@ typedef struct _suNf_hspinor
 
 __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in, suNf* gauge, int *iup, int *idn, int N){
   suNf_spinor r;
-  __shared__ suNf_hspinor sn[BLOCK_SIZE];
+  suNf_hspinor sn;
   suNf u;
   int iy;
   int ix = blockIdx.x*BLOCK_SIZE + threadIdx.x;
