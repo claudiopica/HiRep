@@ -56,7 +56,7 @@ typedef struct _suNf_hspinor
   suNf_vector c[2];
 } suNf_hspinor;
 
-__global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in, suNf* gauge, int *iup, int *idn, int N){
+__global__ void Dphi_gpu_test(suNf_spinor* out, suNf_spinor* in, suNf* gauge, int *iup, int *idn, int N){
   suNf_spinor r;
   suNf_hspinor sn;
   suNf u;
@@ -78,14 +78,14 @@ __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in, suNf* gauge, int *iu
 }    
 
 /* v = suNf_vector ; in = complex* ; 
-   ix = 0..3 spinor component 
+   x = 0..3 spinor component 
  */
 #define _suNf_read_spinor_gpu(v,in,x)\
 	(v).c[0]=(in)[iy+((x)*3)*stride]; \
   (v).c[1]=(in)[iy+((x)*3+1)*stride]; \
-  (v).c[2]=(in)[iy+((x)*3+2)*stride]; 
+  (v).c[2]=(in)[iy+((x)*3+2)*stride]
 
-__global__ void Dphi_gpu_old(suNf_spinor* out, const suNf_spinor* in, 
+__global__ void Dphi_gpu(suNf_spinor* out, const suNf_spinor* in, 
                              const suNf* gauge, const int *iup, const int *idn, 
                              const int N, 
                              const int vol4h, const int stride)
@@ -336,7 +336,13 @@ __global__ void Dphi_gpu_old(suNf_spinor* out, const suNf_spinor* in,
 void Dphi_(spinor_field *out, spinor_field *in)
 {
    int N,grid;
-
+  const int vol4h=T*X*Y*Z/2;
+#ifdef UPDATE_EO
+  const int stride=vol4h
+#else
+  const int stride=vol4h*2;
+#endif
+  
    error((in==NULL)||(out==NULL),1,"Dphi_ [Dphi.c]",
          "Attempt to access unallocated memory space");
    
@@ -352,7 +358,7 @@ void Dphi_(spinor_field *out, spinor_field *in)
    N = out->type->master_end[0] - out->type->master_start[0] + 1 ;
    grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
    
-   Dphi_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f->gpu_ptr,iup_gpu,idn_gpu,N);
+   Dphi_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f->gpu_ptr,iup_gpu,idn_gpu,N,vol4h,stride);
    
 }
 
@@ -363,7 +369,6 @@ void Dphi_(spinor_field *out, spinor_field *in)
  void Dphi(double m0, spinor_field *out, spinor_field *in)
 {
    double rho;
-   int N,grid;
 
    error((in==NULL)||(out==NULL),1,"Dphi [Dphi.cu]",
          "Attempt to access unallocated memory space");
@@ -376,10 +381,8 @@ void Dphi_(spinor_field *out, spinor_field *in)
    error(out->type!=&glattice || in->type!=&glattice,1,"Dphi [Dphi.cu]", "Spinors are not defined on all the lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
    
-   N = out->type->master_end[0] -out->type->master_start[0] + 1 ;
-   grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
-   
-   Dphi_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f->gpu_ptr,iup_gpu,idn_gpu,N);
+  Dphi_(out,in); 
+  
    rho=4.+m0;
    spinor_field_mul_add_assign_f(out,rho,in);
    
@@ -388,7 +391,6 @@ void Dphi_(spinor_field *out, spinor_field *in)
 void g5Dphi(double m0, spinor_field *out, spinor_field *in)
 {
   double rho;
-  int N,grid;
 
   error((in==NULL)||(out==NULL),1,"g5Dphi [Dphi.cu]",
 	"Attempt to access unallocated memory space");
@@ -400,10 +402,7 @@ void g5Dphi(double m0, spinor_field *out, spinor_field *in)
    error(out->type!=&glattice || in->type!=&glattice,1,"g5Dphi [Dphi.cu]", "Spinors are not defined on all the lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
-   N = out->type->master_end[0] - out->type->master_start[0] + 1 ;
-   grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
-   
-   Dphi_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out), START_SP_ADDRESS_GPU(in),u_gauge_f->gpu_ptr,iup_gpu,idn_gpu,N);
+  Dphi_(out,in); 
 
    rho=4.+m0;
    spinor_field_mul_add_assign_f(out,rho,in);
@@ -455,7 +454,6 @@ static void init_Dirac() {
 void Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
 {
   double rho;
-  int N,grid;
   
   error((in==NULL)||(out==NULL),1,"Dphi_eopre [Dphi.cu]",
 	"Attempt to access unallocated memory space");
@@ -470,11 +468,9 @@ void Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
   /* alloc memory for temporary spinor field */
   if (init) { init_Dirac(); }
   
-  N = out->type->master_end[0] -out->type->master_start[0] + 1 ;
-  grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
+  Dphi_(otmp, in);
+  Dphi_(out, otmp);
   
-  Dphi_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(otmp), START_SP_ADDRESS_GPU(in), u_gauge_f->gpu_ptr,iup_gpu,idn_gpu,N);
-  Dphi_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out), START_SP_ADDRESS_GPU(otmp), u_gauge_f->gpu_ptr,iup_gpu,idn_gpu,N);
   rho=4.0+m0;
   rho*=-rho; /* this minus sign is taken into account below */
   
@@ -491,7 +487,6 @@ void Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
 void Dphi_oepre(double m0, spinor_field *out, spinor_field *in)
 {
   double rho;
-  int N,grid;
   
   error((in==NULL)||(out==NULL),1,"Dphi_oepre [Dphi.cu]",
 	"Attempt to access unallocated memory space");
@@ -507,11 +502,8 @@ void Dphi_oepre(double m0, spinor_field *out, spinor_field *in)
   /* alloc memory for temporary spinor field */
   if (init) { init_Dirac();}
   
-  N = out->type->master_end[0] -out->type->master_start[0] + 1 ;
-  grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
-  
-  Dphi_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(etmp), START_SP_ADDRESS_GPU(in), u_gauge_f->gpu_ptr,iup_gpu,idn_gpu,N);
-  Dphi_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out), START_SP_ADDRESS_GPU(etmp), u_gauge_f->gpu_ptr,iup_gpu,idn_gpu,N);
+  Dphi_(etmp, in);
+  Dphi_(out, etmp);
 
   rho=4.0+m0;
   rho*=-rho; /* this minus sign is taken into account below */
@@ -527,7 +519,6 @@ void Dphi_oepre(double m0, spinor_field *out, spinor_field *in)
 void g5Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
 {
   double rho;
-  int N,grid;
 
   error((in==NULL)||(out==NULL),1,"g5Dphi_eopre [Dphi.cu]",
 	"Attempt to access unallocated memory space");
@@ -546,11 +537,8 @@ void g5Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
   /* alloc memory for temporary spinor field */
   if (init) { init_Dirac();}
   
-  N = out->type->master_end[0] -out->type->master_start[0] + 1 ;
-  grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
-  
-  Dphi_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(otmp), START_SP_ADDRESS_GPU(in), u_gauge_f->gpu_ptr,iup_gpu,idn_gpu,N);
-  Dphi_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out), START_SP_ADDRESS_GPU(otmp), u_gauge_f->gpu_ptr,iup_gpu,idn_gpu,N);
+  Dphi_(otmp, in);
+  Dphi_(out, otmp);
 
   rho=4.0+m0;
   rho*=-rho; /* this minus sign is taken into account below */
@@ -568,7 +556,7 @@ void g5Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
 /* g5Dphi_eopre ^2 */
 void g5Dphi_eopre_sq(double m0, spinor_field *out, spinor_field *in) {
   /* alloc memory for temporary spinor field */
-  if (init) { init_Dirac(); init=0; }
+  if (init) { init_Dirac(); }
 
   g5Dphi_eopre(m0, etmp, in);
   g5Dphi_eopre(m0, out, etmp);

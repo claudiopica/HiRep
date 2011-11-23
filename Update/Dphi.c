@@ -437,9 +437,9 @@ void Dphi_eopre_cpu(double m0, spinor_field *out, spinor_field *in)
 #endif /* defined(BASIC_SF) || defined(ROTATED_SF) */
 
   /* alloc memory for temporary spinor field */
-  if (init) { init_Dirac(); init=0; }
+  if (init) { init_Dirac(); }
   
-  Dphi_(otmp, in);
+  Dphi_cpu(otmp, in);
 #if defined(BASIC_SF) || defined(ROTATED_SF)
   SF_spinor_bcs(otmp);
 #endif /* defined(BASIC_SF) || defined(ROTATED_SF) */
@@ -481,7 +481,7 @@ void Dphi_oepre_cpu(double m0, spinor_field *out, spinor_field *in)
 #endif /* defined(BASIC_SF) || defined(ROTATED_SF) */
 
   /* alloc memory for temporary spinor field */
-  if (init) { init_Dirac(); init=0; }
+  if (init) { init_Dirac(); }
   
   Dphi__cpu(etmp, in);
 #if defined(BASIC_SF) || defined(ROTATED_SF)
@@ -522,7 +522,7 @@ void g5Dphi_eopre_cpu(double m0, spinor_field *out, spinor_field *in)
 #endif /* defined(BASIC_SF) || defined(ROTATED_SF) */
 
   /* alloc memory for temporary spinor field */
-  if (init) { init_Dirac(); init=0; }
+  if (init) { init_Dirac(); }
   
   Dphi__cpu(otmp, in);
 #if defined(BASIC_SF) || defined(ROTATED_SF)
@@ -546,7 +546,7 @@ void g5Dphi_eopre_cpu(double m0, spinor_field *out, spinor_field *in)
 /* g5Dphi_eopre ^2 */
 void g5Dphi_eopre_sq_cpu(double m0, spinor_field *out, spinor_field *in) {
   /* alloc memory for temporary spinor field */
-  if (init) { init_Dirac(); init=0; }
+  if (init) { init_Dirac(); }
 
   g5Dphi_eopre_cpu(m0, etmp, in);
   g5Dphi_eopre_cpu(m0, out, etmp);
@@ -556,7 +556,7 @@ void g5Dphi_eopre_sq_cpu(double m0, spinor_field *out, spinor_field *in) {
 /* g5Dhi ^2 */
 void g5Dphi_sq_cpu(double m0, spinor_field *out, spinor_field *in) {
   /* alloc memory for temporary spinor field */
-  if (init) { init_Dirac(); init=0; }
+  if (init) { init_Dirac(); }
   
 #ifdef ROTATED_SF
   /*the switch of the SF_sign is needed to take care of the antihermiticity of the boundary term of the dirac operator*/
