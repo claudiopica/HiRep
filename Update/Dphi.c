@@ -439,7 +439,7 @@ void Dphi_eopre_cpu(double m0, spinor_field *out, spinor_field *in)
   /* alloc memory for temporary spinor field */
   if (init) { init_Dirac(); }
   
-  Dphi_cpu(otmp, in);
+  Dphi__cpu(otmp, in);
 #if defined(BASIC_SF) || defined(ROTATED_SF)
   SF_spinor_bcs(otmp);
 #endif /* defined(BASIC_SF) || defined(ROTATED_SF) */
