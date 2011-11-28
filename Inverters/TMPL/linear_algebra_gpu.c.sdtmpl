@@ -97,6 +97,19 @@ double _FUNC(spinor_field_g5_prod_re)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE
   _REAL* resGPU;
   _REAL* resField;
   
+#ifdef UPDATE_EO
+  if (s1->type==&glattice) {
+    // we call recursively this function twice
+    // on the even and odd sublattices
+    s1->type=s2->type=&glat_even;
+    res=_FUNC(spinor_field_g5_prod_re)(s1, s2);
+    s1->type=s2->type=&glat_odd;
+    res+=_FUNC(spinor_field_g5_prod_re)(s1, s2);
+    s1->type=s2->type=&glattice;
+    return (double) res;
+  }
+#endif //UPDATE_EO
+  
   int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
   N*=_NCOM;
   int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
@@ -119,6 +132,19 @@ double _FUNC(spinor_field_g5_prod_im)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE
   _REAL res;
   _REAL * resGPU; // one number
   _REAL * resField; // resulting scalar field when dotting each spinor
+
+#ifdef UPDATE_EO
+  if (s1->type==&glattice) {
+    // we call recursively this function twice
+    // on the even and odd sublattices
+    s1->type=s2->type=&glat_even;
+    res=_FUNC(spinor_field_g5_prod_im)(s1, s2);
+    s1->type=s2->type=&glat_odd;
+    res+=_FUNC(spinor_field_g5_prod_im)(s1, s2);
+    s1->type=s2->type=&glattice;
+    return (double) res;
+  }
+#endif //UPDATE_EO
 
   int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
   N *= _NCOM;
@@ -332,6 +358,20 @@ void _FUNC(spinor_field_clc_add_assign)(_SPINOR_FIELD_TYPE *s1, complex cd1, _SP
 /* s1=g5*s2  */
 void _FUNC(spinor_field_g5)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
+
+#ifdef UPDATE_EO
+  if (s1->type==&glattice) {
+    // we call recursively this function twice
+    // on the even and odd sublattices
+    s1->type=s2->type=&glat_even;
+    _FUNC(spinor_field_g5)(s1, s2);
+    s1->type=s2->type=&glat_odd;
+    _FUNC(spinor_field_g5)(s1, s2);
+    s1->type=s2->type=&glattice;
+    return;
+  }
+#endif //UPDATE_EO
+
   int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
   N *= _NCOM;
   int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
@@ -342,6 +382,20 @@ void _FUNC(spinor_field_g5)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 /* s1=g5*s1  */
 void _FUNC(spinor_field_g5_assign)(_SPINOR_FIELD_TYPE *s1)
 {
+
+#ifdef UPDATE_EO
+  if (s1->type==&glattice) {
+    // we call recursively this function twice
+    // on the even and odd sublattices
+    s1->type=&glat_even;
+    _FUNC(spinor_field_g5_assign)(s1);
+    s1->type=&glat_odd;
+    _FUNC(spinor_field_g5_assign)(s1);
+    s1->type=&glattice;
+    return;
+  }
+#endif //UPDATE_EO
+
   int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
   N *= _NCOM;
   int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);

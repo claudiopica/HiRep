@@ -43,7 +43,7 @@ double sfdiff (spinor_field_flt* sf){
   spinor_field_copy_f_flt_cpu(tmp,sf);
   spinor_field_copy_to_gpu_f_flt(tmp);
   spinor_field_sub_f_flt(tmp,tmp,sf);
-  res= spinor_field_sqnorm_f_flt(tmp);
+  res=spinor_field_sqnorm_f_flt(tmp);
   free_spinor_field_flt_gpu(tmp);
   free_spinor_field_flt(tmp);
   return res;
@@ -149,7 +149,7 @@ int main(int argc,char *argv[])
   //Check spinor_field_g5_prod_im
   res_gpu = spinor_field_g5_prod_im_f_flt(&sf1[0],&sf1[1]);
   res_cpu = spinor_field_g5_prod_im_f_flt_cpu(&sf1[0],&sf1[1]);
-  lprintf("LA TEST",0,"Check spinor_field_g5_prod_re\n gpu=%1.10g, cpu=%1.10g, \n gpu-cpu= %1.10g\n\n",res_gpu,res_cpu,res_gpu-res_cpu);
+  lprintf("LA TEST",0,"Check spinor_field_g5_prod_im\n gpu=%1.10g, cpu=%1.10g, \n gpu-cpu= %1.10g\n\n",res_gpu,res_cpu,res_gpu-res_cpu);
 
   //Check spinor_field_sqnorm
   res_gpu = spinor_field_sqnorm_f_flt(&sf1[0]);

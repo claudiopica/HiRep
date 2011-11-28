@@ -84,7 +84,10 @@ void gfield_togpuformat(suNg_field *out, suNg_field *in);
 void gfield_tocpuformat(suNg_field *out, suNg_field *in);
 void gfield_togpuformat_f(suNf_field *out, suNf_field *in);
 void gfield_tocpuformat_f(suNf_field *out, suNf_field *in);
-  
+void gfield_togpuformat_flt(suNg_field_flt *out, suNg_field_flt *in);
+void gfield_tocpuformat_flt(suNg_field_flt *out, suNg_field_flt *in);
+void gfield_togpuformat_f_flt(suNf_field_flt *out, suNf_field_flt *in);
+void gfield_tocpuformat_f_flt(suNf_field_flt *out, suNf_field_flt *in);  
 #endif
 
 void free_avfield(suNg_av_field *u);

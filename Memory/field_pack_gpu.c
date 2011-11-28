@@ -147,9 +147,9 @@ void spinor_field_tocpuformat_flt(spinor_field_flt *out, spinor_field_flt *in) {
     // we call recursively this function twice
     // on the even and odd sublattices
     in->type=out->type=&glat_even;
-    spinor_field_togpuformat_flt(out, in);
+    spinor_field_tocpuformat_flt(out, in);
     in->type=out->type=&glat_odd;
-    spinor_field_togpuformat_flt(out, in);
+    spinor_field_tocpuformat_flt(out, in);
     in->type=out->type=&glattice;
     return;
   }
