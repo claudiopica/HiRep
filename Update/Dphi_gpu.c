@@ -60,19 +60,38 @@ typedef struct _suNf_hspinor
 /* v = suNf_vector ; in = input ; iy = site
    x = 0..3 spinor component 
  */
-#define _suNf_read_spinor_gpu(v,in,iy,x)\
+#define _suNf_read_spinor_gpu_old(v,in,iy,x)\
 	(v).c[0]=((complex*)(in))[(iy)+((x)*3)*stride]; \
   (v).c[1]=((complex*)(in))[(iy)+((x)*3+1)*stride]; \
   (v).c[2]=((complex*)(in))[(iy)+((x)*3+2)*stride]
 
+#define _suNf_read_spinor_gpu(v,in,iy,x)\
+iz=(iy)+((x)*3)*stride;\
+(v).c[0]=((complex*)(in))[iz]; iz+=stride; \
+(v).c[1]=((complex*)(in))[iz]; iz+=stride;\
+(v).c[2]=((complex*)(in))[iz]
+
+
 /* v = suNf_vector ; out = output ; iy = site
  x = 0..3 spinor component 
  */
-#define _suNf_write_spinor_gpu(v,out,iy,x)\
+#define _suNf_write_spinor_gpu_old(v,out,iy,x)\
 ((complex*)(out))[(iy)+((x)*3)*stride]=(v).c[0]; \
 ((complex*)(out))[(iy)+((x)*3+1)*stride]=(v).c[1]; \
 ((complex*)(out))[(iy)+((x)*3+2)*stride]=(v).c[2]
 
+#define _suNf_write_spinor_gpu(v,out,iy,x)\
+iz=(iy)+((x)*3)*stride;\
+((complex*)(out))[iz]=(v).c[0]; iz+=stride; \
+((complex*)(out))[iz]=(v).c[1]; iz+=stride;\
+((complex*)(out))[iz]=(v).c[2]
+
+#define _suNf_read_gpu(v,in,iy,x)\
+iz=(iy)+((x)*4)*stride;\
+(v).c[0]=((double*)(in))[iz]; iz+=stride; \
+(v).c[1]=((double*)(in))[iz]; iz+=stride;\
+(v).c[2]=((double*)(in))[iz]; iz+=stride;\
+(v).c[3]=((double*)(in))[iz]
 
 __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in, 
                              const suNf* gauge, const int *iup, const int *idn, 
@@ -84,7 +103,7 @@ __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in,
   suNf_hspinor sn;
   suNf u;
   
-  int iy, shift=0;
+  int iy, shift=0, iz;
   int ix = blockIdx.x*BLOCK_SIZE + threadIdx.x;
   ix = min (ix,N-1);
 
@@ -102,7 +121,8 @@ __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in,
   _suNf_read_spinor_gpu(sn.c[0],in,iy,0);
   _suNf_read_spinor_gpu(sn.c[1],in,iy,2);
   
-  u = gauge[coord_to_index(ix,0)];
+  //u = gauge[coord_to_index(ix,0)];
+  _suNf_read_gpu(u,gauge+4*(vol4h-shift),ix+(vol4h-shift),0);
   
   _vector_add_assign_f(sn.c[0],sn.c[1]);
   _suNf_multiply(r.c[0],u,sn.c[0]);
@@ -127,7 +147,8 @@ __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in,
   _suNf_read_spinor_gpu(sn.c[0],in,iy,0);
   _suNf_read_spinor_gpu(sn.c[1],in,iy,2);
  
-  u = gauge[coord_to_index(iy+shift,0)];
+  //u = gauge[coord_to_index(iy+shift,0)];
+  _suNf_read_gpu(u,gauge+4*(shift),iy,0);
   
   _vector_sub_assign_f(sn.c[0],sn.c[1]);
   _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
@@ -155,7 +176,8 @@ __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in,
   _suNf_read_spinor_gpu(sn.c[0],in,iy,0);
   _suNf_read_spinor_gpu(sn.c[1],in,iy,3);
 
-  u = gauge[coord_to_index(ix,1)];
+  //u = gauge[coord_to_index(ix,1)];
+  _suNf_read_gpu(u,gauge+4*(vol4h-shift),ix+(vol4h-shift),1);
   
   _vector_i_add_assign_f(sn.c[0],sn.c[1]);
   _suNf_multiply(sn.c[1],u,sn.c[0]);
@@ -183,7 +205,8 @@ __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in,
   _suNf_read_spinor_gpu(sn.c[0],in,iy,0);
   _suNf_read_spinor_gpu(sn.c[1],in,iy,3);
 
-  u = gauge[coord_to_index(iy+shift,1)];
+  //u = gauge[coord_to_index(iy+shift,1)];
+  _suNf_read_gpu(u,gauge+4*(shift),iy,1);
   
   _vector_i_sub_assign_f(sn.c[0],sn.c[1]);
   _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
@@ -211,7 +234,8 @@ __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in,
   _suNf_read_spinor_gpu(sn.c[0],in,iy,0);
   _suNf_read_spinor_gpu(sn.c[1],in,iy,3);
 
-  u = gauge[coord_to_index(ix,2)];
+  //u = gauge[coord_to_index(ix,2)];
+  _suNf_read_gpu(u,gauge+4*(vol4h-shift),ix+(vol4h-shift),2);
   
   _vector_add_assign_f(sn.c[0],sn.c[1]);
   _suNf_multiply(sn.c[1],u,sn.c[0]);
@@ -239,7 +263,8 @@ __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in,
   _suNf_read_spinor_gpu(sn.c[0],in,iy,0);
   _suNf_read_spinor_gpu(sn.c[1],in,iy,3);
 
-  u  = gauge[coord_to_index(iy+shift,2)];
+  //u  = gauge[coord_to_index(iy+shift,2)];
+  _suNf_read_gpu(u,gauge+4*(shift),iy,2);
   
   _vector_sub_assign_f(sn.c[0],sn.c[1]);
   _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
@@ -267,7 +292,8 @@ __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in,
   _suNf_read_spinor_gpu(sn.c[0],in,iy,0);
   _suNf_read_spinor_gpu(sn.c[1],in,iy,2);
 
-  u  = gauge[coord_to_index(ix,3)];
+  //u  = gauge[coord_to_index(ix,3)];
+  _suNf_read_gpu(u,gauge+4*(vol4h-shift),ix+(vol4h-shift),3);
   
   _vector_i_add_assign_f(sn.c[0],sn.c[1]);
   _suNf_multiply(sn.c[1],u,sn.c[0]);
@@ -295,7 +321,8 @@ __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in,
   _suNf_read_spinor_gpu(sn.c[0],in,iy,0);
   _suNf_read_spinor_gpu(sn.c[1],in,iy,2);
 
-  u  = gauge[coord_to_index(iy+shift,3)];
+  //u  = gauge[coord_to_index(iy+shift,3)];
+  _suNf_read_gpu(u,gauge+4*(shift),iy,3);
   
   _vector_i_sub_assign_f(sn.c[0],sn.c[1]);
   _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);

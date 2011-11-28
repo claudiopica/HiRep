@@ -105,19 +105,31 @@ void alloc_gfield_f_flt_gpu(suNf_field_flt *field) {
 }
 
 void gfield_copy_to_gpu(suNg_field *field){
-  cudaMemcpy(field->gpu_ptr,field->ptr,field->type->gsize*4*sizeof(suNg),cudaMemcpyHostToDevice);
+  suNg_field *tmp=alloc_gfield(field->type);
+  gfield_togpuformat(tmp,field);
+  cudaMemcpy(field->gpu_ptr,tmp->ptr,field->type->gsize*4*sizeof(suNg),cudaMemcpyHostToDevice);
+  free_gfield(tmp);
 }
 
 void gfield_copy_from_gpu(suNg_field *field){
-  cudaMemcpy(field->ptr,field->gpu_ptr,field->type->gsize*4*sizeof(suNg),cudaMemcpyDeviceToHost);
+  suNg_field *tmp=alloc_gfield(field->type);
+  cudaMemcpy(tmp->ptr,field->gpu_ptr,field->type->gsize*4*sizeof(suNg),cudaMemcpyDeviceToHost);
+  gfield_tocpuformat(field,tmp);
+  free_gfield(tmp);
 }
 
 void gfield_copy_to_gpu_f(suNf_field *field){
-  cudaMemcpy(field->gpu_ptr,field->ptr,field->type->gsize*4*sizeof(suNf),cudaMemcpyHostToDevice);
+  suNf_field *tmp=alloc_gfield_f(field->type);
+  gfield_togpuformat_f(tmp,field);
+  cudaMemcpy(field->gpu_ptr,tmp->ptr,field->type->gsize*4*sizeof(suNf),cudaMemcpyHostToDevice);
+  free_gfield_f(tmp);
 }
 
 void gfield_copy_from_gpu_f(suNf_field *field){
-  cudaMemcpy(field->ptr,field->gpu_ptr,field->type->gsize*4*sizeof(suNf),cudaMemcpyDeviceToHost);
+  suNf_field *tmp=alloc_gfield_f(field->type);
+  cudaMemcpy(tmp->ptr,field->gpu_ptr,field->type->gsize*4*sizeof(suNf),cudaMemcpyDeviceToHost);
+  gfield_tocpuformat_f(field,tmp);
+  free_gfield_f(tmp);
 }
 
 void gfield_copy_to_gpu_flt(suNg_field_flt *field){
