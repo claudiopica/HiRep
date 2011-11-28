@@ -34,3 +34,15 @@ void gaussian_spinor_field_flt(spinor_field_flt *s) {
         SF_spinor_bcs_flt(s);
 #endif /* defined(BASIC_SF) || defined(ROTATED_SF) */
 }
+
+
+void z2_spinor_field(spinor_field *s) {
+	unsigned int i;
+	geometry_descriptor *type = s->type;
+	for(i=0;i<type->local_master_pieces;i++)
+ 	  ranz2((double*)(s->ptr+type->master_start[i]),(type->master_end[i]-type->master_start[i]+1)*sizeof(suNf_spinor)/sizeof(double));
+#if defined(BASIC_SF) || defined(ROTATED_SF)
+        SF_spinor_bcs(s);
+#endif /* defined(BASIC_SF) || defined(ROTATED_SF) */
+}
+
