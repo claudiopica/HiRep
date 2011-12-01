@@ -96,7 +96,7 @@ iz=(iy)+((x)*4)*stride;\
 __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in, 
                              const suNf* gauge, const int *iup, const int *idn, 
                              const int N, 
-                             const int vol4h, const int stride)
+                             int vol4h, const int stride)
 {
 
   suNf_spinor r;
@@ -109,7 +109,9 @@ __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in,
 
 #ifdef UPDATE_EO
   if (ix<vol4h) { shift=vol4h; } 
-  else { out+=vol4h; } 
+  else { out+=vol4h; }
+#else 
+  vol4h=0;
 #endif //UPDATE_EO                   
   
   in+=shift;
@@ -122,7 +124,7 @@ __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in,
   _suNf_read_spinor_gpu(sn.c[1],in,iy,2);
   
   //u = gauge[coord_to_index(ix,0)];
-  _suNf_read_gpu(u,gauge+4*(vol4h-shift),ix+(vol4h-shift),0);
+  _suNf_read_gpu(u,gauge+4*(vol4h-shift),ix-(vol4h-shift),0);
   
   _vector_add_assign_f(sn.c[0],sn.c[1]);
   _suNf_multiply(r.c[0],u,sn.c[0]);
@@ -177,7 +179,7 @@ __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in,
   _suNf_read_spinor_gpu(sn.c[1],in,iy,3);
 
   //u = gauge[coord_to_index(ix,1)];
-  _suNf_read_gpu(u,gauge+4*(vol4h-shift),ix+(vol4h-shift),1);
+  _suNf_read_gpu(u,gauge+4*(vol4h-shift),ix-(vol4h-shift),1);
   
   _vector_i_add_assign_f(sn.c[0],sn.c[1]);
   _suNf_multiply(sn.c[1],u,sn.c[0]);
@@ -235,7 +237,7 @@ __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in,
   _suNf_read_spinor_gpu(sn.c[1],in,iy,3);
 
   //u = gauge[coord_to_index(ix,2)];
-  _suNf_read_gpu(u,gauge+4*(vol4h-shift),ix+(vol4h-shift),2);
+  _suNf_read_gpu(u,gauge+4*(vol4h-shift),ix-(vol4h-shift),2);
   
   _vector_add_assign_f(sn.c[0],sn.c[1]);
   _suNf_multiply(sn.c[1],u,sn.c[0]);
@@ -293,7 +295,7 @@ __global__ void Dphi_gpu(suNf_spinor* out, suNf_spinor* in,
   _suNf_read_spinor_gpu(sn.c[1],in,iy,2);
 
   //u  = gauge[coord_to_index(ix,3)];
-  _suNf_read_gpu(u,gauge+4*(vol4h-shift),ix+(vol4h-shift),3);
+  _suNf_read_gpu(u,gauge+4*(vol4h-shift),ix-(vol4h-shift),3);
   
   _vector_i_add_assign_f(sn.c[0],sn.c[1]);
   _suNf_multiply(sn.c[1],u,sn.c[0]);
@@ -379,7 +381,7 @@ void Dphi_(spinor_field *out, spinor_field *in)
    grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
    
    Dphi_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f->gpu_ptr,iup_gpu,idn_gpu,N,vol4h,stride);
-   
+   CudaCheckError();
 }
 
 
