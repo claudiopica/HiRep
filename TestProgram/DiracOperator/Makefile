@@ -1,7 +1,7 @@
 TOPDIR = ../..
 MKDIR=$(TOPDIR)/Make
 
-EXES = check_diracoperator_1 check_diracoperator_2 check_diracoperator_3 check_diracoperator_1_gpu speed_test_diracoperator_gpu #check_diracoperator_4
+EXES = check_diracoperator_1 check_diracoperator_2 check_diracoperator_3 check_diracoperator_1_gpu speed_test_diracoperator_gpu speed_test_diracoperator_flt_gpu
 
 default: $(EXES)
 
@@ -19,7 +19,7 @@ MODS := boundary_conditions time timer_gpu
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Memory
-MODS := amalloc field_alloc spinor_field_alloc 
+MODS := amalloc field_alloc spinor_field_alloc field_pack_gpu
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Random
@@ -27,7 +27,7 @@ MODS := gauss random_suNg ranlxs ranlxd random_fields
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Update
-MODS := Dphi random_spinor_field random_su2 representation Dphi_gpu
+MODS := Dphi Dphi_flt random_spinor_field random_su2 representation Dphi_gpu Dphi_flt_gpu
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Error
