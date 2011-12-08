@@ -26,16 +26,17 @@ static double hmass=0.1;
 static suNg_field_flt *g;
 
 double sfdiff (spinor_field_flt* sf){
-  spinor_field_flt *tmp;
+  spinor_field *tmp;
   double res;
-  tmp=alloc_spinor_field_f_flt(1, &glattice);
-  alloc_spinor_field_f_flt_gpu(1, tmp);
-  spinor_field_copy_f_flt_cpu(tmp,sf);
-  spinor_field_copy_to_gpu_f_flt(tmp);
-  spinor_field_sub_f_flt(tmp,tmp,sf);
-  res= spinor_field_sqnorm_f_flt(tmp);
-  free_spinor_field_flt_gpu(tmp);
-  free_spinor_field_flt(tmp);
+  tmp=alloc_spinor_field_f(2, &glattice);
+  alloc_spinor_field_f_gpu(2, tmp);
+  assign_s2sd(&tmp[0], sf);
+  spinor_field_copy_from_gpu_f_flt(sf);
+  assign_s2sd(&tmp[1], sf);
+  spinor_field_sub_f_cpu(&tmp[0],&tmp[0],&tmp[1]);
+  res= spinor_field_sqnorm_f_cpu(&tmp[0]);
+  free_spinor_field_gpu(tmp);
+  free_spinor_field(tmp);
   return res;
 }
 
@@ -119,9 +120,6 @@ int main(int argc,char *argv[])
 
   rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed);
   
-  
-  
-  
   /* setup communication geometry */
   if (geometry_init() == 1) {
     finalize_process();
@@ -142,8 +140,8 @@ int main(int argc,char *argv[])
   u_gauge_flt=alloc_gfield_flt(&glattice);
   alloc_gfield_flt_gpu(u_gauge_flt);
 #if (!defined(REPR_FUNDAMENTAL) && !defined(WITH_QUATERNIONS)) || defined(ROTATED_SF) 
-  u_gauge_f=alloc_gfield_f(&glattice);
-  alloc_gfield_f_gpu(u_gauge_f_flt);
+  u_gauge_f_flt=alloc_gfield_f_flt(&glattice);
+  alloc_gfield_f_flt_gpu(u_gauge_f_flt);
 #endif
   /* allocate memory */
   s0=alloc_spinor_field_f_flt(4,&glattice);

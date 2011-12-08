@@ -56,7 +56,6 @@ typedef struct _suNf_hspinor_flt
   suNf_vector_flt c[2];
 } suNf_hspinor_flt;
   
-///////////////////////							I am not sure if the floating point fields are stored in a similar way as double.
 /* v = suNf_vector ; in = input ; iy = site
    x = 0..3 spinor component 
  */
@@ -341,7 +340,6 @@ void Dphi_flt_(spinor_field_flt *out, spinor_field_flt *in)
    N = out->type->master_end[0] - out->type->master_start[0] + 1 ;
    grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
   
-   lprintf("LA TEST",0,"In function Dphi_flt for gpu\n");	
    Dphi_flt_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f_flt->gpu_ptr,iup_gpu,idn_gpu,N,vol4h,stride);
    CudaCheckError();
 }
