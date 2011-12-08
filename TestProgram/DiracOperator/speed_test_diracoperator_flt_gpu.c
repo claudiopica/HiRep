@@ -20,29 +20,29 @@
 #include "dirac.h"
 #include "linear_algebra.h"
 #include "representation.h"
-#include "communications.h"
+#include "communications_flt.h"
 
 static double hmass=0.1;
-static suNg_field *g;
+static suNg_field_flt *g;
 
-double sfdiff (spinor_field* sf){
-  spinor_field *tmp;
+double sfdiff (spinor_field_flt* sf){
+  spinor_field_flt *tmp;
   double res;
-  tmp=alloc_spinor_field_f(1, &glattice);
-  alloc_spinor_field_f_gpu(1, tmp);
-  spinor_field_copy_f_cpu(tmp,sf);
-  spinor_field_copy_to_gpu_f(tmp);
-  spinor_field_sub_f(tmp,tmp,sf);
-  res= spinor_field_sqnorm_f(tmp);
-  free_spinor_field_gpu(tmp);
-  free_spinor_field(tmp);
+  tmp=alloc_spinor_field_f_flt(1, &glattice);
+  alloc_spinor_field_f_flt_gpu(1, tmp);
+  spinor_field_copy_f_flt_cpu(tmp,sf);
+  spinor_field_copy_to_gpu_f_flt(tmp);
+  spinor_field_sub_f_flt(tmp,tmp,sf);
+  res= spinor_field_sqnorm_f_flt(tmp);
+  free_spinor_field_flt_gpu(tmp);
+  free_spinor_field_flt(tmp);
   return res;
 }
 
 
 
-static void D(spinor_field *out, spinor_field *in){
-   Dphi(hmass,out,in);
+static void D(spinor_field_flt *out, spinor_field_flt *in){
+   Dphi_flt(hmass,out,in);
 }
 
 static void random_g(void)
@@ -50,39 +50,39 @@ static void random_g(void)
    _DECLARE_INT_ITERATOR(ix);
 
    _MASTER_FOR(&glattice,ix)
-      random_suNg(_FIELD_AT(g,ix));
+      random_suNg_flt(_FIELD_AT(g,ix));				// This one might not exist
 }
 
 static void transform_u(void)
 {
    _DECLARE_INT_ITERATOR(ix);
    int iy,mu;
-   suNg *u,v;
+   suNg_flt *u,v;
 
    _MASTER_FOR(&glattice,ix) {
       for (mu=0;mu<4;mu++) {
          iy=iup(ix,mu);
-         u=pu_gauge(ix,mu);
+         u=pu_gauge_flt(ix,mu);
          _suNg_times_suNg_dagger(v,*u,*_FIELD_AT(g,iy));
          _suNg_times_suNg(*u,*_FIELD_AT(g,ix),v);
       }
    }
    
-   start_gf_sendrecv(u_gauge);
-   represent_gauge_field();
+   start_gf_sendrecv_flt(u_gauge_flt);
+   represent_gauge_field_flt();
 }
 
-static void transform_s(spinor_field *out, spinor_field *in)
+static void transform_s(spinor_field_flt *out, spinor_field_flt *in)
 {
    _DECLARE_INT_ITERATOR(ix);
-   suNf gfx;
-   suNf_spinor *r,*s;
+   suNf_flt gfx;
+   suNf_spinor_flt *r,*s;
 
    _MASTER_FOR(&glattice,ix) {
       s = _FIELD_AT(in,ix);
       r = _FIELD_AT(out,ix);
       
-      _group_represent2(&gfx,_FIELD_AT(g,ix));
+      _group_represent2_flt(&gfx,_FIELD_AT(g,ix));
 
       _suNf_multiply(r->c[0],gfx,s->c[0]);
       _suNf_multiply(r->c[1],gfx,s->c[1]);
@@ -96,7 +96,7 @@ int main(int argc,char *argv[])
 {
   char tmp[256];
   double res1,res2,res_cpu,res_gpu;
-  spinor_field *s0,*s1,*s2,*s3;
+  spinor_field_flt *s0,*s1,*s2,*s3;
   gpu_timer t1;
   float elapsed, gflops;
   int i;
@@ -139,44 +139,44 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"\n");
   fflush(stdout);
   
-  u_gauge=alloc_gfield(&glattice);
-  alloc_gfield_gpu(u_gauge);
+  u_gauge_flt=alloc_gfield_flt(&glattice);
+  alloc_gfield_flt_gpu(u_gauge_flt);
 #if (!defined(REPR_FUNDAMENTAL) && !defined(WITH_QUATERNIONS)) || defined(ROTATED_SF) 
   u_gauge_f=alloc_gfield_f(&glattice);
-  alloc_gfield_f_gpu(u_gauge_f);
+  alloc_gfield_f_gpu(u_gauge_f_flt);
 #endif
   /* allocate memory */
-  s0=alloc_spinor_field_f(4,&glattice);
-  alloc_spinor_field_f_gpu(4,s0);
+  s0=alloc_spinor_field_f_flt(4,&glattice);
+  alloc_spinor_field_f_flt_gpu(4,s0);
   s1=s0+1;
   s2=s1+1;
   s3=s2+1;
   
-  gaussian_spinor_field(s0);
-  spinor_field_copy_to_gpu_f(s0);
+  gaussian_spinor_field_flt(s0);
+  spinor_field_copy_to_gpu_f_flt(s0);
 
-  gaussian_spinor_field(s1);
-  spinor_field_copy_to_gpu_f(s1);
+  gaussian_spinor_field_flt(s1);
+  spinor_field_copy_to_gpu_f_flt(s1);
 
   lprintf("MAIN",0,"Generating a random gauge field... ");
   fflush(stdout);
-  random_u(u_gauge);
-  gfield_copy_to_gpu(u_gauge);
-  start_gf_sendrecv(u_gauge);
-  represent_gauge_field();
-  gfield_copy_to_gpu_f(u_gauge_f);
+  random_u_flt(u_gauge_flt);
+  gfield_copy_to_gpu_flt(u_gauge_flt);
+  start_gf_sendrecv_flt(u_gauge_flt);
+  represent_gauge_field_flt();
+  gfield_copy_to_gpu_f_flt(u_gauge_f_flt);
 
   lprintf("MAIN",0,"done.\n");
   lprintf("LA TEST",0,"Checking the diracoperator..\n");
 
-  Dphi_(s1,s0);
-  Dphi__cpu(s1,s0);
+  Dphi_flt_(s1,s0);
+  Dphi_flt__cpu(s1,s0);
   
   res1 = sfdiff(s0);
   res2 = sfdiff(s1);
 
-  res_gpu = spinor_field_sqnorm_f(s1);
-  res_cpu = spinor_field_sqnorm_f_cpu(s1);
+  res_gpu = spinor_field_sqnorm_f_flt(s1);
+  res_cpu = spinor_field_sqnorm_f_flt_cpu(s1);
 
   lprintf("LA TEST",0,"Result, mass=0, \nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g,\nsqnorm(gpu-cpu)= %1.10g (check %1.10g=0?),\n",res_gpu,res_cpu,res2,res1);
 
@@ -185,13 +185,13 @@ int main(int argc,char *argv[])
   lprintf("LA TEST",0,"Calculating Diracoperator %d times.\n",n_times);
 
   for (i=0;i<n_times;++i){
-    Dphi_(s1,s0);
+    Dphi_flt_(s1,s0);
   }
 
   elapsed = gpuTimerStop(t1);
   lprintf("LA TEST",0,"Time: %1.10gms\n",elapsed);
 
-  gflops=n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*744./elapsed/1.e6;   //536
+  gflops=n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*744./elapsed/1.e6;   // 536
   lprintf("LA TEST",0,"GFLOPS: %1.4g\n\n",gflops);
 
 /*  t1 = gpuTimerStart();
@@ -205,8 +205,8 @@ int main(int argc,char *argv[])
     lprintf("LA TEST",0,"DONE!\n\n");
 */
 
-  free_spinor_field(s0);
-  free_spinor_field_gpu(s0);
+  free_spinor_field_flt(s0);
+  free_spinor_field_flt_gpu(s0);
   
   
   finalize_process();

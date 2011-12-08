@@ -26,8 +26,10 @@ void random_suNg_unit_vector(suNg_vector *v);
 void gaussian_suNg_vector(suNg_vector *v);
 
 void random_suNg(suNg *u);
+void random_suNg_flt(suNg_flt *u);
 
 void random_u(suNg_field *gf);
+void random_u_flt(suNg_field_flt *gf);
 void unit_u(suNg_field *gf);
 
 void ranz2(double r[],int n);

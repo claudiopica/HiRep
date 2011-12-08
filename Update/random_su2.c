@@ -82,86 +82,177 @@ static void update_y(void)
 }
 
 void random_su2(double rho,double s[])
-  /*
-   *  Computes a random vector s[4] with probability density
-   *  proportional to exp(rho*s[0])*delta(1-s^2) assuming rho>=0
-   */
+/*
+ *  Computes a random vector s[4] with probability density
+ *  proportional to exp(rho*s[0])*delta(1-s^2) assuming rho>=0
+ */
 {
-   double rhoinv,s0p1,ut,rt;
-   double s0,s1,s2,s3,sq;
+	double rhoinv,s0p1,ut,rt;
+	double s0,s1,s2,s3,sq;
+	
+	if (i_vec==NVEC)
+		update_vec();
+	
+	if (rho>1.5f)
+	{
+		rhoinv=1.0f/rho;
+		
+		for (;;)
+		{         
+			if (i_y==NRAN)
+				update_y();
+			
+			s0p1=2.0f-rhoinv*y[i_y];
+			ut=u[i_y++];
+			
+			if (ut<=s0p1)
+				break;
+		}
+	}
+	else if (rho>0.3f)
+	{
+		rhoinv=1.0f/rho;
+		rt=exp(rho+rho)-1.0;
+		
+		for (;;)
+		{
+			if (i_v==NRAN)
+			{
+				ranlxd(v,NRAN);
+				i_v=0;
+			}         
+			
+			s0p1=rhoinv*log(1.0+rt*v[i_v++]);
+			ut=v[i_v++];
+			
+			if ((ut*ut)<=(s0p1*(2.0f-s0p1)))
+				break;
+		}
+	}
+	else
+	{
+		for (;;)
+		{
+			if (i_v==NRAN)
+			{
+				ranlxd(v,NRAN);
+				i_v=0;
+			}
+			
+			s0p1=2.0f*v[i_v++];
+			rt=exp(rho*(s0p1-2.0f));
+			ut=v[i_v++];
+			
+			if ((ut*ut)<=(s0p1*(2.0f-s0p1)*rt*rt))
+				break;
+		}
+	}
+	
+	sq=sqrt(s0p1*(2.0f-s0p1));   
+	s0=s0p1-1.0f;   
+	s1=sq*vec1[i_vec];
+	s2=sq*vec2[i_vec];
+	s3=sq*vec3[i_vec];
+	
+	sq=s0*s0+s1*s1+s2*s2+s3*s3;
+	sq=1.5f-0.5f*sq;
+	
+	s[0]=sq*s0;
+	s[1]=sq*s1;
+	s[2]=sq*s2;
+	s[3]=sq*s3;
+	
+	i_vec+=1;
+}
 
-   if (i_vec==NVEC)
-      update_vec();
-   
-   if (rho>1.5f)
-   {
-      rhoinv=1.0f/rho;
 
-      for (;;)
-      {         
-         if (i_y==NRAN)
-            update_y();
 
-         s0p1=2.0f-rhoinv*y[i_y];
-         ut=u[i_y++];
 
-         if (ut<=s0p1)
-            break;
-      }
-   }
-   else if (rho>0.3f)
-   {
-      rhoinv=1.0f/rho;
-      rt=exp(rho+rho)-1.0;
 
-      for (;;)
-      {
-         if (i_v==NRAN)
-         {
-            ranlxd(v,NRAN);
-            i_v=0;
-         }         
 
-         s0p1=rhoinv*log(1.0+rt*v[i_v++]);
-         ut=v[i_v++];
-         
-         if ((ut*ut)<=(s0p1*(2.0f-s0p1)))
-            break;
-      }
-   }
-   else
-   {
-      for (;;)
-      {
-         if (i_v==NRAN)
-         {
-            ranlxd(v,NRAN);
-            i_v=0;
-         }
 
-         s0p1=2.0f*v[i_v++];
-         rt=exp(rho*(s0p1-2.0f));
-         ut=v[i_v++];
-         
-         if ((ut*ut)<=(s0p1*(2.0f-s0p1)*rt*rt))
-            break;
-      }
-   }
 
-   sq=sqrt(s0p1*(2.0f-s0p1));   
-   s0=s0p1-1.0f;   
-   s1=sq*vec1[i_vec];
-   s2=sq*vec2[i_vec];
-   s3=sq*vec3[i_vec];
-   
-   sq=s0*s0+s1*s1+s2*s2+s3*s3;
-   sq=1.5f-0.5f*sq;
-
-   s[0]=sq*s0;
-   s[1]=sq*s1;
-   s[2]=sq*s2;
-   s[3]=sq*s3;
-
-   i_vec+=1;
+void random_su2_flt(double rho,float s[])
+/*
+ *  Computes a random vector s[4] with probability density
+ *  proportional to exp(rho*s[0])*delta(1-s^2) assuming rho>=0
+ */
+{
+	double rhoinv,s0p1,ut,rt;
+	double s0,s1,s2,s3,sq;
+	
+	if (i_vec==NVEC)
+		update_vec();
+	
+	if (rho>1.5f)
+	{
+		rhoinv=1.0f/rho;
+		
+		for (;;)
+		{         
+			if (i_y==NRAN)
+				update_y();
+			
+			s0p1=2.0f-rhoinv*y[i_y];
+			ut=u[i_y++];
+			
+			if (ut<=s0p1)
+				break;
+		}
+	}
+	else if (rho>0.3f)
+	{
+		rhoinv=1.0f/rho;
+		rt=exp(rho+rho)-1.0;
+		
+		for (;;)
+		{
+			if (i_v==NRAN)
+			{
+				ranlxd(v,NRAN);
+				i_v=0;
+			}         
+			
+			s0p1=rhoinv*log(1.0+rt*v[i_v++]);
+			ut=v[i_v++];
+			
+			if ((ut*ut)<=(s0p1*(2.0f-s0p1)))
+				break;
+		}
+	}
+	else
+	{
+		for (;;)
+		{
+			if (i_v==NRAN)
+			{
+				ranlxd(v,NRAN);
+				i_v=0;
+			}
+			
+			s0p1=2.0f*v[i_v++];
+			rt=exp(rho*(s0p1-2.0f));
+			ut=v[i_v++];
+			
+			if ((ut*ut)<=(s0p1*(2.0f-s0p1)*rt*rt))
+				break;
+		}
+	}
+	
+	sq=sqrt(s0p1*(2.0f-s0p1));   
+	s0=s0p1-1.0f;   
+	s1=sq*vec1[i_vec];
+	s2=sq*vec2[i_vec];
+	s3=sq*vec3[i_vec];
+	
+	sq=s0*s0+s1*s1+s2*s2+s3*s3;
+	sq=1.5f-0.5f*sq;
+	
+	s[0]=(float)sq*s0;
+	s[1]=(float)sq*s1;
+	s[2]=(float)sq*s2;
+	s[3]=(float)sq*s3;
+	
+	i_vec+=1;
 }
 

@@ -20,10 +20,13 @@
 
 /* static variables for random_suNg */
 static double s[4];
+static float s_flt[4];
 static suNg_vector *pu1,*pu2;
+static suNg_vector_flt *pu1_flt,*pu2_flt;
 
 
 void random_su2(double rho,double s[]);
+void random_su2_flt(double rho,float s[]);
 
 
 void random_suNg_unit_vector(suNg_vector *v)
@@ -49,45 +52,87 @@ void gaussian_suNg_vector(suNg_vector *v)
 /* generates a random SU(N) matrix via SU(2) rotations */
 static void rotate(void) /* same as in cabmar */
 {
-	  int i;
-	  complex z1,z2;
-	  complex *cu1, *cu2;
+	int i;
+	complex z1,z2;
+	complex *cu1, *cu2;
+	
+	cu1 = &((*pu1).c[0]);
+	cu2 = &((*pu2).c[0]);
+	
+	for (i=0; i<NG; ++i) {
+		z1.re=s[0]*(*cu1).re-s[1]*(*cu2).im+s[2]*(*cu2).re-s[3]*(*cu1).im;
+		z1.im=s[0]*(*cu1).im+s[1]*(*cu2).re+s[2]*(*cu2).im+s[3]*(*cu1).re;
+		z2.re=s[0]*(*cu2).re-s[1]*(*cu1).im-s[2]*(*cu1).re+s[3]*(*cu2).im;
+		z2.im=s[0]*(*cu2).im+s[1]*(*cu1).re-s[2]*(*cu1).im-s[3]*(*cu2).re;
+		(*cu1) = z1; 
+		(*cu2) = z2; 
+		++cu1;
+		++cu2;
+	}
+}
+static void rotate_flt(void) /* same as in cabmar */
+{
+	int i;
+	complex_flt z1,z2;
+	complex_flt *cu1, *cu2;
+	
+	cu1 = &((*pu1_flt).c[0]);
+	cu2 = &((*pu2_flt).c[0]);
+	
+	for (i=0; i<NG; ++i) {
+		z1.re=s[0]*(*cu1).re-s[1]*(*cu2).im+s[2]*(*cu2).re-s[3]*(*cu1).im;
+		z1.im=s[0]*(*cu1).im+s[1]*(*cu2).re+s[2]*(*cu2).im+s[3]*(*cu1).re;
+		z2.re=s[0]*(*cu2).re-s[1]*(*cu1).im-s[2]*(*cu1).re+s[3]*(*cu2).im;
+		z2.im=s[0]*(*cu2).im+s[1]*(*cu1).re-s[2]*(*cu1).im-s[3]*(*cu2).re;
+		(*cu1) = z1; 
+		(*cu2) = z2; 
+		++cu1;
+		++cu2;
+	}
+}
+
+void random_suNg_flt(suNg_flt *u) {
+#ifdef WITH_QUATERNIONS
+    random_su2_flt(0.,u->c);
+#else
+  int i,j;
+
+	_suNg_unit(*u);
+  pu1_flt=(suNg_vector_flt*)(u);
 				  
-	  cu1 = &((*pu1).c[0]);
-	  cu2 = &((*pu2).c[0]);
-						  
-	  for (i=0; i<NG; ++i) {
-		    z1.re=s[0]*(*cu1).re-s[1]*(*cu2).im+s[2]*(*cu2).re-s[3]*(*cu1).im;
-		    z1.im=s[0]*(*cu1).im+s[1]*(*cu2).re+s[2]*(*cu2).im+s[3]*(*cu1).re;
-		    z2.re=s[0]*(*cu2).re-s[1]*(*cu1).im-s[2]*(*cu1).re+s[3]*(*cu2).im;
-		    z2.im=s[0]*(*cu2).im+s[1]*(*cu1).re-s[2]*(*cu1).im-s[3]*(*cu2).re;
-		    (*cu1) = z1; 
-		    (*cu2) = z2; 
-		    ++cu1;
-		    ++cu2;
-	  }
+  for (i=0; i<NG; ++i) {
+    pu2_flt = pu1_flt + 1;
+    for (j=i+1; j<NG; ++j) {
+		  random_su2_flt(0.0,s_flt);
+      rotate_flt();
+      ++pu2_flt; 
+    } 
+	  ++pu1_flt; 
+  }
+#endif //WITH_QUATERNIONS
 }
 
 void random_suNg(suNg *u) {
 #ifdef WITH_QUATERNIONS
     random_su2(0.,u->c);
 #else
-  int i,j;
-
+	int i,j;
+	
 	_suNg_unit(*u);
-  pu1=(suNg_vector*)(u);
-				  
-  for (i=0; i<NG; ++i) {
-    pu2 = pu1 + 1;
-    for (j=i+1; j<NG; ++j) {
-		  random_su2(0.0,s);
-      rotate();
-      ++pu2; 
-    } 
-	  ++pu1; 
-  }
+	pu1=(suNg_vector*)(u);
+	
+	for (i=0; i<NG; ++i) {
+		pu2 = pu1 + 1;
+		for (j=i+1; j<NG; ++j) {
+			random_su2(0.0,s);
+			rotate();
+			++pu2; 
+		} 
+		++pu1; 
+	}
 #endif //WITH_QUATERNIONS
 }
+
 
 /* this generates a U(N) matrix but not necessarely in SU(N) */
 void random_suNg_old(suNg *u)
