@@ -30,13 +30,24 @@ void assign_u2ud(void)
     {
       r=(complex*)(pu_gauge(ix,mu));
       rf=(complex_flt*)(pu_gauge_flt(ix,mu));
-
+      
+#ifdef WITH_QUATERNIONS
+#if (NG != 2)
+#error "WITH_QUATERNIONS not defined with NG!=2"
+#else
+      r[0].re=(double)(rf[0].re);
+      r[0].im=(double)(rf[0].im);
+      r[1].re=(double)(rf[1].re);
+      r[1].im=(double)(rf[1].im);
+#endif
+#else
       for (i=0;i<(NG*NG);++i)
       {
         r[i].re=(double)(rf[i].re);
         r[i].im=(double)(rf[i].im);
       }
-
+#endif
+      
       project_to_suNg(pu_gauge(ix,mu));
     }
   }
@@ -56,17 +67,32 @@ void assign_ud2u(void)
       r=(complex*)(pu_gauge(ix,mu));
       rf=(complex_flt*)(pu_gauge_flt(ix,mu));
 
+#ifdef WITH_QUATERNIONS
+#if (NG != 2)
+#error "WITH_QUATERNIONS not defined with NG!=2"
+#else
+      rf[0].re=(float)(r[0].re);
+      rf[0].im=(float)(r[0].im);
+      rf[1].re=(float)(r[1].re);
+      rf[1].im=(float)(r[1].im);
+#endif
+#else
       for (i=0;i<(NG*NG);++i)
       {
         rf[i].re=(float)(r[i].re);
         rf[i].im=(float)(r[i].im);
       }
+#endif
+      
     }
   }
 }
 
 void assign_ud2u_f(void)
 {
+#ifdef WITH_QUATERNIONS
+  assign_ud2u();
+#else
   _DECLARE_INT_ITERATOR(ix);
   int i,mu;
   complex *r;
@@ -85,7 +111,35 @@ void assign_ud2u_f(void)
       }
     }
   }
+#endif //WITH_QUATERNIONS
 }
+
+void assign_u2ud_f(void)
+{
+#ifdef WITH_QUATERNIONS
+  assign_u2ud();
+#else
+  _DECLARE_INT_ITERATOR(ix);
+  int i,mu;
+  complex *r;
+  complex_flt *rf;
+  
+  _MASTER_FOR(&glattice,ix){
+    for (mu=0;mu<4;mu++)
+    {
+      r=(complex*)(pu_gauge_f(ix,mu));
+      rf=(complex_flt*)(pu_gauge_f_flt(ix,mu));
+      
+      for (i=0;i<(NF*NF);++i)
+      {
+        r[i].re=(double)(rf[i].re);
+        r[i].im=(double)(rf[i].im);
+      }
+    }
+  }
+#endif //WITH_QUATERNIONS
+}
+
 
 void assign_s2sd(spinor_field *out, spinor_field_flt *in) {
 

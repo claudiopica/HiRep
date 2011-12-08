@@ -49,6 +49,7 @@ void project_cooling_to_suNg(suNg* g_out, suNg* g_in, int cooling);
 void assign_u2ud(void);
 void assign_ud2u(void);
 void assign_ud2u_f(void);
+void assign_u2ud_f(void);
 
 /* void assign_s2sd(int len, suNf_spinor *out, suNf_spinor_flt *in); */
 /* void assign_sd2s(int len, suNf_spinor_flt *out, suNf_spinor *in); */
