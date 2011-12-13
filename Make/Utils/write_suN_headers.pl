@@ -2697,7 +2697,7 @@ sub write_su3_myrandom {
 #
 
 
-sub write_su2_multiply {
+sub old2_write_su2_multiply {
     print "/* SU(2) matrix u times SU(2) vector s */\n";
     print "/* r=u*s */\n";
     print "/* using quaternionic representations for SU(2) matrices */\n";
@@ -2735,6 +2735,55 @@ sub write_su2_multiply {
     
 }
 
+sub write_su2_multiply {
+    print "/* SU(2) matrix u times SU(2) vector s */\n";
+    print "/* r=u*s */\n";
+    print "/* using quaternionic representations for SU(2) matrices */\n";
+        
+    if ($N==2) { #fundamental representation
+        print "#define _${dataname}_multiply(r,u,s) \\\n";
+        print "   (r).$cname\[0\].re=(u).$cname\[0\]*(s).$cname\[0\].re-(u).$cname\[1\]*(s).$cname\[1\].im-(u).$cname\[2\]*(s).$cname\[1\].re-(u).$cname\[3\]*(s).$cname\[0\].im; \\\n";
+        print "   (r).$cname\[0\].im=(u).$cname\[0\]*(s).$cname\[0\].im+(u).$cname\[1\]*(s).$cname\[1\].re-(u).$cname\[2\]*(s).$cname\[1\].im+(u).$cname\[3\]*(s).$cname\[0\].re; \\\n";
+        print "   (r).$cname\[1\].re=(u).$cname\[0\]*(s).$cname\[1\].re-(u).$cname\[1\]*(s).$cname\[0\].im+(u).$cname\[2\]*(s).$cname\[0\].re+(u).$cname\[3\]*(s).$cname\[1\].im; \\\n";
+        print "   (r).$cname\[1\].im=(u).$cname\[0\]*(s).$cname\[1\].im+(u).$cname\[1\]*(s).$cname\[0\].re+(u).$cname\[2\]*(s).$cname\[0\].im-(u).$cname\[3\]*(s).$cname\[1\].re \n\n";
+        
+    } elsif ($N==3) { #adjoint representation
+        print "#define _${rdataname}_multiply(r,u,s) \\\n";
+        print "   (r).$cname\[0\].re=((u).$cname\[0\]*(u).$cname\[3\]+(u).$cname\[1\]*(u).$cname\[2\])*(s).$cname\[1\].re; \\\n";
+        print "   (r).$cname\[0\].re+=((u).$cname\[2\]*(u).$cname\[3\]-(u).$cname\[0\]*(u).$cname\[1\])*(s).$cname\[2\].re; \\\n";
+        print "   (r).$cname\[0\].re+=(r).$cname\[0\].re; \\\n";
+        print "   (r).$cname\[0\].re+=((u).$cname\[0\]*(u).$cname\[0\]-(u).$cname\[1\]*(u).$cname\[1\]+(u).$cname\[2\]*(u).$cname\[2\]-(u).$cname\[3\]*(u).$cname\[3\])*(s).$cname\[0\].re; \\\n";
+
+        print "   (r).$cname\[0\].im=((u).$cname\[0\]*(u).$cname\[3\]+(u).$cname\[1\]*(u).$cname\[2\])*(s).$cname\[1\].im; \\\n";
+        print "   (r).$cname\[0\].im+=((u).$cname\[2\]*(u).$cname\[3\]-(u).$cname\[0\]*(u).$cname\[1\])*(s).$cname\[2\].im; \\\n";
+        print "   (r).$cname\[0\].im+=(r).$cname\[0\].im; \\\n";
+        print "   (r).$cname\[0\].im+=((u).$cname\[0\]*(u).$cname\[0\]-(u).$cname\[1\]*(u).$cname\[1\]+(u).$cname\[2\]*(u).$cname\[2\]-(u).$cname\[3\]*(u).$cname\[3\])*(s).$cname\[0\].im; \\\n";
+
+        print "   (r).$cname\[1\].re=((u).$cname\[1\]*(u).$cname\[2\]-(u).$cname\[0\]*(u).$cname\[3\])*(s).$cname\[0\].re; \\\n";
+        print "   (r).$cname\[1\].re+=((u).$cname\[0\]*(u).$cname\[2\]+(u).$cname\[1\]*(u).$cname\[3\])*(s).$cname\[2\].re; \\\n";
+        print "   (r).$cname\[1\].re+=(r).$cname\[1\].re; \\\n";
+        print "   (r).$cname\[1\].re+=((u).$cname\[0\]*(u).$cname\[0\]+(u).$cname\[1\]*(u).$cname\[1\]-(u).$cname\[2\]*(u).$cname\[2\]-(u).$cname\[3\]*(u).$cname\[3\])*(s).$cname\[1\].re; \\\n";
+
+        print "   (r).$cname\[1\].im=((u).$cname\[1\]*(u).$cname\[2\]-(u).$cname\[0\]*(u).$cname\[3\])*(s).$cname\[0\].im; \\\n";
+        print "   (r).$cname\[1\].im+=((u).$cname\[0\]*(u).$cname\[2\]+(u).$cname\[1\]*(u).$cname\[3\])*(s).$cname\[2\].im; \\\n";
+        print "   (r).$cname\[1\].im+=(r).$cname\[1\].im; \\\n";
+        print "   (r).$cname\[1\].im+=((u).$cname\[0\]*(u).$cname\[0\]+(u).$cname\[1\]*(u).$cname\[1\]-(u).$cname\[2\]*(u).$cname\[2\]-(u).$cname\[3\]*(u).$cname\[3\])*(s).$cname\[1\].im; \\\n";
+
+        print "   (r).$cname\[2\].re=((u).$cname\[0\]*(u).$cname\[1\]+(u).$cname\[2\]*(u).$cname\[3\])*(s).$cname\[0\].re; \\\n";
+        print "   (r).$cname\[2\].re+=((u).$cname\[1\]*(u).$cname\[3\]-(u).$cname\[0\]*(u).$cname\[2\])*(s).$cname\[1\].re; \\\n";
+        print "   (r).$cname\[2\].re+=(r).$cname\[2\].re; \\\n";
+        print "   (r).$cname\[2\].re+=((u).$cname\[0\]*(u).$cname\[0\]-(u).$cname\[1\]*(u).$cname\[1\]-(u).$cname\[2\]*(u).$cname\[2\]+(u).$cname\[3\]*(u).$cname\[3\])*(s).$cname\[2\].re; \\\n";
+
+        print "   (r).$cname\[2\].im=((u).$cname\[0\]*(u).$cname\[1\]+(u).$cname\[2\]*(u).$cname\[3\])*(s).$cname\[0\].im; \\\n";
+        print "   (r).$cname\[2\].im+=((u).$cname\[1\]*(u).$cname\[3\]-(u).$cname\[0\]*(u).$cname\[2\])*(s).$cname\[1\].im; \\\n";
+        print "   (r).$cname\[2\].im+=(r).$cname\[2\].im; \\\n";
+        print "   (r).$cname\[2\].im+=((u).$cname\[0\]*(u).$cname\[0\]-(u).$cname\[1\]*(u).$cname\[1\]-(u).$cname\[2\]*(u).$cname\[2\]+(u).$cname\[3\]*(u).$cname\[3\])*(s).$cname\[2\].im \n\n";
+    } else {
+        die("Undefined fermion representation in quaternionic code. Exiting...\n");
+    }
+    
+}
+
 sub write_su2_inverse_multiply {
     print "/* SU(2) matrix u^dagger times SU(2) vector s */\n";
     print "/* r=u^(dagger)*s */\n";
@@ -2749,23 +2798,34 @@ sub write_su2_inverse_multiply {
         
     } elsif ($N==3) { #adjoint representation
         print "#define _${rdataname}_inverse_multiply(r,u,s) \\\n";
-        print "   (r).$cname\[0\].re=((u).$cname\[0\]*(u).$cname\[0\]-(u).$cname\[1\]*(u).$cname\[1\]+(u).$cname\[2\]*(u).$cname\[2\]-(u).$cname\[3\]*(u).$cname\[3\])*(s).$cname\[0\].re; \\\n";
-        print "   (r).$cname\[0\].re+=2.*((u).$cname\[1\]*(u).$cname\[2\]-(u).$cname\[0\]*(u).$cname\[3\])*(s).$cname\[1\].re; \\\n";
-        print "   (r).$cname\[0\].re+=2.*((u).$cname\[0\]*(u).$cname\[1\]+(u).$cname\[2\]*(u).$cname\[3\])*(s).$cname\[2\].re; \\\n";
-        print "   (r).$cname\[0\].im=((u).$cname\[0\]*(u).$cname\[0\]-(u).$cname\[1\]*(u).$cname\[1\]+(u).$cname\[2\]*(u).$cname\[2\]-(u).$cname\[3\]*(u).$cname\[3\])*(s).$cname\[0\].im; \\\n";
-        print "   (r).$cname\[0\].im+=2.*((u).$cname\[1\]*(u).$cname\[2\]-(u).$cname\[0\]*(u).$cname\[3\])*(s).$cname\[1\].im; \\\n";
-        print "   (r).$cname\[0\].im+=2.*((u).$cname\[0\]*(u).$cname\[1\]+(u).$cname\[2\]*(u).$cname\[3\])*(s).$cname\[2\].im; \\\n";
-        print "   (r).$cname\[1\].re=2.*((u).$cname\[0\]*(u).$cname\[3\]+(u).$cname\[1\]*(u).$cname\[2\])*(s).$cname\[0\].re; \\\n";
+        print "   (r).$cname\[0\].re=((u).$cname\[1\]*(u).$cname\[2\]-(u).$cname\[0\]*(u).$cname\[3\])*(s).$cname\[1\].re; \\\n";
+        print "   (r).$cname\[0\].re+=((u).$cname\[0\]*(u).$cname\[1\]+(u).$cname\[2\]*(u).$cname\[3\])*(s).$cname\[2\].re; \\\n";
+        print "   (r).$cname\[0\].re+=(r).$cname\[0\].re; \\\n";
+        print "   (r).$cname\[0\].re+=((u).$cname\[0\]*(u).$cname\[0\]-(u).$cname\[1\]*(u).$cname\[1\]+(u).$cname\[2\]*(u).$cname\[2\]-(u).$cname\[3\]*(u).$cname\[3\])*(s).$cname\[0\].re; \\\n";
+
+        print "   (r).$cname\[0\].im+=((u).$cname\[1\]*(u).$cname\[2\]-(u).$cname\[0\]*(u).$cname\[3\])*(s).$cname\[1\].im; \\\n";
+        print "   (r).$cname\[0\].im+=((u).$cname\[0\]*(u).$cname\[1\]+(u).$cname\[2\]*(u).$cname\[3\])*(s).$cname\[2\].im; \\\n";
+        print "   (r).$cname\[0\].im+=(r).$cname\[0\].im; \\\n";
+        print "   (r).$cname\[0\].im+=((u).$cname\[0\]*(u).$cname\[0\]-(u).$cname\[1\]*(u).$cname\[1\]+(u).$cname\[2\]*(u).$cname\[2\]-(u).$cname\[3\]*(u).$cname\[3\])*(s).$cname\[0\].im; \\\n";
+
+        print "   (r).$cname\[1\].re=((u).$cname\[0\]*(u).$cname\[3\]+(u).$cname\[1\]*(u).$cname\[2\])*(s).$cname\[0\].re; \\\n";
+        print "   (r).$cname\[1\].re+=((u).$cname\[1\]*(u).$cname\[3\]-(u).$cname\[0\]*(u).$cname\[2\])*(s).$cname\[2\].re; \\\n";
+        print "   (r).$cname\[1\].re+=(r).$cname\[1\].re; \\\n";
         print "   (r).$cname\[1\].re+=((u).$cname\[0\]*(u).$cname\[0\]+(u).$cname\[1\]*(u).$cname\[1\]-(u).$cname\[2\]*(u).$cname\[2\]-(u).$cname\[3\]*(u).$cname\[3\])*(s).$cname\[1\].re; \\\n";
-        print "   (r).$cname\[1\].re+=2.*((u).$cname\[1\]*(u).$cname\[3\]-(u).$cname\[0\]*(u).$cname\[2\])*(s).$cname\[2\].re; \\\n";
-        print "   (r).$cname\[1\].im=2.*((u).$cname\[0\]*(u).$cname\[3\]+(u).$cname\[1\]*(u).$cname\[2\])*(s).$cname\[0\].im; \\\n";
+
+        print "   (r).$cname\[1\].im=((u).$cname\[0\]*(u).$cname\[3\]+(u).$cname\[1\]*(u).$cname\[2\])*(s).$cname\[0\].im; \\\n";
+        print "   (r).$cname\[1\].im+=((u).$cname\[1\]*(u).$cname\[3\]-(u).$cname\[0\]*(u).$cname\[2\])*(s).$cname\[2\].im; \\\n";
+        print "   (r).$cname\[1\].im+=(r).$cname\[1\].im; \\\n";
         print "   (r).$cname\[1\].im+=((u).$cname\[0\]*(u).$cname\[0\]+(u).$cname\[1\]*(u).$cname\[1\]-(u).$cname\[2\]*(u).$cname\[2\]-(u).$cname\[3\]*(u).$cname\[3\])*(s).$cname\[1\].im; \\\n";
-        print "   (r).$cname\[1\].im+=2.*((u).$cname\[1\]*(u).$cname\[3\]-(u).$cname\[0\]*(u).$cname\[2\])*(s).$cname\[2\].im; \\\n";
-        print "   (r).$cname\[2\].re=2.*((u).$cname\[2\]*(u).$cname\[3\]-(u).$cname\[0\]*(u).$cname\[1\])*(s).$cname\[0\].re; \\\n";
-        print "   (r).$cname\[2\].re+=2.*((u).$cname\[0\]*(u).$cname\[2\]+(u).$cname\[1\]*(u).$cname\[3\])*(s).$cname\[1\].re; \\\n";
+
+        print "   (r).$cname\[2\].re=((u).$cname\[2\]*(u).$cname\[3\]-(u).$cname\[0\]*(u).$cname\[1\])*(s).$cname\[0\].re; \\\n";
+        print "   (r).$cname\[2\].re+=((u).$cname\[0\]*(u).$cname\[2\]+(u).$cname\[1\]*(u).$cname\[3\])*(s).$cname\[1\].re; \\\n";
+        print "   (r).$cname\[2\].re+=(r).$cname\[2\].re; \\\n";
         print "   (r).$cname\[2\].re+=((u).$cname\[0\]*(u).$cname\[0\]-(u).$cname\[1\]*(u).$cname\[1\]-(u).$cname\[2\]*(u).$cname\[2\]+(u).$cname\[3\]*(u).$cname\[3\])*(s).$cname\[2\].re; \\\n";
-        print "   (r).$cname\[2\].im=2.*((u).$cname\[2\]*(u).$cname\[3\]-(u).$cname\[0\]*(u).$cname\[1\])*(s).$cname\[0\].im; \\\n";
-        print "   (r).$cname\[2\].im+=2.*((u).$cname\[0\]*(u).$cname\[2\]+(u).$cname\[1\]*(u).$cname\[3\])*(s).$cname\[1\].im; \\\n";
+
+        print "   (r).$cname\[2\].im=((u).$cname\[2\]*(u).$cname\[3\]-(u).$cname\[0\]*(u).$cname\[1\])*(s).$cname\[0\].im; \\\n";
+        print "   (r).$cname\[2\].im+=((u).$cname\[0\]*(u).$cname\[2\]+(u).$cname\[1\]*(u).$cname\[3\])*(s).$cname\[1\].im; \\\n";
+        print "   (r).$cname\[2\].im+=(r).$cname\[2\].im; \\\n";
         print "   (r).$cname\[2\].im+=((u).$cname\[0\]*(u).$cname\[0\]-(u).$cname\[1\]*(u).$cname\[1\]-(u).$cname\[2\]*(u).$cname\[2\]+(u).$cname\[3\]*(u).$cname\[3\])*(s).$cname\[2\].im \n\n";
     } else {
         die("Undefined fermion representation in quaternionic code. Exiting...\n");
