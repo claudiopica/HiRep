@@ -189,8 +189,14 @@ int main(int argc,char *argv[])
   elapsed = gpuTimerStop(t1);
   lprintf("LA TEST",0,"Time: %1.10gms\n",elapsed);
 
-  gflops=n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*744./elapsed/1.e6;   // 536
-  lprintf("LA TEST",0,"GFLOPS: %1.4g\n\n",gflops);
+  gflops=n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*744./elapsed/1.e6;   // 536 //240
+  lprintf("LA TEST",0,"GFLOPS: %1.6g\n\n",gflops);
+
+  gflops=8.;
+  gflops=n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*((24.+28*gflops)*4.+gflops*4.)/elapsed/1.e6; 
+  //gflops=n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*328./elapsed/1.e6; 
+  //gflops=n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*212./elapsed/1.e6; 
+  lprintf("LA TEST",0,"BAND: %1.6g\n\n",gflops);
 
 /*  t1 = gpuTimerStart();
   for (i=0;i<n_times;++i){
