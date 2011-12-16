@@ -140,7 +140,7 @@ extern double bc[4];
 #endif
 
 #undef BC_T
-#undef BC_x
+#undef BC_X
 #undef BC_Y
 #undef BC_Z
 
