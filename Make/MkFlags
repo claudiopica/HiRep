@@ -4,12 +4,15 @@ NG = 2
 #REPR = REPR_ANTISYMMETRIC
 REPR = REPR_ADJOINT
 
+TWIST = 0.5
+
 MACRO += -DANTIPERIODIC_BC_T
 #MACRO += -DANTIPERIODIC_BC_X
 #MACRO += -DANTIPERIODIC_BC_Y
 #MACRO += -DANTIPERIODIC_BC_Z
+MACRO += -DTWISTED_DIRAC
 
-#MACRO += -DBASIC_SF
+MACRO += -DBASIC_SF
 #MACRO += -DROTATED_SF
 
 MACRO += -DUPDATE_EO
@@ -28,7 +31,7 @@ CFLAGS = -Wall -std=c99 -O2 -fomit-frame-pointer -mfpmath=sse -msse -msse2
 ##########################################################################
 
 #Macros
-MACRO += -D$(REPR) -DREPR_NAME=\"$(REPR)\"
+MACRO += -D$(REPR) -DREPR_NAME=\"$(REPR)\" -DTWIST=$(TWIST)
 
 #Include
 INCDIR = $(TOPDIR)/Include

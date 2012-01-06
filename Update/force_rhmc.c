@@ -42,6 +42,8 @@ extern rational_app r_MD; /* used in the action MD evolution */
  */
 
 /* these macros use the variables ptmp, p */
+
+
 #define _F_DIR0(u,chi1,chi2)				      \
   _vector_add_f(ptmp,(chi2)->c[0],(chi2)->c[2]);		      \
   _suNf_multiply(p.c[0],*(pu_gauge_f(x,0)),ptmp);		      \
@@ -50,6 +52,43 @@ extern rational_app r_MD; /* used in the action MD evolution */
   _vector_sub_f(p.c[2],(chi1)->c[0],(chi1)->c[2]);	      \
   _vector_sub_f(p.c[3],(chi1)->c[1],(chi1)->c[3]);	      \
   _suNf_FMAT((u),p)
+
+#ifdef TWISTED_DIRAC
+
+#define _F_DIR1(u,chi1,chi2)				      \
+  _vector_i_add_f(ptmp,(chi2)->c[0],(chi2)->c[3]);		      \
+  _suNf_multiply(ptmp_twisted,*(pu_gauge_f(x,1)),ptmp);		      \
+	_vector_mulc_f(p.c[0],phasep,ptmp_twisted);												\
+  _vector_i_add_f(ptmp,(chi2)->c[1],(chi2)->c[2]);		      \
+  _suNf_multiply(ptmp_twisted,*(pu_gauge_f(x,1)),ptmp);		      \
+	_vector_mulc_f(p.c[1],phasep,ptmp_twisted);												\
+  _vector_i_sub_f(p.c[2],(chi1)->c[0],(chi1)->c[3]);	      \
+  _vector_i_sub_f(p.c[3],(chi1)->c[1],(chi1)->c[2]);	      \
+  _suNf_FMAT((u),p)
+
+#define _F_DIR2(u,chi1,chi2)				      \
+  _vector_add_f(ptmp,(chi2)->c[0],(chi2)->c[3]);		      \
+  _suNf_multiply(ptmp_twisted,*(pu_gauge_f(x,2)),ptmp);		      \
+	_vector_mulc_f(p.c[0],phasep,ptmp_twisted);												\
+  _vector_sub_f(ptmp,(chi2)->c[1],(chi2)->c[2]);		      \
+  _suNf_multiply(ptmp_twisted,*(pu_gauge_f(x,2)),ptmp);		      \
+	_vector_mulc_f(p.c[1],phasep,ptmp_twisted);												\
+  _vector_sub_f(p.c[2],(chi1)->c[0],(chi1)->c[3]);	      \
+  _vector_add_f(p.c[3],(chi1)->c[1],(chi1)->c[2]);	      \
+  _suNf_FMAT((u),p)
+
+#define _F_DIR3(u,chi1,chi2)				      \
+  _vector_i_add_f(ptmp,(chi2)->c[0],(chi2)->c[2]);		      \
+  _suNf_multiply(ptmp_twisted,*(pu_gauge_f(x,3)),ptmp);		      \
+	_vector_mulc_f(p.c[0],phasep,ptmp_twisted);												\
+  _vector_i_sub_f(ptmp,(chi2)->c[1],(chi2)->c[3]);		      \
+  _suNf_multiply(ptmp_twisted,*(pu_gauge_f(x,3)),ptmp);		      \
+	_vector_mulc_f(p.c[1],phasep,ptmp_twisted);												\
+  _vector_i_sub_f(p.c[2],(chi1)->c[0],(chi1)->c[2]);	      \
+  _vector_i_add_f(p.c[3],(chi1)->c[1],(chi1)->c[3]);	      \
+  _suNf_FMAT((u),p)
+
+#else
 
 #define _F_DIR1(u,chi1,chi2)				      \
   _vector_i_add_f(ptmp,(chi2)->c[0],(chi2)->c[3]);		      \
@@ -78,6 +117,7 @@ extern rational_app r_MD; /* used in the action MD evolution */
   _vector_i_add_f(p.c[3],(chi1)->c[1],(chi1)->c[3]);	      \
   _suNf_FMAT((u),p)
 
+#endif
 
 
 void Force_rhmc_f(double dt, suNg_av_field *force){
@@ -86,6 +126,15 @@ void Force_rhmc_f(double dt, suNg_av_field *force){
   static suNg_algebra_vector f;
   static suNf_vector ptmp;
   static suNf_spinor p;
+#ifdef TWISTED_DIRAC
+  static suNf_vector ptmp_twisted;
+		complex phasep;
+		phasep.re = cos(TWIST/GLB_X);
+		phasep.im = sin(TWIST/GLB_X);
+		complex phasem;
+		phasem.re = cos(TWIST/GLB_X);
+		phasem.im = -sin(TWIST/GLB_X);
+#endif
   static suNf s1;
   static mshift_par inv_par;
   spinor_field *chi, *Hchi;

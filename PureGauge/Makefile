@@ -27,7 +27,7 @@ MODS := avr_plaquette
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Random
-MODS := gauss random_suNg ranlxs ranlxd random_fields
+MODS := gauss random_suNg ranlxs ranlxd random_fields ranz2
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Update
