@@ -194,6 +194,10 @@ int main(int argc,char *argv[])
   gflops=n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*744./elapsed/1.e6;   //536
   lprintf("LA TEST",0,"GFLOPS: %1.4g\n\n",gflops);
 
+  gflops=n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*2016./elapsed/1.e6;
+  lprintf("LA TEST",0,"BAND: %1.4g GB/s\n\n",gflops);
+
+
 /*  t1 = gpuTimerStart();
   for (i=0;i<n_times;++i){
     spinor_field_sub_f(s2,s0,s1);
