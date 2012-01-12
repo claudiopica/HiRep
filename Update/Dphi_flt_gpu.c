@@ -350,7 +350,7 @@ __global__ void Dphi_flt_gpu_oe(suNf_spinor_flt* out, suNf_spinor_flt* in,
   
   _vector_add_assign_f(sn.c[0],sn.c[1]);
   
-  _suNf_flt_read_gpu(stride,u,gauge+4*vol4h,ix-vol4h,0);
+  _suNf_flt_read_gpu(stride,u,gauge+(vol4h<<2),ix-vol4h,0);
   
   _suNf_multiply(r.c[0],u,sn.c[0]);
   
@@ -397,7 +397,7 @@ __global__ void Dphi_flt_gpu_oe(suNf_spinor_flt* out, suNf_spinor_flt* in,
   
   _vector_i_add_assign_f(sn.c[0],sn.c[1]);
   
-  _suNf_flt_read_gpu(stride,u,gauge+4*vol4h,ix-vol4h,1);
+  _suNf_flt_read_gpu(stride,u,gauge+(vol4h<<2),ix-vol4h,1);
   
   _suNf_multiply(sn.c[1],u,sn.c[0]);
   
@@ -446,7 +446,7 @@ __global__ void Dphi_flt_gpu_oe(suNf_spinor_flt* out, suNf_spinor_flt* in,
   
   
   _vector_add_assign_f(sn.c[0],sn.c[1]);
-  _suNf_flt_read_gpu(stride,u,gauge+4*vol4h,ix-vol4h,2);
+  _suNf_flt_read_gpu(stride,u,gauge+(vol4h<<2),ix-vol4h,2);
   
   _suNf_multiply(sn.c[1],u,sn.c[0]);
   
@@ -494,7 +494,7 @@ __global__ void Dphi_flt_gpu_oe(suNf_spinor_flt* out, suNf_spinor_flt* in,
   _suNf_read_spinor_flt_gpu(stride,sn.c[1],in,iy,2);
   
   _vector_i_add_assign_f(sn.c[0],sn.c[1]);
-  _suNf_flt_read_gpu(stride,u,gauge+4*vol4h,ix-vol4h,3);
+  _suNf_flt_read_gpu(stride,u,gauge+(vol4h<<2),ix-vol4h,3);
   
   _suNf_multiply(sn.c[1],u,sn.c[0]);
   
@@ -599,7 +599,7 @@ __global__ void Dphi_flt_gpu_eo(suNf_spinor_flt* out, suNf_spinor_flt* in,
   
   _vector_sub_assign_f(sn.c[0],sn.c[1]);
   
-  _suNf_flt_read_gpu(stride,u,gauge+4*vol4h,iy,0);
+  _suNf_flt_read_gpu(stride,u,gauge+(vol4h<<2),iy,0);
   
   _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
   
@@ -649,7 +649,7 @@ __global__ void Dphi_flt_gpu_eo(suNf_spinor_flt* out, suNf_spinor_flt* in,
   
   _vector_i_sub_assign_f(sn.c[0],sn.c[1]);
   
-  _suNf_flt_read_gpu(stride,u,gauge+4*vol4h,iy,1);
+  _suNf_flt_read_gpu(stride,u,gauge+(vol4h<<2),iy,1);
   
   _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
   
@@ -697,7 +697,7 @@ __global__ void Dphi_flt_gpu_eo(suNf_spinor_flt* out, suNf_spinor_flt* in,
   _suNf_read_spinor_flt_gpu(stride,sn.c[1],in,iy,3);
   
   _vector_sub_assign_f(sn.c[0],sn.c[1]);
-  _suNf_flt_read_gpu(stride,u,gauge+4*vol4h,iy,2);
+  _suNf_flt_read_gpu(stride,u,gauge+(vol4h<<2),iy,2);
   
   _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
   
@@ -745,7 +745,7 @@ __global__ void Dphi_flt_gpu_eo(suNf_spinor_flt* out, suNf_spinor_flt* in,
   
   _vector_i_sub_assign_f(sn.c[0],sn.c[1]);
   
-  _suNf_flt_read_gpu(stride,u,gauge+4*vol4h,iy,3);
+  _suNf_flt_read_gpu(stride,u,gauge+(vol4h<<2),iy,3);
   
   _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
   
