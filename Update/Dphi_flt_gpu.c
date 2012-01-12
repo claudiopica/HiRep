@@ -314,10 +314,10 @@ __global__ void Dphi_flt_gpu(suNf_spinor_flt* out, suNf_spinor_flt* in,
   ix+=shift-vol4h; //if(ix>=vol4h) ix-=vol4h;
   _spinor_mul_f(r,-0.5f,r);
   
-  _suNf_write_spinor_flt_gpu(r.c[0],out,ix,0);
-  _suNf_write_spinor_flt_gpu(r.c[1],out,ix,1);
-  _suNf_write_spinor_flt_gpu(r.c[2],out,ix,2);
-  _suNf_write_spinor_flt_gpu(r.c[3],out,ix,3);
+  _suNf_write_spinor_flt_gpu(stride,r.c[0],out,ix,0);
+  _suNf_write_spinor_flt_gpu(stride,r.c[1],out,ix,1);
+  _suNf_write_spinor_flt_gpu(stride,r.c[2],out,ix,2);
+  _suNf_write_spinor_flt_gpu(stride,r.c[3],out,ix,3);
   
 }
 
@@ -541,10 +541,10 @@ __global__ void Dphi_flt_gpu_oe(suNf_spinor_flt* out, suNf_spinor_flt* in,
   ix-=vol4h;
   _spinor_mul_f(r,-0.5f,r);
   
-  _suNf_write_spinor_flt_gpu(r.c[0],out,ix,0);
-  _suNf_write_spinor_flt_gpu(r.c[1],out,ix,1);
-  _suNf_write_spinor_flt_gpu(r.c[2],out,ix,2);
-  _suNf_write_spinor_flt_gpu(r.c[3],out,ix,3);
+  _suNf_write_spinor_flt_gpu(vol4h,r.c[0],out,ix,0);
+  _suNf_write_spinor_flt_gpu(vol4h,r.c[1],out,ix,1);
+  _suNf_write_spinor_flt_gpu(vol4h,r.c[2],out,ix,2);
+  _suNf_write_spinor_flt_gpu(vol4h,r.c[3],out,ix,3);
   
 }
 
@@ -766,10 +766,10 @@ __global__ void Dphi_flt_gpu_eo(suNf_spinor_flt* out, suNf_spinor_flt* in,
   //out[ix]=r;
   _spinor_mul_f(r,-0.5f,r);
   
-  _suNf_write_spinor_flt_gpu(r.c[0],out,ix,0);
-  _suNf_write_spinor_flt_gpu(r.c[1],out,ix,1);
-  _suNf_write_spinor_flt_gpu(r.c[2],out,ix,2);
-  _suNf_write_spinor_flt_gpu(r.c[3],out,ix,3);
+  _suNf_write_spinor_flt_gpu(vol4h,r.c[0],out,ix,0);
+  _suNf_write_spinor_flt_gpu(vol4h,r.c[1],out,ix,1);
+  _suNf_write_spinor_flt_gpu(vol4h,r.c[2],out,ix,2);
+  _suNf_write_spinor_flt_gpu(vol4h,r.c[3],out,ix,3);
   
 }
 
