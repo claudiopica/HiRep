@@ -797,8 +797,9 @@ void Dphi_flt_(spinor_field_flt *out, spinor_field_flt *in)
    error(out->type==&glattice && in->type!=&glattice,1,"Dphi_flt [Dphi_flt_gpu.c]", "Spinors don't match! (3)");
 #endif
    
-   N = out->type->master_end[0] - out->type->master_start[0] + 1 ;
-   grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
+   //N = out->type->master_end[0] - out->type->master_start[0] + 1 ;
+  N=vol4h; 
+  grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
   
   if(in->type==&glat_odd){
     Dphi_flt_gpu_eo<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f_flt->gpu_ptr,iup_gpu,idn_gpu,vol4h);
@@ -813,8 +814,20 @@ void Dphi_flt_(spinor_field_flt *out, spinor_field_flt *in)
   }
   
   if(in->type==&glattice){
-    Dphi_flt_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f_flt->gpu_ptr,iup_gpu,idn_gpu,N,vol4h,stride);
+    in->type=&glat_even;
+    out->type=&glat_odd;
+    Dphi_flt_gpu_oe<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f_flt->gpu_ptr,iup_gpu,idn_gpu,vol4h);
     CudaCheckError();
+    in->type=&glat_odd;
+    out->type=&glat_even;
+    Dphi_flt_gpu_eo<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f_flt->gpu_ptr,iup_gpu,idn_gpu,vol4h);
+    CudaCheckError();
+    
+    in->type=&glattice;
+    out->type=&glattice;
+    
+    //Dphi_flt_gpu<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f_flt->gpu_ptr,iup_gpu,idn_gpu,N,vol4h,stride);
+    //CudaCheckError();
   }
   
 
