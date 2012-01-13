@@ -556,7 +556,7 @@ void Dphi_flt_(spinor_field_flt *out, spinor_field_flt *in)
       
       in->type=&glattice;
       out->type=&glattice;      
-    else {
+  } else {
       error(1,1,"Dphi_flt_ [Dphi_flt_gpu.c]", "Wrong input spinor geometry!");
   }
   
