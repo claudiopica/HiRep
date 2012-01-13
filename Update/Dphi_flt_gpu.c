@@ -519,9 +519,7 @@ void Dphi_flt_(spinor_field_flt *out, spinor_field_flt *in)
    int N,grid;
   const int vol4h=T*X*Y*Z/2;
 #ifdef UPDATE_EO
-  const int stride=vol4h;
 #else
-  const int stride=vol4h*2;
 #endif
   
    error((in==NULL)||(out==NULL),1,"Dphi_flt [Dphi_flt_gpu.c]",
@@ -540,16 +538,13 @@ void Dphi_flt_(spinor_field_flt *out, spinor_field_flt *in)
   N=vol4h; 
   grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
   
-  switch (in->type) {
-    case &glat_odd:
+  if(in->type==&glat_odd) {
       Dphi_flt_gpu_eo<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f_flt->gpu_ptr,iup_gpu,idn_gpu,vol4h, vol4h);
       CudaCheckError();
-      break;
-    case &glat_even:
+  } else if (in->type==&glat_even) {
       Dphi_flt_gpu_oe<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f_flt->gpu_ptr,iup_gpu,idn_gpu,vol4h, vol4h);
       CudaCheckError();
-      break;
-      case &glattice:
+  } else if (in->type==&glattice) {
       in->type=&glat_even;
       out->type=&glat_odd;
       Dphi_flt_gpu_oe<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f_flt->gpu_ptr,iup_gpu,idn_gpu,vol4h, vol4h);
@@ -561,9 +556,7 @@ void Dphi_flt_(spinor_field_flt *out, spinor_field_flt *in)
       
       in->type=&glattice;
       out->type=&glattice;      
-      break;
-
-    default:
+    else {
       error(1,1,"Dphi_flt_ [Dphi_flt_gpu.c]", "Wrong input spinor geometry!");
   }
   
