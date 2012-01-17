@@ -31,18 +31,18 @@ void spinor_field_togpuformat(spinor_field *out, spinor_field *in) {
     //check input and output type are the same
     error(out->type!=in->type,1,"spinor_field_togpuformat " __FILE__, "Spinors don't match!");
     
-#ifdef UPDATE_EO
+//#ifdef UPDATE_EO
     if (in->type==&glattice) {
         // we call recursively this function twice
         // on the even and odd sublattices
         in->type=out->type=&glat_even;
         spinor_field_togpuformat(out, in);
-    	in->type=out->type=&glat_odd;
+    		in->type=out->type=&glat_odd;
         spinor_field_togpuformat(out, in);
         in->type=out->type=&glattice;
         return;
     }
-#endif //UPDATE_EO
+//#endif //UPDATE_EO
     
     _PIECE_FOR(in->type,ix) {
         const int start = in->type->master_start[_PIECE_INDEX(ix)];
@@ -68,7 +68,7 @@ void spinor_field_tocpuformat(spinor_field *out, spinor_field *in) {
     //check input and output type are the same
     error(out->type!=in->type,1,"spinor_field_tocpuformat " __FILE__, "Spinors don't match!");
     
-#ifdef UPDATE_EO
+//#ifdef UPDATE_EO
     if (in->type==&glattice) {
         // we call recursively this function twice
         // on the even and odd sublattices
@@ -79,7 +79,7 @@ void spinor_field_tocpuformat(spinor_field *out, spinor_field *in) {
         in->type=out->type=&glattice;
         return;
     }
-#endif //UPDATE_EO    
+//#endif //UPDATE_EO    
     
     _PIECE_FOR(in->type,ix) {
         int start = in->type->master_start[_PIECE_INDEX(ix)];
@@ -105,7 +105,7 @@ void spinor_field_togpuformat_flt(spinor_field_flt *out, spinor_field_flt *in) {
   //check input and output type are the same
   error(out->type!=in->type,1,"spinor_field_togpuformat_flt " __FILE__, "Spinors don't match!");
   
-#ifdef UPDATE_EO
+//#ifdef UPDATE_EO
   if (in->type==&glattice) {
     // we call recursively this function twice
     // on the even and odd sublattices
@@ -116,7 +116,7 @@ void spinor_field_togpuformat_flt(spinor_field_flt *out, spinor_field_flt *in) {
     in->type=out->type=&glattice;
     return;
   }
-#endif //UPDATE_EO
+//#endif //UPDATE_EO
   
   _PIECE_FOR(in->type,ix) {
     const int start = in->type->master_start[_PIECE_INDEX(ix)];
@@ -142,7 +142,7 @@ void spinor_field_tocpuformat_flt(spinor_field_flt *out, spinor_field_flt *in) {
   //check input and output type are the same
   error(out->type!=in->type,1,"spinor_field_tocpuformat_flt " __FILE__, "Spinors don't match!");
   
-#ifdef UPDATE_EO
+//#ifdef UPDATE_EO
   if (in->type==&glattice) {
     // we call recursively this function twice
     // on the even and odd sublattices
@@ -153,7 +153,7 @@ void spinor_field_tocpuformat_flt(spinor_field_flt *out, spinor_field_flt *in) {
     in->type=out->type=&glattice;
     return;
   }
-#endif //UPDATE_EO    
+//#endif //UPDATE_EO    
   
   _PIECE_FOR(in->type,ix) {
     int start = in->type->master_start[_PIECE_INDEX(ix)];
@@ -180,7 +180,7 @@ void gfield_togpuformat(suNg_field *out, suNg_field *in) {
   //check input and output type are the same
   error(out->type!=in->type,1,"gield_togpuformat " __FILE__, "Gauge field types don't match!");
   
-#ifdef UPDATE_EO
+//#ifdef UPDATE_EO
   if (in->type==&glattice) {
     // we call recursively this function twice
     // on the even and odd sublattices
@@ -191,7 +191,7 @@ void gfield_togpuformat(suNg_field *out, suNg_field *in) {
     in->type=out->type=&glattice;
     return;
   }
-#endif //UPDATE_EO
+//#endif //UPDATE_EO
   
   _PIECE_FOR(in->type,ix) {
     const int start = in->type->master_start[_PIECE_INDEX(ix)];
@@ -216,7 +216,7 @@ void gfield_tocpuformat(suNg_field *out, suNg_field *in) {
   //check input and output type are the same
   error(out->type!=in->type,1,"gield_tocpuformat " __FILE__, "Gauge field types don't match!");
   
-#ifdef UPDATE_EO
+//#ifdef UPDATE_EO
   if (in->type==&glattice) {
     // we call recursively this function twice
     // on the even and odd sublattices
@@ -227,7 +227,7 @@ void gfield_tocpuformat(suNg_field *out, suNg_field *in) {
     in->type=out->type=&glattice;
     return;
   }
-#endif //UPDATE_EO
+//#endif //UPDATE_EO
   
   _PIECE_FOR(in->type,ix) {
     const int start = in->type->master_start[_PIECE_INDEX(ix)];
@@ -261,7 +261,7 @@ void gfield_togpuformat_flt(suNg_field_flt *out, suNg_field_flt *in) {
   //check input and output type are the same
   error(out->type!=in->type,1,"gield_togpuformat " __FILE__, "Gauge field types don't match!");
   
-#ifdef UPDATE_EO
+//#ifdef UPDATE_EO
   if (in->type==&glattice) {
     // we call recursively this function twice
     // on the even and odd sublattices
@@ -272,7 +272,7 @@ void gfield_togpuformat_flt(suNg_field_flt *out, suNg_field_flt *in) {
     in->type=out->type=&glattice;
     return;
   }
-#endif //UPDATE_EO
+//#endif //UPDATE_EO
   
   _PIECE_FOR(in->type,ix) {
     const int start = in->type->master_start[_PIECE_INDEX(ix)];
@@ -298,7 +298,7 @@ void gfield_tocpuformat_flt(suNg_field_flt *out, suNg_field_flt *in) {
   //check input and output type are the same
   error(out->type!=in->type,1,"gield_tocpuformat " __FILE__, "Gauge field types don't match!");
   
-#ifdef UPDATE_EO
+//#ifdef UPDATE_EO
   if (in->type==&glattice) {
     // we call recursively this function twice
     // on the even and odd sublattices
@@ -309,7 +309,7 @@ void gfield_tocpuformat_flt(suNg_field_flt *out, suNg_field_flt *in) {
     in->type=out->type=&glattice;
     return;
   }
-#endif //UPDATE_EO
+//#endif //UPDATE_EO
   
   _PIECE_FOR(in->type,ix) {
     const int start = in->type->master_start[_PIECE_INDEX(ix)];
