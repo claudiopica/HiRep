@@ -92,7 +92,7 @@ void spinor_field_copy_to_gpu_f_flt(spinor_field_flt *field){
   spinor_field_flt *tmp = alloc_spinor_field_f_flt(1, field->type);
   spinor_field_togpuformat_flt(tmp, field);
   cudaMemcpy(field->gpu_ptr,tmp->ptr,field->type->gsize*sizeof(suNf_spinor_flt),cudaMemcpyHostToDevice);
-	free_spinor_field_flt(tmp);
+  free_spinor_field_flt(tmp);
 }
 
 void spinor_field_copy_from_gpu_f_flt(spinor_field_flt *field){

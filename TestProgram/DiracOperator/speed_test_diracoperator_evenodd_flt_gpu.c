@@ -28,16 +28,16 @@ static suNg_field_flt *g;
 double sfdiff (spinor_field_flt* sf){
   spinor_field *tmp;
   double res;
-  tmp=alloc_spinor_field_f(2, &glattice);
+  tmp=alloc_spinor_field_f(2, sf->type);
   alloc_spinor_field_f_gpu(2, tmp);
   assign_s2sd(&tmp[0], sf);
   spinor_field_copy_from_gpu_f_flt(sf);
   assign_s2sd(&tmp[1], sf);
-  spinor_field_sub_f_cpu(&tmp[0],&tmp[0],&tmp[1]);
-  res= spinor_field_sqnorm_f_cpu(&tmp[0]);
+  spinor_field_sub_f_cpu(&tmp[1],&tmp[0],&tmp[1]);
+  res= spinor_field_sqnorm_f_cpu(&tmp[1]);
+  assign_sd2s(sf,&tmp[0]);
   free_spinor_field_gpu(tmp);
   free_spinor_field(tmp);
-  return res;
 }
 
 
@@ -148,6 +148,11 @@ int main(int argc,char *argv[])
   alloc_spinor_field_f_flt_gpu(1,s0);
   s1=alloc_spinor_field_f_flt(1,&glat_even);
   alloc_spinor_field_f_flt_gpu(1,s1);
+
+  s2=alloc_spinor_field_f_flt(1,&glat_odd);
+  alloc_spinor_field_f_flt_gpu(1,s2);
+  s3=alloc_spinor_field_f_flt(1,&glat_odd);
+  alloc_spinor_field_f_flt_gpu(1,s3);
   
   gaussian_spinor_field_flt(s0);
   spinor_field_copy_to_gpu_f_flt(s0);
@@ -155,6 +160,17 @@ int main(int argc,char *argv[])
   gaussian_spinor_field_flt(s1);
   spinor_field_copy_to_gpu_f_flt(s1);
 
+  gaussian_spinor_field_flt(s2);
+  spinor_field_copy_to_gpu_f_flt(s2);
+
+  gaussian_spinor_field_flt(s3);
+  spinor_field_copy_to_gpu_f_flt(s3);
+
+  res1 = sfdiff(s0);
+  res2 = sfdiff(s2);  
+  lprintf("LA TEST",0,"Copy works if 0=%1.10g and 0=%1.10 .\n",res1,res2);
+
+	  
   lprintf("MAIN",0,"Generating a random gauge field... ");
   fflush(stdout);
   random_u_flt(u_gauge_flt);
@@ -163,23 +179,127 @@ int main(int argc,char *argv[])
   represent_gauge_field_flt();
   gfield_copy_to_gpu_f_flt(u_gauge_f_flt);
 
-  lprintf("MAIN",0,"done.\n");
-  lprintf("LA TEST",0,"Checking the diracoperator..\n");
+  //Diracoperator with zero mass
+  
+  lprintf("LA TEST",0,"Testing dirac operator with mass=0\n");
+  lprintf("LA TEST",0,"Even lattice\n");
+
+  // Norm before operation
+  res_gpu = spinor_field_sqnorm_f_flt(s0);
+  res_cpu = spinor_field_sqnorm_f_flt_cpu(s0);
+  lprintf("LA TEST",0,"Before operator even, \nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g\nsqnorm(gpu-cpu)=%1.10g\n",res_gpu,res_cpu,sfdiff(s0));
 
   Dphi_eopre_flt(0,s1,s0);
   Dphi_eopre_flt_cpu(0,s1,s0);
-  
-  res1 = sfdiff(s0);
-  res2 = sfdiff(s1);
 
   res_gpu = spinor_field_sqnorm_f_flt(s1);
   res_cpu = spinor_field_sqnorm_f_flt_cpu(s1);
+  
+  res1 = sfdiff(s0); 
+  res2 = sfdiff(s1);
 
   lprintf("LA TEST",0,"Result, mass=0, \nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g,\nsqnorm(gpu-cpu)= %1.10g (check %1.10g=0?),\n",res_gpu,res_cpu,res2,res1);
 
-  t1 = gpuTimerStart();
+  // Norm before operation
+  res_gpu = spinor_field_sqnorm_f_flt(s2);
+  res_cpu = spinor_field_sqnorm_f_flt_cpu(s2);
+  lprintf("LA TEST",0,"Before operator odd, \nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g\nsqnorm(gpu-cpu)=%1.10g\n",res_gpu,res_cpu,sfdiff(s2));
+	
+  lprintf("MAIN",0,"done even.\n");
+  lprintf("LA TEST",0,"Odd lattice\n");
 
-  lprintf("LA TEST",0,"Calculating Diracoperator %d times.\n",n_times);
+  Dphi_oepre_flt(0,s2,s3);
+  Dphi_oepre_flt_cpu(0,s2,s3);
+
+  res_gpu = spinor_field_sqnorm_f_flt(s3);
+  res_cpu = spinor_field_sqnorm_f_flt_cpu(s3);
+  
+  res1 = sfdiff(s2); 
+  res2 = sfdiff(s3);
+
+  lprintf("LA TEST",0,"Result, mass=0, \nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g,\nsqnorm(gpu-cpu)= %1.10g (check %1.10g=0?),\n",res_gpu,res_cpu,res2,res1);
+  lprintf("MAIN",0,"done odd.\n");
+
+  //Diracoperator with zero m=0.13
+  
+  // Norm before operation
+  lprintf("LA TEST",0,"Testing dirac operator with mass=0.13\n");
+  lprintf("LA TEST",0,"Even lattice\n");
+
+  Dphi_eopre_flt(0.13,s1,s0);
+  Dphi_eopre_flt_cpu(0.13,s1,s0);
+
+  res_gpu = spinor_field_sqnorm_f_flt(s1);
+  res_cpu = spinor_field_sqnorm_f_flt_cpu(s1);
+  
+  res1 = sfdiff(s0); 
+  res2 = sfdiff(s1);
+
+  lprintf("LA TEST",0,"Result, mass=0, \nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g,\nsqnorm(gpu-cpu)= %1.10g (check %1.10g=0?),\n",res_gpu,res_cpu,res2,res1);
+
+  // Norm before operation
+  lprintf("MAIN",0,"done even.\n");
+
+  lprintf("LA TEST",0,"Odd lattice\n");
+  Dphi_oepre_flt(0.13,s2,s3);
+  Dphi_oepre_flt_cpu(0.13,s2,s3);
+
+  res_gpu = spinor_field_sqnorm_f_flt(s3);
+  res_cpu = spinor_field_sqnorm_f_flt_cpu(s3);
+  
+  res1 = sfdiff(s2); 
+  res2 = sfdiff(s3);
+
+  lprintf("LA TEST",0,"Result, mass=0, \nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g,\nsqnorm(gpu-cpu)= %1.10g (check %1.10g=0?),\n",res_gpu,res_cpu,res2,res1);
+  lprintf("MAIN",0,"done odd.\n");
+
+
+  //Gamma_5xDiracoperator with m=0.13
+  
+  // Norm before operation
+  lprintf("LA TEST",0,"Testing gamma_5 x dirac operator with mass=0.13");
+  lprintf("LA TEST",0,"Even lattice\n");
+
+  g5Dphi_eopre_flt(0.13,s1,s0);
+  g5Dphi_eopre_flt_cpu(0.13,s1,s0);
+
+  res_gpu = spinor_field_sqnorm_f_flt(s1);
+  res_cpu = spinor_field_sqnorm_f_flt_cpu(s1);
+  
+  res1 = sfdiff(s0); 
+  res2 = sfdiff(s1);
+
+  lprintf("LA TEST",0,"Result, mass=0, \nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g,\nsqnorm(gpu-cpu)= %1.10g (check %1.10g=0?),\n",res_gpu,res_cpu,res2,res1);
+
+  // Norm before operation
+  lprintf("MAIN",0,"done even.\n");
+
+
+  //Gamma_5xDiracoperator^2 with m=0.13
+  
+  // Norm before operation
+  lprintf("LA TEST",0,"Testing gamma_5 x (dirac operator)^2 with mass=0.13");
+  lprintf("LA TEST",0,"Even lattice\n");
+
+  g5Dphi_eopre_sq_flt(0.13,s1,s0);
+  g5Dphi_eopre_sq_flt_cpu(0.13,s1,s0);
+
+  res_gpu = spinor_field_sqnorm_f_flt(s1);
+  res_cpu = spinor_field_sqnorm_f_flt_cpu(s1);
+  
+  res1 = sfdiff(s0); 
+  res2 = sfdiff(s1);
+
+  lprintf("LA TEST",0,"Result, mass=0, \nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g,\nsqnorm(gpu-cpu)= %1.10g (check %1.10g=0?),\n",res_gpu,res_cpu,res2,res1);
+
+  // Norm before operation
+  lprintf("MAIN",0,"done even.\n");
+
+
+
+  lprintf("LA TEST",0,"Calculating Diracoperator %d times on even lattice.\n",n_times);
+
+  t1 = gpuTimerStart();
 
   for (i=0;i<n_times;++i){
     Dphi_eopre_flt(0,s1,s0);
@@ -197,6 +317,63 @@ int main(int argc,char *argv[])
   //gflops=n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*212./elapsed/1.e6; 
   lprintf("LA TEST",0,"BAND: %1.6g\n\n",gflops);
 
+  lprintf("LA TEST",0,"Calculating Diracoperator %d times on odd lattice.\n",n_times);
+
+  t1 = gpuTimerStart();
+
+  for (i=0;i<n_times;++i){
+    Dphi_oepre_flt(0,s3,s2);
+  }
+
+  elapsed = gpuTimerStop(t1);
+  lprintf("LA TEST",0,"Time: %1.10gms\n",elapsed);
+
+  gflops=n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*744./elapsed/1.e6;   // 536 //240
+  lprintf("LA TEST",0,"GFLOPS: %1.6g\n\n",gflops);
+
+  gflops=8.;
+  gflops=n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*((24.+28*gflops)*4.+gflops*4.)/elapsed/1.e6; 
+  lprintf("LA TEST",0,"BAND: %1.6g\n\n",gflops);
+
+  lprintf("LA TEST",0,"Calculating gamma_5 x Diracoperator %d times on even lattice.\n",n_times);
+
+  t1 = gpuTimerStart();
+
+  for (i=0;i<n_times;++i){
+    g5Dphi_eopre_flt(0,s1,s0);
+  }
+
+  elapsed = gpuTimerStop(t1);
+  lprintf("LA TEST",0,"Time: %1.10gms\n",elapsed);
+
+  gflops=n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*(744.+24.)/elapsed/1.e6;   // 536 //240
+  lprintf("LA TEST",0,"GFLOPS: %1.6g\n\n",gflops);
+
+  gflops=8.;
+  gflops=n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*((24.+28*gflops)*4.+gflops*4.+24.)/elapsed/1.e6; 
+  lprintf("LA TEST",0,"BAND: %1.6g\n\n",gflops);
+
+  lprintf("LA TEST",0,"Calculating (gamma_5 x Diracoperator)^2 %d times on even lattice.\n",n_times);
+
+  t1 = gpuTimerStart();
+
+  for (i=0;i<n_times;++i){
+    g5Dphi_eopre_sq_flt(0,s1,s0);
+  }
+
+  elapsed = gpuTimerStop(t1);
+  lprintf("LA TEST",0,"Time: %1.10gms\n",elapsed);
+
+  gflops=2*n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*(744.+24.)/elapsed/1.e6;   // 536 //240
+  lprintf("LA TEST",0,"GFLOPS: %1.6g\n\n",gflops);
+
+  gflops=8.;
+  gflops=2*n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*((24.+28*gflops)*4.+gflops*4.+24.)/elapsed/1.e6; 
+  lprintf("LA TEST",0,"BAND: %1.6g\n\n",gflops);
+
+
+
+
 /*  t1 = gpuTimerStart();
   for (i=0;i<n_times;++i){
     spinor_field_sub_f(s2,s0,s1);
@@ -205,9 +382,11 @@ int main(int argc,char *argv[])
   gflops=n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*24.*2./elapsed/1.e6; 
     lprintf("LA TEST",0,"SQnorm GFLOPS: %1.4g\n\n",gflops);
  
-    lprintf("LA TEST",0,"DONE!\n\n");
+
 */
 
+
+  lprintf("LA TEST",0,"DONE!\n\n");
   free_spinor_field_flt(s0);
   free_spinor_field_flt_gpu(s0);
 
