@@ -1,7 +1,7 @@
 TOPDIR = ../..
 MKDIR=$(TOPDIR)/Make
 
-EXES = check_inverters_1 check_inverters_gpu_1 check_inverters_2 check_inverters_3 check_inverters_4 check_inverters_5 check_inverters_6
+EXES = check_inverters_1 check_inverters_gpu_1 check_inverters_2 check_inverters_3 check_inverters_4 check_inverters_5 #check_inverters_6
 
 default: $(EXES)
 
@@ -15,11 +15,11 @@ MODS := logger read_input
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Utils
-MODS := boundary_conditions single_double_utils suN_utils time timer_gpu
+MODS := boundary_conditions single_double_utils suN_utils time timer_gpu single_double_utils_gpu
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Memory
-MODS := amalloc field_alloc spinor_field_alloc
+MODS := amalloc field_alloc spinor_field_alloc field_pack_gpu
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Random
@@ -27,7 +27,7 @@ MODS := gauss random_suNg ranlxs ranlxd random_fields ranz2
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Update
-MODS := Dphi random_spinor_field random_su2 representation Dphi_flt Dphi_gpu
+MODS := Dphi random_spinor_field random_su2 representation Dphi_flt Dphi_gpu Dphi_flt_gpu
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Error

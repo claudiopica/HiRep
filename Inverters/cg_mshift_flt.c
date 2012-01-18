@@ -41,6 +41,9 @@ static int cg_mshift_flt_core(short int *sflags, mshift_par *par, spinor_operato
 
   /* allocate spinors fields and aux real variables */
   p = alloc_spinor_field_f_flt(3+par->n,in->type);
+#ifdef WITH_GPU
+  alloc_spinor_field_f_flt_gpu(3+par->n,p);
+#endif //WITH_GPU
   k=p+par->n;
   r=k+1;
   Mk=r+1;
@@ -117,7 +120,11 @@ static int cg_mshift_flt_core(short int *sflags, mshift_par *par, spinor_operato
   } while ((par->max_iter==0 || cgiter<par->max_iter) && notconverged);
 
   /* free memory */
+#ifdef WITH_GPU
+  free_spinor_field_flt_gpu(p);
+#endif //WITH_GPU
   free_spinor_field_flt(p);
+
   free(z1); free(z2); free(z3);
 
   /* return number of cg iter */
@@ -146,8 +153,16 @@ int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_operator_flt F, spi
 
   /* allocate memory for single-precision solutions and residual vectors */
   res_flt = alloc_spinor_field_f_flt(1+par->n,in->type);
+#ifdef WITH_GPU
+  alloc_spinor_field_f_flt_gpu(1+par->n,res_flt);
+#endif //WITH_GPU
+
   out_flt = res_flt + 1;
   res = alloc_spinor_field_f(3,in->type);
+#ifdef WITH_GPU
+  alloc_spinor_field_f_gpu(3,res);
+#endif //WITH_GPU
+
   res2 = res + 1;
   tmp = res2 + 1;
 
@@ -208,7 +223,11 @@ int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_operator_flt F, spi
 
     if (notconverged) {
       /* Do single precision inversion */
+#ifdef WITH_GPU
+      assign_sd2s_gpu(res_flt,res); 
+#else
       assign_sd2s(res_flt,res); 
+#endif
       local_par.err2=par->err2/local_par.err2*0.9;
 #define MAX_PREC 1.e-10
       if(local_par.err2<MAX_PREC) local_par.err2=MAX_PREC;
@@ -222,12 +241,16 @@ int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_operator_flt F, spi
       /* accumulate solution in double precision */
       for(i=0;i<par->n; ++i) {
         if(sflags[i]!=0){
+#ifdef WITH_GPU
+          assign_s2sd_gpu(res2,&out_flt[i]);
+#else
           assign_s2sd(res2,&out_flt[i]);
+#endif 
           spinor_field_mul_add_assign_f(&out[i],norm[i],res2);
         }
       }
     }
-
+    lprintf("CGDEBUG",20,"End of loop\n");
   } while(notconverged);
 
   
@@ -235,7 +258,14 @@ int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_operator_flt F, spi
     lprintf("INVERTER",20,"CG inversion: err2 = %1.8e < %1.8e\n",norm[i],par->err2);
   }
 
+#ifdef WITH_GPU
+  free_spinor_field_flt_gpu(res_flt);
+#endif //WITH_GPU
   free_spinor_field_flt(res_flt);
+
+#ifdef WITH_GPU
+  free_spinor_field_gpu(res);
+#endif //WITH_GPU
   free_spinor_field(res);
 
   lprintf("INVERTER",10,"CG_mshift: MVM = %d (single) - %d (double)\n",siter,diter);

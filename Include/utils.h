@@ -94,6 +94,8 @@ typedef cudaEvent_t gpu_timer;
 cudaEvent_t gpuTimerStart();
 float gpuTimerMeasure(cudaEvent_t e);
 float gpuTimerStop(cudaEvent_t e);
+void assign_s2sd_gpu(spinor_field *out, spinor_field_flt *in);
+void assign_sd2s_gpu(spinor_field_flt *out, spinor_field *in);
 #endif
 
 #endif 
