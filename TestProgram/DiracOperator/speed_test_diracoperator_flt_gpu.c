@@ -82,7 +82,7 @@ static void transform_s(spinor_field_flt *out, spinor_field_flt *in)
    _MASTER_FOR(&glattice,ix) {
       s = _FIELD_AT(in,ix);
       r = _FIELD_AT(out,ix);
-      
+     
       _group_represent2_flt(&gfx,_FIELD_AT(g,ix));
 
       _suNf_multiply(r->c[0],gfx,s->c[0]);
