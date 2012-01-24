@@ -79,6 +79,7 @@ int main(int argc,char *argv[])
    
    /* logger setup */
    logger_setlevel(0,10000); /* log all */
+   //   logger_setlevel(0,10); /* log all */
    logger_map("DEBUG","debug");
 #ifdef WITH_MPI
    sprintf(pame,">out_%d",PID); logger_stdout(pame);
@@ -157,6 +158,8 @@ int main(int argc,char *argv[])
    par.shift[4]=-0.15;
    par.shift[5]=-0.05;
    
+   par.n = 3;
+
    gaussian_spinor_field(s1);
    spinor_field_copy_to_gpu_f(s1);
    
@@ -180,9 +183,27 @@ int main(int argc,char *argv[])
 
    lprintf("CG TEST",0,"\n\nTesting CG multishift with single precision acceleration\n");
    lprintf("CG TEST",0,"------------------------------------------------------------\n");
-   
+
    t1 = gpuTimerStart();
    cgiters = cg_mshift_flt(&par, &M, &F,s1, res);
+   elapsed = gpuTimerStop(t1);
+   lprintf("CG TEST",0,"Converged in %d iterations\n",cgiters);
+   for(i=0;i<par.n;++i){
+     M(s2,&res[i]);
+     spinor_field_mul_add_assign_f(s2,-par.shift[i],&res[i]);
+     spinor_field_sub_assign_f(s2,s1);
+     tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
+     lprintf("CG TEST",0,"test cg[%d] = %e (req. %e)\n",i,tau,par.err2);
+     spinor_field_zero_f(&res[i]);
+   }
+   lprintf("CG TEST",0,"time: %1.10gms\n",elapsed);
+
+
+   lprintf("CG TEST",0,"\n\nTesting CG multishift version 2 with single precision acceleration\n");
+   lprintf("CG TEST",0,"------------------------------------------------------------\n");
+
+   t1 = gpuTimerStart();
+   cgiters = cg_mshift_flt2(&par, &M, &F,s1, res);
    elapsed = gpuTimerStop(t1);
    lprintf("CG TEST",0,"Converged in %d iterations\n",cgiters);
    for(i=0;i<par.n;++i){

@@ -73,9 +73,9 @@ void spinor_field_tocpuformat(spinor_field *out, spinor_field *in) {
         // we call recursively this function twice
         // on the even and odd sublattices
         in->type=out->type=&glat_even;
-        spinor_field_togpuformat(out, in);
+        spinor_field_tocpuformat(out, in);
     	in->type=out->type=&glat_odd;
-        spinor_field_togpuformat(out, in);
+        spinor_field_tocpuformat(out, in);
         in->type=out->type=&glattice;
         return;
     }
@@ -221,9 +221,9 @@ void gfield_tocpuformat(suNg_field *out, suNg_field *in) {
     // we call recursively this function twice
     // on the even and odd sublattices
     in->type=out->type=&glat_even;
-    gfield_togpuformat(out, in);
+    gfield_tocpuformat(out, in);
     in->type=out->type=&glat_odd;
-    gfield_togpuformat(out, in);
+    gfield_tocpuformat(out, in);
     in->type=out->type=&glattice;
     return;
   }
@@ -303,9 +303,9 @@ void gfield_tocpuformat_flt(suNg_field_flt *out, suNg_field_flt *in) {
     // we call recursively this function twice
     // on the even and odd sublattices
     in->type=out->type=&glat_even;
-    gfield_togpuformat_flt(out, in);
+    gfield_tocpuformat_flt(out, in);
     in->type=out->type=&glat_odd;
-    gfield_togpuformat_flt(out, in);
+    gfield_tocpuformat_flt(out, in);
     in->type=out->type=&glattice;
     return;
   }

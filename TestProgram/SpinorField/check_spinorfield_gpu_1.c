@@ -35,7 +35,7 @@ static complex v[25];
 static double EPSILON=1.e-12;
 static spinor_field *ppk[5];
 
-double sfdiff (spinor_field* sf){
+double sfdiff_gpu (spinor_field* sf){
   spinor_field *tmp;
   double res;
   tmp=alloc_spinor_field_f(1, &glattice);
@@ -44,6 +44,23 @@ double sfdiff (spinor_field* sf){
   spinor_field_copy_to_gpu_f(tmp);
   spinor_field_sub_f(tmp,tmp,sf);
   res= spinor_field_sqnorm_f(tmp);
+  free_spinor_field_gpu(tmp);
+  free_spinor_field(tmp);
+  return res;
+}
+
+double sfdiff (spinor_field* sf){
+  spinor_field *tmp;
+  double res;
+  tmp=alloc_spinor_field_f(1, &glattice);
+  alloc_spinor_field_f_gpu(1, tmp);
+
+  spinor_field_copy_f(tmp,sf);
+  spinor_field_copy_from_gpu_f(tmp);
+  spinor_field_sub_f_cpu(tmp,tmp,sf);
+
+  res=spinor_field_sqnorm_f_cpu(tmp);
+
   free_spinor_field_gpu(tmp);
   free_spinor_field(tmp);
   return res;
