@@ -57,6 +57,15 @@ void assign_u2ud_f(void);
 void assign_s2sd(spinor_field *out, spinor_field_flt *in);
 void assign_sd2s(spinor_field_flt *out, spinor_field *in);
 
+#ifdef WITH_GPU
+void assign_u2ud_cpu(void);
+void assign_ud2u_cpu(void);
+void assign_ud2u_f_cpu(void);
+void assign_u2ud_f_cpu(void);
+void assign_s2sd_cpu(spinor_field *out, spinor_field_flt *in);
+void assign_sd2s_cpu(spinor_field_flt *out, spinor_field *in);
+#endif
+
 /* use power method to find max eigvalue of H2 */
 int max_H(spinor_operator H, geometry_descriptor *type, double *max);
 
@@ -94,8 +103,6 @@ typedef cudaEvent_t gpu_timer;
 cudaEvent_t gpuTimerStart();
 float gpuTimerMeasure(cudaEvent_t e);
 float gpuTimerStop(cudaEvent_t e);
-void assign_s2sd_gpu(spinor_field *out, spinor_field_flt *in);
-void assign_sd2s_gpu(spinor_field_flt *out, spinor_field *in);
 #endif
 
 #endif 

@@ -18,7 +18,7 @@
 #include "global.h"
 #include "spinor_field.h"
 
-void assign_u2ud(void)
+void assign_u2ud_cpu(void)
 {
   _DECLARE_INT_ITERATOR(ix);
   int i,mu;
@@ -54,7 +54,7 @@ void assign_u2ud(void)
 }
 
 
-void assign_ud2u(void)
+void assign_ud2u_cpu(void)
 {
   _DECLARE_INT_ITERATOR(ix);
   int i,mu;
@@ -88,10 +88,10 @@ void assign_ud2u(void)
   }
 }
 
-void assign_ud2u_f(void)
+void assign_ud2u_f_cpu(void)
 {
 #ifdef WITH_QUATERNIONS
-  assign_ud2u();
+  assign_ud2u_cpu();
 #else
   _DECLARE_INT_ITERATOR(ix);
   int i,mu;
@@ -114,10 +114,10 @@ void assign_ud2u_f(void)
 #endif //WITH_QUATERNIONS
 }
 
-void assign_u2ud_f(void)
+void assign_u2ud_f_cpu(void)
 {
 #ifdef WITH_QUATERNIONS
-  assign_u2ud();
+  assign_u2ud_cpu();
 #else
   _DECLARE_INT_ITERATOR(ix);
   int i,mu;
@@ -141,7 +141,7 @@ void assign_u2ud_f(void)
 }
 
 
-void assign_s2sd(spinor_field *out, spinor_field_flt *in) {
+void assign_s2sd_cpu(spinor_field *out, spinor_field_flt *in) {
 
   int n;
   float *i;
@@ -164,7 +164,7 @@ void assign_s2sd(spinor_field *out, spinor_field_flt *in) {
 
 }
 
-void assign_sd2s(spinor_field_flt *out, spinor_field *in) {
+void assign_sd2s_cpu(spinor_field_flt *out, spinor_field *in) {
 
   int n;
   float *o;
@@ -184,5 +184,13 @@ void assign_sd2s(spinor_field_flt *out, spinor_field *in) {
       *(o++) = (float) *(i++);
     }
   }
-
 }
+
+#ifndef WITH_GPU
+void (*assign_u2ud) (void)=assign_u2ud_cpu;
+void (*assign_ud2u) (void)=assign_ud2u_cpu;
+void (*assign_ud2u_f) (void)=assign_ud2u_f_cpu;
+void (*assign_u2ud_f)(void)=assign_u2ud_f_cpu;
+void (*assign_s2sd)(spinor_field *out, spinor_field_flt *in)=assign_s2sd_cpu;
+void (*assign_sd2s)(spinor_field_flt *out, spinor_field *in)=assign_sd2s_cpu;
+#endif

@@ -127,7 +127,7 @@ int main(int argc,char *argv[])
    fflush(stdout);
    random_u(u_gauge);
    gfield_copy_to_gpu(u_gauge);
-   assign_ud2u();
+   assign_ud2u_cpu();
    gfield_copy_to_gpu_flt(u_gauge_flt);
    lprintf("MAIN",0,"done.\n");
    
@@ -158,7 +158,7 @@ int main(int argc,char *argv[])
    par.shift[4]=-0.15;
    par.shift[5]=-0.05;
    
-   par.n = 3;
+   par.n = 6;
 
    gaussian_spinor_field(s1);
    spinor_field_copy_to_gpu_f(s1);

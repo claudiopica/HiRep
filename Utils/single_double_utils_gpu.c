@@ -20,14 +20,14 @@
 #include "memory.h"
 
 
-void assign_s2sd_gpu(spinor_field *out, spinor_field_flt *in) {
+void assign_s2sd(spinor_field *out, spinor_field_flt *in) {
   spinor_field_copy_from_gpu_f_flt(in);
-  assign_s2sd(out,in);
+  assign_s2sd_cpu(out,in);
   spinor_field_copy_to_gpu_f(out);
 }
 
-void assign_sd2s_gpu(spinor_field_flt *out, spinor_field *in) {
+void assign_sd2s(spinor_field_flt *out, spinor_field *in) {
   spinor_field_copy_from_gpu_f(in);
-  assign_sd2s(out,in);
+  assign_sd2s_cpu(out,in);
   spinor_field_copy_to_gpu_f_flt(out);
 }
