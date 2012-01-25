@@ -54,22 +54,34 @@ void assign_u2ud_f(void);
 /* void assign_s2sd(int len, suNf_spinor *out, suNf_spinor_flt *in); */
 /* void assign_sd2s(int len, suNf_spinor_flt *out, suNf_spinor *in); */
 
-void assign_s2sd(spinor_field *out, spinor_field_flt *in);
-void assign_sd2s(spinor_field_flt *out, spinor_field *in);
+/*void assign_s2sd(spinor_field *out, spinor_field_flt *in);
+void assign_sd2s(spinor_field_flt *out, spinor_field *in);*/
+#ifdef __cplusplus
+extern "C" {
+#endif
 void assign_u2ud_cpu(void);
 void assign_ud2u_cpu(void);
 void assign_ud2u_f_cpu(void);
 void assign_u2ud_f_cpu(void);
 void assign_s2sd_cpu(spinor_field *out, spinor_field_flt *in);
 void assign_sd2s_cpu(spinor_field_flt *out, spinor_field *in);
+#ifdef __cplusplus
+}
+#endif
 
 #ifdef WITH_GPU
 void assign_u2ud(void);
 void assign_ud2u(void);
 void assign_ud2u_f(void);
 void assign_u2ud_f(void);
+#ifdef __cplusplus
+extern "C" {
+#endif
 void assign_s2sd(spinor_field *out, spinor_field_flt *in);
 void assign_sd2s(spinor_field_flt *out, spinor_field *in);
+#ifdef __cplusplus
+}
+#endif
 #else
 extern void (*assign_u2ud) (void);
 extern void (*assign_ud2u) (void);
