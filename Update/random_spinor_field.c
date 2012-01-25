@@ -11,7 +11,7 @@
 #include "update.h"
 #include <math.h>
 
-void gaussian_spinor_field(spinor_field *s) {
+void gaussian_spinor_field_cpu(spinor_field *s) {
 	const double c1=1./sqrt(2.);
 	unsigned int i;
 	geometry_descriptor *type = s->type;
@@ -23,7 +23,7 @@ void gaussian_spinor_field(spinor_field *s) {
 #endif /* defined(BASIC_SF) || defined(ROTATED_SF) */
 }
 
-void gaussian_spinor_field_flt(spinor_field_flt *s) {
+void gaussian_spinor_field_flt_cpu(spinor_field_flt *s) {
 	const float c1=1./sqrt(2.);
 	unsigned int i;
 	geometry_descriptor *type = s->type;
@@ -34,3 +34,9 @@ void gaussian_spinor_field_flt(spinor_field_flt *s) {
         SF_spinor_bcs_flt(s);
 #endif /* defined(BASIC_SF) || defined(ROTATED_SF) */
 }
+
+
+#ifndef WITH_GPU
+void (*gaussian_spinor_field) (spinor_field *s)=gaussian_spinor_field_cpu;
+void (*gaussian_spinor_field_flt) (spinor_field_flt *s)=gaussian_spinor_field_flt_cpu;
+#endif

@@ -139,7 +139,7 @@ int main(int argc,char *argv[])
    
    init_rhmc(&rpar);
 
-   lprintf("REV TEST",0,"MVM during RHMC initialzation: %ld\n",getMVM());
+   lprintf("REV TEST",0,"MVM during RHMC initialzation: %ld\n",getMVM_cpu());
    lprintf("REV TEST",0,"Initial plaquette: %1.8e\n",avr_plaquette());
    
    rr=update_rhmc_o();

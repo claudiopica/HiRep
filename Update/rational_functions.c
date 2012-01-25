@@ -234,6 +234,10 @@ void rational_func(rational_app *coef, spinor_operator Q, spinor_field *out, spi
   spinor_field *inv_out;
   int i;
 
+#ifdef WITH_GPU
+  gfield_copy_to_gpu(u_gauge);
+#endif 
+
   /* check input types */
 #ifndef CHECK_SPINOR_MATCHING
   _TWO_SPINORS_MATCHING(in,out);

@@ -10,18 +10,19 @@
 #include "linear_algebra.h"
 #include "error.h"
 #include "representation.h"
+#include "memory.h"
 
 extern rhmc_par _update_par;
 
 /*
- * compute the local action at every site for the HMC
+ * compute the local action at every site for the HMC (Done at CPU)
  * H = | momenta |^2 + S_g + < phi1, phi2>
  */
 void local_hmc_action(local_action_type type,
                       scalar_field *loc_action,
                       suNg_av_field *momenta,
                       spinor_field *phi1,
-                      spinor_field *phi2) {
+                      spinor_field *phi2) { 
 
   _DECLARE_INT_ITERATOR(i);
   int j;
@@ -35,6 +36,12 @@ void local_hmc_action(local_action_type type,
   _TWO_SPINORS_MATCHING(loc_action,phi2);
 #endif
 
+#ifdef WITH_GPU //COPY SPINORS TO CPU
+    for (j=0;j<_update_par.n_pf;++j) {
+      spinor_field_copy_from_gpu_f(&phi1[j]);
+      spinor_field_copy_from_gpu_f(&phi2[j]);
+    }
+#endif
 
   switch(type) {
   case NEW:
@@ -123,6 +130,14 @@ void local_hmc_action(local_action_type type,
 
     *_FIELD_AT(loc_action,i)+=a;
   }
+
+#ifdef WITH_GPU //COPY SPINORS TO GPU
+    for (j=0;j<_update_par.n_pf;++j) {
+      spinor_field_copy_to_gpu_f(&phi1[j]);
+      spinor_field_copy_to_gpu_f(&phi2[j]);
+    }
+#endif
+
 
    
 }

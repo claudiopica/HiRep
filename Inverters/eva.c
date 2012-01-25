@@ -114,12 +114,18 @@ static void alloc_ws_rotate(void)
   initr=1;
 }
 
-static void rotate(int n,spinor_field *pkk,complex v[])
+static void rotate(int n,spinor_field *pkk,complex v[]) //FIX: DONE always on CPU
 {
+
   _DECLARE_INT_ITERATOR(ix);
   int k,j;
   complex *z;
   suNf_spinor *pk,*pj;
+
+  for (k=0;k<n;k++){
+    spinor_field_copy_from_gpu_f(&pkk[k]);
+  }
+  
 
   if (initr==0)
     alloc_ws_rotate();
@@ -153,6 +159,9 @@ static void rotate(int n,spinor_field *pkk,complex v[])
 
     for (k=0;k<n;k++)
       *_FIELD_AT(&pkk[k],ix)=psi[k];
+  }
+  for (k=0;k<n;k++){
+    spinor_field_copy_to_gpu_f(&pkk[k]);
   }
 }
 
@@ -467,6 +476,10 @@ int eva(int nev,int nevt,int init,int kmax,
   error((omega1<(ubnd*EPSILON))&&(omega2<EPSILON),1,
 	"eva [eva.c]",
 	"Improper parameters omega1 or omega2");
+
+#ifdef WITH_GPU
+  gfield_copy_to_gpu(u_gauge); //Make sure gauge field is on GPU
+#endif
 
   nop=0;
   nlock=0;
