@@ -37,12 +37,17 @@ void O2MN_multistep(suNg_av_field *momenta, int_par *traj_par);
 
 void gaussian_momenta(suNg_av_field *momenta);
 
-void gaussian_spinor_field(spinor_field *s);
-void gaussian_spinor_field_flt(spinor_field_flt *s);
-
-#ifdef WITH_GPU
 void gaussian_spinor_field_cpu(spinor_field *s);
 void gaussian_spinor_field_flt_cpu(spinor_field_flt *s);
+
+
+
+#ifdef WITH_GPU
+void gaussian_spinor_field(spinor_field *s);
+void gaussian_spinor_field_flt(spinor_field_flt *s);
+#else
+extern void (*gaussian_spinor_field) (spinor_field *s);
+extern void (*gaussian_spinor_field_flt) (spinor_field_flt *s);
 #endif //WITH_GPU
 
 
