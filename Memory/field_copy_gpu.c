@@ -5,7 +5,7 @@
 
 /*******************************************************************************
  *
- * File gpu_field_alloc.c
+ * File field_copy_gpu.c
  *
  * Functions for fields allocation on GPUs
  *
@@ -23,7 +23,7 @@
 #endif
 #include "gpu.h"
 
-
+/* GAUGE FIELDS */
 void gfield_copy_to_gpu(suNg_field *field){
   suNg_field *tmp=alloc_gfield(field->type);
   gfield_togpuformat(tmp,field);
@@ -78,5 +78,34 @@ void gfield_copy_from_gpu_f_flt(suNf_field_flt *field){
   cudaMemcpy(tmp->ptr,field->gpu_ptr,field->type->gsize*4*sizeof(suNf_flt),cudaMemcpyDeviceToHost);
   gfield_tocpuformat_f_flt(field,tmp);
   free_gfield_f_flt(tmp);
+}
+
+/* SPINORS */
+void spinor_field_copy_to_gpu_f(spinor_field *field){
+  spinor_field *tmp = alloc_spinor_field_f(1, field->type);
+  spinor_field_togpuformat(tmp, field);
+  cudaMemcpy(field->gpu_ptr,tmp->ptr,field->type->gsize*sizeof(suNf_spinor),cudaMemcpyHostToDevice);
+  free_spinor_field_f(tmp);
+}
+
+void spinor_field_copy_from_gpu_f(spinor_field *field){
+  spinor_field *tmp = alloc_spinor_field_f(1, field->type);
+  cudaMemcpy(tmp->ptr,field->gpu_ptr,field->type->gsize*sizeof(suNf_spinor),cudaMemcpyDeviceToHost);
+  spinor_field_tocpuformat(field,tmp);
+  free_spinor_field_f(tmp);
+}
+
+void spinor_field_copy_to_gpu_f_flt(spinor_field_flt *field){
+  spinor_field_flt *tmp = alloc_spinor_field_f_flt(1, field->type);
+  spinor_field_togpuformat_flt(tmp, field);
+  cudaMemcpy(field->gpu_ptr,tmp->ptr,field->type->gsize*sizeof(suNf_spinor_flt),cudaMemcpyHostToDevice);
+  free_spinor_field_f_flt(tmp);
+}
+
+void spinor_field_copy_from_gpu_f_flt(spinor_field_flt *field){
+  spinor_field_flt *tmp = alloc_spinor_field_f_flt(1, field->type);
+  cudaMemcpy(tmp->ptr,field->gpu_ptr,field->type->gsize*sizeof(suNf_spinor_flt),cudaMemcpyDeviceToHost);
+  spinor_field_tocpuformat_flt(field,tmp);
+  free_spinor_field_f_flt(tmp);
 }
 
