@@ -53,7 +53,7 @@ void find_spec_H2(double *max, double *min, double mass) {
   lprintf("SPECLIMITS",0,"Range = [%1.8e,%1.8e] [MVM = %d]\n",*min,*max,MVM);
 
   free(d1);
-  free_spinor_field(ev);
+  free_spinor_field_f(ev);
 
   return;
 }

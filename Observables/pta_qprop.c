@@ -181,12 +181,12 @@ void pta_qprop_QMR_eo(int g0[4], spinor_field **pta_qprop, int nm, double *mass,
 
 	/* free memory */
 
-	free_spinor_field(in);
-	free_spinor_field(res);
+	free_spinor_field_f(in);
+	free_spinor_field_f(res);
 	free(shift);
 #ifndef NDEBUG
-	free_spinor_field(test_e);
-	free_spinor_field(test);
+	free_spinor_field_f(test_e);
+	free_spinor_field_f(test);
 #endif
 }
 
@@ -294,10 +294,10 @@ void pta_qprop_QMR(int g0[4], spinor_field **pta_qprop, int nm, double *mass, do
 	lprintf("PROPAGATOR",10,"QMR MVM = %d\n",cgiter);
   
   /* free memory */
-	free_spinor_field(in);
+	free_spinor_field_f(in);
   free(shift);
 #ifndef NDEBUG
-	free_spinor_field(test);
+	free_spinor_field_f(test);
 #endif
 }
 
@@ -357,6 +357,6 @@ void pta_qprop_MINRES(int g0[4], spinor_field **pta_qprop, int nm, double *mass,
   lprintf("PROPAGATOR",10,"MINRES MVM = %d",cgiter);
 
   /* free input spinor field */
-  free_spinor_field(in);
+  free_spinor_field_f(in);
 
 }

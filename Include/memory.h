@@ -44,24 +44,11 @@ suNg_field* alloc_gtransf(geometry_descriptor* type);
 
 spinor_field* alloc_spinor_field_f(unsigned int n, geometry_descriptor *type);
 spinor_field_flt* alloc_spinor_field_f_flt(unsigned int n, geometry_descriptor *type);
-void free_spinor_field(spinor_field *s);
-void free_spinor_field_flt(spinor_field_flt *s);
+void free_spinor_field_f(spinor_field *s);
+void free_spinor_field_f_flt(spinor_field_flt *s);
 
 #ifdef WITH_GPU
 
-void free_gfield_gpu(suNg_field *field);
-void alloc_gfield_gpu(suNg_field *field);
-void free_gfield_f_gpu(suNf_field *field);
-void alloc_gfield_f_gpu(suNf_field *field);
-void free_gfield_flt_gpu(suNg_field_flt *field);
-void alloc_gfield_flt_gpu(suNg_field_flt *field);
-void free_gfield_f_flt_gpu(suNf_field_flt *field);
-void alloc_gfield_f_flt_gpu(suNf_field_flt *field);
-
-void free_spinor_field_gpu(spinor_field *field);
-void free_spinor_field_flt_gpu(spinor_field_flt *field);
-void alloc_spinor_field_f_gpu(unsigned int n, spinor_field *field);
-void alloc_spinor_field_f_flt_gpu(unsigned int n, spinor_field_flt *field);
 void spinor_field_copy_to_gpu_f(spinor_field *field);
 void spinor_field_copy_from_gpu_f(spinor_field *field);
 void spinor_field_copy_to_gpu_f_flt(spinor_field_flt *field);

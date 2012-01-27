@@ -288,9 +288,9 @@ static spinor_field_flt *etmp=NULL;
 static spinor_field_flt *otmp=NULL;
 
 static void free_mem() {
-  if (gtmp!=NULL) { free_spinor_field_flt(gtmp); etmp=NULL; }
-  if (etmp!=NULL) { free_spinor_field_flt(etmp); etmp=NULL; }
-  if (otmp!=NULL) { free_spinor_field_flt(otmp); otmp=NULL; }
+  if (gtmp!=NULL) { free_spinor_field_f_flt(gtmp); etmp=NULL; }
+  if (etmp!=NULL) { free_spinor_field_f_flt(etmp); etmp=NULL; }
+  if (otmp!=NULL) { free_spinor_field_f_flt(otmp); otmp=NULL; }
   init=1;
 }
 

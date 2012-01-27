@@ -190,7 +190,7 @@ int MINRES_mshift_core(short int *flags,mshift_par *par, spinor_operator M, spin
 
 
   /* free memory */
-  free_spinor_field(memall);
+  free_spinor_field_f(memall);
   free(q1);
   free(q2);
   free(r);

@@ -27,6 +27,7 @@ static int cg_mshift_flt_core(short int *sflags, mshift_par *par, spinor_operato
   double alpha, lambda, delta;
   double innorm2;
   double *z1, *z2, *z3;
+  mem_t mem_t_save=in->type->mem_type; /* save input memory location */
 
   int i;
   int cgiter;
@@ -40,10 +41,11 @@ static int cg_mshift_flt_core(short int *sflags, mshift_par *par, spinor_operato
 #endif
 
   /* allocate spinors fields and aux real variables */
-  p = alloc_spinor_field_f_flt(3+par->n,in->type);
 #ifdef WITH_GPU
-  alloc_spinor_field_f_flt_gpu(3+par->n,p);
-#endif //WITH_GPU
+  in->type->mem_type=GPU_MEM; /* allocate only on GPU */
+#endif
+  p = alloc_spinor_field_f_flt(3+par->n,in->type);
+  in->type->mem_type=mem_t_save;
   k=p+par->n;
   r=k+1;
   Mk=r+1;
@@ -120,10 +122,7 @@ static int cg_mshift_flt_core(short int *sflags, mshift_par *par, spinor_operato
   } while ((par->max_iter==0 || cgiter<par->max_iter) && notconverged);
 
   /* free memory */
-#ifdef WITH_GPU
-  free_spinor_field_flt_gpu(p);
-#endif //WITH_GPU
-  free_spinor_field_flt(p);
+  free_spinor_field_f_flt(p);
 
   free(z1); free(z2); free(z3);
 
@@ -146,27 +145,29 @@ int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_operator_flt F, spi
   
   spinor_field_flt *out_flt, *res_flt,*tmp_flt;
   spinor_field *res, *res2, *tmp;
-
+  
+	mem_t mem_t_save=in->type->mem_type; /* save input memory location */
+  
   /* check types */
   _TWO_SPINORS_MATCHING(in,out); 
   _ARRAY_SPINOR_MATCHING(out,i,par->n);
 
   /* allocate memory for single-precision solutions and residual vectors */
-  res_flt = alloc_spinor_field_f_flt(2+par->n,in->type);
 #ifdef WITH_GPU
-  alloc_spinor_field_f_flt_gpu(2+par->n,res_flt);
-#endif //WITH_GPU
+  in->type->mem_type=GPU_MEM; /* allocate only on GPU */
+#endif
+  
+  res_flt = alloc_spinor_field_f_flt(2+par->n,in->type);
 
   out_flt = res_flt + 1;
   tmp_flt = out_flt + par->n;
   res = alloc_spinor_field_f(3,in->type);
-#ifdef WITH_GPU
-  alloc_spinor_field_f_gpu(3,res);
-#endif //WITH_GPU
 
   res2 = res + 1;
   tmp = res2 + 1;
-
+  
+  in->type->mem_type=mem_t_save; /* set the input memory location back */
+  
   /* set all flags to 1
    * set all out to zero execpt if par->n==1
    */
@@ -250,15 +251,9 @@ int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_operator_flt F, spi
     lprintf("INVERTER",20,"CG inversion: err2 = %1.8e < %1.8e\n",norm[i],par->err2);
   }
 
-#ifdef WITH_GPU
-  free_spinor_field_flt_gpu(res_flt);
-#endif //WITH_GPU
-  free_spinor_field_flt(res_flt);
+  free_spinor_field_f_flt(res_flt);
 
-#ifdef WITH_GPU
-  free_spinor_field_gpu(res);
-#endif //WITH_GPU
-  free_spinor_field(res);
+  free_spinor_field_f(res);
 
   lprintf("INVERTER",10,"CG_mshift: MVM = %d (single) - %d (double)\n",siter,diter);
 
@@ -281,25 +276,26 @@ int cg_mshift_flt2(mshift_par *par, spinor_operator M, spinor_operator_flt F, sp
   spinor_field_flt *out_flt, *res_flt,*tmp_flt;
   spinor_field *res, *tmp;
 
+  mem_t mem_t_save=in->type->mem_type; /* save input memory location */
+
   /* check types */
   _TWO_SPINORS_MATCHING(in,out); 
   _ARRAY_SPINOR_MATCHING(out,i,par->n);
 
   /* allocate memory for single-precision solutions and residual vectors */
-  res_flt = alloc_spinor_field_f_flt(2+par->n,in->type);
 #ifdef WITH_GPU
-  alloc_spinor_field_f_flt_gpu(2+par->n,res_flt);
-#endif //WITH_GPU
+  in->type->mem_type=GPU_MEM; /* allocate only on GPU */
+#endif
+  res_flt = alloc_spinor_field_f_flt(2+par->n,in->type);
 
   out_flt = res_flt + 1;
   tmp_flt = out_flt + par->n;
   res = alloc_spinor_field_f(2,in->type);
-#ifdef WITH_GPU
-  alloc_spinor_field_f_gpu(2,res);
-#endif //WITH_GPU
 
   tmp = res + 1;
 
+  in->type->mem_type=mem_t_save; /* set the input memory location back */
+  
   /* compute input norm2 */
   innorm2=spinor_field_sqnorm_f(in);
   
@@ -359,15 +355,8 @@ int cg_mshift_flt2(mshift_par *par, spinor_operator M, spinor_operator_flt F, sp
     lprintf("INVERTER",20,"CG inversion: err2 = %1.8e < %1.8e\n",norm[i],par->err2);
   }
 
-#ifdef WITH_GPU
-  free_spinor_field_flt_gpu(res_flt);
-#endif //WITH_GPU
-  free_spinor_field_flt(res_flt);
-
-#ifdef WITH_GPU
-  free_spinor_field_gpu(res);
-#endif //WITH_GPU
-  free_spinor_field(res);
+  free_spinor_field_f_flt(res_flt);
+	free_spinor_field_f(res);
 
   lprintf("INVERTER",10,"CG_mshift: MVM = %d (single) - %d (double)\n",siter,diter);
 

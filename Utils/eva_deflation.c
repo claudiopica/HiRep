@@ -14,7 +14,7 @@ static double *eigval=NULL;
 static spinor_operator H_loc=NULL;
 
 static void free_loc_mem() {
-  if (ev!=NULL) {free_spinor_field(ev); ev=NULL; }
+  if (ev!=NULL) {free_spinor_field_f(ev); ev=NULL; }
   if (eigval!=NULL) {free(eigval); eigval=NULL; }
 }
 

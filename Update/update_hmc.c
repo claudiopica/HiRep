@@ -140,7 +140,7 @@ void free_hmc(){
     /* free momenta */
     if(u_gauge_old!=NULL) free_gfield(u_gauge_old); u_gauge_old=NULL;
     if(momenta!=NULL) free_avfield(momenta); momenta=NULL;
-    if(pf!=NULL) free_spinor_field(pf); pf=NULL;
+    if(pf!=NULL) free_spinor_field_f(pf); pf=NULL;
     
     if(la!=NULL) free_sfield(la); la=NULL;
     

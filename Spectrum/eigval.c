@@ -344,7 +344,7 @@ int main(int argc,char *argv[]) {
       }
 
       free(d1);
-      free_spinor_field(ev);
+      free_spinor_field_f(ev);
     }
 
     if(list==NULL) break;

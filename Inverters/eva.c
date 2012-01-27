@@ -535,14 +535,14 @@ int eva(int nev,int nevt,int init,int kmax,
       if (nlock==nev)
 	{
 	  lprintf("EVA",10,"Computation succeded. MVM = %d\n",*status);
-  free_spinor_field(ws);
+  free_spinor_field_f(ws);
 	  return 0;
 	}
     }
 
   lprintf("EVA",10,"Unable to reach required precision. MVM = %d\n",*status);
 
-  free_spinor_field(ws);
+  free_spinor_field_f(ws);
    
   return -1;
 }

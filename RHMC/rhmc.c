@@ -115,7 +115,7 @@ void inline_mk_mesons(double *m, int nm, double prec) {
     }
 #undef CORR
 
-  free_spinor_field(pta_qprop[0]);
+  free_spinor_field_f(pta_qprop[0]);
   free(pta_qprop);
   free(tricorr);
 

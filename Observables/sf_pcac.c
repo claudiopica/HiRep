@@ -232,8 +232,8 @@ double SF_PCAC_wall_mass(double mass)
   for (ix0=2;ix0<GLB_T-3;ix0++)
     lprintf("PC_wall_AC",0,"PCACnegt%d = %10e\n",ix0,(double)(f_At[(int)(ix0)+1] - f_At[(int)(ix0)-1])/(4*f_Pt[(int)(ix0)]));
   
-  free_spinor_field(source);
-  free_spinor_field(prop);
+  free_spinor_field_f(source);
+  free_spinor_field_f(prop);
   
 
   free(stmp);
@@ -406,9 +406,9 @@ Q- = |             | * 1/2
   
   free(stmp);
   free(sbord[0]);
-  free_spinor_field(prop[0]);
-  free_spinor_field(prop[1]);
-  free_spinor_field(source );
+  free_spinor_field_f(prop[0]);
+  free_spinor_field_f(prop[1]);
+  free_spinor_field_f(source );
  
 #else
 

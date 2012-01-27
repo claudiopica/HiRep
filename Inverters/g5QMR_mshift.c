@@ -230,7 +230,7 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
   }
 
   /* free memory */
-  free_spinor_field(memall);
+  free_spinor_field_f(memall);
   free(q1);
   free(q2);
   free(r);

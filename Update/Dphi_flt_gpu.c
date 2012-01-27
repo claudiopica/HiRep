@@ -615,18 +615,18 @@ static spinor_field_flt *otmp=NULL;
 
 static void free_mem() {
   if (gtmp!=NULL) { 
-    free_spinor_field_flt_gpu(gtmp);					// This doesn't change when float
-    free_spinor_field_flt(gtmp);					// This does
+    free_spinor_field_f_flt_gpu(gtmp);					// This doesn't change when float
+    free_spinor_field_f_flt(gtmp);					// This does
     etmp=NULL; 
   }
   if (etmp!=NULL) { 
-    free_spinor_field_flt_gpu(etmp); 
-    free_spinor_field_flt(etmp); 
+    free_spinor_field_f_flt_gpu(etmp); 
+    free_spinor_field_f_flt(etmp); 
     etmp=NULL; 
   }
   if (otmp!=NULL) { 
-    free_spinor_field_flt_gpu(otmp);
-    free_spinor_field_flt(otmp); 
+    free_spinor_field_f_flt_gpu(otmp);
+    free_spinor_field_f_flt(otmp); 
     otmp=NULL; 
   }
   init=1;
@@ -634,12 +634,17 @@ static void free_mem() {
 
 static void init_Dirac_flt() {
   if (init) {
-    gtmp=alloc_spinor_field_f_flt(1,&glattice);
-    alloc_spinor_field_f_flt_gpu(1,gtmp);
-    etmp=alloc_spinor_field_f_flt(1,&glat_even);
-    alloc_spinor_field_f_flt_gpu(1,etmp);
-    otmp=alloc_spinor_field_f_flt(1,&glat_odd);
-    alloc_spinor_field_f_flt_gpu(1,otmp);
+    geometry_descriptor gd_loc=glattice;
+    gd_loc.mem_type=GPU_MEM;
+    gtmp=alloc_spinor_field_f_flt(1,&gd_loc);
+    
+    gd_loc=glat_even;
+    gd_loc.mem_type=GPU_MEM;
+    etmp=alloc_spinor_field_f_flt(1,&gd_loc);
+    
+    gd_loc=glat_odd;
+    gd_loc.mem_type=GPU_MEM;
+    otmp=alloc_spinor_field_f_flt(1,&gd_loc);
     atexit(&free_mem);
     init=0;
   }

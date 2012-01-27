@@ -354,11 +354,11 @@ void dirac_eva_onemass(int nev,int nevt,int kmax,
 	}
 #endif
 
-	free_spinor_field(test);
-	free_spinor_field(plus);
-	free_spinor_field(minus);
-	free_spinor_field(ws);
-	free_spinor_field(h2tmp);
+	free_spinor_field_f(test);
+	free_spinor_field_f(plus);
+	free_spinor_field_f(minus);
+	free_spinor_field_f(ws);
+	free_spinor_field_f(h2tmp);
 }
 
 

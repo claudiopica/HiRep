@@ -101,7 +101,7 @@ int main(int argc,char *argv[]) {
 /*  write_spinor_field_eo_lexi(cnfg_filename,sp);*/
   write_spinor_field(cnfg_filename,sp);
 
-	free_spinor_field(sp);
+	free_spinor_field_f(sp);
 
 	return 0;
 }

@@ -267,6 +267,6 @@ void rational_func(rational_app *coef, spinor_operator Q, spinor_field *out, spi
   }
 
   /* free memory */
-  free_spinor_field(inv_out);
+  free_spinor_field_f(inv_out);
 
 }

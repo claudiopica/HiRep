@@ -238,7 +238,7 @@ void Force_rhmc_f(double dt, suNg_av_field *force){
 #ifdef UPDATE_EO
   chi[0].type=&glattice;
 #endif
-  free_spinor_field(chi);
+  free_spinor_field_f(chi);
 
 }
 

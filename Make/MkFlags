@@ -14,7 +14,7 @@ REPR = REPR_ADJOINT
 
 MACRO += -DUPDATE_EO
 #MACRO += -DWITH_MPI
-MACRO += -DWITH_GPU
+#MACRO += -DWITH_GPU
 MACRO += -DNDEBUG
 #MACRO += -DCHECK_SPINOR_MATCHING
 #MACRO += -DMPI_TIMING
@@ -24,10 +24,11 @@ MACRO += -DIO_FLUSH
 
 #Compiler
 #export OMPI_CC = ccache gcc
-#CC = gcc
+CC = gcc
 #CFLAGS = -Wall -std=c99 -O2 -fomit-frame-pointer -mfpmath=sse -msse -msse2 
-CC = nvcc 
-CFLAGS = -O2 -Xcompiler "-std=c99 -fgcse-sm -fgcse-las -fgcse-after-reload "
+CFLAGS = -Wall -std=c99 -g -mfpmath=sse -msse -msse2 
+#CC = nvcc 
+#CFLAGS = -O2 -Xcompiler "-std=c99 -fgcse-sm -fgcse-las -fgcse-after-reload "
 GPUFLAGS = --x cu -arch=sm_20 --use_fast_math -Xptxas -v  -Xptxas -dlcm=ca 
 #GPUFLAGS = --x cu -arch=sm_11 -Xptxas -v -Xptxas -dlcm=ca 
 

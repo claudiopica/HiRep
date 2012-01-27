@@ -603,18 +603,15 @@ static spinor_field *otmp=NULL;
 
 static void free_mem() {
   if (gtmp!=NULL) { 
-    free_spinor_field_gpu(gtmp);
-    free_spinor_field(gtmp); 
+    free_spinor_field_f(gtmp); 
     etmp=NULL; 
   }
   if (etmp!=NULL) { 
-    free_spinor_field_gpu(etmp); 
-    free_spinor_field(etmp); 
+    free_spinor_field_f(etmp); 
     etmp=NULL; 
   }
   if (otmp!=NULL) { 
-    free_spinor_field_gpu(otmp);
-    free_spinor_field(otmp); 
+    free_spinor_field_f(otmp); 
     otmp=NULL; 
   }
   init=1;
@@ -622,12 +619,17 @@ static void free_mem() {
 
 static void init_Dirac() {
   if (init) {
-    gtmp=alloc_spinor_field_f(1,&glattice);
-    alloc_spinor_field_f_gpu(1,gtmp);
-    etmp=alloc_spinor_field_f(1,&glat_even);
-    alloc_spinor_field_f_gpu(1,etmp);
-    otmp=alloc_spinor_field_f(1,&glat_odd);
-    alloc_spinor_field_f_gpu(1,otmp);
+		geometry_descriptor gd_loc=glattice;
+    gd_loc.mem_type=GPU_MEM;
+    gtmp=alloc_spinor_field_f(1,&gd_loc);
+    
+    gd_loc=glat_even;
+    gd_loc.mem_type=GPU_MEM;
+    etmp=alloc_spinor_field_f(1,&gd_loc);
+
+    gd_loc=glat_odd;
+    gd_loc.mem_type=GPU_MEM;
+    otmp=alloc_spinor_field_f(1,&gd_loc);
     atexit(&free_mem);
     init=0;
   }
