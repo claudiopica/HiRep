@@ -29,14 +29,12 @@ double sfdiff (spinor_field_flt* sf){
   spinor_field *tmp;
   double res;
   tmp=alloc_spinor_field_f(2, &glattice);
-  alloc_spinor_field_f_gpu(2, tmp);
   assign_s2sd(&tmp[0], sf);
   spinor_field_copy_from_gpu_f_flt(sf);
   assign_s2sd(&tmp[1], sf);
   spinor_field_sub_f_cpu(&tmp[0],&tmp[0],&tmp[1]);
   res= spinor_field_sqnorm_f_cpu(&tmp[0]);
-  free_spinor_field_gpu(tmp);
-  free_spinor_field(tmp);
+  free_spinor_field_f(tmp);
   return res;
 }
 
@@ -138,14 +136,11 @@ int main(int argc,char *argv[])
   fflush(stdout);
   
   u_gauge_flt=alloc_gfield_flt(&glattice);
-  alloc_gfield_flt_gpu(u_gauge_flt);
 #if (!defined(REPR_FUNDAMENTAL) && !defined(WITH_QUATERNIONS)) || defined(ROTATED_SF) 
   u_gauge_f_flt=alloc_gfield_f_flt(&glattice);
-  alloc_gfield_f_flt_gpu(u_gauge_f_flt);
 #endif
   /* allocate memory */
   s0=alloc_spinor_field_f_flt(4,&glattice);
-  alloc_spinor_field_f_flt_gpu(4,s0);
   s1=s0+1;
   s2=s1+1;
   s3=s2+1;
@@ -297,9 +292,7 @@ int main(int argc,char *argv[])
 
   lprintf("LA TEST",0,"DONE!");
 
-  free_spinor_field_flt(s0);
-  free_spinor_field_flt_gpu(s0);
-  
+  free_spinor_field_f_flt(s0);
   
   finalize_process();
   exit(0);

@@ -177,7 +177,7 @@ int main(int argc,char *argv[])
 #ifndef REPR_FUNDAMENTAL
   free_gfield_f(u_gauge_f);
 #endif
-  free_spinor_field(s0);
+  free_spinor_field_f(s0);
   
   free_gtransf(g);
   

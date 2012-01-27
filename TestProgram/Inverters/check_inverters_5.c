@@ -155,7 +155,7 @@ int main(int argc,char *argv[])
     printf("test g5QMR[%d] = %e, trunc = %e (req. %e)\n",i,tau1,tau2,par.err2);
   }
 	 
-  free_spinor_field(res);
+  free_spinor_field_f(res);
   free(par.shift);
   finalize_process();
 

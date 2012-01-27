@@ -39,12 +39,10 @@ double sfdiff_gpu (spinor_field_flt* sf){
   spinor_field_flt *tmp;
   double res;
   tmp=alloc_spinor_field_f_flt(1, &glattice);
-  alloc_spinor_field_f_flt_gpu(1, tmp);
   spinor_field_copy_f_flt_cpu(tmp,sf);
   spinor_field_copy_to_gpu_f_flt(tmp);
   spinor_field_sub_f_flt(tmp,tmp,sf);
   res=spinor_field_sqnorm_f_flt(tmp);
-  free_spinor_field_flt_gpu(tmp);
   free_spinor_field_flt(tmp);
   return res;
 }
@@ -120,11 +118,9 @@ int main(int argc,char *argv[])
   lprintf("CPTEST",0,"lmp=%d\n",glattice.local_master_pieces);
   lprintf("CPTEST",0,"ncopies=%d\n",glattice.ncopies);
   
-//	Allocates memory for cpu spinor field. GPU pointer = NULL
+//	Allocates memory for cpu & gpu spinor field. 
   sf1=alloc_spinor_field_f_flt(sfsize, &glattice);
   sf2=alloc_spinor_field_f_flt(sfsize, &glattice);
-  alloc_spinor_field_f_flt_gpu(sfsize, sf1);
-  alloc_spinor_field_f_flt_gpu(sfsize,sf2);
 	
 // CPU part set to gaussian
   for (i=0;i<sfsize;i++){
@@ -370,10 +366,8 @@ int main(int argc,char *argv[])
   
   lprintf("LA TEST",0,"DONE!\n");
 
-  free_spinor_field_flt_gpu(sf1);
-  free_spinor_field_flt_gpu(sf2);
-  free_spinor_field_flt(sf1);
-  free_spinor_field_flt(sf2);
+  free_spinor_field_f_flt(sf1);
+  free_spinor_field_f_flt(sf2);
 	
   finalize_process();
 

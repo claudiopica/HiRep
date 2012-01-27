@@ -183,8 +183,8 @@ int main(int argc,char *argv[])
    }
 
 
-   free_spinor_field(res);
-   free_spinor_field_flt(tmp_flt);
+   free_spinor_field_f(res);
+   free_spinor_field_f_flt(tmp_flt);
    free(par.shift);
 
    finalize_process();

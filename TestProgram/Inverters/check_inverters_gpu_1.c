@@ -109,17 +109,13 @@ int main(int argc,char *argv[])
    /* test_geometry_mpi_eo(); */
    
    u_gauge=alloc_gfield(&glattice);
-   alloc_gfield_gpu(u_gauge);
 #if (!defined(REPR_FUNDAMENTAL) && !defined(WITH_QUATERNIONS)) || defined(ROTATED_SF) 
    u_gauge_f=alloc_gfield_f(&glattice);
-   alloc_gfield_f_gpu(u_gauge_f);
 #endif
 
    u_gauge_flt=alloc_gfield_flt(&glattice);
-   alloc_gfield_flt_gpu(u_gauge_flt);
 #if (!defined(REPR_FUNDAMENTAL) && !defined(WITH_QUATERNIONS)) || defined(ROTATED_SF) 
    u_gauge_f_flt=alloc_gfield_f_flt(&glattice);
-   alloc_gfield_f_flt_gpu(u_gauge_f_flt);
 #endif
 
    
@@ -143,13 +139,11 @@ int main(int argc,char *argv[])
    par.err2=1.e-28;
    par.max_iter=0;
    res=alloc_spinor_field_f(par.n+3,&glattice);
-   alloc_spinor_field_f_gpu(par.n+3,res);
    s1=res+par.n;
    s2=s1+1;
    tmp=s2+1;
    
    tmp_flt = alloc_spinor_field_f_flt(1,&glattice);
-   alloc_spinor_field_f_flt_gpu(1,tmp_flt);
    
    par.shift[0]=+0.1;
    par.shift[1]=-0.21;
@@ -218,11 +212,9 @@ int main(int argc,char *argv[])
 
    lprintf("CG TEST",0,"DONE!\n");
 
-   free_spinor_field_gpu(res);
-   free_spinor_field(res);
+   free_spinor_field_f(res);
 
-   free_spinor_field_flt_gpu(tmp_flt);
-   free_spinor_field_flt(tmp_flt);
+   free_spinor_field_f_flt(tmp_flt);
 
 
    free(par.shift);

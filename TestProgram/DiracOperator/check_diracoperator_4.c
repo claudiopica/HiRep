@@ -188,8 +188,8 @@ void compute_gamma(int g[4], int ic) {
     }
   }
   
-  free_spinor_field(in);
-  free_spinor_field(out);
+  free_spinor_field_f(in);
+  free_spinor_field_f(out);
 }
 
 /* FUNZIONA SOLO CON PBC */

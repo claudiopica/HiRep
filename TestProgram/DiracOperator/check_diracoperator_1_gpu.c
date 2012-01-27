@@ -29,13 +29,11 @@ double sfdiff (spinor_field* sf){
   spinor_field *tmp;
   double res;
   tmp=alloc_spinor_field_f(1, &glattice);
-  alloc_spinor_field_f_gpu(1, tmp);
   spinor_field_copy_f_cpu(tmp,sf);
   spinor_field_copy_to_gpu_f(tmp);
   spinor_field_sub_f(tmp,tmp,sf);
   res= spinor_field_sqnorm_f(tmp);
-  free_spinor_field_gpu(tmp);
-  free_spinor_field(tmp);
+  free_spinor_field_f(tmp);
   return res;
 }
 
@@ -117,9 +115,6 @@ int main(int argc,char *argv[])
 
   rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed);
   
-  
-  
-  
   /* setup communication geometry */
   if (geometry_init() == 1) {
     finalize_process();
@@ -138,14 +133,11 @@ int main(int argc,char *argv[])
   fflush(stdout);
   
   u_gauge=alloc_gfield(&glattice);
-  alloc_gfield_gpu(u_gauge);
 #if (!defined(REPR_FUNDAMENTAL) && !defined(WITH_QUATERNIONS)) || defined(ROTATED_SF) 
   u_gauge_f=alloc_gfield_f(&glattice);
-  alloc_gfield_f_gpu(u_gauge_f);
 #endif
   /* allocate memory */
   s0=alloc_spinor_field_f(4,&glattice);
-  alloc_spinor_field_f_gpu(4,s0);
   s1=s0+1;
   s2=s1+1;
   s3=s2+1;
@@ -203,10 +195,7 @@ int main(int argc,char *argv[])
 
   lprintf("LA TEST",0,"Check gamma_5xDiracoperator, mass=%1.2g, \nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g,\nsqnorm(gpu-cpu)= %1.10g (check %1.10g=0?) \n\n",hmass,res_gpu,res_cpu,res2,res1);
 
-
-
-  free_spinor_field(s0);
-  free_spinor_field_gpu(s0);
+  free_spinor_field_f(s0);
   
   
   finalize_process();
