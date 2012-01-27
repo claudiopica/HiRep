@@ -1294,7 +1294,9 @@ void geometry_mpi_eo(void)
     
   set_memory_order();
 
-  fix_geometry_descriptor(); 
+  fix_geometry_descriptor();
+  /* Set the type of memory to the standard one defined in global.h */
+  glattice.mem_type=glat_odd.mem_type=glat_even.mem_type=std_mem_t;
   
   geometry_mem_alloc();
   

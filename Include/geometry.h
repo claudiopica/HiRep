@@ -11,6 +11,11 @@
  */
 #define BORDERSIZE 1
 
+typedef enum _mem_t {
+  CPU_MEM = 1<<0,
+  GPU_MEM = 1<<1
+} mem_t; 
+
 typedef struct _geometry_descriptor {
   unsigned int local_master_pieces, total_master_pieces;
   unsigned int *master_start, *master_end;
@@ -21,6 +26,7 @@ typedef struct _geometry_descriptor {
   unsigned int *rbuf_from_proc, *rbuf_start;
   unsigned int *sbuf_to_proc, *sbuf_start;
   unsigned int gsize;
+  mem_t mem_type;
 } geometry_descriptor;
 
 #define _PIECE_FOR(type,i) \
