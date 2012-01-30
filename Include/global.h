@@ -97,6 +97,7 @@ GLB_VAR(mem_t,std_mem_t, /* default memory allocation type for fields */
         	=(CPU_MEM)
 #endif
         );
+GLB_VAR(mem_t,alloc_mem_t, std_mem_t); /* memory type requested for allocating fields */
 
 
 /* Gauge field */

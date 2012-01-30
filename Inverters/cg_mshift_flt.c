@@ -27,7 +27,6 @@ static int cg_mshift_flt_core(short int *sflags, mshift_par *par, spinor_operato
   double alpha, lambda, delta;
   double innorm2;
   double *z1, *z2, *z3;
-  mem_t mem_t_save=in->type->mem_type; /* save input memory location */
 
   int i;
   int cgiter;
@@ -42,10 +41,10 @@ static int cg_mshift_flt_core(short int *sflags, mshift_par *par, spinor_operato
 
   /* allocate spinors fields and aux real variables */
 #ifdef WITH_GPU
-  in->type->mem_type=GPU_MEM; /* allocate only on GPU */
+  alloc_mem_t=GPU_MEM; /* allocate only on GPU */
 #endif
   p = alloc_spinor_field_f_flt(3+par->n,in->type);
-  in->type->mem_type=mem_t_save;
+  alloc_mem_t=std_mem_t;
   k=p+par->n;
   r=k+1;
   Mk=r+1;
@@ -145,16 +144,14 @@ int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_operator_flt F, spi
   
   spinor_field_flt *out_flt, *res_flt,*tmp_flt;
   spinor_field *res, *res2, *tmp;
-  
-	mem_t mem_t_save=in->type->mem_type; /* save input memory location */
-  
+    
   /* check types */
   _TWO_SPINORS_MATCHING(in,out); 
   _ARRAY_SPINOR_MATCHING(out,i,par->n);
 
   /* allocate memory for single-precision solutions and residual vectors */
 #ifdef WITH_GPU
-  in->type->mem_type=GPU_MEM; /* allocate only on GPU */
+  alloc_mem_t=GPU_MEM; /* allocate only on GPU */
 #endif
   
   res_flt = alloc_spinor_field_f_flt(2+par->n,in->type);
@@ -166,7 +163,7 @@ int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_operator_flt F, spi
   res2 = res + 1;
   tmp = res2 + 1;
   
-  in->type->mem_type=mem_t_save; /* set the input memory location back */
+  alloc_mem_t=std_mem_t; /* set the allocation memory type back */
   
   /* set all flags to 1
    * set all out to zero execpt if par->n==1

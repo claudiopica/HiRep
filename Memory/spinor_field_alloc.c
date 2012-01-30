@@ -19,7 +19,7 @@
 /* MPI allocation and deallocation code */
 #ifdef WITH_MPI
 
-#define _FREE_MPI_CODE afree(u->comm_req)
+#define _FREE_MPI_CODE if(u->comm_req!=NULL) afree(u->comm_req)
 
 #define _ALLOC_MPI_CODE(_name) \
 if (type->nbuffers>0) {\
@@ -45,10 +45,10 @@ for (int i=0; i<n; ++i) f[i].comm_req=NULL;\
 /* GPU allocation and deallocation code */
 #ifdef WITH_GPU
 
-#define _FREE_GPU_CODE if((u->type->mem_type & GPU_MEM) && u->gpu_ptr!=NULL) cudaFree(u->gpu_ptr)
+#define _FREE_GPU_CODE if(u->gpu_ptr!=NULL) cudaFree(u->gpu_ptr)
 
 #define _ALLOC_GPU_CODE(_name,_size)\
-if(type->mem_type & GPU_MEM) {\
+if(alloc_mem_t & GPU_MEM) {\
 cudaError_t err;\
 err = cudaMalloc((void **) &f->gpu_ptr, n*_size*type->gsize*sizeof(*(f->gpu_ptr))); \
 error(err!=cudaSuccess,1,"alloc_" #_name " [" __FILE__ "]", \
@@ -68,7 +68,7 @@ for (int i=1; i<n; ++i) f[i].gpu_ptr=f[i-1].gpu_ptr+type->gsize*_size;\
 #define _DECLARE_FREE_FUNC(_name,_type)\
 void free_##_name(_type *u){ \
 if (u!=NULL) {\
-if ((u->type->mem_type & CPU_MEM) && u->ptr!=NULL) afree(u->ptr);\
+if (u->ptr!=NULL) afree(u->ptr);\
 _FREE_GPU_CODE;\
 _FREE_MPI_CODE;\
 afree(u);\
@@ -87,7 +87,7 @@ error(f==NULL,1,"alloc_" #_name " [" __FILE__ "]",\
 "Could not allocate memory space for field (structure)");\
 for (int i=0; i<n; ++i) f[i].type=type;\
 \
-if(type->mem_type & CPU_MEM) {\
+if(alloc_mem_t & CPU_MEM) {\
 f->ptr=amalloc(n*_size*type->gsize*sizeof(*(f->ptr)),ALIGN);\
 error((f->ptr)==NULL,1,"alloc_" #_name " [" __FILE__ "]",\
 "Could not allocate memory space for field (data)");\

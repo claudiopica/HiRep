@@ -623,17 +623,14 @@ static void free_mem() {
 
 static void init_Dirac() {
   if (init) {
-		geometry_descriptor gd_loc=glattice;
-    gd_loc.mem_type=GPU_MEM;
-    gtmp=alloc_spinor_field_f(1,&gd_loc);
+    alloc_mem_t=GPU_MEM;
     
-    gd_loc=glat_even;
-    gd_loc.mem_type=GPU_MEM;
-    etmp=alloc_spinor_field_f(1,&gd_loc);
-
-    gd_loc=glat_odd;
-    gd_loc.mem_type=GPU_MEM;
-    otmp=alloc_spinor_field_f(1,&gd_loc);
+    gtmp=alloc_spinor_field_f(1,&glattice);
+    etmp=alloc_spinor_field_f(1,&glat_even);
+		otmp=alloc_spinor_field_f(1,&glat_odd);
+    
+    alloc_mem_t=std_mem_t;
+    
     atexit(&free_mem);
     init=0;
   }

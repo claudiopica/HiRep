@@ -27,7 +27,6 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
   double alpha, lambda, delta;
   double innorm2;
   double *z1, *z2, *z3;
-  mem_t mem_t_save=in->type->mem_type; /* save input memory location */
 
   int i;
   int cgiter;
@@ -42,10 +41,10 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
 
   /* allocate spinors fields and aux real variables */
 #ifdef WITH_GPU
-  in->type->mem_type=GPU_MEM; /* allocate only on GPU */
+  alloc_mem_t=GPU_MEM; /* allocate only on GPU */
 #endif
   p = alloc_spinor_field_f(3+par->n,in->type);
-  in->type->mem_type=mem_t_save;
+  alloc_mem_t=std_mem_t;
   k=p+par->n;
   r=k+1;
   Mk=r+1;

@@ -26,7 +26,6 @@ typedef struct _geometry_descriptor {
   unsigned int *rbuf_from_proc, *rbuf_start;
   unsigned int *sbuf_to_proc, *sbuf_start;
   unsigned int gsize;
-  mem_t mem_type;
 } geometry_descriptor;
 
 #define _PIECE_FOR(type,i) \
