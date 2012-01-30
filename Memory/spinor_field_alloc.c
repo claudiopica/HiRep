@@ -9,6 +9,7 @@
 #include "memory.h"
 #include "geometry.h"
 #include "linear_algebra.h"
+#include "global.h"
 #ifdef WITH_MPI
 #include <mpi.h>
 #endif
