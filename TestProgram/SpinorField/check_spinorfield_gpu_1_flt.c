@@ -43,7 +43,7 @@ double sfdiff_gpu (spinor_field_flt* sf){
   spinor_field_copy_to_gpu_f_flt(tmp);
   spinor_field_sub_f_flt(tmp,tmp,sf);
   res=spinor_field_sqnorm_f_flt(tmp);
-  free_spinor_field_flt(tmp);
+  free_spinor_field_f_flt(tmp);
   return res;
 }
 
@@ -58,7 +58,7 @@ double sfdiff (spinor_field_flt* sf){
 
   res=spinor_field_sqnorm_f_flt_cpu(tmp);
 
-  free_spinor_field_flt(tmp);
+  free_spinor_field_f_flt(tmp);
   return res;
 }
 
