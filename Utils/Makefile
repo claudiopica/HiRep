@@ -2,6 +2,7 @@ TOPDIR = ..
 MKDIR = $(TOPDIR)/Make
 
 SRCS = suN_utils.c suN_exp.c boundary_conditions.c time.c single_double_utils.c HYP_smearing.c
+GPUFILES = single_double_utils_gpu.c
 
 include $(MKDIR)/MkRules
 
