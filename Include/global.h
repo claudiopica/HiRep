@@ -90,14 +90,14 @@ GLB_VAR(int,*idn,=NULL);
 GLB_VAR(geometry_descriptor,glattice,={0}); /* global lattice */
 GLB_VAR(geometry_descriptor,glat_even,={0}); /* global even lattice */
 GLB_VAR(geometry_descriptor,glat_odd,={0}); /* global odd lattice */
-GLB_VAR(mem_t,std_mem_t, /* default memory allocation type for fields */
+
 #ifdef WITH_GPU
-					=(CPU_MEM | GPU_MEM)
+#define STD_MEM_TYPE (CPU_MEM | GPU_MEM)
 #else
-        	=(CPU_MEM)
+#define STD_MEM_TYPE (CPU_MEM)
 #endif
-        );
-GLB_VAR(mem_t,alloc_mem_t, =std_mem_t); /* memory type requested for allocating fields */
+GLB_VAR(mem_t,std_mem_t, =STD_MEM_TYPE); /* default memory allocation type for fields */
+GLB_VAR(mem_t,alloc_mem_t, =STD_MEM_TYPE); /* memory type requested for allocating fields */
 
 
 /* Gauge field */
