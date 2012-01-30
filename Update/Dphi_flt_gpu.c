@@ -36,14 +36,14 @@ extern rhmc_par _update_par; /* Update/update_rhmc.c */
  * matrix-vector multiplication.
  * we count how many time the function Dphi_ is called
  */
-///static unsigned long int MVMcounter=0;
+static unsigned long int MVMcounter=0;
 
-//unsigned long int getMVM() {
-//	unsigned long int res=MVMcounter>>1; /* divide by two */
-//	MVMcounter=0; /* reset counter */
+unsigned long int getMVM_flt() {
+	unsigned long int res=MVMcounter>>1; /* divide by two */
+	MVMcounter=0; /* reset counter */
 
-//	return res;
-//}
+	return res;
+}
 
 /*
  * This function defines the massless Dirac operator
@@ -539,19 +539,23 @@ void Dphi_flt_(spinor_field_flt *out, spinor_field_flt *in)
   grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
   
   if(in->type==&glat_odd) {
-      Dphi_flt_gpu_eo<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f_flt->gpu_ptr,iup_gpu,idn_gpu,vol4h, vol4h);
+    getMVM_flt();
+    Dphi_flt_gpu_eo<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f_flt->gpu_ptr,iup_gpu,idn_gpu,vol4h, vol4h);
       CudaCheckError();
   } else if (in->type==&glat_even) {
-      Dphi_flt_gpu_oe<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f_flt->gpu_ptr,iup_gpu,idn_gpu,vol4h, vol4h);
+    getMVM_flt();
+    Dphi_flt_gpu_oe<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f_flt->gpu_ptr,iup_gpu,idn_gpu,vol4h, vol4h);
       CudaCheckError();
   } else if (in->type==&glattice) {
       in->type=&glat_even;
       out->type=&glat_odd;
-      Dphi_flt_gpu_oe<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f_flt->gpu_ptr,iup_gpu,idn_gpu,vol4h, vol4h);
+    getMVM_flt();
+    Dphi_flt_gpu_oe<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f_flt->gpu_ptr,iup_gpu,idn_gpu,vol4h, vol4h);
       CudaCheckError();
       in->type=&glat_odd;
       out->type=&glat_even;
-      Dphi_flt_gpu_eo<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f_flt->gpu_ptr,iup_gpu,idn_gpu,vol4h, vol4h);
+    getMVM_flt();
+    Dphi_flt_gpu_eo<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f_flt->gpu_ptr,iup_gpu,idn_gpu,vol4h, vol4h);
       CudaCheckError();
       
       in->type=&glattice;
