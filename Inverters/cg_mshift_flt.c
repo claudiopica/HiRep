@@ -273,15 +273,13 @@ int cg_mshift_flt2(mshift_par *par, spinor_operator M, spinor_operator_flt F, sp
   spinor_field_flt *out_flt, *res_flt,*tmp_flt;
   spinor_field *res, *tmp;
 
-  mem_t mem_t_save=in->type->mem_type; /* save input memory location */
-
   /* check types */
   _TWO_SPINORS_MATCHING(in,out); 
   _ARRAY_SPINOR_MATCHING(out,i,par->n);
 
   /* allocate memory for single-precision solutions and residual vectors */
 #ifdef WITH_GPU
-  in->type->mem_type=GPU_MEM; /* allocate only on GPU */
+  alloc_mem_t=GPU_MEM; /* allocate only on GPU */
 #endif
   res_flt = alloc_spinor_field_f_flt(2+par->n,in->type);
 
@@ -291,7 +289,7 @@ int cg_mshift_flt2(mshift_par *par, spinor_operator M, spinor_operator_flt F, sp
 
   tmp = res + 1;
 
-  in->type->mem_type=mem_t_save; /* set the input memory location back */
+  alloc_mem_t=std_mem_t; /* set the allocation memory type back */
   
   /* compute input norm2 */
   innorm2=spinor_field_sqnorm_f(in);
