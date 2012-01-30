@@ -88,6 +88,8 @@ _type *f;\
 f=amalloc(sizeof(*f),ALIGN);\
 error(f==NULL,1,"alloc_" #_name " [" __FILE__ "]",\
       "Could not allocate memory space for field (structure)");\
+f->type=type;\
+\
 if(type->mem_type & CPU_MEM) {\
 	f->ptr=amalloc(_size*type->gsize*sizeof(*(f->ptr)),ALIGN);\
   error((f->ptr)==NULL,1,"alloc_" #_name " [" __FILE__ "]",\
@@ -95,8 +97,6 @@ if(type->mem_type & CPU_MEM) {\
 } else { f->ptr=NULL; }\
 \
 _ALLOC_GPU_CODE(_name,_size);\
-\
-f->type=type;\
 \
 _ALLOC_MPI_CODE(_name);\
 \

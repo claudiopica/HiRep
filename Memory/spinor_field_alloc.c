@@ -13,6 +13,7 @@
 #include <mpi.h>
 #endif
 
+#include "logger.h"
 
 
 /* MPI allocation and deallocation code */
@@ -52,7 +53,7 @@ cudaError_t err;\
 err = cudaMalloc((void **) &f->gpu_ptr, n*_size*type->gsize*sizeof(*(f->gpu_ptr))); \
 error(err!=cudaSuccess,1,"alloc_" #_name " [" __FILE__ "]", \
 "Could not allocate GPU memory space for field"); \
-for (int i=1; i<n; ++i) f[i].gpu_ptr=f[i-1].gpu_ptr+f->type->gsize*_size;\
+for (int i=1; i<n; ++i) f[i].gpu_ptr=f[i-1].gpu_ptr+type->gsize*_size;\
 } else for (int i=0; i<n; ++i) f[i].gpu_ptr=NULL
 
 #else /* WITH_GPU */
@@ -84,6 +85,8 @@ if (n==0) return NULL;\
 f=amalloc(n*sizeof(*f),ALIGN);\
 error(f==NULL,1,"alloc_" #_name " [" __FILE__ "]",\
 "Could not allocate memory space for field (structure)");\
+for (int i=0; i<n; ++i) f[i].type=type;\
+\
 if(type->mem_type & CPU_MEM) {\
 f->ptr=amalloc(n*_size*type->gsize*sizeof(*(f->ptr)),ALIGN);\
 error((f->ptr)==NULL,1,"alloc_" #_name " [" __FILE__ "]",\
@@ -92,8 +95,6 @@ for (int i=1; i<n; ++i) f[i].ptr=f[i-1].ptr+type->gsize*_size;\
 } else { for (int i=0; i<n; ++i) f[i].ptr=NULL; }\
 \
 _ALLOC_GPU_CODE(_name,_size);\
-\
-for (int i=0; i<n; ++i) f[i].type=type;\
 \
 _ALLOC_MPI_CODE(_name);\
 \
