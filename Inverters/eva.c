@@ -122,10 +122,11 @@ static void rotate(int n,spinor_field *pkk,complex v[]) //FIX: DONE always on CP
   complex *z;
   suNf_spinor *pk,*pj;
 
+#ifdef WITH_GPU
   for (k=0;k<n;k++){
     spinor_field_copy_from_gpu_f(&pkk[k]);
   }
-  
+#endif 
 
   if (initr==0)
     alloc_ws_rotate();
@@ -160,9 +161,11 @@ static void rotate(int n,spinor_field *pkk,complex v[]) //FIX: DONE always on CP
     for (k=0;k<n;k++)
       *_FIELD_AT(&pkk[k],ix)=psi[k];
   }
+#ifdef WITH_GPU
   for (k=0;k<n;k++){
     spinor_field_copy_to_gpu_f(&pkk[k]);
   }
+#endif
 }
 
 static int alloc_aux(int nevt)
@@ -430,7 +433,7 @@ static void apply_cheby(int k,double lbnd,double ubnd,
   int j;
   double c1,c2;
   spinor_field *psi0,*psi1,*psi2,*psi3;
-
+  
   c1=2.0f/(ubnd-lbnd);
   c2=-(ubnd+lbnd)/(ubnd-lbnd);
 
@@ -478,7 +481,7 @@ int eva(int nev,int nevt,int init,int kmax,
 	"Improper parameters omega1 or omega2");
 
 #ifdef WITH_GPU
-  gfield_copy_to_gpu(u_gauge); //Make sure gauge field is on GPU
+  gfield_copy_to_gpu_f(u_gauge_f); //Make sure gauge field is on GPU
 #endif
 
   nop=0;
@@ -535,7 +538,7 @@ int eva(int nev,int nevt,int init,int kmax,
       if (nlock==nev)
 	{
 	  lprintf("EVA",10,"Computation succeded. MVM = %d\n",*status);
-  free_spinor_field_f(ws);
+	  free_spinor_field_f(ws);
 	  return 0;
 	}
     }

@@ -235,7 +235,7 @@ void rational_func(rational_app *coef, spinor_operator Q, spinor_field *out, spi
   int i;
 
 #ifdef WITH_GPU
-  gfield_copy_to_gpu(u_gauge);
+  gfield_copy_to_gpu_f(u_gauge_f); //Make sure gauge field is on GPU
 #endif 
 
   /* check input types */

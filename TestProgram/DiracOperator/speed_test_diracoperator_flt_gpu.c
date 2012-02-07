@@ -29,9 +29,9 @@ double sfdiff (spinor_field_flt* sf){
   spinor_field *tmp;
   double res;
   tmp=alloc_spinor_field_f(2, &glattice);
-  assign_s2sd(&tmp[0], sf);
+  assign_s2sd_cpu(&tmp[0], sf);
   spinor_field_copy_from_gpu_f_flt(sf);
-  assign_s2sd(&tmp[1], sf);
+  assign_s2sd_cpu(&tmp[1], sf);
   spinor_field_sub_f_cpu(&tmp[0],&tmp[0],&tmp[1]);
   res= spinor_field_sqnorm_f_cpu(&tmp[0]);
   free_spinor_field_f(tmp);

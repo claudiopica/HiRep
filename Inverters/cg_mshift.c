@@ -110,7 +110,7 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
     }
 
     /* Uncomment this to print cg recursion parameters 
-       lprintf("CGTEST",0,"[ %d ] alpha=%e\n",cgiter,alpha);
+    lprintf("CGTEST",0,"[ %d ] alpha=%e\n",cgiter,alpha);
        lprintf("CGTEST",0,"[ %d ] omega=%e\n",cgiter,omega);
        lprintf("CGTEST",0,"[ %d ] still runnning=%d\n",cgiter,notconverged);
 	   for (i=0;i<par->n;++i) lprintf("CGTEST",0,"z3[%d]=%e; test=[%e,%e]\n",i,z3[i],delta*z3[i]*z3[i],par->err2*innorm2);

@@ -26,6 +26,8 @@
 #include "memory.h"
 #include "gpu.h"
 
+#ifdef WITH_GPU
+
 #ifdef ROTATED_SF
 #include "update.h"
 extern rhmc_par _update_par; /* Update/update_rhmc.c */
@@ -763,3 +765,5 @@ void g5Dphi_sq(double m0, spinor_field *out, spinor_field *in) {
   g5Dphi(m0, out, gtmp);
 
 }
+
+#endif

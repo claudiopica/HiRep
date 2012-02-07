@@ -169,14 +169,14 @@ int main(int argc,char *argv[])
   
   if(glb_var.rlxd_state[0]!='\0')
   {
-  	/*load saved state*/
-	lprintf("MAIN",0,"Loading rlxd state from file %s\n",glb_var.rlxd_state);
-	read_ranlxd_state(glb_var.rlxd_state);
+    /*load saved state*/
+    lprintf("MAIN",0,"Loading rlxd state from file %s\n",glb_var.rlxd_state);
+    read_ranlxd_state(glb_var.rlxd_state);
   }
   else
   {
-  lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed+PID);
-  rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
+    lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed+PID);
+    rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
   }
   
   /* setup communication geometry */

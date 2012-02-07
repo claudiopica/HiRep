@@ -134,16 +134,20 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"\n");
   fflush(stdout);
   
+  lprintf("MAIN",0,"Allocating gauge field\n");  
   u_gauge=alloc_gfield(&glattice);
 #if (!defined(REPR_FUNDAMENTAL) && !defined(WITH_QUATERNIONS)) || defined(ROTATED_SF) 
   u_gauge_f=alloc_gfield_f(&glattice);
 #endif
   /* allocate memory */
+  lprintf("MAIN",0,"Allocating spinor field\n");  
   s0=alloc_spinor_field_f(4,&glattice);
   s1=s0+1;
   s2=s1+1;
   s3=s2+1;
   
+
+  lprintf("MAIN",0,"Randomizing spinor field");  
   gaussian_spinor_field(s0);
   spinor_field_copy_to_gpu_f(s0);
 

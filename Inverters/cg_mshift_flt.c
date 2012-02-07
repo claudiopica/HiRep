@@ -20,7 +20,6 @@
  * returns the number of cg iterations done.
  */
 static int cg_mshift_flt_core(short int *sflags, mshift_par *par, spinor_operator_flt M, spinor_field_flt *in, spinor_field_flt *out){
-
   spinor_field_flt *k,*r,*Mk;
   spinor_field_flt *p;
   double omega, oldomega, gamma;

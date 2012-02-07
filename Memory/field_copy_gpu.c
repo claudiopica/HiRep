@@ -22,7 +22,7 @@
 #include <mpi.h>
 #endif
 #include "gpu.h"
-
+#ifdef WITH_GPU
 /* GAUGE FIELDS */
 void gfield_copy_to_gpu(suNg_field *field){
   suNg_field *tmp=alloc_gfield(field->type);
@@ -108,4 +108,4 @@ void spinor_field_copy_from_gpu_f_flt(spinor_field_flt *field){
   spinor_field_tocpuformat_flt(field,tmp);
   free_spinor_field_f_flt(tmp);
 }
-
+#endif

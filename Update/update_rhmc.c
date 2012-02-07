@@ -230,6 +230,7 @@ int update_rhmc(){
     
     /* integrate molecular dynamics */
     lprintf("RHMC",30,"MD integration...\n");
+    
     _update_par.integrator(momenta,_update_par.MD_par);//NEED TO CHANGE?
     
     /* project gauge field */
@@ -334,7 +335,7 @@ int update_rhmc_o(){
     
     /* integrate molecular dynamics */
     lprintf("RHMC",30,"MD integration...\n");
-    _update_par.integrator(momenta,_update_par.MD_par); //NEED TO CHANGE?
+    _update_par.integrator(momenta,_update_par.MD_par); //NEED TO CHANGE DONE
     /*leapfrog(momenta, _update_par.tlen, _update_par.nsteps);
      O2MN_multistep(momenta, _update_par.tlen, _update_par.nsteps, 3);*/
     

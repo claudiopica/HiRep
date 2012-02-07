@@ -38,7 +38,7 @@ static spinor_field *ppk[5];
 double sfdiff_gpu (spinor_field* sf){
   spinor_field *tmp;
   double res;
-  tmp=alloc_spinor_field_f(1, &glattice);
+  tmp=alloc_spinor_field_f(1, sf->type);
   spinor_field_copy_f_cpu(tmp,sf);
   spinor_field_copy_to_gpu_f(tmp);
   spinor_field_sub_f(tmp,tmp,sf);
@@ -50,7 +50,7 @@ double sfdiff_gpu (spinor_field* sf){
 double sfdiff (spinor_field* sf){
   spinor_field *tmp;
   double res;
-  tmp=alloc_spinor_field_f(1, &glattice);
+  tmp=alloc_spinor_field_f(1, sf->type);
 
   spinor_field_copy_f(tmp,sf);
   spinor_field_copy_from_gpu_f(tmp);
@@ -117,8 +117,8 @@ int main(int argc,char *argv[])
   lprintf("CPTEST",0,"ncopies=%d\n",glattice.ncopies);
   
 //	Allocates memory for cpu & gpu spinor field. 
-  sf1=alloc_spinor_field_f(sfsize, &glattice);
-  sf2=alloc_spinor_field_f(sfsize, &glattice);
+  sf1=alloc_spinor_field_f(sfsize, &glat_odd);
+  sf2=alloc_spinor_field_f(sfsize, &glat_odd);
 
 	
 // CPU part set to gaussian

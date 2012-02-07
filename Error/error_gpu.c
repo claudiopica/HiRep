@@ -4,6 +4,8 @@
 #include "error.h"
 #include "gpu.h"
 
+#ifdef WITH_GPU
+
 void __cudaSafeCall( cudaError_t err, const char *file, const int line )
 {
 #ifdef CUDA_CHECK_ERROR
@@ -62,3 +64,4 @@ inline void __cudaCheckError( const char *file, const int line )
 
 #undef CUDA_CHECK_ERROR
 
+#endif

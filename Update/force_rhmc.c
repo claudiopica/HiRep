@@ -119,12 +119,13 @@ void Force_rhmc_f(double dt, suNg_av_field *force){
     Hchi->type=&glat_even; 
 #endif
 
-
+#ifdef WITH_GPU
+    gfield_copy_to_gpu_f(u_gauge_f); //Make sure gauge field is on GPU
+#endif    
   for (k=0; k<_update_par.n_pf; ++k) {
     /* compute inverse vectors chi[i] = (H^2 - b[i])^1 * pf */
     if (inv_par.n==1) { spinor_field_zero_f(chi); }
     cg_mshift(&inv_par, &H2, &pf[k], chi);
-
     for (n=0; n<r_MD.order; ++n) {
 #ifdef UPDATE_EO
       /* change temporarely the type of chi[n] and Hchi */
@@ -142,6 +143,15 @@ void Force_rhmc_f(double dt, suNg_av_field *force){
 #else
       g5Dphi(_update_par.mass, Hchi, &chi[n]);
       start_sf_sendrecv(Hchi);
+#endif
+
+#ifdef WITH_GPU //Do rest of the calculation at CPU.
+      spinor_field_copy_from_gpu_f(&chi[n]);
+      spinor_field_copy_from_gpu_f(Hchi);
+#ifdef UPDATE_EO
+      spinor_field_copy_from_gpu_f(&delta);
+      spinor_field_copy_from_gpu_f(&sigma);
+#endif
 #endif
 
       lprintf("FORCE_RHMC",50,"[%d] |chi| = %1.8e |Hchi| = %1.8e\n",n,
@@ -200,7 +210,7 @@ void Force_rhmc_f(double dt, suNg_av_field *force){
 	    _algebra_project(f,s1);
 	    /*_print_avect(f); */
 #ifdef UPDATE_EO
-	    _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),-dt*r_MD.a[n+1]*(_REPR_NORM2/_FUND_NORM2),f);	
+	    _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),-dt*r_MD.a[n+1]*(_REPR_NORM2/_FUND_NORM2),f);
 #else
 	    _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),dt*r_MD.a[n+1]*(_REPR_NORM2/_FUND_NORM2),f);	
 #endif
@@ -232,7 +242,7 @@ void Force_rhmc_f(double dt, suNg_av_field *force){
        	SF_force_bcs(force);
 #endif /* BASIC_SF || ROTATED_SF*/
 
-    }  
+    }
   }
 
 #ifdef UPDATE_EO

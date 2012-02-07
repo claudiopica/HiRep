@@ -77,3 +77,6 @@ void _FUNC(spinor_field_lc1)(double c1, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TY
 void _FUNC(spinor_field_lc2)(double c1, double c2, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2);
 void _FUNC(spinor_field_lc3)(double c1, double c2, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2, _SPINOR_FIELD_TYPE *s3);
 
+#ifdef WITH_GPU
+void _FUNC(spinor_field_copy_gpu_to_gpu)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2);              
+#endif

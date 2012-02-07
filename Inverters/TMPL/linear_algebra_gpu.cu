@@ -146,7 +146,6 @@ __global__ void spinor_field_mul_gpu(COMPLEX *s1, REAL r, COMPLEX *s2,int N){
   int i = blockIdx.x*BLOCK_SIZE + threadIdx.x;
   i=min(i,N-1);
   _complex_mulr(s1[i],r,s2[i]);
-
 }
 
 /* s1+=c*s2 c complex */
@@ -292,6 +291,14 @@ __global__ void spinor_field_lc3_gpu(REAL r1,REAL r2, COMPLEX *s1, COMPLEX *s2, 
   i=min(i,N-1);
   _complex_rlc_assign(s3[i],r1,s1[i],r2,s2[i]);
   _complex_minus(s3[i],s3[i]);
+}
+
+template< typename COMPLEX>
+__global__ void spinor_field_copy_gpu_to_gpu_gpu(COMPLEX* dst, COMPLEX* src, int N){
+  int i = blockIdx.x*BLOCK_SIZE + threadIdx.x;
+  int j;
+  i=min(i,N-1);
+  dst[i]=src[i];
 }
 
 /* c1=0 */

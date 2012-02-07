@@ -1,7 +1,7 @@
 TOPDIR = ../..
 MKDIR=$(TOPDIR)/Make
 
-EXES = speed_flt_gpu speed_dbl_gpu check_spinorfield_gpu_1 check_spinorfield_gpu_1_flt
+EXES = speed_flt_gpu speed_dbl_gpu check_spinorfield_gpu_1 check_spinorfield_gpu_1_flt speed_spinor_gpu_flt
 
 default: $(EXES)
 
@@ -19,7 +19,7 @@ MODS := timer_gpu boundary_conditions # suN_utils suN_exp single_double_utils
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Memory
-MODS := amalloc field_alloc spinor_field_alloc field_pack_gpu
+MODS := amalloc field_alloc spinor_field_alloc field_pack_gpu field_copy_gpu 
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Observables
@@ -31,7 +31,7 @@ MODS := gauss random_suNg ranlxs ranlxd random_fields
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Update
-MODS := random_su2 representation random_spinor_field # cabmar staples update_hb  Dphi Dphi_old  random_momenta  find_spec_limits
+MODS := random_su2 representation random_spinor_field random_spinor_field_gpu # cabmar staples update_hb  Dphi Dphi_old  random_momenta  find_spec_limits
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Error

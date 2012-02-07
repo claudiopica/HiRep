@@ -15,11 +15,11 @@ MODS := logger read_input
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Utils
-MODS := boundary_conditions time timer_gpu single_double_utils suN_utils
+MODS := boundary_conditions time timer_gpu single_double_utils suN_utils single_double_utils_gpu
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Memory
-MODS := amalloc field_alloc spinor_field_alloc field_pack_gpu
+MODS := amalloc field_alloc spinor_field_alloc field_pack_gpu field_copy_gpu
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Random
@@ -27,7 +27,7 @@ MODS := gauss random_suNg ranlxs ranlxd random_fields
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Update
-MODS := Dphi Dphi_flt random_spinor_field random_su2 representation Dphi_gpu Dphi_flt_gpu
+MODS := Dphi Dphi_flt random_spinor_field random_su2 representation Dphi_gpu Dphi_flt_gpu random_spinor_field_gpu
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Error

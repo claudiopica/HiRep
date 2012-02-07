@@ -266,6 +266,7 @@ int init_mc(rhmc_flow *rf, char *ifile) {
 
   /* init RHMC */  
   rhmc_var.rhmc_p.integrator=&O2MN_multistep;
+  //rhmc_var.rhmc_p.integrator=&leapfrog;
   rhmc_var.rhmc_p.mshift_solver=&cg_mshift; 
   rhmc_var.rhmc_p.MD_par=&rhmc_var.int_p;
 

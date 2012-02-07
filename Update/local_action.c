@@ -131,7 +131,7 @@ void local_hmc_action(local_action_type type,
     *_FIELD_AT(loc_action,i)+=a;
   }
 
-#ifdef WITH_GPU //COPY SPINORS TO GPU
+#ifdef WITH_GPU //COPY SPINORS BACK TO GPU
     for (j=0;j<_update_par.n_pf;++j) {
       spinor_field_copy_to_gpu_f(&phi1[j]);
       spinor_field_copy_to_gpu_f(&phi2[j]);
