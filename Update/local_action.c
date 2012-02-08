@@ -36,12 +36,6 @@ void local_hmc_action(local_action_type type,
   _TWO_SPINORS_MATCHING(loc_action,phi2);
 #endif
 
-#ifdef WITH_GPU //COPY SPINORS TO CPU
-    for (j=0;j<_update_par.n_pf;++j) {
-      spinor_field_copy_from_gpu_f(&phi1[j]);
-      spinor_field_copy_from_gpu_f(&phi2[j]);
-    }
-#endif
 
   switch(type) {
   case NEW:
@@ -119,6 +113,13 @@ void local_hmc_action(local_action_type type,
 
 #endif /* ROTATED_SF */
 
+#ifdef WITH_GPU //COPY SPINORS TO CPU
+  for (j=0;j<_update_par.n_pf;++j) {
+    spinor_field_copy_from_gpu_f(&phi1[j]);
+    spinor_field_copy_from_gpu_f(&phi2[j]);
+  }
+#endif
+  
   /* pseudofermion fields can be defined only on even sites is the preconditioning is used */
   _MASTER_FOR(phi1->type,i) {
     a=0.;
@@ -130,14 +131,5 @@ void local_hmc_action(local_action_type type,
 
     *_FIELD_AT(loc_action,i)+=a;
   }
-
-#ifdef WITH_GPU //COPY SPINORS BACK TO GPU
-    for (j=0;j<_update_par.n_pf;++j) {
-      spinor_field_copy_to_gpu_f(&phi1[j]);
-      spinor_field_copy_to_gpu_f(&phi2[j]);
-    }
-#endif
-
-
    
 }

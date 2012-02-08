@@ -116,9 +116,9 @@ int main(int argc,char *argv[])
   lprintf("CPTEST",0,"lmp=%d\n",glattice.local_master_pieces);
   lprintf("CPTEST",0,"ncopies=%d\n",glattice.ncopies);
   
-//	Allocates memory for cpu & gpu spinor field. 
-  sf1=alloc_spinor_field_f(sfsize, &glat_odd);
-  sf2=alloc_spinor_field_f(sfsize, &glat_odd);
+  //	Allocates memory for cpu & gpu spinor field. 
+  sf1=alloc_spinor_field_f(sfsize, &glattice);
+  sf2=alloc_spinor_field_f(sfsize, &glattice);
 
 	
 // CPU part set to gaussian
@@ -137,6 +137,15 @@ int main(int argc,char *argv[])
     spinor_field_copy_f(&sf2[i],&sf1[i]);
     spinor_field_copy_f_cpu(&sf2[i],&sf1[i]);
   }  
+
+  
+  //Check spinor_field_prod_re
+  gaussian_spinor_field_cpu(&sf1[0]);
+  res_cpu = spinor_field_sqnorm_f_cpu(&sf1[0]);
+  spinor_field_copy_to_gpu_f(&sf1[0]);
+  res_gpu = spinor_field_sqnorm_f(&sf1[0]);
+
+  lprintf("LA TEST",0,"Check gaussian_spinor_field\n gpu=%1.10g, cpu=%1.10g, \n gpu-cpu= %1.10g\n\n",res_gpu,res_cpu,res_gpu-res_cpu);
 
   //Check spinor_field_prod_re
   for (i=0;i<sfsize;i++){ spinor_field_copy_to_gpu_f(&sf1[i]); }

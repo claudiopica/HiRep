@@ -210,9 +210,9 @@ int update_rhmc(){
     /* generate new momenta and pseudofermions */
     lprintf("RHMC",30,"Generating gaussian momenta and pseudofermions...\n");
     gaussian_momenta(momenta);
-    for (i=0;i<_update_par.n_pf;++i)
+    for (i=0;i<_update_par.n_pf;++i){
       gaussian_spinor_field(&pf[i]); //NEED TO CHANGE (DONE)
-
+    }
 #if defined(BASIC_SF) && !defined(NDEBUG)
     lprintf("MAIN",0,"SF_test_force_bcs(START): %1.8e\n",SF_test_force_bcs(momenta));
     for (i=0;i<_update_par.n_pf;++i)
