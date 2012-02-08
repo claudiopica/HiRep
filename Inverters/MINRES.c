@@ -65,7 +65,7 @@ static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, spi
 
   spinor_field_copy_f(p2, in);
   if(trial!=NULL) {
-    M(p1,trial);
+    M.dbl(p1,trial);
     ++cgiter;
     spinor_field_sub_assign_f(p2,p1);
     if(out!=trial){
@@ -91,7 +91,7 @@ static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, spi
   do {
     ++cgiter;
 
-    M(Mp,p2);
+    M.dbl(Mp,p2);
     
     /* compute alpha */
     alpha = spinor_field_prod_re_f(Mp,p2);
@@ -150,7 +150,7 @@ static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, spi
   } while ((par->max_iter==0 || cgiter<par->max_iter) && notconverged);
 
   /* test results */
-  M(Mp,out);
+  M.dbl(Mp,out);
   ++cgiter;
   spinor_field_sub_f(Mp,Mp,in);
   innorm2=spinor_field_sqnorm_f(Mp)/innorm2;

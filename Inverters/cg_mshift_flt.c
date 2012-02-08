@@ -19,7 +19,7 @@
  * out[i] = (M-(par->shift[i]))^-1 in
  * returns the number of cg iterations done.
  */
-static int cg_mshift_flt_core(short int *sflags, mshift_par *par, spinor_operator_flt M, spinor_field_flt *in, spinor_field_flt *out){
+static int cg_mshift_flt_core(short int *sflags, mshift_par *par, spinor_operator M, spinor_field_flt *in, spinor_field_flt *out){
   spinor_field_flt *k,*r,*Mk;
   spinor_field_flt *p;
   double omega, oldomega, gamma;
@@ -59,7 +59,7 @@ static int cg_mshift_flt_core(short int *sflags, mshift_par *par, spinor_operato
   innorm2=spinor_field_sqnorm_f_flt(in);
   if(par->n==1) { /* non multishift case */
     /* use out[0] as initial guess */
-    M(Mk,&out[0]);
+    M.flt(Mk,&out[0]);
     ++cgiter;
     spinor_field_mul_add_assign_f_flt(Mk,-par->shift[0],&out[0]);
     spinor_field_sub_f_flt(r,in,Mk);
@@ -78,7 +78,7 @@ static int cg_mshift_flt_core(short int *sflags, mshift_par *par, spinor_operato
 
   /* cg recursion */
   do {
-    M(Mk,k);
+    M.flt(Mk,k);
     alpha = spinor_field_prod_re_f_flt(k,Mk);
     oldomega = omega;
     omega = - delta/alpha;
@@ -130,7 +130,7 @@ static int cg_mshift_flt_core(short int *sflags, mshift_par *par, spinor_operato
 
 /* cg mshift with single precision acceleration */
 /* results are still accurate to double precision! */
-int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_operator_flt F, spinor_field *in, spinor_field *out){ 
+int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out){ 
   int siter=0,diter=0;
   int i;
   mshift_par local_par=*par;
@@ -183,7 +183,7 @@ int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_operator_flt F, spi
     for (i=0; i<par->n; ++i) {
       if (sflags[i]!=0) {
         /* compute residual vector */
-        M(tmp,&out[i]); ++diter;
+        M.dbl(tmp,&out[i]); ++diter;
         spinor_field_sub_f(res2,in,tmp);
         spinor_field_mul_add_assign_f(res2,par->shift[i],&out[i]);
         /* test for convergence */
@@ -230,7 +230,7 @@ int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_operator_flt F, spi
       lprintf("CGDEBUG",20,"err2 = %e\n",local_par.err2);
       /* should not be needed since core do not modify flags */
       for(i=0;i<par->n;++i) loc_flags[i]=sflags[i]; /* set core flags */ 
-      siter+=cg_mshift_flt_core(loc_flags, &local_par, F, res_flt, out_flt); /* save single precision iterations */
+      siter+=cg_mshift_flt_core(loc_flags, &local_par, M, res_flt, out_flt); /* save single precision iterations */
       
       /* accumulate solution in double precision */
       for(i=0;i<par->n; ++i) {
@@ -258,7 +258,7 @@ int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_operator_flt F, spi
 
 /* cg mshift with single precision acceleration */
 /* results are still accurate to double precision! */
-int cg_mshift_flt2(mshift_par *par, spinor_operator M, spinor_operator_flt F, spinor_field *in, spinor_field *out){ 
+int cg_mshift_flt2(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out){ 
   int siter=0,diter=0;
   int i,j;
   mshift_par local_par=*par;
@@ -305,7 +305,7 @@ int cg_mshift_flt2(mshift_par *par, spinor_operator M, spinor_operator_flt F, sp
 #define MAX_PREC 1.e-10
   if(local_par.err2<MAX_PREC) local_par.err2=MAX_PREC;
 #undef MAX_PREC
-  siter=cg_mshift_flt_core(sflags, &local_par, F, res_flt, out_flt); /* save single precision iterations */
+  siter=cg_mshift_flt_core(sflags, &local_par, M, res_flt, out_flt); /* save single precision iterations */
 
   for (i=0;i<(par->n); ++i){
     assign_s2sd(&out[i],&out_flt[i]); 
@@ -315,7 +315,7 @@ int cg_mshift_flt2(mshift_par *par, spinor_operator M, spinor_operator_flt F, sp
 
   for (i=0;i<(par->n); ++i){
     for (;;){
-      M(tmp,&out[i]); ++diter;
+      M.dbl(tmp,&out[i]); ++diter;
       spinor_field_sub_f(res,in,tmp);
       spinor_field_mul_add_assign_f(res,par->shift[i],&out[i]);
       /* test for convergence */
@@ -339,7 +339,7 @@ int cg_mshift_flt2(mshift_par *par, spinor_operator M, spinor_operator_flt F, sp
 	sflags[j]=1;
       }
       sflags[i]=1;
-      siter+=cg_mshift_flt_core(sflags, &local_par, F, res_flt, out_flt); /* save single precision iterations */
+      siter+=cg_mshift_flt_core(sflags, &local_par, M, res_flt, out_flt); /* save single precision iterations */
       assign_s2sd(res,&out_flt[i]);
       spinor_field_add_assign_f(&out[i],res);
     } 

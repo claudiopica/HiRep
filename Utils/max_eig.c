@@ -41,7 +41,7 @@ int max_H(spinor_operator H, geometry_descriptor *type, double *max) {
 #ifdef WITH_GPU
   gfield_copy_to_gpu_f(u_gauge_f); //Make sure gauge field is on GPU
 #endif
-  H(s3,s1); count=1;
+  H.dbl(s3,s1); count=1;
 
   do {
 
@@ -51,7 +51,7 @@ int max_H(spinor_operator H, geometry_descriptor *type, double *max) {
     spinor_field_mul_f(s1,1./norm,s1);
 
     oldmax=*max;
-    H(s3,s1); ++count;
+    H.dbl(s3,s1); ++count;
     *max=spinor_field_prod_re_f(s1,s3);
     
     /* printf("Iter %d: %4.5e\n",count,fabs(oldnorm-norm)); */

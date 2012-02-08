@@ -23,17 +23,22 @@
 
 static double hmass, hmass_pre;
 
-static void H_pta(spinor_field *out, spinor_field *in){
+static void H_pta_dbl(spinor_field *out, spinor_field *in){
   g5Dphi(hmass,out,in);
 }
+spinor_operator H_pta={&H_pta_dbl,NULL};
 
-static void D_pta(spinor_field *out, spinor_field *in){
+static void D_pta_dbl(spinor_field *out, spinor_field *in){
   Dphi(hmass,out,in);
 }
 
-static void D_pta_pre(spinor_field *out, spinor_field *in){
+spinor_operator D_pta={&D_pta_dbl,NULL};
+
+static void D_pta_pre_dbl(spinor_field *out, spinor_field *in){
   Dphi_eopre(hmass_pre,out,in);
 }
+
+spinor_operator D_pta_pre={&D_pta_pre_dbl,NULL};
 
 /*
  * Computes the matrix elements (H^-1)_{x,x0}
@@ -115,7 +120,7 @@ void pta_qprop_QMR_eo(int g0[4], spinor_field **pta_qprop, int nm, double *mass,
 		spinor_field_zero_f(&resdn[i]);
 	}
 	spinor_field_g5_assign_f(in);
-	cgiter+=g5QMR_mshift(&QMR_par, &D_pta_pre, in, resdn);
+	cgiter+=g5QMR_mshift(&QMR_par, D_pta_pre, in, resdn);
 	spinor_field_g5_assign_f(in);
 
 	/* now loop over sources */
@@ -132,7 +137,7 @@ void pta_qprop_QMR_eo(int g0[4], spinor_field **pta_qprop, int nm, double *mass,
 #endif /* NDEBUG */
   	  		spinor_field_zero_f(&resd[i]);
 		}
-		cgiter+=g5QMR_mshift(&QMR_par, &D_pta_pre, in, resd);
+		cgiter+=g5QMR_mshift(&QMR_par, D_pta_pre, in, resd);
 
 		for(i=0;i<QMR_par.n;++i){
 
@@ -245,7 +250,7 @@ void pta_qprop_QMR(int g0[4], spinor_field **pta_qprop, int nm, double *mass, do
 	
 	/* invert noise */
 	spinor_field_g5_assign_f(in);
-  cgiter+=g5QMR_mshift(&QMR_par, &D_pta, in, resdn);
+  cgiter+=g5QMR_mshift(&QMR_par, D_pta, in, resdn);
   spinor_field_g5_assign_f(in);
 
 	/* now loop over sources */
@@ -255,7 +260,7 @@ void pta_qprop_QMR(int g0[4], spinor_field **pta_qprop, int nm, double *mass, do
 	    *( (double *)_FIELD_AT(in,x0) + 2*source ) =1.;
 		spinor_field_g5_assign_f(in);
 
-		cgiter+=g5QMR_mshift(&QMR_par, &D_pta, in, resd);
+		cgiter+=g5QMR_mshift(&QMR_par, D_pta, in, resd);
 
 		for(i=0;i<QMR_par.n;++i){
 
@@ -343,10 +348,10 @@ void pta_qprop_MINRES(int g0[4], spinor_field **pta_qprop, int nm, double *mass,
     MINRESpar.err2 = acc;
     MINRESpar.max_iter = 0;
 
-    cgiter+=MINRES(&MINRESpar, &H_pta, in, &pta_qprop[0][source],0);
+    cgiter+=MINRES(&MINRESpar, H_pta, in, &pta_qprop[0][source],0);
     for(i=1;i<nm;++i){
       hmass=mass[i];
-      cgiter+=MINRES(&MINRESpar, &H_pta, in, &pta_qprop[i][source],&pta_qprop[i-1][source]);
+      cgiter+=MINRES(&MINRESpar, H_pta, in, &pta_qprop[i][source],&pta_qprop[i-1][source]);
     }
 
 		/* remove source */

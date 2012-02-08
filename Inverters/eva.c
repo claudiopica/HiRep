@@ -253,7 +253,7 @@ static void init_subsp(int nev,int nevt,int init,spinor_field *ev)
 }
 
 
-static void ritz_subsp(int nlock,int nevt,spinor_operator Op,
+static void ritz_subsp(int nlock,int nevt,spinor_operator_dbl Op,
                        spinor_field *ws,spinor_field *ev,double d[])
 {
   int neff,i,j;
@@ -321,7 +321,7 @@ static double min_eva(int ia,int ib,double d[])
 
 
 static int res_subsp(int nlock,int nev,double omega1,double omega2,
-                     spinor_operator Op,
+                     spinor_operator_dbl Op,
                      spinor_field *ws,spinor_field *ev,double d[])
 {
   int i,ia,ib;
@@ -427,7 +427,7 @@ static double set_lbnd(int nevt,int kmax,double ubnd,double d[],int *k)
 
 
 static void apply_cheby(int k,double lbnd,double ubnd,
-                        spinor_operator Op,
+                        spinor_operator_dbl Op,
                         spinor_field *ws,spinor_field *ev)
 {
   int j;
@@ -463,7 +463,7 @@ static void apply_cheby(int k,double lbnd,double ubnd,
 
 int eva(int nev,int nevt,int init,int kmax,
         int imax,double ubnd,double omega1,double omega2,
-        spinor_operator Op,
+        spinor_operator_dbl Op,
         spinor_field *ev,double d[],int *status)   
 {
   int i,k,n;

@@ -27,6 +27,9 @@ rational_app r_S={0};  /* used for computing the action S in the metropolis test
 rational_app r_MD={0}; /* used in the action MD evolution */
 rational_app r_HB={0};  /* used in pseudofermions heatbath */
 double minev, maxev; /* min and max eigenvalue of H^2 */
+
+spinor_operator H2={NULL,NULL}; 
+spinor_operator H={NULL,NULL}; 
 /* END of State */
 
 
@@ -37,7 +40,7 @@ static suNg_field *u_gauge_old=NULL;
 static scalar_field *la=NULL; /* local action field for Metropolis test */
 
 /* this is the basic operator used in the update */
-void H2(spinor_field *out, spinor_field *in){
+void H2_dbl(spinor_field *out, spinor_field *in){
 #ifdef UPDATE_EO
     g5Dphi_eopre_sq(_update_par.mass, out, in);
 #else
@@ -45,14 +48,30 @@ void H2(spinor_field *out, spinor_field *in){
 #endif
 }
 
-void H(spinor_field *out, spinor_field *in){
+/* this is the basic operator used in the update */
+void H2_flt(spinor_field_flt *out, spinor_field_flt *in){
+#ifdef UPDATE_EO
+  g5Dphi_eopre_sq_flt(_update_par.mass, out, in);
+#else
+  g5Dphi_sq_flt(_update_par.mass, out, in);
+#endif
+}
+
+void H_dbl(spinor_field *out, spinor_field *in){
 #ifdef UPDATE_EO
     g5Dphi_eopre(_update_par.mass, out, in);
 #else
     g5Dphi(_update_par.mass, out, in);
 #endif
 }
-
+/* this is the basic operator used in the update */
+void H_flt(spinor_field_flt *out, spinor_field_flt *in){
+#ifdef UPDATE_EO
+  g5Dphi_eopre_flt(_update_par.mass, out, in);
+#else
+  g5Dphi_flt(_update_par.mass, out, in);
+#endif
+}
 
 static int gcd(int a, int b) {
     while (b!=0){ int t=b; b=a%t; a=t; }
@@ -136,7 +155,7 @@ void init_rhmc(rhmc_par *par){
     
     /* represent gauge field and find min and max eigenvalue of H^2 */
     represent_gauge_field();
-    find_spec_H2(&maxev,&minev, par->mass); /* find spectral interval of H^2 */ //NEED TO CHANGE (DONE)
+    find_spec_H2(H2, &maxev,&minev); /* find spectral interval of H^2 */ //NEED TO CHANGE (DONE)
     
     /* set up rational approx needed for RHMC */
     /* r_S = x^{-Nf/(4*NPf)} is used in the metropolis test */
@@ -164,6 +183,10 @@ void init_rhmc(rhmc_par *par){
     r_app_alloc(&r_HB);
     r_app_set(&r_HB,minev,maxev);
     
+  	/* set spinor_operator pointers H2 */
+    H2.dbl=&H2_dbl;
+    H2.flt=&H2_flt;
+  
     init = 1;
     
     lprintf("RHMC",0,"Initialization done.\n");
@@ -189,6 +212,10 @@ void free_rhmc(){
     r_app_free(&r_MD);
     r_app_free(&r_HB);
     
+  /* set spinor_operator pointers H2 */
+  H2.dbl=NULL;
+  H2.flt=NULL;
+  
     init = 0;
     
     lprintf("RHMC",0,"Memory deallocated.\n");
@@ -226,7 +253,7 @@ int update_rhmc(){
     /* compute H2^{a/2}*pf */
     lprintf("RHMC",30,"Correcting pseudofermions distribution...\n");
     for (i=0;i<_update_par.n_pf;++i)
-      rational_func(&r_HB, &H2, &pf[i], &pf[i]);//NEED TO CHANGE (DONE)
+      rational_func(&r_HB, H2, &pf[i], &pf[i]);//NEED TO CHANGE (DONE)
     
     /* integrate molecular dynamics */
     lprintf("RHMC",30,"MD integration...\n");
@@ -241,7 +268,7 @@ int update_rhmc(){
     /* now it just tests the approx !!! */
     oldmax = maxev; /* save old max */
     oldmin = minev; /* save old min */
-    find_spec_H2(&maxev,&minev, _update_par.mass); /* find spectral interval of H^2 */ //NEED TO CHANGE 2 (DONE)
+    find_spec_H2(H2, &maxev,&minev); /* find spectral interval of H^2 */ //NEED TO CHANGE 2 (DONE)
     r_app_set(&r_S,minev,maxev);
     r_app_set(&r_MD,minev,maxev);
     r_app_set(&r_HB,minev,maxev);
@@ -250,7 +277,7 @@ int update_rhmc(){
     /* compute H2^{-a/2}*pf or H2^{-a}*pf */
     /* here we choose the first strategy which is more symmetric */
     for (i=0;i<_update_par.n_pf;++i)
-      rational_func(&r_S, &H2, &pf[i], &pf[i]); //NEED TO CHANGE 2(DONE)
+      rational_func(&r_S, H2, &pf[i], &pf[i]); //NEED TO CHANGE 2(DONE)
     
     /* compute new action */
     local_hmc_action(DELTA, la, momenta, pf, pf); //NEED TO CHANGE 2(DONE)
@@ -331,7 +358,7 @@ int update_rhmc_o(){
     /* compute H2^{a/2}*pf */
     lprintf("RHMC",30,"Correcting pseudofermions distribution...\n");
     for (i=0;i<_update_par.n_pf;++i)
-      rational_func(&r_HB, &H2, &pf[i], &pf[i]); //NEED TO CHANGE 3
+      rational_func(&r_HB, H2, &pf[i], &pf[i]); //NEED TO CHANGE 3
     
     /* integrate molecular dynamics */
     lprintf("RHMC",30,"MD integration...\n");
@@ -347,7 +374,7 @@ int update_rhmc_o(){
     /* now it just tests the approx !!! */
     oldmax = maxev; /* save old max */
     oldmin = minev; /* save old min */
-    find_spec_H2(&maxev,&minev, _update_par.mass); /* find spectral interval of H^2 */ //NEED TO CHANGE 3
+    find_spec_H2(H2, &maxev,&minev); /* find spectral interval of H^2 */ //NEED TO CHANGE 3
     r_app_set(&r_S,minev,maxev);
     r_app_set(&r_MD,minev,maxev);
     r_app_set(&r_HB,minev,maxev);
@@ -356,7 +383,7 @@ int update_rhmc_o(){
     /* compute H2^{-a/2}*pf or H2^{-a}*pf */
     /* here we choose the first strategy which is more symmetric */
     for (i=0;i<_update_par.n_pf;++i)
-      rational_func(&r_S, &H2, &pf[i], &pf[i]); //NEED TO CHANGE 4
+      rational_func(&r_S, H2, &pf[i], &pf[i]); //NEED TO CHANGE 4
     
     /* compute new action */
     local_hmc_action(DELTA, la, momenta, pf, pf); //NEED TO CHANGE 4

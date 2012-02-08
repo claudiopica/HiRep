@@ -31,6 +31,8 @@ extern suNg_av_field *momenta;
 extern spinor_field *pf;
 extern rhmc_par _update_par;
 extern rational_app r_MD; /* used in the action MD evolution */
+extern spinor_operator H2;
+extern spinor_operator H;
 /* extern double minev, maxev; */ /* min and max eigenvalue of H^2 */
 
 
@@ -122,7 +124,13 @@ void init_hmc(rhmc_par *par){
 	r_MD.a[1]=1.;
 	/* r_HB = x^{+Nf/(4*NPf)} = x^1/2 is used in the heat bath for pseudofermions */
 	/* we don't need a rational approximation for this since H2^1/2 = H */
-    
+  
+  /* set spinor_operator pointers H2 */
+  H2.dbl=&H2_dbl;
+  H2.flt=&H2_flt;
+  H.dbl=&H_dbl;
+  H.flt=&H_flt;
+  
 	init = 1;
     
 	lprintf("HMC",0,"Initialization done.\n");
@@ -179,7 +187,7 @@ int update_hmc(){
     lprintf("HMC",30,"Correcting pseudofermions distribution...\n");
     for (i=0;i<_update_par.n_pf;++i) {
         spinor_field_copy_f(&pf[_update_par.n_pf],&pf[i]);
-        H(&pf[i], &pf[_update_par.n_pf]);
+        H.dbl(&pf[i], &pf[_update_par.n_pf]);
     }
     
     /* integrate molecular dynamics */
@@ -196,7 +204,7 @@ int update_hmc(){
     /* for the HMC H2^-1/2 = H^-1 and we use MINRES for this inversion */
     for (i=0;i<_update_par.n_pf;++i) {
         spinor_field_copy_f(&pf[_update_par.n_pf],&pf[i]);
-        MINRES(&pfa,&H,&pf[_update_par.n_pf],&pf[i],0);
+        MINRES(&pfa,H,&pf[_update_par.n_pf],&pf[i],0);
     }
     
     /* compute new action */

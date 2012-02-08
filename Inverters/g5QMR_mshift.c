@@ -95,7 +95,7 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
   spinor_field_copy_f(p2, in); /* trial solution = 0 */
   innorm2=spinor_field_sqnorm_f(in);
   if(par->n==1) { /* in this case is not a multishift and we use as starting vector out[0] */
-    M(Mp,&out[0]);
+    M.dbl(Mp,&out[0]);
     spinor_field_mul_add_assign_f(Mp,-par->shift[0],&out[0]);
     spinor_field_sub_f(p2,p2,Mp);
   }
@@ -120,7 +120,7 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
   do {
     ++cgiter;
 
-    M(Mp,p2);
+    M.dbl(Mp,p2);
     spinor_field_mul_add_assign_f(Mp,-par->shift[0],p2);
 
     /* compute alpha */
@@ -213,7 +213,7 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
   /* test results */
   for(i=0;i<par->n;++i){
     double norm;
-    M(Mp,&out[i]);
+    M.dbl(Mp,&out[i]);
     ++cgiter;
     if(par->shift[i]!=0.) {
       spinor_field_mul_add_assign_f(Mp,-par->shift[i],&out[i]);
@@ -244,13 +244,14 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
 
 static double sh;
 static spinor_operator g5Herm;
-static void Herm(spinor_field *out, spinor_field *in){
-  g5Herm(out,in);
+static void Herm_dbl(spinor_field *out, spinor_field *in){
+  g5Herm.dbl(out,in);
   if(sh!=0.) {
     spinor_field_mul_add_assign_f(out,-sh,in);
   }
   spinor_field_g5_f(out,out);
 }
+spinor_operator Herm={Herm_dbl,NULL};
 
 int g5QMR_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out){
   int cgiter;
@@ -290,7 +291,7 @@ int g5QMR_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_fi
 	sh=par->shift[0];
 
 	spinor_field_g5_f(in,in); /* multiply input by g5 for MINRES */
-	loccg=MINRES(&Mpar,&Herm,in,&out[n],(n==0)?&out[n]:&out[n-1]);
+	loccg=MINRES(&Mpar,Herm,in,&out[n],(n==0)?&out[n]:&out[n-1]);
 	spinor_field_g5_f(in,in); /* restore input vector */
 
 	cgiter+=loccg;

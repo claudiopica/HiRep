@@ -11,16 +11,20 @@
 #include "spinor_field.h"
 
 
-typedef void (*spinor_operator)(spinor_field *out, spinor_field *in);
+typedef void (*spinor_operator_dbl)(spinor_field *out, spinor_field *in);
 typedef void (*spinor_operator_flt)(spinor_field_flt *out, spinor_field_flt *in);
 typedef void (*spinor_operator_m)(spinor_field *out, spinor_field *in, double m);
+
+typedef struct _spinor_operator {
+	spinor_operator_dbl dbl;
+  spinor_operator_flt flt;
+} spinor_operator;
 
 typedef struct _mshift_par {
    int n; /* number of shifts */
    double *shift;
    double err2; /* relative error of the solutions */
    int max_iter; /* maximum number of iterations: 0 => infinity */
-    spinor_operator_flt M_flt;
 	 void *add_par; /* additional parameters for specific inverters */
 } mshift_par;
 
@@ -31,7 +35,8 @@ typedef struct _mshift_par {
  */
 int cg_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
 int cg_mshift_def(mshift_par *par, spinor_operator M, spinor_operator P, spinor_operator_m Pinv, spinor_field *in, spinor_field *out);
-int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_operator_flt F, spinor_field *in, spinor_field *out);
+int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
+int cg_mshift_flt2(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
 
 int BiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
 int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
@@ -50,7 +55,7 @@ int MINRES(MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field *o
 
 int eva(int nev,int nevt,int init,int kmax,
                int imax,double ubnd,double omega1,double omega2,
-               spinor_operator Op,
+               spinor_operator_dbl Op,
                spinor_field *ev,double d[],int *status);
 
 void jacobi1(int n,double a[],double d[],double v[]);

@@ -89,8 +89,10 @@ int update_rhmc_o();
 
 /* this is the basic operator used in the update */
 /* defined in update_rhmc.c */
-void H2(spinor_field *out, spinor_field *in);
-void H(spinor_field *out, spinor_field *in);
+void H2_dbl(spinor_field *out, spinor_field *in);
+void H2_flt(spinor_field_flt *out, spinor_field_flt *in);
+void H_dbl(spinor_field *out, spinor_field *in);
+void H_flt(spinor_field_flt *out, spinor_field_flt *in);
 
 
 /* local action */
@@ -112,6 +114,6 @@ void local_hmc_action(local_action_type type,
 void suNg_field_copy(suNg_field *g1, suNg_field *g2);
 
 /* find spectral interval using eva */
-void find_spec_H2(double *max, double *min, double mass);
+void find_spec_H2(spinor_operator H2, double *max, double *min);
 
 #endif

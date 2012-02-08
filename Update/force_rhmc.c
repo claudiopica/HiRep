@@ -24,6 +24,7 @@
 extern rhmc_par _update_par;
 extern spinor_field *pf;
 extern rational_app r_MD; /* used in the action MD evolution */
+extern spinor_operator H2; /* Dirac operator */
 
 #define _print_avect(a) printf("(%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e)\n",(a).c1,(a).c2,(a).c3,(a).c4,(a).c5,(a).c6,(a).c7,(a).c8)
 
@@ -125,7 +126,7 @@ void Force_rhmc_f(double dt, suNg_av_field *force){
   for (k=0; k<_update_par.n_pf; ++k) {
     /* compute inverse vectors chi[i] = (H^2 - b[i])^1 * pf */
     if (inv_par.n==1) { spinor_field_zero_f(chi); }
-    cg_mshift(&inv_par, &H2, &pf[k], chi);
+    cg_mshift(&inv_par, H2, &pf[k], chi);
     for (n=0; n<r_MD.order; ++n) {
 #ifdef UPDATE_EO
       /* change temporarely the type of chi[n] and Hchi */
