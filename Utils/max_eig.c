@@ -20,7 +20,7 @@ int max_H(spinor_operator H, geometry_descriptor *type, double *max) {
   double norm, oldmax, dt;
   spinor_field *s1,*s2,*s3;
   int count;
-
+  
   s1=alloc_spinor_field_f(3,type);
 /* #ifdef UPDATE_EO */
 /*  s1=alloc_spinor_field_f(3,&glat_even); */
@@ -35,14 +35,12 @@ int max_H(spinor_operator H, geometry_descriptor *type, double *max) {
   norm=sqrt(spinor_field_sqnorm_f(s1));
   spinor_field_mul_f(s1,1./norm,s1);
   norm=1.;
-
   dt=1.;
 
 #ifdef WITH_GPU
   gfield_copy_to_gpu_f(u_gauge_f); //Make sure gauge field is on GPU
 #endif
   H.dbl(s3,s1); count=1;
-
   do {
 
     spinor_field_mul_f(s1,dt,s3);

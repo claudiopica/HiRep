@@ -17,11 +17,7 @@ void gaussian_spinor_field_cpu(spinor_field *s) {
 	geometry_descriptor *type = s->type;
 	for(i=0;i<type->local_master_pieces;i++)
  	  gauss((double*)(s->ptr+type->master_start[i]),(type->master_end[i]-type->master_start[i]+1)*sizeof(suNf_spinor)/sizeof(double));
-#ifdef WITH_GPU
 	spinor_field_mul_f_cpu(s,c1,s);
-#else
-	spinor_field_mul_f(s,c1,s);
-#endif
 #if defined(BASIC_SF) || defined(ROTATED_SF)
         SF_spinor_bcs(s);
 #endif /* defined(BASIC_SF) || defined(ROTATED_SF) */
@@ -33,12 +29,7 @@ void gaussian_spinor_field_flt_cpu(spinor_field_flt *s) {
 	geometry_descriptor *type = s->type;
 	for(i=0;i<type->local_master_pieces;i++)
  	  gauss_flt((float*)(s->ptr+type->master_start[i]),(type->master_end[i]-type->master_start[i]+1)*sizeof(suNf_spinor_flt)/sizeof(float));
-
-#ifdef WITH_GPU
 	spinor_field_mul_f_flt_cpu(s,c1,s);
-#else
-	spinor_field_mul_f_flt(s,c1,s);
-#endif
 #if defined(BASIC_SF) || defined(ROTATED_SF)
         SF_spinor_bcs_flt(s);
 #endif /* defined(BASIC_SF) || defined(ROTATED_SF) */

@@ -152,6 +152,11 @@ void init_rhmc(rhmc_par *par){
 
     /* allocate memory for the local action */
     if(la==NULL) la=alloc_sfield(&glattice);
+
+    /* set spinor_operator pointers H2 */
+    H2.dbl=&H2_dbl;
+    H2.flt=&H2_flt;
+    
     
     /* represent gauge field and find min and max eigenvalue of H^2 */
     represent_gauge_field();
@@ -183,9 +188,6 @@ void init_rhmc(rhmc_par *par){
     r_app_alloc(&r_HB);
     r_app_set(&r_HB,minev,maxev);
     
-  	/* set spinor_operator pointers H2 */
-    H2.dbl=&H2_dbl;
-    H2.flt=&H2_flt;
   
     init = 1;
     
