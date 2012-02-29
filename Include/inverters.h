@@ -36,7 +36,7 @@ int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_operator_flt F, spi
 typedef struct {
   double err2; /* maximum error on the solutions */
   int max_iter; /* maximum number of iterations: 0 => infinity */
-  float err2_flt; /* maximum error on the solutions */
+  double err2_flt; /* maximum error on the solutions */
   int max_iter_flt; /* maximum number of iterations: 0 => infinity */
 } g5QMR_fltacc_par;
 
@@ -62,6 +62,7 @@ int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spino
 int MINRES_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
 
 int MINRES(MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field *out, spinor_field *trial);
+int MINRES_flt(MINRES_par *par, spinor_operator_flt M, spinor_field_flt *in, spinor_field_flt *out, spinor_field_flt *trial);
 
 int eva(int nev,int nevt,int init,int kmax,
                int imax,double ubnd,double omega1,double omega2,

@@ -1,7 +1,7 @@
 TOPDIR = ../..
 MKDIR=$(TOPDIR)/Make
 
-EXES = check_inverters_1 check_inverters_2 check_inverters_3 check_inverters_4 check_inverters_5 check_inverters_6
+EXES = check_inverters_1 check_inverters_2 check_inverters_3 check_inverters_4 check_inverters_5 check_inverters_6 check_inverters_8
 
 default: $(EXES)
 
@@ -39,7 +39,7 @@ MODS := linear_algebra cg_mshift MINRES_mshift MINRES g5QMR_mshift eva jacobi cg
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Observables
-MODS := g5QMR_trunc trunc_hairpin
+MODS := g5QMR_trunc trunc_hairpin avr_plaquette
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 COMMON_OBJS = $(MOD_OBJS)
