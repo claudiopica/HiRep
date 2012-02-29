@@ -3,27 +3,28 @@
  * All rights reserved.                                                      * 
  \***************************************************************************/
  
-#ifndef RHMC_UTILS_H
-#define RHMC_UTILS_H
+#ifndef HMC_UTILS_H
+#define HMC_UTILS_H
 
 #include "update.h"
 #include "input_par.h"
 
-/* RHMC variables */
-typedef struct _input_rhmc {
-  /* rhmc parameters */
+/* HMC variables */
+typedef struct _input_hmc {
+  /* hmc parameters */
   rhmc_par rhmc_p;
 
   /* for the reading function */
-  input_record_t read[16];
+  input_record_t read[17];
   
-} input_rhmc;
+} input_hmc;
 
-#define init_input_rhmc(varname) \
+#define init_input_hmc(varname) \
 { \
   .read={\
     {"beta", "beta = %lf", DOUBLE_T, &(varname).rhmc_p.beta},\
     {"nf", "nf = %d", INT_T, &(varname).rhmc_p.nf},\
+    {"n_pf", "n_pf = %d", INT_T, &(varname).rhmc_p.n_pf},\
     {"mass", "mass = %lf", DOUBLE_T, &(varname).rhmc_p.mass},\
     {"SF_zf", "SF_zf = %lf", DOUBLE_T, &(varname).rhmc_p.SF_zf},\
     {"SF_ds", "SF_ds = %lf", DOUBLE_T, &(varname).rhmc_p.SF_ds},\
@@ -33,7 +34,7 @@ typedef struct _input_rhmc {
     {"MD_prec", "MD_prec = %lf", DOUBLE_T, &(varname).rhmc_p.MD_prec},\
     {"HB_prec", "HB_prec = %lf", DOUBLE_T, &(varname).rhmc_p.HB_prec},\
     {"force_prec", "force_prec = %lf", DOUBLE_T, &(varname).rhmc_p.force_prec},\
-    {"n_pf", "n_pf = %u", UNSIGNED_T, &(varname).rhmc_p.n_pf},\
+    {"force_prec_flt", "force_prec_flt = %lf", DOUBLE_T, &(varname).rhmc_p.force_prec_flt},\
     {"tlen", "tlen = %lf", DOUBLE_T, &(varname).rhmc_p.tlen},\
     {"nsteps", "nsteps = %u", UNSIGNED_T, &(varname).rhmc_p.nsteps},\
     {"gsteps", "gsteps = %u", UNSIGNED_T, &(varname).rhmc_p.gsteps},\
@@ -42,7 +43,7 @@ typedef struct _input_rhmc {
 }
 
 /* Flow control variables variables */
-typedef struct _rhmc_flow {
+typedef struct _hmc_flow {
   char run_name[64]; /* name for this run */
   char g_start[64]; /* for gauge fields => unit, random, file */
   char r_start[64]; /* for ranlux: name of the state file  */ 
@@ -57,14 +58,14 @@ typedef struct _rhmc_flow {
    * but inferred from the above
    */
   int start, end;
-  input_rhmc *rhmc_v;
+  input_hmc *hmc_v;
 
   /* for the reading function */
   input_record_t read[8];
   
-} rhmc_flow;
+} hmc_flow;
 
-#define init_rhmc_flow(varname) \
+#define init_hmc_flow(varname) \
 { \
   .read={\
     {"run name", "run name = %s", STRING_T, &((varname).run_name[0])},\
@@ -78,8 +79,8 @@ typedef struct _rhmc_flow {
   }\
 }
 
-int init_mc(rhmc_flow *rf, char *ifile);
-int save_conf(rhmc_flow *rf, int id);
+int init_mc(hmc_flow *rf, char *ifile);
+int save_conf(hmc_flow *rf, int id);
 int end_mc();
 
-#endif /* RHMC_UTILS_H */
+#endif /* HMC_UTILS_H */

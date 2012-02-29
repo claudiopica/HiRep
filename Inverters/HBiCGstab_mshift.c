@@ -34,7 +34,6 @@ int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spino
   int cgiter;
   char *sflags;
   unsigned short notconverged;
-	unsigned int spinorlen;
    
   /* fare qualche check sugli input */
   /* par->n deve essere almeno 2! */
@@ -50,8 +49,12 @@ int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spino
   /* implementation note: to minimize the number of malloc calls
    * objects of the same type are allocated together
    */
-	get_spinor_len(&spinorlen);
-  s = alloc_spinor_field_f((par->n)+6);
+#ifndef CHECK_SPINOR_MATCHING
+  for(i=0;i<par->n;++i)
+    _TWO_SPINORS_MATCHING(in,&out[i]);
+#endif
+
+  s = alloc_spinor_field_f((par->n)+6,in->type);
   r = s+par->n;
   r1 = r+1;
   o = r1+1;

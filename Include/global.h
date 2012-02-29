@@ -133,6 +133,11 @@ GLB_VAR(suNf_field_flt,*u_gauge_f_flt,=NULL);
 #define BC_Z 0.
 #endif
 
+#ifdef TWISTED_BC
+GLB_VAR(int,**twbc_staples, =NULL);
+GLB_VAR(int,*twbc_plaq, =NULL);
+#endif
+
 #ifdef MAIN_PROGRAM
 double bc[4]={BC_T,BC_X,BC_Y,BC_Z};
 #else

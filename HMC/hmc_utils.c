@@ -5,7 +5,7 @@
 
 #include "global.h"
 #include "logger.h"
-#include "rhmc_utils.h"
+#include "hmc_utils.h"
 #include "random.h"
 #include "io.h"
 #include "representation.h"
@@ -17,7 +17,7 @@
 #include <string.h>
 
 
-input_rhmc rhmc_var = init_input_rhmc(rhmc_var);
+input_hmc hmc_var = init_input_hmc(hmc_var);
 
 /* short 3-letter name to use in gconf name */
 #ifdef REPR_FUNDAMENTAL
@@ -31,10 +31,10 @@ input_rhmc rhmc_var = init_input_rhmc(rhmc_var);
 #endif
 
 /* build configuration name */
-static void mk_gconf_name(char *name, rhmc_flow *rf, int id) {
+static void mk_gconf_name(char *name, hmc_flow *rf, int id) {
   sprintf(name,"%s_%dx%dx%dx%dnc%dr%snf%db%.6fm%.6fn%d",
            rf->run_name,GLB_T,GLB_X,GLB_Y,GLB_Z,NG,repr_name,
-           rf->rhmc_v->rhmc_p.nf,rf->rhmc_v->rhmc_p.beta,-rf->rhmc_v->rhmc_p.mass,
+           rf->hmc_v->rhmc_p.nf,rf->hmc_v->rhmc_p.beta,-rf->hmc_v->rhmc_p.mass,
            id);
 }
 
@@ -56,7 +56,7 @@ static void slower(char *str) {
 }
 
 /* read g_start string and decide what the initial config should be.
- * It also fill the content of the variable start in rhmc_flow with the
+ * It also fill the content of the variable start in hmc_flow with the
  * id of the first config to be used.
  * returns:
  * 0 => g_start is a valid file name which should be used as starting config
@@ -67,7 +67,7 @@ static void slower(char *str) {
  * 5 = random with UNIT bcs
  * 6 = random with SF bcs
  */
-static int parse_gstart(rhmc_flow *rf) {
+static int parse_gstart(hmc_flow *rf) {
 
   int t, x, y, z, ng, nf;
   double beta, mass;
@@ -156,7 +156,7 @@ static int parse_gstart(rhmc_flow *rf) {
 }
 
 /* read last_conf string and fill the end parameter
- * in trhmc_flow with the id of the last conf to be generated.
+ * in thmc_flow with the id of the last conf to be generated.
  * last_conf must be one of:
  * "%d" => this will be the id of the last conf generated
  * "+%d" => if a '+' is prepended then this run will be %d config long,
@@ -165,7 +165,7 @@ static int parse_gstart(rhmc_flow *rf) {
  *  0 => string was valid
  *  -1 => invalid format
  */
-static int parse_lastconf(rhmc_flow *rf) {
+static int parse_lastconf(hmc_flow *rf) {
 
   int ret=0;
   int addtostart=0;
@@ -191,11 +191,11 @@ static int parse_lastconf(rhmc_flow *rf) {
 /* Initialize the Monte Carlo.
  * This performs the following operations:
  * 1) read from the specified input file the flow variables 
- *    and the rhmc parameters;
+ *    and the hmc parameters;
  * 2) set the starting gauge field
- * 3) init the rhmc update
+ * 3) init the hmc update
  */
-int init_mc(rhmc_flow *rf, char *ifile) {
+int init_mc(hmc_flow *rf, char *ifile) {
 
   int start_t;
 
@@ -204,6 +204,7 @@ int init_mc(rhmc_flow *rf, char *ifile) {
 #if !defined(REPR_FUNDAMENTAL) || defined(ROTATED_SF)
   u_gauge_f=alloc_gfield_f(&glattice);
 #endif
+  u_gauge_f_flt=alloc_gfield_f_flt(&glattice);
 
   /* flow defaults */
   strcpy(rf->g_start,"invalid");
@@ -213,9 +214,9 @@ int init_mc(rhmc_flow *rf, char *ifile) {
   strcpy(rf->conf_dir,"./");
   rf->save_freq=0;
   rf->meas_freq=0;
-  rf->rhmc_v=&rhmc_var;
+  rf->hmc_v=&hmc_var;
 
-  read_input(rhmc_var.read,ifile);
+  read_input(hmc_var.read,ifile);
   read_input(rf->read,ifile);
 
   /* fix conf_dir name: put a / at the end of string */
@@ -259,17 +260,17 @@ int init_mc(rhmc_flow *rf, char *ifile) {
       break;
   }
   represent_gauge_field();
+  assign_ud2u_f();
   
-
-  /* init RHMC */
-  init_rhmc(&rhmc_var.rhmc_p);
+  /* init HMC */
+  init_hmc(&hmc_var.rhmc_p);
 
   return 0;
 
 }
 
 /* save the gauge config with the specified id */
-int save_conf(rhmc_flow *rf, int id) {
+int save_conf(hmc_flow *rf, int id) {
   char buf[256];
   
   mk_gconf_name(buf, rf, id);
@@ -280,7 +281,7 @@ int save_conf(rhmc_flow *rf, int id) {
 
 /* clean up memory */
 int end_mc() {
-  free_rhmc();
+  free_hmc();
 
   /* free memory */
   free_gfield(u_gauge);

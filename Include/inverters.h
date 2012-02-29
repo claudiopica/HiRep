@@ -20,7 +20,6 @@ typedef struct _mshift_par {
    double *shift;
    double err2; /* relative error of the solutions */
    int max_iter; /* maximum number of iterations: 0 => infinity */
-    spinor_operator_flt M_flt;
 	 void *add_par; /* additional parameters for specific inverters */
 } mshift_par;
 
@@ -33,19 +32,35 @@ int cg_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field
 int cg_mshift_def(mshift_par *par, spinor_operator M, spinor_operator P, spinor_operator_m Pinv, spinor_field *in, spinor_field *out);
 int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_operator_flt F, spinor_field *in, spinor_field *out);
 
-int BiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
-int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
+
+typedef struct {
+  double err2; /* maximum error on the solutions */
+  int max_iter; /* maximum number of iterations: 0 => infinity */
+  float err2_flt; /* maximum error on the solutions */
+  int max_iter_flt; /* maximum number of iterations: 0 => infinity */
+} g5QMR_fltacc_par;
 
 int g5QMR_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
 int g5QMR_mshift_trunc(mshift_par *par, int trunc_iter, spinor_operator M, spinor_field *in, spinor_field *out_trunc, spinor_field *out);
-/*int g5QMR_mshift_flt(mshift_par *par, spinor_operator_flt M, suNf_spinor_flt *in, suNf_spinor_flt **out); */
+int g5QMR_fltacc(g5QMR_fltacc_par *par, spinor_operator M, spinor_operator_flt M_flt, spinor_field *in, spinor_field *out);
 
-int MINRES_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
 
 typedef struct _MINRES_par {
   double err2; /* maximum error on the solutions */
   int max_iter; /* maximum number of iterations: 0 => infinity */
 } MINRES_par;
+
+int HBiCGstab(MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
+int HBiCGstab_flt(MINRES_par *par, spinor_operator_flt M, spinor_field_flt *in, spinor_field_flt *out);
+
+/*
+int BiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
+int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
+*/
+
+
+int MINRES_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
+
 int MINRES(MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field *out, spinor_field *trial);
 
 int eva(int nev,int nevt,int init,int kmax,

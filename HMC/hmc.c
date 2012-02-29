@@ -5,7 +5,7 @@
 
 /*******************************************************************************
  *
- * Main RHMC program
+ * Main HMC program
  *
  *******************************************************************************/
 
@@ -23,7 +23,7 @@
 #include "observables.h"
 #include "dirac.h"
 #include "logger.h"
-#include "rhmc_utils.h"
+#include "hmc_utils.h"
 #include "memory.h"
 #include "communications.h"
 #include "observables.h"
@@ -115,7 +115,7 @@ input_eigval eigval_var = init_input_eigval(eigval_var);
 
 
 /* flow control variable */
-rhmc_flow flow=init_rhmc_flow(flow);
+hmc_flow flow=init_hmc_flow(flow);
 
 
 void read_cmdline(int argc, char* argv[]) {
@@ -152,7 +152,7 @@ int main(int argc,char *argv[])
   read_cmdline(argc,argv);
 
   /* logger setup */
-    logger_setlevel(0,10);
+    logger_setlevel(0,30);
   /* disable logger for MPI processes != 0 */
   if (PID!=0) { logger_disable(); }
 
@@ -220,7 +220,7 @@ int main(int argc,char *argv[])
 
   /* Init Monte Carlo */
   init_mc(&flow, "input_file");
-  lprintf("MAIN",0,"MVM during RHMC initialzation: %ld\n",getMVM());
+  lprintf("MAIN",0,"MVM during HMC initialzation: %ld\n",getMVM());
   lprintf("MAIN",0,"Initial plaquette: %1.8e\n",avr_plaquette());
 
 
@@ -228,10 +228,10 @@ int main(int argc,char *argv[])
 #ifndef NDEBUG
   lprintf("MAIN",0,"Initial SF_test_gauge_bcs: %1.8e\n",SF_test_gauge_bcs());
 #endif /*NDEBUG*/
-  lprintf("MAIN",0,"Initial SF_action: %1.8e\n",SF_action((&flow)->rhmc_v->rhmc_p.beta));
+  lprintf("MAIN",0,"Initial SF_action: %1.8e\n",SF_action((&flow)->hmc_v->rhmc_p.beta));
 #endif /* BASIC_SF */
 
-  h2evamass=mass=flow.rhmc_v->rhmc_p.mass;
+  h2evamass=mass=flow.hmc_v->rhmc_p.mass;
 
   double *eva_vals=NULL;
   spinor_field *eva_vecs=NULL;
@@ -249,7 +249,7 @@ int main(int argc,char *argv[])
     
     gettimeofday(&start,0);
     
-    rr=update_rhmc();
+    rr=update_hmc();
 
     gettimeofday(&end,0);
     timeval_subtract(&etime,&end,&start);
@@ -264,14 +264,14 @@ int main(int argc,char *argv[])
     rc++;
     perc=(acc==0)?0.:(float)(100*acc)/(float)(rc);
 
-    lprintf("MAIN",0,"Trajectory #%d: %d/%d (%3.4f%%) MVM = %ld\n",i,acc,rc,perc,getMVM());
+    lprintf("MAIN",0,"Trajectory #%d: %d/%d (%3.4f%%) MVM (f;d) = %ld ; %ld\n",i,acc,rc,perc,getMVM_flt(),getMVM());
 
     if((i%flow.save_freq)==0) {
       save_conf(&flow, i);
     }
 
 #ifdef BASIC_SF
-    lprintf("MAIN",0,"SF action: %1.8e\n",SF_action((&flow)->rhmc_v->rhmc_p.beta));
+    lprintf("MAIN",0,"SF action: %1.8e\n",SF_action((&flow)->hmc_v->rhmc_p.beta));
 #endif /* BASIC_SF */
 
     if((i%flow.meas_freq)==0) {
@@ -279,12 +279,12 @@ int main(int argc,char *argv[])
       lprintf("MAIN",0,"Plaquette: %1.8e\n",avr_plaquette());
 #ifdef BASIC_SF
       lprintf("MAIN",0,"SF_test_gauge_bcs: %1.8e\n",SF_test_gauge_bcs());
-      lprintf("MAIN",0,"PCAC mass: %1.8e\n",SF_PCAC_wall_mass((&flow)->rhmc_v->rhmc_p.mass));
+      lprintf("MAIN",0,"PCAC mass: %1.8e\n",SF_PCAC_wall_mass((&flow)->hmc_v->rhmc_p.mass));
 #endif /* BASIC_SF */
 
       /* Mesons */
       if(strcmp(mes_var.make,"true")==0) {
-        z2semwall_mesons(i,mes_var.nhits,1,&(flow.rhmc_v->rhmc_p.mass),mes_var.precision);
+        z2semwall_mesons(i,mes_var.nhits,1,&(flow.hmc_v->rhmc_p.mass),mes_var.precision);
       }
 
       /* Polyakov loops */
@@ -325,7 +325,9 @@ int main(int argc,char *argv[])
   /* finalize Monte Carlo */
   end_mc();
 
-
+#ifdef TWISTED_BC
+  free_twbc();
+#endif
 
   /* close communications */
   finalize_process();

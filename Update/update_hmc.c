@@ -1,5 +1,5 @@
 /***************************************************************************\
- * Copyright (c) 2008, Claudio Pica                                          *   
+ * Copyright (c) 2008, Agostino Patella, Claudio Pica                        *   
  * All rights reserved.                                                      * 
  \***************************************************************************/
 
@@ -11,7 +11,6 @@
 #include "random.h"
 #include "dirac.h"
 #include "representation.h"
-#include "rational_functions.h"
 #include "linear_algebra.h"
 #include <stdlib.h>
 #include <stdio.h>
@@ -19,19 +18,39 @@
 #include "logger.h"
 #include "communications.h"
 
-/* these are all alredy defined in update_rhmc.c */
 /* State quantities for HMC */
-/* suNg_av_field *momenta=NULL; */
-/* spinor_field *pf=NULL; */
-/* rhmc_par _update_par={0}; */
-/* rational_app r_MD={0}; /\* used in the action MD evolution *\/ */
-/* double minev, maxev; /\* min and max eigenvalue of H^2 *\/ */
+suNg_av_field *momenta=NULL;
+spinor_field *pf=NULL;
+rhmc_par _update_par={0};
+integrator_par *integrator = NULL;
+double minev, maxev; /* min and max eigenvalue of H^2 */
 /* END of State */
-extern suNg_av_field *momenta;
-extern spinor_field *pf;
-extern rhmc_par _update_par;
-extern rational_app r_MD; /* used in the action MD evolution */
-/* extern double minev, maxev; */ /* min and max eigenvalue of H^2 */
+
+/* this is the basic operator used in the update */
+void H2(spinor_field *out, spinor_field *in){
+#ifdef UPDATE_EO
+    g5Dphi_eopre_sq(_update_par.mass, out, in);
+#else
+    g5Dphi_sq(_update_par.mass, out, in);
+#endif
+}
+
+void H(spinor_field *out, spinor_field *in){
+#ifdef UPDATE_EO
+    g5Dphi_eopre(_update_par.mass, out, in);
+#else
+    g5Dphi(_update_par.mass, out, in);
+#endif
+}
+
+void H_flt(spinor_field_flt *out, spinor_field_flt *in){
+#ifdef UPDATE_EO
+    g5Dphi_eopre_flt((float)(_update_par.mass), out, in);
+#else
+    g5Dphi_flt((float)(_update_par.mass), out, in);
+#endif
+}
+
 
 
 static short int init=0;
@@ -43,10 +62,10 @@ static MINRES_par pfa;
 void init_hmc(rhmc_par *par){
     
 	if (init) {
-        /* already initialized */
-        lprintf("HMC",0,"WARNING: HMC already initialized!\nWARNNG: Ignoring call to init_hmc.\n");
+	  /* already initialized */
+	  lprintf("HMC",0,"WARNING: HMC already initialized!\nWARNNG: Ignoring call to init_hmc.\n");
 		return;
-    }
+	}
     
 	lprintf("HMC",0,"Initializing...\n");
     
@@ -58,70 +77,88 @@ void init_hmc(rhmc_par *par){
 	}
     
 	lprintf("HMC",10,
-			"Number of Flavors = %d\n"
-			"beta = %.8f\n"
-			"Mass = %.8f\n"
-			"Metropolis test precision = %.8e\n"
-			"RHMC force precision = %.8e\n"
-			"Number of pseudofermions = %d\n"
-			"MD trajectory length = %.8f\n"
-			"MD steps = %d\n"
-			"MD gauge substeps = %d\n"
-			,_update_par.nf
-			,_update_par.beta
-			,_update_par.mass
-			,_update_par.MT_prec
-			,_update_par.force_prec
-			,_update_par.n_pf
-			,_update_par.MD_par->tlen
-			,_update_par.MD_par->nsteps
-			,_update_par.MD_par->gsteps
-			);
+	  "Number of Flavors = %d\n"
+	  "beta = %.8f\n"
+	  "Mass = %.8f\n"
+	  "Metropolis test precision = %.8e\n"
+	  "RHMC force precision = %.8e\n"
+	  "Number of pseudofermions = %d\n"
+	  "MD trajectory length = %.8f\n"
+	  "MD steps = %d\n"
+	  "MD gauge substeps = %d\n"
+	  ,_update_par.nf
+	  ,_update_par.beta
+	  ,_update_par.mass
+	  ,_update_par.MT_prec
+	  ,_update_par.force_prec
+	  ,_update_par.n_pf
+	  ,_update_par.tlen
+	  ,_update_par.nsteps
+	  ,_update_par.gsteps
+	  );
     
-    /* allocate space for the backup copy of gfield */
-    if(u_gauge_old==NULL) u_gauge_old=alloc_gfield(&glattice);
-    suNg_field_copy(u_gauge_old,u_gauge);
+	/* allocate space for the backup copy of gfield */
+	if(u_gauge_old==NULL) u_gauge_old=alloc_gfield(&glattice);
+	suNg_field_copy(u_gauge_old,u_gauge);
     
-    /* allocate momenta */
-    if(momenta==NULL) momenta = alloc_avfield(&glattice);
+	/* allocate momenta */
+	if(momenta==NULL) momenta = alloc_avfield(&glattice);
     
-    /* allocate pseudofermions */
-    /* we allocate one more pseudofermion for the computation 
-	 * of the final action density 
-	 */
-    if(pf==NULL) {
-        /* we need 1 more spinor field for Metropolis test action with MINRES */
-        pf=alloc_spinor_field_f(_update_par.n_pf+1,
+	/* allocate pseudofermions */
+	/* we allocate one more pseudofermion for the computation 
+	* of the final action density 
+	*/
+	if(pf==NULL) {
+	  /* we need 1 more spinor field for Metropolis test action with MINRES */
+	  pf=alloc_spinor_field_f(_update_par.n_pf+1,
 #ifdef UPDATE_EO
-                                &glat_even /* even lattice for preconditioned dynamics */
+      &glat_even /* even lattice for preconditioned dynamics */
 #else
-                                &glattice /* global lattice */
+      &glattice /* global lattice */
 #endif 
-                                );
-    }
+    );
+  }
     
-    /* allocate memory for the local action */
-    if(la==NULL) la=alloc_sfield(&glattice);
+  /* allocate memory for the local action */
+  if(la==NULL) la=alloc_sfield(&glattice);
 
-    /* represent gauge field */
-    represent_gauge_field();
+  /* represent gauge field */
+  represent_gauge_field();
+
+  /* integrator */
+  integrator = (integrator_par*)malloc(sizeof(integrator_par)*3);
+
+  integrator[0].level = 0;
+  integrator[0].tlen = _update_par.tlen;
+  integrator[0].nsteps = _update_par.nsteps;
+  integrator[0].force = &Force_hmc_f;
+  integrator[0].force_par = malloc(sizeof(force_hmc_par));
+  ((force_hmc_par*)(integrator[0].force_par))->pf = pf;
+  ((force_hmc_par*)(integrator[0].force_par))->hasenbusch=0;
+  integrator[0].integrator = &O2MN_multistep;
+  integrator[0].next = &integrator[1];
+
+  integrator[1].level = 1;
+  integrator[1].tlen = integrator[0].tlen/((double)(2*integrator[0].nsteps));
+  integrator[1].nsteps = _update_par.gsteps;
+  integrator[1].force = &Force0;
+  integrator[1].force_par = NULL;
+  integrator[1].integrator = &O2MN_multistep;
+  integrator[1].next = &integrator[2];
+
+  integrator[2].level = 2;
+  integrator[2].tlen = integrator[1].tlen/((double)(2*integrator[1].nsteps));
+  integrator[2].nsteps = 1;
+  integrator[2].force = NULL;
+  integrator[2].force_par = NULL;
+  integrator[2].integrator = &gauge_integrator;
+  integrator[2].next = NULL;
+
     
 	/* set up rational approx needed for HMC */
-	/* r_S = x^{-Nf/(4*NPf)} = x^-1/2 is used in the metropolis test */
-	/* since H2^-1/2 = H^-1 we use the MINRES inverter */
 	pfa.err2=_update_par.MT_prec;
 	pfa.err2*=pfa.err2;
 	pfa.max_iter=0;
-	/* r_MD = x^{-Nf/(2*NPf)} = x^-1 is used in the molecular dynamics in the force*/
-	r_MD.order=1;
-	r_MD.n=-1;
-	r_MD.d=1; 
-	r_MD.rel_error=0.; /* not used */
-	r_app_alloc(&r_MD);
-	r_MD.a[0]=r_MD.b[0]=0.;
-	r_MD.a[1]=1.;
-	/* r_HB = x^{+Nf/(4*NPf)} = x^1/2 is used in the heat bath for pseudofermions */
-	/* we don't need a rational approximation for this since H2^1/2 = H */
     
 	init = 1;
     
@@ -131,21 +168,27 @@ void init_hmc(rhmc_par *par){
 
 void free_hmc(){
    
-    if (!init) {
-        /* not initialized */
-        lprintf("HMC",0,"WARNING: HMC not initialized!\nWARNNG: Ignoring call to free_hmc.\n");
+  if (!init) {
+    /* not initialized */
+    lprintf("HMC",0,"WARNING: HMC not initialized!\nWARNNG: Ignoring call to free_hmc.\n");
 		return;
-    }
+	}
     
-    /* free momenta */
-    if(u_gauge_old!=NULL) free_gfield(u_gauge_old); u_gauge_old=NULL;
-    if(momenta!=NULL) free_avfield(momenta); momenta=NULL;
-    if(pf!=NULL) free_spinor_field(pf); pf=NULL;
+	/* free momenta */
+	if(u_gauge_old!=NULL) free_gfield(u_gauge_old); u_gauge_old=NULL;
+	if(momenta!=NULL) free_avfield(momenta); momenta=NULL;
+	if(pf!=NULL) free_spinor_field(pf); pf=NULL;
     
-    if(la!=NULL) free_sfield(la); la=NULL;
-    
-    r_app_free(&r_MD);
-        
+	if(la!=NULL) free_sfield(la); la=NULL;
+  
+  int i=0;
+  while(1) {
+    if(integrator[i].force_par != NULL) free(integrator[0].force_par);
+    if(integrator[i].next == NULL) break;
+    i++;
+  }
+  free(integrator);
+	
 	init = 0;
     
 	lprintf("HMC",0,"Memory deallocated.\n");
@@ -162,9 +205,7 @@ int update_hmc(){
         lprintf("HMC",0,"WARNING: HMC not initialized!\nWARNNG: Ignoring call to update_hmc.\n");
         return -1;
     }
-    
-    /* find_spec_H2(&maxev,&minev, _update_par.mass); /\* find spectral interval of H^2 *\/ */
-    
+        
     /* generate new momenta and pseudofermions */
     lprintf("HMC",30,"Generating gaussian momenta and pseudofermions...\n");
     gaussian_momenta(momenta);
@@ -184,7 +225,7 @@ int update_hmc(){
     
     /* integrate molecular dynamics */
     lprintf("HMC",30,"MD integration...\n");
-    _update_par.integrator(momenta,_update_par.MD_par);
+    (*(integrator[0].integrator))(momenta,&integrator[0]);
     
     /* project gauge field */
     project_gauge_field();

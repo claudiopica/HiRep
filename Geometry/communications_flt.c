@@ -133,7 +133,7 @@ void start_gf_sendrecv_flt(suNg_field_flt *gf) {
     /* send ith buffer */
     mpiret=MPI_Isend((gf->ptr)+4*gd->sbuf_start[i], /* buffer */
         (gd->sbuf_len[i])*sizeof(suNg_flt)/sizeof(float)*4, /* lenght in units of flaots */
-        MPI_DOUBLE, /* basic datatype */
+        MPI_FLOAT, /* basic datatype */
         gd->sbuf_to_proc[i], /* cid of destination */
         i, /* tag of communication */
         cart_comm, /* use the cartesian communicator */
@@ -152,7 +152,7 @@ void start_gf_sendrecv_flt(suNg_field_flt *gf) {
     /* receive ith buffer */
     mpiret=MPI_Irecv((gf->ptr)+4*gd->rbuf_start[i], /* buffer */
         (gd->rbuf_len[i])*sizeof(suNg_flt)/sizeof(float)*4, /* lenght in units of floats */
-        MPI_DOUBLE, /* basic datatype */
+        MPI_FLOAT, /* basic datatype */
         gd->rbuf_from_proc[i], /* cid of origin */
         i, /* tag of communication */
         cart_comm, /* use the cartesian communicator */
@@ -244,7 +244,7 @@ void start_sf_sendrecv_flt(spinor_field_flt *sf) {
     /* send ith buffer */
     mpiret=MPI_Isend((sf->ptr)+(gd->sbuf_start[i]), /* buffer */
         (gd->sbuf_len[i])*(sizeof(suNf_spinor_flt)/sizeof(float)), /* lenght in units of floats */
-        MPI_DOUBLE, /* basic datatype */
+        MPI_FLOAT, /* basic datatype */
         gd->sbuf_to_proc[i], /* cid of destination */
         i, /* tag of communication */
         cart_comm, /* use the cartesian communicator */
@@ -263,7 +263,7 @@ void start_sf_sendrecv_flt(spinor_field_flt *sf) {
     /* receive ith buffer */
     mpiret=MPI_Irecv((sf->ptr)+(gd->rbuf_start[i]), /* buffer */
         (gd->rbuf_len[i])*(sizeof(suNf_spinor_flt)/sizeof(float)), /* lenght in units of float */
-        MPI_DOUBLE, /* basic datatype */
+        MPI_FLOAT, /* basic datatype */
         gd->rbuf_from_proc[i], /* cid of origin */
         i, /* tag of communication */
         cart_comm, /* use the cartesian communicator */

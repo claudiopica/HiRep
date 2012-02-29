@@ -270,6 +270,10 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"local size is %dx%dx%dx%d\n",T,X,Y,Z);
   lprintf("MAIN",0,"extended local size is %dx%dx%dx%d\n",T_EXT,X_EXT,Y_EXT,Z_EXT);
 
+#ifdef TWISTED_BC
+  init_twbc();
+#endif
+
   lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed);
   rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
   srand(glb_var.rlxd_seed+PID);
@@ -316,13 +320,17 @@ int main(int argc,char *argv[]) {
   if(list!=NULL) fclose(list);
 
   z2semwall_qprop_free();
-
-  finalize_process();
  
   free_gfield(u_gauge);
 #ifndef REPR_FUNDAMENTAL
   free_gfield_f(u_gauge_f);
 #endif
+
+#ifdef TWISTED_BC
+  free_twbc();
+#endif
+
+  finalize_process();
 
   return 0;
 }

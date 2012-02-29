@@ -32,6 +32,13 @@
  */
 static unsigned long int MVMcounter=0;
 
+unsigned long int getMVM_flt() {
+	unsigned long int res=MVMcounter>>1; /* divide by two */
+	MVMcounter=0; /* reset counter */
+
+	return res;
+}
+
 /*
  * NOTE :
  * here we are making the assumption that the geometry is such that

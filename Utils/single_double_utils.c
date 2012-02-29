@@ -18,6 +18,7 @@
 #include "global.h"
 #include "spinor_field.h"
 
+/*
 void assign_u2ud(void)
 {
   _DECLARE_INT_ITERATOR(ix);
@@ -64,17 +65,30 @@ void assign_ud2u(void)
     }
   }
 }
+*/
 
 void assign_ud2u_f(void)
 {
   _DECLARE_INT_ITERATOR(ix);
   int i,mu;
+#ifdef REPR_ADJOINT
+  double *r;
+  float *rf;
+#else
   complex *r;
   complex_flt *rf;
+#endif
 
   _MASTER_FOR(&glattice,ix){
     for (mu=0;mu<4;mu++)
     {
+#ifdef REPR_ADJOINT
+      r=(double*)(pu_gauge_f(ix,mu));
+      rf=(float*)(pu_gauge_f_flt(ix,mu));
+
+      for (i=0;i<(NF*NF);++i)
+        rf[i]=(float)(r[i]);
+#else
       r=(complex*)(pu_gauge_f(ix,mu));
       rf=(complex_flt*)(pu_gauge_f_flt(ix,mu));
 
@@ -83,6 +97,7 @@ void assign_ud2u_f(void)
         rf[i].re=(float)(r[i].re);
         rf[i].im=(float)(r[i].im);
       }
+#endif
     }
   }
 }
