@@ -28,6 +28,7 @@
 #include "communications.h"
 #include "observables.h"
 #include "utils.h"
+#include "gpu.h"
 
 #include "cinfo.c"
 
@@ -35,6 +36,11 @@
 #error ROTATED_SF DOES NOT WORK WITH E/O PRECONDITIONING
 #endif
 
+char input_filename[256] = "input_file";
+
+#ifdef WITH_GPU
+input_gpu gpu_var = init_input_gpu(gpu_var);
+#endif //WITH_GPU
 
 /* Mesons parameters */
 typedef struct _input_mesons {
@@ -126,16 +132,19 @@ rhmc_flow flow=init_rhmc_flow(flow);
 
 
 void read_cmdline(int argc, char* argv[]) {
-  int i, am=0;
+  int i, am=0, ai=0;
 
   for (i=1;i<argc;i++) {
     if (strcmp(argv[i],"-m")==0) am=i;
+    if (strcmp(argv[i],"-i")==0) ai=i+1;
   }
 
   if (am != 0) {
     print_compiling_info();
     exit(0);
   }
+  
+  if (ai!=0 && ai<argc) strcpy(input_filename,argv[ai]);
 
 }
 
@@ -164,8 +173,13 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
 
   /* read input file */
-  read_input(glb_var.read,"input_file");
-  read_input(mes_var.read,"input_file");
+  read_input(glb_var.read,input_filename);
+  read_input(mes_var.read,input_filename);
+#ifdef WITH_GPU
+  read_input(gpu_var.read,input_filename);
+  cudaSetDevice(gpu_var.gpuID);
+#endif //WITH_GPU
+  
   
   if(glb_var.rlxd_state[0]!='\0')
   {
@@ -197,7 +211,7 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"Geometry buffers: %d\n",glattice.nbuffers);
 
   /* Init Monte Carlo */
-  init_mc(&flow, "input_file");
+  init_mc(&flow, input_filename);
   lprintf("MAIN",0,"MVM during RHMC initialzation: %ld\n",getMVM());
   lprintf("MAIN",0,"Initial plaquette: %1.8e\n",avr_plaquette());
 #ifdef BASIC_SF
