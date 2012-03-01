@@ -69,36 +69,16 @@ void assign_ud2u(void)
 
 void assign_ud2u_f(void)
 {
-  _DECLARE_INT_ITERATOR(ix);
-  int i,mu;
-#ifdef REPR_ADJOINT
-  double *r;
-  float *rf;
-#else
-  complex *r;
-  complex_flt *rf;
-#endif
+  int i;
+  double *d;
+  float *f;
 
-  _MASTER_FOR(&glattice,ix){
-    for (mu=0;mu<4;mu++)
-    {
-#ifdef REPR_ADJOINT
-      r=(double*)(pu_gauge_f(ix,mu));
-      rf=(float*)(pu_gauge_f_flt(ix,mu));
-
-      for (i=0;i<(NF*NF);++i)
-        rf[i]=(float)(r[i]);
-#else
-      r=(complex*)(pu_gauge_f(ix,mu));
-      rf=(complex_flt*)(pu_gauge_f_flt(ix,mu));
-
-      for (i=0;i<(NF*NF);++i)
-      {
-        rf[i].re=(float)(r[i].re);
-        rf[i].im=(float)(r[i].im);
-      }
-#endif
-    }
+  d = (double*)(u_gauge_f->ptr);
+  f = (float*)(u_gauge_f_flt->ptr);
+  for(i=0; i<4*glattice.gsize*sizeof(suNf)/sizeof(double); i++) {
+    *f = (float)(*d);
+    d++;
+    f++;
   }
 }
 

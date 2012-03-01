@@ -20,20 +20,28 @@ void update(double beta,int nhb,int nor);
 void random_su2(double rho,double s[]);
 
 /* forces for the update */
-void Force0(double dt, suNg_av_field *force, void *par);
+void force0(double dt, suNg_av_field *force, void *par);
 
 typedef struct {
+  int n_pf;
   spinor_field *pf;
   rational_app *ratio;
+  double inv_err2;
 } force_rhmc_par;
-void Force_rhmc_f(double dt, suNg_av_field *force, void *par);
+void init_force_rhmc();
+void free_force_rhmc();
+void force_rhmc(double dt, suNg_av_field *force, void *par);
 
 typedef struct {
+  int n_pf;
   spinor_field *pf;
   int hasenbusch; /* 0 = no hasenbusch ; 1 = force with Dtilde = a*D+b ; 2 = force with Y = Ddag^{-1}(a*phi+b*X) */
   double aD, bD, aY, bY;
+  double inv_err2, inv_err2_flt;
 } force_hmc_par;
-void Force_hmc_f(double dt, suNg_av_field *force, void *par);
+void init_force_hmc();
+void free_force_hmc();
+void force_hmc(double dt, suNg_av_field *force, void *par);
 
 
 

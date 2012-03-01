@@ -63,7 +63,7 @@ void init_hmc(rhmc_par *par){
     
 	if (init) {
 	  /* already initialized */
-	  lprintf("HMC",0,"WARNING: HMC already initialized!\nWARNNG: Ignoring call to init_hmc.\n");
+	  lprintf("HMC",0,"WARNING: HMC already initialized!\nWARNING: Ignoring call to init_hmc.\n");
 		return;
 	}
     
@@ -71,8 +71,8 @@ void init_hmc(rhmc_par *par){
     
 	/* copy input parameters into the internal variable and make some tests */
 	_update_par=*par;
-	if (_update_par.nf!=2*_update_par.n_pf) {
-		lprintf("HMC",0,"The number of fermions is not twice the number of pseudofermions.\nTry with the RHMC algorithm.\n");
+	if (_update_par.nf%2 != 0) {
+		lprintf("HMC",0,"The number of fermions even.\nTry with the RHMC algorithm.\n");
 		error(1,1,"init_hmc","The HMC algorithm is not suitable for the parameters specified as input.\n");
 	}
     
@@ -82,7 +82,6 @@ void init_hmc(rhmc_par *par){
 	  "Mass = %.8f\n"
 	  "Metropolis test precision = %.8e\n"
 	  "RHMC force precision = %.8e\n"
-	  "Number of pseudofermions = %d\n"
 	  "MD trajectory length = %.8f\n"
 	  "MD steps = %d\n"
 	  "MD gauge substeps = %d\n"
@@ -91,11 +90,12 @@ void init_hmc(rhmc_par *par){
 	  ,_update_par.mass
 	  ,_update_par.MT_prec
 	  ,_update_par.force_prec
-	  ,_update_par.n_pf
 	  ,_update_par.tlen
 	  ,_update_par.nsteps
 	  ,_update_par.gsteps
 	  );
+	
+	_update_par.n_pf = _update_par.nf/2;
     
 	/* allocate space for the backup copy of gfield */
 	if(u_gauge_old==NULL) u_gauge_old=alloc_gfield(&glattice);
@@ -131,17 +131,20 @@ void init_hmc(rhmc_par *par){
   integrator[0].level = 0;
   integrator[0].tlen = _update_par.tlen;
   integrator[0].nsteps = _update_par.nsteps;
-  integrator[0].force = &Force_hmc_f;
+  integrator[0].force = &force_hmc;
   integrator[0].force_par = malloc(sizeof(force_hmc_par));
+  ((force_hmc_par*)(integrator[0].force_par))->n_pf = _update_par.nf/2;
   ((force_hmc_par*)(integrator[0].force_par))->pf = pf;
-  ((force_hmc_par*)(integrator[0].force_par))->hasenbusch=0;
+  ((force_hmc_par*)(integrator[0].force_par))->hasenbusch = 0;
+  ((force_hmc_par*)(integrator[0].force_par))->inv_err2 = _update_par.force_prec;
+  ((force_hmc_par*)(integrator[0].force_par))->inv_err2_flt = _update_par.force_prec_flt;
   integrator[0].integrator = &O2MN_multistep;
   integrator[0].next = &integrator[1];
 
   integrator[1].level = 1;
   integrator[1].tlen = integrator[0].tlen/((double)(2*integrator[0].nsteps));
   integrator[1].nsteps = _update_par.gsteps;
-  integrator[1].force = &Force0;
+  integrator[1].force = &force0;
   integrator[1].force_par = NULL;
   integrator[1].integrator = &O2MN_multistep;
   integrator[1].next = &integrator[2];
@@ -153,6 +156,8 @@ void init_hmc(rhmc_par *par){
   integrator[2].force_par = NULL;
   integrator[2].integrator = &gauge_integrator;
   integrator[2].next = NULL;
+  
+  init_force_hmc();
 
     
 	/* set up rational approx needed for HMC */
@@ -188,6 +193,8 @@ void free_hmc(){
     i++;
   }
   free(integrator);
+  
+  free_force_hmc();
 	
 	init = 0;
     

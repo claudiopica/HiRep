@@ -158,7 +158,7 @@ int main(int argc,char *argv[])
 
   if (PID==0) {
     sprintf(sbuf,">>out_%d",PID);  logger_stdout(sbuf); 
-    /* sprintf(sbuf,"err_%d",PID); freopen(sbuf,"w",stderr);  */
+    sprintf(sbuf,"err_%d",PID); freopen(sbuf,"w",stderr);
   }
 
   lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS); 
