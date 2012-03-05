@@ -38,10 +38,8 @@ int MINRES_mshift_core(short int *flags,mshift_par *par, spinor_operator M, spin
   /* fare qualche check sugli input */
   /* par->n deve essere almeno 1! */
   assert(par->n>0);
-#ifndef CHECK_SPINOR_MATCHING
   for(i=0;i<par->n;++i)
    _TWO_SPINORS_MATCHING(in,&out[i]);
-#endif
 
   /*
     printf("numero vettori n=%d\n",par->n);

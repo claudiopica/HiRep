@@ -199,9 +199,7 @@ static void project(spinor_field *pk,spinor_field *pl)
   complex sp;
 
   /* check input types */
-#ifndef CHECK_SPINOR_MATCHING
   _TWO_SPINORS_MATCHING(pk,pl);
-#endif
 
   sp.re=-spinor_field_prod_re_f(pl,pk);
   sp.im=-spinor_field_prod_im_f(pl,pk);

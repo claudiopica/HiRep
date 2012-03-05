@@ -39,6 +39,11 @@ void SF_gauge_bcs(suNg_field *gf, int strength);
 double SF_test_gauge_bcs();
 #endif /* BASIC_SF || ROTATED_SF */
 
+#ifdef TWISTED_BC
+void init_twbc();
+void free_twbc();
+#endif
+
 
 void cross_prod(suNg_vector *v1,suNg_vector *v2,suNg_vector *v3);
 void cross_prod_flt(suNg_vector_flt *v1,suNg_vector_flt *v2,suNg_vector_flt *v3);

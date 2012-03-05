@@ -22,7 +22,7 @@
 #include "linear_algebra.h"
 #include "spinor_field.h"
 #include "geometry.h"
-#include "communications_flt.h"
+#include "communications.h"
 #include "memory.h"
 
 /*
@@ -38,7 +38,6 @@ unsigned long int getMVM_flt_cpu() {
     
 	return res;
 }
-
 
 /*
  * NOTE :

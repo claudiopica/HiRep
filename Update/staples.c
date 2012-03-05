@@ -16,7 +16,7 @@
 #include <math.h>
 #include "suN.h"
 #include "global.h"
-
+#include "communications.h"
 
 static suNg *u1up,*u2up,*u3up;
 static suNg *u1dn,*u2dn,*u3dn;
@@ -26,6 +26,12 @@ static suNg staple, tr1, tr2;
 static void add_to_v(suNg *v){
   _suNg_add_assign(*v,staple);
 }
+
+#ifdef TWISTED_BC
+static void sub_to_v(suNg *v){
+  _suNg_sub_assign(*v,staple);
+}
+#endif
 
 static void up_staple(void)
 {
@@ -50,43 +56,95 @@ void staples(int ix,int mu,suNg *v)
    _suNg_zero(*v);
 
    ixpmu=iup(ix,mu);
-
-   for (i=1;i<4;i++)
-   {
-      nu=(mu+i)&0x3;
-      ixpnu=iup(ix,nu);
-      ixmnu=idn(ix,nu);
-      ixpmumnu=idn(ixpmu,nu);
-      
-      u1up=pu_gauge(ix,nu);
-      u2up=pu_gauge(ixpnu,mu);
-      u3up=pu_gauge(ixpmu,nu);   
    
-      u1dn=pu_gauge(ixmnu,nu);
-      u2dn=pu_gauge(ixmnu,mu);
-      u3dn=pu_gauge(ixpmumnu,nu);   
 
-      up_staple();
-      add_to_v(v);      
-      dn_staple();
-      add_to_v(v);
-   }
+#ifdef TWISTED_BC
+   if(twbc_staples[ix*4+mu]!=NULL)
+     for (i=1;i<4;i++)
+       {
+	 nu=(mu+i)&0x3;
+	 ixpnu=iup(ix,nu);
+	 ixmnu=idn(ix,nu);
+	 ixpmumnu=idn(ixpmu,nu);
+	 
+	 u1up=pu_gauge(ix,nu);
+	 u2up=pu_gauge(ixpnu,mu);
+	 u3up=pu_gauge(ixpmu,nu);   
+	 
+	 u1dn=pu_gauge(ixmnu,nu);
+	 u2dn=pu_gauge(ixmnu,mu);
+	 u3dn=pu_gauge(ixpmumnu,nu);   
+	 
+	 up_staple();
+	 if(twbc_staples[ix*4+mu][i-1]==1) {add_to_v(v);} else {
+	   sub_to_v(v);}
+	 dn_staple();
+	 if(twbc_staples[ix*4+mu][i+2]==1) {add_to_v(v);} else {
+	   sub_to_v(v);}
+       }
+   else
+     for (i=1;i<4;i++)
+       {
+	 nu=(mu+i)&0x3;
+	 ixpnu=iup(ix,nu);
+	 ixmnu=idn(ix,nu);
+	 ixpmumnu=idn(ixpmu,nu);
+	 
+	 u1up=pu_gauge(ix,nu);
+	 u2up=pu_gauge(ixpnu,mu);
+	 u3up=pu_gauge(ixpmu,nu);   
+	 
+	 u1dn=pu_gauge(ixmnu,nu);
+	 u2dn=pu_gauge(ixmnu,mu);
+	 u3dn=pu_gauge(ixpmumnu,nu);   
+	 
+	 up_staple();
+	 add_to_v(v);
+	 dn_staple();
+	 add_to_v(v);
+       }
+#else
+   for (i=1;i<4;i++)
+     {
+       nu=(mu+i)&0x3;
+       ixpnu=iup(ix,nu);
+       ixmnu=idn(ix,nu);
+       ixpmumnu=idn(ixpmu,nu);
+       
+       u1up=pu_gauge(ix,nu);
+       u2up=pu_gauge(ixpnu,mu);
+       u3up=pu_gauge(ixpmu,nu);   
+       
+       u1dn=pu_gauge(ixmnu,nu);
+       u2dn=pu_gauge(ixmnu,mu);
+       u3dn=pu_gauge(ixpmumnu,nu);   
+       
+       up_staple();
+       add_to_v(v);
+       dn_staple();
+       add_to_v(v);
+     }
+   
+#endif  
 }
 
 #include "observables.h"
 #include "logger.h"
 void test_staples()
 {
-  int ix,mu;
+  int mu;
   suNg s, res;
   double pa=0.0;
   double ps=0.0, pl=0.;
-	double tr;
+  double tr;
   int fl;
+  _DECLARE_INT_ITERATOR(ix);
+
+
 
   fl = 0;
   pa = avr_plaquette();
-  for (ix=0;ix<VOLUME;++ix){
+  _MASTER_FOR(&glattice,ix){
     for (mu=0; mu<4; ++mu){
       staples(ix, mu, &res);
       /* _suNg_dagger(s, res); */
@@ -97,13 +155,15 @@ void test_staples()
     }
     pl+=local_plaq(ix);
   }
+  global_sum(&ps,1);
+  global_sum(&pl,1);
 
-  ps /= 4.0*(double)(6*VOLUME*NG);
-  pl/=(double)(6*VOLUME*NG);
+  ps /= 4.0*(double)(6*GLB_T*GLB_X*GLB_Y*GLB_Z*NG);
+  pl/=(double)(6*GLB_T*GLB_X*GLB_Y*GLB_Z*NG);
 	lprintf("TESTING",50,"Staple test: ");
   if (fabs(pa-ps)<1.e-6)
 		lprintf("TESTING",50,"PASSED.");
   else
 		lprintf("TESTING",50,"FAILED.");
-	lprintf("TESTING",50," [diff1 = %1.8e][diff2 = %1.8e]\n", pa-ps, pl-ps);
+  lprintf("TESTING",50," [diff1 = %1.8e][diff2 = %1.8e][diff3 = %1.8e]\n", pa-ps, pl-ps, pa-pl);
 }

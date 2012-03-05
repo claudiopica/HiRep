@@ -104,7 +104,7 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, int trunc_iter, spin
 
   innorm2=spinor_field_sqnorm_f(in);
   if(par->n==1) { /* in this case is not a multishift and we use as starting vector out[0] */
-    M(Mp,&out[0]);
+    M.dbl(Mp,&out[0]);
     spinor_field_mul_add_assign_f(Mp,-par->shift[0],&out[0]);
     spinor_field_sub_f(p2,p2,Mp);
   }
@@ -129,7 +129,7 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, int trunc_iter, spin
   do {
     ++cgiter;
 
-    M(Mp,p2);
+    M.dbl(Mp,p2);
     spinor_field_mul_add_assign_f(Mp,-par->shift[0],p2);
 
     /* compute alpha */

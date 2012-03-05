@@ -95,12 +95,25 @@ void assign_ud2u_f_cpu(void)
 #else
   _DECLARE_INT_ITERATOR(ix);
   int i,mu;
+
+#ifdef REPR_ADJOINT
+  double *r;
+  float *rf;
+#else
   complex *r;
   complex_flt *rf;
+#endif
 
   _MASTER_FOR(&glattice,ix){
     for (mu=0;mu<4;mu++)
     {
+#ifdef REPR_ADJOINT
+      r=(double*)(pu_gauge_f(ix,mu));
+      rf=(float*)(pu_gauge_f_flt(ix,mu));
+
+      for (i=0;i<(NF*NF);++i)
+        rf[i]=(float)(r[i]);
+#else
       r=(complex*)(pu_gauge_f(ix,mu));
       rf=(complex_flt*)(pu_gauge_f_flt(ix,mu));
 
@@ -109,6 +122,7 @@ void assign_ud2u_f_cpu(void)
         rf[i].re=(float)(r[i].re);
         rf[i].im=(float)(r[i].im);
       }
+#endif
     }
   }
 #endif //WITH_QUATERNIONS
@@ -121,12 +135,24 @@ void assign_u2ud_f_cpu(void)
 #else
   _DECLARE_INT_ITERATOR(ix);
   int i,mu;
+#ifdef REPR_ADJOINT
+  double *r;
+  float *rf;
+#else
   complex *r;
   complex_flt *rf;
+#endif
   
   _MASTER_FOR(&glattice,ix){
     for (mu=0;mu<4;mu++)
     {
+#ifdef REPR_ADJOINT
+      r=(double*)(pu_gauge_f(ix,mu));
+      rf=(float*)(pu_gauge_f_flt(ix,mu));
+      
+      for (i=0;i<(NF*NF);++i)
+        r[i]=(double)(rf[i]);
+#else
       r=(complex*)(pu_gauge_f(ix,mu));
       rf=(complex_flt*)(pu_gauge_f_flt(ix,mu));
       
@@ -135,6 +161,7 @@ void assign_u2ud_f_cpu(void)
         r[i].re=(double)(rf[i].re);
         r[i].im=(double)(rf[i].im);
       }
+#endif
     }
   }
 #endif //WITH_QUATERNIONS

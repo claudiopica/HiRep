@@ -22,8 +22,6 @@
 
 /* declared in update_rhmc.c */
 extern rhmc_par _update_par;
-extern spinor_field *pf;
-extern rational_app r_MD; /* used in the action MD evolution */
 extern spinor_operator H2; /* Dirac operator */
 
 #define _print_avect(a) printf("(%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e)\n",(a).c1,(a).c2,(a).c3,(a).c4,(a).c5,(a).c6,(a).c7,(a).c8)
@@ -43,6 +41,8 @@ extern spinor_operator H2; /* Dirac operator */
  */
 
 /* these macros use the variables ptmp, p */
+
+
 #define _F_DIR0(u,chi1,chi2)				      \
   _vector_add_f(ptmp,(chi2)->c[0],(chi2)->c[2]);		      \
   _suNf_multiply(p.c[0],*(pu_gauge_f(x,0)),ptmp);		      \
@@ -80,8 +80,7 @@ extern spinor_operator H2; /* Dirac operator */
   _suNf_FMAT((u),p)
 
 
-
-void Force_rhmc_f(double dt, suNg_av_field *force){
+void Force_rhmc_f(double dt, suNg_av_field *force, void *vpar){
   _DECLARE_INT_ITERATOR(x);
   int mu, n, k;
   static suNg_algebra_vector f;
@@ -96,25 +95,29 @@ void Force_rhmc_f(double dt, suNg_av_field *force){
   double forcestat[2]; /* used for computation of avr and max force */
   double nsq;
 
+  force_rhmc_par *par = (force_rhmc_par*)vpar;
+  spinor_field *pf = par->pf;
+  rational_app *ratio = par->ratio;
+
   /* check input types */
 #ifndef CHECK_SPINOR_MATCHING
    _TWO_SPINORS_MATCHING(u_gauge,force);
 #endif
 
   /* allocate spinors */
-  chi = alloc_spinor_field_f(r_MD.order+1,&glattice);
-  Hchi = chi+r_MD.order;
+  chi = alloc_spinor_field_f(ratio->order+1,&glattice);
+  Hchi = chi+ratio->order;
 
   /* Compute (H^2-b[n])^-1 * pf */
   /* set up cg parameters */
-  inv_par.n = r_MD.order;
-  inv_par.shift = r_MD.b;
+  inv_par.n = ratio->order;
+  inv_par.shift = ratio->b;
   inv_par.err2= _update_par.force_prec; /* this should be high for reversibility */
   inv_par.max_iter=0; /* no limit */
 
 #ifdef UPDATE_EO
       /* change the type of chi[n] */
-    for (n=0; n<r_MD.order; ++n) {
+    for (n=0; n<ratio->order; ++n) {
       chi[n].type=&glat_even;
     }
     Hchi->type=&glat_even; 
@@ -127,7 +130,7 @@ void Force_rhmc_f(double dt, suNg_av_field *force){
     /* compute inverse vectors chi[i] = (H^2 - b[i])^1 * pf */
     if (inv_par.n==1) { spinor_field_zero_f(chi); }
     cg_mshift(&inv_par, H2, &pf[k], chi);
-    for (n=0; n<r_MD.order; ++n) {
+    for (n=0; n<ratio->order; ++n) {
 #ifdef UPDATE_EO
       /* change temporarely the type of chi[n] and Hchi */
       g5Dphi_eopre(_update_par.mass, Hchi, &chi[n]);
@@ -211,9 +214,9 @@ void Force_rhmc_f(double dt, suNg_av_field *force){
 	    _algebra_project(f,s1);
 	    /*_print_avect(f); */
 #ifdef UPDATE_EO
-	    _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),-dt*r_MD.a[n+1]*(_REPR_NORM2/_FUND_NORM2),f);
+	    _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),-dt*ratio->a[n+1]*(_REPR_NORM2/_FUND_NORM2),f);
 #else
-	    _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),dt*r_MD.a[n+1]*(_REPR_NORM2/_FUND_NORM2),f);	
+	    _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),dt*ratio->a[n+1]*(_REPR_NORM2/_FUND_NORM2),f);	
 #endif
 	  
 	    _algebra_vector_sqnorm_g(nsq,f);
@@ -235,9 +238,9 @@ void Force_rhmc_f(double dt, suNg_av_field *force){
       }
 
       global_sum(forcestat,2);
-      forcestat[0]*=dt*r_MD.a[n+1]*(_REPR_NORM2/_FUND_NORM2)/((double)(4*GLB_T*GLB_X*GLB_Y*GLB_Z));
-      forcestat[1]*=dt*r_MD.a[n+1]*(_REPR_NORM2/_FUND_NORM2);
-      lprintf("FORCE_RHMC",50,"[%d] avr |force| = %1.8e maxforce = %1.8e a = %1.8e b = %1.8e\n",n,forcestat[0],forcestat[1],r_MD.a[n+1],r_MD.b[n]);
+      forcestat[0]*=dt*ratio->a[n+1]*(_REPR_NORM2/_FUND_NORM2)/((double)(4*GLB_T*GLB_X*GLB_Y*GLB_Z));
+      forcestat[1]*=dt*ratio->a[n+1]*(_REPR_NORM2/_FUND_NORM2);
+      lprintf("FORCE_RHMC",50,"[%d] avr |force| = %1.8e maxforce = %1.8e a = %1.8e b = %1.8e\n",n,forcestat[0],forcestat[1],ratio->a[n+1],ratio->b[n]);
       
 #if defined(BASIC_SF) || defined(ROTATED_SF)
        	SF_force_bcs(force);

@@ -1,5 +1,5 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
+* Copyright (c) 2008, Agostino Patella, Claudio Pica                        *   
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
@@ -8,6 +8,7 @@
 
 #include "suN.h"
 #include "inverters.h"
+#include "rational_functions.h"
 
 void staples(int ix,int mu,suNg *v);
 void test_staples();
@@ -19,21 +20,36 @@ void update(double beta,int nhb,int nor);
 void random_su2(double rho,double s[]);
 
 /* forces for the update */
-void Force(double dt, suNg_av_field *force); /* total force */
-void Force0(double dt, suNg_av_field *force); /* gauge forces */
-/* fermionic forces for RHMC/HMC */
-void Force_rhmc_f(double dt, suNg_av_field *force);
-/* SF forces */
+void Force0(double dt, suNg_av_field *force, void *par);
+
+typedef struct {
+  spinor_field *pf;
+  rational_app *ratio;
+} force_rhmc_par;
+void Force_rhmc_f(double dt, suNg_av_field *force, void *par);
+
+typedef struct {
+  spinor_field *pf;
+  int hasenbusch; /* 0 = no hasenbusch ; 1 = force with Dtilde = a*D+b ; 2 = force with Y = Ddag^{-1}(a*phi+b*X) */
+  double aD, bD, aY, bY;
+} force_hmc_par;
+void Force_hmc_f(double dt, suNg_av_field *force, void *par);
 
 
-typedef struct _int_par {
-	double tlen; /* trajectory lenght */
-	unsigned int nsteps; /* number of step in the integration */
-	unsigned int gsteps; /* number of substeps for the gauge part every step */
-} int_par;
 
-void leapfrog(suNg_av_field *momenta, int_par *traj_par);
-void O2MN_multistep(suNg_av_field *momenta, int_par *traj_par);
+typedef struct _integrator_par {
+  double tlen;
+  int nsteps;
+  void (*force)(double,suNg_av_field*,void*);
+  void *force_par;
+  void (*integrator)(suNg_av_field*, struct _integrator_par*);
+  struct _integrator_par *next;
+  int level;
+} integrator_par;
+void gauge_integrator(suNg_av_field *momenta, integrator_par *int_par);
+void O2MN_multistep(suNg_av_field *momenta, integrator_par *int_par);
+
+
 
 void gaussian_momenta(suNg_av_field *momenta);
 
@@ -49,6 +65,8 @@ void gaussian_spinor_field_flt(spinor_field_flt *s);
 extern void (*gaussian_spinor_field) (spinor_field *s);
 extern void (*gaussian_spinor_field_flt) (spinor_field_flt *s);
 #endif //WITH_GPU
+
+void z2_spinor_field(spinor_field *s);
 
 
 typedef struct _rhmc_par {
@@ -66,10 +84,12 @@ typedef struct _rhmc_par {
   double MD_prec; /* molecular dynamics precision */
   double HB_prec; /* heatbath precision for pseudofermions */
   double force_prec; /* precision used in the inversions in the force */
+  double force_prec_flt; /* precision used in single-precision acceleration for the inversions in the force (HMC only)*/
   unsigned int n_pf; /* number of psudofermions used in the evolution */
-  void (*integrator)(suNg_av_field *, int_par *); /* integrator used in MD */
-  int_par *MD_par;
-  int (*mshift_solver)(mshift_par *, spinor_operator, spinor_field *, spinor_field *);
+
+	double tlen; /* trajectory lenght */
+	unsigned int nsteps; /* number of step in the integration */
+	unsigned int gsteps; /* number of substeps for the gauge part every step */
 } rhmc_par;
 void init_rhmc(rhmc_par *par);
 void free_rhmc();

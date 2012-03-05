@@ -118,6 +118,7 @@ void apply_bc(){
 	}
   }
 #endif
+
 }
 
 
@@ -214,6 +215,7 @@ void apply_bc_flt(){
     }
   }
 #endif
+
 }
 
 #if defined(BASIC_SF) || defined(ROTATED_SF)
@@ -243,7 +245,7 @@ void SF_spinor_bcs(spinor_field *sp)
   if(COORD[0] == 0) {
     for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
       index=ipt(0,ix,iy,iz);
-      _spinor_zero_g(*_FIELD_AT(sp,index));
+      _spinor_zero_f(*_FIELD_AT(sp,index));
     }
   }
 #endif
@@ -275,7 +277,7 @@ void SF_spinor_bcs_flt(spinor_field_flt *sp)
   if(COORD[0] == 0) {
     for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
       index=ipt(0,ix,iy,iz);
-      _spinor_zero_g(*_FIELD_AT(sp,index));
+      _spinor_zero_f(*_FIELD_AT(sp,index));
     }
   }
 #endif

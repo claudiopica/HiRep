@@ -39,7 +39,7 @@ MODS := linear_algebra cg_mshift MINRES_mshift MINRES g5QMR_mshift eva jacobi cg
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Observables
-MODS := g5QMR_trunc trunc_hairpin
+MODS := g5QMR_trunc trunc_hairpin avr_plaquette
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 COMMON_OBJS = $(MOD_OBJS)

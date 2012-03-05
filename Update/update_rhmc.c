@@ -1,5 +1,5 @@
 /***************************************************************************\
- * Copyright (c) 2008, Claudio Pica                                          *   
+ * Copyright (c) 2008, Agostino Patella, Claudio Pica                        *   
  * All rights reserved.                                                      * 
  \***************************************************************************/
 
@@ -19,6 +19,12 @@
 #include "logger.h"
 #include "communications.h"
 
+/* these are the basic operators used in the update */
+void H2_dbl(spinor_field *out, spinor_field *in);
+void H2_flt(spinor_field_flt *out, spinor_field_flt *in);
+void H_dbl(spinor_field *out, spinor_field *in);
+void H_flt(spinor_field_flt *out, spinor_field_flt *in);
+  
 /* State quantities for RHMC */
 suNg_av_field *momenta=NULL;
 spinor_field *pf=NULL;
@@ -26,25 +32,20 @@ rhmc_par _update_par={0};
 rational_app r_S={0};  /* used for computing the action S in the metropolis test */
 rational_app r_MD={0}; /* used in the action MD evolution */
 rational_app r_HB={0};  /* used in pseudofermions heatbath */
+integrator_par *integrator = NULL;
 double minev, maxev; /* min and max eigenvalue of H^2 */
 
-spinor_operator H2={NULL,NULL}; 
-spinor_operator H={NULL,NULL}; 
+spinor_operator H2={&H2_dbl,&H2_flt}; 
+spinor_operator H={&H_dbl,&H_flt}; 
 /* END of State */
 
-
-static short int init=0;
-
-
-static suNg_field *u_gauge_old=NULL;
-static scalar_field *la=NULL; /* local action field for Metropolis test */
 
 /* this is the basic operator used in the update */
 void H2_dbl(spinor_field *out, spinor_field *in){
 #ifdef UPDATE_EO
-    g5Dphi_eopre_sq(_update_par.mass, out, in);
+  g5Dphi_eopre_sq(_update_par.mass, out, in);
 #else
-    g5Dphi_sq(_update_par.mass, out, in);
+  g5Dphi_sq(_update_par.mass, out, in);
 #endif
 }
 
@@ -59,19 +60,28 @@ void H2_flt(spinor_field_flt *out, spinor_field_flt *in){
 
 void H_dbl(spinor_field *out, spinor_field *in){
 #ifdef UPDATE_EO
-    g5Dphi_eopre(_update_par.mass, out, in);
+  g5Dphi_eopre(_update_par.mass, out, in);
 #else
-    g5Dphi(_update_par.mass, out, in);
+  g5Dphi(_update_par.mass, out, in);
 #endif
 }
 /* this is the basic operator used in the update */
 void H_flt(spinor_field_flt *out, spinor_field_flt *in){
 #ifdef UPDATE_EO
-  g5Dphi_eopre_flt(_update_par.mass, out, in);
+  g5Dphi_eopre_flt((float)(_update_par.mass), out, in);
 #else
-  g5Dphi_flt(_update_par.mass, out, in);
+  g5Dphi_flt((float)(_update_par.mass), out, in);
 #endif
 }
+
+
+static short int init=0;
+
+
+static suNg_field *u_gauge_old=NULL;
+static scalar_field *la=NULL; /* local action field for Metropolis test */
+
+
 
 static int gcd(int a, int b) {
     while (b!=0){ int t=b; b=a%t; a=t; }
@@ -84,6 +94,7 @@ static void reduce_fraction(int *a, int *b){
 }
 
 void init_rhmc(rhmc_par *par){
+  
 
   if (init) {
     /* already initialized */
@@ -93,7 +104,7 @@ void init_rhmc(rhmc_par *par){
     
   lprintf("RHMC",0,"Initializing...\n");
 
-   /* copy input parameters into the internal variable and make some tests */
+  /* copy input parameters into the internal variable and make some tests */
   _update_par=*par;
     /* no tests yet... */
   
@@ -127,11 +138,11 @@ void init_rhmc(rhmc_par *par){
 	  ,_update_par.HB_prec
 	  ,_update_par.force_prec
 	  ,_update_par.n_pf
-	  ,_update_par.MD_par->tlen
-	  ,_update_par.MD_par->nsteps
-	  ,_update_par.MD_par->gsteps
+	  ,_update_par.tlen
+	  ,_update_par.nsteps
+	  ,_update_par.gsteps
 	  );
-   
+
   /* allocate space for the backup copy of gfield */
     if(u_gauge_old==NULL) u_gauge_old=alloc_gfield(&glattice);
     suNg_field_copy(u_gauge_old,u_gauge);
@@ -149,15 +160,11 @@ void init_rhmc(rhmc_par *par){
 #endif 
                                 );
     }
-
-    /* allocate memory for the local action */
+	
+	  /* allocate memory for the local action */
     if(la==NULL) la=alloc_sfield(&glattice);
 
-    /* set spinor_operator pointers H2 */
-    H2.dbl=&H2_dbl;
-    H2.flt=&H2_flt;
-    
-    
+       
     /* represent gauge field and find min and max eigenvalue of H^2 */
     represent_gauge_field();
     find_spec_H2(H2, &maxev,&minev); /* find spectral interval of H^2 */ //NEED TO CHANGE (DONE)
@@ -189,17 +196,46 @@ void init_rhmc(rhmc_par *par){
     r_app_set(&r_HB,minev,maxev);
     
   
-    init = 1;
-    
-    lprintf("RHMC",0,"Initialization done.\n");
-    
+  /* integrator */
+  integrator = (integrator_par*)malloc(sizeof(integrator_par)*3);
+
+  integrator[0].level = 0;
+  integrator[0].tlen = _update_par.tlen;
+  integrator[0].nsteps = _update_par.nsteps;
+  integrator[0].force = &Force_rhmc_f;
+  integrator[0].force_par = malloc(sizeof(force_rhmc_par));
+  ((force_rhmc_par*)(integrator[0].force_par))->pf = pf;
+  ((force_rhmc_par*)(integrator[0].force_par))->ratio = &r_MD;
+  integrator[0].integrator = &O2MN_multistep;
+  integrator[0].next = &integrator[1];
+
+  integrator[1].level = 1;
+  integrator[1].tlen = integrator[0].tlen/((double)(2*integrator[0].nsteps));
+  integrator[1].nsteps = _update_par.gsteps;
+  integrator[1].force = &Force0;
+  integrator[1].force_par = NULL;
+  integrator[1].integrator = &O2MN_multistep;
+  integrator[1].next = &integrator[2];
+
+  integrator[2].level = 2;
+  integrator[2].tlen = integrator[1].tlen/((double)(2*integrator[1].nsteps));
+  integrator[2].nsteps = 1;
+  integrator[2].force = NULL;
+  integrator[2].force_par = NULL;
+  integrator[2].integrator = &gauge_integrator;
+  integrator[2].next = NULL;
+	
+	init = 1;
+	
+	lprintf("RHMC",0,"Initialization done.\n");
+	
 }
 
 void free_rhmc(){
-
-    if (!init) {
-        /* not initialized */
-        lprintf("RHMC",0,"WARNING: RHMC not initialized!\nWARNNG: Ignoring call to free_rhmc.\n");
+  
+  if (!init) {
+    /* not initialized */
+    lprintf("RHMC",0,"WARNING: RHMC not initialized!\nWARNNG: Ignoring call to free_rhmc.\n");
 		return;
     }
     
@@ -214,14 +250,18 @@ void free_rhmc(){
     r_app_free(&r_MD);
     r_app_free(&r_HB);
     
-  /* set spinor_operator pointers H2 */
-  H2.dbl=NULL;
-  H2.flt=NULL;
-  
-    init = 0;
-    
-    lprintf("RHMC",0,"Memory deallocated.\n");
-    
+  if (integrator!=NULL) {
+    int i=0;
+    do {
+      if(integrator[i].force_par != NULL) free(integrator[i].force_par);
+    } while (integrator[i++].next != NULL);
+    free(integrator);    
+  }
+	
+	init = 0;
+	
+	lprintf("RHMC",0,"Memory deallocated.\n");
+	
 }
 
 int update_rhmc(){
@@ -259,8 +299,7 @@ int update_rhmc(){
     
     /* integrate molecular dynamics */
     lprintf("RHMC",30,"MD integration...\n");
-    
-    _update_par.integrator(momenta,_update_par.MD_par);//NEED TO CHANGE?
+    (*(integrator[0].integrator))(momenta,&integrator[0]);
     
     /* project gauge field */
     project_gauge_field();
@@ -364,9 +403,7 @@ int update_rhmc_o(){
     
     /* integrate molecular dynamics */
     lprintf("RHMC",30,"MD integration...\n");
-    _update_par.integrator(momenta,_update_par.MD_par); //NEED TO CHANGE DONE
-    /*leapfrog(momenta, _update_par.tlen, _update_par.nsteps);
-     O2MN_multistep(momenta, _update_par.tlen, _update_par.nsteps, 3);*/
+    (*(integrator[0].integrator))(momenta,&integrator[0]);
     
     /* project gauge field */
     project_gauge_field();

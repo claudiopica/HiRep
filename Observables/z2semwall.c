@@ -103,15 +103,16 @@ static void create_diluted_source_even(spinor_field *source, int tau, int beta) 
 static double hmass, hmass_pre;
 
 #ifndef NDEBUG
-static void D(spinor_field *out, spinor_field *in){
+static void D_dbl(spinor_field *out, spinor_field *in){
   Dphi(hmass,out,in);
 }
+spinor_operator D_dbl={&D_dbl,NULL};
 #endif
 
-static void D_pre(spinor_field *out, spinor_field *in){
+static void D_pre_dbl(spinor_field *out, spinor_field *in){
   Dphi_eopre(hmass_pre,out,in);
 }
-
+spinor_operator D_pre={&D_pre_dbl,NULL};
 
 
 static int init=0;
@@ -172,12 +173,12 @@ static void z2semwall_qprop_init(int nm, double *m, double acc) {
   /* invert noise */
   for(i=0;i<QMR_par.n;++i)
     spinor_field_zero_f(&QMR_resdn[i]);
-  cgiter+=g5QMR_mshift(&QMR_par, &D_pre, QMR_noise, QMR_resdn);
+  cgiter+=g5QMR_mshift(&QMR_par, D_pre, QMR_noise, QMR_resdn);
 
 #ifndef NDEBUG
   for(i=0;i<QMR_par.n;++i){
     hmass_pre=mass[i];
-    D_pre(test_e,&QMR_resdn[i]);
+    D_pre.dbl(test_e,&QMR_resdn[i]);
     ++cgiter;
     spinor_field_sub_assign_f(test_e,QMR_noise);
     norm=spinor_field_sqnorm_f(test_e);
@@ -236,7 +237,7 @@ static void z2semwall_qprop_QMR_eo(void (*Gamma)(suNf_spinor*,suNf_spinor*), spi
 #ifndef NDEBUG
     /* this is a test of the solution */
     hmass_pre=mass[i];
-    D_pre(test_e,&QMR_resdn[i]);
+    D_pre.dbl(test_e,&QMR_resdn[i]);
     ++cgiter;
     spinor_field_sub_assign_f(test_e,QMR_noise);
     norm=spinor_field_sqnorm_f(test_e);
@@ -256,14 +257,14 @@ static void z2semwall_qprop_QMR_eo(void (*Gamma)(suNf_spinor*,suNf_spinor*), spi
   for(i=0;i<QMR_par.n;++i){
     spinor_field_zero_f(&resd[i]);
   }
-  cgiter+=g5QMR_mshift(&QMR_par, &D_pre, eta2, resd);
+  cgiter+=g5QMR_mshift(&QMR_par, D_pre, eta2, resd);
 
   for(i=0;i<QMR_par.n;++i){
 
 #ifndef NDEBUG
     /* this is a test of the solution */
     hmass_pre=mass[i];
-    D_pre(test_e,&resd[i]);
+    D_pre.dbl(test_e,&resd[i]);
     ++cgiter;
     spinor_field_sub_assign_f(test_e,eta2);
     norm=spinor_field_sqnorm_f(test_e);
@@ -281,7 +282,7 @@ static void z2semwall_qprop_QMR_eo(void (*Gamma)(suNf_spinor*,suNf_spinor*), spi
 #ifndef NDEBUG
     /* this is a test of the solution */
     hmass_pre=mass[i];
-    D_pre(test_e,&resd[i]);
+    D_pre.dbl(test_e,&resd[i]);
     ++cgiter;
     spinor_field_sub_assign_f(test_e,eta2);
     norm=spinor_field_sqnorm_f(test_e);
@@ -301,7 +302,7 @@ static void z2semwall_qprop_QMR_eo(void (*Gamma)(suNf_spinor*,suNf_spinor*), spi
 #ifndef NDEBUG
     /* this is a test of the solution */
     hmass=mass[i];
-    D(&test[0],&psi[i]);
+    D.dbl(&test[0],&psi[i]);
     ++cgiter;
     spinor_field_zero_f(&test[1]);
    _MASTER_FOR(&glat_even,ix)

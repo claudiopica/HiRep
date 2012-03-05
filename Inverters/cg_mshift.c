@@ -34,10 +34,8 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
 
   /* fare qualche check sugli input */
   assert(par->n>0);
-#ifndef CHECK_SPINOR_MATCHING
   for(i=0;i<par->n;++i)
     _TWO_SPINORS_MATCHING(in,&out[i]);
-#endif
 
   /* allocate spinors fields and aux real variables */
 #ifdef WITH_GPU

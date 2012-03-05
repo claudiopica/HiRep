@@ -33,17 +33,16 @@ static int cg_mshift_flt_core(short int *sflags, mshift_par *par, spinor_operato
 
   /* fare qualche check sugli input */
   assert(par->n>0);
-#ifndef CHECK_SPINOR_MATCHING
+
   for(i=0;i<par->n;++i)
     _TWO_SPINORS_MATCHING(in,&out[i]);
-#endif
 
   /* allocate spinors fields and aux real variables */
 #ifdef WITH_GPU
   alloc_mem_t=GPU_MEM; /* allocate only on GPU */
 #endif
   p = alloc_spinor_field_f_flt(3+par->n,in->type);
-  alloc_mem_t=std_mem_t;
+  alloc_mem_t=std_mem_t; /* set the allocation memory type back */
   k=p+par->n;
   r=k+1;
   Mk=r+1;

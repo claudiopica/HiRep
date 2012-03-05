@@ -143,8 +143,13 @@ GLB_VAR(suNf_field_flt,*u_gauge_f_flt,=NULL);
 
 GLB_VAR(double,bc[4],={BC_T,BC_X,BC_Y,BC_Z});
 
+#ifdef TWISTED_BC
+GLB_VAR(int,**twbc_staples, =NULL);
+GLB_VAR(int,*twbc_plaq, =NULL);
+#endif
+
 #undef BC_T
-#undef BC_x
+#undef BC_X
 #undef BC_Y
 #undef BC_Z
 

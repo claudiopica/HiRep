@@ -205,6 +205,10 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"local size is %dx%dx%dx%d\n",T,X,Y,Z);
   lprintf("MAIN",0,"extended local size is %dx%dx%dx%d\n",T_EXT,X_EXT,Y_EXT,Z_EXT);
 
+#ifdef TWISTED_BC
+  init_twbc();
+#endif
+
   /* alloc global gauge fields */
   u_gauge=alloc_gfield(&glattice);
 
@@ -236,9 +240,14 @@ int main(int argc,char *argv[]) {
 
   if(list!=NULL) fclose(list);
 
-  finalize_process();
+
+#ifdef TWISTED_BC
+  free_twbc();
+#endif
  
   free_gfield(u_gauge);
+
+  finalize_process();
   
   return 0;
 }
