@@ -80,7 +80,24 @@ extern spinor_operator H2; /* Dirac operator */
   _suNf_FMAT((u),p)
 
 
-void Force_rhmc_f(double dt, suNg_av_field *force, void *vpar){
+  
+static int n_ws=0;
+static spinor_field *chi=NULL, *Hchi=NULL;
+
+void init_force_rhmc(int n) {
+  n_ws = n;
+  chi = alloc_spinor_field_f(n_ws,&glattice);
+  Hchi = chi+n_ws-1;
+}
+
+void free_force_rhmc() {
+  free_spinor_field_f(chi);
+}
+
+
+  
+  
+void force_rhmc(double dt, suNg_av_field *force, void *vpar){
   _DECLARE_INT_ITERATOR(x);
   int mu, n, k;
   static suNg_algebra_vector f;
@@ -88,7 +105,6 @@ void Force_rhmc_f(double dt, suNg_av_field *force, void *vpar){
   static suNf_spinor p;
   static suNf_FMAT s1;
   static mshift_par inv_par;
-  spinor_field *chi, *Hchi;
 #ifdef UPDATE_EO
   spinor_field delta, sigma;
 #endif
@@ -99,20 +115,18 @@ void Force_rhmc_f(double dt, suNg_av_field *force, void *vpar){
   spinor_field *pf = par->pf;
   rational_app *ratio = par->ratio;
 
+  error(n_ws<ratio->order+1,1,"force_rhmc" __FILE__,"Workspace is too small");
+  
   /* check input types */
 #ifndef CHECK_SPINOR_MATCHING
    _TWO_SPINORS_MATCHING(u_gauge,force);
 #endif
 
-  /* allocate spinors */
-  chi = alloc_spinor_field_f(ratio->order+1,&glattice);
-  Hchi = chi+ratio->order;
-
   /* Compute (H^2-b[n])^-1 * pf */
   /* set up cg parameters */
   inv_par.n = ratio->order;
   inv_par.shift = ratio->b;
-  inv_par.err2= _update_par.force_prec; /* this should be high for reversibility */
+  inv_par.err2= par->inv_err2; /* this should be high for reversibility */
   inv_par.max_iter=0; /* no limit */
 
 #ifdef UPDATE_EO
@@ -126,7 +140,7 @@ void Force_rhmc_f(double dt, suNg_av_field *force, void *vpar){
 #ifdef WITH_GPU
     gfield_copy_to_gpu_f(u_gauge_f); //Make sure gauge field is on GPU
 #endif    
-  for (k=0; k<_update_par.n_pf; ++k) {
+  for (k=0; k<par->n_pf; ++k) {
     /* compute inverse vectors chi[i] = (H^2 - b[i])^1 * pf */
     if (inv_par.n==1) { spinor_field_zero_f(chi); }
     cg_mshift(&inv_par, H2, &pf[k], chi);
@@ -252,7 +266,6 @@ void Force_rhmc_f(double dt, suNg_av_field *force, void *vpar){
 #ifdef UPDATE_EO
   chi[0].type=&glattice;
 #endif
-  free_spinor_field_f(chi);
 
 }
 

@@ -727,7 +727,7 @@ int g5QMR_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_fi
 
 int g5QMR_fltacc( g5QMR_fltacc_par* par, spinor_operator M, spinor_field *in, spinor_field *out)
 {
-  int cgiter=0,cgiter_flt=0,cgiter_minres=0, k;
+  int cgiter=0,cgiter_flt=0,cgiter_minres=0;
   short valid;
   spinor_field_flt *in_flt, *out_flt, *res_flt;
   spinor_field *res;
@@ -768,7 +768,8 @@ int g5QMR_fltacc( g5QMR_fltacc_par* par, spinor_operator M, spinor_field *in, sp
       spinor_field_g5_f_flt(res_flt,res_flt); /* restore input vector */
     }
  
-    assign_s2sd(out,out_flt);
+    assign_s2sd(res,out_flt);
+    spinor_field_add_assign_f(out, res);
     
     M.dbl(res,out);
     spinor_field_sub_f(res,in,res);

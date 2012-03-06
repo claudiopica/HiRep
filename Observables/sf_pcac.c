@@ -15,7 +15,6 @@
 #include <assert.h>
 #include "logger.h"
 #include "update.h"
-#include "matrix.h"
 
 extern rhmc_par _update_par; /* Update/update_rhmc.c */
 

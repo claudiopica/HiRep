@@ -80,16 +80,6 @@ extern rhmc_par _update_par;
 
 
 
-/*
-typedef struct {
-  double mass;
-  double has_a;
-  double has_b;
-  float mass_flt;
-  float has_a_flt;
-  float has_b_flt;
-} dirac_par;
-*/
 
 void D_dbl(spinor_field *out, spinor_field *in){
 #ifdef UPDATE_EO
@@ -109,8 +99,33 @@ void D_flt(spinor_field_flt *out, spinor_field_flt *in){
 
 spinor_operator D={&D_dbl, &D_flt};
 
+static spinor_field *Xs=NULL, *Ys=NULL, *eta=NULL;
+static spinor_field_flt *eta_flt=NULL;
 
-void Force_hmc_f(double dt, suNg_av_field *force, void *vpar){
+void init_force_hmc() {
+#ifndef UPDATE_EO
+  Xs = alloc_spinor_field_f(3,&glattice);
+  Ys = Xs+1;
+  eta = Ys+1;
+  eta_flt = alloc_spinor_field_f_flt(2,&glattice);
+#else
+  Xs = alloc_spinor_field_f(2,&glattice);
+  Ys = Xs+1;
+  eta = alloc_spinor_field_f(1,&glat_even);
+  eta_flt = alloc_spinor_field_f_flt(2,&glat_even);
+#endif
+}
+
+void free_force_hmc() {
+  free_spinor_field_f_flt(eta_flt);
+  free_spinor_field_f(Xs);
+#ifdef UPDATE_EO
+  free_spinor_field_f(eta);
+#endif
+}
+
+
+void force_hmc(double dt, suNg_av_field *force, void *vpar){
   _DECLARE_INT_ITERATOR(x);
   int mu,  k;
   static suNg_algebra_vector f;
@@ -118,8 +133,6 @@ void Force_hmc_f(double dt, suNg_av_field *force, void *vpar){
   static suNf_spinor p;
   static suNf s1;
   static MINRES_par inv_par;
-  spinor_field *X, *Y, *eta;
-  spinor_field_flt *eta_flt;
 #ifdef UPDATE_EO
   spinor_field Xe, Xo, Ye, Yo;
 #endif
@@ -136,13 +149,13 @@ void Force_hmc_f(double dt, suNg_av_field *force, void *vpar){
 
   /* allocate spinors */
 #ifndef UPDATE_EO
-  X = alloc_spinor_field_f(3,&glattice);
-  Y = X+1;
-  eta = Y+1;
+  Xs = alloc_spinor_field_f(3,&glattice);
+  Ys = Xs+1;
+  eta = Ys+1;
   eta_flt = alloc_spinor_field_f_flt(2,&glattice);
 #else
-  X = alloc_spinor_field_f(2,&glattice);
-  Y = X+1;
+  Xs = alloc_spinor_field_f(2,&glattice);
+  Ys = Xs+1;
   eta = alloc_spinor_field_f(1,&glat_even);
   eta_flt = alloc_spinor_field_f_flt(2,&glat_even);
 #endif
@@ -151,79 +164,41 @@ void Force_hmc_f(double dt, suNg_av_field *force, void *vpar){
 
   assign_ud2u_f();
   
-  for (k=0; k<_update_par.n_pf; ++k) {
+  for (k=0; k<par->n_pf; ++k) {
 
 #ifndef UPDATE_EO
     /* X = H^{-1} pf[k] = D^{-1} g5 pf[k] */
     g5QMR_fltacc_par mpar;
-    mpar.err2 = _update_par.force_prec;
+    mpar.err2 = par->inv_err2;
     mpar.max_iter = 0;
-    mpar.err2_flt = _update_par.force_prec_flt;
+    mpar.err2_flt = par->inv_err2_flt;
     mpar.max_iter_flt = 0;
-    spinor_field_zero_f(X);
+    spinor_field_zero_f(Xs);
     spinor_field_g5_assign_f(&pf[k]);
-    g5QMR_fltacc(&mpar, &D, &D_flt, &pf[k], X);
+    g5QMR_fltacc(&mpar, D, &pf[k], Xs);
     spinor_field_g5_assign_f(&pf[k]);
-
-    /*
-    spinor_field_zero_f_flt(&eta_flt[0]);
-    assign_sd2s(&eta_flt[1],&pf[k]);
-    inv_par.err2 = _update_par.force_prec_flt;
-    HBiCGstab_flt(&inv_par, &H_flt, &eta_flt[1], &eta_flt[0]);
-    assign_s2sd(X,&eta_flt[0]);
-    inv_par.err2= _update_par.force_prec;
-    HBiCGstab(&inv_par, &H, &pf[k], X);
-    */
         
     /* Y = H^{-1} ( a g5 pf[k] + b X ) = D^{-1} ( a pf[k] + b g5 X ) */
     if(par->hasenbusch != 2) {
-      spinor_field_g5_f(eta,X);
+      spinor_field_g5_f(eta,Xs);
     } else {
-      spinor_field_g5_f(eta,X);
+      spinor_field_g5_f(eta,Xs);
       spinor_field_mul_f(eta,par->bY,eta);
       spinor_field_mul_add_assign_f(eta,par->aY,&pf[k]);
     }
-    spinor_field_zero_f(Y);
-    g5QMR_fltacc(&mpar, &D, &D_flt, eta, Y);
-
-    /*
-    if(par->hasenbusch != 2) {
-      spinor_field_copy_f(eta,X);
-    } else {
-      spinor_field_g5_f(eta,&pf[k]);
-      spinor_field_mul_f(eta,par->aY,eta);
-      spinor_field_mul_add_assign_f(eta,par->bY,X);
-    }
-    spinor_field_zero_f_flt(&eta_flt[0]);
-    assign_sd2s(&eta_flt[1],eta);
-    inv_par.err2 = _update_par.force_prec_flt;
-    HBiCGstab_flt(&inv_par, &H_flt, &eta_flt[1], &eta_flt[0]);
-    assign_s2sd(Y,&eta_flt[0]);
-    inv_par.err2= _update_par.force_prec;
-    HBiCGstab(&inv_par, &H, eta, Y);
-    */
+    spinor_field_zero_f(Ys);
+    g5QMR_fltacc(&mpar, D, eta, Ys);
     
 #else
     /* X_e = H^{-1} pf[k] */
     /* X_o = D_{oe} X_e = D_{oe} H^{-1} pf[k] */
-    Xe=*X; Xe.type=&glat_even;
-    Xo=*X; Xo.type=&glat_odd;
-
-    /*
-    spinor_field_zero_f_flt(&eta_flt[0]);
-    assign_sd2s(&eta_flt[1],&pf[k]);
-    inv_par.err2 = _update_par.force_prec_flt;
-    HBiCGstab_flt(&inv_par, &H_flt, &eta_flt[1], &eta_flt[0]);
-    assign_s2sd(&Xe,&eta_flt[0]);
-    inv_par.err2= _update_par.force_prec;
-    HBiCGstab(&inv_par, &H, &pf[k], &Xe);
-    Dphi_(&Xo,&Xe);
-    */
+    Xe=*Xs; Xe.type=&glat_even;
+    Xo=*Xs; Xo.type=&glat_odd;
 
     g5QMR_fltacc_par mpar;
-    mpar.err2 = _update_par.force_prec;
+    mpar.err2 = par->inv_err2;
     mpar.max_iter = 0;
-    mpar.err2_flt = _update_par.force_prec_flt;
+    mpar.err2_flt = par->inv_err2_flt;
     mpar.max_iter_flt = 0;
     spinor_field_zero_f(&Xe);
     /* H^{-1} pf = D^{-1} g5 pf */
@@ -234,8 +209,8 @@ void Force_hmc_f(double dt, suNg_av_field *force, void *vpar){
     
     /* Y_e = H^{-1} ( a g5 pf[k] + b X_e ) */
     /* Y_o = D_oe H^{-1} ( a g5 pf[k] + b X_e ) */
-    Ye=*Y; Ye.type=&glat_even;
-    Yo=*Y; Yo.type=&glat_odd;
+    Ye=*Ys; Ye.type=&glat_even;
+    Yo=*Ys; Yo.type=&glat_odd;
 
     if(par->hasenbusch != 2) {
       spinor_field_copy_f(eta,&Xe);
@@ -245,17 +220,6 @@ void Force_hmc_f(double dt, suNg_av_field *force, void *vpar){
       spinor_field_mul_add_assign_f(eta,par->bY,&Xe);
     }
     
-    /*
-    spinor_field_zero_f_flt(&eta_flt[0]);
-    assign_sd2s(&eta_flt[1],eta);
-    inv_par.err2 = _update_par.force_prec_flt;
-    HBiCGstab_flt(&inv_par, &H_flt, &eta_flt[1], &eta_flt[0]);
-    assign_s2sd(&Ye,&eta_flt[0]);
-    inv_par.err2= _update_par.force_prec;
-    HBiCGstab(&inv_par, &H, eta, &Ye);
-    Dphi_(&Yo,&Ye);
-    */
-
     spinor_field_zero_f(&Ye);
     spinor_field_g5_assign_f(eta);
     g5QMR_fltacc(&mpar, D, eta, &Ye);
@@ -266,13 +230,13 @@ void Force_hmc_f(double dt, suNg_av_field *force, void *vpar){
 
 
     lprintf("FORCE",50,"|X| = %1.8e |Y| = %1.8e\n",
-	    sqrt(spinor_field_sqnorm_f(X)),
-	    sqrt(spinor_field_sqnorm_f(Y))
+	    sqrt(spinor_field_sqnorm_f(Xs)),
+	    sqrt(spinor_field_sqnorm_f(Ys))
 	    );
     
     /* reset force stat counters */
-    start_sf_sendrecv(X);
-    start_sf_sendrecv(Y);
+    start_sf_sendrecv(Xs);
+    start_sf_sendrecv(Ys);
     
     forcestat[1]=forcestat[0]=0.;
     
@@ -286,38 +250,38 @@ void Force_hmc_f(double dt, suNg_av_field *force, void *vpar){
       	  switch (mu) {
       	  case 0:
       	    y=iup(x,0);
-      	    chi1=_FIELD_AT(X,x);
-      	    chi2=_FIELD_AT(Y,y);
+      	    chi1=_FIELD_AT(Xs,x);
+      	    chi2=_FIELD_AT(Ys,y);
       	    _F_DIR0(s1,chi1,chi2);
-      	    chi1=_FIELD_AT(Y,x);
-      	    chi2=_FIELD_AT(X,y);
+      	    chi1=_FIELD_AT(Ys,x);
+      	    chi2=_FIELD_AT(Xs,y);
       	    _F_DIR0(s1,chi1,chi2);
       	    break;
       	  case 1:
       	    y=iup(x,1);
-      	    chi1=_FIELD_AT(X,x);
-      	    chi2=_FIELD_AT(Y,y);
+      	    chi1=_FIELD_AT(Xs,x);
+      	    chi2=_FIELD_AT(Ys,y);
       	    _F_DIR1(s1,chi1,chi2);
-      	    chi1=_FIELD_AT(Y,x);
-      	    chi2=_FIELD_AT(X,y);
+      	    chi1=_FIELD_AT(Ys,x);
+      	    chi2=_FIELD_AT(Xs,y);
       	    _F_DIR1(s1,chi1,chi2);
       	    break;
       	  case 2:
       	    y=iup(x,2);
-      	    chi1=_FIELD_AT(X,x);
-      	    chi2=_FIELD_AT(Y,y);
+      	    chi1=_FIELD_AT(Xs,x);
+      	    chi2=_FIELD_AT(Ys,y);
       	    _F_DIR2(s1,chi1,chi2);
-      	    chi1=_FIELD_AT(Y,x);
-      	    chi2=_FIELD_AT(X,y);
+      	    chi1=_FIELD_AT(Ys,x);
+      	    chi2=_FIELD_AT(Xs,y);
       	    _F_DIR2(s1,chi1,chi2);
       	    break;
       	  default: /* DIR 3 */
       	    y=iup(x,3);
-      	    chi1=_FIELD_AT(X,x);
-      	    chi2=_FIELD_AT(Y,y);
+      	    chi1=_FIELD_AT(Xs,x);
+      	    chi2=_FIELD_AT(Ys,y);
       	    _F_DIR3(s1,chi1,chi2);
-      	    chi1=_FIELD_AT(Y,x);
-      	    chi2=_FIELD_AT(X,y);
+      	    chi1=_FIELD_AT(Ys,x);
+      	    chi2=_FIELD_AT(Xs,y);
       	    _F_DIR3(s1,chi1,chi2);
       	  }
 	  
@@ -346,8 +310,8 @@ void Force_hmc_f(double dt, suNg_av_field *force, void *vpar){
       	}
       }
       if(_PIECE_INDEX(x)==0) {
-      	complete_sf_sendrecv(X);
-       	complete_sf_sendrecv(Y);
+      	complete_sf_sendrecv(Xs);
+       	complete_sf_sendrecv(Ys);
       }
     }
 
@@ -362,11 +326,6 @@ void Force_hmc_f(double dt, suNg_av_field *force, void *vpar){
     
   }
   
-  free_spinor_field_f_flt(eta_flt);
-  free_spinor_field_f(X);
-#ifdef UPDATE_EO
-  free_spinor_field_f(eta);
-#endif
 
 }
 

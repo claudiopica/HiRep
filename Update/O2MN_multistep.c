@@ -38,8 +38,8 @@ void gauge_integrator(suNg_av_field *momenta, integrator_par *int_par){
 
   if(int_par->nsteps == 0)  return;
 
-  lprintf("MD_INT",10,"Starting new MD trajectory with O2MN_multistep, level %d.\n",int_par->level);
-  lprintf("MD_INT",20,"MD parameters: level=%d tlen=%1.6f nsteps=%d => dt=%1.6f\n",
+  lprintf("MD_INT",20,"Starting new MD trajectory with O2MN_multistep, level %d.\n",int_par->level);
+  lprintf("MD_INT",30,"MD parameters: level=%d tlen=%1.6f nsteps=%d => dt=%1.6f\n",
     int_par->level,int_par->tlen,int_par->nsteps,dt);
   for(n=1;n<=int_par->nsteps;++n) {
     _MASTER_FOR(&glattice,i) {
@@ -49,9 +49,9 @@ void gauge_integrator(suNg_av_field *momenta, integrator_par *int_par){
       ExpX(dt,_4FIELD_AT(momenta,i,3), _4FIELD_AT(u_gauge,i,3));
     }
     _proj_gfield(count);
-    lprintf("MD_INT",30,"MD step (level %d): %d/%d\n",int_par->level,n,int_par->nsteps);
+    lprintf("MD_INT",40,"MD step (level %d): %d/%d\n",int_par->level,n,int_par->nsteps);
    }
-  lprintf("MD_INT",10,"MD trajectory completed, level %d.\n",int_par->level);
+  lprintf("MD_INT",20,"MD trajectory completed, level %d.\n",int_par->level);
   represent_gauge_field();
 }
 
@@ -69,8 +69,8 @@ void O2MN_multistep(suNg_av_field *momenta, integrator_par *int_par){
   int n;
   double dt=int_par->tlen/((double)int_par->nsteps);
     
-  lprintf("MD_INT",10,"Starting new MD trajectory with O2MN_multistep, level %d.\n",int_par->level);
-  lprintf("MD_INT",20,"MD parameters: level=%d tlen=%1.6f nsteps=%d => dt=%1.6f\n",
+  lprintf("MD_INT",20,"Starting new MD trajectory with O2MN_multistep, level %d.\n",int_par->level);
+  lprintf("MD_INT",30,"MD parameters: level=%d tlen=%1.6f nsteps=%d => dt=%1.6f\n",
     int_par->level,int_par->tlen,int_par->nsteps,dt);
 
   (*int_par->force)(lambda*dt,momenta,int_par->force_par);
@@ -86,10 +86,10 @@ void O2MN_multistep(suNg_av_field *momenta, integrator_par *int_par){
     /* Update of momenta */
     if(n<int_par->nsteps) {
       (*int_par->force)(2.*lambda*dt,momenta,int_par->force_par);
-      lprintf("MD_INT",30,"MD step (level %d): %d/%d\n",int_par->level,n,int_par->nsteps);
+      lprintf("MD_INT",40,"MD step (level %d): %d/%d\n",int_par->level,n,int_par->nsteps);
     } else {
       (*int_par->force)(lambda*dt,momenta,int_par->force_par);
-      lprintf("MD_INT",10,"MD trajectory completed, level %d.\n",int_par->level);
+      lprintf("MD_INT",20,"MD trajectory completed, level %d.\n",int_par->level);
     }
   }
 

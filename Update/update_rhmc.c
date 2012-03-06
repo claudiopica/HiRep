@@ -202,17 +202,19 @@ void init_rhmc(rhmc_par *par){
   integrator[0].level = 0;
   integrator[0].tlen = _update_par.tlen;
   integrator[0].nsteps = _update_par.nsteps;
-  integrator[0].force = &Force_rhmc_f;
+  integrator[0].force = &force_rhmc;
   integrator[0].force_par = malloc(sizeof(force_rhmc_par));
+  ((force_rhmc_par*)(integrator[0].force_par))->n_pf = _update_par.n_pf;
   ((force_rhmc_par*)(integrator[0].force_par))->pf = pf;
   ((force_rhmc_par*)(integrator[0].force_par))->ratio = &r_MD;
+  ((force_rhmc_par*)(integrator[0].force_par))->inv_err2 = _update_par.force_prec;
   integrator[0].integrator = &O2MN_multistep;
   integrator[0].next = &integrator[1];
 
   integrator[1].level = 1;
   integrator[1].tlen = integrator[0].tlen/((double)(2*integrator[0].nsteps));
   integrator[1].nsteps = _update_par.gsteps;
-  integrator[1].force = &Force0;
+  integrator[1].force = &force0;
   integrator[1].force_par = NULL;
   integrator[1].integrator = &O2MN_multistep;
   integrator[1].next = &integrator[2];
@@ -224,6 +226,8 @@ void init_rhmc(rhmc_par *par){
   integrator[2].force_par = NULL;
   integrator[2].integrator = &gauge_integrator;
   integrator[2].next = NULL;
+  
+  init_force_rhmc(r_MD.order+1);
 	
 	init = 1;
 	
@@ -257,6 +261,8 @@ void free_rhmc(){
     } while (integrator[i++].next != NULL);
     free(integrator);    
   }
+  
+  free_force_rhmc();
 	
 	init = 0;
 	
