@@ -201,7 +201,7 @@ int init_mc(hmc_flow *rf, char *ifile) {
 
   /* alloc global gauge fields */
   u_gauge=alloc_gfield(&glattice);
-#if !defined(REPR_FUNDAMENTAL) || defined(ROTATED_SF)
+#if (!defined(REPR_FUNDAMENTAL) && !defined(WITH_QUATERNIONS)) || defined(ROTATED_SF)
   u_gauge_f=alloc_gfield_f(&glattice);
 #endif
   u_gauge_f_flt=alloc_gfield_f_flt(&glattice);
