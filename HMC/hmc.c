@@ -161,7 +161,7 @@ int main(int argc,char *argv[])
   read_cmdline(argc,argv);
 
   /* logger setup */
-    logger_setlevel(0,30);
+    logger_setlevel(0,10);
   /* disable logger for MPI processes != 0 */
   if (PID!=0) { logger_disable(); }
 

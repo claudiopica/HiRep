@@ -136,14 +136,14 @@ void init_hmc(rhmc_par *par){
   init_force_hmc();
 
     
-	/* set up rational approx needed for HMC */
-	pfa.err2=_update_par.MT_prec;
-	pfa.err2*=pfa.err2;
-	pfa.max_iter=0;
+  /* set up rational approx needed for HMC */
+  pfa.err2=_update_par.MT_prec;
+  pfa.err2*=pfa.err2;
+  pfa.max_iter=0;
   
-	init = 1;
-    
-	lprintf("HMC",0,"Initialization done.\n");
+  init = 1;
+	
+  lprintf("HMC",0,"Initialization done.\n");
     
 }
 
@@ -152,15 +152,15 @@ void free_hmc(){
   if (!init) {
     /* not initialized */
     lprintf("HMC",0,"WARNING: HMC not initialized!\nWARNNG: Ignoring call to free_hmc.\n");
-		return;
-	}
-    
-	/* free momenta */
-	if(u_gauge_old!=NULL) free_gfield(u_gauge_old); u_gauge_old=NULL;
-	if(momenta!=NULL) free_avfield(momenta); momenta=NULL;
-	if(pf!=NULL) free_spinor_field_f(pf); pf=NULL;
-    
-	if(la!=NULL) free_sfield(la); la=NULL;
+    return;
+  }
+  
+  /* free momenta */
+  if(u_gauge_old!=NULL) free_gfield(u_gauge_old); u_gauge_old=NULL;
+  if(momenta!=NULL) free_avfield(momenta); momenta=NULL;
+  if(pf!=NULL) free_spinor_field_f(pf); pf=NULL;
+  
+  if(la!=NULL) free_sfield(la); la=NULL;
   
   if (integrator!=NULL) {
     int i=0;
@@ -172,9 +172,9 @@ void free_hmc(){
   
   free_force_hmc();
   
-	init = 0;
-    
-	lprintf("HMC",0,"Memory deallocated.\n");
+  init = 0;
+  
+  lprintf("HMC",0,"Memory deallocated.\n");
     
 }
 
@@ -193,7 +193,7 @@ int update_hmc(){
     lprintf("HMC",30,"Generating gaussian momenta and pseudofermions...\n");
     gaussian_momenta(momenta);
     for (i=0;i<_update_par.n_pf;++i)
-        gaussian_spinor_field(&pf[i]);
+      gaussian_spinor_field(&pf[i]);
     
     /* compute starting action */
     lprintf("HMC",30,"Computing action density...\n");
@@ -218,9 +218,13 @@ int update_hmc(){
     /* compute H2^{-1/2}*pf or H2^{-1}*pf */
     /* here we choose the first strategy which is more symmetric */
     /* for the HMC H2^-1/2 = H^-1 and we use MINRES for this inversion */
+#ifdef WITH_GPU //Make sure gauge field is on GPU
+    gfield_copy_to_gpu_f(u_gauge_f); 
+    gfield_copy_to_gpu_f_flt(u_gauge_f_flt);
+#endif
     for (i=0;i<_update_par.n_pf;++i) {
-        spinor_field_copy_f(&pf[_update_par.n_pf],&pf[i]);
-        MINRES(&pfa,H,&pf[_update_par.n_pf],&pf[i],0);
+      spinor_field_copy_f(&pf[_update_par.n_pf],&pf[i]);
+      MINRES(&pfa,H,&pf[_update_par.n_pf],&pf[i],0);
     }
     
     /* compute new action */
@@ -229,7 +233,7 @@ int update_hmc(){
     /* Metropolis test */
     deltaH=0.;
     _MASTER_FOR(la->type,i) {
-        deltaH+=*_FIELD_AT(la,i);
+      deltaH+=*_FIELD_AT(la,i);
     }
     global_sum(&deltaH, 1);
     lprintf("HMC",10,"[DeltaS = %1.8e][exp(-DS) = %1.8e]\n",deltaH,exp(-deltaH));
@@ -246,8 +250,7 @@ int update_hmc(){
             lprintf("HMC",10,"Configuration rejected.\n");
             suNg_field_copy(u_gauge,u_gauge_old);
             start_gf_sendrecv(u_gauge); /* this may not be needed if we always guarantee that we copy also the buffers */
-            represent_gauge_field();
-            
+            represent_gauge_field();         
             return 0;
         }
     }

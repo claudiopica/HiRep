@@ -167,7 +167,7 @@ void init_rhmc(rhmc_par *par){
        
     /* represent gauge field and find min and max eigenvalue of H^2 */
     represent_gauge_field();
-    find_spec_H2(H2, &maxev,&minev); /* find spectral interval of H^2 */ //NEED TO CHANGE (DONE)
+    find_spec_H2(H2, &maxev,&minev); /* find spectral interval of H^2 */ 
     
     /* set up rational approx needed for RHMC */
     /* r_S = x^{-Nf/(4*NPf)} is used in the metropolis test */
@@ -286,7 +286,7 @@ int update_rhmc(){
     lprintf("RHMC",30,"Generating gaussian momenta and pseudofermions...\n");
     gaussian_momenta(momenta);
     for (i=0;i<_update_par.n_pf;++i){
-      gaussian_spinor_field(&pf[i]); //NEED TO CHANGE (DONE)
+      gaussian_spinor_field(&pf[i]); 
     }
 #if defined(BASIC_SF) && !defined(NDEBUG)
     lprintf("MAIN",0,"SF_test_force_bcs(START): %1.8e\n",SF_test_force_bcs(momenta));
@@ -296,12 +296,12 @@ int update_rhmc(){
       
     /* compute starting action */
     lprintf("RHMC",30,"Computing action density...\n");
-    local_hmc_action(NEW, la, momenta, pf, pf); //NEED TO CHANGE (DONE)
+    local_hmc_action(NEW, la, momenta, pf, pf); 
     
     /* compute H2^{a/2}*pf */
     lprintf("RHMC",30,"Correcting pseudofermions distribution...\n");
     for (i=0;i<_update_par.n_pf;++i)
-      rational_func(&r_HB, H2, &pf[i], &pf[i]);//NEED TO CHANGE (DONE)
+      rational_func(&r_HB, H2, &pf[i], &pf[i]);
     
     /* integrate molecular dynamics */
     lprintf("RHMC",30,"MD integration...\n");

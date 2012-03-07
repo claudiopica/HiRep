@@ -420,10 +420,9 @@ void represent_gauge_field_flt() {
 
   apply_bc_flt();
 #else
+  static int first_time=1;
   /* wait gauge field transfer */
   complete_gf_sendrecv_flt(u_gauge_flt);
-
-  static int first_time=1;
   if(first_time) {
     first_time=0;
     u_gauge_f_flt=(suNf_field_flt *)((void*)u_gauge_flt);

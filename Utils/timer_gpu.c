@@ -11,6 +11,7 @@
 //		... Call another kernel ...
 //
 //		float elapsedTime=gpuTimerStop(gpu_event);
+#ifdef WITH_GPU
 #include "gpu.h"
 
 
@@ -44,3 +45,4 @@ float gpuTimerStop(cudaEvent_t e){
 	return t;
 }
 
+#endif //WITH_GPU

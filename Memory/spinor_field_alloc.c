@@ -17,6 +17,8 @@
 #include "logger.h"
 
 
+int spinor_counter = 0;
+
 /* MPI allocation and deallocation code */
 #ifdef WITH_MPI
 
@@ -68,7 +70,7 @@ for (int i=1; i<n; ++i) f[i].gpu_ptr=f[i-1].gpu_ptr+type->gsize*_size;\
 /* deallocation function */
 #define _DECLARE_FREE_FUNC(_name,_type)\
 void free_##_name(_type *u){ \
-if (u!=NULL) {\
+if (u!=NULL) { \
 if (u->ptr!=NULL) afree(u->ptr);\
 _FREE_GPU_CODE;\
 _FREE_MPI_CODE;\
@@ -82,7 +84,6 @@ _type *alloc_##_name(unsigned int n, geometry_descriptor *type){ \
 _type *f;\
 \
 if (n==0) return NULL;\
-\
 f=amalloc(n*sizeof(*f),ALIGN);\
 error(f==NULL,1,"alloc_" #_name " [" __FILE__ "]",\
 "Could not allocate memory space for field (structure)");\

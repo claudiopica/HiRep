@@ -30,7 +30,7 @@
 #include "communications.h"
 
 static int iw;
-static double hmass=-7.94871867e-01f;
+static double hmass=0.;//-7.94871867e-01f;
 static spinor_field *ws,*ev;
 static double EPSILON=1.e-12;
 
@@ -51,28 +51,30 @@ static double normalize(spinor_field *ps)
   return (double)(1.0/r);
 }
 
-static void Op1(spinor_field *out,spinor_field *in)
+static void Op1_dbl(spinor_field *out,spinor_field *in)
 {
   g5Dphi(hmass,&ev[iw],in);
   g5Dphi(hmass,out,&ev[iw]);
 }
 
+spinor_operator Op1={&Op1_dbl,NULL}; 
 
 static double power(int nit,spinor_operator Op,spinor_field *ws)
 {
   int i;
   double ubnd;
 
+
   gaussian_spinor_field(&ws[0]);
   normalize(&ws[0]);
-  Op(&ws[1],&ws[0]);
-  Op(&ws[0],&ws[1]);
+  Op.dbl(&ws[1],&ws[0]);
+  Op.dbl(&ws[0],&ws[1]);
   ubnd=normalize(&ws[0]);   
 
   for (i=1;i<nit;i++)
     {
-      Op(&ws[1],&ws[0]);
-      Op(&ws[0],&ws[1]);
+      Op.dbl(&ws[1],&ws[0]);
+      Op.dbl(&ws[0],&ws[1]);
       ubnd=normalize(&ws[0]);
     }
   return (double)sqrt((double)(ubnd));
@@ -125,7 +127,7 @@ int main(int argc,char *argv[])
    u_gauge_f=alloc_gfield_f(&glattice);
 #endif
   lprintf("MAIN",0,"Generating a random gauge field... ");fflush(stdout);
-  random_u(u_gauge);
+  unit_u(u_gauge);
   
   start_gf_sendrecv(u_gauge);
   complete_gf_sendrecv(u_gauge);
@@ -155,14 +157,14 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"Accuracy parameters: omega1=%.1e, omega2=%.1e\n\n",
 	 omega1,omega2);
 
-  ie=eva(nev,nevt,0,100,20,ubnd,omega1,omega2,Op1,ev,d1,&status);
+  ie=eva(nev,nevt,0,100,20,ubnd,omega1,omega2,Op1.dbl,ev,d1,&status);
 
   lprintf("MAIN",0,"\nEigenvalues of Q^2 (status = %d, ie = %d):\n\n",
 	 status,ie);
 
   for (i=0;i<nevt;i++)
     {
-      Op1(&ws[0],&ev[i]);
+      Op1.dbl(&ws[0],&ev[i]);
   
       z.re=-(double)d1[i];
       z.im=(double)0.0f;

@@ -14,11 +14,11 @@ MODS := archive logger read_input endian
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Utils
-MODS := suN_utils suN_exp single_double_utils boundary_conditions time max_eig init_twbc
+MODS := suN_utils suN_exp single_double_utils boundary_conditions time max_eig init_twbc single_double_utils_gpu
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Memory
-MODS := amalloc field_alloc spinor_field_alloc
+MODS := amalloc field_alloc spinor_field_alloc field_pack_gpu field_copy_gpu
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Observables
@@ -30,11 +30,11 @@ MODS := gauss random_suNg ranlxs ranlxd random_fields ranz2
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Update
-MODS := Dphi Dphi_flt staples update_hb random_su2 representation random_momenta random_spinor_field update_hmc update_rhmc local_action force0 copy_gfield force_hmc O2MN_multistep cabmar rational_functions find_spec_limits force_rhmc
+MODS := Dphi Dphi_flt staples update_hb random_su2 representation random_momenta random_spinor_field update_hmc update_rhmc local_action force0 copy_gfield force_hmc O2MN_multistep cabmar rational_functions find_spec_limits force_rhmc random_spinor_field_gpu Dphi_gpu Dphi_flt_gpu 
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Error
-MODS := error
+MODS := error error_gpu
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Statistics

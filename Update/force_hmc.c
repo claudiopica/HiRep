@@ -131,7 +131,7 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
   static suNg_algebra_vector f;
   static suNf_vector ptmp;
   static suNf_spinor p;
-  static suNf s1;
+  static suNf_FMAT s1;
   static MINRES_par inv_par;
 #ifdef UPDATE_EO
   spinor_field Xe, Xo, Ye, Yo;
@@ -143,12 +143,10 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
   spinor_field *pf = par->pf;
   
   /* check input types */
-#ifndef CHECK_SPINOR_MATCHING
-   _TWO_SPINORS_MATCHING(u_gauge,force);
-#endif
+  _TWO_SPINORS_MATCHING(u_gauge,force);
 
   /* allocate spinors */
-#ifndef UPDATE_EO
+  /*#ifndef UPDATE_EO
   Xs = alloc_spinor_field_f(3,&glattice);
   Ys = Xs+1;
   eta = Ys+1;
@@ -158,11 +156,15 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
   Ys = Xs+1;
   eta = alloc_spinor_field_f(1,&glat_even);
   eta_flt = alloc_spinor_field_f_flt(2,&glat_even);
-#endif
+  #endif*/
 
   inv_par.max_iter=0;
 
   assign_ud2u_f();
+#ifdef WITH_GPU//Make sure gauge field is on GPU
+    gfield_copy_to_gpu_f(u_gauge_f); 
+    gfield_copy_to_gpu_f_flt(u_gauge_f_flt);
+#endif    
   
   for (k=0; k<par->n_pf; ++k) {
 
@@ -225,9 +227,15 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
     g5QMR_fltacc(&mpar, D, eta, &Ye);
     spinor_field_g5_assign_f(eta);
     Dphi_(&Yo,&Ye);
-    
-#endif
 
+#endif //!UPDATE_EO
+
+#ifdef WITH_GPU //Do rest of the calculation at CPU
+    spinor_field_copy_from_gpu_f(Xs);
+    spinor_field_copy_from_gpu_f(Ys);
+    spinor_field_copy_from_gpu_f(Xo);
+    spinor_field_copy_from_gpu_f(Yo);
+#endif //WITH_GPU
 
     lprintf("FORCE",50,"|X| = %1.8e |Y| = %1.8e\n",
 	    sqrt(spinor_field_sqnorm_f(Xs)),
@@ -246,13 +254,13 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
       	for (mu=0; mu<4; ++mu) {
       	  int y;
       	  suNf_spinor *chi1, *chi2;
-      	  _suNf_zero(s1);
+      	  _suNf_FMAT_zero(s1);
       	  switch (mu) {
       	  case 0:
       	    y=iup(x,0);
       	    chi1=_FIELD_AT(Xs,x);
       	    chi2=_FIELD_AT(Ys,y);
-      	    _F_DIR0(s1,chi1,chi2);
+	    _F_DIR0(s1,chi1,chi2);
       	    chi1=_FIELD_AT(Ys,x);
       	    chi2=_FIELD_AT(Xs,y);
       	    _F_DIR0(s1,chi1,chi2);

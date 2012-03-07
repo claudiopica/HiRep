@@ -214,10 +214,11 @@ void assign_sd2s_cpu(spinor_field_flt *out, spinor_field *in) {
 }
 
 #ifndef WITH_GPU
-void (*assign_u2ud) (void)=assign_u2ud_cpu;
-void (*assign_ud2u) (void)=assign_ud2u_cpu;
-void (*assign_ud2u_f) (void)=assign_ud2u_f_cpu;
-void (*assign_u2ud_f)(void)=assign_u2ud_f_cpu;
 void (*assign_s2sd)(spinor_field *out, spinor_field_flt *in)=assign_s2sd_cpu;
 void (*assign_sd2s)(spinor_field_flt *out, spinor_field *in)=assign_sd2s_cpu;
 #endif
+/* Gauge fields not yet on GPU */
+void (*assign_u2ud) (void)=assign_u2ud_cpu;
+void (*assign_ud2u) (void)=assign_ud2u_cpu;
+void (*assign_u2ud_f)(void)=assign_u2ud_f_cpu;
+void (*assign_ud2u_f) (void)=assign_ud2u_f_cpu;

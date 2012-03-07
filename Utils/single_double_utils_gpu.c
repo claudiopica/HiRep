@@ -10,7 +10,7 @@
 * Functions for conversion from single to double precision and viceversa with gpu
 *
 *******************************************************************************/
-
+#ifdef WITH_GPU
 #include <stdlib.h>
 #include "utils.h"
 #include "suN.h"
@@ -69,3 +69,4 @@ void assign_sd2s(spinor_field_flt *out, spinor_field *in) {
 	 CudaCheckError();
 	 
 }
+#endif //WITH_GPU

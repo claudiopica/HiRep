@@ -71,7 +71,7 @@ void O2MN_multistep(suNg_av_field *momenta, integrator_par *int_par){
     
   lprintf("MD_INT",20,"Starting new MD trajectory with O2MN_multistep, level %d.\n",int_par->level);
   lprintf("MD_INT",30,"MD parameters: level=%d tlen=%1.6f nsteps=%d => dt=%1.6f\n",
-    int_par->level,int_par->tlen,int_par->nsteps,dt);
+	  int_par->level,int_par->tlen,int_par->nsteps,dt);
 
   (*int_par->force)(lambda*dt,momenta,int_par->force_par);
   

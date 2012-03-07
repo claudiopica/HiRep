@@ -203,8 +203,12 @@ int init_mc(hmc_flow *rf, char *ifile) {
   u_gauge=alloc_gfield(&glattice);
 #if (!defined(REPR_FUNDAMENTAL) && !defined(WITH_QUATERNIONS)) || defined(ROTATED_SF)
   u_gauge_f=alloc_gfield_f(&glattice);
-#endif
   u_gauge_f_flt=alloc_gfield_f_flt(&glattice);
+#else
+  u_gauge_flt=alloc_gfield_flt(&glattice);
+  u_gauge_f_flt = (suNf_field_flt *)((void*) u_gauge_flt);
+#endif
+
 
   /* flow defaults */
   strcpy(rf->g_start,"invalid");

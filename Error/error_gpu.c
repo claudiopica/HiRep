@@ -1,5 +1,5 @@
 // Enable this for error checking
-#define CUDA_CHECK_ERROR
+//#define CUDA_CHECK_ERROR
 
 #include "error.h"
 #include "gpu.h"

@@ -42,7 +42,7 @@
 static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out){
   
   spinor_field **q1,**q2;
-  spinor_field *p1, *p2, *Mp, *sd;
+  spinor_field *p1, *p2, *Mp;
   spinor_field *sptmp, *memall;
   
   double alpha, beta, delta, rho, innorm2; 
@@ -68,7 +68,7 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
 #ifdef WITH_GPU
   alloc_mem_t=GPU_MEM; /* allocate only on GPU */
 #endif
-  memall = alloc_spinor_field_f(2*(par->n)+4,in->type);
+  memall = alloc_spinor_field_f(2*(par->n)+3,in->type);
   q1 = (spinor_field**)malloc(sizeof(spinor_field*)*par->n);
   q2 = (spinor_field**)malloc(sizeof(spinor_field*)*par->n);
   for(i=0; i<par->n; i++) {
@@ -78,7 +78,7 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
   p1 = memall+2*par->n;
   p2 = p1+1;
   Mp = p2+1;
-  sd = Mp+1;
+  //  sd = Mp+1;
   
   r = (double *)malloc(sizeof(double)*5*(par->n));
   s1 = r+(par->n);
@@ -249,7 +249,7 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
 static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operator M, spinor_field_flt *in, spinor_field_flt *out){
   
   spinor_field_flt *q1,*q2;
-  spinor_field_flt *p1, *p2, *Mp, *sd;
+  spinor_field_flt *p1, *p2, *Mp;
   spinor_field_flt *sptmp, *memall;
 #ifndef NDEBUG
   spinor_field_flt *sdbg;
@@ -274,14 +274,14 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
 #ifdef WITH_GPU
   alloc_mem_t=GPU_MEM; /* allocate only on GPU */
 #endif
-  memall = alloc_spinor_field_f_flt(2+4,in->type);
+  memall = alloc_spinor_field_f_flt(2+3,in->type);
   alloc_mem_t=std_mem_t;
   q1 = memall;
   q2 = q1+1;
   p1 = q2+1;
   p2 = p1+1;
   Mp = p2+1;
-  sd = Mp+1;
+  //  sd = Mp+1;
 
 #ifndef NDEBUG
 #ifdef WITH_GPU
@@ -448,7 +448,7 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
 static int g5QMR_core(short *valid, double err2, int max_iter, spinor_operator M, spinor_field *in, spinor_field *out){
   
   spinor_field *q1,*q2;
-  spinor_field *p1, *p2, *Mp, *sd;
+  spinor_field *p1, *p2, *Mp;
   spinor_field *sptmp, *memall;
 #ifndef NDEBUG
   spinor_field *sdbg;
@@ -473,14 +473,14 @@ static int g5QMR_core(short *valid, double err2, int max_iter, spinor_operator M
 #ifdef WITH_GPU
   alloc_mem_t=GPU_MEM; /* allocate only on GPU */
 #endif
-  memall = alloc_spinor_field_f(2+4,in->type);
+  memall = alloc_spinor_field_f(2+3,in->type);
   alloc_mem_t=std_mem_t;
   q1 = memall;
   q2 = q1+1;
   p1 = q2+1;
   p2 = p1+1;
   Mp = p2+1;
-  sd = Mp+1;
+  //  sd = Mp+1;
 
 #ifndef NDEBUG
 #ifdef WITH_GPU
@@ -783,6 +783,9 @@ int g5QMR_fltacc( g5QMR_fltacc_par* par, spinor_operator M, spinor_field *in, sp
   
   lprintf("INVERTER",10,"g5QMR_fltacc: MVM (g5QMR_flt,g5QMR,MINRES) = %d ; %d ; %d\n",cgiter_flt,cgiter,cgiter_minres);
   
+  free_spinor_field_f(res);
+  free_spinor_field_f_flt(in_flt);
+
   return cgiter+cgiter_flt+cgiter_minres;
 }
 
