@@ -82,9 +82,11 @@ complex _FUNC(spinor_field_prod)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
   spinor_field_prod_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),resField,N);
   global_sum_complex_gpu<<<1,BLOCK_SIZE>>>(resField,resGPU,N);
     
-  // Copy result to device
+  // Copy result to host
   cudaMemcpy(&res,resGPU,sizeof(_COMPLEX),cudaMemcpyDeviceToHost);
-    
+  cudaFree(resField);
+  cudaFree(resGPU);
+  
   res_dbl.re=(double)res.re; res_dbl.im=(double)res.im; // CASTING TO DBL COMPLEX
   return res_dbl;		
 
