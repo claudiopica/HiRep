@@ -1,13 +1,14 @@
-FC = ifort -cxxlib -O2 -align -Zp16 -r8
-#FC = gfortran -O2
+FC = ifort 
+FOPT = -cxxlib -O2 -align -Zp16 -r8
+#Fc = gfortran -O2
+FSOURCES=su4dbl.f luesher.f
+FOBJECTS=$(FSOURCES:.f=.o)
+EXECUTABLE=su4dbl 
 
 TOPDIR = ..
 MKDIR=$(TOPDIR)/Make
 
-EXES = su4dbl
-
-default: $(EXES)
-
+default: all
 
 MODDIR := Random
 MODS := ranlxd
@@ -41,11 +42,20 @@ MODDIR := Observables
 MODS := avr_plaquette
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
-$(EXES): %: %.o $(MOD_OBJS)
-	echo -n Linking [$@]... 
-	$(FC) -o $@ luesher.f $< $(MOD_OBJS) &&\
+all: $(FSOURCES) $(EXECUTABLE)
+
+tidy: 
+	rm $(EXECUTABLE) *.o
+
+%.o: %.f 
+	echo -n Compiling [$@]... 
+	$(FC) $(FOPT) -c $< -o $@ &&\
 	echo " done." || echo " failed."
 
+$(EXECUTABLE): $(FOBJECTS) $(MOD_OBJS)
+	echo -n Linking [$@]... 
+	$(FC) $(FOBJECTS) $(MOD_OBJS) -o su4dbl &&\
+	echo " done." || echo " failed."
 
 include $(MKDIR)/MkRules
 

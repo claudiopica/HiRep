@@ -57,8 +57,8 @@ void read_gauge_field_ascii(char filename[])
 	  tmpmat.c[gamma*NG+alpha].im=im;
 	  counter++;
 	}
-      *pu_gauge(ipt(g[0]+1,g[1]-1,g[2]-1,g[3]-1),mu)=tmpmat;
-      Vdone[g[0]+1][g[1]-1][g[2]-1][g[3]-1][mu]=1; 
+      *pu_gauge(ipt((g[0]+1)%GLB_T,g[1]-1,g[2]-1,g[3]-1),mu)=tmpmat;
+      Vdone[(g[0]+1)%GLB_T][g[1]-1][g[2]-1][g[3]-1][mu]=1; 
     }
   }
   

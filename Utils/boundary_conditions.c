@@ -34,7 +34,7 @@ void apply_bc(){
     }
   }
 #elif defined(ROTATED_SF)
-  if(COORD[0] == 0) {
+   if(COORD[0] == 0) {
     int index;
     int ix,iy,iz;
     suNf *u;
@@ -270,8 +270,7 @@ void SF_spinor_bcs_flt(spinor_field_flt *sp)
   }
 
 #else 
-  int ix,iy,iz,index;
-  
+  int ix,iy,iz,index; 
   if(COORD[0] == 0) {
     for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
       index=ipt(0,ix,iy,iz);
@@ -308,13 +307,7 @@ double SF_test_spinor_bcs(spinor_field *sp) {
   return pa/(double)(GLB_X*GLB_Y*GLB_Z*(4*NF)*(3));
 }
 
-#endif /* BASIC_SF */
 
-
-
-
-
-#if defined(BASIC_SF) || defined(ROTATED_SF)
 /*We should test if the use of even/odd could give any performance benefit*/
 void SF_force_bcs(suNg_av_field *force) {
   int ix,iy,iz,index;
@@ -344,8 +337,6 @@ void SF_force_bcs(suNg_av_field *force) {
   }
   
 }
-
-
 
 
 double SF_test_force_bcs(suNg_av_field *force) {
@@ -378,9 +369,6 @@ double SF_test_force_bcs(suNg_av_field *force) {
   global_sum(&pa, 1);
   return pa/(double)(GLB_X*GLB_Y*GLB_Z*(NG*NG-1)*(4+4+3));
 }
-
-
-#endif /* BASIC_SF || ROTATED_SF */
 
 
 
@@ -530,3 +518,4 @@ double SF_test_gauge_bcs()
   return pa/(double)(GLB_X*GLB_Y*GLB_Z*NG*(6+6+3));
 }
 
+#endif /* BASIC_SF || ROTATED_SF */

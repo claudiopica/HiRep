@@ -8,7 +8,11 @@
 #include "utils.h"
 #include <math.h>
 
-
+#ifdef ROTATED_SF
+#include "suN.h"
+#include "update.h"
+extern rhmc_par _update_par; /* Update/update_rhmc.c */
+#endif
 
 #define XG(m,a,b) ((m)+(a)*NG+(b))
 #define XF(m,a,b) ((m)+(a)*NF+(b))
@@ -340,30 +344,66 @@ void represent_gauge_field() {
   int mu;
   suNf *Ru;
   suNg *u;
+#ifdef ROTATED_SF
+  suNf Rtmp;
+  complex phase[3];
+  phase[0].re=cos(_update_par.SF_theta/GLB_X);
+  phase[0].im=sin(_update_par.SF_theta/GLB_X);
+  phase[1].re=cos(_update_par.SF_theta/GLB_Y);
+  phase[1].im=sin(_update_par.SF_theta/GLB_Y);
+  phase[2].re=cos(_update_par.SF_theta/GLB_Z);
+  phase[2].im=sin(_update_par.SF_theta/GLB_Z);
+#endif /*ROTATED_SF*/
+
 
   /* loop on local lattice first */
   for(ip=0;ip<glattice.local_master_pieces;ip++)
-    for(ix=glattice.master_start[ip];ix<=glattice.master_end[ip];ix++)
+    for(ix=glattice.master_start[ip];ix<=glattice.master_end[ip];ix++){
+#ifndef ROTATED_SF
       for (mu=0;mu<4;mu++) {
         u=pu_gauge(ix,mu);
         Ru=pu_gauge_f(ix,mu);
         _group_represent2(Ru,u); 
         /*_group_represent(*Ru,*u);*/
       }
+#else /*ROTATED_SF*/
+      u=pu_gauge(ix,0);
+  Ru=pu_gauge_f(ix,0);
+  _group_represent2(Ru,u); 
+  for (mu=1;mu<4;mu++) {
+    u=pu_gauge(ix,mu);
+        Ru=pu_gauge_f(ix,mu);
+        _group_represent2(&Rtmp,u); 
+ 	_suNf_mulc(*Ru,phase[mu-1],Rtmp); 
+  }	
+#endif /*ROTATED_SF*/
+    }
 
   /* wait gauge field transfer */
   complete_gf_sendrecv(u_gauge);
 
   /* loop on the rest of master sites */
   for(ip=glattice.local_master_pieces;ip<glattice.total_master_pieces;ip++)
-    for(ix=glattice.master_start[ip];ix<=glattice.master_end[ip];ix++)
+    for(ix=glattice.master_start[ip];ix<=glattice.master_end[ip];ix++){
+#ifndef ROTATED_SF
       for (mu=0;mu<4;mu++) {
         u=pu_gauge(ix,mu);
         Ru=pu_gauge_f(ix,mu);
         _group_represent2(Ru,u); 
-        /*_group_represent(*Ru,*u);*/
+	/*_group_represent(*Ru,*u);*/
       }
-
+#else /*ROTATED_SF*/
+      u=pu_gauge(ix,0);
+      Ru=pu_gauge_f(ix,0);
+      _group_represent2(Ru,u); 
+      for (mu=1;mu<4;mu++) {
+        u=pu_gauge(ix,mu);
+        Ru=pu_gauge_f(ix,mu);
+        _group_represent2(&Rtmp,u); 
+	_suNf_mulc(*Ru,phase[mu-1],Rtmp); 
+      }	
+#endif /*ROTATED_SF*/
+    }
   apply_bc();
 #else
   static int first_time=1;

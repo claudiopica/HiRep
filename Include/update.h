@@ -47,11 +47,13 @@ typedef struct _rhmc_par {
   int nf;
   double mass;
   
-	double SF_zf;
-	double SF_ds;
-	int SF_sign;
-	double SF_ct;
-	
+  double SF_zf;
+  double SF_ds;
+  int SF_sign;
+  double SF_ct;
+  double SF_theta;
+  
+
   double MT_prec; /* metropolis test precision */
   double MD_prec; /* molecular dynamics precision */
   double HB_prec; /* heatbath precision for pseudofermions */

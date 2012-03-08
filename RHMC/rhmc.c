@@ -38,7 +38,7 @@
 
 /* Mesons parameters */
 typedef struct _input_mesons {
-  int domes;
+  char make[256];
   double precision;
   int nhits;
 
@@ -49,77 +49,70 @@ typedef struct _input_mesons {
 
 #define init_input_mesons(varname) \
 { \
-  .domes=0,\
   .read={\
-    {"do mesons", "mes:domes = %d", INT_T, &(varname).domes},\
+    {"make mesons", "mes:make = %s", STRING_T, (varname).make},\
     {"inverter precision", "mes:precision = %lf", DOUBLE_T, &(varname).precision},\
-    {"number of inversions per cnfg", "mes:nhits = %d", INT_T, &(varname).nhits},\
+    {"number of noisy sources per cnfg", "mes:nhits = %d", INT_T, &(varname).nhits},\
     {NULL, NULL, 0, NULL}\
   }\
 }
 
+
 input_mesons mes_var = init_input_mesons(mes_var);
 
-void inline_mk_mesons(double *m, int nm, double prec) {
-    int k, n, g0[4];
-    spinor_field **pta_qprop=0;
-    double* tricorr;
+/* Polyakov-loop parameters */
+typedef struct _input_polyakov {
+  char make[256];
 
-    tricorr=(double*)malloc(GLB_T*sizeof(double));
-    pta_qprop=(spinor_field**)malloc(sizeof(spinor_field*)*nm);
-    pta_qprop[0]=alloc_spinor_field_f(4*NF*nm,&glattice);
+  /* for the reading function */
+  input_record_t read[2];
 
-    for(k=0;k<nm;++k)
-	    pta_qprop[k]=pta_qprop[0]+4*NF*k;
+} input_polyakov;
 
-    g0[0]=rand()%GLB_T; g0[1]=rand()%GLB_X; g0[2]=rand()%GLB_Y; g0[3]=rand()%GLB_Z;
-    if((g0[0]+g0[1]+g0[2]+g0[3])%2!=0)
-	    g0[3]=(g0[3]+1)%GLB_Z;
-
-    bcast_int(g0,4);
-
-    lprintf("MAIN",0,"PTA meson source in (%d,%d,%d,%d)\n",g0[0],g0[1],g0[2],g0[3]);
-
-    pta_qprop_QMR_eo(g0, pta_qprop, nm, m, prec);
-
-    for (k=0;k<nm;++k){
-
-#define CORR(name) \
-	    name##_correlator(tricorr, g0[0], pta_qprop[k]);\
-	    lprintf("MAIN",0,"conf #0 mass=%2.6f TRIPLET " #name "= ",m[k]);\
-	    for(n=0;n<GLB_T;++n) {\
-		    lprintf("MAIN",0,"%e ",tricorr[n]);\
-	    }\
-	    lprintf("MAIN",0,"\n");\
-	    fflush(stdout)
-
-	    CORR(id);
-	    CORR(g5);
-	    CORR(g0);
-	    CORR(g0g5);
-	    CORR(g1);
-	    CORR(g2);
-	    CORR(g3);
-	    CORR(g0g1);
-	    CORR(g0g2);
-	    CORR(g0g3);
-	    CORR(g5g1);
-	    CORR(g5g2);
-	    CORR(g5g3);
-	    CORR(g0g5g1);
-	    CORR(g0g5g2);
-	    CORR(g0g5g3);
-	    CORR(g5_g0g5_re);
-	    CORR(g5_g0g5_im);
-
-    }
-#undef CORR
-
-  free_spinor_field(pta_qprop[0]);
-  free(pta_qprop);
-  free(tricorr);
-
+#define init_input_polyakov(varname) \
+{ \
+  .read={\
+    {"make polyakov loops", "poly:make = %s", STRING_T, (varname).make},\
+    {NULL, NULL, 0, NULL}\
+  }\
 }
+
+
+input_polyakov poly_var = init_input_polyakov(poly_var);
+
+
+/* Lowest-eigenvalue parameters */
+typedef struct _input_eigval {
+  char make[256];
+  int nevt; /* search space dimension */
+  int nev; /* number of accurate eigenvalues */
+  int kmax; /* max degree of polynomial */
+  int maxiter; /* max number of subiterations */
+  double omega1; /* absolute precision */
+  double omega2; /* relative precision */
+
+  /* for the reading function */
+  input_record_t read[8];
+
+} input_eigval;
+
+#define init_input_eigval(varname) \
+{ \
+  .read={\
+    {"make lowest eigenvalues", "eva:make = %s", STRING_T, (varname).make},\
+    {"search space dimension", "eva:nevt = %d", INT_T, &(varname).nevt},\
+    {"number of accurate eigenvalues", "eva:nev = %d", INT_T, &(varname).nev},\
+    {"max degree of polynomial", "eva:kmax = %d", INT_T, &(varname).kmax},\
+    {"max number of subiterations", "eva:maxiter = %d", INT_T, &(varname).maxiter},\
+    {"absolute precision", "eva:omega1 = %lf", DOUBLE_T, &(varname).omega1},\
+    {"relative precision", "eva:omega2 = %lf", DOUBLE_T, &(varname).omega2},\
+    {NULL, NULL, 0, NULL}\
+  }\
+}
+
+input_eigval eigval_var = init_input_eigval(eigval_var);
+
+
 
 /* flow control variable */
 rhmc_flow flow=init_rhmc_flow(flow);
@@ -138,6 +131,14 @@ void read_cmdline(int argc, char* argv[]) {
   }
 
 }
+
+
+double h2evamass=0.;
+void H2eva(spinor_field *out, spinor_field *in){
+  g5Dphi_sq(h2evamass, out, in);
+}
+
+
 
 int main(int argc,char *argv[])
 {
@@ -166,6 +167,8 @@ int main(int argc,char *argv[])
   /* read input file */
   read_input(glb_var.read,"input_file");
   read_input(mes_var.read,"input_file");
+  read_input(poly_var.read,"input_file");
+  read_input(eigval_var.read,"input_file");
   
   if(glb_var.rlxd_state[0]!='\0')
   {
@@ -196,19 +199,41 @@ int main(int argc,char *argv[])
   /* test_geometry_mpi_eo(); */
   lprintf("MAIN",0,"Geometry buffers: %d\n",glattice.nbuffers);
 
+  if(strcmp(mes_var.make,"true")==0) {
+    lprintf("MAIN",0,"Inverter precision for mesons = %e\n",mes_var.precision);
+    lprintf("MAIN",0,"Number of noisy sources for mesons per cnfg = %d\n",mes_var.nhits);
+  }
+
+  if(strcmp(eigval_var.make,"true")==0) {
+    lprintf("MAIN",0,"EVA Search space dimension  (eva:nevt) = %d\n",eigval_var.nevt);
+    lprintf("MAIN",0,"EVA Number of accurate eigenvalues (eva:nev) = %d\n",eigval_var.nev);
+    lprintf("MAIN",0,"EVA Max degree of polynomial (eva:kmax) = %d\n",eigval_var.kmax);
+    lprintf("MAIN",0,"EVA Max number of subiterations (eva:maxiter) = %d\n",eigval_var.maxiter);
+    lprintf("MAIN",0,"EVA Absolute precision  (eva:omega1) = %e\n",eigval_var.omega1);
+    lprintf("MAIN",0,"EVA Relative precision (eva:omega2) = %e\n",eigval_var.omega2);
+  }
+
   /* Init Monte Carlo */
   init_mc(&flow, "input_file");
   lprintf("MAIN",0,"MVM during RHMC initialzation: %ld\n",getMVM());
   lprintf("MAIN",0,"Initial plaquette: %1.8e\n",avr_plaquette());
+
+#if defined(ROTATED_SF) || defined(BASIC_SF)
   lprintf("MAIN",0,"Initial SF_action: %1.8e\n",SF_action((&flow)->rhmc_v->rhmc_p.beta));
-#ifdef BASIC_SF
 #ifndef NDEBUG
   lprintf("MAIN",0,"Initial SF_test_gauge_bcs: %1.8e\n",SF_test_gauge_bcs());
 #endif /*NDEBUG*/
-#endif /* BASIC_SF */
+#endif /* defined(ROTATED_SF) || defined(BASIC_SF) */
 
-  mass=flow.rhmc_v->rhmc_p.mass;
+  h2evamass=mass=flow.rhmc_v->rhmc_p.mass;
 
+  double *eva_vals=NULL;
+  spinor_field *eva_vecs=NULL;
+  if(strcmp(eigval_var.make,"true")==0) {
+    eva_vals=malloc(sizeof(double)*eigval_var.nevt);
+    eva_vecs=alloc_spinor_field_f(eigval_var.nevt,&glattice);
+  }
+  
   rc=acc=0;
   for(i=flow.start;i<flow.end;++i) {
     int rr;
@@ -241,31 +266,49 @@ int main(int argc,char *argv[])
 
 #ifdef BASIC_SF
     lprintf("MAIN",0,"SF action: %1.8e\n",SF_action((&flow)->rhmc_v->rhmc_p.beta));
-#ifndef NDEBUG
-      lprintf("MAIN",0,"SF_test_gauge_bcs: %1.8e\n",SF_test_gauge_bcs());
-#endif /*NDEBUG*/
 #endif /* BASIC_SF */
 
     if((i%flow.meas_freq)==0) {
       /* plaquette */
       lprintf("MAIN",0,"Plaquette: %1.8e\n",avr_plaquette());
-#ifdef BASIC_SF
 
-    gettimeofday(&start,0);
-	    
-    lprintf("MAIN",0,"PCAC mass: %1.8e\n",SF_PCAC_wall_mass((&flow)->rhmc_v->rhmc_p.mass));
-	    
-    gettimeofday(&end,0);
-    timeval_subtract(&etime,&end,&start);
-    lprintf("MAIN",0,"SF Propagators generated in [%ld sec %ld usec]\n",etime.tv_sec,etime.tv_usec);
 
-#endif /* BASIC_SF */
+#if defined(ROTATED_SF) || defined(BASIC_SF)
+    lprintf("MAIN",0,"SF action: %1.8e\n",SF_action((&flow)->rhmc_v->rhmc_p.beta));
+	    
+    /* lprintf("MAIN",0,"PCAC mass: %1.8e\n",SF_PCAC_wall_mass((&flow)->rhmc_v->rhmc_p.mass)); */
+
+#ifndef NDEBUG
+      lprintf("MAIN",0,"SF_test_gauge_bcs: %1.8e\n",SF_test_gauge_bcs());
+#endif /*NDEBUG*/
+
+#endif /* defined(ROTATED_SF) || defined(BASIC_SF) */
 
       /* Mesons */
-      if (mes_var.domes) {
-        int nn;
-        for (nn=0;nn<mes_var.nhits;++nn) {
-          inline_mk_mesons(&mass,1,mes_var.precision);
+      if(strcmp(mes_var.make,"true")==0) {
+        z2semwall_mesons(i,mes_var.nhits,1,&(flow.rhmc_v->rhmc_p.mass),mes_var.precision);
+      }
+
+      /* Polyakov loops */
+      if(strcmp(poly_var.make,"true")==0) {
+        polyakov();
+      }
+      
+      /* Lowest eigenvalues */
+      if(strcmp(eigval_var.make,"true")==0) {
+        double max;
+        max_H(&H2eva, &glattice, &max);
+        max*=1.1;
+        
+        int status;
+        int ie=eva(eigval_var.nev, eigval_var.nevt, 0, eigval_var.kmax, eigval_var.maxiter, max, eigval_var.omega1, eigval_var.omega2, &H2eva, eva_vecs, eva_vals, &status);
+        while (ie!=0) { /* if failed restart EVA */
+          lprintf("MAIN",0,"Restarting EVA!\n");
+          ie=eva(eigval_var.nev, eigval_var.nevt, 2, eigval_var.kmax, eigval_var.maxiter, max, eigval_var.omega1, eigval_var.omega2, &H2eva, eva_vecs, eva_vals, &status);
+        }
+  
+        for (int n=0;n<eigval_var.nev;++n) {
+          lprintf("LOWEIG",0,"Eig %d = %1.15e\n",n,eva_vecs[n]);
         }
       }
     }

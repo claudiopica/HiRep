@@ -241,6 +241,7 @@ int init_mc(rhmc_flow *rf, char *ifile) {
     case 2:
       random_u(u_gauge);
       break;
+#if defined(BASIC_SF) || defined(ROTATED_SF)
     case 3:
       unit_u(u_gauge);
       SF_gauge_bcs(u_gauge,0);
@@ -257,6 +258,7 @@ int init_mc(rhmc_flow *rf, char *ifile) {
       random_u(u_gauge);
       SF_gauge_bcs(u_gauge,1);
       break;
+#endif
   }
   represent_gauge_field();
   

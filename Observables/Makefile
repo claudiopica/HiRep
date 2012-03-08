@@ -1,7 +1,7 @@
 TOPDIR = ..
 MKDIR = $(TOPDIR)/Make
 
-SRCS = avr_plaquette.c pta_qprop.c mesons.c g5QMR_trunc.c trunc_hairpin.c wilsonloops.c polyakov.c z2semwall.c sf_action.c sf_pcac.c
+SRCS = avr_plaquette.c pta_qprop.c mesons.c g5QMR_trunc.c trunc_hairpin.c wilsonloops.c polyakov.c z2semwall.c #sf_action.c sf_pcac.c
 
 include $(MKDIR)/MkRules
 

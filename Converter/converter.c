@@ -36,6 +36,10 @@
 #error Please compile without MPI!
 #endif
 
+#if defined(BASIC_SF) || defined(ROTATED_SF)
+#error Please compile without SF conditions!
+#endif
+
 #define true (0==0)
 #define false (0==1)
 

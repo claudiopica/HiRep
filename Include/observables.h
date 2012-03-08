@@ -26,9 +26,10 @@ double avr_plaquette();
 double SF_action(double beta);
 double local_plaq(int ix);
 void full_plaquette();
-double SF_PCAC_wall_mass(double mass);
+double SF_PCAC_wall_mass(double mass,double ** corr);
+void SF_quark_propagator(spinor_field *in, double mass, spinor_field *out, double acc);
 
-void polyakov(int mu);
+void polyakov();
 
 void pta_qprop_QMR_eo(int g0[4], spinor_field **pta_qprop, int nm, double *m, double acc);
 void pta_qprop_QMR(int g0[4], spinor_field **pta_qprop, int nm, double *m, double acc);
