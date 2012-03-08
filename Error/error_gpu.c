@@ -1,5 +1,4 @@
 // Enable this for error checking
-//#define CUDA_CHECK_ERROR
 
 #include "error.h"
 #include "gpu.h"
@@ -62,6 +61,5 @@ inline void __cudaCheckError( const char *file, const int line )
     return;
 }
 
-#undef CUDA_CHECK_ERROR
 
 #endif
