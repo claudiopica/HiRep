@@ -13,16 +13,17 @@
 //		float elapsedTime=gpuTimerStop(gpu_event);
 #ifdef WITH_GPU
 #include "gpu.h"
+#include "utils.h"
 
 
-cudaEvent_t gpuTimerStart(){
+gpu_timer gpuTimerStart(){
 	cudaEvent_t e;	
 	cudaEventCreate(&e);	
 	cudaEventRecord(e,0);
 	return e;
 }
 
-float gpuTimerMeasure(cudaEvent_t e){
+float gpuTimerMeasure(gpu_timer e){
 	float t;
 	cudaEvent_t stop;	
 	cudaEventCreate(&stop);  
@@ -33,7 +34,7 @@ float gpuTimerMeasure(cudaEvent_t e){
 	return t;
 }
 
-float gpuTimerStop(cudaEvent_t e){
+float gpuTimerStop(gpu_timer e){
 	float t;
 	cudaEvent_t stop;	
 	cudaEventCreate(&stop);

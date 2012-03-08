@@ -233,8 +233,6 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
 #ifdef WITH_GPU //Do rest of the calculation at CPU
     spinor_field_copy_from_gpu_f(Xs);
     spinor_field_copy_from_gpu_f(Ys);
-    spinor_field_copy_from_gpu_f(Xo);
-    spinor_field_copy_from_gpu_f(Yo);
 #endif //WITH_GPU
 
     lprintf("FORCE",50,"|X| = %1.8e |Y| = %1.8e\n",
