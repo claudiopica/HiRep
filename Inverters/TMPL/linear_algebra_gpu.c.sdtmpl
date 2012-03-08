@@ -4,12 +4,13 @@
 \***************************************************************************/
 
 #include "communications.h"
-#include "linear_algebra_gpu.cu"
 #include "gpu.h"
 
 #define _TOCOMPLEX(sp) ((_COMPLEX *)(sp))
 #define _NCOM (sizeof(_SPINOR_TYPE)/sizeof(_COMPLEX))
 #define GSUM_BLOCK_SIZE 1024
+
+#include "linear_algebra_gpu.cu"
 
 /* Re <s1,s2> */
 double _FUNC(spinor_field_prod_re)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
