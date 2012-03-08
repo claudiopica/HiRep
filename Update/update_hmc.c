@@ -201,6 +201,10 @@ int update_hmc(){
     
     /* compute H2^{1/2}*pf = H*pf */
     lprintf("HMC",30,"Correcting pseudofermions distribution...\n");
+#ifdef WITH_GPU //Make sure gauge field is on GPU
+  gfield_copy_to_gpu_f(u_gauge_f); 
+  gfield_copy_to_gpu_f_flt(u_gauge_f_flt);
+#endif  
     for (i=0;i<_update_par.n_pf;++i) {
         spinor_field_copy_f(&pf[_update_par.n_pf],&pf[i]);
         H.dbl(&pf[i], &pf[_update_par.n_pf]);
