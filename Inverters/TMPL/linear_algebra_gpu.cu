@@ -19,14 +19,14 @@ __device__ void warpReduce(volatile REAL* sdata, int tid){
 
 //Global sum calculation
 template<typename REAL>
-__global__ void global_sum_gpu(REAL* in, REAL* out, int N){
-  __shared__ REAL sdata[BLOCK_SIZE];
+__global__ void global_sum_gpu(REAL* in, double* out, int N){
+  __shared__ double sdata[BLOCK_SIZE];
   int tid = threadIdx.x;
   int i;
   //  REAL res;
   sdata[tid]=in[tid];
   for (i=tid+BLOCK_SIZE;i<N;i+= BLOCK_SIZE){ // Sum over all blocks 
-    sdata[tid]+=in[i];
+    sdata[tid]+=(double)in[i];
   }
   __syncthreads();
   
@@ -54,8 +54,8 @@ __device__ void warpReduce_complex(volatile COMPLEX* sdata, int tid){
 
 //Global sum calculation
 template<typename COMPLEX>
-__global__ void global_sum_complex_gpu(COMPLEX* in, COMPLEX* out, int N){
-  __shared__ COMPLEX sdata[BLOCK_SIZE];
+__global__ void global_sum_complex_gpu(COMPLEX* in, complex* out, int N){
+  __shared__ complex sdata[BLOCK_SIZE];
   int tid = threadIdx.x;
   int i;
   //  REAL res;
