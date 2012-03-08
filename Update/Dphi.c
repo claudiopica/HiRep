@@ -56,15 +56,6 @@ void Dphi_(spinor_field *out, spinor_field *in)
    _DECLARE_INT_ITERATOR(ix);
    suNf *up,*um;
    suNf_vector psi,chi;
-	#ifdef TWISTED_DIRAC
-   suNf_vector tchi;
-		complex phasep;
-		phasep.re = cos(TWIST/GLB_X);
-		phasep.im = sin(TWIST/GLB_X);
-		complex phasem;
-		phasem.re = cos(TWIST/GLB_X);
-		phasem.im = -sin(TWIST/GLB_X);
-	#endif
    suNf_spinor *r=0,*sp,*sm;
 
    error((in==NULL)||(out==NULL),1,"Dphi_ [Dphi.c]",
@@ -133,23 +124,13 @@ void Dphi_(spinor_field *out, spinor_field *in)
        up=pu_gauge_f(ix,1);
       
        _vector_i_add_f(psi,(*sp).c[0],(*sp).c[3]);
-	#ifdef TWISTED_DIRAC
-			_suNf_multiply(tchi,(*up),psi);
-			_vector_mulc_f(chi,phasep,tchi);
-	#else
        _suNf_multiply(chi,(*up),psi);
-	#endif
 
        _vector_add_assign_f((*r).c[0],chi);
        _vector_i_sub_assign_f((*r).c[3],chi);
 
        _vector_i_add_f(psi,(*sp).c[1],(*sp).c[2]);
-	#ifdef TWISTED_DIRAC
-			_suNf_multiply(tchi,(*up),psi);
-			_vector_mulc_f(chi,phasep,tchi);
-	#else
        _suNf_multiply(chi,(*up),psi);
-	#endif
 
        _vector_add_assign_f((*r).c[1],chi);
        _vector_i_sub_assign_f((*r).c[2],chi);
@@ -161,23 +142,13 @@ void Dphi_(spinor_field *out, spinor_field *in)
        um=pu_gauge_f(iy,1);
       
        _vector_i_sub_f(psi,(*sm).c[0],(*sm).c[3]);
-	#ifdef TWISTED_DIRAC
-       _suNf_inverse_multiply(tchi,(*um),psi);
-			_vector_mulc_f(chi,phasem,tchi);
-	#else
        _suNf_inverse_multiply(chi,(*um),psi);
-	#endif
 
        _vector_add_assign_f((*r).c[0],chi);
        _vector_i_add_assign_f((*r).c[3],chi);
 
        _vector_i_sub_f(psi,(*sm).c[1],(*sm).c[2]);
-	#ifdef TWISTED_DIRAC
-       _suNf_inverse_multiply(tchi,(*um),psi);
-			_vector_mulc_f(chi,phasem,tchi);
-	#else
        _suNf_inverse_multiply(chi,(*um),psi);
-	#endif
 
        _vector_add_assign_f((*r).c[1],chi);
        _vector_i_add_assign_f((*r).c[2],chi);
@@ -189,23 +160,13 @@ void Dphi_(spinor_field *out, spinor_field *in)
        up=pu_gauge_f(ix,2);
       
        _vector_add_f(psi,(*sp).c[0],(*sp).c[3]);
-	#ifdef TWISTED_DIRAC
-       _suNf_multiply(tchi,(*up),psi);
-			_vector_mulc_f(chi,phasep,tchi);
-	#else
        _suNf_multiply(chi,(*up),psi);
-	#endif
 
        _vector_add_assign_f((*r).c[0],chi);
        _vector_add_assign_f((*r).c[3],chi);
 
        _vector_sub_f(psi,(*sp).c[1],(*sp).c[2]);
-	#ifdef TWISTED_DIRAC
-       _suNf_multiply(tchi,(*up),psi);
-			_vector_mulc_f(chi,phasep,tchi);
-	#else
        _suNf_multiply(chi,(*up),psi);
-	#endif
       
        _vector_add_assign_f((*r).c[1],chi);
        _vector_sub_assign_f((*r).c[2],chi);
@@ -217,23 +178,13 @@ void Dphi_(spinor_field *out, spinor_field *in)
        um=pu_gauge_f(iy,2);
       
        _vector_sub_f(psi,(*sm).c[0],(*sm).c[3]);
-	#ifdef TWISTED_DIRAC
-      _suNf_inverse_multiply(tchi,(*um),psi);
-			_vector_mulc_f(chi,phasem,tchi);
-	#else
        _suNf_inverse_multiply(chi,(*um),psi);
-	#endif
 
        _vector_add_assign_f((*r).c[0],chi);
        _vector_sub_assign_f((*r).c[3],chi);
 
        _vector_add_f(psi,(*sm).c[1],(*sm).c[2]);
-	#ifdef TWISTED_DIRAC
-      _suNf_inverse_multiply(tchi,(*um),psi);
-			_vector_mulc_f(chi,phasem,tchi);
-	#else
        _suNf_inverse_multiply(chi,(*um),psi);
-	#endif
       
        _vector_add_assign_f((*r).c[1],chi);
        _vector_add_assign_f((*r).c[2],chi);
@@ -245,23 +196,13 @@ void Dphi_(spinor_field *out, spinor_field *in)
        up=pu_gauge_f(ix,3);
       
        _vector_i_add_f(psi,(*sp).c[0],(*sp).c[2]);
-	#ifdef TWISTED_DIRAC
-      _suNf_multiply(tchi,(*up),psi);
-			_vector_mulc_f(chi,phasep,tchi);
-	#else
        _suNf_multiply(chi,(*up),psi);
-	#endif
 
        _vector_add_assign_f((*r).c[0],chi);
        _vector_i_sub_assign_f((*r).c[2],chi);
 
        _vector_i_sub_f(psi,(*sp).c[1],(*sp).c[3]);
-	#ifdef TWISTED_DIRAC
-      _suNf_multiply(tchi,(*up),psi);
-			_vector_mulc_f(chi,phasep,tchi);
-	#else
        _suNf_multiply(chi,(*up),psi);
-	#endif
 
        _vector_add_assign_f((*r).c[1],chi);
        _vector_i_add_assign_f((*r).c[3],chi);
@@ -273,23 +214,13 @@ void Dphi_(spinor_field *out, spinor_field *in)
        um=pu_gauge_f(iy,3);
       
        _vector_i_sub_f(psi,(*sm).c[0],(*sm).c[2]);
-	#ifdef TWISTED_DIRAC
-      _suNf_inverse_multiply(tchi,(*um),psi);
-			_vector_mulc_f(chi,phasem,tchi);
-	#else
        _suNf_inverse_multiply(chi,(*um),psi);
-	#endif
       
        _vector_add_assign_f((*r).c[0],chi);
        _vector_i_add_assign_f((*r).c[2],chi);
 
        _vector_i_add_f(psi,(*sm).c[1],(*sm).c[3]);
-	#ifdef TWISTED_DIRAC
-      _suNf_inverse_multiply(tchi,(*um),psi);
-			_vector_mulc_f(chi,phasem,tchi);
-	#else
        _suNf_inverse_multiply(chi,(*um),psi);
-	#endif
 
        _vector_add_assign_f((*r).c[1],chi);
        _vector_i_sub_assign_f((*r).c[3],chi);

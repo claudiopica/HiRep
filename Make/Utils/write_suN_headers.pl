@@ -174,8 +174,6 @@ END
 ##write_vector_copy();
 write_vector_zero();
 write_vector_minus();
-write_vector_i_minus();
-write_vector_i_plus();
 write_vector_mul();
 write_vector_mulc();
 write_vector_add();
@@ -240,7 +238,6 @@ write_suN_TA();
 
 write_suN_FMAT();
 
-write_suNr_mulc();
 if ($complex eq "R") { # we only need these functions at the moment...
     write_suNr_zero();
     write_suNr_FMAT();
@@ -269,10 +266,6 @@ END
 #write_spinor_copy();
 write_spinor_zero();
 write_spinor_g5();
-write_spinor_g0();
-write_spinor_g1();
-write_spinor_g2();
-write_spinor_g3();
 write_spinor_minus();
 write_spinor_mul();
 write_spinor_mulc();
@@ -297,26 +290,6 @@ write_spinor_project();
 write_spinor_pminus();
 write_spinor_pplus();
 
-print <<END
-/*******************************************************************************
-*
-* Macros for matrices of spinors
-*
-* Arguments are variables of 4*NF spinors
-*
-*******************************************************************************/
-
-END
-;
-if ($suff eq "f") {
-write_smatrix_trace();
-write_smatrix_traceg5();
-write_smatrix_gmu();
-write_smatrix_g5();
-#write_smatrix_m_n();
-#write_smatrix_mdag_n();
-#write_smatrix_m_ndag();
-}
 # COMMENTATO
 
 # print <<END
@@ -442,50 +415,6 @@ sub write_vector_minus {
 		print "      }\\\n";
 		for(my $i=0;$i<$vr;$i++){
 			print "      _complex_minus((r).$cname\[_i\],(s).$cname\[_i\]); ++_i; \\\n";
-		}
-		print "   }((void)0) \n\n";
-	}
-}
-
-sub write_vector_i_minus {
-  print "/* r=-i*s */\n";
-  print "#define _vector_i_minus_${suff}(r,s) \\\n";
-  if ($N<$Nmax or $N<(2*$unroll+1) ) { #unroll all
-		for(my $i=0;$i<$N;$i++){
-			print "   _complex_i_minus((r).$cname\[$i\],(s).$cname\[$i\])";
-			if($i==$N-1) { print "\n\n"; } else { print "; \\\n"; }
-		}
-	} else { #partial unroll
-		print "   {\\\n";
-		print "      int _i;for (_i=0; _i<$vd; ){\\\n";
-		for(my $i=0;$i<$unroll;$i++){
-			print "         _complex_i_minus((r).$cname\[_i\],(s).$cname\[_i\]); ++_i; \\\n";
-		}
-		print "      }\\\n";
-		for(my $i=0;$i<$vr;$i++){
-			print "      _complex_i_minus((r).$cname\[_i\],(s).$cname\[_i\]); ++_i; \\\n";
-		}
-		print "   }((void)0) \n\n";
-	}
-}
-
-sub write_vector_i_plus {
-  print "/* r=i*s */\n";
-  print "#define _vector_i_plus_${suff}(r,s) \\\n";
-  if ($N<$Nmax or $N<(2*$unroll+1) ) { #unroll all
-		for(my $i=0;$i<$N;$i++){
-			print "   _complex_i_plus((r).$cname\[$i\],(s).$cname\[$i\])";
-			if($i==$N-1) { print "\n\n"; } else { print "; \\\n"; }
-		}
-	} else { #partial unroll
-		print "   {\\\n";
-		print "      int _i;for (_i=0; _i<$vd; ){\\\n";
-		for(my $i=0;$i<$unroll;$i++){
-			print "         _complex_i_plus((r).$cname\[_i\],(s).$cname\[_i\]); ++_i; \\\n";
-		}
-		print "      }\\\n";
-		for(my $i=0;$i<$vr;$i++){
-			print "      _complex_i_plus((r).$cname\[_i\],(s).$cname\[_i\]); ++_i; \\\n";
 		}
 		print "   }((void)0) \n\n";
 	}
@@ -1718,29 +1647,6 @@ sub write_suN_mul {
 	}
 }
 
-sub write_suNr_mulc {
-  print "/* u=z*v (u,v mat, z complex) */\n";
-  print "#define _${rdataname}_mulc(u,z,v) \\\n";
-	my $dim=$N*$N;
-	if ($N<$Nmax or $dim<(2*$unroll+1)) { #unroll all 
-		for(my $i=0; $i<$dim; $i++) {
-			print "         _complex_mul((u).$cname\[$i\],(z),(v).$cname\[$i\])";
-			if($i==$dim-1) {print "\n\n";} else { print ";\\\n"; }
-		}
-	} else { #partial unroll
-		print "   {\\\n";
-		print "      int _i;for (_i=0; _i<$md2; ){\\\n";
-		for(my $i=0;$i<$unroll;$i++){
-			print "         _complex_mul((u).$cname\[_i\],(z),(v).$cname\[_i\]); ++_i;\\\n";
-		}
-		print "      }\\\n";
-		for(my $i=0;$i<$mr2;$i++){
-			print "      _complex_mul((u).$cname\[_i\],(z),(v).$cname\[_i\]); ++_i;\\\n";
-		}
-		print "   }((void)0) \n\n";
-	}
-}
-
 sub write_suNr_mul {
   print "/* u=r*v (u,v mat, r real) */\n";
   print "#define _${rdataname}_mul(u,r,v) \\\n";
@@ -2275,42 +2181,6 @@ sub write_spinor_g5 {
   }
 }
 
-sub write_spinor_g0 {
-  print "/*  s=g0*r (r,s spinors, g0 matrix) */\n";
-  print "#define _spinor_g0_${suff}(s,r) \\\n";
-  print "  _vector_minus_${suff}((s).$cname\[0\],(r).$cname\[2\]); \\\n";
-  print "  _vector_minus_${suff}((s).$cname\[1\],(r).$cname\[3\]); \\\n";
-  print "  _vector_minus_${suff}((s).$cname\[2\],(r).$cname\[0\]); \\\n";
-  print "  _vector_minus_${suff}((s).$cname\[3\],(r).$cname\[1\])\n\n";
-}
-
-sub write_spinor_g1 {
-  print "/*  s=g1*r (r,s spinors, g1 matrix) */\n";
-  print "#define _spinor_g1_${suff}(s,r) \\\n";
-  print "  _vector_i_minus_${suff}((s).$cname\[0\],(r).$cname\[3\]); \\\n";
-  print "  _vector_i_minus_${suff}((s).$cname\[1\],(r).$cname\[2\]); \\\n";
-  print "  _vector_i_plus_${suff}((s).$cname\[2\],(r).$cname\[1\]); \\\n";
-  print "  _vector_i_plus_${suff}((s).$cname\[3\],(r).$cname\[0\])\n\n";
-}
-
-sub write_spinor_g2 {
-  print "/*  s=g2*r (r,s spinors, g2 matrix) */\n";
-  print "#define _spinor_g2_${suff}(s,r) \\\n";
-  print "  _vector_minus_${suff}((s).$cname\[0\],(r).$cname\[3\]); \\\n";
-  print "  (s).$cname\[1\]=(r).$cname\[2\]; \\\n";
-  print "  (s).$cname\[2\]=(r).$cname\[1\]; \\\n";
-  print "  _vector_minus_${suff}((s).$cname\[3\],(r).$cname\[0\])\n\n";
-}
-
-sub write_spinor_g3 {
-  print "/*  s=g3*r (r,s spinors, g3 matrix) */\n";
-  print "#define _spinor_g3_${suff}(s,r) \\\n";
-  print "  _vector_i_minus_${suff}((s).$cname\[0\],(r).$cname\[2\]); \\\n";
-  print "  _vector_i_plus_${suff}((s).$cname\[1\],(r).$cname\[3\]); \\\n";
-  print "  _vector_i_plus_${suff}((s).$cname\[2\],(r).$cname\[0\]); \\\n";
-  print "  _vector_i_minus_${suff}((s).$cname\[3\],(r).$cname\[1\])\n\n";
-}
-
 sub write_spinor_minus {
   print "/*  s=-r (r,s spinors) */\n";
   print "#define _spinor_minus_${suff}(s,r) \\\n";
@@ -2537,95 +2407,6 @@ sub write_spinor_pplus {
   print "  _vector_mul_${suff}((r).$cname\[3\],-1.,(r).$cname\[1\])\n\n";
 }
 
-sub write_smatrix_trace {
-  print "/*  z=Tr(m) (z complex; m = matrix of 4*NF spinors) */\n";
-  print "#define _smatrix_trace_${suff}(z,m) \\\n";
-	print "  (z).re=0; \\\n";
-	print "  (z).im=0; \\\n";
-  for (my $a_d=0; $a_d<4; $a_d++){
-	  for (my $a_n=0; $a_n<$Nf; $a_n++){
-			my $a = $a_d*$Nf + $a_n;
-	    print "  _complex_add_assign((z),(m)\[$a\].$cname\[$a_d\].$cname\[$a_n\])";
-	    if($a==(4*$Nf-1)) {print"\n\n";} else {print "; \\\n"}
-		}
-  }
-}
-
-sub write_smatrix_traceg5 {
-  print "/*  z=Tr(g5m) (z complex; m = matrix of 4*NF spinors) */\n";
-  print "#define _smatrix_traceg5_${suff}(z,m) \\\n";
-	print "  (z).re=0; \\\n";
-	print "  (z).im=0; \\\n";
-  for (my $a_d=0; $a_d<4; $a_d++){
-	  for (my $a_n=0; $a_n<$Nf; $a_n++){
-			my $a = $a_d*$Nf + $a_n;
-	    if($a_d<2)
-			{
-		    print "  _complex_add_assign((z),(m)\[$a\].$cname\[$a_d\].$cname\[$a_n\])";
-			}
-			else
-			{
-		    print "  _complex_sub_assign((z),(m)\[$a\].$cname\[$a_d\].$cname\[$a_n\])";
-			}
-	    if($a==(4*$Nf-1)) {print"\n\n";} else {print "; \\\n"}
-		}
-  }
-}
-
-sub write_smatrix_gmu {
-for (my $mu=0; $mu<4; $mu++){	
-  print "/*  l=g${mu}*m  (l,m = matrix of 4*NF spinors) */\n";
-  print "#define _smatrix_g${mu}_${suff}(l,m) \\\n";
-  for (my $a_d=0; $a_d<4; $a_d++){
-	  for (my $a_n=0; $a_n<$Nf; $a_n++){
-			my $a = $a_d*$Nf + $a_n;
-	    print "  _spinor_g${mu}_${suff}((l)\[$a\],(m)\[$a\])";
-	    if($a==(4*$Nf-1)) {print"\n\n";} else {print "; \\\n"}
-		}
-  }
-  print "/*  l=g${mu}*m  (l = matrix of 4*NF spinors, m = pointer to matrix) */\n";
-  print "#define _smatrixp_g${mu}_${suff}(l,m) \\\n";
-  for (my $a_d=0; $a_d<4; $a_d++){
-	  for (my $a_n=0; $a_n<$Nf; $a_n++){
-			my $a = $a_d*$Nf + $a_n;
-	    print "  _spinor_g${mu}_${suff}((l)\[$a\],*((m)\[$a\]))";
-	    if($a==(4*$Nf-1)) {print"\n\n";} else {print "; \\\n"}
-		}
-  }
-}
-}
-
-sub write_smatrix_g5 {
-  print "/*  l=g5*m  (l,m = matrix of 4*NF spinors) */\n";
-  print "#define _smatrix_g5_${suff}(l,m) \\\n";
-  for (my $a_d=0; $a_d<4; $a_d++){
-	  for (my $a_n=0; $a_n<$Nf; $a_n++){
-			my $a = $a_d*$Nf + $a_n;
-	    print "  _spinor_g5_${suff}((l)\[$a\],(m)\[$a\])";
-	    if($a==(4*$Nf-1)) {print"\n\n";} else {print "; \\\n"}
-		}
-  }
-  print "/*  l=g5*m  (l = matrix of 4*NF spinors, m = pointer to matrix) */\n";
-  print "#define _smatrixp_g5_${suff}(l,m) \\\n";
-  for (my $a_d=0; $a_d<4; $a_d++){
-	  for (my $a_n=0; $a_n<$Nf; $a_n++){
-			my $a = $a_d*$Nf + $a_n;
-	    print "  _spinor_g5_${suff}((l)\[$a\],*((m)\[$a\]))";
-	    if($a==(4*$Nf-1)) {print"\n\n";} else {print "; \\\n"}
-		}
-  }
-
-  print "/*  m=g5*m  (m = matrix of 4*NF spinors) */\n";
-  print "#define _smatrix_g5_assign_${suff}(m) \\\n";
-  for (my $a_d=0; $a_d<4; $a_d++){
-	  for (my $a_n=0; $a_n<$Nf; $a_n++){
-			my $a = $a_d*$Nf + $a_n;
-	    print "  _spinor_g5_assign_${suff}((m)\[$a\])";
-	    if($a==(4*$Nf-1)) {print"\n\n";} else {print "; \\\n"}
-		}
-  }
-
-}
 
 sub write_vector_myrandom {
   print "/* random vector */\n";
