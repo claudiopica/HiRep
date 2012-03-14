@@ -54,7 +54,8 @@ void assign_sd2s(spinor_field_flt *out, spinor_field *in) {
 void assign_s2sd(spinor_field *out, spinor_field_flt *in) {
 
 	 int size, grid;
-	 size=4*2*NF*T*X*Y*Z;				// 4 spinor indices, 2 reals in complex, NF gauge indices
+	 size = in->type->master_end[0] -  in->type->master_start[0] + 1;
+	 size *= sizeof(suNf_spinor)/sizeof(double);				
 	 grid = size/BLOCK_SIZE + ((size % BLOCK_SIZE == 0) ? 0 : 1); 	// NF is defined in suN_types.h
 	 assign_s2sd_kernel<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), size);
 	 CudaCheckError();	
@@ -63,7 +64,8 @@ void assign_s2sd(spinor_field *out, spinor_field_flt *in) {
 void assign_sd2s(spinor_field_flt *out, spinor_field *in) {
 
 	 int size, grid;
-	 size=4*2*NF*T*X*Y*Z;
+	 size = in->type->master_end[0] -  in->type->master_start[0] + 1;
+	 size *= sizeof(suNf_spinor)/sizeof(double);				
 	 grid = size/BLOCK_SIZE + ((size % BLOCK_SIZE == 0) ? 0 : 1); 	// NF is defined in suN_types.h
 	 assign_sd2s_kernel<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), size);
 	 CudaCheckError();
