@@ -123,12 +123,12 @@ int main(int argc,char *argv[])
   
  t1 = gpuTimerStart();
   //	Allocates memory for cpu & gpu spinor field. 
-  sf1=alloc_spinor_field_f(sfsize, &glattice);
+ sf1=alloc_spinor_field_f(sfsize, &glattice);
 //  sf2=alloc_spinor_field_f(sfsize, &glattice);
-	elapsed = gpuTimerStop(t1);
-	lprintf("TEST",0,"Time for allocation: %1.10gms\n",elapsed);
-	
-	 t1 = gpuTimerStart();
+ elapsed = gpuTimerStop(t1);
+ lprintf("TEST",0,"Time for allocation: %1.10gms\n",elapsed);
+ 
+ t1 = gpuTimerStart();
 // CPU part set to gaussian
   for (i=0;i<sfsize;i++){
     gaussian_spinor_field(&sf1[i]);
@@ -145,32 +145,38 @@ int main(int argc,char *argv[])
   //  spinor_field_copy_f(&sf2[i],&sf1[i]);
 //    spinor_field_copy_f_cpu(&sf2[i],&sf1[i]);
   //}  
-	elapsed = gpuTimerStop(t1);
-	lprintf("TEST",0,"Time for Gaussian+cpy: %1.10gms\n",elapsed);
+  elapsed = gpuTimerStop(t1);
+  lprintf("TEST",0,"Time for Gaussian+cpy: %1.10gms\n",elapsed);
 	
 	
   
   //Check Gaussian Spinor Field
-  gaussian_spinor_field_cpu(&sf1[0]);
+  /*gaussian_spinor_field_cpu(&sf1[0]);
   res_cpu = spinor_field_sqnorm_f_cpu(&sf1[0]);
   for (i=0;i<sfsize;i++){ spinor_field_copy_to_gpu_f(&sf1[i]); }
   res_gpu = spinor_field_sqnorm_f(&sf1[0]);
-  lprintf("TEST",0,"Check gaussian_spinor_field\n gpu=%1.10g, cpu=%1.10g, \n gpu-cpu= %1.10g\n\n", res_gpu, res_cpu, res_gpu-res_cpu);
+  lprintf("TEST",0,"Check gaussian_spinor_field\n gpu=%1.10g, cpu=%1.10g, \n gpu-cpu= %1.10g\n\n", res_gpu, res_cpu, res_gpu-res_cpu);*/
 	
-	//Check spinor_field_prod_re
-//	for (i=0;i<sfsize;i++){ spinor_field_copy_to_gpu_f(&sf1[i]); }
-	res_gpu = spinor_field_prod_re_f(&sf1[0],&sf1[1]);
-	res_cpu = spinor_field_prod_re_f_cpu(&sf1[0],&sf1[1]);
-	res_gpu_opt = spinor_field_prod_re_opt_f(&sf1[0],&sf1[1]);
-	lprintf("TEST",0,"Check spinor_field_prod_re\n gpu=%1.10g, cpu=%1.10g, opt=%1.10g, \n opt-cpu= %1.10g\n\n",res_gpu,res_cpu,res_gpu_opt,res_gpu_opt-res_cpu);
-	
-	//Check spinor_field_prod_im
-//	for (i=0;i<sfsize;i++){ spinor_field_copy_to_gpu_f(&sf1[i]); }
-	res_gpu = spinor_field_prod_im_f(&sf1[0],&sf1[1]);
-	res_cpu = spinor_field_prod_im_f_cpu(&sf1[0],&sf1[1]);
-	res_gpu_opt = spinor_field_prod_im_opt_f(&sf1[0],&sf1[1]);
-	lprintf("TEST",0,"Check spinor_field_prod_im\n gpu=%1.10g, cpu=%1.10g, opt=%1.10g, \n opt-cpu= %1.10g\n\n",res_gpu,res_cpu,res_gpu_opt,res_gpu_opt-res_cpu);
-	
+  //Check spinor_field_prod_re
+  //	for (i=0;i<sfsize;i++){ spinor_field_copy_to_gpu_f(&sf1[i]); }
+  //  res_gpu = spinor_field_prod_re_f(&sf1[0],&sf1[1]);
+  res_cpu = spinor_field_prod_re_f_cpu(&sf1[0],&sf1[1]);
+  t1 = gpuTimerStart();
+  res_gpu_opt = spinor_field_prod_re_opt_f(&sf1[0],&sf1[1]);
+  elapsed = gpuTimerStop(t1);
+  lprintf("TEST",0,"Check spinor_field_prod_re\n gpu=%1.10g, cpu=%1.10g, opt=%1.10g, \n opt-cpu= %1.10g\n\n",res_gpu,res_cpu,res_gpu_opt,res_gpu_opt-res_cpu);
+  lprintf("TEST",0,"Time: =%1.10g \n\n",elapsed);
+  	
+  //Check spinor_field_prod_im
+  //	for (i=0;i<sfsize;i++){ spinor_field_copy_to_gpu_f(&sf1[i]); }
+  //	res_gpu = spinor_field_prod_im_f(&sf1[0],&sf1[1]);
+  res_cpu = spinor_field_prod_im_f_cpu(&sf1[0],&sf1[1]);
+  t1 = gpuTimerStart();
+  res_gpu_opt = spinor_field_prod_im_opt_f(&sf1[0],&sf1[1]);
+  elapsed = gpuTimerStop(t1);
+  lprintf("TEST",0,"Check spinor_field_prod_im\n gpu=%1.10g, cpu=%1.10g, opt=%1.10g, \n opt-cpu= %1.10g\n\n",res_gpu,res_cpu,res_gpu_opt,res_gpu_opt-res_cpu);
+  lprintf("TEST",0,"Time: =%1.10g \n\n",elapsed);
+	/*	
 	//Check spinor_field_prod
 //	for (i=0;i<sfsize;i++){ spinor_field_copy_to_gpu_f(&sf1[i]); }
 	c_res_gpu = spinor_field_prod_f(&sf1[0],&sf1[1]);
@@ -201,9 +207,7 @@ int main(int argc,char *argv[])
 	res_gpu_opt = spinor_field_sqnorm_opt_f(&sf1[0]);
 	lprintf("TEST",0,"Check spinor_field_sqnorm\n gpu=%1.10g, cpu=%1.10g, opt=%1.10g, \n opt-cpu= %1.10g\n\n",res_gpu,res_cpu,res_gpu_opt,res_gpu_opt-res_cpu);
 	
-	
-	
-	
+
 	
 	int NumberOfRuns = 500;
 	
@@ -297,7 +301,7 @@ int main(int argc,char *argv[])
 	lprintf("TEST",0,"Time for optimized: %1.10gms\n\n",elapsed);
 	
 	
-	
+  */	
 	
 	
 	lprintf("TEST",0,"DONE!\n");

@@ -9,74 +9,13 @@
 
 #define _TOCOMPLEX(sp) ((_COMPLEX *)(sp))
 #define _NCOM (sizeof(_SPINOR_TYPE)/sizeof(_COMPLEX))
-#define GSUM_BLOCK_SIZE 256     // No more than 1024 on Tesla
-#define BLOCK_SIZE_REM 32
 
 #include "linear_algebra_gpu.cu"
 
-
-#ifndef NEXT_POW_TWO
-#define NEXT_POW_TWO
-unsigned int NextPow2( unsigned int n )
-{
-register unsigned int val = n;
-val--;
-val = (val >> 1) | val;
-val = (val >> 2) | val;
-val = (val >> 4) | val;
-val = (val >> 8) | val;
-val = (val >> 16) | val;
-return ++val; // Val is now the next highest power of 2.
-} 
-void global_reduction_sum(double* resField, unsigned int Npow2){
-  unsigned int new_gridDim 		= 	Npow2/GSUM_BLOCK_SIZE ;//(Npow2/(2*GSUM_BLOCK_SIZE) > 32767) ? 32768 : Npow2/GSUM_BLOCK_SIZE ;
-  unsigned int new_N 			= 	Npow2;
-  
-  while(new_gridDim>1){
-//		printf(" \t new_gridDim/2 = %d \n", new_gridDim/2);
-		global_sum_gpu_opt<GSUM_BLOCK_SIZE><<<new_gridDim/2,GSUM_BLOCK_SIZE>>>(resField,resField,new_N);
-		new_N=new_gridDim/2;
-		new_gridDim=new_N/(GSUM_BLOCK_SIZE);
-		CudaCheckError(); 
-	}
-  if (new_N > 32){
-  //		printf(" \t Intermediate step:\n \t new_N/(BLOCK_SIZE_REM*2) = %d \n", new_N/(BLOCK_SIZE_REM*2));	
-  //	printf(" \t new_N = %d \n", new_N);
-		global_sum_gpu_opt<BLOCK_SIZE_REM><<<new_N/(BLOCK_SIZE_REM*2),BLOCK_SIZE_REM>>>(resField,resField,new_N);	
-		new_N=new_N/(BLOCK_SIZE_REM*2);
-		CudaCheckError(); 
-	}
-  if (new_N>1){
-		global_sum_gpu_remainder<32><<<1,32>>>(resField,new_N);
-		CudaCheckError(); 
-	}
-
+void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
+  _TWO_SPINORS_MATCHING(s1,s2);
+  cudaMemcpy(s1->gpu_ptr,s2->gpu_ptr,s1->type->gsize*sizeof(suNf_spinor),cudaMemcpyDeviceToDevice);
 }
-
-void global_reduction_complex_sum(complex* resField, unsigned int Npow2){
-  unsigned int new_gridDim 		= 	Npow2/GSUM_BLOCK_SIZE;
-  unsigned int new_N 			= 	Npow2;
-  
-  while(new_gridDim>1){
-		global_complex_sum_gpu_opt<GSUM_BLOCK_SIZE><<<new_gridDim/2,GSUM_BLOCK_SIZE>>>(resField,resField,new_N);
-		new_N=new_gridDim/2;
-		new_gridDim=new_N/(GSUM_BLOCK_SIZE);
-		CudaCheckError(); 
-	}
-	if (new_N > 32){
-		global_complex_sum_gpu_opt<BLOCK_SIZE_REM><<<new_N/(BLOCK_SIZE_REM*2),BLOCK_SIZE_REM>>>(resField,resField,new_N);	
-		new_N=new_N/(BLOCK_SIZE_REM*2);
-		CudaCheckError(); 
-	}
-	if (new_N>1){
-		global_complex_sum_gpu_remainder<32><<<1,32>>>(resField,new_N);
-		CudaCheckError(); 
-	}
-	
-}
-
-#endif
-
 
 
 /* Re <s1,s2> */
@@ -86,13 +25,14 @@ double _FUNC(spinor_field_prod_re_opt)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYP
   
   unsigned int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1; 
   N *= _NCOM;
-  unsigned int Npow2 =NextPow2(N);
+  unsigned int Npow2 =NextPow2(N)/2;
   
   // Allocate temp field
   double *resField;								// resulting scalar field when dotting each spinor
+  int grid_size = Npow2/BLOCK_SIZE;
   cudaMalloc((void **) &resField,Npow2*sizeof(*resField));
-  
-  spinor_field_prod_re_padded_gpu<<<Npow2/BLOCK_SIZE,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),resField,N);
+
+  spinor_field_prod_re_padded_gpu<<<grid_size,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),resField,N);
   CudaCheckError();   
   global_reduction_sum(resField,Npow2);
 

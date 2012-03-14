@@ -36,28 +36,33 @@ double beta;
 static double hmass=0.1;
 
 
-void D(spinor_field *out, spinor_field *in){
+void D_dbl(spinor_field *out, spinor_field *in){
    Dphi(hmass,out,in);
 }
 
-void H(spinor_field *out, spinor_field *in){
+void H_dbl(spinor_field *out, spinor_field *in){
    g5Dphi(hmass,out,in);
 }
 
 static spinor_field *tmp;
 
 
-void M(spinor_field *out, spinor_field *in){
+void M_dbl(spinor_field *out, spinor_field *in){
    g5Dphi(-hmass,tmp,in); 
    g5Dphi(-hmass,out,tmp);
 }
 
 static spinor_field_flt *tmp_flt;
 
-void F(spinor_field_flt *out, spinor_field_flt *in){
+void M_flt(spinor_field_flt *out, spinor_field_flt *in){
    g5Dphi_flt(-hmass,tmp_flt,in); 
    g5Dphi_flt(-hmass,out,tmp_flt);
 }
+
+
+spinor_operator D={&D_dbl,NULL}; 
+spinor_operator H={&H_dbl,NULL}; 
+spinor_operator M={&M_dbl,&M_flt}; 
 
 
 int main(int argc,char *argv[])
@@ -163,11 +168,11 @@ int main(int argc,char *argv[])
    lprintf("CG TEST",0,"---------------------\n");
 
    t1 = gpuTimerStart();   
-   cgiters = cg_mshift(&par, &M, s1, res);
+   cgiters = cg_mshift(&par, M, s1, res);
    elapsed = gpuTimerStop(t1);
    lprintf("CG TEST",0,"Converged in %d iterations\n",cgiters);
    for(i=0;i<par.n;++i){
-     M(s2,&res[i]);
+     M.dbl(s2,&res[i]);
      spinor_field_mul_add_assign_f(s2,-par.shift[i],&res[i]);
      spinor_field_sub_assign_f(s2,s1);
      tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
@@ -177,13 +182,13 @@ int main(int argc,char *argv[])
 
    lprintf("CG TEST",0,"\n\nTesting CG multishift with single precision acceleration\n");
    lprintf("CG TEST",0,"------------------------------------------------------------\n");
-
+   
    t1 = gpuTimerStart();
-   cgiters = cg_mshift_flt(&par, &M, &F,s1, res);
+   cgiters = cg_mshift_flt(&par, M, s1, res);
    elapsed = gpuTimerStop(t1);
    lprintf("CG TEST",0,"Converged in %d iterations\n",cgiters);
    for(i=0;i<par.n;++i){
-     M(s2,&res[i]);
+     M.dbl(s2,&res[i]);
      spinor_field_mul_add_assign_f(s2,-par.shift[i],&res[i]);
      spinor_field_sub_assign_f(s2,s1);
      tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
@@ -197,11 +202,11 @@ int main(int argc,char *argv[])
    lprintf("CG TEST",0,"------------------------------------------------------------\n");
 
    t1 = gpuTimerStart();
-   cgiters = cg_mshift_flt2(&par, &M, &F,s1, res);
+   cgiters = cg_mshift_flt2(&par, M, s1, res);
    elapsed = gpuTimerStop(t1);
    lprintf("CG TEST",0,"Converged in %d iterations\n",cgiters);
    for(i=0;i<par.n;++i){
-     M(s2,&res[i]);
+     M.dbl(s2,&res[i]);
      spinor_field_mul_add_assign_f(s2,-par.shift[i],&res[i]);
      spinor_field_sub_assign_f(s2,s1);
      tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);

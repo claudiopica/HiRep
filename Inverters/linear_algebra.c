@@ -15,7 +15,9 @@
  *
  */
 
-
+#ifdef WITH_GPU
+#include "TMPL/global_sum_gpu.c"
+#endif //WITH_GPU
 
 /* double precision */
 
@@ -26,26 +28,13 @@
 
 #define _FUNC(a) a##_f_cpu
 #include "TMPL/linear_algebra.c.sdtmpl"
-void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
-	_TWO_SPINORS_MATCHING(s1,s2);
-	memcpy(s1->ptr,s2->ptr,s1->type->gsize*sizeof(suNf_spinor));
-}
-
 #undef _FUNC
 #define _FUNC(a) a##_f
 
 #ifdef WITH_GPU
 #include "TMPL/linear_algebra_gpu.c.sdtmpl"
-void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
-	_TWO_SPINORS_MATCHING(s1,s2);
-	cudaMemcpy(s1->gpu_ptr,s2->gpu_ptr,s1->type->gsize*sizeof(suNf_spinor),cudaMemcpyDeviceToDevice);
-}
 #else
 #include "TMPL/linear_algebra.c.sdtmpl"
-void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
-	_TWO_SPINORS_MATCHING(s1,s2);
-	memcpy(s1->ptr,s2->ptr,s1->type->gsize*sizeof(suNf_spinor));
-}
 #endif //ifdef WITH_GPU
 
 
@@ -65,26 +54,13 @@ void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
 
 #define _FUNC(a) a##_f_flt_cpu
 #include "TMPL/linear_algebra.c.sdtmpl"
-void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
-	_TWO_SPINORS_MATCHING(s1,s2);
-	memcpy(s1->ptr,s2->ptr,s1->type->gsize*sizeof(suNf_spinor_flt));
-}
-
 #undef _FUNC
 #define _FUNC(a) a##_f_flt
 
 #ifdef WITH_GPU
 #include "TMPL/linear_algebra_gpu.c.sdtmpl"
-void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
-	_TWO_SPINORS_MATCHING(s1,s2);
-	cudaMemcpy(s1->gpu_ptr,s2->gpu_ptr,s1->type->gsize*sizeof(suNf_spinor_flt),cudaMemcpyDeviceToDevice);
-}
 #else //WITH_GPU
 #include "TMPL/linear_algebra.c.sdtmpl"
-void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
-	_TWO_SPINORS_MATCHING(s1,s2);
-	memcpy(s1->ptr,s2->ptr,s1->type->gsize*sizeof(suNf_spinor_flt));
-}
 #endif //ifdef WITH_GPU
 
 

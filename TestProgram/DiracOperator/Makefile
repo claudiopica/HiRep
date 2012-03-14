@@ -1,7 +1,7 @@
 TOPDIR = ../..
 MKDIR=$(TOPDIR)/Make
 
-EXES = check_diracoperator_1 check_diracoperator_2 check_diracoperator_3 check_diracoperator_1_gpu speed_test_diracoperator_gpu speed_test_diracoperator_evenodd_gpu speed_test_diracoperator_flt_gpu speed_test_diracoperator_evenodd_flt_gpu
+EXES = check_diracoperator_1 check_diracoperator_2 check_diracoperator_3 check_diracoperator_1_gpu speed_test_diracoperator_gpu speed_test_diracoperator_evenodd_gpu speed_test_diracoperator_flt_gpu speed_test_diracoperator_evenodd_flt_gpu speed_test_diracoperator_evenodd_flt_gpu_2
 
 default: $(EXES)
 
@@ -23,7 +23,7 @@ MODS := amalloc field_alloc spinor_field_alloc field_pack_gpu field_copy_gpu
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Random
-MODS := gauss random_suNg ranlxs ranlxd random_fields
+MODS := gauss random_suNg ranlxs ranlxd random_fields ranz2
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Update
