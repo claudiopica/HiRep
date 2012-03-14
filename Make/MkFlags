@@ -27,7 +27,7 @@ MACRO += -DWITH_QUATERNIONS
 ##### DEBUG ######
 ##################
 MACRO += -DNDEBUG
-#MACRO += -DCUDA_CHECK_ERROR
+MACRO += -DCUDA_CHECK_ERROR
 #MACRO += -DCHECK_SPINOR_MATCHING
 #MACRO += -DMPI_TIMING
 MACRO += -DIO_FLUSH
@@ -41,7 +41,7 @@ CFLAGS = -Wall -std=c99 -O2 -fomit-frame-pointer -mfpmath=sse -msse -msse2
 else #Compile with GPU
 CC = nvcc 
 CFLAGS = -O2 -Xcompiler '-std=c99 -fgcse-sm -fgcse-las -fgcse-after-reload'
-GPUFLAGS = --x cu -arch=sm_20 --use_fast_math -Xptxas -v  -Xptxas -dlcm=ca 
+GPUFLAGS = --x cu -arch=sm_20 --use_fast_math # -Xptxas -v  -Xptxas -dlcm=ca 
 #GPUFLAGS = --x cu -arch=sm_11 -Xptxas -v -Xptxas -dlcm=ca 
 endif
 

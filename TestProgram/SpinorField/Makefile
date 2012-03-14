@@ -1,7 +1,7 @@
 TOPDIR = ../..
 MKDIR=$(TOPDIR)/Make
 
-EXES = speed_flt_gpu speed_dbl_gpu check_spinorfield_gpu_1 check_spinorfield_gpu_1_flt speed_spinor_gpu_flt
+EXES = check_spinorfield_gpu_1 global_sum_gpu global_sum_gpu_flt #speed_flt_gpu speed_dbl_gpu check_spinorfield_gpu_1_flt speed_spinor_gpu_flt
 
 default: $(EXES)
 
@@ -27,7 +27,7 @@ MODS := avr_plaquette #mesons quark_propagator
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Random
-MODS := gauss random_suNg ranlxs ranlxd random_fields
+MODS := gauss random_suNg ranlxs ranlxd random_fields ranz2
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Update
