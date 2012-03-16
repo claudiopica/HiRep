@@ -6,28 +6,11 @@
 /* Re <s1,s2> */
 double _FUNC(spinor_field_prod_re)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2);
 
-/* OPTIMIZED Re <s1,s2> */
-double _FUNC(spinor_field_prod_re_opt)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2);
-
-/* Im <s1,s2> */
-double _FUNC(spinor_field_prod_im_opt)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2);
-
 /* <s1,s2> */
 complex _FUNC(spinor_field_prod_opt)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2);
 
-/* Re <g5*s1,s2> */
-double _FUNC(spinor_field_g5_prod_re_opt)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2);
-
-/* Im <g5*s1,s2> */
-double _FUNC(spinor_field_g5_prod_im_opt)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2);
-
 /* Re <s1,s1> */
 double _FUNC(spinor_field_sqnorm_opt)(_SPINOR_FIELD_TYPE *s1);
-
-
-
-
-
 
 /* Im <s1,s2> */
 double _FUNC(spinor_field_prod_im)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2);

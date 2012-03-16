@@ -35,6 +35,13 @@ static complex v[25];
 static double EPSILON=1.e-12;
 static spinor_field *ppk[5];
 
+double spinor_field_prod_re_old_f(spinor_field* s1, spinor_field* s2);
+double spinor_field_prod_im_old_f(spinor_field* s1, spinor_field* s2);
+double spinor_field_g5_prod_im_old_f(spinor_field* s1, spinor_field* s2);
+double spinor_field_g5_prod_re_old_f(spinor_field* s1, spinor_field* s2);
+complex spinor_field_prod_old_f(spinor_field* s1, spinor_field* s2);
+double spinor_field_sqnorm_old_f(spinor_field* s1);
+
 double sfdiff_gpu (spinor_field* sf){
   spinor_field *tmp;
   double res;
@@ -159,55 +166,53 @@ int main(int argc,char *argv[])
 	
   //Check spinor_field_prod_re
   //	for (i=0;i<sfsize;i++){ spinor_field_copy_to_gpu_f(&sf1[i]); }
-  //  res_gpu = spinor_field_prod_re_f(&sf1[0],&sf1[1]);
+  //  res_gpu = spinor_field_prod_re_old_f(&sf1[0],&sf1[1]);
   res_cpu = spinor_field_prod_re_f_cpu(&sf1[0],&sf1[1]);
   t1 = gpuTimerStart();
-  res_gpu_opt = spinor_field_prod_re_opt_f(&sf1[0],&sf1[1]);
+  res_gpu_opt = spinor_field_prod_re_f(&sf1[0],&sf1[1]);
   elapsed = gpuTimerStop(t1);
-  lprintf("TEST",0,"Check spinor_field_prod_re\n gpu=%1.10g, cpu=%1.10g, opt=%1.10g, \n opt-cpu= %1.10g\n\n",res_gpu,res_cpu,res_gpu_opt,res_gpu_opt-res_cpu);
+  lprintf("TEST",0,"Check spinor_field_prod_re\n old gpu=%1.10g, cpu=%1.10g, opt gpu=%1.10g, \n opt-cpu= %1.10g\n\n",res_gpu,res_cpu,res_gpu_opt,res_gpu_opt-res_cpu);
   lprintf("TEST",0,"Time: =%1.10g \n\n",elapsed);
   	
   //Check spinor_field_prod_im
   //	for (i=0;i<sfsize;i++){ spinor_field_copy_to_gpu_f(&sf1[i]); }
-  //	res_gpu = spinor_field_prod_im_f(&sf1[0],&sf1[1]);
+  //  res_gpu = spinor_field_prod_im_old_f(&sf1[0],&sf1[1]);
   res_cpu = spinor_field_prod_im_f_cpu(&sf1[0],&sf1[1]);
   t1 = gpuTimerStart();
-  res_gpu_opt = spinor_field_prod_im_opt_f(&sf1[0],&sf1[1]);
+  res_gpu_opt = spinor_field_prod_im_f(&sf1[0],&sf1[1]);
   elapsed = gpuTimerStop(t1);
   lprintf("TEST",0,"Check spinor_field_prod_im\n gpu=%1.10g, cpu=%1.10g, opt=%1.10g, \n opt-cpu= %1.10g\n\n",res_gpu,res_cpu,res_gpu_opt,res_gpu_opt-res_cpu);
   lprintf("TEST",0,"Time: =%1.10g \n\n",elapsed);
-	/*	
+  
 	//Check spinor_field_prod
 //	for (i=0;i<sfsize;i++){ spinor_field_copy_to_gpu_f(&sf1[i]); }
-	c_res_gpu = spinor_field_prod_f(&sf1[0],&sf1[1]);
+  //    c_res_gpu = spinor_field_prod_old_f(&sf1[0],&sf1[1]);
 	c_res_cpu = spinor_field_prod_f_cpu(&sf1[0],&sf1[1]);
-	c_res_gpu_opt = spinor_field_prod_opt_f(&sf1[0],&sf1[1]);
+	c_res_gpu_opt = spinor_field_prod_f(&sf1[0],&sf1[1]);
 	
 	lprintf("TEST",0,"Im: Check spinor_field_prod\n gpu=%1.10g, cpu=%1.10g, opt=%1.10g, \n opt-cpu= %1.10g\n",c_res_gpu.im, c_res_cpu.im,c_res_gpu_opt.im,c_res_gpu_opt.im-c_res_cpu.im);
 	lprintf("TEST",0,"Re: Check spinor_field_prod\n gpu=%1.10g, cpu=%1.10g, opt=%1.10g, \n opt-cpu= %1.10g\n\n",c_res_gpu.re,c_res_cpu.re,c_res_gpu_opt.re,c_res_gpu_opt.re-c_res_cpu.re);
 	
 	//Check spinor_field_g5_prod_re
 //	for (i=0;i<sfsize;i++){ spinor_field_copy_to_gpu_f(&sf1[i]); }
-	res_gpu = spinor_field_g5_prod_re_f(&sf1[0],&sf1[1]);
+//	res_gpu = spinor_field_g5_prod_re_old_f(&sf1[0],&sf1[1]);
 	res_cpu = spinor_field_g5_prod_re_f_cpu(&sf1[0],&sf1[1]);
-	res_gpu_opt = spinor_field_g5_prod_re_opt_f(&sf1[0],&sf1[1]);
+	res_gpu_opt = spinor_field_g5_prod_re_f(&sf1[0],&sf1[1]);
 	lprintf("TEST",0,"Check spinor_field_g5_prod_re\n gpu=%1.10g, cpu=%1.10g, opt=%1.10g, \n opt-cpu= %1.10g\n\n",res_gpu,res_cpu,res_gpu_opt,res_gpu_opt-res_cpu);
 	
 	//Check spinor_g5_field_prod_im
 //	for (i=0;i<sfsize;i++){ spinor_field_copy_to_gpu_f(&sf1[i]); }
-	res_gpu = spinor_field_g5_prod_im_f(&sf1[0],&sf1[1]);
+//	res_gpu = spinor_field_g5_prod_im_old_f(&sf1[0],&sf1[1]);
 	res_cpu = spinor_field_g5_prod_im_f_cpu(&sf1[0],&sf1[1]);
-	res_gpu_opt = spinor_field_g5_prod_im_opt_f(&sf1[0],&sf1[1]);
+	res_gpu_opt = spinor_field_g5_prod_im_f(&sf1[0],&sf1[1]);
 	lprintf("TEST",0,"Check spinor_field_g5_prod_im\n gpu=%1.10g, cpu=%1.10g, opt=%1.10g, \n opt-cpu= %1.10g\n\n",res_gpu,res_cpu,res_gpu_opt,res_gpu_opt-res_cpu);
 
 	//Check spinor_field_sqnorm
 //	for (i=0;i<sfsize;i++){ spinor_field_copy_to_gpu_f(&sf1[i]); }
-	res_gpu = spinor_field_sqnorm_f(&sf1[0]);
+//	res_gpu = spinor_field_sqnorm_old_f(&sf1[0]);
 	res_cpu = spinor_field_sqnorm_f_cpu(&sf1[0]);
-	res_gpu_opt = spinor_field_sqnorm_opt_f(&sf1[0]);
+	res_gpu_opt = spinor_field_sqnorm_f(&sf1[0]);
 	lprintf("TEST",0,"Check spinor_field_sqnorm\n gpu=%1.10g, cpu=%1.10g, opt=%1.10g, \n opt-cpu= %1.10g\n\n",res_gpu,res_cpu,res_gpu_opt,res_gpu_opt-res_cpu);
-	
-
 	
 	int NumberOfRuns = 500;
 	
@@ -221,7 +226,7 @@ int main(int argc,char *argv[])
 	lprintf("TEST",0,"Time for original: %1.10gms\n",elapsed);
 	t1 = gpuTimerStart();
 	for (int i=0; i<NumberOfRuns; i++) {	
-		res_gpu_opt = spinor_field_prod_re_opt_f(&sf1[0],&sf1[1]);
+		res_gpu_opt = spinor_field_prod_re_f(&sf1[0],&sf1[1]);
 	}
 	elapsed = gpuTimerStop(t1);
 	lprintf("TEST",0,"Time for optimized: %1.10gms\n",elapsed);
@@ -235,7 +240,7 @@ int main(int argc,char *argv[])
 	lprintf("TEST",0,"Time for original: %1.10gms\n\n",elapsed);
 	t1 = gpuTimerStart();
 	for (int i=0; i<NumberOfRuns; i++) {	
-		res_gpu_opt = spinor_field_prod_im_opt_f(&sf1[0],&sf1[1]);
+		res_gpu_opt = spinor_field_prod_im_f(&sf1[0],&sf1[1]);
 	}
 	elapsed = gpuTimerStop(t1);
 	lprintf("TEST",0,"Time for optimized: %1.10gms\n\n",elapsed);
@@ -250,7 +255,7 @@ int main(int argc,char *argv[])
 	lprintf("TEST",0,"Time for original: %1.10gms\n",elapsed);
 	t1 = gpuTimerStart();
 	for (int i=0; i<NumberOfRuns; i++) {	
-		c_res_gpu_opt = spinor_field_prod_opt_f(&sf1[0],&sf1[1]);
+		c_res_gpu_opt = spinor_field_prod_f(&sf1[0],&sf1[1]);
 	}
 	elapsed = gpuTimerStop(t1);
 	lprintf("TEST",0,"Time for optimized: %1.10gms\n\n",elapsed);
@@ -265,7 +270,7 @@ int main(int argc,char *argv[])
 	lprintf("TEST",0,"Time for original: %1.10gms\n\n",elapsed);
 	t1 = gpuTimerStart();
 	for (int i=0; i<NumberOfRuns; i++) {	
-		res_gpu_opt = spinor_field_g5_prod_re_opt_f(&sf1[0],&sf1[1]);
+		res_gpu_opt = spinor_field_g5_prod_re_f(&sf1[0],&sf1[1]);
 	}
 	elapsed = gpuTimerStop(t1);
 	lprintf("TEST",0,"Time for optimized: %1.10gms\n\n",elapsed);
@@ -280,7 +285,7 @@ int main(int argc,char *argv[])
 	lprintf("TEST",0,"Time for original: %1.10gms\n\n",elapsed);
 	t1 = gpuTimerStart();
 	for (int i=0; i<NumberOfRuns; i++) {	
-		res_gpu_opt = spinor_field_g5_prod_im_opt_f(&sf1[0],&sf1[1]);
+		res_gpu_opt = spinor_field_g5_prod_im_f(&sf1[0],&sf1[1]);
 	}
 	elapsed = gpuTimerStop(t1);
 	lprintf("TEST",0,"Time for optimized: %1.10gms\n\n",elapsed);
@@ -295,13 +300,12 @@ int main(int argc,char *argv[])
 	lprintf("TEST",0,"Time for original: %1.10gms\n\n",elapsed);
 	t1 = gpuTimerStart();
 	for (int i=0; i<NumberOfRuns; i++) {	
-		res_gpu_opt = spinor_field_sqnorm_opt_f(&sf1[0]);
+		res_gpu_opt = spinor_field_sqnorm_f(&sf1[0]);
 	}
 	elapsed = gpuTimerStop(t1);
 	lprintf("TEST",0,"Time for optimized: %1.10gms\n\n",elapsed);
 	
 	
-  */	
 	
 	
 	lprintf("TEST",0,"DONE!\n");
