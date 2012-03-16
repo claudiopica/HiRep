@@ -19,7 +19,7 @@ void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
 
 
 /* Re <s1,s2> */
-double _FUNC(spinor_field_prod_re_opt)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
+double _FUNC(spinor_field_prod_re)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
   double res;
   
@@ -43,16 +43,17 @@ double _FUNC(spinor_field_prod_re_opt)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYP
 }
 
 /* Im <s1,s2> */
-double _FUNC(spinor_field_prod_im_opt)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
+double _FUNC(spinor_field_prod_im)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
    double res;
   unsigned int N = (s1->type->master_end[0] -  s1->type->master_start[0] + 1)*_NCOM; 
-  unsigned int Npow2 =NextPow2(N);
+  unsigned int Npow2 = NextPow2(N)/2;
   
-  double *resField;	
+  double *resField;
+  int grid_size = Npow2/BLOCK_SIZE;
   cudaMalloc((void **) &resField,Npow2*sizeof(*resField));
   
-  spinor_field_prod_im_padded_gpu<<<Npow2/BLOCK_SIZE,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),resField,N);
+  spinor_field_prod_im_padded_gpu<<<grid_size,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),resField,N);
   global_reduction_sum(resField,Npow2);
 
   cudaMemcpy(&res,resField,sizeof(res),cudaMemcpyDeviceToHost);
@@ -61,16 +62,17 @@ double _FUNC(spinor_field_prod_im_opt)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYP
   return res;
 }
 /* <s1,s2> */
-complex _FUNC(spinor_field_prod_opt)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
+complex _FUNC(spinor_field_prod)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
   complex res;
   unsigned int N = (s1->type->master_end[0] -  s1->type->master_start[0] + 1)*_NCOM; 
-  unsigned int Npow2 =NextPow2(N);
+  unsigned int Npow2 =NextPow2(N)/2;
   
   complex *resField;	
+  int grid_size = Npow2/BLOCK_SIZE;
   cudaMalloc((void **) &resField,Npow2*sizeof(*resField));
   
-  spinor_field_prod_padded_gpu<<<Npow2/BLOCK_SIZE,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),resField,N);
+  spinor_field_prod_padded_gpu<<<grid_size,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),resField,N);
   global_reduction_complex_sum(resField,Npow2);
 
   cudaMemcpy(&res,resField,sizeof(res),cudaMemcpyDeviceToHost);
@@ -82,24 +84,25 @@ complex _FUNC(spinor_field_prod_opt)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE 
 
 
 /* Re <g5*s1,s2> */
-double _FUNC(spinor_field_g5_prod_re_opt)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
+double _FUNC(spinor_field_g5_prod_re)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
   double res;
   if (s1->type==&glattice) {
     s1->type=s2->type=&glat_even;
-    res=_FUNC(spinor_field_g5_prod_re_opt)(s1, s2);
+    res=_FUNC(spinor_field_g5_prod_re)(s1, s2);
     s1->type=s2->type=&glat_odd;
-    res+=_FUNC(spinor_field_g5_prod_re_opt)(s1, s2);
+    res+=_FUNC(spinor_field_g5_prod_re)(s1, s2);
     s1->type=s2->type=&glattice;
     return res;
   }
   unsigned int N = (s1->type->master_end[0] -  s1->type->master_start[0] + 1)*_NCOM; 
-  unsigned int Npow2 =NextPow2(N);
+  unsigned int Npow2 =NextPow2(N)/2;
   
+  int grid_size = Npow2/BLOCK_SIZE;
   double *resField;	
   cudaMalloc((void **) &resField,Npow2*sizeof(*resField));
   
-  spinor_field_g5_prod_re_padded_gpu<<<Npow2/BLOCK_SIZE,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),resField,N);
+  spinor_field_g5_prod_re_padded_gpu<<<grid_size,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),resField,N);
   global_reduction_sum(resField,Npow2);
 
   cudaMemcpy(&res,resField,sizeof(res),cudaMemcpyDeviceToHost);
@@ -109,24 +112,25 @@ double _FUNC(spinor_field_g5_prod_re_opt)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_
 }
 
 /* Im <g5*s1,s2> */
-double _FUNC(spinor_field_g5_prod_im_opt)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
+double _FUNC(spinor_field_g5_prod_im)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
   double res;
   if (s1->type==&glattice) {
     s1->type=s2->type=&glat_even;
-    res=_FUNC(spinor_field_g5_prod_im_opt)(s1, s2);
+    res=_FUNC(spinor_field_g5_prod_im)(s1, s2);
     s1->type=s2->type=&glat_odd;
-    res+=_FUNC(spinor_field_g5_prod_im_opt)(s1, s2);
+    res+=_FUNC(spinor_field_g5_prod_im)(s1, s2);
     s1->type=s2->type=&glattice;
     return res;
   }
   unsigned int N = (s1->type->master_end[0] -  s1->type->master_start[0] + 1)*_NCOM; 
-  unsigned int Npow2 =NextPow2(N);
+  unsigned int Npow2 =NextPow2(N)/2;
   
+  int grid_size = Npow2/BLOCK_SIZE;
   double *resField;	
   cudaMalloc((void **) &resField,Npow2*sizeof(*resField));
   
-  spinor_field_g5_prod_im_padded_gpu<<<Npow2/BLOCK_SIZE,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),resField,N);
+  spinor_field_g5_prod_im_padded_gpu<<<grid_size,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),resField,N);
   global_reduction_sum(resField,Npow2);
 
   cudaMemcpy(&res,resField,sizeof(res),cudaMemcpyDeviceToHost);
@@ -137,19 +141,20 @@ double _FUNC(spinor_field_g5_prod_im_opt)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_
 }
 
 /* Re <s1,s1> */
-double _FUNC(spinor_field_sqnorm_opt)(_SPINOR_FIELD_TYPE *s1)
+double _FUNC(spinor_field_sqnorm)(_SPINOR_FIELD_TYPE *s1)
 {
   double res;
   
   unsigned int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1; 
   N *= _NCOM;
-  unsigned int Npow2 =NextPow2(N);
+  unsigned int Npow2 =NextPow2(N)/2;
   
   // Allocate temp field
+  int grid_size = Npow2/BLOCK_SIZE;
   double *resField;								// resulting scalar field when dotting each spinor
   cudaMalloc((void **) &resField,Npow2*sizeof(*resField));
   
-  spinor_field_sqnorm_padded_gpu<<<Npow2/BLOCK_SIZE,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),resField,N);
+  spinor_field_sqnorm_padded_gpu<<<grid_size,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),resField,N);
   global_reduction_sum(resField,Npow2);
 
   cudaMemcpy(&res,resField,sizeof(res),cudaMemcpyDeviceToHost);
@@ -158,13 +163,9 @@ double _FUNC(spinor_field_sqnorm_opt)(_SPINOR_FIELD_TYPE *s1)
   return res;
 }
 
-
-
-
-
 //////////////////////////////////// NON-OPTIMIZED KERNELS ///////////////////////////////////////////////////////
 /* Re <s1,s2> */
-double _FUNC(spinor_field_prod_re)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
+double _FUNC(spinor_field_prod_re_old)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
   double res;
   double *resGPU; // one number
@@ -192,7 +193,7 @@ double _FUNC(spinor_field_prod_re)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s
 }
 
 /* Im <s1,s2> */
-double _FUNC(spinor_field_prod_im)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
+double _FUNC(spinor_field_prod_im_old)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
   double res;
   double* resGPU;
@@ -213,7 +214,7 @@ double _FUNC(spinor_field_prod_im)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s
 }
 
 /* <s1,s2> */
-complex _FUNC(spinor_field_prod)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
+complex _FUNC(spinor_field_prod_old)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
   complex res;			// One number on cpu
   complex * resGPU;   	// one number
@@ -244,7 +245,7 @@ complex _FUNC(spinor_field_prod)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 }
 
 /* Re <g5*s1,s2> */
-double _FUNC(spinor_field_g5_prod_re)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
+double _FUNC(spinor_field_g5_prod_re_old)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
   double res;
   double* resGPU;
@@ -280,7 +281,7 @@ double _FUNC(spinor_field_g5_prod_re)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE
 }
 
 /* Im <g5*s1,s2> */
-double _FUNC(spinor_field_g5_prod_im)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
+double _FUNC(spinor_field_g5_prod_im_old)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
   double res;
   double* resGPU; // one number
@@ -321,7 +322,7 @@ double _FUNC(spinor_field_g5_prod_im)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE
 }
 
 /* Re <s1,s1> */
-double _FUNC(spinor_field_sqnorm)(_SPINOR_FIELD_TYPE *s1)
+double _FUNC(spinor_field_sqnorm_old)(_SPINOR_FIELD_TYPE *s1)
 {
   double res;
   double* resGPU;
@@ -341,6 +342,8 @@ double _FUNC(spinor_field_sqnorm)(_SPINOR_FIELD_TYPE *s1)
   CudaCheckError();   
   return res;
 }
+// Non optimized kernels end.
+
 
 /* s1+=r*s2 r real */
 void _FUNC(spinor_field_mul_add_assign)(_SPINOR_FIELD_TYPE *s1, double r, _SPINOR_FIELD_TYPE *s2)
