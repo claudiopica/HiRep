@@ -25,7 +25,7 @@ double _FUNC(spinor_field_prod_re)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s
   
   unsigned int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1; 
   N *= _NCOM;
-  unsigned int Npow2 =NextPow2(N)/2;
+  unsigned int Npow2 =next_pow2(N)/2;
   
   // Allocate temp field
   double *resField;								// resulting scalar field when dotting each spinor
@@ -47,7 +47,7 @@ double _FUNC(spinor_field_prod_im)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s
 {
    double res;
   unsigned int N = (s1->type->master_end[0] -  s1->type->master_start[0] + 1)*_NCOM; 
-  unsigned int Npow2 = NextPow2(N)/2;
+  unsigned int Npow2 = next_pow2(N)/2;
   
   double *resField;
   int grid_size = Npow2/BLOCK_SIZE;
@@ -66,7 +66,7 @@ complex _FUNC(spinor_field_prod)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
   complex res;
   unsigned int N = (s1->type->master_end[0] -  s1->type->master_start[0] + 1)*_NCOM; 
-  unsigned int Npow2 =NextPow2(N)/2;
+  unsigned int Npow2 =next_pow2(N)/2;
   
   complex *resField;	
   int grid_size = Npow2/BLOCK_SIZE;
@@ -96,7 +96,7 @@ double _FUNC(spinor_field_g5_prod_re)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE
     return res;
   }
   unsigned int N = (s1->type->master_end[0] -  s1->type->master_start[0] + 1)*_NCOM; 
-  unsigned int Npow2 =NextPow2(N)/2;
+  unsigned int Npow2 =next_pow2(N)/2;
   
   int grid_size = Npow2/BLOCK_SIZE;
   double *resField;	
@@ -124,7 +124,7 @@ double _FUNC(spinor_field_g5_prod_im)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE
     return res;
   }
   unsigned int N = (s1->type->master_end[0] -  s1->type->master_start[0] + 1)*_NCOM; 
-  unsigned int Npow2 =NextPow2(N)/2;
+  unsigned int Npow2 =next_pow2(N)/2;
   
   int grid_size = Npow2/BLOCK_SIZE;
   double *resField;	
@@ -147,7 +147,7 @@ double _FUNC(spinor_field_sqnorm)(_SPINOR_FIELD_TYPE *s1)
   
   unsigned int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1; 
   N *= _NCOM;
-  unsigned int Npow2 =NextPow2(N)/2;
+  unsigned int Npow2 =next_pow2(N)/2;
   
   // Allocate temp field
   int grid_size = Npow2/BLOCK_SIZE;

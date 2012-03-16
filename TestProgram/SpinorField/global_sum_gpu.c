@@ -166,7 +166,7 @@ int main(int argc,char *argv[])
 	
   //Check spinor_field_prod_re
   //	for (i=0;i<sfsize;i++){ spinor_field_copy_to_gpu_f(&sf1[i]); }
-  //  res_gpu = spinor_field_prod_re_old_f(&sf1[0],&sf1[1]);
+  res_gpu = spinor_field_prod_re_old_f(&sf1[0],&sf1[1]);
   res_cpu = spinor_field_prod_re_f_cpu(&sf1[0],&sf1[1]);
   t1 = gpuTimerStart();
   res_gpu_opt = spinor_field_prod_re_f(&sf1[0],&sf1[1]);

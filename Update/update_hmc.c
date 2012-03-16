@@ -236,14 +236,14 @@ int update_hmc(){
     
     /* Metropolis test */
 
-#ifdef WITH_GPU
-    sum_local_action(la)
-#else
+    //#ifdef WITH_GPU
+    //    deltaH = scalar_field_sum(la)
+    //#else
     deltaH=0.;
     _MASTER_FOR(la->type,i) {
       deltaH+=*_FIELD_AT(la,i);
     }
-#endif
+    //#endif
     global_sum(&deltaH, 1);
     lprintf("HMC",10,"[DeltaS = %1.8e][exp(-DS) = %1.8e]\n",deltaH,exp(-deltaH));
     
