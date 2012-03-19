@@ -20,6 +20,9 @@ extern "C" {
 #include "suN.h"
 #include "spinor_field.h"
 
+double global_sum_gpu(double* vector, int n);
+
+
 /* double precision */
 #define _SPINOR_FIELD_TYPE spinor_field
 

@@ -10,6 +10,10 @@
 #include "inverters.h"
 #include "rational_functions.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void staples(int ix,int mu,suNg *v);
 void test_staples();
 void cabmar(double beta,suNg *u, suNg *v,int type);
@@ -133,7 +137,8 @@ typedef enum {
  * compute the local action at every site for the HMC
  * H = | momenta |^2 + S_g + < phi1, phi2>
  */
-void local_hmc_action(local_action_type type,
+
+void local_hmc_action_cpu(local_action_type type,
                       scalar_field *loc_action,
                       suNg_av_field *momenta,
                       spinor_field *phi1,
@@ -143,5 +148,25 @@ void suNg_field_copy(suNg_field *g1, suNg_field *g2);
 
 /* find spectral interval using eva */
 void find_spec_H2(spinor_operator H2, double *max, double *min);
+
+
+#ifdef WITH_GPU
+double scalar_field_sum(scalar_field* sf);
+void local_hmc_action(local_action_type type,
+                      scalar_field *loc_action,
+                      suNg_av_field *momenta,
+                      spinor_field *phi1,
+                      spinor_field *phi2);
+#else
+extern void (*local_hmc_action) (local_action_type type,
+                      scalar_field *loc_action,
+                      suNg_av_field *momenta,
+                      spinor_field *phi1,
+                      spinor_field *phi2);
+#endif
+
+#ifdef __cplusplus
+}
+#endif //__cplusplus
 
 #endif

@@ -18,7 +18,7 @@ extern rhmc_par _update_par;
  * compute the local action at every site for the HMC (Done at CPU)
  * H = | momenta |^2 + S_g + < phi1, phi2>
  */
-void local_hmc_action(local_action_type type,
+void local_hmc_action_cpu(local_action_type type,
                       scalar_field *loc_action,
                       suNg_av_field *momenta,
                       spinor_field *phi1,
@@ -133,3 +133,11 @@ void local_hmc_action(local_action_type type,
   }
    
 }
+
+#ifndef WITH_GPU
+void (*local_hmc_action) (local_action_type type,
+                      scalar_field *loc_action,
+                      suNg_av_field *momenta,
+                      spinor_field *phi1,
+			  spinor_field *phi2) = local_action_cpu;
+#endif

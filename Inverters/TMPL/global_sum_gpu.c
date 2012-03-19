@@ -8,7 +8,7 @@
 #define BLOCK_SIZE_REM 32
 
 template<typename REAL>
-__global__ void copy_with_zero_padd(REAL* out, REAL* in, int N){
+__global__ void copy_with_zero_padding(REAL* out, REAL* in, int N){
   int i = blockIdx.x*BLOCK_SIZE + threadIdx.x;
   if (i<N){
     out[i]=in[i];
@@ -201,7 +201,8 @@ void global_reduction_sum(double* resField, unsigned int Npow2){
   unsigned int new_N 			= 	Npow2;
   
   while(new_gridDim>1){
-    //		printf(" \t new_gridDim/2 = %d \n", new_gridDim/2);
+    //    printf(" \t new_gridDim/2 = %d \n", new_gridDim/2);
+    
     global_sum_gpu_opt<GSUM_BLOCK_SIZE><<<new_gridDim/2,GSUM_BLOCK_SIZE>>>(resField,resField,new_N);
     new_N=new_gridDim/2;
     new_gridDim=new_N/(GSUM_BLOCK_SIZE);
@@ -243,8 +244,17 @@ void global_reduction_complex_sum(complex* resField, unsigned int Npow2){
 	
 }
 
-void global_sum(double* vector, int n){
-  unsigned int new_n = next_pow2(n);  
+double global_sum_gpu(double* vector, int n){
+  unsigned int new_n = next_pow2(n);
+  int grid_size = new_n / BLOCK_SIZE;
+  double* padded_vector;
+  double res;
+  cudaMalloc((void **) &padded_vector,new_n*sizeof(double));
+  copy_with_zero_padding<<<grid_size,BLOCK_SIZE>>>(padded_vector, vector, n);
+  global_reduction_sum(padded_vector,new_n);
+  cudaMemcpy(&res,padded_vector,sizeof(res),cudaMemcpyDeviceToHost);
+  cudaFree(padded_vector);
+  return res;
 }
 
 

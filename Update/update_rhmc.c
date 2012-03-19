@@ -296,7 +296,7 @@ int update_rhmc(){
       
     /* compute starting action */
     lprintf("RHMC",30,"Computing action density...\n");
-    local_hmc_action(NEW, la, momenta, pf, pf); 
+    local_hmc_action_cpu(NEW, la, momenta, pf, pf); 
     
     /* compute H2^{a/2}*pf */
     lprintf("RHMC",30,"Correcting pseudofermions distribution...\n");
@@ -327,7 +327,7 @@ int update_rhmc(){
       rational_func(&r_S, H2, &pf[i], &pf[i]); //NEED TO CHANGE 2(DONE)
     
     /* compute new action */
-    local_hmc_action(DELTA, la, momenta, pf, pf); //NEED TO CHANGE 2(DONE)
+    local_hmc_action_cpu(DELTA, la, momenta, pf, pf); //NEED TO CHANGE 2(DONE)
  
 #if defined(BASIC_SF) && ! defined(NDEBUG)
     lprintf("MAIN",0,"SF_test_force_bcs(END): %1.8e\n",SF_test_force_bcs(momenta));

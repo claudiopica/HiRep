@@ -197,7 +197,7 @@ int update_hmc(){
     
     /* compute starting action */
     lprintf("HMC",30,"Computing action density...\n");
-    local_hmc_action(NEW, la, momenta, pf, pf);
+    local_hmc_action_cpu(NEW, la, momenta, pf, pf);
     
     /* compute H2^{1/2}*pf = H*pf */
     lprintf("HMC",30,"Correcting pseudofermions distribution...\n");
@@ -232,12 +232,12 @@ int update_hmc(){
     }
     
     /* compute new action */
-    local_hmc_action(DELTA, la, momenta, pf, pf);
+    local_hmc_action_cpu(DELTA, la, momenta, pf, pf);
     
     /* Metropolis test */
 
     //#ifdef WITH_GPU
-    //    deltaH = scalar_field_sum(la)
+    //    deltaH = scalar_field_sum(la);
     //#else
     deltaH=0.;
     _MASTER_FOR(la->type,i) {
