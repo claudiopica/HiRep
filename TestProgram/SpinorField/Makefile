@@ -1,7 +1,7 @@
 TOPDIR = ../..
 MKDIR=$(TOPDIR)/Make
 
-EXES = speed_flt_gpu speed_dbl_gpu check_spinorfield_gpu_1 check_spinorfield_gpu_1_flt speed_spinor_gpu_flt prof_test_gpu global_sum_gpu
+EXES = speed_flt_gpu speed_dbl_gpu check_spinorfield_gpu_1 check_spinorfield_gpu_1_flt speed_spinor_gpu_flt prof_test_gpu global_sum_gpu global_sum_gpu_flt
 
 GPUFILES = copy_test_kernel.c 
 

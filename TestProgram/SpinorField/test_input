@@ -1,5 +1,5 @@
 // Global variables 
-GLB_T = 64 //Global T size
+GLB_T = 64//Global T size
 GLB_X = 32
 GLB_Y = 32
 GLB_Z = 32

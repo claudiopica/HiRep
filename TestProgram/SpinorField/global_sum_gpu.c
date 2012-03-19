@@ -35,12 +35,14 @@ static complex v[25];
 static double EPSILON=1.e-12;
 static spinor_field *ppk[5];
 
+/*extern "C" {
 double spinor_field_prod_re_old_f(spinor_field* s1, spinor_field* s2);
 double spinor_field_prod_im_old_f(spinor_field* s1, spinor_field* s2);
 double spinor_field_g5_prod_im_old_f(spinor_field* s1, spinor_field* s2);
 double spinor_field_g5_prod_re_old_f(spinor_field* s1, spinor_field* s2);
 complex spinor_field_prod_old_f(spinor_field* s1, spinor_field* s2);
 double spinor_field_sqnorm_old_f(spinor_field* s1);
+}*/
 
 double sfdiff_gpu (spinor_field* sf){
   spinor_field *tmp;
@@ -166,7 +168,7 @@ int main(int argc,char *argv[])
 	
   //Check spinor_field_prod_re
   //	for (i=0;i<sfsize;i++){ spinor_field_copy_to_gpu_f(&sf1[i]); }
-  res_gpu = spinor_field_prod_re_old_f(&sf1[0],&sf1[1]);
+  //  res_gpu = spinor_field_prod_re_old_f(&sf1[0],&sf1[1]);
   res_cpu = spinor_field_prod_re_f_cpu(&sf1[0],&sf1[1]);
   t1 = gpuTimerStart();
   res_gpu_opt = spinor_field_prod_re_f(&sf1[0],&sf1[1]);
