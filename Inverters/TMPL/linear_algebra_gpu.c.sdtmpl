@@ -14,7 +14,7 @@
 
 void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
   _TWO_SPINORS_MATCHING(s1,s2);
-  cudaMemcpy(s1->gpu_ptr,s2->gpu_ptr,s1->type->gsize*sizeof(suNf_spinor),cudaMemcpyDeviceToDevice);
+  cudaMemcpy(s1->gpu_ptr,s2->gpu_ptr,s1->type->gsize*sizeof(_SPINOR_TYPE),cudaMemcpyDeviceToDevice);
 }
 
 
@@ -155,6 +155,7 @@ double _FUNC(spinor_field_sqnorm)(_SPINOR_FIELD_TYPE *s1)
   cudaMalloc((void **) &resField,Npow2*sizeof(*resField));
   
   spinor_field_sqnorm_padded_gpu<<<grid_size,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),resField,N);
+  CudaCheckError(); 
   global_reduction_sum(resField,Npow2);
 
   cudaMemcpy(&res,resField,sizeof(res),cudaMemcpyDeviceToHost);
@@ -163,186 +164,6 @@ double _FUNC(spinor_field_sqnorm)(_SPINOR_FIELD_TYPE *s1)
   return res;
 }
 
-//////////////////////////////////// NON-OPTIMIZED KERNELS ///////////////////////////////////////////////////////
-/* Re <s1,s2> */
-double _FUNC(spinor_field_prod_re_old)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
-{
-  double res;
-  double *resGPU; // one number
-  _REAL *resField; // resulting scalar field when dotting each spinor
-  
-  int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1; 
-  N *= _NCOM;
-  int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
-  
-  // Allocate temp field
-  cudaMalloc((void **) &resField,N*sizeof(*resField));
-  cudaMalloc((void **) &resGPU,sizeof(*resGPU));
-  
-  spinor_field_prod_re_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),resField,N);
-  global_sum_gpu<<<1,GSUM_BLOCK_SIZE>>>(resField,resGPU,N);
-  
-  // Copy result to device
-  cudaMemcpy(&res,resGPU,sizeof(res),cudaMemcpyDeviceToHost);
-  
-  // deallocating
-  cudaFree(resField);
-  cudaFree(resGPU);
-  
-  return res;
-}
-
-/* Im <s1,s2> */
-double _FUNC(spinor_field_prod_im_old)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
-{
-  double res;
-  double* resGPU;
-  _REAL* resField;
-  
-  int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
-  N *= _NCOM;
-  int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
-  cudaMalloc((void **) &resField,N*sizeof(*resField));
-  cudaMalloc((void **) &resGPU,sizeof(*resGPU));
-  
-  spinor_field_prod_im_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),resField,N);
-  global_sum_gpu<<<1,GSUM_BLOCK_SIZE>>>(resField,resGPU,N);
-  cudaMemcpy(&res,resGPU,sizeof(res),cudaMemcpyDeviceToHost);
-  cudaFree(resField);
-  cudaFree(resGPU);
-  return res;
-}
-
-/* <s1,s2> */
-complex _FUNC(spinor_field_prod_old)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
-{
-  complex res;			// One number on cpu
-  complex * resGPU;   	// one number
-  _COMPLEX * resField; 	// resulting scalar field when dotting each spinor
-
-  int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1; 
-  N *= _NCOM;
-  int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
- 
-  // Allocate temp field
-  cudaMalloc((void **) &resField,N*sizeof(*resField));
-  cudaMalloc((void **) &resGPU,sizeof(*resGPU));
- 
-  // Not defined yet
-//  complex_field_zero_gpu<<<grid,BLOCK_SIZE>>>(resField,N);
- 
-  // Calling kernel
-  spinor_field_prod_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),resField,N);
-  global_sum_complex_gpu<<<1,GSUM_BLOCK_SIZE>>>(resField,resGPU,N);
-    
-  // Copy result to host
-  cudaMemcpy(&res,resGPU,sizeof(res),cudaMemcpyDeviceToHost);
-  cudaFree(resField);
-  cudaFree(resGPU);
-  
-  return res;		
-
-}
-
-/* Re <g5*s1,s2> */
-double _FUNC(spinor_field_g5_prod_re_old)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
-{
-  double res;
-  double* resGPU;
-  _REAL* resField;
-  
-  //#ifdef UPDATE_EO
-  if (s1->type==&glattice) {
-    // we call recursively this function twice
-    // on the even and odd sublattices
-    s1->type=s2->type=&glat_even;
-    res=_FUNC(spinor_field_g5_prod_re)(s1, s2);
-    s1->type=s2->type=&glat_odd;
-    res+=_FUNC(spinor_field_g5_prod_re)(s1, s2);
-    s1->type=s2->type=&glattice;
-    return res;
-  }
-  //#endif //UPDATE_EO
-  
-  int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
-  N*=_NCOM;
-  int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
-  cudaMalloc((void **) &resField,N*sizeof(*resField));
-  cudaMalloc((void **) &resGPU,sizeof(*resGPU));
-
-  spinor_field_g5_prod_re_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),resField,N);
-  global_sum_gpu<<<1,GSUM_BLOCK_SIZE>>>(resField,resGPU,N);  
-  cudaMemcpy(&res,resGPU,sizeof(res),cudaMemcpyDeviceToHost);
-  cudaFree(resField);
-  cudaFree(resGPU);
-  CudaCheckError();   
-
-  return res;
-}
-
-/* Im <g5*s1,s2> */
-double _FUNC(spinor_field_g5_prod_im_old)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
-{
-  double res;
-  double* resGPU; // one number
-  _REAL * resField; // resulting scalar field when dotting each spinor
-
-  if (s1->type==&glattice) {
-    // we call recursively this function twice
-    // on the even and odd sublattices
-    s1->type=s2->type=&glat_even;
-    res=_FUNC(spinor_field_g5_prod_im)(s1, s2);
-    s1->type=s2->type=&glat_odd;
-    res+=_FUNC(spinor_field_g5_prod_im)(s1, s2);
-    s1->type=s2->type=&glattice;
-    return res;
-  }
-
-  int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
-  N *= _NCOM;
-  int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
-
-  // Allocate temp field
-  cudaMalloc((void **) &resField,N*sizeof(*resField));
-  cudaMalloc((void **) &resGPU,sizeof(*resGPU));
-
-  // Invoke kernel
-  spinor_field_g5_prod_im_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),resField,N);
-  global_sum_gpu<<<1,GSUM_BLOCK_SIZE>>>(resField,resGPU,N);
-    
-  // Copy result to device
-  cudaMemcpy(&res,resGPU,sizeof(res),cudaMemcpyDeviceToHost);
-    
-  // deallocating
-  cudaFree(resField);
-  cudaFree(resGPU);
-    
-  return res;
-
-}
-
-/* Re <s1,s1> */
-double _FUNC(spinor_field_sqnorm_old)(_SPINOR_FIELD_TYPE *s1)
-{
-  double res;
-  double* resGPU;
-  _REAL* resField;
-  
-  int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
-  N *= _NCOM;
-  int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
-  cudaMalloc((void **) &resField,N*sizeof(*resField));
-  cudaMalloc((void **) &resGPU,sizeof(*resGPU));
-
-  spinor_field_sqnorm_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),resField,N);
-  global_sum_gpu<<<1,GSUM_BLOCK_SIZE>>>(resField,resGPU,N);  
-  cudaMemcpy(&res,resGPU,sizeof(res),cudaMemcpyDeviceToHost);
-  cudaFree(resField);
-  cudaFree(resGPU);
-  CudaCheckError();   
-  return res;
-}
-// Non optimized kernels end.
 
 
 /* s1+=r*s2 r real */
@@ -609,6 +430,188 @@ void _FUNC(spinor_field_copy_gpu_to_gpu)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_T
   spinor_field_copy_gpu_to_gpu_gpu<<<grid,BLOCK_SIZE>>>(((_COMPLEX*) START_SP_ADDRESS_GPU(s1)),((_COMPLEX*) START_SP_ADDRESS_GPU(s2)),N);
   CudaCheckError();   
 }
+
+
+//////////////////////////////////// NON-OPTIMIZED KERNELS ///////////////////////////////////////////////////////
+/* Re <s1,s2> */
+double _FUNC(spinor_field_prod_re_old)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
+{
+  double res;
+  double *resGPU; // one number
+  _REAL *resField; // resulting scalar field when dotting each spinor
+  
+  int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1; 
+  N *= _NCOM;
+  int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
+  
+  // Allocate temp field
+  cudaMalloc((void **) &resField,N*sizeof(*resField));
+  cudaMalloc((void **) &resGPU,sizeof(*resGPU));
+  
+  spinor_field_prod_re_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),resField,N);
+  global_sum_gpu<<<1,GSUM_BLOCK_SIZE>>>(resField,resGPU,N);
+  
+  // Copy result to device
+  cudaMemcpy(&res,resGPU,sizeof(res),cudaMemcpyDeviceToHost);
+  
+  // deallocating
+  cudaFree(resField);
+  cudaFree(resGPU);
+  
+  return res;
+}
+
+/* Im <s1,s2> */
+double _FUNC(spinor_field_prod_im_old)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
+{
+  double res;
+  double* resGPU;
+  _REAL* resField;
+  
+  int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
+  N *= _NCOM;
+  int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
+  cudaMalloc((void **) &resField,N*sizeof(*resField));
+  cudaMalloc((void **) &resGPU,sizeof(*resGPU));
+  
+  spinor_field_prod_im_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),resField,N);
+  global_sum_gpu<<<1,GSUM_BLOCK_SIZE>>>(resField,resGPU,N);
+  cudaMemcpy(&res,resGPU,sizeof(res),cudaMemcpyDeviceToHost);
+  cudaFree(resField);
+  cudaFree(resGPU);
+  return res;
+}
+
+/* <s1,s2> */
+complex _FUNC(spinor_field_prod_old)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
+{
+  complex res;			// One number on cpu
+  complex * resGPU;   	// one number
+  _COMPLEX * resField; 	// resulting scalar field when dotting each spinor
+
+  int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1; 
+  N *= _NCOM;
+  int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
+ 
+  // Allocate temp field
+  cudaMalloc((void **) &resField,N*sizeof(*resField));
+  cudaMalloc((void **) &resGPU,sizeof(*resGPU));
+ 
+  // Not defined yet
+//  complex_field_zero_gpu<<<grid,BLOCK_SIZE>>>(resField,N);
+ 
+  // Calling kernel
+  spinor_field_prod_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),resField,N);
+  global_sum_complex_gpu<<<1,GSUM_BLOCK_SIZE>>>(resField,resGPU,N);
+    
+  // Copy result to host
+  cudaMemcpy(&res,resGPU,sizeof(res),cudaMemcpyDeviceToHost);
+  cudaFree(resField);
+  cudaFree(resGPU);
+  
+  return res;		
+
+}
+
+/* Re <g5*s1,s2> */
+double _FUNC(spinor_field_g5_prod_re_old)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
+{
+  double res;
+  double* resGPU;
+  _REAL* resField;
+  
+  //#ifdef UPDATE_EO
+  if (s1->type==&glattice) {
+    // we call recursively this function twice
+    // on the even and odd sublattices
+    s1->type=s2->type=&glat_even;
+    res=_FUNC(spinor_field_g5_prod_re)(s1, s2);
+    s1->type=s2->type=&glat_odd;
+    res+=_FUNC(spinor_field_g5_prod_re)(s1, s2);
+    s1->type=s2->type=&glattice;
+    return res;
+  }
+  //#endif //UPDATE_EO
+  
+  int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
+  N*=_NCOM;
+  int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
+  cudaMalloc((void **) &resField,N*sizeof(*resField));
+  cudaMalloc((void **) &resGPU,sizeof(*resGPU));
+
+  spinor_field_g5_prod_re_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),resField,N);
+  global_sum_gpu<<<1,GSUM_BLOCK_SIZE>>>(resField,resGPU,N);  
+  cudaMemcpy(&res,resGPU,sizeof(res),cudaMemcpyDeviceToHost);
+  cudaFree(resField);
+  cudaFree(resGPU);
+  CudaCheckError();   
+
+  return res;
+}
+
+/* Im <g5*s1,s2> */
+double _FUNC(spinor_field_g5_prod_im_old)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
+{
+  double res;
+  double* resGPU; // one number
+  _REAL * resField; // resulting scalar field when dotting each spinor
+
+  if (s1->type==&glattice) {
+    // we call recursively this function twice
+    // on the even and odd sublattices
+    s1->type=s2->type=&glat_even;
+    res=_FUNC(spinor_field_g5_prod_im)(s1, s2);
+    s1->type=s2->type=&glat_odd;
+    res+=_FUNC(spinor_field_g5_prod_im)(s1, s2);
+    s1->type=s2->type=&glattice;
+    return res;
+  }
+
+  int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
+  N *= _NCOM;
+  int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
+
+  // Allocate temp field
+  cudaMalloc((void **) &resField,N*sizeof(*resField));
+  cudaMalloc((void **) &resGPU,sizeof(*resGPU));
+
+  // Invoke kernel
+  spinor_field_g5_prod_im_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),_TOCOMPLEX(START_SP_ADDRESS_GPU(s2)),resField,N);
+  global_sum_gpu<<<1,GSUM_BLOCK_SIZE>>>(resField,resGPU,N);
+    
+  // Copy result to device
+  cudaMemcpy(&res,resGPU,sizeof(res),cudaMemcpyDeviceToHost);
+    
+  // deallocating
+  cudaFree(resField);
+  cudaFree(resGPU);
+    
+  return res;
+
+}
+
+/* Re <s1,s1> */
+double _FUNC(spinor_field_sqnorm_old)(_SPINOR_FIELD_TYPE *s1)
+{
+  double res;
+  double* resGPU;
+  _REAL* resField;
+  
+  int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
+  N *= _NCOM;
+  int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
+  cudaMalloc((void **) &resField,N*sizeof(*resField));
+  cudaMalloc((void **) &resGPU,sizeof(*resGPU));
+ 
+  spinor_field_sqnorm_gpu<<<grid,BLOCK_SIZE>>>(_TOCOMPLEX(START_SP_ADDRESS_GPU(s1)),resField,N);
+  global_sum_gpu<<<1,GSUM_BLOCK_SIZE>>>(resField,resGPU,N);  
+  cudaMemcpy(&res,resGPU,sizeof(res),cudaMemcpyDeviceToHost);
+  cudaFree(resField);
+  cudaFree(resGPU);
+  CudaCheckError();
+  return res;
+}
+// Non optimized kernels end.
 
 
 #undef _TOCOMPLEX
