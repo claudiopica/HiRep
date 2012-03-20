@@ -4,7 +4,7 @@
 #include "global.h"
 #include "gpu.h"
 
-#define GSUM_BLOCK_SIZE 512     // No more than 1024 on Tesla
+#define GSUM_BLOCK_SIZE 256     // No more than 1024 on Tesla
 #define BLOCK_SIZE_REM 32
 
 template<typename REAL>
@@ -80,12 +80,13 @@ __global__ void global_sum_gpu_opt(REAL * g_idata, REALOUT * g_odata, unsigned i
 
 template<unsigned int blockSize, typename REAL>
 __global__ void global_sum_gpu_remainder(REAL * in, unsigned int n) {
-  __shared__ volatile REAL sdata[2*blockSize];
+  __shared__ volatile REAL sdata[blockSize];
   unsigned int tid = threadIdx.x;
   
-  sdata[tid]= (tid < n) ? in[tid] : 0;
-  sdata[blockSize+tid]= 0;
-  
+	sdata[tid]=in[tid];
+	sdata[tid+blockDim.x]=in[tid+blockDim.x];
+	
+  if (blockSize >=64) {sdata[tid]+=sdata[tid+32];}
   if (blockSize >=32) {sdata[tid]+=sdata[tid+16];}
   if (blockSize >=16) {sdata[tid]+=sdata[tid+8];}
   if (blockSize >=8) {sdata[tid]+=sdata[tid+4];}
@@ -163,14 +164,16 @@ __global__ void global_complex_sum_gpu_opt(COMPLEX * g_idata, complex * g_odata,
 }
 template<unsigned int blockSize, typename COMPLEX>
 __global__ void global_complex_sum_gpu_remainder(COMPLEX * in, unsigned int n) {   
-  __shared__ volatile COMPLEX sdata[2*blockSize];
+  __shared__ volatile COMPLEX sdata[blockSize];
   unsigned int tid = threadIdx.x;
-
-  if (tid<n) {sdata[tid].re=in[tid].re;sdata[tid].im=in[tid].im;}
-  else{ sdata[tid].re=0;sdata[tid].im=0;}
-  sdata[blockSize+tid].re= 0;
-  sdata[blockSize+tid].re= 0;
-  
+	
+	sdata[tid].re=in[tid].re;
+	sdata[tid].im=in[tid].im;
+	sdata[tid+blockDim.x].re=in[tid+blockDim.x].re;
+	sdata[tid+blockDim.x].im=in[tid+blockDim.x].im;
+	
+	
+  if (blockSize >=64) {_complex_add(sdata[tid],sdata[tid],sdata[tid+32]);}  
   if (blockSize >=32) {_complex_add(sdata[tid],sdata[tid],sdata[tid+16]);}
   if (blockSize >=16) {_complex_add(sdata[tid],sdata[tid],sdata[tid+8]);}
   if (blockSize >=8) {_complex_add(sdata[tid],sdata[tid],sdata[tid+4]);}
@@ -208,18 +211,43 @@ void global_reduction_sum(double* resField, unsigned int Npow2){
     new_gridDim=new_N/(GSUM_BLOCK_SIZE);
     CudaCheckError(); 
   }
-  if (new_N > 32){
-    //		printf(" \t Intermediate step:\n \t new_N/(BLOCK_SIZE_REM*2) = %d \n", new_N/(BLOCK_SIZE_REM*2));	
-    //	printf(" \t new_N = %d \n", new_N);
+  if (new_N > 64){
+	  //	printf(" \t Intermediate step:\n \t new_N/(BLOCK_SIZE_REM*2) = %d \n", new_N/(BLOCK_SIZE_REM*2));	
+ //   	printf(" \t new_N = %d \n", new_N);
     global_sum_gpu_opt<BLOCK_SIZE_REM><<<new_N/(BLOCK_SIZE_REM*2),BLOCK_SIZE_REM>>>(resField,resField,new_N);	
     new_N=new_N/(BLOCK_SIZE_REM*2);
     CudaCheckError(); 
   }
-  if (new_N>1){
-    global_sum_gpu_remainder<32><<<1,32>>>(resField,new_N);
-    CudaCheckError(); 
-  }
 
+	  switch (new_N) {
+		  case 64:
+			  global_sum_gpu_remainder<64><<<1,32>>>(resField,new_N);
+			  CudaCheckError();
+			  break;
+		  case 32:
+			  global_sum_gpu_remainder<32><<<1,16>>>(resField,new_N);
+			  CudaCheckError();
+			  break;
+		  case 16:
+			  global_sum_gpu_remainder<16><<<1,8>>>(resField,new_N);
+			  CudaCheckError();
+			  break;
+		  case 8:
+			  global_sum_gpu_remainder<8><<<1,4>>>(resField,new_N);
+			  CudaCheckError();
+			  break;
+		  case 4:
+			  global_sum_gpu_remainder<4><<<1,2>>>(resField,new_N);
+			  CudaCheckError();
+			  break;
+		  case 2:
+			  global_sum_gpu_remainder<2><<<1,1>>>(resField,new_N);
+			  CudaCheckError();
+			  break;
+	   default:
+		   break;
+
+	  }
 }
 
 void global_reduction_complex_sum(complex* resField, unsigned int Npow2){
@@ -232,29 +260,42 @@ void global_reduction_complex_sum(complex* resField, unsigned int Npow2){
     new_gridDim=new_N/(GSUM_BLOCK_SIZE);
     CudaCheckError(); 
   }
-  if (new_N > 32){
+  if (new_N > 64){
     global_complex_sum_gpu_opt<BLOCK_SIZE_REM><<<new_N/(BLOCK_SIZE_REM*2),BLOCK_SIZE_REM>>>(resField,resField,new_N);	
     new_N=new_N/(BLOCK_SIZE_REM*2);
     CudaCheckError(); 
   }
-  if (new_N>1){
-    global_complex_sum_gpu_remainder<32><<<1,32>>>(resField,new_N);
-    CudaCheckError(); 
-  }
 	
-}
-
-double global_sum_gpu(double* vector, int n){
-  unsigned int new_n = next_pow2(n);
-  int grid_size = new_n / BLOCK_SIZE;
-  double* padded_vector;
-  double res;
-  cudaMalloc((void **) &padded_vector,new_n*sizeof(double));
-  copy_with_zero_padding<<<grid_size,BLOCK_SIZE>>>(padded_vector, vector, n);
-  global_reduction_sum(padded_vector,new_n);
-  cudaMemcpy(&res,padded_vector,sizeof(res),cudaMemcpyDeviceToHost);
-  cudaFree(padded_vector);
-  return res;
+	switch (new_N) {
+		case 64:
+			global_complex_sum_gpu_remainder<64><<<1,32>>>(resField,new_N);
+			CudaCheckError();
+			break;
+		case 32:
+			global_complex_sum_gpu_remainder<32><<<1,16>>>(resField,new_N);
+			CudaCheckError();
+			break;
+		case 16:
+			global_complex_sum_gpu_remainder<16><<<1,8>>>(resField,new_N);
+			CudaCheckError();
+			break;
+		case 8:
+			global_complex_sum_gpu_remainder<8><<<1,4>>>(resField,new_N);
+			CudaCheckError();
+			break;
+		case 4:
+			global_complex_sum_gpu_remainder<4><<<1,2>>>(resField,new_N);
+			CudaCheckError();
+			break;
+		case 2:
+			global_complex_sum_gpu_remainder<2><<<1,1>>>(resField,new_N);
+			CudaCheckError();
+			break;
+		default:
+			break;
+			
+	}
+	
 }
 
 
@@ -311,5 +352,18 @@ __global__ void global_sum_complex_gpu(COMPLEX* in, complex* out, int N){
   if (tid == 0)  out[0] = sdata[0];
 }
 
+
+double global_sum_gpu(double* vector, int n){
+	unsigned int new_n = next_pow2(n);
+	int grid_size = new_n / BLOCK_SIZE;
+	double* padded_vector;
+	double res,res2;
+	cudaMalloc((void **) &padded_vector,new_n*sizeof(double));
+	copy_with_zero_padding<<<grid_size,BLOCK_SIZE>>>(padded_vector, vector, n);
+	global_reduction_sum(padded_vector,new_n);
+	cudaMemcpy(&res,padded_vector,sizeof(res),cudaMemcpyDeviceToHost);
+	cudaFree(padded_vector);
+	return res;
+}
 
 #endif

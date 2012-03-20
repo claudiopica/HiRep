@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica									  *   
+* All rights reserved.												  * 
 \***************************************************************************/
 
 #include "global.h"
@@ -67,6 +67,7 @@ void local_hmc_action_cpu(local_action_type type,
 
 
 #ifndef ROTATED_SF
+
   _MASTER_FOR(&glattice,i) {
 
     /* Gauge action */
@@ -120,7 +121,7 @@ void local_hmc_action_cpu(local_action_type type,
   }
 #endif
   
-  /* pseudofermion fields can be defined only on even sites is the preconditioning is used */
+  /* pseudofermion fields can be defined only on even sites if the preconditioning is used */
   _MASTER_FOR(phi1->type,i) {
     a=0.;
   /* Fermions */

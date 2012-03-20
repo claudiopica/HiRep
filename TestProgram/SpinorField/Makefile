@@ -1,9 +1,9 @@
 TOPDIR = ../..
 MKDIR=$(TOPDIR)/Make
 
-EXES = speed_flt_gpu speed_dbl_gpu check_spinorfield_gpu_1 check_spinorfield_gpu_1_flt speed_spinor_gpu_flt prof_test_gpu global_sum_gpu global_sum_gpu_flt
+EXES = global_sum_gpu #speed_flt_gpu speed_dbl_gpu check_spinorfield_gpu_1 check_spinorfield_gpu_1_flt speed_spinor_gpu_flt prof_test_gpu global_sum_gpu
 
-GPUFILES = copy_test_kernel.c 
+GPUFILES = #copy_test_kernel.c 
 
 default: $(EXES)
 
@@ -47,9 +47,9 @@ MODDIR := Inverters
 MODS := linear_algebra # cg_mshift BiCGstab_mshift HBiCGstab_mshift MINRES_mshift g5QMR_mshift MINRES eva jacobi dirac_eva
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
-MODDIR := TestProgram/SpinorField
-MODS := copy_test_kernel
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
+#MODDIR := TestProgram/SpinorField
+#MODS := copy_test_kernel
+#MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 
 COMMON_OBJS = $(MOD_OBJS)

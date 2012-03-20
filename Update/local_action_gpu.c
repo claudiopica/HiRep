@@ -12,6 +12,7 @@
 #include "representation.h"
 #include "memory.h"
 #include "gpu.h"
+#ifdef WITH_GPU
 
 extern rhmc_par _update_par;
 
@@ -52,6 +53,67 @@ __global__ void  local_pseudo_fermions_gpu(double* loc_action, suNf_spinor* phi1
   loc_action[ix]+=a;
 }
 
+
+#define _suNg_read_gpu(stride,v,in,iy,x)\
+iw=(iy)+((x)*4)*(stride);\
+(v).c[0]=((double*)(in))[iw]; iw+=(stride); \
+(v).c[1]=((double*)(in))[iw]; iw+=(stride);\
+(v).c[2]=((double*)(in))[iw]; iw+=(stride);\
+(v).c[3]=((double*)(in))[iw]
+
+__device__ double plaq_gpu(const suNg* gauge, int ix,int mu,int nu, const int *iup, int stride)
+{
+	int iy,iz,iw;
+	double p=0;
+	suNg v1,v2,v3,v4, w1, w2, w3 ;
+	
+	iy=iup(ix,mu);
+	iz=iup(ix,nu);
+	
+	_suNg_read_gpu(stride,v1,gauge,ix,mu);
+	_suNg_read_gpu(stride,v2,gauge,iy,nu);
+	_suNg_read_gpu(stride,v3,gauge,iz,mu);
+	_suNg_read_gpu(stride,v4,gauge,ix,nu);
+	
+	_suNg_times_suNg(w1,v1,v2);
+	_suNg_times_suNg(w2,v4,v3);
+	_suNg_times_suNg_dagger(w3,w1,w2);      
+	
+	_suNg_trace_re(p,w3);
+	
+	
+	return p;
+}
+
+__global__ void local_gauge_action_gpu(const suNg* gauge,double *loc_action, const int *iup, const int vol4h, double beta)
+{
+	double pa=0;
+	int ix = blockIdx.x*gridDim.x + threadIdx.x;
+	ix = min(ix,vol4h*2-1);
+	
+	pa+=plaq_gpu(gauge, ix,1,0,iup,vol4h);
+	pa+=plaq_gpu(gauge, ix,2,0,iup,vol4h);
+	pa+=plaq_gpu(gauge, ix,2,1,iup,vol4h);
+	pa+=plaq_gpu(gauge, ix,3,0,iup,vol4h);
+	pa+=plaq_gpu(gauge, ix,3,1,iup,vol4h);
+	pa+=plaq_gpu(gauge, ix,3,2,iup,vol4h);
+	
+	loc_action[ix]+=-pa*beta/(double)NG;
+	
+}
+
+void local_gauge_action_gpu_caller(scalar_field *loc_action, double beta){
+	const int vol4h=T*X*Y*Z/2;
+	int grid = 2*vol4h/BLOCK_SIZE + ((2*vol4h % BLOCK_SIZE == 0) ? 0 : 1);
+	
+	local_gauge_action_gpu<<<grid,BLOCK_SIZE>>>(u_gauge->gpu_ptr,loc_action->gpu_ptr, iup_gpu, vol4h, beta);
+	CudaCheckError();
+	
+}
+
+
+
+
 double scalar_field_sum(scalar_field* sf){
   int N = sf->type->master_end[0] -  sf->type->master_start[0] + 1;  
   return global_sum_gpu(START_SP_ADDRESS_GPU(sf),N);
@@ -69,7 +131,9 @@ void local_hmc_action(local_action_type type,
                       spinor_field *phi2) { 
 
   unsigned int N, grid, N_sp, grid_sp;
-
+	
+ gfield_copy_to_gpu(u_gauge);
+	
   /* check input types */
 #ifndef CHECK_SPINOR_MATCHING
   _TWO_SPINORS_MATCHING(u_gauge,loc_action); /* check that action is defined on the global lattice */
@@ -97,11 +161,17 @@ void local_hmc_action(local_action_type type,
 
 
 #ifndef ROTATED_SF
-  //Gaugefield here
-  //  _MASTER_FOR(&glattice,i) {
-   /* Gauge action */
-  //  *_FIELD_AT(loc_action,i) += -(_update_par.beta/((double)NG))*local_plaq(i);
-  //}
+	
+	//gfield_copy_to_gpu(u_gauge);
+	//local_gauge_action_gpu_caller(loc_action, _update_par.beta);
+
+	//const int vol4h=T*X*Y*Z/2;
+	//int grid = 2*vol4h/BLOCK_SIZE + ((2*vol4h % BLOCK_SIZE == 0) ? 0 : 1);
+	
+	local_gauge_action_gpu<<<grid,BLOCK_SIZE>>>(u_gauge->gpu_ptr,loc_action->gpu_ptr, iup_gpu, N/2, _update_par.beta);
+	CudaCheckError();
+	
+	
 #else /* ROTATED_SF */
 "ROTATED_SF not yet implemented for GPU"
 #endif /* ROTATED_SF */
@@ -116,4 +186,4 @@ void local_hmc_action(local_action_type type,
   local_pseudo_fermions_gpu<<<grid_sp,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(loc_action),START_SP_ADDRESS_GPU(phi1),START_SP_ADDRESS_GPU(phi2),_update_par.n_pf,N);
    
 }
-
+#endif
