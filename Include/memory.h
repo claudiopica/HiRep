@@ -62,6 +62,9 @@ void gfield_copy_to_gpu_flt(suNg_field_flt *field);
 void gfield_copy_from_gpu_flt(suNg_field_flt *field);
 void gfield_copy_to_gpu_f_flt(suNf_field_flt *field);
 void gfield_copy_from_gpu_f_flt(suNf_field_flt *field);
+
+void suNg_av_field_copy_to_gpu(suNg_av_field *field);
+void suNg_av_field_copy_from_gpu(suNg_av_field *field);
     
 void spinor_field_togpuformat(spinor_field *out, spinor_field* in);
 void spinor_field_tocpuformat(spinor_field *out, spinor_field* in);

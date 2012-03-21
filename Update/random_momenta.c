@@ -10,7 +10,7 @@
 #include "utils.h"
 #include <math.h>
 
-void gaussian_momenta(suNg_av_field *momenta) {
+void gaussian_momenta_cpu(suNg_av_field *momenta) {
   double *dptr;
   _DECLARE_INT_ITERATOR(ix);
   geometry_descriptor *gd=momenta->type;
@@ -33,3 +33,7 @@ void gaussian_momenta(suNg_av_field *momenta) {
 #endif /* BASIC_SF || ROTATED_SF */
 
 }
+
+#ifndef WITH_GPU
+void (*gaussian_momenta)(suNg_av_field* momenta) = gaussian_momenta_cpu;
+#endif

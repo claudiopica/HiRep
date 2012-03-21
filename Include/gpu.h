@@ -18,7 +18,7 @@
 
 
 
-#define START_SP_ADDRESS_GPU(sf) (sf->gpu_ptr + sf->type->master_start[0])
+#define START_SP_ADDRESS_GPU(sf) ((sf)->gpu_ptr + (sf)->type->master_start[0])
 
 #endif //WITH_GPU
 #endif

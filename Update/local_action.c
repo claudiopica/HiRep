@@ -55,11 +55,11 @@ void local_hmc_action_cpu(local_action_type type,
 
   _MASTER_FOR(&glattice,i) {
     a=0.;
-    /* Momenta */
+    // Momenta 
     for (j=0;j<4;++j) {
       suNg_algebra_vector *cmom=momenta->ptr+coord_to_index(i,j);
       _algebra_vector_sqnorm_g(tmp,*cmom); 
-      a+=tmp; /* this must be positive */
+      a+=tmp; // this must be positive 
     }
     a*=0.5*_FUND_NORM2;
     *_FIELD_AT(loc_action,i)+=a;
@@ -113,7 +113,7 @@ void local_hmc_action_cpu(local_action_type type,
   }
 
 #endif /* ROTATED_SF */
-
+  
 #ifdef WITH_GPU //COPY SPINORS TO CPU
   for (j=0;j<_update_par.n_pf;++j) {
     spinor_field_copy_from_gpu_f(&phi1[j]);
@@ -129,10 +129,9 @@ void local_hmc_action_cpu(local_action_type type,
       _spinor_prod_re_f(tmp,*_FIELD_AT(&phi1[j],i),*_FIELD_AT(&phi2[j],i));
       a += tmp;
     }
-
+    
     *_FIELD_AT(loc_action,i)+=a;
   }
-   
 }
 
 #ifndef WITH_GPU
