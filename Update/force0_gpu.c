@@ -1,5 +1,5 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
+* Copyright (c) 2012, Ulrik Ishøj Søndergaard                                          *   
 * All rights reserved.                                                      * 
 \***************************************************************************/
 #ifdef WITH_GPU
@@ -11,6 +11,7 @@
 #include "representation.h"
 #include "logger.h"
 #include "communications.h"
+#include "memory.h"
 
 #include <stdio.h>
 #include <math.h>
@@ -36,54 +37,122 @@ iw=(iy)+((x)*3)*(stride);\
 (v).c[1]=((double*)(in))[iw]; iw+=(stride);\
 (v).c[2]=((double*)(in))[iw]
 
+#define _algebra_vector_mul_add_assign_gpu_g(stride,v,iy,x,r,in)\
+iw=(iy)+((x)*3)*(stride);\
+((double*)(v))[iw]+=(in).c[0]*(r); iw+=(stride); \
+((double*)(v))[iw]+=(in).c[1]*(r); iw+=(stride);\
+((double*)(v))[iw]+=(in).c[2]*(r)
+
+
+
+template<unsigned int is_ix_odd> // is_ix_odd = 0 if ix<vol4h,      is_ix_even = 1 if ix>vol4h
+__device__ void staples_device(int ix,int mu,suNg *v, const int *iup, const int *idn, const suNg* gauge,const int vol4h)
+{
+	suNg u1up,u2up,u3up;
+	suNg u1dn,u2dn,u3dn;
+	suNg staple, tr1, tr2;
+	
+	int i,nu,ixpmu,ixpnu,ixmnu,ixpmumnu, iw;
+	unsigned int is_ixpmu_odd = (is_ix_odd)? 0 : 1; 
+	unsigned int is_ixpnu_odd = (is_ix_odd)? 0 : 1; 
+	unsigned int is_ixmnu_odd = (is_ix_odd)? 0 : 1; 
+	unsigned int is_ixpmumnu_odd = (is_ix_odd)? 1 : 0; 
+	
+	_suNg_zero(*v);
+	ixpmu=iup(ix,mu);
+
+	
+	for (i=1;i<4;i++)
+	{
+		nu=(mu+i)&0x3;
+		ixpnu=iup(ix,nu);
+		ixmnu=idn(ix,nu);
+		ixpmumnu=idn(ixpmu,nu);  // if ix is even the this is also even. -"- odd
+
+		ixpnu	-=	is_ixpnu_odd*vol4h;
+		ixmnu	-=	is_ixmnu_odd*vol4h;
+		ixpmumnu -=	is_ixpmumnu_odd*vol4h; 
+		
+		
+		
+		_suNg_read_gpu(vol4h,u1up,gauge+is_ix_odd*4*vol4h,ix-is_ix_odd*vol4h,nu);
+		_suNg_read_gpu(vol4h,u2up,gauge+is_ixpnu_odd*4*vol4h,ixpnu,mu);
+		_suNg_read_gpu(vol4h,u3up,gauge+is_ixpmu_odd*4*vol4h,ixpmu-is_ixpmu_odd*vol4h,nu);
+
+		_suNg_read_gpu(vol4h,u1dn,gauge+is_ixmnu_odd*4*vol4h,ixmnu,nu);
+		_suNg_read_gpu(vol4h,u2dn,gauge+is_ixmnu_odd*4*vol4h,ixmnu,mu);
+		_suNg_read_gpu(vol4h,u3dn,gauge+is_ixpmumnu_odd*4*vol4h,ixpmumnu,nu);
+
+		
+		//up_staple();
+		_suNg_times_suNg(tr2,u1up,u2up);
+		_suNg_dagger(tr1,u3up);
+		_suNg_times_suNg(staple,tr2,tr1);
+		
+		//add_to_v(v);
+		  _suNg_add_assign(*v,staple);
+		
+		//dn_staple();
+		_suNg_times_suNg(tr2,u2dn,u3dn);
+		_suNg_dagger(tr1,u1dn);
+		_suNg_times_suNg(staple,tr1,tr2);
+		
+		//add_to_v(v);
+		_suNg_add_assign(*v,staple);
+	}
+}
+
+
+
+
+__global__ void gauge_force_kernel(const suNg* gauge, suNg_algebra_vector* force, const int *iup, const int *idn, int N, double dt_beta_over_NG){
+	
+	suNg s1,s2,s_tmp;
+	suNg_algebra_vector f;
+//	double nsq;
+	int mu,iw;
+	int vol4h=N/2;
+	
+	int ix = blockIdx.x*blockDim.x+ threadIdx.x;
+	ix = min(ix,N-1);
+	unsigned int is_ix_odd = (ix>=vol4h)? 1 : 0; 
+	
+	for (mu=0; mu<4; ++mu) {
+		
+		// staples
+		if (is_ix_odd){	staples_device<1>(ix,mu,&s1, iup, idn, gauge,vol4h);}
+		else {		staples_device<0>(ix,mu,&s1, iup, idn, gauge,vol4h);}
+
+		_suNg_read_gpu(vol4h,s_tmp,gauge+is_ix_odd*4*vol4h,ix-is_ix_odd*vol4h,mu); 
+		_suNg_times_suNg_dagger(s2,s_tmp,s1);
+		
+		_fund_algebra_project(f,s2);
+
+		_algebra_vector_mul_add_assign_gpu_g(vol4h,force+is_ix_odd*4*vol4h,ix-is_ix_odd*vol4h,mu, -dt_beta_over_NG, f); 
+
+	}
+}
 
 void force0(double dt, suNg_av_field *force, void *vpar){
-  static suNg s1,s2;
-  static suNg_algebra_vector f;
-  double forcestat[2]={0.,0.}; /* used for computation of avr and max force */
-  double nsq;
-  int mu,x;
-
+	
+	gfield_copy_to_gpu(u_gauge);
+	suNg_av_field_copy_to_gpu(force);
   /* check input types */
   _TWO_SPINORS_MATCHING(u_gauge,force);
 
   int N = T*X*Y*Z;//u_gauge->type->master_end[0] -  u_gauge->type->master_start[0] + 1;
   int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
 
-  
+	gauge_force_kernel<<<grid,BLOCK_SIZE>>>(u_gauge->gpu_ptr, force->gpu_ptr, iup_gpu, idn_gpu, N,dt*_update_par.beta/((double)(NG)));
 
-  _MASTER_FOR(&glattice,i) {
-    for (mu=0; mu<4; ++mu) {
-      staples(i,mu,&s1);
-      _suNg_times_suNg_dagger(s2,*_4FIELD_AT(u_gauge,i,mu),s1);
-    
-      /* the projection itself takes the TA: proj(M) = proj(TA(M)) */
-      _fund_algebra_project(f,s2);
-    
-      _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,i,mu), dt*(-_update_par.beta/((double)(NG))), f);
-
-      _algebra_vector_sqnorm_g(nsq,f);
-      forcestat[0]+=sqrt(nsq);
-      for(x=0;x<NG*NG-1;++x){
-	if(forcestat[1]<fabs(*(((double*)&f)+x))) forcestat[1]=fabs(*(((double*)&f)+x));
-      }
-    }
-  }
 	
-  global_sum(forcestat,2);
-  forcestat[0]*=dt*_update_par.beta/((double)(NG*4*GLB_T*GLB_X*GLB_Y*GLB_Z));
-  forcestat[1]*=dt*_update_par.beta/((double)NG);
-  lprintf("FORCE0",50,"avr |force| = %1.8e maxforce = %1.8e\n",forcestat[0],forcestat[1]);
-  
-#if defined(BASIC_SF) || defined(ROTATED_SF)
-	SF_force_bcs(force);
-#endif /* BASIC_SF || ROTATED_SF */
-
+	suNg_av_field_copy_from_gpu(force);
   }
 
 #undef _suNg_read_gpu
 #undef _suNg_av_read_gpu
 #undef _suNg_av_write_gpu
+#undef _algebra_vector_mul_add_assign_gpu_g
 
 #endif
 
