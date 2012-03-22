@@ -10,6 +10,7 @@
 #include "representation.h"
 #include "logger.h"
 #include "communications.h"
+#include "memory.h"
 #include <assert.h>
 
 
@@ -21,13 +22,9 @@
                         complete_gf_sendrecv(u_gauge);
 
 const double lambda = 0.1931833275037836; /* Omelyan et al */ 
-                                         /* lamdba = 1./6. Sexton Weingarten */ 
+/* lamdba = 1./6. Sexton Weingarten */ 
 
 static unsigned int count=0; /*used to project gfield */
-
-
-
-
 
 
 void gauge_integrator(suNg_av_field *momenta, integrator_par *int_par){
@@ -37,25 +34,33 @@ void gauge_integrator(suNg_av_field *momenta, integrator_par *int_par){
   double dt=int_par->tlen/((double)int_par->nsteps);
 
   if(int_par->nsteps == 0)  return;
-
+#ifdef WITH_GPU
+  gfield_copy_to_gpu(u_gauge);
+  suNg_av_field_copy_to_gpu(momenta);
+#endif
   lprintf("MD_INT",20,"Starting new MD trajectory with O2MN_multistep, level %d.\n",int_par->level);
   lprintf("MD_INT",30,"MD parameters: level=%d tlen=%1.6f nsteps=%d => dt=%1.6f\n",
 	  int_par->level,int_par->tlen,int_par->nsteps,dt);
   for(n=1;n<=int_par->nsteps;++n) {
+#ifdef WITH_GPU
+    gauge_integrator_gpu(momenta,dt);
+#else
     _MASTER_FOR(&glattice,i) {
       ExpX(dt,_4FIELD_AT(momenta,i,0), _4FIELD_AT(u_gauge,i,0));
       ExpX(dt,_4FIELD_AT(momenta,i,1), _4FIELD_AT(u_gauge,i,1));
       ExpX(dt,_4FIELD_AT(momenta,i,2), _4FIELD_AT(u_gauge,i,2));
       ExpX(dt,_4FIELD_AT(momenta,i,3), _4FIELD_AT(u_gauge,i,3));
     }
+#endif
     _proj_gfield(count);
     lprintf("MD_INT",40,"MD step (level %d): %d/%d\n",int_par->level,n,int_par->nsteps);
    }
+#ifdef WITH_GPU
+  gfield_copy_from_gpu(u_gauge);
+#endif
   lprintf("MD_INT",20,"MD trajectory completed, level %d.\n",int_par->level);
   represent_gauge_field();
 }
-
-
 
 
 void O2MN_multistep(suNg_av_field *momenta, integrator_par *int_par){

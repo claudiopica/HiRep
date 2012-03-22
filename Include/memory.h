@@ -78,6 +78,11 @@ void gfield_togpuformat_flt(suNg_field_flt *out, suNg_field_flt *in);
 void gfield_tocpuformat_flt(suNg_field_flt *out, suNg_field_flt *in);
 void gfield_togpuformat_f_flt(suNf_field_flt *out, suNf_field_flt *in);
 void gfield_tocpuformat_f_flt(suNf_field_flt *out, suNf_field_flt *in);  
+void sfield_copy_to_gpu(scalar_field *field);
+void sfield_copy_from_gpu(scalar_field *field);
+void avfield_togpuformat(suNg_av_field *out, suNg_av_field *in);
+void avfield_tocpuformat(suNg_av_field *out, suNg_av_field *in);
+
 #endif
 
 void free_avfield(suNg_av_field *u);

@@ -28,20 +28,36 @@ __global__ void minus_scalar_field_gpu(double* loc_action, int N){
   loc_action[ix] = -loc_action[ix];
 }
 
+
+#define _suNg_av_read_gpu(stride,v,in,iy,x)\
+iw=(iy)+((x)*3)*(stride);\
+(v).c[0]=((double*)(in))[iw]; iw+=(stride);\
+(v).c[1]=((double*)(in))[iw]; iw+=(stride);\
+(v).c[2]=((double*)(in))[iw]
+
 __global__ void local_momenta_gpu(double* loc_action, suNg_algebra_vector* momenta, int N){
-  int i;
+  int i,iw,iy;
   int ix = blockIdx.x*BLOCK_SIZE + threadIdx.x;
   double tmp,a=0.;
+  suNg_algebra_vector av;
+  int vol4h = N/2;
   ix = min(ix,N-1);
+  if (ix>=vol4h){ 
+    momenta += 2*N;
+    iy=ix-vol4h;
+  }
+  else{
+    iy=ix;
+  }
   for (i=0;i<4;++i){
-    suNg_algebra_vector av1 = momenta[coord_to_index(ix,i)];
-    _algebra_vector_sqnorm_g(tmp,av1);
+    //av = momenta[coord_to_index(ix,i)];
+    _suNg_av_read_gpu(N/2,av,momenta,iy,i);
+    _algebra_vector_sqnorm_g(tmp,av);
     a+=tmp;
   }
   a*=0.5*_FUND_NORM2;
   loc_action[ix]+=a;
 }
-
 
 #define _suNf_read_spinor_gpu(stride,v,in,iy,x)\
 iz=(iy)+((x)*3)*(stride);\
@@ -164,7 +180,6 @@ void local_hmc_action(local_action_type type,
 #endif
 
   N = loc_action->type->master_end[0] -  loc_action->type->master_start[0] + 1;
-  lprintf("LOCAL_ACTION_GPU",0,"Volume 1 %d, volume 2 %d\n",N,T*X*Y*Z);  
   grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
   switch(type) {
   case NEW:
@@ -208,5 +223,9 @@ void local_hmc_action(local_action_type type,
   //  lprintf("LOCAL_ACTION_GPU",0,"At end: scalar_field_sum: %1.10g\n",scalar_field_sum(loc_action));
    
 }
+
+#undef _suNf_read_spinor_gpu
+#undef _suNg_read_gpu
+
 
 #endif

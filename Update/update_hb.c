@@ -1,6 +1,5 @@
 /***************************************************************************\
 * Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
 \***************************************************************************/
 
 /*******************************************************************************
@@ -21,7 +20,7 @@
 
 static suNg v __attribute__ ((aligned (16)));
 
-void project_gauge_field(void)
+void project_gauge_field_cpu(void)
 {
   _DECLARE_INT_ITERATOR(ix);
 
@@ -43,7 +42,7 @@ static void update_all(double beta,int type)
    static int count=PROJECT_INTERVAL;
 
    if (count>=PROJECT_INTERVAL) {
-     project_gauge_field();
+     project_gauge_field_cpu();
      count=0;
    }
    ++count;
@@ -72,3 +71,6 @@ void update(double beta,int nhb,int nor)
       update_all(beta,1);
 }
 
+#ifndef WITH_GPU
+void (*project_gauge_field)(void) = project_gauge_field_cpu;
+#endif

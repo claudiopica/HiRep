@@ -109,13 +109,27 @@ void spinor_field_copy_from_gpu_f_flt(spinor_field_flt *field){
   free_spinor_field_f_flt(tmp);
 }
 
+/* SCALAR_FIELDS */
+void sfield_copy_to_gpu(scalar_field *field){
+  cudaMemcpy(field->gpu_ptr,field->ptr,field->type->gsize*sizeof(double),cudaMemcpyHostToDevice);
+}
+void sfield_copy_from_gpu(scalar_field *field){
+  cudaMemcpy(field->ptr,field->gpu_ptr,field->type->gsize*sizeof(double),cudaMemcpyDeviceToHost);
+}
+
 //avfield
 void suNg_av_field_copy_to_gpu(suNg_av_field *field){
-  cudaMemcpy(field->gpu_ptr,field->ptr,field->type->gsize*4*sizeof(suNg_av_field),cudaMemcpyHostToDevice);
+  suNg_av_field* tmp = alloc_avfield(field->type);
+  avfield_togpuformat(tmp,field);
+  cudaMemcpy(field->gpu_ptr,tmp->ptr,field->type->gsize*4*sizeof(suNg_algebra_vector),cudaMemcpyHostToDevice);
+  free_avfield(tmp);
 }
 
 void suNg_av_field_copy_from_gpu(suNg_av_field *field){
-  cudaMemcpy(field->ptr,field->gpu_ptr,field->type->gsize*4*sizeof(suNg_av_field),cudaMemcpyHostToDevice);
+  suNg_av_field* tmp = alloc_avfield(field->type);
+  cudaMemcpy(tmp->ptr,field->gpu_ptr,field->type->gsize*4*sizeof(suNg_algebra_vector),cudaMemcpyHostToDevice);
+  avfield_tocpuformat(field,tmp);
+  free_avfield(tmp);
 }
 
 #endif

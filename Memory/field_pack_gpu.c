@@ -232,10 +232,10 @@ void gfield_tocpuformat(suNg_field *out, suNg_field *in) {
   _PIECE_FOR(in->type,ix) {
     const int start = in->type->master_start[_PIECE_INDEX(ix)];
     const int N = in->type->master_end[_PIECE_INDEX(ix)]-in->type->master_start[_PIECE_INDEX(ix)]+1;
-    double *cin=(double*)(_4FIELD_AT(out,start,0));
+    double *cin=(double*)(_4FIELD_AT(in,start,0));
     _SITE_FOR(in->type,ix) {
       
-      r=_4FIELD_AT(in,ix,0);
+      r=_4FIELD_AT(out,ix,0);
       
       for (int j=0; j<4*sizeof(*r)/sizeof(double); ++j) {
         ((double*)(r))[j]=cin[j*N];
@@ -337,4 +337,73 @@ void gfield_tocpuformat_f_flt(suNf_field_flt *out, suNf_field_flt *in) {
 }
 
 
+
+void avfield_togpuformat(suNg_av_field *out, suNg_av_field *in) {
+  _DECLARE_INT_ITERATOR(ix);
+  suNg_algebra_vector *r=0;
+  
+  //check input and output type are the same
+  error(out->type!=in->type,1,"avfield_togpuformat " __FILE__, "Algebra vector field types don't match!");
+  
+  if (in->type==&glattice) {
+    // we call recursively this function twice
+    // on the even and odd sublattices
+    in->type=out->type=&glat_even;
+    avfield_togpuformat(out, in);
+    in->type=out->type=&glat_odd;
+    avfield_togpuformat(out, in);
+    in->type=out->type=&glattice;
+    return;
+  }
+  
+  _PIECE_FOR(in->type,ix) {
+    const int start = in->type->master_start[_PIECE_INDEX(ix)];
+    const int N = in->type->master_end[_PIECE_INDEX(ix)]-in->type->master_start[_PIECE_INDEX(ix)]+1;
+    double *cout=(double*)(_4FIELD_AT(out,start,0));
+    _SITE_FOR(in->type,ix) {
+      
+      r=_4FIELD_AT(in,ix,0);
+      
+      for (int j=0; j<4*sizeof(*r)/sizeof(double); ++j) {
+        cout[j*N]=((double*)(r))[j];
+      }
+      ++cout;
+    }
+  }
+}
+
+void avfield_tocpuformat(suNg_av_field *out, suNg_av_field *in) {
+  _DECLARE_INT_ITERATOR(ix);
+  suNg_algebra_vector *r=0;
+  
+  //check input and output type are the same
+  error(out->type!=in->type,1,"gield_tocpuformat " __FILE__, "Gauge field types don't match!");
+  
+  if (in->type==&glattice) {
+    // we call recursively this function twice
+    // on the even and odd sublattices
+    in->type=out->type=&glat_even;
+    avfield_tocpuformat(out, in);
+    in->type=out->type=&glat_odd;
+    avfield_tocpuformat(out, in);
+    in->type=out->type=&glattice;
+    return;
+  }
+  
+  _PIECE_FOR(in->type,ix) {
+    const int start = in->type->master_start[_PIECE_INDEX(ix)];
+    const int N = in->type->master_end[_PIECE_INDEX(ix)]-in->type->master_start[_PIECE_INDEX(ix)]+1;
+    double *cin=(double*)(_4FIELD_AT(in,start,0));
+    _SITE_FOR(in->type,ix) {
+      
+      r=_4FIELD_AT(out,ix,0);
+      
+      for (int j=0; j<4*sizeof(*r)/sizeof(double); ++j) {
+        ((double*)(r))[j]=cin[j*N];
+      }
+      ++cin;
+      
+    }
+  }
+}
 

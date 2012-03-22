@@ -2,6 +2,7 @@
 * Copyright (c) 2008, Claudio Pica                                          *   
 * All rights reserved.                                                      * 
 \***************************************************************************/
+#ifdef WITH_GPU
 
 #include "global.h"
 #include "update.h"
@@ -16,23 +17,40 @@
 
 extern rhmc_par _update_par;
 
-#define _print_avect(a) printf("(%3.5f,%3.5f,%3.5f,%3.5f,%3.5f,%3.5f,%3.5f,%3.5f)\n",(a).c1,(a).c2,(a).c3,(a).c4,(a).c5,(a).c6,(a).c7,(a).c8)
+#define _suNg_read_gpu(stride,v,in,iy,x)\
+iw=(iy)+((x)*4)*(stride);\
+(v).c[0]=((double*)(in))[iw]; iw+=(stride); \
+(v).c[1]=((double*)(in))[iw]; iw+=(stride);\
+(v).c[2]=((double*)(in))[iw]; iw+=(stride);\
+(v).c[3]=((double*)(in))[iw]
 
-#define _print_mat(a) printf("(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n",(a).c1_1.re,(a).c1_2.re,(a).c1_3.re,(a).c2_1.re,(a).c2_2.re,(a).c2_3.re,(a).c3_1.re,(a).c3_2.re,(a).c3_3.re);printf("(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n",(a).c1_1.im,(a).c1_2.im,(a).c1_3.im,(a).c2_1.im,(a).c2_2.im,(a).c2_3.im,(a).c3_1.im,(a).c3_2.im,(a).c3_3.im)
+#define _suNg_av_read_gpu(stride,v,in,iy,x)\
+iw=(iy)+((x)*3)*(stride);\
+(v).c[0]=((double*)(in))[iw]; iw+=(stride); \
+(v).c[1]=((double*)(in))[iw]; iw+=(stride);\
+(v).c[2]=((double*)(in))[iw]
+
+#define _suNg_av_write_gpu(stride,v,in,iy,x)\
+iw=(iy)+((x)*3)*(stride);\
+(v).c[0]=((double*)(in))[iw]; iw+=(stride); \
+(v).c[1]=((double*)(in))[iw]; iw+=(stride);\
+(v).c[2]=((double*)(in))[iw]
 
 
-void force0_cpu(double dt, suNg_av_field *force, void *vpar){
+void force0(double dt, suNg_av_field *force, void *vpar){
   static suNg s1,s2;
   static suNg_algebra_vector f;
   double forcestat[2]={0.,0.}; /* used for computation of avr and max force */
   double nsq;
   int mu,x;
-  _DECLARE_INT_ITERATOR(i);
 
   /* check input types */
-#ifndef CHECK_SPINOR_MATCHING
   _TWO_SPINORS_MATCHING(u_gauge,force);
-#endif
+
+  int N = T*X*Y*Z;//u_gauge->type->master_end[0] -  u_gauge->type->master_start[0] + 1;
+  int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
+
+  
 
   _MASTER_FOR(&glattice,i) {
     for (mu=0; mu<4; ++mu) {
@@ -63,10 +81,12 @@ void force0_cpu(double dt, suNg_av_field *force, void *vpar){
 
   }
 
+#undef _suNg_read_gpu
+#undef _suNg_av_read_gpu
+#undef _suNg_av_write_gpu
 
-//#ifndef WITH_GPU
-void (*force0)(double dt, suNg_av_field *force, void *par)=force0_cpu;
-//#endif
+#endif
+
 /*
 void Force(double dt, suNg_av_field *force, spinor_field *pf){
   Force0(dt, force);

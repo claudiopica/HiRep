@@ -197,14 +197,15 @@ int update_hmc(){
     
     /* compute starting action */
     lprintf("HMC",30,"Computing action density...\n");
-    local_hmc_action_cpu(NEW, la, momenta, pf, pf);
+    //    local_hmc_action_cpu(NEW, la, momenta, pf, pf);
+    local_hmc_action(NEW, la, momenta, pf, pf);
 
     /* compute H2^{1/2}*pf = H*pf */
     lprintf("HMC",30,"Correcting pseudofermions distribution...\n");
 #ifdef WITH_GPU //Make sure gauge field is on GPU
     gfield_copy_to_gpu_f(u_gauge_f); 
     gfield_copy_to_gpu_f_flt(u_gauge_f_flt);
-#endif  
+#endif
     for (i=0;i<_update_par.n_pf;++i) {
         spinor_field_copy_f(&pf[_update_par.n_pf],&pf[i]);
         H.dbl(&pf[i], &pf[_update_par.n_pf]);
@@ -232,18 +233,19 @@ int update_hmc(){
     }
     
     /* compute new action */
-    local_hmc_action_cpu(DELTA, la, momenta, pf, pf);
+    local_hmc_action(DELTA, la, momenta, pf, pf);
+    //    local_hmc_action_cpu(DELTA, la, momenta, pf, pf);
     
     /* Metropolis test */
 
-    //#ifdef WITH_GPU
-    //    deltaH = scalar_field_sum(la);
-    //#else
+#ifdef WITH_GPU
+    deltaH = scalar_field_sum(la);
+#else
     deltaH=0.;
     _MASTER_FOR(la->type,i) {
       deltaH+=*_FIELD_AT(la,i);
     }
-    //#endif
+#endif
     global_sum(&deltaH, 1);
     lprintf("HMC",10,"[DeltaS = %1.8e][exp(-DS) = %1.8e]\n",deltaH,exp(-deltaH));
     

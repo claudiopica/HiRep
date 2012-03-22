@@ -18,13 +18,26 @@ void staples(int ix,int mu,suNg *v);
 void test_staples();
 void cabmar(double beta,suNg *u, suNg *v,int type);
 
+void project_gauge_field_cpu(void);
+
+#ifdef WITH_GPU
 void project_gauge_field(void);
+#else
+extern void (*project_gauge_field) (void);
+#endif
+
 
 void update(double beta,int nhb,int nor);
 void random_su2(double rho,double s[]);
 
 /* forces for the update */
-void force0(double dt, suNg_av_field *force, void *par);
+void force0_cpu(double dt, suNg_av_field *force, void *par);
+
+  //#ifdef WITH_GPU
+  //void force0(double dt, suNg_av_field *force, void *par);
+  //#else
+extern void (*force0)(double dt, suNg_av_field *force, void *par);
+  //#endif 
 
 typedef struct {
   int n_pf;
@@ -58,7 +71,12 @@ typedef struct _integrator_par {
   struct _integrator_par *next;
   int level;
 } integrator_par;
+
 void gauge_integrator(suNg_av_field *momenta, integrator_par *int_par);
+#ifdef WITH_GPU
+void gauge_integrator_gpu(suNg_av_field *momenta, double dt);
+#endif 
+
 void O2MN_multistep(suNg_av_field *momenta, integrator_par *int_par);
 
 
