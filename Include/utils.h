@@ -86,6 +86,10 @@ double min_tplaq(suNg_field* g);
 void HYP_span_parameters(double mtp[6859]);
 int HYP_best_parameters(double mtp[6859], double w[3]);
 
+//Some matrix operators on suNg matrices
+void diag_hmat(suNg *hmat, double *diag);//diagonalize a hermitean matrix
+void det_suNg(complex* res, suNg *a);//determinant (incoming matrix will be destroyed)
+
 
 /* Timing */
 #include <sys/time.h>

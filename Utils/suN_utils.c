@@ -175,6 +175,71 @@ void project_cooling_to_suNg(suNg* g_out, suNg* g_in, int cooling)
       }
     }
   
-  *g_out = Ug[1]; 
-  
+  *g_out = Ug[1];   
 }
+
+void project_to_suNg_2(suNg *out,suNg *in){
+  suNg hm,om,tmp;
+  double eigval[NG];
+  complex det,f,ctmp;
+  double arg;
+  int i,j;
+  _suNg_times_suNg_dagger(hm,*in,*in);
+  diag_hmat(&hm,eigval);
+  for (i=0;i<NG;++i){
+    eigval[i] = 1.0/sqrt(eigval[i]);
+  }
+  for (i=0;i<NG;++i){
+    for (j=0;j<NG;++j){
+      _complex_mulr(tmp.c[i*NG+j],eigval[j],hm.c[i*NG+j]);
+    }
+  }
+
+  _suNg_times_suNg_dagger(om,tmp,hm);
+  _suNg_times_suNg(tmp,om,*in);
+
+  //Fix the determinant 
+  *out=tmp;
+  det_suNg(&det,&tmp);
+  arg = atan2(det.im,det.re)/NG;
+  f.re = cos(-arg);
+  f.im = sin(-arg);
+  for (i=0;i<NG;++i){
+    for (j=0;j<NG;++j){
+      _complex_mul(ctmp,f,out->c[NG*i+j]);
+      out->c[NG*i+j]=ctmp;
+    }
+  }
+}
+
+void project_to_suNg_real(suNg *out, suNg *in){
+  suNg hm,om,tmp;
+  double eigval[NG];
+  complex det;
+  int i,j;
+  _suNg_times_suNg_dagger(hm,*in,*in);
+  diag_hmat(&hm,eigval);
+  for (i=0;i<NG;++i){
+    eigval[i] = 1.0/sqrt(eigval[i]);
+  }
+  for (i=0;i<NG;++i){
+    for (j=0;j<NG;++j){
+      _complex_mulr(tmp.c[i*NG+j],eigval[j],hm.c[i*NG+j]);
+    }
+  }
+
+  _suNg_times_suNg_dagger(om,tmp,hm);
+  _suNg_times_suNg(tmp,om,*in);
+  *out=tmp;
+  //Fix the determinant 
+  det_suNg(&det,&tmp);
+  if (fabs(det.re)<1-1e-7 || fabs(det.re)>1+1e-7){
+    printf("Error in project project_to_suNg_real: determinant not +/-1");
+  }
+  if (det.re<0){
+    for (i=0;i<NG;++i){
+      _complex_mulr(out->c[i],-1,out->c[i]);
+    }
+  }
+}
+

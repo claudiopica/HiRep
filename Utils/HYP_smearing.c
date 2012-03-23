@@ -19,7 +19,10 @@ static void project_on_suN(suNg *A) {
   project_cooling_to_suNg(A,A,0);
 }
 #else
-#error ERROR: The cooling parameter must be chosen!!!
+static void project_on_suN(suNg* A){
+  suNg B=*A;
+  project_to_suNg_real(A,&B);
+}
 #endif
 
 

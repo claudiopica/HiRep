@@ -86,13 +86,6 @@ typedef struct
    (a).im=-(b).im
 
 /*
-* a=b^+ (a,b complex)
-*/
-#define _complex_star_minus(a,b) \
-   (a).re=-(b).re;	\
-   (a).im=(b).im
-
-/*
 * a=a^+ (a complex)
 */
 #define _complex_star_assign(a) \
@@ -182,32 +175,11 @@ typedef struct
    (c).im+=((a).re*(b).im-(a).im*(b).re)
 
 /*
-* c+=(a^*b^) (a,b,c complex)
-*/
-#define _complex_mul_star_star_assign(c,a,b) \
-   (c).re+=((a).re*(b).re-(a).im*(b).im);\
-   (c).im+=(-(a).re*(b).im-(a).im*(b).re)
-
-/*
 * a=-b (a complex)
 */
 #define _complex_minus(a,b) \
    (a).re=-(b).re; \
    (a).im=-(b).im
-
-/*
-* a=-i*b (a,b complex)
-*/
-#define _complex_i_minus(a,b) \
-   (a).re=(b).im; \
-   (a).im=-(b).re
-
-/*
-* a=i*b (a,b complex)
-*/
-#define _complex_i_plus(a,b) \
-   (a).re=-(b).im; \
-   (a).im=(b).re
 
 /*
 * a=b+i*c (a,b,c complex)
@@ -300,6 +272,7 @@ typedef struct
    (a).im+=(r)*(b).im
 
 
+
 /*
 * a=r1*c1+r2*c2 (a,c1,c2 complex; r1,r2 real)
 */
@@ -328,5 +301,18 @@ typedef struct
     _complex_mul_assign(a,z1,c1); \
     _complex_mul_assign(a,z2,c2);
 
+/*
+ *  = sqrt(a.re^2 + a.im^2)
+ */
+
+#define _complex_abs(a) \
+  sqrt(_complex_prod_re(a,a))
+
+/*
+ *  = a.re^2 + a.im^2
+ */
+
+#define _complex_abs_sqr(a) \
+  _complex_prod_re(a,a)
 
 #endif

@@ -26,6 +26,18 @@ static suNg_vector *pu1,*pu2;
 void random_su2(double rho,double s[]);
 
 
+void random_suNg(suNg *u) {
+  suNg tmp;
+  double gr[NG*NG];
+  int i;
+  gauss(gr,NG*NG);
+  for (i=0;i<NG*NG;i++){
+    tmp.c[i].re=gr[i];
+    tmp.c[i].im=0;
+  }
+  project_to_suNg_real(u,&tmp);
+}
+
 void random_suNg_unit_vector(suNg_vector *v)
 {
    double norm=0.f,fact;
@@ -68,7 +80,7 @@ static void rotate(void) /* same as in cabmar */
 	  }
 }
 
-void random_suNg(suNg *u) {
+void random_suNg_suN(suNg *u) {
   int i,j;
 
 	_suNg_unit(*u);
