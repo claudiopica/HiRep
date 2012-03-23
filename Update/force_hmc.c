@@ -147,19 +147,6 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
    _TWO_SPINORS_MATCHING(u_gauge,force);
 #endif
 
-  /* allocate spinors */
-#ifndef UPDATE_EO
-  Xs = alloc_spinor_field_f(3,&glattice);
-  Ys = Xs+1;
-  eta = Ys+1;
-  eta_flt = alloc_spinor_field_f_flt(2,&glattice);
-#else
-  Xs = alloc_spinor_field_f(2,&glattice);
-  Ys = Xs+1;
-  eta = alloc_spinor_field_f(1,&glat_even);
-  eta_flt = alloc_spinor_field_f_flt(2,&glat_even);
-#endif
-
   inv_par.max_iter=0;
 
   assign_ud2u_f();
@@ -209,8 +196,8 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
     
     /* Y_e = H^{-1} ( a g5 pf[k] + b X_e ) */
     /* Y_o = D_oe H^{-1} ( a g5 pf[k] + b X_e ) */
-    Ye=*Y; Ye.type=&glat_even;
-    Yo=*Y; Yo.type=&glat_odd;
+    Ye=*Ys; Ye.type=&glat_even;
+    Yo=*Ys; Yo.type=&glat_odd;
 
     if(par->hasenbusch != 2) {
       spinor_field_copy_f(eta,&Xe);

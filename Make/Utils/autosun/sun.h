@@ -19,7 +19,7 @@ namespace group
 void group::init(int n)
 {
 #ifndef NDEBUG 
-	cerr << "Initializing group SU(" << n << ")..... ";
+	cerr << "Initializing group SO(" << n << ")..... ";
 #endif 
 
 	int A;
@@ -34,8 +34,8 @@ void group::init(int n)
 		if(a > b)
 		{
 			T[A].size = N;
-			T[A].set(a,b, complex(1.,.0));
-			T[A].set(b,a, complex(1.,.0));
+			//			T[A].set(a,b, complex(1.,.0));
+			//			T[A].set(b,a, complex(1.,.0));
 			A++;
 		}
 		else if(a < b)
@@ -48,9 +48,9 @@ void group::init(int n)
 		else if(a == b && a != 0)
 		{
 			T[A].size = N;
-			for(int k = 0; k < a; k++)
-				T[A].set(k,k, complex(sqrt(2./(a*(a+1.))),.0));
-			T[A].set(a,a, complex(-a*sqrt(2./(a*(a+1.))),.0));
+			//for(int k = 0; k < a; k++)
+			//T[A].set(k,k, complex(sqrt(2./(a*(a+1.))),.0));
+			//T[A].set(a,a, complex(-a*sqrt(2./(a*(a+1.))),.0));
 			A++;
 		}
 		
