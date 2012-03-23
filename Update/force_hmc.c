@@ -39,7 +39,7 @@ extern rhmc_par _update_par;
  * _suNf_FMAT(u,p): u = p.c[0] # p.c[2]^+ + p.c[1] # p.c[3]^+
  */
 
-/* these macros use the variables ptmp, p */
+/* these macros use the variables ptmp, p, and x */
 
 
 #define _F_DIR0(u,chi1,chi2)				      \
@@ -228,12 +228,7 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
     spinor_field_g5_assign_f(eta);
     Dphi_(&Yo,&Ye);
 
-#endif //!UPDATE_EO
-
-#ifdef WITH_GPU //Do rest of the calculation at CPU
-    spinor_field_copy_from_gpu_f(Xs);
-    spinor_field_copy_from_gpu_f(Ys);
-#endif //WITH_GPU
+#endif //UPDATE_EO
 
     lprintf("FORCE",50,"|X| = %1.8e |Y| = %1.8e\n",
 	    sqrt(spinor_field_sqnorm_f(Xs)),
@@ -243,7 +238,13 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
     /* reset force stat counters */
     start_sf_sendrecv(Xs);
     start_sf_sendrecv(Ys);
-    
+
+#ifdef WITH_GPU
+    spinor_field_copy_from_gpu_f(Xs);
+    spinor_field_copy_from_gpu_f(Ys);
+
+    //    force_hmc_gpu(force,Xs,Ys,dt,par);
+#endif    
     forcestat[1]=forcestat[0]=0.;
     
     _PIECE_FOR(&glattice,x) { 
@@ -302,7 +303,7 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
           }
 #else
           if(par->hasenbusch != 1) {
-        	  _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),dt*(_REPR_NORM2/_FUND_NORM2),f);	
+	    _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),dt*(_REPR_NORM2/_FUND_NORM2),f);	
       	  } else {
       	    _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),par->bD*dt*(_REPR_NORM2/_FUND_NORM2),f);
           }
@@ -325,6 +326,7 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
     forcestat[0]*=dt*(_REPR_NORM2/_FUND_NORM2)/((double)(4*GLB_T*GLB_X*GLB_Y*GLB_Z));
     forcestat[1]*=dt*(_REPR_NORM2/_FUND_NORM2);
     lprintf("FORCE",50," avr |force| = %1.8e maxforce = %1.8e \n",forcestat[0],forcestat[1]);
+    //#endif //WITH_GPU
     
 #if defined(BASIC_SF) || defined(ROTATED_SF)
     SF_force_bcs(force);

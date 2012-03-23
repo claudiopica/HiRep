@@ -127,7 +127,7 @@ void suNg_av_field_copy_to_gpu(suNg_av_field *field){
 
 void suNg_av_field_copy_from_gpu(suNg_av_field *field){
   suNg_av_field* tmp = alloc_avfield(field->type);
-  cudaMemcpy(tmp->ptr,field->gpu_ptr,field->type->gsize*4*sizeof(suNg_algebra_vector),cudaMemcpyHostToDevice);
+  cudaMemcpy(tmp->ptr,field->gpu_ptr,field->type->gsize*4*sizeof(suNg_algebra_vector),cudaMemcpyDeviceToHost);
   avfield_tocpuformat(field,tmp);
   free_avfield(tmp);
 }

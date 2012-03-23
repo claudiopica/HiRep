@@ -26,18 +26,17 @@ void project_gauge_field(void);
 extern void (*project_gauge_field) (void);
 #endif
 
-
 void update(double beta,int nhb,int nor);
 void random_su2(double rho,double s[]);
 
 /* forces for the update */
 void force0_cpu(double dt, suNg_av_field *force, void *par);
 
-  //#ifdef WITH_GPU
-  //void force0(double dt, suNg_av_field *force, void *par);
-  //#else
+#ifdef WITH_GPU
+  void force0(double dt, suNg_av_field *force, void *par);
+#else
 extern void (*force0)(double dt, suNg_av_field *force, void *par);
-  //#endif 
+#endif 
 
 typedef struct {
   int n_pf;
@@ -60,6 +59,9 @@ void init_force_hmc();
 void free_force_hmc();
 void force_hmc(double dt, suNg_av_field *force, void *par);
 
+#ifdef WITH_GPU
+void force_hmc_gpu(suNg_av_field* force, spinor_field *Xs, spinor_field *Ys, double dt, force_hmc_par *par);
+#endif 
 
 
 typedef struct _integrator_par {
