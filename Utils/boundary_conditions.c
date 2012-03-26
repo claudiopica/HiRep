@@ -425,6 +425,8 @@ double SF_phi1_up[NG] = {.5, .5, -.5, -.5};
 
 void SF_gauge_bcs(suNg_field *gf, int strength)
 {
+
+#ifdef OLDFUNCTIONS
   int index;
   int ix, iy, iz;
   int k;
@@ -488,6 +490,8 @@ void SF_gauge_bcs(suNg_field *gf, int strength)
   }
   
   start_gf_sendrecv(gf);
+
+#endif
 }
 
 

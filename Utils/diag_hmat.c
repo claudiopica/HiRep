@@ -36,15 +36,15 @@ void tridiagonalize(suNg *hmat, double *diag, double* roffdiag){
     h = scale = 0.0;
     if (l>0){ //Not the last iteration
       for (k=0;k<l+1;k++) //i'th row, called x in comments
-	scale += fabs(hmat->c[i*NG+k].re)+fabs(hmat->c[i*NG+k].im);
+	scale += fabs(hmat->c[i*NG+k]);
       if (scale == 0.0) ///Skip transformation
-	offdiag.c[i] = hmat->c[i*NG+l];
+      { offdiag.c[i].re = hmat->c[i*NG+l]; offdiag.c[i].im=0.; }
       else{
 	for (k=0;k<l+1;k++){
-	  _complex_mulr(hmat->c[i*NG+k],1.0/scale,hmat->c[i*NG+k]); //Use scaled matrix for transformation
-	  h += _complex_abs_sqr(hmat->c[i*NG+k]); //_complex_prod_re(hmat->c[i*NG+k],hmat->c[i*NG+k]); //calculate normalization h=|x|^2
+	  hmat->c[i*NG+k]*=1.0/scale; //Use scaled matrix for transformation
+	  h += hmat->c[i*NG+k]*hmat->c[i*NG+k]; //_complex_prod_re(hmat->c[i*NG+k],hmat->c[i*NG+k]); //calculate normalization h=|x|^2
 	}
-	f = hmat->c[i*NG+l]; //f=x[0]
+          f.re = hmat->c[i*NG+l]; f.im=0.; //f=x[0]
 	fa = _complex_abs(f);
 	if (fa!=0){ // g = -x[0]*|x|/|x[0]|
 	  _complex_mulr(g,-sqrt(h)/fa,f);
@@ -55,38 +55,38 @@ void tridiagonalize(suNg *hmat, double *diag, double* roffdiag){
 	}
 	_complex_mulr(offdiag.c[i],scale,g); //stores off-diagonal values
 	h -= _complex_prod_re(f,g); // h = 1/2 |u|^2; u = x - e[l]*|x|
-	_complex_sub(hmat->c[i*NG+l],f,g);
+	hmat->c[i*NG+l]=f.re-g.re;
 	_complex_0(f);
 	for (j=0;j<l+1;j++){
-	  hmat->c[j*NG+i].re = hmat->c[i*NG+j].re/h; //Keep matrix hermitean
-	  hmat->c[j*NG+i].im = -hmat->c[i*NG+j].im/h;
+	  hmat->c[j*NG+i] = hmat->c[i*NG+j]/h; //Keep matrix hermitean
 	  _complex_0(g);
 	  for (k=0;k<j+1;k++){
-	    _complex_mul_star_assign(g,hmat->c[i*NG+k],hmat->c[j*NG+k]);
+	    g.re+=hmat->c[i*NG+k]*hmat->c[j*NG+k];
 	  }
 	  for (k=j+1;k<l+1;k++){
-	    _complex_mul_assign(g,hmat->c[i*NG+k],hmat->c[k*NG+j]);
+	    g.re+=hmat->c[i*NG+k]*hmat->c[k*NG+j];
 	  }
 	  _complex_mulr(offdiag.c[j],1.0/h,g);
-	  _complex_mul_star_assign(f,offdiag.c[j],hmat->c[i*NG+j]);
+	  _complex_mulr_assign(f,hmat->c[i*NG+j],offdiag.c[j]);
 	}
 
 	hh = f.re/(h+h);
 	for (j=0;j<l+1;j++){
-	  f = hmat->c[i*NG+j];
+	  f.re = hmat->c[i*NG+j];
 	  _complex_mulr(ctmp,hh,f);
 	  _complex_sub(g,offdiag.c[j],ctmp);
 	  offdiag.c[j] = g;
 	  for (k=0;k<j+1;k++){
-	    _complex_mul_star(ctmp,hmat->c[i*NG+k],g);
+	    _complex_mulr(ctmp,hmat->c[i*NG+k],g);
+        _complex_star(ctmp,ctmp);
 	    _complex_mul_star_assign(ctmp,offdiag.c[k],f);
-	    _complex_sub_assign(hmat->c[j*NG+k],ctmp);
+	    hmat->c[j*NG+k]-=ctmp.re;
 	  }
 	}
       }
     }
     else{
-      offdiag.c[i]=hmat->c[i*NG+l];
+      offdiag.c[i].re=hmat->c[i*NG+l];
     }
     diag[i]=h;
   }
@@ -98,19 +98,19 @@ void tridiagonalize(suNg *hmat, double *diag, double* roffdiag){
       for (j=0;j<l;j++){
 	_complex_0(g);
 	for (k=0;k<l;k++){
-	  _complex_mul_assign(g,hmat->c[NG*i+k],hmat->c[NG*k+j]);
+	  g.re+=hmat->c[NG*i+k]*hmat->c[NG*k+j];
 	}
 	for (k=0;k<l;k++){
-	  _complex_mul(ctmp,g,hmat->c[NG*k+i]);
-	  _complex_sub_assign(hmat->c[NG*k+j],ctmp);	  
+	  _complex_mulr(ctmp,hmat->c[NG*k+i],g);
+	  hmat->c[NG*k+j]-=ctmp.re;	  
 	}
       }
     }
-    diag[i] = hmat->c[i*NG+i].re;
-    _complex_1(hmat->c[i*NG+i]);
+    diag[i] = hmat->c[i*NG+i];
+    hmat->c[i*NG+i]=1.;
     for (j=0;j<i;j++){
-      _complex_0(hmat->c[j*NG+i]);
-      _complex_0(hmat->c[i*NG+j]);
+      hmat->c[j*NG+i]=0.;
+      hmat->c[i*NG+j]=0.;
     }
   }
   _complex_1(realtrans.c[0]);
@@ -127,8 +127,9 @@ void tridiagonalize(suNg *hmat, double *diag, double* roffdiag){
   }
   for (i=0;i<NG;i++){
     for (j=0;j<NG;j++){
-      _complex_mul_star(ctmp,hmat->c[NG*j+i],realtrans.c[i]);
-      hmat->c[NG*j+i]=ctmp;
+      _complex_mulr(ctmp,hmat->c[NG*j+i],realtrans.c[i]);
+        _complex_star(ctmp,ctmp);
+      hmat->c[NG*j+i]=ctmp.re;
     }
   }
   for (i=1;i<NG;i++) roffdiag[i-1]=roffdiag[i];
@@ -171,11 +172,11 @@ void diag_tridiag(suNg* hmat, double *diag, double* offdiag){
 	  diag[i+1] = g + p;
 	  g = c*r - b;
 	  for (k=0;k<NG;k++){
-	    ctmp = hmat->c[k*NG+i+1];
-	    _complex_mulr(hmat->c[k*NG+i+1],s,hmat->c[k*NG+i]);
-	    _complex_mulr_assign(hmat->c[k*NG+i+1],c,ctmp);
-	    _complex_mulr(hmat->c[k*NG+i],c,hmat->c[k*NG+i]);
-	    _complex_mulr_assign(hmat->c[k*NG+i],-s,ctmp);
+          ctmp.re = hmat->c[k*NG+i+1];
+	    hmat->c[k*NG+i+1]=s*hmat->c[k*NG+i];
+	    hmat->c[k*NG+i+1]+=c*ctmp.re;
+	    hmat->c[k*NG+i]=c*hmat->c[k*NG+i];
+	    hmat->c[k*NG+i]-=s*ctmp.re;
 	  }
 	}
 	if ( r == 0 && i>=l) continue;

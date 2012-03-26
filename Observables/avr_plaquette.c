@@ -63,8 +63,8 @@ void cplaq(complex *ret,int ix,int mu,int nu)
   _suNg_times_suNg_dagger(w3,w1,w2);      
       
    _suNg_trace_re(ret->re,w3);
-   _suNg_trace_im(ret->im,w3);
-
+    ret->im=0.;
+    
 #ifdef TWISTED_BC
   ret->re *= twbc_plaq[ix*16+mu*4+nu];
   ret->im *= twbc_plaq[ix*16+mu*4+nu];

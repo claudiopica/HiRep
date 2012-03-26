@@ -26,17 +26,17 @@ void group::init(int n)
 	int a, b;
 	
 	N = n;
-	DIM = N*N-1;
+	DIM = N*(N-1)/2;
 	T = new smatrix[group::DIM];
 	
 	A = 0;
 	for(a = 0; a < N; a++) for(b = 0; b < N; b++)
 		if(a > b)
 		{
-			T[A].size = N;
+			//T[A].size = N;
 			//			T[A].set(a,b, complex(1.,.0));
 			//			T[A].set(b,a, complex(1.,.0));
-			A++;
+			//A++;
 		}
 		else if(a < b)
 		{
@@ -47,11 +47,11 @@ void group::init(int n)
 		}
 		else if(a == b && a != 0)
 		{
-			T[A].size = N;
+			//T[A].size = N;
 			//for(int k = 0; k < a; k++)
 			//T[A].set(k,k, complex(sqrt(2./(a*(a+1.))),.0));
 			//T[A].set(a,a, complex(-a*sqrt(2./(a*(a+1.))),.0));
-			A++;
+			//A++;
 		}
 		
 	Tnorm = 2.0;
@@ -115,7 +115,10 @@ string ExpX(const char* dtname,  const char* hname, const char* uname)
 	
 	RET << 
 	"\tdouble y[3];\n" << 
-	"\tdouble s[" << group::N*(group::N-1)/2 << "][4];\n";
+	"\tdouble s[" << group::N*(group::N-1)/2 << "][4];\n"
+    "\tsuNgc ut, *u;\n\n"
+    "\tfor (int i=0; i<NG*NG; ++i) { ut.c[i].re=r->c[i]; ut.c[i].im=0.; }\n"
+    "\tu=&ut;\n\n";
 	
 	int k = 0;
 	for(int j = 1; j < group::N; j++)
@@ -150,6 +153,7 @@ string ExpX(const char* dtname,  const char* hname, const char* uname)
 			k--;
 		}
 
+    RET<<"\n\tfor (int i=0; i<NG*NG; ++i) { r->c[i]=ut.c[i].re; }\n";
 	
 	return RET.str();
 }
@@ -184,7 +188,7 @@ string fundamental_algebra_project(const char* hname, const char* mname)
 //	pmatrix adjM(group::N);
 	pconstant I(complex(0.0,1.0));
 
-	M = new cmatrix(group::N,mname);
+	M = new rmatrix(group::N,mname);
 
 //	adjM = *M;
 //	adjM.adjoint();

@@ -256,7 +256,7 @@ int update_hmc(){
         deltaH+=*_FIELD_AT(la,i);
     }
     global_sum(&deltaH, 1);
-    lprintf("HMC",10,"[DeltaS = %1.8e][exp(-DS) = %1.8e]\n",deltaH,exp(-deltaH));
+    lprintf("HMC",0,"[DeltaS = %1.8e][exp(-DS) = %1.8e]\n",deltaH,exp(-deltaH));
     
     if(deltaH<0.) {
         suNg_field_copy(u_gauge_old,u_gauge);
@@ -267,7 +267,7 @@ int update_hmc(){
         if(r>0.) {
             suNg_field_copy(u_gauge_old,u_gauge);
         } else {
-            lprintf("HMC",10,"Configuration rejected.\n");
+            lprintf("HMC",0,"Configuration rejected.\n");
             suNg_field_copy(u_gauge,u_gauge_old);
             start_gf_sendrecv(u_gauge); /* this may not be needed if we always guarantee that we copy also the buffers */
             represent_gauge_field();
@@ -276,7 +276,7 @@ int update_hmc(){
         }
     }
     
-    lprintf("HMC",10,"Configuration accepted.\n");
+    lprintf("HMC",0,"Configuration accepted.\n");
     
     return 1;
 }

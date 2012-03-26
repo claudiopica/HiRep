@@ -11,16 +11,16 @@ my ($md2,$mr2); #for matrices
 
 my ($Ng,$rep)=@ARGV;
 my ($Nf,$c1,$c2);
-$c1="C"; #gauge field always complex
+$c1="R"; #gauge field always complex
 if ($rep eq "REPR_FUNDAMENTAL") {
 	$Nf=$Ng;
-	$c2="C";
+	$c2="R";
 } elsif ($rep eq "REPR_SYMMETRIC") {
 	$Nf=$Ng*($Ng+1)/2;
-	$c2="C";
+	$c2="R";
 } elsif ($rep eq "REPR_ANTISYMMETRIC") {
 	$Nf=$Ng*($Ng-1)/2;
-	$c2="C";
+	$c2="R";
 } elsif ($rep eq "REPR_ADJOINT") {
 	$Nf=$Ng*$Ng-1;
 	$c2="R";
@@ -242,6 +242,7 @@ if ($complex eq "R") { # we only need these functions at the moment...
     write_suNr_zero();
     write_suNr_FMAT();
     write_suNr_unit();
+    write_suNr_dagger();
     write_suNr_times_suNr();
     write_suNr_times_suNr_dagger();
     write_suNr_add_assign();
@@ -1170,6 +1171,49 @@ sub write_suN_dagger {
 			print "         } \\\n";
 			for(my $i=0;$i<$mr;$i++){
 				print "         ++_n; _k+=$N; _complex_star((u).$cname\[_n\],(v).$cname\[_k\]);\\\n";
+			}
+		}
+		print "         ++_n; _k-=$shift;\\\n";
+		print "      }\\\n";
+		print "   }((void)0) \n\n";
+	}
+}
+
+sub write_suNr_dagger {
+    print "/* u=v^dagger */\n";
+    print "#define _${rdataname}_dagger(u,v) \\\n";
+	my $shift=$N*$N-$N-1;
+	if ($N<$Nmax) { #unroll all 
+		my ($n,$k)=(0,0);
+		for(my $i=1;$i<=$N;$i++){
+			for(my $j=1;$j<=$N;$j++){
+				print "   (u).$cname\[$n\]=(v).$cname\[$k\]";
+				if ($j!=$N) {$n++; $k+=$N;}
+				if($i==$N and $j==$N) {print "\n\n";} else {print "; \\\n";}
+			}
+			$n++; $k-=$shift;
+		}
+	} else { #partial unroll
+		print "   {\\\n";
+		if($N<(2*$unroll+1)) {
+		    print "      int _i,_n=0,_k=0;\\\n";
+		} else {
+		    print "      int _i,_j,_n=0,_k=0;\\\n";
+		}
+		print "      for (_i=0; _i<$N; ++_i){\\\n";
+		print "         (u).$cname\[_n\]=(v).$cname\[_k\];\\\n";
+		if($N<(2*$unroll+1)) {
+			for(my $j=1;$j<$N;$j++){
+				print "         ++_n; _k+=$N; (u).$cname\[_n\]=(v).$cname\[_k\];\\\n";
+			}
+		} else {
+			print "         for (_j=0; _j<$md; ){ \\\n";
+			for(my $i=0;$i<$unroll;$i++){
+				print "            ++_n; _k+=$N; (u).$cname\[_n\]=(v).$cname\[_k\]; ++_j;\\\n";
+			}
+			print "         } \\\n";
+			for(my $i=0;$i<$mr;$i++){
+				print "         ++_n; _k+=$N; (u).$cname\[_n\]=(v).$cname\[_k\];\\\n";
 			}
 		}
 		print "         ++_n; _k-=$shift;\\\n";

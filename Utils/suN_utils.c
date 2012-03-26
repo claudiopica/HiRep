@@ -35,14 +35,19 @@ static void normalize_flt(suNg_vector_flt *v)
    _vector_mul_g(*v, fact, *v);
 }
 
-
 void project_to_suNg(suNg *u)
 {
   int i,j;
   suNg_vector *v1,*v2;
   complex z;
+  suNgc tmp;
 
-  v1=(suNg_vector*)(u);
+    for (i=0; i<NG*NG; ++i) {
+        tmp.c[i].im=0.;
+        tmp.c[i].re=u->c[i];
+    }
+    
+  v1=(suNg_vector*)(&tmp);
   v2=v1+1;
    
   normalize(v1);
@@ -55,10 +60,18 @@ void project_to_suNg(suNg *u)
     }
     normalize(v2);
     ++v2;
-    v1=(suNg_vector*)(u);
+    v1=(suNg_vector*)(&tmp);
   }
 
+    for (i=0; i<NG*NG; ++i) {
+        u->c[i]=tmp.c[i].re;
+    }
+
+    
 }
+
+
+#ifdef OLDFUNCTIONS
 
 void project_to_suNg_flt(suNg_flt *u)
 {
@@ -212,10 +225,12 @@ void project_to_suNg_2(suNg *out,suNg *in){
   }
 }
 
+#endif
+
 void project_to_suNg_real(suNg *out, suNg *in){
   suNg hm,om,tmp;
   double eigval[NG];
-  complex det;
+  double det;
   int i,j;
   _suNg_times_suNg_dagger(hm,*in,*in);
   diag_hmat(&hm,eigval);
@@ -224,7 +239,7 @@ void project_to_suNg_real(suNg *out, suNg *in){
   }
   for (i=0;i<NG;++i){
     for (j=0;j<NG;++j){
-      _complex_mulr(tmp.c[i*NG+j],eigval[j],hm.c[i*NG+j]);
+      tmp.c[i*NG+j]=eigval[j]*hm.c[i*NG+j];
     }
   }
 
@@ -233,12 +248,12 @@ void project_to_suNg_real(suNg *out, suNg *in){
   *out=tmp;
   //Fix the determinant 
   det_suNg(&det,&tmp);
-  if (fabs(det.re)<1-1e-7 || fabs(det.re)>1+1e-7){
+  if (fabs(det)<1-1e-7 || fabs(det)>1+1e-7){
     printf("Error in project project_to_suNg_real: determinant not +/-1");
   }
-  if (det.re<0){
+  if (det<0){
     for (i=0;i<NG;++i){
-      _complex_mulr(out->c[i],-1,out->c[i]);
+      out->c[i]*=-1.;
     }
   }
 }

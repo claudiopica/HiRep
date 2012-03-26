@@ -49,6 +49,7 @@ void cross_prod_flt(suNg_vector_flt *v1,suNg_vector_flt *v2,suNg_vector_flt *v3)
 void project_to_suNg(suNg *u);
 void project_to_suNg_flt(suNg_flt *u);
 void project_cooling_to_suNg(suNg* g_out, suNg* g_in, int cooling);
+void project_to_suNg_real(suNg *out, suNg *in);
 
 void assign_u2ud(void);
 void assign_ud2u(void);
@@ -88,7 +89,7 @@ int HYP_best_parameters(double mtp[6859], double w[3]);
 
 //Some matrix operators on suNg matrices
 void diag_hmat(suNg *hmat, double *diag);//diagonalize a hermitean matrix
-void det_suNg(complex* res, suNg *a);//determinant (incoming matrix will be destroyed)
+void det_suNg(double* res, suNg *a);//determinant (incoming matrix will be destroyed)
 
 
 /* Timing */

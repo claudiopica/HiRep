@@ -32,8 +32,7 @@ void random_suNg(suNg *u) {
   int i;
   gauss(gr,NG*NG);
   for (i=0;i<NG*NG;i++){
-    tmp.c[i].re=gr[i];
-    tmp.c[i].im=0;
+    tmp.c[i]=gr[i];
   }
   project_to_suNg_real(u,&tmp);
 }

@@ -32,7 +32,7 @@ string algebra_project(const char* hname, const char* mname)
 	if(sizeof(representation::TYPE)==sizeof(FLOATING))
 		M = new rmatrix(representation::DIM,mname);
 	else
-		M = new cmatrix(representation::DIM,mname);
+		M = new rmatrix(representation::DIM,mname);
 
 	//adjM = *M;
 	//adjM.adjoint();

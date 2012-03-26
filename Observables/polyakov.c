@@ -228,8 +228,9 @@ void polyakov() {
 /*      lprintf("LOC_POLYAKOV",0,"%d %d %d %d %d %1.8e\n",mu,x[(mu+1)%4],x[(mu+2)%4],x[(mu+3)%4],i3d,dtmp); */
       poly.re += dtmp;
       adjpoly +=dtmp*dtmp;
-      _suNg_trace_im(dtmp,p[i3d]);
-      poly.im += dtmp;
+      //_suNg_trace_im(dtmp,p[i3d]);
+        dtmp=0.;
+        poly.im += dtmp;
       adjpoly +=dtmp*dtmp - 1;
       i3d++;
     }
