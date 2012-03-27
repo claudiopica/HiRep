@@ -213,11 +213,15 @@ void read_gauge_field(char filename[])
         1,"read_gauge_field",
         "Failed to read gauge field plaquette");
     is_complex_file = (sizeof(suNgc)*4*GLB_T*GLB_X*GLB_Y*GLB_Z+sizeof(int)*5 + sizeof(double)==file_size);
+    if (is_complex_file){
+      lprintf("IO",0,"Reading configuration file with complex valued gauge fields.\n");
+    }
   }
 
 #ifdef WITH_MPI
   MPI_Comm_group(MPI_COMM_WORLD,&wg);
   MPI_Comm_group(cart_comm,&cg);
+  MPI_Bcast(&is_complex_file,1,MPI_INT,0,MPI_COMM_WORLD);
 #endif
 
   zsize=GLB_Z/NP_Z; rz=GLB_Z-zsize*NP_Z;
@@ -323,7 +327,6 @@ void read_gauge_field(char filename[])
 	      /* copy buffer in place */
 	      cm=(suNg*)buff;
 	      for (lsite[3]=0; lsite[3]<Z; ++lsite[3]) { /* loop on local Z */
-		
 		int ix=ipt(lsite[0],lsite[1],lsite[2],lsite[3]);
 		suNg *pm=pu_gauge(ix,0);
 		*(pm++)=*(cm++); /* copy 4 directions */

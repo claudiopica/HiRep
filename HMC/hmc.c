@@ -135,7 +135,11 @@ void read_cmdline(int argc, char* argv[]) {
 
 double h2evamass=0.;
 void H2eva(spinor_field *out, spinor_field *in){
-  g5Dphi_sq(h2evamass, out, in);
+#ifdef UPDATE_EO
+    g5Dphi_eopre_sq(h2evamass, out, in);
+#else
+    g5Dphi_sq(h2evamass, out, in);
+#endif
 }
 
 
@@ -237,7 +241,11 @@ int main(int argc,char *argv[])
   spinor_field *eva_vecs=NULL;
   if(strcmp(eigval_var.make,"true")==0) {
     eva_vals=malloc(sizeof(double)*eigval_var.nevt);
-    eva_vecs=alloc_spinor_field_f(eigval_var.nevt,&glattice);
+#ifdef UPDATE_EO
+  eva_vecs=alloc_spinor_field_f(eigval_var.nevt,&glat_even);
+#else
+  eva_vecs=alloc_spinor_field_f(eigval_val.nevt,&glattice);
+#endif
   }
   
   rc=acc=0;
@@ -295,8 +303,11 @@ int main(int argc,char *argv[])
       /* Lowest eigenvalues */
       if(strcmp(eigval_var.make,"true")==0) {
         double max;
-        max_H(&H2eva, &glattice, &max);
-        max*=1.1;
+#ifdef UPDATE_EO
+	max_H(&H2eva, &glat_even,&max);
+#else
+	max_H(&H2eva, &glattice, &max);
+#endif
         
         int status;
         int ie=eva(eigval_var.nev, eigval_var.nevt, 0, eigval_var.kmax, eigval_var.maxiter, max, eigval_var.omega1, eigval_var.omega2, &H2eva, eva_vecs, eva_vals, &status);
@@ -304,10 +315,11 @@ int main(int argc,char *argv[])
           lprintf("MAIN",0,"Restarting EVA!\n");
           ie=eva(eigval_var.nev, eigval_var.nevt, 2, eigval_var.kmax, eigval_var.maxiter, max, eigval_var.omega1, eigval_var.omega2, &H2eva, eva_vecs, eva_vals, &status);
         }
-  
+ 
         for (int n=0;n<eigval_var.nev;++n) {
           lprintf("LOWEIG",0,"Eig %d = %1.15e\n",n,eva_vals[n]);
         }
+          lprintf("HIEIG",0,"%1.15e\n",max);
       }
     }
   }
