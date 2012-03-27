@@ -25,6 +25,8 @@ MACRO += -DIO_FLUSH
 #CC = mpicc
 CC = gcc
 CFLAGS = -Wall -std=c99 -O2 -fomit-frame-pointer -mfpmath=sse -msse -msse2 
+#CFLAGS = -Wall -std=c99 -g -fomit-frame-pointer  
+
 
 ##########################################################################
 # DO NOT EDIT BEYOND THIS POINT

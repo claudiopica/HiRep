@@ -34,7 +34,6 @@ void write_gauge_field(char filename[])
   double plaq;
   struct timeval start, end, etime;
 
-
 #ifdef WITH_MPI
   /* MPI variables */
   MPI_Group wg, cg;
@@ -174,6 +173,7 @@ void read_gauge_field(char filename[])
   int zsize, rz;
   double plaq, testplaq;
   struct timeval start, end, etime;
+  int is_complex_file=0;
 
 
 #ifdef WITH_MPI
@@ -188,8 +188,13 @@ void read_gauge_field(char filename[])
 
   if(PID==0) {
     int d[5]={0}; /* contains NG,GLB_T,GLB_X,GLB_Y,GLB_Z */
+    int file_size;
+
     error((fp=fopen(filename,"rb"))==NULL,1,"read_gauge_field",
         "Failed to open file for reading");
+    fseek(fp, 0, SEEK_END); // seek to end of file
+    file_size = ftell(fp); // get current file pointer = file size
+    fseek(fp, 0, SEEK_SET); // seek back to beginning of file
     /* read NG and global size */
     error(fread_BE_int(d,(size_t)(5),fp)!=(5),
         1,"read_gauge_field",
@@ -207,6 +212,7 @@ void read_gauge_field(char filename[])
     error(fread_BE_double(&plaq,(size_t)(1),fp)!=(1),
         1,"read_gauge_field",
         "Failed to read gauge field plaquette");
+    is_complex_file = (sizeof(suNgc)*4*GLB_T*GLB_X*GLB_Y*GLB_Z+sizeof(int)*5 + sizeof(double)==file_size);
   }
 
 #ifdef WITH_MPI
@@ -215,7 +221,12 @@ void read_gauge_field(char filename[])
 #endif
 
   zsize=GLB_Z/NP_Z; rz=GLB_Z-zsize*NP_Z;
-  buff=malloc(sizeof(suNg)*4*(GLB_Z/NP_Z+((rz>0)?1:0)));
+  if (is_complex_file){
+    buff=malloc(sizeof(suNgc)*4*(GLB_Z/NP_Z+((rz>0)?1:0)));
+  }
+  else{
+    buff=malloc(sizeof(suNg)*4*(GLB_Z/NP_Z+((rz>0)?1:0)));
+  }
 
   g[3]=0;
   for (g[0]=0;g[0]<GLB_T;++g[0]) { /* loop over T, X and Y direction */
@@ -225,7 +236,13 @@ void read_gauge_field(char filename[])
         glb_to_proc(g, p); /* get the processor coordinate */
 #endif
         for (p[3]=0;p[3]<NP_Z;++p[3]) { /* loop over processors in Z direction */
-          int bsize=sizeof(suNg)/sizeof(double)*4*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
+	  int bsize;
+	  if (is_complex_file){
+	    bsize=sizeof(suNgc)/sizeof(double)*4*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
+	  }
+	  else{
+	    bsize=sizeof(suNg)/sizeof(double)*4*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
+	  }  
 #ifdef WITH_MPI
           MPI_Cart_rank(cart_comm, p, &cid);
           MPI_Group_translate_ranks(cg, 1, &cid, wg, &pid);
@@ -280,27 +297,42 @@ void read_gauge_field(char filename[])
 #endif
 
           if (pid==PID) { /* copy buffer into memory */
-            int lsite[4];
-            suNg *cm;
-
+	    int lsite[4];
             /* convert global to local coordinate */
-            origin_coord(lsite);
-            lsite[0]=g[0]-lsite[0];
-            lsite[1]=g[1]-lsite[1];
-            lsite[2]=g[2]-lsite[2];
+	    origin_coord(lsite);
+	    lsite[0]=g[0]-lsite[0];
+	    lsite[1]=g[1]-lsite[1];
+	    lsite[2]=g[2]-lsite[2];
 
-            /* copy buffer in place */
-            cm=(suNg*)buff;
-            for (lsite[3]=0; lsite[3]<Z; ++lsite[3]) { /* loop on local Z */
-              int ix=ipt(lsite[0],lsite[1],lsite[2],lsite[3]);
-              suNg *pm=pu_gauge(ix,0);
-              *(pm++)=*(cm++); /* copy 4 directions */
-              *(pm++)=*(cm++);
-              *(pm++)=*(cm++);
-              *(pm)=*(cm++);
-            }
-          }
-
+	    if (is_complex_file){
+	      /* copy buffer in place */
+	      suNgc *cm=(suNgc*)buff;
+	      for (lsite[3]=0; lsite[3]<Z; ++lsite[3]) { /* loop on local Z */
+		int ix=ipt(lsite[0],lsite[1],lsite[2],lsite[3]);
+		for (int d=0;d<4;++d){
+		  suNg *pm=pu_gauge(ix,d);
+		  for (int i=0;i<NG*NG;++i){
+		    pm->c[i] = cm->c[i].re;
+		  }
+		  cm++;
+		}
+	      }
+	    }
+	    else{
+	      suNg *cm;
+	      /* copy buffer in place */
+	      cm=(suNg*)buff;
+	      for (lsite[3]=0; lsite[3]<Z; ++lsite[3]) { /* loop on local Z */
+		
+		int ix=ipt(lsite[0],lsite[1],lsite[2],lsite[3]);
+		suNg *pm=pu_gauge(ix,0);
+		*(pm++)=*(cm++); /* copy 4 directions */
+		*(pm++)=*(cm++);
+		*(pm++)=*(cm++);
+		*(pm)=*(cm++);
+	      }
+	    }
+	  }
         } /* end loop over processors in Z direction */
       }
     }

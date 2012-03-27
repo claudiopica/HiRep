@@ -113,8 +113,13 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar){
   force_rhmc_par *par = (force_rhmc_par*)vpar;
   spinor_field *pf = par->pf;
   rational_app *ratio = par->ratio;
+  
+  if(n_ws<ratio->order+1){
+    free_force_rhmc();
+    init_force_rhmc(ratio->order+1);
+  }
 
-  error(n_ws<ratio->order+1,1,"force_rhmc" __FILE__,"Workspace is too small");
+  //  error(n_ws<ratio->order+1,1,"void force_rhmc():" __FILE__,"Workspace is too small");
   
   /* check input types */
 #ifndef CHECK_SPINOR_MATCHING
