@@ -234,7 +234,7 @@ void free_rhmc(){
   
   int i=0;
   while(1) {
-    if(integrator[i].force_par != NULL) free(integrator[0].force_par);
+    if(integrator[i].force_par != NULL) free(integrator[i].force_par);
     if(integrator[i].next == NULL) break;
     i++;
   }
