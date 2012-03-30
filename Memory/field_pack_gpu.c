@@ -314,10 +314,10 @@ void gfield_tocpuformat_flt(suNg_field_flt *out, suNg_field_flt *in) {
   _PIECE_FOR(in->type,ix) {
     const int start = in->type->master_start[_PIECE_INDEX(ix)];
     const int N = in->type->master_end[_PIECE_INDEX(ix)]-in->type->master_start[_PIECE_INDEX(ix)]+1;
-    float *cin=(float*)(_4FIELD_AT(out,start,0));
+    float *cin=(float*)(_4FIELD_AT(in,start,0));
     _SITE_FOR(in->type,ix) {
       
-      r=_4FIELD_AT(in,ix,0);
+      r=_4FIELD_AT(out,ix,0);
       
       for (int j=0; j<4*sizeof(*r)/sizeof(double); ++j) {
         ((float*)(r))[j]=cin[j*N];
