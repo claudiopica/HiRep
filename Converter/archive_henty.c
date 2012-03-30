@@ -62,8 +62,9 @@ void read_gauge_field_henty(char filename[])
       g[4]=(g[4]+1)%4; /*This is for fixing with the henty's convection on the directions*/
       if(hm != 9) break;
       counter++;
-      tmpmat.c[row*NG+col].re=(double)re;
-      tmpmat.c[row*NG+col].im=(double)im;
+      tmpmat.c[row*NG+col]=(double)re;
+      //      tmpmat.c[row*NG+col].re=(double)re;
+      //      tmpmat.c[row*NG+col].im=(double)im;
       if(row>=maxrow) maxrow=row;
       else error(maxrow!=NG-1,1,"read_gauge_field_for_henty",
         "Bad number of rows");

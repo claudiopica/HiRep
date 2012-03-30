@@ -201,7 +201,8 @@ void read_gauge_field_eolexi_BE(char filename[])
       for(i=0; i<NG; i++) {
         lprintf("IO",20,"[ ");
         for(j=0; j<NG; j++)
-          lprintf("IO",20,"(%.2f , %.2f) ",pu_gauge(ix,mu)->c[i*NG+j].re,pu_gauge(ix,mu)->c[i*NG+j].im);
+          lprintf("IO",20,"(%.2f) ",pu_gauge(ix,mu)->c[i*NG+j]);
+	  //          lprintf("IO",20,"(%.2f , %.2f) ",pu_gauge(ix,mu)->c[i*NG+j].re,pu_gauge(ix,mu)->c[i*NG+j].im);
         lprintf("IO",20,"]\n");
       }
     }
@@ -226,7 +227,7 @@ void write_gauge_field_eolexi_LE(char filename[])
   MPI_Status st;
   int cid;
   int mpiret;
-#endif
+#endif //WITH_MPI
   
   suNg *eolexi_field=NULL;
   
@@ -376,7 +377,8 @@ void read_gauge_field_eolexi_LE(char filename[])
       for(i=0; i<NG; i++) {
         lprintf("IO",20,"[ ");
         for(j=0; j<NG; j++)
-          lprintf("IO",20,"(%.2f , %.2f) ",pu_gauge(ix,mu)->c[i*NG+j].re,pu_gauge(ix,mu)->c[i*NG+j].im);
+          lprintf("IO",20,"(%.2f) ",pu_gauge(ix,mu)->c[i*NG+j]);
+	//          lprintf("IO",20,"(%.2f , %.2f) ",pu_gauge(ix,mu)->c[i*NG+j].re,pu_gauge(ix,mu)->c[i*NG+j].im);
         lprintf("IO",20,"]\n");
       }
     }
