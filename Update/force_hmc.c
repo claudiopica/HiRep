@@ -136,27 +136,12 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
 #ifdef UPDATE_EO
   spinor_field Xe, Xo, Ye, Yo;
 #endif
-  double forcestat[2]; /* used for computation of avr and max force */
-  double nsq;
-
+ 
   force_hmc_par *par = (force_hmc_par*)vpar;
   spinor_field *pf = par->pf;
   
   /* check input types */
   _TWO_SPINORS_MATCHING(u_gauge,force);
-
-  /* allocate spinors */
-  /*#ifndef UPDATE_EO
-  Xs = alloc_spinor_field_f(3,&glattice);
-  Ys = Xs+1;
-  eta = Ys+1;
-  eta_flt = alloc_spinor_field_f_flt(2,&glattice);
-#else
-  Xs = alloc_spinor_field_f(2,&glattice);
-  Ys = Xs+1;
-  eta = alloc_spinor_field_f(1,&glat_even);
-  eta_flt = alloc_spinor_field_f_flt(2,&glat_even);
-  #endif*/
 
   inv_par.max_iter=0;
 
@@ -230,22 +215,21 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
 
 #endif //UPDATE_EO
 
+    /*  
     lprintf("FORCE",50,"|X| = %1.8e |Y| = %1.8e\n",
 	    sqrt(spinor_field_sqnorm_f(Xs)),
 	    sqrt(spinor_field_sqnorm_f(Ys))
 	    );
+     */
     
-    /* reset force stat counters */
     start_sf_sendrecv(Xs);
     start_sf_sendrecv(Ys);
 
 #ifdef WITH_GPU
-    spinor_field_copy_from_gpu_f(Xs);
-    spinor_field_copy_from_gpu_f(Ys);
-
-    //    force_hmc_gpu(force,Xs,Ys,dt,par);
-#endif    
-    forcestat[1]=forcestat[0]=0.;
+    
+      force_hmc_gpu(force,Xs,Ys,dt,par);
+      
+#else    
     
     _PIECE_FOR(&glattice,x) { 
       _SITE_FOR(&glattice,x) {
@@ -259,7 +243,7 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
       	    y=iup(x,0);
       	    chi1=_FIELD_AT(Xs,x);
       	    chi2=_FIELD_AT(Ys,y);
-	    _F_DIR0(s1,chi1,chi2);
+            _F_DIR0(s1,chi1,chi2);
       	    chi1=_FIELD_AT(Ys,x);
       	    chi2=_FIELD_AT(Xs,y);
       	    _F_DIR0(s1,chi1,chi2);
@@ -309,11 +293,6 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
           }
 #endif
 	  
-    	    _algebra_vector_sqnorm_g(nsq,f);
-    	    forcestat[0]+=sqrt(nsq);
-    	    for(y=0;y<NG*NG-1;++y){
-    	      if(forcestat[1]<fabs(*(((double*)&f)+y))) forcestat[1]=fabs(*(((double*)&f)+y));
-    	    }
       	}
       }
       if(_PIECE_INDEX(x)==0) {
@@ -322,11 +301,7 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
       }
     }
 
-    global_sum(forcestat,2);
-    forcestat[0]*=dt*(_REPR_NORM2/_FUND_NORM2)/((double)(4*GLB_T*GLB_X*GLB_Y*GLB_Z));
-    forcestat[1]*=dt*(_REPR_NORM2/_FUND_NORM2);
-    lprintf("FORCE",50," avr |force| = %1.8e maxforce = %1.8e \n",forcestat[0],forcestat[1]);
-    //#endif //WITH_GPU
+#endif //WITH_GPU
     
 #if defined(BASIC_SF) || defined(ROTATED_SF)
     SF_force_bcs(force);
