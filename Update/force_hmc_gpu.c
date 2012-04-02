@@ -58,10 +58,10 @@ iw=(iy)+((x)*3)*(stride);\
 (v).c[2]=((complex*)(in))[iw]
 
 #define _suNf_read_full_spinor_gpu(stride,sp,in,iy)\
-  _suNf_read_spinor_gpu(stride,sp.c[0],in,iy,0);	\
-  _suNf_read_spinor_gpu(stride,sp.c[1],in,iy,1);	\
-  _suNf_read_spinor_gpu(stride,sp.c[2],in,iy,2);	\
-  _suNf_read_spinor_gpu(stride,sp.c[3],in,iy,3);
+  _suNf_read_spinor_gpu(stride,(sp).c[0],(in),iy,0);	\
+  _suNf_read_spinor_gpu(stride,(sp).c[1],(in),iy,1);	\
+  _suNf_read_spinor_gpu(stride,(sp).c[2],(in),iy,2);	\
+  _suNf_read_spinor_gpu(stride,(sp).c[3],(in),iy,3);
 
 #define _suNg_av_read_gpu(stride,v,in,iy,x)\
 iw=(iy)+((x)*3)*(stride);\
@@ -93,88 +93,82 @@ __global__ void force_hmc_gpu_kernel(suNg_algebra_vector* force, suNf_spinor *Xs
   suNf_spinor chi1,chi2,p;
   suNf_vector ptmp;
   suNg_algebra_vector f;
+  suNf_spinor *Xss, *Yss;
   int iw,iy,ig;
   int ix = blockIdx.x*BLOCK_SIZE+ threadIdx.x;
   int vol4h = N/2;
+  int shift, shift2;
   suNf_FMAT s1;
   suNf pu;
   ix = min(ix,N-1);
-  if (ix<vol4h){
-    ig = ix;
-  } 
-  else{
-    ig = ix-vol4h;
-    force += 4*vol4h;
-    gauge += 4*vol4h;
-  }
+  
+  shift  = (ix<vol4h)? 0 : vol4h; //Even ? 0 : vol4h
+  ig = ix-shift; //always in [0 : vol4h -1]. Normalized ix
+  shift2 = vol4h-shift; //shift factor for iy, with opposite parity w.r.t. ix
+  force += 4*shift; //normalized force
+  gauge += 4*shift; //and gauge
+
+  Xss=Xs+shift2;
+  Xs+=shift;
+  Yss=Ys+shift2;
+  Ys+=shift;
+
   //Dir 0
-  iy = iup(ix,0);
-  _suNf_read_full_spinor_gpu(vol4h,chi1,Xs,ix);
-  _suNf_read_full_spinor_gpu(vol4h,chi2,Ys,iy);
+  iy = iup(ix,0) - shift2;
+  _suNf_read_full_spinor_gpu(vol4h,chi1,Xs,ig);
+  _suNf_read_full_spinor_gpu(vol4h,chi2,Yss,iy);
   _suNf_read_gpu(vol4h,pu,gauge,ig,0);
   _suNf_FMAT_zero(s1);
   _F_DIR0(s1,chi1,chi2);
-  _suNf_read_full_spinor_gpu(vol4h,chi1,Ys,ix);
-  _suNf_read_full_spinor_gpu(vol4h,chi2,Xs,iy);
+  _suNf_read_full_spinor_gpu(vol4h,chi1,Ys,ig);
+  _suNf_read_full_spinor_gpu(vol4h,chi2,Xss,iy);
   _F_DIR0(s1,chi1,chi2);
+
   _algebra_project(f,s1);
   _algebra_vector_mul_add_assign_gpu_g(vol4h,force,ig,0,fs,f);
-  /*  _suNg_av_read_gpu(vol4h,f_tmp,force,ig,0);
-  _algebra_vector_mul_add_assign_g(f_tmp,fs,f);
-  _suNg_av_write_gpu(vol4h,f_tmp,force,ig,0);*/
 
   //Dir 1
-  iy = iup(ix,1);
+  iy = iup(ix,1) - shift2;
   _suNf_read_full_spinor_gpu(vol4h,chi1,Xs,ix);
-  _suNf_read_full_spinor_gpu(vol4h,chi2,Ys,iy);
+  _suNf_read_full_spinor_gpu(vol4h,chi2,Yss,iy);
   _suNf_read_gpu(vol4h,pu,gauge,ig,1);
   _suNf_FMAT_zero(s1);
   _F_DIR1(s1,chi1,chi2);
   _suNf_read_full_spinor_gpu(vol4h,chi1,Ys,ix);
-  _suNf_read_full_spinor_gpu(vol4h,chi2,Xs,iy);
+  _suNf_read_full_spinor_gpu(vol4h,chi2,Xss,iy);
   _F_DIR1(s1,chi1,chi2);
+
   _algebra_project(f,s1);
   _algebra_vector_mul_add_assign_gpu_g(vol4h,force,ig,1,fs,f);
 
-  /*  _suNg_av_read_gpu(vol4h,f_tmp,force,ig,1);
-  _algebra_vector_mul_add_assign_g(f_tmp,fs,f);
-  _suNg_av_write_gpu(vol4h,f_tmp,force,ig,1);*/
-
-
   //Dir 2
-  iy = iup(ix,2);
+  iy = iup(ix,2) - shift2;
   _suNf_read_full_spinor_gpu(vol4h,chi1,Xs,ix);
-  _suNf_read_full_spinor_gpu(vol4h,chi2,Ys,iy);
+  _suNf_read_full_spinor_gpu(vol4h,chi2,Yss,iy);
   _suNf_read_gpu(vol4h,pu,gauge,ig,2);
   _suNf_FMAT_zero(s1);
   _F_DIR2(s1,chi1,chi2);
   _suNf_read_full_spinor_gpu(vol4h,chi1,Ys,ix);
-  _suNf_read_full_spinor_gpu(vol4h,chi2,Xs,iy);
+  _suNf_read_full_spinor_gpu(vol4h,chi2,Xss,iy);
   _F_DIR2(s1,chi1,chi2);
+
   _algebra_project(f,s1);
   _algebra_vector_mul_add_assign_gpu_g(vol4h,force,ig,2,fs,f);
 
-  /*  _suNg_av_read_gpu(vol4h,f_tmp,force,ig,2);
-  _algebra_vector_mul_add_assign_g(f_tmp,fs,f);
-  _suNg_av_write_gpu(vol4h,f_tmp,force,ig,2);*/
-
-
   //Dir 3
-  iy = iup(ix,3);
+  iy = iup(ix,3) - shift2;
   _suNf_read_full_spinor_gpu(vol4h,chi1,Xs,ix);
-  _suNf_read_full_spinor_gpu(vol4h,chi2,Ys,iy);
+  _suNf_read_full_spinor_gpu(vol4h,chi2,Yss,iy);
   _suNf_read_gpu(vol4h,pu,gauge,ig,3);
   _suNf_FMAT_zero(s1);
   _F_DIR3(s1,chi1,chi2);
   _suNf_read_full_spinor_gpu(vol4h,chi1,Ys,ix);
-  _suNf_read_full_spinor_gpu(vol4h,chi2,Xs,iy);
+  _suNf_read_full_spinor_gpu(vol4h,chi2,Xss,iy);
   _F_DIR3(s1,chi1,chi2);
+
   _algebra_project(f,s1);
   _algebra_vector_mul_add_assign_gpu_g(vol4h,force,ig,3,fs,f);
 
-  /*  _suNg_av_read_gpu(vol4h,f_tmp,force,ig,3);
-  _algebra_vector_mul_add_assign_g(f_tmp,fs,f);
-  _suNg_av_write_gpu(vol4h,f_tmp,force,ig,3);*/
 }
 
 

@@ -8,6 +8,7 @@
 #include "random.h"
 #include "update.h"
 #include "utils.h"
+#include "memory.h"
 #include <math.h>
 
 void gaussian_momenta(suNg_av_field *momenta) {
