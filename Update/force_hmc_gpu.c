@@ -129,12 +129,12 @@ __global__ void force_hmc_gpu_kernel(suNg_algebra_vector* force, suNf_spinor *Xs
 
   //Dir 1
   iy = iup(ix,1) - shift2;
-  _suNf_read_full_spinor_gpu(vol4h,chi1,Xs,ix);
+  _suNf_read_full_spinor_gpu(vol4h,chi1,Xs,ig);
   _suNf_read_full_spinor_gpu(vol4h,chi2,Yss,iy);
   _suNf_read_gpu(vol4h,pu,gauge,ig,1);
   _suNf_FMAT_zero(s1);
   _F_DIR1(s1,chi1,chi2);
-  _suNf_read_full_spinor_gpu(vol4h,chi1,Ys,ix);
+  _suNf_read_full_spinor_gpu(vol4h,chi1,Ys,ig);
   _suNf_read_full_spinor_gpu(vol4h,chi2,Xss,iy);
   _F_DIR1(s1,chi1,chi2);
 
@@ -143,12 +143,12 @@ __global__ void force_hmc_gpu_kernel(suNg_algebra_vector* force, suNf_spinor *Xs
 
   //Dir 2
   iy = iup(ix,2) - shift2;
-  _suNf_read_full_spinor_gpu(vol4h,chi1,Xs,ix);
+  _suNf_read_full_spinor_gpu(vol4h,chi1,Xs,ig);
   _suNf_read_full_spinor_gpu(vol4h,chi2,Yss,iy);
   _suNf_read_gpu(vol4h,pu,gauge,ig,2);
   _suNf_FMAT_zero(s1);
   _F_DIR2(s1,chi1,chi2);
-  _suNf_read_full_spinor_gpu(vol4h,chi1,Ys,ix);
+  _suNf_read_full_spinor_gpu(vol4h,chi1,Ys,ig);
   _suNf_read_full_spinor_gpu(vol4h,chi2,Xss,iy);
   _F_DIR2(s1,chi1,chi2);
 
@@ -157,12 +157,12 @@ __global__ void force_hmc_gpu_kernel(suNg_algebra_vector* force, suNf_spinor *Xs
 
   //Dir 3
   iy = iup(ix,3) - shift2;
-  _suNf_read_full_spinor_gpu(vol4h,chi1,Xs,ix);
+  _suNf_read_full_spinor_gpu(vol4h,chi1,Xs,ig);
   _suNf_read_full_spinor_gpu(vol4h,chi2,Yss,iy);
   _suNf_read_gpu(vol4h,pu,gauge,ig,3);
   _suNf_FMAT_zero(s1);
   _F_DIR3(s1,chi1,chi2);
-  _suNf_read_full_spinor_gpu(vol4h,chi1,Ys,ix);
+  _suNf_read_full_spinor_gpu(vol4h,chi1,Ys,ig);
   _suNf_read_full_spinor_gpu(vol4h,chi2,Xss,iy);
   _F_DIR3(s1,chi1,chi2);
 
