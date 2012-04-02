@@ -34,6 +34,29 @@ void gaussian_momenta_cpu(suNg_av_field *momenta) {
 
 }
 
+void zero_momenta_cpu(suNg_av_field *momenta) {
+    double *dptr;
+    _DECLARE_INT_ITERATOR(ix);
+    geometry_descriptor *gd=momenta->type;
+    const int ngen=NG*NG-1;
+    
+    _PIECE_FOR(gd,ix) {
+        int start=gd->master_start[_PIECE_INDEX(ix)];
+        int len=ngen*4*(gd->master_end[_PIECE_INDEX(ix)]-start+1); /* lenght in doubles */
+        dptr=(double*)(momenta->ptr+4*start);
+        for (ix=0; ix<len; ++ix, ++dptr) {
+            *(dptr)*=0.;
+        }
+    }
+    
+#if defined(BASIC_SF) || defined(ROTATED_SF)
+    SF_force_bcs(momenta);
+#endif /* BASIC_SF || ROTATED_SF */
+    
+}
+
+
 #ifndef WITH_GPU
 void (*gaussian_momenta)(suNg_av_field* momenta) = gaussian_momenta_cpu;
+void (*zero_momenta)(suNg_av_field* momenta) = zero_momenta_cpu;
 #endif

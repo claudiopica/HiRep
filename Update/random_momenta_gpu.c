@@ -15,3 +15,7 @@ void gaussian_momenta(suNg_av_field *momenta) {
   suNg_av_field_copy_to_gpu(momenta);
 }
 
+void zero_momenta(suNg_av_field *momenta) {
+    zero_momenta_cpu(momenta);
+    suNg_av_field_copy_to_gpu(momenta);
+}
