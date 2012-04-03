@@ -2,18 +2,19 @@
 #define GLOBAL_SUM_GPU_C
 
 #include "global.h"
-#include "gpu.h"
+ #include "gpu.h"
 
 #define GSUM_BLOCK_SIZE 256     // No more than 1024 on Tesla
-#define BLOCK_SIZE_REM 32
+#define BLOCK_SIZE_REM 64
 
 template<typename REAL>
-__global__ void copy_with_zero_padding(REAL* out, REAL* in, int N){
+__global__ void copy_with_zero_padding(REAL* out, REAL* in, int N, int new_n){
   int i = blockIdx.x*BLOCK_SIZE + threadIdx.x;
+  i = min(i,new_n);
   if (i<N){
     out[i]=in[i];
   }
-  else{
+  else {
     out[i]=0.0;
   }
 }
@@ -190,12 +191,12 @@ __global__ void global_complex_sum_gpu_remainder(COMPLEX * in, unsigned int n) {
 unsigned int next_pow2( unsigned int n )
 {
   register unsigned int val = n;
-  val--;
-  val = (val >> 1) | val;
-  val = (val >> 2) | val;
-  val = (val >> 4) | val;
-  val = (val >> 8) | val;
-  val = (val >> 16) | val;
+  --val;
+  val |= (val >> 1);
+  val |= (val >> 2);
+  val |= (val >> 4);
+  val |= (val >> 8);
+  val |= (val >> 16);
   return ++val; // Val is now the next highest power of 2.
 } 
 
@@ -359,7 +360,7 @@ double global_sum_gpu(double* vector, int n){
 	double* padded_vector;
 	double res,res2;
 	cudaMalloc((void **) &padded_vector,new_n*sizeof(double));
-	copy_with_zero_padding<<<grid_size,BLOCK_SIZE>>>(padded_vector, vector, n);
+	copy_with_zero_padding<<<grid_size,BLOCK_SIZE>>>(padded_vector, vector, n, new_n);
 	global_reduction_sum(padded_vector,new_n);
 	cudaMemcpy(&res,padded_vector,sizeof(res),cudaMemcpyDeviceToHost);
 	cudaFree(padded_vector);
