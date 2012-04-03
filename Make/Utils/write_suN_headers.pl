@@ -3061,7 +3061,7 @@ sub  write_read_spinor_gpu {
     for($i=0; $i<$N-1; $i++) {
         print "      (v).c\[$i\]=((complex_flt*)(in))\[iz\]; iz+=(stride); \\\n";
     }
-    print "      (v).c\[$i\]=((complex_flt*)(in))\[iz\]; \n";
+    print "      (v).c\[$i\]=((complex_flt*)(in))\[iz\]; \\\n";
     print "   } while (0) \n\n";
 
     print "#define _${rdataname}_read_spinor_gpu(stride,v,in,iy,x) \\\n";
@@ -3070,7 +3070,7 @@ sub  write_read_spinor_gpu {
     for($i=0; $i<$N-1; $i++) {
         print "      (v).c\[$i\]=((complex*)(in))\[iz\]; iz+=(stride); \\\n";
     }
-    print "      (v).c\[$i\]=((complex*)(in))\[iz\]; \n";
+    print "      (v).c\[$i\]=((complex*)(in))\[iz\]; \\\n";
     print "   } while (0) \n\n";
 
 }
@@ -3130,7 +3130,63 @@ sub write_su2_read_gpu {
         print "#define _${basename}${repsuff}_read_gpu(stride,v,in,iy,x) _${basename}${fundsuff}_read_gpu(stride,v,in,iy,x)\n\n";
     }
 
-
 }
+
+sub write_suN_read_gpu {
+    my $i; 
+    my $dim=2*$N*$N; #real components
+
+    print "/* Read an suN matrix from GPU memory */\n";
+    print "/* (output) v = suN ; (input) in = suN* */\n";
+    print "/* (input) iy = site ; (input) x = 0..3 direction; */\n"; 
+    
+    print "#define _${dataname}_flt_read_gpu(stride,v,in,iy,x) \\\n";
+    print "   do {  \\\n";
+    print "      int iz=(iy)+((x)*$dim)*(stride); \\\n";
+    for($i=0; $i<$dim-1; $i++) {
+        print "      (v).c\[$i\]=((float*)(in))\[iz\]; iz+=(stride); \\\n";
+    }
+    print "      (v).c\[$i\]=((float*)(in))\[iz\]; \\\n";
+    print "   } while (0) \n\n";
+    
+    print "#define _${dataname}_read_gpu(stride,v,in,iy,x) \\\n";
+    print "   do {  \\\n";
+    print "      int iz=(iy)+((x)*$dim)*(stride); \\\n";
+    for($i=0; $i<$dim-1; $i++) {
+        print "      (v).c\[$i\]=((double*)(in))\[iz\]; iz+=(stride); \\\n";
+    }
+    print "      (v).c\[$i\]=((double*)(in))\[iz\]; \\\n";
+    print "   } while (0) \n\n";
+    
+}
+
+sub write_suNr_read_gpu {
+    my $i; 
+    my $dim=$N*$N; #real components
+    
+    print "/* Read an suN matrix from GPU memory */\n";
+    print "/* (output) v = suN ; (input) in = suN* */\n";
+    print "/* (input) iy = site ; (input) x = 0..3 direction; */\n"; 
+    
+    print "#define _${rdataname}_flt_read_gpu(stride,v,in,iy,x) \\\n";
+    print "   do {  \\\n";
+    print "      int iz=(iy)+((x)*$dim)*(stride); \\\n";
+    for($i=0; $i<$dim-1; $i++) {
+        print "      (v).c\[$i\]=((float*)(in))\[iz\]; iz+=(stride); \\\n";
+    }
+    print "      (v).c\[$i\]=((float*)(in))\[iz\]; \\\n";
+    print "   } while (0) \n\n";
+    
+    print "#define _${rdataname}_read_gpu(stride,v,in,iy,x) \\\n";
+    print "   do {  \\\n";
+    print "      int iz=(iy)+((x)*$dim)*(stride); \\\n";
+    for($i=0; $i<$dim-1; $i++) {
+        print "      (v).c\[$i\]=((double*)(in))\[iz\]; iz+=(stride); \\\n";
+    }
+    print "      (v).c\[$i\]=((double*)(in))\[iz\]; \\\n";
+    print "   } while (0) \n\n";
+      
+}
+
 
 
