@@ -3134,7 +3134,7 @@ sub write_su2_read_gpu {
 
 sub write_suN_read_gpu {
     my $i; 
-    my $dim=2*$N*$N; #real components
+    my $dim=$N*$N; #complex components
 
     print "/* Read an suN matrix from GPU memory */\n";
     print "/* (output) v = suN ; (input) in = suN* */\n";
@@ -3144,18 +3144,22 @@ sub write_suN_read_gpu {
     print "   do {  \\\n";
     print "      int iz=(iy)+((x)*$dim)*(stride); \\\n";
     for($i=0; $i<$dim-1; $i++) {
-        print "      (v).c\[$i\]=((float*)(in))\[iz\]; iz+=(stride); \\\n";
+        print "      (v).c\[$i\].re=((float*)(in))\[iz\]; iz+=(stride); \\\n";
+        print "      (v).c\[$i\].im=((float*)(in))\[iz\]; iz+=(stride); \\\n";
     }
-    print "      (v).c\[$i\]=((float*)(in))\[iz\]; \\\n";
+    print "      (v).c\[$i\].re=((float*)(in))\[iz\]; iz+=(stride); \\\n";
+    print "      (v).c\[$i\].im=((float*)(in))\[iz\]; \\\n";
     print "   } while (0) \n\n";
     
-    print "#define _${dataname}_read_gpu(stride,v,in,iy,x) \\\n";
+    print "#define _${dataname}_flt_read_gpu(stride,v,in,iy,x) \\\n";
     print "   do {  \\\n";
     print "      int iz=(iy)+((x)*$dim)*(stride); \\\n";
     for($i=0; $i<$dim-1; $i++) {
-        print "      (v).c\[$i\]=((double*)(in))\[iz\]; iz+=(stride); \\\n";
+        print "      (v).c\[$i\].re=((double*)(in))\[iz\]; iz+=(stride); \\\n";
+        print "      (v).c\[$i\].im=((double*)(in))\[iz\]; iz+=(stride); \\\n";
     }
-    print "      (v).c\[$i\]=((double*)(in))\[iz\]; \\\n";
+    print "      (v).c\[$i\].re=((double*)(in))\[iz\]; iz+=(stride); \\\n";
+    print "      (v).c\[$i\].im=((double*)(in))\[iz\]; \\\n";
     print "   } while (0) \n\n";
     
 }
