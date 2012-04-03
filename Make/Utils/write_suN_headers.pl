@@ -3151,7 +3151,7 @@ sub write_suN_read_gpu {
     print "      (v).c\[$i\].im=((float*)(in))\[iz\]; \\\n";
     print "   } while (0) \n\n";
     
-    print "#define _${dataname}_flt_read_gpu(stride,v,in,iy,x) \\\n";
+    print "#define _${dataname}_read_gpu(stride,v,in,iy,x) \\\n";
     print "   do {  \\\n";
     print "      int iz=(iy)+((x)*$dim)*(stride); \\\n";
     for($i=0; $i<$dim-1; $i++) {
