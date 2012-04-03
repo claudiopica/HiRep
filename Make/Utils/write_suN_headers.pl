@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 use strict;
 
-(@ARGV==2 or @ARGV==3) or die("Usage: $0 Ng rep [su2 quaternion]\nsu2 quaternion: 0 = 2x2 complex matrix, 1 = 4 reals, 2 = 3 reals\n");
+(@ARGV==2 or @ARGV==3) or die("Usage: $0 Ng rep [su2 quaternion]\nsu2 quaternion: 0 = 2x2 complex matrix, 1 = 4 reals\n");
 
 my ($Nmax,$unroll)=(5,4);
 my ($vd,$vr); #for vectors
@@ -241,7 +241,7 @@ if ($su2quat==0) {
   write_suN_multiply();
   write_suN_inverse_multiply();
 } else {
-  write_su2_decode($su2quat);
+    #write_su2_decode($su2quat);
   write_su2_multiply();
   write_su2_inverse_multiply();
 }
@@ -300,7 +300,7 @@ if ($su2quat==0) {
   }
 
 } else {
-  write_su2_dagger();
+    write_su2_dagger();
     write_su2_times_su2();
     write_su2_times_su2_dagger();
     write_su2_dagger_times_su2();
@@ -372,9 +372,21 @@ write_spinor_g5_prod_im();
 write_spinor_project();
 write_spinor_pminus();
 write_spinor_pplus();
-
+    
+    #GPU READ/WRITE Functions
+    write_read_spinor_gpu();    
+    write_write_spinor_gpu();
+    
+    if ($su2quat==0) {
+        if ($complex eq "R") {
+            write_suNr_read_gpu();
+        } 
+        write_suN_read_gpu();
+    } else {
+        write_su2_read_gpu();
+    }
+    
 # COMMENTATO
-
 # print <<END
 # /*******************************************************************************
 # *
@@ -2585,7 +2597,7 @@ sub write_spinor_prod {
 	print "      (z).re=0.;(z).im=0.; \\\n";
   for (my $k=0; $k<4; $k++){
     print "  _vector_prod_assign_${suff}((z),(r).$cname\[$k\],(s).$cname\[$k\])";
-    if($k==3) {print"; \\\n}((void)0) \n\n";} else {print "; \\\n"}
+    if($k==3) {print"; \\\n   }((void)0) \n\n";} else {print "; \\\n"}
   }
 }
 
@@ -3020,7 +3032,7 @@ sub write_su2_sqnorm_m1 {
     }    
 }
 
-sub write_su2_exp{
+sub write_su2_exp {
     print "/* u=Exp(dt*iT[n]h[n]) */\n";
     print "/* dt real; T[n] are the generators; h[n] is an algebra vector */\n";
     print "/* tmp is a temporary real */\n";
@@ -3038,6 +3050,87 @@ sub write_su2_exp{
     }
 }
 
+sub  write_read_spinor_gpu {
+    my $i;
+    print "/* Read spinor field component from GPU memory */\n";
+    print "/* (output) v = ${dataname}_vector ; (input) in = ${dataname}_spinor* */\n";
+    print "/* (input) iy = site ; (input) x = 0..3 spinor component; */\n"; 
+    print "#define _${rdataname}_read_spinor_flt_gpu(stride,v,in,iy,x) \\\n";
+    print "   do {  \\\n";
+    print "      int iz=(iy)+((x)*$N)*(stride); \\\n";
+    for($i=0; $i<$N-1; $i++) {
+        print "      (v).c\[$i\]=((complex_flt*)(in))\[iz\]; iz+=(stride); \\\n";
+    }
+    print "      (v).c\[$i\]=((complex_flt*)(in))\[iz\]; \n";
+    print "   } while (0) \n\n";
 
+    print "#define _${rdataname}_read_spinor_gpu(stride,v,in,iy,x) \\\n";
+    print "   do {  \\\n";
+    print "      int iz=(iy)+((x)*$N)*(stride); \\\n";
+    for($i=0; $i<$N-1; $i++) {
+        print "      (v).c\[$i\]=((complex*)(in))\[iz\]; iz+=(stride); \\\n";
+    }
+    print "      (v).c\[$i\]=((complex*)(in))\[iz\]; \n";
+    print "   } while (0) \n\n";
+
+}
+
+sub  write_write_spinor_gpu {
+    my $i;
+    print "/* Write spinor field component to GPU memory */\n";
+    print "/* (input) v = ${dataname}_vector ; (output) out = ${dataname}_spinor* */\n";
+    print "/* (input) iy = site ; (input) x = 0..3 spinor component; */\n"; 
+    print "#define _${rdataname}_write_spinor_flt_gpu(stride,v,out,iy,x) \\\n";
+    print "   do {  \\\n";
+    print "      int iz=(iy)+((x)*$N)*(stride); \\\n";
+    for($i=0; $i<$N-1; $i++) {
+        print "      ((complex_flt*)(out))\[iz\]=(v).c\[$i\]; iz+=(stride); \\\n";
+    }
+    print "      ((complex_flt*)(out))\[iz\]=(v).c\[$i\]; \\\n";
+    print "   } while (0) \n\n";
+    
+    print "#define _${rdataname}_write_spinor_gpu(stride,v,out,iy,x) \\\n";
+    print "   do {  \\\n";
+    print "      int iz=(iy)+((x)*$N)*(stride); \\\n";
+    for($i=0; $i<$N-1; $i++) {
+        print "      ((complex*)(out))\[iz\]=(v).c\[$i\]; iz+=(stride); \\\n";
+    }
+    print "      ((complex*)(out))\[iz\]=(v).c\[$i\]; \\\n";
+    print "   } while (0) \n\n";
+    
+}
+
+sub write_su2_read_gpu {
+    print "/* Read an suN matrix from GPU memory */\n";
+    print "/* (output) v = suN ; (input) in = suN* */\n";
+    print "/* (input) iy = site ; (input) x = 0..3 direction; */\n"; 
+    if ($N==2) { #fundamental representation
+        my $i; 
+        my $dim=$N*$N;
+        print "#define _${dataname}_flt_read_gpu(stride,v,in,iy,x) \\\n";
+        print "   do {  \\\n";
+        print "      int iz=(iy)+((x)*$dim)*(stride); \\\n";
+        for($i=0; $i<$dim-1; $i++) {
+            print "      (v).c\[$i\]=((float*)(in))\[iz\]; iz+=(stride); \\\n";
+        }
+        print "      (v).c\[$i\]=((float*)(in))\[iz\]; \\\n";
+        print "   } while (0) \n\n";
+
+        print "#define _${dataname}_read_gpu(stride,v,in,iy,x) \\\n";
+        print "   do {  \\\n";
+        print "      int iz=(iy)+((x)*$dim)*(stride); \\\n";
+        for($i=0; $i<$dim-1; $i++) {
+            print "      (v).c\[$i\]=((double*)(in))\[iz\]; iz+=(stride); \\\n";
+        }
+        print "      (v).c\[$i\]=((double*)(in))\[iz\]; \\\n";
+        print "   } while (0) \n\n";
+    
+    } else {
+        print "#define _${basename}${repsuff}_flt_read_gpu(stride,v,in,iy,x) _${basename}${fundsuff}_flt_read_gpu(stride,v,in,iy,x)\n\n";
+        print "#define _${basename}${repsuff}_read_gpu(stride,v,in,iy,x) _${basename}${fundsuff}_read_gpu(stride,v,in,iy,x)\n\n";
+    }
+
+
+}
 
 
