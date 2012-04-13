@@ -75,12 +75,12 @@ __global__ void Dphi_gpu_oe(suNf_spinor* out, suNf_spinor* in,
   suNf_hspinor sn;
   suNf u;				
   
-  int iy, iz;
+  int iy;
   int ix = blockIdx.x*BLOCK_SIZE/4 + threadIdx.x%(BLOCK_SIZE/4); 
-  iz=threadIdx.x/(BLOCK_SIZE/4);
+  iy=threadIdx.x/(BLOCK_SIZE/4);
   ix = min(ix,vol4h-1);
   
-  switch (iz) {
+  switch (iy) {
     case 0:
       /******************************* direction +0 *********************************/
       iy=iup(ix+vol4h,0);
@@ -512,12 +512,12 @@ __global__ void Dphi_gpu_eo(suNf_spinor* out, suNf_spinor* in,
   suNf_hspinor sn;
   suNf u;				
   
-  int iy, iz;
+  int iy;
   int ix = blockIdx.x*BLOCK_SIZE/4 + threadIdx.x%(BLOCK_SIZE/4); 
-  iz=threadIdx.x/(BLOCK_SIZE/4);
+  iy=threadIdx.x/(BLOCK_SIZE/4);
   ix = min(ix,vol4h-1);
   
-  switch (iz) {
+  switch (iy) {
     case 0:
       
       /******************************* direction +0 *********************************/

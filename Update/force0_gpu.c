@@ -18,13 +18,6 @@
 
 extern rhmc_par _update_par;
 
-#define _suNg_read_gpu(stride,v,in,iy,x)\
-iw=(iy)+((x)*4)*(stride);\
-(v).c[0]=((double*)(in))[iw]; iw+=(stride); \
-(v).c[1]=((double*)(in))[iw]; iw+=(stride);\
-(v).c[2]=((double*)(in))[iw]; iw+=(stride);\
-(v).c[3]=((double*)(in))[iw]
-
 #define _suNg_av_read_gpu(stride,v,in,iy,x)\
 iw=(iy)+((x)*3)*(stride);\
 (v).c[0]=((double*)(in))[iw]; iw+=(stride); \

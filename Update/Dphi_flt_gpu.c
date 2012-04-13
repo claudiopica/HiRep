@@ -74,7 +74,6 @@ __global__ void test_Dphi_flt_gpu_oe(suNf_spinor_flt* out, suNf_spinor_flt* in,
   suNf_hspinor_flt sn2;
   suNf_flt u;				
   
-    int iz;
   int iy, iy2;
   int ix = blockIdx.x*BLOCK_SIZE + threadIdx.x;
   ix = min(ix,vol4h-1);
@@ -280,7 +279,7 @@ __global__ void Dphi_flt_gpu_oe(suNf_spinor_flt* out, suNf_spinor_flt* in,
   suNf_hspinor_flt sn;
   suNf_flt u;				
   
-  int iy, iz;
+  int iy;
   int ix = blockIdx.x*BLOCK_SIZE + threadIdx.x;
   ix = min(ix,vol4h-1);
   
@@ -483,7 +482,7 @@ __global__ void Dphi_flt_gpu_eo(suNf_spinor_flt* out, suNf_spinor_flt* in,
   suNf_hspinor_flt sn;
   suNf_flt u;				
   
-  int iy, iz;
+  int iy;
   int ix = blockIdx.x*BLOCK_SIZE + threadIdx.x;
   ix = min(ix,vol4h-1);
   

@@ -59,15 +59,9 @@ __global__ void local_momenta_gpu(double* loc_action, suNg_algebra_vector* momen
   loc_action[ix]+=a;
 }
 
-#define _suNf_read_spinor_gpu(stride,v,in,iy,x)\
-iz=(iy)+((x)*3)*(stride);\
-(v).c[0]=((complex*)(in))[iz]; iz+=(stride); \
-(v).c[1]=((complex*)(in))[iz]; iz+=(stride);\
-(v).c[2]=((complex*)(in))[iz]
 
 __global__ void  local_pseudo_fermions_gpu(double* loc_action, suNf_spinor* phi1, suNf_spinor* phi2, int stride, int N){
   int ix = blockIdx.x*BLOCK_SIZE + threadIdx.x;
-  int iz;
   suNf_spinor s1,s2;
   double tmp;
   ix = min(ix,N-1);
@@ -84,16 +78,9 @@ __global__ void  local_pseudo_fermions_gpu(double* loc_action, suNf_spinor* phi1
 }
 
 
-#define _suNg_read_gpu(stride,v,in,iy,x)\
-iw=(iy)+((x)*4)*(stride);\
-(v).c[0]=((double*)(in))[iw]; iw+=(stride); \
-(v).c[1]=((double*)(in))[iw]; iw+=(stride);\
-(v).c[2]=((double*)(in))[iw]; iw+=(stride);\
-(v).c[3]=((double*)(in))[iw]
-
 __device__ double plaq_gpu(const suNg* gauge, int ix,int mu,int nu, const int *iup, int vol4h)
 {
-  int iy,iz,iw;
+  int iy,iz;
   double p=0;
   suNg v1,v2,v3,v4, w1, w2, w3 ;
   
@@ -224,8 +211,6 @@ void local_hmc_action(local_action_type type,
    
 }
 
-#undef _suNf_read_spinor_gpu
-#undef _suNg_read_gpu
 
 
 #endif
