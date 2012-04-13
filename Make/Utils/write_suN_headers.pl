@@ -380,10 +380,13 @@ write_spinor_pplus();
     if ($su2quat==0) {
         if ($complex eq "R") {
             write_suNr_read_gpu();
+            write_suNr_write_gpu();
         } 
         write_suN_read_gpu();
+        write_suN_write_gpu();
     } else {
         write_su2_read_gpu();
+        write_su2_write_gpu();
     }
     
 # COMMENTATO
@@ -3132,6 +3135,38 @@ sub write_su2_read_gpu {
 
 }
 
+sub write_su2_write_gpu {
+    print "/* Write an suN matrix to GPU memory */\n";
+    print "/* (input) v = suN ; (output) in = suN* */\n";
+    print "/* (input) iy = site ; (input) x = 0..3 direction; */\n"; 
+    if ($N==2) { #fundamental representation
+        my $i; 
+        my $dim=$N*$N;
+        print "#define _${dataname}_flt_write_gpu(stride,v,out,iy,x) \\\n";
+        print "   do {  \\\n";
+        print "      int __iz=(iy)+((x)*$dim)*(stride); \\\n";
+        for($i=0; $i<$dim-1; $i++) {
+            print "      ((float*)(out))\[__iz\]=(v).c\[$i\]; __iz+=(stride); \\\n";
+        }
+        print "      ((float*)(out))\[__iz\]=(v).c\[$i\]; \\\n";
+        print "   } while (0) \n\n";
+        
+        print "#define _${dataname}_write_gpu(stride,v,out,iy,x) \\\n";
+        print "   do {  \\\n";
+        print "      int __iz=(iy)+((x)*$dim)*(stride); \\\n";
+        for($i=0; $i<$dim-1; $i++) {
+            print "      ((double*)(out))\[__iz\]=(v).c\[$i\]; __iz+=(stride); \\\n";
+        }
+        print "      ((double*)(out))\[__iz\]=(v).c\[$i\]; \\\n";
+        print "   } while (0) \n\n";
+        
+    } else {
+        print "#define _${basename}${repsuff}_flt_write_gpu(stride,v,in,iy,x) _${basename}${fundsuff}_flt_write_gpu(stride,v,in,iy,x)\n\n";
+        print "#define _${basename}${repsuff}_write_gpu(stride,v,in,iy,x) _${basename}${fundsuff}_write_gpu(stride,v,in,iy,x)\n\n";
+    }
+    
+}
+
 sub write_suN_read_gpu {
     my $i; 
     my $dim=$N*$N; #complex components
@@ -3164,6 +3199,39 @@ sub write_suN_read_gpu {
     
 }
 
+sub write_suN_write_gpu {
+    my $i; 
+    my $dim=$N*$N; #complex components
+    
+    print "/* Write an suN matrix to GPU memory */\n";
+    print "/* (input) v = suN ; (output) out = suN* */\n";
+    print "/* (input) iy = site ; (input) x = 0..3 direction; */\n"; 
+    
+    print "#define _${dataname}_flt_write_gpu(stride,v,out,iy,x) \\\n";
+    print "   do {  \\\n";
+    print "      int __iz=(iy)+((x)*$dim)*(stride); \\\n";
+    for($i=0; $i<$dim-1; $i++) {
+        print "      ((float*)(out))\[__iz\]=(v).c\[$i\].re; __iz+=(stride); \\\n";
+        print "      ((float*)(out))\[__iz\]=(v).c\[$i\].im; __iz+=(stride); \\\n";
+    }
+    print "      ((float*)(out))\[__iz\]=(v).c\[$i\].re; __iz+=(stride); \\\n";
+    print "      ((float*)(out))\[__iz\]=(v).c\[$i\].im; \\\n";
+    print "   } while (0) \n\n";
+    
+    print "#define _${dataname}_write_gpu(stride,v,out,iy,x) \\\n";
+    print "   do {  \\\n";
+    print "      int __iz=(iy)+((x)*$dim)*(stride); \\\n";
+    for($i=0; $i<$dim-1; $i++) {
+        print "      ((double*)(out))\[__iz\]=(v).c\[$i\].re; __iz+=(stride); \\\n";
+        print "      ((double*)(out))\[__iz\]=(v).c\[$i\].im; __iz+=(stride); \\\n";
+    }
+    print "      ((double*)(out))\[__iz\]=(v).c\[$i\].re; __iz+=(stride); \\\n";
+    print "      ((double*)(out))\[__iz\]=(v).c\[$i\].im; \\\n";
+    print "   } while (0) \n\n";
+    
+}
+
+
 sub write_suNr_read_gpu {
     my $i; 
     my $dim=$N*$N; #real components
@@ -3190,6 +3258,34 @@ sub write_suNr_read_gpu {
     print "      (v).c\[$i\]=((double*)(in))\[__iz\]; \\\n";
     print "   } while (0) \n\n";
       
+}
+
+sub write_suNr_write_gpu {
+    my $i; 
+    my $dim=$N*$N; #real components
+    
+    print "/* Write an suN matrix to GPU memory */\n";
+    print "/* (input) v = suN ; (output) out = suN* */\n";
+    print "/* (input) iy = site ; (input) x = 0..3 direction; */\n"; 
+    
+    print "#define _${rdataname}_flt_write_gpu(stride,v,out,iy,x) \\\n";
+    print "   do {  \\\n";
+    print "      int __iz=(iy)+((x)*$dim)*(stride); \\\n";
+    for($i=0; $i<$dim-1; $i++) {
+        print "      ((float*)(out))\[__iz\]=(v).c\[$i\]; __iz+=(stride); \\\n";
+    }
+    print "      ((float*)(out))\[__iz\]=(v).c\[$i\]; \\\n";
+    print "   } while (0) \n\n";
+    
+    print "#define _${rdataname}_write_gpu(stride,v,out,iy,x) \\\n";
+    print "   do {  \\\n";
+    print "      int __iz=(iy)+((x)*$dim)*(stride); \\\n";
+    for($i=0; $i<$dim-1; $i++) {
+        print "      ((double*)(out))\[__iz\]=(v).c\[$i\]; __iz+=(stride); \\\n";
+    }
+    print "      ((double*)(out))\[__iz\]=(v).c\[$i\]; \\\n";
+    print "   } while (0) \n\n";
+    
 }
 
 
