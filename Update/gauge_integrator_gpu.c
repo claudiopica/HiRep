@@ -1,3 +1,5 @@
+#ifdef WITH_GPU
+
 #include "global.h"
 #include "suN.h"
 #include "utils.h"
@@ -60,3 +62,5 @@ void gauge_integrator_gpu(suNg_av_field *momenta, double dt){
 #undef _suNg_read_gpu
 #undef _suNg_write_gpu
 #undef _suNg_av_read_gpu
+
+#endif

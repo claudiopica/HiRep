@@ -139,5 +139,5 @@ void (*local_hmc_action) (local_action_type type,
                       scalar_field *loc_action,
                       suNg_av_field *momenta,
                       spinor_field *phi1,
-			  spinor_field *phi2) = local_action_cpu;
+			  spinor_field *phi2) = local_hmc_action_cpu;
 #endif

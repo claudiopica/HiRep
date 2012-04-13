@@ -12,6 +12,8 @@
 *
 *******************************************************************************/
 
+#ifdef WITH_GPU
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -25,8 +27,6 @@
 #include "communications.h"
 #include "memory.h"
 #include "gpu.h"
-
-#ifdef WITH_GPU
 
 
 #ifdef ROTATED_SF
@@ -129,7 +129,7 @@ iz=(iy)+((x)*4)*(stride);\
 //#define __asm_sync
 
 /* Takes an even input spinor and returns an odd spinor */
-__global__ void Dphi_flt_gpu_oe(suNf_spinor_flt* out, suNf_spinor_flt* in, 
+__global__ void test_Dphi_flt_gpu_oe(suNf_spinor_flt* out, suNf_spinor_flt* in, 
                              const suNf_flt* gauge, const int *iup, const int *idn, 
                              const int vol4h, const int stride)
 {
@@ -139,11 +139,9 @@ __global__ void Dphi_flt_gpu_oe(suNf_spinor_flt* out, suNf_spinor_flt* in,
   suNf_hspinor_flt sn2;
   suNf_flt u;				
   
-  int iy, iz, iy2;
+  int iy, iy2;
   int ix = blockIdx.x*BLOCK_SIZE + threadIdx.x;
   ix = min(ix,vol4h-1);
-  
-
   
   /******************************* direction +0 *********************************/
   iy=iup(ix+vol4h,0);
@@ -337,7 +335,7 @@ __asm_sync;
 
 
 /* Takes an even input spinor and returns an odd spinor */
-__global__ void test_Dphi_flt_gpu_oe(suNf_spinor_flt* out, suNf_spinor_flt* in, 
+__global__ void Dphi_flt_gpu_oe(suNf_spinor_flt* out, suNf_spinor_flt* in, 
                              const suNf_flt* gauge, const int *iup, const int *idn, 
                              const int vol4h, const int stride)
 {
@@ -346,16 +344,10 @@ __global__ void test_Dphi_flt_gpu_oe(suNf_spinor_flt* out, suNf_spinor_flt* in,
   suNf_hspinor_flt sn;
   suNf_flt u;				
   
-  int iy, iz;
+  int iy;
   int ix = blockIdx.x*BLOCK_SIZE + threadIdx.x;
   ix = min(ix,vol4h-1);
   
-#ifdef UPDATE_EO
-   
-#else 
-  
-#endif //UPDATE_EO                   
-
   
   /******************************* direction +0 *********************************/
   iy=iup(ix+vol4h,0);
@@ -555,15 +547,9 @@ __global__ void Dphi_flt_gpu_eo(suNf_spinor_flt* out, suNf_spinor_flt* in,
   suNf_hspinor_flt sn;
   suNf_flt u;				
   
-  int iy, iz;
+  int iy;
   int ix = blockIdx.x*BLOCK_SIZE + threadIdx.x;
   ix = min(ix,vol4h-1);
-  
-#ifdef UPDATE_EO
-   
-#else 
-
-#endif //UPDATE_EO                   
   
   
   /******************************* direction +0 *********************************/

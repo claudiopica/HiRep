@@ -201,7 +201,7 @@ int main(int argc,char *argv[])
 
    Xs=alloc_spinor_field_f(2,&glattice);
    Ys=Xs+1;
-    force = alloc_suNg_av_field(&glattice);
+    force = alloc_avfield(&glattice);
     
    gaussian_spinor_field(Xs);
    spinor_field_copy_to_gpu_f(Xs);
@@ -349,6 +349,7 @@ int main(int argc,char *argv[])
  */
 
    free_spinor_field_f(Xs);
+free_avfield(force);
    finalize_process();
 
    exit(0);

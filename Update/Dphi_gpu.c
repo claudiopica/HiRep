@@ -12,6 +12,9 @@
 *
 *******************************************************************************/
 
+
+#ifdef WITH_GPU
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -26,7 +29,6 @@
 #include "memory.h"
 #include "gpu.h"
 
-#ifdef WITH_GPU
 
 #ifdef ROTATED_SF
 #include "update.h"
