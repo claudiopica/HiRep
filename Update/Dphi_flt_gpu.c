@@ -59,71 +59,6 @@ typedef struct _suNf_hspinor_flt
   suNf_vector_flt c[2];
 } suNf_hspinor_flt;
   
-/* v = suNf_vector ; in = input ; iy = site
-   x = 0..3 spinor component 
- */
-#define _suNf_read_spinor_flt_gpu_old(stride,v,in,iy,x)\
-	(v).c[0]=((complex_flt*)(in))[(iy)+((x)*3)*(stride)]; \
-  (v).c[1]=((complex_flt*)(in))[(iy)+((x)*3+1)*(stride)]; \
-  (v).c[2]=((complex_flt*)(in))[(iy)+((x)*3+2)*(stride)]
-
-#define _suNf_read_spinor_flt_gpu(stride,v,in,iy,x)\
-iz=(iy)+((x)*3)*(stride);\
-(v).c[0]=((complex_flt*)(in))[iz]; iz+=(stride); \
-(v).c[1]=((complex_flt*)(in))[iz]; iz+=(stride);\
-(v).c[2]=((complex_flt*)(in))[iz]
-
-#define test_suNf_read_spinor_flt_gpu(stride,v,in,iy,x)\
-(iy)+=((x)*3)*(stride);\
-(v).c[0]=((complex_flt*)(in))[(iy)]; \
-(v).c[1]=((complex_flt*)(in))[(iy)+(stride)];\
-(v).c[2]=((complex_flt*)(in))[(iy)+2*(stride)];\
-(iy)-=(x)*3*(stride)
-
-
-/* v = suNf_vector ; out = output ; iy = site
- x = 0..3 spinor component 
- */
-#define _suNf_write_spinor_flt_gpu_old(stride,v,out,iy,x)\
-((complex_flt*)(out))[(iy)+((x)*3)*(stride)]=(v).c[0]; \
-((complex_flt*)(out))[(iy)+((x)*3+1)*(stride)]=(v).c[1]; \
-((complex_flt*)(out))[(iy)+((x)*3+2)*(stride)]=(v).c[2]
-
-#define _suNf_write_spinor_flt_gpu(stride,v,out,iy,x)\
-iz=(iy)+((x)*3)*(stride);\
-((complex_flt*)(out))[iz]=(v).c[0]; iz+=(stride); \
-((complex_flt*)(out))[iz]=(v).c[1]; iz+=(stride);\
-((complex_flt*)(out))[iz]=(v).c[2]
-
-#define test_suNf_write_spinor_flt_gpu(stride,v,out,iy,x)\
-(iy)+=(x)*3*(stride);\
-((complex_flt*)(out))[(iy)]=(v).c[0]; \
-((complex_flt*)(out))[(iy)+(stride)]=(v).c[1];\
-((complex_flt*)(out))[(iy)+2*(stride)]=(v).c[2];\
-(iy)-=(x)*3*(stride)
-
-
-#define _suNf_flt_read_gpu_old(stride,v,in,iy,x)\
-(v).c[0]=((float*)(in))[(iy)+((x)*4)*(stride)]; \
-(v).c[1]=((float*)(in))[(iy)+((x)*4+1)*(stride)];\
-(v).c[2]=((float*)(in))[(iy)+((x)*4+2)*(stride)];\
-(v).c[3]=((float*)(in))[(iy)+((x)*4+3)*(stride)]
-
-#define _suNf_flt_read_gpu(stride,v,in,iy,x)\
-iz=(iy)+((x)*4)*(stride);\
-(v).c[0]=((float*)(in))[iz]; iz+=(stride); \
-(v).c[1]=((float*)(in))[iz]; iz+=(stride);\
-(v).c[2]=((float*)(in))[iz]; iz+=(stride);\
-(v).c[3]=((float*)(in))[iz]
-
-#define test_suNf_flt_read_gpu(stride,v,in,iy,x)\
-(iy)+=(x)*4*(stride);\
-(v).c[0]=((float*)(in))[(iy)]; \
-(v).c[1]=((float*)(in))[(iy)+(stride)];\
-(v).c[2]=((float*)(in))[(iy)+2*(stride)];\
-(v).c[3]=((float*)(in))[(iy)+3*(stride)];\
-(iy)-=(x)*4*(stride);\
-
 
 #define __asm_sync asm volatile("membar.cta;")
 //#define __asm_sync
@@ -139,6 +74,7 @@ __global__ void test_Dphi_flt_gpu_oe(suNf_spinor_flt* out, suNf_spinor_flt* in,
   suNf_hspinor_flt sn2;
   suNf_flt u;				
   
+    int iz;
   int iy, iy2;
   int ix = blockIdx.x*BLOCK_SIZE + threadIdx.x;
   ix = min(ix,vol4h-1);
@@ -344,7 +280,7 @@ __global__ void Dphi_flt_gpu_oe(suNf_spinor_flt* out, suNf_spinor_flt* in,
   suNf_hspinor_flt sn;
   suNf_flt u;				
   
-  int iy;
+  int iy, iz;
   int ix = blockIdx.x*BLOCK_SIZE + threadIdx.x;
   ix = min(ix,vol4h-1);
   
@@ -547,7 +483,7 @@ __global__ void Dphi_flt_gpu_eo(suNf_spinor_flt* out, suNf_spinor_flt* in,
   suNf_hspinor_flt sn;
   suNf_flt u;				
   
-  int iy;
+  int iy, iz;
   int ix = blockIdx.x*BLOCK_SIZE + threadIdx.x;
   ix = min(ix,vol4h-1);
   

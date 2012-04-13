@@ -61,34 +61,7 @@ typedef struct _suNf_hspinor
 } suNf_hspinor;
   
 
-/* v = suNf_vector ; in = input ; iy = site
-   x = 0..3 spinor component 
- */
-#define _suNf_read_spinor_gpu(stride,v,in,iy,x)\
-iz=(iy)+((x)*3)*(stride);\
-(v).c[0]=((complex*)(in))[iz]; iz+=(stride); \
-(v).c[1]=((complex*)(in))[iz]; iz+=(stride);\
-(v).c[2]=((complex*)(in))[iz]
-
-
-/* v = suNf_vector ; out = output ; iy = site
- x = 0..3 spinor component 
- */
-
-#define _suNf_write_spinor_gpu(stride,v,out,iy,x)\
-iz=(iy)+((x)*3)*(stride);\
-((complex*)(out))[iz]=(v).c[0]; iz+=(stride); \
-((complex*)(out))[iz]=(v).c[1]; iz+=(stride);\
-((complex*)(out))[iz]=(v).c[2]
-
-#define _suNf_read_gpu(stride,v,in,iy,x)\
-iz=(iy)+((x)*4)*(stride);\
-(v).c[0]=((double*)(in))[iz]; iz+=(stride); \
-(v).c[1]=((double*)(in))[iz]; iz+=(stride);\
-(v).c[2]=((double*)(in))[iz]; iz+=(stride);\
-(v).c[3]=((double*)(in))[iz]
-
-
+//#define __asm_sync asm volatile("membar.cta;")
 #define __asm_sync
 
 
