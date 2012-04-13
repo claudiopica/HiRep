@@ -376,6 +376,7 @@ write_spinor_pplus();
     #GPU READ/WRITE Functions
     write_read_spinor_gpu();    
     write_write_spinor_gpu();
+    write_suN_av_read_gpu();
     
     if ($su2quat==0) {
         if ($complex eq "R") {
@@ -3288,5 +3289,32 @@ sub write_suNr_write_gpu {
     
 }
 
+sub write_suN_av_read_gpu {
+    my $i; 
+    my $dim=$N*$N-1; #real components
+    
+    print "/* Read an suN algebra vector from GPU memory */\n";
+    print "/* (output) v = suN_algebra_vector ; (input) in = suN_algebra_vector* */\n";
+    print "/* (input) iy = site ; (input) x = 0..3 direction; */\n"; 
+    
+    print "#define _${rdataname}_av_flt_read_gpu(stride,v,in,iy,x) \\\n";
+    print "   do {  \\\n";
+    print "      int __iz=(iy)+((x)*$dim)*(stride); \\\n";
+    for($i=0; $i<$dim-1; $i++) {
+        print "      (v).c\[$i\]=((float*)(in))\[__iz\]; __iz+=(stride); \\\n";
+    }
+    print "      (v).c\[$i\]=((float*)(in))\[__iz\]; \\\n";
+    print "   } while (0) \n\n";
+    
+    print "#define _${rdataname}_av_read_gpu(stride,v,in,iy,x) \\\n";
+    print "   do {  \\\n";
+    print "      int __iz=(iy)+((x)*$dim)*(stride); \\\n";
+    for($i=0; $i<$dim-1; $i++) {
+        print "      (v).c\[$i\]=((double*)(in))\[__iz\]; __iz+=(stride); \\\n";
+    }
+    print "      (v).c\[$i\]=((double*)(in))\[__iz\]; \\\n";
+    print "   } while (0) \n\n";
+    
+}
 
 
