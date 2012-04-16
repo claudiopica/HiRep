@@ -172,23 +172,13 @@ __global__ void force_hmc_gpu_kernel(suNg_algebra_vector* force, suNf_spinor *Xs
 }
 
 
-void force_hmc_gpu(suNg_av_field* force, spinor_field *Xs, spinor_field *Ys, double dt, force_hmc_par *par){
+void force_hmc_gpu(suNg_av_field* force, spinor_field *Xs, spinor_field *Ys, double dfs){
   int N = T*X*Y*Z;//u_gauge->type->master_end[0] -  u_gauge->type->master_start[0] + 1;
   int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
-  double fs;
-  suNg_av_field_copy_to_gpu(force);
-#ifdef UPDATE_EO
-  if(par->hasenbusch != 1) fs = -dt*(_REPR_NORM2/_FUND_NORM2);
-  else fs = -par->bD*dt*(_REPR_NORM2/_FUND_NORM2);
-#else
-  if(par->hasenbusch != 1) fs = dt*(_REPR_NORM2/_FUND_NORM2);
-  else fs = par->bD*dt*(_REPR_NORM2/_FUND_NORM2);
-#endif
-//  force_hmc_gpu_kernel<<<grid,BLOCK_SIZE>>>(force->gpu_ptr,START_SP_ADDRESS_GPU(Xs),START_SP_ADDRESS_GPU(Ys),u_gauge_f->gpu_ptr,fs,iup_gpu,N);
-
-  force_hmc_gpu_kernel<<<grid,BLOCK_SIZE>>>(force->gpu_ptr,Xs->gpu_ptr,Ys->gpu_ptr,u_gauge_f->gpu_ptr,fs,iup_gpu,N);
+  //  suNg_av_field_copy_to_gpu(force);
+  force_hmc_gpu_kernel<<<grid,BLOCK_SIZE>>>(force->gpu_ptr,Xs->gpu_ptr,Ys->gpu_ptr,u_gauge_f->gpu_ptr,dfs,iup_gpu,N);
   CudaCheckError();
-  suNg_av_field_copy_from_gpu(force);
+  //  suNg_av_field_copy_from_gpu(force);
 }
 
 #undef _suNf_read_spinor_gpu

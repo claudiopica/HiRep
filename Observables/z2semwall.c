@@ -106,7 +106,7 @@ static double hmass, hmass_pre;
 static void D_dbl(spinor_field *out, spinor_field *in){
   Dphi(hmass,out,in);
 }
-spinor_operator D_dbl={&D_dbl,NULL};
+spinor_operator D_op={&D_dbl,NULL};
 #endif
 
 static void D_pre_dbl(spinor_field *out, spinor_field *in){
@@ -302,7 +302,7 @@ static void z2semwall_qprop_QMR_eo(void (*Gamma)(suNf_spinor*,suNf_spinor*), spi
 #ifndef NDEBUG
     /* this is a test of the solution */
     hmass=mass[i];
-    D.dbl(&test[0],&psi[i]);
+    D_op.dbl(&test[0],&psi[i]);
     ++cgiter;
     spinor_field_zero_f(&test[1]);
    _MASTER_FOR(&glat_even,ix)

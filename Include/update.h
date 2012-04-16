@@ -60,7 +60,7 @@ void free_force_hmc();
 void force_hmc(double dt, suNg_av_field *force, void *par);
 
 #ifdef WITH_GPU
-void force_hmc_gpu(suNg_av_field* force, spinor_field *Xs, spinor_field *Ys, double dt, force_hmc_par *par);
+void force_hmc_gpu(suNg_av_field* force, spinor_field *Xs, spinor_field *Ys, double dfs);
 #endif 
 
 
@@ -169,8 +169,14 @@ void local_hmc_action_cpu(local_action_type type,
                       spinor_field *phi1,
                       spinor_field *phi2);
 
-void suNg_field_copy(suNg_field *g1, suNg_field *g2);
 
+void suNg_field_copy_cpu(suNg_field *g1, suNg_field *g2);
+
+#ifdef WITH_GPU
+void suNg_field_copy(suNg_field *g1, suNg_field *g2);
+#else
+extern void (*suNg_field_copy)(suNg_field *g1, suNg_field *g2);
+#endif //WITH_GPU
 /* find spectral interval using eva */
 void find_spec_H2(spinor_operator H2, double *max, double *min);
 

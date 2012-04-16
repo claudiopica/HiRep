@@ -65,7 +65,7 @@ void force0_cpu(double dt, suNg_av_field *force, void *vpar){
 
 
 #ifndef WITH_GPU
-void (*force0)(double dt, suNg_av_field *force, void *par)=force0_cpu;
+void (*force0)(double dt, suNg_av_field *force, void *vpar)=force0_cpu;
 #endif
 /*
 void Force(double dt, suNg_av_field *force, spinor_field *pf){

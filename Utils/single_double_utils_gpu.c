@@ -51,24 +51,128 @@ void assign_sd2s(spinor_field_flt *out, spinor_field *in) {
  ((float*)(out))[ix]=(float)((double*)(in))[ix];
  }
 
-void assign_s2sd(spinor_field *out, spinor_field_flt *in) {
 
-	 int size, grid;
-	 size = in->type->master_end[0] -  in->type->master_start[0] + 1;
-	 size *= sizeof(suNf_spinor)/sizeof(double);				
-	 grid = size/BLOCK_SIZE + ((size % BLOCK_SIZE == 0) ? 0 : 1); 	// NF is defined in suN_types.h
-	 assign_s2sd_kernel<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), size);
-	 CudaCheckError();	
+#define _suNg_read_gpu(stride,v,in,iy,x)\
+iw=(iy)+((x)*4)*(stride);\
+(v).c[0]=((double*)(in))[iw]; iw+=(stride); \
+(v).c[1]=((double*)(in))[iw]; iw+=(stride);\
+(v).c[2]=((double*)(in))[iw]; iw+=(stride);\
+(v).c[3]=((double*)(in))[iw]
+
+#define _suNg_write_gpu(stride,v,in,iy,x)\
+iw=(iy)+((x)*4)*(stride);\
+((double*)(in))[iw]=(v).c[0]; iw+=(stride);\
+((double*)(in))[iw]=(v).c[1]; iw+=(stride);\
+((double*)(in))[iw]=(v).c[2]; iw+=(stride);\
+((double*)(in))[iw]=(v).c[3]
+
+#define _suNg_read_gpu_flt(stride,v,in,iy,x)\
+iw=(iy)+((x)*4)*(stride);\
+(v).c[0]=((float*)(in))[iw]; iw+=(stride); \
+(v).c[1]=((float*)(in))[iw]; iw+=(stride);\
+(v).c[2]=((float*)(in))[iw]; iw+=(stride);\
+(v).c[3]=((float*)(in))[iw]
+
+#define _suNg_write_gpu_flt(stride,v,in,iy,x)\
+iw=(iy)+((x)*4)*(stride);\
+((float*)(in))[iw]=(v).c[0]; iw+=(stride);\
+((float*)(in))[iw]=(v).c[1]; iw+=(stride);\
+((float*)(in))[iw]=(v).c[2]; iw+=(stride);\
+((float*)(in))[iw]=(v).c[3]
+
+__global__ void assign_u2ud_quaternions_kernel(suNg* gauge, suNg_flt* gauge_flt, int N){ //Only for quaternions
+  suNg u;
+  suNg_flt u_flt;
+  int ix = blockIdx.x*BLOCK_SIZE+ threadIdx.x;
+  int iw,i;
+  if (ix>=N/2) {
+    gauge+=2*N;
+    ix -= N/2;
+  }
+  for (i=0;i<4;++i){
+    _suNg_read_gpu_flt(N/2,u_flt,gauge_flt,ix,i);
+    u.c[0]=(double) u_flt.c[0];
+    u.c[1]=(double) u_flt.c[1];
+    u.c[2]=(double) u_flt.c[2];
+    u.c[3]=(double) u_flt.c[3];
+    _suNg_write_gpu(N/2,u,gauge,ix,i);
+  }
+}
+
+__global__ void assign_ud2u_quaternions_kernel(suNg* gauge, suNg_flt* gauge_flt, int N){ //Only for quaternions
+  suNg u;
+  suNg_flt u_flt;
+  int ix = blockIdx.x*BLOCK_SIZE+ threadIdx.x;
+  int iw,i;
+  if (ix>=N/2) {
+    gauge+=2*N;
+    gauge_flt+=2*N;
+    ix -= N/2;
+  }
+  for (i=0;i<4;++i){
+    _suNg_read_gpu(N/2,u,gauge,ix,i);
+    u_flt.c[0]=(float) u.c[0];
+    u_flt.c[1]=(float) u.c[1];
+    u_flt.c[2]=(float) u.c[2];
+    u_flt.c[3]=(float) u.c[3];
+    _suNg_write_gpu_flt(N/2,u_flt,gauge_flt,ix,i);
+  }
+}
+
+
+void assign_s2sd(spinor_field *out, spinor_field_flt *in) {
+  int size, grid;
+  size = in->type->master_end[0] -  in->type->master_start[0] + 1;
+  size *= sizeof(suNf_spinor)/sizeof(double);				
+  grid = size/BLOCK_SIZE + ((size % BLOCK_SIZE == 0) ? 0 : 1); 	// NF is defined in suN_types.h
+  assign_s2sd_kernel<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), size);
+  CudaCheckError();	
 }
 
 void assign_sd2s(spinor_field_flt *out, spinor_field *in) {
-
-	 int size, grid;
-	 size = in->type->master_end[0] -  in->type->master_start[0] + 1;
-	 size *= sizeof(suNf_spinor)/sizeof(double);				
-	 grid = size/BLOCK_SIZE + ((size % BLOCK_SIZE == 0) ? 0 : 1); 	// NF is defined in suN_types.h
-	 assign_sd2s_kernel<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), size);
-	 CudaCheckError();
-	 
+  int size, grid;
+  size = in->type->master_end[0] -  in->type->master_start[0] + 1;
+  size *= sizeof(suNf_spinor)/sizeof(double);				
+  grid = size/BLOCK_SIZE + ((size % BLOCK_SIZE == 0) ? 0 : 1); 	// NF is defined in suN_types.h
+  assign_sd2s_kernel<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), size);
+  CudaCheckError();
 }
+
+void assign_u2ud(){
+  int N = u_gauge->type->master_end[0] -  u_gauge->type->master_start[0] + 1;
+  int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
+#ifdef WITH_QUATERNIONS
+  assign_u2ud_quaternions_kernel<<<grid,BLOCK_SIZE>>>(u_gauge->gpu_ptr,u_gauge_flt->gpu_ptr,N);
+#else
+#error "GPU only with quaternions"
+#endif
+}
+
+void assign_ud2u(){
+  int N = u_gauge->type->master_end[0] -  u_gauge->type->master_start[0] + 1;
+  int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
+#ifdef WITH_QUATERNIONS
+  assign_ud2u_quaternions_kernel<<<grid,BLOCK_SIZE>>>(u_gauge->gpu_ptr,u_gauge_flt->gpu_ptr,N);
+#else
+#error "GPU only with quaternions"
+#endif
+}
+
+void assign_u2ud_f(){
+#ifdef WITH_QUATERNIONS
+  assign_u2ud();
+#else
+#error "GPU only with quaternions"
+#endif 
+}
+
+void assign_ud2u_f(){
+#ifdef WITH_QUATERNIONS
+  assign_ud2u();
+#else
+#error "GPU only with quaternions"
+#endif 
+}
+
+
 #endif //WITH_GPU

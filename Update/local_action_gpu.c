@@ -148,8 +148,8 @@ void local_hmc_action(local_action_type type,
 
   unsigned int N, grid, N_sp, grid_sp,i;
 	
-  gfield_copy_to_gpu(u_gauge);
-  suNg_av_field_copy_to_gpu(momenta);
+  //  gfield_copy_to_gpu(u_gauge);
+  //  suNg_av_field_copy_to_gpu(momenta);
 	
   /* check input types */
 #ifndef CHECK_SPINOR_MATCHING
@@ -185,7 +185,7 @@ void local_hmc_action(local_action_type type,
   CudaCheckError();
   
 #else /* ROTATED_SF */
-  "ROTATED_SF not yet implemented for GPU"
+#error  "ROTATED_SF not yet implemented for GPU"
 #endif /* ROTATED_SF */
 
   

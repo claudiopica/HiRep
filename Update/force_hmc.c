@@ -139,6 +139,8 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
  
   force_hmc_par *par = (force_hmc_par*)vpar;
   spinor_field *pf = par->pf;
+  double dfs;
+
   
   /* check input types */
   _TWO_SPINORS_MATCHING(u_gauge,force);
@@ -147,9 +149,19 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
 
   assign_ud2u_f();
 #ifdef WITH_GPU//Make sure gauge field is on GPU
-    gfield_copy_to_gpu_f(u_gauge_f); 
-    gfield_copy_to_gpu_f_flt(u_gauge_f_flt);
+  //    gfield_copy_to_gpu_f(u_gauge_f); 
+  //    gfield_copy_to_gpu_f_flt(u_gauge_f_flt);
 #endif    
+
+
+#ifdef UPDATE_EO
+  if(par->hasenbusch != 1) dfs = -dt*(_REPR_NORM2/_FUND_NORM2);
+  else dfs = -par->bD*dt*(_REPR_NORM2/_FUND_NORM2);
+#else
+  if(par->hasenbusch != 1) dfs = dt*(_REPR_NORM2/_FUND_NORM2);
+  else dfs = par->bD*dt*(_REPR_NORM2/_FUND_NORM2);
+#endif
+
   
   for (k=0; k<par->n_pf; ++k) {
 
@@ -226,9 +238,9 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
     start_sf_sendrecv(Ys);
 
 #ifdef WITH_GPU
-    
-      force_hmc_gpu(force,Xs,Ys,dt,par);
-      
+   
+    force_hmc_gpu(force,Xs,Ys,dfs);
+     
 #else    
     
     _PIECE_FOR(&glattice,x) { 
@@ -277,22 +289,7 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
       	  }
 	  
       	  _algebra_project(f,s1);
-
-
-#ifdef UPDATE_EO
-          if(par->hasenbusch != 1) {
-      	    _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),-dt*(_REPR_NORM2/_FUND_NORM2),f);
-      	  } else {
-      	    _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),-par->bD*dt*(_REPR_NORM2/_FUND_NORM2),f);
-          }
-#else
-          if(par->hasenbusch != 1) {
-	    _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),dt*(_REPR_NORM2/_FUND_NORM2),f);	
-      	  } else {
-      	    _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),par->bD*dt*(_REPR_NORM2/_FUND_NORM2),f);
-          }
-#endif
-	  
+	  _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),dfs,f);
       	}
       }
       if(_PIECE_INDEX(x)==0) {

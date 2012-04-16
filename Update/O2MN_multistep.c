@@ -35,8 +35,8 @@ void gauge_integrator(suNg_av_field *momenta, integrator_par *int_par){
 
   if(int_par->nsteps == 0)  return;
 #ifdef WITH_GPU
-  gfield_copy_to_gpu(u_gauge);
-  suNg_av_field_copy_to_gpu(momenta);
+  //  gfield_copy_to_gpu(u_gauge);
+  //  suNg_av_field_copy_to_gpu(momenta);
 #endif
   lprintf("MD_INT",20,"Starting new MD trajectory with O2MN_multistep, level %d.\n",int_par->level);
   lprintf("MD_INT",30,"MD parameters: level=%d tlen=%1.6f nsteps=%d => dt=%1.6f\n",
@@ -56,7 +56,7 @@ void gauge_integrator(suNg_av_field *momenta, integrator_par *int_par){
     lprintf("MD_INT",40,"MD step (level %d): %d/%d\n",int_par->level,n,int_par->nsteps);
    }
 #ifdef WITH_GPU
-  gfield_copy_from_gpu(u_gauge);
+  //  gfield_copy_from_gpu(u_gauge);
 #endif
   lprintf("MD_INT",20,"MD trajectory completed, level %d.\n",int_par->level);
   represent_gauge_field();

@@ -114,15 +114,15 @@ void init_hmc(rhmc_par *par){
   ((force_hmc_par*)(integrator[0].force_par))->hasenbusch = 0;
   ((force_hmc_par*)(integrator[0].force_par))->inv_err2 = _update_par.force_prec;
   ((force_hmc_par*)(integrator[0].force_par))->inv_err2_flt = _update_par.force_prec_flt;
-  integrator[0].integrator = &O2MN_multistep;
+  integrator[0].integrator = O2MN_multistep;
   integrator[0].next = &integrator[1];
 
   integrator[1].level = 1;
   integrator[1].tlen = integrator[0].tlen/((double)(2*integrator[0].nsteps));
   integrator[1].nsteps = _update_par.gsteps;
-  integrator[1].force = &force0;
+  integrator[1].force = force0;
   integrator[1].force_par = NULL;
-  integrator[1].integrator = &O2MN_multistep;
+  integrator[1].integrator = O2MN_multistep;
   integrator[1].next = &integrator[2];
 
   integrator[2].level = 2;
@@ -130,7 +130,7 @@ void init_hmc(rhmc_par *par){
   integrator[2].nsteps = 1;
   integrator[2].force = NULL;
   integrator[2].force_par = NULL;
-  integrator[2].integrator = &gauge_integrator;
+  integrator[2].integrator = gauge_integrator;
   integrator[2].next = NULL;
   
   init_force_hmc();
@@ -202,13 +202,10 @@ int update_hmc(){
 
     /* compute H2^{1/2}*pf = H*pf */
     lprintf("HMC",30,"Correcting pseudofermions distribution...\n");
-#ifdef WITH_GPU //Make sure gauge field is on GPU
-    gfield_copy_to_gpu_f(u_gauge_f); 
-    gfield_copy_to_gpu_f_flt(u_gauge_f_flt);
-#endif
+
     for (i=0;i<_update_par.n_pf;++i) {
-        spinor_field_copy_f(&pf[_update_par.n_pf],&pf[i]);
-        H.dbl(&pf[i], &pf[_update_par.n_pf]);
+      spinor_field_copy_f(&pf[_update_par.n_pf],&pf[i]);
+      H.dbl(&pf[i], &pf[_update_par.n_pf]);
     }
     
     /* integrate molecular dynamics */
@@ -223,10 +220,6 @@ int update_hmc(){
     /* compute H2^{-1/2}*pf or H2^{-1}*pf */
     /* here we choose the first strategy which is more symmetric */
     /* for the HMC H2^-1/2 = H^-1 and we use MINRES for this inversion */
-#ifdef WITH_GPU //Make sure gauge field is on GPU
-    gfield_copy_to_gpu_f(u_gauge_f); 
-    gfield_copy_to_gpu_f_flt(u_gauge_f_flt);
-#endif
     for (i=0;i<_update_par.n_pf;++i) {
       spinor_field_copy_f(&pf[_update_par.n_pf],&pf[i]);
       MINRES(&pfa,H,&pf[_update_par.n_pf],&pf[i],0);

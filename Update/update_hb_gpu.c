@@ -20,10 +20,17 @@
 #include "gpu.h"
 
 
+
+#define _suNg_write_gpu(stride,v,in,iy,x)\
+iw=(iy)+((x)*4)*(stride);\
+((double*)(in))[iw]=(v).c[0]; iw+=(stride);\
+((double*)(in))[iw]=(v).c[1]; iw+=(stride);\
+((double*)(in))[iw]=(v).c[2]; iw+=(stride);\
+((double*)(in))[iw]=(v).c[3]
+
 __global__ void project_gauge_field_gpu(suNg* gauge, int N){ //Only for quaternions
-#ifdef WITH_QUATERNIONS
-    int ix = blockIdx.x*BLOCK_SIZE+ threadIdx.x;
-  int i;
+  int ix = blockIdx.x*BLOCK_SIZE+ threadIdx.x;
+  int iw,i;
   double norm;
   suNg u;
   ix = min(ix,N);
@@ -38,9 +45,7 @@ __global__ void project_gauge_field_gpu(suNg* gauge, int N){ //Only for quaterni
     _suNg_mul(u,norm,u);
     _suNg_write_gpu(N/2,u,gauge,ix,i);
   }
-#else //WITH_QUATERNIONS
-#error : project_gauge_field_gpu NOT defined!
-#endif //WITH_QUATERNIONS
+
 }
 
 void project_gauge_field(void){
@@ -51,4 +56,5 @@ void project_gauge_field(void){
 }
 
 
+#undef _suNg_write_gpu
 #endif

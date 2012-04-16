@@ -479,7 +479,7 @@ int eva(int nev,int nevt,int init,int kmax,
 	"Improper parameters omega1 or omega2");
 
 #ifdef WITH_GPU
-  gfield_copy_to_gpu_f(u_gauge_f); //Make sure gauge field is on GPU
+  //  gfield_copy_to_gpu_f(u_gauge_f); //Make sure gauge field is on GPU
 #endif
 
   nop=0;

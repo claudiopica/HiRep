@@ -267,6 +267,10 @@ int init_mc(hmc_flow *rf, char *ifile) {
     default:
       error(1,1,"init_mc " __FILE__,"invalid choice of initial configuration");
   }
+#ifdef WITH_GPU
+  gfield_copy_to_gpu(u_gauge); 
+#endif //WITH_GPU
+
   represent_gauge_field();
   assign_ud2u_f();
   
@@ -280,6 +284,10 @@ int init_mc(hmc_flow *rf, char *ifile) {
 /* save the gauge config with the specified id */
 int save_conf(hmc_flow *rf, int id) {
   char buf[256];
+
+#ifdef WITH_GPU
+  gfield_copy_from_gpu(u_gauge); 
+#endif
   
   mk_gconf_name(buf, rf, id);
   write_gauge_field(add_dirname(rf->conf_dir,buf));

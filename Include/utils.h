@@ -63,12 +63,6 @@ void assign_u2ud_f_cpu(void);
 void assign_s2sd_cpu(spinor_field *out, spinor_field_flt *in);
 void assign_sd2s_cpu(spinor_field_flt *out, spinor_field *in);
 
-/* Gauge fields not yet on GPU */
-extern void (*assign_u2ud) (void);
-extern void (*assign_ud2u) (void);
-extern void (*assign_ud2u_f) (void);
-extern void (*assign_u2ud_f) (void);
-
 #ifdef __cplusplus
 }
 #endif
@@ -77,10 +71,10 @@ extern void (*assign_u2ud_f) (void);
 #ifdef __cplusplus
 extern "C" {
 #endif
-  /*void assign_u2ud(void);
+void assign_u2ud(void);
 void assign_ud2u(void);
 void assign_ud2u_f(void);
-void assign_u2ud_f(void);*/
+void assign_u2ud_f(void);
 
 void assign_s2sd(spinor_field *out, spinor_field_flt *in);
 void assign_sd2s(spinor_field_flt *out, spinor_field *in);
@@ -88,10 +82,10 @@ void assign_sd2s(spinor_field_flt *out, spinor_field *in);
 }
 #endif
 #else
-/*extern void (*assign_u2ud) (void);
+extern void (*assign_u2ud) (void);
 extern void (*assign_ud2u) (void);
 extern void (*assign_ud2u_f) (void);
-extern void (*assign_u2ud_f) (void);*/
+extern void (*assign_u2ud_f) (void);
 extern void (*assign_s2sd) (spinor_field *out, spinor_field_flt *in);
 extern void (*assign_sd2s) (spinor_field_flt *out, spinor_field *in);
 #endif
