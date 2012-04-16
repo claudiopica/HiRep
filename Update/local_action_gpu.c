@@ -28,13 +28,6 @@ __global__ void minus_scalar_field_gpu(double* loc_action, int N){
   loc_action[ix] = -loc_action[ix];
 }
 
-
-#define _suNg_av_read_gpu(stride,v,in,iy,x)\
-iw=(iy)+((x)*3)*(stride);\
-(v).c[0]=((double*)(in))[iw]; iw+=(stride);\
-(v).c[1]=((double*)(in))[iw]; iw+=(stride);\
-(v).c[2]=((double*)(in))[iw]
-
 __global__ void local_momenta_gpu(double* loc_action, suNg_algebra_vector* momenta, int N){
   int i,iw,iy;
   int ix = blockIdx.x*BLOCK_SIZE + threadIdx.x;

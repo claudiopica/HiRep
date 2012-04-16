@@ -21,8 +21,9 @@
 
 
 __global__ void project_gauge_field_gpu(suNg* gauge, int N){ //Only for quaternions
-  int ix = blockIdx.x*BLOCK_SIZE+ threadIdx.x;
-  int iw,i;
+#ifdef WITH_QUATERNIONS
+    int ix = blockIdx.x*BLOCK_SIZE+ threadIdx.x;
+  int i;
   double norm;
   suNg u;
   ix = min(ix,N);
@@ -37,7 +38,9 @@ __global__ void project_gauge_field_gpu(suNg* gauge, int N){ //Only for quaterni
     _suNg_mul(u,norm,u);
     _suNg_write_gpu(N/2,u,gauge,ix,i);
   }
-
+#ifdef //WITH_QUATERNIONS
+#error "project_gauge_field_gpu NOT defined!"
+#endif //WITH_QUATERNIONS
 }
 
 void project_gauge_field(void){
