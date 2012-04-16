@@ -51,42 +51,12 @@
   _vector_i_add_f(p.c[3],(chi1).c[1],(chi1).c[3]);	      \
   _suNf_FMAT((u),p)
 
-#define _suNf_read_spinor_gpu(stride,v,in,iy,x)\
-iw=(iy)+((x)*3)*(stride);\
-(v).c[0]=((complex*)(in))[iw]; iw+=(stride); \
-(v).c[1]=((complex*)(in))[iw]; iw+=(stride);\
-(v).c[2]=((complex*)(in))[iw]
 
 #define _suNf_read_full_spinor_gpu(stride,sp,in,iy)\
   _suNf_read_spinor_gpu(stride,(sp).c[0],(in),iy,0);	\
   _suNf_read_spinor_gpu(stride,(sp).c[1],(in),iy,1);	\
   _suNf_read_spinor_gpu(stride,(sp).c[2],(in),iy,2);	\
   _suNf_read_spinor_gpu(stride,(sp).c[3],(in),iy,3);
-
-#define _suNg_av_read_gpu(stride,v,in,iy,x)\
-iw=(iy)+((x)*3)*(stride);\
-(v).c[0]=((double*)(in))[iw]; iw+=(stride); \
-(v).c[1]=((double*)(in))[iw]; iw+=(stride);\
-(v).c[2]=((double*)(in))[iw]
-
-#define _suNg_av_write_gpu(stride,v,out,iy,x)\
-iw=(iy)+((x)*3)*(stride);\
-((double*)(out))[iw]=(v).c[0]; iw+=(stride); \
-((double*)(out))[iw]=(v).c[1]; iw+=(stride);\
-((double*)(out))[iw]=(v).c[2]
-
-#define _suNf_read_gpu(stride,v,in,iy,x)\
-iw=(iy)+((x)*4)*(stride);\
-(v).c[0]=((double*)(in))[iw]; iw+=(stride);\
-(v).c[1]=((double*)(in))[iw]; iw+=(stride);\
-(v).c[2]=((double*)(in))[iw]; iw+=(stride);\
-(v).c[3]=((double*)(in))[iw]
-
-#define _algebra_vector_mul_add_assign_gpu_g(stride,v,iy,x,r,in)\
-iw=(iy)+((x)*3)*(stride);\
-((double*)(v))[iw]+=(in).c[0]*(r); iw+=(stride); \
-((double*)(v))[iw]+=(in).c[1]*(r); iw+=(stride);\
-((double*)(v))[iw]+=(in).c[2]*(r)
 
 
 __global__ void force_hmc_gpu_kernel(suNg_algebra_vector* force, suNf_spinor *Xs, suNf_spinor *Ys, suNf *gauge, double fs, const int *iup, int N){

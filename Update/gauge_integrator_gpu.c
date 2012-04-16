@@ -12,6 +12,7 @@
 
 
 __global__ void gauge_integrator_gpu_kernel(suNg* gauge, suNg_algebra_vector* momenta, double dt, int N){ //Only for quaternions
+#ifdef WITH_QUATERNIONS    
   int ix = blockIdx.x*BLOCK_SIZE+ threadIdx.x;
   int iw,i;
   int vol4h = N/2;
@@ -30,6 +31,9 @@ __global__ void gauge_integrator_gpu_kernel(suNg* gauge, suNg_algebra_vector* mo
     _suNg_times_suNg(u3,u2,u1);
     _suNg_write_gpu(vol4h,u3,gauge,ix,i);
   }
+#else //WITH_QUATERNIONS
+#error : gauge_integrator_gpu_kernel NOT defined!
+#endif //WITH_QUATERNIONS
 }
 
 

@@ -377,6 +377,8 @@ write_spinor_pplus();
     write_read_spinor_gpu();    
     write_write_spinor_gpu();
     write_suN_av_read_gpu();
+    write_suN_av_write_gpu();
+    write_suN_av_mul_add_assign_gpu();
     
     if ($su2quat==0) {
         if ($complex eq "R") {
@@ -3314,6 +3316,63 @@ sub write_suN_av_read_gpu {
     }
     print "      (v).c\[$i\]=((double*)(in))\[__iz\]; \\\n";
     print "   } while (0) \n\n";
+    
+}
+
+sub write_suN_av_write_gpu {
+    my $i; 
+    my $dim=$N*$N-1; #real components
+    
+    print "/* Write an suN algebra vector to GPU memory */\n";
+    print "/* (input) v = suN_algebra_vector ; (output) out = suN_algebra_vector* */\n";
+    print "/* (input) iy = site ; (input) x = 0..3 direction; */\n"; 
+    
+    print "#define _${rdataname}_av_flt_write_gpu(stride,v,out,iy,x) \\\n";
+    print "   do {  \\\n";
+    print "      int __iz=(iy)+((x)*$dim)*(stride); \\\n";
+    for($i=0; $i<$dim-1; $i++) {
+        print "      ((float*)(out))\[__iz\]=(v).c\[$i\]; __iz+=(stride); \\\n";
+    }
+    print "      ((float*)(out))\[__iz\]=(v).c\[$i\]; \\\n";
+    print "   } while (0) \n\n";
+    
+    print "#define _${rdataname}_av_write_gpu(stride,v,out,iy,x) \\\n";
+    print "   do {  \\\n";
+    print "      int __iz=(iy)+((x)*$dim)*(stride); \\\n";
+    for($i=0; $i<$dim-1; $i++) {
+        print "      ((double*)(out))\[__iz\]=(v).c\[$i\]; __iz+=(stride); \\\n";
+    }
+    print "      ((double*)(out))\[__iz\]=(v).c\[$i\]; \\\n";
+    print "   } while (0) \n\n";
+    
+}
+
+sub write_suN_av_mul_add_assign_gpu {
+    my $i; 
+    my $dim=$N*$N-1; #real components
+    
+    print "/* Mul_add_assign on a suN algebra vector on GPU  */\n";
+    print "/* (in/out) v = suN_algebra_vector* ; (input) in = suN_algebra_vector */\n";
+    print "/* (input) iy = site ; (input) x = 0..3 direction; (input) r = real */\n"; 
+    
+    print "#define _algebra_vector_mul_add_assign_gpu_${suff}_flt(stride,v,out,iy,x,r,in) \\\n";
+    print "   do {  \\\n";
+    print "      int __iz=(iy)+((x)*$dim)*(stride); \\\n";
+    for($i=0; $i<$dim-1; $i++) {
+        print "      ((float*)(v))\[__iz\]+=(in).c\[$i\]*(r); __iz+=(stride); \\\n";
+    }
+    print "      ((float*)(v))\[__iz\]+=(in).c\[$i\]*(r); \\\n";
+    print "   } while (0) \n\n";
+
+    print "#define _algebra_vector_mul_add_assign_gpu_${suff}(stride,v,out,iy,x,r,in) \\\n";
+    print "   do {  \\\n";
+    print "      int __iz=(iy)+((x)*$dim)*(stride); \\\n";
+    for($i=0; $i<$dim-1; $i++) {
+        print "      ((double*)(v))\[__iz\]+=(in).c\[$i\]*(r); __iz+=(stride); \\\n";
+    }
+    print "      ((double*)(v))\[__iz\]+=(in).c\[$i\]*(r); \\\n";
+    print "   } while (0) \n\n";
+
     
 }
 
