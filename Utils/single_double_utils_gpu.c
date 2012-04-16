@@ -34,7 +34,7 @@ void assign_sd2s(spinor_field_flt *out, spinor_field *in) {
 */
 
 
- #include "gpu.h"
+#include "gpu.h"
  
  
  __global__ void assign_s2sd_kernel(suNf_spinor* out, suNf_spinor_flt* in, const int N)
@@ -51,34 +51,6 @@ void assign_sd2s(spinor_field_flt *out, spinor_field *in) {
  ((float*)(out))[ix]=(float)((double*)(in))[ix];
  }
 
-
-#define _suNg_read_gpu(stride,v,in,iy,x)\
-iw=(iy)+((x)*4)*(stride);\
-(v).c[0]=((double*)(in))[iw]; iw+=(stride); \
-(v).c[1]=((double*)(in))[iw]; iw+=(stride);\
-(v).c[2]=((double*)(in))[iw]; iw+=(stride);\
-(v).c[3]=((double*)(in))[iw]
-
-#define _suNg_write_gpu(stride,v,in,iy,x)\
-iw=(iy)+((x)*4)*(stride);\
-((double*)(in))[iw]=(v).c[0]; iw+=(stride);\
-((double*)(in))[iw]=(v).c[1]; iw+=(stride);\
-((double*)(in))[iw]=(v).c[2]; iw+=(stride);\
-((double*)(in))[iw]=(v).c[3]
-
-#define _suNg_read_gpu_flt(stride,v,in,iy,x)\
-iw=(iy)+((x)*4)*(stride);\
-(v).c[0]=((float*)(in))[iw]; iw+=(stride); \
-(v).c[1]=((float*)(in))[iw]; iw+=(stride);\
-(v).c[2]=((float*)(in))[iw]; iw+=(stride);\
-(v).c[3]=((float*)(in))[iw]
-
-#define _suNg_write_gpu_flt(stride,v,in,iy,x)\
-iw=(iy)+((x)*4)*(stride);\
-((float*)(in))[iw]=(v).c[0]; iw+=(stride);\
-((float*)(in))[iw]=(v).c[1]; iw+=(stride);\
-((float*)(in))[iw]=(v).c[2]; iw+=(stride);\
-((float*)(in))[iw]=(v).c[3]
 
 __global__ void assign_u2ud_quaternions_kernel(suNg* gauge, suNg_flt* gauge_flt, int N){ //Only for quaternions
   suNg u;
@@ -144,7 +116,7 @@ void assign_u2ud(){
 #ifdef WITH_QUATERNIONS
   assign_u2ud_quaternions_kernel<<<grid,BLOCK_SIZE>>>(u_gauge->gpu_ptr,u_gauge_flt->gpu_ptr,N);
 #else
-#error "GPU only with quaternions"
+#error : single <-> double : GPU only with quaternions"
 #endif
 }
 
@@ -154,7 +126,7 @@ void assign_ud2u(){
 #ifdef WITH_QUATERNIONS
   assign_ud2u_quaternions_kernel<<<grid,BLOCK_SIZE>>>(u_gauge->gpu_ptr,u_gauge_flt->gpu_ptr,N);
 #else
-#error "GPU only with quaternions"
+#error : single <-> double : GPU only with quaternions"
 #endif
 }
 
@@ -162,7 +134,7 @@ void assign_u2ud_f(){
 #ifdef WITH_QUATERNIONS
   assign_u2ud();
 #else
-#error "GPU only with quaternions"
+#error : single <-> double : GPU only with quaternions"
 #endif 
 }
 
@@ -170,7 +142,7 @@ void assign_ud2u_f(){
 #ifdef WITH_QUATERNIONS
   assign_ud2u();
 #else
-#error "GPU only with quaternions"
+#error : single <-> double : GPU only with quaternions"
 #endif 
 }
 
