@@ -62,7 +62,7 @@ __global__ void assign_u2ud_quaternions_kernel(suNg* gauge, suNg_flt* gauge_flt,
     ix -= N/2;
   }
   for (i=0;i<4;++i){
-    _suNg_read_gpu_flt(N/2,u_flt,gauge_flt,ix,i);
+    _suNg_flt_read_gpu(N/2,u_flt,gauge_flt,ix,i);
     u.c[0]=(double) u_flt.c[0];
     u.c[1]=(double) u_flt.c[1];
     u.c[2]=(double) u_flt.c[2];
@@ -87,7 +87,7 @@ __global__ void assign_ud2u_quaternions_kernel(suNg* gauge, suNg_flt* gauge_flt,
     u_flt.c[1]=(float) u.c[1];
     u_flt.c[2]=(float) u.c[2];
     u_flt.c[3]=(float) u.c[3];
-    _suNg_write_gpu_flt(N/2,u_flt,gauge_flt,ix,i);
+    _suNg_flt_write_gpu(N/2,u_flt,gauge_flt,ix,i);
   }
 }
 
