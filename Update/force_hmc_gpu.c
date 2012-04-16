@@ -64,7 +64,7 @@ __global__ void force_hmc_gpu_kernel(suNg_algebra_vector* force, suNf_spinor *Xs
   suNf_vector ptmp;
   suNg_algebra_vector f;
   suNf_spinor *Xss, *Yss;
-  int iw,iy,ig;
+  int iy,ig;
   int ix = blockIdx.x*BLOCK_SIZE+ threadIdx.x;
   int vol4h = N/2;
   int shift, shift2;
