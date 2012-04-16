@@ -40,14 +40,14 @@ void assign_sd2s(spinor_field_flt *out, spinor_field *in) {
  __global__ void assign_s2sd_kernel(suNf_spinor* out, suNf_spinor_flt* in, const int N)
  {
  int ix = blockIdx.x*BLOCK_SIZE + threadIdx.x;
- ix = min(ix,N-1);						// NF is defined in suN_types.h
+ ix = min(ix,N-1);						
  ((double*)(out))[ix]=(double)((float*)(in))[ix];
  }
  
  __global__ void assign_sd2s_kernel(suNf_spinor_flt* out, suNf_spinor* in, const int N)
  {
  int ix = blockIdx.x*BLOCK_SIZE + threadIdx.x;
- ix = min(ix,N-1);						// NF is defined in suN_types.h
+ ix = min(ix,N-1);						
  ((float*)(out))[ix]=(float)((double*)(in))[ix];
  }
 
@@ -56,7 +56,7 @@ __global__ void assign_u2ud_quaternions_kernel(suNg* gauge, suNg_flt* gauge_flt,
   suNg u;
   suNg_flt u_flt;
   int ix = blockIdx.x*BLOCK_SIZE+ threadIdx.x;
-  int iw,i;
+  int i;
   if (ix>=N/2) {
     gauge+=2*N;
     ix -= N/2;
@@ -75,7 +75,7 @@ __global__ void assign_ud2u_quaternions_kernel(suNg* gauge, suNg_flt* gauge_flt,
   suNg u;
   suNg_flt u_flt;
   int ix = blockIdx.x*BLOCK_SIZE+ threadIdx.x;
-  int iw,i;
+  int i;
   if (ix>=N/2) {
     gauge+=2*N;
     gauge_flt+=2*N;

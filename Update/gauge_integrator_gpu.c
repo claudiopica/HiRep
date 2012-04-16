@@ -14,7 +14,7 @@
 __global__ void gauge_integrator_gpu_kernel(suNg* gauge, suNg_algebra_vector* momenta, double dt, int N){ //Only for quaternions
 #ifdef WITH_QUATERNIONS    
   int ix = blockIdx.x*BLOCK_SIZE+ threadIdx.x;
-  int iw,i;
+  int i;
   int vol4h = N/2;
   suNg u1,u2,u3;
   suNg_algebra_vector h;

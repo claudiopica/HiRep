@@ -29,7 +29,7 @@ __global__ void minus_scalar_field_gpu(double* loc_action, int N){
 }
 
 __global__ void local_momenta_gpu(double* loc_action, suNg_algebra_vector* momenta, int N){
-  int i,iw,iy;
+  int i,iy;
   int ix = blockIdx.x*BLOCK_SIZE + threadIdx.x;
   double tmp,a=0.;
   suNg_algebra_vector av;
@@ -43,7 +43,6 @@ __global__ void local_momenta_gpu(double* loc_action, suNg_algebra_vector* momen
     iy=ix;
   }
   for (i=0;i<4;++i){
-    //av = momenta[coord_to_index(ix,i)];
     _suNg_av_read_gpu(N/2,av,momenta,iy,i);
     _algebra_vector_sqnorm_g(tmp,av);
     a+=tmp;

@@ -3355,7 +3355,7 @@ sub write_suN_av_mul_add_assign_gpu {
     print "/* (in/out) v = suN_algebra_vector* ; (input) in = suN_algebra_vector */\n";
     print "/* (input) iy = site ; (input) x = 0..3 direction; (input) r = real */\n"; 
     
-    print "#define _algebra_vector_mul_add_assign_gpu_${suff}_flt(stride,v,out,iy,x,r,in) \\\n";
+    print "#define _algebra_vector_mul_add_assign_gpu_${suff}_flt(stride,v,iy,x,r,in) \\\n";
     print "   do {  \\\n";
     print "      int __iz=(iy)+((x)*$dim)*(stride); \\\n";
     for($i=0; $i<$dim-1; $i++) {
@@ -3364,7 +3364,7 @@ sub write_suN_av_mul_add_assign_gpu {
     print "      ((float*)(v))\[__iz\]+=(in).c\[$i\]*(r); \\\n";
     print "   } while (0) \n\n";
 
-    print "#define _algebra_vector_mul_add_assign_gpu_${suff}(stride,v,out,iy,x,r,in) \\\n";
+    print "#define _algebra_vector_mul_add_assign_gpu_${suff}(stride,v,iy,x,r,in) \\\n";
     print "   do {  \\\n";
     print "      int __iz=(iy)+((x)*$dim)*(stride); \\\n";
     for($i=0; $i<$dim-1; $i++) {
