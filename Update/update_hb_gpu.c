@@ -38,7 +38,7 @@ __global__ void project_gauge_field_gpu(suNg* gauge, int N){ //Only for quaterni
     _suNg_mul(u,norm,u);
     _suNg_write_gpu(N/2,u,gauge,ix,i);
   }
-#ifdef //WITH_QUATERNIONS
+#else //WITH_QUATERNIONS
 #error "project_gauge_field_gpu NOT defined!"
 #endif //WITH_QUATERNIONS
 }
