@@ -1,5 +1,5 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
+* Copyright (c) 2008, Ari Hietanen                                         *   
 \***************************************************************************/
 
 /*******************************************************************************
@@ -19,8 +19,15 @@
 #include "communications.h"
 #include "gpu.h"
 
+__device__ void normalize_gpu(suNg_vector *v){
+   double fact;
+   _vector_prod_re_g(fact,*v,*v);
+   fact=1.0f/sqrt(fact);
+   _vector_mul_g(*v, fact, *v);
+}
 
-__global__ void project_gauge_field_gpu(suNg* gauge, int N){ //Only for quaternions
+
+__global__ void project_gauge_field_gpu(suNg* gauge, int N){ 
 #ifdef WITH_QUATERNIONS
   int ix = blockIdx.x*BLOCK_SIZE+ threadIdx.x;
   int i;
@@ -52,13 +59,20 @@ __global__ void project_gauge_field_gpu(suNg* gauge, int N){ //Only for quaterni
   for (d=0;d<4;++d){
     _suNg_read_gpu(N/2,u,gauge,ix,d);
     v1 = (suNg_vector*)(&u);
-    v2v1+1 = (suNg_vector*)(&u);
+    v2= v1+1;
+    normalize_gpu(v1);
     for (i=1;i<NG;++i){
       for (j=i;j>0;--j){
-	
+	_vector_prod_re_g(z.re,*v1, *v2);
+	_vector_prod_im_g(z.im,*v1, *v2);
+	_vector_project_g(*v2, z, *v1);
+	++v1;
       }
+      normalize_gpu(v2);
+      ++v2;
+      v1=(suNg_vector*)(&u);
     }
-    _suNg_write_gpu(N/2,u,gauge,ix,i);
+    _suNg_write_gpu(N/2,u,gauge,ix,d);
   }
 
 #endif //WITH_QUATERNIONS
