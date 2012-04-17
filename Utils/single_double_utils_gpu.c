@@ -116,7 +116,7 @@ void assign_u2ud(){
 #ifdef WITH_QUATERNIONS
   assign_u2ud_quaternions_kernel<<<grid,BLOCK_SIZE>>>(u_gauge->gpu_ptr,u_gauge_flt->gpu_ptr,N);
 #else
-#error : single <-> double : GPU only with quaternions"
+#error : single <-> double : GPU only with quaternions
 #endif
 }
 
@@ -126,7 +126,7 @@ void assign_ud2u(){
 #ifdef WITH_QUATERNIONS
   assign_ud2u_quaternions_kernel<<<grid,BLOCK_SIZE>>>(u_gauge->gpu_ptr,u_gauge_flt->gpu_ptr,N);
 #else
-#error : single <-> double : GPU only with quaternions"
+#error : single <-> double : GPU only with quaternions
 #endif
 }
 
@@ -134,7 +134,7 @@ void assign_u2ud_f(){
 #ifdef WITH_QUATERNIONS
   assign_u2ud();
 #else
-#error : single <-> double : GPU only with quaternions"
+#error : single <-> double : GPU only with quaternions
 #endif 
 }
 
@@ -142,7 +142,7 @@ void assign_ud2u_f(){
 #ifdef WITH_QUATERNIONS
   assign_ud2u();
 #else
-#error : single <-> double : GPU only with quaternions"
+#error : single <-> double : GPU only with quaternions
 #endif 
 }
 
