@@ -262,6 +262,11 @@ int init_mc(rhmc_flow *rf, char *ifile) {
     default:
       error(1,1,"init_mc " __FILE__,"invalid choice of initial configuration");
   }
+  
+#ifdef WITH_GPU
+  gfield_copy_to_gpu(u_gauge); 
+#endif
+
   represent_gauge_field();  
 
 

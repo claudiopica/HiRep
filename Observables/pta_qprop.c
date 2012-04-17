@@ -144,7 +144,7 @@ void pta_qprop_QMR_eo(int g0[4], spinor_field **pta_qprop, int nm, double *mass,
 #ifndef NDEBUG
 			/* this is a test of the inverter on the difference vector */
 			hmass_pre=mass[i];
-			D_pta_pre(test_e,&resd[i]);
+			D_pta_pre.dbl(test_e,&resd[i]);
 			++cgiter;
 			spinor_field_sub_f(test_e,test_e,in);
 			norm=spinor_field_sqnorm_f(test_e);
@@ -166,7 +166,7 @@ void pta_qprop_QMR_eo(int g0[4], spinor_field **pta_qprop, int nm, double *mass,
 #ifndef NDEBUG
 			/* this is a test of the solution */
 			hmass=mass[i];
-			H_pta(test,&pta_qprop[i][source]);
+			H_pta.dbl(test,&pta_qprop[i][source]);
 			++cgiter;
 			if(COORD[0]==C0[0] && COORD[1]==C0[1] && COORD[2]==C0[2] && COORD[3]==C0[3])
 			  *( (double *)_FIELD_AT(test,x0) + 2*source ) -=1.;
@@ -267,7 +267,7 @@ void pta_qprop_QMR(int g0[4], spinor_field **pta_qprop, int nm, double *mass, do
 #ifndef NDEBUG
 			/* this is a test of the inverter on the difference vector */
 			hmass=mass[i];
-			D_pta(test,&resd[i]);
+			D_pta.dbl(test,&resd[i]);
 			++cgiter;
 			spinor_field_sub_f(test,test,in);
 			norm=spinor_field_sqnorm_f(test);
@@ -280,7 +280,7 @@ void pta_qprop_QMR(int g0[4], spinor_field **pta_qprop, int nm, double *mass, do
 #ifndef NDEBUG
 			/* this is a test of the solution */
 			hmass=mass[i];
-			H_pta(test,&pta_qprop[i][source]);
+			H_pta.dbl(test,&pta_qprop[i][source]);
 			++cgiter;
     	if(COORD[0]==C0[0] && COORD[1]==C0[1] && COORD[2]==C0[2] && COORD[3]==C0[3])
 			  *( (double *)_FIELD_AT(test,x0) + 2*source ) -=1.;

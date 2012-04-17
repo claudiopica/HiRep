@@ -43,40 +43,40 @@ extern spinor_operator H2; /* Dirac operator */
 /* these macros use the variables ptmp, p */
 
 
-#define _F_DIR0(u,chi1,chi2)				      \
-  _vector_add_f(ptmp,(chi2)->c[0],(chi2)->c[2]);		      \
-  _suNf_multiply(p.c[0],*(pu_gauge_f(x,0)),ptmp);		      \
-  _vector_add_f(ptmp,(chi2)->c[1],(chi2)->c[3]);		      \
-  _suNf_multiply(p.c[1],*(pu_gauge_f(x,0)),ptmp);		      \
-  _vector_sub_f(p.c[2],(chi1)->c[0],(chi1)->c[2]);	      \
-  _vector_sub_f(p.c[3],(chi1)->c[1],(chi1)->c[3]);	      \
+#define _F_DIR0(u,chi1,chi2)				\
+  _vector_add_f(ptmp,(chi2)->c[0],(chi2)->c[2]);	\
+  _suNf_multiply(p.c[0],*(pu_gauge_f(x,0)),ptmp);	\
+  _vector_add_f(ptmp,(chi2)->c[1],(chi2)->c[3]);	\
+  _suNf_multiply(p.c[1],*(pu_gauge_f(x,0)),ptmp);	\
+  _vector_sub_f(p.c[2],(chi1)->c[0],(chi1)->c[2]);	\
+  _vector_sub_f(p.c[3],(chi1)->c[1],(chi1)->c[3]);	\
   _suNf_FMAT((u),p)
 
-#define _F_DIR1(u,chi1,chi2)				      \
-  _vector_i_add_f(ptmp,(chi2)->c[0],(chi2)->c[3]);		      \
-  _suNf_multiply(p.c[0],*(pu_gauge_f(x,1)),ptmp);		      \
-  _vector_i_add_f(ptmp,(chi2)->c[1],(chi2)->c[2]);		      \
-  _suNf_multiply(p.c[1],*(pu_gauge_f(x,1)),ptmp);		      \
-  _vector_i_sub_f(p.c[2],(chi1)->c[0],(chi1)->c[3]);	      \
-  _vector_i_sub_f(p.c[3],(chi1)->c[1],(chi1)->c[2]);	      \
+#define _F_DIR1(u,chi1,chi2)				\
+  _vector_i_add_f(ptmp,(chi2)->c[0],(chi2)->c[3]);	\
+  _suNf_multiply(p.c[0],*(pu_gauge_f(x,1)),ptmp);	\
+  _vector_i_add_f(ptmp,(chi2)->c[1],(chi2)->c[2]);	\
+  _suNf_multiply(p.c[1],*(pu_gauge_f(x,1)),ptmp);	\
+  _vector_i_sub_f(p.c[2],(chi1)->c[0],(chi1)->c[3]);	\
+  _vector_i_sub_f(p.c[3],(chi1)->c[1],(chi1)->c[2]);	\
   _suNf_FMAT((u),p)
 
-#define _F_DIR2(u,chi1,chi2)				      \
-  _vector_add_f(ptmp,(chi2)->c[0],(chi2)->c[3]);		      \
-  _suNf_multiply(p.c[0],*(pu_gauge_f(x,2)),ptmp);		      \
-  _vector_sub_f(ptmp,(chi2)->c[1],(chi2)->c[2]);		      \
-  _suNf_multiply(p.c[1],*(pu_gauge_f(x,2)),ptmp);		      \
-  _vector_sub_f(p.c[2],(chi1)->c[0],(chi1)->c[3]);	      \
-  _vector_add_f(p.c[3],(chi1)->c[1],(chi1)->c[2]);	      \
+#define _F_DIR2(u,chi1,chi2)				\
+  _vector_add_f(ptmp,(chi2)->c[0],(chi2)->c[3]);	\
+  _suNf_multiply(p.c[0],*(pu_gauge_f(x,2)),ptmp);	\
+  _vector_sub_f(ptmp,(chi2)->c[1],(chi2)->c[2]);	\
+  _suNf_multiply(p.c[1],*(pu_gauge_f(x,2)),ptmp);	\
+  _vector_sub_f(p.c[2],(chi1)->c[0],(chi1)->c[3]);	\
+  _vector_add_f(p.c[3],(chi1)->c[1],(chi1)->c[2]);	\
   _suNf_FMAT((u),p)
 
-#define _F_DIR3(u,chi1,chi2)				      \
-  _vector_i_add_f(ptmp,(chi2)->c[0],(chi2)->c[2]);		      \
-  _suNf_multiply(p.c[0],*(pu_gauge_f(x,3)),ptmp);		      \
-  _vector_i_sub_f(ptmp,(chi2)->c[1],(chi2)->c[3]);		      \
-  _suNf_multiply(p.c[1],*(pu_gauge_f(x,3)),ptmp);		      \
-  _vector_i_sub_f(p.c[2],(chi1)->c[0],(chi1)->c[2]);	      \
-  _vector_i_add_f(p.c[3],(chi1)->c[1],(chi1)->c[3]);	      \
+#define _F_DIR3(u,chi1,chi2)				\
+  _vector_i_add_f(ptmp,(chi2)->c[0],(chi2)->c[2]);	\
+  _suNf_multiply(p.c[0],*(pu_gauge_f(x,3)),ptmp);	\
+  _vector_i_sub_f(ptmp,(chi2)->c[1],(chi2)->c[3]);	\
+  _suNf_multiply(p.c[1],*(pu_gauge_f(x,3)),ptmp);	\
+  _vector_i_sub_f(p.c[2],(chi1)->c[0],(chi1)->c[2]);	\
+  _vector_i_add_f(p.c[3],(chi1)->c[1],(chi1)->c[3]);	\
   _suNf_FMAT((u),p)
 
 
@@ -94,9 +94,6 @@ void free_force_rhmc() {
   free_spinor_field_f(chi);
 }
 
-
-  
-  
 void force_rhmc(double dt, suNg_av_field *force, void *vpar){
   _DECLARE_INT_ITERATOR(x);
   int mu, n, k;
@@ -109,13 +106,18 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar){
   spinor_field delta, sigma;
 #endif
   double forcestat[2]; /* used for computation of avr and max force */
-  double nsq;
+  double nsq,dfs;
 
   force_rhmc_par *par = (force_rhmc_par*)vpar;
   spinor_field *pf = par->pf;
   rational_app *ratio = par->ratio;
+  
+  if(n_ws < ratio->order+1){
+    free_force_rhmc();
+    init_force_rhmc(ratio->order+1);
+  }
 
-  error(n_ws<ratio->order+1,1,"force_rhmc" __FILE__,"Workspace is too small");
+  //  error(n_ws<ratio->order+1,1,"force_rhmc" __FILE__,"Workspace is too small");
   
   /* check input types */
   _TWO_SPINORS_MATCHING(u_gauge,force);
@@ -128,20 +130,18 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar){
   inv_par.max_iter=0; /* no limit */
 
 #ifdef UPDATE_EO
-      /* change the type of chi[n] */
-    for (n=0; n<ratio->order; ++n) {
-      chi[n].type=&glat_even;
-    }
-    Hchi->type=&glat_even; 
+  /* change the type of chi[n] */
+  for (n=0; n<ratio->order; ++n) {
+    chi[n].type=&glat_even;
+  }
+  Hchi->type=&glat_even; 
 #endif
-
-#ifdef WITH_GPU
-    gfield_copy_to_gpu_f(u_gauge_f); //Make sure gauge field is on GPU
-#endif    
+  
   for (k=0; k<par->n_pf; ++k) {
     /* compute inverse vectors chi[i] = (H^2 - b[i])^1 * pf */
     if (inv_par.n==1) { spinor_field_zero_f(chi); }
     cg_mshift(&inv_par, H2, &pf[k], chi);
+    
     for (n=0; n<ratio->order; ++n) {
 #ifdef UPDATE_EO
       /* change temporarely the type of chi[n] and Hchi */
@@ -153,7 +153,7 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar){
       sigma=chi[n]; sigma.type=&glat_odd;
       Dphi_(&delta,Hchi);
       Dphi_(&sigma,&chi[n]);
-
+      
       start_sf_sendrecv(&delta);
       start_sf_sendrecv(&sigma);
 #else
@@ -161,26 +161,27 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar){
       start_sf_sendrecv(Hchi);
 #endif
 
-#ifdef WITH_GPU //Do rest of the calculation at CPU.
-      spinor_field_copy_from_gpu_f(&chi[n]);
-      spinor_field_copy_from_gpu_f(Hchi);
-#ifdef UPDATE_EO
-      spinor_field_copy_from_gpu_f(&delta);
-      spinor_field_copy_from_gpu_f(&sigma);
-#endif
-#endif
-
       lprintf("FORCE_RHMC",50,"[%d] |chi| = %1.8e |Hchi| = %1.8e\n",n,
 	      sqrt(spinor_field_sqnorm_f(&chi[n])),
 	      sqrt(spinor_field_sqnorm_f(Hchi))
 	      );
 
+#ifdef UPDATE_EO
+      dfs=-dt*ratio->a[n+1]*(_REPR_NORM2/_FUND_NORM2);
+#else
+      dfs = dt*ratio->a[n+1]*(_REPR_NORM2/_FUND_NORM2);	
+#endif
+	  
+    
+#ifdef WITH_GPU //GPU
+      force_hmc_gpu(force,Hchi,&chi[n],dfs);
+#else
       /* reset force stat counters */
       forcestat[1]=forcestat[0]=0.;
-
+      
       _PIECE_FOR(&glattice,x) { 
 	_SITE_FOR(&glattice,x) {
-
+	  
 	  for (mu=0; mu<4; ++mu) {
 	    int y;
 	    suNf_spinor *chi1, *chi2;
@@ -224,12 +225,7 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar){
 	    }
 	  
 	    _algebra_project(f,s1);
-	    /*_print_avect(f); */
-#ifdef UPDATE_EO
-	    _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),-dt*ratio->a[n+1]*(_REPR_NORM2/_FUND_NORM2),f);
-#else
-	    _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),dt*ratio->a[n+1]*(_REPR_NORM2/_FUND_NORM2),f);	
-#endif
+	    _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),dfs,f);
 	  
 	    _algebra_vector_sqnorm_g(nsq,f);
 	    forcestat[0]+=sqrt(nsq);
@@ -255,9 +251,9 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar){
       lprintf("FORCE_RHMC",50,"[%d] avr |force| = %1.8e maxforce = %1.8e a = %1.8e b = %1.8e\n",n,forcestat[0],forcestat[1],ratio->a[n+1],ratio->b[n]);
       
 #if defined(BASIC_SF) || defined(ROTATED_SF)
-       	SF_force_bcs(force);
+      SF_force_bcs(force);
 #endif /* BASIC_SF || ROTATED_SF*/
-
+#endif//WITH_GPU
     }
   }
 

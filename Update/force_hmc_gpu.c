@@ -145,10 +145,8 @@ __global__ void force_hmc_gpu_kernel(suNg_algebra_vector* force, suNf_spinor *Xs
 void force_hmc_gpu(suNg_av_field* force, spinor_field *Xs, spinor_field *Ys, double dfs){
   int N = T*X*Y*Z;//u_gauge->type->master_end[0] -  u_gauge->type->master_start[0] + 1;
   int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
-  //  suNg_av_field_copy_to_gpu(force);
   force_hmc_gpu_kernel<<<grid,BLOCK_SIZE>>>(force->gpu_ptr,Xs->gpu_ptr,Ys->gpu_ptr,u_gauge_f->gpu_ptr,dfs,iup_gpu,N);
   CudaCheckError();
-  //  suNg_av_field_copy_from_gpu(force);
 }
 
 #undef _suNf_read_spinor_gpu
