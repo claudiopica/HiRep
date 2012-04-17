@@ -3,7 +3,7 @@ MKDIR = $(TOPDIR)/Make
 
 SRCS = cabmar.c staples.c update_hb.c random_su2.c Dphi.c Dphi_flt.c representation.c leapfrog.c force0.c random_momenta.c local_action.c update_rhmc.c update_hmc.c rational_functions.c copy_gfield.c random_momenta.c random_spinor_field.c find_spec_limits.c force_rhmc.c O2MN_multistep.c random_spinor_field_gpu.c local_action_gpu.c update_hb_gpu.c gauge_integrator_gpu.c force_hmc_gpu.c
 
-GPUFILES = Dphi_gpu.c Dphi_flt_gpu.c local_action_gpu.c update_hb_gpu.c gauge_integrator_gpu.c force_hmc_gpu.c force0_gpu.c copy_gfield_gpu.c
+GPUFILES = Dphi_gpu.c Dphi_flt_gpu.c local_action_gpu.c update_hb_gpu.c gauge_integrator_gpu.c force_hmc_gpu.c force0_gpu.c
 
 include $(MKDIR)/MkRules
 
