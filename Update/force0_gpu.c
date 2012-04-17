@@ -25,7 +25,7 @@ __device__ void staples_device(int ix,int mu,suNg *v, const int *iup, const int 
 	suNg u1dn,u2dn,u3dn;
 	suNg staple, tr1, tr2;
 	
-	int i,nu,ixpmu,ixpnu,ixmnu,ixpmumnu, iw;
+	int i,nu,ixpmu,ixpnu,ixmnu,ixpmumnu;
 	unsigned int is_ixpmu_odd = (is_ix_odd)? 0 : 1; 
 	unsigned int is_ixpnu_odd = (is_ix_odd)? 0 : 1; 
 	unsigned int is_ixmnu_odd = (is_ix_odd)? 0 : 1; 
@@ -83,7 +83,7 @@ __global__ void gauge_force_kernel(const suNg* gauge, suNg_algebra_vector* force
 	suNg s1,s2,s_tmp;
 	suNg_algebra_vector f;
 //	double nsq;
-	int mu,iw;
+	int mu;
 	int vol4h=N/2;
 	
 	int ix = blockIdx.x*blockDim.x+ threadIdx.x;
