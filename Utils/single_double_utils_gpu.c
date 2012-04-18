@@ -40,15 +40,14 @@
 
 
 void assign_s2sd(spinor_field *out, spinor_field_flt *in) {
-    int ix, size, grid;
+    int size, grid;
     double *r;
     float *rf;
     
     _TWO_SPINORS_MATCHING(in,out);
     
-    ix=in->type->master_start[0]; //first site in the block
-    r=(double*)(_FIELD_AT(out,ix));
-    rf=(float*)(_FIELD_AT(in,ix));
+    r=(double*)(_GPU_FIELD_BLK(out,0)); //first block only 
+    rf=(float*)(_GPU_FIELD_BLK(in,0));
     size = in->type->master_end[0] -  in->type->master_start[0] + 1;
     size *= sizeof(suNf_spinor)/sizeof(double); ////lenght of the block in real numbers	
     
@@ -58,15 +57,14 @@ void assign_s2sd(spinor_field *out, spinor_field_flt *in) {
 }
 
 void assign_sd2s(spinor_field_flt *out, spinor_field *in) {
-    int ix, size, grid;
+    int size, grid;
     double *r;
     float *rf;
     
     _TWO_SPINORS_MATCHING(in,out);
     
-    ix=in->type->master_start[0]; //first site in the block
-    r=(double*)(_FIELD_AT(in,ix));
-    rf=(float*)(_FIELD_AT(out,ix));
+    r=(double*)(_GPU_FIELD_BLK(in,0)); //first block only
+    rf=(float*)(_GPU_FIELD_BLK(out,0));
     size = in->type->master_end[0] -  in->type->master_start[0] + 1;
     size *= sizeof(suNf_spinor)/sizeof(double); ////lenght of the block in real numbers	
     
@@ -76,13 +74,12 @@ void assign_sd2s(spinor_field_flt *out, spinor_field *in) {
 }
 
 void assign_u2ud(){
-    int ix, size, grid;
+    int size, grid;
     double *r;
     float *rf;
     
-    ix=glattice.master_start[0]; //first site in the block
-    r=(double*)(pu_gauge(ix,0));
-    rf=(float*)(pu_gauge_flt(ix,0));
+    r=(double*)(_GPU_FIELD_BLK(u_gauge,0)); //first block only
+    rf=(float*)(_GPU_FIELD_BLK(u_gauge_flt,0));
     size=glattice.master_end[0] - glattice.master_start[0] + 1;
     size*=4*sizeof(suNg)/sizeof(double); //lenght of the block in real numbers
     
@@ -92,13 +89,12 @@ void assign_u2ud(){
 }
 
 void assign_ud2u(){
-    int ix, size, grid;
+    int size, grid;
     double *r;
     float *rf;
     
-    ix=glattice.master_start[0]; //first site in the block
-    r=(double*)(pu_gauge(ix,0));
-    rf=(float*)(pu_gauge_flt(ix,0));
+    r=(double*)(_GPU_FIELD_BLK(u_gauge,0)); //first block only
+    rf=(float*)(_GPU_FIELD_BLK(u_gauge_flt,0));
     size=glattice.master_end[0] - glattice.master_start[0] + 1;
     size*=4*sizeof(suNg)/sizeof(double); //lenght of the block in real numbers
     
@@ -108,13 +104,12 @@ void assign_ud2u(){
 }
 
 void assign_u2ud_f(){
-    int ix, size, grid;
+    int size, grid;
     double *r;
     float *rf;
     
-    ix=glattice.master_start[0]; //first site in the block
-    r=(double*)(pu_gauge_f(ix,0));
-    rf=(float*)(pu_gauge_f_flt(ix,0));
+    r=(double*)(_GPU_FIELD_BLK(u_gauge_f,0)); //first block only
+    rf=(float*)(_GPU_FIELD_BLK(u_gauge_f_flt,0));
     size=glattice.master_end[0] - glattice.master_start[0] + 1;
     size*=4*sizeof(suNf)/sizeof(double); //lenght of the block in real numbers
     
@@ -124,13 +119,12 @@ void assign_u2ud_f(){
 }
 
 void assign_ud2u_f(){
-    int ix, size, grid;
+    int size, grid;
     double *r;
     float *rf;
     
-    ix=glattice.master_start[0]; //first site in the block
-    r=(double*)(pu_gauge_f(ix,0));
-    rf=(float*)(pu_gauge_f_flt(ix,0));
+    r=(double*)(_GPU_FIELD_BLK(u_gauge_f,0)); //first block only
+    rf=(float*)(_GPU_FIELD_BLK(u_gauge_f_flt,0));
     size=glattice.master_end[0] - glattice.master_start[0] + 1;
     size*=4*sizeof(suNf)/sizeof(double); //lenght of the block in real numbers
     

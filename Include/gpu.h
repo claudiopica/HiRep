@@ -20,5 +20,8 @@
 
 #define START_SP_ADDRESS_GPU(sf) ((sf)->gpu_ptr + (sf)->type->master_start[0])
 
+#define _GPU_FIELD_BLK(s,i) (((s)->gpu_ptr) + (s)->type->master_start[(i)])
+#define _GPU_4FIELD_BLK(s,i) (((s)->gpu_ptr) + 4*(s)->type->master_start[(i)])
+
 #endif //WITH_GPU
 #endif
