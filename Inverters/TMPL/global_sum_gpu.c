@@ -358,7 +358,7 @@ double global_sum_gpu(double* vector, int n){
 	unsigned int new_n = next_pow2(n);
 	int grid_size = new_n / BLOCK_SIZE;
 	double* padded_vector;
-	double res,res2;
+	double res;
 	cudaMalloc((void **) &padded_vector,new_n*sizeof(double));
 	copy_with_zero_padding<<<grid_size,BLOCK_SIZE>>>(padded_vector, vector, n, new_n);
 	global_reduction_sum(padded_vector,new_n);
