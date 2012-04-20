@@ -417,7 +417,7 @@ void represent_gauge_field_flt() {
         _group_represent2_flt(Ru,u); 
         /*_group_represent(*Ru,*u);*/
       }
-
+  
   apply_bc_flt();
 #else
   static int first_time=1;

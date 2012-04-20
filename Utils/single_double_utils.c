@@ -46,7 +46,7 @@ void assign_u2ud_cpu(void)
 
 void assign_ud2u_cpu(void)
 {
-    for(int pidx=0; pidx<glattice.local_master_pieces;++pidx) {
+    for(int pidx=0; pidx<glattice.total_master_pieces;++pidx) {
         int ix=glattice.master_start[pidx]; //first site in the block
         double *r=(double*)(pu_gauge(ix,0));
         float *rf=(float*)(pu_gauge_flt(ix,0));
@@ -60,7 +60,7 @@ void assign_ud2u_cpu(void)
 
 void assign_ud2u_f_cpu(void)
 {
-    for(int pidx=0; pidx<glattice.local_master_pieces;++pidx) {
+    for(int pidx=0; pidx<glattice.total_master_pieces;++pidx) {
         int ix=glattice.master_start[pidx]; //first site in the block
         double *r=(double*)(pu_gauge_f(ix,0));
         float *rf=(float*)(pu_gauge_f_flt(ix,0));
@@ -70,6 +70,14 @@ void assign_ud2u_f_cpu(void)
         
         assign_d2f(rf, r, len);
     }
+    /*    for (int pidx=pidx=glattice.local_master_pieces;pidx<glattice.total_master_pieces;pidx++){
+        int ix=glattice.master_start[pidx]; //first site in the block
+        double *r=(double*)(pu_gauge_f(ix,0));
+        float *rf=(float*)(pu_gauge_f_flt(ix,0));
+        int len=glattice.master_end[pidx]-glattice.master_start[pidx]+1;
+        len*=4*sizeof(suNf)/sizeof(*r); //lenght of the block in real numbers
+        assign_d2f(rf, r, len);      
+	}*/
 }
 
 void assign_u2ud_f_cpu(void)

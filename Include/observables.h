@@ -23,6 +23,10 @@
 double plaq(int ix,int mu,int nu);
 void cplaq(complex *ret,int ix,int mu,int nu);
 double avr_plaquette();
+double avr_plaquette_flt();
+double avr_plaquette_f();
+double avr_plaquette_f_flt();
+
 double SF_action(double beta);
 double local_plaq(int ix);
 void full_plaquette();

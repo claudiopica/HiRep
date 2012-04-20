@@ -6,6 +6,8 @@
 
 #define MAIN_PROGRAM
 
+#ifdef WITH_GPU
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -201,3 +203,12 @@ int main(int argc,char *argv[])
   finalize_process();
   exit(0);
 }
+
+#else //WITH_GPU
+#include <stdio.h>
+#include "global.h"
+
+int main(){
+  printf("Compile with WITH_GPU to test GPU!\n");
+}
+#endif //WITH_GPU

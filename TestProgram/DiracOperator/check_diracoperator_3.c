@@ -41,13 +41,16 @@ void H(spinor_field *out, spinor_field *in){
    g5Dphi(-hmass,out,in);
 }
 
-void M(spinor_field *out, spinor_field *in){
+void M_dbl(spinor_field *out, spinor_field *in){
 #ifdef UPDATE_EO
    g5Dphi_eopre_sq(-hmass, out, in);
 #else
    g5Dphi_sq(-hmass, out, in);
 #endif
 }
+
+spinor_operator M = {M_dbl,NULL};
+
 
 void test_herm(spinor_operator S, char *name){
    spinor_field *s1, *s2, *s3, *s4;
@@ -66,8 +69,8 @@ void test_herm(spinor_operator S, char *name){
 
    gaussian_spinor_field(s1);
    gaussian_spinor_field(s2);
-   S(s3,s1);
-   S(s4,s2);
+   S.dbl(s3,s1);
+   S.dbl(s4,s2);
 
    tau=spinor_field_prod_re_f(s2,s3);
    tau-=spinor_field_prod_re_f(s4,s1);
@@ -150,7 +153,7 @@ int main(int argc,char *argv[])
    
 
   
-  test_herm(&M,"M");
+  test_herm(M,"M");
  
   finalize_process();
 }

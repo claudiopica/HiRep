@@ -1,7 +1,7 @@
 TOPDIR = ../..
 MKDIR=$(TOPDIR)/Make
 
-EXES = check_diracoperator_1 check_diracoperator_2 check_diracoperator_3 check_diracoperator_1_gpu speed_test_diracoperator_gpu speed_test_diracoperator_evenodd_gpu speed_test_diracoperator_flt_gpu speed_test_diracoperator_evenodd_flt_gpu speed_test_diracoperator_evenodd_flt_gpu_2
+EXES = check_diracoperator_1 check_diracoperator_2 check_diracoperator_3 check_diracoperator_5 check_diracoperator_1_gpu speed_test_diracoperator_gpu speed_test_diracoperator_evenodd_gpu speed_test_diracoperator_flt_gpu speed_test_diracoperator_evenodd_flt_gpu speed_test_diracoperator_evenodd_flt_gpu_2
 
 default: $(EXES)
 

@@ -166,7 +166,7 @@ int main(int argc,char *argv[])
   spinor_field_zero_f(s1);
   D(s1,s3);
   
-  
+
   spinor_field_mul_add_assign_f(s1,-1.0,s2);
   sig=spinor_field_sqnorm_f(s1);
   
