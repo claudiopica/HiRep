@@ -382,9 +382,6 @@ double SF_test_force_bcs(suNg_av_field *force) {
 }
 
 
-#endif /* BASIC_SF || ROTATED_SF */
-
-
 
 #define PI 3.141592653589793238462643383279502884197
 #define ST 1.414213562373095048801688724209698078570
@@ -420,8 +417,6 @@ double SF_phi1_up[NG] = {.5, .5, -.5, -.5};
 
 #endif
 
-
-#if defined(BASIC_SF) || defined(ROTATED_SF)
 
 void SF_gauge_bcs(suNg_field *gf, int strength)
 {
@@ -531,4 +526,5 @@ double SF_test_gauge_bcs()
   global_sum(&pa, 1);
   return pa/(double)(GLB_X*GLB_Y*GLB_Z*NG*(6+6+3));
 }
-#endif
+
+#endif //defined(BASIC_SF) || defined(ROTATED_SF)
