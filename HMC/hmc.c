@@ -174,10 +174,10 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
 
   /* read input file */
-  read_input(glb_var.read,"input_file");
-  read_input(mes_var.read,"input_file");
-  read_input(poly_var.read,"input_file");
-  read_input(eigval_var.read,"input_file");
+  read_input(glb_var.read,input_filename);
+  read_input(mes_var.read,input_filename);
+  read_input(poly_var.read,input_filename);
+  read_input(eigval_var.read,input_filename);
 #ifdef WITH_GPU
   read_input(gpu_var.read,input_filename);
   cudaSetDevice(gpu_var.gpuID);

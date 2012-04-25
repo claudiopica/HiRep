@@ -1,5 +1,5 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
+* Copyright (c) 2012, Claudio Pica                                          *   
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
@@ -31,7 +31,7 @@ static inline void assign_d2f(float *out, double *in, unsigned int len)
 
 void assign_u2ud_cpu(void)
 {
-    for(int pidx=0; pidx<glattice.local_master_pieces;++pidx) {
+    for(int pidx=0; pidx<glattice.total_master_pieces;++pidx) {
         int ix=glattice.master_start[pidx]; //first site in the block
         double *r=(double*)(pu_gauge(ix,0));
         float *rf=(float*)(pu_gauge_flt(ix,0));
@@ -70,19 +70,11 @@ void assign_ud2u_f_cpu(void)
         
         assign_d2f(rf, r, len);
     }
-    /*    for (int pidx=pidx=glattice.local_master_pieces;pidx<glattice.total_master_pieces;pidx++){
-        int ix=glattice.master_start[pidx]; //first site in the block
-        double *r=(double*)(pu_gauge_f(ix,0));
-        float *rf=(float*)(pu_gauge_f_flt(ix,0));
-        int len=glattice.master_end[pidx]-glattice.master_start[pidx]+1;
-        len*=4*sizeof(suNf)/sizeof(*r); //lenght of the block in real numbers
-        assign_d2f(rf, r, len);      
-	}*/
 }
 
 void assign_u2ud_f_cpu(void)
 {
-    for(int pidx=0; pidx<glattice.local_master_pieces;++pidx) {
+    for(int pidx=0; pidx<glattice.total_master_pieces;++pidx) {
         int ix=glattice.master_start[pidx]; //first site in the block
         double *r=(double*)(pu_gauge_f(ix,0));
         float *rf=(float*)(pu_gauge_f_flt(ix,0));
@@ -99,7 +91,7 @@ void assign_s2sd_cpu(spinor_field *out, spinor_field_flt *in)
 {
     _TWO_SPINORS_MATCHING(in,out);
     
-    for(int pidx=0; pidx<in->type->local_master_pieces;++pidx) {
+    for(int pidx=0; pidx<in->type->total_master_pieces;++pidx) {
         int ix=in->type->master_start[pidx]; //first site in the block
         double *r=(double*)(_FIELD_AT(out,ix));
         float *rf=(float*)(_FIELD_AT(in,ix));
@@ -115,7 +107,7 @@ void assign_sd2s_cpu(spinor_field_flt *out, spinor_field *in)
 {
     _TWO_SPINORS_MATCHING(in,out);
     
-    for(int pidx=0; pidx<in->type->local_master_pieces;++pidx) {
+    for(int pidx=0; pidx<in->type->total_master_pieces;++pidx) {
         int ix=in->type->master_start[pidx]; //first site in the block
         double *r=(double*)(_FIELD_AT(in,ix));
         float *rf=(float*)(_FIELD_AT(out,ix));

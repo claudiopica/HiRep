@@ -86,5 +86,5 @@ void project_gauge_field(void){
 }
 
 
-#undef _suNg_write_gpu
+
 #endif
