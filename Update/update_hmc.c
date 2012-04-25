@@ -107,7 +107,7 @@ void init_hmc(rhmc_par *par){
   integrator[0].level = 0;
   integrator[0].tlen = _update_par.tlen;
   integrator[0].nsteps = _update_par.nsteps;
-  integrator[0].force = &force_hmc;
+  integrator[0].force = force_hmc;
   integrator[0].force_par = malloc(sizeof(force_hmc_par));
   ((force_hmc_par*)(integrator[0].force_par))->n_pf = _update_par.nf/2;
   ((force_hmc_par*)(integrator[0].force_par))->pf = pf;

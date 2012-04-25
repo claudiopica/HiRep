@@ -35,8 +35,8 @@ rational_app r_HB={0};  /* used in pseudofermions heatbath */
 integrator_par *integrator = NULL;
 double minev, maxev; /* min and max eigenvalue of H^2 */
 
-spinor_operator H2={&H2_dbl,&H2_flt}; 
-spinor_operator H={&H_dbl,&H_flt}; 
+spinor_operator H2={H2_dbl, H2_flt}; 
+spinor_operator H={H_dbl, H_flt}; 
 /* END of State */
 
 
@@ -202,7 +202,7 @@ void init_rhmc(rhmc_par *par){
   integrator[0].level = 0;
   integrator[0].tlen = _update_par.tlen;
   integrator[0].nsteps = _update_par.nsteps;
-  integrator[0].force = &force_rhmc;
+  integrator[0].force = force_rhmc;
   integrator[0].force_par = malloc(sizeof(force_rhmc_par));
   ((force_rhmc_par*)(integrator[0].force_par))->n_pf = _update_par.n_pf;
   ((force_rhmc_par*)(integrator[0].force_par))->pf = pf;
