@@ -25,6 +25,7 @@ void force0(double dt, suNg_av_field *force, void *par);
 typedef struct {
   int n_pf;
   spinor_field *pf;
+  double mass;
   rational_app *ratio;
   double inv_err2;
 } force_rhmc_par;
@@ -35,8 +36,9 @@ void force_rhmc(double dt, suNg_av_field *force, void *par);
 typedef struct {
   int n_pf;
   spinor_field *pf;
-  int hasenbusch; /* 0 = no hasenbusch ; 1 = force with Dtilde = a*D+b ; 2 = force with Y = Ddag^{-1}(a*phi+b*X) */
-  double aD, bD, aY, bY;
+  int hasenbusch; /* 0 = force with Y = Ddag^{-1} phi (standard) ; 2 = force with Y = Ddag^{-1}(phi+dm*X) */
+  double mass;
+  double b;
   double inv_err2, inv_err2_flt;
 } force_hmc_par;
 void init_force_hmc();
@@ -71,25 +73,57 @@ typedef struct _rhmc_par {
   int nf;
   double mass;
   
-	double SF_zf;
-	double SF_ds;
-	int SF_sign;
-	double SF_ct;
-	
+  double SF_zf;
+  double SF_ds;
+  int SF_sign;
+  double SF_ct;
+  
   double MT_prec; /* metropolis test precision */
   double MD_prec; /* molecular dynamics precision */
   double HB_prec; /* heatbath precision for pseudofermions */
   double force_prec; /* precision used in the inversions in the force */
   double force_prec_flt; /* precision used in single-precision acceleration for the inversions in the force (HMC only)*/
   unsigned int n_pf; /* number of psudofermions used in the evolution */
-
-	double tlen; /* trajectory lenght */
-	unsigned int nsteps; /* number of step in the integration */
-	unsigned int gsteps; /* number of substeps for the gauge part every step */
+  
+  double tlen; /* trajectory lenght */
+  unsigned int nsteps; /* number of step in the integration */
+  unsigned int gsteps; /* number of substeps for the gauge part every step */
 } rhmc_par;
 void init_rhmc(rhmc_par *par);
 void free_rhmc();
-void init_hmc(rhmc_par *par);
+
+typedef struct _hmc_par {
+  /* sim parameters */
+  double beta;
+  int nf;
+  double mass;
+  
+  double SF_zf;
+  double SF_ds;
+  int SF_sign;
+  double SF_ct;
+	
+  double n_MT_prec; /* n metropolis test precision */
+  double h_MT_prec; /* h metropolis test precision */
+  double n_MT_prec_flt; /* n metropolis test precision float*/
+  double h_MT_prec_flt; /* h metropolis test precision float*/
+  double MD_prec; /* molecular dynamics precision */
+  double HB_prec; /* heatbath precision for pseudofermions */
+  double n_force_prec; /* precision used in the inversions in the force F1 (higher mass) of the Hasenbush acceleration*/
+  double n_force_prec_flt; /* precision used in single-precision acceleration for the inversions in the force F1 (HMC only)*/
+  double h_force_prec; /* precision used in the inversions in the force F2 (lower mass) of the Hasenbush acceleration*/
+  double h_force_prec_flt; /* precision used in single-precision acceleration for the inversions in the force F2 (HMC only)*/
+
+  double tlen; /* trajectory lenght */
+  unsigned int nsteps; /* number of steps in the integration */
+  unsigned int hsteps; /* number of substeps for the lower mass of the Hasenbush acceleration */
+  unsigned int gsteps; /* number of substeps for the gauge part every step */
+  
+  int hasenbush; /* 0=no hasenbush ; 1=hasenbush */
+  double hasen_dm;
+} hmc_par;
+
+void init_hmc(hmc_par *par);
 void free_hmc();
 
 /* update the gauge field using RHMC algorithm
@@ -120,7 +154,16 @@ typedef enum {
  * compute the local action at every site for the HMC
  * H = | momenta |^2 + S_g + < phi1, phi2>
  */
+typedef struct _action_par {
+  /* sim parameters */
+  double beta;
+  int n_pf;
+#ifndef ROTATED_SF
+  double SF_ct;
+#endif
+} action_par;
 void local_hmc_action(local_action_type type,
+                      action_par *par,
                       scalar_field *loc_action,
                       suNg_av_field *momenta,
                       spinor_field *phi1,

@@ -10,14 +10,14 @@
 #include "linear_algebra.h"
 #include "error.h"
 #include "representation.h"
-
-extern rhmc_par _update_par;
+#include "logger.h"
 
 /*
  * compute the local action at every site for the HMC
  * H = | momenta |^2 + S_g + < phi1, phi2>
  */
 void local_hmc_action(local_action_type type,
+                      action_par *par,
                       scalar_field *loc_action,
                       suNg_av_field *momenta,
                       spinor_field *phi1,
@@ -51,7 +51,6 @@ void local_hmc_action(local_action_type type,
     error(1,1,"local_hmc_action","Invalid type");
   }
 
-
   _MASTER_FOR(&glattice,i) {
     a=0.;
     /* Momenta */
@@ -64,49 +63,49 @@ void local_hmc_action(local_action_type type,
     *_FIELD_AT(loc_action,i)+=a;
   }
 
-
 #ifndef ROTATED_SF
   _MASTER_FOR(&glattice,i) {
 
     /* Gauge action */
-    *_FIELD_AT(loc_action,i) += -(_update_par.beta/((double)NG))*local_plaq(i);
+    *_FIELD_AT(loc_action,i) += -(par->beta/((double)NG))*local_plaq(i);
   }
+
 #else /* ROTATED_SF */
 
   
   if(COORD[0]==0) {
     for(int x=0;x<X;x++) for(int y=0;y<Y;y++) for(int z=0;z<Z;z++) {
       i=ipt(1,x,y,z);
-      *_FIELD_AT(loc_action,i) += -(.5*_update_par.SF_ct*_update_par.beta/((double)NG))*plaq(i,1,0);
-      *_FIELD_AT(loc_action,i) += -(.5*_update_par.SF_ct*_update_par.beta/((double)NG))*plaq(i,2,0);
-      *_FIELD_AT(loc_action,i) += -(.5*_update_par.SF_ct*_update_par.beta/((double)NG))*plaq(i,3,0);
+      *_FIELD_AT(loc_action,i) += -(.5*par->SF_ct*par->beta/((double)NG))*plaq(i,1,0);
+      *_FIELD_AT(loc_action,i) += -(.5*par->SF_ct*par->beta/((double)NG))*plaq(i,2,0);
+      *_FIELD_AT(loc_action,i) += -(.5*par->SF_ct*par->beta/((double)NG))*plaq(i,3,0);
     }
   } else{
     for(int t=0;t<2;t++) for(int x=0;x<X;x++) for(int y=0;y<Y;y++) for(int z=0;z<Z;z++) {
       i=ipt(t,x,y,z);
-      *_FIELD_AT(loc_action,i) += -(_update_par.beta/((double)NG))*local_plaq(i);
+      *_FIELD_AT(loc_action,i) += -(par->beta/((double)NG))*local_plaq(i);
     }
   }
   
   for(int t=2;t<T-2;t++) for(int x=0;x<X;x++) for(int y=0;y<Y;y++) for(int z=0;z<Z;z++) {
     i=ipt(t,x,y,z);
-    *_FIELD_AT(loc_action,i) += -(_update_par.beta/((double)NG))*local_plaq(i);
+    *_FIELD_AT(loc_action,i) += -(par->beta/((double)NG))*local_plaq(i);
   }
   
   if(COORD[0]==NP_T-1) {
     for(int x=0;x<X;x++) for(int y=0;y<Y;y++) for(int z=0;z<Z;z++) {
       i=ipt(T-2,x,y,z);
-      *_FIELD_AT(loc_action,i) += -(.5*_update_par.SF_ct*_update_par.beta/((double)NG))*plaq(i,1,0);
-      *_FIELD_AT(loc_action,i) += -(.5*_update_par.SF_ct*_update_par.beta/((double)NG))*plaq(i,2,0);
-      *_FIELD_AT(loc_action,i) += -(.5*_update_par.SF_ct*_update_par.beta/((double)NG))*plaq(i,3,0);
-      *_FIELD_AT(loc_action,i) += -(_update_par.beta/((double)NG))*plaq(i,1,2);
-      *_FIELD_AT(loc_action,i) += -(_update_par.beta/((double)NG))*plaq(i,1,3);
-      *_FIELD_AT(loc_action,i) += -(_update_par.beta/((double)NG))*plaq(i,2,3);
+      *_FIELD_AT(loc_action,i) += -(.5*par->SF_ct*par->beta/((double)NG))*plaq(i,1,0);
+      *_FIELD_AT(loc_action,i) += -(.5*par->SF_ct*par->beta/((double)NG))*plaq(i,2,0);
+      *_FIELD_AT(loc_action,i) += -(.5*par->SF_ct*par->beta/((double)NG))*plaq(i,3,0);
+      *_FIELD_AT(loc_action,i) += -(par->beta/((double)NG))*plaq(i,1,2);
+      *_FIELD_AT(loc_action,i) += -(par->beta/((double)NG))*plaq(i,1,3);
+      *_FIELD_AT(loc_action,i) += -(par->beta/((double)NG))*plaq(i,2,3);
     }
   } else {
     for(int t=T-2;t<T;t++) for(int x=0;x<X;x++) for(int y=0;y<Y;y++) for(int z=0;z<Z;z++) {
       i=ipt(t,x,y,z);
-      *_FIELD_AT(loc_action,i) += -(_update_par.beta/((double)NG))*local_plaq(i);
+      *_FIELD_AT(loc_action,i) += -(par->beta/((double)NG))*local_plaq(i);
     }
   }
 
@@ -116,13 +115,11 @@ void local_hmc_action(local_action_type type,
   _MASTER_FOR(phi1->type,i) {
     a=0.;
   /* Fermions */
-    for (j=0;j<_update_par.n_pf;++j) {
+    for (j=0;j<par->n_pf;++j) {
       _spinor_prod_re_f(tmp,*_FIELD_AT(&phi1[j],i),*_FIELD_AT(&phi2[j],i));
       a += tmp;
     }
 
     *_FIELD_AT(loc_action,i)+=a;
-  }
-
-   
+  }   
 }

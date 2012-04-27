@@ -12,14 +12,13 @@ level = 1  seed = 12345
 
 // RHMC variables
 beta = 2.25
-mass = -1.15
+mass = -1
 nf = 2
 n_pf = 2
 MT_prec = 1.e-14
 MD_prec = 1.e-6
 HB_prec = 1.e-14
 force_prec = 1.e-14
-force_prec_flt = 1.e-3
 tlen = 1
 nsteps = 10
 gsteps = 20
@@ -31,7 +30,7 @@ meas freq = 1
 conf dir = .
 gauge start = random
 //ranlxd start =
-last conf = 5
+last conf = 10
 
 //Mesons
 mes:make = false
@@ -42,7 +41,7 @@ mes:nhits = 1
 poly:make = false
 
 //Eigenvalues
-eva:make = true
+eva:make = false
 eva:nevt = 5
 eva:nev = 1
 eva:kmax = 50

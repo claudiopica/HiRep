@@ -152,7 +152,7 @@ int main(int argc,char *argv[])
   read_cmdline(argc,argv);
 
   /* logger setup */
-    logger_setlevel(0,30);
+  logger_setlevel(0,10);
   /* disable logger for MPI processes != 0 */
   if (PID!=0) { logger_disable(); }
 
@@ -228,10 +228,10 @@ int main(int argc,char *argv[])
 #ifndef NDEBUG
   lprintf("MAIN",0,"Initial SF_test_gauge_bcs: %1.8e\n",SF_test_gauge_bcs());
 #endif /*NDEBUG*/
-  lprintf("MAIN",0,"Initial SF_action: %1.8e\n",SF_action((&flow)->hmc_v->rhmc_p.beta));
+  lprintf("MAIN",0,"Initial SF_action: %1.8e\n",SF_action((&flow)->hmc_v->hmc_p.beta));
 #endif /* BASIC_SF */
 
-  h2evamass=mass=flow.hmc_v->rhmc_p.mass;
+  h2evamass=mass=flow.hmc_v->hmc_p.mass;
 
   double *eva_vals=NULL;
   spinor_field *eva_vecs=NULL;
@@ -273,7 +273,7 @@ int main(int argc,char *argv[])
     }
 
 #ifdef BASIC_SF
-    lprintf("MAIN",0,"SF action: %1.8e\n",SF_action((&flow)->hmc_v->rhmc_p.beta));
+    lprintf("MAIN",0,"SF action: %1.8e\n",SF_action((&flow)->hmc_v->hmc_p.beta));
 #endif /* BASIC_SF */
 
     if((i%flow.meas_freq)==0) {
@@ -281,12 +281,12 @@ int main(int argc,char *argv[])
       lprintf("MAIN",0,"Plaquette: %1.8e\n",avr_plaquette());
 #ifdef BASIC_SF
       lprintf("MAIN",0,"SF_test_gauge_bcs: %1.8e\n",SF_test_gauge_bcs());
-      lprintf("MAIN",0,"PCAC mass: %1.8e\n",SF_PCAC_wall_mass((&flow)->hmc_v->rhmc_p.mass));
+      lprintf("MAIN",0,"PCAC mass: %1.8e\n",SF_PCAC_wall_mass((&flow)->hmc_v->hmc_p.mass));
 #endif /* BASIC_SF */
 
       /* Mesons */
       if(strcmp(mes_var.make,"true")==0) {
-        z2semwall_mesons(i,mes_var.nhits,1,&(flow.hmc_v->rhmc_p.mass),mes_var.precision);
+        z2semwall_mesons(i,mes_var.nhits,1,&(flow.hmc_v->hmc_p.mass),mes_var.precision);
       }
 
       /* Polyakov loops */

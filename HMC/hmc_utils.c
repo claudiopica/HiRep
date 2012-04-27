@@ -34,7 +34,7 @@ input_hmc hmc_var = init_input_hmc(hmc_var);
 static void mk_gconf_name(char *name, hmc_flow *rf, int id) {
   sprintf(name,"%s_%dx%dx%dx%dnc%dr%snf%db%.6fm%.6fn%d",
            rf->run_name,GLB_T,GLB_X,GLB_Y,GLB_Z,NG,repr_name,
-           rf->hmc_v->rhmc_p.nf,rf->hmc_v->rhmc_p.beta,-rf->hmc_v->rhmc_p.mass,
+           rf->hmc_v->hmc_p.nf,rf->hmc_v->hmc_p.beta,-rf->hmc_v->hmc_p.mass,
            id);
 }
 
@@ -260,10 +260,9 @@ int init_mc(hmc_flow *rf, char *ifile) {
       break;
   }
   represent_gauge_field();
-  assign_ud2u_f();
   
   /* init HMC */
-  init_hmc(&hmc_var.rhmc_p);
+  init_hmc(&hmc_var.hmc_p);
 
   return 0;
 

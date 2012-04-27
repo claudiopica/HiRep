@@ -376,6 +376,8 @@ void represent_gauge_field() {
     apply_bc();
   }
 #endif
+
+  assign_ud2u_f();
 }
 
 void represent_gauge_field_flt() {

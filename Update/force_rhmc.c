@@ -20,8 +20,6 @@
 #include <stdio.h>
 #include <math.h>
 
-/* declared in update_rhmc.c */
-extern rhmc_par _update_par;
 
 #define _print_avect(a) printf("(%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e)\n",(a).c1,(a).c2,(a).c3,(a).c4,(a).c5,(a).c6,(a).c7,(a).c8)
 
@@ -83,10 +81,7 @@ extern rhmc_par _update_par;
 static int n_ws=0;
 static spinor_field *chi=NULL, *Hchi=NULL;
 
-void init_force_rhmc(int n) {
-  n_ws = n;
-  chi = alloc_spinor_field_f(n_ws,&glattice);
-  Hchi = chi+n_ws-1;
+void init_force_rhmc() {
 }
 
 void free_force_rhmc() {
@@ -114,7 +109,12 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar){
   spinor_field *pf = par->pf;
   rational_app *ratio = par->ratio;
 
-  error(n_ws<ratio->order+1,1,"force_rhmc" __FILE__,"Workspace is too small");
+  if(n_ws<ratio->order+1) {
+    if(chi!=NULL) free_spinor_field(chi);
+    n_ws = ratio->order+1;
+    chi = alloc_spinor_field_f(n_ws,&glattice);
+    Hchi = chi+n_ws-1;
+  }
   
   /* check input types */
 #ifndef CHECK_SPINOR_MATCHING
@@ -145,7 +145,7 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar){
     for (n=0; n<ratio->order; ++n) {
 #ifdef UPDATE_EO
       /* change temporarely the type of chi[n] and Hchi */
-      g5Dphi_eopre(_update_par.mass, Hchi, &chi[n]);
+      g5Dphi_eopre(par->mass, Hchi, &chi[n]);
       /* start_sf_sendrecv(Hchi); this is not needed since it is done by the following Dphi_ call*/
       /* copy the spinor field structures of chi[n] and Hchi */
       /* in this way we can reuse the odd part of the fields with new names */
@@ -157,7 +157,7 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar){
       start_sf_sendrecv(&delta);
       start_sf_sendrecv(&sigma);
 #else
-      g5Dphi(_update_par.mass, Hchi, &chi[n]);
+      g5Dphi(par->mass, Hchi, &chi[n]);
       start_sf_sendrecv(Hchi);
 #endif
 

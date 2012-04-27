@@ -17,6 +17,10 @@
 #include <assert.h>
 
 
+/* DA ELIMINARE */
+#include "observables.h"
+
+
 #undef NDEBUG
 
 
@@ -327,14 +331,8 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
   M(Mp,out);
   spinor_field_sub_f_flt(p2,p2,Mp);
   rho=sqrt(spinor_field_sqnorm_f_f2d(p2));
-  lprintf("INVERTER",50,"g5QMR_core_flt: rho init: %1.8e\n",rho*rho/innorm2);
+  lprintf("INVERTER",60,"g5QMR_core_flt: rho init: %1.8e\n",rho*rho/innorm2);
 
-#ifndef NDEBUG
-  M(sdbg,out);
-  spinor_field_sub_assign_f_flt(sdbg,in);
-  lprintf("INVERTER",20,"g5QMR_core_flt: [%d] res=%e notconverged=%d\n",cgiter,spinor_field_sqnorm_f_f2d(sdbg)/innorm2,notconverged);   
-#endif
-  
   spinor_field_mul_f_flt(p2,1./rho,p2);
   spinor_field_zero_f_flt(p1);
   r=rho;
@@ -401,9 +399,9 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
       if(fabs(r*r)*(float)(1+cgiter)<err2*innorm2){
         flag=0;
         --notconverged;
-        lprintf("INVERTER",50,"g5QMR_core_flt: vect converged at iter: %d\n",cgiter);
+        lprintf("INVERTER",60,"g5QMR_core_flt: vect converged at iter: %d\n",cgiter);
       } else {
-        lprintf("INVERTER",50,"g5QMR_core_flt: iter: %d res: %1.8e s2: %1.8e m=%1.8e\n",cgiter,fabs(r*r)*(float)(1+cgiter)/innorm2,s2,m);
+        lprintf("INVERTER",60,"g5QMR_core_flt: iter: %d res: %1.8e s2: %1.8e m=%1.8e\n",cgiter,fabs(r*r)*(float)(1+cgiter)/innorm2,s2,m);
       }
       
     }
@@ -418,9 +416,9 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
       olddelta=delta;
       delta = spinor_field_g5_prod_re_f_f2d(p2,p2);
       
-      lprintf("INVERTER",40,"g5QMR_core_flt: delta=%1.8e rho=%1.8e [iter=%d]\n",delta,rho,cgiter);
+      lprintf("INVERTER",60,"g5QMR_core_flt: delta=%1.8e rho=%1.8e [iter=%d]\n",delta,rho,cgiter);
       if(fabs(delta)<1.e-6 || maxm<1.e-3) { /* the method has failed ! */
-        lprintf("INVERTER",40,"g5QMR_core_flt: method failed! delta=%e [iter=%d]\n",delta,cgiter);
+        lprintf("INVERTER",60,"g5QMR_core_flt: method failed! delta=%e [iter=%d]\n",delta,cgiter);
         notconverged=0; /* exit loop */
       }
       
@@ -429,7 +427,7 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
       
     } else { /* system has converged */
       notconverged=0;
-      lprintf("INVERTER",40,"g5QMR_core_flt: rho < 1.e-5 ! (system converged)\n");
+      lprintf("INVERTER",60,"g5QMR_core_flt: rho < 1.e-5 ! (system converged)\n");
     }
     
     
@@ -452,9 +450,9 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
   *valid=1;
   if (fabs(norm)>err2){
     *valid=0;
-    lprintf("INVERTER",30,"g5QMR_core_flt failed: err2 = %1.8e > %1.8e\n",norm,err2);
+    lprintf("INVERTER",50,"g5QMR_core_flt failed: err2 = %1.8e > %1.8e\n",norm,err2);
   } else {
-    lprintf("INVERTER",20,"g5QMR_core_flt inversion: err2 = %1.8e < %1.8e\n",norm,err2);
+    lprintf("INVERTER",50,"g5QMR_core_flt inversion: err2 = %1.8e < %1.8e\n",norm,err2);
   } 
   
   /* free memory */
@@ -739,7 +737,7 @@ int g5QMR_fltacc( g5QMR_fltacc_par* par, spinor_operator M, spinor_operator_flt 
   spinor_field_flt *in_flt, *out_flt, *res_flt;
   spinor_field *res;
   double err2, innorm2;
-  
+
   res = alloc_spinor_field_f(1,in->type);
   in_flt = alloc_spinor_field_f_flt(3,in->type);
   out_flt = in_flt+1;
@@ -758,6 +756,7 @@ int g5QMR_fltacc( g5QMR_fltacc_par* par, spinor_operator M, spinor_operator_flt 
 
     assign_sd2s(res_flt,res);
     spinor_field_zero_f_flt(out_flt);
+
     cgiter_flt += g5QMR_core_flt(&valid,par->err2_flt,par->max_iter_flt,M_flt,res_flt,out_flt);
     if (valid==0) {
       lprintf("INVERTER",20,"g5QMR_fltacc: using MINRES\n");
@@ -770,22 +769,23 @@ int g5QMR_fltacc( g5QMR_fltacc_par* par, spinor_operator M, spinor_operator_flt 
       cgiter_minres+=MINRES_flt(&Mpar,&Herm_flt,res_flt,out_flt,out_flt);
       spinor_field_g5_f_flt(res_flt,res_flt); /* restore input vector */
     }
-   
+
     _MASTER_FOR(out->type,ix) {
       for(k=0; k<8*NF; k++) {
         ((double*)_FIELD_AT(out,ix))[k] += (double) ((float*)_FIELD_AT(out_flt,ix))[k];
       }
     }
-  
+
     M(res,out);
     spinor_field_sub_f(res,in,res);
-    
     err2 = spinor_field_sqnorm_f(res);
-    
     cgiter++;
     
-    lprintf("INVERTER",50,"g5QMR_fltacc: res=%e\n", err2/innorm2);
+    lprintf("INVERTER",20,"g5QMR_fltacc [%d]: res=%e\n", cgiter, err2/innorm2);
   } while(err2/innorm2>par->err2);
+
+  
+  lprintf("INVERTER",20,"g5QMR_fltacc: res=%e < %e \n", err2/innorm2,par->err2);
   
   lprintf("INVERTER",10,"g5QMR_fltacc: MVM (g5QMR_flt,g5QMR,MINRES) = %d ; %d ; %d\n",cgiter_flt,cgiter,cgiter_minres);
   

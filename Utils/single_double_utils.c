@@ -69,16 +69,19 @@ void assign_ud2u(void)
 
 void assign_ud2u_f(void)
 {
-  int i;
-  double *d;
-  float *f;
-
-  d = (double*)(u_gauge_f->ptr);
-  f = (float*)(u_gauge_f_flt->ptr);
-  for(i=0; i<4*glattice.gsize*sizeof(suNf)/sizeof(double); i++) {
-    *f = (float)(*d);
-    d++;
-    f++;
+  if(u_gauge_f_flt!=NULL){
+    int i;
+    double *d;
+    float *f;
+  
+    d = (double*)(u_gauge_f->ptr);
+    f = (float*)(u_gauge_f_flt->ptr);
+    
+    for(i=0; i<4*glattice.gsize*sizeof(suNf)/sizeof(double); i++) {
+      *f = (float)(*d);
+      d++;
+      f++;
+    }
   }
 }
 

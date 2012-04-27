@@ -12,32 +12,39 @@
 /* HMC variables */
 typedef struct _input_hmc {
   /* hmc parameters */
-  rhmc_par rhmc_p;
+  hmc_par hmc_p;
 
   /* for the reading function */
-  input_record_t read[17];
+  input_record_t read[24];
   
 } input_hmc;
 
 #define init_input_hmc(varname) \
 { \
   .read={\
-    {"beta", "beta = %lf", DOUBLE_T, &(varname).rhmc_p.beta},\
-    {"nf", "nf = %d", INT_T, &(varname).rhmc_p.nf},\
-    {"n_pf", "n_pf = %d", INT_T, &(varname).rhmc_p.n_pf},\
-    {"mass", "mass = %lf", DOUBLE_T, &(varname).rhmc_p.mass},\
-    {"SF_zf", "SF_zf = %lf", DOUBLE_T, &(varname).rhmc_p.SF_zf},\
-    {"SF_ds", "SF_ds = %lf", DOUBLE_T, &(varname).rhmc_p.SF_ds},\
-    {"SF_sign", "SF_sign = %d", INT_T, &(varname).rhmc_p.SF_sign},\
-    {"SF_ct", "SF_ct = %lf", DOUBLE_T, &(varname).rhmc_p.SF_ct}, \
-    {"MT_prec", "MT_prec = %lf", DOUBLE_T, &(varname).rhmc_p.MT_prec},\
-    {"MD_prec", "MD_prec = %lf", DOUBLE_T, &(varname).rhmc_p.MD_prec},\
-    {"HB_prec", "HB_prec = %lf", DOUBLE_T, &(varname).rhmc_p.HB_prec},\
-    {"force_prec", "force_prec = %lf", DOUBLE_T, &(varname).rhmc_p.force_prec},\
-    {"force_prec_flt", "force_prec_flt = %lf", DOUBLE_T, &(varname).rhmc_p.force_prec_flt},\
-    {"tlen", "tlen = %lf", DOUBLE_T, &(varname).rhmc_p.tlen},\
-    {"nsteps", "nsteps = %u", UNSIGNED_T, &(varname).rhmc_p.nsteps},\
-    {"gsteps", "gsteps = %u", UNSIGNED_T, &(varname).rhmc_p.gsteps},\
+    {"beta", "beta = %lf", DOUBLE_T, &(varname).hmc_p.beta},\
+    {"nf", "nf = %d", INT_T, &(varname).hmc_p.nf},\
+    {"mass", "mass = %lf", DOUBLE_T, &(varname).hmc_p.mass},\
+    {"hasen_dm", "hasen_dm = %lf", DOUBLE_T, &(varname).hmc_p.hasen_dm},\
+    {"SF_zf", "SF_zf = %lf", DOUBLE_T, &(varname).hmc_p.SF_zf},\
+    {"SF_ds", "SF_ds = %lf", DOUBLE_T, &(varname).hmc_p.SF_ds},\
+    {"SF_sign", "SF_sign = %d", INT_T, &(varname).hmc_p.SF_sign},\
+    {"SF_ct", "SF_ct = %lf", DOUBLE_T, &(varname).hmc_p.SF_ct}, \
+    {"n_MT_prec", "n_MT_prec = %lf", DOUBLE_T, &(varname).hmc_p.n_MT_prec},\
+    {"h_MT_prec", "h_MT_prec = %lf", DOUBLE_T, &(varname).hmc_p.h_MT_prec},\
+    {"n_MT_prec_flt", "n_MT_prec_flt = %lf", DOUBLE_T, &(varname).hmc_p.n_MT_prec_flt},\
+    {"h_MT_prec_flt", "h_MT_prec_flt = %lf", DOUBLE_T, &(varname).hmc_p.h_MT_prec_flt},\
+    {"MD_prec", "MD_prec = %lf", DOUBLE_T, &(varname).hmc_p.MD_prec},\
+    {"HB_prec", "HB_prec = %lf", DOUBLE_T, &(varname).hmc_p.HB_prec},\
+    {"n_force_prec", "n_force_prec = %lf", DOUBLE_T, &(varname).hmc_p.n_force_prec},\
+    {"h_force_prec", "h_force_prec = %lf", DOUBLE_T, &(varname).hmc_p.h_force_prec},\
+    {"n_force_prec_flt", "n_force_prec_flt = %lf", DOUBLE_T, &(varname).hmc_p.n_force_prec_flt},\
+    {"h_force_prec_flt", "h_force_prec_flt = %lf", DOUBLE_T, &(varname).hmc_p.h_force_prec_flt},\
+    {"tlen", "tlen = %lf", DOUBLE_T, &(varname).hmc_p.tlen},\
+    {"nsteps", "nsteps = %u", UNSIGNED_T, &(varname).hmc_p.nsteps},\
+    {"hsteps", "hsteps = %u", UNSIGNED_T, &(varname).hmc_p.hsteps},\
+    {"gsteps", "gsteps = %u", UNSIGNED_T, &(varname).hmc_p.gsteps},\
+    {"hasenbush", "hasenbush = %d", INT_T, &(varname).hmc_p.hasenbush},\
     {NULL, NULL, 0, NULL}\
   }\
 }

@@ -28,6 +28,7 @@ rational_app r_MD={0}; /* used in the action MD evolution */
 rational_app r_HB={0};  /* used in pseudofermions heatbath */
 integrator_par *integrator = NULL;
 double minev, maxev; /* min and max eigenvalue of H^2 */
+action_par rhmc_action_par;
 /* END of State */
 
 
@@ -185,6 +186,7 @@ void init_rhmc(rhmc_par *par){
   ((force_rhmc_par*)(integrator[0].force_par))->n_pf = _update_par.n_pf;
   ((force_rhmc_par*)(integrator[0].force_par))->pf = pf;
   ((force_rhmc_par*)(integrator[0].force_par))->ratio = &r_MD;
+  ((force_rhmc_par*)(integrator[0].force_par))->mass = _update_par.mass;
   ((force_rhmc_par*)(integrator[0].force_par))->inv_err2 = _update_par.force_prec;
   integrator[0].integrator = &O2MN_multistep;
   integrator[0].next = &integrator[1];
@@ -193,7 +195,8 @@ void init_rhmc(rhmc_par *par){
   integrator[1].tlen = integrator[0].tlen/((double)(2*integrator[0].nsteps));
   integrator[1].nsteps = _update_par.gsteps;
   integrator[1].force = &force0;
-  integrator[1].force_par = NULL;
+  integrator[1].force_par = (void*)malloc(sizeof(double));
+  *((double*)integrator[1].force_par) = _update_par.beta;
   integrator[1].integrator = &O2MN_multistep;
   integrator[1].next = &integrator[2];
 
@@ -205,8 +208,12 @@ void init_rhmc(rhmc_par *par){
   integrator[2].integrator = &gauge_integrator;
   integrator[2].next = NULL;
   
-  init_force_rhmc(r_MD.order+1);
+  init_force_rhmc();
 	
+  rhmc_action_par.beta = _update_par.beta;
+  rhmc_action_par.n_pf = _update_par.n_pf;
+  rhmc_action_par.SF_ct = _update_par.SF_ct;
+
 	init = 1;
 	
 	lprintf("RHMC",0,"Initialization done.\n");
@@ -274,7 +281,7 @@ int update_rhmc(){
       
     /* compute starting action */
     lprintf("RHMC",30,"Computing action density...\n");
-    local_hmc_action(NEW, la, momenta, pf, pf);
+    local_hmc_action(NEW, &rhmc_action_par, la, momenta, pf, pf);
     
     /* compute H2^{a/2}*pf */
     lprintf("RHMC",30,"Correcting pseudofermions distribution...\n");
@@ -305,7 +312,7 @@ int update_rhmc(){
         rational_func(&r_S, &H2, &pf[i], &pf[i]);
     
     /* compute new action */
-    local_hmc_action(DELTA, la, momenta, pf, pf);
+    local_hmc_action(DELTA, &rhmc_action_par, la, momenta, pf, pf);
  
 #if defined(BASIC_SF) && ! defined(NDEBUG)
     lprintf("MAIN",0,"SF_test_force_bcs(END): %1.8e\n",SF_test_force_bcs(momenta));
@@ -376,7 +383,7 @@ int update_rhmc_o(){
         lprintf("RHMC",30,"NOT Generating momenta and pseudofermions...\n");
     /* compute starting action */
     lprintf("RHMC",30,"Computing action density...\n");
-    local_hmc_action(NEW, la, momenta, pf, pf);
+    local_hmc_action(NEW, &rhmc_action_par, la, momenta, pf, pf);
     
     /* compute H2^{a/2}*pf */
     lprintf("RHMC",30,"Correcting pseudofermions distribution...\n");
@@ -407,7 +414,7 @@ int update_rhmc_o(){
         rational_func(&r_S, &H2, &pf[i], &pf[i]);
     
     /* compute new action */
-    local_hmc_action(DELTA, la, momenta, pf, pf);
+    local_hmc_action(DELTA, &rhmc_action_par, la, momenta, pf, pf);
     
     /* Metropolis test */
     deltaH=0.;

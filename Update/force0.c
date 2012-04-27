@@ -14,7 +14,6 @@
 #include <stdio.h>
 #include <math.h>
 
-extern rhmc_par _update_par;
 
 #define _print_avect(a) printf("(%3.5f,%3.5f,%3.5f,%3.5f,%3.5f,%3.5f,%3.5f,%3.5f)\n",(a).c1,(a).c2,(a).c3,(a).c4,(a).c5,(a).c6,(a).c7,(a).c8)
 
@@ -34,6 +33,8 @@ void force0(double dt, suNg_av_field *force, void *vpar){
   _TWO_SPINORS_MATCHING(u_gauge,force);
 #endif
 
+  double beta = *((double*)vpar);
+
   _MASTER_FOR(&glattice,i) {
     for (mu=0; mu<4; ++mu) {
       staples(i,mu,&s1);
@@ -42,7 +43,7 @@ void force0(double dt, suNg_av_field *force, void *vpar){
       /* the projection itself takes the TA: proj(M) = proj(TA(M)) */
       _fund_algebra_project(f,s2);
     
-      _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,i,mu), dt*(-_update_par.beta/((double)(NG))), f);
+      _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,i,mu), dt*(-beta/((double)(NG))), f);
 
       _algebra_vector_sqnorm_g(nsq,f);
       forcestat[0]+=sqrt(nsq);
@@ -53,14 +54,13 @@ void force0(double dt, suNg_av_field *force, void *vpar){
   }
 	
   global_sum(forcestat,2);
-  forcestat[0]*=dt*_update_par.beta/((double)(NG*4*GLB_T*GLB_X*GLB_Y*GLB_Z));
-  forcestat[1]*=dt*_update_par.beta/((double)NG);
+  forcestat[0]*=dt*beta/((double)(NG*4*GLB_T*GLB_X*GLB_Y*GLB_Z));
+  forcestat[1]*=dt*beta/((double)NG);
   lprintf("FORCE0",50,"avr |force| = %1.8e maxforce = %1.8e\n",forcestat[0],forcestat[1]);
   
 #if defined(BASIC_SF) || defined(ROTATED_SF)
 	SF_force_bcs(force);
 #endif /* BASIC_SF || ROTATED_SF */
-
   }
 
 /*
