@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Search the best parameters for the HYP smearing
+* Verify that the gauge field are still in the SO-group
 *
 *******************************************************************************/
 
@@ -31,10 +31,32 @@
 #include "cinfo.c"
 
 
+
+#define _suNg_im_sq(k,u) \
+(k)=\
++_complex_im((u).c[0])*_complex_im((u).c[0])\
++_complex_im((u).c[1])*_complex_im((u).c[1])\
++_complex_im((u).c[2])*_complex_im((u).c[2])\
++_complex_im((u).c[3])*_complex_im((u).c[3])\
++_complex_im((u).c[4])*_complex_im((u).c[4])\
++_complex_im((u).c[5])*_complex_im((u).c[5])\
++_complex_im((u).c[6])*_complex_im((u).c[6])\
++_complex_im((u).c[7])*_complex_im((u).c[7])\
++_complex_im((u).c[8])*_complex_im((u).c[8])\
++_complex_im((u).c[9])*_complex_im((u).c[9])\
++_complex_im((u).c[10])*_complex_im((u).c[10])\
++_complex_im((u).c[11])*_complex_im((u).c[11])\
++_complex_im((u).c[12])*_complex_im((u).c[12])\
++_complex_im((u).c[13])*_complex_im((u).c[13])\
++_complex_im((u).c[14])*_complex_im((u).c[14])\
++_complex_im((u).c[15])*_complex_im((u).c[15])
+
+
+
 char cnfg_filename[256]="";
 char list_filename[256]="";
 char input_filename[256] = "input_file";
-char output_filename[256] = "HYPsmearing.out";
+char output_filename[256] = "VERIFY_GROUP.out";
 enum { UNKNOWN_CNFG, DYNAMICAL_CNFG, QUENCHED_CNFG };
 
 
@@ -46,6 +68,76 @@ typedef struct {
   int n;
   int type;
 } filename_t;
+
+
+
+/*static void polyako_1P(complex* poly, int tx[3], int mu) {
+	int i, x[4];
+	int glb[4]={GLB_T,GLB_X,GLB_Y,GLB_Z};
+	suNg omega;
+	suNg omega2;
+	
+	error(mu<0 || mu>3,1,"polyako_1P [polyak]","Bad value for direction parameter.");
+	
+	x[(mu+1)%4]=tx[0];
+	x[(mu+2)%4]=tx[1];
+	x[(mu+3)%4]=tx[2];
+	
+	_suNg_unit(omega);
+	for(x[mu]=0; x[mu]<glb[mu]; ) {
+		i=ipt(x[0],x[1],x[2],x[3]);
+		_suNg_times_suNg(omega2,omega,*pu_gauge(i,mu));
+		x[mu]++;
+		i=ipt(x[0],x[1],x[2],x[3]);
+		_suNg_times_suNg(omega,omega2,*pu_gauge(i,mu));
+		x[mu]++;
+	}
+	
+	_suNg_trace_re(poly->re,omega);
+	_suNg_trace_im(poly->im,omega);
+} */
+
+void identity_measure() {
+
+	int tx[4];
+	int glb[4]={GLB_T,GLB_X,GLB_Y,GLB_Z};
+//	complex cnum;
+	double rnum=0;
+//	double inum=0;
+//	cnum.re=cnum.im=0.;
+	suNg Uf;
+	int i;
+	
+	for(int mu=0;mu<4;mu++){
+	for(tx[0]=0; tx[0]<glb[0]; tx[0]++)	{
+		for(tx[1]=0; tx[1]<glb[1]; tx[1]++){	
+			for(tx[2]=0; tx[2]<glb[2]; tx[2]++){	
+				for(tx[3]=0; tx[3]<glb[3]; tx[3]++){
+					double tmp;
+					i=ipt(tx[0],tx[1],tx[2],tx[3]);
+					
+					_suNg_times_suNg_dagger(Uf,*pu_gauge(i,mu),*pu_gauge(i,mu));
+					_suNg_sqnorm(tmp,Uf);
+					//  Take the norm
+					rnum += (tmp>4) ? tmp-4 : 4- tmp ;
+//					_suNg_im_sq(tmp,*pu_gauge(i,mu));
+//					inum +=tmp;
+				}}}}}
+	//_complex_1(cnum);
+
+	//cnum.re /= GLB_X*GLB_Y*GLB_Z*GLB_T;
+	//cnum.im /= GLB_X*GLB_Y*GLB_Z*GLB_T;
+	
+	lprintf("ID_MEASURE",0,"\nSum |UU^T-1|^2 = %1.8e\n",rnum);
+//	lprintf("ID_MEASURE",0,"Sum |Im(U)|^2 = %1.8e\n",inum);
+}
+
+/////////////////////
+
+
+
+
+
 
 
 int parse_cnfg_filename(char* filename, filename_t* fn) {
@@ -99,6 +191,13 @@ int parse_cnfg_filename(char* filename, filename_t* fn) {
     return QUENCHED_CNFG;
   }
 
+  hm=sscanf(basename,"%dx%dx%dx%d%*[Nn]c%d",
+      &(fn->t),&(fn->x),&(fn->y),&(fn->z),&(fn->nc));
+  if(hm==5) {
+    fn->type=QUENCHED_CNFG;
+    return QUENCHED_CNFG;
+  }
+
   fn->type=UNKNOWN_CNFG;
   return UNKNOWN_CNFG;
 }
@@ -124,17 +223,17 @@ void read_cmdline(int argc, char* argv[]) {
   if (ao!=0) strcpy(output_filename,argv[ao]);
   if (ai!=0) strcpy(input_filename,argv[ai]);
 
-  error((ac==0 && al==0) || (ac!=0 && al!=0),1,"parse_cmdline [tune_HYP_smearing.c]",
-      "Syntax: tune_HYP_smearing { -c <config file> | -l <list file> } [-i <input file>] [-o <output file>] [-m]");
+  error((ac==0 && al==0) || (ac!=0 && al!=0),1,"parse_cmdline [verify_group.c]",
+      "Syntax: verify_group { -c <config file> | -l <list file> } [-i <input file>] [-o <output file>] [-m]");
 
   if(ac != 0) {
     strcpy(cnfg_filename,argv[ac]);
     strcpy(list_filename,"");
   } else if(al != 0) {
     strcpy(list_filename,argv[al]);
-    error((list=fopen(list_filename,"r"))==NULL,1,"parse_cmdline [tune_HYP_smearing.c]" ,
+    error((list=fopen(list_filename,"r"))==NULL,1,"parse_cmdline [verify_group.c]" ,
 	"Failed to open list file\n");
-    error(fscanf(list,"%s",cnfg_filename)==0,1,"parse_cmdline [tune_HYP_smearing.c]" ,
+    error(fscanf(list,"%s",cnfg_filename)==0,1,"parse_cmdline [verify_group.c]" ,
 	"Empty list file\n");
     fclose(list);
   }
@@ -148,9 +247,6 @@ int main(int argc,char *argv[]) {
   char tmp[256];
   FILE* list;
   filename_t fpars;
-  double mtp[6859], mtp0, mtp1;
-  double weight[3];
-  int ibest;
 
   /* setup process id and communications */
   read_cmdline(argc, argv);
@@ -158,7 +254,7 @@ int main(int argc,char *argv[]) {
 
   /* logger setup */
   /* disable logger for MPI processes != 0 */
-  logger_setlevel(0,10);
+  logger_setlevel(0,70);
   if (PID!=0) { logger_disable(); }
   if (PID==0) { 
     sprintf(tmp,">%s",output_filename); logger_stdout(tmp);
@@ -178,8 +274,8 @@ int main(int argc,char *argv[]) {
 
   read_input(glb_var.read,input_filename);
   GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
-  error(fpars.type==UNKNOWN_CNFG,1,"tune_HYP_smearing.c","Bad name for a configuration file");
-  error(fpars.nc!=NG,1,"tune_HYP_smearing.c","Bad NG");
+  error(fpars.type==UNKNOWN_CNFG,1,"verify_group.c","Bad name for a configuration file");
+  error(fpars.nc!=NG,1,"verify_group.c","Bad NG");
 
 
   /* setup communication geometry */
@@ -201,23 +297,14 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"local size is %dx%dx%dx%d\n",T,X,Y,Z);
   lprintf("MAIN",0,"extended local size is %dx%dx%dx%d\n",T_EXT,X_EXT,Y_EXT,Z_EXT);
 
-  lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed);
-  rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
-
   /* alloc global gauge fields */
   u_gauge=alloc_gfield(&glattice);
-#ifndef REPR_FUNDAMENTAL
-  u_gauge_f=alloc_gfield_f(&glattice);
-#endif
 
   list=NULL;
   if(strcmp(list_filename,"")!=0) {
     error((list=fopen(list_filename,"r"))==NULL,1,"main [mk_mesons.c]" ,
 	"Failed to open list file\n");
   }
-
-  for(i=0;i<6859;i++) mtp[i]=0.;
-  mtp0=0.;
 
   i=0;
   while(1) {
@@ -230,39 +317,22 @@ int main(int argc,char *argv[]) {
     lprintf("MAIN",0,"Configuration from %s\n", cnfg_filename);
     /* NESSUN CHECK SULLA CONSISTENZA CON I PARAMETRI DEFINITI !!! */
     read_gauge_field(cnfg_filename);
-    represent_gauge_field();
 
-    lprintf("TEST",0,"<p> %1.6f\n",avr_plaquette());
+    //lprintf("TEST",0,"<p> %1.6f\n",avr_plaquette());
 
-    HYP_span_parameters(mtp);
-    mtp0+=min_tplaq(u_gauge);
-
-    ibest=HYP_best_parameters(mtp,weight);
-    lprintf("MAIN",0,"Best weights for HYP smearing: %.2f %.2f %.2f\n",weight[0],weight[1],weight[2]);
-    lprintf("MAIN",0,"The smallest plaquette has been increased from %e to %e\n",mtp0/i,mtp[ibest]/i);
-
-    
+    //full_plaquette();
+	//  polyako(0);
+    identity_measure();
+   
     if(list==NULL) break;
   }
 
   if(list!=NULL) fclose(list);
 
-
-  ibest=HYP_best_parameters(mtp,weight);
-  mtp0/=i;
-  mtp1=mtp[ibest]/i;
-
-  lprintf("MAIN",0,"Best weights for HYP smearing: %.2f %.2f %.2f\n",weight[0],weight[1],weight[2]);
-  lprintf("MAIN",0,"The smallest plaquette has been increased from %e to %e\n",mtp0,mtp1);
-
-
   finalize_process();
  
   free_gfield(u_gauge);
-#ifndef REPR_FUNDAMENTAL
-  free_gfield_f(u_gauge_f);
-#endif
-
+  
   return 0;
 }
 

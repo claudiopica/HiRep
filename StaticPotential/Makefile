@@ -1,7 +1,7 @@
 TOPDIR = ..
 MKDIR=$(TOPDIR)/Make
 
-EXES = mk_wilsonloops tune_HYP_smearing polyakov_loops
+EXES = mk_wilsonloops polyakov_loops verify_group #tune_HYP_smearing
 
 default: $(EXES)
 
@@ -15,7 +15,7 @@ MODS := archive logger read_input endian
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Utils
-MODS := suN_utils time boundary_conditions HYP_smearing
+MODS := suN_utils time boundary_conditions HYP_smearing diag_hmat det_suNg
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Memory
@@ -42,6 +42,8 @@ MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 mk_wilsonloops_OBJS = $(MOD_OBJS)
 polyakov_loops_OBJS = $(MOD_OBJS)
+tune_HYP_smearing_OBJS = $(MOD_OBJS)
+verify_group_OBJS = $(MOD_OBJS)
 
 
 include $(MKDIR)/MkRules
