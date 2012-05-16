@@ -370,10 +370,12 @@ void Dphi_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
    error(out->type!=&glattice || in->type!=&glattice,1,"Dphi [Dphi.c]", "Spinors are not defined on all the lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
+   apply_BCs_on_spinor_field_flt(in);
    Dphi_flt_(out, in);
 
    rho=4.+m0;
    spinor_field_mul_add_assign_f_flt(out,rho,in);
+   apply_BCs_on_spinor_field_flt(out);
 
 }
 
@@ -391,12 +393,15 @@ void g5Dphi_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
    error(out->type!=&glattice || in->type!=&glattice,1,"g5Dphi [Dphi.c]", "Spinors are not defined on all the lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
+   apply_BCs_on_spinor_field_flt(in);
+   
    Dphi_flt_(out, in);
    
    rho=4.+m0;
 
    spinor_field_mul_add_assign_f_flt(out,rho,in);
    spinor_field_g5_assign_f_flt(out);
+   apply_BCs_on_spinor_field_flt(out);
 }
 
 
@@ -423,7 +428,9 @@ void Dphi_eopre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
   /* alloc memory for temporary spinor field */
   if (init) { init_Dirac(); init=0; }
   
+  apply_BCs_on_spinor_field_flt(in);
   Dphi_flt_(otmp, in);
+  apply_BCs_on_spinor_field_flt(otmp);
   Dphi_flt_(out, otmp);
   
   rho=4.0+m0;
@@ -431,6 +438,7 @@ void Dphi_eopre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
   
   spinor_field_mul_add_assign_f_flt(out,rho,in);
   spinor_field_minus_f_flt(out,out);
+  apply_BCs_on_spinor_field_flt(out);
 }
 
 
@@ -455,8 +463,10 @@ void Dphi_oepre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
 
   /* alloc memory for temporary spinor field */
   if (init) { init_Dirac(); init=0; }
-  
+
+  apply_BCs_on_spinor_field_flt(in);  
   Dphi_flt_(etmp, in);
+  apply_BCs_on_spinor_field_flt(etmp);
   Dphi_flt_(out, etmp);
   
   rho=4.0+m0;
@@ -464,6 +474,7 @@ void Dphi_oepre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
   
   spinor_field_mul_add_assign_f_flt(out,rho,in);
   spinor_field_minus_f_flt(out,out);
+  apply_BCs_on_spinor_field_flt(out);
 }
 
 
@@ -485,7 +496,9 @@ void g5Dphi_eopre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
   /* alloc memory for temporary spinor field */
   if (init) { init_Dirac(); init=0; }
   
+  apply_BCs_on_spinor_field_flt(in);
   Dphi_flt_(otmp, in);
+  apply_BCs_on_spinor_field_flt(otmp);
   Dphi_flt_(out, otmp);
   
   rho=4.0+m0;
@@ -494,7 +507,7 @@ void g5Dphi_eopre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
   spinor_field_mul_add_assign_f_flt(out,rho,in);
   spinor_field_minus_f_flt(out,out);
   spinor_field_g5_assign_f_flt(out);
-  
+  apply_BCs_on_spinor_field_flt(out);
 }
 
 /* g5Dphi_eopre ^2 */

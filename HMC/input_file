@@ -8,9 +8,15 @@ NP_X = 1
 NP_Y = 1
 NP_Z = 1
 
-level = 1  seed = 12345
+level = 1  seed = 13813
 
-beta = 2.25
+//Fermion twisting
+theta_T = 0.
+theta_X = 0.
+theta_Y = 0.
+theta_Z = 0.
+
+beta = 2
 mass = -1.0
 
 // R/HMC variables
@@ -22,17 +28,24 @@ HB_prec = 1.e-14
 n_force_prec = 1.e-14
 n_force_prec_flt = 1.e-6
 tlen = 1
-nsteps = 10
-gsteps = 10
+nsteps = 5
+gsteps = 40
 
 // Hasenbush variables
 hasenbush = 1 // 1 = enabled , 0 = disabled
-hasen_dm = .75
+hasen_dm = .5
 h_force_prec =  1.e-14
 h_force_prec_flt = 1.e-6
 h_MT_prec = 1.e-14
 h_MT_prec_flt = 1.e-6
-hsteps = 5
+hsteps = 4
+
+
+// Schroedinger functional
+SF_zf = 1.
+SF_ds = 1.
+SF_ct = 1.
+SF_sign = 1
 
 
 // Run control variables
@@ -42,7 +55,7 @@ meas freq = 1
 conf dir = .
 gauge start = random
 //ranlxd start =
-last conf = 500
+last conf = 1000
 
 //Mesons
 mes:make = false
@@ -53,10 +66,10 @@ mes:nhits = 1
 poly:make = false
 
 //Eigenvalues
-eva:make = false
+eva:make = true
 eva:nevt = 5
 eva:nev = 1
 eva:kmax = 50
 eva:maxiter = 100
-eva:omega1 = 1.e-12
-eva:omega2 = 1.e-6
+eva:omega1 = 1.e-8
+eva:omega2 = 1.e-3

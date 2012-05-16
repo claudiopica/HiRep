@@ -130,29 +130,29 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
   static suNf_spinor p;
   static suNf s1;
   static MINRES_par inv_par;
-#ifdef UPDATE_EO
+  #ifdef UPDATE_EO
   spinor_field Xe, Xo, Ye, Yo;
-#endif
+  #endif
   double forcestat[2]; /* used for computation of avr and max force */
   double nsq;
-
-
+  
+  
   force_hmc_par *par = (force_hmc_par*)vpar;
   spinor_field *pf = par->pf;
   static_mass = par->mass;
-
+  
   
   /* check input types */
-#ifndef CHECK_SPINOR_MATCHING
-   _TWO_SPINORS_MATCHING(u_gauge,force);
-#endif
-
-
+  #ifndef CHECK_SPINOR_MATCHING
+  _TWO_SPINORS_MATCHING(u_gauge,force);
+  #endif
+  
+  
   inv_par.max_iter=0;
   
   for (k=0; k<par->n_pf; ++k) {
-
-#ifndef UPDATE_EO
+    
+    #ifndef UPDATE_EO
     /* X = H^{-1} pf[k] = D^{-1} g5 pf[k] */
     g5QMR_fltacc_par mpar;
     mpar.err2 = par->inv_err2;
@@ -163,7 +163,7 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
     spinor_field_g5_assign_f(&pf[k]);
     g5QMR_fltacc(&mpar, &D, &D_flt, &pf[k], Xs);
     spinor_field_g5_assign_f(&pf[k]);
-        
+    
     /* Y = H^{-1} ( g5 pf[k] + b X ) = D^{-1} ( pf[k] + b g5 X ) */
     if(par->hasenbusch != 2) {
       spinor_field_g5_f(eta,Xs);
@@ -175,12 +175,12 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
     spinor_field_zero_f(Ys);
     g5QMR_fltacc(&mpar, &D, &D_flt, eta, Ys);
     
-#else
+    #else
     /* X_e = H^{-1} pf[k] */
     /* X_o = D_{oe} X_e = D_{oe} H^{-1} pf[k] */
     Xe=*Xs; Xe.type=&glat_even;
     Xo=*Xs; Xo.type=&glat_odd;
-
+    
     g5QMR_fltacc_par mpar;
     mpar.err2 = par->inv_err2;
     mpar.max_iter = 0;
@@ -197,7 +197,7 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
     /* Y_o = D_oe H^{-1} ( g5 pf[k] + b X_e ) */
     Ye=*Ys; Ye.type=&glat_even;
     Yo=*Ys; Yo.type=&glat_odd;
-
+    
     if(par->hasenbusch != 2) {
       spinor_field_copy_f(eta,&Xe);
     } else {
@@ -211,9 +211,9 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
     spinor_field_g5_assign_f(eta);
     Dphi_(&Yo,&Ye);
     
-#endif
-
-
+    #endif
+    
+    
     lprintf("FORCE",50,"|Xs| = %1.8e |Ys| = %1.8e\n",
 	    sqrt(spinor_field_sqnorm_f(Xs)),
 	    sqrt(spinor_field_sqnorm_f(Ys))
@@ -227,7 +227,7 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
     
     _PIECE_FOR(&glattice,x) { 
       _SITE_FOR(&glattice,x) {
-	
+        
       	for (mu=0; mu<4; ++mu) {
       	  int y;
       	  suNf_spinor *chi1, *chi2;
@@ -269,24 +269,24 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
       	    chi2=_FIELD_AT(Xs,y);
       	    _F_DIR3(s1,chi1,chi2);
       	  }
-	  
+      	  
       	  _algebra_project(f,s1);
-
-
-#ifdef UPDATE_EO
+      	  
+      	  
+      	  #ifdef UPDATE_EO
           if(par->hasenbusch != 2) {
       	    _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),-dt*(_REPR_NORM2/_FUND_NORM2),f);
       	  } else {
       	    _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),-par->b*dt*(_REPR_NORM2/_FUND_NORM2),f);
           }
-#else
+          #else
           if(par->hasenbusch != 2) {
         	  _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),dt*(_REPR_NORM2/_FUND_NORM2),f);	
       	  } else {
       	    _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),par->b*dt*(_REPR_NORM2/_FUND_NORM2),f);
           }
-#endif
-	  
+          #endif
+          
     	    _algebra_vector_sqnorm_g(nsq,f);
     	    forcestat[0]+=sqrt(nsq);
     	    for(y=0;y<NG*NG-1;++y){
@@ -299,17 +299,14 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
        	complete_sf_sendrecv(Ys);
       }
     }
-
+    
     global_sum(forcestat,2);
     forcestat[0]*=dt*(_REPR_NORM2/_FUND_NORM2)/((double)(4*GLB_T*GLB_X*GLB_Y*GLB_Z));
     forcestat[1]*=dt*(_REPR_NORM2/_FUND_NORM2);
     lprintf("FORCE",50," avr |force| = %1.8e maxforce = %1.8e \n",forcestat[0],forcestat[1]);
-    
-#if defined(BASIC_SF) || defined(ROTATED_SF)
-    SF_force_bcs(force);
-#endif /* BASIC_SF || ROTATED_SF*/
-    
   }
+
+  apply_BCs_on_momentum_field(force);
   
 }
 

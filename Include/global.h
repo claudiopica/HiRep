@@ -16,6 +16,8 @@
 
 #include <stddef.h>
 
+#include "check_options.h"
+
 #ifdef MAIN_PROGRAM
 #  define GLB_VAR(type,name,init...) type name init
 #else
@@ -91,6 +93,7 @@ GLB_VAR(geometry_descriptor,glattice,={0}); /* global lattice */
 GLB_VAR(geometry_descriptor,glat_even,={0}); /* global even lattice */
 GLB_VAR(geometry_descriptor,glat_odd,={0}); /* global odd lattice */
 
+
 /* Gauge field */
 #include "field_ordering.h"
 #include "suN_types.h"
@@ -107,59 +110,37 @@ GLB_VAR(suNf_field_flt,*u_gauge_f_flt,=NULL);
 #define pu_gauge_f_flt(ix,mu) ((u_gauge_f_flt->ptr)+coord_to_index(ix,mu))
 
 
-/* Boundary conditions */
-#ifdef ANTIPERIODIC_BC_T
-#define BC_T 1.
-#else
-#define BC_T 0.
-#endif
-
-#ifdef ANTIPERIODIC_BC_X
-#define BC_X 1.
-#else
-#define BC_X 0.
-#endif
-
-#ifdef ANTIPERIODIC_BC_Y
-#define BC_Y 1.
-#else
-#define BC_Y 0.
-#endif
-
-#ifdef ANTIPERIODIC_BC_Z
-#define BC_Z 1.
-#else
-#define BC_Z 0.
-#endif
-
-GLB_VAR(double,bc[4],={BC_T,BC_X,BC_Y,BC_Z});
-
-#ifdef TWISTED_BC
-GLB_VAR(int,**twbc_staples, =NULL);
-GLB_VAR(int,*twbc_plaq, =NULL);
-#endif
-
-#undef BC_T
-#undef BC_X
-#undef BC_Y
-#undef BC_Z
-
 /* input parameters */
 #include "input_par.h"
 GLB_VAR(input_glb,glb_var,=init_input_glb(glb_var));
 
+
+/* Does the represented field need to be allocated? */
+
+#if !defined(REPR_FUNDAMENTAL) || defined(ROTATED_SF)
+#define ALLOCATE_REPR_GAUGE_FIELD
+#endif
+
+
+
+#ifdef PLAQ_WEIGHTS
+GLB_VAR(double,*plaq_weight, =NULL);
+#endif
+
 /* Theta Boundary conditions */
-#if defined(BC_T_THETA) || defined(BC_X_THETA) || defined(BC_Y_THETA) || defined(BC_Z_THETA)
+#ifdef FERMION_THETA
 GLB_VAR(complex,eitheta[4],={{1.,0.}});
 #endif
 
-#ifdef WITH_GPU
-#define BLOCK_SIZE 512
-GLB_VAR(int,*iup_gpu,=NULL);
-GLB_VAR(int,*idn_gpu,=NULL);
-#endif //WITH_GPU
+
+#if defined(ROTATED_SF) && defined(UPDATE_EO)
+#error ROTATED_SF DOES NOT WORK WITH E/O PRECONDITIONING
+#endif
+
 
 #undef GLB_VAR
+
+
 #endif
 
 

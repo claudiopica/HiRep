@@ -366,16 +366,11 @@ void Dphi(double m0, spinor_field *out, spinor_field *in)
    error(in==out,1,"Dphi [Dphi.c]",
          "Input and output fields must be different");
 
-#if defined(BASIC_SF) || defined(ROTATED_SF)
-   SF_spinor_bcs(in);
-#endif /* defined(BASIC_SF) || defined(ROTATED_SF) */
+   apply_BCs_on_spinor_field(in);
 
 #ifdef CHECK_SPINOR_MATCHING
    error(out->type!=&glattice || in->type!=&glattice,1,"Dphi [Dphi.c]", "Spinors are not defined on all the lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
-
-    /* Init Dphi module */
-    if (init) { init_Dirac(); init=0; }
     
    Dphi_(out, in);
 
@@ -419,11 +414,7 @@ void Dphi(double m0, spinor_field *out, spinor_field *in)
 	}
 #endif /* ROTATED_SF */
 
-
-#if defined(BASIC_SF) || defined(ROTATED_SF)
-   SF_spinor_bcs(out);
-#endif /* defined(BASIC_SF) || defined(ROTATED_SF) */
-
+  apply_BCs_on_spinor_field(out);
 }
 
 void g5Dphi(double m0, spinor_field *out, spinor_field *in)
@@ -445,13 +436,8 @@ void g5Dphi(double m0, spinor_field *out, spinor_field *in)
 #ifdef CHECK_SPINOR_MATCHING
    error(out->type!=&glattice || in->type!=&glattice,1,"g5Dphi [Dphi.c]", "Spinors are not defined on all the lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
-
-    /* Init Dphi module */
-    if (init) { init_Dirac(); init=0; }
     
-#if defined(BASIC_SF) || defined(ROTATED_SF)
-   SF_spinor_bcs(in);
-#endif /* defined(BASIC_SF) || defined(ROTATED_SF) */
+   apply_BCs_on_spinor_field(in);
 
    Dphi_(out, in);
 
@@ -497,10 +483,7 @@ void g5Dphi(double m0, spinor_field *out, spinor_field *in)
    
    spinor_field_g5_assign_f(out);
 
-#if defined(BASIC_SF) || defined(ROTATED_SF)
-   SF_spinor_bcs(out);
-#endif /* defined(BASIC_SF) || defined(ROTATED_SF) */
-
+   apply_BCs_on_spinor_field(out);
 }
 
 
@@ -524,17 +507,13 @@ void Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
   error(out->type!=&glat_even || in->type!=&glat_even,1,"Dphi_eopre " __FILE__, "Spinors are not defined on even lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
-#if defined(BASIC_SF) || defined(ROTATED_SF)
-  SF_spinor_bcs(in);
-#endif /* defined(BASIC_SF) || defined(ROTATED_SF) */
+  apply_BCs_on_spinor_field(in);
 
   /* alloc memory for temporary spinor field */
   if (init) { init_Dirac(); init=0; }
   
   Dphi_(otmp, in);
-#if defined(BASIC_SF) || defined(ROTATED_SF)
-  SF_spinor_bcs(otmp);
-#endif /* defined(BASIC_SF) || defined(ROTATED_SF) */
+  apply_BCs_on_spinor_field(otmp);
   Dphi_(out, otmp);
   
   rho=4.0+m0;
@@ -542,10 +521,7 @@ void Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
   
   spinor_field_mul_add_assign_f(out,rho,in);
   spinor_field_minus_f(out,out);
-#if defined(BASIC_SF) || defined(ROTATED_SF)
-  SF_spinor_bcs(out);
-#endif /* defined(BASIC_SF) || defined(ROTATED_SF) */
-
+  apply_BCs_on_spinor_field(out);
 }
 
 
@@ -568,17 +544,13 @@ void Dphi_oepre(double m0, spinor_field *out, spinor_field *in)
   error(out->type!=&glat_odd || in->type!=&glat_odd,1,"Dphi_oepre " __FILE__, "Spinors are not defined on odd lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
-#if defined(BASIC_SF) || defined(ROTATED_SF)
-  SF_spinor_bcs(in);
-#endif /* defined(BASIC_SF) || defined(ROTATED_SF) */
+  apply_BCs_on_spinor_field(in);
 
   /* alloc memory for temporary spinor field */
   if (init) { init_Dirac(); init=0; }
   
   Dphi_(etmp, in);
-#if defined(BASIC_SF) || defined(ROTATED_SF)
-  SF_spinor_bcs(etmp);
-#endif /* defined(BASIC_SF) || defined(ROTATED_SF) */
+  apply_BCs_on_spinor_field(etmp);
   Dphi_(out, etmp);
   
   rho=4.0+m0;
@@ -587,10 +559,7 @@ void Dphi_oepre(double m0, spinor_field *out, spinor_field *in)
   spinor_field_mul_add_assign_f(out,rho,in);
   spinor_field_minus_f(out,out);
 
-#if defined(BASIC_SF) || defined(ROTATED_SF)
-  SF_spinor_bcs(out);
-#endif /* defined(BASIC_SF) || defined(ROTATED_SF) */
-
+  apply_BCs_on_spinor_field(out);
 }
 
 
@@ -609,17 +578,13 @@ void g5Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
   error(out->type!=&glat_even || in->type!=&glat_even,1,"g5Dphi_eopre " __FILE__, "Spinors are not defined on even lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
-#if defined(BASIC_SF) || defined(ROTATED_SF)
-  SF_spinor_bcs(in);
-#endif /* defined(BASIC_SF) || defined(ROTATED_SF) */
+  apply_BCs_on_spinor_field(in);
 
   /* alloc memory for temporary spinor field */
   if (init) { init_Dirac(); init=0; }
   
   Dphi_(otmp, in);
-#if defined(BASIC_SF) || defined(ROTATED_SF)
-  SF_spinor_bcs(otmp);
-#endif /* defined(BASIC_SF) || defined(ROTATED_SF) */
+  apply_BCs_on_spinor_field(otmp);
   Dphi_(out, otmp);
   
   rho=4.0+m0;
@@ -629,10 +594,7 @@ void g5Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
   spinor_field_minus_f(out,out);
   spinor_field_g5_assign_f(out);
 
-#if defined(BASIC_SF) || defined(ROTATED_SF)
-  SF_spinor_bcs(out);
-#endif /* defined(BASIC_SF) || defined(ROTATED_SF) */
-  
+  apply_BCs_on_spinor_field(out);
 }
 
 /* g5Dphi_eopre ^2 */

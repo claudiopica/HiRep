@@ -21,32 +21,27 @@
 
 void ExpX(double dt, suNg_algebra_vector *h, suNg *u);
 
-void apply_bc();
-void apply_bc_flt();
 
-void set_bc_theta_t(double theta);
-void set_bc_theta_x(double theta);
-void set_bc_theta_y(double theta);
-void set_bc_theta_z(double theta);
 
-#ifdef BASIC_SF
-double SF_test_spinor_bcs(spinor_field *sp);
-#endif /* BASIC_SF */
+typedef struct {
+  double gauge_boundary_improvement_cs;
+  double gauge_boundary_improvement_ct;
+  double chiSF_boundary_improvement_ds;
+  double fermion_twisting_theta[4];
+  int SF_BCs;
+  suNg gauge_boundary_up;
+  suNg gauge_boundary_dn;
+} BCs_pars_t;  
 
-void SF_gauge_bcs(suNg_field *gf, int strength);
-double SF_test_gauge_bcs();
+void init_BCs(BCs_pars_t *pars);
+void free_BCs();
+void apply_BCs_on_represented_gauge_field();
+void apply_BCs_on_fundamental_gauge_field();
+void apply_BCs_on_momentum_field(suNg_av_field *force);
+void apply_BCs_on_spinor_field(spinor_field *sp);
+void apply_BCs_on_spinor_field_flt(spinor_field_flt *sp);
 
-#if defined(BASIC_SF) || defined(ROTATED_SF)
-void SF_spinor_bcs(spinor_field *sp);
-void SF_spinor_bcs_flt(spinor_field_flt *sp);
-void SF_force_bcs(suNg_av_field *force);
-double SF_test_force_bcs(suNg_av_field *force);
-#endif /* BASIC_SF || ROTATED_SF */
 
-#ifdef TWISTED_BC
-void init_twbc();
-void free_twbc();
-#endif
 
 
 void cross_prod(suNg_vector *v1,suNg_vector *v2,suNg_vector *v3);

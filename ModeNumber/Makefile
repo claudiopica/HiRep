@@ -1,12 +1,13 @@
 TOPDIR = ..
 MKDIR=$(TOPDIR)/Make
 
-EXES = rhmc
+EXES = mk_modenumber mk_eigvals
 
 default: $(EXES)
 
+
 MODDIR := Geometry
-MODS := geometry_init geometry_mpi_eo test_geometry_mpi communications communications_flt
+MODS := geometry_init geometry_mpi_eo communications
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := IO
@@ -14,7 +15,7 @@ MODS := archive logger read_input endian
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Utils
-MODS := suN_utils suN_exp single_double_utils boundary_conditions time max_eig
+MODS := boundary_conditions time max_eig single_double_utils
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Memory
@@ -22,42 +23,40 @@ MODS := amalloc field_alloc spinor_field_alloc
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Observables
-MODS := avr_plaquette pta_qprop mesons polyakov z2semwall sf_action sf_pcac
+MODS := avr_plaquette
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Random
-MODS := gauss random_suNg ranlxs ranlxd random_fields ranz2
+MODS := gauss ranlxs ranlxd ranz2 random_fields random_suNg 
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Update
-MODS := Dphi staples update_hb random_su2 representation random_momenta random_spinor_field update_rhmc local_action force0 copy_gfield find_spec_limits rational_functions force_rhmc O2MN_multistep cabmar Dphi_flt
+MODS := Dphi representation random_spinor_field random_su2
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Error
 MODS := error
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
-MODDIR := Statistics
-MODS := 
+MODDIR := ModeNumber
+MODS := modenumber
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Inverters
-MODS := linear_algebra cg_mshift MINRES_mshift g5QMR_mshift MINRES eva jacobi HBiCGstab
+MODS := linear_algebra cg_mshift MINRES_mshift g5QMR_mshift MINRES eva jacobi
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
-MODDIR := RHMC
-MODS := rhmc_utils
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
-
-rhmc_OBJS = $(MOD_OBJS)
-
-#rhmc: $(OBJS) $(MOD_OBJS)
-#	echo -n "Linking [$@]..." 
-#	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(MOD_OBJS) &&\
-#	echo " done." || ( echo " failed." && false )
-
+COMMON_OBJS = $(MOD_OBJS)
 
 include $(MKDIR)/MkRules
 
+
+# THIS HAS TO BE ADAPTED TO THE MACHINE
+approx_for_modenumber: approx_for_modenumber.c
+	gcc -o approx_for_modenumber approx_for_modenumber.c -Wall -std=c99 -lm -lgsl -lgslcblas -I/sw/include -L/sw/lib -m32
+
+
+
 .PHONY: default
+
 

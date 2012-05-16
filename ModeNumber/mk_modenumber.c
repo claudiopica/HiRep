@@ -1,9 +1,3 @@
-/*******************************************************************************
-*
-* Computation of the mesonic spectrum
-*
-*******************************************************************************/
-
 #define MAIN_PROGRAM
 
 #include <stdlib.h>
@@ -27,7 +21,6 @@
 #include "representation.h"
 #include "utils.h"
 #include "logger.h"
-#include "communications.h"
 
 #include "cinfo.c"
 
@@ -39,25 +32,26 @@
 #error This code does not work with the fermion twisting !!!
 #endif
 
-
-
-/* Mesons parameters */
-typedef struct _input_mesons {
-  char mstring[256];
-  double precision;
+typedef struct _input_nu {
+  double inverr2;
+  char approx[512];
   int nhits;
+  double mass;
+  char list[1024];
 
   /* for the reading function */
-  input_record_t read[4];
+  input_record_t read[6];
 
-} input_mesons;
+} input_nu;
 
-#define init_input_mesons(varname) \
+#define init_input_nu(varname) \
 { \
   .read={\
-    {"quark quenched masses", "mes:masses = %s", STRING_T, (varname).mstring},\
-    {"inverter precision", "mes:precision = %lf", DOUBLE_T, &(varname).precision},\
-    {"number of inversions per cnfg", "mes:nhits = %d", INT_T, &(varname).nhits},\
+    {"squared error for inverter", "nu:inverr2 = %lf", DOUBLE_T, &(varname).inverr2},\
+    {"Chebyshev approximation file", "nu:approx = %s", STRING_T, (varname).approx},\
+    {"number of stochastic spinors", "nu:nhits = %d", INT_T, &(varname).nhits},\
+    {"quark mass (overridden by file name)", "nu:mass = %lf", DOUBLE_T, &(varname).mass},\
+    {"list of eigenvalues", "nu:list = %s", STRING_T, (varname).list},\
     {NULL, NULL, 0, NULL}\
   }\
 }
@@ -66,71 +60,11 @@ typedef struct _input_mesons {
 char cnfg_filename[256]="";
 char list_filename[256]="";
 char input_filename[256] = "input_file";
-char output_filename[256] = "mesons.out";
+char output_filename[256] = "modenumber.out";
 enum { UNKNOWN_CNFG, DYNAMICAL_CNFG, QUENCHED_CNFG };
 
-input_mesons mes_var = init_input_mesons(mes_var);
+input_nu nu_var = init_input_nu(nu_var);
 
-void inline_mk_mesons(double *m, int nm, double prec) {
-    int k, n, g0[4];
-    spinor_field **pta_qprop=0;
-    double* tricorr;
-
-    tricorr=(double*)malloc(GLB_T*sizeof(double));
-    pta_qprop=(spinor_field**)malloc(sizeof(spinor_field*)*nm);
-    pta_qprop[0]=alloc_spinor_field_f(4*NF*nm,&glattice);
-
-    for(k=0;k<nm;++k)
-	    pta_qprop[k]=pta_qprop[0]+4*NF*k;
-
-    g0[0]=rand()%GLB_T; g0[1]=rand()%GLB_X; g0[2]=rand()%GLB_Y; g0[3]=rand()%GLB_Z;
-    if((g0[0]+g0[1]+g0[2]+g0[3])%2!=0)
-	    g0[3]=(g0[3]+1)%GLB_Z;
-
-    bcast_int(g0,4);
-
-    lprintf("MAIN",0,"PTA meson source in (%d,%d,%d,%d)\n",g0[0],g0[1],g0[2],g0[3]);
-
-    pta_qprop_QMR_eo(g0, pta_qprop, nm, m, prec);
-
-    for (k=0;k<nm;++k){
-
-#define CORR(name) \
-	    name##_correlator(tricorr, g0[0], pta_qprop[k]);\
-	    lprintf("MAIN",0,"conf #0 mass=%2.6f TRIPLET " #name "= ",m[k]);\
-	    for(n=0;n<GLB_T;++n) {\
-		    lprintf("MAIN",0,"%e ",tricorr[n]);\
-	    }\
-	    lprintf("MAIN",0,"\n");\
-	    fflush(stdout)
-
-	    CORR(id);
-	    CORR(g5);
-	    CORR(g0);
-	    CORR(g0g5);
-	    CORR(g1);
-	    CORR(g2);
-	    CORR(g3);
-	    CORR(g0g1);
-	    CORR(g0g2);
-	    CORR(g0g3);
-	    CORR(g5g1);
-	    CORR(g5g2);
-	    CORR(g5g3);
-	    CORR(g0g5g1);
-	    CORR(g0g5g2);
-	    CORR(g0g5g3);
-	    CORR(g5_g0g5_re);
-	    CORR(g5_g0g5_im);
-
-    }
-#undef CORR
-
-  free_spinor_field(pta_qprop[0]);
-  free(pta_qprop);
-  free(tricorr);
-
-}
 
 typedef struct {
   char string[256];
@@ -179,14 +113,14 @@ int parse_cnfg_filename(char* filename, filename_t* fn) {
     return DYNAMICAL_CNFG;
   }
 
-  hm=sscanf(basename,"%dx%dx%dx%d%*[Nn]c%db%lfn%d",
+  hm=sscanf(basename,"%*[^_]_%dx%dx%dx%d%*[Nn]c%db%lfn%d",
       &(fn->t),&(fn->x),&(fn->y),&(fn->z),&(fn->nc),&(fn->b),&(fn->n));
   if(hm==7) {
     fn->type=QUENCHED_CNFG;
     return QUENCHED_CNFG;
   }
 
-  hm=sscanf(basename,"%*[^_]_%dx%dx%dx%d%*[Nn]c%db%lfn%d",
+  hm=sscanf(basename,"%dx%dx%dx%d%*[Nn]c%db%lfn%d",
       &(fn->t),&(fn->x),&(fn->y),&(fn->z),&(fn->nc),&(fn->b),&(fn->n));
   if(hm==7) {
     fn->type=QUENCHED_CNFG;
@@ -218,17 +152,17 @@ void read_cmdline(int argc, char* argv[]) {
   if (ao!=0) strcpy(output_filename,argv[ao]);
   if (ai!=0) strcpy(input_filename,argv[ai]);
 
-  error((ac==0 && al==0) || (ac!=0 && al!=0),1,"parse_cmdline [mk_mesons.c]",
-      "Syntax: mk_mesons { -c <config file> | -l <list file> } [-i <input file>] [-o <output file>] [-m]");
+  error((ac==0 && al==0) || (ac!=0 && al!=0),1,"parse_cmdline [mk_modenumber.c]",
+      "Syntax: mk_modenumber { -c <config file> | -l <list file> } [-i <input file>] [-o <output file>] [-m]");
 
   if(ac != 0) {
     strcpy(cnfg_filename,argv[ac]);
     strcpy(list_filename,"");
   } else if(al != 0) {
     strcpy(list_filename,argv[al]);
-    error((list=fopen(list_filename,"r"))==NULL,1,"parse_cmdline [mk_mesons.c]" ,
+    error((list=fopen(list_filename,"r"))==NULL,1,"parse_cmdline [mk_modenumber.c]" ,
 	"Failed to open list file\n");
-    error(fscanf(list,"%s",cnfg_filename)==0,1,"parse_cmdline [mk_mesons.c]" ,
+    error(fscanf(list,"%s",cnfg_filename)==0,1,"parse_cmdline [mk_modenumber.c]" ,
 	"Empty list file\n");
     fclose(list);
   }
@@ -236,14 +170,18 @@ void read_cmdline(int argc, char* argv[]) {
 
 }
 
+double hevamass=0.;
+void HEVA(spinor_field *out, spinor_field *in){
+  g5Dphi_sq(hevamass, out, in);
+}
 
 int main(int argc,char *argv[]) {
-  int i,k;
-  char tmp[256], *cptr;
+  char tmp[1024];
   FILE* list;
   filename_t fpars;
-  int nm;
-  double m[256];
+  char *cptr;
+  int neig;
+  double M[1024];
 
   /* setup process id and communications */
   read_cmdline(argc, argv);
@@ -251,6 +189,7 @@ int main(int argc,char *argv[]) {
 
   /* logger setup */
   /* disable logger for MPI processes != 0 */
+  logger_setlevel("INVERTER",0);
   logger_setlevel(0,30);
   if (PID!=0) { logger_disable(); }
   if (PID==0) { 
@@ -262,67 +201,38 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
   lprintf("MAIN",0,"input file [%s]\n",input_filename); 
   lprintf("MAIN",0,"output file [%s]\n",output_filename); 
-  if (list_filename!=NULL) lprintf("MAIN",0,"list file [%s]\n",list_filename); 
+  if (strcmp(list_filename,"")!=0) lprintf("MAIN",0,"list file [%s]\n",list_filename); 
   else lprintf("MAIN",0,"cnfg file [%s]\n",cnfg_filename); 
 
 
   /* read & broadcast parameters */
   parse_cnfg_filename(cnfg_filename,&fpars);
-
-/*
- * x Agostino: Serve veramente??
- * Claudio
-
-#define remove_parameter(NAME,PAR) \
-  { \
-    for(i=0;(PAR).read[i].name!=NULL;i++) { \
-      if(strcmp((PAR).read[i].name,#NAME)==0) { \
-	(PAR).read[i].descr=NULL; \
-	break; \
-      } \
-    } \
-  }
-
-  if(fpars.type==DYNAMICAL_CNFG || fpars.type==QUENCHED_CNFG) {
-    remove_parameter(GLB_T,glb_var);
-    remove_parameter(GLB_X,glb_var);
-    remove_parameter(GLB_Y,glb_var);
-    remove_parameter(GLB_Z,glb_var);
-  }
-  if(fpars.type==DYNAMICAL_CNFG) remove_parameter(quark quenched masses,mes_var);
-#undef remove_parameter
-*/
-
+  
   read_input(glb_var.read,input_filename);
-  read_input(mes_var.read,input_filename);
+  read_input(nu_var.read,input_filename);
   GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
-  error(fpars.type==UNKNOWN_CNFG,1,"mk_mesons.c","Bad name for a configuration file");
-  error(fpars.nc!=NG,1,"mk_mesons.c","Bad NG");
-
-
+  error(fpars.type==UNKNOWN_CNFG,1,"mk_modenumber.c","Bad name for a configuration file");
+  error(fpars.nc!=NG,1,"mk_modenumber.c","Bad NG");
+  
   lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed);
   rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
-  srand(glb_var.rlxd_seed+PID);
-
+  
   lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
   lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
 
-  nm=0;
-  if(fpars.type==DYNAMICAL_CNFG) {
-    nm=1;
-    m[0] = fpars.m;
-  } else if(fpars.type==QUENCHED_CNFG) {
-    strcpy(tmp,mes_var.mstring);
-    cptr = strtok(tmp, ";");
-    nm=0;
-    while(cptr != NULL) {
-      m[nm]=atof(cptr);
-      nm++;
-      cptr = strtok(NULL, ";");
-    }            
+  if(fpars.type==DYNAMICAL_CNFG) nu_var.mass = fpars.m;
+
+  strcpy(tmp,nu_var.list);
+  cptr = strtok(tmp, ";");
+  neig=0;
+  while(cptr != NULL) {
+    M[neig]=atof(cptr);
+    neig++;
+    cptr = strtok(NULL, ";");
   }
-
-
+  error(neig==0,1,"mk_modenumber.c","neig == 0 !!!");
+  
+  
   /* setup communication geometry */
   if (geometry_init() == 1) {
     finalize_process();
@@ -341,69 +251,62 @@ int main(int argc,char *argv[]) {
   u_gauge_f=alloc_gfield_f(&glattice);
 #endif
 
-  lprintf("MAIN",0,"Inverter precision = %e\n",mes_var.precision);
-  for(k=0;k<nm;k++)
-    lprintf("MAIN",0,"Mass[%d] = %f\n",k,m[k]);
+  init_modenumber(nu_var.mass, nu_var.inverr2, nu_var.nhits, nu_var.approx);
+  for(int k = 0; k < neig; k++)
+    lprintf("MODENUMBER",0,"M[%d] = %e\n",k,M[k]);
 
-/*
-  tricorr=(double*)malloc(GLB_T*sizeof(double));
-  pta_qprop=(spinor_field**)malloc(sizeof(spinor_field*)*nm);
-  pta_qprop[0]=alloc_spinor_field_f(4*NF*nm,&glattice);
-  for(k=0;k<nm;++k)
-    pta_qprop[k]=pta_qprop[0]+4*NF*k;
-*/
-
-  list=NULL;
-  if(strcmp(list_filename,"")!=0) {
-    error((list=fopen(list_filename,"r"))==NULL,1,"main [mk_mesons.c]" ,
-	"Failed to open list file\n");
+  if (PID==0) { 
+    sprintf(tmp,">>%s",output_filename); logger_stdout(tmp);
   }
 
 
-  i=0;
+  list=NULL;
+  if(strcmp(list_filename,"")!=0) {
+    error((list=fopen(list_filename,"r"))==NULL,1,"main [mk_modenumber.c]" ,
+	"Failed to open list file\n");
+  }
+
+  int i=0;
   while(1) {
-	  int nn;
 
-	  if(list!=NULL)
-		  if(fscanf(list,"%s",cnfg_filename)==0 || feof(list)) break;
+    if(list!=NULL)
+      if(fscanf(list,"%s",cnfg_filename)==0 || feof(list)) break;
 
-	  i++;
+    i++;
 
-	  lprintf("MAIN",0,"Configuration from %s\n", cnfg_filename);
-	  /* NESSUN CHECK SULLA CONSISTENZA CON I PARAMETRI DEFINITI !!! */
-	  read_gauge_field(cnfg_filename);
-	  represent_gauge_field();
+    lprintf("MAIN",0,"Configuration from %s\n", cnfg_filename);
+    /* NESSUN CHECK SULLA CONSISTENZA CON I PARAMETRI DEFINITI !!! */
+    read_gauge_field(cnfg_filename);
+    represent_gauge_field();
 
-	  lprintf("TEST",0,"<p> %1.6f\n",avr_plaquette());
+    lprintf("TEST",0,"<p> %1.6f\n",avr_plaquette());
 
-	  full_plaquette();
+    /* full_plaquette(); */
 
-	  for (nn=0;nn<mes_var.nhits;++nn) {
-		  lprintf("MAIN",0,"Configuration #%d hit %d\n",i,nn);
-		  inline_mk_mesons(m,nm,mes_var.precision);
-	  }
+    for(int k = 0; k < neig; k++) {
+      double number = ModeNumber(M[k]*M[k]);
+      int mvm = getMVM();
+      lprintf("MODENUMBER",0,"nu[ %e ] = %.2f\n",M[k],number);
+      lprintf("MODENUMBER",0,"MVM = %d\n",mvm);
+      if (PID==0) { 
+        sprintf(tmp,">>%s",output_filename); logger_stdout(tmp);
+      }
+    }
 
-	  if(list==NULL) break;
+    if(list==NULL) break;
   }
 
   if(list!=NULL) fclose(list);
 
-  finalize_process();
-
-  /*
-     free_spinor_field(pta_qprop[0]);
-     free(pta_qprop);
-     free(tricorr);
-   */
-
   free_BCs();
+  
+  free_modenumber();
 
   free_gfield(u_gauge);
 #ifdef ALLOCATE_REPR_GAUGE_FIELD
   free_gfield_f(u_gauge_f);
 #endif
 
-  /* close communications */
   finalize_process();
 
   return 0;

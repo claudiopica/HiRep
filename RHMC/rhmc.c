@@ -31,10 +31,6 @@
 
 #include "cinfo.c"
 
-#if defined(ROTATED_SF) && defined(UPDATE_EO)
-#error ROTATED_SF DOES NOT WORK WITH E/O PRECONDITIONING
-#endif
-
 
 /* Mesons parameters */
 typedef struct _input_mesons {
@@ -158,7 +154,7 @@ int main(int argc,char *argv[])
 
   if (PID==0) {
     sprintf(sbuf,">>out_%d",PID);  logger_stdout(sbuf); 
-    /* sprintf(sbuf,"err_%d",PID); freopen(sbuf,"w",stderr);  */
+    sprintf(sbuf,"err_%d",PID); freopen(sbuf,"w",stderr);
   }
 
   lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS); 
@@ -181,6 +177,8 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed+PID);
   rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
   }
+  lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
+  lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
   
   /* setup communication geometry */
   if (geometry_init() == 1) {
@@ -188,35 +186,9 @@ int main(int argc,char *argv[])
     return 0;
   }
 
-  lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
-  lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
-  lprintf("MAIN",0,"global size is %dx%dx%dx%d\n",GLB_T,GLB_X,GLB_Y,GLB_Z);
-  lprintf("MAIN",0,"proc grid is %dx%dx%dx%d\n",NP_T,NP_X,NP_Y,NP_Z);
-  lprintf("MAIN",0,"Fermion boundary conditions: %.2f,%.2f,%.2f,%.2f\n",bc[0],bc[1],bc[2],bc[3]);
-
   /* setup lattice geometry */
   geometry_mpi_eo();
   /* test_geometry_mpi_eo(); */
-  lprintf("MAIN",0,"Geometry buffers: %d\n",glattice.nbuffers);
-
-#ifdef TWISTED_BC
-  init_twbc();
-#endif
-
-
-  if(strcmp(mes_var.make,"true")==0) {
-    lprintf("MAIN",0,"Inverter precision for mesons = %e\n",mes_var.precision);
-    lprintf("MAIN",0,"Number of noisy sources for mesons per cnfg = %d\n",mes_var.nhits);
-  }
-
-  if(strcmp(eigval_var.make,"true")==0) {
-    lprintf("MAIN",0,"EVA Search space dimension  (eva:nevt) = %d\n",eigval_var.nevt);
-    lprintf("MAIN",0,"EVA Number of accurate eigenvalues (eva:nev) = %d\n",eigval_var.nev);
-    lprintf("MAIN",0,"EVA Max degree of polynomial (eva:kmax) = %d\n",eigval_var.kmax);
-    lprintf("MAIN",0,"EVA Max number of subiterations (eva:maxiter) = %d\n",eigval_var.maxiter);
-    lprintf("MAIN",0,"EVA Absolute precision  (eva:omega1) = %e\n",eigval_var.omega1);
-    lprintf("MAIN",0,"EVA Relative precision (eva:omega2) = %e\n",eigval_var.omega2);
-  }
 
   /* Init Monte Carlo */
   init_mc(&flow, "input_file");
@@ -224,12 +196,19 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"Initial plaquette: %1.8e\n",avr_plaquette());
 
 
-#ifdef BASIC_SF
-#ifndef NDEBUG
-  lprintf("MAIN",0,"Initial SF_test_gauge_bcs: %1.8e\n",SF_test_gauge_bcs());
-#endif /*NDEBUG*/
-  lprintf("MAIN",0,"Initial SF_action: %1.8e\n",SF_action((&flow)->rhmc_v->rhmc_p.beta));
-#endif /* BASIC_SF */
+  if(strcmp(mes_var.make,"true")==0) {
+    lprintf("OBSERVABLES",0,"Inverter precision for mesons = %e\n",mes_var.precision);
+    lprintf("OBSERVABLES",0,"Number of noisy sources for mesons per cnfg = %d\n",mes_var.nhits);
+  }
+
+  if(strcmp(eigval_var.make,"true")==0) {
+    lprintf("OBSERVABLES",0,"EVA Search space dimension  (eva:nevt) = %d\n",eigval_var.nevt);
+    lprintf("OBSERVABLES",0,"EVA Number of accurate eigenvalues (eva:nev) = %d\n",eigval_var.nev);
+    lprintf("OBSERVABLES",0,"EVA Max degree of polynomial (eva:kmax) = %d\n",eigval_var.kmax);
+    lprintf("OBSERVABLES",0,"EVA Max number of subiterations (eva:maxiter) = %d\n",eigval_var.maxiter);
+    lprintf("OBSERVABLES",0,"EVA Absolute precision  (eva:omega1) = %e\n",eigval_var.omega1);
+    lprintf("OBSERVABLES",0,"EVA Relative precision (eva:omega2) = %e\n",eigval_var.omega2);
+  }
 
   h2evamass=mass=flow.rhmc_v->rhmc_p.mass;
 
@@ -272,17 +251,9 @@ int main(int argc,char *argv[])
       save_conf(&flow, i);
     }
 
-#ifdef BASIC_SF
-    lprintf("MAIN",0,"SF action: %1.8e\n",SF_action((&flow)->rhmc_v->rhmc_p.beta));
-#endif /* BASIC_SF */
-
     if((i%flow.meas_freq)==0) {
       /* plaquette */
       lprintf("MAIN",0,"Plaquette: %1.8e\n",avr_plaquette());
-#ifdef BASIC_SF
-      lprintf("MAIN",0,"SF_test_gauge_bcs: %1.8e\n",SF_test_gauge_bcs());
-      lprintf("MAIN",0,"PCAC mass: %1.8e\n",SF_PCAC_wall_mass((&flow)->rhmc_v->rhmc_p.mass));
-#endif /* BASIC_SF */
 
       /* Mesons */
       if(strcmp(mes_var.make,"true")==0) {
@@ -326,8 +297,6 @@ int main(int argc,char *argv[])
   
   /* finalize Monte Carlo */
   end_mc();
-
-
 
   /* close communications */
   finalize_process();

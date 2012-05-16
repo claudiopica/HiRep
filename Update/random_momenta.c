@@ -28,8 +28,5 @@ void gaussian_momenta(suNg_av_field *momenta) {
     }
   }
   
-#if defined(BASIC_SF) || defined(ROTATED_SF)
-  SF_force_bcs(momenta);
-#endif /* BASIC_SF || ROTATED_SF */
-
+  apply_BCs_on_momentum_field(momenta);
 }

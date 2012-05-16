@@ -73,6 +73,8 @@ typedef struct _rhmc_par {
   int nf;
   double mass;
   
+  double theta[4];
+  
   double SF_zf;
   double SF_ds;
   int SF_sign;
@@ -98,6 +100,8 @@ typedef struct _hmc_par {
   int nf;
   double mass;
   
+  double theta[4];
+
   double SF_zf;
   double SF_ds;
   int SF_sign;

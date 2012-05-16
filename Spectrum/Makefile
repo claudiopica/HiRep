@@ -1,7 +1,7 @@
 TOPDIR = ..
 MKDIR=$(TOPDIR)/Make
 
-#EXES = mk_mesons random_cnfg random_spinor eigval mk_mesons_with_z2semwall
+EXES = mk_mesons random_cnfg random_spinor mk_mesons_with_z2semwall
 
 default: $(EXES)
 
@@ -15,7 +15,7 @@ MODS := archive logger read_input archive_spinors endian
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Utils
-MODS := boundary_conditions time max_eig #suN_utils suN_exp single_double_utils
+MODS := boundary_conditions time max_eig single_double_utils
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Memory
@@ -23,7 +23,7 @@ MODS := amalloc field_alloc spinor_field_alloc
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Observables
-MODS := avr_plaquette mesons g5QMR_trunc pta_qprop z2semwall trunc_hairpin
+MODS := avr_plaquette
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Random
@@ -32,7 +32,6 @@ MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Update
 MODS := Dphi representation random_spinor_field random_su2
-#staples update_hb  random_momenta update_rhmc leapfrog local_action force0 copy_gfield find_spec_limits rational_functions force_rhmc O2MN_multistep cabmar
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Error
@@ -53,12 +52,9 @@ MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 COMMON_OBJS = $(MOD_OBJS)
 
+mk_mesons_with_z2semwall_OBJS = $(TOPDIR)/Observables/mesons.o $(TOPDIR)/Observables/pta_qprop.o $(TOPDIR)/Observables/z2semwall.o
 
-mk_mesons_with_z2semwall: cinfo.c $(OBJS) $(MOD_OBJS) mk_mesons_with_z2semwall.o
-	echo -n Linking [$@]... 
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(OBJS) $(MOD_OBJS) mk_mesons_with_z2semwall.o &&\
-	echo " done." || echo " failed."
-
+mk_mesons_OBJS = $(TOPDIR)/Observables/mesons.o $(TOPDIR)/Observables/pta_qprop.o
 
 include $(MKDIR)/MkRules
 

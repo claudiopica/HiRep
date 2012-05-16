@@ -335,7 +335,7 @@ void _group_represent2_flt(suNf_flt* v, suNg_flt *u) {
 #include "communications.h"
 
 void represent_gauge_field() {
-#if !defined(REPR_FUNDAMENTAL) || defined(ROTATED_SF)
+#ifdef ALLOCATE_REPR_GAUGE_FIELD
   int ix, ip;
   int mu;
   suNf *Ru;
@@ -364,7 +364,7 @@ void represent_gauge_field() {
         /*_group_represent(*Ru,*u);*/
       }
 
-  apply_bc();
+  apply_BCs_on_represented_gauge_field();
 #else
   static int first_time=1;
   /* wait gauge field transfer */
@@ -373,57 +373,10 @@ void represent_gauge_field() {
   if(first_time) {
     first_time=0;
     u_gauge_f=(suNf_field *)((void*)u_gauge);
-    apply_bc();
+    apply_BCs_on_represented_gauge_field();
   }
 #endif
 
   assign_ud2u_f();
 }
-
-void represent_gauge_field_flt() {
-#ifndef REPR_FUNDAMENTAL
-  int ix, ip;
-  int mu;
-  suNf_flt *Ru;
-  suNg_flt *u;
-
-  /* loop on local lattice first */
-  for(ip=0;ip<glattice.local_master_pieces;ip++)
-    for(ix=glattice.master_start[ip];ix<=glattice.master_end[ip];ix++)
-      for (mu=0;mu<4;mu++) {
-        u=pu_gauge_flt(ix,mu);
-        Ru=pu_gauge_f_flt(ix,mu);
-        _group_represent2_flt(Ru,u); 
-        /*_group_represent(*Ru,*u);*/
-      }
-
-  /* TO BE IMPLEMENTED */
-  /* wait gauge field transfer */
-  /* complete_gf_sendrecv_flt(u_gauge_flt); */
-
-  /* loop on the rest of master sites */
-  for(ip=glattice.local_master_pieces;ip<glattice.total_master_pieces;ip++)
-    for(ix=glattice.master_start[ip];ix<=glattice.master_end[ip];ix++)
-      for (mu=0;mu<4;mu++) {
-        u=pu_gauge_flt(ix,mu);
-        Ru=pu_gauge_f_flt(ix,mu);
-        _group_represent2_flt(Ru,u); 
-        /*_group_represent(*Ru,*u);*/
-      }
-
-  apply_bc_flt();
-#else
-  /* wait gauge field transfer */
-  /* complete_gf_sendrecv_flt(u_gauge_flt); */
-
-  static int first_time=1;
-  if(first_time) {
-    first_time=0;
-    u_gauge_f_flt=(suNf_field_flt *)((void*)u_gauge_flt);
-    apply_bc_flt();
-  }
-#endif
-}
-
-
 

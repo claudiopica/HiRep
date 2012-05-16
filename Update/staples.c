@@ -23,21 +23,26 @@ static suNg *u1dn,*u2dn,*u3dn;
 
 static suNg staple, tr1, tr2;
 
+static int ixpmu,ixpnu,ixmnu,ixpmumnu;
+#ifdef PLAQ_WEIGHTS
+static int IX,MU,NU;
+#endif
+
 static void add_to_v(suNg *v){
   _suNg_add_assign(*v,staple);
 }
 
-#ifdef TWISTED_BC
-static void sub_to_v(suNg *v){
-  _suNg_sub_assign(*v,staple);
-}
-#endif
 
 static void up_staple(void)
 {
   _suNg_times_suNg(tr2,*u1up,*u2up);
   _suNg_dagger(tr1,*u3up);
   _suNg_times_suNg(staple,tr2,tr1);
+#ifdef PLAQ_WEIGHTS
+  if(plaq_weight!=NULL) {
+    _suNg_mul(staple,plaq_weight[IX*16+NU*4+MU],staple);
+  }
+#endif
 }
 
 
@@ -46,70 +51,32 @@ static void dn_staple(void)
   _suNg_times_suNg(tr2,*u2dn,*u3dn);
   _suNg_dagger(tr1,*u1dn);
   _suNg_times_suNg(staple,tr1,tr2);
+#ifdef PLAQ_WEIGHTS
+  if(plaq_weight!=NULL) {
+    _suNg_mul(staple,plaq_weight[ixmnu*16+MU*4+NU],staple);
+  }
+#endif
 }
    
 
 void staples(int ix,int mu,suNg *v)
 {
-   int i,nu,ixpmu,ixpnu,ixmnu,ixpmumnu;
+   int i,nu;
 
    _suNg_zero(*v);
 
    ixpmu=iup(ix,mu);
    
 
-#ifdef TWISTED_BC
-   if(twbc_staples[ix*4+mu]!=NULL)
-     for (i=1;i<4;i++)
-       {
-	 nu=(mu+i)&0x3;
-	 ixpnu=iup(ix,nu);
-	 ixmnu=idn(ix,nu);
-	 ixpmumnu=idn(ixpmu,nu);
-	 
-	 u1up=pu_gauge(ix,nu);
-	 u2up=pu_gauge(ixpnu,mu);
-	 u3up=pu_gauge(ixpmu,nu);   
-	 
-	 u1dn=pu_gauge(ixmnu,nu);
-	 u2dn=pu_gauge(ixmnu,mu);
-	 u3dn=pu_gauge(ixpmumnu,nu);   
-	 
-	 up_staple();
-	 if(twbc_staples[ix*4+mu][i-1]==1) {add_to_v(v);} else {
-	   sub_to_v(v);}
-	 dn_staple();
-	 if(twbc_staples[ix*4+mu][i+2]==1) {add_to_v(v);} else {
-	   sub_to_v(v);}
-       }
-   else
-     for (i=1;i<4;i++)
-       {
-	 nu=(mu+i)&0x3;
-	 ixpnu=iup(ix,nu);
-	 ixmnu=idn(ix,nu);
-	 ixpmumnu=idn(ixpmu,nu);
-	 
-	 u1up=pu_gauge(ix,nu);
-	 u2up=pu_gauge(ixpnu,mu);
-	 u3up=pu_gauge(ixpmu,nu);   
-	 
-	 u1dn=pu_gauge(ixmnu,nu);
-	 u2dn=pu_gauge(ixmnu,mu);
-	 u3dn=pu_gauge(ixpmumnu,nu);   
-	 
-	 up_staple();
-	 add_to_v(v);
-	 dn_staple();
-	 add_to_v(v);
-       }
-#else
    for (i=1;i<4;i++)
      {
        nu=(mu+i)&0x3;
        ixpnu=iup(ix,nu);
        ixmnu=idn(ix,nu);
        ixpmumnu=idn(ixpmu,nu);
+#ifdef PLAQ_WEIGHTS
+       IX=ix;MU=mu;NU=nu;
+#endif
        
        u1up=pu_gauge(ix,nu);
        u2up=pu_gauge(ixpnu,mu);
@@ -124,8 +91,6 @@ void staples(int ix,int mu,suNg *v)
        dn_staple();
        add_to_v(v);
      }
-   
-#endif  
 }
 
 #include "observables.h"

@@ -15,7 +15,7 @@ typedef struct _input_rhmc {
   rhmc_par rhmc_p;
 
   /* for the reading function */
-  input_record_t read[16];
+  input_record_t read[20];
   
 } input_rhmc;
 
@@ -25,6 +25,10 @@ typedef struct _input_rhmc {
     {"beta", "beta = %lf", DOUBLE_T, &(varname).rhmc_p.beta},\
     {"nf", "nf = %d", INT_T, &(varname).rhmc_p.nf},\
     {"mass", "mass = %lf", DOUBLE_T, &(varname).rhmc_p.mass},\
+    {"theta_T", "theta_T = %lf", DOUBLE_T, &(varname).rhmc_p.theta[0]},\
+    {"theta_X", "theta_X = %lf", DOUBLE_T, &(varname).rhmc_p.theta[1]},\
+    {"theta_Y", "theta_Y = %lf", DOUBLE_T, &(varname).rhmc_p.theta[2]},\
+    {"theta_Z", "theta_Z = %lf", DOUBLE_T, &(varname).rhmc_p.theta[3]},\
     {"SF_zf", "SF_zf = %lf", DOUBLE_T, &(varname).rhmc_p.SF_zf},\
     {"SF_ds", "SF_ds = %lf", DOUBLE_T, &(varname).rhmc_p.SF_ds},\
     {"SF_sign", "SF_sign = %d", INT_T, &(varname).rhmc_p.SF_sign},\

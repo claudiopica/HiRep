@@ -186,6 +186,10 @@ int geometry_init() {
   VOL3=X*Y*Z;
   VOLUME=VOL3*T;
 
+  lprintf("GEOMETRY",0,"Global size is %dx%dx%dx%d\n",GLB_T,GLB_X,GLB_Y,GLB_Z);
+  lprintf("GEOMETRY",0,"Proc grid is %dx%dx%dx%d\n",NP_T,NP_X,NP_Y,NP_Z);
+  lprintf("GEOMETRY",0,"Local size is %dx%dx%dx%d\n",T,X,Y,Z);
+  
   return 0;
 }
 

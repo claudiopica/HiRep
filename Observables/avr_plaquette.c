@@ -37,9 +37,10 @@ double plaq(int ix,int mu,int nu)
 
   _suNg_trace_re(p,w3);
 
-#ifdef TWISTED_BC
-  return twbc_plaq[ix*16+mu*4+nu]*p;
-#else  
+#ifdef PLAQ_WEIGHTS
+  if(plaq_weight==NULL) return p;
+  return plaq_weight[ix*16+mu*4+nu]*p;
+#else
   return p;
 #endif
 }
@@ -62,12 +63,14 @@ void cplaq(complex *ret,int ix,int mu,int nu)
   _suNg_times_suNg(w2,(*v4),(*v3));
   _suNg_times_suNg_dagger(w3,w1,w2);      
       
-   _suNg_trace_re(ret->re,w3);
-   _suNg_trace_im(ret->im,w3);
+  _suNg_trace_re(ret->re,w3);
+  _suNg_trace_im(ret->im,w3);
 
-#ifdef TWISTED_BC
-  ret->re *= twbc_plaq[ix*16+mu*4+nu];
-  ret->im *= twbc_plaq[ix*16+mu*4+nu];
+#ifdef PLAQ_WEIGHTS
+  if(plaq_weight!=NULL) {
+    ret->re *= plaq_weight[ix*16+mu*4+nu];
+    ret->im *= plaq_weight[ix*16+mu*4+nu];
+  }
 #endif
 
 }

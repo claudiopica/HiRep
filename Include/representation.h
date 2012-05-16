@@ -19,7 +19,6 @@
 void _group_represent2(suNf* v, suNg *u);
 void _group_represent2_flt(suNf_flt* v, suNg_flt *u);
 void represent_gauge_field();
-void represent_gauge_field_flt();
 
 
 #endif

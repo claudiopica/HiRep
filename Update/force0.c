@@ -27,28 +27,28 @@ void force0(double dt, suNg_av_field *force, void *vpar){
   double nsq;
   int mu,x;
   _DECLARE_INT_ITERATOR(i);
-
+  
   /* check input types */
-#ifndef CHECK_SPINOR_MATCHING
+  #ifndef CHECK_SPINOR_MATCHING
   _TWO_SPINORS_MATCHING(u_gauge,force);
-#endif
-
+  #endif
+  
   double beta = *((double*)vpar);
-
+  
   _MASTER_FOR(&glattice,i) {
     for (mu=0; mu<4; ++mu) {
       staples(i,mu,&s1);
       _suNg_times_suNg_dagger(s2,*_4FIELD_AT(u_gauge,i,mu),s1);
-    
+      
       /* the projection itself takes the TA: proj(M) = proj(TA(M)) */
       _fund_algebra_project(f,s2);
-    
+      
       _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,i,mu), dt*(-beta/((double)(NG))), f);
-
+      
       _algebra_vector_sqnorm_g(nsq,f);
       forcestat[0]+=sqrt(nsq);
       for(x=0;x<NG*NG-1;++x){
-	if(forcestat[1]<fabs(*(((double*)&f)+x))) forcestat[1]=fabs(*(((double*)&f)+x));
+        if(forcestat[1]<fabs(*(((double*)&f)+x))) forcestat[1]=fabs(*(((double*)&f)+x));
       }
     }
   }
@@ -58,15 +58,7 @@ void force0(double dt, suNg_av_field *force, void *vpar){
   forcestat[1]*=dt*beta/((double)NG);
   lprintf("FORCE0",50,"avr |force| = %1.8e maxforce = %1.8e\n",forcestat[0],forcestat[1]);
   
-#if defined(BASIC_SF) || defined(ROTATED_SF)
-	SF_force_bcs(force);
-#endif /* BASIC_SF || ROTATED_SF */
-  }
-
-/*
-void Force(double dt, suNg_av_field *force, spinor_field *pf){
-  Force0(dt, force);
-  Force_rhmc_f(dt, force, pf);
+  
+  apply_BCs_on_momentum_field(force);
 }
-*/
 
