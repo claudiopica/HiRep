@@ -17,9 +17,9 @@
 #include <stddef.h>
 
 #ifdef MAIN_PROGRAM
-#  define GLB_VAR(type,name,init) type name init
+#  define GLB_VAR(type,name,init...) type name init
 #else
-#  define GLB_VAR(type,name,init) extern type name
+#  define GLB_VAR(type,name,init...) extern type name
 #endif
 
 /* local lattice attributes */
@@ -91,7 +91,6 @@ GLB_VAR(geometry_descriptor,glattice,={0}); /* global lattice */
 GLB_VAR(geometry_descriptor,glat_even,={0}); /* global even lattice */
 GLB_VAR(geometry_descriptor,glat_odd,={0}); /* global odd lattice */
 
-
 /* Gauge field */
 #include "field_ordering.h"
 #include "suN_types.h"
@@ -133,15 +132,11 @@ GLB_VAR(suNf_field_flt,*u_gauge_f_flt,=NULL);
 #define BC_Z 0.
 #endif
 
+GLB_VAR(double,bc[4],={BC_T,BC_X,BC_Y,BC_Z});
+
 #ifdef TWISTED_BC
 GLB_VAR(int,**twbc_staples, =NULL);
 GLB_VAR(int,*twbc_plaq, =NULL);
-#endif
-
-#ifdef MAIN_PROGRAM
-double bc[4]={BC_T,BC_X,BC_Y,BC_Z};
-#else
-extern double bc[4];
 #endif
 
 #undef BC_T
@@ -153,9 +148,18 @@ extern double bc[4];
 #include "input_par.h"
 GLB_VAR(input_glb,glb_var,=init_input_glb(glb_var));
 
+/* Theta Boundary conditions */
+#if defined(BC_T_THETA) || defined(BC_X_THETA) || defined(BC_Y_THETA) || defined(BC_Z_THETA)
+GLB_VAR(complex,eitheta[4],={{1.,0.}});
+#endif
+
+#ifdef WITH_GPU
+#define BLOCK_SIZE 512
+GLB_VAR(int,*iup_gpu,=NULL);
+GLB_VAR(int,*idn_gpu,=NULL);
+#endif //WITH_GPU
+
 #undef GLB_VAR
-
-
 #endif
 
 

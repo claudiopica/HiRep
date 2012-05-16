@@ -18,6 +18,45 @@
 extern rhmc_par _update_par; /* Update/update_rhmc.c */
 #endif /* ROTATED_SF */
 
+/***************************************************************************/
+/* THETA BC */
+/***************************************************************************/
+
+void set_bc_theta_t(double theta)
+{
+#ifdef BC_T_THETA
+    eitheta[0].re=cos(theta/(double)GLB_T);
+    eitheta[0].im=sin(theta/(double)GLB_T);
+#endif //BC_T_THETA
+}
+
+void set_bc_theta_x(double theta)
+{
+#ifdef BC_X_THETA
+    eitheta[1].re=cos(theta/(double)GLB_X);
+    eitheta[1].im=sin(theta/(double)GLB_X);
+#endif //BC_X_THETA
+}
+
+void set_bc_theta_y(double theta)
+{
+#ifdef BC_Y_THETA
+    eitheta[2].re=cos(theta/(double)GLB_Y);
+    eitheta[2].im=sin(theta/(double)GLB_Y);
+#endif //BC_Y_THETA
+}
+
+void set_bc_theta_z(double theta)
+{
+#ifdef BC_Z_THETA
+    eitheta[3].re=cos(theta/(double)GLB_Z);
+    eitheta[3].im=sin(theta/(double)GLB_Z);
+#endif //BC_Z_THETA
+}
+
+/***************************************************************************/
+
+
 
 void apply_bc(){
 #if defined(ANTIPERIODIC_BC_T) && !defined(ROTATED_SF) && !defined(BASIC_SF)
@@ -382,9 +421,6 @@ double SF_test_force_bcs(suNg_av_field *force) {
 }
 
 
-#endif /* BASIC_SF || ROTATED_SF */
-
-
 
 #define PI 3.141592653589793238462643383279502884197
 #define ST 1.414213562373095048801688724209698078570
@@ -419,8 +455,6 @@ double SF_phi1_up[NG] = {.5, .5, -.5, -.5};
 #error SF boundary conditions not defined at this NG
 
 #endif
-
-
 
 
 void SF_gauge_bcs(suNg_field *gf, int strength)
@@ -532,3 +566,4 @@ double SF_test_gauge_bcs()
   return pa/(double)(GLB_X*GLB_Y*GLB_Z*NG*(6+6+3));
 }
 
+#endif //defined(BASIC_SF) || defined(ROTATED_SF)

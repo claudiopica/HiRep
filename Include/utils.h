@@ -24,6 +24,11 @@ void ExpX(double dt, suNg_algebra_vector *h, suNg *u);
 void apply_bc();
 void apply_bc_flt();
 
+void set_bc_theta_t(double theta);
+void set_bc_theta_x(double theta);
+void set_bc_theta_y(double theta);
+void set_bc_theta_z(double theta);
+
 #ifdef BASIC_SF
 double SF_test_spinor_bcs(spinor_field *sp);
 #endif /* BASIC_SF */
