@@ -210,7 +210,7 @@ int update_hmc(){
     
     /* integrate molecular dynamics */
     lprintf("HMC",30,"MD integration...\n");
-    (*(integrator[0].integrator))(momenta,&integrator[0]);
+    integrator[0].integrator(momenta,&integrator[0]);
     
     /* project gauge field */
     project_gauge_field();
