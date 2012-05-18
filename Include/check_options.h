@@ -63,6 +63,21 @@
 # undef BC_T_THETA
 # define BC_T_ALREADY
 
+# undef BC_X_PERIODIC
+# undef BC_X_ANTIPERIODIC
+# undef BC_X_THETA
+# define BC_X_THETA
+
+# undef BC_Y_PERIODIC
+# undef BC_Y_ANTIPERIODIC
+# undef BC_Y_THETA
+# define BC_Y_THETA
+
+# undef BC_Z_PERIODIC
+# undef BC_Z_ANTIPERIODIC
+# undef BC_Z_THETA
+# define BC_Z_THETA
+
 # define PLAQ_WEIGHTS
 
 # ifdef BASIC_SF
