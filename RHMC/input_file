@@ -10,6 +10,11 @@ NP_Z = 1
 
 level = 1  seed = 12345
 
+//Logger levels (default = -1)
+log:default = -1
+log:inverter = -1
+log:forcestat = 0
+
 //Fermion twisting
 theta_T = 0.
 theta_X = 0.
