@@ -147,8 +147,11 @@ int main(int argc,char *argv[])
 
   read_cmdline(argc,argv);
 
+  read_input(logger_var.read,"input_file");
+
   /* logger setup */
-  logger_setlevel(0,10);
+  logger_set_input(&logger_var);
+
   /* disable logger for MPI processes != 0 */
   if (PID!=0) { logger_disable(); }
 

@@ -56,5 +56,32 @@ typedef struct _input_glb {
   .rlxd_state=""\
 }
 
+/* Logger global variables */
+typedef struct _input_logger {
+/* Logger level defined globally */
+/* They are defined at imput level */
+/* If you need to separate the log level for a channel insert it here */
+
+  int def_log_lvl;
+  int inverter_log_lvl;
+  int forcestat_log_lvl;
+  /* for the reading function */
+  input_record_t read[4];
+  
+} input_logger;
+
+#define init_input_logger(varname) \
+{ \
+  .read={\
+    {"Default logger level", "log:default = %d", INT_T, &(varname).def_log_lvl},\
+    {"Inverter logger level", "log:inverter = %d", INT_T, &(varname).inverter_log_lvl},\
+    {"Forcestat logger level", "log:forcestat = %d", INT_T, &(varname).forcestat_log_lvl},\
+    {NULL, NULL, 0, NULL}\
+  }, \
+  .def_log_lvl=-1,\
+  .inverter_log_lvl=-1,\
+  .forcestat_log_lvl=-1\
+}
+
 
 #endif /* INPUT_PAR_H */

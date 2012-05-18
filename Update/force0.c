@@ -53,11 +53,16 @@ void force0(double dt, suNg_av_field *force, void *vpar){
     }
   }
 	
-  global_sum(forcestat,2);
-  forcestat[0]*=dt*beta/((double)(NG*4*GLB_T*GLB_X*GLB_Y*GLB_Z));
-  forcestat[1]*=dt*beta/((double)NG);
-  lprintf("FORCE0",50,"avr |force| = %1.8e maxforce = %1.8e\n",forcestat[0],forcestat[1]);
-  
+
+
+  if(logger_getlevel("FORCE-STAT")>=10){
+    global_sum(forcestat,1);
+    global_max(forcestat+1,1);
+    
+    forcestat[0]*=dt*beta/((double)(NG*4*GLB_T*GLB_X*GLB_Y*GLB_Z));
+    forcestat[1]*=dt*beta/((double)(NG));
+    lprintf("FORCE-STAT",10," force0 : dt= %1.8e avr |force|= %1.8e maxforce= %1.8e \n",dt,forcestat[0],forcestat[1]);
+  }  
   
   apply_BCs_on_momentum_field(force);
 }

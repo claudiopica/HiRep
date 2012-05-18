@@ -212,17 +212,11 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
     Dphi_(&Yo,&Ye);
     
     #endif
-    
-    
-    lprintf("FORCE",50,"|Xs| = %1.8e |Ys| = %1.8e\n",
-	    sqrt(spinor_field_sqnorm_f(Xs)),
-	    sqrt(spinor_field_sqnorm_f(Ys))
-	    );
-    
-    /* reset force stat counters */
+        
     start_sf_sendrecv(Xs);
     start_sf_sendrecv(Ys);
     
+    /* reset force stat counters */
     forcestat[1]=forcestat[0]=0.;
     
     _PIECE_FOR(&glattice,x) { 
@@ -300,10 +294,18 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
       }
     }
     
-    global_sum(forcestat,2);
-    forcestat[0]*=dt*(_REPR_NORM2/_FUND_NORM2)/((double)(4*GLB_T*GLB_X*GLB_Y*GLB_Z));
-    forcestat[1]*=dt*(_REPR_NORM2/_FUND_NORM2);
-    lprintf("FORCE",50," avr |force| = %1.8e maxforce = %1.8e \n",forcestat[0],forcestat[1]);
+    if(logger_getlevel("FORCE-STAT")>=10){
+      global_sum(forcestat,1);
+      global_max(forcestat+1,1);
+      
+      forcestat[0]*=dt*(_REPR_NORM2/_FUND_NORM2)/((double)(4*GLB_T*GLB_X*GLB_Y*GLB_Z));
+      forcestat[1]*=dt*(_REPR_NORM2/_FUND_NORM2);
+      if(par->hasenbusch == 2) {
+	forcestat[0]*=par->b;
+	forcestat[1]*=par->b;
+      } 
+      lprintf("FORCE-STAT",10," force_hmc : dt= %1.8e avr |force|= %1.8e maxforce= %1.8e h= %d mass= %f \n",dt,forcestat[0],forcestat[1],par->hasenbusch,par->mass);
+    }
   }
 
   apply_BCs_on_momentum_field(force);

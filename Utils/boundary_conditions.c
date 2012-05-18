@@ -245,7 +245,7 @@ static void sf_open_BCs(spinor_field *sp);
 static void sf_open_BCs_flt(spinor_field_flt *sp);
 
 void apply_BCs_on_spinor_field(spinor_field *sp) {
-#ifdef BASIC_SF || defined(BC_T_OPEN)
+#if defined(BASIC_SF) || defined(BC_T_OPEN)
   sf_Dirichlet_BCs(sp);
 #endif
 #if defined(ROTATED_SF)
@@ -254,7 +254,7 @@ void apply_BCs_on_spinor_field(spinor_field *sp) {
 }
 
 void apply_BCs_on_spinor_field_flt(spinor_field_flt *sp) {
-#ifdef BASIC_SF || defined(BC_T_OPEN)
+#if defined(BASIC_SF) || defined(BC_T_OPEN)
   sf_Dirichlet_BCs_flt(sp);
 #endif
 #if defined(ROTATED_SF)

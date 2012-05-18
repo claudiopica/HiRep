@@ -10,6 +10,11 @@ NP_Z = 1
 
 level = 1  seed = 13813
 
+//Logger levels (default = -1)
+log:default = -1
+log:inverter = -1
+log:forcestat = 0
+
 //Fermion twisting
 theta_T = 0.
 theta_X = 0.
@@ -19,7 +24,7 @@ theta_Z = 0.
 beta = 2
 mass = -1.0
 
-// R/HMC variables
+// HMC variables
 nf = 2
 n_MT_prec = 1.e-14
 n_MT_prec_flt = 1.e-6
@@ -55,7 +60,7 @@ meas freq = 1
 conf dir = .
 gauge start = random
 //ranlxd start =
-last conf = 1000
+last conf = 10
 
 //Mesons
 mes:make = false

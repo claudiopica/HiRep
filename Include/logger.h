@@ -5,6 +5,7 @@
 
 #ifndef LOGGER_H
 #define LOGGER_H
+#include "input_par.h"
 
 /* ***********************************************
  * Simple output logging facility
@@ -79,6 +80,8 @@ int logger_reset();
  * 1 => failed to open new file (old logger stdout remains unchanged)
  */
 int logger_stdout(char *filename);
+
+void logger_set_input(input_logger *logger);
 
 /* set verbosity level of the logger 
  * if name==0 then set the default level
