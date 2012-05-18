@@ -824,6 +824,8 @@ static void init_plaq_twisted_BCs() {
       }
     }
   } 
+
+  lprintf("BCS",0,"Twisted BCs. Dirac strings intersecting at ( X , Y , Z ) = ( 1 , 1 , 1 )\n");
 }
 
 

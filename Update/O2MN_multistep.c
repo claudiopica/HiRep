@@ -27,17 +27,17 @@ static unsigned int count=0; /*used to project gfield */
 
 
 
-void gauge_integrator(suNg_av_field *momenta, integrator_par *int_par){
+void gauge_integrator(suNg_av_field *momenta, double tlen, integrator_par *int_par){
   _DECLARE_INT_ITERATOR(i);
 
   int n;
-  double dt=int_par->tlen/((double)int_par->nsteps);
+  double dt=tlen/((double)int_par->nsteps);
 
   if(int_par->nsteps == 0)  return;
 
   lprintf("MD_INT",10+int_par->level*10,"Starting new MD trajectory with gauge_integrator, level %d.\n",int_par->level);
   lprintf("MD_INT",10+int_par->level*10,"MD parameters: level=%d tlen=%1.6f nsteps=%d => dt=%1.6f\n",
-    int_par->level,int_par->tlen,int_par->nsteps,dt);
+    int_par->level,tlen,int_par->nsteps,dt);
   for(n=1;n<=int_par->nsteps;++n) {
     _MASTER_FOR(&glattice,i) {
       ExpX(dt,_4FIELD_AT(momenta,i,0), _4FIELD_AT(u_gauge,i,0));
@@ -55,7 +55,7 @@ void gauge_integrator(suNg_av_field *momenta, integrator_par *int_par){
 
 
 
-void O2MN_multistep(suNg_av_field *momenta, integrator_par *int_par){
+void O2MN_multistep(suNg_av_field *momenta, double tlen, integrator_par *int_par){
   /* check input types */
 #ifndef CHECK_SPINOR_MATCHING
    _TWO_SPINORS_MATCHING(u_gauge,momenta);
@@ -64,21 +64,21 @@ void O2MN_multistep(suNg_av_field *momenta, integrator_par *int_par){
   if(int_par->nsteps == 0)  return;
   
   int n;
-  double dt=int_par->tlen/((double)int_par->nsteps);
+  double dt=tlen/((double)int_par->nsteps);
     
   lprintf("MD_INT",10+int_par->level*10,"Starting new MD trajectory with O2MN_multistep, level %d.\n",int_par->level);
   lprintf("MD_INT",10+int_par->level*10,"MD parameters: level=%d tlen=%1.6f nsteps=%d => dt=%1.6f\n",
-    int_par->level,int_par->tlen,int_par->nsteps,dt);
+    int_par->level,tlen,int_par->nsteps,dt);
 
   (*int_par->force)(lambda*dt,momenta,int_par->force_par);
   
   for(n=1;n<=int_par->nsteps;++n) {
     
-    (*int_par->next->integrator)(momenta, int_par->next);
+    (*int_par->next->integrator)(momenta, dt/2., int_par->next);
     
     (*int_par->force)((1.-2.*lambda)*dt,momenta,int_par->force_par);
     
-    (*int_par->next->integrator)(momenta, int_par->next);
+    (*int_par->next->integrator)(momenta, dt/2., int_par->next);
     
     /* Update of momenta */
     if(n<int_par->nsteps) {

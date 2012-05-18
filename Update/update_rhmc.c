@@ -179,7 +179,6 @@ void init_rhmc(rhmc_par *par){
   integrator = (integrator_par*)malloc(sizeof(integrator_par)*3);
 
   integrator[0].level = 0;
-  integrator[0].tlen = _update_par.tlen;
   integrator[0].nsteps = _update_par.nsteps;
   integrator[0].force = &force_rhmc;
   integrator[0].force_par = malloc(sizeof(force_rhmc_par));
@@ -192,7 +191,6 @@ void init_rhmc(rhmc_par *par){
   integrator[0].next = &integrator[1];
 
   integrator[1].level = 1;
-  integrator[1].tlen = integrator[0].tlen/((double)(2*integrator[0].nsteps));
   integrator[1].nsteps = _update_par.gsteps;
   integrator[1].force = &force0;
   integrator[1].force_par = (void*)malloc(sizeof(double));
@@ -201,7 +199,6 @@ void init_rhmc(rhmc_par *par){
   integrator[1].next = &integrator[2];
 
   integrator[2].level = 2;
-  integrator[2].tlen = integrator[1].tlen/((double)(2*integrator[1].nsteps));
   integrator[2].nsteps = 1;
   integrator[2].force = NULL;
   integrator[2].force_par = NULL;
@@ -284,7 +281,7 @@ int update_rhmc(){
     
     /* integrate molecular dynamics */
     lprintf("RHMC",30,"MD integration...\n");
-    (*(integrator[0].integrator))(momenta,&integrator[0]);
+    (*(integrator[0].integrator))(momenta,_update_par.tlen,&integrator[0]);
     
     /* project gauge field */
     project_gauge_field();
@@ -379,7 +376,7 @@ int update_rhmc_o(){
     
     /* integrate molecular dynamics */
     lprintf("RHMC",30,"MD integration...\n");
-    (*(integrator[0].integrator))(momenta,&integrator[0]);
+    (*(integrator[0].integrator))(momenta,_update_par.tlen,&integrator[0]);
     
     /* project gauge field */
     project_gauge_field();

@@ -48,16 +48,15 @@ void force_hmc(double dt, suNg_av_field *force, void *par);
 
 
 typedef struct _integrator_par {
-  double tlen;
   int nsteps;
   void (*force)(double,suNg_av_field*,void*);
   void *force_par;
-  void (*integrator)(suNg_av_field*, struct _integrator_par*);
+  void (*integrator)(suNg_av_field*, double, struct _integrator_par*);
   struct _integrator_par *next;
   int level;
 } integrator_par;
-void gauge_integrator(suNg_av_field *momenta, integrator_par *int_par);
-void O2MN_multistep(suNg_av_field *momenta, integrator_par *int_par);
+void gauge_integrator(suNg_av_field *momenta, double tlen, integrator_par *int_par);
+void O2MN_multistep(suNg_av_field *momenta, double tlen, integrator_par *int_par);
 
 
 
