@@ -87,7 +87,7 @@ void init_hmc(hmc_par *par){
 		,_update_par.n_force_prec_flt
 		);
 	
-	if(_update_par.hasenbush)
+	if(_update_par.hasenbusch)
 	lprintf("HMC",10,
 	  "Using Hasenbush accelerator\n"
 	  "Metropolis test precision (F2==h) = %.8e\n"
@@ -107,9 +107,9 @@ void init_hmc(hmc_par *par){
 		,_update_par.gsteps
 		);
 	
-	if(_update_par.hasenbush)
+	if(_update_par.hasenbusch)
 	lprintf("HMC",10,
-	  "MD Hasenbush sub steps = %d\n"
+	  "MD Hasenbusch sub steps = %d\n"
 	  ,_update_par.hsteps
 	  );
 	
@@ -127,7 +127,7 @@ void init_hmc(hmc_par *par){
 	* of the final action density 
 	*/
 	if(pf==NULL) {
-	  n_pf = _update_par.hasenbush?_update_par.nf:(_update_par.nf/2);
+	  n_pf = _update_par.hasenbusch?_update_par.nf:(_update_par.nf/2);
 	  /* we need 1 more spinor field for Metropolis test action with MINRES */
 	  pf=alloc_spinor_field_f(n_pf+1,
 	    #ifdef UPDATE_EO
@@ -147,7 +147,7 @@ void init_hmc(hmc_par *par){
   int currentlevel;
   
   /* integrator */
-  integrator = (integrator_par*)malloc(sizeof(integrator_par)*(_update_par.hasenbush?4:3));
+  integrator = (integrator_par*)malloc(sizeof(integrator_par)*(_update_par.hasenbusch?4:3));
   
   currentlevel = 0;
   integrator[currentlevel].level = currentlevel;
@@ -157,7 +157,7 @@ void init_hmc(hmc_par *par){
   ((force_hmc_par*)(integrator[currentlevel].force_par))->n_pf = _update_par.nf/2;
   ((force_hmc_par*)(integrator[currentlevel].force_par))->pf = pf;
   ((force_hmc_par*)(integrator[currentlevel].force_par))->mass = _update_par.mass;
-  ((force_hmc_par*)(integrator[currentlevel].force_par))->hasenbusch = (_update_par.hasenbush?2:0);
+  ((force_hmc_par*)(integrator[currentlevel].force_par))->hasenbusch = (_update_par.hasenbusch?2:0);
   #ifdef UPDATE_EO
   ((force_hmc_par*)(integrator[currentlevel].force_par))->b = (4.+_update_par.mass+_update_par.hasen_dm)*(4.+_update_par.mass+_update_par.hasen_dm)-(4.+_update_par.mass)*(4.+_update_par.mass);
   #else
@@ -168,7 +168,7 @@ void init_hmc(hmc_par *par){
   integrator[currentlevel].integrator = &O2MN_multistep;
   integrator[currentlevel].next = &integrator[currentlevel+1];
   
-  if(_update_par.hasenbush) {
+  if(_update_par.hasenbusch) {
     currentlevel++;
     integrator[currentlevel].level = currentlevel;
     integrator[currentlevel].nsteps = _update_par.hsteps;
@@ -272,7 +272,7 @@ int update_hmc(){
   
   /* compute H2^{1/2}*pf = H*pf */
   lprintf("HMC",30,"Correcting pseudofermions distribution...\n");
-  if(!_update_par.hasenbush) {
+  if(!_update_par.hasenbusch) {
     for (i=0;i<n_pf;++i) {
       spinor_field_copy_f(&pf[n_pf],&pf[i]);
       static_mass=_update_par.mass;
@@ -317,7 +317,7 @@ int update_hmc(){
   represent_gauge_field();
   
   lprintf("HMC",30,"Computing new action density...\n");
-  if(!_update_par.hasenbush) {
+  if(!_update_par.hasenbusch) {
     /* compute H2^{-1/2}*pf or H2^{-1}*pf */
     /* here we choose the first strategy which is more symmetric */
     /* for the HMC H2^-1/2 = H^-1 and we use MINRES for this inversion */

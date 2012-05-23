@@ -114,18 +114,27 @@ input_eigval eigval_var = init_input_eigval(eigval_var);
 hmc_flow flow=init_hmc_flow(flow);
 
 
+char input_filename[256] = "input_file";
+char output_filename[256] = "out_0";
 void read_cmdline(int argc, char* argv[]) {
-  int i, am=0;
-  
+  int i, ai=0, ao=0, am=0, requested=1;
+
   for (i=1;i<argc;i++) {
-    if (strcmp(argv[i],"-m")==0) am=i;
+    if (strcmp(argv[i],"-i")==0) {ai=i+1;requested+=2;}
+    else if (strcmp(argv[i],"-o")==0) {ao=i+1;requested+=2;}
+    else if (strcmp(argv[i],"-m")==0) {am=i;requested+=1;}
   }
-  
+
   if (am != 0) {
     print_compiling_info();
     exit(0);
   }
-  
+
+  error(argc!=requested,1,"read_cmdline [hmc.c]",
+      "Arguments: [-i <input file>] [-o <output file>] [-m]");
+
+  if (ao!=0) strcpy(output_filename,argv[ao]);
+  if (ai!=0) strcpy(input_filename,argv[ai]);
 }
 
 
@@ -138,15 +147,15 @@ void H2eva(spinor_field *out, spinor_field *in){
 
 int main(int argc,char *argv[]) {
   int i, acc, rc;
-  char sbuf[128];
   double mass;
+  char sbuf[128];
   
   /* setup process id and communications */
   setup_process(&argc,&argv);
   
   read_cmdline(argc,argv);
   
-  read_input(logger_var.read,"input_file");
+  read_input(logger_var.read,input_filename);
 
   /* logger setup */
   logger_set_input(&logger_var);
@@ -154,20 +163,23 @@ int main(int argc,char *argv[]) {
 
   /* disable logger for MPI processes != 0 */
   if (PID!=0) { logger_disable(); }
-  
   if (PID==0) {
-    sprintf(sbuf,">>out_%d",PID);  logger_stdout(sbuf); 
+    sprintf(sbuf,">>%s",output_filename); logger_stdout(sbuf); 
     sprintf(sbuf,"err_%d",PID); freopen(sbuf,"w",stderr);
   }
+  /*
+  sprintf(sbuf,">>%s.pid%d",output_filename,PID); logger_stdout(sbuf); 
+  sprintf(sbuf,"err_%d",PID); freopen(sbuf,"w",stderr);
+  */
   
   lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS); 
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
   
   /* read input file */
-  read_input(glb_var.read,"input_file");
-  read_input(mes_var.read,"input_file");
-  read_input(poly_var.read,"input_file");
-  read_input(eigval_var.read,"input_file");
+  read_input(glb_var.read,input_filename);
+  read_input(mes_var.read,input_filename);
+  read_input(poly_var.read,input_filename);
+  read_input(eigval_var.read,input_filename);
   
   if(glb_var.rlxd_state[0]!='\0')
   {
@@ -194,7 +206,7 @@ int main(int argc,char *argv[]) {
   /* test_geometry_mpi_eo(); */
   
   /* Init Monte Carlo */
-  init_mc(&flow, "input_file");
+  init_mc(&flow, input_filename);
   lprintf("MAIN",0,"MVM during HMC initialzation: %ld\n",getMVM());
   lprintf("MAIN",0,"Initial plaquette: %1.8e\n",avr_plaquette());
 

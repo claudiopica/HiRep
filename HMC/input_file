@@ -36,8 +36,8 @@ tlen = 1
 nsteps = 5
 gsteps = 40
 
-// Hasenbush variables
-hasenbush = 1 // 1 = enabled , 0 = disabled
+// Hasenbusch variables
+hasenbusch = 1 // 1 = enabled , 0 = disabled
 hasen_dm = .5
 h_force_prec =  1.e-14
 h_force_prec_flt = 1.e-6

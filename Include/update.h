@@ -122,7 +122,7 @@ typedef struct _hmc_par {
   unsigned int hsteps; /* number of substeps for the lower mass of the Hasenbush acceleration */
   unsigned int gsteps; /* number of substeps for the gauge part every step */
   
-  int hasenbush; /* 0=no hasenbush ; 1=hasenbush */
+  int hasenbusch; /* 0=no hasenbusch ; 1=hasenbusch */
   double hasen_dm;
 } hmc_par;
 

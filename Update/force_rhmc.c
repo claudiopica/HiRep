@@ -240,8 +240,8 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar){
 	global_sum(forcestat,1);
 	global_max(forcestat+1,1);
 	
-	forcestat[0]*=dt*ratio->a[n+1]*(_REPR_NORM2/_FUND_NORM2)/((double)(4*GLB_T*GLB_X*GLB_Y*GLB_Z));
-	forcestat[1]*=dt*ratio->a[n+1]*(_REPR_NORM2/_FUND_NORM2);
+	forcestat[0]*=ratio->a[n+1]*(_REPR_NORM2/_FUND_NORM2)/((double)(4*GLB_T*GLB_X*GLB_Y*GLB_Z));
+	forcestat[1]*=ratio->a[n+1]*(_REPR_NORM2/_FUND_NORM2);
 	lprintf("FORCE-STAT",10," force_rhmc: dt= %1.8e avr |force|= %1.8e maxforce= %1.8e mass= %f k= %d n= %d a= %1.8e b= %1.8e\n",dt,forcestat[0],forcestat[1],par->mass,k,n,ratio->a[n+1],ratio->b[n]);
       }
       
