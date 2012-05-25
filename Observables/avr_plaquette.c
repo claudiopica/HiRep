@@ -15,6 +15,7 @@
 #include "suN.h"
 #include "communications.h"
 #include "logger.h"
+#include "observables.h"
 #include <stdio.h>
 
 double plaq(int ix,int mu,int nu)

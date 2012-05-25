@@ -312,7 +312,7 @@ public:
 			}
 		}
 	}
-	const void remove(const INDEX& index)
+	void remove(const INDEX& index)
 	{
 		if(length == 0)
 			return;

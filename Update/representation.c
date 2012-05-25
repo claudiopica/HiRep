@@ -209,8 +209,8 @@ void _group_represent2_flt(suNf_flt* v, suNg_flt *u) {
           XG(mf,i,j)->re += XG(uf,i,k)->re*XG(uf,j,k)->re+XG(uf,i,k)->im*XG(uf,j,k)->im;
           XG(mf,i,j)->im += XG(uf,i,k)->im*XG(uf,j,k)->re-XG(uf,i,k)->re*XG(uf,j,k)->im;
         }
-        XG(mf,i,j)->re *= sqrt(2./(a*(a+1.)));
-        XG(mf,i,j)->im *= sqrt(2./(a*(a+1.)));
+        XG(mf,i,j)->re *= (float)sqrt(2./(a*(a+1.)));
+        XG(mf,i,j)->im *= (float)sqrt(2./(a*(a+1.)));
       }
     }
 
@@ -230,7 +230,7 @@ void _group_represent2_flt(suNf_flt* v, suNg_flt *u) {
         for(k = 0; k < c; k++) {
           *(XF(vf,C,A)) += XG(mf,k,k)->re;
         }
-        *(XF(vf,C,A)) *= sqrt(.5/(c*(c+1.)));
+        *(XF(vf,C,A)) *= (float)sqrt(.5/(c*(c+1.)));
       }
 
       C++;

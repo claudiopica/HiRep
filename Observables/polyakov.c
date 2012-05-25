@@ -4,6 +4,7 @@
 #include "global.h"
 #include "logger.h"
 #include "communications.h"
+#include "observables.h"
 
 
 void polyakov() {

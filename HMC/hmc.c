@@ -116,7 +116,7 @@ hmc_flow flow=init_hmc_flow(flow);
 
 char input_filename[256] = "input_file";
 char output_filename[256] = "out_0";
-void read_cmdline(int argc, char* argv[]) {
+static void read_cmdline(int argc, char* argv[]) {
   int i, ai=0, ao=0, am=0, requested=1;
 
   for (i=1;i<argc;i++) {
@@ -139,7 +139,7 @@ void read_cmdline(int argc, char* argv[]) {
 
 
 double h2evamass=0.;
-void H2eva(spinor_field *out, spinor_field *in){
+static void H2eva(spinor_field *out, spinor_field *in){
   g5Dphi_sq(h2evamass, out, in);
 }
 
@@ -147,7 +147,6 @@ void H2eva(spinor_field *out, spinor_field *in){
 
 int main(int argc,char *argv[]) {
   int i, acc, rc;
-  double mass;
   char sbuf[128];
   
   /* setup process id and communications */
@@ -225,7 +224,7 @@ int main(int argc,char *argv[]) {
     lprintf("OBSERVABLES",0,"EVA Relative precision (eva:omega2) = %e\n",eigval_var.omega2);
   }
 
-  h2evamass=mass=flow.hmc_v->hmc_p.mass;
+  h2evamass=flow.hmc_v->hmc_p.mass;
   
   double *eva_vals=NULL;
   spinor_field *eva_vecs=NULL;

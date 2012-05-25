@@ -126,34 +126,34 @@ static int N_BORDER;
 
 static int memory_map_counter=0;
 static int local_memory_map_counter=0;
-static unsigned int *memory_map_address=NULL;
-static unsigned int *memory_map_end=NULL;
+static int *memory_map_address=NULL;
+static int *memory_map_end=NULL;
 
 static int memory_map_counter_e=0;
 static int local_memory_map_counter_e=0;
-static unsigned int *memory_map_address_e=NULL;
-static unsigned int *memory_map_end_e=NULL;
+static int *memory_map_address_e=NULL;
+static int *memory_map_end_e=NULL;
 static int index_counter_e=0;
 
 static int memory_map_counter_o=0;
 static int local_memory_map_counter_o=0;
-static unsigned int *memory_map_address_o=NULL;
-static unsigned int *memory_map_end_o=NULL;
+static int *memory_map_address_o=NULL;
+static int *memory_map_end_o=NULL;
 static int index_counter_o=0;
 
-static unsigned int * function_copy_list_from=NULL;
-static unsigned int * function_copy_list_to=NULL;
-static unsigned int * function_copy_list_len=NULL;
+static int * function_copy_list_from=NULL;
+static int * function_copy_list_to=NULL;
+static int * function_copy_list_len=NULL;
 static int function_copy_length=0;
 
-static unsigned int * function_copy_list_from_o=NULL;
-static unsigned int * function_copy_list_to_o=NULL;
-static unsigned int * function_copy_list_len_o=NULL;
+static int * function_copy_list_from_o=NULL;
+static int * function_copy_list_to_o=NULL;
+static int * function_copy_list_len_o=NULL;
 static int function_copy_length_o=0;
 
-static unsigned int * function_copy_list_from_e=NULL;
-static unsigned int * function_copy_list_to_e=NULL;
-static unsigned int * function_copy_list_len_e=NULL;
+static int * function_copy_list_from_e=NULL;
+static int * function_copy_list_to_e=NULL;
+static int * function_copy_list_len_e=NULL;
 static int function_copy_length_e=0;
 
 
@@ -200,27 +200,27 @@ static void fix_geometry_descriptor()
   glattice.gsize=index_position;
 
   if(N_BORDER>0){
-    glattice.rbuf_len=malloc((N_BORDER)*sizeof(unsigned int));
+    glattice.rbuf_len=malloc((N_BORDER)*sizeof(int));
     error((glattice.rbuf_len==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
     
-    glattice.sbuf_len=malloc((N_BORDER)*sizeof(unsigned int));
+    glattice.sbuf_len=malloc((N_BORDER)*sizeof(int));
     error((glattice.sbuf_len==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
     
-    glattice.sbuf_to_proc=malloc((N_BORDER)*sizeof(unsigned int));
+    glattice.sbuf_to_proc=malloc((N_BORDER)*sizeof(int));
     error((glattice.sbuf_to_proc==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	"Cannot allocate memory");
     
-    glattice.sbuf_start=malloc((N_BORDER)*sizeof(unsigned int));
+    glattice.sbuf_start=malloc((N_BORDER)*sizeof(int));
     error((glattice.sbuf_start==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
     
-    glattice.rbuf_from_proc=malloc((N_BORDER)*sizeof(unsigned int));
+    glattice.rbuf_from_proc=malloc((N_BORDER)*sizeof(int));
     error((glattice.rbuf_from_proc==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
     
-    glattice.rbuf_start=malloc((N_BORDER)*sizeof(unsigned int));
+    glattice.rbuf_start=malloc((N_BORDER)*sizeof(int));
     error((glattice.rbuf_start==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
   }
@@ -244,51 +244,51 @@ static void fix_geometry_descriptor()
 
   /*Setting glat_even & glat_odd values*/
   if(N_BORDER>0){
-    glat_even.rbuf_len=malloc((N_BORDER)*sizeof(unsigned int));
+    glat_even.rbuf_len=malloc((N_BORDER)*sizeof(int));
     error((glat_even.rbuf_len==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
     
-    glat_even.sbuf_len=malloc((N_BORDER)*sizeof(unsigned int));
+    glat_even.sbuf_len=malloc((N_BORDER)*sizeof(int));
     error((glat_even.sbuf_len==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
     
-    glat_even.sbuf_to_proc=malloc((N_BORDER)*sizeof(unsigned int));
+    glat_even.sbuf_to_proc=malloc((N_BORDER)*sizeof(int));
     error((glat_even.sbuf_to_proc==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
     
-    glat_even.sbuf_start=malloc((N_BORDER)*sizeof(unsigned int));
+    glat_even.sbuf_start=malloc((N_BORDER)*sizeof(int));
     error((glat_even.sbuf_start==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
     
-    glat_even.rbuf_from_proc=malloc((N_BORDER)*sizeof(unsigned int));
+    glat_even.rbuf_from_proc=malloc((N_BORDER)*sizeof(int));
     error((glat_even.rbuf_from_proc==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
     
-    glat_even.rbuf_start=malloc((N_BORDER)*sizeof(unsigned int));
+    glat_even.rbuf_start=malloc((N_BORDER)*sizeof(int));
     error((glat_even.rbuf_start==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
     
-    glat_odd.rbuf_len=malloc((N_BORDER)*sizeof(unsigned int));
+    glat_odd.rbuf_len=malloc((N_BORDER)*sizeof(int));
     error((glat_odd.rbuf_len==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
     
-    glat_odd.sbuf_len=malloc((N_BORDER)*sizeof(unsigned int));
+    glat_odd.sbuf_len=malloc((N_BORDER)*sizeof(int));
     error((glat_odd.sbuf_len==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
     
-    glat_odd.sbuf_to_proc=malloc((N_BORDER)*sizeof(unsigned int));
+    glat_odd.sbuf_to_proc=malloc((N_BORDER)*sizeof(int));
     error((glat_odd.sbuf_to_proc==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	"Cannot allocate memory");
     
-    glat_odd.sbuf_start=malloc((N_BORDER)*sizeof(unsigned int));
+    glat_odd.sbuf_start=malloc((N_BORDER)*sizeof(int));
     error((glat_odd.sbuf_start==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
     
-    glat_odd.rbuf_from_proc=malloc((N_BORDER)*sizeof(unsigned int));
+    glat_odd.rbuf_from_proc=malloc((N_BORDER)*sizeof(int));
     error((glat_odd.rbuf_from_proc==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
     
-    glat_odd.rbuf_start=malloc((N_BORDER)*sizeof(unsigned int));
+    glat_odd.rbuf_start=malloc((N_BORDER)*sizeof(int));
     error((glat_odd.rbuf_start==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
   }
@@ -502,7 +502,7 @@ static void set_block_width(int pte, int pxe, int pye, int pze)
 
 
 
-static void set_border_pointer(int actualn,int level)
+static void set_border_pointer(int actualn)
 {
   map_true2oversize[index_position]=actualn;
   if( map_oversize2true[actualn]==-1 ) map_oversize2true[actualn]=index_position;
@@ -587,14 +587,14 @@ static void walk_on_lattice(int level)
 	  for (x1=blx_start;x1<blx_start+blx_width;x1++) 
 	    for (x0=blt_start;x0<blt_start+blt_width;x0++)
 	      if((x0+x1+x2+x3+T_BORDER+X_BORDER+Y_BORDER+Z_BORDER+PSIGN+1)&1)
-		set_border_pointer(local_index(x0,x1,x2,x3),level);
+		set_border_pointer(local_index(x0,x1,x2,x3));
 		  
       for (x3=blz_start;x3<blz_start+blz_width;x3++) 
 	for (x2=bly_start;x2<bly_start+bly_width;x2++) 
 	  for (x1=blx_start;x1<blx_start+blx_width;x1++) 
 	    for (x0=blt_start;x0<blt_start+blt_width;x0++)
 	      if(!((x0+x1+x2+x3+T_BORDER+X_BORDER+Y_BORDER+Z_BORDER+PSIGN+1)&1) )
-		set_border_pointer(local_index(x0,x1,x2,x3),level);
+		set_border_pointer(local_index(x0,x1,x2,x3));
       
       
     }
@@ -698,7 +698,7 @@ static void fix_buffer()
 	  for (x1=blx_start;x1<blx_start+blx_width;x1++) 
 	    for (x0=blt_start;x0<blt_start+blt_width;x0++) 
 	      if((x0+x1+x2+x3+T_BORDER+X_BORDER+Y_BORDER+Z_BORDER+PSIGN+1)&1)
-		set_border_pointer(local_index(x0,x1,x2,x3),border[index_eval_border].level);
+		set_border_pointer(local_index(x0,x1,x2,x3));
       
       
       for (x3=blz_start;x3<blz_start+blz_width;x3++) 
@@ -706,7 +706,7 @@ static void fix_buffer()
 	  for (x1=blx_start;x1<blx_start+blx_width;x1++) 
 	    for (x0=blt_start;x0<blt_start+blt_width;x0++)
 	      if(!((x0+x1+x2+x3+T_BORDER+X_BORDER+Y_BORDER+Z_BORDER+PSIGN+1)&1) )
-		set_border_pointer(local_index(x0,x1,x2,x3),border[index_eval_border].level);
+		set_border_pointer(local_index(x0,x1,x2,x3));
       
       
     }
@@ -743,7 +743,7 @@ static void set_border(int dir){
   int ind2[]={Y_BORDER,Y};
   int ind3[]={Z_BORDER,Z};
 	    
-  int tmp_ind=index_position;
+  /*int tmp_ind=index_position;*/
 
   for(id0=0;id0<out_id0;id0++)
     for(id1=0;id1<out_id1;id1++)
@@ -754,7 +754,7 @@ static void set_border(int dir){
 	    /* 	    printf("L3\n"); */
 
 	    /* 	    printf("indice di all'interno di border1 pos= %d, diff=%d\n",index_position,index_position-tmp_ind); */
-	    tmp_ind=index_position;
+	    /*tmp_ind=index_position;*/
 	    /*(Level=3)*/
 	    
 	    if(out_id0==2){
@@ -777,7 +777,7 @@ static void set_border(int dir){
 	    walk_on_lattice(3);
 	    
 	    /* 	    printf("indice di all'interno di border2 pos= %d, diff=%d\n",index_position,index_position-tmp_ind); */
-	    tmp_ind=index_position;
+	    /*tmp_ind=index_position;*/
 	    /* 	    printf("L2\n"); */
 	    
 	    
@@ -805,7 +805,7 @@ static void set_border(int dir){
 	      }
 	    
 	    /* 	    printf("indice di all'interno di border3 pos= %d, diff=%d\n",index_position,index_position-tmp_ind); */
-	    tmp_ind=index_position;
+	    /*tmp_ind=index_position;*/
 	    
 	    
 	    
@@ -833,7 +833,7 @@ static void set_border(int dir){
 	      }
 
 	    /* 	    printf("indice di all'interno di border4 pos= %d, diff=%d\n",index_position,index_position-tmp_ind); */
-	    tmp_ind=index_position;
+	    /*tmp_ind=index_position;*/
 	    
  	    if(out_id2==1)
 	      {
@@ -859,7 +859,7 @@ static void set_border(int dir){
 	      }
 	    
 	    /* 	    printf("indice di all'interno di border5 pos= %d, diff=%d\n",index_position,index_position-tmp_ind); */
-	    tmp_ind=index_position;
+	    /*tmp_ind=index_position;*/
 	    
  	    if(out_id3==1)
 	      {
@@ -882,7 +882,7 @@ static void set_border(int dir){
 	      }
 	    
 	    /* 	    printf("indice di all'interno di border6 pos= %d, diff=%d\n",index_position,index_position-tmp_ind); */
-	    tmp_ind=index_position;
+	    /*tmp_ind=index_position;*/
 	    
 	    /* 	    printf("fine\n"); */
 
@@ -902,8 +902,8 @@ static void set_memory_order()
 {
   int i1,i2=0;
   int *check=malloc(OVERSIZE_VOLUME*sizeof(int));
-  unsigned int *oversize_zone_addr_list=malloc(index_position*sizeof(unsigned int));
-  unsigned int *oversize_zone_length_list=malloc(index_position*sizeof(unsigned int));
+  int *oversize_zone_addr_list=malloc(index_position*sizeof(int));
+  int *oversize_zone_length_list=malloc(index_position*sizeof(int));
 
   int counter_zone=0;
   int test_master=1;
@@ -974,11 +974,11 @@ static void set_memory_order()
 
   if(counter_zone!=0)
     {
-      memory_map_address=malloc(counter_zone*sizeof(unsigned int));
+      memory_map_address=malloc(counter_zone*sizeof(int));
       error((memory_map_address==NULL),1,"set_memory_order [geometry_mpi.c]", 
 	    "Cannot allocate memory"); 
 
-      memory_map_end=malloc(counter_zone*sizeof(unsigned int)); 
+      memory_map_end=malloc(counter_zone*sizeof(int)); 
       error((memory_map_end==NULL),1,"set_memory_order [geometry_mpi.c]", 
 	    "Cannot allocate memory"); 
 
@@ -1027,7 +1027,8 @@ static void set_memory_order()
 
   int tmp_function_copy_length_o=0;
   int start=0;
-  int sign,end,pt,length,diff;
+  int sign,end,pt;
+  /*int length,diff;*/
 
   for(i1=0;i1<function_copy_length;i1++)
     {
@@ -1036,7 +1037,7 @@ static void set_memory_order()
       pt = function_copy_list_from[i1];
       end = function_copy_list_from[i1]  + function_copy_list_len[i1] - 1;
       start=pt;
-      diff=length=0;
+      /*diff=length=0;*/
 /*       printf("ZONE FROM %d TO %d LENGTH %d\n",pt,function_copy_list_to[i1],function_copy_list_len[i1]); */
 
       while(pt <= end)
@@ -1212,11 +1213,11 @@ static void set_memory_order()
 /*   printf("ALLOCAZIONI EO\n"); */
   if(counter_o!=0)
     {
-      memory_map_address_o=malloc(counter_o*sizeof(unsigned int));
+      memory_map_address_o=malloc(counter_o*sizeof(int));
       error((memory_map_address_o==NULL),1,"set_memory_order [geometry_mpi.c]", 
 	    "Cannot allocate memory"); 
 
-      memory_map_end_o=malloc(counter_o*sizeof(unsigned int)); 
+      memory_map_end_o=malloc(counter_o*sizeof(int)); 
       error((memory_map_end_o==NULL),1,"set_memory_order [geometry_mpi.c]", 
 	    "Cannot allocate memory"); 
 
@@ -1231,11 +1232,11 @@ static void set_memory_order()
    
    if(counter_e!=0)
     {
-      memory_map_address_e=malloc(counter_e*sizeof(unsigned int));
+      memory_map_address_e=malloc(counter_e*sizeof(int));
       error((memory_map_address_e==NULL),1,"set_memory_order [geometry_mpi.c]", 
 	    "Cannot allocate memory"); 
 
-      memory_map_end_e=malloc(counter_e*sizeof(unsigned int)); 
+      memory_map_end_e=malloc(counter_e*sizeof(int)); 
       error((memory_map_end_e==NULL),1,"set_memory_order [geometry_mpi.c]", 
 	    "Cannot allocate memory"); 
 

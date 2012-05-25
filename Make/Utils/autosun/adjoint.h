@@ -112,7 +112,7 @@ string group_represent(const char* vname, const char* uname)
 
 string debug_group_represent(const char* vname, const char* uname)
 {
-	string RET = "\
+	string RET = string("copy(") + vname + "," + uname + ");\n\
 	int A, B;\n\
 	GROUP::matrix e[DIM];\n\
 	GROUP::matrix tmp[2];\n\

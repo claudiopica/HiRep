@@ -117,7 +117,7 @@ string group_represent(const char* vname, const char* uname)
 
 string debug_group_represent(const char* vname, const char* uname)
 {
-	string RET = "\
+	string RET = string("copy(") + vname + "," + uname + ");\n\
 	A = 0;\n\
 	for(int a = 0; a < NCOLORS; a++) {\n\
 		for(int b = 0; b < a; b++) {\n\

@@ -41,12 +41,12 @@ static int** rec_global_coord;
 #define RBUFFER  4
 
 typedef struct {
-	unsigned int c_type;    /* NOT_ASSIGNED ; ORIGINAL; DUPLICATE */
-	unsigned int b_type[4]; /* INNER ; LBORDER ; RBORDER ; LBUFFER ; RBUFFER */
-	unsigned int n_inner;   /* 0 ... 4 */
-	unsigned int n_border;  /* 0 ... 4 */
-	unsigned int n_buffer;  /* 0 ... 4 */
-	unsigned int t_flag;
+	int c_type;    /* NOT_ASSIGNED ; ORIGINAL; DUPLICATE */
+	int b_type[4]; /* INNER ; LBORDER ; RBORDER ; LBUFFER ; RBUFFER */
+	int n_inner;   /* 0 ... 4 */
+	int n_border;  /* 0 ... 4 */
+	int n_buffer;  /* 0 ... 4 */
+	int t_flag;
 } site_info;
 static site_info* descr;
 
@@ -156,19 +156,19 @@ static void set_coordinates(int x, int *test_q) {
 }
 
 
-int even_q(int c[4]) {
+static int even_q(int c[4]) {
    return ((c[0]+c[1]+c[2]+c[3]
            +PSIGN+1)&1);
 }
 
-int odd_q(int c[4]) {
+static int odd_q(int c[4]) {
    return !((c[0]+c[1]+c[2]+c[3]
            +PSIGN+1)&1);
 }
 
 
 
-void test_geometry_descriptor(geometry_descriptor *gd, int(*in_subset_q)(int*)) {
+static void test_geometry_descriptor(geometry_descriptor *gd, int(*in_subset_q)(int*)) {
 	int i, j;
 	int x, y;
 	int *cx, *cy;
@@ -507,7 +507,7 @@ void test_geometry_descriptor(geometry_descriptor *gd, int(*in_subset_q)(int*)) 
 }
 
 
-void test_glattice() {
+static void test_glattice() {
 	int i, j, k;
 	int x, y;
 	int *cx, *cy;
@@ -1020,7 +1020,7 @@ void test_glattice() {
 		}*/
 		
 		/* TEST: rid*[i] is received from the right processor */
-		int id;
+		int id2;
 		
 		if(glattice.rbuf_from_proc[i] == CID && !periodic_q[i]) {
 			lprintf("TEST_GEOMETRY",loglevel,"rbuf_from_proc[%d]=CID=%d (rbuf_mask={%d,%d,%d,%d}) but not periodic BC.\n",i,CID,rbuf_mask[0],rbuf_mask[1],rbuf_mask[2],rbuf_mask[3]);
@@ -1030,13 +1030,13 @@ void test_glattice() {
 			lprintf("TEST_GEOMETRY",loglevel,"rbuf_from_proc[%d]=%d (rbuf_mask={%d,%d,%d,%d}) out of range.\n", i,glattice.rbuf_from_proc[i],rbuf_mask[0],rbuf_mask[1],rbuf_mask[2],rbuf_mask[3]);
 			test_q = false;
 		}
-		id = CID;
+		id2 = CID;
 		for(k=0; k<4; k++) {
-			if(shift[k] > 0) id = proc_up(id,k);
-			else if(shift[k] < 0) id = proc_dn(id,k);
+			if(shift[k] > 0) id2 = proc_up(id2,k);
+			else if(shift[k] < 0) id2 = proc_dn(id2,k);
 		}
-		if(id != glattice.rbuf_from_proc[i]) {
-			lprintf("TEST_GEOMETRY",loglevel,"rbuf_from_proc[%d]=%d (rbuf_mask={%d,%d,%d,%d}) , expected %d.\n", i,glattice.rbuf_from_proc[i],rbuf_mask[0],rbuf_mask[1],rbuf_mask[2],rbuf_mask[3],id);
+		if(id2 != glattice.rbuf_from_proc[i]) {
+			lprintf("TEST_GEOMETRY",loglevel,"rbuf_from_proc[%d]=%d (rbuf_mask={%d,%d,%d,%d}) , expected %d.\n", i,glattice.rbuf_from_proc[i],rbuf_mask[0],rbuf_mask[1],rbuf_mask[2],rbuf_mask[3],id2);
 			test_q = false;
 		}
 
@@ -1049,13 +1049,13 @@ void test_glattice() {
 			lprintf("TEST_GEOMETRY",loglevel,"sbuf_to_proc[%d]=%d (sbuf_mask={%d,%d,%d,%d}) out of range.\n", i,glattice.sbuf_to_proc[i],sbuf_mask[0],sbuf_mask[1],sbuf_mask[2],sbuf_mask[3]);
 			test_q = false;
 		}
-		id = CID;
+		id2 = CID;
 		for(k=0; k<4; k++) {
-			if(shift[k] > 0) id = proc_dn(id,k);
-			else if(shift[k] < 0) id = proc_up(id,k);
+			if(shift[k] > 0) id2 = proc_dn(id2,k);
+			else if(shift[k] < 0) id2 = proc_up(id2,k);
 		}
-		if(id != glattice.sbuf_to_proc[i]) {
-			lprintf("TEST_GEOMETRY",loglevel,"sbuf_to_proc[%d]=%d (sbuf_mask={%d,%d,%d,%d}) , expected %d.\n", i,glattice.sbuf_to_proc[i],sbuf_mask[0],sbuf_mask[1],sbuf_mask[2],sbuf_mask[3],id);
+		if(id2 != glattice.sbuf_to_proc[i]) {
+			lprintf("TEST_GEOMETRY",loglevel,"sbuf_to_proc[%d]=%d (sbuf_mask={%d,%d,%d,%d}) , expected %d.\n", i,glattice.sbuf_to_proc[i],sbuf_mask[0],sbuf_mask[1],sbuf_mask[2],sbuf_mask[3],id2);
 			test_q = false;
 		}
 
@@ -1069,7 +1069,8 @@ void test_glattice() {
 }
 
 
-void set_global_coordinates() {
+#ifdef WITH_MPI
+static void set_global_coordinates() {
   int x, k;
   for(x=0; x<glattice.gsize; x++)
   for(k=0; k<4; k++) {
@@ -1078,8 +1079,7 @@ void set_global_coordinates() {
 }
 
 
-void test_communication_buffers(geometry_descriptor *gd) {
-#ifdef WITH_MPI
+static void test_communication_buffers(geometry_descriptor *gd) {
   int test_q=true;
   int x, i, mpiret;
   MPI_Request *comm_req;
@@ -1179,8 +1179,8 @@ void test_communication_buffers(geometry_descriptor *gd) {
 
 
   afree(comm_req);
-#endif
 }
+#endif
 
 
 void test_geometry_mpi() {

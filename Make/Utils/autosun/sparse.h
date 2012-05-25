@@ -7,21 +7,14 @@ public:
 	sparselinear(int n) : orderedlist<INDEX,VALUE>() { size = n; }
 	sparselinear(const sparselinear<INDEX,VALUE>& mat) : orderedlist<INDEX,VALUE>(mat) { size = mat.size; }
 	
-	virtual sparselinear<INDEX,VALUE>& operator=(const sparselinear<INDEX,VALUE>& b)
+	virtual orderedlist<INDEX,VALUE>& operator=(const orderedlist<INDEX,VALUE>& b)
 	{
-		for(KEYTYPE i = 0; i < orderedlist<INDEX,VALUE>::length; i++)
-			delete orderedlist<INDEX,VALUE>::data[i];
-		if(orderedlist<INDEX,VALUE>::length != 0) delete[] orderedlist<INDEX,VALUE>::data;
-		size = b.size;
-		orderedlist<INDEX,VALUE>::length = b.length;
-		orderedlist<INDEX,VALUE>::data = new typename orderedlist<INDEX,VALUE>::ELEMENT*[orderedlist<INDEX,VALUE>::length];
-		for(KEYTYPE i = 0; i < orderedlist<INDEX,VALUE>::length; i++)
-		{
-			orderedlist<INDEX,VALUE>::data[i] = new typename orderedlist<INDEX,VALUE>::ELEMENT;
-			orderedlist<INDEX,VALUE>::data[i]->index = b.data[i]->index;
-			orderedlist<INDEX,VALUE>::data[i]->value = b.data[i]->value;
-		}
-		return *this;
+	  orderedlist<INDEX,VALUE>::operator=(b);
+	  if(dynamic_cast<const sparselinear<INDEX,VALUE>*>(&b) != NULL) {
+      const sparselinear<INDEX,VALUE>& sb = *dynamic_cast<const sparselinear<INDEX,VALUE>*>(&b);
+      size = sb.size;
+    }      
+    return *this;
 	}
 	
 	virtual void minus()
@@ -30,22 +23,25 @@ public:
 			(orderedlist<INDEX,VALUE>::data)[i]->value.minus();
 	}
 	
-	virtual void add(sparselinear<INDEX,VALUE>& l)
+	virtual void add(const orderedlist<INDEX,VALUE>& l)
 	{
-		if(size != l.size)
-		{
-			cerr << "WRONG LINEAR SUM.\n";
-			return;
-		}
+	  if(dynamic_cast<const sparselinear<INDEX,VALUE>*>(&l) != NULL) {
+      const sparselinear<INDEX,VALUE>& sl = *dynamic_cast<const sparselinear<INDEX,VALUE>*>(&l);
+      if(size != sl.size)
+      {
+        cerr << "WRONG LINEAR SUM.\n";
+        return;
+      }
+    }
 		orderedlist<INDEX,VALUE>::add(l);
 	}
 	virtual void sub(const sparselinear<INDEX,VALUE>& l)
 	{
-		if(size != l.size)
-		{
-			cerr << "WRONG LINEAR SUM.\n";
-			return;
-		}
+    if(size != l.size)
+    {
+      cerr << "WRONG LINEAR SUM.\n";
+      return;
+    }
 		minus();
 		orderedlist<INDEX,VALUE>::add(l);
 		minus();
@@ -133,6 +129,8 @@ public:
 	sparsematrix(int n) : sparselinear<mindex,VALUE>(n) {}
 	sparsematrix(const sparsematrix<VALUE>& mat) : sparselinear<mindex,VALUE>(mat) {}
 
+	using sparselinear<mindex,VALUE>::operator=;
+	
 	const VALUE& get(int row, int col) const
 	{
 		return orderedlist<mindex,VALUE>::get(mindex(row,col,sparselinear<mindex,VALUE>::size));
@@ -184,14 +182,8 @@ public:
 		this->sort();
 	}
 	
-	virtual void add(sparsematrix<VALUE>& m)
-	{
-		sparselinear<mindex,VALUE>::add(m);
-	}
-	virtual void sub(sparsematrix<VALUE>& m)
-	{
-		sparselinear<mindex,VALUE>::sub(m);
-	}
+	using sparselinear<mindex,VALUE>::add;
+	using sparselinear<mindex,VALUE>::sub;
 	void mult(const sparsematrix<VALUE>& p, const sparsematrix<VALUE>& q)
 	{
 		if(p.size != q.size)
@@ -286,24 +278,9 @@ public:
 	sparsevector() : sparselinear<vindex,VALUE>() {}
 	sparsevector(int n) : sparselinear<vindex,VALUE>(n) {}
 	sparsevector(const sparsevector<VALUE>& vec) : sparselinear<vindex,VALUE>(vec) {}
-/*	
-	sparsevector<VALUE>& operator=(const sparsevector<VALUE>& b)
-	{
-		for(KEYTYPE i = 0; i < orderedlist<vindex,VALUE>::length; i++)
-			delete orderedlist<vindex,VALUE>::data[i];
-		if(orderedlist<vindex,VALUE>::length != 0) delete[] orderedlist<vindex,VALUE>::data;
-		size = b.size;
-		orderedlist<vindex,VALUE>::length = b.length;
-		orderedlist<vindex,VALUE>::data = new typename orderedlist<vindex,VALUE>::ELEMENT*[orderedlist<vindex,VALUE>::length];
-		for(KEYTYPE i = 0; i < orderedlist<int,VALUE>::length; i++)
-		{
-			orderedlist<vindex,VALUE>::data[i] = new typename orderedlist<vindex,VALUE>::ELEMENT;
-			orderedlist<vindex,VALUE>::data[i]->index = b.data[i]->index;
-			orderedlist<vindex,VALUE>::data[i]->value = b.data[i]->value;
-		}
-		return *this;
-	}
-*/
+
+	using sparselinear<vindex,VALUE>::operator=;
+
 	const VALUE& get(int row) const
 	{
 		return orderedlist<vindex,VALUE>::get(vindex(row,sparselinear<vindex,VALUE>::size));
@@ -327,14 +304,8 @@ public:
 		return RET.str();
 	}
 
-	virtual void add(sparsevector<VALUE>& v)
-	{
-		sparselinear<vindex,VALUE>::add(v);
-	}
-	virtual void sub(sparsevector<VALUE>& v)
-	{
-		sparselinear<vindex,VALUE>::sub(v);
-	}
+	using sparselinear<vindex,VALUE>::add;
+	using sparselinear<vindex,VALUE>::sub;
 	void dot(const sparsematrix<VALUE>& p, const sparsevector<VALUE>& v)
 	{
 		if(p.size != v.size)

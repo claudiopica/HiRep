@@ -26,7 +26,7 @@
  *
  */
 
-double E_8(int ix,int k)
+static double E_8(int ix,int k)
 {
    double p;
    suNg *v1,*v2,*v3,*v4,w1,w2,w3,w4,ilambda8;
@@ -87,7 +87,7 @@ double E_8(int ix,int k)
 
  */
 
-double E_8_top(int ix,int k)
+static double E_8_top(int ix,int k)
 {
   double p;
   suNg *v1,*v2,*v3,*v4,w1,w2,w3,w4,ilambda8;

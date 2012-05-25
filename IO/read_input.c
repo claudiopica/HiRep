@@ -64,15 +64,15 @@ void read_input(input_record_t irec[], char *filename) {
 
   do {
     int count=0;
-    int nowarn=0;
+    /*int nowarn=0;*/
     /*skip white space*/
-    nowarn=fscanf(inputfile," ");
+    /*nowarn=*/fscanf(inputfile," ");
 
     fgetpos(inputfile,&pos);
 
     /* skip comments */
-    nowarn=fscanf(inputfile,"//%n",&count);
-    if(count==2) { nowarn=fscanf(inputfile,"%*[^\n]"); goto NEXTLOOP; } if(feof(inputfile)) break; fsetpos(inputfile,&pos);
+    /*nowarn=*/fscanf(inputfile,"//%n",&count);
+    if(count==2) { /*nowarn=*/fscanf(inputfile,"%*[^\n]"); goto NEXTLOOP; } if(feof(inputfile)) break; fsetpos(inputfile,&pos);
 
     /* read variables as described in irec */
     for (count=0; count<npar; ++count) {
@@ -85,7 +85,7 @@ void read_input(input_record_t irec[], char *filename) {
       fsetpos(inputfile,&pos);
     }
 
-    nowarn=fscanf(inputfile,"%s",buf);
+    /*nowarn=*/fscanf(inputfile,"%s",buf);
     lprintf("READINPUT",10000,"Ignoring unknown token: [%s]\n",buf);
 
 NEXTLOOP:

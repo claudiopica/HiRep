@@ -17,6 +17,7 @@
 #include "suN.h"
 #include "global.h"
 #include "communications.h"
+#include "update.h"
 
 static suNg *u1up,*u2up,*u3up;
 static suNg *u1dn,*u2dn,*u3dn;
@@ -102,12 +103,8 @@ void test_staples()
   double pa=0.0;
   double ps=0.0, pl=0.;
   double tr;
-  int fl;
   _DECLARE_INT_ITERATOR(ix);
 
-
-
-  fl = 0;
   pa = avr_plaquette();
   _MASTER_FOR(&glattice,ix){
     for (mu=0; mu<4; ++mu){

@@ -57,7 +57,7 @@ void r_app_realloc(rational_app *app){
  * after  : r(x)=a[0]+a[1]/(x-b[0])+a[2]/(x-b[1])+...+a[n+1)/(x-b[n])
  */
 static void r_app_rp2pfe(rational_app *app) {
-  int i,j;
+  unsigned int i,j;
   double *ctmp;
 
   ctmp=malloc(sizeof(*ctmp)*(app->order));
@@ -80,7 +80,7 @@ static void r_app_rp2pfe(rational_app *app) {
  * as r_app_rp2pfe but for the inverse function
  */
 static void r_app_rp2pfe_inv(rational_app *app) {
-  int i;
+  unsigned int i;
   double ctmp;
   
   app->a[0]=1./app->a[0];
@@ -99,7 +99,7 @@ static void r_app_rp2pfe_inv(rational_app *app) {
  * used by r_app_set to adjust approximation intervals
  */
 void r_app_rescale(rational_app *app, double k) {
-  int i;
+  unsigned int i;
   double fexp=-fabs(((double)app->n)/((double)app->d));
   app->a[0]*=pow(k,fexp);
   for(i=0;i<app->order;){
@@ -232,7 +232,7 @@ void r_app_set(rational_app *app, double min, double max) {
 void rational_func(rational_app *coef, spinor_operator Q, spinor_field *out, spinor_field *in) {
   static mshift_par inv_par;
   spinor_field *inv_out;
-  int i;
+  unsigned int i;
 
   /* check input types */
 #ifndef CHECK_SPINOR_MATCHING

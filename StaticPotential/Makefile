@@ -1,7 +1,7 @@
 TOPDIR = ..
 MKDIR=$(TOPDIR)/Make
 
-EXES = mk_wilsonloops tune_HYP_smearing polyakov_loops
+EXES = mk_wilsonloops tune_HYP_smearing mk_polyakov_loops
 
 default: $(EXES)
 

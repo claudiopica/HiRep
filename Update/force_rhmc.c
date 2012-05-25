@@ -78,7 +78,7 @@
 
 
   
-static int n_ws=0;
+static unsigned int n_ws=0;
 static spinor_field *chi=NULL, *Hchi=NULL;
 
 void init_force_rhmc() {
@@ -93,7 +93,8 @@ void free_force_rhmc() {
 
 void force_rhmc(double dt, suNg_av_field *force, void *vpar){
   _DECLARE_INT_ITERATOR(x);
-  int mu, n, k;
+  int mu, k;
+  unsigned int n;
   static suNg_algebra_vector f;
   static suNf_vector ptmp;
   static suNf_spinor p;

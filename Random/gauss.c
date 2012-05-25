@@ -63,7 +63,7 @@ void gauss_flt(float rd[],int n)
       y1=rho*sin(x2);
       y2=rho*cos(x2);
       
-      rd[k++]=y1;
+      rd[k++]=(float)y1;
       if (k<n)
          rd[k++]=(float)y2;
    }

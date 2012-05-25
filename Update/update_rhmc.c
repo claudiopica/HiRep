@@ -256,7 +256,8 @@ int update_rhmc(){
     
     double deltaH;
     double oldmax,oldmin;
-    _DECLARE_INT_ITERATOR(i);
+    _DECLARE_INT_ITERATOR(ix);
+    unsigned int i;
     
     if (!init) {
         /* not initialized */
@@ -307,8 +308,8 @@ int update_rhmc(){
     
     /* Metropolis test */
     deltaH=0.;
-    _MASTER_FOR(la->type,i) {
-        deltaH+=*_FIELD_AT(la,i);
+    _MASTER_FOR(la->type,ix) {
+        deltaH+=*_FIELD_AT(la,ix);
     }
     global_sum(&deltaH, 1);
     lprintf("RHMC",10,"[DeltaS = %1.8e][exp(-DS) = %1.8e]\n",deltaH,exp(-deltaH));
@@ -348,8 +349,8 @@ int update_rhmc(){
 int update_rhmc_o(){
     
     double deltaH;
-    double oldmax,oldmin;
-    _DECLARE_INT_ITERATOR(i);
+    _DECLARE_INT_ITERATOR(ix);
+    unsigned int i;
     
     if(!init)
         return -1;
@@ -384,8 +385,6 @@ int update_rhmc_o(){
     
     /* test min and max eigenvalue of H2 and update approx if necessary */
     /* now it just tests the approx !!! */
-    oldmax = maxev; /* save old max */
-    oldmin = minev; /* save old min */
     find_spec_H2(&maxev,&minev, _update_par.mass); /* find spectral interval of H^2 */
     r_app_set(&r_S,minev,maxev);
     r_app_set(&r_MD,minev,maxev);
@@ -402,7 +401,7 @@ int update_rhmc_o(){
     
     /* Metropolis test */
     deltaH=0.;
-    _MASTER_FOR(la->type,i) {
+    _MASTER_FOR(la->type,ix) {
         deltaH+=*_FIELD_AT(la,i);
     }
     global_sum(&deltaH, 1);

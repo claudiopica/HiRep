@@ -15,6 +15,8 @@ public:
 		return zero;
 	}
 	
+	using orderedlist<string,int>::operator=;
+	
 	friend bool operator<(const rmonomial& a, const rmonomial& b) { return a.getstring() < b.getstring(); }
 	friend bool operator<=(const rmonomial& a, const rmonomial& b) { return a.getstring() <= b.getstring(); }
 	friend bool operator==(const rmonomial& a, const rmonomial& b) { return a.getstring() == b.getstring(); }
@@ -55,6 +57,8 @@ public:
 		return zero;
 	}
 	
+	using orderedlist<rmonomial,complex>::operator=;
+
 	polynomial& operator+=(const polynomial& b)
 	{
 		for(KEYTYPE i = 0; i < b.length; i++)
@@ -205,6 +209,8 @@ public:
 		index.add(string(name), 1);
 		orderedlist<rmonomial,complex>::add(index,complex(1.0,0.0));
 	}
+
+	using polynomial::operator=;
 };
 
 
@@ -220,6 +226,8 @@ public:
 		index2.add(string(name)+".im", 1);
 		orderedlist<rmonomial,complex>::add(index2,complex(0.0,1.0));
 	}
+
+	using polynomial::operator=;
 };
 
 
@@ -236,4 +244,6 @@ public:
 		rmonomial index;
 		orderedlist<rmonomial,complex>::add(index,z);
 	}
+
+	using polynomial::operator=;
 };

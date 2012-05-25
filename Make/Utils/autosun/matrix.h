@@ -4,6 +4,8 @@ public:
 	smatrix() : sparsematrix<complex>() {}
 	smatrix(int N) : sparsematrix<complex>(N) {}
 	
+	using sparsematrix<complex>::operator=;
+
 	complex& getzero() const
 	{
 		static complex zero(0.0,0.0);
@@ -18,6 +20,8 @@ public:
 	svector() : sparsevector<complex>() {}
 	svector(int N) : sparsevector<complex>(N) {}
 	
+	using sparsevector<complex>::operator=;
+
 	complex& getzero() const
 	{
 		static complex zero(0.0,0.0);
@@ -42,6 +46,8 @@ public:
 			}
 	}
 	
+	using sparsematrix<polynomial>::operator=;
+
 	polynomial& getzero() const
 	{
 		static polynomial zero;
@@ -119,6 +125,8 @@ public:
 				set(i,j, tmp);
 			}
 	}
+	
+	using pmatrix::operator=;
 };
 
 
@@ -147,6 +155,8 @@ public:
 				set(i,j, tmp);
 			}
 	}
+	
+	using pmatrix::operator=;
 };
 
 
@@ -164,6 +174,8 @@ public:
 			set(i, tmp);
 		}
 	}
+	
+	using sparsevector<polynomial>::operator=;
 	
 	polynomial& getzero() const
 	{
@@ -238,6 +250,8 @@ public:
 			set(i, tmp);
 		}
 	}
+
+	using pvector::operator=;
 };
 
 
@@ -264,4 +278,6 @@ public:
 			set(i, tmp);
 		}
 	}
+
+	using pvector::operator=;
 };

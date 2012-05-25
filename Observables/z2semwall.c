@@ -100,7 +100,10 @@ static void create_diluted_source_even(spinor_field *source, int tau, int beta) 
 
 
 
-static double hmass, hmass_pre;
+#ifndef NDEBUG
+static double hmass;
+#endif
+static double hmass_pre;
 
 #ifndef NDEBUG
 static void D(spinor_field *out, spinor_field *in){
@@ -138,7 +141,9 @@ static void z2semwall_qprop_init(int nm, double *m, double acc) {
     shift=(double*)malloc(sizeof(double)*(nm));
     mass=(double*)malloc(sizeof(double)*(nm));
     hmass_pre=m[0]; /* we can put any number here!!! */
+#ifndef NDEBUG
     hmass=m[0]; /* we can put any number here!!! */
+#endif
     for(i=0;i<nm;++i){
       mass[i]=m[i];
       shift[i]=(4.+hmass_pre)*(4.+hmass_pre)-(4.+m[i])*(4.+m[i]);

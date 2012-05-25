@@ -12,15 +12,15 @@
 #define BORDERSIZE 1
 
 typedef struct _geometry_descriptor {
-  unsigned int local_master_pieces, total_master_pieces;
-  unsigned int *master_start, *master_end;
-  unsigned int ncopies;
-  unsigned int *copy_from, *copy_to, *copy_len;
-  unsigned int nbuffers;
-  unsigned int *rbuf_len, *sbuf_len;
-  unsigned int *rbuf_from_proc, *rbuf_start;
-  unsigned int *sbuf_to_proc, *sbuf_start;
-  unsigned int gsize;
+  int local_master_pieces, total_master_pieces;
+  int *master_start, *master_end;
+  int ncopies;
+  int *copy_from, *copy_to, *copy_len;
+  int nbuffers;
+  int *rbuf_len, *sbuf_len;
+  int *rbuf_from_proc, *rbuf_start;
+  int *sbuf_to_proc, *sbuf_start;
+  int gsize;
 } geometry_descriptor;
 
 #define _PIECE_FOR(type,i) \

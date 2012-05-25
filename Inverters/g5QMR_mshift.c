@@ -80,7 +80,7 @@ static double spinor_field_sqnorm_f_f2d(spinor_field_flt *s1)
 static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out){
   
   spinor_field **q1,**q2;
-  spinor_field *p1, *p2, *Mp, *sd;
+  spinor_field *p1, *p2, *Mp;
   spinor_field *sptmp, *memall;
   
   double alpha, beta, delta, rho, innorm2; 
@@ -105,7 +105,7 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
   /* implementation note: to minimize the number of malloc calls
   * objects of the same type are allocated together
   */
-  memall = alloc_spinor_field_f(2*(par->n)+4,in->type);
+  memall = alloc_spinor_field_f(2*(par->n)+3,in->type);
   q1 = (spinor_field**)malloc(sizeof(spinor_field*)*par->n);
   q2 = (spinor_field**)malloc(sizeof(spinor_field*)*par->n);
   for(i=0; i<par->n; i++) {
@@ -115,7 +115,6 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
   p1 = memall+2*par->n;
   p2 = p1+1;
   Mp = p2+1;
-  sd = Mp+1;
   
   r = (double *)malloc(sizeof(double)*5*(par->n));
   s1 = r+(par->n);
@@ -286,7 +285,7 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
 static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operator_flt M, spinor_field_flt *in, spinor_field_flt *out){
   
   spinor_field_flt *q1,*q2;
-  spinor_field_flt *p1, *p2, *Mp, *sd;
+  spinor_field_flt *p1, *p2, *Mp;
   spinor_field_flt *sptmp, *memall;
   #ifndef NDEBUG
   spinor_field_flt *sdbg;
@@ -310,13 +309,12 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
   /* implementation note: to minimize the number of malloc calls
   * objects of the same type are allocated together
   */
-  memall = alloc_spinor_field_f_flt(2+4,in->type);
+  memall = alloc_spinor_field_f_flt(2+3,in->type);
   q1 = memall;
   q2 = q1+1;
   p1 = q2+1;
   p2 = p1+1;
   Mp = p2+1;
-  sd = Mp+1;
   
   #ifndef NDEBUG
   sdbg = alloc_spinor_field_f_flt(1,in->type);
@@ -367,7 +365,7 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
     maxm=1.e-10; /* to check if the error is going down */
     
     if (flag) {
-      float a, t, e, d, m;
+      double a, t, e, d, m;
       a=alpha;
       t=s1*beta;
       e=c2*c1*beta+s2*a;
@@ -396,18 +394,18 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
       /* update residuum */
       r*=-s2;
       
-      if(fabs(r*r)*(float)(1+cgiter)<err2*innorm2){
+      if(fabs(r*r)*(double)(1+cgiter)<err2*innorm2){
         flag=0;
         --notconverged;
         lprintf("INVERTER",60,"g5QMR_core_flt: vect converged at iter: %d\n",cgiter);
       } else {
-        lprintf("INVERTER",60,"g5QMR_core_flt: iter: %d res: %1.8e s2: %1.8e m=%1.8e\n",cgiter,fabs(r*r)*(float)(1+cgiter)/innorm2,s2,m);
+        lprintf("INVERTER",60,"g5QMR_core_flt: iter: %d res: %1.8e s2: %1.8e m=%1.8e\n",cgiter,fabs(r*r)*(double)(1+cgiter)/innorm2,s2,m);
       }
       
     }
     
     if (fabs(rho)> 1.e-5) {
-      float olddelta;
+      double olddelta;
       
       /*normalize p2 */
       spinor_field_mul_f_flt(p2,1./rho,p2);
@@ -442,7 +440,7 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
   } while ((max_iter==0 || cgiter<max_iter) && notconverged);
   
   /* test results */
-  float norm;
+  double norm;
   M(Mp,out);
   ++cgiter;
   spinor_field_sub_f_flt(Mp,Mp,in);

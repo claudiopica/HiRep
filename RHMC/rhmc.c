@@ -114,7 +114,7 @@ input_eigval eigval_var = init_input_eigval(eigval_var);
 rhmc_flow flow=init_rhmc_flow(flow);
 
 
-void read_cmdline(int argc, char* argv[]) {
+static void read_cmdline(int argc, char* argv[]) {
   int i, am=0;
 
   for (i=1;i<argc;i++) {
@@ -130,7 +130,7 @@ void read_cmdline(int argc, char* argv[]) {
 
 
 double h2evamass=0.;
-void H2eva(spinor_field *out, spinor_field *in){
+static void H2eva(spinor_field *out, spinor_field *in){
   g5Dphi_sq(h2evamass, out, in);
 }
 
@@ -140,7 +140,6 @@ int main(int argc,char *argv[])
 {
   int i, acc, rc;
   char sbuf[128];
-  double mass;
 
   /* setup process id and communications */
   setup_process(&argc,&argv);
@@ -213,7 +212,7 @@ int main(int argc,char *argv[])
     lprintf("OBSERVABLES",0,"EVA Relative precision (eva:omega2) = %e\n",eigval_var.omega2);
   }
 
-  h2evamass=mass=flow.rhmc_v->rhmc_p.mass;
+  h2evamass=flow.rhmc_v->rhmc_p.mass;
 
   double *eva_vals=NULL;
   spinor_field *eva_vecs=NULL;

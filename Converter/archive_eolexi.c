@@ -132,7 +132,7 @@ void write_gauge_field_eolexi_BE(char filename[])
   if(PID==0) {
     error((fp=fopen(filename,"wb"))==NULL,1,"write_gauge_field_eolexi",
         "Failed to open file for writing");
-    error(fwrite_BE_double((double*)eolexi_field,4*GLB_T*GLB_X*GLB_Y*GLB_Z*sizeof(suNg)/sizeof(double),fp)!=4*GLB_T*GLB_X*GLB_Y*GLB_Z*sizeof(suNg)/sizeof(double),
+    error(fwrite_BE_double((double*)eolexi_field,4*GLB_T*GLB_X*GLB_Y*GLB_Z*sizeof(suNg)/sizeof(double),fp)!=4*GLB_T*GLB_X*GLB_Y*GLB_Z*(int)sizeof(suNg)/(int)sizeof(double),
         1,"write_gauge_field_eolexi",
         "Failed to write gauge field to file");
     fclose(fp);
@@ -157,7 +157,7 @@ void read_gauge_field_eolexi_BE(char filename[])
   if(PID==0) {
     error((fp=fopen(filename,"rb"))==NULL,1,"read_gauge_field_eolexi",
         "Failed to open file for reading");
-    error(fread_BE_double((double*)eolexi_field,4*GLB_T*GLB_X*GLB_Y*GLB_Z*sizeof(suNg)/sizeof(double),fp)!=4*GLB_T*GLB_X*GLB_Y*GLB_Z*sizeof(suNg)/sizeof(double),
+    error(fread_BE_double((double*)eolexi_field,4*GLB_T*GLB_X*GLB_Y*GLB_Z*sizeof(suNg)/sizeof(double),fp)!=4*GLB_T*GLB_X*GLB_Y*GLB_Z*(int)sizeof(suNg)/(int)sizeof(double),
         1,"read_gauge_field_eolexi",
         "Failed to read gauge field from file");
   }
@@ -307,7 +307,7 @@ void write_gauge_field_eolexi_LE(char filename[])
   if(PID==0) {
     error((fp=fopen(filename,"wb"))==NULL,1,"write_gauge_field_eolexi",
         "Failed to open file for writing");
-    error(fwrite_LE_double((double*)eolexi_field,4*GLB_T*GLB_X*GLB_Y*GLB_Z*sizeof(suNg)/sizeof(double),fp)!=4*GLB_T*GLB_X*GLB_Y*GLB_Z*sizeof(suNg)/sizeof(double),
+    error(fwrite_LE_double((double*)eolexi_field,4*GLB_T*GLB_X*GLB_Y*GLB_Z*sizeof(suNg)/sizeof(double),fp)!=4*GLB_T*GLB_X*GLB_Y*GLB_Z*(int)sizeof(suNg)/(int)sizeof(double),
         1,"write_gauge_field_eolexi",
         "Failed to write gauge field to file");
     fclose(fp);
@@ -332,7 +332,7 @@ void read_gauge_field_eolexi_LE(char filename[])
   if(PID==0) {
     error((fp=fopen(filename,"rb"))==NULL,1,"read_gauge_field_eolexi",
         "Failed to open file for reading");
-    error(fread_LE_double((double*)eolexi_field,4*GLB_T*GLB_X*GLB_Y*GLB_Z*sizeof(suNg)/sizeof(double),fp)!=4*GLB_T*GLB_X*GLB_Y*GLB_Z*sizeof(suNg)/sizeof(double),
+    error(fread_LE_double((double*)eolexi_field,4*GLB_T*GLB_X*GLB_Y*GLB_Z*sizeof(suNg)/sizeof(double),fp)!=4*GLB_T*GLB_X*GLB_Y*GLB_Z*(int)sizeof(suNg)/(int)sizeof(double),
         1,"read_gauge_field_eolexi",
         "Failed to read gauge field from file");
   }

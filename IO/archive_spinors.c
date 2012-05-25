@@ -80,7 +80,7 @@ void write_spinor_field(char filename[],spinor_field* sp)
         glb_to_proc(g, p); /* get the processor coordinate */
 #endif
         for (p[3]=0;p[3]<NP_Z;++p[3]) { /* loop over processors in Z direction */
-          int bsize=sizeof(suNf_spinor)/sizeof(double)*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
+          unsigned int bsize=sizeof(suNf_spinor)/sizeof(double)*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
 #ifdef WITH_MPI
           MPI_Cart_rank(cart_comm, p, &cid);
           MPI_Group_translate_ranks(cg, 1, &cid, wg, &pid);
@@ -231,7 +231,7 @@ void read_spinor_field(char filename[], spinor_field *sp)
         glb_to_proc(g, p); /* get the processor coordinate */
 #endif
         for (p[3]=0;p[3]<NP_Z;++p[3]) { /* loop over processors in Z direction */
-          int bsize=sizeof(suNf_spinor)/sizeof(double)*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
+          unsigned int bsize=sizeof(suNf_spinor)/sizeof(double)*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
 #ifdef WITH_MPI
           MPI_Cart_rank(cart_comm, p, &cid);
           MPI_Group_translate_ranks(cg, 1, &cid, wg, &pid);

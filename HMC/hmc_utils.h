@@ -48,7 +48,7 @@ typedef struct _input_hmc {
     {"nsteps", "nsteps = %u", UNSIGNED_T, &(varname).hmc_p.nsteps},\
     {"hsteps", "hsteps = %u", UNSIGNED_T, &(varname).hmc_p.hsteps},\
     {"gsteps", "gsteps = %u", UNSIGNED_T, &(varname).hmc_p.gsteps},\
-    {"hasenbush", "hasenbush = %d", INT_T, &(varname).hmc_p.hasenbush},\
+    {"hasenbusch", "hasenbusch = %d", INT_T, &(varname).hmc_p.hasenbusch},\
     {NULL, NULL, 0, NULL}\
   }\
 }

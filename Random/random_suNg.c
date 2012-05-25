@@ -23,7 +23,7 @@ static double s[4];
 static suNg_vector *pu1,*pu2;
 
 
-void random_su2(double rho,double s[]);
+extern void random_su2(double rho,double s[]);
 
 
 void random_suNg_unit_vector(suNg_vector *v)
@@ -84,56 +84,5 @@ void random_suNg(suNg *u) {
 	  ++pu1; 
   }
 
-}
-
-/* this generates a U(N) matrix but not necessarely in SU(N) */
-void random_suNg_old(suNg *u)
-{
-  int i, j;
-  double norm=0.f,fact;
-  suNg_vector *v1,*v2;
-  complex z;
-  
-  v1=(suNg_vector*)(u);
-  v2=v1+1;
-  
-  random_suNg_unit_vector(v1);
-  for (i=1; i<NG; ++i) {
-    while ((1.0+norm)==1.0) {
-      random_suNg_unit_vector(v2);
-      for (j=i; j>0; --j) {
-	_vector_prod_re_g(z.re,*v1, *v2);
-	_vector_prod_im_g(z.im,*v1, *v2);
-	_vector_project_g(*v2, z, *v1); 
-	++v1;
-      }
-      _vector_prod_re_g(norm,*v2,*v2);
-      norm=sqrt(norm);
-    }        
-    fact=1.0/norm;
-    _vector_mul_g(*v2,fact,*v2); /* normalize v2 */
-    norm=0.;
-    ++v2;
-    v1=(suNg_vector*)(u);
-  }
-  /* TEST */
-  /*
-  v1=(suNg_vector*)(u);
-  v2=v1;
-  for (i=0; i<NG; ++i) {
-    norm = _vector_prod_re_g(*v2, *v2);
-    printf("norm2 %d= %4.5f\n", i, norm);
-    v2++;
-  }
-  for (i=0; i<NG-1; ++i) {
-    for (j=1+i; j<NG; ++j){
-      v1=(suNg_vector*)(u)+i;
-      v2=(suNg_vector*)(u)+j;
-      z.re = _vector_prod_re_g(*v1, *v2);
-      z.im = _vector_prod_im_g(*v1, *v2);
-      printf("prod %d %d= (%4.5f,%4.5f)\n", i+1,j+1, z.re,z.im);
-    }
-  }
-  */
 }
 

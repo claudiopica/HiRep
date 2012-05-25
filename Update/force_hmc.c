@@ -78,7 +78,7 @@ _suNf_FMAT((u),p)
 
 
 static double static_mass=0.;
-void D(spinor_field *out, spinor_field *in){
+static void D(spinor_field *out, spinor_field *in){
   #ifdef UPDATE_EO
   Dphi_eopre(static_mass, out, in);
   #else
@@ -87,7 +87,7 @@ void D(spinor_field *out, spinor_field *in){
 }
 
 
-void D_flt(spinor_field_flt *out, spinor_field_flt *in){
+static void D_flt(spinor_field_flt *out, spinor_field_flt *in){
   #ifdef UPDATE_EO
   Dphi_eopre_flt((float)(static_mass), out, in);
   #else
@@ -129,7 +129,6 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
   static suNf_vector ptmp;
   static suNf_spinor p;
   static suNf s1;
-  static MINRES_par inv_par;
   #ifdef UPDATE_EO
   spinor_field Xe, Xo, Ye, Yo;
   #endif
@@ -149,7 +148,6 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
   #endif
   
   
-  inv_par.max_iter=0;
   cgiter=0;
   
   for (k=0; k<par->n_pf; ++k) {
