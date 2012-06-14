@@ -78,6 +78,7 @@ typedef struct _rhmc_par {
   double SF_ds;
   int SF_sign;
   double SF_ct;
+  double SF_prec;
   
   double MT_prec; /* metropolis test precision */
   double MD_prec; /* molecular dynamics precision */

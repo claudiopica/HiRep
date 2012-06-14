@@ -39,6 +39,7 @@ SF_zf = 1.
 SF_ds = 1.
 SF_ct = 1.
 SF_sign = 1
+SF_prec = 1.e-20
 
 // Run control variables
 run name = run1

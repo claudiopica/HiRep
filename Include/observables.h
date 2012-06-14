@@ -26,7 +26,8 @@ double avr_plaquette();
 double SF_action(double beta);
 double local_plaq(int ix);
 void full_plaquette();
-double SF_PCAC_wall_mass(double mass);
+void SF_PCAC_wall_mass(double mass, double acc);
+void SF_quark_propagator(spinor_field *in, double mass, spinor_field *out, double acc);
 
 void polyakov();
 
