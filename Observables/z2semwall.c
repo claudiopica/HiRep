@@ -93,7 +93,7 @@ static void create_diluted_source_even(spinor_field *source, int tau, int beta) 
   
 #ifndef NDEBUG
   double norm=spinor_field_sqnorm_f(source);
-  lprintf("Z2SEMWALL",0,"Source sqnorm (must be %d) = %e\n",NF*GLB_X*GLB_Y*GLB_Z/2,norm);
+  lprintf("Z2SEMWALL",0,"Source sqnorm (must be %.0f) = %e\n",(.5*NF)*GLB_VOL3,norm);
 #endif
 }
 #endif
@@ -523,9 +523,9 @@ void z2semwall_mesons(int conf, int nhits, int nm, double *m, double acc) {
     global_sum(corr[k],GLB_T*nm);
     for(i=0; i<nm*GLB_T; i++)
 #ifdef POINT_TO_ALL
-      corr[k][i] *= -1./(GLB_X*GLB_Y*GLB_Z);
+      corr[k][i] *= -1./GLB_VOL3;
 #else
-      corr[k][i] *= -2./(GLB_X*GLB_Y*GLB_Z*GLB_X*GLB_Y*GLB_Z*nhits);
+      corr[k][i] *= -((2./nhits)/GLB_VOL3)/GLB_VOL3;
 #endif
   }
 

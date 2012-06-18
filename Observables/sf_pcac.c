@@ -161,11 +161,11 @@ void SF_PCAC_wall_mass(double mass, double acc )
 
   global_sum((double*)f_P,GLB_T);
   for(ix0=0;ix0<GLB_T-1;ix0++)
-    lprintf("PC_wall_AC",10,"f_Ppost%d = %.10e\n",ix0,f_P[ix0]/(double)(GLB_X*GLB_Y*GLB_Z));	
+    lprintf("PC_wall_AC",10,"f_Ppost%d = %.10e\n",ix0,f_P[ix0]/(double)GLB_VOL3);	
 
   global_sum((double*)f_A,GLB_T);
   for(ix0=0;ix0<GLB_T-1;ix0++)
-    lprintf("PC_wall_AC",10,"f_Apost%d = %.10e\n",ix0,f_A[ix0]/(double)(GLB_X*GLB_Y*GLB_Z));	
+    lprintf("PC_wall_AC",10,"f_Apost%d = %.10e\n",ix0,f_A[ix0]/(double)GLB_VOL3);	
   
 
   /*f_1 - NEED TO DO EACH color/dirac component separately, then combine at the end*/
@@ -196,7 +196,7 @@ void SF_PCAC_wall_mass(double mass, double acc )
       f_1+=temp;
     }
   }
-  lprintf("PC_wall_AC",0,"f1 = %.10e\n",f_1/((double)(GLB_X*GLB_Y*GLB_Z*GLB_X*GLB_Y*GLB_Z)));
+  lprintf("PC_wall_AC",0,"f1 = %.10e\n",f_1/(double)GLB_VOL3/(double)GLB_VOL3);
   lprintf("PC_wall_AC",0,"ZP_pos = %.10e\n",(sqrt(f_1)/(f_P[(int)(GLB_X/2)])));
   
   for (ix0=2;ix0<GLB_T-3;ix0++)
@@ -251,11 +251,11 @@ void SF_PCAC_wall_mass(double mass, double acc )
   
   global_sum((double*)f_Pt,GLB_T);
   for(ix0=0;ix0<GLB_T-1;ix0++)
-    lprintf("PC_wall_AC",10,"f_Pnegt%d = %.10e\n",ix0,f_Pt[ix0]/(double)(GLB_X*GLB_Y*GLB_Z));	
+    lprintf("PC_wall_AC",10,"f_Pnegt%d = %.10e\n",ix0,f_Pt[ix0]/(double)GLB_VOL3);	
 
   global_sum((double*)f_At,GLB_T);
   for(ix0=0;ix0<GLB_T-1;ix0++)
-    lprintf("PC_wall_AC",10,"f_Anegt%d = %.10e\n",ix0,f_At[ix0]/(double)(GLB_X*GLB_Y*GLB_Z));	
+    lprintf("PC_wall_AC",10,"f_Anegt%d = %.10e\n",ix0,f_At[ix0]/(double)GLB_VOL3);	
 
   lprintf("PC_wall_AC",0,"ZP_neg = %.10e\n",(sqrt(f_1)/(f_Pt[(int)(GLB_X/2)])));
   
@@ -376,7 +376,7 @@ gaud+ = - 1/2 sum tr  g0  Hdd^(-1)(x:2,y) U0(1,y)^dag  Q- csi csi^dag  Q- U0(1,z
       sptr[0] = _FIELD_AT(&prop[s],i);
       _spinor_prod_re_f(temp,*sptr[0],*sptr[0]);
       /*gpud*/
-      gp[(COORD[0]*T+ix0-1+GLB_T)%GLB_T] += .5*(temp)/(GLB_X*GLB_Y*GLB_Z);
+      gp[(COORD[0]*T+ix0-1+GLB_T)%GLB_T] += .5*(temp)/GLB_VOL3;
  
       /*gaud*/
       /*-gamma_0*/
@@ -386,7 +386,7 @@ gaud+ = - 1/2 sum tr  g0  Hdd^(-1)(x:2,y) U0(1,y)^dag  Q- csi csi^dag  Q- U0(1,z
       stmp[0].c[3]=sptr[0]->c[1];
 
       _spinor_prod_re_f(temp,*sptr[0],stmp[0]);
-      ga[(COORD[0]*T+ix0-1+GLB_T)%GLB_T] += .5*temp/(GLB_X*GLB_Y*GLB_Z);
+      ga[(COORD[0]*T+ix0-1+GLB_T)%GLB_T] += .5*temp/GLB_VOL3;
 
 
     }
@@ -474,7 +474,7 @@ Q+ = |             | * 1/2
     
     g1+=temp;
   }
-  g1*=.5/(GLB_X*GLB_Y*GLB_Z*GLB_X*GLB_Y*GLB_Z);
+  g1*=(.5/GLB_VOL3)/GLB_VOL3;
   
   global_sum((double*)(&g1),1);
   lprintf("PC_twisted_AC",10," g1_ud_+ = %.10e\n",g1);	

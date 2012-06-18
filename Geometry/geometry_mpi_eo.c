@@ -376,22 +376,6 @@ static void fix_geometry_descriptor()
 static void geometry_mpi_init()
 {
   int i,BOR_CUBE,BOR_SQUARE,L3_BORDER;
-  
-	X_BORDER=(NP_X>1)?BORDERSIZE:0;
-	Y_BORDER=(NP_Y>1)?BORDERSIZE:0;
-	Z_BORDER=(NP_Z>1)?BORDERSIZE:0;
-	T_BORDER=(NP_T>1)?BORDERSIZE:0;
-
-  error(T-2*T_BORDER<0,1,"geometry_mpi_init [geometry_mpi.c]","Too large T Border in the geometry");
-  error(X-2*X_BORDER<0,1,"geometry_mpi_init [geometry_mpi.c]","Too large X Border in the geometry");
-  error(Y-2*Y_BORDER<0,1,"geometry_mpi_init [geometry_mpi.c]","Too large Y Border in the geometry");
-  error(Z-2*Z_BORDER<0,1,"geometry_mpi_init [geometry_mpi.c]","Too large Z Border in the geometry");
-
-  X_EXT=X+2*X_BORDER;
-  Y_EXT=Y+2*Y_BORDER;
-  Z_EXT=Z+2*Z_BORDER;
-  T_EXT=T+2*T_BORDER;
-
 
   OVERSIZE_VOLUME=((X+2*X_BORDER)*(Y+2*Y_BORDER)*(Z+2*Z_BORDER)*(T+2*T_BORDER));
 

@@ -29,9 +29,11 @@ GLB_VAR(int,T,=0); /* local lattice size in direction T */
 GLB_VAR(int,X,=0); /* local lattice size in direction X */
 GLB_VAR(int,Y,=0); /* local lattice size in direction Y */
 GLB_VAR(int,Z,=0); /* local lattice size in direction Z */
+GLB_VAR(long int,GLB_VOL3,=0); 
+GLB_VAR(long int,GLB_VOLUME,=0);
 /* this two probably are not more needed... */
-GLB_VAR(int,VOL3,=0); 
-GLB_VAR(int,VOLUME,=0);
+GLB_VAR(long int,VOL3,=0); 
+GLB_VAR(long int,VOLUME,=0);
 
 /* Nodes attributes
  * NP = number of processes in each direction 

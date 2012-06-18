@@ -567,7 +567,7 @@ void WL_correlators(double** ret, const suNg_field* gf, const suNg* poly, const 
               buf_gtf[0][_WL_4VOL_INDEX(t0,x0,y0,z0)],
               buf_gtf[1][_WL_4VOL_INDEX(t1,x0,y0,z0)]);
             _suNg_trace_re(dtmp,tmp[0]);
-            ret[s][((DT-1)*T+t1-t0+GLB_T)%GLB_T]+=dtmp/(GLB_T*GLB_X*GLB_Y*GLB_Z);
+            ret[s][((DT-1)*T+t1-t0+GLB_T)%GLB_T]+=dtmp/GLB_VOLUME;
           }
         } else {
           for(int x0=0;x0<X;x0++) for(int y0=0;y0<Y;y0++) for(int z0=0;z0<Z;z0++) {
@@ -578,7 +578,7 @@ void WL_correlators(double** ret, const suNg_field* gf, const suNg* poly, const 
             _suNg_times_suNg_dagger(tmp[1],tmp[0],buf_gtf[1][_WL_4VOL_INDEX(t1,x0,y0,z0)]);
             _suNg_times_suNg_dagger(tmp[0],tmp[1],poly[_WL_3VOL_INDEX(x0,y0,z0)]);
             _suNg_trace_re(dtmp,tmp[0]);
-            ret[s][((DT-1)*T+t1-t0+GLB_T)%GLB_T]+=dtmp/(GLB_T*GLB_X*GLB_Y*GLB_Z);
+            ret[s][((DT-1)*T+t1-t0+GLB_T)%GLB_T]+=dtmp/GLB_VOLUME;
           }
         }
       }

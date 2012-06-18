@@ -239,9 +239,9 @@ void polyakov() {
     global_sum((double*)&adjpoly,1);
   
     
-    poly.re /= NG*GLB_X*GLB_Y*GLB_Z*GLB_T/loc[mu];
-    poly.im /= NG*GLB_X*GLB_Y*GLB_Z*GLB_T/loc[mu];
-    adjpoly /= NG*GLB_X*GLB_Y*GLB_Z*GLB_T/loc[mu];
+    poly.re /= NG*(GLB_VOLUME/loc[mu]);
+    poly.im /= NG*(GLB_VOLUME/loc[mu]);
+    adjpoly /= NG*(GLB_VOLUME/loc[mu]);
     
     lprintf("FUND_POLYAKOV",0,"Polyakov direction %d = %1.8e %1.8e\n",mu,poly.re,poly.im);
     lprintf("ADJ_POLYAKOV",0,"Polyakov direction %d = %1.8e\n",mu,adjpoly);

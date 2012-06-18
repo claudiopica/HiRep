@@ -72,7 +72,7 @@ void name##_correlator(double *out, int t0, spinor_field *qp) { \
         hc += (_S3_)*_tmp; \
       } \
     } \
-    out[(COORD[0]*T+t+GLB_T-t0)%GLB_T] = (_SIGN_)*hc/(GLB_X*GLB_Y*GLB_Z); \
+    out[(COORD[0]*T+t+GLB_T-t0)%GLB_T] = (_SIGN_)*hc/GLB_VOL3; \
   } \
   global_sum(out,GLB_T); \
 }
@@ -120,7 +120,7 @@ void name##_re_correlator(double *out, int t0, spinor_field *qp) { \
         hc += (_T3_)*_tmp; \
       } \
     } \
-    out[(COORD[0]*T+t+GLB_T-t0)%GLB_T] = -(_SIGN_)*hc/(GLB_X*GLB_Y*GLB_Z); \
+    out[(COORD[0]*T+t+GLB_T-t0)%GLB_T] = -(_SIGN_)*hc/GLB_VOL3; \
   } \
   global_sum(out,GLB_T); \
 }
@@ -168,7 +168,7 @@ void name##_im_correlator(double *out, int t0, spinor_field *qp) { \
         hc += (_T3_)*_tmp; \
       } \
     } \
-    out[(COORD[0]*T+t+GLB_T-t0)%GLB_T] = -(_SIGN_)*hc/(GLB_X*GLB_Y*GLB_Z); \
+    out[(COORD[0]*T+t+GLB_T-t0)%GLB_T] = -(_SIGN_)*hc/GLB_VOL3; \
   } \
   global_sum(out,GLB_T); \
 }

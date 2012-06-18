@@ -467,7 +467,7 @@ int main(int argc,char *argv[]) {
         norm+=tmp;
       }
     }
-    norm=sqrt(norm/(4*GLB_T*GLB_X*GLB_Y*GLB_Z*NG*NG*2));
+    norm=sqrt(norm/(8.*NG*NG)/GLB_VOLUME);
     
     lprintf("MAIN",0,"Average distance from unitarity = %e\n",norm);
   } else {

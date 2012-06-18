@@ -19,6 +19,114 @@
 
 static int *alloc_mem=NULL;
 
+
+static void check_geometry_variables() {
+  int tmp;
+  long int ltmp;
+
+  error(GLB_T<=0,1,"check_geometry_variables " __FILE__,"GLB_T <= 0");
+  error(GLB_X<=0,1,"check_geometry_variables " __FILE__,"GLB_X <= 0");
+  error(GLB_Y<=0,1,"check_geometry_variables " __FILE__,"GLB_Y <= 0");
+  error(GLB_Z<=0,1,"check_geometry_variables " __FILE__,"GLB_Z <= 0");
+
+  error(T<=0,1,"check_geometry_variables " __FILE__,"T <= 0");
+  error(X<=0,1,"check_geometry_variables " __FILE__,"X <= 0");
+  error(Y<=0,1,"check_geometry_variables " __FILE__,"Y <= 0");
+  error(Z<=0,1,"check_geometry_variables " __FILE__,"Z <= 0");
+
+  error(T_EXT<=0,1,"check_geometry_variables " __FILE__,"T_EXT <= 0");
+  error(X_EXT<=0,1,"check_geometry_variables " __FILE__,"X_EXT <= 0");
+  error(Y_EXT<=0,1,"check_geometry_variables " __FILE__,"Y_EXT <= 0");
+  error(Z_EXT<=0,1,"check_geometry_variables " __FILE__,"Z_EXT <= 0");
+
+  error(NP_T<=0,1,"check_geometry_variables " __FILE__,"NP_T <= 0");
+  error(NP_X<=0,1,"check_geometry_variables " __FILE__,"NP_X <= 0");
+  error(NP_Y<=0,1,"check_geometry_variables " __FILE__,"NP_Y <= 0");
+  error(NP_Z<=0,1,"check_geometry_variables " __FILE__,"NP_Z <= 0");
+  
+  error(T_BORDER<0,1,"check_geometry_variables " __FILE__,"T_BORDER < 0");
+  error(X_BORDER<0,1,"check_geometry_variables " __FILE__,"X_BORDER < 0");
+  error(Y_BORDER<0,1,"check_geometry_variables " __FILE__,"Y_BORDER < 0");
+  error(Z_BORDER<0,1,"check_geometry_variables " __FILE__,"Z_BORDER < 0");
+
+  error(T<=2*T_BORDER,1,"check_geometry_variables " __FILE__,"T <= 2*T_BORDER");
+  error(X<=2*X_BORDER,1,"check_geometry_variables " __FILE__,"X <= 2*X_BORDER");
+  error(Y<=2*Y_BORDER,1,"check_geometry_variables " __FILE__,"Y <= 2*Y_BORDER");
+  error(Z<=2*Z_BORDER,1,"check_geometry_variables " __FILE__,"Z <= 2*Z_BORDER");
+
+  error(WORLD_SIZE<=0,1,"check_geometry_variables " __FILE__,"WORLD_SIZE < 0");
+  error(CART_SIZE<=0,1,"check_geometry_variables " __FILE__,"CART_SIZE < 0");
+  
+  error(
+      (((VOLUME/T)/X)/Y)/Z!=1 || VOLUME%T!=0 || (VOLUME/T)%X!=0 || ((VOLUME/T)/X)%Y!=0 || (((VOLUME/T)/X)/Y)%Z!=0 || VOLUME <= 0,
+      1,"check_geometry_variables " __FILE__,"(long) T*X*Y*Z overflows"
+    );
+  
+  error(
+      ((VOL3/X)/Y)/Z!=1 || VOL3%X!=0 || (VOL3/X)%Y!=0 || ((VOL3/X)/Y)%Z!=0 || VOL3 <= 0,
+      1,"check_geometry_variables " __FILE__,"(long) T*X*Y*Z overflows"
+    );
+  
+  error(
+      (((GLB_VOLUME/GLB_T)/GLB_X)/GLB_Y)/GLB_Z!=1 || GLB_VOLUME%GLB_T!=0 || (GLB_VOLUME/GLB_T)%GLB_X!=0 || ((GLB_VOLUME/GLB_T)/GLB_X)%GLB_Y!=0 || (((GLB_VOLUME/GLB_T)/GLB_X)/GLB_Y)%GLB_Z!=0 || GLB_VOLUME <= 0,
+      1,"check_geometry_variables " __FILE__,"(long) GLB_T*GLB_X*GLB_Y*GLB_Z overflows"
+    );
+  
+  error(
+      ((GLB_VOL3/GLB_X)/GLB_Y)/GLB_Z!=1 || GLB_VOL3%GLB_X!=0 || (GLB_VOL3/GLB_X)%GLB_Y!=0 || ((GLB_VOL3/GLB_X)/GLB_Y)%GLB_Z!=0 || GLB_VOL3 <= 0,
+      1,"check_geometry_variables " __FILE__,"(long) GLB_X*GLB_Y*GLB_Z overflows"
+    );
+  
+  ltmp = 24*NG*GLB_VOLUME;
+  error(ltmp/(24*NG)!=GLB_VOLUME || ltmp%(24*NG)!=0,
+      1,"check_geometry_variables " __FILE__,"(long) 24*NG*GLB_VOLUME overflows (used in Update/staples.c)"
+    );
+
+  
+  tmp = GLB_X*GLB_Y*GLB_Z;
+  if((long int)tmp!=GLB_VOL3) {
+    lprintf("WARNING",0,"(int) GLB_X*GLB_Y*GLB_Z overflows\n");
+  }
+  
+  tmp = GLB_T*GLB_X*GLB_Y*GLB_Z;
+  if((long int)tmp!=GLB_VOLUME) {
+    lprintf("WARNING",0,"(int) GLB_T*GLB_X*GLB_Y*GLB_Z overflows\n");
+  }
+  
+  tmp = X*Y*Z;
+  if((long int)tmp!=VOL3) {
+    lprintf("WARNING",0,"(int) X*Y*Z overflows\n");
+  }
+  
+  tmp = T*X*Y*Z;
+  if((long int)tmp!=VOLUME) {
+    lprintf("WARNING",0,"(int) T*X*Y*Z overflows\n");
+  }
+  
+  tmp = GLB_VOL3*GLB_VOL3;
+  if(tmp/GLB_VOL3!=GLB_VOL3 || tmp%GLB_VOL3!=0) {
+    lprintf("WARNING",0,"(int) GLB_VOL3*GLB_VOL3 overflows\n");
+  }
+  
+  tmp = T_EXT*X_EXT*Y_EXT*Z_EXT;
+  if((((tmp/T_EXT)/X_EXT)/Y_EXT)/Z_EXT!=1 || tmp%T_EXT!=0 || (tmp/T_EXT)%X_EXT!=0 || ((tmp/T_EXT)/X_EXT)%Y_EXT!=0 || (((tmp/T_EXT)/X_EXT)/Y_EXT)%Z_EXT!=0 || tmp <= 0) {
+    lprintf("WARNING",0,"(int) T_EXT*X_EXT*Y_EXT*Z_EXT overflows\n");
+  }
+  
+  tmp = 24*NG*GLB_VOLUME;
+  if(tmp/(24*NG)!=GLB_VOLUME || tmp%(24*NG)!=0) {
+    lprintf("WARNING",0,"(int) 24*NG*GLB_VOLUME overflows\n");
+  }
+
+  ltmp = GLB_VOL3*GLB_VOL3;
+  if(ltmp/GLB_VOL3!=GLB_VOL3 || ltmp%GLB_VOL3!=0) {
+    lprintf("WARNING",0,"(long) GLB_VOL3*GLB_VOL3 overflows\n");
+  }
+
+  lprintf("GEOMETRY",0,"Geometry variable checked\n");
+}
+
+
 static void free_memory() {
   if(alloc_mem!=NULL) {
     free(alloc_mem);
@@ -177,18 +285,34 @@ int geometry_init() {
 
   /* from here on there are no more free parameters to set */
 
+  GLB_VOL3=((long int)GLB_X)*((long int)GLB_Y)*((long int)GLB_Z);
+  GLB_VOLUME=GLB_VOL3*((long int)GLB_T);
+  
   /* compute local lattice size */
   T=compute_dim(COORD[0],GLB_T,NP_T);
   X=compute_dim(COORD[1],GLB_X,NP_X);
   Y=compute_dim(COORD[2],GLB_Y,NP_Y);
   Z=compute_dim(COORD[3],GLB_Z,NP_Z);
 
-  VOL3=X*Y*Z;
-  VOLUME=VOL3*T;
+  VOL3=((long int)X)*((long int)Y)*((long int)Z);
+  VOLUME=VOL3*((long int)T);
 
+	X_BORDER=(NP_X>1)?BORDERSIZE:0;
+	Y_BORDER=(NP_Y>1)?BORDERSIZE:0;
+	Z_BORDER=(NP_Z>1)?BORDERSIZE:0;
+	T_BORDER=(NP_T>1)?BORDERSIZE:0;
+	
+  X_EXT=X+2*X_BORDER;
+  Y_EXT=Y+2*Y_BORDER;
+  Z_EXT=Z+2*Z_BORDER;
+  T_EXT=T+2*T_BORDER;
+  
   lprintf("GEOMETRY",0,"Global size is %dx%dx%dx%d\n",GLB_T,GLB_X,GLB_Y,GLB_Z);
   lprintf("GEOMETRY",0,"Proc grid is %dx%dx%dx%d\n",NP_T,NP_X,NP_Y,NP_Z);
   lprintf("GEOMETRY",0,"Local size is %dx%dx%dx%d\n",T,X,Y,Z);
+  lprintf("GEOMETRY",0,"Extended local size is %dx%dx%dx%d\n",T_EXT,X_EXT,Y_EXT,Z_EXT);
+  
+  check_geometry_variables();
   
   return 0;
 }

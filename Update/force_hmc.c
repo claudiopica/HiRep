@@ -298,7 +298,7 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
       global_sum(forcestat,1);
       global_max(forcestat+1,1);
       
-      forcestat[0]*=(_REPR_NORM2/_FUND_NORM2)/((double)(4*GLB_T*GLB_X*GLB_Y*GLB_Z));
+      forcestat[0]*=(_REPR_NORM2/_FUND_NORM2)/(4.*GLB_VOLUME);
       forcestat[1]*=(_REPR_NORM2/_FUND_NORM2);
       if(par->hasenbusch == 2) {
         forcestat[0]*=par->b;

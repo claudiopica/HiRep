@@ -120,8 +120,8 @@ void test_staples()
   global_sum(&ps,1);
   global_sum(&pl,1);
 
-  ps /= 4.0*(double)(6*GLB_T*GLB_X*GLB_Y*GLB_Z*NG);
-  pl/=(double)(6*GLB_T*GLB_X*GLB_Y*GLB_Z*NG);
+  ps /= 24*NG*GLB_VOLUME;
+  pl /= 6*NG*GLB_VOLUME;
 	lprintf("TESTING",50,"Staple test: ");
   if (fabs(pa-ps)<1.e-6)
 		lprintf("TESTING",50,"PASSED.");
