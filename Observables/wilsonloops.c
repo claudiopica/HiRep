@@ -11,6 +11,17 @@
 #include <math.h>
 #include <string.h>
 
+#if defined(ROTATED_SF) && defined(BASIC_SF)
+#error This code does not work with the Schroedinger functional
+#endif
+
+#ifdef BC_XYZ_TWISTED
+#error This code does not work with the twisted BCs
+#endif
+
+#ifdef BC_T_OPEN
+#error This code does not work with the open BCs
+#endif
 
 
 #define _WL_4VOL_INDEX(t,x,y,z) ((t)+(x)*T+(y)*T*X+(z)*T*X*Y)
@@ -19,6 +30,9 @@ static suNg_field* ws_gtf[2]; /* gtf = gauge transformation field */
 static suNg* buf_gtf[3];
 static suNg* Polyakov;
 static suNg_field* HYP;
+static int rot12=(1==0);
+static int rot13=(1==0);
+static int rot23=(1==0);
 
 struct {
   int c[3];
@@ -46,6 +60,18 @@ void WL_initialize() {
   buf_gtf[1]=amalloc(sizeof(suNg)*T*X*Y*Z,ALIGN);
   buf_gtf[2]=amalloc(sizeof(suNg)*T*X*Y*Z,ALIGN);
   Polyakov=amalloc(sizeof(suNg)*X*Y*Z,ALIGN);
+
+  #if (defined(BC_X_ANTIPERIODIC) && defined(BC_Y_ANTIPERIODIC)) || (defined(BC_X_PERIODIC) && defined(BC_Y_PERIODIC))
+    if(GLB_X==GLB_Y) rot12=(1==1);
+  #endif
+
+  #if (defined(BC_X_ANTIPERIODIC) && defined(BC_Z_ANTIPERIODIC)) || (defined(BC_X_PERIODIC) && defined(BC_Z_PERIODIC))
+    if(GLB_X==GLB_Z) rot13=(1==1);
+  #endif
+
+  #if (defined(BC_Z_ANTIPERIODIC) && defined(BC_Y_ANTIPERIODIC)) || (defined(BC_Z_PERIODIC) && defined(BC_Y_PERIODIC))
+    if(GLB_Z==GLB_Y) rot23=(1==1);
+  #endif
   
   WL_init=(1==1);
 }
@@ -123,14 +149,17 @@ void WL_load_path(int c[3], int nsteps) {
   c[2]=(c[2]>=0)?c[2]:-c[2];
   
   #define _SWAP(a,b) {int tmp=a;a=b;b=tmp;}
-  if(GLB_X==GLB_Y && bc[1]==bc[2]) {
+  if(rot12) {
     if(c[0]<c[1]) _SWAP(c[0],c[1]);
   }
-  if(GLB_Y==GLB_Z && bc[2]==bc[3]) {
+  if(rot23) {
     if(c[1]<c[2]) _SWAP(c[1],c[2]);
   }
-  if(GLB_X==GLB_Y && bc[1]==bc[2]) {
+  if(rot12) {
     if(c[0]<c[1]) _SWAP(c[0],c[1]);
+  }
+  if(rot13) {
+    if(c[0]<c[2]) _SWAP(c[0],c[2]);
   }
   #undef _SWAP
   
@@ -159,7 +188,7 @@ void WL_load_path(int c[3], int nsteps) {
   WL_path[WL_npaths].nsteps=nsteps;
   if(nsteps>WL_max_nsteps) WL_max_nsteps=nsteps;
   
-  if(GLB_X==GLB_Y && GLB_Y==GLB_Z && bc[1]==bc[2] && bc[2]==bc[3]) {
+  if(rot12 && rot23) {
     if(c[0]==c[1] && c[1]==c[2]) {
       WL_path[WL_npaths].nperms=1;
       WL_path[WL_npaths].perm=amalloc(sizeof(int*)*WL_path[WL_npaths].nperms,ALIGN);
@@ -177,7 +206,7 @@ void WL_load_path(int c[3], int nsteps) {
       WL_path[WL_npaths].perm=amalloc(sizeof(int*)*WL_path[WL_npaths].nperms,ALIGN);
       for(int w=0;w<WL_path[WL_npaths].nperms;w++) WL_path[WL_npaths].perm[w]=abc_perm[w];
     }
-  } else if(GLB_X==GLB_Y && bc[1]==bc[2]) {
+  } else if(rot12) {
     if(c[0]==c[1]) {
       WL_path[WL_npaths].nperms=1;
       WL_path[WL_npaths].perm=amalloc(sizeof(int*)*WL_path[WL_npaths].nperms,ALIGN);
@@ -187,7 +216,7 @@ void WL_load_path(int c[3], int nsteps) {
       WL_path[WL_npaths].perm=amalloc(sizeof(int*)*WL_path[WL_npaths].nperms,ALIGN);
       for(int w=0;w<WL_path[WL_npaths].nperms;w++) WL_path[WL_npaths].perm[w]=abX_perm[w];
     }
-  } else if(GLB_Y==GLB_Z && bc[2]==bc[3]) {
+  } else if(rot23) {
     if(c[1]==c[2]) {
       WL_path[WL_npaths].nperms=1;
       WL_path[WL_npaths].perm=amalloc(sizeof(int*)*WL_path[WL_npaths].nperms,ALIGN);
@@ -197,7 +226,7 @@ void WL_load_path(int c[3], int nsteps) {
       WL_path[WL_npaths].perm=amalloc(sizeof(int*)*WL_path[WL_npaths].nperms,ALIGN);
       for(int w=0;w<WL_path[WL_npaths].nperms;w++) WL_path[WL_npaths].perm[w]=Xab_perm[w];
     }
-  } else if(GLB_X==GLB_Z && bc[1]==bc[3]) {
+  } else if(rot13) {
     if(c[0]==c[2]) {
       WL_path[WL_npaths].nperms=1;
       WL_path[WL_npaths].perm=amalloc(sizeof(int*)*WL_path[WL_npaths].nperms,ALIGN);

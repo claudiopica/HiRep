@@ -7,6 +7,16 @@
 #include "observables.h"
 
 
+#if defined(ROTATED_SF) && defined(BASIC_SF)
+#error This code does not work with the Schroedinger functional
+#endif
+
+#ifdef BC_T_OPEN
+#error This code does not work with the open BCs
+#endif
+
+
+
 void polyakov() {
   int x[4], i4d, i3d, size3d;
   int loc[4]={T,X,Y,Z};

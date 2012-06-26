@@ -39,6 +39,10 @@
 #error This code does not work with the twisted BCs
 #endif
 
+#ifdef BC_T_OPEN
+#error This code does not work with the open BCs
+#endif
+
 /* HYP smearing parameters */
 typedef struct _input_HYP {
 /*  int nsteps;*/

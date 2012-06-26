@@ -185,6 +185,11 @@ int main(int argc,char *argv[]) {
   error(fpars.type==UNKNOWN_CNFG,1,"polyakov_loops.c","Bad name for a configuration file");
   error(fpars.nc!=NG,1,"polyakov_loops.c","Bad NG");
 
+  lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed);
+  rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
+
+  lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
+  lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
 
   /* setup communication geometry */
   if (geometry_init() == 1) {
@@ -192,22 +197,11 @@ int main(int argc,char *argv[]) {
     return 0;
   }
 
-  lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
-  lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
-  lprintf("MAIN",0,"global size is %dx%dx%dx%d\n",GLB_T,GLB_X,GLB_Y,GLB_Z);
-  lprintf("MAIN",0,"proc grid is %dx%dx%dx%d\n",NP_T,NP_X,NP_Y,NP_Z);
-  lprintf("MAIN",0,"Fermion boundary conditions: %.2f,%.2f,%.2f,%.2f\n",bc[0],bc[1],bc[2],bc[3]);
-
   /* setup lattice geometry */
   geometry_mpi_eo();
   /* test_geometry_mpi_eo(); */
 
-  lprintf("MAIN",0,"local size is %dx%dx%dx%d\n",T,X,Y,Z);
-  lprintf("MAIN",0,"extended local size is %dx%dx%dx%d\n",T_EXT,X_EXT,Y_EXT,Z_EXT);
-
-#ifdef TWISTED_BC
-  init_twbc();
-#endif
+  init_BCs(NULL);
 
   /* alloc global gauge fields */
   u_gauge=alloc_gfield(&glattice);
@@ -240,10 +234,7 @@ int main(int argc,char *argv[]) {
 
   if(list!=NULL) fclose(list);
 
-
-#ifdef TWISTED_BC
-  free_twbc();
-#endif
+  free_BCs();
  
   free_gfield(u_gauge);
 
