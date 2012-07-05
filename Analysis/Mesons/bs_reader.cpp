@@ -24,51 +24,50 @@ void read_cut(const char *cutFile)
 {
     ifstream CutFile(cutFile);
 
-    
     while(1){
       stringstream line;
       stringbuf sb;
       CutFile.get(sb);
       line << sb.str();
       if(line.good()){
-        string Channel;
-        int left, right;
-      	line>>Channel;
+	string Channel;
+	int left, right;
+	line>>Channel;
         if(Channel.compare("")!=0)
-        if(Channel[0]!='#'){        
-          pair<map<string,int>::iterator,bool> ret; 
-          if(!(line >> left)) {
-            cerr<<"[read_cut]:Missing entry for "<<Channel<<" for left cut"<<endl;
-            exit(1);
-          }
-          ret=eval_ctrl::left_cut.insert(pair<string,int>(Channel,left));
-          if(ret.second==false) {
-            cerr<<"[read_cut]:Duplicate entry for "<<Channel<<" for left cut"<<endl;
-            exit(1);
-          }
-          if(!(line >> right)) {
-            cerr<<"[read_cut]:Missing entry for "<<Channel<<" for right cut"<<endl;
-            exit(1);
-          }
-          ret=eval_ctrl::right_cut.insert(pair<string,int>(Channel,right));
-          if(ret.second==false) {
-            cerr<<"[read_cut]:Duplicate entry for "<<Channel<<" for right cut"<<endl;
-            exit(1);
-          }
-          if(left<0) {
-            cerr<<"[read_cut]:Negative value for "<<Channel<<" for left cut"<<endl;
-            exit(1);
-          }
-          if(right<left) {
-            cerr<<"[read_cut]:Right cut value less than left cut value for "<<Channel<<""<<endl;
-            exit(1);
-          }
-        }
+	  if(Channel[0]!='#'){        
+	    pair<map<string,int>::iterator,bool> ret; 
+	    if(!(line >> left)) {
+	      cerr<<"[read_cut]:Missing entry for "<<Channel<<" for left cut"<<endl;
+	      exit(1);
+	    }
+	    ret=eval_ctrl::left_cut.insert(pair<string,int>(Channel,left));
+	    if(ret.second==false) {
+	      cerr<<"[read_cut]:Duplicate entry for "<<Channel<<" for left cut"<<endl;
+	      exit(1);
+	    }
+	    if(!(line >> right)) {
+	      cerr<<"[read_cut]:Missing entry for "<<Channel<<" for right cut"<<endl;
+	      exit(1);
+	    }
+	    ret=eval_ctrl::right_cut.insert(pair<string,int>(Channel,right));
+	    if(ret.second==false) {
+	      cerr<<"[read_cut]:Duplicate entry for "<<Channel<<" for right cut"<<endl;
+	      exit(1);
+	    }
+	    if(left<0) {
+	      cerr<<"[read_cut]:Negative value for "<<Channel<<" for left cut"<<endl;
+	      exit(1);
+	    }
+	    if(right<left) {
+	      cerr<<"[read_cut]:Right cut value less than left cut value for "<<Channel<<""<<endl;
+	      exit(1);
+	    }
+	  }
+	}
+	if(CutFile.eof()) break;
+	CutFile.clear();
+	CutFile.seekg(1,ios_base::cur);
       }
-      if(CutFile.eof()) break;
-      CutFile.clear();
-      CutFile.seekg(1,ios_base::cur);
-    }
     CutFile.close();
 }
 

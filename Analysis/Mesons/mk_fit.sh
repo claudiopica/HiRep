@@ -1,12 +1,13 @@
 #!/bin/bash
 help(){
-        echo -e "Usage -c<channel> -T<Lt> -L<Ls> -i<input meson> -b<blocksize> -m<method>"
+        echo -e "Usage -c<channel> -T<Lt> -L<Ls> -i<input meson> -b<blocksize> -m<method> [-f]"
 	echo -e "\tc) Channel name"
 	echo -e "\tLt) Length in the T dir"
 	echo -e "\tLs) Length in the Spatial dir"
 	echo -e "\ti) mesonic input file"
 	echo -e "\tb) block size"
 	echo -e "\tm) method of analysis:\n\t   0 -> effective mass\n\t   1 -> Prony no excitation\n\t   2 -> Prony one excitation"
+	echo -e "\tf) force recomputation"
         exit 0;
 }
 
@@ -17,8 +18,9 @@ EXEC="${EXECDIR}/bs_mesons"
 OUTDIR="output"
 RESDIR="results"
 FINALCUTDIR="cut"
+FORCEFLAG=""
 
-while getopts "c:T:L:i:m:b:" opt; do
+while getopts "c:T:L:i:m:b:f" opt; do
     case $opt in
 	h ) help ;;
 	c ) CHANNEL=$OPTARG;;
@@ -27,6 +29,7 @@ while getopts "c:T:L:i:m:b:" opt; do
 	i ) INPUT=$OPTARG;;
 	b ) BLKSIZE=$OPTARG;;
 	m ) METHOD=$OPTARG;;
+	f ) FORCEFLAG="-f";;
 	* ) help ;;
     esac
 done
@@ -78,6 +81,14 @@ NAME="${BASENAME}_M${METHOD}"
 OUTFILE="${OUTDIR}/${NAME}_TMP"
 FINALCUTNAME="${FINALCUTDIR}/${BASENAME}_M${METHOD}"
 
+[ -f ${RESDIR}/${NAME} ] && EVALUATED=`awk '$1=="'$CHANNEL'" {print $2}' ${RESDIR}/${NAME}`
+if [ ! -z "$EVALUATED" ] && [ "$FORCEFLAG" != "-f" ] ; then
+    echo " Channel $CHANNEL already evaluated use the flag -f to force re-evaluation."
+    exit 0;
+fi
+echo " Evaluating channel ${CHANNEL}."
+
+
 if [ ! -f ${FINALCUTNAME} ]
 then
   echo "$0: ${FINALCUTNAME} missing."
@@ -113,7 +124,7 @@ if [ ! -z "$FIT" ]
 then
   awk '$1!="'$CHANNEL'" {print}' ${RESDIR}/${NAME} > ${RESDIR}/${NAME}.tmp
   mv ${RESDIR}/${NAME}.tmp ${RESDIR}/${NAME}
-  grep $OUTFILE -e "10 FIT " | awk '{print $3, $4, $5}' >> ${RESDIR}/${NAME}
+  grep $OUTFILE -e "10 FIT " | awk '{print $3, $4, $5, "#", $7, $9, $11}' >> ${RESDIR}/${NAME}
   rm $OUTFILE
 else
   echo "$0: $EXEC unable to perform the fit for $CHANNEL"
