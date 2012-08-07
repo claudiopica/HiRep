@@ -225,6 +225,7 @@ int main(int argc,char *argv[]) {
   /* read & broadcast parameters */
   parse_cnfg_filename(cnfg_filename,&fpars);
 
+  eig_var.mass=-20.;
   read_input(glb_var.read,input_filename);
   read_input(eig_var.read,input_filename);
   GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
@@ -239,7 +240,7 @@ int main(int argc,char *argv[]) {
 
   if(fpars.type==DYNAMICAL_CNFG)
     hevamass = fpars.m;
-  else if(fpars.type==QUENCHED_CNFG)
+  if(fpars.type==QUENCHED_CNFG || eig_var.mass>-10.)
     hevamass = eig_var.mass;
 
 
