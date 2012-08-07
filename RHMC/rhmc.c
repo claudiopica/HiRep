@@ -76,6 +76,27 @@ typedef struct _input_polyakov {
 
 input_polyakov poly_var = init_input_polyakov(poly_var);
 
+/* Rotated SF parameters */
+typedef struct _input_XSF {
+    char make[256];
+    double precision;
+    
+    /* for the reading function */
+    input_record_t read[3];
+    
+} input_XSF;
+
+#define init_input_XSF(varname) \
+{ \
+.read={\
+{"make Rotated SF measures", "XSF:make = %s", STRING_T, (varname).make},\
+{"inverter precision", "XSF:precision = %lf", DOUBLE_T, &(varname).precision},\
+{NULL, NULL, 0, NULL}\
+}\
+}
+
+input_XSF XSF_var = init_input_XSF(XSF_var);
+
 
 /* Lowest-eigenvalue parameters */
 typedef struct _input_eigval {
@@ -166,6 +187,9 @@ int main(int argc,char *argv[])
   read_input(glb_var.read,"input_file");
   read_input(mes_var.read,"input_file");
   read_input(poly_var.read,"input_file");
+#ifdef ROTATED_SF
+  read_input(XSF_var.read,"input_file");
+#endif //ROTATED_SF
   read_input(eigval_var.read,"input_file");
   
   if(glb_var.rlxd_state[0]!='\0')
@@ -266,7 +290,12 @@ int main(int argc,char *argv[])
       if(strcmp(poly_var.make,"true")==0) {
         polyakov();
       }
-      
+#ifdef ROTATED_SF
+      /* Rotated SF measures */
+      if(strcmp(XSF_var.make,"true")==0) {
+         SF_PCAC_wall_mass(flow.rhmc_v->rhmc_p.mass,XSF_var.precision);
+      }
+#endif
       /* Lowest eigenvalues */
       if(strcmp(eigval_var.make,"true")==0) {
         double max;
