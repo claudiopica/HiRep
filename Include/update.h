@@ -162,7 +162,7 @@ typedef struct _action_par {
   /* sim parameters */
   double beta;
   int n_pf;
-#ifndef ROTATED_SF
+#ifdef ROTATED_SF
   double SF_ct;
 #endif
 } action_par;

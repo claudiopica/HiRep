@@ -209,8 +209,9 @@ void init_rhmc(rhmc_par *par){
 	
   rhmc_action_par.beta = _update_par.beta;
   rhmc_action_par.n_pf = _update_par.n_pf;
+#ifdef ROTATED_SF
   rhmc_action_par.SF_ct = _update_par.SF_ct;
-
+#endif
 	init = 1;
 	
 	lprintf("RHMC",0,"Initialization done.\n");
