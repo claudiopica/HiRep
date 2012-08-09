@@ -25,6 +25,11 @@
 #include "communications_flt.h"
 #include "memory.h"
 
+#ifdef ROTATED_SF
+#include "update.h"
+extern rhmc_par _update_par; /* Update/update_rhmc.c */
+#endif /* ROTATED_SF */
+
 
 /*
  * Init of Dphi_flt
@@ -359,6 +364,12 @@ void Dphi_flt_(spinor_field_flt *out, spinor_field_flt *in)
 void Dphi_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
 {
    double rho;
+#ifdef ROTATED_SF
+    int ix,iy,iz,index;
+    suNf_spinor_flt *r, *sp;
+    float SFrho;
+    suNf_spinor_flt tmp;
+#endif /* ROTATED_SF */
 
    error((in==NULL)||(out==NULL),1,"Dphi_flt [Dphi_flt.c]",
          "Attempt to access unallocated memory space");
@@ -375,6 +386,44 @@ void Dphi_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
 
    rho=4.+m0;
    spinor_field_mul_add_assign_f_flt(out,rho,in);
+    
+#ifdef ROTATED_SF
+    SFrho=3.*_update_par.SF_ds+_update_par.SF_zf-4.;
+    
+	if(COORD[0] == 0) {
+		for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
+			index=ipt(1,ix,iy,iz);
+			r=_FIELD_AT(out,index);
+            sp=_FIELD_AT(in,index);
+			_spinor_mul_add_assign_f(*r,SFrho,*sp);
+			
+			_spinor_pminus_f(tmp,*sp);
+			_spinor_g5_assign_f(tmp);
+			if(_update_par.SF_sign==1) {
+				_spinor_i_add_assign_f(*r,tmp);
+			} else {
+				_spinor_i_sub_assign_f(*r,tmp);
+			}
+		}
+	}
+	if(COORD[0] == NP_T-1) {
+		for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
+			index=ipt(T-1,ix,iy,iz);
+			r=_FIELD_AT(out,index);
+            sp=_FIELD_AT(in,index);
+			_spinor_mul_add_assign_f(*r,SFrho,*sp);
+			
+			_spinor_pplus_f(tmp,*sp);
+			_spinor_g5_assign_f(tmp);
+			if(_update_par.SF_sign==1) {
+				_spinor_i_add_assign_f(*r,tmp);
+			} else {
+				_spinor_i_sub_assign_f(*r,tmp);
+			}
+		}
+	}
+#endif /* ROTATED_SF */
+    
    apply_BCs_on_spinor_field_flt(out);
 
 }
