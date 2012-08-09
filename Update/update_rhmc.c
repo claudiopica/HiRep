@@ -91,11 +91,12 @@ void init_rhmc(rhmc_par *par){
 	  "Number of Flavors = %d\n"
 	  "beta = %.8f\n"
 	  "Mass = %.8f\n"
-	  #ifdef ROTATED_SF
+#ifdef ROTATED_SF
 	  "rotatedSF zf = %.8f\n"
 	  "rotatedSF ds = %.8f\n"
+      "rotatedSF ct = %.8f\n"
 	  "rotatedSF sign = %d\n"
-	  #endif /* ROTATED_SF */
+#endif /* ROTATED_SF */
 	  "Metropolis test precision = %.8e\n"
 	  "MD precision = %.8e\n"
 	  "PF heat-bath precision = %.8e\n"
@@ -107,11 +108,12 @@ void init_rhmc(rhmc_par *par){
 	  ,_update_par.nf
 	  ,_update_par.beta
 	  ,_update_par.mass
-	  #ifdef ROTATED_SF
+#ifdef ROTATED_SF
 	  ,_update_par.SF_zf
 	  ,_update_par.SF_ds
+      ,_update_par.SF_ct
 	  ,_update_par.SF_sign
-	  #endif /* ROTATED_SF */
+#endif /* ROTATED_SF */
 	  ,_update_par.MT_prec
 	  ,_update_par.MD_prec
 	  ,_update_par.HB_prec
