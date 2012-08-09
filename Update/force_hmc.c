@@ -39,11 +39,34 @@
 /* these macros use the variables ptmp, p */
 
 
+#ifdef BC_T_THETA
+#define _T_theta_mulc(r) _vector_mulc_f(ptmp,eitheta[0],(r)); (r)=ptmp
+#else
+#define _T_theta_mulc(r)
+#endif
+#ifdef BC_X_THETA
+#define _X_theta_mulc(r) _vector_mulc_f(ptmp,eitheta[1],(r)); (r)=ptmp
+#else
+#define _X_theta_mulc(r)
+#endif
+#ifdef BC_Y_THETA
+#define _Y_theta_mulc(r) _vector_mulc_f(ptmp,eitheta[2],(r)); (r)=ptmp
+#else
+#define _Y_theta_mulc(r)
+#endif
+#ifdef BC_Z_THETA
+#define _Z_theta_mulc(r) _vector_mulc_f(ptmp,eitheta[3],(r)); (r)=ptmp
+#else
+#define _Z_theta_mulc(r)
+#endif
+
 #define _F_DIR0(u,chi1,chi2)				      \
 _vector_add_f(ptmp,(chi2)->c[0],(chi2)->c[2]);		      \
 _suNf_multiply(p.c[0],*(pu_gauge_f(x,0)),ptmp);		      \
+_T_theta_mulc(p.c[0]);                                      \
 _vector_add_f(ptmp,(chi2)->c[1],(chi2)->c[3]);		      \
 _suNf_multiply(p.c[1],*(pu_gauge_f(x,0)),ptmp);		      \
+_T_theta_mulc(p.c[1]);                                      \
 _vector_sub_f(p.c[2],(chi1)->c[0],(chi1)->c[2]);	      \
 _vector_sub_f(p.c[3],(chi1)->c[1],(chi1)->c[3]);	      \
 _suNf_FMAT((u),p)
@@ -51,8 +74,10 @@ _suNf_FMAT((u),p)
 #define _F_DIR1(u,chi1,chi2)				      \
 _vector_i_add_f(ptmp,(chi2)->c[0],(chi2)->c[3]);		      \
 _suNf_multiply(p.c[0],*(pu_gauge_f(x,1)),ptmp);		      \
+_X_theta_mulc(p.c[0]);                                      \
 _vector_i_add_f(ptmp,(chi2)->c[1],(chi2)->c[2]);		      \
 _suNf_multiply(p.c[1],*(pu_gauge_f(x,1)),ptmp);		      \
+_X_theta_mulc(p.c[1]);                                      \
 _vector_i_sub_f(p.c[2],(chi1)->c[0],(chi1)->c[3]);	      \
 _vector_i_sub_f(p.c[3],(chi1)->c[1],(chi1)->c[2]);	      \
 _suNf_FMAT((u),p)
@@ -60,8 +85,10 @@ _suNf_FMAT((u),p)
 #define _F_DIR2(u,chi1,chi2)				      \
 _vector_add_f(ptmp,(chi2)->c[0],(chi2)->c[3]);		      \
 _suNf_multiply(p.c[0],*(pu_gauge_f(x,2)),ptmp);		      \
+_Y_theta_mulc(p.c[0]);                                      \
 _vector_sub_f(ptmp,(chi2)->c[1],(chi2)->c[2]);		      \
 _suNf_multiply(p.c[1],*(pu_gauge_f(x,2)),ptmp);		      \
+_Y_theta_mulc(p.c[1]);                                      \
 _vector_sub_f(p.c[2],(chi1)->c[0],(chi1)->c[3]);	      \
 _vector_add_f(p.c[3],(chi1)->c[1],(chi1)->c[2]);	      \
 _suNf_FMAT((u),p)
@@ -69,8 +96,10 @@ _suNf_FMAT((u),p)
 #define _F_DIR3(u,chi1,chi2)				      \
 _vector_i_add_f(ptmp,(chi2)->c[0],(chi2)->c[2]);		      \
 _suNf_multiply(p.c[0],*(pu_gauge_f(x,3)),ptmp);		      \
+_Z_theta_mulc(p.c[0]);                                      \
 _vector_i_sub_f(ptmp,(chi2)->c[1],(chi2)->c[3]);		      \
 _suNf_multiply(p.c[1],*(pu_gauge_f(x,3)),ptmp);		      \
+_Z_theta_mulc(p.c[1]);                                      \
 _vector_i_sub_f(p.c[2],(chi1)->c[0],(chi1)->c[2]);	      \
 _vector_i_add_f(p.c[3],(chi1)->c[1],(chi1)->c[3]);	      \
 _suNf_FMAT((u),p)
