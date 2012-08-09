@@ -208,7 +208,7 @@ void init_hmc(hmc_par *par){
   
   hmc_action_par.beta = _update_par.beta;
   hmc_action_par.n_pf = n_pf;
-  #ifndef ROTATED_SF
+  #ifdef ROTATED_SF
   hmc_action_par.SF_ct = _update_par.SF_ct;
   #endif
   init = 1;
