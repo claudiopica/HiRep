@@ -29,6 +29,7 @@ rhmc_par _update_par;
 int main(int argc,char *argv[])
 {
   setup_process(&argc,&argv);
+  char sbuf[350];
 
 
   BCs_pars_t BCs_pars = {
@@ -40,23 +41,31 @@ int main(int argc,char *argv[])
   };
   
 
+
   double sig;
   spinor_field *s0,*s1,*s2,*s3,*s4,*s5;
 
 
   double kappa=0.1354990000;  
   double mass=1.0/(2*kappa)-4.0;
- 
+  double acc=1.e-20;
+
   _update_par.mass=1.0/(2*kappa)-4.0;
   _update_par.SF_ds=0.5;
   _update_par.SF_sign=1;
   _update_par.SF_ct=1;
   _update_par.SF_zf=1.3;
 
-  
   logger_setlevel(0,99); /* log all */
   logger_map("DEBUG","debug");
   
+  if (PID!=0) { logger_disable(); }
+
+  if (PID==0) {
+    sprintf(sbuf,"out_%d",PID);  logger_stdout(sbuf); 
+    sprintf(sbuf,"err_%d",PID); freopen(sbuf,"w",stderr);
+  }
+
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
   
   read_input(glb_var.read,"test_input");
@@ -121,7 +130,7 @@ int main(int argc,char *argv[])
   read_spinor_field_ascii("test_Qinversevolsource_zf1.3_ds_0.5",s2);
   apply_BCs_on_spinor_field(s2);
   
-  lprintf("MAIN",0,"Testing difference beetween the our implementation of the dirac operator on the delta source and the out spinor\n");
+  lprintf("MAIN",0,"Testing difference beetween the our implementation of the dirac operator on the delta source (test_volsource_zf1.3_ds_0.5) and the out spinor\n");
   g5Dphi(mass,s4,s0);
   apply_BCs_on_spinor_field(s4);
 
@@ -133,7 +142,7 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"Maximal normalized difference = %.2e\n",sqrt(sig/(GLB_T*GLB_X*GLB_Y*GLB_Z*24)));
   lprintf("MAIN",0,"(should be around 1*10^(-10) or so)\n\n");
   
-  lprintf("MAIN",0,"Testing difference beetween the our implementation of the dirac on the out spinor of Stepan and the in spinor\n");
+  lprintf("MAIN",0,"Testing difference beetween the our implementation of the dirac on the out spinor of Stefan (test_Qinversevolsource_zf1.3_ds_0.5) and the in spinor\n");
   g5Dphi(mass,s3,s2);
   apply_BCs_on_spinor_field(s3);
   spinor_field_mul_f(s3,(2*kappa)/(1+8*kappa),s3);
@@ -151,20 +160,21 @@ int main(int argc,char *argv[])
 //    for(j=0;j<12;j++)
 //      lprintf("SPINOR",0,"%.10f %.10f\n",((complex*)(_FIELD_AT(s3,i)))[j].re,((complex*)(_FIELD_AT(s3,i)))[j].im);
 //  }
-//  lprintf("MAIN",0,"Testing difference beetween the our implementation of the dirac on the out spinor of Stepan and the in spinor\n");
-//  
-//  lprintf("MAIN",0,"Testing the outspinor generated with Hirep Inverter\n");
-//  SF_quark_propagator(s0, mass, s1 , acc);
-//
-//  sig=0.;
-//
-//  spinor_field_mul_add_assign_f(s4,-(1+8*kappa)/(2*kappa),s1);
-//  sig=spinor_field_sqnorm_f(s4);
-//  
-//  lprintf("MAIN",0,"Maximal normalized difference = %.2e\n",sqrt(sig/(GLB_T*GLB_X*GLB_Y*GLB_Z*24)));
-//  lprintf("MAIN",0,"(should be around 1*10^(-10) or so)\n\n");
-//
-//
+
+  
+  lprintf("MAIN",0,"Testing the outspinor generated with Hirep Inverter\n");
+  spinor_field_zero_f(s4);
+  SF_quark_propagator(s0, mass, s4 , acc);
+
+  sig=0.;
+
+  spinor_field_mul_add_assign_f(s4,-(2*kappa)/(1+8*kappa),s2);
+  sig=spinor_field_sqnorm_f(s4);
+  
+  lprintf("MAIN",0,"Maximal normalized difference = %.2e\n",sqrt(sig/(GLB_T*GLB_X*GLB_Y*GLB_Z*24)));
+  lprintf("MAIN",0,"(should be around 1*10^(-10) or so)\n\n");
+
+
 /*
   _update_par.SF_zf=2.3;
   _update_par.SF_ds=2.3;
@@ -194,7 +204,7 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"Maximal normalized difference = %.2e\n",sqrt(sig/(GLB_T*GLB_X*GLB_Y*GLB_Z*24)));
   lprintf("MAIN",0,"(should be around 1*10^(-10) or so)\n\n");
   
-  lprintf("MAIN",0,"Testing difference beetween the our implementation of the dirac on the out spinor of Stepan and the in spinor\n");
+  lprintf("MAIN",0,"Testing difference beetween the our implementation of the dirac on the out spinor of Stefan and the in spinor\n");
   g5Dphi(mass,s3,s2);
   apply_BCs_on_spinor_field(s3);
   spinor_field_mul_f(s3,(2*kappa)/(1+8*kappa),s3);

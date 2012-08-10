@@ -201,6 +201,7 @@ int init_mc(rhmc_flow *rf, char *ifile) {
 #ifdef ROTATED_SF
   BCs_pars.gauge_boundary_improvement_ct = rhmc_var.rhmc_p.SF_ct;
   BCs_pars.chiSF_boundary_improvement_ds = rhmc_var.rhmc_p.SF_ds;
+  BCs_pars.SF_BCs = 1;
 #endif
 #ifdef BASIC_SF
   BCs_pars.SF_BCs = 1;

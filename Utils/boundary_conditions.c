@@ -103,11 +103,10 @@ void init_BCs(BCs_pars_t *pars) {
     "\n");
 
   
-
 #if defined(ROTATED_SF)
-  lprintf("BCS",0,"Chirally rotated Schroedinger Functional ds=%e\n",BCs_pars.chiSF_boundary_improvement_ds);
+  lprintf("BCS",0,"Chirally rotated Schroedinger Functional ds=%e BCs=%d\n",BCs_pars.chiSF_boundary_improvement_ds,BCs_pars.SF_BCs);
 #elif defined(BASIC_SF)
-  lprintf("BCS",0,"Basic Schroedinger Functional\n");
+  lprintf("BCS",0,"Basic Schroedinger Functional BCs=%d\n",BCs_pars.SF_BCs);
 #endif
 
 
@@ -496,7 +495,6 @@ static void gf_Dirichlet_BCs(suNg* dn, suNg* up) {
     for(ix=0;ix<X_EXT;++ix) for(iy=0;iy<Y_EXT;++iy) for(iz=0;iz<Z_EXT;++iz){
       index=ipt_ext(T_BORDER+1,ix,iy,iz);
       if(index!=-1) {
-        index=ipt(1,ix,iy,iz);
         u=pu_gauge(index,1);
         *u = *dn;
         u=pu_gauge(index,2);

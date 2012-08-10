@@ -62,6 +62,44 @@ void global_sum(double *d, int n) {
 }
 
 
+void global_sum_int(int *d, int n) {
+#ifdef WITH_MPI
+  int mpiret;
+  int pres[n];
+
+#ifdef MPI_TIMING
+  struct timeval start, end, etime;
+  gettimeofday(&start,0);  
+#endif
+  
+  mpiret=MPI_Allreduce(d,pres,n,MPI_INT,MPI_SUM,MPI_COMM_WORLD);
+
+  
+#ifdef MPI_TIMING
+  gettimeofday(&end,0);
+  timeval_subtract(&etime,&end,&start);
+  lprintf("MPI TIMING",0,"global_sum_int " __FILE__ " %ld sec %ld usec\n",etime.tv_sec,etime.tv_usec);
+#endif
+
+#ifndef NDEBUG
+  if (mpiret != MPI_SUCCESS) {
+    char mesg[MPI_MAX_ERROR_STRING];
+    int mesglen;
+    MPI_Error_string(mpiret,mesg,&mesglen);
+    lprintf("MPI",0,"ERROR: %s\n",mesg);
+    error(1,1,"global_sum_int " __FILE__,"Cannot perform global_sum");
+  }
+#endif
+  while(n>0) { 
+    --n;
+    d[n]=pres[n];	
+  }
+#else
+  /* for non mpi do nothing */
+  return;
+#endif
+}
+
 
 
 void global_max(double *d, int n) {
