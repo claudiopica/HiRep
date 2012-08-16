@@ -480,6 +480,11 @@ Q+ = |             | * 1/2
   lprintf("PC_twisted_AC",10," g1_ud_+ = %.10e\n",g1);	
   lprintf("PC_twisted_AC",10,"\n");
 
+  free_spinor_field(prop);
+  free_spinor_field(source);
+  free(stmp);
+  free(sbord[0]);
+  
 #endif
   
 }
