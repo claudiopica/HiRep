@@ -15,7 +15,25 @@
 
 #include "logger.h"
 #include "error.h"
+#include "input_par.h"
 
+/* GPU variables */
+typedef struct _input_gpu {
+  unsigned int gpuID;
+  
+  /* for the reading function */
+  input_record_t read[2];
+  
+} input_gpu;
+
+#define init_input_gpu(varname) \
+{ \
+.gpuID=0,\
+.read={\
+{"gpuID", "gpuID = %d", INT_T, &(varname).gpuID},\
+{NULL, NULL, 0, NULL}\
+}\
+}
 
 
 #define START_SP_ADDRESS_GPU(sf) ((sf)->gpu_ptr + (sf)->type->master_start[0])

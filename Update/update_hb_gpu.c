@@ -80,7 +80,7 @@ __global__ void project_gauge_field_gpu(suNg* gauge, int N){
 
 void project_gauge_field(void){
   int N = u_gauge->type->master_end[0] -  u_gauge->type->master_start[0] + 1;
-  int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
+  int grid = (N-1)/BLOCK_SIZE + 1;
   project_gauge_field_gpu<<<grid,BLOCK_SIZE>>>(u_gauge->gpu_ptr,N);
   //  start_gf_sendrecv(u_gauge);
 }

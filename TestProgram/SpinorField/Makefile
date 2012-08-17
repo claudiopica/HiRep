@@ -1,7 +1,7 @@
 TOPDIR = ../..
 MKDIR=$(TOPDIR)/Make
 
-EXES = global_sum_gpu #speed_flt_gpu speed_dbl_gpu check_spinorfield_gpu_1 check_spinorfield_gpu_1_flt speed_spinor_gpu_flt prof_test_gpu global_sum_gpu
+EXES = global_sum_gpu speed_flt_gpu speed_dbl_gpu check_spinorfield_gpu_1 #check_spinorfield_gpu_1_flt speed_spinor_gpu_flt prof_test_gpu global_sum_gpu
 
 GPUFILES = #copy_test_kernel.c 
 
@@ -16,7 +16,7 @@ MODS := logger read_input
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Utils
-MODS := timer_gpu boundary_conditions # suN_utils suN_exp single_double_utils 
+MODS := timer_gpu boundary_conditions init_gpu # suN_utils suN_exp single_double_utils 
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Memory

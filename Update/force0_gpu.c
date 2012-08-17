@@ -110,13 +110,13 @@ void force0(double dt, suNg_av_field *force, void *vpar){
 	
   //	gfield_copy_to_gpu(u_gauge);
   //	suNg_av_field_copy_to_gpu(force);
-	/* check input types */
-	_TWO_SPINORS_MATCHING(u_gauge,force);
+  /* check input types */
+  _TWO_SPINORS_MATCHING(u_gauge,force);
 	
-	int N = T*X*Y*Z;//u_gauge->type->master_end[0] -  u_gauge->type->master_start[0] + 1;
-	int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
-
-	gauge_force_kernel<<<grid,BLOCK_SIZE>>>(u_gauge->gpu_ptr, force->gpu_ptr, iup_gpu, idn_gpu, N,dt*_update_par.beta/((double)(NG)));
+  int N = T*X*Y*Z;//u_gauge->type->master_end[0] -  u_gauge->type->master_start[0] + 1;
+  int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
+  
+  gauge_force_kernel<<<grid,BLOCK_SIZE>>>(u_gauge->gpu_ptr, force->gpu_ptr, iup_gpu, idn_gpu, N,dt*_update_par.beta/((double)(NG)));
 
 	
 	//	suNg_av_field_copy_from_gpu(force);

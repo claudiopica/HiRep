@@ -66,7 +66,7 @@ int main(int argc,char *argv[])
 {
   
   spinor_field *sf1,*sf2;
-  int sfsize = 10;
+  int sfsize = 3;
   double norm_cpu;
   double norm_gpu;
   double res_cpu,res_gpu;
@@ -115,11 +115,18 @@ int main(int argc,char *argv[])
   lprintf("CPTEST",0,"nbuffers=%d\n",glattice.nbuffers);
   lprintf("CPTEST",0,"lmp=%d\n",glattice.local_master_pieces);
   lprintf("CPTEST",0,"ncopies=%d\n",glattice.ncopies);
-  
+
+
+  input_gpu gpu_var = init_input_gpu(gpu_var);
+  read_input(gpu_var.read,"test_input");
+  init_gpu(gpu_var);
+
   //	Allocates memory for cpu & gpu spinor field. 
   sf1=alloc_spinor_field_f(sfsize, &glattice);
   sf2=alloc_spinor_field_f(sfsize, &glattice);
 
+
+  lprintf("LA TEST",0,"Maximum grid size: %d\n", grid_size_max_gpu);
 	
 // CPU part set to gaussian
   for (i=0;i<sfsize;i++){

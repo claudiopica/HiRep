@@ -160,9 +160,17 @@ GLB_VAR(input_glb,glb_var,=init_input_glb(glb_var));
 
 
 #ifdef WITH_GPU
-#define BLOCK_SIZE 512
+#define BLOCK_SIZE 256
+#define BLOCK_SIZE_LINEAR_ALGEBRA 512
+#define BLOCK_SIZE_GLOBAL_SUM 512
+#define BLOCK_SIZE_DIRAC 512
+#define BLOCK_SIZE_DIRAC_FLT 512
+
 GLB_VAR(int,*iup_gpu,=NULL);
 GLB_VAR(int,*idn_gpu,=NULL);
+GLB_VAR(int, gpu_id,=0);
+GLB_VAR(unsigned int, grid_size_max_gpu,=65535);
+
 #endif //WITH_GPU
 
 #undef GLB_VAR

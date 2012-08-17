@@ -134,7 +134,7 @@ __global__ void gauge_integrator_gpu_kernel(suNg* gauge, suNg_algebra_vector* mo
 
 void gauge_integrator_gpu(suNg_av_field *momenta, double dt){
   int N = T*X*Y*Z;//u_gauge->type->master_end[0] -  u_gauge->type->master_start[0] + 1;
-  int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
+  int grid = (N-1)/BLOCK_SIZE + 1;
   gauge_integrator_gpu_kernel<<<grid,BLOCK_SIZE>>>(u_gauge->gpu_ptr,momenta->gpu_ptr,dt,N);
 }
 

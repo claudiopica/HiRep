@@ -1,10 +1,11 @@
-GLB_T = 8
-GLB_X = 4
-GLB_Y = 4
-GLB_Z = 4
+GLB_T = 32
+GLB_X = 32
+GLB_Y = 32
+GLB_Z = 32
 NP_T = 1
 NP_X = 1
 NP_Y = 1
 NP_Z = 1
 level = 1
 seed = 12345
+gpuID = 1

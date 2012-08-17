@@ -26,6 +26,7 @@
 #include "logger.h"
 #include "utils.h"
 #include "io.h"
+#include "gpu.h"
 
 #include "communications.h"
 
@@ -75,16 +76,16 @@ int main(int argc,char *argv[])
 {
   
   spinor_field *sf1,*sf2;
-	int sfsize = 2;
-//  double norm_cpu;
-	// double norm_gpu;
-	double res_cpu,res_gpu, res_gpu_opt;
-	complex c_res_cpu,c_res_gpu, c_res_gpu_opt;
+  int sfsize = 2;
+  //  double norm_cpu;
+  // double norm_gpu;
+  double res_cpu,res_gpu, res_gpu_opt;
+  complex c_res_cpu,c_res_gpu, c_res_gpu_opt;
   complex c1,c2;
   int i;
 	
-	gpu_timer t1;
-	float elapsed;
+  gpu_timer t1;
+  float elapsed;
 	
 
   /* setup process id and communications */
@@ -104,6 +105,10 @@ int main(int argc,char *argv[])
   /* read input file */
   read_input(glb_var.read,"test_input");
   rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed);
+
+  input_gpu gpu_var = init_input_gpu(gpu_var);
+  read_input(gpu_var.read,"test_input");
+  init_gpu(gpu_var);
 
 
   /* setup communication geometry */
@@ -222,13 +227,13 @@ int main(int argc,char *argv[])
 	lprintf("TEST",0,"::::::::::::spinor_field_prod_re:::::::::::::::\n\n");
 	t1 = gpuTimerStart();
 	for (int i=0; i<NumberOfRuns; i++) {	
-		res_gpu = spinor_field_prod_re_f(&sf1[0],&sf1[1]);
+	  res_gpu = spinor_field_prod_re_f(&sf1[0],&sf1[1]);
 	}
 	elapsed = gpuTimerStop(t1);
 	lprintf("TEST",0,"Time for original: %1.10gms\n",elapsed);
 	t1 = gpuTimerStart();
 	for (int i=0; i<NumberOfRuns; i++) {	
-		res_gpu_opt = spinor_field_prod_re_f(&sf1[0],&sf1[1]);
+	  res_gpu_opt = spinor_field_prod_re_f(&sf1[0],&sf1[1]);
 	}
 	elapsed = gpuTimerStop(t1);
 	lprintf("TEST",0,"Time for optimized: %1.10gms\n",elapsed);

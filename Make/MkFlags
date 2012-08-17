@@ -1,8 +1,8 @@
 NG = 2
-#REPR = REPR_FUNDAMENTAL
+REPR = REPR_FUNDAMENTAL
 #REPR = REPR_SYMMETRIC
 #REPR = REPR_ANTISYMMETRIC
-REPR = REPR_ADJOINT
+#REPR = REPR_ADJOINT
 
 ## Boundary conditins
 #MACRO += -DANTIPERIODIC_BC_T
@@ -15,8 +15,8 @@ REPR = REPR_ADJOINT
 #### OPTIONS #####
 ##################
 MACRO += -DUPDATE_EO
-MACRO += -DWITH_MPI
-#MACRO += -DWITH_GPU
+#MACRO += -DWITH_MPI
+MACRO += -DWITH_GPU
 MACRO += -DWITH_QUATERNIONS
 
 ## SF
@@ -27,7 +27,7 @@ MACRO += -DWITH_QUATERNIONS
 ##### DEBUG ######
 ##################
 #MACRO += -DNDEBUG
-#MACRO += -DCUDA_CHECK_ERROR
+MACRO += -DCUDA_CHECK_ERROR
 #MACRO += -DCHECK_SPINOR_MATCHING
 #MACRO += -DMPI_TIMING
 MACRO += -DIO_FLUSH
@@ -40,8 +40,10 @@ CFLAGS = -Wall -std=c99 -O2 -fomit-frame-pointer -mfpmath=sse -msse -msse2
 #CFLAGS = -Wall -std=c99 -g -mfpmath=sse -msse -msse2 
 else #Compile with GPU
 CC = nvcc 
-CFLAGS = -g -Xcompiler '-std=c99 -fgcse-sm -fgcse-las -fgcse-after-reload'
+#CFLAGS = -g -G -Xcompiler '-std=c99 -fgcse-sm -fgcse-las -fgcse-after-reload'
+CFLAGS = -O2 -Xcompiler '-std=c99 -fgcse-sm -fgcse-las -fgcse-after-reload'
 GPUFLAGS = --x cu -arch=sm_20 --use_fast_math -Xptxas -v  -Xptxas -dlcm=ca 
+LDFLAGS = -lcuda
 #GPUFLAGS = --x cu -arch=sm_11 -Xptxas -v -Xptxas -dlcm=ca 
 endif
 
@@ -63,7 +65,7 @@ INC = -I $(INCDIR)
 GCC = gcc
 CPPFLAGS += $(MACRO)
 CPPFLAGS += $(INC)
-LDFLAGS = -lm
+LDFLAGS += -lm 
 
 ifeq ($(strip $(CXX)),)
   CXX = g++

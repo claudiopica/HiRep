@@ -103,6 +103,13 @@ int main(int argc,char *argv[])
      finalize_process();
      return 0;
    }
+
+   
+  input_gpu gpu_var = init_input_gpu(gpu_var);
+  read_input(gpu_var.read,"test_input");
+  init_gpu(gpu_var);
+   
+
    
    lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
    lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
@@ -139,11 +146,14 @@ int main(int argc,char *argv[])
    //gfield_copy_to_gpu_f_flt(u_gauge_f_flt);
    lprintf("MAIN",0,"done.\n");
 
-   par.n = 6;
+   par.n = 3;
    par.shift=(double*)malloc(sizeof(double)*(par.n));
-   par.err2=1.e-28;
+   par.err2=1.e-15;
    par.max_iter=0;
+   t1 = gpuTimerStart();
    res=alloc_spinor_field_f(par.n+3,&glattice);
+   elapsed = gpuTimerStop(t1);
+   lprintf("MAIN",0,"Time to allocate %d spinorfields: %fms",par.n+3,elapsed);
    s1=res+par.n;
    s2=s1+1;
    tmp=s2+1;
@@ -153,12 +163,10 @@ int main(int argc,char *argv[])
    par.shift[0]=+0.1;
    par.shift[1]=-0.21;
    par.shift[2]=+0.05;
-   par.shift[3]=-0.01;
+   /*   par.shift[3]=-0.01;
    par.shift[4]=-0.15;
-   par.shift[5]=-0.05;
+   par.shift[5]=-0.05;*/
    
-   par.n = 6;
-
    gaussian_spinor_field(s1);
    spinor_field_copy_to_gpu_f(s1);
    
@@ -167,7 +175,7 @@ int main(int argc,char *argv[])
    lprintf("CG TEST",0,"Testing CG multishift\n");
    lprintf("CG TEST",0,"---------------------\n");
 
-   t1 = gpuTimerStart();   
+   t1 = gpuTimerStart();
    cgiters = cg_mshift(&par, M, s1, res);
    elapsed = gpuTimerStop(t1);
    lprintf("CG TEST",0,"Converged in %d iterations\n",cgiters);

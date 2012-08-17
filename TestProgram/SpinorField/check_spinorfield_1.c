@@ -181,7 +181,7 @@ int main(int argc,char *argv[])
   read_input(glb_var.read,"test_input");
   rlxd_init(glb_var.rlxd_seed,glb_var.rlxd_level*(PID + 1));
 
-
+  
   /* setup communication geometry */
   if (geometry_init() == 1) {
     finalize_process();

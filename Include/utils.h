@@ -127,5 +127,15 @@ typedef cudaEvent_t gpu_timer;
 cudaEvent_t gpuTimerStart();
 float gpuTimerMeasure(cudaEvent_t e);
 float gpuTimerStop(cudaEvent_t e);
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+  void init_gpu(input_gpu gpu_var);
+#ifdef __cplusplus
+}
+#endif
 #endif 
+
+
 #endif 

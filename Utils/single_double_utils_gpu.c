@@ -22,6 +22,9 @@
 
 
 #include "gpu.h"
+
+
+
  
  
  __global__ void assign_f2d_kernel(double* out, float* in, const int N)
@@ -39,6 +42,20 @@
  }
 
 
+#define _GRID_LOOP(kernel...)						\
+  do {									\
+    unsigned int offset=0;						\
+    long tmp_grid=grid;							\
+    do {								\
+      grid = (tmp_grid > grid_size_max_gpu) ? grid_size_max_gpu : tmp_grid; \
+      kernel;								\
+      tmp_grid -= grid_size_max_gpu;					\
+      offset += grid_size_max_gpu*BLOCK_SIZE;				\
+    } while (tmp_grid>0);						\
+  } while(0)
+
+
+
 void assign_s2sd(spinor_field *out, spinor_field_flt *in) {
     int size, grid;
     double *r;
@@ -51,8 +68,8 @@ void assign_s2sd(spinor_field *out, spinor_field_flt *in) {
     size = in->type->master_end[0] -  in->type->master_start[0] + 1;
     size *= sizeof(suNf_spinor)/sizeof(double); ////lenght of the block in real numbers	
     
-    grid = size/BLOCK_SIZE + ((size % BLOCK_SIZE == 0) ? 0 : 1); 
-    assign_f2d_kernel<<<grid,BLOCK_SIZE>>>(r, rf, size);
+    grid = (size-1)/BLOCK_SIZE + 1;
+    _GRID_LOOP(assign_f2d_kernel<<<grid,BLOCK_SIZE>>>(r+offset, rf+offset, size));
     CudaCheckError();	
 }
 
@@ -68,8 +85,8 @@ void assign_sd2s(spinor_field_flt *out, spinor_field *in) {
     size = in->type->master_end[0] -  in->type->master_start[0] + 1;
     size *= sizeof(suNf_spinor)/sizeof(double); ////lenght of the block in real numbers	
     
-    grid = size/BLOCK_SIZE + ((size % BLOCK_SIZE == 0) ? 0 : 1); 
-    assign_d2f_kernel<<<grid,BLOCK_SIZE>>>(rf, r, size);
+    grid = (size-1)/BLOCK_SIZE + 1;
+    _GRID_LOOP(assign_d2f_kernel<<<grid,BLOCK_SIZE>>>(rf+offset, r+offset, size));
     CudaCheckError();	
 }
 
@@ -83,8 +100,8 @@ void assign_u2ud(){
     size=glattice.master_end[0] - glattice.master_start[0] + 1;
     size*=4*sizeof(suNg)/sizeof(double); //lenght of the block in real numbers
     
-    grid = size/BLOCK_SIZE + ((size % BLOCK_SIZE == 0) ? 0 : 1); 
-    assign_f2d_kernel<<<grid,BLOCK_SIZE>>>(r, rf, size);
+    grid = (size-1)/BLOCK_SIZE + 1;
+    _GRID_LOOP(assign_f2d_kernel<<<grid,BLOCK_SIZE>>>(r+offset, rf+offset, size));
     CudaCheckError();	
 }
 
@@ -98,8 +115,8 @@ void assign_ud2u(){
     size=glattice.master_end[0] - glattice.master_start[0] + 1;
     size*=4*sizeof(suNg)/sizeof(double); //lenght of the block in real numbers
     
-    grid = size/BLOCK_SIZE + ((size % BLOCK_SIZE == 0) ? 0 : 1); 
-    assign_d2f_kernel<<<grid,BLOCK_SIZE>>>(rf, r, size);
+    grid = (size-1)/BLOCK_SIZE + 1;
+    _GRID_LOOP(assign_d2f_kernel<<<grid,BLOCK_SIZE>>>(rf+offset, r+offset, size));
     CudaCheckError();	
 }
 
@@ -113,8 +130,8 @@ void assign_u2ud_f(){
     size=glattice.master_end[0] - glattice.master_start[0] + 1;
     size*=4*sizeof(suNf)/sizeof(double); //lenght of the block in real numbers
     
-    grid = size/BLOCK_SIZE + ((size % BLOCK_SIZE == 0) ? 0 : 1); 
-    assign_f2d_kernel<<<grid,BLOCK_SIZE>>>(r, rf, size);
+    grid = (size-1)/BLOCK_SIZE + 1;
+    _GRID_LOOP(assign_f2d_kernel<<<grid,BLOCK_SIZE>>>(r+offset, rf+offset, size));
     CudaCheckError();	
 }
 
@@ -127,11 +144,12 @@ void assign_ud2u_f(){
     rf=(float*)(_GPU_FIELD_BLK(u_gauge_f_flt,0));
     size=glattice.master_end[0] - glattice.master_start[0] + 1;
     size*=4*sizeof(suNf)/sizeof(double); //lenght of the block in real numbers
-    
-    grid = size/BLOCK_SIZE + ((size % BLOCK_SIZE == 0) ? 0 : 1); 
-    assign_d2f_kernel<<<grid,BLOCK_SIZE>>>(rf, r, size);
+
+    grid = (size-1)/BLOCK_SIZE + 1;
+    _GRID_LOOP(assign_d2f_kernel<<<grid,BLOCK_SIZE>>>(rf+offset, r+offset, size));
     CudaCheckError();	
 }
 
+#undef _GRID_LOOP
 
 #endif //WITH_GPU

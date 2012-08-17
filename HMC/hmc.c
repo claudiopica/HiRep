@@ -180,7 +180,7 @@ int main(int argc,char *argv[])
   read_input(eigval_var.read,input_filename);
 #ifdef WITH_GPU
   read_input(gpu_var.read,input_filename);
-  cudaSetDevice(gpu_var.gpuID);
+  init_gpu(gpu_var);
 #endif //WITH_GPU
   
   if(glb_var.rlxd_state[0]!='\0')

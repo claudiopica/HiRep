@@ -8,6 +8,7 @@
 
 #include "update.h"
 #include "input_par.h"
+#include "gpu.h"
 
 /* HMC variables */
 typedef struct _input_hmc {
@@ -78,27 +79,6 @@ typedef struct _hmc_flow {
     {NULL, NULL, 0, NULL}\
   }\
 }
-
-#ifdef WITH_GPU
-/* GPU variables */
-typedef struct _input_gpu {
-  unsigned int gpuID;
-  
-  /* for the reading function */
-  input_record_t read[2];
-  
-} input_gpu;
-
-#define init_input_gpu(varname) \
-{ \
-.gpuID=0,\
-.read={\
-{"gpuID", "gpuID = %d", INT_T, &(varname).gpuID},\
-{NULL, NULL, 0, NULL}\
-}\
-}
-#endif //WITH_GPU
-
 
 int init_mc(hmc_flow *rf, char *ifile);
 int save_conf(hmc_flow *rf, int id);
