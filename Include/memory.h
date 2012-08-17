@@ -83,6 +83,10 @@ void sfield_copy_from_gpu(scalar_field *field);
 void avfield_togpuformat(suNg_av_field *out, suNg_av_field *in);
 void avfield_tocpuformat(suNg_av_field *out, suNg_av_field *in);
 
+cudaError_t alloc_pool_gpu(void** gpu_ptr, size_t size);
+void free_pool_gpu(void*);
+void erase_pool_gpu();
+
 #endif
 
 void free_avfield(suNg_av_field *u);

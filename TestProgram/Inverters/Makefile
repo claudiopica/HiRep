@@ -20,7 +20,7 @@ MODS := boundary_conditions single_double_utils suN_utils time timer_gpu single_
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Memory
-MODS := amalloc field_alloc spinor_field_alloc field_pack_gpu field_copy_gpu
+MODS := amalloc field_alloc spinor_field_alloc field_pack_gpu field_copy_gpu memory_pool_gpu
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Random

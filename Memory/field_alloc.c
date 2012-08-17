@@ -1,5 +1,5 @@
 /***************************************************************************\
- * Copyright (c) 2008, Claudio Pica                                          *   
+ * Copyright (c) 2008, 2011, 2012 Claudio Pica and Ari Hietanen              *   
  * All rights reserved.                                                      * 
  \***************************************************************************/
 
@@ -47,16 +47,18 @@ if (type->nbuffers>0) {\
 #endif /* WITH_MPI */
 
 
-
 /* GPU allocation and deallocation code */
 #ifdef WITH_GPU
 
-#define _FREE_GPU_CODE if(u->gpu_ptr!=NULL) cudaFree(u->gpu_ptr)
+//#define _FREE_GPU_CODE if(u->gpu_ptr!=NULL) cudaFree(u->gpu_ptr)
+#define _FREE_GPU_CODE if(u->gpu_ptr!=NULL) free_pool_gpu(u->gpu_ptr)
+
+//	err = cudaMalloc((void **) &f->gpu_ptr, _size*type->gsize*sizeof(*(f->gpu_ptr))); \
 
 #define _ALLOC_GPU_CODE(_name,_size)\
 if(alloc_mem_t & GPU_MEM) {\
 	cudaError_t err;\
-	err = cudaMalloc((void **) &f->gpu_ptr, _size*type->gsize*sizeof(*(f->gpu_ptr))); \
+	err = alloc_pool_gpu((void **) &(f->gpu_ptr), _size*type->gsize*sizeof(*(f->gpu_ptr))); \
 	error(err!=cudaSuccess,1,"alloc_" #_name " [" __FILE__ "]", \
   	    "Could not allocate GPU memory space for field"); \
 } else f->gpu_ptr=NULL
