@@ -87,6 +87,7 @@
  *******************************************************************************/
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "geometry.h" 
 #include "global.h" 
@@ -410,6 +411,7 @@ static void geometry_mpi_init()
   error((map_oversize2true==NULL),1,"geometry_mpi_init [geometry_mpi.c]",
 	"Cannot allocate memory");
   border=malloc((2*N_BORDER+1)*sizeof(border_id));
+  memset(border,0,(2*N_BORDER+1)*sizeof(border_id));
   error((border==NULL),1,"geometry_mpi_init [geometry_mpi.c]",
 	"Cannot allocate memory");
 
@@ -1284,7 +1286,10 @@ void geometry_mpi_eo(void)
   fix_next_neightbours(); 
  
   geometry_mpi_finalize(); 
- 
+
+  #ifdef GEOMETRY_MPI_EO_PATCH
+  init_geometry_mpi_eo_patch();
+  #endif
 }
 
 

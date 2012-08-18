@@ -20,6 +20,9 @@ typedef struct _geometry_descriptor {
   int *rbuf_len, *sbuf_len;
   int *rbuf_from_proc, *rbuf_start;
   int *sbuf_to_proc, *sbuf_start;
+  #ifdef GEOMETRY_MPI_EO_PATCH
+  int *buf_dim;
+  #endif
   int gsize;
 } geometry_descriptor;
 
@@ -52,5 +55,11 @@ int proc_dn(int id, int dir);
 void test_geometry_mpi(void);
 void test_geometry_mpi_eo(void);
 void print_wdmatrix(char *filename);
+
+#ifdef GEOMETRY_MPI_EO_PATCH
+void init_geometry_mpi_eo_patch();
+void free_geometry_mpi_eo_patch();
+#endif
+
 
 #endif
