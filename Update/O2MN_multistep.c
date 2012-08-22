@@ -28,6 +28,17 @@ static unsigned int count=0; /*used to project gfield */
 
 
 void gauge_integrator(suNg_av_field *momenta, double tlen, integrator_par *int_par){
+  #ifdef TIMING
+  struct timeval start, end;
+  struct timeval start1, end1;
+  struct timeval etime;
+  
+  #ifdef TIMING_WITH_BARRIERS
+  MPI_Barrier(MPI_COMM_WORLD);
+  #endif
+  gettimeofday(&start,0);
+  #endif
+
   _DECLARE_INT_ITERATOR(i);
 
   int n;
@@ -39,23 +50,94 @@ void gauge_integrator(suNg_av_field *momenta, double tlen, integrator_par *int_p
   lprintf("MD_INT",10+int_par->level*10,"MD parameters: level=%d tlen=%1.6f nsteps=%d => dt=%1.6f\n",
     int_par->level,tlen,int_par->nsteps,dt);
   for(n=1;n<=int_par->nsteps;++n) {
+
+    #ifdef TIMING
+    #ifdef TIMING_WITH_BARRIERS
+    MPI_Barrier(MPI_COMM_WORLD);
+    #endif
+    gettimeofday(&start1,0);
+    #endif
+
     _MASTER_FOR(&glattice,i) {
       ExpX(dt,_4FIELD_AT(momenta,i,0), _4FIELD_AT(u_gauge,i,0));
       ExpX(dt,_4FIELD_AT(momenta,i,1), _4FIELD_AT(u_gauge,i,1));
       ExpX(dt,_4FIELD_AT(momenta,i,2), _4FIELD_AT(u_gauge,i,2));
       ExpX(dt,_4FIELD_AT(momenta,i,3), _4FIELD_AT(u_gauge,i,3));
     }
+
+    #ifdef TIMING
+    #ifdef TIMING_WITH_BARRIERS
+    MPI_Barrier(MPI_COMM_WORLD);
+    #endif
+    gettimeofday(&end1,0);
+    timeval_subtract(&etime,&end1,&start1);
+    lprintf("TIMING",0,"exp in gauge_integrator %.6f s\n",1.*etime.tv_sec+1.e-6*etime.tv_usec);
+    #endif
+
+    #ifdef TIMING
+    #ifdef TIMING_WITH_BARRIERS
+    MPI_Barrier(MPI_COMM_WORLD);
+    #endif
+    gettimeofday(&start1,0);
+    #endif
+
     _proj_gfield(count);
+
+    #ifdef TIMING
+    #ifdef TIMING_WITH_BARRIERS
+    MPI_Barrier(MPI_COMM_WORLD);
+    #endif
+    gettimeofday(&end1,0);
+    timeval_subtract(&etime,&end1,&start1);
+    lprintf("TIMING",0,"proj_gfield in gauge_integrator %.6f s\n",1.*etime.tv_sec+1.e-6*etime.tv_usec);
+    #endif
+
     lprintf("MD_INT",20+int_par->level*10,"MD step (level %d): %d/%d\n",int_par->level,n,int_par->nsteps);
    }
   lprintf("MD_INT",10+int_par->level*10,"MD trajectory completed, level %d.\n",int_par->level);
+
+  #ifdef TIMING
+  #ifdef TIMING_WITH_BARRIERS
+  MPI_Barrier(MPI_COMM_WORLD);
+  #endif
+  gettimeofday(&start1,0);
+  #endif
+
   represent_gauge_field();
+
+  #ifdef TIMING
+  #ifdef TIMING_WITH_BARRIERS
+  MPI_Barrier(MPI_COMM_WORLD);
+  #endif
+  gettimeofday(&end1,0);
+  timeval_subtract(&etime,&end1,&start1);
+  lprintf("TIMING",0,"represent_gauge_field in gauge_integrator %.6f s\n",1.*etime.tv_sec+1.e-6*etime.tv_usec);
+  #endif
+
+  #ifdef TIMING
+  #ifdef TIMING_WITH_BARRIERS
+  MPI_Barrier(MPI_COMM_WORLD);
+  #endif
+  gettimeofday(&end,0);
+  timeval_subtract(&etime,&end,&start);
+  lprintf("TIMING",0,"gauge_integrator %.6f s\n",1.*etime.tv_sec+1.e-6*etime.tv_usec);
+  #endif
 }
 
 
 
 
 void O2MN_multistep(suNg_av_field *momenta, double tlen, integrator_par *int_par){
+  #ifdef TIMING
+  struct timeval start, end;
+  struct timeval etime;
+  
+  #ifdef TIMING_WITH_BARRIERS
+  MPI_Barrier(MPI_COMM_WORLD);
+  #endif
+  gettimeofday(&start,0);
+  #endif
+
   /* check input types */
 #ifndef CHECK_SPINOR_MATCHING
    _TWO_SPINORS_MATCHING(u_gauge,momenta);
@@ -90,6 +172,14 @@ void O2MN_multistep(suNg_av_field *momenta, double tlen, integrator_par *int_par
     }
   }
 
+  #ifdef TIMING
+  #ifdef TIMING_WITH_BARRIERS
+  MPI_Barrier(MPI_COMM_WORLD);
+  #endif
+  gettimeofday(&end,0);
+  timeval_subtract(&etime,&end,&start);
+  lprintf("TIMING",0,"O2MN_multistep[%d] %.6f s\n",int_par->level,1.*etime.tv_sec+1.e-6*etime.tv_usec);
+  #endif
 }
 
 

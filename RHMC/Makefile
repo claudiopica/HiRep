@@ -6,7 +6,7 @@ EXES = rhmc
 default: $(EXES)
 
 MODDIR := Geometry
-MODS := geometry_init geometry_mpi_eo test_geometry_mpi communications communications_flt
+MODS := geometry_init geometry_mpi_eo test_geometry_mpi communications communications_flt geometry_mpi_eo_patch
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := IO
@@ -22,7 +22,7 @@ MODS := amalloc field_alloc spinor_field_alloc
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Observables
-MODS := avr_plaquette pta_qprop mesons polyakov z2semwall sf_action sf_pcac
+MODS := avr_plaquette pta_qprop mesons polyakov z2semwall #sf_action sf_pcac
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Random

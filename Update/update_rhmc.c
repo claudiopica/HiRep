@@ -257,6 +257,17 @@ void free_rhmc(){
 
 int update_rhmc(){
     
+    #ifdef TIMING
+    struct timeval start1, end1;
+    struct timeval start2, end2;
+    struct timeval etime;
+    
+    #ifdef TIMING_WITH_BARRIERS
+    MPI_Barrier(MPI_COMM_WORLD);
+    #endif
+    gettimeofday(&start1,0);
+    #endif
+    
     double deltaH;
     double oldmax,oldmin;
     _DECLARE_INT_ITERATOR(ix);
@@ -285,7 +296,21 @@ int update_rhmc(){
     
     /* integrate molecular dynamics */
     lprintf("RHMC",30,"MD integration...\n");
+    #ifdef TIMING
+    #ifdef TIMING_WITH_BARRIERS
+    MPI_Barrier(MPI_COMM_WORLD);
+    #endif
+    gettimeofday(&start2,0);
+    #endif
     (*(integrator[0].integrator))(momenta,_update_par.tlen,&integrator[0]);
+    #ifdef TIMING
+    #ifdef TIMING_WITH_BARRIERS
+    MPI_Barrier(MPI_COMM_WORLD);
+    #endif
+    gettimeofday(&end2,0);
+    timeval_subtract(&etime,&end2,&start2);
+    lprintf("TIMING",0,"integrator in update_rhmc %.6f s\n",1.*etime.tv_sec+1.e-6*etime.tv_usec);
+    #endif
     
     /* project gauge field */
     project_gauge_field();
@@ -343,6 +368,15 @@ int update_rhmc(){
     }
     
     lprintf("RHMC",10,"Configuration accepted.\n");
+
+    #ifdef TIMING
+    #ifdef TIMING_WITH_BARRIERS
+    MPI_Barrier(MPI_COMM_WORLD);
+    #endif
+    gettimeofday(&end1,0);
+    timeval_subtract(&etime,&end1,&start1);
+    lprintf("TIMING",0,"update_rhmc %.6f s\n",1.*etime.tv_sec+1.e-6*etime.tv_usec);
+    #endif
     
     return 1;
 }

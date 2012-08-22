@@ -347,8 +347,11 @@ void represent_gauge_field() {
       for (mu=0;mu<4;mu++) {
         u=pu_gauge(ix,mu);
         Ru=pu_gauge_f(ix,mu);
-        _group_represent2(Ru,u); 
-        /*_group_represent(*Ru,*u);*/
+        #ifdef UNROLL_GROUP_REPRESENT
+          _group_represent(*Ru,*u);
+        #else
+          _group_represent2(Ru,u); 
+        #endif
       }
 
   /* wait gauge field transfer */
@@ -360,8 +363,11 @@ void represent_gauge_field() {
       for (mu=0;mu<4;mu++) {
         u=pu_gauge(ix,mu);
         Ru=pu_gauge_f(ix,mu);
-        _group_represent2(Ru,u); 
-        /*_group_represent(*Ru,*u);*/
+        #ifdef UNROLL_GROUP_REPRESENT
+          _group_represent(*Ru,*u);
+        #else
+          _group_represent2(Ru,u); 
+        #endif
       }
 
   apply_BCs_on_represented_gauge_field();

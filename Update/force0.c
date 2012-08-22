@@ -21,6 +21,16 @@
 
 
 void force0(double dt, suNg_av_field *force, void *vpar){
+  #ifdef TIMING
+  struct timeval start, end;
+  struct timeval etime;
+  
+  #ifdef TIMING_WITH_BARRIERS
+  MPI_Barrier(MPI_COMM_WORLD);
+  #endif
+  gettimeofday(&start,0);
+  #endif
+
   static suNg s1,s2;
   static suNg_algebra_vector f;
   double forcestat[2]={0.,0.}; /* used for computation of avr and max force */
@@ -65,5 +75,14 @@ void force0(double dt, suNg_av_field *force, void *vpar){
   }  
   
   apply_BCs_on_momentum_field(force);
+
+  #ifdef TIMING
+  #ifdef TIMING_WITH_BARRIERS
+  MPI_Barrier(MPI_COMM_WORLD);
+  #endif
+  gettimeofday(&end,0);
+  timeval_subtract(&etime,&end,&start);
+  lprintf("TIMING",0,"force0 %.6f s\n",1.*etime.tv_sec+1.e-6*etime.tv_usec);
+  #endif
 }
 

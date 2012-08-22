@@ -120,6 +120,18 @@ void free_force_rhmc() {
   
 
 void force_rhmc(double dt, suNg_av_field *force, void *vpar){
+    
+  #ifdef TIMING
+  struct timeval start, end;
+  struct timeval start1, end1;
+  struct timeval etime;
+  
+  #ifdef TIMING_WITH_BARRIERS
+  MPI_Barrier(MPI_COMM_WORLD);
+  #endif
+  gettimeofday(&start,0);
+  #endif
+
   _DECLARE_INT_ITERATOR(x);
   int mu, k;
   unsigned int n;
@@ -169,8 +181,25 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar){
   for (k=0; k<par->n_pf; ++k) {
     /* compute inverse vectors chi[i] = (H^2 - b[i])^1 * pf */
     if (inv_par.n==1) { spinor_field_zero_f(chi); }
+
+    #ifdef TIMING
+    #ifdef TIMING_WITH_BARRIERS
+    MPI_Barrier(MPI_COMM_WORLD);
+    #endif
+    gettimeofday(&start1,0);
+    #endif
+
     cg_mshift(&inv_par, &H2, &pf[k], chi);
     
+    #ifdef TIMING
+    #ifdef TIMING_WITH_BARRIERS
+    MPI_Barrier(MPI_COMM_WORLD);
+    #endif
+    gettimeofday(&end1,0);
+    timeval_subtract(&etime,&end1,&start1);
+    lprintf("TIMING",0,"cg_mshift in force_rhmc %.6f s\n",1.*etime.tv_sec+1.e-6*etime.tv_usec);
+    #endif
+
     for (n=0; n<ratio->order; ++n) {
       #ifdef UPDATE_EO
       /* change temporarely the type of chi[n] and Hchi */
@@ -285,6 +314,14 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar){
   chi[0].type=&glattice;
   #endif
   
+  #ifdef TIMING
+  #ifdef TIMING_WITH_BARRIERS
+  MPI_Barrier(MPI_COMM_WORLD);
+  #endif
+  gettimeofday(&end,0);
+  timeval_subtract(&etime,&end,&start);
+  lprintf("TIMING",0,"force_rhmc %.6f s\n",1.*etime.tv_sec+1.e-6*etime.tv_usec);
+  #endif
 }
 
 #undef _F_DIR0
