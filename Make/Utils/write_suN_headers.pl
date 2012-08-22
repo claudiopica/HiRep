@@ -214,6 +214,7 @@ write_vector_zero();
 write_vector_minus();
 write_vector_mul();
 write_vector_mulc();
+write_vector_mulc_star();
 write_vector_add();
 write_vector_sub();
 write_vector_i_add();
@@ -579,6 +580,28 @@ sub write_vector_mulc {
 		print "      }\\\n";
 		for(my $i=0;$i<$vr;$i++){
 			print "      _complex_mul((r).$cname\[_i\],(z),(s).$cname\[_i\]); ++_i;\\\n";
+		}
+		print "   } while(0) \n\n";
+	}
+}
+
+sub write_vector_mulc_star {
+    print "/* r=(z^+)*s (z complex) */\n";
+    print "#define _vector_mulc_star_${suff}(r,z,s) \\\n";
+	if ($N<$Nmax or $N<(2*$unroll+1) ) { #unroll all
+		for(my $i=0;$i<$N;$i++){
+			print "   _complex_mul_star((r).$cname\[$i\],(s).$cname\[$i\],(z))";
+			if($i==$N-1) { print "\n\n"; } else { print "; \\\n"; }
+		}
+	} else { #partial unroll
+		print "   do { \\\n";
+		print "      int _i;for (_i=0; _i<$vd; ){\\\n";
+		for(my $i=0;$i<$unroll;$i++){
+			print "         _complex_mul_star((r).$cname\[_i\],(s).$cname\[_i\],(z)); ++_i;\\\n";
+		}
+		print "      }\\\n";
+		for(my $i=0;$i<$vr;$i++){
+			print "      _complex_mul_star((r).$cname\[_i\],(s).$cname\[_i\],(z)); ++_i;\\\n";
 		}
 		print "   } while(0) \n\n";
 	}

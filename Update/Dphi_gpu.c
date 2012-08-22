@@ -35,6 +35,8 @@
 extern rhmc_par _update_par; /* Update/update_rhmc.c */
 #endif /* ROTATED_SF */
 
+__constant__ complex eitheta_gpu[4];
+
 /*
  * the following variable is used to keep trace of
  * matrix-vector multiplication.
@@ -49,11 +51,80 @@ unsigned long int getMVM() {
 	return res;
 }
 
-/*
- * This function defines the massless Dirac operator
- * It can act on spinors defined on the whole lattice 
- * or on spinors with definite parity
- */
+
+/* r=t*u*s */
+#ifdef BC_T_THETA
+
+#define _suNf_theta_T_multiply(r,u,s)\
+    _suNf_multiply(vtmp,(u),(s));\
+    _vector_mulc_f((r),eitheta_gpu[0],vtmp)
+    
+#define _suNf_theta_T_inverse_multiply(r,u,s)\
+    _suNf_inverse_multiply(vtmp,(u),(s));\
+    _vector_mulc_star_f((r),eitheta_gpu[0],vtmp)
+
+#else
+
+#define _suNf_theta_T_multiply(r,u,s) _suNf_multiply((r),(u),(s))
+#define _suNf_theta_T_inverse_multiply(r,u,s) _suNf_inverse_multiply((r),(u),(s))
+
+#endif
+
+/* r=t*u*s */
+#ifdef BC_X_THETA
+
+#define _suNf_theta_X_multiply(r,u,s)\
+_suNf_multiply(vtmp,(u),(s));\
+_vector_mulc_f((r),eitheta_gpu[1],vtmp)
+
+#define _suNf_theta_X_inverse_multiply(r,u,s)\
+_suNf_inverse_multiply(vtmp,(u),(s));\
+_vector_mulc_star_f((r),eitheta_gpu[1],vtmp)
+
+#else
+
+#define _suNf_theta_X_multiply(r,u,s) _suNf_multiply((r),(u),(s))
+#define _suNf_theta_X_inverse_multiply(r,u,s) _suNf_inverse_multiply((r),(u),(s))
+
+#endif
+
+/* r=t*u*s */
+#ifdef BC_Y_THETA
+
+#define _suNf_theta_Y_multiply(r,u,s)\
+_suNf_multiply(vtmp,(u),(s));\
+_vector_mulc_f((r),eitheta_gpu[2],vtmp)
+
+#define _suNf_theta_Y_inverse_multiply(r,u,s)\
+_suNf_inverse_multiply(vtmp,(u),(s));\
+_vector_mulc_star_f((r),eitheta_gpu[2],vtmp)
+
+#else
+
+#define _suNf_theta_Y_multiply(r,u,s) _suNf_multiply((r),(u),(s))
+#define _suNf_theta_Y_inverse_multiply(r,u,s) _suNf_inverse_multiply((r),(u),(s))
+
+#endif
+
+/* r=t*u*s */
+#ifdef BC_Z_THETA
+
+#define _suNf_theta_Z_multiply(r,u,s)\
+_suNf_multiply(vtmp,(u),(s));\
+_vector_mulc_f((r),eitheta_gpu[3],vtmp)
+
+#define _suNf_theta_Z_inverse_multiply(r,u,s)\
+_suNf_inverse_multiply(vtmp,(u),(s));\
+_vector_mulc_star_f((r),eitheta_gpu[3],vtmp)
+
+#else
+
+#define _suNf_theta_Z_multiply(r,u,s) _suNf_multiply((r),(u),(s))
+#define _suNf_theta_Z_inverse_multiply(r,u,s) _suNf_inverse_multiply((r),(u),(s))
+
+#endif
+
+
 
 typedef struct _suNf_hspinor
 {
@@ -65,6 +136,12 @@ typedef struct _suNf_hspinor
 //#define __asm_sync
 
 
+/*
+ * This function defines the massless Dirac operator
+ * It can act on spinors defined on the whole lattice 
+ * or on spinors with definite parity
+ */
+
 /* Takes an even input spinor and returns an odd spinor */
 __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restrict__ in, 
 			    const suNf* gauge, const int* __restrict__ iup, const int* __restrict__ idn, 
@@ -74,7 +151,9 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
   suNf_vector r;
   suNf_hspinor sn;
   suNf u;				
-  
+#ifdef FERMION_THETA
+  suNf_vector vtmp;
+#endif
   int iy;
   int ix = blockIdx.x*BLOCK_SIZE/4 + threadIdx.x%(BLOCK_SIZE/4); 
   iy=threadIdx.x/(BLOCK_SIZE/4);
@@ -90,7 +169,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_add_assign_f(sn.c[0],sn.c[1]);
       
       _suNf_read_gpu(vol4h,u,gauge+4*vol4h,ix,0);
-      _suNf_multiply(r,u,sn.c[0]);
+      _suNf_theta_T_multiply(r,u,sn.c[0]);
       
       /******************************* direction -0 *********************************/
       iy=idn(ix+vol4h,0);
@@ -100,7 +179,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_sub_assign_f(sn.c[0],sn.c[1]);
       
       _suNf_read_gpu(vol4h,u,gauge,iy,0);
-      _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_T_inverse_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_add_assign_f(r,sn.c[1]);
  
@@ -113,7 +192,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_i_add_assign_f(sn.c[0],sn.c[1]);
       
       _suNf_read_gpu(vol4h,u,gauge+4*vol4h,ix,1);
-      _suNf_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_X_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_add_assign_f(r,sn.c[1]);
       
@@ -125,7 +204,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_i_sub_assign_f(sn.c[0],sn.c[1]);
       
       _suNf_read_gpu(vol4h,u,gauge,iy,1);
-      _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_X_inverse_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_add_assign_f(r,sn.c[1]);
 
@@ -139,7 +218,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_add_assign_f(sn.c[0],sn.c[1]);
       
       _suNf_read_gpu(vol4h,u,gauge+4*vol4h,ix,2);
-      _suNf_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_Y_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_add_assign_f(r,sn.c[1]);
       
@@ -151,7 +230,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_sub_assign_f(sn.c[0],sn.c[1]);
       
       _suNf_read_gpu(vol4h,u,gauge,iy,2);
-      _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_Y_inverse_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_add_assign_f(r,sn.c[1]);
 
@@ -164,7 +243,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_i_add_assign_f(sn.c[0],sn.c[1]);
       
       _suNf_read_gpu(vol4h,u,gauge+4*vol4h,ix,3);
-      _suNf_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_Z_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_add_assign_f(r,sn.c[1]);
       
@@ -176,7 +255,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_i_sub_assign_f(sn.c[0],sn.c[1]);
       
       _suNf_read_gpu(vol4h,u,gauge,iy,3);
-      _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_Z_inverse_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_add_assign_f(r,sn.c[1]);
 
@@ -200,7 +279,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_add_assign_f(sn.c[0],sn.c[1]);
       _suNf_read_gpu(vol4h,u,gauge+4*vol4h,ix,0);
       
-      _suNf_multiply(r,u,sn.c[0]);
+      _suNf_theta_T_multiply(r,u,sn.c[0]);
       
       /******************************* direction -0 *********************************/
       iy=idn(ix+vol4h,0);
@@ -210,7 +289,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_sub_assign_f(sn.c[0],sn.c[1]);
       _suNf_read_gpu(vol4h,u,gauge,iy,0);
       
-      _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_T_inverse_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_add_assign_f(r,sn.c[1]);
       
@@ -223,7 +302,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_i_add_assign_f(sn.c[0],sn.c[1]);
       _suNf_read_gpu(vol4h,u,gauge+4*vol4h,ix,1);
       
-      _suNf_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_X_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_add_assign_f(r,sn.c[1]);
       
@@ -236,7 +315,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_i_sub_assign_f(sn.c[0],sn.c[1]);
       _suNf_read_gpu(vol4h,u,gauge,iy,1);
       
-      _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_X_inverse_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_add_assign_f(r,sn.c[1]);
 
@@ -249,7 +328,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_sub_assign_f(sn.c[0],sn.c[1]);
       _suNf_read_gpu(vol4h,u,gauge+4*vol4h,ix,2);
       
-      _suNf_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_Y_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_add_assign_f(r,sn.c[1]);
       
@@ -261,7 +340,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_add_assign_f(sn.c[0],sn.c[1]);
       _suNf_read_gpu(vol4h,u,gauge,iy,2);
       
-      _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_Y_inverse_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_add_assign_f(r,sn.c[1]);
       
@@ -274,7 +353,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_i_sub_assign_f(sn.c[0],sn.c[1]);
       _suNf_read_gpu(vol4h,u,gauge+4*vol4h,ix,3);
       
-      _suNf_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_Z_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_add_assign_f(r,sn.c[1]);
       
@@ -286,7 +365,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_i_add_assign_f(sn.c[0],sn.c[1]);
       _suNf_read_gpu(vol4h,u,gauge,iy,3);
       
-      _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_Z_inverse_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_add_assign_f(r,sn.c[1]);
       
@@ -308,7 +387,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_add_assign_f(sn.c[0],sn.c[1]);
       
       _suNf_read_gpu(vol4h,u,gauge+4*vol4h,ix,0);
-      _suNf_multiply(r,u,sn.c[0]);
+      _suNf_theta_T_multiply(r,u,sn.c[0]);
       
       
       /******************************* direction -0 *********************************/
@@ -319,7 +398,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_sub_assign_f(sn.c[0],sn.c[1]);
       
       _suNf_read_gpu(vol4h,u,gauge,iy,0);
-      _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_T_inverse_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_sub_assign_f(r,sn.c[1]);
       
@@ -332,7 +411,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_i_add_assign_f(sn.c[0],sn.c[1]);
       _suNf_read_gpu(vol4h,u,gauge+4*vol4h,ix,1);
       
-      _suNf_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_X_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_i_sub_assign_f(r,sn.c[1]);
       
@@ -344,7 +423,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_i_sub_assign_f(sn.c[0],sn.c[1]);
       _suNf_read_gpu(vol4h,u,gauge,iy,1);
       
-      _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_X_inverse_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_i_add_assign_f(r,sn.c[1]);
 
@@ -357,7 +436,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_sub_assign_f(sn.c[0],sn.c[1]);
       _suNf_read_gpu(vol4h,u,gauge+4*vol4h,ix,2);
       
-      _suNf_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_Y_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_sub_assign_f(r,sn.c[1]);
       
@@ -370,7 +449,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       
       _suNf_read_gpu(vol4h,u,gauge,iy,2);
       
-      _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_Y_inverse_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_add_assign_f(r,sn.c[1]);
 
@@ -383,7 +462,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_i_add_assign_f(sn.c[0],sn.c[1]);
       
       _suNf_read_gpu(vol4h,u,gauge+4*vol4h,ix,3);
-      _suNf_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_Z_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_i_sub_assign_f(r,sn.c[1]);
       
@@ -395,7 +474,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_i_sub_assign_f(sn.c[0],sn.c[1]);
       
       _suNf_read_gpu(vol4h,u,gauge,iy,3);
-      _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_Z_inverse_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_i_add_assign_f(r,sn.c[1]);
 
@@ -417,7 +496,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_add_assign_f(sn.c[0],sn.c[1]);
       _suNf_read_gpu(vol4h,u,gauge+4*vol4h,ix,0);
       
-      _suNf_multiply(r,u,sn.c[0]);
+      _suNf_theta_T_multiply(r,u,sn.c[0]);
       
       /******************************* direction -0 *********************************/
       iy=idn(ix+vol4h,0);
@@ -427,7 +506,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_sub_assign_f(sn.c[0],sn.c[1]);
       _suNf_read_gpu(vol4h,u,gauge,iy,0);
       
-      _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_T_inverse_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_sub_assign_f(r,sn.c[1]);       
 
@@ -440,7 +519,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_i_add_assign_f(sn.c[0],sn.c[1]);
       
       _suNf_read_gpu(vol4h,u,gauge+4*vol4h,ix,1);
-      _suNf_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_X_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_i_sub_assign_f(r,sn.c[1]);
       
@@ -452,7 +531,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_i_sub_assign_f(sn.c[0],sn.c[1]);
       
       _suNf_read_gpu(vol4h,u,gauge,iy,1);
-      _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_X_inverse_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_i_add_assign_f(r,sn.c[1]);
       
@@ -465,7 +544,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_add_assign_f(sn.c[0],sn.c[1]);
       
       _suNf_read_gpu(vol4h,u,gauge+4*vol4h,ix,2);
-      _suNf_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_Y_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_add_assign_f(r,sn.c[1]);
       
@@ -477,7 +556,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_sub_assign_f(sn.c[0],sn.c[1]);
       
       _suNf_read_gpu(vol4h,u,gauge,iy,2);
-      _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_Y_inverse_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_sub_assign_f(r,sn.c[1]);
 
@@ -490,7 +569,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_i_sub_assign_f(sn.c[0],sn.c[1]);
       _suNf_read_gpu(vol4h,u,gauge+4*vol4h,ix,3);
       
-      _suNf_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_Z_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_i_add_assign_f(r,sn.c[1]);
       
@@ -502,7 +581,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_i_add_assign_f(sn.c[0],sn.c[1]);
       _suNf_read_gpu(vol4h,u,gauge,iy,3);
       
-      _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_Z_inverse_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_i_sub_assign_f(r,sn.c[1]);
       
@@ -527,7 +606,9 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
   suNf_vector r;
   suNf_hspinor sn;
   suNf u;				
-  
+#ifdef FERMION_THETA
+  suNf_vector vtmp;
+#endif
   int iy;
   int ix = blockIdx.x*BLOCK_SIZE/4 + threadIdx.x%(BLOCK_SIZE/4); 
   iy=threadIdx.x/(BLOCK_SIZE/4);
@@ -544,7 +625,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_add_assign_f(sn.c[0],sn.c[1]);
       
       _suNf_read_gpu(vol4h,u,gauge,ix,0);
-      _suNf_multiply(r,u,sn.c[0]);
+      _suNf_theta_T_multiply(r,u,sn.c[0]);
       
       /******************************* direction -0 *********************************/
       iy=idn(ix,0)-vol4h;
@@ -554,7 +635,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_sub_assign_f(sn.c[0],sn.c[1]);
       
       _suNf_read_gpu(vol4h,u,gauge+4*vol4h,iy,0);
-      _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_T_inverse_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_add_assign_f(r,sn.c[1]);
 
@@ -567,7 +648,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_i_add_assign_f(sn.c[0],sn.c[1]);
       
       _suNf_read_gpu(vol4h,u,gauge,ix,1);
-      _suNf_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_X_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_add_assign_f(r,sn.c[1]);
       
@@ -579,7 +660,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_i_sub_assign_f(sn.c[0],sn.c[1]);
       
       _suNf_read_gpu(vol4h,u,gauge+4*vol4h,iy,1);
-      _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_X_inverse_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_add_assign_f(r,sn.c[1]);
       
@@ -592,7 +673,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_add_assign_f(sn.c[0],sn.c[1]);
       
       _suNf_read_gpu(vol4h,u,gauge,ix,2);
-      _suNf_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_Y_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_add_assign_f(r,sn.c[1]);
       
@@ -604,7 +685,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_sub_assign_f(sn.c[0],sn.c[1]);
       
       _suNf_read_gpu(vol4h,u,gauge+4*vol4h,iy,2);
-      _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_Y_inverse_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_add_assign_f(r,sn.c[1]);
       
@@ -617,7 +698,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_i_add_assign_f(sn.c[0],sn.c[1]);
       
       _suNf_read_gpu(vol4h,u,gauge,ix,3);
-      _suNf_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_Z_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_add_assign_f(r,sn.c[1]);
       
@@ -629,7 +710,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_i_sub_assign_f(sn.c[0],sn.c[1]);
       
       _suNf_read_gpu(vol4h,u,gauge+4*vol4h,iy,3);
-      _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_Z_inverse_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_add_assign_f(r,sn.c[1]);
       
@@ -652,7 +733,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_add_assign_f(sn.c[0],sn.c[1]);
       _suNf_read_gpu(vol4h,u,gauge,ix,0);
       
-      _suNf_multiply(r,u,sn.c[0]);
+      _suNf_theta_T_multiply(r,u,sn.c[0]);
       
       /******************************* direction -0 *********************************/
       iy=idn(ix,0)-vol4h;
@@ -662,7 +743,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_sub_assign_f(sn.c[0],sn.c[1]);
       _suNf_read_gpu(vol4h,u,gauge+4*vol4h,iy,0);
       
-      _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_T_inverse_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_add_assign_f(r,sn.c[1]);
  
@@ -675,7 +756,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_i_add_assign_f(sn.c[0],sn.c[1]);
       _suNf_read_gpu(vol4h,u,gauge,ix,1);
       
-      _suNf_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_X_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_add_assign_f(r,sn.c[1]);
       
@@ -688,7 +769,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_i_sub_assign_f(sn.c[0],sn.c[1]);
       _suNf_read_gpu(vol4h,u,gauge+4*vol4h,iy,1);
       
-      _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_X_inverse_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_add_assign_f(r,sn.c[1]);
       
@@ -701,7 +782,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_sub_assign_f(sn.c[0],sn.c[1]);
       _suNf_read_gpu(vol4h,u,gauge,ix,2);
       
-      _suNf_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_Y_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_add_assign_f(r,sn.c[1]);
       
@@ -713,7 +794,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_add_assign_f(sn.c[0],sn.c[1]);
       _suNf_read_gpu(vol4h,u,gauge+4*vol4h,iy,2);
       
-      _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_Y_inverse_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_add_assign_f(r,sn.c[1]); 
 
@@ -726,7 +807,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_i_sub_assign_f(sn.c[0],sn.c[1]);
       _suNf_read_gpu(vol4h,u,gauge,ix,3);
       
-      _suNf_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_Z_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_add_assign_f(r,sn.c[1]);
       
@@ -738,7 +819,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_i_add_assign_f(sn.c[0],sn.c[1]);
       _suNf_read_gpu(vol4h,u,gauge+4*vol4h,iy,3);
       
-      _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_Z_inverse_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_add_assign_f(r,sn.c[1]); 
       __asm_sync     
@@ -759,7 +840,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_add_assign_f(sn.c[0],sn.c[1]);
       
       _suNf_read_gpu(vol4h,u,gauge,ix,0);
-      _suNf_multiply(r,u,sn.c[0]);
+      _suNf_theta_T_multiply(r,u,sn.c[0]);
       
       
       /******************************* direction -0 *********************************/
@@ -770,7 +851,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_sub_assign_f(sn.c[0],sn.c[1]);
       
       _suNf_read_gpu(vol4h,u,gauge+4*vol4h,iy,0);
-      _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_T_inverse_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_sub_assign_f(r,sn.c[1]);
 
@@ -783,7 +864,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_i_add_assign_f(sn.c[0],sn.c[1]);
       _suNf_read_gpu(vol4h,u,gauge,ix,1);
       
-      _suNf_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_X_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_i_sub_assign_f(r,sn.c[1]);
       
@@ -795,7 +876,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_i_sub_assign_f(sn.c[0],sn.c[1]);
       _suNf_read_gpu(vol4h,u,gauge+4*vol4h,iy,1);
       
-      _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_X_inverse_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_i_add_assign_f(r,sn.c[1]);
       
@@ -808,7 +889,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_sub_assign_f(sn.c[0],sn.c[1]);
       _suNf_read_gpu(vol4h,u,gauge,ix,2);
       
-      _suNf_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_Y_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_sub_assign_f(r,sn.c[1]);
       
@@ -821,7 +902,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       
       _suNf_read_gpu(vol4h,u,gauge+4*vol4h,iy,2);
       
-      _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_Y_inverse_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_add_assign_f(r,sn.c[1]);
 
@@ -834,7 +915,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_i_add_assign_f(sn.c[0],sn.c[1]);
       
       _suNf_read_gpu(vol4h,u,gauge,ix,3);
-      _suNf_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_Z_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_i_sub_assign_f(r,sn.c[1]);
       
@@ -846,7 +927,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_i_sub_assign_f(sn.c[0],sn.c[1]);
       
       _suNf_read_gpu(vol4h,u,gauge+4*vol4h,iy,3);
-      _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_Z_inverse_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_i_add_assign_f(r,sn.c[1]);
   
@@ -868,7 +949,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_add_assign_f(sn.c[0],sn.c[1]);
       _suNf_read_gpu(vol4h,u,gauge,ix,0);
       
-      _suNf_multiply(r,u,sn.c[0]);
+      _suNf_theta_T_multiply(r,u,sn.c[0]);
       
       
       /******************************* direction -0 *********************************/
@@ -879,7 +960,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_sub_assign_f(sn.c[0],sn.c[1]);
       _suNf_read_gpu(vol4h,u,gauge+4*vol4h,iy,0);
       
-      _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_T_inverse_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_sub_assign_f(r,sn.c[1]);       
 
@@ -892,7 +973,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_i_add_assign_f(sn.c[0],sn.c[1]);
       
       _suNf_read_gpu(vol4h,u,gauge,ix,1);
-      _suNf_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_X_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_i_sub_assign_f(r,sn.c[1]);
       
@@ -904,7 +985,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_i_sub_assign_f(sn.c[0],sn.c[1]);
       
       _suNf_read_gpu(vol4h,u,gauge+4*vol4h,iy,1);
-      _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_X_inverse_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_i_add_assign_f(r,sn.c[1]);
       
@@ -917,7 +998,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_add_assign_f(sn.c[0],sn.c[1]);
       
       _suNf_read_gpu(vol4h,u,gauge,ix,2);
-      _suNf_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_Y_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_add_assign_f(r,sn.c[1]);
       
@@ -929,7 +1010,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_sub_assign_f(sn.c[0],sn.c[1]);
       
       _suNf_read_gpu(vol4h,u,gauge+4*vol4h,iy,2);
-      _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_Y_inverse_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_sub_assign_f(r,sn.c[1]);
  
@@ -942,7 +1023,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_i_sub_assign_f(sn.c[0],sn.c[1]);
       _suNf_read_gpu(vol4h,u,gauge,ix,3);
       
-      _suNf_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_Z_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_i_add_assign_f(r,sn.c[1]);
       
@@ -954,7 +1035,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
       _vector_i_add_assign_f(sn.c[0],sn.c[1]);
       _suNf_read_gpu(vol4h,u,gauge+4*vol4h,iy,3);
       
-      _suNf_inverse_multiply(sn.c[1],u,sn.c[0]);
+      _suNf_theta_Z_inverse_multiply(sn.c[1],u,sn.c[0]);
       
       _vector_i_sub_assign_f(r,sn.c[1]);
 
@@ -972,21 +1053,25 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
   }
 }
 
+static void init_bc_gpu(){
+  static int initialized=0;
+  if (!initialized){
+    cudaMemcpyToSymbol("eitheta_gpu", eitheta, 4*sizeof(complex), 0, cudaMemcpyHostToDevice);
+    initialized=1;
+  }
+}
 
 void Dphi_(spinor_field *out, spinor_field *in)
 {
-   int N,grid;
+  int N,grid;
   const int vol4h=T*X*Y*Z/2;
-  /*#ifdef UPDATE_EO
-  const int stride=vol4h;
-#else
-  const int stride=vol4h*2;
-  #endif*/
   
-   error((in==NULL)||(out==NULL),1,"Dphi_ [Dphi.c]",
+  init_bc_gpu();
+  
+  error((in==NULL)||(out==NULL),1,"Dphi_ [Dphi.c]",
          "Attempt to access unallocated memory space");
    
-   error(in==out,1,"Dphi_ [Dphi.c]",
+  error(in==out,1,"Dphi_ [Dphi.c]",
          "Input and output fields must be different");
 
 #ifndef CHECK_SPINOR_MATCHING

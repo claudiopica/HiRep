@@ -141,6 +141,7 @@ GLB_VAR(suNf_field_flt,*u_gauge_f_flt,=NULL);
 #define BC_Z 0.
 #endif
 
+
 GLB_VAR(double,bc[4],={BC_T,BC_X,BC_Y,BC_Z});
 
 #ifdef TWISTED_BC
@@ -153,10 +154,35 @@ GLB_VAR(int,*twbc_plaq, =NULL);
 #undef BC_Y
 #undef BC_Z
 
+#ifdef ANTIPERIODIC_BC_T
+#define FERMION_THETA
+#define BC_T_THETA
+#endif
+
+#ifdef ANTIPERIODIC_BC_X
+#define FERMION_THETA
+#define BC_X_THETA
+#endif
+
+#ifdef ANTIPERIODIC_BC_Y
+#define FERMION_THETA
+#define BC_Y_THETA
+#endif
+
+#ifdef ANTIPERIODIC_BC_Z
+#define FERMION_THETA
+#define BC_Z_THETA
+#endif
+
 /* input parameters */
 #include "input_par.h"
 GLB_VAR(input_glb,glb_var,=init_input_glb(glb_var));
 
+
+/* Theta Boundary conditions */
+#ifdef FERMION_THETA
+GLB_VAR(complex,eitheta[4],={{1.,0.}});
+#endif
 
 
 #ifdef WITH_GPU

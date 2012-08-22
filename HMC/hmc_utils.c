@@ -273,6 +273,10 @@ int init_mc(hmc_flow *rf, char *ifile) {
 
   represent_gauge_field();
   assign_ud2u_f();
+
+  /*Initialize fermion boundary condition variables eitheta*/
+  init_bc();
+
   
   /* init HMC */
   init_hmc(&hmc_var.rhmc_p);

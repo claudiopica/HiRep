@@ -174,7 +174,7 @@ int main(int argc,char *argv[])
   read_input(eigval_var.read,"input_file");
 #ifdef WITH_GPU
   read_input(gpu_var.read,input_filename);
-  cudaSetDevice(gpu_var.gpuID);
+  init_gpu(gpu_var);
 #endif //WITH_GPU
   
   

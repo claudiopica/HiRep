@@ -14,39 +14,69 @@
 #include <stdio.h>
 #include <math.h>
 
+__constant__ complex eitheta_f_gpu[4];
+
+#ifdef BC_T_THETA
+#define _T_theta_mulc(r) _vector_mulc_f(ptmp,eitheta_f_gpu[0],(r)); (r)=ptmp
+#else
+#define _T_theta_mulc(r)
+#endif
+#ifdef BC_X_THETA
+#define _X_theta_mulc(r) _vector_mulc_f(ptmp,eitheta_f_gpu[1],(r)); (r)=ptmp
+#else
+#define _X_theta_mulc(r)
+#endif
+#ifdef BC_Y_THETA
+#define _Y_theta_mulc(r) _vector_mulc_f(ptmp,eitheta_f_gpu[2],(r)); (r)=ptmp
+#else
+#define _Y_theta_mulc(r)
+#endif
+#ifdef BC_Z_THETA
+#define _Z_theta_mulc(r) _vector_mulc_f(ptmp,eitheta_f_gpu[3],(r)); (r)=ptmp
+#else
+#define _Z_theta_mulc(r)
+#endif
 
 #define _F_DIR0(u,chi1,chi2)				      \
-  _vector_add_f(ptmp,(chi2).c[0],(chi2).c[2]);	      \
-  _suNf_multiply(p.c[0],pu,ptmp);	      \
-  _vector_add_f(ptmp,(chi2).c[1],(chi2).c[3]);	      \
-  _suNf_multiply(p.c[1],pu,ptmp);	      \
+  _vector_add_f(ptmp,(chi2).c[0],(chi2).c[2]);		      \
+  _suNf_multiply(p.c[0],pu,ptmp);			      \
+  _T_theta_mulc(p.c[0]);				      \
+  _vector_add_f(ptmp,(chi2).c[1],(chi2).c[3]);		      \
+  _suNf_multiply(p.c[1],pu,ptmp);			      \
+  _T_theta_mulc(p.c[1]);                                      \
   _vector_sub_f(p.c[2],(chi1).c[0],(chi1).c[2]);	      \
   _vector_sub_f(p.c[3],(chi1).c[1],(chi1).c[3]);	      \
   _suNf_FMAT((u),p)
 
 #define _F_DIR1(u,chi1,chi2)				      \
   _vector_i_add_f(ptmp,(chi2).c[0],(chi2).c[3]);	      \
-  _suNf_multiply(p.c[0],pu,ptmp);	      \
+  _suNf_multiply(p.c[0],pu,ptmp);			      \
+  _X_theta_mulc(p.c[0]);                                      \
   _vector_i_add_f(ptmp,(chi2).c[1],(chi2).c[2]);	      \
-  _suNf_multiply(p.c[1],pu,ptmp);	      \
+  _suNf_multiply(p.c[1],pu,ptmp);			      \
+  _X_theta_mulc(p.c[1]);                                      \
   _vector_i_sub_f(p.c[2],(chi1).c[0],(chi1).c[3]);	      \
   _vector_i_sub_f(p.c[3],(chi1).c[1],(chi1).c[2]);	      \
   _suNf_FMAT((u),p)
 
 #define _F_DIR2(u,chi1,chi2)				      \
-  _vector_add_f(ptmp,(chi2).c[0],(chi2).c[3]);	      \
-  _suNf_multiply(p.c[0],pu,ptmp);	      \
-  _vector_sub_f(ptmp,(chi2).c[1],(chi2).c[2]);	      \
-  _suNf_multiply(p.c[1],pu,ptmp);	      \
+  _vector_add_f(ptmp,(chi2).c[0],(chi2).c[3]);		      \
+  _suNf_multiply(p.c[0],pu,ptmp);			      \
+  _Y_theta_mulc(p.c[0]);                                      \
+  _vector_sub_f(ptmp,(chi2).c[1],(chi2).c[2]);		      \
+  _suNf_multiply(p.c[1],pu,ptmp);			      \
+  _Y_theta_mulc(p.c[1]);                                      \
   _vector_sub_f(p.c[2],(chi1).c[0],(chi1).c[3]);	      \
   _vector_add_f(p.c[3],(chi1).c[1],(chi1).c[2]);	      \
   _suNf_FMAT((u),p)
 
 #define _F_DIR3(u,chi1,chi2)				      \
   _vector_i_add_f(ptmp,(chi2).c[0],(chi2).c[2]);	      \
-  _suNf_multiply(p.c[0],pu,ptmp);	      \
+  _suNf_multiply(p.c[0],pu,ptmp);			      \
+  _Z_theta_mulc(p.c[0]);                                      \
   _vector_i_sub_f(ptmp,(chi2).c[1],(chi2).c[3]);	      \
-  _suNf_multiply(p.c[1],pu,ptmp);	      \
+  _suNf_multiply(p.c[1],pu,ptmp);			      \
+  _Z_theta_mulc(p.c[1]);                                      \
   _vector_i_sub_f(p.c[2],(chi1).c[0],(chi1).c[2]);	      \
   _vector_i_add_f(p.c[3],(chi1).c[1],(chi1).c[3]);	      \
   _suNf_FMAT((u),p)
@@ -141,10 +171,18 @@ __global__ void force_hmc_gpu_kernel(suNg_algebra_vector* force, suNf_spinor *Xs
 
 }
 
+static void init_bc_gpu(){
+  static int initialized=0;
+  if (!initialized){
+    cudaMemcpyToSymbol("eitheta_f_gpu", eitheta, 4*sizeof(complex), 0, cudaMemcpyHostToDevice);
+    initialized=1;
+  }
+}
 
 void force_hmc_gpu(suNg_av_field* force, spinor_field *Xs, spinor_field *Ys, double dfs){
   int N = T*X*Y*Z;//u_gauge->type->master_end[0] -  u_gauge->type->master_start[0] + 1;
   int grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
+  init_bc_gpu();
   force_hmc_gpu_kernel<<<grid,BLOCK_SIZE>>>(force->gpu_ptr,Xs->gpu_ptr,Ys->gpu_ptr,u_gauge_f->gpu_ptr,dfs,iup_gpu,N);
   CudaCheckError();
 }

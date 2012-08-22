@@ -18,6 +18,43 @@
 extern rhmc_par _update_par; /* Update/update_rhmc.c */
 #endif /* ROTATED_SF */
 
+#define PI 3.141592653589793238462643383279502884197
+
+void init_bc(){
+  double thetaX,thetaY,thetaZ,thetaT;
+#if defined(ANTIPERIODIC_BC_T)
+  thetaT = PI;
+#else
+  thetaT = 0.;
+#endif 
+
+#if defined(ANTIPERIODIC_BC_X)
+  thetaX = PI;
+#else
+  thetaX = 0.;
+#endif 
+
+#if defined(ANTIPERIODIC_BC_Y)
+  thetaY = PI;
+#else
+  thetaY = 0.;
+#endif 
+
+#if defined(ANTIPERIODIC_BC_Z)
+  thetaZ = PI;
+#else
+  thetaZ = 0.;
+#endif 
+
+  eitheta[0].re=cos(thetaT/(double)GLB_T);
+  eitheta[0].im=sin(thetaT/(double)GLB_T);
+  eitheta[1].re=cos(thetaX/(double)GLB_X);
+  eitheta[1].im=sin(thetaX/(double)GLB_X);
+  eitheta[2].re=cos(thetaY/(double)GLB_Y);
+  eitheta[2].im=sin(thetaY/(double)GLB_Y);
+  eitheta[3].re=cos(thetaZ/(double)GLB_Z);
+  eitheta[3].im=sin(thetaZ/(double)GLB_Z);
+}
 
 void apply_bc(){
 #if defined(ANTIPERIODIC_BC_T) && !defined(ROTATED_SF) && !defined(BASIC_SF)

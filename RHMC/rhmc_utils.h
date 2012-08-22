@@ -78,25 +78,25 @@ typedef struct _rhmc_flow {
   }\
 }
 
-#ifdef WITH_GPU
-/* GPU variables */
-typedef struct _input_gpu {
-  unsigned int gpuID;
+/* #ifdef WITH_GPU */
+/* /\* GPU variables *\/ */
+/* typedef struct _input_gpu { */
+/*   unsigned int gpuID; */
   
-  /* for the reading function */
-  input_record_t read[2];
+/*   /\* for the reading function *\/ */
+/*   input_record_t read[2]; */
   
-} input_gpu;
+/* } input_gpu; */
 
-#define init_input_gpu(varname) \
-{ \
-.gpuID=0,\
-.read={\
-{"gpuID", "gpuID = %d", INT_T, &(varname).gpuID},\
-{NULL, NULL, 0, NULL}\
-}\
-}
-#endif //WITH_GPU
+/* #define init_input_gpu(varname) \ */
+/* { \ */
+/* .gpuID=0,\ */
+/* .read={\ */
+/* {"gpuID", "gpuID = %d", INT_T, &(varname).gpuID},\ */
+/* {NULL, NULL, 0, NULL}\ */
+/* }\ */
+/* } */
+/* #endif //WITH_GPU */
 
 int init_mc(rhmc_flow *rf, char *ifile);
 int save_conf(rhmc_flow *rf, int id);

@@ -22,8 +22,10 @@
 
 void ExpX(double dt, suNg_algebra_vector *h, suNg *u);
 
+void init_bc();
 void apply_bc();
 void apply_bc_flt();
+
 
 #ifdef BASIC_SF
 double SF_test_spinor_bcs(spinor_field *sp);
