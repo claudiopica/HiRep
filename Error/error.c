@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include "error.h"
 #include "logger.h"
+#include "geometry.h"
 
 void error(int test,int no,char *name,char *text)
 {
