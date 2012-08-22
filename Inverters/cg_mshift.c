@@ -11,6 +11,7 @@
 #include "global.h"
 #include "memory.h"
 #include "logger.h"
+#include "utils.h"
 #include <assert.h>
 
 
