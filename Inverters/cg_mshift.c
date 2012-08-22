@@ -143,6 +143,16 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
 }
 
 int cg_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out){ 
+  #ifdef TIMING
+  struct timeval start, end;
+  struct timeval etime;
+  
+  #ifdef TIMING_WITH_BARRIERS
+  MPI_Barrier(MPI_COMM_WORLD);
+  #endif
+  gettimeofday(&start,0);
+  #endif
+
   int cgiter,msiter;
   int i;
   mshift_par par_save=*par;
@@ -165,6 +175,15 @@ int cg_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field
   *par=par_save;
 
   lprintf("INVERTER",10,"CG_mshift: MVM = %d/%d\n",msiter,cgiter);
+
+  #ifdef TIMING
+  #ifdef TIMING_WITH_BARRIERS
+  MPI_Barrier(MPI_COMM_WORLD);
+  #endif
+  gettimeofday(&end,0);
+  timeval_subtract(&etime,&end,&start);
+  lprintf("TIMING",0,"cg_mshift %.6f s\n",1.*etime.tv_sec+1.e-6*etime.tv_usec);
+  #endif
 
   return cgiter;
 }
