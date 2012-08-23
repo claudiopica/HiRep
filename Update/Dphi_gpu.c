@@ -1087,23 +1087,23 @@ void Dphi_(spinor_field *out, spinor_field *in)
 
 
   if(in->type==&glat_odd) {
-    getMVM();
+    ++MVMcounter;
     Dphi_gpu_eo<<<grid*4,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f->gpu_ptr,iup_gpu,idn_gpu,vol4h);
       CudaCheckError();
   } else if (in->type==&glat_even) {
-    getMVM();
+    ++MVMcounter;
     Dphi_gpu_oe<<<grid*4,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f->gpu_ptr,iup_gpu,idn_gpu,vol4h);
       CudaCheckError();
   } else if (in->type==&glattice) {
       in->type=&glat_even;
       out->type=&glat_odd;
-    getMVM();
-    Dphi_gpu_oe<<<grid*4,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f->gpu_ptr,iup_gpu,idn_gpu,vol4h);
+      ++MVMcounter;
+      Dphi_gpu_oe<<<grid*4,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f->gpu_ptr,iup_gpu,idn_gpu,vol4h);
       CudaCheckError();
       in->type=&glat_odd;
       out->type=&glat_even;
-    getMVM();
-    Dphi_gpu_eo<<<grid*4,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f->gpu_ptr,iup_gpu,idn_gpu,vol4h);
+      ++MVMcounter;
+      Dphi_gpu_eo<<<grid*4,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f->gpu_ptr,iup_gpu,idn_gpu,vol4h);
       CudaCheckError();
       
       in->type=&glattice;

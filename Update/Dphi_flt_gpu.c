@@ -596,29 +596,29 @@ void Dphi_flt_(spinor_field_flt *out, spinor_field_flt *in)
   grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
   
   if(in->type==&glat_odd) {
-    getMVM_flt();
+    ++MVMcounter;
     Dphi_flt_gpu_eo<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f_flt->gpu_ptr,iup_gpu,idn_gpu,vol4h, vol4h);
-      CudaCheckError();
+    CudaCheckError();
   } else if (in->type==&glat_even) {
-    getMVM_flt();
+    ++MVMcounter;
     Dphi_flt_gpu_oe<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f_flt->gpu_ptr,iup_gpu,idn_gpu,vol4h, vol4h);
-      CudaCheckError();
+    CudaCheckError();
   } else if (in->type==&glattice) {
-      in->type=&glat_even;
-      out->type=&glat_odd;
-    getMVM_flt();
+    in->type=&glat_even;
+    out->type=&glat_odd;
+    ++MVMcounter;
     Dphi_flt_gpu_oe<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f_flt->gpu_ptr,iup_gpu,idn_gpu,vol4h, vol4h);
-      CudaCheckError();
-      in->type=&glat_odd;
-      out->type=&glat_even;
-    getMVM_flt();
+    CudaCheckError();
+    in->type=&glat_odd;
+    out->type=&glat_even;
+    ++MVMcounter;
     Dphi_flt_gpu_eo<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f_flt->gpu_ptr,iup_gpu,idn_gpu,vol4h, vol4h);
-      CudaCheckError();
-      
-      in->type=&glattice;
-      out->type=&glattice;      
+    CudaCheckError();
+    
+    in->type=&glattice;
+    out->type=&glattice;      
   } else {
-      error(1,1,"Dphi_flt_ [Dphi_flt_gpu.c]", "Wrong input spinor geometry!");
+    error(1,1,"Dphi_flt_ [Dphi_flt_gpu.c]", "Wrong input spinor geometry!");
   }
   
 }
