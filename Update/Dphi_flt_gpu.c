@@ -130,6 +130,7 @@ _vector_mulc_star_f((r),eitheta_flt_gpu[3],vtmp)
 #endif
 
 static void init_bc_gpu(){
+#ifdef FERMION_THETA
   static int initialized=0;
   if (!initialized){
     complex_flt theta_flt[4];
@@ -141,6 +142,7 @@ static void init_bc_gpu(){
     cudaMemcpyToSymbol("eitheta_flt_gpu", theta_flt, 4*sizeof(complex_flt), 0, cudaMemcpyHostToDevice);
     initialized=1;
   }
+#endif
 }
 
 

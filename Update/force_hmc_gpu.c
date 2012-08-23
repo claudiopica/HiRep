@@ -172,11 +172,13 @@ __global__ void force_hmc_gpu_kernel(suNg_algebra_vector* force, suNf_spinor *Xs
 }
 
 static void init_bc_gpu(){
+#ifdef FERMION_THETA
   static int initialized=0;
   if (!initialized){
     cudaMemcpyToSymbol("eitheta_f_gpu", eitheta, 4*sizeof(complex), 0, cudaMemcpyHostToDevice);
     initialized=1;
   }
+#endif
 }
 
 void force_hmc_gpu(suNg_av_field* force, spinor_field *Xs, spinor_field *Ys, double dfs){

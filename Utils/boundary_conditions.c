@@ -45,7 +45,7 @@ void init_bc(){
 #else
   thetaZ = 0.;
 #endif 
-
+#ifdef FERMION_THETA
   eitheta[0].re=cos(thetaT/(double)GLB_T);
   eitheta[0].im=sin(thetaT/(double)GLB_T);
   eitheta[1].re=cos(thetaX/(double)GLB_X);
@@ -54,6 +54,7 @@ void init_bc(){
   eitheta[2].im=sin(thetaY/(double)GLB_Y);
   eitheta[3].re=cos(thetaZ/(double)GLB_Z);
   eitheta[3].im=sin(thetaZ/(double)GLB_Z);
+#endif
 }
 
 void apply_bc(){

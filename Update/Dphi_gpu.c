@@ -1054,11 +1054,13 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, suNf_spinor* __restri
 }
 
 static void init_bc_gpu(){
+#ifdef FERMION_THETA
   static int initialized=0;
   if (!initialized){
     cudaMemcpyToSymbol("eitheta_gpu", eitheta, 4*sizeof(complex), 0, cudaMemcpyHostToDevice);
     initialized=1;
   }
+#endif
 }
 
 void Dphi_(spinor_field *out, spinor_field *in)

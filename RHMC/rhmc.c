@@ -170,8 +170,8 @@ int main(int argc,char *argv[])
   /* read input file */
   read_input(glb_var.read,input_filename);
   read_input(mes_var.read,input_filename);
-  read_input(poly_var.read,"input_file");
-  read_input(eigval_var.read,"input_file");
+  read_input(poly_var.read,input_filename);
+  read_input(eigval_var.read,input_filename);
 #ifdef WITH_GPU
   read_input(gpu_var.read,input_filename);
   init_gpu(gpu_var);

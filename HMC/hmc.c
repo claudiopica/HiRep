@@ -232,7 +232,7 @@ int main(int argc,char *argv[])
   }
 
   /* Init Monte Carlo */
-  init_mc(&flow, "input_file");
+  init_mc(&flow, input_filename);
   lprintf("MAIN",0,"MVM during HMC initialzation: %ld\n",getMVM());
   lprintf("MAIN",0,"Initial plaquette: %1.8e\n",avr_plaquette());
 
