@@ -69,6 +69,7 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
   alloc_mem_t=GPU_MEM; /* allocate only on GPU */
 #endif
   memall = alloc_spinor_field_f(2*(par->n)+3,in->type);
+  alloc_mem_t=std_mem_t;
   q1 = (spinor_field**)malloc(sizeof(spinor_field*)*par->n);
   q2 = (spinor_field**)malloc(sizeof(spinor_field*)*par->n);
   for(i=0; i<par->n; i++) {
