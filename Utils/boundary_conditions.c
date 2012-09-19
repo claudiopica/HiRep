@@ -412,12 +412,18 @@ static void chiSF_ds_BT(double ds) {
 
 
 static void init_gf_SF_BCs(suNg* dn, suNg* up) {
-  #if NG==2
-  
+#if NG==2
+
+#ifndef HALFBG_SF
   static double SF_eta = PI/4.0;
+  static double SF_phi0_up[NG] = {-PI, PI};
+#else
+  static double SF_eta = PI/8.0;
+  static double SF_phi0_up[NG] = {-PI/2, PI/2};
+#endif
+
   static double SF_phi0_dn[NG] = {0., 0.};
   static double SF_phi1_dn[NG] = {-1., 1.};
-  static double SF_phi0_up[NG] = {-PI, PI};
   static double SF_phi1_up[NG] = {1., -1.};
   
   #elif NG==3

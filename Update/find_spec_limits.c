@@ -25,7 +25,7 @@ void find_spec_H2(double *max, double *min, double mass) {
   const int kmax=200; /* max degree of polynomial */
   const int maxiter=20; /* max number of subiterations */
   static double *d1;
-  const double omega1=1.e-4; /* absolute precision */
+  const double omega1=1.e-8; /* absolute precision */
   const double omega2=1.e-1; /* relative precision */
   int status,ie;
   /* END of EVA parameters */

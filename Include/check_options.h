@@ -86,6 +86,9 @@
 
 #endif
 
+#if defined(HALFBG_SF) && ( NG!=2 || ( !defined(BASIC_SF) && !defined(ROTATED_SF) ) )
+#   error (HALFBG_SF) can be defined only if NG=2 and or BASIC_SF or ROTATED_SF is used!!!
+# endif
 
 
 #ifdef BC_T_ANTIPERIODIC
