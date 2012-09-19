@@ -1,6 +1,8 @@
 #ifndef CHECK_OPTIONS_H
 #define CHECK_OPTIONS_H
 
+#include "suN_types.h"
+
 /* Boundary conditions */
 
 #ifdef BC_XYZ_TWISTED
@@ -86,7 +88,7 @@
 
 #endif
 
-#if defined(HALFBG_SF) && ( NG!=2 || ( !defined(BASIC_SF) && !defined(ROTATED_SF) ) )
+#if defined(HALFBG_SF) && !( (NG == 2) && ( defined(BASIC_SF) || defined(ROTATED_SF) ) )
 #   error (HALFBG_SF) can be defined only if NG=2 and or BASIC_SF or ROTATED_SF is used!!!
 # endif
 
