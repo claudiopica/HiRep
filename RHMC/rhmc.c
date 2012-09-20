@@ -293,6 +293,8 @@ int main(int argc,char *argv[])
 #ifdef ROTATED_SF
       /* Rotated SF measures */
       if(strcmp(XSF_var.make,"true")==0) {
+         double gsf=SF_action(flow.rhmc_v->rhmc_p.beta);
+          lprintf("SF_action",10,"gsf = %.10e\n",gsf);
          SF_PCAC_wall_mass(flow.rhmc_v->rhmc_p.mass,XSF_var.precision);
       }
 #endif
