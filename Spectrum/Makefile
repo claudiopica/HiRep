@@ -1,13 +1,13 @@
 TOPDIR = ..
 MKDIR=$(TOPDIR)/Make
 
-EXES = mk_mesons random_cnfg random_spinor mk_mesons_with_z2semwall
+EXES = mk_mesons random_cnfg random_spinor mk_mesons_with_z2semwall mk_sfcoupling
 
 default: $(EXES)
 
 
 MODDIR := Geometry
-MODS := geometry_init geometry_mpi_eo communications
+MODS := geometry_init geometry_mpi_eo communications geometry_mpi_eo_patch
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := IO
@@ -31,7 +31,7 @@ MODS := gauss ranlxs ranlxd ranz2 random_fields random_suNg
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Update
-MODS := Dphi representation random_spinor_field random_su2
+MODS := representation random_spinor_field random_su2
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Error
@@ -55,6 +55,8 @@ COMMON_OBJS = $(MOD_OBJS)
 mk_mesons_with_z2semwall_OBJS = $(TOPDIR)/Observables/mesons.o $(TOPDIR)/Observables/pta_qprop.o $(TOPDIR)/Observables/z2semwall.o
 
 mk_mesons_OBJS = $(TOPDIR)/Observables/mesons.o $(TOPDIR)/Observables/pta_qprop.o
+
+mk_sfcoupling_OBJS = $(TOPDIR)/Observables/sf_action.o
 
 include $(MKDIR)/MkRules
 
