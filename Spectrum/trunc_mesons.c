@@ -35,6 +35,10 @@
 #error The implementation of the Schroedinger functional has not been tested on this code
 #endif
 
+#ifdef FERMION_THETA
+#error This code does not work with the fermion twisting !!!
+#endif
+
 
 /* Mesons parameters */
 typedef struct _input_ata_qprop {
@@ -203,10 +207,12 @@ int main(int argc,char *argv[]) {
 
   /* logger setup */
   /* disable logger for MPI processes != 0 */
+  logger_setlevel(0,30);
   if (PID!=0) { logger_disable(); }
-  if (PID==0) { sprintf(tmp,">%s",output_filename); logger_stdout(tmp); }
-  logger_setlevel(0,40);
-  sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
+  if (PID==0) { 
+    sprintf(tmp,">%s",output_filename); logger_stdout(tmp);
+    sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
+  }
 
   lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS); 
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
@@ -224,6 +230,13 @@ int main(int argc,char *argv[]) {
   GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
   error(fpars.type==UNKNOWN_CNFG,1,"mk_hairpins.c","Bad name for a configuration file");
   error(fpars.nc!=NG,1,"mk_hairpins.c","Bad NG");
+
+  lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed);
+  rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
+  srand(glb_var.rlxd_seed+PID);
+
+  lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
+  lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
 
   ata_qprop_var.pars.n_masses=0;
   if(fpars.type==DYNAMICAL_CNFG) {
@@ -247,21 +260,10 @@ int main(int argc,char *argv[]) {
     return 0;
   }
 
-  lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
-  lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
-  lprintf("MAIN",0,"global size is %dx%dx%dx%d\n",GLB_T,GLB_X,GLB_Y,GLB_Z);
-  lprintf("MAIN",0,"proc grid is %dx%dx%dx%d\n",NP_T,NP_X,NP_Y,NP_Z);
-  lprintf("MAIN",0,"Fermion boundary conditions: %.2f,%.2f,%.2f,%.2f\n",bc[0],bc[1],bc[2],bc[3]);
-
   /* setup lattice geometry */
   geometry_mpi_eo();
   /* test_geometry_mpi_eo(); */
 
-  lprintf("MAIN",0,"local size is %dx%dx%dx%d\n",T,X,Y,Z);
-  lprintf("MAIN",0,"extended local size is %dx%dx%dx%d\n",T_EXT,X_EXT,Y_EXT,Z_EXT);
-
-  lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed);
-  rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
 
   /* Print inversion/truncation parameters */
   lprintf("MAIN",0,"Simulation masses:");

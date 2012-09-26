@@ -1,7 +1,7 @@
 TOPDIR = ..
 MKDIR=$(TOPDIR)/Make
 
-EXES = mk_mesons random_cnfg random_spinor mk_mesons_with_z2semwall mk_sfcoupling
+EXES = mk_mesons random_cnfg random_spinor mk_mesons_with_z2semwall mk_sfcoupling trunc_mesons
 
 default: $(EXES)
 
@@ -23,7 +23,7 @@ MODS := amalloc field_alloc spinor_field_alloc
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Observables
-MODS := avr_plaquette
+MODS := avr_plaquette trunc_hairpin mesons g5QMR_trunc
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Random
@@ -31,7 +31,7 @@ MODS := gauss ranlxs ranlxd ranz2 random_fields random_suNg
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Update
-MODS := representation random_spinor_field random_su2
+MODS := representation random_spinor_field random_su2 Dphi
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Error
