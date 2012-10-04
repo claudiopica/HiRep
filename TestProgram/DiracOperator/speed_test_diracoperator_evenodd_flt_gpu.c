@@ -23,7 +23,7 @@
 #include "dirac.h"
 #include "linear_algebra.h"
 #include "representation.h"
-#include "communications_flt.h"
+#include "communications.h"
 
 static double hmass=0.1;
 static suNg_field_flt *g;
