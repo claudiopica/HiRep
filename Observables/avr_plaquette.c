@@ -217,7 +217,7 @@ double avr_plaquette_flt()
     }
     if(_PIECE_INDEX(ix)==0) {
       /* wait for gauge field to be transfered */
-      complete_gf_sendrecv(u_gauge_flt);
+      complete_gf_sendrecv_flt(u_gauge_flt);
     }
   }
 
@@ -323,7 +323,7 @@ double avr_plaquette_f_flt()
     }
     if(_PIECE_INDEX(ix)==0) {
       /* wait for gauge field to be transfered */
-      complete_gf_sendrecv(u_gauge_f_flt);
+      complete_gf_sendrecv_flt(u_gauge_f_flt);
     }
   }
 

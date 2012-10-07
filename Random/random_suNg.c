@@ -80,10 +80,10 @@ static void rotate_flt(void) /* same as in cabmar */
 	cu2 = &((*pu2_flt).c[0]);
 	
 	for (i=0; i<NG; ++i) {
-		z1.re=s[0]*(*cu1).re-s[1]*(*cu2).im+s[2]*(*cu2).re-s[3]*(*cu1).im;
-		z1.im=s[0]*(*cu1).im+s[1]*(*cu2).re+s[2]*(*cu2).im+s[3]*(*cu1).re;
-		z2.re=s[0]*(*cu2).re-s[1]*(*cu1).im-s[2]*(*cu1).re+s[3]*(*cu2).im;
-		z2.im=s[0]*(*cu2).im+s[1]*(*cu1).re-s[2]*(*cu1).im-s[3]*(*cu2).re;
+		z1.re=s_flt[0]*(*cu1).re-s_flt[1]*(*cu2).im+s_flt[2]*(*cu2).re-s_flt[3]*(*cu1).im;
+		z1.im=s_flt[0]*(*cu1).im+s_flt[1]*(*cu2).re+s_flt[2]*(*cu2).im+s_flt[3]*(*cu1).re;
+		z2.re=s_flt[0]*(*cu2).re-s_flt[1]*(*cu1).im-s_flt[2]*(*cu1).re+s_flt[3]*(*cu2).im;
+		z2.im=s_flt[0]*(*cu2).im+s_flt[1]*(*cu1).re-s_flt[2]*(*cu1).im-s_flt[3]*(*cu2).re;
 		(*cu1) = z1; 
 		(*cu2) = z2; 
 		++cu1;
