@@ -29,7 +29,7 @@ static suNg_field *g;
 double sfdiff (spinor_field* sf){
   spinor_field *tmp;
   double res;
-  tmp=alloc_spinor_field_f(1, &glattice);
+  tmp=alloc_spinor_field_f(1, sf->type);
   spinor_field_copy_f_cpu(tmp,sf);
   spinor_field_copy_to_gpu_f(tmp);
   spinor_field_sub_f(tmp,tmp,sf);
@@ -99,6 +99,7 @@ int main(int argc,char *argv[])
   gpu_timer t1;
   float elapsed, gflops;
   int i;
+  int flopsite, bytesite;
   int n_times=50;
   
   setup_process(&argc,&argv);
@@ -117,6 +118,8 @@ int main(int argc,char *argv[])
 
 
   rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed);
+  
+  cudaSetDevice(0);
   
   /* setup communication geometry */
   if (geometry_init() == 1) {
@@ -148,7 +151,7 @@ int main(int argc,char *argv[])
   s3=s2+1;
   
 
-  lprintf("MAIN",0,"Randomizing spinor field");  
+  lprintf("MAIN",0,"Randomizing spinor field\n");  
   gaussian_spinor_field(s0);
   spinor_field_copy_to_gpu_f(s0);
 
@@ -181,10 +184,10 @@ int main(int argc,char *argv[])
   lprintf("LA TEST",0,"Result, \nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g,\nsqnorm(gpu-cpu)= %1.10g (check %1.10g=0?),\n",res_gpu,res_cpu,res2,res1);
 
  //Check diracoperator with mass
-  lprintf("LA TEST",0,"Checking the diracoperator with mass=0.13\n");
+  lprintf("LA TEST",0,"Checking the diracoperator with mass=%g\n",hmass);
 
-  Dphi(0.13,s1,s0);
-  Dphi_cpu(0.13,s1,s0);
+  Dphi(hmass,s1,s0);
+  Dphi_cpu(hmass,s1,s0);
   
   res1 = sfdiff(s0);
   res2 = sfdiff(s1);
@@ -196,10 +199,10 @@ int main(int argc,char *argv[])
 
   //Check gamma_5 x diracoperator with mass
 
-  lprintf("LA TEST",0,"Checking the gamma_5 x diracoperator with mass=0.13\n");
+  lprintf("LA TEST",0,"Checking the gamma_5 x diracoperator with mass=%g\n",hmass);
 
-  g5Dphi(0.13,s1,s0);
-  g5Dphi_cpu(0.13,s1,s0);
+  g5Dphi(hmass,s1,s0);
+  g5Dphi_cpu(hmass,s1,s0);
   
   res1 = sfdiff(s0);
   res2 = sfdiff(s1);
@@ -211,93 +214,79 @@ int main(int argc,char *argv[])
 
   //Check (gamma_5 x diracoperator) ^2 with mass
 
-  lprintf("LA TEST",0,"Checking the (gamma_5 x diracoperator)^2 with mass=0.13\n");
+  lprintf("LA TEST",0,"Checking the (gamma_5 x diracoperator)^2 with mass=%g\n",hmass);
 
-  g5Dphi_sq(0.13,s1,s0);
-  g5Dphi_sq_cpu(0.13,s1,s0);
+  g5Dphi_sq(hmass,s1,s0);
+  g5Dphi_sq_cpu(hmass,s1,s0);
   
   res1 = sfdiff(s0);
   res2 = sfdiff(s1);
 
   res_gpu = spinor_field_sqnorm_f(s1);
   res_cpu = spinor_field_sqnorm_f_cpu(s1);
-
+  
   lprintf("LA TEST",0,"Result, \nsqnorm(qpu)=%1.10g, sqnorm(cpu)=%1.10g,\nsqnorm(gpu-cpu)= %1.10g (check %1.10g=0?),\n",res_gpu,res_cpu,res2,res1);
+  
+#if defined(REPR_ADJOINT)
+  flopsite=8*NF*(7+8*NF);
+#else
+  flopsite=8*NF*(7+16*NF);
+#endif
+  bytesite=36*sizeof(suNf_vector)+16*sizeof(suNf); //add integers for geometric indexes?
+  
+  lprintf("LA TEST",0,"Flop per site = %d\n",flopsite);
+  lprintf("LA TEST",0,"Byte per site = %d\n",bytesite);
 
 
   //speed test Dirac operator
-  lprintf("LA TEST",0,"Calculating Diracoperator %d times.\n",n_times);
+  lprintf("LA TEST",0,"Calculating massless Diracoperator %d times.\n",n_times);
   t1 = gpuTimerStart();
-
-  for (i=0;i<n_times;++i){
-    Dphi_(s1,s0);
-  }
-
+  for (i=0;i<n_times;++i){ Dphi_(s1,s0); }
   elapsed = gpuTimerStop(t1);
-  lprintf("LA TEST",0,"Time: %1.10gms\n",elapsed);
-
-  gflops=n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*744./elapsed/1.e6;   //536
-  lprintf("LA TEST",0,"GFLOPS: %1.4g\n\n",gflops);
-
-  gflops=n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*2016./elapsed/1.e6;
-  lprintf("LA TEST",0,"BAND: %1.4g GB/s\n\n",gflops);
-
-  //speed test massive Dirac operator
-
-  lprintf("LA TEST",0,"Calculating massive Diracoperator %d times.\n",n_times);
+  lprintf("LA TEST",0,"Time: %1.10g ms\n",elapsed);
+  gflops=(double)n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*flopsite/elapsed/1.e6;
+  lprintf("LA TEST",0,"GFLOPS: %1.6g\n\n",gflops);
+  gflops=(double)n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*bytesite/elapsed/1.e6;
+  lprintf("LA TEST",0,"BAND: %1.6g GB/s\n\n",gflops);
+  lprintf("LA TEST",0,"DONE!");
+  
+  lprintf("LA TEST",0,"Calculating Diracoperator with mass=%g %d times.\n",hmass,n_times);
   t1 = gpuTimerStart();
-  for (i=0;i<n_times;++i){
-    Dphi(0.13,s1,s0);
-  }
-
+  for (i=0;i<n_times;++i){ Dphi(hmass,s1,s0); }
   elapsed = gpuTimerStop(t1);
-  lprintf("LA TEST",0,"Time: %1.10gms\n",elapsed);
-
-  gflops=n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*(744.+2.*24.)/elapsed/1.e6;   //536
-  lprintf("LA TEST",0,"GFLOPS: %1.4g\n\n",gflops);
-
-  gflops=n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*(2016.+48.*8.)/elapsed/1.e6;
-  lprintf("LA TEST",0,"BAND: %1.4g GB/s\n\n",gflops);
-
+  lprintf("LA TEST",0,"Time: %1.10g ms\n",elapsed);
+  gflops=(double)n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*flopsite/elapsed/1.e6;
+  lprintf("LA TEST",0,"GFLOPS: %1.6g\n\n",gflops);
+  gflops=(double)n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*bytesite/elapsed/1.e6;
+  lprintf("LA TEST",0,"BAND: %1.6g GB/s\n\n",gflops);
+  lprintf("LA TEST",0,"DONE!");
 
   //speed test gamma_5 x Dirac operator
+
+  lprintf("LA TEST",0,"Calculating gamma_5 x Diracoperator with mass=%g %d times.\n",hmass,n_times);
   t1 = gpuTimerStart();
-
-  lprintf("LA TEST",0,"Calculating gamma_5 x  Diracoperator %d times.\n",n_times);
-
-  for (i=0;i<n_times;++i){
-    g5Dphi(0.13,s1,s0);
-  }
-
+  for (i=0;i<n_times;++i){ g5Dphi(hmass,s1,s0); }
   elapsed = gpuTimerStop(t1);
-  lprintf("LA TEST",0,"Time: %1.10gms\n",elapsed);
-
-  gflops=n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*(744.+48.)/elapsed/1.e6;   //536
-  lprintf("LA TEST",0,"GFLOPS: %1.4g\n\n",gflops);
-
-  gflops=n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*(2016.+48.*8.)/elapsed/1.e6;
-  lprintf("LA TEST",0,"BAND: %1.4g GB/s\n\n",gflops);
-
-  t1 = gpuTimerStart();
-
+  lprintf("LA TEST",0,"Time: %1.10g ms\n",elapsed);
+  gflops=(double)n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*flopsite/elapsed/1.e6;
+  lprintf("LA TEST",0,"GFLOPS: %1.6g\n\n",gflops);
+  gflops=(double)n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*bytesite/elapsed/1.e6;
+  lprintf("LA TEST",0,"BAND: %1.6g GB/s\n\n",gflops);
+  lprintf("LA TEST",0,"DONE!");
+  
+  
   //speed test (gamma_5 x Dirac operator)^2
 
-  lprintf("LA TEST",0,"Calculating (gamma_5 x Diracoperator)^2 %d times.\n",n_times);
-
-  for (i=0;i<n_times;++i){
-    g5Dphi_sq(0.13,s1,s0);
-  }
-
+  lprintf("LA TEST",0,"Calculating (gamma_5 x Diracoperator)^2 with mass=%g %d times.\n",hmass,n_times);
+  t1 = gpuTimerStart();
+  for (i=0;i<n_times;++i){ g5Dphi_sq(hmass,s1,s0); }
   elapsed = gpuTimerStop(t1);
-  lprintf("LA TEST",0,"Time: %1.10gms\n",elapsed);
-
-  gflops=2*n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*(744.+48.)/elapsed/1.e6;   //536
-  lprintf("LA TEST",0,"GFLOPS: %1.4g\n\n",gflops);
-
-  gflops=2*n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*(2016.+48*8)/elapsed/1.e6;
-  lprintf("LA TEST",0,"BAND: %1.4g GB/s\n\n",gflops);
-
-  lprintf("LA TEST",0,"DONE!\n\n");
+  lprintf("LA TEST",0,"Time: %1.10g ms\n",elapsed);
+  gflops=(double)2*n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*flopsite/elapsed/1.e6;
+  lprintf("LA TEST",0,"GFLOPS: %1.6g\n\n",gflops);
+  gflops=(double)2*n_times*GLB_T*GLB_X*GLB_Y*GLB_Z*bytesite/elapsed/1.e6;
+  lprintf("LA TEST",0,"BAND: %1.6g GB/s\n\n",gflops);
+  lprintf("LA TEST",0,"DONE!");
 
   free_spinor_field_f(s0);
     
