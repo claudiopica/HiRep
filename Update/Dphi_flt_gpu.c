@@ -157,8 +157,8 @@ typedef struct _suNf_hspinor_flt
 //#define __asm_sync
 
 /* Takes an even input spinor and returns an odd spinor */
-__global__ void Dphi_flt_gpu_oe(suNf_spinor_flt* out, suNf_spinor_flt* in, 
-                             const suNf_flt* gauge, const int *iup, const int *idn, 
+__global__ void Dphi_flt_gpu_oe(suNf_spinor_flt* __restrict__ out, const suNf_spinor_flt* __restrict__ in,
+                             const suNf_flt* __restrict__ gauge, const int * __restrict__ iup, const int * __restrict__ idn,
                              const int vol4h, const int stride)
 {
   
@@ -364,8 +364,8 @@ __asm_sync;
 }
 
 /* Takes an odd input spinor and returns an even spinor */
-__global__ void Dphi_flt_gpu_eo(suNf_spinor_flt* out, suNf_spinor_flt* in, 
-                                const suNf_flt* gauge, const int *iup, const int *idn, 
+__global__ void Dphi_flt_gpu_eo(suNf_spinor_flt* out, const suNf_spinor_flt* __restrict__ in,
+                                const suNf_flt* __restrict__ gauge, const int * __restrict__ iup, const int * __restrict__ idn, 
                                 const int vol4h, const int stride)
 {
   
