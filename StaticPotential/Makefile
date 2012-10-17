@@ -1,7 +1,7 @@
 TOPDIR = ..
 MKDIR=$(TOPDIR)/Make
 
-EXES = mk_wilsonloops polyakov_loops verify_group #tune_HYP_smearing
+EXES = mk_wilsonloops monopoles poly_local poly_in_time polyakov_loops verify_group #tune_HYP_smearing
 
 default: $(EXES)
 
@@ -41,7 +41,10 @@ MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 #COMMON_OBJS = $(MOD_OBJS)
 
 mk_wilsonloops_OBJS = $(MOD_OBJS)
+monopoles_OBJS = $(MOD_OBJS)
 polyakov_loops_OBJS = $(MOD_OBJS)
+poly_in_time_OBJS = $(MOD_OBJS)
+poly_local_OBJS = $(MOD_OBJS)
 tune_HYP_smearing_OBJS = $(MOD_OBJS)
 verify_group_OBJS = $(MOD_OBJS)
 

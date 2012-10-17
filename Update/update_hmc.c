@@ -126,6 +126,26 @@ void init_hmc(rhmc_par *par){
   represent_gauge_field();
 
   /* integrator */
+	
+#ifdef WITHOUT_FERMIONS
+	integrator = (integrator_par*)malloc(sizeof(integrator_par)*2);
+
+	integrator[0].level = 0;
+	integrator[0].tlen =_update_par.tlen/((double)(2*_update_par.gsteps));
+	integrator[0].nsteps = _update_par.gsteps;
+	integrator[0].force = &force0;
+	integrator[0].force_par = NULL;
+	integrator[0].integrator = &O2MN_multistep;
+	integrator[0].next = &integrator[1];
+	
+	integrator[1].level = 1;
+	integrator[1].tlen = integrator[0].tlen/((double)(2*integrator[0].nsteps));
+	integrator[1].nsteps = 1;
+	integrator[1].force = NULL;
+	integrator[1].force_par = NULL;
+	integrator[1].integrator = &gauge_integrator;
+	integrator[1].next = NULL;  
+#else
   integrator = (integrator_par*)malloc(sizeof(integrator_par)*3);
 
   integrator[0].level = 0;
@@ -157,6 +177,8 @@ void init_hmc(rhmc_par *par){
   integrator[2].integrator = &gauge_integrator;
   integrator[2].next = NULL;
   
+#endif
+	
   init_force_hmc();
 
     
@@ -212,24 +234,29 @@ int update_hmc(){
         lprintf("HMC",0,"WARNING: HMC not initialized!\nWARNNG: Ignoring call to update_hmc.\n");
         return -1;
     }
-        
+
+	
     /* generate new momenta and pseudofermions */
     lprintf("HMC",30,"Generating gaussian momenta and pseudofermions...\n");
     gaussian_momenta(momenta);
+	
+#ifndef WITHOUT_FERMIONS
     for (i=0;i<_update_par.n_pf;++i)
         gaussian_spinor_field(&pf[i]);
-    
+#endif
     /* compute starting action */
     lprintf("HMC",30,"Computing action density...\n");
     local_hmc_action(NEW, la, momenta, pf, pf);
+
     
+#ifndef WITHOUT_FERMIONS
     /* compute H2^{1/2}*pf = H*pf */
     lprintf("HMC",30,"Correcting pseudofermions distribution...\n");
     for (i=0;i<_update_par.n_pf;++i) {
         spinor_field_copy_f(&pf[_update_par.n_pf],&pf[i]);
         H(&pf[i], &pf[_update_par.n_pf]);
     }
-    
+#endif    
     /* integrate molecular dynamics */
     lprintf("HMC",30,"MD integration...\n");
     (*(integrator[0].integrator))(momenta,&integrator[0]);
@@ -242,11 +269,13 @@ int update_hmc(){
     /* compute H2^{-1/2}*pf or H2^{-1}*pf */
     /* here we choose the first strategy which is more symmetric */
     /* for the HMC H2^-1/2 = H^-1 and we use MINRES for this inversion */
+	
+#ifndef WITHOUT_FERMIONS
     for (i=0;i<_update_par.n_pf;++i) {
         spinor_field_copy_f(&pf[_update_par.n_pf],&pf[i]);
         MINRES(&pfa,&H,&pf[_update_par.n_pf],&pf[i],0);
     }
-    
+#endif
     /* compute new action */
     local_hmc_action(DELTA, la, momenta, pf, pf);
     

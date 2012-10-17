@@ -11,8 +11,8 @@ NP_Z = 1
 level = 1  seed = 12345
 
 // RHMC variables
-beta = 2.25
-mass = -1.15
+beta = 7.0
+mass = -0.1
 nf = 2
 n_pf = 1
 MT_prec = 1.e-14
@@ -21,12 +21,12 @@ HB_prec = 1.e-14
 force_prec = 1.e-14
 force_prec_flt = 1.e-6
 tlen = 1
-nsteps = 10
-gsteps = 20
+nsteps = 4
+gsteps = 10
 
 // Run control variables
 run name = run1
-save freq = 9999
+save freq = 5
 meas freq = 1
 conf dir = .
 gauge start = random

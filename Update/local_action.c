@@ -112,6 +112,7 @@ void local_hmc_action(local_action_type type,
 
 #endif /* ROTATED_SF */
 
+#ifndef WITHOUT_FERMIONS
   /* pseudofermion fields can be defined only on even sites is the preconditioning is used */
   _MASTER_FOR(phi1->type,i) {
     a=0.;
@@ -123,6 +124,6 @@ void local_hmc_action(local_action_type type,
 
     *_FIELD_AT(loc_action,i)+=a;
   }
-
+#endif
    
 }
