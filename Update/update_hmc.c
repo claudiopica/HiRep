@@ -131,7 +131,7 @@ void init_hmc(rhmc_par *par){
 	integrator = (integrator_par*)malloc(sizeof(integrator_par)*2);
 
 	integrator[0].level = 0;
-	integrator[0].tlen =_update_par.tlen/((double)(2*_update_par.gsteps));
+	integrator[0].tlen =_update_par.tlen;///((double)(2*_update_par.gsteps));
 	integrator[0].nsteps = _update_par.gsteps;
 	integrator[0].force = &force0;
 	integrator[0].force_par = NULL;
