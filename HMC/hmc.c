@@ -1,5 +1,5 @@
 /***************************************************************************\
- * Copyright (c) 2008, Claudio Pica                                          *   
+ * Copyright (c) 2008 2012, Claudio Pica, Ulrik Ishoej, Ari Hietanen                *   
  * All rights reserved.                                                      * 
  \***************************************************************************/
 
@@ -77,8 +77,48 @@ typedef struct _input_polyakov {
   }\
 }
 
+#define init_input_poly_in_time(varname) \
+{ \
+.read={\
+{"make polyakov_in_time", "poly_in_time:make = %s", STRING_T, (varname).make},\
+{NULL, NULL, 0, NULL}\
+}\
+}
 
+#define init_input_Tmonopoles(varname) \
+{ \
+.read={\
+{"make T-monopoles", "Tmonopoles:make = %s", STRING_T, (varname).make},\
+{NULL, NULL, 0, NULL}\
+}\
+}
+#define init_input_Xmonopoles(varname) \
+{ \
+.read={\
+{"make X-monopoles", "Xmonopoles:make = %s", STRING_T, (varname).make},\
+{NULL, NULL, 0, NULL}\
+}\
+}
+#define init_input_Ymonopoles(varname) \
+{ \
+.read={\
+{"make Y-monopoles", "Ymonopoles:make = %s", STRING_T, (varname).make},\
+{NULL, NULL, 0, NULL}\
+}\
+}
+#define init_input_Zmonopoles(varname) \
+{ \
+.read={\
+{"make Z-monopoles", "Zmonopoles:make = %s", STRING_T, (varname).make},\
+{NULL, NULL, 0, NULL}\
+}\
+}
 input_polyakov poly_var = init_input_polyakov(poly_var);
+input_polyakov poly_in_time_var = init_input_poly_in_time(poly_in_time_var);
+input_polyakov Tmonopoles_var = init_input_Tmonopoles(Tmonopoles_var);
+input_polyakov Xmonopoles_var = init_input_Xmonopoles(Xmonopoles_var);
+input_polyakov Ymonopoles_var = init_input_Ymonopoles(Ymonopoles_var);
+input_polyakov Zmonopoles_var = init_input_Zmonopoles(Zmonopoles_var);
 
 
 /* Lowest-eigenvalue parameters */
@@ -170,8 +210,13 @@ int main(int argc,char *argv[])
 
   /* read input file */
   read_input(glb_var.read,"input_file");
-  read_input(mes_var.read,"input_file");
-  read_input(poly_var.read,"input_file");
+	read_input(mes_var.read,"input_file");
+	read_input(poly_var.read,"input_file");
+	read_input(poly_in_time_var.read,"input_file");
+	read_input(Tmonopoles_var.read,"input_file");
+	read_input(Xmonopoles_var.read,"input_file");
+	read_input(Ymonopoles_var.read,"input_file");
+	read_input(Zmonopoles_var.read,"input_file");
   read_input(eigval_var.read,"input_file");
   
   if(glb_var.rlxd_state[0]!='\0')
@@ -299,11 +344,37 @@ int main(int argc,char *argv[])
       if(strcmp(mes_var.make,"true")==0) {
         z2semwall_mesons(i,mes_var.nhits,1,&(flow.hmc_v->rhmc_p.mass),mes_var.precision);
       }
-
-      /* Polyakov loops */
-      if(strcmp(poly_var.make,"true")==0) {
-        polyakov();
-      }
+		
+		/* Polyakov loops */
+		if(strcmp(poly_var.make,"true")==0) {
+			polyakov();
+		       lprintf("MAIN TEST",0,"polyakov called\n");
+		}
+		
+		/* Time resolved polyakov loops */
+		if(strcmp(poly_in_time_var.make,"true")==0) {
+			polyakov_in_time();
+			lprintf("MAIN TEST",0,"poly_in_time called\n");
+		}
+		
+		/* Monopoles */
+		if(strcmp(Tmonopoles_var.make,"true")==0) {
+			monopoles(0);
+			lprintf("MAIN TEST",0,"Tmonopoles called\n");
+		}
+		if(strcmp(Xmonopoles_var.make,"true")==0) {
+			monopoles(1);
+			lprintf("MAIN TEST",0,"Xmonopoles called\n");
+		}
+		if(strcmp(Ymonopoles_var.make,"true")==0) {
+			monopoles(2);
+			lprintf("MAIN TEST",0,"Ymonopoles called\n");
+		}
+		if(strcmp(Zmonopoles_var.make,"true")==0) {
+			monopoles(3);
+			lprintf("MAIN TEST",0,"Zmonopoles called\n");
+		}
+		
       
       /* Lowest eigenvalues */
       if(strcmp(eigval_var.make,"true")==0) {

@@ -742,8 +742,9 @@ void monopoles(int dir) {
 	p1=malloc(sizeof(suNg));
 	p2=malloc(sizeof(suNg));
 	p3=malloc(sizeof(suNg));
-
-	lprintf("Monopoles",dir,"Cubes orthogonal to x-direction: Nesting order t,x,y,z\n"); 
+	
+	lprintf("Monopoles",0,"Cubes orthogonal to %d-direction: Nesting order t,x,y,z\n",dir);
+	lprintf("MonopolesOut",0,"(dir=%d)",dir); 
 	
 	if (dir==1) {d1=0;}
 	if (dir==2) {d2=0;}
@@ -783,8 +784,7 @@ void monopoles(int dir) {
 					}else {
 						Mono=0;
 					}
-					
-					lprintf("MonopolesOut",dir,"%d",Mono);
+					lprintf("MonopolesOut",0,"%d",Mono);
 					
 					
 				}	
