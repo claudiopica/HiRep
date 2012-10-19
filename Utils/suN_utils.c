@@ -1,5 +1,5 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
+* Copyright (c) 2008, 2012, Claudio Pica, Ulrik Ishoej, Ari Hietanen        *   
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
@@ -7,7 +7,7 @@
 *
 * File su3_utils.c
 *
-* Functions to project to SU(3)
+* Functions to project
 *
 *******************************************************************************/
 
@@ -17,6 +17,7 @@
 #include "utils.h"
 #include "suN.h"
 #include "representation.h"
+#include "logger.h"
 
 static void normalize(suNg_vector *v)
 {
@@ -249,8 +250,9 @@ void project_to_suNg_real(suNg *out, suNg *in){
   //Fix the determinant 
   det_suNg(&det,&tmp);
   if (fabs(det)<1-1e-7 || fabs(det)>1+1e-7){
-    printf("Error in project project_to_suNg_real: determinant not +/-1");
+    lprintf("suNg_utils",10,"Error in project project_to_suNg_real: determinant not +/-1. It is %1.8g",det);
   }
+
   if (det<0){
     for (i=0;i<NG;++i){
       out->c[i]*=-1.;
