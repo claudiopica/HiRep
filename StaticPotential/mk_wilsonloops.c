@@ -59,7 +59,7 @@ typedef struct _input_HYP {
     {"HYP smearing weight[0]", "HYP:weight0 = %lf", DOUBLE_T, &((varname).weight[0])},\
     {"HYP smearing weight[1]", "HYP:weight1 = %lf", DOUBLE_T, &((varname).weight[1])},\
     {"HYP smearing weight[2]", "HYP:weight2 = %lf", DOUBLE_T, &((varname).weight[2])},\
-    {NULL, NULL, 0, NULL}\
+    {NULL, NULL, INT_T, NULL}\
   }\
 }
 
@@ -115,7 +115,7 @@ typedef struct _input_wilson {
     {"WL load path[9] delta(y)", "WL[9]:delta.y = %d", INT_T, &((varname).c[9][1])},\
     {"WL load path[9] delta(z)", "WL[9]:delta.z = %d", INT_T, &((varname).c[9][2])},\
     {"WL load path[9] nsteps", "WL[9]:nsteps = %d", INT_T, &((varname).nsteps[9])},\
-    {NULL, NULL, 0, NULL}\
+    {NULL, NULL, INT_T, NULL}\
   }\
 }
 

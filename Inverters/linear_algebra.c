@@ -27,7 +27,7 @@
 #include "TMPL/linear_algebra.c.sdtmpl"
 void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
 	_TWO_SPINORS_MATCHING(s1,s2);
-	memcpy(s1->ptr,s2->ptr,s1->type->gsize*sizeof(suNf_spinor));
+	memcpy(s1->ptr,s2->ptr,s1->type->gsize_spinor*sizeof(suNf_spinor));
 }
 
 #undef _SPINOR_FIELD_TYPE
@@ -48,7 +48,7 @@ void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
 #include "TMPL/linear_algebra.c.sdtmpl"
 void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
 	_TWO_SPINORS_MATCHING(s1,s2);
-	memcpy(s1->ptr,s2->ptr,s1->type->gsize*sizeof(suNf_spinor_flt));
+	memcpy(s1->ptr,s2->ptr,s1->type->gsize_spinor*sizeof(suNf_spinor_flt));
 }
 
 #undef _SPINOR_FIELD_TYPE

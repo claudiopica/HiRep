@@ -207,8 +207,12 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar){
       /* start_sf_sendrecv(Hchi); this is not needed since it is done by the following Dphi_ call*/
       /* copy the spinor field structures of chi[n] and Hchi */
       /* in this way we can reuse the odd part of the fields with new names */
-      delta=*Hchi; delta.type=&glat_odd;
-      sigma=chi[n]; sigma.type=&glat_odd;
+      delta=*Hchi; 
+      delta.ptr=Hchi->ptr+glat_odd.master_shift;
+      delta.type=&glat_odd;
+      sigma=chi[n]; 
+      sigma.type=&glat_odd;
+      sigma.ptr=chi[n].ptr+glat_odd.master_shift;
       Dphi_(&delta,Hchi);
       Dphi_(&sigma,&chi[n]);
       
@@ -223,6 +227,15 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar){
       forcestat[1]=forcestat[0]=0.;
       
       _PIECE_FOR(&glattice,x) { 
+        if(_PIECE_INDEX(x)==glattice.inner_master_pieces) {
+          /* wait for spinor to be transfered */
+          #ifdef UPDATE_EO
+          complete_sf_sendrecv(&delta);
+          complete_sf_sendrecv(&sigma);
+          #else
+          complete_sf_sendrecv(Hchi);
+          #endif
+        }
         _SITE_FOR(&glattice,x) {
           
           for (mu=0; mu<4; ++mu) {
@@ -281,15 +294,6 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar){
               if(forcestat[1]<fabs(*(((double*)&f)+y))) forcestat[1]=fabs(*(((double*)&f)+y));
             }
           }
-        }
-        if(_PIECE_INDEX(x)==0) {
-          /* wait for spinor to be transfered */
-          #ifdef UPDATE_EO
-          complete_sf_sendrecv(&delta);
-          complete_sf_sendrecv(&sigma);
-          #else
-          complete_sf_sendrecv(Hchi);
-          #endif
         }
       }
       

@@ -24,8 +24,8 @@ int HBiCGstab(MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field
   spinor_field *sptmp;
 
   double delta, phi; 
-  double z1, z2, alpha, beta, chi, rho;
-  double rtmp1,rtmp2,rtmp3, oldalpha,oldchi;
+  double alpha, beta, chi;
+  double rtmp1,rtmp2,rtmp3;
 
   int cgiter;
   char sflags;

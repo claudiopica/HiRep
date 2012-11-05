@@ -28,16 +28,16 @@ extern void random_su2(double rho,double s[]);
 
 void random_suNg_unit_vector(suNg_vector *v)
 {
-   double norm=0.f,fact;
-
-   while ((1.0+norm)==1.0)   {
-     gauss((double*)v,(sizeof(suNg_vector)/sizeof(double)));
-     _vector_prod_re_g(norm,*v,*v);
-     norm=sqrt(norm);
-   }
-
-   fact=1.0/norm;
-   _vector_mul_g(*v,fact,*v);
+  double norm=0.0,fact;
+  
+  while ((1.0+norm)==1.0)   {
+    gauss((double*)v,(sizeof(suNg_vector)/sizeof(double)));
+    _vector_prod_re_g(norm,*v,*v);
+    norm=sqrt(norm);
+  }
+  
+  fact=1.0/norm;
+  _vector_mul_g(*v,fact,*v);
 }
 
 void gaussian_suNg_vector(suNg_vector *v)

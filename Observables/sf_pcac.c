@@ -1,3 +1,4 @@
+#if defined(BASIC_SF) || defined(ROTATED_SF)
 #include "global.h"
 #include "communications.h"
 #include "linear_algebra.h"
@@ -14,6 +15,7 @@
 #include <math.h>
 #include <assert.h>
 #include "logger.h"
+
 
 
 #ifdef ROTATED_SF
@@ -48,7 +50,7 @@ void SF_quark_propagator(spinor_field *in, double mass, spinor_field *out, doubl
   MINRESpar.max_iter = 0;
   cgiter=MINRES(&MINRESpar, &H_sf, in, out, 0);
 	lprintf("PROPAGATOR",10,"MINRES MVM = %d",cgiter);
-#else
+#else 
 	  
   int cgiter;
   static mshift_par inv_par;
@@ -487,4 +489,7 @@ Q+ = |             | * 1/2
   
 #endif
   
-}
+};
+
+
+#endif

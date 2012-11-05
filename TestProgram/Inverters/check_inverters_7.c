@@ -70,12 +70,14 @@ int main(int argc,char *argv[])
   setup_process(&argc,&argv);
 
   /* logger setup */
-  logger_setlevel(0,10000); /* log all */
-  logger_map("DEBUG","debug");
-#ifdef WITH_MPI
-  sprintf(pame,">out_%d",PID); logger_stdout(pame);
-  sprintf(pame,"err_%d",PID); freopen(pame,"w",stderr);
-#endif
+   logger_setlevel(0,100); /* log all */
+  if (PID!=0) { 
+    logger_disable();}
+  else{
+    sprintf(pame,">out_%d",PID); logger_stdout(pame);
+    sprintf(pame,"err_%d",PID); freopen(pame,"w",stderr);
+  }
+
 
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
 
@@ -190,5 +192,5 @@ set_def_matrix(&e_par, &M, s1->type);
 
   finalize_process();
 
-  exit(0);
+  return 0;
 }

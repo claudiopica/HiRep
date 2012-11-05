@@ -56,43 +56,72 @@ static void transform(suNg_field* gtransf, suNg_field* gfield)
 
 int main(int argc,char *argv[])
 {
-  suNg_field* u_gauge_1;
-  suNg_field* u_gauge_2;
-  suNg_field* g;
-  int level,seed;
-  double norm, tmp;
-  double weight[3]={0.6,0.4,0.3};
-  _DECLARE_INT_ITERATOR(ix);
-  int mu;
 
+
+  char pame[256];
   
-  GLB_T=GLB_X=GLB_Y=GLB_Z=8;
-  NP_T=NP_X=NP_Y=NP_Z=1;
+  setup_process(&argc,&argv);
+  
+  logger_setlevel(0,100); /* log all */
+  if (PID!=0) {
+    logger_disable();}
+  else{
+    sprintf(pame,">out_%d",PID); logger_stdout(pame);
+    sprintf(pame,"err_%d",PID); freopen(pame,"w",stderr);
+  }
+  
+  logger_map("DEBUG","debug");
+
+  lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE);
+  
+  read_input(glb_var.read,"test_input");
+  lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed);
+
+
+  rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed);
+  
+  
+  
   
   /* setup communication geometry */
   if (geometry_init() == 1) {
     finalize_process();
     return 0;
   }
+  
+  geometry_mpi_eo();
+  
+  BCs_pars_t BCs_pars = {
+    .fermion_twisting_theta = {0.,0.,0.,0.},
+    .gauge_boundary_improvement_cs = 1.,
+    .gauge_boundary_improvement_ct = 1.,
+    .chiSF_boundary_improvement_ds = 1.,
+    .SF_BCs = 0
+  };
+  init_BCs(&BCs_pars);
 
+ 
+
+
+  suNg_field* u_gauge_1;
+  suNg_field* u_gauge_2;
+  suNg_field* g;
+
+  double norm, tmp;
+  double weight[3]={0.6,0.4,0.3};
+  _DECLARE_INT_ITERATOR(ix);
+  int mu;
+
+  
+  
+ 
   lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
   lprintf("MAIN",0,"global size is %dx%dx%dx%d\n",GLB_T,GLB_X,GLB_Y,GLB_Z);
   lprintf("MAIN",0,"proc grid is %dx%dx%dx%d\n",NP_T,NP_X,NP_Y,NP_Z);
-  lprintf("MAIN",0,"Fermion boundary conditions: %.2f,%.2f,%.2f,%.2f\n",bc[0],bc[1],bc[2],bc[3]);
-
-  /* setup lattice geometry */
-  geometry_mpi_eo();
-  /* test_geometry_mpi_eo(); */
 
   lprintf("MAIN",0,"local size is %dx%dx%dx%d\n",T,X,Y,Z);
   lprintf("MAIN",0,"extended local size is %dx%dx%dx%d\n",T_EXT,X_EXT,Y_EXT,Z_EXT);
    
-  level=0;
-  seed=123;
-  rlxs_init(level,seed);
-  lprintf("MAIN",0,"ranlux: level = %d, seed = %d\n\n",level,seed); 
-  fflush(stdout);
-
   lprintf("MAIN",0,"HYP smearing weights: %f %f %f\n",weight[0],weight[1],weight[2]);
 
   /* alloc global gauge fields */
@@ -135,6 +164,11 @@ int main(int argc,char *argv[])
   norm=sqrt(norm/(GLB_T*GLB_X*GLB_Y*GLB_Z*4*(NG*NG-1)*2));
 
   lprintf("MAIN",0,"Mean difference (must be small): %e\n",norm);
-  
+  free_gfield(u_gauge);
+  free_gfield(u_gauge_1);
+  free_gfield(u_gauge_2);
+  free_gfield(g);
+  finalize_process();
+
   exit(0);
 }

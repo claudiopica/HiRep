@@ -232,6 +232,11 @@ write_vector_lc_add_assign();
 write_vector_clc();
 write_vector_clc_add_assign();
 write_vector_prod_assign();
+write_vector_prod_add_assign_re();
+write_vector_prod_add_assign_im();
+write_vector_prod_sub_assign_re();
+write_vector_prod_sub_assign_im();
+
 write_vector_project();
 
 if ($su2quat==0) {
@@ -828,6 +833,110 @@ sub write_vector_prod_im {
 		print "      }\\\n";
 		for(my $i=0;$i<$mr;$i++){
 			print "      (k)+=_complex_prod_im((r).$cname\[_i\],(s).$cname\[_i\]); ++_i;\\\n";
+		}
+		print "   } while(0) \n\n";
+	}
+}
+
+
+
+sub write_vector_prod_add_assign_re {
+	print "/* k+=Re(r^*s) */\n";
+  print "#define _vector_prod_add_assign_re_${suff}(k,r,s) \\\n";
+  if ($N<$Nmax or $N<(2*$unroll+1) ) { #unroll all 
+		print "   (k)+=_complex_prod_re((r).$cname\[0\],(s).$cname\[0\]);\\\n";
+		for(my $i=1;$i<$N;$i++){
+			print "   (k)+=_complex_prod_re((r).$cname\[$i\],(s).$cname\[$i\])";
+			if($i==$N-1) { print "\n\n"; } else { print "; \\\n"; }
+		}
+	} else { #partial unroll
+		print "   do { \\\n";
+		print "      int _i;\\\n";
+		print "      (k)+=_complex_prod_re((r).$cname\[0\],(s).$cname\[0\]);\\\n";
+		print "      for (_i=1; _i<$md; ){\\\n";
+		for(my $i=0;$i<$unroll;$i++){
+			print "         (k)+=_complex_prod_re((r).$cname\[_i\],(s).$cname\[_i\]); ++_i;\\\n";
+		}
+		print "      }\\\n";
+		for(my $i=0;$i<$mr;$i++){
+			print "      (k)+=_complex_prod_re((r).$cname\[_i\],(s).$cname\[_i\]); ++_i;\\\n";
+		}
+		print "   } while(0) \n\n";
+	}
+}
+
+
+sub write_vector_prod_add_assign_im {
+  print "/* k+=Im(r*s) */\n";
+  print "#define _vector_prod_add_assign_im_${suff}(k,r,s) \\\n";
+  if ($N<$Nmax or $N<(2*$unroll+1) ) { #unroll all 
+		print "   (k)+=_complex_prod_im((r).$cname\[0\],(s).$cname\[0\]);\\\n";
+		for(my $i=1;$i<$N;$i++){
+			print "   (k)+=_complex_prod_im((r).$cname\[$i\],(s).$cname\[$i\])";
+			if($i==$N-1) { print "\n\n"; } else { print "; \\\n"; }
+		}
+	} else { #partial unroll
+		print "   do { \\\n";
+		print "      int _i;\\\n";
+		print "      (k)+=_complex_prod_im((r).$cname\[0\],(s).$cname\[0\]);\\\n";
+		print "      for (_i=1; _i<$md; ){\\\n";
+		for(my $i=0;$i<$unroll;$i++){
+			print "         (k)+=_complex_prod_im((r).$cname\[_i\],(s).$cname\[_i\]); ++_i;\\\n";
+		}
+		print "      }\\\n";
+		for(my $i=0;$i<$mr;$i++){
+			print "      (k)+=_complex_prod_im((r).$cname\[_i\],(s).$cname\[_i\]); ++_i;\\\n";
+		}
+		print "   } while(0) \n\n";
+	}
+}
+
+sub write_vector_prod_sub_assign_re {
+	print "/* k-=Re(r^*s) */\n";
+  print "#define _vector_prod_sub_assign_re_${suff}(k,r,s) \\\n";
+  if ($N<$Nmax or $N<(2*$unroll+1) ) { #unroll all 
+		print "   (k)-=_complex_prod_re((r).$cname\[0\],(s).$cname\[0\]);\\\n";
+		for(my $i=1;$i<$N;$i++){
+			print "   (k)-=_complex_prod_re((r).$cname\[$i\],(s).$cname\[$i\])";
+			if($i==$N-1) { print "\n\n"; } else { print "; \\\n"; }
+		}
+	} else { #partial unroll
+		print "   do { \\\n";
+		print "      int _i;\\\n";
+		print "      (k)-=_complex_prod_re((r).$cname\[0\],(s).$cname\[0\]);\\\n";
+		print "      for (_i=1; _i<$md; ){\\\n";
+		for(my $i=0;$i<$unroll;$i++){
+			print "         (k)-=_complex_prod_re((r).$cname\[_i\],(s).$cname\[_i\]); ++_i;\\\n";
+		}
+		print "      }\\\n";
+		for(my $i=0;$i<$mr;$i++){
+			print "      (k)-=_complex_prod_re((r).$cname\[_i\],(s).$cname\[_i\]); ++_i;\\\n";
+		}
+		print "   } while(0) \n\n";
+	}
+}
+
+
+sub write_vector_prod_sub_assign_im {
+  print "/* k-=Im(r*s) */\n";
+  print "#define _vector_prod_sub_assign_im_${suff}(k,r,s) \\\n";
+  if ($N<$Nmax or $N<(2*$unroll+1) ) { #unroll all 
+		print "   (k)-=_complex_prod_im((r).$cname\[0\],(s).$cname\[0\]);\\\n";
+		for(my $i=1;$i<$N;$i++){
+			print "   (k)-=_complex_prod_im((r).$cname\[$i\],(s).$cname\[$i\])";
+			if($i==$N-1) { print "\n\n"; } else { print "; \\\n"; }
+		}
+	} else { #partial unroll
+		print "   do { \\\n";
+		print "      int _i;\\\n";
+		print "      (k)-=_complex_prod_im((r).$cname\[0\],(s).$cname\[0\]);\\\n";
+		print "      for (_i=1; _i<$md; ){\\\n";
+		for(my $i=0;$i<$unroll;$i++){
+			print "         (k)-=_complex_prod_im((r).$cname\[_i\],(s).$cname\[_i\]); ++_i;\\\n";
+		}
+		print "      }\\\n";
+		for(my $i=0;$i<$mr;$i++){
+			print "      (k)-=_complex_prod_im((r).$cname\[_i\],(s).$cname\[_i\]); ++_i;\\\n";
 		}
 		print "   } while(0) \n\n";
 	}
@@ -2600,10 +2709,10 @@ sub write_spinor_i_sub_assign {
 sub write_spinor_prod_re {
   print "/* k=Real part of the scalar product r*s (r,s spinors) */\n";
   print "#define _spinor_prod_re_${suff}(k,r,s) \\\n";
-	print "   do { \\\n";
-	print "      double _tmp; (k)=0.; \\\n";
-  for (my $k=0; $k<4; $k++){
-    print "      _vector_prod_re_${suff}(_tmp,(r).$cname\[$k\],(s).$cname\[$k\]); (k)+=_tmp;\\\n";
+  print "   do { \\\n";
+  print "      _vector_prod_re_${suff}((k),(r).$cname\[0\],(s).$cname\[0\]);\\\n";
+  for (my $k=1; $k<4; $k++){
+    print "      _vector_prod_add_assign_re_${suff}((k),(r).$cname\[$k\],(s).$cname\[$k\]); \\\n";
   }
 	print "   } while(0) \n\n";
 }
@@ -2611,10 +2720,10 @@ sub write_spinor_prod_re {
 sub write_spinor_prod_im {
   print "/* k=Im part of the scalar product r*s (r,s spinors) */\n";
   print "#define _spinor_prod_im_${suff}(k,r,s) \\\n";
-	print "   do { \\\n";
-	print "      double _tmp; (k)=0.; \\\n";
-  for (my $k=0; $k<4; $k++){
-    print "      _vector_prod_im_${suff}(_tmp,(r).$cname\[$k\],(s).$cname\[$k\]); (k)+=_tmp;\\\n";
+  print "   do { \\\n";
+  print "      _vector_prod_im_${suff}((k),(r).$cname\[0\],(s).$cname\[0\]);\\\n";
+  for (my $k=1; $k<4; $k++){
+    print "      _vector_prod_add_assign_im_${suff}((k),(r).$cname\[$k\],(s).$cname\[$k\]); \\\n";
   }
 	print "   } while(0) \n\n";
 }
@@ -2642,29 +2751,25 @@ sub write_spinor_prod_assign {
 sub write_spinor_g5_prod_re {
   print "/* k=Real part of the scalar product (g5*r)*s (r,s spinors) */\n";
   print "#define _spinor_g5_prod_re_${suff}(k,r,s) \\\n";
-	print "   do { \\\n";
-	print "      double _tmp; (k)=0.; \\\n";
-  for (my $k=0; $k<2; $k++){
-    print "      _vector_prod_re_${suff}(_tmp,(r).$cname\[$k\],(s).$cname\[$k\]); (k)+=_tmp;\\\n";
-  }
+  print "   do { \\\n";
+  print "      _vector_prod_re_${suff}((k),(r).$cname\[0\],(s).$cname\[0\]);\\\n";
+  print "      _vector_prod_add_assign_re_${suff}((k),(r).$cname\[1\],(s).$cname\[1\]);\\\n";
   for (my $k=2; $k<4; $k++){
-    print "      _vector_prod_re_${suff}(_tmp,(r).$cname\[$k\],(s).$cname\[$k\]); (k)-=_tmp;\\\n";
+    print "      _vector_prod_sub_assign_re_${suff}((k),(r).$cname\[$k\],(s).$cname\[$k\]);\\\n";
   }
-	print "   } while(0) \n\n";
+  print "   } while(0) \n\n";
 }
 
 sub write_spinor_g5_prod_im {
   print "/* k=Imaginary part of the scalar product (g5*r)*s (r,s spinors) */\n";
   print "#define _spinor_g5_prod_im_${suff}(k,r,s) \\\n";
-	print "   do { \\\n";
-	print "      double _tmp; (k)=0.; \\\n";
-  for (my $k=0; $k<2; $k++){
-    print "      _vector_prod_im_${suff}(_tmp,(r).$cname\[$k\],(s).$cname\[$k\]); (k)+=_tmp;\\\n";
-  }
+  print "   do { \\\n";
+  print "      _vector_prod_im_${suff}((k),(r).$cname\[0\],(s).$cname\[0\]);\\\n";
+  print "      _vector_prod_add_assign_im_${suff}((k),(r).$cname\[1\],(s).$cname\[1\]);\\\n";
   for (my $k=2; $k<4; $k++){
-    print "      _vector_prod_im_${suff}(_tmp,(r).$cname\[$k\],(s).$cname\[$k\]); (k)-=_tmp;\\\n";
+    print "      _vector_prod_sub_assign_im_${suff}((k),(r).$cname\[$k\],(s).$cname\[$k\]);\\\n";
   }
-	print "   } while(0) \n\n";
+  print "   } while(0) \n\n";
 }
 
 sub write_spinor_project {

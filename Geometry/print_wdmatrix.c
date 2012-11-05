@@ -30,7 +30,7 @@ void print_wdmatrix(char *filename)
   error((fp=fopen(filename,"w"))==NULL,1,"print_wdmatrix",
         "Failed to open file for writing WD matrix image\n");
 
-	fprintf(fp,"P1\n%d %d\n",VOLUME,VOLUME);
+	fprintf(fp,"P1\n%ld %ld\n",VOLUME,VOLUME);
   for (x0=0;x0<VOLUME;x0++){ /* loop over rows */
     int nei[8];
 		for (x1=0;x1<4;++x1){

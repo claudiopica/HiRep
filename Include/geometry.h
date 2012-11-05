@@ -11,19 +11,25 @@
  */
 #define BORDERSIZE 1
 
+
 typedef struct _geometry_descriptor {
-  int local_master_pieces, total_master_pieces;
-  int *master_start, *master_end;
-  int ncopies;
+  int inner_master_pieces; /* number of inner pieces (1 o 2 for even odd or no_eo)) */
+  int local_master_pieces;
+  int total_spinor_master_pieces;
+  int total_gauge_master_pieces;
+  int *master_start, *master_end; 
+  int master_shift; /*  this is the odd spinor's shift, i.e. the index of the first odd entry in the full geometry */
+  int ncopies_spinor;
+  int ncopies_gauge;
   int *copy_from, *copy_to, *copy_len;
-  int nbuffers;
+  int copy_shift; /*  this is the odd spinor's shift, i.e. the index of the first odd copy in the full geometry */
+  int nbuffers_spinor;
+  int nbuffers_gauge;
   int *rbuf_len, *sbuf_len;
   int *rbuf_from_proc, *rbuf_start;
   int *sbuf_to_proc, *sbuf_start;
-  #ifdef GEOMETRY_MPI_EO_PATCH
-  int *buf_dim;
-  #endif
-  int gsize;
+  int gsize_spinor;
+  int gsize_gauge;
 } geometry_descriptor;
 
 #define _PIECE_FOR(type,i) \
@@ -55,11 +61,5 @@ int proc_dn(int id, int dir);
 void test_geometry_mpi(void);
 void test_geometry_mpi_eo(void);
 void print_wdmatrix(char *filename);
-
-#ifdef GEOMETRY_MPI_EO_PATCH
-void init_geometry_mpi_eo_patch();
-void free_geometry_mpi_eo_patch();
-#endif
-
 
 #endif

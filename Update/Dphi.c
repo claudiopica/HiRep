@@ -186,6 +186,10 @@ void Dphi_(spinor_field *out, spinor_field *in)
    start_sf_sendrecv(in);
 
    _PIECE_FOR(out->type,ix) {
+     if(_PIECE_INDEX(ix)==out->type->inner_master_pieces) {
+       /* wait for spinor to be transfered */
+       complete_sf_sendrecv(in);
+     }
      _SITE_FOR(out->type,ix) {
        r=_FIELD_AT(out,ix);
  
@@ -338,10 +342,6 @@ void Dphi_(spinor_field *out, spinor_field *in)
        _spinor_mul_f(*r,-0.5,*r);
 
      } /* SITE_FOR */
-     if(_PIECE_INDEX(ix)==0) {
-       /* wait for spinor to be transfered */
-       complete_sf_sendrecv(in);
-     }
    } /* PIECE FOR */
 }
 

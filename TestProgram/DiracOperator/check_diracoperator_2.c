@@ -115,12 +115,14 @@ int main(int argc,char *argv[])
    setup_process(&argc,&argv);
    
    /* logger setup */
-   logger_setlevel(0,10000); /* log all */
-   logger_map("DEBUG","debug");
-#ifdef WITH_MPI
-   sprintf(tmp,">out_%d",PID); logger_stdout(tmp);
-   sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
-#endif
+ 
+  logger_setlevel(0,100); /* log all */
+  if (PID!=0) { 
+    logger_disable();}
+  else{
+    sprintf(tmp,">out_%d",PID); logger_stdout(tmp);
+    sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
+  }
    
    lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
    
@@ -163,16 +165,16 @@ int main(int argc,char *argv[])
    pi=4.0*atan(1.0);
    n=10;
    bc_t=bc_x=bc_y=bc_z=0;
-#ifdef ANTIPERIODIC_BC_T
+#ifdef BC_T_ANTIPERIODIC
    bc_t=1;
 #endif
-#ifdef ANTIPERIODIC_BC_X
+#ifdef BC_X_ANTIPERIODIC
    bc_x=1;
 #endif
-#ifdef ANTIPERIODIC_BC_Y
+#ifdef BC_Y_ANTIPERIODIC
    bc_y=1;
 #endif
-#ifdef ANTIPERIODIC_BC_Z
+#ifdef BC_Z_ANTIPERIODIC
    bc_z=1;
 #endif
    lprintf("MAIN",0,"Anti periodic boundary conditions: %d %d %d %d\n",bc_t,bc_x,bc_y,bc_z);
@@ -223,7 +225,7 @@ int main(int argc,char *argv[])
 	    for (x3=-Z_BORDER;x3<Z+Z_BORDER;x3++)
 	      {
 		ix=ipt(x0,x1,x2,x3);
-		if(ix==-1) continue;
+		if(ix==-1 || ix >= glattice.gsize_spinor) continue;
 		
 		/* Attention, the definition of the plane wave depends on the slice used for the BC*/
 		px=p[0]*(double)(safe_mod(x0+T*COORD[0]-T_BORDER-1,GLB_T)+T_BORDER+1)

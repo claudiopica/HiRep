@@ -83,6 +83,10 @@ double avr_plaquette()
   double pa=0.;
 
   _PIECE_FOR(&glattice,ix) {
+    if(_PIECE_INDEX(ix)==glattice.inner_master_pieces) {
+      /* wait for gauge field to be transfered */
+      complete_gf_sendrecv(u_gauge);
+    }
     _SITE_FOR(&glattice,ix) {
       pa+=plaq(ix,1,0);
       pa+=plaq(ix,2,0);
@@ -90,10 +94,6 @@ double avr_plaquette()
       pa+=plaq(ix,3,0);
       pa+=plaq(ix,3,1);
       pa+=plaq(ix,3,2);
-    }
-    if(_PIECE_INDEX(ix)==0) {
-      /* wait for gauge field to be transfered */
-      complete_gf_sendrecv(u_gauge);
     }
   }
 
@@ -115,6 +115,10 @@ void full_plaquette()
 /*  int t=0; */
   
   _PIECE_FOR(&glattice,ix) {
+    if(_PIECE_INDEX(ix)==glattice.inner_master_pieces) {
+      /* wait for gauge field to be transfered */
+      complete_gf_sendrecv(u_gauge);
+    }
     _SITE_FOR(&glattice,ix) {
       complex tmp;
 		  cplaq(&tmp,ix,1,0); _complex_add_assign(pa[0],tmp);
@@ -141,10 +145,6 @@ void full_plaquette()
 		  lprintf("LOCPL",0,"Plaq( %d , %d , %d ) = ( %f , %f )\n",t,3,2,tmp.re,tmp.im);
 		  t++;
 		    } */
-    }
-    if(_PIECE_INDEX(ix)==0) {
-      /* wait for gauge field to be transfered */
-      complete_gf_sendrecv(u_gauge);
     }
   }
 

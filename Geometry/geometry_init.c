@@ -19,7 +19,14 @@
 
 static int *alloc_mem=NULL;
 
-
+static void free_memory() {
+  if(alloc_mem!=NULL) {
+    free(alloc_mem);
+    alloc_mem=NULL;
+    iup=idn=NULL;
+    ipt=NULL;
+  }
+}
 static void check_geometry_variables() {
   int tmp;
   long int ltmp;
@@ -126,15 +133,6 @@ static void check_geometry_variables() {
   lprintf("GEOMETRY",0,"Geometry variable checked\n");
 }
 
-
-static void free_memory() {
-  if(alloc_mem!=NULL) {
-    free(alloc_mem);
-    alloc_mem=NULL;
-    iup=idn=NULL;
-    ipt=NULL;
-  }
-}
 
 /* compute the size of the local lattice in the given direction given 
  * the cartesian coordinate of the node, global lattice size and the 
@@ -284,10 +282,9 @@ int geometry_init() {
 
 
   /* from here on there are no more free parameters to set */
-
   GLB_VOL3=((long int)GLB_X)*((long int)GLB_Y)*((long int)GLB_Z);
   GLB_VOLUME=GLB_VOL3*((long int)GLB_T);
-  
+
   /* compute local lattice size */
   T=compute_dim(COORD[0],GLB_T,NP_T);
   X=compute_dim(COORD[1],GLB_X,NP_X);
@@ -296,8 +293,8 @@ int geometry_init() {
 
   VOL3=((long int)X)*((long int)Y)*((long int)Z);
   VOLUME=VOL3*((long int)T);
-
-	X_BORDER=(NP_X>1)?BORDERSIZE:0;
+  
+  	X_BORDER=(NP_X>1)?BORDERSIZE:0;
 	Y_BORDER=(NP_Y>1)?BORDERSIZE:0;
 	Z_BORDER=(NP_Z>1)?BORDERSIZE:0;
 	T_BORDER=(NP_T>1)?BORDERSIZE:0;
@@ -314,6 +311,8 @@ int geometry_init() {
   
   check_geometry_variables();
   
+
+
   return 0;
 }
 
@@ -382,7 +381,7 @@ void geometry_mem_alloc() {
   if (init) {
     int *cur;
     size_t req_mem=0;
-    unsigned int VOL_SIZE=glattice.gsize;
+    unsigned int VOL_SIZE=glattice.gsize_gauge;
 
     req_mem+=2*4*VOL_SIZE; /* for iup and idn */
     req_mem+=(X+2*X_BORDER)*(Y+2*Y_BORDER)*(Z+2*Z_BORDER)*(T+2*T_BORDER);     /* for ipt */

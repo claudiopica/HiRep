@@ -51,7 +51,7 @@ typedef struct _input_glb {
     {"ranlux level", "level = %d", INT_T, &(varname).rlxd_level},\
     {"ranlux seed", "seed = %d", INT_T, &(varname).rlxd_seed},\
     {"ranlux state", "state = %s", STRING_T, &(varname).rlxd_state},\
-    {NULL, NULL, 0, NULL}\
+    {NULL, NULL, INT_T, NULL}				    \
   },\
   .rlxd_state=""\
 }
@@ -76,7 +76,7 @@ typedef struct _input_logger {
     {"Default logger level", "log:default = %d", INT_T, &(varname).def_log_lvl},\
     {"Inverter logger level", "log:inverter = %d", INT_T, &(varname).inverter_log_lvl},\
     {"Forcestat logger level", "log:forcestat = %d", INT_T, &(varname).forcestat_log_lvl},\
-    {NULL, NULL, 0, NULL}\
+    {NULL, NULL, INT_T, NULL}\
   }, \
   .def_log_lvl=-1,\
   .inverter_log_lvl=-1,\

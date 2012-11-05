@@ -331,7 +331,7 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
   rho=sqrt(spinor_field_sqnorm_f_f2d(p2));
   lprintf("INVERTER",60,"g5QMR_core_flt: rho init: %1.8e\n",rho*rho/innorm2);
   
-  spinor_field_mul_f_flt(p2,1./rho,p2);
+  spinor_field_mul_f_flt(p2,1.f/((float)(rho)),p2);
   spinor_field_zero_f_flt(p1);
   r=rho;
   c2=c1=1.;
@@ -352,8 +352,8 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
     alpha = spinor_field_g5_prod_re_f_f2d(p2,Mp)/delta;
     
     /* update p1, p2 */
-    spinor_field_mul_add_assign_f_flt(Mp,-beta,p1);
-    spinor_field_mul_add_assign_f_flt(Mp,-alpha,p2);
+    spinor_field_mul_add_assign_f_flt(Mp,((float)(-beta)),p1);
+    spinor_field_mul_add_assign_f_flt(Mp,-((float)(alpha)),p2);
     sptmp=p1;
     p1=p2;
     p2=Mp;
@@ -381,15 +381,15 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
       maxm=(maxm>fabs(m))?maxm:fabs(m);
       
       /* update q */
-      spinor_field_lc_f_flt(Mp,-t*d,q1,-e*d,q2);
-      spinor_field_mul_add_assign_f_flt(Mp,d,p1);
+      spinor_field_lc_f_flt(Mp,((float)(-t*d)),q1,((float)(-e*d)),q2);
+      spinor_field_mul_add_assign_f_flt(Mp,((float)(d)),p1);
       sptmp=q1;
       q1=q2;
       q2=Mp;
       Mp=sptmp;/* swap q1<-q2<-Mp and Mp point to q1 */
       
       /* update solution */
-      spinor_field_mul_add_assign_f_flt(out,c2*r,q2);
+      spinor_field_mul_add_assign_f_flt(out,((float)(c2*r)),q2);
       
       /* update residuum */
       r*=-s2;
@@ -408,7 +408,7 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
       double olddelta;
       
       /*normalize p2 */
-      spinor_field_mul_f_flt(p2,1./rho,p2);
+      spinor_field_mul_f_flt(p2,((float)(1./rho)),p2);
       
       /* update delta and beta */
       olddelta=delta;
@@ -486,7 +486,7 @@ static spinor_operator_flt g5Herm_flt;
 static void Herm_flt(spinor_field_flt *out, spinor_field_flt *in){
   g5Herm_flt(out,in);
   if(sh_flt!=0.) {
-    spinor_field_mul_add_assign_f_flt(out,-sh_flt,in);
+    spinor_field_mul_add_assign_f_flt(out,((float)(-sh_flt)),in);
   }
   spinor_field_g5_f_flt(out,out);
 }

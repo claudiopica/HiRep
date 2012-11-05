@@ -682,18 +682,25 @@ static void create_sinks_QMR(spinor_field *source, spinor_field *sink, int mode)
 	b=sinktmp+1;
 	b_even=*b;
 	b_even.type=&glat_even;
+	/* b_even.ptr=b->ptr+glat_even.master_shift; */
 	b_odd=*b;
 	b_odd.type=&glat_odd;
+	b_odd.ptr=b->ptr+glat_odd.master_shift;
 
 	sinktmp_even=*sinktmp;
 	sinktmp_even.type=&glat_even;
+	/* sinktmp_even.ptr=sinktmp->ptr+glat_even.master_shift; */
 	sinktmp_odd=*sinktmp;
 	sinktmp_odd.type=&glat_odd;
+	sinktmp_odd.ptr=sinktmp->ptr+glat_odd.master_shift;
+
 
 	source_even=*source;
 	source_even.type=&glat_even;
+	/* source_even.ptr=source->ptr+glat_even.master_shift; */
 	source_odd=*source;
 	source_odd.type=&glat_odd;
+	source_odd.ptr=source->ptr+glat_odd.master_shift;
 	
 	sink_even=(spinor_field*)malloc(sizeof(spinor_field)*pars.n_masses);
 	sink_odd=(spinor_field*)malloc(sizeof(spinor_field)*pars.n_masses);
@@ -703,14 +710,20 @@ static void create_sinks_QMR(spinor_field *source, spinor_field *sink, int mode)
 	for(m = 0; m < pars.n_masses; m++) {
 	  *(sink_even+m)=*(sink+m);
 	  (sink_even+m)->type=&glat_even;
+	  /*(sink_even+m)->ptr=(sink+m)->ptr+glat_even.master_shift; */
+
 	  *(sink_odd+m)=*(sink+m);
 	  (sink_odd+m)->type=&glat_odd;
+	  (sink_odd+m)->ptr=(sink+m)->ptr+glat_odd.master_shift;
 
 	  *(sink_trunc_even+m)=*(sink_trunc+m);
 	  (sink_trunc_even+m)->type=&glat_even;
+	  /*(sink_trunc_even+m)->ptr=(sink_trunc+m)->ptr+glat_even.master_shift; */
+
 	  *(sink_trunc_odd+m)=*(sink_trunc+m);
 	  (sink_trunc_odd+m)->type=&glat_odd;
-	
+	  (sink_trunc_odd+m)->ptr=(sink_trunc+m)->ptr+glat_odd.master_shift;
+
 	}
 
   /* Start preconditioning & inversion */

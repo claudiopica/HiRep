@@ -72,13 +72,15 @@ int main(int argc,char *argv[])
    setup_process(&argc,&argv);
    
    /* logger setup */
-   logger_setlevel(0,50); /* log all */
-   logger_map("DEBUG","debug");
-#ifdef WITH_MPI
-   sprintf(pame,">out_%d",PID); logger_stdout(pame);
-   sprintf(pame,"err_%d",PID); freopen(pame,"w",stderr);
-#endif
-   
+
+  logger_setlevel(0,100); /* log all */
+  if (PID!=0) { 
+    logger_disable();}
+  else{
+    sprintf(pame,">out_%d",PID); logger_stdout(pame);
+    sprintf(pame,"err_%d",PID); freopen(pame,"w",stderr);
+  }
+     
    lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
    
    /* read input file */
@@ -100,12 +102,13 @@ int main(int argc,char *argv[])
    /* setup lattice geometry */
    geometry_mpi_eo();
    /* test_geometry_mpi_eo(); */
-   
+   MPI_Barrier(MPI_COMM_WORLD);
    u_gauge=alloc_gfield(&glattice);
 #ifndef REPR_FUNDAMENTAL
    u_gauge_f=alloc_gfield_f(&glattice);
    u_gauge_f_flt=alloc_gfield_f_flt(&glattice);
 #endif
+   represent_gauge_field();
    
    lprintf("MAIN",0,"Generating a random gauge field... ");
    fflush(stdout);
@@ -189,5 +192,5 @@ int main(int argc,char *argv[])
 
    finalize_process();
 
-   exit(0);
+   return 0;
 }

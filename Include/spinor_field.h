@@ -112,7 +112,7 @@ typedef struct _scalar_field {
 
 #define _ONE_SPINOR_FOR(s,i) \
 	for(_PIECE_INDEX(i)=0;_PIECE_INDEX(i)<(s)->type->local_master_pieces;_PIECE_INDEX(i)++) \
-	for(i=(s)->type->master_start[_PIECE_INDEX(i)], _SPINOR_PTR(s)=(s)->ptr+(s)->type->master_start[_PIECE_INDEX(i)]; \
+	for(i=(s)->type->master_start[_PIECE_INDEX(i)], _SPINOR_PTR(s)=(s)->ptr+(s)->type->master_start[_PIECE_INDEX(i)]-(s)->type->master_shift; \
 	    i<=(s)->type->master_end[_PIECE_INDEX(i)]; \
 	    i++, _SPINOR_PTR(s)++ \
 	   )
@@ -120,8 +120,8 @@ typedef struct _scalar_field {
 #define _TWO_SPINORS_FOR(s1,s2,i) \
 	_TWO_SPINORS_MATCHING(s1,s2); \
 	for(_PIECE_INDEX(i)=0;_PIECE_INDEX(i)<(s1)->type->local_master_pieces;_PIECE_INDEX(i)++) \
-	for(i=(s1)->type->master_start[_PIECE_INDEX(i)], _SPINOR_PTR(s1)=(s1)->ptr+(s1)->type->master_start[_PIECE_INDEX(i)], \
-	              _SPINOR_PTR(s2)=(s2)->ptr+(s1)->type->master_start[_PIECE_INDEX(i)]; \
+	for(i=(s1)->type->master_start[_PIECE_INDEX(i)], _SPINOR_PTR(s1)=(s1)->ptr+(s1)->type->master_start[_PIECE_INDEX(i)]-(s1)->type->master_shift, \
+	              _SPINOR_PTR(s2)=(s2)->ptr+(s1)->type->master_start[_PIECE_INDEX(i)]-(s1)->type->master_shift; \
 	    i<=(s1)->type->master_end[_PIECE_INDEX(i)]; \
 	    i++, _SPINOR_PTR(s1)++, _SPINOR_PTR(s2)++ \
 	   )
@@ -130,17 +130,17 @@ typedef struct _scalar_field {
 	_TWO_SPINORS_MATCHING(s1,s2); \
 	_TWO_SPINORS_MATCHING(s1,s3); \
 	for(_PIECE_INDEX(i)=0;_PIECE_INDEX(i)<(s1)->type->local_master_pieces;_PIECE_INDEX(i)++) \
-	for(i=(s1)->type->master_start[_PIECE_INDEX(i)], _SPINOR_PTR(s1)=(s1)->ptr+(s1)->type->master_start[_PIECE_INDEX(i)], \
-	              _SPINOR_PTR(s2)=(s2)->ptr+(s1)->type->master_start[_PIECE_INDEX(i)], \
-	              _SPINOR_PTR(s3)=(s3)->ptr+(s1)->type->master_start[_PIECE_INDEX(i)]; \
+	for(i=(s1)->type->master_start[_PIECE_INDEX(i)], _SPINOR_PTR(s1)=(s1)->ptr+(s1)->type->master_start[_PIECE_INDEX(i)]-(s1)->type->master_shift, \
+	              _SPINOR_PTR(s2)=(s2)->ptr+(s1)->type->master_start[_PIECE_INDEX(i)]-(s1)->type->master_shift, \
+	              _SPINOR_PTR(s3)=(s3)->ptr+(s1)->type->master_start[_PIECE_INDEX(i)]-(s1)->type->master_shift; \
 	    i<=(s1)->type->master_end[_PIECE_INDEX(i)]; \
 	    i++, _SPINOR_PTR(s1)++, _SPINOR_PTR(s2)++, _SPINOR_PTR(s3)++ \
 	   )
 
 #include "field_ordering.h"
 
-#define _FIELD_AT(s,i) (((s)->ptr)+i)
-#define _4FIELD_AT(s,i,mu) (((s)->ptr)+coord_to_index(i,mu))
+#define _FIELD_AT(s,i) (((s)->ptr)+i-(s)->type->master_shift)
+#define _4FIELD_AT(s,i,mu) (((s)->ptr)+coord_to_index(i-(s)->type->master_shift,mu))
 /*
 #define _SPINOR_ADDR(s) ((s)->ptr)
 */

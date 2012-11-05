@@ -61,7 +61,7 @@ typedef struct _input_mesons {
 { \
   .read={\
     {"quark quenched masses", "mes:masses = %s", STRING_T, (varname).mstring},\
-    {NULL, NULL, 0, NULL}\
+    {NULL, NULL, INT_T, NULL}\
   }\
 }
 
@@ -80,8 +80,8 @@ int main(int argc,char *argv[])
 	int g[4];
   double *ex_triplets[8];
   double *pta_triplets[8];
-  char tmp[256];
-	spinor_field **pta_qprop=0;
+  char pame[256];
+  spinor_field **pta_qprop=0;
 
 
   /* setup process id and communications */
@@ -90,17 +90,22 @@ int main(int argc,char *argv[])
   /* logger setup */
   /* disable logger for MPI processes != 0 */
   /* if (PID!=0) { logger_disable(); } */
-  logger_setlevel(0,40);
-  sprintf(tmp,">out_%d",PID); logger_stdout(tmp);
-  sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
+ if (PID!=0) {
+    logger_disable();}
+  else{
+    sprintf(pame,">out_%d",PID); logger_stdout(pame);
+    sprintf(pame,"err_%d",PID); freopen(pame,"w",stderr);
+  }
+  
+  logger_map("DEBUG","debug");
 
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
 
   read_input(glb_ip.read,"input_file");
   read_input(mes_ip.read,"input_file");
 
-  strcpy(tmp,mes_ip.mstring);
-  mass=atof(strtok(tmp, ";"));       
+  strcpy(pame,mes_ip.mstring);
+  mass=atof(strtok(pame, ";"));       
 
 
   /* setup communication geometry */
@@ -181,6 +186,8 @@ int main(int argc,char *argv[])
 
 /*   error = sqrt(error); */
 /*   printf("Error = %f\n", error); */
+
+  finalize_process();
 
  
   exit(0);

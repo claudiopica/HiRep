@@ -88,21 +88,22 @@ void test_herm(spinor_operator S, char *name){
 
 int main(int argc,char *argv[])
 {
-
+  char tmp[256];
 
 
   /* setup process id and communications */
   setup_process(&argc,&argv);
 
   /* logger setup */
-  logger_setlevel(0,10000); /* log all */
-  logger_map("DEBUG","debug");
-#ifdef WITH_MPI
-  char tmp[256];
-  sprintf(tmp,"out_%d",PID); logger_stdout(tmp);
-  sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
-#endif
-
+ 
+  logger_setlevel(0,100); /* log all */
+  if (PID!=0) { 
+    logger_disable();}
+  else{
+    sprintf(tmp,">out_%d",PID); logger_stdout(tmp);
+    sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
+  }
+   
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
 
   /* read input file */
@@ -129,10 +130,13 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"local size is %dx%dx%dx%d\n",T,X,Y,Z);
   lprintf("MAIN",0,"extended local size is %dx%dx%dx%d\n",T_EXT,X_EXT,Y_EXT,Z_EXT);
 
-  lprintf("CPTEST",0,"gsize=%d\n",glattice.gsize);
-  lprintf("CPTEST",0,"nbuffers=%d\n",glattice.nbuffers);
+  lprintf("CPTEST",0,"gauge gsize=%d\n",glattice.gsize_gauge);
+  lprintf("CPTEST",0,"gauge nbuffers=%d\n",glattice.nbuffers_gauge);
+  lprintf("CPTEST",0,"spinor gsize=%d\n",glattice.gsize_spinor);
+  lprintf("CPTEST",0,"spinor nbuffers=%d\n",glattice.nbuffers_spinor);
   lprintf("CPTEST",0,"lmp=%d\n",glattice.local_master_pieces);
-  lprintf("CPTEST",0,"ncopies=%d\n",glattice.ncopies);
+  lprintf("CPTEST",0,"gauge ncopies=%d\n",glattice.ncopies_gauge);
+  lprintf("CPTEST",0,"spinor ncopies=%d\n",glattice.ncopies_spinor);
 
   /* alloc global gauge fields */
   u_gauge=alloc_gfield(&glattice);

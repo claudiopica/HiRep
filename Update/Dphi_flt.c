@@ -198,6 +198,10 @@ void Dphi_flt_(spinor_field_flt *out, spinor_field_flt *in)
    start_sf_sendrecv_flt(in);
    
    _PIECE_FOR(out->type,ix) {
+     if(_PIECE_INDEX(ix)==out->type->inner_master_pieces) {
+       /* wait for spinor to be transfered */
+       complete_sf_sendrecv_flt(in);
+     }
      _SITE_FOR(out->type,ix) {
        r=_FIELD_AT(out,ix);
  
@@ -349,10 +353,6 @@ void Dphi_flt_(spinor_field_flt *out, spinor_field_flt *in)
 
        _spinor_mul_f(*r,-0.5f,*r);
      } /* SITE_FOR */
-     if(_PIECE_INDEX(ix)==0) {
-       /* wait for spinor to be transfered */
-       complete_sf_sendrecv_flt(in);
-     }
    } /* PIECE FOR */
 }
 
@@ -363,7 +363,7 @@ void Dphi_flt_(spinor_field_flt *out, spinor_field_flt *in)
  */
 void Dphi_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
 {
-   double rho;
+   float rho;
 #ifdef ROTATED_SF
     int ix,iy,iz,index;
     suNf_spinor_flt *r, *sp;
@@ -384,17 +384,17 @@ void Dphi_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
    apply_BCs_on_spinor_field_flt(in);
    Dphi_flt_(out, in);
 
-   rho=4.+m0;
+   rho=4.f+(float)(m0);
    spinor_field_mul_add_assign_f_flt(out,rho,in);
     
 #ifdef ROTATED_SF
-    SFrho=3.*_update_par.SF_ds+_update_par.SF_zf-4.;
+   SFrho=(float)(3.*_update_par.SF_ds+_update_par.SF_zf-4.);
     
 	if(COORD[0] == 0) {
 		for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
 			index=ipt(1,ix,iy,iz);
 			r=_FIELD_AT(out,index);
-            sp=_FIELD_AT(in,index);
+			sp=_FIELD_AT(in,index);
 			_spinor_mul_add_assign_f(*r,SFrho,*sp);
 			
 			_spinor_pminus_f(tmp,*sp);
@@ -430,7 +430,7 @@ void Dphi_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
 
 void g5Dphi_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
 {
-   double rho;
+   float rho;
 
    error((in==NULL)||(out==NULL),1,"g5Dphi_flt [Dphi_flt.c]",
          "Attempt to access unallocated memory space");
@@ -446,7 +446,7 @@ void g5Dphi_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
    
    Dphi_flt_(out, in);
    
-   rho=4.+m0;
+   rho=4.f+(float)(m0);
 
    spinor_field_mul_add_assign_f_flt(out,rho,in);
    spinor_field_g5_assign_f_flt(out);
@@ -462,7 +462,7 @@ void g5Dphi_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
  */
 void Dphi_eopre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
 {
-  double rho;
+  float rho;
   
   error((in==NULL)||(out==NULL),1,"Dphi_eopre_flt [Dphi_flt.c]",
 	"Attempt to access unallocated memory space");
@@ -482,7 +482,7 @@ void Dphi_eopre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
   apply_BCs_on_spinor_field_flt(otmp);
   Dphi_flt_(out, otmp);
   
-  rho=4.0+m0;
+  rho=4.f+(float)(m0);
   rho*=-rho; /* this minus sign is taken into account below */
   
   spinor_field_mul_add_assign_f_flt(out,rho,in);
@@ -498,7 +498,7 @@ void Dphi_eopre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
  */
 void Dphi_oepre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
 {
-  double rho;
+  float rho;
   
   error((in==NULL)||(out==NULL),1,"Dphi_oepre_flt [Dphi_flt.c]",
 	"Attempt to access unallocated memory space");
@@ -518,7 +518,7 @@ void Dphi_oepre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
   apply_BCs_on_spinor_field_flt(etmp);
   Dphi_flt_(out, etmp);
   
-  rho=4.0+m0;
+  rho=4.f+(float)(m0);
   rho*=-rho; /* this minus sign is taken into account below */
   
   spinor_field_mul_add_assign_f_flt(out,rho,in);
@@ -530,7 +530,7 @@ void Dphi_oepre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
 
 void g5Dphi_eopre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
 {
-  double rho;
+  float rho;
   
   error((in==NULL)||(out==NULL),1,"g5Dphi_eopre_flt [Dphi_flt.c]",
 	"Attempt to access unallocated memory space");
@@ -550,7 +550,7 @@ void g5Dphi_eopre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
   apply_BCs_on_spinor_field_flt(otmp);
   Dphi_flt_(out, otmp);
   
-  rho=4.0+m0;
+  rho=4.f+(float)(m0);
   rho*=-rho; /* this minus sign is taken into account below */
   
   spinor_field_mul_add_assign_f_flt(out,rho,in);

@@ -1,4 +1,5 @@
-GLB_T = 6
+// Global variables 
+GLB_T = 6 //Global T size
 GLB_X = 6
 GLB_Y = 6
 GLB_Z = 6
@@ -8,3 +9,4 @@ NP_Y = 2
 NP_Z = 2
 level = 1
 seed = 12345
+

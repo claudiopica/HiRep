@@ -297,8 +297,10 @@ static void z2semwall_qprop_QMR_eo(void (*Gamma)(suNf_spinor*,suNf_spinor*), spi
     /* compute solution */
     qprop_mask=psi[i];
     qprop_mask.type=&glat_even;
+    /* qprop_mask.ptr=psi[i].ptr+glat_even.master_shift; */
     spinor_field_mul_f(&qprop_mask,(4.+mass[i]),&resd[i]);
     qprop_mask.type=&glat_odd;
+    qprop_mask.ptr=psi[i].ptr+glat_odd.master_shift; 
     Dphi_(&qprop_mask,&resd[i]);
     spinor_field_minus_f(&qprop_mask,&qprop_mask);
     if(i&1) ++cgiter; /* count only half of calls. works because the number of sources is even */

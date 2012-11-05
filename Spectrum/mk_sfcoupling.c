@@ -46,7 +46,7 @@ typedef struct _input_sfc {
 { \
   .read={\
     {"beta", "beta = %lf", DOUBLE_T, &(varname).beta},\
-    {NULL, NULL, 0, NULL}\
+    {NULL, NULL, INT_T, NULL}\
   }\
 }
 
@@ -73,7 +73,7 @@ typedef struct _input_bcpar {
     {"theta_Z", "theta_Z = %lf", DOUBLE_T, &(varname).theta[3]},\
     {"SF_ds", "SF_ds = %lf", DOUBLE_T, &(varname).SF_ds},\
     {"SF_ct", "SF_ct = %lf", DOUBLE_T, &(varname).SF_ct}, \
-    {NULL, NULL, 0, NULL}\
+    {NULL, NULL, INT_T, NULL}\
   }\
 }
 

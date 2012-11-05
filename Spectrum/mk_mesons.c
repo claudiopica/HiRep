@@ -58,7 +58,7 @@ typedef struct _input_mesons {
     {"quark quenched masses", "mes:masses = %s", STRING_T, (varname).mstring},\
     {"inverter precision", "mes:precision = %lf", DOUBLE_T, &(varname).precision},\
     {"number of inversions per cnfg", "mes:nhits = %d", INT_T, &(varname).nhits},\
-    {NULL, NULL, 0, NULL}\
+    {NULL, NULL, INT_T, NULL}\
   }\
 }
 

@@ -360,15 +360,15 @@ void WL_Hamiltonian_gauge(suNg_field* out, suNg_field* in) {
   
   _DECLARE_INT_ITERATOR(ix);
   _PIECE_FOR(&glattice,ix) {
+    if(_PIECE_INDEX(ix)==glattice.inner_master_pieces) {
+      complete_gt_sendrecv(ws_gtf[1]);
+    }
     _SITE_FOR(&glattice,ix) {
       for(int mu=0;mu<4;mu++) {
         _suNg_times_suNg(tmp,*_FIELD_AT(ws_gtf[1],ix),*_4FIELD_AT(in,ix,mu));
         _suNg_times_suNg_dagger(*_4FIELD_AT(out,ix,mu),tmp,*_FIELD_AT(ws_gtf[1],iup(ix,mu)));
       }
     } /* SITE_FOR */
-    if(_PIECE_INDEX(ix)==0) {
-      complete_gt_sendrecv(ws_gtf[1]);
-    }
   } /* PIECE FOR */
 
   start_gf_sendrecv(out);

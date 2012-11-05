@@ -94,7 +94,7 @@ cinfo.c: $(MKDIR)/MkFlags $(MKDIR)/MkRules $(MKDIR)/Utils/cinfo.sh
 define LINK_template
 $(1): $(1).o $$($(1)_OBJS) $$(COMMON_OBJS)
 	echo -n Linking [$$@]... 
-	$$(CC) $$(CFLAGS) $$(LDFLAGS) -o $$@ $$< $$($(1)_OBJS) $$(COMMON_OBJS) &&\
+	$$(CC) $$(CFLAGS) -o $$@ $$< $$($(1)_OBJS) $$(COMMON_OBJS) $$(LDFLAGS)  &&\
 	echo " done." || ( echo " failed." && false )
 endef
 

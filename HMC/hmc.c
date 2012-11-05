@@ -49,7 +49,7 @@ typedef struct _input_mesons {
     {"make mesons", "mes:make = %s", STRING_T, (varname).make},\
     {"inverter precision", "mes:precision = %lf", DOUBLE_T, &(varname).precision},\
     {"number of noisy sources per cnfg", "mes:nhits = %d", INT_T, &(varname).nhits},\
-    {NULL, NULL, 0, NULL}\
+    {NULL, NULL, INT_T, NULL}\
   }\
 }
 
@@ -69,7 +69,7 @@ typedef struct _input_polyakov {
 { \
   .read={\
     {"make polyakov loops", "poly:make = %s", STRING_T, (varname).make},\
-    {NULL, NULL, 0, NULL}\
+    {NULL, NULL, INT_T, NULL}\
   }\
 }
 
@@ -102,7 +102,7 @@ typedef struct _input_eigval {
     {"max number of subiterations", "eva:maxiter = %d", INT_T, &(varname).maxiter},\
     {"absolute precision", "eva:omega1 = %lf", DOUBLE_T, &(varname).omega1},\
     {"relative precision", "eva:omega2 = %lf", DOUBLE_T, &(varname).omega2},\
-    {NULL, NULL, 0, NULL}\
+    {NULL, NULL, INT_T, NULL}\
   }\
 }
 

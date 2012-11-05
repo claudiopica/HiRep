@@ -358,7 +358,7 @@ void represent_gauge_field() {
   complete_gf_sendrecv(u_gauge);
 
   /* loop on the rest of master sites */
-  for(ip=glattice.local_master_pieces;ip<glattice.total_master_pieces;ip++)
+  for(ip=glattice.local_master_pieces;ip<glattice.total_gauge_master_pieces;ip++)
     for(ix=glattice.master_start[ip];ix<=glattice.master_end[ip];ix++)
       for (mu=0;mu<4;mu++) {
         u=pu_gauge(ix,mu);

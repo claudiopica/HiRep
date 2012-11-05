@@ -65,13 +65,15 @@ int main(int argc,char *argv[])
   setup_process(&argc,&argv);
   
   /* logger setup */
-  logger_setlevel(0,10000); /* log all */
-  logger_map("DEBUG","debug");
-#ifdef WITH_MPI
-  sprintf(pame,">out_%d",PID); logger_stdout(pame);
-  sprintf(pame,"err_%d",PID); freopen(pame,"w",stderr);
-#endif
-  
+
+  logger_setlevel(0,100); /* log all */
+  if (PID!=0) { 
+    logger_disable();}
+  else{
+    sprintf(pame,">out_%d",PID); logger_stdout(pame);
+    sprintf(pame,"err_%d",PID); freopen(pame,"w",stderr);
+  }
+     
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
   
   /* read input file */
@@ -152,12 +154,12 @@ int main(int argc,char *argv[])
     spinor_field_sub_assign_f(s3,s1);
     tau1=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
     tau2=spinor_field_sqnorm_f(s3)/spinor_field_sqnorm_f(s1);
-    printf("test g5QMR[%d] = %e, trunc = %e (req. %e)\n",i,tau1,tau2,par.err2);
+    lprintf("QMR TEST",0," g5QMR[%d] = %e, trunc = %e (req. %e)\n",i,tau1,tau2,par.err2);
   }
 	 
   free_spinor_field(res);
   free(par.shift);
   finalize_process();
 
-  exit(0);
+  return 0;
 }

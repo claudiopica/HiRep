@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Agostino Patella, Claudio Pica                        *   
-* All rights reserved.                                                      * 
+ * Copyright (c) 2008, Agostino Patella, Claudio Pica                        *   
+ * All rights reserved.                                                      * 
 \***************************************************************************/
 
 #include "global.h"
@@ -31,20 +31,20 @@ action_par hmc_action_par;
 static double static_mass=0.;
 
 static void D(spinor_field *out, spinor_field *in){
-  #ifdef UPDATE_EO
+#ifdef UPDATE_EO
   Dphi_eopre(static_mass, out, in);
-  #else
+#else
   Dphi(static_mass, out, in);
-  #endif
+#endif
 }
 
 
 static void D_flt(spinor_field_flt *out, spinor_field_flt *in){
-  #ifdef UPDATE_EO
+#ifdef UPDATE_EO
   Dphi_eopre_flt((float)(static_mass), out, in);
-  #else
+#else
   Dphi_flt((float)(static_mass), out, in);
-  #endif
+#endif
 }
 
 
@@ -55,99 +55,99 @@ static scalar_field *la=NULL; /* local action field for Metropolis test */
 
 void init_hmc(hmc_par *par){
   
-	if (init) {
-	  /* already initialized */
-	  lprintf("HMC",0,"WARNING: HMC already initialized!\nWARNING: Ignoring call to init_hmc.\n");
-		return;
-	}
+  if (init) {
+    /* already initialized */
+    lprintf("HMC",0,"WARNING: HMC already initialized!\nWARNING: Ignoring call to init_hmc.\n");
+    return;
+  }
 	
-	lprintf("HMC",0,"Initializing...\n");
+  lprintf("HMC",0,"Initializing...\n");
 	
-	/* copy input parameters into the internal variable and make some tests */
-	_update_par=*par;
-	if (_update_par.nf%2 != 0) {
-		lprintf("HMC",0,"The number of fermions even.\nTry with the RHMC algorithm.\n");
-		error(1,1,"init_hmc","The HMC algorithm is not suitable for the parameters specified as input.\n");
-	}
+  /* copy input parameters into the internal variable and make some tests */
+  _update_par=*par;
+  if (_update_par.nf%2 != 0) {
+    lprintf("HMC",0,"The number of fermions even.\nTry with the RHMC algorithm.\n");
+    error(1,1,"init_hmc","The HMC algorithm is not suitable for the parameters specified as input.\n");
+  }
 	
-	lprintf("HMC",10,
-		"Number of Flavors = %d\n"
-		"beta = %.8f\n"
-		"Mass = %.8f\n"
+  lprintf("HMC",10,
+	  "Number of Flavors = %d\n"
+	  "beta = %.8f\n"
+	  "Mass = %.8f\n"
 #ifdef ROTATED_SF
-        "rotatedSF zf = %.8f\n"
-        "rotatedSF ds = %.8f\n"
-        "rotatedSF ct = %.8f\n"
-        "rotatedSF sign = %d\n"
+	  "rotatedSF zf = %.8f\n"
+	  "rotatedSF ds = %.8f\n"
+	  "rotatedSF ct = %.8f\n"
+	  "rotatedSF sign = %d\n"
 #endif /* ROTATED_SF */
-		"Metropolis test precision (F1==n) = %.8e\n"
-		"HMC force precision (F1==n) = %.8e\n"
-		"Metropolis test precision (F1==n) float = %.8e\n"
-		"HMC force precision (F1==n) float = %.8e\n"
-		,_update_par.nf
-		,_update_par.beta
-		,_update_par.mass
+	  "Metropolis test precision (F1==n) = %.8e\n"
+	  "HMC force precision (F1==n) = %.8e\n"
+	  "Metropolis test precision (F1==n) float = %.8e\n"
+	  "HMC force precision (F1==n) float = %.8e\n"
+	  ,_update_par.nf
+	  ,_update_par.beta
+	  ,_update_par.mass
 #ifdef ROTATED_SF
-        ,_update_par.SF_zf
-        ,_update_par.SF_ds
-        ,_update_par.SF_ct
-        ,_update_par.SF_sign
+	  ,_update_par.SF_zf
+	  ,_update_par.SF_ds
+	  ,_update_par.SF_ct
+	  ,_update_par.SF_sign
 #endif /* ROTATED_SF */
-		,_update_par.n_MT_prec
-		,_update_par.n_force_prec
-		,_update_par.n_MT_prec_flt
-		,_update_par.n_force_prec_flt
-		);
-	
-	if(_update_par.hasenbusch)
-	lprintf("HMC",10,
-	  "Using Hasenbush accelerator\n"
-	  "Metropolis test precision (F2==h) = %.8e\n"
-	  "HMC force precision (F2==h) = %.8e\n"
-	  "Hasenbush mass shift = %.8e\n"
-	  ,_update_par.h_MT_prec
-	  ,_update_par.h_force_prec
-	  ,_update_par.hasen_dm
+	  ,_update_par.n_MT_prec
+	  ,_update_par.n_force_prec
+	  ,_update_par.n_MT_prec_flt
+	  ,_update_par.n_force_prec_flt
 	  );
 	
-	lprintf("HMC",10,
-		"MD trajectory length = %.8f\n"
-		"MD steps = %d\n"
-		"MD gauge substeps = %d\n"
-		,_update_par.tlen
-		,_update_par.nsteps
-		,_update_par.gsteps
-		);
+  if(_update_par.hasenbusch)
+    lprintf("HMC",10,
+	    "Using Hasenbush accelerator\n"
+	    "Metropolis test precision (F2==h) = %.8e\n"
+	    "HMC force precision (F2==h) = %.8e\n"
+	    "Hasenbush mass shift = %.8e\n"
+	    ,_update_par.h_MT_prec
+	    ,_update_par.h_force_prec
+	    ,_update_par.hasen_dm
+	    );
 	
-	if(_update_par.hasenbusch)
-	lprintf("HMC",10,
-	  "MD Hasenbusch sub steps = %d\n"
-	  ,_update_par.hsteps
+  lprintf("HMC",10,
+	  "MD trajectory length = %.8f\n"
+	  "MD steps = %d\n"
+	  "MD gauge substeps = %d\n"
+	  ,_update_par.tlen
+	  ,_update_par.nsteps
+	  ,_update_par.gsteps
 	  );
 	
+  if(_update_par.hasenbusch)
+    lprintf("HMC",10,
+	    "MD Hasenbusch sub steps = %d\n"
+	    ,_update_par.hsteps
+	    );
 	
 	
-	/* allocate space for the backup copy of gfield */
-	if(u_gauge_old==NULL) u_gauge_old=alloc_gfield(&glattice);
-	suNg_field_copy(u_gauge_old,u_gauge);
 	
-	/* allocate momenta */
-	if(momenta==NULL) momenta = alloc_avfield(&glattice);
+  /* allocate space for the backup copy of gfield */
+  if(u_gauge_old==NULL) u_gauge_old=alloc_gfield(&glattice);
+  suNg_field_copy(u_gauge_old,u_gauge);
 	
-	/* allocate pseudofermions */
-	/* we allocate one more pseudofermion for the computation 
-	* of the final action density 
-	*/
-	if(pf==NULL) {
-	  n_pf = _update_par.hasenbusch?_update_par.nf:(_update_par.nf/2);
-	  /* we need 1 more spinor field for Metropolis test action with MINRES */
-	  pf=alloc_spinor_field_f(n_pf+1,
-	    #ifdef UPDATE_EO
-      &glat_even /* even lattice for preconditioned dynamics */
-      #else
-      &glattice /* global lattice */
-      #endif 
-      );
+  /* allocate momenta */
+  if(momenta==NULL) momenta = alloc_avfield(&glattice);
+	
+  /* allocate pseudofermions */
+  /* we allocate one more pseudofermion for the computation 
+   * of the final action density 
+   */
+  if(pf==NULL) {
+    n_pf = _update_par.hasenbusch?_update_par.nf:(_update_par.nf/2);
+    /* we need 1 more spinor field for Metropolis test action with MINRES */
+    pf=alloc_spinor_field_f(n_pf+1,
+#ifdef UPDATE_EO
+			    &glat_even /* even lattice for preconditioned dynamics */
+#else
+			    &glattice /* global lattice */
+#endif 
+			    );
   }
   
   /* allocate memory for the local action */
@@ -170,11 +170,11 @@ void init_hmc(hmc_par *par){
   ((force_hmc_par*)(integrator[currentlevel].force_par))->pf = pf;
   ((force_hmc_par*)(integrator[currentlevel].force_par))->mass = _update_par.mass;
   ((force_hmc_par*)(integrator[currentlevel].force_par))->hasenbusch = (_update_par.hasenbusch?2:0);
-  #ifdef UPDATE_EO
+#ifdef UPDATE_EO
   ((force_hmc_par*)(integrator[currentlevel].force_par))->b = (4.+_update_par.mass+_update_par.hasen_dm)*(4.+_update_par.mass+_update_par.hasen_dm)-(4.+_update_par.mass)*(4.+_update_par.mass);
-  #else
+#else
   ((force_hmc_par*)(integrator[currentlevel].force_par))->b = _update_par.hasen_dm;
-  #endif
+#endif
   ((force_hmc_par*)(integrator[currentlevel].force_par))->inv_err2 = _update_par.n_force_prec;
   ((force_hmc_par*)(integrator[currentlevel].force_par))->inv_err2_flt = _update_par.n_force_prec_flt;
   integrator[currentlevel].integrator = &O2MN_multistep;
@@ -220,9 +220,9 @@ void init_hmc(hmc_par *par){
   
   hmc_action_par.beta = _update_par.beta;
   hmc_action_par.n_pf = n_pf;
-  #ifdef ROTATED_SF
+#ifdef ROTATED_SF
   hmc_action_par.SF_ct = _update_par.SF_ct;
-  #endif
+#endif
   init = 1;
   
   lprintf("HMC",0,"Initialization done.\n");

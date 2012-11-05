@@ -52,7 +52,7 @@ typedef struct _input_nu {
     {"number of stochastic spinors", "nu:nhits = %d", INT_T, &(varname).nhits},\
     {"quark mass (overridden by file name)", "nu:mass = %lf", DOUBLE_T, &(varname).mass},\
     {"list of eigenvalues", "nu:list = %s", STRING_T, (varname).list},\
-    {NULL, NULL, 0, NULL}\
+    {NULL, NULL, INT_T, NULL}\
   }\
 }
 

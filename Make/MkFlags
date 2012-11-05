@@ -10,7 +10,7 @@ REPR = REPR_ADJOINT
 #Y => PERIODIC, ANTIPERIODIC, THETA
 #Z => PERIODIC, ANTIPERIODIC, THETA
 
-MACRO += -DBC_T_ANTIPERIODIC
+MACRO += -DBC_T_PERIODIC
 MACRO += -DBC_X_PERIODIC
 MACRO += -DBC_Y_PERIODIC
 MACRO += -DBC_Z_PERIODIC
@@ -22,14 +22,13 @@ MACRO += -DBC_Z_PERIODIC
 #MACRO += -DROTATED_SF
 
 
-#MACRO += -DUPDATE_EO
-#MACRO += -DWITH_MPI
+MACRO += -DUPDATE_EO
+MACRO += -DWITH_MPI
 
 MACRO += -DNDEBUG
 #MACRO += -DCHECK_SPINOR_MATCHING
 #MACRO += -DMPI_TIMING
 MACRO += -DIO_FLUSH
-MACRO += -DGEOMETRY_MPI_EO_PATCH
 #MACRO += -DUNROLL_GROUP_REPRESENT
 #MACRO += -DTIMING
 #MACRO += -DTIMING_WITH_BARRIERS
@@ -37,9 +36,9 @@ MACRO += -DGEOMETRY_MPI_EO_PATCH
 
 #Compiler
 #export OMPI_CC = ccache gcc
-#CC = mpicc
-CC = gcc
-CFLAGS = -Wall -std=c99 -O2 -fomit-frame-pointer -mfpmath=sse -msse -msse2
+CC = openmpicc
+#CC = gcc
+CFLAGS = -Wall -std=c99 -O2 -fomit-frame-pointer -msse -msse2
 
 ##########################################################################
 # DO NOT EDIT BEYOND THIS POINT

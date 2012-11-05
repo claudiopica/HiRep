@@ -69,7 +69,7 @@ typedef struct _input_eigval {
     {"absolute precision", "eva:omega1 = %lf", DOUBLE_T, &(varname).omega1},\
     {"relative precision", "eva:omega2 = %lf", DOUBLE_T, &(varname).omega2},\
     {"quark quenched mass", "eva:mass = %lf", DOUBLE_T, &(varname).mass}, \
-    {NULL, NULL, 0, NULL}\
+    {NULL, NULL, INT_T, NULL}\
   }\
 }
 

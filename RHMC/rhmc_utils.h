@@ -42,7 +42,7 @@ typedef struct _input_rhmc {
     {"tlen", "tlen = %lf", DOUBLE_T, &(varname).rhmc_p.tlen},\
     {"nsteps", "nsteps = %u", UNSIGNED_T, &(varname).rhmc_p.nsteps},\
     {"gsteps", "gsteps = %u", UNSIGNED_T, &(varname).rhmc_p.gsteps},\
-    {NULL, NULL, 0, NULL}\
+    {NULL, NULL, INT_T, NULL}\
   }\
 }
 
@@ -79,7 +79,7 @@ typedef struct _rhmc_flow {
     {"conf save frequency", "save freq = %d", INT_T, &((varname).save_freq)},\
     {"measure frequency", "meas freq = %d", INT_T, &((varname).meas_freq)},\
     {"config dir", "conf dir = %s", STRING_T, &((varname).conf_dir[0])},\
-    {NULL, NULL, 0, NULL}\
+    {NULL, NULL, INT_T, NULL}\
   }\
 }
 

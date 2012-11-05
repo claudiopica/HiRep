@@ -66,7 +66,7 @@ typedef struct _input_ata_qprop {
     {"number of sources for correction", "n_sources_correction = %d", INT_T, &((varname).pars.n_sources_correction)},\
     {"inverter precision", "inverter_precision = %lf", DOUBLE_T, &((varname).pars.inverter_precision)},\
     {"dilution mode", "dilution = %d", INT_T, &((varname).pars.dilution)},\
-    {NULL, NULL, 0, NULL}\
+    {NULL, NULL, INT_T, NULL}\
   }\
 }
 

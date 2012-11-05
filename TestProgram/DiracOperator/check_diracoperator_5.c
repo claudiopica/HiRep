@@ -26,8 +26,8 @@ static double hmass=0.1;
 static suNg_field *g;
 
 
-static void D(spinor_field *out, spinor_field *in){
-   Dphi(hmass,out,in);
+static void D_flt(spinor_field_flt *out, spinor_field_flt *in){
+   Dphi_flt(hmass,out,in);
 }
 
 static void random_g(void)
@@ -57,11 +57,11 @@ static void transform_u(void)
    represent_gauge_field();
 }
 
-static void transform_s(spinor_field *out, spinor_field *in)
+static void transform_s(spinor_field_flt *out, spinor_field_flt *in)
 {
    _DECLARE_INT_ITERATOR(ix);
    suNf gfx;
-   suNf_spinor *r,*s;
+   suNf_spinor_flt *r,*s;
 
    _MASTER_FOR(&glattice,ix) {
       s = _FIELD_AT(in,ix);
@@ -81,7 +81,7 @@ int main(int argc,char *argv[])
 {
   char tmp[256];
   double sig,tau;
-  spinor_field *s0,*s1,*s2,*s3;
+  spinor_field_flt *s0,*s1,*s2,*s3;
   
   setup_process(&argc,&argv);
   
@@ -114,7 +114,17 @@ int main(int argc,char *argv[])
   
   geometry_mpi_eo();
   
-  
+
+BCs_pars_t BCs_pars = {
+    .fermion_twisting_theta = {0.,0.,0.,0.},
+    .gauge_boundary_improvement_cs = 1.,
+    .gauge_boundary_improvement_ct = 1.,
+    .chiSF_boundary_improvement_ds = 1.,
+    .SF_BCs = 0
+  };
+  init_BCs(&BCs_pars);
+
+
   lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
   lprintf("MAIN",0,"Fermion representation: dim = %d\n",NF);
   lprintf("MAIN",0,"The lattice size is %dx%dx%dx%d\n",T,X,Y,Z);
@@ -124,14 +134,18 @@ int main(int argc,char *argv[])
   fflush(stdout);
   
   u_gauge=alloc_gfield(&glattice);
+  u_gauge_flt=alloc_gfield_flt(&glattice);
+
 #ifndef REPR_FUNDAMENTAL
   u_gauge_f=alloc_gfield_f(&glattice);
+
 #endif
+  u_gauge_f_flt=alloc_gfield_f_flt(&glattice);
   represent_gauge_field();
   
   /* allocate memory */
   g=alloc_gtransf(&glattice);
-  s0=alloc_spinor_field_f(4,&glattice);
+  s0=alloc_spinor_field_f_flt(4,&glattice);
   s1=s0+1;
   s2=s1+1;
   s3=s2+1;
@@ -143,10 +157,10 @@ int main(int argc,char *argv[])
   represent_gauge_field();
   lprintf("MAIN",0,"done.\n");
   
-  spinor_field_zero_f(s0);
-  gaussian_spinor_field(&(s0[0]));
-  tau = 1./sqrt(spinor_field_sqnorm_f(s0));
-  spinor_field_mul_f(s0,tau,s0);
+  spinor_field_zero_f_flt(s0);
+  gaussian_spinor_field_flt(&(s0[0]));
+  tau = 1./sqrt(spinor_field_sqnorm_f_flt(s0));
+  spinor_field_mul_f_flt(s0,tau,s0);
   
   lprintf("MAIN",0,"Generating a random gauge transf... ");
   fflush(stdout);
@@ -157,7 +171,9 @@ int main(int argc,char *argv[])
   
   lprintf("MAIN",0,"Gauge covariance of the Dirac operator:\n");
   
-  D(s1,s0);
+  assign_ud2u_f();
+ 
+  D_flt(s1,s0);
   
   transform_s(s2,s1);
   
@@ -166,12 +182,12 @@ int main(int argc,char *argv[])
   
   transform_u();
   
-  spinor_field_zero_f(s1);
-  D(s1,s3);
+  spinor_field_zero_f_flt(s1);
+  D_flt(s1,s3);
   
   
-  spinor_field_mul_add_assign_f(s1,-1.0,s2);
-  sig=spinor_field_sqnorm_f(s1);
+  spinor_field_mul_add_assign_f_flt(s1,-1.0,s2);
+  sig=spinor_field_sqnorm_f_flt(s1);
   
   lprintf("MAIN",0,"Maximal normalized difference = %.2e\n",sqrt(sig));
   lprintf("MAIN",0,"(should be around 1*10^(-15) or so)\n\n");
@@ -180,7 +196,7 @@ int main(int argc,char *argv[])
 #ifndef REPR_FUNDAMENTAL
   free_gfield_f(u_gauge_f);
 #endif
-  free_spinor_field(s0);
+  free_spinor_field_flt(s0);
   
   free_gtransf(g);
   

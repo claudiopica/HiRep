@@ -43,15 +43,15 @@ typedef struct _input_mesons {
 
 } input_mesons;
 
-#define init_input_mesons(varname) \
-{ \
-  .read={\
-    {"make mesons", "mes:make = %s", STRING_T, (varname).make},\
-    {"inverter precision", "mes:precision = %lf", DOUBLE_T, &(varname).precision},\
-    {"number of noisy sources per cnfg", "mes:nhits = %d", INT_T, &(varname).nhits},\
-    {NULL, NULL, 0, NULL}\
-  }\
-}
+#define init_input_mesons(varname)					\
+  {									\
+    .read={								\
+      {"make mesons", "mes:make = %s", STRING_T, (varname).make},	\
+      {"inverter precision", "mes:precision = %lf", DOUBLE_T, &(varname).precision}, \
+      {"number of noisy sources per cnfg", "mes:nhits = %d", INT_T, &(varname).nhits}, \
+      {NULL, NULL, INT_T, NULL}						\
+    }									\
+  }
 
 
 input_mesons mes_var = init_input_mesons(mes_var);
@@ -65,35 +65,35 @@ typedef struct _input_polyakov {
 
 } input_polyakov;
 
-#define init_input_polyakov(varname) \
-{ \
-  .read={\
-    {"make polyakov loops", "poly:make = %s", STRING_T, (varname).make},\
-    {NULL, NULL, 0, NULL}\
-  }\
-}
+#define init_input_polyakov(varname)					\
+  {									\
+    .read={								\
+      {"make polyakov loops", "poly:make = %s", STRING_T, (varname).make}, \
+      {NULL, NULL, INT_T, NULL}						\
+    }									\
+  }
 
 
 input_polyakov poly_var = init_input_polyakov(poly_var);
 
 /* Rotated SF parameters */
 typedef struct _input_XSF {
-    char make[256];
-    double precision;
+  char make[256];
+  double precision;
     
-    /* for the reading function */
-    input_record_t read[3];
+  /* for the reading function */
+  input_record_t read[3];
     
 } input_XSF;
 
-#define init_input_XSF(varname) \
-{ \
-.read={\
-{"make Rotated SF measures", "XSF:make = %s", STRING_T, (varname).make},\
-{"inverter precision", "XSF:precision = %lf", DOUBLE_T, &(varname).precision},\
-{NULL, NULL, 0, NULL}\
-}\
-}
+#define init_input_XSF(varname)						\
+  {									\
+    .read={								\
+      {"make Rotated SF measures", "XSF:make = %s", STRING_T, (varname).make}, \
+      {"inverter precision", "XSF:precision = %lf", DOUBLE_T, &(varname).precision}, \
+      {NULL, NULL,INT_T, NULL}						\
+    }									\
+  }
 
 input_XSF XSF_var = init_input_XSF(XSF_var);
 
@@ -113,19 +113,19 @@ typedef struct _input_eigval {
 
 } input_eigval;
 
-#define init_input_eigval(varname) \
-{ \
-  .read={\
-    {"make lowest eigenvalues", "eva:make = %s", STRING_T, (varname).make},\
-    {"search space dimension", "eva:nevt = %d", INT_T, &(varname).nevt},\
-    {"number of accurate eigenvalues", "eva:nev = %d", INT_T, &(varname).nev},\
-    {"max degree of polynomial", "eva:kmax = %d", INT_T, &(varname).kmax},\
-    {"max number of subiterations", "eva:maxiter = %d", INT_T, &(varname).maxiter},\
-    {"absolute precision", "eva:omega1 = %lf", DOUBLE_T, &(varname).omega1},\
-    {"relative precision", "eva:omega2 = %lf", DOUBLE_T, &(varname).omega2},\
-    {NULL, NULL, 0, NULL}\
-  }\
-}
+#define init_input_eigval(varname)					\
+  {									\
+    .read={								\
+      {"make lowest eigenvalues", "eva:make = %s", STRING_T, (varname).make}, \
+      {"search space dimension", "eva:nevt = %d", INT_T, &(varname).nevt}, \
+      {"number of accurate eigenvalues", "eva:nev = %d", INT_T, &(varname).nev}, \
+      {"max degree of polynomial", "eva:kmax = %d", INT_T, &(varname).kmax}, \
+      {"max number of subiterations", "eva:maxiter = %d", INT_T, &(varname).maxiter}, \
+      {"absolute precision", "eva:omega1 = %lf", DOUBLE_T, &(varname).omega1}, \
+      {"relative precision", "eva:omega2 = %lf", DOUBLE_T, &(varname).omega2}, \
+      {NULL, NULL, INT_T, NULL}						\
+    }									\
+  }
 
 input_eigval eigval_var = init_input_eigval(eigval_var);
 
@@ -193,16 +193,16 @@ int main(int argc,char *argv[])
   read_input(eigval_var.read,"input_file");
   
   if(glb_var.rlxd_state[0]!='\0')
-  {
-  	/*load saved state*/
-	lprintf("MAIN",0,"Loading rlxd state from file %s\n",glb_var.rlxd_state);
-	read_ranlxd_state(glb_var.rlxd_state);
-  }
+    {
+      /*load saved state*/
+      lprintf("MAIN",0,"Loading rlxd state from file %s\n",glb_var.rlxd_state);
+      read_ranlxd_state(glb_var.rlxd_state);
+    }
   else
-  {
-  lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed+PID);
-  rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
-  }
+    {
+      lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed+PID);
+      rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
+    }
   lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
   lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
   
@@ -293,9 +293,9 @@ int main(int argc,char *argv[])
 #ifdef ROTATED_SF
       /* Rotated SF measures */
       if(strcmp(XSF_var.make,"true")==0) {
-         double gsf=SF_action(flow.rhmc_v->rhmc_p.beta);
-          lprintf("SF_action",10,"gsf = %.10e\n",gsf);
-         SF_PCAC_wall_mass(flow.rhmc_v->rhmc_p.mass,XSF_var.precision);
+	double gsf=SF_action(flow.rhmc_v->rhmc_p.beta);
+	lprintf("SF_action",10,"gsf = %.10e\n",gsf);
+	SF_PCAC_wall_mass(flow.rhmc_v->rhmc_p.mass,XSF_var.precision);
       }
 #endif
       /* Lowest eigenvalues */
@@ -322,10 +322,10 @@ int main(int argc,char *argv[])
     save_conf(&flow, i);
   }
 
- /* Only save state if we have a file to save to */
+  /* Only save state if we have a file to save to */
   if(glb_var.rlxd_state[0]!='\0') {
-      lprintf("MAIN",0,"Saving rlxd state to file %s\n",glb_var.rlxd_state);
-      write_ranlxd_state(glb_var.rlxd_state);
+    lprintf("MAIN",0,"Saving rlxd state to file %s\n",glb_var.rlxd_state);
+    write_ranlxd_state(glb_var.rlxd_state);
   }
   
   /* finalize Monte Carlo */
