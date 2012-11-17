@@ -179,7 +179,7 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
     /* X_e = H^{-1} pf[k] */
     /* X_o = D_{oe} X_e = D_{oe} H^{-1} pf[k] */
     Xe=*Xs; Xe.type=&glat_even;
-    Xo=*Xs; Xo.type=&glat_odd;
+    Xo=*Xs; Xo.type=&glat_odd; Xo.ptr+=glat_odd.master_shift;
 
     g5QMR_fltacc_par mpar;
     mpar.err2 = par->inv_err2;
@@ -196,7 +196,7 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
     /* Y_e = H^{-1} ( g5 pf[k] + b X_e ) */
     /* Y_o = D_oe H^{-1} ( g5 pf[k] + b X_e ) */
     Ye=*Ys; Ye.type=&glat_even;
-    Yo=*Ys; Yo.type=&glat_odd;
+    Yo=*Ys; Yo.type=&glat_odd; Yo.ptr+=glat_odd.master_shift;
 
     if(par->hasenbusch != 2) {
       spinor_field_copy_f(eta,&Xe);
