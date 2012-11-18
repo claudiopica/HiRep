@@ -10,9 +10,6 @@ NP_Z = 1
 //level = 1  seed = 1
 level = 1  seed = 12345
 
-WF:mode = fixed
-WF:nintervals=1
-WF:ipar[0] = .01
-WF:tmax[0] = 10
-WF:t2Emax[0] = 0.1
-WF:dt = .001
+WF:tmax = 1
+WF:nmeas = 10
+WF:nint = 10

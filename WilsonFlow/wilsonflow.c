@@ -13,7 +13,9 @@
 #include "wilsonflow.h"
 #include <math.h>
 
-
+/*
+#define EXP_CHECK
+*/
 
 /*
 * S(x,mu) = staple in (x,mu)
@@ -40,6 +42,27 @@ static void Zeta(suNg_field *Z, const suNg_field* U, const double alpha){
 }
 
 
+#ifdef EXP_CHECK
+static void WF_Exp_check(suNg *u, suNg *X) {
+  suNg Xk, tmp;
+  _suNg_unit(*u);
+  _suNg_unit(Xk);
+  
+  int k=1;
+  double error;
+  while(1) {
+    _suNg_times_suNg(tmp,Xk,*X);
+    _suNg_mul(Xk,1./k,tmp);
+    k++;
+    _suNg_add_assign(*u,Xk);    
+
+    _suNg_sqnorm(error,Xk);
+    if(error<1e-28) break;
+  }
+  
+}
+#endif
+
 
 #if NG==2
 
@@ -50,7 +73,7 @@ static void Zeta(suNg_field *Z, const suNg_field* U, const double alpha){
 * X^dag = -X
 * tr X = 0
 */
-void WF_Exp(suNg *u, suNg *X) {
+static void WF_Exp(suNg *u, suNg *X) {
   suNg_algebra_vector h,v;
 
   h.c[0] = X->c[1].im;
@@ -58,21 +81,31 @@ void WF_Exp(suNg *u, suNg *X) {
   h.c[2] = X->c[0].im;
   
   double z=sqrt(h.c[0]*h.c[0]+h.c[1]*h.c[1]+h.c[2]*h.c[2]);
-  double s=sin(z);
+  double s=1.;
+  if(z>1e-16) s=sin(z)/z;
   double c=cos(z);
-  v.c[0]=h.c[0]/z*s;
-  v.c[1]=h.c[1]/z*s;
-  v.c[2]=h.c[2]/z*s;
+  v.c[0]=h.c[0]*s;
+  v.c[1]=h.c[1]*s;
+  v.c[2]=h.c[2]*s;
 
   u->c[0].re = c;       u->c[0].im = v.c[2];
   u->c[1].re = v.c[1];  u->c[1].im = v.c[0];
   u->c[2].re = -v.c[1]; u->c[2].im = v.c[0];
   u->c[3].re = c;       u->c[3].im = -v.c[2];
+  
+#ifdef EXP_CHECK
+  suNg w;
+  double error;
+  WF_Exp_check(&w,X);
+  _suNg_sub_assign(w,*u);
+  _suNg_sqnorm(error,w);
+  lprintf("WILSONFLOW",0,"WF EXP CHECK %e\n",sqrt(error));
+#endif
 }
 
 #elif NG==3
 
-void WF_Exp(suNg *u, suNg *X) {
+static void WF_Exp(suNg *u, suNg *X) {
   suNg X2;
   complex c[3], s[3], tmp;
   double alpha, beta;
@@ -114,6 +147,7 @@ void WF_Exp(suNg *u, suNg *X) {
   
   /* error = |X|^{n+1}/(n+1)! exp(|X|) */  
   error= exp(norm)*norm*norm*norm*norm/24.;
+#error The error must be rechecked!!!
 
   /*
   c[0][n] = i*c[2][n-1]*alpha/n
@@ -135,7 +169,7 @@ void WF_Exp(suNg *u, suNg *X) {
     s[2].re+=c[2].re; s[2].im+=c[2].im;
 
     error *= norm/(n+1);
-    if(error < 1.e-15) break;
+    if(error < 1.e-20) break;
   }
   
   _suNg_zero(*u);
@@ -146,6 +180,15 @@ void WF_Exp(suNg *u, suNg *X) {
     _complex_mul_assign(u->c[i],s[1],X->c[i]);
     _complex_mul_assign(u->c[i],s[2],X2.c[i]);
   }
+  
+#ifdef EXP_CHECK
+  suNg v;
+  WF_Exp_check(&v,X);
+  _suNg_sub_assign(v,*u);
+  _suNg_sqnorm(error,v);
+  lprintf("WILSONFLOW",0,"WF EXP CHECK %e\n",sqrt(error));
+#endif
+  
 }
   
 #else
@@ -155,111 +198,85 @@ void WF_Exp(suNg *u, suNg *X) {
 
 
 
-static suNg_field* ws_gf[2]={NULL,NULL};
+static suNg_field* ws_gf=NULL;
 
 
 void WF_initialize() {
-  if(ws_gf[0]==NULL) ws_gf[0]=alloc_gfield(&glattice);
-  if(ws_gf[1]==NULL) ws_gf[1]=alloc_gfield(&glattice);
+  if(ws_gf==NULL) ws_gf=alloc_gfield(&glattice);
 }
 
 
 void WF_free() {
-  if(ws_gf[0]!=NULL) free_gfield(ws_gf[0]);
-  if(ws_gf[1]!=NULL) free_gfield(ws_gf[1]);
+  if(ws_gf!=NULL) free_gfield(ws_gf);
 }
 
 
-double WilsonFlow(suNg_field* V, const double ipar, const double maxepsilon, const int mode) {
+void WilsonFlow1(suNg_field* V, const double epsilon) {
   _DECLARE_INT_ITERATOR(ix);
   suNg utmp[2];
-  int mu,i;
-  double epsilon=0.;
+  int mu;
   
   _MASTER_FOR(&glattice,ix) {
     for (mu=0; mu<4; ++mu) {
-      _suNg_zero(*_4FIELD_AT(ws_gf[0],ix,mu));
+      _suNg_zero(*_4FIELD_AT(ws_gf,ix,mu));
     }
   }
-  
-  if(mode==WF_FIXED) {
-    epsilon = ipar>maxepsilon ? maxepsilon : ipar;
-    Zeta(ws_gf[0],V,epsilon/4.);
 
-    double norm2=0.;
-    double tmp;
-    _MASTER_FOR(&glattice,ix) {
-      for(mu=0; mu<4; mu++) {
-        _suNg_sqnorm(tmp,*_4FIELD_AT(ws_gf[0],ix,mu));
-        norm2 = tmp>norm2 ? tmp : norm2;
-      }
-    }
-
-    lprintf("WILSONFLOW",0,"norm(X)/VOL = %e\n",sqrt(norm2)*4./epsilon);
-    lprintf("WILSONFLOW",0,"epsilon = %e\n",epsilon);
-
-  } else if(mode==WF_ADAPTIVE) {
-    Zeta(ws_gf[0],V,1.);
-    double norm2=0.;
-    double tmp;
-    _MASTER_FOR(&glattice,ix) {
-      for(mu=0; mu<4; mu++) {
-        _suNg_sqnorm(tmp,*_4FIELD_AT(ws_gf[0],ix,mu));
-        norm2 = tmp>norm2 ? tmp : norm2;
-      }
-    }
-    epsilon = ipar/sqrt(norm2);
-    if(epsilon>maxepsilon) epsilon = maxepsilon;
-    _MASTER_FOR(&glattice,ix) {
-      for(mu=0; mu<4; mu++) {
-        for(i=0; i<NG*NG; i++) {
-          _complex_mulr(_4FIELD_AT(ws_gf[0],ix,mu)->c[i],epsilon/4.,_4FIELD_AT(ws_gf[0],ix,mu)->c[i]);
-        }
-      }
-    }
-
-    lprintf("WILSONFLOW",0,"norm(X)/VOL = %e\n",sqrt(norm2));
-    lprintf("WILSONFLOW",0,"epsilon = %e\n",epsilon);
-    
-  } else {
-    error(1,1,"wilson_flow.c","Unknown mode in WilsonFlow");
-  }
+  Zeta(ws_gf,V,epsilon);
   
   _MASTER_FOR(&glattice,ix) {
     for (mu=0; mu<4; ++mu) {
-      WF_Exp(&utmp[0],_4FIELD_AT(ws_gf[0],ix,mu));
-      _suNg_times_suNg(*_4FIELD_AT(ws_gf[1],ix,mu),utmp[0],*_4FIELD_AT(V,ix,mu));
-      
-      for(i=0; i<NG*NG; i++) {
-      	_complex_mulr(_4FIELD_AT(ws_gf[0],ix,mu)->c[i],-17./9.,_4FIELD_AT(ws_gf[0],ix,mu)->c[i]);
-      }
+      WF_Exp(&utmp[0],_4FIELD_AT(ws_gf,ix,mu));
+      _suNg_times_suNg(utmp[1],utmp[0],*_4FIELD_AT(V,ix,mu));
+      *_4FIELD_AT(V,ix,mu)=utmp[1];
     }
   }
-  
-  Zeta(ws_gf[0],ws_gf[1],8.*epsilon/9.);
+}
+
+
+
+void WilsonFlow3(suNg_field* V, const double epsilon) {
+  _DECLARE_INT_ITERATOR(ix);
+  suNg utmp[2];
+  int mu;
   
   _MASTER_FOR(&glattice,ix) {
     for (mu=0; mu<4; ++mu) {
-      WF_Exp(&utmp[0],_4FIELD_AT(ws_gf[0],ix,mu));
-      _suNg_times_suNg(utmp[1],utmp[0],*_4FIELD_AT(ws_gf[1],ix,mu));
-      *_4FIELD_AT(ws_gf[1],ix,mu)=utmp[1];
-      
-      for(i=0; i<NG*NG; i++) {
-      	_complex_minus(_4FIELD_AT(ws_gf[0],ix,mu)->c[i],_4FIELD_AT(ws_gf[0],ix,mu)->c[i]);
-      }
+      _suNg_zero(*_4FIELD_AT(ws_gf,ix,mu));
     }
   }
   
-  Zeta(ws_gf[0],ws_gf[1],3.*epsilon/4.);
+  Zeta(ws_gf,V,epsilon/4.);
   
   _MASTER_FOR(&glattice,ix) {
     for (mu=0; mu<4; ++mu) {
-      WF_Exp(&utmp[0],_4FIELD_AT(ws_gf[0],ix,mu));
-      _suNg_times_suNg(*_4FIELD_AT(V,ix,mu),utmp[0],*_4FIELD_AT(ws_gf[1],ix,mu));
+      WF_Exp(&utmp[0],_4FIELD_AT(ws_gf,ix,mu));
+      _suNg_times_suNg(utmp[1],utmp[0],*_4FIELD_AT(V,ix,mu));
+      *_4FIELD_AT(V,ix,mu)=utmp[1];
+      _suNg_mul(*_4FIELD_AT(ws_gf,ix,mu),-17./9.,*_4FIELD_AT(ws_gf,ix,mu));
     }
   }
   
-  return epsilon;
+  Zeta(ws_gf,V,8.*epsilon/9.);
+  
+  _MASTER_FOR(&glattice,ix) {
+    for (mu=0; mu<4; ++mu) {
+      WF_Exp(&utmp[0],_4FIELD_AT(ws_gf,ix,mu));
+      _suNg_times_suNg(utmp[1],utmp[0],*_4FIELD_AT(V,ix,mu));
+      *_4FIELD_AT(V,ix,mu)=utmp[1];
+      _suNg_mul(*_4FIELD_AT(ws_gf,ix,mu),-1.,*_4FIELD_AT(ws_gf,ix,mu));
+    }
+  }
+  
+  Zeta(ws_gf,V,3.*epsilon/4.);
+  
+  _MASTER_FOR(&glattice,ix) {
+    for (mu=0; mu<4; ++mu) {
+      WF_Exp(&utmp[0],_4FIELD_AT(ws_gf,ix,mu));
+      _suNg_times_suNg(utmp[1],utmp[0],*_4FIELD_AT(V,ix,mu));
+      *_4FIELD_AT(V,ix,mu)=utmp[1];
+    }
+  }
 }
 
 
