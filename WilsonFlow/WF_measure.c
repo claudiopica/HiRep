@@ -281,7 +281,7 @@ int main(int argc,char *argv[]) {
     lprintf("WILSONFLOW",0,"WF (ncnfg,t,E,t2*E,Esym,t2*Esym) = %d %e %e %e %e %e\n",i,t,E,t*t*E,Esym,t*t*Esym);
     for(n=0;n<WF_var.nmeas;n++) {
       for(k=0;k<WF_var.nint;k++) {
-        WilsonFlow(u_gauge,epsilon);
+        WilsonFlow3(u_gauge,epsilon);
         t+=epsilon;
       }
       E=WF_E(u_gauge);
