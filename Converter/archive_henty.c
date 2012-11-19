@@ -46,7 +46,7 @@ void read_gauge_field_henty(char filename[])
   }
 
 #ifdef WITH_MPI
-  MPI_Comm_group(MPI_COMM_WORLD,&wg);
+  MPI_Comm_group(GLB_COMM,&wg);
   MPI_Comm_group(cart_comm,&cg);
 #endif
 
@@ -83,13 +83,13 @@ void read_gauge_field_henty(char filename[])
       }
       
 #ifdef WITH_MPI
-      MPI_Barrier(MPI_COMM_WORLD); 
+      MPI_Barrier(GLB_COMM); 
 
       if(pid != 0) {
 
         /* send buffer */
         if (PID==0) {
-          mpiret=MPI_Send(g, 5, MPI_INT, pid, 998, MPI_COMM_WORLD);
+          mpiret=MPI_Send(g, 5, MPI_INT, pid, 998, GLB_COMM);
 #ifndef NDEBUG
           if (mpiret != MPI_SUCCESS) {
             char mesg[MPI_MAX_ERROR_STRING];
@@ -99,7 +99,7 @@ void read_gauge_field_henty(char filename[])
             error(1,1,"read_gauge_field_for_henty " __FILE__,"Cannot send (coord,mu) buffer");
           }
 #endif
-          mpiret=MPI_Send(&tmpmat, 2*NG*NG, MPI_DOUBLE, pid, 999, MPI_COMM_WORLD);
+          mpiret=MPI_Send(&tmpmat, 2*NG*NG, MPI_DOUBLE, pid, 999, GLB_COMM);
 #ifndef NDEBUG
           if (mpiret != MPI_SUCCESS) {
             char mesg[MPI_MAX_ERROR_STRING];
@@ -112,7 +112,7 @@ void read_gauge_field_henty(char filename[])
         }
         /* receive buffer */
         if (PID==pid) {
-          mpiret=MPI_Recv(g, 5, MPI_INT, 0, 998, MPI_COMM_WORLD, &st);
+          mpiret=MPI_Recv(g, 5, MPI_INT, 0, 998, GLB_COMM, &st);
 #ifndef NDEBUG
           if (mpiret != MPI_SUCCESS) {
             char mesg[MPI_MAX_ERROR_STRING];
@@ -129,7 +129,7 @@ void read_gauge_field_henty(char filename[])
             error(1,1,"read_gauge_field_for_henty " __FILE__,"Cannot receive (coord,mu) buffer");
           }
 #endif
-          mpiret=MPI_Recv(&tmpmat, 2*NG*NG, MPI_DOUBLE, 0, 999, MPI_COMM_WORLD, &st);
+          mpiret=MPI_Recv(&tmpmat, 2*NG*NG, MPI_DOUBLE, 0, 999, GLB_COMM, &st);
 #ifndef NDEBUG
           if (mpiret != MPI_SUCCESS) {
             char mesg[MPI_MAX_ERROR_STRING];

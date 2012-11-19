@@ -60,7 +60,7 @@ void write_gauge_field_eolexi_BE(char filename[])
   }
 
 #ifdef WITH_MPI
-  MPI_Comm_group(MPI_COMM_WORLD,&wg);
+  MPI_Comm_group(GLB_COMM,&wg);
   MPI_Comm_group(cart_comm,&cg);
 #endif
 
@@ -86,14 +86,14 @@ void write_gauge_field_eolexi_BE(char filename[])
     }
 
 #ifdef WITH_MPI
-    MPI_Barrier(MPI_COMM_WORLD); 
+    MPI_Barrier(GLB_COMM); 
 
     if(pid!=0) {
 
       /* send buffer */
       if(PID==pid) {
 
-        mpiret=MPI_Send(pu_gauge(ix_mpieo,0), 2*4*NG*NG, MPI_DOUBLE, pid, 999, MPI_COMM_WORLD);
+        mpiret=MPI_Send(pu_gauge(ix_mpieo,0), 2*4*NG*NG, MPI_DOUBLE, pid, 999, GLB_COMM);
 #ifndef NDEBUG
         if (mpiret != MPI_SUCCESS) {
           char mesg[MPI_MAX_ERROR_STRING];
@@ -106,7 +106,7 @@ void write_gauge_field_eolexi_BE(char filename[])
       }
       /* receive buffer */
       if (PID==0) {
-        mpiret=MPI_Recv(eolexi_field+4*ix_eolexi, 2*4*NG*NG, MPI_DOUBLE, 0, 999, MPI_COMM_WORLD, &st);
+        mpiret=MPI_Recv(eolexi_field+4*ix_eolexi, 2*4*NG*NG, MPI_DOUBLE, 0, 999, GLB_COMM, &st);
 #ifndef NDEBUG
         if (mpiret != MPI_SUCCESS) {
           char mesg[MPI_MAX_ERROR_STRING];
@@ -235,7 +235,7 @@ void write_gauge_field_eolexi_LE(char filename[])
   }
 
 #ifdef WITH_MPI
-  MPI_Comm_group(MPI_COMM_WORLD,&wg);
+  MPI_Comm_group(GLB_COMM,&wg);
   MPI_Comm_group(cart_comm,&cg);
 #endif
 
@@ -261,14 +261,14 @@ void write_gauge_field_eolexi_LE(char filename[])
     }
 
 #ifdef WITH_MPI
-    MPI_Barrier(MPI_COMM_WORLD); 
+    MPI_Barrier(GLB_COMM); 
 
     if(pid!=0) {
 
       /* send buffer */
       if(PID==pid) {
 
-        mpiret=MPI_Send(pu_gauge(ix_mpieo,0), 2*4*NG*NG, MPI_DOUBLE, pid, 999, MPI_COMM_WORLD);
+        mpiret=MPI_Send(pu_gauge(ix_mpieo,0), 2*4*NG*NG, MPI_DOUBLE, pid, 999, GLB_COMM);
 #ifndef NDEBUG
         if (mpiret != MPI_SUCCESS) {
           char mesg[MPI_MAX_ERROR_STRING];
@@ -281,7 +281,7 @@ void write_gauge_field_eolexi_LE(char filename[])
       }
       /* receive buffer */
       if (PID==0) {
-        mpiret=MPI_Recv(eolexi_field+4*ix_eolexi, 2*4*NG*NG, MPI_DOUBLE, 0, 999, MPI_COMM_WORLD, &st);
+        mpiret=MPI_Recv(eolexi_field+4*ix_eolexi, 2*4*NG*NG, MPI_DOUBLE, 0, 999, GLB_COMM, &st);
 #ifndef NDEBUG
         if (mpiret != MPI_SUCCESS) {
           char mesg[MPI_MAX_ERROR_STRING];

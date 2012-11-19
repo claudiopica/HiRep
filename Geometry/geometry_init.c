@@ -253,7 +253,7 @@ int geometry_init() {
   dims[1]=NP_X;
   dims[2]=NP_Y;
   dims[3]=NP_Z;
-  mpiret=MPI_Cart_create(MPI_COMM_WORLD, 4, dims, periods, reorder, &cart_comm);
+  mpiret=MPI_Cart_create(GLB_COMM, 4, dims, periods, reorder, &cart_comm);
   if (mpiret != MPI_SUCCESS) {
     char mesg[MPI_MAX_ERROR_STRING];
     int mesglen;
@@ -294,7 +294,7 @@ int geometry_init() {
   VOL3=((long int)X)*((long int)Y)*((long int)Z);
   VOLUME=VOL3*((long int)T);
   
-  	X_BORDER=(NP_X>1)?BORDERSIZE:0;
+  X_BORDER=(NP_X>1)?BORDERSIZE:0;
 	Y_BORDER=(NP_Y>1)?BORDERSIZE:0;
 	Z_BORDER=(NP_Z>1)?BORDERSIZE:0;
 	T_BORDER=(NP_T>1)?BORDERSIZE:0;
@@ -316,64 +316,6 @@ int geometry_init() {
   return 0;
 }
 
-/* setup_process
- * Assign a unique PID to each process and setup 
- * communications if necessary
- *
- * return codes:
- * 0 => success
- *
- * OUTPUS:
- * MPI: PID, WORLD_SIZE
- */
-int setup_process(int *argc, char ***argv) {
-
-#ifdef WITH_MPI
-  /* MPI variables */
-  int mpiret;
-#endif
-
-#ifdef WITH_MPI
-  /* init MPI */
-  mpiret=MPI_Init(argc,argv);
-  if (mpiret != MPI_SUCCESS) {
-    char mesg[MPI_MAX_ERROR_STRING];
-    int mesglen;
-    MPI_Error_string(mpiret,mesg,&mesglen);
-    lprintf("MPI",0,"ERROR: %s\n",mesg);
-    error(1,1,"setup_process " __FILE__,"MPI inizialization failed");
-  }
-  MPI_Comm_rank(MPI_COMM_WORLD, &PID);
-  MPI_Comm_size(MPI_COMM_WORLD, &WORLD_SIZE);
-#else
-  PID=0;
-  WORLD_SIZE=1;
-#endif
-
-  return 0;
-
-}
-
-
-/* this function is intended to clean up before process ending
- *
- * return codes:
- * 0 => success
- */
-int finalize_process() { 
-#ifdef WITH_MPI
-  /* MPI variables */
-  int init;
-#endif
-
-#ifdef WITH_MPI
-  MPI_Initialized(&init);
-  if(init) MPI_Finalize();
-#endif
-
-  return 0;
-
-}
 
 void geometry_mem_alloc() {
   static int init=1;

@@ -116,6 +116,7 @@ hmc_flow flow=init_hmc_flow(flow);
 
 char input_filename[256] = "input_file";
 char output_filename[256] = "out_0";
+char error_filename[256] = "err_0";
 static void read_cmdline(int argc, char* argv[]) {
   int i, ai=0, ao=0, am=0, requested=1;
 
@@ -148,61 +149,52 @@ static void H2eva(spinor_field *out, spinor_field *in){
 int main(int argc,char *argv[]) {
   int i, acc, rc;
   char sbuf[128];
-  
-  /* setup process id and communications */
-  setup_process(&argc,&argv);
-  
+ 
   read_cmdline(argc,argv);
   
-  read_input(logger_var.read,input_filename);
-
+  /* setup process communications */
+  setup_process(&argc,&argv);
+  
+  /* read global variables file */
+  read_input(glb_var.read,input_filename);
+  
+  setup_replicas();
+  
   /* logger setup */
+  read_input(logger_var.read,input_filename);
   logger_set_input(&logger_var);
-
-
-  /* disable logger for MPI processes != 0 */
-  if (PID!=0) { logger_disable(); }
-  if (PID==0) {
-    sprintf(sbuf,">>%s",output_filename); logger_stdout(sbuf); 
-    sprintf(sbuf,"err_%d",PID); freopen(sbuf,"w",stderr);
+  if (PID!=0) { logger_disable(); }   /* disable logger for MPI processes != 0 */
+  else {
+    sprintf(sbuf,">>%s",output_filename);  logger_stdout(sbuf);
+    freopen(error_filename,"w",stderr);
   }
-  /*
-  sprintf(sbuf,">>%s.pid%d",output_filename,PID); logger_stdout(sbuf); 
-  sprintf(sbuf,"err_%d",PID); freopen(sbuf,"w",stderr);
-  */
   
-  lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS); 
-  lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
+  lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS);
+  lprintf("MAIN",0,"[RepID: %d][world_size: %d]\n[MPI_ID: %d][MPI_size: %d]\n\n",RID,WORLD_SIZE,MPI_PID,MPI_WORLD_SIZE);
   
-  /* read input file */
+  /* setup lattice geometry */
+  if (geometry_init() == 1) { finalize_process(); return 0; }
+  geometry_mpi_eo();
+  /* test_geometry_mpi_eo(); */
+  
+  /* setup random numbers */
+  if(glb_var.rlxd_state[0]!='\0') {
+    /*load saved state*/
+    lprintf("MAIN",0,"Loading rlxd state from file %s\n",glb_var.rlxd_state);
+    read_ranlxd_state(glb_var.rlxd_state);
+  } else {
+    lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed+MPI_PID);
+    rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
+  }
+  
+  lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
+  lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
+
+  /* read input for measures */
   read_input(glb_var.read,input_filename);
   read_input(mes_var.read,input_filename);
   read_input(poly_var.read,input_filename);
   read_input(eigval_var.read,input_filename);
-  
-  if(glb_var.rlxd_state[0]!='\0')
-  {
-  	/*load saved state*/
-  	lprintf("MAIN",0,"Loading rlxd state from file %s\n",glb_var.rlxd_state);
-  	read_ranlxd_state(glb_var.rlxd_state);
-  }
-  else
-  {
-    lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed+PID);
-    rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
-  }
-  lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
-  lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
-  
-  /* setup communication geometry */
-  if (geometry_init() == 1) {
-    finalize_process();
-    return 0;
-  }
-  
-  /* setup lattice geometry */
-  geometry_mpi_eo();
-  /* test_geometry_mpi_eo(); */
   
   /* Init Monte Carlo */
   init_mc(&flow, input_filename);

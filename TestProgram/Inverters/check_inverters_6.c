@@ -102,7 +102,7 @@ int main(int argc,char *argv[])
    /* setup lattice geometry */
    geometry_mpi_eo();
    /* test_geometry_mpi_eo(); */
-   MPI_Barrier(MPI_COMM_WORLD);
+   MPI_Barrier(GLB_COMM);
    u_gauge=alloc_gfield(&glattice);
 #ifndef REPR_FUNDAMENTAL
    u_gauge_f=alloc_gfield_f(&glattice);

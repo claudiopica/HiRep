@@ -33,7 +33,7 @@ void global_sum(double *d, int n) {
   gettimeofday(&start,0);  
 #endif
   
-  mpiret=MPI_Allreduce(d,pres,n,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
+  mpiret=MPI_Allreduce(d,pres,n,MPI_DOUBLE,MPI_SUM,GLB_COMM);
 
   
 #ifdef MPI_TIMING
@@ -73,7 +73,7 @@ void global_sum_int(int *d, int n) {
   gettimeofday(&start,0);  
 #endif
   
-  mpiret=MPI_Allreduce(d,pres,n,MPI_INT,MPI_SUM,MPI_COMM_WORLD);
+  mpiret=MPI_Allreduce(d,pres,n,MPI_INT,MPI_SUM,GLB_COMM);
 
   
 #ifdef MPI_TIMING
@@ -113,7 +113,7 @@ void global_max(double *d, int n) {
   gettimeofday(&start,0);  
 #endif
   
-  mpiret=MPI_Allreduce(d,pres,n,MPI_DOUBLE,MPI_MAX,MPI_COMM_WORLD);
+  mpiret=MPI_Allreduce(d,pres,n,MPI_DOUBLE,MPI_MAX,GLB_COMM);
 
   
 #ifdef MPI_TIMING
@@ -151,7 +151,7 @@ void bcast(double *d, int n) {
   gettimeofday(&start,0);  
 #endif
 
-  mpiret=MPI_Bcast(d, n, MPI_DOUBLE, 0,MPI_COMM_WORLD);
+  mpiret=MPI_Bcast(d, n, MPI_DOUBLE, 0,GLB_COMM);
 
 #ifdef MPI_TIMING
   gettimeofday(&end,0);
@@ -185,7 +185,7 @@ void bcast_int(int *i, int n) {
   gettimeofday(&start,0);  
 #endif
 
-  mpiret=MPI_Bcast(i, n, MPI_INT, 0,MPI_COMM_WORLD);
+  mpiret=MPI_Bcast(i, n, MPI_INT, 0,GLB_COMM);
 
 #ifdef MPI_TIMING
   gettimeofday(&end,0);

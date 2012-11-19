@@ -149,7 +149,7 @@ int cg_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field
   struct timeval etime;
   
   #ifdef TIMING_WITH_BARRIERS
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(GLB_COMM);
   #endif
   gettimeofday(&start,0);
   #endif
@@ -179,7 +179,7 @@ int cg_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field
 
   #ifdef TIMING
   #ifdef TIMING_WITH_BARRIERS
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(GLB_COMM);
   #endif
   gettimeofday(&end,0);
   timeval_subtract(&etime,&end,&start);

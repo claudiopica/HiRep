@@ -47,6 +47,7 @@ _SITE_FOR((type),i)
 
 
 int setup_process(int *argc, char ***argv);
+int setup_replicas();
 int finalize_process(void);
 
 void origin_coord(int *c);

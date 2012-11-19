@@ -141,7 +141,7 @@ int main(int argc,char *argv[])
   int mpiret;
 
   dtmp=err/(2*NG*NG);
-  mpiret=MPI_Allreduce(&dtmp,&err,1,MPI_DOUBLE,MPI_MAX,MPI_COMM_WORLD);
+  mpiret=MPI_Allreduce(&dtmp,&err,1,MPI_DOUBLE,MPI_MAX,GLB_COMM);
 
   if (mpiret != MPI_SUCCESS) {
     char mesg[MPI_MAX_ERROR_STRING];

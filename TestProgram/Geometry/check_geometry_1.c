@@ -45,7 +45,7 @@ int main(int argc,char *argv[])
   geometry_mpi_eo();
 
   fflush(stdout);
-  MPI_Barrier( MPI_COMM_WORLD ) ; 
+  MPI_Barrier( GLB_COMM ) ; 
 
   test_geometry_mpi_eo();
   

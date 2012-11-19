@@ -263,7 +263,7 @@ int update_rhmc(){
     struct timeval etime;
     
     #ifdef TIMING_WITH_BARRIERS
-    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(GLB_COMM);
     #endif
     gettimeofday(&start1,0);
     #endif
@@ -298,14 +298,14 @@ int update_rhmc(){
     lprintf("RHMC",30,"MD integration...\n");
     #ifdef TIMING
     #ifdef TIMING_WITH_BARRIERS
-    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(GLB_COMM);
     #endif
     gettimeofday(&start2,0);
     #endif
     (*(integrator[0].integrator))(momenta,_update_par.tlen,&integrator[0]);
     #ifdef TIMING
     #ifdef TIMING_WITH_BARRIERS
-    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(GLB_COMM);
     #endif
     gettimeofday(&end2,0);
     timeval_subtract(&etime,&end2,&start2);
@@ -371,7 +371,7 @@ int update_rhmc(){
 
     #ifdef TIMING
     #ifdef TIMING_WITH_BARRIERS
-    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(GLB_COMM);
     #endif
     gettimeofday(&end1,0);
     timeval_subtract(&etime,&end1,&start1);

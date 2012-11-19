@@ -27,13 +27,14 @@ typedef struct _input_glb {
   /* THIS ARE DEFINED GLOBALLY !!! */
   /* int GLB_T, GLB_X, GLB_Y, GLB_Z; */
   /* int NP_T, NP_X, NP_Y, NP_Z; */
+  /* int REP_T, REP_X, REP_Y, REP_Z; */
 
   /* random numbers */
   int rlxd_level, rlxd_seed;
   char rlxd_state[256];
 
   /* for the reading function */
-  input_record_t read[12];
+  input_record_t read[16];
   
 } input_glb;
 
@@ -48,6 +49,10 @@ typedef struct _input_glb {
     {"NP_X", "NP_X = %d", INT_T, &NP_X},\
     {"NP_Y", "NP_Y = %d", INT_T, &NP_Y},\
     {"NP_Z", "NP_Z = %d", INT_T, &NP_Z},\
+    {"REP_T", "REP_T = %d", INT_T, &REP_T},\
+    {"REP_X", "REP_X = %d", INT_T, &REP_X},\
+    {"REP_Y", "REP_Y = %d", INT_T, &REP_Y},\
+    {"REP_Z", "REP_Z = %d", INT_T, &REP_Z},\
     {"ranlux level", "level = %d", INT_T, &(varname).rlxd_level},\
     {"ranlux seed", "seed = %d", INT_T, &(varname).rlxd_seed},\
     {"ranlux state", "state = %s", STRING_T, &(varname).rlxd_state},\

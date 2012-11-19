@@ -69,7 +69,7 @@ void read_gauge_field_nocheck(char filename[])
   }
 
 #ifdef WITH_MPI
-  MPI_Comm_group(MPI_COMM_WORLD,&wg);
+  MPI_Comm_group(GLB_COMM,&wg);
   MPI_Comm_group(cart_comm,&cg);
 #endif
 
@@ -97,11 +97,11 @@ void read_gauge_field_nocheck(char filename[])
           }
 
 #ifdef WITH_MPI
-          /* MPI_Barrier(MPI_COMM_WORLD); */
+          /* MPI_Barrier(GLB_COMM); */
           if (pid!=0) { /* do send/receive only if the data is not on PID 0 */ 
             /* send buffer */
             if (PID==0) {
-              mpiret=MPI_Send(buff, bsize, MPI_DOUBLE, pid, 999, MPI_COMM_WORLD);
+              mpiret=MPI_Send(buff, bsize, MPI_DOUBLE, pid, 999, GLB_COMM);
 #ifndef NDEBUG
               if (mpiret != MPI_SUCCESS) {
                 char mesg[MPI_MAX_ERROR_STRING];
@@ -117,7 +117,7 @@ void read_gauge_field_nocheck(char filename[])
 #ifndef NDEBUG
               error(Z!=(GLB_Z/NP_Z+((p[3]<rz)?1:0)),1,"read_gauge_field", "Local lattice size mismatch!");
 #endif
-              mpiret=MPI_Recv(buff, bsize, MPI_DOUBLE, 0, 999, MPI_COMM_WORLD, &st);
+              mpiret=MPI_Recv(buff, bsize, MPI_DOUBLE, 0, 999, GLB_COMM, &st);
 #ifndef NDEBUG
               if (mpiret != MPI_SUCCESS) {
                 char mesg[MPI_MAX_ERROR_STRING];

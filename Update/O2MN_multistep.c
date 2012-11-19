@@ -34,7 +34,7 @@ void gauge_integrator(suNg_av_field *momenta, double tlen, integrator_par *int_p
   struct timeval etime;
   
   #ifdef TIMING_WITH_BARRIERS
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(GLB_COMM);
   #endif
   gettimeofday(&start,0);
   #endif
@@ -53,7 +53,7 @@ void gauge_integrator(suNg_av_field *momenta, double tlen, integrator_par *int_p
 
     #ifdef TIMING
     #ifdef TIMING_WITH_BARRIERS
-    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(GLB_COMM);
     #endif
     gettimeofday(&start1,0);
     #endif
@@ -67,7 +67,7 @@ void gauge_integrator(suNg_av_field *momenta, double tlen, integrator_par *int_p
 
     #ifdef TIMING
     #ifdef TIMING_WITH_BARRIERS
-    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(GLB_COMM);
     #endif
     gettimeofday(&end1,0);
     timeval_subtract(&etime,&end1,&start1);
@@ -76,7 +76,7 @@ void gauge_integrator(suNg_av_field *momenta, double tlen, integrator_par *int_p
 
     #ifdef TIMING
     #ifdef TIMING_WITH_BARRIERS
-    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(GLB_COMM);
     #endif
     gettimeofday(&start1,0);
     #endif
@@ -85,7 +85,7 @@ void gauge_integrator(suNg_av_field *momenta, double tlen, integrator_par *int_p
 
     #ifdef TIMING
     #ifdef TIMING_WITH_BARRIERS
-    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(GLB_COMM);
     #endif
     gettimeofday(&end1,0);
     timeval_subtract(&etime,&end1,&start1);
@@ -98,7 +98,7 @@ void gauge_integrator(suNg_av_field *momenta, double tlen, integrator_par *int_p
 
   #ifdef TIMING
   #ifdef TIMING_WITH_BARRIERS
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(GLB_COMM);
   #endif
   gettimeofday(&start1,0);
   #endif
@@ -107,7 +107,7 @@ void gauge_integrator(suNg_av_field *momenta, double tlen, integrator_par *int_p
 
   #ifdef TIMING
   #ifdef TIMING_WITH_BARRIERS
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(GLB_COMM);
   #endif
   gettimeofday(&end1,0);
   timeval_subtract(&etime,&end1,&start1);
@@ -116,7 +116,7 @@ void gauge_integrator(suNg_av_field *momenta, double tlen, integrator_par *int_p
 
   #ifdef TIMING
   #ifdef TIMING_WITH_BARRIERS
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(GLB_COMM);
   #endif
   gettimeofday(&end,0);
   timeval_subtract(&etime,&end,&start);
@@ -133,7 +133,7 @@ void O2MN_multistep(suNg_av_field *momenta, double tlen, integrator_par *int_par
   struct timeval etime;
   
   #ifdef TIMING_WITH_BARRIERS
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(GLB_COMM);
   #endif
   gettimeofday(&start,0);
   #endif
@@ -174,7 +174,7 @@ void O2MN_multistep(suNg_av_field *momenta, double tlen, integrator_par *int_par
 
   #ifdef TIMING
   #ifdef TIMING_WITH_BARRIERS
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(GLB_COMM);
   #endif
   gettimeofday(&end,0);
   timeval_subtract(&etime,&end,&start);

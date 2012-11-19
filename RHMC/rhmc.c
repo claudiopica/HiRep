@@ -13,6 +13,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 #include <string.h>
 #include <math.h>
 #include "io.h"
@@ -134,19 +135,28 @@ input_eigval eigval_var = init_input_eigval(eigval_var);
 /* flow control variable */
 rhmc_flow flow=init_rhmc_flow(flow);
 
-
+char input_filename[256] = "input_file";
+char output_filename[256] = "out_0";
+char error_filename[256] = "err_0";
 static void read_cmdline(int argc, char* argv[]) {
-  int i, am=0;
-
+  int i, ai=0, ao=0, am=0, requested=1;
+  
   for (i=1;i<argc;i++) {
-    if (strcmp(argv[i],"-m")==0) am=i;
+    if (strcmp(argv[i],"-i")==0) {ai=i+1;requested+=2;}
+    else if (strcmp(argv[i],"-o")==0) {ao=i+1;requested+=2;}
+    else if (strcmp(argv[i],"-m")==0) {am=i;requested+=1;}
   }
-
+  
   if (am != 0) {
     print_compiling_info();
     exit(0);
   }
-
+  
+  error(argc!=requested,1,"read_cmdline [hmc.c]",
+        "Arguments: [-i <input file>] [-o <output file>] [-m]");
+  
+  if (ao!=0) strcpy(output_filename,argv[ao]);
+  if (ai!=0) strcpy(input_filename,argv[ai]);
 }
 
 
@@ -161,63 +171,58 @@ int main(int argc,char *argv[])
 {
   int i, acc, rc;
   char sbuf[128];
-
-  /* setup process id and communications */
+  
+  read_cmdline(argc,argv);
+  
+  /* setup process communications */
   setup_process(&argc,&argv);
 
-  read_cmdline(argc,argv);
+  /* read global variables file */
+  read_input(glb_var.read,input_filename);
 
-  read_input(logger_var.read,"input_file");
+  setup_replicas();
 
   /* logger setup */
+  read_input(logger_var.read,input_filename);
   logger_set_input(&logger_var);
-
-  /* disable logger for MPI processes != 0 */
-  if (PID!=0) { logger_disable(); }
-
-  if (PID==0) {
-    sprintf(sbuf,">>out_%d",PID);  logger_stdout(sbuf); 
-    sprintf(sbuf,"err_%d",PID); freopen(sbuf,"w",stderr);
+  if (PID!=0) { logger_disable(); }   /* disable logger for MPI processes != 0 */
+  else {
+    sprintf(sbuf,">>%s",output_filename);  logger_stdout(sbuf);
+    freopen(error_filename,"w",stderr);
   }
 
   lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS); 
-  lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
+  lprintf("MAIN",0,"[RepID: %d][world_size: %d]\n[MPI_ID: %d][MPI_size: %d]\n\n",RID,WORLD_SIZE,MPI_PID,MPI_WORLD_SIZE);
 
-  /* read input file */
-  read_input(glb_var.read,"input_file");
-  read_input(mes_var.read,"input_file");
-  read_input(poly_var.read,"input_file");
-#ifdef ROTATED_SF
-  read_input(XSF_var.read,"input_file");
-#endif //ROTATED_SF
-  read_input(eigval_var.read,"input_file");
+  /* setup lattice geometry */
+  if (geometry_init() == 1) { finalize_process(); return 0; }
+  geometry_mpi_eo();
+  /* test_geometry_mpi_eo(); */
   
-  if(glb_var.rlxd_state[0]!='\0')
-    {
-      /*load saved state*/
-      lprintf("MAIN",0,"Loading rlxd state from file %s\n",glb_var.rlxd_state);
-      read_ranlxd_state(glb_var.rlxd_state);
-    }
-  else
-    {
-      lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed+PID);
-      rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
-    }
+  /* setup random numbers */
+  if(glb_var.rlxd_state[0]!='\0') {
+    /*load saved state*/
+    lprintf("MAIN",0,"Loading rlxd state from file %s\n",glb_var.rlxd_state);
+    read_ranlxd_state(glb_var.rlxd_state);
+  } else {
+    lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed+MPI_PID);
+    rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
+  }
+  
   lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
   lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
   
-  /* setup communication geometry */
-  if (geometry_init() == 1) {
-    finalize_process();
-    return 0;
-  }
 
-  /* setup lattice geometry */
-  geometry_mpi_eo();
-  /* test_geometry_mpi_eo(); */
-
+  /* read input for measures */
+  read_input(mes_var.read,input_filename);
+  read_input(poly_var.read,input_filename);
+  read_input(eigval_var.read,input_filename);
+#ifdef ROTATED_SF
+  read_input(XSF_var.read,input_filename);
+#endif //ROTATED_SF
+  
   /* Init Monte Carlo */
-  init_mc(&flow, "input_file");
+  init_mc(&flow, input_filename);
   lprintf("MAIN",0,"MVM during RHMC initialzation: %ld\n",getMVM());
   lprintf("MAIN",0,"Initial plaquette: %1.8e\n",avr_plaquette());
 

@@ -6,7 +6,7 @@ EXES = hmc
 default: $(EXES)
 
 MODDIR := Geometry
-MODS := geometry_init geometry_mpi_eo test_geometry_mpi communications communications_flt
+MODS := process_init geometry_init geometry_mpi_eo test_geometry_mpi communications communications_flt
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := IO

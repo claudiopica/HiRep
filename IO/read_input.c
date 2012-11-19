@@ -19,18 +19,18 @@ static void mpi_broadcast_parameters(input_record_t crec[]) {
     if(crec->descr==NULL) continue;
     switch(crec->type) {
       case INT_T:
-        MPI_Bcast(crec->ptr,1,MPI_INT,0,MPI_COMM_WORLD);
+        MPI_Bcast(crec->ptr,1,MPI_INT,0,GLB_COMM);
         break;
       case UNSIGNED_T:
-        MPI_Bcast(crec->ptr,1,MPI_UNSIGNED,0,MPI_COMM_WORLD);
+        MPI_Bcast(crec->ptr,1,MPI_UNSIGNED,0,GLB_COMM);
         break;
       case DOUBLE_T:
-        MPI_Bcast(crec->ptr,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
+        MPI_Bcast(crec->ptr,1,MPI_DOUBLE,0,GLB_COMM);
         break;
       case STRING_T:
         stringlen=strlen(crec->ptr)+1;
-        MPI_Bcast(&stringlen,1,MPI_INT,0,MPI_COMM_WORLD);
-        MPI_Bcast(crec->ptr,stringlen,MPI_CHAR,0,MPI_COMM_WORLD);
+        MPI_Bcast(&stringlen,1,MPI_INT,0,GLB_COMM);
+        MPI_Bcast(crec->ptr,stringlen,MPI_CHAR,0,GLB_COMM);
         break;
       default:
         error(1,1,"read_input " __FILE__, "Unknown type in input descriptor\n");

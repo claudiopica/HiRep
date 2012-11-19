@@ -26,7 +26,7 @@ void force0(double dt, suNg_av_field *force, void *vpar){
   struct timeval etime;
   
   #ifdef TIMING_WITH_BARRIERS
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(GLB_COMM);
   #endif
   gettimeofday(&start,0);
   #endif
@@ -78,7 +78,7 @@ void force0(double dt, suNg_av_field *force, void *vpar){
 
   #ifdef TIMING
   #ifdef TIMING_WITH_BARRIERS
-  MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(GLB_COMM);
   #endif
   gettimeofday(&end,0);
   timeval_subtract(&etime,&end,&start);
