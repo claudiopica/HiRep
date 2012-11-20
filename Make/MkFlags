@@ -1,8 +1,8 @@
-NG = 2
+NG = 3
 #REPR = REPR_FUNDAMENTAL
-#REPR = REPR_SYMMETRIC
+REPR = REPR_SYMMETRIC
 #REPR = REPR_ANTISYMMETRIC
-REPR = REPR_ADJOINT
+#REPR = REPR_ADJOINT
 
 ## Boundary conditins
 #MACRO += -DANTIPERIODIC_BC_T
@@ -17,7 +17,7 @@ REPR = REPR_ADJOINT
 MACRO += -DUPDATE_EO
 #MACRO += -DWITH_MPI
 MACRO += -DWITH_GPU
-MACRO += -DWITH_QUATERNIONS
+#MACRO += -DWITH_QUATERNIONS
 
 ## SF
 #MACRO += -DBASIC_SF
@@ -42,7 +42,8 @@ else #Compile with GPU
 CC = nvcc 
 #CFLAGS = -g -G -Xcompiler '-std=c99 -fgcse-sm -fgcse-las -fgcse-after-reload'
 CFLAGS = -O2 -Xcompiler '-std=c99 -fgcse-sm -fgcse-las -fgcse-after-reload'
-GPUFLAGS = --x cu -arch=sm_20 --use_fast_math -Xptxas -v  -Xptxas -dlcm=ca 
+#GPUFLAGS = --x cu -arch=sm_20 --use_fast_math -Xptxas -v  -Xptxas -dlcm=ca 
+GPUFLAGS = --x cu -arch=sm_20 -Xptxas -v  -Xptxas -dlcm=ca 
 LDFLAGS = -lcuda
 #GPUFLAGS = --x cu -arch=sm_11 -Xptxas -v -Xptxas -dlcm=ca 
 endif

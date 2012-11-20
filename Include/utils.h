@@ -20,6 +20,11 @@
 #include "geometry.h"
 #include "gpu.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 void ExpX(double dt, suNg_algebra_vector *h, suNg *u);
 
 void init_bc();
@@ -55,9 +60,6 @@ void project_cooling_to_suNg(suNg* g_out, suNg* g_in, int cooling);
 
 
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 void assign_u2ud_cpu(void);
 void assign_ud2u_cpu(void);
 void assign_ud2u_f_cpu(void);

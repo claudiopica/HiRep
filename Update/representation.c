@@ -344,7 +344,7 @@ void _group_represent2_flt(suNf_flt* v, suNg_flt *u) {
 
 #include "communications.h"
 
-void represent_gauge_field() {
+void represent_gauge_field_cpu() {
 #if (!defined(REPR_FUNDAMENTAL) && !defined(WITH_QUATERNIONS)) || defined(ROTATED_SF) 
   int ix, ip;
   int mu;
@@ -388,7 +388,7 @@ void represent_gauge_field() {
 #endif
 }
 
-void represent_gauge_field_flt() {
+void represent_gauge_field_flt_cpu() {
 #if (!defined(REPR_FUNDAMENTAL) && !defined(WITH_QUATERNIONS)) || defined(ROTATED_SF) 
   int ix, ip;
   int mu;
@@ -432,4 +432,7 @@ void represent_gauge_field_flt() {
 }
 
 
-
+#ifndef WITH_GPU
+void (*represent_gauge_field)() = represent_gauge_field_cpu;
+void (*represent_gauge_field_flt)() = represent_gauge_field_flt_cpu;
+#endif

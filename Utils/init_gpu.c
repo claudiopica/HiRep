@@ -10,7 +10,7 @@
 * Functions to initialize and setup the global variables for GPU
 *
 *******************************************************************************/
-
+#ifdef WITH_GPU
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -113,3 +113,5 @@ void init_gpu(input_gpu gpu_var){
  
 
 }
+
+#endif
