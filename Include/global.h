@@ -67,12 +67,12 @@ GLB_VAR(int,REP_T,=1); /* number of replicas in direction T */
 GLB_VAR(int,REP_X,=1); /* number of replicas in direction X */
 GLB_VAR(int,REP_Y,=1); /* number of replicas in direction Y */
 GLB_VAR(int,REP_Z,=1); /* number of replicas in direction Z */
+GLB_VAR(int,MPI_WORLD_SIZE,=1); /* mpi rank for this process */
+GLB_VAR(int,MPI_PID,=0); /* mpi rank inside MPI_COMM_WORLD (unique across replicas) */
 #ifdef WITH_MPI
 #include <mpi.h>
 GLB_VAR(MPI_Comm,GLB_COMM,=MPI_COMM_WORLD); /* this is the global communicator for a replica */
 GLB_VAR(MPI_Comm,cart_comm,=MPI_COMM_NULL); /* cartesian communicator for the replica */
-GLB_VAR(int,MPI_WORLD_SIZE,=1); /* mpi rank for this process */
-GLB_VAR(int,MPI_PID,=0); /* mpi rank inside MPI_COMM_WORLD (unique across replicas) */
 #endif
 
 GLB_VAR(int,RID,=0); /* Replica ID of this process */
