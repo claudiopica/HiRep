@@ -4,7 +4,7 @@
  \***************************************************************************/
 
 #include "global.h"
-#include "communications_flt.h"
+#include "communications.h"
 #include "logger.h"
 #include "error.h"
 #include "geometry.h"

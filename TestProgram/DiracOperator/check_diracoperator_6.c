@@ -21,7 +21,6 @@
 #include "linear_algebra.h"
 #include "representation.h"
 #include "communications.h"
-#include "communications_flt.h"
 
 static double hmass=0.1;
 

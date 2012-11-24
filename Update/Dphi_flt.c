@@ -22,7 +22,7 @@
 #include "linear_algebra.h"
 #include "spinor_field.h"
 #include "geometry.h"
-#include "communications_flt.h"
+#include "communications.h"
 #include "memory.h"
 
 #ifdef ROTATED_SF
