@@ -63,10 +63,7 @@ GLB_VAR(int,Z_EXT,=0);
 /* MPI stuff */
 GLB_VAR(int,WORLD_SIZE,=1); /* mpi rank for this process */
 GLB_VAR(int,CART_SIZE,=1); /* mpi rank for this process */
-GLB_VAR(int,REP_T,=1); /* number of replicas in direction T */
-GLB_VAR(int,REP_X,=1); /* number of replicas in direction X */
-GLB_VAR(int,REP_Y,=1); /* number of replicas in direction Y */
-GLB_VAR(int,REP_Z,=1); /* number of replicas in direction Z */
+GLB_VAR(int,N_REP,=1); /* number of replicas*/
 GLB_VAR(int,MPI_WORLD_SIZE,=1); /* mpi rank for this process */
 GLB_VAR(int,MPI_PID,=0); /* mpi rank inside MPI_COMM_WORLD (unique across replicas) */
 #ifdef WITH_MPI

@@ -8,10 +8,7 @@ NP_X = 1
 NP_Y = 1
 NP_Z = 1
 
-REP_T = 1
-REP_X = 1
-REP_Y = 1
-REP_Z = 1
+N_REP = 1
 
 level = 1  seed = 12345
 
