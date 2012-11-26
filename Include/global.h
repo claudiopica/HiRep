@@ -179,6 +179,12 @@ GLB_VAR(int,*twbc_plaq, =NULL);
 GLB_VAR(input_glb,glb_var,=init_input_glb(glb_var));
 
 
+/* Does the represented field need to be allocated? */
+
+#if !defined(REPR_FUNDAMENTAL) || defined(ROTATED_SF) || !defined(WITH_QUATERNIONS) || !defined(WITH_REPRESENT_ON_FLY)
+#define ALLOCATE_REPR_GAUGE_FIELD
+#endif
+
 /* Theta Boundary conditions */
 #ifdef FERMION_THETA
 GLB_VAR(complex,eitheta[4],={{1.,0.}});
