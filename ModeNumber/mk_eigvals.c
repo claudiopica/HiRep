@@ -339,7 +339,7 @@ int main(int argc,char *argv[]) {
   free_BCs();
 
   free(eva_val);
-  free_spinor_field(eva_vec);
+  free_spinor_field_f(eva_vec);
 
   free_gfield(u_gauge);
 #ifdef ALLOCATE_REPR_GAUGE_FIELD

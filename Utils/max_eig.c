@@ -58,7 +58,7 @@ int max_H(spinor_operator H, geometry_descriptor *type, double *max) {
 
   lprintf("MaxH",10,"Max_eig = %1.8e [MVM = %d]\n",*max,count); 
 
-  free_spinor_field(s1);
+  free_spinor_field_f(s1);
   
   return count;
 }

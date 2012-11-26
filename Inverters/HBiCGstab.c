@@ -147,7 +147,7 @@ int HBiCGstab(MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field
 #endif
    
   /* free memory */
-  free_spinor_field(s);
+  free_spinor_field_f(s);
 
   /* return number of cg iter */
   return cgiter;
@@ -286,7 +286,7 @@ int HBiCGstab_flt(MINRES_par *par, spinor_operator_flt M, spinor_field_flt *in, 
 #endif
    
   /* free memory */
-  free_spinor_field_flt(s);
+  free_spinor_field_f_flt(s);
 
   /* return number of cg iter */
   return cgiter;

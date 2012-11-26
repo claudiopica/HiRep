@@ -266,7 +266,7 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
   }
   
   /* free memory */
-  free_spinor_field(memall);
+  free_spinor_field_f(memall);
   free(q1);
   free(q2);
   free(r);
@@ -454,10 +454,10 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
   } 
   
   /* free memory */
-  free_spinor_field_flt(memall);
+  free_spinor_field_f_flt(memall);
   
   #ifndef NDEBUG
-  free_spinor_field_flt(sdbg);
+  free_spinor_field_f_flt(sdbg);
   #endif
   
   /* return number of cg iter */
@@ -626,8 +626,8 @@ int g5QMR_fltacc( g5QMR_fltacc_par* par, spinor_operator M, spinor_operator_flt 
   
   lprintf("INVERTER",10,"g5QMR_fltacc: cgiter (g5QMR_flt,g5QMR,MINRES) = %d ; %d ; %d\n",cgiter_flt,cgiter,cgiter_minres);
   
-  free_spinor_field(res);
-  free_spinor_field_flt(in_flt);
+  free_spinor_field_f(res);
+  free_spinor_field_f_flt(in_flt);
   
   return cgiter_flt+cgiter_minres;
 }

@@ -196,7 +196,7 @@ BCs_pars_t BCs_pars = {
 #ifndef REPR_FUNDAMENTAL
   free_gfield_f(u_gauge_f);
 #endif
-  free_spinor_field_flt(s0);
+  free_spinor_field_f_flt(s0);
   
   free_gtransf(g);
   

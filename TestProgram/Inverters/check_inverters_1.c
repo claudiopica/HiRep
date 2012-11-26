@@ -147,7 +147,7 @@ int main(int argc,char *argv[])
      lprintf("CG TEST",0,"test cg[%d] = %e (req. %e)\n",i,tau,par.err2);
    }
 
-   free_spinor_field(res);
+   free_spinor_field_f(res);
    free(par.shift);
 
    finalize_process();

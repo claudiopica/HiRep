@@ -110,7 +110,7 @@ int main(int argc,char *argv[]) {
 
   free_BCs();
   
-	free_spinor_field(sp);
+	free_spinor_field_f(sp);
 
 	return 0;
 }

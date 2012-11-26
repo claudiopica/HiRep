@@ -108,7 +108,7 @@ void init_modenumber(double m, double inv, int nh, char *approxfile) {
 void free_modenumber() {
   error(init==0,1,"modenumber.c","Not initialized!");
   free(par.shift);
-  free_spinor_field(x);
+  free_spinor_field_f(x);
   init=0;
 }
 

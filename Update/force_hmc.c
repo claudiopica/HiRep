@@ -114,10 +114,10 @@ void init_force_hmc() {
 }
 
 void free_force_hmc() {
-  free_spinor_field_flt(eta_flt);
-  free_spinor_field(Xs);
+  free_spinor_field_f_flt(eta_flt);
+  free_spinor_field_f(Xs);
 #ifdef UPDATE_EO
-  free_spinor_field(eta);
+  free_spinor_field_f(eta);
 #endif
 }
 

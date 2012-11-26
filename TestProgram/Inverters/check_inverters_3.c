@@ -151,7 +151,7 @@ int main(int argc,char *argv[])
     lprintf("QMR TEST",0,"test g5QMR[%d] = %e (req. %e)\n",i,tau,par.err2);
   }
 	 
-  free_spinor_field(res);
+  free_spinor_field_f(res);
   free(par.shift);
   finalize_process();
 

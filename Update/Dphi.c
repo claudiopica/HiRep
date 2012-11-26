@@ -41,9 +41,9 @@ static spinor_field *etmp=NULL;
 static spinor_field *otmp=NULL;
 
 static void free_mem() {
-    if (gtmp!=NULL) { free_spinor_field(gtmp); etmp=NULL; }
-    if (etmp!=NULL) { free_spinor_field(etmp); etmp=NULL; }
-    if (otmp!=NULL) { free_spinor_field(otmp); otmp=NULL; }
+    if (gtmp!=NULL) { free_spinor_field_f(gtmp); etmp=NULL; }
+    if (etmp!=NULL) { free_spinor_field_f(etmp); etmp=NULL; }
+    if (otmp!=NULL) { free_spinor_field_f(otmp); otmp=NULL; }
     init=1;
 }
 

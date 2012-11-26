@@ -136,7 +136,7 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
   }
 
   /* free memory */
-  free_spinor_field(p);
+  free_spinor_field_f(p);
   free(z1); free(z2); free(z3);
 
   /* return number of cg iter */

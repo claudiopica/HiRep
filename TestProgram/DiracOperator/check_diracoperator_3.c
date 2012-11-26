@@ -81,7 +81,7 @@ void test_herm(spinor_operator S, char *name){
      lprintf("RESULT",0,"OK ");
    lprintf("RESULT",0,"[norm = %e]\n",tau);
    
-   free_spinor_field(s1);
+   free_spinor_field_f(s1);
 
 }
 

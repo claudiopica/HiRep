@@ -117,7 +117,7 @@ static int cg_mshift_flt_core(short int *sflags, mshift_par *par, spinor_operato
   } while ((par->max_iter==0 || cgiter<par->max_iter) && notconverged);
 
   /* free memory */
-  free_spinor_field_flt(p);
+  free_spinor_field_f_flt(p);
   free(z1); free(z2); free(z3);
 
   /* return number of cg iter */
@@ -235,8 +235,8 @@ int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_operator_flt F, spi
     lprintf("INVERTER",20,"CG inversion: err2 = %1.8e < %1.8e\n",norm[i],par->err2);
   }
 
-  free_spinor_field_flt(res_flt);
-  free_spinor_field(res);
+  free_spinor_field_f_flt(res_flt);
+  free_spinor_field_f(res);
 
   lprintf("INVERTER",10,"CG_mshift: MVM = %d (single) - %d (double)\n",siter,diter);
 

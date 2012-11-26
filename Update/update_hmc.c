@@ -151,7 +151,7 @@ void init_hmc(hmc_par *par){
   }
   
   /* allocate memory for the local action */
-  if(la==NULL) la=alloc_sfield(&glattice);
+  if(la==NULL) la=alloc_sfield(1, &glattice);
   
   /* represent gauge field */
   represent_gauge_field();
@@ -240,7 +240,7 @@ void free_hmc(){
   /* free momenta */
   if(u_gauge_old!=NULL) free_gfield(u_gauge_old); u_gauge_old=NULL;
   if(momenta!=NULL) free_avfield(momenta); momenta=NULL;
-  if(pf!=NULL) free_spinor_field(pf); pf=NULL;
+  if(pf!=NULL) free_spinor_field_f(pf); pf=NULL;
   
   if(la!=NULL) free_sfield(la); la=NULL;
   

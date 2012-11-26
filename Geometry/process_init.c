@@ -14,6 +14,7 @@
 #include "global.h"
 #include "error.h"
 #include "logger.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 

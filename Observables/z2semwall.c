@@ -200,18 +200,18 @@ void z2semwall_qprop_free() {
   error(init==0,1,"z2semwall.c","z2semwall method not initialized!");
 
 #ifndef NDEBUG
-  free_spinor_field(test_e);
-  free_spinor_field(test);
+  free_spinor_field_f(test_e);
+  free_spinor_field_f(test);
 #endif /* NDEBUG */
 
-  free_spinor_field(eta2);
+  free_spinor_field_f(eta2);
 
-  free_spinor_field(eta);
-  free_spinor_field(psi0);
+  free_spinor_field_f(eta);
+  free_spinor_field_f(psi0);
 
   free(shift);
   free(mass);
-  free_spinor_field(QMR_noise);
+  free_spinor_field_f(QMR_noise);
   init=0;
 }
 

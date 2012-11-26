@@ -159,7 +159,7 @@ int main(int argc,char *argv[])
   spinor_field_sub_assign_f(s2,s1);
   lprintf("QMR TEST",0,"Res = %e\n",spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1));
 
-  free_spinor_field(s1);
+  free_spinor_field_f(s1);
   finalize_process();
 
   return 0;

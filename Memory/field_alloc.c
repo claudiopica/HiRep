@@ -22,305 +22,107 @@
 #include <mpi.h>
 #endif
 
-void free_gfield(suNg_field *u)
-{
-   afree(u->ptr);
+
+/* MPI allocation and deallocation code */
 #ifdef WITH_MPI
-   afree(u->comm_req);   
-#endif
-   afree(u);
+
+#define _FREE_MPI_CODE if(u->comm_req!=NULL) afree(u->comm_req)
+
+#define _ALLOC_MPI_CODE(_name) \
+if (type->nbuffers_gauge>0) {\
+f->comm_req=amalloc(2*type->nbuffers_gauge*sizeof(MPI_Request),ALIGN);\
+error((f->comm_req)==NULL,1,"alloc_" #_name " [" __FILE__ "]",\
+"Could not allocate memory space for field (MPI)");\
+for (int ix=0; ix<2*type->nbuffers_gauge; ++ix)\
+f->comm_req[ix]=MPI_REQUEST_NULL;\
+} else {\
+f->comm_req=NULL;\
+}do{}while(0)
+
+#else /* WITH_MPI */
+
+#define _FREE_MPI_CODE do{}while(0)
+#define _ALLOC_MPI_CODE(_name) do{}while(0)
+
+#endif /* WITH_MPI */
+
+
+/* GPU allocation and deallocation code */
+#ifdef WITH_GPU
+
+#define _FREE_GPU_CODE if(u->gpu_ptr!=NULL) cudaFree(u->gpu_ptr)
+
+
+#define _ALLOC_GPU_CODE(_name,_size)\
+if(alloc_mem_t & GPU_MEM) {\
+cudaError_t err;\
+err = cudaMalloc((void **) &f->gpu_ptr, _size*type->gsize_gauge*sizeof(*(f->gpu_ptr))); \
+error(err!=cudaSuccess,1,"alloc_" #_name " [" __FILE__ "]", \
+"Could not allocate GPU memory space for field"); \
+} else f->gpu_ptr=NULL
+
+#else /* WITH_GPU */
+
+#define _FREE_GPU_CODE do{}while(0)
+#define _ALLOC_GPU_CODE(_name,_size) do{}while(0)
+
+#endif /* WITH_GPU */
+
+
+/* deallocation function */
+#define _DECLARE_FREE_FUNC(_name,_type)\
+void free_##_name(_type *u){ \
+if (u!=NULL) {\
+if (u->ptr!=NULL) afree(u->ptr);\
+_FREE_GPU_CODE;\
+_FREE_MPI_CODE;\
+afree(u);\
+}\
 }
 
-suNg_field *alloc_gfield(geometry_descriptor* type)
-{
-   int ix;
-   suNg unity;
-   suNg_field *gf;
-
-   gf=amalloc(sizeof(suNg_field),ALIGN);
-   error(gf==NULL,1,"alloc_gfield [field_alloc.c]",
-         "Could not allocate memory space for the gauge field (1)");
-   gf->ptr=amalloc(4*type->gsize_gauge*sizeof(suNg),ALIGN);
-   error((gf->ptr)==NULL,1,"alloc_gfield [field_alloc.c]",
-         "Could not allocate memory space for the gauge field (2)");
-
-   gf->type=type;
-
-#ifdef WITH_MPI
-   if (type->nbuffers_gauge>0) {
-     gf->comm_req=amalloc(2*type->nbuffers_gauge*sizeof(MPI_Request),ALIGN);
-     error((gf->comm_req)==NULL,1,"alloc_gfield [field_alloc.c]",
-	   "Could not allocate memory space for the gauge field (3)");
-     for (ix=0; ix<2*type->nbuffers_gauge; ++ix)
-       gf->comm_req[ix]=MPI_REQUEST_NULL;
-   } else {
-     gf->comm_req=NULL;
-   }
-#endif
-
-   /* set gauge field to unity */
-   _suNg_unit(unity);
-   for (ix=0;ix<4*type->gsize_gauge;++ix)
-     *((gf->ptr)+ix)=unity;
-
-   return gf;
-}
-
-void free_gfield_f(suNf_field *u)
-{
-  afree(u->ptr);
-#ifdef WITH_MPI
-  afree(u->comm_req);   
-#endif
-  afree(u);
-}
-
-suNf_field* alloc_gfield_f(geometry_descriptor* type)
-{
-  int ix;
-  suNf unity;
-  suNf_field *gf;
-
-  gf=amalloc(sizeof(suNf_field),ALIGN);
-  error(gf==NULL,1,"alloc_gfield [field_alloc.c]",
-	"Could not allocate memory space for the gauge field (1)");
-  gf->ptr=amalloc(4*type->gsize_gauge*sizeof(suNf),ALIGN);
-  error((gf->ptr)==NULL,1,"alloc_gfield [field_alloc.c]",
-	"Could not allocate memory space for the gauge field (2)");
-
-  gf->type=type;
-
-#ifdef WITH_MPI
-  if (type->nbuffers_gauge>0) {
-    gf->comm_req=amalloc(2*type->nbuffers_gauge*sizeof(MPI_Request),ALIGN);
-    error((gf->comm_req)==NULL,1,"alloc_gfield [field_alloc.c]",
-	  "Could not allocate memory space for the gauge field (3)");
-     for (ix=0; ix<2*type->nbuffers_gauge; ++ix)
-       gf->comm_req[ix]=MPI_REQUEST_NULL;
-  } else {
-    gf->comm_req=NULL;
-  }
-#endif
-
-  /* set gauge field to unity */
-  _suNf_unit(unity);
-  for (ix=0;ix<4*type->gsize_gauge;++ix)
-    *((gf->ptr)+ix)=unity;
-
-  return gf;
-}
-
-void free_gfield_flt(suNg_field_flt *u)
-{
-  afree(u->ptr);
-#ifdef WITH_MPI
-  afree(u->comm_req);   
-#endif
-  afree(u);
-}
-
-suNg_field_flt* alloc_gfield_flt(geometry_descriptor* type)
-{
-  int ix;
-  suNg_flt unity;
-  suNg_field_flt *gf;
-
-  gf=amalloc(sizeof(suNg_field_flt),ALIGN);
-  error(gf==NULL,1,"alloc_gfield [field_alloc.c]",
-	"Could not allocate memory space for the gauge field (1)");
-  gf->ptr=amalloc(4*type->gsize_gauge*sizeof(suNg_flt),ALIGN);
-  error((gf->ptr)==NULL,1,"alloc_gfield [field_alloc.c]",
-	"Could not allocate memory space for the gauge field (2)");
-
-  gf->type=type;
-
-#ifdef WITH_MPI
-  if (type->nbuffers_gauge>0) {
-    gf->comm_req=amalloc(2*type->nbuffers_gauge*sizeof(MPI_Request),ALIGN);
-    error((gf->comm_req)==NULL,1,"alloc_gfield [field_alloc.c]",
-	  "Could not allocate memory space for the gauge field (3)");
-     for (ix=0; ix<2*type->nbuffers_gauge; ++ix)
-       gf->comm_req[ix]=MPI_REQUEST_NULL;
-  } else {
-    gf->comm_req=NULL;
-  }
-#endif
-
-
-  /* set gauge field to unity */
-  _suNg_unit(unity);
-  for (ix=0;ix<4*type->gsize_gauge;++ix)
-    *((gf->ptr)+ix)=unity;
-
-  return gf;
-}
-
-void free_gfield_f_flt(suNf_field_flt *u)
-{
-  afree(u->ptr);
-#ifdef WITH_MPI
-  afree(u->comm_req);   
-#endif
-  afree(u);
-}
-
-suNf_field_flt* alloc_gfield_f_flt(geometry_descriptor* type)
-{
-  int ix;
-  suNf_flt unity;
-  suNf_field_flt *gf;
-
-  gf=amalloc(sizeof(suNf_field_flt),ALIGN);
-  error(gf==NULL,1,"alloc_gfield [field_alloc.c]",
-	"Could not allocate memory space for the gauge field (1)");
-  gf->ptr=amalloc(4*type->gsize_gauge*sizeof(suNf_flt),ALIGN);
-  error((gf->ptr)==NULL,1,"alloc_gfield [field_alloc.c]",
-	"Could not allocate memory space for the gauge field (2)");
-
-  gf->type=type;
-
-#ifdef WITH_MPI
-  if (type->nbuffers_gauge>0) {
-    gf->comm_req=amalloc(2*type->nbuffers_gauge*sizeof(MPI_Request),ALIGN);
-    error((gf->comm_req)==NULL,1,"alloc_gfield [field_alloc.c]",
-	  "Could not allocate memory space for the gauge field (3)");
-     for (ix=0; ix<2*type->nbuffers_gauge; ++ix)
-       gf->comm_req[ix]=MPI_REQUEST_NULL;
-  } else {
-    gf->comm_req=NULL;
-  }
-#endif
-
-  /* set gauge field to unity */
-  _suNf_unit(unity);
-  for (ix=0;ix<4*type->gsize_gauge;++ix)
-    *((gf->ptr)+ix)=unity;
-
-  return gf;
-}
-
-void free_avfield(suNg_av_field *u)
-{
-   afree(u->ptr);
-#ifdef WITH_MPI
-   afree(u->comm_req);   
-#endif
-   afree(u);
-}
-
-suNg_av_field *alloc_avfield(geometry_descriptor* type)
-{
-#ifdef WITH_MPI
-   int ix;
-#endif
-   suNg_av_field *af;
-
-   af=amalloc(sizeof(*af),ALIGN);
-   error(af==NULL,1,"alloc_avfield [field_alloc.c]",
-         "Could not allocate memory space for the av field (1)");
-   af->ptr=amalloc(4*type->gsize_gauge*sizeof(*(af->ptr)),ALIGN);
-   error((af->ptr)==NULL,1,"alloc_avfield [field_alloc.c]",
-         "Could not allocate memory space for the av field (2)");
-
-   af->type=type;
-
-#ifdef WITH_MPI
-   if (type->nbuffers_gauge>0) {
-     af->comm_req=amalloc(2*type->nbuffers_gauge*sizeof(*(af->comm_req)),ALIGN);
-     error((af->comm_req)==NULL,1,"alloc_avfield [field_alloc.c]",
-	   "Could not allocate memory space for the av field (3)");
-     for (ix=0; ix<2*type->nbuffers_gauge; ++ix)
-       af->comm_req[ix]=MPI_REQUEST_NULL;
-   } else {
-     af->comm_req=NULL;
-   }
-#endif
-
-   return af;
-}
-
-void free_sfield(scalar_field *u)
-{
-   afree(u->ptr);
-#ifdef WITH_MPI
-   afree(u->comm_req);   
-#endif
-   afree(u);
-}
-
-scalar_field *alloc_sfield(geometry_descriptor* type)
-{
-#ifdef WITH_MPI
-   int ix;
-#endif
-   scalar_field *af;
-
-   af=amalloc(sizeof(*af),ALIGN);
-   error(af==NULL,1,"alloc_sfield [field_alloc.c]",
-         "Could not allocate memory space for the s field (1)");
-   af->ptr=amalloc(type->gsize_spinor*sizeof(*(af->ptr)),ALIGN);
-   error((af->ptr)==NULL,1,"alloc_sfield [field_alloc.c]",
-         "Could not allocate memory space for the s field (2)");
-
-   af->type=type;
-
-#ifdef WITH_MPI
-   if (type->nbuffers_spinor>0) {
-     af->comm_req=amalloc(2*type->nbuffers_spinor*sizeof(*(af->comm_req)),ALIGN);
-     error((af->comm_req)==NULL,1,"alloc_avfield [field_alloc.c]",
-	   "Could not allocate memory space for the av field (3)");
-     for (ix=0; ix<2*type->nbuffers_spinor; ++ix)
-       af->comm_req[ix]=MPI_REQUEST_NULL;
-   } else {
-     af->comm_req=NULL;
-   }
-#endif
-
-   return af;
+/* allocation function */
+#define _DECLARE_ALLOC_FUNC(_name,_type,_size)\
+_type *alloc_##_name(geometry_descriptor *type){ \
+_type *f;\
+\
+f=amalloc(sizeof(*f),ALIGN);\
+error(f==NULL,1,"alloc_" #_name " [" __FILE__ "]",\
+"Could not allocate memory space for field (structure)");\
+f->type=type;\
+\
+if(alloc_mem_t & CPU_MEM) {\
+f->ptr=amalloc(_size*type->gsize_gauge*sizeof(*(f->ptr)),ALIGN);\
+error((f->ptr)==NULL,1,"alloc_" #_name " [" __FILE__ "]",\
+"Could not allocate memory space for field (data)");\
+} else { f->ptr=NULL; }\
+\
+_ALLOC_GPU_CODE(_name,_size);\
+\
+_ALLOC_MPI_CODE(_name);\
+\
+return f;\
 }
 
 
-suNg_field *alloc_gtransf(geometry_descriptor* type)
-{
-   int ix;
-   suNg unity;
-   suNg_field *gf;
 
-   gf=amalloc(sizeof(suNg_field),ALIGN);
-   error(gf==NULL,1,"alloc_gtransf [field_alloc.c]",
-         "Could not allocate memory space for the gauge transformation (1)");
-   gf->ptr=amalloc(type->gsize_gauge*sizeof(suNg),ALIGN);
-   error((gf->ptr)==NULL,1,"alloc_gtransf [field_alloc.c]",
-         "Could not allocate memory space for the gauge transformation (2)");
+/*
+ _name = suffix of the allocation and deallocation functions
+ _type = field type to allocate/deallocate
+ _size = the number of elementary objects per lattice site
+ */
 
-   gf->type=type;
+#define _DECLARE_MEMORY_FUNC(_name,_type,_size) \
+_DECLARE_FREE_FUNC(_name,_type);\
+_DECLARE_ALLOC_FUNC(_name,_type,_size)
 
-#ifdef WITH_MPI
-   if (type->nbuffers_gauge>0) {
-     gf->comm_req=amalloc(2*type->nbuffers_gauge*sizeof(MPI_Request),ALIGN);
-     error((gf->comm_req)==NULL,1,"alloc_gtransf [field_alloc.c]",
-	   "Could not allocate memory space for the gauge transformation (3)");
-     for (ix=0; ix<2*type->nbuffers_gauge; ++ix)
-       gf->comm_req[ix]=MPI_REQUEST_NULL;
-   } else {
-     gf->comm_req=NULL;
-   }
-#endif
 
-   /* set gauge field to unity */
-   _suNg_unit(unity);
-   for (ix=0;ix<type->gsize_gauge;++ix)
-     *((gf->ptr)+ix)=unity;
+_DECLARE_MEMORY_FUNC(gfield, suNg_field, 4);
+_DECLARE_MEMORY_FUNC(gfield_flt, suNg_field_flt, 4);
 
-   return gf;
-}
+_DECLARE_MEMORY_FUNC(gfield_f, suNf_field, 4);
+_DECLARE_MEMORY_FUNC(gfield_f_flt, suNf_field_flt, 4);
 
-void free_gtransf(suNg_field *u)
-{
-  afree(u->ptr);
-#ifdef WITH_MPI
-  afree(u->comm_req);   
-#endif
-  afree(u);
-}
+_DECLARE_MEMORY_FUNC(avfield, suNg_av_field, 4);
+
+_DECLARE_MEMORY_FUNC(gtransf, suNg_field, 1);
 

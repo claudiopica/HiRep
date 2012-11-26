@@ -113,7 +113,7 @@ void init_force_rhmc() {
 }
 
 void free_force_rhmc() {
-  free_spinor_field(chi);
+  free_spinor_field_f(chi);
 }
 
 
@@ -151,7 +151,7 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar){
   rational_app *ratio = par->ratio;
   
   if(n_ws<ratio->order+1) {
-    if(chi!=NULL) free_spinor_field(chi);
+    if(chi!=NULL) free_spinor_field_f(chi);
     n_ws = ratio->order+1;
     chi = alloc_spinor_field_f(n_ws,&glattice);
     Hchi = chi+n_ws-1;

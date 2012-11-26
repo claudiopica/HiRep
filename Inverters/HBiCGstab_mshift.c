@@ -234,7 +234,7 @@ int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spino
 #endif
    
   /* free memory */
-  free_spinor_field(s);
+  free_spinor_field_f(s);
   free(z1);
   free(sflags);
 

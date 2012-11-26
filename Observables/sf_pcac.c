@@ -269,8 +269,8 @@ void SF_PCAC_wall_mass(double mass, double acc )
 
 
 
-  free_spinor_field(source);
-  free_spinor_field(prop);
+  free_spinor_field_f(source);
+  free_spinor_field_f(prop);
   
 
   free(stmp);
@@ -482,8 +482,8 @@ Q+ = |             | * 1/2
   lprintf("PC_twisted_AC",10," g1_ud_+ = %.10e\n",g1);	
   lprintf("PC_twisted_AC",10,"\n");
 
-  free_spinor_field(prop);
-  free_spinor_field(source);
+  free_spinor_field_f(prop);
+  free_spinor_field_f(source);
   free(stmp);
   free(sbord[0]);
   

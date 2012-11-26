@@ -147,8 +147,8 @@ int main(int argc,char *argv[])
   free_gfield_f(u_gauge_f);
 #endif
   free_gfield_f_flt(u_gauge_f_flt);
-  free_spinor_field(s0);
-  free_spinor_field_flt(f0);
+  free_spinor_field_f(s0);
+  free_spinor_field_f_flt(f0);
     
   finalize_process();
   exit(0);

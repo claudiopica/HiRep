@@ -164,7 +164,7 @@ static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, spi
   } 
    
   /* free memory */
-  free_spinor_field(memall);
+  free_spinor_field_f(memall);
 
   /* return number of cg iter */
   return cgiter;
@@ -357,7 +357,7 @@ static int MINRES_core_flt(short int *valid, MINRES_par *par, spinor_operator_fl
   } 
    
   /* free memory */
-  free_spinor_field_flt(memall);
+  free_spinor_field_f_flt(memall);
 
   /* return number of cg iter */
   return cgiter;

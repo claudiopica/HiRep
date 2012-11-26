@@ -199,7 +199,7 @@ int main(int argc,char *argv[])
 
   free_gfield(u_gauge);
   free_gfield_f(u_gauge_f);
-  free_spinor_field(s0);
+  free_spinor_field_f(s0);
 
   free_gtransf(g);
   
