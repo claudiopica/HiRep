@@ -36,7 +36,7 @@ MACRO += -DIO_FLUSH
 #Compiler
 #export OMPI_CC = ccache gcc
 ifeq (,$(findstring -DWITH_GPU,$(MACRO))) #Compile CPU only
-CC = mpicc
+CC = gcc
 CFLAGS = -Wall -std=c99 -O2 -fomit-frame-pointer -mfpmath=sse -msse -msse2 
 #CFLAGS = -Wall -std=c99 -g -mfpmath=sse -msse -msse2 
 else #Compile with GPU
@@ -58,8 +58,8 @@ MACRO += -D$(REPR) -DREPR_NAME=\"$(REPR)\"
 
 #CFLAGS += -std=c99
 
-WQUAT = $(if $(findstring -DWITH_QUATERNIONS,$(MACRO)),1,0)
-WQUAT = $(if $(findstring -DWITH_REPRESENT_ON_FLY,$(MACRO)),2,$WQUAT)
+#WQUAT = $(if $(findstring -DWITH_QUATERNIONS,$(MACRO)),1,0)
+WQUAT = $(if $(findstring -DWITH_REPRESENT_ON_FLY,$(MACRO)),2,0)
 
 #Include
 INCDIR = $(TOPDIR)/Include

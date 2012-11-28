@@ -309,7 +309,7 @@ int end_mc() {
   free_gfield_f(u_gauge_f);
   free_gfield_f_flt(u_gauge_f_flt);
 #else
-  free(u_gauge_f_flt);
+  free_gfield_flt(u_gauge_flt);
 #endif
 
 

@@ -27,7 +27,7 @@ MODS := gauss random_suNg ranlxs ranlxd random_fields ranz2
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Update
-MODS := Dphi Dphi_flt random_spinor_field random_su2 representation Dphi_gpu Dphi_flt_gpu random_spinor_field_gpu
+MODS := Dphi Dphi_flt random_spinor_field random_su2 representation Dphi_gpu Dphi_flt_gpu random_spinor_field_gpu representation_gpu
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Error

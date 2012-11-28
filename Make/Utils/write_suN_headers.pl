@@ -288,7 +288,7 @@ print <<END
 END
 ;
 
-if ($su2quat==0 or $su2quat==2) {
+if ($su2quat==0) {
   write_suN_dagger();
   write_suN_times_suN();
   write_suN_times_suN_dagger();
@@ -322,12 +322,12 @@ if ($su2quat==0 or $su2quat==2) {
     write_suNr_minus();
   }
 
-} else {
+} elsif($su2quat==1) {
     write_su2_dagger();
     write_su2_times_su2();
     write_su2_times_su2_dagger();
     write_su2_dagger_times_su2();
-	write_su2_zero();
+    write_su2_zero();
     write_su2_unit();
     write_su2_minus();
     write_su2_mul();
@@ -345,6 +345,25 @@ if ($su2quat==0 or $su2quat==2) {
     }
     
     write_su2_exp();
+} else{
+    write_onfly_suN_dagger();
+    write_onfly_suN_times_suN();
+    write_onfly_suN_times_suN_dagger();
+    write_onfly_suN_dagger_times_suN();
+    write_onfly_suN_zero();
+    write_onfly_suN_unit();
+    write_onfly_suN_minus();
+    write_onfly_suN_mul();
+    write_onfly_suN_add_assign();
+    write_onfly_suN_sub_assign();
+    write_onfly_suN_sqnorm();
+    write_onfly_suN_sqnorm_m1();
+    write_onfly_suN_trace_re();
+    write_onfly_suN_trace_im();
+    write_suN_FMAT(); #this is the same as before
+    if ($complex eq "R") {
+        write_suNr_FMAT(); #this is the same as before
+    }
 }
 
     my ($ldn,$lrdn)=($dataname,$rdataname);
@@ -2926,7 +2945,7 @@ sub write_su2_inverse_multiply {
 
 
 sub write_su2_dagger {
-    print "/* u=v^dagger */\n";
+    print "/ *u=v^dagger */\n";
     if ($N==2) {
     	print "#define _${dataname}_dagger(u,v) \\\n";
         print "   (u).$cname\[0\]=(v).$cname\[0\]; \\\n";
@@ -3214,6 +3233,143 @@ sub write_su3_onfly_inverse_multiply{
      }
 }
 
+sub write_onfly_suN_dagger {
+    if ($N==3) {
+	write_suN_dagger();
+    } else {
+	print "/*u=v^dagger */\n";
+    	print "#define _${basename}${repsuff}_dagger(u,v) _${basename}${fundsuff}_dagger((u),(v))\n\n";
+    }
+}    
+
+sub write_onfly_suN_zero {
+    if ($N==3) {
+	write_suN_zero();
+    } else {
+	print "/* u=0 */\n";
+    	print "#define _${basename}${repsuff}_zero(u) _${basename}${fundsuff}_zero((u))\n\n";
+    }
+}   
+
+sub write_onfly_suN_unit {
+    if ($N==3) {
+	write_suN_unit();
+    } else {
+	print "/* u=1 */\n";
+    	print "#define _${basename}${repsuff}_unit(u) _${basename}${fundsuff}_unit((u))\n\n";
+    }
+}  
+
+sub write_onfly_suN_minus {
+    if ($N==3) {
+	write_suN_minus();
+    } else {
+	print "/* u=-v */\n";
+    	print "#define _${basename}${repsuff}_minus(u,v) _${basename}${fundsuff}_minus((u),(v))\n\n";
+    }
+}    
+
+sub write_onfly_suN_add_assign{
+    if ($N==3) {
+	write_suN_add_assign();
+    } else {
+	print "/* u+=v */\n";
+    	print "#define _${basename}${repsuff}_add_assign(u,v) _${basename}${fundsuff}_add_assign((u),(v))\n\n";
+    }
+}    
+
+sub write_onfly_suN_sub_assign{
+    if ($N==3) {
+	write_suN_sub_assign();	
+    } else {
+	print "/* u-=v */\n";
+    	print "#define _${basename}${repsuff}_sub_assign(u,v) _${basename}${fundsuff}_sub_assign((u),(v))\n\n";
+    }
+}    
+
+sub write_onfly_suN_mul{
+    if ($N==3) {
+	write_suN_mul();
+    } else {
+	print "/* u=r*v (u,v mat, r real) */\n";
+    	print "#define _${basename}${repsuff}_mul(u,r,v) _${basename}${fundsuff}_mul((u),(r),(v))\n\n";
+    }
+}    
+
+sub write_onfly_suN_trace_re{
+    if ($N==3) { #fundamental representation
+	write_suN_trace_re();
+    } elsif ($N==6) { #symmetric representation
+	print "/* k=Re Tr (u) */\n";
+        print "#define _${rdataname}_trace_re(k,u) \\\n";
+
+	print "   (k)=(u).$cname\[0\].re*(u).$cname\[0\].re-(u).$cname\[0\].im*(u).$cname\[0\].im+(u).$cname\[1\].re*(u).$cname\[3\].re-(u).$cname\[1\].im*(u).$cname\[3\].im+(u).$cname\[0\].re*(u).$cname\[4\].re-(u).$cname\[0\].im*(u).$cname\[4\].im+(u).$cname\[4\].re*(u).$cname\[4\].re-(u).$cname\[4\].im*(u).$cname\[4\].im+(u).$cname\[2\].re*(u).$cname\[6\].re-(u).$cname\[2\].im*(u).$cname\[6\].im+(u).$cname\[5\].re*(u).$cname\[7\].re-(u).$cname\[5\].im*(u).$cname\[7\].im+(u).$cname\[0\].re*(u).$cname\[8\].re-(u).$cname\[0\].im*(u).$cname\[8\].im+(u).$cname\[4\].re*(u).$cname\[8\].re-(u).$cname\[4\].im*(u).$cname\[8\].im+(u).$cname\[8\].re*(u).$cname\[8\].re-(u).$cname\[8\].im*(u).$cname\[8\].im;\n\n";
+    } else {
+        die("Undefined fermion representation in onfly multiply code ( write_onfly_suN_trace_re). Exiting...\n");
+    }
+}    
+
+sub write_onfly_suN_trace_im{
+    if ($N==3) { #fundamental representation
+	write_suN_trace_im();
+    } elsif ($N==6) { #symmetric representation
+	print "/* k=Im Tr (u) */\n";
+        print "#define _${rdataname}_trace_im(k,u) \\\n";
+        print "   (k)=+(u).$cname\[0\].im*(u).$cname\[0\].re+(u).$cname\[0\].re*(u).$cname\[0\].im+(u).$cname\[1\].im*(u).$cname\[3\].re+(u).$cname\[1\].re*(u).$cname\[3\].im+(u).$cname\[0\].im*(u).$cname\[4\].re+(u).$cname\[0\].re*(u).$cname\[4\].im+(u).$cname\[4\].im*(u).$cname\[4\].re+(u).$cname\[4\].re*(u).$cname\[4\].im+(u).$cname\[2\].im*(u).$cname\[6\].re+(u).$cname\[2\].re*(u).$cname\[6\].im+(u).$cname\[5\].im*(u).$cname\[7\].re+(u).$cname\[5\].re*(u).$cname\[7\].im+(u).$cname\[0\].im*(u).$cname\[8\].re+(u).$cname\[0\].re*(u).$cname\[8\].im+(u).$cname\[4\].im*(u).$cname\[8\].re+(u).$cname\[4\].re*(u).$cname\[8\].im+(u).$cname\[8\].im*(u).$cname\[8\].re+(u).$cname\[8\].re*(u).$cname\[8\].im;\n\n";
+    } else {
+        die("Undefined fermion representation in quaternionic code ( write_onfly_suN_trace_im). Exiting...\n");
+    }    
+}    
+
+sub write_onfly_suN_times_suN{
+    if ($N==3) {
+	write_suN_times_suN();
+    } else {
+	print "/* u=v*w */\n";
+    	print "#define _${basename}${repsuff}_times_${basename}${repsuff}(u,v,w) _${basename}${fundsuff}_times_${basename}${fundsuff}((u),(v),(w))\n\n";
+    }
+}
+
+sub write_onfly_suN_times_suN_dagger{
+    if ($N==3) {
+	write_suN_times_suN_dagger();
+    } else {
+	print "/* u=v*w^+ */\n";
+    	print "#define _${basename}${repsuff}_times_${basename}${repsuff}_dagger(u,v,w) _${basename}${fundsuff}_times_${basename}${fundsuff}_dagger((u),(v),(w))\n\n";
+    }
+}
+
+sub write_onfly_suN_dagger_times_suN{
+    if ($N==3) {
+	write_suN_dagger_times_suN();
+    } else {
+	print "/* u=v^+*w */\n";
+    	print "#define _${basename}${repsuff}_dagger_times_${basename}${repsuff}(u,v,w) _${basename}${fundsuff}_dagger_times_${basename}${fundsuff}((u),(v),(w))\n\n";
+    }
+}
+
+sub write_onfly_suN_sqnorm {
+    if ($N==3) { #fundamental representation
+	write_suN_sqnorm();
+    } elsif ($N==6) { #symmetric representation
+	print "/* k=| u |2 ) */\n";
+        print "#define _${rdataname}_sqnorm(k,u) \\\n";
+        print "   error not implemented\n\n";
+    } else {
+        die("Undefined fermion representation in quaternionic code ( write_onfly_suN_sqnorm). Exiting...\n");
+    }    
+}
+
+sub write_onfly_suN_sqnorm_m1 {
+    if ($N==3) { #fundamental representation
+	write_suN_sqnorm_m1();
+    } elsif ($N==6) { #symmetric representation
+        print "#define _${rdataname}_sqnorm_m1(k,u) \\\n";
+        print "   error not implemented\n\n";
+    } else {
+        die("Undefined fermion representation in quaternionic code (write_onfly_sqnorm_m1). Exiting...\n");
+    }    
+}
 
 sub  write_read_spinor_gpu {
     my $i;
@@ -3296,6 +3452,9 @@ sub write_su2_read_gpu {
     }
 
 }
+
+
+
 
 sub write_su2_write_gpu {
     print "/* Write an suN matrix to GPU memory */\n";

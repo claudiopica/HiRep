@@ -134,6 +134,7 @@ typedef struct _suNf_hspinor
 
 #define __asm_sync asm volatile("membar.cta;");
 //#define __asm_sync
+#define GPU_KEPLER
 
 #ifdef GPU_KEPLER
 
