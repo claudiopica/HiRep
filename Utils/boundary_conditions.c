@@ -731,11 +731,11 @@ static void sf_Dirichlet_BCs(spinor_field *sp) {
   if(COORD[0] == 0) {
     for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
       index=ipt_ext(T_BORDER,ix,iy,iz);
-      if(index!=-1 && sp->type->master_shift >= index && sp->type->master_shift+ sp->type->gsize_spinor < index  ) {
+      if(index!=-1 && sp->type->master_shift <= index && sp->type->master_shift+sp->type->gsize_spinor > index  ) {
         _spinor_zero_f(*_FIELD_AT(sp,index));
       }
       index=ipt_ext(T_BORDER+1,ix,iy,iz);
-      if(index!=-1 && sp->type->master_shift >= index && sp->type->master_shift+ sp->type->gsize_spinor < index ) {
+      if(index!=-1 && sp->type->master_shift <= index && sp->type->master_shift+sp->type->gsize_spinor > index ) {
         _spinor_zero_f(*_FIELD_AT(sp,index));
       }
     }
@@ -743,7 +743,7 @@ static void sf_Dirichlet_BCs(spinor_field *sp) {
   if(COORD[0] == NP_T-1) {
     for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
       index=ipt_ext(T+T_BORDER-1,ix,iy,iz);
-      if(index!=-1 && sp->type->master_shift >= index && sp->type->master_shift+ sp->type->gsize_spinor < index ) {
+      if(index!=-1 && sp->type->master_shift <= index && sp->type->master_shift+sp->type->gsize_spinor > index ) {
         _spinor_zero_f(*_FIELD_AT(sp,index));
       }
     }
@@ -756,11 +756,11 @@ static void sf_Dirichlet_BCs_flt(spinor_field_flt *sp) {
   if(COORD[0] == 0) {
     for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
       index=ipt_ext(T_BORDER,ix,iy,iz);
-      if(index!=-1 && sp->type->master_shift >= index && sp->type->master_shift+ sp->type->gsize_spinor < index ) {
+      if(index!=-1 && sp->type->master_shift <= index && sp->type->master_shift+sp->type->gsize_spinor > index ) {
         _spinor_zero_f(*_FIELD_AT(sp,index));
       }
       index=ipt_ext(T_BORDER+1,ix,iy,iz);
-      if(index!=-1 && sp->type->master_shift >= index && sp->type->master_shift+ sp->type->gsize_spinor < index ) {
+      if(index!=-1 && sp->type->master_shift <= index && sp->type->master_shift+sp->type->gsize_spinor > index ) {
         _spinor_zero_f(*_FIELD_AT(sp,index));
       }
     }
@@ -768,7 +768,7 @@ static void sf_Dirichlet_BCs_flt(spinor_field_flt *sp) {
   if(COORD[0] == NP_T-1) {
     for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
       index=ipt_ext(T+T_BORDER-1,ix,iy,iz);
-      if(index!=-1 && sp->type->master_shift >= index && sp->type->master_shift+ sp->type->gsize_spinor < index ) {
+      if(index!=-1 && sp->type->master_shift <= index && sp->type->master_shift+sp->type->gsize_spinor > index ) {
         _spinor_zero_f(*_FIELD_AT(sp,index));
       }
     }
@@ -781,7 +781,7 @@ static void sf_open_BCs(spinor_field *sp) {
   if(COORD[0] == 0) {
     for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
       index=ipt_ext(T_BORDER,ix,iy,iz);
-      if(index!=-1 && sp->type->master_shift >= index && sp->type->master_shift+ sp->type->gsize_spinor < index ) {
+      if(index!=-1 && sp->type->master_shift <= index && sp->type->master_shift+sp->type->gsize_spinor > index ) {
         _spinor_zero_f(*_FIELD_AT(sp,index));
       }
     }
@@ -794,7 +794,7 @@ static void sf_open_BCs_flt(spinor_field_flt *sp) {
   if(COORD[0] == 0) {
     for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
       index=ipt_ext(T_BORDER,ix,iy,iz);
-      if(index!=-1 && sp->type->master_shift >= index && sp->type->master_shift+ sp->type->gsize_spinor < index ) {
+      if(index!=-1 && sp->type->master_shift <= index && sp->type->master_shift+sp->type->gsize_spinor > index ) {
         _spinor_zero_f(*_FIELD_AT(sp,index));
       }
     }
