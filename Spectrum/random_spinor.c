@@ -65,8 +65,11 @@ int main(int argc,char *argv[]) {
   spinor_field* sp;
 
   /* setup process id and communications */
+  read_cmdline(argc, argv);
   setup_process(&argc,&argv);
 
+  read_input(glb_ip.read,input_filename);
+  setup_replicas();
 
   /* logger setup */
   /* disable logger for MPI processes != 0 */
@@ -78,8 +81,6 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
 
   /* read & broadcast parameters */
-  read_cmdline(argc, argv);
-  read_input(glb_ip.read,input_filename);
 
   lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_ip.rlxd_level,glb_ip.rlxd_seed);
   rlxd_init(glb_ip.rlxd_level,glb_ip.rlxd_seed+PID);

@@ -245,6 +245,9 @@ int main(int argc,char *argv[]) {
   read_cmdline(argc, argv);
   setup_process(&argc,&argv);
 
+  read_input(glb_var.read,input_filename);
+  setup_replicas();
+
   /* logger setup */
   /* disable logger for MPI processes != 0 */
   logger_setlevel(0,70);
@@ -267,7 +270,6 @@ int main(int argc,char *argv[]) {
   
   HYP_var.weight[0]=HYP_var.weight[1]=HYP_var.weight[2]=0.;
   for(i=0;i<10;i++) { WL_var.c[i][0]=WL_var.c[i][1]=WL_var.c[i][2]=WL_var.nsteps[i]=0; }
-  read_input(glb_var.read,input_filename);
   read_input(HYP_var.read,input_filename);
   read_input(WL_var.read,input_filename);
   GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;

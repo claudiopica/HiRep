@@ -249,6 +249,9 @@ int main(int argc,char *argv[]) {
   read_cmdline(argc, argv);
   setup_process(&argc,&argv);
 
+  read_input(glb_var.read,input_filename);
+  setup_replicas();
+
   /* logger setup */
   /* disable logger for MPI processes != 0 */
   logger_setlevel(0,30);
@@ -293,7 +296,6 @@ int main(int argc,char *argv[]) {
 #undef remove_parameter
 */
 
-  read_input(glb_var.read,input_filename);
   read_input(mes_var.read,input_filename);
   GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
   error(fpars.type==UNKNOWN_CNFG,1,"mk_mesons.c","Bad name for a configuration file");

@@ -160,6 +160,9 @@ int main(int argc,char *argv[]) {
   read_cmdline(argc, argv);
   setup_process(&argc,&argv);
 
+  read_input(glb_var.read,input_filename);
+  setup_replicas();
+
   /* logger setup */
   /* disable logger for MPI processes != 0 */
   logger_setlevel(0,70);
@@ -180,7 +183,6 @@ int main(int argc,char *argv[]) {
   /* read & broadcast parameters */
   parse_cnfg_filename(cnfg_filename,&fpars);
 
-  read_input(glb_var.read,input_filename);
   GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
   error(fpars.type==UNKNOWN_CNFG,1,"polyakov_loops.c","Bad name for a configuration file");
   error(fpars.nc!=NG,1,"polyakov_loops.c","Bad NG");
