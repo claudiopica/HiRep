@@ -15,30 +15,78 @@
 
 /*
 #define EXP_CHECK
+#define PLAQ_CHECK
 */
 
 /*
-* S(x,mu) = staple in (x,mu)
-* Z(A,x,mu) += - alpha * P_{AS,tl}[ U(x,mu).S(x,mu) ]
+* d/dt V = Z(V) V
+* S_W = 1/g^2 \sum_{p oriented} Re tr ( 1 - V(p) )
+* d_L f(V) = T^a d/ds f(e^{sT^a} V)
+* T_a^dag = -T_a      tr T_a T_b = -delta_{ab}/2
+* Z(V) = -g^2 d_L S_W = \sum_{p oriented} d_L Re tr ( V(p) )
+* Z(V) = d_L Re ( tr V s + tr V^dag s^dag ) =
+*      = d_L ( tr V s + tr V^dag s^dag ) =
+*      = T^a tr T^a ( V s - s^dag V^dag )
+*      = - 1/2 ( V s - s^dag V^dag - 1/N tr (V s - s^dag V^dag) )
 */
 static void Zeta(suNg_field *Z, const suNg_field* U, const double alpha){
-  suNg s1,s2;
-  int mu, n;
+  suNg staple, tmp1, tmp2;
+  suNg *u1, *u2, *u3;
+  int mu, nu, j, k;
+  double imtr;
   _DECLARE_INT_ITERATOR(i);
+  #ifdef PLAQ_CHECK
+  double retr, plaq=0.;
+  #endif
 
   error(Z->type!=&glattice,1,"wilson_flow.c","'Z' in Zeta must be defined on the whole lattice");
   error(U->type!=&glattice,1,"wilson_flow.c","'U' in Zeta must be defined on the whole lattice");
 
   _MASTER_FOR(&glattice,i) {
     for (mu=0; mu<4; ++mu) {
-      staples(i,mu,&s1);
-      _suNg_times_suNg_dagger(s2,*_4FIELD_AT(U,i,mu),s1);
-      _suNg_2TA(s1,s2);
-      for(n=0; n<NG*NG; n++) {
-      	_complex_mulr_assign(_4FIELD_AT(Z,i,mu)->c[n],-alpha/2.,s1.c[n]);
+      _suNg_zero(staple);
+      for(nu=(mu+1)%4; nu!=mu; nu=(nu+1)%4) {
+        u1=_4FIELD_AT(U,iup(i,mu),nu);
+        u2=_4FIELD_AT(U,iup(i,nu),mu);
+        u3=_4FIELD_AT(U,i,nu);
+        _suNg_times_suNg_dagger(tmp1,*u1,*u2);
+        _suNg_times_suNg_dagger(tmp2,tmp1,*u3);
+        _suNg_add_assign(staple,tmp2);
+        
+        j=idn(i,nu);
+        u1=_4FIELD_AT(U,iup(j,mu),nu);
+        u2=_4FIELD_AT(U,j,mu);
+        u3=_4FIELD_AT(U,j,nu);
+        _suNg_times_suNg(tmp1,*u2,*u1);
+        _suNg_dagger_times_suNg(tmp2,tmp1,*u3);
+        _suNg_add_assign(staple,tmp2);
+      }
+      
+      _suNg_times_suNg(tmp1,*_4FIELD_AT(U,i,mu),staple);
+      
+      #ifdef PLAQ_CHECK
+      _suNg_trace_re(retr,tmp1);
+      plaq += retr/(NG*6);
+      #endif
+      
+      _suNg_dagger(tmp2,tmp1);
+      _suNg_sub_assign(tmp1,tmp2);
+      _suNg_trace_im(imtr,tmp1);
+      imtr = imtr/NG;
+      for(k=0;k<NG*NG;k+=NG+1) {
+        tmp1.c[k].im -= imtr;
+      }
+      
+      for(k=0; k<NG*NG; k++) {
+      	_complex_mulr_assign(_4FIELD_AT(Z,i,mu)->c[k],-alpha/2.,tmp1.c[k]);
       }
     }
   }
+  
+  #ifdef PLAQ_CHECK
+  plaq /= (4*GLB_T*GLB_X*GLB_Y*GLB_Z);
+  lprintf("WILSONFLOW",0,"ZETA Plaquette check %f %e\n",plaq,24.*(1.-plaq));
+  #endif
 }
 
 
