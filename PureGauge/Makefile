@@ -1,7 +1,7 @@
 TOPDIR = ..
 MKDIR=$(TOPDIR)/Make
 
-EXES = soN
+EXES = suN
 
 default: $(EXES)
 
