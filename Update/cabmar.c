@@ -87,8 +87,8 @@ void cabmar(double beta,suNg *u,suNg *v,int type)
 	  s[2]=fact*w[2];
 	  s[3]=fact*w[3];         
 	} else {
-	  fact=(float)(sqrt((double)(wsq)));
-	  rho=b*fact;
+	  fact=(float)(sqrt((double)(wsq))); // k
+	  rho=b*fact;						// total weight for a_0
 	  
 	  random_su2(rho,r);
 	  

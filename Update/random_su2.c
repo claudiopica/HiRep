@@ -11,6 +11,17 @@
 *
 *******************************************************************************/
 
+// Maybe the following are already there
+
+#ifndef max
+	#define max( a, b ) ( ((a) > (b)) ? (a) : (b) )
+#endif
+
+#ifndef min
+	#define min( a, b ) ( ((a) < (b)) ? (a) : (b) )
+#endif
+
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -165,3 +176,61 @@ void random_su2(double rho,double s[])
    i_vec+=1;
 }
 
+
+double random_so2(double a)
+//
+//  Computes a random angle theta \in [-\pi,\pi] with probability density
+//  proportional to exp(a*\cos(theta)) assuming rho>=0
+//
+{
+
+double x,xprime,epsi,astar,mas,alpha,beta,delta,betafrac,hx,gx;
+ 
+ //  Method used here:
+ // arXiv:hep-lat/9210016v1
+ // "IMPROVEMENT OF EFFICIENCY IN GENERATING RANDOM U(1) 
+ //                    VARIABLES WITH BOLTZMANN DISTRIBUTION"
+ // By T.Hattori and H.Nakajima
+ /*
+ %\cite{Hattori:1992qk}
+\bibitem{Hattori:1992qk} 
+  T.~Hattori and H.~Nakajima,
+  %``Improvement of efficiency in generating random U(1) variables with Boltzmann distribution,''
+  Nucl.\ Phys.\ Proc.\ Suppl.\  {\bf 26}, 635 (1992)
+  [hep-lat/9210016].
+  %%CITATION = HEP-LAT/9210016;%%
+  */      
+      
+      for (;;)
+      {
+         if (i_v==NRAN)	// Making sure we have enough random numbers
+         {
+            ranlxd(v,NRAN);
+            i_v=0;
+         }
+
+		epsi	= 0.001;
+		astar	= 0.798953686083986;
+		mas		= max(0,a-astar);
+		delta=0.35*mas+1.03*sqrt(mas);
+		
+		// Step 1
+		alpha=min(sqrt(a*(2-epsi)),max(sqrt(epsi*a),delta));
+		beta=max(alpha*alpha/a,(cosh(PI*alpha)-1)/(exp(2*a)-1))-1;
+		
+		// Step 2
+		betafrac=sqrt((1+beta)/(1-beta));
+		x=v[i_v++];
+        xprime=v[i_v++];				// Random number in [0 ; 1[
+        hx=(2/alpha)*atanh(   betafrac*tan(  (2*x-1)*atan(  tanh(PI*alpha/2)/betafrac  )  )  );
+		gx=exp(-a*(1-cos(hx)))*(cosh(alpha*hx)+beta)/(1+beta);
+         
+         if (xprime <= gx)
+         {
+         	return hx;
+            break;
+    	 }
+      }
+   
+
+}

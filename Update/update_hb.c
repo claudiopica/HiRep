@@ -68,7 +68,7 @@ void update(double beta,int nhb,int nor)
    for (n=0;n<nhb;n++)
       update_all(beta,0);
 
-   for (n=0;n<nor;n++)
-      update_all(beta,1);
+//   for (n=0;n<nor;n++)
+//      update_all(beta,1);
 }
 
