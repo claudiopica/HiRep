@@ -13,11 +13,13 @@
 void staples(int ix,int mu,suNg *v);
 void test_staples();
 void cabmar(double beta,suNg *u, suNg *v,int type);
+void cabmar_so(double beta,suNg *u,suNg *v,int type);
 
 void project_gauge_field(void);
 
 void update(double beta,int nhb,int nor);
 void random_su2(double rho,double s[]);
+double random_so2(double a);
 
 /* forces for the update */
 void force0(double dt, suNg_av_field *force, void *par);

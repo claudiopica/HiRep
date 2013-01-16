@@ -19,7 +19,7 @@ int main(int argc,char *argv[])
 
 
 for (int i=0;i<100000;i++){
-   lprintf("THETA",0," %f \n", random_so2(2));
+   lprintf("THETA",0," %f \n", random_so2(3.56531));
 }
 
 

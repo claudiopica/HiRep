@@ -50,13 +50,13 @@ static void update_all(double beta,int type)
 
   _MASTER_FOR(&glattice,ix) {
     staples(ix,0,&v);
-    cabmar(beta,pu_gauge(ix,0),&v,type);
+    cabmar_so(beta,pu_gauge(ix,0),&v,type);
     staples(ix,1,&v);
-    cabmar(beta,pu_gauge(ix,1),&v,type);
+    cabmar_so(beta,pu_gauge(ix,1),&v,type);
     staples(ix,2,&v);
-    cabmar(beta,pu_gauge(ix,2),&v,type);
+    cabmar_so(beta,pu_gauge(ix,2),&v,type);
     staples(ix,3,&v);
-    cabmar(beta,pu_gauge(ix,3),&v,type);
+    cabmar_so(beta,pu_gauge(ix,3),&v,type);
    }
 } 
 

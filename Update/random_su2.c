@@ -234,3 +234,28 @@ double x,xprime,epsi,astar,mas,alpha,beta,delta,betafrac,hx,gx;
    
 
 }
+
+double random_so2_2(double a,double b)
+//
+//  Computes a random angle theta \in [-\pi,\pi] with probability density
+//  proportional to exp(a*\cos(theta)) assuming rho>=0
+//
+{
+     
+      double maxV=exp(sqrt(a*a+b*b));
+         
+      
+      for (;;)
+      {
+         if (i_v==NRAN)	// Making sure we have enough random numbers
+         {
+            ranlxd(v,NRAN);
+            i_v=0;
+         }
+         
+         double y=maxV*v[i_v++];
+         double x=2*PI*v[i_v++]-PI;
+         if (y<exp(a*cos(x)+b*sin(x))) return x;
+      }
+}         
+

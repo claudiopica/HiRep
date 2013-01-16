@@ -68,7 +68,7 @@ int main(int argc,char *argv[])
 
   /* logger setup */
   if (PID!=0) { logger_disable(); }
-  if (PID==0) { sprintf(tmp,">%s",output_filename); logger_stdout(tmp); }
+  if (PID==0) { sprintf(tmp,">%s",output_filename); logger_stdout(stdout); }
   logger_setlevel(0,40);
   sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
 
@@ -92,8 +92,7 @@ int main(int argc,char *argv[])
     return 0;
   }
 
-  lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
-  lprintf("MAIN",1,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
+  lprintf("MAIN",0,"Gauge group: SO(%d)\n",NG);
   lprintf("MAIN",0,"global size is %dx%dx%dx%d\n",GLB_T,GLB_X,GLB_Y,GLB_Z);
   lprintf("MAIN",0,"proc grid is %dx%dx%dx%d\n",NP_T,NP_X,NP_Y,NP_Z);
 

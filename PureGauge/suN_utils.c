@@ -18,16 +18,6 @@
 
 input_pg pg_var = init_input_pg(pg_var);
 
-/* short 3-letter name to use in gconf name */
-#ifdef REPR_FUNDAMENTAL
-#define repr_name "FUN"
-#elif defined REPR_SYMMETRIC
-#define repr_name "SYM"
-#elif defined REPR_ANTISYMMETRIC
-#define repr_name "ASY"
-#elif defined REPR_ADJOINT
-#define repr_name "ADJ"
-#endif
 
 static void mk_gconf_name(char *name, pg_flow *gf, int id) {
   sprintf(name,"%s_%dx%dx%dx%dnc%db%.6fn%d",
@@ -128,9 +118,6 @@ int init_mc(pg_flow *gf, char *ifile) {
 
   /* alloc global gauge fields */
   u_gauge=alloc_gfield(&glattice);
-#ifndef REPR_FUNDAMENTAL
-  u_gauge_f=alloc_gfield_f(&glattice);
-#endif
 
   /* flow defaults */
   strcpy(gf->g_start,"invalid");
@@ -197,9 +184,7 @@ int save_conf(pg_flow *gf, int id) {
 int end_mc() {
   /* free memory */
   free_gfield(u_gauge);
-#ifndef REPR_FUNDAMENTAL
-  free_gfield_f(u_gauge_f);
-#endif
+
 
   return 0;
 }
