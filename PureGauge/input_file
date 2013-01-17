@@ -23,8 +23,8 @@ save freq = 1000
 meas freq = 1 
 conf dir = cnfg
 gauge start = ranDoM
-//gauge start = Unit
+gauge start = Unit
 //gauge start = run1_8x2x2x2nc2rADJnf2b2.000000m1.310000n10
 //ranlxd start =
-last conf = 500
+last conf = 50
 

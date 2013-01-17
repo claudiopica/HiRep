@@ -149,7 +149,7 @@ void cabmar_so(double beta,suNg *u,suNg *v,int type)
   for (i=0; i<NG-1; ++i) { // Looping over subgroups
     for (j=i+1; j<NG; ++j) {
     
-      _suNg_times_suNg(uv,*u,*v);
+      _suNg_times_suNg_dagger(uv,*u,*v);
     
     // Reading components
     COSuv	= (uv.c[i*NG+i]+uv.c[j*NG+j])/2.;  // Assuming rows*NG+cols
@@ -164,7 +164,7 @@ void cabmar_so(double beta,suNg *u,suNg *v,int type)
 	if ((bsq*wsq)>1.0e-16f) {
 		if (type==0) {
       	  
-      		theta = 0;//random_so2(2*b*w);
+      		theta = random_so2(2*b*w);
       		//theta = random_so2_2(2*b*w*COSuv,-2*b*w*SINuv);
       		COSran = cos(theta);
       		SINran = sin(theta);
