@@ -11,7 +11,7 @@ NP_Z = 1
 level = 1  seed = 4231
 
 // Pure gauge variables
-beta  =   10
+beta  =   4
 nhb   =   1
 nor   =   4
 nit   =   1 
@@ -26,5 +26,5 @@ gauge start = ranDoM
 gauge start = Unit
 //gauge start = run1_8x2x2x2nc2rADJnf2b2.000000m1.310000n10
 //ranlxd start =
-last conf = 50
+last conf = 200
 

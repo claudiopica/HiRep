@@ -109,19 +109,7 @@ void cabmar(double beta,suNg *u,suNg *v,int type)
    }
 }
 
-void print_mat(suNg u)
-{
-for (int i=0;i<NG;i++){
 
-for (int j=0;j<NG;j++)
-	printf("%g ", u.c[i*NG+j]);
-
-printf("\n"); 
-
-}  
-}
-
-double random_so2_2(double a,double b);
 void cabmar_so(double beta,suNg *u,suNg *v,int type) 
 // u is the link 
 // v is the sum of staples
@@ -139,17 +127,13 @@ void cabmar_so(double beta,suNg *u,suNg *v,int type)
   
   b=invng*beta; 
   bsq=b*b;
-  					//suNg Uf;
-   					//double tmp;
-   					//_suNg_times_suNg_dagger(Uf,*u,*u);
-					//_suNg_sqnorm(tmp,Uf);
-					//lprintf("ID",0,"Tr(U*U^T) = %f ...",tmp);
-
+ 
+  
+  
+      _suNg_times_suNg_dagger(uv,*u,*v);
   
   for (i=0; i<NG-1; ++i) { // Looping over subgroups
     for (j=i+1; j<NG; ++j) {
-    
-      _suNg_times_suNg_dagger(uv,*u,*v);
     
     // Reading components
     COSuv	= (uv.c[i*NG+i]+uv.c[j*NG+j])/2.;  // Assuming rows*NG+cols
@@ -158,49 +142,55 @@ void cabmar_so(double beta,suNg *u,suNg *v,int type)
     w		= sqrt(wsq);
     COSuv	= COSuv/w;
     SINuv	= SINuv/w;
-  //  print_mat(uv);
       
       
 	if ((bsq*wsq)>1.0e-16f) {
 		if (type==0) {
       	  
       		theta = random_so2(2*b*w);
-      		//theta = random_so2_2(2*b*w*COSuv,-2*b*w*SINuv);
       		COSran = cos(theta);
       		SINran = sin(theta);
-      	    //COSup = cos(theta);
-      		//SINup = sin(theta);
-      	
-      	/*
-      	    lprintf("TESTING",0,"2*b*w = %g \n",2*b*w);      	
-      	    lprintf("TESTING",0,"w = %g \n",w);    	
-      	    lprintf("TESTING",0,"b = %g \n",b);    	
-      	    lprintf("TESTING",0,"(uv.c[i*NG+i]+uv.c[j*NG+j])/2 = %g \n",(uv.c[i*NG+i]+uv.c[j*NG+j])/2);    	
-      	    lprintf("TESTING",0,"(uv.c[i*NG+j]-uv.c[j*NG+i])/2 = %g \n",(uv.c[i*NG+j]-uv.c[j*NG+i])/2);
-      	    lprintf("TESTING",0,"theta = %g \n",theta);
-      	*/	
-      		
+
       		// Rotating back the generated rotation matrix
       		COSup=COSran*COSuv+SINran*SINuv;
       		SINup=COSuv*SINran-COSran*SINuv;
-      	/*	
-      		lprintf("TESTING",0,"COSup = %g \n",COSup);
-      		lprintf("TESTING",0,"SINup = %g \n",SINup);
-      	*/	
-      		
-      		
+
       		// Rotate the subgroup using these angles
       		for (k=0;k<NG;k++){
       			Urow=u->c[NG*i+k];
       			u->c[NG*i+k]=COSup*Urow+SINup*u->c[NG*j+k];
       			u->c[NG*j+k]=COSup*u->c[NG*j+k]-SINup*Urow;
+      			
+      			// Update also the plaquettes for the next read
+      			Urow=uv.c[NG*i+k];
+      			uv.c[NG*i+k]=COSup*Urow+SINup*uv.c[NG*j+k];
+      			uv.c[NG*j+k]=COSup*uv.c[NG*j+k]-SINup*Urow;
       		}
       		
  
       		
       
 		} else {
-			// Overrelaxation    
+			// Microcanonical Overrelaxation 
+
+      		// Rotating back the generated rotation matrix
+      		COSup=COSuv;
+      		SINup=-SINuv;
+
+      		for (int l=0;l<2;l++){
+      			for (k=0;k<NG;k++){
+      				Urow=u->c[NG*i+k];
+      				u->c[NG*i+k]=COSup*Urow+SINup*u->c[NG*j+k];
+      				u->c[NG*j+k]=COSup*u->c[NG*j+k]-SINup*Urow;
+      			
+      				// Update also the plaquettes for the next read
+      				Urow=uv.c[NG*i+k];
+      				uv.c[NG*i+k]=COSup*Urow+SINup*uv.c[NG*j+k];
+      				uv.c[NG*j+k]=COSup*uv.c[NG*j+k]-SINup*Urow;
+      			}
+      		}
+      		
+			   
 		}      
       } else {
 			// If the element is approximately orthogonal to the subgroup
@@ -208,10 +198,6 @@ void cabmar_so(double beta,suNg *u,suNg *v,int type)
     }// 
    }// Stop looping over subgroups
  
- //exit(0);
-
-   					//_suNg_times_suNg_dagger(Uf,*u,*u);
-					//_suNg_sqnorm(tmp,Uf);
-					//lprintf("ID",0,"Tr(U*U^T) = %f \n",tmp);
+ 
 }
 
