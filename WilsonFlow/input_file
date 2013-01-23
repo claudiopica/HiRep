@@ -10,6 +10,9 @@ NP_Z = 1
 //level = 1  seed = 1
 level = 1  seed = 12345
 
-WF:tmax = 1
+WF:tmax = 10
 WF:nmeas = 10
-WF:nint = 10
+WF:nint = 100
+
+// Schroedinger functional
+SF_ct = 1.0
