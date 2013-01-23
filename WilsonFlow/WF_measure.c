@@ -33,13 +33,6 @@
 
 
 
-#ifdef WITH_MPI
-#error The Wilson Flow does not work with MPI
-#endif
-
-#if defined(BASIC_SF) || defined(ROTATED_SF)
-#error The Wilson Flow does not work with SF
-#endif
 
 
 
@@ -49,9 +42,10 @@ typedef struct _input_WF {
   double tmax;
   int nmeas;
   int nint;
+  double SF_ct;
 
   /* for the reading function */
-  input_record_t read[4];
+  input_record_t read[7];
 
 } input_WF;
 
@@ -61,6 +55,7 @@ typedef struct _input_WF {
     {"WF max integration time", "WF:tmax = %lf", DOUBLE_T, &((varname).tmax)},\
     {"WF number of measures", "WF:nmeas = %d", DOUBLE_T, &((varname).nmeas)},\
     {"WF number of integration steps between measures", "WF:nint = %d", INT_T, &((varname).nint)},\
+    {"SF_ct", "SF_ct = %lf", DOUBLE_T, &((varname).SF_ct)},\
     {NULL, NULL, 0, NULL}\
   }\
 }
@@ -181,7 +176,7 @@ void read_cmdline(int argc, char* argv[]) {
 
 
 int main(int argc,char *argv[]) {
-  int i;
+  int i,j;
   char tmp[256];
   FILE* list;
   filename_t fpars;
@@ -235,9 +230,21 @@ int main(int argc,char *argv[]) {
   /* setup lattice geometry */
   geometry_mpi_eo();
   /* test_geometry_mpi_eo(); */
-
-  init_BCs(NULL);
   
+  BCs_pars_t BCs_pars = {
+    .fermion_twisting_theta = {0.,0.,0.,0.},
+    .gauge_boundary_improvement_cs = 1.,
+#ifdef ROTATED_SF
+    .gauge_boundary_improvement_ct = WF_var.SF_ct,
+#else
+    .gauge_boundary_improvement_ct = 1.,
+#endif
+    .chiSF_boundary_improvement_ds = 1.,
+    .SF_BCs = 1
+  };
+
+  init_BCs(&BCs_pars);
+
   /* alloc global gauge fields */
   u_gauge=alloc_gfield(&glattice);
 
@@ -278,17 +285,34 @@ int main(int argc,char *argv[]) {
     double epsilon=WF_var.tmax/(WF_var.nmeas*WF_var.nint);
     double t=0.;
 
+#ifdef ROTATED_SF
+    double E[GLB_T];
+    double Esym[GLB_T];
+    WF_E_T(E,u_gauge);
+    WF_Esym_T(Esym,u_gauge);
+    for(j=0;j<GLB_T;j++)
+      lprintf("WILSONFLOW",0,"WF (ncnfg,T,t,E,t2*E,Esym,t2*Esym) = %d %d %e %e %e %e %e\n",i,j,t,E[j],t*t*E[j],Esym[j],t*t*Esym[j]);      
+#else
     double E=WF_E(u_gauge);
     double Esym=WF_Esym(u_gauge);
     lprintf("WILSONFLOW",0,"WF (ncnfg,t,E,t2*E,Esym,t2*Esym) = %d %e %e %e %e %e\n",i,t,E,t*t*E,Esym,t*t*Esym);
+#endif
+
     for(n=0;n<WF_var.nmeas;n++) {
       for(k=0;k<WF_var.nint;k++) {
         WilsonFlow3(u_gauge,epsilon);
         t+=epsilon;
       }
+#ifdef ROTATED_SF
+      WF_E_T(E,u_gauge);
+      WF_Esym_T(Esym,u_gauge);
+      for(j=0;j<GLB_T;j++)
+	lprintf("WILSONFLOW",0,"WF (ncnfg,T,t,E,t2*E,Esym,t2*Esym) = %d %d %e %e %e %e %e\n",i,j,t,E[j],t*t*E[j],Esym[j],t*t*Esym[j]);      
+#else
       E=WF_E(u_gauge);
       Esym=WF_Esym(u_gauge);
-      lprintf("WILSONFLOW",0,"WF (ncnfg,t,E,t2*E,Esym,t2*Esym) = %d %e %e %e %e %e\n",i,t,E,t*t*E,Esym,t*t*Esym);      
+      lprintf("WILSONFLOW",0,"WF (ncnfg,t,E,t2*E,Esym,t2*Esym) = %d %e %e %e %e %e\n",i,t,E,t*t*E,Esym,t*t*Esym);
+#endif
     }
     
     if(list==NULL) break;

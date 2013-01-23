@@ -146,10 +146,12 @@ void init_BCs(BCs_pars_t *pars) {
 
 
 #ifdef BC_T_OPEN
+  lprintf("BCS",0,"Open BC gauge boundary term ct=%e cs=%e\n",BCs_pars.chiSF_boundary_improvement_ct,BCs_pars.chiSF_boundary_improvement_cs);  
   init_plaq_open_BCs(BCs_pars.gauge_boundary_improvement_ct,BCs_pars.gauge_boundary_improvement_cs);
 #endif
 
 #ifdef BASIC_SF
+  lprintf("BCS",0,"Dirichlet BC gauge boundary term ct=%e\n",BCs_pars.gauge_boundary_improvement_ct);  
   if(BCs_pars.SF_BCs == 0) {
     _suNg_unit(BCs_pars.gauge_boundary_dn);
     _suNg_unit(BCs_pars.gauge_boundary_up);
@@ -159,6 +161,7 @@ void init_BCs(BCs_pars_t *pars) {
 #endif
 
 #ifdef ROTATED_SF
+  lprintf("BCS",0,"Dirichlet BC gauge boundary term ct=%e\n",BCs_pars.gauge_boundary_improvement_ct);  
   if(BCs_pars.SF_BCs == 0) {
     _suNg_unit(BCs_pars.gauge_boundary_dn);
     _suNg_unit(BCs_pars.gauge_boundary_up);

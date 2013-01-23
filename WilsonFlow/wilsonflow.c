@@ -51,6 +51,11 @@ static void Zeta(suNg_field *Z, const suNg_field* U, const double alpha){
         u3=_4FIELD_AT(U,i,nu);
         _suNg_times_suNg_dagger(tmp1,*u1,*u2);
         _suNg_times_suNg_dagger(tmp2,tmp1,*u3);
+#ifdef PLAQ_WEIGHTS
+	if(plaq_weight!=NULL) {
+	  _suNg_mul(tmp2,plaq_weight[i*16+nu*4+mu],tmp2);
+	}
+#endif
         _suNg_add_assign(staple,tmp2);
         
         j=idn(i,nu);
@@ -59,6 +64,12 @@ static void Zeta(suNg_field *Z, const suNg_field* U, const double alpha){
         u3=_4FIELD_AT(U,j,nu);
         _suNg_times_suNg(tmp1,*u2,*u1);
         _suNg_dagger_times_suNg(tmp2,tmp1,*u3);
+
+#ifdef PLAQ_WEIGHTS
+	if(plaq_weight!=NULL) {
+	  _suNg_mul(tmp2,plaq_weight[j*16+nu*4+mu],tmp2);
+	}
+#endif
         _suNg_add_assign(staple,tmp2);
       }
       
@@ -81,10 +92,12 @@ static void Zeta(suNg_field *Z, const suNg_field* U, const double alpha){
       	_complex_mulr_assign(_4FIELD_AT(Z,i,mu)->c[k],-alpha/2.,tmp1.c[k]);
       }
     }
+
   }
-  
-  #ifdef PLAQ_CHECK
+ 
+ #ifdef PLAQ_CHECK
   plaq /= (4*GLB_T*GLB_X*GLB_Y*GLB_Z);
+  global_sum(&plaq,1);
   lprintf("WILSONFLOW",0,"ZETA Plaquette check %f %e\n",plaq,24.*(1.-plaq));
   #endif
 }
@@ -279,7 +292,10 @@ void WilsonFlow1(suNg_field* V, const double epsilon) {
       *_4FIELD_AT(V,ix,mu)=utmp[1];
     }
   }
+  start_gf_sendrecv(V);
+  complete_gf_sendrecv(V);
 }
+
 
 
 
@@ -294,6 +310,8 @@ void WilsonFlow3(suNg_field* V, const double epsilon) {
     }
   }
   
+
+
   Zeta(ws_gf,V,epsilon/4.);
   
   _MASTER_FOR(&glattice,ix) {
@@ -305,6 +323,10 @@ void WilsonFlow3(suNg_field* V, const double epsilon) {
     }
   }
   
+
+  start_gf_sendrecv(V);
+  complete_gf_sendrecv(V);
+
   Zeta(ws_gf,V,8.*epsilon/9.);
   
   _MASTER_FOR(&glattice,ix) {
@@ -315,6 +337,9 @@ void WilsonFlow3(suNg_field* V, const double epsilon) {
       _suNg_mul(*_4FIELD_AT(ws_gf,ix,mu),-1.,*_4FIELD_AT(ws_gf,ix,mu));
     }
   }
+
+  start_gf_sendrecv(V);
+  complete_gf_sendrecv(V);
   
   Zeta(ws_gf,V,3.*epsilon/4.);
   
@@ -325,131 +350,224 @@ void WilsonFlow3(suNg_field* V, const double epsilon) {
       *_4FIELD_AT(V,ix,mu)=utmp[1];
     }
   }
+
+  start_gf_sendrecv(V);
+  complete_gf_sendrecv(V);
+
+}
+
+
+static void WF_plaq(double *ret,suNg_field* V,int ix,int mu,int nu)
+{
+  int iy,iz;
+  suNg *v1,*v2,*v3,*v4,w1,w2,w3;
+
+  iy=iup(ix,mu);
+  iz=iup(ix,nu);
+
+  v1=_4FIELD_AT(V,ix,mu);
+  v2=_4FIELD_AT(V,iy,nu);
+  v3=_4FIELD_AT(V,iz,mu);
+  v4=_4FIELD_AT(V,ix,nu);
+
+  _suNg_times_suNg(w1,(*v1),(*v2));
+  _suNg_times_suNg(w2,(*v4),(*v3));
+  _suNg_times_suNg_dagger(w3,w1,w2);      
+      
+  _suNg_trace_re(*ret,w3);
+
+#ifdef PLAQ_WEIGHTS
+  if(plaq_weight!=NULL) {
+    *ret *= plaq_weight[ix*16+nu*4+mu];
+  }
+#endif
+
+
 }
 
 
 double WF_E(suNg_field* V) {
   _DECLARE_INT_ITERATOR(ix);
-  int iy,iz;
   int mu,nu;
   double p;
-  suNg *v1,*v2,*v3,*v4,w1,w2,w3;
   double E;
   
   E=0.;
 
   _MASTER_FOR(&glattice,ix) {
     for(mu=0;mu<4;mu++) for(nu=mu+1;nu<4;nu++) {
-      iy=iup(ix,mu);
-      iz=iup(ix,nu);
-    
-      v1=_4FIELD_AT(V,ix,mu);
-      v2=_4FIELD_AT(V,iy,nu);
-      v3=_4FIELD_AT(V,iz,mu);
-      v4=_4FIELD_AT(V,ix,nu);
-    
-      _suNg_times_suNg(w1,(*v1),(*v2));
-      _suNg_times_suNg(w2,(*v4),(*v3));
-      _suNg_times_suNg_dagger(w3,w1,w2);      
-  
-      _suNg_trace_re(p,w3);
-      
-      E += NG-p;
-    }
+	WF_plaq(&p,V, ix, mu, nu);
+	E += NG-p;
+      }
   }
   
   E *= 2./(GLB_T*GLB_X*GLB_Y*GLB_Z);
+
+  global_sum(&E,1);
   
   return E;
 }
 
+void WF_E_T(double* E, suNg_field* V) {
+  int t,x,y,z,ix;
+  int mu,nu;
+  double p;
+  
+  for(t=0;t<GLB_T;t++) E[t]=0.;
 
+  for (t=0; t<T; t++){
+    for (x=0; x<X; x++)
+      for (y=0; y<Y; y++)
+	for (z=0; z<Z; z++)
+	  for(mu=0;mu<4;mu++)
+	    for(nu=mu+1;nu<4;nu++) {
+	      ix=ipt(t,x,y,z);
+	      WF_plaq(&p,V, ix, mu, nu);
+	      E[(COORD[0]*T+t+GLB_T)%GLB_T] += NG-p;
+	    }
+    E[(COORD[0]*T+t+GLB_T)%GLB_T] *= 2./(GLB_X*GLB_Y*GLB_Z);
+  }
+  
+  global_sum(E,GLB_T);
+
+}
+
+
+
+static void WF_cplaq_sym(double *ret,suNg_field* V,int ix,int mu,int nu)
+{
+  int iy,iz,iw;
+  suNg *v1,*v2,*v3,*v4,w1,w2,w3;
+  
+  _suNg_unit(w3);
+  _suNg_mul(w3,-4.,w3);
+  
+  
+  iy=iup(ix,mu);
+  iz=iup(ix,nu);
+  
+  v1=_4FIELD_AT(V,ix,mu);
+  v2=_4FIELD_AT(V,iy,nu);
+  v3=_4FIELD_AT(V,iz,mu);
+  v4=_4FIELD_AT(V,ix,nu);
+  
+  _suNg_times_suNg(w1,(*v1),(*v2));
+  _suNg_times_suNg_dagger(w2,w1,(*v3));
+  _suNg_times_suNg_dagger(w1,w2,(*v4));
+#ifdef PLAQ_WEIGHTS
+	if(plaq_weight!=NULL) {
+	  _suNg_mul(w1,plaq_weight[ix*16+nu*4+mu],w1);
+	}
+#endif
+  _suNg_add_assign(w3,w1);
+  
+  
+  iy=idn(ix,mu);
+  iz=iup(iy,nu);
+  
+  v1=_4FIELD_AT(V,ix,nu);
+  v2=_4FIELD_AT(V,iz,mu);
+  v3=_4FIELD_AT(V,iy,nu);
+  v4=_4FIELD_AT(V,iy,mu);
+  
+  _suNg_times_suNg_dagger(w1,(*v1),(*v2));
+  _suNg_times_suNg_dagger(w2,w1,(*v3));
+  _suNg_times_suNg(w1,w2,(*v4));
+#ifdef PLAQ_WEIGHTS
+	if(plaq_weight!=NULL) {
+	  _suNg_mul(w1,plaq_weight[iy*16+nu*4+mu],w1);
+	}
+#endif
+  _suNg_add_assign(w3,w1);
+  
+  
+  iy=idn(ix,mu);
+  iz=idn(iy,nu);
+  iw=idn(ix,nu);
+  
+  v1=_4FIELD_AT(V,iy,mu);
+  v2=_4FIELD_AT(V,iz,nu);
+  v3=_4FIELD_AT(V,iz,mu);
+  v4=_4FIELD_AT(V,iw,nu);
+  
+  _suNg_times_suNg(w1,(*v2),(*v1));
+  _suNg_dagger_times_suNg(w2,w1,(*v3));
+  _suNg_times_suNg(w1,w2,(*v4));
+#ifdef PLAQ_WEIGHTS
+  if(plaq_weight!=NULL) {
+    _suNg_mul(w1,plaq_weight[iz*16+nu*4+mu],w1);
+  }
+#endif
+  _suNg_add_assign(w3,w1);
+  
+  
+  iy=idn(ix,nu);
+  iz=iup(iy,mu);
+  
+  v1=_4FIELD_AT(V,iy,nu);
+  v2=_4FIELD_AT(V,iy,mu);
+  v3=_4FIELD_AT(V,iz,nu);
+  v4=_4FIELD_AT(V,ix,mu);
+  
+  _suNg_dagger_times_suNg(w1,(*v1),(*v2));
+  _suNg_times_suNg(w2,w1,(*v3));
+  _suNg_times_suNg_dagger(w1,w2,(*v4));
+#ifdef PLAQ_WEIGHTS
+  if(plaq_weight!=NULL) {
+    _suNg_mul(w1,plaq_weight[iy*16+nu*4+mu],w1);
+  }
+#endif	
+  _suNg_add_assign(w3,w1);
+  
+  
+  _suNg_2TA(w1,w3);
+  
+  _suNg_sqnorm(*ret,w1);
+  
+}
 
 
 double WF_Esym(suNg_field* V) {
   _DECLARE_INT_ITERATOR(ix);
-  int iy,iz,iw;
   int mu,nu;
   double p;
-  suNg *v1,*v2,*v3,*v4,w1,w2,w3;
   double E;
   
   E=0.;
 
   _MASTER_FOR(&glattice,ix) {
     for(mu=0;mu<4;mu++) for(nu=mu+1;nu<4;nu++) {
-      _suNg_unit(w3);
-      _suNg_mul(w3,-4.,w3);
-      
-      
-      iy=iup(ix,mu);
-      iz=iup(ix,nu);
-    
-      v1=_4FIELD_AT(V,ix,mu);
-      v2=_4FIELD_AT(V,iy,nu);
-      v3=_4FIELD_AT(V,iz,mu);
-      v4=_4FIELD_AT(V,ix,nu);
-    
-      _suNg_times_suNg(w1,(*v1),(*v2));
-      _suNg_times_suNg_dagger(w2,w1,(*v3));
-      _suNg_times_suNg_dagger(w1,w2,(*v4));
-      _suNg_add_assign(w3,w1);
-      
-  
-      iy=idn(ix,mu);
-      iz=iup(iy,nu);
-    
-      v1=_4FIELD_AT(V,ix,nu);
-      v2=_4FIELD_AT(V,iz,mu);
-      v3=_4FIELD_AT(V,iy,nu);
-      v4=_4FIELD_AT(V,iy,mu);
-    
-      _suNg_times_suNg_dagger(w1,(*v1),(*v2));
-      _suNg_times_suNg_dagger(w2,w1,(*v3));
-      _suNg_times_suNg(w1,w2,(*v4));
-      _suNg_add_assign(w3,w1);
-      
-
-      iy=idn(ix,mu);
-      iz=idn(iy,nu);
-      iw=idn(ix,nu);
-    
-      v1=_4FIELD_AT(V,iy,mu);
-      v2=_4FIELD_AT(V,iz,nu);
-      v3=_4FIELD_AT(V,iz,mu);
-      v4=_4FIELD_AT(V,iw,nu);
-    
-      _suNg_times_suNg(w1,(*v2),(*v1));
-      _suNg_dagger_times_suNg(w2,w1,(*v3));
-      _suNg_times_suNg(w1,w2,(*v4));
-      _suNg_add_assign(w3,w1);
-      
-
-      iy=idn(ix,nu);
-      iz=iup(iy,mu);
-    
-      v1=_4FIELD_AT(V,iy,nu);
-      v2=_4FIELD_AT(V,iy,mu);
-      v3=_4FIELD_AT(V,iz,nu);
-      v4=_4FIELD_AT(V,ix,mu);
-    
-      _suNg_dagger_times_suNg(w1,(*v1),(*v2));
-      _suNg_times_suNg(w2,w1,(*v3));
-      _suNg_times_suNg_dagger(w1,w2,(*v4));
-      _suNg_add_assign(w3,w1);
-      
-
-      _suNg_2TA(w1,w3);
-      
-      _suNg_sqnorm(p,w1);
-      
-      E += p;
-    }
+	WF_cplaq_sym(&p,V,ix,mu,nu);
+	E += p;
+      }
   }
-  
   E *= 1./(64.*(GLB_T*GLB_X*GLB_Y*GLB_Z));
+
+  global_sum(&E,1);
   
   return E;
 }
 
+void WF_Esym_T(double* E, suNg_field* V) {
+  int t,x,y,z,ix;
+  int mu,nu;
+  double p;
+  
+  for(t=0;t<GLB_T;t++) E[t]=0.;
 
+  for (t=0; t<T; t++){
+    for (x=0; x<X; x++)
+      for (y=0; y<Y; y++)
+	for (z=0; z<Z; z++)
+	  for(mu=0;mu<4;mu++)
+	    for(nu=mu+1;nu<4;nu++) {
+	      ix=ipt(t,x,y,z);
+	      WF_cplaq_sym(&p,V, ix, mu, nu);
+	      E[(COORD[0]*T+t+GLB_T)%GLB_T] += p;
+	    }
+    E[(COORD[0]*T+t+GLB_T)%GLB_T] *= 1./(64.*(GLB_X*GLB_Y*GLB_Z));
+  }
+  
+  global_sum(E,GLB_T);
+
+}
