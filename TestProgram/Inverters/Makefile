@@ -1,7 +1,7 @@
 TOPDIR = ../..
 MKDIR=$(TOPDIR)/Make
 
-EXES =  check_inverters_1 check_inverters_gpu_1 #check_inverters_2 check_inverters_3 check_inverters_4 check_inverters_5 #check_inverters_6
+EXES =  check_inverters_1 check_inverters_gpu_1 check_inverters_9 #check_inverters_2 check_inverters_3 check_inverters_4 check_inverters_5 check_inverters_6
 
 
 default: $(EXES)
@@ -36,7 +36,7 @@ MODS := error error_gpu
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Inverters
-MODS := linear_algebra cg_mshift MINRES_mshift MINRES g5QMR_mshift eva jacobi cg_mshift_flt
+MODS := linear_algebra cg_mshift MINRES_mshift MINRES g5QMR_mshift eva jacobi cg_mshift_flt GMRES
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Observables
