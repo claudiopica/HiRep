@@ -18,29 +18,39 @@
 
 static int GMRES_core(short int *valid, MINRES_par *par, int kry_dim , spinor_operator M, spinor_field *in, spinor_field *out, spinor_field *trial){
 
-int j;
+int i,j;
 int cgiter = 0;
 double beta;
 spinor_field * w;
 spinor_field * v;
 spinor_field * p;
+complex * h;
+complex c;
+double s;
+double tmp;
+complex * gbar;
+complex c_tmp1,c_tmp2;
+
+gbar=(complex*)malloc((kry_dim+1)*sizeof(gbar));
+h=(complex*)malloc(kry_dim*(kry_dim+1)*sizeof(h));
+//h(i,j)=h(i*kry_dim+j)
 
 
 #ifdef WITH_GPU
   alloc_mem_t=GPU_MEM; /* allocate only on GPU */
 #endif
-  w = alloc_spinor_field_f(kry_dim+2,in->type);
-  v=w+kry_dim;
-  p=w+kry_dim+1;
+  v = alloc_spinor_field_f(kry_dim+2,in->type);
+  w=v+kry_dim;
+  p=v+kry_dim+1;
   alloc_mem_t=std_mem_t; /* set the allocation memory type back */
 
 
 
-  spinor_field_copy_f(v, in);  // p2 now has the rhs-spinorfield "b"
+  spinor_field_copy_f(&v[0], in);  // p2 now has the rhs-spinorfield "b"
   if(trial!=NULL) {
     M.dbl(p,trial);
     ++cgiter;
-    spinor_field_sub_assign_f(v,p);
+    spinor_field_sub_assign_f(&v[0],p);
     
     if(out!=trial){
       spinor_field_copy_f(out,trial);
@@ -50,11 +60,61 @@ spinor_field * p;
     spinor_field_zero_f(out);
   }
 
-  beta=sqrt(spinor_field_sqnorm_f(v));
-  spinor_field_mul_f(v,1./beta,v);
+  beta=sqrt(spinor_field_sqnorm_f(&v[0]));
+  spinor_field_mul_f(&v[0],1./beta,&v[0]);
+  gbar[0].re=beta;
+  gbar[0].im=0;
 
-for (j=0;j<kry_dim+1;++j){
+for (j=0;j<kry_dim;++j){
+    
+    ++cgiter;
+    M.dbl(w,&v[j])
+    
+    for (i=0;i<j+1;++i){	// Gram-Schmidth orthogonalization
+    	h[i*kry_dim+j]=spinor_field_prod_f(w,&v[i]);
+    	spinor_field_mul_add_assign_f(w,-h[i*kry_dim+j],&v[i]);
+    }
+    h[(j+1)*kry_dim+j].re=sqrt(spinor_field_sqnorm_f(w));
+    h[(j+1)*kry_dim+j].im=0;
+    
+    if (h[(j+1)*kry_dim+j].re < par->err2){
+    	kry_dim=j;
+    	break;
+    }
+    
+    if (j<kry_dim-1){
+    	spinor_field_mul_f(&v[j+1],1./h[(j+1)*kry_dim+j].re,w);
+	}
 
+	gbar[j+1]= 0;	
+}
+
+// Now doing the Givens rotations
+for (i=0;i<kry_dim;++i){
+	tmp=sqrt(  _complex_prod_re( h[i*kry_dim+i], h[i*kry_dim+i])    +h[i*(kry_dim+1)+i].re*h[i*(kry_dim+1)+i].re)
+	s=h[i*(kry_dim+1)+i] / tmp;
+	_complex_mulr(c,1./tmp,h[i*kry_dim+i]);
+	
+	// Rotate gbar
+	
+	c_tmp1=gbar[i];
+	_complex_mul_star(gbar[i],c_tmp1,c);
+
+	c_tmp2=gbar[i+1];
+	_complex_mulr_assign(gbar[i+1],-s,c_tmp1);
+	_complex_mul_assign(gbar[i+1],c,c_tmp2);
+	
+	for (j=0;j<i+2;++j){
+		c_tmp1=h[i*kry_dim+j];
+		_complex_mul_star(h[i*kry_dim+j],c_tmp1,c);
+		
+	
+		c_tmp2=gbar[i+1];
+		_complex_mulr_assign(gbar[i+1],-s,c_tmp1);
+		_complex_mul_assign(gbar[i+1],c,c_tmp2);	
+	}
+	
+	
 }
 
 
@@ -62,7 +122,7 @@ for (j=0;j<kry_dim+1;++j){
 
 
   /* free memory */
-  free_spinor_field_f(w);
+  free_spinor_field_f(v);
 
   /* return number of cg iter */
   return cgiter;
