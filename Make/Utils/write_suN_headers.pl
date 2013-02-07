@@ -2945,7 +2945,7 @@ sub write_su2_inverse_multiply {
 
 
 sub write_su2_dagger {
-    print "/ *u=v^dagger */\n";
+    print "/* u=v^dagger */\n";
     if ($N==2) {
     	print "#define _${dataname}_dagger(u,v) \\\n";
         print "   (u).$cname\[0\]=(v).$cname\[0\]; \\\n";
