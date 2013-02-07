@@ -29,9 +29,12 @@ complex c;
 double s;
 double tmp;
 complex * gbar;
+double * ybar;
 complex c_tmp1,c_tmp2;
 
 gbar=(complex*)malloc((kry_dim+1)*sizeof(gbar));
+ybar=(complex*)malloc((kry_dim)*sizeof(ybar));
+
 h=(complex*)malloc(kry_dim*(kry_dim+1)*sizeof(h));
 //h(i,j)=h(i*kry_dim+j)
 
@@ -90,36 +93,45 @@ for (j=0;j<kry_dim;++j){
 }
 
 // Now doing the Givens rotations
-for (i=0;i<kry_dim;++i){
+for (i=0;i<kry_dim-1;++i){
 	tmp=sqrt(  _complex_prod_re( h[i*kry_dim+i], h[i*kry_dim+i])    +h[i*(kry_dim+1)+i].re*h[i*(kry_dim+1)+i].re)
 	s=h[i*(kry_dim+1)+i] / tmp;
 	_complex_mulr(c,1./tmp,h[i*kry_dim+i]);
 	
-	// Rotate gbar
-	
+	// Rotate gbar	
 	c_tmp1=gbar[i];
 	_complex_mul_star(gbar[i],c_tmp1,c);
 
 	c_tmp2=gbar[i+1];
-	_complex_mulr_assign(gbar[i+1],-s,c_tmp1);
+	_complex_mulr(gbar[i+1],-s,c_tmp1);
 	_complex_mul_assign(gbar[i+1],c,c_tmp2);
 	
-	for (j=0;j<i+2;++j){
+	
+	// Rotate h
+	for (j=i;j<kry_dim+1;++j){
 		c_tmp1=h[i*kry_dim+j];
 		_complex_mul_star(h[i*kry_dim+j],c_tmp1,c);
-		
-	
-		c_tmp2=gbar[i+1];
-		_complex_mulr_assign(gbar[i+1],-s,c_tmp1);
-		_complex_mul_assign(gbar[i+1],c,c_tmp2);	
+		_complex_mulr_assign(h[i*kry_dim+j],s,h[(i+1)*kry_dim+j]);	
+		c_tmp2=h[(1+i)*kry_dim+j];
+		_complex_mulr(h[(i+1)*kry_dim+j],-s,c_tmp1);
+		_complex_mul_assign(h[(i+1)*kry_dim+j],c,c_tmp2);
 	}
-	
-	
 }
 
 
+// Hopefully h is now upper triangular... now to invert it.
+for (i=kry_dim-1;i>=0;--i){
+  ybar[i]=gbar[i].re;
+  for (j=kry_dim-1;j>i;--j){
+  	ybar[i]-= _complex_mul_re(h[i*kry_dim+j],ybar[j]);
+  }
+  ybar /= h[i*kry_dim+i].re;
+}
 
-
+//
+for (i=0;i<kry_dim;++i){
+	spinor_field_mul_add_assign_f(out,ybar[i],&v[i]);	
+}
 
   /* free memory */
   free_spinor_field_f(v);
