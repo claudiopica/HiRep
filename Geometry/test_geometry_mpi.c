@@ -290,10 +290,10 @@ static void set_originals_coords(site_info* s, int *test_q) {
     }
   }
 
-  s->glb_coord[0] = (COORD[0]*T+s->coord[0] + GLB_T)%GLB_T;
-  s->glb_coord[1] = (COORD[1]*X+s->coord[1] + GLB_X)%GLB_X;
-  s->glb_coord[2] = (COORD[2]*Y+s->coord[2] + GLB_Y)%GLB_Y;
-  s->glb_coord[3] = (COORD[3]*Z+s->coord[3] + GLB_Z)%GLB_Z;
+  s->glb_coord[0] = (zerocoord[0]+s->coord[0] + GLB_T)%GLB_T;
+  s->glb_coord[1] = (zerocoord[1]+s->coord[1] + GLB_X)%GLB_X;
+  s->glb_coord[2] = (zerocoord[2]+s->coord[2] + GLB_Y)%GLB_Y;
+  s->glb_coord[3] = (zerocoord[3]+s->coord[3] + GLB_Z)%GLB_Z;
 }
 
 

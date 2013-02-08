@@ -23,6 +23,7 @@
 #error This code does not work with the open BCs
 #endif
 
+#error "Wilson loop must be fixed, The zerocoord global location must be added"
 
 #define _WL_4VOL_INDEX(t,x,y,z) ((t)+(x)*T+(y)*T*X+(z)*T*X*Y)
 
@@ -253,7 +254,7 @@ void WL_Hamiltonian_gauge(suNg_field* out, suNg_field* in) {
 #endif /* WITH_MPI */
   suNg tmp;
 
-  /* LOC(t)=COORD[0]*T+t */
+  /* LOC(t)=zerocoord[0]+t */
   /* ws_gtf[0](t) = U_0(LOC(0)) ... U_0(LOC(t)) */
   for(x=0;x<X;x++) for(y=0;y<Y;y++) for(z=0;z<Z;z++) {
     i=ipt(0,x,y,z);
@@ -590,7 +591,7 @@ void WL_correlators(double** ret, const suNg_field* gf, const suNg* poly, const 
       /* computation of the Wilson loops for DT-1 */
       double dtmp;
       for(int t0=0;t0<T;t0++) for(int t1=0;t1<T;t1++) {
-        if(((COORD[0]+DT-1)*T+t1)%GLB_T>=COORD[0]*T+t0) {
+        if(((COORD[0]+DT-1)*T+t1)%GLB_T>=zerocoord[0]+t0) {
           for(int x0=0;x0<X;x0++) for(int y0=0;y0<Y;y0++) for(int z0=0;z0<Z;z0++) {
             _suNg_times_suNg_dagger(tmp[0],
               buf_gtf[0][_WL_4VOL_INDEX(t0,x0,y0,z0)],

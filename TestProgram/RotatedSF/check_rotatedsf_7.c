@@ -29,7 +29,35 @@ rhmc_par _update_par;
 
 int main(int argc,char *argv[])
 {
+
+  char tmp[256];
+  
   setup_process(&argc,&argv);
+  
+  logger_setlevel(0,100); /* log all */
+  if (PID!=0) { 
+    logger_disable();}
+  else{
+    sprintf(tmp,">out_%d",PID); logger_stdout(tmp);
+    sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
+  }
+  
+  logger_map("DEBUG","debug");
+  
+  lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
+  
+  read_input(glb_var.read,"test_input");
+  lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed);
+  
+  
+  rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed);
+  
+  
+  /* setup communication geometry */
+  if (geometry_init() == 1) {
+    finalize_process();
+    return 0;
+  }
 
 
   BCs_pars_t BCs_pars = {
@@ -55,28 +83,10 @@ int main(int argc,char *argv[])
   _update_par.SF_ct=1;
   _update_par.SF_zf=1.5;
 
-  
-  logger_setlevel(0,99); /* log all */
-  logger_map("DEBUG","debug");
-  
-  lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
-  
-  read_input(glb_var.read,"test_input");
-  lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed);
-
-
-  rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed);
-  
+    
 #if NG!=3 || NF!=3
 #error "Can work only with NC=3 and Nf==3"
 #endif
-  
-  
-  /* setup communication geometry */
-  if (geometry_init() == 1) {
-    finalize_process();
-    return 0;
-  }
   
   geometry_mpi_eo();
 

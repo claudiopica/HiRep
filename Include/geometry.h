@@ -51,6 +51,7 @@ int setup_replicas();
 int finalize_process(void);
 
 void origin_coord(int *c);
+void other_proc_origin_coord(int * proc_coord, int *c);
 void glb_to_proc(int *g, int *p);
 
 int geometry_init(void);

@@ -146,7 +146,7 @@ void SF_PCAC_wall_mass(double mass, double acc )
       sptr = _FIELD_AT(&prop[s],i);
       /*f_P*/
       _spinor_prod_re_f(temp,*sptr,*sptr);
-      f_P[(COORD[0]*T+ix0-1+GLB_T)%GLB_T]+=temp;
+      f_P[(zerocoord[0]+ix0-1+GLB_T)%GLB_T]+=temp;
       /*f_A*/
       /*gamma_0*/
       stmp[0].c[0]=sptr->c[2];
@@ -154,7 +154,7 @@ void SF_PCAC_wall_mass(double mass, double acc )
       stmp[0].c[2]=sptr->c[0];
       stmp[0].c[3]=sptr->c[1];
       _spinor_prod_re_f(temp,*sptr,stmp[0]);
-      f_A[(COORD[0]*T+ix0-1+GLB_T)%GLB_T]+=temp;
+      f_A[(zerocoord[0]+ix0-1+GLB_T)%GLB_T]+=temp;
     }
   }
   
@@ -239,7 +239,7 @@ void SF_PCAC_wall_mass(double mass, double acc )
       sptr = _FIELD_AT(&prop[s],i);
       /*f_P*/
       _spinor_prod_re_f(temp,*sptr,*sptr);
-      f_Pt[((GLB_T-1)-(COORD[0]*T+ix0))%GLB_T]+=temp;
+      f_Pt[((GLB_T-1)-(zerocoord[0]+ix0))%GLB_T]+=temp;
       /*f_A*/
       /*gamma_0*/
       _vector_mul_f(stmp[0].c[0],-1,sptr->c[2]);
@@ -247,7 +247,7 @@ void SF_PCAC_wall_mass(double mass, double acc )
       _vector_mul_f(stmp[0].c[2],-1,sptr->c[0]);
       _vector_mul_f(stmp[0].c[3],-1,sptr->c[1]);
       _spinor_prod_re_f(temp,*sptr,stmp[0]);
-      f_At[((GLB_T-1)-(COORD[0]*T+ix0))%GLB_T]+=temp;
+      f_At[((GLB_T-1)-(zerocoord[0]+ix0))%GLB_T]+=temp;
     }
   }
   
@@ -378,7 +378,7 @@ gaud+ = - 1/2 sum tr  g0  Hdd^(-1)(x:2,y) U0(1,y)^dag  Q- csi csi^dag  Q- U0(1,z
       sptr[0] = _FIELD_AT(&prop[s],i);
       _spinor_prod_re_f(temp,*sptr[0],*sptr[0]);
       /*gpud*/
-      gp[(COORD[0]*T+ix0-1+GLB_T)%GLB_T] += .5*(temp)/GLB_VOL3;
+      gp[(zerocoord[0]+ix0-1+GLB_T)%GLB_T] += .5*(temp)/GLB_VOL3;
  
       /*gaud*/
       /*-gamma_0*/
@@ -388,7 +388,7 @@ gaud+ = - 1/2 sum tr  g0  Hdd^(-1)(x:2,y) U0(1,y)^dag  Q- csi csi^dag  Q- U0(1,z
       stmp[0].c[3]=sptr[0]->c[1];
 
       _spinor_prod_re_f(temp,*sptr[0],stmp[0]);
-      ga[(COORD[0]*T+ix0-1+GLB_T)%GLB_T] += .5*temp/GLB_VOL3;
+      ga[(zerocoord[0]+ix0-1+GLB_T)%GLB_T] += .5*temp/GLB_VOL3;
 
 
     }
@@ -463,20 +463,22 @@ Q+ = |             | * 1/2
   }
   global_sum((double*)stmp,4*NF*4*NF*2);    
   g1=0.;
-  for(int s=0;s<4*NF;s++){
-    stmp[4*NF]=stmp[s];
-    _vector_i_add_assign_f(stmp[4*NF].c[0],stmp[s].c[2]);
-    _vector_i_add_assign_f(stmp[4*NF].c[1],stmp[s].c[3]);
-    _vector_i_sub_assign_f(stmp[4*NF].c[2],stmp[s].c[0]);
-    _vector_i_sub_assign_f(stmp[4*NF].c[3],stmp[s].c[1]);
+  if(COORD[0]==0){
+    for(int s=0;s<4*NF;s++){
+      stmp[4*NF]=stmp[s];
+      _vector_i_add_assign_f(stmp[4*NF].c[0],stmp[s].c[2]);
+      _vector_i_add_assign_f(stmp[4*NF].c[1],stmp[s].c[3]);
+      _vector_i_sub_assign_f(stmp[4*NF].c[2],stmp[s].c[0]);
+      _vector_i_sub_assign_f(stmp[4*NF].c[3],stmp[s].c[1]);
     
-    
-    _spinor_prod_re_f(temp,stmp[s],stmp[4*NF]);
-    
-    
-    g1+=temp;
+      
+      _spinor_prod_re_f(temp,stmp[s],stmp[4*NF]);
+      
+      
+      g1+=temp;
+    }
+    g1*=(.25/GLB_VOL3)/GLB_VOL3;
   }
-  g1*=(.5/GLB_VOL3)/GLB_VOL3;
   
   global_sum((double*)(&g1),1);
   lprintf("PC_twisted_AC",10," g1_ud_+ = %.10e\n",g1);	

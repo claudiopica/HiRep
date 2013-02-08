@@ -19,6 +19,7 @@
 #include "random.h"
 
 
+#error "Old version of Mesons, it should be updated"
 
 void print_mat(complex mat[4][4], const char name[]) {
   int i,j;

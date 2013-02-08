@@ -121,19 +121,19 @@ void compute_gamma(int g[4], int ic) {
       for(c[2]=0; c[2]<Y; c[2]++)
       for(c[3]=0; c[3]<Z; c[3]++) {
         ix=ipt(c[0],c[1],c[2],c[3]);
-        if(c[0]+COORD[0]*T==g[0] &&
-           c[1]+COORD[1]*X==g[1] &&
-           c[2]+COORD[2]*Y==g[2] &&
-           c[3]+COORD[3]*Z==g[3])
+        if(c[0]+zerocoord[0]==g[0] &&
+           c[1]+zerocoord[1]==g[1] &&
+           c[2]+zerocoord[2]==g[2] &&
+           c[3]+zerocoord[3]==g[3])
         {
           for(alpha=0; alpha<4; alpha++) {
             locmy_gamma[mu][alpha][beta].re += _FIELD_AT(out,ix)->c[alpha].c[ic].re;
             locmy_gamma[mu][alpha][beta].im += _FIELD_AT(out,ix)->c[alpha].c[ic].im;
           }
-        } else if(c[0]+COORD[0]*T==(g[0]+shift[0])%GLB_T &&
-                  c[1]+COORD[1]*X==(g[1]+shift[1])%GLB_X &&
-                  c[2]+COORD[2]*Y==(g[2]+shift[2])%GLB_Y &&
-                  c[3]+COORD[3]*Z==(g[3]+shift[3])%GLB_Z)
+        } else if(c[0]+zerocoord[0]==(g[0]+shift[0])%GLB_T &&
+                  c[1]+zerocoord[1]==(g[1]+shift[1])%GLB_X &&
+                  c[2]+zerocoord[2]==(g[2]+shift[2])%GLB_Y &&
+                  c[3]+zerocoord[3]==(g[3]+shift[3])%GLB_Z)
         {
           for(alpha=0; alpha<4; alpha++) {
             locmy_gamma[mu][alpha][beta].re -= _FIELD_AT(out,ix)->c[alpha].c[ic].re;
@@ -244,6 +244,7 @@ int main(int argc,char *argv[])
 #endif
 
   int g[4], ic;
+
   for(ic=0; ic<NF; ic++)
     for(g[0]=0; g[0]<GLB_T; g[0]++)
       for(g[1]=0; g[1]<GLB_X; g[1]++)
@@ -253,6 +254,8 @@ int main(int argc,char *argv[])
 	    
 	    compute_gamma(g,ic);
 	  }
-  
+
+
   finalize_process();
+
 }

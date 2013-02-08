@@ -170,6 +170,19 @@ void origin_coord(int *c) {
   c[3]=(COORD[3]<r)?(d+1)*COORD[3]:d*COORD[3]+r;
 }
 
+void other_proc_origin_coord(int * proc_coord, int *c) {
+  int d,r;
+
+  d=GLB_T/NP_T; r=GLB_T-d*NP_T;
+  c[0]=(proc_coord[0]<r)?(d+1)*proc_coord[0]:d*proc_coord[0]+r;
+  d=GLB_X/NP_X; r=GLB_X-d*NP_X;
+  c[1]=(proc_coord[1]<r)?(d+1)*proc_coord[1]:d*proc_coord[1]+r;
+  d=GLB_Y/NP_Y; r=GLB_Y-d*NP_Y;
+  c[2]=(proc_coord[2]<r)?(d+1)*proc_coord[2]:d*proc_coord[2]+r;
+  d=GLB_Z/NP_Z; r=GLB_Z-d*NP_Z;
+  c[3]=(proc_coord[3]<r)?(d+1)*proc_coord[3]:d*proc_coord[3]+r;
+}
+
 /* this function compute the parity of this process.
  * To do this we need to compute the global position of local site (0,0,0,0).
  * It is assumed that local dimensions are assigned by the above function compute_dim.
@@ -312,6 +325,8 @@ int geometry_init() {
   check_geometry_variables();
   
 
+  /*Set the global coordinate of the local {0,0,0,0} point*/
+  origin_coord(zerocoord); 
 
   return 0;
 }

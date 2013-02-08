@@ -87,7 +87,7 @@ static void create_diluted_source_even(spinor_field *source, int tau, int beta) 
     for(c[1]=0; c[1]<X; c[1]++)
     for(c[2]=0; c[2]<Y; c[2]++)
     for(c[3]=0; c[3]<Z; c[3]++)
-      if(((tau+COORD[1]*X+c[1]+COORD[2]*Y+c[2]+COORD[3]*Z+c[3])&1)==0)
+      if(((tau+zerocoord[1]+c[1]+zerocoord[2]+c[2]+zerocoord[3]+c[3])&1)==0)
         ranz2((double*)(&(_FIELD_AT(source,ipt(c[0],c[1],c[2],c[3])))->c[beta]),sizeof(suNf_vector)/sizeof(double));
   }
   
@@ -137,6 +137,7 @@ static void z2semwall_qprop_init(int nm, double *m, double acc) {
   double norm;
 
   if(init==0) {
+
 
     shift=(double*)malloc(sizeof(double)*(nm));
     mass=(double*)malloc(sizeof(double)*(nm));
@@ -209,8 +210,10 @@ void z2semwall_qprop_free() {
   free_spinor_field_f(eta);
   free_spinor_field_f(psi0);
 
+
   free(shift);
   free(mass);
+    
   free_spinor_field_f(QMR_noise);
   init=0;
 }
@@ -422,7 +425,7 @@ void z2semwall_mesons(int conf, int nhits, int nm, double *m, double acc) {
               for (z=0; z<Z; z++) {
                 ix=ipt(t,x,y,z);
                 _spinor_prod_re_f(tmp,*_FIELD_AT(&psi0[beta*nm+i],ix),*_FIELD_AT(&psi0[beta*nm+i],ix));
-                corr[_g5][(COORD[0]*T+t+GLB_T-tau)%GLB_T+i*GLB_T]+=tmp;
+                corr[_g5][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T]+=tmp;
               }
     
 
@@ -436,7 +439,7 @@ void z2semwall_mesons(int conf, int nhits, int nm, double *m, double acc) {
             _spinor_zero_f(sp); \
             name##_eval_g5GammaDag_times_spinor(&sp,_FIELD_AT(&psi0[beta*nm+i],ix)); \
             _spinor_prod_re_f(tmp,*_FIELD_AT(&psi[i],ix),sp); \
-            corr[ _##name ][(COORD[0]*T+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; \
+            corr[ _##name ][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; \
           } \
         } \
       } \
@@ -511,7 +514,7 @@ void z2semwall_mesons(int conf, int nhits, int nm, double *m, double acc) {
             _spinor_zero_f(sp);
             g0g5_eval_g5GammaDag_times_spinor(&sp,_FIELD_AT(&psi0[beta*nm+i],ix));
             _spinor_prod_re_f(tmp,*_FIELD_AT(&psi0[beta*nm+i],ix),sp);
-            corr[_g5_g0g5_re][(COORD[0]*T+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
+            corr[_g5_g0g5_re][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
           }
         }
       }

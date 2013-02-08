@@ -7,7 +7,7 @@ default: $(EXES)
 
 
 MODDIR := Geometry
-MODS := geometry_init geometry_mpi_eo communications test_geometry_mpi 
+MODS := geometry_init geometry_mpi_eo communications test_geometry_mpi process_init
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := IO

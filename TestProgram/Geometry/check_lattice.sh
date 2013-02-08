@@ -21,11 +21,18 @@ for (( i=0; i<ntests; i++ )) ; do
    test[$((i*14+5))]=`expr $RANDOM % 3 + 1`; BX=${test[$((i*14+5))]} 
    test[$((i*14+6))]=`expr $RANDOM % 3 + 1`; BY=${test[$((i*14+6))]} 
    test[$((i*14+7))]=`expr $RANDOM % 3 + 1`; BZ=${test[$((i*14+7))]} 
+
+   test[$((i*14+8))]=`expr 2 \* \( $RANDOM % 3 \) `; dT=${test[$((i*14+8))]}
+   test[$((i*14+9))]=`expr 2 \* \( $RANDOM % 3 \) `; dX=${test[$((i*14+9))]}
+   test[$((i*14+10))]=`expr 2 \* \( $RANDOM % 3 \) `; dY=${test[$((i*14+10))]}
+   test[$((i*14+11))]=`expr 2 \* \( $RANDOM % 3 \) `; dZ=${test[$((i*14+11))]}
+
+
    
-   (( T=BT*(T + (BT*T)%2 )  ))
-   (( X=BX*(X + (BX*X)%2 )  ))
-   (( Y=BY*(Y + (BY*Y)%2 )  ))
-   (( Z=BZ*(Z + (BZ*Z)%2 )  ))
+   (( T=BT*(T + (BT*T)%2 )+dT  ))
+   (( X=BX*(X + (BX*X)%2 )+dX  ))
+   (( Y=BY*(Y + (BY*Y)%2 )+dY  ))
+   (( Z=BZ*(Z + (BZ*Z)%2 )+dZ  ))
    
 
    test[$((i*14+0))]=$T

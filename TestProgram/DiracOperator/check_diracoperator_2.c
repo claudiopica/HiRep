@@ -228,10 +228,10 @@ int main(int argc,char *argv[])
 		if(ix==-1 || ix >= glattice.gsize_spinor) continue;
 		
 		/* Attention, the definition of the plane wave depends on the slice used for the BC*/
-		px=p[0]*(double)(safe_mod(x0+T*COORD[0]-T_BORDER-1,GLB_T)+T_BORDER+1)
-		  +p[1]*(double)(safe_mod(x1+X*COORD[1]-X_BORDER-1,GLB_X)+X_BORDER+1)
-		  +p[2]*(double)(safe_mod(x2+Y*COORD[2]-Y_BORDER-1,GLB_Y)+Y_BORDER+1)
-		  +p[3]*(double)(safe_mod(x3+Z*COORD[3]-Z_BORDER-1,GLB_Z)+Z_BORDER+1);
+		px=p[0]*(double)(safe_mod(x0+zerocoord[0]-T_BORDER-1,GLB_T)+T_BORDER+1)
+		  +p[1]*(double)(safe_mod(x1+zerocoord[1]-X_BORDER-1,GLB_X)+X_BORDER+1)
+		  +p[2]*(double)(safe_mod(x2+zerocoord[2]-Y_BORDER-1,GLB_Y)+Y_BORDER+1)
+		  +p[3]*(double)(safe_mod(x3+zerocoord[3]-Z_BORDER-1,GLB_Z)+Z_BORDER+1);
 		
 		z.re=(double)(cos(px));
 		z.im=(double)(sin(px));

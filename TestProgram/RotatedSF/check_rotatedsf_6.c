@@ -30,7 +30,7 @@ rhmc_par _update_par;
 int main(int argc,char *argv[])
 {
   setup_process(&argc,&argv);
-
+  char tmp[256];
 
   BCs_pars_t BCs_pars = {
     .fermion_twisting_theta = {0.,M_PI/5.,M_PI/5.,M_PI/5.},
@@ -57,8 +57,13 @@ int main(int argc,char *argv[])
   _update_par.SF_zf=1.3;
 
   
-  logger_setlevel(0,99); /* log all */
-  logger_map("DEBUG","debug");
+  logger_setlevel(0,100); /* log all */
+  if (PID!=0) { 
+    logger_disable();}
+  else{
+    sprintf(tmp,">out_%d",PID); logger_stdout(tmp);
+    sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
+  }
   
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
   
@@ -92,9 +97,9 @@ int main(int argc,char *argv[])
   u_gauge_f=alloc_gfield_f(&glattice); 
   
   /* unit_u(u_gauge); */
-   read_gauge_field_nocheck("gfield_sint.dat"); 
+  read_gauge_field_nocheck("gfield_sint.dat"); 
   apply_BCs_on_fundamental_gauge_field();
-  
+   
   lprintf("MAIN",0,"mass = %f\n",mass);
 /*   lprintf("MAIN",0,"ds = %f\n",_update_par.SF_ds); */
 /*   lprintf("MAIN",0,"zf = %f\n",_update_par.SF_zf); */
@@ -105,7 +110,7 @@ int main(int argc,char *argv[])
   represent_gauge_field(); 
   full_plaquette();
  
-  SF_PCAC_wall_mass( mass,acc); 
+  SF_PCAC_wall_mass(mass,acc); 
   
   free_gfield(u_gauge);
   free_gfield_f(u_gauge_f);

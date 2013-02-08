@@ -84,6 +84,7 @@ GLB_VAR(int,*ipt, =NULL);
 GLB_VAR(int,*ipt_4d,=NULL);
 GLB_VAR(int,*iup,=NULL);
 GLB_VAR(int,*idn,=NULL);
+GLB_VAR(int,zerocoord[4],={0,0,0,0});
 
 /* Geometry structures */
 #define ipt(t,x,y,z) ipt[((((t)+T_BORDER)*(X_EXT)+((x)+X_BORDER))*(Y_EXT)+((y)+Y_BORDER))*(Z_EXT)+((z)+Z_BORDER)]

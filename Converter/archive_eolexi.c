@@ -171,10 +171,10 @@ void read_gauge_field_eolexi_BE(char filename[])
   for(c[2]=0; c[2]<Y; c[2]++)
   for(c[3]=0; c[3]<Z; c[3]++) {
   
-    g[0]=COORD[0]*T+c[0];
-    g[1]=COORD[1]*X+c[1];
-    g[2]=COORD[2]*Y+c[2];
-    g[3]=COORD[3]*Z+c[3];
+    g[0]=zerocoord[0]+c[0];
+    g[1]=zerocoord[1]+c[1];
+    g[2]=zerocoord[2]+c[2];
+    g[3]=zerocoord[3]+c[3];
 
     ix_eolexi=index_eolexi(g[0],g[1],g[2],g[3]);
     ix_mpieo=ipt(c[0],c[1],c[2],c[3]);
@@ -346,10 +346,10 @@ void read_gauge_field_eolexi_LE(char filename[])
   for(c[2]=0; c[2]<Y; c[2]++)
   for(c[3]=0; c[3]<Z; c[3]++) {
   
-    g[0]=COORD[0]*T+c[0];
-    g[1]=COORD[1]*X+c[1];
-    g[2]=COORD[2]*Y+c[2];
-    g[3]=COORD[3]*Z+c[3];
+    g[0]=zerocoord[0]+c[0];
+    g[1]=zerocoord[1]+c[1];
+    g[2]=zerocoord[2]+c[2];
+    g[3]=zerocoord[3]+c[3];
 
     ix_eolexi=index_eolexi(g[0],g[1],g[2],g[3]);
     ix_mpieo=ipt(c[0],c[1],c[2],c[3]);
