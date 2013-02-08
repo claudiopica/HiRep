@@ -37,8 +37,8 @@ double _FUNC(spinor_field_prod_im)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s
    _REAL prod;
    
    _TWO_SPINORS_FOR(s1,s2,i) {
-      _spinor_prod_im_f(prod,*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
-		res+=(double)prod;
+     _spinor_prod_im_f(prod,*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
+     res+=(double)prod;
    }
 #ifdef WITH_MPI
 	global_sum(&res,1);
@@ -50,7 +50,7 @@ double _FUNC(spinor_field_prod_im)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s
 complex _FUNC(spinor_field_prod)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
    _DECLARE_INT_ITERATOR(i);
-	_SPINOR_TYPE *_SPINOR_PTR(s1), *_SPINOR_PTR(s2);
+   _SPINOR_TYPE *_SPINOR_PTR(s1), *_SPINOR_PTR(s2);
    complex res={0.,0.};
    
    _TWO_SPINORS_FOR(s1,s2,i) {

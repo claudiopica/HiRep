@@ -37,8 +37,8 @@ MACRO += -DIO_FLUSH
 #export OMPI_CC = ccache gcc
 ifeq (,$(findstring -DWITH_GPU,$(MACRO))) #Compile CPU only
 CC = gcc
-CFLAGS = -Wall -std=c99 -O2 -fomit-frame-pointer -mfpmath=sse -msse -msse2 
-#CFLAGS = -Wall -std=c99 -g -mfpmath=sse -msse -msse2 
+#CFLAGS = -Wall -std=c99 -O2 -fomit-frame-pointer -mfpmath=sse -msse -msse2 
+CFLAGS = -Wall -std=c99 -g -mfpmath=sse -msse -msse2 
 else #Compile with GPU
 CC = nvcc 
 #CFLAGS = -g -G -Xcompiler '-std=c99 -fgcse-sm -fgcse-las -fgcse-after-reload'

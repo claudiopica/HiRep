@@ -32,12 +32,18 @@ static int GMRES_core(short int *valid, MINRES_par *par, int kry_dim , spinor_op
   complex * ybar;
   complex c_tmp1,c_tmp2;
 
-  gbar=(complex*)malloc((kry_dim+1)*sizeof(gbar));
-  ybar=(complex*)malloc((kry_dim)*sizeof(ybar));
+  gbar = (complex*) malloc((kry_dim+1)*sizeof(*gbar));
+  ybar = (complex*) malloc(kry_dim*sizeof(*ybar));
 
-  h=(complex*)malloc(kry_dim*(kry_dim+1)*sizeof(h));
-  //h(i,j)=h(i*kry_dim+j)
+  h = (complex*) malloc( kry_dim*(kry_dim+1)*sizeof(*h));
+  //h(i,j)=h[i*kry_dim+j]
 
+  for (i=0;i<kry_dim+1;i++){
+    gbar[i].re = gbar[i].im = 0.;
+    for (j=0;j<kry_dim;j++){
+      h[i*kry_dim+j].re=h[i*kry_dim+j].im=0.0;
+    }
+  }
 
 #ifdef WITH_GPU
   alloc_mem_t=GPU_MEM; /* allocate only on GPU */
@@ -66,27 +72,23 @@ static int GMRES_core(short int *valid, MINRES_par *par, int kry_dim , spinor_op
 
   spinor_field_mul_f(&v[0],1./beta,&v[0]);
   gbar[0].re=beta;
-  gbar[0].im=0;
 
   for (j=0;j<kry_dim;++j){
     
     ++cgiter;
     M.dbl(w,&v[j]);    
-    lprintf("INVERTER",500,"GMRES Applied Dirac operator:\n");
 
     for (i=0;i<j+1;++i){	// Gram-Schmidth orthogonalization
       h[i*kry_dim+j]=spinor_field_prod_f(w,&v[i]);
-      lprintf("INVERTER",500,"GMRES Gram-Schmidt 1!:\n");      
-      _complex_minus(c_tmp1,h[i*kry_dim+j]); 
+      _complex_minus(c_tmp1,h[i*kry_dim+j]);
       spinor_field_mulc_add_assign_f(w,c_tmp1,&v[i]);
-      lprintf("INVERTER",500,"GMRES Gram-Schmidt 2!:\n");      
     }
-    lprintf("INVERTER",500,"GMRES Gram-Schmidt orthogonalization done!:\n");
 
     h[(j+1)*kry_dim+j].re=sqrt(spinor_field_sqnorm_f(w));
     h[(j+1)*kry_dim+j].im=0;
     
     if (h[(j+1)*kry_dim+j].re < par->err2){
+      lprintf("INVERTER",500,"GMRES_core: Lucky termination!:\n");
       kry_dim=j;
       break;
     }
@@ -94,37 +96,50 @@ static int GMRES_core(short int *valid, MINRES_par *par, int kry_dim , spinor_op
     if (j<kry_dim-1){
       spinor_field_mul_f(&v[j+1],1./h[(j+1)*kry_dim+j].re,w);
     }
-    
-    gbar[j+1].re = gbar[j+1].im = 0.;
   }
 
-  lprintf("INVERTER",100,"GMRES loopek over kyrlov_dim:%d!\n",kry_dim);
+  /*  for (i=0;i<kry_dim+1;i++){
+    for (j=0;j<kry_dim;j++){
+      lprintf("INVERTER",500,"h(%d,%d)=(%e,%e)\n",i,j,h[i*kry_dim+j].re,h[i*kry_dim+j].im);
+    }
+    }  */
+
 
   // Now doing the Givens rotations
-  for (i=0;i<kry_dim-1;++i){
-    tmp=sqrt(_complex_prod_re(h[i*kry_dim+i], h[i*kry_dim+i])+h[i*(kry_dim+1)+i].re*h[i*(kry_dim+1)+i].re);
-    s=h[i*(kry_dim+1)+i].re / tmp;
+  for (i=0;i<kry_dim;++i){
+    tmp=sqrt(_complex_prod_re(h[i*kry_dim+i], h[i*kry_dim+i])+h[kry_dim*(i+1)].re*h[kry_dim*(i+1)+i].re);
+    s=h[kry_dim*(i+1)+i].re / tmp;
     _complex_mulr(c,1./tmp,h[i*kry_dim+i]);
-	
     // Rotate gbar
     c_tmp1=gbar[i];
     _complex_mul_star(gbar[i],c_tmp1,c);
 
     c_tmp2=gbar[i+1];
     _complex_mulr(gbar[i+1],-s,c_tmp1);
-    _complex_mul_assign(gbar[i+1],c,c_tmp2);
-	
+    //    _complex_mul_assign(gbar[i+1],c,c_tmp2);
+     
 	
     // Rotate h
-    for (j=i;j<kry_dim+1;++j){
+    for (j=i;j<kry_dim;++j){
       c_tmp1=h[i*kry_dim+j];
       _complex_mul_star(h[i*kry_dim+j],c_tmp1,c);
-      _complex_mulr_assign(h[i*kry_dim+j],s,h[(i+1)*kry_dim+j]);	
+      _complex_mulr_assign(h[i*kry_dim+j],s,h[(i+1)*kry_dim+j]);
       c_tmp2=h[(1+i)*kry_dim+j];
       _complex_mulr(h[(i+1)*kry_dim+j],-s,c_tmp1);
       _complex_mul_assign(h[(i+1)*kry_dim+j],c,c_tmp2);
     }
   }
+
+  /*  for (i=0;i<kry_dim+1;i++){
+    for (j=0;j<kry_dim;j++){
+      lprintf("INVERTER",500,"h(%d,%d)=(%e,%e)\n",i,j,h[i*kry_dim+j].re,h[i*kry_dim+j].im);
+    }
+  }  
+
+  for (i=0;i<kry_dim+1;i++){
+    lprintf("INVERTER",500,"g(%d)=(%e)\n",i,gbar[i].re,gbar[i].im);
+    } */ 
+
 
 
   // h is now upper triangular... 
@@ -137,17 +152,20 @@ static int GMRES_core(short int *valid, MINRES_par *par, int kry_dim , spinor_op
     _complex_mulr(ybar[i],1./h[i*kry_dim+i].re,ybar[i]);
   }
 
-  //The solutions is (out_m = out_0 + V_m y_m)
-  //  for (i=0;i<kry_dim;++i){
-  spinor_field_mulc_add_assign_f(out,ybar[kry_dim-1],&v[kry_dim-1]);
-  // }
+  //The solutions is (out_m = out_0 + V y)
+  for (i=0;i<kry_dim;++i){
+    spinor_field_mulc_add_assign_f(out,ybar[i],&v[i]);
+  }
   
-  *valid = (gbar[kry_dim].re < par->err2 );
+  *valid = (fabs(gbar[kry_dim].re) < par->err2 );
     
-  lprintf("INVERTER",30,"GMRES Error after GMRES_core: %e\n",gbar[kry_dim]);
+  lprintf("INVERTER",100,"GMRES Error after GMRES_core: %e\n",gbar[kry_dim].re);
   
   /* free memory */
   free_spinor_field_f(v);
+  free(h);
+  free(gbar);
+  free(ybar);
   
   /* return number of cg iter */
   return cgiter;
@@ -166,6 +184,6 @@ int GMRES(MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field *ou
       lprintf("INVERTER",-10,"GMRES recursion = %d (precision too high?)\n",rep);
     }
   }
-  lprintf("INVERTER",10,"GMMINRES: MVM = %d\n",iter);
+  lprintf("INVERTER",10,"GMRES: MVM = %d\n",iter);
   return iter;
 }
