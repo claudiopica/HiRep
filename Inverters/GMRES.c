@@ -16,6 +16,13 @@
 #include <math.h>
 #include <assert.h>
 
+static inline double pythag(double x, double y){
+  double ax = fabs(x);
+  double ay = fabs(y);
+  if (ax>ay) return ax*sqrt(1.0+ay*ay/ax/ax);
+  else return (ay == 0.0 ? 0.0 : ay*(sqrt(1.0+(ax*ax/ay/ay))));
+}
+
 static int GMRES_core(short int *valid, MINRES_par *par, int kry_dim , spinor_operator M, spinor_field *in, spinor_field *out, spinor_field *trial){
 
   int i,j;
@@ -71,20 +78,37 @@ static int GMRES_core(short int *valid, MINRES_par *par, int kry_dim , spinor_op
   lprintf("INVERTER",100,"GMRES Initial norm: %e\n",beta);
 
   spinor_field_mul_f(&v[0],1./beta,&v[0]);
-  gbar[0].re=beta;
+  gbar[0].re=beta; 
 
   for (j=0;j<kry_dim;++j){
-    
     ++cgiter;
-    M.dbl(w,&v[j]);    
+    M.dbl(w,&v[j]);
 
-    for (i=0;i<j+1;++i){	// Gram-Schmidth orthogonalization
+    /*    for (i=0;i<j+1;++i){	// Gram-Schmidth orthogonalization (standard)
       h[i*kry_dim+j]=spinor_field_prod_f(w,&v[i]);
       _complex_minus(c_tmp1,h[i*kry_dim+j]);
       spinor_field_mulc_add_assign_f(w,c_tmp1,&v[i]);
+      }*/
+
+    //Gram Schmidt orthogonalization (iterated)
+    beta=-1;
+    for(;;){ 
+      for (i=0;i<j+1;++i){
+	c_tmp1 = spinor_field_prod_f(w,&v[i]);
+	_complex_add_assign(h[i*kry_dim+j],c_tmp1);
+	_complex_minus(c_tmp1,c_tmp1);
+	spinor_field_mulc_add_assign_f(w,c_tmp1,&v[i]);	
+      }
+      tmp = sqrt(spinor_field_sqnorm_f(w));
+      if (beta>0 && tmp > 0.5*beta){
+	break;
+      }
+      else{
+	beta = tmp;
+      }
     }
 
-    h[(j+1)*kry_dim+j].re=sqrt(spinor_field_sqnorm_f(w));
+    h[(j+1)*kry_dim+j].re=tmp;
     h[(j+1)*kry_dim+j].im=0;
     
     if (h[(j+1)*kry_dim+j].re < par->err2){
@@ -105,20 +129,22 @@ static int GMRES_core(short int *valid, MINRES_par *par, int kry_dim , spinor_op
     }  */
 
 
+   
+
   // Now doing the Givens rotations
   for (i=0;i<kry_dim;++i){
-    tmp=sqrt(_complex_prod_re(h[i*kry_dim+i], h[i*kry_dim+i])+h[kry_dim*(i+1)].re*h[kry_dim*(i+1)+i].re);
+    //    tmp=sqrt(_complex_prod_re(h[i*kry_dim+i], h[i*kry_dim+i])+h[kry_dim*(i+1)].re*h[kry_dim*(i+1)+i].re);
+    tmp = pythag(pythag(h[i*kry_dim+i].re,h[i*kry_dim+i].im),h[kry_dim*(i+1)].re);
     s=h[kry_dim*(i+1)+i].re / tmp;
     _complex_mulr(c,1./tmp,h[i*kry_dim+i]);
     // Rotate gbar
     c_tmp1=gbar[i];
     _complex_mul_star(gbar[i],c_tmp1,c);
 
-    c_tmp2=gbar[i+1];
+    //    c_tmp2=gbar[i+1];
     _complex_mulr(gbar[i+1],-s,c_tmp1);
     //    _complex_mul_assign(gbar[i+1],c,c_tmp2);
-     
-	
+     	
     // Rotate h
     for (j=i;j<kry_dim;++j){
       c_tmp1=h[i*kry_dim+j];
@@ -157,10 +183,16 @@ static int GMRES_core(short int *valid, MINRES_par *par, int kry_dim , spinor_op
     spinor_field_mulc_add_assign_f(out,ybar[i],&v[i]);
   }
   
-  *valid = (fabs(gbar[kry_dim].re) < par->err2 );
+  *valid = (fabs(gbar[kry_dim].re*gbar[kry_dim].re) < par->err2 );
     
-  lprintf("INVERTER",100,"GMRES Error after GMRES_core: %e\n",gbar[kry_dim].re);
+  lprintf("INVERTER",100,"GMRES Error after GMRES_core: %e\n",gbar[kry_dim].re*gbar[kry_dim].re);
   
+  //Debug the errro
+  M.dbl(w,out);
+  spinor_field_sub_assign_f(w,in);
+  double tau=spinor_field_sqnorm_f(w)/spinor_field_sqnorm_f(in);
+  lprintf("INVERTER",100,"test  = %e (req. %e)\n",tau,par->err2);
+
   /* free memory */
   free_spinor_field_f(v);
   free(h);
@@ -175,7 +207,7 @@ static int GMRES_core(short int *valid, MINRES_par *par, int kry_dim , spinor_op
 int GMRES(MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field *out, spinor_field *trial){
   int iter, rep=0;
   short int valid;
-  int kry_dim=10;
+  int kry_dim=5;
   lprintf("INVERTER",100,"GMRES starting inverter!\n",rep);  
   iter = GMRES_core(&valid,par,kry_dim,M,in,out,trial);
   while (!valid && (par->max_iter==0 || iter < par->max_iter)){
