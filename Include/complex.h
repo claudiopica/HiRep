@@ -294,6 +294,13 @@ typedef struct
    (a).im=((b).im*(c).re-(b).re*(c).im)
 
 /*
+* a=b*(c^+) (a,c complex, b real)
+*/
+#define _complex_mulr_star(a,b,c) \
+  (a).re= ((b)*(c).re);		  \
+  (a).im= (-(b)*(c).im)
+
+/*
 * a+=b*(c^+) (a,b,c complex)
 */
 #define _complex_mul_star_assign(a,b,c) \
