@@ -44,26 +44,33 @@ void H_dbl(spinor_field *out, spinor_field *in){
 }
 
 static spinor_field *tmp;
+static spinor_field_flt *tmp_flt;
 
 void M_dbl(spinor_field *out, spinor_field *in){
    g5Dphi(-hmass,tmp,in); 
    g5Dphi(-hmass,out,tmp);
 }
 
+void M_flt(spinor_field_flt *out, spinor_field_flt *in){
+   g5Dphi_flt(-hmass,tmp_flt,in); 
+   g5Dphi_flt(-hmass,out,tmp_flt);
+}
+
 spinor_operator D={&D_dbl,NULL}; 
 spinor_operator H={&H_dbl,NULL}; 
-spinor_operator M={&M_dbl,NULL}; 
+spinor_operator M={&M_dbl,&M_flt}; 
 
 
 int main(int argc,char *argv[])
 {
-   int i;
    double tau;
    spinor_field *s1, *s2;
    spinor_field *res;
+   spinor_field_flt *s1_flt, *s2_flt;
+   spinor_field_flt *res_flt;
 
 
-   MINRES_par par;
+   inverter_par par;
 
    int cgiters;
 
@@ -71,7 +78,8 @@ int main(int argc,char *argv[])
    setup_process(&argc,&argv);
    
    /* logger setup */
-   logger_setlevel(0,10000); /* log all */
+   //   logger_setlevel(0,10000); /* log all */
+   logger_setlevel(0,100); /* log all */
    logger_map("DEBUG","debug");
 #ifdef WITH_MPI
    sprintf(pame,">out_%d",PID); logger_stdout(pame);
@@ -101,41 +109,72 @@ int main(int argc,char *argv[])
    /* test_geometry_mpi_eo(); */
    
    u_gauge=alloc_gfield(&glattice);
+   u_gauge_flt=alloc_gfield_flt(&glattice);
 #ifndef REPR_FUNDAMENTAL
    u_gauge_f=alloc_gfield_f(&glattice);
+   u_gauge_f_flt=alloc_gfield_f_flt(&glattice);
 #endif
    
    lprintf("MAIN",0,"Generating a random gauge field... ");
    fflush(stdout);
    random_u(u_gauge);
+   assign_ud2u();
    start_gf_sendrecv(u_gauge);
    complete_gf_sendrecv(u_gauge);
    lprintf("MAIN",0,"done.\n");
    represent_gauge_field();
-   
-   par.err2=1.e-28;
+   represent_gauge_field_flt();
+   //   assign_ud2u_f();
+
+   par.err2=1.e-25;
+   par.err2_flt=1.e-10;
    par.max_iter=0;
+   par.max_iter_flt =0;
+   par.kry_dim = 40;
+
    res=alloc_spinor_field_f(4,&glattice);
    s1=res+1;
    s2=s1+1;
    tmp=s2+1;
+
+   res_flt=alloc_spinor_field_f_flt(4,&glattice);
+   s1_flt=res_flt+1;
+   s2_flt=s1_flt+1;
+   tmp_flt = s2_flt+1;
    
    gaussian_spinor_field(s1);
+   assign_sd2s(s1_flt,s1);   
    
-   
-   /* TEST CG_M */
+   /* TEST GMRES_M */
 
-   lprintf("CG TEST",0,"Testing  multishift\n");
-   lprintf("CG TEST",100,"---------------------\n");
+   lprintf("GMRES TEST",0,"Testing  GMRES\n");
+   lprintf("GMRES TEST",100,"---------------------\n");
 
    cgiters = GMRES(&par, M, s1, res,NULL);
-   lprintf("CG TEST",0,"Converged in %d iterations\n",cgiters);
+   lprintf("GMRES TEST",0,"Converged in %d iterations\n",cgiters);
    M.dbl(s2,res);
    spinor_field_sub_assign_f(s2,s1);
    tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
-   lprintf("CG TEST",0,"test  = %e (req. %e)\n",tau,par.err2);
+   lprintf("GMRES TEST",0,"test  = %e (req. %e)\n",tau,par.err2);
 
    free_spinor_field_f(res);
+
+
+
+   lprintf("GMRES TEST",0,"Testing  GMRES flt\n");
+   lprintf("GMRES TEST",100,"---------------------\n");
+
+   cgiters = GMRES_flt(&par, M, s1_flt, res_flt,NULL);
+   lprintf("GMRES TEST",0,"Converged in %d iterations\n",cgiters);
+   M.flt(s2_flt,res_flt);
+   spinor_field_sub_assign_f_flt(s2_flt,s1_flt);
+   tau=spinor_field_sqnorm_f_flt(s2_flt)/spinor_field_sqnorm_f_flt(s1_flt);
+   lprintf("GMRES TEST",0,"test  = %e (req. %e)\n",tau,par.err2_flt);
+
+   free_spinor_field_f(res);
+
+
+
 
    finalize_process();
 

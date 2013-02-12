@@ -19,8 +19,8 @@
 
 #define Hind(i,j) ((i)*kry_dim - (i)*((i)+1)/2+(j))
 
-static int GMRES_core(short int *valid, MINRES_par *par, int kry_dim, double inorm , spinor_operator M, spinor_field *in, spinor_field *out, spinor_field *trial){
-
+static int GMRES_core(short int *valid, inverter_par *par, spinor_operator M, spinor_field *in, spinor_field *out, spinor_field *trial){
+  int kry_dim = par->kry_dim;
   int i,j,k;
   int cgiter = 0;
   double beta;
@@ -34,6 +34,8 @@ static int GMRES_core(short int *valid, MINRES_par *par, int kry_dim, double ino
   double tmp;
   double norm_w;
   complex c_tmp1,c_tmp2;
+
+  double inorm = spinor_field_sqnorm_f(in);
 
 #ifdef WITH_GPU
   alloc_mem_t=GPU_MEM; /* allocate only on GPU */
@@ -66,7 +68,8 @@ static int GMRES_core(short int *valid, MINRES_par *par, int kry_dim, double ino
   for (j=0;j<kry_dim;++j){
     ++cgiter;
     M.dbl(w,&v[j]);
-
+    
+    tmp = sqrt(spinor_field_sqnorm_f(w));
     for (i=0;i<j+1;++i){	// Gram-Schmidth orthogonalization (modified)
       h[Hind(i,j)]=spinor_field_prod_f(w,&v[i]);
       _complex_minus(c_tmp1,h[Hind(i,j)]);
@@ -74,25 +77,19 @@ static int GMRES_core(short int *valid, MINRES_par *par, int kry_dim, double ino
     }
     norm_w = sqrt(spinor_field_sqnorm_f(w));
 
-    //Gram Schmidt orthogonalization (iterated)
-    /*    beta=-1;
-    for(;;){ 
-      for (i=0;i<j+1;++i){
-	c_tmp1 = spinor_field_prod_f(w,&v[i]);
-	_complex_add_assign(h[i*kry_dim+j],c_tmp1);
-	_complex_minus(c_tmp1,c_tmp1);
-	spinor_field_mulc_add_assign_f(w,c_tmp1,&v[i]);	
-      }
-      norm_w = sqrt(spinor_field_sqnorm_f(w));
-      if (beta>0 && norm_w > 0.5*beta){
-	break;
-      }
-      else{
-	beta = norm_w;
-      }
-      }*/
+    if ( norm_w/tmp < 0.001){
+     lprintf("INVERTER",100,"GMRES in second GR");
+     for (i=0;i<j+1;++i){	// Gram-Schmidth orthogonalization (modified)
+       c_tmp1=spinor_field_prod_f(w,&v[i]);
+       _complex_add_assign(h[Hind(i,j)],c_tmp1);
+       _complex_minus(c_tmp1,c_tmp1);
+       spinor_field_mulc_add_assign_f(w,c_tmp1,&v[i]);
+     }
+      norm_w = sqrt(spinor_field_sqnorm_f(w));      
+    }
 
-    if (norm_w*norm_w < par->err2){
+
+    if (norm_w*norm_w < 1e-28){
       lprintf("INVERTER",500,"GMRES_core: Lucky termination!:\n");
       break;
     }
@@ -167,15 +164,174 @@ static int GMRES_core(short int *valid, MINRES_par *par, int kry_dim, double ino
   return cgiter;
 }
 
-int GMRES(MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field *out, spinor_field *trial){
-  int iter, rep=0;
-  double inorm = spinor_field_sqnorm_f(in);
-  short int valid=0;
-  int kry_dim=20;
+static int GMRES_core_flt(short int *valid, inverter_par *par , spinor_operator M, spinor_field_flt *in, spinor_field_flt *out, spinor_field_flt *trial){
+  int kry_dim = par->kry_dim;
+  int i,j,k;
+  int cgiter = 0;
+  double beta;
+  spinor_field_flt * w;
+  spinor_field_flt * v;
+  complex  h[kry_dim*(kry_dim+1)/2];
+  double ss[kry_dim];
+  complex cs[kry_dim];
+  complex gbar[kry_dim+1];
 
-  iter = GMRES_core(&valid,par,kry_dim,inorm,M,in,out,NULL);
+  double tmp;
+  double norm_w;
+  complex c_tmp1,c_tmp2;
+  double inorm = spinor_field_sqnorm_f_flt(in);
+
+#ifdef WITH_GPU
+  alloc_mem_t=GPU_MEM; /* allocate only on GPU */
+#endif
+  v = alloc_spinor_field_f_flt(kry_dim+1,in->type);
+  w=v+kry_dim;
+  alloc_mem_t=std_mem_t; /* set the allocation memory type back */
+
+  spinor_field_copy_f_flt(&v[0], in);  // p2 now has the rhs-spinorfield "b"
+    
+  if(trial!=NULL) {
+    M.flt(w,trial);
+    ++cgiter;
+    spinor_field_sub_assign_f_flt(&v[0],w);
+    
+    if(out!=trial){
+      spinor_field_copy_f_flt(out,trial);
+    }
+    
+  } else {
+    spinor_field_zero_f_flt(out);
+  }
+
+  beta=sqrt(spinor_field_sqnorm_f_flt(&v[0]));
+
+  lprintf("INVERTER",100,"GMRES Initial norm: %e\n",beta);
+
+  spinor_field_mul_f_flt(&v[0],1./beta,&v[0]);
+  gbar[0].re=beta; 
+  for (j=0;j<kry_dim;++j){
+    ++cgiter;
+    M.flt(w,&v[j]);
+
+    
+    tmp = sqrt(spinor_field_sqnorm_f_flt(w));
+    for (i=0;i<j+1;++i){	// Gram-Schmidth orthogonalization (modified)
+      h[Hind(i,j)]=spinor_field_prod_f_flt(w,&v[i]);
+      _complex_minus(c_tmp1,h[Hind(i,j)]);
+      spinor_field_mulc_add_assign_f_flt(w,c_tmp1,&v[i]);
+    }
+    norm_w = sqrt(spinor_field_sqnorm_f_flt(w));
+
+    if ( norm_w/tmp < 10e-6){
+      for (i=0;i<j+1;++i){	// Gram-Schmidth orthogonalization (modified)
+	c_tmp1=spinor_field_prod_f_flt(w,&v[i]);
+	//	_complex_add_assign(h[i*kry_dim+j],c_tmp1);
+	_complex_minus(c_tmp1,c_tmp1);
+	spinor_field_mulc_add_assign_f_flt(w,c_tmp1,&v[i]);
+      }
+      norm_w = sqrt(spinor_field_sqnorm_f_flt(w));      
+    }
+
+    //Gram Schmidt orthogonalization (iterated)
+    /*    beta=-1;
+    for(;;){ 
+      for (i=0;i<j+1;++i){
+	c_tmp1 = spinor_field_prod_f_flt(w,&v[i]);
+	_complex_add_assign(h[i*kry_dim+j],c_tmp1);
+	_complex_minus(c_tmp1,c_tmp1);
+	spinor_field_mulc_add_assign_f_flt(w,c_tmp1,&v[i]);	
+      }
+      norm_w = sqrt(spinor_field_sqnorm_f_flt(w));
+      if (beta>0 && norm_w > 0.5*beta){
+	break;
+      }
+      else{
+	beta = norm_w;
+      }
+      }*/
+
+    if (norm_w*norm_w < par->err2){
+      lprintf("INVERTER",500,"GMRES_core: Lucky termination!:\n");
+      break;
+    }
+
+    /* Do the givens rotations */
+    //First rotate new column with old rot matrixes
+    for (i=0;i<j;++i){
+      c_tmp1=h[Hind(i,j)];
+      _complex_mul_star(h[Hind(i,j)],c_tmp1,cs[i]);
+      _complex_mulr_assign(h[Hind(i,j)],ss[i],h[Hind((i+1),j)]);
+      c_tmp2=h[Hind((i+1),j)];
+      _complex_mulr(h[Hind((i+1),j)],-ss[i],c_tmp1);
+      _complex_mul_assign(h[Hind((i+1),j)],cs[i],c_tmp2);
+    }
+
+    //Calculate new sin and cos term 
+    tmp=sqrt(_complex_prod_re(h[Hind(j,j)],h[Hind(j,j)])+norm_w*norm_w);
+    ss[j]= norm_w/ tmp;
+    _complex_mulr(cs[j],1./tmp,h[Hind(j,j)]);
+
+    //Rotate gbar
+    tmp=gbar[j].re;
+    _complex_mulr_star(gbar[j],tmp,cs[j]);
+    gbar[j+1].re = -ss[j]*tmp;
+
+    //Rotate new column with the new rot matrix
+    c_tmp1=h[Hind(j,j)];
+    _complex_mul_star(h[Hind(j,j)],c_tmp1,cs[j]);
+    h[Hind(j,j)].re += ss[j]*norm_w;
+
+    lprintf("INVERTER",500,"GMRES Error in iteration %d: %e\n",j,gbar[j+1].re*gbar[j+1].re/inorm);
+    /*Check Convergence*/
+    *valid = (fabs(gbar[j+1].re*gbar[j+1].re/inorm) < par->err2_flt );
+    if (*valid){
+      j++;
+      break;
+    }
+
+    /* If not converged pick new vector */
+    if (j<kry_dim-1){
+      spinor_field_mul_f_flt(&v[j+1],1./norm_w,w);
+    }
+  }
+
+  // h is now upper triangular... 
+  // now the vector that minimizes |\beta e_1 - h y| is found by y = h^-1 g
+  // reusing the variable cs (not needed anymore)
+  for (i=j-1;i>=0;--i){
+    cs[i]=gbar[i];
+    for (k=j-1;k>i;--k){
+      _complex_mul_sub_assign(cs[i],h[Hind(i,k)],cs[k]);
+    }
+    _complex_mulr(cs[i],1./h[Hind(i,i)].re,cs[i]);
+  }
+
+  //The solutions is (out_m = out_0 + V y)
+  for (i=0;i<j;++i){
+    spinor_field_mulc_add_assign_f_flt(out,cs[i],&v[i]);
+  }
+  
+  lprintf("INVERTER",100,"GMRES Error after GMRES_core: %e\n",gbar[j].re*gbar[j].re/inorm);
+  
+  //Debug the error
+  /*  M.flt(w,out);
+  spinor_field_sub_assign_f_flt(w,in);
+  double tau=spinor_field_sqnorm_f_flt(w)/inorm;
+  lprintf("INVERTER",100,"test  = %e (req. %e)\n",tau,par->err2);*/
+
+  /* free memory */
+  free_spinor_field_f_flt(v);
+  /* return number of cg iter */
+  return cgiter;
+}
+
+int GMRES(inverter_par *par, spinor_operator M, spinor_field *in, spinor_field *out, spinor_field *trial){
+  int iter, rep=0;
+  short int valid=0;
+
+  iter = GMRES_core(&valid,par,M,in,out,trial);
   while (!valid && (par->max_iter==0 || iter < par->max_iter)){
-    iter += GMRES_core(&valid,par,kry_dim,inorm,M,in,out,out);
+    iter += GMRES_core(&valid,par,M,in,out,out);
     if ((++rep %10 == 0 )){
       lprintf("INVERTER",-10,"GMRES recursion = %d (precision too high?)\n",rep);
     }
@@ -184,4 +340,21 @@ int GMRES(MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field *ou
   return iter;
 }
 
+
+
+
+int GMRES_flt(inverter_par *par, spinor_operator M, spinor_field_flt *in, spinor_field_flt *out, spinor_field_flt *trial){
+  int iter, rep=0;
+  short int valid=0;
+
+  iter = GMRES_core_flt(&valid,par,M,in,out,NULL);
+  while (!valid && (par->max_iter==0 || iter < par->max_iter)){
+    iter += GMRES_core_flt(&valid,par,M,in,out,out);
+    if ((++rep %10 == 0 )){
+      lprintf("INVERTER",-10,"GMRES recursion = %d (precision too high?)\n",rep);
+    }
+  }
+  lprintf("INVERTER",10,"GMRES: MVM = %d\n",iter);
+  return iter;
+}
 

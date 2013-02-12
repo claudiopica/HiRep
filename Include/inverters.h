@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+ * Copyright (c) 2008, Claudio Pica                                          *   
+ * All rights reserved.                                                      * 
 \***************************************************************************/
 
 #ifndef INVERTERS_H
@@ -16,16 +16,28 @@ typedef void (*spinor_operator_flt)(spinor_field_flt *out, spinor_field_flt *in)
 typedef void (*spinor_operator_m)(spinor_field *out, spinor_field *in, double m);
 
 typedef struct _spinor_operator {
-	spinor_operator_dbl dbl;
+  spinor_operator_dbl dbl;
   spinor_operator_flt flt;
 } spinor_operator;
 
+
+typedef struct _inverter_par {
+  double err2; /* maximum error on the solutions */
+  int max_iter; /* maximum number of iterations: 0 => infinity */
+  double err2_flt; /* maximum error on the solutions */
+  int max_iter_flt; /* maximum number of iterations: 0 => infinity */
+  int kry_dim; /* Size of krylov subspace */
+  int kry_dim_flex; /* Size of krylov subspace */
+  int n; /* number of shifts */
+  double *shift; /* array of shifts */
+} inverter_par;
+
 typedef struct _mshift_par {
-   int n; /* number of shifts */
-   double *shift;
-   double err2; /* relative error of the solutions */
-   int max_iter; /* maximum number of iterations: 0 => infinity */
-	 void *add_par; /* additional parameters for specific inverters */
+  int n; /* number of shifts */
+  double *shift;
+  double err2; /* relative error of the solutions */
+  int max_iter; /* maximum number of iterations: 0 => infinity */
+  void *add_par; /* additional parameters for specific inverters */
 } mshift_par;
 
 /*
@@ -60,8 +72,8 @@ int HBiCGstab(MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field
 int HBiCGstab_flt(MINRES_par *par, spinor_operator M, spinor_field_flt *in, spinor_field_flt *out);
 
 /*
-int BiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
-int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
+  int BiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
+  int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
 */
 
 
@@ -70,22 +82,23 @@ int MINRES_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_f
 int MINRES(MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field *out, spinor_field *trial);
 int MINRES_flt(MINRES_par *par, spinor_operator M, spinor_field_flt *in, spinor_field_flt *out, spinor_field_flt *trial);
 
-int GMRES(MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field *out, spinor_field *trial);
+int GMRES(inverter_par *par, spinor_operator M, spinor_field *in, spinor_field *out, spinor_field *trial);
+int GMRES_flt(inverter_par *par, spinor_operator M, spinor_field_flt *in, spinor_field_flt *out, spinor_field_flt *trial);
 
 int eva(int nev,int nevt,int init,int kmax,
-               int imax,double ubnd,double omega1,double omega2,
-               spinor_operator_dbl Op,
-               spinor_field *ev,double d[],int *status);
+	int imax,double ubnd,double omega1,double omega2,
+	spinor_operator_dbl Op,
+	spinor_field *ev,double d[],int *status);
 
 void jacobi1(int n,double a[],double d[],double v[]);
 void jacobi2(int n,complex a[],double d[],complex v[]);
 
 void dirac_eva_onemass(int nev,int nevt,int kmax,
-        int imax,double omega1,double omega2,double mass,
-        spinor_field *ev,double d[],int *status);
+		       int imax,double omega1,double omega2,double mass,
+		       spinor_field *ev,double d[],int *status);
 void dirac_eva(int nev,int nevt,int kmax,
-        int imax,double omega1,double omega2,int n_masses,double *mass,
-        spinor_field *ev,double d[],int *status);
+	       int imax,double omega1,double omega2,int n_masses,double *mass,
+	       spinor_field *ev,double d[],int *status);
 
 
 #endif
