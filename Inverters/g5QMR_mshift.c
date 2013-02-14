@@ -758,6 +758,18 @@ int g5QMR_fltacc( g5QMR_fltacc_par* par, spinor_operator M, spinor_field *in, sp
     spinor_field_zero_f_flt(out_flt);
     cgiter_flt += g5QMR_core_flt(&valid,par->err2_flt,par->max_iter_flt,M,res_flt,out_flt);
     if (valid==0) {
+      lprintf("INVERTER",20,"g5QMR_fltacc: using GMRES\n");
+      inverter_par Mpar;
+      Mpar.err2=par->err2_flt;
+      Mpar.max_iter=0;
+      Mpar.kry_dim=10;
+      g5Herm=M;
+      sh=0.;
+      spinor_field_g5_f_flt(res_flt,res_flt); /* multiply input by g5 for MINRES */
+      cgiter_minres+=GMRES_flt(&Mpar,Herm,res_flt,out_flt,out_flt);
+      spinor_field_g5_f_flt(res_flt,res_flt); /* restore input vector */
+      
+#if 0
       lprintf("INVERTER",20,"g5QMR_fltacc: using MINRES\n");
       MINRES_par Mpar;
       Mpar.err2=par->err2_flt;
@@ -767,6 +779,7 @@ int g5QMR_fltacc( g5QMR_fltacc_par* par, spinor_operator M, spinor_field *in, sp
       spinor_field_g5_f_flt(res_flt,res_flt); /* multiply input by g5 for MINRES */
       cgiter_minres+=MINRES_flt(&Mpar,Herm,res_flt,out_flt,out_flt);
       spinor_field_g5_f_flt(res_flt,res_flt); /* restore input vector */
+#endif
     }
  
     assign_s2sd(res,out_flt);
@@ -791,4 +804,17 @@ int g5QMR_fltacc( g5QMR_fltacc_par* par, spinor_operator M, spinor_field *in, sp
 }
 
 
+int g5QMR_flt(inverter_par *par, spinor_operator M, spinor_field_flt *in, spinor_field_flt *out){
+  int iter, rep=0;
+  short int valid=0;
 
+  iter = g5QMR_core_flt(&valid,par->err2_flt,par->max_iter_flt,M,in,out);
+  while (!valid && (par->max_iter==0 || iter < par->max_iter)){
+    iter += g5QMR_core_flt(&valid,par->err2_flt,par->max_iter_flt,M,in,out);
+    if ((++rep %10 == 0 )){
+      lprintf("INVERTER",-10,"g5QMR recursion = %d (precision too high?)\n",rep);
+    }
+  }
+  lprintf("INVERTER",10,"g5QMR_flt: MVM_flt = %d\n",iter);
+  return iter;
+}

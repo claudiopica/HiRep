@@ -61,7 +61,7 @@ typedef struct {
 int g5QMR_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
 int g5QMR_mshift_trunc(mshift_par *par, int trunc_iter, spinor_operator M, spinor_field *in, spinor_field *out_trunc, spinor_field *out);
 int g5QMR_fltacc(g5QMR_fltacc_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
-
+int g5QMR_flt(inverter_par *par, spinor_operator M, spinor_field_flt *in, spinor_field_flt *out);
 
 typedef struct _MINRES_par {
   double err2; /* maximum error on the solutions */
@@ -84,6 +84,8 @@ int MINRES_flt(MINRES_par *par, spinor_operator M, spinor_field_flt *in, spinor_
 
 int GMRES(inverter_par *par, spinor_operator M, spinor_field *in, spinor_field *out, spinor_field *trial);
 int GMRES_flt(inverter_par *par, spinor_operator M, spinor_field_flt *in, spinor_field_flt *out, spinor_field_flt *trial);
+
+int FGMRES(inverter_par *par, spinor_operator M, spinor_field *in, spinor_field *out, spinor_field *trial, spinor_operator precon);
 
 int eva(int nev,int nevt,int init,int kmax,
 	int imax,double ubnd,double omega1,double omega2,

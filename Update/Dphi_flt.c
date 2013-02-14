@@ -34,8 +34,7 @@ static unsigned long int MVMcounter=0;
 
 unsigned long int getMVM_flt_cpu() {
 	unsigned long int res=MVMcounter>>1; /* divide by two */
-	MVMcounter=0; /* reset counter */
-    
+	//	MVMcounter=0; /* reset counter */
 	return res;
 }
 
@@ -427,7 +426,7 @@ void (*Dphi_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in)=Dphi_f
 void (*g5Dphi_flt)(double m0, spinor_field_flt *out, spinor_field_flt *in)=g5Dphi_flt_cpu;
 void (*g5Dphi_sq_flt)(double m0, spinor_field_flt *out, spinor_field_flt *in)=g5Dphi_sq_flt_cpu;
 
-unsigned long int (*getMVM_flt)()=getMVM_flt_cpu;
+unsigned long int (*getMVM_flt)() = getMVM_flt_cpu;
 
 /* Even/Odd preconditioned matrix */
 void (*Dphi_eopre_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in)=Dphi_eopre_flt_cpu;

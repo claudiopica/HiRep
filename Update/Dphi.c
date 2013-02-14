@@ -38,10 +38,9 @@ extern rhmc_par _update_par; /* Update/update_rhmc.c */
 static unsigned long int MVMcounter=0;
 
 unsigned long int getMVM_cpu() {
-	unsigned long int res=MVMcounter>>1; /* divide by two */
-	MVMcounter=0; /* reset counter */
-
-	return res;
+  unsigned long int res=MVMcounter>>1; /* divide by two */
+  //	MVMcounter=0; /* reset counter */
+  return res;
 }
 
 

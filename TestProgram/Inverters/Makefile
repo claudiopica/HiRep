@@ -1,7 +1,7 @@
 TOPDIR = ../..
 MKDIR=$(TOPDIR)/Make
 
-EXES =  check_inverters_1 check_inverters_gpu_1 check_inverters_9 #check_inverters_2 check_inverters_3 check_inverters_4 check_inverters_5 check_inverters_6
+EXES =  check_inverters_9 check_inverters_10 #check_inverters_gpu_1 check_inverters_9 #check_inverters_2 check_inverters_3 check_inverters_4 check_inverters_5 check_inverters_6
 
 
 default: $(EXES)
@@ -12,7 +12,7 @@ MODS := geometry_init geometry_mpi_eo test_geometry_mpi communications communica
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := IO
-MODS := logger read_input
+MODS := logger read_input archive endian
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Utils
@@ -28,7 +28,7 @@ MODS := gauss random_suNg ranlxs ranlxd random_fields ranz2
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Update
-MODS := Dphi random_spinor_field random_su2 representation Dphi_flt Dphi_gpu Dphi_flt_gpu random_spinor_field_gpu
+MODS := Dphi random_spinor_field random_su2 representation Dphi_flt Dphi_gpu Dphi_flt_gpu random_spinor_field_gpu representation_gpu
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Error
@@ -36,7 +36,7 @@ MODS := error error_gpu
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Inverters
-MODS := linear_algebra cg_mshift MINRES_mshift MINRES g5QMR_mshift eva jacobi cg_mshift_flt GMRES
+MODS := linear_algebra cg_mshift MINRES_mshift MINRES g5QMR_mshift eva jacobi cg_mshift_flt GMRES FGMRES
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Observables
