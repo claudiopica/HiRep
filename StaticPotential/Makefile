@@ -1,7 +1,7 @@
 TOPDIR = ..
 MKDIR=$(TOPDIR)/Make
 
-EXES = mk_wilsonloops monopoles poly_local poly_in_time polyakov_loops verify_group #tune_HYP_smearing
+EXES = mk_wilsonloops monopoles poly_local poly_in_time polyakov_loops verify_group twist#tune_HYP_smearing
 
 default: $(EXES)
 
@@ -47,7 +47,7 @@ poly_in_time_OBJS = $(MOD_OBJS)
 poly_local_OBJS = $(MOD_OBJS)
 tune_HYP_smearing_OBJS = $(MOD_OBJS)
 verify_group_OBJS = $(MOD_OBJS)
-
+twist_OBJS = $(MOD_OBJS)
 
 include $(MKDIR)/MkRules
 

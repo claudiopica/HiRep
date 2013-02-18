@@ -249,14 +249,19 @@ void project_to_suNg_real(suNg *out, suNg *in){
   *out=tmp;
   //Fix the determinant 
   det_suNg(&det,&tmp);
-  if (fabs(det)<1-1e-7 || fabs(det)>1+1e-7){
-    lprintf("suNg_utils",10,"Error in project project_to_suNg_real: determinant not +/-1. It is %1.8g",det);
+  /*  if (fabs(det)<1-1e-7 || fabs(det)>1+1e-7){
+      lprintf("suNg_utils",10,"Error in project project_to_suNg_real: determinant not +/-1. It is %1.8g\n",det);
+    }*/
+
+  for (i=0;i<NG;++i){
+    out->c[i]*=1./det;
+  }
+    
+  tmp = *out;
+  det_suNg(&det,&tmp);
+  if (det<1-1e-7 || det>1+1e-7){
+    lprintf("suNg_utils",10,"Error in project project_to_suNg_real: determinant not +/-1. It is %1.8g\n",det);
   }
 
-  if (det<0){
-    for (i=0;i<NG;++i){
-      out->c[i]*=-1.;
-    }
-  }
 }
 

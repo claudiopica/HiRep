@@ -68,7 +68,7 @@ int main(int argc,char *argv[])
 
   /* logger setup */
   if (PID!=0) { logger_disable(); }
-  if (PID==0) { sprintf(tmp,">%s",output_filename); logger_stdout(stdout); }
+  if (PID==0) { sprintf(tmp,">%s",output_filename); logger_stdout(output_filename); }
   logger_setlevel(0,40);
   sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
 
@@ -116,7 +116,7 @@ int main(int argc,char *argv[])
   if(i) lprintf("MAIN",0,"%d\nThemalization done.\n",i);
 
 
-  /* Misure */
+  /* Measure */
   for(i=flow.start;i<flow.end;++i) {
     lprintf("MAIN",0,"Trajectory #%d...\n",i);
 
@@ -129,7 +129,10 @@ int main(int argc,char *argv[])
 
     if((i%flow.meas_freq)==0) {
       lprintf("MAIN",0,"Plaquette: %1.8e\n",avr_plaquette());
-      /* do something */
+      /* Measure stuff */
+      polyakov();
+      polyakov_in_time();
+      twists();
     }
   }
 

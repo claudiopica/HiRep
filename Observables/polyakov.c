@@ -492,7 +492,7 @@ void polyakov_in_time() {
 			for(x[(mu+2)%4]=0; x[(mu+2)%4]<loc[(mu+2)%4]; x[(mu+2)%4]++)
 				for(x[(mu+3)%4]=0; x[(mu+3)%4]<loc[(mu+3)%4]; x[(mu+3)%4]++) {
 					_suNg_trace_re(dtmp,p[i3d]);
-					/*      lprintf("LOC_POLYAKOV",0,"%d %d %d %d %d %1.8e\n",mu,x[(mu+1)%4],x[(mu+2)%4],x[(mu+3)%4],i3d,dtmp); */
+//					lprintf("LOC_POLYAKOV",0,"%d %d %d %d %d %1.8e\n",mu,x[(mu+1)%4],x[(mu+2)%4],x[(mu+3)%4],i3d,dtmp); 
 					poly.re += dtmp;
 					adjpoly +=dtmp*dtmp;
 					poly_t[x[0]] += dtmp;
@@ -670,6 +670,7 @@ void plaq_matrix(suNg* rec, int ix,int mu,int nu)
 	//rec=w3;
 }
 
+
 /*
 void Tmonopoles() {
 	int ix,t,x,y,z;
@@ -797,7 +798,65 @@ void monopoles(int dir) {
 	free(p3);
 }
 
-		
+
+
+double plaq_sign(int ix,int mu,int nu)
+{
+  int iy,iz;
+  suNg *v1,*v2,*v3,*v4;
+  suNg w1,w2,w3;
+  double tr;
+  
+  iy=iup(ix,mu);
+  iz=iup(ix,nu);
+  
+  v1=pu_gauge(ix,mu);
+  v2=pu_gauge(iy,nu);
+  v3=pu_gauge(iz,mu);
+  v4=pu_gauge(ix,nu);
+  
+  _suNg_times_suNg(w1,(*v1),(*v2));
+  _suNg_times_suNg(w2,(*v4),(*v3));
+  _suNg_times_suNg_dagger(w3,w1,w2);      
+  _suNg_trace_re(tr,w3);
+  return (tr<0) ? -1 : 1;
+}
+
+
+
+void twists(){
+  double prod,sum;
+  int ix;
+  int d1,d2,d3,d4;
+  int ids[4];
+  int dm[4] = {T,X,Y,Z};
+  for (d1=0;d1<3;d1++){
+    for (d2=d1+1;d2<4;d2++){
+      //This order d1,d2,d3,d4, s.t. \epsilon_{d1,d2,d3,d4} is positive
+      d3 = (d2+d1+1) % 4;
+      while ( (d3==d1) || (d3==d2) ) d3=(d3+1)%4;
+      d4 = (d3+1) % 4;
+      while ( (d4==d1) || (d4==d2) ) d4=(d4+1)%4;
+      sum = 0;
+      for (ids[d3] = 0;ids[d3]<dm[d3];ids[d3]++){
+	for (ids[d4] = 0;ids[d4]<dm[d4];ids[d4]++){
+	  prod = 1;
+	  for (ids[d1] = 0; ids[d1] < dm[d1]; ids[d1]++){
+	    for (ids[d2] = 0; ids[d2] < dm[d2]; ids[d2]++){
+	      ix=ipt(ids[0],ids[1],ids[2],ids[3]);
+	      prod *= plaq_sign(ix,d1,d2);
+	    }
+	  }
+	  sum += prod;
+	}
+      }
+      lprintf("TWIST",0,"mu: %d nu: %d twist: %1.5g\n",d1,d2,sum/dm[d3]/dm[d4]);
+    }
+  }
+}
+
+#undef SIGN
+      
 	
 
 

@@ -122,9 +122,7 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar){
   //  error(n_ws<ratio->order+1,1,"void force_rhmc():" __FILE__,"Workspace is too small");
   
   /* check input types */
-#ifndef CHECK_SPINOR_MATCHING
-   _TWO_SPINORS_MATCHING(u_gauge,force);
-#endif
+  _TWO_SPINORS_MATCHING(u_gauge,force);
 
   /* Compute (H^2-b[n])^-1 * pf */
   /* set up cg parameters */
