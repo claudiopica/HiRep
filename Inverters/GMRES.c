@@ -309,10 +309,10 @@ static int GMRES_core_flt(short int *valid, inverter_par *par , spinor_operator 
   lprintf("INVERTER",50,"GMRES Error after GMRES_core_flt: %e\n",gbar[j].re*gbar[j].re/inorm);
   
   //  Debug the error
-  M.flt(w,out);
+  /*  M.flt(w,out);
   spinor_field_sub_assign_f_flt(w,in);
   double tau=spinor_field_sqnorm_f_flt(w)/inorm;
-  lprintf("INVERTER",100,"test  = %e (req. %e)\n",tau,par->err2);
+  lprintf("INVERTER",100,"test  = %e (req. %e)\n",tau,par->err2);*/
 
   /* free memory */
   free_spinor_field_f_flt(v);

@@ -85,6 +85,9 @@ spinor_operator Mg5={&M_dbl,&M_flt};
 
 inverter_par par_precon;
 g5QMR_fltacc_par parg5;
+inverter_par par_precon;
+MINRES_par par_MINRES;
+
 spinor_field_flt *s1_flt, *s2_flt;
 
 void precon_dbl(spinor_field *out, spinor_field *in){
@@ -117,10 +120,18 @@ void preconQMRflacc_dbl(spinor_field *out, spinor_field *in){
 }
 
 
+void precon_MINRES_dbl(spinor_field *out, spinor_field *in){
+  //  int cgiters;
+  assign_sd2s(s1_flt,in);   
+  (void) MINRES_flt(&par_MINRES, H, s1_flt, s2_flt, NULL);
+  assign_s2sd(out,s2_flt);
+}
+
 spinor_operator precon_GMRES={&precon_dbl,NULL}; 
 spinor_operator precon_QMR={&preconQMR_dbl,NULL}; 
 spinor_operator precon_QMR_flacc={&preconQMRflacc_dbl,NULL}; 
 spinor_operator precon_trivial={&precontrivial_dbl,NULL}; 
+spinor_operator precon_MINRES={&precon_MINRES_dbl,NULL}; 
 
 int main(int argc,char *argv[])
 {
@@ -209,6 +220,8 @@ int main(int argc,char *argv[])
    parg5.err2_flt=1.e-4;
    parg5.max_iter=0;
    parg5.max_iter_flt =0;
+   par_MINRES.err2=1e-6;
+   par_MINRES.max_iter=0;
 
 
    res=alloc_spinor_field_f(4,&glattice);
@@ -254,7 +267,7 @@ int main(int argc,char *argv[])
    tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
    lprintf("GMRES TEST",0,"test  = %e (req. %e)\n",tau,par.err2);*/
 
-   lprintf("GMRES TEST",0,"Testing  g5QMR flt\n");
+   /*   lprintf("GMRES TEST",0,"Testing  g5QMR flt\n");
    lprintf("GMRES TEST",100,"---------------------\n");
    t1 = gpuTimerStart();   
    cgiters = g5QMR_fltacc(&parg5, D, s1, res);
@@ -264,9 +277,21 @@ int main(int argc,char *argv[])
    D.flt(s2_flt,res_flt);
    spinor_field_sub_assign_f(s2,s1);
    tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
-   lprintf("GMRES TEST",0,"test  = %e (req. %e)\n",tau,par.err2);
+   lprintf("GMRES TEST",0,"test  = %e (req. %e)\n",tau,par.err2);*/
 
    cgiters=0;
+   lprintf("FGMRES TEST",0,"Using flt MINRES as preconditioner\n");
+   t1 = gpuTimerStart();   
+   cgiters = FGMRES(&par, H, s1, res,NULL,precon_MINRES);
+   elapsed = gpuTimerStop(t1);
+   lprintf("FGMRES TEST",0,"Converged in %d iterations\n",cgiters);
+   lprintf("FGMRES TEST",0,"Time: %1.10g s\n",elapsed/1000);
+   H.dbl(s2,res);
+   spinor_field_sub_assign_f(s2,s1);
+   tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
+   lprintf("FGMRES TEST",0,"test  = %e (req. %e)\n",tau,par.err2);\
+
+   /*   cgiters=0;
    lprintf("FGMRES TEST",0,"Using flt GMRES as preconditioner\n");
    t1 = gpuTimerStart();   
    cgiters = FGMRES(&par, H, s1, res,NULL,precon_GMRES);
@@ -276,7 +301,7 @@ int main(int argc,char *argv[])
    H.dbl(s2,res);
    spinor_field_sub_assign_f(s2,s1);
    tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
-   lprintf("FGMRES TEST",0,"test  = %e (req. %e)\n",tau,par.err2);
+   lprintf("FGMRES TEST",0,"test  = %e (req. %e)\n",tau,par.err2);*/
 
 
 

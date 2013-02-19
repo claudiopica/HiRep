@@ -197,7 +197,7 @@ int main(int argc,char *argv[])
    tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
    lprintf("GMRES TEST",0,"test  = %e (req. %e)\n",tau,par.err2);
 
-   lprintf("GMRES TEST",0,"Testing  GMRES flatacc\n");
+   /*   lprintf("GMRES TEST",0,"Testing  GMRES flatacc\n");
    lprintf("GMRES TEST",100,"---------------------\n");
    t1 = gpuTimerStart();   
    cgiters = FGMRES(&par, H, s1, res,NULL,precon_GMRES);
@@ -207,7 +207,7 @@ int main(int argc,char *argv[])
    H.dbl(s2,res);
    spinor_field_sub_assign_f(s2,s1);
    tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
-   lprintf("GMRES TEST",0,"test  = %e (req. %e)\n",tau,par.err2);
+   lprintf("GMRES TEST",0,"test  = %e (req. %e)\n",tau,par.err2);*/
  
  
    lprintf("GMRES TEST",0,"Testing  GMRES\n");
