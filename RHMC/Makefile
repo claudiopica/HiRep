@@ -6,7 +6,7 @@ EXES = rhmc
 default: $(EXES)
 
 MODDIR := Geometry
-MODS := geometry_init geometry_mpi_eo test_geometry_mpi communications
+MODS := process_init geometry_init geometry_mpi_eo test_geometry_mpi communications communications_flt
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := IO
@@ -22,15 +22,15 @@ MODS := amalloc field_alloc spinor_field_alloc
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Observables
-MODS := avr_plaquette pta_qprop mesons sf_action sf_pcac
+MODS := avr_plaquette pta_qprop mesons polyakov z2semwall sf_action sf_pcac
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Random
-MODS := gauss random_suNg ranlxs ranlxd random_fields
+MODS := gauss random_suNg ranlxs ranlxd random_fields ranz2
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Update
-MODS := Dphi staples update_hb random_su2 representation random_momenta random_spinor_field update_rhmc update_hmc leapfrog local_action force0 copy_gfield find_spec_limits rational_functions force_rhmc O2MN_multistep cabmar
+MODS := Dphi staples update_hb random_su2 representation random_momenta random_spinor_field update_rhmc local_action force0 copy_gfield find_spec_limits rational_functions force_rhmc O2MN_multistep cabmar Dphi_flt
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Error

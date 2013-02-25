@@ -31,6 +31,10 @@
 #endif
 
 
+#ifdef WITH_MPI
+#error: check_algebra_2 only works only on serial jobs
+#endif
+
 int main(int argc,char *argv[])
 {
    suNg A;

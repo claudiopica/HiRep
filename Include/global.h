@@ -16,10 +16,12 @@
 
 #include <stddef.h>
 
+#include "check_options.h"
+
 #ifdef MAIN_PROGRAM
-#  define GLB_VAR(type,name,init) type name init
+#  define GLB_VAR(type,name,init...) type name init
 #else
-#  define GLB_VAR(type,name,init) extern type name
+#  define GLB_VAR(type,name,init...) extern type name
 #endif
 
 /* local lattice attributes */
@@ -27,9 +29,11 @@ GLB_VAR(int,T,=0); /* local lattice size in direction T */
 GLB_VAR(int,X,=0); /* local lattice size in direction X */
 GLB_VAR(int,Y,=0); /* local lattice size in direction Y */
 GLB_VAR(int,Z,=0); /* local lattice size in direction Z */
+GLB_VAR(long int,GLB_VOL3,=0); 
+GLB_VAR(long int,GLB_VOLUME,=0);
 /* this two probably are not more needed... */
-GLB_VAR(int,VOL3,=0); 
-GLB_VAR(int,VOLUME,=0);
+GLB_VAR(long int,VOL3,=0); 
+GLB_VAR(long int,VOLUME,=0);
 
 /* Nodes attributes
  * NP = number of processes in each direction 
@@ -59,15 +63,19 @@ GLB_VAR(int,Z_EXT,=0);
 /* MPI stuff */
 GLB_VAR(int,WORLD_SIZE,=1); /* mpi rank for this process */
 GLB_VAR(int,CART_SIZE,=1); /* mpi rank for this process */
+GLB_VAR(int,N_REP,=1); /* number of replicas*/
+GLB_VAR(int,MPI_WORLD_SIZE,=1); /* mpi rank for this process */
+GLB_VAR(int,MPI_PID,=0); /* mpi rank inside MPI_COMM_WORLD (unique across replicas) */
 #ifdef WITH_MPI
 #include <mpi.h>
-GLB_VAR(MPI_Comm,cart_comm,=MPI_COMM_NULL);
+GLB_VAR(MPI_Comm,GLB_COMM,=MPI_COMM_WORLD); /* this is the global communicator for a replica */
+GLB_VAR(MPI_Comm,cart_comm,=MPI_COMM_NULL); /* cartesian communicator for the replica */
 #endif
 
-/* ID for this process */
-GLB_VAR(int,PID,=0); /* ID of this process */
+GLB_VAR(int,RID,=0); /* Replica ID of this process */
+GLB_VAR(int,PID,=0); /* Process ID inside a replica */
 
-GLB_VAR(int,CID,=0); /* cartesian ID for this process */
+GLB_VAR(int,CID,=0); /* Cartesian ID inside a replica */
 GLB_VAR(int,COORD[4],={0}); /* cartesian coordinates for this process */
 GLB_VAR(int,PSIGN,=0); /* parity of this process */
 
@@ -76,6 +84,7 @@ GLB_VAR(int,*ipt, =NULL);
 GLB_VAR(int,*ipt_4d,=NULL);
 GLB_VAR(int,*iup,=NULL);
 GLB_VAR(int,*idn,=NULL);
+GLB_VAR(int,zerocoord[4],={0,0,0,0});
 
 /* Geometry structures */
 #define ipt(t,x,y,z) ipt[((((t)+T_BORDER)*(X_EXT)+((x)+X_BORDER))*(Y_EXT)+((y)+Y_BORDER))*(Z_EXT)+((z)+Z_BORDER)]
@@ -91,6 +100,19 @@ GLB_VAR(geometry_descriptor,glattice,={0}); /* global lattice */
 GLB_VAR(geometry_descriptor,glat_even,={0}); /* global even lattice */
 GLB_VAR(geometry_descriptor,glat_odd,={0}); /* global odd lattice */
 
+/* Memory */
+typedef enum _mem_t {
+  CPU_MEM = 1<<0,
+  GPU_MEM = 1<<1
+} mem_t;
+
+#ifdef WITH_GPU
+#define STD_MEM_TYPE (CPU_MEM | GPU_MEM)
+#else
+#define STD_MEM_TYPE (CPU_MEM)
+#endif
+GLB_VAR(mem_t,std_mem_t, =STD_MEM_TYPE); /* default memory allocation type for fields */
+GLB_VAR(mem_t,alloc_mem_t, =STD_MEM_TYPE); /* memory type requested for allocating fields */
 
 /* Gauge field */
 #include "field_ordering.h"
@@ -108,45 +130,36 @@ GLB_VAR(suNf_field_flt,*u_gauge_f_flt,=NULL);
 #define pu_gauge_f_flt(ix,mu) ((u_gauge_f_flt->ptr)+coord_to_index(ix,mu))
 
 
-/* Boundary conditions */
-#ifdef ANTIPERIODIC_BC_T
-#define BC_T 1.
-#else
-#define BC_T 0.
-#endif
-
-#ifdef ANTIPERIODIC_BC_X
-#define BC_X 1.
-#else
-#define BC_X 0.
-#endif
-
-#ifdef ANTIPERIODIC_BC_Y
-#define BC_Y 1.
-#else
-#define BC_Y 0.
-#endif
-
-#ifdef ANTIPERIODIC_BC_Z
-#define BC_Z 1.
-#else
-#define BC_Z 0.
-#endif
-
-#ifdef MAIN_PROGRAM
-double bc[4]={BC_T,BC_X,BC_Y,BC_Z};
-#else
-extern double bc[4];
-#endif
-
-#undef BC_T
-#undef BC_X
-#undef BC_Y
-#undef BC_Z
-
 /* input parameters */
 #include "input_par.h"
 GLB_VAR(input_glb,glb_var,=init_input_glb(glb_var));
+
+/* logger parameters */
+GLB_VAR(input_logger,logger_var,=init_input_logger(logger_var));
+
+
+/* Does the represented field need to be allocated? */
+
+#if !defined(REPR_FUNDAMENTAL) || defined(ROTATED_SF)
+#define ALLOCATE_REPR_GAUGE_FIELD
+#endif
+
+
+
+#ifdef PLAQ_WEIGHTS
+GLB_VAR(double,*plaq_weight, =NULL);
+#endif
+
+/* Theta Boundary conditions */
+#ifdef FERMION_THETA
+GLB_VAR(complex,eitheta[4],={{1.,0.}});
+#endif
+
+
+#if defined(ROTATED_SF) && defined(UPDATE_EO)
+#error ROTATED_SF DOES NOT WORK WITH E/O PRECONDITIONING
+#endif
+
 
 #undef GLB_VAR
 

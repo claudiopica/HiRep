@@ -77,7 +77,9 @@ string group_represent(const char* vname, const char* uname)
 	cmatrix U(group::N,uname);
 	pmatrix trU(group::N);
 	pmatrix rU(representation::DIM);
-	pmatrix Ue[representation::DIM];
+	pmatrix *Ue;
+    
+    Ue = new pmatrix[representation::DIM];
 	
 	trU = U;
 	trU.transpose();
@@ -104,12 +106,14 @@ string group_represent(const char* vname, const char* uname)
 
 	RET += rU.assignment("=", vname);
 	
+    delete[] Ue;
+    
 	return RET;
 }
 
 string debug_group_represent(const char* vname, const char* uname)
 {
-	string RET = "\
+	string RET = string("copy(") + vname + "," + uname + ");\n\
 	int A, C, a, b, c, d;\n\
 	A = 0;\n\
 	for(a = 1; a < GROUP::N; a++) for(b = 0; b < a; b++) {\n\

@@ -19,18 +19,18 @@ static void mpi_broadcast_parameters(input_record_t crec[]) {
     if(crec->descr==NULL) continue;
     switch(crec->type) {
       case INT_T:
-        MPI_Bcast(crec->ptr,1,MPI_INT,0,MPI_COMM_WORLD);
+        MPI_Bcast(crec->ptr,1,MPI_INT,0,GLB_COMM);
         break;
       case UNSIGNED_T:
-        MPI_Bcast(crec->ptr,1,MPI_UNSIGNED,0,MPI_COMM_WORLD);
+        MPI_Bcast(crec->ptr,1,MPI_UNSIGNED,0,GLB_COMM);
         break;
       case DOUBLE_T:
-        MPI_Bcast(crec->ptr,1,MPI_DOUBLE,0,MPI_COMM_WORLD);
+        MPI_Bcast(crec->ptr,1,MPI_DOUBLE,0,GLB_COMM);
         break;
       case STRING_T:
         stringlen=strlen(crec->ptr)+1;
-        MPI_Bcast(&stringlen,1,MPI_INT,0,MPI_COMM_WORLD);
-        MPI_Bcast(crec->ptr,stringlen,MPI_CHAR,0,MPI_COMM_WORLD);
+        MPI_Bcast(&stringlen,1,MPI_INT,0,GLB_COMM);
+        MPI_Bcast(crec->ptr,stringlen,MPI_CHAR,0,GLB_COMM);
         break;
       default:
         error(1,1,"read_input " __FILE__, "Unknown type in input descriptor\n");
@@ -64,15 +64,15 @@ void read_input(input_record_t irec[], char *filename) {
 
   do {
     int count=0;
-    int nowarn=0;
+    /*int nowarn=0;*/
     /*skip white space*/
-    nowarn=fscanf(inputfile," ");
+    /*nowarn=*/fscanf(inputfile," ");
 
     fgetpos(inputfile,&pos);
 
     /* skip comments */
-    nowarn=fscanf(inputfile,"//%n",&count);
-    if(count==2) { nowarn=fscanf(inputfile,"%*[^\n]"); goto NEXTLOOP; } if(feof(inputfile)) break; fsetpos(inputfile,&pos);
+    /*nowarn=*/fscanf(inputfile,"//%n",&count);
+    if(count==2) { /*nowarn=*/fscanf(inputfile,"%*[^\n]"); goto NEXTLOOP; } if(feof(inputfile)) break; fsetpos(inputfile,&pos);
 
     /* read variables as described in irec */
     for (count=0; count<npar; ++count) {
@@ -85,7 +85,7 @@ void read_input(input_record_t irec[], char *filename) {
       fsetpos(inputfile,&pos);
     }
 
-    nowarn=fscanf(inputfile,"%s",buf);
+    /*nowarn=*/fscanf(inputfile,"%s",buf);
     lprintf("READINPUT",10000,"Ignoring unknown token: [%s]\n",buf);
 
 NEXTLOOP:

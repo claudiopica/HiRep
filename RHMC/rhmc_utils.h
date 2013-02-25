@@ -13,11 +13,9 @@
 typedef struct _input_rhmc {
   /* rhmc parameters */
   rhmc_par rhmc_p;
-  /* integrator parameters */
-  int_par int_p;
 
   /* for the reading function */
-  input_record_t read[16];
+  input_record_t read[21];
   
 } input_rhmc;
 
@@ -27,19 +25,24 @@ typedef struct _input_rhmc {
     {"beta", "beta = %lf", DOUBLE_T, &(varname).rhmc_p.beta},\
     {"nf", "nf = %d", INT_T, &(varname).rhmc_p.nf},\
     {"mass", "mass = %lf", DOUBLE_T, &(varname).rhmc_p.mass},\
+    {"theta_T", "theta_T = %lf", DOUBLE_T, &(varname).rhmc_p.theta[0]},\
+    {"theta_X", "theta_X = %lf", DOUBLE_T, &(varname).rhmc_p.theta[1]},\
+    {"theta_Y", "theta_Y = %lf", DOUBLE_T, &(varname).rhmc_p.theta[2]},\
+    {"theta_Z", "theta_Z = %lf", DOUBLE_T, &(varname).rhmc_p.theta[3]},\
     {"SF_zf", "SF_zf = %lf", DOUBLE_T, &(varname).rhmc_p.SF_zf},\
     {"SF_ds", "SF_ds = %lf", DOUBLE_T, &(varname).rhmc_p.SF_ds},\
     {"SF_sign", "SF_sign = %d", INT_T, &(varname).rhmc_p.SF_sign},\
     {"SF_ct", "SF_ct = %lf", DOUBLE_T, &(varname).rhmc_p.SF_ct}, \
+    {"SF_prec", "SF_repc = %lf", DOUBLE_T, &(varname).rhmc_p.SF_prec}, \
     {"MT_prec", "MT_prec = %lf", DOUBLE_T, &(varname).rhmc_p.MT_prec},\
     {"MD_prec", "MD_prec = %lf", DOUBLE_T, &(varname).rhmc_p.MD_prec},\
     {"HB_prec", "HB_prec = %lf", DOUBLE_T, &(varname).rhmc_p.HB_prec},\
     {"force_prec", "force_prec = %lf", DOUBLE_T, &(varname).rhmc_p.force_prec},\
     {"n_pf", "n_pf = %u", UNSIGNED_T, &(varname).rhmc_p.n_pf},\
-    {"tlen", "tlen = %lf", DOUBLE_T, &(varname).int_p.tlen},\
-    {"nsteps", "nsteps = %u", UNSIGNED_T, &(varname).int_p.nsteps},\
-    {"gsteps", "gsteps = %u", UNSIGNED_T, &(varname).int_p.gsteps},\
-    {NULL, NULL, 0, NULL}\
+    {"tlen", "tlen = %lf", DOUBLE_T, &(varname).rhmc_p.tlen},\
+    {"nsteps", "nsteps = %u", UNSIGNED_T, &(varname).rhmc_p.nsteps},\
+    {"gsteps", "gsteps = %u", UNSIGNED_T, &(varname).rhmc_p.gsteps},\
+    {NULL, NULL, INT_T, NULL}\
   }\
 }
 
@@ -76,7 +79,7 @@ typedef struct _rhmc_flow {
     {"conf save frequency", "save freq = %d", INT_T, &((varname).save_freq)},\
     {"measure frequency", "meas freq = %d", INT_T, &((varname).meas_freq)},\
     {"config dir", "conf dir = %s", STRING_T, &((varname).conf_dir[0])},\
-    {NULL, NULL, 0, NULL}\
+    {NULL, NULL, INT_T, NULL}\
   }\
 }
 

@@ -38,16 +38,16 @@ void free_gfield_f_flt(suNf_field_flt *u);
 suNf_field_flt* alloc_gfield_f_flt(geometry_descriptor* type);
 void free_gtransf(suNg_field *u);
 suNg_field* alloc_gtransf(geometry_descriptor* type);
-
-spinor_field* alloc_spinor_field_f(unsigned int n, geometry_descriptor *type);
-spinor_field_flt* alloc_spinor_field_f_flt(unsigned int n, geometry_descriptor *type);
-void free_spinor_field(spinor_field *s);
-void free_spinor_field_flt(spinor_field_flt *s);
-
 void free_avfield(suNg_av_field *u);
 suNg_av_field *alloc_avfield(geometry_descriptor* type);
-void free_sfield(scalar_field *u);
-scalar_field *alloc_sfield(geometry_descriptor* type);
+
+void free_spinor_field_f(spinor_field *s);
+spinor_field* alloc_spinor_field_f(unsigned int n, geometry_descriptor *type);
+void free_spinor_field_f_flt(spinor_field_flt *s);
+spinor_field_flt* alloc_spinor_field_f_flt(unsigned int n, geometry_descriptor *type);
+void free_sfield(scalar_field *s);
+scalar_field *alloc_sfield(unsigned int n, geometry_descriptor* type);
+
 
 spinor_field* create_spinor_mask(spinor_field* s, geometry_descriptor* masktype);
 void free_spinor_mask(spinor_field* s);

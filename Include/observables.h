@@ -26,9 +26,10 @@ double avr_plaquette();
 double SF_action(double beta);
 double local_plaq(int ix);
 void full_plaquette();
-double SF_PCAC_wall_mass(double mass);
+void SF_PCAC_wall_mass(double mass, double acc);
+void SF_quark_propagator(spinor_field *in, double mass, spinor_field *out, double acc);
 
-void polyakov(int mu);
+void polyakov();
 
 void pta_qprop_QMR_eo(int g0[4], spinor_field **pta_qprop, int nm, double *m, double acc);
 void pta_qprop_QMR(int g0[4], spinor_field **pta_qprop, int nm, double *m, double acc);
@@ -140,5 +141,11 @@ void WL_Hamiltonian_gauge(suNg_field* out, suNg_field* in);
 void WL_broadcast_polyakov(suNg* poly, suNg_field* gf);
 void WL_correlators(double** ret, const suNg_field* gf, const suNg* poly, const int nsteps, const int* path, const int length, const int perm[3], int sign[3]);
 void WL_wilsonloops(double HYP_weight[3]);
+
+
+void init_modenumber(double m, double inv, int nh, char *approxfile);
+void free_modenumber();
+double ModeNumber(double M2);
+
 
 #endif 

@@ -110,17 +110,20 @@ int main(int argc, char* argv[]) {
 
   if(cmdline != 0) exit(0);
 
-  read_cut(cutfilename.c_str());
-  eval_ctrl::normalize_cuts(Lt);
-
   map<string,int>::iterator cut_it;
-  for(cut_it=eval_ctrl::left_cut.begin();cut_it!=eval_ctrl::left_cut.end();cut_it++)
-    cout << "2 READCUT " << (*cut_it).first << " " << (*cut_it).second << " " << eval_ctrl::right_cut[(*cut_it).first] << "\n";
+  int csize=channel.size(),comparesize=4;
+  if(csize-comparesize<0) comparesize=csize;
 
+   if( channel.compare(csize-comparesize,comparesize,"_cor")!=0) { 
+    read_cut(cutfilename.c_str());
+    eval_ctrl::normalize_cuts(Lt);
+    for(cut_it=eval_ctrl::left_cut.begin();cut_it!=eval_ctrl::left_cut.end();cut_it++)
+      cout << "2 READCUT " << (*cut_it).first << " " << (*cut_it).second << " " << eval_ctrl::right_cut[(*cut_it).first] << "\n";
+   }  
 
-  cout << "3 READING " << inputfilename;
-  read_input(inputfilename.c_str());
-  cout << " DONE"<<endl;
+   cout << "3 READING " << inputfilename;
+   read_input(inputfilename.c_str());
+   cout << " DONE"<<endl;
 
 
  /* for(map<string,Corr_t*>::iterator chan_it=eval_ctrl::channel_map.begin(); chan_it!=eval_ctrl::channel_map.end(); chan_it++) {
@@ -132,11 +135,11 @@ int main(int argc, char* argv[]) {
 
 
 
-
   ///////////////////////////////////////////////////////////////////////////
   //set effective lenght for bootstrap samples
   ///////////////////////////////////////////////////////////////////////////
   unsigned int len=eval_ctrl::channel_map.begin()->second->d[0].size();
+
   int elen=(int)(double(len)/double(blsize));
   //cerr<<"elen="<<elen<<"len="<<len<<"\n";
 

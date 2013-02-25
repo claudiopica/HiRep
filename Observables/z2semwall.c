@@ -87,20 +87,23 @@ static void create_diluted_source_even(spinor_field *source, int tau, int beta) 
     for(c[1]=0; c[1]<X; c[1]++)
     for(c[2]=0; c[2]<Y; c[2]++)
     for(c[3]=0; c[3]<Z; c[3]++)
-      if(((tau+COORD[1]*X+c[1]+COORD[2]*Y+c[2]+COORD[3]*Z+c[3])&1)==0)
+      if(((tau+zerocoord[1]+c[1]+zerocoord[2]+c[2]+zerocoord[3]+c[3])&1)==0)
         ranz2((double*)(&(_FIELD_AT(source,ipt(c[0],c[1],c[2],c[3])))->c[beta]),sizeof(suNf_vector)/sizeof(double));
   }
   
 #ifndef NDEBUG
   double norm=spinor_field_sqnorm_f(source);
-  lprintf("Z2SEMWALL",0,"Source sqnorm (must be %d) = %e\n",NF*GLB_X*GLB_Y*GLB_Z/2,norm);
+  lprintf("Z2SEMWALL",0,"Source sqnorm (must be %.0f) = %e\n",(.5*NF)*GLB_VOL3,norm);
 #endif
 }
 #endif
 
 
 
-static double hmass, hmass_pre;
+#ifndef NDEBUG
+static double hmass;
+#endif
+static double hmass_pre;
 
 #ifndef NDEBUG
 static void D(spinor_field *out, spinor_field *in){
@@ -135,10 +138,13 @@ static void z2semwall_qprop_init(int nm, double *m, double acc) {
 
   if(init==0) {
 
+
     shift=(double*)malloc(sizeof(double)*(nm));
     mass=(double*)malloc(sizeof(double)*(nm));
     hmass_pre=m[0]; /* we can put any number here!!! */
+#ifndef NDEBUG
     hmass=m[0]; /* we can put any number here!!! */
+#endif
     for(i=0;i<nm;++i){
       mass[i]=m[i];
       shift[i]=(4.+hmass_pre)*(4.+hmass_pre)-(4.+m[i])*(4.+m[i]);
@@ -195,18 +201,20 @@ void z2semwall_qprop_free() {
   error(init==0,1,"z2semwall.c","z2semwall method not initialized!");
 
 #ifndef NDEBUG
-  free_spinor_field(test_e);
-  free_spinor_field(test);
+  free_spinor_field_f(test_e);
+  free_spinor_field_f(test);
 #endif /* NDEBUG */
 
-  free_spinor_field(eta2);
+  free_spinor_field_f(eta2);
 
-  free_spinor_field(eta);
-  free_spinor_field(psi0);
+  free_spinor_field_f(eta);
+  free_spinor_field_f(psi0);
+
 
   free(shift);
   free(mass);
-  free_spinor_field(QMR_noise);
+    
+  free_spinor_field_f(QMR_noise);
   init=0;
 }
 
@@ -292,8 +300,10 @@ static void z2semwall_qprop_QMR_eo(void (*Gamma)(suNf_spinor*,suNf_spinor*), spi
     /* compute solution */
     qprop_mask=psi[i];
     qprop_mask.type=&glat_even;
+    /* qprop_mask.ptr=psi[i].ptr+glat_even.master_shift; */
     spinor_field_mul_f(&qprop_mask,(4.+mass[i]),&resd[i]);
     qprop_mask.type=&glat_odd;
+    qprop_mask.ptr=psi[i].ptr+glat_odd.master_shift; 
     Dphi_(&qprop_mask,&resd[i]);
     spinor_field_minus_f(&qprop_mask,&qprop_mask);
     if(i&1) ++cgiter; /* count only half of calls. works because the number of sources is even */
@@ -415,7 +425,7 @@ void z2semwall_mesons(int conf, int nhits, int nm, double *m, double acc) {
               for (z=0; z<Z; z++) {
                 ix=ipt(t,x,y,z);
                 _spinor_prod_re_f(tmp,*_FIELD_AT(&psi0[beta*nm+i],ix),*_FIELD_AT(&psi0[beta*nm+i],ix));
-                corr[_g5][(COORD[0]*T+t+GLB_T-tau)%GLB_T+i*GLB_T]+=tmp;
+                corr[_g5][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T]+=tmp;
               }
     
 
@@ -429,7 +439,7 @@ void z2semwall_mesons(int conf, int nhits, int nm, double *m, double acc) {
             _spinor_zero_f(sp); \
             name##_eval_g5GammaDag_times_spinor(&sp,_FIELD_AT(&psi0[beta*nm+i],ix)); \
             _spinor_prod_re_f(tmp,*_FIELD_AT(&psi[i],ix),sp); \
-            corr[ _##name ][(COORD[0]*T+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; \
+            corr[ _##name ][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; \
           } \
         } \
       } \
@@ -504,7 +514,7 @@ void z2semwall_mesons(int conf, int nhits, int nm, double *m, double acc) {
             _spinor_zero_f(sp);
             g0g5_eval_g5GammaDag_times_spinor(&sp,_FIELD_AT(&psi0[beta*nm+i],ix));
             _spinor_prod_re_f(tmp,*_FIELD_AT(&psi0[beta*nm+i],ix),sp);
-            corr[_g5_g0g5_re][(COORD[0]*T+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
+            corr[_g5_g0g5_re][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
           }
         }
       }
@@ -518,9 +528,9 @@ void z2semwall_mesons(int conf, int nhits, int nm, double *m, double acc) {
     global_sum(corr[k],GLB_T*nm);
     for(i=0; i<nm*GLB_T; i++)
 #ifdef POINT_TO_ALL
-      corr[k][i] *= -1./(GLB_X*GLB_Y*GLB_Z);
+      corr[k][i] *= -1./GLB_VOL3;
 #else
-      corr[k][i] *= -2./(GLB_X*GLB_Y*GLB_Z*GLB_X*GLB_Y*GLB_Z*nhits);
+      corr[k][i] *= -((2./nhits)/GLB_VOL3)/GLB_VOL3;
 #endif
   }
 

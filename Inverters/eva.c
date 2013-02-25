@@ -207,9 +207,7 @@ static double normalize(spinor_field *ps)
 
   spinor_field_mul_f(ps,1./r,ps);
 
-#if defined(BASIC_SF) || defined(ROTATED_SF)
-  SF_spinor_bcs(ps);
-#endif /* defined(BASIC_SF) || defined(ROTATED_SF) */
+  apply_BCs_on_spinor_field(ps);
 
   return r;
 }
@@ -451,13 +449,12 @@ static void apply_cheby(int k,double lbnd,double ubnd,
 
 int eva(int nev,int nevt,int init,int kmax,
         int imax,double ubnd,double omega1,double omega2,
-        spinor_operator Op,
+        spinor_operator Op,spinor_field *ws,
         spinor_field *ev,double d[],int *status)   
 {
   int i,k,n;
   int nlock,nupd,nlst;
   double lbnd;
-  spinor_field *ws;
   
   *status=0;
    
@@ -474,62 +471,48 @@ int eva(int nev,int nevt,int init,int kmax,
    
   if (alloc_aux(nevt)!=0)
     return -3;
-
-  ws=alloc_spinor_field_f(2,ev->type);
-
+  
   init_subsp(nev,nupd,init,ev);
   ritz_subsp(nlock,nupd,Op,ws,ev,d);
    
-  for (i=0;i<imax;i++)
-    {
-      if (i>0)
-	{
-	  lbnd=set_lbnd(nupd,kmax,ubnd,d,&k);
-
-	  for (n=nupd;n<nevt;n++)
-            spinor_field_copy_f(&ev[n],&ev[n+nupd-nevt]);
-	}
-      else
-	lbnd=set_lbnd(nupd,10,ubnd,d,&k);
-      
-      for (n=nlock;n<nevt;n++) 
-	{
-	  if (n<nupd)
-	    {
-	      apply_cheby(k,lbnd,ubnd,Op,ws,&ev[n]);
-	      mgm_subsp(n,ev);
-	    }
-	  else if (i>0)
-            mgm_subsp(n,ev);
-	}
-
-      if (i>0)
-	nlst=nevt;
-      else
-	nlst=nupd;
-      
-      ritz_subsp(nlock,nlst,Op,ws,ev,d);
-      n=nlock;      
-      nlock=res_subsp(n,nev,omega1,omega2,Op,ws,ev,d);
-      *status=nop;
-      
-      lprintf("EVA",40,"i=%3d, k=%3d, d[%2d]=% .6e, d[%2d]=% .6e, lbnd=% .6e, eps[%2d]=% .1e\n",
-	      i,k,n,d[n],nlst-1,d[nlst-1],lbnd,n,ee[n]);
-      
-      error(d[nlst-1]>ubnd,1,"eva [eva.c]",
-            "Parameter ubnd is too low");
-
-      if (nlock==nev)
-	{
-	  lprintf("EVA",10,"Computation succeded. MVM = %d\n",*status);
-  free_spinor_field(ws);
-	  return 0;
-	}
+  for (i=0;i<imax;i++){
+    if (i>0){
+      lbnd=set_lbnd(nupd,kmax,ubnd,d,&k);
+      for (n=nupd;n<nevt;n++)
+        spinor_field_copy_f(&ev[n],&ev[n+nupd-nevt]);
+    } else
+      lbnd=set_lbnd(nupd,10,ubnd,d,&k);
+    for (n=nlock;n<nevt;n++) {
+      if (n<nupd){
+        apply_cheby(k,lbnd,ubnd,Op,ws,&ev[n]);
+        mgm_subsp(n,ev);
+      }else if (i>0)
+        mgm_subsp(n,ev);
     }
+    
+    if (i>0)
+      nlst=nevt;
+    else
+      nlst=nupd;
+    
+    ritz_subsp(nlock,nlst,Op,ws,ev,d);
+    n=nlock;      
+    nlock=res_subsp(n,nev,omega1,omega2,Op,ws,ev,d);
+    *status=nop;
+    
+    lprintf("EVA",40,"i=%3d, k=%3d, d[%2d]=% .6e, d[%2d]=% .6e, lbnd=% .6e, eps[%2d]=% .1e\n",
+      i,k,n,d[n],nlst-1,d[nlst-1],lbnd,n,ee[n]);
+    
+    error(d[nlst-1]>ubnd,1,"eva [eva.c]",
+          "Parameter ubnd is too low");
+
+    if (nlock==nev){
+      lprintf("EVA",10,"Computation succeded. MVM = %d\n",*status);
+      return 0;
+    }
+  }
 
   lprintf("EVA",10,"Unable to reach required precision. MVM = %d\n",*status);
-
-  free_spinor_field(ws);
    
   return -1;
 }

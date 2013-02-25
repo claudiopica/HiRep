@@ -9,6 +9,7 @@
 #include <assert.h>
 #include <stdarg.h>
 #include "logger.h"
+#include "global.h"
 
 /* 
  * ***********************************************
@@ -337,6 +338,25 @@ void logger_setlevel(char *name, int v){
 
 	addlrecord(&levels,name,v);
 
+}
+
+void logger_set_input(input_logger *logger){
+  if(logger->def_log_lvl==-1)
+    logger->def_log_lvl=10;
+  
+  logger_setlevel(0,logger->def_log_lvl);
+
+
+  if(logger->inverter_log_lvl==-1)
+    logger->inverter_log_lvl=logger->def_log_lvl;
+  else {
+    logger_setlevel("INVERTER",logger->inverter_log_lvl);
+  }
+  if(logger->forcestat_log_lvl==-1)
+    logger->forcestat_log_lvl=logger->def_log_lvl;
+  else {
+    logger_setlevel("FORCE-STAT",logger->forcestat_log_lvl);
+  }
 }
 
 int logger_getlevel(char *name){

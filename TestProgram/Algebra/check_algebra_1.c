@@ -42,6 +42,10 @@ static float C2=(float)(NG+2)*(NG-1)/(float)NG;
 static float Tr=(float)(NG+2)/2;
 #endif
 
+#ifdef WITH_MPI
+#error: check_algebra_1 only works only on serial jobs
+#endif
+
 
 static int dAdj=NG*NG-1;
 static float fund=(float)(NG*NG-1)/(2*(float)(NG));

@@ -31,7 +31,13 @@
 #include "communications.h"
 
 
-#if defined(ANTIPERIODIC_BC_T) || defined(ANTIPERIODIC_BC_X) || defined(ANTIPERIODIC_BC_Y) || defined(ANTIPERIODIC_BC_Z)
+
+#ifdef WITH_MPI
+#error: check_diracoperator_4 only works only on serial jobs
+#endif
+
+
+#if defined(BC_T_ANTIPERIODIC) || defined(BC_X_ANTIPERIODIC) || defined(BC_Y_ANTIPERIODIC) || defined(BC_Z_ANTIPERIODIC)
 #error This test does not work with antiperiodic boundary conditions
 #endif
 
@@ -44,13 +50,13 @@ void D(spinor_field *out, spinor_field *in){
 }
 
 static int init_gamma = 0;
-complex gamma[4][4][4];
+complex my_gamma[4][4][4];
 
 void compute_gamma(int g[4], int ic) {
   int p[4], c[4], shift[4];
   int mu, nu, alpha, beta;
   double dbl;
-  complex locgamma[4][4][4];
+  complex locmy_gamma[4][4][4];
   _DECLARE_INT_ITERATOR(ix);
   spinor_field *in, *out;
   in=alloc_spinor_field_f(1,&glattice);
@@ -59,8 +65,8 @@ void compute_gamma(int g[4], int ic) {
   for(mu=0; mu<4; mu++)
   for(beta=0; beta<4; beta++)
   for(alpha=0; alpha<4; alpha++) {
-    locgamma[mu][alpha][beta].re = 0.;
-    locgamma[mu][alpha][beta].im = 0.;
+    locmy_gamma[mu][alpha][beta].re = 0.;
+    locmy_gamma[mu][alpha][beta].im = 0.;
   }
   
   p[0] = g[0]/T; p[1] = g[1]/X; p[2] = g[2]/Y; p[3] = g[3]/Z;
@@ -115,23 +121,23 @@ void compute_gamma(int g[4], int ic) {
       for(c[2]=0; c[2]<Y; c[2]++)
       for(c[3]=0; c[3]<Z; c[3]++) {
         ix=ipt(c[0],c[1],c[2],c[3]);
-        if(c[0]+COORD[0]*T==g[0] &&
-           c[1]+COORD[1]*X==g[1] &&
-           c[2]+COORD[2]*Y==g[2] &&
-           c[3]+COORD[3]*Z==g[3])
+        if(c[0]+zerocoord[0]==g[0] &&
+           c[1]+zerocoord[1]==g[1] &&
+           c[2]+zerocoord[2]==g[2] &&
+           c[3]+zerocoord[3]==g[3])
         {
           for(alpha=0; alpha<4; alpha++) {
-            locgamma[mu][alpha][beta].re += _FIELD_AT(out,ix)->c[alpha].c[ic].re;
-            locgamma[mu][alpha][beta].im += _FIELD_AT(out,ix)->c[alpha].c[ic].im;
+            locmy_gamma[mu][alpha][beta].re += _FIELD_AT(out,ix)->c[alpha].c[ic].re;
+            locmy_gamma[mu][alpha][beta].im += _FIELD_AT(out,ix)->c[alpha].c[ic].im;
           }
-        } else if(c[0]+COORD[0]*T==(g[0]+shift[0])%GLB_T &&
-                  c[1]+COORD[1]*X==(g[1]+shift[1])%GLB_X &&
-                  c[2]+COORD[2]*Y==(g[2]+shift[2])%GLB_Y &&
-                  c[3]+COORD[3]*Z==(g[3]+shift[3])%GLB_Z)
+        } else if(c[0]+zerocoord[0]==(g[0]+shift[0])%GLB_T &&
+                  c[1]+zerocoord[1]==(g[1]+shift[1])%GLB_X &&
+                  c[2]+zerocoord[2]==(g[2]+shift[2])%GLB_Y &&
+                  c[3]+zerocoord[3]==(g[3]+shift[3])%GLB_Z)
         {
           for(alpha=0; alpha<4; alpha++) {
-            locgamma[mu][alpha][beta].re -= _FIELD_AT(out,ix)->c[alpha].c[ic].re;
-            locgamma[mu][alpha][beta].im -= _FIELD_AT(out,ix)->c[alpha].c[ic].im;
+            locmy_gamma[mu][alpha][beta].re -= _FIELD_AT(out,ix)->c[alpha].c[ic].re;
+            locmy_gamma[mu][alpha][beta].im -= _FIELD_AT(out,ix)->c[alpha].c[ic].im;
           }
         } else {
           _spinor_prod_re_f(dbl,*_FIELD_AT(out,ix),*_FIELD_AT(out,ix));
@@ -142,14 +148,14 @@ void compute_gamma(int g[4], int ic) {
     }
   }
 
-  global_sum((double*)locgamma,2*4*4*4);
+  global_sum((double*)locmy_gamma,2*4*4*4);
 /*
   counter=0;
   for(mu=0; mu<4; mu++)
   for(beta=0; beta<4; beta++)
   for(alpha=0; alpha<4; alpha++) {
-    global_sum(&locgamma[mu][alpha][beta].re,counter);
-    global_sum(&locgamma[mu][alpha][beta].im,counter);
+    global_sum(&locmy_gamma[mu][alpha][beta].re,counter);
+    global_sum(&locmy_gamma[mu][alpha][beta].im,counter);
     counter+=2;
   }
 */
@@ -159,8 +165,8 @@ void compute_gamma(int g[4], int ic) {
       for(alpha=0; alpha<4; alpha++) {
         lprintf("GAMMA",0,"[ ");
         for(beta=0; beta<4; beta++) {
-          gamma[mu][alpha][beta]=locgamma[mu][alpha][beta];
-          lprintf("GAMMA",0,"(%.2f,%.2f) ",gamma[mu][alpha][beta].re,gamma[mu][alpha][beta].im);
+          my_gamma[mu][alpha][beta]=locmy_gamma[mu][alpha][beta];
+          lprintf("GAMMA",0,"(%.2f,%.2f) ",my_gamma[mu][alpha][beta].re,my_gamma[mu][alpha][beta].im);
         }
         lprintf("GAMMA",0,"]\n");
       }
@@ -171,8 +177,8 @@ void compute_gamma(int g[4], int ic) {
       dbl=0.;
       for(beta=0; beta<4; beta++)
       for(alpha=0; alpha<4; alpha++) {
-        dbl+=(locgamma[mu][alpha][beta].re-gamma[mu][alpha][beta].re)*(locgamma[mu][alpha][beta].re-gamma[mu][alpha][beta].re);
-        dbl+=(locgamma[mu][alpha][beta].im-gamma[mu][alpha][beta].im)*(locgamma[mu][alpha][beta].im-gamma[mu][alpha][beta].im);
+        dbl+=(locmy_gamma[mu][alpha][beta].re-my_gamma[mu][alpha][beta].re)*(locmy_gamma[mu][alpha][beta].re-my_gamma[mu][alpha][beta].re);
+        dbl+=(locmy_gamma[mu][alpha][beta].im-my_gamma[mu][alpha][beta].im)*(locmy_gamma[mu][alpha][beta].im-my_gamma[mu][alpha][beta].im);
       }
       if(dbl!=0.) {
         lprintf("ERROR",0,"Wrong gamma matrix! g=(%d,%d,%d,%d) ic=%d mu=%d err2=%e\n",g[0],g[1],g[2],g[3],ic,mu,dbl);
@@ -180,7 +186,7 @@ void compute_gamma(int g[4], int ic) {
         for(alpha=0; alpha<4; alpha++) {
           lprintf("ERROR",0,"[ ");
           for(beta=0; beta<4; beta++) {
-            lprintf("ERROR",0,"(%.2f,%.2f) ",locgamma[mu][alpha][beta].re,locgamma[mu][alpha][beta].im);
+            lprintf("ERROR",0,"(%.2f,%.2f) ",locmy_gamma[mu][alpha][beta].re,locmy_gamma[mu][alpha][beta].im);
           }
           lprintf("ERROR",0,"]\n");
         }
@@ -188,26 +194,28 @@ void compute_gamma(int g[4], int ic) {
     }
   }
   
-  free_spinor_field(in);
-  free_spinor_field(out);
+  free_spinor_field_f(in);
+  free_spinor_field_f(out);
 }
 
 /* FUNZIONA SOLO CON PBC */
 
 int main(int argc,char *argv[])
 {
+  char tmp[256];
   /* setup process id and communications */
   setup_process(&argc,&argv);
 
   /* logger setup */
-  logger_setlevel(0,10000); /* log all */
-  logger_map("DEBUG","debug");
-#ifdef WITH_MPI
-  char tmp[256];
-  sprintf(tmp,"out_%d",PID); logger_stdout(tmp);
-  sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
-#endif
 
+  logger_setlevel(0,100); /* log all */
+  if (PID!=0) { 
+    logger_disable();}
+  else{
+    sprintf(tmp,">out_%d",PID); logger_stdout(tmp);
+    sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
+  }
+   
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
   read_input(glb_var.read,"test_input");
 
@@ -236,13 +244,18 @@ int main(int argc,char *argv[])
 #endif
 
   int g[4], ic;
+
   for(ic=0; ic<NF; ic++)
-  for(g[0]=0; g[0]<GLB_T; g[0]++)
-  for(g[1]=0; g[1]<GLB_X; g[1]++)
-  for(g[2]=0; g[2]<GLB_Y; g[2]++)
-  for(g[3]=0; g[3]<GLB_Z; g[3]++) {
-    compute_gamma(g,ic);
-  }
- 
+    for(g[0]=0; g[0]<GLB_T; g[0]++)
+      for(g[1]=0; g[1]<GLB_X; g[1]++)
+	for(g[2]=0; g[2]<GLB_Y; g[2]++)
+	  for(g[3]=0; g[3]<GLB_Z; g[3]++) {
+	    lprintf("MAIN",0,".");
+	    
+	    compute_gamma(g,ic);
+	  }
+
+
   finalize_process();
+
 }

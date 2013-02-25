@@ -31,7 +31,7 @@
 
 static int iw;
 static double hmass=-7.94871867e-01f;
-static spinor_field *ws,*ev;
+static spinor_field *ev;
 static double EPSILON=1.e-12;
 
 
@@ -91,18 +91,20 @@ int main(int argc,char *argv[])
   setup_process(&argc,&argv);
   
   /* logger setup */
-  logger_setlevel(0,10000); /* log all */
-  logger_map("DEBUG","debug");
-#ifdef WITH_MPI
-  sprintf(pame,">out_%d",PID); logger_stdout(pame);
-  sprintf(pame,"err_%d",PID); freopen(pame,"w",stderr);
-#endif
-  
+
+  logger_setlevel(0,100); /* log all */
+  if (PID!=0) { 
+    logger_disable();}
+  else{
+    sprintf(pame,">out_%d",PID); logger_stdout(pame);
+    sprintf(pame,"err_%d",PID); freopen(pame,"w",stderr);
+  }
+     
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
   
   /* read input file */
   read_input(glb_var.read,"test_input");
-  rlxd_init(glb_var.rlxd_level+PID,glb_var.rlxd_seed);
+  rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
   
   /* setup communication geometry */
   if (geometry_init() == 1) {
@@ -142,7 +144,7 @@ int main(int argc,char *argv[])
   nevt=20;
  
   
-  ws=alloc_spinor_field_f(2,&glattice);
+  spinor_field * ws=alloc_spinor_field_f(2,&glattice);
   ev=alloc_spinor_field_f(iw+1,&glattice);
   double d1[iw+1];
 
@@ -155,7 +157,7 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"Accuracy parameters: omega1=%.1e, omega2=%.1e\n\n",
 	 omega1,omega2);
 
-  ie=eva(nev,nevt,0,100,20,ubnd,omega1,omega2,Op1,ev,d1,&status);
+  ie=eva(nev,nevt,0,100,20,ubnd,omega1,omega2,Op1,ws,ev,d1,&status);
 
   lprintf("MAIN",0,"\nEigenvalues of Q^2 (status = %d, ie = %d):\n\n",
 	 status,ie);
@@ -178,6 +180,6 @@ int main(int argc,char *argv[])
   finalize_process();
 
 
-  exit(0);
+  return 0;
 }
 

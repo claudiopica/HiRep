@@ -14,50 +14,42 @@
 #include "geometry.h"
 #include "global.h"
 #include "logger.h"
+#include "random.h"
+#include <mpi.h>
 
 
 int main(int argc,char *argv[])
 {
-  char tmp[256];
-
-/*  GLB_T=16;*/
-/*  GLB_X=4;*/
-/*  GLB_Y=4;*/
-/*  GLB_Z=4;*/
-
-/*  NP_T=4;*/
-/*  NP_X=1;*/
-/*  NP_Y=1;*/
-/*  NP_Z=1;*/
-
-/*  T_BORDER=1;*/
-/*  X_BORDER=0;*/
-/*  Y_BORDER=0;*/
-/*  Z_BORDER=0;*/
-
-  setup_process(&argc,&argv);
+  char tmp[512];
+ setup_process(&argc,&argv);
   
-  logger_setlevel(0,10000); /* log all */
+  logger_setlevel(0,100); /* log all */
+  if (PID!=0) { logger_disable(); }
+  else{
+    sprintf(tmp,"out_%d",PID); logger_stdout(tmp);
+    sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
+  }
   logger_map("DEBUG","debug");
-#ifdef WITH_MPI
-  sprintf(tmp,">out_%d",PID); logger_stdout(tmp);
-  sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
-#endif
-
+  
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
-
+  
   read_input(glb_var.read,"test_input");
-
+  rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed);
+  
   /* setup communication geometry */
   if (geometry_init() == 1) {
     finalize_process();
     return 0;
   }
 
-	geometry_mpi_eo();
+  geometry_mpi_eo();
 
-	test_geometry_mpi_eo();
+  fflush(stdout);
+  MPI_Barrier( GLB_COMM ) ; 
+
+  test_geometry_mpi_eo();
   
   finalize_process();
-	exit(0);
+
+  return 0;
 }

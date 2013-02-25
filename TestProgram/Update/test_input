@@ -1,0 +1,37 @@
+GLB_T = 8
+GLB_X = 8
+GLB_Y = 8
+GLB_Z = 8
+NP_T = 2
+NP_X = 2
+NP_Y = 2
+NP_Z = 2
+level = 1
+seed = 12345
+//Fermion twisting
+theta_T = 0.
+theta_X = 0.
+theta_Y = 0.
+theta_Z = 0.
+
+// RHMC variables
+beta = 4.9
+mass = -0.8
+nf = 2
+n_pf = 2
+MT_prec = 1.e-10
+MD_prec = 1.e-10
+HB_prec = 1.e-10
+force_prec = 1.e-20
+tlen = 1
+nsteps = 2
+gsteps = 5
+
+
+run name = run1
+save freq = 9999
+meas freq = 1
+conf dir = .
+gauge start = random
+//ranlxd start =
+last conf = 10

@@ -1,13 +1,13 @@
 TOPDIR = ..
 MKDIR=$(TOPDIR)/Make
 
-EXES = mk_wilsonloops tune_HYP_smearing polyakov_loops
+EXES = mk_wilsonloops tune_HYP_smearing mk_polyakov_loops
 
 default: $(EXES)
 
 
 MODDIR := Geometry
-MODS := geometry_init geometry_mpi_eo communications
+MODS := process_init geometry_init geometry_mpi_eo communications
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := IO
@@ -15,7 +15,7 @@ MODS := archive logger read_input endian
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Utils
-MODS := suN_utils time boundary_conditions HYP_smearing
+MODS := suN_utils HYP_smearing single_double_utils boundary_conditions time
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Memory
@@ -38,10 +38,7 @@ MODDIR := Error
 MODS := error
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
-#COMMON_OBJS = $(MOD_OBJS)
-
-mk_wilsonloops_OBJS = $(MOD_OBJS)
-polyakov_loops_OBJS = $(MOD_OBJS)
+COMMON_OBJS = $(MOD_OBJS)
 
 
 include $(MKDIR)/MkRules

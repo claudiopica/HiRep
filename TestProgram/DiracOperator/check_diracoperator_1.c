@@ -85,13 +85,16 @@ int main(int argc,char *argv[])
   
   setup_process(&argc,&argv);
   
-  logger_setlevel(0,10000); /* log all */
-  logger_map("DEBUG","debug");
-#ifdef WITH_MPI
-  sprintf(tmp,">out_%d",PID); logger_stdout(tmp);
-  sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
-#endif
+  logger_setlevel(0,100); /* log all */
+  if (PID!=0) { 
+    logger_disable();}
+  else{
+    sprintf(tmp,">out_%d",PID); logger_stdout(tmp);
+    sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
+  }
   
+  logger_map("DEBUG","debug");
+
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
   
   read_input(glb_var.read,"test_input");
@@ -177,7 +180,7 @@ int main(int argc,char *argv[])
 #ifndef REPR_FUNDAMENTAL
   free_gfield_f(u_gauge_f);
 #endif
-  free_spinor_field(s0);
+  free_spinor_field_f(s0);
   
   free_gtransf(g);
   

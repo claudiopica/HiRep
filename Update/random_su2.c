@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "random.h"
+#include "update.h"
 
 #define NVEC (32)
 #define NRAN (2*NVEC)

@@ -11,16 +11,25 @@
  */
 #define BORDERSIZE 1
 
+
 typedef struct _geometry_descriptor {
-  unsigned int local_master_pieces, total_master_pieces;
-  unsigned int *master_start, *master_end;
-  unsigned int ncopies;
-  unsigned int *copy_from, *copy_to, *copy_len;
-  unsigned int nbuffers;
-  unsigned int *rbuf_len, *sbuf_len;
-  unsigned int *rbuf_from_proc, *rbuf_start;
-  unsigned int *sbuf_to_proc, *sbuf_start;
-  unsigned int gsize;
+  int inner_master_pieces; /* number of inner pieces (1 o 2 for even odd or no_eo)) */
+  int local_master_pieces;
+  int total_spinor_master_pieces;
+  int total_gauge_master_pieces;
+  int *master_start, *master_end; 
+  int master_shift; /*  this is the odd spinor's shift, i.e. the index of the first odd entry in the full geometry */
+  int ncopies_spinor;
+  int ncopies_gauge;
+  int *copy_from, *copy_to, *copy_len;
+  int copy_shift; /*  this is the odd spinor's shift, i.e. the index of the first odd copy in the full geometry */
+  int nbuffers_spinor;
+  int nbuffers_gauge;
+  int *rbuf_len, *sbuf_len;
+  int *rbuf_from_proc, *rbuf_start;
+  int *sbuf_to_proc, *sbuf_start;
+  int gsize_spinor;
+  int gsize_gauge;
 } geometry_descriptor;
 
 #define _PIECE_FOR(type,i) \
@@ -38,9 +47,11 @@ _SITE_FOR((type),i)
 
 
 int setup_process(int *argc, char ***argv);
+int setup_replicas();
 int finalize_process(void);
 
 void origin_coord(int *c);
+void other_proc_origin_coord(int * proc_coord, int *c);
 void glb_to_proc(int *g, int *p);
 
 int geometry_init(void);

@@ -30,8 +30,13 @@
 #include "moreio.h"
 
 
+
 #if defined(ROTATED_SF) && defined(BASIC_SF)
-#error The implementation of the Schroedinger functional has not been tested on this code
+#error This code does not work with the Schroedinger functional !!!
+#endif
+
+#ifdef FERMION_THETA
+#error This code does not work with the fermion twisting !!!
 #endif
 
 
@@ -60,8 +65,11 @@ int main(int argc,char *argv[]) {
   double plaq;
 
   /* setup process id and communications */
+  read_cmdline(argc, argv);
   setup_process(&argc,&argv);
 
+  read_input(glb_ip.read,input_filename);
+  setup_replicas();
 
   /* logger setup */
   /* disable logger for MPI processes != 0 */
@@ -72,11 +80,11 @@ int main(int argc,char *argv[]) {
 
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
 
+  lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_ip.rlxd_level,glb_ip.rlxd_seed);
+  rlxd_init(glb_ip.rlxd_level,glb_ip.rlxd_seed+PID);
 
-  /* read & broadcast parameters */
-  read_cmdline(argc, argv);
-  read_input(glb_ip.read,input_filename);
-
+  lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
+  lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
 
   /* setup communication geometry */
   if (geometry_init() == 1) {
@@ -84,27 +92,20 @@ int main(int argc,char *argv[]) {
     return 0;
   }
 
-  lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
-  lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
-  lprintf("MAIN",0,"global size is %dx%dx%dx%d\n",GLB_T,GLB_X,GLB_Y,GLB_Z);
-  lprintf("MAIN",0,"proc grid is %dx%dx%dx%d\n",NP_T,NP_X,NP_Y,NP_Z);
-
   /* setup lattice geometry */
   geometry_mpi_eo();
   /* test_geometry_mpi_eo(); */
 
-  lprintf("MAIN",0,"local size is %dx%dx%dx%d\n",T,X,Y,Z);
-  lprintf("MAIN",0,"extended local size is %dx%dx%dx%d\n",T_EXT,X_EXT,Y_EXT,Z_EXT);
-
-  lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_ip.rlxd_level,glb_ip.rlxd_seed);
-  rlxd_init(glb_ip.rlxd_level,glb_ip.rlxd_seed+PID);
+  init_BCs(NULL);
  
   /* alloc global gauge fields */
   u_gauge=alloc_gfield(&glattice);
-#ifndef REPR_FUNDAMENTAL
+#ifdef ALLOCATE_REPR_GAUGE_FIELD
   u_gauge_f=alloc_gfield_f(&glattice);
 #endif
+
   random_u(u_gauge);
+  apply_BCs_on_fundamental_gauge_field();
 
   plaq=avr_plaquette();
   lprintf("IO",0,"Configuration generated.  Plaquette=%e\n",plaq);
@@ -125,8 +126,10 @@ int main(int argc,char *argv[]) {
 /*  write_gauge_field_eolexi(cnfg_filename);*/
   write_gauge_field(cnfg_filename);
 
+  free_BCs();
+
 	free_gfield(u_gauge);
-#ifndef REPR_FUNDAMENTAL
+#ifdef ALLOCATE_REPR_GAUGE_FIELD
 	free_gfield_f(u_gauge_f);
 #endif
 

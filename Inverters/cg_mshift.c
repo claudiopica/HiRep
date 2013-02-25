@@ -11,6 +11,7 @@
 #include "global.h"
 #include "memory.h"
 #include "logger.h"
+#include "utils.h"
 #include <assert.h>
 
 
@@ -135,7 +136,7 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
   }
 
   /* free memory */
-  free_spinor_field(p);
+  free_spinor_field_f(p);
   free(z1); free(z2); free(z3);
 
   /* return number of cg iter */
@@ -143,6 +144,16 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
 }
 
 int cg_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out){ 
+  #ifdef TIMING
+  struct timeval start, end;
+  struct timeval etime;
+  
+  #ifdef TIMING_WITH_BARRIERS
+  MPI_Barrier(GLB_COMM);
+  #endif
+  gettimeofday(&start,0);
+  #endif
+
   int cgiter,msiter;
   int i;
   mshift_par par_save=*par;
@@ -165,6 +176,15 @@ int cg_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field
   *par=par_save;
 
   lprintf("INVERTER",10,"CG_mshift: MVM = %d/%d\n",msiter,cgiter);
+
+  #ifdef TIMING
+  #ifdef TIMING_WITH_BARRIERS
+  MPI_Barrier(GLB_COMM);
+  #endif
+  gettimeofday(&end,0);
+  timeval_subtract(&etime,&end,&start);
+  lprintf("TIMING",0,"cg_mshift %.6f s\n",1.*etime.tv_sec+1.e-6*etime.tv_usec);
+  #endif
 
   return cgiter;
 }

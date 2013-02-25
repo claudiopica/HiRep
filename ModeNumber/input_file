@@ -1,0 +1,19 @@
+NP_T = 1
+NP_X = 1
+NP_Y = 1
+NP_Z = 1
+
+level = 1  seed = 12345
+
+nu:inverr2 = 1.e-14
+nu:approx = modenumber.approx
+nu:nhits = 1
+nu:list = 10
+
+eva:nev = 1
+eva:nevt = 5
+eva:omega1 = 1e-4
+eva:omega2 = 1e-2
+eva:kmax = 50
+eva:maxiter = 100
+

@@ -15,6 +15,8 @@
 #include "suN.h"
 #include "communications.h"
 #include "logger.h"
+#include "observables.h"
+#include <stdio.h>
 
 double plaq(int ix,int mu,int nu)
 {
@@ -35,7 +37,13 @@ double plaq(int ix,int mu,int nu)
   _suNg_times_suNg_dagger(w3,w1,w2);      
 
   _suNg_trace_re(p,w3);
+
+#ifdef PLAQ_WEIGHTS
+  if(plaq_weight==NULL) return p;
+  return plaq_weight[ix*16+mu*4+nu]*p;
+#else
   return p;
+#endif
 }
 
 
@@ -56,8 +64,16 @@ void cplaq(complex *ret,int ix,int mu,int nu)
   _suNg_times_suNg(w2,(*v4),(*v3));
   _suNg_times_suNg_dagger(w3,w1,w2);      
       
-   _suNg_trace_re(ret->re,w3);
-   _suNg_trace_im(ret->im,w3);
+  _suNg_trace_re(ret->re,w3);
+  _suNg_trace_im(ret->im,w3);
+
+#ifdef PLAQ_WEIGHTS
+  if(plaq_weight!=NULL) {
+    ret->re *= plaq_weight[ix*16+mu*4+nu];
+    ret->im *= plaq_weight[ix*16+mu*4+nu];
+  }
+#endif
+
 }
 
 
@@ -67,6 +83,10 @@ double avr_plaquette()
   double pa=0.;
 
   _PIECE_FOR(&glattice,ix) {
+    if(_PIECE_INDEX(ix)==glattice.inner_master_pieces) {
+      /* wait for gauge field to be transfered */
+      complete_gf_sendrecv(u_gauge);
+    }
     _SITE_FOR(&glattice,ix) {
       pa+=plaq(ix,1,0);
       pa+=plaq(ix,2,0);
@@ -75,15 +95,11 @@ double avr_plaquette()
       pa+=plaq(ix,3,1);
       pa+=plaq(ix,3,2);
     }
-    if(_PIECE_INDEX(ix)==0) {
-      /* wait for gauge field to be transfered */
-      complete_gf_sendrecv(u_gauge);
-    }
   }
 
   global_sum(&pa, 1);
 
-  return pa/(double)(6*GLB_T*GLB_X*GLB_Y*GLB_Z*NG);
+  return pa/(6.*NG)/GLB_VOLUME;
 
 }
 
@@ -96,7 +112,13 @@ void full_plaquette()
   for(k=0;k<6;k++)
     pa[k].re=pa[k].im=0.;
 
+/*  int t=0; */
+  
   _PIECE_FOR(&glattice,ix) {
+    if(_PIECE_INDEX(ix)==glattice.inner_master_pieces) {
+      /* wait for gauge field to be transfered */
+      complete_gf_sendrecv(u_gauge);
+    }
     _SITE_FOR(&glattice,ix) {
       complex tmp;
 		  cplaq(&tmp,ix,1,0); _complex_add_assign(pa[0],tmp);
@@ -105,17 +127,31 @@ void full_plaquette()
 		  cplaq(&tmp,ix,3,0); _complex_add_assign(pa[3],tmp);
 		  cplaq(&tmp,ix,3,1); _complex_add_assign(pa[4],tmp);
 		  cplaq(&tmp,ix,3,2); _complex_add_assign(pa[5],tmp);
-    }
-    if(_PIECE_INDEX(ix)==0) {
-      /* wait for gauge field to be transfered */
-      complete_gf_sendrecv(u_gauge);
+/*		  
+		  if(twbc_plaq[ix*16+2*4+1]==-1 &&
+		    twbc_plaq[ix*16+3*4+1]==-1 &&
+		    twbc_plaq[ix*16+3*4+2]==-1) {
+		  cplaq(&tmp,ix,1,0);
+		  lprintf("LOCPL",0,"Plaq( %d , %d , %d ) = ( %f , %f )\n",t,1,0,tmp.re,tmp.im);
+		  cplaq(&tmp,ix,2,0);
+		  lprintf("LOCPL",0,"Plaq( %d , %d , %d ) = ( %f , %f )\n",t,2,0,tmp.re,tmp.im);
+		  cplaq(&tmp,ix,2,1);
+		  lprintf("LOCPL",0,"Plaq( %d , %d , %d ) = ( %f , %f )\n",t,2,1,tmp.re,tmp.im);
+		  cplaq(&tmp,ix,3,0);
+		  lprintf("LOCPL",0,"Plaq( %d , %d , %d ) = ( %f , %f )\n",t,3,0,tmp.re,tmp.im);
+		  cplaq(&tmp,ix,3,1);
+		  lprintf("LOCPL",0,"Plaq( %d , %d , %d ) = ( %f , %f )\n",t,3,1,tmp.re,tmp.im);
+		  cplaq(&tmp,ix,3,2);
+		  lprintf("LOCPL",0,"Plaq( %d , %d , %d ) = ( %f , %f )\n",t,3,2,tmp.re,tmp.im);
+		  t++;
+		    } */
     }
   }
 
   global_sum((double*)pa,12);
   for(k=0;k<6;k++) {
-    pa[k].re /= GLB_T*GLB_X*GLB_Y*GLB_Z*NG;
-    pa[k].im /= GLB_T*GLB_X*GLB_Y*GLB_Z*NG;
+    pa[k].re /= GLB_VOLUME*NG;
+    pa[k].im /= GLB_VOLUME*NG;
   }
 
   lprintf("PLAQ",0,"Plaq( %d , %d) = ( %f , %f )\n",1,0,pa[0].re,pa[0].im);

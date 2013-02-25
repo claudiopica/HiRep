@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include "error.h"
 #include "logger.h"
+#include "geometry.h"
 
 void error(int test,int no,char *name,char *text)
 {
@@ -22,6 +23,7 @@ void error(int test,int no,char *name,char *text)
    {
       lprintf("ERROR",0,"%s:\n%s\n",name,text);
       lprintf("ERROR",0,"Exiting program...\n");
+      finalize_process();
       exit(no);
    }
 }

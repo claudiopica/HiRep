@@ -32,7 +32,11 @@
 #include "cinfo.c"
 
 #if defined(ROTATED_SF) && defined(BASIC_SF)
-#error The implementation of the Schroedinger functional has not been tested on this code
+#error This code does not work with the Schroedinger functional !!!
+#endif
+
+#ifdef FERMION_THETA
+#error This code does not work with the fermion twisting !!!
 #endif
 
 
@@ -54,7 +58,7 @@ typedef struct _input_mesons {
     {"quark quenched masses", "mes:masses = %s", STRING_T, (varname).mstring},\
     {"inverter precision", "mes:precision = %lf", DOUBLE_T, &(varname).precision},\
     {"number of inversions per cnfg", "mes:nhits = %d", INT_T, &(varname).nhits},\
-    {NULL, NULL, 0, NULL}\
+    {NULL, NULL, INT_T, NULL}\
   }\
 }
 
@@ -122,7 +126,7 @@ void inline_mk_mesons(double *m, int nm, double prec) {
     }
 #undef CORR
 
-  free_spinor_field(pta_qprop[0]);
+  free_spinor_field_f(pta_qprop[0]);
   free(pta_qprop);
   free(tricorr);
 
@@ -245,6 +249,9 @@ int main(int argc,char *argv[]) {
   read_cmdline(argc, argv);
   setup_process(&argc,&argv);
 
+  read_input(glb_var.read,input_filename);
+  setup_replicas();
+
   /* logger setup */
   /* disable logger for MPI processes != 0 */
   logger_setlevel(0,30);
@@ -289,12 +296,18 @@ int main(int argc,char *argv[]) {
 #undef remove_parameter
 */
 
-  read_input(glb_var.read,input_filename);
   read_input(mes_var.read,input_filename);
   GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
   error(fpars.type==UNKNOWN_CNFG,1,"mk_mesons.c","Bad name for a configuration file");
   error(fpars.nc!=NG,1,"mk_mesons.c","Bad NG");
 
+
+  lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed);
+  rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
+  srand(glb_var.rlxd_seed+PID);
+
+  lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
+  lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
 
   nm=0;
   if(fpars.type==DYNAMICAL_CNFG) {
@@ -318,26 +331,15 @@ int main(int argc,char *argv[]) {
     return 0;
   }
 
-  lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
-  lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
-  lprintf("MAIN",0,"global size is %dx%dx%dx%d\n",GLB_T,GLB_X,GLB_Y,GLB_Z);
-  lprintf("MAIN",0,"proc grid is %dx%dx%dx%d\n",NP_T,NP_X,NP_Y,NP_Z);
-  lprintf("MAIN",0,"Fermion boundary conditions: %.2f,%.2f,%.2f,%.2f\n",bc[0],bc[1],bc[2],bc[3]);
-
   /* setup lattice geometry */
   geometry_mpi_eo();
   /* test_geometry_mpi_eo(); */
 
-  lprintf("MAIN",0,"local size is %dx%dx%dx%d\n",T,X,Y,Z);
-  lprintf("MAIN",0,"extended local size is %dx%dx%dx%d\n",T_EXT,X_EXT,Y_EXT,Z_EXT);
-
-  lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed);
-  rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
-  srand(glb_var.rlxd_seed+PID);
+  init_BCs(NULL);
 
   /* alloc global gauge fields */
   u_gauge=alloc_gfield(&glattice);
-#ifndef REPR_FUNDAMENTAL
+#ifdef ALLOCATE_REPR_GAUGE_FIELD
   u_gauge_f=alloc_gfield_f(&glattice);
 #endif
 
@@ -391,15 +393,20 @@ int main(int argc,char *argv[]) {
   finalize_process();
 
   /*
-     free_spinor_field(pta_qprop[0]);
+     free_spinor_field_f(pta_qprop[0]);
      free(pta_qprop);
      free(tricorr);
    */
 
+  free_BCs();
+
   free_gfield(u_gauge);
-#ifndef REPR_FUNDAMENTAL
+#ifdef ALLOCATE_REPR_GAUGE_FIELD
   free_gfield_f(u_gauge_f);
 #endif
+
+  /* close communications */
+  finalize_process();
 
   return 0;
 }

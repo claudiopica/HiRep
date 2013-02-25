@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Computation of the Polyakov loops
+* Computation of the SF coupling
 *
 *******************************************************************************/
 
@@ -27,14 +27,62 @@
 #include "representation.h"
 #include "utils.h"
 #include "logger.h"
+#include "communications.h"
 
 #include "cinfo.c"
 
 
+/* we need the beta for normalization */
+typedef struct _input_sfc {
+  /* rhmc parameters */
+  double beta;
+
+  /* for the reading function */
+  input_record_t read[2];
+  
+} input_sfc;
+
+#define init_input_sfc(varname) \
+{ \
+  .read={\
+    {"beta", "beta = %lf", DOUBLE_T, &(varname).beta},\
+    {NULL, NULL, INT_T, NULL}\
+  }\
+}
+
+input_sfc sfc_var = init_input_sfc( sfc_var );
+
+/* BC variables */
+typedef struct _input_bcpar {
+  /* rhmc parameters */
+  double theta[4];
+  double SF_ct;
+  double SF_ds;
+
+  /* for the reading function */
+  input_record_t read[7];
+  
+} input_bcpar;
+
+#define init_input_bcpar(varname) \
+{ \
+  .read={\
+    {"theta_T", "theta_T = %lf", DOUBLE_T, &(varname).theta[0]},\
+    {"theta_X", "theta_X = %lf", DOUBLE_T, &(varname).theta[1]},\
+    {"theta_Y", "theta_Y = %lf", DOUBLE_T, &(varname).theta[2]},\
+    {"theta_Z", "theta_Z = %lf", DOUBLE_T, &(varname).theta[3]},\
+    {"SF_ds", "SF_ds = %lf", DOUBLE_T, &(varname).SF_ds},\
+    {"SF_ct", "SF_ct = %lf", DOUBLE_T, &(varname).SF_ct}, \
+    {NULL, NULL, INT_T, NULL}\
+  }\
+}
+
+input_bcpar bcpar_var = init_input_bcpar( bcpar_var );
+
 char cnfg_filename[256]="";
 char list_filename[256]="";
 char input_filename[256] = "input_file";
-char output_filename[256] = "polyakov.out";
+char output_filename[256] = "sfcoupling.out";
 enum { UNKNOWN_CNFG, DYNAMICAL_CNFG, QUENCHED_CNFG };
 
 
@@ -99,13 +147,6 @@ int parse_cnfg_filename(char* filename, filename_t* fn) {
     return QUENCHED_CNFG;
   }
 
-  hm=sscanf(basename,"%dx%dx%dx%d%*[Nn]c%d",
-      &(fn->t),&(fn->x),&(fn->y),&(fn->z),&(fn->nc));
-  if(hm==5) {
-    fn->type=QUENCHED_CNFG;
-    return QUENCHED_CNFG;
-  }
-
   fn->type=UNKNOWN_CNFG;
   return UNKNOWN_CNFG;
 }
@@ -131,17 +172,17 @@ void read_cmdline(int argc, char* argv[]) {
   if (ao!=0) strcpy(output_filename,argv[ao]);
   if (ai!=0) strcpy(input_filename,argv[ai]);
 
-  error((ac==0 && al==0) || (ac!=0 && al!=0),1,"parse_cmdline [polyakov_loops.c]",
-      "Syntax: polyakov_loops { -c <config file> | -l <list file> } [-i <input file>] [-o <output file>] [-m]");
+  error((ac==0 && al==0) || (ac!=0 && al!=0),1,"parse_cmdline [mk_mesons.c]",
+      "Syntax: mk_mesons { -c <config file> | -l <list file> } [-i <input file>] [-o <output file>] [-m]");
 
   if(ac != 0) {
     strcpy(cnfg_filename,argv[ac]);
     strcpy(list_filename,"");
   } else if(al != 0) {
     strcpy(list_filename,argv[al]);
-    error((list=fopen(list_filename,"r"))==NULL,1,"parse_cmdline [polyakov_loops.c]" ,
+    error((list=fopen(list_filename,"r"))==NULL,1,"parse_cmdline [mk_mesons.c]" ,
 	"Failed to open list file\n");
-    error(fscanf(list,"%s",cnfg_filename)==0,1,"parse_cmdline [polyakov_loops.c]" ,
+    error(fscanf(list,"%s",cnfg_filename)==0,1,"parse_cmdline [mk_mesons.c]" ,
 	"Empty list file\n");
     fclose(list);
   }
@@ -155,6 +196,8 @@ int main(int argc,char *argv[]) {
   char tmp[256];
   FILE* list;
   filename_t fpars;
+  int nm;
+  double m[256];
 
   /* setup process id and communications */
   read_cmdline(argc, argv);
@@ -162,7 +205,7 @@ int main(int argc,char *argv[]) {
 
   /* logger setup */
   /* disable logger for MPI processes != 0 */
-  logger_setlevel(0,70);
+  logger_setlevel(0,30);
   if (PID!=0) { logger_disable(); }
   if (PID==0) { 
     sprintf(tmp,">%s",output_filename); logger_stdout(tmp);
@@ -180,66 +223,132 @@ int main(int argc,char *argv[]) {
   /* read & broadcast parameters */
   parse_cnfg_filename(cnfg_filename,&fpars);
 
+
   read_input(glb_var.read,input_filename);
+  read_input(sfc_var.read,input_filename);
+  read_input(bcpar_var.read,input_filename);
   GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
-  error(fpars.type==UNKNOWN_CNFG,1,"polyakov_loops.c","Bad name for a configuration file");
-  error(fpars.nc!=NG,1,"polyakov_loops.c","Bad NG");
+  error(fpars.type==UNKNOWN_CNFG,1,"mk_sfcoupling.c","Bad name for a configuration file");
+  error(fpars.nc!=NG,1,"mk_sfcoupling.c","Bad NG");
+
+
+  lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed);
+  rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
+  srand(glb_var.rlxd_seed+PID);
+
+  lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
+  lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
+
+  nm=0;
+  if(fpars.type==DYNAMICAL_CNFG) {
+    nm=1;
+    m[0] = fpars.m;
+  } else if(fpars.type==QUENCHED_CNFG) {
+   lprintf("MAIN",0,"Quenched configurations NOT suported");
+   finalize_process();
+   return 1;
+  }
 
 
   /* setup communication geometry */
   if (geometry_init() == 1) {
     finalize_process();
-    return 0;
+    return 1;
   }
-
-  lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
-  lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
-  lprintf("MAIN",0,"global size is %dx%dx%dx%d\n",GLB_T,GLB_X,GLB_Y,GLB_Z);
-  lprintf("MAIN",0,"proc grid is %dx%dx%dx%d\n",NP_T,NP_X,NP_Y,NP_Z);
-  lprintf("MAIN",0,"Fermion boundary conditions: %.2f,%.2f,%.2f,%.2f\n",bc[0],bc[1],bc[2],bc[3]);
 
   /* setup lattice geometry */
   geometry_mpi_eo();
   /* test_geometry_mpi_eo(); */
 
-  lprintf("MAIN",0,"local size is %dx%dx%dx%d\n",T,X,Y,Z);
-  lprintf("MAIN",0,"extended local size is %dx%dx%dx%d\n",T_EXT,X_EXT,Y_EXT,Z_EXT);
+ /* initialize boundary conditions */
+  BCs_pars_t BCs_pars = {
+    .fermion_twisting_theta = {0.,0.,0.,0.},
+    .gauge_boundary_improvement_cs = 1.,
+    .gauge_boundary_improvement_ct = 1.,
+    .chiSF_boundary_improvement_ds = 1.,
+    .SF_BCs = 0
+  };
+#ifdef FERMION_THETA
+  BCs_pars.fermion_twisting_theta[0] = bcpar_var.theta[0];
+  BCs_pars.fermion_twisting_theta[1] = bcpar_var.theta[1];
+  BCs_pars.fermion_twisting_theta[2] = bcpar_var.theta[2];
+  BCs_pars.fermion_twisting_theta[3] = bcpar_var.theta[3];
+#endif
+#ifdef ROTATED_SF
+  BCs_pars.gauge_boundary_improvement_ct = bcpar_var.SF_ct;
+  BCs_pars.chiSF_boundary_improvement_ds = bcpar_var.SF_ds;
+  BCs_pars.SF_BCs = 1;
+#endif
+#ifdef BASIC_SF
+  BCs_pars.SF_BCs = 1;
+#endif
+  init_BCs(&BCs_pars);
 
   /* alloc global gauge fields */
   u_gauge=alloc_gfield(&glattice);
+#ifdef ALLOCATE_REPR_GAUGE_FIELD
+  u_gauge_f=alloc_gfield_f(&glattice);
+#endif
+
+  lprintf("MAIN",0,
+          "beta = %.8f\n"
+#ifdef ROTATED_SF
+	  "rotatedSF ds = %.8f\n"
+          "rotatedSF ct = %.8f\n"
+#endif /* ROTATED_SF */
+          ,sfc_var.beta
+          ,bcpar_var.SF_ds
+          ,bcpar_var.SF_ct);
+
 
   list=NULL;
   if(strcmp(list_filename,"")!=0) {
-    error((list=fopen(list_filename,"r"))==NULL,1,"main [mk_mesons.c]" ,
+    error((list=fopen(list_filename,"r"))==NULL,1,"main [mk_sfcoupling.c]" ,
 	"Failed to open list file\n");
   }
+
 
   i=0;
   while(1) {
 
-    if(list!=NULL)
-      if(fscanf(list,"%s",cnfg_filename)==0 || feof(list)) break;
+	  if(list!=NULL)
+		  if(fscanf(list,"%s",cnfg_filename)==0 || feof(list)) break;
 
-    i++;
+	  i++;
 
-    lprintf("MAIN",0,"Configuration from %s\n", cnfg_filename);
-    /* NESSUN CHECK SULLA CONSISTENZA CON I PARAMETRI DEFINITI !!! */
-    read_gauge_field(cnfg_filename);
+	  lprintf("MAIN",0,"Configuration from %s\n", cnfg_filename);
+	  /* NESSUN CHECK SULLA CONSISTENZA CON I PARAMETRI DEFINITI !!! */
+	  read_gauge_field(cnfg_filename);
+	  represent_gauge_field();
 
-    lprintf("TEST",0,"<p> %1.6f\n",avr_plaquette());
+	  lprintf("TEST",0,"<p> %1.6f\n",avr_plaquette());
 
-    full_plaquette();
-    polyakov();
-   
-    if(list==NULL) break;
+          double gsf=SF_action(sfc_var.beta);
+          lprintf("SF_action",10,"gsf = %.10e\n",gsf);
+
+	  if(list==NULL) break;
   }
 
   if(list!=NULL) fclose(list);
 
   finalize_process();
- 
+
+  /*
+     free_spinor_field_f(pta_qprop[0]);
+     free(pta_qprop);
+     free(tricorr);
+   */
+
+  free_BCs();
+
   free_gfield(u_gauge);
-  
+#ifdef ALLOCATE_REPR_GAUGE_FIELD
+  free_gfield_f(u_gauge_f);
+#endif
+
+  /* close communications */
+  finalize_process();
+
   return 0;
 }
 

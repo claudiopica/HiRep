@@ -62,10 +62,6 @@ static void slower(char *str) {
  * 0 => g_start is a valid file name which should be used as starting config
  * 1 => use unit gauge config
  * 2 => use a random config
- * 3 = unit with UNIT bcs
- * 4 = unit with SF bcs
- * 5 = random with UNIT bcs
- * 6 = random with SF bcs
  */
 static int parse_gstart(rhmc_flow *rf) {
 
@@ -110,43 +106,13 @@ static int parse_gstart(rhmc_flow *rf) {
   slower(buf);
   ret=strcmp(buf,"unit");
   if (ret==0) {
-#if defined(BASIC_SF) || defined(ROTATED_SF)
-    lprintf("FLOW",0,"Starting a new run from a unit conf with SF bcs!\n");
-    return 4;
-#else
     lprintf("FLOW",0,"Starting a new run from a unit conf!\n");
     return 1;
-#endif
   }
   ret=strcmp(buf,"random");
   if (ret==0) {
-#if defined(BASIC_SF) || defined(ROTATED_SF)
-    lprintf("FLOW",0,"Starting a new run from a random conf with SF bcs!\n");
-    return 6;
-#else
     lprintf("FLOW",0,"Starting a new run from a random conf!\n");
     return 2;
-#endif
-  }
-  ret=strcmp(buf,"unit_unit");
-  if (ret==0) {
-    lprintf("FLOW",0,"Starting a new run from a unit conf with UNIT bcs!\n");
-    return 3;
-  }
-  ret=strcmp(buf,"unit_sf");
-  if (ret==0) {
-    lprintf("FLOW",0,"Starting a new run from a unit conf with SF bcs!\n");
-    return 4;
-  }
-  ret=strcmp(buf,"random_unit");
-  if (ret==0) {
-    lprintf("FLOW",0,"Starting a new run from a random conf with UNIT bcs!\n");
-    return 5;
-  }
-  ret=strcmp(buf,"random_sf");
-  if (ret==0) {
-    lprintf("FLOW",0,"Starting a new run from a random conf with SF bcs!\n");
-    return 6;
   }
   
   lprintf("ERROR",0,"Invalid starting gauge conf specified [%s]\n",rf->g_start);
@@ -201,7 +167,7 @@ int init_mc(rhmc_flow *rf, char *ifile) {
 
   /* alloc global gauge fields */
   u_gauge=alloc_gfield(&glattice);
-#if !defined(REPR_FUNDAMENTAL) || defined(ROTATED_SF)
+#ifdef ALLOCATE_REPR_GAUGE_FIELD
   u_gauge_f=alloc_gfield_f(&glattice);
 #endif
 
@@ -217,6 +183,30 @@ int init_mc(rhmc_flow *rf, char *ifile) {
 
   read_input(rhmc_var.read,ifile);
   read_input(rf->read,ifile);
+
+  /* initialize boundary conditions */
+  BCs_pars_t BCs_pars = {
+    .fermion_twisting_theta = {0.,0.,0.,0.},
+    .gauge_boundary_improvement_cs = 1.,
+    .gauge_boundary_improvement_ct = 1.,
+    .chiSF_boundary_improvement_ds = 1.,
+    .SF_BCs = 0
+  };
+#ifdef FERMION_THETA
+  BCs_pars.fermion_twisting_theta[0] = rhmc_var.rhmc_p.theta[0];
+  BCs_pars.fermion_twisting_theta[1] = rhmc_var.rhmc_p.theta[1];
+  BCs_pars.fermion_twisting_theta[2] = rhmc_var.rhmc_p.theta[2];
+  BCs_pars.fermion_twisting_theta[3] = rhmc_var.rhmc_p.theta[3];
+#endif
+#ifdef ROTATED_SF
+  BCs_pars.gauge_boundary_improvement_ct = rhmc_var.rhmc_p.SF_ct;
+  BCs_pars.chiSF_boundary_improvement_ds = rhmc_var.rhmc_p.SF_ds;
+  BCs_pars.SF_BCs = 1;
+#endif
+#ifdef BASIC_SF
+  BCs_pars.SF_BCs = 1;
+#endif
+  init_BCs(&BCs_pars);
 
   /* fix conf_dir name: put a / at the end of string */
   start_t=strlen(rf->conf_dir);
@@ -241,31 +231,12 @@ int init_mc(rhmc_flow *rf, char *ifile) {
     case 2:
       random_u(u_gauge);
       break;
-    case 3:
-      unit_u(u_gauge);
-      SF_gauge_bcs(u_gauge,0);
-      break;
-    case 4:
-      unit_u(u_gauge);
-      SF_gauge_bcs(u_gauge,1);
-      break;
-    case 5:
-      random_u(u_gauge);
-      SF_gauge_bcs(u_gauge,0);
-      break;
-    case 6:
-      random_u(u_gauge);
-      SF_gauge_bcs(u_gauge,1);
-      break;
   }
+  apply_BCs_on_fundamental_gauge_field();
   represent_gauge_field();
   
 
-  /* init RHMC */  
-  rhmc_var.rhmc_p.integrator=&O2MN_multistep;
-  rhmc_var.rhmc_p.mshift_solver=&cg_mshift; 
-  rhmc_var.rhmc_p.MD_par=&rhmc_var.int_p;
-
+  /* init RHMC */
   init_rhmc(&rhmc_var.rhmc_p);
 
   return 0;
@@ -285,6 +256,7 @@ int save_conf(rhmc_flow *rf, int id) {
 /* clean up memory */
 int end_mc() {
   free_rhmc();
+  free_BCs();
 
   /* free memory */
   free_gfield(u_gauge);

@@ -4,24 +4,35 @@ NG = 2
 #REPR = REPR_ANTISYMMETRIC
 REPR = REPR_ADJOINT
 
-MACRO += -DANTIPERIODIC_BC_T
-#MACRO += -DANTIPERIODIC_BC_X
-#MACRO += -DANTIPERIODIC_BC_Y
-#MACRO += -DANTIPERIODIC_BC_Z
+
+#T => PERIODIC, ANTIPERIODIC, OPEN, THETA
+#X => PERIODIC, ANTIPERIODIC, THETA
+#Y => PERIODIC, ANTIPERIODIC, THETA
+#Z => PERIODIC, ANTIPERIODIC, THETA
+
+MACRO += -DBC_T_ANTIPERIODIC
+MACRO += -DBC_X_PERIODIC
+MACRO += -DBC_Y_PERIODIC
+MACRO += -DBC_Z_PERIODIC
+
+#MACRO += -DBC_XYZ_TWISTED
 
 #MACRO += -DBASIC_SF
 #MACRO += -DROTATED_SF
+
 
 MACRO += -DUPDATE_EO
 MACRO += -DWITH_MPI
 MACRO += -DNDEBUG
 #MACRO += -DCHECK_SPINOR_MATCHING
 #MACRO += -DMPI_TIMING
+#MACRO += -DIO_FLUSH
 
 #Compiler
-CC =  mpixlc
-
-CFLAGS = -O4 -qarch=440d -qtune=440
+#export OMPI_CC = ccache gcc
+CC = mpicc
+#CC = icc
+CFLAGS = -Wall -wd593 -wd188 -wd981 -wd177 -wd869 -std=c99 -O2
 
 ##########################################################################
 # DO NOT EDIT BEYOND THIS POINT
@@ -43,7 +54,6 @@ ifeq ($(strip $(CXX)),)
   CXX = g++
 endif
 
-
 #make related
 #export CFLAGS LDFLAGS CPPFLAGS
 ifndef REPR
@@ -52,3 +62,4 @@ endif
 
 MAKEFLAGS += -s 
 MAKEFLAGS += -r
+

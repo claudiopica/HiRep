@@ -67,13 +67,15 @@ int main(int argc,char *argv[])
    setup_process(&argc,&argv);
    
    /* logger setup */
-   logger_setlevel(0,10000); /* log all */
-   logger_map("DEBUG","debug");
-#ifdef WITH_MPI
-   sprintf(pame,">out_%d",PID); logger_stdout(pame);
-   sprintf(pame,"err_%d",PID); freopen(pame,"w",stderr);
-#endif
-   
+
+  logger_setlevel(0,100); /* log all */
+  if (PID!=0) { 
+    logger_disable();}
+  else{
+    sprintf(pame,">out_%d",PID); logger_stdout(pame);
+    sprintf(pame,"err_%d",PID); freopen(pame,"w",stderr);
+  }
+      
    lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
    
    /* read input file */
@@ -108,7 +110,9 @@ int main(int argc,char *argv[])
    complete_gf_sendrecv(u_gauge);
    lprintf("MAIN",0,"done.\n");
    represent_gauge_field();
-   
+
+   lprintf("REV TEST",0,"Initial plaquette: %1.8e\n",avr_plaquette());
+
    par.n = 6;
    par.shift=(double*)malloc(sizeof(double)*(par.n));
    par.err2=1.e-28;
@@ -143,10 +147,10 @@ int main(int argc,char *argv[])
      lprintf("CG TEST",0,"test cg[%d] = %e (req. %e)\n",i,tau,par.err2);
    }
 
-   free_spinor_field(res);
+   free_spinor_field_f(res);
    free(par.shift);
 
    finalize_process();
 
-   exit(0);
+   return 0;
 }

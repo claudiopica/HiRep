@@ -59,7 +59,7 @@ void write_gauge_field(char filename[])
   }
 
 #ifdef WITH_MPI
-  MPI_Comm_group(MPI_COMM_WORLD,&wg);
+  MPI_Comm_group(GLB_COMM,&wg);
   MPI_Comm_group(cart_comm,&cg);
 #endif
 
@@ -103,14 +103,14 @@ void write_gauge_field(char filename[])
             }
           }
 #ifdef WITH_MPI
-          MPI_Barrier(MPI_COMM_WORLD); 
+          MPI_Barrier(GLB_COMM); 
           if (pid!=0) { /* do send/receive only if the data is not on PID 0 */ 
             /* send buffer */
             if (pid==PID) {
 #ifndef NDEBUG
               error(Z!=(GLB_Z/NP_Z+((p[3]<rz)?1:0)),1,"write_gauge_field", "Local lattice size mismatch!");
 #endif
-              mpiret=MPI_Send(buff, bsize, MPI_DOUBLE, 0, 999, MPI_COMM_WORLD);
+              mpiret=MPI_Send(buff, bsize, MPI_DOUBLE, 0, 999, GLB_COMM);
 #ifndef NDEBUG
               if (mpiret != MPI_SUCCESS) {
                 char mesg[MPI_MAX_ERROR_STRING];
@@ -123,7 +123,7 @@ void write_gauge_field(char filename[])
             }
             /* receive buffer */
             if (PID==0) {
-              mpiret=MPI_Recv(buff, bsize, MPI_DOUBLE, pid, 999, MPI_COMM_WORLD, &st);
+              mpiret=MPI_Recv(buff, bsize, MPI_DOUBLE, pid, 999, GLB_COMM, &st);
 #ifndef NDEBUG
               if (mpiret != MPI_SUCCESS) {
                 char mesg[MPI_MAX_ERROR_STRING];
@@ -210,7 +210,7 @@ void read_gauge_field(char filename[])
   }
 
 #ifdef WITH_MPI
-  MPI_Comm_group(MPI_COMM_WORLD,&wg);
+  MPI_Comm_group(GLB_COMM,&wg);
   MPI_Comm_group(cart_comm,&cg);
 #endif
 
@@ -238,11 +238,11 @@ void read_gauge_field(char filename[])
           }
 
 #ifdef WITH_MPI
-          /* MPI_Barrier(MPI_COMM_WORLD); */
+          /* MPI_Barrier(GLB_COMM); */
           if (pid!=0) { /* do send/receive only if the data is not on PID 0 */ 
             /* send buffer */
             if (PID==0) {
-              mpiret=MPI_Send(buff, bsize, MPI_DOUBLE, pid, 999, MPI_COMM_WORLD);
+              mpiret=MPI_Send(buff, bsize, MPI_DOUBLE, pid, 999, GLB_COMM);
 #ifndef NDEBUG
               if (mpiret != MPI_SUCCESS) {
                 char mesg[MPI_MAX_ERROR_STRING];
@@ -258,7 +258,7 @@ void read_gauge_field(char filename[])
 #ifndef NDEBUG
               error(Z!=(GLB_Z/NP_Z+((p[3]<rz)?1:0)),1,"read_gauge_field", "Local lattice size mismatch!");
 #endif
-              mpiret=MPI_Recv(buff, bsize, MPI_DOUBLE, 0, 999, MPI_COMM_WORLD, &st);
+              mpiret=MPI_Recv(buff, bsize, MPI_DOUBLE, 0, 999, GLB_COMM, &st);
 #ifndef NDEBUG
               if (mpiret != MPI_SUCCESS) {
                 char mesg[MPI_MAX_ERROR_STRING];
@@ -358,7 +358,7 @@ void write_ranlxd_state(char filename[])
   }
 
 #ifdef WITH_MPI
-  MPI_Comm_group(MPI_COMM_WORLD,&wg);
+  MPI_Comm_group(GLB_COMM,&wg);
   MPI_Comm_group(cart_comm,&cg);
 #endif
 
@@ -378,11 +378,11 @@ void write_ranlxd_state(char filename[])
             rlxd_get(buff);
           }
 #ifdef WITH_MPI
-          MPI_Barrier(MPI_COMM_WORLD); 
+          MPI_Barrier(GLB_COMM); 
           if (pid!=0) { /* do send/receive only if the data is not on PID 0 */ 
             /* send buffer */
             if (pid==PID) {
-              mpiret=MPI_Send(buff, rsize, MPI_INT, 0, 999, MPI_COMM_WORLD);
+              mpiret=MPI_Send(buff, rsize, MPI_INT, 0, 999, GLB_COMM);
 #ifndef NDEBUG
               if (mpiret != MPI_SUCCESS) {
                 char mesg[MPI_MAX_ERROR_STRING];
@@ -395,7 +395,7 @@ void write_ranlxd_state(char filename[])
             }
             /* receive buffer */
             if (PID==0) {
-              mpiret=MPI_Recv(buff, rsize, MPI_INT, pid, 999, MPI_COMM_WORLD, &st);
+              mpiret=MPI_Recv(buff, rsize, MPI_INT, pid, 999, GLB_COMM, &st);
 #ifndef NDEBUG
               if (mpiret != MPI_SUCCESS) {
                 char mesg[MPI_MAX_ERROR_STRING];
@@ -482,7 +482,7 @@ void read_ranlxd_state(char filename[])
   }
 
 #ifdef WITH_MPI
-  MPI_Comm_group(MPI_COMM_WORLD,&wg);
+  MPI_Comm_group(GLB_COMM,&wg);
   MPI_Comm_group(cart_comm,&cg);
 #endif
 
@@ -504,11 +504,11 @@ void read_ranlxd_state(char filename[])
           }
 
 #ifdef WITH_MPI
-          /* MPI_Barrier(MPI_COMM_WORLD); */
+          /* MPI_Barrier(GLB_COMM); */
           if (pid!=0) { /* do send/receive only if the data is not on PID 0 */ 
             /* send buffer */
             if (PID==0) {
-              mpiret=MPI_Send(buff, rsize, MPI_INT, pid, 999, MPI_COMM_WORLD);
+              mpiret=MPI_Send(buff, rsize, MPI_INT, pid, 999, GLB_COMM);
 #ifndef NDEBUG
               if (mpiret != MPI_SUCCESS) {
                 char mesg[MPI_MAX_ERROR_STRING];
@@ -521,7 +521,7 @@ void read_ranlxd_state(char filename[])
             }
             /* receive buffer */
             if (PID==pid) {
-              mpiret=MPI_Recv(buff, rsize, MPI_INT, 0, 999, MPI_COMM_WORLD, &st);
+              mpiret=MPI_Recv(buff, rsize, MPI_INT, 0, 999, GLB_COMM, &st);
 #ifndef NDEBUG
               if (mpiret != MPI_SUCCESS) {
                 char mesg[MPI_MAX_ERROR_STRING];

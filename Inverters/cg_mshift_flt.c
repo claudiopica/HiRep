@@ -58,7 +58,7 @@ static int cg_mshift_flt_core(short int *sflags, mshift_par *par, spinor_operato
     /* use out[0] as initial guess */
     M(Mk,&out[0]);
     ++cgiter;
-    spinor_field_mul_add_assign_f_flt(Mk,-par->shift[0],&out[0]);
+    spinor_field_mul_add_assign_f_flt(Mk,((float)(-par->shift[0])),&out[0]);
     spinor_field_sub_f_flt(r,in,Mk);
 
   } else { /* initial guess = 0 for multishift */
@@ -82,23 +82,23 @@ static int cg_mshift_flt_core(short int *sflags, mshift_par *par, spinor_operato
     for (i=0; i<(par->n); ++i) {
       if(sflags[i]) {
         z3[i] = oldomega*z1[i]*z2[i]/(omega*gamma*(z1[i]-z2[i])+z1[i]*oldomega*(1.+par->shift[i]*omega));
-        spinor_field_mul_add_assign_f_flt(&out[i],-omega*z3[i]/z2[i],&p[i]);
+        spinor_field_mul_add_assign_f_flt(&out[i],((float)(-omega*z3[i]/z2[i])),&p[i]);
       }
     }
-    spinor_field_mul_add_assign_f_flt(r,omega,Mk);
+    spinor_field_mul_add_assign_f_flt(r,((float)(omega)),Mk);
     lambda=spinor_field_sqnorm_f_flt(r);
     gamma=lambda/delta;
     delta=lambda;
 
-    spinor_field_mul_f_flt(k,gamma,k);
+    spinor_field_mul_f_flt(k,((float)(gamma)),k);
     spinor_field_add_assign_f_flt(k,r);
     notconverged=0; /* assume that all vectors have converged */
     for (i=0; i<(par->n); ++i) {
       /* check convergence of vectors */
       if(delta*z3[i]*z3[i]>par->err2*innorm2) ++notconverged;
       if(sflags[i]){
-        spinor_field_mul_f_flt(&p[i],gamma*z3[i]*z3[i]/(z2[i]*z2[i]),&p[i]);
-        spinor_field_mul_add_assign_f_flt(&p[i],z3[i],r);
+        spinor_field_mul_f_flt(&p[i],((float)(gamma*z3[i]*z3[i]/(z2[i]*z2[i]))),&p[i]);
+        spinor_field_mul_add_assign_f_flt(&p[i],((float)(z3[i])),r);
         z1[i]=z2[i];
         z2[i]=z3[i];
       }
@@ -117,7 +117,7 @@ static int cg_mshift_flt_core(short int *sflags, mshift_par *par, spinor_operato
   } while ((par->max_iter==0 || cgiter<par->max_iter) && notconverged);
 
   /* free memory */
-  free_spinor_field_flt(p);
+  free_spinor_field_f_flt(p);
   free(z1); free(z2); free(z3);
 
   /* return number of cg iter */
@@ -235,8 +235,8 @@ int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_operator_flt F, spi
     lprintf("INVERTER",20,"CG inversion: err2 = %1.8e < %1.8e\n",norm[i],par->err2);
   }
 
-  free_spinor_field_flt(res_flt);
-  free_spinor_field(res);
+  free_spinor_field_f_flt(res_flt);
+  free_spinor_field_f(res);
 
   lprintf("INVERTER",10,"CG_mshift: MVM = %d (single) - %d (double)\n",siter,diter);
 

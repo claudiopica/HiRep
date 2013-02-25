@@ -33,7 +33,7 @@ void global_sum(double *d, int n) {
   gettimeofday(&start,0);  
 #endif
   
-  mpiret=MPI_Allreduce(d,pres,n,MPI_DOUBLE,MPI_SUM,MPI_COMM_WORLD);
+  mpiret=MPI_Allreduce(d,pres,n,MPI_DOUBLE,MPI_SUM,GLB_COMM);
 
   
 #ifdef MPI_TIMING
@@ -61,6 +61,87 @@ void global_sum(double *d, int n) {
 #endif
 }
 
+
+
+void global_sum_int(int *d, int n) {
+#ifdef WITH_MPI
+  int mpiret;
+  int pres[n];
+
+#ifdef MPI_TIMING
+  struct timeval start, end, etime;
+  gettimeofday(&start,0);  
+#endif
+  
+  mpiret=MPI_Allreduce(d,pres,n,MPI_INT,MPI_SUM,GLB_COMM);
+
+  
+#ifdef MPI_TIMING
+  gettimeofday(&end,0);
+  timeval_subtract(&etime,&end,&start);
+  lprintf("MPI TIMING",0,"global_sum_int " __FILE__ " %ld sec %ld usec\n",etime.tv_sec,etime.tv_usec);
+#endif
+
+#ifndef NDEBUG
+  if (mpiret != MPI_SUCCESS) {
+    char mesg[MPI_MAX_ERROR_STRING];
+    int mesglen;
+    MPI_Error_string(mpiret,mesg,&mesglen);
+    lprintf("MPI",0,"ERROR: %s\n",mesg);
+    error(1,1,"global_sum_int " __FILE__,"Cannot perform global_sum");
+  }
+#endif
+  while(n>0) { 
+    --n;
+    d[n]=pres[n];	
+  }
+#else
+  /* for non mpi do nothing */
+  return;
+#endif
+}
+
+
+
+void global_max(double *d, int n) {
+#ifdef WITH_MPI
+  int mpiret;
+  double pres[n];
+
+#ifdef MPI_TIMING
+  struct timeval start, end, etime;
+  gettimeofday(&start,0);  
+#endif
+  
+  mpiret=MPI_Allreduce(d,pres,n,MPI_DOUBLE,MPI_MAX,GLB_COMM);
+
+  
+#ifdef MPI_TIMING
+  gettimeofday(&end,0);
+  timeval_subtract(&etime,&end,&start);
+  lprintf("MPI TIMING",0,"global_max " __FILE__ " %ld sec %ld usec\n",etime.tv_sec,etime.tv_usec);
+#endif
+
+#ifndef NDEBUG
+  if (mpiret != MPI_SUCCESS) {
+    char mesg[MPI_MAX_ERROR_STRING];
+    int mesglen;
+    MPI_Error_string(mpiret,mesg,&mesglen);
+    lprintf("MPI",0,"ERROR: %s\n",mesg);
+    error(1,1,"global_max " __FILE__,"Cannot perform global_sum");
+  }
+#endif
+  while(n>0) { 
+    --n;
+    d[n]=pres[n];	
+  }
+#else
+  /* for non mpi do nothing */
+  return;
+#endif
+}
+
+
 void bcast(double *d, int n) {
 #ifdef WITH_MPI
   int mpiret;
@@ -70,7 +151,7 @@ void bcast(double *d, int n) {
   gettimeofday(&start,0);  
 #endif
 
-  mpiret=MPI_Bcast(d, n, MPI_DOUBLE, 0,MPI_COMM_WORLD);
+  mpiret=MPI_Bcast(d, n, MPI_DOUBLE, 0,GLB_COMM);
 
 #ifdef MPI_TIMING
   gettimeofday(&end,0);
@@ -104,7 +185,7 @@ void bcast_int(int *i, int n) {
   gettimeofday(&start,0);  
 #endif
 
-  mpiret=MPI_Bcast(i, n, MPI_INT, 0,MPI_COMM_WORLD);
+  mpiret=MPI_Bcast(i, n, MPI_INT, 0,GLB_COMM);
 
 #ifdef MPI_TIMING
   gettimeofday(&end,0);
@@ -135,7 +216,7 @@ static void sync_gauge_field(suNg_field *gf) {
   geometry_descriptor *gd=gf->type;
   /* int j, mu, x, y; */
 
-  for(i=0; i<gd->ncopies; ++i) {
+  for(i=0; i<gd->ncopies_gauge; ++i) {
     /* this assumes that the 4 directions are contiguous in memory !!! */
     memcpy(((gf->ptr)+4*gd->copy_to[i]),((gf->ptr)+4*gd->copy_from[i]),4*(gd->copy_len[i])*sizeof(*(gf->ptr)));
     /*   
@@ -154,8 +235,8 @@ static void sync_spinor_field(spinor_field *p) {
   /* int j, x, y; */
   geometry_descriptor *gd = p->type;
 
-  for(i=0; i<gd->ncopies; ++i) {
-    memcpy((p->ptr+gd->copy_to[i]),(p->ptr+gd->copy_from[i]),(gd->copy_len[i])*sizeof(*(p->ptr)));
+  for(i=0; i<gd->ncopies_spinor; ++i) {
+    memcpy((p->ptr+gd->copy_to[i]-gd->master_shift),(p->ptr+gd->copy_from[i]-gd->master_shift),(gd->copy_len[i])*sizeof(*(p->ptr)));
     /*
        for(j=0; j<gd->copy_len[i]; j++) {
        x=gd->copy_from[i]+j;
@@ -170,7 +251,7 @@ static void sync_gauge_transf(suNg_field *gf) {
   int i;
   geometry_descriptor *gd=gf->type;
 
-  for(i=0; i<gd->ncopies; ++i) {
+  for(i=0; i<gd->ncopies_gauge; ++i) {
     memcpy(((gf->ptr)+gd->copy_to[i]),((gf->ptr)+gd->copy_from[i]),(gd->copy_len[i])*sizeof(*(gf->ptr)));
   }
 }
@@ -187,7 +268,7 @@ static void sync_gauge_transf(suNg_field *gf) {
 void complete_gf_sendrecv(suNg_field *gf) {
 #ifdef WITH_MPI
   int mpiret;
-  int nreq=2*gf->type->nbuffers;
+  int nreq=2*gf->type->nbuffers_gauge;
 
   if(nreq>0) {
     MPI_Status status[nreq];
@@ -247,7 +328,7 @@ void start_gf_sendrecv(suNg_field *gf) {
   gf_control=1;
 #endif
 
-  for (i=0; i<(gd->nbuffers); ++i) {
+  for (i=0; i<(gd->nbuffers_gauge); ++i) {
     /* send ith buffer */
     mpiret=MPI_Isend((gf->ptr)+4*gd->sbuf_start[i], /* buffer */
         (gd->sbuf_len[i])*sizeof(suNg)/sizeof(double)*4, /* lenght in units of doubles */
@@ -294,7 +375,7 @@ void start_gf_sendrecv(suNg_field *gf) {
 void complete_sf_sendrecv(spinor_field *sf) {
 #ifdef WITH_MPI
   int mpiret;
-  int nreq=2*sf->type->nbuffers;
+  int nreq=2*sf->type->nbuffers_spinor;
 
   if(nreq>0) {
     MPI_Status status[nreq];
@@ -354,9 +435,9 @@ void start_sf_sendrecv(spinor_field *sf) {
   sf_control=1;
 #endif
 
-  for (i=0; i<(gd->nbuffers); ++i) {
+  for (i=0; i<(gd->nbuffers_spinor); ++i) {
     /* send ith buffer */
-    mpiret=MPI_Isend((sf->ptr)+(gd->sbuf_start[i]), /* buffer */
+    mpiret=MPI_Isend((sf->ptr)+(gd->sbuf_start[i])-(gd->master_shift), /* buffer */
         (gd->sbuf_len[i])*(sizeof(suNf_spinor)/sizeof(double)), /* lenght in units of doubles */
         MPI_DOUBLE, /* basic datatype */
         gd->sbuf_to_proc[i], /* cid of destination */
@@ -375,7 +456,7 @@ void start_sf_sendrecv(spinor_field *sf) {
 #endif
 
     /* receive ith buffer */
-    mpiret=MPI_Irecv((sf->ptr)+(gd->rbuf_start[i]), /* buffer */
+    mpiret=MPI_Irecv((sf->ptr)+(gd->rbuf_start[i])-(gd->master_shift), /* buffer */
         (gd->rbuf_len[i])*(sizeof(suNf_spinor)/sizeof(double)), /* lenght in units of doubles */
         MPI_DOUBLE, /* basic datatype */
         gd->rbuf_from_proc[i], /* cid of origin */
@@ -402,7 +483,7 @@ void start_sf_sendrecv(spinor_field *sf) {
 void complete_gt_sendrecv(suNg_field *gf) {
 #ifdef WITH_MPI
   int mpiret;
-  int nreq=2*gf->type->nbuffers;
+  int nreq=2*gf->type->nbuffers_gauge;
 
   if(nreq>0) {
     MPI_Status status[nreq];
@@ -446,7 +527,7 @@ void start_gt_sendrecv(suNg_field *gf) {
   /* fill send buffers */
   sync_gauge_transf(gf);
 
-  for (i=0; i<(gd->nbuffers); ++i) {
+  for (i=0; i<(gd->nbuffers_gauge); ++i) {
     /* send ith buffer */
     mpiret=MPI_Isend((gf->ptr)+gd->sbuf_start[i], /* buffer */
         (gd->sbuf_len[i])*sizeof(suNg)/sizeof(double), /* lenght in units of doubles */

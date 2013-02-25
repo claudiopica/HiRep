@@ -60,7 +60,7 @@ void write_gauge_field_eolexi_BE(char filename[])
   }
 
 #ifdef WITH_MPI
-  MPI_Comm_group(MPI_COMM_WORLD,&wg);
+  MPI_Comm_group(GLB_COMM,&wg);
   MPI_Comm_group(cart_comm,&cg);
 #endif
 
@@ -86,14 +86,14 @@ void write_gauge_field_eolexi_BE(char filename[])
     }
 
 #ifdef WITH_MPI
-    MPI_Barrier(MPI_COMM_WORLD); 
+    MPI_Barrier(GLB_COMM); 
 
     if(pid!=0) {
 
       /* send buffer */
       if(PID==pid) {
 
-        mpiret=MPI_Send(pu_gauge(ix_mpieo,0), 2*4*NG*NG, MPI_DOUBLE, pid, 999, MPI_COMM_WORLD);
+        mpiret=MPI_Send(pu_gauge(ix_mpieo,0), 2*4*NG*NG, MPI_DOUBLE, pid, 999, GLB_COMM);
 #ifndef NDEBUG
         if (mpiret != MPI_SUCCESS) {
           char mesg[MPI_MAX_ERROR_STRING];
@@ -106,7 +106,7 @@ void write_gauge_field_eolexi_BE(char filename[])
       }
       /* receive buffer */
       if (PID==0) {
-        mpiret=MPI_Recv(eolexi_field+4*ix_eolexi, 2*4*NG*NG, MPI_DOUBLE, 0, 999, MPI_COMM_WORLD, &st);
+        mpiret=MPI_Recv(eolexi_field+4*ix_eolexi, 2*4*NG*NG, MPI_DOUBLE, 0, 999, GLB_COMM, &st);
 #ifndef NDEBUG
         if (mpiret != MPI_SUCCESS) {
           char mesg[MPI_MAX_ERROR_STRING];
@@ -132,7 +132,7 @@ void write_gauge_field_eolexi_BE(char filename[])
   if(PID==0) {
     error((fp=fopen(filename,"wb"))==NULL,1,"write_gauge_field_eolexi",
         "Failed to open file for writing");
-    error(fwrite_BE_double((double*)eolexi_field,4*GLB_T*GLB_X*GLB_Y*GLB_Z*sizeof(suNg)/sizeof(double),fp)!=4*GLB_T*GLB_X*GLB_Y*GLB_Z*sizeof(suNg)/sizeof(double),
+    error(fwrite_BE_double((double*)eolexi_field,4*GLB_T*GLB_X*GLB_Y*GLB_Z*sizeof(suNg)/sizeof(double),fp)!=4*GLB_T*GLB_X*GLB_Y*GLB_Z*(int)sizeof(suNg)/(int)sizeof(double),
         1,"write_gauge_field_eolexi",
         "Failed to write gauge field to file");
     fclose(fp);
@@ -157,7 +157,7 @@ void read_gauge_field_eolexi_BE(char filename[])
   if(PID==0) {
     error((fp=fopen(filename,"rb"))==NULL,1,"read_gauge_field_eolexi",
         "Failed to open file for reading");
-    error(fread_BE_double((double*)eolexi_field,4*GLB_T*GLB_X*GLB_Y*GLB_Z*sizeof(suNg)/sizeof(double),fp)!=4*GLB_T*GLB_X*GLB_Y*GLB_Z*sizeof(suNg)/sizeof(double),
+    error(fread_BE_double((double*)eolexi_field,4*GLB_T*GLB_X*GLB_Y*GLB_Z*sizeof(suNg)/sizeof(double),fp)!=4*GLB_T*GLB_X*GLB_Y*GLB_Z*(int)sizeof(suNg)/(int)sizeof(double),
         1,"read_gauge_field_eolexi",
         "Failed to read gauge field from file");
   }
@@ -171,10 +171,10 @@ void read_gauge_field_eolexi_BE(char filename[])
   for(c[2]=0; c[2]<Y; c[2]++)
   for(c[3]=0; c[3]<Z; c[3]++) {
   
-    g[0]=COORD[0]*T+c[0];
-    g[1]=COORD[1]*X+c[1];
-    g[2]=COORD[2]*Y+c[2];
-    g[3]=COORD[3]*Z+c[3];
+    g[0]=zerocoord[0]+c[0];
+    g[1]=zerocoord[1]+c[1];
+    g[2]=zerocoord[2]+c[2];
+    g[3]=zerocoord[3]+c[3];
 
     ix_eolexi=index_eolexi(g[0],g[1],g[2],g[3]);
     ix_mpieo=ipt(c[0],c[1],c[2],c[3]);
@@ -235,7 +235,7 @@ void write_gauge_field_eolexi_LE(char filename[])
   }
 
 #ifdef WITH_MPI
-  MPI_Comm_group(MPI_COMM_WORLD,&wg);
+  MPI_Comm_group(GLB_COMM,&wg);
   MPI_Comm_group(cart_comm,&cg);
 #endif
 
@@ -261,14 +261,14 @@ void write_gauge_field_eolexi_LE(char filename[])
     }
 
 #ifdef WITH_MPI
-    MPI_Barrier(MPI_COMM_WORLD); 
+    MPI_Barrier(GLB_COMM); 
 
     if(pid!=0) {
 
       /* send buffer */
       if(PID==pid) {
 
-        mpiret=MPI_Send(pu_gauge(ix_mpieo,0), 2*4*NG*NG, MPI_DOUBLE, pid, 999, MPI_COMM_WORLD);
+        mpiret=MPI_Send(pu_gauge(ix_mpieo,0), 2*4*NG*NG, MPI_DOUBLE, pid, 999, GLB_COMM);
 #ifndef NDEBUG
         if (mpiret != MPI_SUCCESS) {
           char mesg[MPI_MAX_ERROR_STRING];
@@ -281,7 +281,7 @@ void write_gauge_field_eolexi_LE(char filename[])
       }
       /* receive buffer */
       if (PID==0) {
-        mpiret=MPI_Recv(eolexi_field+4*ix_eolexi, 2*4*NG*NG, MPI_DOUBLE, 0, 999, MPI_COMM_WORLD, &st);
+        mpiret=MPI_Recv(eolexi_field+4*ix_eolexi, 2*4*NG*NG, MPI_DOUBLE, 0, 999, GLB_COMM, &st);
 #ifndef NDEBUG
         if (mpiret != MPI_SUCCESS) {
           char mesg[MPI_MAX_ERROR_STRING];
@@ -307,7 +307,7 @@ void write_gauge_field_eolexi_LE(char filename[])
   if(PID==0) {
     error((fp=fopen(filename,"wb"))==NULL,1,"write_gauge_field_eolexi",
         "Failed to open file for writing");
-    error(fwrite_LE_double((double*)eolexi_field,4*GLB_T*GLB_X*GLB_Y*GLB_Z*sizeof(suNg)/sizeof(double),fp)!=4*GLB_T*GLB_X*GLB_Y*GLB_Z*sizeof(suNg)/sizeof(double),
+    error(fwrite_LE_double((double*)eolexi_field,4*GLB_T*GLB_X*GLB_Y*GLB_Z*sizeof(suNg)/sizeof(double),fp)!=4*GLB_T*GLB_X*GLB_Y*GLB_Z*(int)sizeof(suNg)/(int)sizeof(double),
         1,"write_gauge_field_eolexi",
         "Failed to write gauge field to file");
     fclose(fp);
@@ -332,7 +332,7 @@ void read_gauge_field_eolexi_LE(char filename[])
   if(PID==0) {
     error((fp=fopen(filename,"rb"))==NULL,1,"read_gauge_field_eolexi",
         "Failed to open file for reading");
-    error(fread_LE_double((double*)eolexi_field,4*GLB_T*GLB_X*GLB_Y*GLB_Z*sizeof(suNg)/sizeof(double),fp)!=4*GLB_T*GLB_X*GLB_Y*GLB_Z*sizeof(suNg)/sizeof(double),
+    error(fread_LE_double((double*)eolexi_field,4*GLB_T*GLB_X*GLB_Y*GLB_Z*sizeof(suNg)/sizeof(double),fp)!=4*GLB_T*GLB_X*GLB_Y*GLB_Z*(int)sizeof(suNg)/(int)sizeof(double),
         1,"read_gauge_field_eolexi",
         "Failed to read gauge field from file");
   }
@@ -346,10 +346,10 @@ void read_gauge_field_eolexi_LE(char filename[])
   for(c[2]=0; c[2]<Y; c[2]++)
   for(c[3]=0; c[3]<Z; c[3]++) {
   
-    g[0]=COORD[0]*T+c[0];
-    g[1]=COORD[1]*X+c[1];
-    g[2]=COORD[2]*Y+c[2];
-    g[3]=COORD[3]*Z+c[3];
+    g[0]=zerocoord[0]+c[0];
+    g[1]=zerocoord[1]+c[1];
+    g[2]=zerocoord[2]+c[2];
+    g[3]=zerocoord[3]+c[3];
 
     ix_eolexi=index_eolexi(g[0],g[1],g[2],g[3]);
     ix_mpieo=ipt(c[0],c[1],c[2],c[3]);

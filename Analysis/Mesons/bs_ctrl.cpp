@@ -1,10 +1,14 @@
 #include <iostream>
+#include <string.h>
+#include <stdlib.h>
 #include "bs_ctrl.h"
 #include "effective_mass.h"
 
 
 using namespace std;
 
+
+extern int blsize;
 
 set<eval_ctrl*> eval_ctrl::all;
 set<primary_ctrl*> primary_ctrl::all_pr;
@@ -203,6 +207,10 @@ bool eval_ctrl::fill_dep(const char* arg){
   mamv.dep[0]=&g1; mamv.dep_level[0]=P_FIT;
   mamv.dep[1]=&g5g1; mamv.dep_level[1]=P_FIT;
 
+  makmvk.set_ndeps(2);
+  makmvk.dep[0]=&gk; makmvk.dep_level[0]=P_FIT;
+  makmvk.dep[1]=&g5gk; makmvk.dep_level[1]=P_FIT;
+
   gmor.set_ndeps(3);
   gmor.dep[0]=&mpcac; gmor.dep_level[0]=D_FIT;
   gmor.dep[1]=&g5; gmor.dep_level[1]=P_FIT;
@@ -302,33 +310,33 @@ bool eval_ctrl::fill_dep(const char* arg){
 #undef IF_DER_EFF
   
 #define IF_DER_FIT(ch) if(strcmp(arg,#ch)==0 || strcmp(arg,"all_der_fit")==0){ch.set_level(D_AVE_FIT); found=true;}
-
-	  IF_DER_FIT(mpcac)
-	    IF_DER_FIT(fps)
-	    IF_DER_FIT(gps)
-	    IF_DER_FIT(fv)
-	    IF_DER_FIT(fvk)
+    
+  IF_DER_FIT(mpcac)
+  IF_DER_FIT(fps)
+  IF_DER_FIT(gps)
+  IF_DER_FIT(fv)
+  IF_DER_FIT(fvk)
   
 #undef IF_DER_FIT
   
 	    /* RATIOS */
 #define IF_RATIO(ch) if(strcmp(arg,#ch)==0 || strcmp(arg,"all_ratio")==0){ch.set_level(R_ACTIVE); found=true;}
 
-	    IF_RATIO(mvmps);
-	    IF_RATIO(mvkmps);
-	    IF_RATIO(mpsfps);
-	    IF_RATIO(mvfps);
-	    IF_RATIO(mvkfps);
-	    IF_RATIO(gmor);
-	    IF_RATIO(mpsmpcac);
-	    IF_RATIO(mps2mpcac);
-	    IF_RATIO(fvfps);
-	    IF_RATIO(fvkfps);
-	    IF_RATIO(mamps);
-	    IF_RATIO(makmps);
-	    IF_RATIO(mamv);
-	    IF_RATIO(makmvk);
-  
+    IF_RATIO(mvmps);
+    IF_RATIO(mvkmps);
+    IF_RATIO(mpsfps);
+    IF_RATIO(mvfps);
+    IF_RATIO(mvkfps);
+    IF_RATIO(gmor);
+    IF_RATIO(mpsmpcac);
+    IF_RATIO(mps2mpcac);
+    IF_RATIO(fvfps);
+    IF_RATIO(fvkfps);
+    IF_RATIO(mamps);
+    IF_RATIO(makmps);
+    IF_RATIO(mamv);
+    IF_RATIO(makmvk);
+    
 #undef IF_RATIO
 
 	    return found;
@@ -804,32 +812,32 @@ void derived_ctrl::purge_b2() {
 void primary_ctrl::print() {
   if(level[P_AVE_COR]) {
     for(int t=0; t<cor_b1->length; t++)
-      cout << "10 COR " << name << " " << t << " " << cor_b1->d[t].avr().val << " " << cor_b1->d[t].stderr().val << endl;
+      cout << "10 COR " << name << " " << t << " " << cor_b1->d[t].avr().val << " " << cor_b1->d[t].stderr().val << " blksize " << blsize << endl;
   }
   
   if(level[P_AVE_EFF]) {
     for(int t=left_cut[name]; t<=right_cut[name]; t++)
-      cout << "10 EFF " << name << " " << t << " " << eff_b1->d[t].avr().val << " " << eff_b1->d[t].stderr().val << endl;
+      cout << "10 EFF " << name << " " << t << " " << eff_b1->d[t].avr().val << " " << eff_b1->d[t].stderr().val << " blksize " << blsize << endl;
   }
   
   if(level[P_AVE_FIT])
-    cout << "10 FIT " << name << " " << fit.avr().val << " " << fit.stderr().val << endl;
+    cout << "10 FIT " << name << " " << fit.avr().val << " " << fit.stderr().val << " blksize " << blsize << " lcut " << left_cut[name] << " rcut " << right_cut[name] << endl;
 }
 
 
 void derived_ctrl::print() {
   if(level[D_AVE_EFF]) {
     for(int t=left_cut[name]; t<=right_cut[name]; t++)
-      cout << "10 EFF " << name << " " << t << " " << eff_b1->d[t].avr().val << " " << eff_b1->d[t].stderr().val << endl;
+      cout << "10 EFF " << name << " " << t << " " << eff_b1->d[t].avr().val << " " << eff_b1->d[t].stderr().val << " blksize " << blsize << endl;
   }
   
   if(level[D_AVE_FIT])
-    cout << "10 FIT " << name << " " << fit.avr().val << " " << fit.stderr().val << endl;
+    cout << "10 FIT " << name << " " << fit.avr().val << " " << fit.stderr().val << " blksize " << blsize << " lcut " << left_cut[name] << " rcut " << right_cut[name] << endl;
 }
 
 void ratio_ctrl::print() {
   if(level[R_ACTIVE]) {
-    cout << "10 FIT " << name << " " << fit.avr().val << " " << fit.stderr().val << endl;
+    cout << "10 FIT " << name << " " << fit.avr().val << " " << fit.stderr().val << " blksize " << blsize << " lcut " << left_cut[name] << " rcut " << right_cut[name] << endl;
   }
 }
 

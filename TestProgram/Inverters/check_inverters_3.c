@@ -65,13 +65,15 @@ int main(int argc,char *argv[])
   setup_process(&argc,&argv);
   
   /* logger setup */
-  logger_setlevel(0,10000); /* log all */
-  logger_map("DEBUG","debug");
-#ifdef WITH_MPI
-  sprintf(pame,">out_%d",PID); logger_stdout(pame);
-  sprintf(pame,"err_%d",PID); freopen(pame,"w",stderr);
-#endif
-  
+
+  logger_setlevel(0,100); /* log all */
+  if (PID!=0) { 
+    logger_disable();}
+  else{
+    sprintf(pame,">out_%d",PID); logger_stdout(pame);
+    sprintf(pame,"err_%d",PID); freopen(pame,"w",stderr);
+  }
+     
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
   
   /* read input file */
@@ -149,9 +151,9 @@ int main(int argc,char *argv[])
     lprintf("QMR TEST",0,"test g5QMR[%d] = %e (req. %e)\n",i,tau,par.err2);
   }
 	 
-  free_spinor_field(res);
+  free_spinor_field_f(res);
   free(par.shift);
   finalize_process();
 
-  exit(0);
+  return 0;
 }

@@ -19,6 +19,7 @@
 #include "random.h"
 
 
+#error "Old version of Mesons, it should be updated"
 
 void print_mat(complex mat[4][4], const char name[]) {
   int i,j;
@@ -667,6 +668,7 @@ int main(int argc,char *argv[])
     lprintf("MAIN",0,"ERROR! Mismatch for g0g5g3! norm2=%e\n",norm2);
   }
 
+  lprintf("MAIN",0,"End of tests\n");
 
 
 

@@ -20,19 +20,19 @@
 
 static void normalize(suNg_vector *v)
 {
-   double fact;
-	 _vector_prod_re_g(fact,*v,*v);
-   fact=1.0f/sqrt(fact);
-   _vector_mul_g(*v, fact, *v);
+  double fact;
+  _vector_prod_re_g(fact,*v,*v);
+  fact=1.0f/sqrt(fact);
+  _vector_mul_g(*v, fact, *v);
 }
 
 
 static void normalize_flt(suNg_vector_flt *v)
 {
-   double fact;
-	 _vector_prod_re_g(fact,*v,*v);
-   fact=1.0/sqrt(fact);
-   _vector_mul_g(*v, fact, *v);
+  float fact;
+  _vector_prod_re_g(fact,*v,*v);
+  fact=1.0/sqrt(fact);
+  _vector_mul_g(*v, fact, *v);
 }
 
 

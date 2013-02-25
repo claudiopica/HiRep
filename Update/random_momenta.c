@@ -21,15 +21,12 @@ void gaussian_momenta(suNg_av_field *momenta) {
   _PIECE_FOR(gd,ix) {
     int start=gd->master_start[_PIECE_INDEX(ix)];
     int len=ngen*4*(gd->master_end[_PIECE_INDEX(ix)]-start+1); /* lenght in doubles */
-    dptr=(double*)(momenta->ptr+4*start);
+    dptr=(double*)(momenta->ptr+4*(start-gd->master_shift));
     gauss(dptr,len);
     for (ix=0; ix<len; ++ix, ++dptr) {
       *(dptr)*=c3;
     }
   }
   
-#if defined(BASIC_SF) || defined(ROTATED_SF)
-  SF_force_bcs(momenta);
-#endif /* BASIC_SF || ROTATED_SF */
-
+  apply_BCs_on_momentum_field(momenta);
 }

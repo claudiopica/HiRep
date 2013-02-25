@@ -152,8 +152,15 @@ void pta_qprop_QMR_eo(int g0[4], spinor_field **pta_qprop, int nm, double *mass,
 			/* compute solution */
 			qprop_mask=pta_qprop[i][source];
 			qprop_mask.type=&glat_even;
+			/*this below is a formal operation that needs to be done every time we change type of spinor
+			 but since the shift for the even spinor is always zero we can skip it*/
+			/* qprop_mask.ptr=pta_qprop[i][source].ptr+glat_even.master_shift; */
+
+
 			spinor_field_mul_f(&qprop_mask,(4.+mass[i]),&resd[i]);
 			qprop_mask.type=&glat_odd;
+			qprop_mask.ptr=pta_qprop[i][source].ptr+glat_odd.master_shift;
+			
 			Dphi_(&qprop_mask,&resd[i]);
 			spinor_field_minus_f(&qprop_mask,&qprop_mask);
 			if(source&1) ++cgiter; /* count only half of calls. works because the number of sources is even */
@@ -181,12 +188,12 @@ void pta_qprop_QMR_eo(int g0[4], spinor_field **pta_qprop, int nm, double *mass,
 
 	/* free memory */
 
-	free_spinor_field(in);
-	free_spinor_field(res);
+	free_spinor_field_f(in);
+	free_spinor_field_f(res);
 	free(shift);
 #ifndef NDEBUG
-	free_spinor_field(test_e);
-	free_spinor_field(test);
+	free_spinor_field_f(test_e);
+	free_spinor_field_f(test);
 #endif
 }
 
@@ -294,10 +301,10 @@ void pta_qprop_QMR(int g0[4], spinor_field **pta_qprop, int nm, double *mass, do
 	lprintf("PROPAGATOR",10,"QMR MVM = %d\n",cgiter);
   
   /* free memory */
-	free_spinor_field(in);
+	free_spinor_field_f(in);
   free(shift);
 #ifndef NDEBUG
-	free_spinor_field(test);
+	free_spinor_field_f(test);
 #endif
 }
 
@@ -357,6 +364,6 @@ void pta_qprop_MINRES(int g0[4], spinor_field **pta_qprop, int nm, double *mass,
   lprintf("PROPAGATOR",10,"MINRES MVM = %d",cgiter);
 
   /* free input spinor field */
-  free_spinor_field(in);
+  free_spinor_field_f(in);
 
 }

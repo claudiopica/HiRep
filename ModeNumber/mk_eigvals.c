@@ -36,7 +36,11 @@
 #include "cinfo.c"
 
 #if defined(ROTATED_SF) && defined(BASIC_SF)
-#error The implementation of the Schroedinger functional has not been tested on this code
+#error This code does not work with the Schroedinger functional !!!
+#endif
+
+#ifdef FERMION_THETA
+#error This code does not work with the fermion twisting !!!
 #endif
 
 /* Mesons parameters */
@@ -48,7 +52,7 @@ typedef struct _input_eigval {
   int maxiter; /* max number of subiterations */
   double omega1; /* absolute precision */
   double omega2; /* relative precision */
-  char mstring[256]; /* for the quenched masses */
+  double mass; /* quenched mass */
 
   /* for the reading function */
   input_record_t read[8];
@@ -64,8 +68,8 @@ typedef struct _input_eigval {
     {"max number of subiterations", "eva:maxiter = %d", INT_T, &(varname).maxiter},\
     {"absolute precision", "eva:omega1 = %lf", DOUBLE_T, &(varname).omega1},\
     {"relative precision", "eva:omega2 = %lf", DOUBLE_T, &(varname).omega2},\
-    {"quark quenched masses", "eva:masses = %s", STRING_T, (varname).mstring},\
-    {NULL, NULL, 0, NULL}\
+    {"quark quenched mass", "eva:mass = %lf", DOUBLE_T, &(varname).mass}, \
+    {NULL, NULL, INT_T, NULL}\
   }\
 }
 
@@ -184,25 +188,29 @@ void read_cmdline(int argc, char* argv[]) {
 }
 
 double hevamass=0.;
-void HEVA(spinor_field *out, spinor_field *in){
+void H2EVA(spinor_field *out, spinor_field *in){
   g5Dphi_sq(hevamass, out, in);
+}
+void HEVA(spinor_field *out, spinor_field *in){
+  g5Dphi(hevamass, out, in);
 }
 
 int main(int argc,char *argv[]) {
-  int i,k,n;
-  char tmp[256], *cptr;
+  int i,n;
+  char tmp[256];
   FILE* list;
   filename_t fpars;
-  int nm;
-  double m[256];
 
   /* setup process id and communications */
   read_cmdline(argc, argv);
   setup_process(&argc,&argv);
 
+  read_input(glb_var.read,input_filename);
+  setup_replicas();
+
   /* logger setup */
   /* disable logger for MPI processes != 0 */
-  logger_setlevel(0,30);
+  logger_setlevel(0,50);
   if (PID!=0) { logger_disable(); }
   if (PID==0) { 
     sprintf(tmp,">%s",output_filename); logger_stdout(tmp);
@@ -220,26 +228,22 @@ int main(int argc,char *argv[]) {
   /* read & broadcast parameters */
   parse_cnfg_filename(cnfg_filename,&fpars);
 
-  read_input(glb_var.read,input_filename);
+  eig_var.mass=-20.;
   read_input(eig_var.read,input_filename);
   GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
   error(fpars.type==UNKNOWN_CNFG,1,"eigval.c","Bad name for a configuration file");
   error(fpars.nc!=NG,1,"eigval.c","Bad NG");
 
-  nm=0;
-  if(fpars.type==DYNAMICAL_CNFG) {
-    nm=1;
-    m[0] = fpars.m;
-  } else if(fpars.type==QUENCHED_CNFG) {
-    strcpy(tmp,eig_var.mstring);
-    cptr = strtok(tmp, ";");
-    nm=0;
-    while(cptr != NULL) {
-      m[nm]=atof(cptr);
-      nm++;
-      cptr = strtok(NULL, ";");
-    }            
-  }
+  lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed);
+  rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
+
+  lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
+  lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
+
+  if(fpars.type==DYNAMICAL_CNFG)
+    hevamass = fpars.m;
+  if(fpars.type==QUENCHED_CNFG || eig_var.mass>-10.)
+    hevamass = eig_var.mass;
 
 
   /* setup communication geometry */
@@ -248,25 +252,15 @@ int main(int argc,char *argv[]) {
     return 0;
   }
 
-  lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
-  lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
-  lprintf("MAIN",0,"global size is %dx%dx%dx%d\n",GLB_T,GLB_X,GLB_Y,GLB_Z);
-  lprintf("MAIN",0,"proc grid is %dx%dx%dx%d\n",NP_T,NP_X,NP_Y,NP_Z);
-  lprintf("MAIN",0,"Fermion boundary conditions: %.2f,%.2f,%.2f,%.2f\n",bc[0],bc[1],bc[2],bc[3]);
-
   /* setup lattice geometry */
   geometry_mpi_eo();
   /* test_geometry_mpi_eo(); */
 
-  lprintf("MAIN",0,"local size is %dx%dx%dx%d\n",T,X,Y,Z);
-  lprintf("MAIN",0,"extended local size is %dx%dx%dx%d\n",T_EXT,X_EXT,Y_EXT,Z_EXT);
-
-  lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed);
-  rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
+  init_BCs(NULL);
 
   /* alloc global gauge fields */
   u_gauge=alloc_gfield(&glattice);
-#ifndef REPR_FUNDAMENTAL
+#ifdef ALLOCATE_REPR_GAUGE_FIELD
   u_gauge_f=alloc_gfield_f(&glattice);
 #endif
 
@@ -278,8 +272,7 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"max number of subiterations (eva:maxiter) = %d\n",eig_var.maxiter);
   lprintf("MAIN",0,"absolute precision  (eva:omega1) = %e\n",eig_var.omega1);
   lprintf("MAIN",0,"relative precision (eva:omega2) = %e\n",eig_var.omega2);
-  for(k=0;k<nm;k++)
-    lprintf("MAIN",0,"Mass[%d] = %f\n",k,m[k]);
+  lprintf("MAIN",0,"mass = %f\n",hevamass);
 
 
   list=NULL;
@@ -287,6 +280,21 @@ int main(int argc,char *argv[]) {
     error((list=fopen(list_filename,"r"))==NULL,1,"main [eigval.c]" ,
 	"Failed to open list file\n");
   }
+
+  
+  /* EVA parameters */
+  double max, mupp;
+  double *eva_val;
+  int status,ie;
+  spinor_field *eva_vec, *eva_ws;
+
+  eva_val=malloc(sizeof(double)*eig_var.nevt);
+  eva_vec=alloc_spinor_field_f(eig_var.nevt+2,&glattice);
+  eva_ws=eva_vec+eig_var.nevt;
+
+  mupp=fabs(hevamass+4)+4;
+  mupp*=mupp;
+  /* END of EVA parameters */
 
   i=0;
   while(1) {
@@ -303,60 +311,44 @@ int main(int argc,char *argv[]) {
 
     lprintf("TEST",0,"<p> %1.6f\n",avr_plaquette());
 
-    /* full_plaquette(); */
 
-    for (k=0;k<nm;++k){
+    int MVM=0; /* counter for matrix-vector multiplications */
 
-      /* EVA parameters */
+    max_H(&H2EVA, &glattice, &max);
+    lprintf("MAIN",0,"MAXCHECK: cnfg=%e  uppbound=%e diff=%e %s\n",max,mupp,mupp-max,(mupp-max)<0?"[FAILED]":"[OK]");
+    max*=1.1;
 
-      double max, mupp;
-      double *d1;
-      int status,ie;
-      spinor_field *ev;
-      /* END of EVA parameters */
-      int MVM=0; /* counter for matrix-vector multiplications */
-
-      lprintf("MAIN",0,"conf #%d mass=%2.6f \n",i,m[k]);
-
-      hevamass=m[k];
-      mupp=fabs(m[k]+4)+4;
-      mupp*=mupp;
-
-      max_H(&HEVA, &glattice, &max);
-      lprintf("MAIN",0,"MAXCHECK: cnfg=%e  uppbound=%e diff=%e %s\n",max,mupp,mupp-max,(mupp-max)<0?"[FAILED]":"[OK]");
-
-      max*=1.1;
-
-      d1=malloc(sizeof(*d1)*eig_var.nevt);
-      ev=alloc_spinor_field_f(eig_var.nevt,&glattice);
-
-      ie=eva(eig_var.nev,eig_var.nevt,0,eig_var.kmax,eig_var.maxiter,max,eig_var.omega1,eig_var.omega2,&HEVA,ev,d1,&status);
+    ie=eva(eig_var.nev,eig_var.nevt,0,eig_var.kmax,eig_var.maxiter,max,eig_var.omega1,eig_var.omega2,&H2EVA,eva_ws,eva_vec,eva_val,&status);
+    MVM+=status;
+    while (ie!=0) { /* if failed restart EVA */
+      lprintf("MAIN",0,"Restarting EVA!\n");
+      ie=eva(eig_var.nev,eig_var.nevt,2,eig_var.kmax,eig_var.maxiter,max,eig_var.omega1,eig_var.omega2,&H2EVA,eva_ws,eva_vec,eva_val,&status);
       MVM+=status;
-      while (ie!=0) { /* if failed restart EVA */
-        lprintf("MAIN",0,"Restarting EVA!\n");
-        ie=eva(eig_var.nev,eig_var.nevt,2,eig_var.kmax,eig_var.maxiter,max,eig_var.omega1,eig_var.omega2,&HEVA,ev,d1,&status);
-        MVM+=status;
-      }
-
-      lprintf("MAIN",0,"EVA MVM = %d\n",MVM);
-      for (n=0;n<eig_var.nev;++n) {
-        lprintf("RESULT",0,"Eig %d = %1.15e\n",n,d1[n]);
-      }
-
-      free(d1);
-      free_spinor_field(ev);
     }
 
+    lprintf("MAIN",0,"EVA MVM = %d\n",MVM);
+    for (n=0;n<eig_var.nev;++n) {
+      HEVA(&eva_ws[0],&eva_vec[n]);
+      lprintf("RESULT",0,"Eig %d = %.15e %.15e\n",n,eva_val[n],
+        spinor_field_prod_re_f(&eva_ws[0],&eva_vec[n])/spinor_field_sqnorm_f(&eva_vec[n]));
+    }
+    
     if(list==NULL) break;
   }
 
   if(list!=NULL) fclose(list);
 
+  free_BCs();
+
+  free(eva_val);
+  free_spinor_field_f(eva_vec);
 
   free_gfield(u_gauge);
-#ifndef REPR_FUNDAMENTAL
+#ifdef ALLOCATE_REPR_GAUGE_FIELD
   free_gfield_f(u_gauge_f);
 #endif
+
+  finalize_process();
 
   return 0;
 }

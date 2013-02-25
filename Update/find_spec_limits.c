@@ -25,7 +25,7 @@ void find_spec_H2(double *max, double *min, double mass) {
   const int kmax=200; /* max degree of polynomial */
   const int maxiter=20; /* max number of subiterations */
   static double *d1;
-  const double omega1=1.e-4; /* absolute precision */
+  const double omega1=1.e-8; /* absolute precision */
   const double omega2=1.e-1; /* relative precision */
   int status,ie;
   /* END of EVA parameters */
@@ -34,17 +34,17 @@ void find_spec_H2(double *max, double *min, double mass) {
 
   d1=malloc(sizeof(*d1)*nevt);
 #ifdef UPDATE_EO
-  ev=alloc_spinor_field_f(nevt,&glat_even);
+  ev=alloc_spinor_field_f(nevt+2,&glat_even);
   MVM+=max_H(&H2, &glat_even, max);
 #else
-  ev=alloc_spinor_field_f(nevt,&glattice);
+  ev=alloc_spinor_field_f(nevt+2,&glattice);
   MVM+=max_H(&H2, &glattice, max);
 #endif
 
-  ie=eva(nev,nevt,0,kmax,maxiter,*max,omega1,omega2,&H2,ev,d1,&status);
+  ie=eva(nev,nevt,0,kmax,maxiter,*max,omega1,omega2,&H2,ev+nevt,ev,d1,&status);
   MVM+=status;
   while (ie!=0) { /* if failed restart EVA */
-    ie=eva(nev,nevt,2,kmax,maxiter,*max,omega1,omega2,&H2,ev,d1,&status);
+    ie=eva(nev,nevt,2,kmax,maxiter,*max,omega1,omega2,&H2,ev+nevt,ev,d1,&status);
     MVM+=status;
   }
 
@@ -53,7 +53,7 @@ void find_spec_H2(double *max, double *min, double mass) {
   lprintf("SPECLIMITS",0,"Range = [%1.8e,%1.8e] [MVM = %d]\n",*min,*max,MVM);
 
   free(d1);
-  free_spinor_field(ev);
+  free_spinor_field_f(ev);
 
   return;
 }

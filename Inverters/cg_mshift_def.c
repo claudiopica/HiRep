@@ -135,7 +135,7 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
   }
 
   /* free memory */
-  free_spinor_field(p);
+  free_spinor_field_f(p);
   free(z1); free(z2); free(z3);
 
   /* return number of cg iter */
@@ -193,7 +193,7 @@ int cg_mshift_def(mshift_par *par, spinor_operator M, spinor_operator P, spinor_
   lprintf("INVERTER",10,"CG_mshift: MVM = %d/%d\n",msiter,cgiter);
 
   /* free memory */
-  free_spinor_field(p1);
+  free_spinor_field_f(p1);
 
   return cgiter;
 }

@@ -2,6 +2,20 @@ check_algebra_1            Check the generators
 
 check_algebra_2            Check that the 2AS is equivalent to fund^* for SU(3)
 
+check_bagel_1		     still under construction
+
+check_diracoperator_1      Check gauge covariance of the Dirac operator
+
+check_diracoperator_2      Action of the Dirac operator on plane waves
+
+check_diracoperator_3      Hermiticity of the Dirac op
+
+check_diracoperator_4      Build the gamma matrices from the Dirac operator
+
+check_diracoperator_5      Check gauge covariance of the Dirac operator float
+
+check_diracoperator_6      coherence of the dirac float with the dirac op
+
 check_geometry_1           Check the geometry
 
 check_puregauge_1          Check that _group_represent is homomorphic
@@ -9,12 +23,6 @@ check_puregauge_1          Check that _group_represent is homomorphic
 check_puregauge_2          Check the gauge covariance of the HYP smearing
 
 check_spinorfield_1        Check the consistency of spinor linear algebra
-
-check_diracoperator_1      Check gauge covariance of the Dirac operator
-
-check_diracoperator_2      Action of the Dirac operator on plane waves
-
-check_diracoperator_3      Hermiticity of the Dirac op
 
 check_inverters_1          Check of the CG inversion
 
@@ -24,10 +32,17 @@ check_inverters_3          Check of QMR multishift
 
 check_inverters_4          Check the eva module
 
-check_inverters_6          Check the single precision accelerated CG_mshift
+check_inverters_5          Check of g5QMR multishift
 
-check_update_1             Reversibility of the molecular dynamics (NEED TO BE FIXED THE READ FORM FILE)
+check_inverters_6            Check the single precision accelerated CG_mshift     TO BE FIXED
 
-check13                    Check the mesons (both mesons.c and dublin_mesons.c) using a free field (STILL TO BE FIXED)
+check_inverters_6            Check the single precision accelerated CG_mshift     TO BE FIXED
 
-check14                    Check the dirac_eva module using a random field(STILL TO BE FIXED)	
+check_inverters_8            Check the single precision accelerated g5QMR
+
+check_update_1             Reversibility of the molecular dynamics
+
+check_triplets_1  	     Check of the triplet mesons (free case)
+ 
+check_triplets_2	     Check of the Gamma matrix structure
+

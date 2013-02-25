@@ -27,7 +27,7 @@ typedef struct _input_pg {
     {"nit", "nit = %d", INT_T, &(varname).nit},\
     {"nhb", "nhb = %d", INT_T, &(varname).nhb},\
     {"nor", "nor = %d", INT_T, &(varname).nor},\
-    {NULL, NULL, 0, NULL}\
+    {NULL, NULL, INT_T, NULL}\
   }\
 }
 
@@ -68,7 +68,7 @@ typedef struct _pg_flow {
     {"measure frequency", "meas freq = %d", INT_T, &((varname).meas_freq)},\
     {"config dir", "conf dir = %s", STRING_T, &((varname).conf_dir[0])},\
     {"thermalization", "therm = %d", INT_T, &((varname).therm)},\
-    {NULL, NULL, 0, NULL}\
+    {NULL, NULL, INT_T, NULL}\
   }\
 }
 

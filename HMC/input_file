@@ -1,0 +1,82 @@
+// Global variables 
+GLB_T = 4
+GLB_X = 4
+GLB_Y = 4
+GLB_Z = 4
+NP_T = 1
+NP_X = 1
+NP_Y = 1
+NP_Z = 1
+
+N_REP = 1
+
+level = 1  seed = 13813
+
+//Logger levels (default = -1)
+log:default = -1
+log:inverter = -1
+log:forcestat = 0
+
+//Fermion twisting
+theta_T = 0.
+theta_X = 0.
+theta_Y = 0.
+theta_Z = 0.
+
+beta = 2
+mass = -1.0
+
+// HMC variables
+nf = 2
+n_MT_prec = 1.e-14
+n_MT_prec_flt = 1.e-6
+MD_prec = 1.e-6
+HB_prec = 1.e-14
+n_force_prec = 1.e-14
+n_force_prec_flt = 1.e-6
+tlen = 1
+nsteps = 5
+gsteps = 40
+
+// Hasenbusch variables
+hasenbusch = 1 // 1 = enabled , 0 = disabled
+hasen_dm = .5
+h_force_prec =  1.e-14
+h_force_prec_flt = 1.e-6
+h_MT_prec = 1.e-14
+h_MT_prec_flt = 1.e-6
+hsteps = 4
+
+
+// Schroedinger functional
+SF_zf = 1.
+SF_ds = 1.
+SF_ct = 1.
+SF_sign = 1
+
+
+// Run control variables
+run name = run1
+save freq = 9999
+meas freq = 1
+conf dir = .
+gauge start = random
+//ranlxd start =
+last conf = 10
+
+//Mesons
+mes:make = false
+mes:precision = 1.e-20
+mes:nhits = 1
+
+//Polyakov
+poly:make = false
+
+//Eigenvalues
+eva:make = true
+eva:nevt = 5
+eva:nev = 1
+eva:kmax = 50
+eva:maxiter = 100
+eva:omega1 = 1.e-8
+eva:omega2 = 1.e-3

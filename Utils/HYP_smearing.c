@@ -242,6 +242,9 @@ U{x,eta} U{x+eta,mu} U{x+mu,eta}^\dag
   start_gf_sendrecv(in);
 
   _PIECE_FOR(&glattice,ix) {
+    if(_PIECE_INDEX(ix)==glattice.inner_master_pieces) {
+      complete_gf_sendrecv(in);
+    }
     _SITE_FOR(&glattice,ix) {
 
       for(i=0;i<24;i++) {
@@ -275,9 +278,6 @@ U{x,eta} U{x+eta,mu} U{x+mu,eta}^\dag
       }
     
     } /* SITE_FOR */
-    if(_PIECE_INDEX(ix)==0) {
-      complete_gf_sendrecv(in);
-    }
   } /* PIECE FOR */  
 
 /*
@@ -293,6 +293,9 @@ Vbar{x,rho;nu,mu} Vbar{x+rho,mu;rho,nu} Vbar{x+mu,rho;nu,mu}^\dag
   for(i=0;i<24;i++) start_gt_sendrecv(Vbar[i]);
 
   _PIECE_FOR(&glattice,ix) {
+    if(_PIECE_INDEX(ix)==glattice.inner_master_pieces) {
+      for(i=0;i<24;i++) complete_gt_sendrecv(Vbar[i]);
+    }
     _SITE_FOR(&glattice,ix) {
 
       for(i=0;i<12;i++) {
@@ -326,9 +329,6 @@ Vbar{x,rho;nu,mu} Vbar{x+rho,mu;rho,nu} Vbar{x+mu,rho;nu,mu}^\dag
           
       }
     } /* SITE_FOR */
-    if(_PIECE_INDEX(ix)==0) {
-      for(i=0;i<24;i++) complete_gt_sendrecv(Vbar[i]);
-    }
   } /* PIECE FOR */  
 
 /*
@@ -344,6 +344,9 @@ Vtilde{x,nu;mu} Vtilde{x+nu,mu;nu} Vtilde{x+mu,nu;mu}^\dag
   for(i=0;i<12;i++) start_gt_sendrecv(Vtilde[i]);
 
   _PIECE_FOR(&glattice,ix) {
+    if(_PIECE_INDEX(ix)==glattice.inner_master_pieces) {
+      for(i=0;i<12;i++) complete_gt_sendrecv(Vtilde[i]);
+    }
     _SITE_FOR(&glattice,ix) {
 
       for(mu=0;mu<4;mu++) {
@@ -375,9 +378,6 @@ Vtilde{x,nu;mu} Vtilde{x+nu,mu;nu} Vtilde{x+mu,nu;mu}^\dag
         
       }
     } /* SITE_FOR */
-    if(_PIECE_INDEX(ix)==0) {
-      for(i=0;i<12;i++) complete_gt_sendrecv(Vtilde[i]);
-    }
   } /* PIECE FOR */  
 
 

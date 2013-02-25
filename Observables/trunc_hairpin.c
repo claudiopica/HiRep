@@ -321,8 +321,7 @@ static void compute_evs() {
     }
     hmass=pars.mass[m];
     max_H2_ev(&ubnd);
-    eva(pars.n_eigenvalues,pars.eva_nevt,init,pars.eva_kmax,pars.eva_imax,ubnd,pars.eva_omega1,pars.eva_omega2,locH2,ev_mask,d,&status);
-    /*     eva(pars.n_eigenvalues,pars.eva_nevt,init,pars.eva_kmax,pars.eva_imax,ubnd,pars.eva_omega1,pars.eva_omega2,locH2,eva_ws,ev_mask,d,&status); */
+    eva(pars.n_eigenvalues,pars.eva_nevt,init,pars.eva_kmax,pars.eva_imax,ubnd,pars.eva_omega1,pars.eva_omega2,locH2,eva_ws,ev_mask,d,&status);
 
 #ifndef NDEBUG
     int q;
@@ -346,7 +345,7 @@ static void compute_evs() {
 
 
 #ifndef NDEBUG
-	  free_spinor_field(test);
+	  free_spinor_field_f(test);
 #endif /* NDEBUG */
 
 
@@ -683,18 +682,25 @@ static void create_sinks_QMR(spinor_field *source, spinor_field *sink, int mode)
 	b=sinktmp+1;
 	b_even=*b;
 	b_even.type=&glat_even;
+	/* b_even.ptr=b->ptr+glat_even.master_shift; */
 	b_odd=*b;
 	b_odd.type=&glat_odd;
+	b_odd.ptr=b->ptr+glat_odd.master_shift;
 
 	sinktmp_even=*sinktmp;
 	sinktmp_even.type=&glat_even;
+	/* sinktmp_even.ptr=sinktmp->ptr+glat_even.master_shift; */
 	sinktmp_odd=*sinktmp;
 	sinktmp_odd.type=&glat_odd;
+	sinktmp_odd.ptr=sinktmp->ptr+glat_odd.master_shift;
+
 
 	source_even=*source;
 	source_even.type=&glat_even;
+	/* source_even.ptr=source->ptr+glat_even.master_shift; */
 	source_odd=*source;
 	source_odd.type=&glat_odd;
+	source_odd.ptr=source->ptr+glat_odd.master_shift;
 	
 	sink_even=(spinor_field*)malloc(sizeof(spinor_field)*pars.n_masses);
 	sink_odd=(spinor_field*)malloc(sizeof(spinor_field)*pars.n_masses);
@@ -704,14 +710,20 @@ static void create_sinks_QMR(spinor_field *source, spinor_field *sink, int mode)
 	for(m = 0; m < pars.n_masses; m++) {
 	  *(sink_even+m)=*(sink+m);
 	  (sink_even+m)->type=&glat_even;
+	  /*(sink_even+m)->ptr=(sink+m)->ptr+glat_even.master_shift; */
+
 	  *(sink_odd+m)=*(sink+m);
 	  (sink_odd+m)->type=&glat_odd;
+	  (sink_odd+m)->ptr=(sink+m)->ptr+glat_odd.master_shift;
 
 	  *(sink_trunc_even+m)=*(sink_trunc+m);
 	  (sink_trunc_even+m)->type=&glat_even;
+	  /*(sink_trunc_even+m)->ptr=(sink_trunc+m)->ptr+glat_even.master_shift; */
+
 	  *(sink_trunc_odd+m)=*(sink_trunc+m);
 	  (sink_trunc_odd+m)->type=&glat_odd;
-	
+	  (sink_trunc_odd+m)->ptr=(sink_trunc+m)->ptr+glat_odd.master_shift;
+
 	}
 
   /* Start preconditioning & inversion */
@@ -832,7 +844,7 @@ static void create_sinks_QMR(spinor_field *source, spinor_field *sink, int mode)
 	}
 
 #ifndef NDEBUG
-  free_spinor_field(test);
+  free_spinor_field_f(test);
 #endif /* NDEBUG */
 	
 	lprintf("GET_SINKS_QMR",loglevel+1,"QMR MVM = %d\n",cgiter);
@@ -1033,26 +1045,26 @@ void ata_qprop_free() {
 	if(init_flag != 1) return;
 	
 	if(pars.n_eigenvalues != 0) {
-	  free_spinor_field(ev[0]);
+	  free_spinor_field_f(ev[0]);
     afree(ev);
-    free_spinor_field(compute_evs_ws);
-    free_spinor_field(max_H2_ev_ws);
-    free_spinor_field(ev_propagator_ws);
+    free_spinor_field_f(compute_evs_ws);
+    free_spinor_field_f(max_H2_ev_ws);
+    free_spinor_field_f(ev_propagator_ws);
 	}
 	
 	if(pars.hopping_order >= 0) {
-    free_spinor_field(hopping_propagator_ws);
-    free_spinor_field(hopping_remainder_ws);
+    free_spinor_field_f(hopping_propagator_ws);
+    free_spinor_field_f(hopping_remainder_ws);
 	}
 
 	if(pars.n_sources_truncation > 0 || pars.dilution == EXACT) {
-	  free_spinor_field(stoc_propagator_ws);
+	  free_spinor_field_f(stoc_propagator_ws);
 #ifdef QMR_INVERTER
-	  free_spinor_field(create_sinks_QMR_ws);
+	  free_spinor_field_f(create_sinks_QMR_ws);
 	  
-	  free_spinor_field(QMR2_source);
-	  free_spinor_field(QMR2_sinks);
-	  free_spinor_field(QMR2_sinks_trunc);
+	  free_spinor_field_f(QMR2_source);
+	  free_spinor_field_f(QMR2_sinks);
+	  free_spinor_field_f(QMR2_sinks_trunc);
 #endif /* QMR_INVERTER */
 	}
 	init_flag = 0;
@@ -1109,7 +1121,7 @@ static void QMR_init() {
 #endif /* NDEBUG */
 
 #ifndef NDEBUG
-  free_spinor_field(test);
+  free_spinor_field_f(test);
 #endif /* NDEBUG */
 
 
