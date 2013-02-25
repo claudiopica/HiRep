@@ -118,12 +118,12 @@ void full_plaquette()
     pa[k].im /= GLB_T*GLB_X*GLB_Y*GLB_Z*NG;
   }
 
-  lprintf("PLAQ",0,"Plaq( %d , %d) = ( %.10f , %.10f )\n",1,0,pa[0].re,pa[0].im);
-  lprintf("PLAQ",0,"Plaq( %d , %d) = ( %.10f , %.10f )\n",2,0,pa[1].re,pa[1].im);
-  lprintf("PLAQ",0,"Plaq( %d , %d) = ( %.10f , %.10f )\n",2,1,pa[2].re,pa[2].im);
-  lprintf("PLAQ",0,"Plaq( %d , %d) = ( %.10f , %.10f )\n",3,0,pa[3].re,pa[3].im);
-  lprintf("PLAQ",0,"Plaq( %d , %d) = ( %.10f , %.10f )\n",3,1,pa[4].re,pa[4].im);
-  lprintf("PLAQ",0,"Plaq( %d , %d) = ( %.10f , %.10f )\n",3,2,pa[5].re,pa[5].im);
+  lprintf("PLAQ",0,"Plaq( %d , %d) = ( %f , %f )\n",1,0,pa[0].re,pa[0].im);
+  lprintf("PLAQ",0,"Plaq( %d , %d) = ( %f , %f )\n",2,0,pa[1].re,pa[1].im);
+  lprintf("PLAQ",0,"Plaq( %d , %d) = ( %f , %f )\n",2,1,pa[2].re,pa[2].im);
+  lprintf("PLAQ",0,"Plaq( %d , %d) = ( %f , %f )\n",3,0,pa[3].re,pa[3].im);
+  lprintf("PLAQ",0,"Plaq( %d , %d) = ( %f , %f )\n",3,1,pa[4].re,pa[4].im);
+  lprintf("PLAQ",0,"Plaq( %d , %d) = ( %f , %f )\n",3,2,pa[5].re,pa[5].im);
 
 }
 

@@ -14,38 +14,16 @@
 #include <math.h>
 #include <assert.h>
 #include "logger.h"
-
-
-#ifdef ROTATED_SF
 #include "update.h"
-extern rhmc_par _update_par; /* Update/update_rhmc.c */
-#endif /* ROTATED_SF */
 
+extern rhmc_par _update_par; /* Update/update_rhmc.c */
 
 static double hmass;
-#ifdef BASIC_SF
-static void H_sf(spinor_field *out, spinor_field *in){
-  g5Dphi(hmass,out,in);
-}
-#else
 static void H2_sf(spinor_field *out, spinor_field *in){
   g5Dphi_sq(hmass,out,in);
 }
-#endif
 
 void SF_quark_propagator(spinor_field *in, double mass, spinor_field *out, double acc) {
-#ifdef BASIC_SF
-
-  static MINRES_par MINRESpar;
-  int cgiter;
-  hmass = mass;
-  
-  MINRESpar.err2 = acc;
-  MINRESpar.max_iter = 0;
-  cgiter=MINRES(&MINRESpar, &H_sf, in, out, 0);
-	lprintf("PROPAGATOR",10,"MINRES MVM = %d",cgiter);
-#else
-	  
   int cgiter;
   static mshift_par inv_par;
   static spinor_field *chi=NULL;
@@ -56,15 +34,13 @@ void SF_quark_propagator(spinor_field *in, double mass, spinor_field *out, doubl
   inv_par.shift = malloc(sizeof(double));
   inv_par.shift[0] = 0.;
   inv_par.err2= acc;
-  inv_par.max_iter=0;
+  inv_par.max_iter=0; /* no limit */
   _update_par.SF_sign = -_update_par.SF_sign;
    g5Dphi(mass, chi, in);
   _update_par.SF_sign = -_update_par.SF_sign;
   cgiter=cg_mshift(&inv_par, &H2_sf, chi, out);
 	lprintf("PROPAGATOR",10,"cg_mshift MVM = %d",cgiter);
 	free(inv_par.shift);
-
-#endif
 }
 
 
@@ -72,14 +48,14 @@ void SF_quark_propagator(spinor_field *in, double mass, spinor_field *out, doubl
 /*
 f1 can be computed inserting the sources in the correlator in the lower or higher border. The two procedures give identical results. We keep only the computation with sources on the lower border.
 */
-double SF_PCAC_wall_mass(double mass,double ** cor_ret )
+double SF_PCAC_wall_mass(double mass)
 {
 
 #ifdef BASIC_SF
 
   int i,j,ix0,ix1,ix2,ix3;
   double f_P[GLB_T], f_A[GLB_T], f_Pt[GLB_T], f_At[GLB_T], f_1=0, temp;
-  double acc = 1.e-20;
+  double acc = 1.e-10;
   spinor_field *prop;	
   spinor_field *source;
   suNf_spinor* sptr;
@@ -192,7 +168,7 @@ double SF_PCAC_wall_mass(double mass,double ** cor_ret )
   lprintf("PC_wall_AC",0,"ZP_pos = %.10e\n",(sqrt(f_1)/(f_P[(int)(GLB_X/2)])));
   
   for (ix0=2;ix0<GLB_T-3;ix0++)
-    lprintf("PC_wall_AC",0,"PCACpost%d = %f\n",ix0,(double)(f_A[(int)(ix0)+1] - f_A[(int)(ix0)-1])/(4*f_P[(int)(ix0)]));
+    lprintf("PC_wall_AC",0,"PCACpost%d = %10e\n",ix0,(double)(f_A[(int)(ix0)+1] - f_A[(int)(ix0)-1])/(4*f_P[(int)(ix0)]));
   
   /*Create wall source with g5 factor at t=T-2*/
   /*U and P- on source (again actually use P+ to account for commuting with g5 in source)*/
@@ -254,22 +230,8 @@ double SF_PCAC_wall_mass(double mass,double ** cor_ret )
   lprintf("PC_wall_AC",0,"Z_P = %.10e\n",0.5*(sqrt(f_1)/(f_Pt[(int)(GLB_X/2)]))+0.5*(sqrt(f_1)/(f_P[(int)(GLB_X/2)])));
   
   for (ix0=2;ix0<GLB_T-3;ix0++)
-    lprintf("PC_wall_AC",0,"PCACnegt%d = %f\n",ix0,(double)(f_At[(int)(ix0)+1] - f_At[(int)(ix0)-1])/(4*f_Pt[(int)(ix0)]));
+    lprintf("PC_wall_AC",0,"PCACnegt%d = %10e\n",ix0,(double)(f_At[(int)(ix0)+1] - f_At[(int)(ix0)-1])/(4*f_Pt[(int)(ix0)]));
   
-
-  if(cor_ret!=NULL){
-    for(ix0=0;ix0<GLB_T-1;ix0++)
-      {
-	cor_ret[0][ix0]=f_P[ix0];
-	cor_ret[1][ix0]=f_A[ix0];
-	cor_ret[2][ix0]=f_Pt[ix0];
-	cor_ret[3][ix0]=f_At[ix0];
-      }
-    cor_ret[4][0]=f_1;
-  }
-
-
-
   free_spinor_field(source);
   free_spinor_field(prop);
   
@@ -306,7 +268,7 @@ double SF_PCAC_wall_mass(double mass,double ** cor_ret )
 
 /*
 [eta_(a0,alpha0)]_{a,alpha} = \delta_{a,a0} \delta_{alpha,alpha0) 
-source_s(t,x) = Q- U_0(1,y)^\dag gamma_5 \eta_s \delta_{t,2}
+source_s(t,x) = Q- U_0(1,y)^\dag gamma_5 \eta_s \delta_{t,1}
 Q- = (1 - i gamma_0 gamma_5)/2 
 
      | Id    -i Id |
@@ -440,24 +402,13 @@ Q- = |             | * 1/2
 
 /*As question of principle it  could be added also the calculation of the correlator with the upper border, these would leade to a double measure of the mpcac, in this moment we are not implemting it, but in case of need should be easy to use the different definition of the upper border to add it*/  
  
-
-  if(cor_ret!=NULL){
-    for(ix0=0;ix0<GLB_T-1;ix0++)
-      {
-	cor_ret[0][ix0]=f_P[ix0];
-	cor_ret[1][ix0]=f_A[ix0];
-      }
-    cor_ret[4][0]=f_1;
-  }
+  return (double)(f_A[(int)(GLB_T/2)] - f_A[(int)(GLB_T/2)-2])/(4*f_P[(int)((GLB_T/2)-1)]);
   
-
   free(stmp);
   free(sbord[0]);
   free_spinor_field(prop[0]);
   free_spinor_field(prop[1]);
   free_spinor_field(source );
-
-  return (double)(f_A[(int)(GLB_T/2)] - f_A[(int)(GLB_T/2)-2])/(4*f_P[(int)((GLB_T/2)-1)]);
  
 #else
 
