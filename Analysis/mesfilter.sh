@@ -1,0 +1,1 @@
+grep TRIPLET | perl -n -e's/\[MAIN\]\[0\]conf #\d+ mass=-*[\.\d]+ //g; chomp; s/=//g; s/TRIPLET //g; print "$_\n" unless ($_=~/^\s?$/ or $_=~/^g5_g0g5_im/);' | perl -n -e'$a=int(($.-1)/17); print "$a $_";'
