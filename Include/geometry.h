@@ -14,10 +14,10 @@
 
 typedef struct _geometry_descriptor {
   int inner_master_pieces; /* number of inner pieces (1 o 2 for even odd or no_eo)) */
-  int local_master_pieces;
+  int local_master_pieces;  // 
   int total_spinor_master_pieces;
   int total_gauge_master_pieces;
-  int *master_start, *master_end; 
+  int *master_start, *master_end; // Beginning has inner pieces, then local pieces, then the rest.
   int master_shift; /*  this is the odd spinor's shift, i.e. the index of the first odd entry in the full geometry */
   int ncopies_spinor;
   int ncopies_gauge;
@@ -60,8 +60,10 @@ void geometry_mem_alloc(void);
 int proc_up(int id, int dir);
 int proc_dn(int id, int dir);
 
+void init_geometry_SAP(void);
 void test_geometry_mpi(void);
 void test_geometry_mpi_eo(void);
 void print_wdmatrix(char *filename);
+
 
 #endif

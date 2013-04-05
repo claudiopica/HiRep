@@ -23,7 +23,7 @@ MACRO += -DBC_Z_PERIODIC
 
 
 MACRO += -DUPDATE_EO
-#MACRO += -DWITH_MPI
+MACRO += -DWITH_MPI
 
 MACRO += -DNDEBUG
 #MACRO += -DCHECK_SPINOR_MATCHING
@@ -36,8 +36,8 @@ MACRO += -DIO_FLUSH
 
 #Compiler
 #export OMPI_CC = ccache gcc
-#CC = mpicc
-CC = gcc
+CC = mpicc
+#CC = gcc
 CFLAGS = -Wall -std=c99 -O2 -fomit-frame-pointer -msse -msse2
 
 ##########################################################################

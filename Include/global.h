@@ -99,6 +99,12 @@ GLB_VAR(int,zerocoord[4],={0,0,0,0});
 GLB_VAR(geometry_descriptor,glattice,={0}); /* global lattice */
 GLB_VAR(geometry_descriptor,glat_even,={0}); /* global even lattice */
 GLB_VAR(geometry_descriptor,glat_odd,={0}); /* global odd lattice */
+GLB_VAR(geometry_descriptor,glat_even_red,={0});
+GLB_VAR(geometry_descriptor,glat_odd_red,={0}); 
+GLB_VAR(geometry_descriptor,glat_even_black,={0});
+GLB_VAR(geometry_descriptor,glat_odd_black,={0}); 
+GLB_VAR(geometry_descriptor,glat_red,={0});
+GLB_VAR(geometry_descriptor,glat_black,={0}); 
 
 /* Memory */
 typedef enum _mem_t {

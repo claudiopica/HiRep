@@ -23,6 +23,13 @@ typedef struct _mshift_par {
 	 void *add_par; /* additional parameters for specific inverters */
 } mshift_par;
 
+
+
+// We might want to add a "trial" spinor to the argument list
+typedef int (*inverter_ptr)(mshift_par* par, spinor_operator M, spinor_field *in, spinor_field *out);
+void SAP_prec(int nu, inverter_ptr inv, mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
+
+
 /*
  * performs the multi-shifted CG inversion:
  * out[i] = (M-(par->shift[i]))^-1 in
@@ -72,5 +79,8 @@ int eva(int nev,int nevt,int init,int kmax,
 void jacobi1(int n,double a[],double d[],double v[]);
 void jacobi2(int n,complex a[],double d[],complex v[]);
 
+
+
+void empty_buffers(spinor_field *s);
 
 #endif

@@ -86,9 +86,7 @@ for (int i=0; i<n; ++i) f[i].type=type;\
 \
 if(alloc_mem_t & CPU_MEM) {\
 f->ptr=amalloc(n*_size*type->gsize_spinor*sizeof(*(f->ptr)),ALIGN);\
-error((f->ptr)==NULL,1,"alloc_" #_name " [" __FILE__ "]",\
-"Could not allocate memory space for field (data)");\
-for (int i=1; i<n; ++i) f[i].ptr=f[i-1].ptr+type->gsize_spinor*_size;\
+for(int i=1; i<n; ++i) f[i].ptr=f[i-1].ptr+type->gsize_spinor*_size;\
 } else { for (int i=0; i<n; ++i) f[i].ptr=NULL; }	      \
 \
 _ALLOC_GPU_CODE(_name,_size);\
@@ -99,6 +97,8 @@ return f;\
 }
 
 
+/*error((f->ptr)==NULL,1,"alloc_" #_name " [" __FILE__ "]",\
+"Could not allocate memory space for field (data)");\*/
 
 /*
  _name = suffix of the allocation and deallocation functions
