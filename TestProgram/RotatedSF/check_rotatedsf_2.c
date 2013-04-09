@@ -92,9 +92,15 @@ int main(int argc,char *argv[])
     .SF_BCs = 0
   };
   
- 
-  logger_setlevel(0,10000); /* log all */
-  logger_map("DEBUG","debug");
+  char tmp[256];
+  logger_setlevel(0,100); /* log all */
+  if (PID!=0) { 
+    logger_disable();}
+  else{
+    sprintf(tmp,">out_%d",PID); logger_stdout(tmp);
+    sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
+  }
+   
   
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
   

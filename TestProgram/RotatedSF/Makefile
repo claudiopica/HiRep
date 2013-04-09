@@ -40,7 +40,7 @@ MODS := linear_algebra cg_mshift eva jacobi MINRES
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Observables
-MODS := avr_plaquette sf_pcac
+MODS := avr_plaquette sf_pcac rotated_corrs_gm  rotated_corrs_gp  rotated_corrs_lm  rotated_corrs_lp
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 COMMON_OBJS = $(MOD_OBJS)

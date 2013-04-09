@@ -51,9 +51,15 @@ int main(int argc,char *argv[])
   _update_par.SF_ct=1;
   _update_par.SF_zf=1.0;
 
-  
-  logger_setlevel(0,99); /* log all */
-  logger_map("DEBUG","debug");
+
+  char tmp[256];
+  logger_setlevel(0,100); /* log all */
+  if (PID!=0) { 
+    logger_disable();}
+  else{
+    sprintf(tmp,">out_%d",PID); logger_stdout(tmp);
+    sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
+  }
   
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
   
