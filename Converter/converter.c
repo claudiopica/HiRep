@@ -45,15 +45,16 @@ typedef struct _format_type {
   void (*write)(char*);
 } format_type;
 
-int nformats=7;
-format_type format[7] = {
+int nformats=8;
+format_type format[8] = {
   { .name="ascii" ,     .read=read_gauge_field_ascii ,     .write=NULL },
   { .name="henty" ,     .read=read_gauge_field_henty ,     .write=NULL },
   { .name="mpieo" ,     .read=read_gauge_field ,           .write=write_gauge_field },
   { .name="eolexi:be" , .read=read_gauge_field_eolexi_BE , .write=write_gauge_field_eolexi_BE },
   { .name="mpieo:be" ,  .read=read_gauge_field_mpieo_BE ,  .write=write_gauge_field_mpieo_BE },
   { .name="eolexi:le" , .read=read_gauge_field_eolexi_LE , .write=write_gauge_field_eolexi_LE },
-  { .name="mpieo:le" ,  .read=read_gauge_field_mpieo_LE ,  .write=write_gauge_field_mpieo_LE }
+  { .name="mpieo:le" ,  .read=read_gauge_field_mpieo_LE ,  .write=write_gauge_field_mpieo_LE },
+  { .name="su2q" ,  .read=read_gauge_field_su2q ,  .write=write_gauge_field_su2q }
 };
 
 enum {QUENCHED_CNFG, DYNAMICAL_CNFG, UNKNOWN_CNFG};
@@ -181,8 +182,8 @@ Syntax (3): converter -i <input file> [<input format>] -o <output file> [<output
 * Convert the input file from the input format to the output format. The volume must be provided if it cannot be extracted from the input file name.\n\n\
 Syntax (4): converter -i <input file> [<input format>] [-v <volume>] --check\n\
 * Open the input file assuming the given format and print, if possible, plaquettes and average distance from unitarity for the link variables.\n\n\
-Input formats = mpieo (be,default) | mpieo:be | mpieo:le | eolexi:be | eolexi:le | henty | ascii\n\
-Output formats = mpieo (be,default) | mpieo:be | mpieo:le | eolexi:be | eolexi:le\
+Input formats = mpieo (be,default) | mpieo:be | mpieo:le | eolexi:be | eolexi:le | henty | ascii | su2q\n\
+Output formats = mpieo (be,default) | mpieo:be | mpieo:le | eolexi:be | eolexi:le | su2q\n\
 ");
 }
 
