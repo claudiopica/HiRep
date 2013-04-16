@@ -100,7 +100,7 @@ void write_gauge_field_su2q(char filename[])
   gettimeofday(&start,0);
 
   zsize=GLB_Z/NP_Z; rz=GLB_Z-zsize*NP_Z;
-  buff=malloc(4*4*(GLB_Z/NP_Z+((rz>0)?1:0)));
+  buff=malloc(4*sizeof(double)*4*(GLB_Z/NP_Z+((rz>0)?1:0)));
 
   g[3]=0;
   for (g[0]=0;g[0]<GLB_T;++g[0]) { /* loop over T, X and Y direction */
@@ -110,7 +110,7 @@ void write_gauge_field_su2q(char filename[])
         glb_to_proc(g, p); /* get the processor coordinate */
 #endif
         for (p[3]=0;p[3]<NP_Z;++p[3]) { /* loop over processors in Z direction */
-          int bsize=4*sizeof(double)*4*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
+          int bsize=4*4*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
 #ifdef WITH_MPI
           MPI_Cart_rank(cart_comm, p, &cid);
           MPI_Group_translate_ranks(cg, 1, &cid, wg, &pid);
@@ -252,7 +252,7 @@ void read_gauge_field_su2q(char filename[])
 #endif
 
   zsize=GLB_Z/NP_Z; rz=GLB_Z-zsize*NP_Z;
-  buff=malloc(4*4*(GLB_Z/NP_Z+((rz>0)?1:0)));
+  buff=malloc(4*sizeof(double)*4*(GLB_Z/NP_Z+((rz>0)?1:0)));
 
   g[3]=0;
   for (g[0]=0;g[0]<GLB_T;++g[0]) { /* loop over T, X and Y direction */
@@ -262,7 +262,8 @@ void read_gauge_field_su2q(char filename[])
         glb_to_proc(g, p); /* get the processor coordinate */
 #endif
         for (p[3]=0;p[3]<NP_Z;++p[3]) { /* loop over processors in Z direction */
-          int bsize=4*sizeof(double)*4*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
+          int bsize=4*4*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
+lprintf("DEBUG",0,"bsize=%d\n",bsize);
 #ifdef WITH_MPI
           MPI_Cart_rank(cart_comm, p, &cid);
           MPI_Group_translate_ranks(cg, 1, &cid, wg, &pid);
