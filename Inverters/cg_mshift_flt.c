@@ -170,7 +170,7 @@ int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_operator_flt F, spi
     for (i=0; i<par->n; ++i) {
       if (sflags[i]!=0) {
         /* compute residual vector */
-        M(tmp,&out[i]); ++diter;
+        M.dbl(tmp,&out[i]); ++diter;
         spinor_field_sub_f(res2,in,tmp);
         spinor_field_mul_add_assign_f(res2,par->shift[i],&out[i]);
         /* test for convergence */

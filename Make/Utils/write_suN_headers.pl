@@ -373,6 +373,10 @@ write_spinor_prod_re();
 write_spinor_prod_im();
 write_spinor_prod();
 write_spinor_prod_assign();
+write_upper_spinor_prod();
+write_upper_spinor_prod_assign();
+write_lower_spinor_prod();
+write_lower_spinor_prod_assign();
 write_spinor_g5_prod_re();
 write_spinor_g5_prod_im();
 write_spinor_project();
@@ -2747,6 +2751,45 @@ sub write_spinor_prod_assign {
     if($k==3) {print"\n\n";} else {print "; \\\n"}
   }
 }
+sub write_upper_spinor_prod {
+  print "/* z=r0*s0+r1*s1 (r,s spinors, z complex) */\n";
+  print "#define _spinor_upper_prod_${suff}(z,r,s) \\\n";	
+  	print "   do { \\\n";
+	print "      (z).re=0.;(z).im=0.; \\\n";
+  for (my $k=0; $k<2; $k++){
+    print "      _vector_prod_assign_${suff}((z),(r).$cname\[$k\],(s).$cname\[$k\])";
+    if($k==1) {print"; \\\n   } while(0) \n\n";} else {print "; \\\n"}
+  }
+}
+sub write_lower_spinor_prod {
+  print "/* z=r2*s2+r3*s3 (r,s spinors, z complex) */\n";
+  print "#define _spinor_lower_prod_${suff}(z,r,s) \\\n";	
+  	print "   do { \\\n";
+	print "      (z).re=0.;(z).im=0.; \\\n";
+  for (my $k=2; $k<4; $k++){
+    print "      _vector_prod_assign_${suff}((z),(r).$cname\[$k\],(s).$cname\[$k\])";
+    if($k==3) {print"; \\\n   } while(0) \n\n";} else {print "; \\\n"}
+  }
+}
+sub write_upper_spinor_prod_assign {
+  print "/* z+=r0*s0+r1*s1 (r,s spinors, z complex) */\n";
+  print "#define _spinor_upper_prod_assign_${suff}(z,r,s) \\\n";	
+  	print "   do { \\\n";
+  for (my $k=0; $k<2; $k++){
+    print "      _vector_prod_assign_${suff}((z),(r).$cname\[$k\],(s).$cname\[$k\])";
+    if($k==1) {print"; \\\n   } while(0) \n\n";} else {print "; \\\n"}
+  }
+}
+sub write_lower_spinor_prod_assign {
+  print "/* z+=r2*s2+r3*s3 (r,s spinors, z complex) */\n";
+  print "#define _spinor_lower_prod_assign_${suff}(z,r,s) \\\n";	
+  	print "   do { \\\n";
+  for (my $k=2; $k<4; $k++){
+    print "      _vector_prod_assign_${suff}((z),(r).$cname\[$k\],(s).$cname\[$k\])";
+    if($k==3) {print"; \\\n   } while(0) \n\n";} else {print "; \\\n"}
+  }
+}
+
 
 sub write_spinor_g5_prod_re {
   print "/* k=Real part of the scalar product (g5*r)*s (r,s spinors) */\n";

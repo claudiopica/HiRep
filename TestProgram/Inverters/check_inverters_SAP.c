@@ -45,12 +45,14 @@ void H(spinor_field *out, spinor_field *in){
 
 static spinor_field *tmp;
 
-void M(spinor_field *out, spinor_field *in){
+void M_dbl(spinor_field *out, spinor_field *in){
+   tmp->type=&glattice;
    empty_buffers(tmp);
    tmp->type=in->type;
    g5Dphi(-hmass,tmp,in); 
    g5Dphi(-hmass,out,tmp);
 }
+spinor_operator M={&M_dbl,NULL};
 
 
 int main(int argc,char *argv[])
@@ -70,7 +72,7 @@ int main(int argc,char *argv[])
    
    /* logger setup */
 
-  logger_setlevel(0,100); /* log all */
+  logger_setlevel(0,101); /* log all */
   if (PID!=0) { 
     logger_disable();}
   else{
@@ -95,10 +97,12 @@ int main(int argc,char *argv[])
    lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
    lprintf("MAIN",0,"global size is %dx%dx%dx%d\n",GLB_T,GLB_X,GLB_Y,GLB_Z);
    lprintf("MAIN",0,"proc grid is %dx%dx%dx%d\n",NP_T,NP_X,NP_Y,NP_Z);
+   lprintf("MAIN",100,"Logger test");
    
    /* setup lattice geometry */
    geometry_mpi_eo();
-   
+      lprintf("MAIN",100,"Logger test after mpi_eo call");
+      
    init_geometry_SAP();
    /* test_geometry_mpi_eo(); */
    
@@ -168,11 +172,11 @@ int main(int argc,char *argv[])
    //cgiters = cg_mshift(&par, &M, s1, res);
    cgiters=0;
    spinor_field_zero_f(res);
-   SAP_prec(5,&cg_mshift,&par, &M, s1, res);
+   SAP_prec(5,&cg_mshift,&par, M, s1, res);
    
  //  lprintf("SAP TEST",0,"Converged in %d iterations\n",cgiters);
    for(i=0;i<par.n;++i){
-     M(s2,&res[i]);
+     M.dbl(s2,&res[i]);
      spinor_field_mul_add_assign_f(s2,-par.shift[i],&res[i]);
      spinor_field_sub_assign_f(s2,s1);
      tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);

@@ -67,7 +67,7 @@ int HBiCGstab(MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field
   spinor_field_copy_f(o, o0);
   delta = spinor_field_prod_re_f(o, r);
 
-  M(Ms,&s[0]);
+  M.dbl(Ms,&s[0]);
   phi=spinor_field_prod_re_f(o0, Ms)/delta; /* o = in (see above) */
 
 
@@ -83,7 +83,7 @@ int HBiCGstab(MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field
     spinor_field_mul_f(o,beta,Ms);
     spinor_field_add_assign_f(o,r);
     
-    M(Mo, o);
+    M.dbl(Mo, o);
 
     oldchi=chi;
     chi=spinor_field_prod_re_f(Mo,o)/spinor_field_sqnorm_f(Mo);
@@ -113,7 +113,7 @@ int HBiCGstab(MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field
     r1=sptmp; /*exchange pointers */
 
     /* update phi */
-    M(Ms,&s[0]);
+    M.dbl(Ms,&s[0]);
     phi = spinor_field_prod_re_f(o0, Ms)/delta;
 
     rtmp1=spinor_field_sqnorm_f(r);

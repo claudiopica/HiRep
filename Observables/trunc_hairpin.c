@@ -144,7 +144,7 @@ static spinor_field *QMR2_sinks, *QMR2_sinks_trunc;
 #endif /* QMR_INVERTER */
 
 
-static void locH2(spinor_field *out, spinor_field *in);
+static void locH2_dbl(spinor_field *out, spinor_field *in);
 
 #ifdef QMR_INVERTER
 static void QMR_init();
@@ -222,9 +222,10 @@ void traced_ata_qprop(complex*** prop, int n_points) {
 
 
 static double hmass=0.;
-static void locH2(spinor_field *out, spinor_field *in){
+static void locH2_dbl(spinor_field *out, spinor_field *in){
   g5Dphi_sq(hmass, out, in);
 }
+spinor_operator locH2={&locH2_dbl,NULL};
 #ifdef QMR_INVERTER
 static void D_qmr(spinor_field *out, spinor_field *in){
 	Dphi(hmass,out,in);
@@ -261,7 +262,7 @@ static int max_H2_ev(double *max) {
 
   dt=1.;
 
-  locH2(s3,s1);
+  locH2.dbl(s3,s1);
 
   count=1;
   do {
@@ -271,7 +272,7 @@ static int max_H2_ev(double *max) {
     spinor_field_mul_f(s1,1./norm,s1);
 
     oldmax=*max;
-    locH2(s3,s1);
+    locH2.dbl(s3,s1);
     *max=spinor_field_prod_re_f(s1,s3);
   } while (fabs((*max-oldmax)/(*max))>1.e-3);
 
@@ -408,7 +409,7 @@ static void ev_propagator(complex** prop) {
     for(p = 0; p < pars.n_eigenvalues; p++) {
       hmass=pars.mass[m];
       spinor_field_g5_f(tmp, ev[m]+p);
-      cgiter+=g5QMR_mshift(&QMR_par, &D_qmr, tmp, source);
+      cgiter+=g5QMR_mshift(&QMR_par, (spinor_operator){&D_qmr,NULL}, tmp, source);
       if(pars.hopping_order<0) {
 	add_source_sink_contraction(prop[m], source, ev[m]+p, 1.0f);
       } else {
@@ -741,7 +742,7 @@ static void create_sinks_QMR(spinor_field *source, spinor_field *sink, int mode)
 	  spinor_field_zero_f(&b_odd); /* Is this better? */
 	  spinor_field_add_assign_f(&b_odd, &source_odd);
 
-    cgiter+=g5QMR_mshift_trunc(&QMR_par, pars.n_truncation_steps, &D_qmr_eo, &b_even, sink_trunc_even, sink_even);
+    cgiter+=g5QMR_mshift_trunc(&QMR_par, pars.n_truncation_steps, (spinor_operator){&D_qmr_eo,NULL}, &b_even, sink_trunc_even, sink_even);
 
     spinor_field_mul_f(sink_even,(4.0+pars.mass[0]),sink_even);
     spinor_field_mul_f(sink_odd,1.0/(4.+pars.mass[0]),sink_odd);
@@ -768,8 +769,8 @@ static void create_sinks_QMR(spinor_field *source, spinor_field *sink, int mode)
 	    shift_eo[i]=(4.+pars.mass[0])*(4.+pars.mass[0])-(4.+pars.mass[i])*(4.+pars.mass[i]);
 	  QMR_par.shift=shift_eo;
 	  
-	  cgiter+=g5QMR_mshift_trunc(&QMR_par, pars.n_truncation_steps, &D_qmr_eo, &source_even, sink_trunc_even, sink_even);
-	  cgiter+=g5QMR_mshift_trunc(&QMR_par, pars.n_truncation_steps, &D_qmr_oe, &source_odd, sink_trunc_odd, sink_odd);
+	  cgiter+=g5QMR_mshift_trunc(&QMR_par, pars.n_truncation_steps, (spinor_operator){&D_qmr_eo,NULL}, &source_even, sink_trunc_even, sink_even);
+	  cgiter+=g5QMR_mshift_trunc(&QMR_par, pars.n_truncation_steps, (spinor_operator){&D_qmr_oe,NULL}, &source_odd, sink_trunc_odd, sink_odd);
 	  
     free(shift_eo);
 
@@ -1095,7 +1096,7 @@ static void QMR_init() {
 	}
 
 	spinor_field_g5_f(QMR2_source, QMR2_source);
-	cgiter+=g5QMR_mshift_trunc(&QMR_par, pars.n_truncation_steps, &D_qmr, QMR2_source, QMR2_sinks_trunc, QMR2_sinks);
+	cgiter+=g5QMR_mshift_trunc(&QMR_par, pars.n_truncation_steps, (spinor_operator){&D_qmr,NULL}, QMR2_source, QMR2_sinks_trunc, QMR2_sinks);
 	if (pars.n_truncation_steps==0) {
 	  for(m = 0; m < pars.n_masses; m++) {
 	    spinor_field_copy_f(QMR2_sinks_trunc+m,QMR2_sinks+m);

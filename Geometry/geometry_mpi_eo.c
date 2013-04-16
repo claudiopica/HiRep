@@ -1825,8 +1825,6 @@ void geometry_mpi_eo(void){
   
   fix_buffer(index_zone-1);
   
-  logger_setlevel(0,11);
-
   set_memory_order();
   
   geometry_mem_alloc();

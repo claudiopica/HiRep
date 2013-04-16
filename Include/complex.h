@@ -329,4 +329,11 @@ typedef struct
     _complex_mul_assign(a,z2,c2);
 
 
+/*
+* a=b*(c^+) (a,c complex, b real)
+*/
+#define _complex_mulr_star(a,b,c) \
+  (a).re= ((b)*(c).re);		  \
+  (a).im= (-(b)*(c).im)
+
 #endif

@@ -249,7 +249,7 @@ static void ritz_subsp(int nlock,int nevt,spinor_operator Op,
    
   for (i=0;i<neff;i++) 
     {
-      Op(&ws[0],&ev[nlock+i]);
+      Op.dbl(&ws[0],&ev[nlock+i]);
       nop+=1;      
       
       aa[neff*i+i].re=spinor_field_prod_re_f(&ev[nlock+i],&ws[0]);
@@ -333,7 +333,7 @@ static int res_subsp(int nlock,int nev,double omega1,double omega2,
             return ia;
 	}
 
-      Op(&ws[0],&ev[ib]);
+      Op.dbl(&ws[0],&ev[ib]);
       nop+=1;
       spinor_field_lc1_f(-d[ib],&ws[0],&ev[ib]);
 
@@ -355,7 +355,7 @@ static int res_subsp(int nlock,int nev,double omega1,double omega2,
 
       if (ib>ia)
 	{
-	  Op(&ws[1],&ws[0]);
+	  Op.dbl(&ws[1],&ws[0]);
 	  nop+=1;      
 
 	  for (i=ia;i<ib;i++) 
@@ -427,7 +427,7 @@ static void apply_cheby(int k,double lbnd,double ubnd,
   psi1=&ws[0];
   psi2=&ws[1];
 
-  Op(psi1,psi0);
+  Op.dbl(psi1,psi0);
   spinor_field_lc2_f(c1,c2,psi1,psi0);
 
   c1*=2.0f;
@@ -435,7 +435,7 @@ static void apply_cheby(int k,double lbnd,double ubnd,
 
   for (j=1;j<k;j++)
     {
-      Op(psi2,psi1);
+      Op.dbl(psi2,psi1);
       spinor_field_lc3_f(c1,c2,psi2,psi1,psi0);
 
       psi3=psi0;

@@ -1,7 +1,7 @@
 TOPDIR = ../..
 MKDIR=$(TOPDIR)/Make
 
-EXES = check_inverters_SAP check_inverters_1 # check_inverters_2 check_inverters_3 check_inverters_4 check_inverters_5 check_inverters_6 check_inverters_8
+EXES = check_inverters_DDalphaAMG check_inverters_SAP # check_inverters_1 check_inverters_2 check_inverters_3 check_inverters_4 check_inverters_5 check_inverters_6 check_inverters_8
 
 default: $(EXES)
 
@@ -35,7 +35,7 @@ MODS := error
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Inverters
-MODS := SAP_precondition linear_algebra cg_mshift MINRES_mshift MINRES g5QMR_mshift eva jacobi cg_mshift_flt
+MODS := DDalphaAMG FGMRES GMRES SAP_precondition linear_algebra cg_mshift MINRES_mshift MINRES g5QMR_mshift eva jacobi cg_mshift_flt
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Observables

@@ -11,7 +11,7 @@
 void SAP_prec(int nu, inverter_ptr inv, mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out)
 {
 
-   // lprintf("SAP_prec",40,"spinor_field_sqnorm_f(in)=%e, spinor_field_sqnorm_f(out)=%e\n",spinor_field_sqnorm_f(in),spinor_field_sqnorm_f(out));
+    //lprintf("SAP_prec",0,"spinor_field_sqnorm_f(in)=%e, spinor_field_sqnorm_f(out)=%e\n",spinor_field_sqnorm_f(in),spinor_field_sqnorm_f(out));
 	spinor_field *res, *tmp_spinor, *tmp_spinor2;
 	res=alloc_spinor_field_f(3,in->type);
 	tmp_spinor=res+1;
@@ -20,13 +20,14 @@ void SAP_prec(int nu, inverter_ptr inv, mshift_par *par, spinor_operator M, spin
 	for (;nu>0;nu--)
 	{
 		// compute/update res (This is a bit waste of time in the first round)
-		M(tmp_spinor,out);
+		M.dbl(tmp_spinor,out);
 		spinor_field_sub_f(res,in,tmp_spinor);
 		
 	    spinor_field_zero_f(tmp_spinor);	// Temporary 
 		empty_buffers(tmp_spinor);
 
-
+    
+    
 		// Invert black
 		if (out->type==&glattice){
 			res->type=&glat_black;			
@@ -50,7 +51,7 @@ void SAP_prec(int nu, inverter_ptr inv, mshift_par *par, spinor_operator M, spin
 		
 		
 		// Update res
-		M(tmp_spinor2,tmp_spinor);
+		M.dbl(tmp_spinor2,tmp_spinor);
 		spinor_field_sub_assign_f(res,tmp_spinor2);
 		// Update solution
 		spinor_field_add_assign_f(out,tmp_spinor);

@@ -82,7 +82,7 @@ static int MINRES_mshift_core(short int *flags,mshift_par *par, spinor_operator 
 
   if (par->n==1){ /* non multishift case */
     spinor_field_copy_f(p2, in);
-    M(p1,&out[0]);
+    M.dbl(p1,&out[0]);
     spinor_field_mul_add_assign_f(p1,-par->shift[0],&out[0]);
     ++cgiter;
     spinor_field_sub_assign_f(p2,p1);
@@ -109,7 +109,7 @@ static int MINRES_mshift_core(short int *flags,mshift_par *par, spinor_operator 
   do {
     ++cgiter;
 
-    M(Mp,p2);
+    M.dbl(Mp,p2);
     spinor_field_mul_add_assign_f(Mp,-par->shift[0],p2);
 
     /* compute alpha */
@@ -174,7 +174,7 @@ static int MINRES_mshift_core(short int *flags,mshift_par *par, spinor_operator 
   /* test results */
   for(i=0;i<par->n;++i){
     double norm;
-    M(Mp,&out[i]);
+    M.dbl(Mp,&out[i]);
     ++cgiter;
     spinor_field_mul_add_assign_f(Mp,-par->shift[i],&out[i]);
     spinor_field_sub_f(Mp,Mp,in);

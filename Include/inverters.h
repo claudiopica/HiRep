@@ -10,10 +10,25 @@
 #include "complex.h"
 #include "spinor_field.h"
 
-
-typedef void (*spinor_operator)(spinor_field *out, spinor_field *in);
+typedef void (*spinor_operator_dbl)(spinor_field *out, spinor_field *in);
 typedef void (*spinor_operator_flt)(spinor_field_flt *out, spinor_field_flt *in);
 typedef void (*spinor_operator_m)(spinor_field *out, spinor_field *in, double m);
+
+typedef struct _spinor_operator {
+  spinor_operator_dbl dbl;
+  spinor_operator_flt flt;
+} spinor_operator;
+
+typedef struct _inverter_par {
+  double err2; /* maximum error on the solutions */
+  int max_iter; /* maximum number of iterations: 0 => infinity */
+  double err2_flt; /* maximum error on the solutions */
+  int max_iter_flt; /* maximum number of iterations: 0 => infinity */
+  int kry_dim; /* Size of krylov subspace */
+  int kry_dim_flex; /* Size of krylov subspace */
+  int n; /* number of shifts */
+  double *shift; /* array of shifts */
+} inverter_par;
 
 typedef struct _mshift_par {
    int n; /* number of shifts */
@@ -70,6 +85,15 @@ int MINRES_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_f
 
 int MINRES(MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field *out, spinor_field *trial);
 int MINRES_flt(MINRES_par *par, spinor_operator_flt M, spinor_field_flt *in, spinor_field_flt *out, spinor_field_flt *trial);
+
+
+int GMRES(inverter_par *par, spinor_operator M, spinor_field *in, spinor_field *out, spinor_field *trial);
+int GMRES_flt(inverter_par *par, spinor_operator M, spinor_field_flt *in, spinor_field_flt *out, spinor_field_flt *trial);
+
+int FGMRES(inverter_par *par, spinor_operator M, spinor_field *in, spinor_field *out, spinor_field *trial, spinor_operator precon);
+
+void DDalphaAMG(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
+
 
 int eva(int nev,int nevt,int init,int kmax,
                int imax,double ubnd,double omega1,double omega2,

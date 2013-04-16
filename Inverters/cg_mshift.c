@@ -57,7 +57,7 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
   innorm2=spinor_field_sqnorm_f(in);
   if(par->n==1) { /* non multishift case */
     /* use out[0] as initial guess */
-    M(Mk,&out[0]);
+    M.dbl(Mk,&out[0]);
     ++cgiter;
     spinor_field_mul_add_assign_f(Mk,-par->shift[0],&out[0]);
     spinor_field_sub_f(r,in,Mk);
@@ -76,7 +76,7 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
 
   /* cg recursion */
   do {
-    M(Mk,k);
+    M.dbl(Mk,k);
     alpha = spinor_field_prod_re_f(k,Mk);
     oldomega = omega;
     omega = - delta/alpha;
@@ -121,7 +121,7 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
   /* test results */
   for(i=0;i<par->n;++i){
     double norm;
-    M(Mk,&out[i]);
+    M.dbl(Mk,&out[i]);
     ++cgiter;
     spinor_field_mul_add_assign_f(Mk,-par->shift[i],&out[i]);
     spinor_field_sub_f(Mk,Mk,in);
@@ -144,6 +144,7 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
 }
 
 int cg_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out){ 
+
   #ifdef TIMING
   struct timeval start, end;
   struct timeval etime;

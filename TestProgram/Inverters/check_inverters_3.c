@@ -140,7 +140,7 @@ int main(int argc,char *argv[])
   lprintf("QMR TEST",0,"Testing g5QMR multishift\n");
   lprintf("QMR TEST",0,"------------------------\n");
 
-  cgiters=g5QMR_mshift(&par, &D, s1, res);
+  cgiters=g5QMR_mshift(&par, (spinor_operator){&D,NULL}, s1, res);
   lprintf("QMR TEST",0,"Converged in %d iterations\n",cgiters);
 
   for(i=0;i<par.n;++i){
