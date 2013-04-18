@@ -349,21 +349,36 @@ void _FUNC(spinor_field_lc3)(_REAL c1, _REAL c2, _SPINOR_FIELD_TYPE *s1, _SPINOR
 
 
 // Aggregate functions for the DDalphaAMG method
-/* <s1,s2> 
+// <s1,s2>
 void _FUNC(spinor_field_prod_aggregate)(complex *res1, complex *res2, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
    _DECLARE_INT_ITERATOR(i);
 	_SPINOR_TYPE *_SPINOR_PTR(s1), *_SPINOR_PTR(s2);
 
-   _complex_0(res1);
-   _complex_0(res2);
+   _complex_0(*res1);
+   _complex_0(*res2);
    
    _TWO_SPINORS_FOR(s1,s2,i) {
-		_spinor_upper_prod_assign_f(res1,*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
-		_spinor_lower_prod_assign_f(res2,*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
+		_spinor_upper_prod_assign_f(*res1,*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
+		_spinor_lower_prod_assign_f(*res2,*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
    }
 
 }
-*/
+// <s1,s1> 
+void _FUNC(spinor_field_sqnorm_aggregate)(double *res1, double *res2, _SPINOR_FIELD_TYPE *s1)
+{
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(s1);
+
+   (*res1)=0.0;
+   (*res2)=0.0;
+   
+   _ONE_SPINOR_FOR(s1,i) {
+		_spinor_upper_prod_re_assign_f(*res1,*_SPINOR_PTR(s1),*_SPINOR_PTR(s1));
+		_spinor_lower_prod_re_assign_f(*res2,*_SPINOR_PTR(s1),*_SPINOR_PTR(s1));
+   }
+
+}
+
 
 
