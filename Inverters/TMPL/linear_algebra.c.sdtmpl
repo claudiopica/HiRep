@@ -379,6 +379,37 @@ void _FUNC(spinor_field_sqnorm_aggregate)(double *res1, double *res2, _SPINOR_FI
    }
 
 }
+/* s1=c*s2 c complex */
+void _FUNC(spinor_field_mulc_aggregate)(_SPINOR_FIELD_TYPE *s1, complex c_upper, complex c_lower, _SPINOR_FIELD_TYPE *s2)
+{
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(s1), *_SPINOR_PTR(s2);
+   
+   _TWO_SPINORS_FOR(s1,s2,i) {
+      _spinor_upper_mulc_f(*_SPINOR_PTR(s1),c_upper,*_SPINOR_PTR(s2));
+      _spinor_lower_mulc_f(*_SPINOR_PTR(s1),c_lower,*_SPINOR_PTR(s2));
+   }
+}
+/* s1=r*s2 */
+void _FUNC(spinor_field_mul_aggregate)(_SPINOR_FIELD_TYPE *s1, double r_upper, double r_lower, _SPINOR_FIELD_TYPE *s2)
+{
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(s1), *_SPINOR_PTR(s2);
+   
+   _TWO_SPINORS_FOR(s1,s2,i) {
+      _spinor_upper_mul_f(*_SPINOR_PTR(s1),r_upper,*_SPINOR_PTR(s2));
+      _spinor_lower_mul_f(*_SPINOR_PTR(s1),r_lower,*_SPINOR_PTR(s2));
+   }
+}
+/* s1+=c*s2 c complex */
+void _FUNC(spinor_field_mulc_add_assign_aggregate)(_SPINOR_FIELD_TYPE *s1, complex c_upper, complex c_lower, _SPINOR_FIELD_TYPE *s2)
+{
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(s1), *_SPINOR_PTR(s2);
 
-
-
+   
+   _TWO_SPINORS_FOR(s1,s2,i) {
+      _spinor_upper_mulc_add_assign_f(*_SPINOR_PTR(s1),c_upper,*_SPINOR_PTR(s2));
+      _spinor_lower_mulc_add_assign_f(*_SPINOR_PTR(s1),c_lower,*_SPINOR_PTR(s2));
+   }
+}

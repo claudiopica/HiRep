@@ -93,7 +93,7 @@ int GMRES_flt(inverter_par *par, spinor_operator M, spinor_field_flt *in, spinor
 int FGMRES(inverter_par *par, spinor_operator M, spinor_field *in, spinor_field *out, spinor_field *trial, spinor_operator precon);
 
 void DDalphaAMG(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
-
+void DDalphaAMG_setup(mshift_par *par, spinor_operator M, int N, int nu, int n_inv);
 
 int eva(int nev,int nevt,int init,int kmax,
                int imax,double ubnd,double omega1,double omega2,

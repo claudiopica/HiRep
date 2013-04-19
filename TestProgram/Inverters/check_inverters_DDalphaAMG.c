@@ -123,7 +123,7 @@ int main(int argc,char *argv[])
    setup_process(&argc,&argv);
    
    /* logger setup */
-  logger_setlevel(0,101); /* log all */
+  logger_setlevel(0,10); /* log all */
   if (PID!=0) { 
     logger_disable();}
   else{
@@ -154,8 +154,7 @@ int main(int argc,char *argv[])
    geometry_mpi_eo();
    /* test_geometry_mpi_eo(); */
     init_geometry_SAP();
-   
-   
+  
    lprintf("MAIN",100,"Logger test 0.1\n");
    
    u_gauge=alloc_gfield(&glattice);
@@ -199,6 +198,11 @@ int main(int argc,char *argv[])
 
    
    gaussian_spinor_field(s1);
+   
+   // --------------------------------------  Debugging: Does not do anything for this program
+       DDalphaAMG_setup(&par_precon, Hop, 5, 3, 3);
+ 
+   
    
    /* TEST FGMRES */
 

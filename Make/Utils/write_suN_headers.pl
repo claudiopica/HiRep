@@ -356,9 +356,17 @@ write_spinor_zero();
 write_spinor_g5();
 write_spinor_minus();
 write_spinor_mul();
+write_upper_spinor_mul();
+write_lower_spinor_mul();
 write_spinor_mulc();
 write_spinor_mulc_add_assign();
 write_spinor_mul_add_assign();
+write_upper_spinor_mulc();
+write_upper_spinor_mulc_add_assign();
+write_upper_spinor_mul_add_assign();
+write_lower_spinor_mulc();
+write_lower_spinor_mulc_add_assign();
+write_lower_spinor_mul_add_assign();
 write_spinor_lc();
 write_spinor_lc_add_assign();
 write_spinor_clc();
@@ -2793,9 +2801,74 @@ sub write_lower_spinor_prod_assign {
     if($k==3) {print"; \\\n   } while(0) \n\n";} else {print "; \\\n"}
   }
 }
+sub write_upper_spinor_mulc {
+  print "/*  r=z*s (z complex; r,s spinors) */\n";
+  print "#define _spinor_upper_mulc_${suff}(r,z,s) \\\n";
+  for (my $k=0; $k<2; $k++){
+    print "  _vector_mulc_${suff}((r).$cname\[$k\],z,(s).$cname\[$k\])";
+    if($k==1) {print"\n\n";} else {print "; \\\n"}
+  }
+}
 
+sub write_upper_spinor_mulc_add_assign {
+  print "/*  r+=z*s (z complex; r,s spinors) */\n";
+  print "#define _spinor_upper_mulc_add_assign_${suff}(r,z,s) \\\n";
+  for (my $k=0; $k<2; $k++){
+    print "  _vector_mulc_add_assign_${suff}((r).$cname\[$k\],(z),(s).$cname\[$k\])";
+    if($k==1) {print"\n\n";} else {print "; \\\n"}
+  }
+}
 
+sub write_upper_spinor_mul_add_assign {
+  print "/*  r+=k*s (k real; r,s spinors) */\n";
+  print "#define _spinor_upper_mul_add_assign_${suff}(r,k,s) \\\n";
+  for (my $k=0; $k<2; $k++){
+    print "  _vector_mul_add_assign_${suff}((r).$cname\[$k\],(k),(s).$cname\[$k\])";
+    if($k==1) {print"\n\n";} else {print "; \\\n"}
+  }
+}
+sub write_lower_spinor_mulc {
+  print "/*  r=z*s (z complex; r,s spinors) */\n";
+  print "#define _spinor_lower_mulc_${suff}(r,z,s) \\\n";
+  for (my $k=2; $k<4; $k++){
+    print "  _vector_mulc_${suff}((r).$cname\[$k\],z,(s).$cname\[$k\])";
+    if($k==3) {print"\n\n";} else {print "; \\\n"}
+  }
+}
 
+sub write_lower_spinor_mulc_add_assign {
+  print "/*  r+=z*s (z complex; r,s spinors) */\n";
+  print "#define _spinor_lower_mulc_add_assign_${suff}(r,z,s) \\\n";
+  for (my $k=2; $k<4; $k++){
+    print "  _vector_mulc_add_assign_${suff}((r).$cname\[$k\],(z),(s).$cname\[$k\])";
+    if($k==3) {print"\n\n";} else {print "; \\\n"}
+  }
+}
+
+sub write_lower_spinor_mul_add_assign {
+  print "/*  r+=k*s (k real; r,s spinors) */\n";
+  print "#define _spinor_lower_mul_add_assign_${suff}(r,k,s) \\\n";
+  for (my $k=2; $k<4; $k++){
+    print "  _vector_mul_add_assign_${suff}((r).$cname\[$k\],(k),(s).$cname\[$k\])";
+    if($k==3) {print"\n\n";} else {print "; \\\n"}
+  }
+}
+sub write_upper_spinor_mul {
+  print "/*  r=k*s (k real; r,s spinors) */\n";
+  print "#define _spinor_upper_mul_${suff}(r,k,s) \\\n";
+  for (my $k=0; $k<2; $k++){
+    print "  _vector_mul_${suff}((r).$cname\[$k\],k,(s).$cname\[$k\])";
+    if($k==1) {print"\n\n";} else {print "; \\\n"}
+  }
+}
+sub write_lower_spinor_mul {
+  print "/*  r=k*s (k real; r,s spinors) */\n";
+  print "#define _spinor_lower_mul_${suff}(r,k,s) \\\n";
+  for (my $k=2; $k<4; $k++){
+    print "  _vector_mul_${suff}((r).$cname\[$k\],k,(s).$cname\[$k\])";
+    if($k==3) {print"\n\n";} else {print "; \\\n"}
+  }
+}
 
 
 
