@@ -40,6 +40,13 @@ int parity = (COORD[0]+COORD[1]+COORD[2]+COORD[3])&1;
 	}	
 }
 
+void init_geometry_nocomm(){
+		copy_gd_no_comm(&glat_nocomm,&glattice);
+		copy_gd_no_comm(&glat_even_nocomm,&glat_even);
+		copy_gd_no_comm(&glat_odd_nocomm,&glat_odd);
+}
+
+
 void empty_buffers(spinor_field *s){
 	for(int i=0;i<s->type->nbuffers_spinor;++i){
 		memset(s->ptr + (s->type->rbuf_start[i]-s->type->master_shift),0,sizeof(suNf_spinor)*s->type->rbuf_len[i]);

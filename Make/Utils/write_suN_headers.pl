@@ -351,7 +351,7 @@ print <<END
 
 END
 ;
-#write_spinor_copy();
+write_spinor_copy();
 write_spinor_zero();
 write_spinor_g5();
 write_spinor_minus();
@@ -394,6 +394,9 @@ write_spinor_g5_prod_im();
 write_spinor_project();
 write_spinor_pminus();
 write_spinor_pplus();
+write_spinor_upper_projection();
+write_spinor_lower_projection();    
+    
     
     #GPU READ/WRITE Functions
     write_read_spinor_gpu();    
@@ -2805,7 +2808,7 @@ sub write_upper_spinor_mulc {
   print "/*  r=z*s (z complex; r,s spinors) */\n";
   print "#define _spinor_upper_mulc_${suff}(r,z,s) \\\n";
   for (my $k=0; $k<2; $k++){
-    print "  _vector_mulc_${suff}((r).$cname\[$k\],z,(s).$cname\[$k\])";
+    print "  _vector_mulc_${suff}((r).$cname\[$k\],(z),(s).$cname\[$k\])";
     if($k==1) {print"\n\n";} else {print "; \\\n"}
   }
 }
@@ -2831,7 +2834,7 @@ sub write_lower_spinor_mulc {
   print "/*  r=z*s (z complex; r,s spinors) */\n";
   print "#define _spinor_lower_mulc_${suff}(r,z,s) \\\n";
   for (my $k=2; $k<4; $k++){
-    print "  _vector_mulc_${suff}((r).$cname\[$k\],z,(s).$cname\[$k\])";
+    print "  _vector_mulc_${suff}((r).$cname\[$k\],(z),(s).$cname\[$k\])";
     if($k==3) {print"\n\n";} else {print "; \\\n"}
   }
 }
@@ -2869,7 +2872,6 @@ sub write_lower_spinor_mul {
     if($k==3) {print"\n\n";} else {print "; \\\n"}
   }
 }
-
 
 
 
@@ -2913,6 +2915,28 @@ sub write_lower_spinor_prod_re_assign {
     if($k==3) {print"; \\\n   } while(0) \n\n";} else {print "; \\\n"}
   }
 }
+
+sub write_spinor_upper_projection {
+  print "\n";
+  print "#define _spinor_upper_projection_${suff}(r,s) \\\n";
+  print "(r).$cname\[0\]=(s).$cname\[0\];\\\n";
+  print "(r).$cname\[1\]=(s).$cname\[1\];\\\n";
+  for (my $k=2; $k<4; $k++){
+    print "  _vector_zero_${suff}((r).$cname\[$k\])";
+    if($k==3) {print"\n\n";} else {print "; \\\n"}
+  }
+}
+sub write_spinor_lower_projection {
+  print "\n";
+  print "#define _spinor_lower_projection_${suff}(r,s) \\\n";
+  print "(r).$cname\[2\]=(s).$cname\[2\];\\\n";
+  print "(r).$cname\[3\]=(s).$cname\[3\];\\\n";
+  for (my $k=0; $k<2; $k++){
+    print "  _vector_zero_${suff}((r).$cname\[$k\])";
+    if($k==1) {print"\n\n";} else {print "; \\\n"}
+  }
+}
+
 
 
 

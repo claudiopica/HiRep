@@ -413,3 +413,14 @@ void _FUNC(spinor_field_mulc_add_assign_aggregate)(_SPINOR_FIELD_TYPE *s1, compl
       _spinor_lower_mulc_add_assign_f(*_SPINOR_PTR(s1),c_lower,*_SPINOR_PTR(s2));
    }
 }
+/* Special operation for constructing til coarse dirac operator */
+void _FUNC(spinor_field_split_aggregate)(_SPINOR_FIELD_TYPE *s1_upper,_SPINOR_FIELD_TYPE *s1_lower, _SPINOR_FIELD_TYPE *s2)
+{
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(s1_upper),  *_SPINOR_PTR(s1_lower), *_SPINOR_PTR(s2);
+   
+   _THREE_SPINORS_FOR(s1_upper,s1_lower,s2,i) {
+      _spinor_upper_projection_f(*_SPINOR_PTR(s1_upper),*_SPINOR_PTR(s2));
+      _spinor_lower_projection_f(*_SPINOR_PTR(s1_lower),*_SPINOR_PTR(s2));
+   }
+}

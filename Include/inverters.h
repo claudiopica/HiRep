@@ -94,6 +94,9 @@ int FGMRES(inverter_par *par, spinor_operator M, spinor_field *in, spinor_field 
 
 void DDalphaAMG(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
 void DDalphaAMG_setup(mshift_par *par, spinor_operator M, int N, int nu, int n_inv);
+void spinor_field_to_course_spinor_field(spinor_field *big);
+void coarse_spinor_field_to_spinor_field(spinor_field *big);
+
 
 int eva(int nev,int nevt,int init,int kmax,
                int imax,double ubnd,double omega1,double omega2,
