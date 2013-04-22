@@ -148,4 +148,53 @@ void free_modenumber();
 double ModeNumber(double M2);
 
 
+typedef struct {
+  complex ***g1_ij, ***g2_ij, ***g3_ij, ***g4_ij, *g1, *g2, *g3, *g4, **M;
+
+  complex *l11, *l12, *l13;
+  complex *l21, *l22, *l23;
+  complex *l31, *l32, *l33;
+  complex *l41, *l42, *l43;
+
+  complex ***l11_ij, ***l12_ij, ***l13_ij;
+  complex ***l21_ij, ***l22_ij, ***l23_ij;
+  complex ***l31_ij, ***l32_ij, ***l33_ij;
+} chisf_mem;
+
+chisf_mem *  init_rotated_corr_mem();
+
+void rotated_gXuup(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+void rotated_gXddp(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+void rotated_gXudp(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+void rotated_gXdup(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+void rotated_gvtuup(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+void rotated_gvtddp(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+void rotated_gvtdup(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+void rotated_gvtudp(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+void rotated_g1uup(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+void rotated_g1ddp(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+void rotated_g1udp(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+void rotated_g1dup(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+void rotated_lXuup(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+void rotated_lXddp(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+void rotated_lXdup(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+void rotated_lXudp(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+void rotated_gXuum(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+void rotated_gXddm(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+void rotated_gXudm(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+void rotated_gXdum(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+void rotated_gvtuum(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+void rotated_gvtddm(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+void rotated_gvtdum(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+void rotated_gvtudm(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+void rotated_g1uum(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+void rotated_g1ddm(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+void rotated_g1udm(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+void rotated_g1dum(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+void rotated_lXuum(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+void rotated_lXddm(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+void rotated_lXudm(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+void rotated_lXdum(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+
 #endif 
+
