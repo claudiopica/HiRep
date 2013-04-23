@@ -185,6 +185,11 @@ if (P==NULL){
 	// --------------- Gram-Schmidt orthogonalization complete
 	build_coarse_operator(M);
 	
+		// DEBUG START
+
+	// DEBUG END
+	
+	
 	} // eta
 	
 	free_spinor_field_f(v);
@@ -203,10 +208,21 @@ void DDalphaAMG(mshift_par *par, spinor_operator M, spinor_field *in, spinor_fie
 
 // (small) = P^H * (big)
 void spinor_field_to_course_spinor_field(spinor_field *big){
-	lprintf("DDalphaAMG",30,"spinor_field_to_course_spinor_field called.\n");
+	lprintf("DDalphaAMG",10,"spinor_field_to_course_spinor_field called.\n");
 	for(int i=0;i<NumVectors;i++){
 		spinor_field_prod_aggregate_f(&small_spinor[i],&small_spinor[i+NumVectors],&P[i],big);
 	}
+}
+// (big) = P * (small)
+void coarse_spinor_field_to_spinor_field(spinor_field *b){
+	lprintf("DDalphaAMG",10,"coarse_spinor_field_to_spinor_field called.\n");
+	
+	spinor_field_mulc_aggregate_f(b,small_result_spinor[0],small_result_spinor[NumVectors],&P[0]);
+
+	for(int i=0;i<NumVectors;i++){
+		spinor_field_mulc_add_assign_aggregate_f(b,small_result_spinor[i],small_result_spinor[i+NumVectors],&P[i]);
+	}
+
 }
 
 // (big) = P * (small)
@@ -220,34 +236,97 @@ void spinor_field_to_course_spinor_field(spinor_field *big){
 
 }*/
 // (small)=Dc (small)
-void coarse_spinor_operation(){
-	lprintf("DDalphaAMG",30,"coarse_spinor_operation called.\n");
-	
+void coarse_spinor_operation(complex *a, complex *b){
+	lprintf("DDalphaAMG",10,"coarse_spinor_operation called.\n");
+	if(a==NULL){
 	for(int i=0;i<2*NumVectors;i++){
 	_complex_0(small_result_spinor[i]);
 			for(int j=0;j<2*NumVectors;j++){
 				_complex_mul_assign(small_result_spinor[i],Dc[i*2*NumVectors+j],small_spinor[j]);
 			}
 	}
-
+	}else{
+	
+	for(int i=0;i<2*NumVectors;i++){
+	_complex_0(a[i]);
+			for(int j=0;j<2*NumVectors;j++){
+				_complex_mul_assign(a[i],Dc[i*2*NumVectors+j],b[j]);
+			}
+	}
+	}
 }
 void coarse_spinor_field_copy(complex *to, complex *from){
-	lprintf("DDalphaAMG",30,"coarse_spinor_field_copy called.\n");
-	
 	for(int i=0;i<2*NumVectors;i++){
 		to[i]=from[i];
 	}
-
 }
-
-
-void coarse_spinor_field_to_spinor_field(spinor_field *b){
-	lprintf("DDalphaAMG",30,"coarse_spinor_field_to_spinor_field called.\n");
-	
-	spinor_field_mulc_aggregate_f(b,small_result_spinor[0],small_result_spinor[NumVectors],&P[0]);
-
-	for(int i=0;i<NumVectors;i++){
-		spinor_field_mulc_add_assign_aggregate_f(b,small_result_spinor[i],small_result_spinor[i+NumVectors],&P[i]);
+void coarse_mulc_add_assign(complex *to,complex c, complex *from){
+	for(int i=0;i<2*NumVectors;i++){
+		_complex_mul_assign(to[i],c,from[i]);
 	}
-
 }
+void coarse_mulc_sub_assign(complex *to,complex c, complex *from){
+	complex tmp;
+	_complex_minus(tmp,c);
+	for(int i=0;i<2*NumVectors;i++){
+		_complex_mul_assign(to[i],tmp,from[i]);
+	}
+}
+void coarse_zero(complex *to){
+
+	for(int i=0;i<2*NumVectors;i++){
+		_complex_0(to[i]);
+	}
+}
+
+complex coarse_inner_product(complex *a,complex *b){
+	complex res;
+	_complex_0(res);
+	
+	for (int i=0;i<NumVectors;i++){
+		_complex_mul_assign(res,a[i],b[i]);
+	}
+	
+	return(res);
+}
+double coarse_sqnorm(complex *a){
+	double res=0;
+	
+	for (int i=0;i<NumVectors;i++){
+		res+=_complex_re(a[i])*_complex_re(a[i])+_complex_im(a[i])*_complex_im(a[i]);
+	}
+	
+	return(res);
+}
+
+void coarse_MINRES(complex *x,complex *b){
+	int iter=0;
+	complex alpha;
+	double tmp,residual;
+	static complex *r;
+	small_spinor=malloc(2*NumVectors*sizeof(r));
+	static complex *p;
+	small_spinor=malloc(2*NumVectors*sizeof(r));
+
+	coarse_spinor_field_copy(r,b); // line 1 (Saad p 165)
+	coarse_zero(x);
+	coarse_spinor_operation(p,r);
+	residual=coarse_sqnorm(r);
+	
+	while(residual>1e-16  ||  iter>500){	// line 2
+		alpha=coarse_inner_product(p,r);
+		tmp=coarse_sqnorm(p);
+		_complex_mulr(alpha,1/tmp,alpha); // line 3
+		coarse_mulc_add_assign(x,alpha,r); // line 4
+		coarse_mulc_sub_assign(r,alpha,p); // line 5
+		coarse_spinor_operation(p,r); // line 6
+	residual=coarse_sqnorm(r);
+	iter++;
+	}	// line 7
+	
+
+	free(r);r=NULL;
+	free(p);p=NULL;
+}
+
+
