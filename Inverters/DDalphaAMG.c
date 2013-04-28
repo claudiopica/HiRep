@@ -219,7 +219,7 @@ void coarse_spinor_field_to_spinor_field(spinor_field *b){
 	
 	spinor_field_mulc_aggregate_f(b,small_result_spinor[0],small_result_spinor[NumVectors],&P[0]);
 
-	for(int i=0;i<NumVectors;i++){
+	for(int i=1;i<NumVectors;i++){
 		spinor_field_mulc_add_assign_aggregate_f(b,small_result_spinor[i],small_result_spinor[i+NumVectors],&P[i]);
 	}
 
@@ -283,7 +283,7 @@ complex coarse_inner_product(complex *a,complex *b){
 	complex res;
 	_complex_0(res);
 	
-	for (int i=0;i<NumVectors;i++){
+	for (int i=0;i<2*NumVectors;i++){
 		_complex_mul_assign(res,a[i],b[i]);
 	}
 	
@@ -292,7 +292,7 @@ complex coarse_inner_product(complex *a,complex *b){
 double coarse_sqnorm(complex *a){
 	double res=0;
 	
-	for (int i=0;i<NumVectors;i++){
+	for (int i=0;i<2*NumVectors;i++){
 		res+=_complex_re(a[i])*_complex_re(a[i])+_complex_im(a[i])*_complex_im(a[i]);
 	}
 	
