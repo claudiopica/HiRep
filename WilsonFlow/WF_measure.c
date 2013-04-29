@@ -275,7 +275,7 @@ int main(int argc,char *argv[]) {
 
     lprintf("MAIN",0,"Configuration from %s\n", cnfg_filename);
     /* NESSUN CHECK SULLA CONSISTENZA CON I PARAMETRI DEFINITI !!! */
-    read_gauge_field(cnfg_filename);
+    read_gauge_field_nocheck(cnfg_filename);
 
     lprintf("TEST",0,"<p> %1.6f\n",avr_plaquette());
 
@@ -286,12 +286,31 @@ int main(int argc,char *argv[]) {
     double t=0.;
 
 #ifdef ROTATED_SF
-    double E[GLB_T];
-    double Esym[GLB_T];
+
+    double E[2*GLB_T];
+    double Esym[2*GLB_T];
+    double Eavg[2];
+    double Esymavg[2];
+    apply_BCs_on_fundamental_gauge_field();
+
     WF_E_T(E,u_gauge);
     WF_Esym_T(Esym,u_gauge);
-    for(j=0;j<GLB_T;j++)
-      lprintf("WILSONFLOW",0,"WF (ncnfg,T,t,E,t2*E,Esym,t2*Esym) = %d %d %e %e %e %e %e\n",i,j,t,E[j],t*t*E[j],Esym[j],t*t*Esym[j]);      
+    Eavg[0]=Eavg[1]=Esymavg[0]=Esymavg[1]=0.0;
+    for(j=1;j<GLB_T-1;j++){
+      lprintf("WILSONFLOW",0,"WF (ncnfg,T,t,Etime,Espace,Esymtime,Esymspace) = %d %d %e %e %e %e %e\n",i,j,t,E[2*j],E[2*j+1],Esym[2*j],Esym[2*j+1]);      
+
+      Eavg[0] += E[2*j];
+      Eavg[1] += E[2*j+1];
+      Esymavg[0] += Esym[2*j];
+      Esymavg[1] += Esym[2*j+1];
+    }
+
+    Eavg[0] /= GLB_T-2;
+    Eavg[1] /= GLB_T-3;
+    Esymavg[0] /= GLB_T-2;
+    Esymavg[1] /= GLB_T-3;
+    lprintf("WILSONFLOW",0,"WF avg (ncnfg,t,Etime,Espace,Esymtime,Esymspace,Pltime,Plspace) = %d %e %e %e %e %e %e %e\n",i,t,Eavg[0],Eavg[1],Esymavg[0],Esymavg[1],(NG-Eavg[0]),(NG-Eavg[1]));
+    
 #else
     double E=WF_E(u_gauge);
     double Esym=WF_Esym(u_gauge);
@@ -306,8 +325,23 @@ int main(int argc,char *argv[]) {
 #ifdef ROTATED_SF
       WF_E_T(E,u_gauge);
       WF_Esym_T(Esym,u_gauge);
-      for(j=0;j<GLB_T;j++)
-	lprintf("WILSONFLOW",0,"WF (ncnfg,T,t,E,t2*E,Esym,t2*Esym) = %d %d %e %e %e %e %e\n",i,j,t,E[j],t*t*E[j],Esym[j],t*t*Esym[j]);      
+      Eavg[0]=Eavg[1]=Esymavg[0]=Esymavg[1]=0.0;
+      for(j=1;j<GLB_T-1;j++){
+	lprintf("WILSONFLOW",0,"WF (ncnfg,T,t,Etime,Espace,Esymtime,Esymspace) = %d %d %e %e %e %e %e\n",i,j,t,E[2*j],E[2*j+1],Esym[2*j],Esym[2*j+1]);
+	Eavg[0] += E[2*j];
+	Eavg[1] += E[2*j+1];
+	Esymavg[0] += Esym[2*j];
+	Esymavg[1] += Esym[2*j+1];
+      }
+
+      Eavg[0] /= GLB_T-2;
+      Eavg[1] /= GLB_T-3;
+      Esymavg[0] /= GLB_T-2;
+      Esymavg[1] /= GLB_T-3;
+
+      lprintf("WILSONFLOW",0,"WF avg (ncnfg,t,Etime,Espace,Esymtime,Esymspace,Pltime,Plspace) = %d %e %e %e %e %e %e %e\n",i,t,Eavg[0],Eavg[1],Esymavg[0],Esymavg[1],(NG-Eavg[0]),(NG-Eavg[1]));
+
+    
 #else
       E=WF_E(u_gauge);
       Esym=WF_Esym(u_gauge);

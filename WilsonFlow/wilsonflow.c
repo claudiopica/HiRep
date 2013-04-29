@@ -124,7 +124,6 @@ static void WF_Exp_check(suNg *u, suNg *X) {
 }
 #endif
 
-
 #if NG==2
 
 /*
@@ -167,90 +166,109 @@ static void WF_Exp(suNg *u, suNg *X) {
 #elif NG==3
 
 static void WF_Exp(suNg *u, suNg *X) {
-  suNg X2;
-  complex c[3], s[3], tmp;
-  double alpha, beta;
-  double norm, error;
-  int n;
+  suNg Xk, tmp;
+  _suNg_unit(*u);
+  _suNg_unit(Xk);
   
-  
-/* X2 = X.X */
-  _suNg_times_suNg(X2,*X,*X);
-  
-/* alpha = Im det(X) */
-  #define _X_(a,b) (X->c[a+3*b])
-  #define ImProd(a,b,c) (a.re*(b.re*c.im+b.im*c.re)+a.im*(b.re*c.re-b.im*c.im))
-  alpha=
-    +ImProd(_X_(0,0),_X_(1,1),_X_(2,2))
-    +ImProd(_X_(0,1),_X_(1,2),_X_(2,0))
-    +ImProd(_X_(0,2),_X_(1,0),_X_(2,1))
-    -ImProd(_X_(0,2),_X_(1,1),_X_(2,0))
-    -ImProd(_X_(0,1),_X_(1,0),_X_(2,2))
-    -ImProd(_X_(0,0),_X_(1,2),_X_(2,1));
-  #undef _X_
-  #undef ImProd
-  
-/* beta = tr (X2) / 2 */
-/* norm = sqrt( |tr (X2)| ) */
-  #define _X2_(a,b) (X2.c[a+3*b])
-  beta=(_X2_(0,0).re+_X2_(1,1).re+_X2_(2,2).re)/2.;
-  norm=sqrt(-_X2_(0,0).re-_X2_(1,1).re-_X2_(2,2).re);
-  #undef _X2_
-  
-  s[0].re = 1.;          s[0].im = alpha/6.;
-  s[1].re = 1.+beta/6.;  s[1].im = 0.;
-  s[2].re = .5;          s[2].im = 0.;
-  
-  n=3;
-  c[0].re = 0.;          c[0].im = alpha/6.;
-  c[1].re = beta/6.;     c[1].im = 0.;
-  c[2].re = 0.;          c[2].im = 0.;
-  
-  /* error = |X|^{n+1}/(n+1)! exp(|X|) */  
-  error= exp(norm)*norm*norm*norm*norm/24.;
-#error The error must be rechecked!!!
-
-  /*
-  c[0][n] = i*c[2][n-1]*alpha/n
-  c[1][n] = (c[0][n-1]+c[2][n-1]*beta)/n
-  c[2][n] = c[1][n-1]/n
-  */
+  int k=1;
+  double error;
   while(1) {
-    n++;
-    tmp=c[1];
-    c[1].re=(c[0].re+c[2].re*beta)/n;
-    c[1].im=(c[0].im+c[2].im*beta)/n;
-    c[0].re=-c[2].im*alpha/n;
-    c[0].im=c[2].re*alpha/n;
-    c[2].re=tmp.re/n;
-    c[2].im=tmp.im/n;
-    
-    s[0].re+=c[0].re; s[0].im+=c[0].im;
-    s[1].re+=c[1].re; s[1].im+=c[1].im;
-    s[2].re+=c[2].re; s[2].im+=c[2].im;
+    _suNg_times_suNg(tmp,Xk,*X);
+    _suNg_mul(Xk,1./k,tmp);
+    k++;
+    _suNg_add_assign(*u,Xk);    
 
-    error *= norm/(n+1);
-    if(error < 1.e-20) break;
+    _suNg_sqnorm(error,Xk);
+    if(error<1e-28) break;
   }
-  
-  _suNg_zero(*u);
-  u->c[0].re=s[0].re; u->c[0].im=s[0].im;
-  u->c[4].re=s[0].re; u->c[4].im=s[0].im;
-  u->c[8].re=s[0].re; u->c[8].im=s[0].im;
-  for(int i=0; i<9; i++) {
-    _complex_mul_assign(u->c[i],s[1],X->c[i]);
-    _complex_mul_assign(u->c[i],s[2],X2.c[i]);
-  }
-  
-#ifdef EXP_CHECK
-  suNg v;
-  WF_Exp_check(&v,X);
-  _suNg_sub_assign(v,*u);
-  _suNg_sqnorm(error,v);
-  lprintf("WILSONFLOW",0,"WF EXP CHECK %e\n",sqrt(error));
-#endif
   
 }
+
+/* static void WF_Exp(suNg *u, suNg *X) { */
+/*   suNg X2; */
+/*   complex c[3], s[3], tmp; */
+/*   double alpha, beta; */
+/*   double norm, error; */
+/*   int n; */
+  
+  
+/* /\* X2 = X.X *\/ */
+/*   _suNg_times_suNg(X2,*X,*X); */
+  
+/* /\* alpha = Im det(X) *\/ */
+/*   #define _X_(a,b) (X->c[a+3*b]) */
+/*   #define ImProd(a,b,c) (a.re*(b.re*c.im+b.im*c.re)+a.im*(b.re*c.re-b.im*c.im)) */
+/*   alpha= */
+/*     +ImProd(_X_(0,0),_X_(1,1),_X_(2,2)) */
+/*     +ImProd(_X_(0,1),_X_(1,2),_X_(2,0)) */
+/*     +ImProd(_X_(0,2),_X_(1,0),_X_(2,1)) */
+/*     -ImProd(_X_(0,2),_X_(1,1),_X_(2,0)) */
+/*     -ImProd(_X_(0,1),_X_(1,0),_X_(2,2)) */
+/*     -ImProd(_X_(0,0),_X_(1,2),_X_(2,1)); */
+/*   #undef _X_ */
+/*   #undef ImProd */
+  
+/* /\* beta = tr (X2) / 2 *\/ */
+/* /\* norm = sqrt( |tr (X2)| ) *\/ */
+/*   #define _X2_(a,b) (X2.c[a+3*b]) */
+/*   beta=(_X2_(0,0).re+_X2_(1,1).re+_X2_(2,2).re)/2.; */
+/*   norm=sqrt(-_X2_(0,0).re-_X2_(1,1).re-_X2_(2,2).re); */
+/*   #undef _X2_ */
+  
+/*   s[0].re = 1.;          s[0].im = alpha/6.; */
+/*   s[1].re = 1.+beta/6.;  s[1].im = 0.; */
+/*   s[2].re = .5;          s[2].im = 0.; */
+  
+/*   n=3; */
+/*   c[0].re = 0.;          c[0].im = alpha/6.; */
+/*   c[1].re = beta/6.;     c[1].im = 0.; */
+/*   c[2].re = 0.;          c[2].im = 0.; */
+  
+/*   /\* error = |X|^{n+1}/(n+1)! exp(|X|) *\/   */
+/*   error= exp(norm)*norm*norm*norm*norm/24.; */
+/* #error The error must be rechecked!!! */
+
+/*   /\* */
+/*   c[0][n] = i*c[2][n-1]*alpha/n */
+/*   c[1][n] = (c[0][n-1]+c[2][n-1]*beta)/n */
+/*   c[2][n] = c[1][n-1]/n */
+/*   *\/ */
+/*   while(1) { */
+/*     n++; */
+/*     tmp=c[1]; */
+/*     c[1].re=(c[0].re+c[2].re*beta)/n; */
+/*     c[1].im=(c[0].im+c[2].im*beta)/n; */
+/*     c[0].re=-c[2].im*alpha/n; */
+/*     c[0].im=c[2].re*alpha/n; */
+/*     c[2].re=tmp.re/n; */
+/*     c[2].im=tmp.im/n; */
+    
+/*     s[0].re+=c[0].re; s[0].im+=c[0].im; */
+/*     s[1].re+=c[1].re; s[1].im+=c[1].im; */
+/*     s[2].re+=c[2].re; s[2].im+=c[2].im; */
+
+/*     error *= norm/(n+1); */
+/*     if(error < 1.e-20) break; */
+/*   } */
+  
+/*   _suNg_zero(*u); */
+/*   u->c[0].re=s[0].re; u->c[0].im=s[0].im; */
+/*   u->c[4].re=s[0].re; u->c[4].im=s[0].im; */
+/*   u->c[8].re=s[0].re; u->c[8].im=s[0].im; */
+/*   for(int i=0; i<9; i++) { */
+/*     _complex_mul_assign(u->c[i],s[1],X->c[i]); */
+/*     _complex_mul_assign(u->c[i],s[2],X2.c[i]); */
+/*   } */
+  
+/* #ifdef EXP_CHECK */
+/*   suNg v; */
+/*   WF_Exp_check(&v,X); */
+/*   _suNg_sub_assign(v,*u); */
+/*   _suNg_sqnorm(error,v); */
+/*   lprintf("WILSONFLOW",0,"WF EXP CHECK %e\n",sqrt(error)); */
+/* #endif */
+  
+/* } */
   
 #else
 #error The exact exponential must be implemented for this value of NG
@@ -294,6 +312,10 @@ void WilsonFlow1(suNg_field* V, const double epsilon) {
   }
   start_gf_sendrecv(V);
   complete_gf_sendrecv(V);
+#ifdef ROTATED_SF
+  apply_BCs_on_fundamental_gauge_field();
+#endif
+
 }
 
 
@@ -309,7 +331,12 @@ void WilsonFlow3(suNg_field* V, const double epsilon) {
       _suNg_zero(*_4FIELD_AT(ws_gf,ix,mu));
     }
   }
-  
+
+  start_gf_sendrecv(V);
+  complete_gf_sendrecv(V);
+#ifdef ROTATED_SF
+  apply_BCs_on_fundamental_gauge_field();
+#endif
 
 
   Zeta(ws_gf,V,epsilon/4.);
@@ -326,6 +353,9 @@ void WilsonFlow3(suNg_field* V, const double epsilon) {
 
   start_gf_sendrecv(V);
   complete_gf_sendrecv(V);
+#ifdef ROTATED_SF
+  apply_BCs_on_fundamental_gauge_field();
+#endif
 
   Zeta(ws_gf,V,8.*epsilon/9.);
   
@@ -340,6 +370,10 @@ void WilsonFlow3(suNg_field* V, const double epsilon) {
 
   start_gf_sendrecv(V);
   complete_gf_sendrecv(V);
+#ifdef ROTATED_SF
+  apply_BCs_on_fundamental_gauge_field();
+#endif
+
   
   Zeta(ws_gf,V,3.*epsilon/4.);
   
@@ -353,6 +387,9 @@ void WilsonFlow3(suNg_field* V, const double epsilon) {
 
   start_gf_sendrecv(V);
   complete_gf_sendrecv(V);
+#ifdef ROTATED_SF
+  apply_BCs_on_fundamental_gauge_field();
+#endif
 
 }
 
@@ -377,9 +414,8 @@ static void WF_plaq(double *ret,suNg_field* V,int ix,int mu,int nu)
   _suNg_trace_re(*ret,w3);
 
 #ifdef PLAQ_WEIGHTS
-  if(plaq_weight!=NULL) {
+  if(plaq_weight!=NULL)
     *ret *= plaq_weight[ix*16+nu*4+mu];
-  }
 #endif
 
 
@@ -413,7 +449,7 @@ void WF_E_T(double* E, suNg_field* V) {
   int mu,nu;
   double p;
   
-  for(t=0;t<GLB_T;t++) E[t]=0.;
+  for(t=0;t<2*GLB_T;t++) E[t]=0.;
 
   for (t=0; t<T; t++){
     for (x=0; x<X; x++)
@@ -423,13 +459,15 @@ void WF_E_T(double* E, suNg_field* V) {
 	    for(nu=mu+1;nu<4;nu++) {
 	      ix=ipt(t,x,y,z);
 	      WF_plaq(&p,V, ix, mu, nu);
-	      E[(zerocoord[0]+t+GLB_T)%GLB_T] += NG-p;
+	      if(mu==0) E[2*((zerocoord[0]+t+GLB_T)%GLB_T)] += p;
+	      else E[2*((zerocoord[0]+t+GLB_T)%GLB_T)+1] += p;
 	    }
-    E[(zerocoord[0]+t+GLB_T)%GLB_T] *= 2./(GLB_X*GLB_Y*GLB_Z);
+    E[2*((zerocoord[0]+t+GLB_T)%GLB_T)] = NG - E[2*((zerocoord[0]+t+GLB_T)%GLB_T)]/(3.*GLB_X*GLB_Y*GLB_Z);
+    E[2*((zerocoord[0]+t+GLB_T)%GLB_T)+1] = NG - E[2*((zerocoord[0]+t+GLB_T)%GLB_T)+1]/(3*GLB_X*GLB_Y*GLB_Z);
   }
   
-  global_sum(E,GLB_T);
-
+  global_sum(E,2*GLB_T);
+  E[3]=0.0;
 }
 
 
@@ -553,7 +591,7 @@ void WF_Esym_T(double* E, suNg_field* V) {
   int mu,nu;
   double p;
   
-  for(t=0;t<GLB_T;t++) E[t]=0.;
+  for(t=0;t<2*GLB_T;t++) E[t]=0.;
 
   for (t=0; t<T; t++){
     for (x=0; x<X; x++)
@@ -561,11 +599,14 @@ void WF_Esym_T(double* E, suNg_field* V) {
 	for (z=0; z<Z; z++)
 	  for(mu=0;mu<4;mu++)
 	    for(nu=mu+1;nu<4;nu++) {
+
 	      ix=ipt(t,x,y,z);
 	      WF_cplaq_sym(&p,V, ix, mu, nu);
-	      E[(zerocoord[0]+t+GLB_T)%GLB_T] += p;
+	      if(mu==0) E[2*((zerocoord[0]+t+GLB_T)%GLB_T)] += p;
+	      else E[2*((zerocoord[0]+t+GLB_T)%GLB_T)+1] += p;
 	    }
-    E[(zerocoord[0]+t+GLB_T)%GLB_T] *= 1./(64.*(GLB_X*GLB_Y*GLB_Z));
+    E[2*((zerocoord[0]+t+GLB_T)%GLB_T)] *= 1./(64.*6*GLB_X*GLB_Y*GLB_Z);
+    E[2*((zerocoord[0]+t+GLB_T)%GLB_T)+1] *= 1./(64.*6*GLB_X*GLB_Y*GLB_Z);
   }
   
   global_sum(E,GLB_T);
