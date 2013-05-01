@@ -35,7 +35,7 @@ MODS := error
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Converter
-MODS := archive_eolexi archive_henty archive_more_mpieo archive_ascii archive_su2quat
+MODS := archive_eolexi archive_milc archive_more_mpieo archive_ascii archive_su2quat
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 COMMON_OBJS = $(MOD_OBJS)

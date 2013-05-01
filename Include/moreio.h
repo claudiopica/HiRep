@@ -19,7 +19,7 @@ void write_gauge_field_eolexi_BE(char filename[]);
 void read_gauge_field_eolexi_LE(char filename[]);
 void write_gauge_field_eolexi_LE(char filename[]);
 
-void read_gauge_field_henty(char filename[]);
+void read_gauge_field_milc(char filename[]);
 void read_gauge_field_ascii(char filename[]);
 
 void read_gauge_field_su2q(char filename[]);
