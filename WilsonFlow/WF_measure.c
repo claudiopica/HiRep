@@ -27,6 +27,7 @@
 #include "representation.h"
 #include "utils.h"
 #include "logger.h"
+#include "random.h"
 #include "wilsonflow.h"
 
 #include "cinfo.c"
@@ -43,6 +44,7 @@ typedef struct _input_WF {
   int nmeas;
   int nint;
   double SF_ct;
+  double beta;
 
   /* for the reading function */
   input_record_t read[7];
@@ -52,6 +54,7 @@ typedef struct _input_WF {
 #define init_input_WF(varname) \
 { \
   .read={\
+    {"WF beta for SF coupling", "beta = %lf", DOUBLE_T, &((varname).beta)},\
     {"WF max integration time", "WF:tmax = %lf", DOUBLE_T, &((varname).tmax)},\
     {"WF number of measures", "WF:nmeas = %d", DOUBLE_T, &((varname).nmeas)},\
     {"WF number of integration steps between measures", "WF:nint = %d", INT_T, &((varname).nint)},\
@@ -180,6 +183,7 @@ int main(int argc,char *argv[]) {
   char tmp[256];
   FILE* list;
   filename_t fpars;
+  double beta;
 
   /* setup process id and communications */
   read_cmdline(argc, argv);
@@ -210,7 +214,8 @@ int main(int argc,char *argv[]) {
 
   read_input(WF_var.read,input_filename);
   GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
- 
+  beta=WF_var.beta;
+
   error(fpars.type==UNKNOWN_CNFG,1,"WF_measure.c","Bad name for a configuration file");
   error(fpars.nc!=NG,1,"WF_measure.c","Bad NG");
 
@@ -270,9 +275,9 @@ int main(int argc,char *argv[]) {
 
     if(list!=NULL)
       if(fscanf(list,"%s",cnfg_filename)==0 || feof(list)) break;
-
+    
     i++;
-
+    
     lprintf("MAIN",0,"Configuration from %s\n", cnfg_filename);
     /* NESSUN CHECK SULLA CONSISTENZA CON I PARAMETRI DEFINITI !!! */
     read_gauge_field_nocheck(cnfg_filename);
@@ -293,6 +298,10 @@ int main(int argc,char *argv[]) {
     double Esymavg[2];
     apply_BCs_on_fundamental_gauge_field();
 
+    
+    lprintf("WILSONFLOW",0,"SF action is evaluated at beta=%e\n",beta);      
+
+
     WF_E_T(E,u_gauge);
     WF_Esym_T(Esym,u_gauge);
     Eavg[0]=Eavg[1]=Esymavg[0]=Esymavg[1]=0.0;
@@ -311,6 +320,7 @@ int main(int argc,char *argv[]) {
     Esymavg[1] /= GLB_T-3;
     lprintf("WILSONFLOW",0,"WF avg (ncnfg,t,Etime,Espace,Esymtime,Esymspace,Pltime,Plspace) = %d %e %e %e %e %e %e %e\n",i,t,Eavg[0],Eavg[1],Esymavg[0],Esymavg[1],(NG-Eavg[0]),(NG-Eavg[1]));
     
+    lprintf("WILSONFLOW",0,"(t,dS/deta)  %e %e\n", t,SF_action(beta));
 #else
     double E=WF_E(u_gauge);
     double Esym=WF_Esym(u_gauge);
@@ -341,7 +351,7 @@ int main(int argc,char *argv[]) {
 
       lprintf("WILSONFLOW",0,"WF avg (ncnfg,t,Etime,Espace,Esymtime,Esymspace,Pltime,Plspace) = %d %e %e %e %e %e %e %e\n",i,t,Eavg[0],Eavg[1],Esymavg[0],Esymavg[1],(NG-Eavg[0]),(NG-Eavg[1]));
 
-    
+      lprintf("WILSONFLOW",0,"(t,dS/deta)  %e %e\n", t,SF_action(beta));
 #else
       E=WF_E(u_gauge);
       Esym=WF_Esym(u_gauge);

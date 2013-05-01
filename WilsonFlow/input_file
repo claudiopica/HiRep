@@ -1,7 +1,7 @@
-GLB_T = 8
-GLB_X = 4
-GLB_Y = 4
-GLB_Z = 4
+GLB_T = 10
+GLB_X = 8
+GLB_Y = 8
+GLB_Z = 8
 NP_T = 1
 NP_X = 1
 NP_Y = 1
@@ -9,10 +9,11 @@ NP_Z = 1
 
 //level = 1  seed = 1
 level = 1  seed = 12345
+beta = 2.30
 
-WF:tmax = 10
-WF:nmeas = 10
-WF:nint = 100
+WF:tmax = 100
+WF:nmeas = 500
+WF:nint = 200
 
 // Schroedinger functional
 SF_ct = 1.0
