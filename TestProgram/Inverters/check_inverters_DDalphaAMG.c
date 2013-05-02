@@ -202,9 +202,9 @@ int main(int argc,char *argv[])
    
    // --------------------------------------  Debugging: Does not do anything for this program
        DDalphaAMG_setup(&par_precon, Hop, 5, 3, 3);
- 		spinor_field_to_course_spinor_field(s1);
- 		coarse_spinor_operation(NULL,NULL);
- 		coarse_spinor_field_to_spinor_field(s1);
+// 		spinor_field_to_course_spinor_field(s1);
+ //		coarse_spinor_operation(NULL,NULL);
+ 	//	coarse_spinor_field_to_spinor_field(s1);
    
    
    /* TEST FGMRES */

@@ -11,7 +11,7 @@
 void SAP_prec(int nu, inverter_ptr inv, mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out)
 {
 
-    //lprintf("SAP_prec",0,"spinor_field_sqnorm_f(in)=%e, spinor_field_sqnorm_f(out)=%e\n",spinor_field_sqnorm_f(in),spinor_field_sqnorm_f(out));
+//    lprintf("SAP_prec",0,"spinor_field_sqnorm_f(in)=%e, spinor_field_sqnorm_f(out)=%e\n",spinor_field_sqnorm_f(in),spinor_field_sqnorm_f(out));
 	spinor_field *res, *tmp_spinor, *tmp_spinor2;
 	res=alloc_spinor_field_f(3,in->type);
 	tmp_spinor=res+1;
@@ -30,18 +30,23 @@ void SAP_prec(int nu, inverter_ptr inv, mshift_par *par, spinor_operator M, spin
     
 		// Invert black
 		if (out->type==&glattice){
+				//lprintf("SAP_prec",0,"glattice BLACK\n");
 			res->type=&glat_black;			
   		  	tmp_spinor->type=&glat_black;
   		  	(void) inv(par, M, res, tmp_spinor);
+  		  	
+				//lprintf("SAP_prec",0,"glattice BLACK 2\n");
           	res->type=&glattice;
           	tmp_spinor->type=&glattice;
 		} else if (out->type==&glat_even){
+				//lprintf("SAP_prec",0,"glat_even BLACK\n");
 			res->type=&glat_even_black;			
   		  	tmp_spinor->type=&glat_even_black;
   		  	(void) inv(par, M, res, tmp_spinor);
           	res->type=&glat_even;
           	tmp_spinor->type=&glat_even;
 		} else {
+			//	lprintf("SAP_prec",0,"glat_odd BLACK\n");
 			res->type=&glat_odd_black;			
   		  	tmp_spinor->type=&glat_odd_black;
   		  	(void) inv(par, M, res, tmp_spinor);

@@ -22,6 +22,9 @@
  */
 static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out){
 
+
+ // lprintf("INVERTER",10,"CG_mshift_core called \n");
+
   spinor_field *k,*r,*Mk;
   spinor_field *p;
   double omega, oldomega, gamma;
@@ -40,6 +43,10 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
     _TWO_SPINORS_MATCHING(in,&out[i]);
 #endif
 
+
+
+ // lprintf("INVERTER",10,"CG_mshift_core check 1 \n");
+
   /* allocate spinors fields and aux real variables */
   p = alloc_spinor_field_f(3+par->n,in->type);
   k=p+par->n;
@@ -49,6 +56,10 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
   z1 = malloc(sizeof(*z1)*(par->n));
   z2 = malloc(sizeof(*z2)*(par->n));
   z3 = malloc(sizeof(*z3)*(par->n));
+
+
+
+ // lprintf("INVERTER",10,"CG_mshift_core check 2 \n");
 
   /* init recursion */
   cgiter = 0;
@@ -74,10 +85,17 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
     sflags[i]=1;
   }
 
+
+
+ // lprintf("INVERTER",10,"CG_mshift_core check 3 \n ");
+
   /* cg recursion */
   do {
     M.dbl(Mk,k);
+//    lprintf("INVERTER",10,"1 ");
     alpha = spinor_field_prod_re_f(k,Mk);
+    
+//    lprintf("INVERTER",10,"2 ");
     oldomega = omega;
     omega = - delta/alpha;
     for (i=0; i<(par->n); ++i) {
@@ -106,6 +124,8 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
       }
     }
 
+
+
     /* Uncomment this to print cg recursion parameters 
        lprintf("CGTEST",0,"[ %d ] alpha=%e\n",cgiter,alpha);
        lprintf("CGTEST",0,"[ %d ] omega=%e\n",cgiter,omega);
@@ -117,6 +137,10 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
 
     ++cgiter;
   } while ((par->max_iter==0 || cgiter<par->max_iter) && notconverged);
+
+
+
+//  lprintf("INVERTER",10,"\nCG_mshift_core check 4 \n");
 
   /* test results */
   for(i=0;i<par->n;++i){
@@ -134,7 +158,8 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
       lprintf("INVERTER",20,"CG inversion: err2 = %1.8e < %1.8e\n",norm,par->err2);
     }
   }
-
+//  lprintf("INVERTER",10,"CG_mshift_core check 5 \n");
+  
   /* free memory */
   free_spinor_field_f(p);
   free(z1); free(z2); free(z3);
@@ -144,6 +169,9 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
 }
 
 int cg_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out){ 
+
+
+//  lprintf("INVERTER",10,"CG_mshift called \n");
 
   #ifdef TIMING
   struct timeval start, end;
@@ -160,9 +188,13 @@ int cg_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field
   mshift_par par_save=*par;
   short int sflags[par->n];
 
+//  lprintf("INVERTER",10,"CG_mshift check 1 \n");
+  
   cgiter=cg_mshift_core(sflags, par, M, in, out);
   msiter=cgiter; /* save multishift iterations for logging */
-
+  
+//  lprintf("INVERTER",10,"CG_mshift check 2 \n");
+  
   par->n=1;
   for(i=0;i<par_save.n;++i) {
     int rep=0;
