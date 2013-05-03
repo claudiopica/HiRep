@@ -168,8 +168,8 @@ int main(int argc,char *argv[])
    lprintf("MAIN",0,"Generating a random gauge field... ");
    fflush(stdout);
 
-     random_u(u_gauge);
-//   read_gauge_field("conf");
+     //random_u(u_gauge);
+   read_gauge_field("run1_12x12x12x12nc3rSYMnf2b6.000000m1.150000n523");
 
    start_gf_sendrecv(u_gauge);
    complete_gf_sendrecv(u_gauge);
@@ -201,11 +201,7 @@ int main(int argc,char *argv[])
    gaussian_spinor_field(s1);
    
    // --------------------------------------  Debugging: Does not do anything for this program
-       DDalphaAMG_setup(&par_precon, Hop, 5, 3, 3);
-// 		spinor_field_to_course_spinor_field(s1);
- //		coarse_spinor_operation(NULL,NULL);
- 	//	coarse_spinor_field_to_spinor_field(s1);
-   
+       DDalphaAMG_setup(&par_precon, Hop, 10, 3, 3);
    
    /* TEST FGMRES */
 

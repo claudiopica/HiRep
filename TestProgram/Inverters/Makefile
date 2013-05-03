@@ -11,7 +11,7 @@ MODS := geometry_SAP geometry_init geometry_mpi_eo test_geometry_mpi communicati
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := IO
-MODS := logger read_input
+MODS := archive endian logger read_input
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Utils
@@ -39,7 +39,7 @@ MODS := DDalphaAMG FGMRES GMRES SAP_precondition linear_algebra cg_mshift MINRES
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Observables
-MODS := g5QMR_trunc trunc_hairpin avr_plaquette
+MODS := g5QMR_trunc avr_plaquette #trunc_hairpin avr_plaquette
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 COMMON_OBJS = $(MOD_OBJS)

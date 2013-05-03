@@ -8,6 +8,8 @@
 #include "global.h" 
 #include "error.h"
 #include "logger.h"
+#include "io.h"
+#include "moreio.h"
 #include "inverters.h" 
 #include "linear_algebra.h"
 #include "memory.h"
@@ -16,24 +18,17 @@
 
 static spinor_field *P=NULL;
 static int NumVectors=0;
-//static complex *small_spinor=NULL;
-//static complex *small_result_spinor=NULL;
 static complex *Dc=NULL;
 
 void DDalphaAMG_finalize(){
 	free_spinor_field_f(P);
-//	free(small_spinor);
 	free(Dc);
-//	free(small_result_spinor);
-	
-//	small_spinor=NULL;
-//	small_result_spinor=NULL;
 	Dc=NULL;
 	P=NULL;
 	NumVectors=0;
 }
 
-
+/*
 void print_matrix(){
 lprintf("DDalphaAMG",10,"\n Real part\n");
 	for(int i=0;i<2*NumVectors;i++){
@@ -51,7 +46,7 @@ lprintf("DDalphaAMG",10,"\n Imaginary part\n");
 		lprintf("DDalphaAMG",10,"\n");
 	}
 lprintf("DDalphaAMG",10,"\n");
-}
+}*/
 
 
 //Dc = P^H D P
@@ -117,8 +112,6 @@ void DDalphaAMG_setup(mshift_par *par, spinor_operator M, int N, int nu, int n_i
 												// P is to contain the locally orthonormalized near kernel vectors
 if (P==NULL){
 	P=alloc_spinor_field_f(N,&glattice);		// &glattice might be changed to &even	
-//	small_spinor = malloc(2*N*sizeof(*small_spinor));
-//	small_result_spinor = malloc(2*N*sizeof(*small_result_spinor));
 	Dc = malloc(4*N*N*sizeof(*Dc));
 	NumVectors=N;
     atexit(DDalphaAMG_finalize);
@@ -137,6 +130,7 @@ if (P==NULL){
 				SAP_prec(eta,&cg_mshift,par, M, &v[i], tmp);
 				spinor_field_copy_f(&v[i],tmp);
 			}
+			
 	}	// Line 6
 	
 	for (int eta=1;eta<=n_inv;eta++){
@@ -188,32 +182,16 @@ if (P==NULL){
 	
 	
 	if(eta<n_inv){ // This if is not in the paper, but I think it should be
-	lprintf("DDalphaAMG",10,"Improving near kernel\n");
-		for(int j=0;j<N;j++){ //  ------------- Line 9
+		lprintf("DDalphaAMG",10,"Improving near kernel\n");
+			for(int j=0;j<N;j++){ //  ------------- Line 9
 			
-//			lprintf("DDalphaAMG",10,"Improving near kernel check 1\n");
-			M.dbl(tmp,&v[j]);
-				// DEBUG START
-		//		r_upper[0].im=spinor_field_sqnorm_f(&v[j]);
-		//		lprintf("DDalphaAMG",10,"global sqnorm of v[%d] = %e).\n",j,r_upper[0].im);
-		//		r_upper[0].im=spinor_field_sqnorm_f(tmp);
-		//		lprintf("DDalphaAMG",10,"global sqnorm of tmp = %e).\n",r_upper[0].im);
-				// DEBUG END
+				M.dbl(tmp,&v[j]);
+				spinor_field_sub_f(tmp2,&v[j],tmp); // Tmp now contains the residua
+				DDalphaAMG(par,M,tmp,tmp2);
+				spinor_field_add_assign_f(&v[j],tmp); // --Line 10
 			
-//			lprintf("DDalphaAMG",10,"Improving near kernel check 2\n");
-			spinor_field_sub_f(tmp2,&v[j],tmp); // Tmp now contains the residual
-		//		r_upper[0].im=spinor_field_sqnorm_f(tmp);
-		//		lprintf("DDalphaAMG",10,"global sqnorm of tmp = %e).\n",r_upper[0].im);
-//			lprintf("DDalphaAMG",10,"Improving near kernel check 3\n");
-			DDalphaAMG(par,M,tmp,tmp2);
-//			lprintf("DDalphaAMG",10,"Improving near kernel check 4\n");
-			spinor_field_add_assign_f(&v[j],tmp); // --Line 10
-			
-		//	spinor_field_sqnorm_aggregate_f(&(r_upper[0].re) , &(r_lower[0].re), &v[j]); // normalize
-		//	spinor_field_mul_aggregate_f(&P[j],1./r_upper[0].re,1./r_lower[0].re,&v[j]); // --Line 10
-			
-		}  // j //-------------   Line 12
-	} // if eta 
+			}  // j //-------------   Line 12
+		} // if eta 
 	} // eta // ------------- Line 13
 	
 	free_spinor_field_f(v);v=NULL;
@@ -238,37 +216,23 @@ void DDalphaAMG(mshift_par *par, spinor_operator M, spinor_field *in, spinor_fie
 	rhs=malloc(2*NumVectors*sizeof(*rhs));
 	sol=malloc(2*NumVectors*sizeof(*sol));
 	
-//	coarse_zero(sol);
-	
 	spinor_field_to_course_spinor_field_new(rhs,in);
 	
 	
 	coarse_MINRES(sol,rhs);
 	
-//	for(int i=0;i<2*NumVectors;i++){lprintf("DDalphaAMG",10,"rhs[%d]= (%e , %e ) .\n",i,rhs[i].re,rhs[i].im);}	
-//	for(int i=0;i<2*NumVectors;i++){lprintf("DDalphaAMG",10,"sol[%d]= (%e , %e ) .\n",i,sol[i].re,sol[i].im);}
-	
  	coarse_spinor_field_to_spinor_field_new(out,sol);  // Now out has the course inversion result
  	
- 	// At this point we should syncronize
- 	
+ 	// At this point we should maybe syncronize
  	// Now we use the smoother on the residual
  	
-//	lprintf("DDalphaAMG",10,"DDalphaAMG checkpoint 1.\n");
+ 	
  	M.dbl(tmp,out);
- 	
-//	lprintf("DDalphaAMG",10,"DDalphaAMG checkpoint 2.\n");
  	spinor_field_sub_assign_f(tmp,in);
- 	
-//	lprintf("DDalphaAMG",10,"DDalphaAMG checkpoint 3.\n");
  	// Now tmp contains the residual
+ 	
     spinor_field_zero_f(tmp2);
- 	
-//	lprintf("DDalphaAMG",10,"DDalphaAMG checkpoint 4.\n");
  	SAP_prec(nu,&cg_mshift,par, M, tmp, tmp2);
- 	
-//	lprintf("DDalphaAMG",10,"DDalphaAMG checkpoint 5.\n");
-	
  	spinor_field_sub_assign_f(out,tmp2);
  	
  	free(rhs);rhs=NULL;
@@ -276,26 +240,6 @@ void DDalphaAMG(mshift_par *par, spinor_operator M, spinor_field *in, spinor_fie
 	free_spinor_field_f(tmp);
 	free_spinor_field_f(tmp2);
 }
-/*
-// (small) = P^H * (big)
-void spinor_field_to_course_spinor_field(spinor_field *big){
-	lprintf("DDalphaAMG",10,"spinor_field_to_course_spinor_field called.\n");
-	for(int i=0;i<NumVectors;i++){
-		spinor_field_prod_aggregate_f(&small_spinor[i],&small_spinor[i+NumVectors],&P[i],big);
-	}
-}
-// (big) = P * (small)
-void coarse_spinor_field_to_spinor_field(spinor_field *b){
-	lprintf("DDalphaAMG",10,"coarse_spinor_field_to_spinor_field called.\n");
-	
-	spinor_field_mulc_aggregate_f(b,small_result_spinor[0],small_result_spinor[NumVectors],&P[0]);
-
-	for(int i=1;i<NumVectors;i++){
-		spinor_field_mulc_add_assign_aggregate_f(b,small_result_spinor[i],small_result_spinor[i+NumVectors],&P[i]);
-	}
-
-}
-*/
 
 // (small) = P^H * (big)
 void spinor_field_to_course_spinor_field_new(complex *smalls,spinor_field *big){
@@ -319,58 +263,15 @@ void coarse_spinor_field_to_spinor_field_new(spinor_field *b,complex *smalls){
 
 }
 
-// (big) = P * (small)
-/*void coarse_spinor_field_to_spinor_field(spinor_field *big){
-	lprintf("DDalphaAMG",10,"coarse_spinor_field_to_spinor_field called.\n");
-	spinor_field_mulc_aggregate_f(big,small_spinor[0],small_spinor[NumVectors],&P[0]);
-	
-	for(int i=1;i<NumVectors;i++){
-		spinor_field_mulc_add_assign_aggregate_f(big,small_spinor[i],small_spinor[i+NumVectors],&P[i]);
-	}
-
-}*/
-// (small)=Dc (small)
-/*void coarse_spinor_operation(complex *a, complex *b){
-	lprintf("DDalphaAMG",10,"coarse_spinor_operation called.\n");
-	if(a==NULL){
-	
-	lprintf("DDalphaAMG",10,"coarse_spinor_operation a=NULL.\n");
-	for(int i=0;i<2*NumVectors;i++){
-	_complex_0(small_result_spinor[i]);
-			for(int j=0;j<2*NumVectors;j++){
-				_complex_mul_assign(small_result_spinor[i],Dc[i*2*NumVectors+j],small_spinor[j]);
-			}
-	}
-	}else{
-	
-	lprintf("DDalphaAMG",10,"coarse_spinor_operation a is not NULL.\n");
-	//print_matrix();
-	
-		for(int i=0;i<2*NumVectors;i++){
-		_complex_0(a[i]);
-		
-		lprintf("DDalphaAMG",10,"b[%d]= (%e , %e ) .\n",i,b[i].re,b[i].im);
-			for(int j=0;j<2*NumVectors;j++){
-				_complex_mul_assign(a[i],Dc[i*2*NumVectors+j],b[j]);
-			}
-		lprintf("DDalphaAMG",10,"a[%d]= (%e , %e ) .\n",i,a[i].re,a[i].im);
-	}
-	}
-}
-*/
 
 // (small)=Dc (small)
 void coarse_operation(complex *a, complex *b){
-//	lprintf("DDalphaAMG",10,"coarse_operation called.\n");
-
 	for(int i=0;i<2*NumVectors;i++){
 		_complex_0(a[i]);
 		
-//		lprintf("DDalphaAMG",10,"1b[%d]= (%e , %e ) .\n",i,b[i].re,b[i].im);
 			for(int j=0;j<2*NumVectors;j++){
 				_complex_mul_assign(a[i],Dc[i*2*NumVectors+j],b[j]);
 			}
-//		lprintf("DDalphaAMG",10,"2b[%d]= (%e , %e ) .\n",i,b[i].re,b[i].im);
 	}
 }
 
@@ -433,22 +334,10 @@ void coarse_MINRES(complex *x,complex *b){
 	complex *p;
 	p=malloc(2*NumVectors*sizeof(*p));
 
-	coarse_spinor_field_copy(r,b); // line 1 (Saad p 165)
-	
-//		for(int KL=0;KL<2*NumVectors;KL++){
-//	lprintf("DDalphaAMG",10,"b[%d]= (%e , %e ) .\n",KL,b[KL].re,b[KL].im);
-//	lprintf("DDalphaAMG",10,"r[%d]= (%e , %e ) .\n",KL,r[KL].re,r[KL].im);
-//	}	
-	
-	coarse_zero(x);
-
-	
-	//		for(int KL=0;KL<2*NumVectors;KL++){lprintf("DDalphaAMG",10,"----1r[%d]= (%e , %e ) .\n",KL,r[KL].re,r[KL].im);}	
+	coarse_spinor_field_copy(r,b); // line 1 (Saad p 165)	
+	coarse_zero(x);	
 	coarse_operation(p,r); 
-	//		for(int KL=0;KL<2*NumVectors;KL++){lprintf("DDalphaAMG",10,"----2r[%d]= (%e , %e ) .\n",KL,r[KL].re,r[KL].im);}	
-	// DEBUG
-	//for(int KL=0;KL<2*NumVectors;KL++){lprintf("DDalphaAMG",10,"p[%d]= (%e , %e ) .\n",KL,p[KL].re,p[KL].im);}	
-	
+
 	residual=coarse_sqnorm(r);
 	bnorm=coarse_sqnorm(b);
 	
@@ -459,19 +348,15 @@ void coarse_MINRES(complex *x,complex *b){
 		alpha=coarse_inner_product(p,r); // I think this should be the right one
 
 		tmp=coarse_sqnorm(p);
-//			lprintf("coarse_MINRES",10,"alpha(%d) = (%e , %e ) , tmp = %e .\n",iter, alpha.re,alpha.im,tmp);
 		_complex_mulr(alpha,1/tmp,alpha); // line 3
 		coarse_mulc_add_assign(x,alpha,r); // line 4
 		
-//			for(int KL=0;KL<2*NumVectors;KL++){lprintf("DDalphaAMG",10,"1r[%d]= (%e , %e ) .\n",KL,r[KL].re,r[KL].im);}	
 		coarse_mulc_sub_assign(r,alpha,p); // line 5		
-//			for(int KL=0;KL<2*NumVectors;KL++){lprintf("DDalphaAMG",10,"2r[%d]= (%e , %e ) .\n",KL,r[KL].re,r[KL].im);}		
 		coarse_operation(p,r); // line 6
-//			for(int KL=0;KL<2*NumVectors;KL++){lprintf("DDalphaAMG",10,"3r[%d]= (%e , %e ) .\n",KL,r[KL].re,r[KL].im);}		
 
 	residual=coarse_sqnorm(r);
 	iter++;
-	lprintf("coarse_MINRES",10,"r(%d) = %e.\n", iter,residual/bnorm);
+	if(iter%10==0){lprintf("coarse_MINRES",10,"r(%d) = %e.\n", iter,residual/bnorm);}
 	}	// line 7
 	
 	
