@@ -80,6 +80,12 @@ void precon_dbl(spinor_field *out, spinor_field *in){
 
 spinor_operator precon_GMRES={&precon_dbl,NULL}; 
 
+#ifndef WITH_GPU
+typedef int gpu_timer;
+int gpuTimerStart(){return 0;}
+float gpuTimerStop(gpu_timer timer){return (float) timer;}
+#endif
+
 int main(int argc,char *argv[])
 {
    double tau;
@@ -91,7 +97,9 @@ int main(int argc,char *argv[])
   
 
    inverter_par par;
+   mshift_par mspar;
    g5QMR_fltacc_par parg5;
+   MINRES_par mrpar;
 
    int cgiters;
 
@@ -120,9 +128,11 @@ int main(int argc,char *argv[])
      return 0;
    }
 
+#ifdef WITH_GPU
    input_gpu gpu_var = init_input_gpu(gpu_var);
    read_input(gpu_var.read,"test_input");
    init_gpu(gpu_var);
+#endif
    
    lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
    lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
@@ -135,15 +145,15 @@ int main(int argc,char *argv[])
    
    u_gauge=alloc_gfield(&glattice);
    u_gauge_flt=alloc_gfield_flt(&glattice);
-#ifndef REPR_FUNDAMENTAL
+#if (!defined(REPR_FUNDAMENTAL) && !defined(WITH_QUATERNIONS)) || defined(ROTATED_SF) 
    u_gauge_f=alloc_gfield_f(&glattice);
    u_gauge_f_flt=alloc_gfield_f_flt(&glattice);
 #endif
    
    lprintf("MAIN",0,"Generating a random gauge field... ");
    fflush(stdout);
-   //   random_u(u_gauge);
-   read_gauge_field("conf");
+   random_u(u_gauge);
+   //read_gauge_field("conf");
 
    assign_ud2u();
    start_gf_sendrecv(u_gauge);
@@ -169,6 +179,15 @@ int main(int argc,char *argv[])
    parg5.max_iter=0;
    parg5.max_iter_flt =0;
 
+   mspar.n = 1;
+   mspar.shift=(double*)malloc(sizeof(double)*mspar.n);
+   mspar.shift[0]=0;
+   mspar.err2=1.e-14;
+   mspar.max_iter=0;
+
+   mrpar.err2=1.e-14;
+   mrpar.max_iter=0;
+
 
    res=alloc_spinor_field_f(4,&glat_even);
    s1=res+1;
@@ -183,45 +202,103 @@ int main(int argc,char *argv[])
    gaussian_spinor_field(s1);
    assign_sd2s(s1_flt,s1);   
    
-   /* TEST GMRES_M */
+   spinor_field_zero_f(res);
+   lprintf("TEST_INVERTERS",0,"Input norm %e \n",spinor_field_sqnorm_f(s1));
+   
 
-   lprintf("GMRES TEST",0,"Testing  g5QMR flt\n");
-   lprintf("GMRES TEST",100,"---------------------\n");
+   /* Testing CG */
+   /*   lprintf("TEST_INVERTERS",0,"---------------------\n");
+   lprintf("TEST_INVERTERS",0,"Testing  CG \n");
+   t1 = gpuTimerStart();
+   cgiters = cg_mshift(&mspar, H, s1, res);
+   elapsed = gpuTimerStop(t1);
+   lprintf("TEST_INVERTERS",0,"Converged in %d iterations\n",cgiters);
+   lprintf("TEST_INVERTERS",0,"Time: %1.10g s\n",elapsed/1000);
+   H.dbl(s2,res);
+   spinor_field_sub_assign_f(s2,s1);
+   tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
+   lprintf("TEST_INVERTERS",0,"test  = %e (req. %e)\n\n",tau,par.err2);*/
+
+
+   /* TEST GMRES_M */
+   lprintf("TEST_INVERTERS",0,"---------------------\n");
+   lprintf("TEST_INVERTERS",0,"Testing  g5QMR flt\n");
    t1 = gpuTimerStart();   
    cgiters = g5QMR_fltacc(&parg5, D, s1, res);
    elapsed = gpuTimerStop(t1);
-   lprintf("GMRES TEST",0,"g5QMR converged in %d iterations\n",cgiters);
-   lprintf("GMRES TEST",0,"Time: %1.10g s\n",elapsed/1000);
-   D.flt(s2_flt,res_flt);
+   lprintf("TEST_INVERTERS",0,"g5QMR converged in %d iterations\n",cgiters);
+   lprintf("TEST_INVERTERS",0,"Time: %1.10g s\n",elapsed/1000);
+   D.dbl(s2,res);
    spinor_field_sub_assign_f(s2,s1);
    tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
-   lprintf("GMRES TEST",0,"test  = %e (req. %e)\n",tau,par.err2);
+   lprintf("TEST_INVERTERS",0,"test  = %e (req. %e)\n\n",tau,par.err2);
+   
+   /* Testing HBiCGstab */
+   /*   lprintf("TEST_INVERTERS",0,"Testing  HBiCGStab\n");
+   lprintf("TEST_INVERTERS",100,"---------------------\n");
+   t1 = gpuTimerStart();   
+   cgiters = HBiCGstab(&mrpar, H, s1, res);
+   elapsed = gpuTimerStop(t1);
+   lprintf("TEST_INVERTERS",0,"HBiCGstab converged in %d iterations\n",cgiters);
+   lprintf("TEST_INVERTERS",0,"Time: %1.10g s\n",elapsed/1000);
+   H.dbl(s2,res);
+   spinor_field_sub_assign_f(s2,s1);
+   tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
+   lprintf("TEST_INVERTERS",0,"test  = %e (req. %e)\n",tau,par.err2);*/
 
-   /*   lprintf("GMRES TEST",0,"Testing  GMRES flatacc\n");
-   lprintf("GMRES TEST",100,"---------------------\n");
+   /* Testing MINRES */
+   lprintf("TEST_INVERTERS",0,"---------------------\n");
+   lprintf("TEST_INVERTERS",0,"Testing  Minres\n");
    t1 = gpuTimerStart();   
-   cgiters = FGMRES(&par, H, s1, res,NULL,precon_GMRES);
+   cgiters = MINRES(&mrpar, H, s1, res,NULL);
    elapsed = gpuTimerStop(t1);
-   lprintf("GMRES TEST",0,"Converged in %d iterations\n",cgiters);
-   lprintf("GMRES TEST",0,"Time: %1.10g s\n",elapsed/1000);
+   lprintf("TEST_INVERTERS",0,"Minres converged in %d iterations\n",cgiters);
+   lprintf("TEST_INVERTERS",0,"Time: %1.10g s\n",elapsed/1000);
    H.dbl(s2,res);
    spinor_field_sub_assign_f(s2,s1);
    tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
-   lprintf("GMRES TEST",0,"test  = %e (req. %e)\n",tau,par.err2);*/
- 
- 
-   lprintf("GMRES TEST",0,"Testing  GMRES\n");
-   lprintf("GMRES TEST",100,"---------------------\n");
-   t1 = gpuTimerStart();   
-   cgiters = GMRES(&par, H, s1, res,NULL);
+   lprintf("TEST_INVERTERS",0,"test  = %e (req. %e)\n\n",tau,par.err2);
+
+
+   /* Testing CG flt_acc*/
+   /*   lprintf("TEST_INVERTERS",0,"---------------------\n");
+   lprintf("TEST_INVERTERS",0,"Testing  CG float accelerated \n");
+   t1 = gpuTimerStart();
+   cgiters = cg_mshift_flt(&mspar, H, s1, res);
    elapsed = gpuTimerStop(t1);
-   lprintf("GMRES TEST",0,"Converged in %d iterations\n",cgiters);
-   lprintf("GMRES TEST",0,"Time: %1.10g s\n",elapsed/1000);
+   lprintf("TEST_INVERTERS",0,"Converged in %d iterations\n",cgiters);
+   lprintf("TEST_INVERTERS",0,"Time: %1.10g s\n",elapsed/1000);
    H.dbl(s2,res);
    spinor_field_sub_assign_f(s2,s1);
    tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
-   lprintf("GMRES TEST",0,"test  = %e (req. %e)\n",tau,par.err2);
-  
+   lprintf("TEST_INVERTERS",0,"test  = %e (req. %e)\n\n",tau,par.err2);*/
+
+
+   /* Testing FGMRES */
+   lprintf("TEST_INVERTERS",0,"---------------------\n");
+   lprintf("TEST_INVERTERS",0,"Testing  GMRES flatacc\n");
+   t1 = gpuTimerStart();
+   cgiters = FGMRES(&par, H, s1, res, NULL, precon_GMRES);
+   elapsed = gpuTimerStop(t1);
+   lprintf("TEST_INVERTERS",0,"Converged in %d iterations\n",cgiters);
+   lprintf("TEST_INVERTERS",0,"Time: %1.10g s\n",elapsed/1000);
+   H.dbl(s2,res);
+   spinor_field_sub_assign_f(s2,s1);
+   tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
+   lprintf("TEST_INVERTERS",0,"test  = %e (req. %e)\n\n",tau,par.err2);
+     
+   /* Testing GMRES */
+   lprintf("TEST_INVERTERS",0,"---------------------\n");
+   lprintf("TEST_INVERTERS",0,"Testing  GMRES\n");
+   t1 = gpuTimerStart();   
+   cgiters = GMRES(&par, H, s1, res, NULL);
+   elapsed = gpuTimerStop(t1);
+   lprintf("TEST_INVERTERS",0,"Converged in %d iterations\n",cgiters);
+   lprintf("TEST_INVERTERS",0,"Time: %1.10g s\n",elapsed/1000);
+   H.dbl(s2,res);
+   spinor_field_sub_assign_f(s2,s1);
+   tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
+   lprintf("TEST_INVERTERS",0,"test  = %e (req. %e)\n",tau,par.err2);
 
    free_spinor_field_f(res);
 

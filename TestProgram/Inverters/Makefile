@@ -36,7 +36,7 @@ MODS := error error_gpu
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Inverters
-MODS := linear_algebra cg_mshift MINRES_mshift MINRES g5QMR_mshift eva jacobi cg_mshift_flt GMRES FGMRES
+MODS := linear_algebra cg_mshift MINRES_mshift MINRES g5QMR_mshift eva jacobi cg_mshift_flt GMRES FGMRES HBiCGstab
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Observables

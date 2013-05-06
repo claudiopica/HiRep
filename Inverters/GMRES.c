@@ -89,8 +89,8 @@ static int GMRES_core(short int *valid, inverter_par *par, spinor_operator M, sp
     }
     norm_w = sqrt(spinor_field_sqnorm_f(w));
 
-    if ( norm_w/tmp < 0.001){
-     lprintf("INVERTER",100,"GMRES in second GR");
+    /*    if ( norm_w/tmp < 0.001){
+     lprintf("INVERTER",100,"GMRES in second GR\n");
      for (i=0;i<j+1;++i){	// Gram-Schmidth orthogonalization (modified)
        c_tmp1=spinor_field_prod_f(w,&v[i]);
        _complex_add_assign(h[Hind(i,j)],c_tmp1);
@@ -98,13 +98,13 @@ static int GMRES_core(short int *valid, inverter_par *par, spinor_operator M, sp
        spinor_field_mulc_add_assign_f(w,c_tmp1,&v[i]);
      }
       norm_w = sqrt(spinor_field_sqnorm_f(w));      
-    }
+      }*/
 
 
-    if (norm_w*norm_w < 1e-28){
-      lprintf("INVERTER",500,"GMRES_core: Lucky termination!:\n");
+    /*    if (norm_w*norm_w < 1e-28){
+      lprintf("INVERTER",90,"GMRES_core: Lucky termination!:\n");
       break;
-    }
+      }*/
 
     /* Do the givens rotations */
     //First rotate new column with old rot matrixes
@@ -132,7 +132,7 @@ static int GMRES_core(short int *valid, inverter_par *par, spinor_operator M, sp
     _complex_mul_star(h[Hind(j,j)],c_tmp1,cs[j]);
     h[Hind(j,j)].re += ss[j]*norm_w;
 
-    lprintf("INVERTER",100,"GMRES Error in iteration %d: %e\n",j,gbar[j+1].re*gbar[j+1].re/inorm);
+    lprintf("INVERTER",90,"GMRES Error in iteration %d: %e\n",j,gbar[j+1].re*gbar[j+1].re/inorm);
     /*Check Convergence*/
     *valid = (fabs(gbar[j+1].re*gbar[j+1].re/inorm) < par->err2 );
     if (*valid){

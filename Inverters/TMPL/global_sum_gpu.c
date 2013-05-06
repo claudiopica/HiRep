@@ -1,3 +1,9 @@
+/***************************************************************************\
+ * Copyright (c) 2012, Ari Hietanen and Ulrik Søndergaard                   *   
+ * All rights reserved.                                                     * 
+\***************************************************************************/
+
+
 #ifndef GLOBAL_SUM_GPU_C
 #define GLOBAL_SUM_GPU_C
 

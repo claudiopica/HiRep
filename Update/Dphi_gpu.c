@@ -46,8 +46,7 @@ static unsigned long int MVMcounter=0;
 
 unsigned long int getMVM() {
 	unsigned long int res=MVMcounter>>1; /* divide by two */
-	MVMcounter=0; /* reset counter */
-
+	//MVMcounter=0; /* reset counter */
 	return res;
 }
 
@@ -337,7 +336,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, const suNf_spinor* __
   
   /******************************** end of directions *********************************/
   //out[ix]=r;
-  _spinor_mul_f(r,-0.5f,r);
+  _spinor_mul_f(r,-0.5,r);
   
   _suNf_write_spinor_gpu(vol4h,r.c[0],out,ix,0);
   _suNf_write_spinor_gpu(vol4h,r.c[1],out,ix,1);
@@ -542,7 +541,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, const suNf_spinor* __
   
   /******************************** end of directions *********************************/
   //out[ix]=r;
-  _spinor_mul_f(r,-0.5f,r);
+  _spinor_mul_f(r,-0.5,r);
   
   _suNf_write_spinor_gpu(vol4h,r.c[0],out,ix,0);
   _suNf_write_spinor_gpu(vol4h,r.c[1],out,ix,1);
@@ -681,7 +680,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, const suNf_spinor* __
       __asm_sync
       /******************************** end of directions *********************************/ 
       //out[ix]=r;
-      _vector_mul_f(r,-0.5f,r);
+      _vector_mul_f(r,-0.5,r);
       
       _suNf_write_spinor_gpu(vol4h,r,out,ix,0);
       
@@ -791,7 +790,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, const suNf_spinor* __
       __asm_sync
       /******************************** end of directions *********************************/ 
       //out[ix]=r;
-      _vector_mul_f(r,-0.5f,r);
+      _vector_mul_f(r,-0.5,r);
       
       _suNf_write_spinor_gpu(vol4h,r,out,ix,1);
       
@@ -900,7 +899,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, const suNf_spinor* __
 
       __asm_sync      
       /******************************** end of directions *********************************/ 
-      _vector_mul_f(r,-0.5f,r);
+      _vector_mul_f(r,-0.5,r);
       
       _suNf_write_spinor_gpu(vol4h,r,out,ix,2);
       
@@ -1007,7 +1006,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, const suNf_spinor* __
       __asm_sync
       /******************************** end of directions *********************************/ 
       //out[ix]=r;
-      _vector_mul_f(r,-0.5f,r);
+      _vector_mul_f(r,-0.5,r);
       
       _suNf_write_spinor_gpu(vol4h,r,out,ix,3);
       
@@ -1135,7 +1134,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, const suNf_spinor* __
       
       /******************************** end of directions *********************************/ 
       //out[ix]=r;
-      _vector_mul_f(r,-0.5f,r);
+      _vector_mul_f(r,-0.5,r);
       
       _suNf_write_spinor_gpu(vol4h,r,out,ix,0);
       
@@ -1244,7 +1243,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, const suNf_spinor* __
       __asm_sync     
       /******************************** end of directions *********************************/ 
       //out[ix]=r;
-      _vector_mul_f(r,-0.5f,r);
+      _vector_mul_f(r,-0.5,r);
       
       _suNf_write_spinor_gpu(vol4h,r,out,ix,1);
       
@@ -1353,7 +1352,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, const suNf_spinor* __
       __asm_sync    
       /******************************** end of directions *********************************/ 
       //out[ix]=r;
-      _vector_mul_f(r,-0.5f,r);
+      _vector_mul_f(r,-0.5,r);
       
       _suNf_write_spinor_gpu(vol4h,r,out,ix,2);
       
@@ -1461,7 +1460,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, const suNf_spinor* __
       __asm_sync      
       /******************************** end of directions *********************************/ 
       //out[ix]=r;
-      _vector_mul_f(r,-0.5f,r);
+      _vector_mul_f(r,-0.5,r);
       
       _suNf_write_spinor_gpu(vol4h,r,out,ix,3);
       
@@ -1473,6 +1472,8 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, const suNf_spinor* __
 }
 
 #endif //GPU_KEPLER
+
+
 
 static void init_bc_gpu(){
 #ifdef FERMION_THETA
@@ -1504,7 +1505,7 @@ void Dphi_(spinor_field *out, spinor_field *in)
 #endif
    
   N = vol4h;
-  grid = N/BLOCK_SIZE + ((N % BLOCK_SIZE == 0) ? 0 : 1);
+  grid = (N-1)/BLOCK_SIZE + 1;
   grid *= THREADSITE; //1 for KEPLER; 4 for FERMI
 
   if(in->type==&glat_odd) {
