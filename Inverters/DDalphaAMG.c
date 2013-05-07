@@ -2,6 +2,11 @@
 * Copyright (c) 2013, Ari Hietanen & Ulrik Ishoej Soendergaard              *   
 * All rights reserved.                                                      * 
 \***************************************************************************/
+
+//#define USE_EXACT_COARSE_INVERSE
+#define USE_COARSE_MINRES
+
+
 #include <stdlib.h>
 
 #include "geometry.h" 
@@ -20,39 +25,55 @@ static spinor_field *P=NULL;
 static int NumVectors=0;
 static complex *Dc=NULL;
 
+#ifdef USE_EXACT_COARSE_INVERSE
+static complex *inv_Dc;
+#endif
+
+
+
+static complex determinant(complex*,int);
+static void cofactor(complex*,int);
+static void transpose(complex*,complex*,int);
+void coarse_operation(complex *a, complex *b);
+
+
+
 void DDalphaAMG_finalize(){
 	free_spinor_field_f(P);
 	free(Dc);
 	Dc=NULL;
 	P=NULL;
+	#ifdef USE_EXACT_COARSE_INVERSE
+	free(inv_Dc);inv_Dc=NULL;
+	#endif
 	NumVectors=0;
 }
 
-/*
-void print_matrix(){
-lprintf("DDalphaAMG",10,"\n Real part\n");
-	for(int i=0;i<2*NumVectors;i++){
-		for(int j=0;j<2*NumVectors;j++){
-			lprintf("DDalphaAMG",10,"%+3.3f ",Dc[i*2*NumVectors+j].re);
+
+void print_matrix(complex *MAT,int Pad){
+lprintf("MatrixPrint",0,"\n Real part\n");
+	for(int i=0;i<Pad;i++){
+		for(int j=0;j<Pad;j++){
+			lprintf("MatrixPrint",0,"%+3.5f ",MAT[i*Pad+j].re);
 		}
-		lprintf("DDalphaAMG",10,"\n");
+		lprintf("MatrixPrint",0,"\n");
 	}
-lprintf("DDalphaAMG",10,"\n");
-lprintf("DDalphaAMG",10,"\n Imaginary part\n");
-	for(int i=0;i<2*NumVectors;i++){
-		for(int j=0;j<2*NumVectors;j++){
-			lprintf("DDalphaAMG",10,"%+3.3f ",Dc[i*2*NumVectors+j].im);
+lprintf("MatrixPrint",0,"\n");
+lprintf("MatrixPrint",0,"\n Imaginary part\n");
+	for(int i=0;i<Pad;i++){
+		for(int j=0;j<Pad;j++){
+			lprintf("MatrixPrint",0,"%+3.5f ",MAT[i*Pad+j].im);
 		}
-		lprintf("DDalphaAMG",10,"\n");
+		lprintf("MatrixPrint",0,"\n");
 	}
-lprintf("DDalphaAMG",10,"\n");
-}*/
+lprintf("MatrixPrint",0,"\n");
+}
 
 
 //Dc = P^H D P
 // Dc(i,j) -> Dc[i*NumVectors+j]
 void build_coarse_operator(spinor_operator M){
-	lprintf("DDalphaAMG",10,"Building coarse operator.\n");
+	lprintf("DDalphaAMG",0,"Building coarse operator.\n");
 	// Starting with the D*P part...
 	spinor_field *tmp;
 	tmp=alloc_spinor_field_f(4*NumVectors,&glat_nocomm);
@@ -104,7 +125,7 @@ void build_coarse_operator(spinor_operator M){
 }
 
 
-void DDalphaAMG_setup(mshift_par *par, spinor_operator M, int N, int nu, int n_inv){ 
+void DDalphaAMG_setup(mshift_par *par, spinor_operator M, int N, int nu, int n_inv){ // nu is not used
 
     lprintf("DDalphaAMG",0,"Setup with N=%d, nu=%d and n_inv=%d\n",N,nu,n_inv);
     
@@ -113,6 +134,9 @@ void DDalphaAMG_setup(mshift_par *par, spinor_operator M, int N, int nu, int n_i
 if (P==NULL){
 	P=alloc_spinor_field_f(N,&glattice);		// &glattice might be changed to &even	
 	Dc = malloc(4*N*N*sizeof(*Dc));
+	#ifdef USE_EXACT_COARSE_INVERSE
+	inv_Dc = malloc(4*N*N*sizeof(*Dc));
+	#endif
 	NumVectors=N;
     atexit(DDalphaAMG_finalize);
 }
@@ -135,7 +159,7 @@ if (P==NULL){
 	
 	for (int eta=1;eta<=n_inv;eta++){
 	
-	lprintf("DDalphaAMG",10,"Building interpolating operators (%d/%d).\n",eta,n_inv);
+	lprintf("DDalphaAMG",0,"Building interpolating operators (%d/%d).\n",eta,n_inv);
 	// ------------------------------- Line 8: Reconstruct P from v-vectors
 	// --------------- Gram-Schmidt orthogonalization
 	
@@ -179,10 +203,15 @@ if (P==NULL){
 	// DEBUG END
 	// --------------- Gram-Schmidt orthogonalization complete
 	build_coarse_operator(M);
+	#ifdef USE_EXACT_COARSE_INVERSE
+	lprintf("DDalphaAMG",0,"Building exact inverse of coarse operator... ");
+	cofactor(Dc,2*NumVectors);
+	lprintf("DDalphaAMG",0,"Done.\n");
+	#endif
 	
 	
 	if(eta<n_inv){ // This if is not in the paper, but I think it should be
-		lprintf("DDalphaAMG",10,"Improving near kernel\n");
+		lprintf("DDalphaAMG",0,"Improving near kernel\n");
 			for(int j=0;j<N;j++){ //  ------------- Line 9
 			
 				M.dbl(tmp,&v[j]);
@@ -202,10 +231,32 @@ if (P==NULL){
 	lprintf("DDalphaAMG",0,"Setup done.\n");
 }
 
+double coarse_sqnorm(complex *a){
+	double res=0;
+	
+	for (int i=0;i<2*NumVectors;i++){
+		res+=_complex_re(a[i])*_complex_re(a[i])+_complex_im(a[i])*_complex_im(a[i]);
+	}
+	
+	return(res);
+}
+void coarse_sub_assign(complex *to, complex *from){
+	for(int i=0;i<2*NumVectors;i++){
+	_complex_sub_assign(to[i],from[i]);
+	}
+}
+
+void coarse_zero(complex *to){
+
+	for(int i=0;i<2*NumVectors;i++){
+		_complex_0(to[i]);
+	}
+}
 
 // 1 V-cycle (C operation)
 void DDalphaAMG(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out){ 
 	int nu=3;
+	double tau=0;
 //	SAP_prec(3,&cg_mshift,par, M, in, out);
 
 	spinor_field *tmp,*tmp2;
@@ -216,12 +267,29 @@ void DDalphaAMG(mshift_par *par, spinor_operator M, spinor_field *in, spinor_fie
 	rhs=malloc(2*NumVectors*sizeof(*rhs));
 	sol=malloc(2*NumVectors*sizeof(*sol));
 	
+	 		M.dbl(tmp,out);
+ 			spinor_field_sub_assign_f(tmp,in);
+    		tau=spinor_field_sqnorm_f(tmp)/spinor_field_sqnorm_f(in);
+   			lprintf("DDalphaAMG",0," Normalized residual (before coarse inversion) = %e \n",tau);
+	
 	spinor_field_to_course_spinor_field_new(rhs,in);
 	
-	
+	#ifdef USE_COARSE_MINRES
 	coarse_MINRES(sol,rhs);
+	#endif 
+	#ifdef USE_EXACT_COARSE_INVERSE
+	//sol = inv_Dc*rhs
+	inverse_coarse_operation(sol,rhs);
+	/*
+	complex *cTmp=malloc(2*NumVectors*sizeof(*cTmp));
+	coarse_operation(cTmp,sol);
+	coarse_sub_assign(cTmp,rhs);
+	lprintf("DDalphaAMG",10,"\"Exact\" residual=%e\n",coarse_sqnorm(cTmp)/coarse_sqnorm(rhs));
+	free(cTmp);cTmp=NULL;*/
+	#endif
 	
  	coarse_spinor_field_to_spinor_field_new(out,sol);  // Now out has the course inversion result
+
  	
  	// At this point we should maybe syncronize
  	// Now we use the smoother on the residual
@@ -230,10 +298,19 @@ void DDalphaAMG(mshift_par *par, spinor_operator M, spinor_field *in, spinor_fie
  	M.dbl(tmp,out);
  	spinor_field_sub_assign_f(tmp,in);
  	// Now tmp contains the residual
+ 		
+    		tau=spinor_field_sqnorm_f(tmp)/spinor_field_sqnorm_f(in);
+   			lprintf("DDalphaAMG",0," Normalized residual (after coarse inversion) = %e \n",tau);
  	
     spinor_field_zero_f(tmp2);
  	SAP_prec(nu,&cg_mshift,par, M, tmp, tmp2);
  	spinor_field_sub_assign_f(out,tmp2);
+ 	
+ 		
+	 		M.dbl(tmp,out);
+ 			spinor_field_sub_assign_f(tmp,in);
+    		tau=spinor_field_sqnorm_f(tmp)/spinor_field_sqnorm_f(in);
+   			lprintf("DDalphaAMG",0," Normalized residual (after SAP inversion) = %e \n",tau);
  	
  	free(rhs);rhs=NULL;
  	free(sol);sol=NULL;
@@ -248,7 +325,6 @@ void spinor_field_to_course_spinor_field_new(complex *smalls,spinor_field *big){
 		spinor_field_prod_aggregate_f(&smalls[i],&smalls[i+NumVectors],&P[i],big);
 	}
 	
-	lprintf("DDalphaAMG",10,"spinor_field_to_course_spinor_field_new complete.\n");
 }
 // (big) = P * (small)
 void coarse_spinor_field_to_spinor_field_new(spinor_field *b,complex *smalls){
@@ -260,6 +336,7 @@ void coarse_spinor_field_to_spinor_field_new(spinor_field *b,complex *smalls){
 		spinor_field_mulc_add_assign_aggregate_f(b,smalls[i],smalls[i+NumVectors],&P[i]);
 	}
 
+//	lprintf("DDalphaAMG",10,"coarse_spinor_field_to_spinor_field_new done.\n");
 
 }
 
@@ -275,14 +352,26 @@ void coarse_operation(complex *a, complex *b){
 	}
 }
 
+#ifdef USE_EXACT_COARSE_INVERSE
+void inverse_coarse_operation(complex *sol,complex *rhs){
+	for(int i=0;i<2*NumVectors;i++){
+		_complex_0(sol[i]);
+		
+			for(int j=0;j<2*NumVectors;j++){
+				_complex_mul_assign(sol[i],inv_Dc[i*2*NumVectors+j],rhs[j]);
+			}
+	}
+};
+#endif
+
 
 
 void coarse_spinor_field_copy(complex *to, complex *from){
-	lprintf("DDalphaAMG",10,"coarse_spinor_field_copy called.\n");
+//	lprintf("DDalphaAMG",10,"coarse_spinor_field_copy called.\n");
 	for(int i=0;i<2*NumVectors;i++){
 		to[i]=from[i];
 	}
-	lprintf("DDalphaAMG",10,"coarse_spinor_field_copy complete.\n");
+//	lprintf("DDalphaAMG",10,"coarse_spinor_field_copy complete.\n");
 }
 void coarse_mulc_add_assign(complex *to,complex c, complex *from){
 	for(int i=0;i<2*NumVectors;i++){
@@ -296,12 +385,7 @@ void coarse_mulc_sub_assign(complex *to, complex c, complex *from){
 		_complex_mul_assign(to[i],tmp,from[i]);
 	}
 }
-void coarse_zero(complex *to){
 
-	for(int i=0;i<2*NumVectors;i++){
-		_complex_0(to[i]);
-	}
-}
 
 complex coarse_inner_product(complex *a,complex *b){
 	complex res;
@@ -313,15 +397,7 @@ complex coarse_inner_product(complex *a,complex *b){
 	
 	return(res);
 }
-double coarse_sqnorm(complex *a){
-	double res=0;
-	
-	for (int i=0;i<2*NumVectors;i++){
-		res+=_complex_re(a[i])*_complex_re(a[i])+_complex_im(a[i])*_complex_im(a[i]);
-	}
-	
-	return(res);
-}
+
 
 void coarse_MINRES(complex *x,complex *b){
 
@@ -344,7 +420,7 @@ void coarse_MINRES(complex *x,complex *b){
 	
 //	lprintf("coarse_MINRES",10,"Residual(0) = %e.\n", residual);
 	
-	while(residual/bnorm>1e-5  &&  iter<100){	// line 2
+	while(residual/bnorm>1e-5  &&  iter<1000){	// line 2
 		alpha=coarse_inner_product(p,r); // I think this should be the right one
 
 		tmp=coarse_sqnorm(p);
@@ -360,10 +436,160 @@ void coarse_MINRES(complex *x,complex *b){
 	}	// line 7
 	
 	
-	lprintf("DDalphaAMG",10,"coarse_MINRES Terminated r(%d) = %e .\n",iter,residual/bnorm);
+	lprintf("DDalphaAMG",0,"coarse_MINRES Terminated r(%d) = %e .\n",iter,residual/bnorm);
 
 	free(r);r=NULL;
 	free(p);p=NULL;
 }
+
+
+
+#ifdef USE_EXACT_COARSE_INVERSE
+// ----------------------------------------------------------------------
+// --- The following code is related to the exact matrix inverse --------
+// ----------------------------------------------------------------------
+
+
+
+#define IN(mt,i,j,M) mt[(M)*(i)+(j)]
+
+/*For calculating Determinant of the Matrix */
+complex determinant(complex *a,int k)
+{
+  complex det,tmp;
+  int s=1;
+  complex *b;
+  _complex_0(det);
+  int i,j,m,n,c;
+  
+  if (k==1)
+    {
+    det=a[0,0];
+    // return (IN(a,0,0,k));
+    }
+  else
+    {
+    
+      b=malloc((k)*(k)*sizeof(*b));	// I'm surprised that it is not (k-1)*(k-1)
+     _complex_0(det);
+     for (c=0;c<k;c++)
+       {
+        m=0;
+        n=0;
+        for (i=0;i<k;i++)
+          {
+            for (j=0;j<k;j++)
+              {
+                _complex_0(IN(b,i,j,k-1));
+                if (i != 0 && j != c)
+                 {
+                 
+                   IN(b,m,n,k-1)=IN(a,i,j,k);
+                   if (n<(k-2))
+                    n++;
+                   else
+                    {
+                     n=0;
+                     m++;
+                     }
+                   }
+               }
+             }
+          
+          
+         tmp=determinant(b,k-1);
+         _complex_mulcr_assign(det,s,IN(a,0,c,k),tmp);	
+         
+          s=-s;
+          }
+    }
+	if (k>1){free(b);b=NULL;}
+    return (det);
+}
+
+void cofactor(complex* num,int f)
+{
+
+  complex *b=malloc((f-1)*(f-1)*sizeof(*b));
+  complex *fac=malloc(f*f*sizeof(*fac));
+  complex tmp;
+
+ int p,q,m,n,i,j;
+ for (q=0;q<f;q++)
+ {
+   for (p=0;p<f;p++)
+    {
+     m=0;
+     n=0;
+     for (i=0;i<f;i++)
+     {
+       for (j=0;j<f;j++)
+        {
+          if (i != q && j != p)
+          {
+          
+            IN(b,m,n,f-1)=IN(num,i,j,f);
+            if (n<(f-2))
+             n++;
+            else
+             {
+               n=0;
+               m++;
+               }
+            }
+        }
+      }
+      
+      tmp=determinant(b,f-1);
+    _complex_mulr(IN(fac,q,p,f),pow(-1,q + p),tmp);
+    }
+  }
+  	free(b);b=NULL;
+  transpose(num,fac,f);
+  	free(fac);fac=NULL;
+}
+
+/*Finding transpose of matrix*/  
+void transpose(complex *num,complex *fac,int r)
+{
+  int i,j;
+  complex d;
+  complex *b=malloc(r*r*sizeof(*b));
+  complex *inverse=malloc(r*r*sizeof(*inverse));
+
+  for (i=0;i<r;i++)
+    {
+     for (j=0;j<r;j++)
+       {
+         IN(b,i,j,r)=IN(fac,j,i,r);
+        }
+    }
+  d=determinant(num,r);
+  for (i=0;i<r;i++)
+    {
+     for (j=0;j<r;j++)
+       {
+        _complex_div(IN(inverse,i,j,r),IN(b,i,j,r),d);
+        }
+    }
+
+
+   for (i=0;i<r;i++)
+    {
+     for (j=0;j<r;j++)
+       {
+
+        IN(inv_Dc,i,j,2*NumVectors)=IN(inverse,i,j,r);
+        }
+
+     }
+       free(b);b=NULL;
+       free(inverse);inverse=NULL;
+}
+#endif
+#undef IN
+
+
+
 
 

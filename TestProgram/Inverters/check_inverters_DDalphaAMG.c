@@ -33,8 +33,9 @@ int nhb,nor,nit,nth,nms,level,seed;
 double beta;
 
 static double hmass=-0.949000;
+//static double hmass=-1.0;
 
-
+// ------------------ Building operators ----------
 void D_dbl(spinor_field *out, spinor_field *in){
    Dphi(hmass,out,in);
 }
@@ -86,30 +87,36 @@ void Mg5_flt(spinor_field_flt *out, spinor_field_flt *in){
    Dphi_flt(-hmass,out,tmp_flt);
 }
 
-
-
 spinor_operator D={&D_dbl,&D_flt}; 
 spinor_operator Hop={&H_dbl,&H_flt}; 
 spinor_operator M={&M_dbl,&M_flt}; 
 spinor_operator Mg5={&M_dbl,&M_flt}; 
 
 
+// ------------------ Defining preconditioners ----------
+
 mshift_par par_precon;
 
 void precon_dbl(spinor_field *out, spinor_field *in){
   DDalphaAMG(&par_precon, Hop, in, out);
 }
-
-
+void precon_SAP_dbl(spinor_field *out, spinor_field *in){
+  SAP_prec(3,&cg_mshift,&par_precon, Hop, in, out);
+}
 void precontrivial_dbl(spinor_field *out, spinor_field *in){
   spinor_field_copy_f(out,in);
 }
 
 spinor_operator precon_DDalphaAMG={&precon_dbl,NULL}; 
+spinor_operator precon_SAP={&precon_SAP_dbl,NULL}; 
 spinor_operator precon_trivial={&precontrivial_dbl,NULL}; 
 
+
+
+// ------------------ Main function --------------
 int main(int argc,char *argv[])
 {
+// ------------------ Standard stuff ----------
    char pame[256];
    double tau;
    spinor_field *s1, *s2;
@@ -123,7 +130,7 @@ int main(int argc,char *argv[])
    setup_process(&argc,&argv);
    
    /* logger setup */
-  logger_setlevel(0,10); /* log all */
+  logger_setlevel(0,5); /* log all */
   if (PID!=0) { 
     logger_disable();}
   else{
@@ -153,8 +160,14 @@ int main(int argc,char *argv[])
    /* setup lattice geometry */
    geometry_mpi_eo();
    /* test_geometry_mpi_eo(); */
+   
+   
+// ------------------ Initializing new geometries ----------
+   
     init_geometry_SAP();
     init_geometry_nocomm();
+  
+  
   
    lprintf("MAIN",100,"Logger test 0.1\n");
    
@@ -168,8 +181,8 @@ int main(int argc,char *argv[])
    lprintf("MAIN",0,"Generating a random gauge field... ");
    fflush(stdout);
 
-     //random_u(u_gauge);
-   read_gauge_field("run1_12x12x12x12nc3rSYMnf2b6.000000m1.150000n523");
+     random_u(u_gauge);
+//   read_gauge_field("run1_12x12x12x12nc3rSYMnf2b6.000000m1.150000n523");
 
    start_gf_sendrecv(u_gauge);
    complete_gf_sendrecv(u_gauge);
@@ -179,15 +192,17 @@ int main(int argc,char *argv[])
    
    lprintf("MAIN",100,"Logger test 1\n");
    
-   par.err2=1.e-20;
+  // ------------------ Inverter parameters (For the FGMRES) ---------- 
+   par.err2=1.e-28;
    par.err2_flt=1.e-10;
    par.max_iter=0;
    par.max_iter_flt =0;
    par.kry_dim = 30;
 
+  // ------------------ Inverter parameters (For the cg inside) ---------- 
    par_precon.n=1;
    par_precon.shift=(double*)malloc(sizeof(double)*(par_precon.n));
-   par_precon.err2=1.e-10;
+   par_precon.err2=1.e-4;
    par_precon.max_iter=0;
    par_precon.shift[0]=0.0;
    
@@ -197,27 +212,73 @@ int main(int argc,char *argv[])
    tmp=s2+1;
 
 
-   
+      
    gaussian_spinor_field(s1);
    
-   // --------------------------------------  Debugging: Does not do anything for this program
-       DDalphaAMG_setup(&par_precon, Hop, 10, 3, 3);
    
-   /* TEST FGMRES */
+   
+   
+// ------------------ FGMRES with SAP test ---------- 
 
-   lprintf("FGMRES TEST",0,"Testing  FGMRES\n");
-   lprintf("FGMRES TEST",100,"---------------------\n");
+   spinor_field_zero_f(res);
+   
+   lprintf("FGMRES with SAP",0,"\n Testing  FGMRES with SAP preconditioner\n");
+   lprintf("FGMRES with SAP",0,"---------------------\n");
 
    cgiters=0;
-   lprintf("FGMRES TEST",0,"Using DDalphaAMG as preconditioner\n");
-   cgiters = FGMRES(&par, Hop, s1, res,NULL,precon_DDalphaAMG);
-   lprintf("MAIN",100,"Logger test 2\n");
- // cgiters = FGMRES(&par, Hop, s1, res,NULL,precon_trivial);
-   lprintf("FGMRES TEST",0,"Converged in %d iterations\n",cgiters);
+   cgiters = FGMRES(&par, Hop, s1, res,NULL,precon_SAP);
+   
+   lprintf("FGMRES with SAP",0," Converged in %d iterations\n",cgiters);
    Hop.dbl(s2,res);
    spinor_field_sub_assign_f(s2,s1);
    tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
-   lprintf("FGMRES TEST",0,"test  = %e (req. %e)\n",tau,par.err2);
+   lprintf("FGMRES with SAP",0," Normalized residual  = %e (req. %e)\n",tau,par.err2);
+   lprintf("FGMRES with SAP",0,"---------------------\n");   
+   
+
+   
+// ------------------ FGMRES with DDalphaAMG test ---------- 
+
+   spinor_field_zero_f(res);
+   
+   DDalphaAMG_setup(&par_precon, Hop, 20, 3, 6);
+   // Arguments are (cg_parameters, operator, Number of vectors to span near kernel, (not used), n_inv)
+   
+   lprintf("FGMRES with DDalphaAMG",0,"\n Testing  FGMRES with DDalphaAMG preconditioner\n");
+   lprintf("FGMRES with DDalphaAMG",0,"---------------------\n");
+
+   cgiters=0;
+   cgiters = FGMRES(&par, Hop, s1, res,NULL,precon_DDalphaAMG);
+   
+   lprintf("FGMRES with DDalphaAMG",0," Converged in %d iterations\n",cgiters);
+   Hop.dbl(s2,res);
+   spinor_field_sub_assign_f(s2,s1);
+   tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
+   lprintf("FGMRES with DDalphaAMG",0," Normalized residual  = %e (req. %e)\n",tau,par.err2);
+   lprintf("FGMRES with DDalphaAMG",0,"---------------------\n");   
+
+   
+
+// ------------------ FGMRES with trivial test ---------- 
+
+   spinor_field_zero_f(res);
+   
+   lprintf("FGMRES with trivial",0,"\n Testing  FGMRES with trivial preconditioner\n");
+   lprintf("FGMRES with trivial",0,"---------------------\n");
+
+   cgiters=0;
+   cgiters = FGMRES(&par, Hop, s1, res,NULL,precon_trivial);
+   
+ // cgiters = FGMRES(&par, Hop, s1, res,NULL,precon_trivial);
+   lprintf("FGMRES with trivial",0," Converged in %d iterations\n",cgiters);
+   Hop.dbl(s2,res);
+   spinor_field_sub_assign_f(s2,s1);
+   tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
+   lprintf("FGMRES with trivial",0," Normalized residual  = %e (req. %e)\n",tau,par.err2);
+   lprintf("FGMRES with trivial",0,"---------------------\n");
+
+
+
 
 
 
