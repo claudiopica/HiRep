@@ -96,6 +96,7 @@ spinor_operator Mg5={&M_dbl,&M_flt};
 // ------------------ Defining preconditioners ----------
 
 mshift_par par_precon;
+mshift_par par_cg;
 
 void precon_dbl(spinor_field *out, spinor_field *in){
   DDalphaAMG(&par_precon, Hop, in, out);
@@ -207,6 +208,13 @@ int main(int argc,char *argv[])
    par_precon.max_iter=0;
    par_precon.shift[0]=0.0;
    
+  // ------------------ Inverter parameters (For CG comparison) ---------- 
+   par_cg.n=1;
+   par_cg.shift=(double*)malloc(sizeof(double)*(par_precon.n));
+   par_cg.err2=1.e-28;
+   par_cg.max_iter=0;
+   par_cg.shift[0]=0.0;
+   
    res=alloc_spinor_field_f(4,&glattice);
    s1=res+1;
    s2=s1+1;
@@ -289,6 +297,30 @@ int main(int argc,char *argv[])
    lprintf("FGMRES with trivial",0," Normalized residual  = %e (req. %e)\n",tau,par.err2);
    lprintf("FGMRES with trivial",0," Inversion took: %ld sec %ld usec\n",etime.tv_sec,etime.tv_usec);
    lprintf("FGMRES with trivial",0,"---------------------\n");
+   
+      
+
+// ------------------ CG inverter ---------- 
+
+   spinor_field_zero_f(res);
+   
+   lprintf("CG inverter",0,"\n Testing  CG inverter\n");
+   lprintf("CG inverter",0,"---------------------\n");
+
+   cgiters=0;
+   gettimeofday(&start,0);   
+   cgiters = cg_mshift(&par_cg, Hop, s1, res);
+   gettimeofday(&end,0);
+   timeval_subtract(&etime,&end,&start);
+   
+ // cgiters = FGMRES(&par, Hop, s1, res,NULL,precon_trivial);
+   lprintf("CG inverter",0," Converged in %d iterations\n",cgiters);
+   Hop.dbl(s2,res);
+   spinor_field_sub_assign_f(s2,s1);
+   tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
+   lprintf("CG inverter",0," Normalized residual  = %e (req. %e)\n",tau,par.err2);
+   lprintf("CG inverter",0," Inversion took: %ld sec %ld usec\n",etime.tv_sec,etime.tv_usec);
+   lprintf("CG inverter",0,"---------------------\n");
 
 
 
