@@ -121,6 +121,7 @@ int main(int argc,char *argv[])
    double tau;
    spinor_field *s1, *s2;
    spinor_field *res;
+   struct timeval start, end, etime;
 
    inverter_par par;
 
@@ -202,7 +203,7 @@ int main(int argc,char *argv[])
   // ------------------ Inverter parameters (For the cg inside) ---------- 
    par_precon.n=1;
    par_precon.shift=(double*)malloc(sizeof(double)*(par_precon.n));
-   par_precon.err2=1.e-4;
+   par_precon.err2=1.e-2;
    par_precon.max_iter=0;
    par_precon.shift[0]=0.0;
    
@@ -226,13 +227,17 @@ int main(int argc,char *argv[])
    lprintf("FGMRES with SAP",0,"---------------------\n");
 
    cgiters=0;
+   gettimeofday(&start,0);
    cgiters = FGMRES(&par, Hop, s1, res,NULL,precon_SAP);
+   gettimeofday(&end,0);
+   timeval_subtract(&etime,&end,&start);
    
    lprintf("FGMRES with SAP",0," Converged in %d iterations\n",cgiters);
    Hop.dbl(s2,res);
    spinor_field_sub_assign_f(s2,s1);
    tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
    lprintf("FGMRES with SAP",0," Normalized residual  = %e (req. %e)\n",tau,par.err2);
+   lprintf("FGMRES with SAP",0," Inversion took: %ld sec %ld usec\n",etime.tv_sec,etime.tv_usec);
    lprintf("FGMRES with SAP",0,"---------------------\n");   
    
 
@@ -241,20 +246,24 @@ int main(int argc,char *argv[])
 
    spinor_field_zero_f(res);
    
-   DDalphaAMG_setup(&par_precon, Hop, 20, 3, 6);
+   DDalphaAMG_setup(&par_precon, Hop, 5, 3, 6);
    // Arguments are (cg_parameters, operator, Number of vectors to span near kernel, (not used), n_inv)
    
    lprintf("FGMRES with DDalphaAMG",0,"\n Testing  FGMRES with DDalphaAMG preconditioner\n");
    lprintf("FGMRES with DDalphaAMG",0,"---------------------\n");
 
    cgiters=0;
+   gettimeofday(&start,0);   
    cgiters = FGMRES(&par, Hop, s1, res,NULL,precon_DDalphaAMG);
+   gettimeofday(&end,0);
+   timeval_subtract(&etime,&end,&start);
    
    lprintf("FGMRES with DDalphaAMG",0," Converged in %d iterations\n",cgiters);
    Hop.dbl(s2,res);
    spinor_field_sub_assign_f(s2,s1);
    tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
    lprintf("FGMRES with DDalphaAMG",0," Normalized residual  = %e (req. %e)\n",tau,par.err2);
+   lprintf("FGMRES with DDalphaAMG",0," Inversion took: %ld sec %ld usec\n",etime.tv_sec,etime.tv_usec);
    lprintf("FGMRES with DDalphaAMG",0,"---------------------\n");   
 
    
@@ -267,7 +276,10 @@ int main(int argc,char *argv[])
    lprintf("FGMRES with trivial",0,"---------------------\n");
 
    cgiters=0;
+   gettimeofday(&start,0);   
    cgiters = FGMRES(&par, Hop, s1, res,NULL,precon_trivial);
+   gettimeofday(&end,0);
+   timeval_subtract(&etime,&end,&start);
    
  // cgiters = FGMRES(&par, Hop, s1, res,NULL,precon_trivial);
    lprintf("FGMRES with trivial",0," Converged in %d iterations\n",cgiters);
@@ -275,6 +287,7 @@ int main(int argc,char *argv[])
    spinor_field_sub_assign_f(s2,s1);
    tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
    lprintf("FGMRES with trivial",0," Normalized residual  = %e (req. %e)\n",tau,par.err2);
+   lprintf("FGMRES with trivial",0," Inversion took: %ld sec %ld usec\n",etime.tv_sec,etime.tv_usec);
    lprintf("FGMRES with trivial",0,"---------------------\n");
 
 
