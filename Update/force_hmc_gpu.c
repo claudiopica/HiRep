@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <math.h>
 
-__constant__ complex eitheta_f_gpu[4];
+__device__ __constant__ complex eitheta_f_gpu[4];
 
 #ifdef BC_T_THETA
 #define _T_theta_mulc(r) _vector_mulc_f(ptmp,eitheta_f_gpu[0],(r)); (r)=ptmp
@@ -175,7 +175,7 @@ static void init_bc_gpu(){
 #ifdef FERMION_THETA
   static int initialized=0;
   if (!initialized){
-    cudaMemcpyToSymbol("eitheta_f_gpu", eitheta, 4*sizeof(complex), 0, cudaMemcpyHostToDevice);
+    cudaMemcpyToSymbol(eitheta_f_gpu, eitheta, 4*sizeof(complex), 0, cudaMemcpyHostToDevice);
     initialized=1;
   }
 #endif

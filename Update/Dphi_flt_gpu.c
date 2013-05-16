@@ -53,7 +53,7 @@ unsigned long int getMVM_flt() {
  * or on spinors with definite parity
  */
 
-__constant__ complex_flt eitheta_flt_gpu[4];
+__device__ __constant__ complex_flt eitheta_flt_gpu[4];
 
 
 /* r=t*u*s */
@@ -138,7 +138,8 @@ static void init_bc_gpu(){
       theta_flt[i].re = (float) eitheta[i].re;
       theta_flt[i].im = (float) eitheta[i].im;
     }
-    cudaMemcpyToSymbol("eitheta_flt_gpu", theta_flt, 4*sizeof(complex_flt), 0, cudaMemcpyHostToDevice);
+    cudaMemcpyToSymbol(eitheta_flt_gpu, theta_flt, 4*sizeof(complex_flt), 0, cudaMemcpyHostToDevice);
+    CudaCheckError();
     initialized=1;
   }
 #endif

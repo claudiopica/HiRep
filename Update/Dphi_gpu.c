@@ -35,7 +35,7 @@
 extern rhmc_par _update_par; /* Update/update_rhmc.c */
 #endif /* ROTATED_SF */
 
-__constant__ complex eitheta_gpu[4];
+__device__ __constant__ complex eitheta_gpu[4];
 
 /*
  * the following variable is used to keep trace of
@@ -1479,7 +1479,8 @@ static void init_bc_gpu(){
 #ifdef FERMION_THETA
   static int initialized=0;
   if (!initialized){
-    cudaMemcpyToSymbol("eitheta_gpu", eitheta, 4*sizeof(complex), 0, cudaMemcpyHostToDevice);
+    cudaMemcpyToSymbol(eitheta_gpu, eitheta, 4*sizeof(complex), 0, cudaMemcpyHostToDevice);
+    CudaCheckError();
     initialized=1;
   }
 #endif
@@ -1515,7 +1516,7 @@ void Dphi_(spinor_field *out, spinor_field *in)
   } else if (in->type==&glat_even) {
     ++MVMcounter;
     Dphi_gpu_oe<<<grid,BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out),START_SP_ADDRESS_GPU(in), u_gauge_f->gpu_ptr,iup_gpu,idn_gpu,vol4h);
-      CudaCheckError();
+    CudaCheckError();
   } else if (in->type==&glattice) {
       in->type=&glat_even;
       out->type=&glat_odd;
