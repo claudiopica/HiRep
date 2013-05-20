@@ -43,28 +43,49 @@ typedef struct _input_WF {
   double tmax;
   int nmeas;
   int nint;
-  double SF_ct;
-  double beta;
 
   /* for the reading function */
-  input_record_t read[7];
+  input_record_t read[4];
 
 } input_WF;
 
 #define init_input_WF(varname) \
 { \
   .read={\
-    {"WF beta for SF coupling", "beta = %lf", DOUBLE_T, &((varname).beta)},\
     {"WF max integration time", "WF:tmax = %lf", DOUBLE_T, &((varname).tmax)},\
     {"WF number of measures", "WF:nmeas = %d", DOUBLE_T, &((varname).nmeas)},\
     {"WF number of integration steps between measures", "WF:nint = %d", INT_T, &((varname).nint)},\
-    {"SF_ct", "SF_ct = %lf", DOUBLE_T, &((varname).SF_ct)},\
     {NULL, NULL, 0, NULL}\
   }\
 }
 
-
 input_WF WF_var = init_input_WF(WF_var);
+
+
+#ifdef ROTATED_SF
+
+typedef struct _input_SF {
+  double ct;
+  double beta;
+
+  /* for the reading function */
+  input_record_t read[3];
+
+} input_SF;
+
+#define init_input_SF(varname) \
+{ \
+  .read={\
+    {"SF ct", "SF:ct = %lf", DOUBLE_T, &((varname).ct)},\
+    {"SF beta", "SF:beta = %lf", DOUBLE_T, &((varname).beta)},\
+    {NULL, NULL, 0, NULL}\
+  }\
+}
+
+input_SF SF_var = init_input_SF(SF_var);
+
+#endif /* ROTATED_SF */
+
 
 char cnfg_filename[256]="";
 char list_filename[256]="";
@@ -179,11 +200,10 @@ void read_cmdline(int argc, char* argv[]) {
 
 
 int main(int argc,char *argv[]) {
-  int i,j;
+  int i;
   char tmp[256];
   FILE* list;
   filename_t fpars;
-  double beta;
 
   /* setup process id and communications */
   read_cmdline(argc, argv);
@@ -213,9 +233,11 @@ int main(int argc,char *argv[]) {
   parse_cnfg_filename(cnfg_filename,&fpars);
 
   read_input(WF_var.read,input_filename);
+#ifdef ROTATED_SF
+  read_input(SF_var.read,input_filename);
+#endif
   GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
-  beta=WF_var.beta;
-
+ 
   error(fpars.type==UNKNOWN_CNFG,1,"WF_measure.c","Bad name for a configuration file");
   error(fpars.nc!=NG,1,"WF_measure.c","Bad NG");
 
@@ -240,7 +262,7 @@ int main(int argc,char *argv[]) {
     .fermion_twisting_theta = {0.,0.,0.,0.},
     .gauge_boundary_improvement_cs = 1.,
 #ifdef ROTATED_SF
-    .gauge_boundary_improvement_ct = WF_var.SF_ct,
+    .gauge_boundary_improvement_ct = SF_var.ct,
 #else
     .gauge_boundary_improvement_ct = 1.,
 #endif
@@ -261,26 +283,43 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"WF number of integration intervals: %d\n",WF_var.nint*WF_var.nmeas);
   lprintf("MAIN",0,"WF integration step: %e\n",WF_var.tmax/(WF_var.nmeas*WF_var.nint));
 
+#ifdef ROTATED_SF
+  lprintf("MAIN",0,"SF beta=%e\n",SF_var.beta);      
+  lprintf("MAIN",0,"SF ct=%e\n",SF_var.ct);
+#endif
+
   
   list=NULL;
   if(strcmp(list_filename,"")!=0) {
-    error((list=fopen(list_filename,"r"))==NULL,1,"main [mk_mesons.c]" ,
+    error((list=fopen(list_filename,"r"))==NULL,1,"main [WF_measure.c]" ,
 	"Failed to open list file\n");
   }
 
   WF_initialize();
+
+#ifndef ROTATED_SF
+  double E, Esym, TC;
+#else
+  int j;
+  double E[2*GLB_T];
+  double Esym[2*GLB_T];
+  double Eavg[2];
+  double Esymavg[2];
+#endif
+
   
   i=0;
   while(1) {
 
     if(list!=NULL)
       if(fscanf(list,"%s",cnfg_filename)==0 || feof(list)) break;
-    
+
     i++;
-    
+
     lprintf("MAIN",0,"Configuration from %s\n", cnfg_filename);
     /* NESSUN CHECK SULLA CONSISTENZA CON I PARAMETRI DEFINITI !!! */
     read_gauge_field_nocheck(cnfg_filename);
+    apply_BCs_on_fundamental_gauge_field();
 
     lprintf("TEST",0,"<p> %1.6f\n",avr_plaquette());
 
@@ -290,58 +329,31 @@ int main(int argc,char *argv[]) {
     double epsilon=WF_var.tmax/(WF_var.nmeas*WF_var.nint);
     double t=0.;
 
-#ifdef ROTATED_SF
-
-    double E[2*GLB_T];
-    double Esym[2*GLB_T];
-    double Eavg[2];
-    double Esymavg[2];
-    apply_BCs_on_fundamental_gauge_field();
-
-    
-    lprintf("WILSONFLOW",0,"SF action is evaluated at beta=%e\n",beta);      
-
-
-    WF_E_T(E,u_gauge);
-    WF_Esym_T(Esym,u_gauge);
-    Eavg[0]=Eavg[1]=Esymavg[0]=Esymavg[1]=0.0;
-    for(j=1;j<GLB_T-1;j++){
-      lprintf("WILSONFLOW",0,"WF (ncnfg,T,t,Etime,Espace,Esymtime,Esymspace) = %d %d %e %e %e %e %e\n",i,j,t,E[2*j],E[2*j+1],Esym[2*j],Esym[2*j+1]);      
-
-      Eavg[0] += E[2*j];
-      Eavg[1] += E[2*j+1];
-      Esymavg[0] += Esym[2*j];
-      Esymavg[1] += Esym[2*j+1];
-    }
-
-    Eavg[0] /= GLB_T-2;
-    Eavg[1] /= GLB_T-3;
-    Esymavg[0] /= GLB_T-2;
-    Esymavg[1] /= GLB_T-3;
-    lprintf("WILSONFLOW",0,"WF avg (ncnfg,t,Etime,Espace,Esymtime,Esymspace,Pltime,Plspace) = %d %e %e %e %e %e %e %e\n",i,t,Eavg[0],Eavg[1],Esymavg[0],Esymavg[1],(NG-Eavg[0]),(NG-Eavg[1]));
-    
-    lprintf("WILSONFLOW",0,"(t,dS/deta)  %e %e\n", t,SF_action(beta));
-#else
-    double E=WF_E(u_gauge);
-    double Esym=WF_Esym(u_gauge);
-    lprintf("WILSONFLOW",0,"WF (ncnfg,t,E,t2*E,Esym,t2*Esym) = %d %e %e %e %e %e\n",i,t,E,t*t*E,Esym,t*t*Esym);
-#endif
-
-    for(n=0;n<WF_var.nmeas;n++) {
-      for(k=0;k<WF_var.nint;k++) {
-        WilsonFlow3(u_gauge,epsilon);
-        t+=epsilon;
+    for(n=-1;n<WF_var.nmeas;n++) {
+      if(n>-1) {
+        for(k=0;k<WF_var.nint;k++) {
+          WilsonFlow3(u_gauge,epsilon);
+          t+=epsilon;
+        }
       }
-#ifdef ROTATED_SF
+#ifndef ROTATED_SF
+
+      E=WF_E(u_gauge);
+      Esym=WF_Esym(u_gauge);
+      TC=WF_topo(u_gauge);
+      lprintf("WILSONFLOW",0,"WF (ncnfg,t,E,t2*E,Esym,t2*Esym,TC) = %d %e %e %e %e %e %e\n",i,t,E,t*t*E,Esym,t*t*Esym,TC);
+
+#else
+
       WF_E_T(E,u_gauge);
       WF_Esym_T(Esym,u_gauge);
       Eavg[0]=Eavg[1]=Esymavg[0]=Esymavg[1]=0.0;
       for(j=1;j<GLB_T-1;j++){
-	lprintf("WILSONFLOW",0,"WF (ncnfg,T,t,Etime,Espace,Esymtime,Esymspace) = %d %d %e %e %e %e %e\n",i,j,t,E[2*j],E[2*j+1],Esym[2*j],Esym[2*j+1]);
-	Eavg[0] += E[2*j];
-	Eavg[1] += E[2*j+1];
-	Esymavg[0] += Esym[2*j];
-	Esymavg[1] += Esym[2*j+1];
+        lprintf("WILSONFLOW",0,"WF (ncnfg,T,t,Etime,Espace,Esymtime,Esymspace) = %d %d %e %e %e %e %e\n",i,j,t,E[2*j],E[2*j+1],Esym[2*j],Esym[2*j+1]);
+        Eavg[0] += E[2*j];
+        Eavg[1] += E[2*j+1];
+        Esymavg[0] += Esym[2*j];
+        Esymavg[1] += Esym[2*j+1];
       }
 
       Eavg[0] /= GLB_T-2;
@@ -351,11 +363,6 @@ int main(int argc,char *argv[]) {
 
       lprintf("WILSONFLOW",0,"WF avg (ncnfg,t,Etime,Espace,Esymtime,Esymspace,Pltime,Plspace) = %d %e %e %e %e %e %e %e\n",i,t,Eavg[0],Eavg[1],Esymavg[0],Esymavg[1],(NG-Eavg[0]),(NG-Eavg[1]));
 
-      lprintf("WILSONFLOW",0,"(t,dS/deta)  %e %e\n", t,SF_action(beta));
-#else
-      E=WF_E(u_gauge);
-      Esym=WF_Esym(u_gauge);
-      lprintf("WILSONFLOW",0,"WF (ncnfg,t,E,t2*E,Esym,t2*Esym) = %d %e %e %e %e %e\n",i,t,E,t*t*E,Esym,t*t*Esym);
 #endif
     }
     

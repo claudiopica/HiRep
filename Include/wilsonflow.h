@@ -25,6 +25,7 @@ void WilsonFlow3(suNg_field* V, const double epsilon);
 
 double WF_E(suNg_field* V);
 double WF_Esym(suNg_field* V);
+double WF_topo(suNg_field* V);
 
 void WF_E_T(double* E,suNg_field* V);
 void WF_Esym_T(double* Esym,suNg_field* V);
