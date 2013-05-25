@@ -449,22 +449,24 @@ void WF_E_T(double* E, suNg_field* V) {
   int t,x,y,z,ix;
   int mu,nu;
   double p;
-  
+
   for(t=0;t<2*GLB_T;t++) E[t]=0.;
 
   for (t=0; t<T; t++){
     for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++)
 	  for(mu=0;mu<4;mu++) for(nu=mu+1;nu<4;nu++) {
-      ix=ipt(t,x,y,z);
-      WF_plaq(&p,V, ix, mu, nu);
-      if(mu==0) E[2*((zerocoord[0]+t+GLB_T)%GLB_T)] += p;
-      else E[2*((zerocoord[0]+t+GLB_T)%GLB_T)+1] += p;
-    }
-    E[2*((zerocoord[0]+t+GLB_T)%GLB_T)] = NG - E[2*((zerocoord[0]+t+GLB_T)%GLB_T)]/(3.*GLB_VOL3);
-    E[2*((zerocoord[0]+t+GLB_T)%GLB_T)+1] = NG - E[2*((zerocoord[0]+t+GLB_T)%GLB_T)+1]/(3*GLB_VOL3);
+	      ix=ipt(t,x,y,z);
+	      WF_plaq(&p,V, ix, mu, nu);
+	      if(mu==0) E[2*((zerocoord[0]+t+GLB_T)%GLB_T)] += p;
+	      else E[2*((zerocoord[0]+t+GLB_T)%GLB_T)+1] += p;
+	    }
+    E[2*((zerocoord[0]+t+GLB_T)%GLB_T)] = - E[2*((zerocoord[0]+t+GLB_T)%GLB_T)]/(3.*GLB_VOL3);
+    E[2*((zerocoord[0]+t+GLB_T)%GLB_T)+1] = - E[2*((zerocoord[0]+t+GLB_T)%GLB_T)+1]/(3.*GLB_VOL3);
   }
-  
+
   global_sum(E,2*GLB_T);
+
+  for(t=0;t<2*GLB_T;t++) E[t] += NG;
   E[3]=0.0;
 }
 
@@ -607,7 +609,7 @@ void WF_Esym_T(double* E, suNg_field* V) {
     E[2*((zerocoord[0]+t+GLB_T)%GLB_T)+1] *= _FUND_NORM2/(6.*GLB_VOL3);
   }
 
-  global_sum(E,GLB_T);
+  global_sum(E,2*GLB_T);
 }
 
 

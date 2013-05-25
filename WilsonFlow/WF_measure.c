@@ -33,12 +33,6 @@
 #include "cinfo.c"
 
 
-
-
-
-
-
-
 typedef struct _input_WF {
   double tmax;
   int nmeas;
@@ -318,10 +312,10 @@ int main(int argc,char *argv[]) {
 
     lprintf("MAIN",0,"Configuration from %s\n", cnfg_filename);
     /* NESSUN CHECK SULLA CONSISTENZA CON I PARAMETRI DEFINITI !!! */
-    read_gauge_field_nocheck(cnfg_filename);
-    apply_BCs_on_fundamental_gauge_field();
 
-    lprintf("TEST",0,"<p> %1.6f\n",avr_plaquette());
+    read_gauge_field_nocheck(cnfg_filename);
+
+    apply_BCs_on_fundamental_gauge_field();
 
     full_plaquette();
 
@@ -362,6 +356,7 @@ int main(int argc,char *argv[]) {
       Esymavg[1] /= GLB_T-3;
 
       lprintf("WILSONFLOW",0,"WF avg (ncnfg,t,Etime,Espace,Esymtime,Esymspace,Pltime,Plspace) = %d %e %e %e %e %e %e %e\n",i,t,Eavg[0],Eavg[1],Esymavg[0],Esymavg[1],(NG-Eavg[0]),(NG-Eavg[1]));
+      lprintf("WILSONFLOW",0,"SF dS/deta= %e\n", SF_action(SF_var.beta));
 
 #endif
     }
