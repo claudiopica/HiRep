@@ -46,9 +46,10 @@ typedef struct _format_type {
 } format_type;
 
 int nformats=8;
-format_type format[8] = {
+format_type format[9] = {
   { .name="ascii" ,     .read=read_gauge_field_ascii ,     .write=NULL },
   { .name="milc" ,     .read=read_gauge_field_milc ,     .write=NULL },
+  { .name="milcn3r" ,     .read=read_gauge_field_milc_no3row ,     .write=NULL },
   { .name="mpieo" ,     .read=read_gauge_field ,           .write=write_gauge_field },
   { .name="eolexi:be" , .read=read_gauge_field_eolexi_BE , .write=write_gauge_field_eolexi_BE },
   { .name="mpieo:be" ,  .read=read_gauge_field_mpieo_BE ,  .write=write_gauge_field_mpieo_BE },
@@ -182,7 +183,7 @@ Syntax (3): converter -i <input file> [<input format>] -o <output file> [<output
 * Convert the input file from the input format to the output format. The volume must be provided if it cannot be extracted from the input file name.\n\n\
 Syntax (4): converter -i <input file> [<input format>] [-v <volume>] --check\n\
 * Open the input file assuming the given format and print, if possible, plaquettes and average distance from unitarity for the link variables.\n\n\
-Input formats = mpieo (be,default) | mpieo:be | mpieo:le | eolexi:be | eolexi:le | milc | ascii | su2q\n\
+Input formats = mpieo (be,default) | mpieo:be | mpieo:le | eolexi:be | eolexi:le | milc | milcn3r | ascii | su2q\n\
 Output formats = mpieo (be,default) | mpieo:be | mpieo:le | eolexi:be | eolexi:le | su2q\n\
 ");
 }

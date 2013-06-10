@@ -201,6 +201,25 @@ int fread_BE_double(double* ptr, size_t n, FILE* fp) {
   return ret;
 }
 
+int fread_BE_float(float* ptr, size_t n, FILE* fp) {
+  int ret;
+  if(which_endian()==_BIG_ENDIAN_HRP) {
+    ret=fread(ptr,sizeof(float),n,fp);
+    lprintf("IO",100,"Read %d floats.\n",n);
+  } else {
+    size_t i;
+    ret=fread(ptr,sizeof(float),n,fp);
+    if(sizeof(float)*CHAR_BIT==16)
+      for(i=0; i<n; i++) swapendian16(ptr+i);
+    else if(sizeof(float)*CHAR_BIT==32)
+      for(i=0; i<n; i++) swapendian32(ptr+i);
+    else if(sizeof(float)*CHAR_BIT==64)
+      for(i=0; i<n; i++) swapendian64(ptr+i);
+    lprintf("IO",100,"Read %d floats with swapped endian.\n",n);
+  }
+  return ret;
+}
+
 int fread_LE_double(double* ptr, size_t n, FILE* fp) {
   int ret;
   if(which_endian()==_LITTLE_ENDIAN_HRP) {
