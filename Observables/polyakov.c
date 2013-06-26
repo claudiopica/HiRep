@@ -277,7 +277,7 @@ void polyakov_in_time() {
 	double adjpoly;
 	double dtmp;
 	double *poly_t;
-	poly_t=malloc(sizeof(double)*T);
+	poly_t=malloc(sizeof(double)*GLB_T); //uuu
 #ifdef WITH_MPI  
 	int np[4]={NP_T,NP_X,NP_Y,NP_Z};
 	int mpiret;
@@ -482,7 +482,7 @@ void polyakov_in_time() {
 		poly.re=poly.im=0.0;
 		adjpoly=0.;
 		
-		for(x[0]=0; x[0]<T; x[0]++){								// initialize to zero
+		for(x[0]=0; x[0]<GLB_T; x[0]++){								// initialize to zero //uuu
 			poly_t[x[0]]=0;
 		}
 		
@@ -495,18 +495,41 @@ void polyakov_in_time() {
 //					lprintf("LOC_POLYAKOV",0,"%d %d %d %d %d %1.8e\n",mu,x[(mu+1)%4],x[(mu+2)%4],x[(mu+3)%4],i3d,dtmp); 
 					poly.re += dtmp;
 					adjpoly +=dtmp*dtmp;
-					poly_t[x[0]] += dtmp;
+					if(COORD[1]+COORD[2]+COORD[3]==0){
+						poly_t[x[0]+loc[0]*COORD[0]] += dtmp;	//uuu
+					}
 					//_suNg_trace_im(dtmp,p[i3d]);
 					dtmp=0.;
 					poly.im += dtmp;
 					adjpoly +=dtmp*dtmp - 1;
 					i3d++;
 				}
+	
+	
+	#ifdef ANVKNRFVF //WITH_MPI  
+		if(COORD[0]!=0) {
+			MPI_Status status;
+			mpiret=MPI_Recv(&poly_t[T*COORD[0]], // buffer */
+							T*sizeof(double)/sizeof(double), /* lenght in units of doubles */
+							MPI_DOUBLE, /* basic datatype */
+							proc_dn(CID,mu), /* cid of origin */
+							COORD[0]-1, /* tag of communication */
+							cart_comm, /* use the cartesian communicator */
+							&status);
+		}
+	#endif	
+	
+//		for(int i=0;i<MP_T;i++){ // Copy the poly_t from the other local volumes to the outputting process
+//		
+//		}
+		
+		
 		
 		global_sum((double*)&poly,2);   //MPI communication
 		global_sum((double*)&adjpoly,1);
+		global_sum(poly_t,GLB_T);
 		
-		for(x[0]=0; x[0]<T; x[0]++){
+		for(x[0]=0; x[0]<GLB_T; x[0]++){ //uuu
 			//global_sum((double*)&poly_t[x[0]],1); //MPI communication
 			poly_t[x[0]] /= NG*GLB_X*GLB_Y*GLB_Z/loc[mu];
 		}
@@ -518,7 +541,7 @@ void polyakov_in_time() {
 		lprintf("FUND_POLYAKOV",0,"Polyakov direction %d = %1.8e %1.8e\n",mu,poly.re,poly.im);
 		lprintf("ADJ_POLYAKOV",0,"Polyakov direction %d = %1.8e\n",mu,adjpoly);
 		
-		for(x[0]=0; x[0]<T; x[0]++){
+		for(x[0]=0; x[0]<GLB_T; x[0]++){ //uuu
 			lprintf("FUND_POLYAKOV",0,"Polyakov ( d = %d t = %d ) : %1.8e\n",mu,x[0],poly_t[x[0]]);
 		}
 		
