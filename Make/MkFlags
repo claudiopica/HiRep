@@ -4,7 +4,7 @@ REPR = REPR_FUNDAMENTAL
 #REPR = REPR_ANTISYMMETRIC
 #REPR = REPR_ADJOINT
 
-MACRO += -DWITHOUT_FERMIONS
+#MACRO += -DWITHOUT_FERMIONS
 
 MACRO += -DANTIPERIODIC_BC_T
 #MACRO += -DANTIPERIODIC_BC_X
@@ -16,7 +16,7 @@ MACRO += -DANTIPERIODIC_BC_T
 #MACRO += -DROTATED_SF
 
 MACRO += -DUPDATE_EO
-#MACRO += -DWITH_MPI
+MACRO += -DWITH_MPI
 #MACRO += -DNDEBUG
 #MACRO += -DCHECK_SPINOR_MATCHING
 #MACRO += -DMPI_TIMING
@@ -24,9 +24,13 @@ MACRO += -DIO_FLUSH
 
 #Compiler
 #export OMPI_CC = ccache gcc
-#CC = mpicc
-CC = gcc
-CFLAGS = -Wall -std=c99 -O2 -fomit-frame-pointer -mfpmath=sse -msse -msse2 
+CC = mpicc
+#CC = gcc
+#CFLAGS = -Wall -std=c99 -O2 -fomit-frame-pointer -mfpmath=sse -msse -msse2 
+CFLAGS = -Wall -std=c99 -O3 -funroll-loops -fomit-frame-pointer -ftree-vectorize -ftree-vectorizer-verbose=2 -fivopts -msse4.2
+#CC = icc 
+#CFLAGS = -std=c99 -O3 -unroll-aggressive -ip -vec-threshold0 -xsse4.2 -vec-report2 -opt-prefetch=3 -opt-streaming-stores always -opt-block-factor=10 -fomit-frame-pointer -scalar-rep
+
 #CFLAGS = -Wall -std=c99 -g -fomit-frame-pointer  
 
 
