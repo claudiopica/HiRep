@@ -152,7 +152,6 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
   assign_ud2u_f();
   
   for (k=0; k<par->n_pf; ++k) {
-
 #ifndef UPDATE_EO
     /* X = H^{-1} pf[k] = D^{-1} g5 pf[k] */
     g5QMR_fltacc_par mpar;
@@ -177,20 +176,30 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
     g5QMR_fltacc(&mpar, &D, &D_flt, eta, Ys);
     
 #else
+    /*    g5QMR_fltacc_par mpar;
+    mpar.err2 = par->inv_err2;
+    mpar.max_iter = 0;
+    mpar.err2_flt = par->inv_err2_flt;
+    mpar.max_iter_flt = 0;*/
+
+    mshift_par mpar;
+    mpar.err2 = par->inv_err2;
+    mpar.max_iter=0;
+    mpar.n = 1;
+    mpar.shift = (double*) malloc(sizeof(double)*(mpar.n));
+    mpar.shift[0]=0;
+
+
     /* X_e = H^{-1} pf[k] */
     /* X_o = D_{oe} X_e = D_{oe} H^{-1} pf[k] */
     Xe=*Xs; Xe.type=&glat_even;
     Xo=*Xs; Xo.type=&glat_odd;
 
-    g5QMR_fltacc_par mpar;
-    mpar.err2 = par->inv_err2;
-    mpar.max_iter = 0;
-    mpar.err2_flt = par->inv_err2_flt;
-    mpar.max_iter_flt = 0;
     spinor_field_zero_f(&Xe);
     /* H^{-1} pf = D^{-1} g5 pf */
     spinor_field_g5_assign_f(&pf[k]);
-    g5QMR_fltacc(&mpar, &D, &D_flt, &pf[k], &Xe);
+    //    g5QMR_fltacc(&mpar, &D, &D_flt, &pf[k], &Xe);
+    g5QMR_mshift(&mpar, &D, &pf[k], &Xe);
     spinor_field_g5_assign_f(&pf[k]);
     Dphi_(&Xo,&Xe);
     
@@ -209,7 +218,8 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
     
     spinor_field_zero_f(&Ye);
     spinor_field_g5_assign_f(eta);
-    g5QMR_fltacc(&mpar, &D, &D_flt, eta, &Ye);
+    //    g5QMR_fltacc(&mpar, &D, &D_flt, eta, &Ye);
+    g5QMR_mshift(&mpar, &D, eta, &Ye);
     spinor_field_g5_assign_f(eta);
     Dphi_(&Yo,&Ye);
     
