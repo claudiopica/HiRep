@@ -15,30 +15,30 @@
 
 
 /*
-#define EXP_CHECK
-#define PLAQ_CHECK
+  #define EXP_CHECK
+  #define PLAQ_CHECK
 */
 
 /*
-* d/dt V = Z(V) V
-* S_W = 1/g^2 \sum_{p oriented} Re tr ( 1 - V(p) )
-* d_L f(V) = T^a d/ds f(e^{sT^a} V)
-* T_a^dag = -T_a      tr T_a T_b = -delta_{ab}/2
-* Z(V) = -g^2 d_L S_W = \sum_{p oriented} d_L Re tr ( V(p) )
-* Z(V) = d_L Re ( tr V s + tr V^dag s^dag ) =
-*      = d_L ( tr V s + tr V^dag s^dag ) =
-*      = T^a tr T^a ( V s - s^dag V^dag )
-*      = - 1/2 ( V s - s^dag V^dag - 1/N tr (V s - s^dag V^dag) )
-*/
+ * d/dt V = Z(V) V
+ * S_W = 1/g^2 \sum_{p oriented} Re tr ( 1 - V(p) )
+ * d_L f(V) = T^a d/ds f(e^{sT^a} V)
+ * T_a^dag = -T_a      tr T_a T_b = -delta_{ab}/2
+ * Z(V) = -g^2 d_L S_W = \sum_{p oriented} d_L Re tr ( V(p) )
+ * Z(V) = d_L Re ( tr V s + tr V^dag s^dag ) =
+ *      = d_L ( tr V s + tr V^dag s^dag ) =
+ *      = T^a tr T^a ( V s - s^dag V^dag )
+ *      = - 1/2 ( V s - s^dag V^dag - 1/N tr (V s - s^dag V^dag) )
+ */
 static void Zeta(suNg_field *Z, const suNg_field* U, const double alpha){
   suNg staple, tmp1, tmp2;
   suNg *u1, *u2, *u3;
   int mu, nu, j, k;
   double imtr;
   _DECLARE_INT_ITERATOR(i);
-  #ifdef PLAQ_CHECK
+#ifdef PLAQ_CHECK
   double retr, plaq=0.;
-  #endif
+#endif
 
   error(Z->type!=&glattice,1,"wilson_flow.c","'Z' in Zeta must be defined on the whole lattice");
   error(U->type!=&glattice,1,"wilson_flow.c","'U' in Zeta must be defined on the whole lattice");
@@ -76,10 +76,10 @@ static void Zeta(suNg_field *Z, const suNg_field* U, const double alpha){
       
       _suNg_times_suNg(tmp1,*_4FIELD_AT(U,i,mu),staple);
       
-      #ifdef PLAQ_CHECK
+#ifdef PLAQ_CHECK
       _suNg_trace_re(retr,tmp1);
       plaq += retr/(NG*6);
-      #endif
+#endif
       
       _suNg_dagger(tmp2,tmp1);
       _suNg_sub_assign(tmp1,tmp2);
@@ -96,11 +96,11 @@ static void Zeta(suNg_field *Z, const suNg_field* U, const double alpha){
 
   }
  
- #ifdef PLAQ_CHECK
+#ifdef PLAQ_CHECK
   plaq /= (4*GLB_T*GLB_X*GLB_Y*GLB_Z);
   global_sum(&plaq,1);
   lprintf("WILSONFLOW",0,"ZETA Plaquette check %f %e\n",plaq,24.*(1.-plaq));
-  #endif
+#endif
 }
 
 
@@ -128,12 +128,12 @@ static void WF_Exp_check(suNg *u, suNg *X) {
 #if NG==2
 
 /*
-*  u = exp(X)
-*
-* I AM ASSUMING
-* X^dag = -X
-* tr X = 0
-*/
+ *  u = exp(X)
+ *
+ * I AM ASSUMING
+ * X^dag = -X
+ * tr X = 0
+ */
 static void WF_Exp(suNg *u, suNg *X) {
   suNg_algebra_vector h,v;
 
@@ -164,26 +164,8 @@ static void WF_Exp(suNg *u, suNg *X) {
 #endif
 }
 
-#elif NG==3
+/*#elif NG==3*/
 
-static void WF_Exp(suNg *u, suNg *X) {
-  suNg Xk, tmp;
-  _suNg_unit(*u);
-  _suNg_unit(Xk);
-  
-  int k=1;
-  double error;
-  while(1) {
-    _suNg_times_suNg(tmp,Xk,*X);
-    _suNg_mul(Xk,1./k,tmp);
-    k++;
-    _suNg_add_assign(*u,Xk);    
-
-    _suNg_sqnorm(error,Xk);
-    if(error<1e-28) break;
-  }
-  
-}
 
 /* static void WF_Exp(suNg *u, suNg *X) { */
 /*   suNg X2; */
@@ -272,7 +254,26 @@ static void WF_Exp(suNg *u, suNg *X) {
 /* } */
   
 #else
-#error The exact exponential must be implemented for this value of NG
+
+static void WF_Exp(suNg *u, suNg *X) {
+  suNg Xk, tmp;
+  _suNg_unit(*u);
+  _suNg_unit(Xk);
+  
+  int k=1;
+  double error;
+  while(1) {
+    _suNg_times_suNg(tmp,Xk,*X);
+    _suNg_mul(Xk,1./k,tmp);
+    k++;
+    _suNg_add_assign(*u,Xk);    
+
+    _suNg_sqnorm(error,Xk);
+    if(error<1e-28) break;
+  }
+  
+}
+
 #endif
 
 
@@ -433,9 +434,9 @@ double WF_E(suNg_field* V) {
 
   _MASTER_FOR(&glattice,ix) {
     for(mu=0;mu<4;mu++) for(nu=mu+1;nu<4;nu++) {
-      WF_plaq(&p,V, ix, mu, nu);
-      E += NG-p;
-    }
+	WF_plaq(&p,V, ix, mu, nu);
+	E += NG-p;
+      }
   }
   
   E *= 2./GLB_VOLUME;
@@ -454,12 +455,12 @@ void WF_E_T(double* E, suNg_field* V) {
 
   for (t=0; t<T; t++){
     for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++)
-	  for(mu=0;mu<4;mu++) for(nu=mu+1;nu<4;nu++) {
-	      ix=ipt(t,x,y,z);
-	      WF_plaq(&p,V, ix, mu, nu);
-	      if(mu==0) E[2*((zerocoord[0]+t+GLB_T)%GLB_T)] += p;
-	      else E[2*((zerocoord[0]+t+GLB_T)%GLB_T)+1] += p;
-	    }
+					      for(mu=0;mu<4;mu++) for(nu=mu+1;nu<4;nu++) {
+						  ix=ipt(t,x,y,z);
+						  WF_plaq(&p,V, ix, mu, nu);
+						  if(mu==0) E[2*((zerocoord[0]+t+GLB_T)%GLB_T)] += p;
+						  else E[2*((zerocoord[0]+t+GLB_T)%GLB_T)+1] += p;
+						}
     E[2*((zerocoord[0]+t+GLB_T)%GLB_T)] = - E[2*((zerocoord[0]+t+GLB_T)%GLB_T)]/(3.*GLB_VOL3);
     E[2*((zerocoord[0]+t+GLB_T)%GLB_T)+1] = - E[2*((zerocoord[0]+t+GLB_T)%GLB_T)+1]/(3.*GLB_VOL3);
   }
@@ -475,11 +476,10 @@ void WF_E_T(double* E, suNg_field* V) {
 static void WF_clover_F(suNg_algebra_vector *F, suNg_field* V, int ix, int mu, int nu) {
   int iy,iz,iw;
   suNg *v1,*v2,*v3,*v4,w1,w2,w3;
-  
+
   _suNg_unit(w3);
   _suNg_mul(w3,-4.,w3);
-  
-  
+
   iy=iup(ix,mu);
   iz=iup(ix,nu);
   
@@ -492,12 +492,11 @@ static void WF_clover_F(suNg_algebra_vector *F, suNg_field* V, int ix, int mu, i
   _suNg_times_suNg_dagger(w2,w1,(*v3));
   _suNg_times_suNg_dagger(w1,w2,(*v4));
 #ifdef PLAQ_WEIGHTS
-	if(plaq_weight!=NULL) {
-	  _suNg_mul(w1,plaq_weight[ix*16+nu*4+mu],w1);
-	}
+  if(plaq_weight!=NULL) {
+    _suNg_mul(w1,plaq_weight[ix*16+nu*4+mu],w1);
+  }
 #endif
   _suNg_add_assign(w3,w1);
-  
   
   iy=idn(ix,mu);
   iz=iup(iy,nu);
@@ -511,12 +510,11 @@ static void WF_clover_F(suNg_algebra_vector *F, suNg_field* V, int ix, int mu, i
   _suNg_times_suNg_dagger(w2,w1,(*v3));
   _suNg_times_suNg(w1,w2,(*v4));
 #ifdef PLAQ_WEIGHTS
-	if(plaq_weight!=NULL) {
-	  _suNg_mul(w1,plaq_weight[iy*16+nu*4+mu],w1);
-	}
+  if(plaq_weight!=NULL) {
+    _suNg_mul(w1,plaq_weight[iy*16+nu*4+mu],w1);
+  }
 #endif
   _suNg_add_assign(w3,w1);
-  
   
   iy=idn(ix,mu);
   iz=idn(iy,nu);
@@ -536,8 +534,7 @@ static void WF_clover_F(suNg_algebra_vector *F, suNg_field* V, int ix, int mu, i
   }
 #endif
   _suNg_add_assign(w3,w1);
-  
-  
+
   iy=idn(ix,nu);
   iz=iup(iy,mu);
   
@@ -562,27 +559,26 @@ static void WF_clover_F(suNg_algebra_vector *F, suNg_field* V, int ix, int mu, i
 }
 
 
-
 double WF_Esym(suNg_field* V) {
   _DECLARE_INT_ITERATOR(ix);
   int mu,nu;
   suNg_algebra_vector clover;
   double p;
   double E;
-  
+
   E=0.;
 
   _MASTER_FOR(&glattice,ix) {
     for(mu=0;mu<4;mu++) for(nu=mu+1;nu<4;nu++) {
-      WF_clover_F(&clover,V,ix,mu,nu);
-      _algebra_vector_sqnorm_g(p,clover);
-      E += p;
-    }
-  }
-  E *= _FUND_NORM2/GLB_VOLUME;
+	WF_clover_F(&clover,V,ix,mu,nu);
+	_algebra_vector_sqnorm_g(p,clover);
+	E += p;
+      }
+  } 
 
-  global_sum(&E,1);
+  E *= _FUND_NORM2/GLB_VOLUME;
   
+  global_sum(&E,1);
   return E;
 }
 
@@ -598,13 +594,13 @@ void WF_Esym_T(double* E, suNg_field* V) {
 
   for (t=0; t<T; t++){
     for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++)
-	  for(mu=0;mu<4;mu++) for(nu=mu+1;nu<4;nu++) {
-	    ix=ipt(t,x,y,z);
-	    WF_clover_F(&clover,V, ix, mu, nu);
-      _algebra_vector_sqnorm_g(p,clover);
-      if(mu==0) E[2*((zerocoord[0]+t+GLB_T)%GLB_T)] += p;
-      else E[2*((zerocoord[0]+t+GLB_T)%GLB_T)+1] += p;
-    }
+					      for(mu=0;mu<4;mu++) for(nu=mu+1;nu<4;nu++) {
+						  ix=ipt(t,x,y,z);
+						  WF_clover_F(&clover,V, ix, mu, nu);
+						  _algebra_vector_sqnorm_g(p,clover);
+						  if(mu==0) E[2*((zerocoord[0]+t+GLB_T)%GLB_T)] += p;
+						  else E[2*((zerocoord[0]+t+GLB_T)%GLB_T)+1] += p;
+						}
     E[2*((zerocoord[0]+t+GLB_T)%GLB_T)] *= _FUND_NORM2/(6.*GLB_VOL3);
     E[2*((zerocoord[0]+t+GLB_T)%GLB_T)+1] *= _FUND_NORM2/(6.*GLB_VOL3);
   }
@@ -614,7 +610,7 @@ void WF_Esym_T(double* E, suNg_field* V) {
 
 
 /*
-q = 1/(16 \pi^2) \epsilon_{\mu\nu\rho\sigma} \tr F_{\mu\nu} F_{\rho\sigma}
+  q = 1/(16 \pi^2) \epsilon_{\mu\nu\rho\sigma} \tr F_{\mu\nu} F_{\rho\sigma}
 */
 double WF_topo(suNg_field* V) {
   _DECLARE_INT_ITERATOR(ix);
@@ -626,23 +622,22 @@ double WF_topo(suNg_field* V) {
 
   _MASTER_FOR(&glattice,ix) {
     WF_clover_F(&F1,V,ix,1,2);
-    WF_clover_F(&F2,V,ix,3,4);
+    WF_clover_F(&F2,V,ix,0,3);
     for(i=0;i<NG*NG-1;i++) TC += F1.c[i]*F2.c[i];
     
     WF_clover_F(&F1,V,ix,1,3);
-    WF_clover_F(&F2,V,ix,2,4);
+    WF_clover_F(&F2,V,ix,0,2);
     for(i=0;i<NG*NG-1;i++) TC -= F1.c[i]*F2.c[i];
     
-    WF_clover_F(&F1,V,ix,1,4);
+    WF_clover_F(&F1,V,ix,0,1);
     WF_clover_F(&F2,V,ix,2,3);
     for(i=0;i<NG*NG-1;i++) TC += F1.c[i]*F2.c[i];
   }
   
-  TC *= _FUND_NORM2/(2.*M_PI*M_PI);
+  TC *= _FUND_NORM2/(4.*M_PI*M_PI);
 
   global_sum(&TC,1);
   
   return TC;
 }
-
 
