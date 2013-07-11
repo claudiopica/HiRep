@@ -50,7 +50,7 @@ void SF_quark_propagator(spinor_field *in, double mass, spinor_field *out, doubl
   MINRESpar.max_iter = 0;
   cgiter=MINRES(&MINRESpar, &H_sf, in, out, 0);
   lprintf("PROPAGATOR",10,"MINRES MVM = %d",cgiter);
-#else
+#elif defined(ROTATED_SF)
 	  
   int cgiter;
   static mshift_par inv_par;
