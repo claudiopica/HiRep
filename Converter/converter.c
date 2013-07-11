@@ -45,8 +45,8 @@ typedef struct _format_type {
   void (*write)(char*);
 } format_type;
 
-int nformats=8;
-format_type format[9] = {
+int nformats=10;
+format_type format[10] = {
   { .name="ascii" ,     .read=read_gauge_field_ascii ,     .write=NULL },
   { .name="milc" ,     .read=read_gauge_field_milc ,     .write=NULL },
   { .name="milcn3r" ,     .read=read_gauge_field_milc_no3row ,     .write=NULL },
@@ -55,6 +55,7 @@ format_type format[9] = {
   { .name="mpieo:be" ,  .read=read_gauge_field_mpieo_BE ,  .write=write_gauge_field_mpieo_BE },
   { .name="eolexi:le" , .read=read_gauge_field_eolexi_LE , .write=write_gauge_field_eolexi_LE },
   { .name="mpieo:le" ,  .read=read_gauge_field_mpieo_LE ,  .write=write_gauge_field_mpieo_LE },
+  { .name="fortran" ,  .read=read_gauge_field_fortran ,  .write=NULL },
   { .name="su2q" ,  .read=read_gauge_field_su2q ,  .write=write_gauge_field_su2q }
 };
 
@@ -183,7 +184,7 @@ Syntax (3): converter -i <input file> [<input format>] -o <output file> [<output
 * Convert the input file from the input format to the output format. The volume must be provided if it cannot be extracted from the input file name.\n\n\
 Syntax (4): converter -i <input file> [<input format>] [-v <volume>] --check\n\
 * Open the input file assuming the given format and print, if possible, plaquettes and average distance from unitarity for the link variables.\n\n\
-Input formats = mpieo (be,default) | mpieo:be | mpieo:le | eolexi:be | eolexi:le | milc | milcn3r | ascii | su2q\n\
+Input formats = mpieo (be,default) | mpieo:be | mpieo:le | eolexi:be | eolexi:le | milc | milcn3r | ascii | fortran | su2q\n\
 Output formats = mpieo (be,default) | mpieo:be | mpieo:le | eolexi:be | eolexi:le | su2q\n\
 ");
 }
