@@ -222,7 +222,7 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
     g5QMR_mshift(&mpar, &D, eta, &Ye);
     spinor_field_g5_assign_f(eta);
     Dphi_(&Yo,&Ye);
-    
+    free(mpar.shift);
 #endif
 
 

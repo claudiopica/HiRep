@@ -69,7 +69,7 @@ int main(int argc,char *argv[])
   /* logger setup */
   if (PID!=0) { logger_disable(); }
   if (PID==0) { sprintf(tmp,">%s",output_filename); logger_stdout(output_filename); }
-  logger_setlevel(0,40);
+  logger_setlevel(0,51);
   sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
 
   lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS); 

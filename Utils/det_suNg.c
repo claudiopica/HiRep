@@ -2,7 +2,7 @@
 *
 * File  det_suNg.c
 *
-* Function to calculate determinant of a complex suNg-matrix using 
+* Function to calculate determinant of a real suNg-matrix using 
 * LU-decomposition. See NR.
 * 
 *

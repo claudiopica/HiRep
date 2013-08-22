@@ -113,7 +113,6 @@ static int parse_lastconf(pg_flow *gf) {
 }
 
 int init_mc(pg_flow *gf, char *ifile) {
-
   int start_t;
 
   /* alloc global gauge fields */

@@ -210,7 +210,7 @@ int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_operator_flt F, spi
       /* Do single precision inversion */
       assign_sd2s(res_flt,res); 
       local_par.err2=par->err2/local_par.err2*0.9;
-#define MAX_PREC 1.e-10
+#define MAX_PREC 1.e-8
       if(local_par.err2<MAX_PREC) local_par.err2=MAX_PREC;
 #undef MAX_PREC
       /* local_par.err2=1.e-10; */
@@ -243,3 +243,6 @@ int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_operator_flt F, spi
   return siter+diter;
 }
 
+int cg_mshift_flt2(mshift_par *par, spinor_operator M, spinor_operator_flt F, spinor_field *in, spinor_field *out){ 
+  
+}
