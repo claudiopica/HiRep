@@ -18,6 +18,7 @@
 #include "global.h"
 #include "spinor_field.h"
 #include "geometry.h"
+#include "logger.h"
 #ifdef WITH_MPI
 #include <mpi.h>
 #endif
@@ -43,7 +44,7 @@ suNg_field *alloc_gfield(geometry_descriptor* type)
    gf->ptr=amalloc(4*type->gsize*sizeof(suNg),ALIGN);
    error((gf->ptr)==NULL,1,"alloc_gfield [field_alloc.c]",
          "Could not allocate memory space for the gauge field (2)");
-
+   lprintf("FIELD_ALLOC",50,"Allocated %d bytes for gauge field\n",4*type->gsize*sizeof(suNg));
    gf->type=type;
 
 #ifdef WITH_MPI
