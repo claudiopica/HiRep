@@ -42,7 +42,7 @@ MODS :=
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Inverters
-MODS := linear_algebra cg_mshift MINRES_mshift g5QMR_mshift MINRES eva jacobi HBiCGstab
+MODS := linear_algebra cg_mshift cg_mshift_flt MINRES_mshift g5QMR_mshift MINRES eva jacobi HBiCGstab 
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := HMC
