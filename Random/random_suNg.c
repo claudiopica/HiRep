@@ -30,11 +30,12 @@ void random_suNg(suNg *u) {
   suNg tmp;
   double gr[NG*NG];
   int i;
-  gauss(gr,NG*NG);
-  for (i=0;i<NG*NG;i++){
-    tmp.c[i]=gr[i];
-  }
-  project_to_suNg_real(u,&tmp);
+  do {
+    gauss(gr,NG*NG);
+    for (i=0;i<NG*NG;i++){
+      tmp.c[i]=gr[i];
+    }
+  } while (!project_to_suNg_real(u,&tmp));
 }
 
 void random_suNg_unit_vector(suNg_vector *v)

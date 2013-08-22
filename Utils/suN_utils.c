@@ -228,7 +228,7 @@ void project_to_suNg_2(suNg *out,suNg *in){
 
 #endif
 
-void project_to_suNg_real(suNg *out, suNg *in){
+int project_to_suNg_real(suNg *out, suNg *in){
   suNg hm,om,tmp;
   double eigval[NG];
   double det;
@@ -260,8 +260,9 @@ void project_to_suNg_real(suNg *out, suNg *in){
   tmp = *out;
   det_suNg(&det,&tmp);
   if (det<1-1e-7 || det>1+1e-7){
-    lprintf("suNg_utils",10,"Error in project project_to_suNg_real: determinant not +/-1. It is %1.8g\n",det);
+    lprintf("suNg_utils",10,"Error in project project_to_suNg_real: determinant not +/-1. It is %1.8g.",det);
+    return 0;
   }
-
+  return 1;
 }
 
