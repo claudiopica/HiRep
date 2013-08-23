@@ -1,7 +1,7 @@
 TOPDIR = ../..
 MKDIR=$(TOPDIR)/Make
 
-EXES = check_diracoperator_SAP # check_diracoperator_2 check_diracoperator_3  check_diracoperator_5 check_diracoperator_6 check_diracoperator_4 speed_test_diracoperator
+EXES = check_diracoperator_2 check_diracoperator_3  check_diracoperator_5 check_diracoperator_6 check_diracoperator_4 speed_test_diracoperator speed_test_diracoperator_flt
 
 default: $(EXES)
 

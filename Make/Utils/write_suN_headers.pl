@@ -212,6 +212,8 @@ END
 ##write_vector_copy();
 write_vector_zero();
 write_vector_minus();
+write_vector_i_plus();
+write_vector_i_minus();
 write_vector_mul();
 write_vector_mulc();
 write_vector_mulc_star();
@@ -545,6 +547,51 @@ sub write_vector_minus {
 		print "   } while(0) \n\n";
 	}
 }
+
+sub write_vector_i_plus {
+  print "/* r= i*s */\n";
+  print "#define _vector_i_plus_${suff}(r,s) \\\n";
+  if ($N<$Nmax or $N<(2*$unroll+1) ) { #unroll all
+		for(my $i=0;$i<$N;$i++){
+			print "   _complex_i_plus((r).$cname\[$i\],(s).$cname\[$i\])";
+			if($i==$N-1) { print "\n\n"; } else { print "; \\\n"; }
+		}
+	} else { #partial unroll
+		print "   do { \\\n";
+		print "      int _i;for (_i=0; _i<$vd; ){\\\n";
+		for(my $i=0;$i<$unroll;$i++){
+			print "         _complex_i_plus((r).$cname\[_i\],(s).$cname\[_i\]); ++_i; \\\n";
+		}
+		print "      }\\\n";
+		for(my $i=0;$i<$vr;$i++){
+			print "      _complex_i_plus((r).$cname\[_i\],(s).$cname\[_i\]); ++_i; \\\n";
+		}
+		print "   } while(0) \n\n";
+	}
+}
+
+sub write_vector_i_minus {
+    print "/* r=-i*s */\n";
+    print "#define _vector_i_minus_${suff}(r,s) \\\n";
+    if ($N<$Nmax or $N<(2*$unroll+1) ) { #unroll all
+	for(my $i=0;$i<$N;$i++){
+	    print "   _complex_i_minus((r).$cname\[$i\],(s).$cname\[$i\])";
+	    if($i==$N-1) { print "\n\n"; } else { print "; \\\n"; }
+	}
+    } else { #partial unroll
+	print "   do { \\\n";
+	print "      int _i;for (_i=0; _i<$vd; ){\\\n";
+	for(my $i=0;$i<$unroll;$i++){
+	    print "         _complex_i_minus((r).$cname\[_i\],(s).$cname\[_i\]); ++_i; \\\n";
+	}
+	print "      }\\\n";
+	for(my $i=0;$i<$vr;$i++){
+	    print "      _complex_i_minus((r).$cname\[_i\],(s).$cname\[_i\]); ++_i; \\\n";
+	}
+	print "   } while(0) \n\n";
+    }
+}
+
 
 sub write_vector_mul {
   print "/* r=k*s (k real) */\n";

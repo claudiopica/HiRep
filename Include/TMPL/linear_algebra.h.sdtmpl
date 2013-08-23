@@ -72,6 +72,19 @@ void _FUNC(spinor_field_g5)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2);
 /* s1=g5*s1  */
 void _FUNC(spinor_field_g5_assign)(_SPINOR_FIELD_TYPE *s1);
 
+/* s1=g0*s2  */
+void _FUNC(spinor_field_g0)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2);
+
+/* s1=g1*s2  */
+void _FUNC(spinor_field_g1)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2);
+
+/* s1=g2*s2  */
+void _FUNC(spinor_field_g2)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2);
+
+/* s1=g3*s2  */
+void _FUNC(spinor_field_g3)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2);
+
+
 /* functions for eva.c  */
 void _FUNC(spinor_field_lc1)(_REAL c1, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2);
 void _FUNC(spinor_field_lc2)(_REAL c1, _REAL c2, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2);

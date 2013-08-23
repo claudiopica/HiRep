@@ -1,7 +1,7 @@
 TOPDIR = ..
 MKDIR=$(TOPDIR)/Make
 
-EXES = mk_mesons random_cnfg random_spinor mk_mesons_with_z2semwall mk_sfcoupling trunc_mesons
+EXES = mk_mesons random_cnfg random_spinor mk_mesons_with_z2semwall mk_mesons_with_z2semwall_new  mk_sfcoupling #trunc_mesons
 
 default: $(EXES)
 
@@ -23,7 +23,7 @@ MODS := amalloc field_alloc spinor_field_alloc
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Observables
-MODS := avr_plaquette trunc_hairpin mesons g5QMR_trunc
+MODS := avr_plaquette trunc_hairpin g5QMR_trunc
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Random
@@ -47,7 +47,7 @@ MODS := linear_algebra cg_mshift MINRES_mshift g5QMR_mshift MINRES eva jacobi
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Converter
-MODS := archive_eolexi archive_henty
+MODS := archive_eolexi #archive_henty
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 COMMON_OBJS = $(MOD_OBJS)
@@ -57,6 +57,8 @@ mk_mesons_with_z2semwall_OBJS = $(TOPDIR)/Observables/mesons.o $(TOPDIR)/Observa
 mk_mesons_OBJS = $(TOPDIR)/Observables/mesons.o $(TOPDIR)/Observables/pta_qprop.o
 
 mk_sfcoupling_OBJS = $(TOPDIR)/Observables/sf_action.o
+
+mk_mesons_with_z2semwall_new_OBJS = $(TOPDIR)/Observables/pta_qprop.o $(TOPDIR)/Observables/z2semwall_new.o
 
 include $(MKDIR)/MkRules
 

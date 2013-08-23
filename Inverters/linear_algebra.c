@@ -7,6 +7,7 @@
 #include "global.h"
 #include <string.h>
 #include "spinor_field.h"
+#include "gamma_spinor.h"
 
 /* 
  * LINEAR ALGEBRA FUNCTIONS ARE DEFINED IN THE TEMPLATE

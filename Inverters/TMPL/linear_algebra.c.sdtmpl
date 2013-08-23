@@ -303,6 +303,50 @@ void _FUNC(spinor_field_g5_assign)(_SPINOR_FIELD_TYPE *s1)
    }
 }
 
+/* s1=g0*s2  */
+void _FUNC(spinor_field_g0)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
+{
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(s1), *_SPINOR_PTR(s2);
+   
+   _TWO_SPINORS_FOR(s1,s2,i) {
+     _spinor_g0_f(*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
+   }
+}
+
+/* s1=g1*s2  */
+void _FUNC(spinor_field_g1)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
+{
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(s1), *_SPINOR_PTR(s2);
+   
+   _TWO_SPINORS_FOR(s1,s2,i) {
+     _spinor_g1_f(*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
+   }
+}
+
+/* s1=g2*s2  */
+void _FUNC(spinor_field_g2)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
+{
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(s1), *_SPINOR_PTR(s2);
+   
+   _TWO_SPINORS_FOR(s1,s2,i) {
+     _spinor_g2_f(*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
+   }
+}
+
+/* s1=g3*s2  */
+void _FUNC(spinor_field_g3)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
+{
+   _DECLARE_INT_ITERATOR(i);
+	_SPINOR_TYPE *_SPINOR_PTR(s1), *_SPINOR_PTR(s2);
+   
+   _TWO_SPINORS_FOR(s1,s2,i) {
+     _spinor_g3_f(*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
+   }
+}
+
 
 
 /* tools per eva.c  */

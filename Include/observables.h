@@ -61,6 +61,9 @@ void ata_qprop_free();
 void z2semwall_qprop_free();
 void z2semwall_mesons(int conf, int nhits, int nm, double *m, double acc);
 
+void z2semwall_qprop_free_new();
+void z2semwall_mesons_new(int conf, int nhits, int nm, double *m, double acc);
+
 void id_correlator(double *out, int t0, spinor_field *qp);
 void g0_correlator(double *out, int t0, spinor_field *qp);
 void g5_correlator(double *out, int t0, spinor_field *qp);
