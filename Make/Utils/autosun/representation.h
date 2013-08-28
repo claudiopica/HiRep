@@ -32,7 +32,11 @@ string algebra_project(const char* hname, const char* mname)
 	if(sizeof(representation::TYPE)==sizeof(FLOATING))
 		M = new rmatrix(representation::DIM,mname);
 	else
+#ifdef _GAUGE_SON_
+	        M = new rmatrix(representation::DIM,mname);
+#else
 		M = new cmatrix(representation::DIM,mname);
+#endif
 
 	//adjM = *M;
 	//adjM.adjoint();

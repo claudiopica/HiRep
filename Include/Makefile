@@ -11,7 +11,7 @@ include $(MKDIR)/MkRules
 
 suN.h suN_types.h: $(MKDIR)/MkFlags $(WRHEAD)
 	echo -n "Writing suN headers..."
-	$(WRHEAD) $(NG) $(REPR) &&\
+	$(WRHEAD) $(NG) $(REPR) $(WQUAT) $(GAUGE_GROUP) &&\
 		echo " done." || ( echo " failed." && false )
 
 suN_repr_func.h: $(MKDIR)/MkFlags $(WRREPR) TMPL/suN_repr_func.h.tmpl

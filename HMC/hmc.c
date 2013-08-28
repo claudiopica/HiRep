@@ -187,8 +187,14 @@ int main(int argc,char *argv[]) {
     lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed+MPI_PID);
     rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
   }
-  
+
+#ifdef GAUGE_SUN
   lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
+#elif GAUGE_SON
+  lprintf("MAIN",0,"Gauge group: SO(%d)\n",NG);
+#else
+  lprintf("MAIN",0,"Default gauge group: SU(%d)\n",NG);
+#endif
   lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
 
   /* read input for measures */

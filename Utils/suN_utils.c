@@ -17,27 +17,55 @@
 #include "utils.h"
 #include "suN.h"
 #include "representation.h"
+#include "logger.h"
 
+#ifdef GAUGE_SON
+static void normalize(double *v)
+{
+  double fact=0;
+  int i;
+  for (i=0;i<NG; ++i){fact+=v[i]*v[i];} 
+  fact = 1.0/sqrt(fact);
+  for (i=0;i<NG; ++i){v[i]*=fact;}
+}
+#else
 static void normalize(suNg_vector *v)
 {
   double fact;
   _vector_prod_re_g(fact,*v,*v);
-  fact=1.0f/sqrt(fact);
+  fact=1.0/sqrt(fact);
   _vector_mul_g(*v, fact, *v);
 }
+#endif
+
 
 
 static void normalize_flt(suNg_vector_flt *v)
 {
   float fact;
   _vector_prod_re_g(fact,*v,*v);
-  fact=1.0/sqrt(fact);
+  fact=1.0f/sqrt(fact);
   _vector_mul_g(*v, fact, *v);
 }
 
 
 void project_to_suNg(suNg *u)
 {
+#ifdef GAUGE_SON
+  double *v1, *v2;
+  int i,j,k;
+  double z;
+  for (i=0; i<NG; ++i ) {
+    v2=&u->c[i*NG];
+    for (j=0; j<i; ++j) {
+      v1=&u->c[j*NG];
+      z=0;
+      for (k=0;k<NG; ++k){z+=v1[k]*v2[k];} /*_vector_prod_re_g */
+      for (k=0;k<NG;++k){v2[k]-= z*v1[k];} /*_vector_project_g */
+    }
+    normalize(v2);
+  }
+#else
   int i,j;
   suNg_vector *v1,*v2;
   complex z;
@@ -57,7 +85,7 @@ void project_to_suNg(suNg *u)
     ++v2;
     v1=(suNg_vector*)(u);
   }
-
+#endif
 }
 
 void project_to_suNg_flt(suNg_flt *u)
@@ -85,7 +113,7 @@ void project_to_suNg_flt(suNg_flt *u)
 }
 
 
-
+#ifndef GAUGE_SON
 void project_cooling_to_suNg(suNg* g_out, suNg* g_in, int cooling)
 {
   suNg Ug[3];
@@ -178,3 +206,45 @@ void project_cooling_to_suNg(suNg* g_out, suNg* g_in, int cooling)
   *g_out = Ug[1]; 
   
 }
+#endif
+
+#ifdef GAUGE_SON
+
+int project_to_suNg_real(suNg *out, suNg *in){
+  suNg hm,om,tmp;
+  double eigval[NG];
+  double det;
+  int i,j;
+  _suNg_times_suNg_dagger(hm,*in,*in);
+  diag_hmat(&hm,eigval);
+  for (i=0;i<NG;++i){
+    eigval[i] = 1.0/sqrt(eigval[i]);
+  }
+  for (i=0;i<NG;++i){
+    for (j=0;j<NG;++j){
+      tmp.c[i*NG+j]=eigval[j]*hm.c[i*NG+j];
+    }
+  }
+
+  _suNg_times_suNg_dagger(om,tmp,hm);
+  _suNg_times_suNg(tmp,om,*in);
+  *out=tmp;
+  //Fix the determinant 
+  det_suNg(&det,&tmp);
+  /*  if (fabs(det)<1-1e-7 || fabs(det)>1+1e-7){
+      lprintf("suNg_utils",10,"Error in project project_to_suNg_real: determinant not +/-1. It is %1.8g\n",det);
+    }*/
+
+  for (i=0;i<NG;++i){
+    out->c[i]*=1./det;
+  }
+    
+  tmp = *out;
+  det_suNg(&det,&tmp);
+  if (det<1-1e-7 || det>1+1e-7){
+    lprintf("suNg_utils",10,"Error in project project_to_suNg_real: determinant not +/-1. It is %1.8g.",det);
+    return 0;
+  }
+  return 1;
+}
+#endif

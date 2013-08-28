@@ -50,6 +50,13 @@ void project_to_suNg(suNg *u);
 void project_to_suNg_flt(suNg_flt *u);
 void project_cooling_to_suNg(suNg* g_out, suNg* g_in, int cooling);
 
+#ifdef GAUGE_SON
+int project_to_suNg_real(suNg *out, suNg *in);
+void det_suNg(double* res, suNg *a);
+void diag_hmat(suNg *hmat, double *dag);
+#endif
+
+
 void assign_u2ud(void);
 void assign_ud2u(void);
 void assign_ud2u_f(void);

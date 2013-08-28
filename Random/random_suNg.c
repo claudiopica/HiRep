@@ -68,6 +68,7 @@ static void rotate(void) /* same as in cabmar */
 	  }
 }
 
+#ifndef GAUGE_SON
 void random_suNg(suNg *u) {
   int i,j;
 
@@ -85,4 +86,18 @@ void random_suNg(suNg *u) {
   }
 
 }
+#else
+void random_suNg(suNg *u) {
+  suNg tmp;
+  double gr[NG*NG];
+  int i;
+  do {
+    gauss(gr,NG*NG);
+    for (i=0;i<NG*NG;i++){
+      tmp.c[i]=gr[i];
+    }
+  } while (!project_to_suNg_real(u,&tmp));
+}
+
+#endif
 

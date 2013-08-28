@@ -1,7 +1,7 @@
 TOPDIR = ..
 MKDIR = $(TOPDIR)/Make
 
-SRCS = suN_utils.c suN_exp.c boundary_conditions.c time.c single_double_utils.c HYP_smearing.c
+SRCS = suN_utils.c suN_exp.c boundary_conditions.c time.c single_double_utils.c HYP_smearing.c det_suNg.c diag_hmat.c
 
 include $(MKDIR)/MkRules
 

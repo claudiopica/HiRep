@@ -65,7 +65,11 @@ void cplaq(complex *ret,int ix,int mu,int nu)
   _suNg_times_suNg_dagger(w3,w1,w2);      
       
   _suNg_trace_re(ret->re,w3);
+#ifdef GAUGE_SON
+  ret->im=0;
+#else
   _suNg_trace_im(ret->im,w3);
+#endif
 
 #ifdef PLAQ_WEIGHTS
   if(plaq_weight!=NULL) {

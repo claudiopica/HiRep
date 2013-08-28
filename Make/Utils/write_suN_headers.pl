@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 use strict;
 
-(@ARGV==2 or @ARGV==3) or die("Usage: $0 Ng rep [su2 quaternion]\nsu2 quaternion: 0 = 2x2 complex matrix, 1 = 4 reals\n");
+(@ARGV==2 or @ARGV==3 or @ARGV==4) or die("Usage: $0 Ng rep [su2_quaternion gauge_group]\nsu2 quaternion: 0 = 2x2 complex matrix, 1 = 4 reals\n");
 
 my ($Nmax,$unroll)=(5,4);
 my ($vd,$vr); #for vectors
@@ -10,7 +10,8 @@ my ($md,$mr); #for matrices
 my ($md2,$mr2); #for matrices
 
 
-my ($Ng,$rep,$su2quat)=@ARGV;
+my ($Ng,$rep,$su2quat,$gauge_group)=@ARGV;
+if (not defined ($gauge_group)) { $gauge_group = "SUN"; }
 if (not defined ($su2quat)) { $su2quat = "0"; }
 if (!($su2quat eq "0") and !($su2quat eq "1")) {
    die("Invalid option for su2 quaternion [$su2quat] specification. Exiting...\n");
@@ -20,7 +21,7 @@ if (!($su2quat eq "0") and $Ng!=2) {
 }
 
 my ($Nf,$c1,$c2);
-$c1="C"; #gauge field always complex
+$c1="C"; #degault gauge field complex
 if ($rep eq "REPR_FUNDAMENTAL") {
 	$Nf=$Ng;
 	$c2="C";
@@ -41,6 +42,12 @@ if ($rep eq "REPR_FUNDAMENTAL") {
 #debug
 #print "Ng=$Ng complex=$c1\n";
 #print "Nf=$Nf complex=$c2\n";
+
+#check for SO(N) gauge group
+if ($gauge_group eq "GAUGE_SON"){ #all represenatations real
+    $c1="R";
+    $c2="R";
+}
 
 my ($N,$suff,$complex,$to);
 
@@ -297,6 +304,7 @@ if ($su2quat==0) {
     write_suNr_zero();
     write_suNr_FMAT();
     write_suNr_unit();
+    write_suNr_dagger();
     write_suNr_times_suNr();
     write_suNr_times_suNr_dagger();
     write_suNr_add_assign();
@@ -1612,6 +1620,50 @@ sub write_suN_dagger {
 		print "         ++_n; _k-=$shift;\\\n";
 		print "      }\\\n";
 		print "   } while(0) \n\n";
+	}
+}
+
+
+sub write_suNr_dagger {
+    print "/* u=v^dagger */\n";
+    print "#define _${rdataname}_dagger(u,v) \\\n";
+	my $shift=$N*$N-$N-1;
+	if ($N<$Nmax) { #unroll all 
+		my ($n,$k)=(0,0);
+		for(my $i=1;$i<=$N;$i++){
+			for(my $j=1;$j<=$N;$j++){
+				print "   (u).$cname\[$n\]=(v).$cname\[$k\]";
+				if ($j!=$N) {$n++; $k+=$N;}
+				if($i==$N and $j==$N) {print "\n\n";} else {print "; \\\n";}
+			}
+			$n++; $k-=$shift;
+		}
+	} else { #partial unroll
+		print "   {\\\n";
+		if($N<(2*$unroll+1)) {
+		    print "      int _i,_n=0,_k=0;\\\n";
+		} else {
+		    print "      int _i,_j,_n=0,_k=0;\\\n";
+		}
+		print "      for (_i=0; _i<$N; ++_i){\\\n";
+		print "         (u).$cname\[_n\]=(v).$cname\[_k\];\\\n";
+		if($N<(2*$unroll+1)) {
+			for(my $j=1;$j<$N;$j++){
+				print "         ++_n; _k+=$N; (u).$cname\[_n\]=(v).$cname\[_k\];\\\n";
+			}
+		} else {
+			print "         for (_j=0; _j<$md; ){ \\\n";
+			for(my $i=0;$i<$unroll;$i++){
+				print "            ++_n; _k+=$N; (u).$cname\[_n\]=(v).$cname\[_k\]; ++_j;\\\n";
+			}
+			print "         } \\\n";
+			for(my $i=0;$i<$mr;$i++){
+				print "         ++_n; _k+=$N; (u).$cname\[_n\]=(v).$cname\[_k\];\\\n";
+			}
+		}
+		print "         ++_n; _k-=$shift;\\\n";
+		print "      }\\\n";
+		print "   }((void)0) \n\n";
 	}
 }
 

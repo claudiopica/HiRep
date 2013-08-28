@@ -18,14 +18,32 @@ namespace group
 
 void group::init(int n)
 {
-#ifndef NDEBUG 
+#ifdef NDEBUG 
+#ifdef _GAUGE_SON_
+	cerr << "Initializing group SO(" << n << ")..... ";
+#else
 	cerr << "Initializing group SU(" << n << ")..... ";
+#endif 
 #endif 
 
 	int A;
 	int a, b;
 	
 	N = n;
+
+#ifdef _GAUGE_SON_
+	DIM = N*(N-1)/2;
+	T = new smatrix[group::DIM];
+	
+	A = 0;
+	for(a = 0; a < N; a++) for(b = a+1; b < N; b++){
+	    T[A].size = N;
+	    T[A].set(a,b, complex(.0,1.));
+	    T[A].set(b,a, complex(.0,-1.));
+	    A++;
+	  }
+
+#else
 	DIM = N*N-1;
 	T = new smatrix[group::DIM];
 	
@@ -53,6 +71,7 @@ void group::init(int n)
 			T[A].set(a,a, complex(-a*sqrt(2./(a*(a+1.))),.0));
 			A++;
 		}
+#endif
 		
 	Tnorm = 2.0;
 
@@ -116,6 +135,13 @@ string ExpX(const char* dtname,  const char* hname, const char* uname)
 	RET << 
 	"\tdouble y[3];\n" << 
 	"\tdouble s[" << group::N*(group::N-1)/2 << "][4];\n";
+
+#ifdef _GAUGE_SON_
+	RET <<
+	  "\tsuNgc ut, *u;\n\n"
+	  "\tfor (int i=0; i<NG*NG; ++i) { ut.c[i].re=r->c[i]; ut.c[i].im=0.; }\n"
+	  "\tu=&ut;\n\n";
+#endif
 	
 	int k = 0;
 	for(int j = 1; j < group::N; j++)
@@ -149,7 +175,9 @@ string ExpX(const char* dtname,  const char* hname, const char* uname)
 					<< uname << mindex(j,p,group::N) << "));\n";
 			k--;
 		}
-
+#ifdef _GAUGE_SON_
+    RET<<"\n\tfor (int i=0; i<NG*NG; ++i) { r->c[i]=ut.c[i].re; }\n";
+#endif
 	
 	return RET.str();
 }
@@ -184,7 +212,11 @@ string fundamental_algebra_project(const char* hname, const char* mname)
 //	pmatrix adjM(group::N);
 	pconstant I(complex(0.0,1.0));
 
+#ifdef _GAUGE_SON_
+	M = new rmatrix(group::N,mname);
+#else
 	M = new cmatrix(group::N,mname);
+#endif
 
 //	adjM = *M;
 //	adjM.adjoint();

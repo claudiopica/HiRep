@@ -414,6 +414,7 @@ static void chiSF_ds_BT(double ds) {
 #define ST 1.414213562373095048801688724209698078570
 
 
+#ifndef GAUGE_SON
 static void init_gf_SF_BCs(suNg* dn, suNg* up) {
 #if NG==2
 
@@ -464,7 +465,11 @@ static void init_gf_SF_BCs(suNg* dn, suNg* up) {
     up->c[(1+NG)*k].im = sin((SF_phi0_up[k]+SF_phi1_up[k]*SF_eta)/(GLB_T-2));
   }
 }
-
+#else
+static void init_gf_SF_BCs(suNg* dn, suNg* up) {
+  error(1,1,"init_gf_SF_BCs","SF not implemented for real gauge group");
+}
+#endif
 
 
 static void gf_Dirichlet_BCs(suNg* dn, suNg* up) {

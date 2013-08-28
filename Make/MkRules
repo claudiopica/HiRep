@@ -42,7 +42,7 @@ RBLD = $(if $(DFILES),,rebuild)
 	else \
 	  $(MAKE) -C $(dir $@) $(notdir $@) ;\
 	fi
-	
+
 $(INCDIR)/.autoheaders.h: $(MKDIR)/MkFlags  
 	if  test $(dir $@) != "./"; then \
 	  $(MAKE) -C $(dir $@) $(notdir $@) ;\
@@ -68,7 +68,7 @@ WRREPRDIR = $(MKDIR)/Utils/autosun
 WRREPR = $(WRREPRDIR)/writeREPR
 
 $(WRREPR): $(MKDIR)/MkFlags
-	REPRESENTATION=$(REPR) make -C $(WRREPRDIR) $(notdir $@)
+	REPRESENTATION=$(REPR) make -C $(WRREPRDIR) $(notdir $@) "GAUGE_GROUP = ${GAUGE_GROUP}"
 
 .PHONY: rebuild clean $(patsubst %,clean-%,$(SUBDIRS)) cleanall _MkRules_default_target default
 
