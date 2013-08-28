@@ -34,6 +34,10 @@ MODDIR := Update
 MODS := representation random_spinor_field random_su2 Dphi
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
+MODDIR := Utils
+MODS := suN_utils diag_hmat det_suNg
+MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
+
 MODDIR := Error
 MODS := error
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))

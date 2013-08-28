@@ -200,8 +200,13 @@ void read_gauge_field_eolexi_BE(char filename[])
       lprintf("IO",20,"x=(0,0,0,0) mu=%d pu_gauge =\n",mu);
       for(i=0; i<NG; i++) {
         lprintf("IO",20,"[ ");
-        for(j=0; j<NG; j++)
+        for(j=0; j<NG; j++){
+#ifdef GAUGE_SON
+          lprintf("IO",20,"(%.2f) ",pu_gauge(ix,mu)->c[i*NG+j]);
+#else
           lprintf("IO",20,"(%.2f , %.2f) ",pu_gauge(ix,mu)->c[i*NG+j].re,pu_gauge(ix,mu)->c[i*NG+j].im);
+#endif //GAUGE_SON
+	}
         lprintf("IO",20,"]\n");
       }
     }
@@ -375,8 +380,13 @@ void read_gauge_field_eolexi_LE(char filename[])
       lprintf("IO",20,"x=(0,0,0,0) mu=%d pu_gauge =\n",mu);
       for(i=0; i<NG; i++) {
         lprintf("IO",20,"[ ");
-        for(j=0; j<NG; j++)
+        for(j=0; j<NG; j++){
+#ifdef GAUGE_SON
+          lprintf("IO",20,"(%.2f) ",pu_gauge(ix,mu)->c[i*NG+j]);
+#else
           lprintf("IO",20,"(%.2f , %.2f) ",pu_gauge(ix,mu)->c[i*NG+j].re,pu_gauge(ix,mu)->c[i*NG+j].im);
+#endif //GAUGE_SON
+	}
         lprintf("IO",20,"]\n");
       }
     }

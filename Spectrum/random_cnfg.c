@@ -116,8 +116,13 @@ int main(int argc,char *argv[]) {
     lprintf("IO",20,"x=(0,0,0,0) mu=0 pu_gauge =\n");
     for(i=0; i<NG; i++) {
       lprintf("IO",20,"[ ");
-      for(j=0; j<NG; j++)
+      for(j=0; j<NG; j++){
+#ifdef GAUGE_SON
+        lprintf("IO",20,"(%.2f) ",pu_gauge(ix,0)->c[i*NG+j]);
+#else
         lprintf("IO",20,"(%.2f , %.2f) ",pu_gauge(ix,0)->c[i*NG+j].re,pu_gauge(ix,0)->c[i*NG+j].im);
+#endif
+      }
       lprintf("IO",20,"]\n");
     }
   }
