@@ -137,7 +137,6 @@ static void z2semwall_qprop_init(int nm, double *m, double acc) {
     psi0=alloc_spinor_field_f(5*nm,&glattice);
     psi=psi0+4*nm;
 
-  
 #ifdef GAUSSIAN_NOISE
     QMR_noise=alloc_spinor_field_f(nm+1,&glat_even);
     QMR_resdn=QMR_noise+1;
@@ -163,7 +162,7 @@ void z2semwall_qprop_free_new() {
 
   free_spinor_field_f(eta);
   free_spinor_field_f(psi0);
-
+  free_spinor_field_f(resd);
 
   free(shift);
   free(mass);
@@ -177,10 +176,7 @@ void z2semwall_qprop_free_new() {
 
 /***************************************************************************\
 
-Gamma is supposed to be one of the name##_eval_g5GammaDag_times_spinor
-functions in mesons.c
-
-psi = D^{-1} g5 Gamma^+ eta
+psi = D^{-1} eta
 
 \***************************************************************************/
 
@@ -755,7 +751,7 @@ void z2semwall_mesons_new(int conf, int nhits, int nm, double *m, double acc) {
 		_spinor_g0_f(sp1,*psi0p);
 		_spinor_minus_f(sp2,*psi0p);
 		_spinor_prod_re_f(tmp,sp1,sp2);	
-		corr[_g5_g0g5_re][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+		corr[_g5_g0g5_re][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += -tmp; 
 	      }
 #endif
 	      if (t+zerocoord[0]==tau){
@@ -889,3 +885,4 @@ void z2semwall_mesons_new(int conf, int nhits, int nm, double *m, double acc) {
 #endif
 
 }
+#undef GAUSSIAN_NOISE
