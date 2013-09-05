@@ -69,14 +69,16 @@ void local_hmc_action(local_action_type type,
   }
 
   /* pseudofermion fields can be defined only on even sites is the preconditioning is used */
-  _MASTER_FOR(phi1->type,i) {
-    a=0.;
-  /* Fermions */
-    for (j=0;j<par->n_pf;++j) {
-      _spinor_prod_re_f(tmp,*_FIELD_AT(&phi1[j],i),*_FIELD_AT(&phi2[j],i));
-      a += tmp;
+  if(par->n_pf > 0) {
+    _MASTER_FOR(phi1->type,i) {
+      a=0.;
+    /* Fermions */
+      for (j=0;j<par->n_pf;++j) {
+        _spinor_prod_re_f(tmp,*_FIELD_AT(&phi1[j],i),*_FIELD_AT(&phi2[j],i));
+        a += tmp;
+      }
+  
+      *_FIELD_AT(loc_action,i)+=a;
     }
-
-    *_FIELD_AT(loc_action,i)+=a;
-  }   
+  }
 }

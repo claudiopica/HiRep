@@ -66,6 +66,20 @@ void gaussian_spinor_field_flt(spinor_field_flt *s);
 void z2_spinor_field(spinor_field *s);
 
 
+typedef struct _puregauge_par {
+  /* sim parameters */
+  double beta;
+    
+  double MT_prec; /* metropolis test precision */
+  double MD_prec; /* molecular dynamics precision */
+  
+  double tlen; /* trajectory lenght */
+  unsigned int gsteps; /* number of substeps for the gauge part every step */
+} puregauge_par;
+void init_puregauge(puregauge_par *par);
+void free_puregauge();
+
+
 typedef struct _rhmc_par {
   /* sim parameters */
   double beta;
@@ -139,6 +153,7 @@ void free_hmc();
  */
 int update_rhmc();
 int update_hmc();
+int update_puregauge();
 int update_rhmc_o();
 
 /* this is the basic operator used in the update */

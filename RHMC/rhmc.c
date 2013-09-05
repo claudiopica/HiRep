@@ -257,6 +257,7 @@ int main(int argc,char *argv[])
     int rr;
     double perc;
     struct timeval start, end, etime; /* //for trajectory timing */
+    lprintf("BLOCK",0," Start %d\n",i);
     lprintf("MAIN",0,"Trajectory #%d...\n",i);
     
     gettimeofday(&start,0);
@@ -321,6 +322,9 @@ int main(int argc,char *argv[])
         }
       }
     }
+
+    lprintf("BLOCK",0," End %d\n",i);
+
   }
   /* save final configuration */
   if(((--i)%flow.save_freq)!=0) {
