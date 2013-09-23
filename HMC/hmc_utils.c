@@ -174,7 +174,6 @@ int init_mc(hmc_flow *rf, char *ifile) {
 
   /* flow defaults */
   strcpy(rf->g_start,"invalid");
-  rf->r_start[0]='\0';
   strcpy(rf->run_name,"run_name");
   strcpy(rf->last_conf,"invalid");
   strcpy(rf->conf_dir,"./");

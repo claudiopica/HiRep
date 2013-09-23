@@ -163,6 +163,10 @@ void write_gauge_field(char filename[])
   timeval_subtract(&etime,&end,&start);
   lprintf("IO",0,"Configuration [%s] saved [%ld sec %ld usec]\n",filename,etime.tv_sec,etime.tv_usec);
 
+#ifdef WITH_MPI
+    MPI_Barrier(GLB_COMM);
+#endif
+
 }
 
 void read_gauge_field(char filename[]) 
@@ -242,7 +246,7 @@ void read_gauge_field(char filename[])
           if (pid!=0) { /* do send/receive only if the data is not on PID 0 */ 
             /* send buffer */
             if (PID==0) {
-              mpiret=MPI_Send(buff, bsize, MPI_DOUBLE, pid, 999, GLB_COMM);
+              mpiret=MPI_Send(buff, bsize, MPI_DOUBLE, pid, 998, GLB_COMM);
 #ifndef NDEBUG
               if (mpiret != MPI_SUCCESS) {
                 char mesg[MPI_MAX_ERROR_STRING];
@@ -258,7 +262,7 @@ void read_gauge_field(char filename[])
 #ifndef NDEBUG
               error(Z!=(GLB_Z/NP_Z+((p[3]<rz)?1:0)),1,"read_gauge_field", "Local lattice size mismatch!");
 #endif
-              mpiret=MPI_Recv(buff, bsize, MPI_DOUBLE, 0, 999, GLB_COMM, &st);
+              mpiret=MPI_Recv(buff, bsize, MPI_DOUBLE, 0, 998, GLB_COMM, &st);
 #ifndef NDEBUG
               if (mpiret != MPI_SUCCESS) {
                 char mesg[MPI_MAX_ERROR_STRING];
@@ -326,6 +330,10 @@ void read_gauge_field(char filename[])
   timeval_subtract(&etime,&end,&start);
   lprintf("IO",0,"Configuration [%s] read [%ld sec %ld usec] Plaquette=%e\n",filename,etime.tv_sec,etime.tv_usec,testplaq);
 
+#ifdef WITH_MPI
+    MPI_Barrier(GLB_COMM);
+#endif
+
 }
 
 void write_ranlxd_state(char filename[]) 
@@ -382,7 +390,7 @@ void write_ranlxd_state(char filename[])
           if (pid!=0) { /* do send/receive only if the data is not on PID 0 */ 
             /* send buffer */
             if (pid==PID) {
-              mpiret=MPI_Send(buff, rsize, MPI_INT, 0, 999, GLB_COMM);
+              mpiret=MPI_Send(buff, rsize, MPI_INT, 0, 991, GLB_COMM);
 #ifndef NDEBUG
               if (mpiret != MPI_SUCCESS) {
                 char mesg[MPI_MAX_ERROR_STRING];
@@ -395,7 +403,7 @@ void write_ranlxd_state(char filename[])
             }
             /* receive buffer */
             if (PID==0) {
-              mpiret=MPI_Recv(buff, rsize, MPI_INT, pid, 999, GLB_COMM, &st);
+              mpiret=MPI_Recv(buff, rsize, MPI_INT, pid, 991, GLB_COMM, &st);
 #ifndef NDEBUG
               if (mpiret != MPI_SUCCESS) {
                 char mesg[MPI_MAX_ERROR_STRING];
@@ -435,6 +443,11 @@ void write_ranlxd_state(char filename[])
   timeval_subtract(&etime,&end,&start);
   lprintf("IO",0,"Ranlxd state [%s] saved [%ld sec %ld usec]\n",filename,etime.tv_sec,etime.tv_usec);
 
+#ifdef WITH_MPI
+    MPI_Barrier(GLB_COMM);
+#endif
+
+    
 }
 
 
@@ -508,7 +521,7 @@ void read_ranlxd_state(char filename[])
           if (pid!=0) { /* do send/receive only if the data is not on PID 0 */ 
             /* send buffer */
             if (PID==0) {
-              mpiret=MPI_Send(buff, rsize, MPI_INT, pid, 999, GLB_COMM);
+              mpiret=MPI_Send(buff, rsize, MPI_INT, pid, 990, GLB_COMM);
 #ifndef NDEBUG
               if (mpiret != MPI_SUCCESS) {
                 char mesg[MPI_MAX_ERROR_STRING];
@@ -521,7 +534,7 @@ void read_ranlxd_state(char filename[])
             }
             /* receive buffer */
             if (PID==pid) {
-              mpiret=MPI_Recv(buff, rsize, MPI_INT, 0, 999, GLB_COMM, &st);
+              mpiret=MPI_Recv(buff, rsize, MPI_INT, 0, 990, GLB_COMM, &st);
 #ifndef NDEBUG
               if (mpiret != MPI_SUCCESS) {
                 char mesg[MPI_MAX_ERROR_STRING];
@@ -566,5 +579,9 @@ void read_ranlxd_state(char filename[])
   timeval_subtract(&etime,&end,&start);
   lprintf("IO",0,"Ranlxd state [%s] read [%ld sec %ld usec]\n",filename,etime.tv_sec,etime.tv_usec);
 
+#ifdef WITH_MPI
+    MPI_Barrier(GLB_COMM);
+#endif
+    
 }
 

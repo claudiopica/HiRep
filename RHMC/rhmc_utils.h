@@ -50,7 +50,6 @@ typedef struct _input_rhmc {
 typedef struct _rhmc_flow {
   char run_name[64]; /* name for this run */
   char g_start[64]; /* for gauge fields => unit, random, file */
-  char r_start[64]; /* for ranlux: name of the state file  */ 
 
   char last_conf[64]; /* last conf: can be a number or of the format "+n" */
   char conf_dir[64]; /* directory to store gconfs */
@@ -65,7 +64,7 @@ typedef struct _rhmc_flow {
   input_rhmc *rhmc_v;
 
   /* for the reading function */
-  input_record_t read[8];
+  input_record_t read[7];
   
 } rhmc_flow;
 
@@ -74,7 +73,6 @@ typedef struct _rhmc_flow {
   .read={\
     {"run name", "run name = %s", STRING_T, &((varname).run_name[0])},\
     {"gauge start", "gauge start = %s", STRING_T, &((varname).g_start[0])},\
-    {"ranlxd start", "ranlxd start = %s", STRING_T, &((varname).r_start[0])},\
     {"gauge last conf", "last conf = %s", STRING_T, &((varname).last_conf[0])},\
     {"conf save frequency", "save freq = %d", INT_T, &((varname).save_freq)},\
     {"measure frequency", "meas freq = %d", INT_T, &((varname).meas_freq)},\

@@ -32,9 +32,10 @@ typedef struct _input_glb {
   /* random numbers */
   int rlxd_level, rlxd_seed;
   char rlxd_state[256];
+  char rlxd_start[256];
 
   /* for the reading function */
-  input_record_t read[13];
+  input_record_t read[14];
   
 } input_glb;
 
@@ -52,7 +53,8 @@ typedef struct _input_glb {
     {"N_REP", "N_REP = %d", INT_T, &N_REP},\
     {"ranlux level", "level = %d", INT_T, &(varname).rlxd_level},\
     {"ranlux seed", "seed = %d", INT_T, &(varname).rlxd_seed},\
-    {"ranlux state", "state = %s", STRING_T, &(varname).rlxd_state},\
+    {"ranlux state", "rlx_state = %s", STRING_T, &(varname).rlxd_state},\
+    {"ranlux start", "rlx_start = %s", STRING_T, &(varname).rlxd_start},\
     {NULL, NULL, INT_T, NULL}				    \
   },\
   .rlxd_state=""\
