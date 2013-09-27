@@ -25,6 +25,12 @@ void read_gauge_field(char filename[]);
 void read_gauge_field_nocheck(char filename[]);
 void write_gauge_field(char filename[]);
 
+#if NG==2
+void read_gauge_field_su2(char filename[]);
+void read_gauge_field_su2q(char filename[]);
+void write_gauge_field_su2q(char filename[]);
+#endif
+
 void write_ranlxd_state(char filename[]);
 void read_ranlxd_state(char filename[]);
 

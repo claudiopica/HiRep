@@ -11,7 +11,7 @@ MODS := geometry_init geometry_mpi_eo communications process_init
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := IO
-MODS := archive logger read_input endian
+MODS := archive logger read_input endian archive_su2quat
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Utils
@@ -35,7 +35,7 @@ MODS := error
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Converter
-MODS := archive_eolexi archive_milc archive_more_mpieo archive_ascii archive_su2quat archive_fortran
+MODS := archive_eolexi archive_milc archive_more_mpieo archive_ascii archive_fortran
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 COMMON_OBJS = $(MOD_OBJS)

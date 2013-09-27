@@ -222,7 +222,11 @@ int init_mc(rhmc_flow *rf, char *ifile) {
   /* init gauge field */
   switch(start_t) {
     case 0:
-      read_gauge_field(add_dirname(rf->conf_dir,rf->g_start)); 
+      #if NG==2
+      read_gauge_field_su2(add_dirname(rf->conf_dir,rf->g_start));
+      #else
+      read_gauge_field(add_dirname(rf->conf_dir,rf->g_start));
+      #endif
       break;
     case 1:
       unit_u(u_gauge);
@@ -247,7 +251,11 @@ int save_conf(rhmc_flow *rf, int id) {
   char buf[256];
   
   mk_gconf_name(buf, rf, id);
+  #if NG==2
+  write_gauge_field_su2q(add_dirname(rf->conf_dir,buf));
+  #else
   write_gauge_field(add_dirname(rf->conf_dir,buf));
+  #endif
 
   return 0;
 }

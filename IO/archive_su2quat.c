@@ -23,6 +23,10 @@
 #include "utils.h"
 #include "ranlux.h"
 
+
+#if NG==2
+
+
 /* 
  * The conversion is based on the following convention
  * for su(2) matrices:
@@ -263,7 +267,6 @@ void read_gauge_field_su2q(char filename[])
 #endif
         for (p[3]=0;p[3]<NP_Z;++p[3]) { /* loop over processors in Z direction */
           int bsize=4*4*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
-lprintf("DEBUG",0,"bsize=%d\n",bsize);
 #ifdef WITH_MPI
           MPI_Cart_rank(cart_comm, p, &cid);
           MPI_Group_translate_ranks(cg, 1, &cid, wg, &pid);
@@ -366,3 +369,65 @@ lprintf("DEBUG",0,"bsize=%d\n",bsize);
   lprintf("IO",0,"Configuration [%s] read [%ld sec %ld usec] Plaquette=%e\n",filename,etime.tv_sec,etime.tv_usec,testplaq);
 
 }
+
+
+void read_gauge_field_su2(char filename[])
+{
+  FILE *fp=NULL;
+  double plaq;
+  int quaternions;
+
+
+  error((NG!=2),1,"read_gauge_field_su2", "This function cannot be called if NG!=2");
+
+  if(PID==0) {
+    int d[5]={0}; /* contains NG,GLB_T,GLB_X,GLB_Y,GLB_Z */
+    error((fp=fopen(filename,"rb"))==NULL,1,"read_gauge_field_su2",
+        "Failed to open file for reading");
+    /* read NG and global size */
+    error(fread_BE_int(d,(size_t)(5),fp)!=(5),
+        1,"read_gauge_field_su2",
+        "Failed to read gauge field geometry");
+    /* Check Gauge group and Lattice dimesions */
+    if (NG!=d[0]) {
+      lprintf("ERROR",0,"Read value of NG [%d] do not match this code [NG=%d].\nPlease recompile.\n",d[0],NG);
+      error(1,1,"read_gauge_field_su2 " __FILE__,"Gauge group mismatch");
+    }
+    if (GLB_T!=d[1] ||GLB_X!=d[2] ||GLB_Y!=d[3] ||GLB_Z!=d[4]) {
+      lprintf("ERROR",0,"Read value of global lattice size (%d,%d,%d,%d) do not match input file (%d,%d,%d,%d).\n",
+          d[1],d[2],d[3],d[4],GLB_T,GLB_X,GLB_Y,GLB_Z);
+      error(1,1,"read_gauge_field_su2 " __FILE__,"Gauge group mismatch");
+    }
+    error(fread_BE_double(&plaq,(size_t)(1),fp)!=(1),
+        1,"read_gauge_field_su2",
+        "Failed to read gauge field plaquette");
+
+    double buff[8];
+    error(fread_BE_double(buff,8,fp)!=8,
+                1,"read_gauge_field_su2",
+                "Failed to read gauge field from file");
+    
+    if(buff[0]*buff[4]+buff[1]*buff[5]+buff[2]*buff[6]+buff[3]*buff[7]<1e-10 &&
+      buff[0]*buff[5]-buff[4]*buff[1]+buff[2]*buff[7]-buff[6]*buff[3]<1e-10) {
+      quaternions = (1==0);
+      lprintf("IO",0,"SU2 matrix representation\n");
+    } else {
+      quaternions = (1==1);
+      lprintf("IO",0,"SU2 quaternion representation\n");
+    }
+
+    fclose(fp);
+  }
+  
+  if(quaternions)
+    read_gauge_field_su2q(filename);
+  else
+    read_gauge_field(filename);
+    
+}
+
+
+
+
+#endif /* NG==2 */
+

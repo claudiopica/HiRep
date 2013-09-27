@@ -10,7 +10,7 @@ MODS := process_init geometry_init geometry_mpi_eo test_geometry_mpi communicati
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := IO
-MODS := archive logger read_input endian
+MODS := archive logger read_input endian archive_su2quat
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Utils
