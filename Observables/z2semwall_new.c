@@ -751,7 +751,7 @@ void z2semwall_mesons_new(int conf, int nhits, int nm, double *m, double acc) {
 		_spinor_g0_f(sp1,*psi0p);
 		_spinor_minus_f(sp2,*psi0p);
 		_spinor_prod_re_f(tmp,sp1,sp2);	
-		corr[_g5_g0g5_re][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += -tmp; 
+		corr[_g5_g0g5_re][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
 	      }
 #endif
 	      if (t+zerocoord[0]==tau){

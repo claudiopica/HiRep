@@ -1,0 +1,27 @@
+/***************************************************************************\
+* Copyright (c) 2013, Rudy Arthur, Ari Hietanen                             *
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
+/*******************************************************************************
+*
+* File spectrum.h
+* 
+* Functions for measuring spectrum
+*
+*******************************************************************************/
+#ifndef SPECTRUM_H
+#define SPECTRUM_H
+#include "suN.h"
+#include "inverters.h"
+#include <stdio.h>
+
+void measure_spectrum_semwall(int nm, double* m, int nhits,int conf_num, double precision);
+void measure_spectrum_pt(int tau, int nm, double* m, int n_mom,int nhits,int conf_num, double precision);
+void measure_spectrum_semwall_ext(int nm, double* m, int nhits,int conf_num, double precision);
+void measure_spectrum_pt_ext(int tau, int nm, double* m, int n_mom,int nhits,int conf_num, double precision);
+void measure_spectrum_semwall_fixedbc(int dt, int nm, double* m, int nhits,int conf_num, double precision);
+void measure_spectrum_pt_fixedbc(int tau, int dt, int nm, double* m, int n_mom,int nhits,int conf_num, double precision);
+
+
+#endif

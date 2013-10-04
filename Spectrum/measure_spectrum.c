@@ -2,7 +2,6 @@
 *
 * Computation of the mesonic spectrum
 *
-*
 *******************************************************************************/
 
 #define MAIN_PROGRAM
@@ -29,7 +28,7 @@
 #include "utils.h"
 #include "logger.h"
 #include "communications.h"
-
+#include "spectrum.h"
 #include "cinfo.c"
 
 #if defined(ROTATED_SF) && defined(BASIC_SF)
@@ -40,26 +39,38 @@
 #error This code does not work with the fermion twisting !!!
 #endif
 
-
+//typedef enum {semwall_src,point_src} source_type_t;
 /* Mesons parameters */
 typedef struct _input_mesons {
   char mstring[256];
   double precision;
   int nhits;
-
+  int def_semwall;
+  int def_point;
+  int ext_semwall;
+  int ext_point;
+  int fixed_semwall;
+  int fixed_point;
+  int n_mom;
   /* for the reading function */
-  input_record_t read[4];
-
+  input_record_t read[11];
 } input_mesons;
 
 #define init_input_mesons(varname) \
 { \
   .read={\
-    {"quark quenched masses", "mes:masses = %s", STRING_T, (varname).mstring},\
+    {"quark quenched masses", "mes:masses = %s", STRING_T, (varname).mstring}, \
     {"inverter precision", "mes:precision = %lf", DOUBLE_T, &(varname).precision},\
-    {"number of noisy sources per cnfg", "mes:nhits = %d", INT_T, &(varname).nhits},\
-    {NULL, NULL, INT_T, NULL}\
-  }\
+    {"number of noisy sources per cnfg", "mes:nhits = %d", INT_T, &(varname).nhits}, \
+    {"enable default semwall", "mes:def_semwall = %d",INT_T, &(varname).def_semwall},	\
+    {"enable default point", "mes:def_point = %d",INT_T, &(varname).def_point},		\
+    {"enable extended semwall", "mes:ext_semwall = %d",INT_T, &(varname).ext_semwall},	\
+    {"enable extended point", "mes:ext_point = %d",INT_T, &(varname).ext_point},		\
+    {"enable Dirichlet semwall", "mes:dirichlet_semwall = %d",INT_T, &(varname).fixed_semwall},	\
+    {"enable Dirichlet point", "mes:dirichlet_point = %d",INT_T, &(varname).fixed_point},	\
+    {"maximum component of momentum", "mes:momentum = %d", INT_T, &(varname).n_mom}, \
+    {NULL, NULL, INT_T, NULL}				\
+   }							\
 }
 
 
@@ -178,7 +189,7 @@ void read_cmdline(int argc, char* argv[]) {
 
 
 int main(int argc,char *argv[]) {
-  int i,k;
+  int i,k,tau;
   char tmp[256], *cptr;
   FILE* list;
   filename_t fpars;
@@ -199,7 +210,8 @@ int main(int argc,char *argv[]) {
   if (PID!=0) { logger_disable(); }
   if (PID==0) { 
     sprintf(tmp,">%s",output_filename); logger_stdout(tmp);
-    sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
+    sprintf(tmp,"err_%d",PID); 
+    if (!freopen(tmp,"w",stderr)) lprintf("MAIN",0,"Error out not open\n");
   }
 
   lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS); 
@@ -212,12 +224,11 @@ int main(int argc,char *argv[]) {
 
   /* read & broadcast parameters */
   parse_cnfg_filename(cnfg_filename,&fpars);
-
-
   read_input(mes_var.read,input_filename);
+
   GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
-  error(fpars.type==UNKNOWN_CNFG,1,"mk_mesons.c","Bad name for a configuration file");
-  error(fpars.nc!=NG,1,"mk_mesons.c","Bad NG");
+  error(fpars.type==UNKNOWN_CNFG,1,"measure_spectrum.c","Bad name for a configuration file");
+  error(fpars.nc!=NG,1,"measure_spectrum.c","Bad NG");
 
   lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed);
   rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
@@ -242,7 +253,7 @@ int main(int argc,char *argv[]) {
       m[nm]=atof(cptr);
       nm++;
       cptr = strtok(NULL, ";");
-    }            
+    }    
   }
 
 
@@ -267,7 +278,32 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"Inverter precision = %e\n",mes_var.precision);
   for(k=0;k<nm;k++)
     lprintf("MAIN",0,"Mass[%d] = %f\n",k,m[k]);
-  lprintf("MAIN",0,"Number of noisy sources per cnfg = %d\n",mes_var.nhits);
+
+  lprintf("MAIN",0,"Number of noisy sources per cnfg = %d. Does not affect point sources\n",mes_var.nhits);
+  if (mes_var.def_semwall){
+    lprintf("MAIN",0,"Spin Explicit Method (SEM) wall sources\n");    
+  }
+  if (mes_var.def_point){
+    lprintf("MAIN",0,"Point sources\n");    
+  }
+  if (mes_var.ext_semwall){
+    lprintf("MAIN",0,"Spin Explicit Method (SEM) wall sources on extended lattice\n");    
+  }
+  if (mes_var.ext_point){
+    lprintf("MAIN",0,"Point sources on extended lattice\n");    
+  }
+  if (mes_var.fixed_semwall){
+    lprintf("MAIN",0,"Spin Explicit Method (SEM) wall sources with Dirichlet boundary conditions\n");    
+  }
+  if (mes_var.fixed_point){
+    lprintf("MAIN",0,"Point sources with Dirichlet boundary conditions\n");    
+  }
+  if (mes_var.n_mom>1){
+    lprintf("MAIN",0,"Number of maximum monentum component\n",mes_var.n_mom-1);
+    if (mes_var.def_semwall || mes_var.ext_semwall || mes_var.fixed_semwall){
+      lprintf("MAIN",0,"WARGING: wall sources measure only with zero momenta\n");
+    }
+  }
 
   list=NULL;
   if(strcmp(list_filename,"")!=0) {
@@ -276,8 +312,10 @@ int main(int argc,char *argv[]) {
   }
 
   i=0;
+
   while(1) {
     struct timeval start, end, etime;
+
     if(list!=NULL)
       if(fscanf(list,"%s",cnfg_filename)==0 || feof(list)) break;
 
@@ -288,21 +326,35 @@ int main(int argc,char *argv[]) {
     represent_gauge_field();
 
     lprintf("TEST",0,"<p> %1.6f\n",avr_plaquette());
-
     full_plaquette();
     gettimeofday(&start,0);
-    z2semwall_mesons_new(i,mes_var.nhits,nm, m, mes_var.precision);
+
+    tau=0;
+    if (mes_var.def_semwall){
+      measure_spectrum_semwall(nm,m,mes_var.nhits,i,mes_var.precision);
+    }
+    if (mes_var.def_point){
+      measure_spectrum_pt(tau,nm,m,mes_var.n_mom,mes_var.nhits,i,mes_var.precision);
+    }
+    if (mes_var.ext_semwall){
+      measure_spectrum_semwall_ext(nm,m,mes_var.nhits,i,mes_var.precision);
+    }
+    if (mes_var.ext_point){
+      measure_spectrum_pt_ext(tau,nm,m,mes_var.n_mom,mes_var.nhits,i,mes_var.precision);
+    }
+    if (mes_var.fixed_semwall){
+      measure_spectrum_semwall_fixedbc(2,nm,m,mes_var.nhits,i,mes_var.precision);
+    }
+    if (mes_var.fixed_point){
+      measure_spectrum_pt_fixedbc(tau,2,nm,m,mes_var.n_mom,mes_var.nhits,i,mes_var.precision);
+    }
     gettimeofday(&end,0);
     timeval_subtract(&etime,&end,&start);
     lprintf("MAIN",0,"Configuration #%d: analysed in [%ld sec %ld usec]\n",i,etime.tv_sec,etime.tv_usec);
-
     if(list==NULL) break;
   }
 
   if(list!=NULL) fclose(list);
-
-  z2semwall_qprop_free_new();
- 
 
   free_BCs();
 

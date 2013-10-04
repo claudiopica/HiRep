@@ -189,6 +189,7 @@ void local_hmc_action(local_action_type type,
                       spinor_field *phi2);
 
 void suNg_field_copy(suNg_field *g1, suNg_field *g2);
+void suNf_field_copy(suNf_field *g1, suNf_field *g2);
 
 /* find spectral interval using eva */
 void find_spec_H2(double *max, double *min, double mass);

@@ -1,7 +1,8 @@
 TOPDIR = ..
 MKDIR=$(TOPDIR)/Make
 
-EXES = mk_mesons random_cnfg random_spinor mk_mesons_with_z2semwall mk_mesons_with_z2semwall_new  mk_sfcoupling #trunc_mesons
+EXES = mk_mesons random_cnfg random_spinor mk_mesons_with_z2semwall mk_mesons_with_z2semwall_new  measure_spectrum measure_formfactor #mk_sfcoupling #trunc_mesons
+
 
 default: $(EXES)
 
@@ -23,7 +24,7 @@ MODS := amalloc field_alloc spinor_field_alloc
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Observables
-MODS := avr_plaquette trunc_hairpin g5QMR_trunc
+MODS := avr_plaquette trunc_hairpin g5QMR_trunc calc_prop measure_mesons
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Random
@@ -31,7 +32,7 @@ MODS := gauss ranlxs ranlxd ranz2 random_fields random_suNg
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Update
-MODS := representation random_spinor_field random_su2 Dphi
+MODS := representation random_spinor_field random_su2 Dphi copy_gfield
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Utils
@@ -47,11 +48,19 @@ MODS :=
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Inverters
-MODS := linear_algebra cg_mshift MINRES_mshift g5QMR_mshift MINRES eva jacobi
+MODS := linear_algebra cg_mshift MINRES_mshift g5QMR_mshift HBiCGstab_mshift MINRES eva jacobi
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Converter
 MODS := archive_eolexi #archive_henty
+MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
+
+MODDIR := GaugeFix
+MODS := gaugefix
+MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
+
+MODDIR := Spectrum
+MODS := meson_measurements
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 COMMON_OBJS = $(MOD_OBJS)

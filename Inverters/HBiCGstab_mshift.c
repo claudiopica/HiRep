@@ -13,7 +13,7 @@
 #include <math.h>
 
 #define _print_par(c) \
-  printf("[%d] " #c " = %e\n",cgiter,c)
+  //  printf("[%d] " #c " = %e\n",cgiter,c)
 
 /*
  * performs the multi-shifted BiCGstab inversion for the hermitean matrix M:
@@ -95,10 +95,10 @@ int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spino
   M(Ms,&s[0]);
   phi=spinor_field_prod_re_f(o0, Ms)/delta; /* o = in (see above) */
 
-  _print_par(delta);
+  /*  _print_par(delta);
   _print_par(phi);
   _print_par(alpha[0]);
-  _print_par(beta[0]);
+  _print_par(beta[0]);*/
 
 
   /* cg recursion */
@@ -146,11 +146,11 @@ int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spino
     M(Ms,&s[0]);
     phi = spinor_field_prod_re_f(o0, Ms)/delta;
 
-    _print_par(delta);
+    /*    _print_par(delta);
     _print_par(phi);
     _print_par(alpha[0]);
     _print_par(beta[0]);
-    _print_par(chi[0]);
+    _print_par(chi[0]);*/
 
     for (i=1; i<(par->n); ++i) { /* update shifted quantities i=1..n-1 */
       if(sflags[i]) {
@@ -205,7 +205,7 @@ int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spino
     if(rtmp1<par->err2)
       notconverged=0;
 	
-    printf("[ %d ] residuo=%e\n",cgiter,rtmp1);
+    //    printf("[ %d ] residuo=%e\n",cgiter,rtmp1);
     
     /* Uncomment this to print cg recursion parameters
        printf("[ %d ] alpha=%e\n",cgiter,alpha);

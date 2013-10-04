@@ -189,6 +189,13 @@ typedef struct
    (c).im+=(-(a).re*(b).im-(a).im*(b).re)
 
 /*
+* a+=(b+c^*) (a,b complex)
+*/
+#define _complex_add_star_assign(a,b,c) \
+   (a).re+=(b).re+(c).re; \
+   (a).im+=(b).im-(c).im
+
+/*
 * a=-b (a complex)
 */
 #define _complex_minus(a,b) \

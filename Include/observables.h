@@ -64,6 +64,30 @@ void z2semwall_mesons(int conf, int nhits, int nm, double *m, double acc);
 void z2semwall_qprop_free_new();
 void z2semwall_mesons_new(int conf, int nhits, int nm, double *m, double acc);
 
+void create_point_source(spinor_field *source,int tau,int color);
+int create_diluted_source_equal_eo(spinor_field *source);
+void create_diluted_source_equal_atau_eo(spinor_field *source, int tau);
+int create_diluted_source_equal(spinor_field *source);
+void create_noise_source_equal_eo(spinor_field *source);
+void create_gauge_fixed_wall_source(spinor_field *source, int tau, int color);
+void create_sequential_source(spinor_field *source, int tf, spinor_field* prop);
+
+void init_propagator_eo(int nm, double *m, double acc);
+void free_propagator_eo();
+void calc_propagator_eo(spinor_field *psi, spinor_field *eta, int ndilute);
+void calc_propagator(spinor_field *psi, spinor_field* eta, int ndilute);
+void calc_propagator_multisource(spinor_field *psi, spinor_field* eta, int ndilute);
+
+void measure_mesons(spinor_field *psi0, spinor_field *eta, int nm,int tau);
+void measure_mesons_ext(spinor_field *psi0, spinor_field *eta, int nm,int tau,int begin);
+void measure_point_mesons_momenta(spinor_field* psi0, spinor_field* eta, int nm, int tau, int n_mom);
+void measure_point_mesons_momenta_ext(spinor_field* psi0, spinor_field* eta, int nm, int tau, int n_mom, int begin);
+void measure_formfactors(spinor_field* psi0, spinor_field* psi1, spinor_field* eta, int nm, int ti, int tf, int n_mom);
+void print_mesons(double norm,int conf, int nm, double* mass, char* label);
+void print_mesons_ext(double norm,int conf, int nm, double* mass, char* label);
+void print_mesons_momenta(int conf, int nm, double* mass,int n_mom, char* label);
+void print_mesons_momenta_ext(int conf, int nm, double* mass,int n_mom, char* label);
+
 void id_correlator(double *out, int t0, spinor_field *qp);
 void g0_correlator(double *out, int t0, spinor_field *qp);
 void g5_correlator(double *out, int t0, spinor_field *qp);
