@@ -43,7 +43,7 @@ typedef struct _geometry_descriptor {
 
 #define _MASTER_FOR(type,i) \
   _PIECE_FOR((type),i)    \
-_SITE_FOR((type),i)
+  _SITE_FOR((type),i)
 
 
 int setup_process(int *argc, char ***argv);

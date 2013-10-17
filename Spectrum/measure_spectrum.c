@@ -51,9 +51,10 @@ typedef struct _input_mesons {
   int ext_point;
   int fixed_semwall;
   int fixed_point;
+  int dt;
   int n_mom;
   /* for the reading function */
-  input_record_t read[11];
+  input_record_t read[12];
 } input_mesons;
 
 #define init_input_mesons(varname) \
@@ -68,6 +69,7 @@ typedef struct _input_mesons {
     {"enable extended point", "mes:ext_point = %d",INT_T, &(varname).ext_point},		\
     {"enable Dirichlet semwall", "mes:dirichlet_semwall = %d",INT_T, &(varname).fixed_semwall},	\
     {"enable Dirichlet point", "mes:dirichlet_point = %d",INT_T, &(varname).fixed_point},	\
+    {"Distance of t_initial from Dirichlet boundary", "mes:dirichlet_dt = %d", INT_T, &(varname).dt},\ 
     {"maximum component of momentum", "mes:momentum = %d", INT_T, &(varname).n_mom}, \
     {NULL, NULL, INT_T, NULL}				\
    }							\
@@ -206,7 +208,7 @@ int main(int argc,char *argv[]) {
 
   /* logger setup */
   /* disable logger for MPI processes != 0 */
-  logger_setlevel(0,30);
+  logger_setlevel(0,50);
   if (PID!=0) { logger_disable(); }
   if (PID==0) { 
     sprintf(tmp,">%s",output_filename); logger_stdout(tmp);
@@ -293,13 +295,15 @@ int main(int argc,char *argv[]) {
     lprintf("MAIN",0,"Point sources on extended lattice\n");    
   }
   if (mes_var.fixed_semwall){
-    lprintf("MAIN",0,"Spin Explicit Method (SEM) wall sources with Dirichlet boundary conditions\n");    
+    lprintf("MAIN",0,"Spin Explicit Method (SEM) wall sources with Dirichlet boundary conditions\n"); 
+    lprintf("MAIN",0,"Distance between tau and the boundary: %d\n",mes_var.dt); 
   }
   if (mes_var.fixed_point){
     lprintf("MAIN",0,"Point sources with Dirichlet boundary conditions\n");    
+    lprintf("MAIN",0,"Distance between tau and the boundary: %d\n",mes_var.dt); 
   }
   if (mes_var.n_mom>1){
-    lprintf("MAIN",0,"Number of maximum monentum component\n",mes_var.n_mom-1);
+    lprintf("MAIN",0,"Number of maximum monentum component %d\n",mes_var.n_mom-1);
     if (mes_var.def_semwall || mes_var.ext_semwall || mes_var.fixed_semwall){
       lprintf("MAIN",0,"WARGING: wall sources measure only with zero momenta\n");
     }
@@ -343,10 +347,10 @@ int main(int argc,char *argv[]) {
       measure_spectrum_pt_ext(tau,nm,m,mes_var.n_mom,mes_var.nhits,i,mes_var.precision);
     }
     if (mes_var.fixed_semwall){
-      measure_spectrum_semwall_fixedbc(2,nm,m,mes_var.nhits,i,mes_var.precision);
+      measure_spectrum_semwall_fixedbc(mes_var.dt,nm,m,mes_var.nhits,i,mes_var.precision);
     }
     if (mes_var.fixed_point){
-      measure_spectrum_pt_fixedbc(tau,2,nm,m,mes_var.n_mom,mes_var.nhits,i,mes_var.precision);
+      measure_spectrum_pt_fixedbc(tau,mes_var.dt,nm,m,mes_var.n_mom,mes_var.nhits,i,mes_var.precision);
     }
     gettimeofday(&end,0);
     timeval_subtract(&etime,&end,&start);

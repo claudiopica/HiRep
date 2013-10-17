@@ -27,7 +27,7 @@
 #define PI 3.141592653589793238462643383279502884197
 
 //Helps QMR solver find more accurate solutions
-#undef GAUSSIAN_NOISE 
+#undef GAUSSIAN_NOISE
 
 
 /* Random timeslize not previously chosen */
@@ -183,7 +183,7 @@ void create_noise_source_equal_eo(spinor_field *source) {
   
   //if(COORD[0]==tau/T) {// Check that tau is in this thread.
   //  c[0]=tau%T;
-    for(c[0]=0; c[0]<T; c[0]++) for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
+  for(c[0]=0; c[0]<T; c[0]++) for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
 	  if(((zerocoord[0]+c[0]+zerocoord[1]+c[1]+zerocoord[2]+c[2]+zerocoord[3]+c[3])&1)==0){
 	    v1 = &((_FIELD_AT(&source[0],ipt(c[0],c[1],c[2],c[3])))->c[0]);
 	    ranz2((double*)(v1),sizeof(suNf_vector)/sizeof(double)); // Make new sources
@@ -452,6 +452,7 @@ static void calc_propagator_core(spinor_field *psi, spinor_field *eta) {
 
 void calc_propagator_eo(spinor_field *psi, spinor_field *eta, int ndilute) {
   int beta;
+  lprintf("CALC_PROPAGATOR_EO",20,"Calculating EO propagator with ndilute: %d\n",ndilute);
   for (beta=0;beta<ndilute;++beta){
     calc_propagator_eo_core(&psi[beta*QMR_par.n],&eta[beta]);
   }

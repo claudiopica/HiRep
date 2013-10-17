@@ -38,6 +38,22 @@ typedef struct
   (r).c[2].c[i] = (s).c[2]; \
   (r).c[3].c[i] = (s).c[3]
 
+
+//r = s + t 
+#define _spinmatrix_add(r,s,t) \
+  _spinor_add_f((r).c[0],(s).c[0],(t).c[0]);\
+  _spinor_add_f((r).c[1],(s).c[1],(t).c[1]);\
+  _spinor_add_f((r).c[2],(s).c[2],(t).c[2]);\
+  _spinor_add_f((r).c[3],(s).c[3],(t).c[3])
+
+//r = s - t 
+#define _spinmatrix_sub(r,s,t) \
+  _spinor_sub_f((r).c[0],(s).c[0],(t).c[0]);\
+  _spinor_sub_f((r).c[1],(s).c[1],(t).c[1]);\
+  _spinor_sub_f((r).c[2],(s).c[2],(t).c[2]);\
+  _spinor_sub_f((r).c[3],(s).c[3],(t).c[3])
+  
+
 //s = r . gamma_5 
 #define _spinmatrix_g5(s, r) \
   _spinor_g5_f((s).c[0],(r).c[0]);		\
