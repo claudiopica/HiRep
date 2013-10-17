@@ -24,7 +24,7 @@
 #include "ranlux.h"
 #include "gamma_spinor.h"
 #include "spin_matrix.h"
-#include "propagator.h"
+//#include "propagator.h"
 #define PI 3.141592653589793238462643383279502884197
 
 enum { _g5= 0,_id, _g0, _g1, _g2, _g3,  _g0g1, _g0g2, _g0g3, _g0g5, _g5g1, _g5g2, _g5g3, _g0g5g1, _g0g5g2, _g0g5g3, _g5_g0g5_re, _id_disc,_g5_disc,_pipig_ff_re,_pipig_ff_im,_pipig_conserved_ff,NCHANNELS };
@@ -207,65 +207,65 @@ static void measure_mesons_core(spinor_field* psi0, spinor_field* psi1, spinor_f
 }
 
 /* spinor_fields* are nmx4xNF arrays of spinor_field ordered([nm][color][spinor])*/
-static void measure_nonlocal_core(spinor_field* psi0, spinor_field* psi1, spinor_field* eta, int nm, int tau, int n_mom, int offset,int lt){
-  int i,ix,t,x,y,z,beta,px,py,pz,tc,a;
-  double pdotx,cpdotx,spdotx;
-  complex tr;
-  suNf_propagator sp0,sp1,Usp,spf,sptmp1,sptmp2;
-  lprintf("measure_mesons_core",50,"Measuring channels: ");
-  for (i=NCHANNELS-1;i<NCHANNELS;++i){
-    if (measure_channels[i]) lprintf("",50," %s",channel_names[i]);
-  }
-  lprintf("",50,"\n");
-  for (px=0;px<n_mom;++px) for (py=0;py<n_mom;++py) for (pz=0;pz<n_mom;++pz){
-	for(i=0; i<nm; i++) {
-	  for (t=0; t<T; t++) {	 
-	    tc = (zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T+offset;
-	    for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) {
-		  ix=ipt(t,x,y,z);					
-		  pdotx = 2.0*PI*(((double) px)*(x+zerocoord[1])/GLB_X + ((double) py)*(y+zerocoord[2])/GLB_Y + ((double) pz)*(z+zerocoord[3])/GLB_Z);
-		  cpdotx=cos(pdotx);
-		  spdotx=sin(pdotx);
-		  for (a=0;a<NF;++a){
-		    for (beta=0;beta<4;beta++){ 
-		      _propagator_assign(sp0, *_FIELD_AT(&psi0[a*4*nm+beta*nm+i],ix),a,beta);
-		      _propagator_assign(sp1, *_FIELD_AT(&psi1[a*4*nm+beta*nm+i],ix),a,beta);
-		    }
-		  }
-		  if (measure_channels[_pipig_conserved_ff]){
-		    suNf *u1 = _4FIELD_AT(u_gauge_f,ix,0);
-		    int ixmu = iup(ix,0);
-		    int alpha,a;
-		    /* Tr [ 1/2 S^(0,y+\mu) g_5(1+g_0) U^(y) S(y,x) */
-		    _suNf_inverse_prop_multiply(Usp,*u1,sp0);
-		    sptmp1=Usp;
-		    _g0_propagator(stmp2,stmp1);
-		    _propagator_add(stmp1,stmp1,stmp2);
-		    _g5_propagator(stmp2,stmp1);
-		    for (a=0;a<NF;a++) for (beta=0;beta<4;beta++){ 
-			_propagator_assign(spf, *_FIELD_AT(&psi1[4*a*nm+beta*nm+i],ixmu), a,beta); 
-		    }
-		    _tr_propagator_mul_propagator(tr,stmp2,sfp);
+/* static void measure_nonlocal_core(spinor_field* psi0, spinor_field* psi1, spinor_field* eta, int nm, int tau, int n_mom, int offset,int lt){ */
+/*   int i,ix,t,x,y,z,beta,px,py,pz,tc,a; */
+/*   double pdotx,cpdotx,spdotx; */
+/*   complex tr; */
+/*   suNf_propagator sp0,sp1,Usp,spf,sptmp1,sptmp2; */
+/*   lprintf("measure_mesons_core",50,"Measuring channels: "); */
+/*   for (i=NCHANNELS-1;i<NCHANNELS;++i){ */
+/*     if (measure_channels[i]) lprintf("",50," %s",channel_names[i]); */
+/*   } */
+/*   lprintf("",50,"\n"); */
+/*   for (px=0;px<n_mom;++px) for (py=0;py<n_mom;++py) for (pz=0;pz<n_mom;++pz){ */
+/* 	for(i=0; i<nm; i++) { */
+/* 	  for (t=0; t<T; t++) {	  */
+/* 	    tc = (zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T+offset; */
+/* 	    for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) { */
+/* 		  ix=ipt(t,x,y,z);					 */
+/* 		  pdotx = 2.0*PI*(((double) px)*(x+zerocoord[1])/GLB_X + ((double) py)*(y+zerocoord[2])/GLB_Y + ((double) pz)*(z+zerocoord[3])/GLB_Z); */
+/* 		  cpdotx=cos(pdotx); */
+/* 		  spdotx=sin(pdotx); */
+/* 		  for (a=0;a<NF;++a){ */
+/* 		    for (beta=0;beta<4;beta++){  */
+/* 		      _propagator_assign(sp0, *_FIELD_AT(&psi0[a*4*nm+beta*nm+i],ix),a,beta); */
+/* 		      _propagator_assign(sp1, *_FIELD_AT(&psi1[a*4*nm+beta*nm+i],ix),a,beta); */
+/* 		    } */
+/* 		  } */
+/* 		  if (measure_channels[_pipig_conserved_ff]){ */
+/* 		    suNf *u1 = _4FIELD_AT(u_gauge_f,ix,0); */
+/* 		    int ixmu = iup(ix,0); */
+/* 		    int alpha,a; */
+/* 		    /\* Tr [ 1/2 S^(0,y+\mu) g_5(1+g_0) U^(y) S(y,x) *\/ */
+/* 		    _suNf_inverse_prop_multiply(Usp,*u1,sp0); */
+/* 		    sptmp1=Usp; */
+/* 		    _g0_propagator(stmp2,stmp1); */
+/* 		    _propagator_add(stmp1,stmp1,stmp2); */
+/* 		    _g5_propagator(stmp2,stmp1); */
+/* 		    for (a=0;a<NF;a++) for (beta=0;beta<4;beta++){  */
+/* 			_propagator_assign(spf, *_FIELD_AT(&psi1[4*a*nm+beta*nm+i],ixmu), a,beta);  */
+/* 		    } */
+/* 		    _tr_propagator_mul_propagator(tr,stmp2,sfp); */
 						  
-		    corr[_pipig_conserved_ff][corr_ind(px,py,pz,n_mom,tc,nm)] += +0.5*(cpdotx*tr.re+spdotx*tr.im);
-		    /* Tr [ -1/2 S^(0,y) g_5(1-g_0) U(y) S(y+mu,x) */
-		    for (a=0;a<NF;a++) for (beta=0;beta<4;beta++){ 
-			_propagator_assign(spf, *_FIELD_AT(&psi0[4*a*nm+beta*nm+i],ixmu), a,beta); 
-		      }
-		    _suNf_prop_multiply(Usp,*u1,spf);
-		    sptmp1=Usp;
-		    _g0_propagator(stmp2,stmp1);
-		    _propagator_sub(stmp1,stmp1,stmp2);
-		    _g5_propagator(stmp2,stmp1);
-		    _tr_propagator_mul_propagator(tr,stmp2,sp1);		    
-		    corr[_pipig_conserved_ff][corr_ind(px,py,pz,n_mom,tc,nm)] += -0.5*(cpdotx*tr.re+spdotx*tr.im);
-		  }
-		}
-	  }
-	}
-      }
-  lprintf("measure_nonlocal_core",50,"Measuring DONE! ");
-}		  
+/* 		    corr[_pipig_conserved_ff][corr_ind(px,py,pz,n_mom,tc,nm)] += +0.5*(cpdotx*tr.re+spdotx*tr.im); */
+/* 		    /\* Tr [ -1/2 S^(0,y) g_5(1-g_0) U(y) S(y+mu,x) *\/ */
+/* 		    for (a=0;a<NF;a++) for (beta=0;beta<4;beta++){  */
+/* 			_propagator_assign(spf, *_FIELD_AT(&psi0[4*a*nm+beta*nm+i],ixmu), a,beta);  */
+/* 		      } */
+/* 		    _suNf_prop_multiply(Usp,*u1,spf); */
+/* 		    sptmp1=Usp; */
+/* 		    _g0_propagator(stmp2,stmp1); */
+/* 		    _propagator_sub(stmp1,stmp1,stmp2); */
+/* 		    _g5_propagator(stmp2,stmp1); */
+/* 		    _tr_propagator_mul_propagator(tr,stmp2,sp1);		     */
+/* 		    corr[_pipig_conserved_ff][corr_ind(px,py,pz,n_mom,tc,nm)] += -0.5*(cpdotx*tr.re+spdotx*tr.im); */
+/* 		  } */
+/* 		} */
+/* 	  } */
+/* 	} */
+/*       } */
+/*   lprintf("measure_nonlocal_core",50,"Measuring DONE! "); */
+/* } */		  
 
 
 static void init_corrs(int nm, int n_mom){
@@ -375,7 +375,7 @@ void measure_formfactors_ext(spinor_field* psi0, spinor_field* psi1, spinor_fiel
 void measure_formfactors_conserved(spinor_field* psi0, spinor_field* psi1, spinor_field* eta, int nm, int ti, int tf, int n_mom, int begin){
   init_corrs(nm,n_mom);
   measure_channels[_pipig_conserved_ff]=1;
-  measure_nonlocal_core(psi1, psi1, eta, nm, ti, n_mom, 0, GLB_T);    
+  //  measure_nonlocal_core(psi1, psi1, eta, nm, ti, n_mom, 0, GLB_T);    
 }
 
 
