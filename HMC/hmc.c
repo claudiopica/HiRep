@@ -183,11 +183,11 @@ int main(int argc,char *argv[]) {
   //slower(rlx_var.rlxd_start); //convert start variable to lowercase
   if(strcmp(rlx_var.rlxd_start,"continue")==0 && rlx_var.rlxd_state[0]!='\0') {
     /*load saved state*/
-    lprintf("MAIN",0,"Loading rlxd state from file [%s]\n",glb_var.rlxd_state);
+    lprintf("MAIN",0,"Loading rlxd state from file [%s]\n",rlx_var.rlxd_state);
     read_ranlxd_state(rlx_var.rlxd_state);
   } else {
     lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
-    rlxd_init(rlx_var.rlxd_level,glb_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
+    rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
   }
 
 #ifdef GAUGE_SUN
