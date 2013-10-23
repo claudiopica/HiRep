@@ -43,10 +43,8 @@
 char input_filename[256] = "input_file";
 char output_filename[256] = "random_spinor.out";
 
-input_glb glb_ip = init_input_glb(glb_ip);
-
-
-void read_cmdline(int argc, char* argv[]) {
+void read_cmdline(int argc, char* argv[])
+{
   int i, ai=0, ao=0;
   
   for (i=1;i<argc;i++) {
@@ -68,7 +66,7 @@ int main(int argc,char *argv[]) {
   read_cmdline(argc, argv);
   setup_process(&argc,&argv);
 
-  read_input(glb_ip.read,input_filename);
+  read_input(rlx_var.read,input_filename);
   setup_replicas();
 
   /* logger setup */
@@ -82,8 +80,8 @@ int main(int argc,char *argv[]) {
 
   /* read & broadcast parameters */
 
-  lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_ip.rlxd_level,glb_ip.rlxd_seed);
-  rlxd_init(glb_ip.rlxd_level,glb_ip.rlxd_seed+PID);
+  lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed);
+  rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+PID);
 
   lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
   lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);

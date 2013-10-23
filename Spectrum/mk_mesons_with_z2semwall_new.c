@@ -191,6 +191,7 @@ int main(int argc,char *argv[]) {
   setup_process(&argc,&argv);
 
   read_input(glb_var.read,input_filename);
+  read_input(rlx_var.read,input_filename);
   setup_replicas();
 
   /* logger setup */
@@ -219,9 +220,9 @@ int main(int argc,char *argv[]) {
   error(fpars.type==UNKNOWN_CNFG,1,"mk_mesons.c","Bad name for a configuration file");
   error(fpars.nc!=NG,1,"mk_mesons.c","Bad NG");
 
-  lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed);
-  rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
-  srand(glb_var.rlxd_seed+PID);
+  lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed);
+  rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+PID);
+  srand(rlx_var.rlxd_seed+PID);
 
 #ifdef GAUGE_SON
   lprintf("MAIN",0,"Gauge group: SO(%d)\n",NG);
