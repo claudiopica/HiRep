@@ -178,6 +178,8 @@ GLB_VAR(int,*twbc_plaq, =NULL);
 #include "input_par.h"
 GLB_VAR(input_glb,glb_var,=init_input_glb(glb_var));
 
+/* Random number generator parameters */
+GLB_VAR(input_rlx,rlx_var,=init_input_rlx(rlx_var));
 
 /* Does the represented field need to be allocated? */
 
