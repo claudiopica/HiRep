@@ -45,7 +45,7 @@ typedef struct _input_glb {
 {"NP_Y", "NP_Y = %d", INT_T, &NP_Y},\
 {"NP_Z", "NP_Z = %d", INT_T, &NP_Z},\
 {NULL, NULL, INT_T, NULL}				    \
-}
+}\
 }
 
 /* Global or common variables */
