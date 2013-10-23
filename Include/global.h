@@ -140,6 +140,9 @@ GLB_VAR(suNf_field_flt,*u_gauge_f_flt,=NULL);
 #include "input_par.h"
 GLB_VAR(input_glb,glb_var,=init_input_glb(glb_var));
 
+/* Random number generator parameters */
+GLB_VAR(input_rlx,rlx_var,=init_input_rlx(rlx_var));
+
 /* logger parameters */
 GLB_VAR(input_logger,logger_var,=init_input_logger(logger_var));
 

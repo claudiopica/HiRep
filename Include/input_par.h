@@ -29,13 +29,8 @@ typedef struct _input_glb {
   /* int NP_T, NP_X, NP_Y, NP_Z; */
   /* int N_REP; */
 
-  /* random numbers */
-  int rlxd_level, rlxd_seed;
-  char rlxd_state[256];
-  char rlxd_start[256];
-
   /* for the reading function */
-  input_record_t read[14];
+  input_record_t read[10];
   
 } input_glb;
 
@@ -51,13 +46,33 @@ typedef struct _input_glb {
     {"NP_Y", "NP_Y = %d", INT_T, &NP_Y},\
     {"NP_Z", "NP_Z = %d", INT_T, &NP_Z},\
     {"N_REP", "N_REP = %d", INT_T, &N_REP},\
-    {"ranlux level", "level = %d", INT_T, &(varname).rlxd_level},\
-    {"ranlux seed", "seed = %d", INT_T, &(varname).rlxd_seed},\
-    {"ranlux state", "rlx_state = %s", STRING_T, &(varname).rlxd_state},\
-    {"ranlux start", "rlx_start = %s", STRING_T, &(varname).rlxd_start},\
     {NULL, NULL, INT_T, NULL}				    \
-  },\
-  .rlxd_state=""\
+  }
+}
+
+/* Global or common variables */
+typedef struct _input_rlx {
+    
+    /* random numbers */
+    int rlxd_level, rlxd_seed;
+    char rlxd_state[256];
+    char rlxd_start[256];
+    
+    /* for the reading function */
+    input_record_t read[5];
+    
+} input_rlx;
+
+#define init_input_rlx(varname) \
+{ \
+.read={\
+{"ranlux level", "level = %d", INT_T, &(varname).rlxd_level},\
+{"ranlux seed", "seed = %d", INT_T, &(varname).rlxd_seed},\
+{"ranlux state", "rlx_state = %s", STRING_T, &(varname).rlxd_state},\
+{"ranlux start", "rlx_start = %s", STRING_T, &(varname).rlxd_start},\
+{NULL, NULL, INT_T, NULL}				    \
+},\
+.rlxd_state=""\
 }
 
 /* Logger global variables */

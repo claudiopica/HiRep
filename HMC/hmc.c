@@ -179,14 +179,15 @@ int main(int argc,char *argv[]) {
   geometry_mpi_eo();
   /* test_geometry_mpi_eo(); */ 
   /* setup random numbers */
-  //slower(glb_var.rlxd_start); //convert start variable to lowercase
-  if(strcmp(glb_var.rlxd_start,"continue")==0 && glb_var.rlxd_state[0]!='\0') {
+  read_input(rlx_var.read,input_filename);
+  //slower(rlx_var.rlxd_start); //convert start variable to lowercase
+  if(strcmp(rlx_var.rlxd_start,"continue")==0 && rlx_var.rlxd_state[0]!='\0') {
     /*load saved state*/
     lprintf("MAIN",0,"Loading rlxd state from file [%s]\n",glb_var.rlxd_state);
-    read_ranlxd_state(glb_var.rlxd_state);
+    read_ranlxd_state(rlx_var.rlxd_state);
   } else {
-    lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed+MPI_PID);
-    rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
+    lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
+    rlxd_init(rlx_var.rlxd_level,glb_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
   }
 
 #ifdef GAUGE_SUN
@@ -199,7 +200,6 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
 
   /* read input for measures */
-  read_input(glb_var.read,input_filename);
   read_input(mes_var.read,input_filename);
   read_input(poly_var.read,input_filename);
   read_input(eigval_var.read,input_filename);
@@ -263,9 +263,9 @@ int main(int argc,char *argv[]) {
     if((i%flow.save_freq)==0) {
       save_conf(&flow, i);
       /* Only save state if we have a file to save to */
-      if(glb_var.rlxd_state[0]!='\0') {
-          lprintf("MAIN",0,"Saving rlxd state to file %s\n",glb_var.rlxd_state);
-          write_ranlxd_state(glb_var.rlxd_state);
+      if(rlx_var.rlxd_state[0]!='\0') {
+          lprintf("MAIN",0,"Saving rlxd state to file %s\n",rlx_var.rlxd_state);
+          write_ranlxd_state(rlx_var.rlxd_state);
       }
     }
     
@@ -306,9 +306,9 @@ int main(int argc,char *argv[]) {
   if(((--i)%flow.save_freq)!=0) {
     save_conf(&flow, i);
     /* Only save state if we have a file to save to */
-    if(glb_var.rlxd_state[0]!='\0') {
-        lprintf("MAIN",0,"Saving rlxd state to file %s\n",glb_var.rlxd_state);
-        write_ranlxd_state(glb_var.rlxd_state);
+    if(rlx_var.rlxd_state[0]!='\0') {
+        lprintf("MAIN",0,"Saving rlxd state to file %s\n",rlx_var.rlxd_state);
+        write_ranlxd_state(rlx_var.rlxd_state);
     }
   }
   
