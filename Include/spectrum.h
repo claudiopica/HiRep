@@ -26,7 +26,6 @@ void measure_spectrum_pt_ext(int tau, int nm, double* m, int n_mom,int nhits,int
 void measure_spectrum_semwall_fixedbc(int dt, int nm, double* m, int nhits,int conf_num, double precision);
 void measure_spectrum_pt_fixedbc(int tau, int dt, int nm, double* m, int n_mom,int nhits,int conf_num, double precision);
 void measure_formfactor_pt(int ti, int tf, int nm, double* m, int n_mom, int conf_num, double precision);
-void measure_formfactor_ext(int ti, int tf, int nm, double* m, int n_mom, int conf_num, double precision);
 void measure_formfactor_fixed(int ti, int tf, int dt, int nm, double* m, int n_mom, int conf_num, double precision);
 void measure_conserved_formfactor_fixed(int ti, int tf, int dt, int nm, double* m, int n_mom, int conf_num, double precision);
 

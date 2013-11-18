@@ -1,0 +1,490 @@
+%% -*- Mode: LaTeX; comment-column: 36; fill-column: 78; font-lock-mode: true -*-
+%% Time-stamp: <24-AUG-2012 18:28:43 adk@BENJAMIN>
+
+\documentclass[3p,preprint]{elsarticle}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{ifpdf}
+\usepackage{epsfig}
+\usepackage{graphicx}
+\usepackage[font=small,format=plain,labelfont=bf,up,textfont=it,up]{caption}
+\usepackage{subfigure}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage{psfrag}
+\usepackage[backref,citecolor=blue,bookmarks=true]{hyperref}
+\usepackage{color}
+\usepackage{comment}
+
+\topmargin=-0.5in
+\textwidth=6.5in
+\textheight=9in
+\oddsidemargin=0in
+
+\begin{document}
+
+\title{Contractions}
+
+\section{Connected two point correlation functions}
+
+First we choose interpolating operators with the quantum numbers of the meson we would like to study:
+\begin{equation}
+O_M = \bar{\psi}^{(1)}(x) \Gamma \psi^{(2)}(x)
+\end{equation}
+\begin{equation}
+\bar{O}_M = \bar{\psi}^{(2)}(x) \bar{ \Gamma } \psi^{(1)}(x)
+\end{equation}
+where $\bar{ \Gamma } = \gamma_0 \Gamma^\dagger \gamma_0$. The gamma matrix is chosen to have the same $J^{PC}$
+quantum numbers as the meson we want to create. We then calculate the expectation value to create a meson at
+$y$ and destroy it again at $x$:
+\begin{eqnarray}
+\langle O_M(x) \bar{O}_M'(y) \rangle &=& \langle \bar{\psi}^{(1)}(x) \Gamma \psi^{(2)}(x) \bar{\psi}^{(2)}(y) \bar{ \Gamma }' \psi^{(1)}(y) \rangle 
+\\
+&=& \Gamma_{\alpha \beta} \bar{ \Gamma }'_{\gamma \delta} \langle \bar{\psi}^{(1)}_\alpha(x)  \psi^{(2)}_\beta(y) \bar{\psi}^{(2)}_\gamma(y)  \psi^{(1)}_\delta(x) \rangle \\
+&=& -\Gamma_{\alpha \beta} \bar{ \Gamma }'_{\gamma \delta} \langle \psi^{(2)}_\beta(x) \bar{\psi}^{(2)}_\gamma(y)  \psi^{(1)}_\delta(y) 
+\bar{\psi}^{(1)}_\alpha (x) \rangle
+\end{eqnarray}
+where the sign in the last line comes from exchanging the anticommuting $\bar{\psi}_\alpha$ 3 times. Wick contracting where $\langle \psi_\alpha(x) \bar{\psi}_\beta(y) \rangle = S_{\alpha \beta}(x,y)$ gives
+\begin{eqnarray}
+\langle O_M(x) \bar{O}_M'(y) \rangle &=& -\Gamma_{\alpha \beta} S^{(2)}_{\beta \gamma} (x,y) \bar{ \Gamma }'_{\gamma \delta} S^{(1)}_{\delta \alpha} (y,x) \\
+&=& -\text{Tr}\left[ \Gamma S^{(2)} (x,y) \bar{ \Gamma }' S^{(1)} (y,x) \right]
+\end{eqnarray}
+
+To get correlation functions we Fourier transform, ie. sum over all source and sink seperations
+while projecting onto the momentum we want to give to the particle:
+\begin{eqnarray}
+C(t - \tau, \vec{p}) &=& \sum_{\vec{x} \vec{y}} e^{-i \vec{p}(\vec{x} - \vec{y}) } \langle O_M(\vec{x}, t) O_M'(\vec{y}, \tau)\rangle \\
+&=& -\sum_{\vec{x} \vec{y}} e^{-i \vec{p}(\vec{x} - \vec{y}) } \text{Tr}\left[ \Gamma S^{(2)} (x,y) \bar{ \Gamma }' S^{(1)} (y,x) \right]
+\end{eqnarray}
+here $x = (\vec{x}, t)$ and $y = (\vec{y}, \tau)$ and the zero momentum correlator is:
+\begin{equation}
+C(t - \tau, 0) = -\sum_{\vec{x} \vec{y}} \text{Tr}\left[ \Gamma S^{(2)} (x,y) \bar{ \Gamma }' S^{(1)} (y,x) \right]
+\end{equation}
+We now use $\gamma_5$ Hermiticity: $\gamma_5 S^\dagger(x,y) \gamma_5 = S(y,x)$,
+\begin{equation}\label{eqn:corr}
+C(t - \tau, 0) = -\sum_{\vec{x} \vec{y}} \text{Tr}\left[ \gamma_5 \Gamma S^{(2)} (x,y) \bar{ \Gamma }' \gamma_5 S^{\dagger (1)} (x,y) \right]
+\end{equation}
+
+\section{Point Sources}
+Using a delta function source and solving the Dirac equation gives a point propagator,
+\begin{equation}
+	D_{\alpha a, \beta b} (x,y) S_{\beta b, \gamma c} (y, z) = \delta(x,z) \delta_{ac} \delta_{\alpha \gamma}
+\end{equation}
+usually $z = (\vec{0}, 0)$ so we get $S(y,0) = \gamma_5 S^{\dagger} (0,y) \gamma_5$. Then we use these to calculate
+correlation functions,
+\begin{equation}\label{eqn:pointcorr}
+C(t, 0) = -\sum_{\vec{x}} \text{Tr} e^{-i \vec{p} \vec{x}} \left[ \gamma_5 \Gamma S (x,0) \bar{ \Gamma }' \gamma_5 S (x,0) \right]
+\end{equation}
+Translational invariance in the limit of infinitely many gauge configurations implies
+$S(x,y) = S(|x - y|)$, so the sum over $\vec{y}$ in equation (\ref{eqn:corr}) just gives $V$ times equation 
+\ref{eqn:pointcorr}.  We place the source at the time origin so $\tau = 0$.
+
+\section{One-end Trick}
+For this method it helps to write all the indices out,
+\begin{equation}
+C(t - \tau, 0) = -\sum_{\vec{x} \vec{y}} (\gamma_5 \Gamma)_{\alpha \beta} S^{(2)}_{\beta\gamma,bc} (x,y) (\bar{ \Gamma }' \gamma_5)_{\gamma \delta} S^{\dagger (1)}_{\delta \alpha, cb} (x,y) 
+\end{equation}
+Greek indices $\alpha, \beta, \gamma, \delta, ...$ are spinor indices and Latin indices $a, b, c, d...$ are colour indices.
+The one-end trick involves inserting a delta function in colour, spin and space.
+\begin{equation}
+C(t - \tau, 0) = -\sum_{\vec{x} \vec{y} \vec{z}} (\gamma_5 \Gamma)_{\alpha \beta} S^{(2)}_{\beta\gamma,b c} (\vec{x}, t; \vec{y}, \tau) \delta_{\gamma \lambda} \delta_{cd} \delta(\vec{y}, \vec{z}) (\bar{ \Gamma }' \gamma_5)_{\lambda \delta} S^{\dagger (1)}_{\delta \alpha, d b} (\vec{x}, t;\vec{z}, \tau) 
+\end{equation}
+The delta function is aproximated with a $Z(2) \times Z(2)$ noise source on timeslice $\tau$
+\begin{equation}
+\delta_{\gamma \lambda} \delta_{cd} \delta(\vec{y}, \vec{z}) \approx \frac{1}{K} \sum_{k = 0}^{K} | \eta^{(k)}_{\gamma c }(\vec{y})\rangle \langle \eta^{(k)}_{\lambda d }(\vec{z}) |
+\end{equation}
+which is exact in the limit $K \rightarrow \infty$.
+\begin{equation}\label{eqn:oet}
+C(t - \tau, 0) = -\frac{1}{K} \sum_{k = 0}^{K} \sum_{\vec{x} \vec{y} \vec{z}} (\gamma_5 \Gamma)_{\alpha \beta} S^{(2)}_{\beta\gamma,b c} (\vec{x}, t; \vec{y}, \tau) | \eta^{(k)}_{\gamma c }(\vec{y})\rangle \langle \eta^{(k)}_{\lambda d }(\vec{z}) | (\bar{ \Gamma }' \gamma_5)_{\lambda \delta} S^{\dagger (1)}_{\delta \alpha, d b} (\vec{x}, t;\vec{z}, \tau) 
+\end{equation}
+Defining
+\begin{equation}
+\phi^{(k)}_{\beta, b}(\vec{x}, t; \tau) = \sum_{\vec{y}} S^{(2)}_{\beta\gamma,b c} (\vec{x}, t; \vec{y}, \tau) | \eta^{(k)}_{\gamma c }(\vec{y})\rangle
+\end{equation}
+and
+\begin{equation}
+\phi^{\Gamma (k)}_{\alpha, b}(\vec{x}, t; \tau) = \sum_{\vec{z}} S^{(1)}_{\alpha \delta , b d} (\vec{x}, t;\vec{z}, \tau) (\bar{ \Gamma }' \gamma_5)^{\dagger}_{\delta \lambda} | \eta^{(k)}_{\lambda d }(\vec{z}) \rangle
+\end{equation}
+the correlator can be evaluated as,
+\begin{equation}
+C(t - \tau, 0) = -\frac{1}{K} \sum_{k = 0}^{K} \sum_{\vec{x} } (\gamma_5 \Gamma)_{\alpha \beta} \phi^{(k)}_{\beta, b}(\vec{x}, t; \tau) \phi^{\Gamma \dagger (k)}_{\alpha, b}(\vec{x}, t; \tau) 
+\end{equation}
+
+\subsection{One-End-Trick in HiRep}
+In HiRep the code Spectrum/mk\_mesons\_with\_z2semwall.c does two solves to calculate $S^{(1)} | \eta \rangle $ and $S^{(2)} (\bar{ \Gamma }' \gamma_5)^{\dagger} | \eta \rangle $.
+HiRep has 
+\begin{equation}
+\rho = \rho_{ c }(\vec{y})
+\end{equation}
+a $Z(2) \times Z(2)$ colour vector at all (even) spatial sites $\vec{y}$ and non-zero only on timeslice $\tau$.
+\begin{equation}
+\rho^{\alpha}_\beta = \delta_{\alpha \beta} \rho^\alpha
+\end{equation}
+eg.
+$$
+\rho^1_\beta = \left( \begin{matrix}
+  0 \\
+  \rho^1 \\
+  0 \\
+  0
+ \end{matrix} \right)
+$$
+It then solves for the four objects
+\begin{equation}
+\chi^\alpha_\beta = S_{\beta \gamma} \rho^{\alpha}_\gamma
+\end{equation}
+eg.
+$$
+\chi^0_\beta = \left( \begin{matrix}
+  S_{00} \rho^0 \\
+  S_{10} \rho^0 \\
+  S_{20} \rho^0 \\
+  S_{30} \rho^0
+ \end{matrix} \right)
+$$
+For every different $\Gamma$ that is required it does four more inversions,
+\begin{equation}
+\chi^{\Gamma \alpha}_\beta = S_{\beta \gamma} (\Gamma \gamma_5)^\dagger_{\gamma \delta} \rho^{\alpha}_\delta
+\end{equation}
+before calculating the correlator as,
+\begin{equation}
+C(t - \tau, 0) = -\frac{1}{K} \sum_{k = 0}^{K} \sum_{\lambda = 0}^{3}\sum_{\vec{x} } (\gamma_5 \Gamma)_{\alpha \beta} \chi^{\lambda}_{\beta, b}(\vec{x}, t; \tau) \chi^{\Gamma \lambda \dagger}_{\alpha, b}(\vec{x}, t; \tau) 
+\end{equation}
+where the $\lambda$ sum is over the $4$ spinor components.
+
+We should be able to improve the signal and reduce the number of inversions with two modifications. 
+First, instead of having a different noise vector for every spin component we reuse the same noise, i.e.
+\begin{equation}
+\rho^{\alpha}_\beta = \delta_{\alpha \beta} \rho
+\end{equation}
+for fixed $\rho$. Using less noise seems to be generally preferred.
+
+Secondly there is no need to invert for every different $\Gamma$. 
+Let,
+\begin{equation}
+\chi^{\Gamma \alpha}_\beta = (\Gamma \gamma_5)^\dagger_{\gamma \alpha} \chi^{\gamma}_\beta
+\end{equation}
+This is true because,
+\begin{equation}
+(\Gamma \gamma_5)^\dagger_{\gamma \alpha} \chi^{\gamma}_\beta = (\Gamma \gamma_5)^\dagger_{\gamma \alpha}
+S_{\beta \delta} \rho^{\gamma}_\delta = (\Gamma \gamma_5)^\dagger_{\gamma \alpha}
+S_{\beta \delta} \delta_{\gamma \delta} \rho = (\Gamma \gamma_5)^\dagger_{\gamma \alpha}
+S_{\beta \gamma} \rho = S_{\beta \gamma} (\Gamma \gamma_5)^\dagger_{\gamma \alpha} \rho 
+\end{equation}
+then the correlation function is
+\begin{equation}
+C(t - \tau, 0) = -\frac{1}{K} \sum_{k = 0}^{K} \sum_{\lambda = 0}^{3}\sum_{\vec{x} } (\gamma_5 \Gamma)_{\alpha \beta} \chi^{\lambda}_{\beta, b}(\vec{x}, t; \tau) \chi^{\Gamma \lambda \dagger}_{\alpha, b}(\vec{x}, t; \tau) 
+\end{equation}
+as before. By using the spin\_matrix object in HiRep to construct the objects $\chi^{\lambda}_{\beta, b}$ the correlators can
+be calculated with only $4 N_F$ inversions.
+
+
+\section{Disconnected}
+
+The Disconnected contributions occur when we have fermion species of the same type in the hadron interpolator $O_M$:
+\begin{equation}
+O_M(x) = \bar{ \psi } (x) \Gamma \psi(x)
+\end{equation}
+The same manipulations that lead to equation (5) give,
+\begin{eqnarray}
+\langle O_M(x) \bar{O}_M'(y) \rangle &=& \langle \bar{\psi}(x) \Gamma \psi(x) \bar{\psi}(y) \bar{ \Gamma }' \psi(y) \rangle \\ 
+&=& \Gamma_{\alpha \beta} \bar{ \Gamma }'_{\gamma \delta} \langle \bar{\psi}_\alpha(x)  \psi_\beta(y) \bar{\psi}_\gamma(y)  \psi_\delta(x) \rangle 
+\end{eqnarray}
+There are two allowed Wick contractions,
+\begin{equation}
+\langle O_M(x) \bar{O}_M'(y) \rangle = -\text{Tr}\left[ \Gamma S (x,y) \bar{ \Gamma }' S (y,x) \right] + \text{Tr}\left[ \Gamma S (x,x) \right] \text{Tr} \left[ \bar{ \Gamma }' S (y,y) \right]
+\end{equation}
+the connected and disconnected contributions. Fourier transforming the first term gives us the same result as before. For the disconnected
+part,
+\begin{eqnarray}
+D(t - \tau, \vec{p}) = \sum_{\vec{x} \vec{y}} e^{-i \vec{p} (\vec{x} - \vec{y} )} \text{Tr}\left[ \Gamma S (x,x) \right] \text{Tr} \left[ \bar{ \Gamma }' S (y,y) \right]
+\end{eqnarray}
+again $x = (\vec{x}, t)$ and $y = (\vec{y}, \tau)$, the zero momentum correlator is
+\begin{eqnarray}
+D(t - \tau, 0) &=& \sum_{\vec{x} \vec{y}} \text{Tr}\left[ \Gamma S (x,x) \right] \text{Tr} \left[ \bar{ \Gamma }' S (y,y) \right] \\
+ &=& \sum_{\vec{x}} \text{Tr}\left[ \Gamma S (x,x) \right] \sum_{\vec{y}} \text{Tr} \left[ \bar{ \Gamma }' S (y,y) \right] 
+\end{eqnarray}
+This means we have to evaluate objects like,
+\begin{eqnarray}
+d(t) = \sum_{\vec{x}} \text{Tr}\left[ \Gamma S (x,x) \right] = \sum_{\vec{x}} \Gamma_{\alpha \beta} S_{\beta \alpha}(x,x)
+\end{eqnarray}
+
+Using 
+\begin{equation}
+\phi^{(k)}_{\beta, b}(\vec{x}, t; \tau) = \sum_{\vec{y}} S_{\beta\gamma,b c} (\vec{x}, t; \vec{y}, \tau) | \eta^{(k)}_{\gamma c }(\vec{y})\rangle
+\end{equation}
+which implies
+\begin{eqnarray}
+\frac{1}{K} \sum_{k}^K \sum_{\vec{x}} \text{Tr} \left[ \langle \eta^{(k)}(\vec{x}) | \Gamma | \phi^{(k)} (\vec{x}, t; \tau) \rangle \right] &=& \frac{1}{K} \sum_{k}^K \sum_{\vec{x}} \Gamma_{\beta \gamma} | \phi^{(k)}_{\gamma, b}(\vec{x}, t; \tau) \rangle \langle \eta^{(k)}_{\beta b }(\vec{x}) | \\
+ &=& \frac{1}{K} \sum_{k}^K \sum_{\vec{x}} \Gamma_{\beta \gamma} \sum_{\vec{y}} S_{\gamma \alpha,b c} (\vec{x}, t; \vec{y}, \tau) 
+| \eta^{(k)}_{\alpha c }(\vec{y})\rangle \langle \eta^{(k)}_{\beta b }(\vec{x}) |
+\end{eqnarray}
+Using the limit $K \rightarrow \infty$ this becomes,
+\begin{eqnarray}
+\sum_{\vec{x}} \Gamma_{\beta \gamma} \sum_{\vec{y}} S_{\gamma \alpha,b c} (\vec{x}, t; \vec{y}, \tau) 
+\delta_{bc} \delta_{\alpha \beta} \delta(\vec{y}, \vec{x}) &=& 
+\sum_{\vec{x}} \Gamma_{\beta \gamma} S_{\gamma \beta,b b} (\vec{x}, t; \vec{x}, \tau) \\
+d(t, \tau) &=& \text{Tr} \left[ \Gamma S(\vec{x}, t; \vec{x}, \tau) \right]
+\end{eqnarray}
+We want only cases where $t = \tau$ so we need either (a) four noise vectors on every timeslice or
+(b) noise vectors that are nonzero on all timeslices. In case (b) we would evaluate,
+\begin{eqnarray}
+\frac{1}{K} \sum_{k}^K \sum_{\vec{x}} \text{Tr} \left[ \langle \eta^{(k)}(\vec{x}, t) | \Gamma | \phi^{(k)} (\vec{x}, t) \rangle \right] 
+\end{eqnarray}
+with
+\begin{equation}
+\phi^{(k)}_{\beta, b}(\vec{x}, t) = \sum_{\vec{y}} S_{\beta\gamma,b c} (\vec{x}, t; \vec{y}, \tau) | \eta^{(k)}_{\gamma c }(\vec{y}, \tau)\rangle
+\end{equation}
+
+\section{Cancelling Backwards Propagation}
+The two point function evaluated in the centre of the lattice is (including the
+backward propagating part to give the extra factor of $2$),
+\begin{equation}
+C(T/2, \vec{p}) = \frac{ |Z_\pi|^2 }{ 2 E_\pi(\vec{p}) }   2 e^{- E_\pi(\vec{p}) (T/2) } 
+\end{equation}
+therefore
+\begin{equation}
+\frac{1}{2} C(T/2, \vec{p}) e^{ - E_\pi(\vec{p}) (T/2 - t)  } = \frac{ |Z_\pi|^2 }{ 2 E_\pi(\vec{p}) } e^{- E_\pi(\vec{p}) (T - t) }
+\end{equation}
+then 
+\begin{equation}
+C_{\rightarrow}(t, \vec{p}) = C(t, \vec{p}) - \frac{1}{2} C(T/2, \vec{p}) e^{ - E_\pi(\vec{p}) (T/2 - t)  }
+\end{equation}
+is the forward propagating part only. $E_\pi(\vec{p})$ is obtained by fitting the zero momentum correlator
+and using $E(\vec{p}) = \sqrt{m_\pi^2 + \vec{p}^2} $. The factor $C(T/2, \vec{p})$ can be obtained also from
+the zero momentum correlator, by fitting to obtain $|Z_\pi|^2$ and using the fact that this is momentum independent.
+Since $0$ momentum results are used this might not be too noisy.
+
+Alternatively the Wilson action is invariant under
+\begin{eqnarray}
+	\psi(x) \rightarrow {\cal P_\mu}[ \psi(x) ] = \gamma_\mu \psi( P_\mu[x]) \\
+	\bar{ \psi } (x) \rightarrow {\cal P_\mu}[ \bar{ \psi } (x) ] = \bar{ \psi }( P_\mu[x])  \gamma_\mu 
+\end{eqnarray}
+where $P_\mu[x]$ reverses the sign of all the components of $x$ except the $\mu$ one. Time reversal corresponds to
+${\cal T} = {\cal P}_1{\cal P}_2{\cal P}_3$.
+\begin{eqnarray}
+	\psi(x) \rightarrow {\cal T}[ \psi(x) ] = \gamma_0 \gamma_5 \psi( T[x]) \\
+	\bar{ \psi } (x) \rightarrow {\cal T}[ \bar{ \psi } (x) ] = \bar{ \psi }( T[x])  \gamma_5 \gamma_0 
+\end{eqnarray}
+Using this the T symmetry of operators used to construct the correlators can be calculated to calculate
+the sign on the backwards propagating part.
+\begin{equation}
+\langle O_1(t) O_2(0) \rangle = C(t) = A \left( e^{ -Et} + \tau_1 \tau_2 e^{-E(T - t)}\right)
+\end{equation}
+where $\tau_i = \pm 1$ is the ${\cal T}$ eigenvalue of $O_i$.
+
+We mostly use correlators where $O_1 = O_2$ so $\tau_1 \tau_2 = 1$
+then the correlator is
+\begin{equation}
+C_{pp}(t, \vec{p}) = \frac{ |Z_\pi|^2 }{ 2 E_\pi(\vec{p}) }   \left( e^{- E_\pi(\vec{p})t } + e^{- E_\pi(\vec{p})(T - t) } + e^{- E_\pi(\vec{p})(2T - t) } + \ldots \right)
+\end{equation}
+The subscript on $C_{pp}$ refers to the fact that both propagators used periodic boundary conditions.
+We want to cancel the backwards propagating part which can be done by
+solving the forward propagator $S(0,x)$ using antiperiodic time bc's and the backward $S(x,0)$ with periodic time bc's
+to give an extra minus sign,
+\begin{equation}
+C_{ap}(t, \vec{p}) = \frac{ |Z_\pi|^2 }{ 2 E_\pi(\vec{p}) }   \left( e^{- E_\pi(\vec{p})t } - e^{- E_\pi(\vec{p})(T - t) } + e^{- E_\pi(\vec{p})(2T - t) } - \ldots \right)
+\end{equation}
+so,
+\begin{equation}
+C_{ap}(t, \vec{p}) + C_{p}(t, \vec{p}) = \frac{ 2 |Z_\pi|^2 }{ 2 E_\pi(\vec{p}) }   \left( e^{- E_\pi(\vec{p})t } + e^{- E_\pi(\vec{p})(2T - t) } + \ldots \right)
+\end{equation}
+cancelling the subleading exponential. This method requires two inversions and the calculation of
+\begin{equation}
+S_{A \pm P} (x,y) = S_A(x,y) \pm S_P(x,y)
+\end{equation}
+Where the subscript refers to (A)ntiperiodic/(P)eriodic boundary conditions. Then,
+\begin{equation}
+C_{\pm}(t - \tau, 0) = -\sum_{\vec{x} \vec{y}} \text{Tr}\left[ \gamma_5 \Gamma S_{A \pm P} (x,y) \bar{ \Gamma }' \gamma_5 S_{A \pm P} (x,y) \right]
+\end{equation}
+where $C_{+}(t - \tau, 0)$ gives the forward propagating part from $0$ to $T$ and $C_{-}(t - \tau, 0)$ gives the
+backwards propagating part from $2T$ to $T$.
+
+\section{Form Factors and Sequential Sources}
+
+The electromagnetic form factor of a `pion' requires the evaluation of the matrix element
+\begin{equation}
+\langle \pi(p_f) | V_\mu | \pi(p_i) \rangle = (p_i + p_f)_\mu f(q^2)
+\end{equation}
+where $q^2 = (p_i - p_f)^2$ and
+\begin{equation}
+V_\mu = q_u \bar{u} \gamma_\mu u + q_d \bar{d} \gamma_\mu d
+\end{equation}
+is the electromagnetic current and $q_i$ is the charge of the fermion $i$. This is the local (not
+conserved) current, so there will be a factor $Z_V$ for renormalization.
+The matrix elements required look like:
+\begin{eqnarray}
+C_3(t_f,t,t_i,\vec{p_i}, \vec{p_f}) = Z_V \sum_{\vec{x} \vec{y} \vec{z}} e^{-i\vec{p_f}(\vec{x} - \vec{y}) } e^{i\vec{p_i} (\vec{y} - \vec{z)}}\langle 0 | \bar{u} \gamma_5 d ( \vec{x}, t_f)  V_0(\vec{y}, t) \bar{d} \gamma_5 u (\vec{z}, t_i) | 0 \rangle
+\end{eqnarray}
+We take the $\mu = 0$ component since this is statistically cleaner and also nonzero
+independant of the momentum direction. The contractions give three propagators eg. taking the $\bar{d} \gamma_\mu d$ part of $V_\mu$,
+\begin{eqnarray}
+Z_V \sum_{\vec{x} \vec{y} \vec{z}} e^{-i\vec{p_f}(\vec{x} - \vec{y}) } e^{-i\vec{p_i} (\vec{y} - \vec{z} ) } Tr \left[ S_u(\vec{z},t_i;\vec{x},t_f) \gamma_5 S_d(\vec{x},t_f;\vec{y},t)  \gamma_0 S_d(\vec{y},t;\vec{z},t_i) \gamma_5  \right]
+\end{eqnarray}
+There are also disconnected contributions from contracting the two fermions in the current together but we ignore those.
+The usual sequential source trick consists of solving
+\begin{equation}
+S_u(\vec{x}, t; \vec{z}, t_i) = \sum_{\vec{y},\tau} D_u ( \vec{x}, t; \vec{y},\tau)  \delta(\vec{y}, \tau; \vec{z}, t_i)
+\end{equation}
+to get the point-to-all propagator (for a specific $\vec{z}$ and $t_i$ as well as dropping the sum over $\vec{z}$
+and using translational invarience). Then taking a single timeslice of the propagator $S_u(\vec{x}, t_f; \vec{z}, t_i)$
+and solving,
+\begin{eqnarray}
+D_d ( \vec{x},t_f; \vec{y}, t ) G_{du}(\vec{y}, t; \vec{p_f}; t_f; \vec{z}, t_i) &=& e^{i\vec{p_f} \vec{x}} \gamma_5 S_u(\vec{x}, t_f; \vec{z}, t_i) \\
+G_{du}(\vec{y}, t; \vec{p_f}; t_f; \vec{z}, t_i) &=& \sum_{ \vec{x} } e^{i\vec{p_f} \vec{x}} S_d(\vec{y},t; \vec{x}, t_f ) \gamma_5 S_u(\vec{x}, t_f; \vec{z}, t_i)
+\end{eqnarray}
+to get the all-to-all-to-point contribution. Then
+\begin{eqnarray}
+\gamma_5 \left[ G_{du}(\vec{y}, t; \vec{p_f}; t_f; \vec{z}, t_i)  \right]^\dagger \gamma_5 &=& \sum_{ \vec{x} } e^{-i\vec{p_f} \vec{x}} \gamma_5 S_u^\dagger (\vec{x}, t_f;\vec{y},t ) \gamma_5 \gamma_5 \gamma_5 \gamma_5 \gamma_5 S_d^\dagger (\vec{z}, t_i;\vec{x}, t_f) \gamma_5 \\
+&=& \sum_{ \vec{x} } e^{-i\vec{p_f} \vec{x}} S_u (\vec{z}, t_i;\vec{x}, t_f) \gamma_5 S_d (\vec{x}, t_f;\vec{y},t ) \\
+&=& G_{ud}(\vec{z}, t_i; t_f; \vec{p_f}; \vec{y}, t )
+\end{eqnarray}
+
+\begin{eqnarray}\label{eqn:3ptfn}
+C_3(t_f,t,t_i, \vec{p_i}, \vec{p_f}) = Z_V \sum_{\vec{y} } e^{-i(\vec{p_i} - \vec{p_f})\vec{y}} Tr \left[ G_{ud}(\vec{z}, t_i; t_f; \vec{p_f}; \vec{y}, t )  \gamma_0 S_d(\vec{y},t;\vec{z},t_i) \gamma_5 \right]
+\end{eqnarray}
+
+This $Z_V$ factor is unknown. We show how to calculate it later, or cancel it, but an alternative is to use the conserved
+vector current in place of the local current:
+\begin{equation}
+V_\mu = \frac{1}{2} \left[ \bar{\psi}(x + \mu)(1 + \gamma_\mu)U_\mu^\dagger(x) \psi(x) - \bar{\psi}(x)(1 - \gamma_\mu)U_\mu^\dagger(x) \psi(x + \mu) \right]
+\end{equation}
+The trace in \ref{eqn:3ptfn} becomes
+\begin{eqnarray}
+Tr[ S_d(\vec{y},t+1;\vec{z},t_i) \gamma_5 (1 + \gamma_0)U_0^\dagger(\vec{y},t) G_{ud}(\vec{z}, t_i; t_f; \vec{p_f}; \vec{y}, t )   - \\ \nonumber
+S_d(\vec{y},t;\vec{z},t_i) \gamma_5 (1 - \gamma_0)U_0(\vec{y},t) G_{ud}(\vec{z}, t_i; t_f; \vec{p_f}; \vec{y}, t+1 ) ]
+\end{eqnarray}
+If we use this then all the following formulas are the same except $Z_V \rightarrow 1$.
+
+There is an alternative that doesn't require the sequential source trick. Using the properties of our noise sources,
+\begin{equation}
+S_d(\vec{x},t_f;\vec{y},t) \approx \frac{1}{K} \sum_{i=0}^K | \psi^{(i)}(\vec{x},t_f) \rangle \langle \eta^{(i)}(\vec{y},t) |
+\end{equation}
+the three point correlation function becomes,
+\begin{eqnarray}
+Z_V \frac{1}{K} \sum_{i=0}^K \sum_{\vec{x} \vec{y} } e^{-i\vec{p_f}(\vec{x} - \vec{y}) } e^{i\vec{p_i} \vec{y}} Tr \left[  \langle \eta^{(i)}(\vec{y},t) | \gamma_0 S_d(\vec{y},t;\vec{0},0) \gamma_5  S_u(\vec{0},0;\vec{x},t_f) \gamma_5 | \psi^{(i)}(\vec{x},t_f) \rangle \right] \\
+Z_V \frac{1}{K} \sum_{i=0}^K \sum_{\vec{x} \vec{y} } e^{-i\vec{p_f}(\vec{x} - \vec{y}) } e^{i\vec{p_i} \vec{y}} Tr \left[  \langle \eta^{(i)}(\vec{y},t) | \gamma_0 S_d(\vec{y},t;\vec{0},0) S_u^{\dagger}(\vec{x},t_f;\vec{0},0) | \psi^{(i)}(\vec{x},t_f) \rangle \right]
+\end{eqnarray}
+Using this method we can inject arbitrary momentum at the source without the need for extra inversions.
+
+
+
+\subsection{Two Point Function}
+
+A complete set of hadrons is given by,
+\begin{equation}
+	\sum_n \frac{ | n \rangle \langle n |}{ 2 E_n V}
+\end{equation}
+the first term is the pion. The two point function (from point sources) is,
+\begin{eqnarray}
+C(t, \vec{p}) &=& \sum_{\vec{x}} e^{-i \vec{p} \vec{x}} \langle O_\pi (\vec{x}, t) O^\dagger_\pi (\vec{0}, 0)\rangle \\
+&=& \sum_{\vec{x}} \sum_n e^{i \vec{p} \vec{x}}  
+\frac{ \langle 0 | O_\pi (\vec{x}, t)  | n \rangle \langle n | O^\dagger_\pi (\vec{0}, 0)| 0 \rangle }{ 2 E_n } 
+\end{eqnarray}
+Use $\sum_{ \vec{y} } e^{-i\vec{p} \vec{y}} O^\dagger_n (\vec{y}, 0) | 0 \rangle  = | n(\vec{p}) \rangle$, the time evolution
+operator $e^{-Ht}$ and
+also the fact that the lightest meson dominates the sum to get,
+\begin{eqnarray}
+C(t, \vec{p}) 
+&=& \sum_{\vec{x} \vec{y} \vec{z}} \sum_{\vec{p'} } e^{-i \vec{p} \vec{x}}  
+\frac{ \langle 0 | O_\pi (\vec{x}, 0)  O^\dagger_\pi (\vec{y}, 0) e^{i \vec{p'} \vec{y} }   | 0 \rangle \langle 0 | e^{i \vec{p'} \vec{z} } O_\pi (\vec{z}, 0) O^\dagger_\pi (\vec{0}, 0)| 0 \rangle }{ 2 E_\pi(\vec{p'}) } e^{- E_\pi(\vec{p'}) t }
+\end{eqnarray}
+The sum over $\vec{p'}$ gives a delta function leaving,
+\begin{eqnarray}
+C(t, \vec{p}) 
+&=& \sum_{\vec{x} \vec{y} } e^{-i \vec{p} \vec{x}}  
+\frac{ \langle 0 | O_\pi (\vec{x}, 0)  O^\dagger_\pi (\vec{y}, 0) | 0 \rangle \langle 0 | O_\pi (\vec{y}, 0) O^\dagger_\pi (\vec{0}, 0) | 0 \rangle }{ 2 E_\pi(\vec{p}) } e^{- E_\pi(\vec{p}) t }
+\end{eqnarray}
+Translational invarience lets us write,
+\begin{eqnarray}
+C(t, \vec{p}) 
+&=& \sum_{\vec{x} \vec{y} } e^{-i \vec{p} ( \vec{x} - \vec{y} ) } e^{ -i \vec{p} \vec{y} }  
+\frac{ \langle 0 | O_\pi (\vec{0}, 0)  O^\dagger_\pi (\vec{x}-\vec{y}, 0) | 0 \rangle \langle 0 | O_\pi (\vec{y}, 0) O^\dagger_\pi (\vec{0}, 0)| 0 \rangle }{ 2 E_\pi(\vec{p}) } e^{- E_\pi(\vec{p}) t }
+\end{eqnarray}
+Now changing variables gives us two Fourier transforms,
+\begin{eqnarray}
+C(t, \vec{p}) 
+&=&  
+\frac{ \langle 0 |  O_\pi (\vec{0}, 0) | \pi(p) \rangle \langle \pi(p) | O^\dagger_\pi (\vec{0}, 0)| 0 \rangle }{ 2 E_\pi(\vec{p}) } e^{- E_\pi(\vec{p}) t }
+\end{eqnarray}
+and finally using the time evolution operator we get,
+\begin{eqnarray}
+C(t, \vec{p}) 
+&=&  
+\frac{ |Z_\pi|^2 }{ 2 E_\pi(\vec{p}) } e^{- E_\pi(\vec{p}) t }
+\end{eqnarray}
+where 
+\begin{equation}
+Z_\pi = \langle \pi(p) | O^\dagger_\pi (\vec{0}, 0)| 0 \rangle
+\end{equation}
+
+\subsection{Three Point Function}
+
+In less detail we insert two complete sets of states into the correlator ( point sources so $(\vec{x_i}, t_i) = (\vec{0}, 0)$ )
+\begin{eqnarray}
+\langle \pi(p_f) | V_\mu | \pi(p_i) \rangle &=& \langle 0| O(\vec{p_f}, t_f) V_\mu(\vec{x}, t) O^\dagger(\vec{p_i}, t_i) |0\rangle \\
+ &=& \langle 0| O(\vec{0}, 0) | \pi(\vec{p_f}) \rangle \frac{e^{-(t_f - t) E_\pi(\vec{p_f}) }}{2 E_\pi(\vec{p_f}) } \langle \pi(\vec{p_f}) | V_\mu(\vec{0}, 0) | \pi(\vec{p_i}) \rangle \\ &\times& \frac{e^{-(t - t_i) E_\pi(\vec{p_i}) }} {2 E_\pi(\vec{p_i}) } \langle \pi(\vec{p_i}) | O^\dagger(\vec{0}, 0) |0 \rangle \\ \nonumber
+&=&  \frac{ Z_{\pi, f}^\dagger Z_{\pi, i} }{4 E(\vec{p_f}) E(\vec{p_i}) } \langle \pi(\vec{p_f}) | V_\mu(\vec{0}, 0) | \pi(\vec{p_i}) \rangle  e^{-(t_f - t) E_\pi(\vec{p_f}) -(t-t_i) E_\pi(\vec{p_i}) }
+\end{eqnarray}
+if $t < t_f$ we have the backwards contribution and the exponential changes to 
+\begin{equation}
+-e^{-(t - t_f) E_\pi(\vec{p_f}) -(T - t + t_i) E_\pi(\vec{p_i}) }
+\end{equation}
+
+\subsection{Correlator Ratios: $Z_V$}
+$Z_V$ can be obtained as follows: The ratio,
+\begin{eqnarray}
+\frac{ C_{\rightarrow}(t_f, \vec{0}) }{ C_3(t_f, t, \vec{p_i}, \vec{p_f}) } &=&  
+\frac{ \frac{ |Z_\pi( \vec{0} )|^2 }{ 2 m_\pi }   e^{- m_\pi t_f }  }{ \frac{ |Z_\pi( \vec{0} )|^2 }{4 m_\pi^2 } \langle \pi(\vec{0}) | V_\mu | \pi(\vec{0}) \rangle e^{-(t_f - t) m_\pi -t m_\pi } } \\
+&=& \frac{ 1  }{ \frac{ 1 }{2 m_\pi } \langle \pi(\vec{0}) | V_\mu | \pi(\vec{0}) \rangle } \\
+&=& \frac{ 1  }{ \frac{ 1 }{2 m_\pi } 2 m_pi f(0)/Z_V } = Z_V.
+\end{eqnarray}
+Where we used that the renormalized form factor $f(0) = 1$
+
+\subsection{Correlator Ratios: $f(q)$}
+There are various ways to cancel the unwanted terms and get $f(q)$,
+\subsubsection{RBC-UKQCD Ratio}
+We examine the ratio,
+\begin{equation}
+2 m_\pi \frac{ C_{3} (t, t_f, \vec{p}, \vec{0} )  C_{\rightarrow}(t, \vec{0}) }{ C_{3} (t, t_f, \vec{0}, \vec{0} )  C_{\rightarrow}(t, \vec{p}) }
+\end{equation}
+Assuming $Z_\pi$ is momentum independant ( this also works (probably) if $Z_\pi = E(\vec{p}) f_\pi$ , which is
+the case for $O = \bar{u} \gamma_0 \gamma_5 d$ type interpolators) the numerator is,
+\begin{equation}
+\frac{ Z_V |Z_\pi|^2 }{ 4 E(\vec{p}) E(\vec{0})} f(q^2) ( E(\vec{p}) + m_\pi ) \frac{|Z_\pi|^2}{2 E(\vec{0})} e^{ -E(\vec{p})t - E(\vec{0})(t_f - t) -E(\vec{0})t }
+\end{equation}
+and the denominator is,
+\begin{equation}
+\frac{ Z_V |Z_\pi|^2 }{ 4 E(\vec{0}) E(\vec{0})} f(0) ( m_\pi + m_\pi ) \frac{|Z_\pi|^2}{2 E(\vec{p})} e^{ -E(\vec{0})t - E(\vec{0})(t_f - t) -E(\vec{p})t }
+\end{equation}
+Cancelling leaves,
+\begin{equation}
+2 m_\pi \frac{ C_{3} (t, t_f, \vec{p}, \vec{0} )  C_{\rightarrow}(t, \vec{0}) }{ C_{3} (t, t_f, \vec{0}, \vec{0} )  C_{\rightarrow}(t, \vec{p}) } = f(q^2) ( E(\vec{p}) + m_\pi ) 
+\end{equation}
+note there is no $Z_V$ here.
+
+\subsubsection{Bonnet et. al. Ratio}
+
+\begin{equation}
+\frac{2 Z_V m_\pi}{E(\vec{p}) + m_\pi} \frac{ C_{3} (t, t_f, \vec{p}, \vec{0} )  C_{\rightarrow}(t, \vec{0}) }{ C_{\rightarrow} (t, \vec{p} )  C_{\rightarrow}(t_f, \vec{0}) }
+\end{equation}
+the numerator of the right term is,
+\begin{equation}
+\frac{ |Z_\pi|^2 }{ 4 E(\vec{p}) m_\pi} f_B(q^2) ( E(\vec{p}) + m_\pi ) \frac{|Z_\pi|^2}{2 m_\pi} e^{ -E(\vec{p})t - m_\pi(t_f - t) -m_\pi t }
+\end{equation}
+the denominator of the right term is,
+\begin{equation}
+\frac{ |Z_\pi|^2 }{ 2 m_\pi } \frac{|Z_\pi|^2}{2 E(\vec{p})} e^{ -m_\pi t - m_\pi (t_f - t) -E(\vec{p})t }
+\end{equation}
+Cancelling leaves,
+\begin{equation}
+\frac{ f_B(q^2) ( E(\vec{p}) + m_\pi ) }{ 2 E(\vec{p}) }
+\end{equation}
+the kinematic factors are cancelled 
+\begin{equation}
+\frac{2 Z_V m_\pi}{E(\vec{p}) + m_\pi} \frac{ f_B(q^2) ( E(\vec{p}) + m_\pi ) }{ 2 E(\vec{p}) } = Z_V f_B(q^2) = f(q^2) 
+\end{equation}
+you need to actually know $Z_V$ or use the conserved current.
+\end{document}
+
+

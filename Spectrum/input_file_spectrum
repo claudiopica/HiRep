@@ -1,0 +1,25 @@
+GLB_T = 16
+GLB_X = 8
+GLB_Y = 8
+GLB_Z = 8
+NP_T = 1
+NP_X = 1
+NP_Y = 1
+NP_Z = 1
+
+//level = 1  seed = 1
+level = 1  seed = 38761
+
+mes:masses = 0
+mes:precision = 1e-20
+mes:nhits = 3
+mes:momentum = 0
+mes:def_semwall = 1
+mes:def_point = 1
+mes:ext_semwall = 1
+mes:ext_point = 1
+mes:dirichlet_semwall = 1
+mes:dirichlet_point = 1
+mes:discon_semwall = 1
+mes:dirichlet_dt = 2
+

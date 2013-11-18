@@ -52,11 +52,10 @@ typedef struct _input_mesons {
   int ti;
   int tf;
   int ff_def_point;
-  int ff_ext_point;
   int ff_fixed_point;
   int dt;
   /* for the reading function */
-  input_record_t read[12];
+  input_record_t read[11];
 } input_mesons;
 
 #define init_input_mesons(varname) \
@@ -69,7 +68,6 @@ typedef struct _input_mesons {
     {"t_initial", "mes:ti = %d", INT_T, &(varname).ti}, \
     {"t_final", "mes:tf = %d", INT_T, &(varname).tf}, \
     {"enable default point", "mes:ff_def_point = %d", INT_T, &(varname).ff_def_point}, \
-    {"enable extended point", "mes:ff_ext_point = %d", INT_T, &(varname).ff_ext_point}, \
     {"enable Dirichlet point", "mes:ff_dirichlet_point = %d", INT_T, &(varname).ff_fixed_point}, \
     {"Distance of t_initial from Dirichlet boundary", "mes:dirichlet_dt = %d", INT_T, &(varname).dt}, \
     {NULL, NULL, INT_T, NULL}				\
@@ -229,9 +227,10 @@ int main(int argc,char *argv[]) {
   error(fpars.type==UNKNOWN_CNFG,1,"measure_spectrum.c","Bad name for a configuration file");
   error(fpars.nc!=NG,1,"measure_spectrum.c","Bad NG");
 
-  lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed);
-  rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
-  srand(glb_var.rlxd_seed+PID);
+  read_input(rlx_var.read,input_filename);
+  lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed);
+  rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
+  srand(rlx_var.rlxd_seed+MPI_PID);
 
 #ifdef GAUGE_SON
   lprintf("MAIN",0,"Gauge group: SO(%d)\n",NG);
@@ -280,9 +279,6 @@ int main(int argc,char *argv[]) {
   if (mes_var.ff_def_point){
     lprintf("MAIN",0,"Point for form factors sources\n");
   }
-  if (mes_var.ff_ext_point){
-    lprintf("MAIN",0,"Point sources on extended lattice for form factors\n");    
-  }
   if (mes_var.ff_fixed_point){
     lprintf("MAIN",0,"Point sources with Dirichlet boundary conditions for form factors\n"); 
     lprintf("MAIN",0,"Distance between ti and the boundary: %d\n",mes_var.dt); 
@@ -319,9 +315,6 @@ int main(int argc,char *argv[]) {
 
     if (mes_var.ff_def_point){
       measure_formfactor_pt(mes_var.ti, mes_var.tf, nm, m, mes_var.n_mom, i, mes_var.precision);
-    }
-    if (mes_var.ff_ext_point){
-      measure_formfactor_ext(mes_var.ti, mes_var.tf, nm, m, mes_var.n_mom, i, mes_var.precision);
     }
     if (mes_var.ff_fixed_point){
       measure_formfactor_fixed(mes_var.ti, mes_var.tf, mes_var.dt,nm, m, mes_var.n_mom, i, mes_var.precision);

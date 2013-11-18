@@ -92,7 +92,6 @@ void print_mesons_ext(double norm,int conf, int nm, double* mass, char* label);
 void print_mesons_momenta(int conf, int nm, double* mass,int n_mom, char* label);
 void print_mesons_momenta_ext(int conf, int nm, double* mass,int n_mom, char* label);
 void print_formfactor(int conf, int nm, double* mass, int n_mom, char* label, int tf);
-void print_formfactor_ext(int conf, int nm, double* mass, int n_mom, char* label, int tf);
 
 
 void id_correlator(double *out, int t0, spinor_field *qp);
