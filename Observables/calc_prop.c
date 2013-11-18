@@ -22,238 +22,13 @@
 #include "random.h"
 #include "communications.h"
 #include "ranlux.h"
-#include "gamma_spinor.h"
 
 #define PI 3.141592653589793238462643383279502884197
 
 //Helps QMR solver find more accurate solutions
-#undef GAUSSIAN_NOISE
+#undef GAUSSIAN_NOISE 
+//#define GAUSSIAN_NOISE 
 
-
-/* Random timeslize not previously chosen */
-static int random_tau(){
-  static int* slices=NULL;
-  if (slices == NULL) slices = (int*) malloc(GLB_T*sizeof(int));
-  static int counter = 0;
-  int itmp,tau,i;
-  double ran;
-
-  if (counter == 0){
-    for (i=0;i<GLB_T;++i){
-      slices[i]=i;
-    }
-    counter=GLB_T;
-  }
-  do{
-    ranlxd(&ran,1);
-    itmp=(int)(ran*counter);    
-  } while(itmp==counter);
-  counter--;
-  tau = slices[itmp];
-  slices[itmp]=slices[counter];
-  slices[counter]=tau;
-  bcast_int(&tau,1);
-  return tau;
-}
-
-/***************************************************************************\
-
-	Sources: 
-		point_source: 			
-						source[spin](t,x) = \delta_{a color} \delta_{s, spin} \delta( (t,x) - (tau,0) )
-		diluted_source_equal_eo:		
-						\xi(x) = Z(2) x Z(2)  -  NF color vector at x
-						eta(t,x) = \delta(t - tau) \xi(x)
-						source[spin](x) = \delta_{s spin} eta(t,x)  -  x even
-		diluted_source_equal:		
-						\xi(x) = Z(2) x Z(2)  -  NF color vector at x
-						eta(t,x) = \delta(t - tau) \xi(x)
-						source[spin](t,x) = \delta_{s spin} eta(t,x)  -  x even & odd
-		noise_source_equal_eo:
-						\xi(x) = Z(2) x Z(2)  -  NF color vector at x
-						eta(t,x) = \xi(t,x)
-						source[spin](t,x) = \delta_{s spin} eta(t,x)  -  x even
-		gauge_fixed_wall_source:
-						source[spin](t,x) = \delta_{a color} \delta_{s spin} \delta(t - tau) 1
-		sequential_source:
-						source[spin](tf,ti,x) = \gamma_5 S(x,tf; 0,ti)
-		gauge_fixed_momentum_source:
-						source[spin](t,x) = \delta_{a color} \delta_{s spin} e^{ i p_\mu x_\mu }
-\***************************************************************************/
-void create_point_source(spinor_field *source,int tau, int color) {
-  int beta;
-  for (beta=0;beta<4;++beta){
-    spinor_field_zero_f(&source[beta]);
-  }
-  if(COORD[0]==tau/T && COORD[1]==0 && COORD[2]==0 && COORD[3]==0) {
-    int ix=ipt(tau,0,0,0);
-    for (beta=0;beta<4;++beta){
-      _FIELD_AT(&source[beta],ix)->c[beta].c[color].re = 1.;
-    }
-  }
-}
-
-/* Creates four Z2xZ2 noise sources localised on time slice tau. The noise 
-   vectors are equal in each source but placed at a different spin. */
-
-int create_diluted_source_equal_eo(spinor_field *source) {
-  int c[4];
-  suNf_vector *v1,*v2;
-  int i;
-  int tau = random_tau();
-  for (i=0;i<4;++i){
-    spinor_field_zero_f(&source[i]);
-  }
-  
-  if(COORD[0]==tau/T) {// Check that tau is in this thread.
-    c[0]=tau%T;
-    for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
-	  if(((tau+zerocoord[1]+c[1]+zerocoord[2]+c[2]+zerocoord[3]+c[3])&1)==0){
-	    v1 = &((_FIELD_AT(&source[0],ipt(c[0],c[1],c[2],c[3])))->c[0]);
-	    ranz2((double*)(v1),sizeof(suNf_vector)/sizeof(double)); // Make new sources
-	    for (i=1;i<4;++i){
-	      v2 = &((_FIELD_AT(&source[i],ipt(c[0],c[1],c[2],c[3])))->c[i]); //Copy previous index.
-	      *v2 = *v1;
-	    }
-	  }
-	}
-  }
-  return tau;
-}
-
-void create_diluted_source_equal_atau_eo(spinor_field *source, int tau){
-  int c[4];
-  suNf_vector *v1,*v2;
-  int i;
-  //int tau = random_tau();
-  for (i=0;i<4;++i){
-    spinor_field_zero_f(&source[i]);
-  }
-  
-  if(COORD[0]==tau/T) {// Check that tau is in this thread.
-    c[0]=tau%T;
-    for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
-	  if(((tau+zerocoord[1]+c[1]+zerocoord[2]+c[2]+zerocoord[3]+c[3])&1)==0){
-	    v1 = &((_FIELD_AT(&source[0],ipt(c[0],c[1],c[2],c[3])))->c[0]);
-	    ranz2((double*)(v1),sizeof(suNf_vector)/sizeof(double)); // Make new sources
-	    for (i=1;i<4;++i){
-	      v2 = &((_FIELD_AT(&source[i],ipt(c[0],c[1],c[2],c[3])))->c[i]); //Copy previous index.
-	      *v2 = *v1;
-	    }
-	  }
-	}
-  }
-  //return tau;
-}
-
-int create_diluted_source_equal(spinor_field *source) {
-  int c[4];
-  suNf_vector *v1,*v2;
-  int i;
-  int tau = random_tau();
-  for (i=0;i<4;++i){
-    spinor_field_zero_f(&source[i]);
-  }
-  
-  if(COORD[0]==tau/T) {// Check that tau is in this thread.
-    c[0]=tau%T;
-    for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
-	  v1 = &((_FIELD_AT(&source[0],ipt(c[0],c[1],c[2],c[3])))->c[0]);
-	  ranz2((double*)(v1),sizeof(suNf_vector)/sizeof(double)); // Make new sources
-	  for (i=1;i<4;++i){
-	    v2 = &((_FIELD_AT(&source[i],ipt(c[0],c[1],c[2],c[3])))->c[i]); //Copy previous index.
-	    *v2 = *v1;
-	  }
-	}
-  }
-  return tau;
-}
-
-/* Creates four Z2xZ2 noise sources NOT localised on time slice but spread over
-all timeslices. The noise vectors are equal in each source but placed at a different spin. */
-
-void create_noise_source_equal_eo(spinor_field *source) {
-  int c[4];
-  suNf_vector *v1,*v2;
-  int i;
-  //int tau = random_tau();
-  for (i=0;i<4;++i){
-    spinor_field_zero_f(&source[i]);
-  }
-  
-  //if(COORD[0]==tau/T) {// Check that tau is in this thread.
-  //  c[0]=tau%T;
-  for(c[0]=0; c[0]<T; c[0]++) for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
-	  if(((zerocoord[0]+c[0]+zerocoord[1]+c[1]+zerocoord[2]+c[2]+zerocoord[3]+c[3])&1)==0){
-	    v1 = &((_FIELD_AT(&source[0],ipt(c[0],c[1],c[2],c[3])))->c[0]);
-	    ranz2((double*)(v1),sizeof(suNf_vector)/sizeof(double)); // Make new sources
-	    for (i=1;i<4;++i){
-	      v2 = &((_FIELD_AT(&source[i],ipt(c[0],c[1],c[2],c[3])))->c[i]); //Copy previous index.
-	      *v2 = *v1;
-	    }
-	  }
-	}
-  //}
-  //return tau;
-}
-
-//create a wall source at timeslice tau, all parity sites.
-void create_gauge_fixed_wall_source(spinor_field *source, int tau, int color) {
-  int c[4];
-  int beta;
-
-  for (beta=0;beta<4;++beta){
-    spinor_field_zero_f(&source[beta]);
-  }
-
-  if(COORD[0]==tau/T) {// Check that tau is in this thread.
-    c[0]=tau%T;
-    for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
-	  for (beta=0;beta<4;++beta){
-	      _FIELD_AT(&source[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color].re = 1.;
-	  }
-    }
-  }
-
-}
-
-void create_sequential_source(spinor_field *source, int tf, spinor_field* prop){
-  int c[4];
-  int beta;
-  suNf_spinor sp;
-  for (beta=0;beta<4;++beta){
-    spinor_field_zero_f(&source[beta]);
-  }
-
-  if(COORD[0]==tf/T) {// Check that tf is in this thread.
-    c[0]=tf%T;
-    for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
-	  for (beta=0;beta<4;++beta){
-	    _spinor_g5_f( sp , *_FIELD_AT(&prop[beta], ipt(c[0],c[1],c[2],c[3]) ) );
-	    _spinor_plus_f( *_FIELD_AT(&source[beta], ipt(c[0],c[1],c[2],c[3])) , sp);
-	  }
-	}
-  }
-}
-
-//create a e^ipx source
-void create_gauge_fixed_momentum_source(spinor_field *source, int pt, int px, int py, int pz, int color) {
-  int c[4];
-  int beta;
-  double pdotx;
-
-  for (beta=0;beta<4;++beta){
-    spinor_field_zero_f(&source[beta]);
-  }
-
-  for(c[0]=0; c[0]<T; c[0]++) for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
-	  pdotx = 2.*PI*( c[0]*pt/GLB_T + c[1]*px/GLB_X + c[2]*py/GLB_Y + c[3]*pz/GLB_Z );
-	  for (beta=0;beta<4;++beta){
-	     _FIELD_AT(&source[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color].re = cos(pdotx);
-	     _FIELD_AT(&source[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color].im = sin(pdotx);
-	  }
-  }
-}
 
 static double hmass_pre;
 
@@ -387,10 +162,16 @@ static void calc_propagator_eo_core(spinor_field *psi, spinor_field *eta) {
     spinor_field_minus_f(&qprop_mask,&qprop_mask);
     if(i&1) ++cgiter; /* count only half of calls. works because the number of sources is even */
   }
+   start_sf_sendrecv(psi);
+   complete_sf_sendrecv(psi);
   lprintf("CALC_PROP",10,"QMR_eo MVM = %d\n",cgiter);
 }
 
 static void calc_propagator_core(spinor_field *psi, spinor_field *eta) {
+
+  start_sf_sendrecv(eta);
+  complete_sf_sendrecv(eta);
+
   spinor_field qprop_mask_eta;
   spinor_field qprop_mask_psi;
   int cgiter=0;
@@ -403,14 +184,13 @@ static void calc_propagator_core(spinor_field *psi, spinor_field *eta) {
   /* Construct source
      eta_even' = eta_even - D_eo D_oo^-1 eta_odd
    */
-
   qprop_mask_eta=*eta;
   qprop_mask_eta.type=&glat_odd;
   qprop_mask_eta.ptr=eta->ptr+glat_odd.master_shift; 
   spinor_field_mul_f(tmp_odd,(1./( 4.+ mass[0] )),&qprop_mask_eta);
   Dphi_(tmp,tmp_odd);
   qprop_mask_eta.type=&glat_even;
-  qprop_mask_eta.ptr=eta->ptr; 
+  qprop_mask_eta.ptr=eta->ptr;
   spinor_field_sub_f(tmp,&qprop_mask_eta,tmp);
 #ifdef GAUSSIAN_NOISE
   spinor_field_add_assign_f(tmp,QMR_noise);
@@ -422,9 +202,9 @@ static void calc_propagator_core(spinor_field *psi, spinor_field *eta) {
 #ifdef GAUSSIAN_NOISE
   cgiter+=g5QMR_mshift(&QMR_par, &D_pre, tmp, resd);
 #else
-  spinor_field_g5_f(tmp,tmp);
-  cgiter+=MINRES_mshift(&QMR_par, &H_pre, tmp, resd);  
-  //  cgiter+=HBiCGstab_mshift(&QMR_par, &H_pre, tmp, resd);  
+  //spinor_field_g5_f(tmp,tmp);
+  //cgiter+=MINRES_mshift(&QMR_par, &H_pre, tmp, resd); 
+  cgiter+=g5QMR_mshift(&QMR_par, &D_pre, tmp, resd);
 #endif
 
 #ifdef GAUSSIAN_NOISE
@@ -447,6 +227,11 @@ static void calc_propagator_core(spinor_field *psi, spinor_field *eta) {
 
   ++cgiter; /* One whole call*/
   lprintf("CALC_PROP_CORE",10,"QMR_eo MVM = %d\n",cgiter);
+
+
+   start_sf_sendrecv(psi);
+   complete_sf_sendrecv(psi);
+
 }
 
 
@@ -469,6 +254,10 @@ void calc_propagator(spinor_field *psi, spinor_field* eta, int ndilute){
     hmass_pre = mass[0];
     for (beta=0;beta<ndilute;++beta){
       calc_propagator_core(&psi[beta*n_masses+i],&eta[beta]);
+      /*spinor_field *ck=alloc_spinor_field_f(1,&glattice);
+      Dphi(mass[0], ck, &psi[beta*n_masses+i] );
+      spinor_field_sub_f(ck,ck,&eta[beta]);
+      lprintf("CALC_PROPAGATOR",10,"mass %g, residual = %g\n",mass[0],spinor_field_sqnorm_f(ck) );*/
     }
     mass++;
   }

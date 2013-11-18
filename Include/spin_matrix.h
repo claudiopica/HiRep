@@ -6,6 +6,14 @@
 *
 * 2013 Rudy Arthur, Ari Hietanen
 *
+*
+*  |S_00 S_01| |1| = |S_00| = c[0]
+*  |S_10 S_11| |0|   |S_10|
+*
+*  etc.
+*  The notation I don't like _spinor_g5_f(r) = g5 r
+*  becomes the more sensible _g5_spinmatrix(s) = g5 s and _spinmatrix_g5(s) = s g5
+*
 *******************************************************************************/
 
 #ifndef SPIN_MATRIX_H
@@ -16,7 +24,7 @@
 
 typedef struct
 {
-   suNf_spinor c[4]; //suNf_spinmatrix.c[ row index ].c[ column index ]
+   suNf_spinor c[4];
 } suNf_spin_matrix;
 
 
@@ -32,11 +40,11 @@ typedef struct
   (r).c[i] = (s)
 
 //r spinmatrix, s spinor, i index
-#define _spinmatrix_assign_col(r, s, i) \
+/*#define _spinmatrix_assign_col(r, s, i) \
   (r).c[0].c[i] = (s).c[0]; \
   (r).c[1].c[i] = (s).c[1]; \
   (r).c[2].c[i] = (s).c[2]; \
-  (r).c[3].c[i] = (s).c[3]
+  (r).c[3].c[i] = (s).c[3]*/
 
 
 //r = s + t 
@@ -54,35 +62,21 @@ typedef struct
   _spinor_sub_f((r).c[3],(s).c[3],(t).c[3])
   
 
-//s = r . gamma_5 
+//s =  r  . gamma_5
 #define _spinmatrix_g5(s, r) \
   _spinor_g5_f((s).c[0],(r).c[0]);		\
   _spinor_g5_f((s).c[1],(r).c[1]); \
   _spinor_g5_f((s).c[2],(r).c[2]); \
   _spinor_g5_f((s).c[3],(r).c[3])
 
-//s = gamma_5 . r
+//s = gamma5 . r 
 #define _g5_spinmatrix(s, r) \
   (s).c[0] = (r).c[0]; \
   (s).c[1] = (r).c[1]; \
   _spinor_minus_f((s).c[2],(r).c[2]); \
   _spinor_minus_f((s).c[3],(r).c[3])
 
-//s = r . gamma_5 
-#define _spinmatrix_g5(s, r) \
-  _spinor_g5_f((s).c[0],(r).c[0]);		\
-  _spinor_g5_f((s).c[1],(r).c[1]); \
-  _spinor_g5_f((s).c[2],(r).c[2]); \
-  _spinor_g5_f((s).c[3],(r).c[3])
-
-//s = gamma_5 . r
-#define _g5_spinmatrix(s, r) \
-  (s).c[0] = (r).c[0]; \
-  (s).c[1] = (r).c[1]; \
-  _spinor_minus_f((s).c[2],(r).c[2]); \
-  _spinor_minus_f((s).c[3],(r).c[3])
-
-//s = r . gamma_0
+//s = r . gamma_0 
 #define _spinmatrix_g0(s, r) \
   _spinor_g0_f((s).c[0],(r).c[0]);		\
   _spinor_g0_f((s).c[1],(r).c[1]); \
@@ -140,7 +134,8 @@ typedef struct
   _spinor_i_plus_f((s).c[2],(r).c[0]); \
   _spinor_i_minus_f((s).c[3],(r).c[1])
 
-//s = r . gamma_5 gamma_0
+
+//s = gamma_5 gamma_0 . r 
 #define _spinmatrix_g5g0(s, r) \
   _spinor_g5g0_f((s).c[0],(r).c[0]); \
   _spinor_g5g0_f((s).c[1],(r).c[1]); \
@@ -285,7 +280,7 @@ typedef struct
   _spinor_i_plus_f((s).c[3],(r).c[3])
 
 
-//r spinmatrix, s spinmatrix, k result; Tr [ r . s^dag]
+//r spinmatrix, s spinmatrix, k result; Tr [ r^dag . s]
 #define _spinmatrix_mul_trace(k, r, s) \
    do { \
       (k).re=0.;(k).im=0.; \

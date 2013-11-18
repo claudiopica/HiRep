@@ -51,10 +51,13 @@ typedef struct _input_mesons {
   int ext_point;
   int fixed_semwall;
   int fixed_point;
+  int discon_semwall;
+  int discon_gfwall;
+  int def_gfwall;
   int dt;
   int n_mom;
   /* for the reading function */
-  input_record_t read[12];
+  input_record_t read[15];
 } input_mesons;
 
 #define init_input_mesons(varname) \
@@ -65,11 +68,14 @@ typedef struct _input_mesons {
     {"number of noisy sources per cnfg", "mes:nhits = %d", INT_T, &(varname).nhits}, \
     {"enable default semwall", "mes:def_semwall = %d",INT_T, &(varname).def_semwall},	\
     {"enable default point", "mes:def_point = %d",INT_T, &(varname).def_point},		\
+    {"enable default gfwall", "mes:def_gfwall = %d",INT_T, &(varname).def_gfwall},	\
     {"enable extended semwall", "mes:ext_semwall = %d",INT_T, &(varname).ext_semwall},	\
     {"enable extended point", "mes:ext_point = %d",INT_T, &(varname).ext_point},		\
     {"enable Dirichlet semwall", "mes:dirichlet_semwall = %d",INT_T, &(varname).fixed_semwall},	\
     {"enable Dirichlet point", "mes:dirichlet_point = %d",INT_T, &(varname).fixed_point},	\
-    {"Distance of t_initial from Dirichlet boundary", "mes:dirichlet_dt = %d", INT_T, &(varname).dt},\ 
+    {"enable discon semwall", "mes:discon_semwall = %d",INT_T, &(varname).discon_semwall},	\
+    {"enable discon gfwall", "mes:discon_gfwall = %d",INT_T, &(varname).discon_gfwall},	\
+    {"Distance of t_initial from Dirichlet boundary", "mes:dirichlet_dt = %d", INT_T, &(varname).dt},\
     {"maximum component of momentum", "mes:momentum = %d", INT_T, &(varname).n_mom}, \
     {NULL, NULL, INT_T, NULL}				\
    }							\
@@ -172,7 +178,7 @@ void read_cmdline(int argc, char* argv[]) {
   if (ai!=0) strcpy(input_filename,argv[ai]);
 
   error((ac==0 && al==0) || (ac!=0 && al!=0),1,"parse_cmdline [mk_mesons.c]",
-      "Syntax: measure_spectrum { -c <config file> | -l <list file> } [-i <input file>] [-o <output file>] [-m]");
+      "Syntax: mk_mesons { -c <config file> | -l <list file> } [-i <input file>] [-o <output file>] [-m]");
 
   if(ac != 0) {
     strcpy(cnfg_filename,argv[ac]);
@@ -204,12 +210,11 @@ int main(int argc,char *argv[]) {
   setup_process(&argc,&argv);
 
   read_input(glb_var.read,input_filename);
-  read_input(rlx_var.read,input_filename);
   setup_replicas();
 
   /* logger setup */
   /* disable logger for MPI processes != 0 */
-  logger_setlevel(0,50);
+  logger_setlevel(0,10);
   if (PID!=0) { logger_disable(); }
   if (PID==0) { 
     sprintf(tmp,">%s",output_filename); logger_stdout(tmp);
@@ -233,9 +238,9 @@ int main(int argc,char *argv[]) {
   error(fpars.type==UNKNOWN_CNFG,1,"measure_spectrum.c","Bad name for a configuration file");
   error(fpars.nc!=NG,1,"measure_spectrum.c","Bad NG");
 
-  lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed);
-  rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+PID);
-  srand(rlx_var.rlxd_seed+PID);
+  lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed);
+  rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
+  srand(glb_var.rlxd_seed+PID);
 
 #ifdef GAUGE_SON
   lprintf("MAIN",0,"Gauge group: SO(%d)\n",NG);
@@ -341,6 +346,9 @@ int main(int argc,char *argv[]) {
     if (mes_var.def_point){
       measure_spectrum_pt(tau,nm,m,mes_var.n_mom,mes_var.nhits,i,mes_var.precision);
     }
+    if (mes_var.def_gfwall){
+      measure_spectrum_gfwall(nm,m,i,mes_var.precision);
+    }
     if (mes_var.ext_semwall){
       measure_spectrum_semwall_ext(nm,m,mes_var.nhits,i,mes_var.precision);
     }
@@ -353,6 +361,13 @@ int main(int argc,char *argv[]) {
     if (mes_var.fixed_point){
       measure_spectrum_pt_fixedbc(tau,mes_var.dt,nm,m,mes_var.n_mom,mes_var.nhits,i,mes_var.precision);
     }
+    if (mes_var.discon_semwall){
+      measure_spectrum_discon_semwall(nm,m,GLB_T,i,mes_var.precision); //mes_var.nhits
+    }
+    if (mes_var.discon_gfwall){
+      measure_spectrum_discon_gfwall(nm,m,i,mes_var.precision);
+    }
+
     gettimeofday(&end,0);
     timeval_subtract(&etime,&end,&start);
     lprintf("MAIN",0,"Configuration #%d: analysed in [%ld sec %ld usec]\n",i,etime.tv_sec,etime.tv_usec);

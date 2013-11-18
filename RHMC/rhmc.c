@@ -201,13 +201,13 @@ int main(int argc,char *argv[])
   
   /* setup random numbers */
   //slower(glb_var.rlxd_start); //convert start variable to lowercase
-  if(strcmp(glb_var.rlxd_start,"continue")==0 && glb_var.rlxd_state[0]!='\0') {
+  if(strcmp(rlx_var.rlxd_start,"continue")==0 && rlx_var.rlxd_state[0]!='\0') {
     /*load saved state*/
-    lprintf("MAIN",0,"Loading rlxd state from file [%s]\n",glb_var.rlxd_state);
-    read_ranlxd_state(glb_var.rlxd_state);
+    lprintf("MAIN",0,"Loading rlxd state from file [%s]\n",rlx_var.rlxd_state);
+    read_ranlxd_state(rlx_var.rlxd_state);
   } else {
-    lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed+MPI_PID);
-    rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
+    lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
+    rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
   }
   
   lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
@@ -283,9 +283,9 @@ int main(int argc,char *argv[])
     if((i%flow.save_freq)==0) {
       save_conf(&flow, i);
       /* Only save state if we have a file to save to */
-      if(glb_var.rlxd_state[0]!='\0') {
-          lprintf("MAIN",0,"Saving rlxd state to file %s\n",glb_var.rlxd_state);
-          write_ranlxd_state(glb_var.rlxd_state);
+      if(rlx_var.rlxd_state[0]!='\0') {
+          lprintf("MAIN",0,"Saving rlxd state to file %s\n",rlx_var.rlxd_state);
+          write_ranlxd_state(rlx_var.rlxd_state);
       }
     }
 
@@ -336,9 +336,9 @@ int main(int argc,char *argv[])
   if(((--i)%flow.save_freq)!=0) {
     save_conf(&flow, i);
     /* Only save state if we have a file to save to */
-    if(glb_var.rlxd_state[0]!='\0') {
-        lprintf("MAIN",0,"Saving rlxd state to file %s\n",glb_var.rlxd_state);
-        write_ranlxd_state(glb_var.rlxd_state);
+    if(rlx_var.rlxd_state[0]!='\0') {
+        lprintf("MAIN",0,"Saving rlxd state to file %s\n",rlx_var.rlxd_state);
+        write_ranlxd_state(rlx_var.rlxd_state);
     }
   }
 

@@ -68,9 +68,11 @@ void create_point_source(spinor_field *source,int tau,int color);
 int create_diluted_source_equal_eo(spinor_field *source);
 void create_diluted_source_equal_atau_eo(spinor_field *source, int tau);
 int create_diluted_source_equal(spinor_field *source);
+void create_diluted_source_equal_atau(spinor_field *source, int tau);
 void create_noise_source_equal_eo(spinor_field *source);
 void create_gauge_fixed_wall_source(spinor_field *source, int tau, int color);
 void create_sequential_source(spinor_field *source, int tf, spinor_field* prop);
+void restrict_timeslice(spinor_field *source, int tf, spinor_field* prop);
 
 void init_propagator_eo(int nm, double *m, double acc);
 void free_propagator_eo();
@@ -79,6 +81,7 @@ void calc_propagator(spinor_field *psi, spinor_field* eta, int ndilute);
 void calc_propagator_multisource(spinor_field *psi, spinor_field* eta, int ndilute);
 
 void measure_mesons(spinor_field *psi0, spinor_field *eta, int nm,int tau);
+void measure_discon(spinor_field *psi0, spinor_field *eta, int nm,int tau);
 void measure_mesons_ext(spinor_field *psi0, spinor_field *eta, int nm,int tau,int begin);
 void measure_point_mesons_momenta(spinor_field* psi0, spinor_field* eta, int nm, int tau, int n_mom);
 void measure_point_mesons_momenta_ext(spinor_field* psi0, spinor_field* eta, int nm, int tau, int n_mom, int begin);
