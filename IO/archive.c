@@ -188,6 +188,11 @@ void read_gauge_field(char filename[])
   int mpiret;
 #endif
 
+  if (NG==2){
+    read_gauge_field_su2(filename);
+    return;
+  }
+
   gettimeofday(&start,0);
 
   if(PID==0) {

@@ -222,7 +222,7 @@ int init_mc(hmc_flow *rf, char *ifile) {
   /* init gauge field */
   switch(start_t) {
     case 0:
-      read_gauge_field(add_dirname(rf->conf_dir,rf->g_start)); 
+      read_gauge_field(add_dirname(rf->conf_dir,rf->g_start));
       break;
     case 1:
       unit_u(u_gauge);

@@ -1,7 +1,7 @@
 TOPDIR = ..
 MKDIR=$(TOPDIR)/Make
 
-EXES = mk_mesons random_cnfg random_spinor mk_mesons_with_z2semwall mk_mesons_with_z2semwall_new  measure_spectrum measure_formfactor #mk_sfcoupling #trunc_mesons
+EXES = mk_mesons random_cnfg random_spinor mk_mesons_with_z2semwall mk_mesons_with_z2semwall_new  measure_spectrum #measure_formfactor #mk_sfcoupling #trunc_mesons
 
 
 default: $(EXES)
@@ -12,7 +12,7 @@ MODS := process_init geometry_init geometry_mpi_eo communications
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := IO
-MODS := archive logger read_input archive_spinors endian
+MODS := archive archive_su2quat logger read_input archive_spinors endian
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Utils
