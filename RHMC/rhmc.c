@@ -200,6 +200,7 @@ int main(int argc,char *argv[])
   /* test_geometry_mpi_eo(); */
   
   /* setup random numbers */
+  read_input(rlx_var.read,input_filename);
   //slower(glb_var.rlxd_start); //convert start variable to lowercase
   if(strcmp(rlx_var.rlxd_start,"continue")==0 && rlx_var.rlxd_state[0]!='\0') {
     /*load saved state*/
