@@ -24,6 +24,7 @@ int fread_BE_float(float* ptr, size_t n, FILE* fp);
 void read_gauge_field(char filename[]);
 void read_gauge_field_nocheck(char filename[]);
 void write_gauge_field(char filename[]);
+void read_gauge_field_matrix(char filename[]);
 
 #if NG==2
 void read_gauge_field_su2(char filename[]);

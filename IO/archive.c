@@ -169,7 +169,19 @@ void write_gauge_field(char filename[])
 
 }
 
-void read_gauge_field(char filename[]) 
+
+void read_gauge_field(char filename[]){
+  if (NG==2){
+    read_gauge_field_su2(filename);
+  }
+  else{
+    read_gauge_field_matrix(filename);
+  }
+}
+
+
+
+void read_gauge_field_matrix(char filename[]) 
 {
   FILE *fp=NULL;
   int g[4], p[4];
@@ -179,7 +191,6 @@ void read_gauge_field(char filename[])
   double plaq, testplaq;
   struct timeval start, end, etime;
 
-
 #ifdef WITH_MPI
   /* MPI variables */
   MPI_Group wg, cg;
@@ -187,11 +198,6 @@ void read_gauge_field(char filename[])
   int cid;
   int mpiret;
 #endif
-
-  if (NG==2){
-    read_gauge_field_su2(filename);
-    return;
-  }
 
   gettimeofday(&start,0);
 

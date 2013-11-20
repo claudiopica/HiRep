@@ -375,7 +375,7 @@ void read_gauge_field_su2(char filename[])
 {
   FILE *fp=NULL;
   double plaq;
-  int quaternions;
+  int quaternions=0;
 
 
   error((NG!=2),1,"read_gauge_field_su2", "This function cannot be called if NG!=2");
@@ -418,11 +418,13 @@ void read_gauge_field_su2(char filename[])
 
     fclose(fp);
   }
-  
+#ifdef WITH_MPI
+  MPI_Bcast(&quaternions,1,MPI_INT,0,GLB_COMM);  
+#endif
   if(quaternions)
     read_gauge_field_su2q(filename);
   else
-    read_gauge_field(filename);
+    read_gauge_field_matrix(filename);
     
 }
 

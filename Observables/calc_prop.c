@@ -249,7 +249,7 @@ void calc_propagator(spinor_field *psi, spinor_field* eta, int ndilute){
   m = mass;
   n_masses=QMR_par.n;
   QMR_par.n=1;
-  lprintf("CALC_PROPAGATOR",10,"n masses=%d, mass = %g",n_masses, mass[0]);
+  lprintf("CALC_PROPAGATOR",10,"n masses=%d, mass = %g\n",n_masses, mass[0]);
   for (i=0;i<n_masses;++i){
     hmass_pre = mass[0];
     for (beta=0;beta<ndilute;++beta){
