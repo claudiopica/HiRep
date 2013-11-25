@@ -381,9 +381,14 @@ void read_gauge_field_su2(char filename[])
   error((NG!=2),1,"read_gauge_field_su2", "This function cannot be called if NG!=2");
 
   if(PID==0) {
+    int file_size;
     int d[5]={0}; /* contains NG,GLB_T,GLB_X,GLB_Y,GLB_Z */
     error((fp=fopen(filename,"rb"))==NULL,1,"read_gauge_field_su2",
-        "Failed to open file for reading");
+	  "Failed to open file for reading");
+    /* Get the file size */
+    fseek(fp, 0, SEEK_END); 
+    file_size = ftell(fp); 
+    fseek(fp, 0, SEEK_SET); 
     /* read NG and global size */
     error(fread_BE_int(d,(size_t)(5),fp)!=(5),
         1,"read_gauge_field_su2",
@@ -408,7 +413,8 @@ void read_gauge_field_su2(char filename[])
                 "Failed to read gauge field from file");
     
     if(buff[0]*buff[4]+buff[1]*buff[5]+buff[2]*buff[6]+buff[3]*buff[7]<1e-10 &&
-      buff[0]*buff[5]-buff[4]*buff[1]+buff[2]*buff[7]-buff[6]*buff[3]<1e-10) {
+      buff[0]*buff[5]-buff[4]*buff[1]+buff[2]*buff[7]-buff[6]*buff[3]<1e-10 && 
+       8*4*GLB_T*GLB_X*GLB_Y*GLB_Z*sizeof(double)+5*sizeof(int)+sizeof(double)==file_size) {
       quaternions = (1==0);
       lprintf("IO",0,"SU2 matrix representation\n");
     } else {
