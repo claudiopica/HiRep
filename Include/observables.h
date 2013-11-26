@@ -75,13 +75,16 @@ void create_sequential_source(spinor_field *source, int tf, spinor_field* prop);
 void restrict_timeslice(spinor_field *source, int tf, spinor_field* prop);
 
 void init_propagator_eo(int nm, double *m, double acc);
+void eig_init(int nev, int nevt, int kmax, int maxiter, double lbnd, double omega1, double omega2);
 void free_propagator_eo();
 void calc_propagator_eo(spinor_field *psi, spinor_field *eta, int ndilute);
 void calc_propagator(spinor_field *psi, spinor_field* eta, int ndilute);
 void calc_propagator_multisource(spinor_field *psi, spinor_field* eta, int ndilute);
+void calc_deflated_propagator(spinor_field *psi, spinor_field* eta, int ndilute, int Nuse);
 
 void measure_mesons(spinor_field *psi0, spinor_field *eta, int nm,int tau);
 void measure_discon(spinor_field *psi0, spinor_field *eta, int nm,int tau);
+void measure_discon_noise(spinor_field* psi0, spinor_field* eta, int nm, int tau);
 void measure_mesons_ext(spinor_field *psi0, spinor_field *eta, int nm,int tau,int begin);
 void measure_point_mesons_momenta(spinor_field* psi0, spinor_field* eta, int nm, int tau, int n_mom);
 void measure_point_mesons_momenta_ext(spinor_field* psi0, spinor_field* eta, int nm, int tau, int n_mom, int begin);

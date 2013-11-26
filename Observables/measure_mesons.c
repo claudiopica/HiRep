@@ -185,6 +185,173 @@ static void measure_mesons_core(spinor_field* psi0, spinor_field* psi1, spinor_f
   lprintf("measure_mesons_core",50,"Measuring DONE! ");
 }
 
+/* spinor_fields* are 4xnm arrays of spinor_field ordered([color][spinor])*/
+static void measure_discon_noise_core(spinor_field* psi0, spinor_field* psi1, spinor_field* eta, int nm, int n_mom, int offset,int lt){
+  int i,ix,t,x,y,z,beta,px,py,pz,tc,tau,tm;
+  double pdotx,cpdotx,spdotx;
+  complex tr;
+  suNf_spin_matrix sma,smb,smc, sm1,sm2;
+  double **bracket=(double**) malloc(sizeof(double*)*NCHANNELS); //b(t) = sum_vec{x} <eta(x)| Gamma | psi(x) >
+  for(i=0;i<NCHANNELS;i++){ 
+	bracket[i]=(double*) malloc(sizeof(double)*lt); 
+	for(t=0;t<lt;t++){ bracket[i][t] = 0; }
+  }
+
+  lprintf("measure_discon_noise_core",50,"Measuring channels: ");
+  for (i=0;i<NCHANNELS;++i){
+    if (measure_channels[i]) lprintf("",50," %s",channel_names[i]);
+  }
+  lprintf("",50,"\n");
+  for (px=0;px<n_mom;++px) for (py=0;py<n_mom;++py) for (pz=0;pz<n_mom;++pz){
+	for(i=0; i<nm; i++) {
+	  for (t=0; t<T; t++) {	 
+	    tc = (zerocoord[0]+t)+i*GLB_T+offset;
+	    for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) { 
+		  ix=ipt(t,x,y,z);					
+		  pdotx = 2.0*PI*(((double) px)*(x+zerocoord[1])/GLB_X + ((double) py)*(y+zerocoord[2])/GLB_Y + ((double) pz)*(z+zerocoord[3])/GLB_Z);
+		  cpdotx=cos(pdotx);
+		  spdotx=sin(pdotx);
+  
+		  for (beta=0;beta<4;beta++){ 
+		    _spinmatrix_assign_row(sma, *_FIELD_AT(&psi0[beta*nm+i],ix), beta);
+		    _spinmatrix_assign_row(smb, *_FIELD_AT(&psi1[beta*nm+i],ix), beta); 
+		    _spinmatrix_assign_row(smc, *_FIELD_AT(&eta[beta],ix), beta); 
+		  }
+		  if (measure_channels[_g5]){
+		    //_spinmatrix_mul_trace(tr, sma, smb);
+		    //corr[_g5][corr_ind(px,py,pz,n_mom,tc,nm)]+= -cpdotx*tr.re;
+		    _g5_spinmatrix(sm1, sma);
+		    _spinmatrix_mul_trace(tr, smc, sm1);
+		    bracket[_g5][(zerocoord[0]+t)] += -tr.re;
+		  }
+		  /*if(measure_channels[_id]){
+		    _g5_spinmatrix(sm1, sma);
+		    _spinmatrix_g5(sm2, smb);
+		    _spinmatrix_mul_trace(tr, sm1, sm2);
+		    corr[_id][corr_ind(px,py,pz,n_mom,tc,nm)] += cpdotx*tr.re;
+		  }
+		  if(measure_channels[_g0]){
+		    _g5g0_spinmatrix(sm1, sma);
+		    _spinmatrix_g5g0(sm2, smb);
+		    _spinmatrix_mul_trace(tr, sm1, sm2);
+		    corr[_g0][corr_ind(px,py,pz,n_mom,tc,nm)] += -cpdotx*tr.re;	
+		  }
+		  if(measure_channels[_g1]){
+		    _g5g1_spinmatrix(sm1, sma);
+		    _spinmatrix_g5g1(sm2, smb);
+		    _spinmatrix_mul_trace(tr, sm1, sm2);
+		    corr[_g1][corr_ind(px,py,pz,n_mom,tc,nm)] += -cpdotx*tr.re;
+		  }      
+		  if(measure_channels[_g2]){
+		    _g5g2_spinmatrix(sm1, sma);
+		    _spinmatrix_g5g2(sm2, smb);
+		    _spinmatrix_mul_trace(tr, sm2, sm1);
+		    corr[_g2][corr_ind(px,py,pz,n_mom,tc,nm)] += cpdotx*tr.re;
+		  }
+		  if(measure_channels[_g3]){
+		    _g5g3_spinmatrix(sm1, sma);
+		    _spinmatrix_g5g3(sm2, smb);
+		    _spinmatrix_mul_trace(tr, sm1, sm2);
+		    corr[_g3][corr_ind(px,py,pz,n_mom,tc,nm)] += -cpdotx*tr.re;
+		  }
+		  if(measure_channels[_g0g5]){
+		    _g0_spinmatrix(sm1, sma);
+		    _spinmatrix_g0(sm2, smb);
+		    _spinmatrix_mul_trace(tr, sm1, sm2);
+		    corr[_g0g5][corr_ind(px,py,pz,n_mom,tc,nm)] += -cpdotx*tr.re;
+		  }
+		  if(measure_channels[_g5g1]){
+		    _g1_spinmatrix(sm1, sma);
+		    _spinmatrix_g1(sm2, smb);
+		    _spinmatrix_mul_trace(tr, sm1, sm2);
+		    corr[_g5g1][corr_ind(px,py,pz,n_mom,tc,nm)] += -cpdotx*tr.re;
+		  }	      
+		  if(measure_channels[_g5g2]){
+		    _g2_spinmatrix(sm1, sma);
+		    _spinmatrix_g2(sm2, smb);
+		    _spinmatrix_mul_trace(tr, sm1, sm2);
+		    corr[_g5g2][corr_ind(px,py,pz,n_mom,tc,nm)] += cpdotx*tr.re;
+		  }
+		  if(measure_channels[_g5g3]){
+		    _g3_spinmatrix(sm1, sma);
+		    _spinmatrix_g3(sm2, smb);
+		    _spinmatrix_mul_trace(tr, sm1, sm2);
+		    corr[_g5g3][corr_ind(px,py,pz,n_mom,tc,nm)] += -cpdotx*tr.re;
+		  }
+		  if(measure_channels[_g0g1]){
+		    _g5g0g1_spinmatrix(sm1, sma);
+		    _spinmatrix_g5g0g1(sm2, smb);
+		    _spinmatrix_mul_trace(tr, sm1, sm2);
+		    corr[_g0g1][corr_ind(px,py,pz,n_mom,tc,nm)] += -cpdotx*tr.re;
+		  }
+		  if(measure_channels[_g0g2]){
+		    _g5g0g2_spinmatrix(sm1, sma);
+		    _spinmatrix_g5g0g2(sm2, smb);
+		    _spinmatrix_mul_trace(tr, sm1, sm2);
+		    corr[_g0g2][corr_ind(px,py,pz,n_mom,tc,nm)] += cpdotx*tr.re;
+		  }
+		  if(measure_channels[_g0g3]){
+		    _g5g0g3_spinmatrix(sm1, sma);
+		    _spinmatrix_g5g0g3(sm2, smb);
+		    _spinmatrix_mul_trace(tr, sm1, sm2);
+		    corr[_g0g3][corr_ind(px,py,pz,n_mom,tc,nm)] += -cpdotx*tr.re;
+		  }
+		  if(measure_channels[_g0g5g1]){
+		    _g0g1_spinmatrix(sm1, sma);
+		    _spinmatrix_g0g1(sm2, smb);
+		    _spinmatrix_mul_trace(tr, sm1, sm2);
+		    corr[_g0g5g1][corr_ind(px,py,pz,n_mom,tc,nm)] += +cpdotx*tr.re;
+		  }
+		  if(measure_channels[_g0g5g2]){
+		    _g0g2_spinmatrix(sm1, sma);
+		    _spinmatrix_g0g2(sm2, smb);
+		    _spinmatrix_mul_trace(tr, sm1, sm2);
+		    corr[_g0g5g2][corr_ind(px,py,pz,n_mom,tc,nm)] += -cpdotx*tr.re;
+		  }
+		  if(measure_channels[_g0g5g3]){
+		    _g0g3_spinmatrix(sm1, sma);
+		    _spinmatrix_g0g3(sm2, smb);
+		    _spinmatrix_mul_trace(tr, sm1, sm2);
+		    corr[_g0g5g3][corr_ind(px,py,pz,n_mom,tc,nm)] += +cpdotx*tr.re;
+		  }
+		  if(measure_channels[_g5_g0g5_re]){
+		    _spinmatrix_g0(sm2, smb);
+		    _spinmatrix_mul_trace(tr, sma, sm2);
+		    corr[_g5_g0g5_re][corr_ind(px,py,pz,n_mom,tc,nm)] += cpdotx*tr.re+spdotx*tr.im;
+		  }
+		  if(measure_channels[_id_disc]){
+		    for (beta=0;beta<4;beta++){
+		      _spinor_prod_re_f(tr.re,*_FIELD_AT(&psi0[beta*nm+i],ix),*_FIELD_AT(&eta[beta],ix));
+		      corr[_id_disc][zerocoord[0]+t+i*lt+offset] += -tr.re;
+		    }
+		  }
+		  if(measure_channels[_g5_disc]){
+		    for (beta=0;beta<4;beta++){
+		      _spinor_g5_prod_re_f(tr.re,*_FIELD_AT(&psi0[beta*nm+i],ix),*_FIELD_AT(&eta[beta],ix));
+		      corr[_g5_disc][zerocoord[0]+t+i*lt+offset] += tr.re;
+		    }
+		  }*/
+		} //END SPATIAL LOOP
+	  } //END TIME LOOP
+	    double *bucket=(double*) malloc(sizeof(double)*lt); 
+	    #ifdef WITH_MPI
+	     MPI_Gather(bracket[ _g5 ] + zerocoord[0], T, MPI_DOUBLE, bucket, T, MPI_DOUBLE, 0, GLB_COMM);
+	    #else
+	     for(t=0;t<T;++t){ bucket[t] = bracket[ _g5 ][ t ]; }
+	    #endif
+
+            for(t=0;t<lt;++t){ 
+		for(tau=0;tau<lt;++tau){ 
+       		 tm = (t+tau)%lt;
+		 corr[_g5][t+i*lt+offset] += bucket[tau] * bucket[tm];
+	        }
+            }
+
+	} //END MASS LOOP
+      } //END MOMENTUM LOOP
+  lprintf("measure_discon_noise_core",50,"Measuring DONE! ");
+}
+
 /* spinor_fields* are nmx4xNF arrays of spinor_field ordered([nm][color][spinor])*/
 static void measure_formfactor_core(spinor_field* psi0, spinor_field* psi1, spinor_field* eta, int nm, int tau, int tf, int n_mom, int offset,int lt){
   int i,ix,t,x,y,z,beta,px,py,pz,tc,a;
@@ -317,16 +484,39 @@ void measure_mesons(spinor_field* psi0, spinor_field* eta, int nm, int tau){
 }
 
 void measure_discon(spinor_field* psi0, spinor_field* eta, int nm, int tau){
-  int i;
+  /*int i;
+  int mtmp[NCHANNELS];
+
   for (i=0;i<NCHANNELS;++i){
+    mtmp[i] = measure_channels[i];
     measure_channels[i]=0;
-  }
+  }*/
   init_corrs(nm,1);
   measure_channels[_g5_disc]=1;
   measure_channels[_id_disc]=1;
   lprintf("measure_mesons",50,"measure default mesons");
   measure_mesons_core(psi0, psi0, eta, nm, tau, 1, 0,GLB_T);
+  /*for (i=0;i<NCHANNELS;++i){
+    measure_channels[i]=mtmp[i];
+  }*/
 }
+
+void measure_discon_noise(spinor_field* psi0, spinor_field* eta, int nm, int tau){
+  /*int i;
+  int mtmp[NCHANNELS];
+
+  for (i=0;i<NCHANNELS;++i){
+    mtmp[i] = measure_channels[i];
+    measure_channels[i]=0;
+  }*/
+  init_corrs(nm,1);
+  lprintf("measure_mesons",50,"measure default mesons");
+  measure_discon_noise_core(psi0, psi0, eta, nm, 1, 0, GLB_T);
+  /*for (i=0;i<NCHANNELS;++i){
+    measure_channels[i]=mtmp[i];
+  }*/
+}
+
 
 void measure_mesons_ext(spinor_field* psi0, spinor_field* eta, int nm, int tau,int begin){
   init_corrs(nm*3,1);

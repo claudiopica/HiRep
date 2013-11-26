@@ -44,20 +44,22 @@
 typedef struct _input_mesons {
   char mstring[256];
   double precision;
-  int nhits;
+  int nhits_2pt;
+  int nhits_disc;
   int def_semwall;
   int def_point;
   int ext_semwall;
   int ext_point;
   int fixed_semwall;
   int fixed_point;
+  int fixed_gfwall;
   int discon_semwall;
   int discon_gfwall;
   int def_gfwall;
   int dt;
   int n_mom;
   /* for the reading function */
-  input_record_t read[15];
+  input_record_t read[17];
 } input_mesons;
 
 #define init_input_mesons(varname) \
@@ -65,7 +67,8 @@ typedef struct _input_mesons {
   .read={\
     {"quark quenched masses", "mes:masses = %s", STRING_T, (varname).mstring}, \
     {"inverter precision", "mes:precision = %lf", DOUBLE_T, &(varname).precision},\
-    {"number of noisy sources per cnfg", "mes:nhits = %d", INT_T, &(varname).nhits}, \
+    {"number of noisy sources per cnfg for 2pt fn", "mes:nhits_2pt = %d", INT_T, &(varname).nhits_2pt}, \
+    {"number of noisy sources per cnfg for disconnected", "mes:nhits_disc = %d", INT_T, &(varname).nhits_disc}, \
     {"enable default semwall", "mes:def_semwall = %d",INT_T, &(varname).def_semwall},	\
     {"enable default point", "mes:def_point = %d",INT_T, &(varname).def_point},		\
     {"enable default gfwall", "mes:def_gfwall = %d",INT_T, &(varname).def_gfwall},	\
@@ -73,6 +76,7 @@ typedef struct _input_mesons {
     {"enable extended point", "mes:ext_point = %d",INT_T, &(varname).ext_point},		\
     {"enable Dirichlet semwall", "mes:dirichlet_semwall = %d",INT_T, &(varname).fixed_semwall},	\
     {"enable Dirichlet point", "mes:dirichlet_point = %d",INT_T, &(varname).fixed_point},	\
+    {"enable Dirichlet gfwall", "mes:dirichlet_gfwall = %d",INT_T, &(varname).fixed_gfwall},	\
     {"enable discon semwall", "mes:discon_semwall = %d",INT_T, &(varname).discon_semwall},	\
     {"enable discon gfwall", "mes:discon_gfwall = %d",INT_T, &(varname).discon_gfwall},	\
     {"Distance of t_initial from Dirichlet boundary", "mes:dirichlet_dt = %d", INT_T, &(varname).dt},\
@@ -288,12 +292,15 @@ int main(int argc,char *argv[]) {
   for(k=0;k<nm;k++)
     lprintf("MAIN",0,"Mass[%d] = %f\n",k,m[k]);
 
-  lprintf("MAIN",0,"Number of noisy sources per cnfg = %d. Does not affect point sources\n",mes_var.nhits);
+  lprintf("MAIN",0,"Number of noisy sources per cnfg = %d. Does not affect point sources\n",mes_var.nhits_2pt);
   if (mes_var.def_semwall){
     lprintf("MAIN",0,"Spin Explicit Method (SEM) wall sources\n");    
   }
   if (mes_var.def_point){
     lprintf("MAIN",0,"Point sources\n");    
+  }
+  if (mes_var.def_gfwall){
+    lprintf("MAIN",0,"Gauge Fixed Wall Source\n");    
   }
   if (mes_var.ext_semwall){
     lprintf("MAIN",0,"Spin Explicit Method (SEM) wall sources on extended lattice\n");    
@@ -307,6 +314,10 @@ int main(int argc,char *argv[]) {
   }
   if (mes_var.fixed_point){
     lprintf("MAIN",0,"Point sources with Dirichlet boundary conditions\n");    
+    lprintf("MAIN",0,"Distance between tau and the boundary: %d\n",mes_var.dt); 
+  }
+  if (mes_var.fixed_gfwall){
+    lprintf("MAIN",0,"Gauge Fixed Wall Source with Dirichlet boundary conditions\n"); 
     lprintf("MAIN",0,"Distance between tau and the boundary: %d\n",mes_var.dt); 
   }
   if (mes_var.n_mom>1){
@@ -342,28 +353,31 @@ int main(int argc,char *argv[]) {
 
     tau=0;
     if (mes_var.def_semwall){
-      measure_spectrum_semwall(nm,m,mes_var.nhits,i,mes_var.precision);
+      measure_spectrum_semwall(nm,m,mes_var.nhits_2pt,i,mes_var.precision);
     }
     if (mes_var.def_point){
-      measure_spectrum_pt(tau,nm,m,mes_var.n_mom,mes_var.nhits,i,mes_var.precision);
+      measure_spectrum_pt(tau,nm,m,mes_var.n_mom,mes_var.nhits_2pt,i,mes_var.precision);
     }
     if (mes_var.def_gfwall){
       measure_spectrum_gfwall(nm,m,i,mes_var.precision);
     }
     if (mes_var.ext_semwall){
-      measure_spectrum_semwall_ext(nm,m,mes_var.nhits,i,mes_var.precision);
+      measure_spectrum_semwall_ext(nm,m,mes_var.nhits_2pt,i,mes_var.precision);
     }
     if (mes_var.ext_point){
-      measure_spectrum_pt_ext(tau,nm,m,mes_var.n_mom,mes_var.nhits,i,mes_var.precision);
+      measure_spectrum_pt_ext(tau,nm,m,mes_var.n_mom,mes_var.nhits_2pt,i,mes_var.precision);
     }
     if (mes_var.fixed_semwall){
-      measure_spectrum_semwall_fixedbc(mes_var.dt,nm,m,mes_var.nhits,i,mes_var.precision);
+      measure_spectrum_semwall_fixedbc(mes_var.dt,nm,m,mes_var.nhits_2pt,i,mes_var.precision);
     }
     if (mes_var.fixed_point){
-      measure_spectrum_pt_fixedbc(tau,mes_var.dt,nm,m,mes_var.n_mom,mes_var.nhits,i,mes_var.precision);
+      measure_spectrum_pt_fixedbc(tau,mes_var.dt,nm,m,mes_var.n_mom,mes_var.nhits_2pt,i,mes_var.precision);
+    }
+    if (mes_var.fixed_gfwall){
+      measure_spectrum_gfwall_fixedbc(mes_var.dt,nm,m,i,mes_var.precision);
     }
     if (mes_var.discon_semwall){
-      measure_spectrum_discon_semwall(nm,m,GLB_T,i,mes_var.precision); //mes_var.nhits
+      measure_spectrum_discon_semwall(nm,m,mes_var.nhits_disc,i,mes_var.precision); 
     }
     if (mes_var.discon_gfwall){
       measure_spectrum_discon_gfwall(nm,m,i,mes_var.precision);

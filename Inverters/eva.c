@@ -500,7 +500,7 @@ int eva(int nev,int nevt,int init,int kmax,
     nlock=res_subsp(n,nev,omega1,omega2,Op,ws,ev,d);
     *status=nop;
     
-    lprintf("EVA",40,"i=%3d, k=%3d, d[%2d]=% .6e, d[%2d]=% .6e, lbnd=% .6e, eps[%2d]=% .1e\n",
+    lprintf("EVA",10,"i=%3d, k=%3d, d[%2d]=% .6e, d[%2d]=% .6e, lbnd=% .6e, eps[%2d]=% .1e\n",
       i,k,n,d[n],nlst-1,d[nlst-1],lbnd,n,ee[n]);
     
     error(d[nlst-1]>ubnd,1,"eva [eva.c]",
@@ -517,3 +517,75 @@ int eva(int nev,int nevt,int init,int kmax,
   return -1;
 }
 
+int eva_tuned(int nev,int nevt,int init,int kmax,
+        int imax,double lbnd, double ubnd,double omega1,double omega2,
+        spinor_operator Op,spinor_field *ws,
+        spinor_field *ev,double d[],int *status)   
+{
+  int i,k,n;
+  int nlock,nupd,nlst;
+  //double lbnd;
+  
+
+  *status=0;
+   
+  error((nev<=0)||(nevt<nev)||(kmax<2)||(imax<1),1,
+	"eva [eva.c]",
+	"Improper parameters nev,nevt,kmax or imax");
+  error((omega1<(ubnd*EPSILON))&&(omega2<EPSILON),1,
+	"eva [eva.c]",
+	"Improper parameters omega1 or omega2");
+
+  nop=0;
+  nlock=0;
+  nupd=(nevt+nev)/2;
+   
+  if (alloc_aux(nevt)!=0)
+    return -3;
+  
+  init_subsp(nev,nupd,init,ev);
+  ritz_subsp(nlock,nupd,Op,ws,ev,d);
+   
+  for (i=0;i<imax;i++){
+    if (i>0){
+//      lbnd=set_lbnd(nupd,kmax,ubnd,d,&k);
+k = kmax;
+      for (n=nupd;n<nevt;n++)
+        spinor_field_copy_f(&ev[n],&ev[n+nupd-nevt]);
+    } else
+//      lbnd=set_lbnd(nupd,10,ubnd,d,&k);
+k = kmax;
+    for (n=nlock;n<nevt;n++) {
+      if (n<nupd){
+        apply_cheby(k,lbnd,ubnd,Op,ws,&ev[n]);
+        mgm_subsp(n,ev);
+      }else if (i>0)
+        mgm_subsp(n,ev);
+    }
+    
+    if (i>0)
+      nlst=nevt;
+    else
+      nlst=nupd;
+    
+    ritz_subsp(nlock,nlst,Op,ws,ev,d);
+    n=nlock;      
+    nlock=res_subsp(n,nev,omega1,omega2,Op,ws,ev,d);
+    *status=nop;
+    
+    lprintf("EVA",10,"i=%3d, k=%3d, d[%2d]=% .6e, d[%2d]=% .6e, lbnd=% .6e, eps[%2d]=% .1e\n",
+      i,k,n,d[n],nlst-1,d[nlst-1],lbnd,n,ee[n]);
+    
+    error(d[nlst-1]>ubnd,1,"eva [eva.c]",
+          "Parameter ubnd is too low");
+
+    if (nlock==nev){
+      lprintf("EVA",10,"Computation succeded. MVM = %d\n",*status);
+      return 0;
+    }
+  }
+
+  lprintf("EVA",10,"Unable to reach required precision. MVM = %d\n",*status);
+   
+  return -1;
+}

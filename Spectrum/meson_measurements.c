@@ -147,7 +147,8 @@ void measure_spectrum_discon_gfwall(int nm, double* m, int conf_num, double prec
       measure_discon(prop,source,nm,tau);
 
   }}
-  print_mesons(GLB_T,conf_num,nm,m,"DISCON_GFWALL");
+  //This gets the norm of the 2pt wrong by a factor GLB_VOL3 but the norm of the disconnected right
+  print_mesons(GLB_T,conf_num,nm,m,"DISCON_GFWALL"); 
 
   suNg_field_copy(u_gauge,u_gauge_old);
   represent_gauge_field();
@@ -358,6 +359,47 @@ void measure_spectrum_pt_fixedbc(int tau, int dt, int nm, double* m, int n_mom,i
   free_spinor_field_f(prop);
   free_gfield_f(u_gauge_old);
   free_propagator_eo(); 
+}
+
+void measure_spectrum_gfwall_fixedbc(int dt, int nm, double* m, int conf_num, double precision){
+  spinor_field* source = alloc_spinor_field_f(4,&glattice);
+  spinor_field* prop =  alloc_spinor_field_f(4*nm,&glattice);
+  suNg_field* u_gauge_old=alloc_gfield(&glattice);
+
+  int tau,k;
+  tau = 0;
+  suNg_field_copy(u_gauge_old,u_gauge);
+
+  //Fix the Gauge
+  double act = gaugefix(0, //= 0, 1, 2, 3 for Coulomb guage else Landau
+	1.8,	//overrelax
+	10000,	//maxit
+	1e-12, //tolerance
+	u_gauge //gauge
+	);
+  lprintf("GFWALL",0,"Gauge fixed action  %1.6f\n",act);
+  double p2 = calc_plaq(u_gauge);
+  lprintf("TEST",0,"fixed_gauge plaq %1.6f\n",p2);
+    full_plaquette();
+  represent_gauge_field();
+
+  fix_T_bc(tau-dt);//Apply fixed boundaryconditions by zeroing links at time slice tau to direction 0.
+
+  init_propagator_eo(nm, m, precision);
+  for (k=0;k<NF;++k){
+      create_gauge_fixed_wall_source(source, tau, k);
+      calc_propagator(prop,source,4);//4 for spin dilution
+      measure_mesons(prop, source, nm, tau);
+  }
+  print_mesons(GLB_VOL3,conf_num,nm,m,"DIRICHLET_GFWALL");
+
+  suNg_field_copy(u_gauge,u_gauge_old);
+  represent_gauge_field();
+
+  free_propagator_eo(); 
+  free_spinor_field_f(source);
+  free_spinor_field_f(prop);
+  free_gfield(u_gauge_old);
 }
 
 void measure_formfactor_pt(int ti, int tf, int nm, double* m, int n_mom, int conf_num, double precision){
