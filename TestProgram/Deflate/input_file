@@ -1,0 +1,23 @@
+GLB_T = 16
+GLB_X = 8
+GLB_Y = 8
+GLB_Z = 8
+NP_T = 1
+NP_X = 1
+NP_Y = 1
+NP_Z = 1
+
+//level = 1  seed = 1
+level = 1  seed = 38761
+
+mes:masses = 0
+mes:precision = 1e-24
+
+
+eva:nev = 10
+eva:nevt = 20
+eva:omega1 = 1e-3
+eva:omega2 = 1e-3
+eva:kmax = 10
+eva:maxiter = 1000
+eva:lbnd = 50
