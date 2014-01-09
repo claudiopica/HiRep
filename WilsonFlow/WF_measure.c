@@ -106,7 +106,7 @@ int parse_cnfg_filename(char* filename, filename_t* fn) {
   basename = filename;
   while ((tmp = strchr(basename, '/')) != NULL) {
     basename = tmp+1;
-  }            
+  }
 
 /*#ifdef REPR_FUNDAMENTAL*/
 /*#define repr_name "FUN"*/
@@ -204,6 +204,7 @@ int main(int argc,char *argv[]) {
   setup_process(&argc,&argv);
 
   read_input(glb_var.read,input_filename);
+  read_input(rlx_var.read,input_filename);
   setup_replicas();
 
   /* logger setup */
@@ -231,13 +232,13 @@ int main(int argc,char *argv[]) {
   read_input(SF_var.read,input_filename);
 #endif
   GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
- 
+
   error(fpars.type==UNKNOWN_CNFG,1,"WF_measure.c","Bad name for a configuration file");
   error(fpars.nc!=NG,1,"WF_measure.c","Bad NG");
 
-  lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed);
-  rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
-  srand(glb_var.rlxd_seed+PID);
+  lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed);
+  rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+PID);
+  srand(rlx_var.rlxd_seed+PID);
 
   lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
   lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
