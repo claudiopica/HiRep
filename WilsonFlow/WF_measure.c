@@ -240,7 +240,14 @@ int main(int argc,char *argv[]) {
   rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+PID);
   srand(rlx_var.rlxd_seed+PID);
 
+#ifdef GAUGE_SUN
   lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
+#elif GAUGE_SON
+  lprintf("MAIN",0,"Gauge group: SO(%d)\n",NG);
+#else
+  lprintf("MAIN",0,"Default gauge group: SU(%d)\n",NG);
+#endif
+
   lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
 
   /* setup communication geometry */

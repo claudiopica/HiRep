@@ -14,7 +14,7 @@ MODS := archive archive_nocheck logger read_input endian
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Utils
-MODS := suN_utils time boundary_conditions single_double_utils
+MODS := suN_utils time boundary_conditions single_double_utils diag_hmat det_suNg
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Memory

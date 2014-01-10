@@ -37,7 +37,9 @@ static void Zeta(suNg_field *Z, const suNg_field* U, const double alpha){
   suNg staple, tmp1, tmp2;
   suNg *u1, *u2, *u3;
   int mu, nu, j, k;
+#ifndef GAUGE_SON
   double imtr;
+#endif
   _DECLARE_INT_ITERATOR(i);
 #ifdef PLAQ_CHECK
   double retr, plaq=0.;
@@ -86,6 +88,7 @@ static void Zeta(suNg_field *Z, const suNg_field* U, const double alpha){
       
       _suNg_dagger(tmp2,tmp1);
       _suNg_sub_assign(tmp1,tmp2);
+#ifndef GAUGE_SON
       _suNg_trace_im(imtr,tmp1);
       imtr = imtr/NG;
       for(k=0;k<NG*NG;k+=NG+1) {
@@ -95,6 +98,11 @@ static void Zeta(suNg_field *Z, const suNg_field* U, const double alpha){
       for(k=0; k<NG*NG; k++) {
       	_complex_mulr_assign(_4FIELD_AT(Z,i,mu)->c[k],-alpha/2.,tmp1.c[k]);
       }
+#else
+      for(k=0; k<NG*NG; k++) {
+      	_4FIELD_AT(Z,i,mu)->c[k]=-alpha/2.*tmp1.c[k];
+      }    
+#endif
     }
 
   }

@@ -8,6 +8,8 @@
 /*! \defgroup sfgauge SF Gauge Observable
  * \ingroup obs
  */
+#ifdef GAUGE_SUN
+
 
 #include "global.h"
 #include "suN.h"
@@ -177,3 +179,4 @@ double SF_action(double beta)
   return pa*(double)(beta/(NG*GLB_X));
 }
 
+#endif

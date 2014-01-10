@@ -412,8 +412,8 @@ void read_gauge_field_su2(char filename[])
                 1,"read_gauge_field_su2",
                 "Failed to read gauge field from file");
     
-    if(buff[0]*buff[4]+buff[1]*buff[5]+buff[2]*buff[6]+buff[3]*buff[7]<1e-10 &&
-      buff[0]*buff[5]-buff[4]*buff[1]+buff[2]*buff[7]-buff[6]*buff[3]<1e-10 && 
+    if(fabs(buff[0]*buff[4]+buff[1]*buff[5]+buff[2]*buff[6]+buff[3]*buff[7])<1e-10 &&
+       fabs(buff[0]*buff[5]-buff[4]*buff[1]+buff[2]*buff[7]-buff[6]*buff[3])<1e-10 && 
        8*4*GLB_T*GLB_X*GLB_Y*GLB_Z*sizeof(double)+5*sizeof(int)+sizeof(double)==file_size) {
       quaternions = (1==0);
       lprintf("IO",0,"SU2 matrix representation\n");
