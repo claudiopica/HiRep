@@ -81,6 +81,7 @@ void calc_propagator_eo(spinor_field *psi, spinor_field *eta, int ndilute);
 void calc_propagator(spinor_field *psi, spinor_field* eta, int ndilute);
 void calc_propagator_multisource(spinor_field *psi, spinor_field* eta, int ndilute);
 void calc_deflated_propagator(spinor_field *psi, spinor_field* eta, int ndilute, int Nuse);
+void copy_evec( int n, spinor_field* psi1, double *eval );
 
 void measure_mesons(spinor_field *psi0, spinor_field *eta, int nm,int tau);
 void measure_discon(spinor_field *psi0, spinor_field *eta, int nm,int tau);

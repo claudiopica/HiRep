@@ -400,6 +400,12 @@ void eig_init(int nev, int nevt, int kmax, int maxiter, double lbnd, double omeg
 
 }
 
+void copy_evec( int n, spinor_field* psi1, double *eval ){
+
+	spinor_field_copy_f(psi1, &eva_vec[n]);
+	*eval = eva_val[n];
+
+}
 
 void calc_deflated_propagator(spinor_field *psi, spinor_field* eta, int ndilute, int Nuse){
   int beta,i,n_masses,n;

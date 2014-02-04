@@ -352,6 +352,73 @@ static void measure_discon_noise_core(spinor_field* psi0, spinor_field* psi1, sp
   lprintf("measure_discon_noise_core",50,"Measuring DONE! ");
 }
 
+
+static double hmass_pre;
+static void D_pre(spinor_field *out, spinor_field *in){  Dphi_eopre(hmass_pre,out,in); }
+static void Ddag_pre(spinor_field *out, spinor_field *in, spinor_field *ttmp){ 
+      spinor_field_copy_f( ttmp, in ); 
+      spinor_field_g5_assign_f( ttmp ); 
+      H_pre(out, ttmp);
+}
+/* spinor_fields* are 4xnm arrays of spinor_field ordered([color][spinor])*/
+static void measure_discon_lma_core(int Nev, int nm, int n_mom, int offset,int lt, double *m){
+  int i,ix,t,x,y,z,beta,px,py,pz,tc,tau,n;
+  double pdotx,cpdotx,spdotx;
+  complex tr;
+
+  spinor_field* vi; vi = alloc_spinor_field_f(1,&glat_even);
+  spinor_field* Dvi; Dvi = alloc_spinor_field_f(1,&glat_even);
+  double li;
+
+  lprintf("measure_discon_lma_core",10,"Measuring channels: ");
+  for (i=0;i<NCHANNELS;++i){
+    if (measure_channels[i]) lprintf("",10," %s",channel_names[i]);
+  }
+  lprintf("",10,"\n");
+
+  hmass_pre = m[0];
+
+for(n=0;n<Nev;n++){
+
+  copy_evec(n, vi, &li);
+  D_pre(Dvi, vi);
+  //spinor_field_sub_assign_f(tmp1,Dvi);
+
+  //lprintf("DISCON",0,"%g %g %g\n",hmass_pre, spinor_field_sqnorm_f(vi), spinor_field_sqnorm_f(tmp1) );
+  for (px=0;px<n_mom;++px) for (py=0;py<n_mom;++py) for (pz=0;pz<n_mom;++pz){
+	for(i=0; i<nm; i++) {
+	  for (t=0; t<T; t++) {	 
+	    tc = (zerocoord[0]+t)+i*GLB_T+offset;
+	    for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) { 
+		  ix=ipt(t,x,y,z);					
+		  pdotx = 2.0*PI*(((double) px)*(x+zerocoord[1])/GLB_X + ((double) py)*(y+zerocoord[2])/GLB_Y + ((double) pz)*(z+zerocoord[3])/GLB_Z);
+		  cpdotx=cos(pdotx);
+		  spdotx=sin(pdotx);
+  
+
+		  
+		  if(measure_channels[_id_disc]){
+		      _spinor_prod_re_f(tr.re,*_FIELD_AT(Dvi,ix),*_FIELD_AT(vi,ix));
+		      corr[_id_disc][zerocoord[0]+t+i*lt+offset] +=  -(4. + hmass_pre) * tr.re/li;
+		  }
+		  if(measure_channels[_g5_disc]){
+		      _spinor_g5_prod_re_f(tr.re,*_FIELD_AT(Dvi,ix),*_FIELD_AT(vi,ix));
+		      corr[_g5_disc][zerocoord[0]+t+i*lt+offset] +=  (4. + hmass_pre) *tr.re/li;
+		  }
+
+		
+		
+
+		} //END SPATIAL LOOP
+	  } //END TIME LOOP
+	} //END MASS LOOP
+      } //END MOMENTUM LOOP
+    }// END NEV LOOP
+  free_spinor_field_f(vi);
+  free_spinor_field_f(Dvi);
+  lprintf("measure_discon_noise_core",50,"Measuring DONE! ");
+}
+
 /* spinor_fields* are nmx4xNF arrays of spinor_field ordered([nm][color][spinor])*/
 static void measure_formfactor_core(spinor_field* psi0, spinor_field* psi1, spinor_field* eta, int nm, int tau, int tf, int n_mom, int offset,int lt){
   int i,ix,t,x,y,z,beta,px,py,pz,tc,a;
