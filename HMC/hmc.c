@@ -160,11 +160,8 @@ int main(int argc,char *argv[])
 
   read_cmdline(argc,argv);
 
-  /* read global variables */
-  read_input(glb_var.read,input_filename);
-    
   /* logger setup */
-  logger_setlevel(0,10);
+    logger_setlevel(0,10);
   /* disable logger for MPI processes != 0 */
   if (PID!=0) { logger_disable(); }
 
@@ -176,45 +173,43 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS); 
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
 
+  /* read input file */
+  read_input(glb_var.read,input_filename);
+  read_input(mes_var.read,input_filename);
+  read_input(poly_var.read,input_filename);
+  read_input(eigval_var.read,input_filename);
+  read_input(rlx_var.read,input_filename);
+#ifdef WITH_GPU
+  read_input(gpu_var.read,input_filename);
+  init_gpu(gpu_var);
+#endif //WITH_GPU
+  
+  if(strcmp(rlx_var.rlxd_start, "continue") == 0 && rlx_var.rlxd_state[0] != '\0')
+  {
+  	/*load saved state*/
+	lprintf("MAIN",0,"Loading rlxd state from file %s\n",rlx_var.rlxd_state);
+	read_ranlxd_state(rlx_var.rlxd_state);
+  }
+  else
+  {
+    lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed+PID);
+    rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+PID);
+  }
 
   /* setup communication geometry */
   if (geometry_init() == 1) {
     finalize_process();
     return 0;
   }
-    /* setup lattice geometry */
-    geometry_mpi_eo();
-    
-    /* setup random numbers */
-    read_input(rlx_var.read,input_filename);
-    //slower(rlx_var.rlxd_start); //convert start variable to lowercase
-    if(strcmp(rlx_var.rlxd_start,"continue")==0 && rlx_var.rlxd_state[0]!='\0') {
-        /*load saved state*/
-        lprintf("MAIN",0,"Loading rlxd state from file [%s]\n",rlx_var.rlxd_state);
-        read_ranlxd_state(rlx_var.rlxd_state);
-    } else {
-        lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
-        rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
-    }
 
-    
-    /* read input file */
-    read_input(mes_var.read,input_filename);
-    read_input(poly_var.read,input_filename);
-    read_input(eigval_var.read,input_filename);
-#ifdef WITH_GPU
-    read_input(gpu_var.read,input_filename);
-    init_gpu(gpu_var);
-#endif //WITH_GPU
-    
-    
   lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
   lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
   lprintf("MAIN",0,"global size is %dx%dx%dx%d\n",GLB_T,GLB_X,GLB_Y,GLB_Z);
   lprintf("MAIN",0,"proc grid is %dx%dx%dx%d\n",NP_T,NP_X,NP_Y,NP_Z);
   lprintf("MAIN",0,"Fermion boundary conditions: %.2f,%.2f,%.2f,%.2f\n",bc[0],bc[1],bc[2],bc[3]);
 
-
+  /* setup lattice geometry */
+  geometry_mpi_eo();
   /* test_geometry_mpi_eo(); */
   lprintf("MAIN",0,"Geometry buffers: %d\n",glattice.nbuffers);
 
@@ -285,12 +280,14 @@ int main(int argc,char *argv[])
 
     lprintf("MAIN",0,"Trajectory #%d: %d/%d (%3.4f%%) MVM (f;d) = %ld ; %ld\n",i,acc,rc,perc,getMVM_flt(),getMVM());
 
-    if((i%flow.save_freq)==0) {
-      save_conf(&flow, i);
-        /* Only save state if we have a file to save to */
-        if(rlx_var.rlxd_state[0]!='\0') {
-            lprintf("MAIN",0,"Saving rlxd state to file %s\n",rlx_var.rlxd_state);
-            write_ranlxd_state(rlx_var.rlxd_state);
+    if((i%flow.save_freq)==0)
+	{
+		save_conf(&flow, i);
+		if(rlx_var.rlxd_state[0] != '\0')
+		{
+			lprintf("MAIN",0,"Saving rlxd state to file %s\n", rlx_var.rlxd_state);
+			write_ranlxd_state(rlx_var.rlxd_state);
+		}
     }
 
 #ifdef BASIC_SF
@@ -335,16 +332,16 @@ int main(int argc,char *argv[])
     }
   }
   /* save final configuration */
-  if(((--i)%flow.save_freq)!=0) {
-    save_conf(&flow, i);
-      /* Only save state if we have a file to save to */
-      if(rlx_var.rlxd_state[0]!='\0') {
-          lprintf("MAIN",0,"Saving rlxd state to file %s\n",rlx_var.rlxd_state);
-          write_ranlxd_state(rlx_var.rlxd_state);
-      }
+  if(((--i)%flow.save_freq)!=0)
+  {
+	save_conf(&flow, i);
+    if(rlx_var.rlxd_state[0] != '\0')
+	{
+		lprintf("MAIN",0,"Saving rlxd state to file %s\n", rlx_var.rlxd_state);
+		write_ranlxd_state(rlx_var.rlxd_state);
+	}
   }
 
-  
   /* finalize Monte Carlo */
   end_mc();
 
