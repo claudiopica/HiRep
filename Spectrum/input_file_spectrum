@@ -11,11 +11,12 @@ NP_Z = 1
 level = 1  seed = 38761
 
 mes:masses = 0
+mes:use_input_mass = 0;
 mes:precision = 1e-20
 mes:nhits_2pt = 3
 mes:nhits_disc = 16
 mes:momentum = 0
-mes:def_semwall = 1
+mes:def_semwall = 0
 mes:def_point = 0
 mes:def_gfwall = 0
 mes:ext_semwall = 0
@@ -23,7 +24,9 @@ mes:ext_point = 0
 mes:dirichlet_semwall = 0
 mes:dirichlet_point = 0
 mes:dirichlet_gfwall = 0
-mes:discon_semwall = 1
-mes:discon_gfwall = 1
+mes:discon_semwall = 0
+mes:discon_gfwall = 0
+mes:discon_volume = 1
+mes:dilution = 4
 mes:dirichlet_dt = 2
 

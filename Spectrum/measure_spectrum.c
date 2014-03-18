@@ -42,7 +42,7 @@
 //typedef enum {semwall_src,point_src} source_type_t;
 /* Mesons parameters */
 typedef struct _input_mesons {
-  char mstring[256];
+  char mstring[1024];
   double precision;
   int nhits_2pt;
   int nhits_disc;
@@ -55,17 +55,21 @@ typedef struct _input_mesons {
   int fixed_gfwall;
   int discon_semwall;
   int discon_gfwall;
+  int discon_volume;
   int def_gfwall;
   int dt;
   int n_mom;
+  int use_input_mass;
+  int dilution;
   /* for the reading function */
-  input_record_t read[17];
+  input_record_t read[20];
 } input_mesons;
 
 #define init_input_mesons(varname) \
 { \
   .read={\
     {"quark quenched masses", "mes:masses = %s", STRING_T, (varname).mstring}, \
+    {"use input mass", "mes:use_input_mass = %d",INT_T, &(varname).use_input_mass},	\
     {"inverter precision", "mes:precision = %lf", DOUBLE_T, &(varname).precision},\
     {"number of noisy sources per cnfg for 2pt fn", "mes:nhits_2pt = %d", INT_T, &(varname).nhits_2pt}, \
     {"number of noisy sources per cnfg for disconnected", "mes:nhits_disc = %d", INT_T, &(varname).nhits_disc}, \
@@ -79,6 +83,8 @@ typedef struct _input_mesons {
     {"enable Dirichlet gfwall", "mes:dirichlet_gfwall = %d",INT_T, &(varname).fixed_gfwall},	\
     {"enable discon semwall", "mes:discon_semwall = %d",INT_T, &(varname).discon_semwall},	\
     {"enable discon gfwall", "mes:discon_gfwall = %d",INT_T, &(varname).discon_gfwall},	\
+    {"enable discon volume", "mes:discon_volume = %d",INT_T, &(varname).discon_volume},	\
+    {"volume source dilution", "mes:dilution = %d",INT_T, &(varname).dilution},	\
     {"Distance of t_initial from Dirichlet boundary", "mes:dirichlet_dt = %d", INT_T, &(varname).dt},\
     {"maximum component of momentum", "mes:momentum = %d", INT_T, &(varname).n_mom}, \
     {NULL, NULL, INT_T, NULL}				\
@@ -269,6 +275,16 @@ int main(int argc,char *argv[]) {
     }    
   }
 
+  if(mes_var.use_input_mass) {
+    strcpy(tmp,mes_var.mstring);
+    cptr = strtok(tmp, ";");
+    nm=0;
+    while(cptr != NULL) {
+      m[nm]=atof(cptr);
+      nm++;
+      cptr = strtok(NULL, ";");
+    }    
+  }
 
   /* setup communication geometry */
   if (geometry_init() == 1) {
@@ -381,6 +397,9 @@ int main(int argc,char *argv[]) {
     }
     if (mes_var.discon_gfwall){
       measure_spectrum_discon_gfwall(nm,m,i,mes_var.precision);
+    }
+    if (mes_var.discon_volume){
+      measure_spectrum_discon_volume(nm,m,i,mes_var.precision,mes_var.dilution);
     }
 
     gettimeofday(&end,0);

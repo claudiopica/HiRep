@@ -159,6 +159,29 @@ void measure_spectrum_discon_gfwall(int nm, double* m, int conf_num, double prec
   free_gfield(u_gauge_old);
 }
 
+void measure_spectrum_discon_volume(int nm, double* m, int conf_num, double precision, int dil){
+
+  //Spin diluted
+  spinor_field* source = alloc_spinor_field_f(4,&glattice);
+  spinor_field* prop =  alloc_spinor_field_f(4*nm,&glattice);
+
+  init_propagator_eo(nm, m, precision);
+  int p;
+  for(p=0;p<dil;p++){
+  	create_diluted_volume_source(source, p, dil);
+  	calc_propagator(prop,source,4);//spin dilution
+  	measure_discon(prop,source,nm,0);
+  }
+
+  print_mesons(1.,conf_num,nm,m,"DISCON_VOLUME"); 
+
+  free_propagator_eo(); 
+  free_spinor_field_f(source);
+  free_spinor_field_f(prop);
+
+}
+
+
 void measure_spectrum_gfwall(int nm, double* m, int conf_num, double precision){
   spinor_field* source = alloc_spinor_field_f(4,&glattice);
   spinor_field* prop =  alloc_spinor_field_f(4*nm,&glattice);
@@ -197,6 +220,22 @@ void measure_spectrum_gfwall(int nm, double* m, int conf_num, double precision){
   free_gfield(u_gauge_old);
 }
 
+
+static void generate_random_point(int *pr) {
+
+  double ran;
+  ranlxd(&ran,1);
+  pr[1] = (int)(ran*GLB_X);
+  ranlxd(&ran,1);
+  pr[2] = (int)(ran*GLB_Y);
+  ranlxd(&ran,1);
+  pr[3] = (int)(ran*GLB_Z);
+  ranlxd(&ran,1);
+  pr[0] = (int)(ran*GLB_T);
+
+  bcast_int(pr,4);
+
+}
 void measure_spectrum_pt(int tau, int nm, double* m, int n_mom,int nhits,int conf_num, double precision){
   spinor_field* source = alloc_spinor_field_f(4,&glattice);
   spinor_field* prop =  alloc_spinor_field_f(4*nm,&glattice);

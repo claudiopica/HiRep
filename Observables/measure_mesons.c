@@ -27,13 +27,19 @@
 #include "propagator.h"
 #define PI 3.141592653589793238462643383279502884197
 
-enum { _g5= 0,_id, _g0, _g1, _g2, _g3,  _g0g1, _g0g2, _g0g3, _g0g5, _g5g1, _g5g2, _g5g3, _g0g5g1, _g0g5g2, _g0g5g3, _g5_g0g5_re, _id_disc,_g5_disc,_pipig_ff_re,_pipig_ff_im,_pipig_conserved_ff,NCHANNELS };
+enum { _g5= 0,_id, _g0, _g1, _g2, _g3,  _g0g1, _g0g2, _g0g3, _g0g5, _g5g1, _g5g2, _g5g3, _g0g5g1, _g0g5g2, _g0g5g3, _g5_g0g5_re,
+ _g5_disc, _id_disc, _g0_disc, _g1_disc, _g2_disc, _g3_disc, _g0g1_disc, _g0g2_disc, _g0g3_disc, _g0g5_disc, _g5g1_disc, _g5g2_disc, _g5g3_disc, _g0g5g1_disc, _g0g5g2_disc, _g0g5g3_disc, 
+_pipig_ff_re,_pipig_ff_im,_pipig_conserved_ff,NCHANNELS };
 
-char* channel_names[NCHANNELS]={"g5","id","g0","g1","g2","g3","g0g1","g0g2","g0g3","g0g5","g5g1","g5g2","g5g3","g0g5g1","g0g5g2","g0g5g3","g5_g0g5_re","id_disc", "g5_disc","pipig_ff_re","pipig_ff_im","pipig_conserved_ff"};
+char* channel_names[NCHANNELS]={"g5","id","g0","g1","g2","g3","g0g1","g0g2","g0g3","g0g5","g5g1","g5g2","g5g3","g0g5g1","g0g5g2","g0g5g3","g5_g0g5_re",
+"g5_disc", "id_disc"," _g0_disc", "_g1_disc", "_g2_disc", "_g3_disc", "_g0g1_disc", "_g0g2_disc", "_g0g3_disc", "_g0g5_disc", "_g5g1_disc", "_g5g2_disc", "_g5g3_disc", "_g0g5g1_disc", "_g0g5g2_disc", "_g0g5g3_disc",
+"pipig_ff_re","pipig_ff_im","pipig_conserved_ff"};
 
-char* channel_types[NCHANNELS]={"TRIPLET","TRIPLET","TRIPLET","TRIPLET","TRIPLET","TRIPLET","TRIPLET","TRIPLET","TRIPLET","TRIPLET","TRIPLET","TRIPLET","TRIPLET","TRIPLET","TRIPLET","TRIPLET","TRIPLET","SINGLET","SINGLET","FORM_FACTOR","FORM_FACTOR","FORM_FACTOR"};
+char* channel_types[NCHANNELS]={"TRIPLET","TRIPLET","TRIPLET","TRIPLET","TRIPLET","TRIPLET","TRIPLET","TRIPLET","TRIPLET","TRIPLET","TRIPLET","TRIPLET","TRIPLET","TRIPLET","TRIPLET","TRIPLET","TRIPLET",
+"SINGLET","SINGLET","SINGLET","SINGLET","SINGLET","SINGLET","SINGLET","SINGLET","SINGLET","SINGLET","SINGLET","SINGLET","SINGLET","SINGLET","SINGLET","SINGLET",
+"FORM_FACTOR","FORM_FACTOR","FORM_FACTOR"};
 
-int measure_channels[NCHANNELS]={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0};
+int measure_channels[NCHANNELS]={ 1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1, 1, 1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1, 0,0,0};
 
 static double* corr[NCHANNELS];
 
@@ -47,7 +53,7 @@ static void measure_mesons_core(spinor_field* psi0, spinor_field* psi1, spinor_f
   double pdotx,cpdotx,spdotx;
   complex tr;
   suNf_spin_matrix sma,smb, sm1,sm2;
-
+  suNf_spinor tmp_sp;
   lprintf("measure_mesons_core",50,"Measuring channels: ");
   for (i=0;i<NCHANNELS;++i){
     if (measure_channels[i]) lprintf("",50," %s",channel_names[i]);
@@ -178,6 +184,106 @@ static void measure_mesons_core(spinor_field* psi0, spinor_field* psi1, spinor_f
 		      corr[_g5_disc][zerocoord[0]+t+i*lt+offset] += tr.re;
 		    }
 		  }
+		  if(measure_channels[_g0_disc]){
+		    for (beta=0;beta<4;beta++){
+		      _spinor_g0_f(tmp_sp, *_FIELD_AT(&psi0[beta*nm+i],ix));
+		      _spinor_prod_re_f(tr.re,tmp_sp,*_FIELD_AT(&eta[beta],ix));
+		      corr[_g0_disc][zerocoord[0]+t+i*lt+offset] += tr.re;
+		    }
+		  }
+		  if(measure_channels[_g1_disc]){
+		    for (beta=0;beta<4;beta++){
+		      _spinor_g1_f(tmp_sp, *_FIELD_AT(&psi0[beta*nm+i],ix));
+		      _spinor_prod_re_f(tr.re,tmp_sp,*_FIELD_AT(&eta[beta],ix));
+		      corr[_g1_disc][zerocoord[0]+t+i*lt+offset] += tr.re;
+		    }
+		  }
+		  if(measure_channels[_g2_disc]){
+		    for (beta=0;beta<4;beta++){
+		      _spinor_g2_f(tmp_sp, *_FIELD_AT(&psi0[beta*nm+i],ix));
+		      _spinor_prod_re_f(tr.re,tmp_sp,*_FIELD_AT(&eta[beta],ix));
+		      corr[_g2_disc][zerocoord[0]+t+i*lt+offset] += tr.re;
+		    }
+		  }
+		  if(measure_channels[_g3_disc]){
+		    for (beta=0;beta<4;beta++){
+		      _spinor_g3_f(tmp_sp, *_FIELD_AT(&psi0[beta*nm+i],ix));
+		      _spinor_prod_re_f(tr.re,tmp_sp,*_FIELD_AT(&eta[beta],ix));
+		      corr[_g3_disc][zerocoord[0]+t+i*lt+offset] += tr.re;
+		    }
+		  }
+		  if(measure_channels[_g0g1_disc]){
+		    for (beta=0;beta<4;beta++){
+		      _spinor_g0g1_f(tmp_sp, *_FIELD_AT(&psi0[beta*nm+i],ix));
+		      _spinor_prod_re_f(tr.re,tmp_sp,*_FIELD_AT(&eta[beta],ix));
+		      corr[_g0g1_disc][zerocoord[0]+t+i*lt+offset] += tr.re;
+		    }
+		  }
+		  if(measure_channels[_g0g2_disc]){
+		    for (beta=0;beta<4;beta++){
+		      _spinor_g0g2_f(tmp_sp, *_FIELD_AT(&psi0[beta*nm+i],ix));
+		      _spinor_prod_re_f(tr.re,tmp_sp,*_FIELD_AT(&eta[beta],ix));
+		      corr[_g0g2_disc][zerocoord[0]+t+i*lt+offset] += tr.re;
+		    }
+		  }
+		  if(measure_channels[_g0g3_disc]){
+		    for (beta=0;beta<4;beta++){
+		      _spinor_g0g3_f(tmp_sp, *_FIELD_AT(&psi0[beta*nm+i],ix));
+		      _spinor_prod_re_f(tr.re,tmp_sp,*_FIELD_AT(&eta[beta],ix));
+		      corr[_g0g3_disc][zerocoord[0]+t+i*lt+offset] += tr.re;
+		    }
+		  }
+		  if(measure_channels[_g0g5_disc]){
+		    for (beta=0;beta<4;beta++){
+		      _spinor_g0g5_f(tmp_sp, *_FIELD_AT(&psi0[beta*nm+i],ix));
+		      _spinor_prod_re_f(tr.re,tmp_sp,*_FIELD_AT(&eta[beta],ix));
+		      corr[_g0g5_disc][zerocoord[0]+t+i*lt+offset] += tr.re;
+		    }
+		  }
+		  if(measure_channels[_g5g1_disc]){
+		    for (beta=0;beta<4;beta++){
+		      _spinor_g5g1_f(tmp_sp, *_FIELD_AT(&psi0[beta*nm+i],ix));
+		      _spinor_prod_re_f(tr.re,tmp_sp,*_FIELD_AT(&eta[beta],ix));
+		      corr[_g5g1_disc][zerocoord[0]+t+i*lt+offset] += tr.re;
+		    }
+		  }
+		  if(measure_channels[_g5g2_disc]){
+		    for (beta=0;beta<4;beta++){
+		      _spinor_g5g2_f(tmp_sp, *_FIELD_AT(&psi0[beta*nm+i],ix));
+		      _spinor_prod_re_f(tr.re,tmp_sp,*_FIELD_AT(&eta[beta],ix));
+		      corr[_g5g2_disc][zerocoord[0]+t+i*lt+offset] += tr.re;
+		    }
+		  }
+		  if(measure_channels[_g5g3_disc]){
+		    for (beta=0;beta<4;beta++){
+		      _spinor_g5g3_f(tmp_sp, *_FIELD_AT(&psi0[beta*nm+i],ix));
+		      _spinor_prod_re_f(tr.re,tmp_sp,*_FIELD_AT(&eta[beta],ix));
+		      corr[_g5g3_disc][zerocoord[0]+t+i*lt+offset] += tr.re;
+		    }
+		  }
+		  if(measure_channels[_g0g5g1_disc]){
+		    for (beta=0;beta<4;beta++){
+		      _spinor_g5g0g1_f(tmp_sp, *_FIELD_AT(&psi0[beta*nm+i],ix));
+		      _spinor_prod_re_f(tr.re,tmp_sp,*_FIELD_AT(&eta[beta],ix));
+		      corr[_g0g5g1_disc][zerocoord[0]+t+i*lt+offset] += tr.re;
+		    }
+		  }
+		  if(measure_channels[_g0g5g2_disc]){
+		    for (beta=0;beta<4;beta++){
+		      _spinor_g5g0g2_f(tmp_sp, *_FIELD_AT(&psi0[beta*nm+i],ix));
+		      _spinor_prod_re_f(tr.re,tmp_sp,*_FIELD_AT(&eta[beta],ix));
+		      corr[_g0g5g2_disc][zerocoord[0]+t+i*lt+offset] += tr.re;
+		    }
+		  }
+		  if(measure_channels[_g0g5g3_disc]){
+		    for (beta=0;beta<4;beta++){
+		      _spinor_g5g0g3_f(tmp_sp, *_FIELD_AT(&psi0[beta*nm+i],ix));
+		      _spinor_prod_re_f(tr.re,tmp_sp,*_FIELD_AT(&eta[beta],ix));
+		      corr[_g0g5g3_disc][zerocoord[0]+t+i*lt+offset] += tr.re;
+		    }
+		  }
+
+
 		} //END SPATIAL LOOP
 	  } //END TIME LOOP
 	} //END MASS LOOP
@@ -319,16 +425,30 @@ void measure_mesons(spinor_field* psi0, spinor_field* eta, int nm, int tau){
 }
 
 void measure_discon(spinor_field* psi0, spinor_field* eta, int nm, int tau){
-  /*int i;
-  int mtmp[NCHANNELS];
+  int i;
+  //int mtmp[NCHANNELS];
 
   for (i=0;i<NCHANNELS;++i){
-    mtmp[i] = measure_channels[i];
+    //mtmp[i] = measure_channels[i];
     measure_channels[i]=0;
-  }*/
+  }
   init_corrs(nm,1);
   measure_channels[_g5_disc]=1;
   measure_channels[_id_disc]=1;
+  measure_channels[_g0_disc]=1;
+  measure_channels[_g1_disc]=1;
+  measure_channels[_g2_disc]=1;
+  measure_channels[_g3_disc]=1;
+  measure_channels[_g0g1_disc]=1;
+  measure_channels[_g0g2_disc]=1;
+  measure_channels[_g0g3_disc]=1;
+  measure_channels[_g0g5_disc]=1;
+  measure_channels[_g5g1_disc]=1;
+  measure_channels[_g5g2_disc]=1;
+  measure_channels[_g5g3_disc]=1;
+  measure_channels[_g0g5g1_disc]=1;
+  measure_channels[_g0g5g2_disc]=1;
+  measure_channels[_g0g5g3_disc]=1;
   lprintf("measure_mesons",50,"measure default mesons");
   measure_mesons_core(psi0, psi0, eta, nm, tau, 1, 0,GLB_T);
   /*for (i=0;i<NCHANNELS;++i){
@@ -455,19 +575,11 @@ void print_discon_core(int channel,int lt,int conf, int nm, double* mass, char* 
 
 static void print_corr(int lt,int conf, int nm, double* mass, char* label, int n_mom){
   int i;
-  char str1[256]; sprintf(str1, "LCORR %s", label); //Modify label
   for(i = 0; i<NCHANNELS; ++i){
     if(measure_channels[i]){
-
-  	if( i == _id_disc || i == _g5_disc ){ 
-		print_corr_core(i,lt,conf,nm,mass,str1,n_mom); }
-	else{ print_corr_core(i,lt,conf,nm,mass,label,n_mom); }
-      
+	print_corr_core(i,lt,conf,nm,mass,label,n_mom); 
     }
   }
-  char str[256]; sprintf(str, "DCORR %s", label); //Modify label
-  if(measure_channels[_id_disc]){ print_discon_core(_id_disc,lt,conf,nm,mass,str,n_mom); }
-  if(measure_channels[_g5_disc]){ print_discon_core(_g5_disc,lt,conf,nm,mass,str,n_mom); }
 }
 
 void print_mesons(double norm, int conf, int nm, double* mass, char* label){

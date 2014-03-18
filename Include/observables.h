@@ -65,6 +65,7 @@ void z2semwall_qprop_free_new();
 void z2semwall_mesons_new(int conf, int nhits, int nm, double *m, double acc);
 
 void create_point_source(spinor_field *source,int tau,int color);
+void create_point_source_loc(spinor_field *source, int t, int x, int y, int z, int color);
 int create_diluted_source_equal_eo(spinor_field *source);
 void create_diluted_source_equal_atau_eo(spinor_field *source, int tau);
 int create_diluted_source_equal(spinor_field *source);
@@ -73,6 +74,7 @@ void create_noise_source_equal_eo(spinor_field *source);
 void create_gauge_fixed_wall_source(spinor_field *source, int tau, int color);
 void create_sequential_source(spinor_field *source, int tf, spinor_field* prop);
 void restrict_timeslice(spinor_field *source, int tf, spinor_field* prop);
+void create_diluted_volume_source(spinor_field *source, int parity_component, int mod);
 
 void init_propagator_eo(int nm, double *m, double acc);
 void eig_init(int nev, int nevt, int kmax, int maxiter, double lbnd, double omega1, double omega2);

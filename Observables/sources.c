@@ -59,6 +59,8 @@ static int random_tau(){
 	Sources: 
 		point_source: 			
 						source[spin](t,x) = \delta_{a color} \delta_{s, spin} \delta( (t,x) - (tau,0) )
+		point_source_loc: 			
+						source[spin](t,x) = \delta_{a color} \delta_{s, spin} \delta( (t,x) - (tau,0) )
 		diluted_source_equal_eo:		
 						\xi(x) = Z(2) x Z(2)  -  NF color vector at x
 						eta(t,x) = \delta(t - tau) \xi(x)
@@ -77,6 +79,8 @@ static int random_tau(){
 						source[spin](tf,ti,x) = \gamma_5 S(x,tf; 0,ti)
 		gauge_fixed_momentum_source:
 						source[spin](t,x) = \delta_{a color} \delta_{s spin} e^{ i p_\mu x_\mu }
+		diluted_volume_source:
+						source[spin](t,x) = \sum_{x%p == 0} \delta_{s spin} 1_color 
 \***************************************************************************/
 void create_point_source(spinor_field *source,int tau, int color) {
   int beta, ix;
@@ -93,6 +97,23 @@ void create_point_source(spinor_field *source,int tau, int color) {
    start_sf_sendrecv(source + beta);
    complete_sf_sendrecv(source + beta);}
 }
+
+void create_point_source_loc(spinor_field *source, int t, int x, int y, int z, int color) {
+  int beta, ix;
+  for (beta=0;beta<4;++beta){
+    spinor_field_zero_f(&source[beta]);
+  }
+  if(COORD[0]==t/T && COORD[1]==x/X && COORD[2]==y/Y && COORD[3]==z/Z) {
+    ix=ipt(t-zerocoord[0],x-zerocoord[1],y-zerocoord[2],z-zerocoord[3]);
+    for (beta=0;beta<4;++beta){
+      _FIELD_AT(&source[beta],ix)->c[beta].c[color].re = 1.;
+    }
+  }
+   for (beta=0;beta<4;++beta){
+   start_sf_sendrecv(source + beta);
+   complete_sf_sendrecv(source + beta);}
+}
+
 
 /* Creates four Z2xZ2 noise sources localised on time slice tau. The noise 
    vectors are equal in each source but placed at a different spin. Even sites only*/
@@ -308,4 +329,28 @@ void create_gauge_fixed_momentum_source(spinor_field *source, int pt, int px, in
   }
 }
 
+//create a eo source
+void create_diluted_volume_source(spinor_field *source, int parity_component, int mod) {
+  int c[4];
+  int beta, b;
+
+  for (beta=0;beta<4;++beta){
+    spinor_field_zero_f(&source[beta]);
+  }
+
+    for(c[0]=0; c[0]<T; c[0]++) for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
+	  if(((zerocoord[0]+c[0]+zerocoord[1]+c[1]+zerocoord[2]+c[2]+zerocoord[3]+c[3])%mod)==parity_component){
+		  for (beta=0;beta<4;++beta){
+		  for (b=0;b<NF;++b){
+		      _FIELD_AT(&source[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[b].re = 1.;
+		  }}
+	  }
+    }
+
+  for (beta=0;beta<4;++beta){
+     start_sf_sendrecv(source + beta);
+     complete_sf_sendrecv(source + beta);
+  }
+
+}
 
