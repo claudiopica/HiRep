@@ -24,11 +24,11 @@ MODS := amalloc field_alloc spinor_field_alloc
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Observables
-MODS := avr_plaquette trunc_hairpin g5QMR_trunc calc_prop measure_mesons sources
+MODS := avr_plaquette trunc_hairpin g5QMR_trunc calc_prop measure_mesons sources measure_ff
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Random
-MODS := gauss ranlxs ranlxd ranz2 random_fields random_suNg 
+MODS := gauss ranlxs ranlxd ranz2 random_fields random_suNg ran_utils
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Update

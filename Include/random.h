@@ -31,5 +31,6 @@ void random_u(suNg_field *gf);
 void unit_u(suNg_field *gf);
 
 void ranz2(double r[],int n);
+void generate_random_point(int *pr);
 
 #endif

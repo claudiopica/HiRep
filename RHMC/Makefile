@@ -26,7 +26,7 @@ MODS := avr_plaquette pta_qprop mesons polyakov z2semwall sf_action sf_pcac
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Random
-MODS := gauss random_suNg ranlxs ranlxd random_fields ranz2
+MODS := gauss random_suNg ranlxs ranlxd random_fields ran_utils
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Update
