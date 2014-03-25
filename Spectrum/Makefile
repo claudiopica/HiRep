@@ -1,7 +1,7 @@
 TOPDIR = ..
 MKDIR=$(TOPDIR)/Make
 
-EXES = mk_mesons random_cnfg random_spinor mk_mesons_with_z2semwall mk_mesons_with_z2semwall_new  measure_spectrum #measure_formfactor #mk_sfcoupling #trunc_mesons
+EXES = mk_mesons random_cnfg random_spinor mk_mesons_with_z2semwall mk_mesons_with_z2semwall_new  measure_spectrum measure_formfactor #mk_sfcoupling #trunc_mesons
 
 
 default: $(EXES)
@@ -28,7 +28,7 @@ MODS := avr_plaquette trunc_hairpin g5QMR_trunc calc_prop measure_mesons sources
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Random
-MODS := gauss ranlxs ranlxd ranz2 random_fields random_suNg ran_utils
+MODS := gauss ranlxs ranlxd random_fields random_suNg ran_utils
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Update

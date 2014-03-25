@@ -259,7 +259,10 @@ int main(int argc,char *argv[]) {
   if (PID!=0) { logger_disable(); }
   if (PID==0) { 
     sprintf(tmp,">%s",output_filename); logger_stdout(tmp);
-    sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
+    sprintf(tmp,"err_%d",PID); 
+    if(!freopen(tmp,"w",stderr)){
+      error(1,1,"mk_mesons.c","Cannot open something!\n");
+    }
   }
 
   lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS); 
