@@ -13,6 +13,7 @@ level = 1  seed = 38761
 mes:masses = 0
 mes:use_input_mass = 0;
 mes:precision = 1e-20
+mes:meas_mixed = 0
 mes:nhits_2pt = 3
 mes:nhits_disc = 16
 mes:momentum = 0

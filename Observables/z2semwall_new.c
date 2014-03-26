@@ -24,6 +24,8 @@
 #include "communications.h"
 #include "ranlux.h"
 #include "gamma_spinor.h"
+#include "meson_observables.h"
+
 
 
 
@@ -58,7 +60,7 @@
   #define ID_DISC_CHANNEL
   #define G5_DISC_CHANNEL
   #define NCHANNELS 19
-enum { _id=0, _g0, _g1, _g2, _g3, _g5, _g0g1, _g0g2, _g0g3, _g0g5, _g5g1, _g5g2, _g5g3, _g0g5g1, _g0g5g2, _g0g5g3, _g5_g0g5_re, _id_disc,_g5_disc };
+  enum {_g5_g0g5_re=NCHANNELS-3, _id_disc,_g5_disc };
 #endif
 
 

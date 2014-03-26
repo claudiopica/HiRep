@@ -43,7 +43,9 @@
 /* Mesons parameters */
 typedef struct _input_mesons {
   char mstring[1024];
+  int use_input_mass;
   double precision;
+  int meas_mixed;
   int nhits_2pt;
   int nhits_disc;
   int def_semwall;
@@ -59,18 +61,18 @@ typedef struct _input_mesons {
   int def_gfwall;
   int dt;
   int n_mom;
-  int use_input_mass;
   int dilution;
   /* for the reading function */
-  input_record_t read[20];
+  input_record_t read[21];
 } input_mesons;
 
 #define init_input_mesons(varname) \
 { \
   .read={\
     {"quark quenched masses", "mes:masses = %s", STRING_T, (varname).mstring}, \
-    {"use input mass", "mes:use_input_mass = %d",INT_T, &(varname).use_input_mass},	\
+    {"use input mass", "mes:use_input_mass = %d",INT_T, &(varname).use_input_mass},\
     {"inverter precision", "mes:precision = %lf", DOUBLE_T, &(varname).precision},\
+    {"measure mixed correlators", "mes:meas_mixed",INT_T,&(varname).meas_mixed},\
     {"number of noisy sources per cnfg for 2pt fn", "mes:nhits_2pt = %d", INT_T, &(varname).nhits_2pt}, \
     {"number of noisy sources per cnfg for disconnected", "mes:nhits_disc = %d", INT_T, &(varname).nhits_disc}, \
     {"enable default semwall", "mes:def_semwall = %d",INT_T, &(varname).def_semwall},	\
@@ -305,9 +307,10 @@ int main(int argc,char *argv[]) {
 #endif
 
   lprintf("MAIN",0,"Inverter precision = %e\n",mes_var.precision);
-  for(k=0;k<nm;k++)
-    lprintf("MAIN",0,"Mass[%d] = %f\n",k,m[k]);
-
+  lprintf("MAIN",0,"Mass[%d] = %f",0,m[0]);
+  for(k=1;k<nm;k++)
+    lprintf("MAIN",0,", Mass[%d] = %f",k,m[k]);
+  lprintf("MAIN",0,"\n",k,m[k]);
   lprintf("MAIN",0,"Number of noisy sources per cnfg = %d. Does not affect point sources\n",mes_var.nhits_2pt);
   if (mes_var.def_semwall){
     lprintf("MAIN",0,"Spin Explicit Method (SEM) wall sources\n");    
@@ -342,6 +345,7 @@ int main(int argc,char *argv[]) {
       lprintf("MAIN",0,"WARGING: wall sources measure only with zero momenta\n");
     }
   }
+  if (mes_var.n_mom==0){ mes_var.n_mom++;}
 
   list=NULL;
   if(strcmp(list_filename,"")!=0) {
@@ -349,6 +353,16 @@ int main(int argc,char *argv[]) {
 	"Failed to open list file\n");
   }
 
+  if (mes_var.meas_mixed){
+    init_meson_correlators(1);
+    lprintf("MAIN",0,"Measuring all 256 correlators %d\n");
+  }
+  else{
+    lprintf("MAIN",0,"Measuring Gamma Gamma correlators and PCAC-mass\n");
+    init_meson_correlators(0);
+  }
+
+  init_discon_correlators();
   i=0;
 
   while(1) {
@@ -361,7 +375,7 @@ int main(int argc,char *argv[]) {
 
     lprintf("MAIN",0,"Configuration from %s\n", cnfg_filename);
     read_gauge_field(cnfg_filename);
-    represent_gauge_field();
+    represent_gauge_field_measure();
 
     lprintf("TEST",0,"<p> %1.6f\n",avr_plaquette());
     full_plaquette();
@@ -409,7 +423,7 @@ int main(int argc,char *argv[]) {
   }
 
   if(list!=NULL) fclose(list);
-
+  free_meson_observables();
   free_BCs();
 
   free_gfield(u_gauge);

@@ -21,7 +21,7 @@
 #include "random.h"
 #include "communications.h"
 #include "ranlux.h"
-
+#include "meson_observables.h"
 
 /*#define POINT_TO_ALL*/
 
@@ -33,7 +33,7 @@
   #define G1_CHANNEL
   #define PCAC_CHANNEL
   #define NCHANNELS 3
-  enum { _g5=0, _g1, _g5_g0g5_re };
+// enum { _g5=0, _g1, _g5_g0g5_re };
 #else
   #define ID_CHANNEL
   #define G0_CHANNEL
@@ -52,9 +52,10 @@
   #define G0G5G3_CHANNEL
   #define PCAC_CHANNEL
   #define NCHANNELS 17
-  enum { _id=0, _g0, _g1, _g2, _g3, _g5, _g0g1, _g0g2, _g0g3, _g0g5, _g5g1, _g5g2, _g5g3, _g0g5g1, _g0g5g2, _g0g5g3, _g5_g0g5_re };
+//  enum { _id=0, _g0, _g1, _g2, _g3, _g5, _g0g1, _g0g2, _g0g3, _g0g5, _g5g1, _g5g2, _g5g3, _g0g5g1, _g0g5g2, _g0g5g3, _g5_g0g5_re };
 #endif
 
+static const int _g5_g0g5_re=NCHANNELS-1;
 
 
 /*static void create_diluted_source(spinor_field *source, int tau, int beta) {*/

@@ -16,6 +16,7 @@
 
 #include "suN.h"
 #include "inverters.h"
+#include "meson_observables.h"
 #include <stdio.h>
 
 #define SPIN_2D_INDEX(i,j) ( (i)*4 + (j) )
@@ -85,20 +86,19 @@ void calc_propagator_multisource(spinor_field *psi, spinor_field* eta, int ndilu
 void calc_deflated_propagator(spinor_field *psi, spinor_field* eta, int ndilute, int Nuse);
 void copy_evec( int n, spinor_field* psi1, double *eval );
 
-void measure_mesons(spinor_field *psi0, spinor_field *eta, int nm,int tau);
-void measure_discon(spinor_field *psi0, spinor_field *eta, int nm,int tau);
-void measure_discon_noise(spinor_field* psi0, spinor_field* eta, int nm, int tau);
-void measure_mesons_ext(spinor_field *psi0, spinor_field *eta, int nm,int tau,int begin);
-void measure_point_mesons_momenta(spinor_field* psi0, spinor_field* eta, int nm, int tau, int n_mom);
-void measure_point_mesons_momenta_ext(spinor_field* psi0, spinor_field* eta, int nm, int tau, int n_mom, int begin);
-void measure_formfactors(spinor_field* psi0, spinor_field* psi1, spinor_field* eta, int nm, int ti, int tf, int n_mom);
-void measure_formfactors_ext(spinor_field* psi0, spinor_field* psi1, spinor_field* eta, int nm, int ti, int tf, int n_mom, int begin);
-void print_mesons(double norm,int conf, int nm, double* mass, char* label);
-void print_mesons_ext(double norm,int conf, int nm, double* mass, char* label);
-void print_mesons_momenta(int conf, int nm, double* mass,int n_mom, char* label);
-void print_mesons_momenta_ext(int conf, int nm, double* mass,int n_mom, char* label);
-void print_formfactor(int conf, int nm, double* mass, int n_mom, char* label, int tf);
+void init_meson_correlators(int meas_offdiag);
+void init_discon_correlators();
+void free_meson_observables();
 
+void measure_mesons(meson_observable* mo,spinor_field *psi0, spinor_field *eta, int nm,int tau);
+void measure_mesons_ext(meson_observable* mo,spinor_field *psi0, spinor_field *eta, int nm,int tau,int begin);
+void measure_point_mesons_momenta(meson_observable* mo,spinor_field* psi0, spinor_field* eta, int nm, int tau, int n_mom);
+void measure_point_mesons_momenta_ext(meson_observable* mo,spinor_field* psi0, spinor_field* eta, int nm, int tau, int n_mom, int begin);
+void measure_formfactors(spinor_field* psi0, spinor_field* psi1, spinor_field* eta, int nm, int ti, int tf, int n_mom, int *pt);
+void measure_formfactors_ext(spinor_field* psi0, spinor_field* psi1, spinor_field* eta, int nm, int ti, int tf, int n_mom, int begin);
+void print_mesons(meson_observable* mo,double norm, int conf, int nm, double* mass, int lt, int n_mom, char* label);
+void print_formfactor(int conf, int nm, double* mass, int n_mom, char* label, int tf);
+void print_formfactor_ext(int conf, int nm, double* mass, int n_mom, char* label, int tf);
 
 void id_correlator(double *out, int t0, spinor_field *qp);
 void g0_correlator(double *out, int t0, spinor_field *qp);

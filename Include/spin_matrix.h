@@ -135,6 +135,21 @@ typedef struct
   _spinor_i_minus_f((s).c[3],(r).c[1])
 
 
+//s = gamma_0 gamma_5 . r 
+#define _spinmatrix_g0g5(s, r) \
+  _spinor_g0g5_f((s).c[0],(r).c[0]); \
+  _spinor_g0g5_f((s).c[1],(r).c[1]); \
+  _spinor_g0g5_f((s).c[2],(r).c[2]); \
+  _spinor_g0g5_f((s).c[3],(r).c[3])
+
+
+//s = gamma_0 . gamma_5 . r
+#define _g0g5_spinmatrix(s, r) \
+  _spinor_plus_f((s).c[0],(r).c[2]); \
+  _spinor_plus_f((s).c[1],(r).c[3]); \
+  _spinor_minus_f((s).c[2],(r).c[0]);\
+  _spinor_minus_f((s).c[3],(r).c[1]);
+
 //s = gamma_5 gamma_0 . r 
 #define _spinmatrix_g5g0(s, r) \
   _spinor_g5g0_f((s).c[0],(r).c[0]); \
