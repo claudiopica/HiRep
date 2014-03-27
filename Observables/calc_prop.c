@@ -319,7 +319,7 @@ if( spinor_field_sqnorm_f(psi) < 1e-28 ){
 }
 
 void calc_propagator_eo(spinor_field *psi, spinor_field *eta, int ndilute) {
-  int beta,i;
+  int beta;
   lprintf("CALC_PROPAGATOR_EO",20,"Calculating EO propagator with ndilute: %d\n",ndilute);
   for (beta=0;beta<ndilute;++beta){
     calc_propagator_eo_core(&psi[beta*QMR_par.n],&eta[beta],_g5QMR);
