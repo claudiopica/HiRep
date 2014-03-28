@@ -31,8 +31,11 @@
 
 meson_observable *meson_correlators  = NULL;
 meson_observable *discon_correlators = NULL;
+meson_observable *cvc_correlators = NULL;
 
 char* meson_channel_names[NGAMMA_IND]={"g5","id","g0","g1","g2","g3","g0g1","g0g2","g0g3","g0g5","g5g1","g5g2","g5g3","g0g5g1","g0g5g2","g0g5g3"};
+
+static int vector_gammas[4] = {_g0, _g1, _g2, _g3};
 
 static double determine_sign(gamma_ind ind){
   if (ind == _g5 || ind == _g0 || ind == _g1 || ind == _g3 || ind == _g0g1 || ind == _g0g3 || ind == _g0g5 || ind == _g5g1 || ind==_g5g3 || ind==_g0g5g2){
@@ -98,6 +101,16 @@ void init_discon_correlators(){
   }
 }
 
+void init_cvc_correlators(){
+  int i;
+  for (i=0;i<4;++i){
+    char name[100];
+    sprintf(name,"%s_CL",meson_channel_names[ vector_gammas[i] ]);
+    add_meson_observable(&cvc_correlators,vector_gammas[i],i,name,"TRIPLET", determine_sign( vector_gammas[i] ));
+  }
+}
+
+
 static void free_observables_core(  meson_observable* mo){
   meson_observable* motmp;
   while (mo!=NULL){
@@ -161,8 +174,22 @@ static void op_spinmatrix(suNf_spin_matrix* out, suNf_spin_matrix* in, gamma_ind
   }
 }
 
-#define corr_ind(px,py,pz,n_mom,tc,nm,cm) ((px)*(n_mom)*(n_mom)*(lt)*(nm)+(py)*(n_mom)*(lt)*(nm)+(pz)*(lt)*(nm)+ ((cm)*(lt)) +(tc))
 
+
+
+static void op_propagator(suNf_propagator* out, suNf_propagator* in, gamma_ind i){
+  switch (i){
+  case _g5: _g5_propagator( (*out),(*in) ); break;
+  case _id: *out=*in; break;
+  case _g0: _g0_propagator( (*out),(*in) ); break;
+  case _g1: _g1_propagator( (*out),(*in) ); break;
+  case _g2: _g2_propagator( (*out),(*in) ); break;
+  case _g3: _g3_propagator( (*out),(*in) ); break;
+  default: break;
+  }
+}
+
+#define corr_ind(px,py,pz,n_mom,tc,nm,cm) ((px)*(n_mom)*(n_mom)*(lt)*(nm)+(py)*(n_mom)*(lt)*(nm)+(pz)*(lt)*(nm)+ ((cm)*(lt)) +(tc))
 
 /* spinor_fields* are 4xnm arrays of spinor_field ordered([color][spinor])*/
 static void measure_mesons_core(spinor_field* psi0, spinor_field* psi1, spinor_field* eta, meson_observable* mo, int nm, int tau, int n_mom, int offset,int lt){
@@ -218,6 +245,88 @@ static void measure_mesons_core(spinor_field* psi0, spinor_field* psi1, spinor_f
 }
 
 
+static void measure_conserved_core(spinor_field* psi0, spinor_field* psi1, spinor_field* eta, meson_observable* mo, int nm, int tau, int n_mom, int offset,int lt){
+
+  int i,ix,t,x,y,z,beta,px,py,pz,tc,a,ixmu;
+  double pdotx,cpdotx,spdotx;
+  complex tr;
+  suNf_propagator sp0,sp1,Usp,spf,sptmp1,sptmp2,sptmp3,spleft,spdag;
+  suNf *u1;
+  meson_observable* motmp=mo;
+
+  lprintf("measure_conserved_core",50,"Measuring channels: ");
+  while (motmp!=NULL){
+    lprintf("",50," %s",motmp->channel_name);
+    motmp=motmp->next;
+  }
+  lprintf("",50,"\n");
+  for (px=0;px<n_mom;++px) for (py=0;py<n_mom;++py) for (pz=0;pz<n_mom;++pz){
+	for(i=0; i<nm; i++) {
+	  for (t=0; t<T; t++) {	 
+	    tc = (zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T+offset;
+	    for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) {
+		  ix=ipt(t,x,y,z);
+
+					
+		  pdotx = 2.0*PI*(((double) px)*(x+zerocoord[1])/GLB_X + ((double) py)*(y+zerocoord[2])/GLB_Y + ((double) pz)*(z+zerocoord[3])/GLB_Z);
+		  cpdotx=cos(pdotx);
+		  spdotx=sin(pdotx);
+		  for (a=0;a<NF;++a){
+		    for (beta=0;beta<4;beta++){ 
+		      _propagator_assign(sp0, *_FIELD_AT(&psi0[a*4*nm+beta*nm+i],ix),a,beta);
+		      _propagator_assign(sp1, *_FIELD_AT(&psi0[a*4*nm+beta*nm+i],ix),a,beta);
+		    }
+		  }
+                  _propagator_dagger(spdag,sp1);
+
+		  motmp=mo;
+		  while (motmp!=NULL){
+
+			  ixmu = iup(ix,motmp->ind2);
+			  for (a=0;a<NF;++a){
+			    for (beta=0;beta<4;beta++){ 
+			      _propagator_assign(spf, *_FIELD_AT(&psi0[a*4*nm+beta*nm+i],ixmu), a,beta); //S(x+mu, y)
+			    }
+			  }
+			  u1 = _4FIELD_AT(u_gauge_f,ix,motmp->ind2);
+
+			  // Tr [ g5 (1+g_mu) U^(x) S(x,0) g5 g_mu S^(x+mu, y) ]
+			  _suNf_inverse_prop_multiply(Usp,*u1,sp0); //U^(x) S(x,0) 
+			  sptmp1=Usp;
+			  op_propagator(&sptmp2,&sptmp1,motmp->ind1); //g_mu U^(x) S(x,0) 
+			  _propagator_add(sptmp1,sptmp1,sptmp2); //(1+g_mu) U^(x) S(x,0) 
+			  _g5_propagator(sptmp2,sptmp1); //g5 (1+g_mu) U^(x) S(x,0) 
+			  _propagator_dagger(sptmp1,spf); //S^(x+mu, 0)
+			  _g5_propagator(sptmp3,sptmp1); //g5 g_mu S^(x+mu, 0)
+			  op_propagator(&sptmp1,&sptmp3,motmp->ind1); //g_mu S^(x+mu, 0)
+			  _propagator_mul(spleft,sptmp2,sptmp1);	
+			    
+
+			  // Tr [ g5 (1+g_mu) U(x) S(x+mu,0) g5 g_mu S^(x, y) ]
+			  _suNf_prop_multiply(Usp,*u1,spf); //U(x) S(x+mu,0)
+			  sptmp1=Usp;
+			  op_propagator(&sptmp2,&sptmp1,motmp->ind1);//g_mu U(x) S(x,0) 
+			  _propagator_sub(sptmp1,sptmp1,sptmp2);//(1-g_mu) U(x) S(x,0) 
+			  _g5_propagator(sptmp2,sptmp1);//g5(1-g_mu) U(x) S(x,0) 
+			  _g5_propagator(sptmp1,spdag); //g5 S^(x, 0)
+			  op_propagator(&sptmp3,&sptmp1,motmp->ind1); //g_mu g5 S^(x, 0)
+			  _propagator_mul(sptmp1,sptmp2,sptmp3);
+
+			  _propagator_sub(sptmp2,spleft,sptmp1);
+			  _propagator_trace(tr,sptmp2);    
+
+			  motmp->corr_re[corr_ind(px,py,pz,n_mom,tc,nm,i)] += 0.5*motmp->sign*(tr.re*cpdotx+tr.im*spdotx);
+			  motmp->corr_im[corr_ind(px,py,pz,n_mom,tc,nm,i)] += 0.5*motmp->sign*(tr.im*cpdotx-tr.re*spdotx);
+			  motmp=motmp->next;
+
+		  } //END CORRELATOR LOOP
+		} //END SPATIAL LOOP
+	  } //END T LOOP
+	} //END MASS LOOP
+      } //END MOMENTUM LOOP
+  lprintf("measure_formfactor_core",50,"Measuring DONE! ");
+}		  
+
 static void init_corrs(int nm, int n_mom, meson_observable* mo){
   int i,n_mom_tot,size;
   meson_observable* motmp=mo;
@@ -259,6 +368,12 @@ void measure_mesons(meson_observable* mo,spinor_field* psi0, spinor_field* eta, 
   init_corrs(nm,1,mo);
   lprintf("measure_mesons",50,"measure default mesons");
   measure_mesons_core(psi0, psi0, eta, mo,nm, tau, 1, 0,GLB_T);
+}
+
+void measure_conserved_currents(meson_observable* mo,spinor_field* psi0, spinor_field* eta, int nm, int tau){
+  init_corrs(nm,1,mo);
+  lprintf("measure_mesons",50,"measure conserved vector currents");
+  measure_conserved_core(psi0, psi0, eta, mo,nm, tau, 1, 0,GLB_T);
 }
 
 void measure_mesons_ext(meson_observable* mo,spinor_field* psi0, spinor_field* eta, int nm, int tau,int begin){

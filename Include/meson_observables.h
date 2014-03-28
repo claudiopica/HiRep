@@ -26,7 +26,7 @@ typedef struct meson_observable_s meson_observable;
 
 extern meson_observable *meson_correlators;
 extern meson_observable *discon_correlators;
-
+extern meson_observable *cvc_correlators;
 
 
 #endif

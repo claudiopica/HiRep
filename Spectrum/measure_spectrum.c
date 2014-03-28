@@ -363,6 +363,7 @@ int main(int argc,char *argv[]) {
   }
 
   init_discon_correlators();
+  init_cvc_correlators();
   i=0;
 
   while(1) {

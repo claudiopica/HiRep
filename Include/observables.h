@@ -88,9 +88,11 @@ void copy_evec( int n, spinor_field* psi1, double *eval );
 
 void init_meson_correlators(int meas_offdiag);
 void init_discon_correlators();
+void init_vcvl_correlators();
 void free_meson_observables();
 
 void measure_mesons(meson_observable* mo,spinor_field *psi0, spinor_field *eta, int nm,int tau);
+void measure_conserved_currents(meson_observable* mo,spinor_field* psi0, spinor_field* eta, int nm, int tau);
 void measure_mesons_ext(meson_observable* mo,spinor_field *psi0, spinor_field *eta, int nm,int tau,int begin);
 void measure_point_mesons_momenta(meson_observable* mo,spinor_field* psi0, spinor_field* eta, int nm, int tau, int n_mom);
 void measure_point_mesons_momenta_ext(meson_observable* mo,spinor_field* psi0, spinor_field* eta, int nm, int tau, int n_mom, int begin);
