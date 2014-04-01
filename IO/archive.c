@@ -505,6 +505,8 @@ void read_ranlxd_state(char filename[])
     }
   }
 
+  bcast_int(&hproc,1);
+
 #ifdef WITH_MPI
   MPI_Comm_group(GLB_COMM,&wg);
   MPI_Comm_group(cart_comm,&cg);
