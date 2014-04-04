@@ -479,8 +479,8 @@ void measure_formfactor_fixed(int ti, int tf, int dt, int nm, double* m, int n_m
 
   init_propagator_eo(1, m, precision);//1 for number of masses 
   int pt[4];
-  //generate_random_point( pt );
-  for(k=0;k<4;k++) pt[k] = 0;
+  generate_random_point( pt );
+  //for(k=0;k<4;k++) pt[k] = 0;
   lprintf("MESON_MEASUREMENTS", 0, "Source at (%d,%d,%d,%d)\n", ti, pt[1], pt[2], pt[3] );
   for (k=0;k<NF;++k){
     //create_point_source(source,ti,k);
