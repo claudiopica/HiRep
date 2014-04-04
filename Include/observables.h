@@ -72,6 +72,8 @@ void create_diluted_source_equal_atau_eo(spinor_field *source, int tau);
 int create_diluted_source_equal(spinor_field *source);
 void create_diluted_source_equal_atau(spinor_field *source, int tau);
 void create_noise_source_equal_eo(spinor_field *source);
+void create_diluted_source_equal_atau_col(spinor_field *source, int tau,int col);
+void create_noise_source_equal_col_dil(spinor_field *source,int col);
 void create_gauge_fixed_wall_source(spinor_field *source, int tau, int color);
 void create_sequential_source(spinor_field *source, int tf, spinor_field* prop);
 void restrict_timeslice(spinor_field *source, int tf, spinor_field* prop);

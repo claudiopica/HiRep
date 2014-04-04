@@ -1,0 +1,24 @@
+GLB_T = 8
+GLB_X = 4
+GLB_Y = 4
+GLB_Z = 4
+NP_T = 1
+NP_X = 1
+NP_Y = 1
+NP_Z = 1
+
+
+N_REP = 1
+
+rlx_start=1
+rlx_state=1
+//level = 1  seed = 1
+level = 1  seed = 12345
+
+disc:masses = -0.6
+disc:precision = 1e-20
+disc:nhits =2
+disc:source_type =4
+
+masses = 2.0
+
