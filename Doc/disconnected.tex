@@ -1,0 +1,165 @@
+\documentclass[a4paper]{article}
+
+\usepackage{bm}
+\usepackage{amsmath}
+\usepackage{latexsym}
+
+
+\newcommand{\tr}{\mathrm{tr}}
+\newcommand{\gR}{\mathbf{R}}
+\newcommand{\gr}{\mathbf{r}}
+\newcommand{\point}{\; .}
+\newcommand{\comma}{\; ,}
+
+\newcommand{\be}{\begin{equation}}
+\newcommand{\een}{\nonumber\end{equation}}
+\newcommand{\ee}{\end{equation}}
+\newcommand{\bea}{\begin{eqnarray}}
+\newcommand{\eean}{\nonumber\end{eqnarray}}
+\newcommand{\eea}{\end{eqnarray}}
+\newcommand{\nonu}{\nonumber\\}
+\newcommand{\sla}{\displaystyle{\not}}
+\newcommand{\beq}{\begin{eqnarray}}
+\newcommand{\eeq}{\end{eqnarray}}
+
+
+
+\def\eq#1{Eq.~(\ref{#1})}
+\def\eqs#1{Eqs.~(\ref{#1})}
+\def\fig#1{Fig.~\ref{#1}}
+\def\figs#1{Figs.~\ref{#1}}
+\def\tab#1{Table~\ref{#1}}
+\def\tabs#1{Tables~\ref{#1}}
+\def\hf{\frac{1}{2}}
+\def\ord#1{{\cal O}\left(#1\right)}
+\def\la{\langle}
+\def\ra{\rangle}
+\def\und#1{\noindent\underline{#1}}
+\def\lra{\longrightarrow}
+\def\tr#1{{~\mathbf{tr}\left[#1\right]}}
+\def\trD#1{{\mathbf{Tr}_D\left\{#1\right\}}}
+
+                %% fields
+
+                \def\psibar{\overline{\psi}}
+                \def\chibar{\overline{\chi}}
+                \def\rhobar{\bar{\rho}}
+                \def\zetabar{\bar{\zeta}}
+
+
+%\newcommand{\ind#1}{\textbf{\index#1}}
+\def\red#1{{\textcolor{red}{#1}}}
+\title{Estimation of disconnected contributions in HiRep}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+
+
+\section{Conventions}
+We choose the  hermitian basis of gamma matrices given in Tab.~\ref{tab:Gamma_basis}. Each element of the basis is refered by an index in $[0,15]$ shown in the table.
+
+\begin{table}[ht]
+\begin{center}
+ \begin{tabular}[h]{cccccccc}
+\hline
+0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 \\
+$\gamma_5$ & $\gamma_1$  & $\gamma_2$  & $\gamma_3$ & $-i\gamma_0 \gamma_5$  & $-i\gamma_0 \gamma_1$  & $-i\gamma_0 \gamma_2$ &$-i\gamma_0 \gamma_3$   \\
+\hline\hline
+ 8 & 9 & 10 & 11 & 12 & 13 & 14 & 15 \\
+ $1$  & $-i\gamma_5 \gamma_1$  & $-i\gamma_5 \gamma_2$  & $-i\gamma_5 \gamma_3$  &  $\gamma_0$  & $-i\gamma_5\gamma_0\gamma_1 $  & $-i\gamma_5 \gamma_0\gamma_2$  & $-i\gamma_5 \gamma_0 \gamma_3$ \\
+\hline
+ \end{tabular}
+\label{tab:Gamma_basis}
+\caption{Basis used in HiRep}
+\end{center}
+\end{table}
+
+
+\section{Singlet two-points functions}
+
+Consider a gauge theory on a group $G$  coupled to $N_f$ fermions in
+an arbitrary representation $R$.
+Let us denote :
+\beq
+\label{eq:corr_scalar}
+C(t,x_0) = \frac{1}{N_f} \sum_{\vec{x}}  \la \bar{q}  \Gamma  q (x) \bar{q} \Gamma q (x_0) \ra
+\eeq
+
+where $q,\bar{q}$ are the ($N_f$) quark fields and $\Gamma$ denotes an
+arbitrary dirac structure. The $1/N_f$ factor is only there for convenience.
+The Wick contractions read :
+\beq
+C(t,x_0) =  \sum_{\vec{x}} \la  -\tr{\Gamma S(x,x_0) \Gamma S(x_0,x)
+}+ N_f  \tr{\Gamma S(x,x)} \tr{\Gamma  S(x_0,x_0)} \ra
+\eeq
+
+\section{stochastic evaluation of disconnected loops}
+\subsection{General idea}
+
+The simple one consist to evaluate stochastically the disconnected contribution without any variance reduction techniques. 
+Considering a general volume source $\xi$, we define $\phi$ using the Dirac operator $D$:
+\be
+\phi = D^{-1} \xi
+\ee
+For a given element $X$ of the basis define in the previous section, we then have
+ \begin{equation}
+ \sum [\xi^* X \phi ]_R =
+ \sum X M^{-1} + {\rm noise}
+ \label{eq:B1}
+ \end{equation}
+ where the symbol $[\dots]_R$ refers to the average over $R$  samples of the stochastic source.
+
+It should be observed that in evaluating the disconnected
+contributions to the neutral  meson correlators each one of the two
+quark loops arising from Wick contractions 
+ must be averaged over completely {\em independent} samples of
+stochastic sources for the purpose of avoiding unwanted biases. 
+
+
+
+\subsection{Implemented source types}
+
+We use XX noise sources. 
+The user can switch between different source type, which have the
+following correspondance :
+
+\begin{itemize}
+\item{ type $0$ : Pure volume source}
+\item{ type $1$ : Gauge fixed wall source }
+\item{ type $2$ : Volume sources with  time and spin dilution}
+\item{ type $3$ : Volume sources with  time, spin and  color dilution}
+\item{ type $4$ : Volume source with  time, spin, color and even-odd
+    dilution} 
+\item{type $6$ : Volume source with spin, color and even-odd dilution}
+\end{itemize}
+
+
+\section{Output}
+
+The code does not perform any average on the stochastic noise or on the
+dilution indices.  This allow to keep as much information as possible
+and to vary the number of stochastic sources at the analysis level.
+
+
+The indices are always :
+
+\begin{verbatim}
+#T #iGamma #iSrc #[color and/or e/o]  #Re #Im
+\end{verbatim}
+
+where iGamma refers to the index of the Gamma matrix defined in \tab{tab:Gamma_basis}
+\section{Debugging options}
+
+
+If the code is executed with the following additional args :
+\begin{verbatim}
+ -p <propagator name> -s <source_name>
+\end{verbatim}
+The code will read the two files and perform the contractions
+accordingly, computing $\xi^\dagger\Gamma \psi$.
+
+\end{document}
+
+
