@@ -5,6 +5,10 @@ EXES = hmc
 
 default: $(EXES)
 
+MODDIR := GaugeFix
+MODS := gaugefix
+MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
+
 MODDIR := Geometry
 MODS := process_init geometry_init geometry_mpi_eo test_geometry_mpi communications communications_flt
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
@@ -22,12 +26,17 @@ MODS := amalloc field_alloc spinor_field_alloc
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Observables
-MODS := avr_plaquette polyakov z2semwall mesons # sf_action sf_pcac
+MODS := avr_plaquette polyakov z2semwall mesons measure_mesons calc_prop sources measure_ff # sf_action sf_pcac
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Random
 MODS := gauss random_suNg ranlxs ranlxd random_fields ran_utils
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
+
+MODDIR := Spectrum
+MODS := meson_measurements
+MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
+
 
 MODDIR := Update
 MODS := Dphi Dphi_flt staples update_hb random_su2 representation random_momenta random_spinor_field update_hmc local_action force0 copy_gfield force_hmc O2MN_multistep cabmar

@@ -1,4 +1,4 @@
-/***************************************************************************\
+/****************************************************************************
 * Copyright (c) 2008, Claudio Pica                                          *   
 * All rights reserved.                                                      * 
 \***************************************************************************/
@@ -211,6 +211,8 @@ int main(int argc,char *argv[]) {
 
   
   if(strcmp(mes_var.make,"true")==0) {
+    init_meson_correlators(0);
+    lprintf("MAIN",0,"Measuring Gamma Gamma correlators and PCAC-mass\n");
     lprintf("OBSERVABLES",0,"Inverter precision for mesons = %e\n",mes_var.precision);
     lprintf("OBSERVABLES",0,"Number of noisy sources for mesons per cnfg = %d\n",mes_var.nhits);
   }
@@ -275,7 +277,8 @@ int main(int argc,char *argv[]) {
       
       /* Mesons */
       if(strcmp(mes_var.make,"true")==0) {
-        z2semwall_mesons(i,mes_var.nhits,1,&(flow.hmc_v->hmc_p.mass),mes_var.precision);
+	measure_spectrum_semwall(1,&(flow.hmc_v->hmc_p.mass),mes_var.nhits,i,mes_var.precision);
+	//        z2semwall_mesons(i,mes_var.nhits,1,&(flow.hmc_v->hmc_p.mass),mes_var.precision);
       }
       
       /* Polyakov loops */
