@@ -328,81 +328,80 @@ int main(int argc,char *argv[]) {
       lprintf("DEBUG",0,"Configuration from %s\n", cnfg_filename);
 
       spinor_field* prop =  alloc_spinor_field_f(1,&glattice);
-      spinor_field* source =  alloc_spinor_field_f(1,&glattice);
-      read_gauge_field(cnfg_filename);
-      represent_gauge_field();
+			spinor_field* source =  alloc_spinor_field_f(1,&glattice);
+			read_gauge_field(cnfg_filename);
+			represent_gauge_field_measure();
+			init_propagator_eo(nm, m, disc_var.precision);
+			read_spinor_field(source_filename,source);
+			lprintf("DEBUG",0,"start invert");
+			start_sf_sendrecv(source);
+			complete_sf_sendrecv(source);
 
-      init_propagator_eo(nm, m, disc_var.precision);
-      read_spinor_field(source_filename,source);
-      lprintf("DEBUG",0,"start invert");
-      start_sf_sendrecv(source);
-      complete_sf_sendrecv(source);
+			calc_propagator(prop,source,1);// No dilution 
+			start_sf_sendrecv(prop);
+			complete_sf_sendrecv(prop);
 
-      calc_propagator(prop,source,1);// No dilution 
-      start_sf_sendrecv(prop);
-      complete_sf_sendrecv(prop);
+			lprintf("DEBUG",0,"start contract\n");
+			measure_bilinear_loops_spinorfield(prop,source,0,nm);
 
-      lprintf("DEBUG",0,"start contract\n");
-      measure_bilinear_loops_spinorfield(prop,source,0,nm);
-  
-    }	
-  }
-  else {
-    list=NULL;
-    if(strcmp(list_filename,"")!=0) {
-      error((list=fopen(list_filename,"r"))==NULL,1,"main [disc.c]" ,
-	    "Failed to open list file\n");
-    }
-
-
-    i=0;
-    while(1) {
-
-      if(list!=NULL)
-	if(fscanf(list,"%s",cnfg_filename)==0 || feof(list)) break;
-
-      i++;
-
-      lprintf("MAIN",0,"Configuration from %s\n", cnfg_filename);
-      /* NESSUN CHECK SULLA CONSISTENZA CON I PARAMETRI DEFINITI !!! */
-      read_gauge_field(cnfg_filename);
-      represent_gauge_field();
-
-      lprintf("TEST",0,"<p> %1.6f\n",avr_plaquette());
-      full_plaquette();
-
-      lprintf("CORR",0,"Number of noise vector : nhits = %i \n", disc_var.nhits);
-      
-      measure_loops(nm, m, disc_var.nhits,i,  disc_var.precision,disc_var.source_type); 
-
-      if(list==NULL) break;
-    }
-
-    if(list!=NULL) fclose(list);
-
-  }
+		}	
+	}
+	else {
+					list=NULL;
+					if(strcmp(list_filename,"")!=0) {
+									error((list=fopen(list_filename,"r"))==NULL,1,"main [disc.c]" ,
+																	"Failed to open list file\n");
+					}
 
 
+					i=0;
+					while(1) {
 
-  finalize_process();
+									if(list!=NULL)
+													if(fscanf(list,"%s",cnfg_filename)==0 || feof(list)) break;
+
+									i++;
+
+									lprintf("MAIN",0,"Configuration from %s\n", cnfg_filename);
+									/* NESSUN CHECK SULLA CONSISTENZA CON I PARAMETRI DEFINITI !!! */
+									read_gauge_field(cnfg_filename);
+									represent_gauge_field();
+
+									lprintf("TEST",0,"<p> %1.6f\n",avr_plaquette());
+									full_plaquette();
+
+									lprintf("CORR",0,"Number of noise vector : nhits = %i \n", disc_var.nhits);
+
+									measure_loops(nm, m, disc_var.nhits,i,  disc_var.precision,disc_var.source_type); 
+
+									if(list==NULL) break;
+					}
+
+					if(list!=NULL) fclose(list);
+
+	}
 
 
-  free_BCs();
 
-  free_gfield(u_gauge);
+	finalize_process();
+
+
+	free_BCs();
+
+	free_gfield(u_gauge);
 #ifdef ALLOCATE_REPR_GAUGE_FIELD
-  free_gfield_f(u_gauge_f);
+	free_gfield_f(u_gauge_f);
 #endif
 
-  /* close communications */
-  finalize_process();
+	/* close communications */
+	finalize_process();
 
-  gettimeofday(&end,0);
-  timeval_subtract(&etime,&end,&start);
-  lprintf("TIMING",0,"Inversions and contractions for configuration  [%s] done [%ld sec %ld usec]\n",cnfg_filename,etime.tv_sec,etime.tv_usec);
-
-
+	gettimeofday(&end,0);
+	timeval_subtract(&etime,&end,&start);
+	lprintf("TIMING",0,"Inversions and contractions for configuration  [%s] done [%ld sec %ld usec]\n",cnfg_filename,etime.tv_sec,etime.tv_usec);
 
 
-  return 0;
+
+
+	return 0;
 }
