@@ -12,6 +12,7 @@
 #include "update.h"
 #include "memory.h"
 #include "utils.h"
+#include "communications.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -222,17 +223,23 @@ int init_mc(rhmc_flow *rf, char *ifile) {
   /* init gauge field */
   switch(start_t) {
     case 0:
-      #if NG==2
-      read_gauge_field_su2(add_dirname(rf->conf_dir,rf->g_start));
-      #else
       read_gauge_field(add_dirname(rf->conf_dir,rf->g_start));
-      #endif
       break;
     case 1:
       unit_u(u_gauge);
+#ifndef ALLOCATE_REPR_GAUGE_FIELD
+      complete_gf_sendrecv(u_gauge); /*Apply boundary conditions already here for fundamental fermions*/
+      u_gauge_f=(suNf_field *)((void*)u_gauge);
+      apply_BCs_on_represented_gauge_field(); 
+#endif     
       break;
     case 2:
       random_u(u_gauge);
+#ifndef ALLOCATE_REPR_GAUGE_FIELD
+      complete_gf_sendrecv(u_gauge); /*Apply boundary conditions already here for fundamental fermions*/
+      u_gauge_f=(suNf_field *)((void*)u_gauge);
+      apply_BCs_on_represented_gauge_field(); 
+#endif     
       break;
   }
   apply_BCs_on_fundamental_gauge_field();

@@ -376,7 +376,7 @@ int main(int argc,char *argv[]) {
 
     lprintf("MAIN",0,"Configuration from %s\n", cnfg_filename);
     read_gauge_field(cnfg_filename);
-    represent_gauge_field_measure();
+    represent_gauge_field();
 
     lprintf("TEST",0,"<p> %1.6f\n",avr_plaquette());
     full_plaquette();

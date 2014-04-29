@@ -187,8 +187,9 @@ int main(int argc,char *argv[])
   logger_set_input(&logger_var);
   if (PID!=0) { logger_disable(); }   /* disable logger for MPI processes != 0 */
   else {
+    FILE* no_warning;    (void) no_warning;
     sprintf(sbuf,">>%s",output_filename);  logger_stdout(sbuf);
-    freopen(error_filename,"w",stderr);
+    no_warning= freopen(error_filename,"w",stderr);
   }
 
   lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS); 

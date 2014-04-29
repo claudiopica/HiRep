@@ -12,6 +12,7 @@
 #include "update.h"
 #include "memory.h"
 #include "utils.h"
+#include "communications.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -221,26 +222,38 @@ int init_mc(hmc_flow *rf, char *ifile) {
 
   /* init gauge field */
   switch(start_t) {
-    case 0:
-      read_gauge_field(add_dirname(rf->conf_dir,rf->g_start));
-      break;
-    case 1:
-      unit_u(u_gauge);
-      break;
-    case 2:
-      random_u(u_gauge);
-      break;
+  case 0:
+    read_gauge_field(add_dirname(rf->conf_dir,rf->g_start));
+    break;
+  case 1:
+    unit_u(u_gauge);
+#ifndef ALLOCATE_REPR_GAUGE_FIELD
+    complete_gf_sendrecv(u_gauge); /*Apply boundary conditions already here for fundamental fermions*/
+    u_gauge_f=(suNf_field *)((void*)u_gauge);
+    apply_BCs_on_represented_gauge_field(); 
+#endif
+    break;
+  case 2:
+    random_u(u_gauge);
+#ifndef ALLOCATE_REPR_GAUGE_FIELD
+    complete_gf_sendrecv(u_gauge); /*Apply boundary conditions already here for fundamental fermions*/
+    u_gauge_f=(suNf_field *)((void*)u_gauge);
+    apply_BCs_on_represented_gauge_field(); 
+#endif
+    break;
   }
-  apply_BCs_on_fundamental_gauge_field();
+  
+  //DOES THE NEXT LINE WORK??? If the simulations is continued from an old run are  the boundary conditions applied twice??
+  apply_BCs_on_fundamental_gauge_field(); 
   represent_gauge_field();
   
   /* init HMC */
   init_hmc(&hmc_var.hmc_p);
-
+    
   return 0;
-
+    
 }
-
+    
 /* save the gauge config with the specified id */
 int save_conf(hmc_flow *rf, int id) {
   char buf[256];

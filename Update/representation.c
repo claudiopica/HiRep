@@ -379,67 +379,10 @@ void represent_gauge_field() {
   if(first_time) {
     first_time=0;
     u_gauge_f=(suNf_field *)((void*)u_gauge);
-    apply_BCs_on_represented_gauge_field();
+    //    apply_BCs_on_represented_gauge_field(); //Already applied when configuration read or initialized 
   }
 #endif
-
   assign_ud2u_f();
 }
 
 
-/*
-  When represented gauge fields are not allocated
-  do not represent them as the saved configuraions should also take
-  this into account 
-*/
-
-void represent_gauge_field_measure() {
-#ifdef ALLOCATE_REPR_GAUGE_FIELD
-  int ix, ip;
-  int mu;
-  suNf *Ru;
-  suNg *u;
-
-  /* loop on local lattice first */
-  for(ip=0;ip<glattice.local_master_pieces;ip++)
-    for(ix=glattice.master_start[ip];ix<=glattice.master_end[ip];ix++)
-      for (mu=0;mu<4;mu++) {
-        u=pu_gauge(ix,mu);
-        Ru=pu_gauge_f(ix,mu);
-        #ifdef UNROLL_GROUP_REPRESENT
-          _group_represent(*Ru,*u);
-        #else
-          _group_represent2(Ru,u); 
-        #endif
-      }
-
-  /* wait gauge field transfer */
-  complete_gf_sendrecv(u_gauge);
-
-  /* loop on the rest of master sites */
-  for(ip=glattice.local_master_pieces;ip<glattice.total_gauge_master_pieces;ip++)
-    for(ix=glattice.master_start[ip];ix<=glattice.master_end[ip];ix++)
-      for (mu=0;mu<4;mu++) {
-        u=pu_gauge(ix,mu);
-        Ru=pu_gauge_f(ix,mu);
-        #ifdef UNROLL_GROUP_REPRESENT
-          _group_represent(*Ru,*u);
-        #else
-          _group_represent2(Ru,u); 
-        #endif
-      }
-
-  apply_BCs_on_represented_gauge_field();
-#else
-  static int first_time=1;
-  /* wait gauge field transfer */
-  complete_gf_sendrecv(u_gauge);
-
-  if(first_time) {
-    first_time=0;
-    u_gauge_f=(suNf_field *)((void*)u_gauge);
-  }
-#endif
-
-  assign_ud2u_f();
-}

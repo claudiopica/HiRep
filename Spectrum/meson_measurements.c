@@ -272,7 +272,7 @@ void measure_spectrum_gfwall(int nm, double* m, int conf_num, double precision){
   double p2 = calc_plaq(u_gauge);
   lprintf("TEST",0,"fixed_gauge plaq %1.6f\n",p2);
   full_plaquette();
-  represent_gauge_field_measure();
+  represent_gauge_field();
 
   init_propagator_eo(nm, m, precision);
   for (k=0;k<NF;++k){
@@ -283,7 +283,7 @@ void measure_spectrum_gfwall(int nm, double* m, int conf_num, double precision){
   print_mesons(meson_correlators,GLB_VOL3,conf_num,nm,m,GLB_T,1,"DEFAULT_GFWALL");
 
   suNg_field_copy(u_gauge,u_gauge_old);
-  represent_gauge_field_measure();
+  represent_gauge_field();
 
   free_propagator_eo(); 
   free_spinor_field_f(source);
@@ -312,7 +312,7 @@ void measure_spectrum_gfwall_fixedbc(int dt, int nm, double* m, int conf_num, do
   double p2 = calc_plaq(u_gauge);
   lprintf("TEST",0,"fixed_gauge plaq %1.6f\n",p2);
     full_plaquette();
-  represent_gauge_field_measure();
+  represent_gauge_field();
 
   fix_T_bc(tau-dt);//Apply fixed boundaryconditions by zeroing links at time slice tau to direction 0.
 
@@ -325,7 +325,7 @@ void measure_spectrum_gfwall_fixedbc(int dt, int nm, double* m, int conf_num, do
   print_mesons(meson_correlators,GLB_VOL3,conf_num,nm,m,GLB_T,1,"DIRICHLET_GFWALL");
 
   suNg_field_copy(u_gauge,u_gauge_old);
-  represent_gauge_field_measure();
+  represent_gauge_field();
 
   free_propagator_eo(); 
   free_spinor_field_f(source);
@@ -375,7 +375,7 @@ void measure_spectrum_discon_gfwall(int nm, double* m, int conf_num, double prec
   double p2 = calc_plaq(u_gauge);
   lprintf("TEST",0,"fixed_gauge plaq %1.6f\n",p2);
     full_plaquette();
-  represent_gauge_field_measure();
+  represent_gauge_field();
   init_propagator_eo(nm, m, precision);
 
   for (tau=0;tau<GLB_T;++tau){
@@ -389,7 +389,7 @@ void measure_spectrum_discon_gfwall(int nm, double* m, int conf_num, double prec
   print_mesons(discon_correlators,GLB_T,conf_num,nm,m,GLB_T,1,"DISCON_GFWALL"); 
 
   suNg_field_copy(u_gauge,u_gauge_old);
-  represent_gauge_field_measure();
+  represent_gauge_field();
 
   free_propagator_eo(); 
   free_spinor_field_f(source);

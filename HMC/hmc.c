@@ -28,7 +28,7 @@
 #include "communications.h"
 #include "observables.h"
 #include "utils.h"
-
+#include "spectrum.h"
 #include "cinfo.c"
 
 
@@ -165,8 +165,11 @@ int main(int argc,char *argv[]) {
   logger_set_input(&logger_var);
   if (PID!=0) { logger_disable(); }   /* disable logger for MPI processes != 0 */
   else {
+    FILE* stderrp;
     sprintf(sbuf,">>%s",output_filename);  logger_stdout(sbuf);
-    freopen(error_filename,"w",stderr);
+    stderrp=freopen(error_filename,"w",stderr);
+    error(stderrp==NULL,1,"main [hmc.c]",
+	  "Cannot redirect the stderr");
   }
   
   lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS);
