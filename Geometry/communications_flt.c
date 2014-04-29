@@ -68,7 +68,7 @@ static void sync_gauge_field_flt(suNg_field_flt *gf) {
 
 void complete_gf_sendrecv_flt(suNg_field_flt *gf) {
 #ifdef WITH_MPI
-  int mpiret;
+  int mpiret; (void)mpiret; // Remove warning of variable set but not used
   int nreq=2*gf->type->nbuffers_gauge;
 
   if(nreq>0) {
@@ -112,7 +112,7 @@ void complete_gf_sendrecv_flt(suNg_field_flt *gf) {
 
 void start_gf_sendrecv_flt(suNg_field_flt *gf) {
 #ifdef WITH_MPI
-  int i, mpiret;
+  int i, mpiret; (void)mpiret; // Remove warning of variable set but not used
   geometry_descriptor *gd=gf->type;
 
   /* check communication status */
@@ -176,7 +176,7 @@ void start_gf_sendrecv_flt(suNg_field_flt *gf) {
 
 void complete_sf_sendrecv_flt(spinor_field_flt *sf) {
 #ifdef WITH_MPI
-  int mpiret;
+  int mpiret; (void)mpiret; // Remove warning of variable set but not used
   int nreq=2*sf->type->nbuffers_spinor;
 
 
@@ -224,7 +224,7 @@ if(nreq>0) {
 
 void start_sf_sendrecv_flt(spinor_field_flt *sf) {
 #ifdef WITH_MPI
-  int i, mpiret, nreq;
+  int i, mpiret, nreq; (void)mpiret; // Remove warning of variable set but not used
   geometry_descriptor *gd=sf->type;
 
 

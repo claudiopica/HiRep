@@ -25,7 +25,7 @@ int gf_control=0,sf_control=0;
 
 void global_sum(double *d, int n) {
 #ifdef WITH_MPI
-  int mpiret;
+  int mpiret;(void)mpiret; // Remove warning of variable set but not used
   double pres[n];
 
 #ifdef MPI_TIMING
@@ -65,7 +65,7 @@ void global_sum(double *d, int n) {
 
 void global_sum_int(int *d, int n) {
 #ifdef WITH_MPI
-  int mpiret;
+  int mpiret; (void)mpiret; // Remove warning of variable set but not used
   int pres[n];
 
 #ifdef MPI_TIMING
@@ -105,7 +105,7 @@ void global_sum_int(int *d, int n) {
 
 void global_max(double *d, int n) {
 #ifdef WITH_MPI
-  int mpiret;
+  int mpiret;(void)mpiret; // Remove warning of variable set but not used
   double pres[n];
 
 #ifdef MPI_TIMING
@@ -144,7 +144,7 @@ void global_max(double *d, int n) {
 
 void bcast(double *d, int n) {
 #ifdef WITH_MPI
-  int mpiret;
+  int mpiret; (void)mpiret; // Remove warning of variable set but not used
 
 #ifdef MPI_TIMING
   struct timeval start, end, etime;
@@ -178,7 +178,7 @@ void bcast(double *d, int n) {
 
 void bcast_int(int *i, int n) {
 #ifdef WITH_MPI
-  int mpiret;
+  int mpiret; (void)mpiret; // Remove warning of variable set but not used
 
 #ifdef MPI_TIMING
   struct timeval start, end, etime;
@@ -267,7 +267,7 @@ static void sync_gauge_transf(suNg_field *gf) {
 
 void complete_gf_sendrecv(suNg_field *gf) {
 #ifdef WITH_MPI
-  int mpiret;
+  int mpiret; (void)mpiret; // Remove warning of variable set but not used
   int nreq=2*gf->type->nbuffers_gauge;
 
   if(nreq>0) {
@@ -311,7 +311,7 @@ void complete_gf_sendrecv(suNg_field *gf) {
 
 void start_gf_sendrecv(suNg_field *gf) {
 #ifdef WITH_MPI
-  int i, mpiret;
+  int i, mpiret;(void)mpiret; // Remove warning of variable set but not used
   geometry_descriptor *gd=gf->type;
 
   /* check communication status */
@@ -374,7 +374,7 @@ void start_gf_sendrecv(suNg_field *gf) {
 
 void complete_sf_sendrecv(spinor_field *sf) {
 #ifdef WITH_MPI
-  int mpiret;
+  int mpiret; (void)mpiret; // Remove warning of variable set but not used
   int nreq=2*sf->type->nbuffers_spinor;
 
   if(nreq>0) {
@@ -418,7 +418,7 @@ void complete_sf_sendrecv(spinor_field *sf) {
 
 void start_sf_sendrecv(spinor_field *sf) {
 #ifdef WITH_MPI
-  int i, mpiret;
+  int i, mpiret; (void)mpiret; // Remove warning of variable set but not used
   geometry_descriptor *gd=sf->type;
 
 
@@ -482,7 +482,7 @@ void start_sf_sendrecv(spinor_field *sf) {
 
 void complete_gt_sendrecv(suNg_field *gf) {
 #ifdef WITH_MPI
-  int mpiret;
+  int mpiret; (void)mpiret; // Remove warning of variable set but not used
   int nreq=2*gf->type->nbuffers_gauge;
 
   if(nreq>0) {
@@ -516,7 +516,8 @@ void complete_gt_sendrecv(suNg_field *gf) {
 
 void start_gt_sendrecv(suNg_field *gf) {
 #ifdef WITH_MPI
-  int i, mpiret;
+  int i, mpiret; 
+  (void)mpiret; // Remove warning of variable set but not used
   geometry_descriptor *gd=gf->type;
 
   /* check communication status */

@@ -121,7 +121,7 @@ int setup_replicas() {
     
     /* chdir to replica dir */
     sprintf(sbuf,"Rep_%d",RID);
-    chdir(sbuf);
+    mpiret = chdir(sbuf);
   }
   
 #endif //ifdef WITH_MPI
