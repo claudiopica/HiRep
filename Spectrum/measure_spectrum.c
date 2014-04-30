@@ -50,6 +50,7 @@ typedef struct _input_mesons {
   int nhits_disc;
   int def_semwall;
   int def_point;
+	int def_baryon;
   int ext_semwall;
   int ext_point;
   int fixed_semwall;
@@ -63,7 +64,7 @@ typedef struct _input_mesons {
   int n_mom;
   int dilution;
   /* for the reading function */
-  input_record_t read[21];
+  input_record_t read[22];
 } input_mesons;
 
 #define init_input_mesons(varname) \
@@ -89,6 +90,7 @@ typedef struct _input_mesons {
     {"volume source dilution", "mes:dilution = %d",INT_T, &(varname).dilution},	\
     {"Distance of t_initial from Dirichlet boundary", "mes:dirichlet_dt = %d", INT_T, &(varname).dt},\
     {"maximum component of momentum", "mes:momentum = %d", INT_T, &(varname).n_mom}, \
+    {"enable baryon", "mes:def_baryon = %d",INT_T, &(varname).def_baryon},		\
     {NULL, NULL, INT_T, NULL}				\
    }							\
 }
@@ -318,6 +320,9 @@ int main(int argc,char *argv[]) {
   if (mes_var.def_point){
     lprintf("MAIN",0,"Point sources\n");    
   }
+ 	if (mes_var.def_baryon){
+    lprintf("MAIN",0,"Baryon masses\n");    
+  }
   if (mes_var.def_gfwall){
     lprintf("MAIN",0,"Gauge Fixed Wall Source\n");    
   }
@@ -389,6 +394,11 @@ int main(int argc,char *argv[]) {
     if (mes_var.def_point){
       measure_spectrum_pt(tau,nm,m,mes_var.n_mom,mes_var.nhits_2pt,i,mes_var.precision);
     }
+	  if (mes_var.def_baryon){
+		  measure_baryons(m,i,mes_var.precision);
+	  }
+
+
     if (mes_var.def_gfwall){
       measure_spectrum_gfwall(nm,m,i,mes_var.precision);
     }

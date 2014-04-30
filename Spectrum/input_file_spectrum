@@ -19,6 +19,7 @@ mes:nhits_disc = 4
 mes:momentum = 0
 mes:def_semwall = 0
 mes:def_point = 0
+mes:def_baryon = 0
 mes:def_gfwall = 0
 mes:ext_semwall = 0
 mes:ext_point = 0

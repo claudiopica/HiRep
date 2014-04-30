@@ -66,6 +66,7 @@ void z2semwall_qprop_free_new();
 void z2semwall_mesons_new(int conf, int nhits, int nm, double *m, double acc);
 
 void create_point_source(spinor_field *source,int tau,int color);
+void create_full_point_source(spinor_field *source, int tau);
 void create_point_source_loc(spinor_field *source, int t, int x, int y, int z, int color);
 int create_diluted_source_equal_eo(spinor_field *source);
 void create_diluted_source_equal_atau_eo(spinor_field *source, int tau);
@@ -103,6 +104,8 @@ void measure_formfactors_ext(spinor_field* psi0, spinor_field* psi1, spinor_fiel
 void print_mesons(meson_observable* mo,double norm, int conf, int nm, double* mass, int lt, int n_mom, char* label);
 void print_formfactor(int conf, int nm, double* mass, int n_mom, char* label, int tf);
 void print_formfactor_ext(int conf, int nm, double* mass, int n_mom, char* label, int tf);
+
+void contract_baryons(spinor_field *psi0,int tau);
 
 void id_correlator(double *out, int t0, spinor_field *qp);
 void g0_correlator(double *out, int t0, spinor_field *qp);

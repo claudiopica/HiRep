@@ -24,7 +24,7 @@ MODS := amalloc field_alloc spinor_field_alloc
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Observables
-MODS := avr_plaquette trunc_hairpin g5QMR_trunc calc_prop measure_mesons sources measure_ff
+MODS := avr_plaquette trunc_hairpin g5QMR_trunc calc_prop measure_mesons measure_baryons sources measure_ff
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Random
@@ -60,7 +60,7 @@ MODS := gaugefix
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Spectrum
-MODS := meson_measurements
+MODS := meson_measurements baryon_measurements
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 COMMON_OBJS = $(MOD_OBJS)

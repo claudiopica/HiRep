@@ -314,6 +314,19 @@ do{						\
   for (a=0;a<NF;++a){ _spinmatrix_g5g0(p.c[a],q.c[a]); }  \
 } while(0)
 
+#define _g5g0g2_propagator(p,q)			\
+do{						\
+  int a; \
+  for (a=0;a<NF;++a){ _g5g0g2_spinmatrix(p.c[a],q.c[a]); }  \
+} while(0)
+
+
+#define _propagator_g5g0g2(p,q)			\
+do{						\
+  int a; \
+  for (a=0;a<NF;++a){ _spinmatrix_g5g0g2(p.c[a],q.c[a]); }  \
+} while(0)
+
 
 
 #endif
