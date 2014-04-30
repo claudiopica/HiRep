@@ -330,7 +330,7 @@ int main(int argc,char *argv[]) {
       spinor_field* prop =  alloc_spinor_field_f(1,&glattice);
 			spinor_field* source =  alloc_spinor_field_f(1,&glattice);
 			read_gauge_field(cnfg_filename);
-			represent_gauge_field_measure();
+			represent_gauge_field();
 			init_propagator_eo(nm, m, disc_var.precision);
 			read_spinor_field(source_filename,source);
 			lprintf("DEBUG",0,"start invert");
