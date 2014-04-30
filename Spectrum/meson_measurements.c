@@ -342,6 +342,7 @@ void measure_spectrum_discon_semwall(int nm, double* m, int nhits,int conf_num, 
   spinor_field* source = alloc_spinor_field_f(4,&glattice);
   spinor_field* prop =  alloc_spinor_field_f(4*nm,&glattice);
   int k,beta;
+  char label[100];
   init_propagator_eo(nm, m, precision);
   for (k=0;k<nhits;++k){
       create_noise_source_equal_eo(source);
@@ -349,8 +350,10 @@ void measure_spectrum_discon_semwall(int nm, double* m, int nhits,int conf_num, 
       calc_propagator(prop,source,4);//4 for spin dilution
       for(beta=0;beta<4;beta++) source[beta].type = &glattice;
       measure_mesons(discon_correlators,prop,source,nm,0);
+      sprintf(label,"src %d DISCON_SEMWALL",k);
+      print_mesons(discon_correlators,GLB_VOL3/2.,conf_num,nm,m,GLB_T,1,label);
   }
-  print_mesons(discon_correlators,nhits*GLB_VOL3/2.,conf_num,nm,m,GLB_T,1,"DISCON_SEMWALL");
+  //print_mesons(discon_correlators,nhits*GLB_VOL3/2.,conf_num,nm,m,GLB_T,1,"DISCON_SEMWALL");
   free_propagator_eo(); 
   free_spinor_field_f(source);
   free_spinor_field_f(prop);
