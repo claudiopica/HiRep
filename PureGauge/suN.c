@@ -13,26 +13,52 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
 #include <string.h>
 #include <math.h>
 #include "io.h"
-#include "random.h"
-#include "error.h"
+#include "ranlux.h"
 #include "geometry.h"
-#include "memory.h"
-#include "statistics.h"
 #include "update.h"
 #include "global.h"
-#include "logger.h"
 #include "observables.h"
-#include "representation.h"
+#include "dirac.h"
+#include "logger.h"
+#include "memory.h"
+#include "communications.h"
+#include "observables.h"
+#include "utils.h"
 #include "suN_utils.h"
 
+
+
 #include "cinfo.c"
+
+
+
+/* Polyakov-loop parameters */
+typedef struct _input_polyakov {
+  char make[256];
+
+  /* for the reading function */
+  input_record_t read[2];
+
+} input_polyakov;
+
+#define init_input_polyakov(varname)					\
+  {									\
+    .read={								\
+      {"make polyakov loops", "poly:make = %s", STRING_T, (varname).make}, \
+      {NULL, NULL, INT_T, NULL}						\
+    }									\
+  }
+
+input_polyakov poly_var = init_input_polyakov(poly_var);
 
 pg_flow flow=init_pg_flow(flow);
 char input_filename[256] = "input_file";
 char output_filename[256] = "puregauge.out";
+char error_filename[256] = "err_0";
 char ranxld_filename[256] = "";
 
 void read_cmdline(int argc, char* argv[]) {
@@ -58,52 +84,60 @@ void read_cmdline(int argc, char* argv[]) {
 
 int main(int argc,char *argv[])
 {
-  char tmp[256];
+  char sbuf[256];
   int i,n;
+
+  read_cmdline(argc,argv);
 
   /* setup process id and communications */
   setup_process(&argc,&argv);
 
-  read_cmdline(argc,argv);
+  /* read global variables file */
+  read_input(glb_var.read,input_filename);
+
+  setup_replicas();
 
   /* logger setup */
-  if (PID!=0) { logger_disable(); }
-  if (PID==0) { sprintf(tmp,">%s",output_filename); logger_stdout(tmp); }
-  logger_setlevel(0,40);
-  sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
+  read_input(logger_var.read,input_filename);
+  logger_set_input(&logger_var);
+  if (PID!=0) { logger_disable(); }   /* disable logger for MPI processes != 0 */
+  else {
+    sprintf(sbuf,">>%s",output_filename);  logger_stdout(sbuf);
+    freopen(error_filename,"w",stderr);
+  }
 
   lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS); 
-  lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
-
-  /* read input file */
-  read_input(glb_var.read,input_filename);
-  FILE *fp=NULL;
-  if(strlen(ranxld_filename)==0 || (fp=fopen(ranxld_filename,"rb"))==NULL) {
-    lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed+PID);
-    rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
-  } else {
-    read_ranlxd_state(ranxld_filename);
-  }
-  if(fp!=NULL) fclose(fp);
-
-  /* setup communication geometry */
-  if (geometry_init() == 1) {
-    finalize_process();
-    return 0;
-  }
-
-  lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
-  lprintf("MAIN",1,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
-  lprintf("MAIN",0,"global size is %dx%dx%dx%d\n",GLB_T,GLB_X,GLB_Y,GLB_Z);
-  lprintf("MAIN",0,"proc grid is %dx%dx%dx%d\n",NP_T,NP_X,NP_Y,NP_Z);
+  lprintf("MAIN",0,"[RepID: %d][world_size: %d]\n[MPI_ID: %d][MPI_size: %d]\n\n",RID,WORLD_SIZE,MPI_PID,MPI_WORLD_SIZE);
 
   /* setup lattice geometry */
+  if (geometry_init() == 1) { finalize_process(); return 0; }
   geometry_mpi_eo();
   /* test_geometry_mpi_eo(); */
+  
+  /* setup random numbers */
+  read_input(rlx_var.read,input_filename);
+  //slower(glb_var.rlxd_start); //convert start variable to lowercase
+  if(strcmp(rlx_var.rlxd_start,"continue")==0 && rlx_var.rlxd_state[0]!='\0') {
+    /*load saved state*/
+    lprintf("MAIN",0,"Loading rlxd state from file [%s]\n",rlx_var.rlxd_state);
+    read_ranlxd_state(rlx_var.rlxd_state);
+  } else {
+    lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
+    rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
+  }
+  
+  lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
+  lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
+  
+
+  /* read input for measures */
+  read_input(poly_var.read,input_filename);
 
   /* Init Monte Carlo */
   init_mc(&flow, input_filename);
   lprintf("MAIN",0,"Initial plaquette: %1.8e\n",avr_plaquette());
+
+
 
 
   /* Termalizzazione */
@@ -119,23 +153,49 @@ int main(int argc,char *argv[])
 
   /* Misure */
   for(i=flow.start;i<flow.end;++i) {
+    struct timeval start, end, etime; /* //for trajectory timing */
+    lprintf("BLOCK",0," Start %d\n",i);
     lprintf("MAIN",0,"Trajectory #%d...\n",i);
+    
+    gettimeofday(&start,0);
 
     for (n=0;n<flow.pg_v->nit;n++) /* nit updates */
       update(flow.pg_v->beta,flow.pg_v->nhb,flow.pg_v->nor);
 
+    gettimeofday(&end,0);
+    timeval_subtract(&etime,&end,&start);
+    lprintf("MAIN",0,"Trajectory #%d: generated in [%ld sec %ld usec]\n",i,etime.tv_sec,etime.tv_usec);
+
     if((i%flow.save_freq)==0) {
       save_conf(&flow, i);
+      if(rlx_var.rlxd_state[0]!='\0') {
+          lprintf("MAIN",0,"Saving rlxd state to file %s\n",rlx_var.rlxd_state);
+          write_ranlxd_state(rlx_var.rlxd_state);
+      }
     }
 
     if((i%flow.meas_freq)==0) {
+      gettimeofday(&start,0);
+      
+      /* plaquette */
       lprintf("MAIN",0,"Plaquette: %1.8e\n",avr_plaquette());
-      /* do something */
+
+      /* Polyakov loops */
+      if(strcmp(poly_var.make,"true")==0) {
+        polyakov();
+      }
+              
+      gettimeofday(&end,0);
+      timeval_subtract(&etime,&end,&start);
+      lprintf("MAIN",0,"Trajectory #%d: observables measured in [%ld sec %ld usec]\n",i,etime.tv_sec,etime.tv_usec);
     }
+
+    lprintf("BLOCK",0," End %d\n",i);
   }
 
   if(strlen(ranxld_filename)!=0)
     write_ranlxd_state(ranxld_filename);
+
 
   /* finalize Monte Carlo */
   end_mc();

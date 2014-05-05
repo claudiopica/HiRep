@@ -11,6 +11,7 @@
 #include "representation.h"
 #include "update.h"
 #include "memory.h"
+#include "utils.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -157,7 +158,17 @@ int init_mc(pg_flow *gf, char *ifile) {
   start_t=parse_gstart(gf);
   /* set last conf id */
   parse_lastconf(gf);
+  /* initialize boundary conditions */
 
+  BCs_pars_t BCs_pars = {
+    .fermion_twisting_theta = {0.,0.,0.,0.},
+    .gauge_boundary_improvement_cs = 1.,
+    .gauge_boundary_improvement_ct = 1.,
+    .chiSF_boundary_improvement_ds = 1.,
+    .SF_BCs = 0
+  };
+  init_BCs(&BCs_pars);
+  
   /* init gauge field */
   switch(start_t) {
     case 0:
@@ -172,7 +183,7 @@ int init_mc(pg_flow *gf, char *ifile) {
       break;
   }
   represent_gauge_field();
-  
+  apply_BCs_on_fundamental_gauge_field();
 
   /* init PG */
   lprintf("MAIN",0,"beta = %2.4f\n",pg_var.beta);

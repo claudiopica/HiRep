@@ -1,14 +1,21 @@
 // Global variables
 GLB_T = 8
-GLB_X = 2
-GLB_Y = 2
-GLB_Z = 2
+GLB_X = 8
+GLB_Y = 8
+GLB_Z = 8
 NP_T = 2
-NP_X = 1
-NP_Y = 1
+NP_X = 2
+NP_Y = 2
 NP_Z = 1
 
+N_REP = 1
+
 level = 1  seed = 12345
+
+//Logger levels (default = -1)
+log:default = -1
+log:inverter = -1
+log:forcestat = 0
 
 // Pure gauge variables
 beta  =   5.6
@@ -25,6 +32,10 @@ conf dir = cnfg
 gauge start = ranDoM
 //gauge start = Unit
 //gauge start = run1_8x2x2x2nc2rADJnf2b2.000000m1.310000n10
-//ranlxd start =
+//rlx_state =
+//rlx_start =
 last conf = 15
+
+//Polyakov
+poly:make = false
 

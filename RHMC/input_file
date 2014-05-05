@@ -1,8 +1,8 @@
 // Global variables 
-GLB_T = 4
-GLB_X = 4
-GLB_Y = 4
-GLB_Z = 4
+GLB_T = 24
+GLB_X = 24
+GLB_Y = 24
+GLB_Z = 24
 NP_T = 1
 NP_X = 1
 NP_Y = 1
@@ -24,7 +24,7 @@ theta_Y = 0.
 theta_Z = 0.
 
 // RHMC variables
-beta = 2.25
+beta = 6.338
 mass = -1
 nf = 1
 n_pf = 4
@@ -32,7 +32,7 @@ MT_prec = 1.e-14
 MD_prec = 1.e-6
 HB_prec = 1.e-14
 force_prec = 1.e-14
-tlen = 1
+tlen = 0
 nsteps = 10
 gsteps = 20
 
@@ -45,12 +45,12 @@ SF_prec = 1.e-20
 
 // Run control variables
 run name = run1
-save freq = 9999
+save freq = 1
 meas freq = 1
 conf dir = .
-gauge start = random
+gauge start = unit
 //ranlxd start =
-last conf = 10
+last conf = 1
 
 //Mesons
 mes:make = false

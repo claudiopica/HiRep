@@ -19,7 +19,7 @@
 #define YDIR 2
 #define ZDIR 3
 
-
+#define REPORTLVL 200000
 
 #define local_index(nt,nx,ny,nz)  (((nt)+2*T_BORDER+T)%(2*T_BORDER+T)+	\
 				   (T+2*T_BORDER)*(((nx)+2*X_BORDER+X)%(2*X_BORDER+X))+ \
@@ -333,10 +333,10 @@ static void geometry_mpi_init()
   }
 
   for(i=0;i<4;i++)
-    lprintf("GEOMETRY" ,300,"dirmask[%c] =  %d \tinvmask[%d] =  %c\n",dc[i], dir_mask[0][i],i,dc[inv_mask[0][i]]);
+    lprintf("GEOMETRY" ,REPORTLVL,"dirmask[%c] =  %d \tinvmask[%d] =  %c\n",dc[i], dir_mask[0][i],i,dc[inv_mask[0][i]]);
 
   for(i=0;i<4;i++)
-    lprintf("GEOMETRY" ,300,"dirmask[%c] =  %d \tinvmask[%d] =  %c\n",dc[i], dir_mask[1][i],i,dc[inv_mask[1][i]]);
+    lprintf("GEOMETRY" ,REPORTLVL,"dirmask[%c] =  %d \tinvmask[%d] =  %c\n",dc[i], dir_mask[1][i],i,dc[inv_mask[1][i]]);
 
 
 
@@ -373,7 +373,7 @@ static void set_inner(int eotype){
   int bl_start[4];
   int bl_width[4];
   int incr[4];
-  lprintf("INNER",200,"START\n");
+  lprintf("INNER",REPORTLVL,"START\n");
   set_block(0,bl_start,incr,bl_width,
 	    2*T_BORDER,T-2*T_BORDER,
 	    2*X_BORDER,X-2*X_BORDER,
@@ -398,7 +398,7 @@ static void set_inner(int eotype){
     }
   } 
   index_zone++;
-  lprintf("INNER",200,"END info: start%d end %d \n",border[index_border].index_start,border[index_border].index_end);
+  lprintf("INNER",REPORTLVL,"END info: start%d end %d \n",border[index_border].index_start,border[index_border].index_end);
 }
 
 
@@ -407,10 +407,10 @@ static void walk_on_lattice(int id_mask,int eotype,int level,int id_zone, int* b
   int x0,x1,x2,x3;
   int x[4];
   int match_length,match_point,steps=0,last_point;
-  lprintf("GEOMETRY",300,"\n\n\nwalk_on_lattice The START (%d,%d,%d,%d) \n",bl_start[dir_mask[id_mask][0]],bl_start[dir_mask[id_mask][1]],bl_start[dir_mask[id_mask][2]],bl_start[dir_mask[id_mask][3]]);
-  lprintf("GEOMETRY",300,"walk_on_lattice The WIDTH (%d,%d,%d,%d) \n",bl_width[dir_mask[id_mask][0]],bl_width[dir_mask[id_mask][1]],bl_width[dir_mask[id_mask][2]],bl_width[dir_mask[id_mask][3]]);
-  lprintf("GEOMETRY",300,"walk_on_lattice The incr (%d,%d,%d,%d) \n",incr[dir_mask[id_mask][0]],incr[dir_mask[id_mask][1]],incr[dir_mask[id_mask][2]],incr[dir_mask[id_mask][3]]);
-  lprintf("GEOMETRY",300,"walk_on_lattice The EO (%d) \n",eotype);
+  lprintf("GEOMETRY",REPORTLVL,"\n\n\nwalk_on_lattice The START (%d,%d,%d,%d) \n",bl_start[dir_mask[id_mask][0]],bl_start[dir_mask[id_mask][1]],bl_start[dir_mask[id_mask][2]],bl_start[dir_mask[id_mask][3]]);
+  lprintf("GEOMETRY",REPORTLVL,"walk_on_lattice The WIDTH (%d,%d,%d,%d) \n",bl_width[dir_mask[id_mask][0]],bl_width[dir_mask[id_mask][1]],bl_width[dir_mask[id_mask][2]],bl_width[dir_mask[id_mask][3]]);
+  lprintf("GEOMETRY",REPORTLVL,"walk_on_lattice The incr (%d,%d,%d,%d) \n",incr[dir_mask[id_mask][0]],incr[dir_mask[id_mask][1]],incr[dir_mask[id_mask][2]],incr[dir_mask[id_mask][3]]);
+  lprintf("GEOMETRY",REPORTLVL,"walk_on_lattice The EO (%d) \n",eotype);
   if(init_border(id_mask,eotype,level,id_zone,bl_start,incr,bl_width,&match_length)){
     for (x3=bl_start[3];block_cond(bl_start[3],bl_start[3]+bl_width[3],x3);x3+=incr[3]) 
       for (x2=bl_start[2];block_cond(bl_start[2],bl_start[2]+bl_width[2],x2);x2+=incr[2]) 
@@ -421,7 +421,7 @@ static void walk_on_lattice(int id_mask,int eotype,int level,int id_zone, int* b
 	    x[inv_mask[id_mask][2]]=x2;
 	    x[inv_mask[id_mask][3]]=x3;
 	    if(eotype==no_eo || eotype==(x0+x1+x2+x3+T_BORDER+X_BORDER+Y_BORDER+Z_BORDER+PSIGN)%2){
-	      lprintf("GEOMETRY",300,"walk_on_lattice T[%d] X[%d] Y[%d] Z[%d] \n",x[0],x[1],x[2],x[3]); 
+	      lprintf("GEOMETRY",REPORTLVL,"walk_on_lattice T[%d] X[%d] Y[%d] Z[%d] \n",x[0],x[1],x[2],x[3]); 
 	      if(match_length>steps) match_point=true;
 	      else match_point=false;
 	      steps++;
@@ -498,11 +498,11 @@ static int init_border(int id_mask, int eotype,int level,int id_zone,  int* bl_s
   if( bl_size == 0 && inner[0] != index_border &&  inner[1] != index_border ) retval = false;
   
   if(!retval){
-    lprintf("GEOMETRY",300,"init_border Border already evaluated or empty \n");
+    lprintf("GEOMETRY",REPORTLVL,"init_border Border already evaluated or empty \n");
     return(retval);
   }
 
-  lprintf("GEOMETRY",300,"init_border Setting a new border \n");
+  lprintf("GEOMETRY",REPORTLVL,"init_border Setting a new border \n");
   x[inv_mask[id_mask][0]]=bl_start[0];
   x[inv_mask[id_mask][1]]=bl_start[1];
   x[inv_mask[id_mask][2]]=bl_start[2];
@@ -540,7 +540,7 @@ static int init_border(int id_mask, int eotype,int level,int id_zone,  int* bl_s
       index_start=i;
       found_start=true;
       length_match=(index_position-i>bl_size)?bl_size:index_position-i;
-      lprintf("GEOMETRY",300,"init_border Found a candidate start:%d for a total of %d steps\n",i,length_match);
+      lprintf("GEOMETRY",REPORTLVL,"init_border Found a candidate start:%d for a total of %d steps\n",i,length_match);
       match_interval=true;
       match_step=true;
       check_index=index_start;
@@ -564,21 +564,21 @@ static int init_border(int id_mask, int eotype,int level,int id_zone,  int* bl_s
 	index_start_out=index_start;
       }
       else 
-	lprintf("GEOMETRY",300,"init_border Not a good match\n");
+	lprintf("GEOMETRY",REPORTLVL,"init_border Not a good match\n");
     }
   }
   
   
   
   if(!found_start ||length_match_out==0 ){
-    lprintf("GEOMETRY",300,"init_border Unable to find a match\n");
+    lprintf("GEOMETRY",REPORTLVL,"init_border Unable to find a match\n");
     index_start=index_position;
     *match_length=0;
   } else {
     *match_length=length_match_out;
     length_match=length_match_out;
     index_start=index_start_out;
-    lprintf("GEOMETRY",300,"init_border Good match -> start %d of %d steps \n",index_start,length_match);
+    lprintf("GEOMETRY",REPORTLVL,"init_border Good match -> start %d of %d steps \n",index_start,length_match);
   }
 
 
@@ -638,7 +638,7 @@ static int init_border(int id_mask, int eotype,int level,int id_zone,  int* bl_s
       
   border[index_border].id_proc = id;
   
-  lprintf("GEOMETRY",300,"id related %d\n",id); 
+  lprintf("GEOMETRY",REPORTLVL,"id related %d\n",id); 
 
   return retval;
 }
@@ -649,7 +649,7 @@ static void set_border_pointer(int actualn,int match_point)
     map_overlexi2id[actualn]=index_position;
     map_id2overlexi[index_position]=actualn;
     memory[index_position]=index_position;
-    lprintf("GEOMETRY",300,"set_border_pointer  memory[%d] =  %d \n",memory[index_position],index_position); 
+    lprintf("GEOMETRY",REPORTLVL,"set_border_pointer  memory[%d] =  %d \n",memory[index_position],index_position); 
     index_position++;
   }
   else    
@@ -693,15 +693,15 @@ static void set_border_l3(int eotype){
 
   /* tmp_ind=index_position; */
   
-  lprintf("GEOMETRY",300,"set_border_l3 After setting only the inner piece we have %d boders\n",index_border);
+  lprintf("GEOMETRY",REPORTLVL,"set_border_l3 After setting only the inner piece we have %d boders\n",index_border);
   /*(Level=3)*/
   if(pdir>0){
  
     reset_tmp;
-    lprintf("GEOMETRY",300,"set_border_l3 first dir %c          second dir %c\n",dc[inv_mask[0][fdir]],dc[inv_mask[0][sdir]]);
+    lprintf("GEOMETRY",REPORTLVL,"set_border_l3 first dir %c          second dir %c\n",dc[inv_mask[0][fdir]],dc[inv_mask[0][sdir]]);
 
     tmp_width[inv_mask[0][fdir]]=ind[inv_mask[0][fdir]][0];
-    lprintf("GEOMETRY",300,"set_border_l3 cambio dir %d\n",inv_mask[0][fdir]);
+    lprintf("GEOMETRY",REPORTLVL,"set_border_l3 cambio dir %d\n",inv_mask[0][fdir]);
 
     set_block(0,bl_start,incr,bl_width, 
     	      tmp_start[0],tmp_width[0],
@@ -709,8 +709,8 @@ static void set_border_l3(int eotype){
     	      tmp_start[2],tmp_width[2],
     	      tmp_start[3],tmp_width[3]);
 
-    lprintf("GEOMETRY",300,"set_border_l3 start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[0][0]],bl_start[dir_mask[0][1]],bl_start[dir_mask[0][2]],bl_start[dir_mask[0][3]]);
-    lprintf("GEOMETRY",300,"set_border_l3 width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[0][0]],bl_width[dir_mask[0][1]],bl_width[dir_mask[0][2]],bl_width[dir_mask[0][3]]);
+    lprintf("GEOMETRY",REPORTLVL,"set_border_l3 start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[0][0]],bl_start[dir_mask[0][1]],bl_start[dir_mask[0][2]],bl_start[dir_mask[0][3]]);
+    lprintf("GEOMETRY",REPORTLVL,"set_border_l3 width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[0][0]],bl_width[dir_mask[0][1]],bl_width[dir_mask[0][2]],bl_width[dir_mask[0][3]]);
 
     walk_on_lattice(0,eotype,3,index_zone,bl_start,incr,bl_width);
     
@@ -727,8 +727,8 @@ static void set_border_l3(int eotype){
 		tmp_start[2],tmp_width[2],
 		tmp_start[3],tmp_width[3]);
       
-      lprintf("GEOMETRY",300,"set_border_l3 start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[0][0]],bl_start[dir_mask[0][1]],bl_start[dir_mask[0][2]],bl_start[dir_mask[0][3]]);
-      lprintf("GEOMETRY",300,"set_border_l3 width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[0][0]],bl_width[dir_mask[0][1]],bl_width[dir_mask[0][2]],bl_width[dir_mask[0][3]]);
+      lprintf("GEOMETRY",REPORTLVL,"set_border_l3 start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[0][0]],bl_start[dir_mask[0][1]],bl_start[dir_mask[0][2]],bl_start[dir_mask[0][3]]);
+      lprintf("GEOMETRY",REPORTLVL,"set_border_l3 width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[0][0]],bl_width[dir_mask[0][1]],bl_width[dir_mask[0][2]],bl_width[dir_mask[0][3]]);
       
       walk_on_lattice(0,eotype,3,index_zone,bl_start,incr,bl_width);
     }
@@ -747,8 +747,8 @@ static void set_border_l3(int eotype){
     	      tmp_start[2],tmp_width[2],
     	      tmp_start[3],tmp_width[3]);
 
-    lprintf("GEOMETRY",300,"set_border_l3 start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[0][0]],bl_start[dir_mask[0][1]],bl_start[dir_mask[0][2]],bl_start[dir_mask[0][3]]);
-    lprintf("GEOMETRY",300,"set_border_l3 width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[0][0]],bl_width[dir_mask[0][1]],bl_width[dir_mask[0][2]],bl_width[dir_mask[0][3]]);
+    lprintf("GEOMETRY",REPORTLVL,"set_border_l3 start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[0][0]],bl_start[dir_mask[0][1]],bl_start[dir_mask[0][2]],bl_start[dir_mask[0][3]]);
+    lprintf("GEOMETRY",REPORTLVL,"set_border_l3 width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[0][0]],bl_width[dir_mask[0][1]],bl_width[dir_mask[0][2]],bl_width[dir_mask[0][3]]);
 
     walk_on_lattice(0,eotype,3,index_zone,bl_start,incr,bl_width);
 
@@ -766,8 +766,8 @@ static void set_border_l3(int eotype){
 		tmp_start[2],tmp_width[2],
 		tmp_start[3],tmp_width[3]);
       
-      lprintf("GEOMETRY",300,"set_border_l3 start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[0][0]],bl_start[dir_mask[0][1]],bl_start[dir_mask[0][2]],bl_start[dir_mask[0][3]]);
-      lprintf("GEOMETRY",300,"set_border_l3 width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[0][0]],bl_width[dir_mask[0][1]],bl_width[dir_mask[0][2]],bl_width[dir_mask[0][3]]);
+      lprintf("GEOMETRY",REPORTLVL,"set_border_l3 start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[0][0]],bl_start[dir_mask[0][1]],bl_start[dir_mask[0][2]],bl_start[dir_mask[0][3]]);
+      lprintf("GEOMETRY",REPORTLVL,"set_border_l3 width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[0][0]],bl_width[dir_mask[0][1]],bl_width[dir_mask[0][2]],bl_width[dir_mask[0][3]]);
       
       walk_on_lattice(0,eotype,3,index_zone,bl_start,incr,bl_width);
     }
@@ -777,7 +777,7 @@ static void set_border_l3(int eotype){
       reset_tmp;
       
       tmp_width[inv_mask[1][fdir]]=ind[inv_mask[1][fdir]][0];
-      lprintf("GEOMETRY",300,"set_border_l3 cambio dir %d\n",inv_mask[1][fdir]);
+      lprintf("GEOMETRY",REPORTLVL,"set_border_l3 cambio dir %d\n",inv_mask[1][fdir]);
 
       set_block(1,bl_start,incr,bl_width, 
 		tmp_start[0],tmp_width[0],
@@ -785,11 +785,11 @@ static void set_border_l3(int eotype){
 		tmp_start[2],tmp_width[2],
 		tmp_start[3],tmp_width[3]);
 
-      lprintf("GEOMETRY",300,"set_border_l3 start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[1][0]],bl_start[dir_mask[1][1]],bl_start[dir_mask[1][2]],bl_start[dir_mask[1][3]]);
-      lprintf("GEOMETRY",300,"set_border_l3 width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[1][0]],bl_width[dir_mask[1][1]],bl_width[dir_mask[1][2]],bl_width[dir_mask[1][3]]);
+      lprintf("GEOMETRY",REPORTLVL,"set_border_l3 start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[1][0]],bl_start[dir_mask[1][1]],bl_start[dir_mask[1][2]],bl_start[dir_mask[1][3]]);
+      lprintf("GEOMETRY",REPORTLVL,"set_border_l3 width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[1][0]],bl_width[dir_mask[1][1]],bl_width[dir_mask[1][2]],bl_width[dir_mask[1][3]]);
 
       walk_on_lattice(1,eotype,3,index_zone,bl_start,incr,bl_width);
-      lprintf("GEOMETRY",300,"set_border_l3 \n");
+      lprintf("GEOMETRY",REPORTLVL,"set_border_l3 \n");
 
       if(pdir>3){
 	
@@ -804,11 +804,11 @@ static void set_border_l3(int eotype){
 		  tmp_start[2],tmp_width[2],
 		  tmp_start[3],tmp_width[3]);
 	
-	lprintf("GEOMETRY",300,"set_border_l3 start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[1][0]],bl_start[dir_mask[1][1]],bl_start[dir_mask[1][2]],bl_start[dir_mask[1][3]]);
-	lprintf("GEOMETRY",300,"set_border_l3 width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[1][0]],bl_width[dir_mask[1][1]],bl_width[dir_mask[1][2]],bl_width[dir_mask[1][3]]);
+	lprintf("GEOMETRY",REPORTLVL,"set_border_l3 start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[1][0]],bl_start[dir_mask[1][1]],bl_start[dir_mask[1][2]],bl_start[dir_mask[1][3]]);
+	lprintf("GEOMETRY",REPORTLVL,"set_border_l3 width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[1][0]],bl_width[dir_mask[1][1]],bl_width[dir_mask[1][2]],bl_width[dir_mask[1][3]]);
 	
 	walk_on_lattice(1,eotype,3,index_zone,bl_start,incr,bl_width);
-	lprintf("GEOMETRY",300,"set_border_l3 \n");
+	lprintf("GEOMETRY",REPORTLVL,"set_border_l3 \n");
       }
       
       
@@ -825,11 +825,11 @@ static void set_border_l3(int eotype){
 		tmp_start[2],tmp_width[2],
 		tmp_start[3],tmp_width[3]);
 
-      lprintf("GEOMETRY",300,"set_border_l3 start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[1][0]],bl_start[dir_mask[1][1]],bl_start[dir_mask[1][2]],bl_start[dir_mask[1][3]]);
-      lprintf("GEOMETRY",300,"set_border_l3 width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[1][0]],bl_width[dir_mask[1][1]],bl_width[dir_mask[1][2]],bl_width[dir_mask[1][3]]);
+      lprintf("GEOMETRY",REPORTLVL,"set_border_l3 start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[1][0]],bl_start[dir_mask[1][1]],bl_start[dir_mask[1][2]],bl_start[dir_mask[1][3]]);
+      lprintf("GEOMETRY",REPORTLVL,"set_border_l3 width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[1][0]],bl_width[dir_mask[1][1]],bl_width[dir_mask[1][2]],bl_width[dir_mask[1][3]]);
 
       walk_on_lattice(1,eotype,3,index_zone,bl_start,incr,bl_width);
-      lprintf("GEOMETRY",300,"set_border_l3 \n");
+      lprintf("GEOMETRY",REPORTLVL,"set_border_l3 \n");
 
       if(pdir>3){
 	
@@ -844,11 +844,11 @@ static void set_border_l3(int eotype){
 		  tmp_start[2],tmp_width[2],
 		  tmp_start[3],tmp_width[3]);
 	
-	lprintf("GEOMETRY",300,"set_border_l3 start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[1][0]],bl_start[dir_mask[1][1]],bl_start[dir_mask[1][2]],bl_start[dir_mask[1][3]]);
-	lprintf("GEOMETRY",300,"set_border_l3 width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[1][0]],bl_width[dir_mask[1][1]],bl_width[dir_mask[1][2]],bl_width[dir_mask[1][3]]);
+	lprintf("GEOMETRY",REPORTLVL,"set_border_l3 start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[1][0]],bl_start[dir_mask[1][1]],bl_start[dir_mask[1][2]],bl_start[dir_mask[1][3]]);
+	lprintf("GEOMETRY",REPORTLVL,"set_border_l3 width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[1][0]],bl_width[dir_mask[1][1]],bl_width[dir_mask[1][2]],bl_width[dir_mask[1][3]]);
 	
 	walk_on_lattice(1,eotype,3,index_zone,bl_start,incr,bl_width);
-	lprintf("GEOMETRY",300,"set_border_l3 \n");
+	lprintf("GEOMETRY",REPORTLVL,"set_border_l3 \n");
       }
     }
   }
@@ -884,7 +884,7 @@ static void set_border_l2(int eotype){
 
   if(pdir==0) return;
   /* (Level=2) */
-  lprintf("GEOMETRY",300,"set_border_l2 After level 3 we have %d boders\n",index_border);
+  lprintf("GEOMETRY",REPORTLVL,"set_border_l2 After level 3 we have %d boders\n",index_border);
   if(pdir>1){    
     
     reset_tmp;
@@ -898,8 +898,8 @@ static void set_border_l2(int eotype){
     	      tmp_start[2],tmp_width[2],
     	      tmp_start[3],tmp_width[3]);
     
-    lprintf("GEOMETRY",300,"set_border_l2 start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[0][0]],bl_start[dir_mask[0][1]],bl_start[dir_mask[0][2]],bl_start[dir_mask[0][3]]);
-    lprintf("GEOMETRY",300,"set_border_l2 width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[0][0]],bl_width[dir_mask[0][1]],bl_width[dir_mask[0][2]],bl_width[dir_mask[0][3]]);
+    lprintf("GEOMETRY",REPORTLVL,"set_border_l2 start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[0][0]],bl_start[dir_mask[0][1]],bl_start[dir_mask[0][2]],bl_start[dir_mask[0][3]]);
+    lprintf("GEOMETRY",REPORTLVL,"set_border_l2 width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[0][0]],bl_width[dir_mask[0][1]],bl_width[dir_mask[0][2]],bl_width[dir_mask[0][3]]);
 
     walk_on_lattice(0,eotype,2,index_zone,bl_start,incr,bl_width);
 
@@ -915,8 +915,8 @@ static void set_border_l2(int eotype){
     	      tmp_start[2],tmp_width[2],
     	      tmp_start[3],tmp_width[3]);
     
-    lprintf("GEOMETRY",300,"set_border_l2 start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[0][0]],bl_start[dir_mask[0][1]],bl_start[dir_mask[0][2]],bl_start[dir_mask[0][3]]);
-    lprintf("GEOMETRY",300,"set_border_l2 width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[0][0]],bl_width[dir_mask[0][1]],bl_width[dir_mask[0][2]],bl_width[dir_mask[0][3]]);
+    lprintf("GEOMETRY",REPORTLVL,"set_border_l2 start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[0][0]],bl_start[dir_mask[0][1]],bl_start[dir_mask[0][2]],bl_start[dir_mask[0][3]]);
+    lprintf("GEOMETRY",REPORTLVL,"set_border_l2 width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[0][0]],bl_width[dir_mask[0][1]],bl_width[dir_mask[0][2]],bl_width[dir_mask[0][3]]);
 
     walk_on_lattice(0,eotype,2,index_zone,bl_start,incr,bl_width);
 
@@ -933,8 +933,8 @@ static void set_border_l2(int eotype){
     	      tmp_start[2],tmp_width[2],
     	      tmp_start[3],tmp_width[3]);
     
-    lprintf("GEOMETRY",300,"set_border_l2 start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[0][0]],bl_start[dir_mask[0][1]],bl_start[dir_mask[0][2]],bl_start[dir_mask[0][3]]);
-    lprintf("GEOMETRY",300,"set_border_l2 width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[0][0]],bl_width[dir_mask[0][1]],bl_width[dir_mask[0][2]],bl_width[dir_mask[0][3]]);
+    lprintf("GEOMETRY",REPORTLVL,"set_border_l2 start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[0][0]],bl_start[dir_mask[0][1]],bl_start[dir_mask[0][2]],bl_start[dir_mask[0][3]]);
+    lprintf("GEOMETRY",REPORTLVL,"set_border_l2 width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[0][0]],bl_width[dir_mask[0][1]],bl_width[dir_mask[0][2]],bl_width[dir_mask[0][3]]);
 
     walk_on_lattice(0,eotype,2,index_zone,bl_start,incr,bl_width);
     
@@ -950,8 +950,8 @@ static void set_border_l2(int eotype){
     	      tmp_start[2],tmp_width[2],
     	      tmp_start[3],tmp_width[3]);
     
-    lprintf("GEOMETRY",300,"set_border_l2 start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[0][0]],bl_start[dir_mask[0][1]],bl_start[dir_mask[0][2]],bl_start[dir_mask[0][3]]);
-    lprintf("GEOMETRY",300,"set_border_l2 width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[0][0]],bl_width[dir_mask[0][1]],bl_width[dir_mask[0][2]],bl_width[dir_mask[0][3]]);
+    lprintf("GEOMETRY",REPORTLVL,"set_border_l2 start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[0][0]],bl_start[dir_mask[0][1]],bl_start[dir_mask[0][2]],bl_start[dir_mask[0][3]]);
+    lprintf("GEOMETRY",REPORTLVL,"set_border_l2 width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[0][0]],bl_width[dir_mask[0][1]],bl_width[dir_mask[0][2]],bl_width[dir_mask[0][3]]);
 
     walk_on_lattice(0,eotype,2,index_zone,bl_start,incr,bl_width);
 
@@ -970,8 +970,8 @@ static void set_border_l2(int eotype){
     	      tmp_start[2],tmp_width[2],
     	      tmp_start[3],tmp_width[3]);
     
-    lprintf("GEOMETRY",300,"set_border_l2 start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[1][0]],bl_start[dir_mask[1][1]],bl_start[dir_mask[1][2]],bl_start[dir_mask[1][3]]);
-    lprintf("GEOMETRY",300,"set_border_l2 width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[1][0]],bl_width[dir_mask[1][1]],bl_width[dir_mask[1][2]],bl_width[dir_mask[1][3]]);
+    lprintf("GEOMETRY",REPORTLVL,"set_border_l2 start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[1][0]],bl_start[dir_mask[1][1]],bl_start[dir_mask[1][2]],bl_start[dir_mask[1][3]]);
+    lprintf("GEOMETRY",REPORTLVL,"set_border_l2 width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[1][0]],bl_width[dir_mask[1][1]],bl_width[dir_mask[1][2]],bl_width[dir_mask[1][3]]);
 
     walk_on_lattice(1,eotype,2,index_zone,bl_start,incr,bl_width);
 
@@ -987,8 +987,8 @@ static void set_border_l2(int eotype){
     	      tmp_start[2],tmp_width[2],
     	      tmp_start[3],tmp_width[3]);
     
-    lprintf("GEOMETRY",300,"set_border_l2 start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[1][0]],bl_start[dir_mask[1][1]],bl_start[dir_mask[1][2]],bl_start[dir_mask[1][3]]);
-    lprintf("GEOMETRY",300,"set_border_l2 width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[1][0]],bl_width[dir_mask[1][1]],bl_width[dir_mask[1][2]],bl_width[dir_mask[1][3]]);
+    lprintf("GEOMETRY",REPORTLVL,"set_border_l2 start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[1][0]],bl_start[dir_mask[1][1]],bl_start[dir_mask[1][2]],bl_start[dir_mask[1][3]]);
+    lprintf("GEOMETRY",REPORTLVL,"set_border_l2 width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[1][0]],bl_width[dir_mask[1][1]],bl_width[dir_mask[1][2]],bl_width[dir_mask[1][3]]);
 
     walk_on_lattice(1,eotype,2,index_zone,bl_start,incr,bl_width);
 
@@ -1005,8 +1005,8 @@ static void set_border_l2(int eotype){
     	      tmp_start[2],tmp_width[2],
     	      tmp_start[3],tmp_width[3]);
     
-    lprintf("GEOMETRY",300,"set_border_l2 start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[1][0]],bl_start[dir_mask[1][1]],bl_start[dir_mask[1][2]],bl_start[dir_mask[1][3]]);
-    lprintf("GEOMETRY",300,"set_border_l2 width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[1][0]],bl_width[dir_mask[1][1]],bl_width[dir_mask[1][2]],bl_width[dir_mask[1][3]]);
+    lprintf("GEOMETRY",REPORTLVL,"set_border_l2 start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[1][0]],bl_start[dir_mask[1][1]],bl_start[dir_mask[1][2]],bl_start[dir_mask[1][3]]);
+    lprintf("GEOMETRY",REPORTLVL,"set_border_l2 width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[1][0]],bl_width[dir_mask[1][1]],bl_width[dir_mask[1][2]],bl_width[dir_mask[1][3]]);
 
     walk_on_lattice(1,eotype,2,index_zone,bl_start,incr,bl_width);
     
@@ -1022,15 +1022,15 @@ static void set_border_l2(int eotype){
     	      tmp_start[2],tmp_width[2],
     	      tmp_start[3],tmp_width[3]);
     
-    lprintf("GEOMETRY",300,"set_border_l2 start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[1][0]],bl_start[dir_mask[1][1]],bl_start[dir_mask[1][2]],bl_start[dir_mask[1][3]]);
-    lprintf("GEOMETRY",300,"set_border_l2 width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[1][0]],bl_width[dir_mask[1][1]],bl_width[dir_mask[1][2]],bl_width[dir_mask[1][3]]);
+    lprintf("GEOMETRY",REPORTLVL,"set_border_l2 start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[1][0]],bl_start[dir_mask[1][1]],bl_start[dir_mask[1][2]],bl_start[dir_mask[1][3]]);
+    lprintf("GEOMETRY",REPORTLVL,"set_border_l2 width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[1][0]],bl_width[dir_mask[1][1]],bl_width[dir_mask[1][2]],bl_width[dir_mask[1][3]]);
        
     walk_on_lattice(1,eotype,2,index_zone,bl_start,incr,bl_width);
 
   } 
   int id0,id1,id2,id3;
   int wd0,wd1,wd2,wd3;
-  lprintf("GEOMETRY",300,"set_border_l2 After the intersecting level 2 we have %d boders\n",index_border);
+  lprintf("GEOMETRY",REPORTLVL,"set_border_l2 After the intersecting level 2 we have %d boders\n",index_border);
 
 
   for(id0=0;id0<2;id0++){
@@ -1058,8 +1058,8 @@ static void set_border_l2(int eotype){
 			      tmp_start[2],tmp_width[2],
 			      tmp_start[3],tmp_width[3]);
 		    
-		    lprintf("GEOMETRY",300,"set_border_l2_auto start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[0][0]],bl_start[dir_mask[0][1]],bl_start[dir_mask[0][2]],bl_start[dir_mask[0][3]]);
-		    lprintf("GEOMETRY",300,"set_border_l2_auto width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[0][0]],bl_width[dir_mask[0][1]],bl_width[dir_mask[0][2]],bl_width[dir_mask[0][3]]);
+		    lprintf("GEOMETRY",REPORTLVL,"set_border_l2_auto start T[%d] X[%d] Y[%d] Z[%d] \n",bl_start[dir_mask[0][0]],bl_start[dir_mask[0][1]],bl_start[dir_mask[0][2]],bl_start[dir_mask[0][3]]);
+		    lprintf("GEOMETRY",REPORTLVL,"set_border_l2_auto width T[%d] X[%d] Y[%d] Z[%d] \n",bl_width[dir_mask[0][0]],bl_width[dir_mask[0][1]],bl_width[dir_mask[0][2]],bl_width[dir_mask[0][3]]);
 		    
 		    walk_on_lattice(0,eotype,2,index_zone,bl_start,incr,bl_width);
 		  }
@@ -1074,7 +1074,7 @@ static void set_border_l2(int eotype){
   
   index_zone++;
  
-  lprintf("GEOMETRY",300,"set_border In the end we have %d borders\n",index_border+1);
+  lprintf("GEOMETRY",REPORTLVL,"set_border In the end we have %d borders\n",index_border+1);
 
 }
 
@@ -1091,10 +1091,10 @@ static void buffer_size(int i,int *tmp_width, int* tmp_start){
   tmp_width[1]= abs(border[i].b_width[1]);
   tmp_width[2]= abs(border[i].b_width[2]);
   tmp_width[3]= abs(border[i].b_width[3]);
-  lprintf("GEOMETRY",300,"fix_buffer width[%d]=%d\n",0,tmp_width[0]);
-  lprintf("GEOMETRY",300,"fix_buffer width[%d]=%d\n",1,tmp_width[1]);
-  lprintf("GEOMETRY",300,"fix_buffer width[%d]=%d\n",2,tmp_width[2]);
-  lprintf("GEOMETRY",300,"fix_buffer width[%d]=%d\n",3,tmp_width[2]);
+  lprintf("GEOMETRY",REPORTLVL,"fix_buffer width[%d]=%d\n",0,tmp_width[0]);
+  lprintf("GEOMETRY",REPORTLVL,"fix_buffer width[%d]=%d\n",1,tmp_width[1]);
+  lprintf("GEOMETRY",REPORTLVL,"fix_buffer width[%d]=%d\n",2,tmp_width[2]);
+  lprintf("GEOMETRY",REPORTLVL,"fix_buffer width[%d]=%d\n",3,tmp_width[2]);
   
   
   if(tmp_width[TDIR] == T_BORDER )
@@ -1141,7 +1141,7 @@ static void buffer_size(int i,int *tmp_width, int* tmp_start){
   
 static void fix_buffer(int zone_id)
 {	
-  lprintf("GEOMETRY",300,"fix_buffer start on zone %d\n",zone_id);
+  lprintf("GEOMETRY",REPORTLVL,"fix_buffer start on zone %d\n",zone_id);
 
   int i,done_border=index_border+1,id_mask;
   int tmp_start[4],bl_start[4],bl_width[4];
@@ -1319,14 +1319,14 @@ static void set_memory_order()
 
   /*Border & Buffer*/
   for(i0=0;i0<=index_border;i0++){
-    /* lprintf("GEOMETRY",200,"Border :%d ----------------------------\n",i0); */
+    /* lprintf("GEOMETRY",REPORTLVL,"Border :%d ----------------------------\n",i0); */
 
     if(border[i0].level>2 && border[i0].size>0) {
 
       glattice.gsize_spinor=border[i0].index_end;
 
       if(border[i0].eo_type==even ){   
-	/* lprintf("GEOMETRY",200,"Even L4L3 ----------------------------\n",i0); */
+	/* lprintf("GEOMETRY",REPORTLVL,"Even L4L3 ----------------------------\n",i0); */
 	glat_even.gsize_spinor=border[i0].index_end;
 
 
@@ -1337,13 +1337,13 @@ static void set_memory_order()
 	    
 	    if(test_master_e==0 && ! zone_border(i1) ) {
 	      master_piece_length_list_e[master_piece_number_e-1]++;
-	      /* lprintf("GEOMETRY",200,"\t\t | \n"); */
+	      /* lprintf("GEOMETRY",REPORTLVL,"\t\t | \n"); */
 	    }
 	    else {
 	      master_piece_start_list_e[master_piece_number_e]=i1;
 	      master_piece_length_list_e[master_piece_number_e]=1;
 	      master_piece_number_e++;
-	      /* lprintf("GEOMETRY",200,"\t\t---\n"); */
+	      /* lprintf("GEOMETRY",REPORTLVL,"\t\t---\n"); */
 	    }
 	    
 	    test_master_e=0;
@@ -1354,24 +1354,24 @@ static void set_memory_order()
 	    
 	    if(memory[i1]==memory[i1-1]+1 && test_master_e==1) {
 	      copy_list_len_e[copy_piece_number_e-1]++;
-	      /* lprintf("GEOMETRY",200,"\t\t\t\t * \n"); */
+	      /* lprintf("GEOMETRY",REPORTLVL,"\t\t\t\t * \n"); */
 	    }
 	    else {
 	      copy_list_from_e[copy_piece_number_e]=memory[i1];
 	      copy_list_to_e[copy_piece_number_e]=i1;
 	      copy_list_len_e[copy_piece_number_e]=1;
 	      copy_piece_number_e++;
-	      /* lprintf("GEOMETRY",200,"\t\t\t\t~~~\n"); */
+	      /* lprintf("GEOMETRY",REPORTLVL,"\t\t\t\t~~~\n"); */
 	    }
 	    test_master_e=1;
 	    
 	  }
-	  /* lprintf("GEOMETRY",200,"Considero %d\n",i1); */
+	  /* lprintf("GEOMETRY",REPORTLVL,"Considero %d\n",i1); */
 	}
       }
 
       if(border[i0].eo_type==odd){   
-	/* lprintf("GEOMETRY",200,"Odd L4L3 ----------------------------\n"); */
+	/* lprintf("GEOMETRY",REPORTLVL,"Odd L4L3 ----------------------------\n"); */
 	for (i1=index_start;i1<border[i0].index_end;i1++){
 	  if(memory[i1]==i1) {
 	    /*master*/
@@ -1404,7 +1404,7 @@ static void set_memory_order()
 	    
 	  }
 	}
-   	/* lprintf("GEOMETRY",200,"Out  ----------------------------\n",i0);  */
+   	/* lprintf("GEOMETRY",REPORTLVL,"Out  ----------------------------\n",i0);  */
       }     
     }
 
@@ -1423,7 +1423,7 @@ static void set_memory_order()
       first_odd=false;
     }
   
-    /* lprintf("GEOMETRY",200,"L2 ----------------------------\n",i0); */
+    /* lprintf("GEOMETRY",REPORTLVL,"L2 ----------------------------\n",i0); */
     if((i0==first_l2_border || i0==index_border ) && first_entrance){
       glat_odd.gsize_spinor=glattice.gsize_spinor-glat_even.gsize_spinor;
       
@@ -1458,7 +1458,7 @@ static void set_memory_order()
 
       
       shift=i_inner_e;
-      /* lprintf("GEOMETRY",200,"1 shift=%d\n",shift); */
+      /* lprintf("GEOMETRY",REPORTLVL,"1 shift=%d\n",shift); */
       for(i1=shift;i1<local_master_piece_number_e;i1++){
 	master_piece_start_list[i_inner]=master_piece_start_list_e[i_inner_e];
 	master_piece_length_list[i_inner]=master_piece_length_list_e[i_inner_e];
@@ -1466,21 +1466,21 @@ static void set_memory_order()
 	i_inner++;
       }
       shift=i_inner_o;
-      /* lprintf("GEOMETRY",200,"2 shift=%d\n",shift); */
+      /* lprintf("GEOMETRY",REPORTLVL,"2 shift=%d\n",shift); */
       for(i1=shift;i1<local_master_piece_number_o;i1++){
 	master_piece_start_list[i_inner]=master_piece_start_list_o[i_inner_o];
 	master_piece_length_list[i_inner]=master_piece_length_list_o[i_inner_o];
 	i_inner_o++;	
 	i_inner++;
       }
-      /* lprintf("GEOMETRY",200,"3 shift=%d\n",shift); */
+      /* lprintf("GEOMETRY",REPORTLVL,"3 shift=%d\n",shift); */
       for(i1=local_master_piece_number_e;i1<master_piece_number_e;i1++){
 	master_piece_start_list[i_inner]=master_piece_start_list_e[i1];
 	master_piece_length_list[i_inner]=master_piece_length_list_e[i1];
 	i_inner++;
       }
       shift=master_piece_number_e;
-      /* lprintf("GEOMETRY",200,"4 shift=%d\n",shift); */
+      /* lprintf("GEOMETRY",REPORTLVL,"4 shift=%d\n",shift); */
       for(i1=local_master_piece_number_o;i1<master_piece_number_o;i1++){
 	master_piece_start_list[i_inner]=master_piece_start_list_o[i1];
 	master_piece_length_list[i_inner]=master_piece_length_list_o[i1];
@@ -1519,7 +1519,7 @@ static void set_memory_order()
       glattice.total_spinor_master_pieces=master_piece_number;
       glattice.ncopies_spinor=copy_piece_number;
       
-      lprintf("GEOMETRY",300,"glattice MPN%d CPN%d \n", glattice.total_spinor_master_pieces,glattice.ncopies_spinor);
+      lprintf("GEOMETRY",REPORTLVL,"glattice MPN%d CPN%d \n", glattice.total_spinor_master_pieces,glattice.ncopies_spinor);
       first_entrance=false;
     }
 
@@ -1580,7 +1580,7 @@ static void set_memory_order()
   	{
   	  glattice.master_start[i1]=master_piece_start_list[i1];
   	  glattice.master_end[i1]=master_piece_start_list[i1]+master_piece_length_list[i1]-1;
-	  lprintf("[GEOMETRY]",200,"START END i:%d start:%d end:%d\n",i1,glattice.master_start[i1],glattice.master_end[i1]);
+	  lprintf("[GEOMETRY]",REPORTLVL,"START END i:%d start:%d end:%d\n",i1,glattice.master_start[i1],glattice.master_end[i1]);
  	}
 
       glattice.total_gauge_master_pieces=master_piece_number;
@@ -1647,8 +1647,8 @@ static void set_memory_order()
 	  glattice.copy_from[i1]=copy_list_from[i1];
 	  glattice.copy_to[i1]=copy_list_to[i1];
 	  glattice.copy_len[i1]=copy_list_len[i1];
-	  /* lprintf("GEOMETRY",200,"Copy From:%d Len:%d To:%d\n",copy_list_from[i1],copy_list_len[i1],copy_list_to[i1]); */
-	  /* if(i1==copy_piece_number_o+copy_piece_number_e-1 ) lprintf("GEOMETRY",200,"----------------------------\n"); */
+	  /* lprintf("GEOMETRY",REPORTLVL,"Copy From:%d Len:%d To:%d\n",copy_list_from[i1],copy_list_len[i1],copy_list_to[i1]); */
+	  /* if(i1==copy_piece_number_o+copy_piece_number_e-1 ) lprintf("GEOMETRY",REPORTLVL,"----------------------------\n"); */
 	}
       glattice.ncopies_gauge=copy_piece_number;
     }
@@ -1753,7 +1753,7 @@ static void set_memory_order()
       	  (glat_even.sbuf_to_proc)[sfbuf_e] = border[i].id_proc;
       	  (glat_even.sbuf_start)[sfbuf_e] = border[i].index_start;
       	  (glat_even.sbuf_len)[sfbuf_e] =  border[i].size;
-      	  lprintf("GEOMETRY",200,"glattice_eo (%d) E send to %d start %d(%d)",sfbuf_e, (glat_even.sbuf_to_proc)[sfbuf_e],(glat_even.sbuf_start)[sfbuf_e],(glat_even.sbuf_len)[sfbuf_e]);
+      	  lprintf("GEOMETRY",REPORTLVL,"glattice_eo (%d) E send to %d start %d(%d)",sfbuf_e, (glat_even.sbuf_to_proc)[sfbuf_e],(glat_even.sbuf_start)[sfbuf_e],(glat_even.sbuf_len)[sfbuf_e]);
 	  
 	  (glat_even.rbuf_from_proc)[sfbuf_e] = border[j].id_proc;
       	  if(border[j].eo_type==even){
@@ -1765,7 +1765,7 @@ static void set_memory_order()
 	    (glat_even.rbuf_len)[sfbuf_e] = border[j1].size;
 	  }
 	  
-	  lprintf("GEOMETRY",200," -> E receive from %d start %d(%d) \n", (glat_even.rbuf_from_proc)[sfbuf_e],(glat_even.rbuf_start)[sfbuf_e],(glat_even.rbuf_len)[sfbuf_e]);
+	  lprintf("GEOMETRY",REPORTLVL," -> E receive from %d start %d(%d) \n", (glat_even.rbuf_from_proc)[sfbuf_e],(glat_even.rbuf_start)[sfbuf_e],(glat_even.rbuf_len)[sfbuf_e]);
       	}
 	
       	if(border[i].eo_type==odd){
@@ -1773,7 +1773,7 @@ static void set_memory_order()
       	  (glat_odd.sbuf_to_proc)[sfbuf_o] = border[i].id_proc;
       	  (glat_odd.sbuf_start)[sfbuf_o] = border[i].index_start;
       	  (glat_odd.sbuf_len)[sfbuf_o] = border[i].size;
-      	  lprintf("GEOMETRY",200,"glattice_eo (%d) O send to %d start %d(%d)",sfbuf_o, (glat_odd.sbuf_to_proc)[sfbuf_o],(glat_odd.sbuf_start)[sfbuf_o],(glat_odd.sbuf_len)[sfbuf_o]);
+      	  lprintf("GEOMETRY",REPORTLVL,"glattice_eo (%d) O send to %d start %d(%d)",sfbuf_o, (glat_odd.sbuf_to_proc)[sfbuf_o],(glat_odd.sbuf_start)[sfbuf_o],(glat_odd.sbuf_len)[sfbuf_o]);
 	  
 	  (glat_odd.rbuf_from_proc)[sfbuf_o] = border[j].id_proc;	  
       	  if(border[j].eo_type==odd){
@@ -1784,14 +1784,14 @@ static void set_memory_order()
       	    (glat_odd.rbuf_start)[sfbuf_o] = border[j1].index_start;
 	    (glat_odd.rbuf_len)[sfbuf_o] = border[j1].size;
 	  }
-	  lprintf("GEOMETRY",200," -> O receive from %d start %d(%d) \n", (glat_odd.rbuf_from_proc)[sfbuf_o],(glat_odd.rbuf_start)[sfbuf_o],(glat_odd.rbuf_len)[sfbuf_o]);
+	  lprintf("GEOMETRY",REPORTLVL," -> O receive from %d start %d(%d) \n", (glat_odd.rbuf_from_proc)[sfbuf_o],(glat_odd.rbuf_start)[sfbuf_o],(glat_odd.rbuf_len)[sfbuf_o]);
 	  
 	}
       }
       
       
       
-      lprintf("GEOMETRY",200,"\n");
+      lprintf("GEOMETRY",REPORTLVL,"\n");
       
 
 
