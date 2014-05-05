@@ -169,14 +169,14 @@ void contract_pion_scatt(spinor_field* phi_ts,spinor_field* phi_tsp1,int k,int t
 	int beta,mu,gamma,l,m,a;
 	complex tmpc;
 	complex *A1,*A2;
-	complex *C1,*C2,*D1,*D2;
+	complex *D1,*D2;
 	double norm;
 	struct timeval start, end, etime;
 	suNf_spin_matrix sm1,sm2, sm3,sm4;
 	complex* corr[4];
 	double* corr_re[4];
 	double* corr_im[4];
-	complex *B1[4][4],*B2[4][4];
+	complex *B1[4][4],*B2[4][4], *C1[4][4], *C2[4][4];
 	complex* tmp2[4];
 	double* corr_2pt;
 	double* corr_tmp[2];
@@ -185,8 +185,6 @@ void contract_pion_scatt(spinor_field* phi_ts,spinor_field* phi_tsp1,int k,int t
 	tmpc.re=0;tmpc.im=0;
 	A1 =  malloc(sizeof(complex)*GLB_T);
 	A2 =  malloc(sizeof(complex)*GLB_T);
-	C1 =  malloc(sizeof(complex)*GLB_T);
-	C2 =  malloc(sizeof(complex)*GLB_T);
 	D1 =  malloc(sizeof(complex)*GLB_T);
 	D2 =  malloc(sizeof(complex)*GLB_T);
 
@@ -200,6 +198,8 @@ void contract_pion_scatt(spinor_field* phi_ts,spinor_field* phi_tsp1,int k,int t
 		{
 			B1[l][m]= (complex*) malloc(sizeof(complex)*GLB_T);
 			B2[l][m]= (complex*) malloc(sizeof(complex)*GLB_T);
+			C1[l][m]= (complex*) malloc(sizeof(complex)*GLB_T);
+			C2[l][m]= (complex*) malloc(sizeof(complex)*GLB_T);
 		}
 
 	}
@@ -222,15 +222,15 @@ void contract_pion_scatt(spinor_field* phi_ts,spinor_field* phi_tsp1,int k,int t
 
 		_complex_0(A1[t]);
 		_complex_0(A2[t]);
-		_complex_0(C1[t]);
-		_complex_0(C2[t]);
 		_complex_0(D1[t]);
 		_complex_0(D2[t]);
 
 		for (beta=0;beta<4;beta++) for (gamma=0;gamma<4;gamma++){
 			_complex_0(B1[beta][gamma][t]);
 			_complex_0(B2[beta][gamma][t]);
-		}
+ 			_complex_0(C1[beta][gamma][t]);
+			_complex_0(C2[beta][gamma][t]);
+ 		}
 
 
 
@@ -270,17 +270,15 @@ void contract_pion_scatt(spinor_field* phi_ts,spinor_field* phi_tsp1,int k,int t
 			// B term
 
 
-			for (beta=0;beta<4;beta++)
-			{
+
 				for (mu=0;mu<4;mu++)
 				{
-					_spinmatrix_assign_row(sm1, *_FIELD_AT(&phi_ts[mu],ix_pts_pa), beta); //  mu : source,  beta : internal one. A_mu beta
-					_spinmatrix_assign_row(sm2, *_FIELD_AT(&phi_tsp1[mu],ix_pts_pa), beta); // B_mu beta
+					_spinmatrix_assign_row(sm1, *_FIELD_AT(&phi_ts[mu],ix_pts_pa), mu); //  mu : source,  beta : internal one. A_mu beta
+					_spinmatrix_assign_row(sm2, *_FIELD_AT(&phi_tsp1[mu],ix_pts_pa), mu); // B_mu beta
 
-					_spinmatrix_assign_row(sm3, *_FIELD_AT(&phi_tsp1[mu],ix_pts), beta);
-					_spinmatrix_assign_row(sm4, *_FIELD_AT(&phi_ts[mu],ix_pts), beta);
+					_spinmatrix_assign_row(sm3, *_FIELD_AT(&phi_tsp1[mu],ix_pts), mu);
+					_spinmatrix_assign_row(sm4, *_FIELD_AT(&phi_ts[mu],ix_pts), mu);
 				}
-			}
 
 			// compute a new spinmatrix  : (A_mu beta * B_gamma_beta )
 			// trace color index -> it becomes a non standard struct. with only spin indices
@@ -290,13 +288,8 @@ void contract_pion_scatt(spinor_field* phi_ts,spinor_field* phi_tsp1,int k,int t
 			{
 				for (gamma=0;gamma<4;gamma++)
 				{
-					for(a=0;a<NF;++a){
-						for (beta=0;beta<4;beta++)
-						{
-							_complex_prod_assign( B1[mu][gamma][tc], sm1.c[mu].c[beta].c[a], sm2.c[gamma].c[beta].c[a] ); 
-							_complex_prod_assign( B2[mu][gamma][tc], sm3.c[mu].c[beta].c[a], sm4.c[gamma].c[beta].c[a] ); 
-						}
-					}
+          _spinor_prod_assign_f(B1[mu][gamma][tc],sm1.c[mu],sm2.c[gamma]);
+          _spinor_prod_assign_f(B2[mu][gamma][tc],sm3.c[mu],sm4.c[gamma]);
 				}
 			}
 
@@ -311,8 +304,15 @@ void contract_pion_scatt(spinor_field* phi_ts,spinor_field* phi_tsp1,int k,int t
 
 			}
 
-			_spinmatrix_mul_trace_assign(C1[tc], sm1, sm2);
-			_spinmatrix_mul_trace_assign(C2[tc], sm3, sm4);
+      for (mu=0;mu<4;mu++)
+			{
+				for (gamma=0;gamma<4;gamma++)
+				{
+          _spinor_prod_assign_f(C1[mu][gamma][tc],sm1.c[mu],sm2.c[gamma]);
+          _spinor_prod_assign_f(C2[mu][gamma][tc],sm3.c[mu],sm4.c[gamma]);
+				}
+			}
+
 
 			// D term
 			for (beta=0;beta<4;beta++)
@@ -339,24 +339,23 @@ void contract_pion_scatt(spinor_field* phi_ts,spinor_field* phi_tsp1,int k,int t
 	//global sums	
 	global_sum((double*)A1,2*GLB_T);
 	global_sum((double*)A2,2*GLB_T);
-
-	global_sum((double*)C1,2*GLB_T);
-	global_sum((double*)C2,2*GLB_T);
 	global_sum((double*)D1,2*GLB_T);
 	global_sum((double*)D2,2*GLB_T);
 	for (l=0;l<4;l++) for (m=0;m<4;m++) {
 		global_sum((double*)B1[l][m],2*GLB_T);
 		global_sum((double*)B2[l][m],2*GLB_T);
-	}	
+		global_sum((double*)C1[l][m],2*GLB_T);
+		global_sum((double*)C2[l][m],2*GLB_T);
+	}
 	// build correlators
 	for(t=0;t<GLB_T;++t) {
 		_complex_mul(corr[0][t],A1[t],A2[t]); 
 
 		for (l=0;l<4;l++) for (m=0;m<4;m++) {
 			_complex_mul_assign(corr[1][t],B1[l][m][t],B2[m][l][t]);
+			_complex_mul_assign(corr[2][t],C1[l][m][t],C2[m][l][t]);
 		}
-		_complex_mul(corr[2][t],C1[t],C2[t]); 
-		_complex_mul(corr[3][t],D1[t],D2[t]); 
+		_complex_mul(corr[3][t],D1[t],D2[t]);
 	}
 
 	// normalize
