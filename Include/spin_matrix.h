@@ -305,6 +305,15 @@ typedef struct
       _spinor_prod_assign_f((k),(r).c[3],(s).c[3]); \
    } while(0) 
 
+//r spinmatrix, s spinmatrix, k += Tr [ r . s^dag]
+#define _spinmatrix_mul_trace_assign(k, r, s) \
+   do { \
+       _spinor_prod_assign_f((k),(r).c[0],(s).c[0]); \
+       _spinor_prod_assign_f((k),(r).c[1],(s).c[1]); \
+       _spinor_prod_assign_f((k),(r).c[2],(s).c[2]); \
+       _spinor_prod_assign_f((k),(r).c[3],(s).c[3]); \
+   } while(0) 
+
 #define _spinmatrix_mul_trace_re(k, r, s) \
     do { \
       double _tmpVAR;							\

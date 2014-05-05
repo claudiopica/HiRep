@@ -71,6 +71,7 @@ void create_point_source_loc(spinor_field *source, int t, int x, int y, int z, i
 int create_diluted_source_equal_eo(spinor_field *source);
 void create_diluted_source_equal_atau_eo(spinor_field *source, int tau);
 int create_diluted_source_equal(spinor_field *source);
+void create_diluted_source_equal_spinorfield1(spinor_field *source,int tau);
 void create_diluted_source_equal_atau(spinor_field *source, int tau);
 void create_noise_source_equal_eo(spinor_field *source);
 void create_diluted_source_equal_atau_col(spinor_field *source, int tau,int col);

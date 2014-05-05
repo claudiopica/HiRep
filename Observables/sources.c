@@ -238,6 +238,24 @@ void create_diluted_source_equal_atau(spinor_field *source, int tau) {
   }
 }
 
+/* Creates one spinorfield  Z2xZ2 noise sources localised on time slice tau. . Even and Odd sites*/
+void create_diluted_source_equal_spinorfield1(spinor_field *source,int tau) {
+	int c[4];
+	suNf_vector *v1;
+	int i;
+	spinor_field_zero_f(source);
+
+	if(COORD[0]==tau/T) {// Check that tau is in this thread.
+		c[0]=tau%T;
+		for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
+			v1 = &((_FIELD_AT(source,ipt(c[0],c[1],c[2],c[3])))->c[0]);
+			ranz2((double*)(v1),sizeof(suNf_spinor)/sizeof(double)); // Make new sources
+		}
+	}
+}
+
+
+
 /* Creates four Z2xZ2 noise sources NOT localised on time slice but spread over
 all timeslices. The noise vectors are equal in each source but placed at a different spin. Even sites only.*/
 void create_noise_source_equal_eo(spinor_field *source) {
