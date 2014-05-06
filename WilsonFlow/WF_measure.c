@@ -321,7 +321,7 @@ int main(int argc,char *argv[]) {
     lprintf("MAIN",0,"Configuration from %s\n", cnfg_filename);
     /* NESSUN CHECK SULLA CONSISTENZA CON I PARAMETRI DEFINITI !!! */
 
-    read_gauge_field_nocheck(cnfg_filename);
+    read_gauge_field(cnfg_filename);
 
     apply_BCs_on_fundamental_gauge_field();
 
