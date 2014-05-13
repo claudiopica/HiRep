@@ -248,11 +248,9 @@ int main(int argc,char *argv[])
 
   double *eva_vals=NULL;
   spinor_field *eva_vecs=NULL;
-  spinor_field *eva_ws=NULL;
   if(strcmp(eigval_var.make,"true")==0) {
     eva_vals=malloc(sizeof(double)*eigval_var.nevt);
-    eva_vecs=alloc_spinor_field_f(eigval_var.nevt+2,&glattice);
-    eva_ws=eva_vecs+eigval_var.nevt;
+    eva_vecs=alloc_spinor_field_f(eigval_var.nevt,&glattice);
   }
   
   rc=acc=0;
@@ -319,10 +317,10 @@ int main(int argc,char *argv[])
         max*=1.1;
         
         int status;
-        int ie=eva(eigval_var.nev, eigval_var.nevt, 0, eigval_var.kmax, eigval_var.maxiter, max, eigval_var.omega1, eigval_var.omega2, &H2eva, eva_ws, eva_vecs, eva_vals, &status);
+        int ie=eva(eigval_var.nev, eigval_var.nevt, 0, eigval_var.kmax, eigval_var.maxiter, max, eigval_var.omega1, eigval_var.omega2, &H2eva, eva_vecs, eva_vals, &status);
         while (ie!=0) { /* if failed restart EVA */
           lprintf("MAIN",0,"Restarting EVA!\n");
-          ie=eva(eigval_var.nev, eigval_var.nevt, 2, eigval_var.kmax, eigval_var.maxiter, max, eigval_var.omega1, eigval_var.omega2, &H2eva, eva_ws, eva_vecs, eva_vals, &status);
+          ie=eva(eigval_var.nev, eigval_var.nevt, 2, eigval_var.kmax, eigval_var.maxiter, max, eigval_var.omega1, eigval_var.omega2, &H2eva, eva_vecs, eva_vals, &status);
         }
   
         for (int n=0;n<eigval_var.nev;++n) {
