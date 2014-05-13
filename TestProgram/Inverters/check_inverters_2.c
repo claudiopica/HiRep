@@ -79,7 +79,6 @@ int main(int argc,char *argv[])
   
   /* read input file */
   read_input(glb_var.read,"test_input");
-  rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed);
   
   /* setup communication geometry */
   if (geometry_init() == 1) {
@@ -96,6 +95,13 @@ int main(int argc,char *argv[])
    /* setup lattice geometry */
    geometry_mpi_eo();
    /* test_geometry_mpi_eo(); */
+    
+    
+    /* setup random numbers */
+    read_input(rlx_var.read,"test_input");
+    lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
+    rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
+
    
    u_gauge=alloc_gfield(&glattice);
 #ifndef REPR_FUNDAMENTAL

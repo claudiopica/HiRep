@@ -93,6 +93,7 @@ void copy_evec( int n, spinor_field* psi1, double *eval );
 void init_meson_correlators(int meas_offdiag);
 void init_discon_correlators();
 void init_vcvl_correlators();
+void init_cvc_correlators();
 void free_meson_observables();
 
 void measure_mesons(meson_observable* mo,spinor_field *psi0, spinor_field *eta, int nm,int tau);

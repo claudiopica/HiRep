@@ -70,7 +70,7 @@ static spinor_field *tmp_odd;
 // EVA parameters 
 double *eva_val;
 static spinor_field *eva_vec;
-static spinor_field *eva_ws;
+static spinor_field *tmp_sf;
 
 enum {_g5QMR=0, _MINRES, _CG};
 
@@ -81,8 +81,8 @@ enum {_g5QMR=0, _MINRES, _CG};
 static void init_eva(int nevt){
   if(init_eig == 0){
     eva_val=malloc(sizeof(double)*nevt);
-    eva_vec=alloc_spinor_field_f(nevt+2,&glat_even);
-    eva_ws=eva_vec+nevt;
+    eva_vec=alloc_spinor_field_f(nevt+1,&glat_even);
+    tmp_sf=eva_vec+nevt;
     init_eig = 1;
   }
 }
@@ -382,20 +382,20 @@ void eig_init(int nev, int nevt, int kmax, int maxiter, double lbnd, double omeg
  //lprintf("MAIN",0,"MAXCHECK: cnfg=%e  uppbound=%e diff=%e %s\n",max,mupp,mupp-max,(mupp-max)<0?"[FAILED]":"[OK]");
  max=1.1*max;
 
- ie=eva_tuned(nev,nevt,0,kmax,maxiter,lbnd,max,omega1,omega2,&H2_pre,eva_ws,eva_vec,eva_val,&status);
+ ie=eva_tuned(nev,nevt,0,kmax,maxiter,lbnd,max,omega1,omega2,&H2_pre,eva_vec,eva_val,&status);
  MVM+=status;
  while (ie!=0) { // if failed restart EVA 
   lprintf("MAIN",0,"Restarting EVA!\n");
-  ie=eva_tuned(nev,nevt,2,kmax,maxiter,lbnd,max,omega1,omega2,&H2_pre,eva_ws,eva_vec,eva_val,&status);
+  ie=eva_tuned(nev,nevt,2,kmax,maxiter,lbnd,max,omega1,omega2,&H2_pre,eva_vec,eva_val,&status);
   MVM+=status;
  }
  lprintf("MAIN",0,"EVA MVM = %d\n",MVM);
  neigs = nev;
 
  for (n=0;n<nev;++n) {
-   H2_pre(&eva_ws[0],&eva_vec[n]);
+   H2_pre(tmp_sf,&eva_vec[n]);
    lprintf("RESULT",0,"Eig %d = %.15e %.15e\n",n,eva_val[n],
-   spinor_field_prod_re_f(&eva_ws[0],&eva_vec[n])/spinor_field_sqnorm_f(&eva_vec[n]));
+   spinor_field_prod_re_f(tmp_sf,&eva_vec[n])/spinor_field_sqnorm_f(&eva_vec[n]));
  } 
 
 }
@@ -421,7 +421,7 @@ void calc_deflated_propagator(spinor_field *psi, spinor_field* eta, int ndilute,
 	psi[beta*n_masses+i].type = &glat_even; //even guy
 	eta[beta].type = &glat_even; //even guy
         spinor_field_zero_f(&psi[beta*n_masses+i]);
-        Ddag_pre(tmp, &eta[beta], &eva_ws[0]);
+        Ddag_pre(tmp, &eta[beta], tmp_sf);
         spinor_field_mul_f(tmp,(4.+m[0]),tmp);
 	for (n=0;n<Nuse;++n) {
 	  complex p = spinor_field_prod_f(&eva_vec[n],tmp);

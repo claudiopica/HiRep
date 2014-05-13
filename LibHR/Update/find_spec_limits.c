@@ -34,17 +34,17 @@ void find_spec_H2(double *max, double *min, double mass) {
 
   d1=malloc(sizeof(*d1)*nevt);
 #ifdef UPDATE_EO
-  ev=alloc_spinor_field_f(nevt+2,&glat_even);
+  ev=alloc_spinor_field_f(nevt,&glat_even);
   MVM+=max_H(&H2, &glat_even, max);
 #else
-  ev=alloc_spinor_field_f(nevt+2,&glattice);
+  ev=alloc_spinor_field_f(nevt,&glattice);
   MVM+=max_H(&H2, &glattice, max);
 #endif
 
-  ie=eva(nev,nevt,0,kmax,maxiter,*max,omega1,omega2,&H2,ev+nevt,ev,d1,&status);
+  ie=eva(nev,nevt,0,kmax,maxiter,*max,omega1,omega2,&H2,ev,d1,&status);
   MVM+=status;
   while (ie!=0) { /* if failed restart EVA */
-    ie=eva(nev,nevt,2,kmax,maxiter,*max,omega1,omega2,&H2,ev+nevt,ev,d1,&status);
+    ie=eva(nev,nevt,2,kmax,maxiter,*max,omega1,omega2,&H2,ev,d1,&status);
     MVM+=status;
   }
 

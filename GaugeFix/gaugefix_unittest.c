@@ -157,10 +157,6 @@ int main(int argc,char *argv[]) {
   /* read & broadcast parameters */
   parse_cnfg_filename(cnfg_filename,&fpars);
 
-  lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed);
-  rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
-  srand(glb_var.rlxd_seed+PID);
-
   lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
   lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
 
@@ -174,6 +170,13 @@ int main(int argc,char *argv[]) {
   geometry_mpi_eo();
   /* test_geometry_mpi_eo(); */
   
+    /* setup random numbers */
+    read_input(rlx_var.read,input_filename);
+    lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
+    rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
+    srand(rlx_var.rlxd_seed+PID);
+
+    
   BCs_pars_t BCs_pars = {
     .fermion_twisting_theta = {0.,0.,0.,0.},
     .gauge_boundary_improvement_cs = 1.,

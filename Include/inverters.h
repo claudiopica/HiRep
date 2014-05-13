@@ -73,11 +73,11 @@ int MINRES_flt(MINRES_par *par, spinor_operator_flt M, spinor_field_flt *in, spi
 
 int eva(int nev,int nevt,int init,int kmax,
                int imax,double ubnd,double omega1,double omega2,
-               spinor_operator Op,spinor_field *ws,
+               spinor_operator Op,
                spinor_field *ev,double d[],int *status);
 int eva_tuned(int nev,int nevt,int init,int kmax,
                int imax,double lbnd ,double ubnd,double omega1,double omega2,
-               spinor_operator Op,spinor_field *ws,
+               spinor_operator Op,
                spinor_field *ev,double d[],int *status);
 
 void jacobi1(int n,double a[],double d[],double v[]);

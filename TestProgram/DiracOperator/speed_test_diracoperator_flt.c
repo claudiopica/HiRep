@@ -38,7 +38,7 @@ int main(int argc,char *argv[])
 {
   char tmp[256];
   double res1,res2,res_cpu,res_gpu;
-  spinor_field *s0,*s1,*s2,*s3;
+  spinor_field_flt *s0,*s1,*s2,*s3;
   float elapsed, gflops;
   int i;
   int flopsite, bytesite;
@@ -71,7 +71,7 @@ int main(int argc,char *argv[])
     read_input(rlx_var.read,"test_input");
     lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
     rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
-
+    
   
   
   lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
@@ -82,28 +82,33 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"\n");
   fflush(stdout);
   
-  lprintf("MAIN",0,"Allocating gauge field\n");  
+  lprintf("MAIN",0,"Allocating gauge field\n");
   u_gauge=alloc_gfield(&glattice);
+  u_gauge_flt=alloc_gfield_flt(&glattice);
 #if (!defined(REPR_FUNDAMENTAL) && !defined(WITH_QUATERNIONS)) || defined(ROTATED_SF) 
   u_gauge_f=alloc_gfield_f(&glattice);
+  u_gauge_f_flt=alloc_gfield_f_flt(&glattice);
 #endif
   /* allocate memory */
   lprintf("MAIN",0,"Allocating spinor field\n");  
-  s0=alloc_spinor_field_f(4,&glattice);
+  s0=alloc_spinor_field_f_flt(4,&glattice);
   s1=s0+1;
   s2=s1+1;
   s3=s2+1;
   
 
   lprintf("MAIN",0,"Randomizing spinor field...\n");  
-  gaussian_spinor_field(s0);
-  gaussian_spinor_field(s1);
+  gaussian_spinor_field_flt(s0);
+  gaussian_spinor_field_flt(s1);
  
   lprintf("MAIN",0,"Generating a random gauge field... ");
   fflush(stdout);
   random_u(u_gauge);
+  //assign_ud2u();
   start_gf_sendrecv(u_gauge);
   represent_gauge_field();
+  assign_ud2u_f();
+  
  
   lprintf("MAIN",0,"done.\n");
 
@@ -124,7 +129,7 @@ int main(int argc,char *argv[])
   //speed test Dirac operator
   lprintf("LA TEST",0,"Calculating massless Diracoperator %d times.\n",n_times);
   gettimeofday(&start,0);
-  for (i=0;i<n_times;++i){ Dphi_(s1,s0); }
+  for (i=0;i<n_times;++i){ Dphi_flt_(s1,s0); }
   gettimeofday(&end,0);
   timeval_subtract(&etime,&end,&start);
   elapsed=etime.tv_sec*1000.+etime.tv_usec*0.001;
@@ -137,7 +142,7 @@ int main(int argc,char *argv[])
   lprintf("LA TEST",0,"DONE!");
 
   
-  free_spinor_field_f(s0);
+  free_spinor_field_f_flt(s0);
     
   finalize_process();
   exit(0);

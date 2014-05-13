@@ -3,7 +3,7 @@ MKDIR = $(TOPDIR)/Make
 
 EXES = mk_modenumber mk_eigvals
 
-mk_modenumber_OBJS = modenumber
+mk_modenumber_OBJS = modenumber.o
 
 
 LIBS += $(TOPDIR)/LibHR/libhr.a

@@ -104,7 +104,6 @@ int main(int argc,char *argv[])
   
   /* read input file */
   read_input(glb_var.read,"test_input");
-  rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
   
   /* setup communication geometry */
   if (geometry_init() == 1) {
@@ -121,6 +120,12 @@ int main(int argc,char *argv[])
    /* setup lattice geometry */
    geometry_mpi_eo();
    /* test_geometry_mpi_eo(); */
+    
+    /* setup random numbers */
+    read_input(rlx_var.read,"test_input");
+    lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
+    rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
+
    
    u_gauge=alloc_gfield(&glattice);
 #ifndef REPR_FUNDAMENTAL
@@ -157,7 +162,7 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"Accuracy parameters: omega1=%.1e, omega2=%.1e\n\n",
 	 omega1,omega2);
 
-  ie=eva(nev,nevt,0,100,20,ubnd,omega1,omega2,Op1,ws,ev,d1,&status);
+  ie=eva(nev,nevt,0,100,20,ubnd,omega1,omega2,Op1,ev,d1,&status);
 
   lprintf("MAIN",0,"\nEigenvalues of Q^2 (status = %d, ie = %d):\n\n",
 	 status,ie);

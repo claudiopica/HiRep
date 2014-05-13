@@ -11,6 +11,7 @@
 #include "update.h"
 #include "memory.h"
 #include "utils.h"
+#include "communications.h"
 
 #include <stdio.h>
 #include <string.h>
