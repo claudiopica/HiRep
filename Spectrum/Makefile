@@ -1,79 +1,16 @@
 TOPDIR = ..
-MKDIR=$(TOPDIR)/Make
+MKDIR = $(TOPDIR)/Make
 
-EXES = mk_mesons random_cnfg random_spinor mk_mesons_with_z2semwall mk_mesons_with_z2semwall_new  measure_spectrum measure_formfactor #mk_sfcoupling #trunc_mesons
+EXES =  mk_mesons random_cnfg random_spinor mk_mesons_with_z2semwall mk_mesons_with_z2semwall_new  measure_spectrum measure_formfactor #mk_sfcoupling #trunc_mesons
+
+COMMON_OBJS = 
+
+measure_spectrum_OBJS = meson_measurements.o ../GaugeFix/gaugefix.o
+measure_formfactor_OBJS = meson_measurements.o ../GaugeFix/gaugefix.o
 
 
-default: $(EXES)
+LIBS += $(TOPDIR)/LibHR/libhr.a
 
-
-MODDIR := Geometry
-MODS := process_init geometry_init geometry_mpi_eo communications
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
-
-MODDIR := IO
-MODS := archive archive_su2quat logger read_input archive_spinors endian
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
-
-MODDIR := Utils
-MODS := boundary_conditions time max_eig single_double_utils
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
-
-MODDIR := Memory
-MODS := amalloc field_alloc spinor_field_alloc
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
-
-MODDIR := Observables
-MODS := avr_plaquette trunc_hairpin g5QMR_trunc calc_prop measure_mesons measure_baryons sources measure_ff
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
-
-MODDIR := Random
-MODS := gauss ranlxs ranlxd random_fields random_suNg ran_utils
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
-
-MODDIR := Update
-MODS := representation random_spinor_field random_su2 Dphi copy_gfield
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
-
-MODDIR := Utils
-MODS := suN_utils diag_hmat det_suNg
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
-
-MODDIR := Error
-MODS := error
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
-
-MODDIR := Statistics
-MODS := 
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
-
-MODDIR := Inverters
-MODS := linear_algebra cg_mshift MINRES_mshift g5QMR_mshift HBiCGstab_mshift MINRES eva jacobi
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
-
-MODDIR := Converter
-MODS := archive_eolexi #archive_henty
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
-
-MODDIR := GaugeFix
-MODS := gaugefix
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
-
-MODDIR := Spectrum
-MODS := meson_measurements baryon_measurements
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
-
-COMMON_OBJS = $(MOD_OBJS)
-
-mk_mesons_with_z2semwall_OBJS = $(TOPDIR)/Observables/mesons.o $(TOPDIR)/Observables/pta_qprop.o $(TOPDIR)/Observables/z2semwall.o
-
-mk_mesons_OBJS = $(TOPDIR)/Observables/mesons.o $(TOPDIR)/Observables/pta_qprop.o
-
-mk_sfcoupling_OBJS = $(TOPDIR)/Observables/sf_action.o
-
-mk_mesons_with_z2semwall_new_OBJS = $(TOPDIR)/Observables/pta_qprop.o $(TOPDIR)/Observables/z2semwall_new.o
 
 include $(MKDIR)/MkRules
-
-.PHONY: default
 

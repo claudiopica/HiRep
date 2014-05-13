@@ -1,8 +1,8 @@
 NG = 2
-REPR = REPR_FUNDAMENTAL
+#REPR = REPR_FUNDAMENTAL
 #REPR = REPR_SYMMETRIC
 #REPR = REPR_ANTISYMMETRIC
-#REPR = REPR_ADJOINT
+REPR = REPR_ADJOINT
 
 #CHOICES ARE GAUGE_SUN AND GAUGE_SON 
 GAUGE_GROUP = GAUGE_SUN
@@ -26,7 +26,7 @@ MACRO += -DBC_Z_PERIODIC
 
 
 MACRO += -DUPDATE_EO
-MACRO += -DWITH_MPI
+#MACRO += -DWITH_MPI
 #MACRO += -DWITH_QUATERNIONS
 MACRO += -DNDEBUG
 #MACRO += -DCHECK_SPINOR_MATCHING
@@ -38,40 +38,8 @@ MACRO += -DIO_FLUSH
 #MACRO += -DAMALLOC_MEASURE
 
 #Compiler
-#export OMPI_CC = ccache gcc
-CC = mpicc-mpich-mp
-#CC = gcc
+#CC = mpicc
+CC = gcc
 CFLAGS = -Wall -std=c99 -O3 -fomit-frame-pointer -msse -msse2
 #CFLAGS = -Wall -std=c99 -g
 
-##########################################################################
-# DO NOT EDIT BEYOND THIS POINT
-##########################################################################
-
-#Macros
-MACRO += -D$(REPR) -DREPR_NAME=\"$(REPR)\" -D${GAUGE_GROUP}
-
-WQUAT = $(if $(findstring -DWITH_QUATERNIONS,$(MACRO)),1,0)
-
-#Include
-INCDIR = $(TOPDIR)/Include
-INC = -I $(INCDIR) -I/opt/local/include/mpich-mp
-
-GCC = gcc
-CPPFLAGS += $(MACRO)
-CPPFLAGS += $(INC)
-LDFLAGS = -lm
-
-ifeq ($(strip $(CXX)),)
-  CXX = g++
-endif
-
-
-#make related
-#export CFLAGS LDFLAGS CPPFLAGS
-ifndef REPR
-  $(error Error: must specify fermion representation!)
-endif
-
-MAKEFLAGS += -s 
-MAKEFLAGS += -r

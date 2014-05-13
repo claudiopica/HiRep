@@ -1,47 +1,13 @@
 TOPDIR = ..
-MKDIR=$(TOPDIR)/Make
+MKDIR = $(TOPDIR)/Make
 
 EXES = converter
 
-default: $(EXES)
+converter_OBJS = archive_eolexi.o archive_milc.o archive_more_mpieo.o archive_ascii.o archive_fortran.o
 
 
-MODDIR := Geometry
-MODS := geometry_init geometry_mpi_eo communications process_init
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
-
-MODDIR := IO
-MODS := archive logger read_input endian archive_su2quat
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
-
-MODDIR := Utils
-MODS := suN_utils time boundary_conditions
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
-
-MODDIR := Memory
-MODS := amalloc field_alloc
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
-
-MODDIR := Observables
-MODS := avr_plaquette
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
-
-MODDIR := Random
-MODS := gauss ranlxs ranlxd
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
-
-MODDIR := Error
-MODS := error
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
-
-MODDIR := Converter
-MODS := archive_eolexi archive_milc archive_more_mpieo archive_ascii archive_fortran
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
-
-COMMON_OBJS = $(MOD_OBJS)
+LIBS += $(TOPDIR)/LibHR/libhr.a
 
 
 include $(MKDIR)/MkRules
-
-.PHONY: default
 

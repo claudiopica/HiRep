@@ -1,6 +1,6 @@
 TOPDIR = ../..
 
-SUBDIRS = autosun
+SUBDIRS := autosun
 
 MKDIR = $(TOPDIR)/Make
 include $(MKDIR)/MkRules

@@ -1,42 +1,14 @@
 TOPDIR = ../..
-MKDIR=$(TOPDIR)/Make
+MKDIR = $(TOPDIR)/Make
 
-EXES = check_algebra_1 check_algebra_2
+EXES = check_algebra_1 
+#check_algebra_2 only compiles for NG=3 and REPR=AS
+EXEC += $(if $(findstring 3,$(NG)),$(if $(findstring REPR_ANTISYMMETRIC,$(REPR)),check_algebra_2,),)
 
-default: $(EXES)
 
 
-MODDIR := Geometry
-MODS := communications geometry_init process_init
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
+LIBS += $(TOPDIR)/LibHR/libhr.a
 
-MODDIR := IO
-MODS := logger
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
-
-MODDIR := Utils
-MODS := boundary_conditions single_double_utils
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
-
-MODDIR := Memory
-MODS := amalloc 
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
-
-MODDIR := Random
-MODS := gauss ranlxs ranlxd random_suNg
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
-
-MODDIR := Error
-MODS := error
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
-
-MODDIR := Update
-MODS := random_su2 representation
-MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
-
-COMMON_OBJS = $(MOD_OBJS)
 
 include $(MKDIR)/MkRules
-
-.PHONY: default
 

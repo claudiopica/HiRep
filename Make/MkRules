@@ -1,24 +1,92 @@
 ###############################################################################
-# Copyright (c) 2008, Claudio Pica                                            #   
+# Copyright (c) 2008,2014, Claudio Pica                                       #   
 # All rights reserved.                                                        #
 ###############################################################################
 
 
 SHELL = /bin/bash
 
-SRCS += $(patsubst %,%.c,$(EXES))
-OBJS = $(SRCS:.c=.o)
-_MkRules_default_target: $(OBJS)
-
-
 include $(MKDIR)/MkFlags
+
+MAKEFLAGS += -s
+MAKEFLAGS += -r
+#NO_COLOR_OUT = 1
+
+SRCS += $(patsubst %,%.c,$(EXES))
+#OBJS = $($(filter-out $(EXCLUDE),$(SRCS)):.c=.o)
+OBJS = $(patsubst %.c,%.o,$(filter-out $(EXCLUDE),$(SRCS)))
+ALIBNAME = $(abspath $(LIBNAME))
+
+#Colorization
+ifneq ($(NO_COLOR_OUT),1)
+
+_esc := 
+_col_black :=       $(_esc)[30m
+_col_red :=         $(_esc)[31m
+_col_green :=       $(_esc)[32m
+_col_yellow :=      $(_esc)[33m
+_col_blue :=        $(_esc)[34m
+_col_magenta :=     $(_esc)[35m
+_col_cyan :=        $(_esc)[36m
+_col_ltgray :=      $(_esc)[37m
+_col_norm :=        $(_esc)[0m
+_col_background :=  $(_esc)[07m
+_col_underline :=   $(_esc)[04m
+_col_blink :=       $(_esc)[05m
+_col_noblink :=     $(_esc)[25m
+_col_bold :=        $(_esc)[1m
+
+#Color Theme
+_col_clean := $(_col_bold)$(_col_blue)
+_col_deps := $(_col_bold)$(_col_blue)
+_col_comp := $(_col_bold)$(_col_blue)
+_col_link := $(_col_background)$(_col_bold)$(_col_blue)
+_col_write := $(_col_bold)$(_col_blue)
+_col_fname := $(_col_bold)
+_col_done := $(_col_green)
+_col_failed := $(_col_bold)$(_col_blink)$(_col_red)
+
+endif
+
+_rname = $(subst $(abspath $(TOPDIR)),%,$(abspath $(1)))
+_testdir = $(subst $(CURDIR)/,,$(dir $(abspath $(1))))
+_cfname = [$(_col_fname)$(1)$(_col_norm)]
+_cfailed := $(_col_failed)failed$(_col_norm)
+_cdone := $(_col_done)done$(_col_norm)
+
+CDIR = $(call _rname, $(CURDIR))
+LNAME = $(call _rname, $(ALIBNAME))
+
+#Macros
+MACRO += -D$(REPR) -DREPR_NAME=\"$(REPR)\" -D${GAUGE_GROUP}
+WQUAT = $(if $(findstring -DWITH_QUATERNIONS,$(MACRO)),1,0)
+
+#Include
+INCDIR = $(TOPDIR)/Include
+INC = -I $(INCDIR)
+
+GCC = gcc
+CXX ?= g++
+CPPFLAGS += $(MACRO)
+CPPFLAGS += $(INC)
+LDFLAGS = -lm
+
+
+ifndef REPR
+  $(error Error: must specify fermion representation!)
+endif
+
+
+_MkRules_default_target: $(EXES) $(OBJS) $(ALIBNAME)
+
+_objs: $(OBJS)
 
 .%.d: SRC=$(patsubst .%.d,%.c,$@)
 .%.d: %.c $(INCDIR)/.autoheaders.h
-	if test $(dir $@) = "./"; then \
-	  echo -n "Generating dependences for [$(SRC)]..." ;\
-	  $(GCC) -MM -MG -MT "$@ $(patsubst .%.d,%.o,$@)" $(CPPFLAGS) $(SRC) > $@ &&\
-	  echo " done." || ( echo " failed." && false ) ;\
+	if test "$(call _testdir, $@)" = ""; then \
+	  echo -n "$(_col_deps)Dependences$(_col_norm) for $(call _cfname,$(call _rname,$(SRC)))..." ;\
+	  ($(GCC) -MM -MG -MT "$@ $(patsubst .%.d,%.o,$@)" $(CPPFLAGS) $(SRC) > $@ &&\
+	  echo " $(_cdone)" || ( echo " $(_cfailed)" && false ) )&&\
 	  MAKEFILES="$@" $(MAKE) $@ ;\
 	else \
 	  $(MAKE) -C $(dir $@) $(notdir $@) ;\
@@ -27,62 +95,89 @@ include $(MKDIR)/MkFlags
 DFILES = $(findstring .d,$(MAKEFILES))
 RBLD = $(if $(DFILES),,rebuild)
 
-%.o: SRC=$(patsubst %.o,%.c,$@) 
+%.o: SRC=$(patsubst %.o,%.c,$@)
 %.o: DEP=$(patsubst %.o,.%.d,$@)
-%.o: %.c $(MKDIR)/MkFlags $(RBLD)
-	if  test $(dir $@) = "./"; then \
+%.o: %.c $(MKDIR)/MkFlags $(RBLD) $(INCDIR)/.autoheaders.h
+	if  test "$(call _testdir, $@)" = ""; then \
 	  if test "$(DFILES)" = ""; then \
-	    $(MAKE) $(DEP) ;\
+	    $(MAKE) $(DEP) &&\
 	    MAKEFILES="$(DEP)" $(MAKE) $@ ;\
 	  else \
-	    echo -n "Compiling [$(CURDIR)/$@]..." ;\
+	    echo -n "$(_col_comp)Compiling$(_col_norm) $(call _cfname,$(call _rname,$(CURDIR)/$@))..." ;\
 	    $(CC) -c $(CFLAGS) $(CPPFLAGS) $(SRC) &&\
-	    echo " done." || ( echo " failed." && false) ;\
+	    echo " $(_cdone)" || ( echo " $(_cfailed)" && false) ;\
 	  fi ;\
 	else \
 	  $(MAKE) -C $(dir $@) $(notdir $@) ;\
 	fi
 
-$(INCDIR)/.autoheaders.h: $(MKDIR)/MkFlags  
-	if  test $(dir $@) != "./"; then \
+$(INCDIR)/.autoheaders.h: $(MKDIR)/MkFlags 
+	if  test "$(call _testdir, $@)" != ""; then \
 	  $(MAKE) -C $(dir $@) $(notdir $@) ;\
 	fi 
 
 %.c:
-	if  test $(dir $@) != "./"; then \
+	if  test "$(call _testdir, $@)" != ""; then \
 	  $(MAKE) -C $(dir $@) $(notdir $@) ;\
 	fi
 
 %.h:
-	echo Missing header: $@
+	echo "$(_col_bold)$(_col_blink)$(_col_red)Missing header: $(_col_noblink)$@$(_col_norm)"
 	false
+
+
+$(patsubst %,lib-%,$(LIBDIRS)): $(INCDIR)/.autoheaders.h
+	$(MAKE) -C $(patsubst lib-%,%,$@) _objs
+
+LIBOBJS=$(if $(LIBDIRS),$(shell find $(LIBDIRS) -name *.o),)
+%.a: $(if $(ALIBNAME),$(OBJS),) | $(patsubst %,lib-%,$(LIBDIRS))
+	if  test "$(call _testdir, $@)" = ""; then \
+		if test "$(strip $(LIBOBJS))" != ""; then \
+			echo -n "$(_col_link)Creating library$(_col_norm) $(call _cfname,$(LNAME))..." ;\
+			ar -rcs $(ALIBNAME) $(LIBOBJS) 2>/dev/null &&\
+			echo " $(_cdone)" || ( echo " $(_cfailed)" && false) ;\
+		fi ;\
+	else \
+	  $(MAKE) -C $(dir $@) $(notdir $@) ;\
+	fi
+
+$(ALIBNAME) $(notdir $(ALIBNAME)): $(LIBOBJS) $(OBJ)
+
+
+$(LIBS): $(if $(call _testdir, $@),,rebuild) $(INCDIR)/.autoheaders.h
+	if  test "$(call _testdir, $@)" != ""; then \
+	  $(MAKE) -C $(dir $@) $(notdir $@) ;\
+	fi 
 
 .PRECIOUS: %.c
 
 #avoid the use of implicit suffix rules!
 .SUFFIXES:
 
+#remove files whose rules generate errors
+.DELETE_ON_ERROR:
 
 WRHEAD = $(MKDIR)/Utils/write_suN_headers.pl
 WRREPRDIR = $(MKDIR)/Utils/autosun
 WRREPR = $(WRREPRDIR)/writeREPR
 
 $(WRREPR): $(MKDIR)/MkFlags
-	REPRESENTATION=$(REPR) make -C $(WRREPRDIR) $(notdir $@) "GAUGE_GROUP = ${GAUGE_GROUP}"
+	make -C $(WRREPRDIR) $(notdir $@)
 
-.PHONY: rebuild clean $(patsubst %,clean-%,$(SUBDIRS)) cleanall _MkRules_default_target default
+
+.PHONY: rebuild clean _objs $(patsubst %,clean-%,$(SUBDIRS)) $(patsubst %,lib-%,$(LIBDIRS)) cleanall _MkRules_default_target default
 
 $(patsubst %,clean-%,$(SUBDIRS)):
 	$(MAKE) -C $(patsubst clean-%,%,$@) clean
 
 clean:: $(patsubst %,clean-%,$(SUBDIRS))
-	echo -n "Cleaning $(CURDIR)..."
-	rm -f *.o *.rpo *~ *.il *.dyn *.ii *.s .*.d cinfo.c
-	echo " done."
+	echo -n "$(_col_clean)Cleaning$(_col_norm) $(call _cfname,$(CDIR))..."
+	rm -f *.o *.rpo *~ *.il *.dyn *.ii *.s .*.d *.a cinfo.c
+	echo " $(_cdone)"
 	if test "$(EXES)" != "" -a "$(CEXE)" != "" ; then \
-	  echo -n "Removing EXEs in $(CURDIR)..." ;\
+	  echo -n "$(_col_clean)Removing EXEs$(_col_norm) in $(call _cfname,$(CDIR))..." ;\
 	  rm -f $(EXES) ;\
-	  echo " done." ;\
+	  echo " $(_cdone)" ;\
 	fi
 
 cleanall::
@@ -91,11 +186,14 @@ cleanall::
 cinfo.c: $(MKDIR)/MkFlags $(MKDIR)/MkRules $(MKDIR)/Utils/cinfo.sh
 	$(MKDIR)/Utils/cinfo.sh $(MKDIR) $(TOPDIR) $(MACRO)
 
+LDFLAGS += $(foreach _lib, $(LIBS),-L$(dir $(_lib)))
+LDFLAGS += $(foreach _lib, $(LIBS),-l$(patsubst lib%.a,%,$(notdir $(_lib))))
+
 define LINK_template
-$(1): $(1).o $$($(1)_OBJS) $$(COMMON_OBJS)
-	echo -n Linking [$$@]... 
-	$$(CC) $$(CFLAGS) -o $$@ $$< $$($(1)_OBJS) $$(COMMON_OBJS) $$(LDFLAGS)  &&\
-	echo " done." || ( echo " failed." && false )
+$(1): $(1).o $$($(1)_OBJS) $$(COMMON_OBJS) $$(LIBS)
+	echo -n "$$(_col_link)Linking$$(_col_norm) $$(call _cfname,$$@)..." 
+	$$(CC) -o $$@ $$< $$($(1)_OBJS) $$(COMMON_OBJS) $$(LDFLAGS)  &&\
+	echo " $$(_cdone)" || ( echo " $$(_cfailed)" && false )
 endef
 
 $(foreach prog,$(EXES),$(eval $(call LINK_template,$(prog))))

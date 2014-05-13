@@ -1,7 +1,9 @@
 TOPDIR = .
+SUBDIRS := $(shell find * -maxdepth 0 -type d)
 
-
-SUBDIRS = Include Geometry IO Memory Observables Random Statistics Update Utils Error Inverters Make Converter TestProgram Disconnected Spectrum GaugeFix Scattering
+#Exclude these directories
+EXCLUDEDIR := Analysis Doc Fortran
+SUBDIRS := $(filter-out $(EXCLUDEDIR), $(SUBDIRS))
 
 MKDIR = $(TOPDIR)/Make
 include $(MKDIR)/MkRules

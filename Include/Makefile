@@ -7,22 +7,26 @@ default: .autoheaders.h
 .autoheaders.h: suN.h suN_types.h suN_repr_func.h
 	echo done > $@
 
-include $(MKDIR)/MkRules
 
-suN.h suN_types.h: $(MKDIR)/MkFlags $(WRHEAD)
-	echo -n "Writing suN headers..."
+#this must be a stem rule otherwise it will be called twice in parallel make
+su%.h su%_types.h: $(MKDIR)/MkFlags $(WRHEAD)
+	echo -n "$(_col_write)Writing suN headers$(_col_norm)..."
 	$(WRHEAD) $(NG) $(REPR) $(WQUAT) $(GAUGE_GROUP) &&\
-		echo " done." || ( echo " failed." && false )
+		echo " $(_cdone)" || ( echo " $(_cfailed)" && false )
 
-suN_repr_func.h: $(MKDIR)/MkFlags $(WRREPR) TMPL/suN_repr_func.h.tmpl
-	echo -n "Writing representation header..."
+suN_repr_func.h: $(MKDIR)/MkFlags TMPL/suN_repr_func.h.tmpl
+	echo -n "$(_col_write)Writing representation header$(_col_norm)..."
 	$(WRREPR) $(NG) TMPL/suN_repr_func.h.tmpl > $@ &&\
-		echo " done." || ( echo " failed." && false )
+		echo " $(_cdone)" || ( echo " (_cfailed)" && false )
 
 
 clean::
 	rm -f *~ suN.h suN_types.h suN_repr_func.h .autoheaders.h
 
+include $(MKDIR)/MkRules
 
-.PHONY: default
+#this must be after MkRules which defines WRREPR
+suN_repr_func.h: $(WRREPR)
+
+suN.h suN_types.h: $(WRHEAD)
 
