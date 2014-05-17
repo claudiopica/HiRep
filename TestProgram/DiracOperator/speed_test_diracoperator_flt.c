@@ -85,9 +85,11 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"Allocating gauge field\n");
   u_gauge=alloc_gfield(&glattice);
   u_gauge_flt=alloc_gfield_flt(&glattice);
-#if (!defined(REPR_FUNDAMENTAL) && !defined(WITH_QUATERNIONS)) || defined(ROTATED_SF) 
+#ifdef ALLOCATE_REPR_GAUGE_FIELD
   u_gauge_f=alloc_gfield_f(&glattice);
   u_gauge_f_flt=alloc_gfield_f_flt(&glattice);
+#else
+  u_gauge_f_flt=(suNf_field_flt*) u_gauge_f;
 #endif
   /* allocate memory */
   lprintf("MAIN",0,"Allocating spinor field\n");  
