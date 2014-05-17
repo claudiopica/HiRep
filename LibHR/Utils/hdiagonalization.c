@@ -66,7 +66,7 @@ void tred2(double **a, int n, double *d, double *e)
   /* Contents of this loop can be omitted if eigenvectors not
      wanted except for statement d[i]=a[i][i]; */
   for (i=1;i<=n;i++) {
-    i-1; 
+    l=i-1;
     if (d[i]) { 
       for (j=1;j<=l;j++) {
 	g=0.0;
