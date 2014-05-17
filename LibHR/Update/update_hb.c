@@ -27,14 +27,14 @@ static int * dyn_gauge=NULL;
 
 void project_gauge_field(void)
 {
-  _DECLARE_INT_ITERATOR(ix);
-
   _MASTER_FOR(&glattice,ix) {
     project_to_suNg(pu_gauge(ix,0));
     project_to_suNg(pu_gauge(ix,1));
     project_to_suNg(pu_gauge(ix,2));
     project_to_suNg(pu_gauge(ix,3));
   }
+  
+  start_gf_sendrecv(u_gauge);
 } 
 
 #if defined(BASIC_SF) || defined(ROTATED_SF)
@@ -118,51 +118,50 @@ static void init_hb_boundary() {
 
 static void update_all(double beta,int type)
 {
-  int mu,i,j;
   static int count=PROJECT_INTERVAL;
-
+  
   if (count>=PROJECT_INTERVAL) {
     project_gauge_field();
     count=0;
   }
   ++count;
-   
-  for(mu=0;mu<4;mu++){
+  
+  for(int mu=0;mu<4;mu++){
     start_gf_sendrecv(u_gauge);
-    for(j=glat_even.master_start[0];j<=glat_even.master_end[0];j++){
+    for(int j=glat_even.master_start[0];j<=glat_even.master_end[0];j++){
       if(dyn_gauge[j*4+mu]!=0){
-      staples(j,mu,&v);
-      cabmar(beta,pu_gauge(j,mu),&v,type);
+        staples(j,mu,&v);
+        cabmar(beta,pu_gauge(j,mu),&v,type);
       }
     }
     complete_gf_sendrecv(u_gauge);
-    for(i=1;i<glat_even.local_master_pieces;i++)
-      for(j=glat_even.master_start[i];j<=glat_even.master_end[i];j++){
-	if(dyn_gauge[j*4+mu]!=0){
-	  staples(j,mu,&v);
-	  cabmar(beta,pu_gauge(j,mu),&v,type);
-	}
+    for(int i=1;i<glat_even.local_master_pieces;i++)
+      for(int j=glat_even.master_start[i];j<=glat_even.master_end[i];j++){
+        if(dyn_gauge[j*4+mu]!=0){
+          staples(j,mu,&v);
+          cabmar(beta,pu_gauge(j,mu),&v,type);
+        }
       }
   }
-   
-  for(mu=0;mu<4;mu++){
+  
+  for(int mu=0;mu<4;mu++){
     start_gf_sendrecv(u_gauge);
-    for(j=glat_odd.master_start[0];j<=glat_odd.master_end[0];j++){
+    for(int j=glat_odd.master_start[0];j<=glat_odd.master_end[0];j++){
       if(dyn_gauge[j*4+mu]!=0){
-	staples(j,mu,&v);
-	cabmar(beta,pu_gauge(j,mu),&v,type);
+        staples(j,mu,&v);
+        cabmar(beta,pu_gauge(j,mu),&v,type);
       }
     }
     complete_gf_sendrecv(u_gauge);
-    for(i=1;i<glat_odd.local_master_pieces;i++)
-      for(j=glat_odd.master_start[i];j<=glat_odd.master_end[i];j++){
-	if(dyn_gauge[j*4+mu]!=0){
-	  staples(j,mu,&v);
-	  cabmar(beta,pu_gauge(j,mu),&v,type);
-	}
+    for(int i=1;i<glat_odd.local_master_pieces;i++)
+      for(int j=glat_odd.master_start[i];j<=glat_odd.master_end[i];j++){
+        if(dyn_gauge[j*4+mu]!=0){
+          staples(j,mu,&v);
+          cabmar(beta,pu_gauge(j,mu),&v,type);
+        }
       }
   }
-
+  
 } 
 
 
