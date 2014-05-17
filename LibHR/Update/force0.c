@@ -31,40 +31,39 @@ void force0(double dt, suNg_av_field *force, void *vpar){
   gettimeofday(&start,0);
   #endif
 
-  static suNg s1,s2;
-  static suNg_algebra_vector f;
-  double forcestat[2]={0.,0.}; /* used for computation of avr and max force */
-  double nsq;
-  int mu,x;
-  _DECLARE_INT_ITERATOR(i);
-  
   /* check input types */
-  #ifndef CHECK_SPINOR_MATCHING
   _TWO_SPINORS_MATCHING(u_gauge,force);
-  #endif
   
   double beta = *((double*)vpar);
-  
+#ifdef MEASURE_FORCE0
+  double forcestat[2]={0.,0.}; /* used for computation of avr and max force */
+  _MASTER_FOR_SUM(&glattice,i,forcestat[0],forcestat[1]) {
+#else
   _MASTER_FOR(&glattice,i) {
-    for (mu=0; mu<4; ++mu) {
+#endif
+    suNg s1,s2;
+    suNg_algebra_vector f;
+    for (int mu=0; mu<4; ++mu) {
       staples(i,mu,&s1);
       _suNg_times_suNg_dagger(s2,*_4FIELD_AT(u_gauge,i,mu),s1);
       
       /* the projection itself takes the TA: proj(M) = proj(TA(M)) */
       _fund_algebra_project(f,s2);
-      
       _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,i,mu), dt*(-beta/((double)(NG))), f);
       
+#ifdef MEASURE_FORCE0
+      double nsq;
       _algebra_vector_sqnorm_g(nsq,f);
       forcestat[0]+=sqrt(nsq);
-      for(x=0;x<NG*NG-1;++x){
+      for(int x=0;x<NG*NG-1;++x){
         if(forcestat[1]<fabs(*(((double*)&f)+x))) forcestat[1]=fabs(*(((double*)&f)+x));
       }
+#endif
     }
   }
 	
 
-
+#ifdef MEASURE_FORCE0
   if(logger_getlevel("FORCE-STAT")>=10){
     global_sum(forcestat,1);
     global_max(forcestat+1,1);
@@ -72,7 +71,8 @@ void force0(double dt, suNg_av_field *force, void *vpar){
     forcestat[0]*=beta/((4.*NG)*GLB_VOLUME);
     forcestat[1]*=beta/((double)(NG));
     lprintf("FORCE-STAT",10," force0 : dt= %1.8e avr |force|= %1.8e maxforce= %1.8e \n",dt,forcestat[0],forcestat[1]);
-  }  
+  }
+#endif
   
   apply_BCs_on_momentum_field(force);
 

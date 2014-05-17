@@ -230,7 +230,7 @@ psi = D^{-1} g5 Gamma^+ eta
 \***************************************************************************/
 
 static void z2semwall_qprop_QMR_eo(void (*Gamma)(suNf_spinor*,suNf_spinor*), spinor_field *psi, spinor_field *eta) {
-  _DECLARE_INT_ITERATOR(ix);
+
   spinor_field qprop_mask;
   int i, cgiter=0;
 
@@ -241,7 +241,6 @@ static void z2semwall_qprop_QMR_eo(void (*Gamma)(suNf_spinor*,suNf_spinor*), spi
 #endif /* NDEBUG */
 
   for(i=0;i<QMR_par.n;++i){
-
 #ifndef NDEBUG
     /* this is a test of the solution */
     hmass_pre=mass[i];

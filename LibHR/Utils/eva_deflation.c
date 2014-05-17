@@ -130,7 +130,6 @@ void set_def_matrix(eva_prec *e_par, spinor_operator H, geometry_descriptor *typ
 
 
 void eva_def(spinor_field *out, spinor_field *in){
-  int i;
   spinor_field_copy_f(out,in);
   orthogonalize(out,ev,loc_par.nev);
   /*

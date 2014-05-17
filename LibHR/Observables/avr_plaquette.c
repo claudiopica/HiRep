@@ -16,6 +16,7 @@
 #include "communications.h"
 #include "logger.h"
 #include "observables.h"
+#include "geometry.h"
 #include <stdio.h>
 
 double plaq(int ix,int mu,int nu)
@@ -83,15 +84,16 @@ void cplaq(complex *ret,int ix,int mu,int nu)
 
 double avr_plaquette()
 {
-  _DECLARE_INT_ITERATOR(ix);
   double pa=0.;
 
-  _PIECE_FOR(&glattice,ix) {
-    if(_PIECE_INDEX(ix)==glattice.inner_master_pieces) {
+  _PIECE_FOR(&glattice,ixp) {
+    if(ixp==glattice.inner_master_pieces) {
+      _OMP_PRAGMA( master )
       /* wait for gauge field to be transfered */
       complete_gf_sendrecv(u_gauge);
+      _OMP_PRAGMA( barrier )
     }
-    _SITE_FOR(&glattice,ix) {
+    _SITE_FOR_SUM(&glattice,ixp,ix,pa) {
       pa+=plaq(ix,1,0);
       pa+=plaq(ix,2,0);
       pa+=plaq(ix,2,1);
@@ -109,21 +111,23 @@ double avr_plaquette()
 
 void full_plaquette()
 {
-  _DECLARE_INT_ITERATOR(ix);
-  int k;
   complex pa[6];
-
-  for(k=0;k<6;k++)
-    pa[k].re=pa[k].im=0.;
+#ifdef _OPENMP
+  double rpa1,rpa2,rpa3,rpa4,rpa5,rpa6,rpa7,rpa8,rpa9,rpa10,rpa11,rpa12; //for OMP reduction
+#endif
+  
+  for(int k=0;k<6;k++) { _complex_0(pa[k]); }
 
 /*  int t=0; */
   
-  _PIECE_FOR(&glattice,ix) {
-    if(_PIECE_INDEX(ix)==glattice.inner_master_pieces) {
+  _PIECE_FOR(&glattice,ixp) {
+    if(ixp==glattice.inner_master_pieces) {
+      _OMP_PRAGMA( master )
       /* wait for gauge field to be transfered */
       complete_gf_sendrecv(u_gauge);
+      _OMP_PRAGMA( barrier )
     }
-    _SITE_FOR(&glattice,ix) {
+    _SITE_FOR_SUM(&glattice,ixp,ix,rpa1,rpa2,rpa3,rpa4,rpa5,rpa6,rpa7,rpa8,rpa9,rpa10,rpa11,rpa12) {
       complex tmp;
 		  cplaq(&tmp,ix,1,0); _complex_add_assign(pa[0],tmp);
 		  cplaq(&tmp,ix,2,0); _complex_add_assign(pa[1],tmp);
@@ -131,6 +135,16 @@ void full_plaquette()
 		  cplaq(&tmp,ix,3,0); _complex_add_assign(pa[3],tmp);
 		  cplaq(&tmp,ix,3,1); _complex_add_assign(pa[4],tmp);
 		  cplaq(&tmp,ix,3,2); _complex_add_assign(pa[5],tmp);
+
+#ifdef _OPENMP
+      rpa1=pa[0].re; rpa2=pa[0].im;
+      rpa3=pa[1].re; rpa4=pa[1].im;
+      rpa5=pa[2].re; rpa6=pa[2].im;
+      rpa7=pa[3].re; rpa8=pa[3].im;
+      rpa9=pa[4].re; rpa10=pa[4].im;
+      rpa11=pa[5].re; rpa12=pa[5].im;
+#endif
+      
 /*		  
 		  if(twbc_plaq[ix*16+2*4+1]==-1 &&
 		    twbc_plaq[ix*16+3*4+1]==-1 &&
@@ -152,8 +166,18 @@ void full_plaquette()
     }
   }
 
+#ifdef _OPENMP
+  pa[0].re=rpa1; pa[0].im=rpa2;
+  pa[1].re=rpa3; pa[1].im=rpa4;
+  pa[2].re=rpa5; pa[2].im=rpa6;
+  pa[3].re=rpa7; pa[3].im=rpa8;
+  pa[4].re=rpa9; pa[4].im=rpa10;
+  pa[5].re=rpa11; pa[5].im=rpa12;
+#endif
+
+  
   global_sum((double*)pa,12);
-  for(k=0;k<6;k++) {
+  for(int k=0;k<6;k++) {
     pa[k].re /= GLB_VOLUME*NG;
     pa[k].im /= GLB_VOLUME*NG;
   }

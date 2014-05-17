@@ -91,13 +91,7 @@ void assign_s2sd(spinor_field *out, spinor_field_flt *in) {
   float *i;
   double *o;
 
-  _DECLARE_INT_ITERATOR(ix);
-  _DECLARE_SPINOR_ITERATOR(out);
-  _DECLARE_SPINOR_FLT_ITERATOR(in);
-
-  _TWO_SPINORS_MATCHING(in,out);
-
-  _TWO_SPINORS_FOR(out,in,ix) {
+  _TWO_SPINORS_FOR(out,in) {
     o=(double*)_SPINOR_PTR(out);
     i=(float*)_SPINOR_PTR(in);
     for (n=0;n<(8*NF);n++)
@@ -114,13 +108,7 @@ void assign_sd2s(spinor_field_flt *out, spinor_field *in) {
   float *o;
   double *i;
 
-  _DECLARE_INT_ITERATOR(ix); 
-  _DECLARE_SPINOR_FLT_ITERATOR(out);
-  _DECLARE_SPINOR_ITERATOR(in);
-
-  _TWO_SPINORS_MATCHING(in,out);
-
-  _TWO_SPINORS_FOR(out,in,ix) {
+  _TWO_SPINORS_FOR(out,in) {
     o=(float*)_SPINOR_PTR(out);
     i=(double*)_SPINOR_PTR(in);
     for (n=0;n<(8*NF);n++)

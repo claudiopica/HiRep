@@ -37,15 +37,14 @@ static spinor_field *ppk[5];
 
 static int initr=0;
 static const suNf_spinor s0={{{{{0.0f}}}}};
-static suNf_spinor *psi,*chi;
+static suNf_spinor *psi;
 
 
 static void alloc_ws_rotate(void)
 {
   psi=calloc(MAX_ROTATE,sizeof(suNf_spinor));
-  chi=calloc(MAX_ROTATE,sizeof(suNf_spinor));
-
-  error((psi==NULL)||(chi==NULL),1,"alloc_ws_rotate [linalg.c]",
+ 
+  error((psi==NULL),1,"alloc_ws_rotate [linalg.c]",
 	"Unable to allocate workspace");
 
   initr=1;
@@ -53,42 +52,40 @@ static void alloc_ws_rotate(void)
 
 static void rotate_ptr(int n,spinor_field *pkk[],complex v[])
 {
-  int i,k,j;
-  _DECLARE_INT_ITERATOR(ix);
-  complex *z;
-  suNf_spinor *pk,*pj;
-
   if (initr==0)
     alloc_ws_rotate();
-
+  
   error((n<1)||(n>MAX_ROTATE),1,"rotate [eva.c]",
-	"Parameter n is out of range");
-
-  for(i=0; i<n; i++)
+        "Parameter n is out of range");
+  
+  for(int i=0; i<n; i++)
     error((*pkk)->type!=(*(pkk+i))->type,1,"not available", "Spinors don't match!");
-
+  
+#undef _OMP_PRAGMA //This doesn't works with multiple threads
+#define _OMP_PRAGMA(s)
+  
   _MASTER_FOR(pkk[0]->type,ix)
+  {
+    for (int k=0;k<n;k++)
     {
-      for (k=0;k<n;k++)
-	{
-	  pk=&(psi[k]);
-	  pj=_FIELD_AT(pkk[0],ix);
-	  z=&v[k];
-
-	  _spinor_mulc_f(*pk,*z,*pj);
-
-	  for (j=1;j<n;j++)
+      suNf_spinor *pk=&(psi[k]);
+      suNf_spinor *pj=_FIELD_AT(pkk[0],ix);
+      complex *z=&v[k];
+      
+      _spinor_mulc_f(*pk,*z,*pj);
+      
+      for (int j=1;j<n;j++)
 	    {
 	      pj=_FIELD_AT(pkk[j],ix);
 	      z+=n;
-
+        
 	      _spinor_mulc_add_assign_f(*pk,*z,*pj);
 	    }
-	}
-
-      for (k=0;k<n;k++)
-	*_FIELD_AT(pkk[k],ix)=psi[k];
     }
+    
+    for (int k=0;k<n;k++)
+      *_FIELD_AT(pkk[k],ix)=psi[k];
+  }
 }
 
 static void project(spinor_field *pk,spinor_field *pl)
@@ -117,35 +114,31 @@ static double normalize(spinor_field *ps)
 
 static complex sp(spinor_field *pk,spinor_field *pl)
 {
-  _DECLARE_INT_ITERATOR(ix);
-  _DECLARE_SPINOR_ITERATOR(pk);
-  _DECLARE_SPINOR_ITERATOR(pl);
-  int i;
-  double x,y;
+
   complex *rpk,*rpl,z;
-
-  x=0.0;
-  y=0.0;
-
-  _TWO_SPINORS_FOR(pk,pl,ix) {
-    for (i=0;i<(4*NF);i++)
-      {
-	rpk = (complex*)_SPINOR_PTR(pk) + i;
-	rpl = (complex*)_SPINOR_PTR(pl) + i;
-	x+=(double)((*rpk).re*(*rpl).re+(*rpk).im*(*rpl).im);
-	y+=(double)((*rpk).re*(*rpl).im-(*rpk).im*(*rpl).re);
-	rpk+=1;
-	rpl+=1;
-      }
+  
+  double x=0.0;
+  double y=0.0;
+  
+  _TWO_SPINORS_FOR_SUM(pk,pl,x,y) {
+    for (int i=0;i<(4*NF);i++)
+    {
+      complex *rpk = (complex*)_SPINOR_PTR(pk) + i;
+      complex *rpl = (complex*)_SPINOR_PTR(pl) + i;
+      x+=(double)((*rpk).re*(*rpl).re+(*rpk).im*(*rpl).im);
+      y+=(double)((*rpk).re*(*rpl).im-(*rpk).im*(*rpl).re);
+      //rpk+=1; //?? why these increment
+      //rpl+=1; //??
+    }
   }
-   
-  z.re=(double)(x);
-  z.im=(double)(y);
-
+  
+  z.re=x;
+  z.im=y;
+  
 #ifdef WITH_MPI
   global_sum((double*)&z,2);
 #endif
-    
+  
   return z;
 }
 

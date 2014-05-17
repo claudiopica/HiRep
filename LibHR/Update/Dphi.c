@@ -156,14 +156,6 @@ _vector_mulc_star_f((r),eitheta[3],vtmp)
 
 void Dphi_(spinor_field *out, spinor_field *in)
 {
-   int iy;
-   _DECLARE_INT_ITERATOR(ix);
-   suNf *up,*um;
-   suNf_vector psi,chi;
-   suNf_spinor *r=0,*sp,*sm;
-#if defined(BC_T_THETA) || defined(BC_X_THETA) || defined(BC_Y_THETA) || defined(BC_Z_THETA)
-    suNf_vector vtmp;
-#endif
 
    error((in==NULL)||(out==NULL),1,"Dphi_ [Dphi.c]",
          "Attempt to access unallocated memory space");
@@ -185,12 +177,23 @@ void Dphi_(spinor_field *out, spinor_field *in)
    /* start communication of input spinor field */
    start_sf_sendrecv(in);
 
-   _PIECE_FOR(out->type,ix) {
-     if(_PIECE_INDEX(ix)==out->type->inner_master_pieces) {
+  _PIECE_FOR(out->type,ixp) {
+     if(ixp==out->type->inner_master_pieces) {
+       _OMP_PRAGMA( master )
        /* wait for spinor to be transfered */
        complete_sf_sendrecv(in);
+       _OMP_PRAGMA( barrier )
      }
-     _SITE_FOR(out->type,ix) {
+     _SITE_FOR(out->type,ixp,ix) {
+
+       int iy;
+       suNf *up,*um;
+       suNf_vector psi,chi;
+       suNf_spinor *r=0,*sp,*sm;
+#if defined(BC_T_THETA) || defined(BC_X_THETA) || defined(BC_Y_THETA) || defined(BC_Z_THETA)
+       suNf_vector vtmp;
+#endif
+
        r=_FIELD_AT(out,ix);
  
        /******************************* direction +0 *********************************/

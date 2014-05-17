@@ -54,43 +54,42 @@ complex my_gamma[4][4][4];
 
 void compute_gamma(int g[4], int ic) {
   int p[4], c[4], shift[4];
-  int mu, nu, alpha, beta;
   double dbl;
   complex locmy_gamma[4][4][4];
-  _DECLARE_INT_ITERATOR(ix);
+  
   spinor_field *in, *out;
   in=alloc_spinor_field_f(1,&glattice);
   out=alloc_spinor_field_f(1,&glattice);
 
-  for(mu=0; mu<4; mu++)
-  for(beta=0; beta<4; beta++)
-  for(alpha=0; alpha<4; alpha++) {
+  for(int mu=0; mu<4; mu++)
+  for(int beta=0; beta<4; beta++)
+  for(int alpha=0; alpha<4; alpha++) {
     locmy_gamma[mu][alpha][beta].re = 0.;
     locmy_gamma[mu][alpha][beta].im = 0.;
   }
   
   p[0] = g[0]/T; p[1] = g[1]/X; p[2] = g[2]/Y; p[3] = g[3]/Z;
   
-  for(mu=0; mu<4; mu++) {
+  for(int mu=0; mu<4; mu++) {
     shift[0]=shift[1]=shift[2]=shift[3]=0;
     shift[mu]=1;
     
     _MASTER_FOR(&glattice,ix) {
-      for(nu=0; nu<4; nu++) {
+      for(int nu=0; nu<4; nu++) {
         _suNg_zero(*_4FIELD_AT(u_gauge,ix,nu));
       }
     }
     if(COORD[0]==p[0] && COORD[1]==p[1] && COORD[2]==p[2] && COORD[3]==p[3]) {
       c[0] = g[0]%T; c[1] = g[1]%X; c[2] = g[2]%Y; c[3] = g[3]%Z;
-      ix=ipt(c[0],c[1],c[2],c[3]);
+      int ix=ipt(c[0],c[1],c[2],c[3]);
       _suNg_unit(*_4FIELD_AT(u_gauge,ix,mu));
     }
     start_gf_sendrecv(u_gauge);
     represent_gauge_field();
 
     dbl=0.;
-    _MASTER_FOR(&glattice,ix) {
-      for(nu=0; nu<4; nu++) {
+    _MASTER_FOR_SUM(&glattice,ix,dbl) {
+      for(int nu=0; nu<4; nu++) {
         double tmp;
         _suNf_sqnorm(tmp,*_4FIELD_AT(u_gauge_f,ix,nu));
         dbl+=tmp;
@@ -100,7 +99,7 @@ void compute_gamma(int g[4], int ic) {
     if(dbl!=NF)
       lprintf("ERROR",0,"u_gauge_f sqnorm=%f\n",dbl);
 
-    for(beta=0; beta<4; beta++) {
+    for(int beta=0; beta<4; beta++) {
       spinor_field_zero_f(in);
       _MASTER_FOR(&glattice,ix) {
         _FIELD_AT(in,ix)->c[beta].c[ic].re=1.;
@@ -120,13 +119,13 @@ void compute_gamma(int g[4], int ic) {
       for(c[1]=0; c[1]<X; c[1]++)
       for(c[2]=0; c[2]<Y; c[2]++)
       for(c[3]=0; c[3]<Z; c[3]++) {
-        ix=ipt(c[0],c[1],c[2],c[3]);
+        int ix=ipt(c[0],c[1],c[2],c[3]);
         if(c[0]+zerocoord[0]==g[0] &&
            c[1]+zerocoord[1]==g[1] &&
            c[2]+zerocoord[2]==g[2] &&
            c[3]+zerocoord[3]==g[3])
         {
-          for(alpha=0; alpha<4; alpha++) {
+          for(int alpha=0; alpha<4; alpha++) {
             locmy_gamma[mu][alpha][beta].re += _FIELD_AT(out,ix)->c[alpha].c[ic].re;
             locmy_gamma[mu][alpha][beta].im += _FIELD_AT(out,ix)->c[alpha].c[ic].im;
           }
@@ -135,7 +134,7 @@ void compute_gamma(int g[4], int ic) {
                   c[2]+zerocoord[2]==(g[2]+shift[2])%GLB_Y &&
                   c[3]+zerocoord[3]==(g[3]+shift[3])%GLB_Z)
         {
-          for(alpha=0; alpha<4; alpha++) {
+          for(int alpha=0; alpha<4; alpha++) {
             locmy_gamma[mu][alpha][beta].re -= _FIELD_AT(out,ix)->c[alpha].c[ic].re;
             locmy_gamma[mu][alpha][beta].im -= _FIELD_AT(out,ix)->c[alpha].c[ic].im;
           }
@@ -160,11 +159,11 @@ void compute_gamma(int g[4], int ic) {
   }
 */
   if(init_gamma==0) {
-    for(mu=0; mu<4; mu++) {
+    for(int mu=0; mu<4; mu++) {
       lprintf("GAMMA",0,"gamma[%d] = \n",mu);
-      for(alpha=0; alpha<4; alpha++) {
+      for(int alpha=0; alpha<4; alpha++) {
         lprintf("GAMMA",0,"[ ");
-        for(beta=0; beta<4; beta++) {
+        for(int beta=0; beta<4; beta++) {
           my_gamma[mu][alpha][beta]=locmy_gamma[mu][alpha][beta];
           lprintf("GAMMA",0,"(%.2f,%.2f) ",my_gamma[mu][alpha][beta].re,my_gamma[mu][alpha][beta].im);
         }
@@ -173,19 +172,19 @@ void compute_gamma(int g[4], int ic) {
     }
     init_gamma=1;
   } else {
-    for(mu=0; mu<4; mu++) {
+    for(int mu=0; mu<4; mu++) {
       dbl=0.;
-      for(beta=0; beta<4; beta++)
-      for(alpha=0; alpha<4; alpha++) {
+      for(int beta=0; beta<4; beta++)
+      for(int alpha=0; alpha<4; alpha++) {
         dbl+=(locmy_gamma[mu][alpha][beta].re-my_gamma[mu][alpha][beta].re)*(locmy_gamma[mu][alpha][beta].re-my_gamma[mu][alpha][beta].re);
         dbl+=(locmy_gamma[mu][alpha][beta].im-my_gamma[mu][alpha][beta].im)*(locmy_gamma[mu][alpha][beta].im-my_gamma[mu][alpha][beta].im);
       }
       if(dbl!=0.) {
         lprintf("ERROR",0,"Wrong gamma matrix! g=(%d,%d,%d,%d) ic=%d mu=%d err2=%e\n",g[0],g[1],g[2],g[3],ic,mu,dbl);
         lprintf("ERROR",0,"gamma[%d] = \n",mu);
-        for(alpha=0; alpha<4; alpha++) {
+        for(int alpha=0; alpha<4; alpha++) {
           lprintf("ERROR",0,"[ ");
-          for(beta=0; beta<4; beta++) {
+          for(int beta=0; beta<4; beta++) {
             lprintf("ERROR",0,"(%.2f,%.2f) ",locmy_gamma[mu][alpha][beta].re,locmy_gamma[mu][alpha][beta].im);
           }
           lprintf("ERROR",0,"]\n");

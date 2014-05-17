@@ -135,7 +135,6 @@ int update_puregauge(){
     #endif
     
     double deltaH;
-    _DECLARE_INT_ITERATOR(ix);
     
     if (!init) {
         /* not initialized */
@@ -179,7 +178,7 @@ int update_puregauge(){
     
     /* Metropolis test */
     deltaH=0.;
-    _MASTER_FOR(la->type,ix) {
+    _MASTER_FOR_SUM(la->type,ix,deltaH) {
         deltaH+=*_FIELD_AT(la,ix);
     }
     global_sum(&deltaH, 1);

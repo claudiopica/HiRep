@@ -210,11 +210,6 @@ void spatialHYP_smearing(suNg_field* out, suNg_field* in, double weight[3]) {
 
 
 void HYP_smearing(suNg_field* out, suNg_field* in, double weight[3]) {
-  _DECLARE_INT_ITERATOR(ix);
-  int mu,nu,rho,eta;
-  int iy;
-  int i;
-  suNg tmp[3];
   suNg_field* Vbar[24];
   suNg_field* Vtilde[12];
 
@@ -223,8 +218,8 @@ void HYP_smearing(suNg_field* out, suNg_field* in, double weight[3]) {
 
   lprintf("HYP",30,"HYP smearing with weights %f %f %f\n",weight[0],weight[1],weight[2]);
 
-  for(i=0;i<24;i++) Vbar[i]=alloc_gtransf(&glattice);
-  for(i=0;i<12;i++) Vtilde[i]=alloc_gtransf(&glattice);
+  for(int i=0;i<24;i++) Vbar[i]=alloc_gtransf(&glattice);
+  for(int i=0;i<12;i++) Vtilde[i]=alloc_gtransf(&glattice);
 
   init_HYP_indices();
   
@@ -240,20 +235,24 @@ U{x,eta} U{x+eta,mu} U{x+mu,eta}^\dag
 
   start_gf_sendrecv(in);
 
-  _PIECE_FOR(&glattice,ix) {
-    if(_PIECE_INDEX(ix)==glattice.inner_master_pieces) {
+  _PIECE_FOR(&glattice,ixp) {
+    if(ixp==glattice.inner_master_pieces) {
+      _OMP_PRAGMA( master )
       complete_gf_sendrecv(in);
+      _OMP_PRAGMA( barrier )
     }
-    _SITE_FOR(&glattice,ix) {
+    suNg tmp[3];
+    _SITE_FOR(&glattice,ixp,ix) {
 
-      for(i=0;i<24;i++) {
-        mu=index_to_three[i][0];
-        nu=index_to_three[i][1];
-        rho=index_to_three[i][2];
-  
+      for(int i=0;i<24;i++) {
+        int mu=index_to_three[i][0];
+        int nu=index_to_three[i][1];
+        int rho=index_to_three[i][2];
+        int eta=(0+1+2+3)-mu-nu-rho;
+        int iy;
+        
         _suNg_zero(tmp[0]);
-        eta=0+1+2+3-mu-nu-rho;
-          
+        
         iy=iup(ix,eta);
         _suNg_times_suNg(tmp[1],*_4FIELD_AT(in,ix,eta),*_4FIELD_AT(in,iy,mu));
         iy=iup(ix,mu);
@@ -289,20 +288,24 @@ Vbar{x,rho;nu,mu} Vbar{x+rho,mu;rho,nu} Vbar{x+mu,rho;nu,mu}^\dag
 
 */
 
-  for(i=0;i<24;i++) start_gt_sendrecv(Vbar[i]);
+  for(int i=0;i<24;i++) start_gt_sendrecv(Vbar[i]);
 
-  _PIECE_FOR(&glattice,ix) {
-    if(_PIECE_INDEX(ix)==glattice.inner_master_pieces) {
-      for(i=0;i<24;i++) complete_gt_sendrecv(Vbar[i]);
+  _PIECE_FOR(&glattice,ixp) {
+    if(ixp==glattice.inner_master_pieces) {
+      _OMP_PRAGMA( master )
+      for(int i=0;i<24;i++) complete_gt_sendrecv(Vbar[i]);
+      _OMP_PRAGMA( barrier )
     }
-    _SITE_FOR(&glattice,ix) {
+    suNg tmp[3];
+    _SITE_FOR(&glattice,ixp, ix) {
 
-      for(i=0;i<12;i++) {
-        mu=index_to_two[i][0];
-        nu=index_to_two[i][1];
-
+      for(int i=0;i<12;i++) {
+        int mu=index_to_two[i][0];
+        int nu=index_to_two[i][1];
+        
         _suNg_zero(tmp[0]);
-        for(rho=0;rho<4;rho++){
+        for(int rho=0;rho<4;rho++){
+          int iy;
           if(rho==mu || rho==nu) continue;
           
           iy=iup(ix,rho);
@@ -340,18 +343,22 @@ Vtilde{x,nu;mu} Vtilde{x+nu,mu;nu} Vtilde{x+mu,nu;mu}^\dag
 
 */
 
-  for(i=0;i<12;i++) start_gt_sendrecv(Vtilde[i]);
+  for(int i=0;i<12;i++) start_gt_sendrecv(Vtilde[i]);
 
-  _PIECE_FOR(&glattice,ix) {
-    if(_PIECE_INDEX(ix)==glattice.inner_master_pieces) {
-      for(i=0;i<12;i++) complete_gt_sendrecv(Vtilde[i]);
+  _PIECE_FOR(&glattice,ixp) {
+    if(ixp==glattice.inner_master_pieces) {
+      _OMP_PRAGMA( master )
+      for(int i=0;i<12;i++) complete_gt_sendrecv(Vtilde[i]);
+      _OMP_PRAGMA( barrier )
     }
-    _SITE_FOR(&glattice,ix) {
+    suNg tmp[3];
+    _SITE_FOR(&glattice,ixp,ix) {
 
-      for(mu=0;mu<4;mu++) {
+      for(int mu=0;mu<4;mu++) {
 
         _suNg_zero(tmp[0]);
-        for(nu=0;nu<4;nu++){
+        for(int nu=0;nu<4;nu++){
+          int iy;
           if(nu==mu) continue;
           
           iy=iup(ix,nu);
@@ -380,27 +387,26 @@ Vtilde{x,nu;mu} Vtilde{x+nu,mu;nu} Vtilde{x+mu,nu;mu}^\dag
   } /* PIECE FOR */  
 
 
-  for(i=0;i<24;i++) free_gtransf(Vbar[i]);
-  for(i=0;i<12;i++) free_gtransf(Vtilde[i]);
+  for(int i=0;i<24;i++) free_gtransf(Vbar[i]);
+  for(int i=0;i<12;i++) free_gtransf(Vtilde[i]);
 
 }
 
 
 double min_tplaq(suNg_field* g) {
-  _DECLARE_INT_ITERATOR(ix);
-  int mu;
-  int iy,iz;
-  double ret=2.,p;
-  suNg *v1,*v2,*v3,*v4,w1,w2,w3;
 
-  _MASTER_FOR(&glattice,ix) {
-    iy=iup(ix,0);
-    v1=_4FIELD_AT(g,ix,0);
-    for(mu=1;mu<4;mu++) {
-      iz=iup(ix,mu);
-      v2=_4FIELD_AT(g,iy,mu);
-      v3=_4FIELD_AT(g,iz,0);
-      v4=_4FIELD_AT(g,ix,mu);
+  double ret=2.;
+
+  _MASTER_FOR_MIN(&glattice,ix,ret) {
+    suNg w1,w2,w3;
+    double p;
+    int iy=iup(ix,0);
+    suNg *v1=_4FIELD_AT(g,ix,0);
+    for(int mu=1;mu<4;mu++) {
+      int iz=iup(ix,mu);
+      suNg *v2=_4FIELD_AT(g,iy,mu);
+      suNg *v3=_4FIELD_AT(g,iz,0);
+      suNg *v4=_4FIELD_AT(g,ix,mu);
       _suNg_times_suNg(w1,(*v1),(*v2));
       _suNg_times_suNg(w2,(*v4),(*v3));
       _suNg_times_suNg_dagger(w3,w1,w2);      

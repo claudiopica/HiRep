@@ -270,8 +270,6 @@ int update_rhmc(){
     
     double deltaH;
     double oldmax,oldmin;
-    _DECLARE_INT_ITERATOR(ix);
-    unsigned int i;
     
     if (!init) {
         /* not initialized */
@@ -282,7 +280,7 @@ int update_rhmc(){
     /* generate new momenta and pseudofermions */
     lprintf("RHMC",30,"Generating gaussian momenta and pseudofermions...\n");
     gaussian_momenta(momenta);
-    for (i=0;i<_update_par.n_pf;++i)
+    for (int i=0;i<_update_par.n_pf;++i)
         gaussian_spinor_field(&pf[i]);
 
     /* compute starting action */
@@ -291,7 +289,7 @@ int update_rhmc(){
     
     /* compute H2^{a/2}*pf */
     lprintf("RHMC",30,"Correcting pseudofermions distribution...\n");
-    for (i=0;i<_update_par.n_pf;++i)
+    for (int i=0;i<_update_par.n_pf;++i)
         rational_func(&r_HB, &H2, &pf[i], &pf[i]);
     
     /* integrate molecular dynamics */
@@ -328,7 +326,7 @@ int update_rhmc(){
     lprintf("RHMC",30,"Computing new action density...\n");
     /* compute H2^{-a/2}*pf or H2^{-a}*pf */
     /* here we choose the first strategy which is more symmetric */
-    for (i=0;i<_update_par.n_pf;++i)
+    for (int i=0;i<_update_par.n_pf;++i)
         rational_func(&r_S, &H2, &pf[i], &pf[i]);
     
     /* compute new action */
@@ -336,7 +334,7 @@ int update_rhmc(){
     
     /* Metropolis test */
     deltaH=0.;
-    _MASTER_FOR(la->type,ix) {
+    _MASTER_FOR_SUM(la->type,ix,deltaH) {
         deltaH+=*_FIELD_AT(la,ix);
     }
     global_sum(&deltaH, 1);
@@ -386,9 +384,7 @@ int update_rhmc(){
 int update_rhmc_o(){
     
     double deltaH;
-    _DECLARE_INT_ITERATOR(ix);
-    unsigned int i;
-    
+  
     if(!init)
         return -1;
     
@@ -398,7 +394,7 @@ int update_rhmc_o(){
     if((calln++&1)==0){
         lprintf("RHMC",30,"Generating gaussian momenta and pseudofermions...\n");
         gaussian_momenta(momenta);
-        for (i=0;i<_update_par.n_pf;++i)
+        for (int i=0;i<_update_par.n_pf;++i)
             gaussian_spinor_field(&pf[i]);
     }
     else
@@ -409,7 +405,7 @@ int update_rhmc_o(){
     
     /* compute H2^{a/2}*pf */
     lprintf("RHMC",30,"Correcting pseudofermions distribution...\n");
-    for (i=0;i<_update_par.n_pf;++i)
+    for (int i=0;i<_update_par.n_pf;++i)
         rational_func(&r_HB, &H2, &pf[i], &pf[i]);
     
     /* integrate molecular dynamics */
@@ -430,7 +426,7 @@ int update_rhmc_o(){
     lprintf("RHMC",30,"Computing new action density...\n");
     /* compute H2^{-a/2}*pf or H2^{-a}*pf */
     /* here we choose the first strategy which is more symmetric */
-    for (i=0;i<_update_par.n_pf;++i)
+    for (int i=0;i<_update_par.n_pf;++i)
         rational_func(&r_S, &H2, &pf[i], &pf[i]);
     
     /* compute new action */
@@ -438,8 +434,8 @@ int update_rhmc_o(){
     
     /* Metropolis test */
     deltaH=0.;
-    _MASTER_FOR(la->type,ix) {
-        deltaH+=*_FIELD_AT(la,i);
+    _MASTER_FOR_SUM(la->type,ix,deltaH) {
+        deltaH+=*_FIELD_AT(la,ix);
     }
     global_sum(&deltaH, 1);
     lprintf("RHMC",10,"[DeltaS = %1.8e][exp(-DS) = %1.8e]\n",deltaH,exp(-deltaH));

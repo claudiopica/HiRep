@@ -116,41 +116,40 @@ static void alloc_ws_rotate(void)
 
 static void rotate(int n,spinor_field *pkk,complex v[])
 {
-  _DECLARE_INT_ITERATOR(ix);
   int k,j;
   complex *z;
   suNf_spinor *pk,*pj;
-
+  
   if (initr==0)
     alloc_ws_rotate();
-
+  
   error((n<1)||(n>MAX_ROTATE),1,"rotate [eva.c]",
-	"Parameter n is out of range");
-
+        "Parameter n is out of range");
+  
   _MASTER_FOR(pkk->type,ix) {
     for (k=0;k<n;k++)
+    {
+      pk=&(psi[k]);
+      pj=_FIELD_AT(&pkk[0],ix);
+      z=&v[k];
+      
+      _vector_mulc_f((*pk).c[0],*z,(*pj).c[0]);
+      _vector_mulc_f((*pk).c[1],*z,(*pj).c[1]);
+      _vector_mulc_f((*pk).c[2],*z,(*pj).c[2]);
+      _vector_mulc_f((*pk).c[3],*z,(*pj).c[3]);
+      
+      for (j=1;j<n;j++)
       {
-	pk=&(psi[k]);
-	pj=_FIELD_AT(&pkk[0],ix);
-	z=&v[k];
-
-	_vector_mulc_f((*pk).c[0],*z,(*pj).c[0]);
-	_vector_mulc_f((*pk).c[1],*z,(*pj).c[1]);
-	_vector_mulc_f((*pk).c[2],*z,(*pj).c[2]);
-	_vector_mulc_f((*pk).c[3],*z,(*pj).c[3]);
-
-	for (j=1;j<n;j++)
-	  {
-            pj=_FIELD_AT(&pkk[j],ix);
-            z+=n;
-
-            _vector_mulc_add_assign_f((*pk).c[0],*z,(*pj).c[0]);
-            _vector_mulc_add_assign_f((*pk).c[1],*z,(*pj).c[1]);
-            _vector_mulc_add_assign_f((*pk).c[2],*z,(*pj).c[2]);
-            _vector_mulc_add_assign_f((*pk).c[3],*z,(*pj).c[3]);
-	  }
+        pj=_FIELD_AT(&pkk[j],ix);
+        z+=n;
+        
+        _vector_mulc_add_assign_f((*pk).c[0],*z,(*pj).c[0]);
+        _vector_mulc_add_assign_f((*pk).c[1],*z,(*pj).c[1]);
+        _vector_mulc_add_assign_f((*pk).c[2],*z,(*pj).c[2]);
+        _vector_mulc_add_assign_f((*pk).c[3],*z,(*pj).c[3]);
       }
-
+    }
+    
     for (k=0;k<n;k++)
       *_FIELD_AT(&pkk[k],ix)=psi[k];
   }

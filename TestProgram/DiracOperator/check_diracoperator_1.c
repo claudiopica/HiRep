@@ -32,22 +32,18 @@ static void D(spinor_field *out, spinor_field *in){
 
 static void random_g(void)
 {
-   _DECLARE_INT_ITERATOR(ix);
-
-   _MASTER_FOR(&glattice,ix)
+  _MASTER_FOR(&glattice,ix) {
       random_suNg(_FIELD_AT(g,ix));
+  }
 }
 
 static void transform_u(void)
 {
-   _DECLARE_INT_ITERATOR(ix);
-   int iy,mu;
-   suNg *u,v;
-
    _MASTER_FOR(&glattice,ix) {
-      for (mu=0;mu<4;mu++) {
-         iy=iup(ix,mu);
-         u=pu_gauge(ix,mu);
+     suNg v;
+     for (int mu=0;mu<4;mu++) {
+         int iy=iup(ix,mu);
+         suNg *u=pu_gauge(ix,mu);
          _suNg_times_suNg_dagger(v,*u,*_FIELD_AT(g,iy));
          _suNg_times_suNg(*u,*_FIELD_AT(g,ix),v);
       }
@@ -59,21 +55,18 @@ static void transform_u(void)
 
 static void transform_s(spinor_field *out, spinor_field *in)
 {
-   _DECLARE_INT_ITERATOR(ix);
-   suNf gfx;
-   suNf_spinor *r,*s;
-
-   _MASTER_FOR(&glattice,ix) {
-      s = _FIELD_AT(in,ix);
-      r = _FIELD_AT(out,ix);
-      
-      _group_represent2(&gfx,_FIELD_AT(g,ix));
-
-      _suNf_multiply(r->c[0],gfx,s->c[0]);
-      _suNf_multiply(r->c[1],gfx,s->c[1]);
-      _suNf_multiply(r->c[2],gfx,s->c[2]);
-      _suNf_multiply(r->c[3],gfx,s->c[3]);
-   }   
+  _MASTER_FOR(&glattice,ix) {
+    suNf_spinor *s = _FIELD_AT(in,ix);
+    suNf_spinor *r = _FIELD_AT(out,ix);
+    suNf gfx;
+ 
+    _group_represent2(&gfx,_FIELD_AT(g,ix));
+    
+    _suNf_multiply(r->c[0],gfx,s->c[0]);
+    _suNf_multiply(r->c[1],gfx,s->c[1]);
+    _suNf_multiply(r->c[2],gfx,s->c[2]);
+    _suNf_multiply(r->c[3],gfx,s->c[3]);
+  }
 }
 
 

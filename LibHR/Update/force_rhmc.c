@@ -132,19 +132,10 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar){
   gettimeofday(&start,0);
   #endif
 
-  _DECLARE_INT_ITERATOR(x);
-  int mu, k;
-  unsigned int n;
-  static suNg_algebra_vector f;
-  static suNf_vector ptmp;
-  static suNf_spinor p;
-  static suNf s1;
   static mshift_par inv_par;
   #ifdef UPDATE_EO
   spinor_field delta, sigma;
   #endif
-  double forcestat[2]; /* used for computation of avr and max force */
-  double nsq;
   
   force_rhmc_par *par = (force_rhmc_par*)vpar;
   spinor_field *pf = par->pf;
@@ -171,14 +162,14 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar){
   
   #ifdef UPDATE_EO
   /* change the type of chi[n] */
-  for (n=0; n<ratio->order; ++n) {
+  for (int n=0; n<ratio->order; ++n) {
     chi[n].type=&glat_even;
   }
   Hchi->type=&glat_even; 
   #endif
   
   
-  for (k=0; k<par->n_pf; ++k) {
+  for (int k=0; k<par->n_pf; ++k) {
     /* compute inverse vectors chi[i] = (H^2 - b[i])^1 * pf */
     if (inv_par.n==1) { spinor_field_zero_f(chi); }
 
@@ -200,7 +191,7 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar){
     lprintf("TIMING",0,"cg_mshift in force_rhmc %.6f s\n",1.*etime.tv_sec+1.e-6*etime.tv_usec);
     #endif
 
-    for (n=0; n<ratio->order; ++n) {
+    for (int n=0; n<ratio->order; ++n) {
       #ifdef UPDATE_EO
       /* change temporarely the type of chi[n] and Hchi */
       g5Dphi_eopre(par->mass, Hchi, &chi[n]);
@@ -222,23 +213,40 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar){
       g5Dphi(par->mass, Hchi, &chi[n]);
       start_sf_sendrecv(Hchi);
       #endif
-      	    
-      /* reset force stat counters */
-      forcestat[1]=forcestat[0]=0.;
       
-      _PIECE_FOR(&glattice,x) { 
-        if(_PIECE_INDEX(x)==glattice.inner_master_pieces) {
+#ifdef MEASURE_FORCERHMC
+      /* reset force stat counters */
+      double forcestat[2]={0.}; /* used for computation of avr and max force */
+#endif
+      
+      _PIECE_FOR(&glattice,xp) {
+        
+        suNg_algebra_vector f;
+        suNf_vector ptmp;
+        suNf_spinor p;
+        suNf_FMAT s1;
+
+        if(xp==glattice.inner_master_pieces) {
+          _OMP_PRAGMA( master )
           /* wait for spinor to be transfered */
-          #ifdef UPDATE_EO
-          complete_sf_sendrecv(&delta);
-          complete_sf_sendrecv(&sigma);
-          #else
-          complete_sf_sendrecv(Hchi);
-          #endif
+          {
+#ifdef UPDATE_EO
+            complete_sf_sendrecv(&delta);
+            complete_sf_sendrecv(&sigma);
+#else
+            complete_sf_sendrecv(Hchi);
+#endif
+          }
+          _OMP_PRAGMA( barrier )
         }
-        _SITE_FOR(&glattice,x) {
+        
+#ifdef MEASURE_FORCEHMC
+        _SITE_FOR_SUM(&glattice,xp,x,forcestat[0],forcestat[1]) {
+#else
+        _SITE_FOR(&glattice,xp,x) {
+#endif
           
-          for (mu=0; mu<4; ++mu) {
+          for (int mu=0; mu<4; ++mu) {
             int y;
             suNf_spinor *chi1, *chi2;
             _suNf_zero(s1);
@@ -287,29 +295,33 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar){
             #else
             _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),dt*ratio->a[n+1]*(_REPR_NORM2/_FUND_NORM2),f);	
             #endif
-            
+
+#ifdef MEASURE_FORCERHMC
+            double nsq;
             _algebra_vector_sqnorm_g(nsq,f);
             forcestat[0]+=sqrt(nsq);
             for(y=0;y<NG*NG-1;++y){
               if(forcestat[1]<fabs(*(((double*)&f)+y))) forcestat[1]=fabs(*(((double*)&f)+y));
             }
-          }
-        }
-      }
-      
-
+#endif
+          } //directions for
+        } //SITE_FOR
+      } //PIECE_FOR
+        
+        
+#ifdef MEASURE_FORCEHMC
       if(logger_getlevel("FORCE-STAT")>=10){
-	global_sum(forcestat,1);
-	global_max(forcestat+1,1);
-	
-	forcestat[0]*=ratio->a[n+1]*(_REPR_NORM2/_FUND_NORM2)/(4.*GLB_VOLUME);
-	forcestat[1]*=ratio->a[n+1]*(_REPR_NORM2/_FUND_NORM2);
-	lprintf("FORCE-STAT",10," force_rhmc: dt= %1.8e avr |force|= %1.8e maxforce= %1.8e mass= %f k= %d n= %d a= %1.8e b= %1.8e\n",dt,forcestat[0],forcestat[1],par->mass,k,n,ratio->a[n+1],ratio->b[n]);
-      }
-      
-
-    }
-  }
+        global_sum(forcestat,1);
+        global_max(forcestat+1,1);
+          
+        forcestat[0]*=ratio->a[n+1]*(_REPR_NORM2/_FUND_NORM2)/(4.*GLB_VOLUME);
+        forcestat[1]*=ratio->a[n+1]*(_REPR_NORM2/_FUND_NORM2);
+        lprintf("FORCE-STAT",10," force_rhmc: dt= %1.8e avr |force|= %1.8e maxforce= %1.8e mass= %f k= %d n= %d a= %1.8e b= %1.8e\n",dt,forcestat[0],forcestat[1],par->mass,k,n,ratio->a[n+1],ratio->b[n]);
+        }
+#endif
+        
+      } //For n ratio order
+    } //For pseudofermions loop
 
   apply_BCs_on_momentum_field(force);
 

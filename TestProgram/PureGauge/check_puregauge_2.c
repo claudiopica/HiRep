@@ -27,28 +27,23 @@
 
 static void random_g(suNg_field* g)
 {
-  _DECLARE_INT_ITERATOR(ix);
-
-  _MASTER_FOR(&glattice,ix)
+  _MASTER_FOR(&glattice,ix) {
     random_suNg(_FIELD_AT(g,ix));
+  }
 }
-
 
 static void transform(suNg_field* gtransf, suNg_field* gfield)
 {
-  _DECLARE_INT_ITERATOR(ix);
-  int iy,mu;
-  suNg *u,v;
-
   _MASTER_FOR(&glattice,ix) {
-    for (mu=0;mu<4;mu++) {
-      iy=iup(ix,mu);
-      u=_4FIELD_AT(gfield,ix,mu);
+    for (int mu=0;mu<4;mu++) {
+      int iy=iup(ix,mu);
+      suNg * u=_4FIELD_AT(gfield,ix,mu);
+      suNg v;
       _suNg_times_suNg_dagger(v,*u,*_FIELD_AT(gtransf,iy));
       _suNg_times_suNg(*u,*_FIELD_AT(gtransf,ix),v);
     }
   }
-
+  
   start_gf_sendrecv(gfield);
   complete_gf_sendrecv(gfield);
 }
@@ -109,9 +104,6 @@ int main(int argc,char *argv[])
 
   double norm, tmp;
   double weight[3]={0.6,0.4,0.3};
-  _DECLARE_INT_ITERATOR(ix);
-  int mu;
-
   
   
  
@@ -154,13 +146,14 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"Gauge covariance of the HYP smearing operator...\n");
   
   norm=0.;
-  _MASTER_FOR(&glattice,ix) {
-    for (mu=0;mu<4;mu++) {
+  _MASTER_FOR_SUM(&glattice,ix,norm) {
+    for (int mu=0;mu<4;mu++) {
       _suNg_sub_assign(*_4FIELD_AT(u_gauge_1,ix,mu),*_4FIELD_AT(u_gauge_2,ix,mu));
       _suNg_sqnorm(tmp,*_4FIELD_AT(u_gauge_1,ix,mu));
       norm+=tmp;
     }
   }
+  global_sum(&norm,1);
   norm=sqrt(norm/(GLB_T*GLB_X*GLB_Y*GLB_Z*4*(NG*NG-1)*2));
 
   lprintf("MAIN",0,"Mean difference (must be small): %e\n",norm);

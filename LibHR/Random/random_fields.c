@@ -23,8 +23,6 @@
 
 void random_u(suNg_field *gf)
 {
-  _DECLARE_INT_ITERATOR(ix);
-
   error(gf==NULL,1,"random_u [random_fields.c]",
 	"Attempt to access unallocated memory space");   
   
@@ -43,7 +41,6 @@ void random_u(suNg_field *gf)
 
 void unit_u(suNg_field *gf)
 {
-  _DECLARE_INT_ITERATOR(ix);
   suNg unity;
 
   error(gf==NULL,1,"unit_u [random_fields.c]",

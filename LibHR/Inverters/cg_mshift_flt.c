@@ -34,10 +34,8 @@ static int cg_mshift_flt_core(short int *sflags, mshift_par *par, spinor_operato
 
   /* fare qualche check sugli input */
   assert(par->n>0);
-#ifndef CHECK_SPINOR_MATCHING
-  for(i=0;i<par->n;++i)
-    _TWO_SPINORS_MATCHING(in,&out[i]);
-#endif
+  _TWO_SPINORS_MATCHING(in,&out[0]);
+  _ARRAY_SPINOR_MATCHING(out,par->n)
 
   /* allocate spinors fields and aux real variables */
   p = alloc_spinor_field_f_flt(3+par->n,in->type);
@@ -141,8 +139,9 @@ int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_operator_flt F, spi
   spinor_field *res, *res2, *tmp;
 
   /* check types */
-  _TWO_SPINORS_MATCHING(in,out); 
-  _ARRAY_SPINOR_MATCHING(out,i,par->n);
+  assert(par->n>0);
+  _TWO_SPINORS_MATCHING(in,&out[0]);
+  _ARRAY_SPINOR_MATCHING(out,par->n);
 
   /* allocate memory for single-precision solutions and residual vectors */
   res_flt = alloc_spinor_field_f_flt(1+par->n,in->type);

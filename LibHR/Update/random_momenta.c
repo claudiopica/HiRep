@@ -11,19 +11,21 @@
 #include <math.h>
 
 void gaussian_momenta(suNg_av_field *momenta) {
-  double *dptr;
-  _DECLARE_INT_ITERATOR(ix);
   geometry_descriptor *gd=momenta->type;
   
   const double c3=1./sqrt(_FUND_NORM2);
   const int ngen=NG*NG-1;
   
-  _PIECE_FOR(gd,ix) {
-    int start=gd->master_start[_PIECE_INDEX(ix)];
-    int len=ngen*4*(gd->master_end[_PIECE_INDEX(ix)]-start+1); /* lenght in doubles */
-    dptr=(double*)(momenta->ptr+4*(start-gd->master_shift));
+//Avoid OMP parallel region in PIECE_FOR
+#undef _OMP_PRAGMA
+#define _OMP_PRAGMA(s)
+  
+  _PIECE_FOR(gd,ixp) {
+    int start=gd->master_start[ixp];
+    int len=ngen*4*(gd->master_end[ixp]-start+1); /* lenght in doubles */
+    double *dptr=(double*)(momenta->ptr+4*(start-gd->master_shift));
     gauss(dptr,len);
-    for (ix=0; ix<len; ++ix, ++dptr) {
+    for (int ix=0; ix<len; ++ix, ++dptr) {
       *(dptr)*=c3;
     }
   }

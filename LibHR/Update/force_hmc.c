@@ -123,18 +123,10 @@ void free_force_hmc() {
 
 
 void force_hmc(double dt, suNg_av_field *force, void *vpar){
-  _DECLARE_INT_ITERATOR(x);
-  int mu,  k;
-  static suNg_algebra_vector f;
-  static suNf_vector ptmp;
-  static suNf_spinor p;
-  static suNf s1;
-  static MINRES_par inv_par;
+
 #ifdef UPDATE_EO
   spinor_field Xe, Xo, Ye, Yo;
 #endif
-  double forcestat[2]; /* used for computation of avr and max force */
-  double nsq;
 
 
   force_hmc_par *par = (force_hmc_par*)vpar;
@@ -143,14 +135,10 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
 
   
   /* check input types */
-#ifndef CHECK_SPINOR_MATCHING
-   _TWO_SPINORS_MATCHING(u_gauge,force);
-#endif
+  _TWO_SPINORS_MATCHING(u_gauge,force);
 
-
-  inv_par.max_iter=0;
   
-  for (k=0; k<par->n_pf; ++k) {
+  for (int k=0; k<par->n_pf; ++k) {
 
 #ifndef UPDATE_EO
     /* X = H^{-1} pf[k] = D^{-1} g5 pf[k] */
@@ -222,66 +210,86 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
     
 #endif
 
-
+#ifdef MEASURE_FORCEHMC
     lprintf("FORCE",50,"|Xs| = %1.8e |Ys| = %1.8e\n",
 	    sqrt(spinor_field_sqnorm_f(Xs)),
 	    sqrt(spinor_field_sqnorm_f(Ys))
 	    );
+    double forcestat[2]={0.}; /* used for computation of avr and max force */
+#endif
     
     /* reset force stat counters */
     start_sf_sendrecv(Xs);
     start_sf_sendrecv(Ys);
     
-    forcestat[1]=forcestat[0]=0.;
+
     
-    _PIECE_FOR(&glattice,x) { 
-      _SITE_FOR(&glattice,x) {
-	
-      	for (mu=0; mu<4; ++mu) {
+    _PIECE_FOR(&glattice,xp) {
+      
+      suNg_algebra_vector f;
+      suNf_vector ptmp;
+      suNf_spinor p;
+      suNf_FMAT s1;
+      
+      if (xp==glattice.inner_master_pieces) {
+        _OMP_PRAGMA( master )
+        {
+          complete_sf_sendrecv(Xs);
+          complete_sf_sendrecv(Ys);
+        }
+        _OMP_PRAGMA( barrier )
+      }
+      
+#ifdef MEASURE_FORCEHMC
+      _SITE_FOR_SUM(&glattice,xp,x,forcestat[0],forcestat[1]) {
+#else
+      _SITE_FOR(&glattice,xp,x) {
+#endif
+      	for (int mu=0; mu<4; ++mu) {
       	  int y;
       	  suNf_spinor *chi1, *chi2;
       	  _suNf_zero(s1);
       	  switch (mu) {
-      	  case 0:
-      	    y=iup(x,0);
-      	    chi1=_FIELD_AT(Xs,x);
-      	    chi2=_FIELD_AT(Ys,y);
-      	    _F_DIR0(s1,chi1,chi2);
-      	    chi1=_FIELD_AT(Ys,x);
-      	    chi2=_FIELD_AT(Xs,y);
-      	    _F_DIR0(s1,chi1,chi2);
-      	    break;
-      	  case 1:
-      	    y=iup(x,1);
-      	    chi1=_FIELD_AT(Xs,x);
-      	    chi2=_FIELD_AT(Ys,y);
-      	    _F_DIR1(s1,chi1,chi2);
-      	    chi1=_FIELD_AT(Ys,x);
-      	    chi2=_FIELD_AT(Xs,y);
-      	    _F_DIR1(s1,chi1,chi2);
-      	    break;
-      	  case 2:
-      	    y=iup(x,2);
-      	    chi1=_FIELD_AT(Xs,x);
-      	    chi2=_FIELD_AT(Ys,y);
-      	    _F_DIR2(s1,chi1,chi2);
-      	    chi1=_FIELD_AT(Ys,x);
-      	    chi2=_FIELD_AT(Xs,y);
-      	    _F_DIR2(s1,chi1,chi2);
-      	    break;
-      	  default: /* DIR 3 */
-      	    y=iup(x,3);
-      	    chi1=_FIELD_AT(Xs,x);
-      	    chi2=_FIELD_AT(Ys,y);
-      	    _F_DIR3(s1,chi1,chi2);
-      	    chi1=_FIELD_AT(Ys,x);
-      	    chi2=_FIELD_AT(Xs,y);
-      	    _F_DIR3(s1,chi1,chi2);
+            case 0:
+              y=iup(x,0);
+              chi1=_FIELD_AT(Xs,x);
+              chi2=_FIELD_AT(Ys,y);
+              _F_DIR0(s1,chi1,chi2);
+              chi1=_FIELD_AT(Ys,x);
+              chi2=_FIELD_AT(Xs,y);
+              _F_DIR0(s1,chi1,chi2);
+              break;
+            case 1:
+              y=iup(x,1);
+              chi1=_FIELD_AT(Xs,x);
+              chi2=_FIELD_AT(Ys,y);
+              _F_DIR1(s1,chi1,chi2);
+              chi1=_FIELD_AT(Ys,x);
+              chi2=_FIELD_AT(Xs,y);
+              _F_DIR1(s1,chi1,chi2);
+              break;
+            case 2:
+              y=iup(x,2);
+              chi1=_FIELD_AT(Xs,x);
+              chi2=_FIELD_AT(Ys,y);
+              _F_DIR2(s1,chi1,chi2);
+              chi1=_FIELD_AT(Ys,x);
+              chi2=_FIELD_AT(Xs,y);
+              _F_DIR2(s1,chi1,chi2);
+              break;
+            default: /* DIR 3 */
+              y=iup(x,3);
+              chi1=_FIELD_AT(Xs,x);
+              chi2=_FIELD_AT(Ys,y);
+              _F_DIR3(s1,chi1,chi2);
+              chi1=_FIELD_AT(Ys,x);
+              chi2=_FIELD_AT(Xs,y);
+              _F_DIR3(s1,chi1,chi2);
       	  }
-	  
+          
       	  _algebra_project(f,s1);
-
-
+          
+          
 #ifdef UPDATE_EO
           if(par->hasenbusch != 2) {
       	    _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),-dt*(_REPR_NORM2/_FUND_NORM2),f);
@@ -290,29 +298,30 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
           }
 #else
           if(par->hasenbusch != 2) {
-        	  _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),dt*(_REPR_NORM2/_FUND_NORM2),f);	
+        	  _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),dt*(_REPR_NORM2/_FUND_NORM2),f);
       	  } else {
       	    _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),par->b*dt*(_REPR_NORM2/_FUND_NORM2),f);
           }
 #endif
-	  
+
+#ifdef MEASURE_FORCEHMC
+          double nsq;
     	    _algebra_vector_sqnorm_g(nsq,f);
     	    forcestat[0]+=sqrt(nsq);
     	    for(y=0;y<NG*NG-1;++y){
     	      if(forcestat[1]<fabs(*(((double*)&f)+y))) forcestat[1]=fabs(*(((double*)&f)+y));
     	    }
-      	}
-      }
-      if(_PIECE_INDEX(x)==0) {
-      	complete_sf_sendrecv(Xs);
-       	complete_sf_sendrecv(Ys);
-      }
-    }
-
+#endif
+      	} //directions for
+      } //SITE_FOR
+    } //PIECE FOR
+    
+#ifdef MEASURE_FORCEHMC
     global_sum(forcestat,2);
     forcestat[0]*=dt*(_REPR_NORM2/_FUND_NORM2)/((double)(4*GLB_T*GLB_X*GLB_Y*GLB_Z));
     forcestat[1]*=dt*(_REPR_NORM2/_FUND_NORM2);
     lprintf("FORCE",50," avr |force| = %1.8e maxforce = %1.8e \n",forcestat[0],forcestat[1]);
+#endif
     
 #if defined(BASIC_SF) || defined(ROTATED_SF)
     SF_force_bcs(force);

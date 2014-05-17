@@ -29,17 +29,16 @@ static suNg_field *g;
 
 static void random_g(void)
 {
-  int ix1,iy1,iz1;
-  _DECLARE_INT_ITERATOR(ix);
   
-  _MASTER_FOR(&glattice,ix)
+  _MASTER_FOR(&glattice,ix) {
     random_suNg(_FIELD_AT(g,ix));
+  }
   
   if(COORD[0] == 0) {
-    for (ix1=0;ix1<X;++ix1) for (iy1=0;iy1<Y;++iy1) for (iz1=0;iz1<Z;++iz1){
+    for (int ix1=0;ix1<X;++ix1) for (int iy1=0;iy1<Y;++iy1) for (int iz1=0;iz1<Z;++iz1){
 /*      ix=ipt(2,ix1,iy1,iz1);
       _suNg_unit(*_FIELD_AT(g,ix));*/
-      ix=ipt(1,ix1,iy1,iz1);
+      int ix=ipt(1,ix1,iy1,iz1);
       _suNg_unit(*_FIELD_AT(g,ix));
       ix=ipt(0,ix1,iy1,iz1);
       _suNg_unit(*_FIELD_AT(g,ix));
@@ -47,8 +46,8 @@ static void random_g(void)
   }
 
   if(COORD[0] == NP_T -1) {
-    for (ix1=0;ix1<X;++ix1) for (iy1=0;iy1<Y;++iy1) for (iz1=0;iz1<Z;++iz1){
-      ix=ipt(T-1,ix1,iy1,iz1);
+    for (int ix1=0;ix1<X;++ix1) for (int iy1=0;iy1<Y;++iy1) for (int iz1=0;iz1<Z;++iz1){
+      int ix=ipt(T-1,ix1,iy1,iz1);
       _suNg_unit(*_FIELD_AT(g,ix));
 /*      ix=ipt(T-2,ix1,iy1,iz1);
       _suNg_unit(*_FIELD_AT(g,ix));
@@ -60,21 +59,19 @@ static void random_g(void)
 
 static void transform_u(void)
 {
-   _DECLARE_INT_ITERATOR(ix);
-   int iy,mu;
-   suNg *u,v;
-
-   _MASTER_FOR(&glattice,ix) {
-      for (mu=0;mu<4;mu++) {
-         iy=iup(ix,mu);
-         u=pu_gauge(ix,mu);
-         _suNg_times_suNg_dagger(v,*u,*_FIELD_AT(g,iy));
-         _suNg_times_suNg(*u,*_FIELD_AT(g,ix),v);
-      }
-   }
-   
-   start_gf_sendrecv(u_gauge);
-   represent_gauge_field();
+  _MASTER_FOR(&glattice,ix) {
+    for (int mu=0;mu<4;mu++) {
+      int iy=iup(ix,mu);
+      suNg *u=pu_gauge(ix,mu);
+      suNg v;
+      
+      _suNg_times_suNg_dagger(v,*u,*_FIELD_AT(g,iy));
+      _suNg_times_suNg(*u,*_FIELD_AT(g,ix),v);
+    }
+  }
+  
+  start_gf_sendrecv(u_gauge);
+  represent_gauge_field();
 }
 
 int main(int argc,char *argv[])

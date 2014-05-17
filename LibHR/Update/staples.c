@@ -19,95 +19,58 @@
 #include "communications.h"
 #include "update.h"
 
-static suNg *u1up,*u2up,*u3up;
-static suNg *u1dn,*u2dn,*u3dn;
-
-static suNg staple, tr1, tr2;
-
-static int ixpmu,ixpnu,ixmnu,ixpmumnu;
-#ifdef PLAQ_WEIGHTS
-static int IX,MU,NU;
-#endif
-
-static void add_to_v(suNg *v){
-  _suNg_add_assign(*v,staple);
-}
-
-
-static void up_staple(void)
-{
-  _suNg_times_suNg(tr2,*u1up,*u2up);
-  _suNg_dagger(tr1,*u3up);
-  _suNg_times_suNg(staple,tr2,tr1);
-#ifdef PLAQ_WEIGHTS
-  if(plaq_weight!=NULL) {
-    _suNg_mul(staple,plaq_weight[IX*16+NU*4+MU],staple);
-  }
-#endif
-}
-
-
-static void dn_staple(void)
-{
-  _suNg_times_suNg(tr2,*u2dn,*u3dn);
-  _suNg_dagger(tr1,*u1dn);
-  _suNg_times_suNg(staple,tr1,tr2);
-#ifdef PLAQ_WEIGHTS
-  if(plaq_weight!=NULL) {
-    _suNg_mul(staple,plaq_weight[ixmnu*16+MU*4+NU],staple);
-  }
-#endif
-}
-   
-
 void staples(int ix,int mu,suNg *v)
 {
-   int i,nu;
+  suNg staple, tr1, tr2;
+  
+  int ixpmu=iup(ix,mu);
 
-   _suNg_zero(*v);
+  _suNg_zero(*v);
+  
+  for (int i=1;i<4;i++) {
+    int nu=(mu+i)&0x3;
+    int ixpnu=iup(ix,nu);
+    int ixmnu=idn(ix,nu);
+    int ixpmumnu=idn(ixpmu,nu);
 
-   ixpmu=iup(ix,mu);
-   
-
-   for (i=1;i<4;i++)
-     {
-       nu=(mu+i)&0x3;
-       ixpnu=iup(ix,nu);
-       ixmnu=idn(ix,nu);
-       ixpmumnu=idn(ixpmu,nu);
+    //Up Staple
+    _suNg_times_suNg(tr2,*pu_gauge(ix,nu),*pu_gauge(ixpnu,mu));
+    _suNg_dagger(tr1,*pu_gauge(ixpmu,nu));
+    _suNg_times_suNg(staple,tr2,tr1);
 #ifdef PLAQ_WEIGHTS
-       IX=ix;MU=mu;NU=nu;
+    if(plaq_weight!=NULL) {
+      _suNg_mul(staple,plaq_weight[ix*16+nu*4+mu],staple);
+    }
 #endif
-       
-       u1up=pu_gauge(ix,nu);
-       u2up=pu_gauge(ixpnu,mu);
-       u3up=pu_gauge(ixpmu,nu);   
-       
-       u1dn=pu_gauge(ixmnu,nu);
-       u2dn=pu_gauge(ixmnu,mu);
-       u3dn=pu_gauge(ixpmumnu,nu);   
-       
-       up_staple();
-       add_to_v(v);
-       dn_staple();
-       add_to_v(v);
-     }
+    _suNg_add_assign(*v,staple);
+    
+    //Down Staple
+    _suNg_times_suNg(tr2,*pu_gauge(ixmnu,mu),*pu_gauge(ixpmumnu,nu));
+    _suNg_dagger(tr1,*pu_gauge(ixmnu,nu));
+    _suNg_times_suNg(staple,tr1,tr2);
+#ifdef PLAQ_WEIGHTS
+    if(plaq_weight!=NULL) {
+      _suNg_mul(staple,plaq_weight[ixmnu*16+mu*4+nu],staple);
+    }
+#endif
+    _suNg_add_assign(*v,staple);
+  }
 }
 
+#if 0
 #include "observables.h"
 #include "logger.h"
 void test_staples()
 {
-  int mu;
-  suNg s, res;
   double pa=0.0;
   double ps=0.0, pl=0.;
-  double tr;
   _DECLARE_INT_ITERATOR(ix);
 
   pa = avr_plaquette();
-  _MASTER_FOR(&glattice,ix){
-    for (mu=0; mu<4; ++mu){
+  _MASTER_FOR_SUM(&glattice,ix,ps,pl){
+    suNg s, res;
+    for (int mu=0; mu<4; ++mu){
+      double tr;
       staples(ix, mu, &res);
       /* _suNg_dagger(s, res); */
       s=res;
@@ -129,3 +92,4 @@ void test_staples()
 		lprintf("TESTING",50,"FAILED.");
   lprintf("TESTING",50," [diff1 = %1.8e][diff2 = %1.8e][diff3 = %1.8e]\n", pa-ps, pl-ps, pa-pl);
 }
+#endif

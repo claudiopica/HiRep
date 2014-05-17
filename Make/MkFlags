@@ -42,4 +42,4 @@ MACRO += -DIO_FLUSH
 CC = gcc
 CFLAGS = -Wall -std=c99 -O3 -fomit-frame-pointer -msse -msse2
 #CFLAGS = -Wall -std=c99 -g
-
+LDFLAGS =

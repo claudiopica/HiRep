@@ -16,6 +16,7 @@
 #include <math.h>
 #include "random.h"
 #include "update.h"
+#include "hr_omp.h"
 
 #define NVEC (32)
 #define NRAN (2*NVEC)
@@ -91,6 +92,8 @@ void random_su2(double rho,double s[])
    double rhoinv,s0p1,ut,rt;
    double s0,s1,s2,s3,sq;
 
+_OMP_PRAGMA( critical )
+{
    if (i_vec==NVEC)
       update_vec();
    
@@ -164,5 +167,6 @@ void random_su2(double rho,double s[])
    s[3]=sq*s3;
 
    i_vec+=1;
+} //OMP Critical section
+  
 }
-

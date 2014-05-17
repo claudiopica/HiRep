@@ -34,13 +34,6 @@ void Dphi_oepre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
 void g5Dphi_eopre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
 void g5Dphi_eopre_sq_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
 
-/* p = out ; q = in */
-
-void Dphi_old(double m0, suNf_spinor *p, suNf_spinor *q);
-void g5Dphi_old(double m0, suNf_spinor *p, suNf_spinor *q);
-void Dphi_flt_old(double m0, suNf_spinor_flt *p, suNf_spinor_flt *q);
-void g5Dphi_flt_old(double m0, suNf_spinor_flt *p, suNf_spinor_flt *q);
-
 
 #endif
 	

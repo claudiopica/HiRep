@@ -190,13 +190,10 @@ int MINRES(MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field *o
 
 static double spinor_field_prod_re_f_f2d(spinor_field_flt *s1, spinor_field_flt *s2)
 {
-  _DECLARE_INT_ITERATOR(i);
   double res=0.;
-  float prod;
-  suNf_spinor_flt *_SPINOR_PTR(s1);
-  suNf_spinor_flt *_SPINOR_PTR(s2);
   
-  _TWO_SPINORS_FOR(s1,s2,i) {
+  _TWO_SPINORS_FOR_SUM(s1,s2,res) {
+    float prod;
     _spinor_prod_re_f(prod,*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
     res+=(double)prod;
   }
@@ -208,12 +205,10 @@ static double spinor_field_prod_re_f_f2d(spinor_field_flt *s1, spinor_field_flt 
 
 static double spinor_field_sqnorm_f_f2d(spinor_field_flt *s1)
 {
-  _DECLARE_INT_ITERATOR(i);
-  suNf_spinor_flt *_SPINOR_PTR(s1);
   double res=0.; 
-  float prod;
    
-  _ONE_SPINOR_FOR(s1,i) {
+  _ONE_SPINOR_FOR_SUM(s1,res) {
+    float prod;
     _spinor_prod_re_f(prod,*_SPINOR_PTR(s1),*_SPINOR_PTR(s1));
     res+=(double)prod;
   }

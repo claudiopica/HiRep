@@ -49,68 +49,47 @@ _DECLARE_FIELD_STRUCT(scalar_field, double);
 
 /* LOOPING MACRO */
 
-#ifndef _PIECE_INDEX
-#define _PIECE_INDEX(i) i##_pindex
-#endif
-#define _SPINOR_PTR(s) s##_ptr
-
-#ifndef _DECLARE_INT_ITERATOR
-#define _DECLARE_INT_ITERATOR(i) int i, _PIECE_INDEX(i)
-#endif
-#define _DECLARE_SPINOR_ITERATOR(s) suNf_spinor* _SPINOR_PTR(s)
-#define _DECLARE_SPINOR_FLT_ITERATOR(s) suNf_spinor_flt* _SPINOR_PTR(s)
-
 
 #ifdef CHECK_SPINOR_MATCHING
 
 #define _TWO_SPINORS_MATCHING(s1,s2) \
 	error((s1)->type!=(s2)->type,1,__FILE__ ": ", "Spinors don't match!");
 
-#define _ARRAY_SPINOR_MATCHING(s,i,n) \
-	for(i=0; i<n; i++) \
+#define _ARRAY_SPINOR_MATCHING(s,n) \
+	for(int i=0; i<n; i++) \
 		error((s)->type!=((s)+i)->type,1,__FILE__ ": ", "Spinors don't match!");
 
 #else /* CHECK_SPINOR_MATCHING */
 
 #define _TWO_SPINORS_MATCHING(s1,s2)
 
-#define _ARRAY_SPINOR_MATCHING(s,i,n)
+#define _ARRAY_SPINOR_MATCHING(s,n)
 
 #endif /* CHECK_SPINOR_MATCHING */
 
 
+#define _ONE_SPINOR_FOR_RED(s,redop1,redop2) _MASTER_FOR_RED((s)->type,_spinor_for_is,redop1,redop2)
+#define _ONE_SPINOR_FOR(s) _ONE_SPINOR_FOR_RED(s,,)
+#define _ONE_SPINOR_FOR_SUM(s,...) _ONE_SPINOR_FOR_RED(s,_omp_sum(__VA_ARGS__),)
 
-#define _ONE_SPINOR_FOR(s,i) \
-	for(_PIECE_INDEX(i)=0;_PIECE_INDEX(i)<(s)->type->local_master_pieces;_PIECE_INDEX(i)++) \
-	for(i=(s)->type->master_start[_PIECE_INDEX(i)], _SPINOR_PTR(s)=(s)->ptr+(s)->type->master_start[_PIECE_INDEX(i)]-(s)->type->master_shift; \
-	    i<=(s)->type->master_end[_PIECE_INDEX(i)]; \
-	    i++, _SPINOR_PTR(s)++ \
-	   )
+#define _TWO_SPINORS_FOR_RED(s1,s2,redop1,redop2) \
+  _TWO_SPINORS_MATCHING(s1,s2); \
+  _ONE_SPINOR_FOR_RED(s1,redop1,redop2)
+#define _TWO_SPINORS_FOR(s1,s2) _TWO_SPINORS_FOR_RED(s1,s2,,)
+#define _TWO_SPINORS_FOR_SUM(s1,s2,...) _TWO_SPINORS_FOR_RED(s1,s2,_omp_sum(__VA_ARGS__),)
 
-#define _TWO_SPINORS_FOR(s1,s2,i) \
-	_TWO_SPINORS_MATCHING(s1,s2); \
-	for(_PIECE_INDEX(i)=0;_PIECE_INDEX(i)<(s1)->type->local_master_pieces;_PIECE_INDEX(i)++) \
-	for(i=(s1)->type->master_start[_PIECE_INDEX(i)], _SPINOR_PTR(s1)=(s1)->ptr+(s1)->type->master_start[_PIECE_INDEX(i)]-(s1)->type->master_shift, \
-	              _SPINOR_PTR(s2)=(s2)->ptr+(s1)->type->master_start[_PIECE_INDEX(i)]-(s1)->type->master_shift; \
-	    i<=(s1)->type->master_end[_PIECE_INDEX(i)]; \
-	    i++, _SPINOR_PTR(s1)++, _SPINOR_PTR(s2)++ \
-	   )
-
-#define _THREE_SPINORS_FOR(s1,s2,s3,i) \
-	_TWO_SPINORS_MATCHING(s1,s2); \
-	_TWO_SPINORS_MATCHING(s1,s3); \
-	for(_PIECE_INDEX(i)=0;_PIECE_INDEX(i)<(s1)->type->local_master_pieces;_PIECE_INDEX(i)++) \
-	for(i=(s1)->type->master_start[_PIECE_INDEX(i)], _SPINOR_PTR(s1)=(s1)->ptr+(s1)->type->master_start[_PIECE_INDEX(i)]-(s1)->type->master_shift, \
-	              _SPINOR_PTR(s2)=(s2)->ptr+(s1)->type->master_start[_PIECE_INDEX(i)]-(s1)->type->master_shift, \
-	              _SPINOR_PTR(s3)=(s3)->ptr+(s1)->type->master_start[_PIECE_INDEX(i)]-(s1)->type->master_shift; \
-	    i<=(s1)->type->master_end[_PIECE_INDEX(i)]; \
-	    i++, _SPINOR_PTR(s1)++, _SPINOR_PTR(s2)++, _SPINOR_PTR(s3)++ \
-	   )
+#define _THREE_SPINORS_FOR_RED(s1,s2,s3,redop1,redop2) \
+  _TWO_SPINORS_MATCHING(s1,s2); \
+  _TWO_SPINORS_MATCHING(s1,s3); \
+  _ONE_SPINOR_FOR_RED(s1,redop1,redop2)
+#define _THREE_SPINORS_FOR(s1,s2,s3) _THREE_SPINORS_FOR_RED(s1,s2,s3,,)
 
 #include "field_ordering.h"
 
 #define _FIELD_AT(s,i) (((s)->ptr)+i-(s)->type->master_shift)
 #define _4FIELD_AT(s,i,mu) (((s)->ptr)+coord_to_index(i-(s)->type->master_shift,mu))
+
+#define _SPINOR_PTR(s) _FIELD_AT(s,_spinor_for_is)
 
 
 #endif

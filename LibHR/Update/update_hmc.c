@@ -263,7 +263,6 @@ void free_hmc(){
 int update_hmc(){
   double deltaH;
   /* double maxev,minev; */
-  _DECLARE_INT_ITERATOR(i);
   
   if(!init) {
     /* not initialized */
@@ -274,7 +273,7 @@ int update_hmc(){
   /* generate new momenta and pseudofermions */
   lprintf("HMC",30,"Generating gaussian momenta and pseudofermions...\n");
   gaussian_momenta(momenta);
-  for (i=0;i<n_pf;++i)
+  for (int i=0;i<n_pf;++i)
     gaussian_spinor_field(&pf[i]);
   
   
@@ -285,7 +284,7 @@ int update_hmc(){
   /* compute H2^{1/2}*pf = H*pf */
   lprintf("HMC",30,"Correcting pseudofermions distribution...\n");
   if(!_update_par.hasenbusch) {
-    for (i=0;i<n_pf;++i) {
+    for (int i=0;i<n_pf;++i) {
       spinor_field_copy_f(&pf[n_pf],&pf[i]);
       static_mass=_update_par.mass;
       D(&pf[i], &pf[n_pf]);
@@ -293,7 +292,7 @@ int update_hmc(){
     }
   } else {
     g5QMR_fltacc_par mpar;
-    for (i=0;i<n_pf/2;++i) {
+    for (int i=0;i<n_pf/2;++i) {
       /* S = | (a D +b) D^{-1} g5 psi |^2 */
       /* (a D +b) D^{-1} g5 psi = A */
       /* psi = g5 D (a D + b)^{-1} A */
@@ -308,7 +307,7 @@ int update_hmc(){
       D(&pf[i], &pf[n_pf]);
       spinor_field_g5_assign_f(&pf[i]);
     }
-    for (i=n_pf/2;i<n_pf;++i) {
+    for (int i=n_pf/2;i<n_pf;++i) {
       /* S = | Dt^{-1} g5 psi |^2 */
       /* Dt^{-1} g5 psi = A */
       /* psi = g5 Dt A */
@@ -334,7 +333,7 @@ int update_hmc(){
     /* here we choose the first strategy which is more symmetric */
     /* for the HMC H2^-1/2 = H^-1 and we use MINRES for this inversion */
     g5QMR_fltacc_par mpar;
-    for (i=0;i<n_pf;++i) {
+    for (int i=0;i<n_pf;++i) {
       /* S = | D^{-1} g5 psi |^2 */
       mpar.err2 = _update_par.n_MT_prec;
       mpar.max_iter = 0;
@@ -347,7 +346,7 @@ int update_hmc(){
     }
   } else {
     g5QMR_fltacc_par mpar;
-    for (i=0;i<n_pf/2;++i) {
+    for (int i=0;i<n_pf/2;++i) {
       /* S = | (D+b) D^{-1} g5 psi |^2 */
       mpar.err2 = _update_par.n_MT_prec;
       mpar.max_iter = 0;
@@ -360,7 +359,7 @@ int update_hmc(){
       static_mass=_update_par.mass+_update_par.hasen_dm;
       D(&pf[i], &pf[n_pf]);
     }
-    for (i=n_pf/2;i<n_pf;++i) {
+    for (int i=n_pf/2;i<n_pf;++i) {
       /* S = | Dt^{-1} g5 psi |^2 */
       mpar.err2 = _update_par.h_MT_prec;
       mpar.max_iter = 0;
@@ -378,7 +377,7 @@ int update_hmc(){
   
   /* Metropolis test */
   deltaH=0.;
-  _MASTER_FOR(la->type,i) {
+  _MASTER_FOR_SUM(la->type,i,deltaH) {
     deltaH+=*_FIELD_AT(la,i);
   }
   global_sum(&deltaH, 1);

@@ -23,17 +23,12 @@ void local_hmc_action(local_action_type type,
                       spinor_field *phi1,
                       spinor_field *phi2) {
 
-  _DECLARE_INT_ITERATOR(i);
-  int j;
-  double a,tmp;
-
+  
   /* check input types */
-#ifndef CHECK_SPINOR_MATCHING
   _TWO_SPINORS_MATCHING(u_gauge,loc_action); /* check that action is defined on the global lattice */
   _TWO_SPINORS_MATCHING(loc_action,momenta);
   _TWO_SPINORS_MATCHING(loc_action,phi1);
   _TWO_SPINORS_MATCHING(loc_action,phi2);
-#endif
 
 
   switch(type) {
@@ -52,28 +47,27 @@ void local_hmc_action(local_action_type type,
   }
 
   _MASTER_FOR(&glattice,i) {
-    a=0.;
+    double a=0., tmp;
     /* Momenta */
-    for (j=0;j<4;++j) {
+    for (int j=0;j<4;++j) {
       suNg_algebra_vector *cmom=momenta->ptr+coord_to_index(i,j);
       _algebra_vector_sqnorm_g(tmp,*cmom); 
       a+=tmp; /* this must be positive */
     }
     a*=0.5*_FUND_NORM2;
     *_FIELD_AT(loc_action,i)+=a;
-  }
-
-  _MASTER_FOR(&glattice,i) {
+//  }
+//  _MASTER_FOR(&glattice,i) {
     /* Gauge action */
     *_FIELD_AT(loc_action,i) += -(par->beta/((double)NG))*local_plaq(i);
   }
 
-  /* pseudofermion fields can be defined only on even sites is the preconditioning is used */
+  /* pseudofermion fields can be defined only on even sites if EO preconditioning is used */
   if(par->n_pf > 0) {
     _MASTER_FOR(phi1->type,i) {
-      a=0.;
+      double a=0., tmp;
     /* Fermions */
-      for (j=0;j<par->n_pf;++j) {
+      for (int j=0;j<par->n_pf;++j) {
         _spinor_prod_re_f(tmp,*_FIELD_AT(&phi1[j],i),*_FIELD_AT(&phi2[j],i));
         a += tmp;
       }

@@ -39,24 +39,14 @@ rhmc_flow flow=init_rhmc_flow(flow);
 
 static void flip_mom()
 {
-
-  suNg_algebra_vector  *dptr;
- 
-  _DECLARE_INT_ITERATOR(ix);
-
   geometry_descriptor *gd=momenta->type;
   
-  int dx;
-
-   _MASTER_FOR(gd,ix) {
-     for(dx=0;dx <4 ; dx++)
-       {
-	 dptr=(suNg_algebra_vector*)(&momenta->ptr[4*ix+dx]);
-
-	_algebra_vector_mul_g(*dptr,-1.0,*dptr);
-	
-       }
-   }
+  _MASTER_FOR(gd,ix) {
+    for(int dx=0;dx <4 ; dx++) {
+      suNg_algebra_vector  *dptr=(suNg_algebra_vector*)(&momenta->ptr[4*ix+dx]);
+      _algebra_vector_mul_g(*dptr,-1.0,*dptr);
+    }
+  }
 }
 
 

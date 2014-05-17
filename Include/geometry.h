@@ -1,7 +1,7 @@
 /***************************************************************************\
- * Copyright (c) 2008, Claudio Pica                                          *   
- * All rights reserved.                                                      * 
- \***************************************************************************/
+ * Copyright (c) 2008-2014, Claudio Pica                                    *
+ * All rights reserved.                                                     *
+ \**************************************************************************/
 
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
@@ -32,18 +32,40 @@ typedef struct _geometry_descriptor {
   int gsize_gauge;
 } geometry_descriptor;
 
-#define _PIECE_FOR(type,i) \
-  for(_PIECE_INDEX(i)=0;_PIECE_INDEX(i)<(type)->local_master_pieces;_PIECE_INDEX(i)++)
 
-#define _SITE_FOR(type,i) \
-  for(i=(type)->master_start[_PIECE_INDEX(i)]; \
-      i<=(type)->master_end[_PIECE_INDEX(i)]; \
-      i++ \
-     )
+#include "hr_omp.h"
 
-#define _MASTER_FOR(type,i) \
-  _PIECE_FOR((type),i)    \
-  _SITE_FOR((type),i)
+//Loop over pieces of given type
+#define _PIECE_FOR(type,ip) \
+_OMP_PRAGMA ( _omp_parallel )\
+  for(int ip=0;\
+      ip<(type)->local_master_pieces;\
+      ip++ )
+
+//Loop over sites of piece ip of given type
+#define _SITE_FOR_RED(type,ip,is,redop1,redop2) \
+_OMP_PRAGMA ( _omp_for redop1 redop2  )\
+  for(int is=(type)->master_start[ip]; \
+      is<=(type)->master_end[ip]; \
+      is++ )
+
+#define _SITE_FOR(type,ip,is) _SITE_FOR_RED(type,ip,is,,)
+#define _SITE_FOR_SUM(type,ip,is,...) _SITE_FOR_RED(type,ip,is,_omp_sum(__VA_ARGS__),)
+#define _SITE_FOR_MAX(type,ip,is,...) _SITE_FOR_RED(type,ip,is,_omp_max(__VA_ARGS__),)
+#define _SITE_FOR_MIN(type,ip,is,...) _SITE_FOR_RED(type,ip,is,_omp_min(__VA_ARGS__),)
+
+
+//Loop over sites of all pieces of given type
+//do an openmp sum over the variables in the redop list
+#define _MASTER_FOR_RED(type,is,redop1,redop2) \
+  _PIECE_FOR((type),_master_for_ip_##is)    \
+  _SITE_FOR_RED((type),_master_for_ip_##is,is,redop1,redop2)
+
+#define _MASTER_FOR(type,is) _MASTER_FOR_RED(type,is,,)
+#define _MASTER_FOR_SUM(type,is,...) _MASTER_FOR_RED(type,is,_omp_sum(__VA_ARGS__),)
+#define _MASTER_FOR_MAX(type,is,...) _MASTER_FOR_RED(type,is,_omp_max(__VA_ARGS__),)
+#define _MASTER_FOR_MIN(type,is,...) _MASTER_FOR_RED(type,is,_omp_min(__VA_ARGS__),)
+
 
 
 int setup_process(int *argc, char ***argv);

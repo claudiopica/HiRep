@@ -30,50 +30,44 @@ static void D_flt(spinor_field_flt *out, spinor_field_flt *in){
    Dphi_flt(hmass,out,in);
 }
 
+
 static void random_g(void)
 {
-   _DECLARE_INT_ITERATOR(ix);
-
-   _MASTER_FOR(&glattice,ix)
-      random_suNg(_FIELD_AT(g,ix));
+  _MASTER_FOR(&glattice,ix) {
+    random_suNg(_FIELD_AT(g,ix));
+  }
 }
 
 static void transform_u(void)
 {
-   _DECLARE_INT_ITERATOR(ix);
-   int iy,mu;
-   suNg *u,v;
-
-   _MASTER_FOR(&glattice,ix) {
-      for (mu=0;mu<4;mu++) {
-         iy=iup(ix,mu);
-         u=pu_gauge(ix,mu);
-         _suNg_times_suNg_dagger(v,*u,*_FIELD_AT(g,iy));
-         _suNg_times_suNg(*u,*_FIELD_AT(g,ix),v);
-      }
-   }
-   
-   start_gf_sendrecv(u_gauge);
-   represent_gauge_field();
+  _MASTER_FOR(&glattice,ix) {
+    suNg v;
+    for (int mu=0;mu<4;mu++) {
+      int iy=iup(ix,mu);
+      suNg *u=pu_gauge(ix,mu);
+      _suNg_times_suNg_dagger(v,*u,*_FIELD_AT(g,iy));
+      _suNg_times_suNg(*u,*_FIELD_AT(g,ix),v);
+    }
+  }
+  
+  start_gf_sendrecv(u_gauge);
+  represent_gauge_field();
 }
 
 static void transform_s(spinor_field_flt *out, spinor_field_flt *in)
 {
-   _DECLARE_INT_ITERATOR(ix);
-   suNf gfx;
-   suNf_spinor_flt *r,*s;
-
-   _MASTER_FOR(&glattice,ix) {
-      s = _FIELD_AT(in,ix);
-      r = _FIELD_AT(out,ix);
-      
-      _group_represent2(&gfx,_FIELD_AT(g,ix));
-
-      _suNf_multiply(r->c[0],gfx,s->c[0]);
-      _suNf_multiply(r->c[1],gfx,s->c[1]);
-      _suNf_multiply(r->c[2],gfx,s->c[2]);
-      _suNf_multiply(r->c[3],gfx,s->c[3]);
-   }   
+  _MASTER_FOR(&glattice,ix) {
+    suNf_spinor_flt *s = _FIELD_AT(in,ix);
+    suNf_spinor_flt *r = _FIELD_AT(out,ix);
+    suNf gfx;
+    
+    _group_represent2(&gfx,_FIELD_AT(g,ix));
+    
+    _suNf_multiply(r->c[0],gfx,s->c[0]);
+    _suNf_multiply(r->c[1],gfx,s->c[1]);
+    _suNf_multiply(r->c[2],gfx,s->c[2]);
+    _suNf_multiply(r->c[3],gfx,s->c[3]);
+  }
 }
 
 

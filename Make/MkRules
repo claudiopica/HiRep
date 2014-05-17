@@ -69,7 +69,7 @@ GCC = gcc
 CXX ?= g++
 CPPFLAGS += $(MACRO)
 CPPFLAGS += $(INC)
-LDFLAGS = -lm
+LDFLAGS += -lm
 
 
 ifndef REPR

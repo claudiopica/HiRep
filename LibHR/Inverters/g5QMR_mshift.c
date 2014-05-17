@@ -39,13 +39,10 @@ printf("[%d] " #c " = %e\n",cgiter,c)
 
 static double spinor_field_g5_prod_re_f_f2d(spinor_field_flt *s1, spinor_field_flt *s2)
 {
-  _DECLARE_INT_ITERATOR(i);
   double res=0.;
-  float prod;
-  suNf_spinor_flt *_SPINOR_PTR(s1);
-  suNf_spinor_flt *_SPINOR_PTR(s2);
   
-  _TWO_SPINORS_FOR(s1,s2,i) {
+  _TWO_SPINORS_FOR_SUM(s1,s2,res) {
+    float prod;
     _spinor_g5_prod_re_f(prod,*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
     res+=(double)prod;
   }
@@ -57,12 +54,10 @@ static double spinor_field_g5_prod_re_f_f2d(spinor_field_flt *s1, spinor_field_f
 
 static double spinor_field_sqnorm_f_f2d(spinor_field_flt *s1)
 {
-  _DECLARE_INT_ITERATOR(i);
-  suNf_spinor_flt *_SPINOR_PTR(s1);
-  double res=0.; 
-  float prod;
+  double res=0.;
   
-  _ONE_SPINOR_FOR(s1,i) {
+  _ONE_SPINOR_FOR_SUM(s1,res) {
+    float prod;
     _spinor_prod_re_f(prod,*_SPINOR_PTR(s1),*_SPINOR_PTR(s1));
     res+=(double)prod;
   }
@@ -96,10 +91,8 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
   /* fare qualche check sugli input */
   /* par->n deve essere almeno 1! */
   assert(par->n>0);
-  #ifndef CHECK_SPINOR_MATCHING
-  for(i=0;i<par->n;++i)
-    _TWO_SPINORS_MATCHING(in,&out[i]);
-  #endif
+  _TWO_SPINORS_MATCHING(in,&out[0]);
+  _ARRAY_SPINOR_MATCHING(out,par->n)
   
   /* allocate spinors fields and aux real variables */
   /* implementation note: to minimize the number of malloc calls
@@ -287,9 +280,6 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
   spinor_field_flt *q1,*q2;
   spinor_field_flt *p1, *p2, *Mp;
   spinor_field_flt *sptmp, *memall;
-  #ifndef NDEBUG
-  spinor_field_flt *sdbg;
-  #endif
   
   double alpha, beta, delta, rho, innorm2; 
   double r, s1, s2, c1, c2;
@@ -301,9 +291,7 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
   unsigned short flag;
   
   /* fare qualche check sugli input */
-  #ifndef CHECK_SPINOR_MATCHING
   _TWO_SPINORS_MATCHING(in,out);
-  #endif
   
   /* allocate spinors fields and aux real variables */
   /* implementation note: to minimize the number of malloc calls
@@ -317,7 +305,7 @@ static int g5QMR_core_flt(short *valid, double err2, int max_iter, spinor_operat
   Mp = p2+1;
   
   #ifndef NDEBUG
-  sdbg = alloc_spinor_field_f_flt(1,in->type);
+  spinor_field_flt *sdbg = alloc_spinor_field_f_flt(1,in->type);
   #endif
   
   /* init recursion */
@@ -557,7 +545,6 @@ int g5QMR_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_fi
 
 int g5QMR_fltacc( g5QMR_fltacc_par* par, spinor_operator M, spinor_operator_flt M_flt, spinor_field *in, spinor_field *out)
 {
-  _DECLARE_INT_ITERATOR(ix);
   int cgiter=0,cgiter_flt=0,cgiter_minres=0, k;
   short valid;
   spinor_field_flt *in_flt, *out_flt, *res_flt;

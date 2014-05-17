@@ -39,9 +39,7 @@ void gauge_integrator(suNg_av_field *momenta, double tlen, integrator_par *int_p
   gettimeofday(&start,0);
   #endif
 
-  _DECLARE_INT_ITERATOR(i);
 
-  int n;
   double dt=tlen/((double)int_par->nsteps);
 
   if(int_par->nsteps == 0)  return;
@@ -49,7 +47,7 @@ void gauge_integrator(suNg_av_field *momenta, double tlen, integrator_par *int_p
   lprintf("MD_INT",10+int_par->level*10,"Starting new MD trajectory with gauge_integrator, level %d.\n",int_par->level);
   lprintf("MD_INT",10+int_par->level*10,"MD parameters: level=%d tlen=%1.6f nsteps=%d => dt=%1.6f\n",
     int_par->level,tlen,int_par->nsteps,dt);
-  for(n=1;n<=int_par->nsteps;++n) {
+  for(int n=1;n<=int_par->nsteps;++n) {
 
     #ifdef TIMING
     #ifdef TIMING_WITH_BARRIERS
