@@ -62,7 +62,18 @@ $GROUP::ALGEBRA_REPRESENT:(m):(h)$
 *	m $REPR::TYPE$ matrix $N$*$N$
 *	h(A) = -i*ReTr[T(A).m]/C(FUND)
 */
+#ifdef WITH_QUATERNIONS
+
+#define _fund_algebra_project(h,m) \
+	(h).c[0] = 2.*(m).c[2]; \
+	(h).c[1] = 2.*(m).c[1]; \
+	(h).c[2] = 2.*(m).c[3]
+    
+#else
+
 #define _fund_algebra_project(h,m) \
 $GROUP::ALGEBRA_PROJECT:(h):(m)$
+
+#endif
 
 #endif 

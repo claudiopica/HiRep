@@ -296,8 +296,8 @@ if ($su2quat==0) {
   write_suN_sqnorm_m1();
   write_suN_trace_re();
   write_suN_trace_im();
-  write_suN_2TA();
-    #write_suN_TA();
+  #write_suN_2TA();
+  #write_suN_TA();
   write_suN_FMAT();
 
   if ($complex eq "R") { # we only need these functions at the moment...
@@ -331,7 +331,7 @@ if ($su2quat==0) {
     write_su2_sqnorm_m1();
     write_su2_trace_re();
     write_su2_trace_im();
-    write_su2_2TA();
+    #write_su2_2TA();
     #write_su2_TA();
     write_suN_FMAT(); #this is the same as before
     if ($complex eq "R") {

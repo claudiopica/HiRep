@@ -259,8 +259,12 @@ int save_conf(hmc_flow *rf, int id) {
   char buf[256];
   
   mk_gconf_name(buf, rf, id);
+#if NG==2 && !defined(WITH_QUATERNIONS)
+  write_gauge_field_su2q(add_dirname(rf->conf_dir,buf));
+#else
   write_gauge_field(add_dirname(rf->conf_dir,buf));
-
+#endif
+  
   return 0;
 }
 

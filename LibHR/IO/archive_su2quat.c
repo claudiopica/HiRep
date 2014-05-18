@@ -24,7 +24,7 @@
 #include "ranlux.h"
 
 
-#if NG==2
+#if NG==2 && !defined(WITH_QUATERNIONS)
 
 
 /* 

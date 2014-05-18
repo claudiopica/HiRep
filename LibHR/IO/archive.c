@@ -180,12 +180,11 @@ void write_gauge_field(char filename[])
  
  
  void read_gauge_field(char filename[]){
-  if (NG==2){
+#if (NG==2) && !defined(WITH_QUATERNIONS)
     read_gauge_field_su2(filename);
-  }
-  else{
+#else
     read_gauge_field_matrix(filename);
-  }
+#endif
 #ifndef ALLOCATE_REPR_GAUGE_FIELD
   complete_gf_sendrecv(u_gauge); /*Apply boundary conditions already here for fundamental fermions*/
   u_gauge_f=(suNf_field *)((void*)u_gauge);

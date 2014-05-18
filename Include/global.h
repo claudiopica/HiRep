@@ -148,8 +148,7 @@ GLB_VAR(input_logger,logger_var,=init_input_logger(logger_var));
 
 
 /* Does the represented field need to be allocated? */
-
-#if !defined(REPR_FUNDAMENTAL) || defined(ROTATED_SF)
+#if ( !defined(REPR_FUNDAMENTAL) && !defined(WITH_QUATERNIONS) ) || defined(ROTATED_SF)
 #define ALLOCATE_REPR_GAUGE_FIELD
 #endif
 

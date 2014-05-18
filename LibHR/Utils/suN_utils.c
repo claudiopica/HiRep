@@ -44,7 +44,7 @@ static void normalize_flt(suNg_vector_flt *v)
 {
   float fact;
   _vector_prod_re_g(fact,*v,*v);
-  fact=1.0f/sqrt(fact);
+  fact=1.0f/sqrtf(fact);
   _vector_mul_g(*v, fact, *v);
 }
 
@@ -66,6 +66,15 @@ void project_to_suNg(suNg *u)
     normalize(v2);
   }
 #else
+#ifdef WITH_QUATERNIONS
+	double norm;
+  
+  _suNg_sqnorm(norm,*u);
+  norm=sqrt(0.5*norm);
+  norm=1./norm;
+  _suNg_mul(*u,norm,*u);
+  
+#else
   int i,j;
   suNg_vector *v1,*v2;
   complex z;
@@ -86,10 +95,37 @@ void project_to_suNg(suNg *u)
     v1=(suNg_vector*)(u);
   }
 #endif
+#endif
 }
 
 void project_to_suNg_flt(suNg_flt *u)
 {
+#ifdef GAUGE_SON
+  float *v1, *v2;
+  int i,j,k;
+  float z;
+  for (i=0; i<NG; ++i ) {
+    v2=&u->c[i*NG];
+    for (j=0; j<i; ++j) {
+      v1=&u->c[j*NG];
+      z=0;
+      for (k=0;k<NG; ++k){z+=v1[k]*v2[k];} /*_vector_prod_re_g */
+      for (k=0;k<NG;++k){v2[k]-= z*v1[k];} /*_vector_project_g */
+    }
+    normalize(v2);
+  }
+#else
+#ifdef WITH_QUATERNIONS
+
+  float norm;
+  
+  _suNg_sqnorm(norm,*u);
+  norm=sqrtf(0.5f*norm);
+  norm=1.f/norm;
+  _suNg_mul(*u,norm,*u);
+
+#else
+  
   int i,j;
   suNg_vector_flt *v1,*v2;
   complex_flt z;
@@ -109,13 +145,17 @@ void project_to_suNg_flt(suNg_flt *u)
     ++v2;
     v1=(suNg_vector_flt*)(u);
   }
-
+#endif
+#endif
 }
 
 
 #ifndef GAUGE_SON
 void project_cooling_to_suNg(suNg* g_out, suNg* g_in, int cooling)
 {
+#ifdef WITH_QUATERNIONS
+  error(1,1,"project_cooling_to_suNg " __FILE__,"not implemented with quaternions");
+#else
   suNg Ug[3];
   suNg tmp[2];
   int k,l;
@@ -204,7 +244,7 @@ void project_cooling_to_suNg(suNg* g_out, suNg* g_in, int cooling)
     }
   
   *g_out = Ug[1]; 
-  
+#endif
 }
 #endif
 

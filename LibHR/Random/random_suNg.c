@@ -64,6 +64,9 @@ static void rotate(suNg_vector *pu1, suNg_vector *pu2, double s[4]) /* same as i
 
 #ifndef GAUGE_SON
 void random_suNg(suNg *u) {
+#ifdef WITH_QUATERNIONS
+  random_su2(0.,u->c);
+#else
   double s[4];
   suNg_vector *pu1=(suNg_vector*)(u);
 	
@@ -78,7 +81,7 @@ void random_suNg(suNg *u) {
     } 
 	  ++pu1; 
   }
-
+#endif //WITH_QUATERNIONS
 }
 #else
 void random_suNg(suNg *u) {

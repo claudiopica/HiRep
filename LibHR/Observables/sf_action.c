@@ -54,10 +54,14 @@ static double E_8(int ix,int k)
    ((ilambda8).c[8]).im = -0.5;
 #elif NG==2
    _suNg_zero(ilambda8);
+#ifdef WITH_QUATERNIONS
+  (ilambda8).c[3]=1.0;
+#else
    ((ilambda8).c[0]).re = 0.0;
    ((ilambda8).c[0]).im = 1.0;
    ((ilambda8).c[3]).re = 0.0;
    ((ilambda8).c[3]).im = -1.0;
+#endif
 #else
 #error  "No explicit generator for observable for given NG"
 #endif 
@@ -114,10 +118,15 @@ static double E_8_top(int ix,int k)
   ((ilambda8).c[8]).im = -0.5;
 #elif NG==2
   _suNg_zero(ilambda8);
+#ifdef WITH_QUATERNIONS
+  (ilambda8).c[3]=1.0;
+#else
+  _suNg_zero(ilambda8);
   ((ilambda8).c[0]).re = 0.0;
   ((ilambda8).c[0]).im = 1.0;
   ((ilambda8).c[3]).re = 0.0;
   ((ilambda8).c[3]).im = -1.0;
+#endif
 #else
 #error "No explicit generator for observable for given NG"
 #endif

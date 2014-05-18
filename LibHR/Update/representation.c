@@ -14,7 +14,9 @@
 #define XF(m,a,b) ((m)+(a)*NF+(b))
 
 void _group_represent2(suNf* v, suNg *u) {
-
+#ifdef WITH_QUATERNIONS
+  *v = *((suNf *)u);
+#else //WITH_QUATERNIONS
 #ifdef REPR_ADJOINT
 
   int A, C;

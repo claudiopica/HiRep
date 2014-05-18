@@ -249,7 +249,7 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar){
           for (int mu=0; mu<4; ++mu) {
             int y;
             suNf_spinor *chi1, *chi2;
-            _suNf_zero(s1);
+            _suNf_FMAT_zero(s1);
             switch (mu) {
             case 0:
               y=iup(x,0);

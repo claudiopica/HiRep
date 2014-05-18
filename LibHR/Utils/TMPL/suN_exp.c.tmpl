@@ -3,6 +3,7 @@
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
+#include "suN.h"
 #include "utils.h"
 #include <math.h>
 
@@ -59,7 +60,17 @@ void ExpX(double dt, suNg_algebra_vector *h, suNg *r)
 void ExpX(double dt, suNg_algebra_vector *h, suNg *u)
 #endif
 {
+#ifdef WITH_QUATERNIONS
+suNg v_tmp, u_tmp;
+
+u_tmp=*u;
+_suNg_exp(dt,*h,v_tmp);
+_suNg_times_suNg(*u,v_tmp,u_tmp);
+#else //WITH_QUATERNIONS 
+
 $GROUP::EXPX:(dt):(*h):(*u)$
+
+#endif //WITH_QUATERNIONS
 }
 
 
@@ -71,6 +82,16 @@ $GROUP::EXPX:(dt):(*h):(*u)$
 
 void ExpX2(double dt, suNg_algebra_vector *h, suNg *u)
 {
+#ifdef WITH_QUATERNIONS
+
+suNg v_tmp, u_tmp;
+
+u_tmp=*u;
+_suNg_exp(dt,*h,v_tmp);
+_suNg_times_suNg(*u,v_tmp,u_tmp);
+
+#else //WITH_QUATERNIONS 
+
 	int i, j, k, n;
 	double y[3];
 	double d[NG];
@@ -106,6 +127,9 @@ void ExpX2(double dt, suNg_algebra_vector *h, suNg *u)
 			su2_rotate(s[k],XG(uf,i,n),XG(uf,j,n));
 		k--;
 	}
+
+#endif //WITH_QUATERNIONS
+
 }
 
 

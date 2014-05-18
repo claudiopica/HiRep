@@ -414,6 +414,7 @@ static void chiSF_ds_BT(double ds) {
 #define ST 1.414213562373095048801688724209698078570
 
 
+#if defined(BASIC_SF) || defined(ROTATED_SF)
 #ifndef GAUGE_SON
 static void init_gf_SF_BCs(suNg* dn, suNg* up) {
 #if NG==2
@@ -430,7 +431,7 @@ static void init_gf_SF_BCs(suNg* dn, suNg* up) {
   static double SF_phi1_dn[NG] = {-1., 1.};
   static double SF_phi1_up[NG] = {1., -1.};
   
-  #elif NG==3
+#elif NG==3
   
   static double SF_eta = 0.;
   static double SF_phi0_dn[NG] = {-PI/3., 0., PI/3.};
@@ -438,7 +439,7 @@ static void init_gf_SF_BCs(suNg* dn, suNg* up) {
   static double SF_phi0_up[NG] = {-PI, PI/3., 2.*PI/3.};
   static double SF_phi1_up[NG] = {-1., .5, .5};
   
-  #elif NG==4
+#elif NG==4
   
   static double SF_eta = 0.;
   static double SF_phi0_dn[NG] = {-ST*PI/4., ST*PI/4.-PI/2., PI/2.-ST*PI/4., ST*PI/4.};
@@ -446,11 +447,11 @@ static void init_gf_SF_BCs(suNg* dn, suNg* up) {
   static double SF_phi0_up[NG] = {-ST*PI/4.-PI/2., -PI+ST*PI/4., PI-ST*PI/4., PI/2.+ST*PI/4.};
   static double SF_phi1_up[NG] = {.5, .5, -.5, -.5};
   
-  #else
+#else
   
-  #error SF boundary conditions not defined at this NG
+#error SF boundary conditions not defined at this NG
   
-  #endif
+#endif
 
   int k;
   
@@ -469,6 +470,7 @@ static void init_gf_SF_BCs(suNg* dn, suNg* up) {
 static void init_gf_SF_BCs(suNg* dn, suNg* up) {
   error(1,1,"init_gf_SF_BCs","SF not implemented for real gauge group");
 }
+#endif
 #endif
 
 
