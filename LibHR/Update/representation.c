@@ -343,34 +343,39 @@ void represent_gauge_field() {
   suNg *u;
 
   /* loop on local lattice first */
-  for(ip=0;ip<glattice.local_master_pieces;ip++)
-    for(ix=glattice.master_start[ip];ix<=glattice.master_end[ip];ix++)
-      for (mu=0;mu<4;mu++) {
-        u=pu_gauge(ix,mu);
-        Ru=pu_gauge_f(ix,mu);
+  _MASTER_FOR(&glattice,ix) {
+//  for(ip=0;ip<glattice.local_master_pieces;ip++)
+//    for(ix=glattice.master_start[ip];ix<=glattice.master_end[ip];ix++)
+      for (int mu=0;mu<4;mu++) {
+        suNg *u=pu_gauge(ix,mu);
+        suNf *Ru=pu_gauge_f(ix,mu);
         #ifdef UNROLL_GROUP_REPRESENT
           _group_represent(*Ru,*u);
         #else
           _group_represent2(Ru,u); 
         #endif
       }
-
+  }
+  
   /* wait gauge field transfer */
   complete_gf_sendrecv(u_gauge);
 
   /* loop on the rest of master sites */
-  for(ip=glattice.local_master_pieces;ip<glattice.total_gauge_master_pieces;ip++)
-    for(ix=glattice.master_start[ip];ix<=glattice.master_end[ip];ix++)
-      for (mu=0;mu<4;mu++) {
-        u=pu_gauge(ix,mu);
-        Ru=pu_gauge_f(ix,mu);
+_OMP_PRAGMA ( _omp_parallel )
+  for(int ip=glattice.local_master_pieces;ip<glattice.total_gauge_master_pieces;ip++) {
+_OMP_PRAGMA ( _omp_for )
+    for(int ix=glattice.master_start[ip];ix<=glattice.master_end[ip];ix++)
+      for (int mu=0;mu<4;mu++) {
+        suNg *u=pu_gauge(ix,mu);
+        suNf *Ru=pu_gauge_f(ix,mu);
         #ifdef UNROLL_GROUP_REPRESENT
           _group_represent(*Ru,*u);
         #else
           _group_represent2(Ru,u); 
         #endif
       }
-
+  }
+  
   apply_BCs_on_represented_gauge_field();
 #else
   static int first_time=1;
