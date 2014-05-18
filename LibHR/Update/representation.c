@@ -16,8 +16,7 @@
 void _group_represent2(suNf* v, suNg *u) {
 #ifdef WITH_QUATERNIONS
   *v = *((suNf *)u);
-#else //WITH_QUATERNIONS
-#ifdef REPR_ADJOINT
+#elif defined REPR_ADJOINT
 
   int A, C;
   int a, b, i, j, k, c, d;
