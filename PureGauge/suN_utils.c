@@ -61,16 +61,19 @@ static int parse_gstart(pg_flow *gf) {
   ret=sscanf(gf->g_start,"%[^_]_%dx%dx%dx%dnc%db%lfn%d",
       buf,&t,&x,&y,&z,&ng,&beta,&gf->start);
 
-  if(ret==10) { /* we have a correct file name */
+  if(ret==8) { /* we have a correct file name */
     /* increase gf->start: this will be the first conf id */
     gf->start++;
 
     /* do some check */
-    if(t!=GLB_T || x!=GLB_X || y!=GLB_Y || z!=GLB_X) {
+    if(t!=GLB_T || x!=GLB_X || y!=GLB_Y || z!=GLB_Z) {
       lprintf("WARNING", 0, "Size read from config name (%d,%d,%d,%d) is different from the lattice size!\n",t,x,y,z);
     }
     if(ng!=NG) {
       lprintf("WARNING", 0, "Gauge group read from config name (NG=%d) is not the one used in this code!\n",ng);
+    }
+    if(strcmp(buf,gf->run_name)!=0) {
+      lprintf("WARNING", 0, "Run name [%s] doesn't match conf name [%s]!\n",gf->run_name,buf);
     }
 
     lprintf("FLOW",0,"Starting from conf [%s]\n",gf->g_start);
@@ -129,13 +132,12 @@ int init_mc(pg_flow *gf, char *ifile) {
 
   /* alloc global gauge fields */
   u_gauge=alloc_gfield(&glattice);
-#ifndef REPR_FUNDAMENTAL
+#ifdef ALLOCATE_REPR_GAUGE_FIELD
   u_gauge_f=alloc_gfield_f(&glattice);
 #endif
 
   /* flow defaults */
   strcpy(gf->g_start,"invalid");
-  gf->r_start[0]='\0';
   strcpy(gf->run_name,"run_name");
   strcpy(gf->last_conf,"invalid");
   strcpy(gf->conf_dir,"./");
@@ -146,6 +148,16 @@ int init_mc(pg_flow *gf, char *ifile) {
 
   read_input(pg_var.read,ifile);
   read_input(gf->read,ifile);
+
+  /* initialize boundary conditions */
+  BCs_pars_t BCs_pars = {
+    .fermion_twisting_theta = {0.,0.,0.,0.},
+    .gauge_boundary_improvement_cs = 1.,
+    .gauge_boundary_improvement_ct = 1.,
+    .chiSF_boundary_improvement_ds = 1.,
+    .SF_BCs = 0
+  };
+  init_BCs(&BCs_pars);
 
   /* fix conf_dir: put a / at the end of it */
   start_t=strlen(gf->conf_dir);
@@ -158,16 +170,7 @@ int init_mc(pg_flow *gf, char *ifile) {
   start_t=parse_gstart(gf);
   /* set last conf id */
   parse_lastconf(gf);
-  /* initialize boundary conditions */
 
-  BCs_pars_t BCs_pars = {
-    .fermion_twisting_theta = {0.,0.,0.,0.},
-    .gauge_boundary_improvement_cs = 1.,
-    .gauge_boundary_improvement_ct = 1.,
-    .chiSF_boundary_improvement_ds = 1.,
-    .SF_BCs = 0
-  };
-  init_BCs(&BCs_pars);
   
   /* init gauge field */
   switch(start_t) {
@@ -182,9 +185,10 @@ int init_mc(pg_flow *gf, char *ifile) {
       random_u(u_gauge);
       break;
   }
-  represent_gauge_field();
+  
   apply_BCs_on_fundamental_gauge_field();
-
+  represent_gauge_field();
+  
   /* init PG */
   lprintf("MAIN",0,"beta = %2.4f\n",pg_var.beta);
   lprintf("MAIN",0,"Number of thermalization cycles: %d\n",gf->therm);
@@ -200,15 +204,21 @@ int save_conf(pg_flow *gf, int id) {
   char buf[256];
   
   mk_gconf_name(buf, gf, id);
+#if NG==2 && !defined(WITH_QUATERNIONS)
+  write_gauge_field_su2q(add_dirname(gf->conf_dir,buf));
+#else
   write_gauge_field(add_dirname(gf->conf_dir,buf));
-
+#endif
+  
   return 0;
 }
 
 int end_mc() {
+  free_BCs();
+  
   /* free memory */
   free_gfield(u_gauge);
-#ifndef REPR_FUNDAMENTAL
+#ifdef ALLOCATE_REPR_GAUGE_FIELD
   free_gfield_f(u_gauge_f);
 #endif
 

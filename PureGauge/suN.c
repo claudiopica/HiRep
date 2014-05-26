@@ -127,7 +127,7 @@ int main(int argc,char *argv[])
   }
   
   lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
-  lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
+  //lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
   
 
   /* read input for measures */
@@ -192,9 +192,16 @@ int main(int argc,char *argv[])
 
     lprintf("BLOCK",0," End %d\n",i);
   }
-
-  if(strlen(ranxld_filename)!=0)
-    write_ranlxd_state(ranxld_filename);
+  
+  /* save final configuration */
+  if(((--i)%flow.save_freq)!=0) {
+    save_conf(&flow, i);
+    /* Only save state if we have a file to save to */
+    if(rlx_var.rlxd_state[0]!='\0') {
+      lprintf("MAIN",0,"Saving rlxd state to file %s\n",rlx_var.rlxd_state);
+      write_ranlxd_state(rlx_var.rlxd_state);
+    }
+  }
 
 
   /* finalize Monte Carlo */

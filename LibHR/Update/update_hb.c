@@ -22,8 +22,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-static suNg v __attribute__ ((aligned (16)));
-static int * dyn_gauge=NULL;
+static int *dyn_gauge=NULL;
 
 void project_gauge_field(void)
 {
@@ -93,10 +92,18 @@ static void g_dn_open_BCs() {
 }
 #endif
 
+static void free_hb_boundary() {
+  if (dyn_gauge!=NULL) {
+    free(dyn_gauge);
+    dyn_gauge = NULL;
+  }
+}
+
 static void init_hb_boundary() {
-  dyn_gauge =(int*)malloc(sizeof(int)*glattice.gsize_gauge*4);
-  int i;
-  for(i=0;i<glattice.gsize_gauge*4;i++) dyn_gauge[i]=1;
+  dyn_gauge = malloc(sizeof(*dyn_gauge)*glattice.gsize_gauge*4);
+  atexit(&free_hb_boundary); //register cleanup function at exit
+  
+  for(int i=0;i<glattice.gsize_gauge*4;i++) dyn_gauge[i]=1;
 #if defined(BASIC_SF) || defined(ROTATED_SF)
   g_up_Dirichlet_BCs();
   g_dn_Dirichlet_BCs();
@@ -126,40 +133,68 @@ static void update_all(double beta,int type)
   }
   ++count;
   
-  for(int mu=0;mu<4;mu++){
-    start_gf_sendrecv(u_gauge);
-    for(int j=glat_even.master_start[0];j<=glat_even.master_end[0];j++){
-      if(dyn_gauge[j*4+mu]!=0){
-        staples(j,mu,&v);
-        cabmar(beta,pu_gauge(j,mu),&v,type);
-      }
-    }
-    complete_gf_sendrecv(u_gauge);
-    for(int i=1;i<glat_even.local_master_pieces;i++)
-      for(int j=glat_even.master_start[i];j<=glat_even.master_end[i];j++){
+_OMP_PRAGMA ( _omp_parallel )
+  {
+    suNg v;
+    
+    for(int mu=0;mu<4;mu++){
+#ifdef WITH_MPI
+_OMP_PRAGMA ( master )
+      { start_gf_sendrecv(u_gauge); }
+_OMP_PRAGMA ( barrier )
+#endif
+_OMP_PRAGMA ( _omp_for )
+      for(int j=glat_even.master_start[0];j<=glat_even.master_end[0];j++){
         if(dyn_gauge[j*4+mu]!=0){
           staples(j,mu,&v);
           cabmar(beta,pu_gauge(j,mu),&v,type);
         }
       }
-  }
-  
-  for(int mu=0;mu<4;mu++){
-    start_gf_sendrecv(u_gauge);
-    for(int j=glat_odd.master_start[0];j<=glat_odd.master_end[0];j++){
-      if(dyn_gauge[j*4+mu]!=0){
-        staples(j,mu,&v);
-        cabmar(beta,pu_gauge(j,mu),&v,type);
+#ifdef WITH_MPI
+_OMP_PRAGMA ( master )
+      { complete_gf_sendrecv(u_gauge); }
+_OMP_PRAGMA ( barrier )
+#endif
+      for(int i=1;i<glat_even.local_master_pieces;i++) {
+_OMP_PRAGMA ( _omp_for )
+        for(int j=glat_even.master_start[i];j<=glat_even.master_end[i];j++){
+          if(dyn_gauge[j*4+mu]!=0){
+            staples(j,mu,&v);
+            cabmar(beta,pu_gauge(j,mu),&v,type);
+          }
+        }
       }
     }
-    complete_gf_sendrecv(u_gauge);
-    for(int i=1;i<glat_odd.local_master_pieces;i++)
-      for(int j=glat_odd.master_start[i];j<=glat_odd.master_end[i];j++){
+    
+    for(int mu=0;mu<4;mu++){
+#ifdef WITH_MPI
+_OMP_PRAGMA ( master )
+      { start_gf_sendrecv(u_gauge); }
+_OMP_PRAGMA ( barrier )
+#endif
+_OMP_PRAGMA ( _omp_for )
+      for(int j=glat_odd.master_start[0];j<=glat_odd.master_end[0];j++) {
         if(dyn_gauge[j*4+mu]!=0){
           staples(j,mu,&v);
           cabmar(beta,pu_gauge(j,mu),&v,type);
         }
       }
+#ifdef WITH_MPI
+_OMP_PRAGMA ( master )
+      { complete_gf_sendrecv(u_gauge); }
+_OMP_PRAGMA ( barrier )
+#endif
+      for(int i=1;i<glat_odd.local_master_pieces;i++) {
+_OMP_PRAGMA ( _omp_for )
+        for(int j=glat_odd.master_start[i];j<=glat_odd.master_end[i];j++) {
+          if(dyn_gauge[j*4+mu]!=0){
+            staples(j,mu,&v);
+            cabmar(beta,pu_gauge(j,mu),&v,type);
+          }
+        }
+      }
+    }
+    
   }
   
 } 
@@ -168,16 +203,16 @@ static void update_all(double beta,int type)
 void update(double beta,int nhb,int nor)
 {
   if(dyn_gauge==NULL ) init_hb_boundary();
-  int n;
    
-  for (n=0;n<nhb;n++){     
+  for (int n=0;n<nhb;n++){
     update_all(beta,0);
   }
 
-  for (n=0;n<nor;n++){     
+  for (int n=0;n<nor;n++){
     update_all(beta,1);
   }
 
+  start_gf_sendrecv(u_gauge);
  
 }
 

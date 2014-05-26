@@ -23,7 +23,7 @@
 #error This code does not work with the open BCs
 #endif
 
-#error "Wilson loop must be fixed, The zerocoord global location must be added"
+//#error "Wilson loop must be fixed, The zerocoord global location must be added"
 
 #define _WL_4VOL_INDEX(t,x,y,z) ((t)+(x)*T+(y)*T*X+(z)*T*X*Y)
 
@@ -252,7 +252,6 @@ void WL_Hamiltonian_gauge(suNg_field* out, suNg_field* in) {
 #ifdef WITH_MPI  
   int mpiret;
 #endif /* WITH_MPI */
-  suNg tmp;
 
   /* LOC(t)=zerocoord[0]+t */
   /* ws_gtf[0](t) = U_0(LOC(0)) ... U_0(LOC(t)) */
@@ -359,12 +358,14 @@ void WL_Hamiltonian_gauge(suNg_field* out, suNg_field* in) {
   }
   start_gt_sendrecv(ws_gtf[1]);
   
-  _DECLARE_INT_ITERATOR(ix);
-  _PIECE_FOR(&glattice,ix) {
-    if(_PIECE_INDEX(ix)==glattice.inner_master_pieces) {
+  _PIECE_FOR(&glattice,ixp) {
+    suNg tmp;
+    if(ixp==glattice.inner_master_pieces) {
+      _OMP_PRAGMA( master )
       complete_gt_sendrecv(ws_gtf[1]);
+      _OMP_PRAGMA( barrier )
     }
-    _SITE_FOR(&glattice,ix) {
+    _SITE_FOR(&glattice,ixp,ix) {
       for(int mu=0;mu<4;mu++) {
         _suNg_times_suNg(tmp,*_FIELD_AT(ws_gtf[1],ix),*_4FIELD_AT(in,ix,mu));
         _suNg_times_suNg_dagger(*_4FIELD_AT(out,ix,mu),tmp,*_FIELD_AT(ws_gtf[1],iup(ix,mu)));

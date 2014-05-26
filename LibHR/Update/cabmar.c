@@ -18,10 +18,9 @@
 #include "update.h"
 
 
-static double s[4],w[4];
-static suNg_vector *pu1,*pu2,*pv1,*pv2;
+#ifndef WITH_QUATERNIONS
 
-static void rotate(void)
+static inline void rotate(suNg_vector *pu1, suNg_vector *pu2, double *s)
 {
   int i;
   complex z1,z2;
@@ -42,7 +41,7 @@ static void rotate(void)
   }
 }
 
-static void wmatrix(void) 
+static inline void wmatrix(suNg_vector *pu1, suNg_vector *pu2, suNg_vector *pv1, suNg_vector *pv2, double *w)
 {
 	double prod1,prod2;
   _vector_prod_re_g(prod1,*pu1,*pv1);
@@ -59,11 +58,13 @@ static void wmatrix(void)
 	w[3] = prod1-prod2;
 }
 
+#endif
+
 void cabmar(double beta,suNg *u,suNg *v,int type)
 {
 #ifdef WITH_QUATERNIONS
   double wsq,rho,fact;
-	static suNg s,w,r;
+	suNg s,w,r;
   
 	/*w=u*v^+ */
 	_suNg_times_suNg_dagger(w,*u,*v);
@@ -96,21 +97,21 @@ void cabmar(double beta,suNg *u,suNg *v,int type)
   
 #else
   int i,j;
-  double b,bsq,wsq,rho,fact,r[4];
+  double b,bsq,wsq,rho,fact,r[4],w[4],s[4];
   
   const double invng = 1. / (double) NG;
   
-  pu1=(suNg_vector*)(u);
-  pv1=(suNg_vector*)(v);
+  suNg_vector *pu1=(suNg_vector*)(u);
+  suNg_vector *pv1=(suNg_vector*)(v);
   
   b=invng*beta;
   bsq=b*b;
   
   for (i=0; i<NG; ++i) {
-    pu2 = pu1 + 1;
-    pv2 = pv1 + 1;
+    suNg_vector *pu2 = pu1 + 1;
+    suNg_vector *pv2 = pv1 + 1;
     for (j=i+1; j<NG; ++j) {
-      wmatrix();
+      wmatrix(pu1, pu2, pv1, pv2, w);
       wsq=w[0]*w[0]+w[1]*w[1]+w[2]*w[2]+w[3]*w[3];
       
       if ((bsq*wsq)>1.0e-28) {
@@ -134,7 +135,7 @@ void cabmar(double beta,suNg *u,suNg *v,int type)
         }
       } else random_su2(0.0,s);
       
-      rotate();
+      rotate(pu1, pu2, s);
       
       ++pu2; ++pv2;
     }
