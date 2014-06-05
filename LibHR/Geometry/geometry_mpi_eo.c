@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <stddef.h>
 
 #include "geometry.h" 
 #include "global.h" 
@@ -173,27 +174,27 @@ static void geometry_mpi_init()
 	"Cannot allocate memory for border");
 
   if(N_BORDER>0){
-    glattice.rbuf_len=malloc((N_BORDER)*sizeof(unsigned int));
+    glattice.rbuf_len=malloc((N_BORDER)*sizeof(int));
     error((glattice.rbuf_len==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
     
-    glattice.sbuf_len=malloc((N_BORDER)*sizeof(unsigned int));
+    glattice.sbuf_len=malloc((N_BORDER)*sizeof(int));
     error((glattice.sbuf_len==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
     
-    glattice.sbuf_to_proc=malloc((N_BORDER)*sizeof(unsigned int));
+    glattice.sbuf_to_proc=malloc((N_BORDER)*sizeof(int));
     error((glattice.sbuf_to_proc==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
     
-    glattice.sbuf_start=malloc((N_BORDER)*sizeof(unsigned int));
+    glattice.sbuf_start=malloc((N_BORDER)*sizeof(int));
     error((glattice.sbuf_start==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
     
-    glattice.rbuf_from_proc=malloc((N_BORDER)*sizeof(unsigned int));
+    glattice.rbuf_from_proc=malloc((N_BORDER)*sizeof(int));
     error((glattice.rbuf_from_proc==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
     
-    glattice.rbuf_start=malloc((N_BORDER)*sizeof(unsigned int));
+    glattice.rbuf_start=malloc((N_BORDER)*sizeof(int));
     error((glattice.rbuf_start==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
   }
@@ -202,51 +203,51 @@ static void geometry_mpi_init()
   /*Setting glat_even & glat_odd values*/
 
   if(L3_BORDER>0){
-    glat_even.rbuf_len=malloc((L3_BORDER)*sizeof(unsigned int));
+    glat_even.rbuf_len=malloc((L3_BORDER)*sizeof(int));
     error((glat_even.rbuf_len==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
     
-    glat_even.sbuf_len=malloc((L3_BORDER)*sizeof(unsigned int));
+    glat_even.sbuf_len=malloc((L3_BORDER)*sizeof(int));
     error((glat_even.sbuf_len==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
     
-    glat_even.sbuf_to_proc=malloc((L3_BORDER)*sizeof(unsigned int));
+    glat_even.sbuf_to_proc=malloc((L3_BORDER)*sizeof(int));
     error((glat_even.sbuf_to_proc==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
     
-    glat_even.sbuf_start=malloc((L3_BORDER)*sizeof(unsigned int));
+    glat_even.sbuf_start=malloc((L3_BORDER)*sizeof(int));
     error((glat_even.sbuf_start==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
     
-    glat_even.rbuf_from_proc=malloc((L3_BORDER)*sizeof(unsigned int));
+    glat_even.rbuf_from_proc=malloc((L3_BORDER)*sizeof(int));
     error((glat_even.rbuf_from_proc==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
     
-    glat_even.rbuf_start=malloc((L3_BORDER)*sizeof(unsigned int));
+    glat_even.rbuf_start=malloc((L3_BORDER)*sizeof(int));
     error((glat_even.rbuf_start==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
     
-    glat_odd.rbuf_len=malloc((L3_BORDER)*sizeof(unsigned int));
+    glat_odd.rbuf_len=malloc((L3_BORDER)*sizeof(int));
     error((glat_odd.rbuf_len==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
     
-    glat_odd.sbuf_len=malloc((L3_BORDER)*sizeof(unsigned int));
+    glat_odd.sbuf_len=malloc((L3_BORDER)*sizeof(int));
     error((glat_odd.sbuf_len==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
     
-    glat_odd.sbuf_to_proc=malloc((L3_BORDER)*sizeof(unsigned int));
+    glat_odd.sbuf_to_proc=malloc((L3_BORDER)*sizeof(int));
     error((glat_odd.sbuf_to_proc==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
     
-    glat_odd.sbuf_start=malloc((L3_BORDER)*sizeof(unsigned int));
+    glat_odd.sbuf_start=malloc((L3_BORDER)*sizeof(int));
     error((glat_odd.sbuf_start==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
     
-    glat_odd.rbuf_from_proc=malloc((L3_BORDER)*sizeof(unsigned int));
+    glat_odd.rbuf_from_proc=malloc((L3_BORDER)*sizeof(int));
     error((glat_odd.rbuf_from_proc==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
     
-    glat_odd.rbuf_start=malloc((L3_BORDER)*sizeof(unsigned int));
+    glat_odd.rbuf_start=malloc((L3_BORDER)*sizeof(int));
     error((glat_odd.rbuf_start==NULL),1,"fix_geometry_descriptor [geometry_mpi.c]",
 	  "Cannot allocate memory");
   }
