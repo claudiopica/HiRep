@@ -19,9 +19,9 @@
 #include "check_options.h"
 
 #ifdef MAIN_PROGRAM
-#  define GLB_VAR(type,name,init...) type name init
+#  define GLB_VAR(type,name,...) type name __VA_ARGS__
 #else
-#  define GLB_VAR(type,name,init...) extern type name
+#  define GLB_VAR(type,name,...) extern type name
 #endif
 
 /* local lattice attributes */
