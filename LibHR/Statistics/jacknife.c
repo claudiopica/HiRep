@@ -32,7 +32,7 @@ double auto_corr_time(int n,int tmax,double g[],int *flag)
    par1=5.0;
    par2=3.0;
          
-   t=malloc(tmax*sizeof(double));
+   t=malloc(tmax*sizeof(*t));
          
    t[0]=0.5;  
          
@@ -70,13 +70,17 @@ double auto_corr_time(int n,int tmax,double g[],int *flag)
          if (itest==0)
          {
             *flag=0;
-            return(t[i]);
+           dt=t[i];
+           free(t);
+            return(dt);
          }
       }
    }
             
    *flag=1;
-   return(taumax);
+  free(t);
+  
+   return taumax;
 }
 
 
@@ -89,10 +93,10 @@ double sigma_bin(int n,int binsize,double a[])
    */
 {
    int i,j,icount,numbin;
-   double *b;
+   double *b,s0;
       
    numbin=n/binsize;
-   b=malloc(numbin*sizeof(double));
+   b=malloc(numbin*sizeof(*b));
    
    icount=0;
    for (i=0;i<numbin;i++)   
@@ -106,7 +110,10 @@ double sigma_bin(int n,int binsize,double a[])
       b[i]/=(double)(binsize);
    }
  
-   return(sigma0(numbin,b));      
+   s0=sigma0(numbin,b);
+  free(b);
+  
+  return s0;
 }
 
 
@@ -165,6 +172,10 @@ double sigma_replicas(int n,int r,double a[],double *tau,int *flag)
    {
       *tau=0.5;
       *flag=0;
+     free(g);
+     free(gr);
+     free(ar);
+
       return(sig0);
    }
 
@@ -172,6 +183,10 @@ double sigma_replicas(int n,int r,double a[],double *tau,int *flag)
 
    var=2.0*(*tau)*g[0]/(double)(nr);
 
+  free(g);
+  free(gr);
+  free(ar);
+  
    return(sqrt(var));
 }
 
@@ -227,6 +242,12 @@ double sigma_jackknife(int nobs,int n,double a[],double *ave_j,
       f[j]=pobs(aj);
    } 
    
-   return(sigma0(n,f)*(double)(n-1));
+   fact=sigma0(n,f)*(double)(n-1);
+  
+  free(atot);
+  free(aj);
+  free(f);
+  
+  return fact;
 }
 

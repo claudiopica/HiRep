@@ -121,6 +121,7 @@ double sigma(int n,double a[],double *tau,int *flag)
    {
       *tau=0.5;
       *flag=0;
+     free(g); free(t);
       return(sig0);
    }
    
@@ -162,7 +163,8 @@ double sigma(int n,double a[],double *tau,int *flag)
             var=2.0*t[i]*g[0]/(double)(n);
             *tau=t[i];
             *flag=0;
-
+           
+           free(g); free(t);
             return(sqrt(var));
          }
       }
@@ -172,6 +174,7 @@ double sigma(int n,double a[],double *tau,int *flag)
    *tau=taumax;
    *flag=1;
 
-   return(sqrt(var));   
+  free(g); free(t);
+   return(sqrt(var));
 }
 
