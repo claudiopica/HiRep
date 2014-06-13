@@ -731,29 +731,34 @@ int g5QMR_fltacc( g5QMR_fltacc_par* par, spinor_operator M, spinor_field *in, sp
   int cgiter=0,cgiter_flt=0,cgiter_minres=0;
   short valid;
   spinor_field_flt *in_flt, *out_flt, *res_flt;
-  spinor_field *res;
+  spinor_field *res, *Mp;
   double err2, innorm2;
-  
+
 #ifdef WITH_GPU
   alloc_mem_t=GPU_MEM; /* allocate only on GPU */
 #endif
-  res = alloc_spinor_field_f(1,in->type);
+  res = alloc_spinor_field_f(2,in->type);
+  Mp = res+1;
   in_flt = alloc_spinor_field_f_flt(3,in->type);
   alloc_mem_t=std_mem_t; /* set the allocation memory type back */
   out_flt = in_flt+1;
   res_flt = out_flt+1;
-  
+
   innorm2 = spinor_field_sqnorm_f(in);
-  
-  /* 0. out = 0 ; res = in */
+
+  /* 0. res = in - Mp*out */
   spinor_field_copy_f(res,in);
-  spinor_field_zero_f(out);
-  
-  do {
+  M.dbl(Mp, out);
+  spinor_field_sub_assign_f(res,Mp);
+
+  err2 = spinor_field_sqnorm_f(res);
+  lprintf("INVERTER",50,"g5QMR_fltacc: res=%e\n", err2/innorm2);
+
+   while(err2/innorm2>par->err2) {
     /* 1. M^{-1} res = out + M^{-1} in */
     /* 2. out + M^{-1} res -> out */
     /* 3. res = in - M.out */
-    
+
     assign_sd2s(res_flt,res);
     spinor_field_zero_f_flt(out_flt);
     cgiter_flt += g5QMR_core_flt(&valid,par->err2_flt,par->max_iter_flt,M,res_flt,out_flt);
@@ -769,7 +774,7 @@ int g5QMR_fltacc( g5QMR_fltacc_par* par, spinor_operator M, spinor_field *in, sp
       //      spinor_field_g5_f_flt(res_flt,res_flt); /* multiply input by g5 for MINRES */
       cgiter_minres+=GMRES_flt(&Mpar,M,res_flt,out_flt,out_flt);
       //      spinor_field_g5_f_flt(res_flt,res_flt); /* restore input vector */
-#endif      
+#endif
       lprintf("INVERTER",20,"g5QMR_fltacc: using MINRES\n");
       MINRES_par Mpar;
       Mpar.err2=par->err2_flt;
@@ -780,22 +785,21 @@ int g5QMR_fltacc( g5QMR_fltacc_par* par, spinor_operator M, spinor_field *in, sp
       cgiter_minres+=MINRES_flt(&Mpar,Herm,res_flt,out_flt,out_flt);
       spinor_field_g5_f_flt(res_flt,res_flt); /* restore input vector */
     }
- 
+
     assign_s2sd(res,out_flt);
     spinor_field_add_assign_f(out, res);
-    
+
     M.dbl(res,out);
     spinor_field_sub_f(res,in,res);
-    
+
     err2 = spinor_field_sqnorm_f(res);
-    
     cgiter++;
-    
+
     lprintf("INVERTER",50,"g5QMR_fltacc: res=%e\n", err2/innorm2);
-  } while(err2/innorm2>par->err2);
-  
+  }
+
   lprintf("INVERTER",10,"g5QMR_fltacc: MVM (g5QMR_flt,g5QMR,MINRES) = %d ; %d ; %d\n",cgiter_flt,cgiter,cgiter_minres);
-  
+
   free_spinor_field_f(res);
   free_spinor_field_f_flt(in_flt);
 

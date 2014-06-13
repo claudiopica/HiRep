@@ -30,7 +30,7 @@ MODS := gauss random_suNg ranlxs ranlxd random_fields ranz2
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Update
-MODS := Dphi Dphi_flt staples update_hb random_su2 representation random_momenta random_spinor_field update_hmc update_rhmc local_action local_action_gpu force0 copy_gfield force_hmc O2MN_multistep cabmar rational_functions find_spec_limits force_rhmc random_spinor_field_gpu Dphi_gpu Dphi_flt_gpu random_momenta_gpu update_hb_gpu gauge_integrator_gpu force_hmc_gpu force0_gpu representation_gpu
+MODS := Dphi Dphi_flt staples update_hb random_su2 representation random_momenta random_spinor_field update_hmc update_rhmc local_action local_action_gpu force0 copy_gfield force_hmc O2MN_multistep cabmar rational_functions find_spec_limits force_rhmc random_spinor_field_gpu Dphi_gpu Dphi_flt_gpu random_momenta_gpu update_hb_gpu gauge_integrator_gpu force_hmc_gpu force0_gpu representation_gpu mre
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 MODDIR := Error

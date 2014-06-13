@@ -78,8 +78,8 @@ extern rhmc_par _update_par;
   _vector_i_add_f(p.c[3],(chi1)->c[1],(chi1)->c[3]);	      \
   _suNf_FMAT((u),p)
 
-
-
+void mre_guess(int,spinor_field*, spinor_operator, spinor_field*);
+void mre_store(int,spinor_field*);
 
 void D_dbl(spinor_field *out, spinor_field *in){
 #ifdef UPDATE_EO
@@ -199,31 +199,44 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
     mpar.max_iter = 0;
     mpar.err2_flt = par->inv_err2_flt;
     mpar.max_iter_flt = 0;
+/*
+    mshift_par mpar;
+    mpar.err2 = par->inv_err2;
+    mpar.max_iter = 0;
+    mpar.n = 1;
+    double tmp = 0;
+    mpar.shift = &tmp;
+*/
     spinor_field_zero_f(&Xe);
     /* H^{-1} pf = D^{-1} g5 pf */
     spinor_field_g5_assign_f(&pf[k]);
+    mre_guess(0, &Xe, D, &pf[k]);
     g5QMR_fltacc(&mpar, D, &pf[k], &Xe);
+    mre_store(0, &Xe);
     spinor_field_g5_assign_f(&pf[k]);
-    Dphi_(&Xo,&Xe);
-    
+    Dphi_(&Xo, &Xe);
+
     /* Y_e = H^{-1} ( a g5 pf[k] + b X_e ) */
     /* Y_o = D_oe H^{-1} ( a g5 pf[k] + b X_e ) */
     Ye=*Ys; Ye.type=&glat_even;
     Yo=*Ys; Yo.type=&glat_odd;
 
-    if(par->hasenbusch != 2) {
+    if(par->hasenbusch != 2)
+    {
       spinor_field_copy_f(eta,&Xe);
     } else {
       spinor_field_g5_f(eta,&pf[k]);
       spinor_field_mul_f(eta,par->aY,eta);
       spinor_field_mul_add_assign_f(eta,par->bY,&Xe);
     }
-    
+
     spinor_field_zero_f(&Ye);
     spinor_field_g5_assign_f(eta);
+    mre_guess(1, &Ye, D, eta);
     g5QMR_fltacc(&mpar, D, eta, &Ye);
+    mre_store(1, &Ye);
     spinor_field_g5_assign_f(eta);
-    Dphi_(&Yo,&Ye);
+    Dphi_(&Yo, &Ye);
 
 #endif //UPDATE_EO
 
