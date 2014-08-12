@@ -50,7 +50,12 @@ void project_to_suNg(suNg *u);
 void project_to_suNg_flt(suNg_flt *u);
 void project_cooling_to_suNg(suNg* g_out, suNg* g_in, int cooling);
 
-#ifdef GAUGE_SON
+#ifndef GAUGE_SON
+void ludcmp(complex* a, int* indx, double* d,int N);
+void lubksb(complex* a, int* indx, complex* b,int N);
+void inv_suNg(suNg* a);
+void det_suNg(complex* res, suNg* a);
+#else
 int project_to_suNg_real(suNg *out, suNg *in);
 void det_suNg(double* res, suNg *a);
 void diag_hmat(suNg *hmat, double *dag);

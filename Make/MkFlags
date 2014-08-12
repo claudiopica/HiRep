@@ -40,6 +40,6 @@ MACRO += -DIO_FLUSH
 #Compiler
 #CC = mpicc
 CC = gcc
-CFLAGS = -Wall -std=c99 -O3 -fomit-frame-pointer -msse -msse2
+CFLAGS = -Wall -std=c99 -O3 -fomit-frame-pointer -msse -msse2 -fopenmp
 #CFLAGS = -Wall -std=c99 -g
-LDFLAGS =
+LDFLAGS = -fopenmp  

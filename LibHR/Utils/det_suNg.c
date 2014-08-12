@@ -9,14 +9,33 @@
 *
 *******************************************************************************/
 
-#ifdef GAUGE_SON
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 #include "utils.h"
 #include "suN.h"
 #include "representation.h"
+
+#ifndef GAUGE_SON
+
+
+void det_suNg(complex* res,suNg* a){
+  suNg b;
+  int indx[NG];
+  double d;
+  int i;
+  complex tmp;
+  b=*a;
+  ludcmp(&(b.c),indx,&d,NG);
+  res->re=d; res->im=0;
+  for (i=0;i<NG;++i){
+    _complex_mul(tmp,*res,b.c[NG*i+i]);
+    *res=tmp;
+  }
+}
+
+
+#else
 
 /* The incoming matrix will be destroyed */
 
