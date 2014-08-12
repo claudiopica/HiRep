@@ -290,6 +290,7 @@ if ($su2quat==0) {
   write_suN_minus();
 # write_suN_copy();
   write_suN_mul();
+  write_suN_mulc();
   write_suN_add_assign();
   write_suN_sub_assign();
   write_suN_sqnorm();
@@ -2191,6 +2192,30 @@ sub write_suN_mul {
 		print "   } while(0) \n\n";
 	}
 }
+
+sub write_suN_mulc {
+  print "/* u=r*v (u,v mat, r complex) */\n";
+  print "#define _${dataname}_mulc(u,r,v) \\\n";
+	my $dim=$N*$N;
+	if ($N<$Nmax or $dim<(2*$unroll+1)) { #unroll all 
+		for(my $i=0; $i<$dim; $i++) {
+			print "   _complex_mul((u).$cname\[$i\],(r),(v).$cname\[$i\])";
+			if($i==$dim-1) {print "\n\n";} else { print ";\\\n"; }
+		}
+	} else { #partial unroll
+		print "   do { \\\n";
+		print "      int _i;for (_i=0; _i<$md2; ){\\\n";
+		for(my $i=0;$i<$unroll;$i++){
+			print "         _complex_mul((u).$cname\[_i\],(r),(v).$cname\[_i\]); ++_i;\\\n";
+		}
+		print "      }\\\n";
+		for(my $i=0;$i<$mr2;$i++){
+			print "      _complex_mul((u).$cname\[_i\],(r),(v).$cname\[_i\]); ++_i;\\\n";
+		}
+		print "   } while(0) \n\n";
+	}
+}
+
 
 sub write_suNr_mul {
   print "/* u=r*v (u,v mat, r real) */\n";
