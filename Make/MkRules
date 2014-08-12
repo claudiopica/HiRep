@@ -69,8 +69,6 @@ GCC = gcc
 CXX ?= g++
 CPPFLAGS += $(MACRO)
 CPPFLAGS += $(INC)
-LDFLAGS += -lm
-
 
 ifndef REPR
   $(error Error: must specify fermion representation!)
@@ -188,11 +186,12 @@ cinfo.c: $(MKDIR)/MkFlags $(MKDIR)/MkRules $(MKDIR)/Utils/cinfo.sh
 
 LDFLAGS += $(foreach _lib, $(LIBS),-L$(dir $(_lib)))
 LDFLAGS += $(foreach _lib, $(LIBS),-l$(patsubst lib%.a,%,$(notdir $(_lib))))
+LDFLAGS += -lm
 
 define LINK_template
 $(1): $(1).o $$($(1)_OBJS) $$(COMMON_OBJS) $$(LIBS)
 	echo -n "$$(_col_link)Linking$$(_col_norm) $$(call _cfname,$$@)..." 
-	$$(CC) -o $$@ $$< $$($(1)_OBJS) $$(COMMON_OBJS) $$(LDFLAGS)  &&\
+	$$(CC) -o $$@ $$< $$($(1)_OBJS) $$(COMMON_OBJS) $$(LDFLAGS) &&\
 	echo " $$(_cdone)" || ( echo " $$(_cfailed)" && false )
 endef
 
