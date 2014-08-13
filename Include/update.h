@@ -57,6 +57,7 @@ typedef struct _integrator_par {
 } integrator_par;
 void gauge_integrator(suNg_av_field *momenta, double tlen, integrator_par *int_par);
 void O2MN_multistep(suNg_av_field *momenta, double tlen, integrator_par *int_par);
+void O4MN_multistep(suNg_av_field *momenta, double tlen, integrator_par *int_par);
 
 
 
