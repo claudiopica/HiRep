@@ -292,7 +292,7 @@ int main(int argc,char *argv[]) {
   spinor_field *eva_vec, *eva_ws;
 
   eva_val=malloc(sizeof(double)*eig_var.nevt);
-  eva_vec=alloc_spinor_field_f(eig_var.nevt+2,&glattice);
+  eva_vec=alloc_spinor_field_f(eig_var.nevt+1,&glattice);
   eva_ws=eva_vec+eig_var.nevt;
 
   mupp=fabs(hevamass+4)+4;
@@ -321,11 +321,11 @@ int main(int argc,char *argv[]) {
     lprintf("MAIN",0,"MAXCHECK: cnfg=%e  uppbound=%e diff=%e %s\n",max,mupp,mupp-max,(mupp-max)<0?"[FAILED]":"[OK]");
     max*=1.1;
 
-    ie=eva(eig_var.nev,eig_var.nevt,0,eig_var.kmax,eig_var.maxiter,max,eig_var.omega1,eig_var.omega2,&H2EVA,eva_ws,eva_vec,eva_val,&status);
+    ie=eva(eig_var.nev,eig_var.nevt,0,eig_var.kmax,eig_var.maxiter,max,eig_var.omega1,eig_var.omega2,&H2EVA,eva_vec,eva_val,&status);
     MVM+=status;
     while (ie!=0) { /* if failed restart EVA */
       lprintf("MAIN",0,"Restarting EVA!\n");
-      ie=eva(eig_var.nev,eig_var.nevt,2,eig_var.kmax,eig_var.maxiter,max,eig_var.omega1,eig_var.omega2,&H2EVA,eva_ws,eva_vec,eva_val,&status);
+      ie=eva(eig_var.nev,eig_var.nevt,2,eig_var.kmax,eig_var.maxiter,max,eig_var.omega1,eig_var.omega2,&H2EVA,eva_vec,eva_val,&status);
       MVM+=status;
     }
 
