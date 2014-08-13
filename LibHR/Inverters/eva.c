@@ -18,7 +18,7 @@
 *   int eva(int nev,int nevt,int init,int kmax,
 *           int imax,float ubnd,float omega1,float omega2,
 *           spinor_operator Op,
-*           spinor_field *ws,spinor_field *ev,float d[],int *status)
+*           spinor_field *ev,float d[],int *status)
 *     Computes the lowest eigenvalues d[0],...,d[nevt-1] of the operator Op
 *     and the corresponding eigenvectors ev[0],..,ev[nevt-1]. The first
 *     nev of the eigenvalues are obtained to an absolute precision omega1 or
@@ -37,8 +37,6 @@
 *     imax     Maximal number of subspace iterations
 *
 *     ubnd     Upper bound on the eigenvalues of the operator
-*
-*     ws       Workspace of 2 double-precision spinor fields
 *
 *     status   On exit this variable reports the number of times the
 *              operator was applied
@@ -94,51 +92,32 @@
 #define GAMMA 3.0
 #define MAX_ROTATE 1000 /*50*/
 
-static int initr=0;
-static suNf_spinor *psi,*chi;
-
 static int nop,nvc=0;
 static double *dd,*ee;
 static complex *aa,*bb,*cc,*vv;
 
 static double EPSILON=1.e-12;
 
-static void alloc_ws_rotate(void)
-{
-  psi=calloc(MAX_ROTATE,sizeof(suNf_spinor));
-  chi=calloc(MAX_ROTATE,sizeof(suNf_spinor));
-
-  error((psi==NULL)||(chi==NULL),1,"alloc_ws_rotate [linalg.c]",
-	"Unable to allocate workspace");
-
-  initr=1;
-}
 
 static void rotate(int n,spinor_field *pkk,complex v[])
 {
-  int k,j;
-  complex *z;
-  suNf_spinor *pk,*pj;
-  
-  if (initr==0)
-    alloc_ws_rotate();
-  
   error((n<1)||(n>MAX_ROTATE),1,"rotate [eva.c]",
         "Parameter n is out of range");
   
   _MASTER_FOR(pkk->type,ix) {
-    for (k=0;k<n;k++)
+    for (int k=0;k<n;k++)
     {
-      pk=&(psi[k]);
-      pj=_FIELD_AT(&pkk[0],ix);
-      z=&v[k];
+      suNf_spinor psi;
+      suNf_spinor *pk=&(psi);
+      suNf_spinor *pj=_FIELD_AT(&pkk[0],ix);
+      complex *z=&v[k];
       
       _vector_mulc_f((*pk).c[0],*z,(*pj).c[0]);
       _vector_mulc_f((*pk).c[1],*z,(*pj).c[1]);
       _vector_mulc_f((*pk).c[2],*z,(*pj).c[2]);
       _vector_mulc_f((*pk).c[3],*z,(*pj).c[3]);
       
-      for (j=1;j<n;j++)
+      for (int j=1;j<n;j++)
       {
         pj=_FIELD_AT(&pkk[j],ix);
         z+=n;
@@ -148,10 +127,9 @@ static void rotate(int n,spinor_field *pkk,complex v[])
         _vector_mulc_add_assign_f((*pk).c[2],*z,(*pj).c[2]);
         _vector_mulc_add_assign_f((*pk).c[3],*z,(*pj).c[3]);
       }
+      
+      *_FIELD_AT(&pkk[k],ix)=psi;
     }
-    
-    for (k=0;k<n;k++)
-      *_FIELD_AT(&pkk[k],ix)=psi[k];
   }
 }
 
