@@ -147,7 +147,7 @@ static void H2eva(spinor_field *out, spinor_field *in){
 
 
 int main(int argc,char *argv[]) {
-  int i, acc, rc;
+  int i, k,acc, rc;
   char sbuf[128];
  
   read_cmdline(argc,argv);
@@ -246,6 +246,13 @@ int main(int argc,char *argv[]) {
     
     gettimeofday(&start,0);
     
+#ifdef MEASURE_FORCE
+    for (k=0;k<3;k++){
+      force_ave[k]=0.0;
+      force_max[k]=0.0;
+    }
+#endif
+    
     rr=update_hmc();
     
     gettimeofday(&end,0);
@@ -272,6 +279,18 @@ int main(int argc,char *argv[]) {
       }
     }
     
+#ifdef MEASURE_FORCE
+    if (flow.hmc_v->hmc_p.hasenbusch){
+      lprintf("FORCE_SUMMARY",0,"%d ave Gauge: %1.6f, Fermion: %1.6f, HB: %1.6f\n",i,force_ave[0],force_ave[1],force_ave[2]);
+      lprintf("FORCE_SUMMARY",0,"%d max Gauge: %1.6f, Fermion: %1.6f, HB: %1.6f\n",i,force_max[0],force_max[1],force_max[2]);
+    }
+    else{
+      lprintf("FORCE_SUMMARY",0,"%d ave Gauge: %1.6f, Fermion: %1.6f\n",i,force_ave[0],force_ave[1]);
+      lprintf("FORCE_SUMMARY",0,"%d max Gauge: %1.6f, Fermion: %1.6f\n",i,force_max[0],force_max[1]);
+    }
+    //    lprintf("TUNINGHB",0," %ld %g %d %d %d %1.6f %1.6f %1.6f\n",etime.tv_sec,flow.hmc_v->hmc_p.hasen_dm,flow.hmc_v->hmc_p.gsteps,flow.hmc_v->hmc_p.nsteps,flow.hmc_v->hmc_p.hsteps,force_ave[0],force_ave[1],force_ave[2]);
+#endif
+
     if((i%flow.meas_freq)==0) {
       /* plaquette */
       lprintf("MAIN",0,"Plaquette: %1.8e\n",avr_plaquette());

@@ -1,4 +1,4 @@
-NG = 3
+NG = 2
 REPR = REPR_FUNDAMENTAL
 #REPR = REPR_SYMMETRIC
 #REPR = REPR_ANTISYMMETRIC
@@ -36,10 +36,11 @@ MACRO += -DIO_FLUSH
 #MACRO += -DTIMING
 #MACRO += -DTIMING_WITH_BARRIERS
 #MACRO += -DAMALLOC_MEASURE
+#MACRO += -DMEASURE_FORCE
 
 #Compiler
 #CC = mpicc
 CC = gcc
-CFLAGS = -Wall -std=c99 -O3 -fomit-frame-pointer -msse -msse2 -fopenmp
+CFLAGS = -Wall -std=c99 -O3 -fomit-frame-pointer -msse -msse2 
 #CFLAGS = -Wall -std=c99 -g
-LDFLAGS = -fopenmp  
+LDFLAGS = 

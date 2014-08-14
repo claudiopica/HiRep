@@ -20,6 +20,8 @@
 #include <stdio.h>
 #include <math.h>
 
+#define P99_PROTECT(...) __VA_ARGS__ 
+
 #define _print_avect(a) printf("(%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e)\n",(a).c1,(a).c2,(a).c3,(a).c4,(a).c5,(a).c6,(a).c7,(a).c8)
 
 #define _print_mat(a) printf("(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n",(a).c1_1.re,(a).c1_2.re,(a).c1_3.re,(a).c2_1.re,(a).c2_2.re,(a).c2_3.re,(a).c3_1.re,(a).c3_2.re,(a).c3_3.re);printf("(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n",(a).c1_1.im,(a).c1_2.im,(a).c1_3.im,(a).c2_1.im,(a).c2_2.im,(a).c2_3.im,(a).c3_1.im,(a).c3_2.im,(a).c3_3.im)
@@ -241,7 +243,7 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
 	    sqrt(spinor_field_sqnorm_f(Xs)),
 	    sqrt(spinor_field_sqnorm_f(Ys))
 	    );
-    double forcestat[2]={0.}; /* used for computation of avr and max force */
+    double forcestat[2]={0.,0.}; /* used for computation of avr and max force */
 #endif
     
     /* reset force stat counters */
@@ -267,6 +269,7 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
       }
       
 #ifdef MEASURE_FORCEHMC
+      //      _SITE_FOR_SUM(&glattice,xp,x,forcestat[0],forcestat[1]) {
       _SITE_FOR_SUM(&glattice,xp,x,forcestat[0],forcestat[1]) {
 #else
       _SITE_FOR(&glattice,xp,x) {
@@ -332,21 +335,32 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
 
 #ifdef MEASURE_FORCEHMC
           double nsq;
-    	    _algebra_vector_sqnorm_g(nsq,f);
-    	    forcestat[0]+=sqrt(nsq);
-    	    for(y=0;y<NG*NG-1;++y){
-    	      if(forcestat[1]<fabs(*(((double*)&f)+y))) forcestat[1]=fabs(*(((double*)&f)+y));
-    	    }
+	  _algebra_vector_sqnorm_g(nsq,f);
+	  forcestat[0]+=sqrt(nsq);
+	  for(y=0;y<NG*NG-1;++y){
+	    if(forcestat[1]<fabs(*(((double*)&f)+y))) forcestat[1]=fabs(*(((double*)&f)+y));
+	  }
 #endif
       	} //directions for
       } //SITE_FOR
     } //PIECE FOR
     
 #ifdef MEASURE_FORCEHMC
-    global_sum(forcestat,2);
+    global_sum(forcestat,1);
     forcestat[0]*=dt*(_REPR_NORM2/_FUND_NORM2)/((double)(4*GLB_T*GLB_X*GLB_Y*GLB_Z));
+    global_max(forcestat+1,1);
     forcestat[1]*=dt*(_REPR_NORM2/_FUND_NORM2);
-    lprintf("FORCE",50," avr |force| = %1.8e maxforce = %1.8e \n",forcestat[0],forcestat[1]);
+    if (par->hasenbusch!=2){
+      force_ave[1]+=forcestat[0];
+      force_max[1]+=forcestat[1];    
+      lprintf("FORCE_HMC",10,"DET: ");
+    } 
+    else{
+      force_ave[2]+=forcestat[0];
+      force_max[2]+=forcestat[1];    
+      lprintf("FORCE_HMC",10,"HBD: ");
+    }
+    lprintf("FORCE_HMC",10,"avr dt |force| = %1.8e dt maxforce = %1.8e, dt = %1.8e \n",forcestat[0],forcestat[1],dt);
 #endif
     
 #if defined(BASIC_SF) || defined(ROTATED_SF)

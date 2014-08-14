@@ -216,7 +216,7 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar){
       
 #ifdef MEASURE_FORCERHMC
       /* reset force stat counters */
-      double forcestat[2]={0.}; /* used for computation of avr and max force */
+      double forcestat[2]={0.,0}; /* used for computation of avr and max force */
 #endif
       
       _PIECE_FOR(&glattice,xp) {
@@ -309,7 +309,7 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar){
       } //PIECE_FOR
         
         
-#ifdef MEASURE_FORCEHMC
+#ifdef MEASURE_FORCERHMC
       if(logger_getlevel("FORCE-STAT")>=10){
         global_sum(forcestat,1);
         global_max(forcestat+1,1);
