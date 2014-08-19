@@ -97,7 +97,7 @@ void init_discon_correlators(){
   for (i=0;i<NGAMMA_IND;++i){
     char name[100];
     sprintf(name,"%s_disc",meson_channel_names[i]);
-    add_meson_observable(&discon_correlators,i,-1,name,"SINGLET",-1);
+    add_meson_observable(&discon_correlators,i,_NOGAMMA,name,"SINGLET",-1);
   }
 }
 
@@ -222,7 +222,7 @@ static void measure_mesons_core(spinor_field* psi0, spinor_field* psi1, spinor_f
 		  }
 		  motmp=mo;
 		  while (motmp!=NULL){
-		    if (motmp->ind2!=-1){
+		    if (motmp->ind2!=_NOGAMMA){
 		      spinmatrix_op(&smtmp1,&sma,motmp->ind2);
 		      _spinmatrix_g5(sm1,smtmp1);
 		      op_spinmatrix(&smtmp2,&smb,motmp->ind1);
