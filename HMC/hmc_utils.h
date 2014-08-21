@@ -17,7 +17,7 @@ typedef struct _input_hmc {
   char hasen_steps[2048]; 
   char hasen_dm[2048];
   /* for the reading function */
-  input_record_t read[28];
+  input_record_t read[29];
   
 } input_hmc;
 
