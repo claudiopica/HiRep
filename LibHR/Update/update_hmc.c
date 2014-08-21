@@ -29,7 +29,6 @@ action_par hmc_action_par;
 //g5QMR_fltacc_par mpar;
 mshift_par mparUpdate;
 
-
 /* END of State */
 
 static double static_mass=0.;
@@ -107,7 +106,7 @@ void init_hmc(hmc_par *par){
 	  ,_update_par.n_MT_prec_flt
 	  ,_update_par.n_force_prec_flt
 	  );
-	
+
   if(_update_par.hasenbusch){
     int i;
     lprintf("HMC",10,
@@ -125,7 +124,7 @@ void init_hmc(hmc_par *par){
     }
     lprintf("HMC",10,"\n");
   }
-	
+
   lprintf("HMC",10,
 	  "MD trajectory length = %.8f\n"
 	  "MD steps = %d\n"
@@ -134,7 +133,7 @@ void init_hmc(hmc_par *par){
 	  ,_update_par.nsteps
 	  ,_update_par.gsteps
 	  );
-	
+
   if(_update_par.hasenbusch){
     int i;
     lprintf("HMC",10,
@@ -145,16 +144,17 @@ void init_hmc(hmc_par *par){
     }
     lprintf("HMC",10,"\n");
   }
-	
-	
-	
+
+  // init the MRE algorithm (chronological inverter)
+  mre_init(_update_par.mre_past, _update_par.hasenbusch ? _update_par.h_force_prec : _update_par.n_force_prec);
+
   /* allocate space for the backup copy of gfield */
   if(u_gauge_old==NULL) u_gauge_old=alloc_gfield(&glattice);
   suNg_field_copy(u_gauge_old,u_gauge);
-	
+
   /* allocate momenta */
   if(momenta==NULL) momenta = alloc_avfield(&glattice);
-	
+
   /* allocate pseudofermions */
   /* we allocate one more pseudofermion for the computation 
    * of the final action density 

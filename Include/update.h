@@ -143,6 +143,7 @@ typedef struct _hmc_par {
   int hasenbusch; /* 0=no hasenbusch ; 1=hasenbusch */
   int n_hasen; /* Number of Hasenbusch levels*/
   double* hasen_dm; /* List of differences of heavier mass of the Hasenbush acceleration */
+  int mre_past;
 } hmc_par;
 
 void init_hmc(hmc_par *par);
@@ -197,5 +198,10 @@ void suNf_field_copy(suNf_field *g1, suNf_field *g2);
 
 /* find spectral interval using eva */
 void find_spec_H2(double *max, double *min, double mass);
+
+/* functions for the MRE algorithm */
+void mre_guess(int, spinor_field*, spinor_operator, spinor_field*);
+void mre_store(int, spinor_field*);
+void mre_init(int, double);
 
 #endif

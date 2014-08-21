@@ -161,11 +161,9 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
   spinor_field *pf = par->pf;
   static_mass = par->mass;
 
-  
   /* check input types */
   _TWO_SPINORS_MATCHING(u_gauge,force);
 
-  
   for (int k=0; k<par->n_pf; ++k) {
 
 #ifndef UPDATE_EO
@@ -179,7 +177,7 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
     spinor_field_g5_assign_f(&pf[k]);
     g5QMR_fltacc(&mpar, &D, &D_flt, &pf[k], Xs);
     spinor_field_g5_assign_f(&pf[k]);
-        
+
     /* Y = H^{-1} ( g5 pf[k] + b X ) = D^{-1} ( pf[k] + b g5 X ) */
     if(par->hasenbusch != 2) {
       spinor_field_g5_f(eta,Xs);
@@ -190,7 +188,6 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
     }
     spinor_field_zero_f(Ys);
     g5QMR_fltacc(&mpar, &D, &D_flt, eta, Ys);
-    
 #else
 
     /*    g5QMR_fltacc_par mpar;
@@ -198,12 +195,13 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
     mpar.max_iter = 0;
     mpar.err2_flt = par->inv_err2_flt;
     mpar.max_iter_flt = 0;*/
+    double tmp;
     mshift_par mpar;
     mpar.err2 = par->inv_err2;
     mpar.max_iter=0;
     mpar.n = 1;
-    mpar.shift = (double*) malloc(sizeof(double)*(mpar.n));
-    mpar.shift[0]=0;
+    mpar.shift = &tmp; // mpar.n = 1
+    mpar.shift[0] = 0;
 
     /* X_e = H^{-1} pf[k] */
     /* X_o = D_{oe} X_e = D_{oe} H^{-1} pf[k] */
@@ -213,10 +211,13 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
     /* H^{-1} pf = D^{-1} g5 pf */
     spinor_field_g5_assign_f(&pf[k]);
     //    g5QMR_fltacc(&mpar, &D, &D_flt, &pf[k], &Xe);
+
+   	if(par->b == 0) mre_guess(0, &Xe, &D, &pf[k]);
     g5QMR_mshift(&mpar, &D, &pf[k], &Xe);
+  	if(par->b == 0) mre_store(0, &Xe);
     spinor_field_g5_assign_f(&pf[k]);
     Dphi_(&Xo,&Xe);
-    
+
     /* Y_e = H^{-1} ( g5 pf[k] + b X_e ) */
     /* Y_o = D_oe H^{-1} ( g5 pf[k] + b X_e ) */
     Ye=*Ys; Ye.type=&glat_even;
@@ -228,14 +229,16 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
       spinor_field_g5_f(eta,&pf[k]);
       spinor_field_mul_add_assign_f(eta,par->b,&Xe);
     }
-    
+
     spinor_field_zero_f(&Ye);
     spinor_field_g5_assign_f(eta);
+  	if(par->b == 0) mre_guess(1, &Ye, &D, eta);
     g5QMR_mshift(&mpar, &D, eta, &Ye);
+   	if(par->b == 0) mre_store(1, &Ye);
     //    g5QMR_fltacc(&mpar, &D, &D_flt, eta, &Ye);
     spinor_field_g5_assign_f(eta);
     Dphi_(&Yo,&Ye);
-    
+
 #endif
 
 #ifdef MEASURE_FORCEHMC
@@ -245,20 +248,17 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
 	    );
     double forcestat[2]={0.,0.}; /* used for computation of avr and max force */
 #endif
-    
+
     /* reset force stat counters */
     start_sf_sendrecv(Xs);
     start_sf_sendrecv(Ys);
-    
 
-    
     _PIECE_FOR(&glattice,xp) {
-      
       suNg_algebra_vector f;
       suNf_vector ptmp;
       suNf_spinor p;
       suNf_FMAT s1;
-      
+
       if (xp==glattice.inner_master_pieces) {
         _OMP_PRAGMA( master )
         {
@@ -267,7 +267,7 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
         }
         _OMP_PRAGMA( barrier )
       }
-      
+
 #ifdef MEASURE_FORCEHMC
       //      _SITE_FOR_SUM(&glattice,xp,x,forcestat[0],forcestat[1]) {
       _SITE_FOR_SUM(&glattice,xp,x,forcestat[0],forcestat[1]) {
@@ -315,10 +315,10 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
               chi2=_FIELD_AT(Xs,y);
               _F_DIR3(s1,chi1,chi2);
       	  }
-          
+
       	  _algebra_project(f,s1);
-          
-          
+
+
 #ifdef UPDATE_EO
           if(par->hasenbusch != 2) {
       	    _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),-dt*(_REPR_NORM2/_FUND_NORM2),f);
@@ -344,7 +344,7 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
       	} //directions for
       } //SITE_FOR
     } //PIECE FOR
-    
+
 #ifdef MEASURE_FORCEHMC
     global_sum(forcestat,1);
     forcestat[0]*=dt*(_REPR_NORM2/_FUND_NORM2)/((double)(4*GLB_T*GLB_X*GLB_Y*GLB_Z));
@@ -354,13 +354,13 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
     force_max[par->id+1]+=forcestat[1];
     lprintf("FORCE_HMC",20,"avr dt |force| = %1.8e dt maxforce = %1.8e, dt = %1.8e \n",forcestat[0],forcestat[1],dt);
 #endif
-    
+
 #if defined(BASIC_SF) || defined(ROTATED_SF)
     SF_force_bcs(force);
 #endif /* BASIC_SF || ROTATED_SF*/
-    
+
   }
-  
+
 }
 
 #undef _F_DIR0
