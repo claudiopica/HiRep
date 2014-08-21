@@ -202,7 +202,7 @@ void init_hmc(hmc_par *par){
 #endif
     fp->inv_err2 = _update_par.n_force_prec;
     fp->inv_err2_flt = _update_par.n_force_prec_flt;
-    ip->integrator = &O4MN_multistep;
+    ip->integrator = &O2MN_multistep;
     ip->next= (integrator_par*)malloc(sizeof(integrator_par));
     ip = ip->next;
     current_mass+=dm;
@@ -223,7 +223,7 @@ void init_hmc(hmc_par *par){
   fp->b = 0;
   fp->inv_err2 = _update_par.n_force_prec;
   fp->inv_err2_flt = _update_par.n_force_prec_flt;
-  ip->integrator = &O4MN_multistep;
+  ip->integrator = &O2MN_multistep;
   ip->next = (integrator_par*)malloc(sizeof(integrator_par));
   ip = ip->next;
   
@@ -233,7 +233,7 @@ void init_hmc(hmc_par *par){
   ip->force = &force0;
   ip->force_par = (void*)malloc(sizeof(double));
   *((double*)ip->force_par) = _update_par.beta;
-  ip->integrator = &O4MN_multistep;
+  ip->integrator = &O2MN_multistep;
   ip->next = (integrator_par*)malloc(sizeof(integrator_par));
   ip=ip->next;
   
