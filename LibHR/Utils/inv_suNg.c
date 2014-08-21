@@ -19,6 +19,9 @@
 
 #ifndef GAUGE_SON
 
+#ifdef WITH_QUATERNIONS
+
+#else
 
 
 void inv_suNg(suNg* a){
@@ -38,6 +41,8 @@ void inv_suNg(suNg* a){
     for (i=0;i<NG;i++) a->c[i*NG+j] = col[i];
   }
 }
+
+#endif
 
 
 void ludcmp(complex* a, int* indx, double* d,int N){

@@ -23,7 +23,17 @@
 #include "utils.h"
 #include "ranlux.h"
 
-void write_gauge_field(char filename[]) 
+
+void write_gauge_field(char filename[]){
+#if NG==2 && !defined(WITH_QUATERNIONS)
+  write_gauge_field_su2q(filename);
+#else
+  write_gauge_field_matrix(filename);
+#endif
+
+}
+
+void write_gauge_field_matrix(char filename[]) 
 {
   FILE *fp=NULL;
   int g[4], p[4];

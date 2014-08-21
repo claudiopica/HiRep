@@ -71,7 +71,7 @@ void force0(double dt, suNg_av_field *force, void *vpar){
     forcestat[0]*=beta/((4.*NG)*GLB_VOLUME);
     forcestat[1]*=beta/((double)(NG));
     //    lprintf("FORCE-STAT",10," force0 : dt= %1.8e avr |force|= %1.8e maxforce= %1.8e \n",dt,forcestat[0],forcestat[1]);
-    lprintf("FORCE_STAT",10,"GF: avr dt |force| = %1.8e dt maxforce = %1.8e, dt = %1.8e \n",forcestat[0]*dt,forcestat[1]*dt,dt);
+    lprintf("FORCE_STAT",20,"GF: avr dt |force| = %1.8e dt maxforce = %1.8e, dt = %1.8e \n",forcestat[0]*dt,forcestat[1]*dt,dt);
     force_ave[0]+=dt*forcestat[0];
     force_max[0]+=dt*forcestat[1];    
     //  }

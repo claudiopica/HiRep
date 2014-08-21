@@ -165,7 +165,8 @@ static int parse_lastconf(hmc_flow *rf) {
 int init_mc(hmc_flow *rf, char *ifile) {
 
   int start_t;
-
+  int nh;
+  char* tok;
   /* alloc global gauge fields */
   u_gauge=alloc_gfield(&glattice);
 #ifdef ALLOCATE_REPR_GAUGE_FIELD
@@ -243,10 +244,41 @@ int init_mc(hmc_flow *rf, char *ifile) {
     break;
   }
   
-  //DOES THE NEXT LINE WORK??? If the simulations is continued from an old run are  the boundary conditions applied twice??
   apply_BCs_on_fundamental_gauge_field(); 
   represent_gauge_field();
+  /* Convert the Hasenbush parameters*/
+  if (hmc_var.hmc_p.hasenbusch){
+    nh=0;
+    int i;
+    for (i=0;hmc_var.hasen_steps[i]!=0;++i) nh+=(hmc_var.hasen_steps[i]==';');
+    if (hmc_var.hasen_steps[i-1]!=';') nh++;
+    hmc_var.hmc_p.n_hasen = nh;
+    hmc_var.hmc_p.hsteps = (unsigned int*) malloc(nh*sizeof(unsigned int));
+    hmc_var.hmc_p.hasen_dm = (double*) malloc(nh*sizeof(double));
+    nh=0;
+    tok = strtok(hmc_var.hasen_steps,";");
+    while (tok!=NULL){
+      hmc_var.hmc_p.hsteps[nh]=atoi(tok);
+      nh++;
+      tok = strtok(NULL,";");
+    }
+    nh=0;
+    tok = strtok(hmc_var.hasen_dm,";");
+    while (tok!=NULL){
+      error(nh>=hmc_var.hmc_p.n_hasen,1,"init_hmc","Number of Hasenbush steps different from Hasenbush masses\n");
+      hmc_var.hmc_p.hasen_dm[nh]=atof(tok);
+      nh++;
+      tok = strtok(NULL,";");
+    }
+    error(nh!=hmc_var.hmc_p.n_hasen,1,"init_hmc","Number of Hasenbush steps different from Hasenbush masses\n");
+  }
+  else{
+    hmc_var.hmc_p.hsteps = NULL;
+    hmc_var.hmc_p.hasen_dm = NULL;
+    hmc_var.hmc_p.n_hasen = 0;
   
+  }  
+
   /* init HMC */
   init_hmc(&hmc_var.hmc_p);
     
@@ -273,6 +305,9 @@ int end_mc() {
   free_hmc();
   free_BCs();
   
+  free(hmc_var.hmc_p.hsteps);
+  free(hmc_var.hmc_p.hasen_dm);
+
   /* free memory */
   free_gfield(u_gauge);
 #ifdef ALLOCATE_REPR_GAUGE_FIELD

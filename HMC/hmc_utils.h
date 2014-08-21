@@ -13,7 +13,9 @@
 typedef struct _input_hmc {
   /* hmc parameters */
   hmc_par hmc_p;
-
+  /* "Temporary" strings to read list to read variable number of hasenbush parameters  */
+  char hasen_steps[2048]; 
+  char hasen_dm[2048];
   /* for the reading function */
   input_record_t read[28];
   
@@ -29,7 +31,7 @@ typedef struct _input_hmc {
     {"theta_X", "theta_X = %lf", DOUBLE_T, &(varname).hmc_p.theta[1]},\
     {"theta_Y", "theta_Y = %lf", DOUBLE_T, &(varname).hmc_p.theta[2]},\
     {"theta_Z", "theta_Z = %lf", DOUBLE_T, &(varname).hmc_p.theta[3]},\
-    {"hasen_dm", "hasen_dm = %lf", DOUBLE_T, &(varname).hmc_p.hasen_dm},\
+    {"hasen_dm", "hasen_dm = %s", STRING_T, &(varname).hasen_dm},\
     {"SF_zf", "SF_zf = %lf", DOUBLE_T, &(varname).hmc_p.SF_zf},\
     {"SF_ds", "SF_ds = %lf", DOUBLE_T, &(varname).hmc_p.SF_ds},\
     {"SF_sign", "SF_sign = %d", INT_T, &(varname).hmc_p.SF_sign},\
@@ -46,7 +48,7 @@ typedef struct _input_hmc {
     {"h_force_prec_flt", "h_force_prec_flt = %lf", DOUBLE_T, &(varname).hmc_p.h_force_prec_flt},\
     {"tlen", "tlen = %lf", DOUBLE_T, &(varname).hmc_p.tlen},\
     {"nsteps", "nsteps = %u", UNSIGNED_T, &(varname).hmc_p.nsteps},\
-    {"hsteps", "hsteps = %u", UNSIGNED_T, &(varname).hmc_p.hsteps},\
+    {"hsteps", "hsteps = %s", STRING_T, &(varname).hasen_steps},	\
     {"gsteps", "gsteps = %u", UNSIGNED_T, &(varname).hmc_p.gsteps},\
     {"hasenbusch", "hasenbusch = %d", INT_T, &(varname).hmc_p.hasenbusch},\
     {NULL, NULL, 0, NULL}\

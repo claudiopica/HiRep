@@ -34,6 +34,7 @@ void free_force_rhmc();
 void force_rhmc(double dt, suNg_av_field *force, void *par);
 
 typedef struct {
+  int id;
   int n_pf;
   spinor_field *pf;
   int hasenbusch; /* 0 = force with Y = Ddag^{-1} phi (standard) ; 2 = force with Y = Ddag^{-1}(phi+dm*X) */
@@ -56,6 +57,7 @@ typedef struct _integrator_par {
   int level;
 } integrator_par;
 void gauge_integrator(suNg_av_field *momenta, double tlen, integrator_par *int_par);
+void leapfrog_multistep(suNg_av_field *momenta, double tlen, integrator_par *int_par);
 void O2MN_multistep(suNg_av_field *momenta, double tlen, integrator_par *int_par);
 void O4MN_multistep(suNg_av_field *momenta, double tlen, integrator_par *int_par);
 
@@ -135,11 +137,12 @@ typedef struct _hmc_par {
 
   double tlen; /* trajectory lenght */
   unsigned int nsteps; /* number of steps in the integration */
-  unsigned int hsteps; /* number of substeps for the lower mass of the Hasenbush acceleration */
+  unsigned int* hsteps; /* List of number of substeps for the heavier mass of the Hasenbush acceleration */
   unsigned int gsteps; /* number of substeps for the gauge part every step */
   
   int hasenbusch; /* 0=no hasenbusch ; 1=hasenbusch */
-  double hasen_dm;
+  int n_hasen; /* Number of Hasenbusch levels*/
+  double* hasen_dm; /* List of differences of heavier mass of the Hasenbush acceleration */
 } hmc_par;
 
 void init_hmc(hmc_par *par);

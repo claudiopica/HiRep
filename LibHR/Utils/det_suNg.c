@@ -18,6 +18,14 @@
 
 #ifndef GAUGE_SON
 
+#ifdef WITH_QUATERNIONS
+void det_suNg(complex* res,suNg* a){
+  res->im=0;
+  _suNg_sqnorm(res->re,*a);
+
+}
+
+#else
 
 void det_suNg(complex* res,suNg* a){
   suNg b;
@@ -26,7 +34,7 @@ void det_suNg(complex* res,suNg* a){
   int i;
   complex tmp;
   b=*a;
-  ludcmp(&(b.c),indx,&d,NG);
+  ludcmp(b.c,indx,&d,NG);
   res->re=d; res->im=0;
   for (i=0;i<NG;++i){
     _complex_mul(tmp,*res,b.c[NG*i+i]);
@@ -34,6 +42,7 @@ void det_suNg(complex* res,suNg* a){
   }
 }
 
+#endif //WITH_QUATERNIONS
 
 #else
 

@@ -2,6 +2,7 @@
 * Copyright (c) 2008, Claudio Pica                                          *   
 * All rights reserved.                                                      * 
 \***************************************************************************/
+#if (1==0) //Old code. leapfrog Moved to file O2MN_multistep.c
 
 #include "global.h"
 #include "suN.h"
@@ -78,3 +79,4 @@ void leapfrog(suNg_av_field *momenta, int_par *traj_par){
 
 #undef _PROJ_BIT
 #undef _proj_leapfrog
+#endif

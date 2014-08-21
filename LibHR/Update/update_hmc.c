@@ -26,6 +26,10 @@ integrator_par *integrator = NULL;
 double minev, maxev; /* min and max eigenvalue of H^2 */
 int n_pf;
 action_par hmc_action_par;
+//g5QMR_fltacc_par mpar;
+mshift_par mparUpdate;
+
+
 /* END of State */
 
 static double static_mass=0.;
@@ -54,7 +58,12 @@ static suNg_field *u_gauge_old=NULL;
 static scalar_field *la=NULL; /* local action field for Metropolis test */
 
 void init_hmc(hmc_par *par){
-  
+  integrator_par *ip;
+  int currentlevel;
+  double current_mass;
+  force_hmc_par *fp;
+  spinor_field *pf_tmp;
+
   if (init) {
     /* already initialized */
     lprintf("HMC",0,"WARNING: HMC already initialized!\nWARNING: Ignoring call to init_hmc.\n");
@@ -99,16 +108,23 @@ void init_hmc(hmc_par *par){
 	  ,_update_par.n_force_prec_flt
 	  );
 	
-  if(_update_par.hasenbusch)
+  if(_update_par.hasenbusch){
+    int i;
     lprintf("HMC",10,
 	    "Using Hasenbush accelerator\n"
 	    "Metropolis test precision (F2==h) = %.8e\n"
 	    "HMC force precision (F2==h) = %.8e\n"
-	    "Hasenbush mass shift = %.8e\n"
+	    "Hasenbush mass shifts ="
 	    ,_update_par.h_MT_prec
 	    ,_update_par.h_force_prec
 	    ,_update_par.hasen_dm
 	    );
+    lprintf("HMC",10," %1.8f",_update_par.hasen_dm[0]);
+    for (i=1;i<_update_par.n_hasen;i++){
+      lprintf("HMC",10,", %1.8f",_update_par.hasen_dm[i]);
+    }
+    lprintf("HMC",10,"\n");
+  }
 	
   lprintf("HMC",10,
 	  "MD trajectory length = %.8f\n"
@@ -119,11 +135,16 @@ void init_hmc(hmc_par *par){
 	  ,_update_par.gsteps
 	  );
 	
-  if(_update_par.hasenbusch)
+  if(_update_par.hasenbusch){
+    int i;
     lprintf("HMC",10,
-	    "MD Hasenbusch sub steps = %d\n"
-	    ,_update_par.hsteps
-	    );
+	    "MD Hasenbusch sub steps =");
+    lprintf("HMC",10," %d",_update_par.hsteps[0]);
+    for (i=1;i<_update_par.n_hasen;i++){
+      lprintf("HMC",10,", %d",_update_par.hsteps[i]);
+    }
+    lprintf("HMC",10,"\n");
+  }
 	
 	
 	
@@ -139,7 +160,7 @@ void init_hmc(hmc_par *par){
    * of the final action density 
    */
   if(pf==NULL) {
-    n_pf = _update_par.hasenbusch?_update_par.nf:(_update_par.nf/2);
+    n_pf = _update_par.nf/2*(_update_par.n_hasen+1);
     /* we need 1 more spinor field for Metropolis test action with MINRES */
     pf=alloc_spinor_field_f(n_pf+1,
 #ifdef UPDATE_EO
@@ -156,67 +177,75 @@ void init_hmc(hmc_par *par){
   /* represent gauge field */
   represent_gauge_field();
   
-  int currentlevel;
-  
-  /* integrator */
-  integrator = (integrator_par*)malloc(sizeof(integrator_par)*(_update_par.hasenbusch?4:3));
-  
-  currentlevel = 0;
-  integrator[currentlevel].level = currentlevel;
-  integrator[currentlevel].nsteps = _update_par.nsteps;
-  integrator[currentlevel].force = &force_hmc;
-  integrator[currentlevel].force_par = malloc(sizeof(force_hmc_par));
-  ((force_hmc_par*)(integrator[currentlevel].force_par))->n_pf = _update_par.nf/2;
-  ((force_hmc_par*)(integrator[currentlevel].force_par))->pf = pf;
-  ((force_hmc_par*)(integrator[currentlevel].force_par))->mass = _update_par.mass;
-  ((force_hmc_par*)(integrator[currentlevel].force_par))->hasenbusch = (_update_par.hasenbusch?2:0);
+  currentlevel=0;
+  current_mass = _update_par.mass;
+  integrator = (integrator_par*)malloc(sizeof(integrator_par));
+  ip = integrator;
+  pf_tmp = pf;
+  while (currentlevel < _update_par.n_hasen){
+    int i = currentlevel;
+    double dm = _update_par.hasen_dm[i];
+    ip->level = i;
+    ip->nsteps = (i==0)?(_update_par.nsteps):(_update_par.hsteps[i-1]);
+    ip->force = &force_hmc;
+    fp = (force_hmc_par*) malloc(sizeof(force_hmc_par));
+    ip->force_par = (void*) fp;
+    fp->id=i;
+    fp->n_pf = _update_par.nf/2;
+    fp->pf = pf_tmp;
+    fp->mass = current_mass;
+    fp->hasenbusch = 2;
 #ifdef UPDATE_EO
-  ((force_hmc_par*)(integrator[currentlevel].force_par))->b = (4.+_update_par.mass+_update_par.hasen_dm)*(4.+_update_par.mass+_update_par.hasen_dm)-(4.+_update_par.mass)*(4.+_update_par.mass);
+    fp->b = (4.+current_mass+dm)*(4.+current_mass+dm)-(4.+current_mass)*(4.+current_mass);
 #else
-  ((force_hmc_par*)(integrator[currentlevel].force_par))->b = _update_par.hasen_dm;
+    fp->b = dm;
 #endif
-  ((force_hmc_par*)(integrator[currentlevel].force_par))->inv_err2 = _update_par.n_force_prec;
-  ((force_hmc_par*)(integrator[currentlevel].force_par))->inv_err2_flt = _update_par.n_force_prec_flt;
-  integrator[currentlevel].integrator = &O2MN_multistep;
-  integrator[currentlevel].next = &integrator[currentlevel+1];
-  
-  if(_update_par.hasenbusch) {
+    fp->inv_err2 = _update_par.n_force_prec;
+    fp->inv_err2_flt = _update_par.n_force_prec_flt;
+    ip->integrator = &O4MN_multistep;
+    ip->next= (integrator_par*)malloc(sizeof(integrator_par));
+    ip = ip->next;
+    current_mass+=dm;
+    pf_tmp+=_update_par.nf/2;
     currentlevel++;
-    integrator[currentlevel].level = currentlevel;
-    integrator[currentlevel].nsteps = _update_par.hsteps;
-    integrator[currentlevel].force = &force_hmc;
-    integrator[currentlevel].force_par = malloc(sizeof(force_hmc_par));
-    ((force_hmc_par*)(integrator[currentlevel].force_par))->n_pf = _update_par.nf/2;
-    ((force_hmc_par*)(integrator[currentlevel].force_par))->pf = pf+_update_par.nf/2;
-    ((force_hmc_par*)(integrator[currentlevel].force_par))->mass = _update_par.mass+_update_par.hasen_dm;
-    ((force_hmc_par*)(integrator[currentlevel].force_par))->hasenbusch = 0;
-    ((force_hmc_par*)(integrator[currentlevel].force_par))->b = 0.;
-    ((force_hmc_par*)(integrator[currentlevel].force_par))->inv_err2 = _update_par.h_force_prec;
-    ((force_hmc_par*)(integrator[currentlevel].force_par))->inv_err2_flt = _update_par.h_force_prec_flt;
-    integrator[currentlevel].integrator = &O2MN_multistep;
-    integrator[currentlevel].next = &integrator[currentlevel+1];
   }
+
+  ip->level = currentlevel;
+  ip->nsteps = (currentlevel==0)?(_update_par.nsteps):(_update_par.hsteps[_update_par.n_hasen-1]);
+  ip->force = &force_hmc;
+  fp = (force_hmc_par*) malloc(sizeof(force_hmc_par));
+  ip->force_par = (void*) fp;
+  fp->id = currentlevel;
+  fp->n_pf = _update_par.nf/2;
+  fp->pf = pf_tmp;
+  fp->mass = current_mass;
+  fp->hasenbusch = 0;
+  fp->b = 0;
+  fp->inv_err2 = _update_par.n_force_prec;
+  fp->inv_err2_flt = _update_par.n_force_prec_flt;
+  ip->integrator = &O4MN_multistep;
+  ip->next = (integrator_par*)malloc(sizeof(integrator_par));
+  ip = ip->next;
   
   currentlevel++;
-  integrator[currentlevel].level = currentlevel;
-  integrator[currentlevel].nsteps = _update_par.gsteps;
-  integrator[currentlevel].force = &force0;
-  integrator[currentlevel].force_par = (void*)malloc(sizeof(double));
-  *((double*)integrator[currentlevel].force_par) = _update_par.beta;
-  integrator[currentlevel].integrator = &O2MN_multistep;
-  integrator[currentlevel].next = &integrator[currentlevel+1];
+  ip->level = currentlevel;
+  ip->nsteps = _update_par.gsteps;
+  ip->force = &force0;
+  ip->force_par = (void*)malloc(sizeof(double));
+  *((double*)ip->force_par) = _update_par.beta;
+  ip->integrator = &O4MN_multistep;
+  ip->next = (integrator_par*)malloc(sizeof(integrator_par));
+  ip=ip->next;
   
   currentlevel++;
-  integrator[currentlevel].level = currentlevel;
-  integrator[currentlevel].nsteps = 1;
-  integrator[currentlevel].force = NULL;
-  integrator[currentlevel].force_par = NULL;
-  integrator[currentlevel].integrator = &gauge_integrator;
-  integrator[currentlevel].next = NULL;
-  
+  ip->level = currentlevel;
+  ip->nsteps = 1;
+  ip->force = NULL;
+  ip->force_par = NULL;
+  ip->integrator = &gauge_integrator;
+  ip->next = NULL;
   
   init_force_hmc();
-  
   
   hmc_action_par.beta = _update_par.beta;
   hmc_action_par.n_pf = n_pf;
@@ -230,7 +259,7 @@ void init_hmc(hmc_par *par){
 }
 
 void free_hmc(){
-  
+  integrator_par *ip;
   if (!init) {
     /* not initialized */
     lprintf("HMC",0,"WARNING: HMC not initialized!\nWARNNG: Ignoring call to free_hmc.\n");
@@ -243,25 +272,31 @@ void free_hmc(){
   if(pf!=NULL) free_spinor_field_f(pf); pf=NULL;
   
   if(la!=NULL) free_sfield(la); la=NULL;
-  
-  int i=0;
-  while(1) {
-    if(integrator[i].force_par != NULL) free(integrator[i].force_par);
-    if(integrator[i].next == NULL) break;
-    i++;
+
+  /*Free integrator */
+  ip = integrator;
+  while(ip!=NULL) {
+    integrator=ip->next;
+    free(ip->force_par);
+    free(ip);
+    ip = integrator;
   }
-  free(integrator);
+  integrator = NULL;
   
   free_force_hmc();
-  
   init = 0;
-  
+
   lprintf("HMC",0,"Memory deallocated.\n");
-  
 }
 
 int update_hmc(){
   double deltaH;
+  g5QMR_fltacc_par mpar;
+  mpar.err2 = _update_par.n_MT_prec;
+  mpar.max_iter = 0;
+  mpar.err2_flt = _update_par.n_MT_prec_flt;
+  mpar.max_iter_flt = 0;
+
   /* double maxev,minev; */
   
   if(!init) {
@@ -291,38 +326,41 @@ int update_hmc(){
       spinor_field_g5_assign_f(&pf[i]);
     }
   } else {
-    g5QMR_fltacc_par mpar;
-    for (int i=0;i<n_pf/2;++i) {
-      /* S = | (a D +b) D^{-1} g5 psi |^2 */
-      /* (a D +b) D^{-1} g5 psi = A */
-      /* psi = g5 D (a D + b)^{-1} A */
-      mpar.err2 = _update_par.n_MT_prec;
-      mpar.max_iter = 0;
-      mpar.err2_flt = _update_par.n_MT_prec_flt;
-      mpar.max_iter_flt = 0;
-      spinor_field_zero_f(&pf[n_pf]);
-      static_mass=_update_par.mass+_update_par.hasen_dm;
-      g5QMR_fltacc(&mpar, &D, &D_flt, &pf[i], &pf[n_pf]);
-      static_mass=_update_par.mass;
-      D(&pf[i], &pf[n_pf]);
-      spinor_field_g5_assign_f(&pf[i]);
-    }
-    for (int i=n_pf/2;i<n_pf;++i) {
-      /* S = | Dt^{-1} g5 psi |^2 */
-      /* Dt^{-1} g5 psi = A */
-      /* psi = g5 Dt A */
-      spinor_field_copy_f(&pf[n_pf],&pf[i]);
-      static_mass=_update_par.mass+_update_par.hasen_dm;
-      D(&pf[i], &pf[n_pf]);
-      spinor_field_g5_assign_f(&pf[i]);
+    integrator_par *ip=integrator;
+    force_hmc_par *fp=(force_hmc_par*) ip->force_par;
+    int i=0;
+    for (int j=0;j<=_update_par.n_hasen;j++){
+      int k;
+      for (k=0;k<_update_par.nf/2;k++,i++){
+	if (fp->hasenbusch==2){
+	  /* S = | (a D +b) D^{-1} g5 psi |^2 */
+	  /* (a D +b) D^{-1} g5 psi = A */
+	  /* psi = g5 D (a D + b)^{-1} A */
+	  spinor_field_zero_f(&pf[n_pf]);
+	  static_mass=fp->mass+_update_par.hasen_dm[j];
+	  g5QMR_fltacc(&mpar,&D,&D_flt, &pf[i],&pf[n_pf]);
+	}
+	else{
+	  /* S = | Dt^{-1} g5 psi |^2 */
+	  /* Dt^{-1} g5 psi = A */
+	  /* psi = g5 Dt A */
+	  spinor_field_copy_f(&pf[n_pf],&pf[i]); 
+	}
+	static_mass=fp->mass;
+	D(&pf[i],&pf[n_pf]);
+	spinor_field_g5_assign_f(&pf[i]);
+      }
+      ip=ip->next;
+      error(ip==NULL,1,"update_hmc","Wrongly initialized integrator list\n");
+      fp=(force_hmc_par*) ip->force_par;
     }
   }
   
   /* integrate molecular dynamics */
   lprintf("HMC",30,"MD integration...\n");
-  (*(integrator[0].integrator))(momenta,_update_par.tlen,&integrator[0]);
-  
-  
+  integrator->integrator(momenta,_update_par.tlen,integrator);
+  //(*(integrator[0].integrator))(momenta,_update_par.tlen,&integrator[0]);
+    
   /* project gauge field */
   project_gauge_field();
   represent_gauge_field();
@@ -332,46 +370,37 @@ int update_hmc(){
     /* compute H2^{-1/2}*pf or H2^{-1}*pf */
     /* here we choose the first strategy which is more symmetric */
     /* for the HMC H2^-1/2 = H^-1 and we use MINRES for this inversion */
-    g5QMR_fltacc_par mpar;
     for (int i=0;i<n_pf;++i) {
       /* S = | D^{-1} g5 psi |^2 */
-      mpar.err2 = _update_par.n_MT_prec;
-      mpar.max_iter = 0;
-      mpar.err2_flt = _update_par.n_MT_prec_flt;
-      mpar.max_iter_flt = 0;
       spinor_field_g5_f(&pf[n_pf],&pf[i]);
       spinor_field_zero_f(&pf[i]);
       static_mass=_update_par.mass;
       g5QMR_fltacc(&mpar, &D, &D_flt, &pf[n_pf], &pf[i]);
     }
   } else {
-    g5QMR_fltacc_par mpar;
-    for (int i=0;i<n_pf/2;++i) {
-      /* S = | (D+b) D^{-1} g5 psi |^2 */
-      mpar.err2 = _update_par.n_MT_prec;
-      mpar.max_iter = 0;
-      mpar.err2_flt = _update_par.n_MT_prec_flt;
-      mpar.max_iter_flt = 0;
-      spinor_field_g5_assign_f(&pf[i]);
-      spinor_field_zero_f(&pf[n_pf]);
-      static_mass=_update_par.mass;
-      g5QMR_fltacc(&mpar, &D, &D_flt, &pf[i], &pf[n_pf]);
-      static_mass=_update_par.mass+_update_par.hasen_dm;
-      D(&pf[i], &pf[n_pf]);
-    }
-    for (int i=n_pf/2;i<n_pf;++i) {
-      /* S = | Dt^{-1} g5 psi |^2 */
-      mpar.err2 = _update_par.h_MT_prec;
-      mpar.max_iter = 0;
-      mpar.err2_flt = _update_par.h_MT_prec_flt;
-      mpar.max_iter_flt = 0;
-      spinor_field_g5_f(&pf[n_pf],&pf[i]);
-      spinor_field_zero_f(&pf[i]);
-      static_mass=_update_par.mass+_update_par.hasen_dm;
-      g5QMR_fltacc(&mpar, &D, &D_flt, &pf[n_pf], &pf[i]);
+    integrator_par *ip=integrator;
+    force_hmc_par *fp=(force_hmc_par*) ip->force_par;
+    int i=0;
+    for (int j=0;j<=_update_par.n_hasen;j++){
+      int k;
+      for (k=0;k<_update_par.nf/2;k++,i++){
+	spinor_field_g5_f(&pf[n_pf],&pf[i]);
+	spinor_field_zero_f(&pf[i]);
+	static_mass=fp->mass;
+	g5QMR_fltacc(&mpar, &D, &D_flt, &pf[n_pf], &pf[i]);
+	if (fp->hasenbusch==2){
+	  /* S = | (D+b) D^{-1} g5 psi |^2 */
+	  static_mass=fp->mass+_update_par.hasen_dm[j];
+	  D(&pf[n_pf],&pf[i]);
+	  spinor_field_copy_f(&pf[i],&pf[n_pf]); 
+	}
+      }
+      ip=ip->next;
+      error(ip==NULL,1,"update_hmc","Wrongly initialized integrator list\n");
+      fp=(force_hmc_par*) ip->force_par;
     }
   }
-  
+    
   /* compute new action */
   local_hmc_action(DELTA, &hmc_action_par, la, momenta, pf, pf);
   

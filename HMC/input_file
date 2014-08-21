@@ -60,7 +60,7 @@ run name = run1
 save freq = 9999
 meas freq = 1
 conf dir = .
-gauge start = random
+gauge start = 
 //ranlxd start =
 last conf = 10
 

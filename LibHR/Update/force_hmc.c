@@ -350,17 +350,9 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
     forcestat[0]*=dt*(_REPR_NORM2/_FUND_NORM2)/((double)(4*GLB_T*GLB_X*GLB_Y*GLB_Z));
     global_max(forcestat+1,1);
     forcestat[1]*=dt*(_REPR_NORM2/_FUND_NORM2);
-    if (par->hasenbusch!=2){
-      force_ave[1]+=forcestat[0];
-      force_max[1]+=forcestat[1];    
-      lprintf("FORCE_HMC",10,"DET: ");
-    } 
-    else{
-      force_ave[2]+=forcestat[0];
-      force_max[2]+=forcestat[1];    
-      lprintf("FORCE_HMC",10,"HBD: ");
-    }
-    lprintf("FORCE_HMC",10,"avr dt |force| = %1.8e dt maxforce = %1.8e, dt = %1.8e \n",forcestat[0],forcestat[1],dt);
+    force_ave[par->id+1]+=forcestat[0];
+    force_max[par->id+1]+=forcestat[1];
+    lprintf("FORCE_HMC",20,"avr dt |force| = %1.8e dt maxforce = %1.8e, dt = %1.8e \n",forcestat[0],forcestat[1],dt);
 #endif
     
 #if defined(BASIC_SF) || defined(ROTATED_SF)

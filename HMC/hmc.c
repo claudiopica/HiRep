@@ -147,7 +147,7 @@ static void H2eva(spinor_field *out, spinor_field *in){
 
 
 int main(int argc,char *argv[]) {
-  int i, k,acc, rc;
+  int i,acc, rc;
   char sbuf[128];
  
   read_cmdline(argc,argv);
@@ -247,7 +247,11 @@ int main(int argc,char *argv[]) {
     gettimeofday(&start,0);
     
 #ifdef MEASURE_FORCE
-    for (k=0;k<3;k++){
+    if (force_ave==NULL){
+      force_ave = (double*) malloc((flow.hmc_v->hmc_p.n_hasen+2)*sizeof(double));
+      force_max = (double*) malloc((flow.hmc_v->hmc_p.n_hasen+2)*sizeof(double));
+    }
+    for (int k=0;k<flow.hmc_v->hmc_p.n_hasen+2;k++){
       force_ave[k]=0.0;
       force_max[k]=0.0;
     }
@@ -280,14 +284,16 @@ int main(int argc,char *argv[]) {
     }
     
 #ifdef MEASURE_FORCE
-    if (flow.hmc_v->hmc_p.hasenbusch){
-      lprintf("FORCE_SUMMARY",0,"%d ave Gauge: %1.6f, Fermion: %1.6f, HB: %1.6f\n",i,force_ave[0],force_ave[1],force_ave[2]);
-      lprintf("FORCE_SUMMARY",0,"%d max Gauge: %1.6f, Fermion: %1.6f, HB: %1.6f\n",i,force_max[0],force_max[1],force_max[2]);
+    lprintf("FORCE_SUMMARY",0,"%d ave Gauge: %1.6f, Fermion: %1.6f",i,force_ave[0],force_ave[1]);
+    for (int k=0;k<flow.hmc_v->hmc_p.n_hasen;++k){
+      lprintf("FORCE_SUMMARY",0,", Hasen %d: %1.6f",k,force_ave[k+2]);
     }
-    else{
-      lprintf("FORCE_SUMMARY",0,"%d ave Gauge: %1.6f, Fermion: %1.6f\n",i,force_ave[0],force_ave[1]);
-      lprintf("FORCE_SUMMARY",0,"%d max Gauge: %1.6f, Fermion: %1.6f\n",i,force_max[0],force_max[1]);
+    lprintf("FORCE_SUMMARY",0,"\n");
+    lprintf("FORCE_SUMMARY",0,"%d max Gauge: %1.6f, Fermion: %1.6f",i,force_max[0],force_max[1]);
+    for (int k=0;k<flow.hmc_v->hmc_p.n_hasen;++k){
+      lprintf("FORCE_SUMMARY",0,", Hasen %d: %1.6f",k,force_max[k+2]);
     }
+    lprintf("FORCE_SUMMARY",0,"\n");
     //    lprintf("TUNINGHB",0," %ld %g %d %d %d %1.6f %1.6f %1.6f\n",etime.tv_sec,flow.hmc_v->hmc_p.hasen_dm,flow.hmc_v->hmc_p.gsteps,flow.hmc_v->hmc_p.nsteps,flow.hmc_v->hmc_p.hsteps,force_ave[0],force_ave[1],force_ave[2]);
 #endif
 
@@ -311,7 +317,6 @@ int main(int argc,char *argv[]) {
         double max;
         max_H(&H2eva, &glattice, &max);
         max*=1.1;
-        
         int status;
         int ie=eva(eigval_var.nev, eigval_var.nevt, 0, eigval_var.kmax, eigval_var.maxiter, max, eigval_var.omega1, eigval_var.omega2, &H2eva, eva_vecs, eva_vals, &status);
         while (ie!=0) { /* if failed restart EVA */
