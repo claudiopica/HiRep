@@ -1,5 +1,5 @@
 /***************************************************************************\
-* Copyright (c) 2008, Agostino Patella, Claudio Pica                        *   
+* Copyright (c) 2008, Agostino Patella, Claudio Pica, Ari Hietanen          *   
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
@@ -40,13 +40,16 @@ void gauge_integrator(suNg_av_field *momenta, double tlen, integrator_par *int_p
   #endif
 
 
-  double dt=tlen/((double)int_par->nsteps);
+  if(int_par->nsteps == 0)  {
+    error(1,1,"gauge_integrator","Error nsteps 0\n");
+    return;
+  }
 
-  if(int_par->nsteps == 0)  return;
+  double dt=tlen/((double)int_par->nsteps);
 
   lprintf("MD_INT",10+int_par->level*10,"Starting new MD trajectory with gauge_integrator, level %d.\n",int_par->level);
   lprintf("MD_INT",10+int_par->level*10,"MD parameters: level=%d tlen=%1.6f nsteps=%d => dt=%1.6f\n",
-    int_par->level,tlen,int_par->nsteps,dt);
+	  int_par->level,tlen,int_par->nsteps,dt);
   for(int n=1;n<=int_par->nsteps;++n) {
 
     #ifdef TIMING
@@ -122,62 +125,121 @@ void gauge_integrator(suNg_av_field *momenta, double tlen, integrator_par *int_p
   #endif
 }
 
-
-
-
-void O2MN_multistep(suNg_av_field *momenta, double tlen, integrator_par *int_par){
+void leapfrog_multistep(suNg_av_field *momenta, double tlen, integrator_par *int_par){
   #ifdef TIMING
   struct timeval start, end;
   struct timeval etime;
   
-  #ifdef TIMING_WITH_BARRIERS
+#ifdef TIMING_WITH_BARRIERS
   MPI_Barrier(GLB_COMM);
-  #endif
+#endif
   gettimeofday(&start,0);
-  #endif
-
+#endif
+  
   /* check input types */
 #ifndef CHECK_SPINOR_MATCHING
-   _TWO_SPINORS_MATCHING(u_gauge,momenta);
+  _TWO_SPINORS_MATCHING(u_gauge,momenta);
 #endif
 
-  if(int_par->nsteps == 0)  return;
-  
+  error(int_par->nsteps==0,1,"leapfrog","Error nsteps 0\n");
+
+
   int n;
   double dt=tlen/((double)int_par->nsteps);
-    
+  lprintf("MD_INT",10+int_par->level*10,"Starting new MD trajectory using leapfrog.\n");
+  lprintf("MD_INT",10+int_par->level*10,"MD parameters: level=%d tlen=%1.6f nsteps=%d => dt=%1.6f\n",
+	  int_par->level,tlen,int_par->nsteps,dt);
+
+
+  integrator_par* ipit;
+  integrator_par* ipn=int_par->next;
+  while (ipn->nsteps==0){
+    ipn=ipn->next; /* ipn points next integrator having non 0 nspets */
+  }
+
+  ipn->integrator(momenta, 0.5*dt, ipn);
+  
+  for(n=1;n<int_par->nsteps;++n) {
+    for (ipit = int_par;ipit != ipn; ipit=ipit->next){
+      (*ipit->force)(dt,momenta,ipit->force_par);
+    }
+    ipn->integrator(momenta, dt, ipn);
+  }
+  for (ipit = int_par;ipit != ipn; ipit=ipit->next){
+    (*ipit->force)(dt,momenta,ipit->force_par);
+  }
+  ipn->integrator(momenta, 0.5*dt, ipn);
+}
+
+
+void O2MN_multistep(suNg_av_field *momenta, double tlen, integrator_par *int_par){
+#ifdef TIMING
+  struct timeval start, end;
+  struct timeval etime;
+  
+#ifdef TIMING_WITH_BARRIERS
+  MPI_Barrier(GLB_COMM);
+#endif
+  gettimeofday(&start,0);
+#endif
+  
+  /* check input types */
+#ifndef CHECK_SPINOR_MATCHING
+  _TWO_SPINORS_MATCHING(u_gauge,momenta);
+#endif
+
+
+  error(int_par->nsteps==0,1,"O2MN_multistep","Error nsteps 0\n");
+
+  int n;
+  double dt=tlen/((double)int_par->nsteps);
+
   lprintf("MD_INT",10+int_par->level*10,"Starting new MD trajectory with O2MN_multistep, level %d.\n",int_par->level);
   lprintf("MD_INT",10+int_par->level*10,"MD parameters: level=%d tlen=%1.6f nsteps=%d => dt=%1.6f\n",
-    int_par->level,tlen,int_par->nsteps,dt);
+	  int_par->level,tlen,int_par->nsteps,dt);
+ 
+  integrator_par* ipit;
+  integrator_par* ipn=int_par->next;
+  while (ipn->nsteps==0){
+    ipn=ipn->next; /* ipn points next integrator having non 0 nspets */
+  }
 
-  (*int_par->force)(lambda*dt,momenta,int_par->force_par);
+  for (ipit = int_par;ipit != ipn; ipit=ipit->next){
+    ipit->force(lambda*dt,momenta,ipit->force_par);
+  }
   
   for(n=1;n<=int_par->nsteps;++n) {
     
-    (*int_par->next->integrator)(momenta, dt/2., int_par->next);
+    ipn->integrator(momenta, dt/2., ipn);
     
-    (*int_par->force)((1.-2.*lambda)*dt,momenta,int_par->force_par);
-    
-    (*int_par->next->integrator)(momenta, dt/2., int_par->next);
+    for (ipit = int_par;ipit != ipn; ipit=ipit->next){
+      ipit->force((1.-2.*lambda)*dt,momenta,ipit->force_par);
+    }
+  
+    ipn->integrator(momenta, dt/2., ipn);
     
     /* Update of momenta */
     if(n<int_par->nsteps) {
-      (*int_par->force)(2.*lambda*dt,momenta,int_par->force_par);
+      for (ipit = int_par;ipit != ipn; ipit=ipit->next){
+	ipit->force(2.*lambda*dt,momenta,ipit->force_par);
+      }
       lprintf("MD_INT",20+int_par->level*10,"MD step (level %d): %d/%d\n",int_par->level,n,int_par->nsteps);
     } else {
-      (*int_par->force)(lambda*dt,momenta,int_par->force_par);
+      for (ipit = int_par;ipit != ipn; ipit=ipit->next){
+	ipit->force(lambda*dt,momenta,ipit->force_par);
+      }
       lprintf("MD_INT",10+int_par->level*10,"MD trajectory completed, level %d.\n",int_par->level);
     }
   }
 
-  #ifdef TIMING
-  #ifdef TIMING_WITH_BARRIERS
+#ifdef TIMING
+#ifdef TIMING_WITH_BARRIERS
   MPI_Barrier(GLB_COMM);
-  #endif
+#endif
   gettimeofday(&end,0);
   timeval_subtract(&etime,&end,&start);
   lprintf("TIMING",0,"O2MN_multistep[%d] %.6f s\n",int_par->level,1.*etime.tv_sec+1.e-6*etime.tv_usec);
-  #endif
+#endif
 }
 
 
@@ -204,43 +266,65 @@ void O4MN_multistep(suNg_av_field *momenta, double tlen, integrator_par *int_par
   _TWO_SPINORS_MATCHING(u_gauge,momenta);
 #endif
   
-  if(int_par->nsteps == 0)  return;
-  
+
+  error(int_par->nsteps==0,1,"O4MN_multistep","Error nsteps 0\n");
+
+
   int n;
   double dt=tlen/((double)int_par->nsteps);
-  
-  lprintf("MD_INT",10+int_par->level*10,"Starting new MD trajectory with O2MN_multistep, level %d.\n",int_par->level);
+    
+  lprintf("MD_INT",10+int_par->level*10,"Starting new MD trajectory with O4MN_multistep, level %d.\n",int_par->level);
   lprintf("MD_INT",10+int_par->level*10,"MD parameters: level=%d tlen=%1.6f nsteps=%d => dt=%1.6f\n",
           int_par->level,tlen,int_par->nsteps,dt);
   
-  (*int_par->force)(r1*dt,momenta,int_par->force_par);
+  integrator_par* ipit;
+  integrator_par* ipn=int_par->next;
+  while (ipn->nsteps==0){
+    ipn=ipn->next; /* ipn points next integrator having non 0 nspets */
+  }
+
+  for (ipit = int_par;ipit != ipn; ipit=ipit->next){
+    ipit->force(r1*dt,momenta,ipit->force_par);
+  }
   
   for(n=1;n<=int_par->nsteps;++n) {
     
-    (*int_par->next->integrator)(momenta, r2*dt, int_par->next);
+    ipn->integrator(momenta, r2*dt, ipn);
+
+    for (ipit = int_par;ipit != ipn; ipit=ipit->next){
+      ipit->force(r3*dt,momenta,ipit->force_par);
+    }
     
-    (*int_par->force)(r3*dt,momenta,int_par->force_par);
+    ipn->integrator(momenta, r4*dt, ipn);
 
-    (*int_par->next->integrator)(momenta, r4*dt, int_par->next);
+    for (ipit = int_par;ipit != ipn; ipit=ipit->next){
+      ipit->force((0.5-r1-r3)*dt,momenta,ipit->force_par);
+    }
 
-    (*int_par->force)((0.5-r1-r3)*dt,momenta,int_par->force_par);
+    ipn->integrator(momenta, (1.-2.*(r2+r4))*dt, ipn);
 
-    (*int_par->next->integrator)(momenta, (1.-2.*(r2+r4))*dt, int_par->next);
-
-    (*int_par->force)((0.5-r1-r3)*dt,momenta,int_par->force_par);
+    for (ipit = int_par;ipit != ipn; ipit=ipit->next){
+      ipit->force((0.5-r1-r3)*dt,momenta,ipit->force_par);
+    }
     
-    (*int_par->next->integrator)(momenta, r4*dt, int_par->next);
+    ipn->integrator(momenta, r4*dt, ipn);
 
-    (*int_par->force)(r3*dt,momenta,int_par->force_par);
-   
-    (*int_par->next->integrator)(momenta, r2*dt, int_par->next);
+    for (ipit = int_par;ipit != ipn; ipit=ipit->next){
+      ipit->force(r3*dt,momenta,ipit->force_par);
+    }
+
+    ipn->integrator(momenta, r2*dt, ipn);
 
     /* Update of momenta */
     if(n<int_par->nsteps) {
-      (*int_par->force)(2.*r1*dt,momenta,int_par->force_par);
+      for (ipit = int_par;ipit != ipn; ipit=ipit->next){
+	ipit->force(2.*r1*dt,momenta,ipit->force_par);
+      }
       lprintf("MD_INT",20+int_par->level*10,"MD step (level %d): %d/%d\n",int_par->level,n,int_par->nsteps);
     } else {
-      (*int_par->force)(r1*dt,momenta,int_par->force_par);
+      for (ipit = int_par;ipit != ipn; ipit=ipit->next){
+	ipit->force(r1*dt,momenta,ipit->force_par);
+      }
       lprintf("MD_INT",10+int_par->level*10,"MD trajectory completed, level %d.\n",int_par->level);
     }
   }
