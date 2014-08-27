@@ -173,7 +173,8 @@ int main(int argc,char *argv[]) {
   }
   
   lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS);
-  lprintf("MAIN",0,"[RepID: %d][world_size: %d]\n[MPI_ID: %d][MPI_size: %d]\n\n",RID,WORLD_SIZE,MPI_PID,MPI_WORLD_SIZE);
+  lprintf("MAIN",0,"[RepID: %d][world_size: %d]\n[MPI_ID: %d][MPI_size: %d]\n",RID,WORLD_SIZE,MPI_PID,MPI_WORLD_SIZE);
+  lprintf("MAIN",0,"SVN Revision: %d\n", CI_svnrevision);
 
   //  lprintf("MAIN",0,"Logger lelvel: %d\n",logger_getlevel(0));
   

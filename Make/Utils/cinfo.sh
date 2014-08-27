@@ -85,4 +85,8 @@ else
   echo "" >> ${FILENAME}
 fi
 
+REV=$(svn info | grep Revision | awk '{ print $2 }')
+echo "static int CI_svnrevision = ${REV};" >> ${FILENAME}
+echo "" >> ${FILENAME}
+
 cat ${MKDIR}/Utils/${FILENAME}.tmpl >> ${FILENAME}
