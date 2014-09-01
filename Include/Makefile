@@ -4,7 +4,7 @@ MKDIR = $(TOPDIR)/Make
 #the default target cannot start with .
 default: .autoheaders.h
  
-.autoheaders.h: suN.h suN_types.h suN_repr_func.h
+.autoheaders.h: suN.h suN_types.h suN_repr_func.h macro_opt.h
 	echo done > $@
 
 
@@ -21,7 +21,7 @@ suN_repr_func.h: $(MKDIR)/MkFlags TMPL/suN_repr_func.h.tmpl
 
 
 clean::
-	rm -f *~ suN.h suN_types.h suN_repr_func.h .autoheaders.h
+	rm -f *~ suN.h suN_types.h suN_repr_func.h macro_opt.h .autoheaders.h
 
 include $(MKDIR)/MkRules
 
@@ -29,4 +29,7 @@ include $(MKDIR)/MkRules
 suN_repr_func.h: $(WRREPR)
 
 suN.h suN_types.h: $(WRHEAD)
+
+macro_opt.h: $(MKDIR)/MkFlags
+	perl -e '$$_="$(CPPFLAGS)"."\n"; s/\s+/\n/g; s/-I\s*.*?\n//g; s/-D/#define /g; s/=/ /g; print; print "\n";' > $@
 
