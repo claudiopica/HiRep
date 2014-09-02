@@ -161,6 +161,10 @@ int update_hmc();
 int update_puregauge();
 int update_rhmc_o();
 
+void corret_pf_dist_hmc();
+void calc_one_force(int n_force);
+
+
 /* this is the basic operator used in the update */
 /* defined in update_rhmc.c */
 void H2(spinor_field *out, spinor_field *in);

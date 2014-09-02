@@ -435,4 +435,62 @@ int update_hmc(){
   return 1;
 }
 
+/*Functions to check forces */
+void corret_pf_dist_hmc(){
+  g5QMR_fltacc_par mpar;
+  mpar.err2 = _update_par.n_MT_prec;
+  mpar.max_iter = 0;
+  mpar.err2_flt = _update_par.n_MT_prec_flt;
+  mpar.max_iter_flt = 0;
+  for (int j=0;j<n_pf;++j) {
+    gaussian_spinor_field(&pf[j]);
+  }
+  lprintf("HMC",30,"Correcting pseudofermions distribution...\n"); 
+  if(!_update_par.hasenbusch) {
+    for (int i=0;i<n_pf;++i) {
+      spinor_field_copy_f(&pf[n_pf],&pf[i]);
+      static_mass=_update_par.mass;
+      D(&pf[i], &pf[n_pf]);
+      spinor_field_g5_assign_f(&pf[i]);
+    }
+  } else {
+    integrator_par *ip=integrator;
+    force_hmc_par *fp=(force_hmc_par*) ip->force_par;
+    int i=0;
+    for (int j=0;j<=_update_par.n_hasen;j++){
+      int k;
+      for (k=0;k<_update_par.nf/2;k++,i++){
+	if (fp->hasenbusch==2){
+	  /* S = | (a D +b) D^{-1} g5 psi |^2 */
+	  /* (a D +b) D^{-1} g5 psi = A */
+	  /* psi = g5 D (a D + b)^{-1} A */
+	  spinor_field_zero_f(&pf[n_pf]);
+	  static_mass=fp->mass+_update_par.hasen_dm[j];
+	  g5QMR_fltacc(&mpar,&D,&D_flt, &pf[i],&pf[n_pf]);
+	}
+	else{
+	  /* S = | Dt^{-1} g5 psi |^2 */
+	  /* Dt^{-1} g5 psi = A */
+	  /* psi = g5 Dt A */
+	  spinor_field_copy_f(&pf[n_pf],&pf[i]); 
+	}
+	static_mass=fp->mass;
+	D(&pf[i],&pf[n_pf]);
+	spinor_field_g5_assign_f(&pf[i]);
+      }
+      ip=ip->next;
+      error(ip==NULL,1,"update_hmc","Wrongly initialized integrator list\n");
+      fp=(force_hmc_par*) ip->force_par;
+    }
+  }
+}
 
+void calc_one_force(int n_force){
+  integrator_par *ip=integrator;
+  error(ip==NULL,1,"calc_one_force","Error in force index\n");
+  for (int i=0;i<n_force;i++){
+    ip=ip->next;
+    error(ip==NULL,1,"calc_one_force","Error in force index\n");
+  }
+  ip->force(1.,momenta,ip->force_par);
+}

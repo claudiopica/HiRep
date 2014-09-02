@@ -251,10 +251,12 @@ int main(int argc,char *argv[]) {
     if (force_ave==NULL){
       force_ave = (double*) malloc((flow.hmc_v->hmc_p.n_hasen+2)*sizeof(double));
       force_max = (double*) malloc((flow.hmc_v->hmc_p.n_hasen+2)*sizeof(double));
+      n_inv_iter = (int*) malloc((flow.hmc_v->hmc_p.n_hasen+2)*sizeof(int));
     }
     for (int k=0;k<flow.hmc_v->hmc_p.n_hasen+2;k++){
       force_ave[k]=0.0;
       force_max[k]=0.0;
+      n_inv_iter[k]=0;
     }
 #endif
     
@@ -295,6 +297,11 @@ int main(int argc,char *argv[]) {
       lprintf("FORCE_SUMMARY",0,", Hasen %d: %1.6f",k,force_max[k+2]);
     }
     lprintf("FORCE_SUMMARY",0,"\n");
+    lprintf("INV_SUMMARY",0,"%d Iterations in fermion: %d ",i,n_inv_iter[0]);
+    for (int k=0;k<flow.hmc_v->hmc_p.n_hasen;++k){
+      lprintf("INV_SUMMARY",0," Hasenbusch %d: %d",k,n_inv_iter[k+1]);
+    }
+    lprintf("INV_SUMMARY",0,"\n");
     //    lprintf("TUNINGHB",0," %ld %g %d %d %d %1.6f %1.6f %1.6f\n",etime.tv_sec,flow.hmc_v->hmc_p.hasen_dm,flow.hmc_v->hmc_p.gsteps,flow.hmc_v->hmc_p.nsteps,flow.hmc_v->hmc_p.hsteps,force_ave[0],force_ave[1],force_ave[2]);
 #endif
 
@@ -341,7 +348,11 @@ int main(int argc,char *argv[]) {
     }
   }
   
-  
+#ifdef MEASURE_FORCE
+  free(force_ave);
+  free(force_max);
+  free(n_inv_iter);
+#endif
   
   /* finalize Monte Carlo */
   end_mc();

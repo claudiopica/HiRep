@@ -159,6 +159,8 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
 
   force_hmc_par *par = (force_hmc_par*)vpar;
   spinor_field *pf = par->pf;
+  int n_iters = 0;
+  (void) n_iters;
   static_mass = par->mass;
 
   /* check input types */
@@ -175,7 +177,7 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
     mpar.max_iter_flt = 0;
     spinor_field_zero_f(Xs);
     spinor_field_g5_assign_f(&pf[k]);
-    g5QMR_fltacc(&mpar, &D, &D_flt, &pf[k], Xs);
+    n_iters += g5QMR_fltacc(&mpar, &D, &D_flt, &pf[k], Xs);
     spinor_field_g5_assign_f(&pf[k]);
 
     /* Y = H^{-1} ( g5 pf[k] + b X ) = D^{-1} ( pf[k] + b g5 X ) */
@@ -187,7 +189,7 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
       spinor_field_add_assign_f(eta,&pf[k]);
     }
     spinor_field_zero_f(Ys);
-    g5QMR_fltacc(&mpar, &D, &D_flt, eta, Ys);
+    n_iters += g5QMR_fltacc(&mpar, &D, &D_flt, eta, Ys);
 #else
 
     /*    g5QMR_fltacc_par mpar;
@@ -212,9 +214,9 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
     spinor_field_g5_assign_f(&pf[k]);
     //    g5QMR_fltacc(&mpar, &D, &D_flt, &pf[k], &Xe);
 
-   	if(par->b == 0) mre_guess(0, &Xe, &D, &pf[k]);
-    g5QMR_mshift(&mpar, &D, &pf[k], &Xe);
-  	if(par->b == 0) mre_store(0, &Xe);
+    if(par->b == 0) mre_guess(0, &Xe, &D, &pf[k]);
+    n_iters+=g5QMR_mshift(&mpar, &D, &pf[k], &Xe);
+    if(par->b == 0) mre_store(0, &Xe);
     spinor_field_g5_assign_f(&pf[k]);
     Dphi_(&Xo,&Xe);
 
@@ -232,9 +234,9 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
 
     spinor_field_zero_f(&Ye);
     spinor_field_g5_assign_f(eta);
-  	if(par->b == 0) mre_guess(1, &Ye, &D, eta);
-    g5QMR_mshift(&mpar, &D, eta, &Ye);
-   	if(par->b == 0) mre_store(1, &Ye);
+    if(par->b == 0) mre_guess(1, &Ye, &D, eta);
+    n_iters+=g5QMR_mshift(&mpar, &D, eta, &Ye);
+    if(par->b == 0) mre_store(1, &Ye);
     //    g5QMR_fltacc(&mpar, &D, &D_flt, eta, &Ye);
     spinor_field_g5_assign_f(eta);
     Dphi_(&Yo,&Ye);
@@ -327,7 +329,7 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
           }
 #else
           if(par->hasenbusch != 2) {
-        	  _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),dt*(_REPR_NORM2/_FUND_NORM2),f);
+            _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),dt*(_REPR_NORM2/_FUND_NORM2),f);
       	  } else {
       	    _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,x,mu),par->b*dt*(_REPR_NORM2/_FUND_NORM2),f);
           }
@@ -352,6 +354,7 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
     forcestat[1]*=dt*(_REPR_NORM2/_FUND_NORM2);
     force_ave[par->id+1]+=forcestat[0];
     force_max[par->id+1]+=forcestat[1];
+    n_inv_iter[par->id]+=n_iters;
     lprintf("FORCE_HMC",20,"avr dt |force| = %1.8e dt maxforce = %1.8e, dt = %1.8e \n",forcestat[0],forcestat[1],dt);
 #endif
 

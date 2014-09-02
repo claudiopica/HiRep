@@ -174,6 +174,7 @@ GLB_VAR(complex,eitheta[4],={{1.,0.}});
 #define MEASURE_FORCEHMC
 GLB_VAR(double,*force_ave,=NULL);
 GLB_VAR(double,*force_max,=NULL);
+GLB_VAR(int,*n_inv_iter,=NULL);
 #endif
 
 #undef GLB_VAR
