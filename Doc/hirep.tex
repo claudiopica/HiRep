@@ -638,6 +638,115 @@ correlator above becomes:
 where $\tilde \Gamma= \gamma_5 \Gamma$, and $\tilde \Gamma^\prime =
 \gamma_5 \Gamma^\prime$.
 
+\section{Hasenbusch acceleration}
+
+
+Let us summarize the Hasenbusch trick ( for two flavours )
+\begin{equation}
+\mathcal{H}_F = \phi^\dagger ( Q_m^2 )^{-1} \phi \,
+\end{equation}
+where $Q_m =\gamma_5 D_m$ is the hermitiean Dirac operator.
+After integration over the pseudo fermions it gives the determinant :
+\begin{equation}
+\det{ Q_m ^2 } = \det{D_m^{\dagger} D_m}
+\end{equation}
+
+The Hasenbusch trick can be rewritten in the following form :
+\begin{equation}
+\det{ Q_m ^2 }  = \det{W_- W_+} \det{\frac{ Q_m^2}{W_- W_+}}
+\end{equation}
+
+Where $W_{\pm}$ can be chosen arbitrarily as long as the determinant
+is well defined. We discuss in the next subsections various choices of
+$W_{\pm}$.
+
+In any case the two term can be evaluated independantly, and we have :
+\begin{equation}
+\mathcal{H}_{F_1} =   \phi_1^\dagger ( W_- W_+ )^{-1} \phi_1,\quad,
+\mathcal{H}_{F_2} = \phi_2^\dagger Q_m^{-1} W_- W_+ Q_m^{-1} \phi_2
+\end{equation}
+
+
+%The forces read :
+%\begin{equation}
+%\dot{\mathcal{H}_{F_1}} = - \phi_1^\dagger \dot{( W_- W_+ )^{-1}}
+%\phi_1,\quad \dot{\mathcal{H}_{F_2}}  = - \phi_2^\dagger \dot{  Q_m^{-1} W_- W_+ Q_m^{-1} }\phi_2
+%\end{equation}
+
+\section{Wilson mass shift}
+Assume
+\begin{equation}
+W_{+} = \left( D_m + \delta_m\right) ,\quad W_{-} =
+W_{+}^\dagger=  \left( D^{\dagger}_m + \delta_m\right) 
+\end{equation}
+
+
+Note that,as written in a comment in the code,  $W_+ Q_m^{-1} = (a D +
+b ) D^{-1} \gamma_5$.
+
+Then
+\begin{equation}
+  Q_m^{-1} \left( D^\dagger_m + \delta_m\right)  \left( D_m +
+   \delta_m  \right) Q_m^{-1}   =  \left( \gamma_5 + \delta_m Q^{-1}
+   \right)  \left( \gamma_5 +    \delta_m Q^{-1}\right)  
+\end{equation}
+
+
+The force can then be computed :
+\begin{eqnarray}
+ \dot{\mathcal{H}_{F_2}}  &=&  - \delta_m \phi_2^\dagger \left[  \left( \gamma_5 + \delta_m Q^{-1}
+   \right) \dot{Q^{-1}} + \dot{Q^{-1}} \left( \gamma_5 + \delta_m Q^{-1}
+   \right)   \right] \phi_2 \\
+&=&  - \delta_m \phi_2^\dagger \left[  \left( \gamma_5 + \delta_m
+    Q^{-1}\right) Q_m^{-1} \dot{Q} Q_m^{-1}  \right]\phi_2 + \rm{h.c}
+  \end{eqnarray}
+
+Note that the equation as now the standard form of the forces for the
+HMC algorithm provided that :
+\begin{equation}
+X\equiv Q^{-1}\phi_2,\quad\textrm{and}\quad Y^{\dagger}=\phi_2^\dagger
+(\gamma_5 + \delta_m Q^{-1}) Q_m^{-1}
+\end{equation}
+
+From which we deduce 
+\begin{equation}
+Y =   Q_m^{-1}(\gamma_5 + \delta_m Q^{-1})  \phi_2 =  D^{-1} ( \phi_2  +
+\delta_m \gamma_5 X)  
+\end{equation}
+
+Which matches one comment in the the {\verb force_hmc.c } file.
+
+\subsection{Twisted mass shift}
+Assume
+\begin{equation}
+W_{+} = \left( Q_m + i \mu  \right) ,\quad W_{-} = W_+^{\dagger}=
+  \left( Q_m - i \mu \right) 
+\end{equation}
+
+Note that $W_- W_+ = Q_m ^2 + \mu^2$ 
+In that case we have :
+\begin{equation}
+Q_m^{-1} W_- W_+ Q_m^{-1} = ( 1 - i\mu Q_m^{-1}) (1+ i\mu Q_m^{-1})) 
+\end{equation}
+
+The force can then be computed :
+\begin{eqnarray}
+ \dot{\mathcal{H}_{F_2}}  &=& - i\mu \phi_2^{\dagger} \left[ ( 1 - i\mu
+  Q_m^{-1}) \dot{Q_m^{-1}}  - \dot{Q_m^{-1}} (1+ i\mu Q_m^{-1})\right] \phi_2 \\
+&=& - i\mu \phi_2^{\dagger} \left[  ( 1 - i\mu
+  Q_m^{-1}) Q_m^{-1} \dot{Q_m} Q_m^{-1} \right] \phi_2 + \rm{h.c}
+\end{eqnarray}
+
+\begin{equation}
+X\equiv Q_m^{-1}\phi_2,\quad\textrm{and}\quad Y^{\dagger}=\phi_2^\dagger
+(1+ \mu Q^{-1}) Q_m^{-1}
+\end{equation}
+
+From which we deduce 
+\begin{equation}
+Y =   Q_m^{-1}(1 + \mu Q^{-1})  \phi_2 =  D^{-1}  \gamma_5( \phi_2  +
+\mu  X)  
+\end{equation}
 \bibliography{hirep}
 
 \end{document}
