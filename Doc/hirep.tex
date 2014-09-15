@@ -672,8 +672,8 @@ In any case the two term can be evaluated independantly, and we have :
 %\dot{\mathcal{H}_{F_1}} = - \phi_1^\dagger \dot{( W_- W_+ )^{-1}}
 %\phi_1,\quad \dot{\mathcal{H}_{F_2}}  = - \phi_2^\dagger \dot{  Q_m^{-1} W_- W_+ Q_m^{-1} }\phi_2
 %\end{equation}
-
-\section{Wilson mass shift}
+This can be combined with even-odd preconditionning.
+\subsection{Wilson mass shift}
 Assume
 \begin{equation}
 W_{+} = \left( D_m + \delta_m\right) ,\quad W_{-} =
@@ -723,7 +723,7 @@ W_{+} = \left( Q_m + i \mu  \right) ,\quad W_{-} = W_+^{\dagger}=
   \left( Q_m - i \mu \right) 
 \end{equation}
 
-Note that $W_- W_+ = Q_m ^2 + \mu^2$ 
+Note that $W_- W_+ = Q_m ^2 + \mu^2$  and that $W_\pm^{\dagger}= W_{\mp}$.
 In that case we have :
 \begin{equation}
 Q_m^{-1} W_- W_+ Q_m^{-1} = ( 1 - i\mu Q_m^{-1}) (1+ i\mu Q_m^{-1})) 
@@ -738,15 +738,158 @@ The force can then be computed :
 \end{eqnarray}
 
 \begin{equation}
-X\equiv Q_m^{-1}\phi_2,\quad\textrm{and}\quad Y^{\dagger}=\phi_2^\dagger
+X\equiv Q_m^{-1}\phi_2,\quad\textrm{and}\quad Y^{\dagger}=i\phi_2^\dagger
 (1+ \mu Q^{-1}) Q_m^{-1}
-\end{equation}
+s\end{equation}
 
 From which we deduce 
 \begin{equation}
-Y =   Q_m^{-1}(1 + \mu Q^{-1})  \phi_2 =  D^{-1}  \gamma_5( \phi_2  +
+Y =   -i Q_m^{-1}(1 + \mu Q^{-1})  \phi_2 =  -i D^{-1}  \gamma_5( \phi_2  +
 \mu  X)  
 \end{equation}
+
+
+Note that we could have use the following relation :
+
+\begin{equation}
+Q_m^{-1} W_- W_+ Q_m^{-1} = ( 1 - i\mu Q_m^{-1}) (1+ i\mu Q_m^{-1}))
+= 1 + \mu^2 Q_m^{-2}
+\end{equation}
+
+Which leads to 
+\begin{eqnarray}
+ \dot{\mathcal{H}_{F_2}}  &=& \mu^2 \phi_2^{\dagger} \dot{Q^{-2}} \phi_2
+\end{eqnarray}
+
+Note that in that case the eo preconditioning becomes the same as in
+the pure Wilson case. Note also that the forces are explicitly
+proportional to $\mu^2$.
+
+\subsection{Twisted mass shift : eo case}
+
+Note that we have : $\widetilde{\mu} \equiv 2 \kappa \mu$.
+
+\begin{equation}
+Q_{\pm}= \gamma_5 \begin{pmatrix} 
+1 \pm i \widetilde{\mu} \gamma_5 & M_{\rm{eo}} \\
+M_{\rm{oe}} & 1 \pm i \widetilde{\mu} \gamma_5\\
+\end{pmatrix} \equiv \gamma_5 \begin{pmatrix} 
+M^{\pm}_{\rm{ee}}  & M_{\rm{eo}} \\
+M_{\rm{oe}} & M^{\pm}_{\rm{oo}}\\
+\end{pmatrix}
+\end{equation}
+Note that $M_{\rm{ee}}^{-1}$ can be computed : 
+\begin{equation}
+M_{\rm{ee}}^{-1} = ( 1 \pm \widetilde{\mu} \gamma_5)^{-1} = \frac{1\mp
+i \widetilde{\mu}\gamma_5 }{ 1 + \widetilde{\mu}^2}
+\end{equation}
+
+
+Now we can conveniently rewrite 
+\begin{equation}
+Q_{\pm} =  \begin{pmatrix} 
+\gamma_5 M^{\pm}_{\rm{ee}}  & 0 \\ \gamma_5 M_{\rm{oe}} & 1\\
+\end{pmatrix} \begin{pmatrix} 
+1  &  \left(M^{\pm}_{\rm{ee}}\right)^{-1} M_{\rm{eo}} \\0 & \gamma_5
+  \left(M^{\pm}_{\rm{oo}} - M_{\rm{oe}}
+    \left(M^{\pm}_{\rm{ee}}\right)^{-1} M_{\rm{eo}} \right)\\
+\end{pmatrix} 
+\end{equation}
+
+
+From the last equation we deduce that :
+\begin{equation}
+\det{Q_{\pm}} = \det{\gamma_5 M^{\pm}_{\rm{ee}} } \det{\gamma_5
+  \left(M^{\pm}_{\rm{oo}} - M_{\rm{oe}}
+    \left(M^{\pm}_{\rm{ee}}\right)^{-1} M_{\rm{eo}} \right)}
+\end{equation}
+
+Note that the first determinant is a constant that could be computed.
+
+In the following we will denote 
+\begin{equation}
+\hat{Q}_{\pm} \equiv \gamma_5
+  \left(M^{\pm}_{\rm{oo}} - M_{\rm{oe}}
+    \left(M^{\pm}_{\rm{ee}}\right)^{-1} M_{\rm{eo}} \right)
+\end{equation}
+where $\hat{Q}_{\pm}$ is defined on the odd sites of the lattice. 
+
+
+We thus have 
+\begin{equation}
+\det{Q_+ Q_-} = \det{Q_+}\det{Q_{-}}\propto\det{\hat{Q}_+ \hat{Q}_-} 
+\end{equation}
+
+and we thus get the following Hamiltonian :
+\begin{equation}
+\mathcal{H}_{F_1} = \phi_1^{\dagger} \left(\hat{Q}_+
+    \hat{Q}_-\right)^{-1} \phi_1
+\end{equation} 
+
+The corresponding force then reads :
+
+\begin{equation}
+\dot{\mathcal{H}_{F_1}} = - \phi_{0}^\dagger\left(    \hat{Q}_-^{-1}
+  \hat{Q}_+^{-1}  \dot{\hat{Q}}_+  \hat{Q}_+^{-1}  + \hat{Q}_{-}^{-1}
+  \dot{\hat{Q}}_{-}  \hat{Q}_-^{-1}   \hat{Q}_+^{-1}    \right)    \phi_0
+\end{equation}
+
+Now using that   $Q_{\pm} ^{\dagger} = Q_{\mp}$, the previous equation
+can be written :
+\begin{equation}
+\dot{\mathcal{H}_{F_1}} = - \left(Y_{\rm{o}}^{\dagger} \dot{\hat{Q}}_{+} X_{\rm{o}}  + \rm{h.c}\right)
+\end{equation}
+with 
+\begin{equation}
+  X_{\rm{o}}=\hat{Q}_+^{-1}\phi_0,\quad. Y_{\rm{o}}= \left(\hat{Q}_-
+    \hat{Q}_+\right)^{-1} \phi_0
+\end{equation}
+
+Furthermore we have 
+\begin{equation}
+\dot{\hat{Q}}_{\pm} =  \gamma_5 \left( -  \dot{M}_{\rm{oe}}
+  \left(M^{\pm}_{\rm{ee}}\right)^{-1} M_{\rm{eo}} -  M_{\rm{oe}}
+    \left(M^{\pm}_{\rm{ee}}\right)^{-1} \dot{M}_{\rm{eo}}\right)
+\end{equation}
+
+Now noting that  
+\begin{equation}
+  \dot{Q}_{\pm} =  \gamma_5 \begin{pmatrix} 
+ 0  & \dot{M}_{\rm{eo}} \\
+\dot{M}_{\rm{oe}} & 0\\
+\end{pmatrix}
+\end{equation}
+
+Note that
+\begin{eqnarray}
+  Y ^{\dagger} \dot{Q} X  &=& \begin{pmatrix} A^\dagger &
+    B^\dagger \end{pmatrix} \gamma_5 \begin{pmatrix} 
+ 0  & \dot{M}_{\rm{eo}} \\
+\dot{M}_{\rm{oe}} & 0\\
+\end{pmatrix}  \begin{pmatrix} C \\  D \end{pmatrix} \\
+&=&  A^\dagger \gamma_5 \dot{M}_{\rm{oe}}  C + B^\dagger \gamma_5 \dot{M}_{\rm{eo}} D
+\end{eqnarray}
+
+Now chosing $A^\dagger= Y^\dagger_0 $,
+$C=-\left(M^{\pm}_{\rm{ee}}\right)^{-1} M_{\rm{eo}} X_0 $, $B^\dagger=
+- Y_0^\dagger \gamma_5 M_{\rm{oe}}
+     \left(M^{\pm}_{\rm{ee}}\right)^{-1} \gamma_5$, and $D= X_0$ allows to write :
+\begin{equation}
+\dot{\mathcal{H}_{F_1}} = - \phi_{0}^\dagger\left( Y^\dagger \dot{Q} X
+  + \rm{h.c} \right)    \phi_0
+\end{equation} 
+with 
+\begin{equation}
+X=\begin{pmatrix}-\left(M^{\pm}_{\rm{ee}}\right)^{-1} M_{\rm{eo}} X_0
+  \\ X_0 \end{pmatrix},\quad \rm{and} \quad Y=\begin{pmatrix}-Y_0
+  M_{\rm{eo}} \left(M^{\pm}_{\rm{ee}}\right)^{-1}
+  \\ Y_0 \end{pmatrix}
+\end{equation}
+We have used that   $\dot{Q}_+= \dot{Q}_-$, $M_{\rm{eo}}^{\dagger}=
+\gamma_5 M_{\rm{oe}} \gamma_5$.
+
+Now we have to deal with the determinant ratio.
+
 \bibliography{hirep}
 
 \end{document}
