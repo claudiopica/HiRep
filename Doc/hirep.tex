@@ -780,7 +780,7 @@ M_{\rm{oe}} & M^{\pm}_{\rm{oo}}\\
 \end{equation}
 Note that $M_{\rm{ee}}^{-1}$ can be computed : 
 \begin{equation}
-M_{\rm{ee}}^{-1} = ( 1 \pm \widetilde{\mu} \gamma_5)^{-1} = \frac{1\mp
+M_{\rm{ee}}^{-1} = ( 1 \pm i\widetilde{\mu} \gamma_5)^{-1} = \frac{1\mp
 i \widetilde{\mu}\gamma_5 }{ 1 + \widetilde{\mu}^2}
 \end{equation}
 
@@ -841,10 +841,13 @@ can be written :
 \end{equation}
 with 
 \begin{equation}
-  X_{\rm{o}}=\hat{Q}_+^{-1}\phi_0,\quad. Y_{\rm{o}}= \left(\hat{Q}_-
-    \hat{Q}_+\right)^{-1} \phi_0
+  X_{\rm{o}}=\hat{Q}_+^{-1}\phi_0,\quad. Y_{\rm{o}}= \left(\hat{Q}_+
+    \hat{Q}_-\right)^{-1} \phi_0,
 \end{equation}
-
+where we have used that 
+\begin{equation}
+  \hat{Q}_\pm^{\dagger} = \hat{Q}_\mp.
+\end{equation}
 Furthermore we have 
 \begin{equation}
 \dot{\hat{Q}}_{\pm} =  \gamma_5 \left( -  \dot{M}_{\rm{oe}}
@@ -860,7 +863,7 @@ Now noting that
 \end{pmatrix}
 \end{equation}
 
-Note that
+We have 
 \begin{eqnarray}
   Y ^{\dagger} \dot{Q} X  &=& \begin{pmatrix} A^\dagger &
     B^\dagger \end{pmatrix} \gamma_5 \begin{pmatrix} 
@@ -875,20 +878,19 @@ $C=-\left(M^{\pm}_{\rm{ee}}\right)^{-1} M_{\rm{eo}} X_0 $, $B^\dagger=
 - Y_0^\dagger \gamma_5 M_{\rm{oe}}
      \left(M^{\pm}_{\rm{ee}}\right)^{-1} \gamma_5$, and $D= X_0$ allows to write :
 \begin{equation}
-\dot{\mathcal{H}_{F_1}} = - \phi_{0}^\dagger\left( Y^\dagger \dot{Q} X
-  + \rm{h.c} \right)    \phi_0
+\dot{\mathcal{H}_{F_1}} = -  Y^\dagger \dot{Q} X
+  + \rm{h.c} 
 \end{equation} 
 with 
 \begin{equation}
 X=\begin{pmatrix}-\left(M^{\pm}_{\rm{ee}}\right)^{-1} M_{\rm{eo}} X_0
-  \\ X_0 \end{pmatrix},\quad \rm{and} \quad Y=\begin{pmatrix}-Y_0
-  M_{\rm{eo}} \left(M^{\pm}_{\rm{ee}}\right)^{-1}
+  \\ X_0 \end{pmatrix},\quad \rm{and} \quad Y=\begin{pmatrix}-
+   \left(M^{\pm}_{\rm{ee}}\right)^{-1} M_{\rm{eo}} Y_0
   \\ Y_0 \end{pmatrix}
 \end{equation}
 We have used that   $\dot{Q}_+= \dot{Q}_-$, $M_{\rm{eo}}^{\dagger}=
 \gamma_5 M_{\rm{oe}} \gamma_5$.
 
-Now we have to deal with the determinant ratio.
 
 \bibliography{hirep}
 
