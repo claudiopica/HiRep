@@ -719,46 +719,64 @@ Which matches one comment in the the {\verb force_hmc.c } file.
 \subsection{Twisted mass shift}
 Assume
 \begin{equation}
-W_{+} = \left( Q_m + i \mu  \right) ,\quad W_{-} = W_+^{\dagger}=
-  \left( Q_m - i \mu \right) 
+W_{+} = \left( Q_m + i \mu_2  \right) ,\quad W_{-} = W_+^{\dagger}=
+  \left( Q_m - i \mu_2 \right) 
 \end{equation}
 
-Note that $W_- W_+ = Q_m ^2 + \mu^2$  and that $W_\pm^{\dagger}= W_{\mp}$.
-In that case we have :
+Note that $W_- W_+ = Q_m ^2 + \mu_2^2$  and that $W_\pm^{\dagger}=
+W_{\mp}$.
+
+Instead of dealing with $\det{ Q_m (W_- 
+ W_+)^{-1} Q_m }$, we consider the slightly more general
+case where the determinant to evaluate is  
+\begin{eqnarray}
+\det{ (Q_m + i \mu_1) (W_- 
+ W_+)^{-1}  (Q_m - i \mu_1)}&\propto&\int D\phi_2 D\phi_2^\dagger e^{-\phi^\dagger_2 \Big(Q_+ (W_- 
+ W_+)^{-1}  Q_- \Big)^{-1}\phi_2 }\big] \\
+&=& \int D\phi_2 D\phi_2^\dagger e^{-\phi_2Q_-^{-1} W_- W_+
+  Q_+^{-1}  \phi_2 }
+\end{eqnarray}
+  The following formulae can then be
+used for the case of several hasenbusch masses.
+The case of the determinatn $\det{ Q_m (W_- 
+ W_+)^{-1} Q_m }$  can be
+recovered by setting $\mu_1=0$ in the following equations.
+
+We have :
 \begin{equation}
-Q_m^{-1} W_- W_+ Q_m^{-1} = ( 1 - i\mu Q_m^{-1}) (1+ i\mu Q_m^{-1})) 
+(Q_m-i\mu_1)^{-1} W_- W_+ (Q_m+i\mu_1)^{-1} = ( 1 - i(\mu_2 - \mu_1)
+Q_m^{-1}) (1+ i(\mu_2 - \mu_1) Q_m^{-1})) 
 \end{equation}
 
 The force can then be computed :
 \begin{eqnarray}
- \dot{\mathcal{H}_{F_2}}  &=& - i\mu \phi_2^{\dagger} \left[ ( 1 - i\mu
-  Q_m^{-1}) \dot{Q_m^{-1}}  - \dot{Q_m^{-1}} (1+ i\mu Q_m^{-1})\right] \phi_2 \\
-&=& - i\mu \phi_2^{\dagger} \left[  ( 1 - i\mu
+ \dot{\mathcal{H}_{F_2}}  &=& - i(\mu_2-\mu_1) \phi_2^{\dagger} \left[ ( 1 - i(\mu_2 - \mu_1) 
+  Q_m^{-1}) \dot{Q_m^{-1}}  - \dot{Q_m^{-1}} (1+ i (\mu_2 - \mu_1) Q_m^{-1})\right] \phi_2 \\
+&=& - i(\mu_2-\mu_1) \phi_2^{\dagger} \left[  ( 1 - i(\mu_2 - \mu_1) 
   Q_m^{-1}) Q_m^{-1} \dot{Q_m} Q_m^{-1} \right] \phi_2 + \rm{h.c}
 \end{eqnarray}
 
 \begin{equation}
 X\equiv Q_m^{-1}\phi_2,\quad\textrm{and}\quad Y^{\dagger}=i\phi_2^\dagger
-(1+ \mu Q^{-1}) Q_m^{-1}
+(1+ (\mu_2-\mu_1) Q^{-1}) Q_m^{-1}
 s\end{equation}
 
 From which we deduce 
 \begin{equation}
-Y =   -i Q_m^{-1}(1 + \mu Q^{-1})  \phi_2 =  -i D^{-1}  \gamma_5( \phi_2  +
-\mu  X)  
+Y =   -i Q_m^{-1}(1 +  (\mu_2-\mu_1)Q^{-1})  \phi_2 =  -i D^{-1}  \gamma_5( \phi_2  +(\mu_2-\mu_1)  X)  
 \end{equation}
 
 
 Note that we could have use the following relation :
 
 \begin{equation}
-Q_m^{-1} W_- W_+ Q_m^{-1} = ( 1 - i\mu Q_m^{-1}) (1+ i\mu Q_m^{-1}))
-= 1 + \mu^2 Q_m^{-2}
+Q_m^{-1} W_- W_+ Q_m^{-1} = ( 1 - i(\mu_2-\mu_1)Q_m^{-1}) (1+ i(\mu_2-\mu_1)Q_m^{-1}))
+= 1 + (\mu_2-\mu_1)^2 Q_m^{-2}
 \end{equation}
 
 Which leads to 
 \begin{eqnarray}
- \dot{\mathcal{H}_{F_2}}  &=& \mu^2 \phi_2^{\dagger} \dot{Q^{-2}} \phi_2
+ \dot{\mathcal{H}_{F_2}}  &=& (\mu_2-\mu_1)^2 \phi_2^{\dagger} \dot{Q_m^{-2}} \phi_2
 \end{eqnarray}
 
 Note that in that case the eo preconditioning becomes the same as in
@@ -874,24 +892,76 @@ We have
 \end{eqnarray}
 
 Now chosing $A^\dagger= Y^\dagger_0 $,
-$C=-\left(M^{\pm}_{\rm{ee}}\right)^{-1} M_{\rm{eo}} X_0 $, $B^\dagger=
+$C=-\left(M^{+}_{\rm{ee}}\right)^{-1} M_{\rm{eo}} X_0 $, $B^\dagger=
 - Y_0^\dagger \gamma_5 M_{\rm{oe}}
-     \left(M^{\pm}_{\rm{ee}}\right)^{-1} \gamma_5$, and $D= X_0$ allows to write :
+     \left(M^{+}_{\rm{ee}}\right)^{-1} \gamma_5$, and $D= X_0$ allows to write :
 \begin{equation}
 \dot{\mathcal{H}_{F_1}} = -  Y^\dagger \dot{Q} X
   + \rm{h.c} 
 \end{equation} 
 with 
 \begin{equation}
-X=\begin{pmatrix}-\left(M^{\pm}_{\rm{ee}}\right)^{-1} M_{\rm{eo}} X_0
+X=\begin{pmatrix}-\left(M^{+}_{\rm{ee}}\right)^{-1} M_{\rm{eo}} X_0
   \\ X_0 \end{pmatrix},\quad \rm{and} \quad Y=\begin{pmatrix}-
-   \left(M^{\pm}_{\rm{ee}}\right)^{-1} M_{\rm{eo}} Y_0
+   \left(M^{+}_{\rm{ee}}\right)^{-1} M_{\rm{eo}} Y_0
   \\ Y_0 \end{pmatrix}
 \end{equation}
 We have used that   $\dot{Q}_+= \dot{Q}_-$, $M_{\rm{eo}}^{\dagger}=
 \gamma_5 M_{\rm{oe}} \gamma_5$.
 
+\subsection{Twisted mass shift : determinant ratio case}
+
+We use that $\det{ Q_+ (W_- 
+ W_+)^{-1} Q_-} = \det{W_+^{-1} Q_+ Q_- W_-^{-1}} \propto\det{\hat{W}_+^{-1} \hat{Q}_+ \hat{Q}_- \hat{W}_-^{-1}}  $
+
+We thus have to compute 
+\begin{eqnarray}
+\dot{\mathcal{H}_{F_2}}  &=& \phi_2^\dagger\big[ \delta \hat{W}_-
+(\hat{Q}_+ \hat{Q}_-)^{-1} \hat{W}_+  +  \hat{W}_-
+(\hat{Q}_+ \hat{Q}_-)^{-1} \delta \hat{W}_+ \\
+&+&  \hat{W}_- \delta \hat{Q}_-^{-1} \hat{Q}_+^{-1} \hat{W}_+ +
+\hat{W}_- \hat{Q}_-^{-1} \delta \hat{Q}_+^{-1} \hat{W}_+   \big] \phi_2 \\
+&=& \phi_2^\dagger\big[ \dot{\hat{W}}_-
+(\hat{Q}_+ \hat{Q}_-)^{-1} \hat{W}_+  +  \hat{W}_-
+(\hat{Q}_+ \hat{Q}_-)^{-1} \delta \hat{W}_+ \\
+&-&  \hat{W}_- \hat{Q}_-^{-1} \dot{\hat{Q}}_- \hat{Q}_-^{-1} \hat{Q}_+^{-1} \hat{W}_+ -
+\hat{W}_- \hat{Q}_-^{-1} \hat{Q}_+^{-1} \dot{\hat{Q}}_+ \hat{Q}_+^{-1} \hat{W}_+   \big] \phi_2 \\
+\end{eqnarray}
+
+Now we introduce 
+\begin{equation}
+X_W =  (\hat{Q}_+ \hat{Q}_-)^{-1} \hat{W}_+ \phi_2,  Y_W =
+\hat{Q}_+^{-1} \hat{W}_+\phi_2 = \hat{Q}_- X_W
+\end{equation}
+
+such that 
+\begin{eqnarray}
+\dot{\mathcal{H}_{F_2}} &=& \phi_2^\dagger  \dot{\hat{W}}_- X_W +
+X_W^\dagger  \delta \hat{W}_+ \phi_2 \\
+&-& X_W^\dagger \dot{\hat{Q}}_- X_W - Y_W^\dagger   \dot{\hat{Q}}_+  X_W
+\end{eqnarray}
+
+
+Now can write the last expression in terms of $\dot{Q} \equiv
+\dot{Q}_{\pm} $.
+\begin{eqnarray}
+\dot{\mathcal{H}_{F_2}} &=& Y_2^\dagger \dot{Q} X_2 + X_2^\dagger
+\dot{Q} Y_2 - X_1^\dagger \dot{Q} Y_1  - Y_1^\dagger \dot{Q} X_1 \\
+&=& 2~ \rm{Re}\Big[ Y_2^\dagger \dot{Q} X_2 - Y_1^\dagger \dot{Q}
+X_1 \Big],
+\end{eqnarray}
+with 
+\begin{eqnarray}
+Y_1 &=& \begin{pmatrix} - (1+i\mu_1\gamma_5)^{-1} M_{\rm{eo}} Y_W \\
+  Y_W \end{pmatrix},\quad Y_2  =  \begin{pmatrix} - (1+i\mu_2\gamma_5)^{-1} M_{\rm{eo}} \phi_2 \\
+  \phi_2 \end{pmatrix},\\
+X_{1,2} &=&  \begin{pmatrix} - (1-i\mu_{1,2}\gamma_5)^{-1} M_{\rm{eo}} X_W \\
+  X_W \end{pmatrix}, \dot{Q} \equiv  \dot{Q}_{\pm} =  \gamma_5 \begin{pmatrix} 
+ 0  & \dot{M}_{\rm{eo}} \\
+\dot{M}_{\rm{oe}} & 0\\
+\end{pmatrix}
+\end{eqnarray}
+
 
 \bibliography{hirep}
-
 \end{document}
