@@ -98,17 +98,31 @@ static complex *aa,*bb,*cc,*vv;
 
 static double EPSILON=1.e-12;
 
+static suNf_spinor *psi=NULL;
+
+static void alloc_ws_rotate(void) {
+  psi=calloc(MAX_ROTATE,sizeof(suNf_spinor));
+  
+  error((psi==NULL),1,"alloc_ws_rotate [linalg.c]",
+        "Unable to allocate workspace");
+  
+}
 
 static void rotate(int n,spinor_field *pkk,complex v[])
 {
+
   error((n<1)||(n>MAX_ROTATE),1,"rotate [eva.c]",
         "Parameter n is out of range");
+
+  if (psi==NULL) alloc_ws_rotate();
+  
+  //Avoid OMP parallel region in MASTER_FOR
+#undef _OMP_PRAGMA
+#define _OMP_PRAGMA(s)
   
   _MASTER_FOR(pkk->type,ix) {
-    for (int k=0;k<n;k++)
-    {
-      suNf_spinor psi;
-      suNf_spinor *pk=&(psi);
+    for (int k=0;k<n;k++) {
+      suNf_spinor *pk=&(psi[k]);
       suNf_spinor *pj=_FIELD_AT(&pkk[0],ix);
       complex *z=&v[k];
       
@@ -117,8 +131,7 @@ static void rotate(int n,spinor_field *pkk,complex v[])
       _vector_mulc_f((*pk).c[2],*z,(*pj).c[2]);
       _vector_mulc_f((*pk).c[3],*z,(*pj).c[3]);
       
-      for (int j=1;j<n;j++)
-      {
+      for (int j=1;j<n;j++) {
         pj=_FIELD_AT(&pkk[j],ix);
         z+=n;
         
@@ -127,8 +140,10 @@ static void rotate(int n,spinor_field *pkk,complex v[])
         _vector_mulc_add_assign_f((*pk).c[2],*z,(*pj).c[2]);
         _vector_mulc_add_assign_f((*pk).c[3],*z,(*pj).c[3]);
       }
-      
-      *_FIELD_AT(&pkk[k],ix)=psi;
+    }
+    
+    for (int k=0;k<n;k++) {
+      *_FIELD_AT(&pkk[k],ix)=psi[k];
     }
   }
 }
