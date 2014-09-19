@@ -738,50 +738,53 @@ case where the determinant to evaluate is
 \end{eqnarray}
   The following formulae can then be
 used for the case of several hasenbusch masses.
-The case of the determinatn $\det{ Q_m (W_- 
+The case of the determinant $\det{ Q_m (W_- 
  W_+)^{-1} Q_m }$  can be
 recovered by setting $\mu_1=0$ in the following equations.
 
 We have :
-\begin{equation}
-(Q_m-i\mu_1)^{-1} W_- W_+ (Q_m+i\mu_1)^{-1} = ( 1 - i(\mu_2 - \mu_1)
-Q_m^{-1}) (1+ i(\mu_2 - \mu_1) Q_m^{-1})) 
-\end{equation}
-
-The force can then be computed :
 \begin{eqnarray}
- \dot{\mathcal{H}_{F_2}}  &=& - i(\mu_2-\mu_1) \phi_2^{\dagger} \left[ ( 1 - i(\mu_2 - \mu_1) 
-  Q_m^{-1}) \dot{Q_m^{-1}}  - \dot{Q_m^{-1}} (1+ i (\mu_2 - \mu_1) Q_m^{-1})\right] \phi_2 \\
-&=& - i(\mu_2-\mu_1) \phi_2^{\dagger} \left[  ( 1 - i(\mu_2 - \mu_1) 
-  Q_m^{-1}) Q_m^{-1} \dot{Q_m} Q_m^{-1} \right] \phi_2 + \rm{h.c}
+&& (Q_m-i\mu_1)^{-1} W_- W_+ (Q_m+i\mu_1)^{-1} \\
+ &=& ( 1 - i(\mu_2 - \mu_1)
+(Q_m - i \mu_1)^{-1}) (1+ i(\mu_2 - \mu_1) (Q_m+i\mu_1)^{-1})) 
+\end{eqnarray}
+
+The force can then be computed : (global sign and factor $i$ have to be checked)
+\begin{eqnarray}
+ \dot{\mathcal{H}_{F_2}}  &=&   i(\mu_2-\mu_1) \phi_2^{\dagger} \Big[ ( 1 - i(\mu_2 - \mu_1) 
+  (Q_m - i \mu_1)^{-1}) \dot{(Q_m+i\mu_1)^{-1}}  \\
+ &&- \dot{(Q_m - i    \mu_1)^{-1}} (1+ i (\mu_2 - \mu_1) (Q_m+i \mu_1)^{-1})\Big] \phi_2 \\
+&=&  i(\mu_2-\mu_1) \phi_2^{\dagger} \left[  ( 1 - i(\mu_2 - \mu_1) 
+  (Q_m - i\mu_1)^{-1}) ( Q_m+i\mu_1)^{-1} \dot{Q_m} (Q_m+i\mu_1)^{-1}
+\right] \phi_2 \\  &+& \rm{h.c}
 \end{eqnarray}
 
 \begin{equation}
-X\equiv Q_m^{-1}\phi_2,\quad\textrm{and}\quad Y^{\dagger}=i\phi_2^\dagger
-(1+ (\mu_2-\mu_1) Q^{-1}) Q_m^{-1}
-s\end{equation}
-
-From which we deduce 
-\begin{equation}
-Y =   -i Q_m^{-1}(1 +  (\mu_2-\mu_1)Q^{-1})  \phi_2 =  -i D^{-1}  \gamma_5( \phi_2  +(\mu_2-\mu_1)  X)  
+X\equiv (Q_m+i\mu_1)^{-1}\phi_2,\quad\textrm{and}\quad Y^{\dagger}=i\phi_2^\dagger
+(1 -i (\mu_2-\mu_1) (Q-i\mu_1)^{-1}) (Q_m+i\mu_1)^{-1}
 \end{equation}
 
+From which we deduce 
+\begin{eqnarray}
+Y &=&   -i (Q_m - i \mu_1)^{-1}(1 +  i(\mu_2-\mu_1)(Q+i\mu_1)^{-1})
+\phi_2 \\ &=&-i (Q_m - i \mu_1)^{-1}  ( \phi_2  + i(\mu_2-\mu_1)  X)  
+\end{eqnarray}
 
-Note that we could have use the following relation :
+
+Note that in the particular case where $\mu_1=0$, 
 
 \begin{equation}
-Q_m^{-1} W_- W_+ Q_m^{-1} = ( 1 - i(\mu_2-\mu_1)Q_m^{-1}) (1+ i(\mu_2-\mu_1)Q_m^{-1}))
-= 1 + (\mu_2-\mu_1)^2 Q_m^{-2}
+Q_m^{-1} W_- W_+ Q_m^{-1} = ( 1 - i\mu_2Q_m^{-1}) (1+ i\mu_2Q_m^{-1}))
+= 1 + \mu_2^2 Q_m^{-2}
 \end{equation}
 
 Which leads to 
 \begin{eqnarray}
- \dot{\mathcal{H}_{F_2}}  &=& (\mu_2-\mu_1)^2 \phi_2^{\dagger} \dot{Q_m^{-2}} \phi_2
+ \dot{\mathcal{H}_{F_2}}  &=& \mu_2^2 \phi_2^{\dagger} \dot{Q_m^{-2}} \phi_2
 \end{eqnarray}
 
-Note that in that case the eo preconditioning becomes the same as in
-the pure Wilson case. Note also that the forces are explicitly
-proportional to $\mu^2$.
+Note also that the forces are explicitly
+proportional to $\mu_2^2$.
 
 \subsection{Twisted mass shift : eo case}
 
