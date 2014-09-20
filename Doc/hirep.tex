@@ -746,7 +746,17 @@ We have :
 \begin{eqnarray}
 && (Q_m-i\mu_1)^{-1} W_- W_+ (Q_m+i\mu_1)^{-1} \\
  &=& ( 1 - i(\mu_2 - \mu_1)
-(Q_m - i \mu_1)^{-1}) (1+ i(\mu_2 - \mu_1) (Q_m+i\mu_1)^{-1})) 
+(Q_m - i \mu_1)^{-1}) (1+ i(\mu_2 - \mu_1)(Q_m - i \mu_1)^{-1}) \\
+&=& 1+ i(\mu_2 - \mu_1) (Q_m+i\mu_1)^{-1}  - i(\mu_2 - \mu_1)
+(Q_m - i \mu_1)^{-1} + (\mu_2- \mu_1)^2\big((Q_m + i \mu_1)(Q_m - i
+\mu_1)\big)^{-1} \\
+&=& 1+ (\mu_2- \mu_1)^2\big(Q_m^2 + \mu_1^2\big)^{-1}+ i(\mu_2 -
+\mu_1) (Q_m^2 +\mu_1^2)^{-1}  (Q_m-i\mu_1) \\
+&&\qquad -i(\mu_2 - \mu_1)
+(Q_m^2 +  \mu_1^2)^{-1} (Q_m+i\mu_1) \\
+&=& 1 +(\mu_2- \mu_1) \big(Q_m^2 + \mu_1^2\big)^{-1} \big( (\mu_2- \mu_1)
++ 2 \mu_1 \big) \\
+&=& 1 +(\mu_2^2- \mu_1^2) \big(Q_m^2 + \mu_1^2\big)^{-1} 
 \end{eqnarray}
 
 The force can then be computed : (global sign and factor $i$ have to be checked)
@@ -912,7 +922,7 @@ X=\begin{pmatrix}-\left(M^{+}_{\rm{ee}}\right)^{-1} M_{\rm{eo}} X_0
 We have used that   $\dot{Q}_+= \dot{Q}_-$, $M_{\rm{eo}}^{\dagger}=
 \gamma_5 M_{\rm{oe}} \gamma_5$.
 
-\subsection{Twisted mass shift : determinant ratio case}
+\subsection{Twisted mass shift : determinant ratio  eo case}
 
 We use that $\det{ Q_+ (W_- 
  W_+)^{-1} Q_-} = \det{W_+^{-1} Q_+ Q_- W_-^{-1}} \propto\det{\hat{W}_+^{-1} \hat{Q}_+ \hat{Q}_- \hat{W}_-^{-1}}  $
