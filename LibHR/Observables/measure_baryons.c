@@ -77,13 +77,9 @@ void _propagator_baryon2_mul2(complex C[4][4],suNf_propagator S,suNf_propagator 
 void contract_baryons(spinor_field* psi0, int tau){
 
 	lprintf("contract_baryons",50,"Performing baryon contraction ");
-	int i,j,k,l,m,n,ix,t,x,y,z,beta,gamma,tc;
-	complex tr;
-	suNf_spin_matrix sma,smb, sm1,sm2;
+	int i,j,ix,t,x,y,z,beta,tc;
 	int a,b,c,ap,bp,cp;
-	int ica,icb,icc;
 	suNf_propagator S,Stilde,Stmp;
-	int offset=0;
 	int idx;
 	complex static C1[4][4]; // to initialize
 	complex C2[4][4]; // to initialize
@@ -93,12 +89,12 @@ void contract_baryons(spinor_field* psi0, int tau){
 	double col_factor[NF][NF][NF][NF][NF][NF];
 
 	double eps[NF][NF][NF];
-	double tmp;
+//	double tmp;
 	// ini corrs
 	error(NG!=3,1,"contract_baryons [measure_baryons.c]" ,
 	"That code does not work for that number of color !\n");
 	
-#ifdef REPR_FUNDAMENTAL 
+#if defined(REPR_FUNDAMENTAL) && NG==3 
 	for (a=0;a<NF;++a){
 		for (b=0;b<NF;++b){
 			for (c=0;c<NF;++c){
@@ -115,7 +111,7 @@ void contract_baryons(spinor_field* psi0, int tau){
 #elif REPR_SYMMETRIC 
 	// def of the color factor for the sextet 
 	double eS[NF][NG][NG];
-
+	int k,l,m;
 	for ( i=0;i<NF;++i){
 		for( j=0; j<NG; ++j){
 			for( k=0; k<NG; ++k){
