@@ -110,16 +110,7 @@ do {  \
    do { \
      int a,beta;			  \
      for (a=0;a<NF;++a) for (beta=0;beta<4;++beta){			\
-	 spinor_mul_assign_f(S.c[a].c[beta],k);	\
-       }								\
-   } while(0) 
-	
-//S propagator k factor;
-#define _propagator_mulr_assign(S, k) \
-   do { \
-     int a,beta;			  \
-     for (a=0;a<NF;++a) for (beta=0;beta<4;++beta){			\
-	 spinor_mulr_assign_f(S.c[a].c[beta],k)				\
+	 _spinor_mul_f((S).c[a].c[beta],k,(S).c[a].c[beta]);	\
        }								\
    } while(0) 
 
@@ -261,72 +252,99 @@ do {				   \
 #define _g0_propagator(p,q)			\
 do{\
   int a; \
-  for (a=0;a<NF;++a){ _g0_spinmatrix(p.c[a],q.c[a]); }	\
+  for (a=0;a<NF;++a){ _g0_spinmatrix((p).c[a],(q).c[a]); }	\
 } while(0)
 
 #define _g1_propagator(p,q)			\
 do{\
   int a; \
-  for (a=0;a<NF;++a){ _g1_spinmatrix(p.c[a],q.c[a]); }	\
+  for (a=0;a<NF;++a){ _g1_spinmatrix((p).c[a],(q).c[a]); }	\
 } while(0)
 
 #define _g2_propagator(p,q)			\
 do{\
   int a; \
-  for (a=0;a<NF;++a){ _g2_spinmatrix(p.c[a],q.c[a]); }	\
+  for (a=0;a<NF;++a){ _g2_spinmatrix((p).c[a],(q).c[a]); }	\
 } while(0)
 
 #define _g3_propagator(p,q)			\
 do{\
   int a; \
-  for (a=0;a<NF;++a){ _g3_spinmatrix(p.c[a],q.c[a]); }	\
+  for (a=0;a<NF;++a){ _g3_spinmatrix((p).c[a],(q).c[a]); }	\
 } while(0)
 
 #define _g5_propagator(p,q)			\
 do{						\
   int a; \
-  for (a=0;a<NF;++a){ _g5_spinmatrix(p.c[a],q.c[a]); }  \
+  for (a=0;a<NF;++a){ _g5_spinmatrix((p).c[a],(q).c[a]); }  \
 } while(0)
 
 #define _g5g0_propagator(p,q)			\
 do{						\
   int a; \
-  for (a=0;a<NF;++a){ _g5g0_spinmatrix(p.c[a],q.c[a]); }  \
+  for (a=0;a<NF;++a){ _g5g0_spinmatrix((p).c[a],(q).c[a]); }  \
 } while(0)
 
+#define _g5g3_propagator(p,q)			\
+do{						\
+  int a; \
+  for (a=0;a<NF;++a){ _g5g3_spinmatrix((p).c[a],(q).c[a]); }  \
+} while(0)
+
+#define _g5g1_propagator(p,q)			\
+do{						\
+  int a; \
+  for (a=0;a<NF;++a){ _g5g1_spinmatrix((p).c[a],(q).c[a]); }  \
+} while(0)
 
 //P = Q Gamma
 #define _propagator_g0(p,q)			\
 do{						\
   int a; \
-  for (a=0;a<NF;++a){ _spinmatrix_g0(p.c[a],q.c[a]); }  \
+  for (a=0;a<NF;++a){ _spinmatrix_g0((p).c[a],(q).c[a]); }  \
+} while(0)
+
+#define _propagator_g2(p,q)			\
+do{						\
+  int a; \
+  for (a=0;a<NF;++a){ _spinmatrix_g2((p).c[a],(q).c[a]); }  \
 } while(0)
 
 #define _propagator_g5(p,q)			\
 do{						\
   int a; \
-  for (a=0;a<NF;++a){ _spinmatrix_g5(p.c[a],q.c[a]); }  \
+  for (a=0;a<NF;++a){ _spinmatrix_g5((p).c[a],(q).c[a]); }  \
 } while(0)
 
 #define _propagator_g5g0(p,q)			\
 do{						\
   int a; \
-  for (a=0;a<NF;++a){ _spinmatrix_g5g0(p.c[a],q.c[a]); }  \
+  for (a=0;a<NF;++a){ _spinmatrix_g5g0((p).c[a],(q).c[a]); }  \
 } while(0)
 
 #define _g5g0g2_propagator(p,q)			\
 do{						\
   int a; \
-  for (a=0;a<NF;++a){ _g5g0g2_spinmatrix(p.c[a],q.c[a]); }  \
+  for (a=0;a<NF;++a){ _g5g0g2_spinmatrix((p).c[a],(q).c[a]); }  \
 } while(0)
 
 
 #define _propagator_g5g0g2(p,q)			\
 do{						\
   int a; \
-  for (a=0;a<NF;++a){ _spinmatrix_g5g0g2(p.c[a],q.c[a]); }  \
+  for (a=0;a<NF;++a){ _spinmatrix_g5g0g2((p).c[a],(q).c[a]); }  \
 } while(0)
 
+#define _propagator_g5g3(p,q)			\
+do{						\
+  int a; \
+  for (a=0;a<NF;++a){ _spinmatrix_g5g3((p).c[a],(q).c[a]); }  \
+} while(0)
 
+#define _propagator_g5g1(p,q)			\
+do{						\
+  int a; \
+  for (a=0;a<NF;++a){ _spinmatrix_g5g1((p).c[a],(q).c[a]); }  \
+} while(0)
 
 #endif
