@@ -975,6 +975,113 @@ X_{1,2} &=&  \begin{pmatrix} - (1-i\mu_{1,2}\gamma_5)^{-1} M_{\rm{eo}} X_W \\
 \end{pmatrix}
 \end{eqnarray}
 
+\subsection{Twisted mass shift : simpler version eo case}
+
+Instead of applying the eo preconditionning to the twisted mass
+operator we can use the wilson dirac eo operator and do a different
+splitting.
+
+
+We define :
+\begin{equation}
+Q_{\rm{eo}} \equiv \gamma_5 \big( (4+m)^2 - D_{eo} D_{oe}\big)
+\end{equation}
+We know write the following :
+\begin{equation}
+\det{ Q_{\rm{eo}} ^2 }  = \det{W_- W_+} \det{\frac{  Q_{\rm{eo}} ^2
+  }{W_- W_+}}
+\end{equation}
+
+Now we choose 
+\begin{equation}
+W_{\pm} = Q_{\rm{eo}} \pm i \mu
+\end{equation}
+
+The corresponding Hamiltonian read :
+
+\begin{equation}
+\mathcal{H}_{F_1} =   \phi_1^\dagger ( W_- W_+ )^{-1} \phi_1,\quad,
+\mathcal{H}_{F_2} = \phi_2^\dagger Q_{\rm{eo}}^{-1} W_- W_+ Q_{\rm{eo}}^{-1} \phi_2
+\end{equation}
+
+Since the operator are now very similar to the non eo case, we can
+reuse some formulae. In particular, we can rewrite the Hamiltonian as
+follows :
+
+The corresponding Hamiltonian read :
+
+\begin{equation}
+\mathcal{H}_{F_1} =   \phi_1^\dagger (Q_{\rm{eo}}  + \mu^2  )^{-1} \phi_1,\quad,
+\mathcal{H}_{F_2} = \phi_2^\dagger \big( 1  + \mu^2 Q_{\rm{eo}}^{-1}\big)  \phi_2
+\end{equation}
+
+
+
+
+
+From which we have the following forces :
+\begin{eqnarray}
+\dot{\mathcal{H}}_{F_1} &=&   \phi_1^\dagger  W_+^{-1} \delta
+W_-^{-1}\phi_1 + \rm{h.c} \\
+&=&  \phi_1^\dagger  W_+^{-1}  W_-^{-1} \dot{Q}_{\rm{eo}} W_-^{-1} \phi_1+ \rm{h.c}
+\end{eqnarray}
+
+Now we want to rewrite the last equation as a function of 
+\begin{equation}
+\dot{Q} = \gamma_5  \begin{pmatrix}  0 & \dot{D}_{\rm{eo}} \\
+  \dot{D}_{\rm{oe}} & 0  \end{pmatrix}
+\end{equation}
+
+
+\begin{equation}
+  X_{\rm{o}}=W_+^{-1}\phi_1,\quad. Y_{\rm{o}}= \left(W_+
+    W_-\right)^{-1} \phi_1,
+\end{equation}
+where we have used that 
+\begin{equation}
+  W_\pm^{\dagger} = W_\mp.
+\end{equation}
+Furthermore we have 
+\begin{equation}
+\dot{Q}_{\rm{eo}} =  -\gamma_5 \left(  \dot{M}_{\rm{oe}}
+   M_{\rm{eo}} +  M_{\rm{oe}} \dot{M}_{\rm{eo}}\right)
+\end{equation}
+
+noting that 
+\begin{eqnarray}
+  Y ^{\dagger} \dot{Q} X  &=& \begin{pmatrix} A^\dagger &
+    B^\dagger \end{pmatrix} \gamma_5 \begin{pmatrix} 
+ 0  & \dot{M}_{\rm{eo}} \\
+\dot{M}_{\rm{oe}} & 0\\
+\end{pmatrix}  \begin{pmatrix} C \\  D \end{pmatrix} \\
+&=&  A^\dagger \gamma_5 \dot{M}_{\rm{oe}}  C + B^\dagger \gamma_5 \dot{M}_{\rm{eo}} D
+\end{eqnarray}
+
+and chosing $A^\dagger= Y^\dagger_0 $,
+$C =  M_{\rm{eo}} X_0 $, $B^\dagger=
+ Y_0^\dagger \gamma_5 M_{\rm{oe}}$, and $D= X_0$ allows us to write :
+\begin{equation}
+\dot{\mathcal{H}_{F_1}} = -  Y^\dagger \dot{Q} X
+  + \rm{h.c} 
+\end{equation} 
+with 
+\begin{equation}
+X=\begin{pmatrix} M_{\rm{eo}} X_0
+  \\ X_0 \end{pmatrix},\quad \rm{and} \quad Y=\begin{pmatrix}
+  M_{\rm{eo}} Y_0
+  \\ Y_0 \end{pmatrix}
+\end{equation}
+We have used that    $M_{\rm{eo}}^{\dagger}=\gamma_5 M_{\rm{oe}} \gamma_5$.
+
+
+
+Similarly for the second Hamiltonian we get :
+\begin{eqnarray}
+\dot{\mathcal{H}}_{F_2} = \mu_2\phi_2^\dagger  \dot{Q_{\rm{eo}}^{-1}}  \phi_2
+\end{eqnarray}
+which is exactly the force that appear in case of a pure wilson dirac
+eo operator up to a multiplicative factor.
+
 
 \bibliography{hirep}
 \end{document}
