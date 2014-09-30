@@ -1,6 +1,5 @@
 /***************************************************************************\
-* Copyright (c) 2014 Vincent Drach, Ari Hietanen                            *
-*                                                                           *
+* Copyright (c) 2014 Vincent Drach, Ari Hietanen, Martin Hansen             *
 *                                                                           *
 \***************************************************************************/
 
@@ -91,7 +90,6 @@ void _propagator_baryon1_mul2(complex C[4][4],suNf_propagator S,suNf_propagator 
 			}
 		}
 	} 
-
 
 	for(int alpha = 0; alpha < 4; ++alpha)
 	{
@@ -339,8 +337,6 @@ void contract_baryons(spinor_field* psi0, int tau)
 				propagator_mul_left_right(&Sdelta[mu][nu], &S, mu, nu);
 			}
 
-			for(int mu = 0; mu < 4; mu++)
-			for(int nu = 0; nu < 4; nu++)
 			for(int a = 0; a < NF; ++a)
 			for(int ap = 0; ap < NF; ++ap)
 			for(int b = 0; b < NF; ++b)
@@ -348,24 +344,27 @@ void contract_baryons(spinor_field* psi0, int tau)
 			for(int c = 0; c < NF; ++c)
 			for(int cp = 0; cp < NF; ++cp)
 			{
-				if(fabs(col_factor[a][b][c][ap][bp][cp]) > 1e-5)
+				if(fabs(col_factor[a][b][c][ap][bp][cp]) < 1e-5)
 				{
-					if(mu == nu)
-					{
-						// Nucleon
-						_propagator_baryon1_mul2(C1, S, Snucleon, c, cp, b, bp, a, ap); // nucleon term 1
-						_propagator_baryon2_mul2(C2, S, Snucleon, c, ap, a, cp, b, bp); // nucleon term 2
+					continue;
+				}
 
-						// Multiply by color factor and accumulate in the correlator
-						for(int i = 0; i < 4; i++)
-						for(int j = 0; j < 4; j++)
-						{
-							corr_nucleon[tc][i][j].re -= col_factor[a][b][c][ap][bp][cp] * (C1[i][j].re - C2[i][j].re);
-							corr_nucleon[tc][i][j].im -= col_factor[a][b][c][ap][bp][cp] * (C1[i][j].im - C2[i][j].im);
-						}
-					}
+				// Nucleon
+				_propagator_baryon1_mul2(C1, S, Snucleon, c, cp, b, bp, a, ap); // nucleon term 1
+				_propagator_baryon2_mul2(C2, S, Snucleon, c, ap, a, cp, b, bp); // nucleon term 2
 
-					// Delta
+				// Multiply by color factor and accumulate in the correlator
+				for(int i = 0; i < 4; i++)
+				for(int j = 0; j < 4; j++)
+				{
+					corr_nucleon[tc][i][j].re -= col_factor[a][b][c][ap][bp][cp] * (C1[i][j].re - C2[i][j].re);
+					corr_nucleon[tc][i][j].im -= col_factor[a][b][c][ap][bp][cp] * (C1[i][j].im - C2[i][j].im);
+				}
+
+				// Delta
+				for(int mu = 0; mu < 4; mu++)
+				for(int nu = 0; nu < 4; nu++)
+				{
 					_propagator_baryon1_mul2(C1, S, Sdelta[mu][nu], c, cp, b, bp, a, ap); // delta term 1
 					_propagator_baryon2_mul2(C2, S, Sdelta[mu][nu], c, ap, a, cp, b, bp); // delta term 2
 
@@ -377,7 +376,7 @@ void contract_baryons(spinor_field* psi0, int tau)
 						corr_delta[tc][mu][nu][i][j].im -= 2*col_factor[a][b][c][ap][bp][cp] * (C2[i][j].im - 2*C1[i][j].im);
 					}
 				}
-			}
+			} // end cp
 		} // END SPATIAL LOOP
 	} // END TEMPORAL LOOP
 
