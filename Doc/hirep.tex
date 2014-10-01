@@ -905,18 +905,18 @@ We have
 \end{eqnarray}
 
 Now chosing $A^\dagger= Y^\dagger_0 $,
-$C=-\left(M^{+}_{\rm{ee}}\right)^{-1} M_{\rm{eo}} X_0 $, $B^\dagger=
-- Y_0^\dagger \gamma_5 M_{\rm{oe}}
+$C=\left(M^{+}_{\rm{ee}}\right)^{-1} M_{\rm{eo}} X_0 $, $B^\dagger=
+ Y_0^\dagger \gamma_5 M_{\rm{oe}}
      \left(M^{+}_{\rm{ee}}\right)^{-1} \gamma_5$, and $D= X_0$ allows to write :
 \begin{equation}
-\dot{\mathcal{H}_{F_1}} = -  Y^\dagger \dot{Q} X
+\dot{\mathcal{H}_{F_1}} =   Y^\dagger \dot{Q} X
   + \rm{h.c} 
 \end{equation} 
 with 
 \begin{equation}
-X=\begin{pmatrix}-\left(M^{+}_{\rm{ee}}\right)^{-1} M_{\rm{eo}} X_0
-  \\ X_0 \end{pmatrix},\quad \rm{and} \quad Y=\begin{pmatrix}-
-   \left(M^{+}_{\rm{ee}}\right)^{-1} M_{\rm{eo}} Y_0
+X=\begin{pmatrix}\left(M^{+}_{\rm{ee}}\right)^{-1} M_{\rm{eo}} X_0
+  \\ X_0 \end{pmatrix},\quad \rm{and} \quad Y=\begin{pmatrix}
+   \left(M^{-}_{\rm{ee}}\right)^{-1} M_{\rm{eo}} Y_0
   \\ Y_0 \end{pmatrix}
 \end{equation}
 We have used that   $\dot{Q}_+= \dot{Q}_-$, $M_{\rm{eo}}^{\dagger}=
@@ -951,31 +951,40 @@ such that
 \begin{eqnarray}
 \dot{\mathcal{H}_{F_2}} &=& \phi_2^\dagger  \dot{\hat{W}}_- X_W +
 X_W^\dagger  \delta \hat{W}_+ \phi_2 \\
-&-& X_W^\dagger \dot{\hat{Q}}_- X_W - Y_W^\dagger   \dot{\hat{Q}}_+  X_W
+&-& Y_W^\dagger \dot{\hat{Q}}_- X_W - X_W^\dagger   \dot{\hat{Q}}_+  Y_W
 \end{eqnarray}
 
+Now recalling that 
+\begin{eqnarray}
+\dot{\hat{Q}}_{\pm} &=&  -\gamma_5 \left(   \dot{M}_{\rm{oe}}
+  \left(1\pm i\mu_1 \gamma_5\right)^{-1} M_{\rm{eo}}   + M_{\rm{oe}}
+    \left( 1\pm i\mu_1 \gamma_5\right)^{-1} \dot{M}_{\rm{eo}}\right)  \\
+\dot{\hat{W}}_{\pm} &=&  -\gamma_5 \left(   \dot{M}_{\rm{oe}}
+  \left(1\pm i\mu_2 \gamma_5\right)^{-1} M_{\rm{eo}} +  M_{\rm{oe}}
+    \left( 1\pm i\mu_2 \gamma_5\right)^{-1} \dot{M}_{\rm{eo}}\right)
+\end{eqnarray}
 
 Now can write the last expression in terms of $\dot{Q} \equiv
 \dot{Q}_{\pm} $.
 \begin{eqnarray}
-\dot{\mathcal{H}_{F_2}} &=& Y_2^\dagger \dot{Q} X_2 + X_2^\dagger
-\dot{Q} Y_2 - X_1^\dagger \dot{Q} Y_1  - Y_1^\dagger \dot{Q} X_1 \\
-&=& 2~ \rm{Re}\Big[ Y_2^\dagger \dot{Q} X_2 - Y_1^\dagger \dot{Q}
-X_1 \Big],
+\dot{\mathcal{H}_{F_2}} &=& Y_1^\dagger \dot{Q} X_1 + X_1^\dagger
+\dot{Q} Y_1 - X_2^\dagger \dot{Q} Y_2  - Y_2^\dagger \dot{Q} X_2 \\
+&=& 2~ \rm{Re}\Big[ Y_1^\dagger \dot{Q} X_1 - Y_2^\dagger \dot{Q}
+X_2 \Big],
 \end{eqnarray}
 with 
 \begin{eqnarray}
-Y_1 &=& \begin{pmatrix} - (1+i\mu_1\gamma_5)^{-1} M_{\rm{eo}} Y_W \\
-  Y_W \end{pmatrix},\quad Y_2  =  \begin{pmatrix} - (1+i\mu_2\gamma_5)^{-1} M_{\rm{eo}} \phi_2 \\
+Y_1 &=& \begin{pmatrix}  (1+i\mu_1\gamma_5)^{-1} M_{\rm{eo}} Y_W \\
+  Y_W \end{pmatrix},\quad Y_2  =  \begin{pmatrix}  (1+i\mu_2\gamma_5)^{-1} M_{\rm{eo}} \phi_2 \\
   \phi_2 \end{pmatrix},\\
-X_{1,2} &=&  \begin{pmatrix} - (1-i\mu_{1,2}\gamma_5)^{-1} M_{\rm{eo}} X_W \\
+X_{1,2} &=&  \begin{pmatrix}  (1-i\mu_{1,2}\gamma_5)^{-1} M_{\rm{eo}} X_W \\
   X_W \end{pmatrix}, \dot{Q} \equiv  \dot{Q}_{\pm} =  \gamma_5 \begin{pmatrix} 
  0  & \dot{M}_{\rm{eo}} \\
 \dot{M}_{\rm{oe}} & 0\\
 \end{pmatrix}
 \end{eqnarray}
 
-\subsection{Twisted mass shift : simpler version eo case}
+\subsection{Twisted mass shift :  twisting the  eo  Wilson-Dirac  operator}
 
 Instead of applying the eo preconditionning to the twisted mass
 operator we can use the wilson dirac eo operator and do a different
@@ -986,13 +995,13 @@ We define :
 \begin{equation}
 Q_{\rm{eo}} \equiv \gamma_5 \big( (4+m)^2 - D_{eo} D_{oe}\big)
 \end{equation}
-We know write the following :
+Now we split the determinant as follows :
 \begin{equation}
 \det{ Q_{\rm{eo}} ^2 }  = \det{W_- W_+} \det{\frac{  Q_{\rm{eo}} ^2
   }{W_- W_+}}
 \end{equation}
 
-Now we choose 
+And we choose 
 \begin{equation}
 W_{\pm} = Q_{\rm{eo}} \pm i \mu
 \end{equation}
