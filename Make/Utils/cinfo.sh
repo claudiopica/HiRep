@@ -86,6 +86,9 @@ else
 fi
 
 REV=$(svn info | grep Revision | awk '{ print $2 }')
+if [ -z "$REV" ]; then
+  REV="0"
+fi
 echo "static int CI_svnrevision = ${REV};" >> ${FILENAME}
 echo "" >> ${FILENAME}
 
