@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 /*******************************************************************************
@@ -35,7 +35,7 @@ double plaq(int ix,int mu,int nu)
 
   _suNg_times_suNg(w1,(*v1),(*v2));
   _suNg_times_suNg(w2,(*v4),(*v3));
-  _suNg_times_suNg_dagger(w3,w1,w2);      
+  _suNg_times_suNg_dagger(w3,w1,w2);
 
   _suNg_trace_re(p,w3);
 
@@ -47,10 +47,9 @@ double plaq(int ix,int mu,int nu)
 #endif
 }
 
-
 void cplaq(complex *ret,int ix,int mu,int nu)
 {
-  int iy,iz;;
+  int iy,iz;
   suNg *v1,*v2,*v3,*v4,w1,w2,w3;
 
   iy=iup(ix,mu);
@@ -63,8 +62,8 @@ void cplaq(complex *ret,int ix,int mu,int nu)
 
   _suNg_times_suNg(w1,(*v1),(*v2));
   _suNg_times_suNg(w2,(*v4),(*v3));
-  _suNg_times_suNg_dagger(w3,w1,w2);      
-      
+  _suNg_times_suNg_dagger(w3,w1,w2);
+
   _suNg_trace_re(ret->re,w3);
 #ifdef GAUGE_SON
   ret->im=0;
@@ -112,12 +111,12 @@ double avr_plaquette()
 void full_plaquette()
 {
 	complex pa[6];
-	double r0re, r0im;
-	double r1re, r1im;
-	double r2re, r2im;
-	double r3re, r3im;
-	double r4re, r4im;
-	double r5re, r5im;
+	double r0re = 0, r0im = 0;
+	double r1re = 0, r1im = 0;
+	double r2re = 0, r2im = 0;
+	double r3re = 0, r3im = 0;
+	double r4re = 0, r4im = 0;
+	double r5re = 0, r5im = 0;
 
 	_PIECE_FOR(&glattice,ixp)
 	{
