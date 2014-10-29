@@ -28,6 +28,26 @@
 #include "meson_observables.h"
 #define PI 3.141592653589793238462643383279502884197
 
+#define corr_left_mult_g5(C) \
+do { \
+for(int i = 2; i < 4; i++) \
+for(int j = 0; j < 4; j++) \
+{ \
+C[i][j].re = -C[i][j].re; \
+C[i][j].im = -C[i][j].im; \
+} \
+} while(0)
+
+#define corr_right_mult_g5(C) \
+do { \
+for(int i = 0; i < 4; i++) \
+for(int j = 2; j < 4; j++) \
+{ \
+C[i][j].re = -C[i][j].re; \
+C[i][j].im = -C[i][j].im; \
+} \
+} while(0)
+
 
 // The function computes: out = Cg_\mu * in * g0(Cg_\nu)^\dagger*g0
 void propagator_mul_left_right(suNf_propagator *out, suNf_propagator *in, int mu, int nu)
@@ -132,19 +152,14 @@ void contract_baryons(spinor_field* psi0, int tau)
 	int ix, tc, idx;
 
 	suNf_propagator S, Stmp;
-	suNf_propagator Snucleon; // Stilde for the nucleon
+	suNf_propagator Snucleon[2][2]; // Stilde for the nucleon
 	suNf_propagator Sdelta[4][4]; // Stilde for the delta
 
 	complex C1[4][4]; // to initialize
 	complex C2[4][4]; // to initialize
 
-	complex corr_nucleon[GLB_T][4][4];
-	double corr_nucleon_re[4][4][GLB_T];
-	double corr_nucleon_im[4][4][GLB_T];
-
+	complex corr_nucleon[GLB_T][2][2][4][4];
 	complex corr_delta[GLB_T][4][4][4][4];
-	double corr_delta_re[4][4][4][4][GLB_T];
-	double corr_delta_im[4][4][4][4][GLB_T];
 
 	double col_factor[NF][NF][NF][NF][NF][NF];
 	double eps[NF][NF][NF];
@@ -280,24 +295,8 @@ void contract_baryons(spinor_field* psi0, int tau)
 	}
 
 	// Zero variables
-	for(int t = 0; t < GLB_T; t++)
-	for(int i = 0; i < 4; i++)
-	for(int j = 0; j < 4; j++)
-	{
-		// Nucleon
-		_complex_0(corr_nucleon[t][i][j]);
-		corr_nucleon_re[i][j][t] = 0;
-		corr_nucleon_im[i][j][t] = 0;
-
-		// Delta
-		for(int mu = 0; mu < 4; mu++)
-		for(int nu = 0; nu < 4; nu++)
-		{
-			_complex_0(corr_delta[t][mu][nu][i][j]);
-			corr_delta_re[mu][nu][i][j][t] = 0;
-			corr_delta_im[mu][nu][i][j][t] = 0;
-		}
-	}
+	memset(corr_nucleon, 0, sizeof(corr_nucleon));
+	memset(corr_delta, 0, sizeof(corr_delta));
 
 	// LOOP VOLUME 
 	for(int t = 0; t < T; t++)
@@ -322,13 +321,26 @@ void contract_baryons(spinor_field* psi0, int tau)
 			_propagator_transpose(S, Stmp);
 
 			// Stilde = Gamma S Gamma_tilde
-			// C  = i g0 g2
-			// C g5 = i g1 g3
-			// Nucleon case: Stilde = - Cg5 S Cg5 = g5g0g2 S g5g0g2
+			// C  =  g0 g2
+			// C g5 =  g1 g3
+			// Nucleon case: Stilde = -Cg5 S Cg5 = - g5g0g2 S g5g0g2
+ 			// we forgot about the minus sign that will contribute only to a global sign...
 
 			// Nucleon propagator
 			_g5g0g2_propagator(Stmp, S);
-			_propagator_g5g0g2(Snucleon, Stmp);
+			_propagator_g5g0g2(Snucleon[0][0], Stmp);
+
+			_g5g0g2_propagator(Stmp, S);
+			_propagator_g0g2(Snucleon[0][1], Stmp);
+
+			_g0g2_propagator(Stmp, S);
+			_propagator_g5g0g2(Snucleon[1][0], Stmp);
+
+			_g0g2_propagator(Stmp, S);
+			_propagator_g0g2(Snucleon[1][1], Stmp);
+
+
+
 
 			// Delta propagator
 			for(int mu = 0; mu < 4; mu++)
@@ -350,16 +362,27 @@ void contract_baryons(spinor_field* psi0, int tau)
 				}
 
 				// Nucleon
-				_propagator_baryon1_mul2(C1, S, Snucleon, c, cp, b, bp, a, ap); // nucleon term 1
-				_propagator_baryon2_mul2(C2, S, Snucleon, c, ap, a, cp, b, bp); // nucleon term 2
+				for (int k = 0; k < 2; k++)
+				for (int l = 0; l < 2; l++)
+				{
+				_propagator_baryon1_mul2(C1, S, Snucleon[k][l], c, cp, b, bp, a, ap); // nucleon term 1
+				_propagator_baryon2_mul2(C2, S, Snucleon[k][l], c, ap, a, cp, b, bp); // nucleon term 2
+				
+				if (k==1) corr_left_mult_g5(C1);
+				if (k==1) corr_left_mult_g5(C2);
+
+				if (l==1) corr_right_mult_g5(C1);
+				if (l==1) corr_right_mult_g5(C2);
 
 				// Multiply by color factor and accumulate in the correlator
-				for(int i = 0; i < 4; i++)
-				for(int j = 0; j < 4; j++)
-				{
-					corr_nucleon[tc][i][j].re -= col_factor[a][b][c][ap][bp][cp] * (C1[i][j].re - C2[i][j].re);
-					corr_nucleon[tc][i][j].im -= col_factor[a][b][c][ap][bp][cp] * (C1[i][j].im - C2[i][j].im);
-				}
+					for(int i = 0; i < 4; i++)
+					for(int j = 0; j < 4; j++)
+					{
+					corr_nucleon[tc][k][l][i][j].re -= col_factor[a][b][c][ap][bp][cp] * (C1[i][j].re - C2[i][j].re);
+					corr_nucleon[tc][k][l][i][j].im -= col_factor[a][b][c][ap][bp][cp] * (C1[i][j].im - C2[i][j].im);
+					}
+			  }
+
 
 				// Delta
 				for(int mu = 0; mu < 4; mu++)
@@ -380,59 +403,26 @@ void contract_baryons(spinor_field* psi0, int tau)
 		} // END SPATIAL LOOP
 	} // END TEMPORAL LOOP
 
-	// split real and im part
-	for(int t = 0; t < T; t++)
-	{
-		tc = (zerocoord[0] + t + GLB_T - tau) % GLB_T;
-
-		for(int i = 0; i < 4; i++)
-		for(int j = 0; j < 4; j++)
-		{
-			// Nucleon
-			corr_nucleon_re[i][j][tc] = corr_nucleon[tc][i][j].re;
-			corr_nucleon_im[i][j][tc] = corr_nucleon[tc][i][j].im;
-
-			// Delta
-			for(int mu = 0; mu < 4; mu++)
-			for(int nu = 0; nu < 4; nu++)
-			{
-				corr_delta_re[mu][nu][i][j][tc] = corr_delta[tc][mu][nu][i][j].re;
-				corr_delta_im[mu][nu][i][j][tc] = corr_delta[tc][mu][nu][i][j].im;
-			}
-		}
-	} 
-
-	// global sum
-	for(int i = 0; i < 4; i++)
-	for(int j = 0; j < 4; j++)
-	{
-		// Nucleon
-		global_sum(corr_nucleon_re[i][j], GLB_T);
-		global_sum(corr_nucleon_im[i][j], GLB_T);
-
-		// Delta
-		for(int mu = 0; mu < 4; mu++)
-		for(int nu = 0; nu < 4; nu++)
-		{
-			global_sum(corr_delta_re[mu][nu][i][j], GLB_T);
-			global_sum(corr_delta_im[mu][nu][i][j], GLB_T);
-		}
-	}
+ global_sum((double*)corr_nucleon, 2*2*2*4*4*GLB_T);
+ global_sum((double*)corr_delta, 2*4*4*4*4*GLB_T);
 
 	// Print nucleon correlator
 	for(int t = 0; t < GLB_T; t++)
+	for(int k = 0; k < 2; k++)
+	for(int l = 0; l < 2; l++)
 	for(int i = 0; i < 4; i++)
 	{
-		lprintf("CORR_NUCLEON", 0, "%d %3.10e %3.10e  %3.10e %3.10e  %3.10e %3.10e  %3.10e %3.10e \n",
-				t,
-				corr_nucleon_re[i][0][t],
-				corr_nucleon_im[i][0][t],
-				corr_nucleon_re[i][1][t],
-				corr_nucleon_im[i][1][t],
-				corr_nucleon_re[i][2][t],
-				corr_nucleon_im[i][2][t],
-				corr_nucleon_re[i][3][t],
-				corr_nucleon_im[i][3][t]
+
+		lprintf("CORR_NUCLEON", 0, "%d %d %d %3.10e %3.10e  %3.10e %3.10e  %3.10e %3.10e  %3.10e %3.10e \n",
+				t,k,l,
+				corr_nucleon[t][k][l][i][0].re,
+				corr_nucleon[t][k][l][i][0].im,
+				corr_nucleon[t][k][l][i][1].re,
+				corr_nucleon[t][k][l][i][1].im,
+				corr_nucleon[t][k][l][i][2].re,
+				corr_nucleon[t][k][l][i][2].im,
+				corr_nucleon[t][k][l][i][3].re,
+				corr_nucleon[t][k][l][i][3].im
 		);
 	}
 
@@ -446,14 +436,14 @@ void contract_baryons(spinor_field* psi0, int tau)
 				t,
 				mu,
 				nu,
-				corr_delta_re[mu][nu][i][0][t],
-				corr_delta_im[mu][nu][i][0][t],
-				corr_delta_re[mu][nu][i][1][t],
-				corr_delta_im[mu][nu][i][1][t],
-				corr_delta_re[mu][nu][i][2][t],
-				corr_delta_im[mu][nu][i][2][t],
-				corr_delta_re[mu][nu][i][3][t],
-				corr_delta_im[mu][nu][i][3][t]
+				corr_delta[t][mu][nu][i][0].re,
+				corr_delta[t][mu][nu][i][0].im,
+				corr_delta[t][mu][nu][i][1].re,
+				corr_delta[t][mu][nu][i][1].im,
+				corr_delta[t][mu][nu][i][2].re,
+				corr_delta[t][mu][nu][i][2].im,
+				corr_delta[t][mu][nu][i][3].re,
+				corr_delta[t][mu][nu][i][3].im
 		);
 	}
 
