@@ -518,7 +518,7 @@ void read_ranlxd_state(char filename[])
     /* give a warning if hproc != nproc */
     hproc=d[0];
     if (hproc!=nproc) {
-      lprintf("IO",50,"WARNING: the number of ranlxd states read [%d] doesn't match the number of processes [%nproc].\n",hproc,nproc);
+      lprintf("IO",10,"WARNING: the number of ranlxd states read [%d] doesn't match the number of processes [%d].\n",hproc,nproc);
     }
     /* check if ranlxd size is the same as in the header */
     if (rsize!=d[1]) {
