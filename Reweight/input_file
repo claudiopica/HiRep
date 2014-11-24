@@ -1,0 +1,34 @@
+// Global variables
+GLB_T = 16
+GLB_X = 8
+GLB_Y = 8
+GLB_Z = 8
+
+NP_T = 1
+NP_X = 1
+NP_Y = 1
+NP_Z = 1
+
+// Ranlux variables
+level = 1
+seed = 12345
+
+// Reweight variables
+hits = 1000
+steps = 2
+precision = 1.0e-16
+
+// Mass variables
+old_mass = -1.2250
+new_mass = -1.2251
+
+// Twisting variables
+old_theta_t = 0.0
+old_theta_x = 0.0
+old_theta_y = 0.0
+old_theta_z = 0.0
+
+new_theta_t = 0.0
+new_theta_x = 0.1
+new_theta_y = 0.1
+new_theta_z = 0.1
