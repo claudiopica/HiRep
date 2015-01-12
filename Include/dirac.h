@@ -34,6 +34,13 @@ void Dphi_oepre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
 void g5Dphi_eopre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
 void g5Dphi_eopre_sq_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
 
+/* Dirac operators used in the Update */
+
+void set_dirac_mass(double mass); //this is the mass used in the following operators
+void H(spinor_field *out, spinor_field *in);
+void H_flt(spinor_field_flt *out, spinor_field_flt *in);
+void D(spinor_field *out, spinor_field *in);
+void D_flt(spinor_field_flt *out, spinor_field_flt *in);
 
 #endif
 	

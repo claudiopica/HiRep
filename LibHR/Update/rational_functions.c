@@ -19,7 +19,7 @@
 
 /* Functions for manipulation of rational_app structures */
 
-/* r_app_init: 
+/* r_app_alloc:
  * read the specified app->order and allocate enough
  * space for the coefficients
  */
@@ -39,7 +39,7 @@ void r_app_free(rational_app *app) {
   app->b=0;
 }
 
-/* r_app_resize:
+/* r_app_realloc:
  * read the new app->order and make enough space for 
  * the coefficients
  */
@@ -54,7 +54,7 @@ void r_app_realloc(rational_app *app){
 
 /* converts the coef from the root/poles form to the partial fraction exp
  * before : r(x)=a[0]*(x-a[1])/(x-b[0])*...*(x-a[n+1])/(x-b[n])
- * after  : r(x)=a[0]+a[1]/(x-b[0])+a[2]/(x-b[1])+...+a[n+1)/(x-b[n])
+ * after  : r(x)=a[0]+a[1]/(x-b[0])+a[2]/(x-b[1])+...+a[n+1]/(x-b[n])
  */
 static void r_app_rp2pfe(rational_app *app) {
   unsigned int i,j;
@@ -169,10 +169,10 @@ void r_app_set(rational_app *app, double min, double max) {
     bmin=cur_app[4];
     bmax=cur_app[5];
     if (bn==abs(app->n) &&
-	bd==abs(app->d) &&
-	berr<(app->rel_error) &&
-	(bmin/bmax)<req_e
-	){
+        bd==abs(app->d) &&
+        berr<(app->rel_error) &&
+        (bmin/bmax)<req_e
+        ){
       /* we have found a candidate approximation */
       /* the selection rules are:
        * 1) the approximation function must match ;
@@ -180,11 +180,11 @@ void r_app_set(rational_app *app, double min, double max) {
        * 3) the approx interval must contain the required one.
        */
       if (best==0 || ((int)best[2])>bo) {
-	/* this is a better approx: either the first approx found or
-	 * one with greater error (i.e. smaller order) but still 
-	 * the required precision
-	 */
-	best=cur_app;
+        /* this is a better approx: either the first approx found or
+         * one with greater error (i.e. smaller order) but still
+         * the required precision
+         */
+        best=cur_app;
       }
     }
     /* go to next approx */
@@ -212,6 +212,8 @@ void r_app_set(rational_app *app, double min, double max) {
   }
   /* rescale to requested interval */
   r_app_rescale(app,max/bmax);
+  app->min=min;
+  app->max=max;
 	
   /* change to pfe representation */
   if((app->n*app->d)<0) { /* check sign for inverse function */

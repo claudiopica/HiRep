@@ -18,7 +18,7 @@
 
 static spinor_field *ev;
 
-void find_spec_H2(double *max, double *min, double mass) {
+void find_spec_H2(double *max, double *min) {
   /* EVA parameters */
   const int nevt=5; /* use 5-dim space */
   const int nev=1; /* require only the smallest to be accurate */

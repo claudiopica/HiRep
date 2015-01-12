@@ -261,7 +261,7 @@ int main(int argc,char *argv[]) {
     }
 #endif
     
-    rr=update_hmc();
+    rr=update_ghmc();
     
     gettimeofday(&end,0);
     timeval_subtract(&etime,&end,&start);

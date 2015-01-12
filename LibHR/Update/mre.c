@@ -6,6 +6,7 @@
 * arXiv: hep-lat/9509012                                                   *
 ***************************************************************************/
 
+#include "update.h"
 #include "linear_algebra.h"
 #include "memory.h"
 #include "global.h"
@@ -13,18 +14,13 @@
 #include "logger.h"
 #include <math.h>
 
-#define cabs(a) \
-	sqrt(a.re*a.re + a.im*a.im)
+#define cabs(a) sqrt(a.re*a.re + a.im*a.im)
+#define MAX 15
 
-#define MAX  15
-#define REPS 2
-
-static spinor_field *s[REPS][MAX];
+// Global variables
 static spinor_field *v[MAX];
 static spinor_field *Dv;
-static int initialized = 0;
-static int num[REPS];
-static int mre_past;
+static int num_init = 0;
 
 // Variables used in in the LU solver
 static complex A[MAX][MAX];
@@ -40,14 +36,14 @@ static int mutate[MAX];
 #define TYPE &glattice
 #endif
 
-void gram_schmidt(int p, int max)
+void gram_schmidt(mre_par *par, int p, int max)
 {
 	complex rij;
 	double rii;
 
 	for(int i = 0; i < max; i++)
 	{
-		spinor_field_copy_f(v[i], s[p][i]);
+		spinor_field_copy_f(v[i], &par->s[p][i]);
 	}
 
 	for(int i = 0; i < max; i++)
@@ -106,7 +102,7 @@ void lu_solve(int max)
 			}
 		}
 
-		if(big < 1.0e-16)
+		if(big < 1.0e-14)
 		{
 			lprintf("MRE", 10, "LU decomposition failed: matrix is singular\n");
 			return;
@@ -171,85 +167,90 @@ int coefficient(int k, int n)
 	return c;
 }
 
-void mre_init(int max, double prec)
+void mre_init(mre_par *par, int max, double prec)
 {
-	mre_past = (max < MAX) ? max : MAX;
-
 	if(max == 0)
 	{
+		par->max = 0;
+		par->init = 0;
 		return;
 	}
-
-	for(int i = 0; i < max; i++)
+	else
 	{
-		for(int j = 0; j < REPS; j++)
-		{
-			s[j][i] = alloc_spinor_field_f(1, TYPE);
-			spinor_field_zero_f(s[j][i]);
-			num[j] = 0;
-		}
-
-		v[i] = alloc_spinor_field_f(1, TYPE);
-		spinor_field_zero_f(v[i]);
+		par->max = (max < MAX) ? max : MAX;
+		par->init = 1;
 	}
 
-	Dv = alloc_spinor_field_f(1, TYPE);
-	initialized = 1;
+	par->s[0] = alloc_spinor_field_f(par->max, TYPE);
+	par->s[1] = alloc_spinor_field_f(par->max, TYPE);
+	par->num[0] = 0;
+	par->num[1] = 0;
+
+	if(num_init == 0)
+	{
+		Dv = alloc_spinor_field_f(1, TYPE);
+	}
+
+	for(int i = num_init; i < par->max; i++)
+	{
+		v[i] = alloc_spinor_field_f(1, TYPE);
+		num_init++;
+	}
 
 	if(prec > 1e-14)
 	{
-		lprintf("MRE", 10,  "WARNING: Inverter precision should be at least 1e-14 to ensure reversibility!");
+		lprintf("MRE", 10,  "WARNING: Inverter precision should be at least 1e-14 to ensure reversibility!\n");
 	}
 
-	lprintf("MRE", 10, "Using chronological inverter with %d past solutions\n", mre_past);
+	lprintf("MRE", 10, "Enabled chronological inverter with %d past solutions\n", par->max);
 }
 
-void mre_store(int p, spinor_field *in)
+void mre_store(mre_par *par, int p, spinor_field *in)
 {
 	spinor_field *tmp;
 
-	if(initialized == 0 || mre_past == 0)
+	if(num_init == 0 || par->init == 0 || par->max <= 0)
 	{
 		return;
 	}
 
-	if(p >= REPS)
+	if(p > 1)
 	{
 		lprintf("MRE", 10, "Cannot store solution: p = %d is not valid\n", p);
 		return;
 	}
 
 	// Shift all vectors by one and store the new vector at position zero
-	tmp = s[p][mre_past - 1];
+	tmp = &par->s[p][par->max - 1];
 
-	for(int i = (mre_past - 1); i > 0; i--)
+	for(int i = (par->max - 1); i > 0; i--)
 	{
-		s[p][i] = s[p][i-1];
+		par->s[p][i] = par->s[p][i-1];
 	}
 
-	s[p][0] = tmp;
-	spinor_field_copy_f(s[p][0], in);
-	num[p]++;
+	par->s[p][0] = *tmp;
+	spinor_field_copy_f(&par->s[p][0], in);
+	par->num[p]++;
 }
 
-void mre_guess(int p, spinor_field *out, spinor_operator D, spinor_field *pf)
+void mre_guess(mre_par *par, int p, spinor_field *out, spinor_operator D, spinor_field *pf)
 {
 	int max;
 
-	if(initialized == 0 || mre_past == 0)
+	if(num_init == 0 || par->init == 0 || par->max <= 0)
 	{
 		return;
 	}
 
-	if(p >= REPS)
+	if(p > 1)
 	{
 		lprintf("MRE", 10, "Cannot guess solution: p = %d is not valid\n", p);
 		return;
 	}
 
 	spinor_field_zero_f(out);
-	max = (num[p] > mre_past) ? mre_past : num[p];
-	gram_schmidt(p, max);
+	max = (par->num[p] > par->max) ? par->max : par->num[p];
+	gram_schmidt(par, p, max);
 
 	for(int i = 0; i < max; i++)
 	{

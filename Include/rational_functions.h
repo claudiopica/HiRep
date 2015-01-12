@@ -10,11 +10,14 @@
 #include "suN.h"
 
 typedef struct _rational_app {
-	int n,d; /* approximated function = x^(n/d) */
+  /* approximate function = x^(n/d) */
+  /* in the range [min,max] with relative precision rel_error */
+	int n,d;
   unsigned int order;
   double rel_error;
   double *a;
   double *b;
+  double min, max; /* eigenvalues */
 	unsigned int _asize; /* allocated space for arrays */
 } rational_app;
 

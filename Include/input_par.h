@@ -66,8 +66,8 @@ typedef struct _input_rlx {
 #define init_input_rlx(varname) \
 { \
 .read={\
-{"ranlux level", "level = %d", INT_T, &(varname).rlxd_level},\
-{"ranlux seed", "seed = %d", INT_T, &(varname).rlxd_seed},\
+{"ranlux level", "rlx_level = %d", INT_T, &(varname).rlxd_level},\
+{"ranlux seed", "rlx_seed = %d", INT_T, &(varname).rlxd_seed},\
 {"ranlux state", "rlx_state = %s", STRING_T, &(varname).rlxd_state},\
 {"ranlux start", "rlx_start = %s", STRING_T, &(varname).rlxd_start},\
 {NULL, NULL, INT_T, NULL}				    \

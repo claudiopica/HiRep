@@ -5,7 +5,7 @@ SRCS = $(wildcard *.c)
 LIBNAME = ../libhr.a
 
 #Exclude this source files
-EXCLUDE = leapfrog.c
+EXCLUDE = leapfrog.c update_hmc.c update_rhmc.c update_puregauge.c
 
 include $(MKDIR)/MkRules
 

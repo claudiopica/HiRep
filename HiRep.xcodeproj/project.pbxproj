@@ -25,6 +25,10 @@
 		0695482C19B38F3C0087839F /* hmc_utils.c in Sources */ = {isa = PBXBuildFile; fileRef = 0695482819B38F3B0087839F /* hmc_utils.c */; };
 		0695482D19B38F3C0087839F /* hmc.c in Sources */ = {isa = PBXBuildFile; fileRef = 0695482A19B38F3B0087839F /* hmc.c */; };
 		0695486619B395770087839F /* gaugefix.c in Sources */ = {isa = PBXBuildFile; fileRef = 0695484219B3915A0087839F /* gaugefix.c */; };
+		06CB9D1B1A24D807003CC511 /* read_action.c in Sources */ = {isa = PBXBuildFile; fileRef = 06CB9D1A1A24D807003CC511 /* read_action.c */; };
+		06D827F019C32530008EE4B2 /* update_mt.c in Sources */ = {isa = PBXBuildFile; fileRef = 06D827EF19C32530008EE4B2 /* update_mt.c */; };
+		06D827F219C9837A008EE4B2 /* D_update.c in Sources */ = {isa = PBXBuildFile; fileRef = 06D827F119C9837A008EE4B2 /* D_update.c */; };
+		06D827F419C98F7D008EE4B2 /* monomials.c in Sources */ = {isa = PBXBuildFile; fileRef = 06D827F319C98F7D008EE4B2 /* monomials.c */; };
 		06DC4D821940FF4200665D80 /* error.c in Sources */ = {isa = PBXBuildFile; fileRef = 06DC4CC41940FF4200665D80 /* error.c */; };
 		06DC4D841940FF4200665D80 /* blocked.c in Sources */ = {isa = PBXBuildFile; fileRef = 06DC4CC71940FF4200665D80 /* blocked.c */; };
 		06DC4D851940FF4200665D80 /* communications.c in Sources */ = {isa = PBXBuildFile; fileRef = 06DC4CC81940FF4200665D80 /* communications.c */; };
@@ -102,9 +106,6 @@
 		06DC4DE21940FF4200665D80 /* representation.c in Sources */ = {isa = PBXBuildFile; fileRef = 06DC4D4C1940FF4200665D80 /* representation.c */; };
 		06DC4DE31940FF4200665D80 /* staples.c in Sources */ = {isa = PBXBuildFile; fileRef = 06DC4D4D1940FF4200665D80 /* staples.c */; };
 		06DC4DE41940FF4200665D80 /* update_hb.c in Sources */ = {isa = PBXBuildFile; fileRef = 06DC4D4E1940FF4200665D80 /* update_hb.c */; };
-		06DC4DE51940FF4200665D80 /* update_hmc.c in Sources */ = {isa = PBXBuildFile; fileRef = 06DC4D4F1940FF4200665D80 /* update_hmc.c */; };
-		06DC4DE61940FF4200665D80 /* update_puregauge.c in Sources */ = {isa = PBXBuildFile; fileRef = 06DC4D501940FF4200665D80 /* update_puregauge.c */; };
-		06DC4DE71940FF4200665D80 /* update_rhmc.c in Sources */ = {isa = PBXBuildFile; fileRef = 06DC4D511940FF4200665D80 /* update_rhmc.c */; };
 		06DC4DE81940FF4200665D80 /* boundary_conditions.c in Sources */ = {isa = PBXBuildFile; fileRef = 06DC4D531940FF4200665D80 /* boundary_conditions.c */; };
 		06DC4DE91940FF4200665D80 /* det_suNg.c in Sources */ = {isa = PBXBuildFile; fileRef = 06DC4D541940FF4200665D80 /* det_suNg.c */; };
 		06DC4DEA1940FF4200665D80 /* diag_hmat.c in Sources */ = {isa = PBXBuildFile; fileRef = 06DC4D551940FF4200665D80 /* diag_hmat.c */; };
@@ -326,6 +327,10 @@
 		0695484319B3915A0087839F /* gaugefix_measure.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = gaugefix_measure.c; sourceTree = "<group>"; };
 		0695484419B3915A0087839F /* gaugefix_unittest.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = gaugefix_unittest.c; sourceTree = "<group>"; };
 		0695484519B3915A0087839F /* input_file */ = {isa = PBXFileReference; lastKnownFileType = text; path = input_file; sourceTree = "<group>"; };
+		06CB9D1A1A24D807003CC511 /* read_action.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = read_action.c; sourceTree = "<group>"; };
+		06D827EF19C32530008EE4B2 /* update_mt.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = update_mt.c; sourceTree = "<group>"; };
+		06D827F119C9837A008EE4B2 /* D_update.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = D_update.c; sourceTree = "<group>"; };
+		06D827F319C98F7D008EE4B2 /* monomials.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = monomials.c; sourceTree = "<group>"; };
 		06DC4C911940FB3200665D80 /* libhr.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libhr.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		06DC4C9C1940FF4200665D80 /* check_options.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = check_options.h; sourceTree = "<group>"; };
 		06DC4C9D1940FF4200665D80 /* communications.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = communications.h; sourceTree = "<group>"; };
@@ -492,9 +497,6 @@
 		06DC4D4C1940FF4200665D80 /* representation.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = representation.c; sourceTree = "<group>"; };
 		06DC4D4D1940FF4200665D80 /* staples.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = staples.c; sourceTree = "<group>"; };
 		06DC4D4E1940FF4200665D80 /* update_hb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = update_hb.c; sourceTree = "<group>"; };
-		06DC4D4F1940FF4200665D80 /* update_hmc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = update_hmc.c; sourceTree = "<group>"; };
-		06DC4D501940FF4200665D80 /* update_puregauge.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = update_puregauge.c; sourceTree = "<group>"; };
-		06DC4D511940FF4200665D80 /* update_rhmc.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = update_rhmc.c; sourceTree = "<group>"; };
 		06DC4D531940FF4200665D80 /* boundary_conditions.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = boundary_conditions.c; sourceTree = "<group>"; };
 		06DC4D541940FF4200665D80 /* det_suNg.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = det_suNg.c; sourceTree = "<group>"; };
 		06DC4D551940FF4200665D80 /* diag_hmat.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = diag_hmat.c; sourceTree = "<group>"; };
@@ -812,6 +814,7 @@
 				06DC4CEC1940FF4200665D80 /* logger.c */,
 				06DC4CED1940FF4200665D80 /* Makefile */,
 				06DC4CEE1940FF4200665D80 /* read_input.c */,
+				06CB9D1A1A24D807003CC511 /* read_action.c */,
 			);
 			path = IO;
 			sourceTree = "<group>";
@@ -882,6 +885,7 @@
 		06DC4D171940FF4200665D80 /* Update */ = {
 			isa = PBXGroup;
 			children = (
+				06D827F319C98F7D008EE4B2 /* monomials.c */,
 				0695481019B378B60087839F /* mre.c */,
 				06DC4D181940FF4200665D80 /* cabmar.c */,
 				06DC4D191940FF4200665D80 /* copy_gfield.c */,
@@ -902,10 +906,9 @@
 				06DC4D281940FF4200665D80 /* remez */,
 				06DC4D4C1940FF4200665D80 /* representation.c */,
 				06DC4D4D1940FF4200665D80 /* staples.c */,
+				06D827EF19C32530008EE4B2 /* update_mt.c */,
+				06D827F119C9837A008EE4B2 /* D_update.c */,
 				06DC4D4E1940FF4200665D80 /* update_hb.c */,
-				06DC4D4F1940FF4200665D80 /* update_hmc.c */,
-				06DC4D501940FF4200665D80 /* update_puregauge.c */,
-				06DC4D511940FF4200665D80 /* update_rhmc.c */,
 			);
 			path = Update;
 			sourceTree = "<group>";
@@ -1344,7 +1347,6 @@
 				06DC4DA71940FF4200665D80 /* read_input.c in Sources */,
 				06DC4DE21940FF4200665D80 /* representation.c in Sources */,
 				06DC4DBF1940FF4200665D80 /* wilsonloops.c in Sources */,
-				06DC4DE61940FF4200665D80 /* update_puregauge.c in Sources */,
 				06DC4DAE1940FF4200665D80 /* calc_prop.c in Sources */,
 				06DC4DA21940FF4200665D80 /* archive_spinors_sint.c in Sources */,
 				06DC4DDA1940FF4200665D80 /* random_su2.c in Sources */,
@@ -1361,17 +1363,19 @@
 				06DC4DF11940FF4200665D80 /* time.c in Sources */,
 				06DC4DD81940FF4200665D80 /* random_momenta.c in Sources */,
 				06DC4D9E1940FF4200665D80 /* SAP_precondition.c in Sources */,
+				06D827F019C32530008EE4B2 /* update_mt.c in Sources */,
 				06DC4DC71940FF4200665D80 /* ranlxd.c in Sources */,
 				06DC4DE91940FF4200665D80 /* det_suNg.c in Sources */,
 				06DC4D9D1940FF4200665D80 /* MINRES_mshift.c in Sources */,
 				06DC4DA41940FF4200665D80 /* endian.c in Sources */,
 				06DC4DA51940FF4200665D80 /* logger.c in Sources */,
+				06D827F419C98F7D008EE4B2 /* monomials.c in Sources */,
 				06DC4DBB1940FF4200665D80 /* sf_action.c in Sources */,
 				06DC4DCE1940FF4200665D80 /* Dphi.c in Sources */,
+				06D827F219C9837A008EE4B2 /* D_update.c in Sources */,
 				06DC4D871940FF4200665D80 /* eo_lexi.c in Sources */,
 				06DC4D8A1940FF4200665D80 /* geometry_SAP.c in Sources */,
 				06DC4DD51940FF4200665D80 /* local_action.c in Sources */,
-				06DC4DE51940FF4200665D80 /* update_hmc.c in Sources */,
 				06DC4DD21940FF4200665D80 /* force_hmc.c in Sources */,
 				06DC4DF01940FF4200665D80 /* suN_utils.c in Sources */,
 				06DC4DA91940FF4200665D80 /* amalloc.c in Sources */,
@@ -1386,8 +1390,8 @@
 				0695481119B378B60087839F /* mre.c in Sources */,
 				06DC4D9F1940FF4200665D80 /* archive.c in Sources */,
 				06DC4DCC1940FF4200665D80 /* cabmar.c in Sources */,
+				06CB9D1B1A24D807003CC511 /* read_action.c in Sources */,
 				06DC4DA11940FF4200665D80 /* archive_spinors.c in Sources */,
-				06DC4DE71940FF4200665D80 /* update_rhmc.c in Sources */,
 				06DC4D961940FF4200665D80 /* g5QMR_mshift.c in Sources */,
 				06DC4D851940FF4200665D80 /* communications.c in Sources */,
 				06DC4DEA1940FF4200665D80 /* diag_hmat.c in Sources */,

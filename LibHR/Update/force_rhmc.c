@@ -180,6 +180,7 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar){
     gettimeofday(&start1,0);
     #endif
 
+    set_dirac_mass(par->mass);
     cg_mshift(&inv_par, &H2, &pf[k], chi);
     
     #ifdef TIMING

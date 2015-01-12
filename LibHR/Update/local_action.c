@@ -16,19 +16,15 @@
  * compute the local action at every site for the HMC
  * H = | momenta |^2 + S_g + < phi1, phi2>
  */
-void local_hmc_action(local_action_type type,
-                      action_par *par,
+void local_hmc_action(local_action_type_old type,
                       scalar_field *loc_action,
-                      suNg_av_field *momenta,
-                      spinor_field *phi1,
-                      spinor_field *phi2) {
+                      suNg_av_field *momenta
+                      ) {
 
   
   /* check input types */
   _TWO_SPINORS_MATCHING(u_gauge,loc_action); /* check that action is defined on the global lattice */
   _TWO_SPINORS_MATCHING(loc_action,momenta);
-  _TWO_SPINORS_MATCHING(loc_action,phi1);
-  _TWO_SPINORS_MATCHING(loc_action,phi2);
 
 
   switch(type) {
@@ -56,23 +52,41 @@ void local_hmc_action(local_action_type type,
     }
     a*=0.5*_FUND_NORM2;
     *_FIELD_AT(loc_action,i)+=a;
-//  }
-//  _MASTER_FOR(&glattice,i) {
-    /* Gauge action */
-    *_FIELD_AT(loc_action,i) += -(par->beta/((double)NG))*local_plaq(i);
   }
 
-  /* pseudofermion fields can be defined only on even sites if EO preconditioning is used */
-  if(par->n_pf > 0) {
-    _MASTER_FOR(phi1->type,i) {
-      double a=0., tmp;
-    /* Fermions */
-      for (int j=0;j<par->n_pf;++j) {
-        _spinor_prod_re_f(tmp,*_FIELD_AT(&phi1[j],i),*_FIELD_AT(&phi2[j],i));
-        a += tmp;
+  int nmon=num_mon();
+  for (int i=0;i<nmon;++i) {
+    const monomial *m=mon_n(i);
+    if ( m->type == PureGauge ) {
+        double beta=((mon_pg_par*)m->par)->beta;
+        _MASTER_FOR(&glattice,i) {
+          /* Gauge action */
+          *_FIELD_AT(loc_action,i) += -(beta/((double)NG))*local_plaq(i);
+        }
+    } else {
+      spinor_field *phi=NULL;
+      switch (m->type) {
+        case HMC:
+          phi=((mon_hmc_par*)m->par)->pf;
+          break;
+        case RHMC:
+          phi=((mon_rhmc_par*)m->par)->pf;
+          break;
+        case Hasenbusch:
+          phi=((mon_hasenbusch_par*)m->par)->pf;
+          break;
+        default:
+          lprintf("MONOMIAL",0,"WARNING: unknown type!\n");
+          break;
       }
-  
-      *_FIELD_AT(loc_action,i)+=a;
+      /* pseudo fermion action = phi^2 */
+      _MASTER_FOR(phi->type,i) {
+        double a=0.;
+        /* Fermions */
+        _spinor_prod_re_f(a,*_FIELD_AT(phi,i),*_FIELD_AT(phi,i));
+        *_FIELD_AT(loc_action,i)+=a;
+      }
+
     }
   }
 }

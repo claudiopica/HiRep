@@ -19,6 +19,18 @@ void project_gauge_field(void);
 void update(double beta,int nhb,int nor);
 void random_su2(double rho,double s[]);
 
+/* functions and structures for the MRE algorithm */
+typedef struct {
+	spinor_field *s[2];
+	int num[2];
+	int max;
+	int init;
+} mre_par;
+
+void mre_guess(mre_par*, int, spinor_field*, spinor_operator, spinor_field*);
+void mre_store(mre_par*, int, spinor_field*);
+void mre_init(mre_par*, int, double);
+
 /* forces for the update */
 void force0(double dt, suNg_av_field *force, void *par);
 
@@ -29,6 +41,7 @@ typedef struct {
   rational_app *ratio;
   double inv_err2;
 } force_rhmc_par;
+
 void init_force_rhmc();
 void free_force_rhmc();
 void force_rhmc(double dt, suNg_av_field *force, void *par);
@@ -41,26 +54,12 @@ typedef struct {
   double mass;
   double b;
   double inv_err2, inv_err2_flt;
+  mre_par mpar;
 } force_hmc_par;
+
 void init_force_hmc();
 void free_force_hmc();
 void force_hmc(double dt, suNg_av_field *force, void *par);
-
-
-
-typedef struct _integrator_par {
-  int nsteps;
-  void (*force)(double,suNg_av_field*,void*);
-  void *force_par;
-  void (*integrator)(suNg_av_field*, double, struct _integrator_par*);
-  struct _integrator_par *next;
-  int level;
-} integrator_par;
-void gauge_integrator(suNg_av_field *momenta, double tlen, integrator_par *int_par);
-void leapfrog_multistep(suNg_av_field *momenta, double tlen, integrator_par *int_par);
-void O2MN_multistep(suNg_av_field *momenta, double tlen, integrator_par *int_par);
-void O4MN_multistep(suNg_av_field *momenta, double tlen, integrator_par *int_par);
-
 
 
 void gaussian_momenta(suNg_av_field *momenta);
@@ -79,6 +78,7 @@ typedef struct _puregauge_par {
   double tlen; /* trajectory lenght */
   unsigned int gsteps; /* number of substeps for the gauge part every step */
 } puregauge_par;
+
 void init_puregauge(puregauge_par *par);
 void free_puregauge();
 
@@ -108,6 +108,7 @@ typedef struct _rhmc_par {
   unsigned int nsteps; /* number of step in the integration */
   unsigned int gsteps; /* number of substeps for the gauge part every step */
 } rhmc_par;
+
 void init_rhmc(rhmc_par *par);
 void free_rhmc();
 
@@ -143,7 +144,6 @@ typedef struct _hmc_par {
   int hasenbusch; /* 0=no hasenbusch ; 1=hasenbusch */
   int n_hasen; /* Number of Hasenbusch levels*/
   double* hasen_dm; /* List of differences of heavier mass of the Hasenbush acceleration */
-  int mre_past;
 } hmc_par;
 
 void init_hmc(hmc_par *par);
@@ -171,41 +171,132 @@ void H2(spinor_field *out, spinor_field *in);
 void H(spinor_field *out, spinor_field *in);
 void H_flt(spinor_field_flt *out, spinor_field_flt *in);
 
+/* Action structures */
+typedef enum {
+  PureGauge,
+  HMC,
+  RHMC,
+  Hasenbusch
+} mon_type;
+
+typedef struct _mon_pg_par {
+  double beta;
+} mon_pg_par;
+
+typedef struct _mon_hmc_par {
+  double mass;
+  int mre_past;
+  force_hmc_par fpar;
+  spinor_field *pf; /* pseudofermion field */
+} mon_hmc_par;
+
+typedef struct _mon_rhmc_par {
+  double mass;
+  rational_app ratio;
+  force_rhmc_par fpar;
+  spinor_field *pf; /* pseudofermion field */
+} mon_rhmc_par;
+
+typedef struct _mon_hasenbusch_par {
+  double mass;
+  double dm;
+  int mre_past;
+  force_hmc_par fpar;
+  spinor_field *pf; /* pseudofermion field */
+} mon_hasenbusch_par;
+
+typedef struct _monomial {
+  int id; /* monomial id */
+  mon_type type; /* type of monomial */
+  void *par; /* parameters */
+  double MT_prec; /* metropolis precision */
+  double MD_prec; /* molecular dynamics precision */
+  double force_prec; /* force precision */
+} monomial;
+
+const monomial *add_mon(monomial *mon);
+int num_mon();
+const monomial *mon_n(int i);
+
+
+typedef struct _integrator_par {
+  int nsteps;
+  int nmon;
+  const monomial **mon_list;
+  void (*integrator)(suNg_av_field*, double, struct _integrator_par*);
+  struct _integrator_par *next;
+  int level;
+} integrator_par;
+
+void gauge_integrator(suNg_av_field *momenta, double tlen, integrator_par *int_par);
+void leapfrog_multistep(suNg_av_field *momenta, double tlen, integrator_par *int_par);
+void O2MN_multistep(suNg_av_field *momenta, double tlen, integrator_par *int_par);
+void O4MN_multistep(suNg_av_field *momenta, double tlen, integrator_par *int_par);
+
+
+typedef struct _ghmc_par {
+	/* action parameter */
+ // mon_list *action;
+  
+  /* integrator */
+  integrator_par *integrator;
+  double tlen;
+
+  /* Fermion Theta angles */
+  double theta[4];
+  
+  /* SF stuff */
+  double SF_zf;
+  double SF_ds;
+  int SF_sign;
+  double SF_ct;
+  
+  /* other parameters */
+  int mre_past; /* chronological guesser */
+
+  /* dummy variables */
+  /* NEED TO DELETE */
+  double beta;
+  int nf;
+  double mass;
+
+  
+} ghmc_par;
+
+void init_ghmc(ghmc_par *par);
+void free_ghmc();
+int update_ghmc();
+
+
 
 /* local action */
 typedef enum {
    NEW=1,
    DELTA=2
-} local_action_type;
+} local_action_type_old;
 
 /*
  * compute the local action at every site for the HMC
  * H = | momenta |^2 + S_g + < phi1, phi2>
  */
-typedef struct _action_par {
+typedef struct _action_par_old {
   /* sim parameters */
   double beta;
   int n_pf;
 #ifdef ROTATED_SF
   double SF_ct;
 #endif
-} action_par;
-void local_hmc_action(local_action_type type,
-                      action_par *par,
+} action_par_old;
+
+
+void local_hmc_action(local_action_type_old type,
                       scalar_field *loc_action,
-                      suNg_av_field *momenta,
-                      spinor_field *phi1,
-                      spinor_field *phi2);
+                      suNg_av_field *momenta);
 
 void suNg_field_copy(suNg_field *g1, suNg_field *g2);
 void suNf_field_copy(suNf_field *g1, suNf_field *g2);
 
 /* find spectral interval using eva */
-void find_spec_H2(double *max, double *min, double mass);
-
-/* functions for the MRE algorithm */
-void mre_guess(int, spinor_field*, spinor_operator, spinor_field*);
-void mre_store(int, spinor_field*);
-void mre_init(int, double);
+void find_spec_H2(double *max, double *min);
 
 #endif

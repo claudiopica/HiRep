@@ -9,6 +9,7 @@
 #include "spinor_field.h"
 #include <stdio.h>
 #include "suN.h"
+#include "update.h"
 
 int fwrite_BE_int(int* ptr, size_t n, FILE* fp);
 int fwrite_LE_int(int* ptr, size_t n, FILE* fp);
@@ -36,6 +37,7 @@ void write_ranlxd_state(char filename[]);
 void read_ranlxd_state(char filename[]);
 
 void read_input(input_record_t irec[], char *filename);
+void read_action(char *filename, integrator_par **ipp);
 
 void read_spinor_field_ascii(char filename[],spinor_field * sf);
 

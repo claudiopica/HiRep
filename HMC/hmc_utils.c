@@ -16,27 +16,13 @@
 
 #include <stdio.h>
 #include <string.h>
-
+#include <ctype.h>
 
 input_hmc hmc_var = init_input_hmc(hmc_var);
 
-/* short 3-letter name to use in gconf name */
-#ifdef REPR_FUNDAMENTAL
-#define repr_name "FUN"
-#elif defined REPR_SYMMETRIC
-#define repr_name "SYM"
-#elif defined REPR_ANTISYMMETRIC
-#define repr_name "ASY"
-#elif defined REPR_ADJOINT
-#define repr_name "ADJ"
-#endif
-
 /* build configuration name */
 static void mk_gconf_name(char *name, hmc_flow *rf, int id) {
-  sprintf(name,"%s_%dx%dx%dx%dnc%dr%snf%db%.6fm%.6fn%d",
-           rf->run_name,GLB_T,GLB_X,GLB_Y,GLB_Z,NG,repr_name,
-           rf->hmc_v->hmc_p.nf,rf->hmc_v->hmc_p.beta,-rf->hmc_v->hmc_p.mass,
-           id);
+  sprintf(name,"%sn%d",rf->run_name,id);
 }
 
 /* add dirname to filename and return it */
@@ -45,8 +31,6 @@ static char *add_dirname(char *dirname, char *filename) {
   strcpy(buf,dirname);
   return strcat(buf,filename);
 }
-
-#include <ctype.h>
 
 /* convert string to lowercase */
 static void slower(char *str) {
@@ -64,66 +48,48 @@ static void slower(char *str) {
  * 1 => use unit gauge config
  * 2 => use a random config
  */
-static int parse_gstart(hmc_flow *rf) {
+static int parse_gstart(hmc_flow *rf)
+{
+	int ret = 0;
+	int len = 0;
+	char buf[256];
+	char *ptr;
 
-  int t, x, y, z, ng, nf;
-  double beta, mass;
-  int ret=0;
-  char buf[256];
+	ptr = strrchr(rf->g_start, 'n');
+	ret = (int)(ptr - rf->g_start);
+	len = strlen(rf->run_name);
+	if(ptr && ret == len && strncmp(rf->g_start, rf->run_name, len) == 0)
+	{
+		rf->start = atoi(ptr+1) + 1;
+		return 0;
+	}
 
-  ret=sscanf(rf->g_start,"%[^_]_%dx%dx%dx%dnc%dr" repr_name "nf%db%lfm%lfn%d",
-      buf,&t,&x,&y,&z,&ng,&nf,&beta,&mass,&rf->start);
+	rf->start = 1; /* reset rf->start */
 
-  if(ret==10) { /* we have a correct file name */
-    /* increase rf->start: this will be the first conf id */
-    rf->start++;
+	/* try other matches */
+	strcpy(buf, rf->g_start);
+	slower(buf);
 
-    /* do some check */
-    if(t!=GLB_T || x!=GLB_X || y!=GLB_Y || z!=GLB_Z) {
-      lprintf("WARNING", 0, "Size read from config name (%d,%d,%d,%d) is different from the lattice size!\n",t,x,y,z);
-    }
-    if(ng!=NG) {
-      lprintf("WARNING", 0, "Gauge group read from config name (NG=%d) is not the one used in this code!\n",ng);
-    }
-    /* dare un warning ?
-       if(nf!=) {
-       lprintf("TESTCP",0,"Invalid gauge group in file name!\n");
-       error(1,1,"parse_gstart " __FILE__,"invalid gauge group");
-       }
-       */
-    if(strcmp(buf,rf->run_name)!=0) {
-      lprintf("WARNING", 0, "Run name [%s] doesn't match conf name [%s]!\n",rf->run_name,buf);
-    }
+	ret = strcmp(buf, "unit");
+	if (ret == 0) {
+		lprintf("FLOW",0,"Starting a new run from a unit conf!\n");
+		return 1;
+	}
 
-    lprintf("FLOW",0,"Starting from conf [%s]\n",rf->g_start);
+	ret = strcmp(buf, "random");
+	if (ret == 0) {
+		lprintf("FLOW",0,"Starting a new run from a random conf!\n");
+		return 2;
+	}
 
-    return 0;
-  }
+	lprintf("ERROR",0,"Invalid starting gauge conf specified [%s]\n",rf->g_start);
+	error(1,1,"parse_gstart " __FILE__,"invalid config name");
 
-  rf->start=1; /* reset rf->start */
-
-  /* try other matches */
-  strcpy(buf,rf->g_start);
-  slower(buf);
-  ret=strcmp(buf,"unit");
-  if (ret==0) {
-    lprintf("FLOW",0,"Starting a new run from a unit conf!\n");
-    return 1;
-  }
-  ret=strcmp(buf,"random");
-  if (ret==0) {
-    lprintf("FLOW",0,"Starting a new run from a random conf!\n");
-    return 2;
-  }
-  
-  lprintf("ERROR",0,"Invalid starting gauge conf specified [%s]\n",rf->g_start);
-  error(1,1,"parse_gstart " __FILE__,"invalid config name");
-
-  return -1;
+	return -1;
 }
 
 /* read last_conf string and fill the end parameter
- * in thmc_flow with the id of the last conf to be generated.
+ * in hmc_flow with the id of the last conf to be generated.
  * last_conf must be one of:
  * "%d" => this will be the id of the last conf generated
  * "+%d" => if a '+' is prepended then this run will be %d config long,
@@ -165,8 +131,7 @@ static int parse_lastconf(hmc_flow *rf) {
 int init_mc(hmc_flow *rf, char *ifile) {
 
   int start_t;
-  int nh;
-  char* tok;
+
   /* alloc global gauge fields */
   u_gauge=alloc_gfield(&glattice);
 #ifdef ALLOCATE_REPR_GAUGE_FIELD
@@ -246,42 +211,11 @@ int init_mc(hmc_flow *rf, char *ifile) {
   
   apply_BCs_on_fundamental_gauge_field(); 
   represent_gauge_field();
-  /* Convert the Hasenbush parameters*/
-  if (hmc_var.hmc_p.hasenbusch){
-    nh=0;
-    int i;
-    for (i=0;hmc_var.hasen_steps[i]!=0;++i) nh+=(hmc_var.hasen_steps[i]==';');
-    if (hmc_var.hasen_steps[i-1]!=';') nh++;
-    hmc_var.hmc_p.n_hasen = nh;
-    hmc_var.hmc_p.hsteps = (unsigned int*) malloc(nh*sizeof(unsigned int));
-    hmc_var.hmc_p.hasen_dm = (double*) malloc(nh*sizeof(double));
-    nh=0;
-    tok = strtok(hmc_var.hasen_steps,";");
-    while (tok!=NULL){
-      hmc_var.hmc_p.hsteps[nh]=atoi(tok);
-      nh++;
-      tok = strtok(NULL,";");
-    }
-    nh=0;
-    tok = strtok(hmc_var.hasen_dm,";");
-    while (tok!=NULL){
-      error(nh>=hmc_var.hmc_p.n_hasen,1,"init_hmc","Number of Hasenbush steps different from Hasenbush masses\n");
-      hmc_var.hmc_p.hasen_dm[nh]=atof(tok);
-      nh++;
-      tok = strtok(NULL,";");
-    }
-    error(nh!=hmc_var.hmc_p.n_hasen,1,"init_hmc","Number of Hasenbush steps different from Hasenbush masses\n");
-  }
-  else{
-    hmc_var.hmc_p.hsteps = NULL;
-    hmc_var.hmc_p.hasen_dm = NULL;
-    hmc_var.hmc_p.n_hasen = 0;
-  
-  }  
 
   /* init HMC */
-  init_hmc(&hmc_var.hmc_p);
-    
+  read_action(ifile, &hmc_var.hmc_p.integrator);
+  init_ghmc(&hmc_var.hmc_p);
+
   return 0;
     
 }
@@ -298,12 +232,9 @@ int save_conf(hmc_flow *rf, int id) {
 
 /* clean up memory */
 int end_mc() {
-  free_hmc();
+  free_ghmc();
   free_BCs();
   
-  free(hmc_var.hmc_p.hsteps);
-  free(hmc_var.hmc_p.hasen_dm);
-
   /* free memory */
   free_gfield(u_gauge);
 #ifdef ALLOCATE_REPR_GAUGE_FIELD
@@ -312,6 +243,3 @@ int end_mc() {
 
   return 0;
 }
-
-#undef repr_name
-

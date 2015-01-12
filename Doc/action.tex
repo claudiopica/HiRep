@@ -1,0 +1,244 @@
+\documentclass[12pt]{article}
+
+% Packages
+\usepackage[a4paper,left=3cm,right=3cm,top=4cm,bottom=4cm]{geometry}
+\usepackage{mathpazo}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{mathrsfs}
+\usepackage{framed}
+
+% Settings
+\setlength{\parindent}{0mm}
+
+\begin{document}
+\subsection*{Integrator}
+The HiRep code uses a multilevel integrator and each integrator level has to be specified in the input file.
+\begin{center}
+\begin{minipage}{40mm}
+\begin{framed}
+\begin{verbatim}
+integrator {
+    level = 0
+    type = o2mn
+    steps = 10
+}
+\end{verbatim}
+\vspace{-5mm}
+\end{framed}
+\end{minipage}
+\end{center}
+
+\vspace{2mm}
+
+\begin{center}
+\begin{tabular}{l|l}
+ Variable & Description \\
+ \hline
+ \verb|level| & unique integrator level (level 0 is the outermost level) \\
+ \verb|type|  & integrator type (see below) \\
+ \verb|steps| & number of integration steps \\
+\end{tabular}
+\end{center}
+
+The table below show the different integrators implemented in the HiRep code. The last column in the table show how many times the next integrator level will be called in each iteration of the given integrator.
+
+\begin{center}
+\begin{tabular}{l|lc}
+ Type & Description & Next level calls \\
+ \hline
+ \verb|lf|   & leap-frog integrator & 1\\
+ \verb|o2mn| & 2nd order minimal norm (omelyan) integrator & 2 \\
+ \verb|o4mn| & 4th order minimal norm (omelyan) integrator & 5\\
+\end{tabular}
+\end{center}
+
+\newpage
+\subsection*{Gauge}
+The gauge monomial is the standard Wilson plaquette action.
+\begin{equation}
+ S = -\frac{\beta}{N}\sum_{x,\mu>\nu} \textrm{Re}~\textrm{tr}(U_\mu(x)U_\nu(x+\hat{\mu})U_\mu^\dagger(x+\hat{\nu})U_\nu^\dagger(x))
+\end{equation}
+
+The example below show how to specify a gauge monomial in the input file.
+\begin{center}
+\begin{minipage}{42mm}
+\begin{framed}
+\begin{verbatim}
+monomial {
+    id = 0
+    type = gauge
+    beta = 2.0
+    level = 0
+}
+\end{verbatim}
+\vspace{-5mm}
+\end{framed}
+\end{minipage}
+\end{center}
+
+\vspace{2mm}
+
+\begin{center}
+\begin{tabular}{l|l}
+ Variable & Description \\
+ \hline
+ \verb|id|    & unique monomial id \\
+ \verb|type|  & monomial type \\
+ \verb|beta|  & bare coupling for the gauge field \\
+ \verb|level| & integrator level where the monomial force is evaluated
+\end{tabular}
+\end{center}
+
+\newpage
+\subsection*{HMC}
+The HMC monomial is the standard term for simulating two mass degenerate fermions.
+\begin{equation}
+ S = \phi^\dagger(D^\dagger D)^{-1}\phi
+\end{equation}
+
+The example below show how to specify an HMC monomial in the input file.
+\begin{center}
+\begin{minipage}{55mm}
+\begin{framed}
+\begin{verbatim}
+monomial {
+    id = 1
+    type = hmc
+    mass = -0.750
+    mt_prec = 1e-14
+    force_prec = 1e-14
+    mre_past = 5
+    level = 1
+}
+\end{verbatim}
+\vspace{-5mm}
+\end{framed}
+\end{minipage}
+\end{center}
+
+\vspace{2mm}
+
+\begin{center}
+\begin{tabular}{l|l}
+ Variable & Description \\
+ \hline
+ \verb|id|         & unique monomial id \\
+ \verb|type|       & monomial type \\
+ \verb|mass|       & bare fermion mass \\
+ \verb|mt_prec|    & inverter precision used in the Metropolis test \\
+ \verb|force_prec| & inverter precision used when calculating the force \\
+ \verb|mre_past|   & number of past solutions used in the chronological inverter \\
+ \verb|level|      & integrator level where the monomial force is evaluated
+\end{tabular}
+\end{center}
+
+\subsubsection*{Comments}
+\begin{itemize}
+ \item When using the chronological inverter the force precision should be $10^{-14}$ or better to ensure reversibility in the algorithm.
+\end{itemize}
+
+\newpage
+\subsection*{Hasenbusch}
+The hasenbusch term is a mass preconditioned term, used in connection with an HMC monomial.
+\begin{equation}
+ S = \phi^\dagger\left(\frac{D^\dagger D}{(D+\Delta m)^\dagger (D+\Delta m)}\right)\phi
+\end{equation}
+
+The example below show how to specify a Hasenbusch monomial in the input file.
+\begin{center}
+\begin{minipage}{55mm}
+\begin{framed}
+\begin{verbatim}
+monomial {
+    id = 1
+    type = hasenbusch
+    mass = -0.750
+    dm = 0.1
+    mt_prec = 1e-14
+    force_prec = 1e-14
+    mre_past = 2
+    level = 0
+}
+\end{verbatim}
+\vspace{-5mm}
+\end{framed}
+\end{minipage}
+\end{center}
+
+\vspace{2mm}
+
+\begin{center}
+\begin{tabular}{l|l}
+ Variable & Description \\
+ \hline
+ \verb|id|         & unique monomial id \\
+ \verb|type|       & monomial type \\
+ \verb|mass|       & bare fermion mass \\
+ \verb|dm|         & shift in the bare mass \\
+ \verb|mt_prec|    & inverter precision used in the Metropolis test \\
+ \verb|force_prec| & inverter precision used when calculating the force \\
+ \verb|mre_past|   & number of past solutions used in the chronological inverter \\
+ \verb|level|      & integrator level where the monomial force is evaluated
+\end{tabular}
+\end{center}
+
+\vspace{2mm}
+\subsubsection*{Comments}
+\begin{itemize}
+ \item When using the chronological inverter the force precision should be $10^{-14}$ or better to ensure reversibility in the algorithm.
+ \item The mass used in the associated HMC monomial should be the mass of the Hasenbusch monomial plus the mass shift.
+\end{itemize}
+
+
+\newpage
+\subsection*{RHMC}
+The RHMC monomial uses a rational approximation to simulate an odd number of mass degenerate fermions.
+\begin{equation}
+ S = \phi^\dagger(D^\dagger D)^{-n/d}\phi
+\end{equation}
+
+The example below show how to specify an RHMC monomial in the input file.
+\begin{center}
+\begin{minipage}{55mm}
+\begin{framed}
+\begin{verbatim}
+monomial {
+    id = 1
+    type = rhmc
+    mass = -0.750
+    n = 1
+    d = 2
+    mt_prec = 1e-14
+    md_prec = 1e-14
+    force_prec = 1e-14
+    level = 0
+}
+\end{verbatim}
+\vspace{-5mm}
+\end{framed}
+\end{minipage}
+\end{center}
+
+\vspace{2mm}
+
+\begin{center}
+\begin{tabular}{l|l}
+ Variable & Description \\
+ \hline
+ \verb|id|         & unique monomial id \\
+ \verb|type|       & monomial type \\
+ \verb|mass|       & bare fermion mass \\
+ \verb|n|          & fraction numerator \\
+ \verb|d|          & fraction denominator \\
+ \verb|mt_prec|    & inverter precision used in the Metropolis test \\
+ \verb|md_prec|    & precision of the rational approximation \\
+ \verb|force_prec| & inverter precision used when calculating the force \\
+ \verb|level|      & integrator level where the monomial force is evaluated
+\end{tabular}
+\end{center}
+
+
+
+\end{document}
