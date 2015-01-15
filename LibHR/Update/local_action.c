@@ -72,12 +72,20 @@ void local_hmc_action(local_action_type_old type,
         case RHMC:
           phi=((mon_rhmc_par*)m->par)->pf;
           break;
-        case Hasenbusch:
+      case TM:
+      case TM_alt:
+          phi=((mon_tm_par*)m->par)->pf;
+          break;
+      case Hasenbusch:
           phi=((mon_hasenbusch_par*)m->par)->pf;
           break;
-        default:
-          lprintf("MONOMIAL",0,"WARNING: unknown type!\n");
+      case Hasenbusch_tm:
+      case Hasenbusch_tm_alt:
+          phi=((mon_hasenbusch_tm_par*)m->par)->pf;
           break;
+      default:
+        lprintf("MONOMIAL",0,"WARNING: unknown type!\n");
+        break;
       }
       /* pseudo fermion action = phi^2 */
       _MASTER_FOR(phi->type,i) {

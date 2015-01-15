@@ -69,9 +69,20 @@ void gforce(suNg_av_field *force, double dt, int nmon, const monomial **mon_list
       case RHMC:
         force_rhmc(dt, force, &((mon_rhmc_par*)m->par)->fpar);
         break;
+      case TM:
+        force_hmc_tm(dt,force, &((mon_tm_par*)m->par)->fpar);
+        break;
+      case TM_alt:
+        force_hmc(dt,force, &((mon_tm_par*)m->par)->fpar);
+        break;
       case Hasenbusch:
         force_hmc(dt, force, &((mon_hasenbusch_par*)m->par)->fpar);
         break;
+      case Hasenbusch_tm:
+        force_hmc_tm(dt,force, &((mon_hasenbusch_tm_par*)m->par)->fpar);
+        break;
+      case Hasenbusch_tm_alt:
+        force_hmc(dt, force, &((mon_hasenbusch_tm_par*)m->par)->fpar);
       default:
         lprintf("MONOMIAL",0,"WARNING: unknown type!\n");
         break;

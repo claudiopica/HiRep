@@ -39,11 +39,13 @@ static int init=1;
 static spinor_field *gtmp=NULL;
 static spinor_field *etmp=NULL;
 static spinor_field *otmp=NULL;
+static spinor_field *otmp2=NULL;
 
 static void free_mem() {
     if (gtmp!=NULL) { free_spinor_field_f(gtmp); etmp=NULL; }
     if (etmp!=NULL) { free_spinor_field_f(etmp); etmp=NULL; }
     if (otmp!=NULL) { free_spinor_field_f(otmp); otmp=NULL; }
+    if (otmp2!=NULL) { free_spinor_field_f(otmp2); otmp2=NULL; }
     init=1;
 }
 
@@ -52,6 +54,7 @@ static void init_Dirac() {
         gtmp=alloc_spinor_field_f(1,&glattice);
         etmp=alloc_spinor_field_f(1,&glat_even);
         otmp=alloc_spinor_field_f(1,&glat_odd);
+        otmp2=alloc_spinor_field_f(1,&glat_odd);
         atexit(&free_mem);
         init=0;
     }
@@ -626,4 +629,58 @@ void g5Dphi_sq(double m0, spinor_field *out, spinor_field *in) {
   g5Dphi(m0, out, gtmp);
 #endif
 
+}
+
+//Twisted mass operator for even odd preconditioned case
+/* g5 (M^+-_ee-M_eo {M_oo}^{-1} M_oe*/
+void Qhat_eopre(double m0, double mu, spinor_field* out, spinor_field *in){
+  double norm = (4+m0)*(4+m0)+mu*mu;
+  double rho = (4+m0)/norm;
+  complex imu;
+  imu.re=0;
+  imu.im=-mu/norm;
+  
+  error((in==NULL)||(out==NULL),1,"Qhat_eopre [Dphi.c]",
+  	"Attempt to access unallocated memory space");
+  
+  error(in==out,1,"Qhat_eopre [Dphi.c]",
+        "Input and output fields must be different");
+  
+#ifdef CHECK_SPINOR_MATCHING
+  error(out->type!=&glat_even || in->type!=&glat_even,1,"Qhat_eopre " __FILE__, "Spinors are not defined on even lattice!");
+#endif /* CHECK_SPINOR_MATCHING */
+
+  apply_BCs_on_spinor_field(in);
+
+  /* alloc memory for temporary spinor field */
+  if (init) { init_Dirac(); init=0; }
+  Dphi_(otmp, in);
+  apply_BCs_on_spinor_field(otmp);
+  spinor_field_mul_f(otmp2,rho,otmp);
+  spinor_field_g5_mulc_add_assign_f(otmp2,imu,otmp);
+  Dphi_(out, otmp2);
+  
+  rho = -(4+m0);
+  spinor_field_mul_add_assign_f(out,rho,in);
+  imu.im=-mu;
+  spinor_field_g5_mulc_add_assign_f(out,imu,in);
+
+  spinor_field_minus_f(out,out);
+  spinor_field_g5_assign_f(out);
+
+  apply_BCs_on_spinor_field(out);
+}
+
+
+void Qhat_eopre_sq(double m0, double mu, spinor_field *out, spinor_field *in) {
+  /* alloc memory for temporary spinor field */
+  if (init) { init_Dirac(); init=0; }
+  
+#ifdef ROTATED_SF
+  /*the switch of the SF_sign is needed to take care of the antihermiticity of the boundary term of the dirac operator*/
+  error(1,"Qhat_eopre_sq",__FILE__,"Not implemented\n");
+#else
+  Qhat_eopre(m0,-mu,etmp,in);
+  Qhat_eopre(m0,mu,out,etmp);
+#endif
 }

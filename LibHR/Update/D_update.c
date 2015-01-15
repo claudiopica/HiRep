@@ -1,10 +1,19 @@
 #include "dirac.h"
-
+#include "linear_algebra.h"
+#include "stddef.h"
+#include "memory.h"
+#include "global.h"
+#include "logger.h"
 
 static double static_mass=0.;
+static double static_mu=0.;
 
 void set_dirac_mass(double mass) {
   static_mass=mass;
+}
+
+void set_twisted_mass(double mu){
+  static_mu=mu;
 }
 
 /* this is the basic operator used in the update */
@@ -48,3 +57,110 @@ void D_flt(spinor_field_flt *out, spinor_field_flt *in){
   Dphi_flt((float)(static_mass), out, in);
 #endif
 }
+
+
+void Qtm_p(spinor_field *out, spinor_field *in){
+#ifdef UPDATE_EO
+    Qhat_eopre(static_mass, static_mu,out, in);
+#else
+  complex imu;
+  imu.re=0;imu.im=static_mu;
+  g5Dphi(static_mass, out, in);
+  spinor_field_mulc_add_assign_f(out,imu,in);
+#endif
+}
+
+void Qtm_m(spinor_field *out, spinor_field *in){
+#ifdef UPDATE_EO
+    Qhat_eopre(static_mass, -static_mu,out, in);
+#else
+  complex imu;
+  imu.re=0;imu.im=-static_mu;
+  g5Dphi(static_mass, out, in);
+  spinor_field_mulc_add_assign_f(out,imu,in);
+#endif
+}
+
+void QpQm_tm(spinor_field *out, spinor_field *in){
+#ifdef UPDATE_EO
+    Qhat_eopre_sq(static_mass,static_mu,out,in);
+#else
+  g5Dphi_sq(static_mass, out, in);
+  spinor_field_mul_add_assign_f(out,static_mu*static_mu,in);
+#endif
+}
+
+
+void Qtm_p_alt(spinor_field *out, spinor_field *in){
+#ifdef UPDATE_EO
+  complex imu;
+  imu.re=0;imu.im=static_mu;
+  g5Dphi_eopre(static_mass,out,in);
+  spinor_field_mulc_add_assign_f(out,imu,in);
+#else
+  complex imu;
+  imu.re=0;imu.im=static_mu;
+  g5Dphi(static_mass, out, in);
+  spinor_field_mulc_add_assign_f(out,imu,in);
+#endif
+}
+
+void Qtm_m_alt(spinor_field *out, spinor_field *in){
+#ifdef UPDATE_EO
+  complex imu;
+  imu.re=0;imu.im=-static_mu;
+  g5Dphi_eopre(static_mass,out, in);
+  spinor_field_mulc_add_assign_f(out,imu,in);
+#else
+  complex imu;
+  imu.re=0;imu.im=-static_mu;
+  g5Dphi(static_mass, out, in);
+  spinor_field_mulc_add_assign_f(out,imu,in);
+#endif
+}
+
+void QpQm_tm_alt(spinor_field *out, spinor_field *in){
+#ifdef UPDATE_EO
+    g5Dphi_eopre_sq(static_mass, out, in);
+    spinor_field_mul_add_assign_f(out,static_mu*static_mu,in);
+#else
+  g5Dphi_sq(static_mass, out, in);
+  spinor_field_mul_add_assign_f(out,static_mu*static_mu,in);
+#endif
+}
+
+
+//
+//This inverts Qtm_p
+void tm_invert(spinor_field* out, spinor_field *in, mshift_par* mpar){
+  static spinor_field* tmp=NULL;
+  if (tmp==NULL){
+#ifndef UPDATE_EO
+    tmp =  alloc_spinor_field_f(1,&glattice);
+#else
+    tmp =  alloc_spinor_field_f(1,&glat_even);
+#endif
+  }
+  lprintf("tm_invert",50,"mu: %g, m: %g\n",static_mu,static_mass);
+  spinor_field_zero_f(tmp);
+  cg_mshift(mpar,QpQm_tm,in,tmp);
+  Qtm_m(out,tmp);
+}
+
+//This inverts Qtm_p_alt
+void tm_invert_alt(spinor_field* out, spinor_field *in, mshift_par* mpar){
+  static spinor_field* tmp=NULL;
+  if (tmp==NULL){
+#ifndef UPDATE_EO
+    tmp =  alloc_spinor_field_f(1,&glattice);
+#else
+    tmp =  alloc_spinor_field_f(1,&glat_even);
+#endif
+  }
+  lprintf("tm_invert_alt",50,"mu: %g, m: %g\n",static_mu,static_mass);
+  spinor_field_zero_f(tmp);
+  cg_mshift(mpar,QpQm_tm_alt,in,tmp);
+  Qtm_m_alt(out,tmp);
+}
+
+

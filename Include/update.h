@@ -50,16 +50,17 @@ typedef struct {
   int id;
   int n_pf;
   spinor_field *pf;
-  int hasenbusch; /* 0 = force with Y = Ddag^{-1} phi (standard) ; 2 = force with Y = Ddag^{-1}(phi+dm*X) */
+  int hasenbusch;
   double mass;
   double b;
+  double mu;
   double inv_err2, inv_err2_flt;
   mre_par mpar;
 } force_hmc_par;
 
-void init_force_hmc();
-void free_force_hmc();
+void force_fermion_core(spinor_field* Xs, spinor_field* Ys, suNg_av_field* force, double dt, double* forcestat, int type);
 void force_hmc(double dt, suNg_av_field *force, void *par);
+void force_hmc_tm(double dt, suNg_av_field *force, void *par);
 
 
 void gaussian_momenta(suNg_av_field *momenta);
@@ -165,18 +166,16 @@ void corret_pf_dist_hmc();
 void calc_one_force(int n_force);
 
 
-/* this is the basic operator used in the update */
-/* defined in update_rhmc.c */
-void H2(spinor_field *out, spinor_field *in);
-void H(spinor_field *out, spinor_field *in);
-void H_flt(spinor_field_flt *out, spinor_field_flt *in);
-
 /* Action structures */
 typedef enum {
   PureGauge,
   HMC,
   RHMC,
-  Hasenbusch
+  TM,
+  TM_alt,
+  Hasenbusch,
+  Hasenbusch_tm,
+  Hasenbusch_tm_alt
 } mon_type;
 
 typedef struct _mon_pg_par {
@@ -197,6 +196,15 @@ typedef struct _mon_rhmc_par {
   spinor_field *pf; /* pseudofermion field */
 } mon_rhmc_par;
 
+typedef struct _mon_tm_par {
+  double mass;
+  double mu;
+  int mre_past;
+  force_hmc_par fpar;
+  spinor_field *pf; /* pseudofermion field */
+} mon_tm_par;
+
+
 typedef struct _mon_hasenbusch_par {
   double mass;
   double dm;
@@ -204,6 +212,16 @@ typedef struct _mon_hasenbusch_par {
   force_hmc_par fpar;
   spinor_field *pf; /* pseudofermion field */
 } mon_hasenbusch_par;
+
+typedef struct _mon_hasenbusch_tm_par {
+  double mass;
+  double mu;
+  double dmu;
+  int mre_past;
+  force_hmc_par fpar;
+  spinor_field *pf; /* pseudofermion field */
+} mon_hasenbusch_tm_par;
+
 
 typedef struct _monomial {
   int id; /* monomial id */

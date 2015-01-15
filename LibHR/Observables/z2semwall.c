@@ -106,11 +106,6 @@ static double hmass;
 #endif
 static double hmass_pre;
 
-#ifndef NDEBUG
-static void D(spinor_field *out, spinor_field *in){
-  Dphi(hmass,out,in);
-}
-#endif
 
 static void D_pre(spinor_field *out, spinor_field *in){
   Dphi_eopre(hmass_pre,out,in);

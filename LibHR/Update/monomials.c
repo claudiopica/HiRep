@@ -23,18 +23,26 @@ void free_mon(mon_list *mon) {
   if (mon!=NULL) {
     if (mon->m.par!=NULL) {
       switch (mon->m.type) {
-        case HMC:
-          free_spinor_field_f(((mon_hmc_par*)mon->m.par)->pf);
-          break;
-        case RHMC:
-          free_spinor_field_f(((mon_rhmc_par*)mon->m.par)->pf);
-          break;
-        case Hasenbusch:
-          free_spinor_field_f(((mon_hasenbusch_par*)mon->m.par)->pf);
-          break;
-        default:
-          lprintf("MONOMIAL",0,"WARNING: unknown type!\n");
-          break;
+      case HMC:
+        free_spinor_field_f(((mon_hmc_par*)mon->m.par)->pf);
+        break;
+      case RHMC:
+        free_spinor_field_f(((mon_rhmc_par*)mon->m.par)->pf);
+        break;
+      case TM:
+      case TM_alt:
+        free_spinor_field_f(((mon_tm_par*)mon->m.par)->pf);
+        break;        
+      case Hasenbusch:
+        free_spinor_field_f(((mon_hasenbusch_par*)mon->m.par)->pf);
+        break;
+      case Hasenbusch_tm:
+      case Hasenbusch_tm_alt:
+        free_spinor_field_f(((mon_hasenbusch_tm_par*)mon->m.par)->pf);
+        break;
+      default:
+        lprintf("MONOMIAL",0,"WARNING: unknown type!\n");
+        break;
       }
       free(mon->m.par);
     }
@@ -52,33 +60,43 @@ void free_mon_list(mon_list *action) {
 
 static spinor_field* alloc_1_sf(){
 #ifdef UPDATE_EO
-	return alloc_spinor_field_f(1, &glat_even);
+  return alloc_spinor_field_f(1, &glat_even);
 #else
-	return alloc_spinor_field_f(1, &glattice);
+  return alloc_spinor_field_f(1, &glattice);
 #endif
 }
 
 mon_list *alloc_mon(mon_type type) {
   mon_list *new_mon=malloc(sizeof(mon_list));
   switch (type) {
-    case PureGauge:
-      new_mon->m.par = malloc(sizeof(mon_pg_par));
-      break;
-    case HMC:
-      new_mon->m.par = malloc(sizeof(mon_hmc_par));
-      ((mon_hmc_par*)new_mon->m.par)->pf=alloc_1_sf();
-      break;
-    case RHMC:
-      new_mon->m.par = malloc(sizeof(mon_rhmc_par));
-      ((mon_rhmc_par*)new_mon->m.par)->pf=alloc_1_sf();
-      break;
-    case Hasenbusch:
-      new_mon->m.par = malloc(sizeof(mon_hasenbusch_par));
-      ((mon_hasenbusch_par*)new_mon->m.par)->pf=alloc_1_sf();
-      break;
-    default:
-      lprintf("MONOMIAL",0,"WARNING: unknown type!\n");
-      break;
+  case PureGauge:
+    new_mon->m.par = malloc(sizeof(mon_pg_par));
+    break;
+  case HMC:
+    new_mon->m.par = malloc(sizeof(mon_hmc_par));
+    ((mon_hmc_par*)new_mon->m.par)->pf=alloc_1_sf();
+    break;
+  case RHMC:
+    new_mon->m.par = malloc(sizeof(mon_rhmc_par));
+    ((mon_rhmc_par*)new_mon->m.par)->pf=alloc_1_sf();
+    break;
+  case TM:
+  case TM_alt:
+    new_mon->m.par = malloc(sizeof(mon_tm_par));
+    ((mon_tm_par*)new_mon->m.par)->pf=alloc_1_sf();
+    break;
+  case Hasenbusch:
+    new_mon->m.par = malloc(sizeof(mon_hasenbusch_par));
+    ((mon_hasenbusch_par*)new_mon->m.par)->pf=alloc_1_sf();
+    break;
+  case Hasenbusch_tm:
+  case Hasenbusch_tm_alt:
+    new_mon->m.par = malloc(sizeof(mon_hasenbusch_tm_par));
+    ((mon_hasenbusch_tm_par*)new_mon->m.par)->pf=alloc_1_sf();
+    break;
+  default:
+    lprintf("MONOMIAL",0,"WARNING: unknown type!\n");
+    break;
   }
   
   return new_mon;
@@ -91,50 +109,75 @@ void mon_copy(monomial *new, monomial *old) {
   new->MD_prec=old->MD_prec;
   new->force_prec=old->force_prec;
   switch (new->type) {
-    case PureGauge:
-	  {
-		  mon_pg_par *par_old = (mon_pg_par*)old->par;
-		  mon_pg_par *par_new = (mon_pg_par*)new->par;
-		  par_new->beta = par_old->beta;
-	  }
-      break;
-    case HMC:
-	  {
-		  mon_hmc_par *par_old = (mon_hmc_par*)old->par;
-		  mon_hmc_par *par_new = (mon_hmc_par*)new->par;
-		  par_new->mass = par_old->mass;
-		  par_new->fpar = par_old->fpar;
-		  par_new->fpar.pf = par_new->pf;
-		  spinor_field_copy_f(par_new->pf, par_old->pf);
-	  }
-      break;
-    case RHMC:
-	  {
-		  mon_rhmc_par *par_old = (mon_rhmc_par*)old->par;
-		  mon_rhmc_par *par_new = (mon_rhmc_par*)new->par;
-		  par_new->mass = par_old->mass;
-		  par_new->ratio = par_old->ratio;
-		  r_app_alloc(&par_new->ratio);
-		  par_new->fpar = par_old->fpar;
-		  par_new->fpar.pf = par_new->pf;
-		  par_new->fpar.ratio = &par_new->ratio;
-		  spinor_field_copy_f(par_new->pf, par_old->pf);
-	  }
-      break;
-    case Hasenbusch:
-	  {
-		  mon_hasenbusch_par *par_old = (mon_hasenbusch_par*)old->par;
-		  mon_hasenbusch_par *par_new = (mon_hasenbusch_par*)new->par;
-		  par_new->mass = par_old->mass;
-		  par_new->dm = par_old->dm;
-		  par_new->fpar = par_old->fpar;
-  		  par_new->fpar.pf = par_new->pf;
-		  spinor_field_copy_f(par_new->pf, par_old->pf);
-	  }
-      break;
-    default:
-      lprintf("MONOMIAL",0,"WARNING: unknown type!\n");
-      break;
+  case PureGauge:
+    {
+      mon_pg_par *par_old = (mon_pg_par*)old->par;
+      mon_pg_par *par_new = (mon_pg_par*)new->par;
+      par_new->beta = par_old->beta;
+    }
+    break;
+  case HMC:
+    {
+      mon_hmc_par *par_old = (mon_hmc_par*)old->par;
+      mon_hmc_par *par_new = (mon_hmc_par*)new->par;
+      par_new->mass = par_old->mass;
+      par_new->fpar = par_old->fpar;
+      par_new->fpar.pf = par_new->pf;
+      spinor_field_copy_f(par_new->pf, par_old->pf);
+    }
+    break;
+  case RHMC:
+    {
+      mon_rhmc_par *par_old = (mon_rhmc_par*)old->par;
+      mon_rhmc_par *par_new = (mon_rhmc_par*)new->par;
+      par_new->mass = par_old->mass;
+      par_new->ratio = par_old->ratio;
+      r_app_alloc(&par_new->ratio);
+      par_new->fpar = par_old->fpar;
+      par_new->fpar.pf = par_new->pf;
+      par_new->fpar.ratio = &par_new->ratio;
+      spinor_field_copy_f(par_new->pf, par_old->pf);
+    }
+    break;
+  case TM:
+  case TM_alt:
+    {
+      mon_tm_par *par_old = (mon_tm_par*)old->par;
+      mon_tm_par *par_new = (mon_tm_par*)new->par;
+      par_new->mass = par_old->mass;
+      par_new->mu = par_old->mu;
+      par_new->fpar = par_old->fpar;
+      par_new->fpar.pf = par_new->pf;
+      spinor_field_copy_f(par_new->pf, par_old->pf);
+    }
+    break;
+  case Hasenbusch:
+    {
+      mon_hasenbusch_par *par_old = (mon_hasenbusch_par*)old->par;
+      mon_hasenbusch_par *par_new = (mon_hasenbusch_par*)new->par;
+      par_new->mass = par_old->mass;
+      par_new->dm = par_old->dm;
+      par_new->fpar = par_old->fpar;
+      par_new->fpar.pf = par_new->pf;
+      spinor_field_copy_f(par_new->pf, par_old->pf);
+    }
+    break;
+  case Hasenbusch_tm:
+  case Hasenbusch_tm_alt:
+    {
+      mon_hasenbusch_tm_par *par_old = (mon_hasenbusch_tm_par*)old->par;
+      mon_hasenbusch_tm_par *par_new = (mon_hasenbusch_tm_par*)new->par;
+      par_new->mass = par_old->mass;
+      par_new->mu = par_old->mu;
+      par_new->dmu = par_old->dmu;
+      par_new->fpar = par_old->fpar;
+      par_new->fpar.pf = par_new->pf;
+      spinor_field_copy_f(par_new->pf, par_old->pf);
+    }
+    break;
+  default:
+    lprintf("MONOMIAL",0,"WARNING: unknown type!\n");
+    break;
   }
 }
 

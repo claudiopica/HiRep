@@ -152,244 +152,361 @@ void free_ghmc()
 /* Generate guassian pf for all monomials */
 static void gaussian_pf()
 {
-	for(int i = 0; i < num_mon(); i++)
-	{
-		const monomial *m = mon_n(i);
-		switch (m->type)
-		{
-			case PureGauge:
-				break;
-			case HMC:
-				gaussian_spinor_field(((mon_hmc_par*)m->par)->pf);
-				break;
-			case RHMC:
-				gaussian_spinor_field(((mon_rhmc_par*)m->par)->pf);
-				break;
-			case Hasenbusch:
-				gaussian_spinor_field(((mon_hasenbusch_par*)m->par)->pf);
-				break;
-			default:
-				lprintf("MONOMIAL",0,"WARNING: unknown type!\n");
-				break;
-		}
-	}
+  for(int i = 0; i < num_mon(); i++)
+    {
+      const monomial *m = mon_n(i);
+      switch (m->type)
+        {
+        case PureGauge:
+          break;
+        case HMC:
+          gaussian_spinor_field(((mon_hmc_par*)m->par)->pf);
+          break;
+        case RHMC:
+          gaussian_spinor_field(((mon_rhmc_par*)m->par)->pf);
+          break;
+        case TM:
+        case TM_alt:
+            gaussian_spinor_field(((mon_tm_par*)m->par)->pf);
+          break;
+        case Hasenbusch:
+          gaussian_spinor_field(((mon_hasenbusch_par*)m->par)->pf);
+          break;
+        case Hasenbusch_tm:
+        case Hasenbusch_tm_alt:
+          gaussian_spinor_field(((mon_hasenbusch_tm_par*)m->par)->pf);
+          break;
+        default:
+          lprintf("MONOMIAL",0,"WARNING: unknown type!\n");
+          break;
+        }
+    }
 }
 
 /* Correct the intial heatbath pseudofermion distribution */
 static void correct_pf()
 {
-	spinor_field *pf = NULL;
-	for(int i = 0; i < num_mon(); i++)
-	{
-		const monomial *m = mon_n(i);
-		switch (m->type)
-		{
-			case PureGauge:
-				break;
-			case HMC:
-				/* compute H2^{1/2}*pf = H*pf */
-				pf=((mon_hmc_par*)m->par)->pf;
-				spinor_field_copy_f(tmp_pf,pf);
-				set_dirac_mass(((mon_hmc_par*)m->par)->mass);
-				H(pf, tmp_pf);
-				break;
-			case RHMC:
-				/* r_APP = x^{-n/(2*d)} */
-				r_APP.rel_error=m->MT_prec;
-				/* use n=-n and d=2*d respect to the r_app used for the MD */
-				r_APP.n=-((mon_rhmc_par*)m->par)->ratio.n;
-				r_APP.d=((mon_rhmc_par*)m->par)->ratio.d*2;
-				reduce_fraction(&r_APP.n, &r_APP.d);
-				r_app_set(&r_APP, ((mon_rhmc_par*)m->par)->ratio.min, ((mon_rhmc_par*)m->par)->ratio.max);
+  spinor_field *pf = NULL;
+  for(int i = 0; i < num_mon(); i++)
+    {
+      const monomial *m = mon_n(i);
+      switch (m->type)
+        {
+        case PureGauge:
+          break;
+        case HMC:
+          /* compute H2^{1/2}*pf = H*pf */
+          pf=((mon_hmc_par*)m->par)->pf;
+          spinor_field_copy_f(tmp_pf,pf);
+          set_dirac_mass(((mon_hmc_par*)m->par)->mass);
+          H(pf, tmp_pf);
+          break;
+        case RHMC:
+          /* r_APP = x^{-n/(2*d)} */
+          r_APP.rel_error=m->MT_prec;
+          /* use n=-n and d=2*d respect to the r_app used for the MD */
+          r_APP.n=-((mon_rhmc_par*)m->par)->ratio.n;
+          r_APP.d=((mon_rhmc_par*)m->par)->ratio.d*2;
+          reduce_fraction(&r_APP.n, &r_APP.d);
+          r_app_set(&r_APP, ((mon_rhmc_par*)m->par)->ratio.min, ((mon_rhmc_par*)m->par)->ratio.max);
 
-				pf=((mon_rhmc_par*)m->par)->pf;
-				set_dirac_mass(((mon_rhmc_par*)m->par)->mass);
-				rational_func(&r_APP, &H2, pf, pf);
-				break;
-			case Hasenbusch:
-				{
-					/* compute H(m)D^{-1}(m+dm)*pf */
-					double tmp;
-					const mon_hasenbusch_par *par=((mon_hasenbusch_par*)m->par);
-					mshift_par mpar;
-					mpar.err2 = m->MT_prec;
-					mpar.max_iter = 0;
-					mpar.n = 1;
-					mpar.shift = &tmp;
-					mpar.shift[0] = 0;
-					pf=((mon_hasenbusch_par*)m->par)->pf;
-					set_dirac_mass(par->mass+par->dm);
-					spinor_field_zero_f(tmp_pf); /* mshift inverter uses this as initial guess for 1 shift */
-					g5QMR_mshift(&mpar, &D, pf, tmp_pf);
-					set_dirac_mass(par->mass);
-					H(pf,tmp_pf);
-				}
-				break;
-			default:
-				lprintf("MONOMIAL",0,"WARNING: unknown type!\n");
-				break;
-		}
-	}
+          pf=((mon_rhmc_par*)m->par)->pf;
+          set_dirac_mass(((mon_rhmc_par*)m->par)->mass);
+          rational_func(&r_APP, &H2, pf, pf);
+          break;
+        case TM:
+           /* psi =  (g5 D+imu) pf */
+           pf=((mon_tm_par*)m->par)->pf;
+           spinor_field_copy_f(tmp_pf,pf);
+           set_dirac_mass(((mon_tm_par*)m->par)->mass);
+           set_twisted_mass(((mon_tm_par*)m->par)->mu);
+           Qtm_p(pf,tmp_pf);
+           break;
+        case TM_alt:
+           /* psi =  (g5 D+imu) pf */
+           pf=((mon_tm_par*)m->par)->pf;
+           spinor_field_copy_f(tmp_pf,pf);
+           set_dirac_mass(((mon_tm_par*)m->par)->mass);
+           set_twisted_mass(((mon_tm_par*)m->par)->mu);
+           Qtm_p_alt(pf,tmp_pf);
+           break;
+        case Hasenbusch:
+          {
+            /* compute H(m)D^{-1}(m+dm)*pf */
+            double tmp;
+            const mon_hasenbusch_par *par=((mon_hasenbusch_par*)m->par);
+            mshift_par mpar;
+            mpar.err2 = m->MT_prec;
+            mpar.max_iter = 0;
+            mpar.n = 1;
+            mpar.shift = &tmp;
+            mpar.shift[0] = 0;
+            pf=par->pf;
+            set_dirac_mass(par->mass+par->dm);
+            spinor_field_zero_f(tmp_pf); /* mshift inverter uses this as initial guess for 1 shift */
+            g5QMR_mshift(&mpar, &D, pf, tmp_pf);
+            set_dirac_mass(par->mass);
+            H(pf,tmp_pf);
+          }
+          break;
+        case Hasenbusch_tm:
+          {
+            /* Note the different convetion between hasenbuch_tm and hasenbusch_tm_alt*/
+            /* S = | D^{-1} g5  (g5 D + i mu )  psi |^2 */
+            /* D^{-1} g5 ( g5 D + i mu )  psi = A */
+            /* psi = ( g5 D + i mu )^{-1}  g5 D  A */
+            const mon_hasenbusch_tm_par *par=((mon_hasenbusch_tm_par*)m->par);
+            double tmp;
+            mshift_par mpar;
+            mpar.err2 = m->MT_prec;
+            mpar.max_iter = 0;
+            mpar.n = 1;
+            mpar.shift = &tmp;
+            mpar.shift[0] = 0;
+
+            pf=par->pf;
+            spinor_field_copy_f(tmp_pf,pf);
+            set_dirac_mass(par->mass);
+            set_twisted_mass(par->mu);
+            Qtm_p(pf,tmp_pf);
+
+            set_twisted_mass(par->mu + par->dmu);
+            spinor_field_zero_f(tmp_pf);
+            tm_invert(tmp_pf,pf,&mpar);
+            spinor_field_copy_f(pf,tmp_pf); 
+          }
+          break;
+        case Hasenbusch_tm_alt:
+          {
+            /* S = | (g5 D + i mu ) D^{-1} g5 psi |^2 */
+            /* ( g5 D + i mu ) D^{-1} g5 psi = A */
+            /* psi = g5 D ( g5 D + i mu )^{-1}  A */
+            const mon_hasenbusch_tm_par *par=((mon_hasenbusch_tm_par*)m->par);
+            pf=par->pf;
+            double tmp;
+            mshift_par mpar;
+            mpar.err2 = m->MT_prec;
+            mpar.max_iter = 0;
+            mpar.n = 1;
+            mpar.shift = &tmp;
+            mpar.shift[0] = 0;
+            set_dirac_mass(par->mass);
+            set_twisted_mass(par->mu + par->dmu);
+            spinor_field_zero_f(tmp_pf);
+            tm_invert_alt(tmp_pf,pf,&mpar);
+            set_twisted_mass(par->mu);
+            set_twisted_mass(par->mu);
+            Qtm_p_alt(pf,tmp_pf);
+          }
+        default:
+          lprintf("MONOMIAL",0,"WARNING: unknown type!\n");
+          break;
+        }
+    }
 }
 
 /* Correct the final pseudofermion distribution for the computation of the local action = pf^2 */
 static void correct_la_pf()
 {
-	spinor_field *pf = NULL;
-	for(int i = 0; i < num_mon(); i++)
-	{
-		const monomial *m = mon_n(i);
-		switch(m->type)
-		{
-			case PureGauge:
-				break;
-			case HMC:
-				{
-					/* compute H2^{-1/2}*pf = H^{-1}*pf */
-					double tmp;
-					mshift_par mpar;
-					mpar.err2 = m->MT_prec;
-					mpar.max_iter = 0;
-					mpar.n = 1;
-					mpar.shift = &tmp;
-					mpar.shift[0] = 0;
-					pf = ((mon_hmc_par*)m->par)->pf;
-					spinor_field_g5_f(tmp_pf,pf);
-					set_dirac_mass(((mon_hmc_par*)m->par)->mass);
-					spinor_field_zero_f(pf); /* mshift inverter uses this as initial guess for 1 shift */
-					g5QMR_mshift(&mpar, &D, tmp_pf, pf);
-				}
-				break;
-			case RHMC:
-				{
-					/* r_APP = x^{n/(2*d)} */
-					r_APP.rel_error=m->MT_prec;
-					/* use n=n and d=2*d respect to the r_app used for the MD */
-					r_APP.n=((mon_rhmc_par*)m->par)->ratio.n;
-					r_APP.d=((mon_rhmc_par*)m->par)->ratio.d*2;
-					reduce_fraction(&r_APP.n, &r_APP.d);
-					r_app_set(&r_APP, ((mon_rhmc_par*)m->par)->ratio.min, ((mon_rhmc_par*)m->par)->ratio.max);
+  spinor_field *pf = NULL;
+  for(int i = 0; i < num_mon(); i++)
+    {
+      const monomial *m = mon_n(i);
+      double tmp;
+      mshift_par mpar;
+      mpar.err2 = m->MT_prec;
+      mpar.max_iter = 0;
+      mpar.n = 1;
+      mpar.shift = &tmp;
+      mpar.shift[0] = 0;
+      switch(m->type)
+        {
+        case PureGauge:
+          break;
+        case HMC:
+          {
+            /* compute H2^{-1/2}*pf = H^{-1}*pf */
+            pf = ((mon_hmc_par*)m->par)->pf;
+            spinor_field_g5_f(tmp_pf,pf);
+            set_dirac_mass(((mon_hmc_par*)m->par)->mass);
+            spinor_field_zero_f(pf); /* mshift inverter uses this as initial guess for 1 shift */
+            g5QMR_mshift(&mpar, &D, tmp_pf, pf);
+          }
+          break;
+        case RHMC:
+          {
+            /* r_APP = x^{n/(2*d)} */
+            r_APP.rel_error=m->MT_prec;
+            /* use n=n and d=2*d respect to the r_app used for the MD */
+            r_APP.n=((mon_rhmc_par*)m->par)->ratio.n;
+            r_APP.d=((mon_rhmc_par*)m->par)->ratio.d*2;
+            reduce_fraction(&r_APP.n, &r_APP.d);
+            r_app_set(&r_APP, ((mon_rhmc_par*)m->par)->ratio.min, ((mon_rhmc_par*)m->par)->ratio.max);
         
-					pf=((mon_rhmc_par*)m->par)->pf;
-					set_dirac_mass(((mon_rhmc_par*)m->par)->mass);
-					rational_func(&r_APP, &H2, pf, pf);
-				}
-				break;
-			case Hasenbusch:
-				{
-					/* compute D(m+dm)D^{-1}(m)*g5*pf */
-					double tmp;
-					const mon_hasenbusch_par *par=((mon_hasenbusch_par*)m->par);
-					mshift_par mpar;
-					mpar.err2 = m->MT_prec;
-					mpar.max_iter = 0;
-					mpar.n = 1;
-					mpar.shift = &tmp;
-					mpar.shift[0] = 0;
-
-					pf=((mon_hasenbusch_par*)m->par)->pf;
-					spinor_field_g5_assign_f(pf);
-					set_dirac_mass(par->mass);
-					spinor_field_zero_f(tmp_pf); /* mshift inverter uses this as initial guess for 1 shift */
-					g5QMR_mshift(&mpar, &D, pf, tmp_pf);
-					set_dirac_mass(par->mass+par->dm);
-					D(pf,tmp_pf);
-				}
-				break;
-			default:
-				lprintf("MONOMIAL",0,"WARNING: unknown type!\n");
-				break;
-		}
-	}
+            pf=((mon_rhmc_par*)m->par)->pf;
+            set_dirac_mass(((mon_rhmc_par*)m->par)->mass);
+            rational_func(&r_APP, &H2, pf, pf);
+          }
+          break;
+        case TM:
+          {
+            /* compute H2^{-1/2}*pf = H^{-1}*pf */
+            const mon_tm_par *par=((mon_tm_par*)m->par);            
+            pf = par->pf;
+            set_dirac_mass(par->mass);
+            spinor_field_copy_f(tmp_pf,pf);
+            spinor_field_zero_f(pf);
+            set_twisted_mass(par->mu);
+            tm_invert(pf,tmp_pf,&mpar);
+          }
+          break;
+        case TM_alt:
+          {
+            /* compute H2^{-1/2}*pf = H^{-1}*pf */
+            const mon_tm_par *par=((mon_tm_par*)m->par);            
+            pf = par->pf;
+            set_dirac_mass(par->mass);
+            spinor_field_copy_f(tmp_pf,pf);
+            spinor_field_zero_f(pf);
+            set_twisted_mass(par->mu);
+            tm_invert_alt(pf,tmp_pf,&mpar);
+          }
+          break;
+        case Hasenbusch:
+          {
+            /* compute D(m+dm)D^{-1}(m)*g5*pf */
+            const mon_hasenbusch_par *par=((mon_hasenbusch_par*)m->par);
+            pf=par->pf;
+            spinor_field_g5_assign_f(pf);
+            set_dirac_mass(par->mass);
+            spinor_field_zero_f(tmp_pf); /* mshift inverter uses this as initial guess for 1 shift */
+            g5QMR_mshift(&mpar, &D, pf, tmp_pf);
+            set_dirac_mass(par->mass+par->dm);
+            D(pf,tmp_pf);
+          }
+          break;
+        case Hasenbusch_tm:
+          {
+            /* S = |  D^{-1} g5 (g5 D + i mu ) psi |^2 */ 
+            const mon_hasenbusch_tm_par *par=((mon_hasenbusch_tm_par*)m->par);
+            pf=par->pf;
+            set_dirac_mass( par->mass );
+            set_twisted_mass( par->mu+par->dmu);
+            Qtm_p(tmp_pf,pf);
+            spinor_field_zero_f(pf);
+            set_twisted_mass( par->mu );
+            tm_invert(pf, tmp_pf,&mpar);
+          }
+          break;
+        case Hasenbusch_tm_alt:
+          {
+            /* S = | (g5 D + i mu ) D^{-1} g5 psi |^2 */ 
+            const mon_hasenbusch_tm_par *par=((mon_hasenbusch_tm_par*)m->par);
+            pf=par->pf;
+            spinor_field_copy_f(tmp_pf,pf);
+            spinor_field_zero_f(pf);
+            set_dirac_mass(par->mass);
+            set_twisted_mass(par->mu);
+            tm_invert_alt(pf, tmp_pf,&mpar);
+            set_twisted_mass(par->mu+par->dmu);
+            Qtm_p_alt(tmp_pf,pf);
+            spinor_field_copy_f(pf,tmp_pf);           
+          }
+          break;
+        default:
+          lprintf("MONOMIAL",0,"WARNING: unknown type!\n");
+          break;
+        }
+    }
 }
 
 int update_ghmc()
 {
-	double deltaH;
+  double deltaH;
 
-	if(!init)
-	{
-		/* not initialized */
-		lprintf("HMC",0,"WARNING: GHMC not initialized!\nWARNNG: Ignoring call to update_ghmc.\n");
-		return -1;
-	}
+  if(!init)
+    {
+      /* not initialized */
+      lprintf("HMC",0,"WARNING: GHMC not initialized!\nWARNNG: Ignoring call to update_ghmc.\n");
+      return -1;
+    }
 
-	/* update spectral limits on rhmc monomials */
-	for (int i=0;i<num_mon();++i)
-	{
-		const monomial *m = mon_n(i);
-		if(m->type == RHMC)
-		{
-			set_dirac_mass(((mon_rhmc_par*)m->par)->mass);
-			find_spec_H2(&maxev, &minev); /* find spectral interval of H^2 */
-			r_app_set(&(((mon_rhmc_par*)m->par)->ratio),minev,maxev);
-		}
-	}
+  /* update spectral limits on rhmc monomials */
+  for (int i=0;i<num_mon();++i)
+    {
+      const monomial *m = mon_n(i);
+      if(m->type == RHMC)
+        {
+          set_dirac_mass(((mon_rhmc_par*)m->par)->mass);
+          find_spec_H2(&maxev, &minev); /* find spectral interval of H^2 */
+          r_app_set(&(((mon_rhmc_par*)m->par)->ratio),minev,maxev);
+        }
+    }
 
-	/* generate new momenta */
-	lprintf("HMC",30,"Generating gaussian momenta and pseudofermions...\n");
-	gaussian_momenta(momenta);
+  /* generate new momenta */
+  lprintf("HMC",30,"Generating gaussian momenta and pseudofermions...\n");
+  gaussian_momenta(momenta);
 
-	/* generate new pseudofermions */
-	gaussian_pf();
+  /* generate new pseudofermions */
+  gaussian_pf();
 
-	/* compute starting action */
-	lprintf("HMC",30,"Computing action density...\n");
-	local_hmc_action(NEW, la, momenta);
+  /* compute starting action */
+  lprintf("HMC",30,"Computing action density...\n");
+  local_hmc_action(NEW, la, momenta);
 
-	/* correct pseudofermion distribution */
-	correct_pf();
+  /* correct pseudofermion distribution */
+  correct_pf();
 
-	/* integrate molecular dynamics */
-	lprintf("HMC",30,"MD integration...\n");
-	update_par.integrator->integrator(momenta,update_par.tlen,update_par.integrator);
+  /* integrate molecular dynamics */
+  lprintf("HMC",30,"MD integration...\n");
+  update_par.integrator->integrator(momenta,update_par.tlen,update_par.integrator);
 
-	/* project and represent gauge field */
-	project_gauge_field();
-	represent_gauge_field();
+  /* project and represent gauge field */
+  project_gauge_field();
+  represent_gauge_field();
 
-	/* compute new action */
-	lprintf("HMC",30,"Computing new action density...\n");
-	correct_la_pf();
-	local_hmc_action(DELTA, la, momenta);
+  /* compute new action */
+  lprintf("HMC",30,"Computing new action density...\n");
+  correct_la_pf();
+  local_hmc_action(DELTA, la, momenta);
 
-	/* Metropolis test */
-	deltaH = 0.0;
-	_MASTER_FOR_SUM(la->type,i,deltaH) {
-		deltaH += *_FIELD_AT(la,i);
-	}
+  /* Metropolis test */
+  deltaH = 0.0;
+  _MASTER_FOR_SUM(la->type,i,deltaH) {
+    deltaH += *_FIELD_AT(la,i);
+  }
 
-	global_sum(&deltaH, 1);
-	lprintf("HMC",10,"[DeltaS = %1.8e][exp(-DS) = %1.8e]\n",deltaH,exp(-deltaH));
+  global_sum(&deltaH, 1);
+  lprintf("HMC",10,"[DeltaS = %1.8e][exp(-DS) = %1.8e]\n",deltaH,exp(-deltaH));
 
-	if(deltaH < 0) {
-		suNg_field_copy(u_gauge_old,u_gauge);
-	} else {
-	double r;
+  if(deltaH < 0) {
+    suNg_field_copy(u_gauge_old,u_gauge);
+  } else {
+    double r;
     if(PID == 0) {
-		ranlxd(&r,1);
-		if(r < exp(-deltaH)) {
-			r = 1.0;
-		} else {
-			r = -1.0;
-		}
-	}
+      ranlxd(&r,1);
+      if(r < exp(-deltaH)) {
+        r = 1.0;
+      } else {
+        r = -1.0;
+      }
+    }
 
-	bcast(&r, 1);
+    bcast(&r, 1);
 
     if(r > 0) {
-		suNg_field_copy(u_gauge_old,u_gauge);
-	} else {
-		lprintf("HMC",10,"Configuration rejected.\n");
-		suNg_field_copy(u_gauge,u_gauge_old);
-		start_gf_sendrecv(u_gauge); /* this may not be needed if we always guarantee that we copy also the buffers */
-		represent_gauge_field();
-		return 0;
-		}
-	}
+      suNg_field_copy(u_gauge_old,u_gauge);
+    } else {
+      lprintf("HMC",10,"Configuration rejected.\n");
+      suNg_field_copy(u_gauge,u_gauge_old);
+      start_gf_sendrecv(u_gauge); /* this may not be needed if we always guarantee that we copy also the buffers */
+      represent_gauge_field();
+      return 0;
+    }
+  }
 
-	lprintf("HMC",10,"Configuration accepted.\n");
-	return 1;
+  lprintf("HMC",10,"Configuration accepted.\n");
+  return 1;
 }
 
 #if 0

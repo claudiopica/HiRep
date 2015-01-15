@@ -4,6 +4,7 @@
 \***************************************************************************/
 
 #include "update.h"
+#include "dirac.h"
 #include "inverters.h"
 #include "linear_algebra.h"
 #include "suN.h"

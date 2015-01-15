@@ -126,6 +126,19 @@ void _FUNC(spinor_field_mulc_add_assign)(_SPINOR_FIELD_TYPE *s1, _COMPLEX c, _SP
    }
 }
 
+/* s1+=c*g5*s2 c complex */
+void _FUNC(spinor_field_g5_mulc_add_assign)(_SPINOR_FIELD_TYPE *s1, _COMPLEX c, _SPINOR_FIELD_TYPE *s2)
+{
+   //_COMPLEX c1=c;
+   //c1.re=(_REAL)c.re; c1.im=(_REAL)c.im;
+  _SPINOR_TYPE tmp;
+   _TWO_SPINORS_FOR(s1,s2) {
+     _spinor_g5_f(tmp,*_SPINOR_PTR(s2));
+     _spinor_mulc_add_assign_f(*_SPINOR_PTR(s1),c,tmp);
+   }
+}
+
+
 /* s1=r*s2 */
 void _FUNC(spinor_field_mul)(_SPINOR_FIELD_TYPE *s1, _REAL r, _SPINOR_FIELD_TYPE *s2)
 {
