@@ -16,7 +16,7 @@
  * compute the local action at every site for the HMC
  * H = | momenta |^2 + S_g + < phi1, phi2>
  */
-void local_hmc_action(local_action_type_old type,
+void local_hmc_action(local_action_type type,
                       scalar_field *loc_action,
                       suNg_av_field *momenta
                       ) {
@@ -57,44 +57,23 @@ void local_hmc_action(local_action_type_old type,
   int nmon=num_mon();
   for (int i=0;i<nmon;++i) {
     const monomial *m=mon_n(i);
-    if ( m->type == PureGauge ) {
-        double beta=((mon_pg_par*)m->par)->beta;
-        _MASTER_FOR(&glattice,i) {
-          /* Gauge action */
-          *_FIELD_AT(loc_action,i) += -(beta/((double)NG))*local_plaq(i);
-        }
-    } else {
-      spinor_field *phi=NULL;
-      switch (m->type) {
-        case HMC:
-          phi=((mon_hmc_par*)m->par)->pf;
-          break;
-        case RHMC:
-          phi=((mon_rhmc_par*)m->par)->pf;
-          break;
-      case TM:
-      case TM_alt:
-          phi=((mon_tm_par*)m->par)->pf;
-          break;
-      case Hasenbusch:
-          phi=((mon_hasenbusch_par*)m->par)->pf;
-          break;
-      case Hasenbusch_tm:
-      case Hasenbusch_tm_alt:
-          phi=((mon_hasenbusch_tm_par*)m->par)->pf;
-          break;
-      default:
-        lprintf("MONOMIAL",0,"WARNING: unknown type!\n");
-        break;
-      }
-      /* pseudo fermion action = phi^2 */
-      _MASTER_FOR(phi->type,i) {
-        double a=0.;
-        /* Fermions */
-        _spinor_prod_re_f(a,*_FIELD_AT(phi,i),*_FIELD_AT(phi,i));
-        *_FIELD_AT(loc_action,i)+=a;
-      }
+    
+    m->add_local_action(m,loc_action);
 
+  }
+}
+
+/* add the square of the pf field to the local action */
+void pf_local_action(scalar_field *loc_action, spinor_field *pf) {
+  if (pf!=NULL) {
+    _MASTER_FOR(pf->type,i) {
+      double a=0.;
+      /* Fermions */
+      _spinor_prod_re_f(a,*_FIELD_AT(pf,i),*_FIELD_AT(pf,i));
+      *_FIELD_AT(loc_action,i)+=a;
     }
   }
 }
+
+
+

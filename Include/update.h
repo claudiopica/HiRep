@@ -69,99 +69,7 @@ void gaussian_spinor_field_flt(spinor_field_flt *s);
 void z2_spinor_field(spinor_field *s);
 
 
-typedef struct _puregauge_par {
-  /* sim parameters */
-  double beta;
-    
-  double MT_prec; /* metropolis test precision */
-  double MD_prec; /* molecular dynamics precision */
-  
-  double tlen; /* trajectory lenght */
-  unsigned int gsteps; /* number of substeps for the gauge part every step */
-} puregauge_par;
-
-void init_puregauge(puregauge_par *par);
-void free_puregauge();
-
-
-typedef struct _rhmc_par {
-  /* sim parameters */
-  double beta;
-  int nf;
-  double mass;
-  
-  double theta[4];
-  
-  double SF_zf;
-  double SF_ds;
-  int SF_sign;
-  double SF_ct;
-  double SF_prec;
-  
-  double MT_prec; /* metropolis test precision */
-  double MD_prec; /* molecular dynamics precision */
-  double HB_prec; /* heatbath precision for pseudofermions */
-  double force_prec; /* precision used in the inversions in the force */
-  double force_prec_flt; /* precision used in single-precision acceleration for the inversions in the force (HMC only)*/
-  unsigned int n_pf; /* number of psudofermions used in the evolution */
-  
-  double tlen; /* trajectory lenght */
-  unsigned int nsteps; /* number of step in the integration */
-  unsigned int gsteps; /* number of substeps for the gauge part every step */
-} rhmc_par;
-
-void init_rhmc(rhmc_par *par);
-void free_rhmc();
-
-typedef struct _hmc_par {
-  /* sim parameters */
-  double beta;
-  int nf;
-  double mass;
-  
-  double theta[4];
-
-  double SF_zf;
-  double SF_ds;
-  int SF_sign;
-  double SF_ct;
-	
-  double n_MT_prec; /* n metropolis test precision */
-  double h_MT_prec; /* h metropolis test precision */
-  double n_MT_prec_flt; /* n metropolis test precision float*/
-  double h_MT_prec_flt; /* h metropolis test precision float*/
-  double MD_prec; /* molecular dynamics precision */
-  double HB_prec; /* heatbath precision for pseudofermions */
-  double n_force_prec; /* precision used in the inversions in the force F1 (higher mass) of the Hasenbush acceleration*/
-  double n_force_prec_flt; /* precision used in single-precision acceleration for the inversions in the force F1 (HMC only)*/
-  double h_force_prec; /* precision used in the inversions in the force F2 (lower mass) of the Hasenbush acceleration*/
-  double h_force_prec_flt; /* precision used in single-precision acceleration for the inversions in the force F2 (HMC only)*/
-
-  double tlen; /* trajectory lenght */
-  unsigned int nsteps; /* number of steps in the integration */
-  unsigned int* hsteps; /* List of number of substeps for the heavier mass of the Hasenbush acceleration */
-  unsigned int gsteps; /* number of substeps for the gauge part every step */
-  
-  int hasenbusch; /* 0=no hasenbusch ; 1=hasenbusch */
-  int n_hasen; /* Number of Hasenbusch levels*/
-  double* hasen_dm; /* List of differences of heavier mass of the Hasenbush acceleration */
-} hmc_par;
-
-void init_hmc(hmc_par *par);
-void free_hmc();
-
-/* update the gauge field using RHMC algorithm
- * return code: (<0 means an error has occurred)
- * 0 => conf correctly generated but has not passed metropolis test
- * 1 => conf accepted
- * 
- * -1 => rhmc has not been initialized. call init_rhmc first.
- */
-int update_rhmc();
-int update_hmc();
-int update_puregauge();
-int update_rhmc_o();
-
+/* For the fermion force ? */
 void corret_pf_dist_hmc();
 void calc_one_force(int n_force);
 
@@ -223,16 +131,43 @@ typedef struct _mon_hasenbusch_tm_par {
 } mon_hasenbusch_tm_par;
 
 
-typedef struct _monomial {
+typedef struct _monomial_data {
   int id; /* monomial id */
   mon_type type; /* type of monomial */
   void *par; /* parameters */
   double MT_prec; /* metropolis precision */
   double MD_prec; /* molecular dynamics precision */
   double force_prec; /* force precision */
+} monomial_data;
+
+typedef struct _monomial {
+  monomial_data data;
+  
+  /* Functions */
+  void (*free)(struct _monomial *m); /* free memory */
+  
+  void (*force_f)(double dt, suNg_av_field *force, void *par); /* force function */
+  void *force_par; /* parameters for the force function */
+
+  void (*init_traj)(const struct _monomial *m);
+  void (*gaussian_pf)(const struct _monomial *m);
+  void (*correct_pf)(const struct _monomial *m);
+  void (*correct_la_pf)(const struct _monomial *m);
+  const spinor_field *(*pseudofermion)(const struct _monomial *m); /* returns ps field pointer */
+  void (*add_local_action)(const struct _monomial *m, scalar_field *loc_action);
+  
 } monomial;
 
-const monomial *add_mon(monomial *mon);
+struct _monomial* pg_create(const monomial_data *data);
+struct _monomial* hmc_create(const monomial_data *data);
+struct _monomial* rhmc_create(const monomial_data *data);
+struct _monomial* tm_create(const monomial_data *data);
+struct _monomial* tm_alt_create(const monomial_data *data);
+struct _monomial* hasen_create(const monomial_data *data);
+struct _monomial* hasen_tm_create(const monomial_data *data);
+struct _monomial* hasen_tm_alt_create(const monomial_data *data);
+
+const monomial *add_mon(monomial_data *mon);
 int num_mon();
 const monomial *mon_n(int i);
 
@@ -253,8 +188,6 @@ void O4MN_multistep(suNg_av_field *momenta, double tlen, integrator_par *int_par
 
 
 typedef struct _ghmc_par {
-	/* action parameter */
- // mon_list *action;
   
   /* integrator */
   integrator_par *integrator;
@@ -263,21 +196,12 @@ typedef struct _ghmc_par {
   /* Fermion Theta angles */
   double theta[4];
   
+  /* Probably not needed anymore */
   /* SF stuff */
   double SF_zf;
   double SF_ds;
   int SF_sign;
   double SF_ct;
-  
-  /* other parameters */
-  int mre_past; /* chronological guesser */
-
-  /* dummy variables */
-  /* NEED TO DELETE */
-  double beta;
-  int nf;
-  double mass;
-
   
 } ghmc_par;
 
@@ -291,25 +215,18 @@ int update_ghmc();
 typedef enum {
    NEW=1,
    DELTA=2
-} local_action_type_old;
+} local_action_type;
 
 /*
  * compute the local action at every site for the HMC
  * H = | momenta |^2 + S_g + < phi1, phi2>
  */
-typedef struct _action_par_old {
-  /* sim parameters */
-  double beta;
-  int n_pf;
-#ifdef ROTATED_SF
-  double SF_ct;
-#endif
-} action_par_old;
-
-
-void local_hmc_action(local_action_type_old type,
+void local_hmc_action(local_action_type type,
                       scalar_field *loc_action,
                       suNg_av_field *momenta);
+void pf_local_action(scalar_field *loc_action,
+                     spinor_field *pf);
+
 
 void suNg_field_copy(suNg_field *g1, suNg_field *g2);
 void suNf_field_copy(suNf_field *g1, suNf_field *g2);

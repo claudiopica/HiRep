@@ -37,9 +37,10 @@ typedef struct _input_mesons {
   char make[256];
   double precision;
   int nhits;
+  double mesmass; /* valence mass */
   
   /* for the reading function */
-  input_record_t read[4];
+  input_record_t read[5];
   
 } input_mesons;
 
@@ -49,6 +50,7 @@ typedef struct _input_mesons {
     {"make mesons", "mes:make = %s", STRING_T, (varname).make},\
     {"inverter precision", "mes:precision = %lf", DOUBLE_T, &(varname).precision},\
     {"number of noisy sources per cnfg", "mes:nhits = %d", INT_T, &(varname).nhits},\
+    {"valence mass", "mes:mass = %lf", DOUBLE_T, &(varname).mesmass},\
     {NULL, NULL, INT_T, NULL}\
   }\
 }
@@ -86,9 +88,10 @@ typedef struct _input_eigval {
   int maxiter; /* max number of subiterations */
   double omega1; /* absolute precision */
   double omega2; /* relative precision */
+  double evamass; /* mass to use in Dirac operator */
   
   /* for the reading function */
-  input_record_t read[8];
+  input_record_t read[9];
   
 } input_eigval;
 
@@ -102,6 +105,7 @@ typedef struct _input_eigval {
     {"max number of subiterations", "eva:maxiter = %d", INT_T, &(varname).maxiter},\
     {"absolute precision", "eva:omega1 = %lf", DOUBLE_T, &(varname).omega1},\
     {"relative precision", "eva:omega2 = %lf", DOUBLE_T, &(varname).omega2},\
+    {"Dirac op mass", "eva:mass = %lf", DOUBLE_T, &(varname).evamass},\
     {NULL, NULL, INT_T, NULL}\
   }\
 }
@@ -139,9 +143,8 @@ static void read_cmdline(int argc, char* argv[]) {
 }
 
 
-double h2evamass=0.;
 static void H2eva(spinor_field *out, spinor_field *in){
-  g5Dphi_sq(h2evamass, out, in);
+  g5Dphi_sq(eigval_var.evamass, out, in);
 }
 
 
@@ -231,7 +234,6 @@ int main(int argc,char *argv[]) {
     lprintf("OBSERVABLES",0,"EVA Relative precision (eva:omega2) = %e\n",eigval_var.omega2);
   }
 
-  h2evamass=flow.hmc_v->hmc_p.mass;
   
   double *eva_vals=NULL;
   spinor_field *eva_vecs=NULL;
@@ -312,8 +314,8 @@ int main(int argc,char *argv[]) {
       
       /* Mesons */
       if(strcmp(mes_var.make,"true")==0) {
-	measure_spectrum_semwall(1,&(flow.hmc_v->hmc_p.mass),mes_var.nhits,i,mes_var.precision);
-	//        z2semwall_mesons(i,mes_var.nhits,1,&(flow.hmc_v->hmc_p.mass),mes_var.precision);
+	measure_spectrum_semwall(1,&mes_var.mesmass,mes_var.nhits,i,mes_var.precision);
+	//        z2semwall_mesons(i,mes_var.nhits,1,&mes_var.mesmass,mes_var.precision);
       }
       
       /* Polyakov loops */

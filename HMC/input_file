@@ -50,6 +50,7 @@ last conf = +10
 mes:make = false
 mes:precision = 1.e-20
 mes:nhits = 1
+mes:mass = -0.55
 
 // Polyakov
 poly:make = false
@@ -62,6 +63,7 @@ eva:kmax = 50
 eva:maxiter = 100
 eva:omega1 = 1.e-8
 eva:omega2 = 1.e-3
+eva:mass = -0.55
 
 // Monomials
 monomial {

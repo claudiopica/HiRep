@@ -58,35 +58,7 @@ void gforce(suNg_av_field *force, double dt, int nmon, const monomial **mon_list
   for(int n = 0; n < nmon; n++)
   {
     const monomial *m = mon_list[n];
-    switch(m->type)
-    {
-      case PureGauge:
-        force0(dt, force, &((mon_pg_par*)(m->par))->beta);
-        break;
-      case HMC:
-        force_hmc(dt, force, &((mon_hmc_par*)m->par)->fpar);
-        break;
-      case RHMC:
-        force_rhmc(dt, force, &((mon_rhmc_par*)m->par)->fpar);
-        break;
-      case TM:
-        force_hmc_tm(dt,force, &((mon_tm_par*)m->par)->fpar);
-        break;
-      case TM_alt:
-        force_hmc(dt,force, &((mon_tm_par*)m->par)->fpar);
-        break;
-      case Hasenbusch:
-        force_hmc(dt, force, &((mon_hasenbusch_par*)m->par)->fpar);
-        break;
-      case Hasenbusch_tm:
-        force_hmc_tm(dt,force, &((mon_hasenbusch_tm_par*)m->par)->fpar);
-        break;
-      case Hasenbusch_tm_alt:
-        force_hmc(dt, force, &((mon_hasenbusch_tm_par*)m->par)->fpar);
-      default:
-        lprintf("MONOMIAL",0,"WARNING: unknown type!\n");
-        break;
-    }
+    m->force_f(dt, force, m->force_par);
   }
 }
 
