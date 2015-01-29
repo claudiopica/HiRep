@@ -41,7 +41,7 @@ static void check(int test, const char* format, ...)
       vsprintf(buf, format, args);
       va_end(args);
       lprintf("ACTION", 0, buf);
-      
+
       finalize_process();
       exit(1);
    }
@@ -57,7 +57,7 @@ static char* find_string(section *sec, char *key)
          return sec->value[i];
       }
    }
-   
+
    last_error = 1;
    return 0;
 }
@@ -72,7 +72,7 @@ static double find_double(section *sec, char *key)
          return atof(sec->value[i]);
       }
    }
-   
+
    last_error = 1;
    return 0;
 }
@@ -98,20 +98,20 @@ static void setup_monomials()
       cur = &sec_mon[i];
       memset(&data, 0, sizeof(data));
       data.id = i;
-      
+
       type = find_string(cur, "type");
       check(last_error, "Monomial type not specified\n");
-      
+
       level = find_double(cur, "level");
       check(last_error, "Unable to find 'level' in monomial");
       check(level<0||level>=n_int, "Invalid integrator level %d in monomial\n", level);
-      
+
       if(strcmp(type, "gauge") == 0)
       {
          mon_pg_par *par = malloc(sizeof(*par));
          data.par = par;
          data.type = PureGauge;
-         
+
          // Find parameters
          par->beta = find_double(cur, "beta");
          check(last_error, "Unable to find 'beta' in monomial of type 'gauge'\n");
@@ -127,23 +127,23 @@ static void setup_monomials()
          mon_hmc_par *par = malloc(sizeof(*par));
          data.par = par;
          data.type = HMC;
-         
+
          // Find parameters
          par->mass = find_double(cur, "mass");
          check(last_error, "Unable to find 'mass' in monomial of type 'hmc'\n");
-         
+
          data.MT_prec = find_double(cur, "mt_prec");
          check(last_error, "Unable to find 'mt_prec' in monomial of type 'hmc'\n");
-         
+
          data.force_prec = find_double(cur, "force_prec");
          check(last_error, "Unable to find 'force_prec' in monomial of type 'hmc'\n");
-         
+
          par->mre_past = find_double(cur, "mre_past");
          check(last_error, "Unable to find 'mre_past' in monomial of type 'hmc'\n");
-         
+
          // Add monomial
          mret = add_mon(&data);
-         
+
          // Monomial information
          lprintf("ACTION", 10, "Monomial %d: level = %d, type = hmc, mass = %1.6f, force_prec = %1.2e, mt_prec = %1.2e\n",
                  i, level, par->mass, data.force_prec, data.MT_prec);
@@ -153,26 +153,26 @@ static void setup_monomials()
          mon_tm_par *par = malloc(sizeof(*par));
          data.par = par;
          data.type = TM;
-         
+
          // Find parameters
          par->mass = find_double(cur, "mass");
          check(last_error, "Unable to find 'mass' in monomial of type 'tm'\n");
-         
+
          par->mu = find_double(cur, "mu");
          check(last_error, "Unable to find 'mu' in monomial of type 'tm'\n");
-         
+
          data.MT_prec = find_double(cur, "mt_prec");
          check(last_error, "Unable to find 'mt_prec' in monomial of type 'tm'\n");
-         
+
          data.force_prec = find_double(cur, "force_prec");
          check(last_error, "Unable to find 'force_prec' in monomial of type 'tm'\n");
-         
+
          par->mre_past = find_double(cur, "mre_past");
          check(last_error, "Unable to find 'mre_past' in monomial of type 'tm'\n");
-         
+
          // Add monomial
          mret = add_mon(&data);
-         
+
          // Monomial information
          lprintf("ACTION", 10, "Monomial %d: level = %d, type = tm, mass = %1.6f, mu = %1.6f, force_prec = %1.2e, mt_prec = %1.2e\n",
                  i, level, par->mass, par->mu, data.force_prec, data.MT_prec);
@@ -182,26 +182,26 @@ static void setup_monomials()
          mon_tm_par *par = malloc(sizeof(*par));
          data.par = par;
          data.type = TM_alt;
-         
+
          // Find parameters
          par->mass = find_double(cur, "mass");
          check(last_error, "Unable to find 'mass' in monomial of type 'tm_alt'\n");
-         
+
          par->mu = find_double(cur, "mu");
          check(last_error, "Unable to find 'mu' in monomial of type 'tm_alt'\n");
-         
+
          data.MT_prec = find_double(cur, "mt_prec");
          check(last_error, "Unable to find 'mt_prec' in monomial of type 'tm_alt'\n");
-         
+
          data.force_prec = find_double(cur, "force_prec");
          check(last_error, "Unable to find 'force_prec' in monomial of type 'tm_alt'\n");
-         
+
          par->mre_past = find_double(cur, "mre_past");
          check(last_error, "Unable to find 'mre_past' in monomial of type 'tm_alt'\n");
-         
+
          // Add monomial
          mret = add_mon(&data);
-         
+
          // Monomial information
          lprintf("ACTION", 10, "Monomial %d: level = %d, type = tm_alt, mass = %1.6f, mu = %1.6f, force_prec = %1.2e, mt_prec = %1.2e\n",
                  i, level, par->mass, par->mu, data.force_prec, data.MT_prec);
@@ -211,26 +211,26 @@ static void setup_monomials()
          mon_hasenbusch_par *par = malloc(sizeof(*par));
          data.par = par;
          data.type = Hasenbusch;
-         
+
          // Find parameters
          par->mass = find_double(cur, "mass");
          check(last_error, "Unable to find 'mass' in monomial of type 'hasenbusch'\n");
-         
+
          par->dm = find_double(cur, "dm");
          check(last_error, "Unable to find 'dm' in monomial of type 'hasenbusch'\n");
-         
+
          data.MT_prec = find_double(cur, "mt_prec");
          check(last_error, "Unable to find 'mt_prec' in monomial of type 'hasenbusch'\n");
-         
+
          data.force_prec = find_double(cur, "force_prec");
          check(last_error, "Unable to find 'force_prec' in monomial of type 'hasenbusch'\n");
-         
+
          par->mre_past = find_double(cur, "mre_past");
          check(last_error, "Unable to find 'mre_past' in monomial of type 'hasenbusch'\n");
-         
+
          // Add monomial
          mret = add_mon(&data);
-         
+
          // Monomial information
          lprintf("ACTION", 10, "Monomial %d: level = %d, type = hasenbusch, mass = %1.6f, dm = %1.6f, force_prec = %1.2e, mt_prec = %1.2e\n",
                  i, level, par->mass, par->dm, data.force_prec, data.MT_prec);
@@ -241,29 +241,29 @@ static void setup_monomials()
          data.par = par;
          data.type = RHMC;
          par->ratio.order = 16;
-         
+
          // Find parameters
          par->mass = find_double(cur, "mass");
          check(last_error, "Unable to find 'mass' in monomial of type 'rhmc'\n");
-         
+
          par->ratio.n = -1*find_double(cur, "n");
          check(last_error, "Unable to find 'n' in monomial of type 'rhmc'\n");
-         
+
          par->ratio.d = find_double(cur, "d");
          check(last_error, "Unable to find 'd' in monomial of type 'rhmc'\n");
-         
+
          data.MT_prec = find_double(cur, "mt_prec");
          check(last_error, "Unable to find 'mt_prec' in monomial of type 'rhmc'\n");
-         
+
          data.MD_prec = find_double(cur, "md_prec");
          check(last_error, "Unable to find 'md_prec' in monomial of type 'rhmc'\n");
-         
+
          data.force_prec = find_double(cur, "force_prec");
          check(last_error, "Unable to find 'force_prec' in monomial of type 'rhmc'\n");
-         
+
          // Add monomial
          mret = add_mon(&data);
-         
+
          // Monomial information
          lprintf("ACTION", 10, "Monomial %d: level = %d, type = rhmc, mass = %1.6f, force_prec = %1.2e, mt_prec = %1.2e, md_prec = %1.2e\n",
                  i, level, par->mass, data.force_prec, data.MT_prec, data.MD_prec);
@@ -271,72 +271,72 @@ static void setup_monomials()
       else if(strcmp(type, "hasenbusch_tm") == 0)
       {
          mon_hasenbusch_tm_par *par = malloc(sizeof(*par));
-         data.par = &par;
+         data.par = par;
          data.type = Hasenbusch_tm;
-         
+
          // Find parameters
          par->mass = find_double(cur, "mass");
          check(last_error, "Unable to find 'mass' in monomial of type 'hasenbusch_tm'\n");
-         
+
          par->mu = find_double(cur, "mu");
          check(last_error, "Unable to find 'dm' in monomial of type 'hasenbusch_tm'\n");
-         
+
          par->dmu = find_double(cur, "dmu");
          check(last_error, "Unable to find 'dm' in monomial of type 'hasenbusch_tm'\n");
-         
+
          data.MT_prec = find_double(cur, "mt_prec");
          check(last_error, "Unable to find 'mt_prec' in monomial of type 'hasenbusch_tm'\n");
-         
+
          data.force_prec = find_double(cur, "force_prec");
          check(last_error, "Unable to find 'force_prec' in monomial of type 'hasenbusch_tm'\n");
-         
+
          par->mre_past = find_double(cur, "mre_past");
          check(last_error, "Unable to find 'mre_past' in monomial of type 'hasenbusch_tm'\n");
-         
+
          // Add monomial
          mret = add_mon(&data);
-         
+
          // Monomial information
-         lprintf("ACTION", 10, "Monomial %d: level = %d, type = hasenbusch_tm, mass = %1.6f, mu = %1.6, dmu = %1.6f, force_prec = %1.2e, mt_prec = %1.2e\n",
+         lprintf("ACTION", 10, "Monomial %d: level = %d, type = hasenbusch_tm, mass = %1.6f, mu = %1.6f, dmu = %1.6f, force_prec = %1.2e, mt_prec = %1.2e\n",
                  i, level, par->mass, par->mu, par->dmu, data.force_prec, data.MT_prec);
       }
       else if(strcmp(type, "hasenbusch_tm_alt") == 0)
       {
          mon_hasenbusch_tm_par *par = malloc(sizeof(*par));
-         data.par = &par;
+         data.par = par;
          data.type = Hasenbusch_tm_alt;
-         
+
          // Find parameters
          par->mass = find_double(cur, "mass");
          check(last_error, "Unable to find 'mass' in monomial of type 'hasenbusch_tm_alt'\n");
-         
+
          par->mu = find_double(cur, "mu");
          check(last_error, "Unable to find 'dm' in monomial of type 'hasenbusch_tm_alt'\n");
-         
+
          par->dmu = find_double(cur, "dmu");
          check(last_error, "Unable to find 'dm' in monomial of type 'hasenbusch_tm_alt'\n");
-         
+
          data.MT_prec = find_double(cur, "mt_prec");
          check(last_error, "Unable to find 'mt_prec' in monomial of type 'hasenbusch_tm_alt'\n");
-         
+
          data.force_prec = find_double(cur, "force_prec");
          check(last_error, "Unable to find 'force_prec' in monomial of type 'hasenbusch_tm_alt'\n");
-         
+
          par->mre_past = find_double(cur, "mre_past");
          check(last_error, "Unable to find 'mre_past' in monomial of type 'hasenbusch_tm_alt'\n");
-         
+
          // Add monomial
          mret = add_mon(&data);
-         
+
          // Monomial information
-         lprintf("ACTION", 10, "Monomial %d: level = %d, type = hasenbusch_tm_alt, mass = %1.6f, mu = %1.6, dmu = %1.6f, force_prec = %1.2e, mt_prec = %1.2e\n",
+         lprintf("ACTION", 10, "Monomial %d: level = %d, type = hasenbusch_tm_alt, mass = %1.6f, mu = %1.6f, dmu = %1.6f, force_prec = %1.2e, mt_prec = %1.2e\n",
                  i, level, par->mass, par->mu, par->dmu, data.force_prec, data.MT_prec);
       }
       else
       {
          check(1, "Unknown monomial type\n");
       }
-      
+
       add_monomial_to_integrator(mret, level);
    }
 }
@@ -349,35 +349,35 @@ static void setup_integrator()
    char *type;
    int map[MAX_SECTIONS];
    int id;
-   
+
    // Determine the ordering of the integrator levels and check for inconsistencies
    for(int i = 0; i < n_int; i++)
    {
       map[i] = -1;
    }
-   
+
    for(int i = 0; i < n_int; i++)
    {
       id = find_double(&sec_int[i], "level");
-      
+
       check(last_error, "Integrator level not specified\n");
       check(id<0||id>=n_int, "Invalid integrator level %d\n", id);
       check(map[id]>=0, "Integrator level %d already exists\n", id);
-      
+
       map[id] = i;
    }
-   
+
    // Construct integrator structure
    for(int i = 0; i < n_int; i++)
    {
       cur = &sec_int[map[i]];
-      
+
       type = find_string(cur, "type");
       check(last_error, "Unable to find 'type' in integrator\n");
-      
+
       tmp.nsteps = find_double(cur, "steps");
       check(last_error, "Unable to find 'steps' in integrator\n");
-      
+
       if(strcmp(type, "o2mn") == 0)
       {
          tmp.integrator = &O2MN_multistep;
@@ -397,7 +397,7 @@ static void setup_integrator()
       {
          check(1, "Unknown integrator type\n");
       }
-      
+
       if(iter == 0)
       {
          iter = malloc(sizeof(integrator_par));
@@ -408,7 +408,7 @@ static void setup_integrator()
          iter->next = malloc(sizeof(integrator_par));
          iter = iter->next;
       }
-      
+
       // Fill structure
       iter->nsteps = tmp.nsteps;
       iter->integrator = tmp.integrator;
@@ -425,7 +425,7 @@ static void parse_lines(section *sec, char *lines)
    char val[MAX_LENGTH];
    int count;
    int id;
-   
+
    while(sscanf(lines, "%s = %s%n", key, val, &count) == 2)
    {
       id = sec->num++;
@@ -440,35 +440,35 @@ void read_action(char *filename, integrator_par **ip_ptr)
    FILE *fp;
    char *content;
    char *lines;
-   char *type;//
+   char *type;
    int fsz = 0;
    int count = 0;
    int pos = 0;
-   
+
    // Open file
    fp = fopen(filename, "r");
-   
+
    if(fp == NULL)
    {
       check(1, "Unable to open file\n");
    }
-   
+
    // Clear memory
    memset(sec_int, 0, sizeof(sec_int));
    memset(sec_mon, 0, sizeof(sec_mon));
-   
+
    // Determine file size
    fseek(fp, 0, SEEK_END);
    fsz = ftell(fp);
    rewind(fp);
-   
+
    // Read file content
    content = malloc(fsz);
    lines = malloc(fsz);
    type = malloc(fsz);
    fread(content, fsz, 1, fp);
    fclose(fp);
-   
+
    // Find all sections in the file
    while(pos < fsz)
    {
@@ -479,13 +479,13 @@ void read_action(char *filename, integrator_par **ip_ptr)
             parse_lines(&sec_mon[n_mon], lines);
             n_mon++;
          }
-         
+
          if(strcmp(type, "integrator") == 0)
          {
             parse_lines(&sec_int[n_int], lines);
             n_int++;
          }
-         
+
          pos += count + 1;
       }
       else
@@ -493,13 +493,12 @@ void read_action(char *filename, integrator_par **ip_ptr)
          pos++;
       }
    }
-   
+
    // Free memory
    free(content);
    free(lines);
    free(type);
-   
-   
+
    // Print log info
    if(n_mon < n_int)
    {
@@ -509,11 +508,11 @@ void read_action(char *filename, integrator_par **ip_ptr)
    {
       lprintf("ACTION", 10, "Found %d monomials and %d integrator levels\n", n_mon, n_int);
    }
-   
+
    // Setup structures
    setup_integrator();
    setup_monomials();
-   
+
    // Check that all integrator levels have monomials
    integrator_par *iter = ip;
    while(iter)
@@ -521,6 +520,7 @@ void read_action(char *filename, integrator_par **ip_ptr)
       check(iter->nmon == 0, "No monomials on integrator level %d\n", iter->level);
       iter = iter->next;
    }
+
    // Return integrator structure
    *ip_ptr = ip;
 }
