@@ -186,32 +186,24 @@ void su2_hit(int fix_dir, int parity, double overrelax, suNg_field *fixed_gauge,
   int i22 = i2*NG + i2;
 
   for (t=0; t<T; t++) for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++){ idx=ipt(t,x,y,z);
-	  p = (zerocoord[0] + t + zerocoord[1] + x + zerocoord[2] + y + zerocoord[3] + z)%2;
+	  p = (zerocoord[0] + t + zerocoord[1] + x + zerocoord[2] + y + zerocoord[3] + z)%2; 
 	  if(p == parity){
-      
+
 	    _suNg_zero(v1);
-	    for(mu=0;mu<4;mu++){
+	    for(mu=0;mu<4;mu++){ 
 	      if(mu != fix_dir){
-          u1=_4FIELD_AT(fixed_gauge,idx,mu);		//u_mu(x)
-          u2=_4FIELD_AT(fixed_gauge,idn(idx,mu),mu);	//u_mu(x - mu)
-          
-          //v1 = u1 + u2^dag. v1 is not in SU(NG).
-#if 0 //OLD CODE
-          for(i=0;i<NG;i++){ for(j=0;j<NG;j++){
+		u1=_4FIELD_AT(fixed_gauge,idx,mu);		//u_mu(x)
+		u2=_4FIELD_AT(fixed_gauge,idn(idx,mu),mu);	//u_mu(x - mu)
+
+		//v1 = u1 + u2^dag. v1 is not in SU(NG). 
+		for(i=0;i<NG;i++){ for(j=0;j<NG;j++){
 #ifdef GAUGE_SON
-            v1.c[i*NG + j]+= u1->c[i*NG+j]+u2->c[j*NG+i];
+		    v1.c[i*NG + j]+= u1->c[i*NG+j]+u2->c[j*NG+i];
 #else
-            _complex_add_star_assign(v1.c[i*NG + j], (u1->c[i*NG+j]), (u2->c[j*NG+i]) );
+		    _complex_add_star_assign(v1.c[i*NG + j], (u1->c[i*NG+j]), (u2->c[j*NG+i]) );
 #endif
-          }}
-#endif //OLD CODE
-          
-          _suNg_dagger(v1,*u2);
-          _suNg_add_assign(v1,*u1);
-          
-          
+		  }}
 	      }}
-      
 #ifdef GAUGE_SON
 	    //Extract gauge transformation
 	    r[0] = v1.c[i11] + v1.c[i22];
@@ -228,39 +220,18 @@ void su2_hit(int fix_dir, int parity, double overrelax, suNg_field *fixed_gauge,
 	    asq = ( acos(a[0]) )*overrelax;
 	    a[0] = cos(asq);
 	    a[1] = sin(asq);
-	    if(r[1] < 0) a[1] *= -1;
-      
+	    if(r[1] < 0) a[1] *= -1; 
+
 	    _suNg_unit(v2);
 	    v2.c[i11]=v2.c[i22]=(a[0]);
 	    v2.c[i21]=(a[1]);
 	    v2.c[i12]=-v2.c[i21];
-#else
-#ifdef WITH_QUATERNIONS
-      // r0, r[i] is equal to v1 already
-      //use v2 to store a0,a[i]
-      _suNg_sqnorm(rnorm,v1); //sqnorm gives twice the quaternion norm
-      if (rnorm>1.e-16) {
-        rnorm=2./rnorm;
-        _suNg_mul(v2,rnorm,v1);
-        _suNg_dagger(v2,v2);
-      } else { _suNg_unit(v2); }
-      
-      //Overrelaxation
-	    asq = v2.c[1]*v2.c[1] + v2.c[2]*v2.c[2] + v2.c[3]*v2.c[3];
-	    a0sq = v2.c[0]*v2.c[0];
-	    ax = (overrelax*a0sq + asq)/(a0sq + asq);
-	    ar = sqrt((double)(a0sq + ax*ax*asq));
-	    axdr = ax/ar;
-	    //a0 = a0/ar; a[0] = a[0]*axdr; a[1] = a[1]*axdr; a[2] = a[2]*axdr;
-      v2.c[0] /= ar; v2.c[1] *= axdr; v2.c[2] *= -axdr; v2.c[3] *= axdr;
-      //There seems to be sign in v2.c[2]...
-
-#else
+#else		
 	    //Extract gauge transform
 	    r0 =   v1.c[i11].re + v1.c[i22].re;
-	    r[0] = v1.c[i12].im + v1.c[i21].im;
-	    r[1] = v1.c[i12].re - v1.c[i21].re;
-	    r[2] = v1.c[i11].im - v1.c[i22].im;
+	    r[0] = v1.c[i12].im + v1.c[i21].im; 
+	    r[1] = v1.c[i12].re - v1.c[i21].re; 
+	    r[2] = v1.c[i11].im - v1.c[i22].im; 
 	    rnorm = 1./sqrt(r0*r0 + r[0]*r[0] + r[1]*r[1] + r[2]*r[2]);
 	    if(1./rnorm > 1e-16){
 	      a0 = r0*rnorm;
@@ -280,21 +251,20 @@ void su2_hit(int fix_dir, int parity, double overrelax, suNg_field *fixed_gauge,
 	    ar = sqrt((double)(a0sq + ax*ax*asq));
 	    axdr = ax/ar;
 	    a0 = a0/ar; a[0] = a[0]*axdr; a[1] = a[1]*axdr; a[2] = a[2]*axdr;
-      
+
 	    _suNg_unit(v2);
-	    v2.c[i11].re = a0; 	v2.c[i11].im = a[2];
-	    v2.c[i12].re = a[1]; 	v2.c[i12].im = a[0];
-	    v2.c[i21].re =-a[1]; 	v2.c[i21].im = a[0];
-	    v2.c[i22].re = a0; 	v2.c[i22].im =-a[2];
-#endif
-#endif
-      
+	    v2.c[i11].re = a0; 	v2.c[i11].im = a[2]; 
+	    v2.c[i12].re = a[1]; 	v2.c[i12].im = a[0]; 
+	    v2.c[i21].re =-a[1]; 	v2.c[i21].im = a[0]; 
+	    v2.c[i22].re = a0; 	v2.c[i22].im =-a[2]; 
+#endif		
+
 	    //_suNg_times_suNg( (*_4FIELD_AT(g,idx,0)), (*_4FIELD_AT(g,idx,0)), v2);
 	    *_4FIELD_AT(g,idx,0) = v2;
 	  } 
 	}
-  start_gf_sendrecv(g);
-  complete_gf_sendrecv(g);
+     start_gf_sendrecv(g);
+     complete_gf_sendrecv(g);
 } 
 
 

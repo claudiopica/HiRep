@@ -114,6 +114,17 @@ do {  \
        }								\
    } while(0) 
 
+#define _propagator_mulc_assign(S, k) \
+   do { \
+      int ITMP, JTMP; \
+      for(ITMP=0;ITMP<4*NF;ITMP++){ \
+      for(JTMP=0;JTMP<4*NF;JTMP++){ \
+	complex tmp; tmp = _PROP_IDX( S,ITMP,JTMP); \
+	_complex_mul( _PROP_IDX( S,ITMP,JTMP), k, tmp ); \
+      }} \
+   } while(0)  
+	
+
 //r propagator = s^T
 #define _propagator_transpose(r,s) \
    do { \
@@ -297,6 +308,13 @@ do{						\
   for (a=0;a<NF;++a){ _g5g1_spinmatrix((p).c[a],(q).c[a]); }  \
 } while(0)
 
+#define _g5g2_propagator(p,q)			\
+do{						\
+  int a; \
+  for (a=0;a<NF;++a){ _g5g2_spinmatrix(p.c[a],q.c[a]); }  \
+} while(0)
+
+
 //P = Q Gamma
 #define _propagator_g0(p,q)			\
 do{						\
@@ -322,6 +340,13 @@ do{						\
   for (a=0;a<NF;++a){ _spinmatrix_g5g0((p).c[a],(q).c[a]); }  \
 } while(0)
 
+#define _g5g0g1_propagator(p,q)			\
+do{						\
+  int a; \
+  for (a=0;a<NF;++a){ _g5g0g1_spinmatrix(p.c[a],q.c[a]); }  \
+} while(0)
+
+
 #define _g5g0g2_propagator(p,q)			\
 do{						\
   int a; \
@@ -334,6 +359,13 @@ do{						\
   int a; \
   for (a=0;a<NF;++a){ _spinmatrix_g5g0g2((p).c[a],(q).c[a]); }  \
 } while(0)
+
+#define _g5g0g3_propagator(p,q)			\
+do{						\
+  int a; \
+  for (a=0;a<NF;++a){ _g5g0g3_spinmatrix(p.c[a],q.c[a]); }  \
+} while(0)
+
 
 #define _propagator_g5g3(p,q)			\
 do{						\
@@ -348,6 +380,12 @@ do{						\
 } while(0)
 
 
+#define _g0g1_propagator(p,q)			\
+do{						\
+  int a; \
+  for (a=0;a<NF;++a){ _g0g1_spinmatrix(p.c[a],q.c[a]); }  \
+} while(0)
+
 
 #define _g0g2_propagator(p,q)			\
 do{						\
@@ -361,6 +399,11 @@ do{						\
   for (a=0;a<NF;++a){ _spinmatrix_g0g2((p).c[a],(q).c[a]); }  \
 } while(0)
 
+#define _g0g3_propagator(p,q)			\
+do{						\
+  int a; \
+  for (a=0;a<NF;++a){ _g0g3_spinmatrix(p.c[a],q.c[a]); }  \
+} while(0)
 
 
 #endif

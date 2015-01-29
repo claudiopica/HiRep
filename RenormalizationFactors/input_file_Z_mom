@@ -1,0 +1,26 @@
+GLB_T = 32
+GLB_X = 16
+GLB_Y = 16
+GLB_Z = 16
+NP_T = 4
+NP_X = 2
+NP_Y = 1
+NP_Z = 1
+
+//level = 1  seed = 1
+level = 1  seed = 38761
+
+mes:masses = 0
+mes:precision = 1e-20
+mes:ne = 1
+mes:n_mom = 4
+mes:n_twist = 2
+mes:pt_out = 0
+mes:px_out = 1
+mes:py_out = 1
+mes:pz_out = 0
+mes:pt_in = 0
+mes:px_in = 1
+mes:py_in = 0
+mes:pz_in = -1
+

@@ -77,6 +77,7 @@ void create_noise_source_equal_eo(spinor_field *source);
 void create_diluted_source_equal_atau_col(spinor_field *source, int tau,int col);
 void create_noise_source_equal_col_dil(spinor_field *source,int col);
 void create_gauge_fixed_wall_source(spinor_field *source, int tau, int color);
+void create_gauge_fixed_momentum_source(spinor_field *source, int pt, int px, int py, int pz, int color);
 void create_sequential_source(spinor_field *source, int tf, spinor_field* prop);
 void restrict_timeslice(spinor_field *source, int tf, spinor_field* prop);
 void create_diluted_volume_source(spinor_field *source, int parity_component, int mod);
@@ -106,6 +107,9 @@ void measure_formfactors_ext(spinor_field* psi0, spinor_field* psi1, spinor_fiel
 void print_mesons(meson_observable* mo,double norm, int conf, int nm, double* mass, int lt, int n_mom, char* label);
 void print_formfactor(int conf, int nm, double* mass, int n_mom, char* label, int tf);
 void print_formfactor_ext(int conf, int nm, double* mass, int n_mom, char* label, int tf);
+
+void measure_renormalization(spinor_field* psi_in, spinor_field* psi_out, int nm, int pt_in, int px_in, int py_in, int pz_in, int pt_out, int px_out, int py_out, int pz_out);
+void print_renormalization(int conf, int nm, double* mass, char* label, int pt_in, int px_in, int py_in, int pz_in, int pt_out, int px_out, int py_out, int pz_out);
 
 void contract_baryons(spinor_field *psi0,int tau);
 
