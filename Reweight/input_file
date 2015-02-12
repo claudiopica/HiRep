@@ -10,8 +10,8 @@ NP_Y = 1
 NP_Z = 1
 
 // Ranlux variables
-level = 1
-seed = 12345
+rlx_level = 1
+rlx_seed = 12345
 
 // Reweight variables
 hits = 1000

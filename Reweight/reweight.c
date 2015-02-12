@@ -36,7 +36,7 @@ static double theta_new[4] = {0.0, 0.0, 0.0, 0.0};
 // Wrappers
 void Dirac_operator(spinor_field *out, spinor_field *in)
 {
-	Dphi(mass, out, in);
+	Dphi_eopre(mass, out, in);
 }
 
 void load_cnfg(char *filename)
@@ -151,7 +151,7 @@ void reweight(double steps, double *result)
 	spinor_field *eta;
 
 	// Allocate spinor
-	eta = alloc_spinor_field_f(1, &glattice);
+	eta = alloc_spinor_field_f(1, &glat_even);
 
 	// Perform calculation
 	for(int n = 0; n < steps; n++)
@@ -222,8 +222,8 @@ void read_cmdline(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-	char sbuf[128];
-	char rbuf[128];
+	char sbuf[512];
+	char rbuf[512];
 
 	// Read commandline
 	read_cmdline(argc, argv);
