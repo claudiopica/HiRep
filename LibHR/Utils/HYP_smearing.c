@@ -18,7 +18,12 @@ static void project_on_suN(suNg *A) {
   project_cooling_to_suNg(A,A,0);
 }
 #else
-#error ERROR: The cooling parameter must be chosen!!!
+//#error ERROR: The cooling parameter must be chosen!!!
+static void project_on_suN(suNg *A) {
+  error(1,1,"project_on_suN",
+      "Error function only defined for NG=2");
+}
+
 #endif
 
 
