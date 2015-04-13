@@ -55,6 +55,7 @@ extern derived_ctrl gps;
 extern derived_ctrl fps;
 extern derived_ctrl fv;
 extern derived_ctrl fvk;
+extern derived_ctrl fak;
 extern ratio_ctrl mvmps;
 extern ratio_ctrl mvkmps;
 extern ratio_ctrl mpsfps;
@@ -210,7 +211,10 @@ int main(int argc, char* argv[]) {
 
           if(fvk.get_level(D_EFF_B2))
             fvk_eval(fvk.eff_b2,gk.cor_b2,gk.eff_b2);
-     
+
+			  if(fak.get_level(D_EFF_B2))
+				  fak_eval(fak.eff_b2,g5gk.cor_b2,g5gk.eff_b2);
+
         } else { --sample2; ++trys; }
       }
 
@@ -304,7 +308,10 @@ int main(int argc, char* argv[]) {
 
       if(fvk.get_level(D_EFF_B1))
         fvk_eval(fvk.eff_b1,gk.cor_b1,gk.eff_b1);
- 
+
+		 if(fak.get_level(D_EFF_B1))
+			 fak_eval(fak.eff_b1,g5gk.cor_b1,g5gk.eff_b1);
+
     } else --sample1;
         
   }

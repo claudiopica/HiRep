@@ -52,6 +52,7 @@ derived_ctrl gps("gps");
 derived_ctrl fps("fps");
 derived_ctrl fv("fv");
 derived_ctrl fvk("fvk");
+derived_ctrl fak("fak");
 
 
 ratio_ctrl mvmps("mvmps");
@@ -157,6 +158,15 @@ bool eval_ctrl::fill_dep(const char* arg){
   fvk.dep[D_EFF_B2][1]=&gk; fvk.dep_level[D_EFF_B2][1]=P_EFF_B2;
   fvk.set_ndeps(D_FIT,1);
   fvk.dep[D_FIT][0]=&fvk; fvk.dep_level[D_FIT][0]=D_EFF_B2;
+
+	fak.set_ndeps(D_EFF_B1,2);
+	fak.dep[D_EFF_B1][0]=&g5gk; fak.dep_level[D_EFF_B1][0]=P_COR_B1;
+	fak.dep[D_EFF_B1][1]=&g5gk; fak.dep_level[D_EFF_B1][1]=P_EFF_B1;
+	fak.set_ndeps(D_EFF_B2,2);
+	fak.dep[D_EFF_B2][0]=&g5gk; fak.dep_level[D_EFF_B2][0]=P_COR_B2;
+	fak.dep[D_EFF_B2][1]=&g5gk; fak.dep_level[D_EFF_B2][1]=P_EFF_B2;
+	fak.set_ndeps(D_FIT,1);
+	fak.dep[D_FIT][0]=&fak; fak.dep_level[D_FIT][0]=D_EFF_B2;
 
 
   mvmps.set_ndeps(2);
@@ -306,6 +316,7 @@ bool eval_ctrl::fill_dep(const char* arg){
   IF_DER_EFF(gps)
   IF_DER_EFF(fv)
   IF_DER_EFF(fvk)
+  IF_DER_EFF(fak)
   
 #undef IF_DER_EFF
   
@@ -316,6 +327,7 @@ bool eval_ctrl::fill_dep(const char* arg){
   IF_DER_FIT(gps)
   IF_DER_FIT(fv)
   IF_DER_FIT(fvk)
+  IF_DER_FIT(fak)
   
 #undef IF_DER_FIT
   

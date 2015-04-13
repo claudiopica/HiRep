@@ -34,6 +34,7 @@ extern derived_ctrl gps;
 extern derived_ctrl fps;
 extern derived_ctrl fv;
 extern derived_ctrl fvk;
+extern derived_ctrl fak;
 extern ratio_ctrl mvmps;
 extern ratio_ctrl mvkmps;
 extern ratio_ctrl mpsfps;
@@ -93,4 +94,12 @@ void fvk_eval(Corr_t* fvk_eff, Corr_t* gk_cor, Corr_t* gk_eff) {
     double cv=gk_cor->d[i].back();
     fvk_eff->d[i].push_back(sqrt(cv/(mv*hc(i,mv,Lt)))*svol);
   }
+}
+
+void fak_eval(Corr_t* fak_eff, Corr_t* g5gk_cor, Corr_t* g5gk_eff) {
+	for (int i=fak.get_left_cut(); i<=fak.get_right_cut(); i++) {
+		double ma=g5gk_eff->d[i].back();
+		double ca=g5gk_cor->d[i].back();
+		fak_eff->d[i].push_back(sqrt(ca/(ma*hc(i,ma,Lt)))*svol);
+	}
 }

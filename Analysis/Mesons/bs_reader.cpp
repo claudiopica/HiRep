@@ -3,6 +3,8 @@
 #include <sstream>
 #include <cmath>
 #include <map>
+#include <cstdlib>
+#include <cstring>
 #include "bs_type.h"
 #include "bs_ctrl.h"
 
