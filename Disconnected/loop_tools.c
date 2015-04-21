@@ -53,7 +53,7 @@ void measure_bilinear_loops_4spinorfield(spinor_field* prop,spinor_field* source
 				double* corr_im[16];
 				suNf_spin_matrix sma,smb, sm1;
 				int size=nm*GLB_T;
-				int i,ix,t,x,y,z,l,tc,beta;
+				int i,ix,t,x,y,z,tc,beta;
 				int tau_min=0;
 				int tau_max=GLB_T;
 			  complex tr;
@@ -63,6 +63,8 @@ void measure_bilinear_loops_4spinorfield(spinor_field* prop,spinor_field* source
 				struct timeval start, end, etime;
 
 				gettimeofday(&start,0);
+
+				
 
 				if (nm != 1) error(nm != 1, 1,"[measure_biliniear_loops_4spinorfield]", "Multimass not implemented !");
 
@@ -216,7 +218,7 @@ void measure_bilinear_loops_4spinorfield(spinor_field* prop,spinor_field* source
 
 
 
-void measure_loops(int nm, double* m, int nhits,int conf_num, double precision,int source_type)
+void measure_loops(int nm, double* m, int nhits,int conf_num, double precision,int source_type,int n_mom)
 {
 
 				int k,l;
@@ -255,7 +257,7 @@ void measure_loops(int nm, double* m, int nhits,int conf_num, double precision,i
 												complete_sf_sendrecv(prop);
 
 												lprintf("CORR",0,"Start to perform the contractions ... \n");
-												measure_bilinear_loops_spinorfield(prop,source,k,nm);
+												measure_bilinear_loops_spinorfield(prop,source,k,nm,n_mom);
 												lprintf("CORR",0,"Contraction done\n");
 												free_spinor_field_f(source);
 												free_spinor_field_f(prop);
@@ -452,139 +454,180 @@ void zero_even_or_odd_site_spinorfield(spinor_field *source,int nspinor,int eo)
 
 
 
-void measure_bilinear_loops_spinorfield(spinor_field* prop,spinor_field* source,int k,int nm)
+void measure_bilinear_loops_spinorfield(spinor_field* prop,spinor_field* source,int k,int nm, int n_mom)
 {
-				complex* corr[16];
-				double* corr_re[16];
-				double* corr_im[16];
+  int px,py,pz,ip;
+  int n_mom_tot = n_mom*n_mom*n_mom;
+  double pdotx;
+  complex phase;
+  complex* corr[n_mom_tot][16];
+  double* corr_re[n_mom_tot][16];
+  double* corr_im[n_mom_tot][16];
 
-				int size=nm*GLB_T;
-				int i,ix,t,x,y,z,tc;
+  int pt[4];
+  pt[0]=pt[1]=pt[2]=pt[3]=0;       
 
-				int NGamma=16;
+  int size=nm*GLB_T;
+  int i,j,ix,t,x,y,z,tc;
+  
+  int NGamma=16;
 
-				int offset=0 ; 
-				suNf_spinor tmp_spinor;
-				struct timeval start, end, etime;
+  int offset=0 ; 
+  suNf_spinor tmp_spinor;
+  complex tmp;
+  struct timeval start, end, etime;
 
+  
+  gettimeofday(&start,0);
+  
+  if (nm != 1) error(nm != 1, 1,"[measure_biliniear_loops_spinorfield]", "Multimass not implemented !");
 
-				gettimeofday(&start,0);
-
-				if (nm != 1) error(nm != 1, 1,"[measure_biliniear_loops_spinorfield]", "Multimass not implemented !");
-
-				for (i=0;i<NGamma;++i){
-								corr[i]=(complex*) malloc(sizeof(complex)*size);
-								corr_re[i]=(double*) malloc(sizeof(double)*size);
-								corr_im[i]=(double*) malloc(sizeof(double)*size);
-				}
-
-				for (i=0;i<NGamma;++i) for (t=0;t<nm*GLB_T;t++)
-				{ 
-								corr[i][t].re=0.0;
-								corr[i][t].im=0.0;
-								corr_re[i][t]=0.0;
-								corr_im[i][t]=0.0;
-				}
-
+ for (j=0;j<n_mom_tot;++j) for (i=0;i<NGamma;++i){
+    corr[j][i]=(complex*) malloc(sizeof(complex)*size);
+    corr_re[j][i]=(double*) malloc(sizeof(double)*size);
+    corr_im[j][i]=(double*) malloc(sizeof(double)*size);
+  }
+  
+  for (j=0;j<n_mom_tot;++j) for (i=0;i<NGamma;++i) for (t=0;t<nm*GLB_T;t++)
+			   { 
+			     corr[j][i][t].re=0.0;
+			     corr[j][i][t].im=0.0;
+			     corr_re[j][i][t]=0.0;
+			     corr_im[j][i][t]=0.0;
+			   }
+  
 				/* loop on nm if the MMS is used */
 				for(i=0; i<nm; i++) 
 				{
-								for (t=0; t<T; t++)
-								{        
-												/* offset set to zero here */
-												tc = (zerocoord[0]+t+GLB_T)%GLB_T+i*GLB_T+offset;
-												/* loop on spatial volume */
-												for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) { 
-																ix=ipt(t,x,y,z);                                        
+				  for (t=0; t<T; t++)
+				  {        
+				  /* offset set to zero here */
+					  tc = (zerocoord[0]+t+GLB_T)%GLB_T+i*GLB_T+offset;
+					  /* loop on spatial volume */
+					  for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) { 
+
+						  ix=ipt(t,x,y,z);                                        
+						  ip = 0;
+						  for (px=0;px<n_mom;++px) for (py=0;py<n_mom;++py) for (pz=0;pz<n_mom;++pz) { 
+							  pdotx = 2.0*PI*(((double) px)*(x+zerocoord[1]-pt[1])/GLB_X + ((double) py)*(y+zerocoord[2]-pt[2])/GLB_Y + ((double) pz)*(z+zerocoord[3]-pt[3])/GLB_Z);
+							  phase.re = cos(pdotx);
+							  phase.im = sin(pdotx);
+
+							  _spinor_g5_f(tmp_spinor,*_FIELD_AT(prop,ix));
+							  _spinor_prod_f(tmp,*_FIELD_AT(source,ix),tmp_spinor); 
+							  _complex_mul_assign(corr[ip][0][tc],phase,tmp);
+
+							  _spinor_g1_f(tmp_spinor,*_FIELD_AT(prop,ix));
+							  _spinor_prod_f(tmp,*_FIELD_AT(source,ix),tmp_spinor); 
+							  _complex_mul_assign(corr[ip][1][tc],phase,tmp);
+
+							  _spinor_g2_f(tmp_spinor,*_FIELD_AT(prop,ix));
+							  _spinor_prod_f(tmp,*_FIELD_AT(source,ix),tmp_spinor); 
+							  _complex_mul_assign(corr[ip][2][tc],phase,tmp);
+
+							  _spinor_g3_f(tmp_spinor,*_FIELD_AT(prop,ix));
+							  _spinor_prod_f(tmp,*_FIELD_AT(source,ix),tmp_spinor); 
+							  _complex_mul_assign(corr[ip][3][tc],phase,tmp);
+
+							  _spinor_g0g5_f(tmp_spinor,*_FIELD_AT(prop,ix));
+							  _spinor_prod_f(tmp,*_FIELD_AT(source,ix),tmp_spinor); 
+							  _complex_mul_assign(corr[ip][4][tc],phase,tmp);
+
+							  _spinor_g0g1_f(tmp_spinor,*_FIELD_AT(prop,ix));
+							  _spinor_prod_f(tmp,*_FIELD_AT(source,ix),tmp_spinor); 
+							  _complex_mul_assign(corr[ip][5][tc],phase,tmp);
+
+							  _spinor_g0g2_f(tmp_spinor,*_FIELD_AT(prop,ix));
+							  _spinor_prod_f(tmp,*_FIELD_AT(source,ix),tmp_spinor); 
+							  _complex_mul_assign(corr[ip][6][tc],phase,tmp);
+
+							  _spinor_g0g3_f(tmp_spinor,*_FIELD_AT(prop,ix));
+							  _spinor_prod_f(tmp,*_FIELD_AT(source,ix),tmp_spinor); 
+							  _complex_mul_assign(corr[ip][7][tc],phase,tmp);
+
+							  _spinor_prod_f(tmp,*_FIELD_AT(source,ix),*_FIELD_AT(prop,ix)); 
+							  _complex_mul_assign(corr[ip][8][tc],phase,tmp);
+
+							  _spinor_g5g1_f(tmp_spinor,*_FIELD_AT(prop,ix));
+							  _spinor_prod_f(tmp,*_FIELD_AT(source,ix),tmp_spinor); 
+							  _complex_mul_assign(corr[ip][9][tc],phase,tmp);
+
+							  _spinor_g5g2_f(tmp_spinor,*_FIELD_AT(prop,ix));
+							  _spinor_prod_f(tmp,*_FIELD_AT(source,ix),tmp_spinor); 
+							  _complex_mul_assign(corr[ip][10][tc],phase,tmp);
+
+							  _spinor_g5g3_f(tmp_spinor,*_FIELD_AT(prop,ix));
+							  _spinor_prod_f(tmp,*_FIELD_AT(source,ix),tmp_spinor); 
+							  _complex_mul_assign(corr[ip][11][tc],phase,tmp);
+
+							  _spinor_g0_f(tmp_spinor,*_FIELD_AT(prop,ix));
+							  _spinor_prod_f(tmp,*_FIELD_AT(source,ix),tmp_spinor);
+							  _complex_mul_assign(corr[ip][12][tc],phase,tmp);
+
+							  _spinor_g5g0g1_f(tmp_spinor,*_FIELD_AT(prop,ix));
+							  _spinor_prod_f(tmp,*_FIELD_AT(source,ix),tmp_spinor); 
+							  _complex_mul_assign(corr[ip][13][tc],phase,tmp);
+
+							  _spinor_g5g0g2_f(tmp_spinor,*_FIELD_AT(prop,ix));
+							  _spinor_prod_f(tmp,*_FIELD_AT(source,ix),tmp_spinor); 
+							  _complex_mul_assign(corr[ip][14][tc],phase,tmp);
+
+							  _spinor_g5g0g3_f(tmp_spinor,*_FIELD_AT(prop,ix));
+							  _spinor_prod_f(tmp,*_FIELD_AT(source,ix),tmp_spinor); 
+							  _complex_mul_assign(corr[ip][15][tc],phase,tmp);
 
 
-																_spinor_g5_f(tmp_spinor,*_FIELD_AT(prop,ix));
-																_spinor_prod_assign_g(corr[0][tc],*_FIELD_AT(source,ix),tmp_spinor); 
-
-																_spinor_g1_f(tmp_spinor,*_FIELD_AT(prop,ix));
-																_spinor_prod_assign_g(corr[1][tc],*_FIELD_AT(source,ix),tmp_spinor); 
-
-																_spinor_g2_f(tmp_spinor,*_FIELD_AT(prop,ix));
-																_spinor_prod_assign_g(corr[2][tc],*_FIELD_AT(source,ix),tmp_spinor); 
-
-																_spinor_g3_f(tmp_spinor,*_FIELD_AT(prop,ix));
-																_spinor_prod_assign_g(corr[3][tc],*_FIELD_AT(source,ix),tmp_spinor); 
-
-																_spinor_g0g5_f(tmp_spinor,*_FIELD_AT(prop,ix));
-																_spinor_prod_assign_g(corr[4][tc],*_FIELD_AT(source,ix),tmp_spinor); 
-
-																_spinor_g0g1_f(tmp_spinor,*_FIELD_AT(prop,ix));
-																_spinor_prod_assign_g(corr[5][tc],*_FIELD_AT(source,ix),tmp_spinor); 
-
-																_spinor_g0g2_f(tmp_spinor,*_FIELD_AT(prop,ix));
-																_spinor_prod_assign_g(corr[6][tc],*_FIELD_AT(source,ix),tmp_spinor); 
-
-																_spinor_g0g3_f(tmp_spinor,*_FIELD_AT(prop,ix));
-																_spinor_prod_assign_g(corr[7][tc],*_FIELD_AT(source,ix),tmp_spinor); 
-
-																_spinor_prod_assign_g(corr[8][tc],*_FIELD_AT(source,ix),*_FIELD_AT(prop,ix)); 
-
-																_spinor_g5g1_f(tmp_spinor,*_FIELD_AT(prop,ix));
-																_spinor_prod_assign_g(corr[9][tc],*_FIELD_AT(source,ix),tmp_spinor); 
-
-																_spinor_g5g2_f(tmp_spinor,*_FIELD_AT(prop,ix));
-																_spinor_prod_assign_g(corr[10][tc],*_FIELD_AT(source,ix),tmp_spinor); 
-
-																_spinor_g5g3_f(tmp_spinor,*_FIELD_AT(prop,ix));
-																_spinor_prod_assign_g(corr[11][tc],*_FIELD_AT(source,ix),tmp_spinor); 
-
-																_spinor_g0_f(tmp_spinor,*_FIELD_AT(prop,ix));
-																_spinor_prod_assign_g(corr[12][tc],*_FIELD_AT(source,ix),tmp_spinor);
-
-																_spinor_g5g0g1_f(tmp_spinor,*_FIELD_AT(prop,ix));
-																_spinor_prod_assign_g(corr[13][tc],*_FIELD_AT(source,ix),tmp_spinor); 
-
-																_spinor_g5g0g2_f(tmp_spinor,*_FIELD_AT(prop,ix));
-																_spinor_prod_assign_g(corr[14][tc],*_FIELD_AT(source,ix),tmp_spinor); 
-
-																_spinor_g5g0g3_f(tmp_spinor,*_FIELD_AT(prop,ix));
-																_spinor_prod_assign_g(corr[15][tc],*_FIELD_AT(source,ix),tmp_spinor); 
-												}
+							  ip=ip+1;
+						  }
 
 
-								}/* end loop t */
+					  }/* end loop t */
+				  } /* end loop px,py,pz */
 				} /* end loop i (nm) */
 
+
+				// the following have to be modified as well !
 				int iGamma;
-				complex tmp;                            
 				for (t=0;t<T;t++){ 
 
-								tc = (zerocoord[0]+t+GLB_T)%GLB_T+0*GLB_T+offset;
-								for (iGamma=0;iGamma<NGamma;iGamma++) {
-												if (iGamma!= 0  && iGamma!=1 &&iGamma!=2 && iGamma!=3 && iGamma!=8 && iGamma!=12)       
-												{
-																/* multiply by -i to match old convention [and to have hermitean operators ] */
-																tmp.re = corr[iGamma][tc].im;
-																tmp.im = -corr[iGamma][tc].re;
-																corr[iGamma][tc].re=tmp.re;
-																corr[iGamma][tc].im=tmp.im;
+					tc = (zerocoord[0]+t+GLB_T)%GLB_T+0*GLB_T+offset;
+					for (j=0;j<n_mom_tot;++j) 	for (iGamma=0;iGamma<NGamma;iGamma++) {
 
-												}
+						if (iGamma!= 0  && iGamma!=1 &&iGamma!=2 && iGamma!=3 && iGamma!=8 && iGamma!=12)       
+						{
+							/* multiply by -i to match old convention [and to have hermitean operators ] */
+							tmp.re = corr[j][iGamma][tc].im;
+							tmp.im = -corr[j][iGamma][tc].re;
+							corr[j][iGamma][tc].re=tmp.re;
+							corr[j][iGamma][tc].im=tmp.im;
 
-												corr_re[iGamma][tc]=corr[iGamma][tc].re;
-												corr_im[iGamma][tc]=corr[iGamma][tc].im;
+						}
+
+						corr_re[j][iGamma][tc]=corr[j][iGamma][tc].re;
+						corr_im[j][iGamma][tc]=corr[j][iGamma][tc].im;
 
 
-								}
+					}
 
 				}
 
 
 				/* print into output file */
-				for(iGamma=0; iGamma<NGamma; iGamma++) {
-								global_sum(corr_re[iGamma],GLB_T*nm);
-								global_sum(corr_im[iGamma],GLB_T*nm);
+				for (j=0;j<n_mom_tot;++j)  for(iGamma=0; iGamma<NGamma; iGamma++) {
+					global_sum(corr_re[j][iGamma],GLB_T*nm);
+					global_sum(corr_im[j][iGamma],GLB_T*nm);
 				}
 
 				if (k==0 ) lprintf("CORR",0,"loops for one noise vector, all local bilinear [t iGamma iSource Re Im] \n"); 
-
-				for(t=0;t<GLB_T;++t) for(iGamma=0;iGamma<NGamma;iGamma++ ) lprintf("CORR",0,"%i %i %i %3.10e %3.10e \n",t,iGamma,k,corr_re[iGamma][t],corr_im[iGamma][t]);
-
+					
+				for(t=0;t<GLB_T;++t) for(iGamma=0;iGamma<NGamma;iGamma++ ){
+					ip=0;				
+					for (px=0;px<n_mom;++px) for (py=0;py<n_mom;++py) for (pz=0;pz<n_mom;++pz) 
+					{
+						lprintf("CORR",0,"%i %i %i %i %i %i %3.10e %3.10e \n",t,iGamma,k,px,py,pz,corr_re[ip][iGamma][t],corr_im[ip][iGamma][t]);
+						ip = ip+1;
+					}
+				}
 				fflush(stdout); 
 				gettimeofday(&end,0);
 				timeval_subtract(&etime,&end,&start);
