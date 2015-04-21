@@ -51,8 +51,9 @@ typedef struct _input_loops {
   double precision;
   int nhits;
   int source_type;
+	int n_mom;
   /* for the reading function */
-  input_record_t read[5];
+  input_record_t read[6];
 
 } input_loops;
 
@@ -63,6 +64,7 @@ typedef struct _input_loops {
       {"inverter precision", "disc:precision = %lf", DOUBLE_T, &(varname).precision}, \
       {"number of inversions per cnfg", "disc:nhits = %d", INT_T, &(varname).nhits}, \
       {"Source type " , "disc:source_type = %d", INT_T, &(varname).source_type}, \
+      {"maximum component of momentum", "mes:momentum = %d", INT_T, &(varname).n_mom}, \	
       {NULL, NULL, INT_T, INT_T,NULL}			\
     }									\
   }
@@ -250,101 +252,106 @@ int main(int argc,char *argv[]) {
   } else {
     lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
     rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
-  }
+  }	
+	
+#ifdef GAUGE_SON
+	lprintf("MAIN",0,"Gauge group: SO(%d)\n",NG);
+#else 
+	lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
+#endif
+	lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
 
+	lprintf("MAIN",0,"Maximum monentum component %d\n",disc_var.n_mom-1);
 
-  lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
-  lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
-
-  nm=0;
-  if(fpars.type==DYNAMICAL_CNFG) {
-    nm=1;
-    m[0] = fpars.m;
-  } else if(fpars.type==QUENCHED_CNFG) {
-    strcpy(tmp,disc_var.mstring);
-    cptr = strtok(tmp, ";");
-    nm=0;
-    while(cptr != NULL) {
-      m[nm]=atof(cptr);
-      nm++;
-      cptr = strtok(NULL, ";");
-      printf(" %3.3e \n",m[nm]);
-    }            
-  }
-
-
-
-  /* setup communication geometry */
-  if (geometry_init() == 1) {
-    finalize_process();
-    return 0;
-  }
-
-  /* setup lattice geometry */
-  geometry_mpi_eo();
-  /* test_geometry_mpi_eo(); */
-
-  init_BCs(NULL);
+	nm=0;
+	if(fpars.type==DYNAMICAL_CNFG) {
+					nm=1;
+					m[0] = fpars.m;
+	} else if(fpars.type==QUENCHED_CNFG) {
+					strcpy(tmp,disc_var.mstring);
+					cptr = strtok(tmp, ";");
+					nm=0;
+					while(cptr != NULL) {
+									m[nm]=atof(cptr);
+									nm++;
+									cptr = strtok(NULL, ";");
+									printf(" %3.3e \n",m[nm]);
+					}            
+	}
 
 
 
-  /* alloc global gauge fields */
-  u_gauge=alloc_gfield(&glattice);
+	/* setup communication geometry */
+	if (geometry_init() == 1) {
+					finalize_process();
+					return 0;
+	}
+
+	/* setup lattice geometry */
+	geometry_mpi_eo();
+	/* test_geometry_mpi_eo(); */
+
+	init_BCs(NULL);
+
+
+
+	/* alloc global gauge fields */
+	u_gauge=alloc_gfield(&glattice);
 #ifdef ALLOCATE_REPR_GAUGE_FIELD
-  u_gauge_f=alloc_gfield_f(&glattice);
+	u_gauge_f=alloc_gfield_f(&glattice);
 #endif
 
-  lprintf("MAIN",0,"Inverter precision = %e\n",disc_var.precision);
-  for(k=0;k<nm;k++)
-    {
-      lprintf("MAIN",0,"Mass[%d] = %f\n",k,m[k]);
-      lprintf("CORR",0,"Mass[%d] = %f\n",k,m[k]);
-    }
-  /* if a propagator and a source are provided , then read them and perform contractions [ debug only ] */
-  if(strcmp(prop_filename,"")!=0 || strcmp(source_filename,"")!=0) {
+	lprintf("MAIN",0,"Inverter precision = %e\n",disc_var.precision);
+	for(k=0;k<nm;k++)
+	{
+					lprintf("MAIN",0,"Mass[%d] = %f\n",k,m[k]);
+					lprintf("CORR",0,"Mass[%d] = %f\n",k,m[k]);
+	}
+	/* if a propagator and a source are provided , then read them and perform contractions [ debug only ] */
+	if(strcmp(prop_filename,"")!=0 || strcmp(source_filename,"")!=0) {
 
-    if(strcmp(prop_filename,"")!=0 && strcmp(source_filename,"")!=0) {
-      nm=1;
-      lprintf("DEBUG",0,"Will read one propagator and one source and perform the contractions\n");
-      lprintf("DEBUG",0,"Propagator from %s\n", prop_filename);
-      lprintf("DEBUG",0,"Source from %s\n", source_filename);
-      lprintf("DEBUG",0,"Configuration from %s\n", cnfg_filename);
+					if(strcmp(prop_filename,"")!=0 && strcmp(source_filename,"")!=0) {
+									nm=1;
+									lprintf("DEBUG",0,"Will read one propagator and one source and perform the contractions\n");
+									lprintf("DEBUG",0,"Propagator from %s\n", prop_filename);
+									lprintf("DEBUG",0,"Source from %s\n", source_filename);
+									lprintf("DEBUG",0,"Configuration from %s\n", cnfg_filename);
 
-      spinor_field* prop =  alloc_spinor_field_f(1,&glattice);
-      spinor_field* source =  alloc_spinor_field_f(1,&glattice);
-      
-      read_spinor_field(prop_filename,prop);
-      read_spinor_field(source_filename,source);
+									spinor_field* prop =  alloc_spinor_field_f(1,&glattice);
+									spinor_field* source =  alloc_spinor_field_f(1,&glattice);
 
-      lprintf("DEBUG",0,"start contract");
-      measure_bilinear_loops_spinorfield(prop,source,0,nm);
-	
+									read_spinor_field(prop_filename,prop);
+									read_spinor_field(source_filename,source);
 
-    }
-    else {
-      nm=1;
-      lprintf("DEBUG",0,"Will read one source and perform the inversion and the contractions\n");
-      lprintf("DEBUG",0,"Source from %s\n", source_filename);
-      lprintf("DEBUG",0,"Configuration from %s\n", cnfg_filename);
+									lprintf("DEBUG",0,"start contract");
+									measure_bilinear_loops_spinorfield(prop,source,0,nm,disc_var.n_mom);
 
-      spinor_field* prop =  alloc_spinor_field_f(1,&glattice);
-			spinor_field* source =  alloc_spinor_field_f(1,&glattice);
-			read_gauge_field(cnfg_filename);
-			represent_gauge_field();
-			init_propagator_eo(nm, m, disc_var.precision);
-			read_spinor_field(source_filename,source);
-			lprintf("DEBUG",0,"start invert");
-			start_sf_sendrecv(source);
-			complete_sf_sendrecv(source);
 
-			calc_propagator(prop,source,1);// No dilution 
-			start_sf_sendrecv(prop);
-			complete_sf_sendrecv(prop);
+					}
+					else {
+									nm=1;
+									lprintf("DEBUG",0,"Will read one source and perform the inversion and the contractions\n");
+									lprintf("DEBUG",0,"Source from %s\n", source_filename);
+									lprintf("DEBUG",0,"Configuration from %s\n", cnfg_filename);
 
-			lprintf("DEBUG",0,"start contract\n");
-			measure_bilinear_loops_spinorfield(prop,source,0,nm);
+									spinor_field* prop =  alloc_spinor_field_f(1,&glattice);
+									spinor_field* source =  alloc_spinor_field_f(1,&glattice);
+									read_gauge_field(cnfg_filename);
+									represent_gauge_field();
+									init_propagator_eo(nm, m, disc_var.precision);
+									read_spinor_field(source_filename,source);
+									lprintf("DEBUG",0,"start invert");
+									start_sf_sendrecv(source);
+									complete_sf_sendrecv(source);
 
-		}	
+									calc_propagator(prop,source,1);// No dilution 
+									start_sf_sendrecv(prop);
+									complete_sf_sendrecv(prop);
+
+									lprintf("DEBUG",0,"start contract\n");
+									measure_bilinear_loops_spinorfield(prop,source,0,nm,disc_var.n_mom);
+
+					}	
 	}
 	else {
 					list=NULL;
@@ -372,7 +379,7 @@ int main(int argc,char *argv[]) {
 
 									lprintf("CORR",0,"Number of noise vector : nhits = %i \n", disc_var.nhits);
 
-									measure_loops(nm, m, disc_var.nhits,i,  disc_var.precision,disc_var.source_type); 
+									measure_loops(nm, m, disc_var.nhits,i,  disc_var.precision,disc_var.source_type,disc_var.n_mom); 
 
 									if(list==NULL) break;
 					}
