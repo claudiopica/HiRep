@@ -715,6 +715,91 @@ Y =   Q_m^{-1}(\gamma_5 + \delta_m Q^{-1})  \phi_2 =  D^{-1} ( \phi_2  +
 \end{equation}
 
 Which matches one comment in the the {\verb force_hmc.c } file.
+\subsection{Wilson mass shift : eo case }
+Writing 
+\begin{equation}
+D_m = \begin{pmatrix}
+4 + m & D_{eo} \\
+ D_{oe} & 4+m \\
+\end{pmatrix}
+\end{equation}
+The determinant in the 2 flavour case can be written as follows:
+\begin{equation}
+\det D_m^2 = \det Q^2 \propto  \det D^\dagger_{eo} D_{oe}
+\end{equation}
+
+
+\begin{equation}
+Q = \gamma_5 \begin{pmatrix} 
+1 + 4m & M_{\rm{eo}} \\
+M_{\rm{oe}} & 1 +4m\\
+\end{pmatrix} \equiv \gamma_5 \begin{pmatrix} 
+M_{\rm{ee}}  & M_{\rm{eo}} \\
+M_{\rm{oe}} & M_{\rm{oo}}\\
+\end{pmatrix}
+\end{equation}
+Note that $M_{\rm{ee}}^{-1}$ can be computed : 
+\begin{equation}
+M_{\rm{ee}}^{-1} =   \frac{1}{1+4m}
+\end{equation}
+
+
+Now we can conveniently rewrite 
+\begin{equation}
+Q_{\pm} =  \begin{pmatrix} 
+\gamma_5 M_{\rm{ee}}  & 0 \\ \gamma_5 M_{\rm{oe}} & 1\\
+\end{pmatrix} \begin{pmatrix} 
+1  &  \left(M_{\rm{ee}}\right)^{-1} M_{\rm{eo}} \\0 & \gamma_5
+  \left(M^{\rm{oo}} - \frac{1}{4+m}M_{\rm{oe}} M_{\rm{eo}} \right)\\
+\end{pmatrix} 
+\end{equation}
+
+
+From the last equation we deduce that :
+\begin{equation}
+\det{Q} = \det{\gamma_5 M^{\rm{ee}}} \det{\gamma_5  \left(M_{\rm{oo}}
+    -\frac{1}{4+m} M_{\rm{oe}}     M_{\rm{eo}} \right)} \propto
+\det{\gamma_5  \left((4+m) M_{\rm{oo}}
+    - M_{\rm{oe}}     M_{\rm{eo}} \right)} 
+\end{equation}
+
+Note that the first determinant is a constant that could be computed.
+
+In the following we will denote 
+\begin{equation}
+\hat{Q}_{m,eo} \equiv \gamma_5
+  \left((4+m)^2 - M_{\rm{oe}}  M_{\rm{eo}} \right)
+\end{equation}
+where $\hat{Q}_{m,eo}$ is defined on the odd sites of the lattice. 
+
+
+
+Now defining 
+\begin{equation}
+W_{+} = D_{m+\delta m} ,\quad W_{-} =
+W_{+}^\dagger=   D^{\dagger}_{m+\delta m} 
+\end{equation}
+
+\begin{eqnarray}
+\det{ Q_m (W_-  W_+)^{-1}  Q_m} \propto \det{ Q_{m,eo} (\hat{D}_{m+\delta_m}
+  \hat{D}_{m+\delta_m,eo}  )^{-1}  Q_{m,eo}}
+\end{eqnarray}
+
+
+We thus have 
+\begin{eqnarray}
+\mathcal{H}_{F_1} = \phi_1^\dagger \left( \hat{D}_{m+\delta m,eo} \hat{D}_{m+\delta_m,eo} \right)^{-1}\phi_1
+\end{eqnarray}
+and
+\begin{eqnarray}
+\mathcal{H}_{F_2} = \phi_2^\dagger Q_{m,eo}^{-1} \hat{D}_{m+\delta_m,eo} \hat{D}_{m+\delta_m,eo} Q_{m,eo}^{-1}\phi_2 
+\end{eqnarray}
+Note that as in the non-eo case this can be rewritten as :
+\begin{eqnarray}
+\mathcal{H}_{F_2} =\phi_2^{\dagger} (\gamma_5 + \delta_m (1 +
+\delta_m (4+m) )Q_{m,eo}^{-1}   (\gamma_5 + \delta_m (1 +
+\delta_m (4+m) )Q_{m,eo}^{-1}\phi_2 
+\end{eqnarray}
 
 \subsection{Twisted mass shift}
 Assume
