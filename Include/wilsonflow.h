@@ -20,8 +20,11 @@
 void WF_initialize();
 void WF_free();
 
+double max_distance(suNg_field* V, suNg_field* Vprime);
+
 void WilsonFlow1(suNg_field* V, const double epsilon);
 void WilsonFlow3(suNg_field* V, const double epsilon);
+double WilsonFlow3_adaptative(suNg_field* V, double epsilon,double delta);
 
 double WF_E(suNg_field* V);
 double WF_Esym(suNg_field* V);

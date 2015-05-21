@@ -299,15 +299,31 @@ static void WF_Exp(suNg *u, suNg *X) {
 
 
 static suNg_field* ws_gf=NULL;
+static suNg_field* ws_gf_tmp=NULL;
+static suNg_field* Vprime=NULL;
+static suNg_field* u_gauge_backup=NULL;
+
 
 
 void WF_initialize() {
-  if(ws_gf==NULL) ws_gf=alloc_gfield(&glattice);
+  if(ws_gf==NULL) 
+	{		
+		ws_gf=alloc_gfield(&glattice);
+		ws_gf_tmp=alloc_gfield(&glattice);
+		Vprime=alloc_gfield(&glattice);  	
+		u_gauge_backup=alloc_gfield(&glattice);  	
+}
 }
 
 
 void WF_free() {
-  if(ws_gf!=NULL) free_gfield(ws_gf);
+  if(ws_gf!=NULL)
+  {
+		free_gfield(ws_gf);
+		free_gfield(ws_gf_tmp);
+		free_gfield(Vprime);
+		free_gfield(u_gauge_backup);
+	}
 }
 
 
@@ -336,6 +352,130 @@ void WilsonFlow1(suNg_field* V, const double epsilon) {
   apply_BCs_on_fundamental_gauge_field();
 #endif
 
+}
+
+//define distance between complex matrices
+double max_distance(suNg_field* V, suNg_field* Vprime){
+
+double d;		
+suNg diff;
+_suNg_zero(diff);
+
+_MASTER_FOR_MAX(&glattice,ix,d) {
+ 	for (int mu=0; mu<4; ++mu) {     
+	 _suNg_mul(diff,1.,*_4FIELD_AT(V,ix,mu));
+   _suNg_sub_assign(diff,*_4FIELD_AT(Vprime,ix,mu));		
+	 _suNg_sqnorm(d,diff);	
+	}
+}
+
+
+return d/(double)NG;
+}
+
+
+// following 1301.4388
+double WilsonFlow3_adaptative(suNg_field* V, double epsilon,double delta) {
+ 
+suNg_field_copy(u_gauge_backup,u_gauge);
+double varepsilon,d;
+ 
+  _MASTER_FOR(&glattice,ix) {
+    for (int mu=0; mu<4; ++mu) {
+      _suNg_zero(*_4FIELD_AT(ws_gf,ix,mu));
+      _suNg_zero(*_4FIELD_AT(ws_gf_tmp,ix,mu));
+    }
+  }
+
+  start_gf_sendrecv(V);
+  complete_gf_sendrecv(V);
+#ifdef ROTATED_SF
+  apply_BCs_on_fundamental_gauge_field();
+#endif
+
+
+  Zeta(ws_gf,V,epsilon/4.); //ws_gf = Z0/4
+  
+  _MASTER_FOR(&glattice,ix) {
+    suNg utmp[2];
+    for (int mu=0; mu<4; ++mu) {
+      WF_Exp(&utmp[0],_4FIELD_AT(ws_gf,ix,mu));
+      _suNg_times_suNg(utmp[1],utmp[0],*_4FIELD_AT(V,ix,mu));
+      *_4FIELD_AT(V,ix,mu)=utmp[1]; // V = exp(Z0/4) W0
+      _suNg_mul(*_4FIELD_AT(ws_gf_tmp,ix,mu),-4.,*_4FIELD_AT(ws_gf,ix,mu)); //ws_gf_tmp = -Z0
+      _suNg_mul(*_4FIELD_AT(ws_gf,ix,mu),-17./9.,*_4FIELD_AT(ws_gf,ix,mu)); //ws_gf =  -17*Z0/36 
+    }
+  }
+  
+
+  start_gf_sendrecv(V);
+  complete_gf_sendrecv(V);
+#ifdef ROTATED_SF
+  apply_BCs_on_fundamental_gauge_field();
+#endif
+
+  Zeta(ws_gf,V,8.*epsilon/9.); // ws_gf = 8 Z1 /9 - 17 Z0/36
+  Zeta(ws_gf_tmp,V,2.*epsilon); // ws_gf_tmp = 2 Z1 - Z0
+  
+  _MASTER_FOR(&glattice,ix) {
+    suNg utmp[4];
+    for (int mu=0; mu<4; ++mu) {
+      WF_Exp(&utmp[0],_4FIELD_AT(ws_gf,ix,mu));
+      WF_Exp(&utmp[2],_4FIELD_AT(ws_gf_tmp,ix,mu));
+      _suNg_times_suNg(utmp[1],utmp[0],*_4FIELD_AT(V,ix,mu)); // utmp[1] = exp(8 Z1/9 - 17 Z0/36) W1
+      _suNg_times_suNg(utmp[3],utmp[2],*_4FIELD_AT(V,ix,mu)); // utmp[4] = exp( Z1 -  Z0) W1
+      *_4FIELD_AT(V,ix,mu)=utmp[1];
+      *_4FIELD_AT(Vprime,ix,mu)=utmp[3];
+      _suNg_mul(*_4FIELD_AT(ws_gf,ix,mu),-1.,*_4FIELD_AT(ws_gf,ix,mu));
+    }
+  }
+
+  start_gf_sendrecv(V);
+  complete_gf_sendrecv(V);
+
+  start_gf_sendrecv(Vprime);
+  complete_gf_sendrecv(Vprime);
+
+#ifdef ROTATED_SF
+  apply_BCs_on_fundamental_gauge_field();
+#endif
+
+  
+  Zeta(ws_gf,V,3.*epsilon/4.);
+  
+  _MASTER_FOR(&glattice,ix) {
+    suNg utmp[2];
+    for (int mu=0; mu<4; ++mu) {
+      WF_Exp(&utmp[0],_4FIELD_AT(ws_gf,ix,mu));
+      _suNg_times_suNg(utmp[1],utmp[0],*_4FIELD_AT(V,ix,mu));
+      *_4FIELD_AT(V,ix,mu)=utmp[1];
+    }
+  }
+
+  start_gf_sendrecv(V);
+  complete_gf_sendrecv(V);
+#ifdef ROTATED_SF
+  apply_BCs_on_fundamental_gauge_field();
+#endif
+
+
+// now need to get the maximum of the distance 
+	d = max_distance(V,Vprime);
+
+// compute new value of epsilon	
+	varepsilon = 0.95*epsilon*pow(delta/d,1./3.);
+
+	if (varepsilon < 0.1) epsilon = varepsilon ;
+	else epsilon = 0.1;
+
+	if (d > delta ) 
+	{
+		suNg_field_copy(u_gauge,u_gauge_backup);
+    epsilon = -1.;
+		lprintf("WARNING",0,"d > delta ! Epsilon is set to -1 in order to repeat the calculation \n");
+	}
+
+	return epsilon;
 }
 
 
