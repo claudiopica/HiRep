@@ -346,9 +346,9 @@ int main(int argc,char *argv[]) {
       Esym=WF_Esym(u_gauge);
       TC=WF_topo(u_gauge);
 			lprintf("WILSONFLOW",0,"WF (ncnfg,t,E,t2*E,Esym,t2*Esym,TC) = %d %e %e %e %e %e %e\n",i,t,E,t*t*E,Esym,t*t*Esym,TC);
-			if (WF_var.def_glueball){
-							measure_glueballs();
-			}
+//			if (WF_var.def_glueball){
+//							measure_glueballs();
+//			}
 #else
 
 			WF_E_T(E,u_gauge);
@@ -389,9 +389,9 @@ int main(int argc,char *argv[]) {
     		 	 Esym=WF_Esym(u_gauge);
       		 TC=WF_topo(u_gauge);
 					 lprintf("WILSONFLOW",0,"WF (ncnfg,t,E,t2*E,Esym,t2*Esym,TC) = %d %e %e %e %e %e %e\n",i,t,E,t*t*E,Esym,t*t*Esym,TC);
-					 if (WF_var.def_glueball){
-							measure_glueballs();
-					 }
+//					 if (WF_var.def_glueball){
+//							measure_glueballs();
+//					 }
 #else
 
 					 WF_E_T(E,u_gauge);
