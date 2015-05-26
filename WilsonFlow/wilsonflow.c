@@ -354,25 +354,34 @@ void WilsonFlow1(suNg_field* V, const double epsilon) {
 
 }
 
+
 //define distance between complex matrices
 double max_distance(suNg_field* V, suNg_field* Vprime){
 
-double d;		
+double d,tmp;
 suNg diff;
 _suNg_zero(diff);
 
-_MASTER_FOR_MAX(&glattice,ix,d) {
- 	for (int mu=0; mu<4; ++mu) {     
+
+
+tmp=0;
+_MASTER_FOR(&glattice,ix) {
+	d=0.;
+
+	for (int mu=0; mu<4; ++mu) {
 	 _suNg_mul(diff,1.,*_4FIELD_AT(V,ix,mu));
-   _suNg_sub_assign(diff,*_4FIELD_AT(Vprime,ix,mu));		
-	 _suNg_sqnorm(d,diff);	
+	 _suNg_sub_assign(diff,*_4FIELD_AT(Vprime,ix,mu));
+	 _suNg_sqnorm(d,diff);
+	 if (d > tmp) tmp=d;
+
 	}
+
 }
+global_max(&tmp,1);
 
 
-return d/(double)NG;
+return tmp/(double)NG;
 }
-
 
 // following 1301.4388
 double WilsonFlow3_adaptative(suNg_field* V, double epsilon,double delta) {

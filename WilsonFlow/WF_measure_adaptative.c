@@ -53,7 +53,7 @@ typedef struct _input_WF {
     {"WF initial epsilon", "WF:eps = %lf", DOUBLE_T, &((varname).eps)},\
     {"WF delta", "WF:delta = %lf", DOUBLE_T, &((varname).delta)},\
 		{"enable glueball", "WF:def_glueball = %d",INT_T, &(varname).def_glueball},                \
-    {NULL, NULL, NULL,NULL, NULL}\
+    {NULL, NULL,0,NULL}\
   }\
 }
 
@@ -379,7 +379,7 @@ int main(int argc,char *argv[]) {
 
 					epsilon_new=WilsonFlow3_adaptative(u_gauge,epsilon,WF_var.delta);
 	      
-          if (epsilon_new != -1) t=t+epsilon;
+          if ( fabs(epsilon_new+1.) > 1e-7) t=t+epsilon;
 				
 					if ( fabs(t - (double)k*dt ) < 1e-7 ) {
 						k=k+1;
@@ -416,8 +416,8 @@ int main(int argc,char *argv[]) {
 #endif
 
 					}
-					if (epsilon_new != -1) epsilon=epsilon_new;	
-					if (epsilon_new == -1) epsilon=epsilon/2;	
+					if (fabs(epsilon_new + 1.) > 1e-7) epsilon=epsilon_new;	
+					if (fabs(epsilon_new +1.) < 1e-7 ) epsilon=epsilon/2;	
     
  }
 	gettimeofday(&end,0);
