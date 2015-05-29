@@ -40,8 +40,7 @@ void apply_BCs_on_fundamental_gauge_field();
 void apply_BCs_on_momentum_field(suNg_av_field *force);
 void apply_BCs_on_spinor_field(spinor_field *sp);
 void apply_BCs_on_spinor_field_flt(spinor_field_flt *sp);
-
-
+void apply_background_field_zdir(suNg_field* V,double Q,int n);
 
 
 void cross_prod(suNg_vector *v1,suNg_vector *v2,suNg_vector *v3);

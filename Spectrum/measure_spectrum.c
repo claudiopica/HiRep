@@ -51,6 +51,7 @@ typedef struct _input_mesons {
   int def_semwall;
   int def_point;
 	int def_baryon;
+	int def_glueball;
   int ext_semwall;
   int ext_point;
   int fixed_semwall;
@@ -63,8 +64,11 @@ typedef struct _input_mesons {
   int dt;
   int n_mom;
   int dilution;
+	int background_field;
+	int nEz;
+	double Q;
   /* for the reading function */
-  input_record_t read[22];
+  input_record_t read[26];
 } input_mesons;
 
 #define init_input_mesons(varname) \
@@ -91,6 +95,10 @@ typedef struct _input_mesons {
     {"Distance of t_initial from Dirichlet boundary", "mes:dirichlet_dt = %d", INT_T, &(varname).dt},\
     {"maximum component of momentum", "mes:momentum = %d", INT_T, &(varname).n_mom}, \
     {"enable baryon", "mes:def_baryon = %d",INT_T, &(varname).def_baryon},		\
+    {"enable glueball", "mes:def_glueball = %d",INT_T, &(varname).def_glueball},		\
+    {"enable background electric field", "mes:background_field = %d",INT_T, &(varname).background_field},	\
+    {"Electric charge", "mes:Q = %lf",DOUBLE_T, &(varname).Q},	\
+    {"electric field nEz", "mes:nEz = %d",INT_T, &(varname).nEz},	\
     {NULL, NULL, INT_T, NULL}				\
    }							\
 }
@@ -323,6 +331,9 @@ int main(int argc,char *argv[]) {
  	if (mes_var.def_baryon){
     lprintf("MAIN",0,"Baryon masses\n");    
   }
+ 	if (mes_var.def_glueball){
+    lprintf("MAIN",0,"Glueball masses\n");    
+  }
   if (mes_var.def_gfwall){
     lprintf("MAIN",0,"Gauge Fixed Wall Source\n");    
   }
@@ -351,7 +362,10 @@ int main(int argc,char *argv[]) {
     }
   }
   if (mes_var.n_mom==0){ mes_var.n_mom++;}
-
+ 	if (mes_var.background_field){
+    lprintf("MAIN",0,"Electric background field in the z direction with charge Q=%1.6f , with E =  %d x 2 pi /(Q*T*L) \n",mes_var.Q,mes_var.nEz);    
+  }
+ 
   list=NULL;
   if(strcmp(list_filename,"")!=0) {
     error((list=fopen(list_filename,"r"))==NULL,1,"main [mk_mesons.c]" ,
@@ -384,6 +398,11 @@ int main(int argc,char *argv[]) {
     represent_gauge_field();
 
     lprintf("TEST",0,"<p> %1.6f\n",avr_plaquette());
+
+		// if non zero background field : apply abelian field and boundary correction. Then measure all plaquettes.
+		if (mes_var.background_field){
+			apply_background_field_zdir(u_gauge,mes_var.Q,mes_var.nEz);
+		}
     full_plaquette();
     gettimeofday(&start,0);
 
@@ -397,8 +416,9 @@ int main(int argc,char *argv[]) {
 	  if (mes_var.def_baryon){
 		  measure_baryons(m,i,mes_var.precision);
 	  }
-
-
+		if (mes_var.def_glueball){
+		  measure_glueballs();
+	  }
     if (mes_var.def_gfwall){
       measure_spectrum_gfwall(nm,m,i,mes_var.precision);
     }
