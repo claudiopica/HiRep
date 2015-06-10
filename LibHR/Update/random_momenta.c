@@ -15,6 +15,7 @@ void gaussian_momenta(suNg_av_field *momenta) {
   
   const double c3=1./sqrt(_FUND_NORM2);
   const int ngen=NG*NG-1;
+  //const int ngen=NG*(NG-1)/2;
   
 //Avoid OMP parallel region in PIECE_FOR
 #undef _OMP_PRAGMA

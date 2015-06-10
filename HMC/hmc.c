@@ -252,11 +252,11 @@ int main(int argc,char *argv[]) {
     
 #ifdef MEASURE_FORCE
     if (force_ave==NULL){
-      force_ave = (double*) malloc((flow.hmc_v->hmc_p.n_hasen+2)*sizeof(double));
-      force_max = (double*) malloc((flow.hmc_v->hmc_p.n_hasen+2)*sizeof(double));
-      n_inv_iter = (int*) malloc((flow.hmc_v->hmc_p.n_hasen+2)*sizeof(int));
+      force_ave = (double*) malloc(num_mon()*sizeof(double));
+      force_max = (double*) malloc(num_mon()*sizeof(double));
+      n_inv_iter = (int*) malloc(num_mon()*sizeof(int));
     }
-    for (int k=0;k<flow.hmc_v->hmc_p.n_hasen+2;k++){
+    for (int k=0;k<num_mon();k++){
       force_ave[k]=0.0;
       force_max[k]=0.0;
       n_inv_iter[k]=0;
@@ -291,21 +291,20 @@ int main(int argc,char *argv[]) {
     
 #ifdef MEASURE_FORCE
     lprintf("FORCE_SUMMARY",0,"%d ave Gauge: %1.6f, Fermion: %1.6f",i,force_ave[0],force_ave[1]);
-    for (int k=0;k<flow.hmc_v->hmc_p.n_hasen;++k){
-      lprintf("FORCE_SUMMARY",0,", Hasen %d: %1.6f",k,force_ave[k+2]);
+    for (int k=2;k<num_mon();++k){
+      lprintf("FORCE_SUMMARY",0,", Hasen %d: %1.6f",k-2,force_ave[k]);
     }
     lprintf("FORCE_SUMMARY",0,"\n");
     lprintf("FORCE_SUMMARY",0,"%d max Gauge: %1.6f, Fermion: %1.6f",i,force_max[0],force_max[1]);
-    for (int k=0;k<flow.hmc_v->hmc_p.n_hasen;++k){
-      lprintf("FORCE_SUMMARY",0,", Hasen %d: %1.6f",k,force_max[k+2]);
+    for (int k=2;k<num_mon();++k){
+      lprintf("FORCE_SUMMARY",0,", Hasen %d: %1.6f",k-2,force_max[k]);
     }
     lprintf("FORCE_SUMMARY",0,"\n");
     lprintf("INV_SUMMARY",0,"%d Iterations in fermion: %d ",i,n_inv_iter[0]);
-    for (int k=0;k<flow.hmc_v->hmc_p.n_hasen;++k){
-      lprintf("INV_SUMMARY",0," Hasenbusch %d: %d",k,n_inv_iter[k+1]);
+    for (int k=1;k<num_mon();++k){
+      lprintf("INV_SUMMARY",0," Hasenbusch %d: %d",k-1,n_inv_iter[k]);
     }
     lprintf("INV_SUMMARY",0,"\n");
-    //    lprintf("TUNINGHB",0," %ld %g %d %d %d %1.6f %1.6f %1.6f\n",etime.tv_sec,flow.hmc_v->hmc_p.hasen_dm,flow.hmc_v->hmc_p.gsteps,flow.hmc_v->hmc_p.nsteps,flow.hmc_v->hmc_p.hsteps,force_ave[0],force_ave[1],force_ave[2]);
 #endif
 
     if((i%flow.meas_freq)==0) {
@@ -315,7 +314,6 @@ int main(int argc,char *argv[]) {
       /* Mesons */
       if(strcmp(mes_var.make,"true")==0) {
 	measure_spectrum_semwall(1,&mes_var.mesmass,mes_var.nhits,i,mes_var.precision);
-	//        z2semwall_mesons(i,mes_var.nhits,1,&mes_var.mesmass,mes_var.precision);
       }
       
       /* Polyakov loops */

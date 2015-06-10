@@ -13,11 +13,19 @@
 
 #include "global.h"
 #include "suN.h"
-#include "communications.h"
-#include "logger.h"
-#include "observables.h"
-#include "geometry.h"
+#include "utils.h"
+#include "update.h"
+#include "memory.h"
+#include "random.h"
+#include "dirac.h"
+#include "representation.h"
+#include "linear_algebra.h"
+#include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
+#include "logger.h"
+#include "communications.h"
+
 
 double plaq(int ix,int mu,int nu)
 {
@@ -210,4 +218,25 @@ double local_plaq(int ix)
 	pa+=plaq(ix,3,2);
 
 	return pa;
+}
+
+void full_momenta(suNg_av_field *momenta){
+  scalar_field *la=alloc_sfield(1, &glattice); 
+  _MASTER_FOR(&glattice,i) {
+    double a=0., tmp;
+    /* Momenta */
+    for (int j=0;j<4;++j) {
+      suNg_algebra_vector *cmom=momenta->ptr+coord_to_index(i,j);
+      _algebra_vector_sqnorm_g(tmp,*cmom); 
+      a+=tmp; /* this must be positive */
+    }
+    a*=0.5*_FUND_NORM2;
+    *_FIELD_AT(la,i)=a;
+  }
+  double mom=0;
+  _MASTER_FOR_SUM(la->type,i,mom) {
+    mom += *_FIELD_AT(la,i);
+  }  
+  lprintf("MOMENTA",0,"%1.8g\n",mom);
+  free_sfield(la);
 }

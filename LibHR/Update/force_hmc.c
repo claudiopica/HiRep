@@ -238,10 +238,10 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
     global_max(forcestat+1,1);
     forcestat[1]*=fabs(dt*par->b)*(_REPR_NORM2/_FUND_NORM2);
   }
-  force_ave[par->id+1]+=forcestat[0];
-  force_max[par->id+1]+=forcestat[1];
+  force_ave[par->id]+=forcestat[0];
+  force_max[par->id]+=forcestat[1];
   lprintf("FORCE_HMC",20,"avr dt |force| = %1.8e dt maxforce = %1.8e, dt = %1.8e \n",forcestat[0],forcestat[1],dt);
-  n_inv_iter[par->id]+=n_iters;
+  n_inv_iter[par->id-1]+=n_iters;
 #endif
 }
 

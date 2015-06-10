@@ -20,9 +20,89 @@
 
 input_hmc hmc_var = init_input_hmc(hmc_var);
 
-/* build configuration name */
+#ifdef REPR_FUNDAMENTAL
+#define repr_name "FUN"
+#elif defined REPR_SYMMETRIC
+#define repr_name "SYM"
+#elif defined REPR_ANTISYMMETRIC
+#define repr_name "ASY"
+#elif defined REPR_ADJOINT
+#define repr_name "ADJ"
+#endif
+
+static double beta(){
+  integrator_par *ip=hmc_var.hmc_p.integrator;
+  while (ip!=NULL){
+    for (int n=0;n<ip->nmon;n++){
+      const monomial* m=ip->mon_list[n];
+      if (m->data.type==PureGauge){
+        return ((mon_pg_par*) m->data.par)->beta;
+      }
+    }
+    ip=ip->next;
+  }
+  return 0;
+}
+
+static double mass(){
+  integrator_par *ip=hmc_var.hmc_p.integrator;
+  double min=1./0.;
+  while (ip!=NULL){
+    for (int n=0;n<ip->nmon;n++){
+      double nm=min;
+      const monomial* m=ip->mon_list[n];
+      if (m->data.type==HMC){
+        nm = ((mon_hmc_par*) m->data.par)->mass;
+      }
+      else if (m->data.type==RHMC){
+        nm = ((mon_rhmc_par*) m->data.par)->mass;
+      }
+      else if (m->data.type==TM || m->data.type==TM_alt){
+        nm = ((mon_tm_par*) m->data.par)->mass;
+      }
+      else if (m->data.type==Hasenbusch){
+        nm = ((mon_hasenbusch_par*) m->data.par)->mass;
+      }
+      else if (m->data.type==Hasenbusch_tm || m->data.type==Hasenbusch_tm_alt){
+        nm = ((mon_hasenbusch_tm_par*) m->data.par)->mass;
+      }
+      if (nm<min) min=nm;
+    }
+    ip=ip->next;
+  }
+  return min;
+}
+
+static int nf(){
+  int nf=0;
+  integrator_par *ip=hmc_var.hmc_p.integrator;
+  while (ip!=NULL){
+    for (int n=0;n<ip->nmon;n++){
+      const monomial* m=ip->mon_list[n];
+      if (m->data.type==HMC){
+        nf+=2;
+      }
+      else if (m->data.type==RHMC){
+        nf+=2;
+      }
+      else if (m->data.type==TM){
+        nf+=2;
+      }
+    }
+    ip=ip->next;
+  }
+  return nf;
+}
+
 static void mk_gconf_name(char *name, hmc_flow *rf, int id) {
-  sprintf(name,"%sn%d",rf->run_name,id);
+  /* build configuration name */
+  if (strlen(rf->run_name)>10)
+      sprintf(name,"%sn%d",rf->run_name,id);
+  else{
+    sprintf(name,"%s_%dx%dx%dx%dnc%dr%snf%db%.6fm%.6fn%d",
+            rf->run_name,GLB_T,GLB_X,GLB_Y,GLB_Z,NG,repr_name,
+            nf(),beta(),-mass(),id);
+  }
 }
 
 /* add dirname to filename and return it */
@@ -58,7 +138,7 @@ static int parse_gstart(hmc_flow *rf)
 	ptr = strrchr(rf->g_start, 'n');
 	ret = (int)(ptr - rf->g_start);
 	len = strlen(rf->run_name);
-	if(ptr && ret == len && strncmp(rf->g_start, rf->run_name, len) == 0)
+	if(ptr && (ret == len || strncmp(rf->g_start, rf->run_name, len) == 0))
 	{
 		rf->start = atoi(ptr+1) + 1;
 		return 0;

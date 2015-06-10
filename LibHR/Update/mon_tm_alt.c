@@ -97,6 +97,7 @@ struct _monomial* tm_alt_create(const monomial_data *data) {
 #endif
   
   // Setup force parameters
+  par->fpar.id=data->id;
   par->fpar.n_pf = 1;
   par->fpar.pf = par->pf;
   par->fpar.inv_err2 = data->force_prec;

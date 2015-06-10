@@ -1,5 +1,5 @@
 /****************************************************************************
-* Copyright (c) 2008, Claudio Pica                                          *   
+* Copyright (c) 2014, Ari Hietanen
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
@@ -240,7 +240,7 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
   lprintf("MAIN",0,"input file [%s]\n",input_filename); 
   lprintf("MAIN",0,"output file [%s]\n",output_filename); 
-  if (list_filename!=NULL) lprintf("MAIN",0,"list file [%s]\n",list_filename); 
+  if (list_filename[0]!=0) lprintf("MAIN",0,"list file [%s]\n",list_filename); 
   else lprintf("MAIN",0,"cnfg file [%s]\n",cnfg_filename); 
 
   parse_cnfg_filename(cnfg_filename,&fpars);
@@ -252,14 +252,13 @@ int main(int argc,char *argv[]) {
   int i=0;
   while(1){
     struct timeval start, end, etime; /* for timing */
-    double times[flow.hmc_v->hmc_p.n_hasen+2];
-
+    double times[num_mon()];
     if (force_ave==NULL){
-      force_ave = (double*) malloc((flow.hmc_v->hmc_p.n_hasen+2)*sizeof(double));
-      force_max = (double*) malloc((flow.hmc_v->hmc_p.n_hasen+2)*sizeof(double));
-      n_inv_iter = (int*) malloc((flow.hmc_v->hmc_p.n_hasen+2)*sizeof(int));
+      force_ave = (double*) malloc(num_mon()*sizeof(double));
+      force_max = (double*) malloc(num_mon()*sizeof(double));
+      n_inv_iter = (int*) malloc(num_mon()*sizeof(int));
     }
-    for (int k=0;k<flow.hmc_v->hmc_p.n_hasen+2;k++){
+    for (int k=0;k<num_mon();k++){
       force_ave[k]=0.0;
       force_max[k]=0.0;
       n_inv_iter[k]=0;
@@ -289,49 +288,49 @@ int main(int argc,char *argv[]) {
     lprintf("MAIN",0,"Configuration %d: Time to correct pseudofermion dist: %ld sec %ld usec\n",i,etime.tv_sec,etime.tv_usec);
 
     gettimeofday(&start,0);
-    calc_one_force(flow.hmc_v->hmc_p.n_hasen+1);
+    calc_one_force(0);
     gettimeofday(&end,0);
     timeval_subtract(&etime,&end,&start);
     lprintf("MAIN",0,"Time to calculate gauge force: %ld sec %ld usec\n",etime.tv_sec,etime.tv_usec);
     times[0]=etime.tv_sec + (double) (etime.tv_usec)/1.0e6;
 
     gettimeofday(&start,0);
-    calc_one_force(0);
+    calc_one_force(1);
     gettimeofday(&end,0);
     timeval_subtract(&etime,&end,&start);
     lprintf("MAIN",0,"Time to calculate fermion force: %ld sec %ld usec\n",etime.tv_sec,etime.tv_usec);
     times[1]=etime.tv_sec + (double) (etime.tv_usec)/1.0e6;
-    for (int k=0;k<flow.hmc_v->hmc_p.n_hasen;k++){
+    for (int k=2;k<num_mon();k++){
       gettimeofday(&start,0);
-      calc_one_force(k+1);
+      calc_one_force(k);
       gettimeofday(&end,0);
       timeval_subtract(&etime,&end,&start);
       lprintf("MAIN",0,"Time to calculate HB force %d: %ld sec %ld usec\n",k,etime.tv_sec,etime.tv_usec);
-      times[k+2]=etime.tv_sec + (double) (etime.tv_usec)/1.0e6;
+      times[k]=etime.tv_sec + (double) (etime.tv_usec)/1.0e6;
     }
-    
+
+    lprintf("FORCE_SUMMARY",10,"Fermion: is the first monomial defined in the input file and Hasen: are the following ones upto number of monomials\n");
     lprintf("FORCE_SUMMARY",0,"%d ave Gauge: %1.6f, Fermion: %1.6f",i,force_ave[0],force_ave[1]);
-    for (int k=0;k<flow.hmc_v->hmc_p.n_hasen;++k){
-      lprintf("FORCE_SUMMARY",0,", Hasen %d: %1.6f",k,force_ave[k+2]);
+
+    for (int k=2;k<num_mon();++k){
+      lprintf("FORCE_SUMMARY",0,", Hasen %d: %1.6f",k-2,force_ave[k]);
     }
     lprintf("FORCE_SUMMARY",0,"\n");
     lprintf("FORCE_SUMMARY",0,"%d max Gauge: %1.6f, Fermion: %1.6f",i,force_max[0],force_max[1]);
-    for (int k=0;k<flow.hmc_v->hmc_p.n_hasen;++k){
-      lprintf("FORCE_SUMMARY",0,", Hasenbusch %d: %1.6f",k,force_max[k+2]);
+    for (int k=2;k<num_mon();++k){
+      lprintf("FORCE_SUMMARY",0,", Hasen %d: %1.6f",k-2,force_max[k]);
     }
     lprintf("FORCE_SUMMARY",0,"\n");
-    
     lprintf("INV_SUMMARY",0,"%d Iterations in fermion: %d ",i,n_inv_iter[0]);
-    for (int k=0;k<flow.hmc_v->hmc_p.n_hasen;++k){
-      lprintf("INV_SUMMARY",0," Hasenbusch %d: %d",k,n_inv_iter[k+1]);
+    for (int k=1;k<num_mon();++k){
+      lprintf("INV_SUMMARY",0," Hasenbusch %d: %d",k-1,n_inv_iter[k]);
     }
+    lprintf("INV_SUMMARY",0,"\n");
 
     lprintf("TIME_SUMMARY",0,"%d Time in gauge: %g fermion: %g",i,times[0],times[1]);
-    for (int k=0;k<flow.hmc_v->hmc_p.n_hasen;++k){
+    for (int k=2;k<num_mon();++k){
       lprintf("TIME_SUMMARY",0," Hasenbusch %d: %1.6f",k,times[k+2]);
     }
-    
-  /* save final configuration */
   }
   
   free(force_ave);

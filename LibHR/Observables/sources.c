@@ -81,6 +81,8 @@ static int random_tau(){
 						source[spin](t,x) = \delta_{a color} \delta_{s spin} e^{ i p_\mu x_\mu }
 		diluted_volume_source:
 						source[spin](t,x) = \sum_{x%p == 0} \delta_{s spin} 1_color 
+
+                z2_volume_source:                  source[spin](t,x) = Z(2) x Z(2) (no dilution)
 \***************************************************************************/
 void create_point_source(spinor_field *source,int tau, int color) {
   int beta, ix;
@@ -100,10 +102,11 @@ void create_point_source(spinor_field *source,int tau, int color) {
 // creates point source for the NF color indices.
 void create_full_point_source(spinor_field *source, int tau) {
 	int col,beta, idx,ix;
-
+        
 	for (beta=0;beta<4*NF;++beta){
-		spinor_field_zero_f(&source[beta]);
+          spinor_field_zero_f(&source[beta]);
 	}
+
 	if(COORD[0]==tau/T && COORD[1]==0 && COORD[2]==0 && COORD[3]==0) {
 		ix=ipt(tau-zerocoord[0],0,0,0);
 		for (col=0;col<NF;++col){
@@ -148,7 +151,8 @@ int create_diluted_source_equal_eo(spinor_field *source) {
     spinor_field_zero_f(&source[i]);
   }
   
-  if(COORD[0]==tau/T) {// Check that tau is in this thread.
+  //  if(COORD[0]==tau/T) {// Check that tau is in this thread.
+  if (zerocoord[0]<=tau && tau<zerocoord[0]+T){
     c[0]=tau-zerocoord[0];
     for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
 	  if(((tau+zerocoord[1]+c[1]+zerocoord[2]+c[2]+zerocoord[3]+c[3])&1)==0){
@@ -174,9 +178,8 @@ void create_diluted_source_equal_atau_eo(spinor_field *source, int tau){
   for (i=0;i<4;++i){
     spinor_field_zero_f(&source[i]);
   }
-  
-  if(COORD[0]==tau/T) {// Check that tau is in this thread.
-    c[0]=tau%T;
+  if (zerocoord[0]<=tau && tau<zerocoord[0]+T){  // Check that tau is in this thread.
+    c[0]=tau-zerocoord[0];
     for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
 	  if(((tau+zerocoord[1]+c[1]+zerocoord[2]+c[2]+zerocoord[3]+c[3])&1)==0){
 	    v1 = &((_FIELD_AT(&source[0],ipt(c[0],c[1],c[2],c[3])))->c[0]);
@@ -200,9 +203,9 @@ int create_diluted_source_equal(spinor_field *source) {
   for (i=0;i<4;++i){
     spinor_field_zero_f(&source[i]);
   }
-  
-  if(COORD[0]==tau/T) {// Check that tau is in this thread.
-    c[0]=tau%T;
+
+  if (zerocoord[0]<=tau && tau<zerocoord[0]+T){  // Check that tau is in this thread.
+    c[0]=tau-zerocoord[0];
     for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
 	  v1 = &((_FIELD_AT(&source[0],ipt(c[0],c[1],c[2],c[3])))->c[0]);
 	  ranz2((double*)(v1),sizeof(suNf_vector)/sizeof(double)); // Make new sources
@@ -224,9 +227,9 @@ void create_diluted_source_equal_atau(spinor_field *source, int tau) {
   for (i=0;i<4;++i){
     spinor_field_zero_f(&source[i]);
   }
-  
-  if(COORD[0]==tau/T) {// Check that tau is in this thread.
-    c[0]=tau%T;
+
+  if (zerocoord[0]<=tau && tau<zerocoord[0]+T){  // Check that tau is in this thread.
+    c[0]=tau-zerocoord[0];
     for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
 	  v1 = &((_FIELD_AT(&source[0],ipt(c[0],c[1],c[2],c[3])))->c[0]);
 	  ranz2((double*)(v1),sizeof(suNf_vector)/sizeof(double)); // Make new sources
@@ -240,17 +243,17 @@ void create_diluted_source_equal_atau(spinor_field *source, int tau) {
 
 /* Creates one spinorfield  Z2xZ2 noise sources localised on time slice tau. . Even and Odd sites*/
 void create_diluted_source_equal_spinorfield1(spinor_field *source,int tau) {
-	int c[4];
-	suNf_vector *v1;
-	spinor_field_zero_f(source);
-
-	if(COORD[0]==tau/T) {// Check that tau is in this thread.
-		c[0]=tau%T;
-		for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
-			v1 = &((_FIELD_AT(source,ipt(c[0],c[1],c[2],c[3])))->c[0]);
-			ranz2((double*)(v1),sizeof(suNf_spinor)/sizeof(double)); // Make new sources
-		}
-	}
+  int c[4];
+  suNf_vector *v1;
+  spinor_field_zero_f(source);
+  
+  if(COORD[0]==tau/T) {// Check that tau is in this thread.
+    c[0]=tau%T;
+    for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
+          v1 = &((_FIELD_AT(source,ipt(c[0],c[1],c[2],c[3])))->c[0]);
+          ranz2((double*)(v1),sizeof(suNf_spinor)/sizeof(double)); // Make new sources
+        }
+  }
 }
 
 
@@ -292,9 +295,8 @@ void create_diluted_source_equal_atau_col(spinor_field *source, int tau,int col)
   for (i=0;i<4;++i){
     spinor_field_zero_f(&source[i]);
   }
-
-  if(COORD[0]==tau/T) {// Check that tau is in this thread.
-    c[0]=tau%T;
+  if (zerocoord[0]<=tau && tau<zerocoord[0]+T){  // Check that tau is in this thread.
+    c[0]=tau-zerocoord[0];
     for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
 	  for (i=0;i<4;++i){
 	    v1 = &((_FIELD_AT(&source[i],ipt(c[0],c[1],c[2],c[3])))->c[i].c[col]);
@@ -340,7 +342,8 @@ void create_gauge_fixed_wall_source(spinor_field *source, int tau, int color) {
     spinor_field_zero_f(&source[beta]);
   }
 
-  if(COORD[0]==tau/T) {// Check that tau is in this thread.
+
+  if (zerocoord[0]<=tau && tau<zerocoord[0]+T){  // Check that tau is in this thread.
     c[0]=tau-zerocoord[0];
     for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
 	  for (beta=0;beta<4;++beta){
@@ -365,10 +368,8 @@ void create_sequential_source(spinor_field *source, int tf, spinor_field* prop){
     spinor_field_zero_f(&source[beta]);
   }
 
-
-  if(COORD[0]==tf/T) {// Check that tf is in this thread.
-
-    c[0] = tf - zerocoord[0];
+  if (zerocoord[0]<=tf && tf<zerocoord[0]+T){  // Check that tf is in this thread.
+    c[0]=tf-zerocoord[0];
     for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
 
 	  ix = ipt(c[0],c[1],c[2],c[3]);
@@ -452,7 +453,7 @@ void create_diluted_volume_source(spinor_field *source, int parity_component, in
   for (beta=0;beta<4;++beta){
     spinor_field_zero_f(&source[beta]);
   }
-
+  
   for(c[0]=0; c[0]<T; c[0]++) for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
 	  if(((zerocoord[0]+c[0]+zerocoord[1]+c[1]+zerocoord[2]+c[2]+zerocoord[3]+c[3])%mod)==parity_component){
 	    for (beta=0;beta<4;++beta){
@@ -461,7 +462,7 @@ void create_diluted_volume_source(spinor_field *source, int parity_component, in
 	      }}
 	  }
 	}
-
+  
   for (beta=0;beta<4;++beta){
     start_sf_sendrecv(source + beta);
     complete_sf_sendrecv(source + beta);
@@ -469,3 +470,8 @@ void create_diluted_volume_source(spinor_field *source, int parity_component, in
 
 }
 
+
+
+void create_z2_volume_source(spinor_field *source) {
+  z2_spinor_field(source);
+}

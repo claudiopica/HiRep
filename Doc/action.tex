@@ -134,6 +134,85 @@ monomial {
 \end{tabular}
 \end{center}
 
+The example below show how to specify an even odd preconditioned twisted mass monomial in the input file.
+\begin{center}
+\begin{minipage}{55mm}
+\begin{framed}
+\begin{verbatim}
+monomial {
+    id = 1
+    type = tm
+    mass = -0.750
+    mu = 0.1
+    mt_prec = 1e-14
+    force_prec = 1e-14
+    mre_past = 5
+    level = 1
+}
+\end{verbatim}
+\vspace{-5mm}
+\end{framed}
+\end{minipage}
+\end{center}
+
+\vspace{2mm}
+
+\begin{center}
+\begin{tabular}{l|l}
+ Variable & Description \\
+ \hline
+ \verb|id|         & unique monomial id \\
+ \verb|type|       & monomial type \\
+ \verb|mass|       & bare fermion mass \\
+ \verb|mu|         & bare twisted mass\\
+ \verb|mt_prec|    & inverter precision used in the Metropolis test \\
+ \verb|force_prec| & inverter precision used when calculating the force \\
+ \verb|mre_past|   & number of past solutions used in the chronological inverter \\
+ \verb|level|      & integrator level where the monomial force is evaluated
+\end{tabular}
+\end{center}
+
+The example below shows how to specify an twisted even odd Wilson
+preconditioned mass monomial in the input file. See documentation HiRep.pdf.
+\begin{center}
+\begin{minipage}{55mm}
+\begin{framed}
+\begin{verbatim}
+monomial {
+    id = 1
+    type = tm_alt
+    mass = -0.750
+    mu = 0.1
+    mt_prec = 1e-14
+    force_prec = 1e-14
+    mre_past = 5
+    level = 1
+}
+\end{verbatim}
+\vspace{-5mm}
+\end{framed}
+\end{minipage}
+\end{center}
+
+\vspace{2mm}
+
+\begin{center}
+\begin{tabular}{l|l}
+ Variable & Description \\
+ \hline
+ \verb|id|         & unique monomial id \\
+ \verb|type|       & monomial type \\
+ \verb|mass|       & bare fermion mass \\
+ \verb|mu|         & bare twisted mass\\
+ \verb|mt_prec|    & inverter precision used in the Metropolis test \\
+ \verb|force_prec| & inverter precision used when calculating the force \\
+ \verb|mre_past|   & number of past solutions used in the chronological inverter \\
+ \verb|level|      & integrator level where the monomial force is evaluated
+\end{tabular}
+\end{center}
+
+
+
 \subsubsection*{Comments}
 \begin{itemize}
  \item When using the chronological inverter the force precision should be $10^{-14}$ or better to ensure reversibility in the algorithm.
@@ -183,6 +262,91 @@ monomial {
  \verb|level|      & integrator level where the monomial force is evaluated
 \end{tabular}
 \end{center}
+
+
+The example below show how to specify a Hasenbusch monomial with
+even odd preconditioned twisted mass 
+\begin{center}
+\begin{minipage}{55mm}
+\begin{framed}
+\begin{verbatim}
+monomial {
+    id = 1
+    type = hasenbusch_tm
+    mass = -0.750
+    mu = 0
+    dmu = 0.1
+    mt_prec = 1e-14
+    force_prec = 1e-14
+    mre_past = 2
+    level = 0
+}
+
+\end{verbatim}
+\vspace{-5mm}
+\end{framed}
+\end{minipage}
+\end{center}
+
+\vspace{2mm}
+
+\begin{center}
+\begin{tabular}{l|l}
+ Variable & Description \\
+ \hline
+ \verb|id|         & unique monomial id \\
+ \verb|type|       & monomial type \\
+ \verb|mass|       & bare fermion mass \\
+ \verb|mu|         & twisted mass \\
+ \verb|dmu|        & shift in the twisted mass \\
+ \verb|mt_prec|    & inverter precision used in the Metropolis test \\
+ \verb|force_prec| & inverter precision used when calculating the force \\
+ \verb|mre_past|   & number of past solutions used in the chronological inverter \\
+ \verb|level|      & integrator level where the monomial force is evaluated
+\end{tabular}
+\end{center}
+
+The example below show how to specify a Hasenbusch monomial with
+twisted even odd preconditioned operator
+\begin{center}
+\begin{minipage}{55mm}
+\begin{framed}
+\begin{verbatim}
+monomial {
+    id = 1
+    type = hasenbusch_tm_alt
+    mass = -0.750
+    mu = 0
+    dmu = 0.1
+    mt_prec = 1e-14
+    force_prec = 1e-14
+    mre_past = 2
+    level = 0
+}
+\end{verbatim}
+\vspace{-5mm}
+\end{framed}
+\end{minipage}
+\end{center}
+
+\vspace{2mm}
+
+\begin{center}
+\begin{tabular}{l|l}
+ Variable & Description \\
+ \hline
+ \verb|id|         & unique monomial id \\
+ \verb|type|       & monomial type \\
+ \verb|mass|       & bare fermion mass \\
+ \verb|mu|         & bare twisted mass \\
+ \verb|dmu|        & shift in the twisted  mass \\
+ \verb|mt_prec|    & inverter precision used in the Metropolis test \\
+ \verb|force_prec| & inverter precision used when calculating the force \\
+ \verb|mre_past|   & number of past solutions used in the chronological inverter \\
+ \verb|level|      & integrator level where the monomial force is evaluated
+\end{tabular}
+\end{center}
+
 
 \vspace{2mm}
 \subsubsection*{Comments}

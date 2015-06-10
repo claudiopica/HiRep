@@ -31,7 +31,11 @@ void representation::init()
 	smatrix tmp(N), tmp1(N);
 
 	name = "ADJOINT";
-	DIM = N*N-1;	
+#ifdef _GAUGE_SON
+        DIM = N*(N-1)/2;
+#else
+	DIM = N*N-1;
+#endif
 	iT = new smatrix[group::DIM];
 	e = new smatrix[DIM];
 	
@@ -78,7 +82,7 @@ string group_represent(const char* vname, const char* uname)
 	pmatrix rU(representation::DIM);
 	pmatrix *Ue;
     
-    Ue = new pmatrix[representation::DIM];
+        Ue = new pmatrix[representation::DIM];
 	
 	adjU = U;
 	adjU.adjoint();

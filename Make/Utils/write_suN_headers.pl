@@ -262,6 +262,8 @@ if ($su2quat==0) {
 }
 
 if ($suff eq "g") { #algebra operations only for gauge
+	write_algebra_vector_add_assign();
+	write_algebra_vector_sub_assign();
 	write_algebra_vector_mul_add_assign();
 	write_algebra_vector_mul();
 	write_algebra_vector_zero();
@@ -447,7 +449,10 @@ sub write_suN_vector {
 
 sub write_suN_algebra_vector {
   print $structdef;
-	my $d=($N*$N)-1;
+  my $d=($N*$N)-1;
+  if ($gauge_group eq "GAUGE_SON"){ #N*(N-1)/2 generators
+      $d=$N*($N-1)/2;
+  }
   print "   double $cname\[$d\];\n";
   print "} ${rdataname}_algebra_vector;\n\n";
   print $structdef;
@@ -1043,10 +1048,66 @@ sub write_vector_mul_add_assign {
 	}
 }
 
+
+sub write_algebra_vector_add_assign {
+  print "/* r+=s */\n";
+  print "#define _algebra_vector_add_assign_${suff}(r,s) \\\n";
+  my $d=$N*$N-1;
+  if ($gauge_group eq "GAUGE_SON"){ #N(N-1)/2 generators
+      $d=$N*($N-1)/2;
+  }
+  if ($N<$Nmax or $d<(4*$unroll+1) ) { #unroll all 
+                for(my $i=0;$i<$d;$i++){
+                        print "      (r).$cname\[$i\]+=(s).$cname\[$i\]";
+                        if($i==$d-1) { print "\n\n"; } else { print "; \\\n"; }
+                }
+        } else { #partial unroll
+                print "   do { \\\n";
+                print "      int _i;for (_i=0; _i<$avd; ){\\\n";
+                for(my $i=0;$i<2*$unroll;$i++){
+                        print "         (r).$cname\[_i\]+=(s).$cname\[_i\]; ++_i;\\\n";
+                }
+                print "      }\\\n";
+                for(my $i=0;$i<$avr;$i++){
+                        print "      (r).$cname\[_i\]+=(s).$cname\[_i\]; ++_i;\\\n";
+                }
+                print "   } while(0) \n\n";
+        }
+}
+
+sub write_algebra_vector_sub_assign {
+  print "/* r-=s */\n";
+  print "#define _algebra_vector_sub_assign_${suff}(r,s) \\\n";
+  my $d=$N*$N-1;
+  if ($gauge_group eq "GAUGE_SON"){ #N(N-1)/2 generators
+      $d=$N*($N-1)/2;
+  }
+  if ($N<$Nmax or $d<(4*$unroll+1) ) { #unroll all 
+                for(my $i=0;$i<$d;$i++){
+                        print "      (r).$cname\[$i\]-=(s).$cname\[$i\]";
+                        if($i==$d-1) { print "\n\n"; } else { print "; \\\n"; }
+                }
+        } else { #partial unroll
+                print "   do { \\\n";
+                print "      int _i;for (_i=0; _i<$avd; ){\\\n";
+                for(my $i=0;$i<2*$unroll;$i++){
+                        print "         (r).$cname\[_i\]-=(s).$cname\[_i\]; ++_i;\\\n";
+                }
+                print "      }\\\n";
+                for(my $i=0;$i<$avr;$i++){
+                        print "      (r).$cname\[_i\]-=(s).$cname\[_i\]; ++_i;\\\n";
+                }
+                print "   } while(0) \n\n";
+        }
+}
+
 sub write_algebra_vector_mul_add_assign {
   print "/* r+=k*s (k real) */\n";
   print "#define _algebra_vector_mul_add_assign_${suff}(r,k,s) \\\n";
-	my $d=$N*$N-1;
+  my $d=$N*$N-1;
+  if ($gauge_group eq "GAUGE_SON"){ #N(N-1)/2 generators
+      $d=$N*($N-1)/2;
+  }
   if ($N<$Nmax or $d<(4*$unroll+1) ) { #unroll all 
 		for(my $i=0;$i<$d;$i++){
 			print "      (r).$cname\[$i\]+=(k)*(s).$cname\[$i\]";
@@ -1069,7 +1130,10 @@ sub write_algebra_vector_mul_add_assign {
 sub write_algebra_vector_mul {
   print "/* r=k*s (k real) */\n";
   print "#define _algebra_vector_mul_${suff}(r,k,s) \\\n";
-	my $d=$N*$N-1;
+  my $d=$N*$N-1;
+  if ($gauge_group eq "GAUGE_SON"){ #N(N-1)/2 generators
+      $d=$N*($N-1)/2;
+  }
   if ($N<$Nmax or $d<(4*$unroll+1) ) { #unroll all 
 		for(my $i=0;$i<$d;$i++){
 			print "      (r).$cname\[$i\]=(k)*(s).$cname\[$i\]";
@@ -1092,7 +1156,10 @@ sub write_algebra_vector_mul {
 sub write_algebra_vector_zero {
   print "/* r=0  */\n";
   print "#define _algebra_vector_zero_${suff}(r) \\\n";
-	my $d=$N*$N-1;
+  my $d=$N*$N-1;
+  if ($gauge_group eq "GAUGE_SON"){ #N(N-1)/2 generators
+      $d=$N*($N-1)/2;
+  }
   if ($N<$Nmax or $d<(4*$unroll+1) ) { #unroll all 
 		for(my $i=0;$i<$d;$i++){
 			print "      (r).$cname\[$i\]=0.";
@@ -1116,6 +1183,9 @@ sub write_algebra_vector_sqnorm {
   print "/* k=|v|^2  */\n";
   print "#define _algebra_vector_sqnorm_${suff}(k,r) \\\n";
   my $last=$N*$N-1;
+  if ($gauge_group eq "GAUGE_SON"){ #N(N-1)/2 generators
+      $last=$N*($N-1)/2;
+  }
   if ($N<$Nmax or $last<(4*$unroll+1) ) { #unroll all 
 		print "   (k)=";
 		my $n=0;

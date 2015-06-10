@@ -20,9 +20,9 @@ void group::init(int n)
 {
 #ifdef NDEBUG 
 #ifdef _GAUGE_SON_
-	cerr << "Initializing group SO(" << n << ")..... ";
+	cerr << " Initializing group SO(" << n << ")..... ";
 #else
-	cerr << "Initializing group SU(" << n << ")..... ";
+	cerr << " Initializing group SU(" << n << ")..... ";
 #endif 
 #endif 
 
