@@ -97,7 +97,7 @@ typedef struct _input_mesons {
     {"enable baryon", "mes:def_baryon = %d",INT_T, &(varname).def_baryon},		\
     {"enable glueball", "mes:def_glueball = %d",INT_T, &(varname).def_glueball},		\
     {"enable background electric field", "mes:background_field = %d",INT_T, &(varname).background_field},	\
-    {"Electric charge", "mes:Q = %lf",DOUBLE_T, &(varname).Q},	\
+    {"electric charge", "mes:Q = %lf",DOUBLE_T, &(varname).Q},	\
     {"electric field nEz", "mes:nEz = %d",INT_T, &(varname).nEz},	\
     {NULL, NULL, INT_T, NULL}				\
    }							\
@@ -401,7 +401,8 @@ int main(int argc,char *argv[]) {
 
 		// if non zero background field : apply abelian field and boundary correction. Then measure all plaquettes.
 		if (mes_var.background_field){
-			apply_background_field_zdir(u_gauge,mes_var.Q,mes_var.nEz);
+//		apply_background_field_zdir(u_gauge,mes_var.Q,mes_var.nEz);
+	      measure_diquark_semwall_background(nm,m,mes_var.nhits_2pt,i,mes_var.precision,mes_var.Q,mes_var.nEz);
 		}
     full_plaquette();
     gettimeofday(&start,0);

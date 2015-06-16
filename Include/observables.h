@@ -98,6 +98,7 @@ void init_cvc_correlators();
 void free_meson_observables();
 
 void measure_mesons(meson_observable* mo,spinor_field *psi0, spinor_field *eta, int nm,int tau);
+void measure_diquarks(meson_observable* mo, spinor_field *psi0, spinor_field *psi1, spinor_field *eta, int nm, int tau);
 void measure_conserved_currents(meson_observable* mo,spinor_field* psi0, spinor_field* eta, int nm, int tau);
 void measure_mesons_ext(meson_observable* mo,spinor_field *psi0, spinor_field *eta, int nm,int tau,int begin);
 void measure_point_mesons_momenta(meson_observable* mo,spinor_field* psi0, spinor_field* eta, int nm, int tau, int n_mom);
@@ -112,6 +113,7 @@ void measure_renormalization(spinor_field* psi_in, spinor_field* psi_out, int nm
 void print_renormalization(int conf, int nm, double* mass, char* label, int pt_in, int px_in, int py_in, int pz_in, int pt_out, int px_out, int py_out, int pz_out);
 
 void contract_baryons(spinor_field *psi0,int tau);
+void measure_glueballs();
 
 void id_correlator(double *out, int t0, spinor_field *qp);
 void g0_correlator(double *out, int t0, spinor_field *qp);

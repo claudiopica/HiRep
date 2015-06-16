@@ -31,6 +31,7 @@ void measure_formfactor_pt(int ti, int tf, int nm, double* m, int n_mom, int con
 void measure_formfactor_fixed(int ti, int tf, int dt, int nm, double* m, int n_mom, int conf_num, double precision);
 void measure_conserved_formfactor_fixed(int ti, int tf, int dt, int nm, double* m, int n_mom, int conf_num, double precision);
 
+void measure_diquark_semwall_background(int nm, double* m, int nhits,int conf_num, double precision,double Q, int n);
 void measure_baryons(double* m,int conf_num, double precision);
 
 #endif

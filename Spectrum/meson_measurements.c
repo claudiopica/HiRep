@@ -181,6 +181,47 @@ void measure_spectrum_pt_fixedbc(int tau, int dt, int nm, double* m, int n_mom,i
 /********************************
 *	SEMWall Sources		*
 *********************************/
+
+void measure_diquark_semwall_background(int nm, double* m, int nhits,int conf_num, double precision,double Q, int n){
+  spinor_field* source = alloc_spinor_field_f(4,&glat_even);
+  spinor_field* prop_u =  alloc_spinor_field_f(4*nm,&glattice);
+  spinor_field* prop_d =  alloc_spinor_field_f(4*nm,&glattice);
+  int tau,k;
+  suNg_field* u_gauge_old=alloc_gfield(&glattice);
+  suNg_field_copy(u_gauge_old,u_gauge);
+
+  error(nm!=1,1,"measure_diquark_semwall_background","nm cannot be different from 1 !\n");
+
+  init_propagator_eo(nm, m, precision);
+
+  for (k=0;k<nhits;++k){
+    tau=create_diluted_source_equal_eo(source);
+		//apply background and calculate first prop
+			apply_background_field_zdir(u_gauge,Q,n);
+    	represent_gauge_field();
+    	calc_propagator_eo(prop_u,source,4);//4 for spin dilution
+		//apply background and calculate second prop
+  		suNg_field_copy(u_gauge,u_gauge_old);
+
+			apply_background_field_zdir(u_gauge,-Q,n);
+	    represent_gauge_field();
+    	calc_propagator_eo(prop_d,source,4);//4 for spin dilution
+
+	    measure_diquarks(meson_correlators,prop_u,prop_d,source,nm,tau);
+
+			suNg_field_copy(u_gauge,u_gauge_old);
+		  represent_gauge_field();
+  }
+	print_mesons(meson_correlators,nhits*GLB_VOL3/2.,conf_num,nm,m,GLB_T,1,"DEFAULT_DIQUARK_SEMWALL_BACKGROUND");
+
+	free_propagator_eo(); 
+  free_spinor_field_f(source);
+  free_spinor_field_f(prop_u);
+  free_spinor_field_f(prop_d);
+  free_gfield(u_gauge_old);
+}
+
+
 void measure_spectrum_semwall(int nm, double* m, int nhits,int conf_num, double precision){
   spinor_field* source = alloc_spinor_field_f(4,&glat_even);
   spinor_field* prop =  alloc_spinor_field_f(4*nm,&glattice);

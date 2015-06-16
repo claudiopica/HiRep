@@ -363,6 +363,13 @@ static void zero_corrs(meson_observable* mo){
     motmp=motmp->next;
   }
 }
+void measure_diquarks(meson_observable* mo,spinor_field* psi0, spinor_field* psi1,spinor_field* eta, int nm, int tau){
+  init_corrs(nm,1,mo);
+  lprintf("measure_mesons",50,"measure default diquarks");
+  measure_mesons_core(psi0, psi1, eta, mo,nm, tau, 1, 0,GLB_T);
+//  measure_mesons_core(psi1, psi0, eta, mo,nm, tau, 1, 0,GLB_T);
+}
+
 
 void measure_mesons(meson_observable* mo,spinor_field* psi0, spinor_field* eta, int nm, int tau){
   init_corrs(nm,1,mo);
