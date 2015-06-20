@@ -25,7 +25,7 @@ if(1) \
 	a.im = (a.im*b.re - re*b.im) / sq; \
 }
 
-#define MAX  1
+#define MAX  5
 #define REPS 2
 static spinor_field *s[REPS][MAX];
 static spinor_field *v[MAX];

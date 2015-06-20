@@ -1,18 +1,21 @@
 // Global variables 
-GLB_T = 8
-GLB_X = 8
-GLB_Y = 8
-GLB_Z = 8
+GLB_T = 4
+GLB_X = 4
+GLB_Y = 4
+GLB_Z = 4
 NP_T = 1
 NP_X = 1
 NP_Y = 1
 NP_Z = 1
 
-level = 1  seed = 12345
+gpuID = 0
+
+level = 1
+seed = 12345
 
 // RHMC variables
-beta = 2.25
-mass = 1.15
+beta = 5.5
+mass = -1.3
 nf = 2
 n_pf = 1
 MT_prec = 1.e-14
@@ -21,17 +24,20 @@ HB_prec = 1.e-14
 force_prec = 1.e-14
 force_prec_flt = 1.e-6
 tlen = 1
-nsteps = 10
-gsteps = 20
+nsteps = 25
+gsteps = 5
+
+hasenbusch = 1
+hasen_dm = 0.3
+hsteps = 1
 
 // Run control variables
 run name = run1
-save freq = 9999
+save freq = 1
 meas freq = 1
-conf dir = RUN
+conf dir = .
 gauge start = random
-//ranlxd start =
-last conf = 5
+last conf = +1
 
 //Mesons
 mes:make = false

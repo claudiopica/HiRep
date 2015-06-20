@@ -16,7 +16,7 @@ typedef struct _input_hmc {
   rhmc_par rhmc_p;
 
   /* for the reading function */
-  input_record_t read[17];
+  input_record_t read[20];
   
 } input_hmc;
 
@@ -39,6 +39,9 @@ typedef struct _input_hmc {
     {"tlen", "tlen = %lf", DOUBLE_T, &(varname).rhmc_p.tlen},\
     {"nsteps", "nsteps = %u", UNSIGNED_T, &(varname).rhmc_p.nsteps},\
     {"gsteps", "gsteps = %u", UNSIGNED_T, &(varname).rhmc_p.gsteps},\
+    {"hasenbusch", "hasenbusch = %u", UNSIGNED_T, &(varname).rhmc_p.hasenbusch},\
+    {"hasen_dm", "hasen_dm = %lf", DOUBLE_T, &(varname).rhmc_p.hasen_dm},\
+    {"hsteps", "hsteps = %u", UNSIGNED_T, &(varname).rhmc_p.hsteps},\
     {NULL, NULL, 0, NULL}\
   }\
 }

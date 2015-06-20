@@ -20,9 +20,6 @@
 #include <stdio.h>
 #include <math.h>
 
-/* declared in update_rhmc.c */
-extern rhmc_par _update_par;
-
 #define _print_avect(a) printf("(%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e)\n",(a).c1,(a).c2,(a).c3,(a).c4,(a).c5,(a).c6,(a).c7,(a).c8)
 
 #define _print_mat(a) printf("(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n",(a).c1_1.re,(a).c1_2.re,(a).c1_3.re,(a).c2_1.re,(a).c2_2.re,(a).c2_3.re,(a).c3_1.re,(a).c3_2.re,(a).c3_3.re);printf("(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n",(a).c1_1.im,(a).c1_2.im,(a).c1_3.im,(a).c2_1.im,(a).c2_2.im,(a).c2_3.im,(a).c3_1.im,(a).c3_2.im,(a).c3_3.im)
@@ -81,23 +78,25 @@ extern rhmc_par _update_par;
 void mre_guess(int,spinor_field*, spinor_operator, spinor_field*);
 void mre_store(int,spinor_field*);
 
-void D_dbl(spinor_field *out, spinor_field *in){
+static double static_mass=0.;
+
+static void D_dbl(spinor_field *out, spinor_field *in){
 #ifdef UPDATE_EO
-    Dphi_eopre(_update_par.mass, out, in);
+    Dphi_eopre(static_mass, out, in);
 #else
-    Dphi(_update_par.mass, out, in);
+    Dphi(static_mass, out, in);
 #endif
 }
 
-void D_flt(spinor_field_flt *out, spinor_field_flt *in){
+static void D_flt(spinor_field_flt *out, spinor_field_flt *in){
 #ifdef UPDATE_EO
-    Dphi_eopre_flt((float)(_update_par.mass), out, in);
+    Dphi_eopre_flt(static_mass, out, in);
 #else
-    Dphi_flt((float)(_update_par.mass), out, in);
+    Dphi_flt(static_mass, out, in);
 #endif
 }
 
-spinor_operator D={&D_dbl, &D_flt};
+static spinor_operator D={&D_dbl, &D_flt};
 
 static spinor_field *Xs=NULL, *Ys=NULL, *eta=NULL;
 static spinor_field_flt *eta_flt=NULL;
@@ -128,6 +127,7 @@ void free_force_hmc() {
 void force_hmc(double dt, suNg_av_field *force, void *vpar){
   _DECLARE_INT_ITERATOR(x);
   int mu,  k;
+  double dfs;
   static suNg_algebra_vector f;
   static suNf_vector ptmp;
   static suNf_spinor p;
@@ -139,9 +139,8 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
  
   force_hmc_par *par = (force_hmc_par*)vpar;
   spinor_field *pf = par->pf;
-  double dfs;
+  static_mass = par->mass;
 
-  
   /* check input types */
   _TWO_SPINORS_MATCHING(u_gauge,force);
 
@@ -151,19 +150,18 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
 #ifdef WITH_GPU//Make sure gauge field is on GPU
   //    gfield_copy_to_gpu_f(u_gauge_f); 
   //    gfield_copy_to_gpu_f_flt(u_gauge_f_flt);
-#endif    
-
-
-#ifdef UPDATE_EO
-  if(par->hasenbusch != 1) dfs = -dt*(_REPR_NORM2/_FUND_NORM2);
-  else dfs = -par->bD*dt*(_REPR_NORM2/_FUND_NORM2);
-#else
-  if(par->hasenbusch != 1) dfs = dt*(_REPR_NORM2/_FUND_NORM2);
-  else dfs = par->bD*dt*(_REPR_NORM2/_FUND_NORM2);
 #endif
 
-  
-  for (k=0; k<par->n_pf; ++k) {
+#ifdef UPDATE_EO
+  if(par->hasenbusch != 2) dfs = -dt*(_REPR_NORM2/_FUND_NORM2);
+  else dfs = -par->b*dt*(_REPR_NORM2/_FUND_NORM2);
+#else
+  if(par->hasenbusch != 2) dfs = dt*(_REPR_NORM2/_FUND_NORM2);
+  else dfs = par->b*dt*(_REPR_NORM2/_FUND_NORM2);
+#endif
+
+  for (k=0; k<par->n_pf; ++k)
+  {
 
 #ifndef UPDATE_EO
     /* X = H^{-1} pf[k] = D^{-1} g5 pf[k] */
@@ -182,8 +180,8 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
       spinor_field_g5_f(eta,Xs);
     } else {
       spinor_field_g5_f(eta,Xs);
-      spinor_field_mul_f(eta,par->bY,eta);
-      spinor_field_mul_add_assign_f(eta,par->aY,&pf[k]);
+      spinor_field_mul_f(eta,par->b,eta);
+      spinor_field_mul_add_assign_f(eta,&pf[k]);
     }
     spinor_field_zero_f(Ys);
     g5QMR_fltacc(&mpar, D, eta, Ys);
@@ -194,25 +192,19 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
     Xe=*Xs; Xe.type=&glat_even;
     Xo=*Xs; Xo.type=&glat_odd;
 
-    g5QMR_fltacc_par mpar;
-    mpar.err2 = par->inv_err2;
-    mpar.max_iter = 0;
-    mpar.err2_flt = par->inv_err2_flt;
-    mpar.max_iter_flt = 0;
-/*
     mshift_par mpar;
     mpar.err2 = par->inv_err2;
     mpar.max_iter = 0;
     mpar.n = 1;
     double tmp = 0;
     mpar.shift = &tmp;
-*/
+
     spinor_field_zero_f(&Xe);
     /* H^{-1} pf = D^{-1} g5 pf */
     spinor_field_g5_assign_f(&pf[k]);
-    mre_guess(0, &Xe, D, &pf[k]);
-    g5QMR_fltacc(&mpar, D, &pf[k], &Xe);
-    mre_store(0, &Xe);
+    if(par->b == 0) mre_guess(0, &Xe, D, &pf[k]);
+    g5QMR_mshift(&mpar, D, &pf[k], &Xe);
+    if(par->b == 0) mre_store(0, &Xe);
     spinor_field_g5_assign_f(&pf[k]);
     Dphi_(&Xo, &Xe);
 
@@ -226,15 +218,14 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
       spinor_field_copy_f(eta,&Xe);
     } else {
       spinor_field_g5_f(eta,&pf[k]);
-      spinor_field_mul_f(eta,par->aY,eta);
-      spinor_field_mul_add_assign_f(eta,par->bY,&Xe);
+      spinor_field_mul_add_assign_f(eta,par->b,&Xe);
     }
 
     spinor_field_zero_f(&Ye);
     spinor_field_g5_assign_f(eta);
-    mre_guess(1, &Ye, D, eta);
-    g5QMR_fltacc(&mpar, D, eta, &Ye);
-    mre_store(1, &Ye);
+    if(par->b == 0) mre_guess(1, &Ye, D, eta);
+    g5QMR_mshift(&mpar, D, eta, &Ye);
+    if(par->b == 0) mre_store(1, &Ye);
     spinor_field_g5_assign_f(eta);
     Dphi_(&Yo, &Ye);
 

@@ -52,7 +52,8 @@ typedef struct {
   int n_pf;
   spinor_field *pf;
   int hasenbusch; /* 0 = no hasenbusch ; 1 = force with Dtilde = a*D+b ; 2 = force with Y = Ddag^{-1}(a*phi+b*X) */
-  double aD, bD, aY, bY;
+  double mass;
+  double b;
   double inv_err2, inv_err2_flt;
 } force_hmc_par;
 void init_force_hmc();
@@ -127,7 +128,12 @@ typedef struct _rhmc_par {
 	double tlen; /* trajectory lenght */
 	unsigned int nsteps; /* number of step in the integration */
 	unsigned int gsteps; /* number of substeps for the gauge part every step */
+	
+	unsigned int hasenbusch;
+	unsigned int hsteps;
+	double hasen_dm;
 } rhmc_par;
+
 void init_rhmc(rhmc_par *par);
 void free_rhmc();
 void init_hmc(rhmc_par *par);

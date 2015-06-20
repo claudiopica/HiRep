@@ -36,7 +36,7 @@ integrator_par *integrator = NULL;
 double minev, maxev; /* min and max eigenvalue of H^2 */
 
 spinor_operator H2={H2_dbl, H2_flt}; 
-spinor_operator H={H_dbl, H_flt}; 
+
 /* END of State */
 
 
@@ -58,21 +58,6 @@ void H2_flt(spinor_field_flt *out, spinor_field_flt *in){
 #endif
 }
 
-void H_dbl(spinor_field *out, spinor_field *in){
-#ifdef UPDATE_EO
-  g5Dphi_eopre(_update_par.mass, out, in);
-#else
-  g5Dphi(_update_par.mass, out, in);
-#endif
-}
-/* this is the basic operator used in the update */
-void H_flt(spinor_field_flt *out, spinor_field_flt *in){
-#ifdef UPDATE_EO
-  g5Dphi_eopre_flt((float)(_update_par.mass), out, in);
-#else
-  g5Dphi_flt((float)(_update_par.mass), out, in);
-#endif
-}
 
 
 static short int init=0;
