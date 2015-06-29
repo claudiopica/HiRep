@@ -124,27 +124,31 @@ void free_force_hmc() {
 }
 
 
-void force_hmc(double dt, suNg_av_field *force, void *vpar){
+void force_hmc(double dt, suNg_av_field *force, void *vpar)
+{
   _DECLARE_INT_ITERATOR(x);
-  int mu,  k;
   double dfs;
   static suNg_algebra_vector f;
   static suNf_vector ptmp;
   static suNf_spinor p;
   static suNf_FMAT s1;
-  static MINRES_par inv_par;
 #ifdef UPDATE_EO
   spinor_field Xe, Xo, Ye, Yo;
 #endif
- 
+
   force_hmc_par *par = (force_hmc_par*)vpar;
   spinor_field *pf = par->pf;
   static_mass = par->mass;
 
+    mshift_par mpar;
+    mpar.err2 = par->inv_err2;
+    mpar.max_iter = 0;
+    mpar.n = 1;
+    double tmp = 0;
+    mpar.shift = &tmp;
+
   /* check input types */
   _TWO_SPINORS_MATCHING(u_gauge,force);
-
-  inv_par.max_iter=0;
 
   assign_ud2u_f();
 #ifdef WITH_GPU//Make sure gauge field is on GPU
@@ -160,21 +164,15 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
   else dfs = par->b*dt*(_REPR_NORM2/_FUND_NORM2);
 #endif
 
-  for (k=0; k<par->n_pf; ++k)
+  for(int k=0; k<par->n_pf; ++k)
   {
-
 #ifndef UPDATE_EO
     /* X = H^{-1} pf[k] = D^{-1} g5 pf[k] */
-    g5QMR_fltacc_par mpar;
-    mpar.err2 = par->inv_err2;
-    mpar.max_iter = 0;
-    mpar.err2_flt = par->inv_err2_flt;
-    mpar.max_iter_flt = 0;
     spinor_field_zero_f(Xs);
     spinor_field_g5_assign_f(&pf[k]);
     g5QMR_fltacc(&mpar, D, &pf[k], Xs);
     spinor_field_g5_assign_f(&pf[k]);
-        
+
     /* Y = H^{-1} ( a g5 pf[k] + b X ) = D^{-1} ( a pf[k] + b g5 X ) */
     if(par->hasenbusch != 2) {
       spinor_field_g5_f(eta,Xs);
@@ -183,21 +181,15 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
       spinor_field_mul_f(eta,par->b,eta);
       spinor_field_mul_add_assign_f(eta,&pf[k]);
     }
+
     spinor_field_zero_f(Ys);
-    g5QMR_fltacc(&mpar, D, eta, Ys);
-    
+    g5QMR_mshift(&mpar, D, eta, Ys);
 #else
+
     /* X_e = H^{-1} pf[k] */
     /* X_o = D_{oe} X_e = D_{oe} H^{-1} pf[k] */
     Xe=*Xs; Xe.type=&glat_even;
     Xo=*Xs; Xo.type=&glat_odd;
-
-    mshift_par mpar;
-    mpar.err2 = par->inv_err2;
-    mpar.max_iter = 0;
-    mpar.n = 1;
-    double tmp = 0;
-    mpar.shift = &tmp;
 
     spinor_field_zero_f(&Xe);
     /* H^{-1} pf = D^{-1} g5 pf */
@@ -250,7 +242,7 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar){
     _PIECE_FOR(&glattice,x) { 
       _SITE_FOR(&glattice,x) {
 	
-      	for (mu=0; mu<4; ++mu) {
+      	for (int mu=0; mu<4; ++mu) {
       	  int y;
       	  suNf_spinor *chi1, *chi2;
       	  _suNf_FMAT_zero(s1);

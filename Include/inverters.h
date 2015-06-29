@@ -68,6 +68,7 @@ typedef struct _MINRES_par {
   int max_iter; /* maximum number of iterations: 0 => infinity */
 } MINRES_par;
 
+int BiCGstab(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
 int HBiCGstab(MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field *out);
 int HBiCGstab_flt(MINRES_par *par, spinor_operator M, spinor_field_flt *in, spinor_field_flt *out);
 

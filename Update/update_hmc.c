@@ -265,16 +265,23 @@ void free_hmc(){
 int update_hmc()
 {
 	double deltaH;
-	g5QMR_fltacc_par mpar;
 
+/*	g5QMR_fltacc_par mpar;
 	mpar.err2 = _update_par.MT_prec;
 	mpar.max_iter = 0;
 	mpar.err2_flt = 1.0e-6;
-	mpar.max_iter_flt = 0;
+	mpar.max_iter_flt = 0;*/
+
+	mshift_par mpar;
+	mpar.err2 = _update_par.MT_prec;
+	mpar.max_iter = 0;
+	mpar.n = 1;
+	double tmp = 0;
+	mpar.shift = &tmp;
 
 	/* double maxev,minev; */
 	_DECLARE_INT_ITERATOR(i);
-    
+
 	if(!init)
 	{
 		/* not initialized */
@@ -302,7 +309,7 @@ int update_hmc()
 		{
 			spinor_field_zero_f(&pf[_update_par.n_pf]);
 			static_mass = _update_par.mass + _update_par.hasen_dm;
-			g5QMR_fltacc(&mpar, D, &pf[i], &pf[_update_par.n_pf]);
+			g5QMR_mshift(&mpar, D, &pf[i], &pf[_update_par.n_pf]);
 			static_mass = _update_par.mass;
 			D.dbl(&pf[i], &pf[_update_par.n_pf]);
 			spinor_field_g5_assign_f(&pf[i]);
@@ -314,15 +321,15 @@ int update_hmc()
 			H.dbl(&pf[i], &pf[_update_par.n_pf]);
 		}
 	}
-    
+
 	/* integrate molecular dynamics */
 	lprintf("HMC",30,"MD integration...\n");
 	integrator[0].integrator(momenta,&integrator[0]);
-    
+
 	/* project gauge field */
 	project_gauge_field();
 	represent_gauge_field();
-    
+
 	lprintf("HMC",30,"Computing new action density...\n");
 	for (i=0;i<_update_par.n_pf;++i)
 	{
@@ -331,7 +338,7 @@ int update_hmc()
 			spinor_field_g5_f(&pf[_update_par.n_pf], &pf[i]);
 			spinor_field_zero_f(&pf[i]);
 			static_mass = _update_par.mass;
-			g5QMR_fltacc(&mpar, D, &pf[_update_par.n_pf], &pf[i]);
+			g5QMR_mshift(&mpar, D, &pf[_update_par.n_pf], &pf[i]);
 			/* S = | (D+b) D^{-1} g5 psi |^2 */
 			static_mass = _update_par.mass + _update_par.hasen_dm;
 			D.dbl(&pf[_update_par.n_pf], &pf[i]);
@@ -363,7 +370,7 @@ int update_hmc()
 #endif
     global_sum(&deltaH, 1);
     lprintf("HMC",10,"[DeltaS = %1.8e][exp(-DS) = %1.8e]\n",deltaH,exp(-deltaH));
-    
+//    deltaH=-1;
     if(deltaH<0.) {
         suNg_field_copy(u_gauge_old,u_gauge);
     } else {

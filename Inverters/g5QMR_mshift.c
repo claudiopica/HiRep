@@ -679,6 +679,15 @@ int g5QMR_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_fi
   msiter=cgiter;
 
   /* if some vector has not converged try non-multishift */
+  if(par->n == 1)
+  {
+      if(valid[0] == 0)
+      {
+         cgiter += BiCGstab(par,M,in,out);
+      }
+   }
+   else
+   {
   par->n=1;
   for(n=0;n<orig.n;++n){
     if (valid[n]==0) {
@@ -711,6 +720,7 @@ int g5QMR_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_fi
       }
 
     }
+  }
   }
 
   /* this is for debug purposes */
