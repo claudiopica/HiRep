@@ -240,7 +240,6 @@ static void setup_monomials()
          mon_rhmc_par *par = malloc(sizeof(*par));
          data.par = par;
          data.type = RHMC;
-         par->ratio.order = 16;
 
          // Find parameters
          par->mass = find_double(cur, "mass");
@@ -335,6 +334,7 @@ static void setup_monomials()
       else
       {
          check(1, "Unknown monomial type\n");
+         mret = 0;
       }
 
       add_monomial_to_integrator(mret, level);
@@ -396,6 +396,7 @@ static void setup_integrator()
       else
       {
          check(1, "Unknown integrator type\n");
+         tmp.integrator = 0;
       }
 
       if(iter == 0)
