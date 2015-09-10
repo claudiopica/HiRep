@@ -322,14 +322,14 @@ int main(int argc,char *argv[]) {
     }
     lprintf("FORCE_SUMMARY",0,"\n");
     lprintf("INV_SUMMARY",0,"%d Iterations in fermion: %d ",i,n_inv_iter[0]);
-    for (int k=1;k<num_mon();++k){
-      lprintf("INV_SUMMARY",0," Hasenbusch %d: %d",k-1,n_inv_iter[k]);
+    for (int k=2;k<num_mon();++k){
+      lprintf("INV_SUMMARY",0," Hasenbusch %d: %d",k-2,n_inv_iter[k-1]);
     }
     lprintf("INV_SUMMARY",0,"\n");
 
     lprintf("TIME_SUMMARY",0,"%d Time in gauge: %g fermion: %g",i,times[0],times[1]);
     for (int k=2;k<num_mon();++k){
-      lprintf("TIME_SUMMARY",0," Hasenbusch %d: %1.6f",k,times[k+2]);
+      lprintf("TIME_SUMMARY",0," Hasenbusch %d: %1.6f",k-2,times[k]);
     }
   }
   

@@ -46,22 +46,21 @@ void force0(double dt, suNg_av_field *force, void *vpar){
     for (int mu=0; mu<4; ++mu) {
       staples(i,mu,&s1);
       _suNg_times_suNg_dagger(s2,*_4FIELD_AT(u_gauge,i,mu),s1);
-      
+
       /* the projection itself takes the TA: proj(M) = proj(TA(M)) */
       _fund_algebra_project(f,s2);
       _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,i,mu), dt*(-beta/((double)(NG))), f);
-      
+
 #ifdef MEASURE_FORCE0
       double nsq;
       _algebra_vector_sqnorm_g(nsq,f);
       forcestat[0]+=sqrt(nsq);
-      for(int x=0;x<NG*NG-1;++x){
-        if(forcestat[1]<fabs(*(((double*)&f)+x))) forcestat[1]=fabs(*(((double*)&f)+x));
+      for(int x=0;x<sizeof(suNg_algebra_vector)/sizeof(double);++x){
+        if(forcestat[1]<fabs(f.c[x])) forcestat[1]=fabs(f.c[x]);
       }
 #endif
     }
   }
-	
 
 #ifdef MEASURE_FORCE0
   //  if(logger_getlevel("FORCE-STAT")>=10){
