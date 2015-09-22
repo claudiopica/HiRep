@@ -134,7 +134,14 @@ monomial {
 \end{tabular}
 \end{center}
 
-The example below show how to specify an even odd preconditioned twisted mass monomial in the input file.
+\subsubsection*{Comments}
+\begin{itemize}
+ \item When using the chronological inverter the force precision should be $10^{-14}$ or better to ensure reversibility in the algorithm.
+\end{itemize}
+
+\newpage
+\subsection*{TM}
+In this monomial the twisted mass is added before the Dirac operator has been even/odd preconditioned. The example below shows how to specify the monomial in the input file.
 \begin{center}
 \begin{minipage}{55mm}
 \begin{framed}
@@ -172,8 +179,14 @@ monomial {
 \end{tabular}
 \end{center}
 
-The example below shows how to specify an twisted even odd Wilson
-preconditioned mass monomial in the input file. See documentation HiRep.pdf.
+\subsubsection*{Comments}
+\begin{itemize}
+ \item When using the chronological inverter the force precision should be $10^{-14}$ or better to ensure reversibility in the algorithm.
+\end{itemize}
+
+\newpage
+\subsection*{TM Alternative}
+In this monomial the twisted mass is added after the Dirac operator has been even/odd preconditioned. The example below shows how to specify the monomial in the input file.
 \begin{center}
 \begin{minipage}{55mm}
 \begin{framed}
@@ -210,8 +223,6 @@ monomial {
  \verb|level|      & integrator level where the monomial force is evaluated
 \end{tabular}
 \end{center}
-
-
 
 \subsubsection*{Comments}
 \begin{itemize}
@@ -263,11 +274,17 @@ monomial {
 \end{tabular}
 \end{center}
 
+\subsubsection*{Comments}
+\begin{itemize}
+ \item When using the chronological inverter the force precision should be $10^{-14}$ or better to ensure reversibility in the algorithm.
+ \item The mass used in the associated HMC monomial should be the mass of this monomial plus the mass shift.
+\end{itemize}
 
-The example below show how to specify a Hasenbusch monomial with
-even odd preconditioned twisted mass 
+\newpage
+\subsection*{TM Hasenbusch}
+The example below show how to specify a Hasenbusch monomial with even odd preconditioned twisted mass 
 \begin{center}
-\begin{minipage}{55mm}
+\begin{minipage}{60mm}
 \begin{framed}
 \begin{verbatim}
 monomial {
@@ -306,10 +323,17 @@ monomial {
 \end{tabular}
 \end{center}
 
-The example below show how to specify a Hasenbusch monomial with
-twisted even odd preconditioned operator
+\subsubsection*{Comments}
+\begin{itemize}
+ \item When using the chronological inverter the force precision should be $10^{-14}$ or better to ensure reversibility in the algorithm.
+ \item The twisted mass $\mu$ used in the associated TM monomial should be the twisted mass of this monomial plus the twisted mass shift.
+\end{itemize}
+
+\newpage
+\subsection*{TM Hasenbusch Alternative}
+The example below show how to specify a Hasenbusch monomial with twisted even odd preconditioned operator.
 \begin{center}
-\begin{minipage}{55mm}
+\begin{minipage}{70mm}
 \begin{framed}
 \begin{verbatim}
 monomial {
@@ -347,14 +371,11 @@ monomial {
 \end{tabular}
 \end{center}
 
-
-\vspace{2mm}
 \subsubsection*{Comments}
 \begin{itemize}
  \item When using the chronological inverter the force precision should be $10^{-14}$ or better to ensure reversibility in the algorithm.
- \item The mass used in the associated HMC monomial should be the mass of the Hasenbusch monomial plus the mass shift.
+ \item The twisted mass $\mu$ used in the associated TM monomial should be the twisted mass of this monomial plus the twisted mass shift.
 \end{itemize}
-
 
 \newpage
 \subsection*{RHMC}
@@ -402,7 +423,5 @@ monomial {
  \verb|level|      & integrator level where the monomial force is evaluated
 \end{tabular}
 \end{center}
-
-
 
 \end{document}
