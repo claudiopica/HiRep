@@ -113,7 +113,8 @@ struct _monomial* hmc_create(const monomial_data *data) {
   
   m->force_f = &force_hmc;
   m->force_par = &par->fpar;
-  
+
+  m->pseudofermion = &hmc_pseudofermion;
   m->init_traj = &hmc_init_traj;
   m->gaussian_pf = &hmc_gaussian_pf;
   m->correct_pf = &hmc_correct_pf;

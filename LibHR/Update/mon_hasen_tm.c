@@ -133,7 +133,8 @@ struct _monomial* hasen_tm_create(const monomial_data *data) {
   
   m->force_f = &force_hmc_tm;
   m->force_par = &par->fpar;
-  
+
+  m->pseudofermion = &hasen_tm_pseudofermion;
   m->init_traj = &hasen_tm_init_traj;
   m->gaussian_pf = &hasen_tm_gaussian_pf;
   m->correct_pf = &hasen_tm_correct_pf;

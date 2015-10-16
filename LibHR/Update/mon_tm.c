@@ -115,7 +115,8 @@ struct _monomial* tm_create(const monomial_data *data) {
   
   m->force_f = &force_hmc_tm;
   m->force_par = &par->fpar;
-  
+
+  m->pseudofermion = &tm_pseudofermion;
   m->init_traj = &tm_init_traj;
   m->gaussian_pf = &tm_gaussian_pf;
   m->correct_pf = &tm_correct_pf;

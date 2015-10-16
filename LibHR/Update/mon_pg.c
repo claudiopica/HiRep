@@ -66,7 +66,8 @@ struct _monomial* pg_create(const monomial_data *data) {
   
   m->force_f = &force0;
   m->force_par = &par->beta;
-  
+
+  m->pseudofermion = &pg_pseudofermion;
   m->init_traj = &pg_init_traj;
   m->gaussian_pf = &pg_gaussian_pf;
   m->correct_pf = &pg_correct_pf;

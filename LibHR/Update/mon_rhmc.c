@@ -140,6 +140,7 @@ struct _monomial* rhmc_create(const monomial_data *data) {
   m->force_f = &force_rhmc;
   m->force_par = &par->fpar;
 
+  m->pseudofermion = &rhmc_pseudofermion;
   m->init_traj = &rhmc_init_traj;
   m->gaussian_pf = &rhmc_gaussian_pf;
   m->correct_pf = &rhmc_correct_pf;
