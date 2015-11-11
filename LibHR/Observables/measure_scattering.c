@@ -3,6 +3,7 @@
 #include "global.h"
 #include "meson_observables.h"
 #include <math.h>
+#include "communications.h"
 
 #define PI 3.141592653589793238462643383279502884197
 
@@ -83,6 +84,10 @@ void measure_scattering_AD_core(meson_observable* mo, spinor_field* psi0,spinor_
 	tr2.re+=trtmp.re*cpdotx+trtmp.im*spdotx;
 	tr2.im+=trtmp.im*cpdotx-trtmp.re*spdotx;
       }
+      global_sum(&tr1.re, 1);
+      global_sum(&tr1.im, 1);
+      global_sum(&tr2.re, 1);
+      global_sum(&tr2.im, 1);
       motmp=mo;
       while (motmp!=NULL){
 	// I chose not to divide by the volume to conform with Ari and Rudy's conventions
