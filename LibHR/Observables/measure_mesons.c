@@ -192,7 +192,7 @@ static void op_propagator(suNf_propagator* out, suNf_propagator* in, gamma_ind i
 #define corr_ind(px,py,pz,n_mom,tc,nm,cm) ((px)*(n_mom)*(n_mom)*(lt)*(nm)+(py)*(n_mom)*(lt)*(nm)+(pz)*(lt)*(nm)+ ((cm)*(lt)) +(tc))
 
 /* spinor_fields* are 4xnm arrays of spinor_field ordered([color][spinor])*/
-static void measure_mesons_core(spinor_field* psi0, spinor_field* psi1, spinor_field* eta, meson_observable* mo, int nm, int tau, int n_mom, int offset,int lt){
+void measure_mesons_core(spinor_field* psi0, spinor_field* psi1, spinor_field* eta, meson_observable* mo, int nm, int tau, int n_mom, int offset,int lt){
   int i,ix,t,x,y,z,beta,px,py,pz,tc;
   double pdotx,cpdotx,spdotx;
   complex tr;

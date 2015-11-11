@@ -81,6 +81,7 @@ void create_gauge_fixed_momentum_source(spinor_field *source, int pt, int px, in
 void create_sequential_source(spinor_field *source, int tf, spinor_field* prop);
 void restrict_timeslice(spinor_field *source, int tf, spinor_field* prop);
 void create_diluted_volume_source(spinor_field *source, int parity_component, int mod);
+void add_momentum(spinor_field* out, spinor_field* in, int px, int py, int pz);
 
 void init_propagator_eo(int nm, double *m, double acc);
 void eig_init(int nev, int nevt, int kmax, int maxiter, double lbnd, double omega1, double omega2);
@@ -97,6 +98,7 @@ void init_vcvl_correlators();
 void init_cvc_correlators();
 void free_meson_observables();
 
+void measure_mesons_core(spinor_field* psi0, spinor_field* psi1, spinor_field* eta, meson_observable* mo, int nm, int tau, int n_mom, int offset,int lt);
 void measure_mesons(meson_observable* mo,spinor_field *psi0, spinor_field *eta, int nm,int tau);
 void measure_diquarks(meson_observable* mo, spinor_field *psi0, spinor_field *psi1, spinor_field *eta, int nm, int tau);
 void measure_conserved_currents(meson_observable* mo,spinor_field* psi0, spinor_field* eta, int nm, int tau);
@@ -108,6 +110,9 @@ void measure_formfactors_ext(spinor_field* psi0, spinor_field* psi1, spinor_fiel
 void print_mesons(meson_observable* mo,double norm, int conf, int nm, double* mass, int lt, int n_mom, char* label);
 void print_formfactor(int conf, int nm, double* mass, int n_mom, char* label, int tf);
 void print_formfactor_ext(int conf, int nm, double* mass, int n_mom, char* label, int tf);
+
+void measure_scattering_AD_core(meson_observable* mo, spinor_field* psi0,spinor_field* psi1,spinor_field* psi2,spinor_field* psi3, int tau, int split, int n_mom, int p_tot_x, int p_tot_y, int p_tot_z);
+void measure_scattering_BC_core(meson_observable* mo, spinor_field* psi0,spinor_field* psi1, spinor_field* psi2,spinor_field* psi3, int tau, int split, int n_mom, int p_tot_x, int p_tot_y, int p_tot_z);
 
 void measure_renormalization(spinor_field* psi_in, spinor_field* psi_out, int nm, int pt_in, int px_in, int py_in, int pz_in, int pt_out, int px_out, int py_out, int pz_out);
 void print_renormalization(int conf, int nm, double* mass, char* label, int pt_in, int px_in, int py_in, int pz_in, int pt_out, int px_out, int py_out, int pz_out);

@@ -1,9 +1,9 @@
 TOPDIR = ..
 MKDIR = $(TOPDIR)/Make
 
-EXES = meson_scattering
+EXES = scatter_test # main_run
 
-meson_scattering_OBJS = scattering_tools.o
+scatter_test_OBJS = ../LibHR/Observables/measure_mesons.o ../LibHR/Observables/measure_scattering.o
 
 
 LIBS += $(TOPDIR)/LibHR/libhr.a

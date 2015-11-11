@@ -444,6 +444,34 @@ void create_gauge_fixed_momentum_source(spinor_field *source, int pt, int px, in
   }
 }
 
+// There don't seem to be any noise sources with momentum, so I'll just add it a posteriori using the following function (I hope it's correct!)
+void add_momentum(spinor_field* out, spinor_field* in, int px, int py, int pz)
+{
+  int c[4];
+  int beta, color;
+  double pdotx;
+
+  for (beta=0;beta<4;++beta){
+    spinor_field_zero_f(&out[beta]);
+  }
+  lprintf("Adding momentum to the source",0,"mom = (%d,%d,%d)",px,py,pz);
+
+  for(c[0]=0; c[0]<T; c[0]++) for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++) for(c[3]=0; c[3]<Z; c[3]++) {
+	  pdotx = 2.*PI*((double)(c[1]+zerocoord[1])*(double)px/(double)GLB_X +
+                         (double)(c[2]+zerocoord[2])*(double)py/(double)GLB_Y +
+                         (double)(c[3]+zerocoord[3])*(double)pz/(double)GLB_Z );
+	  for (beta=0;beta<4;++beta) for (color=0; color<NF; ++color){
+	     _FIELD_AT(&out[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color].re = _FIELD_AT(&in[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color].re * cos(pdotx) - _FIELD_AT(&in[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color].im * sin(pdotx);
+	     _FIELD_AT(&out[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color].im = _FIELD_AT(&in[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color].re * sin(pdotx) + _FIELD_AT(&in[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color].im * cos(pdotx) ;
+	  }
+  }
+
+  //Not sure what this loop does, but it's in every source definition, so it must be important?
+  for (beta=0;beta<4;++beta){
+     start_sf_sendrecv(out + beta);
+     complete_sf_sendrecv(out + beta);
+  }
+}
 
 //create a eo source
 void create_diluted_volume_source(spinor_field *source, int parity_component, int mod) {
