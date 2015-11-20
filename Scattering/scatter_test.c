@@ -10,6 +10,7 @@
 #include "scattering_tools.c"
 #include "IOroutines.c"
 #include "observables.h"
+#include "communications.h"
 
 #define INDEX(px,py,pz,n_mom,tc) ((px + n_mom)*(2*n_mom+1)*(2*n_mom+1)*(GLB_T)+(py + n_mom)*(2*n_mom+1)*(GLB_T)+(pz + n_mom)*(GLB_T)+ (tc))
 // There don't seem to be any noise sources with momentum, so I'll just add it a posteriori using the following function (I hope it's correct!)
@@ -41,6 +42,19 @@
      complete_sf_sendrecv(out + beta);
   }
 }*/
+static void do_global_sum(meson_observable* mo, double norm){
+  meson_observable* motmp=mo;
+  int i;
+  while (motmp!=NULL){
+      global_sum(motmp->corr_re,motmp->corr_size);
+      global_sum(motmp->corr_im,motmp->corr_size);
+      for(i=0; i<motmp->corr_size; i++){
+	motmp->corr_re[i] *= norm;
+	motmp->corr_im[i] *= norm;
+      }
+    motmp=motmp->next;
+  }
+}
 
 int compareSources(spinor_field* s1, spinor_field* s2, double tol)
 {
@@ -77,11 +91,13 @@ void resetTimes(spinor_field *out, spinor_field *in, int tau)
   for (beta=0;beta<4;++beta){
     spinor_field_zero_f(&out[beta]);
   }
+  if(COORD[0]==tau/T){
   for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++) for(c[3]=0; c[3]<Z; c[3]++) {
     for (beta=0;beta<4;++beta) for (color=0; color<NF; ++color){
       _FIELD_AT(&out[beta], ipt(tau,c[1],c[2],c[3]) )->c[beta].c[color].re = _FIELD_AT(&in[beta], ipt(tau,c[1],c[2],c[3]) )->c[beta].c[color].re;
       _FIELD_AT(&out[beta], ipt(tau,c[1],c[2],c[3]) )->c[beta].c[color].im = _FIELD_AT(&in[beta], ipt(tau,c[1],c[2],c[3]) )->c[beta].c[color].im;
     }
+  }
   }
   //Not sure what this loop does, but it's in every source definition, so it must be important?
   for (beta=0;beta<4;++beta){
@@ -253,6 +269,8 @@ int main(int argc,char *argv[])
   spinor_field* prop_tsp1 =  alloc_spinor_field_f(4 ,&glattice);
   spinor_field* prop_ts_mom =  alloc_spinor_field_f(4 ,&glattice);
 
+  lprintf("Global vars", 0, "T=%i, T_BORDER=%i, T_EXT=%i\n",T, T_BORDER, T_EXT);
+
   init_propagator_eo(nm,m,mes_var.precision);
 
   //Create propagators
@@ -283,12 +301,16 @@ int main(int argc,char *argv[])
   for(t=0;t<GLB_T;++t) lprintf("A",0,"%i %3.10e %3.10e \n",t,mo->corr_re[t]/GLB_VOL3/GLB_VOL3, mo->corr_im[t]/GLB_VOL3/GLB_VOL3);
   lprintf("DEBUG",0,"Print output\n");
   //Contraction B
+  reset_mo(mo);
   measure_scattering_BC_core(mo, prop_ts, prop_ts, prop_tsp1, prop_tsp1, 0, 1, 0, 0, 0, 0);
   for(t=0;t<GLB_T;++t) lprintf("B",0,"%i %3.10e %3.10e \n",t,mo->corr_re[t]/GLB_VOL3/GLB_VOL3, mo->corr_im[t]/GLB_VOL3/GLB_VOL3);
   //Contraction C
+  lprintf("DEBUG",0,"Starting contraction C\n");
+  reset_mo(mo);
   measure_scattering_BC_core(mo, prop_ts, prop_ts, prop_tsp1, prop_tsp1, 0, -1, 0, 0, 0, 0);
   for(t=0;t<GLB_T;++t) lprintf("C",0,"%i %3.10e %3.10e \n",t,mo->corr_re[t]/GLB_VOL3/GLB_VOL3, mo->corr_im[t]/GLB_VOL3/GLB_VOL3);
   //Contraction D
+  reset_mo(mo);
   measure_scattering_AD_core(mo, prop_ts, prop_ts, prop_tsp1, prop_tsp1, 0, -1, 0, 0, 0, 0);
   for(t=0;t<GLB_T;++t) lprintf("D",0,"%i %3.10e %3.10e \n",t,mo->corr_re[t]/GLB_VOL3/GLB_VOL3, mo->corr_im[t]/GLB_VOL3/GLB_VOL3);
 
@@ -307,6 +329,7 @@ int main(int argc,char *argv[])
   reset_mo(mo);
   measure_mesons_core(prop_ts,prop_ts_mom, source_ts, mo, 1, 0, 1, 0, GLB_T);
 #define corr_ind(px,py,pz,n_mom,tc,nm,cm) ((px)*(n_mom)*(n_mom)*GLB_T*(nm)+(py)*(n_mom)*GLB_T*(nm)+(pz)*GLB_T*(nm)+ ((cm)*GLB_T) +(tc))
+  do_global_sum(mo,1.0);
   for(t=0;t<GLB_T;++t)
   {
     lprintf("Testing add_momentum - existing code",0,"%i %3.10e %3.10e \n", t, mo->corr_re[corr_ind(0,0,0,1,t,1,0)], mo->corr_im[corr_ind(0,0,0,1,t,1,0)]);
@@ -318,6 +341,7 @@ int main(int argc,char *argv[])
   calc_propagator(prop_ts_mom,source_ts_mom,1);
   reset_mo(mo);
   measure_mesons_core(prop_ts,prop_ts_mom, source_ts, mo, 1, 0, 1, 0, GLB_T);
+  do_global_sum(mo,1.0);
   for(t=0;t<GLB_T;++t)
   {
     lprintf("Testing add_momentum - new code",0,"%i %3.10e %3.10e \n",t, mo->corr_re[corr_ind(0,0,0,1,t,1,0)], mo->corr_im[corr_ind(0,0,0,1,t,1,0)]);
@@ -340,6 +364,7 @@ int main(int argc,char *argv[])
   create_point_source(source_ts, 1, 0);
   calc_propagator(prop_tsp1,source_tsp1,1);*/
 
+  reset_mo(mo);
   measure_scattering_AD_core(mo, prop_ts, prop_ts, prop_ts, prop_ts, 0, 0, 1, 0, 0, 1);
   for(px=-1;px<=1;++px) for(py=-1;py<=1;++py) for(pz=-1;pz<=1;++pz) for(t=0;t<GLB_T;++t) lprintf("A - total momentum 0 0 1",0,"%i %i %i %i %3.10e %3.10e \n", px, py, pz, t,mo->corr_re[INDEX(px,py,pz,1,t)], mo->corr_im[INDEX(px,py,pz,1,t)]);
   reset_mo(mo);
@@ -357,6 +382,8 @@ int main(int argc,char *argv[])
   double c1re, c1im, c2re, c2im = 0.0;
 
   measure_mesons_core(prop_ts,prop_ts, source_ts, mo, 1, 0, 2, 0, GLB_T);
+//  print_mesons(mo, 1.0, 0, 1, m,GLB_T,2,"TEST");
+  do_global_sum(mo,1.0);
   for(t=0;t<GLB_T;++t)
   {
     c1re = mo->corr_re[corr_ind(0,0,0,2,t,1,0)];
