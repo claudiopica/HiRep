@@ -448,7 +448,7 @@ void create_gauge_fixed_momentum_source(spinor_field *source, int pt, int px, in
 void add_momentum(spinor_field* out, spinor_field* in, int px, int py, int pz)
 {
   int c[4];
-  int beta, color;
+  int beta, beta2, color;
   double pdotx;
 
   for (beta=0;beta<4;++beta){
@@ -460,13 +460,12 @@ void add_momentum(spinor_field* out, spinor_field* in, int px, int py, int pz)
 	  pdotx = 2.*PI*((double)(c[1]+zerocoord[1])*(double)px/(double)GLB_X +
                          (double)(c[2]+zerocoord[2])*(double)py/(double)GLB_Y +
                          (double)(c[3]+zerocoord[3])*(double)pz/(double)GLB_Z );
-	  for (beta=0;beta<4;++beta) for (color=0; color<NF; ++color){
-	     _FIELD_AT(&out[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color].re = _FIELD_AT(&in[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color].re * cos(pdotx) - _FIELD_AT(&in[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color].im * sin(pdotx);
-	     _FIELD_AT(&out[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color].im = _FIELD_AT(&in[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color].re * sin(pdotx) + _FIELD_AT(&in[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color].im * cos(pdotx) ;
+	  for (beta=0;beta<4;++beta) for (color=0; color<NF; ++color)for (beta2=0;beta2<4;++beta2){
+	     _FIELD_AT(&out[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta2].c[color].re = _FIELD_AT(&in[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta2].c[color].re * cos(pdotx) - _FIELD_AT(&in[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta2].c[color].im * sin(pdotx);
+	     _FIELD_AT(&out[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta2].c[color].im = _FIELD_AT(&in[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta2].c[color].re * sin(pdotx) + _FIELD_AT(&in[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta2].c[color].im * cos(pdotx) ;
 	  }
   }
 
-  //Not sure what this loop does, but it's in every source definition, so it must be important?
   for (beta=0;beta<4;++beta){
      start_sf_sendrecv(out + beta);
      complete_sf_sendrecv(out + beta);

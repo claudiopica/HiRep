@@ -168,7 +168,7 @@ int main(int argc,char *argv[])
 
   /* logger setup */
   /* disable logger for MPI processes != 0 */
-  logger_setlevel(0,10);
+  logger_setlevel(0,0);
   if (PID!=0) { logger_disable(); }
   if (PID==0) { 
     sprintf(tmp,">%s",output_filename); logger_stdout(tmp);
@@ -262,10 +262,10 @@ int main(int argc,char *argv[])
   read_gauge_field(cnfg_filename);
   represent_gauge_field();
   //End of the I/O block
-  spinor_field* source_ts = alloc_spinor_field_f(4,&glattice);
+  spinor_field* source_ts = alloc_spinor_field_f(4*NF,&glattice);
   spinor_field* source_tsp1 = alloc_spinor_field_f(4,&glattice);
   spinor_field* source_ts_mom = alloc_spinor_field_f(4,&glattice);
-  spinor_field* prop_ts =  alloc_spinor_field_f(4 ,&glattice);
+  spinor_field* prop_ts =  alloc_spinor_field_f(4*NF ,&glattice);
   spinor_field* prop_tsp1 =  alloc_spinor_field_f(4 ,&glattice);
   spinor_field* prop_ts_mom =  alloc_spinor_field_f(4 ,&glattice);
 
@@ -358,7 +358,7 @@ int main(int argc,char *argv[])
   //Create point source propagators (easy to compare with free theory results)
   spinor_field_zero_f(source_ts);
   create_point_source(source_ts, 0, 0);
-  calc_propagator(prop_ts,source_ts,1);
+  calc_propagator(prop_ts,source_ts,4);
 
 /*  spinor_field_zero_f(source_tsp1);
   create_point_source(source_ts, 1, 0);
@@ -397,6 +397,45 @@ int main(int argc,char *argv[])
   {
     lprintf("Two-point",0,"%i %3.10e %3.10e %3.10e %3.10e\n",t, mo->corr_re[corr_ind(0,0,0,1,t,1,0)]/GLB_VOL3, mo->corr_im[corr_ind(0,0,0,1,t,1,0)]/GLB_VOL3, mo->corr_re[corr_ind(0,0,1,1,t,1,0)]/GLB_VOL3, mo->corr_im[corr_ind(0,0,1,1,t,1,0)]/GLB_VOL3);
   }*/
+
+  spinor_field* source_seq0 = alloc_spinor_field_f(4*NF,&glattice);
+  spinor_field* source_seqt = alloc_spinor_field_f(4*NF,&glattice);
+  spinor_field* source_seqtmom = alloc_spinor_field_f(4*NF,&glattice);
+  spinor_field* prop_seq0 =  alloc_spinor_field_f(4*NF ,&glattice);
+  spinor_field* prop_seqt =  alloc_spinor_field_f(4*NF ,&glattice);
+  create_sequential_source(source_seq0, 0, prop_ts);
+  calc_propagator(prop_seq0,source_seq0,4);
+  free_mo(mo);
+  mo = malloc(sizeof(meson_observable));
+  init_mo(mo, "Two-point", 27*GLB_T);
+  mo->ind2=_g3;
+  measure_mesons_core(prop_ts,prop_seq0, source_ts, mo, 1, 0, 2, 0, GLB_T);
+  do_global_sum(mo,1.0);
+  mo->ind2=_g5;
+  for(t=0;t<GLB_T;++t)
+  {
+    lprintf("Triangle", 0, "%i  %3.10e %3.10e %3.10e %3.10e \n", t,  mo->corr_re[corr_ind(0,0,0,2,t,1,0)], mo->corr_im[corr_ind(0,0,0,2,t,1,0)],  mo->corr_re[corr_ind(0,0,1,2,t,1,0)], mo->corr_im[corr_ind(0,0,1,2,t,1,0)]);
+  }
+  for(t=0;t<GLB_T;++t)
+  {
+    reset_mo(mo);
+    create_sequential_source(source_seqt, t, prop_ts);
+    calc_propagator(prop_seqt,source_seqt,4);
+    measure_mesons_core(prop_seq0,prop_seqt, source_ts, mo, 1, 0, 2, 0, GLB_T);
+    do_global_sum(mo,1.0);
+    lprintf("Rectangle", 0, "%i  %3.10e %3.10e %3.10e %3.10e \n", t,  mo->corr_re[corr_ind(0,0,0,2,t,1,0)], mo->corr_im[corr_ind(0,0,0,2,t,1,0)],  mo->corr_re[corr_ind(0,0,1,2,t,1,0)], mo->corr_im[corr_ind(0,0,1,2,t,1,0)]);
+  }
+
+  for(t=0;t<GLB_T;++t)
+  {
+    reset_mo(mo);
+    create_sequential_source(source_seqt, t, prop_ts);
+    add_momentum(source_seqtmom, source_seqt, 0,0,-1);
+    calc_propagator(prop_seqt,source_seqtmom,4);
+    measure_mesons_core(prop_seq0,prop_seqt, source_ts, mo, 1, 0, 2, 0, GLB_T);
+    do_global_sum(mo,1.0);
+    lprintf("Rectangle - momentum on sequential prop", 0, "%i  %3.10e %3.10e %3.10e %3.10e \n", t,  mo->corr_re[corr_ind(0,0,0,2,t,1,0)], mo->corr_im[corr_ind(0,0,0,2,t,1,0)],  mo->corr_re[corr_ind(0,0,1,2,t,1,0)], mo->corr_im[corr_ind(0,0,1,2,t,1,0)]);
+  }
 
   free_mo(mo);
   finalize_process();
