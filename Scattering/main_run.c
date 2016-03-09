@@ -89,6 +89,8 @@ void free_mo(meson_observable* mo)
   free(mo);
 }
 
+#define BASENAME(filename) (strrchr((filename),'/') ? strrchr((filename),'/')+1 : filename )
+
 #define corr_ind(px,py,pz,n_mom,tc,nm,cm) ((px)*(n_mom)*(n_mom)*GLB_T*(nm)+(py)*(n_mom)*GLB_T*(nm)+(pz)*GLB_T*(nm)+ ((cm)*GLB_T) +(tc))
 inline void io2pt(meson_observable* mo, int pmax, int sourceno, char* path, char* name)
 {
@@ -96,7 +98,7 @@ inline void io2pt(meson_observable* mo, int pmax, int sourceno, char* path, char
 	char outfile[256] = {};
 	int px,py,pz,t;
 	if(PID==0){
-		sprintf(outfile,"%s/%s_src_%d_%s", path, name, sourceno, cnfg_filename );
+		sprintf(outfile,"%s/%s_src_%d_%s", path, name, sourceno, BASENAME(cnfg_filename) );
 		file=fopen(outfile,"w+");
 		for(px=0;px<pmax;++px) for(py=0;py<pmax;++py) for(pz=0;pz<pmax;++pz) for(t=0;t<GLB_T;++t) fprintf(file,"%i %i %i %i %3.10e %3.10e \n", px, py, pz, t,mo->corr_re[corr_ind(px,py,pz,pmax,t,1,0)], mo->corr_im[corr_ind(px,py,pz,pmax,t,1,0)]);
 		fclose(file);
@@ -111,7 +113,7 @@ inline void io4pt(meson_observable* mo, int pmax, int sourceno, char* path, char
 	char outfile[256] = {};
 	int px,py,pz,t;
 	if(PID==0){
-		sprintf(outfile,"%s/%s_src_%d_%s", path, name, sourceno, cnfg_filename );
+		sprintf(outfile,"%s/%s_src_%d_%s", path, name, sourceno, BASENAME(cnfg_filename) );
 		file=fopen(outfile,"w+");
 		for(px=-pmax;px<=pmax;++px) for(py=-pmax;py<=pmax;++py) for(pz=-pmax;pz<=pmax;++pz) for(t=0;t<GLB_T;++t) fprintf(file, "%i %i %i %i %3.10e %3.10e \n", px, py, pz, t,mo->corr_re[INDEX(px,py,pz, pmax,t)], mo->corr_im[INDEX(px,py,pz,pmax,t)]);
 		fclose(file);
@@ -121,19 +123,15 @@ inline void io4pt(meson_observable* mo, int pmax, int sourceno, char* path, char
 
 int main(int argc,char *argv[])
 {
-  int numsources = 3;
   int src,t;
   int px,py,pz, px2, py2, pz2;
-  //Picking momenta by hand for now
-  px=0;py=0;pz=1;
-  px2=1;py2=1;pz2=0;
   int tau=0;
   filename_t fpars;
   int nm;
   char tmp[256], *cptr;
-  char *path="output";
   int i,k;
   double m[256];
+  FILE* list;
 
   //Copy I/O from another file
   read_cmdline(argc, argv);
@@ -144,7 +142,7 @@ int main(int argc,char *argv[])
 
   /* logger setup */
   /* disable logger for MPI processes != 0 */
-  logger_setlevel(0,500);
+  //logger_setlevel(0,500);
   if (PID!=0) { logger_disable(); }
   if (PID==0) { 
     sprintf(tmp,">%s",output_filename); logger_stdout(tmp);
@@ -158,18 +156,26 @@ int main(int argc,char *argv[])
   if (list_filename!=NULL) lprintf("MAIN",0,"list file [%s]\n",list_filename); 
   else lprintf("MAIN",0,"cnfg file [%s]\n",cnfg_filename); 
 
+  list=NULL;
+  if(strcmp(list_filename,"")!=0) {
+    error((list=fopen(list_filename,"r"))==NULL,1,"main [mk_mesons.c]" ,
+	"Failed to open list file\n");
+  }
 
   /* read & broadcast parameters */
   parse_cnfg_filename(cnfg_filename,&fpars);
 
   read_input(mes_var.read,input_filename);
+  char *path=mes_var.outdir;
+  printf("The momenta are (%s) and (%s) \n", mes_var.p1, mes_var.p2);
+  sscanf(mes_var.p1, "(%d,%d,%d)" ,&px,&py,&pz);
+  sscanf(mes_var.p2, "(%d,%d,%d)" ,&px2,&py2,&pz2);
+  printf("The momenta are (%d %d %d) and (%d %d %d) \n", px, py, pz, px2, py2, pz2);
+  int numsources = mes_var.nhits;
   GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
 
   /* setup lattice geometry */
   if (geometry_init() == 1) { finalize_process(); return 0; }
-  // geometry_mpi_eo();
-  /* test_geometry_mpi_eo(); */ 
-  // test_geometry_mpi_eo();  
   /* setup random numbers */
   read_input(rlx_var.read,input_filename);
   //slower(rlx_var.rlxd_start); //convert start variable to lowercase
@@ -181,11 +187,6 @@ int main(int argc,char *argv[])
     lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
     rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
   }
-
-  //                                    
-  //lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed);
-  //rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
-  //srand(glb_var.rlxd_seed+PID);
 
   lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
   lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
@@ -269,12 +270,22 @@ mo_t2->ind2=_g3;
 #undef X
     spinor_field* W_0_0 = alloc_spinor_field_f(4*NF,&glattice);
 
-  for (src=0;src<numsources;++src)
-  {
-	// Clear all meson observables
+
+while(1){
+    if(list!=NULL)
+      if(fscanf(list,"%s",cnfg_filename)==0 || feof(list)) break;
+
+    lprintf("MAIN",0,"Configuration from %s\n", cnfg_filename);
+    read_gauge_field(cnfg_filename);
+    represent_gauge_field();
+
+    for (src=0;src<numsources;++src)
+    {
+	    // Clear all meson observables
 #define X(NAME) reset_mo(mo_##NAME);
-	OBSERVABLE_LIST
+	    OBSERVABLE_LIST
 #undef X
+
 
     	// Sources for non-sequential props
   	create_diluted_source_equal_atau(source_0, tau);
@@ -369,21 +380,29 @@ mo_t2->ind2=_g3;
 		measure_mesons_core(W_0_mp2, W_0_0, source_0, mo_tmpr4p2, 1, tau, 2, 0, GLB_T);
 
 		//Pick only the relevant contributions
-		for(px=0;px<2;++px)for(py=0;py<2;++py)for(pz=0;pz<2;++pz){
-#define X(NAME) mo_##NAME->corr_re[corr_ind(px,py,pz,2,t,1,0)] = mo_tmp##NAME->corr_re[corr_ind(px,py,pz,2,t,1,0)]; mo_##NAME->corr_im[corr_ind(px,py,pz,2,t,1,0)] = mo_tmp##NAME->corr_im[corr_ind(px,py,pz,2,t,1,0)];
+		for(int px_=0;px_<2;++px_)for(int py_=0;py_<2;++py_)for(int pz_=0;pz_<2;++pz_){
+#define X(NAME) mo_##NAME->corr_re[corr_ind(px_,py_,pz_,2,t,1,0)] = mo_tmp##NAME->corr_re[corr_ind(px_,py_,pz_,2,t,1,0)]; mo_##NAME->corr_im[corr_ind(px_,py_,pz_,2,t,1,0)] = mo_tmp##NAME->corr_im[corr_ind(px_,py_,pz_,2,t,1,0)];
 			TMP_OBSERVABLE_LIST
 #undef X
 		}
 	}
 
-#define X(NAME) io2pt(mo_##NAME,2,src,path, #NAME);
+#define X(NAME) do_global_sum(mo_##NAME, 1.0); io2pt(mo_##NAME,2,src,path, #NAME);
 	TMP_OBSERVABLE_LIST
 #undef X
   }
 
+    if(list==NULL) break;
+}
+  lprintf("DEBUG",0,"ALL done, deallocating\n");
+
 #define X(NAME) free_mo(mo_##NAME);
   OBSERVABLE_LIST
 #undef X
+#define X(NAME) free_mo(mo_tmp##NAME);
+	  TMP_OBSERVABLE_LIST
+#undef X
+  if(list!=NULL) fclose(list);
   finalize_process();
   free_BCs();
   free_gfield(u_gauge);

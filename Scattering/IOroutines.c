@@ -6,9 +6,10 @@ typedef struct _input_scatt {
 	double precision;
 	int nhits;
 	int tsrc;
+	char outdir[256], p1[16], p2[16];
 
 	/* for the reading function */
-	input_record_t read[5];
+	input_record_t read[8];
 
 } input_scatt;
 
@@ -19,6 +20,9 @@ typedef struct _input_scatt {
 		{"inverter precision", "mes:precision = %lf", DOUBLE_T, &(varname).precision},\
 		{"number of inversions per cnfg", "mes:nhits = %d", INT_T, &(varname).nhits},\
 		{"Source time:", "mes:tsrc = %d", INT_T, &(varname).tsrc},\
+		{"Output directory:", "mes:outdir = %s", STRING_T, &(varname).outdir},\
+		{"Momentum 1:", "mes:p1 = %s", STRING_T, &(varname).p1},\
+		{"Momentum 2:", "mes:p2 = %s", STRING_T, &(varname).p2},\
 		{NULL, NULL, INT_T, NULL}\
 	}\
 }
