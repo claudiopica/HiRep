@@ -100,7 +100,8 @@ inline void io2pt(meson_observable* mo, int pmax, int sourceno, char* path, char
 	if(PID==0){
 		sprintf(outfile,"%s/%s_src_%d_%s", path, name, sourceno, BASENAME(cnfg_filename) );
 		file=fopen(outfile,"w+");
-		for(px=0;px<pmax;++px) for(py=0;py<pmax;++py) for(pz=0;pz<pmax;++pz) for(t=0;t<GLB_T;++t) fprintf(file,"%i %i %i %i %3.10e %3.10e \n", px, py, pz, t,mo->corr_re[corr_ind(px,py,pz,pmax,t,1,0)], mo->corr_im[corr_ind(px,py,pz,pmax,t,1,0)]);
+		//Factor of 2 to correct for the noise source normalisation
+		for(px=0;px<pmax;++px) for(py=0;py<pmax;++py) for(pz=0;pz<pmax;++pz) for(t=0;t<GLB_T;++t) fprintf(file,"%i %i %i %i %3.10e %3.10e \n", px, py, pz, t,2*(mo->corr_re[corr_ind(px,py,pz,pmax,t,1,0)]), 2*(mo->corr_im[corr_ind(px,py,pz,pmax,t,1,0)]));
 		fclose(file);
 	}
 	return;
@@ -115,7 +116,8 @@ inline void io4pt(meson_observable* mo, int pmax, int sourceno, char* path, char
 	if(PID==0){
 		sprintf(outfile,"%s/%s_src_%d_%s", path, name, sourceno, BASENAME(cnfg_filename) );
 		file=fopen(outfile,"w+");
-		for(px=-pmax;px<=pmax;++px) for(py=-pmax;py<=pmax;++py) for(pz=-pmax;pz<=pmax;++pz) for(t=0;t<GLB_T;++t) fprintf(file, "%i %i %i %i %3.10e %3.10e \n", px, py, pz, t,mo->corr_re[INDEX(px,py,pz, pmax,t)], mo->corr_im[INDEX(px,py,pz,pmax,t)]);
+		//Factor of 4 to correct for the noise source normalisation
+		for(px=-pmax;px<=pmax;++px) for(py=-pmax;py<=pmax;++py) for(pz=-pmax;pz<=pmax;++pz) for(t=0;t<GLB_T;++t) fprintf(file, "%i %i %i %i %3.10e %3.10e \n", px, py, pz, t,4*(mo->corr_re[INDEX(px,py,pz, pmax,t)]), 4*(mo->corr_im[INDEX(px,py,pz,pmax,t)]));
 		fclose(file);
 	}
 	return;
@@ -242,7 +244,7 @@ int main(int argc,char *argv[])
 
   init_propagator_eo(nm,m,mes_var.precision);
 
-#define OBSERVABLE_LIST X(pi2p) X(twopt) X(d) X(r1) X(r2) X(r3) X(r4) X(t1) X(t2) X(twoptp2) X(dp2) X(r1p2) X(r2p2) X(r3p2) X(r4p2) X(t1p2) X(t2p2)
+#define OBSERVABLE_LIST X(pi2p) X(pi_p1) X(twopt_nomom) X(twopt) X(d_nomom) X(d) X(r1) X(r2) X(r3) X(r4) X(t1) X(t2) X(twoptp2) X(dp2) X(r1p2) X(r2p2) X(r3p2) X(r4p2) X(t1p2) X(t2p2)
 #define TMP_OBSERVABLE_LIST X(r1) X(r2) X(r3) X(r4) X(r1p2) X(r2p2) X(r3p2) X(r4p2)
 #define X(NAME) meson_observable* mo_##NAME = malloc(sizeof(meson_observable)); init_mo(mo_##NAME,#NAME,27*GLB_T);
 OBSERVABLE_LIST
@@ -250,6 +252,8 @@ OBSERVABLE_LIST
 #define X(NAME) meson_observable* mo_tmp##NAME = malloc(sizeof(meson_observable)); init_mo(mo_tmp##NAME,#NAME,27*GLB_T);
 TMP_OBSERVABLE_LIST
 #undef X
+mo_twopt_nomom->ind1=_g3;
+mo_twopt_nomom->ind2=_g3;
 mo_twopt->ind1=_g3;
 mo_twopt->ind2=_g3;
 mo_t1->ind2=_g3;
@@ -326,16 +330,21 @@ while(1){
 
 	measure_mesons_core(Q_0, Q_0, source_0, mo_pi2p, 1, tau, 2, 0, GLB_T);
 	do_global_sum(mo_pi2p,1.0);
+	measure_mesons_core(Q_0, Q_p, source_0, mo_pi_p1, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_pi2p,1.0);
 
 	// 2-point rho->rho
+	measure_mesons_core(Q_0, Q_0, source_0, mo_twopt_nomom, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_twopt_nomom,1.0);
 	measure_mesons_core(Q_0, Q_p, source_0, mo_twopt, 1, tau, 2, 0, GLB_T);
 	do_global_sum(mo_twopt,1.0);
 	measure_mesons_core(Q_0, Q_p2, source_0, mo_twoptp2, 1, tau, 2, 0, GLB_T);
 	do_global_sum(mo_twoptp2,1.0);
 	
 	// direct 1
-	measure_scattering_AD_core(mo_d, Q_0, Q_p, Q_0_eta, Q_0_eta, tau, 0, 1, px, py, pz );
-	measure_scattering_AD_core(mo_dp2, Q_0, Q_p2, Q_0_eta, Q_0_eta, tau, 0, 1, px2, py2, pz2 );
+	measure_scattering_AD_core(mo_d_nomom, Q_0, Q_0, Q_0_eta, Q_0_eta, tau, 0, 1, 0, 0, 0 );
+	measure_scattering_AD_core(mo_d, Q_p, Q_0, Q_0_eta, Q_0_eta, tau, 0, 1, px, py, pz );
+	measure_scattering_AD_core(mo_dp2, Q_p2, Q_0, Q_0_eta, Q_0_eta, tau, 0, 1, px2, py2, pz2 );
 	//Triangle pipi->rho
 	measure_mesons_core(W_0_mp, Q_0, source_0, mo_t1, 1, tau, 2, 0, GLB_T);
 	do_global_sum(mo_t1,1.0);
@@ -349,9 +358,12 @@ while(1){
 
 	//File IO
 	io2pt(mo_pi2p, 2, src, path, "pi");
+	io2pt(mo_pi_p1, 2, src, path, "pi_p1");
+	io2pt(mo_twopt_nomom, 2, src, path, "rho_p0");
 	io2pt(mo_twopt, 2, src, path, "rho");
 	io2pt(mo_t1, 2, src, path, "t1");
 	io2pt(mo_t2, 2, src, path, "t2");
+	io4pt(mo_d_nomom, 1, src, path, "d_p0");
 	io4pt(mo_d, 1, src, path, "d");
 
 	io2pt(mo_twoptp2, 2, src, path, "rhop2");
