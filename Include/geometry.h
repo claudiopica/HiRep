@@ -9,7 +9,12 @@
 /* this define the width of the borders for parallel dimensions
  * For different actions it must be modified
  */
+
+#ifdef TLSYM
+#define BORDERSIZE 2
+#else
 #define BORDERSIZE 1
+#endif
 
 
 typedef struct _geometry_descriptor {

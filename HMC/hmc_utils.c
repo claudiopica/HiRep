@@ -99,9 +99,15 @@ static void mk_gconf_name(char *name, hmc_flow *rf, int id) {
   if (strlen(rf->run_name)>10)
       sprintf(name,"%sn%d",rf->run_name,id);
   else{
-    sprintf(name,"%s_%dx%dx%dx%dnc%dr%snf%db%.6fm%.6fn%d",
+#ifdef TLSYM
+  sprintf(name,"%s_tlSym_%dx%dx%dx%dnc%dr%snf%db%.6fm%.6fn%d",
             rf->run_name,GLB_T,GLB_X,GLB_Y,GLB_Z,NG,repr_name,
             nf(),beta(),-mass(),id);
+#else  
+  sprintf(name,"%s_%dx%dx%dx%dnc%dr%snf%db%.6fm%.6fn%d",
+            rf->run_name,GLB_T,GLB_X,GLB_Y,GLB_Z,NG,repr_name,
+            nf(),beta(),-mass(),id);
+#endif
   }
 }
 

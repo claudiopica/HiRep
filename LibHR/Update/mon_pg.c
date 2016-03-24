@@ -35,10 +35,26 @@ const spinor_field* pg_pseudofermion(const struct _monomial *m) {
 
 void pg_add_local_action(const struct _monomial *m, scalar_field *loc_action) {
   mon_pg_par *par = (mon_pg_par*)(m->data.par);
-  
+ 
+
   /* Gauge action */
   _MASTER_FOR(&glattice,i) {
+
+#ifdef TLSYM
+	double c0,c1;
+  c1 = -1./12.;
+  c0 = 1. - 8.*c1;
+// *_FIELD_AT(loc_action,i) += (par->beta/((double)NG))*c0*(6*((double)NG)-local_plaq(i)) ;
+//  *_FIELD_AT(loc_action,i) += (par->beta/((double)NG))*c1*(12*(double)NG-local_rect_1x2(i));
+
+  *_FIELD_AT(loc_action,i) += -(par->beta/((double)NG))*c0*local_plaq(i) ;
+  *_FIELD_AT(loc_action,i) += -(par->beta/((double)NG))*c1*local_rect_1x2(i);
+
+
+#else
     *_FIELD_AT(loc_action,i) += -(par->beta/((double)NG))*local_plaq(i);
+#endif
+
   }
 }
 

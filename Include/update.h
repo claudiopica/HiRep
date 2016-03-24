@@ -12,6 +12,11 @@
 
 void staples(int ix,int mu,suNg *v);
 void test_staples();
+#ifdef TLSYM
+void rect_staples_1x2(int ix,int mu,suNg *v);
+void test_rect_staples_1x2();
+#endif
+
 void cabmar(double beta,suNg *u, suNg *v,int type);
 
 void project_gauge_field(void);

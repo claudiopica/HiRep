@@ -44,12 +44,36 @@ void force0(double dt, suNg_av_field *force, void *vpar){
     suNg s1,s2;
     suNg_algebra_vector f;
     for (int mu=0; mu<4; ++mu) {
+#ifdef TLSYM
+      
+      double c0,c1;
+      c1 = -1./12.;
+      c0 = 1. - 8.*c1;
+      static suNg s3,s4;
+      /* pure Wilson part */
+      staples(i,mu,&s1);
+      _suNg_times_suNg_dagger(s2,*_4FIELD_AT(u_gauge,i,mu),s1);
+      
+      /* the projection itself takes the TA: proj(M) = proj(TA(M)) */
+      _fund_algebra_project(f,s2);
+      _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,i,mu), c0*dt*(-beta/((double)(NG))), f);
+      
+      /* rectangular part */
+      rect_staples_1x2(i,mu,&s3);
+      _suNg_times_suNg_dagger(s4,*_4FIELD_AT(u_gauge,i,mu),s3);
+      
+      /* the projection itself takes the TA: proj(M) = proj(TA(M)) */
+      _fund_algebra_project(f,s4);
+    
+      _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,i,mu), c1*dt*(-beta/((double)(NG))), f);
+#else
       staples(i,mu,&s1);
       _suNg_times_suNg_dagger(s2,*_4FIELD_AT(u_gauge,i,mu),s1);
 
       /* the projection itself takes the TA: proj(M) = proj(TA(M)) */
       _fund_algebra_project(f,s2);
       _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,i,mu), dt*(-beta/((double)(NG))), f);
+#endif 
 
 #ifdef MEASURE_FORCE0
       double nsq;

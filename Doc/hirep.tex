@@ -6,7 +6,7 @@
 \usepackage{graphicx}
 
 \def\bfx{{\bf x}}
-
+\def\csw{c_{\rm{SW}}}
 \bibliographystyle{JHEP}
 
 \begin{document}
@@ -141,6 +141,29 @@ introducing complex pseudofermionic fields:
   Q_m^{-N_f} \phi} \equiv
 \int \mathcal D \phi \mathcal D \phi^\dagger e^{-S_\mathrm{pf}}.
 \end{equation}
+
+
+\section{The tree level Symanzik action}
+
+The tree level gauge action is also implemented. It can be used by adding the flag \verb+-DTLSYM+ and read :
+\begin{equation}
+\mathcal{H}_G =  c_0 \beta \sum_{\mu<\nu} \left( 1- \frac{1}{N} \mathrm{Re\ tr\ } \mathcal{P}_{\mu\nu}\right) + c_1 \beta \sum_{\mu \neq \nu} \left( 1- \frac{1}{N} \mathrm{Re\ tr\ } \mathcal{P}^{1\times 2}_{\mu\nu}\right)  \, ,\\
+\end{equation}
+
+The coefficients reads $c_0=1-8 c_1$ and $c_1=-1/12$. \\
+
+Are those coefficients representation and group independent ?
+
+The current implementation does not work if the lattice is parallelized in 2 or more directions.  In that case, the code crashes during the execution of the function \verb+test_geometry_mpi_eo()+. The typical error message is :
+\begin{verbatim}
+Bad candidate index -1 for coordinates (5,7,0,10), reached from (6,7,0,10) with idn[0].
+\end{verbatim}
+
+The code crashes as well if the test function is not called.
+
+%% Conventions to make a test with the tmLQCD suite :
+%% kappa_tmLQCD = (8+2*m_HiRep)^-1
+%% 
 
 \section{Force for the HMC molecular dynamics} \label{SHMC}
 The HMC Hamiltonian is given by:

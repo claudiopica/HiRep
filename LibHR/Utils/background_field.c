@@ -9,6 +9,7 @@
 #include "update.h"
 #include "memory.h"
 #include "communications.h"
+#include "error.h"
 #include "observables.h"
 #include "logger.h"
 #include <math.h>
@@ -29,6 +30,10 @@ void apply_background_field_zdir(suNg_field* V,double Q,int n) {
 				suNg utmp;
 				static suNg_field* V_old=NULL;
 				int c[4];
+#ifdef GAUGE_SON
+
+exit(1);
+#else
 
 #ifdef DEBUG_BACKGROUND
 				static suNg_field* Vtest_old=NULL;
@@ -130,5 +135,6 @@ void apply_background_field_zdir(suNg_field* V,double Q,int n) {
 #endif // DEBUG_BACKGROUND
 
 				free_gfield(V_old);
+#endif //SON
 }
 
