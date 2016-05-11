@@ -36,20 +36,14 @@ void mre_guess(mre_par*, int, spinor_field*, spinor_operator, spinor_field*);
 void mre_store(mre_par*, int, spinor_field*);
 void mre_init(mre_par*, int, double);
 
-/* forces for the update */
-void force0(double dt, suNg_av_field *force, void *par);
-
 typedef struct {
+  int id;
   int n_pf;
   spinor_field *pf;
   double mass;
   rational_app *ratio;
   double inv_err2;
 } force_rhmc_par;
-
-void init_force_rhmc();
-void free_force_rhmc();
-void force_rhmc(double dt, suNg_av_field *force, void *par);
 
 typedef struct {
   int id;
@@ -63,10 +57,14 @@ typedef struct {
   mre_par mpar;
 } force_hmc_par;
 
-void force_fermion_core(spinor_field* Xs, spinor_field* Ys, suNg_av_field* force, double dt, double* forcestat, int type);
-void force_hmc(double dt, suNg_av_field *force, void *par);
-void force_hmc_tm(double dt, suNg_av_field *force, void *par);
+void force_measure_begin();
+void force_measure_end(int, const char*, double, int);
+void force_fermion_core(spinor_field*, spinor_field*, suNg_av_field*, int, double, double);
 
+void force_hmc(double, suNg_av_field*, void*);
+void force_hmc_tm(double, suNg_av_field*, void*);
+void force_rhmc(double, suNg_av_field*, void*);
+void force0(double, suNg_av_field*, void*);
 
 void gaussian_momenta(suNg_av_field *momenta);
 void gaussian_spinor_field(spinor_field *s);
