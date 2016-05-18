@@ -49,9 +49,9 @@ void init_ghmc(ghmc_par *par){
   if( four_fermion_active ) {
     if(ff_sigma_old==NULL) ff_sigma_old=alloc_sfield(1,&glattice);
     if(ff_pi_old==NULL) ff_pi_old=alloc_sfield(1,&glattice); 
+    scalar_field_copy( ff_sigma_old, ff_sigma );
+    scalar_field_copy( ff_pi_old, ff_pi );
   }
-  scalar_field_copy( ff_sigma_old, ff_sigma );
-  scalar_field_copy( ff_pi_old, ff_pi );
   
 
   /* allocate momenta */

@@ -43,7 +43,7 @@ run name = run1
 save freq = 1
 meas freq = 1
 conf dir = .
-gauge start = run1_8x8x8x8nc2rADJnf0b5.000000m0.100000n6
+gauge start = unit
 last conf = +1000
 
 // Mesons
@@ -64,9 +64,6 @@ eva:maxiter = 100
 eva:omega1 = 1.e-8
 eva:omega2 = 1.e-3
 eva:mass = -0.55
-
-// Four fermion measurements
-ff:make = true
 
 // Monomials
 monomial {
