@@ -66,6 +66,12 @@ static double mass(){
       else if (m->data.type==Hasenbusch_tm || m->data.type==Hasenbusch_tm_alt){
         nm = ((mon_hasenbusch_tm_par*) m->data.par)->mass;
       }
+      else if (m->data.type==HMC_ff){
+        nm = ((mon_hmc_par*) m->data.par)->mass;
+      }
+      else if (m->data.type==Hasenbusch_ff){
+        nm = ((mon_hasenbusch_par*) m->data.par)->mass;
+      }
       if (nm<min) min=nm;
     }
     ip=ip->next;
@@ -236,6 +242,9 @@ int init_mc(hmc_flow *rf, char *ifile) {
 
   read_input(hmc_var.read,ifile);
   read_input(rf->read,ifile);
+  
+  /* Read the action and initialize fields */
+  read_action(ifile, &hmc_var.hmc_p.integrator);
 
   /* initialize boundary conditions */
   BCs_pars_t BCs_pars = {
@@ -299,7 +308,6 @@ int init_mc(hmc_flow *rf, char *ifile) {
   represent_gauge_field();
 
   /* init HMC */
-  read_action(ifile, &hmc_var.hmc_p.integrator);
   init_ghmc(&hmc_var.hmc_p);
 
   return 0;
@@ -312,7 +320,7 @@ int save_conf(hmc_flow *rf, int id) {
   
   mk_gconf_name(buf, rf, id);
   write_gauge_field(add_dirname(rf->conf_dir,buf));
-  
+   
   return 0;
 }
 

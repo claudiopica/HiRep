@@ -57,6 +57,12 @@ typedef struct {
   mre_par mpar;
 } force_hmc_par;
 
+//parameters for the four fermion force
+typedef struct {
+  double gamma;
+} force_auxfield_par;
+
+
 void force_measure_begin();
 void force_measure_end(int, const char*, double, int);
 void force_fermion_core(spinor_field*, spinor_field*, suNg_av_field*, int, double, double);
@@ -65,6 +71,8 @@ void force_hmc(double, suNg_av_field*, void*);
 void force_hmc_tm(double, suNg_av_field*, void*);
 void force_rhmc(double, suNg_av_field*, void*);
 void force0(double, suNg_av_field*, void*);
+void force_hmc_auxfields( double dt, suNg_av_field *force, void *par ); //Force from a four_fermion monomial
+void force_hmc_ff(double, suNg_av_field*, void*); //Force from a HMC_ff or Hasenbusch_ff monomial
 
 void gaussian_momenta(suNg_av_field *momenta);
 void gaussian_spinor_field(spinor_field *s);
@@ -80,18 +88,30 @@ void calc_one_force(int n_force);
 /* Action structures */
 typedef enum {
   PureGauge,
+  FourFermion,
   HMC,
   RHMC,
   TM,
   TM_alt,
   Hasenbusch,
   Hasenbusch_tm,
-  Hasenbusch_tm_alt
+  Hasenbusch_tm_alt,
+  HMC_ff,
+  Hasenbusch_ff
 } mon_type;
 
 typedef struct _mon_pg_par {
   double beta;
 } mon_pg_par;
+
+//Parameters for the four fermion auxiliary field monomial
+typedef struct _mon_ff_par {
+  double gamma;
+  char *start_config;  //cold -> set sigmafield to start_value, pi to 0
+                       //Anything else -> use configuration file
+  double start_value;
+  force_auxfield_par fpar;
+} mon_ff_par;
 
 typedef struct _mon_hmc_par {
   double mass;
@@ -170,6 +190,12 @@ struct _monomial* hasen_create(const monomial_data *data);
 struct _monomial* hasen_tm_create(const monomial_data *data);
 struct _monomial* hasen_tm_alt_create(const monomial_data *data);
 
+/* Four fermion monomials */
+struct _monomial* ff_create(const monomial_data *data);
+struct _monomial* hmc_ff_create(const monomial_data *data);
+struct _monomial* hasen_ff_create(const monomial_data *data);
+
+
 const monomial *add_mon(monomial_data *mon);
 int num_mon();
 const monomial *mon_n(int i);
@@ -236,5 +262,16 @@ void suNf_field_copy(suNf_field *g1, suNf_field *g2);
 
 /* find spectral interval using eva */
 void find_spec_H2(double *max, double *min);
+
+
+/* Utility functions for four fermion interactions */
+void scalar_field_copy(scalar_field *s1, scalar_field *s2);
+void flip_scalar_field(scalar_field *s);
+void set_scalar_field(scalar_field *s, double c);
+void gaussian_scalar_field(scalar_field *s);
+
+void update_auxfields( double dt );
+
+
 
 #endif

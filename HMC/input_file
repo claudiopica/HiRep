@@ -1,5 +1,5 @@
 // Global variables 
-GLB_T = 16
+GLB_T = 8
 GLB_X = 8
 GLB_Y = 8
 GLB_Z = 8
@@ -40,11 +40,11 @@ SF_sign = 1
 // Runtime variables
 //example: run1_8x8x8x8nc2rFUNnf0b0.000000m0.000000
 run name = run1
-save freq = 9999
+save freq = 1
 meas freq = 1
 conf dir = .
-gauge start = random
-last conf = +1
+gauge start = run1_8x8x8x8nc2rADJnf0b5.000000m0.100000n6
+last conf = +1000
 
 // Mesons
 mes:make = false
@@ -65,37 +65,49 @@ eva:omega1 = 1.e-8
 eva:omega2 = 1.e-3
 eva:mass = -0.55
 
+// Four fermion measurements
+ff:make = true
+
 // Monomials
 monomial {
 	id = 0
 	type = gauge
-	beta = 2.0
+	beta = 5.0
 	level = 1
 }
 
 monomial {
 	id = 1
 	type = hmc
-	mass = -0.550
+	mass = -0.1
 	mt_prec = 1e-14
 	force_prec = 1e-14
-	mre_past = 0
+	mre_past = 4
 	level = 0
 }
-
 
 
 // Integrators
 integrator {
 	level = 0
 	type = o2mn
-	steps = 5
+	steps = 30
 }
 
 integrator {
 	level = 1
 	type = o2mn
-	steps = 2
+	steps = 5
 }
 
+//auxfield_start = cold: set pi to zero and sigma to start value
+//                 anything else: read auxiliary fields from configuration file
+//monomial {
+//        id = 0
+//        type = four_fermion
+//        gamma = 0.1
+//        auxfield_start = cold
+//        start_value = 1
+//        level = 1
+//}
 

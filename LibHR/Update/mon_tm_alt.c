@@ -82,6 +82,9 @@ void tm_alt_free(struct _monomial *m) {
   /* It does NOT deallocate temporary spinor as it is shared by all mon */
 }
 
+
+
+
 struct _monomial* tm_alt_create(const monomial_data *data) {
   monomial *m = malloc(sizeof(*m));
   mon_tm_par *par = (mon_tm_par*)data->par;

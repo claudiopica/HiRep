@@ -16,9 +16,9 @@
 #include "memory.h"
 #include "communications.h"
 
-static spinor_field *Xs=NULL;
-static spinor_field *Ys=NULL;
-static spinor_field *eta=NULL;
+spinor_field *Xs=NULL;
+spinor_field *Ys=NULL;
+spinor_field *eta=NULL;
 #ifdef UPDATE_EO
 static spinor_field *xi=NULL;
 #endif 

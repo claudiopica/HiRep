@@ -33,9 +33,11 @@ const spinor_field* pg_pseudofermion(const struct _monomial *m) {
   return NULL;
 }
 
+
+
+
 void pg_add_local_action(const struct _monomial *m, scalar_field *loc_action) {
   mon_pg_par *par = (mon_pg_par*)(m->data.par);
- 
 
   /* Gauge action */
   _MASTER_FOR(&glattice,i) {
@@ -64,6 +66,7 @@ void pg_free(struct _monomial *m) {
   free(m);
 }
 
+
 struct _monomial* pg_create(const monomial_data *data) {
   monomial *m = malloc(sizeof(*m));
   mon_pg_par *par = (mon_pg_par*)(data->par);
@@ -71,6 +74,8 @@ struct _monomial* pg_create(const monomial_data *data) {
   // Copy data structure
   m->data = *data;
   
+  gauge_field_active = 1;
+
   // Allocate memory for spinor field
   /* empty */
   
@@ -89,6 +94,7 @@ struct _monomial* pg_create(const monomial_data *data) {
   m->correct_pf = &pg_correct_pf;
   m->correct_la_pf = &pg_correct_la_pf;
   m->add_local_action = &pg_add_local_action;
+
   
   return m;
 }

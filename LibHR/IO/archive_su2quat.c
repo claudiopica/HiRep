@@ -104,7 +104,8 @@ void write_gauge_field_su2q(char filename[])
   gettimeofday(&start,0);
 
   zsize=GLB_Z/NP_Z; rz=GLB_Z-zsize*NP_Z;
-  buff=malloc(4*sizeof(double)*4*(GLB_Z/NP_Z+((rz>0)?1:0)));
+  if(four_fermion_active) buff=malloc(sizeof(double)*(4*4+2)*(GLB_Z/NP_Z+((rz>0)?1:0)));
+  else buff=malloc(4*sizeof(double)*4*(GLB_Z/NP_Z+((rz>0)?1:0)));
 
   g[3]=0;
   for (g[0]=0;g[0]<GLB_T;++g[0]) { /* loop over T, X and Y direction */
@@ -114,7 +115,9 @@ void write_gauge_field_su2q(char filename[])
         glb_to_proc(g, p); /* get the processor coordinate */
 #endif
         for (p[3]=0;p[3]<NP_Z;++p[3]) { /* loop over processors in Z direction */
-          int bsize=4*4*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
+          int bsize;
+          if(four_fermion_active) bsize=(2+4*4)*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
+	  else bsize=4*4*(GLB_Z/NP_Z+((p[3]<rz)?1:0));
 #ifdef WITH_MPI
           MPI_Cart_rank(cart_comm, p, &cid);
           MPI_Group_translate_ranks(cg, 1, &cid, wg, &pid);
@@ -139,7 +142,16 @@ void write_gauge_field_su2q(char filename[])
               translate_su2_quat(cm,pm+1); cm+=4;
               translate_su2_quat(cm,pm+2); cm+=4;
               translate_su2_quat(cm,pm+3); cm+=4;
-            }
+            
+	      if(four_fermion_active) {
+                  double * s_buff = (double*)cm;
+		  double *s = _FIELD_AT(ff_sigma, ix);
+		  double *p = _FIELD_AT(ff_pi, ix);
+	          *(s_buff++)=*s;
+                  *(s_buff++)=*p;
+                  cm = (suNg*) s_buff;
+	     }
+	    }
           }
 #ifdef WITH_MPI
           MPI_Barrier(GLB_COMM); 
@@ -256,7 +268,8 @@ void read_gauge_field_su2q(char filename[])
 #endif
 
   zsize=GLB_Z/NP_Z; rz=GLB_Z-zsize*NP_Z;
-  buff=malloc(4*sizeof(double)*4*(GLB_Z/NP_Z+((rz>0)?1:0)));
+  if(four_fermion_active) buff=malloc(sizeof(double)*(4*4+2)*(GLB_Z/NP_Z+((rz>0)?1:0)));
+  else buff=malloc(4*4*sizeof(double)*(GLB_Z/NP_Z+((rz>0)?1:0)));
 
   g[3]=0;
   for (g[0]=0;g[0]<GLB_T;++g[0]) { /* loop over T, X and Y direction */
@@ -266,7 +279,9 @@ void read_gauge_field_su2q(char filename[])
         glb_to_proc(g, p); /* get the processor coordinate */
 #endif
         for (p[3]=0;p[3]<NP_Z;++p[3]) { /* loop over processors in Z direction */
-          int bsize=4*4*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
+          int bsize;
+	  if(four_fermion_active) bsize=(2+4*4)*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
+	  else bsize=4*4*(GLB_Z/NP_Z+((p[3]<rz)?1:0));
 #ifdef WITH_MPI
           MPI_Cart_rank(cart_comm, p, &cid);
           MPI_Group_translate_ranks(cg, 1, &cid, wg, &pid);
@@ -340,6 +355,16 @@ void read_gauge_field_su2q(char filename[])
               translate_quat_su2(pm+1,cm); cm+=4;
               translate_quat_su2(pm+2,cm); cm+=4;
               translate_quat_su2(pm+3,cm); cm+=4;
+
+	      if(four_fermion_active) {
+                double *s_buff = (double*)cm;
+	        double *s = _FIELD_AT(ff_sigma, ix);
+	        double *p = _FIELD_AT(ff_pi, ix);
+	        *(s)=*(s_buff++);
+                *(p)=*(s_buff++);
+                cm = (suNg*) s_buff;
+	      }
+
             }
           }
 
@@ -412,9 +437,13 @@ void read_gauge_field_su2(char filename[])
                 1,"read_gauge_field_su2",
                 "Failed to read gauge field from file");
     
+
+    int quaternion_buffer_size = 8*4*GLB_T*GLB_X*GLB_Y*GLB_Z*sizeof(double)+5*sizeof(int)+sizeof(double);
+    if(four_fermion_active) quaternion_buffer_size += 2*GLB_T*GLB_X*GLB_Y*GLB_Z*sizeof(double);
+    
     if(fabs(buff[0]*buff[4]+buff[1]*buff[5]+buff[2]*buff[6]+buff[3]*buff[7])<1e-10 &&
        fabs(buff[0]*buff[5]-buff[4]*buff[1]+buff[2]*buff[7]-buff[6]*buff[3])<1e-10 && 
-       8*4*GLB_T*GLB_X*GLB_Y*GLB_Z*sizeof(double)+5*sizeof(int)+sizeof(double)==file_size) {
+       quaternion_buffer_size==file_size) {
       quaternions = (1==0);
       lprintf("IO",0,"SU2 matrix representation\n");
     } else {

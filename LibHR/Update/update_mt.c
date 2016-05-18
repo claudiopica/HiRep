@@ -22,6 +22,9 @@
 
 static suNg_av_field *momenta=NULL;
 static suNg_field *u_gauge_old=NULL;
+static scalar_field *ff_sigma_old=NULL;
+static scalar_field *ff_pi_old=NULL;
+
 static scalar_field *la=NULL; /* local action field for Metropolis test */
 
 static ghmc_par update_par;
@@ -41,7 +44,16 @@ void init_ghmc(ghmc_par *par){
   /* allocate space for the backup copy of gfield */
   if(u_gauge_old==NULL) u_gauge_old=alloc_gfield(&glattice);
   suNg_field_copy(u_gauge_old,u_gauge);
+ 
+  /* allocate space for backup copy of four fermion fields */
+  if( four_fermion_active ) {
+    if(ff_sigma_old==NULL) ff_sigma_old=alloc_sfield(1,&glattice);
+    if(ff_pi_old==NULL) ff_pi_old=alloc_sfield(1,&glattice); 
+  }
+  scalar_field_copy( ff_sigma_old, ff_sigma );
+  scalar_field_copy( ff_pi_old, ff_pi );
   
+
   /* allocate momenta */
   if(momenta==NULL) momenta = alloc_avfield(&glattice);
   
@@ -135,10 +147,12 @@ int update_ghmc()
     const monomial *m = mon_n(i);
     m->correct_pf(m);
   }
+  
 
   /* integrate molecular dynamics */
   lprintf("HMC",30,"MD integration...\n");
   update_par.integrator->integrator(momenta,update_par.tlen,update_par.integrator);
+
 
   /* project and represent gauge field */
   project_gauge_field();
@@ -163,6 +177,10 @@ int update_ghmc()
 
   if(deltaH < 0) {
     suNg_field_copy(u_gauge_old,u_gauge);
+    if( four_fermion_active ) {
+      scalar_field_copy( ff_sigma_old, ff_sigma );
+      scalar_field_copy( ff_pi_old, ff_pi );
+    }
   } else {
     double r;
     if(PID == 0) {
@@ -178,9 +196,17 @@ int update_ghmc()
 
     if(r > 0) {
       suNg_field_copy(u_gauge_old,u_gauge);
+      if( four_fermion_active ) {
+        scalar_field_copy( ff_sigma_old, ff_sigma );
+        scalar_field_copy( ff_pi_old, ff_pi );
+      }
     } else {
       lprintf("HMC",10,"Configuration rejected.\n");
       suNg_field_copy(u_gauge,u_gauge_old);
+      if( four_fermion_active ) {
+        scalar_field_copy( ff_sigma, ff_sigma_old );
+        scalar_field_copy( ff_pi, ff_pi_old );
+      }
       start_gf_sendrecv(u_gauge); /* this may not be needed if we always guarantee that we copy also the buffers */
       represent_gauge_field();
       return 0;

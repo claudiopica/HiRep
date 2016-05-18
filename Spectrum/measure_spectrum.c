@@ -31,6 +31,9 @@
 #include "spectrum.h"
 #include "cinfo.c"
 
+
+
+
 #if defined(ROTATED_SF) && defined(BASIC_SF)
 #error This code does not work with the Schroedinger functional !!!
 #endif
@@ -67,8 +70,13 @@ typedef struct _input_mesons {
 	int background_field;
 	int nEz;
 	double Q;
+
+  //Currently only implemented for ff
+  int nhits_hopping;  //Multiplies the number of hits in the fast part of the hopping parameter expansion
+  int degree_hopping;  // The degree of the hopping parameter expasion  
+
   /* for the reading function */
-  input_record_t read[26];
+  input_record_t read[28];
 } input_mesons;
 
 #define init_input_mesons(varname) \
@@ -99,9 +107,28 @@ typedef struct _input_mesons {
     {"enable background electric field", "mes:background_field = %d",INT_T, &(varname).background_field},	\
     {"electric charge", "mes:Q = %lf",DOUBLE_T, &(varname).Q},	\
     {"electric field nEz", "mes:nEz = %d",INT_T, &(varname).nEz},	\
+    {"hopping expansion degree", "mes:degree_hopping = %d",INT_T, &(varname).degree_hopping}, \
+    {"hopping expansion hits", "mes:nhits_hopping = %d",INT_T, &(varname).nhits_hopping}, \
     {NULL, NULL, INT_T, NULL}				\
    }							\
 }
+
+/* Turn four fermion on/off */
+typedef struct _input_ff {
+  char make[256]; 
+  /* for the reading function */
+  input_record_t read[2];
+  
+} input_ff;
+
+#define init_input_ff(varname) \
+{ \
+  .read={\
+    {"Include four fermion interactions", "ff:on = %s", STRING_T, (varname).make},\
+    {NULL, NULL, INT_T, NULL}\
+  }\
+}
+
 
 
 char cnfg_filename[256]="";
@@ -111,6 +138,8 @@ char output_filename[256] = "mesons.out";
 enum { UNKNOWN_CNFG, DYNAMICAL_CNFG, QUENCHED_CNFG };
 
 input_mesons mes_var = init_input_mesons(mes_var);
+input_ff ff_var = init_input_ff(ff_var);
+
 
 
 typedef struct {
@@ -254,6 +283,7 @@ int main(int argc,char *argv[]) {
 
   /* read & broadcast parameters */
   parse_cnfg_filename(cnfg_filename,&fpars);
+  read_input(ff_var.read,input_filename);
   read_input(mes_var.read,input_filename);
 
   GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
@@ -381,8 +411,15 @@ int main(int argc,char *argv[]) {
     init_meson_correlators(0);
   }
 
+  if(strcmp(ff_var.make,"true")==0){
+    four_fermion_active = 1;
+    ff_sigma = alloc_sfield(1,&glattice);
+    ff_pi = alloc_sfield(1,&glattice); 
+  }
+
   init_discon_correlators();
   init_cvc_correlators();
+  if(four_fermion_active==1) init_triplet_discon_correlators();
   i=0;
 
   while(1) {
@@ -391,7 +428,6 @@ int main(int argc,char *argv[]) {
     if(list!=NULL)
       if(fscanf(list,"%s",cnfg_filename)==0 || feof(list)) break;
 
-    i++;
 
     lprintf("MAIN",0,"Configuration from %s\n", cnfg_filename);
     read_gauge_field(cnfg_filename);
@@ -407,45 +443,66 @@ int main(int argc,char *argv[]) {
     full_plaquette();
     gettimeofday(&start,0);
 
+    if(four_fermion_active==1) ff_observables(); 
+
     tau=0;
-    if (mes_var.def_semwall){
-      measure_spectrum_semwall(nm,m,mes_var.nhits_2pt,i,mes_var.precision);
-    }
-    if (mes_var.def_point){
-      measure_spectrum_pt(tau,nm,m,mes_var.n_mom,mes_var.nhits_2pt,i,mes_var.precision);
-    }
-	  if (mes_var.def_baryon){
-		  measure_baryons(m,i,mes_var.precision);
-	  }
-		if (mes_var.def_glueball){
-		  measure_glueballs();
-	  }
-    if (mes_var.def_gfwall){
-      measure_spectrum_gfwall(nm,m,i,mes_var.precision);
-    }
-    if (mes_var.ext_semwall){
+    if (four_fermion_active==0) {
+
+     if (mes_var.def_semwall){
+       measure_spectrum_semwall(nm,m,mes_var.nhits_2pt,i,mes_var.precision);
+     }
+     if (mes_var.def_point){
+       measure_spectrum_pt(tau,nm,m,mes_var.n_mom,mes_var.nhits_2pt,i,mes_var.precision);
+     }
+     if (mes_var.def_baryon){
+       measure_baryons(m,i,mes_var.precision);
+     }
+     if (mes_var.def_glueball){
+       //measure_glueballs(); //This does not seem to exist 
+     }
+     if (mes_var.def_gfwall){
+       measure_spectrum_gfwall(nm,m,i,mes_var.precision);
+     }
+     if (mes_var.ext_semwall){
       measure_spectrum_semwall_ext(nm,m,mes_var.nhits_2pt,i,mes_var.precision);
-    }
-    if (mes_var.ext_point){
-      measure_spectrum_pt_ext(tau,nm,m,mes_var.n_mom,mes_var.nhits_2pt,i,mes_var.precision);
-    }
-    if (mes_var.fixed_semwall){
-      measure_spectrum_semwall_fixedbc(mes_var.dt,nm,m,mes_var.nhits_2pt,i,mes_var.precision);
-    }
-    if (mes_var.fixed_point){
-      measure_spectrum_pt_fixedbc(tau,mes_var.dt,nm,m,mes_var.n_mom,mes_var.nhits_2pt,i,mes_var.precision);
-    }
-    if (mes_var.fixed_gfwall){
-      measure_spectrum_gfwall_fixedbc(mes_var.dt,nm,m,i,mes_var.precision);
-    }
-    if (mes_var.discon_semwall){
-      measure_spectrum_discon_semwall(nm,m,mes_var.nhits_disc,i,mes_var.precision); 
-    }
-    if (mes_var.discon_gfwall){
-      measure_spectrum_discon_gfwall(nm,m,i,mes_var.precision);
-    }
-    if (mes_var.discon_volume){
-      measure_spectrum_discon_volume(nm,m,i,mes_var.precision,mes_var.dilution);
+     }
+     if (mes_var.ext_point){
+       measure_spectrum_pt_ext(tau,nm,m,mes_var.n_mom,mes_var.nhits_2pt,i,mes_var.precision);
+     }
+     if (mes_var.fixed_semwall){
+       measure_spectrum_semwall_fixedbc(mes_var.dt,nm,m,mes_var.nhits_2pt,i,mes_var.precision);
+     }
+     if (mes_var.fixed_point){
+       measure_spectrum_pt_fixedbc(tau,mes_var.dt,nm,m,mes_var.n_mom,mes_var.nhits_2pt,i,mes_var.precision);
+     }
+     if (mes_var.fixed_gfwall){
+       measure_spectrum_gfwall_fixedbc(mes_var.dt,nm,m,i,mes_var.precision);
+     }
+     if (mes_var.discon_semwall){
+        measure_spectrum_discon_semwall(nm,m,mes_var.nhits_disc,i,mes_var.precision); 
+     }
+     if (mes_var.discon_gfwall){
+       measure_spectrum_discon_gfwall(nm,m,i,mes_var.precision);
+     }
+     if (mes_var.discon_volume){
+       measure_spectrum_discon_volume(nm,m,i,mes_var.precision,mes_var.dilution);
+     }
+
+    } else {
+     //With four fermion interactions
+     if (mes_var.def_semwall){
+       measure_spectrum_ff_semwall(nm,m,mes_var.nhits_2pt,i,mes_var.precision);
+     }
+     if (mes_var.def_point){
+       measure_spectrum_ff_pt(tau,nm,m,mes_var.n_mom,mes_var.nhits_2pt,i,mes_var.precision);
+     }
+     if (mes_var.ext_semwall){
+       measure_spectrum_semwall_ff_ext(nm,m,mes_var.nhits_2pt,i,mes_var.precision);
+     }
+     if (mes_var.discon_semwall){
+       measure_spectrum_discon_ff_semwall(nm,m,mes_var.nhits_disc,mes_var.degree_hopping,mes_var.nhits_hopping,i,mes_var.precision);
+     }
+
     }
 
     gettimeofday(&end,0);
@@ -457,6 +514,8 @@ int main(int argc,char *argv[]) {
   if(list!=NULL) fclose(list);
   free_meson_observables();
   free_BCs();
+
+  if(four_fermion_active==1) free_triplet_discon_observables();
 
   free_gfield(u_gauge);
 #ifdef ALLOCATE_REPR_GAUGE_FIELD

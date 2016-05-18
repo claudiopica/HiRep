@@ -1,7 +1,11 @@
 /***************************************************************************\
- * Copyright (c) 2015, Martin Hansen, Claudio Pica                        *
+ * Copyright (c) 2015, Martin Hansen, Claudio Pica, Jarno Rantaharju      *
  * All rights reserved.                                                   *
  \***************************************************************************/
+
+//Monomial defining a fermion field that interacts with the gauge, if it exists,
+//and trough a four fermions interaction. The monomial four_fermion needs to be
+//included to define the auxiliary fields.
 
 #include "global.h"
 #include "update.h"
@@ -11,10 +15,11 @@
 #include "linear_algebra.h"
 #include "inverters.h"
 #include <stdlib.h>
+#include <math.h>
 
 static spinor_field *tmp_pf = NULL;
 
-void hasen_init_traj(const struct _monomial *m) {
+void hasen_ff_init_traj(const struct _monomial *m) {
    static int init = 1;
    
    /* allocate temporary memory */
@@ -29,62 +34,79 @@ void hasen_init_traj(const struct _monomial *m) {
    }
 }
 
-void hasen_gaussian_pf(const struct _monomial *m) {
+void hasen_ff_gaussian_pf(const struct _monomial *m) {
    mon_hasenbusch_par *par = (mon_hasenbusch_par*)(m->data.par);
    gaussian_spinor_field(par->pf);
 }
 
-void hasen_correct_pf(const struct _monomial *m) {
+//Note: the g5 is here just to change the
+//force calculation to resemple the standard one.
+//It has no effect on the action
+//
+/* S = | (a D +b) D^{-1} g5 psi |^2 */
+/* (a D +b) D^{-1} g5 psi = A */
+/* psi = g5 D (a D + b)^{-1} A */
+void hasen_ff_correct_pf(const struct _monomial *m) {
    mon_hasenbusch_par *par = (mon_hasenbusch_par*)(m->data.par);
+   
    double shift;
-   mshift_par mpar;
+   mshift_par cgpar;
+   shift = 0.;
+   cgpar.n=1;
+   cgpar.shift = &shift;
+   cgpar.max_iter=0;
+   cgpar.err2 = m->data.MT_prec;
 
-   mpar.err2 = m->data.MT_prec;
-   mpar.max_iter = 0;
-   mpar.n = 1;
-   mpar.shift = &shift;
-   mpar.shift[0] = 0;
-
-   /* compute H(m)D^{-1}(m+dm)*pf */
-   set_dirac_mass(par->mass + par->dm);
-   spinor_field_zero_f(tmp_pf); /* mshift inverter uses this as initial guess for 1 shift */
-   g5QMR_mshift(&mpar, &D, par->pf, tmp_pf);
-   set_dirac_mass(par->mass);
-   H(par->pf, tmp_pf);
-}
-
-void hasen_correct_la_pf(const struct _monomial *m) {
-   mon_hasenbusch_par *par = (mon_hasenbusch_par*)(m->data.par);
-   double shift;
-   mshift_par mpar;
-
-   mpar.err2 = m->data.MT_prec;
-   mpar.max_iter = 0;
-   mpar.n = 1;
-   mpar.shift = &shift;
-   mpar.shift[0] = 0;
-
-   /* compute D(m+dm)D^{-1}(m)*g5*pf */
-   spinor_field_g5_assign_f(par->pf);
-   set_dirac_mass(par->mass);
+   set_ff_dirac_mass(par->mass);
+   set_ff_dirac_shift(par->dm);
    spinor_field_zero_f(tmp_pf);
-   g5QMR_mshift(&mpar, &D, par->pf, tmp_pf);
-   set_dirac_mass(par->mass + par->dm);
-   D(par->pf, tmp_pf);
+   cg_mshift( &cgpar, &Dff_sq, par->pf, tmp_pf );
+   Dff(par->pf, tmp_pf);
+   spinor_field_g5_f(tmp_pf,par->pf);
+
+   set_ff_dirac_shift(0.);
+   spinor_field_g5_assign_f(tmp_pf);
+   Dff_dagger(par->pf,tmp_pf);
 }
 
-const spinor_field* hasen_pseudofermion(const struct _monomial *m) {
+void hasen_ff_correct_la_pf(const struct _monomial *m) {
+   mon_hasenbusch_par *par = (mon_hasenbusch_par*)(m->data.par);
+   double shift;
+
+   mshift_par cgpar;
+   shift = 0.;
+   cgpar.n=1;
+   cgpar.shift = &shift;
+   cgpar.max_iter=0;
+   cgpar.err2 = m->data.MT_prec;
+  
+   spinor_field_zero_f(tmp_pf);
+   set_ff_dirac_mass(par->mass);
+   cg_mshift( &cgpar, &Dff_sq, par->pf, tmp_pf );
+   Dff(par->pf,tmp_pf);
+   spinor_field_g5_f(tmp_pf,par->pf);
+
+   /* S = | (D+b) D^{-1} g5 psi |^2 */
+   set_ff_dirac_shift(par->dm);
+   spinor_field_g5_assign_f(tmp_pf);
+   Dff_dagger(par->pf,tmp_pf);
+
+   set_ff_dirac_shift(0.);  
+
+}
+
+const spinor_field* hasen_ff_pseudofermion(const struct _monomial *m) {
    mon_hasenbusch_par *par = (mon_hasenbusch_par*)(m->data.par);
    return par->pf;
 }
 
-void hasen_add_local_action(const struct _monomial *m, scalar_field *loc_action) {
+void hasen_ff_add_local_action(const struct _monomial *m, scalar_field *loc_action) {
    mon_hasenbusch_par *par = (mon_hasenbusch_par*)(m->data.par);
    /* pseudo fermion action = phi^2 */
    pf_local_action(loc_action, par->pf);
 }
 
-void hasen_free(struct _monomial *m) {
+void hasen_ff_free(struct _monomial *m) {
   mon_hasenbusch_par *par = (mon_hasenbusch_par*)m->data.par;
   if (par->pf!=NULL) {  free_spinor_field_f(par->pf); }
   free(par);
@@ -94,7 +116,7 @@ void hasen_free(struct _monomial *m) {
 
 
 
-struct _monomial* hasen_create(const monomial_data *data) {
+struct _monomial* hasen_ff_create(const monomial_data *data) {
   monomial *m = malloc(sizeof(*m));
   mon_hasenbusch_par *par = (mon_hasenbusch_par*)data->par;
   
@@ -115,29 +137,26 @@ struct _monomial* hasen_create(const monomial_data *data) {
   par->fpar.inv_err2 = data->force_prec;
   par->fpar.inv_err2_flt = 1e-6;
   par->fpar.mass = par->mass;
-#ifdef UPDATE_EO
-  par->fpar.b = (4+par->mass+par->dm)*(4+par->mass+par->dm)-(4+par->mass)*(4+par->mass);
-#else
   par->fpar.b = par->dm;
-#endif
-  par->fpar.hasenbusch = 1;
+  par->fpar.hasenbusch = 2;
   par->fpar.mu = 0;
   
   // Setup chronological inverter
   mre_init(&(par->fpar.mpar), par->mre_past, data->force_prec);
   
   // Setup pointers to update functions
-  m->free = &hasen_free;
+  m->free = &hasen_ff_free;
   
-  m->force_f = &force_hmc;
+  m->force_f = &force_hmc_ff;
   m->force_par = &par->fpar;
 
-  m->pseudofermion = &hasen_pseudofermion;
-  m->init_traj = &hasen_init_traj;
-  m->gaussian_pf = &hasen_gaussian_pf;
-  m->correct_pf = &hasen_correct_pf;
-  m->correct_la_pf = &hasen_correct_la_pf;
-  m->add_local_action = &hasen_add_local_action;
+  m->pseudofermion = &hasen_ff_pseudofermion;
+  m->init_traj = &hasen_ff_init_traj;
+  m->gaussian_pf = &hasen_ff_gaussian_pf;
+  m->correct_pf = &hasen_ff_correct_pf;
+  m->correct_la_pf = &hasen_ff_correct_la_pf;
+  m->add_local_action = &hasen_ff_add_local_action;
+
   
   return m;
 }

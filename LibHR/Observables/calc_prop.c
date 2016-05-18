@@ -1,5 +1,5 @@
 /***************************************************************************\
-* Copyright (c) 2013 Rudy Arthur, Ari Hietanen                              *
+* Copyright (c) 2013 Rudy Arthur, Ari Hietanen, Jarno Rantaharju            *
 *                                                                           *
 *                                                                           *
 \***************************************************************************/
@@ -72,7 +72,7 @@ double *eva_val;
 static spinor_field *eva_vec;
 static spinor_field *tmp_sf;
 
-enum {_g5QMR=0, _MINRES, _CG};
+enum {_g5QMR=0, _MINRES, _CG, _CG_4F};
 
 /* Initialises the propagator, nm is the number of masses for multimass solver, 
    m is the array of masses, and acc is the inverter accuracy
@@ -106,7 +106,7 @@ void init_propagator_eo(int nm, double *m, double acc){
     QMR_par.shift = shift;
     QMR_par.err2 = .5*acc;
     QMR_par.max_iter = 0;
-
+ 
     resd=alloc_spinor_field_f(QMR_par.n,&glat_even);
     tmp=alloc_spinor_field_f(1,&glat_even);
 
@@ -153,6 +153,7 @@ void free_propagator_eo() {
   }
   init=0;
 }
+
 
 
 
@@ -221,6 +222,12 @@ static void calc_propagator_eo_core(spinor_field *psi, spinor_field *eta, int so
   complete_sf_sendrecv(psi);
   lprintf("CALC_PROP",10,"QMR_eo MVM = %d\n",cgiter);
 }
+
+
+
+
+
+
 
 
 static void calc_propagator_core(spinor_field *psi, spinor_field *eta, int solver) {
@@ -318,6 +325,16 @@ if( spinor_field_sqnorm_f(psi) < 1e-28 ){
 
 }
 
+
+
+
+
+
+
+
+
+
+
 void calc_propagator_eo(spinor_field *psi, spinor_field *eta, int ndilute) {
   int beta;
   lprintf("CALC_PROPAGATOR_EO",20,"Calculating EO propagator with ndilute: %d\n",ndilute);
@@ -344,6 +361,15 @@ void calc_propagator(spinor_field *psi, spinor_field* eta, int ndilute){
   QMR_par.n = n_masses;
   hmass_pre = mass[0];
 }
+
+
+
+
+
+
+
+
+
 
 /*Different source for each mass. Needed in sequential propagators 
   with multiple masses */

@@ -80,7 +80,12 @@ void write_gauge_field_matrix(char filename[])
   gettimeofday(&start,0);
   
   zsize=GLB_Z/NP_Z; rz=GLB_Z-zsize*NP_Z;
-  buff=malloc(sizeof(suNg)*4*(GLB_Z/NP_Z+((rz>0)?1:0)));
+  if(!four_fermion_active) {
+    buff=malloc(sizeof(suNg)*4*(GLB_Z/NP_Z+((rz>0)?1:0)));
+  } else {
+    buff=malloc((sizeof(suNg)*4+2*sizeof(double))*(GLB_Z/NP_Z+((rz>0)?1:0)));
+  }
+
   
   g[3]=0;
   for (g[0]=0;g[0]<GLB_T;++g[0]) 
@@ -91,7 +96,13 @@ void write_gauge_field_matrix(char filename[])
 	  glb_to_proc(g, p); /* get the processor coordinate */
 #endif
 	  for (p[3]=0;p[3]<NP_Z;++p[3]) { /* loop over processors in Z direction */
-	    int bsize=sizeof(suNg)/sizeof(double)*4*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
+	    int bsize;
+	    if(!four_fermion_active) {
+	      bsize=sizeof(suNg)/sizeof(double)*4*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
+	    } else {
+	      bsize=(sizeof(suNg)/sizeof(double)*4+2)*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
+            }
+	    
 #ifdef WITH_MPI
 	    MPI_Cart_rank(cart_comm, p, &cid);
 	    MPI_Group_translate_ranks(cg, 1, &cid, wg, &pid);
@@ -115,6 +126,15 @@ void write_gauge_field_matrix(char filename[])
 		*(cm++)=*(pm++);
 		*(cm++)=*(pm++);
 		*(cm++)=*(pm);
+	      
+	        if(four_fermion_active) {
+                  double * s_buff = (double*)cm;
+		  double *s = _FIELD_AT(ff_sigma, ix);
+		  double *p = _FIELD_AT(ff_pi, ix);
+	          *(s_buff++)=*s;
+                  *(s_buff++)=*p;
+                  cm = (suNg*) s_buff;
+	        }
 	      }
 	    }
 #ifdef WITH_MPI
@@ -189,7 +209,7 @@ void write_gauge_field_matrix(char filename[])
 }
  
  
- void read_gauge_field(char filename[]){
+void read_gauge_field(char filename[]){
 #if (NG==2) && !defined(WITH_QUATERNIONS)
     read_gauge_field_su2(filename);
 #else
@@ -252,7 +272,12 @@ void read_gauge_field_matrix(char filename[])
 #endif
 
   zsize=GLB_Z/NP_Z; rz=GLB_Z-zsize*NP_Z;
-  buff=malloc(sizeof(suNg)*4*(GLB_Z/NP_Z+((rz>0)?1:0)));
+  if(!four_fermion_active) {
+    buff=malloc(sizeof(suNg)*4*(GLB_Z/NP_Z+((rz>0)?1:0)));
+  } else {
+    buff=malloc((sizeof(suNg)*4+2*sizeof(double))*(GLB_Z/NP_Z+((rz>0)?1:0)));
+  }
+
 
   g[3]=0;
   for (g[0]=0;g[0]<GLB_T;++g[0]) { /* loop over T, X and Y direction */
@@ -262,7 +287,14 @@ void read_gauge_field_matrix(char filename[])
         glb_to_proc(g, p); /* get the processor coordinate */
 #endif
         for (p[3]=0;p[3]<NP_Z;++p[3]) { /* loop over processors in Z direction */
-          int bsize=sizeof(suNg)/sizeof(double)*4*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
+	  int bsize;
+	  if(!four_fermion_active) {
+	    bsize=sizeof(suNg)/sizeof(double)*4*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
+	  } else {
+	    bsize=(sizeof(suNg)/sizeof(double)*4+2)*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
+          }
+	    
+
 #ifdef WITH_MPI
           MPI_Cart_rank(cart_comm, p, &cid);
           MPI_Group_translate_ranks(cg, 1, &cid, wg, &pid);
@@ -335,7 +367,17 @@ void read_gauge_field_matrix(char filename[])
               *(pm++)=*(cm++);
               *(pm++)=*(cm++);
               *(pm)=*(cm++);
-            }
+            
+
+	      if(four_fermion_active) {
+                double *s_buff = (double*)cm;
+	        double *s = _FIELD_AT(ff_sigma, ix);
+	        double *p = _FIELD_AT(ff_pi, ix);
+	        *(s)=*(s_buff++);
+                *(p)=*(s_buff++);
+                cm = (suNg*) s_buff;
+	      }
+	    }
           }
 
         } /* end loop over processors in Z direction */
@@ -619,4 +661,8 @@ void read_ranlxd_state(char filename[])
 #endif
     
 }
+
+
+
+
 

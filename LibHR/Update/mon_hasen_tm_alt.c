@@ -98,6 +98,8 @@ void hasen_tm_alt_free(struct _monomial *m) {
   /* It does NOT deallocate temporary spinor as it is shared by all mon */
 }
 
+
+
 struct _monomial* hasen_tm_alt_create(const monomial_data *data) {
   monomial *m = malloc(sizeof(*m));
   mon_hasenbusch_tm_par *par = (mon_hasenbusch_tm_par*)data->par;
@@ -138,6 +140,6 @@ struct _monomial* hasen_tm_alt_create(const monomial_data *data) {
   m->correct_pf = &hasen_tm_alt_correct_pf;
   m->correct_la_pf = &hasen_tm_alt_correct_la_pf;
   m->add_local_action = &hasen_tm_alt_add_local_action;
-  
+
   return m;
 }

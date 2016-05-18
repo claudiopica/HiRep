@@ -8,6 +8,7 @@
 static double static_mass=0.;
 static double static_mu=0.;
 
+
 void set_dirac_mass(double mass) {
   static_mass=mass;
 }
@@ -15,6 +16,7 @@ void set_dirac_mass(double mass) {
 void set_twisted_mass(double mu){
   static_mu=mu;
 }
+
 
 /* this is the basic operator used in the update */
 void H2(spinor_field *out, spinor_field *in){
@@ -162,5 +164,6 @@ void tm_invert_alt(spinor_field* out, spinor_field *in, mshift_par* mpar){
   cg_mshift(mpar,QpQm_tm_alt,in,tmp);
   Qtm_m_alt(out,tmp);
 }
+
 
 

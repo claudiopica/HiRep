@@ -100,6 +100,8 @@ void hasen_tm_free(struct _monomial *m) {
   /* It does NOT deallocate temporary spinor as it is shared by all mon */
 }
 
+
+
 struct _monomial* hasen_tm_create(const monomial_data *data) {
   monomial *m = malloc(sizeof(*m));
   mon_hasenbusch_tm_par *par = (mon_hasenbusch_tm_par*)data->par;

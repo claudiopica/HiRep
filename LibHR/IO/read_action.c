@@ -16,7 +16,7 @@
 
 #define MAX_SECTIONS 8
 #define MAX_VALUES   16
-#define MAX_LENGTH   32
+#define MAX_LENGTH   64
 
 typedef struct {
    int num;
@@ -121,7 +121,7 @@ static void setup_monomials()
 
          // Monomial information
          lprintf("ACTION", 10, "Monomial %d: level = %d, type = gauge, beta = %1.6f\n", i, level, par->beta);
-      }
+      } 
       else if(strcmp(type, "hmc") == 0)
       {
          mon_hmc_par *par = malloc(sizeof(*par));
@@ -330,6 +330,86 @@ static void setup_monomials()
          // Monomial information
          lprintf("ACTION", 10, "Monomial %d: level = %d, type = hasenbusch_tm_alt, mass = %1.6f, mu = %1.6f, dmu = %1.6f, force_prec = %1.2e, mt_prec = %1.2e\n",
                  i, level, par->mass, par->mu, par->dmu, data.force_prec, data.MT_prec);
+      }
+      else if(strcmp(type, "four_fermion") == 0) //Potential term for four fermion auxiliary fields
+      {
+         mon_ff_par *par = malloc(sizeof(*par));
+         data.par = par;
+         data.type = FourFermion;
+
+         // Find parameters
+         par->gamma = find_double(cur, "gamma");
+         check(last_error, "Unable to find 'gamma' in monomial of type 'four_fermion'\n");
+         par->start_config = find_string(cur, "auxfield_start");
+         check(last_error, "Unable to find 'auxfield_start' in monomial of type 'four_fermion'\n");
+         if(strcmp(par->start_config, "cold") == 0){
+           par->start_value = find_double(cur, "start_value");
+	   check(last_error, "Unable to find 'start_value' in monomial of type 'four_fermion' with cold start\n");
+	 }
+         
+         // Add monomial
+         mret = add_mon(&data);
+
+         // Monomial information
+         lprintf("ACTION", 10, "Monomial %d: level = %d, type = four fermion, gamma = %1.6f\n, ", i, level, par->gamma);
+         if(strcmp(par->start_config, "cold") == 0){
+	    lprintf("ACTION", 10, "Starting from cold configuration with sigma=%1.6f\n", par->start_config); 
+	 }       
+      }
+      else if(strcmp(type, "hmc_ff") == 0)  //pseudofermion with four fermion interaction
+      {
+         mon_hmc_par *par = malloc(sizeof(*par));
+         data.par = par;
+         data.type = HMC_ff;
+
+         // Find parameters
+         par->mass = find_double(cur, "mass");
+         check(last_error, "Unable to find 'mass' in monomial of type 'hmc'\n");
+
+         data.MT_prec = find_double(cur, "mt_prec");
+         check(last_error, "Unable to find 'mt_prec' in monomial of type 'hmc'\n");
+
+         data.force_prec = find_double(cur, "force_prec");
+         check(last_error, "Unable to find 'force_prec' in monomial of type 'hmc'\n");
+
+         par->mre_past = find_double(cur, "mre_past");
+         check(last_error, "Unable to find 'mre_past' in monomial of type 'hmc'\n");
+
+         // Add monomial
+         mret = add_mon(&data);
+
+         // Monomial information
+         lprintf("ACTION", 10, "Monomial %d: level = %d, type = hmc_ff, mass = %1.6f, force_prec = %1.2e, mt_prec = %1.2e\n",
+                 i, level, par->mass, data.force_prec, data.MT_prec);
+      }
+      else if(strcmp(type, "hasenbusch_ff") == 0)  //hasenbusch term for fermions with four fermion interaction
+      {
+         mon_hasenbusch_par *par = malloc(sizeof(*par));
+         data.par = par;
+         data.type = Hasenbusch_ff;
+
+         // Find parameters
+         par->mass = find_double(cur, "mass");
+         check(last_error, "Unable to find 'mass' in monomial of type 'hasenbusch_ff'\n");
+
+         par->dm = find_double(cur, "dm");
+         check(last_error, "Unable to find 'dm' in monomial of type 'hasenbusch_ff'\n");
+
+         data.MT_prec = find_double(cur, "mt_prec");
+         check(last_error, "Unable to find 'mt_prec' in monomial of type 'hasenbusch_ff'\n");
+
+         data.force_prec = find_double(cur, "force_prec");
+         check(last_error, "Unable to find 'force_prec' in monomial of type 'hasenbusch_ff'\n");
+
+         par->mre_past = find_double(cur, "mre_past");
+         check(last_error, "Unable to find 'mre_past' in monomial of type 'hasenbusch_ff'\n");
+
+         // Add monomial
+         mret = add_mon(&data);
+
+         // Monomial information
+         lprintf("ACTION", 10, "Monomial %d: level = %d, type = hasenbusch_ff, mass = %1.6f, dm = %1.6f, force_prec = %1.2e, mt_prec = %1.2e\n",
+                 i, level, par->mass, par->dm, data.force_prec, data.MT_prec);
       }
       else
       {

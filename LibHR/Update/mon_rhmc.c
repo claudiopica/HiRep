@@ -109,6 +109,8 @@ void rhmc_free(struct _monomial *m) {
 }
 
 
+
+
 struct _monomial* rhmc_create(const monomial_data *data) {
   monomial *m = malloc(sizeof(*m));
   mon_rhmc_par *par = (mon_rhmc_par*)data->par;
@@ -146,6 +148,7 @@ struct _monomial* rhmc_create(const monomial_data *data) {
   m->correct_pf = &rhmc_correct_pf;
   m->correct_la_pf = &rhmc_correct_la_pf;
   m->add_local_action = &rhmc_add_local_action;
+
 
   return m;
 }

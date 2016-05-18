@@ -1,4 +1,4 @@
-GLB_T = 16
+GLB_T = 8
 GLB_X = 8
 GLB_Y = 8
 GLB_Z = 8
@@ -7,14 +7,42 @@ NP_X = 1
 NP_Y = 1
 NP_Z = 1
 
-//level = 1  seed = 1
-level = 1  seed = 38761
+N_REP = 1
 
+//level = 1  seed = 2
+rlx_level = 1
+rlx_seed = 1
+rlx_start = new
+rlx_state = rand_state
+
+
+mes:precision = 1.e-14
+mes:nhits = 5
+mes:nhits_disc = 0
 mes:masses = 0
-mes:precision = 1e-20
-mes:nhits = 3
-mes:source = 1
+mes:use_input_mass = 0;
+mes:meas_mixed = 3
+mes:nhits_2pt = 1
 mes:momentum = 0
-mes:ti = 3
-mes:tf = 12
+mes:def_semwall = 1
+mes:def_point = 0
+mes:def_baryon = 0
+mes:def_gfwall = 0
+mes:ext_semwall = 0
+mes:ext_point = 0
+mes:dirichlet_semwall = 0
+mes:dirichlet_point = 0
+mes:dirichlet_gfwall = 0
+mes:discon_semwall = 0
+mes:discon_gfwall = 0
+mes:discon_volume = 0
+mes:dilution = 1
+mes:dirichlet_dt = 2
+
+//Whether to include the four fermion interaction
+ff:on = false
+//Parameters for hopping parameter expansion, 0 in degree_hopping to disable
+mes:degree_hopping = 0
+mes:nhits_hopping = 5
+
 

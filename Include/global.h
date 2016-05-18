@@ -130,11 +130,12 @@ GLB_VAR(suNg_field_flt,*u_gauge_flt,=NULL);
 GLB_VAR(suNf_field,*u_gauge_f,=NULL);
 GLB_VAR(suNf_field_flt,*u_gauge_f_flt,=NULL);
 
+GLB_VAR(int,gauge_field_active,=0); // whether gauge field interactions is active
+
 #define pu_gauge(ix,mu) ((u_gauge->ptr)+coord_to_index(ix,mu))
 #define pu_gauge_flt(ix,mu) ((u_gauge_flt->ptr)+coord_to_index(ix,mu))
 #define pu_gauge_f(ix,mu) ((u_gauge_f->ptr)+coord_to_index(ix,mu))
 #define pu_gauge_f_flt(ix,mu) ((u_gauge_f_flt->ptr)+coord_to_index(ix,mu))
-
 
 /* input parameters */
 #include "input_par.h"
@@ -176,6 +177,21 @@ GLB_VAR(double,*force_ave,=NULL);
 GLB_VAR(double,*force_max,=NULL);
 GLB_VAR(int,*n_inv_iter,=NULL);
 #endif
+
+
+
+
+/* Fields four fermion interactions */ 
+/* Auxiliary fields for four fermion interactions */
+GLB_VAR(scalar_field,*ff_sigma,=NULL);
+GLB_VAR(scalar_field,*ff_pi,=NULL);
+GLB_VAR(scalar_field,*ff_sigma_mom,=NULL);
+GLB_VAR(scalar_field,*ff_pi_mom,=NULL);
+
+GLB_VAR(int,four_fermion_active,=0); // whether four fermion interactions are active
+
+
+
 
 #undef GLB_VAR
 

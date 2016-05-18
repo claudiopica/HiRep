@@ -184,7 +184,7 @@ int main(int argc,char *argv[]) {
   /* setup lattice geometry */
   if (geometry_init() == 1) { finalize_process(); return 0; }
   geometry_mpi_eo();
-  /* test_geometry_mpi_eo(); */ 
+  /* test_geometry_mpi_eo(); */
 
   /* setup random numbers */
   read_input(rlx_var.read,input_filename);
@@ -214,7 +214,7 @@ int main(int argc,char *argv[]) {
   
   /* Init Monte Carlo */
   init_mc(&flow, input_filename);
-  lprintf("MAIN",0,"MVM during HMC initialzation: %ld\n",getMVM());
+  lprintf("MAIN",0,"MVM during HMC initialization: %ld\n",getMVM());
   lprintf("MAIN",0,"Initial plaquette: %1.8e\n",avr_plaquette());
 #ifdef TLSYM
   test_geometry_mpi_eo();	// should fail if more than 1 direction of parallelization 
@@ -320,11 +320,14 @@ int main(int argc,char *argv[]) {
 #else
       /* plaquette */
       lprintf("MAIN",0,"Plaquette: %1.8e\n",avr_plaquette());
-#endif      
+#endif 
       /* Mesons */
       if(strcmp(mes_var.make,"true")==0) {
 	measure_spectrum_semwall(1,&mes_var.mesmass,mes_var.nhits,i,mes_var.precision);
       }
+
+      /* Four fermion observables */
+      if(four_fermion_active==1) ff_observables();
       
       /* Polyakov loops */
       if(strcmp(poly_var.make,"true")==0) {

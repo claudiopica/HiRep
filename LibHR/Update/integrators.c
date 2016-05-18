@@ -32,6 +32,7 @@ void update_gauge_field(suNg_av_field *momenta, double dt) {
 	gettimeofday(&start,0);
 #endif
 
+	if(gauge_field_active){
 	_MASTER_FOR(&glattice,i)
 	{
 		ExpX(dt,_4FIELD_AT(momenta,i,0), _4FIELD_AT(u_gauge,i,0));
@@ -39,9 +40,14 @@ void update_gauge_field(suNg_av_field *momenta, double dt) {
 		ExpX(dt,_4FIELD_AT(momenta,i,2), _4FIELD_AT(u_gauge,i,2));
 		ExpX(dt,_4FIELD_AT(momenta,i,3), _4FIELD_AT(u_gauge,i,3));
 	}
+	}
 
 	_proj_gfield(count);
 	represent_gauge_field();
+
+	if(four_fermion_active){
+	  update_auxfields(dt);
+        }
 
 #ifdef TIMING
 #ifdef TIMING_WITH_BARRIERS
@@ -61,6 +67,7 @@ void gforce(suNg_av_field *force, double dt, int nmon, const monomial **mon_list
     m->force_f(dt, force, m->force_par);
   }
 }
+
 
 void leapfrog_multistep(suNg_av_field *momenta, double tlen, integrator_par *int_par)
 {
@@ -163,7 +170,6 @@ void O2MN_multistep(suNg_av_field *momenta, double tlen, integrator_par *int_par
 			gforce(momenta, (1.-2.*lambda)*dt, int_par->nmon, int_par->mon_list);
 			update_gauge_field(momenta, dt/2);
 		}
-
 		/* Update of momenta */
 		if(n < int_par->nsteps)
 		{

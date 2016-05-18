@@ -61,5 +61,25 @@ void QpQm_tm_alt(spinor_field *out, spinor_field *in);
 void tm_invert(spinor_field* out, spinor_field *in, mshift_par* mpar);
 void tm_invert_alt(spinor_field* out, spinor_field *in, mshift_par* mpar);
 
+
+
+
+/* Dirac operators with a four fermion interaction */
+void Dphi_eopre_4f(double m0, spinor_field *out, spinor_field *in, double shift);
+void Dphi_eopre_4f_dagger(double m0, spinor_field *out, spinor_field *in, double shift);
+void Dphieopre_4f_sq(double m0, spinor_field *out, spinor_field *in, double shift);
+
+void Dphi_eopre_4f_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
+void Dphi_eopre_4f_dagger_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
+void Dphieopre_4f_sq_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
+
+/* Dirac operators used in update */
+void set_ff_dirac_mass(double mass); //this is the mass used in the following operators
+void set_ff_dirac_shift(double mass); //The shift added to four fermion Hasenbush-Dirac operators (Dff, Dff_dagger and Df_sq)
+void Dff(spinor_field *out, spinor_field *in);
+void Dff_dagger(spinor_field *out, spinor_field *in);
+void Dff_sq(spinor_field *out, spinor_field *in);
+
+
 #endif
 	
