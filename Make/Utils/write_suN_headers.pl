@@ -2039,7 +2039,7 @@ sub write_suNr_dagger_times_suNr {
 		print "      for (_i=0; _i<$N; ++_i){\\\n";
 		print "         for (_y=0; _y<$N; ++_y){\\\n";
  		print "            _k=_y; _l=_i;\\\n";
-		print "            (u).$cname\[_n\]=(w).$cname\[_k\]*(v).$cname\[_l\]);\\\n";
+		print "            (u).$cname\[_n\]=(w).$cname\[_k\]*(v).$cname\[_l\];\\\n";
 		if($N<(2*$unroll+1)) {
 			for(my $j=1;$j<$N;$j++){
 				print "            _k+=$N; _l+=$N; (u).$cname\[_n\]+=(w).$cname\[_k\]*(v).$cname\[_l\];\\\n";
