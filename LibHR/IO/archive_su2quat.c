@@ -78,7 +78,14 @@ void write_gauge_field_su2q(char filename[])
   int cid;
   int mpiret;
 #endif
-    
+
+ 
+#ifndef ALLOCATE_REPR_GAUGE_FIELD
+  complete_gf_sendrecv(u_gauge); 
+  apply_BCs_on_represented_gauge_field(); //Save the link variables with periodic boundary conditions 
+#endif
+ 
+  
   error((NG!=2),1,"write_gauge_field_su2q", "This function cannot be called if NG!=2");
 
   plaq=avr_plaquette(); /* to use as a checksum in the header */
@@ -214,6 +221,17 @@ void write_gauge_field_su2q(char filename[])
   timeval_subtract(&etime,&end,&start);
   lprintf("IO",0,"Configuration [%s] saved [%ld sec %ld usec]\n",filename,etime.tv_sec,etime.tv_usec);
 
+#ifdef WITH_MPI
+  MPI_Barrier(GLB_COMM);
+#endif
+  
+
+#ifndef ALLOCATE_REPR_GAUGE_FIELD
+  complete_gf_sendrecv(u_gauge); 
+  apply_BCs_on_represented_gauge_field(); //Save the link variables with periodic boundary conditions 
+#endif
+ 
+  
 }
 
 void read_gauge_field_su2q(char filename[])
