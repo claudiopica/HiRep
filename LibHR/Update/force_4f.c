@@ -94,7 +94,7 @@ void force_hmc_auxfields_fermion(double dt, void *vpar, scalar_field *sigma_mom,
      *_FIELD_AT(pi_mom,i) -= 2.*dt*prod;
   }
 #else
-  implement
+  // Not implemented
 #endif
 
 #ifdef UPDATE_EO

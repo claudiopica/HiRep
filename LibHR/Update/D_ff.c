@@ -242,7 +242,7 @@ void Dff(spinor_field *out, spinor_field *in){
 #ifdef UPDATE_EO
   Dphi_eopre_4f(static_mass, out, in, static_shift);
 #else
-  Implement
+  // Not implemented
 #endif
 }
 
@@ -251,7 +251,7 @@ void Dff_dagger(spinor_field *out, spinor_field *in){
 #ifdef UPDATE_EO
   Dphi_eopre_4f_dagger(static_mass, out, in, static_shift);
 #else
-  Implement
+  // Not implemented
 #endif
 }
 
@@ -260,7 +260,7 @@ void Dff_sq(spinor_field *out, spinor_field *in){
 #ifdef UPDATE_EO
   Dphieopre_4f_sq(static_mass, out, in, static_shift);
 #else
-  Implement
+  // Not implemented
 #endif
 }
 

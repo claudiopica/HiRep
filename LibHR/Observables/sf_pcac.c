@@ -270,8 +270,8 @@ void SF_PCAC_wall_mass(double mass, double acc )
 
 
 
-  free_spinor_field(source);
-  free_spinor_field(prop);
+  free_spinor_field_f(source);
+  free_spinor_field_f(prop);
   
 
   free(stmp);

@@ -55,7 +55,7 @@ double rect_1x2(int ix,int mu,int nu)
 				_suNg_trace_re(p,w3);
 
 #ifdef PLAQ_WEIGHTS
-				error("Plaq weights in rect Not implemented whatever it is ... ");  
+				error(1,1,"rect_1x2","Plaq weights not implemented for 1x2 loops");
 #else
 				return p;
 #endif
@@ -63,7 +63,6 @@ double rect_1x2(int ix,int mu,int nu)
 void crect_1x2(complex *ret,int ix,int mu,int nu)
 {				
 				int ix_pmu,ix_pmu_pnu,ix_pnu,ix_pnu_pnu;
-				double p;
 				suNg *v1,*v2,*v3,*v4,*v5,*v6,w1,w2,w3,w4;
 
 				ix_pmu=iup(ix,mu);
@@ -93,7 +92,7 @@ void crect_1x2(complex *ret,int ix,int mu,int nu)
 #endif
 
 #ifdef PLAQ_WEIGHTS
-				error("NOT TESTED");
+				error(1,1,"crect_1x2","Plaq weights not implemented for 1x2 loops");
 #endif
 
 }

@@ -139,7 +139,7 @@ void force_hmc_ff(double dt, suNg_av_field *force, void *vpar){
   for (int k=0; k<par->n_pf; ++k) {
 
 #ifndef UPDATE_EO
-    Implement
+	  // Not implemented
 #else
 
     /*    g5QMR_fltacc_par mpar;
@@ -329,10 +329,6 @@ void force_hmc_ff(double dt, suNg_av_field *force, void *vpar){
     n_inv_iter[par->id]+=n_iters;
     lprintf("FORCE_HMC",20,"avr dt |force| = %1.8e dt maxforce = %1.8e, dt = %1.8e \n",forcestat[0],forcestat[1],dt);
 #endif
-
-#if defined(BASIC_SF) || defined(ROTATED_SF)
-    SF_force_bcs(force);
-#endif /* BASIC_SF || ROTATED_SF*/
 
   }
 
