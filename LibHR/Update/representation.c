@@ -6,6 +6,7 @@
 #include "global.h"
 #include "representation.h"
 #include "utils.h"
+#include "clover_tools.h"
 #include <math.h>
 
 
@@ -389,6 +390,10 @@ _OMP_PRAGMA ( _omp_for )
   }
 #endif
   assign_ud2u_f();
+
+#ifdef WITH_CLOVER
+  compute_clover_term();
+#endif
 }
 
 

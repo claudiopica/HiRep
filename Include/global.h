@@ -129,7 +129,9 @@ GLB_VAR(suNg_field,*u_gauge,=NULL);
 GLB_VAR(suNg_field_flt,*u_gauge_flt,=NULL);
 GLB_VAR(suNf_field,*u_gauge_f,=NULL);
 GLB_VAR(suNf_field_flt,*u_gauge_f_flt,=NULL);
-
+GLB_VAR(suNfc_field,*cl_term,=NULL);
+GLB_VAR(suNfc_field,*cl_force,=NULL);
+GLB_VAR(ldl_field,*cl_ldl,=NULL);
 GLB_VAR(int,gauge_field_active,=0); // whether gauge field interactions is active
 
 #define pu_gauge(ix,mu) ((u_gauge->ptr)+coord_to_index(ix,mu))

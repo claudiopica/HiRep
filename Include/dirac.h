@@ -23,6 +23,16 @@ void g5Dphi_sq_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
 unsigned long int getMVM();
 unsigned long int getMVM_flt();
 
+// Dirac operators with clover term
+void Cphi(double, spinor_field*, spinor_field*);
+void g5Cphi(double, spinor_field*, spinor_field*);
+void g5Cphi_sq(double, spinor_field*, spinor_field*);
+void Cphi_eopre(double, spinor_field*, spinor_field*);
+void g5Cphi_eopre(double, spinor_field*, spinor_field*);
+void g5Cphi_eopre_sq(double, spinor_field*, spinor_field*);
+void Cphi_diag(double, spinor_field*, spinor_field*);
+void Cphi_diag_inv(double, spinor_field*, spinor_field*);
+
 /* Even/Odd preconditioned matrix */
 void Dphi_eopre(double m0, spinor_field *out, spinor_field *in);
 void Dphi_oepre(double m0, spinor_field *out, spinor_field *in);
@@ -42,6 +52,7 @@ void Qhat_eopre_sq(double m0, double mu, spinor_field *out, spinor_field *in);
 /* Dirac operators used in the Update */
 
 void set_dirac_mass(double mass); //this is the mass used in the following operators
+double get_dirac_mass();
 void set_twisted_mass(double mass); //this is the twisted mass used in the twisted mass operators (Q)
 void H(spinor_field *out, spinor_field *in);
 void H_flt(spinor_field_flt *out, spinor_field_flt *in);

@@ -11,6 +11,7 @@
 #include "linear_algebra.h"
 #include "inverters.h"
 #include "rational_functions.h"
+#include "clover_tools.h"
 #include <stdlib.h>
 
 static spinor_field *tmp_pf = NULL;
@@ -96,6 +97,10 @@ void rhmc_add_local_action(const struct _monomial *m, scalar_field *loc_action) 
    mon_rhmc_par *par = (mon_rhmc_par*)(m->data.par);
    /* pseudo fermion action = phi^2 */
    pf_local_action(loc_action, par->pf);
+#ifdef WITH_CLOVER_EO
+	double nf = (-2.0*par->ratio.n)/par->ratio.d;
+	clover_la_logdet(nf, par->mass, loc_action);
+#endif
 }
 
 

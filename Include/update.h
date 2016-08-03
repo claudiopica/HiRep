@@ -55,6 +55,7 @@ typedef struct {
   double mu;
   double inv_err2, inv_err2_flt;
   mre_par mpar;
+  int logdet;
 } force_hmc_par;
 
 //parameters for the four fermion force
@@ -66,6 +67,7 @@ typedef struct {
 void force_measure_begin();
 void force_measure_end(int, const char*, double, int);
 void force_fermion_core(spinor_field*, spinor_field*, suNg_av_field*, int, double, double);
+void force_logdet_core(suNg_av_field*, double, double, double);
 
 void force_hmc(double, suNg_av_field*, void*);
 void force_hmc_tm(double, suNg_av_field*, void*);
@@ -221,6 +223,7 @@ typedef struct _ghmc_par {
   /* integrator */
   integrator_par *integrator;
   double tlen;
+  double csw;
 
   /* Fermion Theta angles */
   double theta[4];

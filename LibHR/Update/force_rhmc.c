@@ -14,6 +14,7 @@
 #include "logger.h"
 #include "linear_algebra.h"
 #include "memory.h"
+#include "clover_tools.h"
 #include "communications.h"
 
 static unsigned int n_ws = 0;
@@ -100,6 +101,11 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar)
 	timeval_subtract(&etime,&end,&start);
 	lprintf("TIMING",0,"force_rhmc %.6f s\n",1.*etime.tv_sec+1.e-6*etime.tv_usec);
 	#endif
+
+#ifdef WITH_CLOVER_EO
+	double nf = (-2.0*ratio->n)/ratio->d;
+	force_logdet_core(force, par->mass, dt, nf);
+#endif
 
 	force_measure_end(par->id, "force_rhmc", dt, n_iters);
 }

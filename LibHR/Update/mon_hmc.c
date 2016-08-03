@@ -10,6 +10,7 @@
 #include "dirac.h"
 #include "linear_algebra.h"
 #include "inverters.h"
+#include "clover_tools.h"
 #include <stdlib.h>
 
 static spinor_field *tmp_pf = NULL;
@@ -70,6 +71,9 @@ void hmc_add_local_action(const struct _monomial *m, scalar_field *loc_action) {
    mon_hmc_par *par = (mon_hmc_par*)(m->data.par);
    /* pseudo fermion action = phi^2 */
    pf_local_action(loc_action, par->pf);
+#ifdef WITH_CLOVER_EO
+	clover_la_logdet(2., par->mass, loc_action);
+#endif
 }
 
 void hmc_free(struct _monomial *m) {
@@ -105,7 +109,8 @@ struct _monomial* hmc_create(const monomial_data *data) {
   par->fpar.b = 0;
   par->fpar.hasenbusch = 0;
   par->fpar.mu = 0;
-  
+  par->fpar.logdet = 1;
+
   // Setup chronological inverter
   mre_init(&(par->fpar.mpar), par->mre_past, data->force_prec);
   

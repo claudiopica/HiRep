@@ -30,6 +30,7 @@ theta_Z = 0.
 
 // HMC variables
 tlen = 1
+csw = 1.2
 
 // Schroedinger functional
 SF_zf = 1.

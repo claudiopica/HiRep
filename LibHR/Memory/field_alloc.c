@@ -115,7 +115,6 @@ return f;\
 _DECLARE_FREE_FUNC(_name,_type);\
 _DECLARE_ALLOC_FUNC(_name,_type,_size)
 
-
 _DECLARE_MEMORY_FUNC(gfield, suNg_field, 4);
 _DECLARE_MEMORY_FUNC(gfield_flt, suNg_field_flt, 4);
 
@@ -123,6 +122,9 @@ _DECLARE_MEMORY_FUNC(gfield_f, suNf_field, 4);
 _DECLARE_MEMORY_FUNC(gfield_f_flt, suNf_field_flt, 4);
 
 _DECLARE_MEMORY_FUNC(avfield, suNg_av_field, 4);
-
 _DECLARE_MEMORY_FUNC(gtransf, suNg_field, 1);
 
+_DECLARE_MEMORY_FUNC(clover_ldl, ldl_field, 1);
+_DECLARE_MEMORY_FUNC(clover_term, suNfc_field, 4);
+_DECLARE_MEMORY_FUNC(clover_force, suNfc_field, 6);
+_DECLARE_MEMORY_FUNC(clover_spinor, spinor_field_force, 1);

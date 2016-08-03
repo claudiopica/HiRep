@@ -10,6 +10,7 @@
 #include "dirac.h"
 #include "linear_algebra.h"
 #include "inverters.h"
+#include "clover_tools.h"
 #include <stdlib.h>
 
 static spinor_field *tmp_pf = NULL;
@@ -48,13 +49,13 @@ void tm_alt_correct_la_pf(const struct _monomial *m) {
    mon_tm_par *par = (mon_tm_par*)(m->data.par);
    double shift;
    mshift_par mpar;
-   
+
    mpar.err2 = m->data.MT_prec;
    mpar.max_iter = 0;
    mpar.n = 1;
    mpar.shift = &shift;
    mpar.shift[0] = 0;
-   
+
    /* compute H2^{-1/2}*pf = H^{-1}*pf */
    set_dirac_mass(par->mass);
    set_twisted_mass(par->mu);
@@ -72,6 +73,9 @@ void tm_alt_add_local_action(const struct _monomial *m, scalar_field *loc_action
    mon_tm_par *par = (mon_tm_par*)(m->data.par);
    /* pseudo fermion action = phi^2 */
    pf_local_action(loc_action, par->pf);
+#ifdef WITH_CLOVER_EO
+	clover_la_logdet(2., par->mass, loc_action);
+#endif
 }
 
 void tm_alt_free(struct _monomial *m) {
@@ -81,9 +85,6 @@ void tm_alt_free(struct _monomial *m) {
   free(m);
   /* It does NOT deallocate temporary spinor as it is shared by all mon */
 }
-
-
-
 
 struct _monomial* tm_alt_create(const monomial_data *data) {
   monomial *m = malloc(sizeof(*m));
@@ -109,7 +110,8 @@ struct _monomial* tm_alt_create(const monomial_data *data) {
   par->fpar.mu = par->mu;
   par->fpar.b = 0;
   par->fpar.hasenbusch = 0;
-  
+  par->fpar.logdet = 1;
+
   // Setup chronological inverter
   mre_init(&(par->fpar.mpar), par->mre_past, data->force_prec);
   

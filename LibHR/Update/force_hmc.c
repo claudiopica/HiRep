@@ -14,6 +14,7 @@
 #include "logger.h"
 #include "linear_algebra.h"
 #include "memory.h"
+#include "clover_tools.h"
 #include "communications.h"
 
 spinor_field *Xs=NULL;
@@ -179,5 +180,13 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar)
 	}
 
 	force_measure_end(par->id, "force_hmc", dt, n_iters);
-}
 
+#ifdef WITH_CLOVER_EO
+
+	if(par->logdet)
+	{
+		force_logdet_core(force, par->mass, dt, 2.); // 2 = # of flavors
+	}
+
+#endif
+}

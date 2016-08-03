@@ -27,6 +27,11 @@
 #define _GPU_FIELD_DATA(_type) _type *gpu_ptr;
 #endif //WITH_MPI
 
+typedef struct {
+	complex up[NF*(2*NF+1)];
+	complex dn[NF*(2*NF+1)];
+} ldl_t;
+
 #define _DECLARE_FIELD_STRUCT(_name,_type) \
 typedef struct _##_name { \
 _type *ptr; \
@@ -44,7 +49,9 @@ _DECLARE_FIELD_STRUCT(spinor_field, suNf_spinor);
 _DECLARE_FIELD_STRUCT(spinor_field_flt, suNf_spinor_flt);
 _DECLARE_FIELD_STRUCT(suNg_av_field, suNg_algebra_vector);
 _DECLARE_FIELD_STRUCT(scalar_field, double);
-
+_DECLARE_FIELD_STRUCT(ldl_field, ldl_t);
+_DECLARE_FIELD_STRUCT(suNfc_field, suNfc);
+_DECLARE_FIELD_STRUCT(spinor_field_force, suNf_spinor);
 
 
 /* LOOPING MACRO */
@@ -88,6 +95,7 @@ _DECLARE_FIELD_STRUCT(scalar_field, double);
 
 #define _FIELD_AT(s,i) (((s)->ptr)+i-(s)->type->master_shift)
 #define _4FIELD_AT(s,i,mu) (((s)->ptr)+coord_to_index(i-(s)->type->master_shift,mu))
+#define _6FIELD_AT(s,i,mu) (((s)->ptr)+((i-(s)->type->master_shift)*6+mu))
 
 #define _SPINOR_PTR(s) _FIELD_AT(s,_spinor_for_is)
 

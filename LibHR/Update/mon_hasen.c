@@ -122,7 +122,8 @@ struct _monomial* hasen_create(const monomial_data *data) {
 #endif
   par->fpar.hasenbusch = 1;
   par->fpar.mu = 0;
-  
+  par->fpar.logdet = 0;
+
   // Setup chronological inverter
   mre_init(&(par->fpar.mpar), par->mre_past, data->force_prec);
   

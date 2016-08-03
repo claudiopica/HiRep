@@ -224,13 +224,6 @@ int init_mc(hmc_flow *rf, char *ifile) {
 
   int start_t;
 
-  /* alloc global gauge fields */
-  u_gauge=alloc_gfield(&glattice);
-#ifdef ALLOCATE_REPR_GAUGE_FIELD
-  u_gauge_f=alloc_gfield_f(&glattice);
-#endif
-  u_gauge_f_flt=alloc_gfield_f_flt(&glattice);
-
   /* flow defaults */
   strcpy(rf->g_start,"invalid");
   strcpy(rf->run_name,"run_name");
@@ -242,7 +235,17 @@ int init_mc(hmc_flow *rf, char *ifile) {
 
   read_input(hmc_var.read,ifile);
   read_input(rf->read,ifile);
-  
+
+  /* alloc global gauge fields */
+  u_gauge=alloc_gfield(&glattice);
+#ifdef ALLOCATE_REPR_GAUGE_FIELD
+  u_gauge_f=alloc_gfield_f(&glattice);
+#endif
+  u_gauge_f_flt=alloc_gfield_f_flt(&glattice);
+#ifdef WITH_CLOVER
+	clover_init(hmc_var.hmc_p.csw);
+#endif
+
   /* Read the action and initialize fields */
   read_action(ifile, &hmc_var.hmc_p.integrator);
 
