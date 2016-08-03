@@ -45,8 +45,8 @@ void free_clover_ldl(ldl_field *u);
 ldl_field *alloc_clover_ldl(geometry_descriptor* type);
 void free_clover_term(suNfc_field *u);
 suNfc_field* alloc_clover_term(geometry_descriptor* type);
-void free_clover_force(suNfc_field *u);
-suNfc_field* alloc_clover_force(geometry_descriptor* type);
+void free_clover_force(suNf_field *u);
+suNf_field* alloc_clover_force(geometry_descriptor* type);
 void free_clover_spinor(spinor_field_force *s);
 spinor_field_force* alloc_clover_spinor(geometry_descriptor *type);
 

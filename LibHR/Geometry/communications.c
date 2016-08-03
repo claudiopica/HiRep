@@ -230,7 +230,7 @@ static void sync_gauge_field(suNg_field *gf) {
   }
 }
 
-static void sync_clover_force_field(suNfc_field *gf) {
+static void sync_clover_force_field(suNf_field *gf) {
   int i;
   geometry_descriptor *gd=gf->type;
   /* int j, mu, x, y; */
@@ -300,7 +300,7 @@ static void sync_gauge_transf(suNg_field *gf) {
  */ 
 /* static unsigned int comm_status=0; */
 
-void complete_clover_force_sendrecv(suNfc_field *gf) {
+void complete_clover_force_sendrecv(suNf_field *gf) {
 #ifdef WITH_MPI
   int mpiret; (void)mpiret; // Remove warning of variable set but not used
   int nreq=2*gf->type->nbuffers_gauge;
@@ -344,7 +344,7 @@ void complete_clover_force_sendrecv(suNfc_field *gf) {
 #endif /* WITH_MPI */
 }
 
-void start_clover_force_sendrecv(suNfc_field *gf) {
+void start_clover_force_sendrecv(suNf_field *gf) {
 #ifdef WITH_MPI
   int i, mpiret;(void)mpiret; // Remove warning of variable set but not used
   geometry_descriptor *gd=gf->type;
@@ -366,7 +366,7 @@ void start_clover_force_sendrecv(suNfc_field *gf) {
   for (i=0; i<(gd->nbuffers_gauge); ++i) {
     /* send ith buffer */
     mpiret=MPI_Isend((gf->ptr)+6*gd->sbuf_start[i], /* buffer */
-        (gd->sbuf_len[i])*sizeof(suNfc)/sizeof(double)*6, /* lenght in units of doubles */
+        (gd->sbuf_len[i])*sizeof(suNf)/sizeof(double)*6, /* lenght in units of doubles */
         MPI_DOUBLE, /* basic datatype */
         gd->sbuf_to_proc[i], /* cid of destination */
         i, /* tag of communication */
@@ -385,7 +385,7 @@ void start_clover_force_sendrecv(suNfc_field *gf) {
 
     /* receive ith buffer */
     mpiret=MPI_Irecv((gf->ptr)+6*gd->rbuf_start[i], /* buffer */
-        (gd->rbuf_len[i])*sizeof(suNfc)/sizeof(double)*6, /* lenght in units of doubles */
+        (gd->rbuf_len[i])*sizeof(suNf)/sizeof(double)*6, /* lenght in units of doubles */
         MPI_DOUBLE, /* basic datatype */
         gd->rbuf_from_proc[i], /* cid of origin */
         i, /* tag of communication */
