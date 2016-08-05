@@ -122,12 +122,6 @@ int update_ghmc()
       return -1;
     }
 
-  /* init monomials */
-  for (int i=0;i<num_mon();++i) {
-    const monomial *m = mon_n(i);
-    m->init_traj(m);
-  }
-  
   /* generate new momenta */
   lprintf("HMC",30,"Generating gaussian momenta and pseudofermions...\n");
   gaussian_momenta(momenta);

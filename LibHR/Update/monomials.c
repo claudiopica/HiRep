@@ -51,6 +51,9 @@ const monomial *add_mon(monomial_data *mon_dat) {
     case PureGauge:
       new_mon->m = pg_create(mon_dat);
       break;
+    case LuscherWeisz:
+      new_mon->m = lw_create(mon_dat);
+      break;
     case HMC:
       new_mon->m = hmc_create(mon_dat);
       break;

@@ -14,7 +14,7 @@
 #include "global.h"
 #include "linear_algebra.h"
 
-#define MAX_SECTIONS 8
+#define MAX_SECTIONS 16
 #define MAX_VALUES   16
 #define MAX_LENGTH   64
 
@@ -121,7 +121,26 @@ static void setup_monomials()
 
          // Monomial information
          lprintf("ACTION", 10, "Monomial %d: level = %d, type = gauge, beta = %1.6f\n", i, level, par->beta);
-      } 
+      }
+		else if(strcmp(type, "lw_gauge") == 0)
+		{
+			mon_lw_par *par = malloc(sizeof(*par));
+			data.par = par;
+			data.type = LuscherWeisz;
+			
+			// Find parameters
+			par->beta = find_double(cur, "beta");
+			check(last_error, "Unable to find 'beta' in monomial of type 'lw_gauge'\n");
+			
+			par->c0 = find_double(cur, "c0");
+			check(last_error, "Unable to find 'c0' in monomial of type 'lw_gauge'\n");
+			
+			// Add monomial
+			mret = add_mon(&data);
+			
+			// Monomial information
+			lprintf("ACTION", 10, "Monomial %d: level = %d, type = lw_gauge, beta = %1.6f, c0 = %1.6f\n", i, level, par->beta, par->c0);
+		}
       else if(strcmp(type, "hmc") == 0)
       {
          mon_hmc_par *par = malloc(sizeof(*par));
@@ -340,21 +359,25 @@ static void setup_monomials()
          // Find parameters
          par->gamma = find_double(cur, "gamma");
          check(last_error, "Unable to find 'gamma' in monomial of type 'four_fermion'\n");
+
          par->start_config = find_string(cur, "auxfield_start");
          check(last_error, "Unable to find 'auxfield_start' in monomial of type 'four_fermion'\n");
-         if(strcmp(par->start_config, "cold") == 0){
-           par->start_value = find_double(cur, "start_value");
-	   check(last_error, "Unable to find 'start_value' in monomial of type 'four_fermion' with cold start\n");
-	 }
-         
+
+			if(strcmp(par->start_config, "cold") == 0)
+			{
+				par->start_value = find_double(cur, "start_value");
+				check(last_error, "Unable to find 'start_value' in monomial of type 'four_fermion' with cold start\n");
+			}
+
          // Add monomial
          mret = add_mon(&data);
 
          // Monomial information
          lprintf("ACTION", 10, "Monomial %d: level = %d, type = four fermion, gamma = %1.6f\n, ", i, level, par->gamma);
-         if(strcmp(par->start_config, "cold") == 0){
-	    lprintf("ACTION", 10, "Starting from cold configuration with sigma=%1.6f\n", par->start_config); 
-	 }       
+			if(strcmp(par->start_config, "cold") == 0)
+			{
+				lprintf("ACTION", 10, "Starting from cold configuration with sigma=%1.6f\n", par->start_config);
+			}
       }
       else if(strcmp(type, "hmc_ff") == 0)  //pseudofermion with four fermion interaction
       {
@@ -364,16 +387,16 @@ static void setup_monomials()
 
          // Find parameters
          par->mass = find_double(cur, "mass");
-         check(last_error, "Unable to find 'mass' in monomial of type 'hmc'\n");
+         check(last_error, "Unable to find 'mass' in monomial of type 'hmc_ff'\n");
 
          data.MT_prec = find_double(cur, "mt_prec");
-         check(last_error, "Unable to find 'mt_prec' in monomial of type 'hmc'\n");
+         check(last_error, "Unable to find 'mt_prec' in monomial of type 'hmc_ff'\n");
 
          data.force_prec = find_double(cur, "force_prec");
-         check(last_error, "Unable to find 'force_prec' in monomial of type 'hmc'\n");
+         check(last_error, "Unable to find 'force_prec' in monomial of type 'hmc_ff'\n");
 
          par->mre_past = find_double(cur, "mre_past");
-         check(last_error, "Unable to find 'mre_past' in monomial of type 'hmc'\n");
+         check(last_error, "Unable to find 'mre_past' in monomial of type 'hmc_ff'\n");
 
          // Add monomial
          mret = add_mon(&data);

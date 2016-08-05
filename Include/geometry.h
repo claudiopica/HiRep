@@ -10,12 +10,7 @@
  * For different actions it must be modified
  */
 
-#ifdef TLSYM
-#define BORDERSIZE 2
-#else
 #define BORDERSIZE 1
-#endif
-
 
 typedef struct _geometry_descriptor {
   int inner_master_pieces; /* number of inner pieces (1 o 2 for even odd or no_eo)) */

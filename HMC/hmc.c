@@ -216,14 +216,7 @@ int main(int argc,char *argv[]) {
   init_mc(&flow, input_filename);
   lprintf("MAIN",0,"MVM during HMC initialization: %ld\n",getMVM());
   lprintf("MAIN",0,"Initial plaquette: %1.8e\n",avr_plaquette());
-#ifdef TLSYM
-  test_geometry_mpi_eo();	// should fail if more than 1 direction of parallelization 
-  full_rect_1x2();
-  test_rect_staples_1x2();
-  lprintf("MAIN",0,"Initial rectangle: %1.8e\n",avr_rect_1x2());
-#endif
-   
-  
+ 
   if(strcmp(mes_var.make,"true")==0) {
     init_meson_correlators(0);
     lprintf("MAIN",0,"Measuring Gamma Gamma correlators and PCAC-mass\n");
@@ -314,16 +307,12 @@ int main(int argc,char *argv[]) {
 #endif
 
     if((i%flow.meas_freq)==0) {
-#ifdef TLSYM
-      /* plaquette and rectangle if TLSYM */
-      lprintf("MAIN",0,"Plaquette: %1.8e  Rectangle: %1.8e\n",avr_plaquette(),avr_rect_1x2());
-#else
       /* plaquette */
       lprintf("MAIN",0,"Plaquette: %1.8e\n",avr_plaquette());
-#endif 
+
       /* Mesons */
       if(strcmp(mes_var.make,"true")==0) {
-	measure_spectrum_semwall(1,&mes_var.mesmass,mes_var.nhits,i,mes_var.precision);
+			measure_spectrum_semwall(1,&mes_var.mesmass,mes_var.nhits,i,mes_var.precision);
       }
 
       /* Four fermion observables */

@@ -12,13 +12,8 @@
 
 void staples(int ix,int mu,suNg *v);
 void test_staples();
-#ifdef TLSYM
-void rect_staples_1x2(int ix,int mu,suNg *v);
-void test_rect_staples_1x2();
-#endif
 
 void cabmar(double beta,suNg *u, suNg *v,int type);
-
 void project_gauge_field(void);
 
 void update(double beta,int nhb,int nor);
@@ -63,9 +58,12 @@ typedef struct {
   double gamma;
 } force_auxfield_par;
 
-
 void force_measure_begin();
 void force_measure_end(int, const char*, double, int);
+
+void lw_force(double dt, suNg_av_field *force, void *vpar);
+void lw_local_action(scalar_field *loc_action, double beta, double c0, double c1);
+
 void force_fermion_core(spinor_field*, spinor_field*, suNg_av_field*, int, double, double);
 void force_logdet_core(suNg_av_field*, double, double, double);
 
@@ -90,6 +88,7 @@ void calc_one_force(int n_force);
 /* Action structures */
 typedef enum {
   PureGauge,
+  LuscherWeisz,
   FourFermion,
   HMC,
   RHMC,
@@ -106,7 +105,12 @@ typedef struct _mon_pg_par {
   double beta;
 } mon_pg_par;
 
-//Parameters for the four fermion auxiliary field monomial
+typedef struct _mon_lw_par {
+	double beta;
+	double c0;
+	double c1;
+} mon_lw_par;
+
 typedef struct _mon_ff_par {
   double gamma;
   char *start_config;  //cold -> set sigmafield to start_value, pi to 0
@@ -174,7 +178,6 @@ typedef struct _monomial {
   void (*force_f)(double dt, suNg_av_field *force, void *par); /* force function */
   void *force_par; /* parameters for the force function */
 
-  void (*init_traj)(const struct _monomial *m);
   void (*gaussian_pf)(const struct _monomial *m);
   void (*correct_pf)(const struct _monomial *m);
   void (*correct_la_pf)(const struct _monomial *m);
@@ -184,6 +187,7 @@ typedef struct _monomial {
 } monomial;
 
 struct _monomial* pg_create(const monomial_data *data);
+struct _monomial* lw_create(const monomial_data *data);
 struct _monomial* hmc_create(const monomial_data *data);
 struct _monomial* rhmc_create(const monomial_data *data);
 struct _monomial* tm_create(const monomial_data *data);

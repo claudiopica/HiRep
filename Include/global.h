@@ -104,7 +104,13 @@ GLB_VAR(geometry_descriptor,glat_odd_red,={0});
 GLB_VAR(geometry_descriptor,glat_even_black,={0});
 GLB_VAR(geometry_descriptor,glat_odd_black,={0}); 
 GLB_VAR(geometry_descriptor,glat_red,={0});
-GLB_VAR(geometry_descriptor,glat_black,={0}); 
+GLB_VAR(geometry_descriptor,glat_black,={0});
+
+#ifdef UPDATE_EO
+#define glat_default glat_even
+#else
+#define glat_default glattice
+#endif
 
 /* Memory */
 typedef enum _mem_t {

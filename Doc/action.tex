@@ -55,8 +55,8 @@ The table below show the different integrators implemented in the HiRep code. Th
 \end{center}
 
 \newpage
-\subsection*{Gauge}
-The gauge monomial is the standard Wilson plaquette action.
+\subsection*{Plaquette gauge}
+This gauge monomial is the standard Wilson plaquette action.
 \begin{equation}
  S = -\frac{\beta}{N}\sum_{x,\mu>\nu} \textrm{Re}~\textrm{tr}(U_\mu(x)U_\nu(x+\hat{\mu})U_\mu^\dagger(x+\hat{\nu})U_\nu^\dagger(x))
 \end{equation}
@@ -87,6 +87,46 @@ monomial {
  \verb|id|    & unique monomial id \\
  \verb|type|  & monomial type \\
  \verb|beta|  & bare coupling for the gauge field \\
+ \verb|level| & integrator level where the monomial force is evaluated
+\end{tabular}
+\end{center}
+
+\newpage
+\newpage
+\subsection*{L\"uscher-Weisz gauge}
+This gauge monomial is the L\"uscher-Weisz (tree-level Symanzik) gauge action, including the $1\times1$ plaquettes $P_{\mu\nu}$ and the $1\times2$ rectangular loops $R_{\mu\nu}$. The two coefficients below are related through $c_0+8c_1=1$ to ensure the correct continuum limit.
+\begin{equation}
+ S = -\frac{\beta}{N}\sum_{x,\mu>\nu} c_0\textrm{Re}~\textrm{tr}[P_{\mu\nu}(x)] + c_1\textrm{Re}~\textrm{tr}[R_{\mu\nu}(x)+R_{\nu\mu}(x)]
+\end{equation}
+
+The example below show how to specify a gauge monomial in the input file.
+\begin{center}
+\begin{minipage}{48mm}
+\begin{framed}
+\begin{verbatim}
+monomial {
+    id = 0
+    type = lw_gauge
+    c0 = 1.666667
+    beta = 2.0
+    level = 0
+}
+\end{verbatim}
+\vspace{-5mm}
+\end{framed}
+\end{minipage}
+\end{center}
+
+\vspace{2mm}
+
+\begin{center}
+\begin{tabular}{l|l}
+ Variable & Description \\
+ \hline
+ \verb|id|    & unique monomial id \\
+ \verb|type|  & monomial type \\
+ \verb|beta|  & bare coupling for the gauge field \\
+ \verb|c0|    & coefficient in front of the plaquette term \\
  \verb|level| & integrator level where the monomial force is evaluated
 \end{tabular}
 \end{center}
