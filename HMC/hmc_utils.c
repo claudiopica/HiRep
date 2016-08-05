@@ -13,6 +13,7 @@
 #include "memory.h"
 #include "utils.h"
 #include "communications.h"
+#include "clover_tools.h"
 
 #include <stdio.h>
 #include <string.h>
