@@ -34,7 +34,7 @@ static int init = 0;
 static void measure_renormalization_core(spinor_field* psi_in, spinor_field* psi_out, int nm, int pt_in, int px_in, int py_in, int pz_in, int pt_out, int px_out, int py_out, int pz_out){
   int i, ix,t,x,y,z,a,beta;
   double pinx, poutx;
-  complex eipinx, eipoutx;
+  double complex eipinx, eipoutx;
   suNf_propagator Sin,Sout,Sout_dag,Stmp1,Stmp2,Stmp3, Stmp4, Sf;
 
   for(i=0; i<nm; i++) {
@@ -43,8 +43,8 @@ static void measure_renormalization_core(spinor_field* psi_in, spinor_field* psi
 	  pinx = 2.0*PI*(((double) pt_in)*(t+zerocoord[0])/GLB_T + ((double) px_in)*(x+zerocoord[1])/GLB_X + ((double) py_in)*(y+zerocoord[2])/GLB_Y + ((double) pz_in)*(z+zerocoord[3])/GLB_Z);
 	  poutx = 2.0*PI*(((double) pt_out)*(t+zerocoord[0])/GLB_T + ((double) px_out)*(x+zerocoord[1])/GLB_X + ((double) py_out)*(y+zerocoord[2])/GLB_Y + ((double) pz_out)*(z+zerocoord[3])/GLB_Z);
 
-	  eipinx.re = cos(pinx); eipinx.im = -sin(pinx);
-	  eipoutx.re = cos(poutx); eipoutx.im = -sin(poutx);
+	  eipinx = cos(pinx)-I*sin(pinx);
+	  eipoutx= cos(poutx)-I*sin(poutx);
 
 	  for (a=0;a<NF;++a){
 	    for (beta=0;beta<4;beta++){ 
@@ -331,7 +331,7 @@ static void print_renormalization_core(int channel,int conf, int nm, double* mas
     lprintf("MAIN",0,"conf #%d mass=%2.6f %s %s p_in(%d,%d,%d,%d) p_out(%d,%d,%d,%d) =",conf,mass[i],label,tr_channel_names[channel], pt_in, px_in, py_in, pz_in, pt_out, px_out, py_out, pz_out );
 
     for(a=0;a<NF;a++) for(alpha=0;alpha<4;alpha++) for(b=0;b<NF;b++) for(beta=0;beta<4;beta++){
-	lprintf("MAIN",0," ( %1.12g , %1.12g ) ", _PROP_AT(tr_corr[channel][i],a,alpha,beta,b).re, _PROP_AT(tr_corr[channel][i],a,alpha,beta,b).im );
+            lprintf("MAIN",0," ( %1.12g , %1.12g ) ", creal(_PROP_AT(tr_corr[channel][i],a,alpha,beta,b)), creal(_PROP_AT(tr_corr[channel][i],a,alpha,beta,b)) );
     	}
     lprintf("MAIN",0,"\n");
      
@@ -343,12 +343,15 @@ static void print_renormalization_core(int channel,int conf, int nm, double* mas
 void print_renormalization(int conf, int nm, double* mass, char* label, int pt_in, int px_in, int py_in, int pz_in, int pt_out, int px_out, int py_out, int pz_out){
   int k,a,b,alpha,beta,i;
 
+  double loc[2];
   if (init !=0 ){
    for(i=0; i<nm; i++) { 
     for(k=0; k<NCHANNELSR; k++) {
       for(a=0;a<NF;a++) for(alpha=0;alpha<4;alpha++) for(beta=0;beta<4;beta++) for(b=0;b<NF;b++) {
-      	global_sum( &_PROP_AT(tr_corr[k][i],a,alpha,beta,b).re ,1);
-      	global_sum( &_PROP_AT(tr_corr[k][i],a,alpha,beta,b).im ,1);
+              loc[0]=creal(_PROP_AT(tr_corr[k][i],a,alpha,beta,b));
+              loc[1]=cimag(_PROP_AT(tr_corr[k][i],a,alpha,beta,b));
+              global_sum( loc ,2);
+              _PROP_AT(tr_corr[k][i],a,alpha,beta,b)=loc[0]+I*loc[1];
       }
       _propagator_mul_assign( tr_corr[k][i], (1./(double)GLB_VOLUME) );
       print_renormalization_core(k,conf,nm,mass,label,pt_in, px_in, py_in, pz_in, pt_out, px_out, py_out, pz_out);

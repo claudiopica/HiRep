@@ -26,7 +26,7 @@ static double hmass=0.1;
 static suNg_field *g;
 
 
-static void D(spinor_field *out, spinor_field *in){
+static void loc_D(spinor_field *out, spinor_field *in){
    Dphi(hmass,out,in);
 }
 
@@ -151,7 +151,7 @@ int main(int argc,char *argv[])
   
   lprintf("MAIN",0,"Gauge covariance of the Dirac operator:\n");
   
-  D(s1,s0);
+  loc_D(s1,s0);
   
   transform_s(s2,s1);
   
@@ -161,7 +161,7 @@ int main(int argc,char *argv[])
   transform_u();
   
   spinor_field_zero_f(s1);
-  D(s1,s3);
+  loc_D(s1,s3);
   
   
   spinor_field_mul_add_assign_f(s1,-1.0,s2);

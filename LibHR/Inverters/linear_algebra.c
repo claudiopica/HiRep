@@ -23,7 +23,7 @@
 #define _SPINOR_TYPE suNf_spinor
 #define _FUNC(a) a##_f
 #define _REAL double
-#define _COMPLEX complex
+#define _COMPLEX double complex
 
 #include "TMPL/linear_algebra.c.sdtmpl"
 void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
@@ -44,7 +44,7 @@ void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
 #define _SPINOR_TYPE suNf_spinor_flt
 #define _FUNC(a) a##_f_flt
 #define _REAL float
-#define _COMPLEX complex_flt
+#define _COMPLEX float complex
 
 #include "TMPL/linear_algebra.c.sdtmpl"
 void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {

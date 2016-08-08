@@ -28,7 +28,7 @@ static suNg_field *g;
 
 
 
-static void D(spinor_field *out, spinor_field *in){
+static void loc_D(spinor_field *out, spinor_field *in){
    Dphi(hmass,out,in);
 }
 

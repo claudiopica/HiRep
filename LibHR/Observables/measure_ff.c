@@ -41,7 +41,7 @@ static int init = 0;
 static void measure_formfactor_core(spinor_field* psi0, spinor_field* psi1, spinor_field* eta, int nm, int tau, int tf, int n_mom, int offset,int lt, int* pt){
   int i,ix,t,x,y,z,beta,px,py,pz,tc,a,ixmu;
   double pdotx,cpdotx,spdotx;
-  complex tr;
+  double complex tr;
   suNf_propagator sp0,sp1,Usp,spf,sptmp1,sptmp2,sptmp3,spdag;
   suNf *u1;
 
@@ -73,23 +73,23 @@ static void measure_formfactor_core(spinor_field* psi0, spinor_field* psi1, spin
 
 		  //Pion
 		  _propagator_muldag_trace(tr,sp1,sp1);
-		  corr[_g5_ff][corr_ind(px,py,pz,n_mom,tc,nm)] += (cpdotx*tr.re + spdotx*tr.im);		  
+		  corr[_g5_ff][corr_ind(px,py,pz,n_mom,tc,nm)] += (cpdotx*creal(tr) + spdotx*cimag(tr));		  
 
 		  // Local vector current (pipig)
 		  //Sequential source  
 		  _g5g0_propagator(sptmp2, sp0);
 		  _propagator_mul(sptmp1, sptmp2, spdag); // g5 g0 G(x,0) S(y,0)^dagger
 		  _propagator_trace(tr,sptmp1);
-		  corr[_pipig_ff_re][corr_ind(px,py,pz,n_mom,tc,nm)] += +0.5*(cpdotx*tr.re + spdotx*tr.im);
-		  corr[_pipig_ff_im][corr_ind(px,py,pz,n_mom,tc,nm)] += +0.5*(spdotx*tr.re - cpdotx*tr.im);
+		  corr[_pipig_ff_re][corr_ind(px,py,pz,n_mom,tc,nm)] += +0.5*(cpdotx*creal(tr) + spdotx*cimag(tr));
+		  corr[_pipig_ff_im][corr_ind(px,py,pz,n_mom,tc,nm)] += +0.5*(spdotx*creal(tr) - cpdotx*cimag(tr));
 
 		  //2nd contraction
 		  _g5g0_propagator(sptmp1, sp1);
 		  _propagator_dagger(sptmp2,sp0); //G(y,0)^dagger
 		  _propagator_mul(spf, sptmp2, sptmp1); // G(y,0)^dagger g5 g0 S(y,0)
 		  _propagator_trace(tr,spf);
-		  corr[_pipig_ff_re][corr_ind(px,py,pz,n_mom,tc,nm)] += -0.5*(cpdotx*tr.re + spdotx*tr.im);
-		  corr[_pipig_ff_im][corr_ind(px,py,pz,n_mom,tc,nm)] += -0.5*(spdotx*tr.re - cpdotx*tr.im);
+		  corr[_pipig_ff_re][corr_ind(px,py,pz,n_mom,tc,nm)] += -0.5*(cpdotx*creal(tr) + spdotx*cimag(tr));
+		  corr[_pipig_ff_im][corr_ind(px,py,pz,n_mom,tc,nm)] += -0.5*(spdotx*creal(tr) - cpdotx*cimag(tr));
 		  
 		  //Conserved vector current
 
@@ -121,7 +121,7 @@ static void measure_formfactor_core(spinor_field* psi0, spinor_field* psi1, spin
 		  _propagator_mul(sptmp1,spdag,sptmp2);	
 		  _propagator_sub(sptmp2,sptmp3,sptmp1);
 		  _propagator_trace(tr,sptmp2);    
-		  corr[_pipig_conserved_ff][corr_ind(px,py,pz,n_mom,tc,nm)] += 0.5*(cpdotx*tr.re + spdotx*tr.im);
+		  corr[_pipig_conserved_ff][corr_ind(px,py,pz,n_mom,tc,nm)] += 0.5*(cpdotx*creal(tr) + spdotx*cimag(tr));
 		} //END SPATIAL LOOP
 	  } //END T LOOP
 	} //END MASS LOOP

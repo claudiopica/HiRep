@@ -55,11 +55,13 @@ double plaq(int ix,int mu,int nu)
 #endif
 }
 
-void cplaq(complex *ret,int ix,int mu,int nu)
+void cplaq(double complex *ret,int ix,int mu,int nu)
 {
   int iy,iz;
   suNg *v1,*v2,*v3,*v4,w1,w2,w3;
-
+  double tmpre=0.;
+  double tmpim=0.;
+  
   iy=iup(ix,mu);
   iz=iup(ix,nu);
 
@@ -72,20 +74,19 @@ void cplaq(complex *ret,int ix,int mu,int nu)
   _suNg_times_suNg(w2,(*v4),(*v3));
   _suNg_times_suNg_dagger(w3,w1,w2);
 
-  _suNg_trace_re(ret->re,w3);
-#ifdef GAUGE_SON
-  ret->im=0;
-#else
-  _suNg_trace_im(ret->im,w3);
-#endif
+  _suNg_trace_re(tmpre,w3);
 
+#ifndef GAUGE_SON
+  _suNg_trace_im(tmpim,w3);
+#endif
+  *ret = tmpre + I*tmpim;
+  
 #ifdef PLAQ_WEIGHTS
   if(plaq_weight!=NULL) {
-    ret->re *= plaq_weight[ix*16+mu*4+nu];
-    ret->im *= plaq_weight[ix*16+mu*4+nu];
+    *ret *= plaq_weight[ix*16+mu*4+nu];
   }
 #endif
-
+  
 }
 
 
@@ -118,13 +119,13 @@ double avr_plaquette()
 
 void full_plaquette()
 {
-	complex pa[6];
-	double r0re = 0, r0im = 0;
-	double r1re = 0, r1im = 0;
-	double r2re = 0, r2im = 0;
-	double r3re = 0, r3im = 0;
-	double r4re = 0, r4im = 0;
-	double r5re = 0, r5im = 0;
+	double complex pa[6];
+	double complex r0 = 0;
+	double complex r1 = 0;
+	double complex r2 = 0;
+	double complex r3 = 0;
+	double complex r4 = 0;
+	double complex r5 = 0;
 
 	_PIECE_FOR(&glattice,ixp)
 	{
@@ -138,31 +139,25 @@ void full_plaquette()
 
 		_SITE_FOR_SUM(&glattice,ixp,ix,r0re,r0im,r1re,r1im,r2re,r2im,r3re,r3im,r4re,r4im,r5re,r5im)
 		{
-			complex tmp;
+			double complex tmp;
 
 			cplaq(&tmp,ix,1,0);
-			r0re += tmp.re;
-			r0im += tmp.im;
+			r0 += tmp;
 
 			cplaq(&tmp,ix,2,0);
-			r1re += tmp.re;
-			r1im += tmp.im;
+			r1 += tmp;
 
 			cplaq(&tmp,ix,2,1);
-			r2re += tmp.re;
-			r2im += tmp.im;
+			r2 += tmp;
 
 			cplaq(&tmp,ix,3,0);
-			r3re += tmp.re;
-			r3im += tmp.im;
+			r3 += tmp;
 
 			cplaq(&tmp,ix,3,1);
-			r4re += tmp.re;
-			r4im += tmp.im;
+			r4 += tmp;
 
 			cplaq(&tmp,ix,3,2);
-			r5re += tmp.re;
-			r5im += tmp.im;
+			r5 += tmp;
 
 		  /*if(twbc_plaq[ix*16+2*4+1]==-1 &&
 		    twbc_plaq[ix*16+3*4+1]==-1 &&
@@ -184,26 +179,25 @@ void full_plaquette()
 		}
 	}
 
-	pa[0].re=r0re; pa[0].im=r0im;
-	pa[1].re=r1re; pa[1].im=r1im;
-	pa[2].re=r2re; pa[2].im=r2im;
-	pa[3].re=r3re; pa[3].im=r3im;
-	pa[4].re=r4re; pa[4].im=r4im;
-	pa[5].re=r5re; pa[5].im=r5im;
+	pa[0]=r0;
+	pa[1]=r1;
+	pa[2]=r2;
+	pa[3]=r3;
+	pa[4]=r4;
+	pa[5]=r5;
 
 	global_sum((double*)pa,12);
 	for(int k = 0; k < 6; k++)
 	{
-		pa[k].re /= GLB_VOLUME*NG;
-		pa[k].im /= GLB_VOLUME*NG;
+		pa[k] /= GLB_VOLUME*NG;
 	}
 
-	lprintf("PLAQ",0,"Plaq(%d,%d) = ( %f , %f )\n",1,0,pa[0].re,pa[0].im);
-	lprintf("PLAQ",0,"Plaq(%d,%d) = ( %f , %f )\n",2,0,pa[1].re,pa[1].im);
-	lprintf("PLAQ",0,"Plaq(%d,%d) = ( %f , %f )\n",2,1,pa[2].re,pa[2].im);
-	lprintf("PLAQ",0,"Plaq(%d,%d) = ( %f , %f )\n",3,0,pa[3].re,pa[3].im);
-	lprintf("PLAQ",0,"Plaq(%d,%d) = ( %f , %f )\n",3,1,pa[4].re,pa[4].im);
-	lprintf("PLAQ",0,"Plaq(%d,%d) = ( %f , %f )\n",3,2,pa[5].re,pa[5].im);
+	lprintf("PLAQ",0,"Plaq(%d,%d) = ( %f , %f )\n",1,0,creal(pa[0]),cimag(pa[0]));
+	lprintf("PLAQ",0,"Plaq(%d,%d) = ( %f , %f )\n",2,0,creal(pa[1]),cimag(pa[1]));
+	lprintf("PLAQ",0,"Plaq(%d,%d) = ( %f , %f )\n",2,1,creal(pa[2]),cimag(pa[2]));
+	lprintf("PLAQ",0,"Plaq(%d,%d) = ( %f , %f )\n",3,0,creal(pa[3]),cimag(pa[3]));
+	lprintf("PLAQ",0,"Plaq(%d,%d) = ( %f , %f )\n",3,1,creal(pa[4]),cimag(pa[4]));
+	lprintf("PLAQ",0,"Plaq(%d,%d) = ( %f , %f )\n",3,2,creal(pa[5]),cimag(pa[5]));
 }
 
 double local_plaq(int ix)

@@ -1,5 +1,5 @@
 #include "spin_matrix.h"
-#include "complex.h"
+#include "hr_complex.h"
 #include "global.h"
 #include "meson_observables.h"
 #include <math.h>
@@ -63,7 +63,7 @@ int tsplit(int ipt, int delta)
 void measure_scattering_AD_core(meson_observable* mo, spinor_field* psi0,spinor_field* psi1,spinor_field* psi2,spinor_field* psi3, int tau, int split, int n_mom, int p_tot_x, int p_tot_y, int p_tot_z){
 
 	int px, py, pz, t, x, y, z, ix, ix_split, beta, tc, splittmp;
-	complex  trtmp;
+	double complex  trtmp;
 	double tr1re[GLB_T],tr2re[GLB_T],tr1im[GLB_T],tr2im[GLB_T];
 	double pdotx, cpdotx, spdotx;
 	suNf_spin_matrix sm0, sm1, sm2, sm3;
@@ -103,16 +103,16 @@ void measure_scattering_AD_core(meson_observable* mo, spinor_field* psi0,spinor_
 				pdotx = 2.0*PI*( ((double) px)*(x+zerocoord[1])/GLB_X + ((double) py)*(y+zerocoord[2])/GLB_Y + ((double) pz)*(z+zerocoord[3])/GLB_Z);
 				cpdotx=cos(pdotx);
 				spdotx=sin(pdotx);
-				tr1re[tc]+=trtmp.re*cpdotx+trtmp.im*spdotx;
-				tr1im[tc]+=trtmp.im*cpdotx-trtmp.re*spdotx;
+				tr1re[tc]+=creal(trtmp)*cpdotx+cimag(trtmp)*spdotx;
+				tr1im[tc]+=cimag(trtmp)*cpdotx-creal(trtmp)*spdotx;
 
 				//Contracting pion 2
 				_spinmatrix_mul_trace(trtmp, sm3, sm2); // Tr(SM3^\dagger SM2)
 				pdotx = 2.0*PI*( ((double) (p_tot_x - px) )*(x+zerocoord[1])/GLB_X + ((double) (p_tot_y - py))*(y+zerocoord[2])/GLB_Y + ((double) (p_tot_z - pz))*(z+zerocoord[3])/GLB_Z);
 				cpdotx=cos(pdotx);
 				spdotx=sin(pdotx);
-				tr2re[tc]+=trtmp.re*cpdotx+trtmp.im*spdotx;
-				tr2im[tc]+=trtmp.im*cpdotx-trtmp.re*spdotx;
+				tr2re[tc]+=creal(trtmp)*cpdotx+cimag(trtmp)*spdotx;
+				tr2im[tc]+=cimag(trtmp)*cpdotx-creal(trtmp)*spdotx;
 			}
 		}
 
@@ -144,10 +144,10 @@ void measure_scattering_AD_core(meson_observable* mo, spinor_field* psi0,spinor_
 void measure_scattering_BC_core(meson_observable* mo, spinor_field* psi0,spinor_field* psi1, spinor_field* psi2,spinor_field* psi3, int tau, int split, int n_mom, int p_tot_x, int p_tot_y, int p_tot_z){
 
 	int px, py, pz, t, x, y, z, ix, ix_split, mu, gamma, tc, splittmp;
-	complex trace, phase;
+	double complex trace, phase;
 	double pdotx;
 	suNf_spin_matrix sm00, sm11, sm21, sm30;
-	complex B1[4][4], B2[4][4];
+	double complex B1[4][4], B2[4][4];
 	double B1re[16*GLB_T], B1im[16*GLB_T], B2re[16*GLB_T], B2im[16*GLB_T];
 	meson_observable* motmp;
 
@@ -194,15 +194,13 @@ void measure_scattering_BC_core(meson_observable* mo, spinor_field* psi0,spinor_
 
 				// Multiply by phases now, rest of the code will remain unchanged
 				pdotx = 2.0*PI*(((double) px)*(x+zerocoord[1])/GLB_X + ((double) py)*(y+zerocoord[2])/GLB_Y + ((double) pz)*(z+zerocoord[3])/GLB_Z);
-				phase.re = cos(pdotx);
-				phase.im = -sin(pdotx);
+				phase = cos(pdotx) - I*sin(pdotx);
 				for (mu=0;mu<4;mu++){ for (gamma=0;gamma<4;gamma++){
 					_vector_mulc_f(sm00.c[mu].c[gamma], phase, sm00.c[mu].c[gamma]);
 				}}
 
 				pdotx = 2.0*PI*(((double) p_tot_x - (double) px)*(x+zerocoord[1])/GLB_X + ((double) p_tot_y - (double) py)*(y+zerocoord[2])/GLB_Y + ((double) p_tot_z - (double) pz)*(z+zerocoord[3])/GLB_Z);
-				phase.re = cos(pdotx);
-				phase.im = -sin(pdotx);
+				phase = cos(pdotx) -I*sin(pdotx);
 				for (mu=0;mu<4;mu++){ for (gamma=0;gamma<4;gamma++){
 					_vector_mulc_f(sm21.c[mu].c[gamma], phase, sm21.c[mu].c[gamma]);
 				}}
@@ -217,10 +215,10 @@ void measure_scattering_BC_core(meson_observable* mo, spinor_field* psi0,spinor_
 			}
 			// Communications
 			for (mu=0;mu<4;mu++){ for (gamma=0;gamma<4;gamma++) {
-				B1re[4*mu+gamma+16*tc] = B1[mu][gamma].re;
-				B1im[4*mu+gamma+16*tc] = B1[mu][gamma].im;
-				B2re[4*mu+gamma+16*tc] = B2[mu][gamma].re;
-				B2im[4*mu+gamma+16*tc] = B2[mu][gamma].im;
+                            B1re[4*mu+gamma+16*tc] = creal(B1[mu][gamma]);
+                            B1im[4*mu+gamma+16*tc] = cimag(B1[mu][gamma]);
+                            B2re[4*mu+gamma+16*tc] = creal(B2[mu][gamma]);
+                            B2im[4*mu+gamma+16*tc] = cimag(B2[mu][gamma]);
 			}}
 		}
 
@@ -231,12 +229,10 @@ void measure_scattering_BC_core(meson_observable* mo, spinor_field* psi0,spinor_
 		for (t=0; t<GLB_T; t++) {	 
 			tc = (zerocoord[0]+t+splittmp+GLB_T-tau)%GLB_T;
 			for (mu=0;mu<4;mu++){ for (gamma=0;gamma<4;gamma++) {
-				B1[mu][gamma].re = B1re[4*mu+gamma+16*tc];
-				B1[mu][gamma].im = B1im[4*mu+gamma+16*tc];
-				B2[mu][gamma].re = B2re[4*mu+gamma+16*tc];
-				B2[mu][gamma].im = B2im[4*mu+gamma+16*tc];
+				B1[mu][gamma] = B1re[4*mu+gamma+16*tc] +I*B1im[4*mu+gamma+16*tc];
+				B2[mu][gamma] = B2re[4*mu+gamma+16*tc] +I*B2im[4*mu+gamma+16*tc];
 			}}
-			trace.re=0.0; trace.im=0.0;
+			_complex_0(trace);
 			//Trace
 			for (mu=0;mu<4;mu++){ for (gamma=0;gamma<4;gamma++) {
 				_complex_mul_assign(trace, B1[mu][gamma], B2[gamma][mu]);
@@ -244,12 +240,12 @@ void measure_scattering_BC_core(meson_observable* mo, spinor_field* psi0,spinor_
 			//It will be a miracle if this works on the first try...
 			motmp=mo;
 			while (motmp!=NULL){
-				motmp->corr_re[INDEX(px,py,pz,n_mom,tc)] = trace.re; //(GLB_VOL3*GLB_VOL3);
-				motmp->corr_im[INDEX(px,py,pz,n_mom,tc)] = trace.im; //(GLB_VOL3*GLB_VOL3);
-				motmp=motmp->next;
+                          motmp->corr_re[INDEX(px,py,pz,n_mom,tc)] = creal(trace); //(GLB_VOL3*GLB_VOL3);
+                          motmp->corr_im[INDEX(px,py,pz,n_mom,tc)] = cimag(trace); //(GLB_VOL3*GLB_VOL3);
+                          motmp=motmp->next;
 			}
 		}
-	}
+            }
 	/*  motmp=mo;
 	    while (motmp!=NULL){
 	    global_sum(motmp->corr_re, (2*n_mom+1)*(2*n_mom+1)*(2*n_mom+1)*GLB_T);

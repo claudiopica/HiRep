@@ -5,7 +5,7 @@
 
 #include "inverters.h"
 #include "linear_algebra.h"
-#include "complex.h"
+#include "hr_complex.h"
 #include "update.h"
 #include "memory.h"
 #include "logger.h"
@@ -23,9 +23,9 @@ int BiCGstab(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field 
 	spinor_field *r, *r1, *o, *Ms, *Mo, *o0;
 	spinor_field *sptmp;
 
-	complex delta, phi;
-	complex alpha, beta, chi;
-	complex ctmp1, ctmp2;
+	double complex delta, phi;
+	double complex alpha, beta, chi;
+	double complex ctmp1, ctmp2;
 	double rtmp1;
 	double innorm2;
 

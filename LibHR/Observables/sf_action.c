@@ -36,31 +36,22 @@ static double E_8(int ix,int k)
 
 #if NG==4
    _suNg_zero(ilambda8);
-   ((ilambda8).c[0]).re = 0.0;
-   ((ilambda8).c[0]).im = 0.5;
-   ((ilambda8).c[5]).re = 0.0;
-   ((ilambda8).c[5]).im = 0.5;
-   ((ilambda8).c[10]).re = 0.0;
-   ((ilambda8).c[10]).im = -0.5;
-   ((ilambda8).c[15]).re = 0.0;
-   ((ilambda8).c[15]).im = -0.5;
+   ilambda8.c[0] = I*0.5;
+   ilambda8.c[5] = I*0.5;
+   ilambda8.c[10] = -I*0.5;
+   ilambda8.c[15] = -I*0.5;
 #elif NG==3
    _suNg_zero(ilambda8);
-   ((ilambda8).c[0]).re = 0.0;
-   ((ilambda8).c[0]).im = 1.0;
-   ((ilambda8).c[4]).re = 0.0;
-   ((ilambda8).c[4]).im = -0.5;
-   ((ilambda8).c[8]).re = 0.0;
-   ((ilambda8).c[8]).im = -0.5;
+   ilambda8.c[0] = I;
+   ilambda8.c[4] = -I*0.5;
+   ilambda8.c[8] = -I*0.5;
 #elif NG==2
    _suNg_zero(ilambda8);
 #ifdef WITH_QUATERNIONS
-  (ilambda8).c[3]=1.0;
+   ilambda8.c[3] = 1.0;
 #else
-   ((ilambda8).c[0]).re = 0.0;
-   ((ilambda8).c[0]).im = 1.0;
-   ((ilambda8).c[3]).re = 0.0;
-   ((ilambda8).c[3]).im = -1.0;
+   ilambda8.c[0] = I;
+   ilambda8.c[3] = -I;
 #endif
 #else
 #error  "No explicit generator for observable for given NG"
@@ -100,32 +91,23 @@ static double E_8_top(int ix,int k)
   int iy, iz;
 #if NG==4
   _suNg_zero(ilambda8);
-  ((ilambda8).c[0]).re = 0.0;
-  ((ilambda8).c[0]).im = 0.5;
-  ((ilambda8).c[5]).re = 0.0;
-  ((ilambda8).c[5]).im = 0.5;
-  ((ilambda8).c[10]).re = 0.0;
-  ((ilambda8).c[10]).im = -0.5;
-  ((ilambda8).c[15]).re = 0.0;
-  ((ilambda8).c[15]).im = -0.5;
+   ilambda8.c[0] = I*0.5;
+   ilambda8.c[5] = I*0.5;
+   ilambda8.c[10] = -I*0.5;
+   ilambda8.c[15] = -I*0.5;
 #elif NG==3
   _suNg_zero(ilambda8);
-  ((ilambda8).c[0]).re = 0.0;
-  ((ilambda8).c[0]).im = 1.0;
-  ((ilambda8).c[4]).re = 0.0;
-  ((ilambda8).c[4]).im = -0.5;
-  ((ilambda8).c[8]).re = 0.0;
-  ((ilambda8).c[8]).im = -0.5;
+   ilambda8.c[0] = I;
+   ilambda8.c[4] = -I*0.5;
+   ilambda8.c[8] = -I*0.5;
 #elif NG==2
   _suNg_zero(ilambda8);
 #ifdef WITH_QUATERNIONS
-  (ilambda8).c[3]=1.0;
+  ilambda8.c[3] = 1.0;
 #else
   _suNg_zero(ilambda8);
-  ((ilambda8).c[0]).re = 0.0;
-  ((ilambda8).c[0]).im = 1.0;
-  ((ilambda8).c[3]).re = 0.0;
-  ((ilambda8).c[3]).im = -1.0;
+  ilambda8.c[0] = I;
+  ilambda8.c[3] = -I;
 #endif
 #else
 #error "No explicit generator for observable for given NG"

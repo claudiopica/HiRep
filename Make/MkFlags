@@ -1,4 +1,4 @@
-NG = 2
+NG = 3
 REPR = REPR_FUNDAMENTAL
 #REPR = REPR_SYMMETRIC
 #REPR = REPR_ANTISYMMETRIC
@@ -25,8 +25,8 @@ MACRO += -DBC_Z_PERIODIC
 #MACRO += -DROTATED_SF
 
 
-#MACRO += -DUPDATE_EO
-MACRO += -DWITH_MPI
+MACRO += -DUPDATE_EO
+#MACRO += -DWITH_MPI
 #MACRO += -DWITH_QUATERNIONS
 MACRO += -DNDEBUG
 #MACRO += -DCHECK_SPINOR_MATCHING
@@ -40,10 +40,10 @@ MACRO += -DMEASURE_FORCE
 
 #Compiler
 CC = mpicc
-#CC = gcc
-#CC = clang
+#CC = icc
+CC = clang
 #CFLAGS = -Wall -std=c99 -O3 -fomit-frame-pointer -msse -msse2 
-CFLAGS = -Wall -std=c99 -O3
+CFLAGS = -Wall -std=c99 #-O3 -march=core-avx2 -mtune=core-avx2 -g 
 
 
-LDFLAGS = 
+LDFLAGS =

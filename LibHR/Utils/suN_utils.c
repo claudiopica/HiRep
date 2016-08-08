@@ -77,16 +77,14 @@ void project_to_suNg(suNg *u)
 #else
   int i,j;
   suNg_vector *v1,*v2;
-  complex z;
+  double complex z;
 
   v1=(suNg_vector*)(u);
   v2=v1+1;
-   
   normalize(v1);
   for (i=1; i<NG; ++i ) {
     for (j=i; j>0; --j) {
-      _vector_prod_re_g(z.re,*v1, *v2);
-      _vector_prod_im_g(z.im,*v1, *v2);
+      _vector_prod_g(z,*v1, *v2);
       _vector_project_g(*v2, z, *v1);
       ++v1;
     }
@@ -128,7 +126,7 @@ void project_to_suNg_flt(suNg_flt *u)
   
   int i,j;
   suNg_vector_flt *v1,*v2;
-  complex_flt z;
+  float complex z;
 
   v1=(suNg_vector_flt*)(u);
   v2=v1+1;
@@ -136,8 +134,7 @@ void project_to_suNg_flt(suNg_flt *u)
   normalize_flt(v1);
   for (i=1; i<NG; ++i ) {
     for (j=i; j>0; --j) {
-      _vector_prod_re_g(z.re,*v1, *v2);
-      _vector_prod_im_g(z.im,*v1, *v2);
+      _vector_prod_g(z,*v1, *v2);
       _vector_project_g(*v2, z, *v1);
       ++v1;
     }
@@ -161,7 +158,7 @@ void project_cooling_to_suNg(suNg* g_out, suNg* g_in, int cooling)
   int k,l;
   int j,i,ncool;
   double c[NG];
-  complex f[2];
+  double complex f[2];
   double norm;
 
   Ug[0]=*g_in;

@@ -46,51 +46,41 @@ static int safe_mod(int x,int y)
 static suNf_spinor mul_gamma(int mu,suNf_spinor s)
 {
    suNf_spinor r;
-   complex i,m_i,m_1;
-
-   i.re=0.0f;
-   i.im=1.0f;
-
-   m_i.re=0.0f;
-   m_i.im=-1.0f;
-
-   m_1.re=-1.0f;
-   m_1.im=0.0f;
 
    if (mu==0)
    {
-      _vector_mulc_f(r.c[0],m_1,s.c[2]);
-      _vector_mulc_f(r.c[1],m_1,s.c[3]);
-      _vector_mulc_f(r.c[2],m_1,s.c[0]);
-      _vector_mulc_f(r.c[3],m_1,s.c[1]);
+      _vector_mulc_f(r.c[0],-1.0,s.c[2]);
+      _vector_mulc_f(r.c[1],-1.0,s.c[3]);
+      _vector_mulc_f(r.c[2],-1.0,s.c[0]);
+      _vector_mulc_f(r.c[3],-1.0,s.c[1]);
    }
    else if (mu==1)
    {
-      _vector_mulc_f(r.c[0],m_i,s.c[3]);
-      _vector_mulc_f(r.c[1],m_i,s.c[2]);
-      _vector_mulc_f(r.c[2],i,s.c[1]);
-      _vector_mulc_f(r.c[3],i,s.c[0]);
+      _vector_mulc_f(r.c[0],-I,s.c[3]);
+      _vector_mulc_f(r.c[1],-I,s.c[2]);
+      _vector_mulc_f(r.c[2],I,s.c[1]);
+      _vector_mulc_f(r.c[3],I,s.c[0]);
    }
    else if (mu==2)
    {
-      _vector_mulc_f(r.c[0],m_1,s.c[3]);
+      _vector_mulc_f(r.c[0],-1,s.c[3]);
       r.c[1]=s.c[2];
       r.c[2]=s.c[1];
-      _vector_mulc_f(r.c[3],m_1,s.c[0]);
+      _vector_mulc_f(r.c[3],-1,s.c[0]);
    }
    else if (mu==3)
    {
-      _vector_mulc_f(r.c[0],m_i,s.c[2]);
-      _vector_mulc_f(r.c[1],i,s.c[3]);
-      _vector_mulc_f(r.c[2],i,s.c[0]);
-      _vector_mulc_f(r.c[3],m_i,s.c[1]);
+      _vector_mulc_f(r.c[0],-I,s.c[2]);
+      _vector_mulc_f(r.c[1],I,s.c[3]);
+      _vector_mulc_f(r.c[2],I,s.c[0]);
+      _vector_mulc_f(r.c[3],-I,s.c[1]);
    }
    else
    {
       r.c[0]=s.c[0];
       r.c[1]=s.c[1];
-      _vector_mulc_f(r.c[2],m_1,s.c[2]);
-      _vector_mulc_f(r.c[3],m_1,s.c[3]);
+      _vector_mulc_f(r.c[2],-1.0,s.c[2]);
+      _vector_mulc_f(r.c[3],-1.0,s.c[3]);
    }
 
    return r;
@@ -106,7 +96,7 @@ int main(int argc,char *argv[])
    double ran[4],sp[4];
    double pi,p[4];
    double *rs,r,mp,sig,px;
-   complex z;
+   double complex z;
    suNf_spinor s,s0,s1,s2,s3;
    spinor_field *ps0,*ps1,*ps2;
    char tmp[256];
@@ -237,8 +227,7 @@ int main(int argc,char *argv[])
 		  +p[2]*(double)(safe_mod(x2+zerocoord[2]-Y_BORDER-1,GLB_Y)+Y_BORDER+1)
 		  +p[3]*(double)(safe_mod(x3+zerocoord[3]-Z_BORDER-1,GLB_Z)+Z_BORDER+1);
 		
-		z.re=(double)(cos(px));
-		z.im=(double)(sin(px));
+		z=(cos(px))+I*(sin(px));
 		
 		_vector_mulc_f(s0.c[0],z,s.c[0]);
 		_vector_mulc_f(s0.c[1],z,s.c[1]);
@@ -247,8 +236,7 @@ int main(int argc,char *argv[])
 		
 		*_FIELD_AT(ps0,ix) = s0;
 		
-		z.re=mp;
-		z.im=0.0f;
+		z=mp;
 		
 		_vector_mulc_f(s1.c[0],z,s0.c[0]);
 		_vector_mulc_f(s1.c[1],z,s0.c[1]);
@@ -258,8 +246,7 @@ int main(int argc,char *argv[])
 		for (mu=0;mu<4;mu++) {
 		  s2=mul_gamma(mu,s0);
 		  
-		  z.re=0.0f;
-		  z.im=sp[mu];
+		  z=I*sp[mu];
 		  
 		  _vector_mulc_f(s3.c[0],z,s2.c[0]);
 		  _vector_mulc_f(s3.c[1],z,s2.c[1]);

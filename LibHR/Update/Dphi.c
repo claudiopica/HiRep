@@ -636,9 +636,8 @@ void g5Dphi_sq(double m0, spinor_field *out, spinor_field *in) {
 void Qhat_eopre(double m0, double mu, spinor_field* out, spinor_field *in){
   double norm = (4+m0)*(4+m0)+mu*mu;
   double rho = (4+m0)/norm;
-  complex imu;
-  imu.re=0;
-  imu.im=-mu/norm;
+  double complex imu;
+  imu=-I*mu/norm;
   
   error((in==NULL)||(out==NULL),1,"Qhat_eopre [Dphi.c]",
   	"Attempt to access unallocated memory space");
@@ -662,7 +661,7 @@ void Qhat_eopre(double m0, double mu, spinor_field* out, spinor_field *in){
   
   rho = -(4+m0);
   spinor_field_mul_add_assign_f(out,rho,in);
-  imu.im=-mu;
+  imu=-I*mu;
   spinor_field_g5_mulc_add_assign_f(out,imu,in);
 
   spinor_field_minus_f(out,out);

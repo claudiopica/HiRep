@@ -220,10 +220,10 @@ public:
 	cvariable(const char* name) : polynomial()
 	{
 		rmonomial index1;
-		index1.add(string(name)+".re", 1);
+		index1.add("creal("+string(name)+")", 1);
 		orderedlist<rmonomial,complex>::add(index1,complex(1.0,0.0));
 		rmonomial index2;
-		index2.add(string(name)+".im", 1);
+		index2.add("cimag("+string(name)+")", 1);
 		orderedlist<rmonomial,complex>::add(index2,complex(0.0,1.0));
 	}
 

@@ -22,7 +22,7 @@
 #define SPIN_2D_INDEX(i,j) ( (i)*4 + (j) )
 
 double plaq(int ix,int mu,int nu);
-void cplaq(complex *ret,int ix,int mu,int nu);
+void cplaq(double complex *ret,int ix,int mu,int nu);
 double avr_plaquette();
 double SF_action(double beta);
 double local_plaq(int ix);
@@ -55,7 +55,7 @@ typedef struct _ata_qprop_pars {
   double inverter_precision;
 } ata_qprop_pars;
 
-void traced_ata_qprop(complex*** prop, int n_points);
+void traced_ata_qprop(double complex*** prop, int n_points);
 void ata_qprop_init(ata_qprop_pars* p);
 void ata_qprop_free();
 
@@ -139,39 +139,39 @@ void g0g5g3_correlator(double *out, int t0, spinor_field *qp);
 void g5_g0g5_re_correlator(double *out, int t0, spinor_field *qp);
 void g5_g0g5_im_correlator(double *out, int t0, spinor_field *qp);
 
-void id_trace_H(complex* out, complex* smat);
-void g0_trace_H(complex* out, complex* smat);
-void g5_trace_H(complex* out, complex* smat);
-void g0g5_trace_H(complex* out, complex* smat);
-void g1_trace_H(complex* out, complex* smat);
-void g2_trace_H(complex* out, complex* smat);
-void g3_trace_H(complex* out, complex* smat);
-void g0g1_trace_H(complex* out, complex* smat);
-void g0g2_trace_H(complex* out, complex* smat);
-void g0g3_trace_H(complex* out, complex* smat);
-void g5g1_trace_H(complex* out, complex* smat);
-void g5g2_trace_H(complex* out, complex* smat);
-void g5g3_trace_H(complex* out, complex* smat);
-void g0g5g1_trace_H(complex* out, complex* smat);
-void g0g5g2_trace_H(complex* out, complex* smat);
-void g0g5g3_trace_H(complex* out, complex* smat);
+void id_trace_H(double complex* out, double complex* smat);
+void g0_trace_H(double complex* out, double complex* smat);
+void g5_trace_H(double complex* out, double complex* smat);
+void g0g5_trace_H(double complex* out, double complex* smat);
+void g1_trace_H(double complex* out, double complex* smat);
+void g2_trace_H(double complex* out, double complex* smat);
+void g3_trace_H(double complex* out, double complex* smat);
+void g0g1_trace_H(double complex* out, double complex* smat);
+void g0g2_trace_H(double complex* out, double complex* smat);
+void g0g3_trace_H(double complex* out, double complex* smat);
+void g5g1_trace_H(double complex* out, double complex* smat);
+void g5g2_trace_H(double complex* out, double complex* smat);
+void g5g3_trace_H(double complex* out, double complex* smat);
+void g0g5g1_trace_H(double complex* out, double complex* smat);
+void g0g5g2_trace_H(double complex* out, double complex* smat);
+void g0g5g3_trace_H(double complex* out, double complex* smat);
 
-void id_debug(complex Gamma[4][4], int* sign);
-void g0_debug(complex Gamma[4][4], int* sign);
-void g5_debug(complex Gamma[4][4], int* sign);
-void g0g5_debug(complex Gamma[4][4], int* sign);
-void g1_debug(complex Gamma[4][4], int* sign);
-void g2_debug(complex Gamma[4][4], int* sign);
-void g3_debug(complex Gamma[4][4], int* sign);
-void g0g1_debug(complex Gamma[4][4], int* sign);
-void g0g2_debug(complex Gamma[4][4], int* sign);
-void g0g3_debug(complex Gamma[4][4], int* sign);
-void g5g1_debug(complex Gamma[4][4], int* sign);
-void g5g2_debug(complex Gamma[4][4], int* sign);
-void g5g3_debug(complex Gamma[4][4], int* sign);
-void g0g5g1_debug(complex Gamma[4][4], int* sign);
-void g0g5g2_debug(complex Gamma[4][4], int* sign);
-void g0g5g3_debug(complex Gamma[4][4], int* sign);
+void id_debug(double complex Gamma[4][4], int* sign);
+void g0_debug(double complex Gamma[4][4], int* sign);
+void g5_debug(double complex Gamma[4][4], int* sign);
+void g0g5_debug(double complex Gamma[4][4], int* sign);
+void g1_debug(double complex Gamma[4][4], int* sign);
+void g2_debug(double complex Gamma[4][4], int* sign);
+void g3_debug(double complex Gamma[4][4], int* sign);
+void g0g1_debug(double complex Gamma[4][4], int* sign);
+void g0g2_debug(double complex Gamma[4][4], int* sign);
+void g0g3_debug(double complex Gamma[4][4], int* sign);
+void g5g1_debug(double complex Gamma[4][4], int* sign);
+void g5g2_debug(double complex Gamma[4][4], int* sign);
+void g5g3_debug(double complex Gamma[4][4], int* sign);
+void g0g5g1_debug(double complex Gamma[4][4], int* sign);
+void g0g5g2_debug(double complex Gamma[4][4], int* sign);
+void g0g5g3_debug(double complex Gamma[4][4], int* sign);
 
 
 void id_eval_g5GammaDag_times_spinor(suNf_spinor* out, suNf_spinor* in);
@@ -208,16 +208,16 @@ double ModeNumber(double M2);
 
 
 typedef struct {
-  complex ***g1_ij, ***g2_ij, ***g3_ij, ***g4_ij, *g1, *g2, *g3, *g4, **M;
+  double complex ***g1_ij, ***g2_ij, ***g3_ij, ***g4_ij, *g1, *g2, *g3, *g4, **M;
 
-  complex *l11, *l12, *l13;
-  complex *l21, *l22, *l23;
-  complex *l31, *l32, *l33;
-  complex *l41, *l42, *l43;
+  double complex *l11, *l12, *l13;
+  double complex *l21, *l22, *l23;
+  double complex *l31, *l32, *l33;
+  double complex *l41, *l42, *l43;
 
-  complex ***l11_ij, ***l12_ij, ***l13_ij;
-  complex ***l21_ij, ***l22_ij, ***l23_ij;
-  complex ***l31_ij, ***l32_ij, ***l33_ij;
+  double complex ***l11_ij, ***l12_ij, ***l13_ij;
+  double complex ***l21_ij, ***l22_ij, ***l23_ij;
+  double complex ***l31_ij, ***l32_ij, ***l33_ij;
 } chisf_mem;
 
 chisf_mem *  init_rotated_corr_mem();

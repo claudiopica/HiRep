@@ -63,7 +63,7 @@ WQUAT = $(if $(findstring -DWITH_QUATERNIONS,$(MACRO)),1,0)
 
 #Include
 INCDIR = $(TOPDIR)/Include
-INC = -I $(INCDIR)
+INC = -I $(INCDIR) -I /opt/local/include/openmpi-clang/
 
 GCC = gcc
 CXX ?= g++

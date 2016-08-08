@@ -65,7 +65,7 @@ public:
 	string assignment(const char* op, const char* name) const
 	{
 		ostringstream RET;
-		string tmp;
+		string tmp,tmpre,tmpim;
 		if(isreal())
 		{
 			for(int i = 0; i < size; i++)
@@ -83,17 +83,24 @@ public:
 			for(int i = 0; i < size; i++)
 				for(int j = 0; j < size; j++)
 				{
-					tmp = get(i,j).str_real();
-					RET << _INDENT_;
-					RET << name << mindex(i,j,size) << ".re " << op << " " << tmp;
-					RET << _ENDL_;
+					/* tmp = get(i,j).str_real(); */
+					/* RET << _INDENT_; */
+					/* RET << name << mindex(i,j,size) << ".re " << op << " " << tmp; */
+					/* RET << _ENDL_; */
 
-					tmp = get(i,j).str_imag();
-					RET << _INDENT_;
-					RET << name << mindex(i,j,size) << ".im " << op << " " << tmp;
-					if(i == size-1 && j == size-1) RET << _LASTENDL_;
-					else RET << _ENDL_;
-				}
+					/* tmp = get(i,j).str_imag(); */
+					/* RET << _INDENT_; */
+					/* RET << name << mindex(i,j,size) << ".im " << op << " " << tmp; */
+					/* if(i == size-1 && j == size-1) RET << _LASTENDL_; */
+					/* else RET << _ENDL_; */
+                                  tmpre = get(i,j).str_real();
+                                  tmpim = get(i,j).str_imag();
+                                  RET << _INDENT_;
+                                  RET << name << mindex(i,j,size)  << op << " " << tmpre << "+I*(" <<tmpim << ")" ;
+                                  if(i == size-1 && j == size-1) RET << _LASTENDL_;
+                                  else RET << _ENDL_;
+                                  
+                                }
 		}
 		return RET.str();
 	}
@@ -194,7 +201,7 @@ public:
 	string assignment(const char* op, const char* name) const
 	{
 		ostringstream RET;
-		string tmp;
+		string tmp,tmpre,tmpim;
 		if(isreal())
 		{
 			for(int i = 0; i < size; i++)
@@ -210,17 +217,27 @@ public:
 		{
 			for(int i = 0; i < size; i++)
 			{
-				tmp = get(i).str_real();
-				RET << _INDENT_;
-				RET << name << vindex(i,size) << ".re " << op << " " << tmp << "; \\ \n";
-				RET << _ENDL_;
+				/* tmp = get(i).str_real(); */
+				/* RET << _INDENT_; */
+				/* RET << name << vindex(i,size) << ".re " << op << " " << tmp << "; \\ \n"; */
+				/* RET << _ENDL_; */
 
-				tmp = get(i).str_imag();
-				RET << _INDENT_;
-				RET << name << vindex(i,size) << ".im " << op << " " << tmp << "; \\ \n";
-				if(i == size-1) RET << _LASTENDL_;
-				else RET << _ENDL_;
-			}
+				/* tmp = get(i).str_imag(); */
+				/* RET << _INDENT_; */
+				/* RET << name << vindex(i,size) << ".im " << op << " " << tmp << "; \\ \n"; */
+				/* if(i == size-1) RET << _LASTENDL_; */
+				/* else RET << _ENDL_; */
+                          tmpre = get(i).str_real();
+                          tmpim = get(i).str_imag();
+                          RET << _INDENT_;
+                          RET << name << vindex(i,size) <<  op << " " << tmpre << "+I*(" << tmpim << ");";
+                            if(i == size-1) RET << _LASTENDL_; 
+                            else RET << _ENDL_;
+
+
+
+
+                        }
 		}
 		return RET.str();
 	}

@@ -195,7 +195,7 @@ static void op_propagator(suNf_propagator* out, suNf_propagator* in, gamma_ind i
 void measure_mesons_core(spinor_field* psi0, spinor_field* psi1, spinor_field* eta, meson_observable* mo, int nm, int tau, int n_mom, int offset,int lt){
   int i,ix,t,x,y,z,beta,px,py,pz,tc;
   double pdotx,cpdotx,spdotx;
-  complex tr;
+  double complex tr;
   suNf_spin_matrix sma,smb, sm1,sm2,smtmp1,smtmp2,sm_src;
   meson_observable* motmp=mo;
   _spinmatrix_zero(smtmp1);
@@ -233,8 +233,8 @@ void measure_mesons_core(spinor_field* psi0, spinor_field* psi1, spinor_field* e
 		      spinmatrix_op(&smtmp1,&sma,motmp->ind1);
 		      _spinmatrix_mul_trace(tr,smtmp1,sm_src);
 		    }
-		    motmp->corr_re[corr_ind(px,py,pz,n_mom,tc,nm,i)] += motmp->sign*(tr.re*cpdotx+tr.im*spdotx);
-		    motmp->corr_im[corr_ind(px,py,pz,n_mom,tc,nm,i)] += motmp->sign*(tr.im*cpdotx-tr.re*spdotx);
+		    motmp->corr_re[corr_ind(px,py,pz,n_mom,tc,nm,i)] += motmp->sign*(creal(tr)*cpdotx+cimag(tr)*spdotx);
+		    motmp->corr_im[corr_ind(px,py,pz,n_mom,tc,nm,i)] += motmp->sign*(cimag(tr)*cpdotx-creal(tr)*spdotx);
 		    motmp=motmp->next;
 		  }
 		}
@@ -249,7 +249,7 @@ static void measure_conserved_core(spinor_field* psi0, spinor_field* psi1, spino
 
   int i,ix,t,x,y,z,beta,px,py,pz,tc,a,ixmu;
   double pdotx,cpdotx,spdotx;
-  complex tr;
+  double complex tr;
   suNf_propagator sp0,sp1,Usp,spf,sptmp1,sptmp2,sptmp3,spleft,spdag;
   suNf *u1;
   meson_observable* motmp=mo;
@@ -315,8 +315,8 @@ static void measure_conserved_core(spinor_field* psi0, spinor_field* psi1, spino
 			  _propagator_sub(sptmp2,spleft,sptmp1);
 			  _propagator_trace(tr,sptmp2);    
 
-			  motmp->corr_re[corr_ind(px,py,pz,n_mom,tc,nm,i)] += 0.5*motmp->sign*(tr.re*cpdotx+tr.im*spdotx);
-			  motmp->corr_im[corr_ind(px,py,pz,n_mom,tc,nm,i)] += 0.5*motmp->sign*(tr.im*cpdotx-tr.re*spdotx);
+			  motmp->corr_re[corr_ind(px,py,pz,n_mom,tc,nm,i)] += 0.5*motmp->sign*(creal(tr)*cpdotx+cimag(tr)*spdotx);
+			  motmp->corr_im[corr_ind(px,py,pz,n_mom,tc,nm,i)] += 0.5*motmp->sign*(cimag(tr)*cpdotx-creal(tr)*spdotx);
 			  motmp=motmp->next;
 
 		  } //END CORRELATOR LOOP

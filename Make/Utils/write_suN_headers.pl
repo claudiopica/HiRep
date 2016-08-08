@@ -119,7 +119,7 @@ sub write_prolog_suN_types {
 #ifndef SUN_TYPES_H
 #define SUN_TYPES_H
 
-#include "complex.h"
+#include "hr_complex.h"
 
 END
 }
@@ -232,6 +232,7 @@ write_vector_add_assign();
 write_vector_sub_assign();
 write_vector_i_add_assign();
 write_vector_i_sub_assign();
+write_vector_prod();
 write_vector_prod_re();
 write_vector_prod_im();
 write_vector_mulc_add_assign();
@@ -440,10 +441,10 @@ write_spinor_pplus();
 
 sub write_suN_vector {
   print $structdef;
-  print "   complex $cname\[$N\];\n";
+  print "   double complex $cname\[$N\];\n";
   print "} ${rdataname}_vector;\n\n";
   print $structdef;
-  print "   complex_flt $cname\[$N\];\n";
+  print "   float complex $cname\[$N\];\n";
   print "} ${rdataname}_vector_flt;\n\n";
 }
 
@@ -463,10 +464,10 @@ sub write_suN_algebra_vector {
 sub write_suN {
   print $structdef;
 	my $d=($N*$N);
-  print "   complex $cname\[$d\];\n";
+  print "   double complex $cname\[$d\];\n";
   print "} $dataname;\n\n";
   print $structdef;
-  print "   complex_flt $cname\[$d\];\n";
+  print "   float complex $cname\[$d\];\n";
   print "} ${dataname}_flt;\n\n";
 }
 
@@ -845,6 +846,31 @@ sub write_vector_i_sub_assign {
 		print "      }\\\n";
 		for(my $i=0;$i<$vr;$i++){
 			print "      _complex_i_sub_assign((r).$cname\[_i\],(s).$cname\[_i\]); ++_i;\\\n";
+		}
+		print "   } while(0) \n\n";
+	}
+}
+
+sub write_vector_prod {
+  print "/* k=r^*s */\n";
+  print "#define _vector_prod_${suff}(k,r,s) \\\n";
+  if ($N<$Nmax or $N<(2*$unroll+1) ) { #unroll all 
+		print "   (k)=_complex_prod((r).$cname\[0\],(s).$cname\[0\]);\\\n";
+		for(my $i=1;$i<$N;$i++){
+			print "   (k)+=_complex_prod((r).$cname\[$i\],(s).$cname\[$i\])";
+			if($i==$N-1) { print "\n\n"; } else { print "; \\\n"; }
+		}
+	} else { #partial unroll
+		print "   do { \\\n";
+		print "      int _i;\\\n";
+		print "      (k)=_complex_prod((r).$cname\[0\],(s).$cname\[0\]);\\\n";
+		print "      for (_i=1; _i<$md; ){\\\n";
+		for(my $i=0;$i<$unroll;$i++){
+			print "         (k)+=_complex_prod((r).$cname\[_i\],(s).$cname\[_i\]); ++_i;\\\n";
+		}
+		print "      }\\\n";
+		for(my $i=0;$i<$mr;$i++){
+			print "      (k)+=_complex_prode((r).$cname\[_i\],(s).$cname\[_i\]); ++_i;\\\n";
 		}
 		print "   } while(0) \n\n";
 	}
@@ -2982,7 +3008,7 @@ sub write_spinor_prod {
   print "/* z=r*s (r,s spinors, z complex) */\n";
   print "#define _spinor_prod_${suff}(z,r,s) \\\n";	
   	print "   do { \\\n";
-	print "      (z).re=0.;(z).im=0.; \\\n";
+	print "      _complex_0(z); \\\n";
   for (my $k=0; $k<4; $k++){
     print "      _vector_prod_assign_${suff}((z),(r).$cname\[$k\],(s).$cname\[$k\])";
     if($k==3) {print"; \\\n   } while(0) \n\n";} else {print "; \\\n"}
@@ -3443,18 +3469,18 @@ sub  write_read_spinor_gpu {
     print "   do {  \\\n";
     print "      int __iz=(iy)+((x)*$N)*(stride); \\\n";
     for($i=0; $i<$N-1; $i++) {
-        print "      (v).c\[$i\]=((complex_flt*)(in))\[__iz\]; __iz+=(stride); \\\n";
+        print "      (v).c\[$i\]=((float complex*)(in))\[__iz\]; __iz+=(stride); \\\n";
     }
-    print "      (v).c\[$i\]=((complex_flt*)(in))\[__iz\]; \\\n";
+    print "      (v).c\[$i\]=((float complex*)(in))\[__iz\]; \\\n";
     print "   } while (0) \n\n";
 
     print "#define _${rdataname}_read_spinor_gpu(stride,v,in,iy,x) \\\n";
     print "   do {  \\\n";
     print "      int __iz=(iy)+((x)*$N)*(stride); \\\n";
     for($i=0; $i<$N-1; $i++) {
-        print "      (v).c\[$i\]=((complex*)(in))\[__iz\]; __iz+=(stride); \\\n";
+        print "      (v).c\[$i\]=((double complex*)(in))\[__iz\]; __iz+=(stride); \\\n";
     }
-    print "      (v).c\[$i\]=((complex*)(in))\[__iz\]; \\\n";
+    print "      (v).c\[$i\]=((double complex*)(in))\[__iz\]; \\\n";
     print "   } while (0) \n\n";
 
 }
@@ -3468,18 +3494,18 @@ sub  write_write_spinor_gpu {
     print "   do {  \\\n";
     print "      int __iz=(iy)+((x)*$N)*(stride); \\\n";
     for($i=0; $i<$N-1; $i++) {
-        print "      ((complex_flt*)(out))\[__iz\]=(v).c\[$i\]; __iz+=(stride); \\\n";
+        print "      ((float complex*)(out))\[__iz\]=(v).c\[$i\]; __iz+=(stride); \\\n";
     }
-    print "      ((complex_flt*)(out))\[__iz\]=(v).c\[$i\]; \\\n";
+    print "      ((float complex*)(out))\[__iz\]=(v).c\[$i\]; \\\n";
     print "   } while (0) \n\n";
     
     print "#define _${rdataname}_write_spinor_gpu(stride,v,out,iy,x) \\\n";
     print "   do {  \\\n";
     print "      int __iz=(iy)+((x)*$N)*(stride); \\\n";
     for($i=0; $i<$N-1; $i++) {
-        print "      ((complex*)(out))\[__iz\]=(v).c\[$i\]; __iz+=(stride); \\\n";
+        print "      ((double complex*)(out))\[__iz\]=(v).c\[$i\]; __iz+=(stride); \\\n";
     }
-    print "      ((complex*)(out))\[__iz\]=(v).c\[$i\]; \\\n";
+    print "      ((double complex*)(out))\[__iz\]=(v).c\[$i\]; \\\n";
     print "   } while (0) \n\n";
     
 }

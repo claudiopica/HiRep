@@ -7,7 +7,7 @@
 #define INVERTERS_H
 
 #include "suN_types.h"
-#include "complex.h"
+#include "hr_complex.h"
 #include "spinor_field.h"
 
 
@@ -82,7 +82,7 @@ int eva_tuned(int nev,int nevt,int init,int kmax,
                spinor_field *ev,double d[],int *status);
 
 void jacobi1(int n,double a[],double d[],double v[]);
-void jacobi2(int n,complex a[],double d[],complex v[]);
+void jacobi2(int n,double complex a[],double d[],double complex v[]);
 
 
 

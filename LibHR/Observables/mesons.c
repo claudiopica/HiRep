@@ -183,31 +183,29 @@ g0 Gamma^\dag g0 = sign Gamma
 \***************************************************************************/
 
 #define SINGLE_TRACE_DEBUG(name) \
-void name##_debug(complex Gamma[4][4], int* sign) { \
+void name##_debug(double complex Gamma[4][4], int* sign) { \
   int i,j; \
   for(i=0;i<4;i++) \
   for(j=0;j<4;j++) { \
-    Gamma[i][j].re = Gamma[i][j].im = 0.; \
+    _complex_0(Gamma[i][j]);   \
   } \
   if(_REAL_ == 1) { \
     *sign = - _SIGN_; \
-    Gamma[0][_C0_].re = _S0_; \
-    Gamma[1][_C1_].re = _S1_; \
-    Gamma[2][_C2_].re = _S2_; \
-    Gamma[3][_C3_].re = _S3_; \
+    Gamma[0][_C0_] = _S0_; \
+    Gamma[1][_C1_] = _S1_; \
+    Gamma[2][_C2_] = _S2_; \
+    Gamma[3][_C3_] = _S3_; \
   } else { \
     *sign = _SIGN_; \
-    Gamma[0][_C0_].im = _S0_; \
-    Gamma[1][_C1_].im = _S1_; \
-    Gamma[2][_C2_].im = _S2_; \
-    Gamma[3][_C3_].im = _S3_; \
+    Gamma[0][_C0_] = I*_S0_; \
+    Gamma[1][_C1_] = I*_S1_; \
+    Gamma[2][_C2_] = I*_S2_; \
+    Gamma[3][_C3_] = I*_S3_; \
   } \
   for(i=0;i<4;i++) { \
-    Gamma[2][i].re = -Gamma[2][i].re; \
-    Gamma[2][i].im = -Gamma[2][i].im; \
-    Gamma[3][i].re = -Gamma[3][i].re; \
-    Gamma[3][i].im = -Gamma[3][i].im; \
-  } \
+    Gamma[2][i] = -Gamma[2][i]; \
+    Gamma[3][i] = -Gamma[3][i]; \
+   } \
 }
 
 
@@ -218,15 +216,11 @@ out = Re tr (g5 Gamma smat)
 \***************************************************************************/
 
 #define GAMMA_TRACE_RE_DEFINITION(name) \
-void name##_trace_H(complex* out, complex* smat) { \
-        out->re = _S0_*smat[SPIN_2D_INDEX(_C0_,0)].re \
-                + _S1_*smat[SPIN_2D_INDEX(_C1_,1)].re \
-                + _S2_*smat[SPIN_2D_INDEX(_C2_,2)].re \
-                + _S3_*smat[SPIN_2D_INDEX(_C3_,3)].re; \
-        out->im = _S0_*smat[SPIN_2D_INDEX(_C0_,0)].im \
-                + _S1_*smat[SPIN_2D_INDEX(_C1_,1)].im \
-                + _S2_*smat[SPIN_2D_INDEX(_C2_,2)].im \
-                + _S3_*smat[SPIN_2D_INDEX(_C3_,3)].im; \
+void name##_trace_H(double complex* out, double complex* smat) { \
+           *out = _S0_*smat[SPIN_2D_INDEX(_C0_,0)] \
+                + _S1_*smat[SPIN_2D_INDEX(_C1_,1)] \
+                + _S2_*smat[SPIN_2D_INDEX(_C2_,2)] \
+                + _S3_*smat[SPIN_2D_INDEX(_C3_,3)]; \
 }
 
 
@@ -237,15 +231,11 @@ out = Im tr (g5 Gamma smat)
 \***************************************************************************/
 
 #define GAMMA_TRACE_IM_DEFINITION(name) \
-void name##_trace_H(complex* out, complex* smat) { \
-        out->im = _S0_*smat[SPIN_2D_INDEX(_C0_,0)].re \
-                + _S1_*smat[SPIN_2D_INDEX(_C1_,1)].re \
-                + _S2_*smat[SPIN_2D_INDEX(_C2_,2)].re \
-                + _S3_*smat[SPIN_2D_INDEX(_C3_,3)].re; \
-        out->re = - _S0_*smat[SPIN_2D_INDEX(_C0_,0)].im \
-                - _S1_*smat[SPIN_2D_INDEX(_C1_,1)].im \
-                - _S2_*smat[SPIN_2D_INDEX(_C2_,2)].im \
-                - _S3_*smat[SPIN_2D_INDEX(_C3_,3)].im; \
+void name##_trace_H(double complex* out, double complex* smat) { \
+        *out    = _S0_*I*smat[SPIN_2D_INDEX(_C0_,0)] \
+                + _S1_*I*smat[SPIN_2D_INDEX(_C1_,1)] \
+                + _S2_*I*smat[SPIN_2D_INDEX(_C2_,2)] \
+                + _S3_*I*smat[SPIN_2D_INDEX(_C3_,3)]; \
 }
 
 
@@ -259,14 +249,10 @@ out = g5 Gamma^\dag in
 void name##_eval_g5GammaDag_times_spinor(suNf_spinor* out, suNf_spinor* in) { \
   int a; \
   for(a=0; a<NF; a++) { \
-    out->c[0].c[a].re = _SIGN_DAG_ * _S0_ * in->c[_C0_].c[a].re; \
-    out->c[1].c[a].re = _SIGN_DAG_ * _S1_ * in->c[_C1_].c[a].re; \
-    out->c[2].c[a].re = _SIGN_DAG_ * _S2_ * in->c[_C2_].c[a].re; \
-    out->c[3].c[a].re = _SIGN_DAG_ * _S3_ * in->c[_C3_].c[a].re; \
-    out->c[0].c[a].im = _SIGN_DAG_ * _S0_ * in->c[_C0_].c[a].im; \
-    out->c[1].c[a].im = _SIGN_DAG_ * _S1_ * in->c[_C1_].c[a].im; \
-    out->c[2].c[a].im = _SIGN_DAG_ * _S2_ * in->c[_C2_].c[a].im; \
-    out->c[3].c[a].im = _SIGN_DAG_ * _S3_ * in->c[_C3_].c[a].im; \
+    out->c[0].c[a] = _SIGN_DAG_ * _S0_ * in->c[_C0_].c[a]; \
+    out->c[1].c[a] = _SIGN_DAG_ * _S1_ * in->c[_C1_].c[a]; \
+    out->c[2].c[a] = _SIGN_DAG_ * _S2_ * in->c[_C2_].c[a]; \
+    out->c[3].c[a] = _SIGN_DAG_ * _S3_ * in->c[_C3_].c[a]; \
   } \
 }
 
@@ -281,14 +267,10 @@ out = i g5 Gamma^\dag in
 void name##_eval_g5GammaDag_times_spinor(suNf_spinor* out, suNf_spinor* in) { \
   int a; \
   for(a=0; a<NF; a++) { \
-    out->c[0].c[a].re = -_SIGN_DAG_ * _S0_ * in->c[_C0_].c[a].im; \
-    out->c[1].c[a].re = -_SIGN_DAG_ * _S1_ * in->c[_C1_].c[a].im; \
-    out->c[2].c[a].re = -_SIGN_DAG_ * _S2_ * in->c[_C2_].c[a].im; \
-    out->c[3].c[a].re = -_SIGN_DAG_ * _S3_ * in->c[_C3_].c[a].im; \
-    out->c[0].c[a].im = _SIGN_DAG_ * _S0_ * in->c[_C0_].c[a].re; \
-    out->c[1].c[a].im = _SIGN_DAG_ * _S1_ * in->c[_C1_].c[a].re; \
-    out->c[2].c[a].im = _SIGN_DAG_ * _S2_ * in->c[_C2_].c[a].re; \
-    out->c[3].c[a].im = _SIGN_DAG_ * _S3_ * in->c[_C3_].c[a].re; \
+    out->c[0].c[a] = -_SIGN_DAG_ * _S0_ * I * in->c[_C0_].c[a]; \
+    out->c[1].c[a] = -_SIGN_DAG_ * _S1_ * I * in->c[_C1_].c[a]; \
+    out->c[2].c[a] = -_SIGN_DAG_ * _S2_ * I * in->c[_C2_].c[a]; \
+    out->c[3].c[a] = -_SIGN_DAG_ * _S3_ * I * in->c[_C3_].c[a]; \
   } \
 }
 

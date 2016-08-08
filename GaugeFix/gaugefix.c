@@ -228,10 +228,10 @@ void su2_hit(int fix_dir, int parity, double overrelax, suNg_field *fixed_gauge,
 	    v2.c[i12]=-v2.c[i21];
 #else		
 	    //Extract gauge transform
-	    r0 =   v1.c[i11].re + v1.c[i22].re;
-	    r[0] = v1.c[i12].im + v1.c[i21].im; 
-	    r[1] = v1.c[i12].re - v1.c[i21].re; 
-	    r[2] = v1.c[i11].im - v1.c[i22].im; 
+	    r0 =   creal(v1.c[i11]) + creal(v1.c[i22]);
+	    r[0] = cimag(v1.c[i12]) + cimag(v1.c[i21]); 
+	    r[1] = creal(v1.c[i12]) - creal(v1.c[i21]); 
+	    r[2] = cimag(v1.c[i11]) - cimag(v1.c[i22]); 
 	    rnorm = 1./sqrt(r0*r0 + r[0]*r[0] + r[1]*r[1] + r[2]*r[2]);
 	    if(1./rnorm > 1e-16){
 	      a0 = r0*rnorm;
@@ -253,10 +253,10 @@ void su2_hit(int fix_dir, int parity, double overrelax, suNg_field *fixed_gauge,
 	    a0 = a0/ar; a[0] = a[0]*axdr; a[1] = a[1]*axdr; a[2] = a[2]*axdr;
 
 	    _suNg_unit(v2);
-	    v2.c[i11].re = a0; 	v2.c[i11].im = a[2]; 
-	    v2.c[i12].re = a[1]; 	v2.c[i12].im = a[0]; 
-	    v2.c[i21].re =-a[1]; 	v2.c[i21].im = a[0]; 
-	    v2.c[i22].re = a0; 	v2.c[i22].im =-a[2]; 
+	    v2.c[i11]= a0+I*a[2]; 
+	    v2.c[i12]= a[1]+I*a[0]; 
+	    v2.c[i21]=-a[1]+I*a[0]; 
+	    v2.c[i22]= a0-I*a[2]; 
 #endif		
 
 	    //_suNg_times_suNg( (*_4FIELD_AT(g,idx,0)), (*_4FIELD_AT(g,idx,0)), v2);

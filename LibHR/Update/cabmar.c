@@ -23,17 +23,15 @@
 static inline void rotate(suNg_vector *pu1, suNg_vector *pu2, double *s)
 {
   int i;
-  complex z1,z2;
-  complex *cu1, *cu2;
+  double complex z1,z2;
+  double complex *cu1, *cu2;
   
   cu1 = &((*pu1).c[0]);
   cu2 = &((*pu2).c[0]);
   
   for (i=0; i<NG; ++i) {
-    z1.re=s[0]*(*cu1).re-s[1]*(*cu2).im+s[2]*(*cu2).re-s[3]*(*cu1).im;
-    z1.im=s[0]*(*cu1).im+s[1]*(*cu2).re+s[2]*(*cu2).im+s[3]*(*cu1).re;
-    z2.re=s[0]*(*cu2).re-s[1]*(*cu1).im-s[2]*(*cu1).re+s[3]*(*cu2).im;
-    z2.im=s[0]*(*cu2).im+s[1]*(*cu1).re-s[2]*(*cu1).im-s[3]*(*cu2).re;
+    z1=s[0]*creal(*cu1)-s[1]*cimag(*cu2)+s[2]*creal(*cu2)-s[3]*cimag(*cu1)+I*(s[0]*cimag(*cu1)+s[1]*creal(*cu2)+s[2]*cimag(*cu2)+s[3]*creal(*cu1));
+    z2=s[0]*creal(*cu2)-s[1]*cimag(*cu1)-s[2]*creal(*cu1)+s[3]*cimag(*cu2)+I*(s[0]*cimag(*cu2)+s[1]*creal(*cu1)-s[2]*cimag(*cu1)-s[3]*creal(*cu2));
     (*cu1) = z1;
     (*cu2) = z2;
     ++cu1;

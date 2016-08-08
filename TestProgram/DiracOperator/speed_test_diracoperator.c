@@ -28,9 +28,9 @@ static suNg_field *g;
 
 
 
-static void D(spinor_field *out, spinor_field *in){
-   Dphi(hmass,out,in);
-}
+//static void loc_D(spinor_field *out, spinor_field *in){
+//   Dphi(hmass,out,in);
+//}
 
 
 
@@ -42,18 +42,19 @@ int main(int argc,char *argv[])
   float elapsed, gflops;
   int i;
   int flopsite, bytesite;
-  int n_times=50;
+  int n_times=5000;
   struct timeval start, end, etime;
   
   setup_process(&argc,&argv);
   
   logger_setlevel(0,10000); /* log all */
   logger_map("DEBUG","debug");
-#ifdef WITH_MPI
-  sprintf(tmp,">out_%d",PID); logger_stdout(tmp);
-  sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
-#endif
-  
+
+  if (PID!=0) { logger_disable(); }   /* disable logger for MPI processes != 0 */
+  else {
+    sprintf(tmp,">out_%d",PID); logger_stdout(tmp);
+    sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
+  }
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
   
   read_input(glb_var.read,"test_input");

@@ -1,7 +1,7 @@
-/***************************************************************************\
-* Copyright (c) 2013 Rudy Arthur, Ari Hietanen                              *
-*                                                                           *
-*                                                                           *
+/*************************************************************************** \
+ * Copyright (c) 2013 Rudy Arthur, Ari Hietanen                              *
+ *                                                                           *
+ *                                                                           *
 \***************************************************************************/
 
 #include "global.h"
@@ -92,34 +92,34 @@ void create_point_source(spinor_field *source,int tau, int color) {
   if(COORD[0]==tau/T && COORD[1]==0 && COORD[2]==0 && COORD[3]==0) {
     ix=ipt(tau-zerocoord[0],0,0,0);
     for (beta=0;beta<4;++beta){
-      _FIELD_AT(&source[beta],ix)->c[beta].c[color].re = 1.;
+      _FIELD_AT(&source[beta],ix)->c[beta].c[color] = 1.;
     }
   }
-   for (beta=0;beta<4;++beta){
-   start_sf_sendrecv(source + beta);
-   complete_sf_sendrecv(source + beta);}
+  for (beta=0;beta<4;++beta){
+    start_sf_sendrecv(source + beta);
+    complete_sf_sendrecv(source + beta);}
 }
 // creates point source for the NF color indices.
 void create_full_point_source(spinor_field *source, int tau) {
-	int col,beta, idx,ix;
+  int col,beta, idx,ix;
         
-	for (beta=0;beta<4*NF;++beta){
-          spinor_field_zero_f(&source[beta]);
-	}
+  for (beta=0;beta<4*NF;++beta){
+    spinor_field_zero_f(&source[beta]);
+  }
 
-	if(COORD[0]==tau/T && COORD[1]==0 && COORD[2]==0 && COORD[3]==0) {
-		ix=ipt(tau-zerocoord[0],0,0,0);
-		for (col=0;col<NF;++col){
-			for (beta=0;beta<4;++beta){
-				idx = beta + col*4;		
-				_FIELD_AT(&source[idx],ix)->c[beta].c[col].re = 1.;
-			}
-		}
-	}
-	for (beta=0;beta<4*NF;++beta){
-		start_sf_sendrecv(source + beta);
-		complete_sf_sendrecv(source + beta);
-	}
+  if(COORD[0]==tau/T && COORD[1]==0 && COORD[2]==0 && COORD[3]==0) {
+    ix=ipt(tau-zerocoord[0],0,0,0);
+    for (col=0;col<NF;++col){
+      for (beta=0;beta<4;++beta){
+        idx = beta + col*4;		
+        _FIELD_AT(&source[idx],ix)->c[beta].c[col] = 1.;
+      }
+    }
+  }
+  for (beta=0;beta<4*NF;++beta){
+    start_sf_sendrecv(source + beta);
+    complete_sf_sendrecv(source + beta);
+  }
 }
 
 
@@ -131,12 +131,12 @@ void create_point_source_loc(spinor_field *source, int t, int x, int y, int z, i
   if(COORD[0]==t/T && COORD[1]==x/X && COORD[2]==y/Y && COORD[3]==z/Z) {
     ix=ipt(t-zerocoord[0],x-zerocoord[1],y-zerocoord[2],z-zerocoord[3]);
     for (beta=0;beta<4;++beta){
-      _FIELD_AT(&source[beta],ix)->c[beta].c[color].re = 1.;
+      _FIELD_AT(&source[beta],ix)->c[beta].c[color] = 1.;
     }
   }
-   for (beta=0;beta<4;++beta){
-   start_sf_sendrecv(source + beta);
-   complete_sf_sendrecv(source + beta);}
+  for (beta=0;beta<4;++beta){
+    start_sf_sendrecv(source + beta);
+    complete_sf_sendrecv(source + beta);}
 }
 
 
@@ -259,7 +259,7 @@ void create_diluted_source_equal_spinorfield1(spinor_field *source,int tau) {
 
 
 /* Creates four Z2xZ2 noise sources NOT localised on time slice but spread over
-all timeslices. The noise vectors are equal in each source but placed at a different spin. Even sites only.*/
+   all timeslices. The noise vectors are equal in each source but placed at a different spin. Even sites only.*/
 void create_noise_source_equal_eo(spinor_field *source) {
   int c[4];
   suNf_vector *v1,*v2;
@@ -269,7 +269,7 @@ void create_noise_source_equal_eo(spinor_field *source) {
     spinor_field_zero_f(&source[i]);
   }
   
-    for(c[0]=0; c[0]<T; c[0]++) for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
+  for(c[0]=0; c[0]<T; c[0]++) for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
 	  if(((zerocoord[0]+c[0]+zerocoord[1]+c[1]+zerocoord[2]+c[2]+zerocoord[3]+c[3])&1)==0){
 	    v1 = &((_FIELD_AT(&source[0],ipt(c[0],c[1],c[2],c[3])))->c[0]);
 	    ranz2((double*)(v1),sizeof(suNf_vector)/sizeof(double)); // Make new sources
@@ -279,18 +279,18 @@ void create_noise_source_equal_eo(spinor_field *source) {
 	    }
 	  }
 	}
-    for (i=0;i<4;++i){
-      start_sf_sendrecv(source + i);
-      complete_sf_sendrecv(source + i);
-    }
+  for (i=0;i<4;++i){
+    start_sf_sendrecv(source + i);
+    complete_sf_sendrecv(source + i);
+  }
 }
 
 /* Creates four Z2xZ2 noise sources localised on time slice tau. The noise 
-	 vectors are equal in each source but placed at a different spin. Color dilution and Even and Odd sites */
+   vectors are equal in each source but placed at a different spin. Color dilution and Even and Odd sites */
 void create_diluted_source_equal_atau_col(spinor_field *source, int tau,int col) {
   int c[4];
   // suNf_vector *v1,*v2;
-  complex *v1;
+  double complex *v1;
   int i;
   for (i=0;i<4;++i){
     spinor_field_zero_f(&source[i]);
@@ -300,7 +300,7 @@ void create_diluted_source_equal_atau_col(spinor_field *source, int tau,int col)
     for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
 	  for (i=0;i<4;++i){
 	    v1 = &((_FIELD_AT(&source[i],ipt(c[0],c[1],c[2],c[3])))->c[i].c[col]);
-	    ranz2((double*)(v1),sizeof(complex)/sizeof(double)); // Make new sources
+	    ranz2((double*)(v1),sizeof(double complex)/sizeof(double)); // Make new sources
 	  }
 	}
   }
@@ -311,7 +311,7 @@ void create_diluted_source_equal_atau_col(spinor_field *source, int tau,int col)
    all timeslices. The noise vectors are equal in each source but placed at a different spin. Even and odd sites. Color dilution */
 void create_noise_source_equal_col_dil(spinor_field *source,int col) {
   int c[4];
-  complex *v1,*v2;
+  double complex *v1,*v2;
   int i;
 
   for (i=0;i<4;++i){
@@ -320,7 +320,7 @@ void create_noise_source_equal_col_dil(spinor_field *source,int col) {
 
   for(c[0]=0; c[0]<T; c[0]++) for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
 	  v1 = &((_FIELD_AT(&source[0],ipt(c[0],c[1],c[2],c[3])))->c[0].c[col]);
-	  ranz2((double*)(v1),sizeof(complex)/sizeof(double)); // Make new sources
+	  ranz2((double*)(v1),sizeof(double complex)/sizeof(double)); // Make new sources
 	  for (i=1;i<4;++i){
 	    v2 = &((_FIELD_AT(&source[i],ipt(c[0],c[1],c[2],c[3])))->c[i].c[col]); //Copy previous index.
 	    *v2 = *v1;
@@ -347,7 +347,7 @@ void create_gauge_fixed_wall_source(spinor_field *source, int tau, int color) {
     c[0]=tau-zerocoord[0];
     for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
 	  for (beta=0;beta<4;++beta){
-	    _FIELD_AT(&source[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color].re = 1.;
+	    _FIELD_AT(&source[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color] = 1.;
 	  }
 	}
   }
@@ -402,19 +402,18 @@ void create_sequential_source(spinor_field *source, int tf, spinor_field* prop){
   double pdotx;
 
   for (beta=0;beta<4;++beta){
-    spinor_field_zero_f(&source[beta]);
+  spinor_field_zero_f(&source[beta]);
   }
 
   for(c[0]=0; c[0]<T; c[0]++) for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
-	  pdotx = 2.*PI*( c[0]*pt/GLB_T + c[1]*px/GLB_X + c[2]*py/GLB_Y + c[3]*pz/GLB_Z );
-	  for (beta=0;beta<4;++beta){
-	    _FIELD_AT(&source[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color].re = cos(pdotx);
-	    _FIELD_AT(&source[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color].im = sin(pdotx);
-	  }
-	}
+  pdotx = 2.*PI*( c[0]*pt/GLB_T + c[1]*px/GLB_X + c[2]*py/GLB_Y + c[3]*pz/GLB_Z );
   for (beta=0;beta<4;++beta){
-    start_sf_sendrecv(source + beta);
-    complete_sf_sendrecv(source + beta);
+  _FIELD_AT(&source[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color] = cos(pdotx) +I*sin(pdotx);
+  }
+  }
+  for (beta=0;beta<4;++beta){
+  start_sf_sendrecv(source + beta);
+  complete_sf_sendrecv(source + beta);
   }
   }*/
 
@@ -434,13 +433,12 @@ void create_gauge_fixed_momentum_source(spinor_field *source, int pt, int px, in
                          (double)(c[2]+zerocoord[2])*(double)py/(double)GLB_Y +
                          (double)(c[3]+zerocoord[3])*(double)pz/(double)GLB_Z );
 	  for (beta=0;beta<4;++beta){
-	     _FIELD_AT(&source[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color].re = cos(pdotx);
-	     _FIELD_AT(&source[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color].im = sin(pdotx);
+            _FIELD_AT(&source[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color] = cos(pdotx)+I*sin(pdotx);
 	  }
-  }
+        }
   for (beta=0;beta<4;++beta){
-     start_sf_sendrecv(source + beta);
-     complete_sf_sendrecv(source + beta);
+    start_sf_sendrecv(source + beta);
+    complete_sf_sendrecv(source + beta);
   }
 }
 
@@ -461,14 +459,14 @@ void add_momentum(spinor_field* out, spinor_field* in, int px, int py, int pz)
                          (double)(c[2]+zerocoord[2])*(double)py/(double)GLB_Y +
                          (double)(c[3]+zerocoord[3])*(double)pz/(double)GLB_Z );
 	  for (beta=0;beta<4;++beta) for (color=0; color<NF; ++color)for (beta2=0;beta2<4;++beta2){
-	     _FIELD_AT(&out[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta2].c[color].re = _FIELD_AT(&in[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta2].c[color].re * cos(pdotx) - _FIELD_AT(&in[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta2].c[color].im * sin(pdotx);
-	     _FIELD_AT(&out[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta2].c[color].im = _FIELD_AT(&in[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta2].c[color].re * sin(pdotx) + _FIELD_AT(&in[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta2].c[color].im * cos(pdotx) ;
-	  }
-  }
+                _FIELD_AT(&out[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta2].c[color] = (_FIELD_AT(&in[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta2].c[color])*(cos(pdotx) +I*sin(pdotx));
+                
+              }
+        }
 
   for (beta=0;beta<4;++beta){
-     start_sf_sendrecv(out + beta);
-     complete_sf_sendrecv(out + beta);
+    start_sf_sendrecv(out + beta);
+    complete_sf_sendrecv(out + beta);
   }
 }
 
@@ -485,7 +483,7 @@ void create_diluted_volume_source(spinor_field *source, int parity_component, in
 	  if(((zerocoord[0]+c[0]+zerocoord[1]+c[1]+zerocoord[2]+c[2]+zerocoord[3]+c[3])%mod)==parity_component){
 	    for (beta=0;beta<4;++beta){
 	      for (b=0;b<NF;++b){
-		_FIELD_AT(&source[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[b].re = 1.;
+		_FIELD_AT(&source[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[b] = 1.;
 	      }}
 	  }
 	}

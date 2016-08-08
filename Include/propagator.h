@@ -73,17 +73,13 @@ do {  \
 //r propagator k result; Tr [ r ]
 #define _propagator_trace(k, r) \
    do { \
-      (k).re=0.;(k).im=0.; \
+      _complex_0(k); \
       int ITMP; \
       for(ITMP=0;ITMP<NF;ITMP++){ \
-	(k).re += (r).c[ITMP].c[0].c[0].c[ITMP].re; \
-	(k).im += (r).c[ITMP].c[0].c[0].c[ITMP].im; \
-	(k).re += (r).c[ITMP].c[1].c[1].c[ITMP].re; \
-	(k).im += (r).c[ITMP].c[1].c[1].c[ITMP].im; \
-	(k).re += (r).c[ITMP].c[2].c[2].c[ITMP].re; \
-	(k).im += (r).c[ITMP].c[2].c[2].c[ITMP].im; \
-	(k).re += (r).c[ITMP].c[3].c[3].c[ITMP].re; \
-	(k).im += (r).c[ITMP].c[3].c[3].c[ITMP].im; \
+	(k) += (r).c[ITMP].c[0].c[0].c[ITMP]; \
+	(k) += (r).c[ITMP].c[1].c[1].c[ITMP]; \
+	(k) += (r).c[ITMP].c[2].c[2].c[ITMP]; \
+	(k) += (r).c[ITMP].c[3].c[3].c[ITMP]; \
       } \
    } while(0) 
 
@@ -119,7 +115,7 @@ do {  \
       int ITMP, JTMP; \
       for(ITMP=0;ITMP<4*NF;ITMP++){ \
       for(JTMP=0;JTMP<4*NF;JTMP++){ \
-	complex tmp; tmp = _PROP_IDX( S,ITMP,JTMP); \
+	double complex tmp; tmp = _PROP_IDX( S,ITMP,JTMP); \
 	_complex_mul( _PROP_IDX( S,ITMP,JTMP), k, tmp ); \
       }} \
    } while(0)  
@@ -141,8 +137,7 @@ do {  \
       int ITMP, JTMP; \
       for(ITMP=0;ITMP<4*NF;ITMP++){ \
       for(JTMP=0;JTMP<4*NF;JTMP++){ \
-	_PROP_IDX( (r),ITMP,JTMP).re = _PROP_IDX( (s),JTMP,ITMP).re; \
-	_PROP_IDX( (r),ITMP,JTMP).im = -_PROP_IDX( (s),JTMP,ITMP).im; \
+	_PROP_IDX( (r),ITMP,JTMP) = conj(_PROP_IDX( (s),JTMP,ITMP));  \
       }} \
    } while(0) 
 
@@ -191,7 +186,7 @@ do { \
 #define _propagator_mul_trace(tr,S,R) \
    do { \
      int a,b, alpha, beta; \
-     (tr).re=(tr).im=0.0;\
+     _complex_0(tr);\
      for(a=0;a<NF;++a){ \
      for(alpha=0;alpha<4;++alpha){ \
      for(b=0;b<NF;++b){ \
@@ -204,7 +199,7 @@ do { \
 #define _propagator_muldag_trace(tr,S,R) \
    do { \
      int a,b, alpha, beta; \
-     (tr).re=(tr).im=0.0;\
+     _complex_0(tr);\
      for(a=0;a<NF;++a){ \
      for(alpha=0;alpha<4;++alpha){ \
      for(b=0;b<NF;++b){ \

@@ -26,7 +26,7 @@
 
 void inv_suNg(suNg* a){
   suNg b;
-  complex col[NG];
+  double complex col[NG];
   int indx[NG];
   double d;
   int i,j;
@@ -45,12 +45,12 @@ void inv_suNg(suNg* a){
 #endif
 
 
-void ludcmp(complex* a, int* indx, double* d,int N){
+void ludcmp(double complex* a, int* indx, double* d,int N){
   const double tiny = 1.0e-20;
   int i,j,k,imax;
   double big,tmp,dum;
   double vv[N];
-  complex ctmp,csum;
+  double complex ctmp,csum;
   *d=1;
   for (j=0;j<N;++j){
     big = 0;
@@ -101,7 +101,7 @@ void ludcmp(complex* a, int* indx, double* d,int N){
     indx[j]=imax;
     
     tmp =  sqrt(_complex_prod_re(a[j*N+j],a[j*N+j]));
-    if (tmp == 0) a[j*N+j].re = tiny;
+    if (tmp == 0) a[j*N+j] = tiny;
     
     //Divide by pivot element
     if (j != N-1){
@@ -114,9 +114,9 @@ void ludcmp(complex* a, int* indx, double* d,int N){
   }
 }
 
-void lubksb(complex* a, int* indx, complex* b, int N){
+void lubksb(double complex* a, int* indx, double complex* b, int N){
   int i,ii,ip,j;
-  complex csum,ctmp;
+  double complex csum,ctmp;
   double tmp;
   ii=0;
   for (i=0;i<N;++i){

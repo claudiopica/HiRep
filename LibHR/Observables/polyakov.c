@@ -24,7 +24,7 @@ void polyakov() {
   suNg *lp;
   suNg *bp;
   suNg tmp;
-  complex poly;
+  double complex poly;
   double adjpoly;
   double dtmp;
 #ifdef WITH_MPI  
@@ -228,7 +228,7 @@ void polyakov() {
   
     
     /* trace and average */
-    poly.re=poly.im=0.0;
+    _complex_0(poly);
     adjpoly=0.;
   
     i3d=0;
@@ -237,11 +237,11 @@ void polyakov() {
     for(x[(mu+3)%4]=0; x[(mu+3)%4]<loc[(mu+3)%4]; x[(mu+3)%4]++) {
       _suNg_trace_re(dtmp,p[i3d]);
 /*      lprintf("LOC_POLYAKOV",0,"%d %d %d %d %d %1.8e\n",mu,x[(mu+1)%4],x[(mu+2)%4],x[(mu+3)%4],i3d,dtmp); */
-      poly.re += dtmp;
+      poly += dtmp;
       adjpoly +=dtmp*dtmp;
 #ifndef GAUGE_SON
       _suNg_trace_im(dtmp,p[i3d]);
-      poly.im += dtmp;
+      poly += I*dtmp;
       adjpoly +=dtmp*dtmp - 1;
 #endif
       i3d++;
@@ -251,11 +251,10 @@ void polyakov() {
     global_sum((double*)&adjpoly,1);
   
     
-    poly.re /= NG*(GLB_VOLUME/loc[mu]);
-    poly.im /= NG*(GLB_VOLUME/loc[mu]);
+    poly /= NG*(GLB_VOLUME/loc[mu]);
     adjpoly /= NG*(GLB_VOLUME/loc[mu]);
     
-    lprintf("FUND_POLYAKOV",0,"Polyakov direction %d = %1.8e %1.8e\n",mu,poly.re,poly.im);
+    lprintf("FUND_POLYAKOV",0,"Polyakov direction %d = %1.8e %1.8e\n",mu,creal(poly),cimag(poly));
     lprintf("ADJ_POLYAKOV",0,"Polyakov direction %d = %1.8e\n",mu,adjpoly);
     
     free(p);

@@ -238,8 +238,8 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
   lprintf("MAIN",0,"input file [%s]\n",input_filename); 
   lprintf("MAIN",0,"output file [%s]\n",output_filename); 
-  if (list_filename!=NULL) lprintf("MAIN",0,"list file [%s]\n",list_filename); 
-  else lprintf("MAIN",0,"cnfg file [%s]\n",cnfg_filename); 
+  lprintf("MAIN",0,"list file [%s]\n",list_filename); 
+  
 
 
   /* read & broadcast parameters */
@@ -353,7 +353,6 @@ int main(int argc,char *argv[]) {
 
 
 
-  int k, beta;
   init_propagator_eo(1,m, mes_var.precision);//1 for number of masses 
 
 

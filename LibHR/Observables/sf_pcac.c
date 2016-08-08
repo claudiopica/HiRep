@@ -25,12 +25,16 @@ extern rhmc_par _update_par; /* Update/update_rhmc.c */
 
 
 
+#if defined(ROTATED_SF) ||  defined(BASIC_SF)
 static double hmass;
+#endif
+
+
 #ifdef BASIC_SF
 static void H_sf(spinor_field *out, spinor_field *in){
   g5Dphi(hmass,out,in);
 }
-#else
+#elif defined(ROTATED_SF)
 static void H2_sf(spinor_field *out, spinor_field *in){
   g5Dphi_sq(hmass,out,in);
 }
@@ -116,8 +120,7 @@ void SF_PCAC_wall_mass(double mass, double acc )
     spinor_field_zero_f(&source[s]);
     if(COORD[0]==0){
       _spinor_zero_f(stmp[0]);
-      stmp[0].c[s%4].c[s/4].re=1.;
-      stmp[0].c[s%4].c[s/4].im=0.;
+      stmp[0].c[s%4].c[s/4]=1.;
       _spinor_g5_assign_f(stmp[0]);
 
       for(ix1=0;ix1<X;ix1++) for(ix2=0;ix2<Y;ix2++) for(ix3=0;ix3<Z;ix3++) {
@@ -211,8 +214,7 @@ void SF_PCAC_wall_mass(double mass, double acc )
     spinor_field_zero_f(&source[s]);
     if(COORD[0]==NP_T-1){
       _spinor_zero_f(stmp[0]);
-      stmp[0].c[s%4].c[s/4].re=1.;
-      stmp[0].c[s%4].c[s/4].im=0.;
+      stmp[0].c[s%4].c[s/4]=1.;
       _spinor_g5_assign_f(stmp[0]);
     
       for(ix1=0;ix1<X;ix1++) for(ix2=0;ix2<Y;ix2++) for(ix3=0;ix3<Z;ix3++){
@@ -311,8 +313,7 @@ void SF_PCAC_wall_mass(double mass, double acc )
   for(s1=0;s1<4*NF;s1++){
     spinor_field_zero_f(&source[s1]);
     _spinor_zero_f(chi[s1]);
-    chi[s1].c[s1%4].c[s1/4].re=1.;
-    chi[s1].c[s1%4].c[s1/4].im=0.;
+    chi[s1].c[s1%4].c[s1/4]=1.;
     if(COORD[0]==0){
 
       for(ix1=0;ix1<X;ix1++) for(ix2=0;ix2<Y;ix2++) for(ix3=0;ix3<Z;ix3++) {

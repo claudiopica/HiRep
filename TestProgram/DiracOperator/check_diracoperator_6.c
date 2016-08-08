@@ -25,12 +25,12 @@
 static double hmass=0.1;
 
 
-static void D(spinor_field *out, spinor_field *in){
+static void loc_D(spinor_field *out, spinor_field *in){
    Dphi(hmass,out,in);
 }
 
 
-static void D_flt(spinor_field_flt *out, spinor_field_flt *in){
+static void loc_D_flt(spinor_field_flt *out, spinor_field_flt *in){
    Dphi_flt(hmass,out,in);
 }
 
@@ -130,8 +130,8 @@ int main(int argc,char *argv[])
 
   assign_ud2u_f();
   
-  D(s1,s0);
-  D_flt(f1,f0);
+  loc_D(s1,s0);
+  loc_D_flt(f1,f0);
   
   assign_sd2s(f0,s1);
   

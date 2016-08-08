@@ -20,7 +20,7 @@
 #define _SPINOR_FIELD_TYPE spinor_field
 #define _FUNC(a) a##_f
 #define _REAL double
-#define _COMPLEX complex
+#define _COMPLEX double complex
 #include "TMPL/linear_algebra.h.sdtmpl"
 #undef _SPINOR_FIELD_TYPE
 #undef _FUNC
@@ -31,7 +31,7 @@
 #define _SPINOR_FIELD_TYPE spinor_field_flt
 #define _FUNC(a) a##_f_flt
 #define _REAL float
-#define _COMPLEX complex_flt
+#define _COMPLEX float complex
 #include "TMPL/linear_algebra.h.sdtmpl"
 #undef _SPINOR_FIELD_TYPE
 #undef _FUNC

@@ -13,7 +13,7 @@
 #define GAUGEFIX_H
 
 #include "suN_types.h"
-#include "complex.h"
+#include "hr_complex.h"
 #include "spinor_field.h"
 #include "suN.h"
 

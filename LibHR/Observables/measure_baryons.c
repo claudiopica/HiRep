@@ -33,8 +33,7 @@ do { \
 for(int i = 2; i < 4; i++) \
 for(int j = 0; j < 4; j++) \
 { \
-C[i][j].re = -C[i][j].re; \
-C[i][j].im = -C[i][j].im; \
+C[i][j] = -C[i][j]; \
 } \
 } while(0)
 
@@ -43,8 +42,7 @@ do { \
 for(int i = 0; i < 4; i++) \
 for(int j = 2; j < 4; j++) \
 { \
-C[i][j].re = -C[i][j].re; \
-C[i][j].im = -C[i][j].im; \
+C[i][j] = -C[i][j]; \
 } \
 } while(0)
 
@@ -95,9 +93,9 @@ void propagator_mul_left_right(suNf_propagator *out, suNf_propagator *in, int mu
 }
 
 // baryons 1 ; C[beta][delta]  = S^ii' StildeT^jj' S^ kk'  
-void _propagator_baryon1_mul2(complex C[4][4],suNf_propagator S,suNf_propagator Stilde,int i,int ip,int j,int jp,int k,int kp)
+void _propagator_baryon1_mul2(double complex C[4][4],suNf_propagator S,suNf_propagator Stilde,int i,int ip,int j,int jp,int k,int kp)
 {
-	complex tmp[4][4];
+	double complex tmp[4][4];
 
 	for(int alpha = 0; alpha < 4; ++alpha)
 	{
@@ -125,9 +123,9 @@ void _propagator_baryon1_mul2(complex C[4][4],suNf_propagator S,suNf_propagator 
 }
 
 // baryons 2 ; C[beta][delta]  = S^ii'_*tr(_S^ jj' StilteT^kk'
-void _propagator_baryon2_mul2(complex C[4][4],suNf_propagator S,suNf_propagator Stilde,int i,int ip,int j,int jp,int k,int kp)
+void _propagator_baryon2_mul2(double complex C[4][4],suNf_propagator S,suNf_propagator Stilde,int i,int ip,int j,int jp,int k,int kp)
 {
-	complex tmp;
+	double complex tmp;
 	_complex_0(tmp);
 
 	for(int alpha = 0; alpha < 4; ++alpha)
@@ -155,11 +153,11 @@ void contract_baryons(spinor_field* psi0, int tau)
 	suNf_propagator Snucleon[2][2]; // Stilde for the nucleon
 	suNf_propagator Sdelta[4][4]; // Stilde for the delta
 
-	complex C1[4][4]; // to initialize
-	complex C2[4][4]; // to initialize
+	double complex C1[4][4]; // to initialize
+	double complex C2[4][4]; // to initialize
 
-	complex corr_nucleon[GLB_T][2][2][4][4];
-	complex corr_delta[GLB_T][4][4][4][4];
+	double complex corr_nucleon[GLB_T][2][2][4][4];
+	double complex corr_delta[GLB_T][4][4][4][4];
 
 	double col_factor[NF][NF][NF][NF][NF][NF];
 	double eps[NF][NF][NF];
@@ -378,8 +376,7 @@ void contract_baryons(spinor_field* psi0, int tau)
 					for(int i = 0; i < 4; i++)
 					for(int j = 0; j < 4; j++)
 					{
-					corr_nucleon[tc][k][l][i][j].re -= col_factor[a][b][c][ap][bp][cp] * (C1[i][j].re - C2[i][j].re);
-					corr_nucleon[tc][k][l][i][j].im -= col_factor[a][b][c][ap][bp][cp] * (C1[i][j].im - C2[i][j].im);
+					corr_nucleon[tc][k][l][i][j] -= col_factor[a][b][c][ap][bp][cp] * (C1[i][j] - C2[i][j]);
 					}
 			  }
 
@@ -395,8 +392,7 @@ void contract_baryons(spinor_field* psi0, int tau)
 					for(int i = 0; i < 4; i++)
 					for(int j = 0; j < 4; j++)
 					{
-						corr_delta[tc][mu][nu][i][j].re -= 2*col_factor[a][b][c][ap][bp][cp] * (C2[i][j].re - 2*C1[i][j].re);
-						corr_delta[tc][mu][nu][i][j].im -= 2*col_factor[a][b][c][ap][bp][cp] * (C2[i][j].im - 2*C1[i][j].im);
+						corr_delta[tc][mu][nu][i][j] -= 2*col_factor[a][b][c][ap][bp][cp] * (C2[i][j] - 2*C1[i][j]);
 					}
 				}
 			} // end cp
@@ -415,14 +411,10 @@ void contract_baryons(spinor_field* psi0, int tau)
 
 		lprintf("CORR_NUCLEON", 0, "%d %d %d %3.10e %3.10e  %3.10e %3.10e  %3.10e %3.10e  %3.10e %3.10e \n",
 				t,k,l,
-				corr_nucleon[t][k][l][i][0].re,
-				corr_nucleon[t][k][l][i][0].im,
-				corr_nucleon[t][k][l][i][1].re,
-				corr_nucleon[t][k][l][i][1].im,
-				corr_nucleon[t][k][l][i][2].re,
-				corr_nucleon[t][k][l][i][2].im,
-				corr_nucleon[t][k][l][i][3].re,
-				corr_nucleon[t][k][l][i][3].im
+				creal(corr_nucleon[t][k][l][i][0]),cimag(corr_nucleon[t][k][l][i][0]),
+				creal(corr_nucleon[t][k][l][i][1]),cimag(corr_nucleon[t][k][l][i][1]),
+				creal(corr_nucleon[t][k][l][i][2]),cimag(corr_nucleon[t][k][l][i][2]),
+				creal(corr_nucleon[t][k][l][i][3]),cimag(corr_nucleon[t][k][l][i][3])
 		);
 	}
 
@@ -436,14 +428,10 @@ void contract_baryons(spinor_field* psi0, int tau)
 				t,
 				mu,
 				nu,
-				corr_delta[t][mu][nu][i][0].re,
-				corr_delta[t][mu][nu][i][0].im,
-				corr_delta[t][mu][nu][i][1].re,
-				corr_delta[t][mu][nu][i][1].im,
-				corr_delta[t][mu][nu][i][2].re,
-				corr_delta[t][mu][nu][i][2].im,
-				corr_delta[t][mu][nu][i][3].re,
-				corr_delta[t][mu][nu][i][3].im
+				creal(corr_delta[t][mu][nu][i][0]),cimag(corr_delta[t][mu][nu][i][0]),
+				creal(corr_delta[t][mu][nu][i][1]),cimag(corr_delta[t][mu][nu][i][1]),
+				creal(corr_delta[t][mu][nu][i][2]),cimag(corr_delta[t][mu][nu][i][2]),
+				creal(corr_delta[t][mu][nu][i][3]),cimag(corr_delta[t][mu][nu][i][3])
 		);
 	}
 

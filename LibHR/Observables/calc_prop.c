@@ -424,7 +424,7 @@ void calc_deflated_propagator(spinor_field *psi, spinor_field* eta, int ndilute,
         Ddag_pre(tmp, &eta[beta], tmp_sf);
         spinor_field_mul_f(tmp,(4.+m[0]),tmp);
 	for (n=0;n<Nuse;++n) {
-	  complex p = spinor_field_prod_f(&eva_vec[n],tmp);
+	  double complex p = spinor_field_prod_f(&eva_vec[n],tmp);
 	  _complex_mulr( p, ( 1./eva_val[n] ), p );
 	  spinor_field_mulc_add_assign_f(&psi[beta*n_masses+i],p,&eva_vec[n]);
 	}

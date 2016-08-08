@@ -26,7 +26,7 @@ static double hmass=0.1;
 static suNg_field *g;
 
 
-static void D_flt(spinor_field_flt *out, spinor_field_flt *in){
+static void loc_D_flt(spinor_field_flt *out, spinor_field_flt *in){
    Dphi_flt(hmass,out,in);
 }
 
@@ -167,7 +167,7 @@ BCs_pars_t BCs_pars = {
   
   assign_ud2u_f();
  
-  D_flt(s1,s0);
+  loc_D_flt(s1,s0);
   
   transform_s(s2,s1);
   
@@ -177,7 +177,7 @@ BCs_pars_t BCs_pars = {
   transform_u();
   
   spinor_field_zero_f_flt(s1);
-  D_flt(s1,s3);
+  loc_D_flt(s1,s3);
   
   
   spinor_field_mul_add_assign_f_flt(s1,-1.0,s2);

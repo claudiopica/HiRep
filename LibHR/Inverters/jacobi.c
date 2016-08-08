@@ -41,7 +41,7 @@
 #include <math.h>
 #include <float.h>
 #include "error.h"
-#include "complex.h"
+#include "hr_complex.h"
 #include "suN.h"
 #include "inverters.h"
 
@@ -83,11 +83,11 @@ static void sort1(int n,double d[],double v[])
 }
 
 
-static void sort2(int n,double d[],complex v[])
+static void sort2(int n,double d[],double complex v[])
 {
    int i,j,k;
    double p;
-   complex q;
+   double complex q;
    
    for (i=0;i<n-1;i++)
    {
@@ -270,16 +270,16 @@ void jacobi1(int n,double a[],double d[],double v[])
 }
 
 
-void jacobi2(int n,complex a[],double d[],complex v[])
+void jacobi2(int n,double complex a[],double d[],double complex v[])
 {
    int k,l,j,sweep;
    double tol,abs_sum,thresh_factor,sd_factor,thresh;
    double r1,r2,r3,r4;
    double t,s,c,tau;
    double xn,xd0,xdh,xd1;
-   complex z1,z2;
-   complex e;
-   complex zd0,zd1;
+   double complex z1,z2;
+   double complex e;
+   double complex zd0,zd1;
 
    xd0=0.0f;
    xdh=0.5f;
@@ -288,10 +288,8 @@ void jacobi2(int n,complex a[],double d[],complex v[])
    sd_factor=100.0f;
    thresh_factor=0.2f/(xn*xn);
 
-   zd0.re=xd0;
-   zd0.im=xd0;
-   zd1.re=xd1;
-   zd1.im=xd0;
+   zd0=xd0+I*xd0;
+   zd1=xd1+I*xd0;
 
    tol=xd0;
    abs_sum=xd0;
@@ -299,7 +297,7 @@ void jacobi2(int n,complex a[],double d[],complex v[])
    for (k=0;k<n;k++)
    {
       v[n*k+k]=zd1;
-      d[k]=a[n*k+k].re;
+      d[k]=creal(a[n*k+k]);
       tol+=fabs(d[k]);
 
       for (l=k+1;l<n;l++)
@@ -307,10 +305,10 @@ void jacobi2(int n,complex a[],double d[],complex v[])
 	 v[n*k+l]=zd0;
 	 v[n*l+k]=zd0;
 
-	 error((a[n*k+l].re!=a[n*l+k].re)||(a[n*k+l].im!=-a[n*l+k].im),1,
-                   "jacobi2 [jacobi.c]","Matrix is not hermitian");
+	 error(a[n*k+l]!=conj(a[n*l+k]),1,
+               "jacobi2 [jacobi.c]","Matrix is not hermitian");
 	  
-         abs_sum+=(fabs(a[n*k+l].re)+fabs(a[n*k+l].im));
+         abs_sum+=(fabs(creal(a[n*k+l])+fabs(cimag(a[n*k+l]))));
       }
    }
 
@@ -328,15 +326,15 @@ void jacobi2(int n,complex a[],double d[],complex v[])
 	 for (l=k+1;l<n;l++)
 	 {
 	    r1=sd_factor*
-               (fabs(a[n*k+l].re)+fabs(a[n*k+l].im));
+              (fabs(creal(a[n*k+l]))+fabs(cimag(a[n*k+l])));
 	    r2=fabs(d[k]);
 	    r3=fabs(d[l]);
 
 	    if ((sweep>3)&&(r1<=(r2*DBL_EPSILON))&&(r1<=(r3*DBL_EPSILON)))
 	       a[n*k+l]=zd0;
 	
-	    r2=fabs(a[n*k+l].re);
-	    r3=fabs(a[n*k+l].im);
+               r2=fabs(creal(a[n*k+l]));
+               r3=fabs(cimag(a[n*k+l]));
 
 	    if (r2>r3)
 	    {
@@ -376,8 +374,8 @@ void jacobi2(int n,complex a[],double d[],complex v[])
 	       }
 	    }
 
-	    e.re=a[n*k+l].re/r1;
-	    e.im=a[n*k+l].im/r1;
+	    e=a[n*k+l]/r1;
+
 	    a[n*k+l]=zd0;
 
 	    c=xd1/(sqrt(xd1+t*t));
@@ -394,36 +392,49 @@ void jacobi2(int n,complex a[],double d[],complex v[])
 	       {
 		  z1=a[n*j+k];
 		  z2=a[n*j+l];
-		  a[n*j+k].re=-s*( tau*z1.re+e.re*z2.re+e.im*z2.im)+z1.re;
-		  a[n*j+k].im=-s*( tau*z1.im-e.im*z2.re+e.re*z2.im)+z1.im;
-		  a[n*j+l].re= s*(-tau*z2.re+e.re*z1.re-e.im*z1.im)+z2.re;
-		  a[n*j+l].im= s*(-tau*z2.im+e.im*z1.re+e.re*z1.im)+z2.im;
+                  a[n*j+k]=-s*(tau*z1+conj(e)*z2)+z1;
+                  /* a[n*j+k].re=-s*( tau*z1.re+e.re*z2.re+e.im*z2.im)+z1.re; */
+		  /* a[n*j+k].im=-s*( tau*z1.im-e.im*z2.re+e.re*z2.im)+z1.im; */
+
+                  a[n*j+l]=s*(-tau*z2+e*z1)+z2;
+		  /* a[n*j+l].re= s*(-tau*z2.re+e.re*z1.re-e.im*z1.im)+z2.re; */
+		  /* a[n*j+l].im= s*(-tau*z2.im+e.im*z1.re+e.re*z1.im)+z2.im; */
 	       }
 	       else if ((j>k)&&(j<l))
 	       {
 		  z1=a[n*k+j];
 		  z2=a[n*j+l];
-		  a[n*k+j].re=-s*( tau*z1.re+e.re*z2.re+e.im*z2.im)+z1.re;
-		  a[n*k+j].im=-s*( tau*z1.im+e.im*z2.re-e.re*z2.im)+z1.im;
-		  a[n*j+l].re= s*(-tau*z2.re+e.re*z1.re+e.im*z1.im)+z2.re;
-		  a[n*j+l].im= s*(-tau*z2.im+e.im*z1.re-e.re*z1.im)+z2.im;
+                  a[n*k+j]=-s*(tau*z1+e*conj(z2))+z1;
+		  /* a[n*k+j].re=-s*( tau*z1.re+e.re*z2.re+e.im*z2.im)+z1.re; */
+		  /* a[n*k+j].im=-s*( tau*z1.im+e.im*z2.re-e.re*z2.im)+z1.im; */
+
+                  a[n*j+l]=s*(-tau*z2+e*conj(z1))+z2;
+		  /* a[n*j+l].re= s*(-tau*z2.re+e.re*z1.re+e.im*z1.im)+z2.re; */
+		  /* a[n*j+l].im= s*(-tau*z2.im+e.im*z1.re-e.re*z1.im)+z2.im; */
 	       }
 	       else if (j>l)
 	       {
 		  z1=a[n*k+j];
 		  z2=a[n*l+j];
-		  a[n*k+j].re=-s*( tau*z1.re+e.re*z2.re-e.im*z2.im)+z1.re;
-		  a[n*k+j].im=-s*( tau*z1.im+e.im*z2.re+e.re*z2.im)+z1.im;
-		  a[n*l+j].re= s*(-tau*z2.re+e.re*z1.re+e.im*z1.im)+z2.re;
-		  a[n*l+j].im= s*(-tau*z2.im-e.im*z1.re+e.re*z1.im)+z2.im;
+                  a[n*k+j]=-s*(tau*z1+e*z2)+z1;
+		  /* a[n*k+j].re=-s*( tau*z1.re+e.re*z2.re-e.im*z2.im)+z1.re; */
+		  /* a[n*k+j].im=-s*( tau*z1.im+e.im*z2.re+e.re*z2.im)+z1.im; */
+
+                  a[n*l+j]=s*(-tau*z2+conj(e)*z1)+z2;
+		  /* a[n*l+j].re= s*(-tau*z2.re+e.re*z1.re+e.im*z1.im)+z2.re; */
+		  /* a[n*l+j].im= s*(-tau*z2.im-e.im*z1.re+e.re*z1.im)+z2.im; */
 	       }
 
 	       z1=v[n*j+k];
 	       z2=v[n*j+l];
-	       v[n*j+k].re=-s*( tau*z1.re+e.re*z2.re+e.im*z2.im)+z1.re;
-	       v[n*j+k].im=-s*( tau*z1.im-e.im*z2.re+e.re*z2.im)+z1.im;
-	       v[n*j+l].re= s*(-tau*z2.re+e.re*z1.re-e.im*z1.im)+z2.re;
-	       v[n*j+l].im= s*(-tau*z2.im+e.im*z1.re+e.re*z1.im)+z2.im;
+
+               v[n*j+k]=-s*(tau*z1+conj(e)*z2)+z1;
+	       /* v[n*j+k].re=-s*( tau*z1.re+e.re*z2.re+e.im*z2.im)+z1.re; */
+	       /* v[n*j+k].im=-s*( tau*z1.im-e.im*z2.re+e.re*z2.im)+z1.im; */
+
+               v[n*j+l]= s*(-tau*z2+e*z1)+z2;
+               /* v[n*j+l].re= s*(-tau*z2.re+e.re*z1.re-e.im*z1.im)+z2.re; */
+	       /* v[n*j+l].im= s*(-tau*z2.im+e.im*z1.re+e.re*z1.im)+z2.im; */
 	    }
 	 }
       }
@@ -435,7 +446,7 @@ void jacobi2(int n,complex a[],double d[],complex v[])
 	 for (l=k+1;l<n;l++)
 	 {
 	    abs_sum+=
-               (fabs(a[n*k+l].re)+fabs(a[n*k+l].im));
+              (fabs(creal(a[n*k+l]))+fabs(cimag(a[n*k+l])));
 	 }
       }
    }
@@ -447,8 +458,9 @@ void jacobi2(int n,complex a[],double d[],complex v[])
    {
       for (l=k+1;l<n;l++)
       {
-	 a[n*k+l].re=a[n*l+k].re;
-	 a[n*k+l].im=-a[n*l+k].im;
+        a[n*k+l]=conj(a[n*l+k]);
+        /* a[n*k+l].re=a[n*l+k].re; */
+        /* a[n*k+l].im=-a[n*l+k].im; */
       }
    }
 

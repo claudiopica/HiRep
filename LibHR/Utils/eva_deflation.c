@@ -81,18 +81,18 @@ static void find_low_eig_H2(const eva_prec *e_par, geometry_descriptor *type, in
 
 static void check_ortho(spinor_field *in, int n) {
   int i,j;
-  complex p;
+  double complex p;
   for (i=0;i<n;++i) {
     for (j=i;j<n;++j) {
       p=spinor_field_prod_f(&in[i],&in[j]);
-      lprintf("TESTORTHO",0,"(%e,%e) ",p.re,p.im);
+      lprintf("TESTORTHO",0,"(%e,%e) ",creal(p),cimag(p));
     }
-    lprintf("TESTORTHO",0,"\n",p.re,p.im);
+    lprintf("TESTORTHO",0,"\n",creal(p),cimag(p));
   }
 }
 
 static void orthogonalize(spinor_field *out, spinor_field *in, int n) {
-  complex p;
+  double complex p;
   while(n>0) {
     --n;
     p=spinor_field_prod_f(&in[n],out);
@@ -101,15 +101,15 @@ static void orthogonalize(spinor_field *out, spinor_field *in, int n) {
   }
 }
 
-static void GS_vect(spinor_field *b, int n) {
-  int i;
-  double inorm;
-  for (i=0;i<n;++i) {
-    orthogonalize(&b[i], &b[i+1], n-i-1); 
-    inorm=1./sqrt(spinor_field_sqnorm_f(&b[i]));
-    spinor_field_mul_f(&b[i],inorm,&b[i]);
-  }
-}
+/* static void GS_vect(spinor_field *b, int n) { */
+/*   int i; */
+/*   double inorm; */
+/*   for (i=0;i<n;++i) { */
+/*     orthogonalize(&b[i], &b[i+1], n-i-1);  */
+/*     inorm=1./sqrt(spinor_field_sqnorm_f(&b[i])); */
+/*     spinor_field_mul_f(&b[i],inorm,&b[i]); */
+/*   } */
+/* } */
 
 void set_def_matrix(eva_prec *e_par, spinor_operator H, geometry_descriptor *type) {
   int changed;
@@ -134,7 +134,7 @@ void eva_def(spinor_field *out, spinor_field *in){
   orthogonalize(out,ev,loc_par.nev);
   /*
   for (i=0;i<loc_par.nev;++i) {
-    complex p=spinor_field_prod_f(&ev[i],out);
+    double complex p=spinor_field_prod_f(&ev[i],out);
     _complex_mulr(p,(1./eigval[i]-1.),p);
     spinor_field_mulc_add_assign_f(out,p,&ev[i]);
   }
@@ -145,7 +145,7 @@ void eva_def_inv(spinor_field *out, spinor_field *in, double m){
   int i;
   spinor_field_zero_f(out);
   for (i=0;i<loc_par.nev;++i) {
-    complex p=spinor_field_prod_f(&ev[i],in);
+    double complex p=spinor_field_prod_f(&ev[i],in);
     _complex_mulr(p,1./(eigval[i]-m),p);
     spinor_field_mulc_add_assign_f(out,p,&ev[i]);
   }

@@ -22,7 +22,7 @@
 #include <math.h>
 
 
-static double static_mass=0.;
+//static double static_mass=0.;
 static double static_mu=0.;
 
 

@@ -29,9 +29,8 @@ static void Mee_inv(spinor_field *out, double mass, double mu, spinor_field *in)
 
   double norm = (4+mass)*(4+mass)+mu*mu;
   double rho = (4+mass)/norm;
-  complex imu;
-  imu.re=0;
-  imu.im=-mu/norm;
+  double complex imu;
+  imu=-I*mu/norm;
   spinor_field_mul_f(out,rho,in);
   spinor_field_g5_mulc_add_assign_f(out,imu,in);
   //  spinor_field_mul_f(out,(4+mass),out);

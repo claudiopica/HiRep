@@ -80,7 +80,7 @@
 #include <math.h>
 #include "error.h"
 #include "update.h"
-#include "complex.h"
+#include "hr_complex.h"
 #include "linear_algebra.h"
 #include "inverters.h"
 #include "logger.h"
@@ -94,7 +94,7 @@
 
 static int nop,nvc=0;
 static double *dd,*ee;
-static complex *aa,*bb,*cc,*vv;
+static double complex *aa,*bb,*cc,*vv;
 
 static double EPSILON=1.e-12;
 
@@ -108,7 +108,7 @@ static void alloc_ws_rotate(void) {
   
 }
 
-static void rotate(int n,spinor_field *pkk,complex v[])
+static void rotate(int n,spinor_field *pkk,double complex v[])
 {
 
   error((n<1)||(n>MAX_ROTATE),1,"rotate [eva.c]",
@@ -124,7 +124,7 @@ static void rotate(int n,spinor_field *pkk,complex v[])
     for (int k=0;k<n;k++) {
       suNf_spinor *pk=&(psi[k]);
       suNf_spinor *pj=_FIELD_AT(&pkk[0],ix);
-      complex *z=&v[k];
+      double complex *z=&v[k];
       
       _vector_mulc_f((*pk).c[0],*z,(*pj).c[0]);
       _vector_mulc_f((*pk).c[1],*z,(*pj).c[1]);
@@ -158,7 +158,7 @@ static int alloc_aux(int nevt)
 	  free(dd);
 	}
       
-      aa=malloc(4*nevt*nevt*sizeof(complex));
+      aa=malloc(4*nevt*nevt*sizeof(double complex));
       dd=malloc(2*nevt*sizeof(double));
 
       bb=aa+nevt*nevt;
@@ -176,16 +176,15 @@ static int alloc_aux(int nevt)
 
 static void project(spinor_field *pk,spinor_field *pl)
 {
-  complex sp;
+  double complex sp;
 
   /* check input types */
 #ifndef CHECK_SPINOR_MATCHING
   _TWO_SPINORS_MATCHING(pk,pl);
 #endif
 
-  sp.re=-spinor_field_prod_re_f(pl,pk);
-  sp.im=-spinor_field_prod_im_f(pl,pk);
-
+  sp=-spinor_field_prod_re_f(pl,pk) -I*spinor_field_prod_im_f(pl,pk);
+  
   spinor_field_mulc_add_assign_f(pk,sp,pl);
 }   
 
@@ -235,7 +234,7 @@ static void ritz_subsp(int nlock,int nevt,spinor_operator Op,
                        spinor_field *ws,spinor_field *ev,double d[])
 {
   int neff,i,j;
-  complex z;
+  double complex z;
 
   neff=nevt-nlock;
    
@@ -244,17 +243,14 @@ static void ritz_subsp(int nlock,int nevt,spinor_operator Op,
       Op(&ws[0],&ev[nlock+i]);
       nop+=1;      
       
-      aa[neff*i+i].re=spinor_field_prod_re_f(&ev[nlock+i],&ws[0]);
-      aa[neff*i+i].im=0.0f;
+      aa[neff*i+i]=spinor_field_prod_re_f(&ev[nlock+i],&ws[0]);
 
       for (j=0;j<i;j++) 
 	{
 	  z=spinor_field_prod_f(&ws[0],&ev[nlock+j]);
 
-	  aa[neff*i+j].re= z.re;
-	  aa[neff*i+j].im= z.im;
-	  aa[neff*j+i].re= z.re;
-	  aa[neff*j+i].im=-z.im;
+	  aa[neff*i+j]= z;
+	  aa[neff*j+i]= conj(z);
 	}
     }
 
@@ -304,7 +300,7 @@ static int res_subsp(int nlock,int nev,double omega1,double omega2,
 {
   int i,ia,ib;
   double eps1,eps2,absd1,absd2;
-  complex z;
+  double complex z;
 
   eps1=0.0f;
   ia=nlock;
@@ -329,10 +325,9 @@ static int res_subsp(int nlock,int nev,double omega1,double omega2,
       nop+=1;
       spinor_field_lc1_f(-d[ib],&ws[0],&ev[ib]);
 
-      bb[nev*ib+ib].re=spinor_field_sqnorm_f(&ws[0]);
-      bb[nev*ib+ib].im=0.0f;
+      bb[nev*ib+ib]=spinor_field_sqnorm_f(&ws[0]);
 
-      eps2=sqrt(bb[nev*ib+ib].re);
+      eps2=sqrt(creal(bb[nev*ib+ib]));
       absd2=fabs(d[ib]);
       ee[ib]=eps2;
       
@@ -354,10 +349,8 @@ static int res_subsp(int nlock,int nev,double omega1,double omega2,
 	    {
 	      z=spinor_field_prod_f(&ws[1],&ev[i]);
 
-	      bb[nev*ib+i].re= z.re;
-	      bb[nev*ib+i].im= z.im;
-	      bb[nev*i+ib].re= z.re;
-	      bb[nev*i+ib].im=-z.im;
+	      bb[nev*ib+i]= z;
+	      bb[nev*i+ib]= conj(z);
 	    }
 	}
     }

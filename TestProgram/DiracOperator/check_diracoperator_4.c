@@ -45,17 +45,17 @@
 #error This test does not work with SF
 #endif
 
-void D(spinor_field *out, spinor_field *in){
-   Dphi_(out,in);
-}
+//void D(spinor_field *out, spinor_field *in){
+//   Dphi_(out,in);
+//}
 
 static int init_gamma = 0;
-complex my_gamma[4][4][4];
+double complex my_gamma[4][4][4];
 
 void compute_gamma(int g[4], int ic) {
   int p[4], c[4], shift[4];
   double dbl;
-  complex locmy_gamma[4][4][4];
+  double complex locmy_gamma[4][4][4];
   
   spinor_field *in, *out;
   in=alloc_spinor_field_f(1,&glattice);
@@ -64,8 +64,7 @@ void compute_gamma(int g[4], int ic) {
   for(int mu=0; mu<4; mu++)
   for(int beta=0; beta<4; beta++)
   for(int alpha=0; alpha<4; alpha++) {
-    locmy_gamma[mu][alpha][beta].re = 0.;
-    locmy_gamma[mu][alpha][beta].im = 0.;
+    locmy_gamma[mu][alpha][beta] = 0.;
   }
   
   p[0] = g[0]/T; p[1] = g[1]/X; p[2] = g[2]/Y; p[3] = g[3]/Z;
@@ -102,14 +101,14 @@ void compute_gamma(int g[4], int ic) {
     for(int beta=0; beta<4; beta++) {
       spinor_field_zero_f(in);
       _MASTER_FOR(&glattice,ix) {
-        _FIELD_AT(in,ix)->c[beta].c[ic].re=1.;
+        _FIELD_AT(in,ix)->c[beta].c[ic]=1.;
       }
 
       dbl=spinor_field_sqnorm_f(in);
       if(dbl!=GLB_T*GLB_X*GLB_Y*GLB_Z)
         lprintf("ERROR",0,"source sqnorm=%f\n",dbl);
       
-      D(out,in);
+      Dphi_(out,in);
 
       dbl=spinor_field_sqnorm_f(out);
       if(dbl==0.)
@@ -126,8 +125,7 @@ void compute_gamma(int g[4], int ic) {
            c[3]+zerocoord[3]==g[3])
         {
           for(int alpha=0; alpha<4; alpha++) {
-            locmy_gamma[mu][alpha][beta].re += _FIELD_AT(out,ix)->c[alpha].c[ic].re;
-            locmy_gamma[mu][alpha][beta].im += _FIELD_AT(out,ix)->c[alpha].c[ic].im;
+            locmy_gamma[mu][alpha][beta] += _FIELD_AT(out,ix)->c[alpha].c[ic];
           }
         } else if(c[0]+zerocoord[0]==(g[0]+shift[0])%GLB_T &&
                   c[1]+zerocoord[1]==(g[1]+shift[1])%GLB_X &&
@@ -135,8 +133,7 @@ void compute_gamma(int g[4], int ic) {
                   c[3]+zerocoord[3]==(g[3]+shift[3])%GLB_Z)
         {
           for(int alpha=0; alpha<4; alpha++) {
-            locmy_gamma[mu][alpha][beta].re -= _FIELD_AT(out,ix)->c[alpha].c[ic].re;
-            locmy_gamma[mu][alpha][beta].im -= _FIELD_AT(out,ix)->c[alpha].c[ic].im;
+            locmy_gamma[mu][alpha][beta] -= _FIELD_AT(out,ix)->c[alpha].c[ic];
           }
         } else {
           _spinor_prod_re_f(dbl,*_FIELD_AT(out,ix),*_FIELD_AT(out,ix));
@@ -165,7 +162,7 @@ void compute_gamma(int g[4], int ic) {
         lprintf("GAMMA",0,"[ ");
         for(int beta=0; beta<4; beta++) {
           my_gamma[mu][alpha][beta]=locmy_gamma[mu][alpha][beta];
-          lprintf("GAMMA",0,"(%.2f,%.2f) ",my_gamma[mu][alpha][beta].re,my_gamma[mu][alpha][beta].im);
+          lprintf("GAMMA",0,"(%.2f,%.2f) ",creal(my_gamma[mu][alpha][beta]),cimag(my_gamma[mu][alpha][beta]));
         }
         lprintf("GAMMA",0,"]\n");
       }
@@ -176,8 +173,7 @@ void compute_gamma(int g[4], int ic) {
       dbl=0.;
       for(int beta=0; beta<4; beta++)
       for(int alpha=0; alpha<4; alpha++) {
-        dbl+=(locmy_gamma[mu][alpha][beta].re-my_gamma[mu][alpha][beta].re)*(locmy_gamma[mu][alpha][beta].re-my_gamma[mu][alpha][beta].re);
-        dbl+=(locmy_gamma[mu][alpha][beta].im-my_gamma[mu][alpha][beta].im)*(locmy_gamma[mu][alpha][beta].im-my_gamma[mu][alpha][beta].im);
+        dbl+=(locmy_gamma[mu][alpha][beta]-my_gamma[mu][alpha][beta])*conj(locmy_gamma[mu][alpha][beta]-my_gamma[mu][alpha][beta]);
       }
       if(dbl!=0.) {
         lprintf("ERROR",0,"Wrong gamma matrix! g=(%d,%d,%d,%d) ic=%d mu=%d err2=%e\n",g[0],g[1],g[2],g[3],ic,mu,dbl);
@@ -185,7 +181,7 @@ void compute_gamma(int g[4], int ic) {
         for(int alpha=0; alpha<4; alpha++) {
           lprintf("ERROR",0,"[ ");
           for(int beta=0; beta<4; beta++) {
-            lprintf("ERROR",0,"(%.2f,%.2f) ",locmy_gamma[mu][alpha][beta].re,locmy_gamma[mu][alpha][beta].im);
+            lprintf("ERROR",0,"(%.2f,%.2f) ",creal(locmy_gamma[mu][alpha][beta]),cimag(locmy_gamma[mu][alpha][beta]));
           }
           lprintf("ERROR",0,"]\n");
         }

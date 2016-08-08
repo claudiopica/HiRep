@@ -14,7 +14,7 @@
 #include "logger.h"
 #include <math.h>
 
-#define cabs(a) sqrt(a.re*a.re + a.im*a.im)
+#define cabs(a) sqrt(_complex_prod_re(a,a))
 #define MAX 15
 
 // Global variables
@@ -23,10 +23,10 @@ static spinor_field *Dv;
 static int num_init = 0;
 
 // Variables used in in the LU solver
-static complex A[MAX][MAX];
-static complex b[MAX];
-static complex x[MAX];
-static complex y[MAX];
+static double complex A[MAX][MAX];
+static double complex b[MAX];
+static double complex x[MAX];
+static double complex y[MAX];
 static int mutate[MAX];
 
 // Handle even/odd preconditioning
@@ -38,7 +38,7 @@ static int mutate[MAX];
 
 void gram_schmidt(mre_par *par, int p, int max)
 {
-	complex rij;
+	double complex rij;
 	double rii;
 
 	for(int i = 0; i < max; i++)
@@ -65,7 +65,7 @@ void lu_solve(int max)
 {
 	double big;
 	int row;
-	complex ctmp;
+	double complex ctmp;
 	int itmp;
 
 	// Setup mutate
@@ -132,8 +132,7 @@ void lu_solve(int max)
 	// Forward substitution
 	for(int i = 0; i < max; i++)
 	{
-		y[i] = b[mutate[i]];
-		y[i].im = -y[i].im;
+          y[i] = conj(b[mutate[i]]);
 		for(int k = 0; k < i; k++)
 		{
 			_complex_mul_sub_assign(y[i], A[i][k], y[k]);
