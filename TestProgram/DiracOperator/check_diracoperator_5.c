@@ -26,8 +26,8 @@ static double hmass=0.1;
 static suNg_field *g;
 
 
-static void loc_D_flt(spinor_field_flt *out, spinor_field_flt *in){
-   Dphi_flt(hmass,out,in);
+static void loc_D(spinor_field *out, spinor_field *in){
+   Dphi(hmass,out,in);
 }
 
 
@@ -54,11 +54,11 @@ static void transform_u(void)
   represent_gauge_field();
 }
 
-static void transform_s(spinor_field_flt *out, spinor_field_flt *in)
+static void transform_s(spinor_field *out, spinor_field *in)
 {
   _MASTER_FOR(&glattice,ix) {
-    suNf_spinor_flt *s = _FIELD_AT(in,ix);
-    suNf_spinor_flt *r = _FIELD_AT(out,ix);
+    suNf_spinor *s = _FIELD_AT(in,ix);
+    suNf_spinor *r = _FIELD_AT(out,ix);
     suNf gfx;
     
     _group_represent2(&gfx,_FIELD_AT(g,ix));
@@ -75,7 +75,7 @@ int main(int argc,char *argv[])
 {
   char tmp[256];
   double sig,tau;
-  spinor_field_flt *s0,*s1,*s2,*s3;
+  spinor_field *s0,*s1,*s2,*s3;
   
   setup_process(&argc,&argv);
   
@@ -139,7 +139,7 @@ BCs_pars_t BCs_pars = {
   
   /* allocate memory */
   g=alloc_gtransf(&glattice);
-  s0=alloc_spinor_field_f_flt(4,&glattice);
+  s0=alloc_spinor_field_f(4,&glattice);
   s1=s0+1;
   s2=s1+1;
   s3=s2+1;
@@ -151,10 +151,10 @@ BCs_pars_t BCs_pars = {
   represent_gauge_field();
   lprintf("MAIN",0,"done.\n");
   
-  spinor_field_zero_f_flt(s0);
-  gaussian_spinor_field_flt(&(s0[0]));
-  tau = 1./sqrt(spinor_field_sqnorm_f_flt(s0));
-  spinor_field_mul_f_flt(s0,tau,s0);
+  spinor_field_zero_f(s0);
+  gaussian_spinor_field(&(s0[0]));
+  tau = 1./sqrt(spinor_field_sqnorm_f(s0));
+  spinor_field_mul_f(s0,tau,s0);
   
   lprintf("MAIN",0,"Generating a random gauge transf... ");
   fflush(stdout);
@@ -167,7 +167,7 @@ BCs_pars_t BCs_pars = {
   
   assign_ud2u_f();
  
-  loc_D_flt(s1,s0);
+  loc_D(s1,s0);
   
   transform_s(s2,s1);
   
@@ -176,12 +176,12 @@ BCs_pars_t BCs_pars = {
   
   transform_u();
   
-  spinor_field_zero_f_flt(s1);
-  loc_D_flt(s1,s3);
+  spinor_field_zero_f(s1);
+  loc_D(s1,s3);
   
   
-  spinor_field_mul_add_assign_f_flt(s1,-1.0,s2);
-  sig=spinor_field_sqnorm_f_flt(s1);
+  spinor_field_mul_add_assign_f(s1,-1.0,s2);
+  sig=spinor_field_sqnorm_f(s1);
   
   lprintf("MAIN",0,"Maximal normalized difference = %.2e\n",sqrt(sig));
   lprintf("MAIN",0,"(should be around 1*10^(-15) or so)\n\n");
@@ -190,7 +190,7 @@ BCs_pars_t BCs_pars = {
 #ifndef REPR_FUNDAMENTAL
   free_gfield_f(u_gauge_f);
 #endif
-  free_spinor_field_f_flt(s0);
+  free_spinor_field_f(s0);
   
   free_gtransf(g);
   
