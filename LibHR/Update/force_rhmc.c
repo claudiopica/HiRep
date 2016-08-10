@@ -23,7 +23,7 @@
 
 #define _print_avect(a) printf("(%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e)\n",(a).c1,(a).c2,(a).c3,(a).c4,(a).c5,(a).c6,(a).c7,(a).c8)
 
-#define _print_mat(a) printf("(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n",(a).c1_1.re,(a).c1_2.re,(a).c1_3.re,(a).c2_1.re,(a).c2_2.re,(a).c2_3.re,(a).c3_1.re,(a).c3_2.re,(a).c3_3.re);printf("(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n",(a).c1_1.im,(a).c1_2.im,(a).c1_3.im,(a).c2_1.im,(a).c2_2.im,(a).c2_3.im,(a).c3_1.im,(a).c3_2.im,(a).c3_3.im)
+#define _print_mat(a) printf("(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n",creal((a).c1_1),creal((a).c1_2),creal((a).c1_3),creal((a).c2_1),creal((a).c2_2),creal((a).c2_3),creal((a).c3_1),creal((a).c3_2),creal((a).c3_3));printf("(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n",cimag((a).c1_1),cimag((a).c1_2),cimag((a).c1_3),cimag((a).c2_1),cimag((a).c2_2),cimag((a).c2_3),cimag((a).c3_1),cimag((a).c3_2),cimag((a).c3_3))
 
 /* we need to compute  Tr  U(x,mu) g_5*(1-g_mu) chi2 # chi1^+
  * where # indicates the tensor product and Tr is the trace on Lorentz space.

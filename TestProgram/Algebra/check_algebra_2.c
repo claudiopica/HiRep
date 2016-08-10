@@ -40,7 +40,7 @@ int main(int argc,char *argv[])
    suNg A;
    suNf a,s,tmp;
    int i,j;
-   complex zp,zm;
+   double complex zp,zm;
    
    printf("Gauge group: SU(%d)\n",NG);
    printf("Fermion representation: dim = %d\n",NF);
@@ -65,7 +65,7 @@ int main(int argc,char *argv[])
    {
       for (j=0;j<NF;j++)
       {
-         printf("%.4f + i %.4f   ",A.c[i*NF+j].re,A.c[i*NF+j].im);
+        printf("%.4f + i %.4f   ",creal(A.c[i*NF+j]),cimag(A.c[i*NF+j]));
       }
       printf("\n");
    }
@@ -75,7 +75,7 @@ int main(int argc,char *argv[])
    {
       for (j=0;j<NF;j++)
       {
-         printf("%.4f + i %.4f   ",a.c[i*NF+j].re,a.c[i*NF+j].im);
+        printf("%.4f + i %.4f   ",creal(a.c[i*NF+j]),cimag(a.c[i*NF+j]));
       }
       printf("\n");
    }

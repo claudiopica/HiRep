@@ -214,8 +214,8 @@ static void print_prop(suNf_propagator S){
       for(i=0;i<4*NF;i++){ 
 	lprintf("PROP", 10, "{");
       for(j=0;j<4*NF;j++){ 
-	 if(j<4*NF-1){ lprintf("PROP", 10, "%.10f + I*%.10f, ", _PROP_IDX(S,i,j).re, _PROP_IDX(S,i,j).im ); }
-	 else{ lprintf("PROP", 10, "%.10f + I*%.10f", _PROP_IDX(S,i,j).re, _PROP_IDX(S,i,j).im ); }
+        if(j<4*NF-1){ lprintf("PROP", 10, "%.10f + I*%.10f, ", creal(_PROP_IDX(S,i,j)), cimag(_PROP_IDX(S,i,j)) ); }
+        else{ lprintf("PROP", 10, "%.10f + I*%.10f", creal(_PROP_IDX(S,i,j)), cimag(_PROP_IDX(S,i,j)) ); }
       }
       	if(i<4*NF-1){ lprintf("PROP", 10, "},"); }
 	else{ lprintf("PROP", 10, "}"); }
@@ -229,7 +229,7 @@ static void check_g5herm(spinor_field *prop1, int t1, spinor_field *prop2, int t
   int beta, a, ix1, ix2;
 
   suNf_propagator sp1,sp2,spdag;
-  complex tr;
+  double complex tr;
 		lprintf("CK_G5HERM",0,"Only Works in serial!\n");
 		ix1 = ipt(t1-zerocoord[0],0,0,0);
 		ix2 = ipt(t2-zerocoord[0],0,0,0);
@@ -249,7 +249,7 @@ static void check_g5herm(spinor_field *prop1, int t1, spinor_field *prop2, int t
 		lprintf("CK_G5HERM",0,"Propagator1 - g5 Propagator2^dagger g5 \n");
 		print_prop(sp2);
 		_propagator_trace(tr,sp2);
-		lprintf("CK_G5HERM",0,"Tr[ g5 Propagator1^dag g5 - Propagator2 ] = %g + I%g\n", tr.re, tr.im);
+		lprintf("CK_G5HERM",0,"Tr[ g5 Propagator1^dag g5 - Propagator2 ] = %g + I%g\n", creal(tr), cimag(tr));
      
 }
 
@@ -293,7 +293,7 @@ static void check_sequential_point(spinor_field *prop_1, spinor_field *prop_2, s
   int ix2 = ipt(ti,0,0,0);
   suNf_propagator sp1,sp2,sp3,sptmp1, sptmp2;
   int a, beta;
-  complex tr;
+  double complex tr;
 
 	for (a=0;a<NF;++a){
 	    for (beta=0;beta<4;beta++){ 
@@ -307,16 +307,16 @@ static void check_sequential_point(spinor_field *prop_1, spinor_field *prop_2, s
 	_propagator_mul(sptmp2,sp2,sptmp1);
 
 	_propagator_trace(tr,sptmp2);
-	lprintf("CK_SEQ",0,"S(0,x) g5 S(x,0) point = %g + I%g\n", tr.re, tr.im);
+	lprintf("CK_SEQ",0,"S(0,x) g5 S(x,0) point = %g + I%g\n", creal(tr), cimag(tr));
 	print_prop(sptmp2);
 
 	_propagator_trace(tr,sp1);
-	lprintf("CK_SEQ",0,"S(0,x) g5 S(x,0) seq   = %g + I%g\n", tr.re, tr.im);
+	lprintf("CK_SEQ",0,"S(0,x) g5 S(x,0) seq   = %g + I%g\n", creal(tr), cimag(tr));
 	print_prop(sp1);
 
 	_propagator_sub(sptmp1,sp1,sptmp2);
 	_propagator_trace(tr,sptmp1);
-	lprintf("CK_SEQ",0,"point - seq   = %g + I%g\n", tr.re, tr.im);
+	lprintf("CK_SEQ",0,"point - seq   = %g + I%g\n", creal(tr), cimag(tr));
 	print_prop(sptmp1);
 }
 
@@ -326,7 +326,7 @@ lprintf("CK_SEQ",0,"Only Works in serial!\n");
 
 double Corr[2][GLB_T];
 int ix,t,x,y,z,a,beta,tc;
-complex tr;
+double complex tr;
 suNf_propagator sp0,sp1,spdag, sptmp;
 
 int i;
@@ -351,13 +351,13 @@ for (t=0; t<GLB_T; t++) {
 
 			//Pion
 			_propagator_mul(sptmp,sp1,spdag); _propagator_trace(tr, sptmp); 
-			Corr[0][tc] += tr.re;
+			Corr[0][tc] += creal(tr);
 
 			//g5 Seq(0,0)
 			if(t == 0 && x==0 && y==0 && z==0){
 				_g5_propagator(sptmp,sp0); 
 				_propagator_trace(tr, sptmp);
-				Corr[1][tc] += tr.re;
+				Corr[1][tc] += creal(tr);
 			}
 		} //END SPATIAL LOOP
 	  } //END TIME LOOP
@@ -398,7 +398,7 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
   lprintf("MAIN",0,"input file [%s]\n",input_filename); 
   lprintf("MAIN",0,"output file [%s]\n",output_filename); 
-  if (list_filename!=NULL) lprintf("MAIN",0,"list file [%s]\n",list_filename); 
+  if (strcmp(list_filename,"") != 0) lprintf("MAIN",0,"list file [%s]\n",list_filename); 
   else lprintf("MAIN",0,"cnfg file [%s]\n",cnfg_filename); 
 
 

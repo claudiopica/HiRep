@@ -31,12 +31,12 @@
 
 #define MAX_ROTATE 50
 
-static complex v[25];
+static double complex v[25];
 static double EPSILON=1.e-12;
 static spinor_field *ppk[5];
 
 static int initr=0;
-static const suNf_spinor s0={{{{{0.0f}}}}};
+
 static suNf_spinor *psi;
 
 
@@ -50,7 +50,7 @@ static void alloc_ws_rotate(void)
   initr=1;
 }
 
-static void rotate_ptr(int n,spinor_field *pkk[],complex v[])
+static void rotate_ptr(int n,spinor_field *pkk[],double complex v[])
 {
   if (initr==0)
     alloc_ws_rotate();
@@ -70,7 +70,7 @@ static void rotate_ptr(int n,spinor_field *pkk[],complex v[])
     {
       suNf_spinor *pk=&(psi[k]);
       suNf_spinor *pj=_FIELD_AT(pkk[0],ix);
-      complex *z=&v[k];
+      double complex *z=&v[k];
       
       _spinor_mulc_f(*pk,*z,*pj);
       
@@ -90,10 +90,9 @@ static void rotate_ptr(int n,spinor_field *pkk[],complex v[])
 
 static void project(spinor_field *pk,spinor_field *pl)
 {
-  complex sp;
+  double complex sp;
 
-  sp.re=-spinor_field_prod_re_f(pl,pk);
-  sp.im=-spinor_field_prod_im_f(pl,pk);
+  sp=-spinor_field_prod_f(pl,pk);
 
   spinor_field_mulc_add_assign_f(pk,sp,pl);
 }   
@@ -112,28 +111,25 @@ static double normalize(spinor_field *ps)
   return (double)(r);
 }
 
-static complex sp(spinor_field *pk,spinor_field *pl)
+static double complex sp(spinor_field *pk,spinor_field *pl)
 {
 
-  complex *rpk,*rpl,z;
   
-  double x=0.0;
-  double y=0.0;
+  double complex z=0.0;
   
   _TWO_SPINORS_FOR_SUM(pk,pl,x,y) {
     for (int i=0;i<(4*NF);i++)
     {
-      complex *rpk = (complex*)_SPINOR_PTR(pk) + i;
-      complex *rpl = (complex*)_SPINOR_PTR(pl) + i;
-      x+=(double)((*rpk).re*(*rpl).re+(*rpk).im*(*rpl).im);
-      y+=(double)((*rpk).re*(*rpl).im-(*rpk).im*(*rpl).re);
+      double complex *rpk = (double complex*)_SPINOR_PTR(pk) + i;
+      double complex *rpl = (double complex*)_SPINOR_PTR(pl) + i;
+      z+=conj(*rpk)*(*rpl);
+      /* x+=(double)((*rpk).re*(*rpl).re+(*rpk).im*(*rpl).im); */
+      /* y+=(double)((*rpk).re*(*rpl).im-(*rpk).im*(*rpl).re); */
       //rpk+=1; //?? why these increment
       //rpl+=1; //??
     }
   }
   
-  z.re=x;
-  z.im=y;
   
 #ifdef WITH_MPI
   global_sum((double*)&z,2);
@@ -149,8 +145,8 @@ int main(int argc,char *argv[])
   double r;
   double rd,zsqd;
   double d,dmax;
-  complex w;
-  complex zd,wd;
+  double complex w;
+  double complex zd,wd;
   spinor_field *ws;
   spinor_field *pk,*pl;
   spinor_field *tmp;
@@ -240,25 +236,26 @@ int main(int argc,char *argv[])
       
       zd=spinor_field_prod_f(pk,pl);
       rd=spinor_field_sqnorm_f(pk)*spinor_field_sqnorm_f(pl);
-      d=((zd.re-(double)w.re)*(zd.re-(double)w.re)+
-         (zd.im-(double)w.im)*(zd.im-(double)w.im));
+      d=(zd-w)*conj(zd-w);
+      /* d=((zd.re-(double)w.re)*(zd.re-(double)w.re)+ */
+      /*    (zd.im-(double)w.im)*(zd.im-(double)w.im)); */
       d=sqrt(d/rd);
       if (d>dmax)
 	dmax=d;
 
       rd=spinor_field_prod_re_f(pk,pl);
-      d=fabs(zd.re/rd-1.0);
+      d=fabs(creal(zd)/rd-1.0);
       if (d>dmax)
 	dmax=d;
 
       zd=spinor_field_prod_f(pk,pk);
       rd=spinor_field_sqnorm_f(pk);
       
-      d=fabs(zd.im/rd);
+      d=fabs(cimag(zd)/rd);
       if (d>dmax)
 	dmax=d;
 
-      d=fabs(zd.re/rd-1.0f);
+      d=fabs(creal(zd)/rd-1.0f);
       if (d>dmax)
 	dmax=d;
     }
@@ -267,9 +264,8 @@ int main(int argc,char *argv[])
 
    
   dmax=0.0;
-  zd.re= 0.345;
-  zd.im=-0.876;
-  zsqd=zd.re*zd.re+zd.im*zd.im;
+  zd=0.345-I*0.876;
+  zsqd=zd*conj(zd);
    
   for (i=0;i<9;i++)
     {
@@ -278,7 +274,7 @@ int main(int argc,char *argv[])
       
       wd=spinor_field_prod_f(pk,pl);
       rd=spinor_field_sqnorm_f(pk)+zsqd*spinor_field_sqnorm_f(pl)
-	+2.0*(zd.re*wd.re-zd.im*wd.im);
+	+2.0*(creal(zd*wd));
       
       spinor_field_mulc_add_assign_f(pk,zd,pl);
 
@@ -303,8 +299,8 @@ int main(int argc,char *argv[])
 	  project(pk,pl);
 	  zd=spinor_field_prod_f(pk,pl);
          
-	  d=(fabs(zd.re)+
-	     fabs(zd.im))/
+	  d=(fabs(creal(zd))+
+	     fabs(cimag(zd)))/
             sqrt(spinor_field_sqnorm_f(pk));
          
 	  if (d>dmax)
@@ -333,8 +329,7 @@ int main(int argc,char *argv[])
        
       for (j=0;j<5;j++)
 	{
-	  v[5*i+j].re=0.1234f*(double)(i^2)-0.8976f*(double)(j);
-	  v[5*i+j].im=0.2231f*(double)(i)+0.9922f*(double)(j^2);
+	  v[5*i+j]=0.1234f*(double)(i^2)-0.8976f*(double)(j)+I*(0.2231f*(double)(i)+0.9922f*(double)(j^2));
 	}
        
       ppk[i]=pl;
@@ -349,8 +344,7 @@ int main(int argc,char *argv[])
       
       for (j=0;j<5;j++)
 	{
-	  zd.re=-(double)v[5*j+(i-5)].re;
-	  zd.im=-(double)v[5*j+(i-5)].im;
+	  zd=-v[5*j+(i-5)];
          
 	  pl=&ws[j];
 	  spinor_field_mulc_add_assign_f(pk,zd,pl);
@@ -381,8 +375,7 @@ int main(int argc,char *argv[])
       spinor_field_g5_f(tmp,pk);
       spinor_field_g5_f(pk,tmp);
       
-      zd.re=-1.0;
-      zd.im=0.0;
+      zd=-1.0;
       
       spinor_field_mulc_add_assign_f(pl,zd,pk);
       r=spinor_field_sqnorm_f(pl)/spinor_field_sqnorm_f(pk);
@@ -396,8 +389,8 @@ int main(int argc,char *argv[])
       spinor_field_g5_f(pl,pl);
       wd=spinor_field_prod_f(pk,pl);
       
-      d=(fabs(zd.re-wd.re)+fabs(zd.im-wd.im))/
-	(fabs(zd.re)+fabs(zd.im));
+      d=(fabs(creal(zd-wd))+fabs(cimag(zd-wd)))/
+         (fabs(creal(zd))+fabs(cimag(zd)));
       if (d>dmax)
 	dmax=d;
     }
@@ -416,8 +409,7 @@ int main(int argc,char *argv[])
       d=-2.5;
       spinor_field_lc1_f(d,pk,pl);
       
-      zd.re=1.5;
-      zd.im=0.0;
+      zd=1.5;
       spinor_field_mulc_add_assign_f(pk,zd,pl);
       d=spinor_field_sqnorm_f(pk)/spinor_field_sqnorm_f(pl);
       
@@ -439,8 +431,7 @@ int main(int argc,char *argv[])
       r=2.5;
       spinor_field_lc2_f(d,r,pk,pl);
       
-      zd.re=-3.5;
-      zd.im=0.0;
+      zd=-3.5;
       spinor_field_mulc_add_assign_f(pk,zd,pl);
       d=spinor_field_sqnorm_f(pk)/spinor_field_sqnorm_f(pl);
       
@@ -462,8 +453,8 @@ int main(int argc,char *argv[])
       r=-1.5;
       spinor_field_lc3_f(d,r,pk,pl,pk);
       
-      zd.re=-1.0;
-      zd.im=0.0;
+      zd=-1.0;
+
       spinor_field_mulc_add_assign_f(pk,zd,pl);
       d=spinor_field_sqnorm_f(pk)/spinor_field_sqnorm_f(pl);
       

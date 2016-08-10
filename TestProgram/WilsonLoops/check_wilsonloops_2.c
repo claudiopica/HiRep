@@ -58,7 +58,7 @@ int main(int argc,char *argv[])
   start_gf_sendrecv(u_gauge);
   complete_gf_sendrecv(u_gauge);
   
-  complex plaq[T*X*Y*Z][6];
+  double complex plaq[T*X*Y*Z][6];
   
   int t,x,y,z,i,j,k,mu,nu;
   
@@ -82,7 +82,7 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"\n");
 
  
-  complex ctmp;
+  double complex ctmp;
   double dtmp;
   double err=0.;
 
@@ -92,7 +92,7 @@ int main(int argc,char *argv[])
     k=0;
     for(mu=0;mu<4;mu++) for(nu=0;nu<mu;nu++) {
       cplaq(&ctmp,i,mu,nu);
-      dtmp=(plaq[j][k].re-ctmp.re)*(plaq[j][k].re-ctmp.re)+(plaq[j][k].im-ctmp.im)*(plaq[j][k].im-ctmp.im);
+      dtmp=(plaq[j][k]-ctmp)*conj(plaq[j][k]-ctmp);
       if(dtmp>err) err=dtmp;
 /*      printf("%d\t%d\t%d\t%d\t##\t%d\t%d\t##\t%.2e\n",t,x,y,z,mu,nu,dtmp);*/
       k++;

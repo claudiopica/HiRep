@@ -23,14 +23,14 @@
 
 
 static void random_g(suNg_field* g) {
-   _DECLARE_INT_ITERATOR(ix);
+  //   _DECLARE_INT_ITERATOR(ix);
 
    _MASTER_FOR(g->type,ix)
       random_suNg(_FIELD_AT(g,ix));
 }
 
 static void transform_u(suNg_field* out, suNg_field* in, suNg_field* g) {
-   _DECLARE_INT_ITERATOR(ix);
+  //   _DECLARE_INT_ITERATOR(ix);
    int iy,mu;
    suNg v;
 

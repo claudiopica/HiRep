@@ -10,10 +10,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include "global.h"
 #include "io.h"
 #include "update.h"
 #include "geometry.h"
-#include "global.h"
 #include "logger.h"
 #include "random.h"
 #include "memory.h"

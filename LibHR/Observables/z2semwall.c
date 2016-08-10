@@ -76,7 +76,7 @@ static void create_point_source_even(spinor_field *source, int beta, int b) {
   spinor_field_zero_f(source);
   if(COORD[0]==0 && COORD[1]==0 && COORD[2]==0 && COORD[3]==0) {
     int ix=ipt(0,0,0,0);
-    _FIELD_AT(source,ix)->c[beta].c[b].re = 1.;
+    _FIELD_AT(source,ix)->c[beta].c[b] = 1.;
   }
 }
 #else

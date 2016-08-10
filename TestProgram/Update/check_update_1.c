@@ -28,14 +28,14 @@
 #include "utils.h"
 #include "logger.h"
 #include "communications.h"
-#include "../RHMC/rhmc_utils.h"
+#include "../HMC/hmc_utils.h"
 
 int nhb,nor,nit,nth,nms,level,seed;
 double beta;
 
 extern suNg_av_field *momenta;
 
-rhmc_flow flow=init_rhmc_flow(flow);
+hmc_flow flow=init_hmc_flow(flow);
 
 static void flip_mom()
 {
@@ -96,13 +96,13 @@ int main(int argc,char *argv[])
 
   /* Init Monte Carlo */
   init_mc(&flow, "test_input");
-  lprintf("MAIN",0,"MVM during RHMC initialzation: %ld\n",getMVM());
+  lprintf("MAIN",0,"MVM during (R)HMC initialzation: %ld\n",getMVM());
   lprintf("MAIN",0,"Initial plaquette: %1.8e\n",avr_plaquette());
 
 
 
   
-  int rr=update_rhmc_o();
+  int rr=update_hmc_o();
 
   if(rr<0) {
     lprintf("REV TEST",0,"Error in updating the gauge field!!\n");
@@ -112,14 +112,15 @@ int main(int argc,char *argv[])
   
    flip_mom();
 
-   rr=update_rhmc_o();
+   rr=update_hmc_o();
    if(rr<0) {
      lprintf("REV TEST",0,"Error in updating the gauge field!!\n");
      return 1;
    }
    lprintf("REV TEST",0,"Plaquette: %1.8e\n",avr_plaquette());
    
-   free_rhmc();
+  /* finalize Monte Carlo */
+  end_mc();
    
    free_gfield(u_gauge);
 #ifndef REPR_FUNDAMENTAL

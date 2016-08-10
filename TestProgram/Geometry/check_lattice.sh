@@ -63,14 +63,19 @@ echo "NP_T =   ${test[$((i*14+4))]}		">>test_input
 echo "NP_X =   ${test[$((i*14+5))]}		">>test_input
 echo "NP_Y =   ${test[$((i*14+6))]}      		">>test_input
 echo "NP_Z =   ${test[$((i*14+7))]}		">>test_input
-echo "level = 1			">>test_input
-echo "seed = 12345              ">>test_input
+echo "// Replicas">>test_input
+echo "N_REP = 1">>test_input
 
+echo "// Random generator">>test_input
+echo "rlx_level = 1">>test_input
+echo "rlx_seed = 13813">>test_input
+echo "rlx_start = new">>test_input
+echo "rlx_state = rand_state">>test_input
 
 (( ${test[$((i*14+13))]} > 18 )) && continue;
 cat test_input
 
-   openmpirun -np  ${test[$((i*14+13))]} ./check_geometry_1
+   mpirun -np  ${test[$((i*14+13))]} ./check_geometry_1
    pippo=`echo $?`;
    if [ "${pippo}" != "0" ] ; then exit ; fi
    

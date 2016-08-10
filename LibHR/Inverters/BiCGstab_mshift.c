@@ -34,7 +34,7 @@ __inline static void _compute_z(complex *res, complex *z1, complex *z2,
 }
 
 #define _print_complex(c) \
-  printf("[%d] " #c " = (%e,%e)\n",cgiter,c.re,c.im)
+  printf("[%d] " #c " = (%e,%e)\n",cgiter,creal(c),cimag(c))
 
 /*
  * performs the multi-shifted CG inversion:

@@ -37,26 +37,22 @@
 //#define _FAST_CONVERSION
 static void translate_su2_quat(double *q, suNg *m) {
 #ifdef _FAST_CONVERSION
-    q[0]=(*m).c[0].re;
-    q[1]=(*m).c[1].im;
-    q[2]=-(*m).c[1].re;
-    q[3]=(*m).c[0].im;
+  q[0]=creal((*m).c[0]);
+  q[1]=cimag((*m).c[1]);
+  q[2]=-creal((*m).c[1]);
+  q[3]=cimag((*m).c[0]));
 #else
-    q[0]=((*m).c[0].re+(*m).c[3].re)/2.;
-    q[1]=((*m).c[1].im+(*m).c[2].im)/2.;
-    q[2]=((*m).c[2].re-(*m).c[1].re)/2.;
-    q[3]=((*m).c[0].im-(*m).c[3].im)/2.;
+    q[0]=(creal((*m).c[0])+creal((*m).c[3]))/2.;
+    q[1]=(cimag((*m).c[1])+cimag((*m).c[2]))/2.;
+    q[2]=(creal((*m).c[2])-creal((*m).c[1]))/2.;
+    q[3]=(cimag((*m).c[0])-cimag((*m).c[3]))/2.;
 #endif
 }
 static void translate_quat_su2(suNg *m, double *q) {
-    (*m).c[0].re=q[0];
-    (*m).c[0].im=q[3];
-    (*m).c[1].re=-q[2];
-    (*m).c[1].im=q[1];
-    (*m).c[2].re=q[2];
-    (*m).c[2].im=q[1];
-    (*m).c[3].re=q[0];
-    (*m).c[3].im=-q[3];
+    (*m).c[0]=q[0]+I*q[3];
+    (*m).c[1]=-q[2]+I*q[1];
+    (*m).c[2]=q[2]+I*q[1];
+    (*m).c[3]=q[0]-I*q[3];
 }
 
 

@@ -76,7 +76,7 @@ unsigned long int getMVM_flt() {
  * local copy in single precision of global variable
  */
 #if defined(BC_T_THETA) || defined(BC_X_THETA) || defined(BC_Y_THETA) || defined(BC_Z_THETA)
-static complex_flt eitheta_flt[4]={{1.f,0.f}};
+static  hr_complex_flt eitheta_flt[4]={{1.f,0.f}};
 #endif
 
 /* r=t*u*s */
@@ -175,10 +175,10 @@ void Dphi_flt_(spinor_field_flt *out, spinor_field_flt *in)
 
 #if defined(BC_T_THETA) || defined(BC_X_THETA) || defined(BC_Y_THETA) || defined(BC_Z_THETA)
     /* copy global theta bc to local single-precision copy */
-    eitheta_flt[0].re=(float)eitheta[0].re; eitheta_flt[0].im=(float)eitheta[0].im;
-    eitheta_flt[1].re=(float)eitheta[1].re; eitheta_flt[1].im=(float)eitheta[1].im;
-    eitheta_flt[2].re=(float)eitheta[2].re; eitheta_flt[2].im=(float)eitheta[2].im;
-    eitheta_flt[3].re=(float)eitheta[3].re; eitheta_flt[3].im=(float)eitheta[3].im;
+    eitheta_flt[0]=(hr_complex_flt)eitheta[0];
+    eitheta_flt[1]=(hr_complex_flt)eitheta[1];
+    eitheta_flt[2]=(hr_complex_flt)eitheta[2];
+    eitheta_flt[3]=(hr_complex_flt)eitheta[3];
 #endif    
 
     ++MVMcounter; /* count matrix call */

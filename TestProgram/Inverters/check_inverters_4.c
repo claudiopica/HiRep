@@ -84,7 +84,7 @@ int main(int argc,char *argv[])
   int i;
   int nev,nevt,ie,status;
   double omega1,omega2,res,ubnd;
-  complex z;
+  double complex z;
   char pame[256];
 
   /* setup process id and communications */
@@ -171,8 +171,7 @@ int main(int argc,char *argv[])
     {
       Op1(&ws[0],&ev[i]);
   
-      z.re=-(double)d1[i];
-      z.im=(double)0.0f;
+      z=-(double)d1[i];
       spinor_field_mulc_add_assign_f(&ws[0],z,&ev[i]);
       res=spinor_field_sqnorm_f(&ws[0]);
       res=(double)(sqrt((double)(res)));

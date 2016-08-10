@@ -1,7 +1,7 @@
-NG = 3
-REPR = REPR_FUNDAMENTAL
+NG = 2
+#REPR = REPR_FUNDAMENTAL
 #REPR = REPR_SYMMETRIC
-#REPR = REPR_ANTISYMMETRIC
+REPR = REPR_ANTISYMMETRIC
 #REPR = REPR_ADJOINT
 
 #CHOICES ARE GAUGE_SUN AND GAUGE_SON 
@@ -40,8 +40,8 @@ MACRO += -DMEASURE_FORCE
 
 #Compiler
 #CC = mpiicc
-CC = icc
-#CC = clang
+#CC = icc
+CC = clang
 #CFLAGS = -Wall -std=c99 -O3 -fomit-frame-pointer -msse -msse2 
 CFLAGS = -Wall -std=c99 -O3 #-march=core-avx2 -mtune=core-avx2 -g
 

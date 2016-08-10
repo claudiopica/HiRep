@@ -14,13 +14,13 @@
 #include "representation.h"
 #include "utils.h"
 
-void print_cmplx(complex c){
-  printf("%g",c.re);
-  if (c.im>0){
-    printf("+%gi",c.im);
+void print_cmplx(double complex c){
+  printf("%g",creal(c));
+  if (cimag(c)>0){
+    printf("+%gi",cimag(c));
   }
   else{
-    printf("%gi",c.im);
+    printf("%gi",cimag(c));
   }
 }
 
@@ -39,7 +39,7 @@ printf("]\n");
 }
 
 int main(){
-  complex det;
+  double complex det;
   suNg a,b,c;
   random_suNg(&a);
   random_suNg(&b);
@@ -55,7 +55,7 @@ int main(){
   printML(&a);
   _suNg_times_suNg(b,a,c);
   printML(&b);
-  b.c[8].re=1e-15;
+  b.c[8]=1e-15;
   c=b;
   printML(&b);
   inv_suNg(&b);
