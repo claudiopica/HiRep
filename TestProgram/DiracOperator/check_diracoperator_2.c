@@ -148,6 +148,9 @@ int main(int argc,char *argv[])
 #ifndef REPR_FUNDAMENTAL
    u_gauge_f=alloc_gfield_f(&glattice);
 #endif
+
+	
+   unit_u(u_gauge);
    start_gf_sendrecv(u_gauge);
 
    represent_gauge_field();
