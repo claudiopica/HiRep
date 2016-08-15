@@ -65,7 +65,7 @@ void lw_force(double dt, suNg_av_field *force, void *vpar);
 void lw_local_action(scalar_field *loc_action, double beta, double c0, double c1);
 
 void force_fermion_core(spinor_field*, spinor_field*, suNg_av_field*, int, double, double);
-void force_logdet_core(suNg_av_field*, double, double, double);
+void force_clover_logdet(suNg_av_field*, double, double, double);
 
 void force_hmc(double, suNg_av_field*, void*);
 void force_hmc_tm(double, suNg_av_field*, void*);

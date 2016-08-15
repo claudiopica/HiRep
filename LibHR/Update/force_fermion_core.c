@@ -158,18 +158,6 @@ void force_measure_end(int id, const char *name, double dt, int nit)
 /* ----------------------------------- */
 /* CALCULATE FORCE OF THE CLOVER TERM  */
 /* ----------------------------------- */
-void spinor_field_copy_to_force(spinor_field_force *s1, spinor_field *s2)
-{
-	_TWO_SPINORS_MATCHING(s1,s2);
-	memcpy(s1->ptr,s2->ptr,s1->type->gsize_spinor*sizeof(suNf_spinor));
-}
-
-void spinor_field_copy_from_force(spinor_field *s1, spinor_field_force *s2)
-{
-	_TWO_SPINORS_MATCHING(s1,s2);
-	memcpy(s1->ptr,s2->ptr,s1->type->gsize_spinor*sizeof(suNf_spinor));
-}
-
 static void g5_sigma(suNf_spinor *s, suNf_spinor *u, int mu, int nu)
 {
 	if(mu == 0 && nu == 1)
@@ -367,144 +355,14 @@ static suNf fmat_create(suNf_spinor *a_lhs, suNf_spinor *a_rhs, suNf_spinor *b_l
 	return fmat;
 }
 
-void force_clover_core(spinor_field* Xsp, spinor_field* Ysp, suNg_av_field* force, double dt, double residue)
-{
-	static int init = 0;
-	static spinor_field_force *Xs, *Ys;
-	double coeff = residue*dt*(_REPR_NORM2/_FUND_NORM2)*(1./8.)*get_csw();
-
-	if(init == 0)
-	{
-		Xs = alloc_clover_spinor(&glattice);
-		Ys = alloc_clover_spinor(&glattice);
-		init = 1;
-	}
-
-	spinor_field_copy_to_force(Xs, Xsp);
-	spinor_field_copy_to_force(Ys, Ysp);
-	start_sf_force_sendrecv(Xs);
-	start_sf_force_sendrecv(Ys);
-
-	_PIECE_FOR(&glattice,xp)
-	{
-		if(xp == glattice.inner_master_pieces)
-		{
-			_OMP_PRAGMA(master)
-			{
-				complete_sf_force_sendrecv(Xs);
-				complete_sf_force_sendrecv(Ys);
-			}
-			_OMP_PRAGMA(barrier)
-		}
-	
-		_SITE_FOR(&glattice,xp,ix)
-		{
-			suNf Z[6], W[9];
-			suNf s1, s2, s3, fmat;
-			suNf_spinor tmp_lhs, tmp_rhs;
-			suNf_spinor *rhs, *lhs;
-			suNg_algebra_vector f;
-
-			for(int mu = 0; mu < 4; mu++)
-			{
-				for(int nu = 0; nu < 4; nu++)
-				{
-					if(mu == nu) continue;
-
-					// Coordinates
-					int o1 = iup(ix,mu); // x + mu
-					int o2 = iup(ix,nu); // x + nu
-					int o3 = idn(ix,nu); // x - nu
-					int o4 = iup(o3,mu); // x + mu - nu
-					int o5 = iup(o2,mu); // x + mu + nu
-
-					// Construct force matrices
-					rhs = _FIELD_AT(Xs,ix);
-					lhs = _FIELD_AT(Ys,ix);
-					g5_sigma(&tmp_rhs, rhs, mu, nu);
-					g5_sigma(&tmp_lhs, lhs, mu, nu);
-					Z[0] = fmat_create(&tmp_lhs, rhs, &tmp_rhs, lhs);
-
-					rhs = _FIELD_AT(Xs,o1);
-					lhs = _FIELD_AT(Ys,o1);
-					g5_sigma(&tmp_rhs, rhs, mu, nu);
-					g5_sigma(&tmp_lhs, lhs, mu, nu);
-					Z[1] = fmat_create(&tmp_lhs, rhs, &tmp_rhs, lhs);
-
-					rhs = _FIELD_AT(Xs,o3);
-					lhs = _FIELD_AT(Ys,o3);
-					g5_sigma(&tmp_rhs, rhs, mu, nu);
-					g5_sigma(&tmp_lhs, lhs, mu, nu);
-					Z[2] = fmat_create(&tmp_lhs, rhs, &tmp_rhs, lhs);
-
-					rhs = _FIELD_AT(Xs,o4);
-					lhs = _FIELD_AT(Ys,o4);
-					g5_sigma(&tmp_rhs, rhs, mu, nu);
-					g5_sigma(&tmp_lhs, lhs, mu, nu);
-					Z[3] = fmat_create(&tmp_lhs, rhs, &tmp_rhs, lhs);
-
-					rhs = _FIELD_AT(Xs,o5);
-					lhs = _FIELD_AT(Ys,o5);
-					g5_sigma(&tmp_rhs, rhs, mu, nu);
-					g5_sigma(&tmp_lhs, lhs, mu, nu);
-					Z[4] = fmat_create(&tmp_lhs, rhs, &tmp_rhs, lhs);
-
-					rhs = _FIELD_AT(Xs,o2);
-					lhs = _FIELD_AT(Ys,o2);
-					g5_sigma(&tmp_rhs, rhs, mu, nu);
-					g5_sigma(&tmp_lhs, lhs, mu, nu);
-					Z[5] = fmat_create(&tmp_lhs, rhs, &tmp_rhs, lhs);
-
-					// Construct links
-					_suNf_dagger(W[0], *pu_gauge_f(o3,mu));
-					W[1] = *pu_gauge_f(o3,nu);
-					W[2] = *pu_gauge_f(o1,nu);
-					_suNf_dagger(W[3], *pu_gauge_f(o2,mu));
-					_suNf_dagger(W[4], *pu_gauge_f(ix,nu));
-					_suNf_dagger(W[5], *pu_gauge_f(o4,nu));
-					_suNf_times_suNf(W[6], W[0], W[1]);
-					_suNf_times_suNf(W[7], W[2], W[3]);
-					_suNf_times_suNf(s1, W[5], W[6]);
-					_suNf_times_suNf(W[8], W[7], W[4]);
-					_suNf_sub_assign(W[8], s1);
-
-					// Calculate sum of forces
-					_suNf_times_suNf(fmat, W[8], Z[0]);
-					_suNf_times_suNf(s1, Z[1], W[8]);
-					_suNf_add_assign(fmat, s1);
-					_suNf_times_suNf(s1, W[0], Z[2]);
-					_suNf_times_suNf(s2, s1, W[1]);
-					_suNf_times_suNf(s3, Z[3], W[6]);
-					_suNf_add_assign(s2, s3);
-					_suNf_times_suNf(s1, W[5], s2);
-					_suNf_sub_assign(fmat, s1);
-					_suNf_times_suNf(s1, W[2], Z[4]);
-					_suNf_times_suNf(s2, s1, W[3]);
-					_suNf_times_suNf(s3, W[7], Z[5]);
-					_suNf_add_assign(s2, s3);
-					_suNf_times_suNf(s1, s2, W[4]);
-					_suNf_add_assign(fmat, s1);
-					_suNf_times_suNf(s1, *pu_gauge_f(ix,mu), fmat);
-
-					// Project on force
-					_algebra_project(f,s1);
-					_algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,ix,mu),coeff,f);
-				} // nu
-			} // mu
-		} // sites
-	} // pieces
-
-	spinor_field_copy_from_force(Xsp, Xs);
-	spinor_field_copy_from_force(Ysp, Ys);
-}
-
-void force_logdet_core(suNg_av_field* force, double mass, double dt, double residue)
+static void force_clover_core(suNg_av_field* force, double dt, double residue)
 {
 	double coeff = residue*dt*(_REPR_NORM2/_FUND_NORM2)*(1./8.)*get_csw();
 
-	compute_force_logdet(mass);
+	// Communicate forces
 	start_clover_force_sendrecv(cl_force);
 
+	// Loop over lattice
 	_PIECE_FOR(&glattice,xp)
 	{
 		if(xp == glattice.inner_master_pieces)
@@ -515,7 +373,7 @@ void force_logdet_core(suNg_av_field* force, double mass, double dt, double resi
 			}
 			_OMP_PRAGMA(barrier)
 		}
-	
+
 		_SITE_FOR(&glattice,xp,ix)
 		{
 			suNf *Z[6], W[9];
@@ -528,7 +386,7 @@ void force_logdet_core(suNg_av_field* force, double mass, double dt, double resi
 				for(int nu = 0; nu < 4; nu++)
 				{
 					if(mu == nu) continue;
-
+					
 					// Coordinates
 					int o1 = iup(ix,mu); // x + mu
 					int o2 = iup(ix,nu); // x + nu
@@ -595,6 +453,77 @@ void force_logdet_core(suNg_av_field* force, double mass, double dt, double resi
 	} // pieces
 }
 
+void force_clover_fermion(spinor_field* Xs, spinor_field* Ys, suNg_av_field* force, double dt, double residue)
+{
+	// Construct force matrices
+	_MASTER_FOR(&glattice,ix)
+	{
+		suNf_spinor tmp_lhs, tmp_rhs;
+		suNf_spinor *rhs, *lhs;
+		suNf *fm;
+
+		// (mu,nu) = (0,1)
+		rhs = _FIELD_AT(Xs, ix);
+		lhs = _FIELD_AT(Ys, ix);
+		fm = _6FIELD_AT(cl_force, ix, 0);
+		g5_sigma(&tmp_rhs, rhs, 0, 1);
+		g5_sigma(&tmp_lhs, lhs, 0, 1);
+		*fm = fmat_create(&tmp_lhs, rhs, &tmp_rhs, lhs);
+
+		// (mu,nu) = (0,2)
+		rhs = _FIELD_AT(Xs, ix);
+		lhs = _FIELD_AT(Ys, ix);
+		fm = _6FIELD_AT(cl_force, ix, 1);
+		g5_sigma(&tmp_rhs, rhs, 0, 2);
+		g5_sigma(&tmp_lhs, lhs, 0, 2);
+		*fm = fmat_create(&tmp_lhs, rhs, &tmp_rhs, lhs);
+
+		// (mu,nu) = (1,2)
+		rhs = _FIELD_AT(Xs, ix);
+		lhs = _FIELD_AT(Ys, ix);
+		fm = _6FIELD_AT(cl_force, ix, 2);
+		g5_sigma(&tmp_rhs, rhs, 1, 2);
+		g5_sigma(&tmp_lhs, lhs, 1, 2);
+		*fm = fmat_create(&tmp_lhs, rhs, &tmp_rhs, lhs);
+	
+		// (mu,nu) = (0,3)
+		rhs = _FIELD_AT(Xs, ix);
+		lhs = _FIELD_AT(Ys, ix);
+		fm = _6FIELD_AT(cl_force, ix, 3);
+		g5_sigma(&tmp_rhs, rhs, 0, 3);
+		g5_sigma(&tmp_lhs, lhs, 0, 3);
+		*fm = fmat_create(&tmp_lhs, rhs, &tmp_rhs, lhs);
+
+		// (mu,nu) = (1,3)
+		rhs = _FIELD_AT(Xs, ix);
+		lhs = _FIELD_AT(Ys, ix);
+		fm = _6FIELD_AT(cl_force, ix, 4);
+		g5_sigma(&tmp_rhs, rhs, 1, 3);
+		g5_sigma(&tmp_lhs, lhs, 1, 3);
+		*fm = fmat_create(&tmp_lhs, rhs, &tmp_rhs, lhs);
+
+		// (mu,nu) = (2,3)
+		rhs = _FIELD_AT(Xs, ix);
+		lhs = _FIELD_AT(Ys, ix);
+		fm = _6FIELD_AT(cl_force, ix, 5);
+		g5_sigma(&tmp_rhs, rhs, 2, 3);
+		g5_sigma(&tmp_lhs, lhs, 2, 3);
+		*fm = fmat_create(&tmp_lhs, rhs, &tmp_rhs, lhs);
+	}
+
+	// Calculate clover force
+	force_clover_core(force, dt, residue);
+}
+
+void force_clover_logdet(suNg_av_field* force, double mass, double dt, double residue)
+{
+	// Compute force matrices
+	compute_force_logdet(mass);
+
+	// Calculate clover force
+	force_clover_core(force, dt, residue);
+}
+
 /* ------------------------------------ */
 /* CALCULATE FORCE OF THE HOPPING TERM  */
 /* ------------------------------------ */
@@ -640,11 +569,11 @@ void force_fermion_core(spinor_field *Xs, spinor_field *Ys, suNg_av_field *force
 #endif
 
 	// Communicate spinor field
-#ifdef WITH_CLOVER
-	force_clover_core(Xs, Ys, force, dt, residue);
-#else
 	start_sf_sendrecv(Xs);
 	start_sf_sendrecv(Ys);
+
+#ifdef WITH_CLOVER
+	force_clover_fermion(Xs, Ys, force, dt, residue);
 #endif
 
 	// Loop over lattice
@@ -655,7 +584,6 @@ void force_fermion_core(spinor_field *Xs, spinor_field *Ys, suNg_av_field *force
 		suNf_spinor p;
 		suNf_FMAT s1;
 
-#ifndef WITH_CLOVER
 		if(xp == glattice.inner_master_pieces)
 		{
 			_OMP_PRAGMA(master)
@@ -665,7 +593,6 @@ void force_fermion_core(spinor_field *Xs, spinor_field *Ys, suNg_av_field *force
 			}
 			_OMP_PRAGMA(barrier)
 		}
-#endif
 
 		_SITE_FOR(&glattice,xp,ix)
 		{

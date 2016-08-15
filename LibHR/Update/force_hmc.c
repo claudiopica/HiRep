@@ -185,7 +185,7 @@ void force_hmc(double dt, suNg_av_field *force, void *vpar)
 
 	if(par->logdet)
 	{
-		force_logdet_core(force, par->mass, dt, 2.); // 2 = # of flavors
+		force_clover_logdet(force, par->mass, dt, 2.); // 2 = # of flavors
 	}
 
 #endif

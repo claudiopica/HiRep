@@ -104,7 +104,7 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar)
 
 #ifdef WITH_CLOVER_EO
 	double nf = (-2.0*ratio->n)/ratio->d;
-	force_logdet_core(force, par->mass, dt, nf);
+	force_clover_logdet(force, par->mass, dt, nf);
 #endif
 
 	force_measure_end(par->id, "force_rhmc", dt, n_iters);

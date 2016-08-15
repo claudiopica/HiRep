@@ -327,6 +327,9 @@ static void _compute_clover_force(int id)
 
 void compute_force_logdet(double mass)
 {
+	suNf u;
+	_suNf_zero(u);
+
 	// Update LDL decomposition
 	compute_ldl_decomp(4.0+mass);
 
@@ -334,6 +337,15 @@ void compute_force_logdet(double mass)
 	_MASTER_FOR(&glat_odd,id)
 	{
 		_compute_clover_force(id);
+	}
+
+	// Loop even sites
+	_MASTER_FOR(&glat_even,id)
+	{
+		for(int mu = 0; mu < 6; mu++)
+		{
+			*_6FIELD_AT(cl_force,id,mu) = u;
+		}
 	}
 }
 
@@ -392,18 +404,7 @@ void clover_init(double csw)
 	cl_ldl = alloc_clover_ldl(&glattice);
 
 #ifdef UPDATE_EO
-
-	suNf u;
-	_suNf_zero(u);
 	cl_force = alloc_clover_force(&glattice);
-	_MASTER_FOR(&glattice,id)
-	{
-		for(int mu = 0; mu < 6; mu++)
-		{
-			*_6FIELD_AT(cl_force,id,mu) = u;
-		}
-	}
-
 #endif
 
 	csw_value = csw;

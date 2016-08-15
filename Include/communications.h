@@ -18,8 +18,6 @@ void start_gf_sendrecv(suNg_field *gf);
 void complete_sf_sendrecv(spinor_field *gf);
 void start_sf_sendrecv(spinor_field *gf);
 
-void complete_sf_force_sendrecv(spinor_field_force *gf);
-void start_sf_force_sendrecv(spinor_field_force *gf);
 void complete_clover_force_sendrecv(suNf_field *gf);
 void start_clover_force_sendrecv(suNf_field *gf);
 
