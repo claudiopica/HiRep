@@ -399,14 +399,11 @@ void compute_ldl_decomp(double sigma0)
 
 void clover_init(double csw)
 {
-	sigma = 0xF00F;
 	cl_term = alloc_clover_term(&glattice);
 	cl_ldl = alloc_clover_ldl(&glattice);
-
-#ifdef UPDATE_EO
 	cl_force = alloc_clover_force(&glattice);
-#endif
 
+	sigma = 0xF00F;
 	csw_value = csw;
 	lprintf("CLOVER", 10, "Coefficient: csw = %1.6f\n", csw_value);
 }
