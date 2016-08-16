@@ -1,0 +1,14 @@
+
+#MACRO += -DWITH_MPI
+#MACRO += -DMPI_TIMING
+
+#Compiler
+#CC = mpiicc
+#CC = icc
+CC = clang
+#CFLAGS = -Wall -std=c99 -O3 -fomit-frame-pointer -msse -msse2 
+CFLAGS = -Wall -std=c99 -O3 #-march=core-avx2 -mtune=core-avx2 -g
+
+
+LDFLAGS = 
+
