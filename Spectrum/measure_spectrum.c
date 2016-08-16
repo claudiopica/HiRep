@@ -29,6 +29,7 @@
 #include "logger.h"
 #include "communications.h"
 #include "spectrum.h"
+#include "clover_tools.h"
 #include "cinfo.c"
 
 
@@ -45,38 +46,39 @@
 //typedef enum {semwall_src,point_src} source_type_t;
 /* Mesons parameters */
 typedef struct _input_mesons {
-  char mstring[1024];
-  int use_input_mass;
-  double precision;
-  int meas_mixed;
-  int nhits_2pt;
-  int nhits_disc;
-  int def_semwall;
-  int def_point;
+	char mstring[1024];
+	int use_input_mass;
+	double precision;
+	int meas_mixed;
+	int nhits_2pt;
+	int nhits_disc;
+	int def_semwall;
+	int def_point;
 	int def_baryon;
 	int def_glueball;
-  int ext_semwall;
-  int ext_point;
-  int fixed_semwall;
-  int fixed_point;
-  int fixed_gfwall;
-  int discon_semwall;
-  int discon_gfwall;
-  int discon_volume;
-  int def_gfwall;
-  int dt;
-  int n_mom;
-  int dilution;
+	int ext_semwall;
+	int ext_point;
+	int fixed_semwall;
+	int fixed_point;
+	int fixed_gfwall;
+	int discon_semwall;
+	int discon_gfwall;
+	int discon_volume;
+	int def_gfwall;
+	int dt;
+	int n_mom;
+	int dilution;
 	int background_field;
 	int nEz;
 	double Q;
+	double csw;
 
-  //Currently only implemented for ff
-  int nhits_hopping;  //Multiplies the number of hits in the fast part of the hopping parameter expansion
-  int degree_hopping;  // The degree of the hopping parameter expasion  
+	//Currently only implemented for ff
+	int nhits_hopping;  //Multiplies the number of hits in the fast part of the hopping parameter expansion
+	int degree_hopping;  // The degree of the hopping parameter expasion
 
-  /* for the reading function */
-  input_record_t read[28];
+	/* for the reading function */
+	input_record_t read[29];
 } input_mesons;
 
 #define init_input_mesons(varname) \
@@ -107,6 +109,7 @@ typedef struct _input_mesons {
     {"enable background electric field", "mes:background_field = %d",INT_T, &(varname).background_field},	\
     {"electric charge", "mes:Q = %lf",DOUBLE_T, &(varname).Q},	\
     {"electric field nEz", "mes:nEz = %d",INT_T, &(varname).nEz},	\
+    {"csw coefficient", "mes:csw = %lg",DOUBLE_T, &(varname).csw},	\
     {"hopping expansion degree", "mes:degree_hopping = %d",INT_T, &(varname).degree_hopping}, \
     {"hopping expansion hits", "mes:nhits_hopping = %d",INT_T, &(varname).nhits_hopping}, \
     {NULL, NULL, INT_T, NULL}				\
@@ -345,6 +348,9 @@ int main(int argc,char *argv[]) {
 #ifdef ALLOCATE_REPR_GAUGE_FIELD
   u_gauge_f=alloc_gfield_f(&glattice);
 #endif
+#ifdef WITH_CLOVER
+  clover_init(mes_var.csw);
+#endif
 
   lprintf("MAIN",0,"Inverter precision = %e\n",mes_var.precision);
   lprintf("MAIN",0,"Mass[%d] = %f",0,m[0]);
@@ -422,7 +428,7 @@ int main(int argc,char *argv[]) {
   if(four_fermion_active==1) init_triplet_discon_correlators();
   i=0;
 
-  while(1) {
+  while(++i) {
     struct timeval start, end, etime;
 
     if(list!=NULL)

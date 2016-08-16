@@ -40,4 +40,4 @@ mes:dirichlet_dt = 2
 mes:background_field = 1
 mes:Q =  0.5
 mes:nEz = 1
-
+mes:csw = 1.9192

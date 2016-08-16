@@ -327,6 +327,9 @@ if( spinor_field_sqnorm_f(psi) < 1e-28 ){
 
 static void calc_propagator_clover(double mass, spinor_field *dptr, spinor_field *sptr)
 {
+	static spinor_field *etmp, *otmp, *stmp;
+	static int init = 0;
+
 	// Inverter
 	mshift_par mpar;
 	double tmp;
@@ -340,20 +343,12 @@ static void calc_propagator_clover(double mass, spinor_field *dptr, spinor_field
 	// Dirac operator
 	set_dirac_mass(mass);
 
-#ifndef UPDATE_EO
-
-	g5QMR_mshift(&mpar, D, sptr, dptr);
-
-#else
-
-	static spinor_field *etmp, *otmp;
-	static int init = 0;
-
 	// Allocate temporary fields
 	if(init == 0)
 	{
 		etmp = alloc_spinor_field_f(1, &glat_even);
 		otmp = alloc_spinor_field_f(1, &glat_odd);
+		stmp = alloc_spinor_field_f(1, &glattice);
 		init = 1;
 	}
 
@@ -367,11 +362,22 @@ static void calc_propagator_clover(double mass, spinor_field *dptr, spinor_field
 
 	// Source even/odd
 	spinor_field sptr_e, sptr_o;
-	sptr_e = *sptr;
+	sptr_e = *stmp;
 	sptr_e.type = &glat_even;
-	sptr_o = *sptr;
+	sptr_o = *stmp;
 	sptr_o.ptr += glat_odd.master_shift;
 	sptr_o.type = &glat_odd;
+
+	// Handle source
+	if(sptr->type == &glat_even)
+	{
+		spinor_field_zero_f(stmp);
+		spinor_field_copy_f(&sptr_e, sptr);
+	}
+	else
+	{
+		spinor_field_copy_f(stmp, sptr);
+	}
 
 #ifdef WITH_CLOVER
 
@@ -406,7 +412,6 @@ static void calc_propagator_clover(double mass, spinor_field *dptr, spinor_field
 	spinor_field_add_assign_f(&dptr_o, &sptr_o);
 	spinor_field_mul_f(&dptr_o, 1./(4.+mass), &dptr_o);
 
-#endif
 #endif
 }
 
