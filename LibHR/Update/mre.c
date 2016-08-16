@@ -29,13 +29,6 @@ static complex x[MAX];
 static complex y[MAX];
 static int mutate[MAX];
 
-// Handle even/odd preconditioning
-#ifdef UPDATE_EO
-#define TYPE &glat_even
-#else
-#define TYPE &glattice
-#endif
-
 void gram_schmidt(mre_par *par, int p, int max)
 {
 	complex rij;
@@ -181,19 +174,19 @@ void mre_init(mre_par *par, int max, double prec)
 		par->init = 1;
 	}
 
-	par->s[0] = alloc_spinor_field_f(par->max, TYPE);
-	par->s[1] = alloc_spinor_field_f(par->max, TYPE);
+	par->s[0] = alloc_spinor_field_f(par->max, &glat_default);
+	par->s[1] = alloc_spinor_field_f(par->max, &glat_default);
 	par->num[0] = 0;
 	par->num[1] = 0;
 
 	if(num_init == 0)
 	{
-		Dv = alloc_spinor_field_f(1, TYPE);
+		Dv = alloc_spinor_field_f(1, &glat_default);
 	}
 
 	for(int i = num_init; i < par->max; i++)
 	{
-		v[i] = alloc_spinor_field_f(1, TYPE);
+		v[i] = alloc_spinor_field_f(1, &glat_default);
 		num_init++;
 	}
 

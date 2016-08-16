@@ -31,103 +31,121 @@ input_hmc hmc_var = init_input_hmc(hmc_var);
 #define repr_name "ADJ"
 #endif
 
-static double beta(){
-  integrator_par *ip=hmc_var.hmc_p.integrator;
-  while (ip!=NULL){
-    for (int n=0;n<ip->nmon;n++){
-      const monomial* m=ip->mon_list[n];
-      if (m->data.type==PureGauge){
-        return ((mon_pg_par*) m->data.par)->beta;
-      }else
-			if (m->data.type==LuscherWeisz){
-				return ((mon_lw_par*) m->data.par)->beta;
-			}
-    }
-    ip=ip->next;
-  }
-  return 0;
+static double beta()
+{
+	double beta = 0;
+	for(int i = 0; i < num_mon(); i++)
+	{
+		const monomial *m = mon_n(i);
+		void *mpar = m->data.par;
+		switch(m->data.type)
+		{
+			case PureGauge:
+				beta = ((mon_pg_par*)mpar)->beta;
+				break;
+			case LuscherWeisz:
+				beta = ((mon_lw_par*)mpar)->beta;
+				break;
+			default:
+				break;
+		}
+	}
+	return beta;
 }
 
-static double mass(){
-  integrator_par *ip=hmc_var.hmc_p.integrator;
-  double min=1./0.;
-  while (ip!=NULL){
-    for (int n=0;n<ip->nmon;n++){
-      double nm=min;
-      const monomial* m=ip->mon_list[n];
-      if (m->data.type==HMC){
-        nm = ((mon_hmc_par*) m->data.par)->mass;
-      }
-      else if (m->data.type==RHMC){
-        nm = ((mon_rhmc_par*) m->data.par)->mass;
-      }
-      else if (m->data.type==TM || m->data.type==TM_alt){
-        nm = ((mon_tm_par*) m->data.par)->mass;
-      }
-      else if (m->data.type==Hasenbusch){
-        nm = ((mon_hasenbusch_par*) m->data.par)->mass;
-      }
-      else if (m->data.type==Hasenbusch_tm || m->data.type==Hasenbusch_tm_alt){
-        nm = ((mon_hasenbusch_tm_par*) m->data.par)->mass;
-      }
-      else if (m->data.type==HMC_ff){
-        nm = ((mon_hmc_par*) m->data.par)->mass;
-      }
-      else if (m->data.type==Hasenbusch_ff){
-        nm = ((mon_hasenbusch_par*) m->data.par)->mass;
-      }
-      if (nm<min) min=nm;
-    }
-    ip=ip->next;
-  }
-  return min;
+static double mass()
+{
+	double mass = 1./0.;
+	for(int i = 0; i < num_mon(); i++)
+	{
+		const monomial *m = mon_n(i);
+		void *mpar = m->data.par;
+		double nm = mass;
+		switch(m->data.type)
+		{
+			case HMC:
+			case HMC_ff:
+				nm = ((mon_hmc_par*)mpar)->mass;
+				break;
+			case Hasenbusch:
+			case Hasenbusch_ff:
+				nm = ((mon_hasenbusch_par*)mpar)->mass;
+				break;
+			case RHMC:
+				nm = ((mon_rhmc_par*)mpar)->mass;
+				break;
+			case TM:
+			case TM_alt:
+				nm = ((mon_tm_par*)mpar)->mass;
+				break;
+			case Hasenbusch_tm:
+			case Hasenbusch_tm_alt:
+				nm = ((mon_hasenbusch_tm_par*)mpar)->mass;
+				break;
+			default:
+				break;
+		}
+		mass = (nm < mass) ? nm : mass;
+	}
+	return mass;
 }
 
-static int nf(){
-  int nf=0;
-  integrator_par *ip=hmc_var.hmc_p.integrator;
-  while (ip!=NULL){
-    for (int n=0;n<ip->nmon;n++){
-      const monomial* m=ip->mon_list[n];
-      if (m->data.type==HMC){
-        nf+=2;
-      }
-      else if (m->data.type==RHMC){
-        nf+=2;
-      }
-      else if (m->data.type==TM){
-        nf+=2;
-      }
-    }
-    ip=ip->next;
-  }
-  return nf;
+static int nf()
+{
+	int nf = 0;
+	for(int i = 0; i < num_mon(); i++)
+	{
+		const monomial *m = mon_n(i);
+		switch(m->data.type)
+		{
+			case HMC:
+			case HMC_ff:
+				nf += 2;
+				break;
+			case RHMC:
+				nf += 1;
+				break;
+			case TM:
+			case TM_alt:
+				nf += 2;
+				break;
+			default:
+				break;
+		}
+	}
+	return nf;
 }
 
-static void mk_gconf_name(char *name, hmc_flow *rf, int id) {
-  /* build configuration name */
-  if (strlen(rf->run_name)>10)
-      sprintf(name,"%sn%d",rf->run_name,id);
-  else{
-  sprintf(name,"%s_%dx%dx%dx%dnc%dr%snf%db%.6fm%.6fn%d",
-            rf->run_name,GLB_T,GLB_X,GLB_Y,GLB_Z,NG,repr_name,
-            nf(),beta(),-mass(),id);
-  }
+static void mk_gconf_name(char *name, hmc_flow *rf, int id)
+{
+	/* build configuration name */
+	if(strlen(rf->run_name) > 10)
+	{
+		sprintf(name,"%sn%d",rf->run_name,id);
+	}
+	else
+	{
+		sprintf(name,"%s_%dx%dx%dx%dnc%dr%snf%db%.6fm%.6fn%d",
+				  rf->run_name,GLB_T,GLB_X,GLB_Y,GLB_Z,NG,repr_name,nf(),beta(),-mass(),id);
+	}
 }
 
 /* add dirname to filename and return it */
-static char *add_dirname(char *dirname, char *filename) {
-  static char buf[256];
-  strcpy(buf,dirname);
-  return strcat(buf,filename);
+static char *add_dirname(char *dirname, char *filename)
+{
+	static char buf[256];
+	strcpy(buf,dirname);
+	return strcat(buf,filename);
 }
 
 /* convert string to lowercase */
-static void slower(char *str) {
-  while (*str) {
-    *str=(char)(tolower(*str));
-    ++str;
-  }
+static void slower(char *str)
+{
+	while(*str)
+	{
+		*str=(char)(tolower(*str));
+		++str;
+	}
 }
 
 /* read g_start string and decide what the initial config should be.
