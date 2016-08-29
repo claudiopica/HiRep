@@ -391,8 +391,8 @@ static void calc_propagator_clover(spinor_field *dptr, spinor_field *sptr)
 	// Call inverter
 	g5QMR_mshift(&mpar, D_pre, etmp, &dptr_e);
 
-	// dptr_o = D_oo^-1 ( sptr_o - D_oe etmp )
-	Dphi_(&dptr_o, etmp);
+	// dptr_o = D_oo^-1 ( sptr_o - D_oe dptr_e )
+	Dphi_(&dptr_o, &dptr_e);
 	spinor_field_minus_f(&dptr_o, &dptr_o);
 	spinor_field_add_assign_f(&dptr_o, &sptr_o);
 	Cphi_diag_inv(hmass_pre, &dptr_o, &dptr_o);
@@ -407,8 +407,8 @@ static void calc_propagator_clover(spinor_field *dptr, spinor_field *sptr)
 	// Call inverter
 	g5QMR_mshift(&mpar, D_pre, etmp, &dptr_e);
 
-	// dptr_o = D_oo^-1 ( sptr_o - D_oe etmp )
-	Dphi_(&dptr_o, etmp);
+	// dptr_o = D_oo^-1 ( sptr_o - D_oe dptr_e )
+	Dphi_(&dptr_o, &dptr_e);
 	spinor_field_minus_f(&dptr_o, &dptr_o);
 	spinor_field_add_assign_f(&dptr_o, &sptr_o);
 	spinor_field_mul_f(&dptr_o, 1./(4.+hmass_pre), &dptr_o);

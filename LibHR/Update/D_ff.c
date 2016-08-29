@@ -174,7 +174,7 @@ void Dphi_4f(double m0, spinor_field *out, spinor_field *in)
 	"Input and output fields must be different");
   
 #ifdef CHECK_SPINOR_MATCHING
-  error(out->type!=&glattice || in->type!=&glatttice,1,"Dphi_eopre " __FILE__, "Spinors are not defined on full lattice!");
+  error(out->type!=&glattice || in->type!=&glattice,1,"Dphi_eopre " __FILE__, "Spinors are not defined on full lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
   apply_BCs_on_spinor_field(in);
