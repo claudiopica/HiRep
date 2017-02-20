@@ -1,6 +1,5 @@
 #include <stdlib.h>
-
-#include "geometry.h" 
+#include "geometry.h"
 #include "global.h" 
 #include "error.h"
 #include "logger.h"
@@ -10,79 +9,87 @@
 
 void SAP_prec(int nu, inverter_ptr inv, mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out)
 {
+	spinor_field *res;
+	spinor_field *stmp1;
+	spinor_field *stmp2;
 
-   // lprintf("SAP_prec",40,"spinor_field_sqnorm_f(in)=%e, spinor_field_sqnorm_f(out)=%e\n",spinor_field_sqnorm_f(in),spinor_field_sqnorm_f(out));
-	spinor_field *res, *tmp_spinor, *tmp_spinor2;
-	res=alloc_spinor_field_f(3,in->type);
-	tmp_spinor=res+1;
-	tmp_spinor2=res+2;
-	
-	for (;nu>0;nu--)
+	res = alloc_spinor_field_f(3,in->type);
+	stmp1 = res+1;
+	stmp2 = res+2;
+
+	while(nu--)
 	{
-		// compute/update res (This is a bit waste of time in the first round)
-		M(tmp_spinor,out);
-		spinor_field_sub_f(res,in,tmp_spinor);
-		
-	    spinor_field_zero_f(tmp_spinor);	// Temporary 
-		empty_buffers(tmp_spinor);
+		// Compute residue: res = in - M * out
+		M(stmp1, out);
+		spinor_field_sub_f(res, in, stmp1);
+		spinor_field_zero_f(stmp1);
+		empty_buffers(stmp1);
 
-
-		// Invert black
-		if (out->type==&glattice){
-			res->type=&glat_black;			
-  		  	tmp_spinor->type=&glat_black;
-  		  	(void) inv(par, M, res, tmp_spinor);
-          	res->type=&glattice;
-          	tmp_spinor->type=&glattice;
-		} else if (out->type==&glat_even){
-			res->type=&glat_even_black;			
-  		  	tmp_spinor->type=&glat_even_black;
-  		  	(void) inv(par, M, res, tmp_spinor);
-          	res->type=&glat_even;
-          	tmp_spinor->type=&glat_even;
-		} else {
-			res->type=&glat_odd_black;			
-  		  	tmp_spinor->type=&glat_odd_black;
-  		  	(void) inv(par, M, res, tmp_spinor);
-          	res->type=&glat_odd;
-          	tmp_spinor->type=&glat_odd;
+		// Invert black: stmp1 = M^-1 * res
+		if(out->type == &glattice)
+		{
+			res->type = &glat_black;
+			stmp1->type = &glat_black;
+			inv(par, M, res, stmp1);
+			res->type = &glattice;
+			stmp1->type = &glattice;
 		}
-		
-		
-		// Update res
-		M(tmp_spinor2,tmp_spinor);
-		spinor_field_sub_assign_f(res,tmp_spinor2);
-		// Update solution
-		spinor_field_add_assign_f(out,tmp_spinor);
-		
-	    spinor_field_zero_f(tmp_spinor);	// Temporary 
-		empty_buffers(tmp_spinor);
-		
-		// Invert red
-			if (out->type==&glattice){
-			res->type=&glat_red;			
-  		  	tmp_spinor->type=&glat_red;
-  		  	(void) inv(par, M, res, tmp_spinor);
-          	res->type=&glattice;
-          	tmp_spinor->type=&glattice;
-		} else if (out->type==&glat_even){
-			res->type=&glat_even_red;			
-  		  	tmp_spinor->type=&glat_even_red;
-  		  	(void) inv(par, M, res, tmp_spinor);
-          	res->type=&glat_even;
-          	tmp_spinor->type=&glat_even;
-		} else {
-			res->type=&glat_odd_red;			
-  		  	tmp_spinor->type=&glat_odd_red;
-  		  	(void) inv(par, M, res, tmp_spinor);
-          	res->type=&glat_odd;
-          	tmp_spinor->type=&glat_odd;
+		else if(out->type == &glat_even)
+		{
+			res->type = &glat_even_black;
+			stmp1->type = &glat_even_black;
+			inv(par, M, res, stmp1);
+			res->type = &glat_even;
+			stmp1->type = &glat_even;
+		}
+		else
+		{
+			res->type = &glat_odd_black;
+			stmp1->type = &glat_odd_black;
+			inv(par, M, res, stmp1);
+			res->type = &glat_odd;
+			stmp1->type = &glat_odd;
 		}
 
-		// Update solution
-		spinor_field_add_assign_f(out,tmp_spinor);
+		// Update residue: res = res - M * stmp1
+		M(stmp2, stmp1);
+		spinor_field_sub_assign_f(res, stmp2);
+
+		// Update solution: out = out + stmp1
+		spinor_field_add_assign_f(out, stmp1);
+		spinor_field_zero_f(stmp1);
+		empty_buffers(stmp1);
+
+		// Invert red: stmp1 = M^-1 * res
+		if(out->type == &glattice)
+		{
+			res->type = &glat_red;
+			stmp1->type = &glat_red;
+			inv(par, M, res, stmp1);
+			res->type = &glattice;
+			stmp1->type = &glattice;
+		}
+		else if(out->type == &glat_even)
+		{
+			res->type = &glat_even_red;
+			stmp1->type = &glat_even_red;
+			inv(par, M, res, stmp1);
+			res->type = &glat_even;
+			stmp1->type = &glat_even;
+		}
+		else
+		{
+			res->type = &glat_odd_red;
+			stmp1->type = &glat_odd_red;
+			inv(par, M, res, stmp1);
+			res->type = &glat_odd;
+			stmp1->type = &glat_odd;
+		}
+
+		// Update solution: out = out + stmp1
+		spinor_field_add_assign_f(out, stmp1);
 	}
 
-// remove temporary spinors	
+	// Free temporary spinors
 	free_spinor_field_f(res);
 }
