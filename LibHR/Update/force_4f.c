@@ -25,7 +25,7 @@
  *  the auxfield part of the action.
  */
 
-void force_hmc_auxfields( double dt, suNg_av_field *force, void *vpar ){
+void force_hmc_auxfields(double dt, void *vpar){
   force_auxfield_par *par = (force_auxfield_par*)vpar;
   double g = par->gamma*par->gamma*4.0;
   _MASTER_FOR(ff_sigma->type,i) {
@@ -133,7 +133,7 @@ void force_hmc_auxfields_fermion(double dt, void *vpar, scalar_field *sigma_mom,
 
 
 //Update the auxiliary fields
-void update_auxfields( double dt ){
+void update_auxfields(double dt, void *vpar){
   _MASTER_FOR(ff_sigma->type,i) {
     double tm = *_FIELD_AT(ff_sigma_mom,i);
     *_FIELD_AT(ff_sigma,i)+=dt*tm;

@@ -95,8 +95,10 @@ struct _monomial* ff_create(const monomial_data *data)
 
 	// Setup pointers to update functions
 	m->free = &ff_free;
-	m->force_f = &force_hmc_auxfields;
+	m->update_force = &force_hmc_auxfields;
 	m->force_par = &par->fpar;
+	m->update_field = &update_auxfields;
+	m->field_par = 0;
 
 	m->pseudofermion = &ff_pseudofermion;
 	m->gaussian_pf = &ff_gaussian_pf;

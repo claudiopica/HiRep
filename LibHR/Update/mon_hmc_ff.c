@@ -115,7 +115,7 @@ struct _monomial* hmc_ff_create(const monomial_data *data)
 	par->pf = alloc_spinor_field_f(1, &glat_default);
 
 	// Setup force parameters
-	par->fpar.id=data->id;
+	par->fpar.id = data->id;
 	par->fpar.n_pf = 1;
 	par->fpar.pf = par->pf;
 	par->fpar.inv_err2 = data->force_prec;
@@ -124,14 +124,17 @@ struct _monomial* hmc_ff_create(const monomial_data *data)
 	par->fpar.b = 0;
 	par->fpar.hasenbusch = 0;
 	par->fpar.mu = 0;
+	par->fpar.momenta = &suN_momenta;
 
 	// Setup chronological inverter
 	mre_init(&(par->fpar.mpar), par->mre_past, data->force_prec);
 
 	// Setup pointers to update functions
 	m->free = &hmc_ff_free;
-	m->force_f = &force_hmc_ff;
+	m->update_force = &force_hmc_ff;
 	m->force_par = &par->fpar;
+	m->update_field = 0;
+	m->field_par = 0;
 
 	m->pseudofermion = &hmc_ff_pseudofermion;
 	m->gaussian_pf = &hmc_ff_gaussian_pf;

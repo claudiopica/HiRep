@@ -56,10 +56,20 @@ struct _monomial* lw_create(const monomial_data *data)
 	par->c1 = (1.-par->c0)/8.;
 	gauge_field_active = 1;
 
+	// Setup force parameters
+	par->force_par.beta = par->beta;
+	par->force_par.c0 = par->c0;
+	par->force_par.c1 = par->c1;
+	par->force_par.momenta = &suN_momenta;
+	par->field_par.field = &u_gauge;
+	par->field_par.momenta = &suN_momenta;
+
 	// Setup pointers to update functions
 	m->free = &lw_free;
-	m->force_f = &lw_force;
-	m->force_par = par;
+	m->update_force = &lw_force;
+	m->force_par = &par->force_par;
+	m->update_field = &update_gauge_field;
+	m->field_par = &par->field_par;
 
 	m->pseudofermion = &lw_pseudofermion;
 	m->gaussian_pf = &lw_gaussian_pf;

@@ -132,13 +132,16 @@ struct _monomial* rhmc_create(const monomial_data *data)
 	par->fpar.mass = par->mass;
 	par->ratio.rel_error = data->MD_prec;
 	par->fpar.ratio = &par->ratio;
+	par->fpar.momenta = &suN_momenta;
 	par->ratio.order = 16;
 	r_app_alloc(&par->ratio);
 
 	// Setup pointers to update functions
 	m->free = &rhmc_free;
-	m->force_f = &force_rhmc;
+	m->update_force = &force_rhmc;
 	m->force_par = &par->fpar;
+	m->update_field = 0;
+	m->field_par = 0;
 
 	m->pseudofermion = &rhmc_pseudofermion;
 	m->gaussian_pf = &rhmc_gaussian_pf;

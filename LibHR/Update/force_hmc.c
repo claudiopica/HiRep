@@ -55,10 +55,11 @@ void init_force_hmc()
 	}
 }
 
-void force_hmc(double dt, suNg_av_field *force, void *vpar)
+void force_hmc(double dt, void *vpar)
 {
 	int n_iters = 0;
 	force_hmc_par *par = (force_hmc_par*)vpar;
+	suNg_av_field *force = *par->momenta;
 	spinor_field *pf = par->pf;
 
 	init_force_hmc();

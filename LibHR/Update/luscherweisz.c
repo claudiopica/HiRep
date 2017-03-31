@@ -70,7 +70,7 @@ static suNg* stfld[8] = {NULL};
 static void calculate_stfld(int comm)
 {
 	suNg *staple, wu1;
-   static int nb[8];
+	static int nb[8];
 	static int nc = 0;
 	static int source[8][32];
 	static int *ib[8] = {NULL};
@@ -132,11 +132,11 @@ static void calculate_stfld(int comm)
 		}
 
 		lprintf("INIT", 0, "nc=%d nbuffers_gauge=%d\n", nc, glattice.nbuffers_gauge);
-      for(int k = 0; k < 8; k++)
+		for(int k = 0; k < 8; k++)
 		{
 			lprintf("INIT", 0, "nb[%d] = %d\n", k, nb[k]);
 		}
-   }
+	}
 
 	memset(stfld[0], 0, glattice.gsize_gauge*sizeof(suNg)*8*3);
 	start_gf_sendrecv(u_gauge);
@@ -270,12 +270,13 @@ void lw_local_action(scalar_field *loc_action, double beta, double c0, double c1
 	}
 }
 
-void lw_force(double dt, suNg_av_field *force, void *vpar)
+void lw_force(double dt, void *vpar)
 {
 	suNg ws[4], wu1, wu2;
 	suNg_algebra_vector wf1;
 
-	mon_lw_par *par = (mon_lw_par*)vpar;
+	force_gauge_par *par = (force_gauge_par*)vpar;
+	suNg_av_field *force = *par->momenta;
 	double beta = par->beta;
 	double c0 = par->c0;
 	double c1 = par->c1;

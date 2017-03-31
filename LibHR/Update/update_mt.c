@@ -19,8 +19,6 @@
 #include "communications.h"
 
 /* State quantities for HMC */
-
-static suNg_av_field *momenta=NULL;
 static suNg_field *u_gauge_old=NULL;
 static scalar_field *ff_sigma_old=NULL;
 static scalar_field *ff_pi_old=NULL;
@@ -55,7 +53,7 @@ void init_ghmc(ghmc_par *par){
   
 
   /* allocate momenta */
-  if(momenta==NULL) momenta = alloc_avfield(&glattice);
+  if(suN_momenta==NULL) suN_momenta = alloc_avfield(&glattice);
   
   /* allocate pseudofermions */
   /* we allocate one more pseudofermion for the computation
@@ -90,9 +88,9 @@ void free_ghmc()
 	}
 
 	/* free momenta */
-	if(u_gauge_old!=NULL) free_gfield(u_gauge_old); u_gauge_old=NULL;
-	if(momenta!=NULL) free_avfield(momenta); momenta=NULL;
-	if(la!=NULL) free_sfield(la); la=NULL;
+	if(u_gauge_old!=NULL) { free_gfield(u_gauge_old); u_gauge_old=NULL; }
+	if(suN_momenta!=NULL) { free_avfield(suN_momenta); suN_momenta=NULL; }
+	if(la!=NULL) { free_sfield(la); la=NULL; }
   
 	/*Free integrator */
 	integrator_par *ip = update_par.integrator;
@@ -124,7 +122,7 @@ int update_ghmc()
 
   /* generate new momenta */
   lprintf("HMC",30,"Generating gaussian momenta and pseudofermions...\n");
-  gaussian_momenta(momenta);
+  gaussian_momenta(suN_momenta);
 
   /* generate new pseudofermions */
   for (int i=0;i<num_mon();++i) {
@@ -134,7 +132,7 @@ int update_ghmc()
 
   /* compute starting action */
   lprintf("HMC",30,"Computing action density...\n");
-  local_hmc_action(NEW, la, momenta);
+  local_hmc_action(NEW, la, suN_momenta);
 
   /* correct pseudofermion distribution */
   for (int i=0;i<num_mon();++i) {
@@ -145,7 +143,7 @@ int update_ghmc()
 
   /* integrate molecular dynamics */
   lprintf("HMC",30,"MD integration...\n");
-  update_par.integrator->integrator(momenta,update_par.tlen,update_par.integrator);
+  update_par.integrator->integrator(update_par.tlen,update_par.integrator);
 
 
   /* project and represent gauge field */
@@ -158,7 +156,7 @@ int update_ghmc()
     const monomial *m = mon_n(i);
     m->correct_la_pf(m);
   }
-  local_hmc_action(DELTA, la, momenta);
+  local_hmc_action(DELTA, la, suN_momenta);
 
   /* Metropolis test */
   deltaH = 0.0;
@@ -223,7 +221,7 @@ void corret_pf_dist_hmc(){
   
   /* generate new momenta */
   lprintf("HMC",30,"Generating gaussian momenta and pseudofermions...\n");
-  gaussian_momenta(momenta);
+  gaussian_momenta(suN_momenta);
 
   /* generate new pseudofermions */
   for (int i=0;i<num_mon();++i) {
@@ -233,7 +231,7 @@ void corret_pf_dist_hmc(){
 
   /* compute starting action */
   lprintf("HMC",30,"Computing action density...\n");
-  local_hmc_action(NEW, la, momenta);
+  local_hmc_action(NEW, la, suN_momenta);
 
   /* correct pseudofermion distribution */
   for (int i=0;i<num_mon();++i) {
@@ -249,7 +247,7 @@ void calc_one_force(int n_force){
     for(int n = 0; n < ip->nmon; n++){
       const monomial *m=ip->mon_list[n];
       if (m->data.id==n_force){
-        m->force_f(1,momenta,m->force_par);
+        m->force_f(1,m->force_par);
         return;
       }
     }

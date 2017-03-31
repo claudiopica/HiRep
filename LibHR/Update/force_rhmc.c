@@ -21,7 +21,7 @@ static unsigned int n_ws = 0;
 static spinor_field *chi = NULL;
 static spinor_field *Hchi = NULL;
 
-void force_rhmc(double dt, suNg_av_field *force, void *vpar)
+void force_rhmc(double dt, void *vpar)
 {
 	#ifdef TIMING
 	struct timeval start, end;
@@ -36,6 +36,7 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar)
 
 	int n_iters = 0;
 	force_rhmc_par *par = (force_rhmc_par*)vpar;
+	suNg_av_field *force = *par->momenta;
 	spinor_field *pf = par->pf;
 	rational_app *ratio = par->ratio;
 	force_measure_begin();

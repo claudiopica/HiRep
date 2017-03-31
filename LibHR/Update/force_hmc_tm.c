@@ -55,7 +55,7 @@ static void init_force_hmc_tm()
 	}
 }
 
-void force_hmc_tm(double dt, suNg_av_field *force, void *vpar)
+void force_hmc_tm(double dt, void *vpar)
 {
 #ifndef UPDATE_EO
 	error(1, 1, "FORCE_HMC_TM", "Use only with even odd preconditioned case\n");
@@ -74,6 +74,7 @@ void force_hmc_tm(double dt, suNg_av_field *force, void *vpar)
 	
 	int n_iters = 0;
 	force_hmc_par *par = (force_hmc_par*)vpar;
+	suNg_av_field *force = *par->momenta;
 	spinor_field *pf = par->pf;
 	set_dirac_mass(par->mass);
 	set_twisted_mass(par->mu);
@@ -93,14 +94,14 @@ void force_hmc_tm(double dt, suNg_av_field *force, void *vpar)
 		mre_guess(&par->mpar, 0, Ys, &QpQm_tm, pf);
 		n_iters += 2*cg_mshift(&mpar, QpQm_tm, pf, Ys);
 		mre_store(&par->mpar, 0, Ys);
-		
+
 		/* Xe = (\hat{Q}+)^-1\phi = \hat{Q}_- * Ye */
 		Qtm_m(Xs, Ys);
-		
+
 		/* Yo = (M_ee^-)^-1 * M_eo Ye */
 		Dphi_(xi, Ys);
 		Mee_inv(&Yo, par->mass, -par->mu, xi);
-		
+
 		/* Xo = (M_ee^+)^-1 M_eo Xe */
 		Dphi_(xi, Xs);
 		Mee_inv(&Xo, par->mass, par->mu, xi);
@@ -117,27 +118,27 @@ void force_hmc_tm(double dt, suNg_av_field *force, void *vpar)
 		mre_guess(&par->mpar, 0, Xs, &QpQm_tm, pf);
 		n_iters += 2*cg_mshift(&mpar, QpQm_tm, Ys, Xs);
 		mre_store(&par->mpar, 0, Xs);
-		
+
 		// Ye = Q_- Xe
 		Qtm_m(Ys, Xs);
-		
+
 		/* Yo = (M_ee^+)^-1 * M_eo Ye */
 		Dphi_(xi, Ys);
 		Mee_inv(&Yo, par->mass, par->mu, xi);
-		
+
 		/* Xo = (M_ee^-)^-1 M_eo Xe */
 		Dphi_(xi,Xs);
 		Mee_inv(&Xo, par->mass, -par->mu, xi);
 		force_fermion_core(Xs, Ys, force, 0, dt, 1.);
-		
+
 		//Second contribution to force
 		// Ye = pf
 		spinor_field_copy_f(Ys, pf);
-		
+
 		/* Yo = (M_ee^+)^-1 * M_eo pf */
 		Dphi_(xi, pf);
 		Mee_inv(&Yo, par->mass, par->mu+par->b, xi);
-		
+
 		/* Xo = (M_ee^-)^-1 M_eo Xe */
 		Dphi_(xi, Xs);
 		Mee_inv(&Xo, par->mass, -par->mu-par->b, xi);

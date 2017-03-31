@@ -119,7 +119,7 @@ void spinor_sigma_pi_rho_div_assign(spinor_field *out,scalar_field *sigma,scalar
 void spinor_sigma_pi_dagger_rho_div_assign(spinor_field *out,scalar_field *sigma,scalar_field *pi,double rho, spinor_field *in);
 void force_hmc_auxfields_fermion(double dt, void *vpar, scalar_field *sigma_mom, scalar_field *pi_mom,spinor_field *Xs, spinor_field *Ys, int hasenbusch );
 
-void force_hmc_ff(double dt, suNg_av_field *force, void *vpar){
+void force_hmc_ff(double dt, void *vpar){
 
 #ifdef UPDATE_EO
   spinor_field Xe, Xo, Ye, Yo;
@@ -127,6 +127,7 @@ void force_hmc_ff(double dt, suNg_av_field *force, void *vpar){
 
   init_force_hmc();
   force_hmc_par *par = (force_hmc_par*)vpar;
+  suNg_av_field *force = *par->momenta;
   spinor_field *pf = par->pf;
   int n_iters = 0;
   (void) n_iters;
