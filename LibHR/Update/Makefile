@@ -4,8 +4,8 @@ MKDIR = $(TOPDIR)/Make
 SRCS = $(wildcard *.c)
 LIBNAME = ../libhr.a
 
-#Exclude this source files
-EXCLUDE = leapfrog.c update_hmc.c update_rhmc.c update_puregauge.c
+#Exclude these source files
+EXCLUDE = 
 
 include $(MKDIR)/MkRules
 

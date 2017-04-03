@@ -44,6 +44,7 @@ void update_gauge_field(double dt, void *vpar)
 	{
 		count = 0;
 		project_gauge_field();
+		complete_gf_sendrecv(u_gauge);
 	}
 	else
 	{

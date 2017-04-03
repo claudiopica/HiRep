@@ -91,7 +91,7 @@ struct _monomial* ff_create(const monomial_data *data)
 	}
 
 	// Setup force parameters
-	(par->fpar).gamma = par->gamma;
+	par->fpar.gamma = par->gamma;
 
 	// Setup pointers to update functions
 	m->free = &ff_free;
