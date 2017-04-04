@@ -27,6 +27,11 @@
 	_suNf_inverse_multiply(a,b,c)
 #endif
 
+#ifndef _suNfc_zero
+#define _suNfc_zero(a) \
+	_suNf_zero(a)
+#endif
+
 double get_csw();
 void compute_ldl_decomp(double);
 void compute_clover_term();

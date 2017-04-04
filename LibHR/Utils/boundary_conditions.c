@@ -8,6 +8,7 @@
 #include "suN.h"
 #include "communications.h"
 #include "logger.h"
+#include "clover_tools.h"
 #include <math.h>
 #include <stdlib.h>
 
@@ -146,7 +147,7 @@ void init_BCs(BCs_pars_t *pars) {
 
 
 #ifdef BC_T_OPEN
-  lprintf("BCS",0,"Open BC gauge boundary term ct=%e cs=%e\n",BCs_pars.chiSF_boundary_improvement_ct,BCs_pars.chiSF_boundary_improvement_cs);  
+  lprintf("BCS",0,"Open BC gauge boundary term ct=%e cs=%e\n",BCs_pars.gauge_boundary_improvement_ct,BCs_pars.gauge_boundary_improvement_cs);
   init_plaq_open_BCs(BCs_pars.gauge_boundary_improvement_ct,BCs_pars.gauge_boundary_improvement_cs);
 #endif
 
@@ -267,8 +268,13 @@ void apply_BCs_on_spinor_field_flt(spinor_field_flt *sp) {
 #endif
 }
 
+static void cl_open_BCs(suNfc_field*);
 
-
+void apply_BCs_on_clover_term(suNfc_field *cl) {
+#ifdef BC_T_OPEN
+	cl_open_BCs(cl);
+#endif
+}
 
 
 /***************************************************************************/
@@ -727,8 +733,58 @@ static void mf_open_BCs(suNg_av_field *force) {
   }
 }
 
+/***************************************************************************/
+/* BOUNDARY CONDITIONS TO BE APPLIED ON THE CLOVER TERM                    */
+/***************************************************************************/
 
+static void cl_open_BCs(suNfc_field *cl)
+{
+	int index;
+	suNfc u;
+	_suNfc_zero(u);
 
+	// These should reflect the boundary conditions imposed on the spinor fields
+	if(COORD[0] == 0)
+	{
+		for(int ix = 0; ix < X_EXT; ix++)
+		for(int iy = 0; iy < Y_EXT; iy++)
+		for(int iz = 0; iz < Z_EXT; iz++)
+		{
+			index = ipt_ext(T_BORDER,ix,iy,iz);
+			if(index != -1)
+			{
+				for(int mu = 0; mu < 4; mu++)
+				{
+					*_4FIELD_AT(cl,index,mu) = u;
+				}
+			}
+			index = ipt_ext(T_BORDER+1,ix,iy,iz);
+			if(index != -1)
+			{
+				for(int mu = 0; mu < 4; mu++)
+				{
+					*_4FIELD_AT(cl,index,mu) = u;
+				}
+			}
+		}
+	}
+	if(COORD[0] == NP_T-1)
+	{
+		for(int ix = 0; ix < X_EXT; ix++)
+		for(int iy = 0; iy < Y_EXT; iy++)
+		for(int iz = 0; iz < Z_EXT; iz++)
+		{
+			index = ipt_ext(T+T_BORDER-1,ix,iy,iz);
+			if(index != -1)
+			{
+				for(int mu = 0; mu < 4; mu++)
+				{
+					*_4FIELD_AT(cl,index,mu) = u;
+				}
+			}
+		}
+	}
+}
 
 
 

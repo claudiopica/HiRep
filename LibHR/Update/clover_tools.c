@@ -9,6 +9,7 @@
 #include "logger.h"
 #include "communications.h"
 #include "clover_tools.h"
+#include "utils.h"
 #include <math.h>
 #include <string.h>
 
@@ -378,6 +379,7 @@ void compute_clover_term()
 	{
 		_compute_clover_term(id);
 	}
+	apply_BCs_on_clover_term(cl_term);
 }
 
 void compute_ldl_decomp(double sigma0)
