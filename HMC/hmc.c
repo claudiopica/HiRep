@@ -241,7 +241,6 @@ int main(int argc,char *argv[]) {
     eva_vecs=alloc_spinor_field_f(eigval_var.nevt,&glattice);
   }
   rc=acc=0;
-  printf("flow = %i - %i\n",flow.start,flow.end);fflush(stdout);
   for(i=flow.start;i<flow.end;++i) {
     int rr;
     double perc;
@@ -311,7 +310,9 @@ int main(int argc,char *argv[]) {
 */
     if((i%flow.save_freq)==0) {
       save_conf(&flow, i);
-      save_scalar_conf(&flow, i);
+      if(u_scalar!=NULL){
+	      save_scalar_conf(&flow, i);
+      }
       /* Only save state if we have a file to save to */
       if(rlx_var.rlxd_state[0]!='\0') {
           lprintf("MAIN",0,"Saving rlxd state to file %s\n",rlx_var.rlxd_state);
@@ -376,7 +377,9 @@ int main(int argc,char *argv[]) {
   /* save final configuration */
   if(((--i)%flow.save_freq)!=0) {
     save_conf(&flow, i);
-    save_scalar_conf(&flow, i);
+    if(u_scalar!=NULL){
+	    save_scalar_conf(&flow, i);
+    }
     /* Only save state if we have a file to save to */
     if(rlx_var.rlxd_state[0]!='\0') {
         lprintf("MAIN",0,"Saving rlxd state to file %s\n",rlx_var.rlxd_state);

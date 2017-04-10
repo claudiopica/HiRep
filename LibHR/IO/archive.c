@@ -53,7 +53,6 @@ void write_gauge_field_matrix(char filename[])
 #endif
   
 #ifndef ALLOCATE_REPR_GAUGE_FIELD
-  printf("Inside ALLOCATE_REPR_GAUGE_FIELD block\n");
   complete_gf_sendrecv(u_gauge); 
   apply_BCs_on_represented_gauge_field(); //Save the link variables with periodic boundary conditions 
 #endif
@@ -683,7 +682,6 @@ void write_scalar_field(char filename[])
 #endif
   
 #ifndef ALLOCATE_REPR_GAUGE_FIELD
-  printf("Inside ALLOCATE_REPR_GAUGE_FIELD block\n");
   complete_sc_sendrecv(u_scalar); 
 //  apply_BCs_on_represented_gauge_field(); //Save the link variables with periodic boundary conditions 
 #endif

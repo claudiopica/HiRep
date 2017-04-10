@@ -81,7 +81,6 @@ void write_gauge_field_su2q(char filename[])
 
  
 #ifndef ALLOCATE_REPR_GAUGE_FIELD
-  printf("Inside ALLOCATE_REPR_GAUGE_FIELD block\n");
   complete_gf_sendrecv(u_gauge); 
   apply_BCs_on_represented_gauge_field(); //Save the link variables with periodic boundary conditions 
 #endif
@@ -220,7 +219,6 @@ void write_gauge_field_su2q(char filename[])
 
   gettimeofday(&end,0);
   timeval_subtract(&etime,&end,&start);
-  printf("Using quaternion IO\n");
   lprintf("IO",0,"Configuration [%s] saved [%ld sec %ld usec]\n",filename,etime.tv_sec,etime.tv_usec);
 
 #ifdef WITH_MPI

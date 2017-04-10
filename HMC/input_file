@@ -1,12 +1,12 @@
 // Global variables 
-GLB_T = 4
-GLB_X = 4
-GLB_Y = 4
-GLB_Z = 4
-NP_T = 1
-NP_X = 1
-NP_Y = 1
-NP_Z = 1
+GLB_T = 8
+GLB_X = 8
+GLB_Y = 8
+GLB_Z = 8
+NP_T = 2
+NP_X = 2
+NP_Y = 2
+NP_Z = 2
 
 // Replicas
 N_REP = 1
@@ -85,13 +85,13 @@ monomial {
 	level = 0
 }
 
-monomial {
-	id = 2
-	type = scalar
-	mass = 0.5
-	lambda = 0.5
-	level = 0
-}
+//monomial {
+//	id = 2
+//	type = scalar
+//	mass = 0.5
+//	lambda = 0.5
+//	level = 0
+//}
 
 // Integrators
 integrator {

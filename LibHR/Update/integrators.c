@@ -44,7 +44,7 @@ void monomial_field(double dt, int nmon, const monomial **mon_list, integrator_p
 		}
 	}
 	local_hmc_action(NEW,la,suN_momenta,scalar_momenta);
-	printf("Field: mon type: action = %f \n",total_action(la));
+//	printf("Field: mon type: action = %f \n",total_action(la));
 	if(ipn)
 	{
 		ipn->integrator(dt, ipn);
