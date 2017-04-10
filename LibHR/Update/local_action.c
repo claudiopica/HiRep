@@ -18,8 +18,9 @@
  */
 void local_hmc_action(local_action_type type,
                       scalar_field *loc_action,
-                      suNg_av_field *momenta
-                      ) {
+                      suNg_av_field *momenta,
+                      suNg_scalar_field *momenta_s
+                      ){
 
   
   /* check input types */
@@ -42,7 +43,9 @@ void local_hmc_action(local_action_type type,
     error(1,1,"local_hmc_action","Invalid type");
   }
 
+//  double P2total = 0.0;
   _MASTER_FOR(&glattice,i) {
+//    printf("before: %f\n", *_FIELD_AT(loc_action,i));
     double a=0., tmp;
     /* Momenta */
     for (int j=0;j<4;++j) {
@@ -50,9 +53,17 @@ void local_hmc_action(local_action_type type,
       _algebra_vector_sqnorm_g(tmp,*cmom); 
       a+=tmp; /* this must be positive */
     }
+    double P2=0.0; //Scalar momentum squared
+    if(u_scalar!=NULL){
+	    suNg_vector P=*_FIELD_AT(momenta_s,i);
+	    _vector_prod_re_g(P2,P,P);
+//	    P2total += P2;
+    }
     a*=0.5*_FUND_NORM2;
-    *_FIELD_AT(loc_action,i)+=a;
+    *_FIELD_AT(loc_action,i)+=a + P2;
+//    printf("after: %f\n", *_FIELD_AT(loc_action,i));
   }
+//  printf("<P^+ P> = %f\n", P2total);
 
   int nmon=num_mon();
   for (int i=0;i<nmon;++i) {

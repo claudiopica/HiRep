@@ -17,19 +17,23 @@ typedef struct _geometry_descriptor {
   int local_master_pieces;  // 
   int total_spinor_master_pieces;
   int total_gauge_master_pieces;
+  int total_scalar_master_pieces;
   int *master_start, *master_end; // Beginning has inner pieces, then local pieces, then the rest.
   int master_shift; /*  this is the odd spinor's shift, i.e. the index of the first odd entry in the full geometry */
   int ncopies_spinor;
   int ncopies_gauge;
+  int ncopies_scalar;
   int *copy_from, *copy_to, *copy_len;
   int copy_shift; /*  this is the odd spinor's shift, i.e. the index of the first odd copy in the full geometry */
   int nbuffers_spinor;
   int nbuffers_gauge;
+  int nbuffers_scalar;
   int *rbuf_len, *sbuf_len;
   int *rbuf_from_proc, *rbuf_start;
   int *sbuf_to_proc, *sbuf_start;
   int gsize_spinor;
   int gsize_gauge;
+  int gsize_scalar;
 } geometry_descriptor;
 
 

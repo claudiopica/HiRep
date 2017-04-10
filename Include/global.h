@@ -132,6 +132,7 @@ GLB_VAR(mem_t,alloc_mem_t, =STD_MEM_TYPE); /* memory type requested for allocati
 #include "spinor_field.h"
 
 GLB_VAR(suNg_field,*u_gauge,=NULL);
+GLB_VAR(suNg_scalar_field,*u_scalar,=NULL);
 GLB_VAR(suNg_field_flt,*u_gauge_flt,=NULL);
 GLB_VAR(suNf_field,*u_gauge_f,=NULL);
 GLB_VAR(suNf_field_flt,*u_gauge_f_flt,=NULL);
@@ -139,9 +140,11 @@ GLB_VAR(suNfc_field,*cl_term,=NULL);
 GLB_VAR(suNf_field,*cl_force,=NULL);
 GLB_VAR(ldl_field,*cl_ldl,=NULL);
 GLB_VAR(suNg_av_field,*suN_momenta,=NULL);
+GLB_VAR(suNg_scalar_field,*scalar_momenta,=NULL);
 GLB_VAR(int,gauge_field_active,=0); // whether gauge field interactions is active
 
 #define pu_gauge(ix,mu) ((u_gauge->ptr)+coord_to_index(ix,mu))
+#define pu_scalar(ix) ((u_scalar->ptr)+ix)
 #define pu_gauge_flt(ix,mu) ((u_gauge_flt->ptr)+coord_to_index(ix,mu))
 #define pu_gauge_f(ix,mu) ((u_gauge_f->ptr)+coord_to_index(ix,mu))
 #define pu_gauge_f_flt(ix,mu) ((u_gauge_f_flt->ptr)+coord_to_index(ix,mu))

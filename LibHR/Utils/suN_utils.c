@@ -19,6 +19,12 @@
 #include "representation.h"
 #include "logger.h"
 
+void vector_star(suNg_vector *v1,suNg_vector *v2){
+	for(int i=0;i<NG;i++){
+		_complex_star(v1->c[i],v2->c[i]);
+	}
+}
+
 #ifdef GAUGE_SON
 static void normalize(double *v)
 {

@@ -241,6 +241,7 @@ int main(int argc,char *argv[]) {
     eva_vecs=alloc_spinor_field_f(eigval_var.nevt,&glattice);
   }
   rc=acc=0;
+  printf("flow = %i - %i\n",flow.start,flow.end);fflush(stdout);
   for(i=flow.start;i<flow.end;++i) {
     int rr;
     double perc;
@@ -263,6 +264,9 @@ int main(int argc,char *argv[]) {
 #endif
     
     rr=update_ghmc();
+
+    //average of exp(-DeltaS)
+
     
     gettimeofday(&end,0);
     timeval_subtract(&etime,&end,&start);
@@ -279,8 +283,35 @@ int main(int argc,char *argv[]) {
     
     lprintf("MAIN",0,"Trajectory #%d: %d/%d (%3.4f%%) MVM (f;d) = %ld ; %ld\n",i,acc,rc,perc,getMVM_flt(),getMVM());
     
+/*    read_scalar_field("scalar_run1_8x8x8x8nc2rFUNnf2b5.000000m0.100000n0");	
+    int coord[4];
+    origin_coord(coord);
+    int counter=2*(coord[0]*GLB_X*GLB_Y*GLB_Z+coord[1]*GLB_Y*GLB_Z+coord[2]*GLB_Z+coord[3]);
+//    counter++; //This line will break the code
+
+    printf("XYZT = %i %i %i %i\n",X,Y,Z,T);fflush(stdout);
+    for(int it=0; it<T; it++){
+	    for(int ix=0; ix<X; ix++){
+		    for(int iy=0; iy<Y; iy++){
+			    for(int iz=0; iz<Z; iz++){
+				    
+				    (u_scalar->ptr+ipt(it,ix,iy,iz))->c[0].re = counter++; 
+				    (u_scalar->ptr+ipt(it,ix,iy,iz))->c[0].im = counter++; 
+				     
+				    double v=(u_scalar->ptr+ipt(it,ix,iy,iz))->c[0].re;
+				    if(fabs(v-counter)>1.e-15) { printf("ERROR scalar!!!\n"); }
+				    counter++;
+				    v=(u_scalar->ptr+ipt(it,ix,iy,iz))->c[0].im;
+				    if(fabs(v-counter)>1.e-15) { printf("ERROR scalar!!!\n"); }
+				    counter++;
+			    }
+		    }
+	    }
+    }
+*/
     if((i%flow.save_freq)==0) {
       save_conf(&flow, i);
+      save_scalar_conf(&flow, i);
       /* Only save state if we have a file to save to */
       if(rlx_var.rlxd_state[0]!='\0') {
           lprintf("MAIN",0,"Saving rlxd state to file %s\n",rlx_var.rlxd_state);
@@ -341,9 +372,11 @@ int main(int argc,char *argv[]) {
       }
     }
   }
+  //suNg_vector* ptr = u_scalar->ptr;
   /* save final configuration */
   if(((--i)%flow.save_freq)!=0) {
     save_conf(&flow, i);
+    save_scalar_conf(&flow, i);
     /* Only save state if we have a file to save to */
     if(rlx_var.rlxd_state[0]!='\0') {
         lprintf("MAIN",0,"Saving rlxd state to file %s\n",rlx_var.rlxd_state);
@@ -362,6 +395,7 @@ int main(int argc,char *argv[]) {
   
   /* close communications */
   finalize_process();
+	
   
   return 0;
   

@@ -63,6 +63,13 @@ typedef struct {
 } force_gauge_par;
 
 typedef struct {
+	double mass;
+	double lambda;
+	suNg_scalar_field **momenta;
+	suNg_av_field **g_momenta;
+} force_scalar_par;
+
+typedef struct {
 	double gamma;
 } force_auxfield_par;
 
@@ -71,11 +78,20 @@ typedef struct {
 	suNg_av_field **momenta;
 } field_gauge_par;
 
+typedef struct {
+	suNg_scalar_field **field;
+	suNg_scalar_field **momenta;
+} field_scalar_par;
+
 void force_measure_begin();
 void force_measure_end(int, const char*, double, int);
 
 void update_gauge_field(double, void*);
 void update_auxfields(double, void*);
+
+void update_scalar_field(double, void*);
+void force_scalar(double, void*);
+
 
 void lw_force(double, void*);
 void lw_local_action(scalar_field*, double, double, double);
@@ -91,6 +107,7 @@ void force_hmc_auxfields(double, void*); //Force from a four_fermion monomial
 void force_hmc_ff(double, void*); //Force from a HMC_ff or Hasenbusch_ff monomial
 
 void gaussian_momenta(suNg_av_field *momenta);
+void gaussian_scalar_momenta(suNg_scalar_field *momenta);
 void gaussian_spinor_field(spinor_field *s);
 void gaussian_spinor_field_flt(spinor_field_flt *s);
 void z2_spinor_field(spinor_field *s);
@@ -152,13 +169,15 @@ typedef enum {
  */
 void local_hmc_action(local_action_type type,
                       scalar_field *loc_action,
-                      suNg_av_field *momenta);
+                      suNg_av_field *momenta,
+                      suNg_scalar_field *momenta_s);
 void pf_local_action(scalar_field *loc_action,
                      spinor_field *pf);
 
 
 void suNg_field_copy(suNg_field *g1, suNg_field *g2);
 void suNf_field_copy(suNf_field *g1, suNf_field *g2);
+void suNg_scalar_field_copy(suNg_scalar_field *g1, suNg_scalar_field *g2);
 
 /* find spectral interval using eva */
 void find_spec_H2(double *max, double *min);

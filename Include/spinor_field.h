@@ -42,6 +42,7 @@ _GPU_FIELD_DATA(_type) \
 
 
 _DECLARE_FIELD_STRUCT(suNg_field, suNg);
+_DECLARE_FIELD_STRUCT(suNg_scalar_field, suNg_vector);
 _DECLARE_FIELD_STRUCT(suNg_field_flt, suNg_flt);
 _DECLARE_FIELD_STRUCT(suNf_field, suNf);
 _DECLARE_FIELD_STRUCT(suNf_field_flt, suNf_flt);

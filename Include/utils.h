@@ -21,6 +21,7 @@
 
 void ExpX(double dt, suNg_algebra_vector *h, suNg *u);
 
+void vector_star(suNg_vector*,suNg_vector*);
 
 
 typedef struct {

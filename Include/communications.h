@@ -17,6 +17,8 @@ void complete_gf_sendrecv(suNg_field *gf);
 void start_gf_sendrecv(suNg_field *gf);
 void complete_sf_sendrecv(spinor_field *gf);
 void start_sf_sendrecv(spinor_field *gf);
+void complete_sc_sendrecv(suNg_scalar_field *gf);
+void start_sc_sendrecv(suNg_scalar_field *gf);
 
 void complete_clover_force_sendrecv(suNf_field *gf);
 void start_clover_force_sendrecv(suNf_field *gf);

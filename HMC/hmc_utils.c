@@ -130,6 +130,19 @@ static void mk_gconf_name(char *name, hmc_flow *rf, int id)
 	}
 }
 
+static void mk_sconf_name(char *name, hmc_flow *rf, int id)
+{
+	/* build configuration name */
+	if(strlen(rf->run_name) > 10)
+	{
+		sprintf(name,"scalar_%sn%d",rf->run_name,id);
+	}
+	else
+	{
+		sprintf(name,"scalar_%s_%dx%dx%dx%dnc%dr%snf%db%.6fm%.6fn%d",
+				  rf->run_name,GLB_T,GLB_X,GLB_Y,GLB_Z,NG,repr_name,nf(),beta(),-mass(),id);
+	}
+}
 /* add dirname to filename and return it */
 static char *add_dirname(char *dirname, char *filename)
 {
@@ -196,6 +209,50 @@ static int parse_gstart(hmc_flow *rf)
 	return -1;
 }
 
+#if 0
+static int parse_sstart(hmc_flow *rf)
+{
+	int ret = 0;
+	int len = 0;
+	char buf[256];
+	char temp[256]="scalar_";
+	char *ptr;
+
+	ptr = strrchr(rf->s_start, 'n');
+	ret = (int)(ptr - rf->s_start);
+	len = strlen(rf->run_name)+7; //adding "scalar_"
+	strcat(temp,rf->run_name);
+//	if(ptr && (ret == len || strncmp(rf->s_start, temp, len) == 0))
+//	{
+		rf->start = atoi(ptr+1) + 1;
+		return 0;
+//	}
+
+	rf->start = 1; /* reset rf->start */
+
+	/* try other matches */
+	strcpy(buf, rf->s_start);
+	slower(buf);
+
+	ret = strcmp(buf, "unit");
+	if (ret == 0) {
+		lprintf("FLOW",0,"Starting a new run from a unit conf!\n");
+		return 1;
+	}
+
+	ret = strcmp(buf, "random");
+	if (ret == 0) {
+		lprintf("FLOW",0,"Starting a new run from a random conf!\n");
+		return 2;
+	}
+
+	lprintf("ERROR",0,"Invalid starting scalar conf specified [%s]\n",rf->s_start);
+	error(1,1,"parse_sstart " __FILE__,"invalid config name");
+
+	return -1;
+}
+#endif
+
 /* read last_conf string and fill the end parameter
  * in hmc_flow with the id of the last conf to be generated.
  * last_conf must be one of:
@@ -257,6 +314,7 @@ int init_mc(hmc_flow *rf, char *ifile) {
 #ifdef ALLOCATE_REPR_GAUGE_FIELD
   u_gauge_f=alloc_gfield_f(&glattice);
 #endif
+
   u_gauge_f_flt=alloc_gfield_f_flt(&glattice);
 #ifdef WITH_CLOVER
 	clover_init(hmc_var.hmc_p.csw);
@@ -304,19 +362,35 @@ int init_mc(hmc_flow *rf, char *ifile) {
   switch(start_t) {
   case 0:
     read_gauge_field(add_dirname(rf->conf_dir,rf->g_start));
+    char configname[256] = "scalar_";
+    strcat(configname, rf->g_start);
+    printf("%s\n",configname);
+    read_scalar_field(add_dirname(rf->conf_dir,configname));
     break;
   case 1:
     unit_u(u_gauge);
+    if(u_scalar!=NULL){
+	    zero_s(u_scalar);
+    }
 #ifndef ALLOCATE_REPR_GAUGE_FIELD
     complete_gf_sendrecv(u_gauge); /*Apply boundary conditions already here for fundamental fermions*/
+    if(u_scalar!=NULL){
+	    complete_sc_sendrecv(u_scalar);
+    }
     u_gauge_f=(suNf_field *)((void*)u_gauge);
     apply_BCs_on_represented_gauge_field(); 
 #endif
     break;
   case 2:
     random_u(u_gauge);
+    if(u_scalar!=NULL){
+	    random_s(u_scalar);
+    }
 #ifndef ALLOCATE_REPR_GAUGE_FIELD
     complete_gf_sendrecv(u_gauge); /*Apply boundary conditions already here for fundamental fermions*/
+    if(u_scalar!=NULL){
+	    complete_sc_sendrecv(u_scalar);
+    }
     u_gauge_f=(suNf_field *)((void*)u_gauge);
     apply_BCs_on_represented_gauge_field(); 
 #endif
@@ -343,6 +417,16 @@ int save_conf(hmc_flow *rf, int id) {
   return 0;
 }
 
+/* save the gauge config with the specified id */
+int save_scalar_conf(hmc_flow *rf, int id) {
+  char buf[256];
+  
+  mk_sconf_name(buf, rf, id);
+  write_scalar_field(add_dirname(rf->conf_dir,buf));
+   
+  return 0;
+}
+
 /* clean up memory */
 int end_mc() {
   free_ghmc();
@@ -353,6 +437,9 @@ int end_mc() {
 #ifdef ALLOCATE_REPR_GAUGE_FIELD
   free_gfield_f(u_gauge_f);
 #endif
+  if(u_scalar!=NULL){
+	  free_scalar_field(u_scalar);
+  }
 
   return 0;
 }

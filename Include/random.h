@@ -30,6 +30,9 @@ void random_suNg(suNg *u);
 void random_u(suNg_field *gf);
 void unit_u(suNg_field *gf);
 
+void random_s(suNg_scalar_field*);
+void zero_s(suNg_scalar_field *sf);
+
 void ranz2(double r[],int n);
 void generate_random_point(int *pr);
 

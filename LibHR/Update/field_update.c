@@ -1,5 +1,5 @@
 /***************************************************************************\
- * Copyright (c) 2008, Agostino Patella, Claudio Pica, Ari Hietanen          *
+ * Copyright (c) 2017                    			             *
  * All rights reserved.                                                      *
  \***************************************************************************/
 
@@ -64,3 +64,41 @@ void update_gauge_field(double dt, void *vpar)
 	lprintf("TIMING",0,"gauge_integrator %.6f s\n",1.*etime.tv_sec+1.e-6*etime.tv_usec);
 #endif
 }
+
+
+void update_scalar_field(double dt, void *vpar)
+{
+#ifdef TIMING
+    struct timeval start, end;
+    struct timeval start1, end1;
+    struct timeval etime;
+    
+#ifdef TIMING_WITH_BARRIERS
+    MPI_Barrier(GLB_COMM);
+#endif
+    gettimeofday(&start,0);
+#endif
+    
+    field_scalar_par *par = (field_scalar_par*)vpar;
+    suNg_scalar_field *s_field = *par->field;
+    suNg_scalar_field *force = *par->momenta;
+    suNg_vector mom_star, sum;
+
+    _MASTER_FOR(&glattice,ix)
+    {
+	vector_star(&mom_star,_FIELD_AT(force,ix));
+	_vector_lc_g(sum,1.0,*_FIELD_AT(s_field,ix),dt,mom_star);
+	*_FIELD_AT(s_field,ix) = sum;	
+    }
+    
+    
+#ifdef TIMING
+#ifdef TIMING_WITH_BARRIERS
+    MPI_Barrier(GLB_COMM);
+#endif
+    gettimeofday(&end,0);
+    timeval_subtract(&etime,&end,&start);
+    lprintf("TIMING",0,"gauge_integrator %.6f s\n",1.*etime.tv_sec+1.e-6*etime.tv_usec);
+#endif
+}
+

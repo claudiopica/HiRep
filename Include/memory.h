@@ -30,6 +30,8 @@ void afree(void *addr);
 
 void free_gfield(suNg_field *u);
 suNg_field* alloc_gfield(geometry_descriptor* type);
+void free_scalar_field(suNg_scalar_field *u);
+suNg_scalar_field* alloc_scalar_field(geometry_descriptor* type);
 void free_gfield_f(suNf_field *u);
 suNf_field* alloc_gfield_f(geometry_descriptor* type);
 void free_gfield_flt(suNg_field_flt *u);

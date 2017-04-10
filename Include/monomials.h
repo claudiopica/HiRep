@@ -24,7 +24,8 @@ typedef enum {
 	Hasenbusch_tm,
 	Hasenbusch_tm_alt,
 	HMC_ff,
-	Hasenbusch_ff
+	Hasenbusch_ff,
+    	Scalar
 } mon_type;
 
 typedef struct {
@@ -88,6 +89,13 @@ typedef struct {
 } mon_hasenbusch_tm_par;
 
 typedef struct {
+    	double mass;
+    	double lambda;
+	force_scalar_par force_par;
+	field_scalar_par field_par;
+} mon_scalar_par;
+
+typedef struct {
 	int id;
 	mon_type type;
 	void *par;
@@ -122,6 +130,7 @@ struct _monomial* hasen_tm_alt_create(const monomial_data*);
 struct _monomial* ff_create(const monomial_data*);
 struct _monomial* hmc_ff_create(const monomial_data*);
 struct _monomial* hasen_ff_create(const monomial_data*);
+struct _monomial* scalar_create(const monomial_data*);
 
 const monomial *add_mon(monomial_data*);
 const monomial *mon_n(int);
