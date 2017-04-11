@@ -209,50 +209,6 @@ static int parse_gstart(hmc_flow *rf)
 	return -1;
 }
 
-#if 0
-static int parse_sstart(hmc_flow *rf)
-{
-	int ret = 0;
-	int len = 0;
-	char buf[256];
-	char temp[256]="scalar_";
-	char *ptr;
-
-	ptr = strrchr(rf->s_start, 'n');
-	ret = (int)(ptr - rf->s_start);
-	len = strlen(rf->run_name)+7; //adding "scalar_"
-	strcat(temp,rf->run_name);
-//	if(ptr && (ret == len || strncmp(rf->s_start, temp, len) == 0))
-//	{
-		rf->start = atoi(ptr+1) + 1;
-		return 0;
-//	}
-
-	rf->start = 1; /* reset rf->start */
-
-	/* try other matches */
-	strcpy(buf, rf->s_start);
-	slower(buf);
-
-	ret = strcmp(buf, "unit");
-	if (ret == 0) {
-		lprintf("FLOW",0,"Starting a new run from a unit conf!\n");
-		return 1;
-	}
-
-	ret = strcmp(buf, "random");
-	if (ret == 0) {
-		lprintf("FLOW",0,"Starting a new run from a random conf!\n");
-		return 2;
-	}
-
-	lprintf("ERROR",0,"Invalid starting scalar conf specified [%s]\n",rf->s_start);
-	error(1,1,"parse_sstart " __FILE__,"invalid config name");
-
-	return -1;
-}
-#endif
-
 /* read last_conf string and fill the end parameter
  * in hmc_flow with the id of the last conf to be generated.
  * last_conf must be one of:
@@ -374,9 +330,6 @@ int init_mc(hmc_flow *rf, char *ifile) {
     }
 #ifndef ALLOCATE_REPR_GAUGE_FIELD
     complete_gf_sendrecv(u_gauge); /*Apply boundary conditions already here for fundamental fermions*/
-    if(u_scalar!=NULL){
-	    complete_sc_sendrecv(u_scalar);
-    }
     u_gauge_f=(suNf_field *)((void*)u_gauge);
     apply_BCs_on_represented_gauge_field(); 
 #endif
@@ -388,9 +341,6 @@ int init_mc(hmc_flow *rf, char *ifile) {
     }
 #ifndef ALLOCATE_REPR_GAUGE_FIELD
     complete_gf_sendrecv(u_gauge); /*Apply boundary conditions already here for fundamental fermions*/
-    if(u_scalar!=NULL){
-	    complete_sc_sendrecv(u_scalar);
-    }
     u_gauge_f=(suNf_field *)((void*)u_gauge);
     apply_BCs_on_represented_gauge_field(); 
 #endif

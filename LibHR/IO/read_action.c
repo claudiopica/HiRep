@@ -434,23 +434,25 @@ static void setup_monomials()
          lprintf("ACTION", 10, "Monomial %d: level = %d, type = hasenbusch_ff, mass = %1.6f, dm = %1.6f, force_prec = %1.2e, mt_prec = %1.2e\n",
                  i, level, par->mass, par->dm, data.force_prec, data.MT_prec);
       }
-      else if(strcmp(type, "scalar") == 0){
-         mon_scalar_par *par = malloc(sizeof(*par));
-         data.par = par;
-         data.type = Scalar;
+		else if(strcmp(type, "scalar") == 0)
+		{
+			mon_scalar_par *par = malloc(sizeof(*par));
+			data.par = par;
+			data.type = Scalar;
 
-         // Find parameters
-         par->mass = find_double(cur, "mass");
-         check(last_error, "Unable to find 'mass' in monomial of type 'scalar'\n");
-         par->lambda = find_double(cur, "lambda");
-         check(last_error, "Unable to find 'lambda' in monomial of type 'scalar'\n");
+			// Find parameters
+			par->mass = find_double(cur, "mass");
+			check(last_error, "Unable to find 'mass' in monomial of type 'scalar'\n");
 
-         // Add monomial
-         mret = add_mon(&data);
+			par->lambda = find_double(cur, "lambda");
+			check(last_error, "Unable to find 'lambda' in monomial of type 'scalar'\n");
 
-         // Monomial information
-         lprintf("ACTION", 10, "Monomial %d: level = %d, type = scalar, mass = %1.6f, lambda = %1.6f\n", i, level, par->mass, par->lambda);
-      }
+			// Add monomial
+			mret = add_mon(&data);
+
+			// Monomial information
+			lprintf("ACTION", 10, "Monomial %d: level = %d, type = scalar, mass = %1.6f, lambda = %1.6f\n", i, level, par->mass, par->lambda);
+		}
       else
       {
          check(1, "Unknown monomial type\n");

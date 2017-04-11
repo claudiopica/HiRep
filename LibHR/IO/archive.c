@@ -196,7 +196,6 @@ void write_gauge_field_matrix(char filename[])
   
   gettimeofday(&end,0);
   timeval_subtract(&etime,&end,&start);
-  printf("Using IO without quaternions\n");
   lprintf("IO",0,"Configuration [%s] saved [%ld sec %ld usec]\n",filename,etime.tv_sec,etime.tv_usec);
   
 #ifdef WITH_MPI

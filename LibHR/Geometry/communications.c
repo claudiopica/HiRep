@@ -275,6 +275,22 @@ static void sync_gauge_transf(suNg_field *gf) {
   }
 }
 
+static void sync_scalar_field(suNg_scalar_field *p) {
+	int i;
+	/* int j, x, y; */
+	geometry_descriptor *gd = p->type;
+	
+	for(i=0; i<gd->ncopies_spinor; ++i) {
+		memcpy((p->ptr+gd->copy_to[i]-gd->master_shift),(p->ptr+gd->copy_from[i]-gd->master_shift),(gd->copy_len[i])*sizeof(*(p->ptr)));
+		/*
+		 for(j=0; j<gd->copy_len[i]; j++) {
+		 x=gd->copy_from[i]+j;
+		 y=gd->copy_to[i]+j;
+		 p->ptr[y] = p->ptr[x];
+		 }
+		 */
+	}
+}
 #endif /* WITH_MPI */
 
 /* This variable contains the information of the current status of communications
@@ -696,26 +712,6 @@ void start_gt_sendrecv(suNg_field *gf) {
   }
 
 #endif /* WITH_MPI */
-}
-
-/*
- COME BACK HERE
-*/
-static void sync_scalar_field(suNg_scalar_field *p) {
-  int i;
-  /* int j, x, y; */
-  geometry_descriptor *gd = p->type;
-
-  for(i=0; i<gd->ncopies_spinor; ++i) {
-    memcpy((p->ptr+gd->copy_to[i]-gd->master_shift),(p->ptr+gd->copy_from[i]-gd->master_shift),(gd->copy_len[i])*sizeof(*(p->ptr)));
-    /*
-       for(j=0; j<gd->copy_len[i]; j++) {
-       x=gd->copy_from[i]+j;
-       y=gd->copy_to[i]+j;
-       p->ptr[y] = p->ptr[x];
-       }
-       */
-  }
 }
 
 void complete_sc_sendrecv(suNg_scalar_field *sf) {

@@ -6,45 +6,26 @@
 #include "global.h"
 #include "update.h"
 #include "logger.h"
-#include "memory.h"
-#include <stdio.h>
 
-static double total_action(scalar_field* la){
-	double tot_action=0.0;
-	_MASTER_FOR(&glattice,i){
-		tot_action += *_FIELD_AT(la,i);
-	}
-
-	return tot_action;	
-}
 void monomial_force(double dt, int nmon, const monomial **mon_list)
 {
-	scalar_field *la = alloc_sfield(1,&glattice); 
-	local_hmc_action(NEW,la,suN_momenta,scalar_momenta);
-//	printf("Force: mon type: action = %f \n",total_action(la));
 	for(int n = 0; n < nmon; n++)
 	{
 		const monomial *m = mon_list[n];
-//		local_hmc_action(NEW,la,suN_momenta,scalar_momenta);
 		m->update_force(dt, m->force_par);
 	}
-
 }
 
 void monomial_field(double dt, int nmon, const monomial **mon_list, integrator_par *ipn)
 {
-	scalar_field *la = alloc_sfield(1,&glattice); 
 	for(int n = 0; n < nmon; n++)
 	{
 		const monomial *m = mon_list[n];
 		if(m->update_field)
 		{
-//			local_hmc_action(NEW,la,suN_momenta,scalar_momenta);
 			m->update_field(dt, m->field_par);
 		}
 	}
-	local_hmc_action(NEW,la,suN_momenta,scalar_momenta);
-//	printf("Field: mon type: action = %f \n",total_action(la));
 	if(ipn)
 	{
 		ipn->integrator(dt, ipn);
@@ -107,7 +88,6 @@ void O2MN_multistep(double tlen, integrator_par *par)
 		monomial_field(dt/2, par->nmon, par->mon_list, par->next);
 		monomial_force((1-2*lambda)*dt, par->nmon, par->mon_list);
 		monomial_field(dt/2, par->nmon, par->mon_list, par->next);
-		
 	}
 	monomial_force(lambda*dt, par->nmon, par->mon_list);
 }

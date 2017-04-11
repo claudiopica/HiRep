@@ -46,7 +46,7 @@ meas freq = 1
 conf dir = .
 //gauge start = run1_8x8x8x8nc2rFUNnf2b5.000000m0.100000n1
 gauge start = random
-last conf = +7
+last conf = +100
 
 // Mesons
 mes:make = false
@@ -71,33 +71,33 @@ eva:mass = -0.55
 monomial {
 	id = 0
 	type = gauge
-	beta = 5.0
+	beta = 2.0
 	level = 0
 }
 
-monomial {
+mon1omial {
 	id = 1
 	type = hmc
-	mass = -0.1
+	mass = -0.5
 	mt_prec = 1e-14
 	force_prec = 1e-14
 	mre_past = 4
 	level = 0
 }
 
-//monomial {
-//	id = 2
-//	type = scalar
-//	mass = 0.5
-//	lambda = 0.5
-//	level = 0
-//}
+monomial {
+	id = 2
+	type = scalar
+	mass = 0.5
+	lambda = 0.5
+	level = 0
+}
 
 // Integrators
 integrator {
 	level = 0
 	type = o2mn
-	steps = 1000
+	steps = 50
 }
 
 //integrator {

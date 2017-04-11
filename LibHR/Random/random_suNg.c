@@ -20,26 +20,10 @@
 
 extern void random_su2(double rho,double s[]);
 
-
-void random_suNg_unit_vector(suNg_vector *v)
-{
-  double norm=0.0,fact;
-  
-  while ((1.0+norm)==1.0)   {
-    gauss((double*)v,(sizeof(suNg_vector)/sizeof(double)));
-    _vector_prod_re_g(norm,*v,*v);
-    norm=sqrt(norm);
-  }
-  
-  fact=1.0/norm;
-  _vector_mul_g(*v,fact,*v);
-}
-
 void gaussian_suNg_vector(suNg_vector *v)
 {
-   gauss((double*)v,(sizeof(suNg_vector)/sizeof(double)));
+   gauss((double*)v, sizeof(suNg_vector)/sizeof(double));
 }
-
 
 /* generates a random SU(N) matrix via SU(2) rotations */
 static void rotate(suNg_vector *pu1, suNg_vector *pu2, double s[4]) /* same as in cabmar */
