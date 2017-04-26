@@ -318,14 +318,15 @@ int init_mc(hmc_flow *rf, char *ifile) {
   switch(start_t) {
   case 0:
     read_gauge_field(add_dirname(rf->conf_dir,rf->g_start));
-    char configname[256] = "scalar_";
-    strcat(configname, rf->g_start);
-    printf("%s\n",configname);
-    read_scalar_field(add_dirname(rf->conf_dir,configname));
+    if(u_scalar) {
+       char configname[256] = "scalar_";
+       strcat(configname, rf->g_start);
+       read_scalar_field(add_dirname(rf->conf_dir,configname));
+    }
     break;
   case 1:
     unit_u(u_gauge);
-    if(u_scalar!=NULL){
+    if(u_scalar) {
 	    zero_s(u_scalar);
     }
 #ifndef ALLOCATE_REPR_GAUGE_FIELD
@@ -336,7 +337,7 @@ int init_mc(hmc_flow *rf, char *ifile) {
     break;
   case 2:
     random_u(u_gauge);
-    if(u_scalar!=NULL){
+    if(u_scalar) {
 	    random_s(u_scalar);
     }
 #ifndef ALLOCATE_REPR_GAUGE_FIELD

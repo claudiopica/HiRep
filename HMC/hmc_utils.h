@@ -37,11 +37,11 @@ typedef struct _input_hmc {
 
 /* Flow control variables variables */
 typedef struct _hmc_flow {
-  char run_name[64]; /* name for this run */
-  char g_start[64]; /* for gauge fields => unit, random, file */
+  char run_name[128]; /* name for this run */
+  char g_start[128]; /* for gauge fields => unit, random, file */
 
-  char last_conf[64]; /* last conf: can be a number or of the format "+n" */
-  char conf_dir[64]; /* directory to store gconfs */
+  char last_conf[128]; /* last conf: can be a number or of the format "+n" */
+  char conf_dir[128]; /* directory to store gconfs */
   
   int save_freq; /* save gauge conf if number%save_freq==0 */
   int meas_freq; /* mk measures if number%meas_freq==0 */
