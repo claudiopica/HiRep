@@ -7,28 +7,28 @@
 #include "update.h"
 #include "logger.h"
 
-void monomial_force(double dt, int nmon, const monomial **mon_list)
+void monomial_force(double dt, integrator_par *par)
 {
-	for(int n = 0; n < nmon; n++)
+	for(int n = 0; n < par->nmon; n++)
 	{
-		const monomial *m = mon_list[n];
+		const monomial *m = par->mon_list[n];
 		m->update_force(dt, m->force_par);
 	}
 }
 
-void monomial_field(double dt, int nmon, const monomial **mon_list, integrator_par *ipn)
+void monomial_field(double dt, integrator_par *par)
 {
-	for(int n = 0; n < nmon; n++)
+	for(int n = 0; n < par->nmon; n++)
 	{
-		const monomial *m = mon_list[n];
+		const monomial *m = par->mon_list[n];
 		if(m->update_field)
 		{
 			m->update_field(dt, m->field_par);
 		}
 	}
-	if(ipn)
+	if(par->next)
 	{
-		ipn->integrator(dt, ipn);
+		par->next->integrator(dt, par->next);
 	}
 }
 
@@ -43,21 +43,21 @@ void leapfrog_multistep(double tlen, integrator_par *par)
 	}
 
 	lprintf("MD_INT", level, "Starting new MD trajectory with Leapfrog\n");
-	lprintf("MD_INT", level, "MD parameters: level=%d tlen=%1.6f nsteps=%d => dt=%1.6f\n",par->level, tlen, par->nsteps, dt);
+	lprintf("MD_INT", level, "MD parameters: level=%d tlen=%1.6f nsteps=%d => dt=%1.6f\n", par->level, tlen, par->nsteps, dt);
 	
 	for(int n = 0; n < par->nsteps; n++)
 	{
 		if(n == 0)
 		{
-			monomial_force(dt/2, par->nmon, par->mon_list);
+			monomial_force(dt/2, par);
 		}
 		else
 		{
-			monomial_force(dt, par->nmon, par->mon_list);
+			monomial_force(dt, par);
 		}
-		monomial_field(dt, par->nmon, par->mon_list, par->next);
+		monomial_field(dt, par);
 	}
-	monomial_force(dt/2, par->nmon, par->mon_list);
+	monomial_force(dt/2, par);
 }
 
 
@@ -79,17 +79,17 @@ void O2MN_multistep(double tlen, integrator_par *par)
 	{
 		if(n == 0)
 		{
-			monomial_force(lambda*dt, par->nmon, par->mon_list);
+			monomial_force(lambda*dt, par);
 		}
 		else
 		{
-			monomial_force(2*lambda*dt, par->nmon, par->mon_list);
+			monomial_force(2*lambda*dt, par);
 		}
-		monomial_field(dt/2, par->nmon, par->mon_list, par->next);
-		monomial_force((1-2*lambda)*dt, par->nmon, par->mon_list);
-		monomial_field(dt/2, par->nmon, par->mon_list, par->next);
+		monomial_field(dt/2, par);
+		monomial_force((1-2*lambda)*dt, par);
+		monomial_field(dt/2, par);
 	}
-	monomial_force(lambda*dt, par->nmon, par->mon_list);
+	monomial_force(lambda*dt, par);
 }
 
 /* 4th order  I.P. Omelyan, I.M. Mryglod, R. Folk, computer Physics Communications 151 (2003) 272-314 */
@@ -114,22 +114,21 @@ void O4MN_multistep(double tlen, integrator_par *par)
 	{
 		if(n == 0)
 		{
-			monomial_force(r1*dt, par->nmon, par->mon_list);
+			monomial_force(r1*dt, par);
 		}
 		else
 		{
-			monomial_force(2*r1*dt, par->nmon, par->mon_list);
+			monomial_force(2*r1*dt, par);
 		}
-		monomial_field(r2*dt, par->nmon, par->mon_list, par->next);
-		monomial_force(r3*dt, par->nmon, par->mon_list);
-		monomial_field(r4*dt, par->nmon, par->mon_list, par->next);
-		monomial_force((0.5-r1-r3)*dt, par->nmon, par->mon_list);
-		monomial_field((1-2*(r2+r4))*dt, par->nmon, par->mon_list, par->next);
-		monomial_force((0.5-r1-r3)*dt, par->nmon, par->mon_list);
-		monomial_field(r4*dt, par->nmon, par->mon_list, par->next);
-		monomial_force(r3*dt, par->nmon, par->mon_list);
-		monomial_field(r2*dt, par->nmon, par->mon_list, par->next);
+		monomial_field(r2*dt, par);
+		monomial_force(r3*dt, par);
+		monomial_field(r4*dt, par);
+		monomial_force((0.5-r1-r3)*dt, par);
+		monomial_field((1-2*(r2+r4))*dt, par);
+		monomial_force((0.5-r1-r3)*dt, par);
+		monomial_field(r4*dt, par);
+		monomial_force(r3*dt, par);
+		monomial_field(r2*dt, par);
 	}
-	monomial_force(r1*dt, par->nmon, par->mon_list);
+	monomial_force(r1*dt, par);
 }
-

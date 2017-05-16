@@ -61,10 +61,9 @@ void update_gauge_field(double dt, void *vpar)
 #endif
 	gettimeofday(&end,0);
 	timeval_subtract(&etime,&end,&start);
-	lprintf("TIMING",0,"gauge_integrator %.6f s\n",1.*etime.tv_sec+1.e-6*etime.tv_usec);
+	lprintf("TIMING",0,"update_gauge_field %.6f s\n",1.*etime.tv_sec+1.e-6*etime.tv_usec);
 #endif
 }
-
 
 void update_scalar_field(double dt, void *vpar)
 {
@@ -82,13 +81,12 @@ void update_scalar_field(double dt, void *vpar)
 	field_scalar_par *par = (field_scalar_par*)vpar;
 	suNg_scalar_field *s_field = *par->field;
 	suNg_scalar_field *force = *par->momenta;
-	suNg_vector mom_star, sum;
+	suNg_vector mom_star;
 
 	_MASTER_FOR(&glattice,ix)
 	{
-		vector_star(&mom_star,_FIELD_AT(force,ix));
-		_vector_lc_g(sum,1.0,*_FIELD_AT(s_field,ix),dt,mom_star);
-		*_FIELD_AT(s_field,ix) = sum;
+		vector_star(&mom_star, _FIELD_AT(force,ix));
+		_vector_mul_add_assign_g(*_FIELD_AT(s_field,ix), dt, mom_star);
 	}
 
 	start_sc_sendrecv(s_field);
@@ -100,7 +98,7 @@ void update_scalar_field(double dt, void *vpar)
 #endif
 	gettimeofday(&end,0);
 	timeval_subtract(&etime,&end,&start);
-	lprintf("TIMING",0,"gauge_integrator %.6f s\n",1.*etime.tv_sec+1.e-6*etime.tv_usec);
+	lprintf("TIMING",0,"update_scalar_field %.6f s\n",1.*etime.tv_sec+1.e-6*etime.tv_usec);
 #endif
 }
 

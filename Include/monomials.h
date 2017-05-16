@@ -25,7 +25,7 @@ typedef enum {
 	Hasenbusch_tm_alt,
 	HMC_ff,
 	Hasenbusch_ff,
-    	Scalar
+	Scalar
 } mon_type;
 
 typedef struct {
@@ -89,8 +89,8 @@ typedef struct {
 } mon_hasenbusch_tm_par;
 
 typedef struct {
-    	double mass;
-    	double lambda;
+	double mass;
+	double lambda;
 	force_scalar_par force_par;
 	field_scalar_par field_par;
 } mon_scalar_par;
