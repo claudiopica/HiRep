@@ -65,7 +65,7 @@ void force_hmc(double dt, void *vpar)
 	init_force_hmc();
 	set_dirac_mass(par->mass);
 	set_twisted_mass(par->mu);
-	force_measure_begin();
+	fermion_force_begin();
 
 	double tmp;
 	mshift_par mpar;
@@ -173,21 +173,21 @@ void force_hmc(double dt, void *vpar)
 
 	if(par->hasenbusch != 1)
 	{
-		force_fermion_core(Xs, Ys, force, 1, dt, 1.);
+		force_fermion_core(Xs, Ys, 1, dt, 1.);
 	}
 	else
 	{
-		force_fermion_core(Xs, Ys, force, 1, dt, par->b);
+		force_fermion_core(Xs, Ys, 1, dt, par->b);
 	}
-
-	force_measure_end(par->id, "force_hmc", dt, n_iters);
 
 #ifdef WITH_CLOVER_EO
 
 	if(par->logdet)
 	{
-		force_clover_logdet(force, par->mass, dt, 2.); // 2 = # of flavors
+		force_clover_logdet(par->mass, 2.); // 2 = # of flavors
 	}
 
 #endif
+
+	fermion_force_end(dt, force);
 }

@@ -311,7 +311,11 @@ int main(int argc,char *argv[]) {
 
     if((i%flow.meas_freq)==0) {
       /* plaquette */
-      lprintf("MAIN",0,"Plaquette: %1.8e\n",avr_plaquette());
+#ifdef WITH_SMEARING
+		 lprintf("MAIN",0,"Plaquette: %1.8e, Smeared: %1.8e\n",avr_plaquette(),avr_smeared_plaquette());
+#else
+		 lprintf("MAIN",0,"Plaquette: %1.8e\n",avr_plaquette());
+#endif
 
       /* Mesons */
       if(strcmp(mes_var.make,"true")==0) {

@@ -210,7 +210,7 @@ static void _compute_clover_term(int id)
 	}
 }
 
-static void _compute_clover_force(int id)
+static void _compute_clover_force(int id, double coeff)
 {
 	complex A[2*NF][2*NF];
 	complex B[2*NF][2*NF];
@@ -232,8 +232,8 @@ static void _compute_clover_force(int id)
 	// Calculate inverse from LDL
 	for(int n = 0; n < 2*NF; n++)
 	{
-		A[n][n].re = 1;
-		B[n][n].re = 1;
+		A[n][n].re = coeff;
+		B[n][n].re = coeff;
 
 		for(int i = n; i < 2*NF; i++)
 		{
@@ -302,31 +302,31 @@ static void _compute_clover_force(int id)
 			}
 
 #ifdef REPR_IS_REAL
-			clover_force(id,0,ij) =  a12_im + a21_im - a34_im - a43_im; // X_01
-			clover_force(id,1,ij) =  a12_re - a21_re + a43_re - a34_re; // X_02
-			clover_force(id,2,ij) =  a22_im - a11_im + a44_im - a33_im; // X_12
-			clover_force(id,3,ij) =  a11_im - a22_im + a44_im - a33_im; // X_03
-			clover_force(id,4,ij) =  a12_re - a21_re + a34_re - a43_re; // X_13
-			clover_force(id,5,ij) = -a12_im - a21_im - a34_im - a43_im; // X_23
+			clover_force(id,0,ij) +=  a12_im + a21_im - a34_im - a43_im; // X_01
+			clover_force(id,1,ij) +=  a12_re - a21_re + a43_re - a34_re; // X_02
+			clover_force(id,2,ij) +=  a22_im - a11_im + a44_im - a33_im; // X_12
+			clover_force(id,3,ij) +=  a11_im - a22_im + a44_im - a33_im; // X_03
+			clover_force(id,4,ij) +=  a12_re - a21_re + a34_re - a43_re; // X_13
+			clover_force(id,5,ij) += -a12_im - a21_im - a34_im - a43_im; // X_23
 #else
-			clover_force_re(id,0,ij) =  a12_im + a21_im - a34_im - a43_im; // X_01
-			clover_force_im(id,0,ij) = -a12_re - a21_re + a34_re + a43_re;
-			clover_force_re(id,1,ij) =  a12_re - a21_re + a43_re - a34_re; // X_02
-			clover_force_im(id,1,ij) =  a12_im - a21_im + a43_im - a34_im;
-			clover_force_re(id,2,ij) =  a22_im - a11_im + a44_im - a33_im; // X_12
-			clover_force_im(id,2,ij) =  a11_re - a22_re + a33_re - a44_re;
-			clover_force_re(id,3,ij) =  a11_im - a22_im + a44_im - a33_im; // X_03
-			clover_force_im(id,3,ij) =  a22_re - a11_re + a33_re - a44_re;
-			clover_force_re(id,4,ij) =  a12_re - a21_re + a34_re - a43_re; // X_13
-			clover_force_im(id,4,ij) =  a12_im - a21_im + a34_im - a43_im;
-			clover_force_re(id,5,ij) = -a12_im - a21_im - a34_im - a43_im; // X_23
-			clover_force_im(id,5,ij) =  a12_re + a21_re + a34_re + a43_re;
+			clover_force_re(id,0,ij) +=  a12_im + a21_im - a34_im - a43_im; // X_01
+			clover_force_im(id,0,ij) += -a12_re - a21_re + a34_re + a43_re;
+			clover_force_re(id,1,ij) +=  a12_re - a21_re + a43_re - a34_re; // X_02
+			clover_force_im(id,1,ij) +=  a12_im - a21_im + a43_im - a34_im;
+			clover_force_re(id,2,ij) +=  a22_im - a11_im + a44_im - a33_im; // X_12
+			clover_force_im(id,2,ij) +=  a11_re - a22_re + a33_re - a44_re;
+			clover_force_re(id,3,ij) +=  a11_im - a22_im + a44_im - a33_im; // X_03
+			clover_force_im(id,3,ij) +=  a22_re - a11_re + a33_re - a44_re;
+			clover_force_re(id,4,ij) +=  a12_re - a21_re + a34_re - a43_re; // X_13
+			clover_force_im(id,4,ij) +=  a12_im - a21_im + a34_im - a43_im;
+			clover_force_re(id,5,ij) += -a12_im - a21_im - a34_im - a43_im; // X_23
+			clover_force_im(id,5,ij) +=  a12_re + a21_re + a34_re + a43_re;
 #endif
 		}
 	}
 }
 
-void compute_force_logdet(double mass)
+void compute_force_logdet(double mass, double coeff)
 {
 	suNf u;
 	_suNf_zero(u);
@@ -337,16 +337,7 @@ void compute_force_logdet(double mass)
 	// Loop odd sites
 	_MASTER_FOR(&glat_odd,id)
 	{
-		_compute_clover_force(id);
-	}
-
-	// Loop even sites
-	_MASTER_FOR(&glat_even,id)
-	{
-		for(int mu = 0; mu < 6; mu++)
-		{
-			*_6FIELD_AT(cl_force,id,mu) = u;
-		}
+		_compute_clover_force(id, coeff);
 	}
 }
 

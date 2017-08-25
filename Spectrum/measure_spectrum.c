@@ -72,6 +72,8 @@ typedef struct _input_mesons {
 	int nEz;
 	double Q;
 	double csw;
+	double rho_s;
+	double rho_t;
 
 	//Currently only implemented for ff
 	int nhits_hopping;  //Multiplies the number of hits in the fast part of the hopping parameter expansion
@@ -110,6 +112,8 @@ typedef struct _input_mesons {
     {"electric charge", "mes:Q = %lf",DOUBLE_T, &(varname).Q},	\
     {"electric field nEz", "mes:nEz = %d",INT_T, &(varname).nEz},	\
     {"csw coefficient", "mes:csw = %lg",DOUBLE_T, &(varname).csw},	\
+    {"smearing space", "mes:rho_s = %lg",DOUBLE_T, &(varname).rho_s},	\
+    {"smearing time", "mes:rho_t = %lg",DOUBLE_T, &(varname).rho_t},	\
     {"hopping expansion degree", "mes:degree_hopping = %d",INT_T, &(varname).degree_hopping}, \
     {"hopping expansion hits", "mes:nhits_hopping = %d",INT_T, &(varname).nhits_hopping}, \
     {NULL, NULL, INT_T, NULL}				\
@@ -350,6 +354,9 @@ int main(int argc,char *argv[]) {
 #endif
 #ifdef WITH_CLOVER
   clover_init(mes_var.csw);
+#endif
+#ifdef WITH_SMEARING
+	init_smearing(mes_var.rho_s, mes_var.rho_t);
 #endif
 
   lprintf("MAIN",0,"Inverter precision = %e\n",mes_var.precision);

@@ -1,6 +1,6 @@
 /***************************************************************************\
 * Copyright (c) 2008, Claudio Pica, Vincent Drach and Ari Hietanen          *
-* Copyright (c) 2016, Martin Hansen                                         *
+* Copyright (c) 2017, Martin Hansen                                         *
 * All rights reserved.                                                      *
 \***************************************************************************/
 
@@ -97,63 +97,7 @@
   _vector_i_add_f(p.c[3],(chi1)->c[1],(chi1)->c[3]);	      \
   _suNf_FMAT((u),p)
 
-#ifdef MEASURE_FORCE
-static suNg_av_field *force_tmp = NULL;
-static int force_init = 0;
-#endif
-
-void force_measure_begin()
-{
-#ifdef MEASURE_FORCE
-	if(force_init == 0)
-	{
-		force_tmp = alloc_avfield(&glattice);
-		force_init = 1;
-	}
-	_MASTER_FOR(&glattice,ix)
-	{
-		for(int mu = 0; mu < 4; mu++)
-		{
-			_algebra_vector_zero_g(*_4FIELD_AT(force_tmp,ix,mu));
-		}
-	}
-#endif
-}
-
-void force_measure_end(int id, const char *name, double dt, int nit)
-{
-#ifdef MEASURE_FORCE
-	double max = 0;
-	double sum = 0;
-
-	// This loop does not work with OpenMP
-	_MASTER_FOR(&glattice,ix)
-	{
-		suNg_algebra_vector *f;
-		double nsq;
-
-		for(int mu = 0; mu < 4; mu++)
-		{
-			// Calculate |F|^2 = sum_{a,b} (F^a * F^b) * (T_R * delta^{ab})
-			f = _4FIELD_AT(force_tmp, ix, mu);
-			_algebra_vector_sqnorm_g(nsq, *f);
-			nsq *= _REPR_NORM2;
-
-			sum += nsq;
-			if(nsq > max) max = nsq;
-		}
-	}
-
-	global_max(&max, 1);
-	global_sum(&sum, 1);
-
-	force_ave[id] += sum;
-	force_max[id] += max;
-	n_inv_iter[id-1] += nit;
-
-	lprintf("FORCE", 20, "%s: id = %d, sum|F|^2 = %1.8e, avg|F|^2 = %1.8e, max|F|^2 = %1.8e, dt = %1.8e\n", name, id, sum, sum/(4*GLB_VOLUME), max, dt);
-#endif
-}
+static suNg_av_field *force_sum = NULL;
 
 /* ----------------------------------- */
 /* CALCULATE FORCE OF THE CLOVER TERM  */
@@ -355,9 +299,9 @@ static suNf fmat_create(suNf_spinor *a_lhs, suNf_spinor *a_rhs, suNf_spinor *b_l
 	return fmat;
 }
 
-static void force_clover_core(suNg_av_field* force, double dt, double residue)
+static void force_clover_core(double dt)
 {
-	double coeff = residue*dt*(_REPR_NORM2/_FUND_NORM2)*(1./8.)*get_csw();
+	double coeff = dt*(_REPR_NORM2/_FUND_NORM2)*(1./8.)*get_csw();
 
 	// Communicate forces
 	start_clover_force_sendrecv(cl_force);
@@ -446,21 +390,21 @@ static void force_clover_core(suNg_av_field* force, double dt, double residue)
 
 					// Project on force
 					_algebra_project(f,s1);
-					_algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,ix,mu),sign*coeff,f);
+					_algebra_vector_mul_add_assign_g(*_4FIELD_AT(force_sum,ix,mu), sign*coeff, f);
 				} // nu
 			} // mu
 		} // sites
 	} // pieces
 }
 
-void force_clover_fermion(spinor_field* Xs, spinor_field* Ys, suNg_av_field* force, double dt, double residue)
+void force_clover_fermion(spinor_field* Xs, spinor_field* Ys, double residue)
 {
 	// Construct force matrices
 	_MASTER_FOR(&glattice,ix)
 	{
 		suNf_spinor tmp_lhs, tmp_rhs;
 		suNf_spinor *rhs, *lhs;
-		suNf *fm;
+		suNf *fm, fm_tmp;
 
 		// (mu,nu) = (0,1)
 		rhs = _FIELD_AT(Xs, ix);
@@ -468,7 +412,9 @@ void force_clover_fermion(spinor_field* Xs, spinor_field* Ys, suNg_av_field* for
 		fm = _6FIELD_AT(cl_force, ix, 0);
 		g5_sigma(&tmp_rhs, rhs, 0, 1);
 		g5_sigma(&tmp_lhs, lhs, 0, 1);
-		*fm = fmat_create(&tmp_lhs, rhs, &tmp_rhs, lhs);
+		fm_tmp = fmat_create(&tmp_lhs, rhs, &tmp_rhs, lhs);
+		_suNf_mul(fm_tmp, residue, fm_tmp);
+		_suNf_add_assign(*fm, fm_tmp);
 
 		// (mu,nu) = (0,2)
 		rhs = _FIELD_AT(Xs, ix);
@@ -476,7 +422,9 @@ void force_clover_fermion(spinor_field* Xs, spinor_field* Ys, suNg_av_field* for
 		fm = _6FIELD_AT(cl_force, ix, 1);
 		g5_sigma(&tmp_rhs, rhs, 0, 2);
 		g5_sigma(&tmp_lhs, lhs, 0, 2);
-		*fm = fmat_create(&tmp_lhs, rhs, &tmp_rhs, lhs);
+		fm_tmp = fmat_create(&tmp_lhs, rhs, &tmp_rhs, lhs);
+		_suNf_mul(fm_tmp, residue, fm_tmp);
+		_suNf_add_assign(*fm, fm_tmp);
 
 		// (mu,nu) = (1,2)
 		rhs = _FIELD_AT(Xs, ix);
@@ -484,7 +432,9 @@ void force_clover_fermion(spinor_field* Xs, spinor_field* Ys, suNg_av_field* for
 		fm = _6FIELD_AT(cl_force, ix, 2);
 		g5_sigma(&tmp_rhs, rhs, 1, 2);
 		g5_sigma(&tmp_lhs, lhs, 1, 2);
-		*fm = fmat_create(&tmp_lhs, rhs, &tmp_rhs, lhs);
+		fm_tmp = fmat_create(&tmp_lhs, rhs, &tmp_rhs, lhs);
+		_suNf_mul(fm_tmp, residue, fm_tmp);
+		_suNf_add_assign(*fm, fm_tmp);
 	
 		// (mu,nu) = (0,3)
 		rhs = _FIELD_AT(Xs, ix);
@@ -492,7 +442,9 @@ void force_clover_fermion(spinor_field* Xs, spinor_field* Ys, suNg_av_field* for
 		fm = _6FIELD_AT(cl_force, ix, 3);
 		g5_sigma(&tmp_rhs, rhs, 0, 3);
 		g5_sigma(&tmp_lhs, lhs, 0, 3);
-		*fm = fmat_create(&tmp_lhs, rhs, &tmp_rhs, lhs);
+		fm_tmp = fmat_create(&tmp_lhs, rhs, &tmp_rhs, lhs);
+		_suNf_mul(fm_tmp, residue, fm_tmp);
+		_suNf_add_assign(*fm, fm_tmp);
 
 		// (mu,nu) = (1,3)
 		rhs = _FIELD_AT(Xs, ix);
@@ -500,7 +452,9 @@ void force_clover_fermion(spinor_field* Xs, spinor_field* Ys, suNg_av_field* for
 		fm = _6FIELD_AT(cl_force, ix, 4);
 		g5_sigma(&tmp_rhs, rhs, 1, 3);
 		g5_sigma(&tmp_lhs, lhs, 1, 3);
-		*fm = fmat_create(&tmp_lhs, rhs, &tmp_rhs, lhs);
+		fm_tmp = fmat_create(&tmp_lhs, rhs, &tmp_rhs, lhs);
+		_suNf_mul(fm_tmp, residue, fm_tmp);
+		_suNf_add_assign(*fm, fm_tmp);
 
 		// (mu,nu) = (2,3)
 		rhs = _FIELD_AT(Xs, ix);
@@ -508,26 +462,22 @@ void force_clover_fermion(spinor_field* Xs, spinor_field* Ys, suNg_av_field* for
 		fm = _6FIELD_AT(cl_force, ix, 5);
 		g5_sigma(&tmp_rhs, rhs, 2, 3);
 		g5_sigma(&tmp_lhs, lhs, 2, 3);
-		*fm = fmat_create(&tmp_lhs, rhs, &tmp_rhs, lhs);
+		fm_tmp = fmat_create(&tmp_lhs, rhs, &tmp_rhs, lhs);
+		_suNf_mul(fm_tmp, residue, fm_tmp);
+		_suNf_add_assign(*fm, fm_tmp);
 	}
-
-	// Calculate clover force
-	force_clover_core(force, dt, residue);
 }
 
-void force_clover_logdet(suNg_av_field* force, double mass, double dt, double residue)
+void force_clover_logdet(double mass, double residue)
 {
 	// Compute force matrices
-	compute_force_logdet(mass);
-
-	// Calculate clover force
-	force_clover_core(force, dt, residue);
+	compute_force_logdet(mass, residue);
 }
 
 /* ------------------------------------ */
 /* CALCULATE FORCE OF THE HOPPING TERM  */
 /* ------------------------------------ */
-void force_fermion_core(spinor_field *Xs, spinor_field *Ys, suNg_av_field *force, int auto_fill_odd, double dt, double residue)
+void force_fermion_core(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, double dt, double residue)
 {
 	double coeff;
 	spinor_field Xtmp, Ytmp;
@@ -573,7 +523,7 @@ void force_fermion_core(spinor_field *Xs, spinor_field *Ys, suNg_av_field *force
 	start_sf_sendrecv(Ys);
 
 #ifdef WITH_CLOVER
-	force_clover_fermion(Xs, Ys, force, dt, residue);
+	force_clover_fermion(Xs, Ys, residue);
 #endif
 
 	// Loop over lattice
@@ -610,11 +560,7 @@ void force_fermion_core(spinor_field *Xs, spinor_field *Ys, suNg_av_field *force
 			_F_DIR0(s1,chi1,chi2);
 
 			_algebra_project(f,s1);
-			_algebra_vector_mul_g(f,coeff,f);
-			_algebra_vector_add_assign_g(*_4FIELD_AT(force,ix,0),f);
-			#ifdef MEASURE_FORCE
-			_algebra_vector_add_assign_g(*_4FIELD_AT(force_tmp,ix,0),f);
-			#endif
+			_algebra_vector_mul_add_assign_g(*_4FIELD_AT(force_sum,ix,0),coeff,f);
 
 			// Direction 1
 			iy = iup(ix,1);
@@ -627,11 +573,7 @@ void force_fermion_core(spinor_field *Xs, spinor_field *Ys, suNg_av_field *force
 			_F_DIR1(s1,chi1,chi2);
 
 			_algebra_project(f,s1);
-			_algebra_vector_mul_g(f,coeff,f);
-			_algebra_vector_add_assign_g(*_4FIELD_AT(force,ix,1),f);
-			#ifdef MEASURE_FORCE
-			_algebra_vector_add_assign_g(*_4FIELD_AT(force_tmp,ix,1),f);
-			#endif
+			_algebra_vector_mul_add_assign_g(*_4FIELD_AT(force_sum,ix,1),coeff,f);
 
 			// Direction 2
 			iy = iup(ix,2);
@@ -644,11 +586,7 @@ void force_fermion_core(spinor_field *Xs, spinor_field *Ys, suNg_av_field *force
 			_F_DIR2(s1,chi1,chi2);
 
 			_algebra_project(f,s1);
-			_algebra_vector_mul_g(f,coeff,f);
-			_algebra_vector_add_assign_g(*_4FIELD_AT(force,ix,2),f);
-			#ifdef MEASURE_FORCE
-			_algebra_vector_add_assign_g(*_4FIELD_AT(force_tmp,ix,2),f);
-			#endif
+			_algebra_vector_mul_add_assign_g(*_4FIELD_AT(force_sum,ix,2),coeff,f);
 
 			// Direction 3
 			iy = iup(ix,3);
@@ -661,16 +599,9 @@ void force_fermion_core(spinor_field *Xs, spinor_field *Ys, suNg_av_field *force
 			_F_DIR3(s1,chi1,chi2);
 
 			_algebra_project(f,s1);
-			_algebra_vector_mul_g(f,coeff,f);
-			_algebra_vector_add_assign_g(*_4FIELD_AT(force,ix,3),f);
-			#ifdef MEASURE_FORCE
-			_algebra_vector_add_assign_g(*_4FIELD_AT(force_tmp,ix,3),f);
-			#endif
+			_algebra_vector_mul_add_assign_g(*_4FIELD_AT(force_sum,ix,3),coeff,f);
 		} // sites
 	} // pieces
-
-	// Boundary conditions
-	apply_BCs_on_momentum_field(force);
 
 	// Reset spinor geometry
 	Xs->type = Xtmp.type;
@@ -681,3 +612,64 @@ void force_fermion_core(spinor_field *Xs, spinor_field *Ys, suNg_av_field *force
 #undef _F_DIR1
 #undef _F_DIR2
 #undef _F_DIR3
+
+void fermion_force_begin()
+{
+	if(force_sum == NULL)
+	{
+		force_sum = alloc_avfield(&glattice);
+	}
+
+	// Clear force field
+	_MASTER_FOR(&glattice,ix)
+	{
+		for(int mu = 0; mu < 4; mu++)
+		{
+			_algebra_vector_zero_g(*_4FIELD_AT(force_sum,ix,mu));
+		}
+	}
+
+#ifdef WITH_CLOVER
+
+	// Clear clover force field
+	_MASTER_FOR(&glattice,ix)
+	{
+		for(int mu = 0; mu < 6; mu++)
+		{
+			_suNf_zero(*_6FIELD_AT(cl_force,ix,mu));
+		}
+	}
+
+#endif
+}
+
+void fermion_force_end(double dt, suNg_av_field *force)
+{
+#ifdef WITH_CLOVER
+
+	// Evaluate derivative of clover term
+	force_clover_core(dt);
+
+#endif
+
+#ifdef WITH_SMEARING
+
+	// Evaluate smeared force and add to global force field
+	smeared_gauge_force(force_sum, force);
+
+#else
+
+	// Add force to global force field
+	_MASTER_FOR(&glattice,ix)
+	{
+		for(int mu = 0; mu < 4; mu++)
+		{
+			_algebra_vector_add_assign_g(*_4FIELD_AT(force,ix,mu), *_4FIELD_AT(force_sum,ix,mu));
+		}
+	}
+
+#endif
+
+	// Boundary conditions
+	apply_BCs_on_momentum_field(force);
+}

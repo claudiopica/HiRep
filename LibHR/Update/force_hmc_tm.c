@@ -62,6 +62,7 @@ void force_hmc_tm(double dt, void *vpar)
 #endif
 	
 	init_force_hmc_tm();
+	fermion_force_begin();
 	spinor_field Xo, Yo;
 	
 	Yo = *Ys;
@@ -78,7 +79,6 @@ void force_hmc_tm(double dt, void *vpar)
 	spinor_field *pf = par->pf;
 	set_dirac_mass(par->mass);
 	set_twisted_mass(par->mu);
-	force_measure_begin();
 
 	double tmp;
 	mshift_par mpar;
@@ -105,7 +105,7 @@ void force_hmc_tm(double dt, void *vpar)
 		/* Xo = (M_ee^+)^-1 M_eo Xe */
 		Dphi_(xi, Xs);
 		Mee_inv(&Xo, par->mass, par->mu, xi);
-		force_fermion_core(Xs, Ys, force, 0, dt, 1.);
+		force_fermion_core(Xs, Ys, 0, dt, 1.);
 	}
 	else // (Q^2+mu^2)/(Q^2)
 	{
@@ -129,7 +129,7 @@ void force_hmc_tm(double dt, void *vpar)
 		/* Xo = (M_ee^-)^-1 M_eo Xe */
 		Dphi_(xi,Xs);
 		Mee_inv(&Xo, par->mass, -par->mu, xi);
-		force_fermion_core(Xs, Ys, force, 0, dt, 1.);
+		force_fermion_core(Xs, Ys, 0, dt, 1.);
 
 		//Second contribution to force
 		// Ye = pf
@@ -142,9 +142,9 @@ void force_hmc_tm(double dt, void *vpar)
 		/* Xo = (M_ee^-)^-1 M_eo Xe */
 		Dphi_(xi, Xs);
 		Mee_inv(&Xo, par->mass, -par->mu-par->b, xi);
-		force_fermion_core(Xs, Ys, force, 0, -dt, 1.);
+		force_fermion_core(Xs, Ys, 0, -dt, 1.);
 	}
 
-	force_measure_end(par->id, "force_hmc_tm", dt, n_iters);
+	fermion_force_end(dt, force);
 }
 

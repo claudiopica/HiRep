@@ -83,21 +83,19 @@ typedef struct {
 	suNg_scalar_field **momenta;
 } field_scalar_par;
 
-void force_measure_begin();
-void force_measure_end(int, const char*, double, int);
-
 void update_gauge_field(double, void*);
 void update_auxfields(double, void*);
 
 void update_scalar_field(double, void*);
 void force_scalar(double, void*);
 
-
 void lw_force(double, void*);
 void lw_local_action(scalar_field*, double, double, double);
 
-void force_fermion_core(spinor_field*, spinor_field*, suNg_av_field*, int, double, double);
-void force_clover_logdet(suNg_av_field*, double, double, double);
+void fermion_force_begin();
+void fermion_force_end(double dt, suNg_av_field*);
+void force_fermion_core(spinor_field*, spinor_field*, int, double, double);
+void force_clover_logdet(double, double);
 
 void force_hmc(double, void*);
 void force_hmc_tm(double, void*);
@@ -138,6 +136,8 @@ typedef struct _ghmc_par {
   integrator_par *integrator;
   double tlen;
   double csw;
+  double rho_s;
+  double rho_t;
 
   /* Fermion Theta angles */
   double theta[4];
@@ -155,7 +155,11 @@ void init_ghmc(ghmc_par *par);
 void free_ghmc();
 int update_ghmc();
 
-
+/* stout smearing */
+void init_smearing(double, double);
+double avr_smeared_plaquette();
+void smear_gauge_field();
+void smeared_gauge_force(suNg_av_field*,suNg_av_field*);
 
 /* local action */
 typedef enum {

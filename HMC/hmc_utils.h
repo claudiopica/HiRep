@@ -14,7 +14,7 @@ typedef struct _input_hmc {
   /* hmc parameters */
   ghmc_par hmc_p;
   /* for the reading function */
-  input_record_t read[11];
+  input_record_t read[13];
   
 } input_hmc;
 
@@ -30,6 +30,8 @@ typedef struct _input_hmc {
     {"SF_sign", "SF_sign = %d", INT_T, &(varname).hmc_p.SF_sign},\
     {"SF_ct", "SF_ct = %lf", DOUBLE_T, &(varname).hmc_p.SF_ct}, \
     {"tlen", "tlen = %lf", DOUBLE_T, &(varname).hmc_p.tlen}, \
+    {"smearing space", "rho_s = %lf", DOUBLE_T, &(varname).hmc_p.rho_s}, \
+    {"smearing time", "rho_t = %lf", DOUBLE_T, &(varname).hmc_p.rho_t}, \
     {"csw", "csw = %lf", DOUBLE_T, &(varname).hmc_p.csw}, \
     {NULL, NULL, 0, NULL}\
   }\

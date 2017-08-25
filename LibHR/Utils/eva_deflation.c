@@ -81,7 +81,7 @@ static void find_low_eig_H2(const eva_prec *e_par, geometry_descriptor *type, in
 
 static void check_ortho(spinor_field *in, int n) {
   int i,j;
-  complex p;
+  complex p = {0,0};
   for (i=0;i<n;++i) {
     for (j=i;j<n;++j) {
       p=spinor_field_prod_f(&in[i],&in[j]);

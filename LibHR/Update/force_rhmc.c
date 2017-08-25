@@ -39,7 +39,7 @@ void force_rhmc(double dt, void *vpar)
 	suNg_av_field *force = *par->momenta;
 	spinor_field *pf = par->pf;
 	rational_app *ratio = par->ratio;
-	force_measure_begin();
+	fermion_force_begin();
 
 	mshift_par mpar;
 	mpar.n = ratio->order;
@@ -90,7 +90,7 @@ void force_rhmc(double dt, void *vpar)
 		for(int n = 0; n < ratio->order; n++)
 		{
 			H(Hchi, &chi[n]);
-			force_fermion_core(Hchi, &chi[n], force, 1, dt, ratio->a[n+1]);
+			force_fermion_core(Hchi, &chi[n], 1, dt, ratio->a[n+1]);
 		}
 	}
 
@@ -105,8 +105,8 @@ void force_rhmc(double dt, void *vpar)
 
 #ifdef WITH_CLOVER_EO
 	double nf = (-2.0*ratio->n)/ratio->d;
-	force_clover_logdet(force, par->mass, dt, nf);
+	force_clover_logdet(par->mass, nf);
 #endif
 
-	force_measure_end(par->id, "force_rhmc", dt, n_iters);
+	fermion_force_end(dt, force);
 }

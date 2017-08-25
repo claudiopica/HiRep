@@ -267,13 +267,19 @@ int init_mc(hmc_flow *rf, char *ifile) {
 
   /* alloc global gauge fields */
   u_gauge=alloc_gfield(&glattice);
+
 #ifdef ALLOCATE_REPR_GAUGE_FIELD
   u_gauge_f=alloc_gfield_f(&glattice);
 #endif
 
   u_gauge_f_flt=alloc_gfield_f_flt(&glattice);
+
 #ifdef WITH_CLOVER
 	clover_init(hmc_var.hmc_p.csw);
+#endif
+
+#ifdef WITH_SMEARING
+	init_smearing(hmc_var.hmc_p.rho_s, hmc_var.hmc_p.rho_t);
 #endif
 
   /* Read the action and initialize fields */

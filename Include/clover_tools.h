@@ -36,7 +36,7 @@ double get_csw();
 void compute_ldl_decomp(double);
 void compute_clover_term();
 void clover_la_logdet(double, double, scalar_field*);
-void compute_force_logdet(double);
+void compute_force_logdet(double, double);
 void clover_init(double);
 
 #endif

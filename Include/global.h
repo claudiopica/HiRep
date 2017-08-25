@@ -135,6 +135,7 @@ GLB_VAR(suNg_field,*u_gauge,=NULL);
 GLB_VAR(suNg_scalar_field,*u_scalar,=NULL);
 GLB_VAR(suNg_field_flt,*u_gauge_flt,=NULL);
 GLB_VAR(suNf_field,*u_gauge_f,=NULL);
+GLB_VAR(suNg_field,*u_gauge_s,=NULL);
 GLB_VAR(suNf_field_flt,*u_gauge_f_flt,=NULL);
 GLB_VAR(suNfc_field,*cl_term,=NULL);
 GLB_VAR(suNf_field,*cl_force,=NULL);

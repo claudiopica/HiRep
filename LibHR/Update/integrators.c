@@ -64,7 +64,7 @@ void leapfrog_multistep(double tlen, integrator_par *par)
 void O2MN_multistep(double tlen, integrator_par *par)
 {
 	const double lambda = 0.1931833275037836;
-	const double dt = tlen / par->nsteps;
+	double dt = tlen / par->nsteps;
 	int level = 10+par->level*10;
 
 	if(par->nsteps == 0)

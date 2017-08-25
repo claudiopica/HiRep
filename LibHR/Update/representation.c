@@ -7,9 +7,8 @@
 #include "representation.h"
 #include "utils.h"
 #include "clover_tools.h"
+#include "update.h"
 #include <math.h>
-
-
 
 #define XG(m,a,b) ((m)+(a)*NG+(b))
 #define XF(m,a,b) ((m)+(a)*NF+(b))
@@ -336,19 +335,23 @@ void _group_represent2_flt(suNf_flt* v, suNg_flt *u) {
 
 #include "communications.h"
 
-void represent_gauge_field() {
-#ifdef ALLOCATE_REPR_GAUGE_FIELD
-  int ix, ip;
-  int mu;
-  suNf *Ru;
-  suNg *u;
+void represent_gauge_field()
+{
+#ifdef WITH_SMEARING
+	smear_gauge_field();
+#endif
 
+#ifdef ALLOCATE_REPR_GAUGE_FIELD
   /* loop on local lattice first */
   _MASTER_FOR(&glattice,ix) {
 //  for(ip=0;ip<glattice.local_master_pieces;ip++)
 //    for(ix=glattice.master_start[ip];ix<=glattice.master_end[ip];ix++)
       for (int mu=0;mu<4;mu++) {
+#ifdef WITH_SMEARING
+        suNg *u=_4FIELD_AT(u_gauge_s,ix,mu);
+#else
         suNg *u=pu_gauge(ix,mu);
+#endif
         suNf *Ru=pu_gauge_f(ix,mu);
         #ifdef UNROLL_GROUP_REPRESENT
           _group_represent(*Ru,*u);
@@ -367,7 +370,11 @@ _OMP_PRAGMA ( _omp_parallel )
 _OMP_PRAGMA ( _omp_for )
     for(int ix=glattice.master_start[ip];ix<=glattice.master_end[ip];ix++)
       for (int mu=0;mu<4;mu++) {
+#ifdef WITH_SMEARING
+        suNg *u=_4FIELD_AT(u_gauge_s,ix,mu);
+#else
         suNg *u=pu_gauge(ix,mu);
+#endif
         suNf *Ru=pu_gauge_f(ix,mu);
         #ifdef UNROLL_GROUP_REPRESENT
           _group_represent(*Ru,*u);
@@ -385,8 +392,12 @@ _OMP_PRAGMA ( _omp_for )
 
   if(first_time) {
     first_time=0;
+#ifdef WITH_SMEARING
+	  u_gauge_f=(suNf_field *)((void*)u_gauge_s);
+#else
     u_gauge_f=(suNf_field *)((void*)u_gauge);
-    //    apply_BCs_on_represented_gauge_field(); //Already applied when configuration read or initialized 
+#endif
+    //    apply_BCs_on_represented_gauge_field(); //Already applied when configuration read or initialized
   }
 #endif
   assign_ud2u_f();
