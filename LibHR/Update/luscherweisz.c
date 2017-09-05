@@ -1,4 +1,9 @@
-/***********************************************************************************************************************
+/***************************************************************************\
+ * Copyright (c) 2017, Agostino Patella, Martin Hansen                     *
+ * All rights reserved.                                                    *
+\***************************************************************************/
+
+/*
 
 Main functions:
 
@@ -40,7 +45,7 @@ Test functions:
 ===  static void transform_force(suNg_field* gtransf, suNg_av_field* force);
   Utilities for gauge transformations.
 
-***********************************************************************************************************************/
+*/
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -71,7 +76,6 @@ static void calculate_stfld(int comm)
 {
 	suNg *staple, wu1;
 	static int nb[8];
-	static int nc = 0;
 	static int source[8][32];
 	static int *ib[8] = {NULL};
 
@@ -94,7 +98,6 @@ static void calculate_stfld(int comm)
 			}
 		}
 
-		nc = 7;
 		for(int nu = 0; nu < 4; nu++)
 		{
 			source[2*nu+0][0] = proc_dn(CID,nu);
@@ -119,7 +122,7 @@ static void calculate_stfld(int comm)
 			nb[k] = 0;
 			for(int n = 0; n < glattice.nbuffers_gauge; n++)
 			{
-				for(int i = 0; i < nc; i++)
+				for(int i = 0; i < 7; i++)
 				{
 					if(glattice.rbuf_from_proc[n] == source[k][i])
 					{
@@ -131,7 +134,7 @@ static void calculate_stfld(int comm)
 			}
 		}
 
-		lprintf("INIT", 0, "nc=%d nbuffers_gauge=%d\n", nc, glattice.nbuffers_gauge);
+		lprintf("INIT", 0, "nbuffers_gauge = %d\n", glattice.nbuffers_gauge);
 		for(int k = 0; k < 8; k++)
 		{
 			lprintf("INIT", 0, "nb[%d] = %d\n", k, nb[k]);
@@ -139,8 +142,9 @@ static void calculate_stfld(int comm)
 	}
 
 	memset(stfld[0], 0, glattice.gsize_gauge*sizeof(suNg)*8*3);
-	start_gf_sendrecv(u_gauge);
-	complete_gf_sendrecv(u_gauge);
+	//start_gf_sendrecv(u_gauge);
+	//complete_gf_sendrecv(u_gauge);
+	//apply_BCs_on_fundamental_gauge_field();
 
 	_MASTER_FOR(&glattice,ix)
 	{
@@ -233,12 +237,12 @@ static double lw_action_density(int ix, double beta, double c0, double c1)
 	{
 		for(int i = 0; i < 3; i++)
 		{
-			_suNg_times_suNg_dagger(w1, stfld[2*nu+1][3*ix+i], stfld[2*nu][3*ix+i]);
+			int ixpnu = iup(ix,nu);
+			_suNg_times_suNg_dagger(w1, stfld[2*nu+1][3*ixpnu+i], stfld[2*nu+0][3*ixpnu+i]);
 			_suNg_trace_re(p,w1);
 #ifdef PLAQ_WEIGHTS
 			int mu = (nu+i+1)&0x3;
-			int ixmnu = idn(ix,nu);
-			p *= plaq_weight[16*ixmnu+4*nu+mu];
+			p *= rect_weight[16*ix+4*mu+nu];
 #endif
 			rects -= p;
 		}
@@ -263,7 +267,7 @@ double lw_action(double beta, double c0, double c1)
 
 void lw_local_action(scalar_field *loc_action, double beta, double c0, double c1)
 {
-	calculate_stfld(NOCOMM);
+	calculate_stfld(COMM);
 	_MASTER_FOR(&glattice,ix)
 	{
 		*_FIELD_AT(loc_action,ix) += lw_action_density(ix,beta,c0,c1);
@@ -334,7 +338,6 @@ void lw_force(double dt, void *vpar)
 		{
 			int ixpnu = iup(ix,nu);
 			int ixmnu = idn(ix,nu);
-			int ixmnumnu = idn(ixmnu,nu);
 
 			for(int i = 0; i < 3; i++)
 			{
@@ -348,7 +351,8 @@ void lw_force(double dt, void *vpar)
 				_suNg_dagger_times_suNg(wu1, *pu_gauge(ixmnu,nu), stfld[2*nu+0][3*ixmnu+i]);
 				_suNg_times_suNg(wu2, wu1, *pu_gauge(ixpmunnu,nu));
 #ifdef PLAQ_WEIGHTS
-				_suNg_mul(wu2, plaq_weight[16*ixmnumnu+4*nu+mu], wu2);
+				int ixmnumnu = idn(ixmnu,nu);
+				_suNg_mul(wu2, rect_weight[16*ixmnumnu+4*mu+nu], wu2);
 #endif
 				_suNg_add_assign(ws[mu], wu2);
 
@@ -358,7 +362,7 @@ void lw_force(double dt, void *vpar)
 				_suNg_times_suNg(wu1, *pu_gauge(ix,nu), stfld[2*nu+1][3*ixpnu+i]);
 				_suNg_times_suNg_dagger(wu2, wu1, *pu_gauge(ixpmu,nu));
 #ifdef PLAQ_WEIGHTS
-				_suNg_mul(wu2, plaq_weight[16*ix+4*nu+mu], wu2);
+				_suNg_mul(wu2, rect_weight[16*ix+4*mu+nu], wu2);
 #endif
 				_suNg_add_assign(ws[mu], wu2);
 			}
@@ -385,7 +389,7 @@ void lw_force(double dt, void *vpar)
 				_suNg_dagger_times_suNg(wu1, *pu_gauge(ixmnu,nu), *pu_gauge(ixmnu,mu));
 				_suNg_times_suNg(wu2, wu1, stfld[2*mu+1][3*ixmnupmu+i]);
 #ifdef PLAQ_WEIGHTS
-				_suNg_mul(wu2, plaq_weight[16*ixmnu+4*mu+nu], wu2);
+				_suNg_mul(wu2, rect_weight[16*ixmnu+4*nu+mu], wu2);
 #endif
 				_suNg_add_assign(ws[mu], wu2);
 
@@ -397,7 +401,7 @@ void lw_force(double dt, void *vpar)
 				_suNg_times_suNg(wu1, *pu_gauge(ix,nu), *pu_gauge(ixpnu,mu));
 				_suNg_times_suNg_dagger(wu2, wu1, stfld[2*mu+1][3*ixpmu+i]);
 #ifdef PLAQ_WEIGHTS
-				_suNg_mul(wu2, plaq_weight[16*ix+4*mu+nu], wu2);
+				_suNg_mul(wu2, rect_weight[16*ix+4*nu+mu], wu2);
 #endif
 				_suNg_add_assign(ws[mu], wu2);
 
@@ -409,7 +413,7 @@ void lw_force(double dt, void *vpar)
 				_suNg_dagger_times_suNg(wu1, stfld[2*mu+0][3*ixmnu+i], *pu_gauge(ixmnu,mu));
 				_suNg_times_suNg(wu2, wu1, *pu_gauge(ixmnupmu,nu));
 #ifdef PLAQ_WEIGHTS
-				_suNg_mul(wu2,plaq_weight[16*ixmnummu+4*mu+nu],wu2);
+				_suNg_mul(wu2,rect_weight[16*ixmnummu+4*nu+mu],wu2);
 #endif
 				_suNg_add_assign(ws[mu],wu2);
 
@@ -421,7 +425,7 @@ void lw_force(double dt, void *vpar)
 				_suNg_times_suNg(wu1, stfld[2*mu+0][3*ix+i], *pu_gauge(ixpnu,mu));
 				_suNg_times_suNg_dagger(wu2, wu1, *pu_gauge(ixpmu,nu));
 #ifdef PLAQ_WEIGHTS
-				_suNg_mul(wu2, plaq_weight[16*ixmmu+4*mu+nu], wu2);
+				_suNg_mul(wu2, rect_weight[16*ixmmu+4*nu+mu], wu2);
 #endif
 				_suNg_add_assign(ws[mu], wu2);
 			}

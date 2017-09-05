@@ -112,7 +112,13 @@ double avr_plaquette()
 
   global_sum(&pa, 1);
 
-  return pa/(6.*NG)/GLB_VOLUME;
+#ifdef BC_T_OPEN
+	pa /= 6.0*NG*GLB_VOLUME*(GLB_T-2)/GLB_T;
+#else
+	pa /= 6.0*NG*GLB_VOLUME;
+#endif
+
+  return pa;
 
 }
 
@@ -194,8 +200,13 @@ void full_plaquette()
 	global_sum((double*)pa,12);
 	for(int k = 0; k < 6; k++)
 	{
-		pa[k].re /= GLB_VOLUME*NG;
-		pa[k].im /= GLB_VOLUME*NG;
+#ifdef BC_T_OPEN
+		pa[k].re /= NG*GLB_VOLUME*(GLB_T-2)/GLB_T;
+		pa[k].im /= NG*GLB_VOLUME*(GLB_T-2)/GLB_T;
+#else
+		pa[k].re /= NG*GLB_VOLUME;
+		pa[k].im /= NG*GLB_VOLUME;
+#endif
 	}
 
 	lprintf("PLAQ",0,"Plaq(%d,%d) = ( %f , %f )\n",1,0,pa[0].re,pa[0].im);

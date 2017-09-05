@@ -328,9 +328,6 @@ static void _compute_clover_force(int id, double coeff)
 
 void compute_force_logdet(double mass, double coeff)
 {
-	suNf u;
-	_suNf_zero(u);
-
 	// Update LDL decomposition
 	compute_ldl_decomp(4.0+mass);
 

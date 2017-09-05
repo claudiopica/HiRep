@@ -170,6 +170,7 @@ GLB_VAR(input_logger,logger_var,=init_input_logger(logger_var));
 
 #ifdef PLAQ_WEIGHTS
 GLB_VAR(double,*plaq_weight, =NULL);
+GLB_VAR(double,*rect_weight, =NULL);
 #endif
 
 /* Theta Boundary conditions */

@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Agostino Patella, Claudio Pica                        *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Agostino Patella, Claudio Pica                        *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 #include "global.h"
@@ -30,8 +30,13 @@ void init_BCs(BCs_pars_t *pars) {
   init=1;
 
 #ifdef PLAQ_WEIGHTS
-  plaq_weight=malloc(sizeof(double)*glattice.gsize_gauge*16);
-  for(int i=0;i<16*glattice.gsize_gauge;i++) plaq_weight[i]=1.;
+	plaq_weight=malloc(sizeof(double)*glattice.gsize_gauge*16);
+	rect_weight=malloc(sizeof(double)*glattice.gsize_gauge*16);
+	for(int i = 0; i < 16*glattice.gsize_gauge; i++)
+	{
+		rect_weight[i] = 1.0;
+		plaq_weight[i] = 1.0;
+	}
 #endif
 
   BCs_pars.fermion_twisting_theta[0] = 0.;
@@ -103,7 +108,7 @@ void init_BCs(BCs_pars_t *pars) {
 #endif
     "\n");
 
-  
+
 #if defined(ROTATED_SF)
   lprintf("BCS",0,"Chirally rotated Schroedinger Functional ds=%e BCs=%d\n",BCs_pars.chiSF_boundary_improvement_ds,BCs_pars.SF_BCs);
 #elif defined(BASIC_SF)
@@ -152,7 +157,7 @@ void init_BCs(BCs_pars_t *pars) {
 #endif
 
 #ifdef BASIC_SF
-  lprintf("BCS",0,"Dirichlet BC gauge boundary term ct=%e\n",BCs_pars.gauge_boundary_improvement_ct);  
+  lprintf("BCS",0,"Dirichlet BC gauge boundary term ct=%e\n",BCs_pars.gauge_boundary_improvement_ct);
   if(BCs_pars.SF_BCs == 0) {
     _suNg_unit(BCs_pars.gauge_boundary_dn);
     _suNg_unit(BCs_pars.gauge_boundary_up);
@@ -162,13 +167,13 @@ void init_BCs(BCs_pars_t *pars) {
 #endif
 
 #ifdef ROTATED_SF
-  lprintf("BCS",0,"Dirichlet BC gauge boundary term ct=%e\n",BCs_pars.gauge_boundary_improvement_ct);  
+  lprintf("BCS",0,"Dirichlet BC gauge boundary term ct=%e\n",BCs_pars.gauge_boundary_improvement_ct);
   if(BCs_pars.SF_BCs == 0) {
     _suNg_unit(BCs_pars.gauge_boundary_dn);
     _suNg_unit(BCs_pars.gauge_boundary_up);
   } else
     init_gf_SF_BCs(&(BCs_pars.gauge_boundary_dn),&(BCs_pars.gauge_boundary_up));
-  init_plaq_Dirichlet_BCs(BCs_pars.gauge_boundary_improvement_ct); 
+  init_plaq_Dirichlet_BCs(BCs_pars.gauge_boundary_improvement_ct);
 #endif
 
 
@@ -182,9 +187,10 @@ void free_BCs() {
   error(init==0,1,"free_BCs [boundary_conditions.c]",
     "BCs not initialized yet");
   init=0;
-  
+
 #ifdef PLAQ_WEIGHTS
   if(plaq_weight!=NULL) free(plaq_weight);
+  if(rect_weight!=NULL) free(rect_weight);
 #endif
 }
 
@@ -353,7 +359,7 @@ static void sp_spatial_theta_BCs(double theta) {
   phase[1].im=sin(theta/GLB_Y);
   phase[2].re=cos(theta/GLB_Z);
   phase[2].im=sin(theta/GLB_Z);
-  
+
   int index,it,ix,iy,iz,mu;
   suNf Rtmp;
   suNf *Ru;
@@ -436,31 +442,31 @@ static void init_gf_SF_BCs(suNg* dn, suNg* up) {
   static double SF_phi0_dn[NG] = {0., 0.};
   static double SF_phi1_dn[NG] = {-1., 1.};
   static double SF_phi1_up[NG] = {1., -1.};
-  
+
 #elif NG==3
-  
+
   static double SF_eta = 0.;
   static double SF_phi0_dn[NG] = {-PI/3., 0., PI/3.};
   static double SF_phi1_dn[NG] = {1., -.5, -.5};
   static double SF_phi0_up[NG] = {-PI, PI/3., 2.*PI/3.};
   static double SF_phi1_up[NG] = {-1., .5, .5};
-  
+
 #elif NG==4
-  
+
   static double SF_eta = 0.;
   static double SF_phi0_dn[NG] = {-ST*PI/4., ST*PI/4.-PI/2., PI/2.-ST*PI/4., ST*PI/4.};
   static double SF_phi1_dn[NG] = {-.5, -.5, .5, .5};
   static double SF_phi0_up[NG] = {-ST*PI/4.-PI/2., -PI+ST*PI/4., PI-ST*PI/4., PI/2.+ST*PI/4.};
   static double SF_phi1_up[NG] = {.5, .5, -.5, -.5};
-  
+
 #else
-  
+
 #error SF boundary conditions not defined at this NG
-  
+
 #endif
 
   int k;
-  
+
   _suNg_zero(*dn);
   for(k=0; k<NG; k++) {
     dn->c[(1+NG)*k].re = cos((SF_phi0_dn[k]+SF_phi1_dn[k]*SF_eta)/(GLB_T-2));
@@ -564,7 +570,7 @@ static void gf_open_BCs() {
   int index;
   int ix, iy, iz;
   suNg *u;
-  
+
   if(COORD[0] == 0) {
     if(T_BORDER > 0) {
       for(ix=0;ix<X_EXT;++ix) for(iy=0;iy<Y_EXT;++iy) for(iz=0;iz<Z_EXT;++iz){
@@ -631,7 +637,7 @@ static void gf_open_BCs() {
 
 static void mf_Dirichlet_BCs(suNg_av_field *force) {
   int ix,iy,iz,index;
-  
+
   if(COORD[0] == 0) {
     if(T_BORDER > 0) {
       for(ix=0;ix<X_EXT;++ix) for(iy=0;iy<Y_EXT;++iy) for(iz=0;iz<Z_EXT;++iz){
@@ -652,7 +658,7 @@ static void mf_Dirichlet_BCs(suNg_av_field *force) {
         _algebra_vector_zero_g(*_4FIELD_AT(force,index,2));
         _algebra_vector_zero_g(*_4FIELD_AT(force,index,3));
       }
-      
+
       index=ipt_ext(T_BORDER+1,ix,iy,iz);
       if(index!=-1) {
         _algebra_vector_zero_g(*_4FIELD_AT(force,index,1));
@@ -661,7 +667,7 @@ static void mf_Dirichlet_BCs(suNg_av_field *force) {
       }
     }
   }
-  
+
   if(COORD[0] == NP_T-1) {
     for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
       index=ipt_ext(T+T_BORDER-1,ix,iy,iz);
@@ -688,7 +694,7 @@ static void mf_Dirichlet_BCs(suNg_av_field *force) {
 
 static void mf_open_BCs(suNg_av_field *force) {
   int ix,iy,iz,index;
-  
+
   if(COORD[0] == 0) {
     if(T_BORDER > 0) {
       for(ix=0;ix<X_EXT;++ix) for(iy=0;iy<Y_EXT;++iy) for(iz=0;iz<Z_EXT;++iz){
@@ -711,7 +717,7 @@ static void mf_open_BCs(suNg_av_field *force) {
       }
     }
   }
-  
+
   if(COORD[0] == NP_T-1) {
     for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
       index=ipt_ext(T+T_BORDER-1,ix,iy,iz);
@@ -897,7 +903,7 @@ static void init_plaq_twisted_BCs() {
         plaq_weight[index*16+nu*4+mu] *= -1.; /*IF COMPLEX, THE WEIGHT SHOULD BE C.C.*/
       }
     }
-  } 
+  }
 
   lprintf("BCS",0,"Twisted BCs. Dirac strings intersecting at ( X , Y , Z ) = ( 1 , 1 , 1 )\n");
 }
@@ -908,15 +914,24 @@ static void init_plaq_open_BCs(double ct, double cs) {
     "Structure plaq_weight not initialized yet");
 
   int mu,nu,ix,iy,iz,index;
-  
+
   if(COORD[0] == 0) {
     if(T_BORDER > 0) {
       for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
         index=ipt_ext(T_BORDER-1,ix,iy,iz);
         if(index!=-1) {
           for(mu=0;mu<3;mu++) for(nu=mu+1;nu<4;nu++) {
-            plaq_weight[index*16+mu*4+nu] *= 0.;
-            plaq_weight[index*16+nu*4+mu] *= 0.;
+            plaq_weight[index*16+mu*4+nu] = 0;
+            plaq_weight[index*16+nu*4+mu] = 0;
+            rect_weight[index*16+mu*4+nu] = 0;
+            rect_weight[index*16+nu*4+mu] = 0;
+          }
+        }
+        index=ipt_ext(T+T_BORDER,ix,iy,iz);
+        if(index!=-1) {
+          for(mu=0;mu<3;mu++) for(nu=mu+1;nu<4;nu++) {
+            rect_weight[index*16+mu*4+nu] = 0;
+            rect_weight[index*16+nu*4+mu] = 0;
           }
         }
       }
@@ -926,34 +941,39 @@ static void init_plaq_open_BCs(double ct, double cs) {
       index=ipt_ext(T_BORDER,ix,iy,iz);
       if(index!=-1) {
         for(mu=0;mu<3;mu++) for(nu=mu+1;nu<4;nu++) {
-          plaq_weight[index*16+mu*4+nu] *= 0.;
-          plaq_weight[index*16+nu*4+mu] *= 0.;
-        }
+          plaq_weight[index*16+mu*4+nu] = 0;
+          plaq_weight[index*16+nu*4+mu] = 0;
+          rect_weight[index*16+mu*4+nu] = 0;
+          rect_weight[index*16+nu*4+mu] = 0;
+		  }
       }
     }
-      
+
     for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
       index=ipt_ext(T_BORDER+1,ix,iy,iz);
       if(index!=-1) {
         mu=0; for(nu=mu+1;nu<4;nu++) {
-          plaq_weight[index*16+mu*4+nu] *= ct;
-          plaq_weight[index*16+nu*4+mu] *= ct;
+          plaq_weight[index*16+mu*4+nu] = ct;
+          plaq_weight[index*16+nu*4+mu] = ct;
         }
         for(mu=1;mu<3;mu++) for(nu=mu+1;nu<4;nu++) {
-          plaq_weight[index*16+mu*4+nu] *= .5*cs;
-          plaq_weight[index*16+nu*4+mu] *= .5*cs;
+          plaq_weight[index*16+mu*4+nu] = 0.5*cs;
+          plaq_weight[index*16+nu*4+mu] = 0.5*cs;
+          rect_weight[index*16+mu*4+nu] = 0.5*cs;
+          rect_weight[index*16+nu*4+mu] = 0.5*cs;
         }
       }
     }
   }
-  
+
   if(COORD[0] == NP_T-1) {
     for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
       index=ipt_ext(T+T_BORDER-2,ix,iy,iz);
       if(index!=-1) {
         mu=0; for(nu=mu+1;nu<4;nu++) {
-          plaq_weight[index*16+mu*4+nu] *= ct;
-          plaq_weight[index*16+nu*4+mu] *= ct;
+          plaq_weight[index*16+mu*4+nu] = ct;
+          plaq_weight[index*16+nu*4+mu] = ct;
+          rect_weight[index*16+nu*4+mu] = 0;
         }
       }
     }
@@ -962,24 +982,16 @@ static void init_plaq_open_BCs(double ct, double cs) {
       index=ipt_ext(T+T_BORDER-1,ix,iy,iz);
       if(index!=-1) {
         mu=0; for(nu=mu+1;nu<4;nu++) {
-          plaq_weight[index*16+mu*4+nu] *= 0.;
-          plaq_weight[index*16+nu*4+mu] *= 0.;
+          plaq_weight[index*16+mu*4+nu] = 0;
+          plaq_weight[index*16+nu*4+mu] = 0;
+          rect_weight[index*16+mu*4+nu] = 0;
+          rect_weight[index*16+nu*4+mu] = 0;
         }
         for(mu=1;mu<3;mu++) for(nu=mu+1;nu<4;nu++) {
-          plaq_weight[index*16+mu*4+nu] *= .5*cs;
-          plaq_weight[index*16+nu*4+mu] *= .5*cs;
-        }
-      }
-    }
-
-    if(T_BORDER > 0) {
-      for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
-        index=ipt_ext(T+T_BORDER,ix,iy,iz);
-        if(index!=-1) {
-          for(mu=0;mu<3;mu++) for(nu=mu+1;nu<4;nu++) {
-            plaq_weight[index*16+mu*4+nu] *= 0.;
-            plaq_weight[index*16+nu*4+mu] *= 0.;
-          }
+          plaq_weight[index*16+mu*4+nu] = 0.5*cs;
+          plaq_weight[index*16+nu*4+mu] = 0.5*cs;
+          rect_weight[index*16+mu*4+nu] = 0.5*cs;
+          rect_weight[index*16+nu*4+mu] = 0.5*cs;
         }
       }
     }
@@ -995,4 +1007,3 @@ static void init_plaq_Dirichlet_BCs(double ct) {
 }
 
 #endif
-
