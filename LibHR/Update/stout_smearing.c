@@ -94,7 +94,14 @@ double avr_smeared_plaquette()
 	}
 
 	global_sum(&pa, 1);
-	return pa/(6.*NG)/GLB_VOLUME;
+
+#ifdef BC_T_OPEN
+	pa /= 6.0*NG*GLB_VOLUME*(GLB_T-1)/GLB_T;
+#else
+	pa /= 6.0*NG*GLB_VOLUME;
+#endif
+
+	return pa;
 }
 
 // Staples used to smear the field

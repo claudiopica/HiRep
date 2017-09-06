@@ -255,13 +255,17 @@ static void sf_Dirichlet_BCs(spinor_field *sp);
 static void sf_Dirichlet_BCs_flt(spinor_field_flt *sp);
 static void sf_open_BCs(spinor_field *sp);
 static void sf_open_BCs_flt(spinor_field_flt *sp);
+static void sf_open_v2_BCs(spinor_field *sf);
 
 void apply_BCs_on_spinor_field(spinor_field *sp) {
-#if defined(BASIC_SF) || defined(BC_T_OPEN)
+#ifdef BASIC_SF
   sf_Dirichlet_BCs(sp);
 #endif
-#if defined(ROTATED_SF)
+#ifdef ROTATED_SF
   sf_open_BCs(sp);
+#endif
+#ifdef BC_T_OPEN
+  sf_open_v2_BCs(sp);
 #endif
 }
 
@@ -577,27 +581,14 @@ static void gf_open_BCs() {
         index=ipt_ext(T_BORDER-1,ix,iy,iz);
         if(index!=-1) {
           u=pu_gauge(index,0);
-          _suNg_unit(*u);
+          _suNg_zero(*u);
           u=pu_gauge(index,1);
-          _suNg_unit(*u);
+          _suNg_zero(*u);
           u=pu_gauge(index,2);
-          _suNg_unit(*u);
+          _suNg_zero(*u);
           u=pu_gauge(index,3);
-          _suNg_unit(*u);
+          _suNg_zero(*u);
         }
-      }
-    }
-    for(ix=0;ix<X_EXT;++ix) for(iy=0;iy<Y_EXT;++iy) for(iz=0;iz<Z_EXT;++iz){
-      index=ipt_ext(T_BORDER,ix,iy,iz);
-      if(index!=-1) {
-        u=pu_gauge(index,0);
-        _suNg_unit(*u);
-        u=pu_gauge(index,1);
-        _suNg_unit(*u);
-        u=pu_gauge(index,2);
-        _suNg_unit(*u);
-        u=pu_gauge(index,3);
-        _suNg_unit(*u);
       }
     }
   }
@@ -606,7 +597,7 @@ static void gf_open_BCs() {
       index=ipt_ext(T+T_BORDER-1,ix,iy,iz);
       if(index!=-1) {
         u=pu_gauge(index,0);
-        _suNg_unit(*u);
+        _suNg_zero(*u);
       }
     }
     if(T_BORDER > 0) {
@@ -614,13 +605,13 @@ static void gf_open_BCs() {
         index=ipt_ext(T+T_BORDER,ix,iy,iz);
         if(index!=-1) {
           u=pu_gauge(index,0);
-          _suNg_unit(*u);
+          _suNg_zero(*u);
           u=pu_gauge(index,1);
-          _suNg_unit(*u);
+          _suNg_zero(*u);
           u=pu_gauge(index,2);
-          _suNg_unit(*u);
+          _suNg_zero(*u);
           u=pu_gauge(index,3);
-          _suNg_unit(*u);
+          _suNg_zero(*u);
         }
       }
     }
@@ -707,15 +698,6 @@ static void mf_open_BCs(suNg_av_field *force) {
         }
       }
     }
-    for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
-      index=ipt_ext(T_BORDER,ix,iy,iz);
-      if(index!=-1) {
-        _algebra_vector_zero_g(*_4FIELD_AT(force,index,0));
-        _algebra_vector_zero_g(*_4FIELD_AT(force,index,1));
-        _algebra_vector_zero_g(*_4FIELD_AT(force,index,2));
-        _algebra_vector_zero_g(*_4FIELD_AT(force,index,3));
-      }
-    }
   }
 
   if(COORD[0] == NP_T-1) {
@@ -756,15 +738,18 @@ static void cl_open_BCs(suNfc_field *cl)
 		for(int iy = 0; iy < Y_EXT; iy++)
 		for(int iz = 0; iz < Z_EXT; iz++)
 		{
-			index = ipt_ext(T_BORDER,ix,iy,iz);
-			if(index != -1)
+			if(T_BORDER > 0)
 			{
-				for(int mu = 0; mu < 4; mu++)
+				index = ipt_ext(T_BORDER-1,ix,iy,iz);
+				if(index != -1)
 				{
-					*_4FIELD_AT(cl,index,mu) = u;
+					for(int mu = 0; mu < 4; mu++)
+					{
+						*_4FIELD_AT(cl,index,mu) = u;
+					}
 				}
 			}
-			index = ipt_ext(T_BORDER+1,ix,iy,iz);
+			index = ipt_ext(T_BORDER,ix,iy,iz);
 			if(index != -1)
 			{
 				for(int mu = 0; mu < 4; mu++)
@@ -786,6 +771,17 @@ static void cl_open_BCs(suNfc_field *cl)
 				for(int mu = 0; mu < 4; mu++)
 				{
 					*_4FIELD_AT(cl,index,mu) = u;
+				}
+			}
+			if(T_BORDER > 0)
+			{
+				index = ipt_ext(T+T_BORDER,ix,iy,iz);
+				if(index != -1)
+				{
+					for(int mu = 0; mu < 4; mu++)
+					{
+						*_4FIELD_AT(cl,index,mu) = u;
+					}
 				}
 			}
 		}
@@ -873,7 +869,56 @@ static void sf_open_BCs_flt(spinor_field_flt *sp) {
   }
 }
 
+static void sf_open_v2_BCs(spinor_field *sf)
+{
+	int index;
+	suNf_spinor u;
+	_spinor_zero_f(u);
 
+	// These should reflect the boundary conditions imposed on the clover field
+	if(COORD[0] == 0)
+	{
+		for(int ix = 0; ix < X_EXT; ix++)
+		for(int iy = 0; iy < Y_EXT; iy++)
+		for(int iz = 0; iz < Z_EXT; iz++)
+		{
+			if(T_BORDER > 0)
+			{
+				index = ipt_ext(T_BORDER-1,ix,iy,iz);
+				if(index != -1 && sf->type->master_shift <= index && sf->type->master_shift + sf->type->gsize_spinor > index)
+				{
+					*_FIELD_AT(sf,index) = u;
+				}
+			}
+			index = ipt_ext(T_BORDER,ix,iy,iz);
+			if(index != -1 && sf->type->master_shift <= index && sf->type->master_shift + sf->type->gsize_spinor > index)
+			{
+				*_FIELD_AT(sf,index) = u;
+			}
+		}
+	}
+	if(COORD[0] == NP_T-1)
+	{
+		for(int ix = 0; ix < X_EXT; ix++)
+		for(int iy = 0; iy < Y_EXT; iy++)
+		for(int iz = 0; iz < Z_EXT; iz++)
+		{
+			index = ipt_ext(T+T_BORDER-1,ix,iy,iz);
+			if(index != -1 && sf->type->master_shift <= index && sf->type->master_shift + sf->type->gsize_spinor > index)
+			{
+				*_FIELD_AT(sf,index) = u;
+			}
+			if(T_BORDER > 0)
+			{
+				index = ipt_ext(T+T_BORDER,ix,iy,iz);
+				if(index != -1 && sf->type->master_shift <= index && sf->type->master_shift + sf->type->gsize_spinor > index)
+				{
+					*_FIELD_AT(sf,index) = u;
+				}
+			}
+		}
+	}
+}
 
 
 
@@ -939,18 +984,6 @@ static void init_plaq_open_BCs(double ct, double cs) {
 
     for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
       index=ipt_ext(T_BORDER,ix,iy,iz);
-      if(index!=-1) {
-        for(mu=0;mu<3;mu++) for(nu=mu+1;nu<4;nu++) {
-          plaq_weight[index*16+mu*4+nu] = 0;
-          plaq_weight[index*16+nu*4+mu] = 0;
-          rect_weight[index*16+mu*4+nu] = 0;
-          rect_weight[index*16+nu*4+mu] = 0;
-		  }
-      }
-    }
-
-    for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
-      index=ipt_ext(T_BORDER+1,ix,iy,iz);
       if(index!=-1) {
         mu=0; for(nu=mu+1;nu<4;nu++) {
           plaq_weight[index*16+mu*4+nu] = ct;

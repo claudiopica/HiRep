@@ -101,7 +101,7 @@ static void calculate_stfld(int comm)
 		for(int nu = 0; nu < 4; nu++)
 		{
 			source[2*nu+0][0] = proc_dn(CID,nu);
-			for (int i = 0; i < 3; i++)
+			for(int i = 0; i < 3; i++)
 			{
 				int mu = (nu+i+1)&0x3;
 				source[2*nu+0][i+1] = proc_dn(source[2*nu+0][0],mu);
@@ -237,12 +237,13 @@ static double lw_action_density(int ix, double beta, double c0, double c1)
 	{
 		for(int i = 0; i < 3; i++)
 		{
-			int ixpnu = iup(ix,nu);
+			int ixpnu = ix;
 			_suNg_times_suNg_dagger(w1, stfld[2*nu+1][3*ixpnu+i], stfld[2*nu+0][3*ixpnu+i]);
 			_suNg_trace_re(p,w1);
 #ifdef PLAQ_WEIGHTS
 			int mu = (nu+i+1)&0x3;
-			p *= rect_weight[16*ix+4*mu+nu];
+			ixpnu = idn(ix,nu);
+			p *= rect_weight[16*ixpnu+4*mu+nu];
 #endif
 			rects -= p;
 		}
@@ -268,9 +269,10 @@ double lw_action(double beta, double c0, double c1)
 void lw_local_action(scalar_field *loc_action, double beta, double c0, double c1)
 {
 	calculate_stfld(COMM);
+	int iy = ipt(2,0,0,0);
 	_MASTER_FOR(&glattice,ix)
 	{
-		*_FIELD_AT(loc_action,ix) += lw_action_density(ix,beta,c0,c1);
+		*_FIELD_AT(loc_action,iy) += lw_action_density(ix,beta,c0,c1);
 	}
 }
 

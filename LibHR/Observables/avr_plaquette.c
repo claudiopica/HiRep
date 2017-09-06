@@ -113,7 +113,7 @@ double avr_plaquette()
   global_sum(&pa, 1);
 
 #ifdef BC_T_OPEN
-	pa /= 6.0*NG*GLB_VOLUME*(GLB_T-2)/GLB_T;
+	pa /= 6.0*NG*GLB_VOLUME*(GLB_T-1)/GLB_T;
 #else
 	pa /= 6.0*NG*GLB_VOLUME;
 #endif
@@ -201,8 +201,8 @@ void full_plaquette()
 	for(int k = 0; k < 6; k++)
 	{
 #ifdef BC_T_OPEN
-		pa[k].re /= NG*GLB_VOLUME*(GLB_T-2)/GLB_T;
-		pa[k].im /= NG*GLB_VOLUME*(GLB_T-2)/GLB_T;
+		pa[k].re /= NG*GLB_VOLUME*(GLB_T-1)/GLB_T;
+		pa[k].im /= NG*GLB_VOLUME*(GLB_T-1)/GLB_T;
 #else
 		pa[k].re /= NG*GLB_VOLUME;
 		pa[k].im /= NG*GLB_VOLUME;
