@@ -1371,14 +1371,14 @@ sub write_suN_multiply {
 		}
 	} else { #partial unroll
 		print "   do { \\\n";
-		print "      int _i,_j,_k=0;for (_i=0; _i<$N; ++_i){\\\n";
-		print "         _complex_mul((r).$cname\[_i\],(u).$cname\[_k\],(s).$cname\[0\]); ++_k; _j=1;\\\n";
+		print "      int _i,_k=0;for (_i=0; _i<$N; ++_i){\\\n";
+		print "         _complex_mul((r).$cname\[_i\],(u).$cname\[_k\],(s).$cname\[0\]); ++_k;\\\n";
 		if($N<(2*$unroll+1)) {
 			for(my $j=1;$j<$N;$j++){
 				print "         _complex_mul_assign((r).$cname\[_i\],(u).$cname\[_k\],(s).$cname\[$j\]); ++_k;\\\n";
 			}
 		} else {
-			print "         for (; _j<$md; ){ \\\n";
+			print "         int _j=1; for (; _j<$md; ){ \\\n";
 			for(my $i=0;$i<$unroll;$i++){
 				print "            _complex_mul_assign((r).$cname\[_i\],(u).$cname\[_k\],(s).$cname\[_j\]); ++_k; ++_j;\\\n";
 			}
@@ -1409,14 +1409,14 @@ sub write_suNr_multiply {
 		}
 	} else { #partial unroll
 		print "   do { \\\n";
-		print "      int _i,_j,_k=0;for (_i=0; _i<$N; ++_i){\\\n";
-		print "         _complex_mulr((r).$cname\[_i\],(u).$cname\[_k\],(s).$cname\[0\]); ++_k; _j=1;\\\n";
+		print "      int _i,_k=0;for (_i=0; _i<$N; ++_i){\\\n";
+		print "         _complex_mulr((r).$cname\[_i\],(u).$cname\[_k\],(s).$cname\[0\]); ++_k;\\\n";
 		if($N<(2*$unroll+1)) {
 			for(my $j=1;$j<$N;$j++){
 				print "         _complex_mulr_assign((r).$cname\[_i\],(u).$cname\[_k\],(s).$cname\[$j\]); ++_k;\\\n";
 			}
 		} else {
-			print "         for (; _j<$md; ){ \\\n";
+			print "         int _j=1; for (; _j<$md; ){ \\\n";
 			for(my $i=0;$i<$unroll;$i++){
 				print "            _complex_mulr_assign((r).$cname\[_i\],(u).$cname\[_k\],(s).$cname\[_j\]); ++_k; ++_j;\\\n";
 			}
@@ -1586,14 +1586,14 @@ sub write_suN_inverse_multiply {
 		}
 	} else { #partial unroll
 		print "   do { \\\n";
-		print "      int _i,_j,_k=0;for (_i=0; _i<$N; ++_i){\\\n";
-		print "         _complex_mul_star((r).$cname\[_i\],(s).$cname\[0\],(u).$cname\[_k\]); _j=1;\\\n";
+		print "      int _i,_k=0;for (_i=0; _i<$N; ++_i){\\\n";
+		print "         _complex_mul_star((r).$cname\[_i\],(s).$cname\[0\],(u).$cname\[_k\]);\\\n";
 		if($N<(2*$unroll+1)) {
 			for(my $j=1;$j<$N;$j++){
 				print "         _k+=$N; _complex_mul_star_assign((r).$cname\[_i\],(s).$cname\[$j\],(u).$cname\[_k\]);\\\n";
 			}
 		} else {
-			print "         for (; _j<$md; ){ \\\n";
+			print "         int _j=1; for (; _j<$md; ){ \\\n";
 			for(my $i=0;$i<$unroll;$i++){
 				print "            _k+=$N; _complex_mul_star_assign((r).$cname\[_i\],(s).$cname\[_j\],(u).$cname\[_k\]); ++_j;\\\n";
 			}
@@ -1626,14 +1626,14 @@ sub write_suNr_inverse_multiply {
 		}
 	} else { #partial unroll
 		print "   do { \\\n";
-		print "      int _i,_j,_k=0;for (_i=0; _i<$N; ++_i){\\\n";
-		print "         _complex_mulr((r).$cname\[_i\],(u).$cname\[_k\],(s).$cname\[0\]); _j=1;\\\n";
+		print "      int _i,_k=0;for (_i=0; _i<$N; ++_i){\\\n";
+		print "         _complex_mulr((r).$cname\[_i\],(u).$cname\[_k\],(s).$cname\[0\]);\\\n";
 		if($N<(2*$unroll+1)) {
 			for(my $j=1;$j<$N;$j++){
 				print "         _k+=$N; _complex_mulr_assign((r).$cname\[_i\],(u).$cname\[_k\],(s).$cname\[$j\]);\\\n";
 			}
 		} else {
-			print "         for (; _j<$md; ){ \\\n";
+			print "         int _j=1; for (; _j<$md; ){ \\\n";
 			for(my $i=0;$i<$unroll;$i++){
 				print "            _k+=$N; _complex_mulr_assign((r).$cname\[_i\],(u).$cname\[_k\],(s).$cname\[_j\]); ++_j;\\\n";
 			}

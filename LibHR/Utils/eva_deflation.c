@@ -101,7 +101,7 @@ static void orthogonalize(spinor_field *out, spinor_field *in, int n) {
   }
 }
 
-static void GS_vect(spinor_field *b, int n) {
+/*static void GS_vect(spinor_field *b, int n) {
   int i;
   double inorm;
   for (i=0;i<n;++i) {
@@ -109,7 +109,7 @@ static void GS_vect(spinor_field *b, int n) {
     inorm=1./sqrt(spinor_field_sqnorm_f(&b[i]));
     spinor_field_mul_f(&b[i],inorm,&b[i]);
   }
-}
+}*/
 
 void set_def_matrix(eva_prec *e_par, spinor_operator H, geometry_descriptor *type) {
   int changed;

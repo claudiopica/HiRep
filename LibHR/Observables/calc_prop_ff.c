@@ -38,7 +38,6 @@ void spinor_sigma_pi_dagger_rho_div_assign(spinor_field *out,scalar_field *sigma
 
 static int init=0;
 static int init_odd=0;
-static int init_eig=0;
 
 static mshift_par QMR_par;
 static double *shift;

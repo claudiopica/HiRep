@@ -61,34 +61,34 @@ echo "\";" >> ${FILENAME}
 echo "" >> ${FILENAME}
 rm cinfo.tmp
 
-svn --version >&- ; ret=$?
-if [ "${ret}" -eq "0" ] ; then
-  svn info ${TOPDIR} | awk '{printf "%s\\n",$0}' > cinfo.tmp
-  len=`cat cinfo.tmp | wc -c`+1
-  echo -n "static char CI_svninfo[${len}] = \"" >> ${FILENAME}
-  cat cinfo.tmp >> ${FILENAME}
-  echo "\";" >> ${FILENAME}
-  echo "" >> ${FILENAME}
-  rm cinfo.tmp
+#svn --version >&- ; ret=$?
+#if [ "${ret}" -eq "0" ] ; then
+#  svn info ${TOPDIR} | awk '{printf "%s\\n",$0}' > cinfo.tmp
+#  len=`cat cinfo.tmp | wc -c`+1
+#  echo -n "static char CI_svninfo[${len}] = \"" >> ${FILENAME}
+#  cat cinfo.tmp >> ${FILENAME}
+#  echo "\";" >> ${FILENAME}
+#  echo "" >> ${FILENAME}
+#  rm cinfo.tmp
 
-  svn st -q ${TOPDIR} | awk '{printf "%s\\n",$0}' > cinfo.tmp
-  len=`cat cinfo.tmp | wc -c`+1
-  echo -n "static char CI_svnstatus[${len}] = \"" >> ${FILENAME}
-  cat cinfo.tmp >> ${FILENAME}
-  echo "\";" >> ${FILENAME}
-  echo "" >> ${FILENAME}
-  rm cinfo.tmp
-else
+#  svn st -q ${TOPDIR} | awk '{printf "%s\\n",$0}' > cinfo.tmp
+#  len=`cat cinfo.tmp | wc -c`+1
+#  echo -n "static char CI_svnstatus[${len}] = \"" >> ${FILENAME}
+#  cat cinfo.tmp >> ${FILENAME}
+#  echo "\";" >> ${FILENAME}
+#  echo "" >> ${FILENAME}
+#  rm cinfo.tmp
+#else
   echo -n "static char CI_svninfo[1] = \"\";" >> ${FILENAME}
   echo "" >> ${FILENAME}
   echo -n "static char CI_svnstatus[1] = \"\";" >> ${FILENAME}
   echo "" >> ${FILENAME}
-fi
+#fi
 
-REV=$(svn info | grep Revision | awk '{ print $2 }')
-if [ -z "$REV" ]; then
+#REV=$(svn info | grep Revision | awk '{ print $2 }')
+#if [ -z "$REV" ]; then
   REV="0"
-fi
+#fi
 echo "static int CI_svnrevision = ${REV};" >> ${FILENAME}
 echo "" >> ${FILENAME}
 

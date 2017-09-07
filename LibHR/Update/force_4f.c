@@ -61,8 +61,7 @@ void force_hmc_auxfields(double dt, void *vpar){
 void force_hmc_auxfields_fermion(double dt, void *vpar, scalar_field *sigma_mom, scalar_field *pi_mom,spinor_field *Xs, spinor_field *Ys, int hasenbusch ){
   force_hmc_par *par = (force_hmc_par*)vpar;
 #ifdef UPDATE_EO
-  spinor_field Xe, Xo, Ye, Yo;
-  Ye=*Ys; Ye.type=&glat_even;
+  spinor_field Xe, Xo, Yo;
   Yo=*Ys; Yo.type=&glat_odd; Yo.ptr+=glat_odd.master_shift;
   Xe=*Xs; Xe.type=&glat_even;
   Xo=*Xs; Xo.type=&glat_odd; Xo.ptr+=glat_odd.master_shift;

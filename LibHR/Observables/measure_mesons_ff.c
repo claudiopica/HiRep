@@ -31,9 +31,6 @@
 
 meson_observable *triplet_discon_correlators = NULL; //For four fermion interaction
 
-
-static int vector_gammas[4] = {_g0, _g1, _g2, _g3};
-
 //If ind2=-2 disconnected correlator
 static void add_meson_observable(meson_observable** mop, gamma_ind ind1, gamma_ind ind2, char* channel_name, char* channel_type,double sign){
   meson_observable* motmp,*mo;
@@ -115,9 +112,8 @@ static void measure_mesons_disconnected_core(spinor_field* psi0, spinor_field* p
   complex tr;
   //suNf_spin_matrix sma,smb, sm1,sm2,smtmp1,smtmp2,sm_src;
   meson_observable* motmp=mo;
-  //_spinmatrix_zero(smtmp1);
-  //_spinmatrix_zero(smtmp2);
-  suNf_spinor sma,smb, sm1,sm2,smtmp1,smtmp2,sm_src;
+  suNf_spinor sma, smtmp1,sm_src;
+  _spinor_zero_f(smtmp1);
   lprintf("measure_mesons_disconnected_core",50,"Measuring channels: ");
   while (motmp!=NULL){
     lprintf("measure_mesons_disconnected_core",50," %s",motmp->channel_name);
@@ -130,8 +126,7 @@ static void measure_mesons_disconnected_core(spinor_field* psi0, spinor_field* p
 	    for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) { 
 		  ix=ipt(t,x,y,z);
 		  sma=*_FIELD_AT(psi0,ix);
-                  smb=*_FIELD_AT(psi1,ix);
-                  sm_src=*_FIELD_AT(eta,ix);
+        sm_src=*_FIELD_AT(eta,ix);
 		  motmp=mo;
 		  while (motmp!=NULL){
 		    op_spinor(&smtmp1,&sma,motmp->ind1);

@@ -7,6 +7,7 @@
 #include <string.h>
 #include "spinor_field.h"
 #include "update.h"
+#include "random.h"
 
 void scalar_field_copy(scalar_field *s1, scalar_field *s2)
 { 

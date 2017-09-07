@@ -25,12 +25,14 @@ extern rhmc_par _update_par; /* Update/update_rhmc.c */
 
 
 
-static double hmass;
 #ifdef BASIC_SF
+static double hmass;
 static void H_sf(spinor_field *out, spinor_field *in){
   g5Dphi(hmass,out,in);
 }
-#else
+#endif
+#ifdef ROTATED_SF
+static double hmass;
 static void H2_sf(spinor_field *out, spinor_field *in){
   g5Dphi_sq(hmass,out,in);
 }

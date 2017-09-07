@@ -80,7 +80,7 @@ typedef struct _input_mesons {
 	int degree_hopping;  // The degree of the hopping parameter expasion
 
 	/* for the reading function */
-	input_record_t read[29];
+	input_record_t read[31];
 } input_mesons;
 
 #define init_input_mesons(varname) \

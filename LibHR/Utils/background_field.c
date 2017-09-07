@@ -22,10 +22,8 @@
 #define DEBUG_BACKGROUND
 
 void apply_background_field_zdir(suNg_field* V,double Q,int n) {
-				int mu;
 				int index;
 				double A=0;
-				complex phase_bulk,phase_boundary;
 				complex phase;
 				suNg utmp;
 				static suNg_field* V_old=NULL;
