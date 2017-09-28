@@ -89,7 +89,7 @@ int main(int argc,char *argv[])
   u_gauge_f=alloc_gfield_f(&glattice);
   u_gauge_f_flt=alloc_gfield_f_flt(&glattice);
 #else
-  u_gauge_f_flt=(suNf_field_flt*) u_gauge_f;
+  u_gauge_f_flt=(suNf_field_flt*) u_gauge_flt;
 #endif
   /* allocate memory */
   lprintf("MAIN",0,"Allocating spinor field\n");  
