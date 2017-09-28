@@ -37,8 +37,10 @@ void force0(double dt, suNg_av_field *force, void *vpar){
   
   double beta = *((double*)vpar);
 #ifdef MEASURE_FORCE0
-  double forcestat[2]={0.,0.}; /* used for computation of avr and max force */
-  _MASTER_FOR_SUM(&glattice,i,forcestat[0],forcestat[1]) {
+  double forcestat0=0.; /* used for computation of avr and max force */
+  double forcestat1=0.; /* used for computation of avr and max force */
+
+  _MASTER_FOR_SUM(&glattice,i,forcestat0,forcestat1) {
 #else
   _MASTER_FOR(&glattice,i) {
 #endif
@@ -51,13 +53,12 @@ void force0(double dt, suNg_av_field *force, void *vpar){
       /* the projection itself takes the TA: proj(M) = proj(TA(M)) */
       _fund_algebra_project(f,s2);
       _algebra_vector_mul_add_assign_g(*_4FIELD_AT(force,i,mu), dt*(-beta/((double)(NG))), f);
-
 #ifdef MEASURE_FORCE0
       double nsq;
       _algebra_vector_sqnorm_g(nsq,f);
-      forcestat[0]+=sqrt(nsq);
+      forcestat0+=sqrt(nsq);
       for(int x=0;x<sizeof(suNg_algebra_vector)/sizeof(double);++x){
-        if(forcestat[1]<fabs(f.c[x])) forcestat[1]=fabs(f.c[x]);
+        if(forcestat1<fabs(f.c[x])) forcestat1=fabs(f.c[x]);
       }
 #endif
     }
@@ -65,15 +66,15 @@ void force0(double dt, suNg_av_field *force, void *vpar){
 
 #ifdef MEASURE_FORCE0
   //  if(logger_getlevel("FORCE-STAT")>=10){
-    global_sum(forcestat,1);
-    global_max(forcestat+1,1);
+    global_sum(&forcestat0,1);
+    global_max(&forcestat1,1);
     
-    forcestat[0]*=beta/((4.*NG)*GLB_VOLUME);
-    forcestat[1]*=beta/((double)(NG));
+    forcestat0*=beta/((4.*NG)*GLB_VOLUME);
+    forcestat1*=beta/((double)(NG));
     //    lprintf("FORCE-STAT",10," force0 : dt= %1.8e avr |force|= %1.8e maxforce= %1.8e \n",dt,forcestat[0],forcestat[1]);
-    lprintf("FORCE_STAT",20,"GF: avr dt |force| = %1.8e dt maxforce = %1.8e, dt = %1.8e \n",forcestat[0]*dt,forcestat[1]*dt,dt);
-    force_ave[0]+=dt*forcestat[0];
-    force_max[0]+=dt*forcestat[1];    
+    lprintf("FORCE_STAT",20,"GF: avr dt |force| = %1.8e dt maxforce = %1.8e, dt = %1.8e \n",forcestat0*dt,forcestat1*dt,dt);
+    force_ave[0]+=dt*forcestat0;
+    force_max[0]+=dt*forcestat1;    
     //  }
 #endif
   

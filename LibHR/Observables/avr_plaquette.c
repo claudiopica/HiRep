@@ -137,7 +137,7 @@ void full_plaquette()
 			_OMP_PRAGMA( barrier )
 		}
 
-		_SITE_FOR_SUM(&glattice,ixp,ix,r0re,r0im,r1re,r1im,r2re,r2im,r3re,r3im,r4re,r4im,r5re,r5im)
+		_SITE_FOR_SUM(&glattice,ixp,ix,r0,r1,r2,r3,r4,r5)
 		{
 			double complex tmp;
 

@@ -217,7 +217,7 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar){
       
 #ifdef MEASURE_FORCERHMC
       /* reset force stat counters */
-      double forcestat[2]={0.,0}; /* used for computation of avr and max force */
+      double forcestat0=0., forcestat1=0.; /* used for computation of avr and max force */
 #endif
       
       _PIECE_FOR(&glattice,xp) {
@@ -241,8 +241,8 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar){
           _OMP_PRAGMA( barrier )
         }
         
-#ifdef MEASURE_FORCEHMC
-        _SITE_FOR_SUM(&glattice,xp,x,forcestat[0],forcestat[1]) {
+#ifdef MEASURE_FORCERHMC
+        _SITE_FOR_SUM(&glattice,xp,x,forcestat0,forcestat1) {
 #else
         _SITE_FOR(&glattice,xp,x) {
 #endif
@@ -300,9 +300,9 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar){
 #ifdef MEASURE_FORCERHMC
             double nsq;
             _algebra_vector_sqnorm_g(nsq,f);
-            forcestat[0]+=sqrt(nsq);
+            forcestat0+=sqrt(nsq);
             for(y=0;y<NG*NG-1;++y){
-              if(forcestat[1]<fabs(*(((double*)&f)+y))) forcestat[1]=fabs(*(((double*)&f)+y));
+              if(forcestat1<fabs(*(((double*)&f)+y))) forcestat1=fabs(*(((double*)&f)+y));
             }
 #endif
           } //directions for
@@ -312,12 +312,12 @@ void force_rhmc(double dt, suNg_av_field *force, void *vpar){
         
 #ifdef MEASURE_FORCERHMC
       if(logger_getlevel("FORCE-STAT")>=10){
-        global_sum(forcestat,1);
-        global_max(forcestat+1,1);
+        global_sum(&forcestat0,1);
+        global_max(&forcestat1,1);
           
-        forcestat[0]*=ratio->a[n+1]*(_REPR_NORM2/_FUND_NORM2)/(4.*GLB_VOLUME);
-        forcestat[1]*=ratio->a[n+1]*(_REPR_NORM2/_FUND_NORM2);
-        lprintf("FORCE-STAT",10," force_rhmc: dt= %1.8e avr |force|= %1.8e maxforce= %1.8e mass= %f k= %d n= %d a= %1.8e b= %1.8e\n",dt,forcestat[0],forcestat[1],par->mass,k,n,ratio->a[n+1],ratio->b[n]);
+        forcestat0*=ratio->a[n+1]*(_REPR_NORM2/_FUND_NORM2)/(4.*GLB_VOLUME);
+        forcestat1*=ratio->a[n+1]*(_REPR_NORM2/_FUND_NORM2);
+        lprintf("FORCE-STAT",10," force_rhmc: dt= %1.8e avr |force|= %1.8e maxforce= %1.8e mass= %f k= %d n= %d a= %1.8e b= %1.8e\n",dt,forcestat0,forcestat1,par->mass,k,n,ratio->a[n+1],ratio->b[n]);
         }
 #endif
         
