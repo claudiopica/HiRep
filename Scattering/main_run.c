@@ -331,7 +331,7 @@ while(1){
 	measure_mesons_core(Q_0, Q_0, source_0, mo_pi2p, 1, tau, 2, 0, GLB_T);
 	do_global_sum(mo_pi2p,1.0);
 	measure_mesons_core(Q_0, Q_p, source_0, mo_pi_p1, 1, tau, 2, 0, GLB_T);
-	do_global_sum(mo_pi2p,1.0);
+	do_global_sum(mo_pi_p1,1.0);
 
 	// 2-point rho->rho
 	measure_mesons_core(Q_0, Q_0, source_0, mo_twopt_nomom, 1, tau, 2, 0, GLB_T);
