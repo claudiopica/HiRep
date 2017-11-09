@@ -244,7 +244,7 @@ int main(int argc,char *argv[])
 
   init_propagator_eo(nm,m,mes_var.precision);
 
-#define OBSERVABLE_LIST X(pi2p) X(pi_p1) X(twopt_nomom) X(twopt) X(d_nomom) X(d) X(r1) X(r2) X(r3) X(r4) X(t1) X(t2) X(twoptp2) X(dp2) X(r1p2) X(r2p2) X(r3p2) X(r4p2) X(t1p2) X(t2p2)
+#define OBSERVABLE_LIST X(pi2p) X(pi_p1) X(pi_p2) X(twopt_nomom_g1) X(twopt_nomom_g2) X(twopt_nomom_g3) X(twopt_g1) X(twopt_g2) X(twopt_g3) X(d_nomom) X(d) X(r1) X(r2) X(r3) X(r4) X(t1_g1) X(t1_g2) X(t1_g3) X(t2_g1) X(t2_g2) X(t2_g3) X(twoptp2_g1) X(twoptp2_g2) X(twoptp2_g3) X(dp2) X(r1p2) X(r2p2) X(r3p2) X(r4p2) X(t1p2_g1) X(t1p2_g2) X(t1p2_g3) X(t2p2_g1) X(t2p2_g2) X(t2p2_g3)
 #define TMP_OBSERVABLE_LIST X(r1) X(r2) X(r3) X(r4) X(r1p2) X(r2p2) X(r3p2) X(r4p2)
 #define X(NAME) meson_observable* mo_##NAME = malloc(sizeof(meson_observable)); init_mo(mo_##NAME,#NAME,27*GLB_T);
 OBSERVABLE_LIST
@@ -252,12 +252,38 @@ OBSERVABLE_LIST
 #define X(NAME) meson_observable* mo_tmp##NAME = malloc(sizeof(meson_observable)); init_mo(mo_tmp##NAME,#NAME,27*GLB_T);
 TMP_OBSERVABLE_LIST
 #undef X
-mo_twopt_nomom->ind1=_g3;
-mo_twopt_nomom->ind2=_g3;
-mo_twopt->ind1=_g3;
-mo_twopt->ind2=_g3;
-mo_t1->ind2=_g3;
-mo_t2->ind2=_g3;
+mo_twopt_nomom_g1->ind1=_g1;
+mo_twopt_nomom_g1->ind2=_g1;
+mo_twopt_g1->ind1=_g1;
+mo_twopt_g1->ind2=_g1;
+mo_t1_g1->ind2=_g1;
+mo_t2_g1->ind2=_g1;
+mo_twoptp2_g1->ind1=_g1;
+mo_twoptp2_g1->ind2=_g1;
+mo_t1p2_g1->ind2=_g1;
+mo_t2p2_g1->ind2=_g1;
+
+mo_twopt_nomom_g2->ind1=_g2;
+mo_twopt_nomom_g2->ind2=_g2;
+mo_twopt_g2->ind1=_g2;
+mo_twopt_g2->ind2=_g2;
+mo_t1_g2->ind2=_g2;
+mo_t2_g2->ind2=_g2;
+mo_twoptp2_g2->ind1=_g2;
+mo_twoptp2_g2->ind2=_g2;
+mo_t1p2_g2->ind2=_g2;
+mo_t2p2_g2->ind2=_g2;
+
+mo_twopt_nomom_g3->ind1=_g3;
+mo_twopt_nomom_g3->ind2=_g3;
+mo_twopt_g3->ind1=_g3;
+mo_twopt_g3->ind2=_g3;
+mo_t1_g3->ind2=_g3;
+mo_t2_g3->ind2=_g3;
+mo_twoptp2_g3->ind1=_g3;
+mo_twoptp2_g3->ind2=_g3;
+mo_t1p2_g3->ind2=_g3;
+mo_t2p2_g3->ind2=_g3;
 
 #define SOURCE_LIST_Q X(0) X(0_eta) X(p) X(mp) X(p2) X(mp2) 
 #define SOURCE_LIST_W X(0_p) X(0_mp) X(p_0) X(mp_0) X(0_p2) X(0_mp2) X(p2_0) X(mp2_0)
@@ -332,44 +358,95 @@ while(1){
 	do_global_sum(mo_pi2p,1.0);
 	measure_mesons_core(Q_0, Q_p, source_0, mo_pi_p1, 1, tau, 2, 0, GLB_T);
 	do_global_sum(mo_pi_p1,1.0);
+	measure_mesons_core(Q_0, Q_p2, source_0, mo_pi_p2, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_pi_p2,1.0);
 
 	// 2-point rho->rho
-	measure_mesons_core(Q_0, Q_0, source_0, mo_twopt_nomom, 1, tau, 2, 0, GLB_T);
-	do_global_sum(mo_twopt_nomom,1.0);
-	measure_mesons_core(Q_0, Q_p, source_0, mo_twopt, 1, tau, 2, 0, GLB_T);
-	do_global_sum(mo_twopt,1.0);
-	measure_mesons_core(Q_0, Q_p2, source_0, mo_twoptp2, 1, tau, 2, 0, GLB_T);
-	do_global_sum(mo_twoptp2,1.0);
+	measure_mesons_core(Q_0, Q_0, source_0, mo_twopt_nomom_g1, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_twopt_nomom_g1,1.0);
+	measure_mesons_core(Q_0, Q_p, source_0, mo_twopt_g1, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_twopt_g1,1.0);
+	measure_mesons_core(Q_0, Q_p2, source_0, mo_twoptp2_g1, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_twoptp2_g1,1.0);
+
+	measure_mesons_core(Q_0, Q_0, source_0, mo_twopt_nomom_g2, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_twopt_nomom_g2,1.0);
+	measure_mesons_core(Q_0, Q_p, source_0, mo_twopt_g2, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_twopt_g2,1.0);
+	measure_mesons_core(Q_0, Q_p2, source_0, mo_twoptp2_g2, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_twoptp2_g2,1.0);
+
+	measure_mesons_core(Q_0, Q_0, source_0, mo_twopt_nomom_g3, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_twopt_nomom_g3,1.0);
+	measure_mesons_core(Q_0, Q_p, source_0, mo_twopt_g3, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_twopt_g3,1.0);
+	measure_mesons_core(Q_0, Q_p2, source_0, mo_twoptp2_g3, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_twoptp2_g3,1.0);
 	
 	// direct 1
 	measure_scattering_AD_core(mo_d_nomom, Q_0, Q_0, Q_0_eta, Q_0_eta, tau, 0, 1, 0, 0, 0 );
 	measure_scattering_AD_core(mo_d, Q_p, Q_0, Q_0_eta, Q_0_eta, tau, 0, 1, px, py, pz );
 	measure_scattering_AD_core(mo_dp2, Q_p2, Q_0, Q_0_eta, Q_0_eta, tau, 0, 1, px2, py2, pz2 );
 	//Triangle pipi->rho
-	measure_mesons_core(W_0_mp, Q_0, source_0, mo_t1, 1, tau, 2, 0, GLB_T);
-	do_global_sum(mo_t1,1.0);
-	measure_mesons_core(Q_0, W_0_p, source_0, mo_t2, 1, tau, 2, 0, GLB_T);
-	do_global_sum(mo_t2,1.0);
+	measure_mesons_core(W_0_mp, Q_0, source_0, mo_t1_g1, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_t1_g1,1.0);
+	measure_mesons_core(Q_0, W_0_p, source_0, mo_t2_g1, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_t2_g1,1.0);
+	measure_mesons_core(W_0_mp2, Q_0, source_0, mo_t1p2_g1, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_t1p2_g1,1.0);
+	measure_mesons_core(Q_0, W_0_p2, source_0, mo_t2p2_g1, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_t2p2_g1,1.0);
 
-	measure_mesons_core(W_0_mp2, Q_0, source_0, mo_t1p2, 1, tau, 2, 0, GLB_T);
-	do_global_sum(mo_t1p2,1.0);
-	measure_mesons_core(Q_0, W_0_p2, source_0, mo_t2p2, 1, tau, 2, 0, GLB_T);
-	do_global_sum(mo_t2p2,1.0);
+	measure_mesons_core(W_0_mp, Q_0, source_0, mo_t1_g2, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_t1_g2,1.0);
+	measure_mesons_core(Q_0, W_0_p, source_0, mo_t2_g2, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_t2_g2,1.0);
+	measure_mesons_core(W_0_mp2, Q_0, source_0, mo_t1p2_g2, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_t1p2_g2,1.0);
+	measure_mesons_core(Q_0, W_0_p2, source_0, mo_t2p2_g2, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_t2p2_g2,1.0);
+
+	measure_mesons_core(W_0_mp, Q_0, source_0, mo_t1_g3, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_t1_g3,1.0);
+	measure_mesons_core(Q_0, W_0_p, source_0, mo_t2_g3, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_t2_g3,1.0);
+	measure_mesons_core(W_0_mp2, Q_0, source_0, mo_t1p2_g3, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_t1p2_g3,1.0);
+	measure_mesons_core(Q_0, W_0_p2, source_0, mo_t2p2_g3, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_t2p2_g3,1.0);
 
 	//File IO
 	io2pt(mo_pi2p, 2, src, path, "pi");
 	io2pt(mo_pi_p1, 2, src, path, "pi_p1");
-	io2pt(mo_twopt_nomom, 2, src, path, "rho_p0");
-	io2pt(mo_twopt, 2, src, path, "rho");
-	io2pt(mo_t1, 2, src, path, "t1");
-	io2pt(mo_t2, 2, src, path, "t2");
+	io2pt(mo_pi_p2, 2, src, path, "pi_p2");
 	io4pt(mo_d_nomom, 1, src, path, "d_p0");
 	io4pt(mo_d, 1, src, path, "d");
-
-	io2pt(mo_twoptp2, 2, src, path, "rhop2");
-	io2pt(mo_t1p2, 2, src, path, "t1p2");
-	io2pt(mo_t2p2, 2, src, path, "t2p2");
 	io4pt(mo_dp2, 1, src, path, "dp2");
+
+	io2pt(mo_twopt_nomom_g1, 2, src, path, "rho_p0_g1");
+	io2pt(mo_twopt_g1, 2, src, path, "rho_g1");
+	io2pt(mo_t1_g1, 2, src, path, "t1_g1");
+	io2pt(mo_t2_g1, 2, src, path, "t2_g1");
+	io2pt(mo_twoptp2_g1, 2, src, path, "rhop2_g1");
+	io2pt(mo_t1p2_g1, 2, src, path, "t1p2_g1");
+	io2pt(mo_t2p2_g1, 2, src, path, "t2p2_g1");
+
+	io2pt(mo_twopt_nomom_g2, 2, src, path, "rho_p0_g2");
+	io2pt(mo_twopt_g2, 2, src, path, "rho_g2");
+	io2pt(mo_t1_g2, 2, src, path, "t1_g2");
+	io2pt(mo_t2_g2, 2, src, path, "t2_g2");
+	io2pt(mo_twoptp2_g2, 2, src, path, "rhop2_g2");
+	io2pt(mo_t1p2_g2, 2, src, path, "t1p2_g2");
+	io2pt(mo_t2p2_g2, 2, src, path, "t2p2_g2");
+
+	io2pt(mo_twopt_nomom_g3, 2, src, path, "rho_p0_g3");
+	io2pt(mo_twopt_g3, 2, src, path, "rho_g3");
+	io2pt(mo_t1_g3, 2, src, path, "t1_g3");
+	io2pt(mo_t2_g3, 2, src, path, "t2_g3");
+	io2pt(mo_twoptp2_g3, 2, src, path, "rhop2_g3");
+	io2pt(mo_t1p2_g3, 2, src, path, "t1p2_g3");
+	io2pt(mo_t2p2_g3, 2, src, path, "t2p2_g3");
+
 	//Will have to change the range; this is too big
 	for (t=0; t<GLB_T; ++t)
 	{
