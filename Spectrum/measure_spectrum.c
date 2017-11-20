@@ -89,7 +89,7 @@ typedef struct _input_mesons {
     {"quark quenched masses", "mes:masses = %s", STRING_T, (varname).mstring}, \
     {"use input mass", "mes:use_input_mass = %d",INT_T, &(varname).use_input_mass},\
     {"inverter precision", "mes:precision = %lf", DOUBLE_T, &(varname).precision},\
-    {"measure mixed correlators", "mes:meas_mixed",INT_T,&(varname).meas_mixed},\
+    {"measure mixed correlators", "mes:meas_mixed = %d",INT_T,&(varname).meas_mixed},\
     {"number of noisy sources per cnfg for 2pt fn", "mes:nhits_2pt = %d", INT_T, &(varname).nhits_2pt}, \
     {"number of noisy sources per cnfg for disconnected", "mes:nhits_disc = %d", INT_T, &(varname).nhits_disc}, \
     {"enable default semwall", "mes:def_semwall = %d",INT_T, &(varname).def_semwall},	\
