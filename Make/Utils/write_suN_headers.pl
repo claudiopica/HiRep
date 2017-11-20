@@ -21,7 +21,7 @@ if (!($su2quat eq "0") and $Ng!=2) {
 }
 
 my ($Nf,$c1,$c2);
-$c1="C"; #degault gauge field complex
+$c1="C"; #default gauge field complex
 if ($rep eq "REPR_FUNDAMENTAL") {
 	$Nf=$Ng;
 	$c2="C";
@@ -166,36 +166,31 @@ END
 write_suN_vector();
 
 if ($su2quat==0) {
-write_suN();
-print "typedef $dataname ${dataname}_FMAT;\n\n";
-print "typedef ${dataname}_flt ${dataname}_FMAT_flt;\n\n";
-
+	write_suN();
     if ($complex eq "R") {
-    write_suNr();
-    print "typedef $rdataname ${rdataname}_FMAT;\n\n";
-    print "typedef ${rdataname}_flt ${rdataname}_FMAT_flt;\n\n";
+	    write_suNr();
     } else {
-    print "typedef $dataname ${dataname}c;\n\n";
-    print "typedef ${dataname}_flt ${dataname}c_flt;\n\n";
-}
+		print "typedef $dataname ${dataname}c;\n\n";
+		print "typedef ${dataname}_flt ${dataname}c_flt;\n\n";
+	}
 } else {
     write_su2($su2quat);
-    #print "typedef $dataname ${dataname}c;\n\n";
-    #print "typedef ${dataname}_flt ${dataname}c_flt;\n\n";
     my ($ldn,$lrdn)=($dataname,$rdataname);
-    $dataname="${dataname}_FMAT";
-    $rdataname="${rdataname}_FMAT";
+    $dataname="${rdataname}c";
+	$rdataname="${rdataname}_FMAT";
     write_suN();
     if ($complex eq "R") {
         write_suNr();
     } else {
-        print "typedef $dataname ${dataname}c;\n\n";
-        print "typedef ${dataname}_flt ${dataname}c_flt;\n\n";
-    }    
-    $dataname=$ldn;
+		print "typedef $dataname ${rdataname};\n\n";
+		print "typedef ${dataname}_flt ${rdataname}_flt;\n\n";
+	}
+	$dataname=$ldn;
     $rdataname=$lrdn;
     
 }
+
+
 
 write_spinor();
 if ($suff eq $fundsuff) { #algebra operations only for gauge
@@ -249,16 +244,30 @@ write_vector_prod_sub_assign_im();
 write_vector_project();
 
 if ($su2quat==0) {
+  write_suN_multiply();
+  write_suN_inverse_multiply();
+  write_suN_zero();
   if ($complex eq "R") {
     write_suNr_multiply();
     write_suNr_inverse_multiply();
-  } 
-  write_suN_multiply();
-  write_suN_inverse_multiply();
+ 	write_suNr_zero();
+  } else {
+	  print "#define _suNfc_multiply(a,b,c) _suNf_multiply(a,b,c)\n\n";
+	  print "#define _suNfc_inverse_multiply(a,b,c) _suNf_inverse_multiply(a,b,c)\n\n";
+	  print "#define _suNfc_zero(a) _suNf_zero(a)\n\n";
+  }
 } else {
     #write_su2_decode($su2quat);
-  write_su2_multiply();
-  write_su2_inverse_multiply();
+    write_su2_multiply();
+    write_su2_inverse_multiply();
+	write_su2_zero();
+ 
+    my ($ldn,$lrdn)=($dataname,$rdataname);
+    $dataname="${dataname}c";
+    write_suN_multiply();
+    write_suN_inverse_multiply();
+	write_suN_zero();
+    $dataname=$ldn;
 }
 
 if ($suff eq "g") { #algebra operations only for gauge
@@ -287,7 +296,7 @@ if ($su2quat==0) {
   write_suN_times_suN();
   write_suN_times_suN_dagger();
   write_suN_dagger_times_suN();
-  write_suN_zero();
+ ## write_suN_zero();
   write_suN_unit();
   write_suN_minus();
 # write_suN_copy();
@@ -304,7 +313,7 @@ if ($su2quat==0) {
   write_suN_FMAT();
 
   if ($complex eq "R") { # we only need these functions at the moment...
-    write_suNr_zero();
+ ##   write_suNr_zero();
     write_suNr_FMAT();
     write_suNr_unit();
     write_suNr_dagger();
@@ -324,7 +333,7 @@ if ($su2quat==0) {
     write_su2_times_su2();
     write_su2_times_su2_dagger();
     write_su2_dagger_times_su2();
-	write_su2_zero();
+##	write_su2_zero();
     write_su2_unit();
     write_su2_minus();
     write_su2_mul();
@@ -344,16 +353,16 @@ if ($su2quat==0) {
     write_su2_exp();
 }
 
-    my ($ldn,$lrdn)=($dataname,$rdataname);
-    $dataname="${dataname}_FMAT";
-    $rdataname="${rdataname}_FMAT";
-    write_suN_zero();
-    if ($complex eq "R") { # we only need these functions at the moment...
-        write_suNr_zero();
-    }
-    $dataname=$ldn;
-    $rdataname=$lrdn;
-    
+my ($ldn,$lrdn)=($dataname,$rdataname);
+$dataname="${dataname}_FMAT";
+$rdataname="${rdataname}_FMAT";
+write_suN_zero();
+if ($complex eq "R") { # we only need these functions at the moment...
+	write_suNr_zero();
+}
+$dataname=$ldn;
+$rdataname=$lrdn;
+
 print <<END
 /*******************************************************************************
 *

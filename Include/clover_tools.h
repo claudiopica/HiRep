@@ -13,25 +13,6 @@
 #define WITH_CLOVER_EO
 #endif
 
-#if (defined(REPR_ADJOINT) || defined(GAUGE_SON))
-#define REPR_IS_REAL
-#endif
-
-#ifndef _suNfc_multiply
-#define _suNfc_multiply(a,b,c) \
-	_suNf_multiply(a,b,c)
-#endif
-
-#ifndef _suNfc_inverse_multiply
-#define _suNfc_inverse_multiply(a,b,c) \
-	_suNf_inverse_multiply(a,b,c)
-#endif
-
-#ifndef _suNfc_zero
-#define _suNfc_zero(a) \
-	_suNf_zero(a)
-#endif
-
 double get_csw();
 void compute_ldl_decomp(double);
 void compute_clover_term();

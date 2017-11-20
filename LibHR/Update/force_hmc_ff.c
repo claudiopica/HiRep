@@ -231,7 +231,7 @@ void force_hmc_ff(double dt, void *vpar){
       suNg_algebra_vector f;
       suNf_vector ptmp;
       suNf_spinor p;
-      suNf_FMAT s1;
+      suNf s1;
 
       if (xp==glattice.inner_master_pieces) {
         _OMP_PRAGMA( master )
