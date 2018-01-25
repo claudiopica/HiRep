@@ -49,6 +49,8 @@ $REPR::ALGEBRA_REPRESENT:(m):(h)$
 #define _algebra_project(h,m) \
 $REPR::ALGEBRA_PROJECT:(h):(m)$
 
+#define _algebra_project_FMAT(h,m) _algebra_project(h,m) 
+
 
 /*
 *	m $REPR::TYPE$ matrix $N$*$N$
@@ -89,6 +91,15 @@ $GROUP::ALGEBRA_PROJECT:(h):(m)$
 *	h(A) = -i*ReTr[rT(A).m]/C(r)
 */
 #define _algebra_project(h,m) _fund_algebra_project(h,m)
+
+/*
+*	h real $GROUP::DIM$-vector
+*	m $REPR::TYPE$ matrix $REPR::DIM$*$REPR::DIM$
+*	h(A) = -i*ReTr[rT(A).m]/C(r)
+*/
+#define _algebra_project_FMAT(h,m) \
+$REPR::ALGEBRA_PROJECT:(h):(m)$
+
 
 /*
 *	m $REPR::TYPE$ matrix $N$*$N$

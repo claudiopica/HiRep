@@ -231,7 +231,7 @@ void force_hmc_ff(double dt, void *vpar){
       suNg_algebra_vector f;
       suNf_vector ptmp;
       suNf_spinor p;
-      suNf s1;
+      suNf_FMAT s1;
 
       if (xp==glattice.inner_master_pieces) {
         _OMP_PRAGMA( master )
@@ -290,7 +290,7 @@ void force_hmc_ff(double dt, void *vpar){
               _F_DIR3(s1,chi1,chi2);
       	  }
 
-      	  _algebra_project(f,s1);
+      	  _algebra_project_FMAT(f,s1);
 
 
 #ifdef UPDATE_EO

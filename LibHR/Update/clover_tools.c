@@ -16,6 +16,8 @@
 static double sigma;
 static double csw_value;
 
+#ifdef WITH_CLOVER
+
 #define clover_re(id,mu,ndx) \
 	_4FIELD_AT(cl_term,id,mu)->c[ndx].re
 
@@ -397,3 +399,5 @@ void clover_init(double csw)
 	csw_value = csw;
 	lprintf("CLOVER", 10, "Coefficient: csw = %1.6f\n", csw_value);
 }
+
+#endif //#ifdef WITH_CLOVER

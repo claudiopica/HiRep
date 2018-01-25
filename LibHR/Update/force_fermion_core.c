@@ -99,6 +99,8 @@
 
 static suNg_av_field *force_sum = NULL;
 
+#ifdef WITH_CLOVER
+
 /* ----------------------------------- */
 /* CALCULATE FORCE OF THE CLOVER TERM  */
 /* ----------------------------------- */
@@ -474,6 +476,8 @@ void force_clover_logdet(double mass, double residue)
 	compute_force_logdet(mass, residue);
 }
 
+#endif //#ifdef WITH_CLOVER
+
 /* ------------------------------------ */
 /* CALCULATE FORCE OF THE HOPPING TERM  */
 /* ------------------------------------ */
@@ -532,7 +536,7 @@ void force_fermion_core(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, d
 		suNg_algebra_vector f;
 		suNf_vector ptmp;
 		suNf_spinor p;
-		suNf s1;
+		suNf_FMAT s1;
 
 		if(xp == glattice.inner_master_pieces)
 		{
@@ -559,7 +563,7 @@ void force_fermion_core(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, d
 			chi2 = _FIELD_AT(Xs,iy);
 			_F_DIR0(s1,chi1,chi2);
 
-			_algebra_project(f,s1);
+			_algebra_project_FMAT(f,s1);
 			_algebra_vector_mul_add_assign_g(*_4FIELD_AT(force_sum,ix,0),coeff,f);
 
 			// Direction 1
@@ -572,7 +576,7 @@ void force_fermion_core(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, d
 			chi2 = _FIELD_AT(Xs,iy);
 			_F_DIR1(s1,chi1,chi2);
 
-			_algebra_project(f,s1);
+			_algebra_project_FMAT(f,s1);
 			_algebra_vector_mul_add_assign_g(*_4FIELD_AT(force_sum,ix,1),coeff,f);
 
 			// Direction 2
@@ -585,7 +589,7 @@ void force_fermion_core(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, d
 			chi2 = _FIELD_AT(Xs,iy);
 			_F_DIR2(s1,chi1,chi2);
 
-			_algebra_project(f,s1);
+			_algebra_project_FMAT(f,s1);
 			_algebra_vector_mul_add_assign_g(*_4FIELD_AT(force_sum,ix,2),coeff,f);
 
 			// Direction 3
@@ -598,7 +602,7 @@ void force_fermion_core(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, d
 			chi2 = _FIELD_AT(Xs,iy);
 			_F_DIR3(s1,chi1,chi2);
 
-			_algebra_project(f,s1);
+			_algebra_project_FMAT(f,s1);
 			_algebra_vector_mul_add_assign_g(*_4FIELD_AT(force_sum,ix,3),coeff,f);
 		} // sites
 	} // pieces

@@ -28,11 +28,6 @@ static suNg_field *g;
 
 
 
-static void D(spinor_field *out, spinor_field *in){
-   Dphi(hmass,out,in);
-}
-
-
 
 int main(int argc,char *argv[])
 {
@@ -42,7 +37,7 @@ int main(int argc,char *argv[])
   float elapsed, gflops;
   int i;
   int flopsite, bytesite;
-  int n_times=50;
+  int n_times=5000;
   struct timeval start, end, etime;
   
   setup_process(&argc,&argv);
@@ -115,7 +110,7 @@ int main(int argc,char *argv[])
 #else
   flopsite=8*NF*(7+16*NF);
 #endif
-  bytesite=36*sizeof(suNf_vector)+16*sizeof(suNf); //add integers for geometry indexes?
+  bytesite=36*sizeof(suNf_vector)+8*sizeof(suNf); //add integers for geometry indexes?
   
   lprintf("LA TEST",0,"Flop per site = %d\n",flopsite);
   lprintf("LA TEST",0,"Byte per site = %d\n",bytesite);

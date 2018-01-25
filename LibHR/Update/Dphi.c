@@ -149,128 +149,6 @@ _vector_mulc_star_f((r),eitheta[3],vtmp)
 
 #endif
 
-static void Cphi_(double mass, spinor_field *dptr, spinor_field *sptr, int assign)
-{
-	// Correct mass term
-	mass = (4.+mass);
-
-	// Loop over local sites
-	_MASTER_FOR(dptr->type,ix)
-	{
-		suNf_vector v1, v2;
-		suNf_spinor *out, *in, tmp;
-		suNfc *s0, *s1, *s2, *s3;
-
-		// Field pointers
-		out = _FIELD_AT(dptr,ix);
-		in = _FIELD_AT(sptr,ix);
-		s0 = _4FIELD_AT(cl_term,ix,0);
-		s1 = _4FIELD_AT(cl_term,ix,1);
-		s2 = _4FIELD_AT(cl_term,ix,2);
-		s3 = _4FIELD_AT(cl_term,ix,3);
-
-		// Component 0
-		_suNfc_multiply(v1, *s0, in->c[0]);
-		_suNfc_multiply(v2, *s1, in->c[1]);
-		_vector_add_f(tmp.c[0], v1, v2);
-
-		// Component 1
-		_suNfc_inverse_multiply(v1, *s1, in->c[0]);
-		_suNfc_multiply(v2, *s0, in->c[1]);
-		_vector_sub_f(tmp.c[1], v1, v2);
-
-		// Component 2
-		_suNfc_multiply(v1, *s2, in->c[2]);
-		_suNfc_multiply(v2, *s3, in->c[3]);
-		_vector_add_f(tmp.c[2], v1, v2);
-
-		// Component 3
-		_suNfc_inverse_multiply(v1, *s3, in->c[2]);
-		_suNfc_multiply(v2, *s2, in->c[3]);
-		_vector_sub_f(tmp.c[3], v1, v2);
-
-		// Add mass
-		_spinor_mul_add_assign_f(tmp, mass, *in);
-
-		// Store
-		if(assign)
-		{
-			_spinor_add_assign_f(*out, tmp);
-		}
-		else
-		{
-			*out = tmp;
-		}
-	}
-}
-
-static void Cphi_inv_(double mass, spinor_field *dptr, spinor_field *sptr, int assign)
-{
-	int N = 2*NF;
-	mass = (4.+mass);
-
-	// Update LDL decomposition
-	compute_ldl_decomp(mass);
-
-	// Loop over local sites
-	_MASTER_FOR(dptr->type,ix)
-	{
-		complex *up, *dn, *x, c;
-		suNf_spinor *out, *in, tmp;
-		int n;
-
-		// Field pointers
-		up = _FIELD_AT(cl_ldl,ix)->up;
-		dn = _FIELD_AT(cl_ldl,ix)->dn;
-		out = _FIELD_AT(dptr,ix);
-		in = _FIELD_AT(sptr,ix);
-
-		// tmp = in
-		tmp = *in;
-		x = (complex*)&tmp;
-
-		// Forward substitution
-		for(int i = 0; i < N; i++)
-		{
-			for(int k = 0; k < i; k++)
-			{
-				n = i*(i+1)/2+k;
-				_complex_mul_sub_assign(x[i], up[n], x[k]);
-				_complex_mul_sub_assign(x[i+N], dn[n], x[k+N]);
-			}
-		}
-
-		// Backward substitution
-		for(int i = N-1; i >= 0; i--)
-		{
-			n = i*(i+1)/2+i;
-			_complex_mulr(x[i], 1./up[n].re, x[i]);
-			_complex_mulr(x[i+N], 1./dn[n].re, x[i+N]);
-			for(int k = i+1; k < N; k++)
-			{
-				n = k*(k+1)/2+i;
-
-				c.re = up[n].re;
-				c.im = -up[n].im;
-				_complex_mul_sub_assign(x[i], c, x[k]);
-
-				c.re = dn[n].re;
-				c.im = -dn[n].im;
-				_complex_mul_sub_assign(x[i+N], c, x[k+N]);
-			}
-		}
-
-		// Store
-		if(assign)
-		{
-			_spinor_add_assign_f(*out, tmp);
-		}
-		else
-		{
-			*out = tmp;
-		}
-	}
-}
 
 
 
@@ -808,6 +686,8 @@ void Qhat_eopre_sq(double m0, double mu, spinor_field *out, spinor_field *in) {
 #endif
 }
 
+#ifdef WITH_CLOVER
+
 /*************************************************
  * Dirac operators with clover term:             *
  * Cphi = Dphi + clover                          *
@@ -815,6 +695,130 @@ void Qhat_eopre_sq(double m0, double mu, spinor_field *out, spinor_field *in) {
  * Cphi_diag = D_oo or D_ee                      *
  * Cphi_diag_inv = D_oo^-1 or D_ee^-1            *
  *************************************************/
+
+static void Cphi_(double mass, spinor_field *dptr, spinor_field *sptr, int assign)
+{
+	// Correct mass term
+	mass = (4.+mass);
+
+	// Loop over local sites
+	_MASTER_FOR(dptr->type,ix)
+	{
+		suNf_vector v1, v2;
+		suNf_spinor *out, *in, tmp;
+		suNfc *s0, *s1, *s2, *s3;
+
+		// Field pointers
+		out = _FIELD_AT(dptr,ix);
+		in = _FIELD_AT(sptr,ix);
+		s0 = _4FIELD_AT(cl_term,ix,0);
+		s1 = _4FIELD_AT(cl_term,ix,1);
+		s2 = _4FIELD_AT(cl_term,ix,2);
+		s3 = _4FIELD_AT(cl_term,ix,3);
+
+		// Component 0
+		_suNfc_multiply(v1, *s0, in->c[0]);
+		_suNfc_multiply(v2, *s1, in->c[1]);
+		_vector_add_f(tmp.c[0], v1, v2);
+
+		// Component 1
+		_suNfc_inverse_multiply(v1, *s1, in->c[0]);
+		_suNfc_multiply(v2, *s0, in->c[1]);
+		_vector_sub_f(tmp.c[1], v1, v2);
+
+		// Component 2
+		_suNfc_multiply(v1, *s2, in->c[2]);
+		_suNfc_multiply(v2, *s3, in->c[3]);
+		_vector_add_f(tmp.c[2], v1, v2);
+
+		// Component 3
+		_suNfc_inverse_multiply(v1, *s3, in->c[2]);
+		_suNfc_multiply(v2, *s2, in->c[3]);
+		_vector_sub_f(tmp.c[3], v1, v2);
+
+		// Add mass
+		_spinor_mul_add_assign_f(tmp, mass, *in);
+
+		// Store
+		if(assign)
+		{
+			_spinor_add_assign_f(*out, tmp);
+		}
+		else
+		{
+			*out = tmp;
+		}
+	}
+}
+
+static void Cphi_inv_(double mass, spinor_field *dptr, spinor_field *sptr, int assign)
+{
+	int N = 2*NF;
+	mass = (4.+mass);
+
+	// Update LDL decomposition
+	compute_ldl_decomp(mass);
+
+	// Loop over local sites
+	_MASTER_FOR(dptr->type,ix)
+	{
+		complex *up, *dn, *x, c;
+		suNf_spinor *out, *in, tmp;
+		int n;
+
+		// Field pointers
+		up = _FIELD_AT(cl_ldl,ix)->up;
+		dn = _FIELD_AT(cl_ldl,ix)->dn;
+		out = _FIELD_AT(dptr,ix);
+		in = _FIELD_AT(sptr,ix);
+
+		// tmp = in
+		tmp = *in;
+		x = (complex*)&tmp;
+
+		// Forward substitution
+		for(int i = 0; i < N; i++)
+		{
+			for(int k = 0; k < i; k++)
+			{
+				n = i*(i+1)/2+k;
+				_complex_mul_sub_assign(x[i], up[n], x[k]);
+				_complex_mul_sub_assign(x[i+N], dn[n], x[k+N]);
+			}
+		}
+
+		// Backward substitution
+		for(int i = N-1; i >= 0; i--)
+		{
+			n = i*(i+1)/2+i;
+			_complex_mulr(x[i], 1./up[n].re, x[i]);
+			_complex_mulr(x[i+N], 1./dn[n].re, x[i+N]);
+			for(int k = i+1; k < N; k++)
+			{
+				n = k*(k+1)/2+i;
+
+				c.re = up[n].re;
+				c.im = -up[n].im;
+				_complex_mul_sub_assign(x[i], c, x[k]);
+
+				c.re = dn[n].re;
+				c.im = -dn[n].im;
+				_complex_mul_sub_assign(x[i+N], c, x[k+N]);
+			}
+		}
+
+		// Store
+		if(assign)
+		{
+			_spinor_add_assign_f(*out, tmp);
+		}
+		else
+		{
+			*out = tmp;
+		}
+	}
+}
+
 void Cphi(double mass, spinor_field *dptr, spinor_field *sptr)
 {
 	apply_BCs_on_spinor_field(sptr);
@@ -889,3 +893,5 @@ void Cphi_diag_inv(double mass, spinor_field *dptr, spinor_field *sptr)
 	Cphi_inv_(mass, dptr, sptr, 0);
 	apply_BCs_on_spinor_field(dptr);
 }
+
+#endif //#ifdef WITH_CLOVER

@@ -169,10 +169,15 @@ if ($su2quat==0) {
 	write_suN();
     if ($complex eq "R") {
 	    write_suNr();
+		print "typedef $rdataname ${rdataname}_FMAT;\n\n";
+		print "typedef ${rdataname}_flt ${rdataname}_FMAT_flt;\n\n";
     } else {
 		print "typedef $dataname ${dataname}c;\n\n";
 		print "typedef ${dataname}_flt ${dataname}c_flt;\n\n";
+		print "typedef $dataname ${dataname}_FMAT;\n\n";
+		print "typedef ${dataname}_flt ${dataname}_FMAT_flt;\n\n";
 	}
+	
 } else {
     write_su2($su2quat);
     my ($ldn,$lrdn)=($dataname,$rdataname);
@@ -263,7 +268,9 @@ if ($su2quat==0) {
 	write_su2_zero();
  
     my ($ldn,$lrdn)=($dataname,$rdataname);
-    $dataname="${dataname}c";
+  	if ($complex eq "C") {
+    	$dataname="${dataname}c";
+  	}
     write_suN_multiply();
     write_suN_inverse_multiply();
 	write_suN_zero();

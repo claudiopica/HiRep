@@ -7,6 +7,6 @@ NP_T = 2
 NP_X = 2
 NP_Y = 2
 NP_Z = 2
-level = 1
-seed = 12345
+rlx_level = 1
+rlx_seed = 12345
 

@@ -13,6 +13,8 @@
 #include <stdio.h>
 #include <math.h>
 
+#ifndef WITH_QUATERNIONS
+
 static void force_scalar_s(double dt, void *vpar)
 {
 	force_scalar_par *par = (force_scalar_par*)vpar;
@@ -90,3 +92,5 @@ void force_scalar(double dt, void* par)
 	force_scalar_s(dt, par);
 	force_scalar_g(dt, par);
 }
+
+#endif //WITH_QUATERNIONS
