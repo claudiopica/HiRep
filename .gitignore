@@ -1,0 +1,16 @@
+#Auto-generated files
+Include/.autoheaders.h
+Include/macro_opt.h
+Include/suN.h
+Include/suN_types.h
+Include/suN_repr_func.h
+Make/Utils/autosun/writeREPR
+LibHR/Update/approx_data.db
+LibHR/Utils/suN_exp.c
+
+#object, dependences, library and info files
+*.o
+*.d
+*.a
+**/cinfo.c
+
