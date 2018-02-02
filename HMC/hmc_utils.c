@@ -53,6 +53,42 @@ static double beta()
 	return beta;
 }
 
+static double scalar_mass()
+{
+	double mass = 0;
+	for(int i = 0; i < num_mon(); i++)
+	{
+		const monomial *m = mon_n(i);
+		void *mpar = m->data.par;
+		switch(m->data.type)
+		{
+			case Scalar:
+				mass = ((mon_scalar_par*)mpar)->mass;
+				break;
+			default:
+				break;
+		}
+	}
+	return mass;
+}
+static double scalar_lambda()
+{
+	double l = 0;
+	for(int i = 0; i < num_mon(); i++)
+	{
+		const monomial *m = mon_n(i);
+		void *mpar = m->data.par;
+		switch(m->data.type)
+		{
+			case Scalar:
+				l = ((mon_scalar_par*)mpar)->lambda;
+				break;
+			default:
+				break;
+		}
+	}
+	return l;
+}
 static double mass()
 {
 	double mass = 1./0.;
@@ -267,19 +303,13 @@ int init_mc(hmc_flow *rf, char *ifile) {
 
   /* alloc global gauge fields */
   u_gauge=alloc_gfield(&glattice);
-
 #ifdef ALLOCATE_REPR_GAUGE_FIELD
   u_gauge_f=alloc_gfield_f(&glattice);
 #endif
 
   u_gauge_f_flt=alloc_gfield_f_flt(&glattice);
-
 #ifdef WITH_CLOVER
 	clover_init(hmc_var.hmc_p.csw);
-#endif
-
-#ifdef WITH_SMEARING
-	init_smearing(hmc_var.hmc_p.rho_s, hmc_var.hmc_p.rho_t);
 #endif
 
   /* Read the action and initialize fields */
@@ -322,36 +352,36 @@ int init_mc(hmc_flow *rf, char *ifile) {
 
   /* init gauge field */
   switch(start_t) {
-  case 0:
-    read_gauge_field(add_dirname(rf->conf_dir,rf->g_start));
-    if(u_scalar) {
-       char configname[256] = "scalar_";
-       strcat(configname, rf->g_start);
-       read_scalar_field(add_dirname(rf->conf_dir,configname));
-    }
-    break;
-  case 1:
-    unit_u(u_gauge);
-    if(u_scalar) {
-	    zero_s(u_scalar);
-    }
+	  case 0:
+		  read_gauge_field(add_dirname(rf->conf_dir,rf->g_start));
+		  if(u_scalar!=NULL){    
+			  char configname[256] = "scalar_";
+			  strcat(configname, rf->g_start);
+			  read_scalar_field(add_dirname(rf->conf_dir,configname));
+		  }   
+		  break;
+	  case 1:
+		  unit_u(u_gauge);
+		  if(u_scalar!=NULL){
+			  zero_s(u_scalar);
+		  }
 #ifndef ALLOCATE_REPR_GAUGE_FIELD
-    complete_gf_sendrecv(u_gauge); /*Apply boundary conditions already here for fundamental fermions*/
-    u_gauge_f=(suNf_field *)((void*)u_gauge);
-    apply_BCs_on_represented_gauge_field(); 
+		  complete_gf_sendrecv(u_gauge); /*Apply boundary conditions already here for fundamental fermions*/
+		  u_gauge_f=(suNf_field *)((void*)u_gauge);
+		  apply_BCs_on_represented_gauge_field(); 
 #endif
-    break;
-  case 2:
-    random_u(u_gauge);
-    if(u_scalar) {
-	    random_s(u_scalar);
-    }
+		  break;
+	  case 2:
+		  random_u(u_gauge);
+		  if(u_scalar!=NULL){
+			  zero_s(u_scalar);
+		  }
 #ifndef ALLOCATE_REPR_GAUGE_FIELD
-    complete_gf_sendrecv(u_gauge); /*Apply boundary conditions already here for fundamental fermions*/
-    u_gauge_f=(suNf_field *)((void*)u_gauge);
-    apply_BCs_on_represented_gauge_field(); 
+		  complete_gf_sendrecv(u_gauge); /*Apply boundary conditions already here for fundamental fermions*/
+		  u_gauge_f=(suNf_field *)((void*)u_gauge);
+		  apply_BCs_on_represented_gauge_field(); 
 #endif
-    break;
+		  break;
   }
   
   apply_BCs_on_fundamental_gauge_field(); 

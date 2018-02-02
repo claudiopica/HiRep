@@ -286,11 +286,14 @@ int main(int argc,char *argv[]) {
       }
       /* Only save state if we have a file to save to */
       if(rlx_var.rlxd_state[0]!='\0') {
-          lprintf("MAIN",0,"Saving rlxd state to file %s\n",rlx_var.rlxd_state);
-          write_ranlxd_state(rlx_var.rlxd_state);
+	      lprintf("MAIN",0,"Saving rlxd state to file %s\n",rlx_var.rlxd_state);
+	      write_ranlxd_state(rlx_var.rlxd_state);
       }
     }
-    
+
+
+
+
 #ifdef MEASURE_FORCE
     lprintf("FORCE_SUMMARY",0,"%d ave Gauge: %1.6f, Fermion: %1.6f",i,force_ave[0],force_ave[1]);
     for (int k=2;k<num_mon();++k){
@@ -311,16 +314,45 @@ int main(int argc,char *argv[]) {
 
     if((i%flow.meas_freq)==0) {
       /* plaquette */
-#ifdef WITH_SMEARING
-		 lprintf("MAIN",0,"Plaquette: %1.8e, Smeared: %1.8e\n",avr_plaquette(),avr_smeared_plaquette());
-#else
-		 lprintf("MAIN",0,"Plaquette: %1.8e\n",avr_plaquette());
-#endif
+      lprintf("MAIN",0,"Plaquette: %1.8e\n",avr_plaquette());
 
       /* Mesons */
       if(strcmp(mes_var.make,"true")==0) {
 			measure_spectrum_semwall(1,&mes_var.mesmass,mes_var.nhits,i,mes_var.precision);
+			if(u_scalar!=NULL){   
+				measure_fs_pt(&mes_var.mesmass, mes_var.precision);
+			}
       }
+
+    /* Scalar measurements */
+    if(u_scalar!=NULL){   
+	    suNg_vector Sc;
+
+	    /*measure scalar condensate*/
+	    double S_cond = 0;
+	    double S_sq = 0;
+	    _MASTER_FOR_SUM(&glattice,ix,S_cond){
+		    Sc = *pu_scalar(ix);
+		    _vector_prod_re_g(S_sq,Sc,Sc);
+		    S_cond += S_sq;
+	    }
+	    global_sum(&S_cond,1);
+	    lprintf("MAIN",0,"Scalar condensate = %f\n",S_cond/(double)GLB_VOLUME);
+	    measure_SUS(0);
+
+
+	    /*measure average  scalar FOR  SU(NG) VECTOR SCALAR*/
+	    suNg_vector S_av;
+	    _vector_zero_g(S_av);
+	    _MASTER_FOR(&glattice,ix){
+		    Sc = *pu_scalar(ix);
+		    _vector_add_assign_g(S_av,Sc);
+	    }
+	    global_sum((double*)&S_av,sizeof(S_av)/sizeof(double));
+	    for(int cont=0; cont<NG; cont++){
+	    	lprintf("MAIN",0,"Average scalar[%d] = %f %f \n", cont, S_av.c[cont].re/(double)GLB_VOLUME, S_av.c[cont].im/(double)GLB_VOLUME);
+	    }
+    }
 
       /* Four fermion observables */
       if(four_fermion_active==1) ff_observables();
