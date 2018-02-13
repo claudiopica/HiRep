@@ -27,7 +27,7 @@ void scalar_add_local_action(const struct _monomial *m, scalar_field *loc_action
 {
 	mon_scalar_par *par = (mon_scalar_par*)m->data.par;
 	double Msq = par->mass;
-	Msq = Msq*Msq + 8.0;
+	Msq = Msq + 8.0;
 	double lambda = par->lambda;
 
 	_MASTER_FOR(&glattice,ix)

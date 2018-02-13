@@ -44,7 +44,7 @@ static void force_scalar_s(double dt, void *vpar)
 		double S2;
 		double Msq = par->mass;
 		double lambda = par->lambda;
-		Msq = Msq*Msq + 8.0;
+		Msq = Msq + 8.0;
 
 		suNg_vector S = *pu_scalar(ix);
 		suNg_vector SStar;

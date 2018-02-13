@@ -687,12 +687,12 @@ void write_scalar_field(char filename[])
   
   if(PID==0){
     int d[5]={NG,GLB_T,GLB_X,GLB_Y,GLB_Z};
-    error((fp=fopen(filename,"wb"))==NULL,1,"write_gauge_field",
+    error((fp=fopen(filename,"wb"))==NULL,1,"write_scalar_field",
 	  "Failed to open file for writing");
     /* write NG and global size */
-    error(fwrite_LE_int(d,(size_t)(5),fp)!=(5),
-	  1,"write_gauge_field",
-	  "Failed to write gauge field geometry");
+    error(fwrite_BE_int(d,(size_t)(5),fp)!=(5),
+	  1,"write_scalar_field",
+	  "Failed to write scalar field geometry");
   }
   
 #ifdef WITH_MPI
@@ -783,8 +783,7 @@ void write_scalar_field(char filename[])
 	    
 	    /* write buffer to file */
 	    if (PID==0) {
-		// Little endian output CHANGE LATER
-	      error(fwrite_LE_double(buff,(size_t)(bsize),fp)!=(bsize),
+	      error(fwrite_BE_double(buff,(size_t)(bsize),fp)!=(bsize),
 		    1,"write_scalar_field",
 		    "Failed to write scalar field to file");
 	    }
@@ -834,7 +833,7 @@ void read_scalar_field(char filename[])
 		error((fp=fopen(filename,"rb"))==NULL,1,"read_scalar_field",
 				"Failed to open file for reading");
 		/* read NG and global size */
-		error(fread_LE_int(d,(size_t)(5),fp)!=(5),
+		error(fread_BE_int(d,(size_t)(5),fp)!=(5),
 				1,"read_scalar_field",
 				"Failed to read scalar field geometry");
 		/* Check Gauge group and Lattice dimesions */
@@ -876,7 +875,7 @@ void read_scalar_field(char filename[])
 #endif
 					/* read buffer from file */
 					if (PID==0) {
-						error(fread_LE_double(buff,(size_t)(bsize),fp)!=(bsize),
+						error(fread_BE_double(buff,(size_t)(bsize),fp)!=(bsize),
 								1,"read_scalar_field",
 								"Failed to read scalar field from file");
 					}

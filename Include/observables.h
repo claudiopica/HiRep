@@ -126,6 +126,12 @@ void measure_renormalization(spinor_field* psi_in, spinor_field* psi_out, int nm
 void print_renormalization(int conf, int nm, double* mass, char* label, int pt_in, int px_in, int py_in, int pz_in, int pt_out, int px_out, int py_out, int pz_out);
 
 void contract_baryons(spinor_field *psi0,int tau);
+void contract_fs(spinor_field *psi0,int tau);
+void measure_fs_pt(double* m, double precision);
+void measure_SUS(int tau);
+complex average_SUS();
+suNg_vector average_S();
+double average_SdagS();
 void measure_glueballs();
 
 void id_correlator(double *out, int t0, spinor_field *qp);

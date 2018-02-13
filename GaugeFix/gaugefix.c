@@ -60,6 +60,20 @@ static void gUgmu(suNg_field *gauge){
 }
 
 
+static void gS(suNg_scalar_field *scalar){
+	
+	suNg_vector v;
+	_MASTER_FOR(&glattice,ix)
+	{
+		_suNg_multiply(v,*_4FIELD_AT(g,ix,0),*_FIELD_AT(scalar,ix));
+		*_FIELD_AT(scalar,ix)=v;
+	}
+
+	start_sc_sendrecv(scalar);
+	complete_sc_sendrecv(scalar);
+
+}
+
 
 void random_gauge_transform(suNg_field *gauge){
 
@@ -283,6 +297,23 @@ double gaugefixstep(int fix_dir,double overrelax, suNg_field *fixed_gauge )
 	return gaugefix_action(fix_dir, fixed_gauge );
 } 
 
+
+double scalar_gaugefixstep(int fix_dir,double overrelax, suNg_field *fixed_gauge, suNg_scalar_field *fixed_scalar)
+{
+	int c, parity;
+	for(parity=0; parity<2; parity++){
+		//Loop over SU(2) subgroups
+		for(c=0; c< NG*(NG-1)/2; ++c){
+			unit_gauge(g);
+			su2_hit(fix_dir, parity, overrelax, fixed_gauge, c); //<-- Should Fix This Maybe?
+			gUgmu(fixed_gauge);
+			gS(fixed_scalar);
+		}
+	}
+	return gaugefix_action(fix_dir, fixed_gauge );
+} 
+
+
 double gaugefix(int fix_dir,double overrelax,int max_it,
 	      double fix_tol, suNg_field *fixed_gauge )
 {
@@ -317,3 +348,35 @@ double gaugefix(int fix_dir,double overrelax,int max_it,
 }
 
 
+double scalar_gaugefix(int fix_dir,double overrelax,int max_it,
+	      double fix_tol, suNg_field *fixed_gauge, suNg_scalar_field *fixed_scalar)
+{
+  lprintf("GAUGE FIXING",30,"Reunitarizing every %d steps.\n",REUNIT);
+  int it;
+  double new_act, old_act=0., diff_act;
+  init_g();
+  for (it=0; it < max_it; it++) {
+ 	//Do gauge fixing  
+    	new_act = scalar_gaugefixstep(fix_dir, overrelax, fixed_gauge, fixed_scalar); //returns new action
+	double p2 = calc_plaq(fixed_gauge);
+        lprintf("GAUGE FIXING",20,"Iteration %d action %1.12f plaq %1.6f\n",it, new_act, p2);
+
+	if(it != 0) {
+	  diff_act = new_act - old_act;
+	  if (fabs(diff_act) < fix_tol) break;		//Stop when the change in action is very small
+	}
+    	old_act = new_act;
+
+	// Reunitarize periodically
+	if((it % REUNIT) == (REUNIT - 1)){ reunit(fixed_gauge); }
+  }
+  // Reunitarize at the end
+  if((it % REUNIT) != 0){ reunit(fixed_gauge); }
+
+  start_gf_sendrecv(fixed_gauge);
+  complete_gf_sendrecv(fixed_gauge);
+
+  new_act = gaugefix_action(fix_dir, fixed_gauge);
+  free_g();
+  return new_act;
+}
