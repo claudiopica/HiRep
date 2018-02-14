@@ -33,7 +33,6 @@ static void scalar_prop_scalar(complex result[4][4], suNg_vector *S_src, suNg_ve
 	for(int mu=0; mu<4;mu++)
 		for(int nu=0; nu<4;nu++)
 		{
-//			_complex_0(result[mu][nu]);
 			for(int i=0;i<NF;i++)
 				for(int j=0;j<NF;j++)
 				{
@@ -113,72 +112,3 @@ void measure_fs_pt(double* m, double precision){
 	free_spinor_field_f(prop);
 }
 
-void measure_SUS(int tau){
-	complex SUS[GLB_T][4];
-	double SS[GLB_T];
-	memset(SUS, 0, sizeof(SUS));
-	memset(SS, 0, sizeof(SS));
-	suNg_vector *Sx, *Sup, UtimesSup;
-	complex SUSup;
-	double SStmp;
-	suNg *U;
-	for(int t = 0; t < T; t++)
-	{
-		int tc = (zerocoord[0] + t + GLB_T - tau) % GLB_T;
-		for(int x = 0; x < X; x++) for(int y = 0; y < Y; y++) for(int z = 0; z < Z; z++)
-		{
-			int ix = ipt(t, x, y, z);
-
-			Sx = _FIELD_AT(u_scalar,ix);
-			_vector_prod_re_g(SStmp, *Sx, *Sx);
-			SS[tc] += SStmp;
-
-			for(int mu = 0; mu < 4; mu++)
-			{
-				Sup = _FIELD_AT(u_scalar, iup(ix,mu));
-				U = _4FIELD_AT(u_gauge, ix, mu);
-				_suNg_multiply(UtimesSup, *U, *Sup);
-				_vector_prod_re_g(SUSup.re, *Sx, UtimesSup);
-				_vector_prod_im_g(SUSup.im, *Sx, UtimesSup);
-				_complex_add_assign(SUS[tc][mu], SUSup);
-			}
-		}
-	}
-	global_sum((double*)SUS,8*GLB_T);
-	global_sum((double*)SS,GLB_T);
-	for(int t = 0; t < GLB_T; t++)
-	{
-		int tc = (zerocoord[0] + t + GLB_T - tau) % GLB_T;
-		lprintf("Hi!",0,"SS[%d] = %f\n",tc, SS[tc]);
-	}
-	for(int t = 0; t < GLB_T; t++)
-	{
-		int tc = (zerocoord[0] + t + GLB_T - tau) % GLB_T;
-		for(int mu = 0; mu < 4; mu++)
-		{
-			lprintf("Hi!",0,"SUS[%d][%d] = %f %f\n",tc,mu, SUS[tc][mu].re, SUS[tc][mu].im);
-		}
-	}
-}
-/*void measure_SUS(){
-    double SUS = 0.0;
-    _MASTER_FOR_SUM(&glattice,ix,SUS)
-    {
-	    suNg_vector *Sx, *Sup, UtimesSup;
-	    double SUSup;
-	    suNg *U;
-
-	    Sx = _FIELD_AT(u_scalar,ix);
-
-	    for(int mu = 0; mu < 4; mu++)
-	    {
-		    Sup = _FIELD_AT(u_scalar, iup(ix,mu));
-		    U = _4FIELD_AT(u_gauge, ix, mu);
-		    _suNg_multiply(UtimesSup, *U, *Sup);
-		    _vector_prod_re_g(SUSup, *Sx, UtimesSup);
-		    SUS += 2.0*SUSup;
-	    }
-    }
-    global_sum(&SUS,1);
-    lprintf("Hi!",0,"SUS = %f\n",SUS/(double)GLB_VOLUME);
-}*/
