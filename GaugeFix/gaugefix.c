@@ -377,6 +377,6 @@ double scalar_gaugefix(int fix_dir,double overrelax,int max_it,
   complete_gf_sendrecv(fixed_gauge);
 
   new_act = gaugefix_action(fix_dir, fixed_gauge);
-  free_g();
+  free_gfield(g);
   return new_act;
 }
