@@ -67,6 +67,7 @@ void contract_fs(spinor_field* psi0, int tau){
 				{
 					int idx = beta + a*4;
 					_propagator_assign(Stmp, *_FIELD_AT(&psi0[idx],ix), a, beta);
+					lprintf("DEBUG SCALAR SPECTRUM",0, "%d %d %d %d %d %d %f %f %f %f %f %f %f %f \n", a, beta, t, x, y, z, Stmp.c[a].c[0].c[beta].c[a].re, Stmp.c[a].c[0].c[beta].c[a].im, Stmp.c[a].c[1].c[beta].c[a].re, Stmp.c[a].c[1].c[beta].c[a].im, Stmp.c[a].c[2].c[beta].c[a].re, Stmp.c[a].c[2].c[beta].c[a].im, Stmp.c[a].c[3].c[beta].c[a].re, Stmp.c[a].c[3].c[beta].c[a].im);
 				}
 			scalar_prop_scalar(corr_fs[tc], S_src, S_snk, &Stmp );
 		}
