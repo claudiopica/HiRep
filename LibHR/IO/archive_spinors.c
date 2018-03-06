@@ -50,16 +50,11 @@ void write_spinor_field(char filename[],spinor_field* sp)
   norm2=spinor_field_sqnorm_f(sp); /* to use as a checksum in the header */
   if(PID==0) {
     int d[6]={NG,NF,GLB_T,GLB_X,GLB_Y,GLB_Z};
-    error((fp=fopen(filename,"wb"))==NULL,1,"write_spinor_field",
-        "Failed to open file for writing");
+    error((fp=fopen(filename,"wb"))==NULL,-1,"write_spinor_field","Failed to open file for writing");
     /* write NG, NF and global size */
-    error(fwrite(d,(size_t) sizeof(int),(size_t)(6),fp)!=(6),
-        1,"write_spinor_field",
-        "Failed to write spinor field geometry");
+    error(fwrite(d,sizeof(int),6,fp)!=6,-1,"write_spinor_field","Failed to write spinor field geometry");
     /* write sq. norm */
-    error(fwrite(&norm2,(size_t) sizeof(double),(size_t)(1),fp)!=(1),
-        1,"write_spinor_field",
-        "Failed to write spinor field plaquette");
+    error(fwrite(&norm2,sizeof(double),1,fp)!=1,-1,"write_spinor_field","Failed to write spinor field plaquette");
   }
 
 #ifdef WITH_MPI
@@ -109,7 +104,7 @@ void write_spinor_field(char filename[],spinor_field* sp)
             /* send buffer */
             if (pid==PID) {
 #ifndef NDEBUG
-              error(Z!=(GLB_Z/NP_Z+((p[3]<rz)?1:0)),1,"write_spinor_field", "Local lattice size mismatch!");
+              error(Z!=(GLB_Z/NP_Z+((p[3]<rz)?1:0)),-1,"write_spinor_field", "Local lattice size mismatch!");
 #endif
               mpiret=MPI_Send(buff, bsize, MPI_DOUBLE, 0, 999, GLB_COMM);
 #ifndef NDEBUG
@@ -118,7 +113,7 @@ void write_spinor_field(char filename[],spinor_field* sp)
                 int mesglen;
                 MPI_Error_string(mpiret,mesg,&mesglen);
                 lprintf("MPI",0,"ERROR: %s\n",mesg);
-                error(1,1,"write_spinor_field " __FILE__,"Cannot send buffer");
+                error(1,-1,"write_spinor_field " __FILE__,"Cannot send buffer");
               }
 #endif
             }
@@ -138,7 +133,7 @@ void write_spinor_field(char filename[],spinor_field* sp)
                       st.MPI_TAG,
                       mesg);
                 }
-                error(1,1,"write_spinor_field " __FILE__,"Cannot receive buffer");
+                error(1,-1,"write_spinor_field " __FILE__,"Cannot receive buffer");
               }
 #endif
             }
@@ -147,9 +142,7 @@ void write_spinor_field(char filename[],spinor_field* sp)
 
           /* write buffer to file */
           if (PID==0) {
-            error(fwrite(buff,(size_t) sizeof(double),(size_t)(bsize),fp)!=(bsize),
-                1,"write_spinor_field",
-                "Failed to write spinor field to file");
+            error(fwrite(buff,sizeof(double),bsize,fp)!=bsize,-1,"write_spinor_field","Failed to write spinor field to file");
           }
 
         } /* end loop over processors in Z direction */
@@ -190,29 +183,24 @@ void read_spinor_field(char filename[], spinor_field *sp)
 
   if(PID==0) {
     int d[6]={0}; /* contains NG,NF,GLB_T,GLB_X,GLB_Y,GLB_Z */
-    error((fp=fopen(filename,"rb"))==NULL,1,"read_spinor_field",
-        "Failed to open file for reading");
+    error((fp=fopen(filename,"rb"))==NULL,-1,"read_spinor_field","Failed to open file for reading");
     /* read NG, NF and global size */
-    error(fread(d,(size_t) sizeof(int),(size_t)(6),fp)!=(6),
-        1,"read_spinor_field",
-        "Failed to read spinor field geometry");
+    error(fread(d,sizeof(int),6,fp)!=6,-1,"read_spinor_field","Failed to read spinor field geometry");
     /* Check Gauge group and Lattice dimesions */
     if (NG!=d[0]) {
       lprintf("ERROR",0,"Read value of NG [%d] do not match this code [NG=%d].\nPlease recompile.\n",d[0],NG);
-      error(1,1,"read_spinor_field " __FILE__,"Gauge group mismatch");
+      error(1,-1,"read_spinor_field " __FILE__,"Gauge group mismatch");
     }
     if (NF!=d[1]) {
       lprintf("ERROR",0,"Read value of NF [%d] do not match this code [NF=%d].\nPlease recompile.\n",d[1],NF);
-      error(1,1,"read_spinor_field " __FILE__,"Representation mismatch");
+      error(1,-1,"read_spinor_field " __FILE__,"Representation mismatch");
     }
     if (GLB_T!=d[2] ||GLB_X!=d[3] ||GLB_Y!=d[4] ||GLB_Z!=d[5]) {
       lprintf("ERROR",0,"Read value of global lattice size (%d,%d,%d,%d) do not match input file (%d,%d,%d,%d).\n",
           d[2],d[3],d[4],d[5],GLB_T,GLB_X,GLB_Y,GLB_Z);
-      error(1,1,"read_spinor_field " __FILE__,"Lattice mismatch");
+      error(1,-1,"read_spinor_field " __FILE__,"Lattice mismatch");
     }
-    error(fread(&norm2,(size_t) sizeof(double),(size_t)(1),fp)!=(1),
-        1,"read_spinor_field",
-        "Failed to read spinor field sq. norm");
+    error(fread(&norm2,sizeof(double),1,fp)!=1,-1,"read_spinor_field","Failed to read spinor field sq. norm");
   }
 
 #ifdef WITH_MPI
@@ -238,9 +226,7 @@ void read_spinor_field(char filename[], spinor_field *sp)
 #endif
           /* read buffer from file */
           if (PID==0) {
-            error(fread(buff,(size_t) sizeof(double),(size_t)(bsize),fp)!=(bsize),
-                1,"read_spinor_field",
-                "Failed to read spinor field from file");
+            error(fread(buff,sizeof(double),bsize,fp)!=bsize,-1,"read_spinor_field","Failed to read spinor field from file");
           }
 
 #ifdef WITH_MPI
@@ -255,14 +241,14 @@ void read_spinor_field(char filename[], spinor_field *sp)
                 int mesglen;
                 MPI_Error_string(mpiret,mesg,&mesglen);
                 lprintf("MPI",0,"ERROR: %s\n",mesg);
-                error(1,1,"read_spinor_field " __FILE__,"Cannot send buffer");
+                error(1,-1,"read_spinor_field " __FILE__,"Cannot send buffer");
               }
 #endif
             }
             /* receive buffer */
             if (PID==pid) {
 #ifndef NDEBUG
-              error(Z!=(GLB_Z/NP_Z+((p[3]<rz)?1:0)),1,"read_spinor_field", "Local lattice size mismatch!");
+              error(Z!=(GLB_Z/NP_Z+((p[3]<rz)?1:0)),-1,"read_spinor_field", "Local lattice size mismatch!");
 #endif
               mpiret=MPI_Recv(buff, bsize, MPI_DOUBLE, 0, 999, GLB_COMM, &st);
 #ifndef NDEBUG
@@ -278,7 +264,7 @@ void read_spinor_field(char filename[], spinor_field *sp)
                       st.MPI_TAG,
                       mesg);
                 }
-                error(1,1,"read_spinor_field " __FILE__,"Cannot receive buffer");
+                error(1,-1,"read_spinor_field " __FILE__,"Cannot receive buffer");
               }
 #endif
             }
@@ -317,7 +303,7 @@ void read_spinor_field(char filename[], spinor_field *sp)
   if (PID==0) {
     if (fabs(testnorm2-norm2)>1.e-14) {
       lprintf("ERROR",0,"Stored sq. norm value [%e] do not match the pseudofermion! [diff=%e]\n",norm2,fabs(testnorm2-norm2));
-      error(1,1,"read_spinor_field " __FILE__,"Sq. norm value mismatch");
+      error(1,-1,"read_spinor_field " __FILE__,"Sq. norm value mismatch");
     }
   }
 

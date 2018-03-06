@@ -91,16 +91,11 @@ void write_gauge_field_su2q(char filename[])
   plaq=avr_plaquette(); /* to use as a checksum in the header */
   if(PID==0) {
     int d[5]={NG,GLB_T,GLB_X,GLB_Y,GLB_Z};
-    error((fp=fopen(filename,"wb"))==NULL,1,"write_gauge_field_su2q",
-        "Failed to open file for writing");
+    error((fp=fopen(filename,"wb"))==NULL,-1,"write_gauge_field_su2q","Failed to open file for writing");
     /* write NG and global size */
-    error(fwrite_BE_int(d,(size_t)(5),fp)!=(5),
-        1,"write_gauge_field_su2q",
-        "Failed to write gauge field geometry");
+    error(fwrite_BE_int(d,5,fp)!=5,-1,"write_gauge_field_su2q","Failed to write gauge field geometry");
     /* write average plaquette */
-    error(fwrite_BE_double(&plaq,(size_t)(1),fp)!=(1),
-        1,"write_gauge_field_su2q",
-        "Failed to write gauge field plaquette");
+    error(fwrite_BE_double(&plaq,1,fp)!=1,-1,"write_gauge_field_su2q","Failed to write gauge field plaquette");
   }
 
 #ifdef WITH_MPI
@@ -166,7 +161,7 @@ void write_gauge_field_su2q(char filename[])
             /* send buffer */
             if (pid==PID) {
 #ifndef NDEBUG
-              error(Z!=(GLB_Z/NP_Z+((p[3]<rz)?1:0)),1,"write_gauge_field_su2q", "Local lattice size mismatch!");
+              error(Z!=(GLB_Z/NP_Z+((p[3]<rz)?1:0)),-1,"write_gauge_field_su2q", "Local lattice size mismatch!");
 #endif
               mpiret=MPI_Send(buff, bsize, MPI_DOUBLE, 0, 999, GLB_COMM);
 #ifndef NDEBUG
@@ -175,7 +170,7 @@ void write_gauge_field_su2q(char filename[])
                 int mesglen;
                 MPI_Error_string(mpiret,mesg,&mesglen);
                 lprintf("MPI",0,"ERROR: %s\n",mesg);
-                error(1,1,"write_gauge_field_su2q " __FILE__,"Cannot send buffer");
+                error(1,-1,"write_gauge_field_su2q " __FILE__,"Cannot send buffer");
               }
 #endif
             }
@@ -195,7 +190,7 @@ void write_gauge_field_su2q(char filename[])
                       st.MPI_TAG,
                       mesg);
                 }
-                error(1,1,"write_gauge_field_su2q " __FILE__,"Cannot receive buffer");
+                error(1,-1,"write_gauge_field_su2q " __FILE__,"Cannot receive buffer");
               }
 #endif
             }
@@ -204,9 +199,7 @@ void write_gauge_field_su2q(char filename[])
 
           /* write buffer to file */
           if (PID==0) {
-            error(fwrite_BE_double(buff,(size_t)(bsize),fp)!=(bsize),
-                1,"write_gauge_field_su2q",
-                "Failed to write gauge field to file");
+            error(fwrite_BE_double(buff,bsize,fp)!=bsize,-1,"write_gauge_field_su2q","Failed to write gauge field to file");
           }
 
         } /* end loop over processors in Z direction */
@@ -259,25 +252,20 @@ void read_gauge_field_su2q(char filename[])
 
   if(PID==0) {
     int d[5]={0}; /* contains NG,GLB_T,GLB_X,GLB_Y,GLB_Z */
-    error((fp=fopen(filename,"rb"))==NULL,1,"read_gauge_field_su2q",
-        "Failed to open file for reading");
+    error((fp=fopen(filename,"rb"))==NULL,-1,"read_gauge_field_su2q","Failed to open file for reading");
     /* read NG and global size */
-    error(fread_BE_int(d,(size_t)(5),fp)!=(5),
-        1,"read_gauge_field_su2q",
-        "Failed to read gauge field geometry");
+    error(fread_BE_int(d,5,fp)!=5,-1,"read_gauge_field_su2q","Failed to read gauge field geometry");
     /* Check Gauge group and Lattice dimesions */
     if (NG!=d[0]) {
       lprintf("ERROR",0,"Read value of NG [%d] do not match this code [NG=%d].\nPlease recompile.\n",d[0],NG);
-      error(1,1,"read_gauge_field_su2q " __FILE__,"Gauge group mismatch");
+      error(1,-1,"read_gauge_field_su2q " __FILE__,"Gauge group mismatch");
     }
     if (GLB_T!=d[1] ||GLB_X!=d[2] ||GLB_Y!=d[3] ||GLB_Z!=d[4]) {
       lprintf("ERROR",0,"Read value of global lattice size (%d,%d,%d,%d) do not match input file (%d,%d,%d,%d).\n",
           d[1],d[2],d[3],d[4],GLB_T,GLB_X,GLB_Y,GLB_Z);
-      error(1,1,"read_gauge_field_su2q " __FILE__,"Gauge group mismatch");
+      error(1,-1,"read_gauge_field_su2q " __FILE__,"Gauge group mismatch");
     }
-    error(fread_BE_double(&plaq,(size_t)(1),fp)!=(1),
-        1,"read_gauge_field_su2q",
-        "Failed to read gauge field plaquette");
+    error(fread_BE_double(&plaq,1,fp)!=1,-1,"read_gauge_field_su2q","Failed to read gauge field plaquette");
   }
 
 #ifdef WITH_MPI
@@ -306,9 +294,7 @@ void read_gauge_field_su2q(char filename[])
 #endif
           /* read buffer from file */
           if (PID==0) {
-            error(fread_BE_double(buff,(size_t)(bsize),fp)!=(bsize),
-                1,"read_gauge_field_su2q",
-                "Failed to read gauge field from file");
+            error(fread_BE_double(buff,bsize,fp)!=bsize,-1,"read_gauge_field_su2q","Failed to read gauge field from file");
           }
 
 #ifdef WITH_MPI
@@ -323,14 +309,14 @@ void read_gauge_field_su2q(char filename[])
                 int mesglen;
                 MPI_Error_string(mpiret,mesg,&mesglen);
                 lprintf("MPI",0,"ERROR: %s\n",mesg);
-                error(1,1,"read_gauge_field_su2q " __FILE__,"Cannot send buffer");
+                error(1,-1,"read_gauge_field_su2q " __FILE__,"Cannot send buffer");
               }
 #endif
             }
             /* receive buffer */
             if (PID==pid) {
 #ifndef NDEBUG
-              error(Z!=(GLB_Z/NP_Z+((p[3]<rz)?1:0)),1,"read_gauge_field", "Local lattice size mismatch!");
+              error(Z!=(GLB_Z/NP_Z+((p[3]<rz)?1:0)),-1,"read_gauge_field", "Local lattice size mismatch!");
 #endif
               mpiret=MPI_Recv(buff, bsize, MPI_DOUBLE, 0, 999, GLB_COMM, &st);
 #ifndef NDEBUG
@@ -346,7 +332,7 @@ void read_gauge_field_su2q(char filename[])
                       st.MPI_TAG,
                       mesg);
                 }
-                error(1,1,"read_gauge_field_su2q " __FILE__,"Cannot receive buffer");
+                error(1,-1,"read_gauge_field_su2q " __FILE__,"Cannot receive buffer");
               }
 #endif
             }
@@ -403,7 +389,7 @@ void read_gauge_field_su2q(char filename[])
   if (PID==0) {
     if (fabs(testplaq-plaq)>1.e-12) {
       lprintf("ERROR",0,"Stored plaquette value [%e] do not match the configuration! [diff=%e]\n",plaq,fabs(testplaq-plaq));
-      error(1,1,"read_gauge_field_su2q " __FILE__,"Plaquette value mismatch");
+      error(1,-1,"read_gauge_field_su2q " __FILE__,"Plaquette value mismatch");
     }
   }
 
@@ -426,34 +412,27 @@ void read_gauge_field_su2(char filename[])
   if(PID==0) {
     int file_size;
     int d[5]={0}; /* contains NG,GLB_T,GLB_X,GLB_Y,GLB_Z */
-    error((fp=fopen(filename,"rb"))==NULL,1,"read_gauge_field_su2",
-	  "Failed to open file for reading");
+    error((fp=fopen(filename,"rb"))==NULL,-1,"read_gauge_field_su2","Failed to open file for reading");
     /* Get the file size */
     fseek(fp, 0, SEEK_END); 
     file_size = ftell(fp); 
     fseek(fp, 0, SEEK_SET); 
     /* read NG and global size */
-    error(fread_BE_int(d,(size_t)(5),fp)!=(5),
-        1,"read_gauge_field_su2",
-        "Failed to read gauge field geometry");
+    error(fread_BE_int(d,5,fp)!=5,-1,"read_gauge_field_su2","Failed to read gauge field geometry");
     /* Check Gauge group and Lattice dimesions */
     if (NG!=d[0]) {
       lprintf("ERROR",0,"Read value of NG [%d] do not match this code [NG=%d].\nPlease recompile.\n",d[0],NG);
-      error(1,1,"read_gauge_field_su2 " __FILE__,"Gauge group mismatch");
+      error(1,-1,"read_gauge_field_su2 " __FILE__,"Gauge group mismatch");
     }
     if (GLB_T!=d[1] ||GLB_X!=d[2] ||GLB_Y!=d[3] ||GLB_Z!=d[4]) {
       lprintf("ERROR",0,"Read value of global lattice size (%d,%d,%d,%d) do not match input file (%d,%d,%d,%d).\n",
           d[1],d[2],d[3],d[4],GLB_T,GLB_X,GLB_Y,GLB_Z);
-      error(1,1,"read_gauge_field_su2 " __FILE__,"Gauge group mismatch");
+      error(1,-1,"read_gauge_field_su2 " __FILE__,"Gauge group mismatch");
     }
-    error(fread_BE_double(&plaq,(size_t)(1),fp)!=(1),
-        1,"read_gauge_field_su2",
-        "Failed to read gauge field plaquette");
+    error(fread_BE_double(&plaq,1,fp)!=1,-1,"read_gauge_field_su2","Failed to read gauge field plaquette");
 
     double buff[8];
-    error(fread_BE_double(buff,8,fp)!=8,
-                1,"read_gauge_field_su2",
-                "Failed to read gauge field from file");
+    error(fread_BE_double(buff,8,fp)!=8,-1,"read_gauge_field_su2","Failed to read gauge field from file");
     
 
     int quaternion_buffer_size = 8*4*GLB_T*GLB_X*GLB_Y*GLB_Z*sizeof(double)+5*sizeof(int)+sizeof(double);
