@@ -44,30 +44,77 @@ static void scalar_prop_scalar(complex result[4][4], suNg_vector *S_src, suNg_ve
 }
 
 //Measures meson correlators made of 1 scalar and 1 fermion
+//void contract_fs(spinor_field* psi0, int tau){
+//	complex corr_fs[GLB_T][4][4];
+//	memset(corr_fs, 0, sizeof(corr_fs));
+//	suNf_propagator Stmp;
+//	suNg_vector *S_src = pu_scalar(ipt(tau,0,0,0)); //CHANGE LATER
+//	for(int t = 0; t < T; t++)
+//	{
+//		int tc = (zerocoord[0] + t + GLB_T - tau) % GLB_T;
+//	//	for(int i=0;i<4;i++){
+//	//		for(int j=0;j<4;j++){
+//	//			_complex_0(corr_fs[tc][i][j]);
+//	//		}
+//	//	}
+//
+//		for(int x = 0; x < X; x++) for(int y = 0; y < Y; y++) for(int z = 0; z < Z; z++)
+//		{
+//			int ix = ipt(t, x, y, z);
+//			suNg_vector *S_snk = pu_scalar(ix); //CHANGE LATER
+//			for(int a = 0; a < NF; ++a)
+//				for(int beta = 0; beta < 4; beta++)
+//				{
+//					int idx = beta + a*4;
+//					_propagator_assign(Stmp, *_FIELD_AT(&psi0[idx],ix), a, beta);
+//				//	lprintf("DEBUG SCALAR SPECTRUM",0, "%d %d %d %d %d %d %f %f %f %f %f %f %f %f \n", a, beta, t, x, y, z, Stmp.c[a].c[0].c[beta].c[a].re, Stmp.c[a].c[0].c[beta].c[a].im, Stmp.c[a].c[1].c[beta].c[a].re, Stmp.c[a].c[1].c[beta].c[a].im, Stmp.c[a].c[2].c[beta].c[a].re, Stmp.c[a].c[2].c[beta].c[a].im, Stmp.c[a].c[3].c[beta].c[a].re, Stmp.c[a].c[3].c[beta].c[a].im);
+//				}
+//			scalar_prop_scalar(corr_fs[tc], S_src, S_snk, &Stmp );
+//		}
+//	}
+//	global_sum((double*)corr_fs, 2*4*4*GLB_T);
+//	for(int t = 0; t < GLB_T; t++) for(int i = 0; i < 4; i++)
+//	{
+//
+//		lprintf("CORR_FS", 0, "%d %d %3.10e %3.10e  %3.10e %3.10e  %3.10e %3.10e  %3.10e %3.10e \n",
+//				t,i,
+//				corr_fs[t][i][0].re,
+//				corr_fs[t][i][0].im,
+//				corr_fs[t][i][1].re,
+//				corr_fs[t][i][1].im,
+//				corr_fs[t][i][2].re,
+//				corr_fs[t][i][2].im,
+//				corr_fs[t][i][3].re,
+//				corr_fs[t][i][3].im
+//		       );
+//	}
+//}
+
 void contract_fs(spinor_field* psi0, int tau){
 	complex corr_fs[GLB_T][4][4];
 	memset(corr_fs, 0, sizeof(corr_fs));
 	suNf_propagator Stmp;
-	suNg_vector *S_src = pu_scalar(ipt(tau,0,0,0)); //CHANGE LATER
+	suNg_vector *S_src;
+	// this only works for tau=0! 
+  	suNg_vector S_zero=*pu_scalar(ipt(0,0,0,0));
+        tau=0;
+        //broadcast from mpi process 0
+        bcast((double *) &S_zero, sizeof(S_zero)/sizeof(double)); 
+ 	S_src=&S_zero;        
+
 	for(int t = 0; t < T; t++)
 	{
 		int tc = (zerocoord[0] + t + GLB_T - tau) % GLB_T;
-	//	for(int i=0;i<4;i++){
-	//		for(int j=0;j<4;j++){
-	//			_complex_0(corr_fs[tc][i][j]);
-	//		}
-	//	}
 
 		for(int x = 0; x < X; x++) for(int y = 0; y < Y; y++) for(int z = 0; z < Z; z++)
 		{
 			int ix = ipt(t, x, y, z);
-			suNg_vector *S_snk = pu_scalar(ix); //CHANGE LATER
+			suNg_vector *S_snk = pu_scalar(ix); 
 			for(int a = 0; a < NF; ++a)
 				for(int beta = 0; beta < 4; beta++)
 				{
 					int idx = beta + a*4;
 					_propagator_assign(Stmp, *_FIELD_AT(&psi0[idx],ix), a, beta);
-					lprintf("DEBUG SCALAR SPECTRUM",0, "%d %d %d %d %d %d %f %f %f %f %f %f %f %f \n", a, beta, t, x, y, z, Stmp.c[a].c[0].c[beta].c[a].re, Stmp.c[a].c[0].c[beta].c[a].im, Stmp.c[a].c[1].c[beta].c[a].re, Stmp.c[a].c[1].c[beta].c[a].im, Stmp.c[a].c[2].c[beta].c[a].re, Stmp.c[a].c[2].c[beta].c[a].im, Stmp.c[a].c[3].c[beta].c[a].re, Stmp.c[a].c[3].c[beta].c[a].im);
 				}
 			scalar_prop_scalar(corr_fs[tc], S_src, S_snk, &Stmp );
 		}
