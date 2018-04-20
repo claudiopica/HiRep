@@ -197,7 +197,7 @@ _PIECE_FOR(out->type,ixp) {
 
        int iy;
        suNf *up,*um;
-       suNf_vector psi,chi;
+       suNf_vector psi,chi, psi2, chi2;
        suNf_spinor *r, *sp, *sm;
 #if defined(BC_T_THETA) || defined(BC_X_THETA) || defined(BC_Y_THETA) || defined(BC_Z_THETA)
        suNf_vector vtmp;
@@ -212,16 +212,14 @@ _PIECE_FOR(out->type,ixp) {
        up=pu_gauge_f(ix,0);
       
        _vector_add_f(psi,(*sp).c[0],(*sp).c[2]);
+       _vector_add_f(psi2,(*sp).c[1],(*sp).c[3]);
        _suNf_theta_T_multiply(chi,(*up),psi);
-      
+       _suNf_theta_T_multiply(chi2,(*up),psi2);
+         
        (*r).c[0]=chi;
        (*r).c[2]=chi;
-
-       _vector_add_f(psi,(*sp).c[1],(*sp).c[3]);
-       _suNf_theta_T_multiply(chi,(*up),psi);
-         
-       (*r).c[1]=chi;
-       (*r).c[3]=chi;
+       (*r).c[1]=chi2;
+       (*r).c[3]=chi2;
 
        /******************************* direction -0 *********************************/
 
@@ -230,16 +228,14 @@ _PIECE_FOR(out->type,ixp) {
        um=pu_gauge_f(iy,0);
       
        _vector_sub_f(psi,(*sm).c[0],(*sm).c[2]);
+       _vector_sub_f(psi2,(*sm).c[1],(*sm).c[3]);
        _suNf_theta_T_inverse_multiply(chi,(*um),psi);
+       _suNf_theta_T_inverse_multiply(chi2,(*um),psi2);
          
        _vector_add_assign_f((*r).c[0],chi);
        _vector_sub_assign_f((*r).c[2],chi);
-
-       _vector_sub_f(psi,(*sm).c[1],(*sm).c[3]);
-       _suNf_theta_T_inverse_multiply(chi,(*um),psi);
-         
-       _vector_add_assign_f((*r).c[1],chi);
-       _vector_sub_assign_f((*r).c[3],chi);
+       _vector_add_assign_f((*r).c[1],chi2);
+       _vector_sub_assign_f((*r).c[3],chi2);
 
        /******************************* direction +1 *********************************/
 
@@ -248,16 +244,14 @@ _PIECE_FOR(out->type,ixp) {
        up=pu_gauge_f(ix,1);
       
        _vector_i_add_f(psi,(*sp).c[0],(*sp).c[3]);
+       _vector_i_add_f(psi2,(*sp).c[1],(*sp).c[2]);
        _suNf_theta_X_multiply(chi,(*up),psi);
+       _suNf_theta_X_multiply(chi2,(*up),psi2);
          
        _vector_add_assign_f((*r).c[0],chi);
        _vector_i_sub_assign_f((*r).c[3],chi);
-
-       _vector_i_add_f(psi,(*sp).c[1],(*sp).c[2]);
-       _suNf_theta_X_multiply(chi,(*up),psi);
-         
-       _vector_add_assign_f((*r).c[1],chi);
-       _vector_i_sub_assign_f((*r).c[2],chi);
+       _vector_add_assign_f((*r).c[1],chi2);
+       _vector_i_sub_assign_f((*r).c[2],chi2);
 
        /******************************* direction -1 *********************************/
 
@@ -266,16 +260,14 @@ _PIECE_FOR(out->type,ixp) {
        um=pu_gauge_f(iy,1);
       
        _vector_i_sub_f(psi,(*sm).c[0],(*sm).c[3]);
+       _vector_i_sub_f(psi2,(*sm).c[1],(*sm).c[2]);
        _suNf_theta_X_inverse_multiply(chi,(*um),psi);
+       _suNf_theta_X_inverse_multiply(chi2,(*um),psi2);
          
        _vector_add_assign_f((*r).c[0],chi);
        _vector_i_add_assign_f((*r).c[3],chi);
-
-       _vector_i_sub_f(psi,(*sm).c[1],(*sm).c[2]);
-       _suNf_theta_X_inverse_multiply(chi,(*um),psi);
-         
-       _vector_add_assign_f((*r).c[1],chi);
-       _vector_i_add_assign_f((*r).c[2],chi);
+       _vector_add_assign_f((*r).c[1],chi2);
+       _vector_i_add_assign_f((*r).c[2],chi2);
 
        /******************************* direction +2 *********************************/
 
@@ -284,16 +276,14 @@ _PIECE_FOR(out->type,ixp) {
        up=pu_gauge_f(ix,2);
       
        _vector_add_f(psi,(*sp).c[0],(*sp).c[3]);
+       _vector_sub_f(psi2,(*sp).c[1],(*sp).c[2]);
        _suNf_theta_Y_multiply(chi,(*up),psi);
-         
+       _suNf_theta_Y_multiply(chi2,(*up),psi2);
+      
        _vector_add_assign_f((*r).c[0],chi);
        _vector_add_assign_f((*r).c[3],chi);
-
-       _vector_sub_f(psi,(*sp).c[1],(*sp).c[2]);
-       _suNf_theta_Y_multiply(chi,(*up),psi);
-      
-       _vector_add_assign_f((*r).c[1],chi);
-       _vector_sub_assign_f((*r).c[2],chi);
+       _vector_add_assign_f((*r).c[1],chi2);
+       _vector_sub_assign_f((*r).c[2],chi2);
 
        /******************************* direction -2 *********************************/
 
@@ -302,16 +292,14 @@ _PIECE_FOR(out->type,ixp) {
        um=pu_gauge_f(iy,2);
       
        _vector_sub_f(psi,(*sm).c[0],(*sm).c[3]);
+       _vector_add_f(psi2,(*sm).c[1],(*sm).c[2]);
        _suNf_theta_Y_inverse_multiply(chi,(*um),psi);
+       _suNf_theta_Y_inverse_multiply(chi2,(*um),psi2);
 
        _vector_add_assign_f((*r).c[0],chi);
        _vector_sub_assign_f((*r).c[3],chi);
-
-       _vector_add_f(psi,(*sm).c[1],(*sm).c[2]);
-       _suNf_theta_Y_inverse_multiply(chi,(*um),psi);
-
-       _vector_add_assign_f((*r).c[1],chi);
-       _vector_add_assign_f((*r).c[2],chi);
+       _vector_add_assign_f((*r).c[1],chi2);
+       _vector_add_assign_f((*r).c[2],chi2);
 
        /******************************* direction +3 *********************************/
 
@@ -320,16 +308,14 @@ _PIECE_FOR(out->type,ixp) {
        up=pu_gauge_f(ix,3);
       
        _vector_i_add_f(psi,(*sp).c[0],(*sp).c[2]);
+       _vector_i_sub_f(psi2,(*sp).c[1],(*sp).c[3]);
        _suNf_theta_Z_multiply(chi,(*up),psi);
+       _suNf_theta_Z_multiply(chi2,(*up),psi2);
 
        _vector_add_assign_f((*r).c[0],chi);
        _vector_i_sub_assign_f((*r).c[2],chi);
-
-       _vector_i_sub_f(psi,(*sp).c[1],(*sp).c[3]);
-       _suNf_theta_Z_multiply(chi,(*up),psi);
-
-       _vector_add_assign_f((*r).c[1],chi);
-       _vector_i_add_assign_f((*r).c[3],chi);
+       _vector_add_assign_f((*r).c[1],chi2);
+       _vector_i_add_assign_f((*r).c[3],chi2);
 
        /******************************* direction -3 *********************************/
 
@@ -338,16 +324,14 @@ _PIECE_FOR(out->type,ixp) {
        um=pu_gauge_f(iy,3);
       
        _vector_i_sub_f(psi,(*sm).c[0],(*sm).c[2]);
+       _vector_i_add_f(psi2,(*sm).c[1],(*sm).c[3]);
        _suNf_theta_Z_inverse_multiply(chi,(*um),psi);
+       _suNf_theta_Z_inverse_multiply(chi2,(*um),psi2);
 
        _vector_add_assign_f((*r).c[0],chi);
        _vector_i_add_assign_f((*r).c[2],chi);
-
-       _vector_i_add_f(psi,(*sm).c[1],(*sm).c[3]);
-       _suNf_theta_Z_inverse_multiply(chi,(*um),psi);
-
-       _vector_add_assign_f((*r).c[1],chi);
-       _vector_i_sub_assign_f((*r).c[3],chi);
+       _vector_add_assign_f((*r).c[1],chi2);
+       _vector_i_sub_assign_f((*r).c[3],chi2);
       
        /******************************** end of loop *********************************/
 
