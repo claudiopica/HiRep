@@ -318,9 +318,9 @@ int geometry_init() {
   T_EXT=T+2*T_BORDER;
   
   lprintf("GEOMETRY",0,"Global size is %dx%dx%dx%d\n",GLB_T,GLB_X,GLB_Y,GLB_Z);
-  lprintf("GEOMETRY",0,"Proc grid is %dx%dx%dx%d\n",NP_T,NP_X,NP_Y,NP_Z);
   lprintf("GEOMETRY",0,"Local size is %dx%dx%dx%d\n",T,X,Y,Z);
   lprintf("GEOMETRY",0,"Extended local size is %dx%dx%dx%d\n",T_EXT,X_EXT,Y_EXT,Z_EXT);
+  lprintf("GEOMETRY",0,"The lattice borders are (%d,%d,%d,%d)\n",T_BORDER,X_BORDER,Y_BORDER,Z_BORDER);
   
   check_geometry_variables();
   

@@ -181,9 +181,6 @@ clean:: $(patsubst %,clean-%,$(SUBDIRS))
 cleanall::
 	CEXE="all" $(MAKE) clean
 
-cinfo.c: $(MKDIR)/MkFlags $(MKDIR)/MkRules $(MKDIR)/Utils/cinfo.sh
-	$(MKDIR)/Utils/cinfo.sh $(MKDIR) $(TOPDIR) $(MACRO)
-
 LDFLAGS += $(foreach _lib, $(LIBS),-L$(dir $(_lib)))
 LDFLAGS += $(foreach _lib, $(LIBS),-l$(patsubst lib%.a,%,$(notdir $(_lib))))
 LDFLAGS += -lm

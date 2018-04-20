@@ -39,7 +39,11 @@ printf("[%d] " #c " = %e\n",cgiter,c)
 
 static double spinor_field_g5_prod_re_f_f2d(spinor_field_flt *s1, spinor_field_flt *s2)
 {
-  double res=0.;
+   static double res;
+    _OMP_PRAGMA ( single )
+    { 
+      res = 0.;
+    }
   
   _TWO_SPINORS_FOR_SUM(s1,s2,res) {
     float prod;
@@ -54,7 +58,11 @@ static double spinor_field_g5_prod_re_f_f2d(spinor_field_flt *s1, spinor_field_f
 
 static double spinor_field_sqnorm_f_f2d(spinor_field_flt *s1)
 {
-  double res=0.;
+   static double res;
+    _OMP_PRAGMA ( single )
+    { 
+      res = 0.;
+    }
   
   _ONE_SPINOR_FOR_SUM(s1,res) {
     float prod;

@@ -178,21 +178,27 @@ void Dphi_(spinor_field *out, spinor_field *in)
  
 /************************ loop over all lattice sites *************************/
    /* start communication of input spinor field */
-   start_sf_sendrecv(in);
-
-  _PIECE_FOR(out->type,ixp) {
+_OMP_PRAGMA( master )
+{
+  start_sf_sendrecv(in);
+}
+_PIECE_FOR(out->type,ixp) {
+#ifdef WITH_MPI
      if(ixp==out->type->inner_master_pieces) {
-       _OMP_PRAGMA( master )
        /* wait for spinor to be transfered */
-       complete_sf_sendrecv(in);
+       _OMP_PRAGMA( master )
+       {
+	 complete_sf_sendrecv(in);
+       }
        _OMP_PRAGMA( barrier )
-     }
+}
+#endif
      _SITE_FOR(out->type,ixp,ix) {
 
        int iy;
        suNf *up,*um;
        suNf_vector psi,chi;
-       suNf_spinor *r=0,*sp,*sm;
+       suNf_spinor *r, *sp, *sm;
 #if defined(BC_T_THETA) || defined(BC_X_THETA) || defined(BC_Y_THETA) || defined(BC_Z_THETA)
        suNf_vector vtmp;
 #endif

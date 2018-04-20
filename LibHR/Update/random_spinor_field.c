@@ -17,7 +17,10 @@ void gaussian_spinor_field(spinor_field *s) {
 	geometry_descriptor *type = s->type;
 	for(i=0;i<type->local_master_pieces;i++)
  	  gauss((double*)(s->ptr+(type->master_start[i]-type->master_shift)),(type->master_end[i]-type->master_start[i]+1)*sizeof(suNf_spinor)/sizeof(double));
-	spinor_field_mul_f(s,c1,s);
+#pragma omp parallel 
+	{ 
+	  spinor_field_mul_f(s,c1,s);
+	}
 	apply_BCs_on_spinor_field(s);
 }
 

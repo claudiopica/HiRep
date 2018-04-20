@@ -61,35 +61,24 @@ echo "\";" >> ${FILENAME}
 echo "" >> ${FILENAME}
 rm cinfo.tmp
 
-svn --version >&- ; ret=$?
-if [ "${ret}" -eq "0" ] ; then
-  svn info ${TOPDIR} | awk '{printf "%s\\n",$0}' > cinfo.tmp
-  len=`cat cinfo.tmp | wc -c`+1
-  echo -n "static char CI_svninfo[${len}] = \"" >> ${FILENAME}
-  cat cinfo.tmp >> ${FILENAME}
-  echo "\";" >> ${FILENAME}
-  echo "" >> ${FILENAME}
-  rm cinfo.tmp
-
-  svn st -q ${TOPDIR} | awk '{printf "%s\\n",$0}' > cinfo.tmp
-  len=`cat cinfo.tmp | wc -c`+1
-  echo -n "static char CI_svnstatus[${len}] = \"" >> ${FILENAME}
-  cat cinfo.tmp >> ${FILENAME}
-  echo "\";" >> ${FILENAME}
-  echo "" >> ${FILENAME}
-  rm cinfo.tmp
+if [ -x "`command -v git`" ]
+    then
+    ${MKDIR}/Utils/git-info.sh | awk '{printf "%s\\n",$0}' |  sed 's/"/\\"/g' > cinfo.tmp
+    len=`cat cinfo.tmp | wc -c`+1
+    echo -n "static char CI_gitinfo[${len}] = \"" >> ${FILENAME}
+    cat cinfo.tmp >> ${FILENAME}
+    echo "\";" >> ${FILENAME}
+    echo "" >> ${FILENAME}
+    rm cinfo.tmp
+    
+    len=`git log --format="%H" -n 1|wc -c`+1
+    echo "static char CI_gitrevision[${len}] = \"" `git log --format="%H" -n 1` "\";" >>${FILENAME}
+    echo "" >> ${FILENAME}
 else
-  echo -n "static char CI_svninfo[1] = \"\";" >> ${FILENAME}
-  echo "" >> ${FILENAME}
-  echo -n "static char CI_svnstatus[1] = \"\";" >> ${FILENAME}
-  echo "" >> ${FILENAME}
+    echo -n "static char CI_gitinfo[1] = \"\";" >> ${FILENAME}
+    echo "" >> ${FILENAME}
+    echo "static char CI_gitrevisio[11] = \""No version"\";" >>${FILENAME}
+    echo "" >> ${FILENAME}
 fi
 
-REV=$(svn info | grep Revision | awk '{ print $2 }')
-if [ -z "$REV" ]; then
-  REV="0"
-fi
-echo "static int CI_svnrevision = ${REV};" >> ${FILENAME}
-echo "" >> ${FILENAME}
 
-cat ${MKDIR}/Utils/${FILENAME}.tmpl >> ${FILENAME}

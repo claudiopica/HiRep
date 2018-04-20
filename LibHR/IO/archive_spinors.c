@@ -314,9 +314,10 @@ void read_spinor_field(char filename[], spinor_field *sp)
 
   /* check sq. norm */
   testnorm2=spinor_field_sqnorm_f(sp);
+  double relerr=fabs(testnorm2-norm2)/norm2; //relative error
   if (PID==0) {
-    if (fabs(testnorm2-norm2)>1.e-14) {
-      lprintf("ERROR",0,"Stored sq. norm value [%e] do not match the pseudofermion! [diff=%e]\n",norm2,fabs(testnorm2-norm2));
+    if (relerr>1.e-14) {
+      lprintf("ERROR",0,"Stored sq. norm value [%e] do not match the pseudofermion! [relerr=%e]\n",norm2,relerr);
       error(1,1,"read_spinor_field " __FILE__,"Sq. norm value mismatch");
     }
   }

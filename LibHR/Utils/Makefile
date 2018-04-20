@@ -1,7 +1,7 @@
 TOPDIR = ../..
 MKDIR = $(TOPDIR)/Make
 
-SRCS = $(wildcard *.c) suN_exp.c
+SRCS = $(wildcard *.c) suN_exp.c cinfo.c
 LIBNAME = ../libhr.a
 
 #Exclude this source files
@@ -14,6 +14,10 @@ suN_exp.c: $(MKDIR)/MkFlags $(WRREPR) TMPL/suN_exp.c.tmpl
 	$(WRREPR) $(NG) TMPL/suN_exp.c.tmpl > $@ &&\
 	  echo " $(_cdone)" || ( echo " $(_cfailed)" && false )
 
+cinfo.c: $(MKDIR)/MkFlags $(MKDIR)/Utils/cinfo.sh TMPL/cinfo.c.tmpl
+	$(MKDIR)/Utils/cinfo.sh $(MKDIR) $(TOPDIR) $(MACRO)
+	cat TMPL/cinfo.c.tmpl >> cinfo.c
+
 clean::
-	rm -f suN_exp.c
+	rm -f suN_exp.c cinfo.c
 

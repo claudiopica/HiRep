@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <getopt.h>
 #include <math.h>
 #include "io.h"
 #include "ranlux.h"
@@ -118,29 +119,7 @@ input_eigval eigval_var = init_input_eigval(eigval_var);
 hmc_flow flow=init_hmc_flow(flow);
 
 
-char input_filename[256] = "input_file";
-char output_filename[256] = "out_0";
-char error_filename[256] = "err_0";
-static void read_cmdline(int argc, char* argv[]) {
-  int i, ai=0, ao=0, am=0, requested=1;
 
-  for (i=1;i<argc;i++) {
-    if (strcmp(argv[i],"-i")==0) {ai=i+1;requested+=2;}
-    else if (strcmp(argv[i],"-o")==0) {ao=i+1;requested+=2;}
-    else if (strcmp(argv[i],"-m")==0) {am=i;requested+=1;}
-  }
-
-  if (am != 0) {
-    print_compiling_info();
-    exit(0);
-  }
-
-  error(argc!=requested,1,"read_cmdline [hmc.c]",
-      "Arguments: [-i <input file>] [-o <output file>] [-m]");
-
-  if (ao!=0) strcpy(output_filename,argv[ao]);
-  if (ai!=0) strcpy(input_filename,argv[ai]);
-}
 
 
 static void H2eva(spinor_field *out, spinor_field *in){
@@ -152,42 +131,15 @@ static void H2eva(spinor_field *out, spinor_field *in){
 int main(int argc,char *argv[]) {
   int i,acc, rc;
   char sbuf[128];
- 
-  read_cmdline(argc,argv);
   
   /* setup process communications */
   setup_process(&argc,&argv);
   
-  /* read global variables file */
-  read_input(glb_var.read,input_filename);
-  
-  setup_replicas();
-  
-  /* logger setup */
-  read_input(logger_var.read,input_filename);
-  logger_set_input(&logger_var);
-  if (PID!=0) { logger_disable(); }   /* disable logger for MPI processes != 0 */
-  else {
-    FILE* stderrp;
-    sprintf(sbuf,">>%s",output_filename);  logger_stdout(sbuf);
-    stderrp=freopen(error_filename,"w",stderr);
-    error(stderrp==NULL,1,"main [hmc.c]",
-	  "Cannot redirect the stderr");
-  }
-  
-  lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS);
-  lprintf("MAIN",0,"[RepID: %d][world_size: %d]\n[MPI_ID: %d][MPI_size: %d]\n",RID,WORLD_SIZE,MPI_PID,MPI_WORLD_SIZE);
-  lprintf("MAIN",0,"SVN Revision: %d\n", CI_svnrevision);
-
-  //  lprintf("MAIN",0,"Logger lelvel: %d\n",logger_getlevel(0));
-  
-  /* setup lattice geometry */
-  if (geometry_init() == 1) { finalize_process(); return 0; }
   geometry_mpi_eo();
   /* test_geometry_mpi_eo(); */ 
 
   /* setup random numbers */
-  read_input(rlx_var.read,input_filename);
+  read_input(rlx_var.read,get_input_filename());
   lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
   rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
 
@@ -208,12 +160,12 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
 
   /* read input for measures */
-  read_input(mes_var.read,input_filename);
-  read_input(poly_var.read,input_filename);
-  read_input(eigval_var.read,input_filename);
+  read_input(mes_var.read,get_input_filename());
+  read_input(poly_var.read,get_input_filename());
+  read_input(eigval_var.read,get_input_filename());
   
   /* Init Monte Carlo */
-  init_mc(&flow, input_filename);
+  init_mc(&flow, get_input_filename());
   lprintf("MAIN",0,"MVM during HMC initialzation: %ld\n",getMVM());
   lprintf("MAIN",0,"Initial plaquette: %1.8e\n",avr_plaquette());
 

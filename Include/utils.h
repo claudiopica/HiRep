@@ -102,4 +102,8 @@ int HYP_best_parameters(double mtp[6859], double w[3]);
 #include <sys/time.h>
 int timeval_subtract (struct timeval *result, struct timeval *x, struct timeval *y);
 
+/* CINFO */
+void print_compiling_info(); 
+void print_compiling_info_short(); 
+
 #endif 

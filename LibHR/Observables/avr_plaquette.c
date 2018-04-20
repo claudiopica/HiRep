@@ -92,7 +92,12 @@ void cplaq(double complex *ret,int ix,int mu,int nu)
 
 double avr_plaquette()
 {
-  double pa=0.;
+  static double pa=0.;
+
+_OMP_PRAGMA ( single )
+    {
+      pa = 0.;
+    }
 
   _PIECE_FOR(&glattice,ixp) {
     if(ixp==glattice.inner_master_pieces) {
@@ -119,13 +124,23 @@ double avr_plaquette()
 
 void full_plaquette()
 {
-	double complex pa[6];
-	double complex r0 = 0;
-	double complex r1 = 0;
-	double complex r2 = 0;
-	double complex r3 = 0;
-	double complex r4 = 0;
-	double complex r5 = 0;
+	static double complex pa[6];
+	static double complex r0;
+	static double complex r1;
+	static double complex r2;
+	static double complex r3;
+	static double complex r4;
+	static double complex r5;
+
+_OMP_PRAGMA ( single )
+    {
+      r0 = 0.;
+      r1 = 0.;
+      r2 = 0.;
+      r3 = 0.;
+      r4 = 0.;
+      r5 = 0.;
+    }
 
 	_PIECE_FOR(&glattice,ixp)
 	{
@@ -179,14 +194,19 @@ void full_plaquette()
 		}
 	}
 
+
+_OMP_PRAGMA ( single )
+    {
 	pa[0]=r0;
 	pa[1]=r1;
 	pa[2]=r2;
 	pa[3]=r3;
 	pa[4]=r4;
 	pa[5]=r5;
+    }
 
 	global_sum((double*)pa,12);
+_OMP_PRAGMA ( single )
 	for(int k = 0; k < 6; k++)
 	{
 		pa[k] /= GLB_VOLUME*NG;
@@ -227,7 +247,11 @@ void full_momenta(suNg_av_field *momenta){
     a*=0.5*_FUND_NORM2;
     *_FIELD_AT(la,i)=a;
   }
-  double mom=0;
+  static double mom;
+_OMP_PRAGMA ( single )
+    { 
+      mom=0.;
+    }
   _MASTER_FOR_SUM(la->type,i,mom) {
     mom += *_FIELD_AT(la,i);
   }  

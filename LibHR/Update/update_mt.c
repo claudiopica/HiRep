@@ -101,7 +101,7 @@ void free_ghmc()
 
 int update_ghmc()
 {
-  double deltaH;
+  static double deltaH;
 
   if(!init)
     {
@@ -153,7 +153,10 @@ int update_ghmc()
   local_hmc_action(DELTA, la, momenta);
 
   /* Metropolis test */
+_OMP_PRAGMA ( single )
+{ 
   deltaH = 0.0;
+}
   _MASTER_FOR_SUM(la->type,i,deltaH) {
     deltaH += *_FIELD_AT(la,i);
   }

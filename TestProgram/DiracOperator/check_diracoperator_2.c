@@ -103,39 +103,13 @@ int main(int argc,char *argv[])
    
    /* setup process id and communications */
    setup_process(&argc,&argv);
-   
-   /* logger setup */
- 
-  logger_setlevel(0,100); /* log all */
-  if (PID!=0) { 
-    logger_disable();}
-  else{
-    sprintf(tmp,">out_%d",PID); logger_stdout(tmp);
-    sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
-  }
-   
-   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
-   
-   /* read input file */
-   read_input(glb_var.read,"test_input");
-   
-   /* setup communication geometry */
-   if (geometry_init() == 1) {
-     finalize_process();
-     return 0;
-   }
-   
-   lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
-   lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
-   lprintf("MAIN",0,"global size is %dx%dx%dx%d\n",GLB_T,GLB_X,GLB_Y,GLB_Z);
-   lprintf("MAIN",0,"proc grid is %dx%dx%dx%d\n",NP_T,NP_X,NP_Y,NP_Z);
-   
+      
    /* setup lattice geometry */
    geometry_mpi_eo();
    /* test_geometry_mpi_eo(); */
    
     /* setup random numbers */
-    read_input(rlx_var.read,"test_input");
+    read_input(rlx_var.read,"input_file");
     lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
     rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
 
@@ -263,9 +237,11 @@ int main(int argc,char *argv[])
 		}
 		*_FIELD_AT(ps1,ix) = s1;
 	      }
-      
+#pragma omp parallel default(shared)
+{      
       Dphi(hmass,ps2,ps0);
-      
+}
+     
       spinor_field_mul_add_assign_f(ps1,-1.0,ps2);
       sig=spinor_field_sqnorm_f(ps1)/spinor_field_sqnorm_f(ps0);
       

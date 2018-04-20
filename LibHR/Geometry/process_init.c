@@ -14,9 +14,13 @@
 #include "global.h"
 #include "error.h"
 #include "logger.h"
+#include "hr_omp.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
+#include "utils.h"
+#include "io.h"
 
 /* setup_process
  * Assign a unique RID, PID to each process and setup
@@ -28,16 +32,51 @@
  * OUTPUT:
  * MPI: GLB_COMM, RID, PID, WORLD_SIZE
  */
+
+static char input_filename[256]="input_file";
+static char output_filename[256]="out_0";
+static char error_filename[256]="err_0";
+
+char* get_input_filename(){return input_filename;}
+char* get_output_filename(){return output_filename;}
+char* get_error_filename(){return error_filename;}
+
+
+static void read_cmdline(int argc, char** argv) {
+  int i, ai=0, ao=0, am=0, requested=1;
+
+  for (i=1;i<argc;i++) {
+    if (strcmp(argv[i],"-i")==0) {ai=i+1;requested+=2;}
+    else if (strcmp(argv[i],"-o")==0) {ao=i+1;requested+=2;}
+    else if (strcmp(argv[i],"-m")==0) {am=i;requested+=1;}
+  }
+
+  if (am != 0) {
+    print_compiling_info();
+    exit(0);
+  }
+
+  error(argc!=requested,1,"read_cmdline [hmc.c]",
+      "Arguments: [-i <input file>] [-o <output file>] [-m]");
+
+  if (ao!=0) strcpy(output_filename,argv[ao]);
+  if (ai!=0) strcpy(input_filename,argv[ai]);
+
+}
+
+
+
 int setup_process(int *argc, char ***argv) {
   
-#ifdef WITH_MPI
-  /* MPI variables */
-  int mpiret;
-#endif
+  read_cmdline(*argc,*argv) ;
+  
   
 #ifdef WITH_MPI
-  /* init MPI */
-  mpiret=MPI_Init(argc,argv);
+  /* INIT MPI*/
+  int mpiret;
+  int required=MPI_THREAD_SINGLE;
+  int provided;
+  mpiret=MPI_Init_thread(argc,argv,required,&provided);
   if (mpiret != MPI_SUCCESS) {
     char mesg[MPI_MAX_ERROR_STRING];
     int mesglen;
@@ -57,6 +96,52 @@ int setup_process(int *argc, char ***argv) {
   WORLD_SIZE=1;
 #endif
   
+
+ 
+
+
+  /* read global variables file */
+  read_input(glb_var.read,input_filename);
+  
+  setup_replicas();
+  
+  /* logger setup */
+  read_input(logger_var.read,input_filename);
+  logger_set_input(&logger_var);
+  if (PID!=0) { logger_disable(); }   /* disable logger for MPI processes != 0 */
+  else {
+    FILE* stderrp;
+    char sbuf[256];
+    sprintf(sbuf,">>%s",output_filename);  
+    logger_stdout(sbuf);
+    stderrp=freopen(error_filename,"w",stderr);
+    error(stderrp==NULL,1,"main [hmc.c]",
+	  "Cannot redirect the stderr");
+  }
+  
+
+#ifdef _OPENMP
+#pragma omp parallel 
+  {
+#pragma omp master
+    {
+      lprintf ("OMP", 0, "Number of Threads requested = %i\n", omp_get_num_threads());
+    }
+  }
+#endif
+  
+  
+  lprintf("SYSTEM",0,"Gauge group: SU(%d)\n",NG);                           
+  lprintf("SYSTEM",0,"Fermion representation: dim = %d\n",NF);
+  lprintf("SYSTEM",0,"[RepID: %d][world_size: %d]\n[MPI_ID: %d][MPI_size: %d]\n",RID,WORLD_SIZE,MPI_PID,MPI_WORLD_SIZE);
+  print_compiling_info_short();
+
+  //  lprintf("MAIN",0,"Logger lelvel: %d\n",logger_getlevel(0));
+  
+  /* setup lattice geometry */
+  if (geometry_init() == 1) { finalize_process(); return 0; }
+
+
   return 0;
   
 }

@@ -27,7 +27,9 @@ static suNg_field *g;
 
 
 static void loc_D(spinor_field *out, spinor_field *in){
+
    Dphi(hmass,out,in);
+
 }
 
 static void random_g(void)
@@ -72,50 +74,20 @@ static void transform_s(spinor_field *out, spinor_field *in)
 
 int main(int argc,char *argv[])
 {
-  char tmp[256];
+
   double sig,tau;
   spinor_field *s0,*s1,*s2,*s3;
   
   setup_process(&argc,&argv);
-  
-  logger_setlevel(0,100); /* log all */
-  if (PID!=0) { 
-    logger_disable();}
-  else{
-    sprintf(tmp,">out_%d",PID); logger_stdout(tmp);
-    sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
-  }
-  
+    
   logger_map("DEBUG","debug");
-
-  lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
-  
-  read_input(glb_var.read,"test_input");
-  
-  
-  
-  
-  /* setup communication geometry */
-  if (geometry_init() == 1) {
-    finalize_process();
-    return 0;
-  }
-  
+    
   geometry_mpi_eo();
-    /* setup random numbers */
-    read_input(rlx_var.read,"test_input");
-    lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
-    rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
-
-  
-  
-  lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
-  lprintf("MAIN",0,"Fermion representation: dim = %d\n",NF);
-  lprintf("MAIN",0,"The lattice size is %dx%dx%dx%d\n",T,X,Y,Z);
-  lprintf("MAIN",0,"The lattice global size is %dx%dx%dx%d\n",GLB_T,GLB_X,GLB_Y,GLB_Z);
-  lprintf("MAIN",0,"The lattice borders are (%d,%d,%d,%d)\n",T_BORDER,X_BORDER,Y_BORDER,Z_BORDER);
-  lprintf("MAIN",0,"\n");
-  fflush(stdout);
+ 
+ /* setup random numbers */
+  read_input(rlx_var.read,get_input_filename());
+  lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
+  rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
   
   u_gauge=alloc_gfield(&glattice);
 #ifndef REPR_FUNDAMENTAL
@@ -141,6 +113,9 @@ int main(int argc,char *argv[])
   gaussian_spinor_field(&(s0[0]));
   tau = 1./sqrt(spinor_field_sqnorm_f(s0));
   spinor_field_mul_f(s0,tau,s0);
+  sig=spinor_field_sqnorm_f(s0);
+  
+  lprintf("MAIN",0,"Normalized norm = %.2e\n",sig);
   
   lprintf("MAIN",0,"Generating a random gauge transf... ");
   fflush(stdout);
@@ -161,8 +136,11 @@ int main(int argc,char *argv[])
   transform_u();
   
   spinor_field_zero_f(s1);
+
+#pragma omp parallel default(shared)
+{
   loc_D(s1,s3);
-  
+} 
   
   spinor_field_mul_add_assign_f(s1,-1.0,s2);
   sig=spinor_field_sqnorm_f(s1);

@@ -37,7 +37,6 @@ typedef struct _geometry_descriptor {
 
 //Loop over pieces of given type
 #define _PIECE_FOR(type,ip) \
-_OMP_PRAGMA ( _omp_parallel )\
   for(int ip=0;\
       ip<(type)->local_master_pieces;\
       ip++ )
@@ -49,7 +48,7 @@ _OMP_PRAGMA ( _omp_for redop1 redop2  )\
       is<=(type)->master_end[ip]; \
       is++ )
 
-#define _SITE_FOR(type,ip,is) _SITE_FOR_RED(type,ip,is,,)
+#define _SITE_FOR(type,ip,is) _SITE_FOR_RED(type,ip,is,nowait,)
 #define _SITE_FOR_SUM(type,ip,is,...) _SITE_FOR_RED(type,ip,is,_omp_sum(__VA_ARGS__),)
 #define _SITE_FOR_MAX(type,ip,is,...) _SITE_FOR_RED(type,ip,is,_omp_max(__VA_ARGS__),)
 #define _SITE_FOR_MIN(type,ip,is,...) _SITE_FOR_RED(type,ip,is,_omp_min(__VA_ARGS__),)
@@ -67,6 +66,9 @@ _OMP_PRAGMA ( _omp_for redop1 redop2  )\
 #define _MASTER_FOR_MIN(type,is,...) _MASTER_FOR_RED(type,is,_omp_min(__VA_ARGS__),)
 
 
+char* get_input_filename();
+char* get_output_filename();
+char* get_error_filename();
 
 int setup_process(int *argc, char ***argv);
 int setup_replicas();
