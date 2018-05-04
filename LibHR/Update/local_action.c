@@ -43,6 +43,15 @@ void local_hmc_action(local_action_type type,
     error(1,1,"local_hmc_action","Invalid type");
   }
 
+#ifdef DEBUGACTION
+   double total_action = 0.0;
+    _MASTER_FOR_SUM(&glattice,j,total_action){
+	total_action += *_FIELD_AT(loc_action,j);
+    }
+    global_sum(&total_action,1);
+    lprintf("DEBUG ACTION",0,"Action b4 momenta: %f\n",total_action);
+#endif
+
   _MASTER_FOR(&glattice,i) {
     double a=0., tmp;
     /* Momenta */
@@ -60,11 +69,29 @@ void local_hmc_action(local_action_type type,
     *_FIELD_AT(loc_action,i)+=a + P2;
   }
 
+#ifdef DEBUGACTION
+    total_action = 0.0;	
+    _MASTER_FOR_SUM(&glattice,j,total_action){
+	total_action += *_FIELD_AT(loc_action,j);
+    }
+    global_sum(&total_action,1);
+    lprintf("DEBUG ACTION",0,"Action after momenta: %f\n",total_action);
+#endif
+
   int nmon=num_mon();
   for (int i=0;i<nmon;++i) {
     const monomial *m=mon_n(i);
     
     m->add_local_action(m,loc_action);
+
+#ifdef DEBUGACTION
+    total_action = 0.0;	
+    _MASTER_FOR_SUM(&glattice,j,total_action){
+	total_action += *_FIELD_AT(loc_action,j);
+    }
+    global_sum(&total_action,1);
+    lprintf("DEBUG ACTION",0,"Monomial type %d, monomial number %d, action after: %f\n",m->data.type, i, total_action);
+#endif
 
   }
 }
