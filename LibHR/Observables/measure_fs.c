@@ -137,6 +137,44 @@ void contract_fs(spinor_field* psi0, int tau){
 	}
 }
 
+void contract_s_left(spinor_field* psi0, int tau){
+	complex corr_fs[GLB_T][4][4];
+	memset(corr_fs, 0, sizeof(corr_fs));
+
+	for(int t = 0; t < T; t++)
+	{
+		int tc = (zerocoord[0] + t + GLB_T - tau) % GLB_T;
+
+		for(int x = 0; x < X; x++) for(int y = 0; y < Y; y++) for(int z = 0; z < Z; z++)
+		{
+			int ix = ipt(t, x, y, z);
+			suNg_vector *S_snk = pu_scalar(ix); 
+			for(int alpha = 0; alpha < 4; alpha++) //spin source
+				for(int beta = 0; beta < 4; beta++) //spin sink
+					for(int a = 0; a < NF; ++a) //color
+					{
+						_complex_prod_assign(corr_fs[tc][alpha][beta], (*S_snk).c[a],(*_FIELD_AT(&psi0[alpha],ix)).c[beta].c[a]);
+					}
+		}
+	}
+	global_sum((double*)corr_fs, sizeof(corr_fs)/sizeof(double));
+	for(int t = 0; t < GLB_T; t++) for(int i = 0; i < 4; i++)
+	{
+
+		lprintf("CORR_FS_SSRC", 0, "%d %d %3.10e %3.10e  %3.10e %3.10e  %3.10e %3.10e  %3.10e %3.10e \n",
+				t,i,
+				corr_fs[t][i][0].re,
+				corr_fs[t][i][0].im,
+				corr_fs[t][i][1].re,
+				corr_fs[t][i][1].im,
+				corr_fs[t][i][2].re,
+				corr_fs[t][i][2].im,
+				corr_fs[t][i][3].re,
+				corr_fs[t][i][3].im
+		       );
+	}
+}
+
 void measure_fs_pt(double* m, double precision){
 	spinor_field* source = alloc_spinor_field_f(4*NF,&glattice); //This isn't glat_even so that the odd sites will be set to zero explicitly
 	spinor_field* prop =  alloc_spinor_field_f(4*NF,&glattice);
@@ -153,6 +191,30 @@ void measure_fs_pt(double* m, double precision){
 
 	// perform contraction
 	contract_fs(prop,tau);
+  
+	// free 
+	free_propagator_eo(); 
+	free_spinor_field_f(source);
+	free_spinor_field_f(prop);
+}
+
+void measure_fs_scSrc(double* m, double precision){
+	spinor_field* source = alloc_spinor_field_f(4,&glattice); //This isn't glat_even so that the odd sites will be set to zero explicitly
+	spinor_field* prop =  alloc_spinor_field_f(4,&glattice);
+	int nm=1;
+	int tau=0;
+
+
+	init_propagator_eo(nm, m, precision);
+
+	// create point source
+	create_scalar_source(source,tau);
+
+	// calc invert
+	calc_propagator(prop,source,4);//4x3 for QCD 
+
+	// perform contraction
+	contract_s_left(prop,tau);
   
 	// free 
 	free_propagator_eo(); 

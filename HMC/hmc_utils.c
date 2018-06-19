@@ -14,6 +14,7 @@
 #include "utils.h"
 #include "communications.h"
 #include "clover_tools.h"
+#include "gaugefix.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -417,6 +418,7 @@ int save_scalar_conf(hmc_flow *rf, int id) {
 /* clean up memory */
 int end_mc() {
   free_ghmc();
+  free_hmc_gaugefix();
   free_BCs();
   
   /* free memory */

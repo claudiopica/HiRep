@@ -8,13 +8,17 @@
 #include "global.h"
 #include "logger.h"
 #include "update.h"
+#include "observables.h"
 #include "utils.h"
 #include "random.h"
 #include "communications.h"
 #include "wilsonflow.h"
+#include "gaugefix.h"
 #include <math.h>
 
 #define REUNIT 10
+
+
 
 void unit_gauge(suNg_field *gauge){
   int mu;
@@ -380,3 +384,108 @@ double scalar_gaugefix(int fix_dir,double overrelax,int max_it,
   free_gfield(g);
   return new_act;
 }
+
+
+/* backup fields */
+static suNg_field *u_gauge_bk=NULL;
+static suNg_scalar_field *u_scalar_bk=NULL;
+
+void hmc_Landau_gaugefix(){
+	
+	struct timeval gf_start, gf_end, gf_etime;
+	
+	/* allocate space for the backup copy of gfield */
+	if(u_gauge_bk==NULL) u_gauge_bk=alloc_gfield(&glattice);
+	suNg_field_copy(u_gauge_bk,u_gauge);
+
+	/* allocate space for the backup copy of the scalar field */
+	if(u_scalar_bk==NULL) u_scalar_bk=alloc_scalar_field(&glattice);
+	suNg_scalar_field_copy(u_scalar_bk,u_scalar);
+
+	gettimeofday(&gf_start,0);
+
+	lprintf("LANDAU_GAUGEFIX",0,"Plaquette before gauge fixing = %1.6f\n",avr_plaquette());
+	lprintf("LANDAU_GAUGEFIX",0,"SUS before gauge fixing = %1.6f %1.6f \n",average_SUS().re,average_SUS().im);
+
+	for(int cont=0; cont<NG; cont++){
+		lprintf("LANDAU_GAUGEFIX",0,"Average scalar[%d], before gauge fixing = %1.6f %1.6f \n", cont, average_S().c[cont].re, average_S().c[cont].im);
+	}
+
+	double act = scalar_gaugefix(10, //= 0, 1, 2, 3 for Coulomb gauge else Landau
+			1.8,	//overrelax
+			10000,	//maxit
+			1e-10, //tolerance
+			u_gauge, //gauge
+			u_scalar //scalar
+			);
+	lprintf("LANDAU_GAUGEFIX",0,"action  %1.6f\n",act);
+
+	lprintf("LANDAU_GAUGEFIX",0,"Plaquette after gauge fixing = %1.6f\n",avr_plaquette());
+	lprintf("LANDAU_GAUGEFIX",0,"SUS after gauge fixing = %1.6f %1.6f \n",average_SUS().re,average_SUS().im);
+
+	for(int cont=0; cont<NG; cont++){
+		lprintf("LANDAU_GAUGEFIX",0,"Average scalar[%d], after gauge fixing = %1.6f %1.6f \n", cont, average_S().c[cont].re, average_S().c[cont].im);
+	}
+
+	suNg_field_copy(u_gauge,u_gauge_bk);
+	suNg_scalar_field_copy(u_scalar,u_scalar_bk);
+	
+	gettimeofday(&gf_end,0);
+	timeval_subtract(&gf_etime,&gf_end,&gf_start);
+	lprintf("LANDAU_GAUGEFIX",0,"Configuration analysed in [%ld sec %ld usec]\n",gf_etime.tv_sec,gf_etime.tv_usec);
+
+
+}
+
+void hmc_Coulomb_gaugefix(){
+	
+	struct timeval gf_start, gf_end, gf_etime;
+	
+	/* allocate space for the backup copy of gfield */
+	if(u_gauge_bk==NULL) u_gauge_bk=alloc_gfield(&glattice);
+	suNg_field_copy(u_gauge_bk,u_gauge);
+
+	/* allocate space for the backup copy of the scalar field */
+	if(u_scalar_bk==NULL) u_scalar_bk=alloc_scalar_field(&glattice);
+	suNg_scalar_field_copy(u_scalar_bk,u_scalar);
+
+	gettimeofday(&gf_start,0);
+
+	lprintf("COULOMB_GAUGEFIX",0,"Plaquette before gauge fixing = %1.6f\n",avr_plaquette());
+	lprintf("COULOMB_GAUGEFIX",0,"SUS before gauge fixing = %1.6f %1.6f \n",average_SUS().re,average_SUS().im);
+
+	lprintf("COULOMB_GAUGEFIX",0,"Coulomb order parameter, before gauge fixing = %1.6f \n", order_param_Coulomb());
+
+	double act = scalar_gaugefix(0, //= 0, 1, 2, 3 for Coulomb gauge else Landau
+			1.8,	//overrelax
+			10000,	//maxit
+			1e-10, //tolerance
+			u_gauge, //gauge
+			u_scalar //scalar
+			);
+	lprintf("COULOMB_GAUGEFIX",0,"action  %1.6f\n",act);
+
+	lprintf("COULOMB_GAUGEFIX",0,"Plaquette after gauge fixing = %1.6f\n",avr_plaquette());
+	lprintf("COULOMB_GAUGEFIX",0,"SUS after gauge fixing = %1.6f %1.6f \n",average_SUS().re,average_SUS().im);
+
+	lprintf("COULOMB_GAUGEFIX",0,"Coulomb order parameter, after gauge fixing = %1.6f \n", order_param_Coulomb());
+	
+	suNg_field_copy(u_gauge,u_gauge_bk);
+	suNg_scalar_field_copy(u_scalar,u_scalar_bk);
+
+	gettimeofday(&gf_end,0);
+	timeval_subtract(&gf_etime,&gf_end,&gf_start);
+	lprintf("COULOMB_GAUGEFIX",0,"Configuration analysed in [%ld sec %ld usec]\n",gf_etime.tv_sec,gf_etime.tv_usec);
+
+
+}
+
+
+void free_hmc_gaugefix(){
+
+	if(u_gauge_bk!=NULL) { free_gfield(u_gauge_bk); u_gauge_bk=NULL; }
+	if(u_scalar_bk!=NULL){ free_scalar_field(u_scalar_bk); u_scalar_bk=NULL;}
+  
+	lprintf("HMC_GAUGEFIX",0,"Memory deallocated.\n");
+}
+

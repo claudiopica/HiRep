@@ -1,11 +1,12 @@
 TOPDIR = ..
 MKDIR = $(TOPDIR)/Make
 
-EXES = gaugefix_scalar
+EXES = Landau_gaugefix_scalar Coulomb_gaugefix_scalar
  
-COMMON_OBJS = 
 
-gaugefix_scalar_OBJS = gaugefix.o
+Landau_gaugefix_scalar_OBJS = gaugefix.o
+
+Coulomb_gaugefix_scalar_OBJS = gaugefix.o
 
 
 LIBS += $(TOPDIR)/LibHR/libhr.a

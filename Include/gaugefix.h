@@ -40,5 +40,9 @@ double gaugefix(int fix_dir,double overrelax,int max_it,
 
 double scalar_gaugefix(int fix_dir,double overrelax,int max_it, double fix_tol, suNg_field *fixed_gauge, suNg_scalar_field *fixed_scalar);
 
+void hmc_Landau_gaugefix();
+void hmc_Coulomb_gaugefix();
+void free_hmc_gaugefix();
+
 #endif /* GAUGEFIX_H */
 

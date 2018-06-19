@@ -49,6 +49,11 @@ conf dir = .
 gauge start = random // run1_6x6x6x6nc2rADJnf2b6.000000m-0.000000n10
 last conf = 100
 
+// Gaugefix
+gaugefix:make = false
+gaugefix:landau = false
+gaugefix:coulomb = false
+
 // Mesons
 mes:make = false
 mes:precision = 1.e-20

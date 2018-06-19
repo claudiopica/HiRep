@@ -133,3 +133,34 @@ double average_SdagS(){
 
 	return S_cond/(double)GLB_VOLUME;
 }
+
+
+double order_param_Coulomb(){
+	
+	double result = 0;
+	double tmp;
+	suNg U_av, U_sum[GLB_T], U_tmp;
+	memset(U_sum, 0, sizeof(U_sum));
+	for(int t=0; t<T; t++){
+		
+		int tc = zerocoord[0] + t;
+		for(int x=0; x<X; x++) for(int y=0; y<Y; y++) for(int z=0; z<Z; z++){
+			
+			_suNg_add_assign(U_sum[tc],*_4FIELD_AT(u_gauge,ipt(t,x,y,z),0));
+		
+		}
+		
+	}
+	global_sum((double*)U_sum, GLB_T*2*NG*NG);
+
+	for(int t=0; t<GLB_T; t++){
+		_suNg_mul(U_av, 1/(double)(GLB_X*GLB_Y*GLB_Z), U_sum[t]);
+		_suNg_dagger_times_suNg(U_tmp,U_av,U_av);
+		_suNg_trace_re(tmp,U_tmp);
+		result += tmp;			
+	}
+	
+	return result/(double)GLB_T;
+
+}
+

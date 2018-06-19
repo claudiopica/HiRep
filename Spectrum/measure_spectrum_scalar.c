@@ -53,6 +53,7 @@ typedef struct _input_mesons {
 	int nhits_2pt;
 	int nhits_disc;
 	int def_sf_pt;
+	int def_sf_scSrc;
 	int def_semwall;
 	int def_point;
 	int def_baryon;
@@ -79,7 +80,7 @@ typedef struct _input_mesons {
 	int degree_hopping;  // The degree of the hopping parameter expasion
 
 	/* for the reading function */
-	input_record_t read[30];
+	input_record_t read[31];
 } input_mesons;
 
 #define init_input_mesons(varname) \
@@ -94,6 +95,7 @@ typedef struct _input_mesons {
     {"enable default semwall", "mes:def_semwall = %d",INT_T, &(varname).def_semwall},	\
     {"enable default point", "mes:def_point = %d",INT_T, &(varname).def_point},		\
     {"enable default scalar-fermion point", "mes:def_sf_pt = %d",INT_T, &(varname).def_sf_pt},		\
+    {"enable default scalar-fermion scalar source", "mes:def_sf_scSrc = %d",INT_T, &(varname).def_sf_scSrc},		\
     {"enable default gfwall", "mes:def_gfwall = %d",INT_T, &(varname).def_gfwall},	\
     {"enable extended semwall", "mes:ext_semwall = %d",INT_T, &(varname).ext_semwall},	\
     {"enable extended point", "mes:ext_point = %d",INT_T, &(varname).ext_point},		\
@@ -508,6 +510,9 @@ int main(int argc,char *argv[]) {
 
      if (mes_var.def_sf_pt){
        measure_fs_pt(m,mes_var.precision);
+     }
+     if (mes_var.def_sf_scSrc){
+       measure_fs_scSrc(m,mes_var.precision);
      }
      if (mes_var.def_semwall){
        measure_spectrum_semwall(nm,m,mes_var.nhits_2pt,i,mes_var.precision);

@@ -29,7 +29,33 @@
 #include "observables.h"
 #include "utils.h"
 #include "spectrum.h"
+#include "gaugefix.h"
 #include "cinfo.c"
+
+
+/* Gaugefix parameters */
+typedef struct _input_gaugefix {
+  char make[256];
+  char landau[256];
+  char coulomb[256]; 
+ 
+  /* for the reading function */
+  input_record_t read[4];
+  
+} input_gaugefix;
+
+#define init_input_gaugefix(varname) \
+{ \
+  .read={\
+    {"make gaugefix", "gaugefix:make = %s", STRING_T, (varname).make},\
+    {"fix landau gauge", "gaugefix:landau = %s", STRING_T, (varname).landau},\
+    {"fix coulomb gauge", "gaugefix:coulomb = %s", STRING_T, (varname).coulomb},\
+    {NULL, NULL, INT_T, NULL}\
+  }\
+}
+
+
+input_gaugefix gaugefix_var = init_input_gaugefix(gaugefix_var);
 
 
 /* Mesons parameters */
@@ -208,6 +234,7 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
 
   /* read input for measures */
+  read_input(gaugefix_var.read,input_filename);
   read_input(mes_var.read,input_filename);
   read_input(poly_var.read,input_filename);
   read_input(eigval_var.read,input_filename);
@@ -320,8 +347,21 @@ int main(int argc,char *argv[]) {
       if(strcmp(mes_var.make,"true")==0) {
 			measure_spectrum_semwall(1,&mes_var.mesmass,mes_var.nhits,i,mes_var.precision);
 			if(u_scalar!=NULL){   
-				measure_fs_pt(&mes_var.mesmass, mes_var.precision);
+				measure_fs_scSrc(&mes_var.mesmass, mes_var.precision);
 			}
+      }
+
+      /* Gauge fixing */
+      if(strcmp(gaugefix_var.make,"true")==0) {
+	      if(u_scalar!=NULL){   
+		      if(strcmp(gaugefix_var.landau,"true")==0){
+			      hmc_Landau_gaugefix();
+		      }
+
+		      if(strcmp(gaugefix_var.coulomb,"true")==0){
+			      hmc_Coulomb_gaugefix();
+		      }
+	      }
       }
 
     /* Scalar measurements */

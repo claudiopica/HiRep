@@ -530,3 +530,27 @@ void create_diluted_volume_source(spinor_field *source, int parity_component, in
 void create_z2_volume_source(spinor_field *source) {
   z2_spinor_field(source);
 }
+
+// use scalar field as source
+void create_scalar_source(spinor_field *source, int tau) {
+	int col,beta,ix;
+        
+	for (beta=0;beta<4;++beta){
+          spinor_field_zero_f(&source[beta]);
+	}
+
+	if(COORD[0]==tau/T) {
+		for(int x = 0; x < X; x++) for(int y = 0; y < Y; y++) for(int z = 0; z < Z; z++){
+			ix=ipt(tau-zerocoord[0],x,y,z);
+			for (beta=0;beta<4;++beta){
+				for (col=0;col<NF;++col){
+					_FIELD_AT(&source[beta],ix)->c[beta].c[col] = pu_scalar(ix)->c[col];
+				}
+			}
+		}
+	}
+	for (beta=0;beta<4;++beta){
+		start_sf_sendrecv(source + beta);
+		complete_sf_sendrecv(source + beta);
+	}
+}

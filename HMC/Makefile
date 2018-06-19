@@ -5,7 +5,7 @@ EXES = hmc hmc_forces
 
 hmc_OBJS = hmc_utils.o ../Spectrum/meson_measurements.o ../GaugeFix/gaugefix.o
 
-hmc_forces_OBJS =  hmc_utils.o
+hmc_forces_OBJS =  hmc_utils.o ../GaugeFix/gaugefix.o
 
 
 LIBS += $(TOPDIR)/LibHR/libhr.a

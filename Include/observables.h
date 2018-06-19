@@ -74,6 +74,7 @@ void z2semwall_mesons_new(int conf, int nhits, int nm, double *m, double acc);
 
 void create_point_source(spinor_field *source,int tau,int color);
 void create_full_point_source(spinor_field *source, int tau);
+void create_scalar_source(spinor_field *source, int tau);
 void create_point_source_loc(spinor_field *source, int t, int x, int y, int z, int color);
 int create_diluted_source_equal_eo(spinor_field *source);
 void create_diluted_source_equal_atau_eo(spinor_field *source, int tau);
@@ -127,12 +128,16 @@ void print_renormalization(int conf, int nm, double* mass, char* label, int pt_i
 
 void contract_baryons(spinor_field *psi0,int tau);
 void contract_fs(spinor_field *psi0,int tau);
+void contract_s_left(spinor_field* psi0, int tau);
 void measure_fs_pt(double* m, double precision);
+void measure_fs_scSrc(double* m, double precision);
+void measure_glueballs();
+
 void measure_SUS(int tau);
 complex average_SUS();
 suNg_vector average_S();
 double average_SdagS();
-void measure_glueballs();
+double order_param_Coulomb();
 
 void id_correlator(double *out, int t0, spinor_field *qp);
 void g0_correlator(double *out, int t0, spinor_field *qp);
