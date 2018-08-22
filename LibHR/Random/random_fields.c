@@ -60,3 +60,33 @@ void unit_u(suNg_field *gf)
 
 }
 
+void random_s(suNg_scalar_field *sf)
+{
+	error(sf==NULL,1,"random_s [random_fields.c]","Attempt to access unallocated memory space");
+
+	_MASTER_FOR(sf->type,ix)
+	{
+		suNg_vector *ptr = _FIELD_AT(sf,ix);
+		gaussian_suNg_vector(ptr);
+	}
+
+	start_sc_sendrecv(sf);
+	complete_sc_sendrecv(sf);
+}
+
+void zero_s(suNg_scalar_field *sf)
+{
+	error(sf==NULL,1,"zero_s [random_fields.c]","Attempt to access unallocated memory space");
+
+	suNg_vector zero_vector;
+	_vector_zero_g(zero_vector);
+
+	_MASTER_FOR(sf->type,ix)
+	{
+		suNg_vector *ptr = _FIELD_AT(sf,ix);
+		*ptr = zero_vector;
+	}
+
+	start_sc_sendrecv(sf);
+	complete_sc_sendrecv(sf);
+}

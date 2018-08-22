@@ -9,8 +9,8 @@
 /* this define the width of the borders for parallel dimensions
  * For different actions it must be modified
  */
-#define BORDERSIZE 1
 
+#define BORDERSIZE 1
 
 typedef struct _geometry_descriptor {
   int inner_master_pieces; /* number of inner pieces (1 o 2 for even odd or no_eo)) */

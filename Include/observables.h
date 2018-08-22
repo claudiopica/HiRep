@@ -27,6 +27,13 @@ double avr_plaquette();
 double SF_action(double beta);
 double local_plaq(int ix);
 void full_plaquette();
+
+double rect_1x2(int ix,int mu,int nu);
+void crect_1x2(complex *ret,int ix,int mu,int nu);
+double avr_rect_1x2();
+void full_rect_1x2();
+double local_rect_1x2(int ix);
+
 void SF_PCAC_wall_mass(double mass, double acc);
 void SF_quark_propagator(spinor_field *in, double mass, spinor_field *out, double acc);
 
@@ -74,6 +81,7 @@ int create_diluted_source_equal(spinor_field *source);
 void create_diluted_source_equal_spinorfield1(spinor_field *source,int tau);
 void create_diluted_source_equal_atau(spinor_field *source, int tau);
 void create_noise_source_equal_eo(spinor_field *source);
+void create_noise_source_equal_oe(spinor_field *source);
 void create_diluted_source_equal_atau_col(spinor_field *source, int tau,int col);
 void create_noise_source_equal_col_dil(spinor_field *source,int col);
 void create_gauge_fixed_wall_source(spinor_field *source, int tau, int color);
@@ -254,6 +262,26 @@ void rotated_lXuum(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu
 void rotated_lXddm(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
 void rotated_lXudm(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
 void rotated_lXdum(chisf_mem* corr_mem, suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd);
+
+
+
+
+/* Functions that include four fermion interactions */
+void init_propagator_ff_eo(int nm, double *m, double acc);
+void free_propagator_ff_eo();
+
+void calc_propagator_ff(spinor_field *psi, spinor_field* eta, int ndilute);
+void calc_propagator_ff_eo(spinor_field *psi, spinor_field *eta, int ndilute);
+void calc_propagator_ff_oe(spinor_field *psi, spinor_field *eta, int ndilute);
+void calc_propagator_ff_hopping_eo(spinor_field *psi, spinor_field *eta, int hopping, int ndilute);
+void calc_propagator_ff_hopping_oe(spinor_field *psi, spinor_field *eta, int hopping, int ndilute);
+void calc_propagator_ff_hopping_series(spinor_field *psi, spinor_field *eta, int hopping, int ndilute);
+
+/* Disconnected part of triplet correlators */
+void init_triplet_discon_correlators();
+
+void ff_observables();
+
 
 #endif 
 

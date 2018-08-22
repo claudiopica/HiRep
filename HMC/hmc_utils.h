@@ -14,7 +14,7 @@ typedef struct _input_hmc {
   /* hmc parameters */
   ghmc_par hmc_p;
   /* for the reading function */
-  input_record_t read[10];
+  input_record_t read[13];
   
 } input_hmc;
 
@@ -30,17 +30,20 @@ typedef struct _input_hmc {
     {"SF_sign", "SF_sign = %d", INT_T, &(varname).hmc_p.SF_sign},\
     {"SF_ct", "SF_ct = %lf", DOUBLE_T, &(varname).hmc_p.SF_ct}, \
     {"tlen", "tlen = %lf", DOUBLE_T, &(varname).hmc_p.tlen}, \
+    {"smearing space", "rho_s = %lf", DOUBLE_T, &(varname).hmc_p.rho_s}, \
+    {"smearing time", "rho_t = %lf", DOUBLE_T, &(varname).hmc_p.rho_t}, \
+    {"csw", "csw = %lf", DOUBLE_T, &(varname).hmc_p.csw}, \
     {NULL, NULL, 0, NULL}\
   }\
 }
 
 /* Flow control variables variables */
 typedef struct _hmc_flow {
-  char run_name[64]; /* name for this run */
-  char g_start[64]; /* for gauge fields => unit, random, file */
+  char run_name[128]; /* name for this run */
+  char g_start[128]; /* for gauge fields => unit, random, file */
 
-  char last_conf[64]; /* last conf: can be a number or of the format "+n" */
-  char conf_dir[64]; /* directory to store gconfs */
+  char last_conf[128]; /* last conf: can be a number or of the format "+n" */
+  char conf_dir[128]; /* directory to store gconfs */
   
   int save_freq; /* save gauge conf if number%save_freq==0 */
   int meas_freq; /* mk measures if number%meas_freq==0 */
@@ -71,6 +74,7 @@ typedef struct _hmc_flow {
 
 int init_mc(hmc_flow *rf, char *ifile);
 int save_conf(hmc_flow *rf, int id);
+int save_scalar_conf(hmc_flow *rf, int id);
 int end_mc();
 
 #endif /* HMC_UTILS_H */

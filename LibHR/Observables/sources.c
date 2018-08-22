@@ -285,6 +285,34 @@ void create_noise_source_equal_eo(spinor_field *source) {
   }
 }
 
+/* Creates four Z2xZ2 noise sources NOT localised on time slice but spread over
+all timeslices. The noise vectors are equal in each source but placed at a different spin, site parity.*/
+void create_noise_source_equal_oe(spinor_field *source) {
+  int c[4];
+  suNf_vector *v1,*v2;
+  int i;
+
+  for (i=0;i<4;++i){
+    spinor_field_zero_f(&source[i]);
+  }
+  
+  for(c[0]=0; c[0]<T; c[0]++) for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
+    if(((zerocoord[0]+c[0]+zerocoord[1]+c[1]+zerocoord[2]+c[2]+zerocoord[3]+c[3])&1)==1){
+	    v1 = &((_FIELD_AT(&source[0],ipt(c[0],c[1],c[2],c[3])))->c[0]);
+	    ranz2((double*)(v1),sizeof(suNf_vector)/sizeof(double)); // Make new sources
+	    for (i=1;i<4;++i){
+	      v2 = &((_FIELD_AT(&source[i],ipt(c[0],c[1],c[2],c[3])))->c[i]); //Copy previous index.
+	      *v2 = *v1;
+	    }
+	  }
+	}
+    for (i=0;i<4;++i){
+      start_sf_sendrecv(source + i);
+      complete_sf_sendrecv(source + i);
+    }
+
+}
+
 /* Creates four Z2xZ2 noise sources localised on time slice tau. The noise 
    vectors are equal in each source but placed at a different spin. Color dilution and Even and Odd sites */
 void create_diluted_source_equal_atau_col(spinor_field *source, int tau,int col) {

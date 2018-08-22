@@ -12,7 +12,7 @@
 #endif
 
 #ifdef BC_T_OPEN
-#error This code does not work with the open BCs
+#warning This code does not work with the open BCs
 #endif
 
 

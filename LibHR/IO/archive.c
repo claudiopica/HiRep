@@ -80,7 +80,12 @@ void write_gauge_field_matrix(char filename[])
   gettimeofday(&start,0);
   
   zsize=GLB_Z/NP_Z; rz=GLB_Z-zsize*NP_Z;
-  buff=malloc(sizeof(suNg)*4*(GLB_Z/NP_Z+((rz>0)?1:0)));
+  if(!four_fermion_active) {
+    buff=malloc(sizeof(suNg)*4*(GLB_Z/NP_Z+((rz>0)?1:0)));
+  } else {
+    buff=malloc((sizeof(suNg)*4+2*sizeof(double))*(GLB_Z/NP_Z+((rz>0)?1:0)));
+  }
+
   
   g[3]=0;
   for (g[0]=0;g[0]<GLB_T;++g[0]) 
@@ -91,7 +96,13 @@ void write_gauge_field_matrix(char filename[])
 	  glb_to_proc(g, p); /* get the processor coordinate */
 #endif
 	  for (p[3]=0;p[3]<NP_Z;++p[3]) { /* loop over processors in Z direction */
-	    int bsize=sizeof(suNg)/sizeof(double)*4*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
+	    int bsize;
+	    if(!four_fermion_active) {
+	      bsize=sizeof(suNg)/sizeof(double)*4*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
+	    } else {
+	      bsize=(sizeof(suNg)/sizeof(double)*4+2)*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
+            }
+	    
 #ifdef WITH_MPI
 	    MPI_Cart_rank(cart_comm, p, &cid);
 	    MPI_Group_translate_ranks(cg, 1, &cid, wg, &pid);
@@ -115,6 +126,15 @@ void write_gauge_field_matrix(char filename[])
 		*(cm++)=*(pm++);
 		*(cm++)=*(pm++);
 		*(cm++)=*(pm);
+	      
+	        if(four_fermion_active) {
+                  double * s_buff = (double*)cm;
+		  double *s = _FIELD_AT(ff_sigma, ix);
+		  double *p = _FIELD_AT(ff_pi, ix);
+	          *(s_buff++)=*s;
+                  *(s_buff++)=*p;
+                  cm = (suNg*) s_buff;
+	        }
 	      }
 	    }
 #ifdef WITH_MPI
@@ -189,7 +209,7 @@ void write_gauge_field_matrix(char filename[])
 }
  
  
- void read_gauge_field(char filename[]){
+void read_gauge_field(char filename[]){
 #if (NG==2) && !defined(WITH_QUATERNIONS)
     read_gauge_field_su2(filename);
 #else
@@ -252,7 +272,12 @@ void read_gauge_field_matrix(char filename[])
 #endif
 
   zsize=GLB_Z/NP_Z; rz=GLB_Z-zsize*NP_Z;
-  buff=malloc(sizeof(suNg)*4*(GLB_Z/NP_Z+((rz>0)?1:0)));
+  if(!four_fermion_active) {
+    buff=malloc(sizeof(suNg)*4*(GLB_Z/NP_Z+((rz>0)?1:0)));
+  } else {
+    buff=malloc((sizeof(suNg)*4+2*sizeof(double))*(GLB_Z/NP_Z+((rz>0)?1:0)));
+  }
+
 
   g[3]=0;
   for (g[0]=0;g[0]<GLB_T;++g[0]) { /* loop over T, X and Y direction */
@@ -262,7 +287,14 @@ void read_gauge_field_matrix(char filename[])
         glb_to_proc(g, p); /* get the processor coordinate */
 #endif
         for (p[3]=0;p[3]<NP_Z;++p[3]) { /* loop over processors in Z direction */
-          int bsize=sizeof(suNg)/sizeof(double)*4*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
+	  int bsize;
+	  if(!four_fermion_active) {
+	    bsize=sizeof(suNg)/sizeof(double)*4*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
+	  } else {
+	    bsize=(sizeof(suNg)/sizeof(double)*4+2)*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
+          }
+	    
+
 #ifdef WITH_MPI
           MPI_Cart_rank(cart_comm, p, &cid);
           MPI_Group_translate_ranks(cg, 1, &cid, wg, &pid);
@@ -335,7 +367,17 @@ void read_gauge_field_matrix(char filename[])
               *(pm++)=*(cm++);
               *(pm++)=*(cm++);
               *(pm)=*(cm++);
-            }
+            
+
+	      if(four_fermion_active) {
+                double *s_buff = (double*)cm;
+	        double *s = _FIELD_AT(ff_sigma, ix);
+	        double *p = _FIELD_AT(ff_pi, ix);
+	        *(s)=*(s_buff++);
+                *(p)=*(s_buff++);
+                cm = (suNg*) s_buff;
+	      }
+	    }
           }
 
         } /* end loop over processors in Z direction */
@@ -620,3 +662,304 @@ void read_ranlxd_state(char filename[])
     
 }
 
+void write_scalar_field(char filename[]) 
+{
+  FILE *fp=NULL;
+  int g[4], p[4];
+  double *buff=NULL;
+  int pid=0;
+  int zsize, rz;
+  struct timeval start, end, etime;
+  
+  
+#ifdef WITH_MPI
+  /* MPI variables */
+  MPI_Group wg, cg;
+  MPI_Status st;
+  int cid;
+  int mpiret;(void) mpiret;
+#endif
+  
+#ifndef ALLOCATE_REPR_GAUGE_FIELD
+  complete_sc_sendrecv(u_scalar); 
+//  apply_BCs_on_represented_gauge_field(); //Save the link variables with periodic boundary conditions 
+#endif
+  
+  if(PID==0){
+    int d[5]={NG,GLB_T,GLB_X,GLB_Y,GLB_Z};
+    error((fp=fopen(filename,"wb"))==NULL,1,"write_gauge_field",
+	  "Failed to open file for writing");
+    /* write NG and global size */
+    error(fwrite_LE_int(d,(size_t)(5),fp)!=(5),
+	  1,"write_gauge_field",
+	  "Failed to write gauge field geometry");
+  }
+  
+#ifdef WITH_MPI
+  MPI_Comm_group(GLB_COMM,&wg);
+  MPI_Comm_group(cart_comm,&cg);
+#endif
+  
+  gettimeofday(&start,0);
+  
+  zsize=GLB_Z/NP_Z; rz=GLB_Z-zsize*NP_Z;
+  buff=malloc(sizeof(suNg_vector)*(GLB_Z/NP_Z+((rz>0)?1:0)));
+  
+  g[3]=0;
+  for (g[0]=0;g[0]<GLB_T;++g[0]) 
+    { /* loop over T, X and Y direction */
+      for (g[1]=0;g[1]<GLB_X;++g[1]) {
+	for (g[2]=0;g[2]<GLB_Y;++g[2]) {
+#ifdef WITH_MPI
+	  glb_to_proc(g, p); /* get the processor coordinate */
+#endif
+	  for (p[3]=0;p[3]<NP_Z;++p[3]) { /* loop over processors in Z direction */
+	    int bsize;
+	    bsize=sizeof(suNg_vector)/sizeof(double)*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
+	    
+#ifdef WITH_MPI
+	    MPI_Cart_rank(cart_comm, p, &cid);
+	    MPI_Group_translate_ranks(cg, 1, &cid, wg, &pid);
+#endif
+	    if (pid==PID) { /* fill link buffer */
+	      int lsite[4];
+	      suNg_vector *cm;
+	      
+	      /* convert global to local coordinate */
+	      origin_coord(lsite);
+	      lsite[0]=g[0]-lsite[0];
+	      lsite[1]=g[1]-lsite[1];
+	      lsite[2]=g[2]-lsite[2];
+	      
+	      /* fill buffer */
+	      cm=(suNg_vector*)buff;
+	      for (lsite[3]=0; lsite[3]<Z; ++lsite[3]) { /* loop on local Z */
+		int ix=ipt(lsite[0],lsite[1],lsite[2],lsite[3]);
+		suNg_vector *pm=pu_scalar(ix);
+		*(cm++)=*(pm);
+	      }
+	    }
+#ifdef WITH_MPI
+	    MPI_Barrier(GLB_COMM); 
+	    if (pid!=0) { /* do send/receive only if the data is not on PID 0 */ 
+	      /* send buffer */
+	      if (pid==PID) {
+#ifndef NDEBUG
+		error(Z!=(GLB_Z/NP_Z+((p[3]<rz)?1:0)),1,"write_scalar_field", "Local lattice size mismatch!");
+#endif
+		mpiret=MPI_Send(buff, bsize, MPI_DOUBLE, 0, 999, GLB_COMM);
+#ifndef NDEBUG
+		if (mpiret != MPI_SUCCESS) {
+		  char mesg[MPI_MAX_ERROR_STRING];
+		  int mesglen;
+		  MPI_Error_string(mpiret,mesg,&mesglen);
+		  lprintf("MPI",0,"ERROR: %s\n",mesg);
+		  error(1,1,"write_scalar_field " __FILE__,"Cannot send buffer");
+		}
+#endif
+	      }
+	      /* receive buffer */
+	      if (PID==0) {
+		mpiret=MPI_Recv(buff, bsize, MPI_DOUBLE, pid, 999, GLB_COMM, &st);
+#ifndef NDEBUG
+		if (mpiret != MPI_SUCCESS) {
+		  char mesg[MPI_MAX_ERROR_STRING];
+		  int mesglen;
+		  MPI_Error_string(mpiret,mesg,&mesglen);
+		  lprintf("MPI",0,"ERROR: %s\n",mesg);
+		  if (st.MPI_ERROR != MPI_SUCCESS) {
+		    MPI_Error_string(st.MPI_ERROR,mesg,&mesglen);
+		    lprintf("MPI",0,"Source [%d] Tag [%] ERROR: %s\n",
+			    st.MPI_SOURCE,
+			    st.MPI_TAG,
+			    mesg);
+		  }
+		  error(1,1,"write_scalar_field " __FILE__,"Cannot receive buffer");
+		}
+#endif
+	      }
+	    }
+#endif
+	    
+	    /* write buffer to file */
+	    if (PID==0) {
+		// Little endian output CHANGE LATER
+	      error(fwrite_LE_double(buff,(size_t)(bsize),fp)!=(bsize),
+		    1,"write_scalar_field",
+		    "Failed to write scalar field to file");
+	    }
+	    
+	  } /* end loop over processors in Z direction */
+	}
+      }
+    } /* end loop over T, X and Y direction */
+  
+  if (PID==0) fclose(fp); 
+  free(buff);
+  
+  gettimeofday(&end,0);
+  timeval_subtract(&etime,&end,&start);
+  lprintf("IO",0,"Configuration [%s] saved [%ld sec %ld usec]\n",filename,etime.tv_sec,etime.tv_usec);
+  
+#ifdef WITH_MPI
+  MPI_Barrier(GLB_COMM);
+#endif
+  
+#ifndef ALLOCATE_REPR_GAUGE_FIELD
+  complete_sc_sendrecv(u_scalar); 
+#endif
+}
+
+void read_scalar_field(char filename[]) 
+{
+	FILE *fp=NULL;
+	int g[4], p[4];
+	double *buff=NULL;
+	int pid=0;
+	int zsize, rz;
+	struct timeval start, end, etime;
+
+#ifdef WITH_MPI
+	/* MPI variables */
+	MPI_Group wg, cg;
+	MPI_Status st;
+	int cid;
+	int mpiret; (void) mpiret;
+#endif
+
+	gettimeofday(&start,0);
+
+	if(PID==0) {
+		int d[5]={0}; /* contains NG,GLB_T,GLB_X,GLB_Y,GLB_Z */
+		error((fp=fopen(filename,"rb"))==NULL,1,"read_scalar_field",
+				"Failed to open file for reading");
+		/* read NG and global size */
+		error(fread_LE_int(d,(size_t)(5),fp)!=(5),
+				1,"read_scalar_field",
+				"Failed to read scalar field geometry");
+		/* Check Gauge group and Lattice dimesions */
+		if (NG!=d[0]) {
+			lprintf("ERROR",0,"Read value of NG [%d] do not match this code [NG=%d].\nPlease recompile.\n",d[0],NG);
+			error(1,1,"read_scalar_field " __FILE__,"Gauge group mismatch");
+		}
+		if (GLB_T!=d[1] ||GLB_X!=d[2] ||GLB_Y!=d[3] ||GLB_Z!=d[4]) {
+			lprintf("ERROR",0,"Read value of global lattice size (%d,%d,%d,%d) do not match input file (%d,%d,%d,%d).\n",
+					d[1],d[2],d[3],d[4],GLB_T,GLB_X,GLB_Y,GLB_Z);
+			error(1,1,"read_scalar_field " __FILE__,"Gauge group mismatch");
+		}
+	}
+
+#ifdef WITH_MPI
+	MPI_Comm_group(GLB_COMM,&wg);
+	MPI_Comm_group(cart_comm,&cg);
+#endif
+
+	zsize=GLB_Z/NP_Z; rz=GLB_Z-zsize*NP_Z;
+	buff=malloc(sizeof(suNg_vector)*(GLB_Z/NP_Z+((rz>0)?1:0)));
+
+
+	g[3]=0;
+	for (g[0]=0;g[0]<GLB_T;++g[0]) { /* loop over T, X and Y direction */
+		for (g[1]=0;g[1]<GLB_X;++g[1]) {
+			for (g[2]=0;g[2]<GLB_Y;++g[2]) {
+#ifdef WITH_MPI
+				glb_to_proc(g, p); /* get the processor coordinate */
+#endif
+				for (p[3]=0;p[3]<NP_Z;++p[3]) { /* loop over processors in Z direction */
+					int bsize;
+					bsize=sizeof(suNg_vector)/sizeof(double)*(GLB_Z/NP_Z+((p[3]<rz)?1:0)); /* buffer size in doubles */
+
+
+#ifdef WITH_MPI
+					MPI_Cart_rank(cart_comm, p, &cid);
+					MPI_Group_translate_ranks(cg, 1, &cid, wg, &pid);
+#endif
+					/* read buffer from file */
+					if (PID==0) {
+						error(fread_LE_double(buff,(size_t)(bsize),fp)!=(bsize),
+								1,"read_scalar_field",
+								"Failed to read scalar field from file");
+					}
+
+#ifdef WITH_MPI
+					/* MPI_Barrier(GLB_COMM); */
+					if (pid!=0) { /* do send/receive only if the data is not on PID 0 */ 
+						/* send buffer */
+						if (PID==0) {
+							mpiret=MPI_Send(buff, bsize, MPI_DOUBLE, pid, 998, GLB_COMM);
+#ifndef NDEBUG
+							if (mpiret != MPI_SUCCESS) {
+								char mesg[MPI_MAX_ERROR_STRING];
+								int mesglen;
+								MPI_Error_string(mpiret,mesg,&mesglen);
+								lprintf("MPI",0,"ERROR: %s\n",mesg);
+								error(1,1,"read_scalar_field " __FILE__,"Cannot send buffer");
+							}
+#endif
+						}
+						/* receive buffer */
+						if (PID==pid) {
+#ifndef NDEBUG
+							error(Z!=(GLB_Z/NP_Z+((p[3]<rz)?1:0)),1,"read_scalar_field", "Local lattice size mismatch!");
+#endif
+							mpiret=MPI_Recv(buff, bsize, MPI_DOUBLE, 0, 998, GLB_COMM, &st);
+#ifndef NDEBUG
+							if (mpiret != MPI_SUCCESS) {
+								char mesg[MPI_MAX_ERROR_STRING];
+								int mesglen;
+								MPI_Error_string(mpiret,mesg,&mesglen);
+								lprintf("MPI",0,"ERROR: %s\n",mesg);
+								if (st.MPI_ERROR != MPI_SUCCESS) {
+									MPI_Error_string(st.MPI_ERROR,mesg,&mesglen);
+									lprintf("MPI",0,"Source [%d] Tag [%] ERROR: %s\n",
+											st.MPI_SOURCE,
+											st.MPI_TAG,
+											mesg);
+								}
+								error(1,1,"read_scalar_field " __FILE__,"Cannot receive buffer");
+							}
+#endif
+						}
+					}
+#endif
+
+					if (pid==PID) { /* copy buffer into memory */
+						int lsite[4];
+						suNg_vector *cm;
+
+						/* convert global to local coordinate */
+						origin_coord(lsite);
+						lsite[0]=g[0]-lsite[0];
+						lsite[1]=g[1]-lsite[1];
+						lsite[2]=g[2]-lsite[2];
+
+						/* copy buffer in place */
+						cm=(suNg_vector*)buff;
+						for (lsite[3]=0; lsite[3]<Z; ++lsite[3]) { /* loop on local Z */
+							int ix=ipt(lsite[0],lsite[1],lsite[2],lsite[3]);
+							suNg_vector *pm=pu_scalar(ix);
+							*(pm)=*(cm++);
+						}
+					}
+
+				} /* end loop over processors in Z direction */
+			}
+		}
+	} /* end loop over T, X and Y direction */
+
+	if (PID==0) fclose(fp); 
+	free(buff);
+
+	/* start sendrecv of global scalar field */
+	start_sc_sendrecv(u_scalar);
+	complete_sc_sendrecv(u_scalar);
+
+	/* check average plaquette */
+	gettimeofday(&end,0);
+	timeval_subtract(&etime,&end,&start);
+
+#ifdef WITH_MPI
+	MPI_Barrier(GLB_COMM);
+#endif
+
+}

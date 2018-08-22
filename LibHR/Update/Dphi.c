@@ -24,6 +24,7 @@
 #include "geometry.h"
 #include "communications.h"
 #include "memory.h"
+#include "clover_tools.h"
 
 #ifdef ROTATED_SF
 #include "update.h"
@@ -35,28 +36,28 @@ extern rhmc_par _update_par; /* Update/update_rhmc.c */
  * Init of Dphi
  */
 
-static int init=1;
-static spinor_field *gtmp=NULL;
-static spinor_field *etmp=NULL;
-static spinor_field *otmp=NULL;
-static spinor_field *otmp2=NULL;
+int init_dirac=1;
+spinor_field *gtmp=NULL;
+spinor_field *etmp=NULL;
+spinor_field *otmp=NULL;
+spinor_field *otmp2=NULL;
 
 static void free_mem() {
     if (gtmp!=NULL) { free_spinor_field_f(gtmp); etmp=NULL; }
     if (etmp!=NULL) { free_spinor_field_f(etmp); etmp=NULL; }
     if (otmp!=NULL) { free_spinor_field_f(otmp); otmp=NULL; }
     if (otmp2!=NULL) { free_spinor_field_f(otmp2); otmp2=NULL; }
-    init=1;
+    init_dirac=1;
 }
 
-static void init_Dirac() {
-    if (init) {
+void init_Dirac() {
+    if (init_dirac) {
         gtmp=alloc_spinor_field_f(1,&glattice);
         etmp=alloc_spinor_field_f(1,&glat_even);
         otmp=alloc_spinor_field_f(1,&glat_odd);
         otmp2=alloc_spinor_field_f(1,&glat_odd);
         atexit(&free_mem);
-        init=0;
+        init_dirac=0;
     }
 }
 
@@ -506,7 +507,7 @@ void Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
   apply_BCs_on_spinor_field(in);
 
   /* alloc memory for temporary spinor field */
-  if (init) { init_Dirac(); init=0; }
+  if (init_dirac) { init_Dirac(); init_dirac=0; }
   
   Dphi_(otmp, in);
   apply_BCs_on_spinor_field(otmp);
@@ -543,7 +544,7 @@ void Dphi_oepre(double m0, spinor_field *out, spinor_field *in)
   apply_BCs_on_spinor_field(in);
 
   /* alloc memory for temporary spinor field */
-  if (init) { init_Dirac(); init=0; }
+  if (init_dirac) { init_Dirac(); init_dirac=0; }
   
   Dphi_(etmp, in);
   apply_BCs_on_spinor_field(etmp);
@@ -577,7 +578,7 @@ void g5Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
   apply_BCs_on_spinor_field(in);
 
   /* alloc memory for temporary spinor field */
-  if (init) { init_Dirac(); init=0; }
+  if (init_dirac) { init_Dirac(); init_dirac=0; }
   
   Dphi_(otmp, in);
   apply_BCs_on_spinor_field(otmp);
@@ -596,7 +597,7 @@ void g5Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
 /* g5Dphi_eopre ^2 */
 void g5Dphi_eopre_sq(double m0, spinor_field *out, spinor_field *in) {
   /* alloc memory for temporary spinor field */
-  if (init) { init_Dirac(); init=0; }
+  if (init_dirac) { init_Dirac(); init_dirac=0; }
 
   g5Dphi_eopre(m0, etmp, in);
   g5Dphi_eopre(m0, out, etmp);
@@ -606,7 +607,7 @@ void g5Dphi_eopre_sq(double m0, spinor_field *out, spinor_field *in) {
 /* g5Dhi ^2 */
 void g5Dphi_sq(double m0, spinor_field *out, spinor_field *in) {
   /* alloc memory for temporary spinor field */
-  if (init) { init_Dirac(); init=0; }
+  if (init_dirac) { init_Dirac(); init_dirac=0; }
   
 #ifdef ROTATED_SF
   /*the switch of the SF_sign is needed to take care of the antihermiticity of the boundary term of the dirac operator*/
@@ -642,7 +643,7 @@ void Qhat_eopre(double m0, double mu, spinor_field* out, spinor_field *in){
   apply_BCs_on_spinor_field(in);
 
   /* alloc memory for temporary spinor field */
-  if (init) { init_Dirac(); init=0; }
+  if (init_dirac) { init_Dirac(); init_dirac=0; }
   Dphi_(otmp, in);
   apply_BCs_on_spinor_field(otmp);
   spinor_field_mul_f(otmp2,rho,otmp);
@@ -663,7 +664,7 @@ void Qhat_eopre(double m0, double mu, spinor_field* out, spinor_field *in){
 
 void Qhat_eopre_sq(double m0, double mu, spinor_field *out, spinor_field *in) {
   /* alloc memory for temporary spinor field */
-  if (init) { init_Dirac(); init=0; }
+  if (init_dirac) { init_Dirac(); init_dirac=0; }
   
 #ifdef ROTATED_SF
   /*the switch of the SF_sign is needed to take care of the antihermiticity of the boundary term of the dirac operator*/
@@ -673,3 +674,213 @@ void Qhat_eopre_sq(double m0, double mu, spinor_field *out, spinor_field *in) {
   Qhat_eopre(m0,mu,out,etmp);
 #endif
 }
+
+#ifdef WITH_CLOVER
+
+/*************************************************
+ * Dirac operators with clover term:             *
+ * Cphi = Dphi + clover                          *
+ * Cphi_eopre = D_ee - D_eo D_oo^-1 D_oe         *
+ * Cphi_diag = D_oo or D_ee                      *
+ * Cphi_diag_inv = D_oo^-1 or D_ee^-1            *
+ *************************************************/
+
+static void Cphi_(double mass, spinor_field *dptr, spinor_field *sptr, int assign)
+{
+	// Correct mass term
+	mass = (4.+mass);
+
+	// Loop over local sites
+	_MASTER_FOR(dptr->type,ix)
+	{
+		suNf_vector v1, v2;
+		suNf_spinor *out, *in, tmp;
+		suNfc *s0, *s1, *s2, *s3;
+
+		// Field pointers
+		out = _FIELD_AT(dptr,ix);
+		in = _FIELD_AT(sptr,ix);
+		s0 = _4FIELD_AT(cl_term,ix,0);
+		s1 = _4FIELD_AT(cl_term,ix,1);
+		s2 = _4FIELD_AT(cl_term,ix,2);
+		s3 = _4FIELD_AT(cl_term,ix,3);
+
+		// Component 0
+		_suNfc_multiply(v1, *s0, in->c[0]);
+		_suNfc_multiply(v2, *s1, in->c[1]);
+		_vector_add_f(tmp.c[0], v1, v2);
+
+		// Component 1
+		_suNfc_inverse_multiply(v1, *s1, in->c[0]);
+		_suNfc_multiply(v2, *s0, in->c[1]);
+		_vector_sub_f(tmp.c[1], v1, v2);
+
+		// Component 2
+		_suNfc_multiply(v1, *s2, in->c[2]);
+		_suNfc_multiply(v2, *s3, in->c[3]);
+		_vector_add_f(tmp.c[2], v1, v2);
+
+		// Component 3
+		_suNfc_inverse_multiply(v1, *s3, in->c[2]);
+		_suNfc_multiply(v2, *s2, in->c[3]);
+		_vector_sub_f(tmp.c[3], v1, v2);
+
+		// Add mass
+		_spinor_mul_add_assign_f(tmp, mass, *in);
+
+		// Store
+		if(assign)
+		{
+			_spinor_add_assign_f(*out, tmp);
+		}
+		else
+		{
+			*out = tmp;
+		}
+	}
+}
+
+static void Cphi_inv_(double mass, spinor_field *dptr, spinor_field *sptr, int assign)
+{
+	int N = 2*NF;
+	mass = (4.+mass);
+
+	// Update LDL decomposition
+	compute_ldl_decomp(mass);
+
+	// Loop over local sites
+	_MASTER_FOR(dptr->type,ix)
+	{
+		complex *up, *dn, *x, c;
+		suNf_spinor *out, *in, tmp;
+		int n;
+
+		// Field pointers
+		up = _FIELD_AT(cl_ldl,ix)->up;
+		dn = _FIELD_AT(cl_ldl,ix)->dn;
+		out = _FIELD_AT(dptr,ix);
+		in = _FIELD_AT(sptr,ix);
+
+		// tmp = in
+		tmp = *in;
+		x = (complex*)&tmp;
+
+		// Forward substitution
+		for(int i = 0; i < N; i++)
+		{
+			for(int k = 0; k < i; k++)
+			{
+				n = i*(i+1)/2+k;
+				_complex_mul_sub_assign(x[i], up[n], x[k]);
+				_complex_mul_sub_assign(x[i+N], dn[n], x[k+N]);
+			}
+		}
+
+		// Backward substitution
+		for(int i = N-1; i >= 0; i--)
+		{
+			n = i*(i+1)/2+i;
+			_complex_mulr(x[i], 1./up[n].re, x[i]);
+			_complex_mulr(x[i+N], 1./dn[n].re, x[i+N]);
+			for(int k = i+1; k < N; k++)
+			{
+				n = k*(k+1)/2+i;
+
+				c.re = up[n].re;
+				c.im = -up[n].im;
+				_complex_mul_sub_assign(x[i], c, x[k]);
+
+				c.re = dn[n].re;
+				c.im = -dn[n].im;
+				_complex_mul_sub_assign(x[i+N], c, x[k+N]);
+			}
+		}
+
+		// Store
+		if(assign)
+		{
+			_spinor_add_assign_f(*out, tmp);
+		}
+		else
+		{
+			*out = tmp;
+		}
+	}
+}
+
+void Cphi(double mass, spinor_field *dptr, spinor_field *sptr)
+{
+	apply_BCs_on_spinor_field(sptr);
+	Dphi_(dptr, sptr);
+	Cphi_(mass, dptr, sptr, 1);
+	apply_BCs_on_spinor_field(dptr);
+}
+
+void g5Cphi(double mass, spinor_field *dptr, spinor_field *sptr)
+{
+	Cphi(mass, dptr, sptr);
+	spinor_field_g5_assign_f(dptr);
+}
+
+void g5Cphi_sq(double mass, spinor_field *dptr, spinor_field *sptr)
+{
+	if(init_dirac)
+	{
+		init_Dirac();
+	}
+
+	g5Cphi(mass, gtmp, sptr);
+	g5Cphi(mass, dptr, gtmp);
+}
+
+void Cphi_eopre(double mass, spinor_field *dptr, spinor_field *sptr)
+{
+	if(init_dirac)
+	{
+		init_Dirac();
+	}
+
+	apply_BCs_on_spinor_field(sptr);
+	Dphi_(otmp, sptr);
+	Cphi_inv_(mass, otmp, otmp, 0);
+	apply_BCs_on_spinor_field(otmp);
+	Dphi_(dptr, otmp);
+	spinor_field_minus_f(dptr, dptr);
+	Cphi_(mass, dptr, sptr, 1);
+	apply_BCs_on_spinor_field(dptr);
+}
+
+void g5Cphi_eopre(double mass, spinor_field *dptr, spinor_field *sptr)
+{
+	Cphi_eopre(mass, dptr, sptr);
+	spinor_field_g5_assign_f(dptr);
+}
+
+void g5Cphi_eopre_sq(double mass, spinor_field *dptr, spinor_field *sptr)
+{
+	if(init_dirac)
+	{
+		init_Dirac();
+	}
+
+	g5Cphi_eopre(mass, etmp, sptr);
+	g5Cphi_eopre(mass, dptr, etmp);
+}
+
+void Cphi_diag(double mass, spinor_field *dptr, spinor_field *sptr)
+{
+	// Here (dptr == sptr) is allowed
+	apply_BCs_on_spinor_field(sptr);
+	Cphi_(mass, dptr, sptr, 0);
+	apply_BCs_on_spinor_field(dptr);
+}
+
+void Cphi_diag_inv(double mass, spinor_field *dptr, spinor_field *sptr)
+{
+	// Here (dptr == sptr) is allowed
+	apply_BCs_on_spinor_field(sptr);
+	Cphi_inv_(mass, dptr, sptr, 0);
+	apply_BCs_on_spinor_field(dptr);
+}
+
+#endif //#ifdef WITH_CLOVER

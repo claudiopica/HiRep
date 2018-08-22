@@ -30,6 +30,8 @@
 #include "gaugefix.h"
 #include "meson_observables.h"
 
+
+
 static void fix_T_bc(int tau){
   int index;
   int ix,iy,iz;
@@ -81,6 +83,9 @@ static void flip_T_bc(int tau){
 /********************************
 *	Point Sources		*
 *********************************/
+
+#define corr_ind(px,py,pz,n_mom,tc,nm,cm) ((px)*(n_mom)*(n_mom)*(24)*(nm)+(py)*(n_mom)*(24)*(nm)+(pz)*(24)*(nm)+ ((cm)*(24)) +(tc))
+
 void measure_spectrum_pt(int tau, int nm, double* m, int n_mom,int nhits,int conf_num, double precision){
   spinor_field* source = alloc_spinor_field_f(4,&glattice);
   spinor_field* prop =  alloc_spinor_field_f(4*nm*NF,&glattice);
@@ -238,6 +243,9 @@ void measure_spectrum_semwall(int nm, double* m, int nhits,int conf_num, double 
   free_spinor_field_f(prop);
 }
 
+
+
+
 void measure_spectrum_semwall_ext(int nm, double* m, int nhits,int conf_num, double precision){
   int k,l,tau;
   spinor_field* source = alloc_spinor_field_f(4,&glat_even);
@@ -266,6 +274,8 @@ void measure_spectrum_semwall_ext(int nm, double* m, int nhits,int conf_num, dou
   free_spinor_field_f(source);
   free_spinor_field_f(prop_p);
 }
+
+
 
 void measure_spectrum_semwall_fixedbc(int dt, int nm, double* m, int nhits,int conf_num, double precision){
   int tau,k;

@@ -21,7 +21,7 @@ if (!($su2quat eq "0") and $Ng!=2) {
 }
 
 my ($Nf,$c1,$c2);
-$c1="C"; #degault gauge field complex
+$c1="C"; #default gauge field complex
 if ($rep eq "REPR_FUNDAMENTAL") {
 	$Nf=$Ng;
 	$c2="C";
@@ -166,36 +166,36 @@ END
 write_suN_vector();
 
 if ($su2quat==0) {
-write_suN();
-print "typedef $dataname ${dataname}_FMAT;\n\n";
-print "typedef ${dataname}_flt ${dataname}_FMAT_flt;\n\n";
-
+	write_suN();
     if ($complex eq "R") {
-    write_suNr();
-    print "typedef $rdataname ${rdataname}_FMAT;\n\n";
-    print "typedef ${rdataname}_flt ${rdataname}_FMAT_flt;\n\n";
+	    write_suNr();
+		print "typedef $rdataname ${rdataname}_FMAT;\n\n";
+		print "typedef ${rdataname}_flt ${rdataname}_FMAT_flt;\n\n";
     } else {
-    print "typedef $dataname ${dataname}c;\n\n";
-    print "typedef ${dataname}_flt ${dataname}c_flt;\n\n";
-}
+		print "typedef $dataname ${dataname}c;\n\n";
+		print "typedef ${dataname}_flt ${dataname}c_flt;\n\n";
+		print "typedef $dataname ${dataname}_FMAT;\n\n";
+		print "typedef ${dataname}_flt ${dataname}_FMAT_flt;\n\n";
+	}
+	
 } else {
     write_su2($su2quat);
-    #print "typedef $dataname ${dataname}c;\n\n";
-    #print "typedef ${dataname}_flt ${dataname}c_flt;\n\n";
     my ($ldn,$lrdn)=($dataname,$rdataname);
-    $dataname="${dataname}_FMAT";
-    $rdataname="${rdataname}_FMAT";
+    $dataname="${rdataname}c";
+	$rdataname="${rdataname}_FMAT";
     write_suN();
     if ($complex eq "R") {
         write_suNr();
     } else {
-        print "typedef $dataname ${dataname}c;\n\n";
-        print "typedef ${dataname}_flt ${dataname}c_flt;\n\n";
-    }    
-    $dataname=$ldn;
+		print "typedef $dataname ${rdataname};\n\n";
+		print "typedef ${dataname}_flt ${rdataname}_flt;\n\n";
+	}
+	$dataname=$ldn;
     $rdataname=$lrdn;
     
 }
+
+
 
 write_spinor();
 if ($suff eq $fundsuff) { #algebra operations only for gauge
@@ -250,16 +250,32 @@ write_vector_prod_sub_assign_im();
 write_vector_project();
 
 if ($su2quat==0) {
+  write_suN_multiply();
+  write_suN_inverse_multiply();
+  write_suN_zero();
   if ($complex eq "R") {
     write_suNr_multiply();
     write_suNr_inverse_multiply();
-  } 
-  write_suN_multiply();
-  write_suN_inverse_multiply();
+ 	write_suNr_zero();
+  } else {
+	  print "#define _suNfc_multiply(a,b,c) _suNf_multiply(a,b,c)\n\n";
+	  print "#define _suNfc_inverse_multiply(a,b,c) _suNf_inverse_multiply(a,b,c)\n\n";
+	  print "#define _suNfc_zero(a) _suNf_zero(a)\n\n";
+  }
 } else {
     #write_su2_decode($su2quat);
-  write_su2_multiply();
-  write_su2_inverse_multiply();
+    write_su2_multiply();
+    write_su2_inverse_multiply();
+	write_su2_zero();
+ 
+    my ($ldn,$lrdn)=($dataname,$rdataname);
+  	if ($complex eq "C") {
+    	$dataname="${dataname}c";
+  	}
+    write_suN_multiply();
+    write_suN_inverse_multiply();
+	write_suN_zero();
+    $dataname=$ldn;
 }
 
 if ($suff eq "g") { #algebra operations only for gauge
@@ -288,7 +304,7 @@ if ($su2quat==0) {
   write_suN_times_suN();
   write_suN_times_suN_dagger();
   write_suN_dagger_times_suN();
-  write_suN_zero();
+ ## write_suN_zero();
   write_suN_unit();
   write_suN_minus();
 # write_suN_copy();
@@ -305,7 +321,7 @@ if ($su2quat==0) {
   write_suN_FMAT();
 
   if ($complex eq "R") { # we only need these functions at the moment...
-    write_suNr_zero();
+ ##   write_suNr_zero();
     write_suNr_FMAT();
     write_suNr_unit();
     write_suNr_dagger();
@@ -325,7 +341,7 @@ if ($su2quat==0) {
     write_su2_times_su2();
     write_su2_times_su2_dagger();
     write_su2_dagger_times_su2();
-	write_su2_zero();
+##	write_su2_zero();
     write_su2_unit();
     write_su2_minus();
     write_su2_mul();
@@ -345,16 +361,16 @@ if ($su2quat==0) {
     write_su2_exp();
 }
 
-    my ($ldn,$lrdn)=($dataname,$rdataname);
-    $dataname="${dataname}_FMAT";
-    $rdataname="${rdataname}_FMAT";
-    write_suN_zero();
-    if ($complex eq "R") { # we only need these functions at the moment...
-        write_suNr_zero();
-    }
-    $dataname=$ldn;
-    $rdataname=$lrdn;
-    
+my ($ldn,$lrdn)=($dataname,$rdataname);
+$dataname="${dataname}_FMAT";
+$rdataname="${rdataname}_FMAT";
+write_suN_zero();
+if ($complex eq "R") { # we only need these functions at the moment...
+	write_suNr_zero();
+}
+$dataname=$ldn;
+$rdataname=$lrdn;
+
 print <<END
 /*******************************************************************************
 *
@@ -1397,14 +1413,14 @@ sub write_suN_multiply {
 		}
 	} else { #partial unroll
 		print "   do { \\\n";
-		print "      int _i,_j,_k=0;for (_i=0; _i<$N; ++_i){\\\n";
-		print "         _complex_mul((r).$cname\[_i\],(u).$cname\[_k\],(s).$cname\[0\]); ++_k; _j=1;\\\n";
+		print "      int _i,_k=0;for (_i=0; _i<$N; ++_i){\\\n";
+		print "         _complex_mul((r).$cname\[_i\],(u).$cname\[_k\],(s).$cname\[0\]); ++_k;\\\n";
 		if($N<(2*$unroll+1)) {
 			for(my $j=1;$j<$N;$j++){
 				print "         _complex_mul_assign((r).$cname\[_i\],(u).$cname\[_k\],(s).$cname\[$j\]); ++_k;\\\n";
 			}
 		} else {
-			print "         for (; _j<$md; ){ \\\n";
+			print "         int _j=1; for (; _j<$md; ){ \\\n";
 			for(my $i=0;$i<$unroll;$i++){
 				print "            _complex_mul_assign((r).$cname\[_i\],(u).$cname\[_k\],(s).$cname\[_j\]); ++_k; ++_j;\\\n";
 			}
@@ -1435,14 +1451,14 @@ sub write_suNr_multiply {
 		}
 	} else { #partial unroll
 		print "   do { \\\n";
-		print "      int _i,_j,_k=0;for (_i=0; _i<$N; ++_i){\\\n";
-		print "         _complex_mulr((r).$cname\[_i\],(u).$cname\[_k\],(s).$cname\[0\]); ++_k; _j=1;\\\n";
+		print "      int _i,_k=0;for (_i=0; _i<$N; ++_i){\\\n";
+		print "         _complex_mulr((r).$cname\[_i\],(u).$cname\[_k\],(s).$cname\[0\]); ++_k;\\\n";
 		if($N<(2*$unroll+1)) {
 			for(my $j=1;$j<$N;$j++){
 				print "         _complex_mulr_assign((r).$cname\[_i\],(u).$cname\[_k\],(s).$cname\[$j\]); ++_k;\\\n";
 			}
 		} else {
-			print "         for (; _j<$md; ){ \\\n";
+			print "         int _j=1; for (; _j<$md; ){ \\\n";
 			for(my $i=0;$i<$unroll;$i++){
 				print "            _complex_mulr_assign((r).$cname\[_i\],(u).$cname\[_k\],(s).$cname\[_j\]); ++_k; ++_j;\\\n";
 			}
@@ -1612,14 +1628,14 @@ sub write_suN_inverse_multiply {
 		}
 	} else { #partial unroll
 		print "   do { \\\n";
-		print "      int _i,_j,_k=0;for (_i=0; _i<$N; ++_i){\\\n";
-		print "         _complex_mul_star((r).$cname\[_i\],(s).$cname\[0\],(u).$cname\[_k\]); _j=1;\\\n";
+		print "      int _i,_k=0;for (_i=0; _i<$N; ++_i){\\\n";
+		print "         _complex_mul_star((r).$cname\[_i\],(s).$cname\[0\],(u).$cname\[_k\]);\\\n";
 		if($N<(2*$unroll+1)) {
 			for(my $j=1;$j<$N;$j++){
 				print "         _k+=$N; _complex_mul_star_assign((r).$cname\[_i\],(s).$cname\[$j\],(u).$cname\[_k\]);\\\n";
 			}
 		} else {
-			print "         for (; _j<$md; ){ \\\n";
+			print "         int _j=1; for (; _j<$md; ){ \\\n";
 			for(my $i=0;$i<$unroll;$i++){
 				print "            _k+=$N; _complex_mul_star_assign((r).$cname\[_i\],(s).$cname\[_j\],(u).$cname\[_k\]); ++_j;\\\n";
 			}
@@ -1652,14 +1668,14 @@ sub write_suNr_inverse_multiply {
 		}
 	} else { #partial unroll
 		print "   do { \\\n";
-		print "      int _i,_j,_k=0;for (_i=0; _i<$N; ++_i){\\\n";
-		print "         _complex_mulr((r).$cname\[_i\],(u).$cname\[_k\],(s).$cname\[0\]); _j=1;\\\n";
+		print "      int _i,_k=0;for (_i=0; _i<$N; ++_i){\\\n";
+		print "         _complex_mulr((r).$cname\[_i\],(u).$cname\[_k\],(s).$cname\[0\]);\\\n";
 		if($N<(2*$unroll+1)) {
 			for(my $j=1;$j<$N;$j++){
 				print "         _k+=$N; _complex_mulr_assign((r).$cname\[_i\],(u).$cname\[_k\],(s).$cname\[$j\]);\\\n";
 			}
 		} else {
-			print "         for (; _j<$md; ){ \\\n";
+			print "         int _j=1; for (; _j<$md; ){ \\\n";
 			for(my $i=0;$i<$unroll;$i++){
 				print "            _k+=$N; _complex_mulr_assign((r).$cname\[_i\],(u).$cname\[_k\],(s).$cname\[_j\]); ++_j;\\\n";
 			}
@@ -2065,7 +2081,7 @@ sub write_suNr_dagger_times_suNr {
 		print "      for (_i=0; _i<$N; ++_i){\\\n";
 		print "         for (_y=0; _y<$N; ++_y){\\\n";
  		print "            _k=_y; _l=_i;\\\n";
-		print "            (u).$cname\[_n\]=(w).$cname\[_k\]*(v).$cname\[_l\]);\\\n";
+		print "            (u).$cname\[_n\]=(w).$cname\[_k\]*(v).$cname\[_l\];\\\n";
 		if($N<(2*$unroll+1)) {
 			for(my $j=1;$j<$N;$j++){
 				print "            _k+=$N; _l+=$N; (u).$cname\[_n\]+=(w).$cname\[_k\]*(v).$cname\[_l\];\\\n";

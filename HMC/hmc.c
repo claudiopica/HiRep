@@ -136,7 +136,7 @@ int main(int argc,char *argv[]) {
   setup_process(&argc,&argv);
   
   geometry_mpi_eo();
-  /* test_geometry_mpi_eo(); */ 
+  /* test_geometry_mpi_eo(); */
 
   /* setup random numbers */
   read_input(rlx_var.read,get_input_filename());
@@ -165,11 +165,13 @@ int main(int argc,char *argv[]) {
   read_input(eigval_var.read,get_input_filename());
   
   /* Init Monte Carlo */
+
   init_mc(&flow, get_input_filename());
   lprintf("MAIN",0,"MVM during HMC initialzation: %ld\n",getMVM());
-  lprintf("MAIN",0,"Initial plaquette: %1.8e\n",avr_plaquette());
 
-  
+
+  lprintf("MAIN",0,"Initial plaquette: %1.8e\n",avr_plaquette());
+ 
   if(strcmp(mes_var.make,"true")==0) {
     init_meson_correlators(0);
     lprintf("MAIN",0,"Measuring Gamma Gamma correlators and PCAC-mass\n");
@@ -216,7 +218,7 @@ int main(int argc,char *argv[]) {
 #endif
     
     rr=update_ghmc();
-    
+
     gettimeofday(&end,0);
     timeval_subtract(&etime,&end,&start);
     lprintf("MAIN",0,"Trajectory #%d: generated in [%ld sec %ld usec]\n",i,etime.tv_sec,etime.tv_usec);
@@ -231,9 +233,12 @@ int main(int argc,char *argv[]) {
     perc=(acc==0)?0.:(float)(100*acc)/(float)(rc);
     
     lprintf("MAIN",0,"Trajectory #%d: %d/%d (%3.4f%%) MVM (f;d) = %ld ; %ld\n",i,acc,rc,perc,getMVM_flt(),getMVM());
-    
+
     if((i%flow.save_freq)==0) {
       save_conf(&flow, i);
+      if(u_scalar!=NULL){
+	      save_scalar_conf(&flow, i);
+      }
       /* Only save state if we have a file to save to */
       if(rlx_var.rlxd_state[0]!='\0') {
           lprintf("MAIN",0,"Saving rlxd state to file %s\n",rlx_var.rlxd_state);
@@ -261,12 +266,19 @@ int main(int argc,char *argv[]) {
 
     if((i%flow.meas_freq)==0) {
       /* plaquette */
-      lprintf("MAIN",0,"Plaquette: %1.8e\n",avr_plaquette());
-      
+#ifdef WITH_SMEARING
+		 lprintf("MAIN",0,"Plaquette: %1.8e, Smeared: %1.8e\n",avr_plaquette(),avr_smeared_plaquette());
+#else
+		 lprintf("MAIN",0,"Plaquette: %1.8e\n",avr_plaquette());
+#endif
+
       /* Mesons */
       if(strcmp(mes_var.make,"true")==0) {
-	measure_spectrum_semwall(1,&mes_var.mesmass,mes_var.nhits,i,mes_var.precision);
+			measure_spectrum_semwall(1,&mes_var.mesmass,mes_var.nhits,i,mes_var.precision);
       }
+
+      /* Four fermion observables */
+      if(four_fermion_active==1) ff_observables();
       
       /* Polyakov loops */
       if(strcmp(poly_var.make,"true")==0) {
@@ -291,9 +303,13 @@ int main(int argc,char *argv[]) {
       }
     }
   }
+
   /* save final configuration */
   if(((--i)%flow.save_freq)!=0) {
     save_conf(&flow, i);
+    if(u_scalar!=NULL){
+	    save_scalar_conf(&flow, i);
+    }
     /* Only save state if we have a file to save to */
     if(rlx_var.rlxd_state[0]!='\0') {
         lprintf("MAIN",0,"Saving rlxd state to file %s\n",rlx_var.rlxd_state);
@@ -312,6 +328,7 @@ int main(int argc,char *argv[]) {
   
   /* close communications */
   finalize_process();
+	
   
   return 0;
   

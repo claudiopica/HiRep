@@ -1,0 +1,12 @@
+// Global variables 
+GLB_T = 6 //Global T size
+GLB_X = 6
+GLB_Y = 6
+GLB_Z = 6
+NP_T = 2
+NP_X = 2
+NP_Y = 2
+NP_Z = 2
+rlx_level = 1
+rlx_seed = 12345
+

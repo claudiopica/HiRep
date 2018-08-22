@@ -118,7 +118,13 @@ _OMP_PRAGMA ( single )
 
   global_sum(&pa, 1);
 
-  return pa/(6.*NG)/GLB_VOLUME;
+#ifdef BC_T_OPEN
+	pa /= 6.0*NG*GLB_VOLUME*(GLB_T-1)/GLB_T;
+#else
+	pa /= 6.0*NG*GLB_VOLUME;
+#endif
+
+  return pa;
 
 }
 
@@ -209,7 +215,13 @@ _OMP_PRAGMA ( single )
 _OMP_PRAGMA ( single )
 	for(int k = 0; k < 6; k++)
 	{
-		pa[k] /= GLB_VOLUME*NG;
+
+#ifdef BC_T_OPEN
+		pa[k] /= NG*GLB_VOLUME*(GLB_T-1)/GLB_T;
+#else
+		pa[k] /= NG*GLB_VOLUME;
+#endif
+
 	}
 
 	lprintf("PLAQ",0,"Plaq(%d,%d) = ( %f , %f )\n",1,0,creal(pa[0]),cimag(pa[0]));

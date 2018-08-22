@@ -22,6 +22,8 @@ check_puregauge_1          Check that _group_represent is homomorphic
 
 check_puregauge_2          Check the gauge covariance of the HYP smearing
 
+check_puregauge_3          Various checks for the Luscher-Weisz gauge action
+
 check_spinorfield_1        Check the consistency of spinor linear algebra
 
 check_inverters_1          Check of the CG inversion

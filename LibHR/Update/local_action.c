@@ -18,8 +18,9 @@
  */
 void local_hmc_action(local_action_type type,
                       scalar_field *loc_action,
-                      suNg_av_field *momenta
-                      ) {
+                      suNg_av_field *momenta,
+                      suNg_scalar_field *momenta_s
+                      ){
 
   
   /* check input types */
@@ -50,8 +51,13 @@ void local_hmc_action(local_action_type type,
       _algebra_vector_sqnorm_g(tmp,*cmom); 
       a+=tmp; /* this must be positive */
     }
+    double P2=0.0; //Scalar momentum squared
+    if(u_scalar!=NULL){
+	    suNg_vector P=*_FIELD_AT(momenta_s,i);
+	    _vector_prod_re_g(P2,P,P);
+    }
     a*=0.5*_FUND_NORM2;
-    *_FIELD_AT(loc_action,i)+=a;
+    *_FIELD_AT(loc_action,i)+=a + P2;
   }
 
   int nmon=num_mon();

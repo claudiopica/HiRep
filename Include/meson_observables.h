@@ -28,5 +28,9 @@ extern meson_observable *meson_correlators;
 extern meson_observable *discon_correlators;
 extern meson_observable *cvc_correlators;
 
+/* Disconnected part of Triplet correlators,
+ * appears with four fermion interactions */
+extern meson_observable *triplet_discon_correlators;
+
 
 #endif

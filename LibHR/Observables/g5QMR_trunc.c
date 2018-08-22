@@ -38,7 +38,7 @@ static short int truncated;
 static int g5QMR_mshift_core(short *valid, mshift_par *par, int trunc_iter, spinor_operator M, spinor_field *in, spinor_field *out_trunc, spinor_field *out){
 
   spinor_field **q1,**q2;
-  spinor_field *p1, *p2, *Mp, *sd;
+  spinor_field *p1, *p2, *Mp;
   spinor_field *sptmp, *memall;
 
   double alpha, beta, delta, rho, innorm2; 
@@ -71,7 +71,7 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, int trunc_iter, spin
   /* implementation note: to minimize the number of malloc calls
    * objects of the same type are allocated together
    */
-  memall = alloc_spinor_field_f(2*(par->n)+4,in->type);
+  memall = alloc_spinor_field_f(2*(par->n)+3,in->type);
   q1 = (spinor_field**)malloc(sizeof(spinor_field*)*par->n);
   q2 = (spinor_field**)malloc(sizeof(spinor_field*)*par->n);
   for(i=0; i<par->n; i++) {
@@ -81,7 +81,6 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, int trunc_iter, spin
   p1 = memall+2*par->n;
   p2 = p1+1;
   Mp = p2+1;
-  sd = Mp+1;
 
   r = (double *)malloc(sizeof(double)*5*(par->n));
   s1 = r+(par->n);

@@ -12,8 +12,6 @@ rlx_seed = 13813
 rlx_start = new
 rlx_state = rand_state
 
-
-
 mes:masses = 0
 mes:use_input_mass = 0;
 mes:precision = 1e-20
@@ -36,8 +34,10 @@ mes:discon_volume = 0
 mes:dilution = 4
 mes:dirichlet_dt = 2
 
-
 mes:background_field = 1
 mes:Q =  0.5
 mes:nEz = 1
 
+mes:csw = 1.9192
+mes:rho_s = 0.15
+mes:rho_t = 0.15

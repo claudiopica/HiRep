@@ -1,0 +1,212 @@
+\documentclass[12pt]{article}
+
+% Packages
+\usepackage[a4paper,left=2cm,right=2cm,top=3cm,bottom=3cm]{geometry}
+\usepackage{mathpazo}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{mathrsfs}
+\usepackage{algpseudocode}
+\usepackage{fancyhdr}
+
+\thispagestyle{fancyplain}
+\renewcommand{\headrulewidth}{0pt}
+\fancyhead[R]{Martin Hansen, 2017 \\ hansen@cp3-origins.net}
+
+% Settings
+\setlength{\parindent}{0mm}
+\newcommand{\tr}{\mathrm{tr}}
+\newcommand{\re}{\mathrm{Re}}
+\newcommand{\cP}{\mathcal{P}}
+\newcommand{\csw}{\mathrm{c}_\mathrm{sw}}
+
+\begin{document}
+\section*{Stout smearing}
+The implementation follows [hep-lat/0311018] closely. We define the smeared links as
+\begin{equation}
+ U'_\mu(x) = e^{Q_\mu(x)}U_\mu(x)
+\end{equation}
+
+where $\Sigma_\mu(x)$ is an element of the Lie algebra, defined via the projection
+\begin{equation}
+ Q_\mu(x) = \cP\{\Omega_\mu(x)\}.
+\end{equation}
+
+The projection operator is not unique, but the most common choice is
+\begin{equation}
+ \cP(\Omega) = \frac{1}{2}(\Omega-\Omega^\dagger) - \frac{1}{2N}\tr(\Omega-\Omega^\dagger).
+\end{equation}
+
+However, in a setup with mixed representations, it is convenient to use the following two-step procedure for the projection. This allows us to project matrices from different representations onto the generators of the fundamental representation.
+\begin{align}
+ A_\mu^a(x) &= -\frac{1}{T_f}\tr[iT^a_R\Omega_\mu(x)] \\
+ Q_\mu(x) &= iT^a_F A_\mu^a(x)
+\end{align}
+
+The matrix $\Omega_\mu(x)$ is defined as
+\begin{equation}
+ \Omega_\mu(x) = U_\mu(x)V_\mu(x)
+\end{equation}
+\begin{equation}
+ V_\mu(x) = \sum_{\nu\neq\mu}
+ \rho_{\mu\nu}\left(
+ U_\nu(x+\hat{\mu})U_\mu^\dagger(x+\hat{\nu})U_\nu^\dagger(x) +
+ U_\nu^\dagger(x+\hat{\mu}-\hat{\nu})U_\mu^\dagger(x-\hat{\nu})U_\nu(x-\hat{\nu})
+ \right)
+\end{equation}
+
+For the force calculation we use the chain rule.
+\begin{equation}
+ \frac{dS}{dU} = \frac{dS}{dU'}\frac{dU'}{dU}
+\end{equation}
+
+The first derivative on the right-hand side is the usual force $\Sigma_\mu'(x)$ evaluated using the smeared links. The second term is the derivative of the smeared links with respect to the fundamental links. This can be written in the following way, because the derivative of the action is surrounded by a trace.
+\begin{equation}
+ \frac{dS}{dU} = e^Q\Sigma' + \frac{d\Omega}{dU}\cP(X)
+\end{equation}
+
+When using a Taylor expansion to define the exponential function, we can use the following definition of $X$.
+\begin{equation}
+ X = \sum_{n=0}^\infty\sum_{k=0}^n Q^kU\Sigma' Q^{n-k}
+\end{equation}
+
+The derivative of the $\Omega$ matrix is the last missing piece. Define $\Lambda=\cP(X)$ and consider
+\begin{equation}
+ \frac{d}{d U_\mu(x)} U_\mu(x)V_\mu(x)\Lambda_\mu(x)
+\end{equation}
+
+Here we have a sum over $\nu\neq\mu$. There are eight contributions to the above derivative.
+\begin{align}
+ \rho_{\mu\nu}U_\nu(x+\hat{\mu})U_\mu^\dagger(x+\hat{\nu})U_\nu^\dagger(x)\Lambda_\mu(x) \\
+ \rho_{\nu\mu}U_\nu^\dagger(x+\hat{\mu}-\hat{\nu})U_\mu^\dagger(x-\hat{\nu})\Lambda_\nu(x-\hat{\nu})U_\nu(x-\hat{\nu}) \\
+ \rho_{\mu\nu}U_\nu^\dagger(x+\hat{\mu}-\hat{\nu})U_\mu^\dagger(x-\hat{\nu})\Lambda_\mu^\dagger(x-\hat{\nu})U_\nu(x-\hat{\nu}) \\
+ \rho_{\nu\mu}U_\nu(x+\hat{\mu})U_\mu^\dagger(x+\hat{\nu})U_\nu^\dagger(x)\Lambda_\nu^\dagger(x) \\
+ \nonumber\\
+ \rho_{\mu\nu}U_\nu^\dagger(x+\hat{\mu}-\hat{\nu})U_\mu^\dagger(x-\hat{\nu})U_\nu(x-\hat{\nu})\Lambda_\mu(x) \\
+ \rho_{\nu\mu}U_\nu^\dagger(x-\hat{\nu}+\hat{\mu})\Lambda_\nu^\dagger(x-\hat{\nu}+\hat{\mu})U_\mu^\dagger(x-\hat{\nu})U_\nu(x-\hat{\nu}) \\
+ \rho_{\mu\nu}U_\nu(x+\hat{\mu})U_\mu^\dagger(x+\hat{\nu})\Lambda_\mu^\dagger(x+\hat{\nu})U_\nu^\dagger(x) \\
+ \rho_{\nu\mu}\Lambda_\nu(x+\hat{\mu})U_\nu(x+\hat{\mu})U_\mu^\dagger(x+\hat{\nu})U_\nu^\dagger(x)
+\end{align}
+
+This can be simplified because several products appear more than once and we can use $\Lambda^\dagger=-\Lambda$ to remove some of the Hermitian conjugates. In the following we also assume that $\rho_{\mu\nu}=\rho_{\nu\mu}$.
+\begin{align}
+ \rho_{\mu\nu}W_2U_\nu^\dagger(x)\{\Lambda_\mu(x)-\Lambda_\nu(x)\} \\
+ \rho_{\mu\nu}U_\nu^\dagger(x+\hat{\mu}-\hat{\nu})U_\mu^\dagger(x-\hat{\nu})\{\Lambda_\nu(x-\hat{\nu})-\Lambda_\mu(x-\hat{\nu})\}U_\nu(x-\hat{\nu}) \\
+ \rho_{\mu\nu}U_\nu^\dagger(x+\hat{\mu}-\hat{\nu})\{W_1\Lambda_\mu(x)-\Lambda_\nu(x+\hat{\mu}-\hat{\nu})W_1\} \\
+ \rho_{\mu\nu}\{\Lambda_\nu(x+\hat{\mu})W_2-W_2\Lambda_\mu(x+\hat{\nu})\}U_\nu^\dagger(x)
+\end{align}
+
+Here
+\begin{align}
+ W_1 &= U_\mu^\dagger(x-\hat{\nu})U_\nu(x-\hat{\nu}) \\
+ W_2 &= U_\nu(x+\hat{\mu})U_\mu^\dagger(x+\hat{\nu})
+\end{align}
+
+This brings us down to 13 multiplications.
+
+\newpage
+\section*{Comparisons with Helsinki code}
+To verify the implementation of the stout smearing we have performed three different comparisons between the HiRep code and the Helsinki code. The bare parameters and the results from the Helsinki code are listed below for future references.
+
+\subsection*{Comparison 1}
+\begin{itemize}
+\item Parameters
+\begin{itemize}
+ \item SU(2) gauge with $N_f=2$ fundamental fermions
+ \item smearing coefficient: $\rho=0.15$
+ \item bare coupling: $\beta=3$
+ \item bare mass: $m_0=0$
+ \item clover coefficient: $\csw=0$
+ \item volume: $4^3\times4$
+ \item boundary conditions: PPPA
+\end{itemize}
+\item Results from Helsinki code
+\begin{itemize}
+ \item plaquette = 0.72825(81)
+ \item smeared plaquette = 0.94640(21)
+\end{itemize}
+\end{itemize}
+
+\newpage
+\subsection*{Comparison 2}
+\begin{itemize}
+\item Parameters
+\begin{itemize}
+ \item SU(2) gauge with $N_f=2$ adjoint fermions
+ \item smearing coefficient: $\rho=0.15$
+ \item bare coupling: $\beta=3$
+ \item bare mass: $m_0=0$
+ \item clover coefficient: $\csw=0$
+ \item volume: $8^3\times16$
+ \item boundary conditions: PPPA
+\end{itemize}
+\item Results from Helsinki code
+\begin{itemize}
+ \item plaquette = 0.7287(1)
+ \item adjoint plaquette = 0.86293(8)
+ \item smeared plaquette = 0.94604(3)
+ \item pion mass = 0.77(3)
+\end{itemize}
+\item Pion correlator from Helsinki code calculated with a point source
+\begin{verbatim}
+0 14.3676443 0.0045994
+1 0.914223028 0.0012735
+2 0.146273475 0.00075613
+3 0.0339348137 0.00031231
+4 0.010181324 0.00015345
+5 0.0036325474 6.854e-05
+6 0.00148887148 3.4079e-05
+7 0.000731674392 1.8238e-05
+8 0.000535888673 1.6006e-05
+9 0.000719737921 3.419e-05
+10 0.00146685761 6.6653e-05
+11 0.00361812596 9.7931e-05
+12 0.0101638629 0.00017299
+13 0.0338646793 0.00035478
+14 0.146191624 0.0008822
+15 0.916037914 0.0019661
+\end{verbatim}
+\end{itemize}
+
+\newpage
+\subsection*{Comparison 3}
+\begin{itemize}
+\item Parameters
+\begin{itemize}
+ \item SU(2) gauge with $N_f=2$ adjoint fermions
+ \item smearing coefficient: $\rho=0.15$
+ \item bare coupling: $\beta=3$
+ \item bare mass: $m_0=0$
+ \item clover coefficient: $\csw=1$
+ \item volume: $8^3\times16$
+ \item boundary conditions: PPPA
+\end{itemize}
+\item Results from Helsinki code
+\begin{itemize}
+ \item plaquette = 0.7354(2)
+ \item smeared plaquette = 0.95022(4)
+ \item pion mass = 0.381(9)
+\end{itemize}
+\item Pion correlator from Helsinki code calculated with a point source
+\begin{verbatim}
+0 14.6612854 0.0085004
+1 1.04119832 0.0016945
+2 0.19746517 0.00073826
+3 0.0616323455 0.00036193
+4 0.0287732603 0.00020687
+5 0.0175299864 0.00014312
+6 0.0126331759 0.00010638
+7 0.0103783769 8.9186e-05
+8 0.00970566401 8.528e-05
+9 0.0103333328 8.8617e-05
+10 0.0125259474 0.00010258
+11 0.0174300416 0.00014409
+12 0.028713674 0.00021674
+13 0.0616770494 0.00039017
+14 0.197164488 0.00083612
+15 1.0392694 0.0019799
+\end{verbatim}
+\end{itemize}
+
+\end{document}

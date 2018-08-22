@@ -13,6 +13,7 @@
 #include "memory.h"
 #include "utils.h"
 #include "communications.h"
+#include "clover_tools.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -30,94 +31,134 @@ input_hmc hmc_var = init_input_hmc(hmc_var);
 #define repr_name "ADJ"
 #endif
 
-static double beta(){
-  integrator_par *ip=hmc_var.hmc_p.integrator;
-  while (ip!=NULL){
-    for (int n=0;n<ip->nmon;n++){
-      const monomial* m=ip->mon_list[n];
-      if (m->data.type==PureGauge){
-        return ((mon_pg_par*) m->data.par)->beta;
-      }
-    }
-    ip=ip->next;
-  }
-  return 0;
+static double beta()
+{
+	double beta = 0;
+	for(int i = 0; i < num_mon(); i++)
+	{
+		const monomial *m = mon_n(i);
+		void *mpar = m->data.par;
+		switch(m->data.type)
+		{
+			case PureGauge:
+				beta = ((mon_pg_par*)mpar)->beta;
+				break;
+			case LuscherWeisz:
+				beta = ((mon_lw_par*)mpar)->beta;
+				break;
+			default:
+				break;
+		}
+	}
+	return beta;
 }
 
-static double mass(){
-  integrator_par *ip=hmc_var.hmc_p.integrator;
-  double min=1./0.;
-  while (ip!=NULL){
-    for (int n=0;n<ip->nmon;n++){
-      double nm=min;
-      const monomial* m=ip->mon_list[n];
-      if (m->data.type==HMC){
-        nm = ((mon_hmc_par*) m->data.par)->mass;
-      }
-      else if (m->data.type==RHMC){
-        nm = ((mon_rhmc_par*) m->data.par)->mass;
-      }
-      else if (m->data.type==TM || m->data.type==TM_alt){
-        nm = ((mon_tm_par*) m->data.par)->mass;
-      }
-      else if (m->data.type==Hasenbusch){
-        nm = ((mon_hasenbusch_par*) m->data.par)->mass;
-      }
-      else if (m->data.type==Hasenbusch_tm || m->data.type==Hasenbusch_tm_alt){
-        nm = ((mon_hasenbusch_tm_par*) m->data.par)->mass;
-      }
-      if (nm<min) min=nm;
-    }
-    ip=ip->next;
-  }
-  return min;
+static double mass()
+{
+	double mass = 1./0.;
+	for(int i = 0; i < num_mon(); i++)
+	{
+		const monomial *m = mon_n(i);
+		void *mpar = m->data.par;
+		double nm = mass;
+		switch(m->data.type)
+		{
+			case HMC:
+			case HMC_ff:
+				nm = ((mon_hmc_par*)mpar)->mass;
+				break;
+			case Hasenbusch:
+			case Hasenbusch_ff:
+				nm = ((mon_hasenbusch_par*)mpar)->mass;
+				break;
+			case RHMC:
+				nm = ((mon_rhmc_par*)mpar)->mass;
+				break;
+			case TM:
+			case TM_alt:
+				nm = ((mon_tm_par*)mpar)->mass;
+				break;
+			case Hasenbusch_tm:
+			case Hasenbusch_tm_alt:
+				nm = ((mon_hasenbusch_tm_par*)mpar)->mass;
+				break;
+			default:
+				break;
+		}
+		mass = (nm < mass) ? nm : mass;
+	}
+	return mass;
 }
 
-static int nf(){
-  int nf=0;
-  integrator_par *ip=hmc_var.hmc_p.integrator;
-  while (ip!=NULL){
-    for (int n=0;n<ip->nmon;n++){
-      const monomial* m=ip->mon_list[n];
-      if (m->data.type==HMC){
-        nf+=2;
-      }
-      else if (m->data.type==RHMC){
-        nf+=2;
-      }
-      else if (m->data.type==TM){
-        nf+=2;
-      }
-    }
-    ip=ip->next;
-  }
-  return nf;
+static int nf()
+{
+	int nf = 0;
+	for(int i = 0; i < num_mon(); i++)
+	{
+		const monomial *m = mon_n(i);
+		switch(m->data.type)
+		{
+			case HMC:
+			case HMC_ff:
+				nf += 2;
+				break;
+			case RHMC:
+				nf += 1;
+				break;
+			case TM:
+			case TM_alt:
+				nf += 2;
+				break;
+			default:
+				break;
+		}
+	}
+	return nf;
 }
 
-static void mk_gconf_name(char *name, hmc_flow *rf, int id) {
-  /* build configuration name */
-  if (strlen(rf->run_name)>10)
-      sprintf(name,"%sn%d",rf->run_name,id);
-  else{
-    sprintf(name,"%s_%dx%dx%dx%dnc%dr%snf%db%.6fm%.6fn%d",
-            rf->run_name,GLB_T,GLB_X,GLB_Y,GLB_Z,NG,repr_name,
-            nf(),beta(),-mass(),id);
-  }
+static void mk_gconf_name(char *name, hmc_flow *rf, int id)
+{
+	/* build configuration name */
+	if(strlen(rf->run_name) > 10)
+	{
+		sprintf(name,"%sn%d",rf->run_name,id);
+	}
+	else
+	{
+		sprintf(name,"%s_%dx%dx%dx%dnc%dr%snf%db%.6fm%.6fn%d",
+				  rf->run_name,GLB_T,GLB_X,GLB_Y,GLB_Z,NG,repr_name,nf(),beta(),-mass(),id);
+	}
 }
 
+static void mk_sconf_name(char *name, hmc_flow *rf, int id)
+{
+	/* build configuration name */
+	if(strlen(rf->run_name) > 10)
+	{
+		sprintf(name,"scalar_%sn%d",rf->run_name,id);
+	}
+	else
+	{
+		sprintf(name,"scalar_%s_%dx%dx%dx%dnc%dr%snf%db%.6fm%.6fn%d",
+				  rf->run_name,GLB_T,GLB_X,GLB_Y,GLB_Z,NG,repr_name,nf(),beta(),-mass(),id);
+	}
+}
 /* add dirname to filename and return it */
-static char *add_dirname(char *dirname, char *filename) {
-  static char buf[256];
-  strcpy(buf,dirname);
-  return strcat(buf,filename);
+static char *add_dirname(char *dirname, char *filename)
+{
+	static char buf[256];
+	strcpy(buf,dirname);
+	return strcat(buf,filename);
 }
 
 /* convert string to lowercase */
-static void slower(char *str) {
-  while (*str) {
-    *str=(char)(tolower(*str));
-    ++str;
-  }
+static void slower(char *str)
+{
+	while(*str)
+	{
+		*str=(char)(tolower(*str));
+		++str;
+	}
 }
 
 /* read g_start string and decide what the initial config should be.
@@ -212,13 +253,6 @@ int init_mc(hmc_flow *rf, char *ifile) {
 
   int start_t;
 
-  /* alloc global gauge fields */
-  u_gauge=alloc_gfield(&glattice);
-#ifdef ALLOCATE_REPR_GAUGE_FIELD
-  u_gauge_f=alloc_gfield_f(&glattice);
-#endif
-  u_gauge_f_flt=alloc_gfield_f_flt(&glattice);
-
   /* flow defaults */
   strcpy(rf->g_start,"invalid");
   strcpy(rf->run_name,"run_name");
@@ -230,6 +264,26 @@ int init_mc(hmc_flow *rf, char *ifile) {
 
   read_input(hmc_var.read,ifile);
   read_input(rf->read,ifile);
+
+  /* alloc global gauge fields */
+  u_gauge=alloc_gfield(&glattice);
+
+#ifdef ALLOCATE_REPR_GAUGE_FIELD
+  u_gauge_f=alloc_gfield_f(&glattice);
+#endif
+
+  u_gauge_f_flt=alloc_gfield_f_flt(&glattice);
+
+#ifdef WITH_CLOVER
+	clover_init(hmc_var.hmc_p.csw);
+#endif
+
+#ifdef WITH_SMEARING
+	init_smearing(hmc_var.hmc_p.rho_s, hmc_var.hmc_p.rho_t);
+#endif
+
+  /* Read the action and initialize fields */
+  read_action(ifile, &hmc_var.hmc_p.integrator);
 
   /* initialize boundary conditions */
   BCs_pars_t BCs_pars = {
@@ -270,9 +324,17 @@ int init_mc(hmc_flow *rf, char *ifile) {
   switch(start_t) {
   case 0:
     read_gauge_field(add_dirname(rf->conf_dir,rf->g_start));
+    if(u_scalar) {
+       char configname[256] = "scalar_";
+       strcat(configname, rf->g_start);
+       read_scalar_field(add_dirname(rf->conf_dir,configname));
+    }
     break;
   case 1:
     unit_u(u_gauge);
+    if(u_scalar) {
+	    zero_s(u_scalar);
+    }
 #ifndef ALLOCATE_REPR_GAUGE_FIELD
     complete_gf_sendrecv(u_gauge); /*Apply boundary conditions already here for fundamental fermions*/
     u_gauge_f=(suNf_field *)((void*)u_gauge);
@@ -281,6 +343,9 @@ int init_mc(hmc_flow *rf, char *ifile) {
     break;
   case 2:
     random_u(u_gauge);
+    if(u_scalar) {
+	    random_s(u_scalar);
+    }
 #ifndef ALLOCATE_REPR_GAUGE_FIELD
     complete_gf_sendrecv(u_gauge); /*Apply boundary conditions already here for fundamental fermions*/
     u_gauge_f=(suNf_field *)((void*)u_gauge);
@@ -293,7 +358,6 @@ int init_mc(hmc_flow *rf, char *ifile) {
   represent_gauge_field();
 
   /* init HMC */
-  read_action(ifile, &hmc_var.hmc_p.integrator);
   init_ghmc(&hmc_var.hmc_p);
 
   return 0;
@@ -306,7 +370,17 @@ int save_conf(hmc_flow *rf, int id) {
   
   mk_gconf_name(buf, rf, id);
   write_gauge_field(add_dirname(rf->conf_dir,buf));
+   
+  return 0;
+}
+
+/* save the gauge config with the specified id */
+int save_scalar_conf(hmc_flow *rf, int id) {
+  char buf[256];
   
+  mk_sconf_name(buf, rf, id);
+  write_scalar_field(add_dirname(rf->conf_dir,buf));
+   
   return 0;
 }
 
@@ -320,6 +394,9 @@ int end_mc() {
 #ifdef ALLOCATE_REPR_GAUGE_FIELD
   free_gfield_f(u_gauge_f);
 #endif
+  if(u_scalar!=NULL){
+	  free_scalar_field(u_scalar);
+  }
 
   return 0;
 }

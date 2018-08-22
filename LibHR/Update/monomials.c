@@ -51,6 +51,9 @@ const monomial *add_mon(monomial_data *mon_dat) {
     case PureGauge:
       new_mon->m = pg_create(mon_dat);
       break;
+    case LuscherWeisz:
+      new_mon->m = lw_create(mon_dat);
+      break;
     case HMC:
       new_mon->m = hmc_create(mon_dat);
       break;
@@ -71,6 +74,18 @@ const monomial *add_mon(monomial_data *mon_dat) {
       break;
     case Hasenbusch_tm_alt:
       new_mon->m = hasen_tm_alt_create(mon_dat);
+      break;
+    case FourFermion:
+      new_mon->m = ff_create(mon_dat);
+      break;
+    case HMC_ff:
+      new_mon->m = hmc_ff_create(mon_dat);
+      break;
+    case Hasenbusch_ff:
+      new_mon->m = hasen_ff_create(mon_dat);
+      break;
+    case Scalar:
+      new_mon->m = scalar_create(mon_dat);
       break;
     default:
       lprintf("MONOMIAL",0,"WARNING: unknown type!\n");

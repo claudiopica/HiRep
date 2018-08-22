@@ -24,6 +24,8 @@ void read_gauge_field_milc_no3row(char filename[]);
 void read_gauge_field_ascii(char filename[]);
 void read_gauge_field_fortran(char filename[]);
 
+void read_gauge_field_openQCD(char filename[]);
+void write_gauge_field_openQCD(char filename[]);
 
 #include "spinor_field.h"
 /* void write_spinor_field_eo_lexi(char filename[],spinor_field *sp); */

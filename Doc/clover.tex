@@ -1,0 +1,442 @@
+\documentclass[12pt]{article}
+
+% Packages
+\usepackage[a4paper,left=2cm,right=2cm,top=3cm,bottom=3cm]{geometry}
+\usepackage{mathpazo}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{mathrsfs}
+\usepackage{algpseudocode}
+\usepackage{fancyhdr}
+
+\thispagestyle{fancyplain}
+\renewcommand{\headrulewidth}{0pt}
+\fancyhead[R]{Martin Hansen, 2016 \\ hansen@cp3-origins.net}
+
+% Settings
+\setlength{\parindent}{0mm}
+\newcommand{\tr}{\mathrm{tr}}
+\newcommand{\re}{\mathrm{Re}}
+
+\begin{document}
+\section*{Clover Term}
+The clover term can be written as
+\begin{equation}
+ D_{sw} = -\frac{c_{sw}}{4}\sum_x\sum_{\mu,\nu}\sigma_{\mu\nu}F_{\mu\nu}(x),
+ \label{eq:clover}
+\end{equation}
+
+with the (unconventional) definition of $\sigma_{\mu\nu}$ given by
+\begin{equation}
+ \sigma_{\mu\nu} = \frac{1}{2}[\gamma_\mu,\gamma_\nu].
+\end{equation}
+
+With the Euclidean definition of the gamma matrices $\sigma_{\mu\nu}$ satisfies
+\begin{equation}
+ \sigma_{\mu\nu}^\dagger = \sigma_{\nu\mu} = -\sigma_{\mu\nu} = \sigma_{\mu\nu}^{-1}.
+\end{equation}
+
+For the Hermitian Dirac operator $\gamma^5D$ we can make the following replacement without affecting any of the calculations presented here.
+\begin{equation}
+ \sigma_{\mu\nu} \to \bar{\sigma}_{\mu\nu} = \gamma_5\sigma_{\mu\nu}.
+\end{equation}
+
+The field strength tensor is defined as
+\begin{equation}
+ F_{\mu\nu}(x) = \frac{1}{8}\left\{Q_{\mu\nu}(x) - Q_{\mu\nu}^\dagger(x)\right\}
+\end{equation}
+
+with
+\begin{align}
+\begin{split}
+ Q_{\mu\nu}(x)
+ &= U_\mu(x)U_\nu(x+\hat{\mu})U_\mu^\dagger(x+\hat{\nu})U_\nu^\dagger(x) \\
+ &+ U_\nu(x)U_\mu^\dagger(x-\hat{\mu}+\hat{\nu})U_\nu^\dagger(x-\hat{\mu})U_\mu(x-\hat{\mu}) \\
+ &+ U_\mu^\dagger(x-\hat{\mu})U_\nu^\dagger(x-\hat{\mu}-\hat{\nu})U_\mu(x-\hat{\mu}-\hat{\nu})U_\nu(x-\hat{\nu}) \\
+ &+ U_\nu^\dagger(x-\hat{\nu})U_\mu(x-\hat{\nu})U_\nu(x+\hat{\mu}-\hat{\nu})U_\mu^\dagger(x)
+\end{split}
+\end{align}
+
+Because $Q_{\mu\nu}^\dagger=Q_{\nu\mu}$ we have $F_{\mu\nu}=-F_{\nu\mu}$. For this reason we can change the sum over $\mu,\nu$ in equation \eqref{eq:clover} to a sum over $\mu<\nu$ and a factor of two.
+\begin{equation}
+ D_{sw} = -\frac{c_{sw}}{2}\sum_x\sum_{\mu<\nu}\sigma_{\mu\nu}F_{\mu\nu}(x)
+ \label{eq:clover2}
+\end{equation}
+
+The quantity $\sigma_{\mu\nu}F_{\mu\nu}$ is Hermitian and block diagonal. It can be written as
+\begin{align}
+ \sum_{\mu<\nu}\sigma_{\mu\nu}F_{\mu\nu} =
+ \begin{pmatrix}
+ A & B & 0 & 0 \\
+ B^\dagger & -A & 0 & 0 \\
+ 0  & 0 & C & D \\
+ 0 & 0 & D^\dagger & -C
+ \end{pmatrix}
+\end{align}
+
+with the definitions
+\begin{align}
+ A &= -iF_{03}+iF_{12} \\
+ B &= -iF_{01}-F_{02}-F_{13}+iF_{23} \\
+ C &= iF_{03}+iF_{12} \\
+ D &= iF_{01}+F_{02}-F_{13}+iF_{23}
+\end{align}
+
+\subsection*{Pseudofermion Forces}
+For the forces we use the following short-hand notation for the derivative wrt. the link variables.
+\begin{equation}
+ \dot{S} = \partial_{x,\mu}^a S
+\end{equation}
+
+\subsubsection*{Preliminaries}
+To calculate the pseudofermion forces let us write down the action as
+\begin{equation}
+ S = \phi^\dagger(H^{-2})\phi,
+\end{equation}
+
+where $H=\gamma^5D$ is the Hermitian Dirac operator. When differentiating the action we obtain
+\begin{equation}
+ \dot{S} = -2\re~\xi^\dagger\dot{H}\eta,
+ \label{eq:dotS}
+\end{equation}
+
+with the definitions
+\begin{align}
+ \eta &= H^{-2}\phi, \\
+ \xi &= H\eta.
+\end{align}
+
+\subsubsection*{Forces}
+Here we will only consider the forces from the clover term and not the hopping term. The clover part of the Dirac operator is given by
+\begin{equation}
+ H_{sw} = -\frac{c_{sw}}{2}\sum_{\mu<\nu}\bar{\sigma}_{\mu\nu}F_{\mu\nu}(x)
+ \label{eq:Hsw}
+\end{equation}
+
+When inserting equation \eqref{eq:Hsw} in equation \eqref{eq:dotS} we obtain
+\begin{equation}
+ \dot{S} = c_{sw}\sum_{\mu<\nu}\re(\xi^\dagger\bar{\sigma}_{\mu\nu}\dot{F}_{\mu\nu}\eta).
+\end{equation}
+
+From the definition of $F_{\mu\nu}$ it follows that
+\begin{align}
+ \dot{S} &= \frac{1}{8}c_{sw}\sum_{\mu<\nu}\re(\xi^\dagger\bar{\sigma}_{\mu\nu}\dot{Q}_{\mu\nu}\eta + \xi^\dagger\bar{\sigma}_{\mu\nu}^\dagger\dot{Q}_{\mu\nu}^\dagger\eta), \\
+ &=
+ \frac{1}{8}c_{sw}\sum_{\mu<\nu}\re(\xi^\dagger\bar{\sigma}_{\mu\nu}\dot{Q}_{\mu\nu}\eta + \eta^\dagger\bar{\sigma}_{\mu\nu}\dot{Q}_{\mu\nu}\xi).
+\end{align}
+
+This can in be written as
+\begin{equation}
+ \dot{S} = \frac{1}{8}c_{sw}\sum_{\mu<\nu} \re~\tr\left[\dot{Q}_{\mu\nu}\left\{\bar{\sigma}_{\mu\nu}\eta(x)\otimes\xi^\dagger(x) + \bar{\sigma}_{\mu\nu}\xi(x)\otimes\eta^\dagger(x)\right\}\right]
+\end{equation}
+
+In a short hand notation we need to calculate
+\begin{equation}
+ \dot{S} = \frac{1}{8}c_{sw}\re~\tr[\dot{Q}_{\mu\nu}(x)X_{\mu\nu}(x)]
+ \label{eq:force}
+\end{equation}
+
+with
+\begin{equation}
+ X_{\mu\nu}(x) = \bar{\sigma}_{\mu\nu}\eta(x)\otimes\xi^\dagger(x) + \bar{\sigma}_{\mu\nu}\xi(x)\otimes\eta^\dagger(x)
+\end{equation}
+
+This matrix has the properties $X_{\mu\nu}^\dagger=X_{\nu\mu}=-X_{\mu\nu}$. The expression for $\dot{Q}_{\mu\nu}(x)$ contains eight different terms (two from each of the four leafs). The eight contributions to the force can be written as
+\begin{align}
+ F_1(x) &=
+ \re~\tr[\dot{U}_\mu(x)U_\nu(x+\hat{\mu})U_\mu^\dagger(x+\hat{\nu})U_\nu^\dagger(x)X_{\mu\nu}(x)] \\
+ F_2(x) &=
+ \re~\tr[\dot{U}_\mu(x)U_\nu^\dagger(x+\hat{\mu}-\hat{\nu})U_\mu^\dagger(x-\hat{\nu})X_{\mu\nu}^\dagger(x-\hat{\nu})U_\nu(x-\hat{\nu})] \\
+ F_3(x) &=
+ \re~\tr[\dot{U}_\mu(x)U_\nu^\dagger(x+\hat{\mu}-\hat{\nu})X_{\mu\nu}^\dagger(x+\hat{\mu}-\hat{\nu})U_\mu^\dagger(x-\hat{\nu})U_\nu(x-\hat{\nu})] \\
+ F_4(x) &=
+ \re~\tr[\dot{U}_\mu(x)X_{\mu\nu}(x+\hat{\mu})U_\nu(x+\hat{\mu})U_\mu^\dagger(x+\hat{\nu})U_\nu^\dagger(x)] \\
+ F_5(x) &=
+ \re~\tr[\dot{U}_\mu(x)X_{\mu\nu}^\dagger(x+\hat{\mu})U_\nu^\dagger(x+\hat{\mu}-\hat{\nu})U_\mu^\dagger(x-\hat{\nu})U_\nu(x-\hat{\nu})] \\
+ F_6(x) &=
+ \re~\tr[\dot{U}_\mu(x)U_\nu(x+\hat{\mu})X_{\mu\nu}(x+\hat{\mu}+\hat{\nu})U_\mu^\dagger(x+\hat{\nu})U_\nu^\dagger(x)] \\
+ F_7(x) &=
+ \re~\tr[\dot{U}_\mu(x)U_\nu(x+\hat{\mu})U_\mu^\dagger(x+\hat{\nu})X_{\mu\nu}(x+\hat{\nu})U_\nu^\dagger(x)] \\
+ F_8(x) &=
+ \re~\tr[\dot{U}_\mu(x)U_\nu^\dagger(x+\hat{\mu}-\hat{\nu})U_\mu^\dagger(x-\hat{\nu})U_\nu(x-\hat{\nu})X_{\mu\nu}^\dagger(x)]
+\end{align}
+
+where each term should be multiplied by $c_{sw}/8$. The calculation can be done efficiently by noticing that several products and terms appear in multiple places. Introduce the intermediate variables
+\begin{align}
+ Z_0 &= X_{\mu\nu}(x) \\
+ Z_1 &= X_{\mu\nu}(x+\hat{\mu}) \\
+ Z_2 &= X_{\mu\nu}(x-\hat{\nu}) \\
+ Z_3 &= X_{\mu\nu}(x+\hat{\mu}-\hat{\nu}) \\
+ Z_4 &= X_{\mu\nu}(x+\hat{\mu}+\hat{\nu}) \\
+ Z_5 &= X_{\mu\nu}(x+\hat{\nu}) \\
+ W_0 &= U_\mu^\dagger(x-\hat{\nu}) \\
+ W_1 &= U_\nu(x-\hat{\nu}) \\
+ W_2 &= U_\nu(x+\hat{\mu}) \\
+ W_3 &= U_\mu^\dagger(x+\hat{\nu}) \\
+ W_4 &= U_\nu^\dagger(x) \\
+ W_5 &= U_\nu^\dagger(x+\hat{\mu}-\hat{\nu}) \\
+ W_6 &= W_0W_1 \\
+ W_7 &= W_2W_3 \\
+ W_8 &= W_7W_4-W_5W_6
+\end{align}
+
+The total force can now be written as
+\begin{equation}
+ F(x) = \frac{c_{sw}}{8}\dot{U}_\mu(x)\left\{W_8Z_0 + Z_1W_8 - W_5(W_0Z_2W_1+Z_3W_6) + (W_2Z_4W_3+W_7Z_5)W_4\right\}
+\end{equation}
+
+This brings us down to a total of 15 matrix multiplications and 6 additions.
+
+\subsection*{Logarithmic Forces}
+In the case of even-odd preconditioning (see the next section) the action of the small determinant $D_{oo}$ can be written as
+\begin{equation}
+ S_{sw} = -N_f\log\det D_{oo} = -N_f~\tr\log D_{oo} = -N_f\sum_{x~\mathrm{odd}}\tr\log D_{oo}(x)
+\end{equation}
+
+The derivative is given by
+\begin{equation}
+ \dot{S} = -N_f\sum_{x~\mathrm{odd}}\tr\left[D_{oo}^{-1}(x)\dot{D}_{oo}(x)\right]
+\end{equation}
+
+with $D_{oo}(x)$ given by
+\begin{equation}
+ D_{oo}(x) = 4+m_0-\frac{c_{sw}}{2}\sum_{\mu<\nu}\sigma_{\mu\nu}F_{\mu\nu}(x)
+\end{equation}
+
+Both the determinant and the inverse of $D_{oo}(x)$ can be calculated from an LDL decomposition. If we insert the above definition we obtain
+\begin{equation}
+ \dot{S} = \frac{N_fc_{sw}}{2}\sum_{x~\mathrm{odd}}\sum_{\mu<\nu}\tr(D_{oo}^{-1}(x)\sigma_{\mu\nu}\dot{F}_{\mu\nu}(x))
+\end{equation}
+
+\begin{equation}
+ \dot{S} = \frac{N_fc_{sw}}{2\cdot8}\sum_{x~\mathrm{odd}}\sum_{\mu<\nu}
+ \tr(D_{oo}^{-1}(x)\sigma_{\mu\nu}\dot{Q}_{\mu\nu}(x) + D_{oo}^{-1}(x)\sigma_{\mu\nu}^\dagger\dot{Q}_{\mu\nu}^\dagger(x))
+\end{equation}
+
+Since $D_{oo}^{-1}$ is Hermitian we can write the result as two times the real part. To simplify the result we define $X_{\mu\nu}(x)=D_{oo}^{-1}(x)\sigma_{\mu\nu}$ such that
+\begin{equation}
+ \dot{S} = \frac{N_fc_{sw}}{8}\sum_{x~\mathrm{odd}}\sum_{\mu<\nu}\re~\tr[X_{\mu\nu}(x)\dot{Q}_{\mu\nu}(x)]
+\end{equation}
+
+This is equivalent to Eq. \eqref{eq:force} except from the factor $N_f$ and the definition of $X_{\mu\nu}(x)$. Notice that we still have the identity $X_{\mu\nu}^\dagger=-X_{\mu\nu}$. The sum over $x$ can be extended to all sites by setting $X_{\mu\nu}$ to zero on the even sites. To calculate the inverse $D_{oo}^{-1}$ we introduce the definitions:
+\begin{equation}
+ D_{oo} = D_{oo}^\dagger = \begin{pmatrix}
+ D_+ & 0 \\
+ 0 & D_-
+ \end{pmatrix}
+\end{equation}
+
+\begin{equation}
+ D_{oo}^{-1} = \begin{pmatrix}
+ D_{+}^{-1} & 0 \\
+ 0 & D_{-}^{-1}
+ \end{pmatrix}
+\end{equation}
+
+\begin{equation}
+ D_{+}^{-1} =
+ \begin{pmatrix}
+  D_{11} &  D_{12} \\
+  D_{21} &  D_{22} \\
+ \end{pmatrix}
+\end{equation}
+
+\begin{equation}
+ D_{-}^{-1} =
+ \begin{pmatrix}
+  D_{33} &  D_{34} \\
+  D_{43} &  D_{44} \\
+ \end{pmatrix}
+\end{equation}
+
+Because of hermiticity we know that $D_{12} = D_{21}^\dagger$ and $D_{34} = D_{43}^\dagger$. The six independent elements of $X_{\mu\nu}$ can now be written as
+\begin{align}
+ X_{01} &= i(D_{34}+D_{43}) - i(D_{12}+D_{21}) \\
+ X_{02} &= ~(D_{12}-D_{21}) + ~(D_{43}-D_{34}) \\
+ X_{03} &= i(D_{22}-D_{11}) + i(D_{33}-D_{44}) \\
+ X_{12} &= i(D_{11}-D_{22}) + i(D_{33}-D_{44}) \\
+ X_{13} &= ~(D_{12}-D_{21}) + ~(D_{34}-D_{43}) \\
+ X_{23} &= i(D_{12}+D_{21}) + i(D_{34}+D_{43})
+\end{align}
+
+\subsection*{Even-odd Preconditioning}
+\subsubsection*{Method 1}
+We can write the determinant as
+\begin{equation}
+ \det D = \det(D_{oo})\det(D_{ee}-D_{eo}D_{oo}^{-1}D_{oe})
+\end{equation}
+
+Use the notation
+\begin{align}
+ Q_{oo} &= \gamma_5D_{oo} \\
+ Q &= \gamma_5(D_{ee}-D_{eo}D_{oo}^{-1}D_{oe})
+\end{align}
+
+The action is
+\begin{equation}
+ S = S_1 + S_2 = \phi_1^\dagger Q_{oo}^{-2}\phi_1 + \phi_2^\dagger Q^{-2}\phi_2
+\end{equation}
+
+\subsubsection*{Forces for $\phi_1$-term}
+The derivative is
+\begin{equation}
+ \dot{S}_1 = -2\re\left[\phi_1^\dagger(Q_{oo}^{-2}Q_{oo}\dot{Q}_{oo}Q_{oo}^{-2})\phi_1\right]
+\end{equation}
+
+and we can write it as
+\begin{equation}
+ \dot{S}_1 = -2\re\left[\xi^\dagger\dot{Q}_{oo}\eta\right]
+\end{equation}
+
+with
+\begin{align}
+ \eta &= Q_{oo}^{-2}\phi_1, \\
+ \xi &= Q_{oo}\eta.
+\end{align}
+
+\subsubsection*{Forces for $\phi_2$-term}
+The derivative is
+\begin{equation}
+ \dot{S}_2 = -2\re\left[\phi_2^\dagger(Q^{-2}Q\dot{Q}Q^{-2})\phi_2\right]
+\end{equation}
+
+and we can write it as
+\begin{equation}
+ \dot{S}_2 = -2\re\left[\xi^\dagger\dot{Q}\eta\right]
+\end{equation}
+
+with
+\begin{align}
+ \eta &= Q^{-2}\phi_2, \\
+ \xi &= Q\eta.
+\end{align}
+
+The explicit expression for $\xi^\dagger\dot{Q}\eta$ is given by
+\begin{equation}
+ \xi^\dagger \dot{Q}\eta
+ = \xi^\dagger\gamma_5\dot{D}_{ee}\eta
+ - \xi^\dagger\gamma_5\dot{D}_{eo}D_{oo}^{-1}D_{oe}\eta
+ + \xi^\dagger\gamma_5D_{eo}D_{oo}^{-1}\dot{D}_{oo}D_{oo}^{-1}D_{oe}\eta
+ - \xi^\dagger\gamma_5D_{eo}D_{oo}^{-1}\dot{D}_{oe}\eta
+\end{equation}
+
+and it can be written as
+\begin{equation}
+ \xi^\dagger \dot{Q}\eta
+ = \xi^\dagger\gamma_5\dot{D}_{ee}\eta
+ - \xi^\dagger\gamma_5\dot{D}_{eo}\eta_1
+ + \xi_1^\dagger\gamma_5\dot{D}_{oo}\eta_1
+ - \xi_1^\dagger\gamma_5\dot{D}_{oe}\eta
+\end{equation}
+
+with
+\begin{align}
+ \eta_1 &= D_{oo}^{-1}D_{oe}\eta \\
+  \xi_1 &= D_{oo}^{-1}D_{oe}\xi
+\end{align}
+
+\subsubsection*{Method 2}
+The action of $D_{oo}$ can also be expressed directly as the logarithm of the determinant.
+\begin{equation}
+ S = -2\log\det D_{oo} + \phi^\dagger Q^{-2}\phi
+\end{equation}
+
+This is the approach implemented in the code.
+
+\subsection*{LDL factorization}
+With even-odd preconditioning we need to calculate the inverse $D_{oo}^{-1}$ when applying the dirac operator and when calculating the forces. Because this matrix is Hermitian and block diagonal it can be inverted locally with an exact solver. The most practical solver is via an LDL decomposition.
+\begin{equation}
+ A = LDL^\dagger
+\end{equation}
+
+Sum over $j$
+\begin{equation}
+ D_j = A_{jj} - \sum_{k=1}^{j-1}L_{jk}L_{jk}^*D_k
+\end{equation}
+
+Sum over $i>j$.
+\begin{equation}
+ L_{ij} = \frac{1}{D_j}\left(A_{ij}-\sum_{k=1}^{j-1}L_{ik}L_{jk}^*D_k\right)
+\end{equation}
+
+The determinant is given by
+\begin{equation}
+ \det(A) = \prod_k D_k
+\end{equation}
+
+\subsubsection*{LDL Decomposition}
+Calculates the LDL decomposition $A=LDL^\dagger$ in-place. After the decomposition, the lower triangular part of $A$ is $L$ and the diagonal is $D$.
+\begin{center}
+\fbox{\begin{minipage}{70mm}
+\begin{algorithmic}
+\For {$i=0\dots N-1$}
+	\For {$k=0\dots i-1$}
+		\State $A_{ii} \leftarrow A_{ii} - L_{ik}L_{ik}^*A_{kk}$
+	\EndFor
+	\For {$j=i+1\dots N-1$}
+		\For {$k=0\dots i-1$}
+			\State $A_{ji} \leftarrow A_{ji} - A_{jk}L_{ik}^*A_{kk}$
+		\EndFor
+		\State $A_{ji} = A_{ji}/A_{ii}$
+	\EndFor
+\EndFor
+\end{algorithmic}
+\end{minipage}}
+\end{center}
+
+\subsubsection*{Forward substitution}
+Calculates $x=L^{-1}b$.
+\begin{center}
+\fbox{\begin{minipage}{52mm}
+\begin{algorithmic}
+\For {$i=0\dots N-1$}
+	\State $x_i\leftarrow b_i$
+	\For {$k=0\dots i-1$}
+		\State $x_i \leftarrow x_i - A_{ik}x_k$
+	\EndFor
+\EndFor
+\end{algorithmic}
+\end{minipage}}
+\end{center}
+
+\subsubsection*{Backward substitution with diagonal}
+Calculates $x=(L^\dagger)^{-1}D^{-1}x$.
+\begin{center}
+\fbox{\begin{minipage}{60mm}
+\begin{algorithmic}
+\For {$i=N-1\dots 0$}
+	\State $x_i\leftarrow x_i/A_{ii}$
+	\For {$k=i+1\dots N-1$}
+		\State $x_i \leftarrow x_i - A_{ki}^*x_k$
+	\EndFor
+\EndFor
+\end{algorithmic}
+\end{minipage}}
+\end{center}
+
+\subsubsection*{Full inversion}
+This algorithm calculates the inverse $B=A^{-1}$ from the LDL decomposition. Because the inverse is Hermitian we only calculate the lower triangular part.
+\begin{center}
+\fbox{\begin{minipage}{70mm}
+\begin{algorithmic}
+\State $B = 0$
+\For {$i=0\dots N-1$}
+	\State $B_{ii}\leftarrow 1$
+	\For {$j=i\dots N-1$}
+		\For {$k=i\dots j-1$}
+			\State $B_{ji} \leftarrow L_{jk}B_{ki}$
+		\EndFor
+	\EndFor
+	\For {$j=N-1\dots i$}
+		\State $B_{ji}\leftarrow B_{ji}/L_{ii}$
+		\For {$k=j+1\dots N-1$}
+			\State $B_{ji} \leftarrow L_{kj}^*B_{ki}$
+		\EndFor
+	\EndFor
+\EndFor
+\end{algorithmic}
+\end{minipage}}
+\end{center}
+
+\end{document}

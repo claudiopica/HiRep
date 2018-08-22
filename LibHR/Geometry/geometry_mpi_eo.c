@@ -1194,7 +1194,7 @@ static int correnspondig_buffer(int * bf , int i){
 
 
 
-  int myfound[10];
+  //int myfound[10];
 
   found=0;
   for(j=0;j<done_border;j++){
@@ -1209,7 +1209,7 @@ static int correnspondig_buffer(int * bf , int i){
        border[j].checksum[7] == checksum[7]){
 	found++;
 
-	myfound[found]=j;
+	//myfound[found]=j;
 	if(border[j].eo_type == buffer_sign )
 	  bf[0]=j;
 	else
@@ -1722,7 +1722,7 @@ static void set_memory_order()
   int sfbuf_e=-1;
   int sfbuf_o=-1;
   int done_border=index_border+1,j,i,j1 ;
-  int bf[2];
+  int bf[2] = {0,0};
 
   for(i=0;i<done_border;i++){
     if(border[i].id_zone>=0 &&  inner[0]!=i && inner[1]!=i && border[i].size > 0){

@@ -104,7 +104,13 @@ GLB_VAR(geometry_descriptor,glat_odd_red,={0});
 GLB_VAR(geometry_descriptor,glat_even_black,={0});
 GLB_VAR(geometry_descriptor,glat_odd_black,={0}); 
 GLB_VAR(geometry_descriptor,glat_red,={0});
-GLB_VAR(geometry_descriptor,glat_black,={0}); 
+GLB_VAR(geometry_descriptor,glat_black,={0});
+
+#ifdef UPDATE_EO
+#define glat_default glat_even
+#else
+#define glat_default glattice
+#endif
 
 /* Memory */
 typedef enum _mem_t {
@@ -126,15 +132,23 @@ GLB_VAR(mem_t,alloc_mem_t, =STD_MEM_TYPE); /* memory type requested for allocati
 #include "spinor_field.h"
 
 GLB_VAR(suNg_field,*u_gauge,=NULL);
+GLB_VAR(suNg_scalar_field,*u_scalar,=NULL);
 GLB_VAR(suNg_field_flt,*u_gauge_flt,=NULL);
 GLB_VAR(suNf_field,*u_gauge_f,=NULL);
+GLB_VAR(suNg_field,*u_gauge_s,=NULL);
 GLB_VAR(suNf_field_flt,*u_gauge_f_flt,=NULL);
+GLB_VAR(suNfc_field,*cl_term,=NULL);
+GLB_VAR(suNf_field,*cl_force,=NULL);
+GLB_VAR(ldl_field,*cl_ldl,=NULL);
+GLB_VAR(suNg_av_field,*suN_momenta,=NULL);
+GLB_VAR(suNg_scalar_field,*scalar_momenta,=NULL);
+GLB_VAR(int,gauge_field_active,=0); // whether gauge field interactions is active
 
 #define pu_gauge(ix,mu) ((u_gauge->ptr)+coord_to_index(ix,mu))
+#define pu_scalar(ix) ((u_scalar->ptr)+ix)
 #define pu_gauge_flt(ix,mu) ((u_gauge_flt->ptr)+coord_to_index(ix,mu))
 #define pu_gauge_f(ix,mu) ((u_gauge_f->ptr)+coord_to_index(ix,mu))
 #define pu_gauge_f_flt(ix,mu) ((u_gauge_f_flt->ptr)+coord_to_index(ix,mu))
-
 
 /* input parameters */
 #include "input_par.h"
@@ -152,10 +166,14 @@ GLB_VAR(input_logger,logger_var,=init_input_logger(logger_var));
 #define ALLOCATE_REPR_GAUGE_FIELD
 #endif
 
-
+/* Is the representation real? */
+#if (defined(REPR_ADJOINT) || defined(GAUGE_SON))
+#define REPR_IS_REAL
+#endif
 
 #ifdef PLAQ_WEIGHTS
 GLB_VAR(double,*plaq_weight, =NULL);
+GLB_VAR(double,*rect_weight, =NULL);
 #endif
 
 /* Theta Boundary conditions */
@@ -176,6 +194,21 @@ GLB_VAR(double,*force_ave,=NULL);
 GLB_VAR(double,*force_max,=NULL);
 GLB_VAR(int,*n_inv_iter,=NULL);
 #endif
+
+
+
+
+/* Fields four fermion interactions */ 
+/* Auxiliary fields for four fermion interactions */
+GLB_VAR(scalar_field,*ff_sigma,=NULL);
+GLB_VAR(scalar_field,*ff_pi,=NULL);
+GLB_VAR(scalar_field,*ff_sigma_mom,=NULL);
+GLB_VAR(scalar_field,*ff_pi_mom,=NULL);
+
+GLB_VAR(int,four_fermion_active,=0); // whether four fermion interactions are active
+
+
+
 
 #undef GLB_VAR
 

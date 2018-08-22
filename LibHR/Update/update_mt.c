@@ -19,9 +19,11 @@
 #include "communications.h"
 
 /* State quantities for HMC */
-
-static suNg_av_field *momenta=NULL;
 static suNg_field *u_gauge_old=NULL;
+static suNg_scalar_field *u_scalar_old=NULL;
+static scalar_field *ff_sigma_old=NULL;
+static scalar_field *ff_pi_old=NULL;
+
 static scalar_field *la=NULL; /* local action field for Metropolis test */
 
 static ghmc_par update_par;
@@ -41,9 +43,27 @@ void init_ghmc(ghmc_par *par){
   /* allocate space for the backup copy of gfield */
   if(u_gauge_old==NULL) u_gauge_old=alloc_gfield(&glattice);
   suNg_field_copy(u_gauge_old,u_gauge);
+ 
+  /* allocate space for the backup copy of the scalar field */
+  if(u_scalar!=NULL){
+	  if(u_scalar_old==NULL) u_scalar_old=alloc_scalar_field(&glattice);
+	  suNg_scalar_field_copy(u_scalar_old,u_scalar);
+  }
+
+  /* allocate space for backup copy of four fermion fields */
+  if( four_fermion_active ) {
+    if(ff_sigma_old==NULL) ff_sigma_old=alloc_sfield(1,&glattice);
+    if(ff_pi_old==NULL) ff_pi_old=alloc_sfield(1,&glattice); 
+    scalar_field_copy( ff_sigma_old, ff_sigma );
+    scalar_field_copy( ff_pi_old, ff_pi );
+  }
   
+
   /* allocate momenta */
-  if(momenta==NULL) momenta = alloc_avfield(&glattice);
+  if(suN_momenta==NULL) suN_momenta = alloc_avfield(&glattice);
+  if(u_scalar!=NULL){
+	  if(scalar_momenta==NULL) scalar_momenta = alloc_scalar_field(&glattice);
+  }
   
   /* allocate pseudofermions */
   /* we allocate one more pseudofermion for the computation
@@ -78,9 +98,11 @@ void free_ghmc()
 	}
 
 	/* free momenta */
-	if(u_gauge_old!=NULL) free_gfield(u_gauge_old); u_gauge_old=NULL;
-	if(momenta!=NULL) free_avfield(momenta); momenta=NULL;
-	if(la!=NULL) free_sfield(la); la=NULL;
+	if(u_gauge_old!=NULL) { free_gfield(u_gauge_old); u_gauge_old=NULL; }
+	if(u_scalar_old!=NULL){ free_scalar_field(u_scalar_old); u_scalar_old=NULL;}
+	if(suN_momenta!=NULL) { free_avfield(suN_momenta); suN_momenta=NULL; }
+	if(scalar_momenta!=NULL){ free_scalar_field(scalar_momenta); scalar_momenta=NULL;}
+	if(la!=NULL) { free_sfield(la); la=NULL; }
   
 	/*Free integrator */
 	integrator_par *ip = update_par.integrator;
@@ -110,15 +132,12 @@ int update_ghmc()
       return -1;
     }
 
-  /* init monomials */
-  for (int i=0;i<num_mon();++i) {
-    const monomial *m = mon_n(i);
-    m->init_traj(m);
-  }
-  
   /* generate new momenta */
   lprintf("HMC",30,"Generating gaussian momenta and pseudofermions...\n");
-  gaussian_momenta(momenta);
+  gaussian_momenta(suN_momenta);
+  if(u_scalar!=NULL){
+	  gaussian_scalar_momenta(scalar_momenta);
+  }
 
   /* generate new pseudofermions */
   for (int i=0;i<num_mon();++i) {
@@ -128,17 +147,19 @@ int update_ghmc()
 
   /* compute starting action */
   lprintf("HMC",30,"Computing action density...\n");
-  local_hmc_action(NEW, la, momenta);
+  local_hmc_action(NEW, la, suN_momenta, scalar_momenta);
 
   /* correct pseudofermion distribution */
   for (int i=0;i<num_mon();++i) {
     const monomial *m = mon_n(i);
     m->correct_pf(m);
   }
+  
 
   /* integrate molecular dynamics */
   lprintf("HMC",30,"MD integration...\n");
-  update_par.integrator->integrator(momenta,update_par.tlen,update_par.integrator);
+  update_par.integrator->integrator(update_par.tlen,update_par.integrator);
+
 
   /* project and represent gauge field */
   project_gauge_field();
@@ -150,7 +171,7 @@ int update_ghmc()
     const monomial *m = mon_n(i);
     m->correct_la_pf(m);
   }
-  local_hmc_action(DELTA, la, momenta);
+  local_hmc_action(DELTA, la, suN_momenta, scalar_momenta);
 
   /* Metropolis test */
 _OMP_PRAGMA ( single )
@@ -166,6 +187,13 @@ _OMP_PRAGMA ( single )
 
   if(deltaH < 0) {
     suNg_field_copy(u_gauge_old,u_gauge);
+    if(u_scalar!=NULL){
+	    suNg_scalar_field_copy(u_scalar_old,u_scalar);
+    }
+    if( four_fermion_active ) {
+      scalar_field_copy( ff_sigma_old, ff_sigma );
+      scalar_field_copy( ff_pi_old, ff_pi );
+    }
   } else {
     double r;
     if(PID == 0) {
@@ -181,10 +209,27 @@ _OMP_PRAGMA ( single )
 
     if(r > 0) {
       suNg_field_copy(u_gauge_old,u_gauge);
+      if(u_scalar!=NULL){
+	      suNg_scalar_field_copy(u_scalar_old,u_scalar);
+      }
+      if( four_fermion_active ) {
+        scalar_field_copy( ff_sigma_old, ff_sigma );
+        scalar_field_copy( ff_pi_old, ff_pi );
+      }
     } else {
       lprintf("HMC",10,"Configuration rejected.\n");
       suNg_field_copy(u_gauge,u_gauge_old);
+      if(u_scalar!=NULL){
+	      suNg_scalar_field_copy(u_scalar,u_scalar_old);
+      }
+      if( four_fermion_active ) {
+        scalar_field_copy( ff_sigma, ff_sigma_old );
+        scalar_field_copy( ff_pi, ff_pi_old );
+      }
       start_gf_sendrecv(u_gauge); /* this may not be needed if we always guarantee that we copy also the buffers */
+      if(u_scalar!=NULL){
+	      start_sc_sendrecv(u_scalar); /* this may not be needed if we always guarantee that we copy also the buffers */
+      }
       represent_gauge_field();
       return 0;
     }
@@ -206,7 +251,7 @@ void corret_pf_dist_hmc(){
   
   /* generate new momenta */
   lprintf("HMC",30,"Generating gaussian momenta and pseudofermions...\n");
-  gaussian_momenta(momenta);
+  gaussian_momenta(suN_momenta);
 
   /* generate new pseudofermions */
   for (int i=0;i<num_mon();++i) {
@@ -216,7 +261,7 @@ void corret_pf_dist_hmc(){
 
   /* compute starting action */
   lprintf("HMC",30,"Computing action density...\n");
-  local_hmc_action(NEW, la, momenta);
+  local_hmc_action(NEW, la, suN_momenta, scalar_momenta);
 
   /* correct pseudofermion distribution */
   for (int i=0;i<num_mon();++i) {
@@ -232,7 +277,7 @@ void calc_one_force(int n_force){
     for(int n = 0; n < ip->nmon; n++){
       const monomial *m=ip->mon_list[n];
       if (m->data.id==n_force){
-        m->force_f(1,momenta,m->force_par);
+        m->force_f(1,m->force_par);
         return;
       }
     }

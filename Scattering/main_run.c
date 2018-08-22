@@ -89,6 +89,8 @@ void free_mo(meson_observable* mo)
   free(mo);
 }
 
+#define BASENAME(filename) (strrchr((filename),'/') ? strrchr((filename),'/')+1 : filename )
+
 #define corr_ind(px,py,pz,n_mom,tc,nm,cm) ((px)*(n_mom)*(n_mom)*GLB_T*(nm)+(py)*(n_mom)*GLB_T*(nm)+(pz)*GLB_T*(nm)+ ((cm)*GLB_T) +(tc))
 inline void io2pt(meson_observable* mo, int pmax, int sourceno, char* path, char* name)
 {
@@ -96,9 +98,10 @@ inline void io2pt(meson_observable* mo, int pmax, int sourceno, char* path, char
 	char outfile[256] = {};
 	int px,py,pz,t;
 	if(PID==0){
-		sprintf(outfile,"%s/%s_src_%d_%s", path, name, sourceno, cnfg_filename );
+		sprintf(outfile,"%s/%s_src_%d_%s", path, name, sourceno, BASENAME(cnfg_filename) );
 		file=fopen(outfile,"w+");
-		for(px=0;px<pmax;++px) for(py=0;py<pmax;++py) for(pz=0;pz<pmax;++pz) for(t=0;t<GLB_T;++t) fprintf(file,"%i %i %i %i %3.10e %3.10e \n", px, py, pz, t,mo->corr_re[corr_ind(px,py,pz,pmax,t,1,0)], mo->corr_im[corr_ind(px,py,pz,pmax,t,1,0)]);
+		//Factor of 2 to correct for the noise source normalisation
+		for(px=0;px<pmax;++px) for(py=0;py<pmax;++py) for(pz=0;pz<pmax;++pz) for(t=0;t<GLB_T;++t) fprintf(file,"%i %i %i %i %3.10e %3.10e \n", px, py, pz, t,2*(mo->corr_re[corr_ind(px,py,pz,pmax,t,1,0)]), 2*(mo->corr_im[corr_ind(px,py,pz,pmax,t,1,0)]));
 		fclose(file);
 	}
 	return;
@@ -111,9 +114,10 @@ inline void io4pt(meson_observable* mo, int pmax, int sourceno, char* path, char
 	char outfile[256] = {};
 	int px,py,pz,t;
 	if(PID==0){
-		sprintf(outfile,"%s/%s_src_%d_%s", path, name, sourceno, cnfg_filename );
+		sprintf(outfile,"%s/%s_src_%d_%s", path, name, sourceno, BASENAME(cnfg_filename) );
 		file=fopen(outfile,"w+");
-		for(px=-pmax;px<=pmax;++px) for(py=-pmax;py<=pmax;++py) for(pz=-pmax;pz<=pmax;++pz) for(t=0;t<GLB_T;++t) fprintf(file, "%i %i %i %i %3.10e %3.10e \n", px, py, pz, t,mo->corr_re[INDEX(px,py,pz, pmax,t)], mo->corr_im[INDEX(px,py,pz,pmax,t)]);
+		//Factor of 4 to correct for the noise source normalisation
+		for(px=-pmax;px<=pmax;++px) for(py=-pmax;py<=pmax;++py) for(pz=-pmax;pz<=pmax;++pz) for(t=0;t<GLB_T;++t) fprintf(file, "%i %i %i %i %3.10e %3.10e \n", px, py, pz, t,4*(mo->corr_re[INDEX(px,py,pz, pmax,t)]), 4*(mo->corr_im[INDEX(px,py,pz,pmax,t)]));
 		fclose(file);
 	}
 	return;
@@ -121,19 +125,15 @@ inline void io4pt(meson_observable* mo, int pmax, int sourceno, char* path, char
 
 int main(int argc,char *argv[])
 {
-  int numsources = 3;
   int src,t;
   int px,py,pz, px2, py2, pz2;
-  //Picking momenta by hand for now
-  px=0;py=0;pz=1;
-  px2=1;py2=1;pz2=0;
   int tau=0;
   filename_t fpars;
   int nm;
   char tmp[256], *cptr;
-  char *path="output";
   int i,k;
   double m[256];
+  FILE* list;
 
   //Copy I/O from another file
   read_cmdline(argc, argv);
@@ -144,7 +144,7 @@ int main(int argc,char *argv[])
 
   /* logger setup */
   /* disable logger for MPI processes != 0 */
-  logger_setlevel(0,500);
+  //logger_setlevel(0,500);
   if (PID!=0) { logger_disable(); }
   if (PID==0) { 
     sprintf(tmp,">%s",output_filename); logger_stdout(tmp);
@@ -158,18 +158,26 @@ int main(int argc,char *argv[])
   if (list_filename!=NULL) lprintf("MAIN",0,"list file [%s]\n",list_filename); 
   else lprintf("MAIN",0,"cnfg file [%s]\n",cnfg_filename); 
 
+  list=NULL;
+  if(strcmp(list_filename,"")!=0) {
+    error((list=fopen(list_filename,"r"))==NULL,1,"main [mk_mesons.c]" ,
+	"Failed to open list file\n");
+  }
 
   /* read & broadcast parameters */
   parse_cnfg_filename(cnfg_filename,&fpars);
 
   read_input(mes_var.read,input_filename);
+  char *path=mes_var.outdir;
+  printf("The momenta are (%s) and (%s) \n", mes_var.p1, mes_var.p2);
+  sscanf(mes_var.p1, "(%d,%d,%d)" ,&px,&py,&pz);
+  sscanf(mes_var.p2, "(%d,%d,%d)" ,&px2,&py2,&pz2);
+  printf("The momenta are (%d %d %d) and (%d %d %d) \n", px, py, pz, px2, py2, pz2);
+  int numsources = mes_var.nhits;
   GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
 
   /* setup lattice geometry */
   if (geometry_init() == 1) { finalize_process(); return 0; }
-  // geometry_mpi_eo();
-  /* test_geometry_mpi_eo(); */ 
-  // test_geometry_mpi_eo();  
   /* setup random numbers */
   read_input(rlx_var.read,input_filename);
   //slower(rlx_var.rlxd_start); //convert start variable to lowercase
@@ -181,11 +189,6 @@ int main(int argc,char *argv[])
     lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
     rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
   }
-
-  //                                    
-  //lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed);
-  //rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
-  //srand(glb_var.rlxd_seed+PID);
 
   lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
   lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
@@ -241,7 +244,7 @@ int main(int argc,char *argv[])
 
   init_propagator_eo(nm,m,mes_var.precision);
 
-#define OBSERVABLE_LIST X(pi2p) X(twopt) X(d) X(r1) X(r2) X(r3) X(r4) X(t1) X(t2) X(twoptp2) X(dp2) X(r1p2) X(r2p2) X(r3p2) X(r4p2) X(t1p2) X(t2p2)
+#define OBSERVABLE_LIST X(pi2p) X(pi_p1) X(pi_p2) X(twopt_nomom_g1) X(twopt_nomom_g2) X(twopt_nomom_g3) X(twopt_g1) X(twopt_g2) X(twopt_g3) X(d_nomom) X(d) X(r1) X(r2) X(r3) X(r4) X(t1_g1) X(t1_g2) X(t1_g3) X(t2_g1) X(t2_g2) X(t2_g3) X(twoptp2_g1) X(twoptp2_g2) X(twoptp2_g3) X(dp2) X(r1p2) X(r2p2) X(r3p2) X(r4p2) X(t1p2_g1) X(t1p2_g2) X(t1p2_g3) X(t2p2_g1) X(t2p2_g2) X(t2p2_g3)
 #define TMP_OBSERVABLE_LIST X(r1) X(r2) X(r3) X(r4) X(r1p2) X(r2p2) X(r3p2) X(r4p2)
 #define X(NAME) meson_observable* mo_##NAME = malloc(sizeof(meson_observable)); init_mo(mo_##NAME,#NAME,27*GLB_T);
 OBSERVABLE_LIST
@@ -249,10 +252,38 @@ OBSERVABLE_LIST
 #define X(NAME) meson_observable* mo_tmp##NAME = malloc(sizeof(meson_observable)); init_mo(mo_tmp##NAME,#NAME,27*GLB_T);
 TMP_OBSERVABLE_LIST
 #undef X
-mo_twopt->ind1=_g3;
-mo_twopt->ind2=_g3;
-mo_t1->ind2=_g3;
-mo_t2->ind2=_g3;
+mo_twopt_nomom_g1->ind1=_g1;
+mo_twopt_nomom_g1->ind2=_g1;
+mo_twopt_g1->ind1=_g1;
+mo_twopt_g1->ind2=_g1;
+mo_t1_g1->ind2=_g1;
+mo_t2_g1->ind2=_g1;
+mo_twoptp2_g1->ind1=_g1;
+mo_twoptp2_g1->ind2=_g1;
+mo_t1p2_g1->ind2=_g1;
+mo_t2p2_g1->ind2=_g1;
+
+mo_twopt_nomom_g2->ind1=_g2;
+mo_twopt_nomom_g2->ind2=_g2;
+mo_twopt_g2->ind1=_g2;
+mo_twopt_g2->ind2=_g2;
+mo_t1_g2->ind2=_g2;
+mo_t2_g2->ind2=_g2;
+mo_twoptp2_g2->ind1=_g2;
+mo_twoptp2_g2->ind2=_g2;
+mo_t1p2_g2->ind2=_g2;
+mo_t2p2_g2->ind2=_g2;
+
+mo_twopt_nomom_g3->ind1=_g3;
+mo_twopt_nomom_g3->ind2=_g3;
+mo_twopt_g3->ind1=_g3;
+mo_twopt_g3->ind2=_g3;
+mo_t1_g3->ind2=_g3;
+mo_t2_g3->ind2=_g3;
+mo_twoptp2_g3->ind1=_g3;
+mo_twoptp2_g3->ind2=_g3;
+mo_t1p2_g3->ind2=_g3;
+mo_t2p2_g3->ind2=_g3;
 
 #define SOURCE_LIST_Q X(0) X(0_eta) X(p) X(mp) X(p2) X(mp2) 
 #define SOURCE_LIST_W X(0_p) X(0_mp) X(p_0) X(mp_0) X(0_p2) X(0_mp2) X(p2_0) X(mp2_0)
@@ -269,12 +300,22 @@ mo_t2->ind2=_g3;
 #undef X
     spinor_field* W_0_0 = alloc_spinor_field_f(4*NF,&glattice);
 
-  for (src=0;src<numsources;++src)
-  {
-	// Clear all meson observables
+
+while(1){
+    if(list!=NULL)
+      if(fscanf(list,"%s",cnfg_filename)==0 || feof(list)) break;
+
+    lprintf("MAIN",0,"Configuration from %s\n", cnfg_filename);
+    read_gauge_field(cnfg_filename);
+    represent_gauge_field();
+
+    for (src=0;src<numsources;++src)
+    {
+	    // Clear all meson observables
 #define X(NAME) reset_mo(mo_##NAME);
-	OBSERVABLE_LIST
+	    OBSERVABLE_LIST
 #undef X
+
 
     	// Sources for non-sequential props
   	create_diluted_source_equal_atau(source_0, tau);
@@ -315,38 +356,97 @@ mo_t2->ind2=_g3;
 
 	measure_mesons_core(Q_0, Q_0, source_0, mo_pi2p, 1, tau, 2, 0, GLB_T);
 	do_global_sum(mo_pi2p,1.0);
+	measure_mesons_core(Q_0, Q_p, source_0, mo_pi_p1, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_pi_p1,1.0);
+	measure_mesons_core(Q_0, Q_p2, source_0, mo_pi_p2, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_pi_p2,1.0);
 
 	// 2-point rho->rho
-	measure_mesons_core(Q_0, Q_p, source_0, mo_twopt, 1, tau, 2, 0, GLB_T);
-	do_global_sum(mo_twopt,1.0);
-	measure_mesons_core(Q_0, Q_p2, source_0, mo_twoptp2, 1, tau, 2, 0, GLB_T);
-	do_global_sum(mo_twoptp2,1.0);
+	measure_mesons_core(Q_0, Q_0, source_0, mo_twopt_nomom_g1, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_twopt_nomom_g1,1.0);
+	measure_mesons_core(Q_0, Q_p, source_0, mo_twopt_g1, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_twopt_g1,1.0);
+	measure_mesons_core(Q_0, Q_p2, source_0, mo_twoptp2_g1, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_twoptp2_g1,1.0);
+
+	measure_mesons_core(Q_0, Q_0, source_0, mo_twopt_nomom_g2, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_twopt_nomom_g2,1.0);
+	measure_mesons_core(Q_0, Q_p, source_0, mo_twopt_g2, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_twopt_g2,1.0);
+	measure_mesons_core(Q_0, Q_p2, source_0, mo_twoptp2_g2, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_twoptp2_g2,1.0);
+
+	measure_mesons_core(Q_0, Q_0, source_0, mo_twopt_nomom_g3, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_twopt_nomom_g3,1.0);
+	measure_mesons_core(Q_0, Q_p, source_0, mo_twopt_g3, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_twopt_g3,1.0);
+	measure_mesons_core(Q_0, Q_p2, source_0, mo_twoptp2_g3, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_twoptp2_g3,1.0);
 	
 	// direct 1
-	measure_scattering_AD_core(mo_d, Q_0, Q_p, Q_0_eta, Q_0_eta, tau, 0, 1, px, py, pz );
-	measure_scattering_AD_core(mo_dp2, Q_0, Q_p2, Q_0_eta, Q_0_eta, tau, 0, 1, px2, py2, pz2 );
+	measure_scattering_AD_core(mo_d_nomom, Q_0, Q_0, Q_0_eta, Q_0_eta, tau, 0, 1, 0, 0, 0 );
+	measure_scattering_AD_core(mo_d, Q_p, Q_0, Q_0_eta, Q_0_eta, tau, 0, 1, px, py, pz );
+	measure_scattering_AD_core(mo_dp2, Q_p2, Q_0, Q_0_eta, Q_0_eta, tau, 0, 1, px2, py2, pz2 );
 	//Triangle pipi->rho
-	measure_mesons_core(W_0_mp, Q_0, source_0, mo_t1, 1, tau, 2, 0, GLB_T);
-	do_global_sum(mo_t1,1.0);
-	measure_mesons_core(Q_0, W_0_p, source_0, mo_t2, 1, tau, 2, 0, GLB_T);
-	do_global_sum(mo_t2,1.0);
+	measure_mesons_core(W_0_mp, Q_0, source_0, mo_t1_g1, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_t1_g1,1.0);
+	measure_mesons_core(Q_0, W_0_p, source_0, mo_t2_g1, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_t2_g1,1.0);
+	measure_mesons_core(W_0_mp2, Q_0, source_0, mo_t1p2_g1, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_t1p2_g1,1.0);
+	measure_mesons_core(Q_0, W_0_p2, source_0, mo_t2p2_g1, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_t2p2_g1,1.0);
 
-	measure_mesons_core(W_0_mp2, Q_0, source_0, mo_t1p2, 1, tau, 2, 0, GLB_T);
-	do_global_sum(mo_t1p2,1.0);
-	measure_mesons_core(Q_0, W_0_p2, source_0, mo_t2p2, 1, tau, 2, 0, GLB_T);
-	do_global_sum(mo_t2p2,1.0);
+	measure_mesons_core(W_0_mp, Q_0, source_0, mo_t1_g2, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_t1_g2,1.0);
+	measure_mesons_core(Q_0, W_0_p, source_0, mo_t2_g2, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_t2_g2,1.0);
+	measure_mesons_core(W_0_mp2, Q_0, source_0, mo_t1p2_g2, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_t1p2_g2,1.0);
+	measure_mesons_core(Q_0, W_0_p2, source_0, mo_t2p2_g2, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_t2p2_g2,1.0);
+
+	measure_mesons_core(W_0_mp, Q_0, source_0, mo_t1_g3, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_t1_g3,1.0);
+	measure_mesons_core(Q_0, W_0_p, source_0, mo_t2_g3, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_t2_g3,1.0);
+	measure_mesons_core(W_0_mp2, Q_0, source_0, mo_t1p2_g3, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_t1p2_g3,1.0);
+	measure_mesons_core(Q_0, W_0_p2, source_0, mo_t2p2_g3, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_t2p2_g3,1.0);
 
 	//File IO
 	io2pt(mo_pi2p, 2, src, path, "pi");
-	io2pt(mo_twopt, 2, src, path, "rho");
-	io2pt(mo_t1, 2, src, path, "t1");
-	io2pt(mo_t2, 2, src, path, "t2");
+	io2pt(mo_pi_p1, 2, src, path, "pi_p1");
+	io2pt(mo_pi_p2, 2, src, path, "pi_p2");
+	io4pt(mo_d_nomom, 1, src, path, "d_p0");
 	io4pt(mo_d, 1, src, path, "d");
-
-	io2pt(mo_twoptp2, 2, src, path, "rhop2");
-	io2pt(mo_t1p2, 2, src, path, "t1p2");
-	io2pt(mo_t2p2, 2, src, path, "t2p2");
 	io4pt(mo_dp2, 1, src, path, "dp2");
+
+	io2pt(mo_twopt_nomom_g1, 2, src, path, "rho_p0_g1");
+	io2pt(mo_twopt_g1, 2, src, path, "rho_g1");
+	io2pt(mo_t1_g1, 2, src, path, "t1_g1");
+	io2pt(mo_t2_g1, 2, src, path, "t2_g1");
+	io2pt(mo_twoptp2_g1, 2, src, path, "rhop2_g1");
+	io2pt(mo_t1p2_g1, 2, src, path, "t1p2_g1");
+	io2pt(mo_t2p2_g1, 2, src, path, "t2p2_g1");
+
+	io2pt(mo_twopt_nomom_g2, 2, src, path, "rho_p0_g2");
+	io2pt(mo_twopt_g2, 2, src, path, "rho_g2");
+	io2pt(mo_t1_g2, 2, src, path, "t1_g2");
+	io2pt(mo_t2_g2, 2, src, path, "t2_g2");
+	io2pt(mo_twoptp2_g2, 2, src, path, "rhop2_g2");
+	io2pt(mo_t1p2_g2, 2, src, path, "t1p2_g2");
+	io2pt(mo_t2p2_g2, 2, src, path, "t2p2_g2");
+
+	io2pt(mo_twopt_nomom_g3, 2, src, path, "rho_p0_g3");
+	io2pt(mo_twopt_g3, 2, src, path, "rho_g3");
+	io2pt(mo_t1_g3, 2, src, path, "t1_g3");
+	io2pt(mo_t2_g3, 2, src, path, "t2_g3");
+	io2pt(mo_twoptp2_g3, 2, src, path, "rhop2_g3");
+	io2pt(mo_t1p2_g3, 2, src, path, "t1p2_g3");
+	io2pt(mo_t2p2_g3, 2, src, path, "t2p2_g3");
+
 	//Will have to change the range; this is too big
 	for (t=0; t<GLB_T; ++t)
 	{
@@ -369,21 +469,29 @@ mo_t2->ind2=_g3;
 		measure_mesons_core(W_0_mp2, W_0_0, source_0, mo_tmpr4p2, 1, tau, 2, 0, GLB_T);
 
 		//Pick only the relevant contributions
-		for(px=0;px<2;++px)for(py=0;py<2;++py)for(pz=0;pz<2;++pz){
-#define X(NAME) mo_##NAME->corr_re[corr_ind(px,py,pz,2,t,1,0)] = mo_tmp##NAME->corr_re[corr_ind(px,py,pz,2,t,1,0)]; mo_##NAME->corr_im[corr_ind(px,py,pz,2,t,1,0)] = mo_tmp##NAME->corr_im[corr_ind(px,py,pz,2,t,1,0)];
+		for(int px_=0;px_<2;++px_)for(int py_=0;py_<2;++py_)for(int pz_=0;pz_<2;++pz_){
+#define X(NAME) mo_##NAME->corr_re[corr_ind(px_,py_,pz_,2,t,1,0)] = mo_tmp##NAME->corr_re[corr_ind(px_,py_,pz_,2,t,1,0)]; mo_##NAME->corr_im[corr_ind(px_,py_,pz_,2,t,1,0)] = mo_tmp##NAME->corr_im[corr_ind(px_,py_,pz_,2,t,1,0)];
 			TMP_OBSERVABLE_LIST
 #undef X
 		}
 	}
 
-#define X(NAME) io2pt(mo_##NAME,2,src,path, #NAME);
+#define X(NAME) do_global_sum(mo_##NAME, 1.0); io2pt(mo_##NAME,2,src,path, #NAME);
 	TMP_OBSERVABLE_LIST
 #undef X
   }
 
+    if(list==NULL) break;
+}
+  lprintf("DEBUG",0,"ALL done, deallocating\n");
+
 #define X(NAME) free_mo(mo_##NAME);
   OBSERVABLE_LIST
 #undef X
+#define X(NAME) free_mo(mo_tmp##NAME);
+	  TMP_OBSERVABLE_LIST
+#undef X
+  if(list!=NULL) fclose(list);
   finalize_process();
   free_BCs();
   free_gfield(u_gauge);

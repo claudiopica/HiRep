@@ -45,8 +45,13 @@ typedef struct _format_type {
   void (*write)(char*);
 } format_type;
 
-int nformats=10;
-format_type format[10] = {
+#ifdef WITH_QUATERNIONS
+#define nformats 10
+#else
+#define nformats 11
+#endif
+
+format_type format[nformats] = {
   { .name="ascii" ,     .read=read_gauge_field_ascii ,     .write=NULL },
   { .name="milc" ,     .read=read_gauge_field_milc ,     .write=NULL },
   { .name="milcn3r" ,     .read=read_gauge_field_milc_no3row ,     .write=NULL },
@@ -56,7 +61,10 @@ format_type format[10] = {
   { .name="eolexi:le" , .read=read_gauge_field_eolexi_LE , .write=write_gauge_field_eolexi_LE },
   { .name="mpieo:le" ,  .read=read_gauge_field_mpieo_LE ,  .write=write_gauge_field_mpieo_LE },
   { .name="fortran" ,  .read=read_gauge_field_fortran ,  .write=NULL },
-  { .name="su2q" ,  .read=read_gauge_field_su2q ,  .write=write_gauge_field_su2q }
+#ifdef WITH_QUATERNIONS
+  { .name="su2q" ,  .read=read_gauge_field_su2q ,  .write=write_gauge_field_su2q },
+#endif
+  { .name="openQCD" ,  .read=read_gauge_field_openQCD ,  .write=write_gauge_field_openQCD }
 };
 
 enum {QUENCHED_CNFG, DYNAMICAL_CNFG, UNKNOWN_CNFG};
@@ -458,7 +466,6 @@ int main(int argc,char *argv[]) {
   if(check) {
     full_plaquette();
     
-    _DECLARE_INT_ITERATOR(ix);
     int mu;
     suNg A;
     double norm=0., tmp;

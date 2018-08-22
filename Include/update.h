@@ -12,8 +12,8 @@
 
 void staples(int ix,int mu,suNg *v);
 void test_staples();
-void cabmar(double beta,suNg *u, suNg *v,int type);
 
+void cabmar(double beta,suNg *u, suNg *v,int type);
 void project_gauge_field(void);
 
 void update(double beta,int nhb,int nor);
@@ -31,160 +31,103 @@ void mre_guess(mre_par*, int, spinor_field*, spinor_operator, spinor_field*);
 void mre_store(mre_par*, int, spinor_field*);
 void mre_init(mre_par*, int, double);
 
-/* forces for the update */
-void force0(double dt, suNg_av_field *force, void *par);
-
 typedef struct {
-  int n_pf;
-  spinor_field *pf;
-  double mass;
-  rational_app *ratio;
-  double inv_err2;
+	int id;
+	int n_pf;
+	spinor_field *pf;
+	double mass;
+	rational_app *ratio;
+	double inv_err2;
+	suNg_av_field **momenta;
 } force_rhmc_par;
 
-void init_force_rhmc();
-void free_force_rhmc();
-void force_rhmc(double dt, suNg_av_field *force, void *par);
-
 typedef struct {
-  int id;
-  int n_pf;
-  spinor_field *pf;
-  int hasenbusch;
-  double mass;
-  double b;
-  double mu;
-  double inv_err2, inv_err2_flt;
-  mre_par mpar;
+	int id;
+	int n_pf;
+	spinor_field *pf;
+	int hasenbusch;
+	double mass;
+	double b;
+	double mu;
+	double inv_err2, inv_err2_flt;
+	mre_par mpar;
+	int logdet;
+	suNg_av_field **momenta;
 } force_hmc_par;
 
-void force_fermion_core(spinor_field* Xs, spinor_field* Ys, suNg_av_field* force, double dt, double* forcestat, int type);
-void force_hmc(double dt, suNg_av_field *force, void *par);
-void force_hmc_tm(double dt, suNg_av_field *force, void *par);
+typedef struct {
+	double beta;
+	double c0;
+	double c1;
+	suNg_av_field **momenta;
+} force_gauge_par;
 
+typedef struct {
+	double mass;
+	double lambda;
+	suNg_scalar_field **momenta;
+	suNg_av_field **g_momenta;
+} force_scalar_par;
+
+typedef struct {
+	double gamma;
+} force_auxfield_par;
+
+typedef struct {
+	suNg_field **field;
+	suNg_av_field **momenta;
+} field_gauge_par;
+
+typedef struct {
+	suNg_scalar_field **field;
+	suNg_scalar_field **momenta;
+} field_scalar_par;
+
+void update_gauge_field(double, void*);
+void update_auxfields(double, void*);
+
+void update_scalar_field(double, void*);
+void force_scalar(double, void*);
+
+void lw_force(double, void*);
+void lw_local_action(scalar_field*, double, double, double);
+
+void fermion_force_begin();
+void fermion_force_end(double dt, suNg_av_field*);
+void force_fermion_core(spinor_field*, spinor_field*, int, double, double);
+void force_clover_logdet(double, double);
+
+void force_hmc(double, void*);
+void force_hmc_tm(double, void*);
+void force_rhmc(double, void*);
+void force0(double, void*);
+void force_hmc_auxfields(double, void*); //Force from a four_fermion monomial
+void force_hmc_ff(double, void*); //Force from a HMC_ff or Hasenbusch_ff monomial
 
 void gaussian_momenta(suNg_av_field *momenta);
+void gaussian_scalar_momenta(suNg_scalar_field *momenta);
 void gaussian_spinor_field(spinor_field *s);
 void gaussian_spinor_field_flt(spinor_field_flt *s);
 void z2_spinor_field(spinor_field *s);
-
 
 /* For the fermion force ? */
 void corret_pf_dist_hmc();
 void calc_one_force(int n_force);
 
-
-/* Action structures */
-typedef enum {
-  PureGauge,
-  HMC,
-  RHMC,
-  TM,
-  TM_alt,
-  Hasenbusch,
-  Hasenbusch_tm,
-  Hasenbusch_tm_alt
-} mon_type;
-
-typedef struct _mon_pg_par {
-  double beta;
-} mon_pg_par;
-
-typedef struct _mon_hmc_par {
-  double mass;
-  int mre_past;
-  force_hmc_par fpar;
-  spinor_field *pf; /* pseudofermion field */
-} mon_hmc_par;
-
-typedef struct _mon_rhmc_par {
-  double mass;
-  rational_app ratio;
-  force_rhmc_par fpar;
-  spinor_field *pf; /* pseudofermion field */
-} mon_rhmc_par;
-
-typedef struct _mon_tm_par {
-  double mass;
-  double mu;
-  int mre_past;
-  force_hmc_par fpar;
-  spinor_field *pf; /* pseudofermion field */
-} mon_tm_par;
-
-
-typedef struct _mon_hasenbusch_par {
-  double mass;
-  double dm;
-  int mre_past;
-  force_hmc_par fpar;
-  spinor_field *pf; /* pseudofermion field */
-} mon_hasenbusch_par;
-
-typedef struct _mon_hasenbusch_tm_par {
-  double mass;
-  double mu;
-  double dmu;
-  int mre_past;
-  force_hmc_par fpar;
-  spinor_field *pf; /* pseudofermion field */
-} mon_hasenbusch_tm_par;
-
-
-typedef struct _monomial_data {
-  int id; /* monomial id */
-  mon_type type; /* type of monomial */
-  void *par; /* parameters */
-  double MT_prec; /* metropolis precision */
-  double MD_prec; /* molecular dynamics precision */
-  double force_prec; /* force precision */
-} monomial_data;
-
-typedef struct _monomial {
-  monomial_data data;
-  
-  /* Functions */
-  void (*free)(struct _monomial *m); /* free memory */
-  
-  void (*force_f)(double dt, suNg_av_field *force, void *par); /* force function */
-  void *force_par; /* parameters for the force function */
-
-  void (*init_traj)(const struct _monomial *m);
-  void (*gaussian_pf)(const struct _monomial *m);
-  void (*correct_pf)(const struct _monomial *m);
-  void (*correct_la_pf)(const struct _monomial *m);
-  const spinor_field *(*pseudofermion)(const struct _monomial *m); /* returns ps field pointer */
-  void (*add_local_action)(const struct _monomial *m, scalar_field *loc_action);
-  
-} monomial;
-
-struct _monomial* pg_create(const monomial_data *data);
-struct _monomial* hmc_create(const monomial_data *data);
-struct _monomial* rhmc_create(const monomial_data *data);
-struct _monomial* tm_create(const monomial_data *data);
-struct _monomial* tm_alt_create(const monomial_data *data);
-struct _monomial* hasen_create(const monomial_data *data);
-struct _monomial* hasen_tm_create(const monomial_data *data);
-struct _monomial* hasen_tm_alt_create(const monomial_data *data);
-
-const monomial *add_mon(monomial_data *mon);
-int num_mon();
-const monomial *mon_n(int i);
-
+#include "monomials.h"
 
 typedef struct _integrator_par {
   int nsteps;
   int nmon;
   const monomial **mon_list;
-  void (*integrator)(suNg_av_field*, double, struct _integrator_par*);
+  void (*integrator)(double, struct _integrator_par*);
   struct _integrator_par *next;
   int level;
 } integrator_par;
 
-void gauge_integrator(suNg_av_field *momenta, double tlen, integrator_par *int_par);
-void leapfrog_multistep(suNg_av_field *momenta, double tlen, integrator_par *int_par);
-void O2MN_multistep(suNg_av_field *momenta, double tlen, integrator_par *int_par);
-void O4MN_multistep(suNg_av_field *momenta, double tlen, integrator_par *int_par);
+void leapfrog_multistep(double tlen, integrator_par *int_par);
+void O2MN_multistep(double tlen, integrator_par *int_par);
+void O4MN_multistep(double tlen, integrator_par *int_par);
 
 
 typedef struct _ghmc_par {
@@ -192,6 +135,9 @@ typedef struct _ghmc_par {
   /* integrator */
   integrator_par *integrator;
   double tlen;
+  double csw;
+  double rho_s;
+  double rho_t;
 
   /* Fermion Theta angles */
   double theta[4];
@@ -209,7 +155,11 @@ void init_ghmc(ghmc_par *par);
 void free_ghmc();
 int update_ghmc();
 
-
+/* stout smearing */
+void init_smearing(double, double);
+double avr_smeared_plaquette();
+void smear_gauge_field();
+void smeared_gauge_force(suNg_av_field*,suNg_av_field*);
 
 /* local action */
 typedef enum {
@@ -223,15 +173,26 @@ typedef enum {
  */
 void local_hmc_action(local_action_type type,
                       scalar_field *loc_action,
-                      suNg_av_field *momenta);
+                      suNg_av_field *momenta,
+                      suNg_scalar_field *momenta_s);
 void pf_local_action(scalar_field *loc_action,
                      spinor_field *pf);
 
 
 void suNg_field_copy(suNg_field *g1, suNg_field *g2);
 void suNf_field_copy(suNf_field *g1, suNf_field *g2);
+void suNg_scalar_field_copy(suNg_scalar_field *g1, suNg_scalar_field *g2);
 
 /* find spectral interval using eva */
 void find_spec_H2(double *max, double *min);
+
+
+/* Utility functions for four fermion interactions */
+void scalar_field_copy(scalar_field *s1, scalar_field *s2);
+void flip_scalar_field(scalar_field *s);
+void set_scalar_field(scalar_field *s, double c);
+void gaussian_scalar_field(scalar_field *s);
+
+
 
 #endif

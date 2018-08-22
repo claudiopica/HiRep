@@ -19,6 +19,12 @@
 #include "representation.h"
 #include "logger.h"
 
+void vector_star(suNg_vector *v1,suNg_vector *v2){
+	for(int i=0;i<NG;i++){
+		_complex_star(v1->c[i],v2->c[i]);
+	}
+}
+
 #ifdef GAUGE_SON
 static void normalize(double *v)
 {
@@ -51,6 +57,10 @@ static void normalize_flt(suNg_vector_flt *v)
 
 void project_to_suNg(suNg *u)
 {
+  double norm;
+  _suNg_sqnorm(norm,*u);
+  if(norm < 1.e-28) return;
+
 #ifdef GAUGE_SON
   double *v1, *v2;
   int i,j,k;
@@ -67,8 +77,7 @@ void project_to_suNg(suNg *u)
   }
 #else
 #ifdef WITH_QUATERNIONS
-	double norm;
-  
+	
   _suNg_sqnorm(norm,*u);
   norm=sqrt(0.5*norm);
   norm=1./norm;
@@ -98,6 +107,10 @@ void project_to_suNg(suNg *u)
 
 void project_to_suNg_flt(suNg_flt *u)
 {
+  float norm;
+  _suNg_sqnorm(norm,*u);
+  if(norm < 1.e-10) return;
+
 #ifdef GAUGE_SON
   float *v1, *v2;
   int i,j,k;
@@ -114,9 +127,7 @@ void project_to_suNg_flt(suNg_flt *u)
   }
 #else
 #ifdef WITH_QUATERNIONS
-
-  float norm;
-  
+	
   _suNg_sqnorm(norm,*u);
   norm=sqrtf(0.5f*norm);
   norm=1.f/norm;

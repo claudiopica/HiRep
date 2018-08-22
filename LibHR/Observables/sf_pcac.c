@@ -25,16 +25,15 @@ extern rhmc_par _update_par; /* Update/update_rhmc.c */
 
 
 
-#if defined(ROTATED_SF) ||  defined(BASIC_SF)
-static double hmass;
-#endif
-
 
 #ifdef BASIC_SF
+static double hmass;
 static void H_sf(spinor_field *out, spinor_field *in){
   g5Dphi(hmass,out,in);
 }
-#elif defined(ROTATED_SF)
+#endif
+#ifdef ROTATED_SF
+static double hmass;
 static void H2_sf(spinor_field *out, spinor_field *in){
   g5Dphi_sq(hmass,out,in);
 }
@@ -272,8 +271,8 @@ void SF_PCAC_wall_mass(double mass, double acc )
 
 
 
-  free_spinor_field(source);
-  free_spinor_field(prop);
+  free_spinor_field_f(source);
+  free_spinor_field_f(prop);
   
 
   free(stmp);

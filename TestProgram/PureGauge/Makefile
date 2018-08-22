@@ -1,7 +1,7 @@
 TOPDIR = ../..
 MKDIR = $(TOPDIR)/Make
 
-EXES = check_puregauge_1 
+EXES = check_puregauge_1 check_puregauge_3
 EXES += $(if $(findstring 2,$(NG)),check_puregauge_2)
 
 LIBS += $(TOPDIR)/LibHR/libhr.a
