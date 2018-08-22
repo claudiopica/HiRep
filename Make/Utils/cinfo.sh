@@ -63,13 +63,9 @@ rm cinfo.tmp
 
 if [ -x "`command -v git`" ]
     then
-    ${MKDIR}/Utils/git-info.sh | awk '{printf "%s\\n",$0}' |  sed 's/"/\\"/g' > cinfo.tmp
-    len=`cat cinfo.tmp | wc -c`+1
-    echo -n "static char CI_gitinfo[${len}] = \"" >> ${FILENAME}
-    cat cinfo.tmp >> ${FILENAME}
-    echo "\";" >> ${FILENAME}
+    len=`git rev-parse --symbolic-full-name|wc -c`+1
+    echo -n "static char CI_gitinfo[${len}] = \"" `git rev-parse --symbolic-full-name` "\";" >>${FILENAME}
     echo "" >> ${FILENAME}
-    rm cinfo.tmp
     
     len=`git log --format="%H" -n 1|wc -c`+1
     echo "static char CI_gitrevision[${len}] = \"" `git log --format="%H" -n 1` "\";" >>${FILENAME}
@@ -77,6 +73,7 @@ if [ -x "`command -v git`" ]
 else
     echo -n "static char CI_gitinfo[1] = \"\";" >> ${FILENAME}
     echo "" >> ${FILENAME}
+
     echo "static char CI_gitrevisio[11] = \""No version"\";" >>${FILENAME}
     echo "" >> ${FILENAME}
 fi

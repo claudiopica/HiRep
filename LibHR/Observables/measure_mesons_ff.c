@@ -109,7 +109,7 @@ static void op_spinor(suNf_spinor* out, suNf_spinor* in, gamma_ind i){
 #define corr_ind(px,py,pz,n_mom,tc,nm,cm) ((px)*(n_mom)*(n_mom)*(lt)*(nm)+(py)*(n_mom)*(lt)*(nm)+(pz)*(lt)*(nm)+ ((cm)*(lt)) +(tc))
 static void measure_mesons_disconnected_core(spinor_field* psi0, spinor_field* psi1, spinor_field* eta, meson_observable* mo, int offset,int lt){
   int ix,t,x,y,z,tc;
-  complex tr;
+  double complex tr;
   //suNf_spin_matrix sma,smb, sm1,sm2,smtmp1,smtmp2,sm_src;
   meson_observable* motmp=mo;
   suNf_spinor sma, smtmp1,sm_src;
@@ -131,8 +131,8 @@ static void measure_mesons_disconnected_core(spinor_field* psi0, spinor_field* p
 		  while (motmp!=NULL){
 		    op_spinor(&smtmp1,&sma,motmp->ind1);
 		    _spinor_prod_f(tr,smtmp1,sm_src);
-		    motmp->corr_re[corr_ind(0,0,0,1,tc,1,0)] += motmp->sign*(tr.re);
-		    motmp->corr_im[corr_ind(0,0,0,1,tc,1,0)] += motmp->sign*(tr.im);
+		    motmp->corr_re[corr_ind(0,0,0,1,tc,1,0)] += motmp->sign*creal(tr);
+		    motmp->corr_im[corr_ind(0,0,0,1,tc,1,0)] += motmp->sign*cimag(tr);
 		    motmp=motmp->next;
 		  }
             }
