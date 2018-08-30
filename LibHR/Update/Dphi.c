@@ -751,7 +751,7 @@ static void Cphi_inv_(double mass, spinor_field *dptr, spinor_field *sptr, int a
 	// Loop over local sites
 	_MASTER_FOR(dptr->type,ix)
 	{
-		complex *up, *dn, *x, c;
+		double complex *up, *dn, *x, c;
 		suNf_spinor *out, *in, tmp;
 		int n;
 
@@ -763,7 +763,7 @@ static void Cphi_inv_(double mass, spinor_field *dptr, spinor_field *sptr, int a
 
 		// tmp = in
 		tmp = *in;
-		x = (complex*)&tmp;
+		x = (double complex*)&tmp;
 
 		// Forward substitution
 		for(int i = 0; i < N; i++)
@@ -780,19 +780,18 @@ static void Cphi_inv_(double mass, spinor_field *dptr, spinor_field *sptr, int a
 		for(int i = N-1; i >= 0; i--)
 		{
 			n = i*(i+1)/2+i;
-			_complex_mulr(x[i], 1./up[n].re, x[i]);
-			_complex_mulr(x[i+N], 1./dn[n].re, x[i+N]);
+			_complex_mulr(x[i], 1./creal(up[n]), x[i]);
+			_complex_mulr(x[i+N], 1./creal(dn[n]), x[i+N]);
 			for(int k = i+1; k < N; k++)
 			{
 				n = k*(k+1)/2+i;
 
-				c.re = up[n].re;
-				c.im = -up[n].im;
+				c = conj(up[n]);
+        
 				_complex_mul_sub_assign(x[i], c, x[k]);
 
-				c.re = dn[n].re;
-				c.im = -dn[n].im;
-				_complex_mul_sub_assign(x[i+N], c, x[k+N]);
+				c = conj(dn[n]);
+        _complex_mul_sub_assign(x[i+N], c, x[k+N]);
 			}
 		}
 

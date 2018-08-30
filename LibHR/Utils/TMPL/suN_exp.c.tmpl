@@ -15,6 +15,7 @@
 *  U = (1+i*y.sigma/4)(1-i*y.sigma/4)^{-1}
 *  U = u[0] + i*u.sigma/4
 */
+#ifndef WITH_QUATERNIONS
 static void YtoU(double* u, double *y)
 {
    double y2 = y[0]*y[0] + y[1]*y[1] +y[2]*y[2];
@@ -39,7 +40,7 @@ static void su2_rotate(double *s,double complex *v1,double complex *v2)
    (*v1)=z1;
    (*v2)=z2;
 }
-
+#endif
 
 /*
 *  Approssima
@@ -50,9 +51,11 @@ static void su2_rotate(double *s,double complex *v1,double complex *v2)
 */
 #ifdef GAUGE_SON
 void ExpX(double dt, suNg_algebra_vector *h, suNg *r)
+{
+	error(0==0,1,"ExpX [suN_epx.c]","This functiona has yet not been implementd for SON");
+}
 #else
 void ExpX(double dt, suNg_algebra_vector *h, suNg *u)
-#endif
 {
 #ifdef WITH_QUATERNIONS
 suNg v_tmp, u_tmp;
@@ -66,6 +69,7 @@ $GROUP::EXPX:(dt):(*h):(*u)$
 
 #endif //WITH_QUATERNIONS
 }
+#endif
 
 
 

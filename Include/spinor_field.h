@@ -9,6 +9,7 @@
 #include "geometry.h"
 #include "suN_types.h"
 #include "error.h"
+#include "hr_complex.h"
 #ifdef WITH_MPI
 #include <mpi.h>
 #endif
@@ -28,8 +29,8 @@
 #endif //WITH_MPI
 
 typedef struct {
-	complex up[NF*(2*NF+1)];
-	complex dn[NF*(2*NF+1)];
+	double complex up[NF*(2*NF+1)];
+	double complex dn[NF*(2*NF+1)];
 } ldl_t;
 
 #define _DECLARE_FIELD_STRUCT(_name,_type) \

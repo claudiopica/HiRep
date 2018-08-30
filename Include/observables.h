@@ -17,6 +17,7 @@
 #include "suN.h"
 #include "inverters.h"
 #include "meson_observables.h"
+#include "hr_complex.h"
 #include <stdio.h>
 
 #define SPIN_2D_INDEX(i,j) ( (i)*4 + (j) )
@@ -29,7 +30,7 @@ double local_plaq(int ix);
 void full_plaquette();
 
 double rect_1x2(int ix,int mu,int nu);
-void crect_1x2(complex *ret,int ix,int mu,int nu);
+void crect_1x2(double complex *ret,int ix,int mu,int nu);
 double avr_rect_1x2();
 void full_rect_1x2();
 double local_rect_1x2(int ix);
@@ -62,7 +63,7 @@ typedef struct _ata_qprop_pars {
   double inverter_precision;
 } ata_qprop_pars;
 
-void traced_ata_qprop(double complex*** prop, int n_points);
+void traced_ata_qprop(double complex *** prop, int n_points);
 void ata_qprop_init(ata_qprop_pars* p);
 void ata_qprop_free();
 

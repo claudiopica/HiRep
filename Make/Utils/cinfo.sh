@@ -78,4 +78,4 @@ else
     echo "" >> ${FILENAME}
 fi
 
-
+cat ${MKDIR}/Utils/${FILENAME}.tmpl >> ${FILENAME}

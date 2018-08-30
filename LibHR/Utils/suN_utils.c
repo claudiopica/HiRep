@@ -34,7 +34,15 @@ static void normalize(double *v)
   fact = 1.0/sqrt(fact);
   for (i=0;i<NG; ++i){v[i]*=fact;}
 }
-#else
+static void normalize_flt(float *v)
+{
+  float fact=0;
+  int i;
+  for (i=0;i<NG; ++i){fact+=v[i]*v[i];} 
+  fact = 1.0/sqrt(fact);
+  for (i=0;i<NG; ++i){v[i]*=fact;}
+}
+#elif !defined(WITH_QUATERNIONS)
 static void normalize(suNg_vector *v)
 {
   double fact;
@@ -42,10 +50,6 @@ static void normalize(suNg_vector *v)
   fact=1.0/sqrt(fact);
   _vector_mul_g(*v, fact, *v);
 }
-#endif
-
-
-
 static void normalize_flt(suNg_vector_flt *v)
 {
   float fact;
@@ -53,7 +57,7 @@ static void normalize_flt(suNg_vector_flt *v)
   fact=1.0f/sqrtf(fact);
   _vector_mul_g(*v, fact, *v);
 }
-
+#endif
 
 void project_to_suNg(suNg *u)
 {
@@ -123,7 +127,7 @@ void project_to_suNg_flt(suNg_flt *u)
       for (k=0;k<NG; ++k){z+=v1[k]*v2[k];} /*_vector_prod_re_g */
       for (k=0;k<NG;++k){v2[k]-= z*v1[k];} /*_vector_project_g */
     }
-    normalize(v2);
+    normalize_flt(v2);
   }
 #else
 #ifdef WITH_QUATERNIONS

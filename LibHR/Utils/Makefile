@@ -14,9 +14,9 @@ suN_exp.c: $(MKDIR)/MkFlags $(WRREPR) TMPL/suN_exp.c.tmpl
 	$(WRREPR) $(NG) TMPL/suN_exp.c.tmpl > $@ &&\
 	  echo " $(_cdone)" || ( echo " $(_cfailed)" && false )
 
-cinfo.c: $(MKDIR)/MkFlags $(MKDIR)/Utils/cinfo.sh TMPL/cinfo.c.tmpl
-	$(MKDIR)/Utils/cinfo.sh $(MKDIR) $(TOPDIR) $(MACRO)
-	cat TMPL/cinfo.c.tmpl >> cinfo.c
+#cinfo.c: $(MKDIR)/MkFlags $(MKDIR)/Utils/cinfo.sh TMPL/cinfo.c.tmpl
+#	$(MKDIR)/Utils/cinfo.sh $(MKDIR) $(TOPDIR) $(MACRO)
+#	cat TMPL/cinfo.c.tmpl >> cinfo.c
 
 clean::
 	rm -f suN_exp.c cinfo.c

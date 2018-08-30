@@ -115,7 +115,7 @@ int setup_process(int *argc, char ***argv) {
     sprintf(sbuf,">>%s",output_filename);  
     logger_stdout(sbuf);
     stderrp=freopen(error_filename,"w",stderr);
-    error(stderrp==NULL,1,"main [hmc.c]",
+    error(stderrp==NULL,1,"setup_process [process_init.c]",
 	  "Cannot redirect the stderr");
   }
   
@@ -134,7 +134,9 @@ int setup_process(int *argc, char ***argv) {
   lprintf("SYSTEM",0,"Gauge group: SU(%d)\n",NG);                           
   lprintf("SYSTEM",0,"Fermion representation: dim = %d\n",NF);
   lprintf("SYSTEM",0,"[RepID: %d][world_size: %d]\n[MPI_ID: %d][MPI_size: %d]\n",RID,WORLD_SIZE,MPI_PID,MPI_WORLD_SIZE);
-  print_compiling_info_short();
+  /*print_compiling_info_short();*/
+  print_compiling_info();
+
 
   //  lprintf("MAIN",0,"Logger lelvel: %d\n",logger_getlevel(0));
   

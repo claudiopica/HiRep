@@ -26,7 +26,11 @@
 #include "linear_algebra.h"
 #include "spinor_field.h"
 
-
+#ifndef NDEBUG
+#  define MPIRET(type) type =
+#else
+#  define MPIRET(type)
+#endif
 
 void write_spinor_field(char filename[],spinor_field* sp) 
 {
@@ -44,7 +48,9 @@ void write_spinor_field(char filename[],spinor_field* sp)
   MPI_Group wg, cg;
   MPI_Status st;
   int cid;
+#ifndef NDEBUG
   int mpiret;
+#endif
 #endif
 
   norm2=spinor_field_sqnorm_f(sp); /* to use as a checksum in the header */
@@ -111,7 +117,7 @@ void write_spinor_field(char filename[],spinor_field* sp)
 #ifndef NDEBUG
               error(Z!=(GLB_Z/NP_Z+((p[3]<rz)?1:0)),1,"write_spinor_field", "Local lattice size mismatch!");
 #endif
-              mpiret=MPI_Send(buff, bsize, MPI_DOUBLE, 0, 999, GLB_COMM);
+              MPIRET(mpiret) MPI_Send(buff, bsize, MPI_DOUBLE, 0, 999, GLB_COMM);
 #ifndef NDEBUG
               if (mpiret != MPI_SUCCESS) {
                 char mesg[MPI_MAX_ERROR_STRING];
@@ -124,7 +130,7 @@ void write_spinor_field(char filename[],spinor_field* sp)
             }
             /* receive buffer */
             if (PID==0) {
-              mpiret=MPI_Recv(buff, bsize, MPI_DOUBLE, pid, 999, GLB_COMM, &st);
+              MPIRET(mpiret)  MPI_Recv(buff, bsize, MPI_DOUBLE, pid, 999, GLB_COMM, &st);
 #ifndef NDEBUG
               if (mpiret != MPI_SUCCESS) {
                 char mesg[MPI_MAX_ERROR_STRING];
@@ -183,8 +189,11 @@ void read_spinor_field(char filename[], spinor_field *sp)
   MPI_Group wg, cg;
   MPI_Status st;
   int cid;
+#ifndef NDEBUG
   int mpiret;
 #endif
+#endif
+
 
   gettimeofday(&start,0);
 
@@ -248,7 +257,7 @@ void read_spinor_field(char filename[], spinor_field *sp)
           if (pid!=0) { /* do send/receive only if the data is not on PID 0 */ 
             /* send buffer */
             if (PID==0) {
-              mpiret=MPI_Send(buff, bsize, MPI_DOUBLE, pid, 999, GLB_COMM);
+              MPIRET(mpiret) MPI_Send(buff, bsize, MPI_DOUBLE, pid, 999, GLB_COMM);
 #ifndef NDEBUG
               if (mpiret != MPI_SUCCESS) {
                 char mesg[MPI_MAX_ERROR_STRING];
@@ -264,7 +273,7 @@ void read_spinor_field(char filename[], spinor_field *sp)
 #ifndef NDEBUG
               error(Z!=(GLB_Z/NP_Z+((p[3]<rz)?1:0)),1,"read_spinor_field", "Local lattice size mismatch!");
 #endif
-              mpiret=MPI_Recv(buff, bsize, MPI_DOUBLE, 0, 999, GLB_COMM, &st);
+              MPIRET(mpiret) MPI_Recv(buff, bsize, MPI_DOUBLE, 0, 999, GLB_COMM, &st);
 #ifndef NDEBUG
               if (mpiret != MPI_SUCCESS) {
                 char mesg[MPI_MAX_ERROR_STRING];

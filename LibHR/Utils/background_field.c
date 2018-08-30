@@ -17,21 +17,14 @@
 
 #define PI 3.141592653589793238462643383279502884197
 
-#define DEBUG_BACKGROUND
+/*#define DEBUG_BACKGROUND*/
 
 void apply_background_field_zdir(suNg_field *V, double Q, int n)
 {
-  int index;
-  double A = 0;
-  double complex phase;
-  suNg utmp;
-  static suNg_field *V_old = NULL;
-  int c[4];
-#ifdef GAUGE_SON
-
-  exit(1);
+#if defined(GAUGE_SON) || defined(WITH_QUATERNIONS)
+   error(0==0,1,"apply_background_field_zdir [background_field.c]",
+         "This function cannot be used with SO(N) or quaternion representation");
 #else
-
 #ifdef DEBUG_BACKGROUND
   static suNg_field *Vtest_old = NULL;
   static suNg_field *Vtest_new = NULL;
@@ -45,7 +38,12 @@ void apply_background_field_zdir(suNg_field *V, double Q, int n)
   start_gf_sendrecv(Vtest_old);
   complete_gf_sendrecv(Vtest_old);
 #endif
-
+  int index;
+  double A = 0;
+  double complex phase;
+  suNg utmp;
+  static suNg_field *V_old = NULL;
+  int c[4];
   double E = 2. * PI * (double)n / (Q * (double)GLB_T * (double)GLB_Z);
   int x3, x4;
 
@@ -130,5 +128,5 @@ void apply_background_field_zdir(suNg_field *V, double Q, int n)
 #endif // DEBUG_BACKGROUND
 
   free_gfield(V_old);
-#endif //SON
+#endif //SON or WITH_QUATERNIONS
 }

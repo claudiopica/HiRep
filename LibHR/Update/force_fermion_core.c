@@ -232,7 +232,7 @@ static void g5_sigma(suNf_spinor *s, suNf_spinor *u, int mu, int nu)
 			
 			s->c[0].c[i] = I*u->c[1].c[i];
 			s->c[1].c[i] = I*u->c[0].c[i];
-			s->c[2].c[i].im = -I*u->c[3].c[i];
+			s->c[2].c[i] = -I*u->c[3].c[i];
 			s->c[3].c[i] = -I*u->c[2].c[i];
 		}
 	}
