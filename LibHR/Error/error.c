@@ -16,6 +16,7 @@
 #include "error.h"
 #include "logger.h"
 #include "geometry.h"
+#include "setup.h"
 
 void error(int test,int no,char *name,char *text)
 {

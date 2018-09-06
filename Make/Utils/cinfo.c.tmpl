@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "logger.h"
 
 void print_compiling_info() {
   printf("MACROS\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
@@ -20,4 +21,9 @@ void print_compiling_info() {
   printf("\n\n");
   printf("gcc -v\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
   printf("%s",CI_gcc);
+}
+
+
+void print_compiling_info_short() {
+  lprintf("SYSTEM",0,"MACROS=%s",MACROS);
 }

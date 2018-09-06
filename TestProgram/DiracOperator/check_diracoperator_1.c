@@ -21,6 +21,7 @@
 #include "linear_algebra.h"
 #include "representation.h"
 #include "communications.h"
+#include "setup.h"
 
 static double hmass=0.1;
 static suNg_field *g;
@@ -78,24 +79,14 @@ int main(int argc,char *argv[])
   double sig,tau;
   spinor_field *s0,*s1,*s2,*s3;
   
+  logger_map("DEBUG","debug");
+  
   setup_process(&argc,&argv);
     
-  logger_map("DEBUG","debug");
-    
-  geometry_mpi_eo();
+  setup_gauge_fields();
+
  
- /* setup random numbers */
-  read_input(rlx_var.read,get_input_filename());
-  lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
-  rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
-  
-  u_gauge=alloc_gfield(&glattice);
-#ifndef REPR_FUNDAMENTAL
-  u_gauge_f=alloc_gfield_f(&glattice);
-#endif
-  represent_gauge_field();
-  
-  /* allocate memory */
+  /* allocate additional memory */
   g=alloc_gtransf(&glattice);
   s0=alloc_spinor_field_f(4,&glattice);
   s1=s0+1;

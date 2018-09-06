@@ -66,13 +66,6 @@ _OMP_PRAGMA ( _omp_for redop1 redop2  )\
 #define _MASTER_FOR_MIN(type,is,...) _MASTER_FOR_RED(type,is,_omp_min(__VA_ARGS__),)
 
 
-char* get_input_filename();
-char* get_output_filename();
-char* get_error_filename();
-
-int setup_process(int *argc, char ***argv);
-int setup_replicas();
-int finalize_process(void);
 
 void origin_coord(int *c);
 void other_proc_origin_coord(int * proc_coord, int *c);

@@ -13,6 +13,7 @@
 #include "memory.h"
 #include "global.h"
 #include "linear_algebra.h"
+#include "setup.h"
 
 #define MAX_SECTIONS 16
 #define MAX_VALUES   16
