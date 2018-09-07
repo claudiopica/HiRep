@@ -12,6 +12,8 @@ MAKEFLAGS += -s
 MAKEFLAGS += -r
 #NO_COLOR_OUT = 1
 
+TESTEXES := $(foreach _file, ${TESTS}, $(shell  ${MKDIR}/Utils/check_compile.py -f $(_file) -n ${NG} -r "$(REPR)"  -g "${GAUGE_GROUP}" -s "${MACRO}" ) )
+EXES += $(TESTEXES)
 SRCS += $(patsubst %,%.c,$(EXES))
 #OBJS = $($(filter-out $(EXCLUDE),$(SRCS)):.c=.o)
 OBJS = $(patsubst %.c,%.o,$(filter-out $(EXCLUDE),$(SRCS)))
@@ -194,6 +196,7 @@ $(1): $(1).o $$($(1)_OBJS) $$(COMMON_OBJS) $$(LIBS)
 	$$(CC) -o $$@ $$< $$($(1)_OBJS) $$(COMMON_OBJS) $$(LDFLAGS) &&\
 	echo " $$(_cdone)" || ( echo " $$(_cfailed)" && false )
 endef
+
 
 $(foreach prog,$(EXES),$(eval $(call LINK_template,$(prog))))
 
