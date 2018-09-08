@@ -1,5 +1,13 @@
 /******************************************************************************
 *
+* NOCOMPILE= WITH_MPI
+* NOCOMPILE= BC_T_ANTIPERIODIC
+* NOCOMPILE= BC_X_ANTIPERIODIC
+* NOCOMPILE= BC_Y_ANTIPERIODIC
+* NOCOMPILE= BC_Z_ANTIPERIODIC
+* NOCOMPILE= BASIC_SF
+* NOCOMPILE= ROTATED_SF
+*
 * Testing the spin structure & printing the gamma matrices
 *
 ******************************************************************************/

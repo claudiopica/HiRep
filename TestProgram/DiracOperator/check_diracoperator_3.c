@@ -27,6 +27,7 @@
 #include "representation.h"
 #include "utils.h"
 #include "logger.h"
+#include "setup.h"
 
 #include "communications.h"
 
@@ -88,65 +89,12 @@ void test_herm(spinor_operator S, char *name){
 
 int main(int argc,char *argv[])
 {
-  char tmp[256];
-
-
   /* setup process id and communications */
-  setup_process(&argc,&argv);
+  logger_map("DEBUG", "debug");
 
-  /* logger setup */
- 
-  logger_setlevel(0,100); /* log all */
-  if (PID!=0) { 
-    logger_disable();}
-  else{
-    sprintf(tmp,">out_%d",PID); logger_stdout(tmp);
-    sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
-  }
-   
-  lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
+  setup_process(&argc, &argv);
 
-  /* read input file */
-  read_input(glb_var.read,"test_input");
-
-  /* setup communication geometry */
-  if (geometry_init() == 1) {
-    finalize_process();
-    return 0;
-  }
-
-  lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
-  lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
-  lprintf("MAIN",0,"global size is %dx%dx%dx%d\n",GLB_T,GLB_X,GLB_Y,GLB_Z);
-  lprintf("MAIN",0,"proc grid is %dx%dx%dx%d\n",NP_T,NP_X,NP_Y,NP_Z);
-
-  /* setup lattice geometry */
-  geometry_mpi_eo();
-  /* test_geometry_mpi_eo(); */
-
-
-  lprintf("MAIN",0,"local size is %dx%dx%dx%d\n",T,X,Y,Z);
-  lprintf("MAIN",0,"extended local size is %dx%dx%dx%d\n",T_EXT,X_EXT,Y_EXT,Z_EXT);
-
-  lprintf("CPTEST",0,"gauge gsize=%d\n",glattice.gsize_gauge);
-  lprintf("CPTEST",0,"gauge nbuffers=%d\n",glattice.nbuffers_gauge);
-  lprintf("CPTEST",0,"spinor gsize=%d\n",glattice.gsize_spinor);
-  lprintf("CPTEST",0,"spinor nbuffers=%d\n",glattice.nbuffers_spinor);
-  lprintf("CPTEST",0,"lmp=%d\n",glattice.local_master_pieces);
-  lprintf("CPTEST",0,"gauge ncopies=%d\n",glattice.ncopies_gauge);
-  lprintf("CPTEST",0,"spinor ncopies=%d\n",glattice.ncopies_spinor);
-
-    /* setup random numbers */
-    read_input(rlx_var.read,"test_input");
-    lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
-    rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
-
-    
-  /* alloc global gauge fields */
-  u_gauge=alloc_gfield(&glattice);
-#ifndef REPR_FUNDAMENTAL
-  u_gauge_f=alloc_gfield_f(&glattice);
-#endif
+  setup_gauge_fields();
 
   lprintf("MAIN",0,"Generating a random gauge field... ");
   random_u(u_gauge);

@@ -5,14 +5,14 @@
 
 
 SHELL = /bin/bash
-
+unexport MACRO
 include $(MKDIR)/MkFlags
 
 MAKEFLAGS += -s
 MAKEFLAGS += -r
 #NO_COLOR_OUT = 1
 
-TESTEXES := $(foreach _file, ${TESTS}, $(shell  ${MKDIR}/Utils/check_compile.py -f $(_file) -n ${NG} -r "$(REPR)"  -g "${GAUGE_GROUP}" -s "${MACRO}" ) )
+TESTEXES := $(foreach _file, ${TESTS}, $(shell  ${MKDIR}/Utils/check_compile.py -f $(_file) -n ${NG} -r $(REPR)  -g ${GAUGE_GROUP} -s "$(MACRO)" ) )
 EXES += $(TESTEXES)
 SRCS += $(patsubst %,%.c,$(EXES))
 #OBJS = $($(filter-out $(EXCLUDE),$(SRCS)):.c=.o)

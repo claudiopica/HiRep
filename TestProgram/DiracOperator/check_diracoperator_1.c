@@ -1,4 +1,6 @@
 /*******************************************************************************
+* NOCOMPILE= opt1 opt2
+* NOCOMPILE= opt3
 *
 * Gauge covariance of the Dirac operator
 *

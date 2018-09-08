@@ -32,9 +32,12 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
     file=args.f+".c"
+
+    #sys.stderr.write(file+"AAA"+str(args.s[0])+"SSS\n")
     
-    
-    macros=args.s[0].replace("-D","").strip().split(' ')
+    macros=[]
+    for item in args.s:
+        macros.extend(item.replace("-D","").strip().split(' '))
     macros.append(args.g)
     macros.append(args.r)
     macros.append("NG="+args.n)
@@ -46,4 +49,4 @@ if __name__ == '__main__':
             exit(0)
         print args.f
     else:
-        print("Missing file "+file)
+        sys.stderr.write("Missing file "+file)
