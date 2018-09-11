@@ -91,11 +91,7 @@ void init_ghmc(ghmc_par *par){
 void free_ghmc()
 {
 	if (!init)
-	{
-		/* not initialized */
-		lprintf("HMC",0,"WARNING: HMC not initialized!\nWARNNG: Ignoring call to free_hmc.\n");
 		return;
-	}
 
 	/* free momenta */
 	if(u_gauge_old!=NULL) { free_gfield(u_gauge_old); u_gauge_old=NULL; }

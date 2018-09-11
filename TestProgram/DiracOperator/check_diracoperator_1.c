@@ -1,6 +1,4 @@
 /*******************************************************************************
-* NOCOMPILE= opt1 opt2
-* NOCOMPILE= opt3
 *
 * Gauge covariance of the Dirac operator
 *
@@ -78,6 +76,7 @@ static void transform_s(spinor_field *out, spinor_field *in)
 int main(int argc,char *argv[])
 {
 
+int return_value=1;
   double sig,tau;
   spinor_field *s0,*s1,*s2,*s3;
   
@@ -139,16 +138,15 @@ int main(int argc,char *argv[])
   sig=spinor_field_sqnorm_f(s1);
   
   lprintf("MAIN",0,"Maximal normalized difference = %.2e\n",sqrt(sig));
-  lprintf("MAIN",0,"(should be around 1*10^(-15) or so)\n\n");
+  lprintf("MAIN",0,"(should be around 1*10^(-15) or so)\n");
   
-  free_gfield(u_gauge);
-#ifndef REPR_FUNDAMENTAL
-  free_gfield_f(u_gauge_f);
-#endif
+  if(sqrt(sig)<10.e-14) 
+      return_value=0;
+
   free_spinor_field_f(s0);
   
   free_gtransf(g);
   
   finalize_process();
-  exit(0);
+  return return_value;
 }

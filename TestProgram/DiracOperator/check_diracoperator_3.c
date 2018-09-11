@@ -34,15 +34,15 @@
 static double hmass=0.1;
 
 
-void D(spinor_field *out, spinor_field *in){
+void DD(spinor_field *out, spinor_field *in){
    Dphi(hmass,out,in);
 }
 
-void H(spinor_field *out, spinor_field *in){
+void HH(spinor_field *out, spinor_field *in){
    g5Dphi(-hmass,out,in);
 }
 
-void M(spinor_field *out, spinor_field *in){
+void MM(spinor_field *out, spinor_field *in){
 #ifdef UPDATE_EO
    g5Dphi_eopre_sq(-hmass, out, in);
 #else
@@ -106,7 +106,7 @@ int main(int argc,char *argv[])
    
 
   
-  test_herm(&M,"M");
+  test_herm(&MM,"M");
  
   finalize_process();
 }

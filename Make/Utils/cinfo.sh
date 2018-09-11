@@ -1,4 +1,7 @@
 #!/bin/bash
+LOCKFILE=cinfo.lock
+[ -f "$LOCKFILE" ] && exit 0
+> ${LOCKFILE}
 
 FILENAME=cinfo.c
 MKDIR=$1
@@ -79,3 +82,5 @@ else
 fi
 
 cat ${MKDIR}/Utils/${FILENAME}.tmpl >> ${FILENAME}
+
+rm -f ${LOCKFILE}

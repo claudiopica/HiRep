@@ -1201,8 +1201,8 @@ static void fix_buffer(int zone_id)
   lprintf("GEOMETRY", REPORTLVL, "fix_buffer start on zone %d\n", zone_id);
 
   int i, done_border = index_border + 1, id_mask;
-  int tmp_start[4]={0,0,0,0}, bl_start[4], bl_width[4];
-  int tmp_width[4]={0,0,0,0};
+  int tmp_start[4] = {0, 0, 0, 0}, bl_start[4], bl_width[4];
+  int tmp_width[4] = {0, 0, 0, 0};
   int incr[4];
 
   for (i = 0; i < done_border; i++)
@@ -1229,8 +1229,8 @@ static void fix_buffer(int zone_id)
 
 static int correnspondig_buffer(int *bf, int i)
 {
-  int tmp_start[4]={0,0,0,0}, bl_start[4], bl_width[4];
-  int tmp_width[4]={0,0,0,0}, done_border = index_border + 1, checksum[8], buffer_sign;
+  int tmp_start[4] = {0, 0, 0, 0}, bl_start[4], bl_width[4];
+  int tmp_width[4] = {0, 0, 0, 0}, done_border = index_border + 1, checksum[8], buffer_sign;
   int id_mask = border[i].id_mask, found;
   int incr[4], j;
 
@@ -1900,4 +1900,76 @@ void geometry_mpi_eo(void)
   fix_next_neightbours();
 
   geometry_mpi_finalize();
+}
+
+void free_geometry_mpi_eo()
+{
+  if (glattice.master_start != NULL)
+    free(glattice.master_start);
+  if (glattice.master_end != NULL)
+    free(glattice.master_end);
+  if (glattice.copy_from != NULL)
+    free(glattice.copy_from);
+  if (glattice.copy_to != NULL)
+    free(glattice.copy_to);
+  if (glattice.copy_len != NULL)
+    free(glattice.copy_len);
+  if (glattice.rbuf_len != NULL)
+    free(glattice.rbuf_len);
+  if (glattice.sbuf_len != NULL)
+    free(glattice.sbuf_len);
+  if (glattice.rbuf_from_proc != NULL)
+    free(glattice.rbuf_from_proc);
+  if (glattice.rbuf_start != NULL)
+    free(glattice.rbuf_start);
+  if (glattice.sbuf_to_proc != NULL)
+    free(glattice.sbuf_to_proc);
+  if (glattice.sbuf_start != NULL)
+    free(glattice.sbuf_start);
+
+  if (glat_even.master_start != NULL)
+    free(glat_even.master_start);
+  if (glat_even.master_end != NULL)
+    free(glat_even.master_end);
+  if (glat_even.copy_from != NULL)
+    free(glat_even.copy_from);
+  if (glat_even.copy_to != NULL)
+    free(glat_even.copy_to);
+  if (glat_even.copy_len != NULL)
+    free(glat_even.copy_len);
+  if (glat_even.rbuf_len != NULL)
+    free(glat_even.rbuf_len);
+  if (glat_even.sbuf_len != NULL)
+    free(glat_even.sbuf_len);
+  if (glat_even.rbuf_from_proc != NULL)
+    free(glat_even.rbuf_from_proc);
+  if (glat_even.rbuf_start != NULL)
+    free(glat_even.rbuf_start);
+  if (glat_even.sbuf_to_proc != NULL)
+    free(glat_even.sbuf_to_proc);
+  if (glat_even.sbuf_start != NULL)
+    free(glat_even.sbuf_start);
+
+  if (glat_odd.master_start != NULL)
+    free(glat_odd.master_start);
+  if (glat_odd.master_end != NULL)
+    free(glat_odd.master_end);
+  if (glat_odd.copy_from != NULL)
+    free(glat_odd.copy_from);
+  if (glat_odd.copy_to != NULL)
+    free(glat_odd.copy_to);
+  if (glat_odd.copy_len != NULL)
+    free(glat_odd.copy_len);
+  if (glat_odd.rbuf_len != NULL)
+    free(glat_odd.rbuf_len);
+  if (glat_odd.sbuf_len != NULL)
+    free(glat_odd.sbuf_len);
+  if (glat_odd.rbuf_from_proc != NULL)
+    free(glat_odd.rbuf_from_proc);
+  if (glat_odd.rbuf_start != NULL)
+    free(glat_odd.rbuf_start);
+  if (glat_odd.sbuf_to_proc != NULL)
+    free(glat_odd.sbuf_to_proc);
+  if (glat_odd.sbuf_start != NULL)
+    free(glat_odd.sbuf_start);
 }

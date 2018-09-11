@@ -220,12 +220,28 @@ static void setup_random()
  */
 int finalize_process()
 {
+ 
+  free_ghmc();
+ 
+  free_BCs();
+  
+  /* free memory */
+  free_gfield(u_gauge);
+#ifdef ALLOCATE_REPR_GAUGE_FIELD
+  free_gfield_f(u_gauge_f);
+#endif
+  if(u_scalar!=NULL)
+	  free_scalar_field(u_scalar);
+  
+  if(u_gauge_f_flt!=NULL)
+    free_gfield_f_flt(u_gauge_f_flt);
+    
+free_geometry_mpi_eo();
+
+
 #ifdef WITH_MPI
   /* MPI variables */
   int init;
-#endif
-
-#ifdef WITH_MPI
   MPI_Initialized(&init);
   if (init)
     MPI_Finalize();

@@ -178,8 +178,9 @@ void init_BCs(BCs_pars_t *pars)
 
 void free_BCs()
 {
-  error(init == 0, 1, "free_BCs [boundary_conditions.c]",
-        "BCs not initialized yet");
+  if (init == 0)
+    return;
+    
   init = 0;
 
 #ifdef PLAQ_WEIGHTS

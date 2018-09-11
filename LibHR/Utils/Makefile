@@ -19,5 +19,5 @@ suN_exp.c: $(MKDIR)/MkFlags $(WRREPR) TMPL/suN_exp.c.tmpl
 #	cat TMPL/cinfo.c.tmpl >> cinfo.c
 
 clean::
-	rm -f suN_exp.c cinfo.c
+	rm -f suN_exp.c cinfo.c cinfo.lock
 

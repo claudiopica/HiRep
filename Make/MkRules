@@ -12,7 +12,7 @@ MAKEFLAGS += -s
 MAKEFLAGS += -r
 #NO_COLOR_OUT = 1
 
-TESTEXES := $(foreach _file, ${TESTS}, $(shell  ${MKDIR}/Utils/check_compile.py -f $(_file) -n ${NG} -r $(REPR)  -g ${GAUGE_GROUP} -s "$(MACRO)" ) )
+TESTEXES ?= $(foreach _file, ${TESTS}, $(shell  ${MKDIR}/Utils/check_compile.py -f $(_file) -n ${NG} -r $(REPR)  -g ${GAUGE_GROUP} -s "$(MACRO)" ) )
 EXES += $(TESTEXES)
 SRCS += $(patsubst %,%.c,$(EXES))
 #OBJS = $($(filter-out $(EXCLUDE),$(SRCS)):.c=.o)
@@ -65,7 +65,9 @@ WQUAT = $(if $(findstring -DWITH_QUATERNIONS,$(MACRO)),1,0)
 
 #Include
 INCDIR = $(TOPDIR)/Include
-INC = -I $(INCDIR) -I /opt/local/include/mpich-devel-gcc7/
+INC = -I $(INCDIR) 
+#INC += -I /opt/local/include/mpich-devel-gcc7/
+INC += -I /opt/local/include/mpich-clang60/
 
 GCC = gcc
 CXX ?= g++
@@ -183,8 +185,11 @@ clean:: $(patsubst %,clean-%,$(SUBDIRS))
 cleanall::
 	CEXE="all" $(MAKE) clean
 
+LOCK_CINFO:= lock.cinfo
+
 cinfo.c: $(MKDIR)/MkFlags $(MKDIR)/MkRules $(MKDIR)/Utils/cinfo.sh
 	$(MKDIR)/Utils/cinfo.sh $(MKDIR) $(TOPDIR) $(MACRO)
+
 
 LDFLAGS += $(foreach _lib, $(LIBS),-L$(dir $(_lib)))
 LDFLAGS += $(foreach _lib, $(LIBS),-l$(patsubst lib%.a,%,$(notdir $(_lib))))

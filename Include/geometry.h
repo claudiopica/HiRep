@@ -77,6 +77,9 @@ void geometry_mem_alloc(void);
 int proc_up(int id, int dir);
 int proc_dn(int id, int dir);
 
+void free_geometry_mpi_eo(void);
+
+
 void init_geometry_SAP(void);
 void test_geometry_mpi(void);
 void test_geometry_mpi_eo(void);

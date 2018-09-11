@@ -220,6 +220,7 @@ static void init_fields()
 void smear_gauge_field()
 {
 #ifdef WITH_SMEARING
+	suNg s, t1;
 
 	init_fields();
 	estimate_taylor_order();
@@ -228,7 +229,6 @@ void smear_gauge_field()
 	{
 		for (int mu = 0; mu < 4; mu++)
 		{
-			suNg s, t1;
 			projected_stout_staples(ix, mu, &s);
 			*_4FIELD_AT(Sigma, ix, mu) = s;
 			Exp_Taylor(&t1, &s, taylor_order);
