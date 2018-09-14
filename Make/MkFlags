@@ -14,7 +14,7 @@ GAUGE_GROUP = GAUGE_SUN
 #Z => PERIODIC, ANTIPERIODIC, THETA
 
 #MACRO += -DBC_T_THETA
-MACRO += -DBC_T_ANTIPERIODIC
+MACRO += -DBC_T_PERIODIC
 MACRO += -DBC_X_PERIODIC
 MACRO += -DBC_Y_PERIODIC
 MACRO += -DBC_Z_PERIODIC
@@ -26,8 +26,8 @@ MACRO += -DBC_Z_PERIODIC
 #MACRO += -DROTATED_SF
 
 
-MACRO += -DWITH_SMEARING
-MACRO += -DWITH_CLOVER
+#MACRO += -DWITH_SMEARING
+#MACRO += -DWITH_CLOVER
 MACRO += -DUPDATE_EO
 MACRO += -DWITH_MPI
 #MACRO += -DWITH_QUATERNIONS
@@ -43,11 +43,13 @@ MACRO += -DIO_FLUSH
 
 #Compiler
 
-CC = mpicc
-#CC = gcc
-#CC = clang
+CC = mpicc-mpich-clang60   
+MPICC = clang-mp-6.0
+
 #CFLAGS = -Wall -std=c99 -O3 -fomit-frame-pointer -msse -msse2 
-CFLAGS = -Wall -std=c99 -O3 #-march=core-avx2 -mtune=core-avx2 -g
+CFLAGS = -Wall -std=c99 -O3 -g #-march=core-avx2 -mtune=core-avx2 -g
 
 
-LDFLAGS = 
+
+
+LDFLAGS =  #-lefence -L /opt/local/lib
