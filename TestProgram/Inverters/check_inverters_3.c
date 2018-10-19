@@ -28,31 +28,18 @@
 #include "utils.h"
 #include "logger.h"
 #include "communications.h"
+#include "setup.h"
 
 int nhb,nor,nit,nth,nms,level,seed;
 double beta;
 
-static double hmass=0.1;
-
-
-void D(spinor_field *out, spinor_field *in){
-  Dphi(hmass,out,in);
-}
-
-void H(spinor_field *out, spinor_field *in){
-  g5Dphi(hmass,out,in);
-}
-
-static spinor_field *tmp;
-void M(spinor_field *out, spinor_field *in){
-  g5Dphi(-hmass,tmp,in); 
-  g5Dphi(-hmass,out,tmp);
-}
-
 
 int main(int argc,char *argv[])
 {
-  char pame[256];
+
+  int return_value = 0;
+
+  
   int i;
   double tau;
   spinor_field *s1, *s2;
@@ -61,57 +48,16 @@ int main(int argc,char *argv[])
   mshift_par par;
 
   int cgiters;
-  /* setup process id and communications */
-  setup_process(&argc,&argv);
-  
-  /* logger setup */
+  logger_map("DEBUG", "debug");
 
-  logger_setlevel(0,100); /* log all */
-  if (PID!=0) { 
-    logger_disable();}
-  else{
-    sprintf(pame,">out_%d",PID); logger_stdout(pame);
-    sprintf(pame,"err_%d",PID); freopen(pame,"w",stderr);
-  }
-     
-  lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
-  
-  /* read input file */
-  read_input(glb_var.read,"test_input");
+  setup_process(&argc, &argv);
 
-  /* setup communication geometry */
-  if (geometry_init() == 1) {
-    finalize_process();
-    return 0;
-  }
-  
-   
-   lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
-   lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
-   lprintf("MAIN",0,"global size is %dx%dx%dx%d\n",GLB_T,GLB_X,GLB_Y,GLB_Z);
-   lprintf("MAIN",0,"proc grid is %dx%dx%dx%d\n",NP_T,NP_X,NP_Y,NP_Z);
-   
-   /* setup lattice geometry */
-   geometry_mpi_eo();
-   /* test_geometry_mpi_eo(); */
-    
-    
-    /* setup random numbers */
-    read_input(rlx_var.read,"test_input");
-    lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
-    rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
-
-   
-   u_gauge=alloc_gfield(&glattice);
-#ifndef REPR_FUNDAMENTAL
-   u_gauge_f=alloc_gfield_f(&glattice);
-#endif
-  represent_gauge_field();
+  setup_gauge_fields();
 
   lprintf("MAIN",0,"Generating a random gauge field... ");
-  lprintf("MAIN",0,"done.\n");
-
+  
   random_u(u_gauge);
+  lprintf("MAIN",0,"done.\n");
 
   start_gf_sendrecv(u_gauge);
   complete_gf_sendrecv(u_gauge);
@@ -122,10 +68,9 @@ int main(int argc,char *argv[])
   par.shift=(double*)malloc(sizeof(double)*(par.n));
   par.err2=1.e-28;
   par.max_iter=0;
-  res=alloc_spinor_field_f(par.n+3,&glattice);
+  res=alloc_spinor_field_f(par.n+2,&glattice);
   s1=res+par.n;
   s2=s1+1;
-  tmp=s2+1;
 
 
   par.shift[0]=+0.1;
@@ -155,11 +100,13 @@ int main(int argc,char *argv[])
     spinor_field_sub_assign_f(s2,s1);
     tau=spinor_field_sqnorm_f(s2)/spinor_field_sqnorm_f(s1);
     lprintf("QMR TEST",0,"test g5QMR[%d] = %e (req. %e)\n",i,tau,par.err2);
+     if (tau > par.err2)
+      return_value += 1;
   }
 	 
   free_spinor_field_f(res);
   free(par.shift);
   finalize_process();
 
-  return 0;
+  return return_value;
 }

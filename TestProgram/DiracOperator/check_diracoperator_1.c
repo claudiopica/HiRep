@@ -51,9 +51,10 @@ static void transform_u(void)
          _suNg_times_suNg(*u,*_FIELD_AT(g,ix),v);
       }
    }
-   
+
    start_gf_sendrecv(u_gauge);
    represent_gauge_field();
+   smear_gauge_field();
 }
 
 static void transform_s(spinor_field *out, spinor_field *in)
@@ -129,10 +130,7 @@ int return_value=1;
   
   spinor_field_zero_f(s1);
 
-#pragma omp parallel default(shared)
-{
   loc_D(s1,s3);
-} 
   
   spinor_field_mul_add_assign_f(s1,-1.0,s2);
   sig=spinor_field_sqnorm_f(s1);

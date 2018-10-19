@@ -75,7 +75,7 @@ echo "rlx_state = rand_state">>test_input
 (( ${test[$((i*14+13))]} > 18 )) && continue;
 cat test_input
 
-   mpirun -np  ${test[$((i*14+13))]} ./check_geometry_1
+   mpirun -np  ${test[$((i*14+13))]} ./check_geometry_1 -i ./test_input
    pippo=`echo $?`;
    if [ "${pippo}" != "0" ] ; then exit ; fi
    

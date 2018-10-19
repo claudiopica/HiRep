@@ -7,8 +7,10 @@ NP_X = 1
 NP_Y = 1
 NP_Z = 1
 
-//level = 1  seed = 1
-level = 1  seed = 38761
+
+rlx_level = 1
+rlx_seed = 12345
+
 
 mes:masses = 0
 mes:precision = 1e-24

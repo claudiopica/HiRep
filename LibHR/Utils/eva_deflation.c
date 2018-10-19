@@ -78,7 +78,7 @@ static void find_low_eig_H2(const eva_prec *e_par, geometry_descriptor *type, in
   }
 
 }
-
+/*
 static void check_ortho(spinor_field *in, int n) {
   int i,j;
   double complex p;
@@ -90,7 +90,7 @@ static void check_ortho(spinor_field *in, int n) {
     lprintf("TESTORTHO",0,"\n",creal(p),cimag(p));
   }
 }
-
+*/
 static void orthogonalize(spinor_field *out, spinor_field *in, int n) {
   double complex p;
   while(n>0) {
@@ -125,7 +125,7 @@ void set_def_matrix(eva_prec *e_par, spinor_operator H, geometry_descriptor *typ
   else 
     find_low_eig_H2(e_par,type,2);
 
-  check_ortho(ev,e_par->nev);
+  /*check_ortho(ev,e_par->nev);*/
 }
 
 

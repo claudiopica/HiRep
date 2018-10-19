@@ -1,5 +1,13 @@
 /*******************************************************************************
 *
+* NOCOMPILE= BC_T_ANTIPERIODIC
+* NOCOMPILE= BC_X_ANTIPERIODIC
+* NOCOMPILE= BC_Y_ANTIPERIODIC
+* NOCOMPILE= BC_Z_ANTIPERIODIC
+* NOCOMPILE= BASIC_SF
+* NOCOMPILE= ROTATED_SF
+*
+*
 * Action of the Dirac operator on plane waves
 *
 *******************************************************************************/
@@ -99,7 +107,7 @@ int main(int argc, char *argv[])
   double complex z;
   suNf_spinor s, s0, s1, s2, s3;
   spinor_field *ps0, *ps1, *ps2;
-  
+  int return_value=0;
 
   /* setup process id and communications */
   logger_map("DEBUG", "debug");
@@ -111,14 +119,8 @@ int main(int argc, char *argv[])
   lprintf("MAIN", 0, "Action of Qhat on plane waves\n");
   lprintf("MAIN", 0, "-----------------------------\n\n");
 
-  u_gauge = alloc_gfield(&glattice);
-#ifndef REPR_FUNDAMENTAL
-  u_gauge_f = alloc_gfield_f(&glattice);
-#endif
-
   unit_u(u_gauge);
   start_gf_sendrecv(u_gauge);
-
   represent_gauge_field();
 
   ps0 = alloc_spinor_field_f(3, &glattice);
@@ -146,6 +148,8 @@ int main(int argc, char *argv[])
   {
     ranlxd(ran, 4);
 
+    bcast(ran, 4);
+
     np[0] = (int)(ran[0] * (double)(GLB_T));
     np[1] = (int)(ran[1] * (double)(GLB_X));
     np[2] = (int)(ran[2] * (double)(GLB_Y));
@@ -169,6 +173,8 @@ int main(int argc, char *argv[])
 
     rs = (double *)(&s);
     r = 0.0f;
+    
+
     while ((1.0f + r) == 1.0f)
     {
       gauss(rs, 8 * NF);
@@ -179,19 +185,24 @@ int main(int argc, char *argv[])
 
       r = (double)(sqrt((double)(r)));
     }
+    bcast(rs, 8* NF);
+
 
     /*We define directly the spinor also on the buffer so that the test can work with or without mpi*/
-    for (x0 = -T_BORDER; x0 < T + T_BORDER; x0++)
-      for (x1 = -X_BORDER; x1 < X + X_BORDER; x1++)
-        for (x2 = -Y_BORDER; x2 < Y + Y_BORDER; x2++)
-          for (x3 = -Z_BORDER; x3 < Z + Z_BORDER; x3++)
+    for (x0 = -0*T_BORDER; x0 < T + 0*T_BORDER; x0++)
+      for (x1 = -0*X_BORDER; x1 < X + 0*X_BORDER; x1++)
+        for (x2 = -0*Y_BORDER; x2 < Y + 0*Y_BORDER; x2++)
+          for (x3 = -0*Z_BORDER; x3 < Z + 0*Z_BORDER; x3++)
           {
             ix = ipt(x0, x1, x2, x3);
             if (ix == -1 || ix >= glattice.gsize_spinor)
               continue;
 
             /* Attention, the definition of the plane wave depends on the slice used for the BC*/
-            px = p[0] * (double)(safe_mod(x0 + zerocoord[0] - T_BORDER - 1, GLB_T) + T_BORDER + 1) + p[1] * (double)(safe_mod(x1 + zerocoord[1] - X_BORDER - 1, GLB_X) + X_BORDER + 1) + p[2] * (double)(safe_mod(x2 + zerocoord[2] - Y_BORDER - 1, GLB_Y) + Y_BORDER + 1) + p[3] * (double)(safe_mod(x3 + zerocoord[3] - Z_BORDER - 1, GLB_Z) + Z_BORDER + 1);
+            px = p[0] * (double)(safe_mod(x0 + zerocoord[0], GLB_T)) +
+                 p[1] * (double)(safe_mod(x1 + zerocoord[1], GLB_X)) +
+                 p[2] * (double)(safe_mod(x2 + zerocoord[2], GLB_Y)) +
+                 p[3] * (double)(safe_mod(x3 + zerocoord[3], GLB_Z));
 
             z = (cos(px)) + I * (sin(px));
 
@@ -227,10 +238,16 @@ int main(int argc, char *argv[])
             }
             *_FIELD_AT(ps1, ix) = s1;
           }
-#pragma omp parallel default(shared)
-    {
-      Dphi(hmass, ps2, ps0);
-    }
+
+
+    start_sf_sendrecv(ps0);
+    complete_sf_sendrecv(ps0);
+   
+    Dphi(hmass, ps2, ps0);
+
+    
+    start_sf_sendrecv(ps1);
+    complete_sf_sendrecv(ps1);
 
     spinor_field_mul_add_assign_f(ps1, -1.0, ps2);
     sig = spinor_field_sqnorm_f(ps1) / spinor_field_sqnorm_f(ps0);
@@ -238,9 +255,12 @@ int main(int argc, char *argv[])
     lprintf("MAIN", 0, "Maximal normalized difference = %.2e at p=(%d,%d,%d,%d)\n", sqrt(sig),
             np[0], np[1], np[2], np[3]);
     lprintf("MAIN", 0, "should be around 1*10^(-15) or so)\n\n");
+
+    if(sqrt(sig)>10.e-14) 
+      return_value=1;
   }
 
   finalize_process();
 
-  exit(0);
+  return return_value;
 }

@@ -33,8 +33,8 @@
 #include "gamma_spinor.h"
 #include "spin_matrix.h"
 #include "propagator.h"
+#include "setup.h"
 
-#include "cinfo.c"
 
 #if defined(ROTATED_SF) && defined(BASIC_SF)
 #error This code does not work with the Schroedinger functional !!!
@@ -216,17 +216,27 @@ int main(int argc,char *argv[]) {
   int nm;
   double m[256];
   
+ /* setup process id and communications */
+  logger_map("DEBUG", "debug");
+
+  setup_process(&argc, &argv);
+
+  setup_gauge_fields();
+
+
+
+
   /* setup process id and communications */
-  read_cmdline(argc, argv);
+  /*read_cmdline(argc, argv);
   setup_process(&argc,&argv);
 
   read_input(glb_var.read,input_filename);
-  setup_replicas();
+  setup_replicas();*/
 
 
   /* logger setup */
   /* disable logger for MPI processes != 0 */
-  logger_setlevel(0,10);
+  /*logger_setlevel(0,10);
   if (PID!=0) { logger_disable(); }
   if (PID==0) { 
     sprintf(tmp,">%s",output_filename); logger_stdout(tmp);
@@ -238,12 +248,12 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
   lprintf("MAIN",0,"input file [%s]\n",input_filename); 
   lprintf("MAIN",0,"output file [%s]\n",output_filename); 
-  lprintf("MAIN",0,"list file [%s]\n",list_filename); 
+  lprintf("MAIN",0,"list file [%s]\n",list_filename); */
   
 
 
   /* read & broadcast parameters */
-  parse_cnfg_filename(cnfg_filename,&fpars);
+  /*parse_cnfg_filename(cnfg_filename,&fpars);*/
 
 
   read_input(mes_var.read,input_filename);
@@ -253,7 +263,7 @@ int main(int argc,char *argv[]) {
   
 
 
-  read_input(rlx_var.read,input_filename);
+  /*read_input(rlx_var.read,input_filename);
   lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed);
   rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
   srand(rlx_var.rlxd_seed+MPI_PID);
@@ -264,7 +274,7 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
 #endif
   lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
-
+*/
   nm=0;
   if(fpars.type==DYNAMICAL_CNFG) {
     nm=1;
@@ -283,19 +293,19 @@ int main(int argc,char *argv[]) {
   read_input(eig_var.read,input_filename);
 
   /* setup communication geometry */
-  if (geometry_init() == 1) {
+  /*if (geometry_init() == 1) {
     finalize_process();
     return 0;
   }
-
+*/
   /* setup lattice geometry */
-  geometry_mpi_eo();
+/*  geometry_mpi_eo();*/
   /* test_geometry_mpi_eo(); */
 
-  init_BCs(NULL);
+/*  init_BCs(NULL);*/
 
   /* alloc global gauge fields */
-  u_gauge=alloc_gfield(&glattice);
+  /*u_gauge=alloc_gfield(&glattice);
 #ifdef ALLOCATE_REPR_GAUGE_FIELD
   u_gauge_f=alloc_gfield_f(&glattice);
 #endif
@@ -320,7 +330,7 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"relative precision (eva:omega2) = %e\n",eig_var.omega2);
 
 
-
+*/
 
   i=0;
 
