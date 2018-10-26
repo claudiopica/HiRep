@@ -1,7 +1,7 @@
 TOPDIR = ../..
 MKDIR = $(TOPDIR)/Make
 
-EXES = check_geometry_1
+TESTS = check_geometry_1
 
 LIBS += $(TOPDIR)/LibHR/libhr.a
 

@@ -20,7 +20,7 @@ OBJS = $(patsubst %.c,%.o,$(filter-out $(EXCLUDE),$(SRCS)))
 ALIBNAME = $(abspath $(LIBNAME))
 
 
-ifneq ($(findstring -DWITH_MPI,$(MACRO)),-DWITH_MPI)
+ifeq ($(findstring -DWITH_MPI,$(MACRO)),-DWITH_MPI)
 	CC=$(MPICC)
 endif
 
@@ -72,7 +72,7 @@ WQUAT = $(if $(findstring -DWITH_QUATERNIONS,$(MACRO)),1,0)
 INCDIR = $(TOPDIR)/Include
 INC = -I $(INCDIR) 
 #INC += -I /opt/local/include/mpich-devel-gcc7/
-INC += -I /opt/local/include/mpich-clang60/
+INC += -I /opt/local/include/mpich-clang/
 
 GCC = gcc
 CXX ?= g++

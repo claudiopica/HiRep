@@ -43,8 +43,8 @@ MACRO += -DIO_FLUSH
 
 #Compiler
 
-CC = mpicc-mpich-clang60   
-MPICC = clang-mp-6.0
+CC = clang
+MPICC = mpicc-mpich-clang
 
 #CFLAGS = -Wall -std=c99 -O3 -fomit-frame-pointer -msse -msse2 
 CFLAGS = -Wall -std=c99 -O3 -g #-march=core-avx2 -mtune=core-avx2 -g
@@ -52,4 +52,4 @@ CFLAGS = -Wall -std=c99 -O3 -g #-march=core-avx2 -mtune=core-avx2 -g
 
 
 
-LDFLAGS =  #-lefence -L /opt/local/lib
+LDFLAGS =  -L /opt/local/lib/mpich-devel-clang/
