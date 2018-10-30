@@ -168,7 +168,7 @@ int setup_process(int *argc, char ***argv)
   else
   {
     FILE *stderrp;
-    char sbuf[256];
+    char sbuf[270];
     sprintf(sbuf, ">>%s", output_filename);
     logger_stdout(sbuf);
     stderrp = freopen(error_filename, "w", stderr);
