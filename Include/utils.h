@@ -107,4 +107,13 @@ int timeval_subtract (struct timeval *result, struct timeval *x, struct timeval 
 void print_compiling_info(); 
 void print_compiling_info_short(); 
 
+/* Spatial Blocking*/
+int iup_sblk(int site, int dir);
+int idn_sblk(int site, int dir);
+suNg * pu_gauge_sblk(int site, int dir);
+void initialize_spatial_blocking(int *tlist);
+void free_spatial_blocking();
+void spatial_blocking(unsigned int level, int force_eval);
+
+
 #endif 

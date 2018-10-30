@@ -29,6 +29,12 @@ double SF_action(double beta);
 double local_plaq(int ix);
 void full_plaquette();
 
+void cplaq_sblk(double complex *ret,int ix,int mu,int nu);
+double complex spatial_plaquette_sblk();
+
+
+
+
 double rect_1x2(int ix,int mu,int nu);
 void crect_1x2(double complex *ret,int ix,int mu,int nu);
 double avr_rect_1x2();
