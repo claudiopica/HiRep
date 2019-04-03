@@ -3,13 +3,14 @@
 /* Mesons parameters */
 typedef struct _input_scatt {
 	char mstring[256];
+    double csw;
 	double precision;
 	int nhits;
 	int tsrc;
-	char outdir[256], p1[16], p2[16];
+	char outdir[256], p1[16], p2[16], p3[16];
 
 	/* for the reading function */
-	input_record_t read[8];
+	input_record_t read[10];
 
 } input_scatt;
 
@@ -17,12 +18,14 @@ typedef struct _input_scatt {
 { \
 	.read={\
 		{"quark quenched masses", "mes:masses = %s", STRING_T, (varname).mstring},\
+		{"csw", "mes:csw = %lf", DOUBLE_T, &(varname).csw},\
 		{"inverter precision", "mes:precision = %lf", DOUBLE_T, &(varname).precision},\
 		{"number of inversions per cnfg", "mes:nhits = %d", INT_T, &(varname).nhits},\
 		{"Source time:", "mes:tsrc = %d", INT_T, &(varname).tsrc},\
 		{"Output directory:", "mes:outdir = %s", STRING_T, &(varname).outdir},\
 		{"Momentum 1:", "mes:p1 = %s", STRING_T, &(varname).p1},\
 		{"Momentum 2:", "mes:p2 = %s", STRING_T, &(varname).p2},\
+		{"Momentum 3:", "mes:p3 = %s", STRING_T, &(varname).p3},\
 		{NULL, NULL, INT_T, NULL}\
 	}\
 }
