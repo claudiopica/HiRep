@@ -70,10 +70,7 @@ WQUAT = $(if $(findstring -DWITH_QUATERNIONS,$(MACRO)),1,0)
 
 #Include
 INCDIR = $(TOPDIR)/Include
-INC = -I $(INCDIR) 
-#INC += -I /opt/local/include/mpich-devel-gcc7/
-#INC += -I /opt/local/include/mpich-clang/
-INC += -I /opt/local/include/mpich-devel-gcc8/
+INC = -I $(INCDIR) $(INCLUDE)
 GCC = gcc
 CXX ?= g++
 CPPFLAGS += $(MACRO)

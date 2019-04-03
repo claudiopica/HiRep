@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Gauge invariance of the spatial smearing operators
+* check  of the spatial blocking routines
 *
 *******************************************************************************/
 
@@ -39,18 +39,18 @@ static void random_g(void)
   complete_gt_sendrecv(g);
 }
 
-double doubleop(int in, int mu, int nu)
+double complex doubleop(int in, int mu, int nu)
 {
   suNg *w1, *w2;
   suNg res, res1;
   int pit;
-  double p;
+  double complex p;
 
-  w1 = pu_gauge(in, mu);
+  w2 = pu_gauge(in, mu);
 
   pit = iup(in, mu);
-  w2 = pu_gauge(pit, mu);
-  _suNg_times_suNg(res, *w1, *w2);
+  w1 = pu_gauge(pit, mu);
+  _suNg_times_suNg(res, *w2, *w1);
 
   pit = iup(pit, mu);
   w1 = pu_gauge(pit, nu);
@@ -77,8 +77,51 @@ double doubleop(int in, int mu, int nu)
   w1 = pu_gauge(pit, nu);
   _suNg_times_suNg_dagger(res, res1, *w1);
 
-  _suNg_trace_re(p, res);
+  _suNg_trace(p, res);
   return p;
+}
+
+double complex spatial_plaquette_wrk()
+{
+  static double complex pa;
+  static double complex r0;
+
+  _OMP_PRAGMA(single)
+  {
+    r0 = 0.;
+  }
+
+  _PIECE_FOR(&glattice, ixp)
+  {
+
+    _SITE_FOR_SUM(&glattice, ixp, ix, r0)
+    {
+      double complex tmp;
+
+      cplaq_wrk(&tmp, ix, 2, 1);
+      r0 += tmp;
+
+      cplaq_wrk(&tmp, ix, 3, 1);
+      r0 += tmp;
+
+      cplaq_wrk(&tmp, ix, 3, 2);
+      r0 += tmp;
+    }
+  }
+
+  _OMP_PRAGMA(single)
+  {
+    pa = r0;
+  }
+
+  global_sum((double *)&pa, 2);
+
+#ifdef BC_T_OPEN
+  pa[k] /= NG * GLB_VOLUME * (GLB_T - 1) / GLB_T;
+#else
+  pa /= NG * GLB_VOLUME;
+#endif
+  return pa;
 }
 
 static void transform_u(void)
@@ -105,9 +148,7 @@ int main(int argc, char *argv[])
 
   int return_value = 0;
 
-  double complex splaq, splaq2;
-
-  logger_map("DEBUG", "debug");
+  double complex splaq, splaq2, dplaq=0.;
 
   setup_process(&argc, &argv);
 
@@ -123,9 +164,9 @@ int main(int argc, char *argv[])
   lprintf("MAIN", 0, "done.\n");
   lprintf("MAIN", 0, "\n\n");
 
-  initialize_spatial_blocking(NULL);
+  initialize_spatial_active_slices(NULL);
 
-  double dop = 0.;
+  double  dop = 0.;
   int id, ix, iy, iz, it;
 
   for (ix = 0; ix < X; ix++)
@@ -134,106 +175,92 @@ int main(int argc, char *argv[])
         for (it = 0; it < T; it++)
         {
           id = ipt(it, ix, iy, iz);
-          dop += doubleop(id, 1, 2);
-          dop += doubleop(id, 1, 3);
-          dop += doubleop(id, 2, 3);
+          dplaq += doubleop(id, 2, 1);
+          dplaq += doubleop(id, 3, 1);
+          dplaq += doubleop(id, 3, 2);
         }
 
-  global_sum((double *)&dop, 2);
-  dop /= NG * GLB_VOLUME;
+  global_sum((double *)&dplaq, 2);
+  dplaq /= NG * GLB_VOLUME;
 
-  spatial_blocking(1, 1);
+  spatial_blocking_wrkspace(NEW_SBLK, 1);
 
-  splaq = spatial_plaquette_sblk();
+  splaq = spatial_plaquette_wrk();
 
-  dop -= creal(splaq);
-  dop = sqrt(dop * dop);
-
+  dplaq -= splaq;
+  dop = sqrt(creal(conj(dplaq) * dplaq));
 
   lprintf("MAIN", 0, "Comparison of the double plaquette operator vs single plaquette on level of blocking 1.\n ");
   lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", dop);
-  lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n");
+  lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
   if (dop > 10.e-14)
     return_value++;
 
-  lprintf("MAIN", 0, "\n\n");
-  spatial_blocking(blk_level, 1);
+  spatial_blocking_wrkspace(NEW_SBLK,blk_level);
 
-  splaq = spatial_plaquette_sblk();
+  splaq = spatial_plaquette_wrk();
 
   lprintf("MAIN", 0, "Generating and applying a random gauge transf... ");
   random_g();
   transform_u();
 
-  lprintf("MAIN", 0, "done.\n");
-
-  spatial_blocking(blk_level, 1);
-
-  splaq2 = splaq - spatial_plaquette_sblk();
+  lprintf("MAIN", 0, "done.\n\n");
+  
+  spatial_blocking_wrkspace(NEW_SBLK,blk_level);
+  
+  splaq2 = splaq - spatial_plaquette_wrk();
 
   dop = sqrt(_complex_prod_re(splaq2, splaq2));
 
   lprintf("MAIN", 0, "Checking gauge invariance of the spatial plaq on blocking level %d.\n ", blk_level);
   lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", dop);
-  lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n");
+  lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
   if (dop > 10.e-14)
     return_value++;
 
-  lprintf("MAIN", 0, "\n\n");
+  spatial_blocking_wrkspace(NEW_SBLK,blk_level - 2);
+  spatial_blocking_wrkspace(CONT_SBLK,blk_level - 1);
+  spatial_blocking_wrkspace(CONT_SBLK,blk_level);
 
-  spatial_blocking(blk_level - 2, 1);
-  spatial_blocking(blk_level - 1, 0);
-  spatial_blocking(blk_level, 0);
-
-  splaq2 = splaq - spatial_plaquette_sblk();
+  splaq2 = splaq - spatial_plaquette_wrk();
 
   dop = sqrt(_complex_prod_re(splaq2, splaq2));
 
   lprintf("MAIN", 0, "Checking gauge invariance of the spatial plaq on blocking level %d (composing different blocking levels).\n ", blk_level);
   lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", dop);
-  lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n");
+  lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
   if (dop > 10.e-14)
     return_value++;
 
-  lprintf("MAIN", 0, "\n\n");
+  spatial_blocking_wrkspace(CONT_SBLK,blk_level + 2);
+  spatial_blocking_wrkspace(CONT_SBLK,blk_level);
 
-  spatial_blocking(blk_level + 2, 0);
-  spatial_blocking(blk_level , 0);
-
-  splaq2 = splaq - spatial_plaquette_sblk();
+  splaq2 = splaq - spatial_plaquette_wrk();
 
   dop = sqrt(_complex_prod_re(splaq2, splaq2));
 
-  lprintf("MAIN", 0, "Checking gauge invariance of the spatial plaq on blocking level %d (without forcing the re-evaluation).\n ", blk_level );
+  lprintf("MAIN", 0, "Checking gauge invariance of the spatial plaq on blocking level %d (without forcing the re-evaluation).\n ", blk_level);
+  lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", dop);
+  lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
+  if (dop > 10.e-14)
+    return_value++;
+
+  spatial_blocking_wrkspace(CONT_SBLK,blk_level);
+
+  splaq2 = splaq - spatial_plaquette_wrk();
+
+  dop = sqrt(_complex_prod_re(splaq2, splaq2));
+
+  lprintf("MAIN", 0, "Checking gauge invariance of the spatial plaq on blocking level %d (on a level already evaluated).\n ", blk_level);
   lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", dop);
   lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n");
   if (dop > 10.e-14)
     return_value++;
-
-
-lprintf("MAIN", 0, "\n\n");
-
-  spatial_blocking(blk_level , 0);
-
-  splaq2 = splaq - spatial_plaquette_sblk();
-
-  dop = sqrt(_complex_prod_re(splaq2, splaq2));
-
-  lprintf("MAIN", 0, "Checking gauge invariance of the spatial plaq on blocking level %d (on a level already evaluated).\n ", blk_level );
-  lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", dop);
-  lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n");
-  if (dop > 10.e-14)
-    return_value++;
-
-
-
-
 
   free_gtransf(g);
 
-  free_spatial_blocking();
+  free_spatial_active_slices();
 
   finalize_process();
   return return_value;
-
 }

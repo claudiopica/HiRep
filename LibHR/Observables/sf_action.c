@@ -8,7 +8,7 @@
 /*! \defgroup sfgauge SF Gauge Observable
  * \ingroup obs
  */
-#ifdef GAUGE_SUN
+#if defined(GAUGE_SUN) && ( defined(BASIC_SF) || defined(ROTATED_SF))
 
 
 #include "global.h"

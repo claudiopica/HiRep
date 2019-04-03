@@ -19,6 +19,8 @@ void project_gauge_field(void);
 void update(double beta,int nhb,int nor);
 void random_su2(double rho,double s[]);
 
+void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, int *ml_up, int * ml_skip);
+
 /* functions and structures for the MRE algorithm */
 typedef struct {
 	spinor_field *s[2];

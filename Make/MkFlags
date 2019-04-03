@@ -42,15 +42,28 @@ MACRO += -DIO_FLUSH
 #MACRO += -DMEASURE_FORCE
 
 #Compiler
-
-CC = gcc-mp-8
-MPICC = mpicc-mpich-gcc8
-
 #CFLAGS = -Wall -std=c99 -O3 -fomit-frame-pointer -msse -msse2 
-CFLAGS = -Wall -std=c99 -O3 -g #-march=core-avx2 -mtune=core-avx2 -g
+CFLAGS = -Wall -std=c99 -O3  -g #-march=core-avx2 -mtune=core-avx2 -g
 
 
+#CC = gcc-mp-7
+#MPICC = mpicc-mpich-gcc7
+#LDFLAGS =  -L /opt/local/lib/mpich-devel-gcc7/ -L /opt/local/lib/ #-l efence
+#INCLUDE = -I /opt/local/include/mpich-devel-gcc7/
 
 
-#LDFLAGS =  -L /opt/local/lib/mpich-devel-clang/
-LDFLAGS =  -L /opt/local/lib/mpich-devel-gcc8/
+CC = clang-mp-6.0
+MPICC = mpicc-mpich-clang60
+LDFLAGS =  -L /opt/local/lib/mpich-devel-clang60/ -L /opt/local/lib/ #-l efence
+INCLUDE = -I /opt/local/include/mpich-clang60/
+
+
+#CC = clang-mp-6.0
+#MPICC = mpicc-openmpi-devel-clang60
+#LDFLAGS =  -L /opt/local/lib/openmpi-devel-clang60/ -L /opt/local/lib/ #-l efence
+#INCLUDE = -I /opt/local/include/openmpi-devel-clang60/
+
+#CC = icc
+#MPICC = mpiicc
+#LDFLAGS =  -L /opt/local/lib/mpich-devel-gcc7/ -L /opt/local/lib/ #-l efence
+#INCLUDE = -I /opt/local/include/mpich-devel-gcc7/

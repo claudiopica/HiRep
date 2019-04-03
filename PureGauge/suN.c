@@ -151,7 +151,7 @@ int main(int argc,char *argv[])
   if(i) lprintf("MAIN",0,"%d\nThemalization done.\n",i);
 
 
-  /* Misure */
+  /* Measures */
   for(i=flow.start;i<flow.end;++i) {
     struct timeval start, end, etime; /* //for trajectory timing */
     lprintf("BLOCK",0," Start %d\n",i);

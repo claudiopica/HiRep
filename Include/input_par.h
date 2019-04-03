@@ -78,7 +78,7 @@ typedef struct _input_rlx {
 /* Logger global variables */
 typedef struct _input_logger {
 /* Logger level defined globally */
-/* They are defined at imput level */
+/* They are defined at input level */
 /* If you need to separate the log level for a channel insert it here */
 
   int def_log_lvl;

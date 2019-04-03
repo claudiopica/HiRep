@@ -1,9 +1,9 @@
 TOPDIR = ..
 MKDIR = $(TOPDIR)/Make
 
-EXES = suN
+EXES =  suN_multilevel 
 
-suN_OBJS = suN_utils.o 
+suN_multilevel_OBJS =  suN_utils_multilevel.o
 
 
 LIBS += $(TOPDIR)/LibHR/libhr.a

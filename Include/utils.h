@@ -51,10 +51,10 @@ void project_to_suNg_flt(suNg_flt *u);
 void project_cooling_to_suNg(suNg* g_out, suNg* g_in, int cooling);
 
 #ifndef GAUGE_SON
-void ludcmp(double complex* a, int* indx, double* d,int N);
-void lubksb(double complex* a, int* indx, double complex* b,int N);
+void ludcmp(double complex * a, int* indx, double* d,int N);
+void lubksb(double complex * a, int* indx, double complex* b,int N);
 void inv_suNg(suNg* a);
-void det_suNg(double complex* res, suNg* a);
+void det_suNg(double complex * res, suNg* a);
 #else
 int project_to_suNg_real(suNg *out, suNg *in);
 void det_suNg(double* res, suNg *a);
@@ -107,13 +107,38 @@ int timeval_subtract (struct timeval *result, struct timeval *x, struct timeval 
 void print_compiling_info(); 
 void print_compiling_info_short(); 
 
-/* Spatial Blocking*/
-int iup_sblk(int site, int dir);
-int idn_sblk(int site, int dir);
-suNg * pu_gauge_sblk(int site, int dir);
-void initialize_spatial_blocking(int *tlist);
-void free_spatial_blocking();
-void spatial_blocking(unsigned int level, int force_eval);
+/* Spatial Trasformations*/
+void initialize_spatial_active_slices(int *tlist);
+void free_spatial_active_slices();
+
+/* Spatial blocking */
+typedef enum {
+   NEW_SBLK=1,
+   CONT_SBLK=0
+} eval_spat_block;
+
+void spatial_blocking_wrkspace(eval_spat_block eval, unsigned int level);
+
+/* Spatial rotation*/
+void assign_spatial_rotated_wrkspace(int *map,int idx_wrkspace);
+
+/* Spatial APE smearing*/
+void spatial_APE_smear_wrkspace(double *smear_val);
+
+
+/* Workspace database*/
+int iup_wrk(int site, int dir);
+int idn_wrk(int site, int dir);
+suNg * pu_gauge_wrk(int site, int dir);
+suNg_field *u_gauge_wrk();
+void reset_wrk_pointers();
+void set_wrk_space(int i);
+void set_wrk_space_and_pointers(int i, suNg_field **g_wrk_out, int **i_up_wrk_out, int **i_dn_wrk_out);
+int reserve_wrk_space();
+int reserve_wrk_space_with_pointers(suNg_field **g_wrk_out, int **i_up_wrk_out, int **i_dn_wrk_out);
+void release_wrk_space(int id_release);
+void free_wrk_space();
+
 
 
 #endif 

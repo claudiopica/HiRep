@@ -93,7 +93,7 @@ void setup_gauge_fields()
 {
   if (setup_level != 1)
   {
-    error(0, 1, "SETUP_GAUGE_FIELDS","setup_process has not yet been called\n");
+    error(0, 1, "SETUP_GAUGE_FIELDS", "setup_process has not yet been called\n");
   }
   else
     setup_level = 2;
@@ -113,6 +113,8 @@ void setup_gauge_fields()
 #endif
 
   represent_gauge_field();
+
+  reset_wrk_pointers();
 }
 
 int setup_process(int *argc, char ***argv)
@@ -189,7 +191,7 @@ int setup_process(int *argc, char ***argv)
   lprintf("SYSTEM", 0, "Gauge group: SU(%d)\n", NG);
   lprintf("SYSTEM", 0, "Fermion representation: dim = %d\n", NF);
   lprintf("SYSTEM", 0, "[RepID: %d][world_size: %d]\n[MPI_ID: %d][MPI_size: %d]\n", RID, WORLD_SIZE, MPI_PID, MPI_WORLD_SIZE);
-  
+
   print_compiling_info_short();
 
   //  lprintf("MAIN",0,"Logger lelvel: %d\n",logger_getlevel(0));
@@ -220,24 +222,27 @@ static void setup_random()
  */
 int finalize_process()
 {
- 
+
   free_ghmc();
- 
+
   free_BCs();
-  
+
+  free_wrk_space();
+
   /* free memory */
   free_gfield(u_gauge);
 #ifdef ALLOCATE_REPR_GAUGE_FIELD
   free_gfield_f(u_gauge_f);
 #endif
-  if(u_scalar!=NULL)
-	  free_scalar_field(u_scalar);
-  
-  if(u_gauge_f_flt!=NULL)
-    free_gfield_f_flt(u_gauge_f_flt);
-    
-free_geometry_mpi_eo();
+  if (u_scalar != NULL)
+    free_scalar_field(u_scalar);
 
+  if (u_gauge_f_flt != NULL)
+    free_gfield_f_flt(u_gauge_f_flt);
+
+  free_geometry_mpi_eo();
+
+  lprintf("SYSTEM", 0, "Process finalized.\n");
 
 #ifdef WITH_MPI
   /* MPI variables */
