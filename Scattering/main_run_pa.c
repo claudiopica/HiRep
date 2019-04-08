@@ -366,6 +366,8 @@ mo_twoptp3_g3g2->ind2=_g2;
     spinor_field* W_0_0_A = alloc_spinor_field_f(4*NF,&glattice);
 
 while(1){
+    struct timeval start, end, etime;
+    gettimeofday(&start,0);
     if(list!=NULL)
       if(fscanf(list,"%s",cnfg_filename)==0 || feof(list)) break;
 
@@ -643,6 +645,9 @@ while(1){
 	TMP_OBSERVABLE_LIST
 #undef X
   }
+    gettimeofday(&end,0);
+    timeval_subtract(&etime,&end,&start);
+    lprintf("MAIN",0,"Configuration #%d: analysed in [%ld sec %ld usec]\n",i,etime.tv_sec,etime.tv_usec);
 
     if(list==NULL) break;
 }
