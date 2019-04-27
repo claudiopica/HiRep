@@ -311,6 +311,7 @@ if ($su2quat==0) {
   write_suN_mul();
 	write_suN_mul_assign();
   write_suN_mulc();
+	write_suN_mul_add();
   write_suN_add_assign();
   write_suN_sub_assign();
   write_suN_sqnorm();
@@ -333,6 +334,7 @@ if ($su2quat==0) {
     write_suNr_add_assign();
     write_suNr_sub_assign();
     write_suNr_mul();
+   	write_suN_mul_add();
     write_suNr_trace_re();
     write_suNr_sqnorm();
     write_suNr_minus();
@@ -2424,6 +2426,29 @@ sub write_suNr_add_assign {
 	}
 }
 
+sub write_suN_mul_add {
+  print "/* u=r*v+m*w */\n";
+  print "#define _${dataname}_mul_add(u,r,v,m,w) \\\n";
+	my $dim=$N*$N;
+	if ($N<$Nmax or $dim<(2*$unroll+1)) { #unroll all 
+		for(my $i=0; $i<$dim; $i++) {
+			print "   (u).$cname\[$i\]=(r)*(v).$cname\[$i\]+(m)*(w).$cname\[$i\]";
+			if($i==$dim-1) {print "\n\n";} else { print ";\\\n"; }
+		}
+	} else { #partial unroll
+		print "   do { \\\n";
+		print "      int _i;for (_i=0; _i<$md2; ){\\\n";
+		for(my $i=0;$i<$unroll;$i++){
+			print "   (u).$cname\[_i\]=(r)*(v).$cname\[_i\]+(m)*(w).$cname\[_i\]); ++_i;\\\n";
+		}
+		print "      }\\\n";
+		for(my $i=0;$i<$mr2;$i++){
+			print "      (u).$cname\[_i\]=(r)*(v).$cname\[_i\]+(m)*(w).$cname\[_i\]); ++_i;\\\n";
+		}
+		print "   } while(0) \n\n";
+	}
+}
+
 sub write_suN_sub_assign {
   print "/* u-=v */\n";
   print "#define _${dataname}_sub_assign(u,v) \\\n";
@@ -3410,6 +3435,19 @@ sub write_su2_add_assign{
         print "   (u).$cname\[3\]+=(v).$cname\[3\] \n\n";
     } else {
     	print "#define _${basename}${repsuff}_add_assign(u,v) _${basename}${fundsuff}_add_assign((u),(v))\n\n";
+    }
+}    
+
+sub write_su2_mul_add{
+    print "/* u=r*v+m*w */\n";
+    if ($N==2) {
+    	print "#define _${dataname}_mul_add(u,r,v,m,w) \\\n";
+        print "   (u).$cname\[0\]=(r)*(v).$cname\[0\]+(m)*(w).$cname\[0\]; \\\n";
+        print "   (u).$cname\[1\]=(r)*(v).$cname\[1\]+(m)*(w).$cname\[1\]; \\\n";
+        print "   (u).$cname\[2\]=(r)*(v).$cname\[2\]+(m)*(w).$cname\[2\]; \\\n";
+        print "   (u).$cname\[3\]=(r)*(v).$cname\[3\]+(m)*(w).$cname\[3\] \n\n";
+    } else {
+    	print "#define _${basename}${repsuff}_mul_add(u,r,v,m,w) _${basename}${fundsuff}_mul_add((u),(r),(v),(m),(w)\n\n";
     }
 }    
 

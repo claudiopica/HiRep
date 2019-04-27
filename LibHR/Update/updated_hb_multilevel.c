@@ -1,11 +1,11 @@
 /*************************************************************************** \
- * Copyright (c) 2008, Claudio Pica                                          *   
+ * Copyright (c)                                  *   
  * All rights reserved.                                                      * 
 \***************************************************************************/
 
 /*******************************************************************************
  *
- * File update.c
+ * File update_hb_multilevel.c
  *
  * Update programs
  *
@@ -18,9 +18,14 @@
 #include "global.h"
 #include "update.h"
 #include "communications.h"
+#include "logger.h"
+#include "glueballs.h"
+
 #define PI 3.141592653589793238462643383279502884197
 #include <math.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 static int *dyn_gauge = NULL;
 static int max_mh_level;
@@ -286,8 +291,6 @@ static void update_mh_all(int lev, double *beta, int type)
 
 static void update_mh(int lev, double *beta, int nhb, int nor)
 {
-    if (dyn_gauge == NULL)
-        init_hb_multihit_boundary();
 
     for (int n = 0; n < nhb; n++)
     {
@@ -302,28 +305,52 @@ static void update_mh(int lev, double *beta, int nhb, int nor)
     start_gf_sendrecv(u_gauge);
 }
 
-void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, int *ml_up, int * ml_skip)
+void set_max_mh_level(int lev)
 {
-    int i,j;
+    max_mh_level = lev;
+}
 
-    if (lev != max_mh_level)
+void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, int *ml_up, int *ml_skip, int nblocking, double *smear_val, cor_list *lcor)
+{
+    int i, j;
+    static double complex *one_point_gb;
+    static double complex *cor_storage;
+    if (lev == 0)
+    {
+        if (dyn_gauge == NULL)
+        {
+            init_hb_multihit_boundary();
+            one_point_gb = malloc(sizeof(double complex) * total_n_glue_op * nblocking * n_active_slices);
+            cor_storage = malloc(sizeof(double complex) * nblocking * nblocking * lcor->n_corrs * total_n_corrs);
+        }
+  
+        memset(one_point_gb, 0, sizeof(double complex) * total_n_glue_op * nblocking * n_active_slices);
+        memset(cor_storage, 0, sizeof(double complex) * nblocking * nblocking * lcor->n_corrs * total_n_corrs);
+
+    }
+
+    if (lev < max_mh_level - 1)
     {
         for (i = 0; i < ml_up[lev]; i++)
         {
-                for (j = 0; j < ml_skip[lev]; j++)
-                    update_mh(lev, beta, nhb, nor);
+            for (j = 0; j < ml_skip[lev]; j++)
+                update_mh(lev, beta, nhb, nor);
 
-            update_hb_multilevel_gb_measure(lev + 1, beta, nhb, nor, ml_up, ml_skip);
+            update_hb_multilevel_gb_measure(lev + 1, beta, nhb, nor, ml_up, ml_skip, nblocking, smear_val, lcor);
         }
     }
     else
     {
         for (i = 0; i < ml_up[lev]; i++)
         {
-           for (j = 0; j < ml_skip[lev]; j++)
+            for (j = 0; j < ml_skip[lev]; j++)
                 update_mh(lev, beta, nhb, nor);
-        /* code */
-            /*measure_glueballs();*/
+
+            measure_1pt_glueballs(nblocking, smear_val, one_point_gb);
         }
+    }
+    if (lev ==0)
+    {
+        evalute_correlators(lcor, nblocking, one_point_gb, cor_storage);
     }
 }

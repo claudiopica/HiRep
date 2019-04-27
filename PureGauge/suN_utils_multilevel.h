@@ -7,20 +7,24 @@
 #define SUN_UTILS_ML_H
 
 #include "input_par.h"
-
+#include "glueballs.h"
 /* suN variables */
 typedef struct _input_pg_ml {
 
-  double beta;
-  int nms, nhb, nor, nskip, ml_levels;
-  char cml_niteration[64];
+  double beta,APEsmear;
+  int nms, nhb, nor, nskip, ml_levels,nblk;
   int * ml_niteration;
-  char cml_nskip[64];
   int * ml_nskip;
+  cor_list corrs;
+
+  char cml_niteration[64];
+  char cml_nskip[64];
+  char cml_corrs[256];
   
 
+
   /* for the reading function */
-  input_record_t read[9];
+  input_record_t read[12];
   
 } input_pg_ml;
 
@@ -35,6 +39,9 @@ typedef struct _input_pg_ml {
     {"number of ML levels", "ML levels = %d", INT_T, &(varname).ml_levels},\
     {"number of iterations per level", "ML iterations per level = %s", STRING_T, &((varname).cml_niteration[0])},\
     {"number of skip steps at the beginning of each level", "ML skip per level = %s", STRING_T, &((varname).cml_nskip[0])},\
+    {"number of skip steps at the beginning of each level", "ML correlators = %s", STRING_T, &((varname).cml_corrs[0])},\
+    {"APEsmear parameter", "APEsmear = %lf", DOUBLE_T, &(varname).APEsmear},\
+    {"nnumber of spatial blocking level to generate lueballs", "nblk = %d", INT_T, &((varname).nblk)},\
     {NULL, NULL, INT_T, NULL}\
   }\
 }

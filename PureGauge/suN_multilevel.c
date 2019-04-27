@@ -30,13 +30,14 @@
 #include "utils.h"
 #include "suN_utils_multilevel.h"
 #include "setup.h"
+#include "glueballs.h"
 
 pg_flow_ml flow = init_pg_flow_ml(flow);
 
 int main(int argc, char *argv[])
 {
   int i;
-  
+
   setup_process(&argc, &argv);
 
   setup_gauge_fields();
@@ -65,7 +66,7 @@ int main(int argc, char *argv[])
 
     gettimeofday(&start, 0);
 
-    /*qui va l'update*/
+    update_hb_multilevel_gb_measure(0, &(flow.pg_v->beta), flow.pg_v->nhb, flow.pg_v->nor, flow.pg_v->ml_niteration, flow.pg_v->ml_nskip, flow.pg_v->nblk, &(flow.pg_v->APEsmear), &(flow.pg_v->corrs));
 
     gettimeofday(&end, 0);
     timeval_subtract(&etime, &end, &start);
@@ -101,6 +102,6 @@ int main(int argc, char *argv[])
 
   /* close communications */
   finalize_process();
-
+ 
   return 0;
 }

@@ -1,3 +1,44 @@
+/***************************************************************************\
+* Copyright (c)                                                             *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
+/*
+
+int iup_wrk(int site, int dir)
+    Up geometry pointer for the active workspace
+
+int idn_wrk(int site, int dir)
+    Down geometry pointer for the active workspace
+
+suNg * pu_gauge_wrk(int site, int dir);
+    Pointer to the active workspace gauge field poistion and direction element
+
+suNg_field *u_gauge_wrk()
+    Pointer to the active workspace gauge field
+
+void reset_wrk_pointers()
+    Reset the workspace pointers to point to the default gauge field (u_gauge,iup,idn)
+
+void set_wrk_space(int i)
+    Set the workspace pointers to point to the workspace "i" (u_gauge,iup,idn)
+
+void set_wrk_space_and_pointers(int i, suNg_field **g_wrk_out, int **i_up_wrk_out, int **i_dn_wrk_out)
+    Set the workspace pointers to point to the workspace "i" (u_gauge,iup,idn) and gives a direct link to the gauge field pointer and to the geometry pointers
+
+int reserve_wrk_space()
+    Reserve one workspace and returns the id of the reserved workspace 
+
+int reserve_wrk_space_with_pointers(suNg_field **g_wrk_out, int **i_up_wrk_out, int **i_dn_wrk_out)
+    Reserve one workspace and returns the id of the reserved workspace and gives a direct link to the gauge field pointer and to the geometry pointers
+
+void release_wrk_space(int id_release)
+    Release the workspace identified by id_release
+
+void free_wrk_space();
+    Free all the workspaces
+*/
+
 #include "global.h"
 #include "suN.h"
 #include "memory.h"
@@ -60,12 +101,9 @@ void set_wrk_space_and_pointers(int i, suNg_field **g_wrk_out, int **i_up_wrk_ou
 {
     if (_wrk_reserved[i])
     {
-        _iup = _iup_wrk[i];
-        _idn = _idn_wrk[i];
-        _g = _g_wrk[i];
-        *g_wrk_out = _g_wrk[i];
-        *i_up_wrk_out = _iup_wrk[i];
-        *i_dn_wrk_out = _idn_wrk[i];
+        *i_up_wrk_out = _iup = _iup_wrk[i];
+        *i_dn_wrk_out = _idn = _idn_wrk[i];
+        *g_wrk_out = _g = _g_wrk[i];
     }
     else
         error(0, 1, "set_wrk_space_and_pointers", "Invalid work pointer index");
@@ -118,8 +156,6 @@ int reserve_wrk_space()
         n_alloc++;
     }
 
-    j = 0;
-
     for (j = 0; j < n_alloc; j++)
     {
         if (_wrk_reserved[j] == 0)
@@ -147,8 +183,12 @@ int reserve_wrk_space_with_pointers(suNg_field **g_wrk_out, int **i_up_wrk_out, 
 
 void release_wrk_space(int id_release)
 {
-    _wrk_reserved[id_release] = 0;
-    n_reserved--;
+    if (!_wrk_reserved[id_release])
+    {
+        _wrk_reserved[id_release] = 0;
+        n_reserved--;
+    }
+    error(0, 1, "release_wrk_space", "Invalid work pointer index");
 }
 
 void free_wrk_space()

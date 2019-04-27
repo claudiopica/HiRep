@@ -1,7 +1,7 @@
 TOPDIR = ../..
 MKDIR = $(TOPDIR)/Make
 
-TESTS = check_suNg_op check_utils_1 check_utils_2  check_utils_4 #check_utils_3
+TESTS = check_suNg_op check_utils_1 check_utils_2  check_utils_3 check_utils_4
 
 LIBS += $(TOPDIR)/LibHR/libhr.a
 

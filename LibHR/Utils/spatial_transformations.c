@@ -3,6 +3,32 @@
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
+/*
+void initialize_spatial_active_slices(int *tlist)
+    Initialize the list of "t" slices on which to perform the spatial transofrmations.
+    if list is NULL then the code assume that all the t slices are active
+
+void free_spatial_active_slices()
+    free the list of active slices
+
+int spatial_blocking_wrkspace(eval_spat_block eval, unsigned int level)
+    Performs a spatial blocking on a new workspace up to and absolute level of blocking "level".
+    The blocking can be incremental (i.e. starting from a previously blocked conf) or start from a new conf.
+    The routine returns the id of the new workspace and set the pointer to the new workspace automatically.
+
+void single_level_spatial_blocking_wrkspace(wrk_in)
+    Performs a spatial blocking of the in workspace on a new workspace of one blocking "level".
+    The routine returns the id of the new workspace and set the pointer to the new workspace automatically.
+
+void assign_spatial_rotated_wrkspace(int *map,int idx_wrkspace)
+    assigns to the workspace "idx_wrkspace" a spatially rotated copy of u_gauge, the rotation is defined through the map {t',x',y',z'}= Permutation{t,x,y,z}
+    with the constraint t=t'.
+
+int spatial_APE_smear_wrkspace(double *smear_val,int wrkspace_in)
+    evaluate the APE smeared field of workspace "wrkspace_in" into a new wrkspace with a smear value of smear_val.
+    The routine returns the id of the new workspace and set the pointer to the new workspace automatically.
+*/
+
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
@@ -32,9 +58,6 @@ static int *tmp_idn;
 
 static int blocking_level;
 
-static int *active_slices_list = NULL;
-static int n_active_slices;
-
 void initialize_spatial_active_slices(int *tlist)
 {
     if (NP_X != 1 || NP_Y != 1 || NP_Z != 1)
@@ -43,11 +66,6 @@ void initialize_spatial_active_slices(int *tlist)
 
     if (active_slices_list == NULL)
     {
-        wrk_idx2 = reserve_wrk_space_with_pointers(&wrk_g_2, &wrk_iup_2, &wrk_idn_2);
-
-        tmp_g = wrk_g_2;
-        tmp_iup = wrk_iup_2;
-        tmp_idn = wrk_idn_2;
 
         int t = 0;
 
@@ -81,6 +99,13 @@ void initialize_spatial_active_slices(int *tlist)
             for (t = 0; t < T; t++)
                 active_slices_list[t] = t;
         }
+
+        glbT_to_active_slices = malloc(GLB_T * sizeof(int));
+        for (t = 0; t < GLB_T; t++)
+            glbT_to_active_slices[t] = -1;
+
+        for (t = 0; t < n_active_slices; t++)
+            glbT_to_active_slices[active_slices_list[t]+zerocoord[0]] = t;
     }
     else
         lprintf("SPATIAL TRASFORMATION", 0, "Already initialized\n");
@@ -120,19 +145,53 @@ static void slice_spatial_blocking(int t, suNg_field *g_in, int *iup_in, int *id
             }
 }
 
-void spatial_blocking_wrkspace(eval_spat_block eval, unsigned int level)
+int single_level_spatial_blocking_wrkspace(int wrk_in)
 {
-    int t, idx_tmp;
+    suNg_field *g_in, *g_out;
+
+    int *iup_in, *idn_in, *iup_out, *idn_out;
+    int wrk_out;
+    if (wrk_in == -1)
+    {
+        g_in = u_gauge;
+        iup_in = iup;
+        idn_in = idn;
+    }
+    else
+        set_wrk_space_and_pointers(wrk_in, &g_in, &iup_in, &idn_in);
+
+    wrk_out = reserve_wrk_space_with_pointers(&g_out, &iup_out, &idn_out);
+    int t;
+    for (t = 0; t < n_active_slices; t++)
+        slice_spatial_blocking(active_slices_list[t], g_in, iup_in, idn_in, g_out, iup_out, idn_out);
+
+    return wrk_out;
+}
+
+int spatial_blocking_wrkspace(eval_spat_block eval, unsigned int level)
+{
+    int idx_tmp, t;
+
     static int entry = 1;
+    static int init = 1;
     int last_level = 0;
     if (blocking_level == level)
-        return;
+        return wrk_idx2;
 
     if (entry)
     {
         wrk_idx1 = reserve_wrk_space_with_pointers(&wrk_g_1, &wrk_iup_1, &wrk_idn_1);
         entry = 0;
         last_level = 1;
+        if (init)
+        {
+            wrk_idx2 = reserve_wrk_space_with_pointers(&wrk_g_2, &wrk_iup_2, &wrk_idn_2);
+
+            tmp_g = wrk_g_2;
+            tmp_iup = wrk_iup_2;
+            tmp_idn = wrk_idn_2;
+            init = 0;
+        }
     }
     if (eval || blocking_level > level)
     {
@@ -172,6 +231,7 @@ void spatial_blocking_wrkspace(eval_spat_block eval, unsigned int level)
         set_wrk_space(wrk_idx2);
         entry = 1;
     }
+    return wrk_idx2;
 }
 
 #undef gauge_field_pointer
@@ -244,18 +304,29 @@ void assign_spatial_rotated_wrkspace(int *map, int idx_wrkspace)
         }
     }
 }
-/*
-void spatial_APE_smear_wrkspace(double *smear_val)
+
+int spatial_APE_smear_wrkspace(double *smear_val, int wrkspace_in)
 {
     suNg staple, tr1, tr2;
 
     int ix, iy, iz, it, t;
     int mu, nu, mid, midpmu, midpnu, midmnu, midpmumnu;
-    suNg *v;
-    static suNg *storage = NULL;
+    suNg v;
+    suNg_field *gout;
+    int *_iup, *_idn;
+    suNg *vout;
+    int wrkspace_out;
 
-    if (storage == NULL)
-        storage = malloc(sizeof(suNg) * 3 * VOL3);
+    double sm1 = 1. - *smear_val;
+
+    double sm2 = *smear_val / (4.0);
+
+    wrkspace_out = reserve_wrk_space_with_pointers(&gout, &_iup, &_idn);
+
+    if (wrkspace_in == -1)
+        reset_wrk_pointers();
+    else
+        set_wrk_space(wrkspace_in);
 
     for (t = 0; t < n_active_slices; t++)
     {
@@ -266,16 +337,14 @@ void spatial_APE_smear_wrkspace(double *smear_val)
                 {
                     mid = ipt(it, ix, iy, iz);
 
-                    v = storage + 3 * (ix + X * (iy + Y * (iz)));
-
                     for (mu = 1; mu < 4; mu++)
                     {
 
-                        _suNg_zero(*v);
-
+                        _suNg_zero(v);
+                        vout = (gout->ptr) + coord_to_index(mid, mu);
                         midpmu = iup_wrk(mid, mu);
 
-                        for (int i = 0; i < 2-1; i++)
+                        for (int i = 0; i < 2; i++)
                         {
                             nu = (mu + i) % 3 + 1;
                             midpnu = iup_wrk(mid, nu);
@@ -284,34 +353,23 @@ void spatial_APE_smear_wrkspace(double *smear_val)
 
                             //Up Staple
                             _suNg_times_suNg(tr1, *pu_gauge_wrk(mid, nu), *pu_gauge_wrk(midpnu, mu));
-                            _suNg_times_suNg_dagger(staple,tr1,*pu_gauge_wrk(midpmu, nu));
+                            _suNg_times_suNg_dagger(staple, tr1, *pu_gauge_wrk(midpmu, nu));
 
-                            _suNg_add_assign(*v, staple);
+                            _suNg_add_assign(v, staple);
 
                             //Down Staple
                             _suNg_times_suNg(tr2, *pu_gauge_wrk(midmnu, mu), *pu_gauge_wrk(midpmumnu, nu));
                             _suNg_dagger_times_suNg(staple, *pu_gauge_wrk(midmnu, nu), tr2);
 
-                            _suNg_add_assign(*v, staple);
+                            _suNg_add_assign(v, staple);
                         }
-                        _suNg_mul_assign(*v, *smear_val);
-                        v++;
-                    }
-                }
 
-        for (ix = 0; ix < X; ix++)
-            for (iy = 0; iy < Y; iy++)
-                for (iz = 0; iz < Z; iz++)
-                {
-                    mid = ipt(it, ix, iy, iz);
-                    v = storage + 3 * (ix + X * (iy + Y * (iz)));
-                    for (mu = 1; mu < 4; mu++)
-                    {
-                        
-                        _suNg_add_assign(*pu_gauge_wrk(mid, mu), *v);
-                        project_to_suNg(pu_gauge_wrk(mid, mu));
-                        v++;
+                        _suNg_mul_add(*vout, sm1, *pu_gauge_wrk(mid, mu), sm2, v);
+
+                        covariant_project_to_suNg(vout);
                     }
                 }
     }
-}*/
+    set_wrk_space(wrkspace_out);
+    return wrkspace_out;
+}

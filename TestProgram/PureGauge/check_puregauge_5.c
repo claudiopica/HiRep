@@ -60,14 +60,14 @@ static void transform_u(void)
 int main(int argc, char *argv[])
 {
 
-  int return_value = 0, n,nt;
+  int return_value = 0, n, nt;
 
-  double complex *dop, *dop1, *gb_op;
+  double complex *dop, *dop1;
 
   setup_process(&argc, &argv);
 
   setup_gauge_fields();
-  
+
   /* allocate additional memory */
   g = alloc_gtransf(&glattice);
 
@@ -79,26 +79,19 @@ int main(int argc, char *argv[])
 
   dop = malloc(total_n_glue_op * sizeof(double complex));
   dop1 = malloc(total_n_glue_op * sizeof(double complex));
-  gb_op = malloc(total_n_glue_op * sizeof(double complex));
-  
+
   for (n = 0; n < total_n_glue_op; n++)
   {
     dop[n] = 0.;
     dop1[n] = 0.;
   }
 
-  for(nt=0;nt<T;nt++)
-  {
-    eval_all_glueball_ops(nt, gb_op);
+  for (nt = 0; nt < T; nt++)
+    eval_all_glueball_ops(nt, dop);
 
-    for (n = 0; n < total_n_glue_op; n++)
-      dop[n] += gb_op[n];
-  }
-  
   global_sum((double *)dop, 2 * total_n_glue_op);
   for (n = 0; n < total_n_glue_op; n++)
     dop[n] /= NG * GLB_VOLUME;
-
 
   lprintf("MAIN", 0, "Generating and applying a random gauge transf... ");
   random_g();
@@ -106,13 +99,8 @@ int main(int argc, char *argv[])
 
   lprintf("MAIN", 0, "done.\n");
 
-  for(nt=0;nt<T;nt++)
-  {
-    eval_all_glueball_ops(nt, gb_op);
-
-    for (n = 0; n < total_n_glue_op; n++)
-      dop1[n] += gb_op[n];
-  }
+  for (nt = 0; nt < T; nt++)
+    eval_all_glueball_ops(nt, dop1);
 
   global_sum((double *)dop1, 2 * total_n_glue_op);
   for (n = 0; n < total_n_glue_op; n++)
@@ -133,7 +121,6 @@ int main(int argc, char *argv[])
     if (fabs(cimag(dop[n])) > 10.e-14)
       return_value++;
   }
-  
 
   free_gtransf(g);
 

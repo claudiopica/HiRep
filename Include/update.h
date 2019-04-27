@@ -9,17 +9,20 @@
 #include "suN.h"
 #include "inverters.h"
 #include "rational_functions.h"
+#include "glueballs.h"
 
 void staples(int ix,int mu,suNg *v);
 void test_staples();
 
 void cabmar(double beta,suNg *u, suNg *v,int type);
 void project_gauge_field(void);
+void covariant_project_to_suNg(suNg *u);
 
 void update(double beta,int nhb,int nor);
 void random_su2(double rho,double s[]);
 
-void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, int *ml_up, int * ml_skip);
+void set_max_mh_level(int max_lev);
+void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, int *ml_up, int * ml_skip,int nblocking, double *smear_val, cor_list *lcor);
 
 /* functions and structures for the MRE algorithm */
 typedef struct {

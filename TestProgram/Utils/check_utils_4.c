@@ -106,13 +106,11 @@ int main(int argc, char *argv[])
 {
 
     int return_value = 0;
-    int idx_wrk;
-    double complex Zeropp[4];
+    double complex Zeropp[2];
     double dop;
 
-    int identity[4] = {0, 1, 2, 3};
 
-    double smear_par = 1.0;
+    double smear_par = 0.8;
 
     setup_process(&argc, &argv);
 
@@ -127,22 +125,16 @@ int main(int argc, char *argv[])
     start_gf_sendrecv(u_gauge);
     represent_gauge_field();
     lprintf("MAIN", 0, "done.\n\n");
-
+  
     lprintf("MAIN", 0, "Requesting, one workspace... ");
-    idx_wrk = reserve_wrk_space();
+    reserve_wrk_space();
     lprintf("MAIN", 0, "done.\n\n");
 
-    lprintf("MAIN", 0, "Copying the gauge field to the workspace... ");
-    assign_spatial_rotated_wrkspace(identity, idx_wrk);
+    lprintf("MAIN", 0, "Smearing the gauge field of the workspace... ");
+    spatial_APE_smear_wrkspace(&smear_par,-1);
     lprintf("MAIN", 0, "done.\n\n");
 
     Zeropp[0] = spat_avr_0pp_wrk();
-
-    lprintf("MAIN", 0, "Smearing the gauge field of the workspace... ");
-    spatial_APE_smear_wrkspace(&smear_par);
-    lprintf("MAIN", 0, "done.\n\n");
-
-    Zeropp[1] = spat_avr_0pp_wrk();
 
     lprintf("MAIN", 0, "Generating and applying a random gauge transf... ");
     random_g();
@@ -150,27 +142,17 @@ int main(int argc, char *argv[])
 
     lprintf("MAIN", 0, "done.\n\n");
 
-    lprintf("MAIN", 0, "Copying the gauge field to the workspace... ");
-    assign_spatial_rotated_wrkspace(identity, idx_wrk);
-    lprintf("MAIN", 0, "done.\n\n");
-
-    Zeropp[2] = spat_avr_0pp_wrk();
 
     lprintf("MAIN", 0, "Smearing the gauge field of the workspace... ");
-    spatial_APE_smear_wrkspace(&smear_par);
+    spatial_APE_smear_wrkspace(&smear_par,-1);
     lprintf("MAIN", 0, "done.\n\n");
 
-    Zeropp[3] = spat_avr_0pp_wrk();
+    Zeropp[1] = spat_avr_0pp_wrk();
 
-    lprintf("MAIN", 0, "Values %.10e +I*(%.10e).\n", creal(Zeropp[0]), cimag(Zeropp[0]));
-    lprintf("MAIN", 0, "Values %.10e +I*(%.10e).\n", creal(Zeropp[1]), cimag(Zeropp[1]));
-    lprintf("MAIN", 0, "Values %.10e +I*(%.10e).\n", creal(Zeropp[2]), cimag(Zeropp[2]));
-    lprintf("MAIN", 0, "Values %.10e +I*(%.10e).\n", creal(Zeropp[3]), cimag(Zeropp[3]));
+    Zeropp[0] -= Zeropp[1];
+    
 
-    Zeropp[0] -= Zeropp[2];
-    Zeropp[1] -= Zeropp[3];
-
-    dop = sqrt(_complex_prod_re(Zeropp[1], Zeropp[1]));
+    dop = sqrt(_complex_prod_re(Zeropp[0], Zeropp[0]));
 
     lprintf("MAIN", 0, "Checking gauge invariance of the spatial 0pp on smeared configurations.\n ");
     lprintf("MAIN", 0, "Maximal normalized difference = %.4e\n", dop);

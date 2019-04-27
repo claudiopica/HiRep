@@ -15,6 +15,9 @@
 #include <stdio.h>
 #include <string.h>
 
+
+extern char *strtok_r(char *, const char *, char **);
+
 static input_pg_ml pg_var_ml = init_input_pg_ml(pg_var_ml);
 
 static void mk_gconf_name(char *name, pg_flow_ml *gf, int id)
@@ -146,10 +149,15 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
 
     read_input(pg_var_ml.read, ifile);
 
+    set_max_mh_level(pg_var_ml.ml_levels);
+
     pg_var_ml.ml_niteration = malloc(sizeof(int) * pg_var_ml.ml_levels);
     pg_var_ml.ml_nskip = malloc(sizeof(int) * pg_var_ml.ml_levels);
 
-    const char sep[2] = ",";
+    lprintf("MAIN", 0, "ENTRO\n");
+
+
+    char sep[2] = ",";
     char *token;
     /* get the first token */
     token = strtok(pg_var_ml.cml_niteration, sep);
@@ -158,6 +166,7 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
     {
         error(token == NULL, 1, "init_mc_ml " __FILE__, "Missing one level of number of iterartions");
         pg_var_ml.ml_niteration[i] = atoi(token);
+
         token = strtok(NULL, sep);
     }
 
@@ -169,6 +178,89 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
         pg_var_ml.ml_nskip[i] = atoi(token);
         token = strtok(NULL, sep);
     }
+
+    strncpy(sep, ",", 2);
+    char sep2[2] = "|";
+
+    char *token2;
+
+    int i = 0;
+    int j = 0;
+    char *saveptr1, *saveptr2;
+
+    char tmp[256];
+
+    /*error(pg_var_ml.cml_corrs[0] == '\n', 1, "init_mc_ml " __FILE__, "At least one ML correpator must be defined");*/
+
+    strncpy(tmp, pg_var_ml.cml_corrs, 256);
+    token = strtok_r(tmp, sep, &saveptr1);
+
+    do
+    {
+
+        token2 = strtok_r(token, sep2, &saveptr2);
+        do
+        {
+            j++;
+            token2 = strtok_r(NULL, sep2, &saveptr2);
+        } while (token2 != NULL);
+
+        i++;
+        token = strtok_r(NULL, sep, &saveptr1);
+    } while (token != NULL);
+
+    lprintf("INIT ML", 0, " Found %d correlator entries, that defines %d correlators\n", i);
+
+    pg_var_ml.corrs.n_entries = j;
+    pg_var_ml.corrs.n_corrs = i;
+
+    pg_var_ml.corrs.list = malloc(sizeof(cor_points) * j);
+
+    strncpy(tmp, pg_var_ml.cml_corrs, 256);
+    token = strtok_r(tmp, sep, &saveptr1);
+    int k, l, dt;
+    i = 0;
+    j = 0;
+    do
+    {
+        k = 0;
+        token2 = strtok_r(token, sep2, &saveptr2);
+        do
+        {
+            pg_var_ml.corrs.list[j].id = i;
+            error(sscanf(token2, "%d-%d", &(pg_var_ml.corrs.list[j].t1), &(pg_var_ml.corrs.list[j].t2)) != 2, 1, "init_mc_ml " __FILE__, "Badly formatted ML correlators ");
+
+            k++;
+            j++;
+            token2 = strtok_r(NULL, sep2, &saveptr2);
+        } while (token2 != NULL);
+
+        dt = pg_var_ml.corrs.list[j - 1].t2 - pg_var_ml.corrs.list[j - 1].t1;
+
+        for (l = 0; l < k; l++)
+        {
+            error(pg_var_ml.corrs.list[j - 1 - l].t2 - pg_var_ml.corrs.list[j - 1 - l].t1 != dt, 1, "init_mc_ml " __FILE__, "Badly formatted ML correlator (different dt)");
+
+            error(pg_var_ml.corrs.list[j - 1 - l].t1 < 0 || pg_var_ml.corrs.list[j - 1 - l].t1 >= GLB_T, 1, "init_mc_ml " __FILE__, "Badly formatted ML correlator (t1 out of bound)");
+            error(pg_var_ml.corrs.list[j - 1 - l].t2 < 0 || pg_var_ml.corrs.list[j - 1 - l].t2 >= GLB_T, 1, "init_mc_ml " __FILE__, "Badly formatted ML correlator (t2 out of bound)");
+
+            pg_var_ml.corrs.list[j - 1 - l].n_pairs = k;
+        }
+        i++;
+        token = strtok_r(NULL, sep, &saveptr1);
+    } while (token != NULL);
+
+    int tlist[GLB_T];
+    for (l = 0; l < GLB_T; l++)
+        tlist[l] = 0;
+
+    for (l = 0; l < pg_var_ml.corrs.n_entries; l++)
+    {
+        tlist[pg_var_ml.corrs.list[l].t1]=tlist[pg_var_ml.corrs.list[l].t2]=1;
+        lprintf("MAIN", 0, "ML Cor Id=%d size=%d  pairs=(%d %d)\n", pg_var_ml.corrs.list[l].id, pg_var_ml.corrs.list[l].n_pairs, pg_var_ml.corrs.list[l].t1, pg_var_ml.corrs.list[l].t2);
+    }
+
+    initialize_spatial_active_slices(tlist);
 
     read_input(gf->read, ifile);
 
@@ -223,12 +315,6 @@ int save_conf(pg_flow_ml *gf, int id)
 int end_mc_ml()
 {
     free_BCs();
-
-    /* free memory */
-    free_gfield(u_gauge);
-#ifdef ALLOCATE_REPR_GAUGE_FIELD
-    free_gfield_f(u_gauge_f);
-#endif
 
     return 0;
 }

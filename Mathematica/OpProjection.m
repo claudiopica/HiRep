@@ -224,6 +224,12 @@ permTab[1,1,0]={{ax->bx,ay->by,az->bz},{ax->by,ay->bx,az->-bz},{ax->by,ay->bx,az
 permTab[1,1,1]={{ax->bx,ay->by,az->bz},{ax->bz,ay->bx,az->by},{ax->by,ay->bz,az->bx},{ax->by,ay->bx,az->bz},{ax->bx,ay->bz,az->by},{ax->bz,ay->by,az->bx}}
 btoa = {bx -> ax, by -> ay, bz -> az};
 
+IrrepName[0,0,0] = {A1plusOhP, A2plusOhP, EplusOhP, T1plusOhP, T2plusOhP, 
+    A1minusOhP, A2minusOhP, EminusOhP, T1minusOhP, 
+    T2minusOhP};
+IrrepName[0,0,1] = {A1Dic4, A2Dic4, E2Dic4, B1Dic4, B2Dic4};
+IrrepName[0,1,1] = {A1Dic2, A2Dic2, B1Dic2, B2Dic2};
+IrrepName[0,1,1] = {A1Dic3, A2Dic3, EEDic3};
 
 dir[ax]=1;
 dir[-ax]=1;
@@ -247,7 +253,37 @@ opfilename = "../LibHR/Observables/glueballs_op.c";
 headerfilename = "../Include/glueballs.h";
 checkfunctionsfilename="../TestProgram/Utils/check_utils_3_functions.c";
 
-  
+Add1trOpCorrelators[px_, py_, pz_, irrepidx_, irrepev_, charge_, path_]:= Module[{res,success=0,Pxsort,Pysort,Pzsort},
+  If[Not[ListQ[bTOrthog[px, py, pz]]],    Print["Missing Coefficient table for the given impulse"];Abort[];];
+  If[Length[bTOrthog[px, py, pz]] < irrepidx || irrepidx < 1 , Print["Number of irreps is not compatible with the requested irrep index"];Abort[];];
+  If[Length[bTOrthog[px, py, pz][[irrepidx]]] < irrepev || irrepev < 1,  Print["Irrep dimension is not compatible with the requested irrep ev"];Abort[];];
+  If[Not[Or[charge==-1, charge==+1]],Print["Charge can only take values +1 or -1"];Abort[];];
+
+  res=OpGenerate[px, py, pz, irrepidx, irrepev, path];
+  If[ListQ[res],
+    If[!NumberQ[CorrelatorSize[px, py, pz, irrepidx, irrepev, charge]],
+      CorrelatorSize[px, py, pz, irrepidx, irrepev, charge]=0;
+      CorrelatorList[px, py, pz, irrepidx, irrepev, charge]={};
+    ];
+
+    If[ And[Not[SameQ[res[[1, 1]], 0]],charge==+1], 
+      success=1;
+      CorrelatorSize[px, py, pz, irrepidx, irrepev, charge]++;
+      AppendTo[CorrelatorList[px, py, pz, irrepidx, irrepev, charge],res[[2,1]]];
+    ];
+
+    If[ And[Not[SameQ[res[[1, 2]], 0]],charge==-1], 
+      success=1;
+      CorrelatorSize[px, py, pz, irrepidx, irrepev, charge]++;
+      AppendTo[CorrelatorList[px, py, pz, irrepidx, irrepev, charge],res[[2,2]]];
+    ];
+    {Pxsort,Pysort,Pzsort}=Sort[{px,py,pz}//Abs];
+    If[success!=1,Print["Error, the operator seems to have no projection onto the given irrep, but is not 0"];Abort[]]; 
+    Print["Added to the correlator list: ",path,"\n Total P=(",px,",", py,",", pz,")\n Irrep=",IrrepName[Pxsort,Pysort,Pzsort][[irrepidx]],"\n Irrep ev=",irrepev,"\n Charge=",charge];
+    ,
+    Print["The operator has zero projection onto the given symmetry channel"];
+  ];
+];
 
 OpGenerate[px_, py_, pz_, irrepidx_, irrepev_, path_] := Module[{res,res1,tres,opnumplus=NULL,opnumminus=NULL},
   If[Not[ListQ[bTOrthog[px, py, pz]]],    Print["Missing Coefficient table for the given impulse"];Abort[];];
@@ -330,12 +366,13 @@ res];
 OpSimplify[a_] := Module[{ris = a, Ptemp, tmpris, i, normalization, sqrt},
   ris = Select[Variables[ris], MatchQ[#1, P[__]] &];
   Do[
-  tmpris=ris[[i]] //. P[a1__] :> Plus[a1];
-  If[Not[SameQ[tmpris,0]],Print["Error [OpSimplify]: Inserted a non closed path"];Abort[]];
-  PathUniqueIdentifier[ris[[i]]];
-  tmpris = ris[[i]] //. P[a1__] :> Union[{a1}];
-  If[Complement[tmpris, {ax, ay, az, -ax, -ay, -az}] != {},
-  Print["Error [OpSimplify]: Inserted a path that cannot be ciclic Transformed (quite likelly is written with the wrong unit vectors)"];Abort[];];, {i, 1, Length[ris]}];
+    tmpris=ris[[i]] //. P[a1__] :> Plus[a1];
+    If[Not[SameQ[tmpris,0]],Print["Error [OpSimplify]: Inserted a non closed path"];Abort[]];
+    PathUniqueIdentifier[ris[[i]]];
+    tmpris = ris[[i]] //. P[a1__] :> Union[{a1}];
+    If[Complement[tmpris, {ax, ay, az, -ax, -ay, -az}] != {},
+    Print["Error [OpSimplify]: Inserted a path that cannot be ciclic Transformed (quite likelly is written with the wrong unit vectors)"];Abort[];];
+  , {i, 1, Length[ris]}];
   ris = a //. P -> Ptemp;
   ris = ris //. Ptemp[b___] :> PathUniqueIdentifier[P[b]][[1]];
   ris = Expand[ris];
@@ -422,14 +459,14 @@ checkOperator[]:=Module[{Op,OpTmp,irrepdim,RActiveOp,RMatrixOp,Pxsort,Pysort,Pzs
               RMatrixOp=Table[Expand[N[irrepSetOrthog[Pxsort,Pysort,Pzsort][[irrepindex]][[i]]].OpTmp],{i,1,Ord[Pxsort,Pysort,Pzsort]}];
               Off[Part::partd];
             (*Print["The operators: ",OpTmp];*)
-              OpTmp=OpTmp//.Op[a__]:>rotfun[MapCheck[a]];
+              OpTmp=OpTmp//.Op[a__]:>rotfun[MapOptoCindex[a]];
               Print["The operators: ",OpTmp];
-              RMatrixOp=RMatrixOp//.Op[a__]:>unrotfun[MapCheck[a]];
+              RMatrixOp=RMatrixOp//.Op[a__]:>unrotfun[MapOptoCindex[a]];
               Print["And their rotations: ",RMatrixOp];
               On[Part::partd];
               Do[
                 Do[
-                  WriteString[ar,"if(",Position[permutationTable,permTab[Px,Py,Pz][[i]]][[1,1]]-1,"==rotid){\n tmp[0]=",MyCForm[OpTmp[[j,1]]-RMatrixOp[[i,j,1]]],";\n _complex_mul_star(tmp[1],tmp[0],tmp[0]);\n if(sqrt(creal(tmp[1]))>1.e-8) {\nreturn_value++;\n }\n}\n"];
+                  WriteString[ar,"if(",Position[permutationTable,permTab[Px,Py,Pz][[i]]][[1,1]]-1,"==rotid){\n tmp[0]=",MyCForm[OpTmp[[j,1]]-RMatrixOp[[i,j,1]]],";\n _complex_mul_star(tmp[1],tmp[0],tmp[0]);\n if(sqrt(creal(tmp[1]))>1.e-14) {\nreturn_value++;\n }\n}\n"];
                 ,{j,1,irrepdim}];
               ,{i,1,Ord[Pxsort,Pysort,Pzsort]}];
               ];
@@ -488,9 +525,9 @@ checkOperator[]:=Module[{Op,OpTmp,irrepdim,RActiveOp,RMatrixOp,Pxsort,Pysort,Pzs
   ar=OpenWrite[opfilename, FormatType -> InputForm];
   WriteString[ar, "#include <stdlib.h>\n#include \"global.h\"\n#include \"geometry.h\"\n#include \"suN.h\"\n#include \"utils.h\"\n#include \"glueballs.h\"\n\n"];
   WriteString[ar,"#define npaths ",pathindex,"\n"];
-  WriteString[ar,"#define PI 3.141592653589793238462643383279502884197\n"];
-  WriteString[ar,"static double complex *Mom_def_Re_tr_paths=NULL;\n"];
-  WriteString[ar,"static double complex *Mom_def_Im_tr_paths=NULL;\n"];
+  WriteString[ar,"static double PI=3.141592653589793238462643383279502884197;\n"];
+  WriteString[ar,"static double complex *mom_def_Re_tr_paths=NULL;\n"];
+  WriteString[ar,"static double complex *mom_def_Im_tr_paths=NULL;\n"];
   WriteString[ar,"static double complex *path_storage=NULL;\n"];
 
   WriteString[ar, "int ** direct_spatial_rotations(){\nint i;\nint ** res=malloc(sizeof(int *)*48);\nint *res1=malloc(sizeof(int *)*48*4);\nfor (i=0;i<48;i++)\nres[i]=res1+4*i;\n"];
@@ -530,26 +567,26 @@ checkOperator[]:=Module[{Op,OpTmp,irrepdim,RActiveOp,RMatrixOp,Pxsort,Pysort,Pzs
   WriteString[ar,"if(path_storage==NULL)\n{\n"];
   WriteString[ar, stringshift];
   WriteString[ar,"path_storage=malloc(npaths*X*Y*Z*sizeof(double complex));\n"];
-  WriteString[ar,"Mom_def_Re_tr_paths=malloc(npaths*sizeof(double complex));\n"];
-  WriteString[ar,"Mom_def_Im_tr_paths=malloc(npaths*sizeof(double complex));\n}\n"];
-  WriteString[ar,"\nfor(in = 0; in < npaths; in++)\n{\nMom_def_Re_tr_paths[in]=0.;\n"];
-  WriteString[ar,"Mom_def_Im_tr_paths[in]=0.;\n}\n"];
+  WriteString[ar,"mom_def_Re_tr_paths=malloc(npaths*sizeof(double complex));\n"];
+  WriteString[ar,"mom_def_Im_tr_paths=malloc(npaths*sizeof(double complex));\n}\n"];
   WriteString[ar,"if (t != last_t)\n{\nlast_t=t;\n"];
+  WriteString[ar,"\nfor(in = 0; in < npaths; in++)\n{\nmom_def_Re_tr_paths[in]=0.;\n"];
+  WriteString[ar,"mom_def_Im_tr_paths[in]=0.;\n}\n"];
   WriteString[ar,"for (n_x = 0; n_x < X; n_x++)\nfor (n_y = 0; n_y < Y; n_y++)\nfor (n_z = 0; n_z < Z; n_z++)\n{\n"];
   WriteString[ar,"in = ipt(t, n_x, n_y, n_z);\nce = cexp(I * 2.0 * PI * (double)(n_x * px + n_y * py + n_z * pz) / GLB_X);\n"];
   WriteString[ar,"idx = npaths * (n_x + X * (n_y + Y * n_z));\n"];
   Do[ 
-    WriteString[ar,"path_storage[",i-1,"+idx]= path",i-1,"(in);\nMom_def_Re_tr_paths[",i-1,"]+=ce*creal(path_storage[",i-1,"+idx]);"];
-    WriteString[ar,"\nMom_def_Im_tr_paths[",i-1,"]+=I*ce*cimag(path_storage[",i-1,"+idx]);\n"];
+    WriteString[ar,"path_storage[",i-1,"+idx]= path",i-1,"(in);\nmom_def_Re_tr_paths[",i-1,"]+=ce*creal(path_storage[",i-1,"+idx]);"];
+    WriteString[ar,"\nmom_def_Im_tr_paths[",i-1,"]+=I*ce*cimag(path_storage[",i-1,"+idx]);\n"];
   ,{i,1,pathindex}];
   WriteString[ar,"}\n}\nelse{\n"];
   WriteString[ar,"for (n_x = 0; n_x < X; n_x++)\nfor (n_y = 0; n_y < Y; n_y++)\nfor (n_z = 0; n_z < Z; n_z++)\n{\n"];
   WriteString[ar,"ce = cexp(I * 2.0 * PI * (double)(n_x * px + n_y * py + n_z * pz) / GLB_X);\n"];
   WriteString[ar,"idx = npaths * (n_x + X * (n_y + Y * n_z));\n"];
-  Do[ 
-    WriteString[ar,"Mom_def_Re_tr_paths[",i-1,"]+=ce*creal(path_storage[",i-1,"+idx]);\n"];
-    WriteString[ar,"Mom_def_Im_tr_paths[",i-1,"]+=I*ce*cimag(path_storage[",i-1,"+idx]);\n"];
-  ,{i,1,pathindex}];
+  
+  WriteString[ar,"for (int i = 0; i < ",pathindex,"; i++)\n{\nmom_def_Re_tr_paths[i]+=ce*creal(path_storage[i+idx]);\n"];
+  WriteString[ar,"mom_def_Im_tr_paths[i]+=I*ce*cimag(path_storage[i+idx]);\n}\n"];
+
   
   WriteString[ar,"}\n}\n};\n"];
   (**)
@@ -557,24 +594,28 @@ checkOperator[]:=Module[{Op,OpTmp,irrepdim,RActiveOp,RMatrixOp,Pxsort,Pysort,Pzs
   WriteString[ar, "void eval_all_glueball_ops(int t, double complex * numerical_op)\n{\n"];
   opnumberC=0;
   Do[
-    WriteString[ar,"eval_time_momentum_glueball_paths(t,",px,",",py,",",pz,");\n"];
+    evalpaths=0;
     Do[
       Do[
         If[ListQ[Opindex[px, py, pz, irrepidx,charge]],
+          If[evalpaths==0,WriteString[ar,"eval_time_momentum_glueball_paths(t,",px,",",py,",",pz,");\n"];evalpaths=1;];
           Do[
-            Do[
-              idop = Opindex[px, py, pz, irrepidx,charge][[nop, irrepev]];
-              If[idop != 0,
-                WriteString[ar, "OP_oneTr_p_", p[px], "_", p[py], "_", p[pz],"_Ir_", irrepidx, "_C_",p[charge],"_n_", idop,"(numerical_op+",opnumberC,");\n"];
-                MapCheck[px,py,pz,irrepidx,charge,idop]=opnumberC;
-                opnumberC++;];
-            , {nop, 1, Length[Opindex[px, py, pz, irrepidx,charge]]}];
+            If[NumberQ[CorrelatorSize[px,py,pz,irrepidx,irrepev,charge]],
+              Do[
+                idop = Opindex[px, py, pz, irrepidx,charge][[nop, irrepev]];
+                If[idop != 0 && IntersectingQ[CorrelatorList[px,py,pz,irrepidx,irrepev,charge],{idop}],
+                  WriteString[ar, "OP_oneTr_p_", p[px], "_", p[py], "_", p[pz],"_Ir_", irrepidx, "_C_",p[charge],"_n_", idop,"(numerical_op+",opnumberC,");\n"];
+                  MapOptoCindex[px,py,pz,irrepidx,charge,idop]=opnumberC;
+                  opnumberC++;];
+              , {nop, 1, Length[Opindex[px, py, pz, irrepidx,charge]]}];
+            ];
           , {irrepev, 1, Length[bTOrthog[px, py, pz][[irrepidx]]]}];
         ];
       ,{charge,-1,1,2}];
     , {irrepidx, 1, Length[bTOrthog[px, py, pz]]}];
   , {px, -1, 1}, {py, -1, 1}, {pz, -1, 1}];
   WriteString[ar, "}\n\n"];
+
 
   Do[
     Do[
@@ -597,7 +638,155 @@ checkOperator[]:=Module[{Op,OpTmp,irrepdim,RActiveOp,RMatrixOp,Pxsort,Pysort,Pzs
     , {px, -1, 1}, {py, -1, 1}, {pz, -1, 1}];
   
 
+
+  TotalCorrelatorSize=0;
+  WriteString[ar, "void evalute_correlators(cor_list *lcor, int nblocking, double complex *gb_storage, double complex *cor_storage)
+{
+  int totalsize, startbase, basesize, i1, i2, t1, t2, id;
+    double norm;
+    double complex *cor_pointer, tmp;
+
+#ifdef WITH_MPI
+    static int *t_to_proc = NULL;
+    static double complex *gb1_bf;
+    static double complex *gb2_bf;
+
+    if (t_to_proc == NULL)
+    {
+
+        gb1_bf = malloc(sizeof(double complex) * total_n_glue_op * nblocking);
+        gb2_bf = malloc(sizeof(double complex) * total_n_glue_op * nblocking);
+
+        t_to_proc = malloc(sizeof(int) * GLB_T);
+        for (int i = 0; i < GLB_T; i++)
+        {
+            int x[4] = {i, 0, 0, 0}, p[4];
+            glb_to_proc(x, p);
+            t_to_proc[i] = p[0];
+        }
+    }
+
+    int mpiret;
+    MPI_Status r1, r2;
+#endif
+    static double complex *gb1;
+    static double complex *gb2;
+
+    for (int icor = 0; icor < lcor->n_entries; icor++)
+    {
+        t1 = glbT_to_active_slices[lcor->list[icor].t1];
+        t2 = glbT_to_active_slices[lcor->list[icor].t2];
+        id = lcor->list[icor].id;
+
+#ifdef WITH_MPI
+
+        if (t1 != -1)
+        {
+            if (PID == 0)
+            {
+                gb1 = gb_storage + t1 * total_n_glue_op * nblocking;
+            }
+            else
+            {
+                mpiret = MPI_Send(gb_storage + t1 * total_n_glue_op * nblocking, total_n_glue_op * nblocking * 2, MPI_DOUBLE, 0, t1, cart_comm);
+            }
+        }
+
+        if (PID == 0 && t1 == -1)
+        {
+            gb1 = gb1_bf;
+            mpiret = MPI_Recv(gb1, total_n_glue_op * nblocking * 2, MPI_DOUBLE, t_to_proc[t1], t1, cart_comm, &r1);
+        }
+
+        if (t2 != -1)
+        {
+            if (PID == 0)
+            {
+                gb2 = gb_storage + t2 * total_n_glue_op * nblocking;
+            }
+            else
+            {
+                mpiret = MPI_Send(gb_storage + t2 * total_n_glue_op * nblocking, total_n_glue_op * nblocking * 2, MPI_DOUBLE, 0, -t2, cart_comm);
+            }
+        }
+
+        if (PID == 0 && t2 == -1)
+        {
+            gb2 = gb2_bf;
+            mpiret = MPI_Recv(gb2, total_n_glue_op * nblocking * 2, MPI_DOUBLE, t_to_proc[t2], -t2, cart_comm, &r2);
+        }
+#else
+        gb1 = gb_storage + t1 * total_n_glue_op * nblocking;
+        gb2 = gb_storage + t2 * total_n_glue_op * nblocking;
+#endif
+        totalsize = 0;
+"];
+  TotalCorrelatorSize=0;
+ startbase=0;
+  Do[
+    Do[
+      Do[
+        Do[
+          If[NumberQ[CorrelatorSize[px, py, pz, irrepidx, irrepev, charge]] && CorrelatorSize[px, py, pz, irrepidx, irrepev, charge] > 0 ,
+            cs=CorrelatorSize[px, py, pz, irrepidx, irrepev, charge];
+            TotalCorrelatorSize+=cs*cs;
+            WriteString[ar, "startbase=",startbase,";\n"];
+            startbase+=cs;
+            WriteString[ar, "basesize=",cs,";\n"];
+           
+            WriteString[ar, "norm = 0.5/lcor->list[icor].n_pairs;\n"];
+
+            WriteString[ar, "cor_pointer = cor_storage + totalsize + id * nblocking * nblocking * basesize * basesize;
+
+        for (int n1 = 0; n1 < nblocking; n1++)
+            for (int b1 = 0; b1 < basesize; b1++)
+            {
+                i1 = startbase + b1 + total_n_glue_op * n1;
+                for (int n2 = 0; n2 < nblocking; n2++)
+                    for (int b2 = 0; b2 < basesize; b2++)
+                    {
+                        i2 = startbase + b2 + total_n_glue_op * n2;
+
+                        tmp = norm * (conj(gb1[i1]) * gb2[i2] + conj(gb1[i2]) * gb2[i1]);
+
+                        cor_pointer[b1 + basesize * (n1 + nblocking * (b2 + basesize * n2))] += tmp;
+                        cor_pointer[b2 + basesize * (n2 + nblocking * (b1 + basesize * n1))] += conj(tmp);
+                    }
+            }
+
+        totalsize += (nblocking * nblocking * basesize * basesize * (lcor->n_corrs));
+"];
+           ];
+        , {irrepev, 1, Length[bTOrthog[px, py, pz][[irrepidx]]]}];
+      , {charge, -1, 1, 2}];
+    , {irrepidx, 1, Length[bTOrthog[px, py, pz]]}];
+  , {px, -1, 1}, {py, -1, 1}, {pz, -1, 1}];
+
+ WriteString[ar, "}\n\ntotalsize = 0 ;\n"];
+
+
+Do[
+    Do[
+      Do[
+        Do[
+          If[NumberQ[CorrelatorSize[px, py, pz, irrepidx, irrepev, charge]] && CorrelatorSize[px, py, pz, irrepidx, irrepev, charge] > 0 ,
+            cs=CorrelatorSize[px, py, pz, irrepidx, irrepev, charge];
+            startbase+=cs;
+            WriteString[ar, "basesize=",cs,";\n"];
+
+
+WriteString[ar, "for (int icor = 0+totalsize; icor < (nblocking * nblocking * basesize * basesize *lcor->n_corrs); icor++)
+        lprintf(\"output ML\",0,\"corr %.10e %.10e \\n \",creal(cor_pointer[icor]),cimag(cor_pointer[icor]));
+        totalsize += (nblocking * nblocking * basesize * basesize * (lcor->n_corrs));\n"];
+          ];
+        ,{irrepev, 1, Length[bTOrthog[px, py, pz][[irrepidx]]]}];
+      , {charge, -1, 1, 2}];
+    , {irrepidx, 1, Length[bTOrthog[px, py, pz]]}];
+  , {px, -1, 1}, {py, -1, 1}, {pz, -1, 1}];
+  WriteString[ar, "}\n"];
   Close[ar];
+
+  OneTraceOpGenerateCheader[];
   ]
 
 
@@ -629,18 +818,18 @@ checkOperator[]:=Module[{Op,OpTmp,irrepdim,RActiveOp,RMatrixOp,Pxsort,Pysort,Pzs
 
     ar = OpenAppend[opfilename, FormatType -> InputForm];
     WriteString[ar, "static void OP_oneTr_p_",p[px],"_",p[py],"_",p[pz],"_Ir_",irrepidx,"_C_",p[charge],"_n_",opidx,"(double complex * op_out)\n"];
-    WriteString[ar,"{\n*op_out="];
+    WriteString[ar,"{\n*op_out +="];
     Do[
       WriteString[ar,OpConsts[coeff[[i]]]];
       If[Abs[coeff[[i]]]!=1,WriteString[ar,"*"]];
       If[Not[SameQ[paths[[i,2]],1]],WriteString[ar,MapShifts[paths[[i,2]]],"*"]];
-      If[paths[[i,3]]==0,WriteString[ar,"Mom_def_Re_tr_paths["],WriteString[ar,"Mom_def_Im_tr_paths["]];
+      If[paths[[i,3]]==0,WriteString[ar,"mom_def_Re_tr_paths["],WriteString[ar,"mom_def_Im_tr_paths["]];
       WriteString[ar,PathUniqueIndex[paths[[i,1]]],"]"];
     ,{i,1,Length[paths]}];
     WriteString[ar,";\n}\n\n"];
      Close[ar];
   ,{opidx,1,Max[Opindex[px, py, pz, irrepidx,charge]]}];
-  OneTraceOpGenerateCheader[];
+  (*OneTraceOpGenerateCheader[];*)
   ]
   
   
@@ -672,15 +861,21 @@ checkOperator[]:=Module[{Op,OpTmp,irrepdim,RActiveOp,RMatrixOp,Pxsort,Pysort,Pzs
 
   OneTraceOpGenerateCheader[] := Module[{res},
     ar = OpenWrite[headerfilename, FormatType -> InputForm];
-    WriteString[ar, "#ifndef GLUEBALLS_H\n#define GLUEBALLS_H\n#include \"hr_complex.h\"\n\n"];
+    WriteString[ar, "#ifndef GLUEBALLS_H\n#define GLUEBALLS_H\n#include \"hr_complex.h\"\n#include \"logger.h\"\n\n"];
     (**)
     (**)
     WriteString[ar, "int ** direct_spatial_rotations();\nint ** inverse_spatial_rotations();\n"];
     WriteString[ar, "void request_spatial_paths_evaluation();\n"];
     WriteString[ar, "void eval_time_momentum_glueball_paths(int t, int px, int py, int pz);\n"];
     WriteString[ar, "void eval_all_glueball_ops(int t, double complex * numerical_op);\n"];
-     (**)
-    totalopnumberC=0;
+    WriteString[ar, "void measure_1pt_glueballs(int nblocking, double *smear_val, double complex *gb_storage);\n"];
+
+    
+(**)
+    WriteString[ar, "typedef struct\n{\nint t1;\nint t2;\nint id;\nint n_pairs;\n} cor_points;\n\n"];
+    WriteString[ar, "typedef struct\n{\nint n_entries;\ncor_points *list;\nint n_corrs;\n} cor_list;\n\n"];
+    WriteString[ar, "void evalute_correlators(cor_list *lcor, int nblocking, double complex *gb_storage, double complex *cor_storage);\n"];
+
     WriteString[ar, "\n\n"];
     Do[
       Do[
@@ -688,7 +883,6 @@ checkOperator[]:=Module[{Op,OpTmp,irrepdim,RActiveOp,RMatrixOp,Pxsort,Pysort,Pzs
         Do[
         WriteString[ar, "#define n_OP_oneTr_p_", p[px], "_", p[py],"_", p[pz], "_Ir_", irrepidx,"_C_",p[charge]," "];
         If[ListQ[Opindex[px, py, pz, irrepidx,charge]],
-          totalopnumberC+=Max[Opindex[px, py, pz, irrepidx,charge]];
           WriteString[ar,Max[Opindex[px, py, pz, irrepidx,charge]],"\n"];
           WriteString[ar, "void OP_oneTr_p_", p[px], "_", p[py],"_", p[pz], "_Ir_", irrepidx, "_C_",p[charge],"(double complex * numop);\n"];
           ,WriteString[ar, "0\n"];
@@ -696,7 +890,8 @@ checkOperator[]:=Module[{Op,OpTmp,irrepdim,RActiveOp,RMatrixOp,Pxsort,Pysort,Pzs
       ,{charge,-1,1,2}];
       , {irrepidx, 1, Length[bTOrthog[px, py, pz]]}];
     , {px, -1, 1}, {py, -1, 1}, {pz, -1, 1}];
-    WriteString[ar, "#define total_n_glue_op ",totalopnumberC,"\n"];
+    WriteString[ar, "#define total_n_glue_op ",opnumberC,"\n"];
+    WriteString[ar, "#define total_n_corrs ",TotalCorrelatorSize,"\n"];
     WriteString[ar,"#endif\n"];
     Close[ar];
     ];

@@ -77,6 +77,7 @@ if (u->ptr!=NULL) afree(u->ptr);\
 _FREE_GPU_CODE;\
 _FREE_MPI_CODE;\
 afree(u);\
+u=NULL;\
 }\
 }
 

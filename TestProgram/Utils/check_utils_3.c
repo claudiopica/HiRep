@@ -25,34 +25,20 @@
 
 static void all_g_op(double complex *pa)
 {
-    static double complex *gb_op = NULL;
-
-    if (gb_op == NULL)
-        gb_op=malloc(sizeof(double complex) * total_n_glue_op);
-
     suNg_field *_u = u_gauge_wrk();
     start_gf_sendrecv(_u);
-    int i, nt;
-
-    _OMP_PRAGMA(single)
-    {
-        for (i = 0; i < total_n_glue_op; i++)
-            pa[i] = 0.;
-    }
-
-    for(nt=0;nt<T;nt++)
-    {
-        eval_all_glueball_ops(nt, gb_op);
-        for (i = 0; i < total_n_glue_op; i++)
-            pa[i] += gb_op[i];
-
-    }
-
-
-    global_sum((double *)(pa), 2 * total_n_glue_op);
+    int i;
 
     for (i = 0; i < total_n_glue_op; i++)
-        pa[i] /= GLB_T;
+        pa[i] = 0.;
+
+    for (i = 0; i < n_active_slices; i++)
+        eval_all_glueball_ops(active_slices_list[i], pa);
+
+    for (i = 0; i < total_n_glue_op; i++)
+        pa[i] /= n_active_slices * NP_T;
+
+    global_sum((double *)(pa), 2 * total_n_glue_op);
 }
 
 int main(int argc, char *argv[])
@@ -69,6 +55,8 @@ int main(int argc, char *argv[])
 
     setup_gauge_fields();
 
+    initialize_spatial_active_slices(NULL);
+
     lprintf("MAIN", 0, "Generating a random gauge field... ");
     random_u(u_gauge);
     start_gf_sendrecv(u_gauge);
@@ -77,8 +65,10 @@ int main(int argc, char *argv[])
 
     op = malloc(total_n_glue_op * sizeof(complex double));
     rop = malloc(total_n_glue_op * sizeof(complex double));
+
     lprintf("MAIN", 0, "Measuring all the glueballs operators on the original configuration\n");
     all_g_op(op);
+
     lprintf("MAIN", 0, "done.\n\n");
 
     lprintf("MAIN", 0, "Requesting, one workspace gauge field\n");
