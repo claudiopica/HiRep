@@ -27,10 +27,10 @@ nor   =   4
 //total number of ML measures 
 nms   =   2 
 //separations steps between each ML measures 
-nskip = 3
-ML levels = 2
-ML iterations per level = 2,5
-ML skip per level = 0,0
+nskip = 10
+ML levels = 1
+ML iterations per level = 100
+ML skip per level = 2
 // the correlators are inputed according to the structure x1-y1|x2-y2,x3-y3,...
 // where pairs separated by a | are meant to have the same distance and will be averaged
 ML correlators = 3-5,3-6|2-5,2-6
@@ -42,18 +42,13 @@ APEsmear = 0.888
 
 
 // Run control variables
-therm = 2
+therm = 100
 run name = run1
-save freq = 1
-meas freq = 1 
+save freq = 50
 conf dir = cnfg
 gauge start = ranDoM
 //gauge start = Unit
 //gauge start = run1_8x2x2x2nc2rADJnf2b2.000000m1.310000n10
 //rlx_state =
 //rlx_start =
-last conf = 2
-
-//Polyakov
-poly:make = false
-
+last conf = 150

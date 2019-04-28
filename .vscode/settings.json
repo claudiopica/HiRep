@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "global.h": "c",
+        "logger.h": "c",
+        "utils.h": "c",
+        "glueballs.h": "c",
+        "communications.h": "c"
+    },
+    "python.jediEnabled": false,
+    "python.linting.pylintEnabled": false
+}

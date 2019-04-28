@@ -15,7 +15,6 @@
 #include <stdio.h>
 #include <string.h>
 
-
 extern char *strtok_r(char *, const char *, char **);
 
 static input_pg_ml pg_var_ml = init_input_pg_ml(pg_var_ml);
@@ -154,9 +153,6 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
     pg_var_ml.ml_niteration = malloc(sizeof(int) * pg_var_ml.ml_levels);
     pg_var_ml.ml_nskip = malloc(sizeof(int) * pg_var_ml.ml_levels);
 
-    lprintf("MAIN", 0, "ENTRO\n");
-
-
     char sep[2] = ",";
     char *token;
     /* get the first token */
@@ -209,7 +205,7 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
         token = strtok_r(NULL, sep, &saveptr1);
     } while (token != NULL);
 
-    lprintf("INIT ML", 0, " Found %d correlator entries, that defines %d correlators\n", i);
+    lprintf("INIT ML", 0, " Found %d correlator entries, that defines %d correlators\n", j, i);
 
     pg_var_ml.corrs.n_entries = j;
     pg_var_ml.corrs.n_corrs = i;
@@ -256,7 +252,7 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
 
     for (l = 0; l < pg_var_ml.corrs.n_entries; l++)
     {
-        tlist[pg_var_ml.corrs.list[l].t1]=tlist[pg_var_ml.corrs.list[l].t2]=1;
+        tlist[pg_var_ml.corrs.list[l].t1] = tlist[pg_var_ml.corrs.list[l].t2] = 1;
         lprintf("MAIN", 0, "ML Cor Id=%d size=%d  pairs=(%d %d)\n", pg_var_ml.corrs.list[l].id, pg_var_ml.corrs.list[l].n_pairs, pg_var_ml.corrs.list[l].t1, pg_var_ml.corrs.list[l].t2);
     }
 

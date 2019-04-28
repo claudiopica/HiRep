@@ -66,6 +66,7 @@ int main(int argc, char *argv[])
     op = malloc(total_n_glue_op * sizeof(complex double));
     rop = malloc(total_n_glue_op * sizeof(complex double));
 
+
     lprintf("MAIN", 0, "Measuring all the glueballs operators on the original configuration\n");
     all_g_op(op);
 
@@ -86,6 +87,7 @@ int main(int argc, char *argv[])
         assign_spatial_rotated_wrkspace(inverse_space_rotations[j], idx_wrk);
 
         lprintf("MAIN", 0, "Measuring all the glueballs operators on the rotated configuration\n");
+       
         all_g_op(rop);
 
         ret = fullcheck(j, rop, op);
