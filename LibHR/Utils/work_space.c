@@ -183,12 +183,13 @@ int reserve_wrk_space_with_pointers(suNg_field **g_wrk_out, int **i_up_wrk_out, 
 
 void release_wrk_space(int id_release)
 {
-    if (!_wrk_reserved[id_release])
+    if (_wrk_reserved[id_release])
     {
         _wrk_reserved[id_release] = 0;
         n_reserved--;
     }
-    error(0, 1, "release_wrk_space", "Invalid work pointer index");
+    else
+        error(1, 1, "release_wrk_space", "Invalid work pointer index");
 }
 
 void free_wrk_space()
