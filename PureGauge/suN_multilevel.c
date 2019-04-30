@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
   {
     struct timeval start, end, etime; /* //for trajectory timing */
     lprintf("BLOCK", 0, " Start %d\n", i);
-    lprintf("MAIN", 0, "Trajectory #%d...\n", i);
+    lprintf("MAIN", 0, "ML Measure #%d...\n", i);
 
     gettimeofday(&start, 0);
 
@@ -70,7 +70,18 @@ int main(int argc, char *argv[])
 
     gettimeofday(&end, 0);
     timeval_subtract(&etime, &end, &start);
-    lprintf("MAIN", 0, "Trajectory #%d: generated in [%ld sec %ld usec]\n", i, etime.tv_sec, etime.tv_usec);
+    lprintf("MAIN", 0, "ML Measure #%d: generated in [%ld sec %ld usec]\n", i, etime.tv_sec, etime.tv_usec);
+
+    if (i < flow.end - 1)
+    {
+      gettimeofday(&start, 0);
+
+      for (int j = 0; j < flow.nskip; ++j)
+        update(flow.pg_v->beta, flow.pg_v->nhb, flow.pg_v->nor);
+      gettimeofday(&end, 0);
+      timeval_subtract(&etime, &end, &start);
+      lprintf("MAIN", 0, "Skipped %d Trajectories: [%ld sec %ld usec]\n", flow.nskip, etime.tv_sec, etime.tv_usec);
+    }
 
     if ((i % flow.save_freq) == 0)
     {
@@ -102,6 +113,6 @@ int main(int argc, char *argv[])
 
   /* close communications */
   finalize_process();
- 
+
   return 0;
 }

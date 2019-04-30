@@ -12,7 +12,7 @@
 typedef struct _input_pg_ml {
 
   double beta,APEsmear;
-  int nms, nhb, nor, nskip, ml_levels,nblk;
+  int nhb, nor, nskip, ml_levels,nblk;
   int * ml_niteration;
   int * ml_nskip;
   cor_list corrs;
@@ -24,7 +24,7 @@ typedef struct _input_pg_ml {
 
 
   /* for the reading function */
-  input_record_t read[12];
+  input_record_t read[10];
   
 } input_pg_ml;
 
@@ -32,10 +32,8 @@ typedef struct _input_pg_ml {
 { \
   .read={\
     {"beta", "beta = %lf", DOUBLE_T, &(varname).beta},\
-    {"nms", "nms = %d", INT_T, &(varname).nms},\
     {"nhb", "nhb = %d", INT_T, &(varname).nhb},\
     {"nor", "nor = %d", INT_T, &(varname).nor},\
-    {"nskpi", "nskip = %d", INT_T, &(varname).nskip},\
     {"number of ML levels", "ML levels = %d", INT_T, &(varname).ml_levels},\
     {"number of iterations per level", "ML iterations per level = %s", STRING_T, &((varname).cml_niteration[0])},\
     {"number of skip steps at the beginning of each level", "ML skip per level = %s", STRING_T, &((varname).cml_nskip[0])},\
@@ -58,7 +56,7 @@ typedef struct _pg_flow_ml {
   char conf_dir[64]; /* directory to store gconfs */
   
   int save_freq; /* save gauge conf if number%save_freq==0 */
-  
+  int nskip;
   /* these are not actually read from input
    * but inferred from the above
    */
@@ -66,7 +64,7 @@ typedef struct _pg_flow_ml {
   input_pg_ml *pg_v;
 
   /* for the reading function */
-  input_record_t read[7];
+  input_record_t read[8];
   
 } pg_flow_ml;
 
@@ -75,6 +73,7 @@ typedef struct _pg_flow_ml {
   .read={\
     {"thermalization", "therm = %d", INT_T, &((varname).therm)},\
     {"run name", "run name = %s", STRING_T, &((varname).run_name[0])},\
+    {"number of update between each measure", "nskip = %d", INT_T, &(varname).nskip},\
     {"conf save frequency", "save freq = %d", INT_T, &((varname).save_freq)},\
     {"gauge start", "gauge start = %s", STRING_T, &((varname).g_start[0])},\
     {"gauge last conf", "last conf = %s", STRING_T, &((varname).last_conf[0])},\

@@ -42,7 +42,7 @@ static void g_up_Dirichlet_BCs()
                 for (iz = 0; iz < Z; ++iz)
                 {
                     index = ipt(T - 1, ix, iy, iz);
-                    for (lev = 0; lev <= max_mh_level; lev++)
+                    for (lev = 0; lev < max_mh_level; lev++)
                     {
                         dyn_gauge[lev * (glattice.gsize_gauge * 4) + index * 4] = 0;
                         dyn_gauge[lev * (glattice.gsize_gauge * 4) + index * 4 + 1] = 0;
@@ -79,7 +79,7 @@ static void g_dn_Dirichlet_BCs()
                 for (iz = 0; iz < Z; ++iz)
                 {
                     index = ipt(1, ix, iy, iz);
-                    for (lev = 0; lev <= max_mh_level; lev++)
+                    for (lev = 0; lev < max_mh_level; lev++)
                     {
                         dyn_gauge[lev * (glattice.gsize_gauge * 4) + index * 4 + 1] = 0;
                         dyn_gauge[lev * (glattice.gsize_gauge * 4) + index * 4 + 2] = 0;
@@ -102,7 +102,7 @@ static void g_up_open_BCs()
                 for (iz = 0; iz < Z; ++iz)
                 {
                     index = ipt(T - 1, ix, iy, iz);
-                    for (lev = 0; lev <= max_mh_level; lev++)
+                    for (lev = 0; lev < max_mh_level; lev++)
                     {
                         dyn_gauge[lev * (glattice.gsize_gauge * 4) + index * 4] = 0;
                     }
@@ -123,7 +123,7 @@ static void g_dn_open_BCs()
                 for (iz = 0; iz < Z; ++iz)
                 {
                     index = ipt(0, ix, iy, iz);
-                    for (lev = 0; lev <= max_mh_level; lev++)
+                    for (lev = 0; lev < max_mh_level; lev++)
                     {
                         dyn_gauge[lev * (glattice.gsize_gauge * 4) + index * 4] = 0;
                         dyn_gauge[lev * (glattice.gsize_gauge * 4) + index * 4 + 1] = 0;
@@ -146,10 +146,10 @@ static void free_hb_boundary()
 
 static void init_hb_multihit_boundary()
 {
-    dyn_gauge = malloc(sizeof(*dyn_gauge) * glattice.gsize_gauge * 4 * (max_mh_level + 1));
+    dyn_gauge = malloc(sizeof(*dyn_gauge) * glattice.gsize_gauge * 4 * (max_mh_level));
     atexit(&free_hb_boundary); //register cleanup function at exit
 
-    for (int i = 0; i < glattice.gsize_gauge * 4 * (max_mh_level + 1); i++)
+    for (int i = 0; i < glattice.gsize_gauge * 4 * (max_mh_level); i++)
         dyn_gauge[i] = 1;
 
 #if defined(BASIC_SF) || defined(ROTATED_SF)
@@ -166,10 +166,10 @@ static void init_hb_multihit_boundary()
 #endif
 
     int ix, iy, iz, index, lev, it;
-    for (lev = 1; lev <= max_mh_level; lev++)
+    for (lev = 0; lev < max_mh_level; lev++)
         for (it = 0; it < T; ++it)
         {
-            if ((it + zerocoord[0] % (GLB_T / (1 << lev))) == 0 && it + zerocoord[0] != 0)
+            if ((it + zerocoord[0] % (GLB_T / (1 << (lev + 1)))) == 0 && it + zerocoord[0] != 0)
             {
                 for (ix = 0; ix < X; ++ix)
                     for (iy = 0; iy < Y; ++iy)
