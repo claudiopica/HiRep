@@ -315,6 +315,7 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
     int i, j;
     static double complex *one_point_gb;
     static double complex *cor_storage;
+    static int norm = 1;
     if (lev == 0)
     {
         if (dyn_gauge == NULL)
@@ -322,6 +323,9 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
             init_hb_multihit_boundary();
             one_point_gb = malloc(sizeof(double complex) * total_n_glue_op * nblocking * n_active_slices);
             cor_storage = malloc(sizeof(double complex) * nblocking * nblocking * lcor->n_corrs * total_corrs_size);
+            for (i = 0; i < max_mh_level; i++)
+                norm *= ml_up[i];
+            norm*=GLB_VOL3*NG;
         }
 
         memset(one_point_gb, 0, sizeof(double complex) * total_n_glue_op * nblocking * n_active_slices);
@@ -350,6 +354,9 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
     }
     if (lev == 0)
     {
+        for (i = 0; i < nblocking * n_active_slices * total_n_glue_op; i++)
+            one_point_gb[i] /= norm;
+
         evaluate_correlators(lcor, nblocking, one_point_gb, cor_storage);
     }
 }
