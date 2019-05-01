@@ -57,7 +57,7 @@ static void g_up_Dirichlet_BCs()
 #if defined(BASIC_SF) || defined(ROTATED_SF) || defined(BC_T_MIXED)
 static void g_dn_Dirichlet_BCs()
 {
-    int ix, iy, iz, index;
+    int ix, iy, iz, index, lev;
 
     if (COORD[0] == 0)
     {
@@ -93,7 +93,7 @@ static void g_dn_Dirichlet_BCs()
 #if defined(BC_T_OPEN) || defined(BC_T_MIXED)
 static void g_up_open_BCs()
 {
-    int ix, iy, iz, index;
+    int ix, iy, iz, index, lev ;
 
     if (COORD[0] == NP_T - 1)
     {
@@ -114,7 +114,7 @@ static void g_up_open_BCs()
 #if defined(BC_T_OPEN)
 static void g_dn_open_BCs()
 {
-    int ix, iy, iz, index;
+    int ix, iy, iz, index, lev ;
 
     if (COORD[0] == 0)
     {
