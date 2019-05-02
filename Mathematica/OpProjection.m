@@ -527,6 +527,7 @@ GenerateCchecks[]:=Module[{Op,OpTmp,irrepdim,RActiveOp,RMatrixOp,Pxsort,Pysort,P
   GenerateCcode[]:=Module[{res},
   ar=OpenWrite[opfilename, FormatType -> InputForm];
   WriteString[ar, "#include <stdlib.h>\n#include \"global.h\"\n#include \"geometry.h\"\n#include \"suN.h\"\n#include \"utils.h\"\n#include \"glueballs.h\"\n\n"];
+   WriteString[ar, "#include <string.h>\n"];
   WriteString[ar,"#define npaths ",pathindex,"\n"];
   WriteString[ar,"static double PI=3.141592653589793238462643383279502884197;\n"];
   WriteString[ar,"static double complex *mom_def_Re_tr_paths=NULL;\n"];
@@ -646,23 +647,42 @@ GenerateCchecks[]:=Module[{Op,OpTmp,irrepdim,RActiveOp,RMatrixOp,Pxsort,Pysort,P
   WriteString[ar, "
 void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_storage, double complex *cor_storage)
 {
-    int totalsize, startbase, basesize, i1, i2, t1, t2, id, n1, n2, b1, b2, icor;
+    int totalsize, i1, i2, t1, t2, id, n1, n2, b1, b2, icor, i;
     double norm;
     double complex *cor_pointer, tmp;
+    static double complex *gb1_bf;
 
 #ifdef WITH_MPI
     static int *t_to_proc = NULL;
-    static double complex *gb1_bf;
-    static double complex *gb2_bf;
+    static int *listactive = NULL;
+    static int n_total_active_slices = 0;
+    static int *listsent = NULL;
 
     if (t_to_proc == NULL)
     {
+        listactive = malloc(sizeof(int) * GLB_T);
+        listsent = malloc(sizeof(int) * GLB_T);
 
-        gb1_bf = malloc(sizeof(double complex) * total_n_glue_op * nblocking);
-        gb2_bf = malloc(sizeof(double complex) * total_n_glue_op * nblocking);
+        for (i = 0; i < GLB_T; i++)
+            listactive[i] = -1;
+
+        for (i = 0; i < lcor->n_entries; i++)
+        {
+            listactive[lcor->list[i].t1] = 1;
+            listactive[lcor->list[i].t2] = 1;
+        }
+
+        for (i = 0; i < GLB_T; i++)
+            if (listactive[i] == 1)
+            {
+                listactive[i] = n_total_active_slices;
+                n_total_active_slices++;
+            }
+
+        gb1_bf = malloc(sizeof(double complex) * total_n_glue_op * nblocking * n_total_active_slices);
 
         t_to_proc = malloc(sizeof(int) * GLB_T);
-        for (int i = 0; i < GLB_T; i++)
+        for (i = 0; i < GLB_T; i++)
         {
             int x[4] = {i, 0, 0, 0}, p[4];
             glb_to_proc(x, p);
@@ -670,8 +690,14 @@ void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_stor
         }
     }
 
+    for (i = 0; i < GLB_T; i++)
+        listsent[i] = -1;
+
     MPI_Status r1, r2;
+#else
+    gb1_bf = gb_storage;
 #endif
+
     static double complex *gb1;
     static double complex *gb2;
 
@@ -683,47 +709,58 @@ void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_stor
 
 #ifdef WITH_MPI
 
-        gb1 = gb1_bf;
-        if (t1 != -1)
+        if (listsent[lcor->list[icor].t1] == -1)
         {
-            if (PID == 0)
+            gb1 = gb1_bf + total_n_glue_op * nblocking * listactive[lcor->list[icor].t1];
+            if (t1 != -1)
             {
-                gb1 = gb_storage + t1 * total_n_glue_op * nblocking;
+                if (PID == 0)
+                {
+                    memcpy(gb1, gb_storage + t1 * total_n_glue_op * nblocking, sizeof(double complex) * total_n_glue_op * nblocking);
+                    //gb1 = gb_storage + t1 * total_n_glue_op * nblocking;
+                }
+                else
+                {
+                    MPI_Send(gb_storage + t1 * total_n_glue_op * nblocking, total_n_glue_op * nblocking * 2, MPI_DOUBLE, 0, lcor->list[icor].t1, cart_comm);
+                }
             }
-            else
+
+            if (PID == 0 && t1 == -1)
             {
-                MPI_Send(gb_storage + t1 * total_n_glue_op * nblocking, total_n_glue_op * nblocking * 2, MPI_DOUBLE, 0, lcor->list[icor].t1, cart_comm);
+                MPI_Recv(gb1, total_n_glue_op * nblocking * 2, MPI_DOUBLE, t_to_proc[lcor->list[icor].t1], lcor->list[icor].t1, cart_comm, &r1);
             }
+            listsent[lcor->list[icor].t1] = 0;
         }
 
-        if (PID == 0 && t1 == -1)
+        if (listsent[lcor->list[icor].t2] == -1)
         {
-            MPI_Recv(gb1, total_n_glue_op * nblocking * 2, MPI_DOUBLE, t_to_proc[lcor->list[icor].t1], lcor->list[icor].t1, cart_comm, &r1);
-        }
-
-        gb2 = gb2_bf;
-        if (t2 != -1)
-        {
-            if (PID == 0)
+            gb2 = gb1_bf + total_n_glue_op * nblocking * listactive[lcor->list[icor].t2];
+            if (t2 != -1)
             {
-                gb2 = gb_storage + t2 * total_n_glue_op * nblocking;
+                if (PID == 0)
+                {
+                    memcpy(gb2, gb_storage + t2 * total_n_glue_op * nblocking, sizeof(double complex) * total_n_glue_op * nblocking);
+                    //gb2 = gb_storage + t2 * total_n_glue_op * nblocking;
+                }
+                else
+                {
+                    MPI_Send(gb_storage + t2 * total_n_glue_op * nblocking, total_n_glue_op * nblocking * 2, MPI_DOUBLE, 0, GLB_T + lcor->list[icor].t2, cart_comm);
+                }
             }
-            else
-            {
-                MPI_Send(gb_storage + t2 * total_n_glue_op * nblocking, total_n_glue_op * nblocking * 2, MPI_DOUBLE, 0, GLB_T + lcor->list[icor].t2, cart_comm);
-            }
-        }
 
-        if (PID == 0 && t2 == -1)
-        {
-            MPI_Recv(gb2, total_n_glue_op * nblocking * 2, MPI_DOUBLE, t_to_proc[lcor->list[icor].t2], GLB_T + lcor->list[icor].t2, cart_comm, &r2);
+            if (PID == 0 && t2 == -1)
+            {
+                MPI_Recv(gb2, total_n_glue_op * nblocking * 2, MPI_DOUBLE, t_to_proc[lcor->list[icor].t2], GLB_T + lcor->list[icor].t2, cart_comm, &r2);
+            }
+            listsent[lcor->list[icor].t2] = 0;
         }
 #else
         gb1 = gb_storage + t1 * total_n_glue_op * nblocking;
         gb2 = gb_storage + t2 * total_n_glue_op * nblocking;
 #endif
+
         totalsize = 0;
-        norm = 0.5/lcor->list[icor].n_pairs;
+        norm = 0.5 / lcor->list[icor].n_pairs;
 "];
   TotalCorrelatorSize=0;
  startbase=0;
@@ -734,43 +771,41 @@ void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_stor
           If[NumberQ[CorrelatorSize[px, py, pz, irrepidx, irrepev, charge]] && CorrelatorSize[px, py, pz, irrepidx, irrepev, charge] > 0 ,
             cs=CorrelatorSize[px, py, pz, irrepidx, irrepev, charge];
             TotalCorrelatorSize+=cs*cs;
-            WriteString[ar, "startbase=",startbase,";\n"];
             startbase+=cs;
-            WriteString[ar, "basesize=",cs,";\n"];
            
 
-            WriteString[ar, " 
-        cor_pointer = cor_storage + totalsize + id * nblocking * nblocking * basesize * basesize;
+            WriteString[ar, "        
+        cor_pointer = cor_storage + totalsize + id * nblocking * nblocking * ",cs*cs,";
 
         for (n1 = 0; n1 < nblocking; n1++)
-            for (b1 = 0; b1 < basesize; b1++)
+            for (b1 = 0; b1 < ",cs,"; b1++)
             {
-                i1 = startbase + b1 + total_n_glue_op * n1;
+                i1 = ",startbase-cs," + b1 + total_n_glue_op * n1;
 
                 n2 = n1;
                 b2 = b1;
-                i2 = startbase + b2 + total_n_glue_op * n2;
+                i2 = ",startbase-cs," + b2 + total_n_glue_op * n2;
                 tmp = norm * (conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
-                cor_pointer[b1 + basesize * (n1 + nblocking * (b2 + basesize * n2))] += tmp;
+                cor_pointer[b1 + ",cs," * (n1 + nblocking * (b2 + ",cs," * n2))] += tmp;
 
-                for (b2 = b1 + 1; b2 < basesize; b2++)
+                for (b2 = b1 + 1; b2 < ",cs,"; b2++)
                 {
-                    i2 = startbase + b2 + total_n_glue_op * n2;
+                    i2 = ",startbase-cs," + b2 + total_n_glue_op * n2;
                     tmp = norm * (conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
-                    cor_pointer[b1 + basesize * (n1 + nblocking * (b2 + basesize * n2))] += tmp;
-                    cor_pointer[b2 + basesize * (n2 + nblocking * (b1 + basesize * n1))] += conj(tmp);
+                    cor_pointer[b1 + ",cs," * (n1 + nblocking * (b2 + ",cs," * n2))] += tmp;
+                    cor_pointer[b2 + ",cs," * (n2 + nblocking * (b1 + ",cs," * n1))] += conj(tmp);
                 }
 
                 for (n2 = n1 + 1; n2 < nblocking; n2++)
-                    for (b2 = 0; b2 < basesize; b2++)
+                    for (b2 = 0; b2 < ",cs,"; b2++)
                     {
-                        i2 = startbase + b2 + total_n_glue_op * n2;
+                        i2 = ",startbase-cs," + b2 + total_n_glue_op * n2;
                         tmp = norm * (conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
-                        cor_pointer[b1 + basesize * (n1 + nblocking * (b2 + basesize * n2))] += tmp;
-                        cor_pointer[b2 + basesize * (n2 + nblocking * (b1 + basesize * n1))] += conj(tmp);
+                        cor_pointer[b1 + ",cs," * (n1 + nblocking * (b2 + ",cs," * n2))] += tmp;
+                        cor_pointer[b2 + ",cs," * (n2 + nblocking * (b1 + ",cs," * n1))] += conj(tmp);
                     }
             }
-        totalsize += (nblocking * nblocking * basesize * basesize * (lcor->n_corrs));
+        totalsize += (nblocking * nblocking * ",cs*cs," * (lcor->n_corrs));
 "];
            ];
         , {irrepev, 1, Length[bTOrthog[px, py, pz][[irrepidx]]]}];
@@ -782,7 +817,7 @@ void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_stor
 
 stcharge[+1]="+";
 stcharge[-1]="-";
-
+startbase=0;
 Do[
     Do[
       Do[
@@ -791,12 +826,27 @@ Do[
             cs=CorrelatorSize[px, py, pz, irrepidx, irrepev, charge];
             startbase+=cs;
             {Pxsort,Pysort,Pzsort}=Sort[{px,py,pz}//Abs];
+          If[irrepidx==1 && irrepev==1 && charge==+1,
+             WriteString[ar, "
+    lprintf(\"Measure ML\", 0, \"\\n1pt function P=(",px,",", py,",", pz,") Irrep=",IrrepName[Pxsort,Pysort,Pzsort][[irrepidx]]," Irrep ev=",irrepev,"/",Length[bTOrthog[Pxsort,Pysort,Pzsort][[irrepidx]]]," Charge=",stcharge[charge],"\\n\\n\");
+    
+    for (n1 = 0; n1 < GLB_T; n1++)
+        if (listactive[n1] > 0)
+        {
+            lprintf(\"Measure ML\", 0, \" t=%d\", n1);
+            for (n2 = 0; n2 < nblocking; n2++)
+                for (i = ",startbase-cs,"; i < ",startbase,"; i++)
+                    lprintf(\"Measure ML\", 0, \" ( %.10e %.10e )\", creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
+                            cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
+            lprintf(\"Measure ML\", 0, \"\\n\");
+        }
+    "];
+          ];
             WriteString[ar, "
-    basesize=",cs,";
     b2 = 0;
     b1 = 0;
     
-    lprintf(\"Measure ML\", 0,\"\\n\\nCorr Total P=(",px,",", py,",", pz,") Irrep=",IrrepName[Pxsort,Pysort,Pzsort][[irrepidx]]," Irrep ev=",irrepev,"/",Length[bTOrthog[Pxsort,Pysort,Pzsort][[irrepidx]]]," Charge=",stcharge[charge],"\\n\");
+    lprintf(\"Measure ML\", 0,\"\\nCorr Total P=(",px,",", py,",", pz,") Irrep=",IrrepName[Pxsort,Pysort,Pzsort][[irrepidx]]," Irrep ev=",irrepev,"/",Length[bTOrthog[Pxsort,Pysort,Pzsort][[irrepidx]]]," Charge=",stcharge[charge],"\\n\");
    
 
     for (icor = 0; icor < lcor->n_corrs; icor++)
@@ -808,21 +858,21 @@ Do[
             b2 = lcor->list[b1].t2 - lcor->list[b1].t1;
             while (b2 == lcor->list[b1].t2 - lcor->list[b1].t1)
             {
-                lprintf(\"Measure ML\", 0, \"(%d %d) \", lcor->list[b1].t2, lcor->list[b1].t1);
+                lprintf(\"Measure ML\", 0, \"( %d %d ) \", lcor->list[b1].t2, lcor->list[b1].t1);
                 b1++;
             }
         }
 
         lprintf(\"Measure ML\", 0, \"\\n\");
 
-        for (i1 = 0; i1 < (nblocking * basesize); i1++)
+        for (i1 = 0; i1 < (nblocking * ",cs,"); i1++)
         {
-            for (i2 = 0; i2 < (nblocking * basesize); i2++)
-                lprintf(\"Measure ML\", 0, \"( %.6e %.6e ) \", creal(cor_pointer[i1 + nblocking * basesize * i2]), cimag(cor_pointer[i1 + nblocking * basesize * i2]));
+            for (i2 = 0; i2 < (nblocking * ",cs,"); i2++)
+                lprintf(\"Measure ML\", 0, \" ( %.6e %.6e )\", creal(cor_pointer[i1 + nblocking * ",cs," * i2]), cimag(cor_pointer[i1 + nblocking * ",cs," * i2]));
 
             lprintf(\"Measure ML\", 0, \"\\n\");
         }
-        totalsize += (nblocking * nblocking * basesize * basesize);
+        totalsize += (nblocking * nblocking * ",cs*cs,");
     }
 "];
           ];

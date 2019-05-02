@@ -231,6 +231,32 @@ void full_plaquette()
   lprintf("PLAQ", 0, "Plaq(%d,%d) = ( %f , %f )\n", 3, 2, creal(pa[5]), cimag(pa[5]));
 }
 
+/*void avr_ts_plaquette()
+{
+  int ix;
+  static double pt = 0., ps = 0.;
+  for (int nt = 0; nt < T; nt++)
+  {
+    for (int nx = 0; nx < X; nx++)
+      for (int ny = 0; ny < Y; ny++)
+        for (int nz = 0; nz < Z; nz++)
+        {
+          ix = ipt(nt, nx, ny, nz);
+          pt += plaq(ix, 1, 0);
+          pt += plaq(ix, 2, 0);
+          ps += plaq(ix, 2, 1);
+          pt += plaq(ix, 3, 0);
+          ps += plaq(ix, 3, 1);
+          ps += plaq(ix, 3, 2);
+        }
+    pt /= 3.0 * NG * GLB_VOL3;
+    ps /= 3.0 * NG * GLB_VOL3;
+    printf("%d %.10e %.10e\n",nt+zerocoord[0],pt,ps);
+
+    pt=ps=0;
+  }
+}*/
+
 double local_plaq(int ix)
 {
   double pa;

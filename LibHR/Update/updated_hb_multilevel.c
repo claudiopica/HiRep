@@ -111,29 +111,6 @@ static void g_up_open_BCs()
 }
 #endif
 
-#if defined(BC_T_OPEN)
-static void g_dn_open_BCs()
-{
-    int ix, iy, iz, index, lev ;
-
-    if (COORD[0] == 0)
-    {
-        for (ix = 0; ix < X; ++ix)
-            for (iy = 0; iy < Y; ++iy)
-                for (iz = 0; iz < Z; ++iz)
-                {
-                    index = ipt(0, ix, iy, iz);
-                    for (lev = 0; lev < max_mh_level; lev++)
-                    {
-                        dyn_gauge[lev * (glattice.gsize_gauge * 4) + index * 4] = 0;
-                        dyn_gauge[lev * (glattice.gsize_gauge * 4) + index * 4 + 1] = 0;
-                        dyn_gauge[lev * (glattice.gsize_gauge * 4) + index * 4 + 2] = 0;
-                        dyn_gauge[lev * (glattice.gsize_gauge * 4) + index * 4 + 3] = 0;
-                    }
-                }
-    }
-}
-#endif
 
 static void free_hb_boundary()
 {
@@ -162,7 +139,6 @@ static void init_hb_multihit_boundary()
 #endif
 #ifdef BC_T_OPEN
     g_up_open_BCs();
-    g_dn_open_BCs();
 #endif
 
     int ix, iy, iz, index, lev, it;

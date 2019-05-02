@@ -30,7 +30,7 @@
 #include "observables.h"
 #include "utils.h"
 #include "spectrum.h"
-#include "cinfo.c"
+#include "setup.h"
 
 
 /* Mesons parameters */
@@ -135,30 +135,14 @@ int main(int argc,char *argv[]) {
   /* setup process communications */
   setup_process(&argc,&argv);
   
-  geometry_mpi_eo();
+
+  setup_gauge_fields();
+
+ /* geometry_mpi_eo();*/
   /* test_geometry_mpi_eo(); */
 
   /* setup random numbers */
-  read_input(rlx_var.read,get_input_filename());
-  lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
-  rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
-
-  if(strcmp(rlx_var.rlxd_start,"continue")==0 && rlx_var.rlxd_state[0]!='\0')
-  {
-    /*load saved state*/
-    lprintf("MAIN",0,"Loading rlxd state from file [%s]\n",rlx_var.rlxd_state);
-    read_ranlxd_state(rlx_var.rlxd_state);
-  }
-
-#ifdef GAUGE_SUN
-  lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
-#elif GAUGE_SON
-  lprintf("MAIN",0,"Gauge group: SO(%d)\n",NG);
-#else
-  lprintf("MAIN",0,"Default gauge group: SU(%d)\n",NG);
-#endif
-  lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
-
+  
   /* read input for measures */
   read_input(mes_var.read,get_input_filename());
   read_input(poly_var.read,get_input_filename());
@@ -270,6 +254,7 @@ int main(int argc,char *argv[]) {
 		 lprintf("MAIN",0,"Plaquette: %1.8e, Smeared: %1.8e\n",avr_plaquette(),avr_smeared_plaquette());
 #else
 		 lprintf("MAIN",0,"Plaquette: %1.8e\n",avr_plaquette());
+     /*avr_ts_plaquette();*/
 #endif
 
       /* Mesons */

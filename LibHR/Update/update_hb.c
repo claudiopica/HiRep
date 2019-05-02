@@ -98,23 +98,6 @@ static void g_up_open_BCs()
 }
 #endif
 
-#if defined(BC_T_OPEN)
-static void g_dn_open_BCs()
-{
-  int ix, iy, iz, index;
-
-  if (COORD[0] == 0)
-  {
-    for (ix = 0; ix < X; ++ix)
-      for (iy = 0; iy < Y; ++iy)
-        for (iz = 0; iz < Z; ++iz)
-        {
-          index = ipt(0, ix, iy, iz);
-          dyn_gauge[index * 4] = dyn_gauge[index * 4 + 1] = dyn_gauge[index * 4 + 2] = dyn_gauge[index * 4 + 3] = 0;
-        }
-  }
-}
-#endif
 
 static void free_hb_boundary()
 {
@@ -142,7 +125,6 @@ static void init_hb_boundary()
 #endif
 #ifdef BC_T_OPEN
   g_up_open_BCs();
-  g_dn_open_BCs();
 #endif
 }
 
