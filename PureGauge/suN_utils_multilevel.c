@@ -146,7 +146,11 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
     gf->therm = 0;
     gf->pg_v = &pg_var_ml;
 
+    
     read_input(pg_var_ml.read, ifile);
+
+    lprintf("INIT ML", 0, "beta=%lf\n", pg_var_ml.beta);
+    lprintf("INIT ML", 0, "nhb=%d nor=%d\n", pg_var_ml.nhb, pg_var_ml.nor);
 
     set_max_mh_level(pg_var_ml.ml_levels);
 
@@ -174,6 +178,9 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
         pg_var_ml.ml_nskip[i] = atoi(token);
         token = strtok(NULL, sep);
     }
+    lprintf("INIT ML", 0, "number of MultiLevels=%d\n", pg_var_ml.ml_levels);
+    for (int i = 0; i < pg_var_ml.ml_levels; i++)
+        lprintf("INIT ML", 0, "lev %d nup=%d nskip=%d\n", i,pg_var_ml.ml_niteration[i], pg_var_ml.ml_nskip[i]);
 
     strncpy(sep, ",", 2);
     char sep2[2] = "|";
@@ -205,7 +212,7 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
         token = strtok_r(NULL, sep, &saveptr1);
     } while (token != NULL);
 
-    lprintf("INIT ML", 0, " Found %d correlator entries, that defines %d correlators\n", j, i);
+    lprintf("INIT ML", 0, "Found %d correlator entries, that defines %d correlators\n", j, i);
 
     pg_var_ml.corrs.n_entries = j;
     pg_var_ml.corrs.n_corrs = i;
@@ -253,10 +260,12 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
     for (l = 0; l < pg_var_ml.corrs.n_entries; l++)
     {
         tlist[pg_var_ml.corrs.list[l].t1] = tlist[pg_var_ml.corrs.list[l].t2] = 1;
-        lprintf("MAIN", 0, "ML Cor Id=%d size=%d  pairs=(%d %d)\n", pg_var_ml.corrs.list[l].id, pg_var_ml.corrs.list[l].n_pairs, pg_var_ml.corrs.list[l].t1, pg_var_ml.corrs.list[l].t2);
+        lprintf("INIT ML", 0, " Cor Id=%d size=%d  pairs=(%d %d)\n", pg_var_ml.corrs.list[l].id, pg_var_ml.corrs.list[l].n_pairs, pg_var_ml.corrs.list[l].t1, pg_var_ml.corrs.list[l].t2);
     }
 
     initialize_spatial_active_slices(tlist);
+    lprintf("INIT ML", 0, "Blocking iteration on the observables=%d\n", pg_var_ml.nblk);
+    lprintf("INIT ML", 0, "Ape smearing par=%lf\n", pg_var_ml.APEsmear);
 
     read_input(gf->read, ifile);
 
@@ -272,6 +281,8 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
     start_t = parse_gstart(gf);
     /* set last conf id */
     parse_lastconf(gf);
+
+    lprintf("INIT ML", 0, "Separation between each measure=%d\n", gf->nskip);
 
     /* init gauge field */
     switch (start_t)
@@ -292,13 +303,12 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
     represent_gauge_field();
 
     BCs_pars_t BCs_pars = {
-    .fermion_twisting_theta = {0.,0.,0.,0.},
-    .gauge_boundary_improvement_cs = 1.,
-    .gauge_boundary_improvement_ct = 1.,
-    .chiSF_boundary_improvement_ds = 1.,
-    .SF_BCs = 0
-  };
-  init_BCs(&BCs_pars);
+        .fermion_twisting_theta = {0., 0., 0., 0.},
+        .gauge_boundary_improvement_cs = 1.,
+        .gauge_boundary_improvement_ct = 1.,
+        .chiSF_boundary_improvement_ds = 1.,
+        .SF_BCs = 0};
+    init_BCs(&BCs_pars);
 
     return 0;
 }

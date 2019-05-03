@@ -6,7 +6,7 @@
 #include "glueballs.h"
 
 #include <string.h>
-#define npaths 9
+#define npaths 3
 static double PI = 3.141592653589793238462643383279502884197;
 static double complex *mom_def_Re_tr_paths = NULL;
 static double complex *mom_def_Im_tr_paths = NULL;
@@ -426,18 +426,10 @@ static double complex path0(int in)
 
     _suNg_dagger(res1, *w2);
     w2 = &res1;
-    site = idn_wrk(site, 1);
-    w1 = pu_gauge_wrk(site, 1);
-    _suNg_times_suNg_dagger(res, *w2, *w1);
-
     site = idn_wrk(site, 2);
     w1 = pu_gauge_wrk(site, 2);
-    _suNg_times_suNg_dagger(res1, res, *w1);
+    _suNg_times_suNg_dagger(res, *w2, *w1);
 
-    w1 = pu_gauge_wrk(site, 1);
-    _suNg_times_suNg(res, res1, *w1);
-
-    site = iup_wrk(site, 1);
     w1 = pu_gauge_wrk(site, 1);
     _suNg_times_suNg(res1, res, *w1);
 
@@ -461,18 +453,10 @@ static double complex path1(int in)
 
     _suNg_dagger(res1, *w2);
     w2 = &res1;
-    site = idn_wrk(site, 1);
-    w1 = pu_gauge_wrk(site, 1);
-    _suNg_times_suNg_dagger(res, *w2, *w1);
-
     site = idn_wrk(site, 3);
     w1 = pu_gauge_wrk(site, 3);
-    _suNg_times_suNg_dagger(res1, res, *w1);
+    _suNg_times_suNg_dagger(res, *w2, *w1);
 
-    w1 = pu_gauge_wrk(site, 1);
-    _suNg_times_suNg(res, res1, *w1);
-
-    site = iup_wrk(site, 1);
     w1 = pu_gauge_wrk(site, 1);
     _suNg_times_suNg(res1, res, *w1);
 
@@ -496,128 +480,15 @@ static double complex path2(int in)
 
     _suNg_dagger(res1, *w2);
     w2 = &res1;
-    site = idn_wrk(site, 2);
-    w1 = pu_gauge_wrk(site, 2);
-    _suNg_times_suNg_dagger(res, *w2, *w1);
-
-    site = idn_wrk(site, 1);
-    w1 = pu_gauge_wrk(site, 1);
-    _suNg_times_suNg_dagger(res1, res, *w1);
-
-    w1 = pu_gauge_wrk(site, 2);
-    _suNg_times_suNg(res, res1, *w1);
-
-    site = iup_wrk(site, 2);
-    w1 = pu_gauge_wrk(site, 2);
-    _suNg_times_suNg(res1, res, *w1);
-
-    site = iup_wrk(site, 2);
-    w1 = pu_gauge_wrk(site, 1);
-    _suNg_times_suNg(res, res1, *w1);
-
-    _suNg_trace(p, res);
-    return p;
-}
-
-static double complex path3(int in)
-{
-    suNg *w1, *w2;
-    suNg res, res1;
-    int site = in;
-    double complex p;
-
-    site = idn_wrk(site, 2);
-    w2 = pu_gauge_wrk(site, 2);
-
-    _suNg_dagger(res1, *w2);
-    w2 = &res1;
-    site = idn_wrk(site, 2);
-    w1 = pu_gauge_wrk(site, 2);
-    _suNg_times_suNg_dagger(res, *w2, *w1);
-
     site = idn_wrk(site, 3);
     w1 = pu_gauge_wrk(site, 3);
-    _suNg_times_suNg_dagger(res1, res, *w1);
+    _suNg_times_suNg_dagger(res, *w2, *w1);
 
-    w1 = pu_gauge_wrk(site, 2);
-    _suNg_times_suNg(res, res1, *w1);
-
-    site = iup_wrk(site, 2);
     w1 = pu_gauge_wrk(site, 2);
     _suNg_times_suNg(res1, res, *w1);
 
     site = iup_wrk(site, 2);
     w1 = pu_gauge_wrk(site, 3);
-    _suNg_times_suNg(res, res1, *w1);
-
-    _suNg_trace(p, res);
-    return p;
-}
-
-static double complex path4(int in)
-{
-    suNg *w1, *w2;
-    suNg res, res1;
-    int site = in;
-    double complex p;
-
-    site = idn_wrk(site, 3);
-    w2 = pu_gauge_wrk(site, 3);
-
-    _suNg_dagger(res1, *w2);
-    w2 = &res1;
-    site = idn_wrk(site, 3);
-    w1 = pu_gauge_wrk(site, 3);
-    _suNg_times_suNg_dagger(res, *w2, *w1);
-
-    site = idn_wrk(site, 1);
-    w1 = pu_gauge_wrk(site, 1);
-    _suNg_times_suNg_dagger(res1, res, *w1);
-
-    w1 = pu_gauge_wrk(site, 3);
-    _suNg_times_suNg(res, res1, *w1);
-
-    site = iup_wrk(site, 3);
-    w1 = pu_gauge_wrk(site, 3);
-    _suNg_times_suNg(res1, res, *w1);
-
-    site = iup_wrk(site, 3);
-    w1 = pu_gauge_wrk(site, 1);
-    _suNg_times_suNg(res, res1, *w1);
-
-    _suNg_trace(p, res);
-    return p;
-}
-
-static double complex path5(int in)
-{
-    suNg *w1, *w2;
-    suNg res, res1;
-    int site = in;
-    double complex p;
-
-    site = idn_wrk(site, 3);
-    w2 = pu_gauge_wrk(site, 3);
-
-    _suNg_dagger(res1, *w2);
-    w2 = &res1;
-    site = idn_wrk(site, 3);
-    w1 = pu_gauge_wrk(site, 3);
-    _suNg_times_suNg_dagger(res, *w2, *w1);
-
-    site = idn_wrk(site, 2);
-    w1 = pu_gauge_wrk(site, 2);
-    _suNg_times_suNg_dagger(res1, res, *w1);
-
-    w1 = pu_gauge_wrk(site, 3);
-    _suNg_times_suNg(res, res1, *w1);
-
-    site = iup_wrk(site, 3);
-    w1 = pu_gauge_wrk(site, 3);
-    _suNg_times_suNg(res1, res, *w1);
-
-    site = iup_wrk(site, 3);
-    w1 = pu_gauge_wrk(site, 2);
     _suNg_times_suNg(res, res1, *w1);
 
     _suNg_trace(p, res);
@@ -626,119 +497,7 @@ static double complex path5(int in)
 
 static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_1(double complex *op_out)
 {
-    *op_out += +(8.) * mom_def_Re_tr_paths[0] + (8.) * mom_def_Re_tr_paths[1] + (8.) * mom_def_Re_tr_paths[2] + (8.) * mom_def_Re_tr_paths[3] + (8.) * mom_def_Re_tr_paths[4] + (8.) * mom_def_Re_tr_paths[5];
-}
-
-static void OP_oneTr_p_0_0_0_Ir_2_C_1_n_1(double complex *op_out)
-{
-    *op_out += +(8.) * mom_def_Re_tr_paths[0] + (-8.) * mom_def_Re_tr_paths[1] + (-8.) * mom_def_Re_tr_paths[2] + (8.) * mom_def_Re_tr_paths[3] + (8.) * mom_def_Re_tr_paths[4] + (-8.) * mom_def_Re_tr_paths[5];
-}
-
-static double complex path6(int in)
-{
-    suNg *w1, *w2;
-    suNg res, res1;
-    int site = in;
-    double complex p;
-
-    site = idn_wrk(site, 1);
-    w2 = pu_gauge_wrk(site, 1);
-
-    _suNg_dagger(res1, *w2);
-    w2 = &res1;
-    site = idn_wrk(site, 2);
-    w1 = pu_gauge_wrk(site, 2);
-    _suNg_times_suNg_dagger(res, *w2, *w1);
-
-    w1 = pu_gauge_wrk(site, 1);
-    _suNg_times_suNg(res1, res, *w1);
-
-    site = iup_wrk(site, 1);
-    w1 = pu_gauge_wrk(site, 2);
-    _suNg_times_suNg(res, res1, *w1);
-
-    _suNg_trace(p, res);
-    return p;
-}
-
-static double complex path7(int in)
-{
-    suNg *w1, *w2;
-    suNg res, res1;
-    int site = in;
-    double complex p;
-
-    site = idn_wrk(site, 1);
-    w2 = pu_gauge_wrk(site, 1);
-
-    _suNg_dagger(res1, *w2);
-    w2 = &res1;
-    site = idn_wrk(site, 3);
-    w1 = pu_gauge_wrk(site, 3);
-    _suNg_times_suNg_dagger(res, *w2, *w1);
-
-    w1 = pu_gauge_wrk(site, 1);
-    _suNg_times_suNg(res1, res, *w1);
-
-    site = iup_wrk(site, 1);
-    w1 = pu_gauge_wrk(site, 3);
-    _suNg_times_suNg(res, res1, *w1);
-
-    _suNg_trace(p, res);
-    return p;
-}
-
-static double complex path8(int in)
-{
-    suNg *w1, *w2;
-    suNg res, res1;
-    int site = in;
-    double complex p;
-
-    site = idn_wrk(site, 2);
-    w2 = pu_gauge_wrk(site, 2);
-
-    _suNg_dagger(res1, *w2);
-    w2 = &res1;
-    site = idn_wrk(site, 3);
-    w1 = pu_gauge_wrk(site, 3);
-    _suNg_times_suNg_dagger(res, *w2, *w1);
-
-    w1 = pu_gauge_wrk(site, 2);
-    _suNg_times_suNg(res1, res, *w1);
-
-    site = iup_wrk(site, 2);
-    w1 = pu_gauge_wrk(site, 3);
-    _suNg_times_suNg(res, res1, *w1);
-
-    _suNg_trace(p, res);
-    return p;
-}
-
-static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_1(double complex *op_out)
-{
-    *op_out += +(16.) * mom_def_Re_tr_paths[6] + (-8.) * mom_def_Re_tr_paths[7] + (-8.) * mom_def_Re_tr_paths[8];
-}
-
-static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_2(double complex *op_out)
-{
-    *op_out += +(-13.8564064605510183) * mom_def_Re_tr_paths[7] + (13.8564064605510183) * mom_def_Re_tr_paths[8];
-}
-
-static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_3(double complex *op_out)
-{
-    *op_out += +(8.) * mom_def_Re_tr_paths[0] + (8.) * mom_def_Re_tr_paths[1] + (8.) * mom_def_Re_tr_paths[2] + (8.) * mom_def_Re_tr_paths[3] + (-16.) * mom_def_Re_tr_paths[4] + (-16.) * mom_def_Re_tr_paths[5];
-}
-
-static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_4(double complex *op_out)
-{
-    *op_out += +(-13.8564064605510183) * mom_def_Re_tr_paths[0] + (-13.8564064605510183) * mom_def_Re_tr_paths[1] + (13.8564064605510183) * mom_def_Re_tr_paths[2] + (13.8564064605510183) * mom_def_Re_tr_paths[3];
-}
-
-static double complex c0;
-static void OP_oneTr_p_1_0_0_Ir_1_C_1_n_1(double complex *op_out)
-{
-    *op_out += +(4.) * c0 * mom_def_Re_tr_paths[0] + (4.) * c0 * mom_def_Re_tr_paths[1];
+    *op_out += +(16.) * mom_def_Re_tr_paths[0] + (16.) * mom_def_Re_tr_paths[1] + (16.) * mom_def_Re_tr_paths[2];
 }
 
 static int last_t = -10;
@@ -750,7 +509,6 @@ void eval_time_momentum_glueball_paths(int t, int px, int py, int pz)
     double complex ce = 0.;
     if (path_storage == NULL)
     {
-        c0 = cexp(I * PI * (-4. / GLB_X));
         path_storage = malloc(npaths * X * Y * Z * sizeof(double complex));
         mom_def_Re_tr_paths = malloc(npaths * sizeof(double complex));
         mom_def_Im_tr_paths = malloc(npaths * sizeof(double complex));
@@ -780,24 +538,6 @@ void eval_time_momentum_glueball_paths(int t, int px, int py, int pz)
                     path_storage[2 + idx] = path2(in);
                     mom_def_Re_tr_paths[2] += ce * creal(path_storage[2 + idx]);
                     mom_def_Im_tr_paths[2] += I * ce * cimag(path_storage[2 + idx]);
-                    path_storage[3 + idx] = path3(in);
-                    mom_def_Re_tr_paths[3] += ce * creal(path_storage[3 + idx]);
-                    mom_def_Im_tr_paths[3] += I * ce * cimag(path_storage[3 + idx]);
-                    path_storage[4 + idx] = path4(in);
-                    mom_def_Re_tr_paths[4] += ce * creal(path_storage[4 + idx]);
-                    mom_def_Im_tr_paths[4] += I * ce * cimag(path_storage[4 + idx]);
-                    path_storage[5 + idx] = path5(in);
-                    mom_def_Re_tr_paths[5] += ce * creal(path_storage[5 + idx]);
-                    mom_def_Im_tr_paths[5] += I * ce * cimag(path_storage[5 + idx]);
-                    path_storage[6 + idx] = path6(in);
-                    mom_def_Re_tr_paths[6] += ce * creal(path_storage[6 + idx]);
-                    mom_def_Im_tr_paths[6] += I * ce * cimag(path_storage[6 + idx]);
-                    path_storage[7 + idx] = path7(in);
-                    mom_def_Re_tr_paths[7] += ce * creal(path_storage[7 + idx]);
-                    mom_def_Im_tr_paths[7] += I * ce * cimag(path_storage[7 + idx]);
-                    path_storage[8 + idx] = path8(in);
-                    mom_def_Re_tr_paths[8] += ce * creal(path_storage[8 + idx]);
-                    mom_def_Im_tr_paths[8] += I * ce * cimag(path_storage[8 + idx]);
                 }
     }
     else
@@ -808,7 +548,7 @@ void eval_time_momentum_glueball_paths(int t, int px, int py, int pz)
                 {
                     ce = cexp(I * 2.0 * PI * (double)(n_x * px + n_y * py + n_z * pz) / GLB_X);
                     idx = npaths * (n_x + X * (n_y + Y * n_z));
-                    for (int i = 0; i < 9; i++)
+                    for (int i = 0; i < 3; i++)
                     {
                         mom_def_Re_tr_paths[i] += ce * creal(path_storage[i + idx]);
                         mom_def_Im_tr_paths[i] += I * ce * cimag(path_storage[i + idx]);
@@ -818,38 +558,15 @@ void eval_time_momentum_glueball_paths(int t, int px, int py, int pz)
 };
 void eval_all_glueball_ops(int t, double complex *numerical_op)
 {
+    request_space_paths_evaluation();
     eval_time_momentum_glueball_paths(t, 0, 0, 0);
     OP_oneTr_p_0_0_0_Ir_1_C_1_n_1(numerical_op + 0);
-    OP_oneTr_p_0_0_0_Ir_2_C_1_n_1(numerical_op + 1);
-    OP_oneTr_p_0_0_0_Ir_3_C_1_n_1(numerical_op + 2);
-    OP_oneTr_p_0_0_0_Ir_3_C_1_n_3(numerical_op + 3);
-    OP_oneTr_p_0_0_0_Ir_3_C_1_n_2(numerical_op + 4);
-    OP_oneTr_p_0_0_0_Ir_3_C_1_n_4(numerical_op + 5);
-    eval_time_momentum_glueball_paths(t, 1, 0, 0);
-    OP_oneTr_p_1_0_0_Ir_1_C_1_n_1(numerical_op + 6);
 }
+
 
 void eval_all_glueball_ops_p_0_0_0_Ir_1_C_1(double complex *numerical_op)
 {
     OP_oneTr_p_0_0_0_Ir_1_C_1_n_1(numerical_op + 0);
-}
-
-void eval_all_glueball_ops_p_0_0_0_Ir_2_C_1(double complex *numerical_op)
-{
-    OP_oneTr_p_0_0_0_Ir_2_C_1_n_1(numerical_op + 0);
-}
-
-void eval_all_glueball_ops_p_0_0_0_Ir_3_C_1(double complex *numerical_op)
-{
-    OP_oneTr_p_0_0_0_Ir_3_C_1_n_1(numerical_op + 0);
-    OP_oneTr_p_0_0_0_Ir_3_C_1_n_3(numerical_op + 1);
-    OP_oneTr_p_0_0_0_Ir_3_C_1_n_2(numerical_op + 2);
-    OP_oneTr_p_0_0_0_Ir_3_C_1_n_4(numerical_op + 3);
-}
-
-void eval_all_glueball_ops_p_1_0_0_Ir_1_C_1(double complex *numerical_op)
-{
-    OP_oneTr_p_1_0_0_Ir_1_C_1_n_1(numerical_op + 0);
 }
 
 void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_storage, double complex *cor_storage)
@@ -1000,134 +717,6 @@ void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_stor
                     }
             }
         totalsize += (nblocking * nblocking * 1 * (lcor->n_corrs));
-
-        cor_pointer = cor_storage + totalsize + id * nblocking * nblocking * 1;
-
-        for (n1 = 0; n1 < nblocking; n1++)
-            for (b1 = 0; b1 < 1; b1++)
-            {
-                i1 = 1 + b1 + total_n_glue_op * n1;
-
-                n2 = n1;
-                b2 = b1;
-                i2 = 1 + b2 + total_n_glue_op * n2;
-                tmp = norm * (conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
-                cor_pointer[b1 + 1 * (n1 + nblocking * (b2 + 1 * n2))] += tmp;
-
-                for (b2 = b1 + 1; b2 < 1; b2++)
-                {
-                    i2 = 1 + b2 + total_n_glue_op * n2;
-                    tmp = norm * (conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
-                    cor_pointer[b1 + 1 * (n1 + nblocking * (b2 + 1 * n2))] += tmp;
-                    cor_pointer[b2 + 1 * (n2 + nblocking * (b1 + 1 * n1))] += conj(tmp);
-                }
-
-                for (n2 = n1 + 1; n2 < nblocking; n2++)
-                    for (b2 = 0; b2 < 1; b2++)
-                    {
-                        i2 = 1 + b2 + total_n_glue_op * n2;
-                        tmp = norm * (conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
-                        cor_pointer[b1 + 1 * (n1 + nblocking * (b2 + 1 * n2))] += tmp;
-                        cor_pointer[b2 + 1 * (n2 + nblocking * (b1 + 1 * n1))] += conj(tmp);
-                    }
-            }
-        totalsize += (nblocking * nblocking * 1 * (lcor->n_corrs));
-
-        cor_pointer = cor_storage + totalsize + id * nblocking * nblocking * 4;
-
-        for (n1 = 0; n1 < nblocking; n1++)
-            for (b1 = 0; b1 < 2; b1++)
-            {
-                i1 = 2 + b1 + total_n_glue_op * n1;
-
-                n2 = n1;
-                b2 = b1;
-                i2 = 2 + b2 + total_n_glue_op * n2;
-                tmp = norm * (conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
-                cor_pointer[b1 + 2 * (n1 + nblocking * (b2 + 2 * n2))] += tmp;
-
-                for (b2 = b1 + 1; b2 < 2; b2++)
-                {
-                    i2 = 2 + b2 + total_n_glue_op * n2;
-                    tmp = norm * (conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
-                    cor_pointer[b1 + 2 * (n1 + nblocking * (b2 + 2 * n2))] += tmp;
-                    cor_pointer[b2 + 2 * (n2 + nblocking * (b1 + 2 * n1))] += conj(tmp);
-                }
-
-                for (n2 = n1 + 1; n2 < nblocking; n2++)
-                    for (b2 = 0; b2 < 2; b2++)
-                    {
-                        i2 = 2 + b2 + total_n_glue_op * n2;
-                        tmp = norm * (conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
-                        cor_pointer[b1 + 2 * (n1 + nblocking * (b2 + 2 * n2))] += tmp;
-                        cor_pointer[b2 + 2 * (n2 + nblocking * (b1 + 2 * n1))] += conj(tmp);
-                    }
-            }
-        totalsize += (nblocking * nblocking * 4 * (lcor->n_corrs));
-
-        cor_pointer = cor_storage + totalsize + id * nblocking * nblocking * 4;
-
-        for (n1 = 0; n1 < nblocking; n1++)
-            for (b1 = 0; b1 < 2; b1++)
-            {
-                i1 = 4 + b1 + total_n_glue_op * n1;
-
-                n2 = n1;
-                b2 = b1;
-                i2 = 4 + b2 + total_n_glue_op * n2;
-                tmp = norm * (conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
-                cor_pointer[b1 + 2 * (n1 + nblocking * (b2 + 2 * n2))] += tmp;
-
-                for (b2 = b1 + 1; b2 < 2; b2++)
-                {
-                    i2 = 4 + b2 + total_n_glue_op * n2;
-                    tmp = norm * (conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
-                    cor_pointer[b1 + 2 * (n1 + nblocking * (b2 + 2 * n2))] += tmp;
-                    cor_pointer[b2 + 2 * (n2 + nblocking * (b1 + 2 * n1))] += conj(tmp);
-                }
-
-                for (n2 = n1 + 1; n2 < nblocking; n2++)
-                    for (b2 = 0; b2 < 2; b2++)
-                    {
-                        i2 = 4 + b2 + total_n_glue_op * n2;
-                        tmp = norm * (conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
-                        cor_pointer[b1 + 2 * (n1 + nblocking * (b2 + 2 * n2))] += tmp;
-                        cor_pointer[b2 + 2 * (n2 + nblocking * (b1 + 2 * n1))] += conj(tmp);
-                    }
-            }
-        totalsize += (nblocking * nblocking * 4 * (lcor->n_corrs));
-
-        cor_pointer = cor_storage + totalsize + id * nblocking * nblocking * 1;
-
-        for (n1 = 0; n1 < nblocking; n1++)
-            for (b1 = 0; b1 < 1; b1++)
-            {
-                i1 = 6 + b1 + total_n_glue_op * n1;
-
-                n2 = n1;
-                b2 = b1;
-                i2 = 6 + b2 + total_n_glue_op * n2;
-                tmp = norm * (conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
-                cor_pointer[b1 + 1 * (n1 + nblocking * (b2 + 1 * n2))] += tmp;
-
-                for (b2 = b1 + 1; b2 < 1; b2++)
-                {
-                    i2 = 6 + b2 + total_n_glue_op * n2;
-                    tmp = norm * (conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
-                    cor_pointer[b1 + 1 * (n1 + nblocking * (b2 + 1 * n2))] += tmp;
-                    cor_pointer[b2 + 1 * (n2 + nblocking * (b1 + 1 * n1))] += conj(tmp);
-                }
-
-                for (n2 = n1 + 1; n2 < nblocking; n2++)
-                    for (b2 = 0; b2 < 1; b2++)
-                    {
-                        i2 = 6 + b2 + total_n_glue_op * n2;
-                        tmp = norm * (conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
-                        cor_pointer[b1 + 1 * (n1 + nblocking * (b2 + 1 * n2))] += tmp;
-                        cor_pointer[b2 + 1 * (n2 + nblocking * (b1 + 1 * n1))] += conj(tmp);
-                    }
-            }
-        totalsize += (nblocking * nblocking * 1 * (lcor->n_corrs));
     }
 
     totalsize = 0;
@@ -1149,143 +738,6 @@ void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_stor
     b1 = 0;
 
     lprintf("Measure ML", 0, "\nCorr Total P=(0,0,0) Irrep=A1plusOhP Irrep ev=1/1 Charge=+\n");
-
-    for (icor = 0; icor < lcor->n_corrs; icor++)
-    {
-        cor_pointer = cor_storage + totalsize;
-        lprintf("Measure ML", 0, "\n Corr points: ");
-        if (b1 < lcor->n_entries)
-        {
-            b2 = lcor->list[b1].t2 - lcor->list[b1].t1;
-            while (b2 == lcor->list[b1].t2 - lcor->list[b1].t1)
-            {
-                lprintf("Measure ML", 0, "( %d %d ) ", lcor->list[b1].t2, lcor->list[b1].t1);
-                b1++;
-            }
-        }
-
-        lprintf("Measure ML", 0, "\n");
-
-        for (i1 = 0; i1 < (nblocking * 1); i1++)
-        {
-            for (i2 = 0; i2 < (nblocking * 1); i2++)
-                lprintf("Measure ML", 0, " ( %.6e %.6e )", creal(cor_pointer[i1 + nblocking * 1 * i2]), cimag(cor_pointer[i1 + nblocking * 1 * i2]));
-
-            lprintf("Measure ML", 0, "\n");
-        }
-        totalsize += (nblocking * nblocking * 1);
-    }
-
-    b2 = 0;
-    b1 = 0;
-
-    lprintf("Measure ML", 0, "\nCorr Total P=(0,0,0) Irrep=A2plusOhP Irrep ev=1/1 Charge=+\n");
-
-    for (icor = 0; icor < lcor->n_corrs; icor++)
-    {
-        cor_pointer = cor_storage + totalsize;
-        lprintf("Measure ML", 0, "\n Corr points: ");
-        if (b1 < lcor->n_entries)
-        {
-            b2 = lcor->list[b1].t2 - lcor->list[b1].t1;
-            while (b2 == lcor->list[b1].t2 - lcor->list[b1].t1)
-            {
-                lprintf("Measure ML", 0, "( %d %d ) ", lcor->list[b1].t2, lcor->list[b1].t1);
-                b1++;
-            }
-        }
-
-        lprintf("Measure ML", 0, "\n");
-
-        for (i1 = 0; i1 < (nblocking * 1); i1++)
-        {
-            for (i2 = 0; i2 < (nblocking * 1); i2++)
-                lprintf("Measure ML", 0, " ( %.6e %.6e )", creal(cor_pointer[i1 + nblocking * 1 * i2]), cimag(cor_pointer[i1 + nblocking * 1 * i2]));
-
-            lprintf("Measure ML", 0, "\n");
-        }
-        totalsize += (nblocking * nblocking * 1);
-    }
-
-    b2 = 0;
-    b1 = 0;
-
-    lprintf("Measure ML", 0, "\nCorr Total P=(0,0,0) Irrep=EplusOhP Irrep ev=1/2 Charge=+\n");
-
-    for (icor = 0; icor < lcor->n_corrs; icor++)
-    {
-        cor_pointer = cor_storage + totalsize;
-        lprintf("Measure ML", 0, "\n Corr points: ");
-        if (b1 < lcor->n_entries)
-        {
-            b2 = lcor->list[b1].t2 - lcor->list[b1].t1;
-            while (b2 == lcor->list[b1].t2 - lcor->list[b1].t1)
-            {
-                lprintf("Measure ML", 0, "( %d %d ) ", lcor->list[b1].t2, lcor->list[b1].t1);
-                b1++;
-            }
-        }
-
-        lprintf("Measure ML", 0, "\n");
-
-        for (i1 = 0; i1 < (nblocking * 2); i1++)
-        {
-            for (i2 = 0; i2 < (nblocking * 2); i2++)
-                lprintf("Measure ML", 0, " ( %.6e %.6e )", creal(cor_pointer[i1 + nblocking * 2 * i2]), cimag(cor_pointer[i1 + nblocking * 2 * i2]));
-
-            lprintf("Measure ML", 0, "\n");
-        }
-        totalsize += (nblocking * nblocking * 4);
-    }
-
-    b2 = 0;
-    b1 = 0;
-
-    lprintf("Measure ML", 0, "\nCorr Total P=(0,0,0) Irrep=EplusOhP Irrep ev=2/2 Charge=+\n");
-
-    for (icor = 0; icor < lcor->n_corrs; icor++)
-    {
-        cor_pointer = cor_storage + totalsize;
-        lprintf("Measure ML", 0, "\n Corr points: ");
-        if (b1 < lcor->n_entries)
-        {
-            b2 = lcor->list[b1].t2 - lcor->list[b1].t1;
-            while (b2 == lcor->list[b1].t2 - lcor->list[b1].t1)
-            {
-                lprintf("Measure ML", 0, "( %d %d ) ", lcor->list[b1].t2, lcor->list[b1].t1);
-                b1++;
-            }
-        }
-
-        lprintf("Measure ML", 0, "\n");
-
-        for (i1 = 0; i1 < (nblocking * 2); i1++)
-        {
-            for (i2 = 0; i2 < (nblocking * 2); i2++)
-                lprintf("Measure ML", 0, " ( %.6e %.6e )", creal(cor_pointer[i1 + nblocking * 2 * i2]), cimag(cor_pointer[i1 + nblocking * 2 * i2]));
-
-            lprintf("Measure ML", 0, "\n");
-        }
-        totalsize += (nblocking * nblocking * 4);
-    }
-
-    lprintf("Measure ML", 0, "\n1pt function P=(1,0,0) Irrep=A1Dic4 Irrep ev=1/1 Charge=+\n\n");
-
-    for (n1 = 0; n1 < GLB_T; n1++)
-        if (listactive[n1] > 0)
-        {
-            lprintf("Measure ML", 0, " t=%d", n1);
-            for (n2 = 0; n2 < nblocking; n2++)
-                for (i = 6; i < 7; i++)
-                    lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
-                            cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
-            lprintf("Measure ML", 0, "\n");
-        }
-
-    b2 = 0;
-    b1 = 0;
-
-    lprintf("Measure ML", 0, "\nCorr Total P=(1,0,0) Irrep=A1Dic4 Irrep ev=1/1 Charge=+\n");
 
     for (icor = 0; icor < lcor->n_corrs; icor++)
     {

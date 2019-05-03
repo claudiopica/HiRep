@@ -105,7 +105,7 @@ void initialize_spatial_active_slices(int *tlist)
             glbT_to_active_slices[t] = -1;
 
         for (t = 0; t < n_active_slices; t++)
-            glbT_to_active_slices[active_slices_list[t]+zerocoord[0]] = t;
+            glbT_to_active_slices[active_slices_list[t] + zerocoord[0]] = t;
     }
     else
         lprintf("SPATIAL TRASFORMATION", 0, "Already initialized\n");
@@ -312,8 +312,8 @@ int spatial_APE_smear_wrkspace(double *smear_val, int wrkspace_in)
     int ix, iy, iz, it, t;
     int mu, nu, mid, midpmu, midpnu, midmnu, midpmumnu;
     suNg v;
-    suNg_field *gout;
-    int *_iup, *_idn;
+    suNg_field *gout,*gin;
+    int *_iup, *_idn,*_iup_in, *_idn_in;
     suNg *vout;
     int wrkspace_out;
 
@@ -324,9 +324,15 @@ int spatial_APE_smear_wrkspace(double *smear_val, int wrkspace_in)
     wrkspace_out = reserve_wrk_space_with_pointers(&gout, &_iup, &_idn);
 
     if (wrkspace_in == -1)
+    {
         reset_wrk_pointers();
+        _iup_in=iup;
+        _idn_in=idn;
+    }
     else
-        set_wrk_space(wrkspace_in);
+    {
+        set_wrk_space_and_pointers(wrkspace_in,  &gin, &_iup_in, &_idn_in);
+    }
 
     for (t = 0; t < n_active_slices; t++)
     {
@@ -370,6 +376,10 @@ int spatial_APE_smear_wrkspace(double *smear_val, int wrkspace_in)
                     }
                 }
     }
+
+    memcpy(_iup, _iup_in, 4 * glattice.gsize_gauge * sizeof(int));
+    memcpy(_idn, _idn_in, 4 * glattice.gsize_gauge * sizeof(int));
+
     set_wrk_space(wrkspace_out);
     return wrkspace_out;
 }

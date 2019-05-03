@@ -595,7 +595,7 @@ GenerateCchecks[]:=Module[{Op,OpTmp,irrepdim,RActiveOp,RMatrixOp,Pxsort,Pysort,P
   WriteString[ar,"}\n}\n};\n"];
   (**)
   
-  WriteString[ar, "void eval_all_glueball_ops(int t, double complex * numerical_op)\n{\n"];
+  WriteString[ar, "void eval_all_glueball_ops(int t, double complex * numerical_op)\n{\nrequest_space_paths_evaluation();\n"];
   opnumberC=0;
   Do[
     evalpaths=0;

@@ -12,7 +12,7 @@
 typedef struct _input_pg_ml {
 
   double beta,APEsmear;
-  int nhb, nor, nskip, ml_levels,nblk;
+  int nhb, nor,  ml_levels,nblk;
   int * ml_niteration;
   int * ml_nskip;
   cor_list corrs;

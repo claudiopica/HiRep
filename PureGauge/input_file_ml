@@ -1,5 +1,5 @@
 // Global variables
-GLB_T = 8
+GLB_T = 16
 GLB_X = 8
 GLB_Y = 8
 GLB_Z = 8
@@ -30,21 +30,21 @@ nms   =   20
 nskip = 10
 ML levels = 1
 //The number of iterations per level must be written in a order string comma separated x1,x2,x3.... (one information per level)
-ML iterations per level = 10
-//The number of update skip per level must be written in a order string comma separated x1,x2,x3.... (one information per level) (each of these must be >=1)
-ML skip per level = 2
+ML iterations per level = 400
+//The number of update skip per level must be writte n in a order string comma separated x1,x2,x3.... (one information per level) (each of these must be >=1)
+ML skip per level = 1
 // the correlators are inputed according to the structure x1-y1|x2-y2,x3-y3,...
 // where pairs separated by a | are meant to have the same distance and will be averaged
-ML correlators = 3-5,3-6|2-5,2-6
+ML correlators = 6-8,6-9|5-8,5-9,5-10|4-9,4-10,4-11|3-10
 //number of spatial blocking level used to generate the glueballs correlators
 nblk = 2
 //APE smearing parameter value
-APEsmear = 0.6
+APEsmear = 0.33
 
 
 
 // Run control variables
-therm = 10
+therm = 100
 run name = run1
 save freq = 50
 conf dir = cnfg
@@ -53,4 +53,4 @@ gauge start = ranDoM
 //gauge start = run1_8x2x2x2nc2rADJnf2b2.000000m1.310000n10
 //rlx_state =
 //rlx_start =
-last conf = 150
+last conf = +100
