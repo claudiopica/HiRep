@@ -145,7 +145,8 @@ static void init_hb_multihit_boundary()
     for (lev = 0; lev < max_mh_level; lev++)
         for (it = 0; it < T; ++it)
         {
-            if ((it + zerocoord[0] % (GLB_T / (1 << (lev + 1)))) == 0 && it + zerocoord[0] != 0)
+
+            if ((it + zerocoord[0] ) % (GLB_T / (1 << (lev + 1))) == 0 && it + zerocoord[0] != 0)
             {
                 for (ix = 0; ix < X; ++ix)
                     for (iy = 0; iy < Y; ++iy)
