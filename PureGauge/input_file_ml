@@ -1,5 +1,5 @@
 // Global variables
-GLB_T = 16
+GLB_T = 24
 GLB_X = 8
 GLB_Y = 8
 GLB_Z = 8
@@ -24,10 +24,8 @@ beta  =   5.6
 nhb   =   1 
 // number of overelaxations steps
 nor   =   4
-//total number of ML measures 
-nms   =   20
 //separations steps between each ML measures 
-nskip = 10
+nskip = 100
 ML levels = 1
 //The number of iterations per level must be written in a order string comma separated x1,x2,x3.... (one information per level)
 ML iterations per level = 400
@@ -35,7 +33,7 @@ ML iterations per level = 400
 ML skip per level = 1
 // the correlators are inputed according to the structure x1-y1|x2-y2,x3-y3,...
 // where pairs separated by a | are meant to have the same distance and will be averaged
-ML correlators = 6-8,6-9|5-8,5-9,5-10|4-9,4-10,4-11|3-10
+ML correlators = 10-12,9-12|10-13,9-13,8-13|9-14,8-14,7-14|8-15
 //number of spatial blocking level used to generate the glueballs correlators
 nblk = 2
 //APE smearing parameter value
@@ -44,7 +42,7 @@ APEsmear = 0.33
 
 
 // Run control variables
-therm = 100
+therm = 400
 run name = run1
 save freq = 50
 conf dir = cnfg

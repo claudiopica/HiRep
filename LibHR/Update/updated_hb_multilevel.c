@@ -93,7 +93,7 @@ static void g_dn_Dirichlet_BCs()
 #if defined(BC_T_OPEN) || defined(BC_T_MIXED)
 static void g_up_open_BCs()
 {
-    int ix, iy, iz, index, lev ;
+    int ix, iy, iz, index, lev;
 
     if (COORD[0] == NP_T - 1)
     {
@@ -110,7 +110,6 @@ static void g_up_open_BCs()
     }
 }
 #endif
-
 
 static void free_hb_boundary()
 {
@@ -146,8 +145,9 @@ static void init_hb_multihit_boundary()
         for (it = 0; it < T; ++it)
         {
 
-            if ((it + zerocoord[0] ) % (GLB_T / (1 << (lev + 1))) == 0 && it + zerocoord[0] != 0)
+            if ((it + zerocoord[0] + 1) % (GLB_T / (1 << (lev + 1))) == 0 && it + zerocoord[0] + 1 != GLB_T)
             {
+                printf("Level %d Frozen t=%d\n", lev, it + zerocoord[0]);
                 for (ix = 0; ix < X; ++ix)
                     for (iy = 0; iy < Y; ++iy)
                         for (iz = 0; iz < Z; ++iz)
@@ -302,7 +302,7 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
             cor_storage = malloc(sizeof(double complex) * nblocking * nblocking * lcor->n_corrs * total_corrs_size);
             for (i = 0; i < max_mh_level; i++)
                 norm *= ml_up[i];
-            norm*=GLB_VOL3*NG;
+            norm *= GLB_VOL3 * NG;
         }
 
         memset(one_point_gb, 0, sizeof(double complex) * total_n_glue_op * nblocking * n_active_slices);

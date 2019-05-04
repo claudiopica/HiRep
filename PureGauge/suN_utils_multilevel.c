@@ -146,7 +146,6 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
     gf->therm = 0;
     gf->pg_v = &pg_var_ml;
 
-    
     read_input(pg_var_ml.read, ifile);
 
     lprintf("INIT ML", 0, "beta=%lf\n", pg_var_ml.beta);
@@ -180,7 +179,7 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
     }
     lprintf("INIT ML", 0, "number of MultiLevels=%d\n", pg_var_ml.ml_levels);
     for (int i = 0; i < pg_var_ml.ml_levels; i++)
-        lprintf("INIT ML", 0, "lev %d nup=%d nskip=%d\n", i,pg_var_ml.ml_niteration[i], pg_var_ml.ml_nskip[i]);
+        lprintf("INIT ML", 0, "lev %d nup=%d nskip=%d\n", i, pg_var_ml.ml_niteration[i], pg_var_ml.ml_nskip[i]);
 
     strncpy(sep, ",", 2);
     char sep2[2] = "|";
@@ -261,6 +260,15 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
     {
         tlist[pg_var_ml.corrs.list[l].t1] = tlist[pg_var_ml.corrs.list[l].t2] = 1;
         lprintf("INIT ML", 0, " Cor Id=%d size=%d  pairs=(%d %d)\n", pg_var_ml.corrs.list[l].id, pg_var_ml.corrs.list[l].n_pairs, pg_var_ml.corrs.list[l].t1, pg_var_ml.corrs.list[l].t2);
+    }
+
+    for (l = 0; l < GLB_T; l++)
+    {
+        if (tlist[l] != 0)
+        {
+            if ((l + 1) % (GLB_T / (1 << (pg_var_ml.ml_levels))) == 0)
+                lprintf("INIT ML", 0, "Warning the correlator's point %d is measured on a frozen slice\n", l);
+        }
     }
 
     initialize_spatial_active_slices(tlist);

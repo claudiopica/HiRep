@@ -312,8 +312,8 @@ int spatial_APE_smear_wrkspace(double *smear_val, int wrkspace_in)
     int ix, iy, iz, it, t;
     int mu, nu, mid, midpmu, midpnu, midmnu, midpmumnu;
     suNg v;
-    suNg_field *gout,*gin;
-    int *_iup, *_idn,*_iup_in, *_idn_in;
+    suNg_field *gout, *gin;
+    int *_iup, *_idn, *_iup_in, *_idn_in;
     suNg *vout;
     int wrkspace_out;
 
@@ -326,12 +326,12 @@ int spatial_APE_smear_wrkspace(double *smear_val, int wrkspace_in)
     if (wrkspace_in == -1)
     {
         reset_wrk_pointers();
-        _iup_in=iup;
-        _idn_in=idn;
+        _iup_in = iup;
+        _idn_in = idn;
     }
     else
     {
-        set_wrk_space_and_pointers(wrkspace_in,  &gin, &_iup_in, &_idn_in);
+        set_wrk_space_and_pointers(wrkspace_in, &gin, &_iup_in, &_idn_in);
     }
 
     for (t = 0; t < n_active_slices; t++)
