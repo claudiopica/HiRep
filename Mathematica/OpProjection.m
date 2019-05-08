@@ -853,16 +853,12 @@ Do[
     {
         cor_pointer = cor_storage + totalsize;
         lprintf(\"Measure ML\", 0, \"\\n Corr points: \");
-        if (b1 < lcor->n_entries)
+        n2=lcor->list[b1].n_pairs;
+        for (b2 = 0; b2 < n2; b2++)
         {
-            b2 = lcor->list[b1].t2 - lcor->list[b1].t1;
-            while (b2 == lcor->list[b1].t2 - lcor->list[b1].t1)
-            {
-                lprintf(\"Measure ML\", 0, \"( %d %d ) \", lcor->list[b1].t2, lcor->list[b1].t1);
-                b1++;
-            }
+            lprintf(\"Measure ML\", 0, \"( %d %d ) \", lcor->list[b1].t2, lcor->list[b1].t1);
+            b1++;
         }
-
         lprintf(\"Measure ML\", 0, \"\\n\");
 
         for (i1 = 0; i1 < (nblocking * ",cs,"); i1++)

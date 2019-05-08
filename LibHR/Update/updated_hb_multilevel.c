@@ -147,7 +147,6 @@ static void init_hb_multihit_boundary()
 
             if ((it + zerocoord[0] + 1) % (GLB_T / (1 << (lev + 1))) == 0 && it + zerocoord[0] + 1 != GLB_T)
             {
-                printf("Level %d Frozen t=%d\n", lev, it + zerocoord[0]);
                 for (ix = 0; ix < X; ++ix)
                     for (iy = 0; iy < Y; ++iy)
                         for (iz = 0; iz < Z; ++iz)

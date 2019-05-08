@@ -343,16 +343,18 @@ int project_to_suNg_real(suNg *out, suNg *in)
 
 void covariant_project_to_suNg(suNg *u)
 {
-  int i,j,k;
+  int i, j, k;
   suNg tmp, tmp1;
   double eval[NG];
-  double complex det;
+  double complex norm;
   double complex evec[NG * NG];
 
-  det_suNg(&det, u);
-  det = cpow(det, -1. / NG);
-  _suNg_mul_assign(*u, det);
+  det_suNg(&norm, u);
+  norm = cpow(norm, -1. / NG);
+  _suNg_mul_assign(*u, norm);
+
   _suNg_dagger_times_suNg(tmp, *u, *u);
+
   jacobi2(NG, tmp.c, eval, evec);
 
   for (i = 0; i < NG; i++)
@@ -373,5 +375,4 @@ void covariant_project_to_suNg(suNg *u)
   tmp1 = *u;
 
   _suNg_times_suNg(*u, tmp1, tmp);
-
 }
