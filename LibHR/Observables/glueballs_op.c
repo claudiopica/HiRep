@@ -729,6 +729,11 @@ static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_4(double complex * op_out)
 *op_out +=+(-13.8564064605510183)*mom_def_Re_tr_paths[3]+(-13.8564064605510183)*mom_def_Re_tr_paths[4]+(13.8564064605510183)*mom_def_Re_tr_paths[5]+(13.8564064605510183)*mom_def_Re_tr_paths[6];
 }
 
+static void OP_oneTr_p_0_0_0_Ir_4_C_m1_n_1(double complex * op_out)
+{
+*op_out +=+(+I*8.)*mom_def_Im_tr_paths[4]+(-8.)*mom_def_Im_tr_paths[6]+(+I*8.)*mom_def_Im_tr_paths[7]+(8.)*mom_def_Im_tr_paths[8];
+}
+
 static void OP_oneTr_p_1_0_0_Ir_1_C_1_n_1(double complex * op_out)
 {
 *op_out +=+(4.)*mom_def_Re_tr_paths[3]+(4.)*mom_def_Re_tr_paths[4];
@@ -839,6 +844,11 @@ OP_oneTr_p_0_0_0_Ir_3_C_1_n_2(numerical_op+2);
 OP_oneTr_p_0_0_0_Ir_3_C_1_n_4(numerical_op+3);
 }
 
+void eval_all_glueball_ops_p_0_0_0_Ir_4_C_m1(double complex * numerical_op)
+{
+OP_oneTr_p_0_0_0_Ir_4_C_m1_n_1(numerical_op+0);
+}
+
 void eval_all_glueball_ops_p_1_0_0_Ir_1_C_1(double complex * numerical_op)
 {
 OP_oneTr_p_1_0_0_Ir_1_C_1_n_1(numerical_op+0);
@@ -932,28 +942,36 @@ void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_stor
             listsent[lcor->list[icor].t1] = 0;
         }
 
-        if (listsent[lcor->list[icor].t2] == -1)
+      if (lcor->list[icor].t1 != lcor->list[icor].t2)
         {
-            gb2 = gb1_bf + total_n_glue_op * nblocking * listactive[lcor->list[icor].t2];
-            if (t2 != -1)
+            if (listsent[lcor->list[icor].t2] == -1)
             {
-                if (PID == 0)
+                gb2 = gb1_bf + total_n_glue_op * nblocking * listactive[lcor->list[icor].t2];
+                if (t2 != -1)
                 {
-                    memcpy(gb2, gb_storage + t2 * total_n_glue_op * nblocking, sizeof(double complex) * total_n_glue_op * nblocking);
-                    //gb2 = gb_storage + t2 * total_n_glue_op * nblocking;
+                    if (PID == 0)
+                    {
+                        memcpy(gb2, gb_storage + t2 * total_n_glue_op * nblocking, sizeof(double complex) * total_n_glue_op * nblocking);
+                        //gb2 = gb_storage + t2 * total_n_glue_op * nblocking;
+                    }
+                    else
+                    {
+                        MPI_Send(gb_storage + t2 * total_n_glue_op * nblocking, total_n_glue_op * nblocking * 2, MPI_DOUBLE, 0, GLB_T + lcor->list[icor].t2, cart_comm);
+                    }
                 }
-                else
-                {
-                    MPI_Send(gb_storage + t2 * total_n_glue_op * nblocking, total_n_glue_op * nblocking * 2, MPI_DOUBLE, 0, GLB_T + lcor->list[icor].t2, cart_comm);
-                }
-            }
 
-            if (PID == 0 && t2 == -1)
-            {
-                MPI_Recv(gb2, total_n_glue_op * nblocking * 2, MPI_DOUBLE, t_to_proc[lcor->list[icor].t2], GLB_T + lcor->list[icor].t2, cart_comm, &r2);
+                if (PID == 0 && t2 == -1)
+                {
+                    MPI_Recv(gb2, total_n_glue_op * nblocking * 2, MPI_DOUBLE, t_to_proc[lcor->list[icor].t2], GLB_T + lcor->list[icor].t2, cart_comm, &r2);
+                }
+                listsent[lcor->list[icor].t2] = 0;
             }
-            listsent[lcor->list[icor].t2] = 0;
         }
+        else
+        {
+            gb2=gb1;
+        }
+
 #else
         gb1 = gb_storage + t1 * total_n_glue_op * nblocking;
         gb2 = gb_storage + t2 * total_n_glue_op * nblocking;
@@ -1250,19 +1268,6 @@ totalsize = 0 ;
         totalsize += (nblocking * nblocking * 4);
     }
 
-    lprintf("Measure ML", 0, "\n1pt function P=(1,0,0) Irrep=A1Dic4 Irrep ev=1/1 Charge=+\n\n");
-    
-    for (n1 = 0; n1 < GLB_T; n1++)
-        if (listactive[n1] > 0)
-        {
-            lprintf("Measure ML", 0, " t=%d", n1);
-            for (n2 = 0; n2 < nblocking; n2++)
-                for (i = 6; i < 7; i++)
-                    lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
-                            cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
-            lprintf("Measure ML", 0, "\n");
-        }
-    
     b2 = 0;
     b1 = 0;
     

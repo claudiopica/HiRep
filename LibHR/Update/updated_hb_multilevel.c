@@ -291,7 +291,7 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
     int i, j;
     static double complex *one_point_gb;
     static double complex *cor_storage;
-    static int norm = 1;
+    static long double norm = 1.0;
     if (lev == 0)
     {
         if (dyn_gauge == NULL)

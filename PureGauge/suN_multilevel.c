@@ -37,6 +37,7 @@ pg_flow_ml flow = init_pg_flow_ml(flow);
 int main(int argc, char *argv[])
 {
   int i;
+  struct timeval start, end, etime; /* //for trajectory timing */
 
   setup_process(&argc, &argv);
 
@@ -46,21 +47,27 @@ int main(int argc, char *argv[])
   init_mc_ml(&flow, get_input_filename());
 
   /* Thermalization */
+  gettimeofday(&start, 0);
   for (i = 0; i < flow.therm; ++i)
   {
+
     update(flow.pg_v->beta, flow.pg_v->nhb, flow.pg_v->nor);
-    if ((i % 10) == 0)
-      lprintf("MAIN", 0, "%d", i);
-    else
-      lprintf("MAIN", 0, ".");
+    if (flow.therm > 20)
+    {
+      if (i % (flow.therm / 5) == 0)
+        lprintf("MAIN", 0, "%d", ((i * 100) / flow.therm));
+      else if (i % (flow.therm / 20) == 0)
+        lprintf("MAIN", 0, ".");
+    }
   }
+  gettimeofday(&end, 0);
+  timeval_subtract(&etime, &end, &start);
   if (i)
-    lprintf("MAIN", 0, "%d\nThermalization done.\n", i);
+    lprintf("MAIN", 0, "100\nThermalized %d Trajectories: [%ld sec %ld usec]\n", flow.therm, etime.tv_sec, etime.tv_usec);
 
   /* Measures */
   for (i = flow.start; i < flow.end; ++i)
   {
-    struct timeval start, end, etime; /* //for trajectory timing */
     lprintf("BLOCK", 0, " Start %d\n", i);
     lprintf("MAIN", 0, "ML Measure #%d...\n", i);
 

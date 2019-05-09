@@ -116,11 +116,8 @@ double complex spatial_plaquette_wrk()
 
   global_sum((double *)&pa, 2);
 
-#ifdef BC_T_OPEN
-  pa[k] /= NG * GLB_VOLUME * (GLB_T - 1) / GLB_T;
-#else
   pa /= NG * GLB_VOLUME;
-#endif
+
   return pa;
 }
 

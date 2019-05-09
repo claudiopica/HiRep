@@ -292,6 +292,15 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
 
     lprintf("INIT ML", 0, "Separation between each measure=%d\n", gf->nskip);
 
+
+    BCs_pars_t BCs_pars = {
+        .fermion_twisting_theta = {0., 0., 0., 0.},
+        .gauge_boundary_improvement_cs = 1.,
+        .gauge_boundary_improvement_ct = 1.,
+        .chiSF_boundary_improvement_ds = 1.,
+        .SF_BCs = 0};
+    init_BCs(&BCs_pars);
+    
     /* init gauge field */
     switch (start_t)
     {
@@ -310,13 +319,6 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
     apply_BCs_on_fundamental_gauge_field();
     represent_gauge_field();
 
-    BCs_pars_t BCs_pars = {
-        .fermion_twisting_theta = {0., 0., 0., 0.},
-        .gauge_boundary_improvement_cs = 1.,
-        .gauge_boundary_improvement_ct = 1.,
-        .chiSF_boundary_improvement_ds = 1.,
-        .SF_BCs = 0};
-    init_BCs(&BCs_pars);
 
     return 0;
 }

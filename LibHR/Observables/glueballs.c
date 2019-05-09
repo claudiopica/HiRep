@@ -15,12 +15,13 @@ void measure_1pt_glueballs(int nblocking, double *smear_val, double complex *gb_
     for (i = 0; i < nblocking; i++)
     {
 
-        wrk2 = single_level_spatial_blocking_wrkspace(wrk1);
+        wrk2 = spatial_APE_smear_wrkspace(smear_val, wrk1);
+        
 
         if (wrk1 != -1)
             release_wrk_space(wrk1);
 
-        wrk1 = spatial_APE_smear_wrkspace(smear_val, wrk2);
+        wrk1 = single_level_spatial_blocking_wrkspace(wrk2);
 
         release_wrk_space(wrk2);
 

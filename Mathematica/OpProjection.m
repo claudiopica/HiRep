@@ -229,7 +229,7 @@ IrrepName[0,0,0] = {A1plusOhP, A2plusOhP, EplusOhP, T1plusOhP, T2plusOhP,
     T2minusOhP};
 IrrepName[0,0,1] = {A1Dic4, A2Dic4, E2Dic4, B1Dic4, B2Dic4};
 IrrepName[0,1,1] = {A1Dic2, A2Dic2, B1Dic2, B2Dic2};
-IrrepName[0,1,1] = {A1Dic3, A2Dic3, EEDic3};
+IrrepName[1,1,1] = {A1Dic3, A2Dic3, EEDic3};
 
 dir[ax]=1;
 dir[-ax]=1;
@@ -732,28 +732,36 @@ void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_stor
             listsent[lcor->list[icor].t1] = 0;
         }
 
-        if (listsent[lcor->list[icor].t2] == -1)
+      if (lcor->list[icor].t1 != lcor->list[icor].t2)
         {
-            gb2 = gb1_bf + total_n_glue_op * nblocking * listactive[lcor->list[icor].t2];
-            if (t2 != -1)
+            if (listsent[lcor->list[icor].t2] == -1)
             {
-                if (PID == 0)
+                gb2 = gb1_bf + total_n_glue_op * nblocking * listactive[lcor->list[icor].t2];
+                if (t2 != -1)
                 {
-                    memcpy(gb2, gb_storage + t2 * total_n_glue_op * nblocking, sizeof(double complex) * total_n_glue_op * nblocking);
-                    //gb2 = gb_storage + t2 * total_n_glue_op * nblocking;
+                    if (PID == 0)
+                    {
+                        memcpy(gb2, gb_storage + t2 * total_n_glue_op * nblocking, sizeof(double complex) * total_n_glue_op * nblocking);
+                        //gb2 = gb_storage + t2 * total_n_glue_op * nblocking;
+                    }
+                    else
+                    {
+                        MPI_Send(gb_storage + t2 * total_n_glue_op * nblocking, total_n_glue_op * nblocking * 2, MPI_DOUBLE, 0, GLB_T + lcor->list[icor].t2, cart_comm);
+                    }
                 }
-                else
-                {
-                    MPI_Send(gb_storage + t2 * total_n_glue_op * nblocking, total_n_glue_op * nblocking * 2, MPI_DOUBLE, 0, GLB_T + lcor->list[icor].t2, cart_comm);
-                }
-            }
 
-            if (PID == 0 && t2 == -1)
-            {
-                MPI_Recv(gb2, total_n_glue_op * nblocking * 2, MPI_DOUBLE, t_to_proc[lcor->list[icor].t2], GLB_T + lcor->list[icor].t2, cart_comm, &r2);
+                if (PID == 0 && t2 == -1)
+                {
+                    MPI_Recv(gb2, total_n_glue_op * nblocking * 2, MPI_DOUBLE, t_to_proc[lcor->list[icor].t2], GLB_T + lcor->list[icor].t2, cart_comm, &r2);
+                }
+                listsent[lcor->list[icor].t2] = 0;
             }
-            listsent[lcor->list[icor].t2] = 0;
         }
+        else
+        {
+            gb2=gb1;
+        }
+
 #else
         gb1 = gb_storage + t1 * total_n_glue_op * nblocking;
         gb2 = gb_storage + t2 * total_n_glue_op * nblocking;
@@ -826,7 +834,7 @@ Do[
             cs=CorrelatorSize[px, py, pz, irrepidx, irrepev, charge];
             startbase+=cs;
             {Pxsort,Pysort,Pzsort}=Sort[{px,py,pz}//Abs];
-          If[irrepidx==1 && irrepev==1 && charge==+1,
+          If[irrepidx==1 && irrepev==1 && charge==+1 && px==0 && py ==0 && pz==0,
              WriteString[ar, "
     lprintf(\"Measure ML\", 0, \"\\n1pt function P=(",px,",", py,",", pz,") Irrep=",IrrepName[Pxsort,Pysort,Pzsort][[irrepidx]]," Irrep ev=",irrepev,"/",Length[bTOrthog[Pxsort,Pysort,Pzsort][[irrepidx]]]," Charge=",stcharge[charge],"\\n\\n\");
     
