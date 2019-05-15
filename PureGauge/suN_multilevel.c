@@ -63,8 +63,10 @@ int main(int argc, char *argv[])
   gettimeofday(&end, 0);
   timeval_subtract(&etime, &end, &start);
   if (i)
+  {
     lprintf("MAIN", 0, "100\nThermalized %d Trajectories: [%ld sec %ld usec]\n", flow.therm, etime.tv_sec, etime.tv_usec);
-
+    save_conf(&flow, 0);
+  }
   /* Measures */
   for (i = flow.start; i < flow.end; ++i)
   {

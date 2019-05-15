@@ -292,6 +292,8 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
     static double complex *one_point_gb;
     static double complex *cor_storage;
     static long double norm = 1.0;
+    struct timeval start, end, etime;
+
     if (lev == 0)
     {
         if (dyn_gauge == NULL)
@@ -303,6 +305,7 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
                 norm *= ml_up[i];
             norm *= GLB_VOL3 * NG;
         }
+        gettimeofday(&start, 0);
 
         memset(one_point_gb, 0, sizeof(double complex) * total_n_glue_op * nblocking * n_active_slices);
         memset(cor_storage, 0, sizeof(double complex) * nblocking * nblocking * lcor->n_corrs * total_corrs_size);
@@ -328,11 +331,21 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
             measure_1pt_glueballs(nblocking, smear_val, one_point_gb);
         }
     }
+
     if (lev == 0)
     {
+        gettimeofday(&end, 0);
+
+        timeval_subtract(&etime, &end, &start);
+        lprintf("HB MULTILEVEL", 0, "Update and 1pt measure done [%ld sec %ld usec]\n", etime.tv_sec, etime.tv_usec);
+
         for (i = 0; i < nblocking * n_active_slices * total_n_glue_op; i++)
             one_point_gb[i] /= norm;
 
         evaluate_correlators(lcor, nblocking, one_point_gb, cor_storage);
+        gettimeofday(&start, 0);
+        timeval_subtract(&etime, &start, &end);
+
+        lprintf("HB MULTILEVEL", 0, "2pt contraction done [%ld sec %ld usec]\n", etime.tv_sec, etime.tv_usec);
     }
 }
