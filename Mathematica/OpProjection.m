@@ -522,6 +522,7 @@ GenerateCchecks[]:=Module[{Op,OpTmp,irrepdim,RActiveOp,RMatrixOp,Pxsort,Pysort,P
   (**)
   WriteString[ar, "_suNg_trace(p,res);\nreturn p;\n}\n\n"];
   Close[ar];
+  WrittenPaths[idx]=1;
   ]
 
   GenerateCcode[]:=Module[{res},
@@ -580,8 +581,10 @@ GenerateCchecks[]:=Module[{Op,OpTmp,irrepdim,RActiveOp,RMatrixOp,Pxsort,Pysort,P
   WriteString[ar,"in = ipt(t, n_x, n_y, n_z);\nce = cexp(I * 2.0 * PI * (double)(n_x * px + n_y * py + n_z * pz) / GLB_X);\n"];
   WriteString[ar,"idx = npaths * (n_x + X * (n_y + Y * n_z));\n"];
   Do[ 
-    WriteString[ar,"path_storage[",i-1,"+idx]= path",i-1,"(in);\nmom_def_Re_tr_paths[",i-1,"]+=ce*creal(path_storage[",i-1,"+idx]);"];
-    WriteString[ar,"\nmom_def_Im_tr_paths[",i-1,"]+=I*ce*cimag(path_storage[",i-1,"+idx]);\n"];
+    If[NumberQ[WrittenPaths[i-1]],
+      WriteString[ar,"path_storage[",i-1,"+idx]= path",i-1,"(in);\nmom_def_Re_tr_paths[",i-1,"]+=ce*creal(path_storage[",i-1,"+idx]);"];
+      WriteString[ar,"\nmom_def_Im_tr_paths[",i-1,"]+=I*ce*cimag(path_storage[",i-1,"+idx]);\n"];
+    ];
   ,{i,1,pathindex}];
   WriteString[ar,"}\n}\nelse{\n"];
   WriteString[ar,"for (n_x = 0; n_x < X; n_x++)\nfor (n_y = 0; n_y < Y; n_y++)\nfor (n_z = 0; n_z < Z; n_z++)\n{\n"];
@@ -834,12 +837,13 @@ Do[
             cs=CorrelatorSize[px, py, pz, irrepidx, irrepev, charge];
             startbase+=cs;
             {Pxsort,Pysort,Pzsort}=Sort[{px,py,pz}//Abs];
-          If[irrepidx==1 && irrepev==1 && charge==+1 && px==0 && py ==0 && pz==0,
-             WriteString[ar, "
+
+          If[Not[irrepidx==1 && irrepev==1 && charge==+1 && px==0 && py ==0 && pz==0],WriteString[ar, "#ifdef ML_TUNING"]];
+          WriteString[ar, "
     lprintf(\"Measure ML\", 0, \"\\n1pt function P=(",px,",", py,",", pz,") Irrep=",IrrepName[Pxsort,Pysort,Pzsort][[irrepidx]]," Irrep ev=",irrepev,"/",Length[bTOrthog[Pxsort,Pysort,Pzsort][[irrepidx]]]," Charge=",stcharge[charge],"\\n\\n\");
     
     for (n1 = 0; n1 < GLB_T; n1++)
-        if (listactive[n1] > 0)
+        if (listactive[n1] > -1)
         {
             lprintf(\"Measure ML\", 0, \" t=%d\", n1);
             for (n2 = 0; n2 < nblocking; n2++)
@@ -848,9 +852,10 @@ Do[
                             cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
             lprintf(\"Measure ML\", 0, \"\\n\");
         }
-    "];
-          ];
-            WriteString[ar, "
+"];
+          If[Not[irrepidx==1 && irrepev==1 && charge==+1 && px==0 && py ==0 && pz==0],WriteString[ar, "#endif //ML_TUNING"]];
+
+          WriteString[ar, "
     b2 = 0;
     b1 = 0;
     

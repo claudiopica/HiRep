@@ -2452,9 +2452,9 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_m1_n_1(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_m1_n_1(double complex * op_out)
 {
-*op_out +=+mom_def_Im_tr_paths[97]+mom_def_Im_tr_paths[98]+mom_def_Im_tr_paths[99]+mom_def_Im_tr_paths[100]+mom_def_Im_tr_paths[101]+mom_def_Im_tr_paths[102]+mom_def_Im_tr_paths[103]+mom_def_Im_tr_paths[104]+mom_def_Im_tr_paths[105]+mom_def_Im_tr_paths[106]+mom_def_Im_tr_paths[107]+mom_def_Im_tr_paths[108]+mom_def_Im_tr_paths[109]+mom_def_Im_tr_paths[110]+mom_def_Im_tr_paths[111]+mom_def_Im_tr_paths[112]+mom_def_Im_tr_paths[113]+mom_def_Im_tr_paths[114]+mom_def_Im_tr_paths[115]+mom_def_Im_tr_paths[116]+mom_def_Im_tr_paths[117]+mom_def_Im_tr_paths[118]+mom_def_Im_tr_paths[119]+mom_def_Im_tr_paths[120]+mom_def_Im_tr_paths[121]+mom_def_Im_tr_paths[122]+mom_def_Im_tr_paths[123]+mom_def_Im_tr_paths[124]+mom_def_Im_tr_paths[125]+mom_def_Im_tr_paths[126]+mom_def_Im_tr_paths[127]+mom_def_Im_tr_paths[128]+mom_def_Im_tr_paths[129]+mom_def_Im_tr_paths[130]+mom_def_Im_tr_paths[131]+mom_def_Im_tr_paths[132]+mom_def_Im_tr_paths[133]+mom_def_Im_tr_paths[134]+mom_def_Im_tr_paths[135]+mom_def_Im_tr_paths[136]+mom_def_Im_tr_paths[137]+mom_def_Im_tr_paths[138]+mom_def_Im_tr_paths[139]+mom_def_Im_tr_paths[140]+mom_def_Im_tr_paths[141]+mom_def_Im_tr_paths[142]+mom_def_Im_tr_paths[143]+mom_def_Im_tr_paths[144];
+*op_out +=+mom_def_Im_tr_paths[97]+mom_def_Im_tr_paths[98]+mom_def_Im_tr_paths[99]+mom_def_Im_tr_paths[100]+mom_def_Im_tr_paths[101]+mom_def_Im_tr_paths[102]+mom_def_Im_tr_paths[103]+mom_def_Im_tr_paths[104]+mom_def_Im_tr_paths[105]+mom_def_Im_tr_paths[106]+mom_def_Im_tr_paths[107]+mom_def_Im_tr_paths[108]+mom_def_Im_tr_paths[109]+mom_def_Im_tr_paths[110]+mom_def_Im_tr_paths[111]+mom_def_Im_tr_paths[112]+mom_def_Im_tr_paths[113]+mom_def_Im_tr_paths[114]+mom_def_Im_tr_paths[115]+mom_def_Im_tr_paths[116]+mom_def_Im_tr_paths[117]+mom_def_Im_tr_paths[118]+mom_def_Im_tr_paths[119]+mom_def_Im_tr_paths[120]+mom_def_Im_tr_paths[121]+mom_def_Im_tr_paths[122]+mom_def_Im_tr_paths[123]+mom_def_Im_tr_paths[124]+mom_def_Im_tr_paths[125]+mom_def_Im_tr_paths[126]+mom_def_Im_tr_paths[127]+mom_def_Im_tr_paths[128]+(-2.)*mom_def_Im_tr_paths[129]+(-2.)*mom_def_Im_tr_paths[130]+(-2.)*mom_def_Im_tr_paths[131]+(-2.)*mom_def_Im_tr_paths[132]+(-2.)*mom_def_Im_tr_paths[133]+(-2.)*mom_def_Im_tr_paths[134]+(-2.)*mom_def_Im_tr_paths[135]+(-2.)*mom_def_Im_tr_paths[136]+(-2.)*mom_def_Im_tr_paths[137]+(-2.)*mom_def_Im_tr_paths[138]+(-2.)*mom_def_Im_tr_paths[139]+(-2.)*mom_def_Im_tr_paths[140]+(-2.)*mom_def_Im_tr_paths[141]+(-2.)*mom_def_Im_tr_paths[142]+(-2.)*mom_def_Im_tr_paths[143]+(-2.)*mom_def_Im_tr_paths[144];
 }
 
 static double complex path145(int in)
@@ -4497,9 +4497,9 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_m1_n_2(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_m1_n_2(double complex * op_out)
 {
-*op_out +=+mom_def_Im_tr_paths[145]+mom_def_Im_tr_paths[146]+mom_def_Im_tr_paths[147]+mom_def_Im_tr_paths[148]+mom_def_Im_tr_paths[149]+mom_def_Im_tr_paths[150]+mom_def_Im_tr_paths[151]+mom_def_Im_tr_paths[152]+mom_def_Im_tr_paths[153]+mom_def_Im_tr_paths[154]+mom_def_Im_tr_paths[155]+mom_def_Im_tr_paths[156]+mom_def_Im_tr_paths[157]+mom_def_Im_tr_paths[158]+mom_def_Im_tr_paths[159]+mom_def_Im_tr_paths[160]+mom_def_Im_tr_paths[161]+mom_def_Im_tr_paths[162]+mom_def_Im_tr_paths[163]+mom_def_Im_tr_paths[164]+mom_def_Im_tr_paths[165]+mom_def_Im_tr_paths[166]+mom_def_Im_tr_paths[167]+mom_def_Im_tr_paths[168]+mom_def_Im_tr_paths[169]+mom_def_Im_tr_paths[170]+mom_def_Im_tr_paths[171]+mom_def_Im_tr_paths[172]+mom_def_Im_tr_paths[173]+mom_def_Im_tr_paths[174]+mom_def_Im_tr_paths[175]+mom_def_Im_tr_paths[176]+mom_def_Im_tr_paths[177]+mom_def_Im_tr_paths[178]+mom_def_Im_tr_paths[179]+mom_def_Im_tr_paths[180]+mom_def_Im_tr_paths[181]+mom_def_Im_tr_paths[182]+mom_def_Im_tr_paths[183]+mom_def_Im_tr_paths[184]+mom_def_Im_tr_paths[185]+mom_def_Im_tr_paths[186]+mom_def_Im_tr_paths[187]+mom_def_Im_tr_paths[188]+mom_def_Im_tr_paths[189]+mom_def_Im_tr_paths[190]+mom_def_Im_tr_paths[191]+mom_def_Im_tr_paths[192];
+*op_out +=+mom_def_Im_tr_paths[145]+mom_def_Im_tr_paths[146]+mom_def_Im_tr_paths[147]+mom_def_Im_tr_paths[148]+mom_def_Im_tr_paths[149]+mom_def_Im_tr_paths[150]+mom_def_Im_tr_paths[151]+mom_def_Im_tr_paths[152]+mom_def_Im_tr_paths[153]+mom_def_Im_tr_paths[154]+mom_def_Im_tr_paths[155]+mom_def_Im_tr_paths[156]+mom_def_Im_tr_paths[157]+mom_def_Im_tr_paths[158]+mom_def_Im_tr_paths[159]+mom_def_Im_tr_paths[160]+mom_def_Im_tr_paths[161]+mom_def_Im_tr_paths[162]+mom_def_Im_tr_paths[163]+mom_def_Im_tr_paths[164]+mom_def_Im_tr_paths[165]+mom_def_Im_tr_paths[166]+mom_def_Im_tr_paths[167]+mom_def_Im_tr_paths[168]+mom_def_Im_tr_paths[169]+mom_def_Im_tr_paths[170]+mom_def_Im_tr_paths[171]+mom_def_Im_tr_paths[172]+mom_def_Im_tr_paths[173]+mom_def_Im_tr_paths[174]+mom_def_Im_tr_paths[175]+mom_def_Im_tr_paths[176]+(-2.)*mom_def_Im_tr_paths[177]+(-2.)*mom_def_Im_tr_paths[178]+(-2.)*mom_def_Im_tr_paths[179]+(-2.)*mom_def_Im_tr_paths[180]+(-2.)*mom_def_Im_tr_paths[181]+(-2.)*mom_def_Im_tr_paths[182]+(-2.)*mom_def_Im_tr_paths[183]+(-2.)*mom_def_Im_tr_paths[184]+(-2.)*mom_def_Im_tr_paths[185]+(-2.)*mom_def_Im_tr_paths[186]+(-2.)*mom_def_Im_tr_paths[187]+(-2.)*mom_def_Im_tr_paths[188]+(-2.)*mom_def_Im_tr_paths[189]+(-2.)*mom_def_Im_tr_paths[190]+(-2.)*mom_def_Im_tr_paths[191]+(-2.)*mom_def_Im_tr_paths[192];
 }
 
 static double complex path205(int in)
@@ -5546,9 +5546,9 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_m1_n_3(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_m1_n_3(double complex * op_out)
 {
-*op_out +=+(2.)*mom_def_Im_tr_paths[205]+(2.)*mom_def_Im_tr_paths[206]+(2.)*mom_def_Im_tr_paths[207]+(2.)*mom_def_Im_tr_paths[208]+(2.)*mom_def_Im_tr_paths[209]+(2.)*mom_def_Im_tr_paths[210]+(2.)*mom_def_Im_tr_paths[211]+(2.)*mom_def_Im_tr_paths[212]+(2.)*mom_def_Im_tr_paths[213]+(2.)*mom_def_Im_tr_paths[214]+(2.)*mom_def_Im_tr_paths[215]+(2.)*mom_def_Im_tr_paths[216]+(2.)*mom_def_Im_tr_paths[217]+(2.)*mom_def_Im_tr_paths[218]+(2.)*mom_def_Im_tr_paths[219]+(2.)*mom_def_Im_tr_paths[220]+(2.)*mom_def_Im_tr_paths[221]+(2.)*mom_def_Im_tr_paths[222]+(2.)*mom_def_Im_tr_paths[223]+(2.)*mom_def_Im_tr_paths[224]+(2.)*mom_def_Im_tr_paths[225]+(2.)*mom_def_Im_tr_paths[226]+(2.)*mom_def_Im_tr_paths[227]+(2.)*mom_def_Im_tr_paths[228];
+*op_out +=+(2.)*mom_def_Im_tr_paths[205]+(2.)*mom_def_Im_tr_paths[206]+(2.)*mom_def_Im_tr_paths[207]+(2.)*mom_def_Im_tr_paths[208]+(2.)*mom_def_Im_tr_paths[209]+(2.)*mom_def_Im_tr_paths[210]+(2.)*mom_def_Im_tr_paths[211]+(2.)*mom_def_Im_tr_paths[212]+(2.)*mom_def_Im_tr_paths[213]+(2.)*mom_def_Im_tr_paths[214]+(2.)*mom_def_Im_tr_paths[215]+(2.)*mom_def_Im_tr_paths[216]+(2.)*mom_def_Im_tr_paths[217]+(2.)*mom_def_Im_tr_paths[218]+(2.)*mom_def_Im_tr_paths[219]+(2.)*mom_def_Im_tr_paths[220]+(-4.)*mom_def_Im_tr_paths[221]+(-4.)*mom_def_Im_tr_paths[222]+(-4.)*mom_def_Im_tr_paths[223]+(-4.)*mom_def_Im_tr_paths[224]+(-4.)*mom_def_Im_tr_paths[225]+(-4.)*mom_def_Im_tr_paths[226]+(-4.)*mom_def_Im_tr_paths[227]+(-4.)*mom_def_Im_tr_paths[228];
 }
 
 static double complex path253(int in)
@@ -6763,9 +6763,9 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_m1_n_4(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_m1_n_4(double complex * op_out)
 {
-*op_out +=+(2.)*mom_def_Im_tr_paths[253]+(2.)*mom_def_Im_tr_paths[254]+(2.)*mom_def_Im_tr_paths[255]+(2.)*mom_def_Im_tr_paths[256]+(2.)*mom_def_Im_tr_paths[257]+(2.)*mom_def_Im_tr_paths[258]+(2.)*mom_def_Im_tr_paths[259]+(2.)*mom_def_Im_tr_paths[260]+(2.)*mom_def_Im_tr_paths[261]+(2.)*mom_def_Im_tr_paths[262]+(2.)*mom_def_Im_tr_paths[263]+(2.)*mom_def_Im_tr_paths[264]+(2.)*mom_def_Im_tr_paths[265]+(2.)*mom_def_Im_tr_paths[266]+(2.)*mom_def_Im_tr_paths[267]+(2.)*mom_def_Im_tr_paths[268]+(2.)*mom_def_Im_tr_paths[269]+(2.)*mom_def_Im_tr_paths[270]+(2.)*mom_def_Im_tr_paths[271]+(2.)*mom_def_Im_tr_paths[272]+(2.)*mom_def_Im_tr_paths[273]+(2.)*mom_def_Im_tr_paths[274]+(2.)*mom_def_Im_tr_paths[275]+(2.)*mom_def_Im_tr_paths[276];
+*op_out +=+(2.)*mom_def_Im_tr_paths[253]+(2.)*mom_def_Im_tr_paths[254]+(2.)*mom_def_Im_tr_paths[255]+(2.)*mom_def_Im_tr_paths[256]+(2.)*mom_def_Im_tr_paths[257]+(2.)*mom_def_Im_tr_paths[258]+(2.)*mom_def_Im_tr_paths[259]+(2.)*mom_def_Im_tr_paths[260]+(2.)*mom_def_Im_tr_paths[261]+(2.)*mom_def_Im_tr_paths[262]+(2.)*mom_def_Im_tr_paths[263]+(2.)*mom_def_Im_tr_paths[264]+(2.)*mom_def_Im_tr_paths[265]+(2.)*mom_def_Im_tr_paths[266]+(2.)*mom_def_Im_tr_paths[267]+(2.)*mom_def_Im_tr_paths[268]+(-4.)*mom_def_Im_tr_paths[269]+(-4.)*mom_def_Im_tr_paths[270]+(-4.)*mom_def_Im_tr_paths[271]+(-4.)*mom_def_Im_tr_paths[272]+(-4.)*mom_def_Im_tr_paths[273]+(-4.)*mom_def_Im_tr_paths[274]+(-4.)*mom_def_Im_tr_paths[275]+(-4.)*mom_def_Im_tr_paths[276];
 }
 
 static double complex path277(int in)
@@ -9192,9 +9192,9 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_m1_n_5(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_m1_n_5(double complex * op_out)
 {
-*op_out +=+mom_def_Im_tr_paths[277]+mom_def_Im_tr_paths[278]+mom_def_Im_tr_paths[279]+mom_def_Im_tr_paths[280]+mom_def_Im_tr_paths[281]+mom_def_Im_tr_paths[282]+mom_def_Im_tr_paths[283]+mom_def_Im_tr_paths[284]+mom_def_Im_tr_paths[285]+mom_def_Im_tr_paths[286]+mom_def_Im_tr_paths[287]+mom_def_Im_tr_paths[288]+mom_def_Im_tr_paths[289]+mom_def_Im_tr_paths[290]+mom_def_Im_tr_paths[291]+mom_def_Im_tr_paths[292]+mom_def_Im_tr_paths[293]+mom_def_Im_tr_paths[294]+mom_def_Im_tr_paths[295]+mom_def_Im_tr_paths[296]+mom_def_Im_tr_paths[297]+mom_def_Im_tr_paths[298]+mom_def_Im_tr_paths[299]+mom_def_Im_tr_paths[300]+mom_def_Im_tr_paths[301]+mom_def_Im_tr_paths[302]+mom_def_Im_tr_paths[303]+mom_def_Im_tr_paths[304]+mom_def_Im_tr_paths[305]+mom_def_Im_tr_paths[306]+mom_def_Im_tr_paths[307]+mom_def_Im_tr_paths[308]+mom_def_Im_tr_paths[309]+mom_def_Im_tr_paths[310]+mom_def_Im_tr_paths[311]+mom_def_Im_tr_paths[312]+mom_def_Im_tr_paths[313]+mom_def_Im_tr_paths[314]+mom_def_Im_tr_paths[315]+mom_def_Im_tr_paths[316]+mom_def_Im_tr_paths[317]+mom_def_Im_tr_paths[318]+mom_def_Im_tr_paths[319]+mom_def_Im_tr_paths[320]+mom_def_Im_tr_paths[321]+mom_def_Im_tr_paths[322]+mom_def_Im_tr_paths[323]+mom_def_Im_tr_paths[324];
+*op_out +=+mom_def_Im_tr_paths[277]+mom_def_Im_tr_paths[278]+mom_def_Im_tr_paths[279]+mom_def_Im_tr_paths[280]+mom_def_Im_tr_paths[281]+mom_def_Im_tr_paths[282]+mom_def_Im_tr_paths[283]+mom_def_Im_tr_paths[284]+mom_def_Im_tr_paths[285]+mom_def_Im_tr_paths[286]+mom_def_Im_tr_paths[287]+mom_def_Im_tr_paths[288]+mom_def_Im_tr_paths[289]+mom_def_Im_tr_paths[290]+mom_def_Im_tr_paths[291]+mom_def_Im_tr_paths[292]+mom_def_Im_tr_paths[293]+mom_def_Im_tr_paths[294]+mom_def_Im_tr_paths[295]+mom_def_Im_tr_paths[296]+mom_def_Im_tr_paths[297]+mom_def_Im_tr_paths[298]+mom_def_Im_tr_paths[299]+mom_def_Im_tr_paths[300]+mom_def_Im_tr_paths[301]+mom_def_Im_tr_paths[302]+mom_def_Im_tr_paths[303]+mom_def_Im_tr_paths[304]+mom_def_Im_tr_paths[305]+mom_def_Im_tr_paths[306]+mom_def_Im_tr_paths[307]+mom_def_Im_tr_paths[308]+(-2.)*mom_def_Im_tr_paths[309]+(-2.)*mom_def_Im_tr_paths[310]+(-2.)*mom_def_Im_tr_paths[311]+(-2.)*mom_def_Im_tr_paths[312]+(-2.)*mom_def_Im_tr_paths[313]+(-2.)*mom_def_Im_tr_paths[314]+(-2.)*mom_def_Im_tr_paths[315]+(-2.)*mom_def_Im_tr_paths[316]+(-2.)*mom_def_Im_tr_paths[317]+(-2.)*mom_def_Im_tr_paths[318]+(-2.)*mom_def_Im_tr_paths[319]+(-2.)*mom_def_Im_tr_paths[320]+(-2.)*mom_def_Im_tr_paths[321]+(-2.)*mom_def_Im_tr_paths[322]+(-2.)*mom_def_Im_tr_paths[323]+(-2.)*mom_def_Im_tr_paths[324];
 }
 
 static double complex path325(int in)
@@ -11621,9 +11621,9 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_m1_n_6(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_m1_n_6(double complex * op_out)
 {
-*op_out +=+mom_def_Im_tr_paths[325]+mom_def_Im_tr_paths[326]+mom_def_Im_tr_paths[327]+mom_def_Im_tr_paths[328]+mom_def_Im_tr_paths[329]+mom_def_Im_tr_paths[330]+mom_def_Im_tr_paths[331]+mom_def_Im_tr_paths[332]+mom_def_Im_tr_paths[333]+mom_def_Im_tr_paths[334]+mom_def_Im_tr_paths[335]+mom_def_Im_tr_paths[336]+mom_def_Im_tr_paths[337]+mom_def_Im_tr_paths[338]+mom_def_Im_tr_paths[339]+mom_def_Im_tr_paths[340]+mom_def_Im_tr_paths[341]+mom_def_Im_tr_paths[342]+mom_def_Im_tr_paths[343]+mom_def_Im_tr_paths[344]+mom_def_Im_tr_paths[345]+mom_def_Im_tr_paths[346]+mom_def_Im_tr_paths[347]+mom_def_Im_tr_paths[348]+mom_def_Im_tr_paths[349]+mom_def_Im_tr_paths[350]+mom_def_Im_tr_paths[351]+mom_def_Im_tr_paths[352]+mom_def_Im_tr_paths[353]+mom_def_Im_tr_paths[354]+mom_def_Im_tr_paths[355]+mom_def_Im_tr_paths[356]+mom_def_Im_tr_paths[357]+mom_def_Im_tr_paths[358]+mom_def_Im_tr_paths[359]+mom_def_Im_tr_paths[360]+mom_def_Im_tr_paths[361]+mom_def_Im_tr_paths[362]+mom_def_Im_tr_paths[363]+mom_def_Im_tr_paths[364]+mom_def_Im_tr_paths[365]+mom_def_Im_tr_paths[366]+mom_def_Im_tr_paths[367]+mom_def_Im_tr_paths[368]+mom_def_Im_tr_paths[369]+mom_def_Im_tr_paths[370]+mom_def_Im_tr_paths[371]+mom_def_Im_tr_paths[372];
+*op_out +=+mom_def_Im_tr_paths[325]+mom_def_Im_tr_paths[326]+mom_def_Im_tr_paths[327]+mom_def_Im_tr_paths[328]+mom_def_Im_tr_paths[329]+mom_def_Im_tr_paths[330]+mom_def_Im_tr_paths[331]+mom_def_Im_tr_paths[332]+mom_def_Im_tr_paths[333]+mom_def_Im_tr_paths[334]+mom_def_Im_tr_paths[335]+mom_def_Im_tr_paths[336]+mom_def_Im_tr_paths[337]+mom_def_Im_tr_paths[338]+mom_def_Im_tr_paths[339]+mom_def_Im_tr_paths[340]+mom_def_Im_tr_paths[341]+mom_def_Im_tr_paths[342]+mom_def_Im_tr_paths[343]+mom_def_Im_tr_paths[344]+mom_def_Im_tr_paths[345]+mom_def_Im_tr_paths[346]+mom_def_Im_tr_paths[347]+mom_def_Im_tr_paths[348]+mom_def_Im_tr_paths[349]+mom_def_Im_tr_paths[350]+mom_def_Im_tr_paths[351]+mom_def_Im_tr_paths[352]+mom_def_Im_tr_paths[353]+mom_def_Im_tr_paths[354]+mom_def_Im_tr_paths[355]+mom_def_Im_tr_paths[356]+(-2.)*mom_def_Im_tr_paths[357]+(-2.)*mom_def_Im_tr_paths[358]+(-2.)*mom_def_Im_tr_paths[359]+(-2.)*mom_def_Im_tr_paths[360]+(-2.)*mom_def_Im_tr_paths[361]+(-2.)*mom_def_Im_tr_paths[362]+(-2.)*mom_def_Im_tr_paths[363]+(-2.)*mom_def_Im_tr_paths[364]+(-2.)*mom_def_Im_tr_paths[365]+(-2.)*mom_def_Im_tr_paths[366]+(-2.)*mom_def_Im_tr_paths[367]+(-2.)*mom_def_Im_tr_paths[368]+(-2.)*mom_def_Im_tr_paths[369]+(-2.)*mom_def_Im_tr_paths[370]+(-2.)*mom_def_Im_tr_paths[371]+(-2.)*mom_def_Im_tr_paths[372];
 }
 
 static double complex path373(int in)
@@ -14050,9 +14050,9 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_m1_n_7(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_m1_n_7(double complex * op_out)
 {
-*op_out +=+mom_def_Im_tr_paths[373]+mom_def_Im_tr_paths[374]+mom_def_Im_tr_paths[375]+mom_def_Im_tr_paths[376]+mom_def_Im_tr_paths[377]+mom_def_Im_tr_paths[378]+mom_def_Im_tr_paths[379]+mom_def_Im_tr_paths[380]+mom_def_Im_tr_paths[381]+mom_def_Im_tr_paths[382]+mom_def_Im_tr_paths[383]+mom_def_Im_tr_paths[384]+mom_def_Im_tr_paths[385]+mom_def_Im_tr_paths[386]+mom_def_Im_tr_paths[387]+mom_def_Im_tr_paths[388]+mom_def_Im_tr_paths[389]+mom_def_Im_tr_paths[390]+mom_def_Im_tr_paths[391]+mom_def_Im_tr_paths[392]+mom_def_Im_tr_paths[393]+mom_def_Im_tr_paths[394]+mom_def_Im_tr_paths[395]+mom_def_Im_tr_paths[396]+mom_def_Im_tr_paths[397]+mom_def_Im_tr_paths[398]+mom_def_Im_tr_paths[399]+mom_def_Im_tr_paths[400]+mom_def_Im_tr_paths[401]+mom_def_Im_tr_paths[402]+mom_def_Im_tr_paths[403]+mom_def_Im_tr_paths[404]+mom_def_Im_tr_paths[405]+mom_def_Im_tr_paths[406]+mom_def_Im_tr_paths[407]+mom_def_Im_tr_paths[408]+mom_def_Im_tr_paths[409]+mom_def_Im_tr_paths[410]+mom_def_Im_tr_paths[411]+mom_def_Im_tr_paths[412]+mom_def_Im_tr_paths[413]+mom_def_Im_tr_paths[414]+mom_def_Im_tr_paths[415]+mom_def_Im_tr_paths[416]+mom_def_Im_tr_paths[417]+mom_def_Im_tr_paths[418]+mom_def_Im_tr_paths[419]+mom_def_Im_tr_paths[420];
+*op_out +=+mom_def_Im_tr_paths[373]+mom_def_Im_tr_paths[374]+mom_def_Im_tr_paths[375]+mom_def_Im_tr_paths[376]+mom_def_Im_tr_paths[377]+mom_def_Im_tr_paths[378]+mom_def_Im_tr_paths[379]+mom_def_Im_tr_paths[380]+mom_def_Im_tr_paths[381]+mom_def_Im_tr_paths[382]+mom_def_Im_tr_paths[383]+mom_def_Im_tr_paths[384]+mom_def_Im_tr_paths[385]+mom_def_Im_tr_paths[386]+mom_def_Im_tr_paths[387]+mom_def_Im_tr_paths[388]+mom_def_Im_tr_paths[389]+mom_def_Im_tr_paths[390]+mom_def_Im_tr_paths[391]+mom_def_Im_tr_paths[392]+mom_def_Im_tr_paths[393]+mom_def_Im_tr_paths[394]+mom_def_Im_tr_paths[395]+mom_def_Im_tr_paths[396]+mom_def_Im_tr_paths[397]+mom_def_Im_tr_paths[398]+mom_def_Im_tr_paths[399]+mom_def_Im_tr_paths[400]+mom_def_Im_tr_paths[401]+mom_def_Im_tr_paths[402]+mom_def_Im_tr_paths[403]+mom_def_Im_tr_paths[404]+(-2.)*mom_def_Im_tr_paths[405]+(-2.)*mom_def_Im_tr_paths[406]+(-2.)*mom_def_Im_tr_paths[407]+(-2.)*mom_def_Im_tr_paths[408]+(-2.)*mom_def_Im_tr_paths[409]+(-2.)*mom_def_Im_tr_paths[410]+(-2.)*mom_def_Im_tr_paths[411]+(-2.)*mom_def_Im_tr_paths[412]+(-2.)*mom_def_Im_tr_paths[413]+(-2.)*mom_def_Im_tr_paths[414]+(-2.)*mom_def_Im_tr_paths[415]+(-2.)*mom_def_Im_tr_paths[416]+(-2.)*mom_def_Im_tr_paths[417]+(-2.)*mom_def_Im_tr_paths[418]+(-2.)*mom_def_Im_tr_paths[419]+(-2.)*mom_def_Im_tr_paths[420];
 }
 
 static double complex path445(int in)
@@ -16479,9 +16479,9 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_m1_n_8(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_m1_n_8(double complex * op_out)
 {
-*op_out +=+mom_def_Im_tr_paths[445]+mom_def_Im_tr_paths[446]+mom_def_Im_tr_paths[447]+mom_def_Im_tr_paths[448]+mom_def_Im_tr_paths[449]+mom_def_Im_tr_paths[450]+mom_def_Im_tr_paths[451]+mom_def_Im_tr_paths[452]+mom_def_Im_tr_paths[453]+mom_def_Im_tr_paths[454]+mom_def_Im_tr_paths[455]+mom_def_Im_tr_paths[456]+mom_def_Im_tr_paths[457]+mom_def_Im_tr_paths[458]+mom_def_Im_tr_paths[459]+mom_def_Im_tr_paths[460]+mom_def_Im_tr_paths[461]+mom_def_Im_tr_paths[462]+mom_def_Im_tr_paths[463]+mom_def_Im_tr_paths[464]+mom_def_Im_tr_paths[465]+mom_def_Im_tr_paths[466]+mom_def_Im_tr_paths[467]+mom_def_Im_tr_paths[468]+mom_def_Im_tr_paths[469]+mom_def_Im_tr_paths[470]+mom_def_Im_tr_paths[471]+mom_def_Im_tr_paths[472]+mom_def_Im_tr_paths[473]+mom_def_Im_tr_paths[474]+mom_def_Im_tr_paths[475]+mom_def_Im_tr_paths[476]+mom_def_Im_tr_paths[477]+mom_def_Im_tr_paths[478]+mom_def_Im_tr_paths[479]+mom_def_Im_tr_paths[480]+mom_def_Im_tr_paths[481]+mom_def_Im_tr_paths[482]+mom_def_Im_tr_paths[483]+mom_def_Im_tr_paths[484]+mom_def_Im_tr_paths[485]+mom_def_Im_tr_paths[486]+mom_def_Im_tr_paths[487]+mom_def_Im_tr_paths[488]+mom_def_Im_tr_paths[489]+mom_def_Im_tr_paths[490]+mom_def_Im_tr_paths[491]+mom_def_Im_tr_paths[492];
+*op_out +=+mom_def_Im_tr_paths[445]+mom_def_Im_tr_paths[446]+mom_def_Im_tr_paths[447]+mom_def_Im_tr_paths[448]+mom_def_Im_tr_paths[449]+mom_def_Im_tr_paths[450]+mom_def_Im_tr_paths[451]+mom_def_Im_tr_paths[452]+mom_def_Im_tr_paths[453]+mom_def_Im_tr_paths[454]+mom_def_Im_tr_paths[455]+mom_def_Im_tr_paths[456]+mom_def_Im_tr_paths[457]+mom_def_Im_tr_paths[458]+mom_def_Im_tr_paths[459]+mom_def_Im_tr_paths[460]+mom_def_Im_tr_paths[461]+mom_def_Im_tr_paths[462]+mom_def_Im_tr_paths[463]+mom_def_Im_tr_paths[464]+mom_def_Im_tr_paths[465]+mom_def_Im_tr_paths[466]+mom_def_Im_tr_paths[467]+mom_def_Im_tr_paths[468]+mom_def_Im_tr_paths[469]+mom_def_Im_tr_paths[470]+mom_def_Im_tr_paths[471]+mom_def_Im_tr_paths[472]+mom_def_Im_tr_paths[473]+mom_def_Im_tr_paths[474]+mom_def_Im_tr_paths[475]+mom_def_Im_tr_paths[476]+(-2.)*mom_def_Im_tr_paths[477]+(-2.)*mom_def_Im_tr_paths[478]+(-2.)*mom_def_Im_tr_paths[479]+(-2.)*mom_def_Im_tr_paths[480]+(-2.)*mom_def_Im_tr_paths[481]+(-2.)*mom_def_Im_tr_paths[482]+(-2.)*mom_def_Im_tr_paths[483]+(-2.)*mom_def_Im_tr_paths[484]+(-2.)*mom_def_Im_tr_paths[485]+(-2.)*mom_def_Im_tr_paths[486]+(-2.)*mom_def_Im_tr_paths[487]+(-2.)*mom_def_Im_tr_paths[488]+(-2.)*mom_def_Im_tr_paths[489]+(-2.)*mom_def_Im_tr_paths[490]+(-2.)*mom_def_Im_tr_paths[491]+(-2.)*mom_def_Im_tr_paths[492];
 }
 
 static double complex path517(int in)
@@ -17696,9 +17696,9 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_m1_n_9(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_m1_n_9(double complex * op_out)
 {
-*op_out +=+(2.)*mom_def_Im_tr_paths[517]+(2.)*mom_def_Im_tr_paths[518]+(2.)*mom_def_Im_tr_paths[519]+(2.)*mom_def_Im_tr_paths[520]+(2.)*mom_def_Im_tr_paths[521]+(2.)*mom_def_Im_tr_paths[522]+(2.)*mom_def_Im_tr_paths[523]+(2.)*mom_def_Im_tr_paths[524]+(2.)*mom_def_Im_tr_paths[525]+(2.)*mom_def_Im_tr_paths[526]+(2.)*mom_def_Im_tr_paths[527]+(2.)*mom_def_Im_tr_paths[528]+(2.)*mom_def_Im_tr_paths[529]+(2.)*mom_def_Im_tr_paths[530]+(2.)*mom_def_Im_tr_paths[531]+(2.)*mom_def_Im_tr_paths[532]+(2.)*mom_def_Im_tr_paths[533]+(2.)*mom_def_Im_tr_paths[534]+(2.)*mom_def_Im_tr_paths[535]+(2.)*mom_def_Im_tr_paths[536]+(2.)*mom_def_Im_tr_paths[537]+(2.)*mom_def_Im_tr_paths[538]+(2.)*mom_def_Im_tr_paths[539]+(2.)*mom_def_Im_tr_paths[540];
+*op_out +=+(2.)*mom_def_Im_tr_paths[517]+(2.)*mom_def_Im_tr_paths[518]+(2.)*mom_def_Im_tr_paths[519]+(2.)*mom_def_Im_tr_paths[520]+(2.)*mom_def_Im_tr_paths[521]+(2.)*mom_def_Im_tr_paths[522]+(2.)*mom_def_Im_tr_paths[523]+(2.)*mom_def_Im_tr_paths[524]+(2.)*mom_def_Im_tr_paths[525]+(2.)*mom_def_Im_tr_paths[526]+(2.)*mom_def_Im_tr_paths[527]+(2.)*mom_def_Im_tr_paths[528]+(2.)*mom_def_Im_tr_paths[529]+(2.)*mom_def_Im_tr_paths[530]+(2.)*mom_def_Im_tr_paths[531]+(2.)*mom_def_Im_tr_paths[532]+(-4.)*mom_def_Im_tr_paths[533]+(-4.)*mom_def_Im_tr_paths[534]+(-4.)*mom_def_Im_tr_paths[535]+(-4.)*mom_def_Im_tr_paths[536]+(-4.)*mom_def_Im_tr_paths[537]+(-4.)*mom_def_Im_tr_paths[538]+(-4.)*mom_def_Im_tr_paths[539]+(-4.)*mom_def_Im_tr_paths[540];
 }
 
 static double complex path541(int in)
@@ -20125,9 +20125,9 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_m1_n_10(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_m1_n_10(double complex * op_out)
 {
-*op_out +=+mom_def_Im_tr_paths[541]+mom_def_Im_tr_paths[542]+mom_def_Im_tr_paths[543]+mom_def_Im_tr_paths[544]+mom_def_Im_tr_paths[545]+mom_def_Im_tr_paths[546]+mom_def_Im_tr_paths[547]+mom_def_Im_tr_paths[548]+mom_def_Im_tr_paths[549]+mom_def_Im_tr_paths[550]+mom_def_Im_tr_paths[551]+mom_def_Im_tr_paths[552]+mom_def_Im_tr_paths[553]+mom_def_Im_tr_paths[554]+mom_def_Im_tr_paths[555]+mom_def_Im_tr_paths[556]+mom_def_Im_tr_paths[557]+mom_def_Im_tr_paths[558]+mom_def_Im_tr_paths[559]+mom_def_Im_tr_paths[560]+mom_def_Im_tr_paths[561]+mom_def_Im_tr_paths[562]+mom_def_Im_tr_paths[563]+mom_def_Im_tr_paths[564]+mom_def_Im_tr_paths[565]+mom_def_Im_tr_paths[566]+mom_def_Im_tr_paths[567]+mom_def_Im_tr_paths[568]+mom_def_Im_tr_paths[569]+mom_def_Im_tr_paths[570]+mom_def_Im_tr_paths[571]+mom_def_Im_tr_paths[572]+mom_def_Im_tr_paths[573]+mom_def_Im_tr_paths[574]+mom_def_Im_tr_paths[575]+mom_def_Im_tr_paths[576]+mom_def_Im_tr_paths[577]+mom_def_Im_tr_paths[578]+mom_def_Im_tr_paths[579]+mom_def_Im_tr_paths[580]+mom_def_Im_tr_paths[581]+mom_def_Im_tr_paths[582]+mom_def_Im_tr_paths[583]+mom_def_Im_tr_paths[584]+mom_def_Im_tr_paths[585]+mom_def_Im_tr_paths[586]+mom_def_Im_tr_paths[587]+mom_def_Im_tr_paths[588];
+*op_out +=+mom_def_Im_tr_paths[541]+mom_def_Im_tr_paths[542]+mom_def_Im_tr_paths[543]+mom_def_Im_tr_paths[544]+mom_def_Im_tr_paths[545]+mom_def_Im_tr_paths[546]+mom_def_Im_tr_paths[547]+mom_def_Im_tr_paths[548]+mom_def_Im_tr_paths[549]+mom_def_Im_tr_paths[550]+mom_def_Im_tr_paths[551]+mom_def_Im_tr_paths[552]+mom_def_Im_tr_paths[553]+mom_def_Im_tr_paths[554]+mom_def_Im_tr_paths[555]+mom_def_Im_tr_paths[556]+mom_def_Im_tr_paths[557]+mom_def_Im_tr_paths[558]+mom_def_Im_tr_paths[559]+mom_def_Im_tr_paths[560]+mom_def_Im_tr_paths[561]+mom_def_Im_tr_paths[562]+mom_def_Im_tr_paths[563]+mom_def_Im_tr_paths[564]+mom_def_Im_tr_paths[565]+mom_def_Im_tr_paths[566]+mom_def_Im_tr_paths[567]+mom_def_Im_tr_paths[568]+mom_def_Im_tr_paths[569]+mom_def_Im_tr_paths[570]+mom_def_Im_tr_paths[571]+mom_def_Im_tr_paths[572]+(-2.)*mom_def_Im_tr_paths[573]+(-2.)*mom_def_Im_tr_paths[574]+(-2.)*mom_def_Im_tr_paths[575]+(-2.)*mom_def_Im_tr_paths[576]+(-2.)*mom_def_Im_tr_paths[577]+(-2.)*mom_def_Im_tr_paths[578]+(-2.)*mom_def_Im_tr_paths[579]+(-2.)*mom_def_Im_tr_paths[580]+(-2.)*mom_def_Im_tr_paths[581]+(-2.)*mom_def_Im_tr_paths[582]+(-2.)*mom_def_Im_tr_paths[583]+(-2.)*mom_def_Im_tr_paths[584]+(-2.)*mom_def_Im_tr_paths[585]+(-2.)*mom_def_Im_tr_paths[586]+(-2.)*mom_def_Im_tr_paths[587]+(-2.)*mom_def_Im_tr_paths[588];
 }
 
 static double complex path589(int in)
@@ -21342,9 +21342,9 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_m1_n_11(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_m1_n_11(double complex * op_out)
 {
-*op_out +=+(2.)*mom_def_Im_tr_paths[589]+(2.)*mom_def_Im_tr_paths[590]+(2.)*mom_def_Im_tr_paths[591]+(2.)*mom_def_Im_tr_paths[592]+(2.)*mom_def_Im_tr_paths[593]+(2.)*mom_def_Im_tr_paths[594]+(2.)*mom_def_Im_tr_paths[595]+(2.)*mom_def_Im_tr_paths[596]+(2.)*mom_def_Im_tr_paths[597]+(2.)*mom_def_Im_tr_paths[598]+(2.)*mom_def_Im_tr_paths[599]+(2.)*mom_def_Im_tr_paths[600]+(2.)*mom_def_Im_tr_paths[601]+(2.)*mom_def_Im_tr_paths[602]+(2.)*mom_def_Im_tr_paths[603]+(2.)*mom_def_Im_tr_paths[604]+(2.)*mom_def_Im_tr_paths[605]+(2.)*mom_def_Im_tr_paths[606]+(2.)*mom_def_Im_tr_paths[607]+(2.)*mom_def_Im_tr_paths[608]+(2.)*mom_def_Im_tr_paths[609]+(2.)*mom_def_Im_tr_paths[610]+(2.)*mom_def_Im_tr_paths[611]+(2.)*mom_def_Im_tr_paths[612];
+*op_out +=+(2.)*mom_def_Im_tr_paths[589]+(2.)*mom_def_Im_tr_paths[590]+(2.)*mom_def_Im_tr_paths[591]+(2.)*mom_def_Im_tr_paths[592]+(2.)*mom_def_Im_tr_paths[593]+(2.)*mom_def_Im_tr_paths[594]+(2.)*mom_def_Im_tr_paths[595]+(2.)*mom_def_Im_tr_paths[596]+(2.)*mom_def_Im_tr_paths[597]+(2.)*mom_def_Im_tr_paths[598]+(2.)*mom_def_Im_tr_paths[599]+(2.)*mom_def_Im_tr_paths[600]+(2.)*mom_def_Im_tr_paths[601]+(2.)*mom_def_Im_tr_paths[602]+(2.)*mom_def_Im_tr_paths[603]+(2.)*mom_def_Im_tr_paths[604]+(-4.)*mom_def_Im_tr_paths[605]+(-4.)*mom_def_Im_tr_paths[606]+(-4.)*mom_def_Im_tr_paths[607]+(-4.)*mom_def_Im_tr_paths[608]+(-4.)*mom_def_Im_tr_paths[609]+(-4.)*mom_def_Im_tr_paths[610]+(-4.)*mom_def_Im_tr_paths[611]+(-4.)*mom_def_Im_tr_paths[612];
 }
 
 static double complex path613(int in)
@@ -23771,9 +23771,9 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_m1_n_12(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_m1_n_12(double complex * op_out)
 {
-*op_out +=+mom_def_Im_tr_paths[613]+mom_def_Im_tr_paths[614]+mom_def_Im_tr_paths[615]+mom_def_Im_tr_paths[616]+mom_def_Im_tr_paths[617]+mom_def_Im_tr_paths[618]+mom_def_Im_tr_paths[619]+mom_def_Im_tr_paths[620]+mom_def_Im_tr_paths[621]+mom_def_Im_tr_paths[622]+mom_def_Im_tr_paths[623]+mom_def_Im_tr_paths[624]+mom_def_Im_tr_paths[625]+mom_def_Im_tr_paths[626]+mom_def_Im_tr_paths[627]+mom_def_Im_tr_paths[628]+mom_def_Im_tr_paths[629]+mom_def_Im_tr_paths[630]+mom_def_Im_tr_paths[631]+mom_def_Im_tr_paths[632]+mom_def_Im_tr_paths[633]+mom_def_Im_tr_paths[634]+mom_def_Im_tr_paths[635]+mom_def_Im_tr_paths[636]+mom_def_Im_tr_paths[637]+mom_def_Im_tr_paths[638]+mom_def_Im_tr_paths[639]+mom_def_Im_tr_paths[640]+mom_def_Im_tr_paths[641]+mom_def_Im_tr_paths[642]+mom_def_Im_tr_paths[643]+mom_def_Im_tr_paths[644]+mom_def_Im_tr_paths[645]+mom_def_Im_tr_paths[646]+mom_def_Im_tr_paths[647]+mom_def_Im_tr_paths[648]+mom_def_Im_tr_paths[649]+mom_def_Im_tr_paths[650]+mom_def_Im_tr_paths[651]+mom_def_Im_tr_paths[652]+mom_def_Im_tr_paths[653]+mom_def_Im_tr_paths[654]+mom_def_Im_tr_paths[655]+mom_def_Im_tr_paths[656]+mom_def_Im_tr_paths[657]+mom_def_Im_tr_paths[658]+mom_def_Im_tr_paths[659]+mom_def_Im_tr_paths[660];
+*op_out +=+mom_def_Im_tr_paths[613]+mom_def_Im_tr_paths[614]+mom_def_Im_tr_paths[615]+mom_def_Im_tr_paths[616]+mom_def_Im_tr_paths[617]+mom_def_Im_tr_paths[618]+mom_def_Im_tr_paths[619]+mom_def_Im_tr_paths[620]+mom_def_Im_tr_paths[621]+mom_def_Im_tr_paths[622]+mom_def_Im_tr_paths[623]+mom_def_Im_tr_paths[624]+mom_def_Im_tr_paths[625]+mom_def_Im_tr_paths[626]+mom_def_Im_tr_paths[627]+mom_def_Im_tr_paths[628]+mom_def_Im_tr_paths[629]+mom_def_Im_tr_paths[630]+mom_def_Im_tr_paths[631]+mom_def_Im_tr_paths[632]+mom_def_Im_tr_paths[633]+mom_def_Im_tr_paths[634]+mom_def_Im_tr_paths[635]+mom_def_Im_tr_paths[636]+mom_def_Im_tr_paths[637]+mom_def_Im_tr_paths[638]+mom_def_Im_tr_paths[639]+mom_def_Im_tr_paths[640]+mom_def_Im_tr_paths[641]+mom_def_Im_tr_paths[642]+mom_def_Im_tr_paths[643]+mom_def_Im_tr_paths[644]+(-2.)*mom_def_Im_tr_paths[645]+(-2.)*mom_def_Im_tr_paths[646]+(-2.)*mom_def_Im_tr_paths[647]+(-2.)*mom_def_Im_tr_paths[648]+(-2.)*mom_def_Im_tr_paths[649]+(-2.)*mom_def_Im_tr_paths[650]+(-2.)*mom_def_Im_tr_paths[651]+(-2.)*mom_def_Im_tr_paths[652]+(-2.)*mom_def_Im_tr_paths[653]+(-2.)*mom_def_Im_tr_paths[654]+(-2.)*mom_def_Im_tr_paths[655]+(-2.)*mom_def_Im_tr_paths[656]+(-2.)*mom_def_Im_tr_paths[657]+(-2.)*mom_def_Im_tr_paths[658]+(-2.)*mom_def_Im_tr_paths[659]+(-2.)*mom_def_Im_tr_paths[660];
 }
 
 static double complex path661(int in)
@@ -24988,9 +24988,9 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_m1_n_13(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_m1_n_13(double complex * op_out)
 {
-*op_out +=+(2.)*mom_def_Im_tr_paths[661]+(2.)*mom_def_Im_tr_paths[662]+(2.)*mom_def_Im_tr_paths[663]+(2.)*mom_def_Im_tr_paths[664]+(2.)*mom_def_Im_tr_paths[665]+(2.)*mom_def_Im_tr_paths[666]+(2.)*mom_def_Im_tr_paths[667]+(2.)*mom_def_Im_tr_paths[668]+(2.)*mom_def_Im_tr_paths[669]+(2.)*mom_def_Im_tr_paths[670]+(2.)*mom_def_Im_tr_paths[671]+(2.)*mom_def_Im_tr_paths[672]+(2.)*mom_def_Im_tr_paths[673]+(2.)*mom_def_Im_tr_paths[674]+(2.)*mom_def_Im_tr_paths[675]+(2.)*mom_def_Im_tr_paths[676]+(2.)*mom_def_Im_tr_paths[677]+(2.)*mom_def_Im_tr_paths[678]+(2.)*mom_def_Im_tr_paths[679]+(2.)*mom_def_Im_tr_paths[680]+(2.)*mom_def_Im_tr_paths[681]+(2.)*mom_def_Im_tr_paths[682]+(2.)*mom_def_Im_tr_paths[683]+(2.)*mom_def_Im_tr_paths[684];
+*op_out +=+(2.)*mom_def_Im_tr_paths[661]+(2.)*mom_def_Im_tr_paths[662]+(2.)*mom_def_Im_tr_paths[663]+(2.)*mom_def_Im_tr_paths[664]+(2.)*mom_def_Im_tr_paths[665]+(2.)*mom_def_Im_tr_paths[666]+(2.)*mom_def_Im_tr_paths[667]+(2.)*mom_def_Im_tr_paths[668]+(2.)*mom_def_Im_tr_paths[669]+(2.)*mom_def_Im_tr_paths[670]+(2.)*mom_def_Im_tr_paths[671]+(2.)*mom_def_Im_tr_paths[672]+(2.)*mom_def_Im_tr_paths[673]+(2.)*mom_def_Im_tr_paths[674]+(2.)*mom_def_Im_tr_paths[675]+(2.)*mom_def_Im_tr_paths[676]+(-4.)*mom_def_Im_tr_paths[677]+(-4.)*mom_def_Im_tr_paths[678]+(-4.)*mom_def_Im_tr_paths[679]+(-4.)*mom_def_Im_tr_paths[680]+(-4.)*mom_def_Im_tr_paths[681]+(-4.)*mom_def_Im_tr_paths[682]+(-4.)*mom_def_Im_tr_paths[683]+(-4.)*mom_def_Im_tr_paths[684];
 }
 
 static double complex path685(int in)
@@ -27417,9 +27417,9 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_m1_n_14(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_m1_n_14(double complex * op_out)
 {
-*op_out +=+mom_def_Im_tr_paths[685]+mom_def_Im_tr_paths[686]+mom_def_Im_tr_paths[687]+mom_def_Im_tr_paths[688]+mom_def_Im_tr_paths[689]+mom_def_Im_tr_paths[690]+mom_def_Im_tr_paths[691]+mom_def_Im_tr_paths[692]+mom_def_Im_tr_paths[693]+mom_def_Im_tr_paths[694]+mom_def_Im_tr_paths[695]+mom_def_Im_tr_paths[696]+mom_def_Im_tr_paths[697]+mom_def_Im_tr_paths[698]+mom_def_Im_tr_paths[699]+mom_def_Im_tr_paths[700]+mom_def_Im_tr_paths[701]+mom_def_Im_tr_paths[702]+mom_def_Im_tr_paths[703]+mom_def_Im_tr_paths[704]+mom_def_Im_tr_paths[705]+mom_def_Im_tr_paths[706]+mom_def_Im_tr_paths[707]+mom_def_Im_tr_paths[708]+mom_def_Im_tr_paths[709]+mom_def_Im_tr_paths[710]+mom_def_Im_tr_paths[711]+mom_def_Im_tr_paths[712]+mom_def_Im_tr_paths[713]+mom_def_Im_tr_paths[714]+mom_def_Im_tr_paths[715]+mom_def_Im_tr_paths[716]+mom_def_Im_tr_paths[717]+mom_def_Im_tr_paths[718]+mom_def_Im_tr_paths[719]+mom_def_Im_tr_paths[720]+mom_def_Im_tr_paths[721]+mom_def_Im_tr_paths[722]+mom_def_Im_tr_paths[723]+mom_def_Im_tr_paths[724]+mom_def_Im_tr_paths[725]+mom_def_Im_tr_paths[726]+mom_def_Im_tr_paths[727]+mom_def_Im_tr_paths[728]+mom_def_Im_tr_paths[729]+mom_def_Im_tr_paths[730]+mom_def_Im_tr_paths[731]+mom_def_Im_tr_paths[732];
+*op_out +=+mom_def_Im_tr_paths[685]+mom_def_Im_tr_paths[686]+mom_def_Im_tr_paths[687]+mom_def_Im_tr_paths[688]+mom_def_Im_tr_paths[689]+mom_def_Im_tr_paths[690]+mom_def_Im_tr_paths[691]+mom_def_Im_tr_paths[692]+mom_def_Im_tr_paths[693]+mom_def_Im_tr_paths[694]+mom_def_Im_tr_paths[695]+mom_def_Im_tr_paths[696]+mom_def_Im_tr_paths[697]+mom_def_Im_tr_paths[698]+mom_def_Im_tr_paths[699]+mom_def_Im_tr_paths[700]+mom_def_Im_tr_paths[701]+mom_def_Im_tr_paths[702]+mom_def_Im_tr_paths[703]+mom_def_Im_tr_paths[704]+mom_def_Im_tr_paths[705]+mom_def_Im_tr_paths[706]+mom_def_Im_tr_paths[707]+mom_def_Im_tr_paths[708]+mom_def_Im_tr_paths[709]+mom_def_Im_tr_paths[710]+mom_def_Im_tr_paths[711]+mom_def_Im_tr_paths[712]+mom_def_Im_tr_paths[713]+mom_def_Im_tr_paths[714]+mom_def_Im_tr_paths[715]+mom_def_Im_tr_paths[716]+(-2.)*mom_def_Im_tr_paths[717]+(-2.)*mom_def_Im_tr_paths[718]+(-2.)*mom_def_Im_tr_paths[719]+(-2.)*mom_def_Im_tr_paths[720]+(-2.)*mom_def_Im_tr_paths[721]+(-2.)*mom_def_Im_tr_paths[722]+(-2.)*mom_def_Im_tr_paths[723]+(-2.)*mom_def_Im_tr_paths[724]+(-2.)*mom_def_Im_tr_paths[725]+(-2.)*mom_def_Im_tr_paths[726]+(-2.)*mom_def_Im_tr_paths[727]+(-2.)*mom_def_Im_tr_paths[728]+(-2.)*mom_def_Im_tr_paths[729]+(-2.)*mom_def_Im_tr_paths[730]+(-2.)*mom_def_Im_tr_paths[731]+(-2.)*mom_def_Im_tr_paths[732];
 }
 
 static double complex path733(int in)
@@ -29846,9 +29846,9 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_m1_n_15(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_m1_n_15(double complex * op_out)
 {
-*op_out +=+mom_def_Im_tr_paths[733]+mom_def_Im_tr_paths[734]+mom_def_Im_tr_paths[735]+mom_def_Im_tr_paths[736]+mom_def_Im_tr_paths[737]+mom_def_Im_tr_paths[738]+mom_def_Im_tr_paths[739]+mom_def_Im_tr_paths[740]+mom_def_Im_tr_paths[741]+mom_def_Im_tr_paths[742]+mom_def_Im_tr_paths[743]+mom_def_Im_tr_paths[744]+mom_def_Im_tr_paths[745]+mom_def_Im_tr_paths[746]+mom_def_Im_tr_paths[747]+mom_def_Im_tr_paths[748]+mom_def_Im_tr_paths[749]+mom_def_Im_tr_paths[750]+mom_def_Im_tr_paths[751]+mom_def_Im_tr_paths[752]+mom_def_Im_tr_paths[753]+mom_def_Im_tr_paths[754]+mom_def_Im_tr_paths[755]+mom_def_Im_tr_paths[756]+mom_def_Im_tr_paths[757]+mom_def_Im_tr_paths[758]+mom_def_Im_tr_paths[759]+mom_def_Im_tr_paths[760]+mom_def_Im_tr_paths[761]+mom_def_Im_tr_paths[762]+mom_def_Im_tr_paths[763]+mom_def_Im_tr_paths[764]+mom_def_Im_tr_paths[765]+mom_def_Im_tr_paths[766]+mom_def_Im_tr_paths[767]+mom_def_Im_tr_paths[768]+mom_def_Im_tr_paths[769]+mom_def_Im_tr_paths[770]+mom_def_Im_tr_paths[771]+mom_def_Im_tr_paths[772]+mom_def_Im_tr_paths[773]+mom_def_Im_tr_paths[774]+mom_def_Im_tr_paths[775]+mom_def_Im_tr_paths[776]+mom_def_Im_tr_paths[777]+mom_def_Im_tr_paths[778]+mom_def_Im_tr_paths[779]+mom_def_Im_tr_paths[780];
+*op_out +=+mom_def_Im_tr_paths[733]+mom_def_Im_tr_paths[734]+mom_def_Im_tr_paths[735]+mom_def_Im_tr_paths[736]+mom_def_Im_tr_paths[737]+mom_def_Im_tr_paths[738]+mom_def_Im_tr_paths[739]+mom_def_Im_tr_paths[740]+mom_def_Im_tr_paths[741]+mom_def_Im_tr_paths[742]+mom_def_Im_tr_paths[743]+mom_def_Im_tr_paths[744]+mom_def_Im_tr_paths[745]+mom_def_Im_tr_paths[746]+mom_def_Im_tr_paths[747]+mom_def_Im_tr_paths[748]+mom_def_Im_tr_paths[749]+mom_def_Im_tr_paths[750]+mom_def_Im_tr_paths[751]+mom_def_Im_tr_paths[752]+mom_def_Im_tr_paths[753]+mom_def_Im_tr_paths[754]+mom_def_Im_tr_paths[755]+mom_def_Im_tr_paths[756]+mom_def_Im_tr_paths[757]+mom_def_Im_tr_paths[758]+mom_def_Im_tr_paths[759]+mom_def_Im_tr_paths[760]+mom_def_Im_tr_paths[761]+mom_def_Im_tr_paths[762]+mom_def_Im_tr_paths[763]+mom_def_Im_tr_paths[764]+(-2.)*mom_def_Im_tr_paths[765]+(-2.)*mom_def_Im_tr_paths[766]+(-2.)*mom_def_Im_tr_paths[767]+(-2.)*mom_def_Im_tr_paths[768]+(-2.)*mom_def_Im_tr_paths[769]+(-2.)*mom_def_Im_tr_paths[770]+(-2.)*mom_def_Im_tr_paths[771]+(-2.)*mom_def_Im_tr_paths[772]+(-2.)*mom_def_Im_tr_paths[773]+(-2.)*mom_def_Im_tr_paths[774]+(-2.)*mom_def_Im_tr_paths[775]+(-2.)*mom_def_Im_tr_paths[776]+(-2.)*mom_def_Im_tr_paths[777]+(-2.)*mom_def_Im_tr_paths[778]+(-2.)*mom_def_Im_tr_paths[779]+(-2.)*mom_def_Im_tr_paths[780];
 }
 
 static double complex path781(int in)
@@ -32275,9 +32275,9 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_m1_n_16(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_m1_n_16(double complex * op_out)
 {
-*op_out +=+mom_def_Im_tr_paths[781]+mom_def_Im_tr_paths[782]+mom_def_Im_tr_paths[783]+mom_def_Im_tr_paths[784]+mom_def_Im_tr_paths[785]+mom_def_Im_tr_paths[786]+mom_def_Im_tr_paths[787]+mom_def_Im_tr_paths[788]+mom_def_Im_tr_paths[789]+mom_def_Im_tr_paths[790]+mom_def_Im_tr_paths[791]+mom_def_Im_tr_paths[792]+mom_def_Im_tr_paths[793]+mom_def_Im_tr_paths[794]+mom_def_Im_tr_paths[795]+mom_def_Im_tr_paths[796]+mom_def_Im_tr_paths[797]+mom_def_Im_tr_paths[798]+mom_def_Im_tr_paths[799]+mom_def_Im_tr_paths[800]+mom_def_Im_tr_paths[801]+mom_def_Im_tr_paths[802]+mom_def_Im_tr_paths[803]+mom_def_Im_tr_paths[804]+mom_def_Im_tr_paths[805]+mom_def_Im_tr_paths[806]+mom_def_Im_tr_paths[807]+mom_def_Im_tr_paths[808]+mom_def_Im_tr_paths[809]+mom_def_Im_tr_paths[810]+mom_def_Im_tr_paths[811]+mom_def_Im_tr_paths[812]+mom_def_Im_tr_paths[813]+mom_def_Im_tr_paths[814]+mom_def_Im_tr_paths[815]+mom_def_Im_tr_paths[816]+mom_def_Im_tr_paths[817]+mom_def_Im_tr_paths[818]+mom_def_Im_tr_paths[819]+mom_def_Im_tr_paths[820]+mom_def_Im_tr_paths[821]+mom_def_Im_tr_paths[822]+mom_def_Im_tr_paths[823]+mom_def_Im_tr_paths[824]+mom_def_Im_tr_paths[825]+mom_def_Im_tr_paths[826]+mom_def_Im_tr_paths[827]+mom_def_Im_tr_paths[828];
+*op_out +=+mom_def_Im_tr_paths[781]+mom_def_Im_tr_paths[782]+mom_def_Im_tr_paths[783]+mom_def_Im_tr_paths[784]+mom_def_Im_tr_paths[785]+mom_def_Im_tr_paths[786]+mom_def_Im_tr_paths[787]+mom_def_Im_tr_paths[788]+mom_def_Im_tr_paths[789]+mom_def_Im_tr_paths[790]+mom_def_Im_tr_paths[791]+mom_def_Im_tr_paths[792]+mom_def_Im_tr_paths[793]+mom_def_Im_tr_paths[794]+mom_def_Im_tr_paths[795]+mom_def_Im_tr_paths[796]+mom_def_Im_tr_paths[797]+mom_def_Im_tr_paths[798]+mom_def_Im_tr_paths[799]+mom_def_Im_tr_paths[800]+mom_def_Im_tr_paths[801]+mom_def_Im_tr_paths[802]+mom_def_Im_tr_paths[803]+mom_def_Im_tr_paths[804]+mom_def_Im_tr_paths[805]+mom_def_Im_tr_paths[806]+mom_def_Im_tr_paths[807]+mom_def_Im_tr_paths[808]+mom_def_Im_tr_paths[809]+mom_def_Im_tr_paths[810]+mom_def_Im_tr_paths[811]+mom_def_Im_tr_paths[812]+(-2.)*mom_def_Im_tr_paths[813]+(-2.)*mom_def_Im_tr_paths[814]+(-2.)*mom_def_Im_tr_paths[815]+(-2.)*mom_def_Im_tr_paths[816]+(-2.)*mom_def_Im_tr_paths[817]+(-2.)*mom_def_Im_tr_paths[818]+(-2.)*mom_def_Im_tr_paths[819]+(-2.)*mom_def_Im_tr_paths[820]+(-2.)*mom_def_Im_tr_paths[821]+(-2.)*mom_def_Im_tr_paths[822]+(-2.)*mom_def_Im_tr_paths[823]+(-2.)*mom_def_Im_tr_paths[824]+(-2.)*mom_def_Im_tr_paths[825]+(-2.)*mom_def_Im_tr_paths[826]+(-2.)*mom_def_Im_tr_paths[827]+(-2.)*mom_def_Im_tr_paths[828];
 }
 
 static double complex path829(int in)
@@ -34704,9 +34704,9 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_m1_n_17(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_m1_n_17(double complex * op_out)
 {
-*op_out +=+mom_def_Im_tr_paths[829]+mom_def_Im_tr_paths[830]+mom_def_Im_tr_paths[831]+mom_def_Im_tr_paths[832]+mom_def_Im_tr_paths[833]+mom_def_Im_tr_paths[834]+mom_def_Im_tr_paths[835]+mom_def_Im_tr_paths[836]+mom_def_Im_tr_paths[837]+mom_def_Im_tr_paths[838]+mom_def_Im_tr_paths[839]+mom_def_Im_tr_paths[840]+mom_def_Im_tr_paths[841]+mom_def_Im_tr_paths[842]+mom_def_Im_tr_paths[843]+mom_def_Im_tr_paths[844]+mom_def_Im_tr_paths[845]+mom_def_Im_tr_paths[846]+mom_def_Im_tr_paths[847]+mom_def_Im_tr_paths[848]+mom_def_Im_tr_paths[849]+mom_def_Im_tr_paths[850]+mom_def_Im_tr_paths[851]+mom_def_Im_tr_paths[852]+mom_def_Im_tr_paths[853]+mom_def_Im_tr_paths[854]+mom_def_Im_tr_paths[855]+mom_def_Im_tr_paths[856]+mom_def_Im_tr_paths[857]+mom_def_Im_tr_paths[858]+mom_def_Im_tr_paths[859]+mom_def_Im_tr_paths[860]+mom_def_Im_tr_paths[861]+mom_def_Im_tr_paths[862]+mom_def_Im_tr_paths[863]+mom_def_Im_tr_paths[864]+mom_def_Im_tr_paths[865]+mom_def_Im_tr_paths[866]+mom_def_Im_tr_paths[867]+mom_def_Im_tr_paths[868]+mom_def_Im_tr_paths[869]+mom_def_Im_tr_paths[870]+mom_def_Im_tr_paths[871]+mom_def_Im_tr_paths[872]+mom_def_Im_tr_paths[873]+mom_def_Im_tr_paths[874]+mom_def_Im_tr_paths[875]+mom_def_Im_tr_paths[876];
+*op_out +=+mom_def_Im_tr_paths[829]+mom_def_Im_tr_paths[830]+mom_def_Im_tr_paths[831]+mom_def_Im_tr_paths[832]+mom_def_Im_tr_paths[833]+mom_def_Im_tr_paths[834]+mom_def_Im_tr_paths[835]+mom_def_Im_tr_paths[836]+mom_def_Im_tr_paths[837]+mom_def_Im_tr_paths[838]+mom_def_Im_tr_paths[839]+mom_def_Im_tr_paths[840]+mom_def_Im_tr_paths[841]+mom_def_Im_tr_paths[842]+mom_def_Im_tr_paths[843]+mom_def_Im_tr_paths[844]+mom_def_Im_tr_paths[845]+mom_def_Im_tr_paths[846]+mom_def_Im_tr_paths[847]+mom_def_Im_tr_paths[848]+mom_def_Im_tr_paths[849]+mom_def_Im_tr_paths[850]+mom_def_Im_tr_paths[851]+mom_def_Im_tr_paths[852]+mom_def_Im_tr_paths[853]+mom_def_Im_tr_paths[854]+mom_def_Im_tr_paths[855]+mom_def_Im_tr_paths[856]+mom_def_Im_tr_paths[857]+mom_def_Im_tr_paths[858]+mom_def_Im_tr_paths[859]+mom_def_Im_tr_paths[860]+(-2.)*mom_def_Im_tr_paths[861]+(-2.)*mom_def_Im_tr_paths[862]+(-2.)*mom_def_Im_tr_paths[863]+(-2.)*mom_def_Im_tr_paths[864]+(-2.)*mom_def_Im_tr_paths[865]+(-2.)*mom_def_Im_tr_paths[866]+(-2.)*mom_def_Im_tr_paths[867]+(-2.)*mom_def_Im_tr_paths[868]+(-2.)*mom_def_Im_tr_paths[869]+(-2.)*mom_def_Im_tr_paths[870]+(-2.)*mom_def_Im_tr_paths[871]+(-2.)*mom_def_Im_tr_paths[872]+(-2.)*mom_def_Im_tr_paths[873]+(-2.)*mom_def_Im_tr_paths[874]+(-2.)*mom_def_Im_tr_paths[875]+(-2.)*mom_def_Im_tr_paths[876];
 }
 
 static double complex path877(int in)
@@ -35327,9 +35327,9 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_m1_n_18(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_m1_n_18(double complex * op_out)
 {
-*op_out +=+(4.)*mom_def_Im_tr_paths[877]+(4.)*mom_def_Im_tr_paths[878]+(4.)*mom_def_Im_tr_paths[879]+(4.)*mom_def_Im_tr_paths[880]+(4.)*mom_def_Im_tr_paths[881]+(4.)*mom_def_Im_tr_paths[882]+(4.)*mom_def_Im_tr_paths[883]+(4.)*mom_def_Im_tr_paths[884]+(4.)*mom_def_Im_tr_paths[885]+(4.)*mom_def_Im_tr_paths[886]+(4.)*mom_def_Im_tr_paths[887]+(4.)*mom_def_Im_tr_paths[888];
+*op_out +=+(4.)*mom_def_Im_tr_paths[877]+(4.)*mom_def_Im_tr_paths[878]+(4.)*mom_def_Im_tr_paths[879]+(4.)*mom_def_Im_tr_paths[880]+(4.)*mom_def_Im_tr_paths[881]+(4.)*mom_def_Im_tr_paths[882]+(4.)*mom_def_Im_tr_paths[883]+(4.)*mom_def_Im_tr_paths[884]+(-8.)*mom_def_Im_tr_paths[885]+(-8.)*mom_def_Im_tr_paths[886]+(-8.)*mom_def_Im_tr_paths[887]+(-8.)*mom_def_Im_tr_paths[888];
 }
 
 static double complex path889(int in)
@@ -36568,9 +36568,9 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_m1_n_19(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_m1_n_19(double complex * op_out)
 {
-*op_out +=+(2.)*mom_def_Im_tr_paths[889]+(2.)*mom_def_Im_tr_paths[890]+(2.)*mom_def_Im_tr_paths[891]+(2.)*mom_def_Im_tr_paths[892]+(2.)*mom_def_Im_tr_paths[893]+(2.)*mom_def_Im_tr_paths[894]+(2.)*mom_def_Im_tr_paths[895]+(2.)*mom_def_Im_tr_paths[896]+(2.)*mom_def_Im_tr_paths[897]+(2.)*mom_def_Im_tr_paths[898]+(2.)*mom_def_Im_tr_paths[899]+(2.)*mom_def_Im_tr_paths[900]+(2.)*mom_def_Im_tr_paths[901]+(2.)*mom_def_Im_tr_paths[902]+(2.)*mom_def_Im_tr_paths[903]+(2.)*mom_def_Im_tr_paths[904]+(2.)*mom_def_Im_tr_paths[905]+(2.)*mom_def_Im_tr_paths[906]+(2.)*mom_def_Im_tr_paths[907]+(2.)*mom_def_Im_tr_paths[908]+(2.)*mom_def_Im_tr_paths[909]+(2.)*mom_def_Im_tr_paths[910]+(2.)*mom_def_Im_tr_paths[911]+(2.)*mom_def_Im_tr_paths[912];
+*op_out +=+(2.)*mom_def_Im_tr_paths[889]+(2.)*mom_def_Im_tr_paths[890]+(2.)*mom_def_Im_tr_paths[891]+(2.)*mom_def_Im_tr_paths[892]+(2.)*mom_def_Im_tr_paths[893]+(2.)*mom_def_Im_tr_paths[894]+(2.)*mom_def_Im_tr_paths[895]+(2.)*mom_def_Im_tr_paths[896]+(2.)*mom_def_Im_tr_paths[897]+(2.)*mom_def_Im_tr_paths[898]+(2.)*mom_def_Im_tr_paths[899]+(2.)*mom_def_Im_tr_paths[900]+(2.)*mom_def_Im_tr_paths[901]+(2.)*mom_def_Im_tr_paths[902]+(2.)*mom_def_Im_tr_paths[903]+(2.)*mom_def_Im_tr_paths[904]+(-4.)*mom_def_Im_tr_paths[905]+(-4.)*mom_def_Im_tr_paths[906]+(-4.)*mom_def_Im_tr_paths[907]+(-4.)*mom_def_Im_tr_paths[908]+(-4.)*mom_def_Im_tr_paths[909]+(-4.)*mom_def_Im_tr_paths[910]+(-4.)*mom_def_Im_tr_paths[911]+(-4.)*mom_def_Im_tr_paths[912];
 }
 
 static double complex path913(int in)
@@ -38997,9 +38997,9 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_m1_n_20(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_m1_n_20(double complex * op_out)
 {
-*op_out +=+mom_def_Im_tr_paths[913]+mom_def_Im_tr_paths[914]+mom_def_Im_tr_paths[915]+mom_def_Im_tr_paths[916]+mom_def_Im_tr_paths[917]+mom_def_Im_tr_paths[918]+mom_def_Im_tr_paths[919]+mom_def_Im_tr_paths[920]+mom_def_Im_tr_paths[921]+mom_def_Im_tr_paths[922]+mom_def_Im_tr_paths[923]+mom_def_Im_tr_paths[924]+mom_def_Im_tr_paths[925]+mom_def_Im_tr_paths[926]+mom_def_Im_tr_paths[927]+mom_def_Im_tr_paths[928]+mom_def_Im_tr_paths[929]+mom_def_Im_tr_paths[930]+mom_def_Im_tr_paths[931]+mom_def_Im_tr_paths[932]+mom_def_Im_tr_paths[933]+mom_def_Im_tr_paths[934]+mom_def_Im_tr_paths[935]+mom_def_Im_tr_paths[936]+mom_def_Im_tr_paths[937]+mom_def_Im_tr_paths[938]+mom_def_Im_tr_paths[939]+mom_def_Im_tr_paths[940]+mom_def_Im_tr_paths[941]+mom_def_Im_tr_paths[942]+mom_def_Im_tr_paths[943]+mom_def_Im_tr_paths[944]+mom_def_Im_tr_paths[945]+mom_def_Im_tr_paths[946]+mom_def_Im_tr_paths[947]+mom_def_Im_tr_paths[948]+mom_def_Im_tr_paths[949]+mom_def_Im_tr_paths[950]+mom_def_Im_tr_paths[951]+mom_def_Im_tr_paths[952]+mom_def_Im_tr_paths[953]+mom_def_Im_tr_paths[954]+mom_def_Im_tr_paths[955]+mom_def_Im_tr_paths[956]+mom_def_Im_tr_paths[957]+mom_def_Im_tr_paths[958]+mom_def_Im_tr_paths[959]+mom_def_Im_tr_paths[960];
+*op_out +=+mom_def_Im_tr_paths[913]+mom_def_Im_tr_paths[914]+mom_def_Im_tr_paths[915]+mom_def_Im_tr_paths[916]+mom_def_Im_tr_paths[917]+mom_def_Im_tr_paths[918]+mom_def_Im_tr_paths[919]+mom_def_Im_tr_paths[920]+mom_def_Im_tr_paths[921]+mom_def_Im_tr_paths[922]+mom_def_Im_tr_paths[923]+mom_def_Im_tr_paths[924]+mom_def_Im_tr_paths[925]+mom_def_Im_tr_paths[926]+mom_def_Im_tr_paths[927]+mom_def_Im_tr_paths[928]+mom_def_Im_tr_paths[929]+mom_def_Im_tr_paths[930]+mom_def_Im_tr_paths[931]+mom_def_Im_tr_paths[932]+mom_def_Im_tr_paths[933]+mom_def_Im_tr_paths[934]+mom_def_Im_tr_paths[935]+mom_def_Im_tr_paths[936]+mom_def_Im_tr_paths[937]+mom_def_Im_tr_paths[938]+mom_def_Im_tr_paths[939]+mom_def_Im_tr_paths[940]+mom_def_Im_tr_paths[941]+mom_def_Im_tr_paths[942]+mom_def_Im_tr_paths[943]+mom_def_Im_tr_paths[944]+(-2.)*mom_def_Im_tr_paths[945]+(-2.)*mom_def_Im_tr_paths[946]+(-2.)*mom_def_Im_tr_paths[947]+(-2.)*mom_def_Im_tr_paths[948]+(-2.)*mom_def_Im_tr_paths[949]+(-2.)*mom_def_Im_tr_paths[950]+(-2.)*mom_def_Im_tr_paths[951]+(-2.)*mom_def_Im_tr_paths[952]+(-2.)*mom_def_Im_tr_paths[953]+(-2.)*mom_def_Im_tr_paths[954]+(-2.)*mom_def_Im_tr_paths[955]+(-2.)*mom_def_Im_tr_paths[956]+(-2.)*mom_def_Im_tr_paths[957]+(-2.)*mom_def_Im_tr_paths[958]+(-2.)*mom_def_Im_tr_paths[959]+(-2.)*mom_def_Im_tr_paths[960];
 }
 
 static double complex path961(int in)
@@ -41426,9 +41426,9 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_m1_n_21(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_m1_n_21(double complex * op_out)
 {
-*op_out +=+mom_def_Im_tr_paths[961]+mom_def_Im_tr_paths[962]+mom_def_Im_tr_paths[963]+mom_def_Im_tr_paths[964]+mom_def_Im_tr_paths[965]+mom_def_Im_tr_paths[966]+mom_def_Im_tr_paths[967]+mom_def_Im_tr_paths[968]+mom_def_Im_tr_paths[969]+mom_def_Im_tr_paths[970]+mom_def_Im_tr_paths[971]+mom_def_Im_tr_paths[972]+mom_def_Im_tr_paths[973]+mom_def_Im_tr_paths[974]+mom_def_Im_tr_paths[975]+mom_def_Im_tr_paths[976]+mom_def_Im_tr_paths[977]+mom_def_Im_tr_paths[978]+mom_def_Im_tr_paths[979]+mom_def_Im_tr_paths[980]+mom_def_Im_tr_paths[981]+mom_def_Im_tr_paths[982]+mom_def_Im_tr_paths[983]+mom_def_Im_tr_paths[984]+mom_def_Im_tr_paths[985]+mom_def_Im_tr_paths[986]+mom_def_Im_tr_paths[987]+mom_def_Im_tr_paths[988]+mom_def_Im_tr_paths[989]+mom_def_Im_tr_paths[990]+mom_def_Im_tr_paths[991]+mom_def_Im_tr_paths[992]+mom_def_Im_tr_paths[993]+mom_def_Im_tr_paths[994]+mom_def_Im_tr_paths[995]+mom_def_Im_tr_paths[996]+mom_def_Im_tr_paths[997]+mom_def_Im_tr_paths[998]+mom_def_Im_tr_paths[999]+mom_def_Im_tr_paths[1000]+mom_def_Im_tr_paths[1001]+mom_def_Im_tr_paths[1002]+mom_def_Im_tr_paths[1003]+mom_def_Im_tr_paths[1004]+mom_def_Im_tr_paths[1005]+mom_def_Im_tr_paths[1006]+mom_def_Im_tr_paths[1007]+mom_def_Im_tr_paths[1008];
+*op_out +=+mom_def_Im_tr_paths[961]+mom_def_Im_tr_paths[962]+mom_def_Im_tr_paths[963]+mom_def_Im_tr_paths[964]+mom_def_Im_tr_paths[965]+mom_def_Im_tr_paths[966]+mom_def_Im_tr_paths[967]+mom_def_Im_tr_paths[968]+mom_def_Im_tr_paths[969]+mom_def_Im_tr_paths[970]+mom_def_Im_tr_paths[971]+mom_def_Im_tr_paths[972]+mom_def_Im_tr_paths[973]+mom_def_Im_tr_paths[974]+mom_def_Im_tr_paths[975]+mom_def_Im_tr_paths[976]+mom_def_Im_tr_paths[977]+mom_def_Im_tr_paths[978]+mom_def_Im_tr_paths[979]+mom_def_Im_tr_paths[980]+mom_def_Im_tr_paths[981]+mom_def_Im_tr_paths[982]+mom_def_Im_tr_paths[983]+mom_def_Im_tr_paths[984]+mom_def_Im_tr_paths[985]+mom_def_Im_tr_paths[986]+mom_def_Im_tr_paths[987]+mom_def_Im_tr_paths[988]+mom_def_Im_tr_paths[989]+mom_def_Im_tr_paths[990]+mom_def_Im_tr_paths[991]+mom_def_Im_tr_paths[992]+(-2.)*mom_def_Im_tr_paths[993]+(-2.)*mom_def_Im_tr_paths[994]+(-2.)*mom_def_Im_tr_paths[995]+(-2.)*mom_def_Im_tr_paths[996]+(-2.)*mom_def_Im_tr_paths[997]+(-2.)*mom_def_Im_tr_paths[998]+(-2.)*mom_def_Im_tr_paths[999]+(-2.)*mom_def_Im_tr_paths[1000]+(-2.)*mom_def_Im_tr_paths[1001]+(-2.)*mom_def_Im_tr_paths[1002]+(-2.)*mom_def_Im_tr_paths[1003]+(-2.)*mom_def_Im_tr_paths[1004]+(-2.)*mom_def_Im_tr_paths[1005]+(-2.)*mom_def_Im_tr_paths[1006]+(-2.)*mom_def_Im_tr_paths[1007]+(-2.)*mom_def_Im_tr_paths[1008];
 }
 
 static double complex path0(int in)
@@ -41512,9 +41512,9 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_1(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_1(double complex * op_out)
 {
-*op_out +=+(16.)*mom_def_Re_tr_paths[0]+(16.)*mom_def_Re_tr_paths[1]+(16.)*mom_def_Re_tr_paths[2];
+*op_out +=+(16.)*mom_def_Re_tr_paths[0]+(-8.)*mom_def_Re_tr_paths[1]+(-8.)*mom_def_Re_tr_paths[2];
 }
 
 static double complex path3(int in)
@@ -41727,156 +41727,9 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_2(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_2(double complex * op_out)
 {
-*op_out +=+(8.)*mom_def_Re_tr_paths[3]+(8.)*mom_def_Re_tr_paths[4]+(8.)*mom_def_Re_tr_paths[5]+(8.)*mom_def_Re_tr_paths[6]+(8.)*mom_def_Re_tr_paths[7]+(8.)*mom_def_Re_tr_paths[8];
-}
-
-static double complex path9(int in)
-{
-suNg *w1, *w2;
-suNg res, res1;
-int site=in;
-double complex p;
-
-site = idn_wrk(site, 1);
-w2 = pu_gauge_wrk(site,1);
-
-_suNg_dagger(res1,*w2);
-w2 = &res1;
-site = idn_wrk(site, 2);
-w1 = pu_gauge_wrk(site,2);
-_suNg_times_suNg_dagger( res, *w2, *w1);
-
-site = idn_wrk(site, 3);
-w1 = pu_gauge_wrk(site,3);
-_suNg_times_suNg_dagger(res1, res, *w1);
-
-w1 = pu_gauge_wrk(site,1);
-_suNg_times_suNg(res, res1, *w1);
-
-site = iup_wrk(site, 1);
-w1 = pu_gauge_wrk(site,2);
-_suNg_times_suNg(res1, res, *w1);
-
-site = iup_wrk(site, 2);
-w1 = pu_gauge_wrk(site,3);
-_suNg_times_suNg(res, res1, *w1);
-
-_suNg_trace(p,res);
-return p;
-}
-
-static double complex path10(int in)
-{
-suNg *w1, *w2;
-suNg res, res1;
-int site=in;
-double complex p;
-
-site = idn_wrk(site, 1);
-w2 = pu_gauge_wrk(site,1);
-
-_suNg_dagger(res1,*w2);
-w2 = &res1;
-site = idn_wrk(site, 2);
-w1 = pu_gauge_wrk(site,2);
-_suNg_times_suNg_dagger( res, *w2, *w1);
-
-w1 = pu_gauge_wrk(site,3);
-_suNg_times_suNg(res1, res, *w1);
-
-site = iup_wrk(site, 3);
-w1 = pu_gauge_wrk(site,1);
-_suNg_times_suNg(res, res1, *w1);
-
-site = iup_wrk(site, 1);
-w1 = pu_gauge_wrk(site,2);
-_suNg_times_suNg(res1, res, *w1);
-
-site = iup_wrk(site, 2);
-site = idn_wrk(site, 3);
-w1 = pu_gauge_wrk(site,3);
-_suNg_times_suNg_dagger(res, res1, *w1);
-
-_suNg_trace(p,res);
-return p;
-}
-
-static double complex path11(int in)
-{
-suNg *w1, *w2;
-suNg res, res1;
-int site=in;
-double complex p;
-
-site = idn_wrk(site, 1);
-w2 = pu_gauge_wrk(site,1);
-
-_suNg_dagger(res1,*w2);
-w2 = &res1;
-w1 = pu_gauge_wrk(site,2);
-_suNg_times_suNg( res, *w2, *w1);
-
-site = iup_wrk(site, 2);
-site = idn_wrk(site, 3);
-w1 = pu_gauge_wrk(site,3);
-_suNg_times_suNg_dagger(res1, res, *w1);
-
-w1 = pu_gauge_wrk(site,1);
-_suNg_times_suNg(res, res1, *w1);
-
-site = iup_wrk(site, 1);
-site = idn_wrk(site, 2);
-w1 = pu_gauge_wrk(site,2);
-_suNg_times_suNg_dagger(res1, res, *w1);
-
-w1 = pu_gauge_wrk(site,3);
-_suNg_times_suNg(res, res1, *w1);
-
-_suNg_trace(p,res);
-return p;
-}
-
-static double complex path12(int in)
-{
-suNg *w1, *w2;
-suNg res, res1;
-int site=in;
-double complex p;
-
-site = idn_wrk(site, 1);
-w2 = pu_gauge_wrk(site,1);
-
-_suNg_dagger(res1,*w2);
-w2 = &res1;
-w1 = pu_gauge_wrk(site,2);
-_suNg_times_suNg( res, *w2, *w1);
-
-site = iup_wrk(site, 2);
-w1 = pu_gauge_wrk(site,3);
-_suNg_times_suNg(res1, res, *w1);
-
-site = iup_wrk(site, 3);
-w1 = pu_gauge_wrk(site,1);
-_suNg_times_suNg(res, res1, *w1);
-
-site = iup_wrk(site, 1);
-site = idn_wrk(site, 2);
-w1 = pu_gauge_wrk(site,2);
-_suNg_times_suNg_dagger(res1, res, *w1);
-
-site = idn_wrk(site, 3);
-w1 = pu_gauge_wrk(site,3);
-_suNg_times_suNg_dagger(res, res1, *w1);
-
-_suNg_trace(p,res);
-return p;
-}
-
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_3(double complex * op_out)
-{
-*op_out +=+(12.)*mom_def_Re_tr_paths[9]+(12.)*mom_def_Re_tr_paths[10]+(12.)*mom_def_Re_tr_paths[11]+(12.)*mom_def_Re_tr_paths[12];
+*op_out +=+(8.)*mom_def_Re_tr_paths[3]+(8.)*mom_def_Re_tr_paths[4]+(8.)*mom_def_Re_tr_paths[5]+(8.)*mom_def_Re_tr_paths[6]+(-16.)*mom_def_Re_tr_paths[7]+(-16.)*mom_def_Re_tr_paths[8];
 }
 
 static double complex path13(int in)
@@ -42293,9 +42146,9 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_4(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_3(double complex * op_out)
 {
-*op_out +=+(4.)*mom_def_Re_tr_paths[13]+(4.)*mom_def_Re_tr_paths[14]+(4.)*mom_def_Re_tr_paths[15]+(4.)*mom_def_Re_tr_paths[16]+(4.)*mom_def_Re_tr_paths[17]+(4.)*mom_def_Re_tr_paths[18]+(4.)*mom_def_Re_tr_paths[19]+(4.)*mom_def_Re_tr_paths[20]+(4.)*mom_def_Re_tr_paths[21]+(4.)*mom_def_Re_tr_paths[22]+(4.)*mom_def_Re_tr_paths[23]+(4.)*mom_def_Re_tr_paths[24];
+*op_out +=+(-2.)*mom_def_Re_tr_paths[13]+(-2.)*mom_def_Re_tr_paths[14]+(4.)*mom_def_Re_tr_paths[15]+(4.)*mom_def_Re_tr_paths[16]+(-2.)*mom_def_Re_tr_paths[17]+(-2.)*mom_def_Re_tr_paths[18]+(4.)*mom_def_Re_tr_paths[19]+(4.)*mom_def_Re_tr_paths[20]+(-2.)*mom_def_Re_tr_paths[21]+(-2.)*mom_def_Re_tr_paths[22]+(-2.)*mom_def_Re_tr_paths[23]+(-2.)*mom_def_Re_tr_paths[24];
 }
 
 static double complex path25(int in)
@@ -43318,9 +43171,9 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_5(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_4(double complex * op_out)
 {
-*op_out +=+(2.)*mom_def_Re_tr_paths[25]+(2.)*mom_def_Re_tr_paths[26]+(2.)*mom_def_Re_tr_paths[27]+(2.)*mom_def_Re_tr_paths[28]+(2.)*mom_def_Re_tr_paths[29]+(2.)*mom_def_Re_tr_paths[30]+(2.)*mom_def_Re_tr_paths[31]+(2.)*mom_def_Re_tr_paths[32]+(2.)*mom_def_Re_tr_paths[33]+(2.)*mom_def_Re_tr_paths[34]+(2.)*mom_def_Re_tr_paths[35]+(2.)*mom_def_Re_tr_paths[36]+(2.)*mom_def_Re_tr_paths[37]+(2.)*mom_def_Re_tr_paths[38]+(2.)*mom_def_Re_tr_paths[39]+(2.)*mom_def_Re_tr_paths[40]+(2.)*mom_def_Re_tr_paths[41]+(2.)*mom_def_Re_tr_paths[42]+(2.)*mom_def_Re_tr_paths[43]+(2.)*mom_def_Re_tr_paths[44]+(2.)*mom_def_Re_tr_paths[45]+(2.)*mom_def_Re_tr_paths[46]+(2.)*mom_def_Re_tr_paths[47]+(2.)*mom_def_Re_tr_paths[48];
+*op_out +=+(2.)*mom_def_Re_tr_paths[25]+(2.)*mom_def_Re_tr_paths[26]+(2.)*mom_def_Re_tr_paths[27]+(2.)*mom_def_Re_tr_paths[28]+(2.)*mom_def_Re_tr_paths[29]+(2.)*mom_def_Re_tr_paths[30]+(2.)*mom_def_Re_tr_paths[31]+(2.)*mom_def_Re_tr_paths[32]+(2.)*mom_def_Re_tr_paths[33]+(2.)*mom_def_Re_tr_paths[34]+(2.)*mom_def_Re_tr_paths[35]+(2.)*mom_def_Re_tr_paths[36]+(2.)*mom_def_Re_tr_paths[37]+(2.)*mom_def_Re_tr_paths[38]+(2.)*mom_def_Re_tr_paths[39]+(2.)*mom_def_Re_tr_paths[40]+(-4.)*mom_def_Re_tr_paths[41]+(-4.)*mom_def_Re_tr_paths[42]+(-4.)*mom_def_Re_tr_paths[43]+(-4.)*mom_def_Re_tr_paths[44]+(-4.)*mom_def_Re_tr_paths[45]+(-4.)*mom_def_Re_tr_paths[46]+(-4.)*mom_def_Re_tr_paths[47]+(-4.)*mom_def_Re_tr_paths[48];
 }
 
 static double complex path49(int in)
@@ -44367,9 +44220,9 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_6(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_5(double complex * op_out)
 {
-*op_out +=+(2.)*mom_def_Re_tr_paths[49]+(2.)*mom_def_Re_tr_paths[50]+(2.)*mom_def_Re_tr_paths[51]+(2.)*mom_def_Re_tr_paths[52]+(2.)*mom_def_Re_tr_paths[53]+(2.)*mom_def_Re_tr_paths[54]+(2.)*mom_def_Re_tr_paths[55]+(2.)*mom_def_Re_tr_paths[56]+(2.)*mom_def_Re_tr_paths[57]+(2.)*mom_def_Re_tr_paths[58]+(2.)*mom_def_Re_tr_paths[59]+(2.)*mom_def_Re_tr_paths[60]+(2.)*mom_def_Re_tr_paths[61]+(2.)*mom_def_Re_tr_paths[62]+(2.)*mom_def_Re_tr_paths[63]+(2.)*mom_def_Re_tr_paths[64]+(2.)*mom_def_Re_tr_paths[65]+(2.)*mom_def_Re_tr_paths[66]+(2.)*mom_def_Re_tr_paths[67]+(2.)*mom_def_Re_tr_paths[68]+(2.)*mom_def_Re_tr_paths[69]+(2.)*mom_def_Re_tr_paths[70]+(2.)*mom_def_Re_tr_paths[71]+(2.)*mom_def_Re_tr_paths[72];
+*op_out +=+(2.)*mom_def_Re_tr_paths[49]+(2.)*mom_def_Re_tr_paths[50]+(2.)*mom_def_Re_tr_paths[51]+(2.)*mom_def_Re_tr_paths[52]+(2.)*mom_def_Re_tr_paths[53]+(2.)*mom_def_Re_tr_paths[54]+(2.)*mom_def_Re_tr_paths[55]+(2.)*mom_def_Re_tr_paths[56]+(2.)*mom_def_Re_tr_paths[57]+(2.)*mom_def_Re_tr_paths[58]+(2.)*mom_def_Re_tr_paths[59]+(2.)*mom_def_Re_tr_paths[60]+(2.)*mom_def_Re_tr_paths[61]+(2.)*mom_def_Re_tr_paths[62]+(2.)*mom_def_Re_tr_paths[63]+(2.)*mom_def_Re_tr_paths[64]+(-4.)*mom_def_Re_tr_paths[65]+(-4.)*mom_def_Re_tr_paths[66]+(-4.)*mom_def_Re_tr_paths[67]+(-4.)*mom_def_Re_tr_paths[68]+(-4.)*mom_def_Re_tr_paths[69]+(-4.)*mom_def_Re_tr_paths[70]+(-4.)*mom_def_Re_tr_paths[71]+(-4.)*mom_def_Re_tr_paths[72];
 }
 
 static double complex path73(int in)
@@ -45416,19 +45269,19 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_7(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_6(double complex * op_out)
 {
-*op_out +=+(2.)*mom_def_Re_tr_paths[73]+(2.)*mom_def_Re_tr_paths[74]+(2.)*mom_def_Re_tr_paths[75]+(2.)*mom_def_Re_tr_paths[76]+(2.)*mom_def_Re_tr_paths[77]+(2.)*mom_def_Re_tr_paths[78]+(2.)*mom_def_Re_tr_paths[79]+(2.)*mom_def_Re_tr_paths[80]+(2.)*mom_def_Re_tr_paths[81]+(2.)*mom_def_Re_tr_paths[82]+(2.)*mom_def_Re_tr_paths[83]+(2.)*mom_def_Re_tr_paths[84]+(2.)*mom_def_Re_tr_paths[85]+(2.)*mom_def_Re_tr_paths[86]+(2.)*mom_def_Re_tr_paths[87]+(2.)*mom_def_Re_tr_paths[88]+(2.)*mom_def_Re_tr_paths[89]+(2.)*mom_def_Re_tr_paths[90]+(2.)*mom_def_Re_tr_paths[91]+(2.)*mom_def_Re_tr_paths[92]+(2.)*mom_def_Re_tr_paths[93]+(2.)*mom_def_Re_tr_paths[94]+(2.)*mom_def_Re_tr_paths[95]+(2.)*mom_def_Re_tr_paths[96];
+*op_out +=+(2.)*mom_def_Re_tr_paths[73]+(2.)*mom_def_Re_tr_paths[74]+(2.)*mom_def_Re_tr_paths[75]+(2.)*mom_def_Re_tr_paths[76]+(2.)*mom_def_Re_tr_paths[77]+(2.)*mom_def_Re_tr_paths[78]+(2.)*mom_def_Re_tr_paths[79]+(2.)*mom_def_Re_tr_paths[80]+(2.)*mom_def_Re_tr_paths[81]+(2.)*mom_def_Re_tr_paths[82]+(2.)*mom_def_Re_tr_paths[83]+(2.)*mom_def_Re_tr_paths[84]+(2.)*mom_def_Re_tr_paths[85]+(2.)*mom_def_Re_tr_paths[86]+(2.)*mom_def_Re_tr_paths[87]+(2.)*mom_def_Re_tr_paths[88]+(-4.)*mom_def_Re_tr_paths[89]+(-4.)*mom_def_Re_tr_paths[90]+(-4.)*mom_def_Re_tr_paths[91]+(-4.)*mom_def_Re_tr_paths[92]+(-4.)*mom_def_Re_tr_paths[93]+(-4.)*mom_def_Re_tr_paths[94]+(-4.)*mom_def_Re_tr_paths[95]+(-4.)*mom_def_Re_tr_paths[96];
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_8(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_7(double complex * op_out)
 {
-*op_out +=+mom_def_Re_tr_paths[97]+mom_def_Re_tr_paths[98]+mom_def_Re_tr_paths[99]+mom_def_Re_tr_paths[100]+mom_def_Re_tr_paths[101]+mom_def_Re_tr_paths[102]+mom_def_Re_tr_paths[103]+mom_def_Re_tr_paths[104]+mom_def_Re_tr_paths[105]+mom_def_Re_tr_paths[106]+mom_def_Re_tr_paths[107]+mom_def_Re_tr_paths[108]+mom_def_Re_tr_paths[109]+mom_def_Re_tr_paths[110]+mom_def_Re_tr_paths[111]+mom_def_Re_tr_paths[112]+mom_def_Re_tr_paths[113]+mom_def_Re_tr_paths[114]+mom_def_Re_tr_paths[115]+mom_def_Re_tr_paths[116]+mom_def_Re_tr_paths[117]+mom_def_Re_tr_paths[118]+mom_def_Re_tr_paths[119]+mom_def_Re_tr_paths[120]+mom_def_Re_tr_paths[121]+mom_def_Re_tr_paths[122]+mom_def_Re_tr_paths[123]+mom_def_Re_tr_paths[124]+mom_def_Re_tr_paths[125]+mom_def_Re_tr_paths[126]+mom_def_Re_tr_paths[127]+mom_def_Re_tr_paths[128]+mom_def_Re_tr_paths[129]+mom_def_Re_tr_paths[130]+mom_def_Re_tr_paths[131]+mom_def_Re_tr_paths[132]+mom_def_Re_tr_paths[133]+mom_def_Re_tr_paths[134]+mom_def_Re_tr_paths[135]+mom_def_Re_tr_paths[136]+mom_def_Re_tr_paths[137]+mom_def_Re_tr_paths[138]+mom_def_Re_tr_paths[139]+mom_def_Re_tr_paths[140]+mom_def_Re_tr_paths[141]+mom_def_Re_tr_paths[142]+mom_def_Re_tr_paths[143]+mom_def_Re_tr_paths[144];
+*op_out +=+mom_def_Re_tr_paths[97]+mom_def_Re_tr_paths[98]+mom_def_Re_tr_paths[99]+mom_def_Re_tr_paths[100]+mom_def_Re_tr_paths[101]+mom_def_Re_tr_paths[102]+mom_def_Re_tr_paths[103]+mom_def_Re_tr_paths[104]+mom_def_Re_tr_paths[105]+mom_def_Re_tr_paths[106]+mom_def_Re_tr_paths[107]+mom_def_Re_tr_paths[108]+mom_def_Re_tr_paths[109]+mom_def_Re_tr_paths[110]+mom_def_Re_tr_paths[111]+mom_def_Re_tr_paths[112]+mom_def_Re_tr_paths[113]+mom_def_Re_tr_paths[114]+mom_def_Re_tr_paths[115]+mom_def_Re_tr_paths[116]+mom_def_Re_tr_paths[117]+mom_def_Re_tr_paths[118]+mom_def_Re_tr_paths[119]+mom_def_Re_tr_paths[120]+mom_def_Re_tr_paths[121]+mom_def_Re_tr_paths[122]+mom_def_Re_tr_paths[123]+mom_def_Re_tr_paths[124]+mom_def_Re_tr_paths[125]+mom_def_Re_tr_paths[126]+mom_def_Re_tr_paths[127]+mom_def_Re_tr_paths[128]+(-2.)*mom_def_Re_tr_paths[129]+(-2.)*mom_def_Re_tr_paths[130]+(-2.)*mom_def_Re_tr_paths[131]+(-2.)*mom_def_Re_tr_paths[132]+(-2.)*mom_def_Re_tr_paths[133]+(-2.)*mom_def_Re_tr_paths[134]+(-2.)*mom_def_Re_tr_paths[135]+(-2.)*mom_def_Re_tr_paths[136]+(-2.)*mom_def_Re_tr_paths[137]+(-2.)*mom_def_Re_tr_paths[138]+(-2.)*mom_def_Re_tr_paths[139]+(-2.)*mom_def_Re_tr_paths[140]+(-2.)*mom_def_Re_tr_paths[141]+(-2.)*mom_def_Re_tr_paths[142]+(-2.)*mom_def_Re_tr_paths[143]+(-2.)*mom_def_Re_tr_paths[144];
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_9(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_8(double complex * op_out)
 {
-*op_out +=+mom_def_Re_tr_paths[145]+mom_def_Re_tr_paths[146]+mom_def_Re_tr_paths[147]+mom_def_Re_tr_paths[148]+mom_def_Re_tr_paths[149]+mom_def_Re_tr_paths[150]+mom_def_Re_tr_paths[151]+mom_def_Re_tr_paths[152]+mom_def_Re_tr_paths[153]+mom_def_Re_tr_paths[154]+mom_def_Re_tr_paths[155]+mom_def_Re_tr_paths[156]+mom_def_Re_tr_paths[157]+mom_def_Re_tr_paths[158]+mom_def_Re_tr_paths[159]+mom_def_Re_tr_paths[160]+mom_def_Re_tr_paths[161]+mom_def_Re_tr_paths[162]+mom_def_Re_tr_paths[163]+mom_def_Re_tr_paths[164]+mom_def_Re_tr_paths[165]+mom_def_Re_tr_paths[166]+mom_def_Re_tr_paths[167]+mom_def_Re_tr_paths[168]+mom_def_Re_tr_paths[169]+mom_def_Re_tr_paths[170]+mom_def_Re_tr_paths[171]+mom_def_Re_tr_paths[172]+mom_def_Re_tr_paths[173]+mom_def_Re_tr_paths[174]+mom_def_Re_tr_paths[175]+mom_def_Re_tr_paths[176]+mom_def_Re_tr_paths[177]+mom_def_Re_tr_paths[178]+mom_def_Re_tr_paths[179]+mom_def_Re_tr_paths[180]+mom_def_Re_tr_paths[181]+mom_def_Re_tr_paths[182]+mom_def_Re_tr_paths[183]+mom_def_Re_tr_paths[184]+mom_def_Re_tr_paths[185]+mom_def_Re_tr_paths[186]+mom_def_Re_tr_paths[187]+mom_def_Re_tr_paths[188]+mom_def_Re_tr_paths[189]+mom_def_Re_tr_paths[190]+mom_def_Re_tr_paths[191]+mom_def_Re_tr_paths[192];
+*op_out +=+mom_def_Re_tr_paths[145]+mom_def_Re_tr_paths[146]+mom_def_Re_tr_paths[147]+mom_def_Re_tr_paths[148]+mom_def_Re_tr_paths[149]+mom_def_Re_tr_paths[150]+mom_def_Re_tr_paths[151]+mom_def_Re_tr_paths[152]+mom_def_Re_tr_paths[153]+mom_def_Re_tr_paths[154]+mom_def_Re_tr_paths[155]+mom_def_Re_tr_paths[156]+mom_def_Re_tr_paths[157]+mom_def_Re_tr_paths[158]+mom_def_Re_tr_paths[159]+mom_def_Re_tr_paths[160]+mom_def_Re_tr_paths[161]+mom_def_Re_tr_paths[162]+mom_def_Re_tr_paths[163]+mom_def_Re_tr_paths[164]+mom_def_Re_tr_paths[165]+mom_def_Re_tr_paths[166]+mom_def_Re_tr_paths[167]+mom_def_Re_tr_paths[168]+mom_def_Re_tr_paths[169]+mom_def_Re_tr_paths[170]+mom_def_Re_tr_paths[171]+mom_def_Re_tr_paths[172]+mom_def_Re_tr_paths[173]+mom_def_Re_tr_paths[174]+mom_def_Re_tr_paths[175]+mom_def_Re_tr_paths[176]+(-2.)*mom_def_Re_tr_paths[177]+(-2.)*mom_def_Re_tr_paths[178]+(-2.)*mom_def_Re_tr_paths[179]+(-2.)*mom_def_Re_tr_paths[180]+(-2.)*mom_def_Re_tr_paths[181]+(-2.)*mom_def_Re_tr_paths[182]+(-2.)*mom_def_Re_tr_paths[183]+(-2.)*mom_def_Re_tr_paths[184]+(-2.)*mom_def_Re_tr_paths[185]+(-2.)*mom_def_Re_tr_paths[186]+(-2.)*mom_def_Re_tr_paths[187]+(-2.)*mom_def_Re_tr_paths[188]+(-2.)*mom_def_Re_tr_paths[189]+(-2.)*mom_def_Re_tr_paths[190]+(-2.)*mom_def_Re_tr_paths[191]+(-2.)*mom_def_Re_tr_paths[192];
 }
 
 static double complex path193(int in)
@@ -45953,14 +45806,14 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_10(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_9(double complex * op_out)
 {
-*op_out +=+(4.)*mom_def_Re_tr_paths[193]+(4.)*mom_def_Re_tr_paths[194]+(4.)*mom_def_Re_tr_paths[195]+(4.)*mom_def_Re_tr_paths[196]+(4.)*mom_def_Re_tr_paths[197]+(4.)*mom_def_Re_tr_paths[198]+(4.)*mom_def_Re_tr_paths[199]+(4.)*mom_def_Re_tr_paths[200]+(4.)*mom_def_Re_tr_paths[201]+(4.)*mom_def_Re_tr_paths[202]+(4.)*mom_def_Re_tr_paths[203]+(4.)*mom_def_Re_tr_paths[204];
+*op_out +=+(4.)*mom_def_Re_tr_paths[193]+(4.)*mom_def_Re_tr_paths[194]+(4.)*mom_def_Re_tr_paths[195]+(4.)*mom_def_Re_tr_paths[196]+(4.)*mom_def_Re_tr_paths[197]+(4.)*mom_def_Re_tr_paths[198]+(4.)*mom_def_Re_tr_paths[199]+(4.)*mom_def_Re_tr_paths[200]+(-8.)*mom_def_Re_tr_paths[201]+(-8.)*mom_def_Re_tr_paths[202]+(-8.)*mom_def_Re_tr_paths[203]+(-8.)*mom_def_Re_tr_paths[204];
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_11(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_10(double complex * op_out)
 {
-*op_out +=+(2.)*mom_def_Re_tr_paths[205]+(2.)*mom_def_Re_tr_paths[206]+(2.)*mom_def_Re_tr_paths[207]+(2.)*mom_def_Re_tr_paths[208]+(2.)*mom_def_Re_tr_paths[209]+(2.)*mom_def_Re_tr_paths[210]+(2.)*mom_def_Re_tr_paths[211]+(2.)*mom_def_Re_tr_paths[212]+(2.)*mom_def_Re_tr_paths[213]+(2.)*mom_def_Re_tr_paths[214]+(2.)*mom_def_Re_tr_paths[215]+(2.)*mom_def_Re_tr_paths[216]+(2.)*mom_def_Re_tr_paths[217]+(2.)*mom_def_Re_tr_paths[218]+(2.)*mom_def_Re_tr_paths[219]+(2.)*mom_def_Re_tr_paths[220]+(2.)*mom_def_Re_tr_paths[221]+(2.)*mom_def_Re_tr_paths[222]+(2.)*mom_def_Re_tr_paths[223]+(2.)*mom_def_Re_tr_paths[224]+(2.)*mom_def_Re_tr_paths[225]+(2.)*mom_def_Re_tr_paths[226]+(2.)*mom_def_Re_tr_paths[227]+(2.)*mom_def_Re_tr_paths[228];
+*op_out +=+(2.)*mom_def_Re_tr_paths[205]+(2.)*mom_def_Re_tr_paths[206]+(2.)*mom_def_Re_tr_paths[207]+(2.)*mom_def_Re_tr_paths[208]+(2.)*mom_def_Re_tr_paths[209]+(2.)*mom_def_Re_tr_paths[210]+(2.)*mom_def_Re_tr_paths[211]+(2.)*mom_def_Re_tr_paths[212]+(2.)*mom_def_Re_tr_paths[213]+(2.)*mom_def_Re_tr_paths[214]+(2.)*mom_def_Re_tr_paths[215]+(2.)*mom_def_Re_tr_paths[216]+(2.)*mom_def_Re_tr_paths[217]+(2.)*mom_def_Re_tr_paths[218]+(2.)*mom_def_Re_tr_paths[219]+(2.)*mom_def_Re_tr_paths[220]+(-4.)*mom_def_Re_tr_paths[221]+(-4.)*mom_def_Re_tr_paths[222]+(-4.)*mom_def_Re_tr_paths[223]+(-4.)*mom_def_Re_tr_paths[224]+(-4.)*mom_def_Re_tr_paths[225]+(-4.)*mom_def_Re_tr_paths[226]+(-4.)*mom_def_Re_tr_paths[227]+(-4.)*mom_def_Re_tr_paths[228];
 }
 
 static double complex path229(int in)
@@ -47175,29 +47028,29 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_12(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_11(double complex * op_out)
 {
-*op_out +=+(2.)*mom_def_Re_tr_paths[229]+(2.)*mom_def_Re_tr_paths[230]+(2.)*mom_def_Re_tr_paths[231]+(2.)*mom_def_Re_tr_paths[232]+(2.)*mom_def_Re_tr_paths[233]+(2.)*mom_def_Re_tr_paths[234]+(2.)*mom_def_Re_tr_paths[235]+(2.)*mom_def_Re_tr_paths[236]+(2.)*mom_def_Re_tr_paths[237]+(2.)*mom_def_Re_tr_paths[238]+(2.)*mom_def_Re_tr_paths[239]+(2.)*mom_def_Re_tr_paths[240]+(2.)*mom_def_Re_tr_paths[241]+(2.)*mom_def_Re_tr_paths[242]+(2.)*mom_def_Re_tr_paths[243]+(2.)*mom_def_Re_tr_paths[244]+(2.)*mom_def_Re_tr_paths[245]+(2.)*mom_def_Re_tr_paths[246]+(2.)*mom_def_Re_tr_paths[247]+(2.)*mom_def_Re_tr_paths[248]+(2.)*mom_def_Re_tr_paths[249]+(2.)*mom_def_Re_tr_paths[250]+(2.)*mom_def_Re_tr_paths[251]+(2.)*mom_def_Re_tr_paths[252];
+*op_out +=+(2.)*mom_def_Re_tr_paths[229]+(2.)*mom_def_Re_tr_paths[230]+(2.)*mom_def_Re_tr_paths[231]+(2.)*mom_def_Re_tr_paths[232]+(2.)*mom_def_Re_tr_paths[233]+(2.)*mom_def_Re_tr_paths[234]+(2.)*mom_def_Re_tr_paths[235]+(2.)*mom_def_Re_tr_paths[236]+(2.)*mom_def_Re_tr_paths[237]+(2.)*mom_def_Re_tr_paths[238]+(2.)*mom_def_Re_tr_paths[239]+(2.)*mom_def_Re_tr_paths[240]+(2.)*mom_def_Re_tr_paths[241]+(2.)*mom_def_Re_tr_paths[242]+(2.)*mom_def_Re_tr_paths[243]+(2.)*mom_def_Re_tr_paths[244]+(-4.)*mom_def_Re_tr_paths[245]+(-4.)*mom_def_Re_tr_paths[246]+(-4.)*mom_def_Re_tr_paths[247]+(-4.)*mom_def_Re_tr_paths[248]+(-4.)*mom_def_Re_tr_paths[249]+(-4.)*mom_def_Re_tr_paths[250]+(-4.)*mom_def_Re_tr_paths[251]+(-4.)*mom_def_Re_tr_paths[252];
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_13(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_12(double complex * op_out)
 {
-*op_out +=+(2.)*mom_def_Re_tr_paths[253]+(2.)*mom_def_Re_tr_paths[254]+(2.)*mom_def_Re_tr_paths[255]+(2.)*mom_def_Re_tr_paths[256]+(2.)*mom_def_Re_tr_paths[257]+(2.)*mom_def_Re_tr_paths[258]+(2.)*mom_def_Re_tr_paths[259]+(2.)*mom_def_Re_tr_paths[260]+(2.)*mom_def_Re_tr_paths[261]+(2.)*mom_def_Re_tr_paths[262]+(2.)*mom_def_Re_tr_paths[263]+(2.)*mom_def_Re_tr_paths[264]+(2.)*mom_def_Re_tr_paths[265]+(2.)*mom_def_Re_tr_paths[266]+(2.)*mom_def_Re_tr_paths[267]+(2.)*mom_def_Re_tr_paths[268]+(2.)*mom_def_Re_tr_paths[269]+(2.)*mom_def_Re_tr_paths[270]+(2.)*mom_def_Re_tr_paths[271]+(2.)*mom_def_Re_tr_paths[272]+(2.)*mom_def_Re_tr_paths[273]+(2.)*mom_def_Re_tr_paths[274]+(2.)*mom_def_Re_tr_paths[275]+(2.)*mom_def_Re_tr_paths[276];
+*op_out +=+(2.)*mom_def_Re_tr_paths[253]+(2.)*mom_def_Re_tr_paths[254]+(2.)*mom_def_Re_tr_paths[255]+(2.)*mom_def_Re_tr_paths[256]+(2.)*mom_def_Re_tr_paths[257]+(2.)*mom_def_Re_tr_paths[258]+(2.)*mom_def_Re_tr_paths[259]+(2.)*mom_def_Re_tr_paths[260]+(2.)*mom_def_Re_tr_paths[261]+(2.)*mom_def_Re_tr_paths[262]+(2.)*mom_def_Re_tr_paths[263]+(2.)*mom_def_Re_tr_paths[264]+(2.)*mom_def_Re_tr_paths[265]+(2.)*mom_def_Re_tr_paths[266]+(2.)*mom_def_Re_tr_paths[267]+(2.)*mom_def_Re_tr_paths[268]+(-4.)*mom_def_Re_tr_paths[269]+(-4.)*mom_def_Re_tr_paths[270]+(-4.)*mom_def_Re_tr_paths[271]+(-4.)*mom_def_Re_tr_paths[272]+(-4.)*mom_def_Re_tr_paths[273]+(-4.)*mom_def_Re_tr_paths[274]+(-4.)*mom_def_Re_tr_paths[275]+(-4.)*mom_def_Re_tr_paths[276];
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_14(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_13(double complex * op_out)
 {
-*op_out +=+mom_def_Re_tr_paths[277]+mom_def_Re_tr_paths[278]+mom_def_Re_tr_paths[279]+mom_def_Re_tr_paths[280]+mom_def_Re_tr_paths[281]+mom_def_Re_tr_paths[282]+mom_def_Re_tr_paths[283]+mom_def_Re_tr_paths[284]+mom_def_Re_tr_paths[285]+mom_def_Re_tr_paths[286]+mom_def_Re_tr_paths[287]+mom_def_Re_tr_paths[288]+mom_def_Re_tr_paths[289]+mom_def_Re_tr_paths[290]+mom_def_Re_tr_paths[291]+mom_def_Re_tr_paths[292]+mom_def_Re_tr_paths[293]+mom_def_Re_tr_paths[294]+mom_def_Re_tr_paths[295]+mom_def_Re_tr_paths[296]+mom_def_Re_tr_paths[297]+mom_def_Re_tr_paths[298]+mom_def_Re_tr_paths[299]+mom_def_Re_tr_paths[300]+mom_def_Re_tr_paths[301]+mom_def_Re_tr_paths[302]+mom_def_Re_tr_paths[303]+mom_def_Re_tr_paths[304]+mom_def_Re_tr_paths[305]+mom_def_Re_tr_paths[306]+mom_def_Re_tr_paths[307]+mom_def_Re_tr_paths[308]+mom_def_Re_tr_paths[309]+mom_def_Re_tr_paths[310]+mom_def_Re_tr_paths[311]+mom_def_Re_tr_paths[312]+mom_def_Re_tr_paths[313]+mom_def_Re_tr_paths[314]+mom_def_Re_tr_paths[315]+mom_def_Re_tr_paths[316]+mom_def_Re_tr_paths[317]+mom_def_Re_tr_paths[318]+mom_def_Re_tr_paths[319]+mom_def_Re_tr_paths[320]+mom_def_Re_tr_paths[321]+mom_def_Re_tr_paths[322]+mom_def_Re_tr_paths[323]+mom_def_Re_tr_paths[324];
+*op_out +=+mom_def_Re_tr_paths[277]+mom_def_Re_tr_paths[278]+mom_def_Re_tr_paths[279]+mom_def_Re_tr_paths[280]+mom_def_Re_tr_paths[281]+mom_def_Re_tr_paths[282]+mom_def_Re_tr_paths[283]+mom_def_Re_tr_paths[284]+mom_def_Re_tr_paths[285]+mom_def_Re_tr_paths[286]+mom_def_Re_tr_paths[287]+mom_def_Re_tr_paths[288]+mom_def_Re_tr_paths[289]+mom_def_Re_tr_paths[290]+mom_def_Re_tr_paths[291]+mom_def_Re_tr_paths[292]+mom_def_Re_tr_paths[293]+mom_def_Re_tr_paths[294]+mom_def_Re_tr_paths[295]+mom_def_Re_tr_paths[296]+mom_def_Re_tr_paths[297]+mom_def_Re_tr_paths[298]+mom_def_Re_tr_paths[299]+mom_def_Re_tr_paths[300]+mom_def_Re_tr_paths[301]+mom_def_Re_tr_paths[302]+mom_def_Re_tr_paths[303]+mom_def_Re_tr_paths[304]+mom_def_Re_tr_paths[305]+mom_def_Re_tr_paths[306]+mom_def_Re_tr_paths[307]+mom_def_Re_tr_paths[308]+(-2.)*mom_def_Re_tr_paths[309]+(-2.)*mom_def_Re_tr_paths[310]+(-2.)*mom_def_Re_tr_paths[311]+(-2.)*mom_def_Re_tr_paths[312]+(-2.)*mom_def_Re_tr_paths[313]+(-2.)*mom_def_Re_tr_paths[314]+(-2.)*mom_def_Re_tr_paths[315]+(-2.)*mom_def_Re_tr_paths[316]+(-2.)*mom_def_Re_tr_paths[317]+(-2.)*mom_def_Re_tr_paths[318]+(-2.)*mom_def_Re_tr_paths[319]+(-2.)*mom_def_Re_tr_paths[320]+(-2.)*mom_def_Re_tr_paths[321]+(-2.)*mom_def_Re_tr_paths[322]+(-2.)*mom_def_Re_tr_paths[323]+(-2.)*mom_def_Re_tr_paths[324];
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_15(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_14(double complex * op_out)
 {
-*op_out +=+mom_def_Re_tr_paths[325]+mom_def_Re_tr_paths[326]+mom_def_Re_tr_paths[327]+mom_def_Re_tr_paths[328]+mom_def_Re_tr_paths[329]+mom_def_Re_tr_paths[330]+mom_def_Re_tr_paths[331]+mom_def_Re_tr_paths[332]+mom_def_Re_tr_paths[333]+mom_def_Re_tr_paths[334]+mom_def_Re_tr_paths[335]+mom_def_Re_tr_paths[336]+mom_def_Re_tr_paths[337]+mom_def_Re_tr_paths[338]+mom_def_Re_tr_paths[339]+mom_def_Re_tr_paths[340]+mom_def_Re_tr_paths[341]+mom_def_Re_tr_paths[342]+mom_def_Re_tr_paths[343]+mom_def_Re_tr_paths[344]+mom_def_Re_tr_paths[345]+mom_def_Re_tr_paths[346]+mom_def_Re_tr_paths[347]+mom_def_Re_tr_paths[348]+mom_def_Re_tr_paths[349]+mom_def_Re_tr_paths[350]+mom_def_Re_tr_paths[351]+mom_def_Re_tr_paths[352]+mom_def_Re_tr_paths[353]+mom_def_Re_tr_paths[354]+mom_def_Re_tr_paths[355]+mom_def_Re_tr_paths[356]+mom_def_Re_tr_paths[357]+mom_def_Re_tr_paths[358]+mom_def_Re_tr_paths[359]+mom_def_Re_tr_paths[360]+mom_def_Re_tr_paths[361]+mom_def_Re_tr_paths[362]+mom_def_Re_tr_paths[363]+mom_def_Re_tr_paths[364]+mom_def_Re_tr_paths[365]+mom_def_Re_tr_paths[366]+mom_def_Re_tr_paths[367]+mom_def_Re_tr_paths[368]+mom_def_Re_tr_paths[369]+mom_def_Re_tr_paths[370]+mom_def_Re_tr_paths[371]+mom_def_Re_tr_paths[372];
+*op_out +=+mom_def_Re_tr_paths[325]+mom_def_Re_tr_paths[326]+mom_def_Re_tr_paths[327]+mom_def_Re_tr_paths[328]+mom_def_Re_tr_paths[329]+mom_def_Re_tr_paths[330]+mom_def_Re_tr_paths[331]+mom_def_Re_tr_paths[332]+mom_def_Re_tr_paths[333]+mom_def_Re_tr_paths[334]+mom_def_Re_tr_paths[335]+mom_def_Re_tr_paths[336]+mom_def_Re_tr_paths[337]+mom_def_Re_tr_paths[338]+mom_def_Re_tr_paths[339]+mom_def_Re_tr_paths[340]+mom_def_Re_tr_paths[341]+mom_def_Re_tr_paths[342]+mom_def_Re_tr_paths[343]+mom_def_Re_tr_paths[344]+mom_def_Re_tr_paths[345]+mom_def_Re_tr_paths[346]+mom_def_Re_tr_paths[347]+mom_def_Re_tr_paths[348]+mom_def_Re_tr_paths[349]+mom_def_Re_tr_paths[350]+mom_def_Re_tr_paths[351]+mom_def_Re_tr_paths[352]+mom_def_Re_tr_paths[353]+mom_def_Re_tr_paths[354]+mom_def_Re_tr_paths[355]+mom_def_Re_tr_paths[356]+(-2.)*mom_def_Re_tr_paths[357]+(-2.)*mom_def_Re_tr_paths[358]+(-2.)*mom_def_Re_tr_paths[359]+(-2.)*mom_def_Re_tr_paths[360]+(-2.)*mom_def_Re_tr_paths[361]+(-2.)*mom_def_Re_tr_paths[362]+(-2.)*mom_def_Re_tr_paths[363]+(-2.)*mom_def_Re_tr_paths[364]+(-2.)*mom_def_Re_tr_paths[365]+(-2.)*mom_def_Re_tr_paths[366]+(-2.)*mom_def_Re_tr_paths[367]+(-2.)*mom_def_Re_tr_paths[368]+(-2.)*mom_def_Re_tr_paths[369]+(-2.)*mom_def_Re_tr_paths[370]+(-2.)*mom_def_Re_tr_paths[371]+(-2.)*mom_def_Re_tr_paths[372];
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_16(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_15(double complex * op_out)
 {
-*op_out +=+mom_def_Re_tr_paths[373]+mom_def_Re_tr_paths[374]+mom_def_Re_tr_paths[375]+mom_def_Re_tr_paths[376]+mom_def_Re_tr_paths[377]+mom_def_Re_tr_paths[378]+mom_def_Re_tr_paths[379]+mom_def_Re_tr_paths[380]+mom_def_Re_tr_paths[381]+mom_def_Re_tr_paths[382]+mom_def_Re_tr_paths[383]+mom_def_Re_tr_paths[384]+mom_def_Re_tr_paths[385]+mom_def_Re_tr_paths[386]+mom_def_Re_tr_paths[387]+mom_def_Re_tr_paths[388]+mom_def_Re_tr_paths[389]+mom_def_Re_tr_paths[390]+mom_def_Re_tr_paths[391]+mom_def_Re_tr_paths[392]+mom_def_Re_tr_paths[393]+mom_def_Re_tr_paths[394]+mom_def_Re_tr_paths[395]+mom_def_Re_tr_paths[396]+mom_def_Re_tr_paths[397]+mom_def_Re_tr_paths[398]+mom_def_Re_tr_paths[399]+mom_def_Re_tr_paths[400]+mom_def_Re_tr_paths[401]+mom_def_Re_tr_paths[402]+mom_def_Re_tr_paths[403]+mom_def_Re_tr_paths[404]+mom_def_Re_tr_paths[405]+mom_def_Re_tr_paths[406]+mom_def_Re_tr_paths[407]+mom_def_Re_tr_paths[408]+mom_def_Re_tr_paths[409]+mom_def_Re_tr_paths[410]+mom_def_Re_tr_paths[411]+mom_def_Re_tr_paths[412]+mom_def_Re_tr_paths[413]+mom_def_Re_tr_paths[414]+mom_def_Re_tr_paths[415]+mom_def_Re_tr_paths[416]+mom_def_Re_tr_paths[417]+mom_def_Re_tr_paths[418]+mom_def_Re_tr_paths[419]+mom_def_Re_tr_paths[420];
+*op_out +=+mom_def_Re_tr_paths[373]+mom_def_Re_tr_paths[374]+mom_def_Re_tr_paths[375]+mom_def_Re_tr_paths[376]+mom_def_Re_tr_paths[377]+mom_def_Re_tr_paths[378]+mom_def_Re_tr_paths[379]+mom_def_Re_tr_paths[380]+mom_def_Re_tr_paths[381]+mom_def_Re_tr_paths[382]+mom_def_Re_tr_paths[383]+mom_def_Re_tr_paths[384]+mom_def_Re_tr_paths[385]+mom_def_Re_tr_paths[386]+mom_def_Re_tr_paths[387]+mom_def_Re_tr_paths[388]+mom_def_Re_tr_paths[389]+mom_def_Re_tr_paths[390]+mom_def_Re_tr_paths[391]+mom_def_Re_tr_paths[392]+mom_def_Re_tr_paths[393]+mom_def_Re_tr_paths[394]+mom_def_Re_tr_paths[395]+mom_def_Re_tr_paths[396]+mom_def_Re_tr_paths[397]+mom_def_Re_tr_paths[398]+mom_def_Re_tr_paths[399]+mom_def_Re_tr_paths[400]+mom_def_Re_tr_paths[401]+mom_def_Re_tr_paths[402]+mom_def_Re_tr_paths[403]+mom_def_Re_tr_paths[404]+(-2.)*mom_def_Re_tr_paths[405]+(-2.)*mom_def_Re_tr_paths[406]+(-2.)*mom_def_Re_tr_paths[407]+(-2.)*mom_def_Re_tr_paths[408]+(-2.)*mom_def_Re_tr_paths[409]+(-2.)*mom_def_Re_tr_paths[410]+(-2.)*mom_def_Re_tr_paths[411]+(-2.)*mom_def_Re_tr_paths[412]+(-2.)*mom_def_Re_tr_paths[413]+(-2.)*mom_def_Re_tr_paths[414]+(-2.)*mom_def_Re_tr_paths[415]+(-2.)*mom_def_Re_tr_paths[416]+(-2.)*mom_def_Re_tr_paths[417]+(-2.)*mom_def_Re_tr_paths[418]+(-2.)*mom_def_Re_tr_paths[419]+(-2.)*mom_def_Re_tr_paths[420];
 }
 
 static double complex path421(int in)
@@ -48436,14 +48289,14 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_17(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_16(double complex * op_out)
 {
-*op_out +=+(2.)*mom_def_Re_tr_paths[421]+(2.)*mom_def_Re_tr_paths[422]+(2.)*mom_def_Re_tr_paths[423]+(2.)*mom_def_Re_tr_paths[424]+(2.)*mom_def_Re_tr_paths[425]+(2.)*mom_def_Re_tr_paths[426]+(2.)*mom_def_Re_tr_paths[427]+(2.)*mom_def_Re_tr_paths[428]+(2.)*mom_def_Re_tr_paths[429]+(2.)*mom_def_Re_tr_paths[430]+(2.)*mom_def_Re_tr_paths[431]+(2.)*mom_def_Re_tr_paths[432]+(2.)*mom_def_Re_tr_paths[433]+(2.)*mom_def_Re_tr_paths[434]+(2.)*mom_def_Re_tr_paths[435]+(2.)*mom_def_Re_tr_paths[436]+(2.)*mom_def_Re_tr_paths[437]+(2.)*mom_def_Re_tr_paths[438]+(2.)*mom_def_Re_tr_paths[439]+(2.)*mom_def_Re_tr_paths[440]+(2.)*mom_def_Re_tr_paths[441]+(2.)*mom_def_Re_tr_paths[442]+(2.)*mom_def_Re_tr_paths[443]+(2.)*mom_def_Re_tr_paths[444];
+*op_out +=+(2.)*mom_def_Re_tr_paths[421]+(2.)*mom_def_Re_tr_paths[422]+(2.)*mom_def_Re_tr_paths[423]+(2.)*mom_def_Re_tr_paths[424]+(2.)*mom_def_Re_tr_paths[425]+(2.)*mom_def_Re_tr_paths[426]+(2.)*mom_def_Re_tr_paths[427]+(2.)*mom_def_Re_tr_paths[428]+(2.)*mom_def_Re_tr_paths[429]+(2.)*mom_def_Re_tr_paths[430]+(2.)*mom_def_Re_tr_paths[431]+(2.)*mom_def_Re_tr_paths[432]+(2.)*mom_def_Re_tr_paths[433]+(2.)*mom_def_Re_tr_paths[434]+(2.)*mom_def_Re_tr_paths[435]+(2.)*mom_def_Re_tr_paths[436]+(-4.)*mom_def_Re_tr_paths[437]+(-4.)*mom_def_Re_tr_paths[438]+(-4.)*mom_def_Re_tr_paths[439]+(-4.)*mom_def_Re_tr_paths[440]+(-4.)*mom_def_Re_tr_paths[441]+(-4.)*mom_def_Re_tr_paths[442]+(-4.)*mom_def_Re_tr_paths[443]+(-4.)*mom_def_Re_tr_paths[444];
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_18(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_17(double complex * op_out)
 {
-*op_out +=+mom_def_Re_tr_paths[445]+mom_def_Re_tr_paths[446]+mom_def_Re_tr_paths[447]+mom_def_Re_tr_paths[448]+mom_def_Re_tr_paths[449]+mom_def_Re_tr_paths[450]+mom_def_Re_tr_paths[451]+mom_def_Re_tr_paths[452]+mom_def_Re_tr_paths[453]+mom_def_Re_tr_paths[454]+mom_def_Re_tr_paths[455]+mom_def_Re_tr_paths[456]+mom_def_Re_tr_paths[457]+mom_def_Re_tr_paths[458]+mom_def_Re_tr_paths[459]+mom_def_Re_tr_paths[460]+mom_def_Re_tr_paths[461]+mom_def_Re_tr_paths[462]+mom_def_Re_tr_paths[463]+mom_def_Re_tr_paths[464]+mom_def_Re_tr_paths[465]+mom_def_Re_tr_paths[466]+mom_def_Re_tr_paths[467]+mom_def_Re_tr_paths[468]+mom_def_Re_tr_paths[469]+mom_def_Re_tr_paths[470]+mom_def_Re_tr_paths[471]+mom_def_Re_tr_paths[472]+mom_def_Re_tr_paths[473]+mom_def_Re_tr_paths[474]+mom_def_Re_tr_paths[475]+mom_def_Re_tr_paths[476]+mom_def_Re_tr_paths[477]+mom_def_Re_tr_paths[478]+mom_def_Re_tr_paths[479]+mom_def_Re_tr_paths[480]+mom_def_Re_tr_paths[481]+mom_def_Re_tr_paths[482]+mom_def_Re_tr_paths[483]+mom_def_Re_tr_paths[484]+mom_def_Re_tr_paths[485]+mom_def_Re_tr_paths[486]+mom_def_Re_tr_paths[487]+mom_def_Re_tr_paths[488]+mom_def_Re_tr_paths[489]+mom_def_Re_tr_paths[490]+mom_def_Re_tr_paths[491]+mom_def_Re_tr_paths[492];
+*op_out +=+mom_def_Re_tr_paths[445]+mom_def_Re_tr_paths[446]+mom_def_Re_tr_paths[447]+mom_def_Re_tr_paths[448]+mom_def_Re_tr_paths[449]+mom_def_Re_tr_paths[450]+mom_def_Re_tr_paths[451]+mom_def_Re_tr_paths[452]+mom_def_Re_tr_paths[453]+mom_def_Re_tr_paths[454]+mom_def_Re_tr_paths[455]+mom_def_Re_tr_paths[456]+mom_def_Re_tr_paths[457]+mom_def_Re_tr_paths[458]+mom_def_Re_tr_paths[459]+mom_def_Re_tr_paths[460]+mom_def_Re_tr_paths[461]+mom_def_Re_tr_paths[462]+mom_def_Re_tr_paths[463]+mom_def_Re_tr_paths[464]+mom_def_Re_tr_paths[465]+mom_def_Re_tr_paths[466]+mom_def_Re_tr_paths[467]+mom_def_Re_tr_paths[468]+mom_def_Re_tr_paths[469]+mom_def_Re_tr_paths[470]+mom_def_Re_tr_paths[471]+mom_def_Re_tr_paths[472]+mom_def_Re_tr_paths[473]+mom_def_Re_tr_paths[474]+mom_def_Re_tr_paths[475]+mom_def_Re_tr_paths[476]+(-2.)*mom_def_Re_tr_paths[477]+(-2.)*mom_def_Re_tr_paths[478]+(-2.)*mom_def_Re_tr_paths[479]+(-2.)*mom_def_Re_tr_paths[480]+(-2.)*mom_def_Re_tr_paths[481]+(-2.)*mom_def_Re_tr_paths[482]+(-2.)*mom_def_Re_tr_paths[483]+(-2.)*mom_def_Re_tr_paths[484]+(-2.)*mom_def_Re_tr_paths[485]+(-2.)*mom_def_Re_tr_paths[486]+(-2.)*mom_def_Re_tr_paths[487]+(-2.)*mom_def_Re_tr_paths[488]+(-2.)*mom_def_Re_tr_paths[489]+(-2.)*mom_def_Re_tr_paths[490]+(-2.)*mom_def_Re_tr_paths[491]+(-2.)*mom_def_Re_tr_paths[492];
 }
 
 static double complex path493(int in)
@@ -49682,74 +49535,74 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_19(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_18(double complex * op_out)
 {
-*op_out +=+(2.)*mom_def_Re_tr_paths[493]+(2.)*mom_def_Re_tr_paths[494]+(2.)*mom_def_Re_tr_paths[495]+(2.)*mom_def_Re_tr_paths[496]+(2.)*mom_def_Re_tr_paths[497]+(2.)*mom_def_Re_tr_paths[498]+(2.)*mom_def_Re_tr_paths[499]+(2.)*mom_def_Re_tr_paths[500]+(2.)*mom_def_Re_tr_paths[501]+(2.)*mom_def_Re_tr_paths[502]+(2.)*mom_def_Re_tr_paths[503]+(2.)*mom_def_Re_tr_paths[504]+(2.)*mom_def_Re_tr_paths[505]+(2.)*mom_def_Re_tr_paths[506]+(2.)*mom_def_Re_tr_paths[507]+(2.)*mom_def_Re_tr_paths[508]+(2.)*mom_def_Re_tr_paths[509]+(2.)*mom_def_Re_tr_paths[510]+(2.)*mom_def_Re_tr_paths[511]+(2.)*mom_def_Re_tr_paths[512]+(2.)*mom_def_Re_tr_paths[513]+(2.)*mom_def_Re_tr_paths[514]+(2.)*mom_def_Re_tr_paths[515]+(2.)*mom_def_Re_tr_paths[516];
+*op_out +=+(2.)*mom_def_Re_tr_paths[493]+(2.)*mom_def_Re_tr_paths[494]+(2.)*mom_def_Re_tr_paths[495]+(2.)*mom_def_Re_tr_paths[496]+(2.)*mom_def_Re_tr_paths[497]+(2.)*mom_def_Re_tr_paths[498]+(2.)*mom_def_Re_tr_paths[499]+(2.)*mom_def_Re_tr_paths[500]+(2.)*mom_def_Re_tr_paths[501]+(2.)*mom_def_Re_tr_paths[502]+(2.)*mom_def_Re_tr_paths[503]+(2.)*mom_def_Re_tr_paths[504]+(2.)*mom_def_Re_tr_paths[505]+(2.)*mom_def_Re_tr_paths[506]+(2.)*mom_def_Re_tr_paths[507]+(2.)*mom_def_Re_tr_paths[508]+(-4.)*mom_def_Re_tr_paths[509]+(-4.)*mom_def_Re_tr_paths[510]+(-4.)*mom_def_Re_tr_paths[511]+(-4.)*mom_def_Re_tr_paths[512]+(-4.)*mom_def_Re_tr_paths[513]+(-4.)*mom_def_Re_tr_paths[514]+(-4.)*mom_def_Re_tr_paths[515]+(-4.)*mom_def_Re_tr_paths[516];
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_20(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_19(double complex * op_out)
 {
-*op_out +=+(2.)*mom_def_Re_tr_paths[517]+(2.)*mom_def_Re_tr_paths[518]+(2.)*mom_def_Re_tr_paths[519]+(2.)*mom_def_Re_tr_paths[520]+(2.)*mom_def_Re_tr_paths[521]+(2.)*mom_def_Re_tr_paths[522]+(2.)*mom_def_Re_tr_paths[523]+(2.)*mom_def_Re_tr_paths[524]+(2.)*mom_def_Re_tr_paths[525]+(2.)*mom_def_Re_tr_paths[526]+(2.)*mom_def_Re_tr_paths[527]+(2.)*mom_def_Re_tr_paths[528]+(2.)*mom_def_Re_tr_paths[529]+(2.)*mom_def_Re_tr_paths[530]+(2.)*mom_def_Re_tr_paths[531]+(2.)*mom_def_Re_tr_paths[532]+(2.)*mom_def_Re_tr_paths[533]+(2.)*mom_def_Re_tr_paths[534]+(2.)*mom_def_Re_tr_paths[535]+(2.)*mom_def_Re_tr_paths[536]+(2.)*mom_def_Re_tr_paths[537]+(2.)*mom_def_Re_tr_paths[538]+(2.)*mom_def_Re_tr_paths[539]+(2.)*mom_def_Re_tr_paths[540];
+*op_out +=+(2.)*mom_def_Re_tr_paths[517]+(2.)*mom_def_Re_tr_paths[518]+(2.)*mom_def_Re_tr_paths[519]+(2.)*mom_def_Re_tr_paths[520]+(2.)*mom_def_Re_tr_paths[521]+(2.)*mom_def_Re_tr_paths[522]+(2.)*mom_def_Re_tr_paths[523]+(2.)*mom_def_Re_tr_paths[524]+(2.)*mom_def_Re_tr_paths[525]+(2.)*mom_def_Re_tr_paths[526]+(2.)*mom_def_Re_tr_paths[527]+(2.)*mom_def_Re_tr_paths[528]+(2.)*mom_def_Re_tr_paths[529]+(2.)*mom_def_Re_tr_paths[530]+(2.)*mom_def_Re_tr_paths[531]+(2.)*mom_def_Re_tr_paths[532]+(-4.)*mom_def_Re_tr_paths[533]+(-4.)*mom_def_Re_tr_paths[534]+(-4.)*mom_def_Re_tr_paths[535]+(-4.)*mom_def_Re_tr_paths[536]+(-4.)*mom_def_Re_tr_paths[537]+(-4.)*mom_def_Re_tr_paths[538]+(-4.)*mom_def_Re_tr_paths[539]+(-4.)*mom_def_Re_tr_paths[540];
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_21(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_20(double complex * op_out)
 {
-*op_out +=+mom_def_Re_tr_paths[541]+mom_def_Re_tr_paths[542]+mom_def_Re_tr_paths[543]+mom_def_Re_tr_paths[544]+mom_def_Re_tr_paths[545]+mom_def_Re_tr_paths[546]+mom_def_Re_tr_paths[547]+mom_def_Re_tr_paths[548]+mom_def_Re_tr_paths[549]+mom_def_Re_tr_paths[550]+mom_def_Re_tr_paths[551]+mom_def_Re_tr_paths[552]+mom_def_Re_tr_paths[553]+mom_def_Re_tr_paths[554]+mom_def_Re_tr_paths[555]+mom_def_Re_tr_paths[556]+mom_def_Re_tr_paths[557]+mom_def_Re_tr_paths[558]+mom_def_Re_tr_paths[559]+mom_def_Re_tr_paths[560]+mom_def_Re_tr_paths[561]+mom_def_Re_tr_paths[562]+mom_def_Re_tr_paths[563]+mom_def_Re_tr_paths[564]+mom_def_Re_tr_paths[565]+mom_def_Re_tr_paths[566]+mom_def_Re_tr_paths[567]+mom_def_Re_tr_paths[568]+mom_def_Re_tr_paths[569]+mom_def_Re_tr_paths[570]+mom_def_Re_tr_paths[571]+mom_def_Re_tr_paths[572]+mom_def_Re_tr_paths[573]+mom_def_Re_tr_paths[574]+mom_def_Re_tr_paths[575]+mom_def_Re_tr_paths[576]+mom_def_Re_tr_paths[577]+mom_def_Re_tr_paths[578]+mom_def_Re_tr_paths[579]+mom_def_Re_tr_paths[580]+mom_def_Re_tr_paths[581]+mom_def_Re_tr_paths[582]+mom_def_Re_tr_paths[583]+mom_def_Re_tr_paths[584]+mom_def_Re_tr_paths[585]+mom_def_Re_tr_paths[586]+mom_def_Re_tr_paths[587]+mom_def_Re_tr_paths[588];
+*op_out +=+mom_def_Re_tr_paths[541]+mom_def_Re_tr_paths[542]+mom_def_Re_tr_paths[543]+mom_def_Re_tr_paths[544]+mom_def_Re_tr_paths[545]+mom_def_Re_tr_paths[546]+mom_def_Re_tr_paths[547]+mom_def_Re_tr_paths[548]+mom_def_Re_tr_paths[549]+mom_def_Re_tr_paths[550]+mom_def_Re_tr_paths[551]+mom_def_Re_tr_paths[552]+mom_def_Re_tr_paths[553]+mom_def_Re_tr_paths[554]+mom_def_Re_tr_paths[555]+mom_def_Re_tr_paths[556]+mom_def_Re_tr_paths[557]+mom_def_Re_tr_paths[558]+mom_def_Re_tr_paths[559]+mom_def_Re_tr_paths[560]+mom_def_Re_tr_paths[561]+mom_def_Re_tr_paths[562]+mom_def_Re_tr_paths[563]+mom_def_Re_tr_paths[564]+mom_def_Re_tr_paths[565]+mom_def_Re_tr_paths[566]+mom_def_Re_tr_paths[567]+mom_def_Re_tr_paths[568]+mom_def_Re_tr_paths[569]+mom_def_Re_tr_paths[570]+mom_def_Re_tr_paths[571]+mom_def_Re_tr_paths[572]+(-2.)*mom_def_Re_tr_paths[573]+(-2.)*mom_def_Re_tr_paths[574]+(-2.)*mom_def_Re_tr_paths[575]+(-2.)*mom_def_Re_tr_paths[576]+(-2.)*mom_def_Re_tr_paths[577]+(-2.)*mom_def_Re_tr_paths[578]+(-2.)*mom_def_Re_tr_paths[579]+(-2.)*mom_def_Re_tr_paths[580]+(-2.)*mom_def_Re_tr_paths[581]+(-2.)*mom_def_Re_tr_paths[582]+(-2.)*mom_def_Re_tr_paths[583]+(-2.)*mom_def_Re_tr_paths[584]+(-2.)*mom_def_Re_tr_paths[585]+(-2.)*mom_def_Re_tr_paths[586]+(-2.)*mom_def_Re_tr_paths[587]+(-2.)*mom_def_Re_tr_paths[588];
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_22(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_21(double complex * op_out)
 {
-*op_out +=+(2.)*mom_def_Re_tr_paths[589]+(2.)*mom_def_Re_tr_paths[590]+(2.)*mom_def_Re_tr_paths[591]+(2.)*mom_def_Re_tr_paths[592]+(2.)*mom_def_Re_tr_paths[593]+(2.)*mom_def_Re_tr_paths[594]+(2.)*mom_def_Re_tr_paths[595]+(2.)*mom_def_Re_tr_paths[596]+(2.)*mom_def_Re_tr_paths[597]+(2.)*mom_def_Re_tr_paths[598]+(2.)*mom_def_Re_tr_paths[599]+(2.)*mom_def_Re_tr_paths[600]+(2.)*mom_def_Re_tr_paths[601]+(2.)*mom_def_Re_tr_paths[602]+(2.)*mom_def_Re_tr_paths[603]+(2.)*mom_def_Re_tr_paths[604]+(2.)*mom_def_Re_tr_paths[605]+(2.)*mom_def_Re_tr_paths[606]+(2.)*mom_def_Re_tr_paths[607]+(2.)*mom_def_Re_tr_paths[608]+(2.)*mom_def_Re_tr_paths[609]+(2.)*mom_def_Re_tr_paths[610]+(2.)*mom_def_Re_tr_paths[611]+(2.)*mom_def_Re_tr_paths[612];
+*op_out +=+(2.)*mom_def_Re_tr_paths[589]+(2.)*mom_def_Re_tr_paths[590]+(2.)*mom_def_Re_tr_paths[591]+(2.)*mom_def_Re_tr_paths[592]+(2.)*mom_def_Re_tr_paths[593]+(2.)*mom_def_Re_tr_paths[594]+(2.)*mom_def_Re_tr_paths[595]+(2.)*mom_def_Re_tr_paths[596]+(2.)*mom_def_Re_tr_paths[597]+(2.)*mom_def_Re_tr_paths[598]+(2.)*mom_def_Re_tr_paths[599]+(2.)*mom_def_Re_tr_paths[600]+(2.)*mom_def_Re_tr_paths[601]+(2.)*mom_def_Re_tr_paths[602]+(2.)*mom_def_Re_tr_paths[603]+(2.)*mom_def_Re_tr_paths[604]+(-4.)*mom_def_Re_tr_paths[605]+(-4.)*mom_def_Re_tr_paths[606]+(-4.)*mom_def_Re_tr_paths[607]+(-4.)*mom_def_Re_tr_paths[608]+(-4.)*mom_def_Re_tr_paths[609]+(-4.)*mom_def_Re_tr_paths[610]+(-4.)*mom_def_Re_tr_paths[611]+(-4.)*mom_def_Re_tr_paths[612];
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_23(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_22(double complex * op_out)
 {
-*op_out +=+mom_def_Re_tr_paths[613]+mom_def_Re_tr_paths[614]+mom_def_Re_tr_paths[615]+mom_def_Re_tr_paths[616]+mom_def_Re_tr_paths[617]+mom_def_Re_tr_paths[618]+mom_def_Re_tr_paths[619]+mom_def_Re_tr_paths[620]+mom_def_Re_tr_paths[621]+mom_def_Re_tr_paths[622]+mom_def_Re_tr_paths[623]+mom_def_Re_tr_paths[624]+mom_def_Re_tr_paths[625]+mom_def_Re_tr_paths[626]+mom_def_Re_tr_paths[627]+mom_def_Re_tr_paths[628]+mom_def_Re_tr_paths[629]+mom_def_Re_tr_paths[630]+mom_def_Re_tr_paths[631]+mom_def_Re_tr_paths[632]+mom_def_Re_tr_paths[633]+mom_def_Re_tr_paths[634]+mom_def_Re_tr_paths[635]+mom_def_Re_tr_paths[636]+mom_def_Re_tr_paths[637]+mom_def_Re_tr_paths[638]+mom_def_Re_tr_paths[639]+mom_def_Re_tr_paths[640]+mom_def_Re_tr_paths[641]+mom_def_Re_tr_paths[642]+mom_def_Re_tr_paths[643]+mom_def_Re_tr_paths[644]+mom_def_Re_tr_paths[645]+mom_def_Re_tr_paths[646]+mom_def_Re_tr_paths[647]+mom_def_Re_tr_paths[648]+mom_def_Re_tr_paths[649]+mom_def_Re_tr_paths[650]+mom_def_Re_tr_paths[651]+mom_def_Re_tr_paths[652]+mom_def_Re_tr_paths[653]+mom_def_Re_tr_paths[654]+mom_def_Re_tr_paths[655]+mom_def_Re_tr_paths[656]+mom_def_Re_tr_paths[657]+mom_def_Re_tr_paths[658]+mom_def_Re_tr_paths[659]+mom_def_Re_tr_paths[660];
+*op_out +=+mom_def_Re_tr_paths[613]+mom_def_Re_tr_paths[614]+mom_def_Re_tr_paths[615]+mom_def_Re_tr_paths[616]+mom_def_Re_tr_paths[617]+mom_def_Re_tr_paths[618]+mom_def_Re_tr_paths[619]+mom_def_Re_tr_paths[620]+mom_def_Re_tr_paths[621]+mom_def_Re_tr_paths[622]+mom_def_Re_tr_paths[623]+mom_def_Re_tr_paths[624]+mom_def_Re_tr_paths[625]+mom_def_Re_tr_paths[626]+mom_def_Re_tr_paths[627]+mom_def_Re_tr_paths[628]+mom_def_Re_tr_paths[629]+mom_def_Re_tr_paths[630]+mom_def_Re_tr_paths[631]+mom_def_Re_tr_paths[632]+mom_def_Re_tr_paths[633]+mom_def_Re_tr_paths[634]+mom_def_Re_tr_paths[635]+mom_def_Re_tr_paths[636]+mom_def_Re_tr_paths[637]+mom_def_Re_tr_paths[638]+mom_def_Re_tr_paths[639]+mom_def_Re_tr_paths[640]+mom_def_Re_tr_paths[641]+mom_def_Re_tr_paths[642]+mom_def_Re_tr_paths[643]+mom_def_Re_tr_paths[644]+(-2.)*mom_def_Re_tr_paths[645]+(-2.)*mom_def_Re_tr_paths[646]+(-2.)*mom_def_Re_tr_paths[647]+(-2.)*mom_def_Re_tr_paths[648]+(-2.)*mom_def_Re_tr_paths[649]+(-2.)*mom_def_Re_tr_paths[650]+(-2.)*mom_def_Re_tr_paths[651]+(-2.)*mom_def_Re_tr_paths[652]+(-2.)*mom_def_Re_tr_paths[653]+(-2.)*mom_def_Re_tr_paths[654]+(-2.)*mom_def_Re_tr_paths[655]+(-2.)*mom_def_Re_tr_paths[656]+(-2.)*mom_def_Re_tr_paths[657]+(-2.)*mom_def_Re_tr_paths[658]+(-2.)*mom_def_Re_tr_paths[659]+(-2.)*mom_def_Re_tr_paths[660];
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_24(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_23(double complex * op_out)
 {
-*op_out +=+(2.)*mom_def_Re_tr_paths[661]+(2.)*mom_def_Re_tr_paths[662]+(2.)*mom_def_Re_tr_paths[663]+(2.)*mom_def_Re_tr_paths[664]+(2.)*mom_def_Re_tr_paths[665]+(2.)*mom_def_Re_tr_paths[666]+(2.)*mom_def_Re_tr_paths[667]+(2.)*mom_def_Re_tr_paths[668]+(2.)*mom_def_Re_tr_paths[669]+(2.)*mom_def_Re_tr_paths[670]+(2.)*mom_def_Re_tr_paths[671]+(2.)*mom_def_Re_tr_paths[672]+(2.)*mom_def_Re_tr_paths[673]+(2.)*mom_def_Re_tr_paths[674]+(2.)*mom_def_Re_tr_paths[675]+(2.)*mom_def_Re_tr_paths[676]+(2.)*mom_def_Re_tr_paths[677]+(2.)*mom_def_Re_tr_paths[678]+(2.)*mom_def_Re_tr_paths[679]+(2.)*mom_def_Re_tr_paths[680]+(2.)*mom_def_Re_tr_paths[681]+(2.)*mom_def_Re_tr_paths[682]+(2.)*mom_def_Re_tr_paths[683]+(2.)*mom_def_Re_tr_paths[684];
+*op_out +=+(2.)*mom_def_Re_tr_paths[661]+(2.)*mom_def_Re_tr_paths[662]+(2.)*mom_def_Re_tr_paths[663]+(2.)*mom_def_Re_tr_paths[664]+(2.)*mom_def_Re_tr_paths[665]+(2.)*mom_def_Re_tr_paths[666]+(2.)*mom_def_Re_tr_paths[667]+(2.)*mom_def_Re_tr_paths[668]+(2.)*mom_def_Re_tr_paths[669]+(2.)*mom_def_Re_tr_paths[670]+(2.)*mom_def_Re_tr_paths[671]+(2.)*mom_def_Re_tr_paths[672]+(2.)*mom_def_Re_tr_paths[673]+(2.)*mom_def_Re_tr_paths[674]+(2.)*mom_def_Re_tr_paths[675]+(2.)*mom_def_Re_tr_paths[676]+(-4.)*mom_def_Re_tr_paths[677]+(-4.)*mom_def_Re_tr_paths[678]+(-4.)*mom_def_Re_tr_paths[679]+(-4.)*mom_def_Re_tr_paths[680]+(-4.)*mom_def_Re_tr_paths[681]+(-4.)*mom_def_Re_tr_paths[682]+(-4.)*mom_def_Re_tr_paths[683]+(-4.)*mom_def_Re_tr_paths[684];
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_25(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_24(double complex * op_out)
 {
-*op_out +=+mom_def_Re_tr_paths[685]+mom_def_Re_tr_paths[686]+mom_def_Re_tr_paths[687]+mom_def_Re_tr_paths[688]+mom_def_Re_tr_paths[689]+mom_def_Re_tr_paths[690]+mom_def_Re_tr_paths[691]+mom_def_Re_tr_paths[692]+mom_def_Re_tr_paths[693]+mom_def_Re_tr_paths[694]+mom_def_Re_tr_paths[695]+mom_def_Re_tr_paths[696]+mom_def_Re_tr_paths[697]+mom_def_Re_tr_paths[698]+mom_def_Re_tr_paths[699]+mom_def_Re_tr_paths[700]+mom_def_Re_tr_paths[701]+mom_def_Re_tr_paths[702]+mom_def_Re_tr_paths[703]+mom_def_Re_tr_paths[704]+mom_def_Re_tr_paths[705]+mom_def_Re_tr_paths[706]+mom_def_Re_tr_paths[707]+mom_def_Re_tr_paths[708]+mom_def_Re_tr_paths[709]+mom_def_Re_tr_paths[710]+mom_def_Re_tr_paths[711]+mom_def_Re_tr_paths[712]+mom_def_Re_tr_paths[713]+mom_def_Re_tr_paths[714]+mom_def_Re_tr_paths[715]+mom_def_Re_tr_paths[716]+mom_def_Re_tr_paths[717]+mom_def_Re_tr_paths[718]+mom_def_Re_tr_paths[719]+mom_def_Re_tr_paths[720]+mom_def_Re_tr_paths[721]+mom_def_Re_tr_paths[722]+mom_def_Re_tr_paths[723]+mom_def_Re_tr_paths[724]+mom_def_Re_tr_paths[725]+mom_def_Re_tr_paths[726]+mom_def_Re_tr_paths[727]+mom_def_Re_tr_paths[728]+mom_def_Re_tr_paths[729]+mom_def_Re_tr_paths[730]+mom_def_Re_tr_paths[731]+mom_def_Re_tr_paths[732];
+*op_out +=+mom_def_Re_tr_paths[685]+mom_def_Re_tr_paths[686]+mom_def_Re_tr_paths[687]+mom_def_Re_tr_paths[688]+mom_def_Re_tr_paths[689]+mom_def_Re_tr_paths[690]+mom_def_Re_tr_paths[691]+mom_def_Re_tr_paths[692]+mom_def_Re_tr_paths[693]+mom_def_Re_tr_paths[694]+mom_def_Re_tr_paths[695]+mom_def_Re_tr_paths[696]+mom_def_Re_tr_paths[697]+mom_def_Re_tr_paths[698]+mom_def_Re_tr_paths[699]+mom_def_Re_tr_paths[700]+mom_def_Re_tr_paths[701]+mom_def_Re_tr_paths[702]+mom_def_Re_tr_paths[703]+mom_def_Re_tr_paths[704]+mom_def_Re_tr_paths[705]+mom_def_Re_tr_paths[706]+mom_def_Re_tr_paths[707]+mom_def_Re_tr_paths[708]+mom_def_Re_tr_paths[709]+mom_def_Re_tr_paths[710]+mom_def_Re_tr_paths[711]+mom_def_Re_tr_paths[712]+mom_def_Re_tr_paths[713]+mom_def_Re_tr_paths[714]+mom_def_Re_tr_paths[715]+mom_def_Re_tr_paths[716]+(-2.)*mom_def_Re_tr_paths[717]+(-2.)*mom_def_Re_tr_paths[718]+(-2.)*mom_def_Re_tr_paths[719]+(-2.)*mom_def_Re_tr_paths[720]+(-2.)*mom_def_Re_tr_paths[721]+(-2.)*mom_def_Re_tr_paths[722]+(-2.)*mom_def_Re_tr_paths[723]+(-2.)*mom_def_Re_tr_paths[724]+(-2.)*mom_def_Re_tr_paths[725]+(-2.)*mom_def_Re_tr_paths[726]+(-2.)*mom_def_Re_tr_paths[727]+(-2.)*mom_def_Re_tr_paths[728]+(-2.)*mom_def_Re_tr_paths[729]+(-2.)*mom_def_Re_tr_paths[730]+(-2.)*mom_def_Re_tr_paths[731]+(-2.)*mom_def_Re_tr_paths[732];
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_26(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_25(double complex * op_out)
 {
-*op_out +=+mom_def_Re_tr_paths[733]+mom_def_Re_tr_paths[734]+mom_def_Re_tr_paths[735]+mom_def_Re_tr_paths[736]+mom_def_Re_tr_paths[737]+mom_def_Re_tr_paths[738]+mom_def_Re_tr_paths[739]+mom_def_Re_tr_paths[740]+mom_def_Re_tr_paths[741]+mom_def_Re_tr_paths[742]+mom_def_Re_tr_paths[743]+mom_def_Re_tr_paths[744]+mom_def_Re_tr_paths[745]+mom_def_Re_tr_paths[746]+mom_def_Re_tr_paths[747]+mom_def_Re_tr_paths[748]+mom_def_Re_tr_paths[749]+mom_def_Re_tr_paths[750]+mom_def_Re_tr_paths[751]+mom_def_Re_tr_paths[752]+mom_def_Re_tr_paths[753]+mom_def_Re_tr_paths[754]+mom_def_Re_tr_paths[755]+mom_def_Re_tr_paths[756]+mom_def_Re_tr_paths[757]+mom_def_Re_tr_paths[758]+mom_def_Re_tr_paths[759]+mom_def_Re_tr_paths[760]+mom_def_Re_tr_paths[761]+mom_def_Re_tr_paths[762]+mom_def_Re_tr_paths[763]+mom_def_Re_tr_paths[764]+mom_def_Re_tr_paths[765]+mom_def_Re_tr_paths[766]+mom_def_Re_tr_paths[767]+mom_def_Re_tr_paths[768]+mom_def_Re_tr_paths[769]+mom_def_Re_tr_paths[770]+mom_def_Re_tr_paths[771]+mom_def_Re_tr_paths[772]+mom_def_Re_tr_paths[773]+mom_def_Re_tr_paths[774]+mom_def_Re_tr_paths[775]+mom_def_Re_tr_paths[776]+mom_def_Re_tr_paths[777]+mom_def_Re_tr_paths[778]+mom_def_Re_tr_paths[779]+mom_def_Re_tr_paths[780];
+*op_out +=+mom_def_Re_tr_paths[733]+mom_def_Re_tr_paths[734]+mom_def_Re_tr_paths[735]+mom_def_Re_tr_paths[736]+mom_def_Re_tr_paths[737]+mom_def_Re_tr_paths[738]+mom_def_Re_tr_paths[739]+mom_def_Re_tr_paths[740]+mom_def_Re_tr_paths[741]+mom_def_Re_tr_paths[742]+mom_def_Re_tr_paths[743]+mom_def_Re_tr_paths[744]+mom_def_Re_tr_paths[745]+mom_def_Re_tr_paths[746]+mom_def_Re_tr_paths[747]+mom_def_Re_tr_paths[748]+mom_def_Re_tr_paths[749]+mom_def_Re_tr_paths[750]+mom_def_Re_tr_paths[751]+mom_def_Re_tr_paths[752]+mom_def_Re_tr_paths[753]+mom_def_Re_tr_paths[754]+mom_def_Re_tr_paths[755]+mom_def_Re_tr_paths[756]+mom_def_Re_tr_paths[757]+mom_def_Re_tr_paths[758]+mom_def_Re_tr_paths[759]+mom_def_Re_tr_paths[760]+mom_def_Re_tr_paths[761]+mom_def_Re_tr_paths[762]+mom_def_Re_tr_paths[763]+mom_def_Re_tr_paths[764]+(-2.)*mom_def_Re_tr_paths[765]+(-2.)*mom_def_Re_tr_paths[766]+(-2.)*mom_def_Re_tr_paths[767]+(-2.)*mom_def_Re_tr_paths[768]+(-2.)*mom_def_Re_tr_paths[769]+(-2.)*mom_def_Re_tr_paths[770]+(-2.)*mom_def_Re_tr_paths[771]+(-2.)*mom_def_Re_tr_paths[772]+(-2.)*mom_def_Re_tr_paths[773]+(-2.)*mom_def_Re_tr_paths[774]+(-2.)*mom_def_Re_tr_paths[775]+(-2.)*mom_def_Re_tr_paths[776]+(-2.)*mom_def_Re_tr_paths[777]+(-2.)*mom_def_Re_tr_paths[778]+(-2.)*mom_def_Re_tr_paths[779]+(-2.)*mom_def_Re_tr_paths[780];
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_27(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_26(double complex * op_out)
 {
-*op_out +=+mom_def_Re_tr_paths[781]+mom_def_Re_tr_paths[782]+mom_def_Re_tr_paths[783]+mom_def_Re_tr_paths[784]+mom_def_Re_tr_paths[785]+mom_def_Re_tr_paths[786]+mom_def_Re_tr_paths[787]+mom_def_Re_tr_paths[788]+mom_def_Re_tr_paths[789]+mom_def_Re_tr_paths[790]+mom_def_Re_tr_paths[791]+mom_def_Re_tr_paths[792]+mom_def_Re_tr_paths[793]+mom_def_Re_tr_paths[794]+mom_def_Re_tr_paths[795]+mom_def_Re_tr_paths[796]+mom_def_Re_tr_paths[797]+mom_def_Re_tr_paths[798]+mom_def_Re_tr_paths[799]+mom_def_Re_tr_paths[800]+mom_def_Re_tr_paths[801]+mom_def_Re_tr_paths[802]+mom_def_Re_tr_paths[803]+mom_def_Re_tr_paths[804]+mom_def_Re_tr_paths[805]+mom_def_Re_tr_paths[806]+mom_def_Re_tr_paths[807]+mom_def_Re_tr_paths[808]+mom_def_Re_tr_paths[809]+mom_def_Re_tr_paths[810]+mom_def_Re_tr_paths[811]+mom_def_Re_tr_paths[812]+mom_def_Re_tr_paths[813]+mom_def_Re_tr_paths[814]+mom_def_Re_tr_paths[815]+mom_def_Re_tr_paths[816]+mom_def_Re_tr_paths[817]+mom_def_Re_tr_paths[818]+mom_def_Re_tr_paths[819]+mom_def_Re_tr_paths[820]+mom_def_Re_tr_paths[821]+mom_def_Re_tr_paths[822]+mom_def_Re_tr_paths[823]+mom_def_Re_tr_paths[824]+mom_def_Re_tr_paths[825]+mom_def_Re_tr_paths[826]+mom_def_Re_tr_paths[827]+mom_def_Re_tr_paths[828];
+*op_out +=+mom_def_Re_tr_paths[781]+mom_def_Re_tr_paths[782]+mom_def_Re_tr_paths[783]+mom_def_Re_tr_paths[784]+mom_def_Re_tr_paths[785]+mom_def_Re_tr_paths[786]+mom_def_Re_tr_paths[787]+mom_def_Re_tr_paths[788]+mom_def_Re_tr_paths[789]+mom_def_Re_tr_paths[790]+mom_def_Re_tr_paths[791]+mom_def_Re_tr_paths[792]+mom_def_Re_tr_paths[793]+mom_def_Re_tr_paths[794]+mom_def_Re_tr_paths[795]+mom_def_Re_tr_paths[796]+mom_def_Re_tr_paths[797]+mom_def_Re_tr_paths[798]+mom_def_Re_tr_paths[799]+mom_def_Re_tr_paths[800]+mom_def_Re_tr_paths[801]+mom_def_Re_tr_paths[802]+mom_def_Re_tr_paths[803]+mom_def_Re_tr_paths[804]+mom_def_Re_tr_paths[805]+mom_def_Re_tr_paths[806]+mom_def_Re_tr_paths[807]+mom_def_Re_tr_paths[808]+mom_def_Re_tr_paths[809]+mom_def_Re_tr_paths[810]+mom_def_Re_tr_paths[811]+mom_def_Re_tr_paths[812]+(-2.)*mom_def_Re_tr_paths[813]+(-2.)*mom_def_Re_tr_paths[814]+(-2.)*mom_def_Re_tr_paths[815]+(-2.)*mom_def_Re_tr_paths[816]+(-2.)*mom_def_Re_tr_paths[817]+(-2.)*mom_def_Re_tr_paths[818]+(-2.)*mom_def_Re_tr_paths[819]+(-2.)*mom_def_Re_tr_paths[820]+(-2.)*mom_def_Re_tr_paths[821]+(-2.)*mom_def_Re_tr_paths[822]+(-2.)*mom_def_Re_tr_paths[823]+(-2.)*mom_def_Re_tr_paths[824]+(-2.)*mom_def_Re_tr_paths[825]+(-2.)*mom_def_Re_tr_paths[826]+(-2.)*mom_def_Re_tr_paths[827]+(-2.)*mom_def_Re_tr_paths[828];
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_28(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_27(double complex * op_out)
 {
-*op_out +=+mom_def_Re_tr_paths[829]+mom_def_Re_tr_paths[830]+mom_def_Re_tr_paths[831]+mom_def_Re_tr_paths[832]+mom_def_Re_tr_paths[833]+mom_def_Re_tr_paths[834]+mom_def_Re_tr_paths[835]+mom_def_Re_tr_paths[836]+mom_def_Re_tr_paths[837]+mom_def_Re_tr_paths[838]+mom_def_Re_tr_paths[839]+mom_def_Re_tr_paths[840]+mom_def_Re_tr_paths[841]+mom_def_Re_tr_paths[842]+mom_def_Re_tr_paths[843]+mom_def_Re_tr_paths[844]+mom_def_Re_tr_paths[845]+mom_def_Re_tr_paths[846]+mom_def_Re_tr_paths[847]+mom_def_Re_tr_paths[848]+mom_def_Re_tr_paths[849]+mom_def_Re_tr_paths[850]+mom_def_Re_tr_paths[851]+mom_def_Re_tr_paths[852]+mom_def_Re_tr_paths[853]+mom_def_Re_tr_paths[854]+mom_def_Re_tr_paths[855]+mom_def_Re_tr_paths[856]+mom_def_Re_tr_paths[857]+mom_def_Re_tr_paths[858]+mom_def_Re_tr_paths[859]+mom_def_Re_tr_paths[860]+mom_def_Re_tr_paths[861]+mom_def_Re_tr_paths[862]+mom_def_Re_tr_paths[863]+mom_def_Re_tr_paths[864]+mom_def_Re_tr_paths[865]+mom_def_Re_tr_paths[866]+mom_def_Re_tr_paths[867]+mom_def_Re_tr_paths[868]+mom_def_Re_tr_paths[869]+mom_def_Re_tr_paths[870]+mom_def_Re_tr_paths[871]+mom_def_Re_tr_paths[872]+mom_def_Re_tr_paths[873]+mom_def_Re_tr_paths[874]+mom_def_Re_tr_paths[875]+mom_def_Re_tr_paths[876];
+*op_out +=+mom_def_Re_tr_paths[829]+mom_def_Re_tr_paths[830]+mom_def_Re_tr_paths[831]+mom_def_Re_tr_paths[832]+mom_def_Re_tr_paths[833]+mom_def_Re_tr_paths[834]+mom_def_Re_tr_paths[835]+mom_def_Re_tr_paths[836]+mom_def_Re_tr_paths[837]+mom_def_Re_tr_paths[838]+mom_def_Re_tr_paths[839]+mom_def_Re_tr_paths[840]+mom_def_Re_tr_paths[841]+mom_def_Re_tr_paths[842]+mom_def_Re_tr_paths[843]+mom_def_Re_tr_paths[844]+mom_def_Re_tr_paths[845]+mom_def_Re_tr_paths[846]+mom_def_Re_tr_paths[847]+mom_def_Re_tr_paths[848]+mom_def_Re_tr_paths[849]+mom_def_Re_tr_paths[850]+mom_def_Re_tr_paths[851]+mom_def_Re_tr_paths[852]+mom_def_Re_tr_paths[853]+mom_def_Re_tr_paths[854]+mom_def_Re_tr_paths[855]+mom_def_Re_tr_paths[856]+mom_def_Re_tr_paths[857]+mom_def_Re_tr_paths[858]+mom_def_Re_tr_paths[859]+mom_def_Re_tr_paths[860]+(-2.)*mom_def_Re_tr_paths[861]+(-2.)*mom_def_Re_tr_paths[862]+(-2.)*mom_def_Re_tr_paths[863]+(-2.)*mom_def_Re_tr_paths[864]+(-2.)*mom_def_Re_tr_paths[865]+(-2.)*mom_def_Re_tr_paths[866]+(-2.)*mom_def_Re_tr_paths[867]+(-2.)*mom_def_Re_tr_paths[868]+(-2.)*mom_def_Re_tr_paths[869]+(-2.)*mom_def_Re_tr_paths[870]+(-2.)*mom_def_Re_tr_paths[871]+(-2.)*mom_def_Re_tr_paths[872]+(-2.)*mom_def_Re_tr_paths[873]+(-2.)*mom_def_Re_tr_paths[874]+(-2.)*mom_def_Re_tr_paths[875]+(-2.)*mom_def_Re_tr_paths[876];
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_29(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_28(double complex * op_out)
 {
-*op_out +=+(4.)*mom_def_Re_tr_paths[877]+(4.)*mom_def_Re_tr_paths[878]+(4.)*mom_def_Re_tr_paths[879]+(4.)*mom_def_Re_tr_paths[880]+(4.)*mom_def_Re_tr_paths[881]+(4.)*mom_def_Re_tr_paths[882]+(4.)*mom_def_Re_tr_paths[883]+(4.)*mom_def_Re_tr_paths[884]+(4.)*mom_def_Re_tr_paths[885]+(4.)*mom_def_Re_tr_paths[886]+(4.)*mom_def_Re_tr_paths[887]+(4.)*mom_def_Re_tr_paths[888];
+*op_out +=+(4.)*mom_def_Re_tr_paths[877]+(4.)*mom_def_Re_tr_paths[878]+(4.)*mom_def_Re_tr_paths[879]+(4.)*mom_def_Re_tr_paths[880]+(4.)*mom_def_Re_tr_paths[881]+(4.)*mom_def_Re_tr_paths[882]+(4.)*mom_def_Re_tr_paths[883]+(4.)*mom_def_Re_tr_paths[884]+(-8.)*mom_def_Re_tr_paths[885]+(-8.)*mom_def_Re_tr_paths[886]+(-8.)*mom_def_Re_tr_paths[887]+(-8.)*mom_def_Re_tr_paths[888];
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_30(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_29(double complex * op_out)
 {
-*op_out +=+(2.)*mom_def_Re_tr_paths[889]+(2.)*mom_def_Re_tr_paths[890]+(2.)*mom_def_Re_tr_paths[891]+(2.)*mom_def_Re_tr_paths[892]+(2.)*mom_def_Re_tr_paths[893]+(2.)*mom_def_Re_tr_paths[894]+(2.)*mom_def_Re_tr_paths[895]+(2.)*mom_def_Re_tr_paths[896]+(2.)*mom_def_Re_tr_paths[897]+(2.)*mom_def_Re_tr_paths[898]+(2.)*mom_def_Re_tr_paths[899]+(2.)*mom_def_Re_tr_paths[900]+(2.)*mom_def_Re_tr_paths[901]+(2.)*mom_def_Re_tr_paths[902]+(2.)*mom_def_Re_tr_paths[903]+(2.)*mom_def_Re_tr_paths[904]+(2.)*mom_def_Re_tr_paths[905]+(2.)*mom_def_Re_tr_paths[906]+(2.)*mom_def_Re_tr_paths[907]+(2.)*mom_def_Re_tr_paths[908]+(2.)*mom_def_Re_tr_paths[909]+(2.)*mom_def_Re_tr_paths[910]+(2.)*mom_def_Re_tr_paths[911]+(2.)*mom_def_Re_tr_paths[912];
+*op_out +=+(2.)*mom_def_Re_tr_paths[889]+(2.)*mom_def_Re_tr_paths[890]+(2.)*mom_def_Re_tr_paths[891]+(2.)*mom_def_Re_tr_paths[892]+(2.)*mom_def_Re_tr_paths[893]+(2.)*mom_def_Re_tr_paths[894]+(2.)*mom_def_Re_tr_paths[895]+(2.)*mom_def_Re_tr_paths[896]+(2.)*mom_def_Re_tr_paths[897]+(2.)*mom_def_Re_tr_paths[898]+(2.)*mom_def_Re_tr_paths[899]+(2.)*mom_def_Re_tr_paths[900]+(2.)*mom_def_Re_tr_paths[901]+(2.)*mom_def_Re_tr_paths[902]+(2.)*mom_def_Re_tr_paths[903]+(2.)*mom_def_Re_tr_paths[904]+(-4.)*mom_def_Re_tr_paths[905]+(-4.)*mom_def_Re_tr_paths[906]+(-4.)*mom_def_Re_tr_paths[907]+(-4.)*mom_def_Re_tr_paths[908]+(-4.)*mom_def_Re_tr_paths[909]+(-4.)*mom_def_Re_tr_paths[910]+(-4.)*mom_def_Re_tr_paths[911]+(-4.)*mom_def_Re_tr_paths[912];
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_31(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_30(double complex * op_out)
 {
-*op_out +=+mom_def_Re_tr_paths[913]+mom_def_Re_tr_paths[914]+mom_def_Re_tr_paths[915]+mom_def_Re_tr_paths[916]+mom_def_Re_tr_paths[917]+mom_def_Re_tr_paths[918]+mom_def_Re_tr_paths[919]+mom_def_Re_tr_paths[920]+mom_def_Re_tr_paths[921]+mom_def_Re_tr_paths[922]+mom_def_Re_tr_paths[923]+mom_def_Re_tr_paths[924]+mom_def_Re_tr_paths[925]+mom_def_Re_tr_paths[926]+mom_def_Re_tr_paths[927]+mom_def_Re_tr_paths[928]+mom_def_Re_tr_paths[929]+mom_def_Re_tr_paths[930]+mom_def_Re_tr_paths[931]+mom_def_Re_tr_paths[932]+mom_def_Re_tr_paths[933]+mom_def_Re_tr_paths[934]+mom_def_Re_tr_paths[935]+mom_def_Re_tr_paths[936]+mom_def_Re_tr_paths[937]+mom_def_Re_tr_paths[938]+mom_def_Re_tr_paths[939]+mom_def_Re_tr_paths[940]+mom_def_Re_tr_paths[941]+mom_def_Re_tr_paths[942]+mom_def_Re_tr_paths[943]+mom_def_Re_tr_paths[944]+mom_def_Re_tr_paths[945]+mom_def_Re_tr_paths[946]+mom_def_Re_tr_paths[947]+mom_def_Re_tr_paths[948]+mom_def_Re_tr_paths[949]+mom_def_Re_tr_paths[950]+mom_def_Re_tr_paths[951]+mom_def_Re_tr_paths[952]+mom_def_Re_tr_paths[953]+mom_def_Re_tr_paths[954]+mom_def_Re_tr_paths[955]+mom_def_Re_tr_paths[956]+mom_def_Re_tr_paths[957]+mom_def_Re_tr_paths[958]+mom_def_Re_tr_paths[959]+mom_def_Re_tr_paths[960];
+*op_out +=+mom_def_Re_tr_paths[913]+mom_def_Re_tr_paths[914]+mom_def_Re_tr_paths[915]+mom_def_Re_tr_paths[916]+mom_def_Re_tr_paths[917]+mom_def_Re_tr_paths[918]+mom_def_Re_tr_paths[919]+mom_def_Re_tr_paths[920]+mom_def_Re_tr_paths[921]+mom_def_Re_tr_paths[922]+mom_def_Re_tr_paths[923]+mom_def_Re_tr_paths[924]+mom_def_Re_tr_paths[925]+mom_def_Re_tr_paths[926]+mom_def_Re_tr_paths[927]+mom_def_Re_tr_paths[928]+mom_def_Re_tr_paths[929]+mom_def_Re_tr_paths[930]+mom_def_Re_tr_paths[931]+mom_def_Re_tr_paths[932]+mom_def_Re_tr_paths[933]+mom_def_Re_tr_paths[934]+mom_def_Re_tr_paths[935]+mom_def_Re_tr_paths[936]+mom_def_Re_tr_paths[937]+mom_def_Re_tr_paths[938]+mom_def_Re_tr_paths[939]+mom_def_Re_tr_paths[940]+mom_def_Re_tr_paths[941]+mom_def_Re_tr_paths[942]+mom_def_Re_tr_paths[943]+mom_def_Re_tr_paths[944]+(-2.)*mom_def_Re_tr_paths[945]+(-2.)*mom_def_Re_tr_paths[946]+(-2.)*mom_def_Re_tr_paths[947]+(-2.)*mom_def_Re_tr_paths[948]+(-2.)*mom_def_Re_tr_paths[949]+(-2.)*mom_def_Re_tr_paths[950]+(-2.)*mom_def_Re_tr_paths[951]+(-2.)*mom_def_Re_tr_paths[952]+(-2.)*mom_def_Re_tr_paths[953]+(-2.)*mom_def_Re_tr_paths[954]+(-2.)*mom_def_Re_tr_paths[955]+(-2.)*mom_def_Re_tr_paths[956]+(-2.)*mom_def_Re_tr_paths[957]+(-2.)*mom_def_Re_tr_paths[958]+(-2.)*mom_def_Re_tr_paths[959]+(-2.)*mom_def_Re_tr_paths[960];
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_32(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_31(double complex * op_out)
 {
-*op_out +=+mom_def_Re_tr_paths[961]+mom_def_Re_tr_paths[962]+mom_def_Re_tr_paths[963]+mom_def_Re_tr_paths[964]+mom_def_Re_tr_paths[965]+mom_def_Re_tr_paths[966]+mom_def_Re_tr_paths[967]+mom_def_Re_tr_paths[968]+mom_def_Re_tr_paths[969]+mom_def_Re_tr_paths[970]+mom_def_Re_tr_paths[971]+mom_def_Re_tr_paths[972]+mom_def_Re_tr_paths[973]+mom_def_Re_tr_paths[974]+mom_def_Re_tr_paths[975]+mom_def_Re_tr_paths[976]+mom_def_Re_tr_paths[977]+mom_def_Re_tr_paths[978]+mom_def_Re_tr_paths[979]+mom_def_Re_tr_paths[980]+mom_def_Re_tr_paths[981]+mom_def_Re_tr_paths[982]+mom_def_Re_tr_paths[983]+mom_def_Re_tr_paths[984]+mom_def_Re_tr_paths[985]+mom_def_Re_tr_paths[986]+mom_def_Re_tr_paths[987]+mom_def_Re_tr_paths[988]+mom_def_Re_tr_paths[989]+mom_def_Re_tr_paths[990]+mom_def_Re_tr_paths[991]+mom_def_Re_tr_paths[992]+mom_def_Re_tr_paths[993]+mom_def_Re_tr_paths[994]+mom_def_Re_tr_paths[995]+mom_def_Re_tr_paths[996]+mom_def_Re_tr_paths[997]+mom_def_Re_tr_paths[998]+mom_def_Re_tr_paths[999]+mom_def_Re_tr_paths[1000]+mom_def_Re_tr_paths[1001]+mom_def_Re_tr_paths[1002]+mom_def_Re_tr_paths[1003]+mom_def_Re_tr_paths[1004]+mom_def_Re_tr_paths[1005]+mom_def_Re_tr_paths[1006]+mom_def_Re_tr_paths[1007]+mom_def_Re_tr_paths[1008];
+*op_out +=+mom_def_Re_tr_paths[961]+mom_def_Re_tr_paths[962]+mom_def_Re_tr_paths[963]+mom_def_Re_tr_paths[964]+mom_def_Re_tr_paths[965]+mom_def_Re_tr_paths[966]+mom_def_Re_tr_paths[967]+mom_def_Re_tr_paths[968]+mom_def_Re_tr_paths[969]+mom_def_Re_tr_paths[970]+mom_def_Re_tr_paths[971]+mom_def_Re_tr_paths[972]+mom_def_Re_tr_paths[973]+mom_def_Re_tr_paths[974]+mom_def_Re_tr_paths[975]+mom_def_Re_tr_paths[976]+mom_def_Re_tr_paths[977]+mom_def_Re_tr_paths[978]+mom_def_Re_tr_paths[979]+mom_def_Re_tr_paths[980]+mom_def_Re_tr_paths[981]+mom_def_Re_tr_paths[982]+mom_def_Re_tr_paths[983]+mom_def_Re_tr_paths[984]+mom_def_Re_tr_paths[985]+mom_def_Re_tr_paths[986]+mom_def_Re_tr_paths[987]+mom_def_Re_tr_paths[988]+mom_def_Re_tr_paths[989]+mom_def_Re_tr_paths[990]+mom_def_Re_tr_paths[991]+mom_def_Re_tr_paths[992]+(-2.)*mom_def_Re_tr_paths[993]+(-2.)*mom_def_Re_tr_paths[994]+(-2.)*mom_def_Re_tr_paths[995]+(-2.)*mom_def_Re_tr_paths[996]+(-2.)*mom_def_Re_tr_paths[997]+(-2.)*mom_def_Re_tr_paths[998]+(-2.)*mom_def_Re_tr_paths[999]+(-2.)*mom_def_Re_tr_paths[1000]+(-2.)*mom_def_Re_tr_paths[1001]+(-2.)*mom_def_Re_tr_paths[1002]+(-2.)*mom_def_Re_tr_paths[1003]+(-2.)*mom_def_Re_tr_paths[1004]+(-2.)*mom_def_Re_tr_paths[1005]+(-2.)*mom_def_Re_tr_paths[1006]+(-2.)*mom_def_Re_tr_paths[1007]+(-2.)*mom_def_Re_tr_paths[1008];
 }
 
 static int last_t = -10;
@@ -49808,18 +49661,6 @@ mom_def_Im_tr_paths[7]+=I*ce*cimag(path_storage[7+idx]);
 path_storage[8+idx]= path8(in);
 mom_def_Re_tr_paths[8]+=ce*creal(path_storage[8+idx]);
 mom_def_Im_tr_paths[8]+=I*ce*cimag(path_storage[8+idx]);
-path_storage[9+idx]= path9(in);
-mom_def_Re_tr_paths[9]+=ce*creal(path_storage[9+idx]);
-mom_def_Im_tr_paths[9]+=I*ce*cimag(path_storage[9+idx]);
-path_storage[10+idx]= path10(in);
-mom_def_Re_tr_paths[10]+=ce*creal(path_storage[10+idx]);
-mom_def_Im_tr_paths[10]+=I*ce*cimag(path_storage[10+idx]);
-path_storage[11+idx]= path11(in);
-mom_def_Re_tr_paths[11]+=ce*creal(path_storage[11+idx]);
-mom_def_Im_tr_paths[11]+=I*ce*cimag(path_storage[11+idx]);
-path_storage[12+idx]= path12(in);
-mom_def_Re_tr_paths[12]+=ce*creal(path_storage[12+idx]);
-mom_def_Im_tr_paths[12]+=I*ce*cimag(path_storage[12+idx]);
 path_storage[13+idx]= path13(in);
 mom_def_Re_tr_paths[13]+=ce*creal(path_storage[13+idx]);
 mom_def_Im_tr_paths[13]+=I*ce*cimag(path_storage[13+idx]);
@@ -52829,99 +52670,97 @@ void eval_all_glueball_ops(int t, double complex * numerical_op)
 {
 request_space_paths_evaluation();
 eval_time_momentum_glueball_paths(t,0,0,0);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_1(numerical_op+0);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_2(numerical_op+1);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_3(numerical_op+2);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_4(numerical_op+3);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_5(numerical_op+4);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_6(numerical_op+5);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_7(numerical_op+6);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_8(numerical_op+7);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_9(numerical_op+8);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_10(numerical_op+9);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_11(numerical_op+10);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_12(numerical_op+11);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_13(numerical_op+12);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_14(numerical_op+13);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_15(numerical_op+14);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_16(numerical_op+15);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_17(numerical_op+16);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_18(numerical_op+17);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_19(numerical_op+18);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_20(numerical_op+19);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_21(numerical_op+20);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_22(numerical_op+21);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_23(numerical_op+22);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_24(numerical_op+23);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_25(numerical_op+24);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_26(numerical_op+25);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_27(numerical_op+26);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_28(numerical_op+27);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_29(numerical_op+28);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_30(numerical_op+29);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_31(numerical_op+30);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_32(numerical_op+31);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_1(numerical_op+0);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_2(numerical_op+1);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_3(numerical_op+2);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_4(numerical_op+3);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_5(numerical_op+4);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_6(numerical_op+5);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_7(numerical_op+6);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_8(numerical_op+7);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_9(numerical_op+8);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_10(numerical_op+9);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_11(numerical_op+10);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_12(numerical_op+11);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_13(numerical_op+12);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_14(numerical_op+13);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_15(numerical_op+14);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_16(numerical_op+15);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_17(numerical_op+16);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_18(numerical_op+17);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_19(numerical_op+18);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_20(numerical_op+19);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_21(numerical_op+20);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_22(numerical_op+21);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_23(numerical_op+22);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_24(numerical_op+23);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_25(numerical_op+24);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_26(numerical_op+25);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_27(numerical_op+26);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_28(numerical_op+27);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_29(numerical_op+28);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_30(numerical_op+29);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_31(numerical_op+30);
 }
 
-void eval_all_glueball_ops_p_0_0_0_Ir_1_C_m1(double complex * numerical_op)
+void eval_all_glueball_ops_p_0_0_0_Ir_3_C_m1(double complex * numerical_op)
 {
-OP_oneTr_p_0_0_0_Ir_1_C_m1_n_1(numerical_op+0);
-OP_oneTr_p_0_0_0_Ir_1_C_m1_n_2(numerical_op+1);
-OP_oneTr_p_0_0_0_Ir_1_C_m1_n_3(numerical_op+2);
-OP_oneTr_p_0_0_0_Ir_1_C_m1_n_4(numerical_op+3);
-OP_oneTr_p_0_0_0_Ir_1_C_m1_n_5(numerical_op+4);
-OP_oneTr_p_0_0_0_Ir_1_C_m1_n_6(numerical_op+5);
-OP_oneTr_p_0_0_0_Ir_1_C_m1_n_7(numerical_op+6);
-OP_oneTr_p_0_0_0_Ir_1_C_m1_n_8(numerical_op+7);
-OP_oneTr_p_0_0_0_Ir_1_C_m1_n_9(numerical_op+8);
-OP_oneTr_p_0_0_0_Ir_1_C_m1_n_10(numerical_op+9);
-OP_oneTr_p_0_0_0_Ir_1_C_m1_n_11(numerical_op+10);
-OP_oneTr_p_0_0_0_Ir_1_C_m1_n_12(numerical_op+11);
-OP_oneTr_p_0_0_0_Ir_1_C_m1_n_13(numerical_op+12);
-OP_oneTr_p_0_0_0_Ir_1_C_m1_n_14(numerical_op+13);
-OP_oneTr_p_0_0_0_Ir_1_C_m1_n_15(numerical_op+14);
-OP_oneTr_p_0_0_0_Ir_1_C_m1_n_16(numerical_op+15);
-OP_oneTr_p_0_0_0_Ir_1_C_m1_n_17(numerical_op+16);
-OP_oneTr_p_0_0_0_Ir_1_C_m1_n_18(numerical_op+17);
-OP_oneTr_p_0_0_0_Ir_1_C_m1_n_19(numerical_op+18);
-OP_oneTr_p_0_0_0_Ir_1_C_m1_n_20(numerical_op+19);
-OP_oneTr_p_0_0_0_Ir_1_C_m1_n_21(numerical_op+20);
+OP_oneTr_p_0_0_0_Ir_3_C_m1_n_1(numerical_op+0);
+OP_oneTr_p_0_0_0_Ir_3_C_m1_n_2(numerical_op+1);
+OP_oneTr_p_0_0_0_Ir_3_C_m1_n_3(numerical_op+2);
+OP_oneTr_p_0_0_0_Ir_3_C_m1_n_4(numerical_op+3);
+OP_oneTr_p_0_0_0_Ir_3_C_m1_n_5(numerical_op+4);
+OP_oneTr_p_0_0_0_Ir_3_C_m1_n_6(numerical_op+5);
+OP_oneTr_p_0_0_0_Ir_3_C_m1_n_7(numerical_op+6);
+OP_oneTr_p_0_0_0_Ir_3_C_m1_n_8(numerical_op+7);
+OP_oneTr_p_0_0_0_Ir_3_C_m1_n_9(numerical_op+8);
+OP_oneTr_p_0_0_0_Ir_3_C_m1_n_10(numerical_op+9);
+OP_oneTr_p_0_0_0_Ir_3_C_m1_n_11(numerical_op+10);
+OP_oneTr_p_0_0_0_Ir_3_C_m1_n_12(numerical_op+11);
+OP_oneTr_p_0_0_0_Ir_3_C_m1_n_13(numerical_op+12);
+OP_oneTr_p_0_0_0_Ir_3_C_m1_n_14(numerical_op+13);
+OP_oneTr_p_0_0_0_Ir_3_C_m1_n_15(numerical_op+14);
+OP_oneTr_p_0_0_0_Ir_3_C_m1_n_16(numerical_op+15);
+OP_oneTr_p_0_0_0_Ir_3_C_m1_n_17(numerical_op+16);
+OP_oneTr_p_0_0_0_Ir_3_C_m1_n_18(numerical_op+17);
+OP_oneTr_p_0_0_0_Ir_3_C_m1_n_19(numerical_op+18);
+OP_oneTr_p_0_0_0_Ir_3_C_m1_n_20(numerical_op+19);
+OP_oneTr_p_0_0_0_Ir_3_C_m1_n_21(numerical_op+20);
 }
 
-void eval_all_glueball_ops_p_0_0_0_Ir_1_C_1(double complex * numerical_op)
+void eval_all_glueball_ops_p_0_0_0_Ir_3_C_1(double complex * numerical_op)
 {
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_1(numerical_op+0);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_2(numerical_op+1);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_3(numerical_op+2);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_4(numerical_op+3);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_5(numerical_op+4);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_6(numerical_op+5);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_7(numerical_op+6);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_8(numerical_op+7);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_9(numerical_op+8);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_10(numerical_op+9);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_11(numerical_op+10);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_12(numerical_op+11);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_13(numerical_op+12);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_14(numerical_op+13);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_15(numerical_op+14);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_16(numerical_op+15);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_17(numerical_op+16);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_18(numerical_op+17);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_19(numerical_op+18);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_20(numerical_op+19);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_21(numerical_op+20);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_22(numerical_op+21);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_23(numerical_op+22);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_24(numerical_op+23);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_25(numerical_op+24);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_26(numerical_op+25);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_27(numerical_op+26);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_28(numerical_op+27);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_29(numerical_op+28);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_30(numerical_op+29);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_31(numerical_op+30);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_32(numerical_op+31);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_1(numerical_op+0);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_2(numerical_op+1);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_3(numerical_op+2);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_4(numerical_op+3);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_5(numerical_op+4);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_6(numerical_op+5);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_7(numerical_op+6);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_8(numerical_op+7);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_9(numerical_op+8);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_10(numerical_op+9);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_11(numerical_op+10);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_12(numerical_op+11);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_13(numerical_op+12);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_14(numerical_op+13);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_15(numerical_op+14);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_16(numerical_op+15);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_17(numerical_op+16);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_18(numerical_op+17);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_19(numerical_op+18);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_20(numerical_op+19);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_21(numerical_op+20);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_22(numerical_op+21);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_23(numerical_op+22);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_24(numerical_op+23);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_25(numerical_op+24);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_26(numerical_op+25);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_27(numerical_op+26);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_28(numerical_op+27);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_29(numerical_op+28);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_30(numerical_op+29);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_31(numerical_op+30);
 }
 
 
@@ -53050,10 +52889,10 @@ void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_stor
         totalsize = 0;
         norm = 0.5 / lcor->list[icor].n_pairs;
         
-        cor_pointer = cor_storage + totalsize + id * nblocking * nblocking * 1024;
+        cor_pointer = cor_storage + totalsize + id * nblocking * nblocking * 961;
 
         for (n1 = 0; n1 < nblocking; n1++)
-            for (b1 = 0; b1 < 32; b1++)
+            for (b1 = 0; b1 < 31; b1++)
             {
                 i1 = 0 + b1 + total_n_glue_op * n1;
 
@@ -53061,47 +52900,47 @@ void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_stor
                 b2 = b1;
                 i2 = 0 + b2 + total_n_glue_op * n2;
                 tmp = norm * (conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
-                cor_pointer[b1 + 32 * (n1 + nblocking * (b2 + 32 * n2))] += tmp;
+                cor_pointer[b1 + 31 * (n1 + nblocking * (b2 + 31 * n2))] += tmp;
 
-                for (b2 = b1 + 1; b2 < 32; b2++)
+                for (b2 = b1 + 1; b2 < 31; b2++)
                 {
                     i2 = 0 + b2 + total_n_glue_op * n2;
                     tmp = norm * (conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
-                    cor_pointer[b1 + 32 * (n1 + nblocking * (b2 + 32 * n2))] += tmp;
-                    cor_pointer[b2 + 32 * (n2 + nblocking * (b1 + 32 * n1))] += conj(tmp);
+                    cor_pointer[b1 + 31 * (n1 + nblocking * (b2 + 31 * n2))] += tmp;
+                    cor_pointer[b2 + 31 * (n2 + nblocking * (b1 + 31 * n1))] += conj(tmp);
                 }
 
                 for (n2 = n1 + 1; n2 < nblocking; n2++)
-                    for (b2 = 0; b2 < 32; b2++)
+                    for (b2 = 0; b2 < 31; b2++)
                     {
                         i2 = 0 + b2 + total_n_glue_op * n2;
                         tmp = norm * (conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
-                        cor_pointer[b1 + 32 * (n1 + nblocking * (b2 + 32 * n2))] += tmp;
-                        cor_pointer[b2 + 32 * (n2 + nblocking * (b1 + 32 * n1))] += conj(tmp);
+                        cor_pointer[b1 + 31 * (n1 + nblocking * (b2 + 31 * n2))] += tmp;
+                        cor_pointer[b2 + 31 * (n2 + nblocking * (b1 + 31 * n1))] += conj(tmp);
                     }
             }
-        totalsize += (nblocking * nblocking * 1024 * (lcor->n_corrs));
+        totalsize += (nblocking * nblocking * 961 * (lcor->n_corrs));
 }
 
 totalsize = 0 ;
-
-    lprintf("Measure ML", 0, "\n1pt function P=(0,0,0) Irrep=A1plusOhP Irrep ev=1/1 Charge=+\n\n");
+#ifdef ML_TUNING
+    lprintf("Measure ML", 0, "\n1pt function P=(0,0,0) Irrep=EplusOhP Irrep ev=1/2 Charge=+\n\n");
     
     for (n1 = 0; n1 < GLB_T; n1++)
-        if (listactive[n1] > 0)
+        if (listactive[n1] > -1)
         {
             lprintf("Measure ML", 0, " t=%d", n1);
             for (n2 = 0; n2 < nblocking; n2++)
-                for (i = 0; i < 32; i++)
+                for (i = 0; i < 31; i++)
                     lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
                             cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
             lprintf("Measure ML", 0, "\n");
         }
-    
+#endif //ML_TUNING
     b2 = 0;
     b1 = 0;
     
-    lprintf("Measure ML", 0,"\nCorr Total P=(0,0,0) Irrep=A1plusOhP Irrep ev=1/1 Charge=+\n");
+    lprintf("Measure ML", 0,"\nCorr Total P=(0,0,0) Irrep=EplusOhP Irrep ev=1/2 Charge=+\n");
    
 
     for (icor = 0; icor < lcor->n_corrs; icor++)
@@ -53116,13 +52955,13 @@ totalsize = 0 ;
         }
         lprintf("Measure ML", 0, "\n");
 
-        for (i1 = 0; i1 < (nblocking * 32); i1++)
+        for (i1 = 0; i1 < (nblocking * 31); i1++)
         {
-            for (i2 = 0; i2 < (nblocking * 32); i2++)
-                lprintf("Measure ML", 0, " ( %.6e %.6e )", creal(cor_pointer[i1 + nblocking * 32 * i2]), cimag(cor_pointer[i1 + nblocking * 32 * i2]));
+            for (i2 = 0; i2 < (nblocking * 31); i2++)
+                lprintf("Measure ML", 0, " ( %.6e %.6e )", creal(cor_pointer[i1 + nblocking * 31 * i2]), cimag(cor_pointer[i1 + nblocking * 31 * i2]));
 
             lprintf("Measure ML", 0, "\n");
         }
-        totalsize += (nblocking * nblocking * 1024);
+        totalsize += (nblocking * nblocking * 961);
     }
 }
