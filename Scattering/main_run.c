@@ -26,6 +26,7 @@
 #include "communications.h"
 #include "gamma_spinor.h"
 #include "spin_matrix.h"
+#include "clover_tools.h"
 
 #include "cinfo.c"
 #include "IOroutines.c"
@@ -126,7 +127,7 @@ inline void io4pt(meson_observable* mo, int pmax, int sourceno, char* path, char
 int main(int argc,char *argv[])
 {
   int src,t;
-  int px,py,pz, px2, py2, pz2;
+  int px,py,pz, px2, py2, pz2, px3, py3, pz3;
   int tau=0;
   filename_t fpars;
   int nm;
@@ -144,7 +145,7 @@ int main(int argc,char *argv[])
 
   /* logger setup */
   /* disable logger for MPI processes != 0 */
-  //logger_setlevel(0,500);
+  logger_setlevel(0,10);
   if (PID!=0) { logger_disable(); }
   if (PID==0) { 
     sprintf(tmp,">%s",output_filename); logger_stdout(tmp);
@@ -172,7 +173,8 @@ int main(int argc,char *argv[])
   printf("The momenta are (%s) and (%s) \n", mes_var.p1, mes_var.p2);
   sscanf(mes_var.p1, "(%d,%d,%d)" ,&px,&py,&pz);
   sscanf(mes_var.p2, "(%d,%d,%d)" ,&px2,&py2,&pz2);
-  printf("The momenta are (%d %d %d) and (%d %d %d) \n", px, py, pz, px2, py2, pz2);
+  sscanf(mes_var.p3, "(%d,%d,%d)" ,&px3,&py3,&pz3);
+  printf("The momenta are (%d %d %d), (%d %d %d) and (%d %d %d) \n", px, py, pz, px2, py2, pz2, px3, py3, pz3);
   int numsources = mes_var.nhits;
   GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
 
@@ -230,6 +232,12 @@ int main(int argc,char *argv[])
 #ifdef ALLOCATE_REPR_GAUGE_FIELD
   u_gauge_f=alloc_gfield_f(&glattice);
 #endif
+#ifdef WITH_CLOVER
+  clover_init(mes_var.csw);
+#endif
+#ifdef WITH_SMEARING
+	init_smearing(mes_var.rho_s, mes_var.rho_t);
+#endif
 
   lprintf("MAIN",0,"Inverter precision = %e\n",mes_var.precision);
   for(k=0;k<nm;k++)
@@ -244,8 +252,8 @@ int main(int argc,char *argv[])
 
   init_propagator_eo(nm,m,mes_var.precision);
 
-#define OBSERVABLE_LIST X(pi2p) X(pi_p1) X(pi_p2) X(twopt_nomom_g1) X(twopt_nomom_g2) X(twopt_nomom_g3) X(twopt_g1) X(twopt_g2) X(twopt_g3) X(d_nomom) X(d) X(r1) X(r2) X(r3) X(r4) X(t1_g1) X(t1_g2) X(t1_g3) X(t2_g1) X(t2_g2) X(t2_g3) X(twoptp2_g1) X(twoptp2_g2) X(twoptp2_g3) X(dp2) X(r1p2) X(r2p2) X(r3p2) X(r4p2) X(t1p2_g1) X(t1p2_g2) X(t1p2_g3) X(t2p2_g1) X(t2p2_g2) X(t2p2_g3)
-#define TMP_OBSERVABLE_LIST X(r1) X(r2) X(r3) X(r4) X(r1p2) X(r2p2) X(r3p2) X(r4p2)
+#define OBSERVABLE_LIST X(pi2p) X(pi_p1) X(pi_p2) X(pi_p3) X(twopt_nomom_g1) X(twopt_nomom_g2) X(twopt_nomom_g3) X(twopt_g1) X(twopt_g2) X(twopt_g3) X(d_nomom) X(d) X(r1) X(r2) X(r3) X(r4) X(t1_g1) X(t1_g2) X(t1_g3) X(t2_g1) X(t2_g2) X(t2_g3) X(twoptp2_g1) X(twoptp2_g2) X(twoptp2_g3) X(twoptp2_g1g2) X(twoptp2_g2g1) X(twoptp3_g1) X(twoptp3_g2) X(twoptp3_g3) X(twoptp3_g1g2) X(twoptp3_g1g3) X(twoptp3_g2g1) X(twoptp3_g2g3) X(twoptp3_g3g1) X(twoptp3_g3g2) X(dp2) X(r1p2) X(r2p2) X(r3p2) X(r4p2) X(t1p2_g1) X(t1p2_g2) X(t1p2_g3) X(t2p2_g1) X(t2p2_g2) X(t2p2_g3) X(dp3) X(r1p3) X(r2p3) X(r3p3) X(r4p3) X(t1p3_g1) X(t1p3_g2) X(t1p3_g3) X(t2p3_g1) X(t2p3_g2) X(t2p3_g3)
+#define TMP_OBSERVABLE_LIST X(r1) X(r2) X(r3) X(r4) X(r1p2) X(r2p2) X(r3p2) X(r4p2) X(r1p3) X(r2p3) X(r3p3) X(r4p3)
 #define X(NAME) meson_observable* mo_##NAME = malloc(sizeof(meson_observable)); init_mo(mo_##NAME,#NAME,27*GLB_T);
 OBSERVABLE_LIST
 #undef X
@@ -262,6 +270,10 @@ mo_twoptp2_g1->ind1=_g1;
 mo_twoptp2_g1->ind2=_g1;
 mo_t1p2_g1->ind2=_g1;
 mo_t2p2_g1->ind2=_g1;
+mo_twoptp3_g1->ind1=_g1;
+mo_twoptp3_g1->ind2=_g1;
+mo_t1p3_g1->ind2=_g1;
+mo_t2p3_g1->ind2=_g1;
 
 mo_twopt_nomom_g2->ind1=_g2;
 mo_twopt_nomom_g2->ind2=_g2;
@@ -273,6 +285,10 @@ mo_twoptp2_g2->ind1=_g2;
 mo_twoptp2_g2->ind2=_g2;
 mo_t1p2_g2->ind2=_g2;
 mo_t2p2_g2->ind2=_g2;
+mo_twoptp3_g2->ind1=_g2;
+mo_twoptp3_g2->ind2=_g2;
+mo_t1p3_g2->ind2=_g2;
+mo_t2p3_g2->ind2=_g2;
 
 mo_twopt_nomom_g3->ind1=_g3;
 mo_twopt_nomom_g3->ind2=_g3;
@@ -284,9 +300,31 @@ mo_twoptp2_g3->ind1=_g3;
 mo_twoptp2_g3->ind2=_g3;
 mo_t1p2_g3->ind2=_g3;
 mo_t2p2_g3->ind2=_g3;
+mo_twoptp3_g3->ind1=_g3;
+mo_twoptp3_g3->ind2=_g3;
+mo_t1p3_g3->ind2=_g3;
+mo_t2p3_g3->ind2=_g3;
 
-#define SOURCE_LIST_Q X(0) X(0_eta) X(p) X(mp) X(p2) X(mp2) 
-#define SOURCE_LIST_W X(0_p) X(0_mp) X(p_0) X(mp_0) X(0_p2) X(0_mp2) X(p2_0) X(mp2_0)
+mo_twoptp2_g1g2->ind1=_g1;
+mo_twoptp2_g1g2->ind2=_g2;
+mo_twoptp2_g2g1->ind1=_g2;
+mo_twoptp2_g2g1->ind2=_g1;
+
+mo_twoptp3_g1g2->ind1=_g1;
+mo_twoptp3_g1g2->ind2=_g2;
+mo_twoptp3_g2g1->ind1=_g2;
+mo_twoptp3_g2g1->ind2=_g1;
+mo_twoptp3_g1g3->ind1=_g1;
+mo_twoptp3_g1g3->ind2=_g3;
+mo_twoptp3_g3g1->ind1=_g3;
+mo_twoptp3_g3g1->ind2=_g1;
+mo_twoptp3_g2g3->ind1=_g2;
+mo_twoptp3_g2g3->ind2=_g3;
+mo_twoptp3_g3g2->ind1=_g3;
+mo_twoptp3_g3g2->ind2=_g2;
+
+#define SOURCE_LIST_Q X(0) X(0_eta) X(p) X(mp) X(p2) X(mp2) X(p3) X(mp3) 
+#define SOURCE_LIST_W X(0_p) X(0_mp) X(p_0) X(mp_0) X(0_p2) X(0_mp2) X(p2_0) X(mp2_0) X(0_p3) X(0_mp3) X(p3_0) X(mp3_0)
 #define X(NAME) lprintf("DEBUG",0,"Creating source source_%s \n", #NAME);spinor_field* source_##NAME = alloc_spinor_field_f(4*NF,&glattice); for(i=0;i<4*NF;++i) {spinor_field_zero_f(&source_##NAME[i]);}
     SOURCE_LIST_Q
     SOURCE_LIST_W
@@ -315,15 +353,18 @@ while(1){
 #define X(NAME) reset_mo(mo_##NAME);
 	    OBSERVABLE_LIST
 #undef X
+    lprintf("MAIN",0,"Cleared mo", cnfg_filename);
 
 
     	// Sources for non-sequential props
   	create_diluted_source_equal_atau(source_0, tau);
   	create_diluted_source_equal_atau(source_0_eta, tau);
-    	add_momentum(source_p, source_0, px, py, pz);
-    	add_momentum(source_mp, source_0, -px, -py, -pz);
-    	add_momentum(source_p2, source_0, px2, py2, pz2);
-    	add_momentum(source_mp2, source_0, -px2, -py2, -pz2);
+    add_momentum(source_p, source_0, px, py, pz);
+    add_momentum(source_mp, source_0, -px, -py, -pz);
+    add_momentum(source_p2, source_0, px2, py2, pz2);
+    add_momentum(source_mp2, source_0, -px2, -py2, -pz2);
+    add_momentum(source_p3, source_0, px3, py3, pz3);
+    add_momentum(source_mp3, source_0, -px3, -py3, -pz3);
 	lprintf("DEBUG",0,"Created sources \n");
 	// Non-sequential prop inversions
 #define X(NAME) lprintf("DEBUG",0,"Calculating propagator Q_%s \n", #NAME); calc_propagator(Q_##NAME, source_##NAME,4);
@@ -342,10 +383,15 @@ while(1){
 	add_momentum(source_0_p2,source_0_0,px2,py2,pz2);
 	add_momentum(source_0_mp2,source_0_0,-px2,-py2,-pz2);
 
+	create_sequential_source(source_p3_0,tau,Q_p3);
+	create_sequential_source(source_mp3_0,tau,Q_mp3);
+	add_momentum(source_0_p3,source_0_0,px3,py3,pz3);
+	add_momentum(source_0_mp3,source_0_0,-px3,-py3,-pz3);
 	lprintf("DEBUG",0,"Created seq sources \n");
 
 	//Sequential propagators
 #define X(NAME) calc_propagator(W_##NAME, source_##NAME,4);
+	lprintf("DEBUG",0,"SOURCE_LIST_W \n");
 	SOURCE_LIST_W
 #undef X
 	lprintf("DEBUG",0,"Created seq propagators \n");
@@ -353,6 +399,7 @@ while(1){
 	// pipi-> pipi direct (2 traces) and pipi-> rho contractions go here
 	
 	//2-point pi -> pi
+    lprintf("DEBUG",0,"Calculating contractions \n");
 
 	measure_mesons_core(Q_0, Q_0, source_0, mo_pi2p, 1, tau, 2, 0, GLB_T);
 	do_global_sum(mo_pi2p,1.0);
@@ -360,6 +407,9 @@ while(1){
 	do_global_sum(mo_pi_p1,1.0);
 	measure_mesons_core(Q_0, Q_p2, source_0, mo_pi_p2, 1, tau, 2, 0, GLB_T);
 	do_global_sum(mo_pi_p2,1.0);
+	measure_mesons_core(Q_0, Q_p3, source_0, mo_pi_p3, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_pi_p3,1.0);
+	lprintf("DEBUG",0,"pi 2-point function diagrams done \n");
 
 	// 2-point rho->rho
 	measure_mesons_core(Q_0, Q_0, source_0, mo_twopt_nomom_g1, 1, tau, 2, 0, GLB_T);
@@ -368,6 +418,8 @@ while(1){
 	do_global_sum(mo_twopt_g1,1.0);
 	measure_mesons_core(Q_0, Q_p2, source_0, mo_twoptp2_g1, 1, tau, 2, 0, GLB_T);
 	do_global_sum(mo_twoptp2_g1,1.0);
+	measure_mesons_core(Q_0, Q_p3, source_0, mo_twoptp3_g1, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_twoptp3_g1,1.0);
 
 	measure_mesons_core(Q_0, Q_0, source_0, mo_twopt_nomom_g2, 1, tau, 2, 0, GLB_T);
 	do_global_sum(mo_twopt_nomom_g2,1.0);
@@ -375,6 +427,8 @@ while(1){
 	do_global_sum(mo_twopt_g2,1.0);
 	measure_mesons_core(Q_0, Q_p2, source_0, mo_twoptp2_g2, 1, tau, 2, 0, GLB_T);
 	do_global_sum(mo_twoptp2_g2,1.0);
+	measure_mesons_core(Q_0, Q_p3, source_0, mo_twoptp3_g2, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_twoptp3_g2,1.0);
 
 	measure_mesons_core(Q_0, Q_0, source_0, mo_twopt_nomom_g3, 1, tau, 2, 0, GLB_T);
 	do_global_sum(mo_twopt_nomom_g3,1.0);
@@ -382,11 +436,33 @@ while(1){
 	do_global_sum(mo_twopt_g3,1.0);
 	measure_mesons_core(Q_0, Q_p2, source_0, mo_twoptp2_g3, 1, tau, 2, 0, GLB_T);
 	do_global_sum(mo_twoptp2_g3,1.0);
+	measure_mesons_core(Q_0, Q_p2, source_0, mo_twoptp2_g1g2, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_twoptp2_g1g2,1.0);
+	measure_mesons_core(Q_0, Q_p2, source_0, mo_twoptp2_g2g1, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_twoptp2_g2g1,1.0);
+	measure_mesons_core(Q_0, Q_p3, source_0, mo_twoptp3_g3, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_twoptp3_g3,1.0);
+	measure_mesons_core(Q_0, Q_p3, source_0, mo_twoptp3_g1g2, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_twoptp3_g1g2,1.0);
+	measure_mesons_core(Q_0, Q_p3, source_0, mo_twoptp3_g2g1, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_twoptp3_g2g1,1.0);
+	measure_mesons_core(Q_0, Q_p3, source_0, mo_twoptp3_g1g3, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_twoptp3_g1g3,1.0);
+	measure_mesons_core(Q_0, Q_p3, source_0, mo_twoptp3_g3g1, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_twoptp3_g3g1,1.0);
+	measure_mesons_core(Q_0, Q_p3, source_0, mo_twoptp3_g2g3, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_twoptp3_g2g3,1.0);
+	measure_mesons_core(Q_0, Q_p3, source_0, mo_twoptp3_g3g2, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_twoptp3_g3g2,1.0);
+	lprintf("DEBUG",0,"Rho 2-point functions done \n");
 	
 	// direct 1
 	measure_scattering_AD_core(mo_d_nomom, Q_0, Q_0, Q_0_eta, Q_0_eta, tau, 0, 1, 0, 0, 0 );
 	measure_scattering_AD_core(mo_d, Q_p, Q_0, Q_0_eta, Q_0_eta, tau, 0, 1, px, py, pz );
 	measure_scattering_AD_core(mo_dp2, Q_p2, Q_0, Q_0_eta, Q_0_eta, tau, 0, 1, px2, py2, pz2 );
+	measure_scattering_AD_core(mo_dp3, Q_p3, Q_0, Q_0_eta, Q_0_eta, tau, 0, 1, px3, py3, pz3 );
+	lprintf("DEBUG",0,"D diagrams done \n");
+	
 	//Triangle pipi->rho
 	measure_mesons_core(W_0_mp, Q_0, source_0, mo_t1_g1, 1, tau, 2, 0, GLB_T);
 	do_global_sum(mo_t1_g1,1.0);
@@ -396,6 +472,10 @@ while(1){
 	do_global_sum(mo_t1p2_g1,1.0);
 	measure_mesons_core(Q_0, W_0_p2, source_0, mo_t2p2_g1, 1, tau, 2, 0, GLB_T);
 	do_global_sum(mo_t2p2_g1,1.0);
+	measure_mesons_core(W_0_mp3, Q_0, source_0, mo_t1p3_g1, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_t1p3_g1,1.0);
+	measure_mesons_core(Q_0, W_0_p3, source_0, mo_t2p3_g1, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_t2p3_g1,1.0);
 
 	measure_mesons_core(W_0_mp, Q_0, source_0, mo_t1_g2, 1, tau, 2, 0, GLB_T);
 	do_global_sum(mo_t1_g2,1.0);
@@ -405,6 +485,10 @@ while(1){
 	do_global_sum(mo_t1p2_g2,1.0);
 	measure_mesons_core(Q_0, W_0_p2, source_0, mo_t2p2_g2, 1, tau, 2, 0, GLB_T);
 	do_global_sum(mo_t2p2_g2,1.0);
+	measure_mesons_core(W_0_mp3, Q_0, source_0, mo_t1p3_g2, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_t1p3_g2,1.0);
+	measure_mesons_core(Q_0, W_0_p3, source_0, mo_t2p3_g2, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_t2p3_g2,1.0);
 
 	measure_mesons_core(W_0_mp, Q_0, source_0, mo_t1_g3, 1, tau, 2, 0, GLB_T);
 	do_global_sum(mo_t1_g3,1.0);
@@ -414,14 +498,21 @@ while(1){
 	do_global_sum(mo_t1p2_g3,1.0);
 	measure_mesons_core(Q_0, W_0_p2, source_0, mo_t2p2_g3, 1, tau, 2, 0, GLB_T);
 	do_global_sum(mo_t2p2_g3,1.0);
+	measure_mesons_core(W_0_mp3, Q_0, source_0, mo_t1p3_g3, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_t1p3_g3,1.0);
+	measure_mesons_core(Q_0, W_0_p3, source_0, mo_t2p3_g3, 1, tau, 2, 0, GLB_T);
+	do_global_sum(mo_t2p3_g3,1.0);
+	lprintf("DEBUG",0,"T diagrams done \n");
 
 	//File IO
 	io2pt(mo_pi2p, 2, src, path, "pi");
 	io2pt(mo_pi_p1, 2, src, path, "pi_p1");
 	io2pt(mo_pi_p2, 2, src, path, "pi_p2");
+	io2pt(mo_pi_p3, 2, src, path, "pi_p3");
 	io4pt(mo_d_nomom, 1, src, path, "d_p0");
 	io4pt(mo_d, 1, src, path, "d");
 	io4pt(mo_dp2, 1, src, path, "dp2");
+	io4pt(mo_dp3, 1, src, path, "dp3");
 
 	io2pt(mo_twopt_nomom_g1, 2, src, path, "rho_p0_g1");
 	io2pt(mo_twopt_g1, 2, src, path, "rho_g1");
@@ -430,6 +521,9 @@ while(1){
 	io2pt(mo_twoptp2_g1, 2, src, path, "rhop2_g1");
 	io2pt(mo_t1p2_g1, 2, src, path, "t1p2_g1");
 	io2pt(mo_t2p2_g1, 2, src, path, "t2p2_g1");
+	io2pt(mo_twoptp3_g1, 2, src, path, "rhop3_g1");
+	io2pt(mo_t1p3_g1, 2, src, path, "t1p3_g1");
+	io2pt(mo_t2p3_g1, 2, src, path, "t2p3_g1");
 
 	io2pt(mo_twopt_nomom_g2, 2, src, path, "rho_p0_g2");
 	io2pt(mo_twopt_g2, 2, src, path, "rho_g2");
@@ -438,6 +532,9 @@ while(1){
 	io2pt(mo_twoptp2_g2, 2, src, path, "rhop2_g2");
 	io2pt(mo_t1p2_g2, 2, src, path, "t1p2_g2");
 	io2pt(mo_t2p2_g2, 2, src, path, "t2p2_g2");
+	io2pt(mo_twoptp3_g2, 2, src, path, "rhop3_g2");
+	io2pt(mo_t1p3_g2, 2, src, path, "t1p3_g2");
+	io2pt(mo_t2p3_g2, 2, src, path, "t2p3_g2");
 
 	io2pt(mo_twopt_nomom_g3, 2, src, path, "rho_p0_g3");
 	io2pt(mo_twopt_g3, 2, src, path, "rho_g3");
@@ -446,6 +543,19 @@ while(1){
 	io2pt(mo_twoptp2_g3, 2, src, path, "rhop2_g3");
 	io2pt(mo_t1p2_g3, 2, src, path, "t1p2_g3");
 	io2pt(mo_t2p2_g3, 2, src, path, "t2p2_g3");
+	io2pt(mo_twoptp3_g3, 2, src, path, "rhop3_g3");
+	io2pt(mo_t1p3_g3, 2, src, path, "t1p3_g3");
+	io2pt(mo_t2p3_g3, 2, src, path, "t2p3_g3");
+
+	io2pt(mo_twoptp2_g1g2, 2, src, path, "rhop2_g1g2");
+	io2pt(mo_twoptp2_g2g1, 2, src, path, "rhop2_g2g1");
+
+	io2pt(mo_twoptp3_g1g2, 2, src, path, "rhop3_g1g2");
+	io2pt(mo_twoptp3_g2g1, 2, src, path, "rhop3_g2g1");
+	io2pt(mo_twoptp3_g1g3, 2, src, path, "rhop3_g1g3");
+	io2pt(mo_twoptp3_g3g1, 2, src, path, "rhop3_g3g1");
+	io2pt(mo_twoptp3_g2g3, 2, src, path, "rhop3_g2g3");
+	io2pt(mo_twoptp3_g3g2, 2, src, path, "rhop3_g3g2");
 
 	//Will have to change the range; this is too big
 	for (t=0; t<GLB_T; ++t)
@@ -467,6 +577,11 @@ while(1){
 		measure_mesons_core(W_0_0, W_p2_0, source_0, mo_tmpr2p2, 1, tau, 2, 0, GLB_T);
 		measure_mesons_core(W_0_0, W_0_p2, source_0, mo_tmpr3p2, 1, tau, 2, 0, GLB_T);
 		measure_mesons_core(W_0_mp2, W_0_0, source_0, mo_tmpr4p2, 1, tau, 2, 0, GLB_T);
+
+		measure_mesons_core(W_mp3_0, W_0_0, source_0, mo_tmpr1p3, 1, tau, 2, 0, GLB_T);
+		measure_mesons_core(W_0_0, W_p3_0, source_0, mo_tmpr2p3, 1, tau, 2, 0, GLB_T);
+		measure_mesons_core(W_0_0, W_0_p3, source_0, mo_tmpr3p3, 1, tau, 2, 0, GLB_T);
+		measure_mesons_core(W_0_mp3, W_0_0, source_0, mo_tmpr4p3, 1, tau, 2, 0, GLB_T);
 
 		//Pick only the relevant contributions
 		for(int px_=0;px_<2;++px_)for(int py_=0;py_<2;++py_)for(int pz_=0;pz_<2;++pz_){

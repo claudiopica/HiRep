@@ -421,8 +421,8 @@ while(1){
 
 	create_sequential_source(source_p3_0,tau,Q_p3);
 	create_sequential_source(source_mp3_0,tau,Q_mp3);
-	add_momentum(source_0_p2,source_0_0,px3,py3,pz3);
-	add_momentum(source_0_mp2,source_0_0,-px3,-py3,-pz3);
+	add_momentum(source_0_p3,source_0_0,px3,py3,pz3);
+	add_momentum(source_0_mp3,source_0_0,-px3,-py3,-pz3);
 	lprintf("DEBUG",0,"Created seq sources \n");
 
 	//Sequential propagators
