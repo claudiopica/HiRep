@@ -290,9 +290,11 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
 {
     int i, j;
     static double complex *one_point_gb;
-    static double complex *cor_storage;
+    static double *cor_storage;
     static long double norm = 1.0;
     struct timeval start, end, etime;
+    //double t1, t2;
+    //struct timeval tt1, tt2, tt3;
 
     if (lev == 0)
     {
@@ -300,7 +302,7 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
         {
             init_hb_multihit_boundary();
             one_point_gb = malloc(sizeof(double complex) * total_n_glue_op * nblocking * n_active_slices);
-            cor_storage = malloc(sizeof(double complex) * nblocking * nblocking * lcor->n_corrs * total_corrs_size);
+            cor_storage = malloc(sizeof(double) * nblocking * nblocking * lcor->n_corrs * total_corrs_size);
             for (i = 0; i < max_mh_level; i++)
                 norm *= ml_up[i];
             norm *= GLB_VOL3 * NG;
@@ -308,7 +310,7 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
         gettimeofday(&start, 0);
 
         memset(one_point_gb, 0, sizeof(double complex) * total_n_glue_op * nblocking * n_active_slices);
-        memset(cor_storage, 0, sizeof(double complex) * nblocking * nblocking * lcor->n_corrs * total_corrs_size);
+        memset(cor_storage, 0, sizeof(double) * nblocking * nblocking * lcor->n_corrs * total_corrs_size);
     }
 
     if (lev < max_mh_level - 1)
@@ -323,13 +325,26 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
     }
     else
     {
+        //t1 = t2 = 0;
         for (i = 0; i < ml_up[lev]; i++)
         {
+           // gettimeofday(&tt1, 0);
+
             for (j = 0; j < ml_skip[lev]; j++)
                 update_mh(lev, beta, nhb, nor);
+           // gettimeofday(&tt2, 0);
+           // timeval_subtract(&tt3, &tt2, &tt1);
+           // t1 += tt3.tv_sec + 1e-6 * tt3.tv_usec;
+
+           // gettimeofday(&tt1, 0);
 
             measure_1pt_glueballs(nblocking, smear_val, one_point_gb);
+           // gettimeofday(&tt2, 0);
+
+           // timeval_subtract(&tt3, &tt2, &tt1);
+           // t2 += tt3.tv_sec + 1e-6 * tt3.tv_usec;
         }
+       // lprintf("HB MULTILEVEL", 0, "comparison [%lf sec %lf sec]\n", t1, t2);
     }
 
     if (lev == 0)

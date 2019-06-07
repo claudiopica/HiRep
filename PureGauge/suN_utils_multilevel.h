@@ -8,6 +8,14 @@
 
 #include "input_par.h"
 #include "glueballs.h"
+#define GENERIC_MAX(x, y) ((x) > (y) ? (x) : (y))
+
+#define ENSURE_int(i)   _Generic((i), int:   (i))
+#define ENSURE_float(f) _Generic((f), float: (f))
+
+#define MAX(type, x, y) \
+  (type)GENERIC_MAX(ENSURE_##type(x), ENSURE_##type(y))
+
 /* suN variables */
 typedef struct _input_pg_ml
 {

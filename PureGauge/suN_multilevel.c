@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
   if (i)
   {
     lprintf("MAIN", 0, "100\nThermalized %d Trajectories: [%ld sec %ld usec]\n", flow.therm, etime.tv_sec, etime.tv_usec);
-    save_conf(&flow, max(0,flow.start-1));
+    save_conf(&flow, MAX(int,0,flow.start-1));
   }
   /* Measures */
   for (i = flow.start; i < flow.end; ++i)

@@ -260,6 +260,7 @@ Add1trOpCorrelators[px_, py_, pz_, irrepidx_, irrepev_, charge_, path_]:= Module
   If[Not[Or[charge==-1, charge==+1]],Print["Charge can only take values +1 or -1"];Abort[];];
 
   res=OpGenerate[px, py, pz, irrepidx, irrepev, path];
+  (*Print["ecco res",res];*)
   If[ListQ[res],
     If[!NumberQ[CorrelatorSize[px, py, pz, irrepidx, irrepev, charge]],
       CorrelatorSize[px, py, pz, irrepidx, irrepev, charge]=0;
@@ -648,24 +649,17 @@ GenerateCchecks[]:=Module[{Op,OpTmp,irrepdim,RActiveOp,RMatrixOp,Pxsort,Pysort,P
 
   TotalCorrelatorSize=0;
   WriteString[ar, "
-void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_storage, double complex *cor_storage)
+void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_storage, double *cor_storage)
 {
     int totalsize, i1, i2, t1, t2, id, n1, n2, b1, b2, icor, i;
     double norm;
-    double complex *cor_pointer, tmp;
+    double *cor_pointer, tmp;
     static double complex *gb1_bf;
-
-#ifdef WITH_MPI
-    static int *t_to_proc = NULL;
+    static int n_total_active_slices = 0;    
     static int *listactive = NULL;
-    static int n_total_active_slices = 0;
-    static int *listsent = NULL;
-
-    if (t_to_proc == NULL)
+    if (listactive == NULL)
     {
         listactive = malloc(sizeof(int) * GLB_T);
-        listsent = malloc(sizeof(int) * GLB_T);
-
         for (i = 0; i < GLB_T; i++)
             listactive[i] = -1;
 
@@ -681,6 +675,16 @@ void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_stor
                 listactive[i] = n_total_active_slices;
                 n_total_active_slices++;
             }
+    }
+
+
+#ifdef WITH_MPI
+    static int *t_to_proc = NULL;
+    static int *listsent = NULL;
+
+    if (t_to_proc == NULL)
+    {
+        listsent = malloc(sizeof(int) * GLB_T);
 
         gb1_bf = malloc(sizeof(double complex) * total_n_glue_op * nblocking * n_total_active_slices);
 
@@ -709,12 +713,13 @@ void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_stor
         t1 = glbT_to_active_slices[lcor->list[icor].t1];
         t2 = glbT_to_active_slices[lcor->list[icor].t2];
         id = lcor->list[icor].id;
+        gb1 = gb1_bf + total_n_glue_op * nblocking * listactive[lcor->list[icor].t1];
+        gb2 = gb1_bf + total_n_glue_op * nblocking * listactive[lcor->list[icor].t2];
 
 #ifdef WITH_MPI
 
         if (listsent[lcor->list[icor].t1] == -1)
         {
-            gb1 = gb1_bf + total_n_glue_op * nblocking * listactive[lcor->list[icor].t1];
             if (t1 != -1)
             {
                 if (PID == 0)
@@ -739,7 +744,6 @@ void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_stor
         {
             if (listsent[lcor->list[icor].t2] == -1)
             {
-                gb2 = gb1_bf + total_n_glue_op * nblocking * listactive[lcor->list[icor].t2];
                 if (t2 != -1)
                 {
                     if (PID == 0)
@@ -760,14 +764,6 @@ void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_stor
                 listsent[lcor->list[icor].t2] = 0;
             }
         }
-        else
-        {
-            gb2=gb1;
-        }
-
-#else
-        gb1 = gb_storage + t1 * total_n_glue_op * nblocking;
-        gb2 = gb_storage + t2 * total_n_glue_op * nblocking;
 #endif
 
         totalsize = 0;
@@ -796,24 +792,25 @@ void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_stor
                 n2 = n1;
                 b2 = b1;
                 i2 = ",startbase-cs," + b2 + total_n_glue_op * n2;
-                tmp = norm * (conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
+                tmp = norm * creal(conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
                 cor_pointer[b1 + ",cs," * (n1 + nblocking * (b2 + ",cs," * n2))] += tmp;
+
 
                 for (b2 = b1 + 1; b2 < ",cs,"; b2++)
                 {
                     i2 = ",startbase-cs," + b2 + total_n_glue_op * n2;
-                    tmp = norm * (conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
+                    tmp = norm * creal(conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
                     cor_pointer[b1 + ",cs," * (n1 + nblocking * (b2 + ",cs," * n2))] += tmp;
-                    cor_pointer[b2 + ",cs," * (n2 + nblocking * (b1 + ",cs," * n1))] += conj(tmp);
+                    cor_pointer[b2 + ",cs," * (n2 + nblocking * (b1 + ",cs," * n1))] += tmp;
                 }
 
                 for (n2 = n1 + 1; n2 < nblocking; n2++)
                     for (b2 = 0; b2 < ",cs,"; b2++)
                     {
                         i2 = ",startbase-cs," + b2 + total_n_glue_op * n2;
-                        tmp = norm * (conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
+                        tmp = norm * creal(conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
                         cor_pointer[b1 + ",cs," * (n1 + nblocking * (b2 + ",cs," * n2))] += tmp;
-                        cor_pointer[b2 + ",cs," * (n2 + nblocking * (b1 + ",cs," * n1))] += conj(tmp);
+                        cor_pointer[b2 + ",cs," * (n2 + nblocking * (b1 + ",cs," * n1))] += tmp;
                     }
             }
         totalsize += (nblocking * nblocking * ",cs*cs," * (lcor->n_corrs));
@@ -838,9 +835,9 @@ Do[
             startbase+=cs;
             {Pxsort,Pysort,Pzsort}=Sort[{px,py,pz}//Abs];
 
-          If[Not[irrepidx==1 && irrepev==1 && charge==+1 && px==0 && py ==0 && pz==0],WriteString[ar, "#ifdef ML_TUNING"]];
+          (*If[Not[irrepidx==1 && irrepev==1 && charge==+1 && px==0 && py ==0 && pz==0],WriteString[ar, "#ifdef ML_TUNING"]];*)
           WriteString[ar, "
-    lprintf(\"Measure ML\", 0, \"\\n1pt function P=(",px,",", py,",", pz,") Irrep=",IrrepName[Pxsort,Pysort,Pzsort][[irrepidx]]," Irrep ev=",irrepev,"/",Length[bTOrthog[Pxsort,Pysort,Pzsort][[irrepidx]]]," Charge=",stcharge[charge],"\\n\\n\");
+    lprintf(\"Measure ML\", 0, \"\\n1pt function P=(",px,",", py,",", pz,") Irrep=",IrrepName[Pxsort,Pysort,Pzsort][[irrepidx]]," Irrep ev=",irrepev,"/",Length[bTOrthog[Pxsort,Pysort,Pzsort][[irrepidx]]]," Charge=",stcharge[charge]," nop=%d\\n\\n\",",cs," * nblocking );
     
     for (n1 = 0; n1 < GLB_T; n1++)
         if (listactive[n1] > -1)
@@ -853,7 +850,7 @@ Do[
             lprintf(\"Measure ML\", 0, \"\\n\");
         }
 "];
-          If[Not[irrepidx==1 && irrepev==1 && charge==+1 && px==0 && py ==0 && pz==0],WriteString[ar, "#endif //ML_TUNING"]];
+          (*If[Not[irrepidx==1 && irrepev==1 && charge==+1 && px==0 && py ==0 && pz==0],WriteString[ar, "#endif //ML_TUNING"]];*)
 
           WriteString[ar, "
     b2 = 0;
@@ -877,7 +874,7 @@ Do[
         for (i1 = 0; i1 < (nblocking * ",cs,"); i1++)
         {
             for (i2 = 0; i2 < (nblocking * ",cs,"); i2++)
-                lprintf(\"Measure ML\", 0, \" ( %.6e %.6e )\", creal(cor_pointer[i1 + nblocking * ",cs," * i2]), cimag(cor_pointer[i1 + nblocking * ",cs," * i2]));
+                lprintf(\"Measure ML\", 0, \" ( %.6e ) \", cor_pointer[i1 + nblocking * ",cs," * i2]);
 
             lprintf(\"Measure ML\", 0, \"\\n\");
         }
@@ -993,7 +990,7 @@ typedef struct
     int n_corrs;
 } cor_list;
 
-void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_storage, double complex *cor_storage);
+void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_storage, double *cor_storage);
     "];
     WriteString[ar, "\n\n"];
     Do[
