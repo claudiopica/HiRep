@@ -12,6 +12,7 @@
 #include "update.h"
 #include "memory.h"
 #include "utils.h"
+#include "glueballs.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -292,6 +293,8 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
 
     lprintf("INIT ML", 0, "Separation between each measure=%d\n", gf->nskip);
 
+    /* glueballs 1pt group structure */
+    report_op_group_setup();
 
     BCs_pars_t BCs_pars = {
         .fermion_twisting_theta = {0., 0., 0., 0.},

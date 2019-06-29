@@ -6,7 +6,7 @@
 #include "glueballs.h"
 
 #include <string.h>
-#define npaths 6
+#define npaths 49
 static double PI=3.141592653589793238462643383279502884197;
 static double complex *mom_def_Re_tr_paths=NULL;
 static double complex *mom_def_Im_tr_paths=NULL;
@@ -424,6 +424,92 @@ w2 = pu_gauge_wrk(site,1);
 
 _suNg_dagger(res1,*w2);
 w2 = &res1;
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger( res, *w2, *w1);
+
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 1);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path1(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+site = idn_wrk(site, 1);
+w2 = pu_gauge_wrk(site,1);
+
+_suNg_dagger(res1,*w2);
+w2 = &res1;
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger( res, *w2, *w1);
+
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 1);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path2(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+site = idn_wrk(site, 2);
+w2 = pu_gauge_wrk(site,2);
+
+_suNg_dagger(res1,*w2);
+w2 = &res1;
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger( res, *w2, *w1);
+
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 2);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_1(double complex * op_out)
+{
+*op_out =+(16.)*mom_def_Re_tr_paths[0]+(16.)*mom_def_Re_tr_paths[1]+(16.)*mom_def_Re_tr_paths[2];
+}
+
+static double complex path3(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+site = idn_wrk(site, 1);
+w2 = pu_gauge_wrk(site,1);
+
+_suNg_dagger(res1,*w2);
+w2 = &res1;
 site = idn_wrk(site, 1);
 w1 = pu_gauge_wrk(site,1);
 _suNg_times_suNg_dagger( res, *w2, *w1);
@@ -447,7 +533,7 @@ _suNg_trace(p,res);
 return p;
 }
 
-static double complex path1(int in)
+static double complex path4(int in)
 {
 suNg *w1, *w2;
 suNg res, res1;
@@ -482,111 +568,6 @@ _suNg_trace(p,res);
 return p;
 }
 
-static double complex path2(int in)
-{
-suNg *w1, *w2;
-suNg res, res1;
-int site=in;
-double complex p;
-
-site = idn_wrk(site, 2);
-w2 = pu_gauge_wrk(site,2);
-
-_suNg_dagger(res1,*w2);
-w2 = &res1;
-site = idn_wrk(site, 2);
-w1 = pu_gauge_wrk(site,2);
-_suNg_times_suNg_dagger( res, *w2, *w1);
-
-site = idn_wrk(site, 1);
-w1 = pu_gauge_wrk(site,1);
-_suNg_times_suNg_dagger(res1, res, *w1);
-
-w1 = pu_gauge_wrk(site,2);
-_suNg_times_suNg(res, res1, *w1);
-
-site = iup_wrk(site, 2);
-w1 = pu_gauge_wrk(site,2);
-_suNg_times_suNg(res1, res, *w1);
-
-site = iup_wrk(site, 2);
-w1 = pu_gauge_wrk(site,1);
-_suNg_times_suNg(res, res1, *w1);
-
-_suNg_trace(p,res);
-return p;
-}
-
-static double complex path3(int in)
-{
-suNg *w1, *w2;
-suNg res, res1;
-int site=in;
-double complex p;
-
-site = idn_wrk(site, 2);
-w2 = pu_gauge_wrk(site,2);
-
-_suNg_dagger(res1,*w2);
-w2 = &res1;
-site = idn_wrk(site, 2);
-w1 = pu_gauge_wrk(site,2);
-_suNg_times_suNg_dagger( res, *w2, *w1);
-
-site = idn_wrk(site, 3);
-w1 = pu_gauge_wrk(site,3);
-_suNg_times_suNg_dagger(res1, res, *w1);
-
-w1 = pu_gauge_wrk(site,2);
-_suNg_times_suNg(res, res1, *w1);
-
-site = iup_wrk(site, 2);
-w1 = pu_gauge_wrk(site,2);
-_suNg_times_suNg(res1, res, *w1);
-
-site = iup_wrk(site, 2);
-w1 = pu_gauge_wrk(site,3);
-_suNg_times_suNg(res, res1, *w1);
-
-_suNg_trace(p,res);
-return p;
-}
-
-static double complex path4(int in)
-{
-suNg *w1, *w2;
-suNg res, res1;
-int site=in;
-double complex p;
-
-site = idn_wrk(site, 3);
-w2 = pu_gauge_wrk(site,3);
-
-_suNg_dagger(res1,*w2);
-w2 = &res1;
-site = idn_wrk(site, 3);
-w1 = pu_gauge_wrk(site,3);
-_suNg_times_suNg_dagger( res, *w2, *w1);
-
-site = idn_wrk(site, 1);
-w1 = pu_gauge_wrk(site,1);
-_suNg_times_suNg_dagger(res1, res, *w1);
-
-w1 = pu_gauge_wrk(site,3);
-_suNg_times_suNg(res, res1, *w1);
-
-site = iup_wrk(site, 3);
-w1 = pu_gauge_wrk(site,3);
-_suNg_times_suNg(res1, res, *w1);
-
-site = iup_wrk(site, 3);
-w1 = pu_gauge_wrk(site,1);
-_suNg_times_suNg(res, res1, *w1);
-
-_suNg_trace(p,res);
-return p;
-}
-
 static double complex path5(int in)
 {
 suNg *w1, *w2;
@@ -594,6 +575,111 @@ suNg res, res1;
 int site=in;
 double complex p;
 
+site = idn_wrk(site, 2);
+w2 = pu_gauge_wrk(site,2);
+
+_suNg_dagger(res1,*w2);
+w2 = &res1;
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger( res, *w2, *w1);
+
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 2);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path6(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+site = idn_wrk(site, 2);
+w2 = pu_gauge_wrk(site,2);
+
+_suNg_dagger(res1,*w2);
+w2 = &res1;
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger( res, *w2, *w1);
+
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 2);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path7(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+site = idn_wrk(site, 3);
+w2 = pu_gauge_wrk(site,3);
+
+_suNg_dagger(res1,*w2);
+w2 = &res1;
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger( res, *w2, *w1);
+
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 3);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path8(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
 site = idn_wrk(site, 3);
 w2 = pu_gauge_wrk(site,3);
 
@@ -622,25 +708,1665 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_1(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_2(double complex * op_out)
 {
-*op_out +=+(8.)*mom_def_Re_tr_paths[0]+(8.)*mom_def_Re_tr_paths[1]+(8.)*mom_def_Re_tr_paths[2]+(8.)*mom_def_Re_tr_paths[3]+(8.)*mom_def_Re_tr_paths[4]+(8.)*mom_def_Re_tr_paths[5];
+*op_out =+(8.)*mom_def_Re_tr_paths[3]+(8.)*mom_def_Re_tr_paths[4]+(8.)*mom_def_Re_tr_paths[5]+(8.)*mom_def_Re_tr_paths[6]+(8.)*mom_def_Re_tr_paths[7]+(8.)*mom_def_Re_tr_paths[8];
+}
+
+static double complex path9(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+site = idn_wrk(site, 1);
+w2 = pu_gauge_wrk(site,1);
+
+_suNg_dagger(res1,*w2);
+w2 = &res1;
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger( res, *w2, *w1);
+
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 1);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 2);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path10(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+site = idn_wrk(site, 1);
+w2 = pu_gauge_wrk(site,1);
+
+_suNg_dagger(res1,*w2);
+w2 = &res1;
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger( res, *w2, *w1);
+
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 3);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 1);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 2);
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path11(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+site = idn_wrk(site, 1);
+w2 = pu_gauge_wrk(site,1);
+
+_suNg_dagger(res1,*w2);
+w2 = &res1;
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg( res, *w2, *w1);
+
+site = iup_wrk(site, 2);
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 1);
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path12(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+site = idn_wrk(site, 1);
+w2 = pu_gauge_wrk(site,1);
+
+_suNg_dagger(res1,*w2);
+w2 = &res1;
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg( res, *w2, *w1);
+
+site = iup_wrk(site, 2);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 3);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 1);
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_3(double complex * op_out)
+{
+*op_out =+(12.)*mom_def_Re_tr_paths[9]+(12.)*mom_def_Re_tr_paths[10]+(12.)*mom_def_Re_tr_paths[11]+(12.)*mom_def_Re_tr_paths[12];
+}
+
+static double complex path13(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+site = idn_wrk(site, 1);
+w2 = pu_gauge_wrk(site,1);
+
+_suNg_dagger(res1,*w2);
+w2 = &res1;
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger( res, *w2, *w1);
+
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 1);
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 2);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path14(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+site = idn_wrk(site, 1);
+w2 = pu_gauge_wrk(site,1);
+
+_suNg_dagger(res1,*w2);
+w2 = &res1;
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger( res, *w2, *w1);
+
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 1);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 3);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 2);
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path15(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+site = idn_wrk(site, 1);
+w2 = pu_gauge_wrk(site,1);
+
+_suNg_dagger(res1,*w2);
+w2 = &res1;
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger( res, *w2, *w1);
+
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 1);
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 3);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path16(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+site = idn_wrk(site, 1);
+w2 = pu_gauge_wrk(site,1);
+
+_suNg_dagger(res1,*w2);
+w2 = &res1;
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger( res, *w2, *w1);
+
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 1);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 2);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 3);
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path17(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+w2 = pu_gauge_wrk(site,1);
+
+site = iup_wrk(site, 1);
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger( res, *w2, *w1);
+
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 2);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path18(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+w2 = pu_gauge_wrk(site,1);
+
+site = iup_wrk(site, 1);
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger( res, *w2, *w1);
+
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 3);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 2);
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path19(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+w2 = pu_gauge_wrk(site,1);
+
+site = iup_wrk(site, 1);
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger( res, *w2, *w1);
+
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 3);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path20(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+w2 = pu_gauge_wrk(site,1);
+
+site = iup_wrk(site, 1);
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger( res, *w2, *w1);
+
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 2);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 3);
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path21(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+site = idn_wrk(site, 2);
+w2 = pu_gauge_wrk(site,2);
+
+_suNg_dagger(res1,*w2);
+w2 = &res1;
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger( res, *w2, *w1);
+
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 2);
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 1);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path22(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+site = idn_wrk(site, 2);
+w2 = pu_gauge_wrk(site,2);
+
+_suNg_dagger(res1,*w2);
+w2 = &res1;
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger( res, *w2, *w1);
+
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 2);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 3);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 1);
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path23(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+w2 = pu_gauge_wrk(site,2);
+
+site = iup_wrk(site, 2);
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger( res, *w2, *w1);
+
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 1);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path24(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+w2 = pu_gauge_wrk(site,2);
+
+site = iup_wrk(site, 2);
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger( res, *w2, *w1);
+
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 3);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 1);
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_4(double complex * op_out)
+{
+*op_out =+(4.)*mom_def_Re_tr_paths[13]+(4.)*mom_def_Re_tr_paths[14]+(4.)*mom_def_Re_tr_paths[15]+(4.)*mom_def_Re_tr_paths[16]+(4.)*mom_def_Re_tr_paths[17]+(4.)*mom_def_Re_tr_paths[18]+(4.)*mom_def_Re_tr_paths[19]+(4.)*mom_def_Re_tr_paths[20]+(4.)*mom_def_Re_tr_paths[21]+(4.)*mom_def_Re_tr_paths[22]+(4.)*mom_def_Re_tr_paths[23]+(4.)*mom_def_Re_tr_paths[24];
+}
+
+static double complex path25(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+site = idn_wrk(site, 1);
+w2 = pu_gauge_wrk(site,1);
+
+_suNg_dagger(res1,*w2);
+w2 = &res1;
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger( res, *w2, *w1);
+
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 1);
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 2);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path26(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+site = idn_wrk(site, 1);
+w2 = pu_gauge_wrk(site,1);
+
+_suNg_dagger(res1,*w2);
+w2 = &res1;
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger( res, *w2, *w1);
+
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 1);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 3);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 2);
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path27(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+site = idn_wrk(site, 1);
+w2 = pu_gauge_wrk(site,1);
+
+_suNg_dagger(res1,*w2);
+w2 = &res1;
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger( res, *w2, *w1);
+
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 1);
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 3);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path28(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+site = idn_wrk(site, 1);
+w2 = pu_gauge_wrk(site,1);
+
+_suNg_dagger(res1,*w2);
+w2 = &res1;
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger( res, *w2, *w1);
+
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 1);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 2);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 3);
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path29(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+w2 = pu_gauge_wrk(site,1);
+
+site = iup_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg( res, *w2, *w1);
+
+site = iup_wrk(site, 1);
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 2);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path30(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+w2 = pu_gauge_wrk(site,1);
+
+site = iup_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg( res, *w2, *w1);
+
+site = iup_wrk(site, 1);
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 3);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 2);
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path31(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+w2 = pu_gauge_wrk(site,1);
+
+site = iup_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg( res, *w2, *w1);
+
+site = iup_wrk(site, 1);
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 3);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path32(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+w2 = pu_gauge_wrk(site,1);
+
+site = iup_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg( res, *w2, *w1);
+
+site = iup_wrk(site, 1);
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 2);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 3);
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path33(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+site = idn_wrk(site, 2);
+w2 = pu_gauge_wrk(site,2);
+
+_suNg_dagger(res1,*w2);
+w2 = &res1;
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger( res, *w2, *w1);
+
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 2);
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 1);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path34(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+site = idn_wrk(site, 2);
+w2 = pu_gauge_wrk(site,2);
+
+_suNg_dagger(res1,*w2);
+w2 = &res1;
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger( res, *w2, *w1);
+
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 2);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 3);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 1);
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path35(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+site = idn_wrk(site, 2);
+w2 = pu_gauge_wrk(site,2);
+
+_suNg_dagger(res1,*w2);
+w2 = &res1;
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger( res, *w2, *w1);
+
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 2);
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 3);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path36(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+site = idn_wrk(site, 2);
+w2 = pu_gauge_wrk(site,2);
+
+_suNg_dagger(res1,*w2);
+w2 = &res1;
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger( res, *w2, *w1);
+
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 2);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 1);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 3);
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path37(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+w2 = pu_gauge_wrk(site,2);
+
+site = iup_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg( res, *w2, *w1);
+
+site = iup_wrk(site, 2);
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 1);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path38(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+w2 = pu_gauge_wrk(site,2);
+
+site = iup_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg( res, *w2, *w1);
+
+site = iup_wrk(site, 2);
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 3);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 1);
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path39(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+w2 = pu_gauge_wrk(site,2);
+
+site = iup_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg( res, *w2, *w1);
+
+site = iup_wrk(site, 2);
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 3);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path40(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+w2 = pu_gauge_wrk(site,2);
+
+site = iup_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg( res, *w2, *w1);
+
+site = iup_wrk(site, 2);
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 1);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 3);
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path41(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+site = idn_wrk(site, 3);
+w2 = pu_gauge_wrk(site,3);
+
+_suNg_dagger(res1,*w2);
+w2 = &res1;
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger( res, *w2, *w1);
+
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 3);
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 1);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path42(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+site = idn_wrk(site, 3);
+w2 = pu_gauge_wrk(site,3);
+
+_suNg_dagger(res1,*w2);
+w2 = &res1;
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger( res, *w2, *w1);
+
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 3);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 2);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 1);
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path43(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+site = idn_wrk(site, 3);
+w2 = pu_gauge_wrk(site,3);
+
+_suNg_dagger(res1,*w2);
+w2 = &res1;
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger( res, *w2, *w1);
+
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 3);
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 2);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path44(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+site = idn_wrk(site, 3);
+w2 = pu_gauge_wrk(site,3);
+
+_suNg_dagger(res1,*w2);
+w2 = &res1;
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger( res, *w2, *w1);
+
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 3);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 1);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 2);
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path45(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+w2 = pu_gauge_wrk(site,3);
+
+site = iup_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg( res, *w2, *w1);
+
+site = iup_wrk(site, 3);
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 1);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path46(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+w2 = pu_gauge_wrk(site,3);
+
+site = iup_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg( res, *w2, *w1);
+
+site = iup_wrk(site, 3);
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 2);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 1);
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path47(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+w2 = pu_gauge_wrk(site,3);
+
+site = iup_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg( res, *w2, *w1);
+
+site = iup_wrk(site, 3);
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 2);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static double complex path48(int in)
+{
+suNg *w1, *w2;
+suNg res, res1;
+int site=in;
+double complex p;
+
+w2 = pu_gauge_wrk(site,3);
+
+site = iup_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg( res, *w2, *w1);
+
+site = iup_wrk(site, 3);
+site = idn_wrk(site, 2);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+site = idn_wrk(site, 3);
+w1 = pu_gauge_wrk(site,3);
+_suNg_times_suNg_dagger(res1, res, *w1);
+
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg(res, res1, *w1);
+
+site = iup_wrk(site, 1);
+w1 = pu_gauge_wrk(site,2);
+_suNg_times_suNg(res1, res, *w1);
+
+site = iup_wrk(site, 2);
+site = idn_wrk(site, 1);
+w1 = pu_gauge_wrk(site,1);
+_suNg_times_suNg_dagger(res, res1, *w1);
+
+_suNg_trace(p,res);
+return p;
+}
+
+static void OP_oneTr_p_0_0_0_Ir_1_C_1_n_5(double complex * op_out)
+{
+*op_out =+(2.)*mom_def_Re_tr_paths[25]+(2.)*mom_def_Re_tr_paths[26]+(2.)*mom_def_Re_tr_paths[27]+(2.)*mom_def_Re_tr_paths[28]+(2.)*mom_def_Re_tr_paths[29]+(2.)*mom_def_Re_tr_paths[30]+(2.)*mom_def_Re_tr_paths[31]+(2.)*mom_def_Re_tr_paths[32]+(2.)*mom_def_Re_tr_paths[33]+(2.)*mom_def_Re_tr_paths[34]+(2.)*mom_def_Re_tr_paths[35]+(2.)*mom_def_Re_tr_paths[36]+(2.)*mom_def_Re_tr_paths[37]+(2.)*mom_def_Re_tr_paths[38]+(2.)*mom_def_Re_tr_paths[39]+(2.)*mom_def_Re_tr_paths[40]+(2.)*mom_def_Re_tr_paths[41]+(2.)*mom_def_Re_tr_paths[42]+(2.)*mom_def_Re_tr_paths[43]+(2.)*mom_def_Re_tr_paths[44]+(2.)*mom_def_Re_tr_paths[45]+(2.)*mom_def_Re_tr_paths[46]+(2.)*mom_def_Re_tr_paths[47]+(2.)*mom_def_Re_tr_paths[48];
 }
 
 static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_1(double complex * op_out)
 {
-*op_out +=+(8.)*mom_def_Re_tr_paths[0]+(8.)*mom_def_Re_tr_paths[1]+(8.)*mom_def_Re_tr_paths[2]+(8.)*mom_def_Re_tr_paths[3]+(-16.)*mom_def_Re_tr_paths[4]+(-16.)*mom_def_Re_tr_paths[5];
+*op_out =+(16.)*mom_def_Re_tr_paths[0]+(-8.)*mom_def_Re_tr_paths[1]+(-8.)*mom_def_Re_tr_paths[2];
+}
+
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_2(double complex * op_out)
+{
+*op_out =+(8.)*mom_def_Re_tr_paths[3]+(8.)*mom_def_Re_tr_paths[4]+(8.)*mom_def_Re_tr_paths[5]+(8.)*mom_def_Re_tr_paths[6]+(-16.)*mom_def_Re_tr_paths[7]+(-16.)*mom_def_Re_tr_paths[8];
+}
+
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_3(double complex * op_out)
+{
+*op_out =+(-2.)*mom_def_Re_tr_paths[13]+(-2.)*mom_def_Re_tr_paths[14]+(4.)*mom_def_Re_tr_paths[15]+(4.)*mom_def_Re_tr_paths[16]+(-2.)*mom_def_Re_tr_paths[17]+(-2.)*mom_def_Re_tr_paths[18]+(4.)*mom_def_Re_tr_paths[19]+(4.)*mom_def_Re_tr_paths[20]+(-2.)*mom_def_Re_tr_paths[21]+(-2.)*mom_def_Re_tr_paths[22]+(-2.)*mom_def_Re_tr_paths[23]+(-2.)*mom_def_Re_tr_paths[24];
+}
+
+static void OP_oneTr_p_0_0_0_Ir_3_C_1_n_4(double complex * op_out)
+{
+*op_out =+(2.)*mom_def_Re_tr_paths[25]+(2.)*mom_def_Re_tr_paths[26]+(2.)*mom_def_Re_tr_paths[27]+(2.)*mom_def_Re_tr_paths[28]+(2.)*mom_def_Re_tr_paths[29]+(2.)*mom_def_Re_tr_paths[30]+(2.)*mom_def_Re_tr_paths[31]+(2.)*mom_def_Re_tr_paths[32]+(2.)*mom_def_Re_tr_paths[33]+(2.)*mom_def_Re_tr_paths[34]+(2.)*mom_def_Re_tr_paths[35]+(2.)*mom_def_Re_tr_paths[36]+(2.)*mom_def_Re_tr_paths[37]+(2.)*mom_def_Re_tr_paths[38]+(2.)*mom_def_Re_tr_paths[39]+(2.)*mom_def_Re_tr_paths[40]+(-4.)*mom_def_Re_tr_paths[41]+(-4.)*mom_def_Re_tr_paths[42]+(-4.)*mom_def_Re_tr_paths[43]+(-4.)*mom_def_Re_tr_paths[44]+(-4.)*mom_def_Re_tr_paths[45]+(-4.)*mom_def_Re_tr_paths[46]+(-4.)*mom_def_Re_tr_paths[47]+(-4.)*mom_def_Re_tr_paths[48];
+}
+
+static void OP_oneTr_p_0_0_1_Ir_1_C_1_n_1(double complex * op_out)
+{
+*op_out =+(8.)*mom_def_Re_tr_paths[0];
+}
+
+static void OP_oneTr_p_0_0_1_Ir_1_C_1_n_2(double complex * op_out)
+{
+*op_out =+(4.)*mom_def_Re_tr_paths[3]+(4.)*mom_def_Re_tr_paths[5];
+}
+
+static double complex c0;
+static void OP_oneTr_p_0_1_0_Ir_1_C_1_n_1(double complex * op_out)
+{
+*op_out =+(4.)*c0*mom_def_Re_tr_paths[0]+(4.)*c0*mom_def_Re_tr_paths[2];
+}
+
+static void OP_oneTr_p_0_1_0_Ir_1_C_1_n_2(double complex * op_out)
+{
+*op_out =+(4.)*c0*mom_def_Re_tr_paths[3]+(4.)*c0*mom_def_Re_tr_paths[8];
+}
+
+static void OP_oneTr_p_1_0_0_Ir_1_C_1_n_1(double complex * op_out)
+{
+*op_out =+(4.)*c0*mom_def_Re_tr_paths[0]+(4.)*c0*mom_def_Re_tr_paths[1];
+}
+
+static double complex c1;
+static void OP_oneTr_p_1_0_0_Ir_1_C_1_n_2(double complex * op_out)
+{
+*op_out =+(4.)*c1*mom_def_Re_tr_paths[3]+(4.)*c1*mom_def_Re_tr_paths[4];
 }
 
 static int last_t = -10;
 void request_space_paths_evaluation(){last_t=-10;}
 
-void eval_time_momentum_glueball_paths(int t, int px, int py, int pz)
+static void eval_time_momentum_glueball_paths(int t, int px, int py, int pz)
 {
 int n_x, n_y, n_z, idx, in;
 double complex ce = 0.;
 if(path_storage==NULL)
 {
+c0=cexp(I*PI*(-2./GLB_X));
+c1=cexp(I*PI*(-4./GLB_X));
 path_storage=malloc(npaths*X*Y*Z*sizeof(double complex));
 mom_def_Re_tr_paths=malloc(npaths*sizeof(double complex));
 mom_def_Im_tr_paths=malloc(npaths*sizeof(double complex));
@@ -679,6 +2405,135 @@ mom_def_Im_tr_paths[4]+=I*ce*cimag(path_storage[4+idx]);
 path_storage[5+idx]= path5(in);
 mom_def_Re_tr_paths[5]+=ce*creal(path_storage[5+idx]);
 mom_def_Im_tr_paths[5]+=I*ce*cimag(path_storage[5+idx]);
+path_storage[6+idx]= path6(in);
+mom_def_Re_tr_paths[6]+=ce*creal(path_storage[6+idx]);
+mom_def_Im_tr_paths[6]+=I*ce*cimag(path_storage[6+idx]);
+path_storage[7+idx]= path7(in);
+mom_def_Re_tr_paths[7]+=ce*creal(path_storage[7+idx]);
+mom_def_Im_tr_paths[7]+=I*ce*cimag(path_storage[7+idx]);
+path_storage[8+idx]= path8(in);
+mom_def_Re_tr_paths[8]+=ce*creal(path_storage[8+idx]);
+mom_def_Im_tr_paths[8]+=I*ce*cimag(path_storage[8+idx]);
+path_storage[9+idx]= path9(in);
+mom_def_Re_tr_paths[9]+=ce*creal(path_storage[9+idx]);
+mom_def_Im_tr_paths[9]+=I*ce*cimag(path_storage[9+idx]);
+path_storage[10+idx]= path10(in);
+mom_def_Re_tr_paths[10]+=ce*creal(path_storage[10+idx]);
+mom_def_Im_tr_paths[10]+=I*ce*cimag(path_storage[10+idx]);
+path_storage[11+idx]= path11(in);
+mom_def_Re_tr_paths[11]+=ce*creal(path_storage[11+idx]);
+mom_def_Im_tr_paths[11]+=I*ce*cimag(path_storage[11+idx]);
+path_storage[12+idx]= path12(in);
+mom_def_Re_tr_paths[12]+=ce*creal(path_storage[12+idx]);
+mom_def_Im_tr_paths[12]+=I*ce*cimag(path_storage[12+idx]);
+path_storage[13+idx]= path13(in);
+mom_def_Re_tr_paths[13]+=ce*creal(path_storage[13+idx]);
+mom_def_Im_tr_paths[13]+=I*ce*cimag(path_storage[13+idx]);
+path_storage[14+idx]= path14(in);
+mom_def_Re_tr_paths[14]+=ce*creal(path_storage[14+idx]);
+mom_def_Im_tr_paths[14]+=I*ce*cimag(path_storage[14+idx]);
+path_storage[15+idx]= path15(in);
+mom_def_Re_tr_paths[15]+=ce*creal(path_storage[15+idx]);
+mom_def_Im_tr_paths[15]+=I*ce*cimag(path_storage[15+idx]);
+path_storage[16+idx]= path16(in);
+mom_def_Re_tr_paths[16]+=ce*creal(path_storage[16+idx]);
+mom_def_Im_tr_paths[16]+=I*ce*cimag(path_storage[16+idx]);
+path_storage[17+idx]= path17(in);
+mom_def_Re_tr_paths[17]+=ce*creal(path_storage[17+idx]);
+mom_def_Im_tr_paths[17]+=I*ce*cimag(path_storage[17+idx]);
+path_storage[18+idx]= path18(in);
+mom_def_Re_tr_paths[18]+=ce*creal(path_storage[18+idx]);
+mom_def_Im_tr_paths[18]+=I*ce*cimag(path_storage[18+idx]);
+path_storage[19+idx]= path19(in);
+mom_def_Re_tr_paths[19]+=ce*creal(path_storage[19+idx]);
+mom_def_Im_tr_paths[19]+=I*ce*cimag(path_storage[19+idx]);
+path_storage[20+idx]= path20(in);
+mom_def_Re_tr_paths[20]+=ce*creal(path_storage[20+idx]);
+mom_def_Im_tr_paths[20]+=I*ce*cimag(path_storage[20+idx]);
+path_storage[21+idx]= path21(in);
+mom_def_Re_tr_paths[21]+=ce*creal(path_storage[21+idx]);
+mom_def_Im_tr_paths[21]+=I*ce*cimag(path_storage[21+idx]);
+path_storage[22+idx]= path22(in);
+mom_def_Re_tr_paths[22]+=ce*creal(path_storage[22+idx]);
+mom_def_Im_tr_paths[22]+=I*ce*cimag(path_storage[22+idx]);
+path_storage[23+idx]= path23(in);
+mom_def_Re_tr_paths[23]+=ce*creal(path_storage[23+idx]);
+mom_def_Im_tr_paths[23]+=I*ce*cimag(path_storage[23+idx]);
+path_storage[24+idx]= path24(in);
+mom_def_Re_tr_paths[24]+=ce*creal(path_storage[24+idx]);
+mom_def_Im_tr_paths[24]+=I*ce*cimag(path_storage[24+idx]);
+path_storage[25+idx]= path25(in);
+mom_def_Re_tr_paths[25]+=ce*creal(path_storage[25+idx]);
+mom_def_Im_tr_paths[25]+=I*ce*cimag(path_storage[25+idx]);
+path_storage[26+idx]= path26(in);
+mom_def_Re_tr_paths[26]+=ce*creal(path_storage[26+idx]);
+mom_def_Im_tr_paths[26]+=I*ce*cimag(path_storage[26+idx]);
+path_storage[27+idx]= path27(in);
+mom_def_Re_tr_paths[27]+=ce*creal(path_storage[27+idx]);
+mom_def_Im_tr_paths[27]+=I*ce*cimag(path_storage[27+idx]);
+path_storage[28+idx]= path28(in);
+mom_def_Re_tr_paths[28]+=ce*creal(path_storage[28+idx]);
+mom_def_Im_tr_paths[28]+=I*ce*cimag(path_storage[28+idx]);
+path_storage[29+idx]= path29(in);
+mom_def_Re_tr_paths[29]+=ce*creal(path_storage[29+idx]);
+mom_def_Im_tr_paths[29]+=I*ce*cimag(path_storage[29+idx]);
+path_storage[30+idx]= path30(in);
+mom_def_Re_tr_paths[30]+=ce*creal(path_storage[30+idx]);
+mom_def_Im_tr_paths[30]+=I*ce*cimag(path_storage[30+idx]);
+path_storage[31+idx]= path31(in);
+mom_def_Re_tr_paths[31]+=ce*creal(path_storage[31+idx]);
+mom_def_Im_tr_paths[31]+=I*ce*cimag(path_storage[31+idx]);
+path_storage[32+idx]= path32(in);
+mom_def_Re_tr_paths[32]+=ce*creal(path_storage[32+idx]);
+mom_def_Im_tr_paths[32]+=I*ce*cimag(path_storage[32+idx]);
+path_storage[33+idx]= path33(in);
+mom_def_Re_tr_paths[33]+=ce*creal(path_storage[33+idx]);
+mom_def_Im_tr_paths[33]+=I*ce*cimag(path_storage[33+idx]);
+path_storage[34+idx]= path34(in);
+mom_def_Re_tr_paths[34]+=ce*creal(path_storage[34+idx]);
+mom_def_Im_tr_paths[34]+=I*ce*cimag(path_storage[34+idx]);
+path_storage[35+idx]= path35(in);
+mom_def_Re_tr_paths[35]+=ce*creal(path_storage[35+idx]);
+mom_def_Im_tr_paths[35]+=I*ce*cimag(path_storage[35+idx]);
+path_storage[36+idx]= path36(in);
+mom_def_Re_tr_paths[36]+=ce*creal(path_storage[36+idx]);
+mom_def_Im_tr_paths[36]+=I*ce*cimag(path_storage[36+idx]);
+path_storage[37+idx]= path37(in);
+mom_def_Re_tr_paths[37]+=ce*creal(path_storage[37+idx]);
+mom_def_Im_tr_paths[37]+=I*ce*cimag(path_storage[37+idx]);
+path_storage[38+idx]= path38(in);
+mom_def_Re_tr_paths[38]+=ce*creal(path_storage[38+idx]);
+mom_def_Im_tr_paths[38]+=I*ce*cimag(path_storage[38+idx]);
+path_storage[39+idx]= path39(in);
+mom_def_Re_tr_paths[39]+=ce*creal(path_storage[39+idx]);
+mom_def_Im_tr_paths[39]+=I*ce*cimag(path_storage[39+idx]);
+path_storage[40+idx]= path40(in);
+mom_def_Re_tr_paths[40]+=ce*creal(path_storage[40+idx]);
+mom_def_Im_tr_paths[40]+=I*ce*cimag(path_storage[40+idx]);
+path_storage[41+idx]= path41(in);
+mom_def_Re_tr_paths[41]+=ce*creal(path_storage[41+idx]);
+mom_def_Im_tr_paths[41]+=I*ce*cimag(path_storage[41+idx]);
+path_storage[42+idx]= path42(in);
+mom_def_Re_tr_paths[42]+=ce*creal(path_storage[42+idx]);
+mom_def_Im_tr_paths[42]+=I*ce*cimag(path_storage[42+idx]);
+path_storage[43+idx]= path43(in);
+mom_def_Re_tr_paths[43]+=ce*creal(path_storage[43+idx]);
+mom_def_Im_tr_paths[43]+=I*ce*cimag(path_storage[43+idx]);
+path_storage[44+idx]= path44(in);
+mom_def_Re_tr_paths[44]+=ce*creal(path_storage[44+idx]);
+mom_def_Im_tr_paths[44]+=I*ce*cimag(path_storage[44+idx]);
+path_storage[45+idx]= path45(in);
+mom_def_Re_tr_paths[45]+=ce*creal(path_storage[45+idx]);
+mom_def_Im_tr_paths[45]+=I*ce*cimag(path_storage[45+idx]);
+path_storage[46+idx]= path46(in);
+mom_def_Re_tr_paths[46]+=ce*creal(path_storage[46+idx]);
+mom_def_Im_tr_paths[46]+=I*ce*cimag(path_storage[46+idx]);
+path_storage[47+idx]= path47(in);
+mom_def_Re_tr_paths[47]+=ce*creal(path_storage[47+idx]);
+mom_def_Im_tr_paths[47]+=I*ce*cimag(path_storage[47+idx]);
+path_storage[48+idx]= path48(in);
+mom_def_Re_tr_paths[48]+=ce*creal(path_storage[48+idx]);
+mom_def_Im_tr_paths[48]+=I*ce*cimag(path_storage[48+idx]);
 }
 }
 else{
@@ -688,7 +2543,7 @@ for (n_z = 0; n_z < Z; n_z++)
 {
 ce = cexp(I * 2.0 * PI * (double)(n_x * px + n_y * py + n_z * pz) / GLB_X);
 idx = npaths * (n_x + X * (n_y + Y * n_z));
-for (int i = 0; i < 6; i++)
+for (int i = 0; i < 49; i++)
 {
 mom_def_Re_tr_paths[i]+=ce*creal(path_storage[i+idx]);
 mom_def_Im_tr_paths[i]+=I*ce*cimag(path_storage[i+idx]);
@@ -696,22 +2551,73 @@ mom_def_Im_tr_paths[i]+=I*ce*cimag(path_storage[i+idx]);
 }
 }
 };
-void eval_all_glueball_ops(int t, double complex * numerical_op)
+void eval_all_glueball_ops(int t, double complex *numerical_op_out)
 {
-request_space_paths_evaluation();
-eval_time_momentum_glueball_paths(t,0,0,0);
+    static double complex *numerical_op = NULL;
+    if (numerical_op == NULL)
+    {
+        numerical_op = malloc(total_n_glue_op * sizeof(double complex));
+    }
+    request_space_paths_evaluation();
+    eval_time_momentum_glueball_paths(t,0,0,0);
 OP_oneTr_p_0_0_0_Ir_1_C_1_n_1(numerical_op+0);
-OP_oneTr_p_0_0_0_Ir_3_C_1_n_1(numerical_op+1);
+OP_oneTr_p_0_0_0_Ir_1_C_1_n_2(numerical_op+1);
+OP_oneTr_p_0_0_0_Ir_1_C_1_n_3(numerical_op+2);
+OP_oneTr_p_0_0_0_Ir_1_C_1_n_4(numerical_op+3);
+OP_oneTr_p_0_0_0_Ir_1_C_1_n_5(numerical_op+4);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_1(numerical_op+7);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_2(numerical_op+8);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_3(numerical_op+9);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_4(numerical_op+10);
+eval_time_momentum_glueball_paths(t,0,0,1);
+OP_oneTr_p_0_0_1_Ir_1_C_1_n_1(numerical_op+11);
+OP_oneTr_p_0_0_1_Ir_1_C_1_n_2(numerical_op+12);
+eval_time_momentum_glueball_paths(t,0,1,0);
+OP_oneTr_p_0_1_0_Ir_1_C_1_n_1(numerical_op+13);
+OP_oneTr_p_0_1_0_Ir_1_C_1_n_2(numerical_op+14);
+eval_time_momentum_glueball_paths(t,1,0,0);
+OP_oneTr_p_1_0_0_Ir_1_C_1_n_1(numerical_op+15);
+OP_oneTr_p_1_0_0_Ir_1_C_1_n_2(numerical_op+16);
+*(numerical_op+5)=+(0.816496580927726033)*(conj(*(numerical_op+11)))*((*(numerical_op+11)))+(0.816496580927726033)*(conj(*(numerical_op+13)))*((*(numerical_op+13)))+(0.816496580927726033)*(conj(*(numerical_op+15)))*((*(numerical_op+15)));
+*(numerical_op+6)=+(0.816496580927726033)*(conj(*(numerical_op+12)))*((*(numerical_op+12)))+(0.816496580927726033)*(conj(*(numerical_op+14)))*((*(numerical_op+14)))+(0.816496580927726033)*(conj(*(numerical_op+16)))*((*(numerical_op+16)));
+    for(int i=0;i<total_n_glue_op;i++)
+        *(numerical_op_out+i)+=*(numerical_op+i);
+}
+void eval_all_glueball_oneTr_ops_p_0_0_0_Ir_1_C_1(double complex * numerical_op)
+{
+OP_oneTr_p_0_0_0_Ir_1_C_1_n_1(numerical_op+0);
+OP_oneTr_p_0_0_0_Ir_1_C_1_n_2(numerical_op+1);
+OP_oneTr_p_0_0_0_Ir_1_C_1_n_3(numerical_op+2);
+OP_oneTr_p_0_0_0_Ir_1_C_1_n_4(numerical_op+3);
+OP_oneTr_p_0_0_0_Ir_1_C_1_n_5(numerical_op+4);
+OP_oneTr_p_0_0_0_Ir_1_C_1_n_-2(numerical_op+5);
+OP_oneTr_p_0_0_0_Ir_1_C_1_n_-2(numerical_op+6);
 }
 
-void eval_all_glueball_ops_p_0_0_0_Ir_1_C_1(double complex * numerical_op)
-{
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_1(numerical_op+0);
-}
-
-void eval_all_glueball_ops_p_0_0_0_Ir_3_C_1(double complex * numerical_op)
+void eval_all_glueball_oneTr_ops_p_0_0_0_Ir_3_C_1(double complex * numerical_op)
 {
 OP_oneTr_p_0_0_0_Ir_3_C_1_n_1(numerical_op+0);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_2(numerical_op+1);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_3(numerical_op+2);
+OP_oneTr_p_0_0_0_Ir_3_C_1_n_4(numerical_op+3);
+}
+
+void eval_all_glueball_oneTr_ops_p_0_0_1_Ir_1_C_1(double complex * numerical_op)
+{
+OP_oneTr_p_0_0_1_Ir_1_C_1_n_1(numerical_op+0);
+OP_oneTr_p_0_0_1_Ir_1_C_1_n_2(numerical_op+1);
+}
+
+void eval_all_glueball_oneTr_ops_p_0_1_0_Ir_1_C_1(double complex * numerical_op)
+{
+OP_oneTr_p_0_1_0_Ir_1_C_1_n_1(numerical_op+0);
+OP_oneTr_p_0_1_0_Ir_1_C_1_n_2(numerical_op+1);
+}
+
+void eval_all_glueball_oneTr_ops_p_1_0_0_Ir_1_C_1(double complex * numerical_op)
+{
+OP_oneTr_p_1_0_0_Ir_1_C_1_n_1(numerical_op+0);
+OP_oneTr_p_1_0_0_Ir_1_C_1_n_2(numerical_op+1);
 }
 
 
@@ -791,7 +2697,6 @@ void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_stor
                 if (PID == 0)
                 {
                     memcpy(gb1, gb_storage + t1 * total_n_glue_op * nblocking, sizeof(double complex) * total_n_glue_op * nblocking);
-                    //gb1 = gb_storage + t1 * total_n_glue_op * nblocking;
                 }
                 else
                 {
@@ -815,7 +2720,6 @@ void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_stor
                     if (PID == 0)
                     {
                         memcpy(gb2, gb_storage + t2 * total_n_glue_op * nblocking, sizeof(double complex) * total_n_glue_op * nblocking);
-                        //gb2 = gb_storage + t2 * total_n_glue_op * nblocking;
                     }
                     else
                     {
@@ -835,10 +2739,10 @@ void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_stor
         totalsize = 0;
         norm = 0.5 / lcor->list[icor].n_pairs;
         
-        cor_pointer = cor_storage + totalsize + id * nblocking * nblocking * 1;
+        cor_pointer = cor_storage + totalsize + id * nblocking * nblocking * 49;
 
         for (n1 = 0; n1 < nblocking; n1++)
-            for (b1 = 0; b1 < 1; b1++)
+            for (b1 = 0; b1 < 7; b1++)
             {
                 i1 = 0 + b1 + total_n_glue_op * n1;
 
@@ -846,72 +2750,171 @@ void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_stor
                 b2 = b1;
                 i2 = 0 + b2 + total_n_glue_op * n2;
                 tmp = norm * creal(conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
-                cor_pointer[b1 + 1 * (n1 + nblocking * (b2 + 1 * n2))] += tmp;
+                cor_pointer[b1 + 7 * (n1 + nblocking * (b2 + 7 * n2))] += tmp;
 
 
-                for (b2 = b1 + 1; b2 < 1; b2++)
+                for (b2 = b1 + 1; b2 < 7; b2++)
                 {
                     i2 = 0 + b2 + total_n_glue_op * n2;
                     tmp = norm * creal(conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
-                    cor_pointer[b1 + 1 * (n1 + nblocking * (b2 + 1 * n2))] += tmp;
-                    cor_pointer[b2 + 1 * (n2 + nblocking * (b1 + 1 * n1))] += tmp;
+                    cor_pointer[b1 + 7 * (n1 + nblocking * (b2 + 7 * n2))] += tmp;
+                    cor_pointer[b2 + 7 * (n2 + nblocking * (b1 + 7 * n1))] += tmp;
                 }
 
                 for (n2 = n1 + 1; n2 < nblocking; n2++)
-                    for (b2 = 0; b2 < 1; b2++)
+                    for (b2 = 0; b2 < 7; b2++)
                     {
                         i2 = 0 + b2 + total_n_glue_op * n2;
                         tmp = norm * creal(conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
-                        cor_pointer[b1 + 1 * (n1 + nblocking * (b2 + 1 * n2))] += tmp;
-                        cor_pointer[b2 + 1 * (n2 + nblocking * (b1 + 1 * n1))] += tmp;
+                        cor_pointer[b1 + 7 * (n1 + nblocking * (b2 + 7 * n2))] += tmp;
+                        cor_pointer[b2 + 7 * (n2 + nblocking * (b1 + 7 * n1))] += tmp;
                     }
             }
-        totalsize += (nblocking * nblocking * 1 * (lcor->n_corrs));
+        totalsize += (nblocking * nblocking * 49 * (lcor->n_corrs));
         
-        cor_pointer = cor_storage + totalsize + id * nblocking * nblocking * 1;
+        cor_pointer = cor_storage + totalsize + id * nblocking * nblocking * 16;
 
         for (n1 = 0; n1 < nblocking; n1++)
-            for (b1 = 0; b1 < 1; b1++)
+            for (b1 = 0; b1 < 4; b1++)
             {
-                i1 = 1 + b1 + total_n_glue_op * n1;
+                i1 = 7 + b1 + total_n_glue_op * n1;
 
                 n2 = n1;
                 b2 = b1;
-                i2 = 1 + b2 + total_n_glue_op * n2;
+                i2 = 7 + b2 + total_n_glue_op * n2;
                 tmp = norm * creal(conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
-                cor_pointer[b1 + 1 * (n1 + nblocking * (b2 + 1 * n2))] += tmp;
+                cor_pointer[b1 + 4 * (n1 + nblocking * (b2 + 4 * n2))] += tmp;
 
 
-                for (b2 = b1 + 1; b2 < 1; b2++)
+                for (b2 = b1 + 1; b2 < 4; b2++)
                 {
-                    i2 = 1 + b2 + total_n_glue_op * n2;
+                    i2 = 7 + b2 + total_n_glue_op * n2;
                     tmp = norm * creal(conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
-                    cor_pointer[b1 + 1 * (n1 + nblocking * (b2 + 1 * n2))] += tmp;
-                    cor_pointer[b2 + 1 * (n2 + nblocking * (b1 + 1 * n1))] += tmp;
+                    cor_pointer[b1 + 4 * (n1 + nblocking * (b2 + 4 * n2))] += tmp;
+                    cor_pointer[b2 + 4 * (n2 + nblocking * (b1 + 4 * n1))] += tmp;
                 }
 
                 for (n2 = n1 + 1; n2 < nblocking; n2++)
-                    for (b2 = 0; b2 < 1; b2++)
+                    for (b2 = 0; b2 < 4; b2++)
                     {
-                        i2 = 1 + b2 + total_n_glue_op * n2;
+                        i2 = 7 + b2 + total_n_glue_op * n2;
                         tmp = norm * creal(conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
-                        cor_pointer[b1 + 1 * (n1 + nblocking * (b2 + 1 * n2))] += tmp;
-                        cor_pointer[b2 + 1 * (n2 + nblocking * (b1 + 1 * n1))] += tmp;
+                        cor_pointer[b1 + 4 * (n1 + nblocking * (b2 + 4 * n2))] += tmp;
+                        cor_pointer[b2 + 4 * (n2 + nblocking * (b1 + 4 * n1))] += tmp;
                     }
             }
-        totalsize += (nblocking * nblocking * 1 * (lcor->n_corrs));
+        totalsize += (nblocking * nblocking * 16 * (lcor->n_corrs));
+        
+        cor_pointer = cor_storage + totalsize + id * nblocking * nblocking * 4;
+
+        for (n1 = 0; n1 < nblocking; n1++)
+            for (b1 = 0; b1 < 2; b1++)
+            {
+                i1 = 11 + b1 + total_n_glue_op * n1;
+
+                n2 = n1;
+                b2 = b1;
+                i2 = 11 + b2 + total_n_glue_op * n2;
+                tmp = norm * creal(conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
+                cor_pointer[b1 + 2 * (n1 + nblocking * (b2 + 2 * n2))] += tmp;
+
+
+                for (b2 = b1 + 1; b2 < 2; b2++)
+                {
+                    i2 = 11 + b2 + total_n_glue_op * n2;
+                    tmp = norm * creal(conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
+                    cor_pointer[b1 + 2 * (n1 + nblocking * (b2 + 2 * n2))] += tmp;
+                    cor_pointer[b2 + 2 * (n2 + nblocking * (b1 + 2 * n1))] += tmp;
+                }
+
+                for (n2 = n1 + 1; n2 < nblocking; n2++)
+                    for (b2 = 0; b2 < 2; b2++)
+                    {
+                        i2 = 11 + b2 + total_n_glue_op * n2;
+                        tmp = norm * creal(conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
+                        cor_pointer[b1 + 2 * (n1 + nblocking * (b2 + 2 * n2))] += tmp;
+                        cor_pointer[b2 + 2 * (n2 + nblocking * (b1 + 2 * n1))] += tmp;
+                    }
+            }
+        totalsize += (nblocking * nblocking * 4 * (lcor->n_corrs));
+        
+        cor_pointer = cor_storage + totalsize + id * nblocking * nblocking * 4;
+
+        for (n1 = 0; n1 < nblocking; n1++)
+            for (b1 = 0; b1 < 2; b1++)
+            {
+                i1 = 13 + b1 + total_n_glue_op * n1;
+
+                n2 = n1;
+                b2 = b1;
+                i2 = 13 + b2 + total_n_glue_op * n2;
+                tmp = norm * creal(conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
+                cor_pointer[b1 + 2 * (n1 + nblocking * (b2 + 2 * n2))] += tmp;
+
+
+                for (b2 = b1 + 1; b2 < 2; b2++)
+                {
+                    i2 = 13 + b2 + total_n_glue_op * n2;
+                    tmp = norm * creal(conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
+                    cor_pointer[b1 + 2 * (n1 + nblocking * (b2 + 2 * n2))] += tmp;
+                    cor_pointer[b2 + 2 * (n2 + nblocking * (b1 + 2 * n1))] += tmp;
+                }
+
+                for (n2 = n1 + 1; n2 < nblocking; n2++)
+                    for (b2 = 0; b2 < 2; b2++)
+                    {
+                        i2 = 13 + b2 + total_n_glue_op * n2;
+                        tmp = norm * creal(conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
+                        cor_pointer[b1 + 2 * (n1 + nblocking * (b2 + 2 * n2))] += tmp;
+                        cor_pointer[b2 + 2 * (n2 + nblocking * (b1 + 2 * n1))] += tmp;
+                    }
+            }
+        totalsize += (nblocking * nblocking * 4 * (lcor->n_corrs));
+        
+        cor_pointer = cor_storage + totalsize + id * nblocking * nblocking * 4;
+
+        for (n1 = 0; n1 < nblocking; n1++)
+            for (b1 = 0; b1 < 2; b1++)
+            {
+                i1 = 15 + b1 + total_n_glue_op * n1;
+
+                n2 = n1;
+                b2 = b1;
+                i2 = 15 + b2 + total_n_glue_op * n2;
+                tmp = norm * creal(conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
+                cor_pointer[b1 + 2 * (n1 + nblocking * (b2 + 2 * n2))] += tmp;
+
+
+                for (b2 = b1 + 1; b2 < 2; b2++)
+                {
+                    i2 = 15 + b2 + total_n_glue_op * n2;
+                    tmp = norm * creal(conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
+                    cor_pointer[b1 + 2 * (n1 + nblocking * (b2 + 2 * n2))] += tmp;
+                    cor_pointer[b2 + 2 * (n2 + nblocking * (b1 + 2 * n1))] += tmp;
+                }
+
+                for (n2 = n1 + 1; n2 < nblocking; n2++)
+                    for (b2 = 0; b2 < 2; b2++)
+                    {
+                        i2 = 15 + b2 + total_n_glue_op * n2;
+                        tmp = norm * creal(conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
+                        cor_pointer[b1 + 2 * (n1 + nblocking * (b2 + 2 * n2))] += tmp;
+                        cor_pointer[b2 + 2 * (n2 + nblocking * (b1 + 2 * n1))] += tmp;
+                    }
+            }
+        totalsize += (nblocking * nblocking * 4 * (lcor->n_corrs));
 }
 
 totalsize = 0 ;
 
-    lprintf("Measure ML", 0, "\n1pt function P=(0,0,0) Irrep=A1plusOhP Irrep ev=1/1 Charge=+ nop=%d\n\n",1 * nblocking );
-    
+    lprintf("Measure ML", 0, "\n1pt function P=(0,0,0) Irrep=A1plusOhP Irrep ev=1/1 Charge=+ nop=%d\n",7 * nblocking );
+    lprintf("Measure ML", 0, "Op id= 0 1 2 3 4 5 6 (repeated nblocking times)\n");
     for (n1 = 0; n1 < GLB_T; n1++)
         if (listactive[n1] > -1)
         {
             lprintf("Measure ML", 0, " t=%d", n1);
             for (n2 = 0; n2 < nblocking; n2++)
-                for (i = 0; i < 1; i++)
+                for (i = 0; i < 7; i++)
                     lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
                             cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
             lprintf("Measure ML", 0, "\n");
@@ -935,24 +2938,24 @@ totalsize = 0 ;
         }
         lprintf("Measure ML", 0, "\n");
 
-        for (i1 = 0; i1 < (nblocking * 1); i1++)
+        for (i1 = 0; i1 < (nblocking * 7); i1++)
         {
-            for (i2 = 0; i2 < (nblocking * 1); i2++)
-                lprintf("Measure ML", 0, " ( %.6e ) ", cor_pointer[i1 + nblocking * 1 * i2]);
+            for (i2 = 0; i2 < (nblocking * 7); i2++)
+                lprintf("Measure ML", 0, " ( %.6e ) ", cor_pointer[i1 + nblocking * 7 * i2]);
 
             lprintf("Measure ML", 0, "\n");
         }
-        totalsize += (nblocking * nblocking * 1);
+        totalsize += (nblocking * nblocking * 49);
     }
 
-    lprintf("Measure ML", 0, "\n1pt function P=(0,0,0) Irrep=EplusOhP Irrep ev=1/2 Charge=+ nop=%d\n\n",1 * nblocking );
-    
+    lprintf("Measure ML", 0, "\n1pt function P=(0,0,0) Irrep=EplusOhP Irrep ev=1/2 Charge=+ nop=%d\n",4 * nblocking );
+    lprintf("Measure ML", 0, "Op id= 7 8 9 10 (repeated nblocking times)\n");
     for (n1 = 0; n1 < GLB_T; n1++)
         if (listactive[n1] > -1)
         {
             lprintf("Measure ML", 0, " t=%d", n1);
             for (n2 = 0; n2 < nblocking; n2++)
-                for (i = 1; i < 2; i++)
+                for (i = 7; i < 11; i++)
                     lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
                             cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
             lprintf("Measure ML", 0, "\n");
@@ -976,13 +2979,149 @@ totalsize = 0 ;
         }
         lprintf("Measure ML", 0, "\n");
 
-        for (i1 = 0; i1 < (nblocking * 1); i1++)
+        for (i1 = 0; i1 < (nblocking * 4); i1++)
         {
-            for (i2 = 0; i2 < (nblocking * 1); i2++)
-                lprintf("Measure ML", 0, " ( %.6e ) ", cor_pointer[i1 + nblocking * 1 * i2]);
+            for (i2 = 0; i2 < (nblocking * 4); i2++)
+                lprintf("Measure ML", 0, " ( %.6e ) ", cor_pointer[i1 + nblocking * 4 * i2]);
 
             lprintf("Measure ML", 0, "\n");
         }
-        totalsize += (nblocking * nblocking * 1);
+        totalsize += (nblocking * nblocking * 16);
     }
+
+    lprintf("Measure ML", 0, "\n1pt function P=(0,0,1) Irrep=A1Dic4 Irrep ev=1/1 Charge=+ nop=%d\n",2 * nblocking );
+    lprintf("Measure ML", 0, "Op id= 11 12 (repeated nblocking times)\n");
+    for (n1 = 0; n1 < GLB_T; n1++)
+        if (listactive[n1] > -1)
+        {
+            lprintf("Measure ML", 0, " t=%d", n1);
+            for (n2 = 0; n2 < nblocking; n2++)
+                for (i = 11; i < 13; i++)
+                    lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
+                            cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
+            lprintf("Measure ML", 0, "\n");
+        }
+
+    b2 = 0;
+    b1 = 0;
+    
+    lprintf("Measure ML", 0,"\nCorr Total P=(0,0,1) Irrep=A1Dic4 Irrep ev=1/1 Charge=+\n");
+   
+
+    for (icor = 0; icor < lcor->n_corrs; icor++)
+    {
+        cor_pointer = cor_storage + totalsize;
+        lprintf("Measure ML", 0, "\n Corr points: ");
+        n2=lcor->list[b1].n_pairs;
+        for (b2 = 0; b2 < n2; b2++)
+        {
+            lprintf("Measure ML", 0, "( %d %d ) ", lcor->list[b1].t2, lcor->list[b1].t1);
+            b1++;
+        }
+        lprintf("Measure ML", 0, "\n");
+
+        for (i1 = 0; i1 < (nblocking * 2); i1++)
+        {
+            for (i2 = 0; i2 < (nblocking * 2); i2++)
+                lprintf("Measure ML", 0, " ( %.6e ) ", cor_pointer[i1 + nblocking * 2 * i2]);
+
+            lprintf("Measure ML", 0, "\n");
+        }
+        totalsize += (nblocking * nblocking * 4);
+    }
+
+    lprintf("Measure ML", 0, "\n1pt function P=(0,1,0) Irrep=A1Dic4 Irrep ev=1/1 Charge=+ nop=%d\n",2 * nblocking );
+    lprintf("Measure ML", 0, "Op id= 13 14 (repeated nblocking times)\n");
+    for (n1 = 0; n1 < GLB_T; n1++)
+        if (listactive[n1] > -1)
+        {
+            lprintf("Measure ML", 0, " t=%d", n1);
+            for (n2 = 0; n2 < nblocking; n2++)
+                for (i = 13; i < 15; i++)
+                    lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
+                            cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
+            lprintf("Measure ML", 0, "\n");
+        }
+
+    b2 = 0;
+    b1 = 0;
+    
+    lprintf("Measure ML", 0,"\nCorr Total P=(0,1,0) Irrep=A1Dic4 Irrep ev=1/1 Charge=+\n");
+   
+
+    for (icor = 0; icor < lcor->n_corrs; icor++)
+    {
+        cor_pointer = cor_storage + totalsize;
+        lprintf("Measure ML", 0, "\n Corr points: ");
+        n2=lcor->list[b1].n_pairs;
+        for (b2 = 0; b2 < n2; b2++)
+        {
+            lprintf("Measure ML", 0, "( %d %d ) ", lcor->list[b1].t2, lcor->list[b1].t1);
+            b1++;
+        }
+        lprintf("Measure ML", 0, "\n");
+
+        for (i1 = 0; i1 < (nblocking * 2); i1++)
+        {
+            for (i2 = 0; i2 < (nblocking * 2); i2++)
+                lprintf("Measure ML", 0, " ( %.6e ) ", cor_pointer[i1 + nblocking * 2 * i2]);
+
+            lprintf("Measure ML", 0, "\n");
+        }
+        totalsize += (nblocking * nblocking * 4);
+    }
+
+    lprintf("Measure ML", 0, "\n1pt function P=(1,0,0) Irrep=A1Dic4 Irrep ev=1/1 Charge=+ nop=%d\n",2 * nblocking );
+    lprintf("Measure ML", 0, "Op id= 15 16 (repeated nblocking times)\n");
+    for (n1 = 0; n1 < GLB_T; n1++)
+        if (listactive[n1] > -1)
+        {
+            lprintf("Measure ML", 0, " t=%d", n1);
+            for (n2 = 0; n2 < nblocking; n2++)
+                for (i = 15; i < 17; i++)
+                    lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]),
+                            cimag(gb1_bf[i + total_n_glue_op * (n2 + nblocking * listactive[n1])]));
+            lprintf("Measure ML", 0, "\n");
+        }
+
+    b2 = 0;
+    b1 = 0;
+    
+    lprintf("Measure ML", 0,"\nCorr Total P=(1,0,0) Irrep=A1Dic4 Irrep ev=1/1 Charge=+\n");
+   
+
+    for (icor = 0; icor < lcor->n_corrs; icor++)
+    {
+        cor_pointer = cor_storage + totalsize;
+        lprintf("Measure ML", 0, "\n Corr points: ");
+        n2=lcor->list[b1].n_pairs;
+        for (b2 = 0; b2 < n2; b2++)
+        {
+            lprintf("Measure ML", 0, "( %d %d ) ", lcor->list[b1].t2, lcor->list[b1].t1);
+            b1++;
+        }
+        lprintf("Measure ML", 0, "\n");
+
+        for (i1 = 0; i1 < (nblocking * 2); i1++)
+        {
+            for (i2 = 0; i2 < (nblocking * 2); i2++)
+                lprintf("Measure ML", 0, " ( %.6e ) ", cor_pointer[i1 + nblocking * 2 * i2]);
+
+            lprintf("Measure ML", 0, "\n");
+        }
+        totalsize += (nblocking * nblocking * 4);
+    }
+}
+void report_op_group_setup()
+{
+lprintf("INIT Measure ML",0,"\n1pt Irrep multiplets Total P=(0,0,0) Irrep=A1plusOhP Charge=+");
+lprintf("INIT Measure ML",0," |0|1|2|3|4|2tr|2tr|");
+lprintf("INIT Measure ML",0,"\n1pt Irrep multiplets Total P=(0,0,0) Irrep=EplusOhP Charge=+");
+lprintf("INIT Measure ML",0," |7,na|8,na|9,na|10,na|");
+lprintf("INIT Measure ML",0,"\n1pt Irrep multiplets Total P=(0,0,1) Irrep=A1Dic4 Charge=+");
+lprintf("INIT Measure ML",0," |11|12|");
+lprintf("INIT Measure ML",0,"\n1pt Irrep multiplets Total P=(0,1,0) Irrep=A1Dic4 Charge=+");
+lprintf("INIT Measure ML",0," |13|14|");
+lprintf("INIT Measure ML",0,"\n1pt Irrep multiplets Total P=(1,0,0) Irrep=A1Dic4 Charge=+");
+lprintf("INIT Measure ML",0," |15|16|");
 }
