@@ -20,72 +20,36 @@
 #include "communications.h"
 #include "observables.h"
 #include "error.h"
-
+#include "setup.h"
 
 
 
 int main(int argc,char *argv[])
 {
-  char tmp[256];
-  
-  setup_process(&argc,&argv);
-  
-  logger_setlevel(0,100); /* log all */
-  if (PID!=0) { 
-    logger_disable();}
-  else{
-    sprintf(tmp,">out_%d",PID); logger_stdout(tmp);
-    sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
-  }
-  
+  int return_value = 0;
+
   logger_map("DEBUG","debug");
 
-  lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
-  
-  read_input(glb_var.read,"test_input");
-  
-  
-  
-  
-  /* setup communication geometry */
-  if (geometry_init() == 1) {
-    finalize_process();
-    return 0;
-  }
-  
-  geometry_mpi_eo();
-  /* setup random numbers */
-  read_input(rlx_var.read,"test_input");
-  lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
-  rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
+  setup_process(&argc,&argv);
 
-  
-  
-  lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
-  lprintf("MAIN",0,"Fermion representation: dim = %d\n",NF);
-  lprintf("MAIN",0,"The lattice size is %dx%dx%dx%d\n",T,X,Y,Z);
-  lprintf("MAIN",0,"The lattice global size is %dx%dx%dx%d\n",GLB_T,GLB_X,GLB_Y,GLB_Z);
-  lprintf("MAIN",0,"The lattice borders are (%d,%d,%d,%d)\n",T_BORDER,X_BORDER,Y_BORDER,Z_BORDER);
-  lprintf("MAIN",0,"\n");
-  fflush(stdout);
-  
-  u_gauge=alloc_gfield(&glattice);
+  setup_gauge_fields();
+
   random_u(u_gauge);
   start_gf_sendrecv(u_gauge);
   complete_gf_sendrecv(u_gauge);
-  
+
   WL_initialize();
-  
+
   WL_Hamiltonian_gauge(u_gauge,u_gauge);
   start_gf_sendrecv(u_gauge);
   complete_gf_sendrecv(u_gauge);
-  
+
   double dtmp;
 
   lprintf("MAIN",0,"Checking that the Hamiltonian gauge sets the temporal links to the identity\n");
   lprintf("MAIN",0,"\n");
 
-  
+
   double err=0.;
   int t,x,y,z,i;
   if(COORD[0]==NP_T-1){
@@ -101,7 +65,7 @@ int main(int argc,char *argv[])
             if(dtmp>err) err=dtmp;
           }
   }
-  
+
     err=sqrt(err/(2*NG*NG*GLB_T));
 
 #ifdef WITH_MPI
@@ -125,12 +89,15 @@ int main(int argc,char *argv[])
     if(err<1.e-8)
       lprintf("MAIN",0,"CID=%d check_wilsonloops_1 ... OK\n",CID);
     else
+    {
+      return_value +=1 ;
       lprintf("MAIN",0,"CID=%d check_wilsonloops_1 ... FAILED\n",CID);
-  
+    }
+
     WL_free();
-  
+
     free_gfield(u_gauge);
-  
+
     finalize_process();
-    exit(0);
+    return return_value;
   }

@@ -80,7 +80,7 @@ static void read_cmdline(int argc, char **argv)
     exit(0);
   }
 
-  error(argc != requested, 1, "read_cmdline [hmc.c]",
+  error(argc != requested, 1, "read_cmdline [process_init.c]",
         "Arguments: [-i <input file>] [-o <output file>] [-m]");
 
   if (ao != 0)

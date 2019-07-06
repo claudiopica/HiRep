@@ -23,6 +23,7 @@
 
 int main(void)
 {
+   int return_value=0;
    int k,test1,test2;
    int *state1,*state2;
    float sbase;
@@ -34,7 +35,7 @@ int main(void)
    base=ldexp(1.0,48);
    state1=malloc(rlxs_size()*sizeof(int));
    state2=malloc(rlxd_size()*sizeof(int));
-   
+
    rlxs_init(0,32767);
    rlxd_init(1,32767);
 
@@ -196,7 +197,7 @@ int main(void)
    xdn[45]=273325640150591.0;
    xdn[46]=2768714666444.0;
    xdn[47]=173907458721736.0;
-   
+
    test1=0;
    test2=0;
 
@@ -218,6 +219,7 @@ int main(void)
       printf("Test failed: ranlxs gives incorrect results\n");
       printf("=> do not use ranlxs on this machine\n");
       printf("\n");
+      return_value +=1;
    }
 
    if (test2==1)
@@ -226,6 +228,7 @@ int main(void)
       printf("Test failed: ranlxd gives incorrect results\n");
       printf("=> do not use ranlxd on this machine\n");
       printf("\n");
+      return_value +=1;
    }
 
 
@@ -271,6 +274,7 @@ int main(void)
       printf("Test failed: I/O routines for ranlxs do not work properly\n");
       printf("=> do not use ranlxs on this machine\n");
       printf("\n");
+      return_value +=1;
    }
 
    if (test2==2)
@@ -279,6 +283,7 @@ int main(void)
       printf("Test failed: I/O routines for ranlxd do not work properly\n");
       printf("=> do not use ranlxd on this machine\n");
       printf("\n");
+      return_value +=1;
    }
 
 
@@ -309,6 +314,5 @@ int main(void)
       printf("=> ranlxd works correctly on this machine\n");
       printf("\n");
    }
-   exit(0);
+   return return_value;
 }
-

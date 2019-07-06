@@ -1,7 +1,7 @@
 TOPDIR = ../..
 MKDIR = $(TOPDIR)/Make
 
-EXES = testlx
+TESTS = testlx
 
 LIBS += $(TOPDIR)/LibHR/libhr.a
 

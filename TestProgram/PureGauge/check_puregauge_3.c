@@ -23,6 +23,7 @@
 #include "communications.h"
 #include "logger.h"
 #include "memory.h"
+#include "setup.h"
 
 
 void test_wilson_action_and_force(double beta);
@@ -36,35 +37,35 @@ int main(int argc,char *argv[])
    char pame[256];
 
    setup_process(&argc,&argv);
-   
+
    logger_setlevel(0,100); /* log all */
 	if (PID!=0) { logger_disable(); }   /* disable logger for MPI processes != 0 */
 	else {
    //sprintf(pame,">out_%d",PID); logger_stdout(pame);
    sprintf(pame,"err_%d",PID); freopen(pame,"w",stderr);
 	}
-   
+
    logger_map("DEBUG","debug");
 
    lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE);
-   
+
    read_input(glb_var.read,"test_input");
-   
-   
+
+
    /* setup communication geometry */
    if (geometry_init() == 1) {
      finalize_process();
      return 0;
    }
-   
+
    geometry_mpi_eo();
-   
+
    /* setup random numbers */
    read_input(rlx_var.read,"test_input");
    lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
    rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
 
-   
+
    BCs_pars_t BCs_pars = {
      .fermion_twisting_theta = {0.,0.,0.,0.},
      .gauge_boundary_improvement_cs = 1.,
@@ -83,20 +84,20 @@ int main(int argc,char *argv[])
 
    /* alloc global gauge fields */
    u_gauge=alloc_gfield(&glattice);
-  
-   
+
+
    test_wilson_action_and_force(1.);
    test_wilson_action_and_force(3.);
-   
+
    test_ginv_lw_action(1.,1.,0.);
    test_ginv_lw_action(1.,0.,1.);
-   
+
    test_gcov_lw_force(1.,1.,0.);
    test_gcov_lw_force(1.,0.,1.);
 
    test_lw_force(1.,1.,0.);
    test_lw_force(1.,0.,1.);
-   
+
 
    free_gfield(u_gauge);
 
