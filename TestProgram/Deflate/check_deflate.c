@@ -209,9 +209,9 @@ void read_cmdline(int argc, char* argv[]) {
 
 
 int main(int argc,char *argv[]) {
-  int i,k;
+  int i;
   char tmp[256], *cptr;
-  FILE* list;
+  FILE* list=NULL;
   filename_t fpars;
   int nm;
   double m[256];

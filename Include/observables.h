@@ -29,6 +29,15 @@ double SF_action(double beta);
 double local_plaq(int ix);
 void full_plaquette();
 
+void avr_ts_plaquette();
+
+
+void cplaq_wrk(double complex *ret,int ix,int mu,int nu);
+double complex avr_plaquette_wrk();
+
+
+
+
 double rect_1x2(int ix,int mu,int nu);
 void crect_1x2(double complex *ret,int ix,int mu,int nu);
 double avr_rect_1x2();

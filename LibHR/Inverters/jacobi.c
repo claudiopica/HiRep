@@ -301,9 +301,8 @@ void jacobi2(int n, double complex a[], double d[], double complex v[])
 			v[n * k + l] = zd0;
 			v[n * l + k] = zd0;
 
-			error(a[n * k + l] != conj(a[n * l + k]), 1,
-				  "jacobi2 [jacobi.c]", "Matrix is not hermitian");
-
+			a[n * k + l] = conj(a[n * l + k]);
+			
 			abs_sum += (fabs(creal(a[n * k + l]) + fabs(cimag(a[n * k + l]))));
 		}
 	}
