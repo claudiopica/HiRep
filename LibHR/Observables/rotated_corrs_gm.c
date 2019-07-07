@@ -4,7 +4,6 @@
 #include "communications.h"
 #include "observables.h"
 #include "logger.h"
-#include "hr_complex.h"
 
 
 
@@ -19,16 +18,16 @@
 
 void rotated_gXuum(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd) {
 
-  hr_complex *gsuu_m=corr_mem->g1, *gpuu_m=corr_mem->g2, *gvuu_m=corr_mem->g3, *gauu_m=corr_mem->g4, **M=corr_mem->M;
+  double complex *gsuu_m=corr_mem->g1, *gpuu_m=corr_mem->g2, *gvuu_m=corr_mem->g3, *gauu_m=corr_mem->g4, **M=corr_mem->M;
 
-  hr_complex ***gs_ij=corr_mem->g1_ij,  ***gp_ij=corr_mem->g2_ij,  ***gv_ij=corr_mem->g3_ij,  ***ga_ij=corr_mem->g4_ij;
+  double complex ***gs_ij=corr_mem->g1_ij,  ***gp_ij=corr_mem->g2_ij,  ***gv_ij=corr_mem->g3_ij,  ***ga_ij=corr_mem->g4_ij;
 
   int i,ix0,ix1,ix2,ix3,s1,s2;
 
   suNf_spinor stmp1[2];
   suNf_spinor *sptr2[2];
   suNf_spinor *sptr1[2];
-  hr_complex temp_comp;
+  double complex temp_comp;
 
 
   /**************************************************
@@ -202,9 +201,9 @@ gvuu- = -  1/2 sum  csi^dag U0(1,z) Huu^(-1)(2,z;x)       g5g0      Huu^(-1)(x:2
 
 void rotated_gXddm(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd) {
 
-  hr_complex *gsdd_m=corr_mem->g1, *gpdd_m=corr_mem->g2, *gvdd_m=corr_mem->g3, *gadd_m=corr_mem->g4, **M=corr_mem->M;
+  double complex *gsdd_m=corr_mem->g1, *gpdd_m=corr_mem->g2, *gvdd_m=corr_mem->g3, *gadd_m=corr_mem->g4, **M=corr_mem->M;
 
-  hr_complex ***gs_ij=corr_mem->g1_ij,  ***gp_ij=corr_mem->g2_ij,  ***gv_ij=corr_mem->g3_ij,  ***ga_ij=corr_mem->g4_ij;
+  double complex ***gs_ij=corr_mem->g1_ij,  ***gp_ij=corr_mem->g2_ij,  ***gv_ij=corr_mem->g3_ij,  ***ga_ij=corr_mem->g4_ij;
 
   int i,ix0,ix1,ix2,ix3,s1,s2;
 
@@ -213,7 +212,7 @@ void rotated_gXddm(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu,
   suNf_spinor stmp1[2];
   suNf_spinor *sptr2[2];
   suNf_spinor *sptr1[2];
-  hr_complex temp_comp;
+  double complex temp_comp;
 
 
 
@@ -388,9 +387,9 @@ gvdd- = -  1/2 sum  csi^dag U0(1,z) Hdd^(-1)(2,z;x)       g5g0      Hdd^(-1)(x:2
 
 void rotated_gXudm(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd) {
 
-  hr_complex *gsud_m=corr_mem->g1, *gpud_m=corr_mem->g2, *gvud_m=corr_mem->g3, *gaud_m=corr_mem->g4, **M=corr_mem->M;
+  double complex *gsud_m=corr_mem->g1, *gpud_m=corr_mem->g2, *gvud_m=corr_mem->g3, *gaud_m=corr_mem->g4, **M=corr_mem->M;
 
-  hr_complex ***gs_ij=corr_mem->g1_ij,  ***gp_ij=corr_mem->g2_ij,  ***gv_ij=corr_mem->g3_ij,  ***ga_ij=corr_mem->g4_ij;
+  double complex ***gs_ij=corr_mem->g1_ij,  ***gp_ij=corr_mem->g2_ij,  ***gv_ij=corr_mem->g3_ij,  ***ga_ij=corr_mem->g4_ij;
 
   int i,ix0,ix1,ix2,ix3,s1,s2;
 
@@ -399,7 +398,7 @@ void rotated_gXudm(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu,
   suNf_spinor stmp1[2];
   suNf_spinor *sptr2[2];
   suNf_spinor *sptr1[2];
-  hr_complex temp_comp;
+  double complex temp_comp;
 
 
 
@@ -567,9 +566,9 @@ gvud- =   1/2 sum  csi^dag U0(1,z) Huu^(-1)(2,z;x)       g5g0      Hdd^(-1)(x:2,
 
 void rotated_gXdum(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd) {
 
-  hr_complex *gsdu_m=corr_mem->g1, *gpdu_m=corr_mem->g2, *gvdu_m=corr_mem->g3, *gadu_m=corr_mem->g4, **M=corr_mem->M;
+  double complex *gsdu_m=corr_mem->g1, *gpdu_m=corr_mem->g2, *gvdu_m=corr_mem->g3, *gadu_m=corr_mem->g4, **M=corr_mem->M;
 
-  hr_complex ***gs_ij=corr_mem->g1_ij,  ***gp_ij=corr_mem->g2_ij,  ***gv_ij=corr_mem->g3_ij,  ***ga_ij=corr_mem->g4_ij;
+  double complex ***gs_ij=corr_mem->g1_ij,  ***gp_ij=corr_mem->g2_ij,  ***gv_ij=corr_mem->g3_ij,  ***ga_ij=corr_mem->g4_ij;
 
   int i,ix0,ix1,ix2,ix3,s1,s2;
 
@@ -578,7 +577,7 @@ void rotated_gXdum(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu,
   suNf_spinor stmp1[2];
   suNf_spinor *sptr2[2];
   suNf_spinor *sptr1[2];
-  hr_complex temp_comp;
+  double complex temp_comp;
 
 
 
@@ -751,9 +750,9 @@ gvud- =   1/2 sum  csi^dag U0(1,z) Hdd^(-1)(2,z;x)       g5g0      Huu^(-1)(x:2,
 void rotated_gvtuum(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd) {
 
 
-  hr_complex *gvtuu_m=corr_mem->g1, *gvt1uu_m=corr_mem->g2, *gvt2uu_m=corr_mem->g3, **M=corr_mem->M;
+  double complex *gvtuu_m=corr_mem->g1, *gvt1uu_m=corr_mem->g2, *gvt2uu_m=corr_mem->g3, **M=corr_mem->M;
 
-  hr_complex ***gvt1_ij=corr_mem->g1_ij,  ***gvt2_ij=corr_mem->g2_ij;
+  double complex ***gvt1_ij=corr_mem->g1_ij,  ***gvt2_ij=corr_mem->g2_ij;
 
   int i,j,i2,ix0,ix1,ix2,ix3,s1,s2;
 
@@ -762,7 +761,7 @@ void rotated_gvtuum(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu
   suNf_spinor stmp1[3];
   suNf_spinor *sptr2[2];
   suNf_spinor *sptr1[2];
-  hr_complex temp_comp;
+  double complex temp_comp;
   suNf *uptr;
 
 
@@ -945,9 +944,9 @@ gvtuu- = - gvt1uu- + gvt2uu-
 void rotated_gvtddm(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd) {
 
 
-  hr_complex *gvtdd_m=corr_mem->g1, *gvt1dd_m=corr_mem->g2, *gvt2dd_m=corr_mem->g3, **M=corr_mem->M;
+  double complex *gvtdd_m=corr_mem->g1, *gvt1dd_m=corr_mem->g2, *gvt2dd_m=corr_mem->g3, **M=corr_mem->M;
 
-  hr_complex ***gvt1_ij=corr_mem->g1_ij,  ***gvt2_ij=corr_mem->g2_ij;
+  double complex ***gvt1_ij=corr_mem->g1_ij,  ***gvt2_ij=corr_mem->g2_ij;
 
   int i,j,i2,ix0,ix1,ix2,ix3,s1,s2;
 
@@ -955,7 +954,7 @@ void rotated_gvtddm(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu
   suNf_spinor stmp1[3];
   suNf_spinor *sptr2[2];
   suNf_spinor *sptr1[2];
-  hr_complex temp_comp;
+  double complex temp_comp;
   suNf *uptr;
 
 
@@ -1141,9 +1140,9 @@ gvtdd- = - gvt1dd- + gvt2dd-
 void rotated_gvtudm(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd) {
 
 
-  hr_complex *gvtud_m=corr_mem->g1, *gvt1ud_m=corr_mem->g2, *gvt2ud_m=corr_mem->g3, **M=corr_mem->M;
+  double complex *gvtud_m=corr_mem->g1, *gvt1ud_m=corr_mem->g2, *gvt2ud_m=corr_mem->g3, **M=corr_mem->M;
 
-  hr_complex ***gvt1_ij=corr_mem->g1_ij,  ***gvt2_ij=corr_mem->g2_ij;
+  double complex ***gvt1_ij=corr_mem->g1_ij,  ***gvt2_ij=corr_mem->g2_ij;
 
   int i,j,i2,ix0,ix1,ix2,ix3,s1,s2;
 
@@ -1151,7 +1150,7 @@ void rotated_gvtudm(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu
   suNf_spinor stmp1[3];
   suNf_spinor *sptr2[2];
   suNf_spinor *sptr1[2];
-  hr_complex temp_comp;
+  double complex temp_comp;
   suNf *uptr;
 
 
@@ -1334,9 +1333,9 @@ gvtud- = - gvt1ud- + gvt2ud-
 void rotated_gvtdum(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd) {
 
 
-  hr_complex *gvtdu_m=corr_mem->g1, *gvt1du_m=corr_mem->g2, *gvt2du_m=corr_mem->g3, **M=corr_mem->M;
+  double complex *gvtdu_m=corr_mem->g1, *gvt1du_m=corr_mem->g2, *gvt2du_m=corr_mem->g3, **M=corr_mem->M;
 
-  hr_complex ***gvt1_ij=corr_mem->g1_ij,  ***gvt2_ij=corr_mem->g2_ij;
+  double complex ***gvt1_ij=corr_mem->g1_ij,  ***gvt2_ij=corr_mem->g2_ij;
 
   int i,j,i2,ix0,ix1,ix2,ix3,s1,s2;
 
@@ -1344,7 +1343,7 @@ void rotated_gvtdum(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu
   suNf_spinor stmp1[3];
   suNf_spinor *sptr2[2];
   suNf_spinor *sptr1[2];
-  hr_complex temp_comp;
+  double complex temp_comp;
   suNf *uptr;
 
 
@@ -1522,9 +1521,9 @@ gvtdu- = - gvt1du- + gvt2du-
 void rotated_g1uum(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd) {
 
 
-  hr_complex g1uu_m;
+  double complex g1uu_m;
 
-  hr_complex **g1_ij=corr_mem->g1_ij[0], **M=corr_mem->M;
+  double complex **g1_ij=corr_mem->g1_ij[0], **M=corr_mem->M;
 
   int i,j,ix1,ix2,ix3,s1,s2;
 
@@ -1532,7 +1531,7 @@ void rotated_g1uum(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu,
   suNf_spinor stmp1[2];
   suNf_spinor *sptr2[2];
   suNf_spinor *sptr1[2];
-  hr_complex temp_comp;
+  double complex temp_comp;
   suNf *uptr;
   suNf_spinor chi1[4*NF+1];
   suNf_spinor chi2[4*NF+1];
@@ -1670,9 +1669,9 @@ void rotated_g1uum(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu,
 void rotated_g1ddm(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd) {
 
 
-  hr_complex g1dd_m;
+  double complex g1dd_m;
 
-  hr_complex  **g1_ij=corr_mem->g1_ij[0], **M=corr_mem->M;
+  double complex  **g1_ij=corr_mem->g1_ij[0], **M=corr_mem->M;
 
   int i,j,ix1,ix2,ix3,s1,s2;
 
@@ -1680,7 +1679,7 @@ void rotated_g1ddm(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu,
   suNf_spinor stmp1[2];
   suNf_spinor *sptr2[2];
   suNf_spinor *sptr1[2];
-  hr_complex temp_comp;
+  double complex temp_comp;
   suNf *uptr;
   suNf_spinor chi1[4*NF+1];
   suNf_spinor chi2[4*NF+1];
@@ -1811,9 +1810,9 @@ void rotated_g1ddm(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu,
 void rotated_g1udm(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd) {
 
 
-  hr_complex g1ud_m;
+  double complex g1ud_m;
 
-  hr_complex  **g1_ij=corr_mem->g1_ij[0],  **M=corr_mem->M;
+  double complex  **g1_ij=corr_mem->g1_ij[0],  **M=corr_mem->M;
 
   int i,j,ix1,ix2,ix3,s1,s2;
 
@@ -1821,7 +1820,7 @@ void rotated_g1udm(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu,
   suNf_spinor stmp1[2];
   suNf_spinor *sptr2[2];
   suNf_spinor *sptr1[2];
-  hr_complex temp_comp;
+  double complex temp_comp;
   suNf *uptr;
   suNf_spinor chi1[4*NF+1];
   suNf_spinor chi2[4*NF+1];
@@ -1938,9 +1937,9 @@ void rotated_g1udm(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu,
 void rotated_g1dum(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd) {
 
 
-  hr_complex g1du_m;
+  double complex g1du_m;
 
-  hr_complex  **g1_ij=corr_mem->g1_ij[0], **M=corr_mem->M;
+  double complex  **g1_ij=corr_mem->g1_ij[0], **M=corr_mem->M;
 
   int i,j,ix1,ix2,ix3,s1,s2;
 
@@ -1948,7 +1947,7 @@ void rotated_g1dum(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu,
   suNf_spinor stmp1[2];
   suNf_spinor *sptr2[2];
   suNf_spinor *sptr1[2];
-  hr_complex temp_comp;
+  double complex temp_comp;
   suNf *uptr;
   suNf_spinor chi1[4*NF+1];
   suNf_spinor chi2[4*NF+1];

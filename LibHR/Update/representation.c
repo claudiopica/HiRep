@@ -1,6 +1,6 @@
 /*************************************************************************** \
- * Copyright (c) 2008, Claudio Pica, Agostino Patella                        *   
- * All rights reserved.                                                      * 
+ * Copyright (c) 2008, Claudio Pica, Agostino Patella                        *
+ * All rights reserved.                                                      *
 \***************************************************************************/
 
 #include "global.h"
@@ -207,10 +207,10 @@ void _group_represent_flt(suNf_flt *v, suNg_flt *u)
   int A, C;
   int a, b, i, j, k, c, d;
   float *vf = (float *)v;
-  hr_complex_flt *uf = (hr_complex_flt *)u;
+  float complex *uf = (float complex *)u;
 
   suNg_flt m;
-  hr_complex_flt *mf = (hr_complex_flt *)(&m);
+  float complex *mf = (float complex *)(&m);
 
   A = 0;
   for (a = 0; a < NG; a++)
@@ -287,11 +287,11 @@ void _group_represent_flt(suNf_flt *v, suNg_flt *u)
   const double st = sqrt(2.);
   int A, C;
   int a, b, i, j, c, d;
-  hr_complex_flt *vf = (hr_complex_flt *)v;
-  hr_complex_flt *uf = (hr_complex_flt *)u;
+  float complex *vf = (float complex *)v;
+  float complex *uf = (float complex *)u;
 
   suNg_flt m;
-  hr_complex_flt *mf = (hr_complex_flt *)(&m);
+  float complex *mf = (float complex *)(&m);
 
   A = 0;
   for (a = 0; a < NG; a++)
@@ -348,11 +348,11 @@ void _group_represent_flt(suNf_flt *v, suNg_flt *u)
 
   int A, C;
   int a, b, i, j, c, d;
-  hr_complex_flt *vf = (hr_complex_flt *)v;
-  hr_complex_flt *uf = (hr_complex_flt *)u;
+  float complex *vf = (float complex *)v;
+  float complex *uf = (float complex *)u;
 
   suNg_flt m;
-  hr_complex_flt *mf = (hr_complex_flt *)(&m);
+  float complex *mf = (float complex *)(&m);
 
   A = 0;
   for (a = 1; a < NG; a++)
