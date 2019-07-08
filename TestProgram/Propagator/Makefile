@@ -1,7 +1,7 @@
 TOPDIR = ../..
 MKDIR = $(TOPDIR)/Make
 
-EXES = check_propagator
+TESTS = check_propagator
 
 LIBS += $(TOPDIR)/LibHR/libhr.a
 
