@@ -1,3 +1,9 @@
+/*
+* NOCOMPILE= WITH_MPI
+* NOCOMPILE= BASIC_SF
+* NOCOMPILE= ROTATED_SF
+* NOCOMPILE= FERMION_THETA
+*/
 /*******************************************************************************
 *
 * Checks of propagator, spinmatrix and the sequential sources
@@ -33,6 +39,7 @@
 #include "gamma_spinor.h"
 #include "spin_matrix.h"
 #include "propagator.h"
+#include "setup.h"
 
 #include "cinfo.c"
 
@@ -71,7 +78,7 @@ typedef struct _input_mesons {
 }
 
 
-char cnfg_filename[256]="";
+char cnfg_filename[256]="run1_8x8x8x8nc2rFUNnf2b2.000000m0.940000n10";
 char list_filename[256]="";
 char input_filename[256] = "input_file";
 char output_filename[256] = "mesons.out";
@@ -98,7 +105,7 @@ int parse_cnfg_filename(char* filename, filename_t* fn) {
   basename = filename;
   while ((tmp = strchr(basename, '/')) != NULL) {
     basename = tmp+1;
-  }            
+  }
 
 #ifdef REPR_FUNDAMENTAL
 #define repr_name "FUN"
@@ -189,14 +196,14 @@ static void fix_T_bc(int tau){
   suNf *u;
   if (--tau<0) tau+= GLB_T;
   lprintf("meson_measurements",15,"Setting Dirichlet boundary conidtion at global time slice %d, %d\n",tau,T_BORDER);
-  if((zerocoord[0]-1<=tau && zerocoord[0]+T>tau) || (zerocoord[0]==0 && tau==GLB_T-1)) { 
+  if((zerocoord[0]-1<=tau && zerocoord[0]+T>tau) || (zerocoord[0]==0 && tau==GLB_T-1)) {
     for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
 	  if( ( (tau==zerocoord[0]-1) || (zerocoord[0]==0 && tau==GLB_T-1)) && (NP_T>1) ){
 	//printf("PID = %d, zc = %d, tau = %d\n", PID, zerocoord[0], tau);
 	    index=ipt_ext(0,ix,iy,iz);
 	  }
 	  else{
-	    index=ipt_ext(T_BORDER+tau-zerocoord[0],ix,iy,iz); 
+	    index=ipt_ext(T_BORDER+tau-zerocoord[0],ix,iy,iz);
 	  }
 	  if(index!=-1) {
 	    u=pu_gauge_f(index,0);
@@ -211,9 +218,9 @@ static void fix_T_bc(int tau){
 static void print_prop(suNf_propagator S){
       int i,j;
 	lprintf("PROP", 10, "{");
-      for(i=0;i<4*NF;i++){ 
+      for(i=0;i<4*NF;i++){
 	lprintf("PROP", 10, "{");
-      for(j=0;j<4*NF;j++){ 
+      for(j=0;j<4*NF;j++){
         if(j<4*NF-1){ lprintf("PROP", 10, "%.10f + I*%.10f, ", creal(_PROP_IDX(S,i,j)), cimag(_PROP_IDX(S,i,j)) ); }
         else{ lprintf("PROP", 10, "%.10f + I*%.10f", creal(_PROP_IDX(S,i,j)), cimag(_PROP_IDX(S,i,j)) ); }
       }
@@ -224,7 +231,7 @@ static void print_prop(suNf_propagator S){
 }
 
 //Check: g5 D^dag(x,0) g5 = D(0,x)
-static void check_g5herm(spinor_field *prop1, int t1, spinor_field *prop2, int t2){
+static int check_g5herm(spinor_field *prop1, int t1, spinor_field *prop2, int t2){
 
   int beta, a, ix1, ix2;
 
@@ -234,7 +241,7 @@ static void check_g5herm(spinor_field *prop1, int t1, spinor_field *prop2, int t
 		ix1 = ipt(t1-zerocoord[0],0,0,0);
 		ix2 = ipt(t2-zerocoord[0],0,0,0);
 		for (a=0;a<NF;++a){
-		    for (beta=0;beta<4;beta++){ 
+		    for (beta=0;beta<4;beta++){
 		      _propagator_assign(sp1, *_FIELD_AT(&prop1[a*4+beta],ix1),a,beta); //S( (2,0,0,0), (0,0,0,0) )
 		      _propagator_assign(sp2, *_FIELD_AT(&prop2[a*4+beta],ix2),a,beta); //S( (0,0,0,0), (2,0,0,0) )
 		    }
@@ -250,7 +257,9 @@ static void check_g5herm(spinor_field *prop1, int t1, spinor_field *prop2, int t
 		print_prop(sp2);
 		_propagator_trace(tr,sp2);
 		lprintf("CK_G5HERM",0,"Tr[ g5 Propagator1^dag g5 - Propagator2 ] = %g + I%g\n", creal(tr), cimag(tr));
-     
+    if (cabs(tr) >  1.e-14) return 1;
+    else return 0;
+
 }
 
 //source = g5 prop( x, 0 ) delta( x, (tf,0,0,0) )
@@ -266,7 +275,7 @@ void create_sequential_source_point(spinor_field *source, int tf, spinor_field* 
 
 	ix = ipt(tf-zerocoord[0],0,0,0);
 	for (a=0;a<NF;++a){
-	    for (beta=0;beta<4;beta++){ 
+	    for (beta=0;beta<4;beta++){
 	      _propagator_assign(sp0, *_FIELD_AT(&prop[a*4+beta],ix),a,beta);
 	    }
 	}
@@ -274,7 +283,7 @@ void create_sequential_source_point(spinor_field *source, int tf, spinor_field* 
 	_propagator_transpose(sp0,sp1);
 
 	for (a=0;a<NF;++a){
-	    for (beta=0;beta<4;beta++){ 
+	    for (beta=0;beta<4;beta++){
 	      *_FIELD_AT(&source[a*4+beta],ix) = sp0.c[a].c[beta];
 	    }
 	}
@@ -286,7 +295,7 @@ void create_sequential_source_point(spinor_field *source, int tf, spinor_field* 
 
 }
 //Check sequential Gamma Seq(0,0) = Gamma g5 S^dag(x,0) g5 g5 S(x,0)
-static void check_sequential_point(spinor_field *prop_1, spinor_field *prop_2, spinor_field *prop_seq, int ti){
+static int check_sequential_point(spinor_field *prop_1, spinor_field *prop_2, spinor_field *prop_seq, int ti){
 
   lprintf("CK_SEQ",0,"Only Works in serial!\n");
   int ix1 = ipt(0,0,0,0);
@@ -296,7 +305,7 @@ static void check_sequential_point(spinor_field *prop_1, spinor_field *prop_2, s
   double complex tr;
 
 	for (a=0;a<NF;++a){
-	    for (beta=0;beta<4;beta++){ 
+	    for (beta=0;beta<4;beta++){
 	      _propagator_assign(sp1, *_FIELD_AT(&prop_seq[a*4+beta],ix1),a,beta); //S( (0,0,0,0), (2,0,0,0) ) g5 S( (2,0,0,0), (0,0,0,0) )
 	      _propagator_assign(sp2, *_FIELD_AT(&prop_2[a*4+beta],ix1),a,beta);   //S( (0,0,0,0), (2,0,0,0) )
 	      _propagator_assign(sp3, *_FIELD_AT(&prop_1[a*4+beta],ix2),a,beta);   //S( (2,0,0,0), (0,0,0,0) )
@@ -318,31 +327,34 @@ static void check_sequential_point(spinor_field *prop_1, spinor_field *prop_2, s
 	_propagator_trace(tr,sptmp1);
 	lprintf("CK_SEQ",0,"point - seq   = %g + I%g\n", creal(tr), cimag(tr));
 	print_prop(sptmp1);
+
+  if (cabs(tr) >  1.e-14) return 1;
+  else return 0;
 }
 
-static void check_sequential(spinor_field *prop_seq, spinor_field *prop_1, int tau){
+static int check_sequential(spinor_field *prop_seq, spinor_field *prop_1, int tau, int tf){
 
 lprintf("CK_SEQ",0,"Only Works in serial!\n");
 
-double Corr[2][GLB_T];
+double complex Corr[2][GLB_T];
 int ix,t,x,y,z,a,beta,tc;
 double complex tr;
 suNf_propagator sp0,sp1,spdag, sptmp;
 
 int i;
 for (i=0;i<2;i++){
-for (t=0; t<GLB_T; t++) { 
-	Corr[i][t] = 0; 
+for (t=0; t<GLB_T; t++) {
+	Corr[i][t] = 0;
 }}
 
 
 	for (t=0; t<T; t++) {
-	    tc = (zerocoord[0]+t+GLB_T-tau)%GLB_T;	 
-	    for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) { 
-		  ix=ipt(t,x,y,z);					
-		  
+	    tc = (zerocoord[0]+t+GLB_T-tau)%GLB_T;
+	    for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) {
+		  ix=ipt(t,x,y,z);
+
 		  for (a=0;a<NF;++a){
-		    for (beta=0;beta<4;beta++){ 
+		    for (beta=0;beta<4;beta++){
 		      _propagator_assign(sp0, *_FIELD_AT(&prop_seq[a*4+beta],ix),a,beta);
 		      _propagator_assign(sp1, *_FIELD_AT(&prop_1[a*4+beta],ix),a,beta);
 		    }
@@ -350,213 +362,121 @@ for (t=0; t<GLB_T; t++) {
                   _propagator_dagger(spdag,sp1);
 
 			//Pion
-			_propagator_mul(sptmp,sp1,spdag); _propagator_trace(tr, sptmp); 
-			Corr[0][tc] += creal(tr);
+			_propagator_mul(sptmp,sp1,spdag); _propagator_trace(tr, sptmp);
+			Corr[0][tc] += tr;
 
 			//g5 Seq(0,0)
 			if(t == 0 && x==0 && y==0 && z==0){
-				_g5_propagator(sptmp,sp0); 
+				_g5_propagator(sptmp,sp0);
 				_propagator_trace(tr, sptmp);
 				Corr[1][tc] += creal(tr);
 			}
 		} //END SPATIAL LOOP
 	  } //END TIME LOOP
 
-	lprintf("CORR",0,"Pion: "); for (t=0; t<T; t++){ lprintf("CORR",0,"%g ",Corr[0][t]/(GLB_VOL3) ); } lprintf("CORR",0,"\n");
-	lprintf("CORR",0,"SeqPion: "); for (t=0; t<T; t++){ lprintf("CORR",0,"%g ",Corr[1][t]/(GLB_VOL3) ); } lprintf("CORR",0,"\n");
+	lprintf("CORR",0,"Pion: "); for (t=0; t<T; t++){ lprintf("CORR",0,"%g ",creal(Corr[0][t])/(GLB_VOL3) ); } lprintf("CORR",0,"\n");
+	lprintf("CORR",0,"SeqPion: "); for (t=0; t<T; t++){ lprintf("CORR",0,"%g ",creal(Corr[1][t]/(GLB_VOL3) )); } lprintf("CORR",0,"\n");
+
+  if (cabs(Corr[0][tf] - Corr[1][0]) > 1e-14)  return 1;
+  else return 0;
 
 }
 
 
 int main(int argc,char *argv[]) {
-  int i,k;
-  char tmp[256], *cptr;
-  FILE* list;
-  filename_t fpars;
-  int nm;
+  int i,k,tmp;
+  int return_value = 0;
   double m[256];
-  
+  struct timeval start, end, etime;
   /* setup process id and communications */
-  read_cmdline(argc, argv);
+
+  logger_map("DEBUG","debug");
+
   setup_process(&argc,&argv);
 
-  read_input(glb_var.read,input_filename);
-  setup_replicas();
-
-
-  /* logger setup */
-  /* disable logger for MPI processes != 0 */
-  logger_setlevel(0,30);
-  if (PID!=0) { logger_disable(); }
-  if (PID==0) { 
-    sprintf(tmp,">%s",output_filename); logger_stdout(tmp);
-    sprintf(tmp,"err_%d",PID); 
-    if (!freopen(tmp,"w",stderr)) lprintf("MAIN",0,"Error out not open\n");
-  }
-
-  lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS); 
-  lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
-  lprintf("MAIN",0,"input file [%s]\n",input_filename); 
-  lprintf("MAIN",0,"output file [%s]\n",output_filename); 
-  if (strcmp(list_filename,"") != 0) lprintf("MAIN",0,"list file [%s]\n",list_filename); 
-  else lprintf("MAIN",0,"cnfg file [%s]\n",cnfg_filename); 
-
-
-  /* read & broadcast parameters */
-  parse_cnfg_filename(cnfg_filename,&fpars);
-
-
-  read_input(mes_var.read,input_filename);
-  GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
-  error(fpars.type==UNKNOWN_CNFG,1,"check_propagator.c","Bad name for a configuration file");
-  error(fpars.nc!=NG,1,"check_propagator.c","Bad NG");
-
-  read_input(rlx_var.read,input_filename);
-
-  lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed);
-  rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
-  srand(rlx_var.rlxd_seed+MPI_PID);
-
-#ifdef GAUGE_SON
-  lprintf("MAIN",0,"Gauge group: SO(%d)\n",NG);
-#else
-  lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
-#endif
-  lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
-
-  nm=0;
-  if(fpars.type==DYNAMICAL_CNFG) {
-    nm=1;
-    m[0] = fpars.m;
-  } else if(fpars.type==QUENCHED_CNFG) {
-    strcpy(tmp,mes_var.mstring);
-    cptr = strtok(tmp, ";");
-    nm=0;
-    while(cptr != NULL) {
-      m[nm]=atof(cptr);
-      nm++;
-      cptr = strtok(NULL, ";");
-    }            
-  }
-
-
-  /* setup communication geometry */
-  if (geometry_init() == 1) {
-    finalize_process();
-    return 0;
-  }
-
-  /* setup lattice geometry */
-  geometry_mpi_eo();
-  /* test_geometry_mpi_eo(); */
-
-  init_BCs(NULL);
-
-  /* alloc global gauge fields */
-  u_gauge=alloc_gfield(&glattice);
-#ifdef ALLOCATE_REPR_GAUGE_FIELD
-  u_gauge_f=alloc_gfield_f(&glattice);
-#endif
-
-  lprintf("MAIN",0,"Inverter precision = %e\n",mes_var.precision);
-  for(k=0;k<nm;k++)
-    lprintf("MAIN",0,"Mass[%d] = %f\n",k,m[k]);
-  
-
-  list=NULL;
-  if(strcmp(list_filename,"")!=0) {
-    error((list=fopen(list_filename,"r"))==NULL,1,"main [mk_mesons.c]" ,
-	"Failed to open list file\n");
-  }
-
+  setup_gauge_fields();
   i=0;
+  for (i=0;i<2;++i){
+  mes_var.precision =1e-24;
+
+  mes_var.ti = T/4;
+  mes_var.tf = T/2;
+  m[0] = -0.12;
+
+  lprintf("MAIN",0,"ti = %d\n",mes_var.ti);
+  lprintf("MAIN",0,"tf = %d\n",mes_var.tf);
+  lprintf("MAIN",0,"m = %f\n",m[0]);
+  mes_var.ff_fixed_point=1;
+  lprintf("MAIN",0,"Inverter precision = %e\n",mes_var.precision);
+
+
+
 
   spinor_field* source;
   spinor_field* prop_1;
   spinor_field* prop_2;
   spinor_field* source_seq;
   spinor_field* prop_seq;
-  suNf_field* u_gauge_old=alloc_gfield_f(&glattice);
 
   source = alloc_spinor_field_f(4,&glattice);
   source_seq = alloc_spinor_field_f(4*NF,&glattice);
   prop_1 = alloc_spinor_field_f(4*NF,&glattice);
   prop_2 = alloc_spinor_field_f(4*NF,&glattice);
   prop_seq = alloc_spinor_field_f(4*NF,&glattice);
-  
-  while(1) {
-    struct timeval start, end, etime;
 
-    if(list!=NULL)
-      if(fscanf(list,"%s",cnfg_filename)==0 || feof(list)) break;
 
-    i++;
 
-    lprintf("MAIN",0,"Configuration from %s\n", cnfg_filename);
-    read_gauge_field(cnfg_filename);
-    //unit_gauge(u_gauge);
-    represent_gauge_field();
+  lprintf("MAIN", 0, "Generating a random gauge field... ");
+  random_u(u_gauge);
+  start_gf_sendrecv(u_gauge);
+  complete_gf_sendrecv(u_gauge);
+  represent_gauge_field();
 
-    lprintf("TEST",0,"<p> %1.6f\n",avr_plaquette());
+  lprintf("TEST",0,"<p> %1.6f\n",avr_plaquette());
 
-    full_plaquette();
-    gettimeofday(&start,0);
+  full_plaquette();
+  gettimeofday(&start,0);
 
-  int k;
-
-  suNf_field_copy(u_gauge_old,u_gauge_f);//Save the gaugefield
-  if(mes_var.ff_fixed_point){
+  if(i==1){
     lprintf("MAIN",10,"Applying Dirichlet Boundaries\n");
     fix_T_bc(mes_var.ti-mes_var.dt);//Apply fixed boundaryconditions by zeroing links at time slice tau to direction 0.
   } else {
     lprintf("MAIN",10,"Default Boundaries\n");
   }
 
-  init_propagator_eo(1,m, mes_var.precision);//1 for number of masses 
+
+  init_propagator_eo(1,m, mes_var.precision);//1 for number of masses
   for (k=0;k<NF;++k){
     create_point_source(source,0,k);
     calc_propagator(prop_1+4*k,source,4);//4 for spin components
     create_point_source(source,mes_var.ti,k);
     calc_propagator(prop_2+4*k,source,4);//4 for spin components
   }
-  check_g5herm(prop_1, mes_var.ti, prop_2, 0);
-
+  tmp = check_g5herm(prop_1, mes_var.ti, prop_2, 0);
+  return_value += tmp;
   create_sequential_source_point(source_seq, mes_var.ti, prop_1);
   calc_propagator(prop_seq,source_seq,4*NF);
-  check_sequential_point(prop_1, prop_2, prop_seq, mes_var.ti); 
-
-  create_sequential_source(source_seq,mes_var.tf,prop_1); 
+  tmp = check_sequential_point(prop_1, prop_2, prop_seq, mes_var.ti);
+  return_value += tmp;
+  create_sequential_source(source_seq,mes_var.tf,prop_1);
   calc_propagator(prop_seq,source_seq,4*NF);
-  check_sequential(prop_seq,prop_1,0);
+  tmp = check_sequential(prop_seq,prop_1,0,mes_var.tf);
+  return_value += tmp;
+  gettimeofday(&end,0);
+  timeval_subtract(&etime,&end,&start);
+  if (i==0) lprintf("MAIN",0,"Random configuration without Dirichlet boundaries: analysed in [%ld sec %ld usec]\n",etime.tv_sec,etime.tv_usec);
+  else lprintf("MAIN",0,"Random configuration with Dirichlet boundaries: analysed in [%ld sec %ld usec]\n",etime.tv_sec,etime.tv_usec);
 
-  suNf_field_copy(u_gauge_f,u_gauge_old);//Restore the gaugefield
-  free_propagator_eo(); 
-
-    gettimeofday(&end,0);
-    timeval_subtract(&etime,&end,&start);
-    lprintf("MAIN",0,"Configuration #%d: analysed in [%ld sec %ld usec]\n",i,etime.tv_sec,etime.tv_usec);
-    if(list==NULL) break;
-  }
-
-  free_gfield_f(u_gauge_old);
-  free_spinor_field_f(source);  
+  free_propagator_eo();
+  free_spinor_field_f(source);
   free_spinor_field_f(source_seq);
   free_spinor_field_f(prop_1);
   free_spinor_field_f(prop_2);
   free_spinor_field_f(prop_seq);
-
-  if(list!=NULL) fclose(list);
-
-
-  free_BCs();
-
-  free_gfield(u_gauge);
-#ifdef ALLOCATE_REPR_GAUGE_FIELD
-  free_gfield_f(u_gauge_f);
-#endif
-
-  finalize_process();
-
-  return 0;
 }
+lprintf("MAIN",0,"return_value = %d\n",return_value);
+finalize_process();
 
+return return_value;
+
+}
