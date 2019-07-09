@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Agostino Patella, Claudio Pica                        *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Agostino Patella, Claudio Pica                        *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 #ifndef UPDATE_H
@@ -136,7 +136,7 @@ void O4MN_multistep(double tlen, integrator_par *int_par);
 
 
 typedef struct _ghmc_par {
-  
+
   /* integrator */
   integrator_par *integrator;
   double tlen;
@@ -146,19 +146,20 @@ typedef struct _ghmc_par {
 
   /* Fermion Theta angles */
   double theta[4];
-  
+
   /* Probably not needed anymore */
   /* SF stuff */
   double SF_zf;
   double SF_ds;
   int SF_sign;
   double SF_ct;
-  
+
 } ghmc_par;
 
 void init_ghmc(ghmc_par *par);
 void free_ghmc();
 int update_ghmc();
+int reverse_update_ghmc();
 
 /* stout smearing */
 void init_smearing(double, double);
