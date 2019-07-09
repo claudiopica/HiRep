@@ -1,3 +1,6 @@
+/*
+* NOCOMPILE = SO
+*/
 #define MAIN_PROGRAM
 
 #include <stdio.h>
@@ -20,10 +23,22 @@ void print_cmplx(double complex c){
     printf("+%gi",cimag(c));
   }
   else{
-    printf("%gi",cimag(c));
+    printf("-%gi",fabs(cimag(c)));
   }
 }
 
+double  norm_suNg_minus_id(suNg* a){
+  int i,j;
+  double r=0.;
+  for (i=0;i<NG;i++){
+      for (j=1;j<NG;j++){
+        r +=cabs(a->c[i*NG+j]);
+        if (i==j) r-= 1.0;
+    }
+
+  }
+return r;
+}
 void printML(suNg* a){
   int i,j;
   printf("[");
@@ -39,32 +54,54 @@ printf("]\n");
 }
 
 int main(){
+  int return_value=0;
   double complex det;
+  double test;
   suNg a,b,c;
   random_suNg(&a);
   random_suNg(&b);
-  random_suNg(&c);
-  _suNg_add_assign(a,b);
+  random_suNg(&c); // Vincent:   NOT USED !
+  det_suNg(&det,&a);
+  printf("Det: ");
+  print_cmplx(det);
+  if (cabs(det - 1.0) >1e-14) return_value +=1;
+
+
+  _suNg_add_assign(a,b); /* a = a+ b */
   det_suNg(&det,&a);
   printf("Det: ");
   print_cmplx(det);
   printf("\n");
+  if (cabs(det) < 1e-14) return_value +=1;
+
+
   printML(&a);
-  c = a;
-  inv_suNg(&a);
+  c = a;  /* c = a+b */
+  inv_suNg(&a); /* a= (a+b)^-1 does not work for SO ? */
   printML(&a);
-  _suNg_times_suNg(b,a,c);
+  _suNg_times_suNg(b,a,c); /* b = (a+b)^-1 *(a+b) so it should be 1 */
+  printf("Should be the idendity matrix:\n");
   printML(&b);
-  b.c[8]=1e-15;
-  c=b;
-  printML(&b);
-  inv_suNg(&b);
+  test= norm_suNg_minus_id(&b);
+  if (test > 1e-14) return_value +=1;
+
+  c=b; /* c =  (a+b)^-1 *(a+b) */
+  printML(&b); /* Vincent useless */
+  inv_suNg(&b); /* b = ((a+b)^-1 *(a+b))^-1 */
   det_suNg(&det,&b);
+  printf("Should be the determinant of the idendity matrix:\n");
   printf("Det: ");
   print_cmplx(det);
+  if (cabs(det - 1.0) >1e-14) return_value +=1;
   printf("\n");
   printML(&b);
-  _suNg_times_suNg(a,b,c);
+  _suNg_times_suNg(a,b,c); /* a = ((a+b)^-1 *(a+b))^-1  * (a+b)^-1 *(a+b) */
+  printf("Should be the idendity matrix:\n");
   printML(&a);
-  
+  test= norm_suNg_minus_id(&a);
+  if (test > 1e-14) return_value +=1;
+
+
+  return return_value;
+
 }
