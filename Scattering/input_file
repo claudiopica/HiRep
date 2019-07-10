@@ -23,7 +23,7 @@ mes:csw = 0.0
 mes:precision = 1e-24
 mes:nhits = 1
 mes:outdir = output
-mes:bs = PA
+mes:bc = PA
 mes:p = (0,0,1) (1,1,0) (1,1,1)
 mes:tsrc = 0
 
