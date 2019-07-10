@@ -1,8 +1,17 @@
+/** 
+ * @file IOroutines.c
+ *
+ * Functions used for reading the input file
+ *
+ * @author Tadeusz Janowski
+ */
 
 #ifndef IO_ROUTINES
 #define IO_ROUTINES
-// Followed by the list of IO functions from meson_scattering.c
-/* Mesons parameters */
+
+/**
+ * @brief Structure containing data from the input file relevant to scattering.
+ */
 typedef struct _input_scatt {
 	char mstring[256];
     double csw;
@@ -55,6 +64,9 @@ typedef struct {
 } filename_t;
 
 
+/**
+ * @brief Extracts run parameters from the gauge file filename.
+ */
 int parse_cnfg_filename(char* filename, filename_t* fn) {
 	int hm;
 	char *tmp = NULL;
@@ -110,7 +122,9 @@ int parse_cnfg_filename(char* filename, filename_t* fn) {
 	return UNKNOWN_CNFG;
 }
 
-
+/**
+ * @brief Parses the command-line input
+ */
 void read_cmdline(int argc, char* argv[]) {
 	int i, ai=0, ao=0, ac=0, al=0, am=0,ap=0,as=0;
 	FILE *list=NULL;
@@ -161,6 +175,12 @@ void read_cmdline(int argc, char* argv[]) {
 	}
 
 }
+
+/**
+ * @brief Converts a string of "(px,py,pz)(px2,py2,pz2)..." into a 2D array of integers.
+ * @param momstring input string
+ * @param N number of momenta in the string (used as an output)
+ */
 int** getmomlist(char* momstring, int* N){
     char* tmp = momstring;
     *N = 0;
@@ -182,6 +202,12 @@ int** getmomlist(char* momstring, int* N){
     return plist;
 }
 
+/** 
+ * @brief Frees the 2D array of momenta allocated by getmomlist.
+ * @param p array of momenta
+ * @param N number of momenta
+ * @see getmomlist
+ */
 void freep(int **p, int N){
     for(int i=0; i<N;i++){
         free(p[i]);

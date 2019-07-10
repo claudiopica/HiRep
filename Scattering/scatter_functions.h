@@ -1,5 +1,18 @@
+/**
+ *
+ * @file scatter_functions.h
+ * Contains structures and functions used in the scattering code
+ *
+ * @author Tadeusz Janowski
+ */
+
 #ifndef SCATTER_FUNCTIONS_H
 #define SCATTER_FUNCTIONS_H
+
+/**
+ * @brief Flips the boundary conditions in the T direction between periodic and anti-periodic.
+ * @param tau Time slice corresponding to the boundary.
+ */
 static void flip_T_bc(int tau){
   int index;
   int ix,iy,iz;
@@ -24,8 +37,12 @@ static void flip_T_bc(int tau){
   }
   lprintf("meson_measurements",50,"Flipping DONE!\n");
 }
-//
-// Function for initiating meson observable (used to store the correlation function)
+/** 
+ * @brief Function for initiating meson observable (used to store the correlation function)
+ * @param mo meson_observable to initialise.
+ * @param name name of the channel (e.g. "pi").
+ * @param size Size of the output, typically GLB_T*(number of output momenta)
+ */
 void init_mo(meson_observable* mo, char* name, int size)
 {
   int i;
@@ -51,6 +68,10 @@ void init_mo(meson_observable* mo, char* name, int size)
   }
 }
 
+/**
+ * @brief Resets the meson_observable object (sets all entries to 0).
+ * @param mo meson_observable to reset
+ */
 void reset_mo(meson_observable* mo)
 {
   int i;
@@ -61,6 +82,11 @@ void reset_mo(meson_observable* mo)
   }
 }
 
+/**
+ * @brief Sums the entries of meson_observable over all MPI processes
+ * @param mo meson_observable to sum over
+ * @param norm number to multiply by after the sum
+ */
 static void do_global_sum(meson_observable* mo, double norm){
   meson_observable* motmp=mo;
   int i;
@@ -75,6 +101,9 @@ static void do_global_sum(meson_observable* mo, double norm){
   }
 }
 
+/**
+ * @brief Frees the memory allocated by the meson observable.
+ */
 void free_mo(meson_observable* mo)
 {
   free(mo->corr_re);
@@ -82,9 +111,20 @@ void free_mo(meson_observable* mo)
   free(mo);
 }
 
+/// \cond
 #define BASENAME(filename) (strrchr((filename),'/') ? strrchr((filename),'/')+1 : filename )
 
 #define corr_ind(px,py,pz,n_mom,tc,nm,cm) ((px)*(n_mom)*(n_mom)*GLB_T*(nm)+(py)*(n_mom)*GLB_T*(nm)+(pz)*GLB_T*(nm)+ ((cm)*GLB_T) +(tc))
+/// \endcond
+
+/**
+ * @brief Prints the 2-point function to a file. Not used for JSON output.
+ * @param mo meson_observable to print
+ * @param pmax maximum momentum at the sink
+ * @param sourceno noise source number
+ * @param path directory to which the output file will be saved
+ * @param name name of the output file
+ */
 inline void io2pt(meson_observable* mo, int pmax, int sourceno, char* path, char* name)
 {
 	FILE* file;
@@ -100,7 +140,17 @@ inline void io2pt(meson_observable* mo, int pmax, int sourceno, char* path, char
 	return;
 }
 
+/// \cond
 #define INDEX(px,py,pz,n_mom,tc) ((px + n_mom)*(2*n_mom+1)*(2*n_mom+1)*(GLB_T)+(py + n_mom)*(2*n_mom+1)*(GLB_T)+(pz + n_mom)*(GLB_T)+ (tc))
+/// \endcond
+/**
+ * @brief Prints the 4-point function (d) to a file. Not used for JSON output.
+ * @param mo meson_observable to print
+ * @param pmax maximum momentum at the sink
+ * @param sourceno noise source number
+ * @param path directory to which the output file will be saved
+ * @param name name of the output file
+ */
 inline void io4pt(meson_observable* mo, int pmax, int sourceno, char* path, char* name)
 {
 	FILE* file;
@@ -118,14 +168,20 @@ inline void io4pt(meson_observable* mo, int pmax, int sourceno, char* path, char
 
 // Sources
 
+/**
+ * @brief Propagator sources with zero-momentum
+ */
 struct src_common{
-	spinor_field *src_0;
-	spinor_field *src_0_eta;
-	spinor_field *src_0_0;
+	spinor_field *src_0; /**< Zero momentum, noise 1 */
+	spinor_field *src_0_eta; /**< Zero momentum, noise 2 */
+	spinor_field *src_0_0; /**< Sequential source from timeslice tau with zero-momentum insertion */
 };
 
+/**
+ * @brief Propagator sources with momentum p
+ */
 struct src_p{
-	int p[3];
+	int p[3]; /**< Momentum */
 	spinor_field *src_p;
 	spinor_field *src_mp;
 	spinor_field *src_0_p;
@@ -134,6 +190,11 @@ struct src_p{
 	spinor_field *src_mp_0;
 };
 
+/**
+ * @brief Allocates memory and creates point sources with momentum 0 (used for testing).
+ * @param src output
+ * @param tau time slice at which the sources are generated
+ */
 void init_src_common_point(struct src_common* src, int tau){
 	// Malloc and initialise
 	src->src_0 = alloc_spinor_field_f(4*NF, &glattice);
@@ -150,6 +211,11 @@ void init_src_common_point(struct src_common* src, int tau){
   	create_point_source(src->src_0_eta, 0, 0);
 }
 
+/**
+ * @brief Allocates memory and creates noise sources with momentum 0.
+ * @param src output
+ * @param tau time slice at which the sources are generated
+ */
 void init_src_common(struct src_common* src, int tau){
 	// Malloc and initialise
 	src->src_0 = alloc_spinor_field_f(4*NF, &glattice);
@@ -166,6 +232,14 @@ void init_src_common(struct src_common* src, int tau){
   	create_diluted_source_equal_atau(src->src_0_eta, tau);
 }
 
+/**
+ * @brief Allocates memory and creates noise sources with momentum p.
+ * @param srcp output
+ * @param src0 source at zero momentum. This needs to initialised by init_src_common prior to executing this function.
+ * @param tau time slice at which the sources are generated
+ * @param px,py,pz momentum of the generated propagators
+ * @see init_src_common
+ */
 void init_src_p(struct src_p* srcp, struct src_common* src0, int px, int py, int pz){
 	srcp->p[0]=px;
 	srcp->p[1]=py;
@@ -192,12 +266,18 @@ void init_src_p(struct src_p* srcp, struct src_common* src0, int px, int py, int
     lprintf("init_src_p",0,"Source p generated\n");
 }
 
+/**
+ * @brief Frees memory allocated by to src_common
+ */
 void free_src_common(struct src_common* src){
 	free_spinor_field_f(src->src_0);
 	free_spinor_field_f(src->src_0_eta);
 	free_spinor_field_f(src->src_0_0);
     lprintf("free_src_common",0,"Freed memory\n");
 }
+/**
+ * @brief Frees memory allocated by to src_p
+ */
 void free_src_p(struct src_p* src){
 	free_spinor_field_f(src->src_p);
 	free_spinor_field_f(src->src_mp);
@@ -210,12 +290,18 @@ void free_src_p(struct src_p* src){
 
 // Propagators
 
+/**
+ * @brief Bundle of propagators with zero momentum.
+ */
 struct prop_common{
 	spinor_field *Q_0;
 	spinor_field *Q_0_eta;
 	spinor_field **W_0_0;
 };
 
+/**
+ * @brief Bundle of propagators with momentum p.
+ */
 struct prop_p{
 	spinor_field *Q_p;
 	spinor_field *Q_mp;
@@ -225,10 +311,24 @@ struct prop_p{
 	spinor_field *W_mp_0;
 };
 
+/**
+ * @brief Creates a propagator with periodic boundary conditions
+ * @param prop output
+ * @param src source of the propagator
+ * @param ndilute number of dilution vectors, e.g. 4 for spin dilution
+ * @param tau origin time slice
+ */
 void make_propagator_P(spinor_field* prop, spinor_field* src, int ndilute, int tau){
 	calc_propagator(prop,src,ndilute);
 }
 
+/**
+ * @brief Creates a propagator with P+A boundary conditions
+ * @param prop output
+ * @param src source of the propagator
+ * @param ndilute number of dilution vectors, e.g. 4 for spin dilution
+ * @param tau origin time slice
+ */
 void make_propagator_PA(spinor_field* prop, spinor_field* src, int ndilute, int tau){
 	spinor_field* proptmp = alloc_spinor_field_f(4*NF,&glattice);
 
@@ -244,6 +344,14 @@ void make_propagator_PA(spinor_field* prop, spinor_field* src, int ndilute, int 
     free_spinor_field_f(proptmp);
 }
 
+/**
+ * @brief Creates a propagator bundle with zero momentum
+ * @param prop output
+ * @param src0 source of the propagators
+ * @param ndilute number of dilution vectors, e.g. 4 for spin dilution
+ * @param tau origin time slice
+ * @param bc if set to "PA" generates P+A bcs in time direction, defaults to periodic otherwise
+ */
 void make_prop_common(struct prop_common* prop, struct src_common* src0, int ndilute, int tau, char* bc){
     void (*fun) (spinor_field*, spinor_field*,int,int);
     if(bc == "PA"){
@@ -272,6 +380,15 @@ void make_prop_common(struct prop_common* prop, struct src_common* src0, int ndi
     lprintf("MAIN",0,"Propagator with momentum 0 inverted\n");
 }
 
+/**
+ * @brief Creates a propagator bundle with momentum p
+ * @param prop output
+ * @param srcp source of the propagators with momentum p
+ * @param src0 source of the propagators with momentum 0
+ * @param ndilute number of dilution vectors, e.g. 4 for spin dilution
+ * @param tau origin time slice
+ * @param bc if set to "PA" generates P+A bcs in time direction, defaults to periodic otherwise
+ */
 void make_prop_p(struct prop_p* prop, struct src_p* srcp, struct src_common* src0, int ndilute, int tau, char* bc){
     void (*fun) (spinor_field*, spinor_field*,int,int);
     if(bc == "PA"){
@@ -281,6 +398,7 @@ void make_prop_p(struct prop_p* prop, struct src_p* srcp, struct src_common* src
         lprintf("make_prop_p",0,"Inverting propagator with P boundary conditions");
         fun = &make_propagator_P;
     }
+    /// \cond
 #define PROPLIST X(Q_p) X(Q_mp) X(W_0_p) X(W_0_mp) X(W_p_0) X(W_mp_0)
 #define X(NAME) \
 	prop->NAME = alloc_spinor_field_f(4*NF, &glattice);
@@ -300,10 +418,14 @@ void make_prop_p(struct prop_p* prop, struct src_p* srcp, struct src_common* src
 	PROP
 #undef X
 #undef PROP
+        /// \endcond
     lprintf("MAIN",0,"Propagator with momentum p inverted\n");
 
 }
 
+/**
+ * @brief Frees memory associated with zero-momentum propagator bundle
+ */
 void free_prop_common(struct prop_common* prop){
 	free_spinor_field_f( prop -> Q_0);
 	free_spinor_field_f( prop -> Q_0_eta);
@@ -314,6 +436,9 @@ void free_prop_common(struct prop_common* prop){
     lprintf("free_prop_common",0,"Freed memory\n");
 }
 
+/**
+ * @brief Frees memory associated with momentum-p propagator bundle
+ */
 void free_prop_p(struct prop_p* prop){
 	free_spinor_field_f( prop -> Q_p);
 	free_spinor_field_f( prop -> Q_mp);
@@ -326,17 +451,26 @@ void free_prop_p(struct prop_p* prop){
 
 // Meson observable stuff
 
+/**
+ * @brief Bundle of meson_observables with momentum 0. 
+ */
 struct mo_0{
 	meson_observable *rho[3][3];
 	meson_observable *pi;
 };
 
+/**
+ * @brief Bundle of meson_observables with momentum p. 
+ */
 struct mo_p{
 	int p[3];
 	meson_observable *d, *r1, *r2, *r3, *r4, *pi;
 	meson_observable *t1[3], *t2[3], *rho[3][3];
 };
 
+/**
+ * @brief Initialises bundle of zero-momentum meson observables.
+ */
 void init_mo_0(struct mo_0* mo){
 	mo->pi = (meson_observable*) malloc(sizeof(meson_observable));
     lprintf("init_mo_0",0,"pi initiated\n");
@@ -349,10 +483,15 @@ void init_mo_0(struct mo_0* mo){
     lprintf("MAIN",0,"Meson observable 0 initiated!\n");
 }
 
+/**
+ * @brief Initialises a bundle of meson_observables with momentum p
+ * @param px,py,pz momentum components
+ */
 void init_mo_p(struct mo_p* mo, int px, int py, int pz){
 	mo->p[0] = px;
 	mo->p[1] = py;
 	mo->p[2] = pz;
+/// \cond
 #define R X(d) X(pi) X(r1) X(r2) X(r3) X(r4)
 #define X(NAME)\
        	mo->NAME = (meson_observable*) malloc(sizeof(meson_observable));\
@@ -360,6 +499,7 @@ void init_mo_p(struct mo_p* mo, int px, int py, int pz){
 	R
 #undef X
 #undef R
+/// \endcond
 	for(int i=0; i<3; i++){
 		mo->t1[i] = (meson_observable*) malloc(sizeof(meson_observable));
 		init_mo(mo->t1[i],"t1",27*GLB_T);
@@ -381,6 +521,13 @@ void init_mo_p(struct mo_p* mo, int px, int py, int pz){
     lprintf("MAIN",0,"Meson observable p initiated!\n");
 }
 
+/**
+ * @brief Generates zero-momentum contractions
+ * @param mo output
+ * @param p0 zero-momentum propagator bundle
+ * @param s0 zero-momentum source
+ * @param tau origin time slice
+ */
 void gen_mo_0(struct mo_0* mo, struct prop_common* p0, struct src_common* s0, int tau){
 	measure_mesons_core(p0->Q_0, p0->Q_0, s0->src_0, mo->pi, 1, tau, 2, 0, GLB_T);
 	do_global_sum(mo->pi,1.0);
@@ -391,6 +538,14 @@ void gen_mo_0(struct mo_0* mo, struct prop_common* p0, struct src_common* s0, in
     lprintf("MAIN",0,"Generated mo 0\n");
 }
 
+/**
+ * @brief Generates contractions with source momentum p
+ * @param mo output
+ * @param p0 zero-momentum propagator bundle
+ * @param pp p-momentum propagator bundle
+ * @param s0 zero-momentum source
+ * @param tau origin time slice
+ */
 void gen_mo_p(struct mo_p* mo, struct prop_common* p0, struct prop_p* pp, struct src_common* s0, int tau){
 	measure_mesons_core(p0->Q_0, pp->Q_p, s0->src_0, mo->pi, 1, tau, 2, 0, GLB_T);
 	do_global_sum(mo->pi,1.0);
@@ -409,6 +564,7 @@ void gen_mo_p(struct mo_p* mo, struct prop_common* p0, struct prop_p* pp, struct
 		}
 	}
 
+    /// \cond
 #define R X(r1) X(r2) X(r3) X(r4)
 #define X(NAME) meson_observable* mo_tmp##NAME;
     R
@@ -419,13 +575,6 @@ void gen_mo_p(struct mo_p* mo, struct prop_common* p0, struct prop_p* pp, struct
 		init_mo(mo_tmp##NAME,"tmp",27*GLB_T);
         R
 #undef X
-		//spinor_field* source_0_0 = alloc_spinor_field_f(4*NF,&glattice);
-		//spinor_field* W_0_0 = alloc_spinor_field_f(4*NF,&glattice);
-
-		//create_sequential_source(source_0_0,t,p0->Q_0);
-
-        //fun(W_0_0, source_0_0, 1, tau);
-
 		measure_mesons_core(pp->W_mp_0, p0->W_0_0[t], s0->src_0, mo_tmpr1, 1, tau, 2, 0, GLB_T);
 		measure_mesons_core(p0->W_0_0[t], pp->W_p_0, s0->src_0, mo_tmpr2, 1, tau, 2, 0, GLB_T);
 		measure_mesons_core(p0->W_0_0[t], pp->W_0_p, s0->src_0, mo_tmpr3, 1, tau, 2, 0, GLB_T);
@@ -438,8 +587,6 @@ void gen_mo_p(struct mo_p* mo, struct prop_common* p0, struct prop_p* pp, struct
 #undef X
 		}
 
-		//free_spinor_field_f(source_0_0);
-		//free_spinor_field_f(W_0_0);
 #define X(NAME)\
 		free_mo(mo_tmp##NAME);
         R
@@ -451,15 +598,21 @@ void gen_mo_p(struct mo_p* mo, struct prop_common* p0, struct prop_p* pp, struct
 #undef X
     lprintf("MAIN",0,"Generated mo p\n");
 #undef R
+    /// \endcond
 }	
 
+/**
+ * @brief Resets the mo_p structure, setting all correlation functions to 0.
+ */
 void reset_mo_p(struct mo_p* mo){
+/// \cond
 #define R X(d) X(pi) X(r1) X(r2) X(r3) X(r4)
 #define X(NAME)\
 	reset_mo(mo->NAME);
 	R
 #undef X
 #undef R
+/// \endcond
 	for(int i=0; i<3; i++){
 		reset_mo(mo->t1[i]);
 		reset_mo(mo->t2[i]);
@@ -469,6 +622,9 @@ void reset_mo_p(struct mo_p* mo){
 	}
 }
 
+/**
+ * @brief Frees the memory allocated by mo_0 structure.
+ */
 void free_mo_0(struct mo_0* mo){
 	free_mo(mo->pi);
 	for(int i=0; i<3; i++) for (int j=0;j<3;j++){
@@ -477,13 +633,18 @@ void free_mo_0(struct mo_0* mo){
 	free(mo);
 }
 
+/**
+ * @brief Frees the memory allocated by mo_p structure.
+ */
 void free_mo_p(struct mo_p* mo){
+/// \cond
 #define R X(d) X(pi) X(r1) X(r2) X(r3) X(r4)
 #define X(NAME)\
 	free_mo(mo->NAME);
 	R
 #undef X
 #undef R
+/// \endcond
 	for(int i=0; i<3; i++){
 		free_mo(mo->t1[i]);
 		free_mo(mo->t2[i]);
@@ -494,6 +655,14 @@ void free_mo_p(struct mo_p* mo){
 	free(mo);
 }
 
+/**
+ * @brief "Old style" IO where each correlation function is saved to separate file. Prints zero-momentum only.
+ * @param molist an array of mo_0 objects, where each index corresponds to a different noise source
+ * @param numsources number of noise sources
+ * @param path path to which the file should be saved 
+ *
+ * @see IO_json_0
+ */
 void IOold_0(struct mo_0* molist[], int numsources, char* path){
 	for(int src=0; src<numsources; src++){
         lprintf("IOold_0",0,"Printing pi for source %d\n",src);
@@ -507,6 +676,14 @@ void IOold_0(struct mo_0* molist[], int numsources, char* path){
 	}
 }
 
+/**
+ * @brief "Old style" IO where each correlation function is saved to separate file. Prints momentum p contractions.
+ * @param molist an array of mo_p objects, where each index corresponds to a different noise source
+ * @param numsources number of noise sources
+ * @param path path to which the file should be saved 
+ *
+ * @see IO_json_p
+ */
 void IOold_p(struct mo_p* molist[], int numsources, char* path	){
 	char tmp[100];
 	for(int src=0; src<numsources; src++){
@@ -546,6 +723,11 @@ void IOold_p(struct mo_p* molist[], int numsources, char* path	){
 		}
 	}
 }
+
+/**
+ * @brief Runs the set of functions in the beginning of the code.
+ * @param listlist pointer to a FILE pointer to the input file
+ */
 
 void setup(FILE** listlist){
   char tmp[256], *cptr;
@@ -656,6 +838,7 @@ void setup(FILE** listlist){
   init_propagator_eo(nm,m,mes_var.precision);
 
 }
+/// \cond
 #define JSON(STRUCT, NAME) \
         fprintf(f,"\t\"%s\":{\n\t\t",NAME);\
 		for(px=0;px<pmax;++px) for(py=0;py<pmax;++py) for(pz=0;pz<pmax;++pz){\
@@ -709,7 +892,14 @@ void setup(FILE** listlist){
             }\
         }\
         fprintf(f,"\n\t}");
+/// \endcond
 
+/**
+ * @brief Prints a bundle of meson_observables with momentum 0 to a json file.
+ * @param molist an array of mo_0 objects, where each index corresponds to a different noise source
+ * @param numsources number of noise sources
+ * @param path path to which the file should be saved 
+ */
 void IO_json_0(struct mo_0* molist[], int numsources, char* path){
     FILE* f;
 	char outfile[256] = {};
@@ -735,6 +925,12 @@ void IO_json_0(struct mo_0* molist[], int numsources, char* path){
 	return;
 }
 
+/**
+ * @brief Prints a bundle of meson_observables with momentum p to a json file.
+ * @param molist an array of mo_p objects, where each index corresponds to a different noise source
+ * @param numsources number of noise sources
+ * @param path path to which the file should be saved 
+ */
 void IO_json_p(struct mo_p* molist[], int numsources, char* path){
     FILE* f;
 	char outfile[256] = {};
