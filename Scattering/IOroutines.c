@@ -1,4 +1,6 @@
 
+#ifndef IO_ROUTINES
+#define IO_ROUTINES
 // Followed by the list of IO functions from meson_scattering.c
 /* Mesons parameters */
 typedef struct _input_scatt {
@@ -7,10 +9,10 @@ typedef struct _input_scatt {
 	double precision;
 	int nhits;
 	int tsrc;
-	char outdir[256], p1[16], p2[16], p3[16];
+	char outdir[256], bc[16], p[256];
 
 	/* for the reading function */
-	input_record_t read[10];
+	input_record_t read[9];
 
 } input_scatt;
 
@@ -23,9 +25,8 @@ typedef struct _input_scatt {
 		{"number of inversions per cnfg", "mes:nhits = %d", INT_T, &(varname).nhits},\
 		{"Source time:", "mes:tsrc = %d", INT_T, &(varname).tsrc},\
 		{"Output directory:", "mes:outdir = %s", STRING_T, &(varname).outdir},\
-		{"Momentum 1:", "mes:p1 = %s", STRING_T, &(varname).p1},\
-		{"Momentum 2:", "mes:p2 = %s", STRING_T, &(varname).p2},\
-		{"Momentum 3:", "mes:p3 = %s", STRING_T, &(varname).p3},\
+		{"Boundary conditions:", "mes:bc = %s", STRING_T, &(varname).bc},\
+		{"Momenta:", "mes:p = %s", STRING_T, &(varname).p},\
 		{NULL, NULL, INT_T, NULL}\
 	}\
 }
@@ -160,3 +161,31 @@ void read_cmdline(int argc, char* argv[]) {
 	}
 
 }
+int** getmomlist(char* momstring, int* N){
+    char* tmp = momstring;
+    *N = 0;
+    while(tmp != NULL){
+        tmp = strchr(tmp+1,'(');
+        (*N)++;
+    }
+    int** plist = (int**) malloc(*N*sizeof(int*));
+    int i=0;
+    tmp = momstring;
+    lprintf("getmomlist",0,"%d %s\n",*N,tmp);
+    while(tmp != NULL){
+        plist[i] = (int*) malloc(3*sizeof(int));
+        sscanf(tmp,"(%d,%d,%d)", plist[i], plist[i]+1, plist[i]+2);
+        lprintf("getmomlist",0,"(%d,%d,%d)\n",*(plist[i]),*(plist[i]+1),*(plist[i]+2));
+        tmp = strchr(tmp+1,'(');
+        i++;
+    }
+    return plist;
+}
+
+void freep(int **p, int N){
+    for(int i=0; i<N;i++){
+        free(p[i]);
+    }
+    free(p);
+}
+#endif
