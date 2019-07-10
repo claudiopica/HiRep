@@ -23,10 +23,9 @@ mes:csw = 0.0
 mes:precision = 1e-24
 mes:nhits = 1
 mes:outdir = output
-mes:p1 = (0,0,1)
-mes:p2 = (1,1,0)
-mes:p3 = (1,1,1)
-mes:tsrc = 8
+mes:bs = PA
+mes:p = (0,0,1) (1,1,0) (1,1,1)
+mes:tsrc = 0
 
 n_eigenvalues = 128
 eva_nevt = 128
