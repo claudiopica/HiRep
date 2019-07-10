@@ -112,10 +112,11 @@ while(1){
         }
     }
     lprintf("MAIN",0,"num sources: %d, path: %s\n",numsources,path);
-    IOold_0(mo_p0, numsources, path);
+    //IOold_0(mo_p0, numsources, path);
     IO_json_0(mo_p0, numsources, path);
     for(int i=0; i<Nmom; i++){
-        IOold_p(mo_p[i], numsources, path);
+        //IOold_p(mo_p[i], numsources, path);
+        IO_json_p(mo_p[i], numsources, path);
     }
 
     for(int src=0;src<numsources;src++){

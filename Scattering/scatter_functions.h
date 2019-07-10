@@ -683,6 +683,33 @@ void setup(FILE** listlist){
         }\
         fprintf(f,"\n\t}");
 
+#define JSON_4PT(STRUCT, NAME) \
+        fprintf(f,"\t\"%s\":{\n\t\t",NAME);\
+		for(px=0;px<pmax;++px) for(py=0;py<pmax;++py) for(pz=0;pz<pmax;++pz){\
+            fprintf(f,"\"(%d,%d,%d)\":[[\n",px,py,pz);\
+            for(int src=0; src<numsources; src++){\
+                for(int t=0;t<GLB_T;++t){\
+                    fprintf(f,"\t\t\t\t[%f,%f]", 4*(molist[src]->STRUCT->corr_re[INDEX(px,py,pz,pmax,t)]), 4*(molist[src]->STRUCT->corr_im[INDEX(px,py,pz,pmax,t)]));\
+                    if(t<GLB_T-1){ \
+                        fprintf(f,",\n");\
+                    } else {\
+                        fprintf(f,"]");\
+                    }\
+                }\
+                if(src<numsources-1){\
+                    fprintf(f,",[\n");\
+                } else {\
+                    fprintf(f,"]");\
+                }\
+            }\
+            if(px==pmax-1 && py==pmax-1 && pz==pmax-1){\
+                fprintf(f,"\n");\
+            } else {\
+                fprintf(f,",\n\t\t");\
+            }\
+        }\
+        fprintf(f,"\n\t}");
+
 void IO_json_0(struct mo_0* molist[], int numsources, char* path){
     FILE* f;
 	char outfile[256] = {};
@@ -700,6 +727,42 @@ void IO_json_0(struct mo_0* molist[], int numsources, char* path){
             JSON(rho[i][j], c); 
             if(i!=2 || j!=2) fprintf(f,",");
             fprintf(f,"\n");
+        }
+
+        fprintf(f,"}");
+		fclose(f);
+	}
+	return;
+}
+
+void IO_json_p(struct mo_p* molist[], int numsources, char* path){
+    FILE* f;
+	char outfile[256] = {};
+	int px,py,pz,t;
+    int pmax = 2;
+	if(PID==0){
+		sprintf(outfile,"%s/p_(%d,%d,%d)_n%s.json", path, molist[0]->p[0], molist[0]->p[1], molist[0]->p[2],strrchr(cnfg_filename,'n') + 1 );
+        lprintf("IO_json_0",0,"%s\n",outfile);
+		f=fopen(outfile,"w+");
+        fprintf(f,"{\n");
+        JSON(pi, "pi"); fprintf(f,",\n");
+        JSON_4PT(d, "d"); fprintf(f,",\n");
+        JSON(r1, "r1"); fprintf(f,",\n");
+        JSON(r2, "r2"); fprintf(f,",\n");
+        JSON(r3, "r3"); fprintf(f,",\n");
+        JSON(r4, "r4"); fprintf(f,",\n");
+        for(int i=0;i<3;i++){
+            char c[256];
+            sprintf(c,"t1_g%d",i+1);
+            JSON(t1[i], c); fprintf(f,",\n");
+            sprintf(c,"t2_g%d",i+1);
+            JSON(t2[i], c); fprintf(f,",\n");
+            for(int j=0;j<3;j++){
+                sprintf(c,"rho_g%d_g%d",i+1,j+1);
+                JSON(rho[i][j], c); 
+                if(i!=2 || j!=2) fprintf(f,",");
+                fprintf(f,"\n");
+            }
         }
 
         fprintf(f,"}");
