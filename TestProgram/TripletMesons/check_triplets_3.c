@@ -40,31 +40,16 @@
 #define M_PI 3.14159265358979323846264338327950288419716939937510
 #endif
 
-//#error "Old version of Mesons, it should be updated"
-// A = id
-// Pi = g5
-// Rho = g1
-// B = g0g5g1
-// Pi2 = g0g5
-//Rho2 = g2
-//Xt = g0
-//Yt = g5g1
 
-enum MesonT        {A=0,Pi, Rho,B, Pi2,Rho2,Xt,Yt};
-//static int gid[8]= {1, -1, -1, -1,  1,  1,  1, -1}; /* gid = tr \bar{Gamma} Gamma / 4 */
-//static int g0[8] = {1,  1,  1, -1, -1, -1,  1, -1}; /* g0 = tr Gamma Gamma / 4 */
-//static int g1[8] = {1,  1, -1, -1,  1, -1, -1, +1}; /* g1 = tr gamma_1 \bar{Gamma} gamma_1 Gamma / 4 */
-//static int g2[8] = {1,  1,  1,  1,  1,  1, -1, -1}; /* g2 = tr gamma_2 \bar{Gamma} gamma_2 Gamma / 4 */
-//static int g3[8] = {1,  1,  1,  1,  1,  1, -1, -1}; /* g3 = tr gamma_3 \bar{Gamma} gamma_3 Gamma / 4 */
-//static int gb[8] = {1,  1,  1, -1, -1, -1,  1, -1};
 
 static double gid[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }; /* gid = tr \bar{Gamma} Gamma / 4 */
-static double g0[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }; /* g0 = tr Gamma Gamma / 4 */
+static double g0[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }; /* g0 = tr gamma_0 Gamma gamma_0 \bar{Gamma} / 4  Because our matrices Gamma are not necessary hermitiean !*/
 static double g1[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }; /* g1 = tr gamma_1 \bar{Gamma} gamma_1 Gamma / 4 */
 static double g2[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }; /* g2 = tr gamma_2 \bar{Gamma} gamma_2 Gamma / 4 */
 static double g3[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 }; /* g3 = tr gamma_3 \bar{Gamma} gamma_3 Gamma / 4 */
 static double gb[16] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1 };
 char* mes_channel_names[16]={"g5","id","g0","g1","g2","g3","g0g1","g0g2","g0g3","g0g5","g5g1","g5g2","g5g3","g0g5g1","g0g5g2","g0g5g3"};
+
 #define mult_mat(r,A,B) \
     { \
       int _i, _j, _k; \
@@ -108,7 +93,9 @@ static void adj_mat(double complex At[4][4],double complex A[4][4])
           }
         }
       }
-static void print_mat(double complex mat[4][4], const char name[]) {
+
+/*VD: This is kept to to some debugging.
+  static void print_mat(double complex mat[4][4], const char name[]) {
     int i,j;
     lprintf("MAIN",0,"%s = \n", name);
     for(i=0; i<4; i++) {
@@ -118,7 +105,7 @@ static void print_mat(double complex mat[4][4], const char name[]) {
           }
           lprintf("MAIN",0,"]\n");
         }
-      }
+      }*/
 /* Mesons parameters */
 typedef struct _input_mesons {
   char mstring[256];
@@ -158,36 +145,73 @@ mult_mat(tmp2,g0,tmp);
 mult_mat(Gammabar,tmp2,g0);
 mult_mat(tmp,Gammabar,Gamma);
 trace_mat(r,tmp);
-printf("get_gid %f %f \n",creal(r)/4.,cimag(r)/4.);
+// printf("get_gid %f %f \n",creal(r)/4.,cimag(r)/4.);
 return r/4.0;
 }
+char char_t[100];
+FILE *fp;
+char path[1035];
 
-/* g1 = tr gamma_1 \bar{Gamma} gamma_1 Gamma / 4 */
-double complex get_gi(double complex Gamma[4][4],int i){
+/* Ugly: read the correlator from the output files ! This is because the function that compute the props, make the contractions and write the output zeros the correlators after writting them.
+The purpose of this entire test is to check the function without modifying it */
+static double read_output(int t,int i,int re_im_flag){
+  char char_t[100];
+  FILE *fp;
+  char path[1035];
+  char command[500];
+  double out;
+
+  sprintf(char_t, "%d", t+1);
+  strcpy(command, "grep \"TRIPLET ");
+  strcat(command,mes_channel_names[i  ] );
+  if (re_im_flag==0) // get the real part.
+  {
+    strcat(command, "=\" out_0 | awk -F'=' '{print $3}' | awk '{for (i=1;i<=NF;i++) print $i}' | awk 'NR==") ;
+  }
+  if (re_im_flag==1)
+  {
+    strcat(command, "_im=\" out_0 | awk -F'=' '{print $3}' | awk  '{for (i=1;i<=NF;i++) print $i}' | awk 'NR==") ;
+  }
+  strcat(command, char_t);
+  strcat(command, "'");
+
+  //printf("%d %d %s \n", i,t ,command);
+  fp = popen(command, "r");
+  while (fgets(path, sizeof(path)-1, fp) != NULL) {
+     //printf("%s", path);
+     sscanf(path, "%lf", &out);
+  }
+
+  /* close */
+  pclose(fp);
+
+  return out;
+}
+
+/* = tr gamma_mu \bar{Gamma} gamma_mu Gamma / 4 \bar{Gamma} = gamma_0 Gamma^\dagger gamma_0 */
+double complex get_gmu(double complex Gamma[4][4],int mu){
   int  sign;
   double complex tmp[4][4],tmp2[4][4], tmp3[4][4];
   double complex Gammabar[4][4];
   double complex r;
-  double complex g0[4][4], gi[4][4];
+  double complex g0[4][4], gmu[4][4];
 
   g0_debug(g0, &sign);
-  if (i==1)  g1_debug(gi, &sign);
-  if (i==2)  g2_debug(gi, &sign);
-  if (i==3)  g3_debug(gi, &sign);
-
-  //printf("%d %d \n",i,sign);
-  //print_mat(Gamma,"Gamma");
+  if (mu==1)  g1_debug(gmu, &sign);
+  if (mu==2)  g2_debug(gmu, &sign);
+  if (mu==3)  g3_debug(gmu, &sign);
+  if (mu==0)  g0_debug(gmu, &sign);
   adj_mat(tmp,Gamma);
-  //print_mat(tmp,"Gammadag");
+
   mult_mat(tmp2,g0,tmp);
   mult_mat(Gammabar,tmp2,g0);
-  //print_mat(Gammabar,"gammabar");
-  mult_mat(tmp,gi,Gammabar);
-  mult_mat(tmp2,gi,Gamma);
+
+  mult_mat(tmp,gmu,Gammabar);
+  mult_mat(tmp2,gmu,Gamma);
   mult_mat(tmp3,tmp,tmp2);
-  print_mat(tmp3,"tmp3");
+
   trace_mat(r,tmp3);
-  printf("get_g1 %d %f %f \n",i,creal(r)/4.,cimag(r)/4.);
+//  printf("get_g1 %d %f %f \n",i,creal(r)/4.,cimag(r)/4.);
   return r/4.0;
 }
 
@@ -197,20 +221,16 @@ double complex get_g0(double complex Gamma[4][4]){
   set_zero_mat(tmp);
   mult_mat(tmp,Gamma,Gamma);
   trace_mat(r,tmp);
-  printf("get_g0 %f %f \n",creal(r)/4.,cimag(r)/4.);
+  //printf("get_g0 %f %f \n",creal(r)/4.,cimag(r)/4.);
   return r/4.0;
 }
 int main(int argc,char *argv[])
 {
   int i, t,sign;
-  double *ex_triplets[8];
-
+  double *ex_triplets[16];
   char pame[256];
   int return_value=0;
-  char command[500];
-  char char_t[100];
-  FILE *fp;
-  char path[1035];
+
 
   double complex g[16][4][4];
   g5_debug(g[0], &sign);
@@ -219,7 +239,7 @@ int main(int argc,char *argv[])
   g1_debug(g[3], &sign);
   g2_debug(g[4], &sign);
   g3_debug(g[5], &sign);
-  g0g1_debug(g[6],&sign);//  g0g1
+  mult_mat(g[6],g[2],g[3]) //g0g1
   g0g2_debug(g[7], &sign);
   g0g3_debug(g[8], &sign);
   mult_mat(g[9],g[2],g[0]) //g0g5
@@ -234,16 +254,12 @@ int main(int argc,char *argv[])
 
   for (i=0;i<16;i++){
     gid[i] =  get_gid(g[i]);
-    g0[i] =  get_g0(g[i]);
-    g1[i] =  get_gi(g[i],1);
-    g2[i] =  get_gi(g[i],2);
-    g3[i] =  get_gi(g[i],3);
+    g0[i] =  get_gmu(g[i],0);
+    g1[i] =  get_gmu(g[i],1);
+    g2[i] =  get_gmu(g[i],2);
+    g3[i] =  get_gmu(g[i],3);
   }
-  get_gid(g[4]);
-  get_g0(g[4]);
-  get_gi(g[4],1);
-  get_gi(g[4],2);
-  get_gi(g[4],3);
+
   logger_map("DEBUG","debug");
   logger_setlevel(0,200);
 
@@ -272,53 +288,17 @@ int main(int argc,char *argv[])
   error(!(GLB_X==GLB_Y && GLB_X==GLB_Z),1,"main", "This test works only for GLB_X=GLB_Y=GLB_Z");
 
   measure_spectrum_pt(0,1,&mass,1,3,0,1e-14);
-  double corr_triplets_re[16][GLB_T];
-  double corr_triplets_im[16][GLB_T];
+
   double complex corr_triplets[16][GLB_T];
 
   for(i=0; i<16; i++) {
     for (t=0; t <GLB_T ;t++){
-      sprintf(char_t, "%d", t+1);
-      strcpy(command, "grep \"TRIPLET ");
-      strcat(command,mes_channel_names[i  ] );
-      strcat(command, "=\" out_0 | awk -F'=' '{print $3}' | awk '{for (i=1;i<=NF;i++) print $i}' | awk 'NR==") ;
-      strcat(command, char_t);
-      strcat(command, "'");
-      //printf("%d %d %s \n", i,t ,command);
-      fp = popen(command, "r");
-      while (fgets(path, sizeof(path)-1, fp) != NULL) {
-         //printf("%s", path);
-         sscanf(path, "%lf", &corr_triplets_re[i][t]);
-      }
-
-      /* close */
-      pclose(fp);
-
-      strcpy(command, "grep \"TRIPLET ");
-      strcat(command,mes_channel_names[i  ] );
-      strcat(command, "_im=\" out_0 | awk -F'=' '{print $3}' | awk  '{for (i=1;i<=NF;i++) print $i}' | awk 'NR==") ;
-      strcat(command, char_t);
-      strcat(command, "'");
-
-      fp = popen(command, "r");
-      while (fgets(path, sizeof(path)-1, fp) != NULL) {
-        sscanf(path, "%lf", &corr_triplets_im[i][t]);
-      }
-
-      /* close */
-      pclose(fp);
-
+      corr_triplets[i][t]=read_output(t,i,0) + I *read_output(t,i,1);
     }
   }
 
-  for(i=0; i<16; i++) {
-    for(t=0; t<GLB_T; t++) {
-      corr_triplets[i][t] = corr_triplets_re[i][t] + I*corr_triplets_im[i][t];
-    }
-  }
 
   ex_triplets[0]=(double*)malloc(16*GLB_T*sizeof(double));
-
   for(i=0; i<16; i++) {
     ex_triplets[i]=ex_triplets[0]+i*GLB_T;
   }
@@ -326,28 +306,31 @@ int main(int argc,char *argv[])
 //  /* CALCOLO ESPLICITO */
   free_correlators(ex_triplets);
 
-//
+// VD
+// add a test for wall source
+// add disconnected test.
   lprintf("TEST",0,"\nANALITICO\tPOINT-TO-ALL\tERROR (must be less than 1e-9)\n");
   for(i=0; i<16; i++) {
     lprintf("TEST",0,"TRIPLET CORRELATOR %s\n", mes_channel_names[i]);
     for(t=0; t<GLB_T; t++) {
-        lprintf("TEST",0,"%e\t%e\t%e\n",      ex_triplets[i][t],	      corr_triplets_re[i][t],	      fabs(ex_triplets[i][t]-corr_triplets_re[i][t]));
-        if (fabs(ex_triplets[i][t]-corr_triplets_re[i][t]) > 1e-9)
+        lprintf("TEST",0,"%e\t%e\t%e\n",      ex_triplets[i][t],	      creal(corr_triplets[i][t]),	      fabs(ex_triplets[i][t]-creal(corr_triplets[i][t])));
+        if (fabs(ex_triplets[i][t]-creal(corr_triplets[i][t])) > 1e-10)
         {
-          printf("%d %d %e %e  \n",i,t,ex_triplets[i][t],	      corr_triplets_re[i][t]);
+          printf("%d %d %e %e  \n",i,t,ex_triplets[i][t],	      creal(corr_triplets[i][t]));
+          return_value +=1;
+        }
+        if (fabs(cimag(corr_triplets[i][t])) > 1e-10)
+        {
+          printf("Complex part is not negligible %e \n" ,cimag(corr_triplets[i][t]));
           return_value +=1;
         }
       }
   }
 
+printf("return_value = %d\n", return_value);
 
-
-  finalize_process();
-
-
-  printf("return_value = %d\n", return_value);
-
- return return_value;
+finalize_process();
+return return_value;
 }
 
 
@@ -369,7 +352,7 @@ void free_correlators(double **triplets) {
   double A2[GLB_T], B2[4][GLB_T];
   double complex A[GLB_T], B[4][GLB_T];
   double complex tmp,eit;
-  double norm2, ct, st, z;
+  double norm2,  z;
   int i,j, t;
   double k[4];
   double sigma[4] = {0.,0.,0.,0.};
@@ -411,8 +394,6 @@ void free_correlators(double **triplets) {
             norm2 = tmp*conj(tmp);
 
 	          for(t = 0; t < GLB_T; t++) {
-              ct = cos((2.0*M_PI*t*k[0])/GLB_T);
-              st = sin((2.0*M_PI*t*k[0])/GLB_T);
               eit =cos((2.0*M_PI*t*k[0])/GLB_T) +I*sin((2.0*M_PI*t*k[0])/GLB_T);
               A[t] += creal(tmp)*eit/norm2;
               for (j=0;j <4; j++)  B[j][t] += sin((2.0*M_PI*k[j])/GLB_T) * eit/ norm2;
