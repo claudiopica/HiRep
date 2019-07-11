@@ -369,13 +369,13 @@ void make_prop_common(struct prop_common* prop, struct src_common* src0, int ndi
     fun(prop->Q_0_eta, src0->src_0_eta, ndilute, tau);
 
     prop->W_0_0 = (spinor_field**) malloc(GLB_T*sizeof(spinor_field*));
-    spinor_field* tmp = alloc_spinor_field_f(4*NF,&glattice);
     for(int t=0; t<GLB_T; t++){
         prop->W_0_0[t] = alloc_spinor_field_f(4*NF,&glattice);
+        spinor_field* tmp = alloc_spinor_field_f(4*NF,&glattice);
         create_sequential_source(tmp,(t+tau)%GLB_T,prop->Q_0);
-        fun(prop->W_0_0[t], tmp, 1, tau);
+        fun(prop->W_0_0[t], tmp, 4, tau);
+        free_spinor_field_f(tmp);
     }
-    free_spinor_field_f(tmp);
     create_sequential_source(src0->src_0_0,tau,prop->Q_0);
     lprintf("MAIN",0,"Propagator with momentum 0 inverted\n");
 }
@@ -845,7 +845,7 @@ void setup(FILE** listlist){
             fprintf(f,"\"(%d,%d,%d)\":[[\n",px,py,pz);\
             for(int src=0; src<numsources; src++){\
                 for(int t=0;t<GLB_T;++t){\
-                    fprintf(f,"\t\t\t\t[%f,%f]", 2*(molist[src]->STRUCT->corr_re[corr_ind(px,py,pz,pmax,t,1,0)]), 2*(molist[src]->STRUCT->corr_im[corr_ind(px,py,pz,pmax,t,1,0)]));\
+                    fprintf(f,"\t\t\t\t[%e,%e]", 2*(molist[src]->STRUCT->corr_re[corr_ind(px,py,pz,pmax,t,1,0)]), 2*(molist[src]->STRUCT->corr_im[corr_ind(px,py,pz,pmax,t,1,0)]));\
                     if(t<GLB_T-1){ \
                         fprintf(f,",\n");\
                     } else {\
@@ -872,7 +872,7 @@ void setup(FILE** listlist){
             fprintf(f,"\"(%d,%d,%d)\":[[\n",px,py,pz);\
             for(int src=0; src<numsources; src++){\
                 for(int t=0;t<GLB_T;++t){\
-                    fprintf(f,"\t\t\t\t[%f,%f]", 4*(molist[src]->STRUCT->corr_re[INDEX(px,py,pz,pmax,t)]), 4*(molist[src]->STRUCT->corr_im[INDEX(px,py,pz,pmax,t)]));\
+                    fprintf(f,"\t\t\t\t[%e,%e]", 4*(molist[src]->STRUCT->corr_re[INDEX(px,py,pz,pmax,t)]), 4*(molist[src]->STRUCT->corr_im[INDEX(px,py,pz,pmax,t)]));\
                     if(t<GLB_T-1){ \
                         fprintf(f,",\n");\
                     } else {\
