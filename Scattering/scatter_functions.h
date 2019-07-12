@@ -354,7 +354,8 @@ void make_propagator_PA(spinor_field* prop, spinor_field* src, int ndilute, int 
  */
 void make_prop_common(struct prop_common* prop, struct src_common* src0, int ndilute, int tau, char* bc){
     void (*fun) (spinor_field*, spinor_field*,int,int);
-    if(bc == "PA"){
+    //if(bc == "PA"){
+    if(strcmp(bc,"PA") == 0){
         lprintf("make_prop_common",0,"Inverting propagator with P+A boundary conditions");
         fun = &make_propagator_PA;
     } else {
@@ -391,7 +392,7 @@ void make_prop_common(struct prop_common* prop, struct src_common* src0, int ndi
  */
 void make_prop_p(struct prop_p* prop, struct src_p* srcp, struct src_common* src0, int ndilute, int tau, char* bc){
     void (*fun) (spinor_field*, spinor_field*,int,int);
-    if(bc == "PA"){
+    if(strcmp(bc,"PA") == 0){
         lprintf("make_prop_p",0,"Inverting propagator with P+A boundary conditions");
         fun = &make_propagator_PA;
     } else {
@@ -729,10 +730,10 @@ void IOold_p(struct mo_p* molist[], int numsources, char* path	){
  * @param listlist pointer to a FILE pointer to the input file
  */
 
-void setup(FILE** listlist){
+void setup(FILE** listlist, double* m){
   char tmp[256], *cptr;
   int nm;
-  double m[256];
+//  double m[256];
   FILE* list;
   *listlist = list;
   filename_t fpars;

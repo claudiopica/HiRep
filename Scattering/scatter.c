@@ -40,12 +40,13 @@ int main(int argc,char *argv[])
 
   FILE* list;
   int tau=0;
+  double m[256];
 
   //Copy I/O from another file
   read_cmdline(argc, argv);
   setup_process(&argc,&argv);
 
-  setup(&list);
+  setup(&list, m);
   list=NULL;
   if(strcmp(list_filename,"")!=0) {
     error((list=fopen(list_filename,"r"))==NULL,1,"main [mk_mesons.c]" ,
@@ -125,10 +126,6 @@ while(1){
             free_mo_p(mo_p[i][src]);
         }
     }
-    /*
-    free(mo_p0);
-    free(mo_p);
-    */
 
     gettimeofday(&end,0);
     timeval_subtract(&etime,&end,&start);
