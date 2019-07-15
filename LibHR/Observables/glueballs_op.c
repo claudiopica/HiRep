@@ -2590,8 +2590,6 @@ OP_oneTr_p_0_0_0_Ir_1_C_1_n_2(numerical_op+1);
 OP_oneTr_p_0_0_0_Ir_1_C_1_n_3(numerical_op+2);
 OP_oneTr_p_0_0_0_Ir_1_C_1_n_4(numerical_op+3);
 OP_oneTr_p_0_0_0_Ir_1_C_1_n_5(numerical_op+4);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_-2(numerical_op+5);
-OP_oneTr_p_0_0_0_Ir_1_C_1_n_-2(numerical_op+6);
 }
 
 void eval_all_glueball_oneTr_ops_p_0_0_0_Ir_3_C_1(double complex * numerical_op)
