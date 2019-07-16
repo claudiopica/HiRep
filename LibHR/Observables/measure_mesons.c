@@ -36,7 +36,9 @@ meson_observable *cvc_correlators = NULL;
 char* meson_channel_names[NGAMMA_IND]={"g5","id","g0","g1","g2","g3","g0g1","g0g2","g0g3","g0g5","g5g1","g5g2","g5g3","g0g5g1","g0g5g2","g0g5g3"};
 
 static int vector_gammas[4] = {_g0, _g1, _g2, _g3};
-
+/* VD : denoting  Gbar <- Gamma4%*%t(Conj(G))%*%Gamma4, the sign is determined as follows:
+  if  Gamma5%*%Conj(Gbar) - G%*% Gamma5 == 0; sgn = 1
+  else (if Gamma5%*%Conj(Gbar) + G%*% Gamma5 == 0); sgn= -1 otherwise.*/
 static double determine_sign(gamma_ind ind){
   if (ind == _g5 || ind == _g0 || ind == _g1 || ind == _g3 || ind == _g0g1 || ind == _g0g3 || ind == _g0g5 || ind == _g5g1 || ind==_g5g3 || ind==_g0g5g2){
     return -1.;
@@ -87,7 +89,7 @@ void init_meson_correlators(int meas_offdiag){
 	  add_meson_observable(&meson_correlators,i,j,name,"TRIPLET",determine_sign(j));
 	}
       }
-    }  
+    }
   }
 }
 
@@ -212,14 +214,14 @@ void measure_mesons_core(spinor_field* psi0, spinor_field* psi1, spinor_field* e
   lprintf("",50,"\n");
   for (px=0;px<n_mom;++px) for (py=0;py<n_mom;++py) for (pz=0;pz<n_mom;++pz){
 	for(i=0; i<nm; i++) {
-	  for (t=0; t<T; t++) {	 
+	  for (t=0; t<T; t++) {
 	    tc = (zerocoord[0]+t+GLB_T-tau)%GLB_T+offset;
-	    for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) { 
-		  ix=ipt(t,x,y,z);					
+	    for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) {
+		  ix=ipt(t,x,y,z);
 		  pdotx = 2.0*PI*(((double) px)*(x+zerocoord[1])/GLB_X + ((double) py)*(y+zerocoord[2])/GLB_Y + ((double) pz)*(z+zerocoord[3])/GLB_Z);
 		  cpdotx=cos(pdotx);
 		  spdotx=sin(pdotx);
-		  for (beta=0;beta<4;beta++){ 
+		  for (beta=0;beta<4;beta++){
 		    _spinmatrix_assign_row(sma, *_FIELD_AT(&psi0[beta*nm+i],ix), beta);
 		    _spinmatrix_assign_row(smb, *_FIELD_AT(&psi1[beta*nm+i],ix), beta);
 		    _spinmatrix_assign_row(sm_src, *_FIELD_AT(&eta[beta],ix), beta);
@@ -235,6 +237,8 @@ void measure_mesons_core(spinor_field* psi0, spinor_field* psi1, spinor_field* e
 		    }
 		    else{
 		      spinmatrix_op(&smtmp1,&sma,motmp->ind1);
+          //VD r spinmatrix, s spinmatrix, k result; Tr [ r^dag . s]
+          // VD _spinmatrix_mul_trace(k, r, s)
 		      _spinmatrix_mul_trace(tr,smtmp1,sm_src);
 		    }
 		    motmp->corr_re[corr_ind(px,py,pz,n_mom,tc,nm,i)] += motmp->sign*(creal(tr)*cpdotx+cimag(tr)*spdotx);
@@ -267,17 +271,17 @@ static void measure_conserved_core(spinor_field* psi0, spinor_field* psi1, spino
   lprintf("",50,"\n");
   for (px=0;px<n_mom;++px) for (py=0;py<n_mom;++py) for (pz=0;pz<n_mom;++pz){
 	for(i=0; i<nm; i++) {
-	  for (t=0; t<T; t++) {	 
+	  for (t=0; t<T; t++) {
 	    tc = (zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T+offset;
 	    for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) {
 		  ix=ipt(t,x,y,z);
 
-					
+
 		  pdotx = 2.0*PI*(((double) px)*(x+zerocoord[1])/GLB_X + ((double) py)*(y+zerocoord[2])/GLB_Y + ((double) pz)*(z+zerocoord[3])/GLB_Z);
 		  cpdotx=cos(pdotx);
 		  spdotx=sin(pdotx);
 		  for (a=0;a<NF;++a){
-		    for (beta=0;beta<4;beta++){ 
+		    for (beta=0;beta<4;beta++){
 		      _propagator_assign(sp0, *_FIELD_AT(&psi0[a*4*nm+beta*nm+i],ix),a,beta);
 		      _propagator_assign(sp1, *_FIELD_AT(&psi0[a*4*nm+beta*nm+i],ix),a,beta);
 		    }
@@ -289,36 +293,36 @@ static void measure_conserved_core(spinor_field* psi0, spinor_field* psi1, spino
 
 			  ixmu = iup(ix,motmp->ind2);
 			  for (a=0;a<NF;++a){
-			    for (beta=0;beta<4;beta++){ 
+			    for (beta=0;beta<4;beta++){
 			      _propagator_assign(spf, *_FIELD_AT(&psi0[a*4*nm+beta*nm+i],ixmu), a,beta); //S(x+mu, y)
 			    }
 			  }
 			  u1 = _4FIELD_AT(u_gauge_f,ix,motmp->ind2);
 
 			  // Tr [ g5 (1+g_mu) U^(x) S(x,0) g5 g_mu S^(x+mu, y) ]
-			  _suNf_inverse_prop_multiply(Usp,*u1,sp0); //U^(x) S(x,0) 
+			  _suNf_inverse_prop_multiply(Usp,*u1,sp0); //U^(x) S(x,0)
 			  sptmp1=Usp;
-			  op_propagator(&sptmp2,&sptmp1,motmp->ind1); //g_mu U^(x) S(x,0) 
-			  _propagator_add(sptmp1,sptmp1,sptmp2); //(1+g_mu) U^(x) S(x,0) 
-			  _g5_propagator(sptmp2,sptmp1); //g5 (1+g_mu) U^(x) S(x,0) 
+			  op_propagator(&sptmp2,&sptmp1,motmp->ind1); //g_mu U^(x) S(x,0)
+			  _propagator_add(sptmp1,sptmp1,sptmp2); //(1+g_mu) U^(x) S(x,0)
+			  _g5_propagator(sptmp2,sptmp1); //g5 (1+g_mu) U^(x) S(x,0)
 			  _propagator_dagger(sptmp1,spf); //S^(x+mu, 0)
 			  _g5_propagator(sptmp3,sptmp1); //g5 g_mu S^(x+mu, 0)
 			  op_propagator(&sptmp1,&sptmp3,motmp->ind1); //g_mu S^(x+mu, 0)
-			  _propagator_mul(spleft,sptmp2,sptmp1);	
-			    
+			  _propagator_mul(spleft,sptmp2,sptmp1);
+
 
 			  // Tr [ g5 (1+g_mu) U(x) S(x+mu,0) g5 g_mu S^(x, y) ]
 			  _suNf_prop_multiply(Usp,*u1,spf); //U(x) S(x+mu,0)
 			  sptmp1=Usp;
-			  op_propagator(&sptmp2,&sptmp1,motmp->ind1);//g_mu U(x) S(x,0) 
-			  _propagator_sub(sptmp1,sptmp1,sptmp2);//(1-g_mu) U(x) S(x,0) 
-			  _g5_propagator(sptmp2,sptmp1);//g5(1-g_mu) U(x) S(x,0) 
+			  op_propagator(&sptmp2,&sptmp1,motmp->ind1);//g_mu U(x) S(x,0)
+			  _propagator_sub(sptmp1,sptmp1,sptmp2);//(1-g_mu) U(x) S(x,0)
+			  _g5_propagator(sptmp2,sptmp1);//g5(1-g_mu) U(x) S(x,0)
 			  _g5_propagator(sptmp1,spdag); //g5 S^(x, 0)
 			  op_propagator(&sptmp3,&sptmp1,motmp->ind1); //g_mu g5 S^(x, 0)
 			  _propagator_mul(sptmp1,sptmp2,sptmp3);
 
 			  _propagator_sub(sptmp2,spleft,sptmp1);
-			  _propagator_trace(tr,sptmp2);    
+			  _propagator_trace(tr,sptmp2);
 
 			  motmp->corr_re[corr_ind(px,py,pz,n_mom,tc,nm,i)] += 0.5*motmp->sign*(creal(tr)*cpdotx+cimag(tr)*spdotx);
 			  motmp->corr_im[corr_ind(px,py,pz,n_mom,tc,nm,i)] += 0.5*motmp->sign*(cimag(tr)*cpdotx-creal(tr)*spdotx);
@@ -330,7 +334,7 @@ static void measure_conserved_core(spinor_field* psi0, spinor_field* psi1, spino
 	} //END MASS LOOP
       } //END MOMENTUM LOOP
   lprintf("measure_formfactor_core",50,"Measuring DONE! ");
-}		  
+}
 
 static void init_corrs(int nm, int n_mom, meson_observable* mo){
   int i,n_mom_tot,size;
@@ -346,7 +350,7 @@ static void init_corrs(int nm, int n_mom, meson_observable* mo){
       free(motmp->corr_re);
       free(motmp->corr_im);
       motmp->corr_re=malloc(sizeof(double)*size);
-      motmp->corr_im=malloc(sizeof(double)*size);    
+      motmp->corr_im=malloc(sizeof(double)*size);
       motmp->corr_size=size;
       for(i=0; i<motmp->corr_size; i++){
 	motmp->corr_re[i] = 0.;
@@ -409,31 +413,31 @@ void measure_point_mesons_momenta_ext(meson_observable* mo,spinor_field* psi0, s
 
 static void print_corr_core(meson_observable* mo,int lt,int conf, int nm, double* mass, char* label, int n_mom){
   int i,t,px,py,pz;
-  for (px=0;px<n_mom;++px) for (py=0;py<n_mom;++py) for (pz=0;pz<n_mom;++pz){ 
+  for (px=0;px<n_mom;++px) for (py=0;py<n_mom;++py) for (pz=0;pz<n_mom;++pz){
 	for(i=0; i<nm; i++) {
 	  /*Real*/
 	  if (n_mom>1){
-	    lprintf("MAIN",0,"conf #%d mass=%2.6f %s %s %s_re momentum(%d,%d,%d)= ",conf,mass[i],label,mo->channel_type,mo->channel_name,px,py,pz); 
+	    lprintf("MAIN",0,"conf #%d mass=%2.6f %s %s %s_re momentum(%d,%d,%d)= ",conf,mass[i],label,mo->channel_type,mo->channel_name,px,py,pz);
 	  }
 	  else{
-	    if (mo->ind1==mo->ind2){	    
+	    if (mo->ind1==mo->ind2){
 	      lprintf("MAIN",0,"conf #%d mass=%2.6f %s %s %s= ",conf,mass[i],label,mo->channel_type,mo->channel_name); //To be compatible with the old output
 	    }
 	    else{
-	      lprintf("MAIN",0,"conf #%d mass=%2.6f %s %s %s_re= ",conf,mass[i],label,mo->channel_type,mo->channel_name); 
+	      lprintf("MAIN",0,"conf #%d mass=%2.6f %s %s %s_re= ",conf,mass[i],label,mo->channel_type,mo->channel_name);
 	    }
 	  }
 	  for(t=0;t<lt;++t) lprintf("MAIN",0,"%e ",mo->corr_re[corr_ind(px,py,pz,n_mom,t,nm,i)]);
 	  lprintf("MAIN",0,"\n");
 	  /*Imaginary */
 	  if (n_mom>1){
-	    lprintf("MAIN",0,"conf #%d mass=%2.6f %s %s %s_im momentum(%d,%d,%d)= ",conf,mass[i],label,mo->channel_type,mo->channel_name,px,py,pz); 
+	    lprintf("MAIN",0,"conf #%d mass=%2.6f %s %s %s_im momentum(%d,%d,%d)= ",conf,mass[i],label,mo->channel_type,mo->channel_name,px,py,pz);
 	  }
 	  else{
-	      lprintf("MAIN",0,"conf #%d mass=%2.6f %s %s %s_im= ",conf,mass[i],label,mo->channel_type,mo->channel_name); 
+	      lprintf("MAIN",0,"conf #%d mass=%2.6f %s %s %s_im= ",conf,mass[i],label,mo->channel_type,mo->channel_name);
 	  }
 	  for(t=0;t<lt;++t) lprintf("MAIN",0,"%e ",mo->corr_im[corr_ind(px,py,pz,n_mom,t,nm,i)]);
-	  lprintf("MAIN",0,"\n"); 
+	  lprintf("MAIN",0,"\n");
 	}
       }
 }
@@ -441,7 +445,7 @@ static void print_corr_core(meson_observable* mo,int lt,int conf, int nm, double
 
 static void print_corr(meson_observable* mo,int lt,int conf, int nm, double* mass, char* label, int n_mom){
   meson_observable* motmp=mo;
-  while (motmp!=NULL){  
+  while (motmp!=NULL){
     print_corr_core(motmp,lt,conf,nm,mass,label,n_mom);
     motmp=motmp->next;
   }
