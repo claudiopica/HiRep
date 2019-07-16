@@ -782,7 +782,7 @@ WriteString[ar,"    for(int i=0;i<total_n_glue_op;i++)
           Do[
             Do[
               idop = Opindex[px, py, pz, irrepidx, charge][[nop, irrepev]];
-              If[idop != 0,
+              If[idop >0,
                WriteString[ar, "OP_oneTr_p_", p[px], "_", p[py],"_", p[pz],"_Ir_", irrepidx,"_C_",p[charge],"_n_", idop,"(numerical_op+",opnumber,");\n"];
                opnumber++;];
             , {nop, 1, Length[Opindex[px, py, pz, irrepidx,charge]]}];
