@@ -185,12 +185,6 @@ void read_cmdline(int argc, char* argv[]) {
 }
 
 
-static int safe_mod(int x,int y)
-{
-  return (x>=0)?(x%y):((y-((-x)%y))%y);
-}
-
-
 int main(int argc,char *argv[]) {
   int i,k,n,dt;
   char tmp[256], *cptr;

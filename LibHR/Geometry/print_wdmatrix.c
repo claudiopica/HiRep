@@ -22,6 +22,9 @@
  * every black dot represents a non-zero entry of the matrix in (x,mu) space
  * (flavor in not considered here)
  */
+
+#ifdef HIREP_UNTESTED
+
 void print_wdmatrix(char *filename)
 {
   int x0,x1,x2;
@@ -51,3 +54,4 @@ void print_wdmatrix(char *filename)
 
 	fclose (fp);
 }
+#endif

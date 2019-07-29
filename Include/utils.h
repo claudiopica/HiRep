@@ -18,6 +18,7 @@
 #include "spinor_field.h"
 #include "inverters.h"
 #include "geometry.h"
+#include <stdlib.h>
 
 void ExpX(double dt, suNg_algebra_vector *h, suNg *u);
 
@@ -43,6 +44,16 @@ void apply_BCs_on_spinor_field(spinor_field *sp);
 void apply_BCs_on_spinor_field_flt(spinor_field_flt *sp);
 void apply_background_field_zdir(suNg_field *V, double Q, int n);
 void apply_BCs_on_clover_term(suNfc_field *);
+
+
+inline int safe_mod(int x,int y)
+{
+   if (x>=0)
+      return(x%y);
+   else
+      return((y-(abs(x)%y))%y);
+}
+
 
 void cross_prod(suNg_vector *v1, suNg_vector *v2, suNg_vector *v3);
 void cross_prod_flt(suNg_vector_flt *v1, suNg_vector_flt *v2, suNg_vector_flt *v3);

@@ -16,10 +16,14 @@ static int init = 0;
 static BCs_pars_t BCs_pars;
 
 #ifdef PLAQ_WEIGHTS
+#ifdef BC_XYZ_TWISTED
 static void init_plaq_twisted_BCs();
+#endif
 static void init_plaq_open_BCs(double ct, double cs);
+#if defined(BASIC_SF) || defined(ROTATED_SF) 
 static void init_plaq_Dirichlet_BCs(double ct);
 static void init_gf_SF_BCs(suNg *dn, suNg *up);
+#endif
 #endif
 
 void init_BCs(BCs_pars_t *pars)
@@ -265,7 +269,7 @@ void apply_BCs_on_momentum_field(suNg_av_field *force)
 #endif
 }
 
-#if defined(BASIC_SF) || defined(BC_T_OPEN)
+#if defined(BASIC_SF) 
 static void sf_Dirichlet_BCs(spinor_field *sp);
 static void sf_Dirichlet_BCs_flt(spinor_field_flt *sp);
 #endif
@@ -275,6 +279,7 @@ static void sf_open_BCs_flt(spinor_field_flt *sp);
 #endif
 #ifdef BC_T_OPEN
 static void sf_open_v2_BCs(spinor_field *sf);
+static void sf_open_v2_BCs_flt(spinor_field_flt *sf);
 #endif
 
 void apply_BCs_on_spinor_field(spinor_field *sp)
@@ -292,11 +297,14 @@ void apply_BCs_on_spinor_field(spinor_field *sp)
 
 void apply_BCs_on_spinor_field_flt(spinor_field_flt *sp)
 {
-#if defined(BASIC_SF) || defined(BC_T_OPEN)
+#if defined(BASIC_SF) 
   sf_Dirichlet_BCs_flt(sp);
 #endif
 #if defined(ROTATED_SF)
   sf_open_BCs_flt(sp);
+#endif
+#ifdef BC_T_OPEN
+  sf_open_v2_BCs_flt(sp);
 #endif
 }
 
@@ -931,7 +939,7 @@ static void cl_open_BCs(suNfc_field *cl)
 /***************************************************************************/
 /* BOUNDARY CONDITIONS TO BE APPLIED ON THE SPINOR FIELDS                  */
 /***************************************************************************/
-#if defined(BASIC_SF) || defined(BC_T_OPEN)
+#if defined(BASIC_SF) 
 static void sf_Dirichlet_BCs(spinor_field *sp)
 {
   int ix, iy, iz, index;
@@ -1093,6 +1101,58 @@ static void sf_open_v2_BCs(spinor_field *sf)
         }
   }
 }
+
+
+static void sf_open_v2_BCs_flt(spinor_field_flt *sf)
+{
+  int index;
+  suNf_spinor_flt u;
+  _spinor_zero_f(u);
+
+  // These should reflect the boundary conditions imposed on the clover field
+  if (COORD[0] == 0)
+  {
+    for (int ix = 0; ix < X_EXT; ix++)
+      for (int iy = 0; iy < Y_EXT; iy++)
+        for (int iz = 0; iz < Z_EXT; iz++)
+        {
+          if (T_BORDER > 0)
+          {
+            index = ipt_ext(T_BORDER - 1, ix, iy, iz);
+            if (index != -1 && sf->type->master_shift <= index && sf->type->master_shift + sf->type->gsize_spinor > index)
+            {
+              *_FIELD_AT(sf, index) = u;
+            }
+          }
+          index = ipt_ext(T_BORDER, ix, iy, iz);
+          if (index != -1 && sf->type->master_shift <= index && sf->type->master_shift + sf->type->gsize_spinor > index)
+          {
+            *_FIELD_AT(sf, index) = u;
+          }
+        }
+  }
+  if (COORD[0] == NP_T - 1)
+  {
+    for (int ix = 0; ix < X_EXT; ix++)
+      for (int iy = 0; iy < Y_EXT; iy++)
+        for (int iz = 0; iz < Z_EXT; iz++)
+        {
+          index = ipt_ext(T + T_BORDER - 1, ix, iy, iz);
+          if (index != -1 && sf->type->master_shift <= index && sf->type->master_shift + sf->type->gsize_spinor > index)
+          {
+            *_FIELD_AT(sf, index) = u;
+          }
+          if (T_BORDER > 0)
+          {
+            index = ipt_ext(T + T_BORDER, ix, iy, iz);
+            if (index != -1 && sf->type->master_shift <= index && sf->type->master_shift + sf->type->gsize_spinor > index)
+            {
+              *_FIELD_AT(sf, index) = u;
+            }
+          }
+        }
+  }
+}
 #endif
 
 /***************************************************************************/
@@ -1101,6 +1161,7 @@ static void sf_open_v2_BCs(spinor_field *sf)
 
 #ifdef PLAQ_WEIGHTS
 
+#ifdef BC_XYZ_TWISTED
 static void init_plaq_twisted_BCs()
 {
   error(plaq_weight == NULL, 1, "init_plaq_twisted_BCs [boundary_conditions.c]",
@@ -1129,6 +1190,8 @@ static void init_plaq_twisted_BCs()
 
   lprintf("BCS", 0, "Twisted BCs. Dirac strings intersecting at ( X , Y , Z ) = ( 1 , 1 , 1 )\n");
 }
+#endif //BC_XYZ_TWISTED
+
 
 static void init_plaq_open_BCs(double ct, double cs)
 {
@@ -1241,12 +1304,12 @@ static void init_plaq_open_BCs(double ct, double cs)
         }
   }
 }
-
+#if defined(BASIC_SF) || defined(ROTATED_SF) 
 static void init_plaq_Dirichlet_BCs(double ct)
 {
   error(plaq_weight == NULL, 1, "init_plaq_Dirichlet_BCs [boundary_conditions.c]",
         "Structure plaq_weight not initialized yet");
   init_plaq_open_BCs(ct, 0.);
 }
-
+#endif
 #endif

@@ -16,7 +16,7 @@
 #include <math.h>
 #include "geometry.h"
 #include "global.h"
-#include "safe_mod.h"
+#include "utils.h"
 
 static int index_lexi(int x0,int x1,int x2,int x3)
 {

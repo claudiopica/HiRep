@@ -16,6 +16,7 @@ bstat="./bs_stat "
 trantab={ord('('): None,ord(')'): None}
 trantab2={ord('/'):"x"}
 trantab3={ord('\n'):None}
+trantab4={ord('='):" "}
 
 def correlator_def(l_inputfile,g_correlator_list):
     tmpfile=open(l_inputfile,'r')
@@ -40,18 +41,122 @@ def correlator_meas(nmeas,corr_data,sub_data,l_correlator_list,file):
                     np.outer(np.conjugate(corr_data[pair[1]]), corr_data[pair[0]])).real
         else:
              for pair in l_correlator_list[id]:
-                sum += (1.0/(2*npoints)*(np.outer(np.conjugate(corr_data[pair[0]]), corr_data[pair[1]])+
-                    np.outer(np.conjugate(corr_data[pair[1]]), corr_data[pair[0]])).real+
-                    -0.0/(2*npoints)*(np.outer(sub_data[pair[0]],sub_data[pair[1]])
-                    +np.outer(np.conjugate(sub_data[pair[1]]), sub_data[pair[0]])).real)
-           
+ #               print("qui",corr_data[pair[1]],sub_data[pair[1]],corr_data[pair[0]],sub_data[pair[0]])
+ #               sum += (1.0/(2*npoints)*(np.outer(np.conjugate(corr_data[pair[0]]), corr_data[pair[1]])+
+ #                   np.outer(np.conjugate(corr_data[pair[1]]), corr_data[pair[0]])).real+
+ #                   -0.0/(2*npoints)*(np.outer(sub_data[pair[0]],sub_data[pair[1]])
+ #                   +np.outer(np.conjugate(sub_data[pair[1]]), sub_data[pair[0]])).real)
+                sum += 1.0/(2.0*npoints)*(np.outer(np.conjugate(corr_data[pair[0]] - sub_data[pair[0]]), corr_data[pair[1]]- sub_data[pair[1]])+
+                    np.outer(np.conjugate(corr_data[pair[1]]- sub_data[pair[1]]), corr_data[pair[0]]- sub_data[pair[0]])).real
         file.write(str(nmeas)+" "+str(dt)+"\n")
         np.savetxt(file, sum)
 
 
+def onept_outfilename(instring):
+    head=instring.split("[Measure ML][0]1pt function ",1)[1]
+    head=separator.join(list(head.split(' ')[i] for i in [-6,-5,-2,-4,-3]))
+    return prepend+("1pt_"+head+".dat").translate(trantab2)
+
+
+def find_outfile_list(instring,linfile_name):
+    lnmeas=0
+    file_irreps=[]
+    with open(linfile_name) as lfile:
+        for lline in lfile:
+            if("[MAIN][0]ML Measure #" in lline and "..." in lline):
+                lnmeas+=1
+            elif("[Measure ML][0]1pt function" in lline):
+                file_irreps.append(onept_outfilename(lline))
+            if(lnmeas==2):
+                break
+    req_irreps=[]
+    if(instring):
+        for subs in instring.split(","):
+            if(not(bool(re.match(r"[0-9]+_[0-9]+_[0-9]+_[0-9A-Za-z]+_[\+|\-]_[0-9]+_[0-9]+", subs)))):
+                print("The Irrep Pattern ",subs," is not matched")
+                print("The list of irreps available is:")
+                for name in file_irreps:
+                    print(name)
+                sys.exit()
+            else:
+                tmps=subs.split("_")
+                req_irreps.append("1pt_P=("+tmps[0]+","+tmps[1]+","+tmps[2]+")_Irrep="+tmps[3]+"_Charge="+tmps[4]+"_Irrep_ev="+tmps[5]+"x"+tmps[6]+".dat")
+        tmp_irreps=list(set(file_irreps).intersection(req_irreps))
+        if(len(tmp_irreps)==0):
+            print("No irreps matching the requests have been found in ",linfile_name)
+            print("The list of irreps available is:")
+            for name in file_irreps:
+                print(name)
+            sys.exit(0)
+        if(len(tmp_irreps)!=len(req_irreps)):
+            print("Not all the requested irreps have been found in ",linfile_name)
+            print("The list of irreps available is:")
+            for name in file_irreps:
+                print(name)
+            sys.exit(0)
+        file_irreps=tmp_irreps
+    return file_irreps
+ 
+
+def find_timelist(linfile_name):
+    lnmeas=0
+    lset=set()
+    with open(linfile_name) as lfile:
+        for lline in lfile:
+            if("[MAIN][0]ML Measure #" in lline and "..." in lline):
+                lnmeas+=1
+            elif("[Measure ML][0] t=" in lline):
+                lset.add(lline.translate(trantab4).split()[3])
+            if(lnmeas==2):
+                break
+    lret=sorted([ int(el) for el in lset ])
+    return [ str(el) for el in lret ]
+
+def find_n_up_x_lev(linfile_name):
+    lnuplev=[]
+    with open(linfile_name) as lfile:
+        for lline in lfile:
+            if("[INIT ML][0]lev " in lline):
+                lnuplev.append(re.split(' |=', lline)[4]+" ")
+            elif("[MAIN][0]ML Measure #" in lline and "..." in lline):
+                break
+    return lnuplev
+
 def filter_set_OP(dataset, l):
     row = np.in1d(dataset[:, 1], l)
     return dataset[row, :]
+
+def define_verify_operator_list(lin_op_string,linfile_name,lirrep):
+    ltmp=set()
+    for op in lin_op_string.split(","):
+        try:
+            ltmp.add(int(op))
+            if(int(op)<0):
+              raise()
+        except:
+            print("The operator cut string must be composed of comma separated positive distinct integers")
+            sys.exit()
+    if(len(ltmp)!=len(lin_op_string.split(","))):
+        print("The operator cut string must be composed of comma separated positive distinct integers")
+        sys.exit()
+    ltmp=list(ltmp)
+    ltmp.sort()
+    lastop=ltmp[-1]
+    lnmeas=0
+    lp=lirrep.split("_")
+    string="[Measure ML][0]1pt function P=("+lp[0]+","+lp[1]+","+lp[2]+") Irrep="+lp[3]+" Irrep ev="+lp[5]+"/"+lp[6]+" Charge="+lp[4]
+    with open(linfile_name) as lfile:
+        for lline in lfile:
+            if(string in lline):
+                if(int(lline.split("=")[-1])<=lastop):
+                    print("The operator cut string contains a index larger than the number of available operators")
+                    sys.exit()
+                break
+    lret=[0]
+    for i in ltmp:
+        lret.append(2*i+1)
+        lret.append(2*i+2)
+    return lret
 
 
 if __name__ == '__main__':
@@ -62,12 +167,18 @@ if __name__ == '__main__':
                     help='prefix directory for the output file')
     parser.add_argument('-b', type=str, required=False,
                     help='full path to the bs_stat analysis code')
+    parser.add_argument('-s', required=False, action='store_true',
+                    help='perform the striping of the 1pt functions')
+    parser.add_argument('-q', required=False, type=str,
+                    help='select the irreps to be analized (e.g. px_py_pz_Irrep_Charge_rho_irrepsize,... -> 0_0_0_A1plusOhP_+_1_1,0_0_0_EplusOhP_-_1_2 ) note that the format is fixed')
     parser.add_argument('-y', required=False, action='store_true',
                     help='evaluate the 1pt analysis')
     parser.add_argument('-c', required=False, action='store_true',
                     help='evaluate all the (subtracted) correlators defined in the simulation output file, force enable the y argument')
     parser.add_argument('-a', required=False, action='store_true',
                     help='evaluate the 2pt (non GEVP) analysis, force enable the c argument\n')
+    parser.add_argument('-k', required=False, type=str,
+                    help='select only the specified operators for striping (csv starting from 0), must always be used in conjuction to -q and only one irrep\n')
 
     args = parser.parse_args()
     inputdata_filename=args.i
@@ -78,9 +189,24 @@ if __name__ == '__main__':
     if(args.c):
         args.y=True
 
-    if(not(os.path.isfile(inputdata_filename))):
+    if(args.i and not(os.path.isfile(inputdata_filename))):
         sys.stderr.write("Missing file "+inputdata_filename+"\n")
-        sys.exit()   
+        sys.exit()
+
+    if(args.k):
+        args.s=True
+
+    if(args.k and not(args.q)):
+        sys.stderr.write("When using the -k option you must use also the -q\n")
+        sys.exit()
+
+    if(args.k and len(args.q.split(","))!=1):
+        sys.stderr.write("When using the -k and -q options you must specify only one irrep\n")
+        sys.exit()
+
+    if(args.k):
+        args.s=True
+
     if(args.p):
         prepend=args.p
     else:
@@ -101,53 +227,79 @@ if __name__ == '__main__':
                 sys.exit()  
         else:
             sys.stderr.write("Missing executable file for the statistica analisys (bstat)\n")
-            sys.exit()  
+            sys.exit()
+        
 
-    print("Striping 1pt from",inputdata_filename)
-    separator='_'
-    mydict={}
-    tset="start"
-    nuplev=[]
-    tlist=[]
-    outfilelist=[]
-    with open(inputdata_filename) as file:
-        for line in file:
-            if("[MAIN][0]ML Measure #" in line and "..." in line):
-                nmeas=int((line.split("Measure #",1)[1]).split("...",1)[0])
-            elif("[Measure ML][0]1pt function" in line):
-                if(not(line in mydict)):
-                    head=line.split("[Measure ML][0]1pt function ",1)[1]
-                    head=separator.join(list(head.split(' ')[i] for i in [-6,-5,-2,-4,-3]))
-                    outfile=prepend+("1pt_"+head+".dat").translate(trantab2)
-                    outfilelist.append(outfile)
-                    mydict[line]=open(outfile,'w')
-                    mydict[line].write("# "+head+"\n")
-                filewrite=mydict[line]
-                if(tset=="start"):
-                    tset="firstset"
-                else:
-                    tset="done"
-            elif("[INIT ML][0]lev " in line):
-                nuplev.append(re.split(' |=', line)[4]+" ")
-            elif("[Measure ML][0] t=" in line):
-                data=str(nmeas)+" "+(line.split("[Measure ML][0] t=",1)[1]).translate(trantab)
-                filewrite.write(data)
-                if(tset=="firstset"):
-                    tlist.append(data.split()[1])
-    file.close()
-    for string in mydict:
-        mydict[string].close()
+    if(args.i):
+        print("Reading general setup from",inputdata_filename)
+        separator='_'
+        myopenfile={}
+        tset="start"
+        nuplev=[]
+        tlist=[]
+        outfilelist=[]
+        activemeas={}
+        irreplist=[]
 
-    
+        tlist=find_timelist(inputdata_filename)
+        nuplev=find_n_up_x_lev(inputdata_filename)
+        outfilelist=find_outfile_list(args.q,inputdata_filename)
+        if(args.k):
+            opcutstring=define_verify_operator_list(args.k,inputdata_filename,args.q)
+
+
+    if(args.s):
+        print("Striping the 1pt functions from",inputdata_filename)
+        writedata=False
+        with open(inputdata_filename) as file:
+            for line in file:
+                if("[MAIN][0]ML Measure #" in line and "..." in line):
+                    nmeas=int((line.split("Measure #",1)[1]).split("...",1)[0])
+                elif("[Measure ML][0]1pt function" in line):
+                    if(not(line in activemeas)):
+                        outfile=onept_outfilename(line)
+                        if(outfile in outfilelist):
+                            myopenfile[line]=open(outfile,'w')
+                            activemeas[line]=True
+                        else:
+                            activemeas[line]=False
+                    if(activemeas[line]):
+                        filewrite=myopenfile[line]
+                        writedata=True
+                    else:
+                        writedata= False
+                elif( writedata and "[Measure ML][0] t=" in line):
+                    if(args.k):
+                        ldata=(line.split("[Measure ML][0] t=",1)[1]).translate(trantab).split()
+                        separator = ' '
+                        data=separator.join([ ldata[i] for i in opcutstring ])+"\n"
+                    else:
+                        data=(line.split("[Measure ML][0] t=",1)[1]).translate(trantab)
+                    data=str(nmeas)+" "+data
+                    filewrite.write(data)
+        file.close()
+        for string in myopenfile:
+            myopenfile[string].close()
+
     if(args.y):
         print("Performing the 1pt statistical analyis")
 
+
+        for filename in outfilelist: 
+            if(not(os.path.isfile(filename))):
+                print("Missing the file ",filename," for the analysis, you might want to run the striping (-s) also")
+                sys.exit()
+        
         command = bstat.split()
         separator = ' '
         nuplev=separator.join(nuplev)
     
         tmpfilename=prepend+"tmpfile"
         for datafile in outfilelist:
+            if "P=(0,0,0)_Irrep=A1plusOhP_Charge=+" in datafile:
+                subtract=True
+            else:
+                subtract=False
             with open(datafile) as file:
                 datataufilename=datafile.replace(".dat", "_autocor.dat")
                 dataavgfilename=datafile.replace(".dat", "_avg.dat")
@@ -173,6 +325,9 @@ if __name__ == '__main__':
                     outlinevar=[ti]
                     outlineavr=[ti]
                     outlinetune=[ti,nuplev]
+                    nrescale=1
+                    for i in nuplev.split():
+                        nrescale*=int(i)
                     size=0
                     for i in range(2, nfields):
                         tmpfile.seek(0)
@@ -186,12 +341,16 @@ if __name__ == '__main__':
                         outlinetau.append(outstring[1])
                         outlineavr.append(outstring[3])
                         outlinevar.append(outstring[5])
-
+                    size*=nrescale
                     for i in range(2, nfields, 2):
                         tmpfile.seek(0)
                         process = Popen(command, text=True, stdin=PIPE, stdout=PIPE, stderr=PIPE)
                         for tmpline in tmpfile:
-                            cdata=complex(float(tmpline.split()[i]),float(tmpline.split()[i+1]))
+                            if(subtract):
+                                subs=float(outlineavr[i-1].split()[0])
+                                cdata=complex(float(tmpline.split()[i])-subs,float(tmpline.split()[i+1]))
+                            else:
+                                cdata=complex(float(tmpline.split()[i]),float(tmpline.split()[i+1]))
                             rdata=size*cdata.conjugate()*cdata
                             process.stdin.write(str(rdata.real)+ '\n')
                         outstring=re.split('\n|:', process.communicate()[0])
@@ -292,7 +451,6 @@ if __name__ == '__main__':
                         line=datafile.readline()
                     for j in range(0,nfields):
                         for i in range(j,nfields):
-                            #res=np.append(res,np.array((dt,int(i+nfields*j)),dtype='int,int'))
                             res=np.append(res,np.array((dti,i+nfields*j,np.mean(mat[i+nfields*j]),np.std(mat[i+nfields*j])/np.sqrt(len(mat[i+nfields*j])))))
                 res=res.reshape(int(len(res)/4),4)
                 for j in range(0,nfields):

@@ -12,7 +12,7 @@
 #include <string.h>
 #include "geometry.h"
 #include "global.h"
-#include "safe_mod.h"
+#include "utils.h"
 #include "logger.h"
 #include "error.h"
 #include "memory.h"

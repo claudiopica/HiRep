@@ -13,7 +13,7 @@
 
 #include "geometry.h"
 #include "global.h"
-#include "safe_mod.h"
+#include "utils.h"
 
 static int init=0;
 static int xbl,ybl,zbl,xnl,ynl,znl;
