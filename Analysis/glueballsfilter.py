@@ -179,11 +179,13 @@ if __name__ == '__main__':
                     help='evaluate the 2pt (non GEVP) analysis, force enable the c argument\n')
     parser.add_argument('-k', required=False, type=str,
                     help='select only the specified operators for striping (csv starting from 0), must always be used in conjuction to -q and only one irrep\n')
+    parser.add_argument('-B', required=False, type=int,
+                    help='bin the data, to give B final bins\n')
 
     args = parser.parse_args()
     inputdata_filename=args.i
 
-    if(args.a):
+    if(args.B):
         args.c=True
 
     if(args.c):
@@ -406,25 +408,75 @@ if __name__ == '__main__':
                     
                     tmp=line.split()
 
-                    blockcounter+=1                    
                     tmp1 = np.array(tmp[2:]).astype(np.float)
                     corrdata[tmp[1]]=tmp1[0::2]+1j*tmp1[1::2]
 
-                    if(blockcounter==len(tlist)):
+                    if(blockcounter % len(tlist) == len(tlist)-1 ):
                         n_meas=tmp[0]
                         correlator_meas(n_meas,corrdata,subs,correlator_list,outfile)
 
                         corrdata={}
-                        blockcounter=0
+                    blockcounter+=1                    
             outfile.close()
+            print(corfilename)
 
-        
+            if(args.B):
+                bnmeas=blockcounter/len(tlist)
+                if(args.B>bnmeas):
+                    sys.stderr.write("The number of requested bins "+str(args.B)+" is larger than the number of measures "+str(bnmeas)+"\n")
+                    sys.exit()
+                n_elem_per_bin=int(bnmeas/args.B)
+                print("Binning the data in",args.B,"bins, each bin contains",n_elem_per_bin,"elements")
+                unbindatacorfilename=corfilename.replace(".dat", "_unbinned.dat")
+                os.rename(corfilename,unbindatacorfilename)
+                databin=np.zeros(shape=(len(tlist), 4))
+                lcounter=0
+                with open(unbindatacorfilename) as unbindatafile:
+                    line=unbindatafile.readline()
+                    nfields=len(unbindatafile.readline().split())
+                    unbindatafile.seek(0)
+                    line=unbindatafile.readline()
+                    corrdata={}
+                    measid=int(line.split()[0])
+                    bindatafile=open(corfilename,'w')
+
+                    while(line):
+                        dt=int(line.split()[1])
+                        if(int(line.split()[0])!=measid):
+                            lcounter+=1
+                            measid=int(line.split()[0])
+                        tmp=np.loadtxt(unbindatafile,max_rows=nfields)
+                        #print(tmp)
+                        if dt in corrdata:
+                            corrdata[dt]=np.add(corrdata[dt],tmp)
+                        else:
+                            corrdata[dt]=tmp
+
+                        if(lcounter % n_elem_per_bin == n_elem_per_bin-1):
+                            databin=np.divide(corrdata[dt], n_elem_per_bin) 
+                            bindatafile.write(str(measid)+" "+str(dt)+"\n")
+                            np.savetxt(bindatafile, databin)
+                            corrdata.pop(dt)
+                        line=unbindatafile.readline()
+                    bindatafile.close()
+      
     if(args.a):
         print("Performing the 2pt statistical analyis")
+
+        correlator_list={}
+        correlator_def(inputdata_filename,correlator_list)
+
         dtlist=[]
         for id in correlator_list.keys():
             dtlist.append(abs(int(correlator_list[id][0][1])-int(correlator_list[id][0][0])))
 
+
+        for filename in outfilelist:
+            corfilename=filename.replace("1pt_P","2pt_P") 
+            if(not(os.path.isfile(corfilename))):
+                print("Missing the file ",corfilename," for the analysis, you might want to run the cor creation (-c) also")
+                sys.exit()
+ 
         for filename in outfilelist:
             corfilename=filename.replace("1pt_P","2pt_P")
             with open(corfilename) as datafile:
