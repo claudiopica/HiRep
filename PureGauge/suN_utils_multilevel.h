@@ -28,7 +28,7 @@ typedef struct _input_pg_ml
 
   char cml_niteration[64];
   char cml_nskip[64];
-  char cml_corrs[256];
+  char cml_corrs[2048];
 
   /* for the reading function */
   input_record_t read[11];

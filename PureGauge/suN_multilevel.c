@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
   /* Measures */
   for (i = flow.start; i < flow.end; ++i)
   {
-    if (i != 0)
+    if (i != 1)
     {
       gettimeofday(&start, 0);
 

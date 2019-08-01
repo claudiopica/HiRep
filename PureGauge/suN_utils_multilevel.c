@@ -193,11 +193,11 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
     int j = 0;
     char *saveptr1, *saveptr2;
 
-    char tmp[256];
+    char tmp[2048];
 
     /*error(pg_var_ml.cml_corrs[0] == '\n', 1, "init_mc_ml " __FILE__, "At least one ML correpator must be defined");*/
 
-    strncpy(tmp, pg_var_ml.cml_corrs, 256);
+    strncpy(tmp, pg_var_ml.cml_corrs, 2048);
     token = strtok_r(tmp, sep, &saveptr1);
 
     do
@@ -221,7 +221,7 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
 
     pg_var_ml.corrs.list = malloc(sizeof(cor_points) * j);
 
-    strncpy(tmp, pg_var_ml.cml_corrs, 256);
+    strncpy(tmp, pg_var_ml.cml_corrs, 2048);
     token = strtok_r(tmp, sep, &saveptr1);
     int k, l, dt;
     i = 0;
