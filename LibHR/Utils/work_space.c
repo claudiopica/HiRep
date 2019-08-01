@@ -183,6 +183,8 @@ int reserve_wrk_space_with_pointers(suNg_field **g_wrk_out, int **i_up_wrk_out, 
 
 void release_wrk_space(int id_release)
 {
+    if (id_release == -1)
+        return;
     if (_wrk_reserved[id_release])
     {
         _wrk_reserved[id_release] = 0;

@@ -20,7 +20,7 @@
 typedef struct _input_pg_ml
 {
 
-  double beta, APEsmear;
+  double beta, anisotropy, APEsmear;
   int nhb, nor, ml_levels, nblk;
   int *ml_niteration;
   int *ml_nskip;
@@ -31,7 +31,7 @@ typedef struct _input_pg_ml
   char cml_corrs[256];
 
   /* for the reading function */
-  input_record_t read[10];
+  input_record_t read[11];
 
 } input_pg_ml;
 
@@ -39,6 +39,7 @@ typedef struct _input_pg_ml
   {                                                                                                                           \
     .read = {                                                                                                                 \
       {"beta", "beta = %lf", DOUBLE_T, &(varname).beta},                                                                      \
+      {"anisotropy", "anisotropy = %lf", DOUBLE_T, &(varname).anisotropy},                                                    \
       {"nhb", "nhb = %d", INT_T, &(varname).nhb},                                                                             \
       {"nor", "nor = %d", INT_T, &(varname).nor},                                                                             \
       {"number of ML levels", "ML levels = %d", INT_T, &(varname).ml_levels},                                                 \

@@ -1002,7 +1002,7 @@ Do[
         }
 "];
           (*If[Not[irrepidx==1 && irrepev==1 && charge==+1 && px==0 && py ==0 && pz==0],WriteString[ar, "#endif //ML_TUNING"]];*)
-
+(*  
           WriteString[ar, "
     b2 = 0;
     b1 = 0;
@@ -1031,7 +1031,7 @@ Do[
         }
         totalsize += (nblocking * nblocking * ",cs*cs,");
     }
-"];
+"];*)
           ];
         ,{irrepev, 1, Length[bTOrthog[px, py, pz][[irrepidx]]]}];
       , {charge, -1, 1, 2}];

@@ -128,7 +128,7 @@ static void init_hb_boundary()
 #endif
 }
 
-static void update_all(double beta, int type)
+static void update_all(double *beta, int type)
 {
   static int count = PROJECT_INTERVAL;
 
@@ -158,7 +158,7 @@ static void update_all(double beta, int type)
         if (dyn_gauge[j * 4 + mu] != 0)
         {
           staples(j, mu, &v);
-          cabmar(beta, pu_gauge(j, mu), &v, type);
+          cabmar(beta[mu], pu_gauge(j, mu), &v, type);
         }
       }
 #ifdef WITH_MPI
@@ -176,7 +176,7 @@ static void update_all(double beta, int type)
           if (dyn_gauge[j * 4 + mu] != 0)
           {
             staples(j, mu, &v);
-            cabmar(beta, pu_gauge(j, mu), &v, type);
+            cabmar(beta[mu], pu_gauge(j, mu), &v, type);
           }
         }
       }
@@ -197,7 +197,7 @@ static void update_all(double beta, int type)
         if (dyn_gauge[j * 4 + mu] != 0)
         {
           staples(j, mu, &v);
-          cabmar(beta, pu_gauge(j, mu), &v, type);
+          cabmar(beta[mu], pu_gauge(j, mu), &v, type);
         }
       }
 #ifdef WITH_MPI
@@ -215,7 +215,7 @@ static void update_all(double beta, int type)
           if (dyn_gauge[j * 4 + mu] != 0)
           {
             staples(j, mu, &v);
-            cabmar(beta, pu_gauge(j, mu), &v, type);
+            cabmar(beta[mu], pu_gauge(j, mu), &v, type);
           }
         }
       }
@@ -223,7 +223,7 @@ static void update_all(double beta, int type)
   }
 }
 
-void update(double beta, int nhb, int nor)
+void update(double *beta, int nhb, int nor)
 {
   if (dyn_gauge == NULL)
     init_hb_boundary();

@@ -200,7 +200,7 @@ static void update_mh_all(int lev, double *beta, int type)
                 if (loc_dyn[j * 4 + mu] != 0)
                 {
                     staples(j, mu, &v);
-                    cabmar(*beta, pu_gauge(j, mu), &v, type);
+                    cabmar(beta[mu], pu_gauge(j, mu), &v, type);
                 }
             }
 #ifdef WITH_MPI
@@ -218,7 +218,7 @@ static void update_mh_all(int lev, double *beta, int type)
                     if (loc_dyn[j * 4 + mu] != 0)
                     {
                         staples(j, mu, &v);
-                        cabmar(*beta, pu_gauge(j, mu), &v, type);
+                        cabmar(beta[mu], pu_gauge(j, mu), &v, type);
                     }
                 }
             }
@@ -239,7 +239,7 @@ static void update_mh_all(int lev, double *beta, int type)
                 if (loc_dyn[j * 4 + mu] != 0)
                 {
                     staples(j, mu, &v);
-                    cabmar(*beta, pu_gauge(j, mu), &v, type);
+                    cabmar(beta[mu], pu_gauge(j, mu), &v, type);
                 }
             }
 #ifdef WITH_MPI
@@ -257,7 +257,7 @@ static void update_mh_all(int lev, double *beta, int type)
                     if (loc_dyn[j * 4 + mu] != 0)
                     {
                         staples(j, mu, &v);
-                        cabmar(*beta, pu_gauge(j, mu), &v, type);
+                        cabmar(beta[mu], pu_gauge(j, mu), &v, type);
                     }
                 }
             }
@@ -293,8 +293,6 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
     static double *cor_storage;
     static long double norm = 1.0;
     struct timeval start, end, etime;
-    //double t1, t2;
-    //struct timeval tt1, tt2, tt3;
 
     if (lev == 0)
     {
@@ -325,26 +323,13 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
     }
     else
     {
-        //t1 = t2 = 0;
         for (i = 0; i < ml_up[lev]; i++)
         {
-           // gettimeofday(&tt1, 0);
-
             for (j = 0; j < ml_skip[lev]; j++)
                 update_mh(lev, beta, nhb, nor);
-           // gettimeofday(&tt2, 0);
-           // timeval_subtract(&tt3, &tt2, &tt1);
-           // t1 += tt3.tv_sec + 1e-6 * tt3.tv_usec;
-
-           // gettimeofday(&tt1, 0);
 
             measure_1pt_glueballs(nblocking, smear_val, one_point_gb);
-           // gettimeofday(&tt2, 0);
-
-           // timeval_subtract(&tt3, &tt2, &tt1);
-           // t2 += tt3.tv_sec + 1e-6 * tt3.tv_usec;
-        }
-       // lprintf("HB MULTILEVEL", 0, "comparison [%lf sec %lf sec]\n", t1, t2);
+         }
     }
 
     if (lev == 0)
@@ -361,6 +346,6 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
         gettimeofday(&start, 0);
         timeval_subtract(&etime, &start, &end);
 
-        lprintf("HB MULTILEVEL", 0, "2pt contraction done [%ld sec %ld usec]\n", etime.tv_sec, etime.tv_usec);
+        lprintf("HB MULTILEVEL", 0, "1pt writing done [%ld sec %ld usec]\n", etime.tv_sec, etime.tv_usec);
     }
 }

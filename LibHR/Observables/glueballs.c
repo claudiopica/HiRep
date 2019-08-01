@@ -10,21 +10,12 @@
 void measure_1pt_glueballs(int nblocking, double *smear_val, double complex *gb_storage)
 {
     int i, nt;
-    int wrk1 = -1, wrk2;
+    int wrk1, wrk2=-1;
     double complex *point_gb;
-
-    wrk2 = spatial_APE_smear_wrkspace(smear_val, wrk1);
 
     point_gb = gb_storage;
 
-    for (nt = 0; nt < n_active_slices; nt++)
-    {
-        eval_all_glueball_ops(active_slices_list[nt], point_gb);
-        point_gb += total_n_glue_op * nblocking;
-    }
-
-
-    for (i = 1; i < nblocking; i++)
+    for (i = 0; i < nblocking; i++)
     {
 
         wrk1 = spatial_APE_smear_wrkspace(smear_val, wrk2);

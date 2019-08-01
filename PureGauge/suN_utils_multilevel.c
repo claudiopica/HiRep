@@ -22,9 +22,9 @@ static input_pg_ml pg_var_ml = init_input_pg_ml(pg_var_ml);
 
 static void mk_gconf_name(char *name, pg_flow_ml *gf, int id)
 {
-    sprintf(name, "%s_%dx%dx%dx%dnc%db%.6fn%d",
+    sprintf(name, "%s_%dx%dx%dx%dnc%db%.6fan%.6fn%d",
             gf->run_name, GLB_T, GLB_X, GLB_Y, GLB_Z, NG,
-            gf->pg_v->beta, id);
+            gf->pg_v->beta, gf->pg_v->anisotropy, id);
 }
 
 static char *add_dirname(char *dirname, char *filename)
@@ -48,11 +48,12 @@ static int parse_gstart(pg_flow_ml *gf)
 
     int t, x, y, z, ng;
     double beta;
+    double anisotropy;
     int ret = 0;
     char buf[256];
 
-    ret = sscanf(gf->g_start, "%[^_]_%dx%dx%dx%dnc%db%lfn%d",
-                 buf, &t, &x, &y, &z, &ng, &beta, &gf->start);
+    ret = sscanf(gf->g_start, "%[^_]_%dx%dx%dx%dnc%db%lfan%lfn%d",
+                 buf, &t, &x, &y, &z, &ng, &beta, &anisotropy, &gf->start);
 
     if (ret == 8)
     { /* we have a correct file name */
@@ -150,6 +151,7 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
     read_input(pg_var_ml.read, ifile);
 
     lprintf("INIT ML", 0, "beta=%lf\n", pg_var_ml.beta);
+    lprintf("INIT ML", 0, "bare anisotropy=%lf\n", pg_var_ml.anisotropy);
     lprintf("INIT ML", 0, "nhb=%d nor=%d\n", pg_var_ml.nhb, pg_var_ml.nor);
 
     set_max_mh_level(pg_var_ml.ml_levels);
