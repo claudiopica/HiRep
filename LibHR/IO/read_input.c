@@ -43,7 +43,7 @@ static void mpi_broadcast_parameters(input_record_t crec[]) {
 void read_input(input_record_t irec[], char *filename) {
   FILE *inputfile;
   fpos_t pos;
-  char buf[256];
+  char buf[2048];
   int npar=0, *found=NULL;
   input_record_t *crec=NULL;
 
