@@ -2623,7 +2623,7 @@ void eval_all_glueball_oneTr_ops_p_1_0_0_Ir_1_C_1(double complex *numerical_op)
 
 void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_storage, double *cor_storage)
 {
-    int totalsize, i1, i2, t1, t2, id, n1, n2, b1, b2, icor, i;
+    int totalsize, i1, i2, t1, t2, id, n1, n2, b1, b2, i;
     double norm;
     double *cor_pointer, tmp;
     static double complex *gb1_bf;

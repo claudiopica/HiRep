@@ -46,17 +46,12 @@ int main(int argc, char *argv[])
   /* Init Monte Carlo */
   init_mc_ml(&flow, get_input_filename());
 
-  double lbeta[4] = {flow.pg_v->beta * flow.pg_v->anisotropy,
-                     flow.pg_v->beta / flow.pg_v->anisotropy,
-                     flow.pg_v->beta / flow.pg_v->anisotropy,
-                     flow.pg_v->beta / flow.pg_v->anisotropy};
-
   /* Thermalization */
   gettimeofday(&start, 0);
   for (i = 0; i < flow.therm; ++i)
   {
 
-    update(lbeta, flow.pg_v->nhb, flow.pg_v->nor);
+    update(&(flow.pg_v->beta), flow.pg_v->nhb, flow.pg_v->nor);
     if (flow.therm > 20)
     {
       if (i % (flow.therm / 5) == 0)
@@ -80,7 +75,7 @@ int main(int argc, char *argv[])
       gettimeofday(&start, 0);
 
       for (int j = 0; j < flow.nskip; ++j)
-        update(lbeta, flow.pg_v->nhb, flow.pg_v->nor);
+        update(&(flow.pg_v->beta), flow.pg_v->nhb, flow.pg_v->nor);
       gettimeofday(&end, 0);
       timeval_subtract(&etime, &end, &start);
       lprintf("MAIN", 0, "Skipped %d Trajectories: [%ld sec %ld usec]\n", flow.nskip, etime.tv_sec, etime.tv_usec);
@@ -91,7 +86,7 @@ int main(int argc, char *argv[])
 
     gettimeofday(&start, 0);
 
-    update_hb_multilevel_gb_measure(0, lbeta, flow.pg_v->nhb, flow.pg_v->nor, flow.pg_v->ml_niteration, flow.pg_v->ml_nskip, flow.pg_v->nblk, &(flow.pg_v->APEsmear), &(flow.pg_v->corrs));
+    update_hb_multilevel_gb_measure(0, &(flow.pg_v->beta), flow.pg_v->nhb, flow.pg_v->nor, flow.pg_v->ml_niteration, flow.pg_v->ml_nskip, flow.pg_v->nblk, &(flow.pg_v->APEsmear), &(flow.pg_v->corrs));
 
     gettimeofday(&end, 0);
     timeval_subtract(&etime, &end, &start);

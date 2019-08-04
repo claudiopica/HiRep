@@ -47,7 +47,7 @@ def correlator_meas(nmeas,corr_data,sub_data,l_correlator_list,file):
  #                   -0.0/(2*npoints)*(np.outer(sub_data[pair[0]],sub_data[pair[1]])
  #                   +np.outer(np.conjugate(sub_data[pair[1]]), sub_data[pair[0]])).real)
                 sum += 1.0/(2.0*npoints)*(np.outer(np.conjugate(corr_data[pair[0]] - sub_data[pair[0]]), corr_data[pair[1]]- sub_data[pair[1]])+
-                    np.outer(np.conjugate(corr_data[pair[1]]- sub_data[pair[1]]), corr_data[pair[0]]- sub_data[pair[0]])).real
+                        np.outer(np.conjugate(corr_data[pair[1]]- sub_data[pair[1]]), corr_data[pair[0]]- sub_data[pair[0]])).real
         file.write(str(nmeas)+" "+str(dt)+"\n")
         np.savetxt(file, sum)
 
@@ -339,7 +339,6 @@ if __name__ == '__main__':
                                 size +=1
                             process.stdin.write(tmpline.split()[i]+ '\n')
                         outstring=re.split('\n|:', process.communicate()[0])
-                        
                         outlinetau.append(outstring[1])
                         outlineavr.append(outstring[3])
                         outlinevar.append(outstring[5])

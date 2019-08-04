@@ -45,6 +45,8 @@ void apply_BCs_on_spinor_field_flt(spinor_field_flt *sp);
 void apply_background_field_zdir(suNg_field *V, double Q, int n);
 void apply_BCs_on_clover_term(suNfc_field *);
 
+void init_gauge_anisotropy(double *chi);
+
 
 inline int safe_mod(int x,int y)
 {

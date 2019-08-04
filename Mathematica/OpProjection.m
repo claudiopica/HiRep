@@ -799,7 +799,7 @@ WriteString[ar,"    for(int i=0;i<total_n_glue_op;i++)
   WriteString[ar, "
 void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_storage, double *cor_storage)
 {
-    int totalsize, i1, i2, t1, t2, id, n1, n2, b1, b2, icor, i;
+    int totalsize, i1, i2, t1, t2, id, n1, n2, b1, b2, i;
     double norm;
     double *cor_pointer, tmp;
     static double complex *gb1_bf;

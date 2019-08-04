@@ -325,6 +325,8 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
     represent_gauge_field();
 
 
+    init_gauge_anisotropy(&(pg_var_ml.anisotropy));
+
     return 0;
 }
 

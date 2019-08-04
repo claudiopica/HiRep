@@ -158,7 +158,7 @@ static void update_all(double *beta, int type)
         if (dyn_gauge[j * 4 + mu] != 0)
         {
           staples(j, mu, &v);
-          cabmar(beta[mu], pu_gauge(j, mu), &v, type);
+          cabmar(*beta, pu_gauge(j, mu), &v, type);
         }
       }
 #ifdef WITH_MPI
@@ -176,7 +176,7 @@ static void update_all(double *beta, int type)
           if (dyn_gauge[j * 4 + mu] != 0)
           {
             staples(j, mu, &v);
-            cabmar(beta[mu], pu_gauge(j, mu), &v, type);
+            cabmar(*beta, pu_gauge(j, mu), &v, type);
           }
         }
       }
@@ -197,7 +197,7 @@ static void update_all(double *beta, int type)
         if (dyn_gauge[j * 4 + mu] != 0)
         {
           staples(j, mu, &v);
-          cabmar(beta[mu], pu_gauge(j, mu), &v, type);
+          cabmar(*beta, pu_gauge(j, mu), &v, type);
         }
       }
 #ifdef WITH_MPI
@@ -215,7 +215,7 @@ static void update_all(double *beta, int type)
           if (dyn_gauge[j * 4 + mu] != 0)
           {
             staples(j, mu, &v);
-            cabmar(beta[mu], pu_gauge(j, mu), &v, type);
+            cabmar(*beta, pu_gauge(j, mu), &v, type);
           }
         }
       }

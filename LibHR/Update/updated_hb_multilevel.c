@@ -200,7 +200,7 @@ static void update_mh_all(int lev, double *beta, int type)
                 if (loc_dyn[j * 4 + mu] != 0)
                 {
                     staples(j, mu, &v);
-                    cabmar(beta[mu], pu_gauge(j, mu), &v, type);
+                    cabmar(*beta, pu_gauge(j, mu), &v, type);
                 }
             }
 #ifdef WITH_MPI
@@ -218,7 +218,7 @@ static void update_mh_all(int lev, double *beta, int type)
                     if (loc_dyn[j * 4 + mu] != 0)
                     {
                         staples(j, mu, &v);
-                        cabmar(beta[mu], pu_gauge(j, mu), &v, type);
+                        cabmar(*beta, pu_gauge(j, mu), &v, type);
                     }
                 }
             }
@@ -239,7 +239,7 @@ static void update_mh_all(int lev, double *beta, int type)
                 if (loc_dyn[j * 4 + mu] != 0)
                 {
                     staples(j, mu, &v);
-                    cabmar(beta[mu], pu_gauge(j, mu), &v, type);
+                    cabmar(*beta, pu_gauge(j, mu), &v, type);
                 }
             }
 #ifdef WITH_MPI
@@ -257,7 +257,7 @@ static void update_mh_all(int lev, double *beta, int type)
                     if (loc_dyn[j * 4 + mu] != 0)
                     {
                         staples(j, mu, &v);
-                        cabmar(beta[mu], pu_gauge(j, mu), &v, type);
+                        cabmar(*beta, pu_gauge(j, mu), &v, type);
                     }
                 }
             }

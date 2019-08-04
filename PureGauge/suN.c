@@ -120,12 +120,10 @@ int main(int argc, char *argv[])
   init_mc(&flow, input_filename);
   lprintf("MAIN", 0, "Initial plaquette: %1.8e\n", avr_plaquette());
 
-  double lbeta[4] = {flow.pg_v->beta, flow.pg_v->beta, flow.pg_v->beta, flow.pg_v->beta};
-
   /* Termalizzazione */
   for (i = 0; i < flow.therm; ++i)
   {
-    update(lbeta, flow.pg_v->nhb, flow.pg_v->nor);
+    update(&(flow.pg_v->beta), flow.pg_v->nhb, flow.pg_v->nor);
     if ((i % 10) == 0)
       lprintf("MAIN", 0, "%d", i);
     else
@@ -144,7 +142,7 @@ int main(int argc, char *argv[])
     gettimeofday(&start, 0);
 
     for (n = 0; n < flow.pg_v->nit; n++) /* nit updates */
-      update(lbeta, flow.pg_v->nhb, flow.pg_v->nor);
+      update(&(flow.pg_v->beta), flow.pg_v->nhb, flow.pg_v->nor);
 
     gettimeofday(&end, 0);
     timeval_subtract(&etime, &end, &start);
