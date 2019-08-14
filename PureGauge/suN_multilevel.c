@@ -31,6 +31,7 @@
 #include "suN_utils_multilevel.h"
 #include "setup.h"
 #include "glueballs.h"
+#include "wilsonflow.h"
 
 pg_flow_ml flow = init_pg_flow_ml(flow);
 
@@ -92,6 +93,9 @@ int main(int argc, char *argv[])
     timeval_subtract(&etime, &end, &start);
     lprintf("MAIN", 0, "ML Measure #%d: generated in [%ld sec %ld usec]\n", i, etime.tv_sec, etime.tv_usec);
     lprintf("MAIN", 0, "Plaquette (%f)\n", avr_plaquette());
+
+    WF_adaptive_full_measure(u_gauge, &(flow.pg_v->beta), &(flow.pg_v->beta), &(flow.pg_v->beta) , 10);
+
 
     if ((i % flow.save_freq) == 0)
     {

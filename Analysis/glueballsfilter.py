@@ -253,10 +253,12 @@ if __name__ == '__main__':
     if(args.s):
         print("Striping the 1pt functions from",inputdata_filename)
         writedata=False
+        countmeas=0
         with open(inputdata_filename) as file:
             for line in file:
                 if("[MAIN][0]ML Measure #" in line and "..." in line):
                     nmeas=int((line.split("Measure #",1)[1]).split("...",1)[0])
+                    countmeas+=1
                 elif("[Measure ML][0]1pt function" in line):
                     if(not(line in activemeas)):
                         outfile=onept_outfilename(line)
@@ -282,7 +284,7 @@ if __name__ == '__main__':
         file.close()
         for string in myopenfile:
             myopenfile[string].close()
-
+        print("Found",countmeas,"independent measures")
     if(args.y):
         print("Performing the 1pt statistical analyis")
 

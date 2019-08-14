@@ -87,8 +87,10 @@ void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_stor
 #define n_OP_oneTr_p_m1_0_0_Ir_5_C_m1 0
 #define n_OP_oneTr_p_m1_0_0_Ir_5_C_1 0
 #define dim_p_m1_0_1_Ir_1 1
-#define n_OP_oneTr_p_m1_0_1_Ir_1_C_m1 0
-#define n_OP_oneTr_p_m1_0_1_Ir_1_C_1 0
+#define n_OP_oneTr_p_m1_0_1_Ir_1_C_m1 1
+void OP_oneTr_p_m1_0_1_Ir_1_C_m1(double complex * numop);
+#define n_OP_oneTr_p_m1_0_1_Ir_1_C_1 5
+void OP_oneTr_p_m1_0_1_Ir_1_C_1(double complex * numop);
 #define dim_p_m1_0_1_Ir_2 1
 #define n_OP_oneTr_p_m1_0_1_Ir_2_C_m1 0
 #define n_OP_oneTr_p_m1_0_1_Ir_2_C_1 0
@@ -108,8 +110,10 @@ void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_stor
 #define n_OP_oneTr_p_m1_1_m1_Ir_3_C_m1 0
 #define n_OP_oneTr_p_m1_1_m1_Ir_3_C_1 0
 #define dim_p_m1_1_0_Ir_1 1
-#define n_OP_oneTr_p_m1_1_0_Ir_1_C_m1 0
-#define n_OP_oneTr_p_m1_1_0_Ir_1_C_1 0
+#define n_OP_oneTr_p_m1_1_0_Ir_1_C_m1 4
+void OP_oneTr_p_m1_1_0_Ir_1_C_m1(double complex * numop);
+#define n_OP_oneTr_p_m1_1_0_Ir_1_C_1 5
+void OP_oneTr_p_m1_1_0_Ir_1_C_1(double complex * numop);
 #define dim_p_m1_1_0_Ir_2 1
 #define n_OP_oneTr_p_m1_1_0_Ir_2_C_m1 0
 #define n_OP_oneTr_p_m1_1_0_Ir_2_C_1 0
@@ -156,8 +160,10 @@ void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_stor
 #define n_OP_oneTr_p_0_m1_0_Ir_5_C_m1 0
 #define n_OP_oneTr_p_0_m1_0_Ir_5_C_1 0
 #define dim_p_0_m1_1_Ir_1 1
-#define n_OP_oneTr_p_0_m1_1_Ir_1_C_m1 0
-#define n_OP_oneTr_p_0_m1_1_Ir_1_C_1 0
+#define n_OP_oneTr_p_0_m1_1_Ir_1_C_m1 2
+void OP_oneTr_p_0_m1_1_Ir_1_C_m1(double complex * numop);
+#define n_OP_oneTr_p_0_m1_1_Ir_1_C_1 5
+void OP_oneTr_p_0_m1_1_Ir_1_C_1(double complex * numop);
 #define dim_p_0_m1_1_Ir_2 1
 #define n_OP_oneTr_p_0_m1_1_Ir_2_C_m1 0
 #define n_OP_oneTr_p_0_m1_1_Ir_2_C_1 0
@@ -183,16 +189,16 @@ void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_stor
 #define n_OP_oneTr_p_0_0_m1_Ir_5_C_m1 0
 #define n_OP_oneTr_p_0_0_m1_Ir_5_C_1 0
 #define dim_p_0_0_0_Ir_1 1
-#define n_OP_oneTr_p_0_0_0_Ir_1_C_m1 0
-#define n_OP_oneTr_p_0_0_0_Ir_1_C_1 5
+#define n_OP_oneTr_p_0_0_0_Ir_1_C_m1 3
+void OP_oneTr_p_0_0_0_Ir_1_C_m1(double complex * numop);
+#define n_OP_oneTr_p_0_0_0_Ir_1_C_1 11
 void OP_oneTr_p_0_0_0_Ir_1_C_1(double complex * numop);
 #define dim_p_0_0_0_Ir_2 1
 #define n_OP_oneTr_p_0_0_0_Ir_2_C_m1 0
 #define n_OP_oneTr_p_0_0_0_Ir_2_C_1 0
 #define dim_p_0_0_0_Ir_3 2
 #define n_OP_oneTr_p_0_0_0_Ir_3_C_m1 0
-#define n_OP_oneTr_p_0_0_0_Ir_3_C_1 4
-void OP_oneTr_p_0_0_0_Ir_3_C_1(double complex * numop);
+#define n_OP_oneTr_p_0_0_0_Ir_3_C_1 0
 #define dim_p_0_0_0_Ir_4 3
 #define n_OP_oneTr_p_0_0_0_Ir_4_C_m1 0
 #define n_OP_oneTr_p_0_0_0_Ir_4_C_1 0
@@ -216,7 +222,7 @@ void OP_oneTr_p_0_0_0_Ir_3_C_1(double complex * numop);
 #define n_OP_oneTr_p_0_0_0_Ir_10_C_1 0
 #define dim_p_0_0_1_Ir_1 1
 #define n_OP_oneTr_p_0_0_1_Ir_1_C_m1 0
-#define n_OP_oneTr_p_0_0_1_Ir_1_C_1 2
+#define n_OP_oneTr_p_0_0_1_Ir_1_C_1 5
 void OP_oneTr_p_0_0_1_Ir_1_C_1(double complex * numop);
 #define dim_p_0_0_1_Ir_2 1
 #define n_OP_oneTr_p_0_0_1_Ir_2_C_m1 0
@@ -231,8 +237,10 @@ void OP_oneTr_p_0_0_1_Ir_1_C_1(double complex * numop);
 #define n_OP_oneTr_p_0_0_1_Ir_5_C_m1 0
 #define n_OP_oneTr_p_0_0_1_Ir_5_C_1 0
 #define dim_p_0_1_m1_Ir_1 1
-#define n_OP_oneTr_p_0_1_m1_Ir_1_C_m1 0
-#define n_OP_oneTr_p_0_1_m1_Ir_1_C_1 0
+#define n_OP_oneTr_p_0_1_m1_Ir_1_C_m1 2
+void OP_oneTr_p_0_1_m1_Ir_1_C_m1(double complex * numop);
+#define n_OP_oneTr_p_0_1_m1_Ir_1_C_1 5
+void OP_oneTr_p_0_1_m1_Ir_1_C_1(double complex * numop);
 #define dim_p_0_1_m1_Ir_2 1
 #define n_OP_oneTr_p_0_1_m1_Ir_2_C_m1 0
 #define n_OP_oneTr_p_0_1_m1_Ir_2_C_1 0
@@ -243,8 +251,9 @@ void OP_oneTr_p_0_0_1_Ir_1_C_1(double complex * numop);
 #define n_OP_oneTr_p_0_1_m1_Ir_4_C_m1 0
 #define n_OP_oneTr_p_0_1_m1_Ir_4_C_1 0
 #define dim_p_0_1_0_Ir_1 1
-#define n_OP_oneTr_p_0_1_0_Ir_1_C_m1 0
-#define n_OP_oneTr_p_0_1_0_Ir_1_C_1 2
+#define n_OP_oneTr_p_0_1_0_Ir_1_C_m1 1
+void OP_oneTr_p_0_1_0_Ir_1_C_m1(double complex * numop);
+#define n_OP_oneTr_p_0_1_0_Ir_1_C_1 5
 void OP_oneTr_p_0_1_0_Ir_1_C_1(double complex * numop);
 #define dim_p_0_1_0_Ir_2 1
 #define n_OP_oneTr_p_0_1_0_Ir_2_C_m1 0
@@ -259,8 +268,10 @@ void OP_oneTr_p_0_1_0_Ir_1_C_1(double complex * numop);
 #define n_OP_oneTr_p_0_1_0_Ir_5_C_m1 0
 #define n_OP_oneTr_p_0_1_0_Ir_5_C_1 0
 #define dim_p_0_1_1_Ir_1 1
-#define n_OP_oneTr_p_0_1_1_Ir_1_C_m1 0
-#define n_OP_oneTr_p_0_1_1_Ir_1_C_1 0
+#define n_OP_oneTr_p_0_1_1_Ir_1_C_m1 3
+void OP_oneTr_p_0_1_1_Ir_1_C_m1(double complex * numop);
+#define n_OP_oneTr_p_0_1_1_Ir_1_C_1 5
+void OP_oneTr_p_0_1_1_Ir_1_C_1(double complex * numop);
 #define dim_p_0_1_1_Ir_2 1
 #define n_OP_oneTr_p_0_1_1_Ir_2_C_m1 0
 #define n_OP_oneTr_p_0_1_1_Ir_2_C_1 0
@@ -280,8 +291,10 @@ void OP_oneTr_p_0_1_0_Ir_1_C_1(double complex * numop);
 #define n_OP_oneTr_p_1_m1_m1_Ir_3_C_m1 0
 #define n_OP_oneTr_p_1_m1_m1_Ir_3_C_1 0
 #define dim_p_1_m1_0_Ir_1 1
-#define n_OP_oneTr_p_1_m1_0_Ir_1_C_m1 0
-#define n_OP_oneTr_p_1_m1_0_Ir_1_C_1 0
+#define n_OP_oneTr_p_1_m1_0_Ir_1_C_m1 4
+void OP_oneTr_p_1_m1_0_Ir_1_C_m1(double complex * numop);
+#define n_OP_oneTr_p_1_m1_0_Ir_1_C_1 5
+void OP_oneTr_p_1_m1_0_Ir_1_C_1(double complex * numop);
 #define dim_p_1_m1_0_Ir_2 1
 #define n_OP_oneTr_p_1_m1_0_Ir_2_C_m1 0
 #define n_OP_oneTr_p_1_m1_0_Ir_2_C_1 0
@@ -301,8 +314,10 @@ void OP_oneTr_p_0_1_0_Ir_1_C_1(double complex * numop);
 #define n_OP_oneTr_p_1_m1_1_Ir_3_C_m1 0
 #define n_OP_oneTr_p_1_m1_1_Ir_3_C_1 0
 #define dim_p_1_0_m1_Ir_1 1
-#define n_OP_oneTr_p_1_0_m1_Ir_1_C_m1 0
-#define n_OP_oneTr_p_1_0_m1_Ir_1_C_1 0
+#define n_OP_oneTr_p_1_0_m1_Ir_1_C_m1 1
+void OP_oneTr_p_1_0_m1_Ir_1_C_m1(double complex * numop);
+#define n_OP_oneTr_p_1_0_m1_Ir_1_C_1 5
+void OP_oneTr_p_1_0_m1_Ir_1_C_1(double complex * numop);
 #define dim_p_1_0_m1_Ir_2 1
 #define n_OP_oneTr_p_1_0_m1_Ir_2_C_m1 0
 #define n_OP_oneTr_p_1_0_m1_Ir_2_C_1 0
@@ -314,7 +329,7 @@ void OP_oneTr_p_0_1_0_Ir_1_C_1(double complex * numop);
 #define n_OP_oneTr_p_1_0_m1_Ir_4_C_1 0
 #define dim_p_1_0_0_Ir_1 1
 #define n_OP_oneTr_p_1_0_0_Ir_1_C_m1 0
-#define n_OP_oneTr_p_1_0_0_Ir_1_C_1 2
+#define n_OP_oneTr_p_1_0_0_Ir_1_C_1 5
 void OP_oneTr_p_1_0_0_Ir_1_C_1(double complex * numop);
 #define dim_p_1_0_0_Ir_2 1
 #define n_OP_oneTr_p_1_0_0_Ir_2_C_m1 0
@@ -330,7 +345,8 @@ void OP_oneTr_p_1_0_0_Ir_1_C_1(double complex * numop);
 #define n_OP_oneTr_p_1_0_0_Ir_5_C_1 0
 #define dim_p_1_0_1_Ir_1 1
 #define n_OP_oneTr_p_1_0_1_Ir_1_C_m1 0
-#define n_OP_oneTr_p_1_0_1_Ir_1_C_1 0
+#define n_OP_oneTr_p_1_0_1_Ir_1_C_1 5
+void OP_oneTr_p_1_0_1_Ir_1_C_1(double complex * numop);
 #define dim_p_1_0_1_Ir_2 1
 #define n_OP_oneTr_p_1_0_1_Ir_2_C_m1 0
 #define n_OP_oneTr_p_1_0_1_Ir_2_C_1 0
@@ -350,8 +366,10 @@ void OP_oneTr_p_1_0_0_Ir_1_C_1(double complex * numop);
 #define n_OP_oneTr_p_1_1_m1_Ir_3_C_m1 0
 #define n_OP_oneTr_p_1_1_m1_Ir_3_C_1 0
 #define dim_p_1_1_0_Ir_1 1
-#define n_OP_oneTr_p_1_1_0_Ir_1_C_m1 0
-#define n_OP_oneTr_p_1_1_0_Ir_1_C_1 0
+#define n_OP_oneTr_p_1_1_0_Ir_1_C_m1 4
+void OP_oneTr_p_1_1_0_Ir_1_C_m1(double complex * numop);
+#define n_OP_oneTr_p_1_1_0_Ir_1_C_1 5
+void OP_oneTr_p_1_1_0_Ir_1_C_1(double complex * numop);
 #define dim_p_1_1_0_Ir_2 1
 #define n_OP_oneTr_p_1_1_0_Ir_2_C_m1 0
 #define n_OP_oneTr_p_1_1_0_Ir_2_C_1 0
@@ -370,6 +388,6 @@ void OP_oneTr_p_1_0_0_Ir_1_C_1(double complex * numop);
 #define dim_p_1_1_1_Ir_3 2
 #define n_OP_oneTr_p_1_1_1_Ir_3_C_m1 0
 #define n_OP_oneTr_p_1_1_1_Ir_3_C_1 0
-#define total_n_glue_op 17
-#define total_corrs_size 77
+#define total_n_glue_op 81
+#define total_corrs_size 741
 #endif

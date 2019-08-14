@@ -33,5 +33,7 @@ double WF_topo(suNg_field* V);
 void WF_E_T(double* E,suNg_field* V);
 void WF_Esym_T(double* Esym,suNg_field* V);
 
+void WF_adaptive_full_measure(suNg_field *V, double *tmax, double *eps, double *delta, int nmeas);
+
 #endif /* WILSONFLOW_H */
 

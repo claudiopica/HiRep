@@ -29,11 +29,10 @@
 #include "logger.h"
 #include "random.h"
 #include "wilsonflow.h"
+#include "setup.h"
 
-#include "cinfo.c"
-
-
-typedef struct _input_WF {
+typedef struct _input_WF
+{
   double tmax;
   int nmeas;
   int nint;
@@ -43,22 +42,22 @@ typedef struct _input_WF {
 
 } input_WF;
 
-#define init_input_WF(varname) \
-{ \
-  .read={\
-    {"WF max integration time", "WF:tmax = %lf", DOUBLE_T, &((varname).tmax)},\
-    {"WF number of measures", "WF:nmeas = %d", DOUBLE_T, &((varname).nmeas)},\
-    {"WF number of integration steps between measures", "WF:nint = %d", INT_T, &((varname).nint)},\
-    {NULL, NULL, 0, NULL}\
-  }\
-}
+#define init_input_WF(varname)                                                                       \
+  {                                                                                                  \
+    .read = {                                                                                        \
+      {"WF max integration time", "WF:tmax = %lf", DOUBLE_T, &((varname).tmax)},                     \
+      {"WF number of measures", "WF:nmeas = %d", DOUBLE_T, &((varname).nmeas)},                      \
+      {"WF number of integration steps between measures", "WF:nint = %d", INT_T, &((varname).nint)}, \
+      {NULL, NULL, 0, NULL}                                                                          \
+    }                                                                                                \
+  }
 
 input_WF WF_var = init_input_WF(WF_var);
 
-
 #ifdef ROTATED_SF
 
-typedef struct _input_SF {
+typedef struct _input_SF
+{
   double ct;
   double beta;
 
@@ -67,28 +66,32 @@ typedef struct _input_SF {
 
 } input_SF;
 
-#define init_input_SF(varname) \
-{ \
-  .read={\
-    {"SF ct", "SF:ct = %lf", DOUBLE_T, &((varname).ct)},\
-    {"SF beta", "SF:beta = %lf", DOUBLE_T, &((varname).beta)},\
-    {NULL, NULL, 0, NULL}\
-  }\
-}
+#define init_input_SF(varname)                                   \
+  {                                                              \
+    .read = {                                                    \
+      {"SF ct", "SF:ct = %lf", DOUBLE_T, &((varname).ct)},       \
+      {"SF beta", "SF:beta = %lf", DOUBLE_T, &((varname).beta)}, \
+      {NULL, NULL, 0, NULL}                                      \
+    }                                                            \
+  }
 
 input_SF SF_var = init_input_SF(SF_var);
 
 #endif /* ROTATED_SF */
 
-
-char cnfg_filename[256]="";
-char list_filename[256]="";
+char cnfg_filename[256] = "";
+char list_filename[256] = "";
 char input_filename[256] = "input_file";
 char output_filename[256] = "wilsonflow.out";
-enum { UNKNOWN_CNFG=0, DYNAMICAL_CNFG, QUENCHED_CNFG };
+enum
+{
+  UNKNOWN_CNFG = 0,
+  DYNAMICAL_CNFG,
+  QUENCHED_CNFG
+};
 
-
-typedef struct {
+typedef struct
+{
   char string[256];
   int t, x, y, z;
   int nc, nf;
@@ -97,204 +100,155 @@ typedef struct {
   int type;
 } filename_t;
 
-
-int parse_cnfg_filename(char* filename, filename_t* fn) {
+int parse_cnfg_filename(char *filename, filename_t *fn)
+{
   int hm;
   char *tmp = NULL;
   char *basename;
 
   basename = filename;
-  while ((tmp = strchr(basename, '/')) != NULL) {
-    basename = tmp+1;
+  while ((tmp = strchr(basename, '/')) != NULL)
+  {
+    basename = tmp + 1;
   }
 
-/*#ifdef REPR_FUNDAMENTAL*/
-/*#define repr_name "FUN"*/
-/*#elif defined REPR_SYMMETRIC*/
-/*#define repr_name "SYM"*/
-/*#elif defined REPR_ANTISYMMETRIC*/
-/*#define repr_name "ASY"*/
-/*#elif defined REPR_ADJOINT*/
-/*#define repr_name "ADJ"*/
-/*#endif*/
-  hm=sscanf(basename,"%*[^_]_%dx%dx%dx%d%*[Nn]c%dr%*[FSA]%*[UYSD]%*[NMYJ]%*[Nn]f%db%lfm%lfn%d",
-      &(fn->t),&(fn->x),&(fn->y),&(fn->z),&(fn->nc),&(fn->nf),&(fn->b),&(fn->m),&(fn->n));
-  if(hm==9) {
-    fn->m=-fn->m; /* invert sign of mass */
-    fn->type=DYNAMICAL_CNFG;
+  hm = sscanf(basename, "%*[^_]_%dx%dx%dx%d%*[Nn]c%dr%*[FSA]%*[UYSD]%*[NMYJ]%*[Nn]f%db%lfm%lfn%d",
+              &(fn->t), &(fn->x), &(fn->y), &(fn->z), &(fn->nc), &(fn->nf), &(fn->b), &(fn->m), &(fn->n));
+  if (hm == 9)
+  {
+    fn->m = -fn->m; /* invert sign of mass */
+    fn->type = DYNAMICAL_CNFG;
     return DYNAMICAL_CNFG;
   }
-/*#undef repr_name*/
+  /*#undef repr_name*/
 
   double kappa;
-  hm=sscanf(basename,"%dx%dx%dx%d%*[Nn]c%d%*[Nn]f%db%lfk%lfn%d",
-      &(fn->t),&(fn->x),&(fn->y),&(fn->z),&(fn->nc),&(fn->nf),&(fn->b),&kappa,&(fn->n));
-  if(hm==9) {
-    fn->m = .5/kappa-4.;
-    fn->type=DYNAMICAL_CNFG;
+  hm = sscanf(basename, "%dx%dx%dx%d%*[Nn]c%d%*[Nn]f%db%lfk%lfn%d",
+              &(fn->t), &(fn->x), &(fn->y), &(fn->z), &(fn->nc), &(fn->nf), &(fn->b), &kappa, &(fn->n));
+  if (hm == 9)
+  {
+    fn->m = .5 / kappa - 4.;
+    fn->type = DYNAMICAL_CNFG;
     return DYNAMICAL_CNFG;
   }
 
-  hm=sscanf(basename,"%dx%dx%dx%d%*[Nn]c%db%lfn%d",
-      &(fn->t),&(fn->x),&(fn->y),&(fn->z),&(fn->nc),&(fn->b),&(fn->n));
-  if(hm==7) {
-    fn->type=QUENCHED_CNFG;
+  hm = sscanf(basename, "%dx%dx%dx%d%*[Nn]c%db%lfn%d",
+              &(fn->t), &(fn->x), &(fn->y), &(fn->z), &(fn->nc), &(fn->b), &(fn->n));
+  if (hm == 7)
+  {
+    fn->type = QUENCHED_CNFG;
     return QUENCHED_CNFG;
   }
 
-  hm=sscanf(basename,"%*[^_]_%dx%dx%dx%d%*[Nn]c%db%lfn%d",
-      &(fn->t),&(fn->x),&(fn->y),&(fn->z),&(fn->nc),&(fn->b),&(fn->n));
-  if(hm==7) {
-    fn->type=QUENCHED_CNFG;
+  hm = sscanf(basename, "%*[^_]_%dx%dx%dx%d%*[Nn]c%db%lfn%d",
+              &(fn->t), &(fn->x), &(fn->y), &(fn->z), &(fn->nc), &(fn->b), &(fn->n));
+  if (hm == 7)
+  {
+    fn->type = QUENCHED_CNFG;
     return QUENCHED_CNFG;
   }
 
-  fn->type=UNKNOWN_CNFG;
+  fn->type = UNKNOWN_CNFG;
   return UNKNOWN_CNFG;
 }
 
+void read_cmdline(int argc, char *argv[])
+{
+  int i, ai = 0, ao = 0, ac = 0, al = 0, am = 0;
+  FILE *list = NULL;
 
-void read_cmdline(int argc, char* argv[]) {
-  int i, ai=0, ao=0, ac=0, al=0, am=0;
-  FILE *list=NULL;
-
-  for (i=1;i<argc;i++) {
-    if (strcmp(argv[i],"-i")==0) ai=i+1;
-    else if (strcmp(argv[i],"-o")==0) ao=i+1;
-    else if (strcmp(argv[i],"-c")==0) ac=i+1;
-    else if (strcmp(argv[i],"-l")==0) al=i+1;
-    else if (strcmp(argv[i],"-m")==0) am=i;
+  for (i = 1; i < argc; i++)
+  {
+    if (strcmp(argv[i], "-i") == 0)
+      ai = i + 1;
+    else if (strcmp(argv[i], "-o") == 0)
+      ao = i + 1;
+    else if (strcmp(argv[i], "-c") == 0)
+      ac = i + 1;
+    else if (strcmp(argv[i], "-l") == 0)
+      al = i + 1;
+    else if (strcmp(argv[i], "-m") == 0)
+      am = i;
   }
 
-  if (am != 0) {
+  if (am != 0)
+  {
     print_compiling_info();
     exit(0);
   }
 
-  if (ao!=0) strcpy(output_filename,argv[ao]);
-  if (ai!=0) strcpy(input_filename,argv[ai]);
+  if (ao != 0)
+    strcpy(output_filename, argv[ao]);
+  if (ai != 0)
+    strcpy(input_filename, argv[ai]);
 
-  error((ac==0 && al==0) || (ac!=0 && al!=0),1,"parse_cmdline [WF_measure.c]",
-      "Syntax: mk_wilsonloops { -c <config file> | -l <list file> } [-i <input file>] [-o <output file>] [-m]");
+  error((ac == 0 && al == 0) || (ac != 0 && al != 0), 1, "parse_cmdline [WF_measure.c]",
+        "Syntax: mk_wilsonloops { -c <config file> | -l <list file> } [-i <input file>] [-o <output file>] [-m]");
 
-  if(ac != 0) {
-    strcpy(cnfg_filename,argv[ac]);
-    strcpy(list_filename,"");
-  } else if(al != 0) {
-    strcpy(list_filename,argv[al]);
-    error((list=fopen(list_filename,"r"))==NULL,1,"parse_cmdline [WF_measure.c]" ,
-	"Failed to open list file\n");
-    error(fscanf(list,"%s",cnfg_filename)==0,1,"parse_cmdline [WF_measure.c]" ,
-	"Empty list file\n");
+  if (ac != 0)
+  {
+    strcpy(cnfg_filename, argv[ac]);
+    strcpy(list_filename, "");
+  }
+  else if (al != 0)
+  {
+    strcpy(list_filename, argv[al]);
+    error((list = fopen(list_filename, "r")) == NULL, 1, "parse_cmdline [WF_measure.c]",
+          "Failed to open list file\n");
+    error(fscanf(list, "%s", cnfg_filename) == 0, 1, "parse_cmdline [WF_measure.c]",
+          "Empty list file\n");
     fclose(list);
   }
-
-
 }
 
-
-int main(int argc,char *argv[]) {
+int main(int argc, char *argv[])
+{
   int i;
-  char tmp[256];
-  FILE* list;
+  FILE *list;
   filename_t fpars;
 
   /* setup process id and communications */
   read_cmdline(argc, argv);
-  setup_process(&argc,&argv);
+  setup_process(&argc, &argv);
+  setup_gauge_fields();
 
-  read_input(glb_var.read,input_filename);
-  read_input(rlx_var.read,input_filename);
-  setup_replicas();
-
-  /* logger setup */
-  /* disable logger for MPI processes != 0 */
-  logger_setlevel(0,70);
-  if (PID!=0) { logger_disable(); }
-  if (PID==0) { 
-    sprintf(tmp,">%s",output_filename); logger_stdout(tmp);
-    sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
-  }
-
-  lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS); 
-  lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
-  lprintf("MAIN",0,"input file [%s]\n",input_filename); 
-  lprintf("MAIN",0,"output file [%s]\n",output_filename); 
-  if (strcmp(list_filename,"")!=0) lprintf("MAIN",0,"list file [%s]\n",list_filename); 
-  else lprintf("MAIN",0,"cnfg file [%s]\n",cnfg_filename); 
-
+  if (strcmp(list_filename, "") != 0)
+    lprintf("MAIN", 0, "list file [%s]\n", list_filename);
+  else
+    lprintf("MAIN", 0, "cnfg file [%s]\n", cnfg_filename);
 
   /* read & broadcast parameters */
-  parse_cnfg_filename(cnfg_filename,&fpars);
+  parse_cnfg_filename(cnfg_filename, &fpars);
 
-  read_input(WF_var.read,input_filename);
+  read_input(WF_var.read, input_filename);
 #ifdef ROTATED_SF
-  read_input(SF_var.read,input_filename);
+  read_input(SF_var.read, input_filename);
 #endif
-  GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
+  GLB_T = fpars.t;
+  GLB_X = fpars.x;
+  GLB_Y = fpars.y;
+  GLB_Z = fpars.z;
 
-  error(fpars.type==UNKNOWN_CNFG,1,"WF_measure.c","Bad name for a configuration file");
-  error(fpars.nc!=NG,1,"WF_measure.c","Bad NG");
+  error(fpars.type == UNKNOWN_CNFG, 1, "WF_measure.c", "Bad name for a configuration file");
+  error(fpars.nc != NG, 1, "WF_measure.c", "Bad NG");
 
-  lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed);
-  rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+PID);
-  srand(rlx_var.rlxd_seed+PID);
-
-#ifdef GAUGE_SUN
-  lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
-#elif GAUGE_SON
-  lprintf("MAIN",0,"Gauge group: SO(%d)\n",NG);
-#else
-  lprintf("MAIN",0,"Default gauge group: SU(%d)\n",NG);
-#endif
-
-  lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
-
-  /* setup communication geometry */
-  if (geometry_init() == 1) {
-    finalize_process();
-    return 0;
-  }
-
-  /* setup lattice geometry */
-  geometry_mpi_eo();
-  /* test_geometry_mpi_eo(); */
-  
-  BCs_pars_t BCs_pars = {
-    .fermion_twisting_theta = {0.,0.,0.,0.},
-    .gauge_boundary_improvement_cs = 1.,
-#ifdef ROTATED_SF
-    .gauge_boundary_improvement_ct = SF_var.ct,
-#else
-    .gauge_boundary_improvement_ct = 1.,
-#endif
-    .chiSF_boundary_improvement_ds = 1.,
-    .SF_BCs = 1
-  };
-
-  init_BCs(&BCs_pars);
-
-  /* alloc global gauge fields */
-  u_gauge=alloc_gfield(&glattice);
-
-  
-  lprintf("MAIN",0,"WF tmax: %e\n",WF_var.tmax);
-  lprintf("MAIN",0,"WF number of measures: %d\n",WF_var.nmeas);
-  lprintf("MAIN",0,"WF time lapse between measures: %e\n",WF_var.tmax/WF_var.nmeas);
-  lprintf("MAIN",0,"WF number of integration intervals per measure: %d\n",WF_var.nint);
-  lprintf("MAIN",0,"WF number of integration intervals: %d\n",WF_var.nint*WF_var.nmeas);
-  lprintf("MAIN",0,"WF integration step: %e\n",WF_var.tmax/(WF_var.nmeas*WF_var.nint));
+  lprintf("MAIN", 0, "WF tmax: %e\n", WF_var.tmax);
+  lprintf("MAIN", 0, "WF number of measures: %d\n", WF_var.nmeas);
+  lprintf("MAIN", 0, "WF time lapse between measures: %e\n", WF_var.tmax / WF_var.nmeas);
+  lprintf("MAIN", 0, "WF number of integration intervals per measure: %d\n", WF_var.nint);
+  lprintf("MAIN", 0, "WF number of integration intervals: %d\n", WF_var.nint * WF_var.nmeas);
+  lprintf("MAIN", 0, "WF integration step: %e\n", WF_var.tmax / (WF_var.nmeas * WF_var.nint));
 
 #ifdef ROTATED_SF
-  lprintf("MAIN",0,"SF beta=%e\n",SF_var.beta);      
-  lprintf("MAIN",0,"SF ct=%e\n",SF_var.ct);
+  lprintf("MAIN", 0, "SF beta=%e\n", SF_var.beta);
+  lprintf("MAIN", 0, "SF ct=%e\n", SF_var.ct);
 #endif
 
-  
-  list=NULL;
-  if(strcmp(list_filename,"")!=0) {
-    error((list=fopen(list_filename,"r"))==NULL,1,"main [WF_measure.c]" ,
-	"Failed to open list file\n");
+  list = NULL;
+  if (strcmp(list_filename, "") != 0)
+  {
+    error((list = fopen(list_filename, "r")) == NULL, 1, "main [WF_measure.c]",
+          "Failed to open list file\n");
   }
 
   WF_initialize();
@@ -303,22 +257,23 @@ int main(int argc,char *argv[]) {
   double E, Esym, TC;
 #else
   int j;
-  double E[2*GLB_T];
-  double Esym[2*GLB_T];
+  double E[2 * GLB_T];
+  double Esym[2 * GLB_T];
   double Eavg[2];
   double Esymavg[2];
 #endif
 
-  
-  i=0;
-  while(1) {
+  i = 0;
+  while (1)
+  {
 
-    if(list!=NULL)
-      if(fscanf(list,"%s",cnfg_filename)==0 || feof(list)) break;
+    if (list != NULL)
+      if (fscanf(list, "%s", cnfg_filename) == 0 || feof(list))
+        break;
 
     i++;
 
-    lprintf("MAIN",0,"Configuration from %s\n", cnfg_filename);
+    lprintf("MAIN", 0, "Configuration from %s\n", cnfg_filename);
     /* NESSUN CHECK SULLA CONSISTENZA CON I PARAMETRI DEFINITI !!! */
 
     read_gauge_field(cnfg_filename);
@@ -328,60 +283,65 @@ int main(int argc,char *argv[]) {
     full_plaquette();
 
     int k, n;
-    double epsilon=WF_var.tmax/(WF_var.nmeas*WF_var.nint);
-    double t=0.;
+    double epsilon = WF_var.tmax / (WF_var.nmeas * WF_var.nint);
+    double t = 0.;
 
-    for(n=-1;n<WF_var.nmeas;n++) {
-      if(n>-1) {
-        for(k=0;k<WF_var.nint;k++) {
-          WilsonFlow3(u_gauge,epsilon);
-          t+=epsilon;
+    for (n = -1; n < WF_var.nmeas; n++)
+    {
+      if (n > -1)
+      {
+        for (k = 0; k < WF_var.nint; k++)
+        {
+          WilsonFlow3(u_gauge, epsilon);
+          t += epsilon;
         }
       }
 #ifndef ROTATED_SF
 
-      E=WF_E(u_gauge);
-      Esym=WF_Esym(u_gauge);
-      TC=WF_topo(u_gauge);
-      lprintf("WILSONFLOW",0,"WF (ncnfg,t,E,t2*E,Esym,t2*Esym,TC) = %d %e %e %e %e %e %e\n",i,t,E,t*t*E,Esym,t*t*Esym,TC);
+      E = WF_E(u_gauge);
+      Esym = WF_Esym(u_gauge);
+      TC = WF_topo(u_gauge);
+      lprintf("WILSONFLOW", 0, "WF (ncnfg,t,E,t2*E,Esym,t2*Esym,TC) = %d %e %e %e %e %e %e\n", i, t, E, t * t * E, Esym, t * t * Esym, TC);
 
 #else
 
-      WF_E_T(E,u_gauge);
-      WF_Esym_T(Esym,u_gauge);
-      Eavg[0]=Eavg[1]=Esymavg[0]=Esymavg[1]=0.0;
-      for(j=1;j<GLB_T-1;j++){
-        lprintf("WILSONFLOW",0,"WF (ncnfg,T,t,Etime,Espace,Esymtime,Esymspace) = %d %d %e %e %e %e %e\n",i,j,t,E[2*j],E[2*j+1],Esym[2*j],Esym[2*j+1]);
-        Eavg[0] += E[2*j];
-        Eavg[1] += E[2*j+1];
-        Esymavg[0] += Esym[2*j];
-        Esymavg[1] += Esym[2*j+1];
+      WF_E_T(E, u_gauge);
+      WF_Esym_T(Esym, u_gauge);
+      Eavg[0] = Eavg[1] = Esymavg[0] = Esymavg[1] = 0.0;
+      for (j = 1; j < GLB_T - 1; j++)
+      {
+        lprintf("WILSONFLOW", 0, "WF (ncnfg,T,t,Etime,Espace,Esymtime,Esymspace) = %d %d %e %e %e %e %e\n", i, j, t, E[2 * j], E[2 * j + 1], Esym[2 * j], Esym[2 * j + 1]);
+        Eavg[0] += E[2 * j];
+        Eavg[1] += E[2 * j + 1];
+        Esymavg[0] += Esym[2 * j];
+        Esymavg[1] += Esym[2 * j + 1];
       }
 
-      Eavg[0] /= GLB_T-2;
-      Eavg[1] /= GLB_T-3;
-      Esymavg[0] /= GLB_T-2;
-      Esymavg[1] /= GLB_T-3;
+      Eavg[0] /= GLB_T - 2;
+      Eavg[1] /= GLB_T - 3;
+      Esymavg[0] /= GLB_T - 2;
+      Esymavg[1] /= GLB_T - 3;
 
-      lprintf("WILSONFLOW",0,"WF avg (ncnfg,t,Etime,Espace,Esymtime,Esymspace,Pltime,Plspace) = %d %e %e %e %e %e %e %e\n",i,t,Eavg[0],Eavg[1],Esymavg[0],Esymavg[1],(NG-Eavg[0]),(NG-Eavg[1]));
-      lprintf("WILSONFLOW",0,"SF dS/deta= %e\n", SF_action(SF_var.beta));
+      lprintf("WILSONFLOW", 0, "WF avg (ncnfg,t,Etime,Espace,Esymtime,Esymspace,Pltime,Plspace) = %d %e %e %e %e %e %e %e\n", i, t, Eavg[0], Eavg[1], Esymavg[0], Esymavg[1], (NG - Eavg[0]), (NG - Eavg[1]));
+      lprintf("WILSONFLOW", 0, "SF dS/deta= %e\n", SF_action(SF_var.beta));
 
 #endif
     }
-    
-    if(list==NULL) break;
+
+    if (list == NULL)
+      break;
   }
 
-  if(list!=NULL) fclose(list);
+  if (list != NULL)
+    fclose(list);
 
   WF_free();
-  
+
   free_BCs();
- 
+
   free_gfield(u_gauge);
 
   finalize_process();
-  
+
   return 0;
 }
-

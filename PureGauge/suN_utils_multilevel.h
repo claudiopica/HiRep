@@ -16,7 +16,7 @@
 #define MAX(type, x, y) \
   (type)GENERIC_MAX(ENSURE_##type(x), ENSURE_##type(y))
 
-/* suN variables */
+/* suN ML variables */
 typedef struct _input_pg_ml
 {
 
@@ -52,6 +52,32 @@ typedef struct _input_pg_ml
     }                                                                                                                         \
   }
 
+/* WF variables */
+
+typedef struct _input_WF
+{
+  double tmax;
+  int nmeas;
+  double eps;
+  double delta;
+
+  /* for the reading function */
+  input_record_t read[5];
+} input_WF;
+
+#define init_input_WF(varname)                                                     \
+  {                                                                                \
+    .read = {                                                                      \
+      {"WF max integration time", "WF:tmax = %lf", DOUBLE_T, &((varname).tmax)},   \
+      {"WF number of measures", "WF:nmeas = %d", INT_T, &((varname).nmeas)},    \
+      {"WF initial epsilon", "WF:eps = %lf", DOUBLE_T, &((varname).eps)},          \
+      {"WF delta", "WF:delta = %lf", DOUBLE_T, &((varname).delta)},                \
+      {NULL, NULL, 0, NULL}                                                        \
+    }                                                                              \
+  }
+
+
+
 /* Flow control variables variables */
 typedef struct _pg_flow_ml
 {
@@ -71,6 +97,7 @@ typedef struct _pg_flow_ml
   int start, end;
   input_pg_ml *pg_v;
 
+  input_WF *wf;
   /* for the reading function */
   input_record_t read[8];
 
@@ -89,6 +116,7 @@ typedef struct _pg_flow_ml
       {NULL, NULL, INT_T, NULL}                                                         \
     }                                                                                   \
   }
+
 
 int init_mc_ml(pg_flow_ml *rf, char *ifile);
 int save_conf(pg_flow_ml *rf, int id);
