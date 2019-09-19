@@ -14,7 +14,7 @@
 #include "logger.h"
 #include <math.h>
 
-#define cabs(a) sqrt(_complex_prod_re(a,a))
+//#define cabs(a) sqrt(_complex_prod_re(a,a))
 #define MAX 15
 
 // Global variables
