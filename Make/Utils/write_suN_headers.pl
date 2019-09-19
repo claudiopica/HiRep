@@ -354,6 +354,7 @@ if ($su2quat==0) {
     write_su2_sub_assign();
     write_su2_sqnorm();
     write_su2_sqnorm_m1();
+    write_su2_trace();
     write_su2_trace_re();
     write_su2_trace_im();
     #write_su2_2TA();
@@ -3489,6 +3490,19 @@ sub write_su2_mul_assign{
     	print "#define _${basename}${repsuff}_mul_assign(u,r) _${basename}${fundsuff}_mul_assign((u),(r))\n\n";
     }
 }
+
+sub write_su2_trace{
+    print "/* k=Re Tr (u) */\n";
+    if ($N==2) { #fundamental representation
+        print "#define _${dataname}_trace(k,u) \\\n";
+        print "   (k)=2.*(u).$cname\[0\] \n\n";
+    } elsif ($N==3) { #adjoint representation
+        print "#define _${rdataname}_trace(k,u) \\\n";
+        print "   (k)=3.*(u).$cname\[0\]*(u).$cname\[0\]-(u).$cname\[1\]*(u).$cname\[1\]-(u).$cname\[2\]*(u).$cname\[2\]-(u).$cname\[3\]*(u).$cname\[3\] \n\n";
+    } else {
+        die("Undefined fermion representation in quaternionic code. Exiting...\n");
+    }
+}    
 
 sub write_su2_trace_re{
     print "/* k=Re Tr (u) */\n";
