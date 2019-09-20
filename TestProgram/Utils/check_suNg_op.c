@@ -32,7 +32,11 @@ double  norm_suNg_minus_id(suNg* a){
   double r=0.;
   for (i=0;i<NG;i++){
       for (j=1;j<NG;j++){
+        #ifdef WITH_QUATERNIONS
+        r +=fabs(a->c[i*NG+j]);
+        #else
         r +=cabs(a->c[i*NG+j]);
+        #endif
         if (i==j) r-= 1.0;
     }
 
@@ -61,14 +65,14 @@ int main(){
   random_suNg(&a);
   random_suNg(&b);
   random_suNg(&c); // Vincent:   NOT USED !
-  det_suNg(&det,&a);
+  det_hermNg(&det,&a);
   printf("Det: ");
   print_cmplx(det);
   if (cabs(det - 1.0) >1e-14) return_value +=1;
 
 
   _suNg_add_assign(a,b); /* a = a+ b */
-  det_suNg(&det,&a);
+  det_hermNg(&det,&a);
   printf("Det: ");
   print_cmplx(det);
   printf("\n");
@@ -77,7 +81,7 @@ int main(){
 
   printML(&a);
   c = a;  /* c = a+b */
-  inv_suNg(&a); /* a= (a+b)^-1 does not work for SO ? */
+  inv_hermNg(&a); /* a= (a+b)^-1 does not work for SO ? */
   printML(&a);
   _suNg_times_suNg(b,a,c); /* b = (a+b)^-1 *(a+b) so it should be 1 */
   printf("Should be the idendity matrix:\n");
@@ -87,8 +91,8 @@ int main(){
 
   c=b; /* c =  (a+b)^-1 *(a+b) */
   printML(&b); /* Vincent useless */
-  inv_suNg(&b); /* b = ((a+b)^-1 *(a+b))^-1 */
-  det_suNg(&det,&b);
+  inv_hermNg(&b); /* b = ((a+b)^-1 *(a+b))^-1 */
+  det_hermNg(&det,&b);
   printf("Should be the determinant of the idendity matrix:\n");
   printf("Det: ");
   print_cmplx(det);

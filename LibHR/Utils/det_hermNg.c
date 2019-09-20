@@ -1,10 +1,10 @@
 /*******************************************************************************
 *
-* File  det_suNg.c
+* File  det_hermNg.c
 *
-* Function to calculate determinant of a real suNg-matrix using 
+* Function to calculate determinant of an hermitian-matrix using
 * LU-decomposition. See NR.
-* 
+*
 * Ari Hietanen
 *
 *******************************************************************************/
@@ -19,14 +19,19 @@
 #ifndef GAUGE_SON
 
 #ifdef WITH_QUATERNIONS
-void det_suNg(double complex *res, suNg *a)
+void det_hermNg(double complex *res, suNg *a)
 {
-  _suNg_sqnorm(*res, *a);
+  suNg b;
+  double det;
+
+  b = *a;
+  _suNg_quat_det(det, b);
+  *res = det;
 }
 
 #else
 
-void det_suNg(double complex *res, suNg *a)
+void det_hermNg(double complex *res, suNg *a)
 {
   suNg b;
   int indx[NG];
@@ -49,7 +54,7 @@ void det_suNg(double complex *res, suNg *a)
 
 /* The incoming matrix will be destroyed */
 
-void det_suNg(double *res, suNg *a)
+void det_hermNg(double *res, suNg *a)
 {
   double vv[NG];
   double csum, ctmp, cdum;

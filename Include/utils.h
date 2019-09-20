@@ -1,12 +1,12 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 /*******************************************************************************
 *
 * File utils.h
-* 
+*
 * Some useful functions
 *
 *******************************************************************************/
@@ -70,11 +70,12 @@ void covariant_project_to_suNg(suNg *u);
 #ifndef GAUGE_SON
 void ludcmp(double complex *a, int *indx, double *d, int N);
 void lubksb(double complex *a, int *indx, double complex *b, int N);
-void inv_suNg(suNg *a);
-void det_suNg(double complex *res, suNg *a);
+void inv_hermNg(suNg *a);
+void det_hermNg(double complex *res, suNg *a);
 #else
 int project_to_suNg_real(suNg *out, suNg *in);
-void det_suNg(double *res, suNg *a);
+void inv_hermNg(suNg *a);
+void det_hermNg(double *res, suNg *a);
 void diag_hmat(suNg *hmat, double *dag);
 #endif
 

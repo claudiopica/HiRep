@@ -1,10 +1,10 @@
 /*******************************************************************************
 *
-* File  det_suNg.c
+* File  inv_hermNg.c
 *
-* Function to calculate determinant of a suNg-matrix using LU-decomposition
+* Function to calculate determinant of an hermitian-matrix using LU-decomposition
 * LU-decomposition. Modified from the real number version of Numerical Recipes.
-* 
+*
 * Ari Hietanen
 *
 *******************************************************************************/
@@ -19,10 +19,22 @@
 #ifndef GAUGE_SON
 
 #ifdef WITH_QUATERNIONS
+void inv_hermNg(suNg *a)
+{
+  suNg b;
+  double norm;
+
+  b = *a;
+  _suNg_quat_det(norm, b);
+  norm = 1/(norm);
+  _suNg_dagger(b,b);
+ _suNg_mul_assign(b,norm);
+  *a = b;
+
+}
 
 #else
-
-void inv_suNg(suNg *a)
+void inv_hermNg(suNg *a)
 {
   suNg b;
   double complex col[NG];

@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 /*******************************************************************************
@@ -320,7 +320,7 @@ int project_to_suNg_real(suNg *out, suNg *in)
   _suNg_times_suNg(tmp, om, *in);
   *out = tmp;
   //Fix the determinant
-  det_suNg(&det, &tmp);
+  det_hermNg(&det, &tmp);
   /*  if (fabs(det)<1-1e-7 || fabs(det)>1+1e-7){
       lprintf("suNg_utils",10,"Error in project project_to_suNg_real: determinant not +/-1. It is %1.8g\n",det);
     }*/
@@ -331,7 +331,7 @@ int project_to_suNg_real(suNg *out, suNg *in)
   }
 
   tmp = *out;
-  det_suNg(&det, &tmp);
+  det_hermNg(&det, &tmp);
   if (det < 1 - 1e-7 || det > 1 + 1e-7)
   {
     lprintf("suNg_utils", 10, "Error in project project_to_suNg_real: determinant not +/-1. It is %1.8g.", det);
@@ -349,7 +349,7 @@ void covariant_project_to_suNg(suNg *u)
   double complex norm;
   double complex evec[NG * NG];
 
-  det_suNg(&norm, u);
+  det_hermNg(&norm, u);
   norm = cpow(norm, -1. / NG);
   _suNg_mul_assign(*u, norm);
 
