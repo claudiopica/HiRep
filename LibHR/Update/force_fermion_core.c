@@ -125,27 +125,27 @@ static void g5_sigma(suNf_spinor *s, suNf_spinor *u, int mu, int nu)
 	{
 		for (int i = 0; i < NF; i++)
 		{
-			s->c[0].c[i] = -I*u->c[1].c[i];
-			s->c[1].c[i] = -I*u->c[0].c[i];
-			s->c[2].c[i] = -I*u->c[3].c[i];
-			s->c[3].c[i] = -I*u->c[2].c[i];
+			s->c[0].c[i] = -I * u->c[1].c[i];
+			s->c[1].c[i] = -I * u->c[0].c[i];
+			s->c[2].c[i] = -I * u->c[3].c[i];
+			s->c[3].c[i] = -I * u->c[2].c[i];
 		}
 	}
 	else if (nu == 0 && mu == 1)
 	{
 		for (int i = 0; i < NF; i++)
 		{
-			s->c[0].c[i] = I*u->c[1].c[i];
-			s->c[1].c[i] = I*u->c[0].c[i];
-			s->c[2].c[i] = I*u->c[3].c[i];
-			s->c[3].c[i] = I*u->c[2].c[i];
+			s->c[0].c[i] = I * u->c[1].c[i];
+			s->c[1].c[i] = I * u->c[0].c[i];
+			s->c[2].c[i] = I * u->c[3].c[i];
+			s->c[3].c[i] = I * u->c[2].c[i];
 		}
 	}
 	else if (mu == 0 && nu == 2)
 	{
 		for (int i = 0; i < NF; i++)
 		{
-			
+
 			s->c[0].c[i] = -u->c[1].c[i];
 			s->c[1].c[i] = u->c[0].c[i];
 			s->c[2].c[i] = -u->c[3].c[i];
@@ -156,7 +156,7 @@ static void g5_sigma(suNf_spinor *s, suNf_spinor *u, int mu, int nu)
 	{
 		for (int i = 0; i < NF; i++)
 		{
-			
+
 			s->c[0].c[i] = u->c[1].c[i];
 			s->c[1].c[i] = -u->c[0].c[i];
 			s->c[2].c[i] = u->c[3].c[i];
@@ -167,42 +167,42 @@ static void g5_sigma(suNf_spinor *s, suNf_spinor *u, int mu, int nu)
 	{
 		for (int i = 0; i < NF; i++)
 		{
-			
-			s->c[0].c[i] = -I*u->c[0].c[i];
-			s->c[1].c[i] = I*u->c[1].c[i];
-			s->c[2].c[i] =- I*u->c[2].c[i];
-			s->c[3].c[i] = I*u->c[3].c[i];
+
+			s->c[0].c[i] = -I * u->c[0].c[i];
+			s->c[1].c[i] = I * u->c[1].c[i];
+			s->c[2].c[i] = -I * u->c[2].c[i];
+			s->c[3].c[i] = I * u->c[3].c[i];
 		}
 	}
 	else if (nu == 0 && mu == 3)
 	{
 		for (int i = 0; i < NF; i++)
 		{
-			s->c[0].c[i] = I*u->c[0].c[i];
-			s->c[1].c[i] = -I*u->c[1].c[i];
-			s->c[2].c[i] = I*u->c[2].c[i];
-			s->c[3].c[i] = -I*u->c[3].c[i];
+			s->c[0].c[i] = I * u->c[0].c[i];
+			s->c[1].c[i] = -I * u->c[1].c[i];
+			s->c[2].c[i] = I * u->c[2].c[i];
+			s->c[3].c[i] = -I * u->c[3].c[i];
 		}
 	}
 	else if (mu == 1 && nu == 2)
 	{
 		for (int i = 0; i < NF; i++)
 		{
-			
-			s->c[0].c[i] = I*u->c[0].c[i];
-			s->c[1].c[i] = -I*u->c[1].c[i];
-			s->c[2].c[i] = -I*u->c[2].c[i];
-			s->c[3].c[i] = I*u->c[3].c[i];
+
+			s->c[0].c[i] = I * u->c[0].c[i];
+			s->c[1].c[i] = -I * u->c[1].c[i];
+			s->c[2].c[i] = -I * u->c[2].c[i];
+			s->c[3].c[i] = I * u->c[3].c[i];
 		}
 	}
 	else if (nu == 1 && mu == 2)
 	{
 		for (int i = 0; i < NF; i++)
 		{
-			s->c[0].c[i] = -I*u->c[0].c[i];
-			s->c[1].c[i] = I*u->c[1].c[i];
-			s->c[2].c[i]= I*u->c[2].c[i];
-			s->c[3].c[i] = -I*u->c[3].c[i];
+			s->c[0].c[i] = -I * u->c[0].c[i];
+			s->c[1].c[i] = I * u->c[1].c[i];
+			s->c[2].c[i] = I * u->c[2].c[i];
+			s->c[3].c[i] = -I * u->c[3].c[i];
 		}
 	}
 	else if (mu == 1 && nu == 3)
@@ -219,31 +219,31 @@ static void g5_sigma(suNf_spinor *s, suNf_spinor *u, int mu, int nu)
 	{
 		for (int i = 0; i < NF; i++)
 		{
-			s->c[0].c[i]= u->c[1].c[i];
+			s->c[0].c[i] = u->c[1].c[i];
 			s->c[1].c[i] = -u->c[0].c[i];
 			s->c[2].c[i] = -u->c[3].c[i];
-			s->c[3].c[i]= u->c[2].c[i];
+			s->c[3].c[i] = u->c[2].c[i];
 		}
 	}
 	else if (mu == 2 && nu == 3)
 	{
 		for (int i = 0; i < NF; i++)
 		{
-			
-			s->c[0].c[i] = I*u->c[1].c[i];
-			s->c[1].c[i] = I*u->c[0].c[i];
-			s->c[2].c[i] = -I*u->c[3].c[i];
-			s->c[3].c[i] = -I*u->c[2].c[i];
+
+			s->c[0].c[i] = I * u->c[1].c[i];
+			s->c[1].c[i] = I * u->c[0].c[i];
+			s->c[2].c[i] = -I * u->c[3].c[i];
+			s->c[3].c[i] = -I * u->c[2].c[i];
 		}
 	}
 	else if (nu == 2 && mu == 3)
 	{
 		for (int i = 0; i < NF; i++)
 		{
-			s->c[0].c[i] = -I*u->c[1].c[i];
-			s->c[1].c[i] = -I*u->c[0].c[i];
-			s->c[2].c[i] = I*u->c[3].c[i];
-			s->c[3].c[i] = I*u->c[2].c[i];
+			s->c[0].c[i] = -I * u->c[1].c[i];
+			s->c[1].c[i] = -I * u->c[0].c[i];
+			s->c[2].c[i] = I * u->c[3].c[i];
+			s->c[3].c[i] = I * u->c[2].c[i];
 		}
 	}
 }
@@ -259,17 +259,17 @@ static suNf fmat_create(suNf_spinor *a_lhs, suNf_spinor *a_rhs, suNf_spinor *b_l
 			for (int k = 0; k < 4; k++)
 			{
 #ifdef REPR_IS_REAL
-/*				fmat.c[i * NF + j] += a_lhs->c[k].c[i].re * a_rhs->c[k].c[j].re + a_lhs->c[k].c[i].im * a_rhs->c[k].c[j].im;
+				/*				fmat.c[i * NF + j] += a_lhs->c[k].c[i].re * a_rhs->c[k].c[j].re + a_lhs->c[k].c[i].im * a_rhs->c[k].c[j].im;
 				fmat.c[i * NF + j] += b_lhs->c[k].c[i].re * b_rhs->c[k].c[j].re + b_lhs->c[k].c[i].im * b_rhs->c[k].c[j].im;*/
 
-				fmat.c[i * NF + j] += creal(a_lhs->c[k].c[i] * conj(a_rhs->c[k].c[j]) + b_lhs->c[k].c[i] * conj(b_rhs->c[k].c[j]) ) ;
+				fmat.c[i * NF + j] += creal(a_lhs->c[k].c[i] * conj(a_rhs->c[k].c[j]) + b_lhs->c[k].c[i] * conj(b_rhs->c[k].c[j]));
 #else
-/*				fmat.c[i * NF + j].re += a_lhs->c[k].c[i].re * a_rhs->c[k].c[j].re + a_lhs->c[k].c[i].im * a_rhs->c[k].c[j].im;
+				/*				fmat.c[i * NF + j].re += a_lhs->c[k].c[i].re * a_rhs->c[k].c[j].re + a_lhs->c[k].c[i].im * a_rhs->c[k].c[j].im;
 				fmat.c[i * NF + j].re += b_lhs->c[k].c[i].re * b_rhs->c[k].c[j].re + b_lhs->c[k].c[i].im * b_rhs->c[k].c[j].im;
 
 				fmat.c[i * NF + j].im += a_lhs->c[k].c[i].im * a_rhs->c[k].c[j].re - a_lhs->c[k].c[i].re * a_rhs->c[k].c[j].im;
 				fmat.c[i * NF + j].im += b_lhs->c[k].c[i].im * b_rhs->c[k].c[j].re - b_lhs->c[k].c[i].re * b_rhs->c[k].c[j].im;*/
-				
+
 				fmat.c[i * NF + j] += a_lhs->c[k].c[i] * conj(a_rhs->c[k].c[j]) + b_lhs->c[k].c[i] * conj(b_rhs->c[k].c[j]);
 #endif
 			}

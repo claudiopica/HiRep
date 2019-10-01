@@ -21,10 +21,10 @@ static double csw_value;
 	_4FIELD_AT(cl_term, id, mu)->c[ndx]
 
 #define clover_re(id, mu, ndx) \
-	_4FIELD_AT(cl_term, id, mu)->c[ndx].re
+	creal(_4FIELD_AT(cl_term, id, mu)->c[ndx])
 
 #define clover_im(id, mu, ndx) \
-	_4FIELD_AT(cl_term, id, mu)->c[ndx].im
+	cimag(_4FIELD_AT(cl_term, id, mu)->c[ndx])
 
 #define clover_force(id, mu, ndx) \
 	_6FIELD_AT(cl_force, id, mu)->c[ndx]
@@ -36,7 +36,7 @@ static double csw_value;
 	_6FIELD_AT(cl_force, id, mu)->c[ndx].im
 
 #define cplx(x, i, j) \
-	(x[(i)*((i)+1)/2+(j)])
+	(x[(i) * ((i) + 1) / 2 + (j)])
 
 #define re(x, i, j) \
 	creal(x[(i) * ((i) + 1) / 2 + (j)])
@@ -94,7 +94,7 @@ static void ldl(int N, double complex *A)
 		for (int k = 0; k < i; k++)
 		{
 			/*re(A,i,i) -= (re(A,i,k)*re(A,i,k) + im(A,i,k)*im(A,i,k)) * re(A,k,k);*/
-			cplx(A,i,i) -= ( _complex_prod(cplx(A,i,k),cplx(A,i,k)) )* re(A,k,k);
+			cplx(A, i, i) -= (_complex_prod(cplx(A, i, k), cplx(A, i, k))) * re(A, k, k);
 		}
 		for (int j = i + 1; j < N; j++)
 		{
@@ -102,7 +102,7 @@ static void ldl(int N, double complex *A)
 			{
 				/*re(A,j,i) -= (re(A,j,k)*re(A,i,k) + im(A,j,k)*im(A,i,k)) * re(A,k,k);
 				im(A,j,i) -= (im(A,j,k)*re(A,i,k) - re(A,j,k)*im(A,i,k)) * re(A,k,k);*/
-				cplx(A,j,i) -= (_complex_prod(cplx(A,i,k),cplx(A,j,k))) * re(A,k,k);
+				cplx(A, j, i) -= (_complex_prod(cplx(A, i, k), cplx(A, j, k))) * re(A, k, k);
 			}
 			/*re(A,j,i) /= re(A,i,i);
 			im(A,j,i) /= re(A,i,i);*/
@@ -227,7 +227,7 @@ static void _compute_clover_term(int id)
 
 			atmp = I * (conj(tmp[2].c[ji]) - tmp[2].c[ij]);
 			btmp = I * (conj(tmp[3].c[ij]) - tmp[3].c[ji]);
-			ctmp = I * (conj(tmp[0].c[ij]) - tmp[0].c[ji]) - tmp[1].c[ij] + conj(tmp[1].c[ji]);
+			ctmp = I * (conj(tmp[0].c[ji]) - tmp[0].c[ij]) - tmp[1].c[ij] + conj(tmp[1].c[ji]);
 			dtmp = tmp[4].c[ij] - conj(tmp[4].c[ji]) + I * (conj(tmp[5].c[ji]) - tmp[5].c[ij]);
 #endif
 
@@ -242,7 +242,7 @@ static void _compute_clover_term(int id)
 
 			clover(id, 0, ij) = csw * (atmp - conj(btmp));
 			clover(id, 1, ij) = csw * (ctmp - dtmp);
-			clover(id, 2, ij) = -csw * (conj(atmp) + btmp);
+			clover(id, 2, ij) = -csw * (atmp + conj(btmp));
 			clover(id, 3, ij) = -csw * (ctmp + dtmp);
 		}
 	}
@@ -428,7 +428,7 @@ void clover_la_logdet(double nf, double mass, scalar_field *la)
 			/*prod *= re(A, n, n);
 			prod *= re(B, n, n);*/
 
-			prod *= re(A, n, n)*re(B, n, n);
+			prod *= re(A, n, n) * re(B, n, n);
 		}
 
 		*_FIELD_AT(la, id) -= nf * log(prod);

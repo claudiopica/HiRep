@@ -130,19 +130,12 @@ static void H2eva(spinor_field *out, spinor_field *in){
 
 int main(int argc,char *argv[]) {
   int i,acc, rc;
-  char sbuf[128];
   
   /* setup process communications */
   setup_process(&argc,&argv);
-  
 
   setup_gauge_fields();
 
- /* geometry_mpi_eo();*/
-  /* test_geometry_mpi_eo(); */
-
-  /* setup random numbers */
-  
   /* read input for measures */
   read_input(mes_var.read,get_input_filename());
   read_input(poly_var.read,get_input_filename());
@@ -150,12 +143,12 @@ int main(int argc,char *argv[]) {
   
   /* Init Monte Carlo */
 
-  init_mc(&flow, get_input_filename());
+  init_mc_ghmc(&flow, get_input_filename());
   lprintf("MAIN",0,"MVM during HMC initialzation: %ld\n",getMVM());
 
 
   lprintf("MAIN",0,"Initial plaquette: %1.8e\n",avr_plaquette());
- 
+
   if(strcmp(mes_var.make,"true")==0) {
     init_meson_correlators(0);
     lprintf("MAIN",0,"Measuring Gamma Gamma correlators and PCAC-mass\n");
@@ -200,7 +193,7 @@ int main(int argc,char *argv[]) {
       n_inv_iter[k]=0;
     }
 #endif
-    
+  
     rr=update_ghmc();
 
     gettimeofday(&end,0);

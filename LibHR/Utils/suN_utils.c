@@ -355,7 +355,15 @@ void covariant_project_to_suNg(suNg *u)
 
   _suNg_dagger_times_suNg(tmp, *u, *u);
 
+#ifdef WITH_QUATERNIONS
+  /*With quaternions the only hermitian matrix that can be reqpresented is proportional to the idetity*/
+  eval[0] = u->c[0];
+  eval[1] = u->c[0];
+  evec[0] = evec[3] = 1.0;
+  evec[1] = evec[2] = 0.0;
+#else
   jacobi2(NG, tmp.c, eval, evec);
+#endif
 
   for (i = 0; i < NG; i++)
     eval[i] = 1 / sqrt(eval[i]);

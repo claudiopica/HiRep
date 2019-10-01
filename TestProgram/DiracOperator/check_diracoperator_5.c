@@ -116,8 +116,6 @@ int main(int argc, char *argv[])
 
   lprintf("MAIN", 0, "Gauge covariance of the Dirac operator:\n");
 
-  assign_ud2u_f();
-
   loc_D(s1, s0);
 
   transform_s(s2, s1);

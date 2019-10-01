@@ -65,7 +65,6 @@ int main(int argc, char *argv[])
   random_u(u_gauge);
   lprintf("MAIN", 0, "done.\n");
   represent_gauge_field();
-  assign_ud2u_f();
 
   par.n = 6;
   par.shift = (double *)malloc(sizeof(double) * (par.n));

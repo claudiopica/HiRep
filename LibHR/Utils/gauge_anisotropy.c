@@ -8,10 +8,11 @@
 
 void init_gauge_anisotropy(double *chi)
 {
+#ifdef PLAQ_WEIGHTS
     if (*chi != 1.0)
     {
         error(plaq_weight == NULL, 0, "init_gauge_anisotropy", "In order to use anisotropic lattice you must compile with PLAQ_WEIGHTS enabled");
-        error(*chi < 0., 0, "init_gauge_anisotropy", "The anisotropy factor must be positive");
+        error(*chi <= 0., 0, "init_gauge_anisotropy", "The anisotropy factor must be positive");
 
         int ix, iy, iz, it;
         int mu, nu, index;
@@ -39,4 +40,5 @@ void init_gauge_anisotropy(double *chi)
                         }
                     }
     }
+#endif
 }

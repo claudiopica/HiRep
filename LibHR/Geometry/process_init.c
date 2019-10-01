@@ -99,10 +99,18 @@ void setup_gauge_fields()
     setup_level = 2;
 
   u_gauge = alloc_gfield(&glattice);
+
 #ifndef REPR_FUNDAMENTAL
   u_gauge_f = alloc_gfield_f(&glattice);
 #endif
+
+#ifndef ALLOCATE_REPR_GAUGE_FIELD
+  u_gauge_f = (suNf_field*)(u_gauge);
+#endif
+
+#ifdef DPHI_FLT
   u_gauge_f_flt = alloc_gfield_f_flt(&glattice);
+#endif
 
 #ifdef WITH_SMEARING
   init_smearing(1.0, 1.0);
@@ -111,8 +119,6 @@ void setup_gauge_fields()
 #ifdef WITH_CLOVER
   clover_init(1.0);
 #endif
-
-  represent_gauge_field();
 
   reset_wrk_pointers();
 }

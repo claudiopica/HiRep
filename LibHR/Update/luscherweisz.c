@@ -133,12 +133,6 @@ static void calculate_stfld(int comm)
 				}
 			}
 		}
-
-		lprintf("INIT", 0, "nbuffers_gauge = %d\n", glattice.nbuffers_gauge);
-		for (int k = 0; k < 8; k++)
-		{
-			lprintf("INIT", 0, "nb[%d] = %d\n", k, nb[k]);
-		}
 	}
 
 	memset(stfld[0], 0, glattice.gsize_gauge * sizeof(suNg) * 8 * 3);

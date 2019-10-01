@@ -99,7 +99,7 @@ static void Zeta(suNg_field *Z, const suNg_field *U, const double alpha)
       imtr = imtr / NG;
       for (int k = 0; k < NG * NG; k += NG + 1)
       {
-        tmp1.c[k] -= I*imtr;
+        tmp1.c[k] -= I * imtr;
       }
 #endif
       /*
@@ -178,10 +178,10 @@ static void WF_Exp(suNg *u, suNg *X)
   v.c[1] = h.c[1] * s;
   v.c[2] = h.c[2] * s;
 
-  u->c[0] = c+I*v.c[2];
-  u->c[1] = v.c[1]+I*v.c[0];
-  u->c[2] = -v.c[1]+I*v.c[0];
-  u->c[3] = c+I*-v.c[2];
+  u->c[0] = c + I * v.c[2];
+  u->c[1] = v.c[1] + I * v.c[0];
+  u->c[2] = -v.c[1] + I * v.c[0];
+  u->c[3] = c + I * -v.c[2];
 
 #ifdef EXP_CHECK
   suNg w;
@@ -627,7 +627,7 @@ double WF_E(suNg_field *V)
 
 void WF_E_T(double *E, suNg_field *V)
 {
-  int t, x, y, z, ix;
+  int gt, t, x, y, z, ix;
   int mu, nu;
   double p;
 
@@ -636,28 +636,41 @@ void WF_E_T(double *E, suNg_field *V)
 
   for (t = 0; t < T; t++)
   {
+    gt = t + zerocoord[0];
     for (x = 0; x < X; x++)
       for (y = 0; y < Y; y++)
         for (z = 0; z < Z; z++)
-          for (mu = 0; mu < 4; mu++)
+        {
+          mu = 0;
+          ix = ipt(t, x, y, z);
+          for (nu = 1; nu < 4; nu++)
+          {
+            WF_plaq(&p, V, ix, mu, nu);
+#ifdef PLAQ_WEIGHTS
+
+            E[2 * gt] += ((double)(NG))*plaq_weight[ix * 16 + nu * 4 + mu] - p ;
+#else
+            E[2 * gt] += NG - p;
+#endif
+          }
+          for (mu = 1; mu < 3; mu++)
             for (nu = mu + 1; nu < 4; nu++)
             {
-              ix = ipt(t, x, y, z);
               WF_plaq(&p, V, ix, mu, nu);
-              if (mu == 0)
-                E[2 * ((zerocoord[0] + t + GLB_T) % GLB_T)] += p;
-              else
-                E[2 * ((zerocoord[0] + t + GLB_T) % GLB_T) + 1] += p;
+#ifdef PLAQ_WEIGHTS
+              E[2 * gt + 1] += ((double)(NG))*plaq_weight[ix * 16 + nu * 4 + mu] - p ;
+#else
+              E[2 * gt + 1] += NG - p;
+#endif
             }
-    E[2 * ((zerocoord[0] + t + GLB_T) % GLB_T)] = -E[2 * ((zerocoord[0] + t + GLB_T) % GLB_T)] / (3. * GLB_VOL3);
-    E[2 * ((zerocoord[0] + t + GLB_T) % GLB_T) + 1] = -E[2 * ((zerocoord[0] + t + GLB_T) % GLB_T) + 1] / (3. * GLB_VOL3);
+        }
+    E[2 * gt] /= (3. * GLB_VOL3);
+    E[2 * gt + 1] /= (3. * GLB_VOL3);
   }
 
   global_sum(E, 2 * GLB_T);
 
-  for (t = 0; t < 2 * GLB_T; t++)
-    E[t] += NG;
-  E[3] = 0.0;
+  //E[3] = 0.0;
 }
 
 /* This gives F_{\mu\nu}^A */
@@ -776,7 +789,7 @@ double WF_Esym(suNg_field *V)
 
 void WF_Esym_T(double *E, suNg_field *V)
 {
-  int t, x, y, z, ix;
+  int gt, t, x, y, z, ix;
   int mu, nu;
   suNg_algebra_vector clover;
   double p;
@@ -786,22 +799,30 @@ void WF_Esym_T(double *E, suNg_field *V)
 
   for (t = 0; t < T; t++)
   {
+    gt = t + zerocoord[0];
     for (x = 0; x < X; x++)
       for (y = 0; y < Y; y++)
         for (z = 0; z < Z; z++)
-          for (mu = 0; mu < 4; mu++)
+        {
+          mu = 0;
+          ix = ipt(t, x, y, z);
+          for (nu = 1; nu < 4; nu++)
+          {
+            WF_clover_F(&clover, V, ix, mu, nu);
+            _algebra_vector_sqnorm_g(p, clover);
+            E[2 * gt] += p;
+          }
+
+          for (mu = 1; mu < 4; mu++)
             for (nu = mu + 1; nu < 4; nu++)
             {
-              ix = ipt(t, x, y, z);
               WF_clover_F(&clover, V, ix, mu, nu);
               _algebra_vector_sqnorm_g(p, clover);
-              if (mu == 0)
-                E[2 * ((zerocoord[0] + t + GLB_T) % GLB_T)] += p;
-              else
-                E[2 * ((zerocoord[0] + t + GLB_T) % GLB_T) + 1] += p;
+              E[2 * gt + 1] += p;
             }
-    E[2 * ((zerocoord[0] + t + GLB_T) % GLB_T)] *= _FUND_NORM2 / (6. * GLB_VOL3);
-    E[2 * ((zerocoord[0] + t + GLB_T) % GLB_T) + 1] *= _FUND_NORM2 / (6. * GLB_VOL3);
+        }
+    E[2 * gt] *= _FUND_NORM2 / (6. * GLB_VOL3);
+    E[2 * gt + 1] *= _FUND_NORM2 / (6. * GLB_VOL3);
   }
 
   global_sum(E, 2 * GLB_T);
@@ -843,8 +864,9 @@ double WF_topo(suNg_field *V)
 void WF_adaptive_full_measure(suNg_field *V, double *tmax, double *eps, double *delta, int nmeas)
 {
 
+  double TC;
 #if defined(BC_T_ANTIPERIODIC) || defined(BC_T_PERIODIC)
-  double E, Esym, TC;
+  double E, Esym;
 #else
   int j;
   double E[2 * GLB_T];
@@ -858,17 +880,18 @@ void WF_adaptive_full_measure(suNg_field *V, double *tmax, double *eps, double *
   double epsilon = *eps;
   double dt = *tmax / nmeas;
 
+  TC = WF_topo(V);
+
 #if defined(BC_T_ANTIPERIODIC) || defined(BC_T_PERIODIC)
   E = WF_E(V);
   Esym = WF_Esym(V);
-  TC = WF_topo(V);
   lprintf("WILSONFLOW", 0, "WF (t,E,t2*E,Esym,t2*Esym,TC) = %e %e %e %e %e %e\n", t, E, t * t * E, Esym, t * t * Esym, TC);
 #else
 
   WF_E_T(E, V);
   WF_Esym_T(Esym, V);
   Eavg[0] = Eavg[1] = Esymavg[0] = Esymavg[1] = 0.0;
-  for (j = 1; j < GLB_T - 1; j++)
+  for (j = 0; j < GLB_T; j++)
   {
     lprintf("WILSONFLOW", 0, "WF (T,t,Etime,Espace,Esymtime,Esymspace) = %d %e %e %e %e %e\n", j, t, E[2 * j], E[2 * j + 1], Esym[2 * j], Esym[2 * j + 1]);
     Eavg[0] += E[2 * j];
@@ -876,13 +899,12 @@ void WF_adaptive_full_measure(suNg_field *V, double *tmax, double *eps, double *
     Esymavg[0] += Esym[2 * j];
     Esymavg[1] += Esym[2 * j + 1];
   }
-
   Eavg[0] /= GLB_T - 2;
   Eavg[1] /= GLB_T - 3;
   Esymavg[0] /= GLB_T - 2;
   Esymavg[1] /= GLB_T - 3;
 
-  lprintf("WILSONFLOW", 0, "WF avg (t,Etime,Espace,Esymtime,Esymspace,Pltime,Plspace) = %e %e %e %e %e %e %e\n", t, Eavg[0], Eavg[1], Esymavg[0], Esymavg[1], (NG - Eavg[0]), (NG - Eavg[1]));
+  lprintf("WILSONFLOW", 0, "WF avg (t,Etime,Espace,Esymtime,Esymspace,Pltime,Plspace,TC) = %e %e %e %e %e %e %e %e\n", t, Eavg[0], Eavg[1], Esymavg[0], Esymavg[1], (NG - Eavg[0]), (NG - Eavg[1]), TC);
 
 #endif
   k = 1;
@@ -900,11 +922,13 @@ void WF_adaptive_full_measure(suNg_field *V, double *tmax, double *eps, double *
     if (fabs(t - (double)k * dt) < 1e-7)
     {
       k = k + 1;
+
+      TC = WF_topo(V);
+
 #if defined(BC_T_ANTIPERIODIC) || defined(BC_T_PERIODIC)
 
       E = WF_E(V);
       Esym = WF_Esym(V);
-      TC = WF_topo(V);
       lprintf("WILSONFLOW", 0, "WF (t,E,t2*E,Esym,t2*Esym,TC) = %e %e %e %e %e %e\n", t, E, t * t * E, Esym, t * t * Esym, TC);
 #else
 
@@ -925,7 +949,7 @@ void WF_adaptive_full_measure(suNg_field *V, double *tmax, double *eps, double *
       Esymavg[0] /= GLB_T - 2;
       Esymavg[1] /= GLB_T - 3;
 
-      lprintf("WILSONFLOW", 0, "WF avg (t,Etime,Espace,Esymtime,Esymspace,Pltime,Plspace) = %e %e %e %e %e %e %e\n", t, Eavg[0], Eavg[1], Esymavg[0], Esymavg[1], (NG - Eavg[0]), (NG - Eavg[1]));
+      lprintf("WILSONFLOW", 0, "WF avg (t,Etime,Espace,Esymtime,Esymspace,Pltime,Plspace,TC) = %e %e %e %e %e %e %e %e\n", t, Eavg[0], Eavg[1], Esymavg[0], Esymavg[1], (NG - Eavg[0]), (NG - Eavg[1]), TC);
 
 #endif
     }

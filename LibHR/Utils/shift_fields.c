@@ -38,19 +38,28 @@ void shift_fields(int *shift, spinor_field *sin, suNg_field *uin, spinor_field *
     suNg_field *ubuf[2], *utmp[2];
     spinor_field *sbuf[2], *stmp[2];
 
-    int dd, dx, dy, dz, dt, x0, x1, x2, x3, mu, ipin, ipout;
+    int dd, x0, x1, x2, x3, mu, ipin, ipout;
 
     if (uin != NULL)
     {
         ubuf[0] = alloc_gfield(&glattice);
         ubuf[1] = alloc_gfield(&glattice);
     }
+    else
+    {
+        ubuf[0] = ubuf[1] = NULL;
+    }
+
     if (sin != NULL)
     {
         sbuf[0] = alloc_spinor_field_f(1, &glattice);
         sbuf[1] = alloc_spinor_field_f(1, &glattice);
         spinor_field_zero_f(sbuf[0]);
         spinor_field_zero_f(sbuf[1]);
+    }
+    else
+    {
+        sbuf[0] = sbuf[1] = NULL;
     }
 
     utmp[0] = uin;
@@ -59,49 +68,30 @@ void shift_fields(int *shift, spinor_field *sin, suNg_field *uin, spinor_field *
     stmp[0] = sin;
     stmp[1] = sbuf[1];
 
-    //  printf("qui\n");
-    //fflush(stdout);
-    //MPI_Barrier(GLB_COMM);
     for (int i = 0; i < total_shift; i++)
     {
-        //  printf("the shift %d\n", total_shift);
-        //fflush(stdout);
-        //MPI_Barrier(GLB_COMM);
         if (i == total_shift - 1)
         {
             utmp[1] = uout;
             stmp[1] = sout;
         }
 
-        dt = 0;
-        dx = 0;
-        dy = 0;
-        dz = 0;
-
         if (i < shift[0])
         {
-            dt = 1;
             dd = 0;
         }
         else if (i < shift[0] + shift[1])
         {
-            dx = 1;
             dd = 1;
         }
         else if (i < shift[0] + shift[1] + shift[2])
         {
-            dy = 1;
             dd = 2;
         }
         else
         {
-            dz = 1;
             dd = 3;
         }
-
-        //printf("dr %d %d %d %d  direction %d\n", dt, dx, dy, dz, dd);
-        //fflush(stdout);
-        //MPI_Barrier(GLB_COMM);
 
         for (x0 = 0; x0 < T_EXT; x0++)
             for (x1 = 0; x1 < X_EXT; x1++)
@@ -159,9 +149,6 @@ void shift_fields(int *shift, spinor_field *sin, suNg_field *uin, spinor_field *
             stmp[1] = sbuf[1];
         }
     }
-    //    printf("out\n");
-    //   fflush(stdout);
-    // MPI_Barrier(GLB_COMM);
     if (uin != NULL)
     {
         free_gfield(ubuf[0]);

@@ -20,7 +20,7 @@ static BCs_pars_t BCs_pars;
 static void init_plaq_twisted_BCs();
 #endif
 static void init_plaq_open_BCs(double ct, double cs);
-#if defined(BASIC_SF) || defined(ROTATED_SF) 
+#if defined(BASIC_SF) || defined(ROTATED_SF)
 static void init_plaq_Dirichlet_BCs(double ct);
 static void init_gf_SF_BCs(suNg *dn, suNg *up);
 #endif
@@ -184,7 +184,7 @@ void free_BCs()
 {
   if (init == 0)
     return;
-    
+
   init = 0;
 
 #ifdef PLAQ_WEIGHTS
@@ -269,7 +269,7 @@ void apply_BCs_on_momentum_field(suNg_av_field *force)
 #endif
 }
 
-#if defined(BASIC_SF) 
+#if defined(BASIC_SF)
 static void sf_Dirichlet_BCs(spinor_field *sp);
 static void sf_Dirichlet_BCs_flt(spinor_field_flt *sp);
 #endif
@@ -297,7 +297,7 @@ void apply_BCs_on_spinor_field(spinor_field *sp)
 
 void apply_BCs_on_spinor_field_flt(spinor_field_flt *sp)
 {
-#if defined(BASIC_SF) 
+#if defined(BASIC_SF)
   sf_Dirichlet_BCs_flt(sp);
 #endif
 #if defined(ROTATED_SF)
@@ -939,7 +939,7 @@ static void cl_open_BCs(suNfc_field *cl)
 /***************************************************************************/
 /* BOUNDARY CONDITIONS TO BE APPLIED ON THE SPINOR FIELDS                  */
 /***************************************************************************/
-#if defined(BASIC_SF) 
+#if defined(BASIC_SF)
 static void sf_Dirichlet_BCs(spinor_field *sp)
 {
   int ix, iy, iz, index;
@@ -1102,7 +1102,6 @@ static void sf_open_v2_BCs(spinor_field *sf)
   }
 }
 
-
 static void sf_open_v2_BCs_flt(spinor_field_flt *sf)
 {
   int index;
@@ -1192,7 +1191,6 @@ static void init_plaq_twisted_BCs()
 }
 #endif //BC_XYZ_TWISTED
 
-
 static void init_plaq_open_BCs(double ct, double cs)
 {
   error(plaq_weight == NULL, 1, "init_plaq_open_BCs [boundary_conditions.c]",
@@ -1260,6 +1258,33 @@ static void init_plaq_open_BCs(double ct, double cs)
 
   if (COORD[0] == NP_T - 1)
   {
+    if (T_BORDER > 0)
+    {
+      for (ix = 0; ix < X_EXT; ++ix)
+        for (iy = 0; iy < Y_EXT; ++iy)
+          for (iz = 0; iz < Z_EXT; ++iz)
+          {
+            index = ipt_ext(T + T_BORDER, ix, iy, iz);
+            if (index != -1)
+            {
+              mu = 0;
+              for (nu = mu + 1; nu < 4; nu++)
+              {
+                plaq_weight[index * 16 + mu * 4 + nu] = ct;
+                plaq_weight[index * 16 + nu * 4 + mu] = ct;
+              }
+              for (mu = 1; mu < 3; mu++)
+                for (nu = mu + 1; nu < 4; nu++)
+                {
+                  plaq_weight[index * 16 + mu * 4 + nu] = 0.5 * cs;
+                  plaq_weight[index * 16 + nu * 4 + mu] = 0.5 * cs;
+                  rect_weight[index * 16 + mu * 4 + nu] = 0.5 * cs;
+                  rect_weight[index * 16 + nu * 4 + mu] = 0.5 * cs;
+                }
+            }
+          }
+    }
+
     for (ix = 0; ix < X_EXT; ++ix)
       for (iy = 0; iy < Y_EXT; ++iy)
         for (iz = 0; iz < Z_EXT; ++iz)
@@ -1304,7 +1329,7 @@ static void init_plaq_open_BCs(double ct, double cs)
         }
   }
 }
-#if defined(BASIC_SF) || defined(ROTATED_SF) 
+#if defined(BASIC_SF) || defined(ROTATED_SF)
 static void init_plaq_Dirichlet_BCs(double ct)
 {
   error(plaq_weight == NULL, 1, "init_plaq_Dirichlet_BCs [boundary_conditions.c]",

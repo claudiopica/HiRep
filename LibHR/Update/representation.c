@@ -46,7 +46,7 @@ void _group_represent2(suNf *v, suNg *u)
         for (i = 0; i < NG; i++)
           for (j = i; j < NG; j++)
           {
-            *XG(mf, i, j) = conj(*XG(uf, i, a)) * (*XG(uf, j, b)) - conj(*XG(uf, i, b)) * (*XG(uf, j, a));
+            *XG(mf, i, j) = I*((*XG(uf, i, a)) * conj(*XG(uf, j, b))) - I*((*XG(uf, i, b)) * conj(*XG(uf, j, a)));
             /* XG(mf,i,j)->im = XG(uf,i,a)->re*XG(uf,j,b)->re+XG(uf,i,a)->im*XG(uf,j,b)->im-XG(uf,i,b)->re*XG(uf,j,a)->re-XG(uf,i,b)->im*XG(uf,j,a)->im; */
             /* XG(mf,i,j)->re = +XG(uf,i,a)->re*XG(uf,j,b)->im-XG(uf,i,a)->im*XG(uf,j,b)->re-XG(uf,i,b)->re*XG(uf,j,a)->im+XG(uf,i,b)->im*XG(uf,j,a)->re; */
           }
@@ -231,7 +231,7 @@ void _group_represent_flt(suNf_flt *v, suNg_flt *u)
         for (i = 0; i < NG; i++)
           for (j = i; j < NG; j++)
           {
-            *XG(mf, i, j) = conj(*XG(uf, i, a)) * (*XG(uf, j, b)) - conj(*XG(uf, i, b)) * (*XG(uf, j, a));
+            *XG(mf, i, j) = I*((*XG(uf, i, a)) * conj(*XG(uf, j, b))) - I*((*XG(uf, i, b)) * conj(*XG(uf, j, a)));
             /* XG(mf,i,j)->im = XG(uf,i,a)->re*XG(uf,j,b)->re+XG(uf,i,a)->im*XG(uf,j,b)->im-XG(uf,i,b)->re*XG(uf,j,a)->re-XG(uf,i,b)->im*XG(uf,j,a)->im; */
             /* XG(mf,i,j)->re = +XG(uf,i,a)->re*XG(uf,j,b)->im-XG(uf,i,a)->im*XG(uf,j,b)->re-XG(uf,i,b)->re*XG(uf,j,a)->im+XG(uf,i,b)->im*XG(uf,j,a)->re; */
           }

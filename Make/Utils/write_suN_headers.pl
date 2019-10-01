@@ -2,13 +2,13 @@
 use strict;
 
 (@ARGV==2 or @ARGV==3 or @ARGV==4) or die("Usage: $0 Ng rep [su2_quaternion gauge_group]\nsu2 quaternion: 0 = 2x2 complex matrix, 1 = 4 reals\n");
+#to make Claudio happy I've indented this code... Antonio
 
 my ($Nmax,$unroll)=(5,4);
 my ($vd,$vr); #for vectors
 my ($avd,$avr); #for algebra vectors
 my ($md,$mr); #for matrices
 my ($md2,$mr2); #for matrices
-
 
 my ($Ng,$rep,$su2quat,$gauge_group)=@ARGV;
 if (not defined ($gauge_group)) { $gauge_group = "SUN"; }
@@ -258,9 +258,9 @@ if ($su2quat==0) {
     write_suNr_inverse_multiply();
  	write_suNr_zero();
   } else {
-	  print "#define _suNfc_multiply(a,b,c) _suNf_multiply(a,b,c)\n\n";
-	  print "#define _suNfc_inverse_multiply(a,b,c) _suNf_inverse_multiply(a,b,c)\n\n";
-	  print "#define _suNfc_zero(a) _suNf_zero(a)\n\n";
+	  print "#define _${dataname}c_multiply(a,b,c) _${dataname}_multiply(a,b,c)\n\n";
+	  print "#define _${dataname}c_inverse_multiply(a,b,c) _${dataname}_inverse_multiply(a,b,c)\n\n";
+	  print "#define _${dataname}c_zero(a) _${dataname}_zero(a)\n\n";
   }
 } else {
     #write_su2_decode($su2quat);
@@ -2890,9 +2890,9 @@ sub write_suNr_FMAT {
 		}
 	} else {
 		print "   do { \\\n";
-		print "      int _i,_j,_n=0;\\\n";
-		print "      for (_i=0; _i<$N; ++_i){\\\n";
+		print "      int _i,_n=0;\\\n";
 		if ($N<(2*$unroll+1)) {
+			print "      for (_i=0; _i<$N; ++_i){\\\n";
 			my $n=0;
 			for (my $j=0; $j<$N; $j++) {
 				print "         _complex_mul_star_assign_re((u).$cname\[_n\],(s).${cname}\[0\].$cname\[_i\],(s).${cname}\[2\].$cname\[$j\]); \\\n";
@@ -2900,6 +2900,8 @@ sub write_suNr_FMAT {
 				print "         ++_n; \\\n";
 			}
 		} else {
+			print "      int _j;\\\n";
+			print "      for (_i=0; _i<$N; ++_i){\\\n";
 			print "         for (_j=0; _j<$vd; ){\\\n";
 			for(my $i=0;$i<$unroll;$i++){
 				print "            _complex_mul_star_assign_re((u).$cname\[_n\],(s).${cname}\[0\].$cname\[_i\],(s).${cname}\[2\].$cname\[_j\]); \\\n";

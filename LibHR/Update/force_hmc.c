@@ -17,13 +17,13 @@
 #include "clover_tools.h"
 #include "communications.h"
 
-spinor_field *Xs=NULL;
-spinor_field *Ys=NULL;
-spinor_field *eta=NULL;
+spinor_field *Xs = NULL;
+spinor_field *Ys = NULL;
+spinor_field *eta = NULL;
 
 #ifdef UPDATE_EO
-static spinor_field *xi=NULL;
-#endif 
+static spinor_field *xi = NULL;
+#endif
 
 void free_force_hmc()
 {
@@ -37,15 +37,15 @@ void free_force_hmc()
 void init_force_hmc()
 {
 	static int init = 0;
-	if(init == 0)
+	if (init == 0)
 	{
 #ifndef UPDATE_EO
 		Xs = alloc_spinor_field_f(3, &glattice);
-		Ys = Xs+1;
-		eta = Ys+1;
+		Ys = Xs + 1;
+		eta = Ys + 1;
 #else
 		Xs = alloc_spinor_field_f(2, &glattice);
-		Ys = Xs+1;
+		Ys = Xs + 1;
 		eta = alloc_spinor_field_f(1, &glat_even);
 		xi = alloc_spinor_field_f(1, &glat_odd);
 		Xs->type = &glat_even;
@@ -59,7 +59,7 @@ void init_force_hmc()
 void force_hmc(double dt, void *vpar)
 {
 	int n_iters = 0;
-	force_hmc_par *par = (force_hmc_par*)vpar;
+	force_hmc_par *par = (force_hmc_par *)vpar;
 	suNg_av_field *force = *par->momenta;
 	spinor_field *pf = par->pf;
 
@@ -78,7 +78,7 @@ void force_hmc(double dt, void *vpar)
 
 #ifndef UPDATE_EO
 
-	if(par->mu == 0 || par->hasenbusch != 0)
+	if (par->mu == 0 || par->hasenbusch != 0)
 	{
 		/* X = H^{-1} pf = D^{-1} g5 pf */
 		spinor_field_zero_f(Xs);
@@ -86,24 +86,24 @@ void force_hmc(double dt, void *vpar)
 		n_iters += g5QMR_mshift(&mpar, &D, pf, Xs);
 		spinor_field_g5_assign_f(pf);
 
-		if(par->hasenbusch == 0)
+		if (par->hasenbusch == 0)
 		{
 			/* Y  D^{-1} ( g5 X ) */
 			spinor_field_g5_f(eta, Xs);
 		}
-		else if(par->hasenbusch == 1)
+		else if (par->hasenbusch == 1)
 		{
 			/* Y = H^{-1} ( g5 pf[k] + b X ) = D^{-1}( pf + b g5 X ) */
 			spinor_field_g5_f(eta, Xs);
 			spinor_field_mul_f(eta, par->b, eta);
 			spinor_field_add_assign_f(eta, pf);
 		}
-		else if(par->hasenbusch == 2)
+		else if (par->hasenbusch == 2)
 		{
 			/* Y= -i D^{-1} ( pf[k] + imu g5 X )*/
 			double mu1 = par->mu;
 			double mu2 = par->mu + par->b;
-			double muS = mu2*mu2 - mu1*mu1;
+			double muS = mu2 * mu2 - mu1 * mu1;
 			spinor_field_g5_f(eta, Xs);
 			spinor_field_mul_f(Xs, muS, Xs);
 		}
@@ -114,12 +114,12 @@ void force_hmc(double dt, void *vpar)
 	else
 	{
 		n_iters += cg_mshift(&mpar, QpQm_tm_alt, pf, Xs);
-		Qtm_p_alt(Ys,Xs);
+		Qtm_p_alt(Ys, Xs);
 	}
 
 #else
-
-	if(par->mu == 0)
+	//there should be an error from here
+	if (par->mu == 0)
 	{
 		/* X_e = H^{-1} pf */
 		/* X_o = D_{oe} X_e = D_{oe} H^{-1} pf */
@@ -131,7 +131,7 @@ void force_hmc(double dt, void *vpar)
 
 		/* Y_e = H^{-1} ( g5 pf + b X_e ) */
 		/* Y_o = D_oe H^{-1} ( g5 pf + b X_e ) */
-		if(par->hasenbusch != 1)
+		if (par->hasenbusch != 1)
 		{
 			spinor_field_copy_f(eta, Xs);
 		}
@@ -147,9 +147,9 @@ void force_hmc(double dt, void *vpar)
 		mre_store(&par->mpar, 1, Ys);
 		spinor_field_g5_assign_f(eta);
 
-		if(par->hasenbusch == 2)
+		if (par->hasenbusch == 2)
 		{
-			double muS = par->b*par->b;
+			double muS = par->b * par->b;
 			spinor_field_mul_f(Xs, muS, Xs);
 		}
 	}
@@ -157,22 +157,23 @@ void force_hmc(double dt, void *vpar)
 	{
 		/* Ye = 1/(QpQm+mu^2) \phi */
 		mre_guess(&par->mpar, 0, Ys, QpQm_tm_alt, pf);
-		n_iters += 2*cg_mshift(&mpar, QpQm_tm_alt, pf, Ys);
+		n_iters += 2 * cg_mshift(&mpar, QpQm_tm_alt, pf, Ys);
 		mre_store(&par->mpar, 0, Ys);
 		Qtm_m_alt(Xs, Ys);
 
-		if(par->hasenbusch == 2)
+		if (par->hasenbusch == 2)
 		{
 			double mu1 = par->mu;
 			double mu2 = par->mu + par->b;
-			double muS = mu2*mu2 - mu1*mu1;
+			double muS = mu2 * mu2 - mu1 * mu1;
 			spinor_field_mul_f(Xs, muS, Xs);
 		}
 	}
+	//to here
 
 #endif
 
-	if(par->hasenbusch != 1)
+	if (par->hasenbusch != 1)
 	{
 		force_fermion_core(Xs, Ys, 1, dt, 1.);
 	}
@@ -183,7 +184,7 @@ void force_hmc(double dt, void *vpar)
 
 #ifdef WITH_CLOVER_EO
 
-	if(par->logdet)
+	if (par->logdet)
 	{
 		force_clover_logdet(par->mass, 2.); // 2 = # of flavors
 	}

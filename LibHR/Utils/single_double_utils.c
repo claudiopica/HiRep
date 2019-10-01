@@ -69,37 +69,47 @@ void assign_ud2u(void)
 
 void assign_ud2u_f(void)
 {
-  if(u_gauge_f_flt!=NULL){
+  if (u_gauge_f_flt != NULL)
+  {
     double *d;
     float *f;
-  
-    d = (double*)(u_gauge_f->ptr);
-    f = (float*)(u_gauge_f_flt->ptr);
 
-_OMP_PRAGMA( _omp_parallel )
-_OMP_PRAGMA( _omp_for )
-    for(int i=0; i<4*glattice.gsize_gauge*(sizeof(suNf)/sizeof(double)); i++) {
-      *(f+i) = (float)(*(d+i));
+    d = (double *)(u_gauge_f->ptr);
+    f = (float *)(u_gauge_f_flt->ptr);
+
+    _OMP_PRAGMA(_omp_parallel)
+    _OMP_PRAGMA(_omp_for)
+    for (int i = 0; i < 4 * glattice.gsize_gauge * (sizeof(suNf) / sizeof(double)); i++)
+    {
+      *(f + i) = (float)(*(d + i));
     }
   }
 }
 
-void assign_s2sd(spinor_field *out, spinor_field_flt *in) {
+void assign_s2sd(spinor_field *out, spinor_field_flt *in)
+{
 
-  _TWO_SPINORS_FOR(out,in) {
-    double *o=(double*)_SPINOR_PTR(out);
-    float *i=(float*)_SPINOR_PTR(in);
-    for (int n=0;n<(8*NF);n++) { *(o++) = (double) *(i++); }
+  _TWO_SPINORS_FOR(out, in)
+  {
+    double *o = (double *)_SPINOR_PTR(out);
+    float *i = (float *)_SPINOR_PTR(in);
+    for (int n = 0; n < (8 * NF); n++)
+    {
+      *(o++) = (double)*(i++);
+    }
   }
-
 }
 
-void assign_sd2s(spinor_field_flt *out, spinor_field *in) {
+void assign_sd2s(spinor_field_flt *out, spinor_field *in)
+{
 
-  _TWO_SPINORS_FOR(out,in) {
-    float *o=(float*)_SPINOR_PTR(out);
-    double *i=(double*)_SPINOR_PTR(in);
-    for (int n=0;n<(8*NF);n++) { *(o++) = (float) *(i++); }
+  _TWO_SPINORS_FOR(out, in)
+  {
+    float *o = (float *)_SPINOR_PTR(out);
+    double *i = (double *)_SPINOR_PTR(in);
+    for (int n = 0; n < (8 * NF); n++)
+    {
+      *(o++) = (float)*(i++);
+    }
   }
-
 }
