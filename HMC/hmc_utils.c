@@ -345,7 +345,8 @@ int init_mc_ghmc(hmc_flow *rf, char *ifile)
 		break;
 	}
 
-	apply_BCs_on_represented_gauge_field();
+	start_gf_sendrecv(u_gauge);
+
 	apply_BCs_on_fundamental_gauge_field();
 
 	represent_gauge_field();

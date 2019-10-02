@@ -2846,9 +2846,9 @@ sub write_suN_FMAT {
 		}
 	} else {
 		print "   do { \\\n";
-		print "      int _i,_j,_n=0;\\\n";
-		print "      for (_i=0; _i<$N; ++_i){\\\n";
 		if ($N<(2*$unroll+1)) {
+			print "      int _i,_n=0;\\\n";
+			print "      for (_i=0; _i<$N; ++_i){\\\n";
 			my $n=0;
 			for (my $j=0; $j<$N; $j++) {
 				print "         _complex_mul_star_assign((u).$cname\[_n\],(s).${cname}\[0\].$cname\[_i\],(s).${cname}\[2\].$cname\[$j\]); \\\n";
@@ -2856,6 +2856,8 @@ sub write_suN_FMAT {
 				print "         ++_n; \\\n";
 			}
 		} else {
+			print "      int _i,_j,_n=0;\\\n";
+			print "      for (_i=0; _i<$N; ++_i){\\\n";
 			print "         for (_j=0; _j<$vd; ){\\\n";
 			for(my $i=0;$i<$unroll;$i++){
 				print "            _complex_mul_star_assign((u).$cname\[_n\],(s).${cname}\[0\].$cname\[_i\],(s).${cname}\[2\].$cname\[_j\]); \\\n";

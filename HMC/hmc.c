@@ -147,7 +147,7 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"MVM during HMC initialzation: %ld\n",getMVM());
 
 
-  lprintf("MAIN",0,"Initial plaquette: %1.8e\n",avr_plaquette());
+  lprintf("MAIN",0,"Initial plaquette: %1.16e\n",avr_plaquette());
 
   if(strcmp(mes_var.make,"true")==0) {
     init_meson_correlators(0);
@@ -200,6 +200,7 @@ int main(int argc,char *argv[]) {
     timeval_subtract(&etime,&end,&start);
     lprintf("MAIN",0,"Trajectory #%d: generated in [%ld sec %ld usec]\n",i,etime.tv_sec,etime.tv_usec);
     
+    
     if(rr<0) {
       lprintf("MAIN",0,"Error in updating the gauge field!!\n");
       return 1;
@@ -246,7 +247,7 @@ int main(int argc,char *argv[]) {
 #ifdef WITH_SMEARING
 		 lprintf("MAIN",0,"Plaquette: %1.8e, Smeared: %1.8e\n",avr_plaquette(),avr_smeared_plaquette());
 #else
-		 lprintf("MAIN",0,"Plaquette: %1.8e\n",avr_plaquette());
+		 lprintf("MAIN",0,"Plaquette: %1.16e\n",avr_plaquette());
      /*avr_ts_plaquette();*/
 #endif
 
