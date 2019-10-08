@@ -1209,23 +1209,21 @@ static void init_plaq_open_BCs(double ct, double cs)
             index = ipt_ext(T_BORDER - 1, ix, iy, iz);
             if (index != -1)
             {
-              for (mu = 0; mu < 3; mu++)
+              mu = 0;
+              for (nu = mu + 1; nu < 4; nu++)
+              {
+                plaq_weight[index * 16 + mu * 4 + nu] = 0;
+                plaq_weight[index * 16 + nu * 4 + mu] = 0;
+                rect_weight[index * 16 + mu * 4 + nu] = 0;
+                rect_weight[index * 16 + nu * 4 + mu] = 0;
+              }
+              for (mu = 1; mu < 3; mu++)
                 for (nu = mu + 1; nu < 4; nu++)
                 {
-                  plaq_weight[index * 16 + mu * 4 + nu] = 0;
-                  plaq_weight[index * 16 + nu * 4 + mu] = 0;
-                  rect_weight[index * 16 + mu * 4 + nu] = 0;
-                  rect_weight[index * 16 + nu * 4 + mu] = 0;
-                }
-            }
-            index = ipt_ext(T + T_BORDER, ix, iy, iz);
-            if (index != -1)
-            {
-              for (mu = 0; mu < 3; mu++)
-                for (nu = mu + 1; nu < 4; nu++)
-                {
-                  rect_weight[index * 16 + mu * 4 + nu] = 0;
-                  rect_weight[index * 16 + nu * 4 + mu] = 0;
+                  plaq_weight[index * 16 + mu * 4 + nu] = 0.5 * cs;
+                  plaq_weight[index * 16 + nu * 4 + mu] = 0.5 * cs;
+                  rect_weight[index * 16 + mu * 4 + nu] = 0.5 * cs;
+                  rect_weight[index * 16 + nu * 4 + mu] = 0.5 * cs;
                 }
             }
           }
@@ -1300,12 +1298,7 @@ static void init_plaq_open_BCs(double ct, double cs)
               rect_weight[index * 16 + nu * 4 + mu] = 0;
             }
           }
-        }
 
-    for (ix = 0; ix < X_EXT; ++ix)
-      for (iy = 0; iy < Y_EXT; ++iy)
-        for (iz = 0; iz < Z_EXT; ++iz)
-        {
           index = ipt_ext(T + T_BORDER - 1, ix, iy, iz);
           if (index != -1)
           {
