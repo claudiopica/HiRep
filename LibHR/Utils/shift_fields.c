@@ -17,8 +17,11 @@ void shift_fields(int *shift, spinor_field *sin, suNg_field *uin, spinor_field *
               "Error the shift vector components must all be greater than zero.");
     }
 #if defined(BC_T_OPEN) || defined(ROTATED_SF) || defined(BASIC_SF)
-    shift[0] = 0;
-    lprintf("SHIFT_FIELDS", 0, "Ignoring the time shift due to incompatible BC\n");
+    if (shift[0] != 0)
+    {
+        shift[0] = 0;
+        lprintf("SHIFT_FIELDS", 0, "Ignoring the time shift due to incompatible BC\n");
+    }
 #endif
 
     int total_shift = shift[0] + shift[1] + shift[2] + shift[3];

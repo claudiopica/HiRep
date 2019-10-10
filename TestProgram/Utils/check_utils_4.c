@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Check of the gauge invariance of the spatial APE smearing.
+* Check of the gauge invariance of the spatial APE smearing and of the covariant gauge projection.
 *
 *******************************************************************************/
 
