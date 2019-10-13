@@ -8,6 +8,7 @@ SHELL ["/bin/bash", "-l", "-c"]
 RUN source /etc/profile.d/spack.sh \
  && spack install gcc \
  && spack load gcc \
+ && spack compiler add \
  && spack install openmpi
 
 ENTRYPOINT ["/bin/bash", "/opt/spack/share/spack/docker/entrypoint.bash"]
