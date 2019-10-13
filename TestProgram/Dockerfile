@@ -5,11 +5,17 @@ WORKDIR /root
 SHELL ["/bin/bash", "-l", "-c"]
 
 # install compilers and mpi libraries
+RUN spack install gcc
+
 RUN source /etc/profile.d/spack.sh \
- && spack install gcc \
  && spack load gcc \
  && spack compiler add \
  && spack install openmpi
+
+RUN source /etc/profile.d/spack.sh \
+ && spack load gcc \
+ && spack compiler add \
+ && spack install mpich
 
 ENTRYPOINT ["/bin/bash", "/opt/spack/share/spack/docker/entrypoint.bash"]
 CMD ["docker-shell"]
