@@ -23,7 +23,7 @@
  * (flavor in not considered here)
  */
 
-#ifdef HIREP_UNTESTED
+#ifdef WITH_UNTESTED
 
 void print_wdmatrix(char *filename)
 {

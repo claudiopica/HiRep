@@ -576,22 +576,34 @@ GenerateCchecks[]:=Module[{Op,OpTmp,ar,irrepdim,EvaluatedQ,RActiveOp,RMatrixOp,P
   WrittenPaths[idx]=1;
   ]
 
-  OpGroupString[px_, py_, pz_, iridx_, charge_] := 
-  Module[{res = Opindex[px, py, pz, iridx, charge], string = "|",tmpstring,i,j},
+
+OpGroupStringPaths[px_, py_, pz_, iridx_, charge_] := 
+  Module[{res = Opindex[px, py, pz, iridx, charge], string = "|",tmpstring,i,j,lpath,step},
   Do[
     Do[
-      If[NumberQ[MapOptoCindex[px, py, pz, iridx, charge, res[[i, j]]] ] || res[[i, j]]==-2 , 
-        tmpstring=MapOptoCindex[px, py, pz, iridx, charge, res[[i, j]]] //. MapOptoCindex[_,_,_,_,_,-2]:>"2tr";
-        string = string <> ToString[tmpstring],
-        string = string <> "na";
+      If[NumberQ[MapOptoCindex[px, py, pz, iridx, charge, res[[i, j]]] ] , 
+        string=string<>ToString[MapOptoCindex[px, py, pz, iridx, charge, res[[i, j]]]]<>"=";
+         lpath=OpList[px, py, pz, iridx, charge,res[[i, j]]];
+         If[Head[lpath]==Plus,lpath=lpath[[1]]];
+         lpath = lpath //.  a1_. a_[A__][b__] :> {A} ;
+         Do[
+             step=lpath[[i]]//.{ax -> x , ay -> y , az-> z};
+             string = string <> ToString[step];
+             ,{i,1,Length[lpath]}];
+         ,
+         If[ res[[i, j]]==-2,
+             string=string<>"2tr",
+             string = string <> "na";
+         ];
        ];
        If[j!=Length[res[[i]]], string = string <>","];
     , {j, 1, Length[res[[i]]]}];
    string = string <> "|";
    , {i, 1, Length[res]}];
   string]
-
-
+  
+  
+  
   GenerateCcode[]:=Module[{res,ir1,ir2,path1,path2,llist,lcoeff,lcharge1,lcharge2,llpx1,llpy1,llpz1,llpx2,llpy2,llpz2,llev1,llev2,relsign,ar,twotrstring,opnumber},
   ar=OpenWrite[opfilename, FormatType -> InputForm];
   WriteString[ar, "#include <stdlib.h>\n#include \"global.h\"\n#include \"geometry.h\"\n#include \"suN.h\"\n#include \"utils.h\"\n#include \"glueballs.h\"\n\n"];
@@ -795,13 +807,10 @@ WriteString[ar,"    for(int i=0;i<total_n_glue_op;i++)
   
 
 
-  TotalCorrelatorSize=0;
   WriteString[ar, "
-void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_storage, double *cor_storage)
+void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_storage)
 {
-    int totalsize, i1, i2, t1, t2, id, n1, n2, b1, b2, i;
-    double norm;
-    double *cor_pointer, tmp;
+    int t1, t2, id, n1, n2, i;
     static double complex *gb1_bf;
     static int n_total_active_slices = 0;    
     static int *listactive = NULL;
@@ -911,67 +920,8 @@ void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_stor
             }
         }
 #endif
-
-        totalsize = 0;
-        norm = 0.5 / lcor->list[icor].n_pairs;
+    }
 "];
-  TotalCorrelatorSize=0;
- startbase=0;
-  Do[
-    Do[
-      Do[
-        Do[
-          If[(NumberQ[N1trOPtobemeasured[px, py, pz, irrepidx, irrepev, charge]] && N1trOPtobemeasured[px, py, pz, irrepidx, irrepev, charge] > 0 )|| NumberQ[N2trOPtobemeasured[px, py, pz, irrepidx, irrepev, charge]] ,
-            cs=0;
-
-            If[NumberQ[N1trOPtobemeasured[px, py, pz, irrepidx, irrepev, charge]],cs+=N1trOPtobemeasured[px, py, pz, irrepidx, irrepev, charge]];
-            If[NumberQ[N2trOPtobemeasured[px, py, pz, irrepidx, irrepev, charge]],cs+=N2trOPtobemeasured[px, py, pz, irrepidx, irrepev, charge]];
-            
-            TotalCorrelatorSize+=cs*cs;
-            startbase+=cs;
-           
-
-            WriteString[ar, "        
-        cor_pointer = cor_storage + totalsize + id * nblocking * nblocking * ",cs*cs,";
-
-        for (n1 = 0; n1 < nblocking; n1++)
-            for (b1 = 0; b1 < ",cs,"; b1++)
-            {
-                i1 = ",startbase-cs," + b1 + total_n_glue_op * n1;
-
-                n2 = n1;
-                b2 = b1;
-                i2 = ",startbase-cs," + b2 + total_n_glue_op * n2;
-                tmp = norm * creal(conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
-                cor_pointer[b1 + ",cs," * (n1 + nblocking * (b2 + ",cs," * n2))] += tmp;
-
-
-                for (b2 = b1 + 1; b2 < ",cs,"; b2++)
-                {
-                    i2 = ",startbase-cs," + b2 + total_n_glue_op * n2;
-                    tmp = norm * creal(conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
-                    cor_pointer[b1 + ",cs," * (n1 + nblocking * (b2 + ",cs," * n2))] += tmp;
-                    cor_pointer[b2 + ",cs," * (n2 + nblocking * (b1 + ",cs," * n1))] += tmp;
-                }
-
-                for (n2 = n1 + 1; n2 < nblocking; n2++)
-                    for (b2 = 0; b2 < ",cs,"; b2++)
-                    {
-                        i2 = ",startbase-cs," + b2 + total_n_glue_op * n2;
-                        tmp = norm * creal(conj(gb1[i1]) * gb2[i2] + gb1[i2] * conj(gb2[i1]));
-                        cor_pointer[b1 + ",cs," * (n1 + nblocking * (b2 + ",cs," * n2))] += tmp;
-                        cor_pointer[b2 + ",cs," * (n2 + nblocking * (b1 + ",cs," * n1))] += tmp;
-                    }
-            }
-        totalsize += (nblocking * nblocking * ",cs*cs," * (lcor->n_corrs));
-"];
-           ];
-        , {irrepev, 1, Length[bTOrthog[px, py, pz][[irrepidx]]]}];
-      , {charge, -1, 1, 2}];
-    , {irrepidx, 1, Length[bTOrthog[px, py, pz]]}];
-  , {px, -1, 1}, {py, -1, 1}, {pz, -1, 1}];
-
- WriteString[ar, "}\n\ntotalsize = 0 ;\n"];
 
 stcharge[+1]="+";
 stcharge[-1]="-";
@@ -986,7 +936,6 @@ Do[
             If[NumberQ[N2trOPtobemeasured[px, py, pz, irrepidx, irrepev, charge]],cs+=N2trOPtobemeasured[px, py, pz, irrepidx, irrepev, charge]];
             startbase+=cs;
 
-          (*If[Not[irrepidx==1 && irrepev==1 && charge==+1 && px==0 && py ==0 && pz==0],WriteString[ar, "#ifdef ML_TUNING"]];*)
           WriteString[ar, "
     lprintf(\"Measure ML\", 0, \"\\n1pt function P=(",px,",", py,",", pz,") Irrep=",IrrepName[px,py,pz][[irrepidx]]," Irrep ev=",irrepev,"/",Length[bTOrthog[px,py,pz][[irrepidx]]]," Charge=",stcharge[charge]," nop=%d\\n\",",cs," * nblocking );
     lprintf(\"Measure ML\", 0, \"Op id=",MyRangeString[startbase-cs,startbase-1]," (repeated nblocking times)\\n\");
@@ -1001,37 +950,7 @@ Do[
             lprintf(\"Measure ML\", 0, \"\\n\");
         }
 "];
-          (*If[Not[irrepidx==1 && irrepev==1 && charge==+1 && px==0 && py ==0 && pz==0],WriteString[ar, "#endif //ML_TUNING"]];*)
-(*  
-          WriteString[ar, "
-    b2 = 0;
-    b1 = 0;
-    
-    lprintf(\"Measure ML\", 0,\"\\nCorr Total P=(",px,",", py,",", pz,") Irrep=",IrrepName[px,py,pz][[irrepidx]]," Irrep ev=",irrepev,"/",Length[bTOrthog[px,py,pz][[irrepidx]]]," Charge=",stcharge[charge],"\\n\");
-   
 
-    for (icor = 0; icor < lcor->n_corrs; icor++)
-    {
-        cor_pointer = cor_storage + totalsize;
-        lprintf(\"Measure ML\", 0, \"\\n Corr points: \");
-        n2=lcor->list[b1].n_pairs;
-        for (b2 = 0; b2 < n2; b2++)
-        {
-            lprintf(\"Measure ML\", 0, \"( %d %d ) \", lcor->list[b1].t2, lcor->list[b1].t1);
-            b1++;
-        }
-        lprintf(\"Measure ML\", 0, \"\\n\");
-
-        for (i1 = 0; i1 < (nblocking * ",cs,"); i1++)
-        {
-            for (i2 = 0; i2 < (nblocking * ",cs,"); i2++)
-                lprintf(\"Measure ML\", 0, \" ( %.6e ) \", cor_pointer[i1 + nblocking * ",cs," * i2]);
-
-            lprintf(\"Measure ML\", 0, \"\\n\");
-        }
-        totalsize += (nblocking * nblocking * ",cs*cs,");
-    }
-"];*)
           ];
         ,{irrepev, 1, Length[bTOrthog[px, py, pz][[irrepidx]]]}];
       , {charge, -1, 1, 2}];
@@ -1056,12 +975,12 @@ Do[
         , {irrepev, 1, Length[bTOrthog[px, py, pz][[irrepidx]]]}];
         If[test == 1, 
           WriteString[ar, "lprintf(\"INIT Measure ML\",0,\"\\n1pt Irrep multiplets Total P=(", px, ",", py, ",", pz, ") Irrep=", IrrepName[px,py,pz][[irrepidx]]," Charge=", stcharge[charge], "\");\n"];
-          WriteString[ar, "lprintf(\"INIT Measure ML\",0,\" " <> OpGroupString[px, py, pz, irrepidx, charge] <>"\");\n"]
+          WriteString[ar, "lprintf(\"INIT Measure ML\",0,\" " <> OpGroupStringPaths[px, py, pz, irrepidx, charge] <>"\");\n"]
         ];
       , {charge, -1, 1, 2}];
     , {irrepidx, 1, Length[bTOrthog[px, py, pz]]}];
   , {px, -1, 1}, {py, -1, 1}, {pz, -1, 1}];
-  WriteString[ar, "}\n"];
+              WriteString[ar, "}\n"];
 
 
   Close[ar];
@@ -1169,7 +1088,7 @@ typedef struct
     int n_corrs;
 } cor_list;
 
-void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_storage, double *cor_storage);
+void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_storage);
     "];
     WriteString[ar, "\n\n"];
     Do[
@@ -1186,7 +1105,6 @@ void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_stor
       , {irrepidx, 1, Length[bTOrthog[px, py, pz]]}];
     , {px, -1, 1}, {py, -1, 1}, {pz, -1, 1}];
     WriteString[ar, "#define total_n_glue_op ",opnumberC,"\n"];
-    WriteString[ar, "#define total_corrs_size ",TotalCorrelatorSize,"\n"];
     WriteString[ar,"#endif\n"];
     Close[ar];
     ];

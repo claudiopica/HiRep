@@ -290,7 +290,6 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
 {
     int i, j;
     static double complex *one_point_gb;
-    static double *cor_storage;
     static long double norm = 1.0;
     struct timeval start, end, etime;
 
@@ -300,7 +299,6 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
         {
             init_hb_multihit_boundary();
             one_point_gb = malloc(sizeof(double complex) * total_n_glue_op * nblocking * n_active_slices);
-            cor_storage = malloc(sizeof(double) * nblocking * nblocking * lcor->n_corrs * total_corrs_size);
             for (i = 0; i < max_mh_level; i++)
                 norm *= ml_up[i];
             norm *= GLB_VOL3 * NG;
@@ -308,7 +306,6 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
         gettimeofday(&start, 0);
 
         memset(one_point_gb, 0, sizeof(double complex) * total_n_glue_op * nblocking * n_active_slices);
-        memset(cor_storage, 0, sizeof(double) * nblocking * nblocking * lcor->n_corrs * total_corrs_size);
     }
 
     if (lev < max_mh_level - 1)
@@ -342,7 +339,7 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
         for (i = 0; i < nblocking * n_active_slices * total_n_glue_op; i++)
             one_point_gb[i] /= norm;
 
-        evaluate_correlators(lcor, nblocking, one_point_gb, cor_storage);
+        evaluate_correlators(lcor, nblocking, one_point_gb);
         gettimeofday(&start, 0);
         timeval_subtract(&etime, &start, &end);
 

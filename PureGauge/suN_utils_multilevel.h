@@ -10,11 +10,13 @@
 #include "glueballs.h"
 #define GENERIC_MAX(x, y) ((x) > (y) ? (x) : (y))
 
-#define ENSURE_int(i)   _Generic((i), int:   (i))
-#define ENSURE_float(f) _Generic((f), float: (f))
+#define ENSURE_int(i) _Generic((i), int \
+                               : (i))
+#define ENSURE_float(f) _Generic((f), float \
+                                 : (f))
 
 #define MAX(type, x, y) \
-  (type)GENERIC_MAX(ENSURE_##type(x), ENSURE_##type(y))
+  (type) GENERIC_MAX(ENSURE_##type(x), ENSURE_##type(y))
 
 /* suN ML variables */
 typedef struct _input_pg_ml
@@ -52,31 +54,49 @@ typedef struct _input_pg_ml
     }                                                                                                                         \
   }
 
+/* Polyakov variables */
+
+typedef struct _input_poly
+{
+  char make[256];
+
+  /* for the reading function */
+  input_record_t read[2];
+} input_poly;
+
+#define init_input_poly(varname)                                             \
+  {                                                                      \
+    .read = {                                                            \
+      {"make Polyakov", "polyakov:make = %s", STRING_T, (varname).make}, \
+      {NULL, NULL, 0, NULL}                                              \
+    }                                                                    \
+  }
+
 /* WF variables */
 
 typedef struct _input_WF
 {
+  char make[256];
   double tmax;
   int nmeas;
   double eps;
   double delta;
 
   /* for the reading function */
-  input_record_t read[5];
+  input_record_t read[6];
 } input_WF;
 
-#define init_input_WF(varname)                                                     \
-  {                                                                                \
-    .read = {                                                                      \
-      {"WF max integration time", "WF:tmax = %lf", DOUBLE_T, &((varname).tmax)},   \
-      {"WF number of measures", "WF:nmeas = %d", INT_T, &((varname).nmeas)},    \
-      {"WF initial epsilon", "WF:eps = %lf", DOUBLE_T, &((varname).eps)},          \
-      {"WF delta", "WF:delta = %lf", DOUBLE_T, &((varname).delta)},                \
-      {NULL, NULL, 0, NULL}                                                        \
-    }                                                                              \
+#define init_input_WF(varname)                                                   \
+  {                                                                              \
+    .read = {                                                                    \
+      {"make Wilson Flow", "wf:make = %s", STRING_T, (varname).make},            \
+      {"WF max integration time", "WF:tmax = %lf", DOUBLE_T, &((varname).tmax)}, \
+      {"WF number of measures", "WF:nmeas = %d", INT_T, &((varname).nmeas)},     \
+      {"WF initial epsilon", "WF:eps = %lf", DOUBLE_T, &((varname).eps)},        \
+      {"WF delta", "WF:delta = %lf", DOUBLE_T, &((varname).delta)},              \
+      {NULL, NULL, 0, NULL}                                                      \
+    }                                                                            \
   }
-
-
 
 /* Flow control variables variables */
 typedef struct _pg_flow_ml
@@ -98,6 +118,8 @@ typedef struct _pg_flow_ml
   input_pg_ml *pg_v;
 
   input_WF *wf;
+
+  input_poly *poly;
   /* for the reading function */
   input_record_t read[8];
 
@@ -116,7 +138,6 @@ typedef struct _pg_flow_ml
       {NULL, NULL, INT_T, NULL}                                                         \
     }                                                                                   \
   }
-
 
 int init_mc_ml(pg_flow_ml *rf, char *ifile);
 int save_conf(pg_flow_ml *rf, int id);

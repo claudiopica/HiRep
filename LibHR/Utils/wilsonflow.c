@@ -12,9 +12,18 @@
 #include "communications.h"
 #include "wilsonflow.h"
 #include <math.h>
+#include <string.h>
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338327
+#endif
+
+static suNg_field *ws_gf = NULL;
+static suNg_field *ws_gf_tmp = NULL;
+static suNg_field *Vprime = NULL;
+static suNg_field *u_gauge_backup = NULL;
+#if defined(PLAQ_WEIGHTS)
+static double *wf_plaq_weight = NULL;
 #endif
 
 /*
@@ -38,6 +47,7 @@ static void Zeta(suNg_field *Z, const suNg_field *U, const double alpha)
 
   error(Z->type != &glattice, 1, "wilson_flow.c", "'Z' in Zeta must be defined on the whole lattice");
   error(U->type != &glattice, 1, "wilson_flow.c", "'U' in Zeta must be defined on the whole lattice");
+  suNg staple, tmp1, tmp2;
 
 #ifdef PLAQ_CHECK
   double plaq = 0.;
@@ -47,7 +57,6 @@ static void Zeta(suNg_field *Z, const suNg_field *U, const double alpha)
   _MASTER_FOR(&glattice, i)
   {
 #endif
-    suNg staple, tmp1, tmp2;
     for (int mu = 0; mu < 4; ++mu)
     {
       _suNg_zero(staple);
@@ -59,10 +68,7 @@ static void Zeta(suNg_field *Z, const suNg_field *U, const double alpha)
         _suNg_times_suNg_dagger(tmp1, *u1, *u2);
         _suNg_times_suNg_dagger(tmp2, tmp1, *u3);
 #ifdef PLAQ_WEIGHTS
-        if (plaq_weight != NULL)
-        {
-          _suNg_mul(tmp2, plaq_weight[i * 16 + nu * 4 + mu], tmp2);
-        }
+        _suNg_mul(tmp2, wf_plaq_weight[i * 16 + nu * 4 + mu], tmp2);
 #endif
         _suNg_add_assign(staple, tmp2);
 
@@ -74,10 +80,7 @@ static void Zeta(suNg_field *Z, const suNg_field *U, const double alpha)
         _suNg_dagger_times_suNg(tmp2, tmp1, *u3);
 
 #ifdef PLAQ_WEIGHTS
-        if (plaq_weight != NULL)
-        {
-          _suNg_mul(tmp2, plaq_weight[j * 16 + nu * 4 + mu], tmp2);
-        }
+        _suNg_mul(tmp2, wf_plaq_weight[j * 16 + nu * 4 + mu], tmp2);
 #endif
         _suNg_add_assign(staple, tmp2);
       }
@@ -305,11 +308,6 @@ static void WF_Exp(suNg *u, suNg *X)
 
 #endif
 
-static suNg_field *ws_gf = NULL;
-static suNg_field *ws_gf_tmp = NULL;
-static suNg_field *Vprime = NULL;
-static suNg_field *u_gauge_backup = NULL;
-
 void WF_initialize()
 {
   if (ws_gf == NULL)
@@ -318,6 +316,101 @@ void WF_initialize()
     ws_gf_tmp = alloc_gfield(&glattice);
     Vprime = alloc_gfield(&glattice);
     u_gauge_backup = alloc_gfield(&glattice);
+#if defined(PLAQ_WEIGHTS) && defined(BC_T_OPEN)
+    int ix, iy, iz, index, mu, nu;
+    wf_plaq_weight = malloc(sizeof(double) * glattice.gsize_gauge * 16);
+    memcpy(wf_plaq_weight, plaq_weight, sizeof(double) * glattice.gsize_gauge * 16);
+    if (COORD[0] == 0)
+    {
+      for (ix = 0; ix < X_EXT; ++ix)
+        for (iy = 0; iy < Y_EXT; ++iy)
+          for (iz = 0; iz < Z_EXT; ++iz)
+          {
+            index = ipt_ext(T_BORDER, ix, iy, iz);
+            if (index != -1)
+            {
+
+              for (mu = 0; mu < 3; mu++)
+                for (nu = mu + 1; nu < 4; nu++)
+                {
+                  wf_plaq_weight[index * 16 + mu * 4 + nu] *= 0.5;
+                  wf_plaq_weight[index * 16 + nu * 4 + mu] *= 0.5;
+                }
+            }
+          }
+      if (T_BORDER > 0)
+      {
+        for (ix = 0; ix < X_EXT; ++ix)
+          for (iy = 0; iy < Y_EXT; ++iy)
+            for (iz = 0; iz < Z_EXT; ++iz)
+            {
+              index = ipt_ext(T_BORDER - 1, ix, iy, iz);
+              if (index != -1)
+              {
+
+                for (mu = 1; mu < 3; mu++)
+                  for (nu = mu + 1; nu < 4; nu++)
+                  {
+                    wf_plaq_weight[index * 16 + mu * 4 + nu] *= 0.5;
+                    wf_plaq_weight[index * 16 + nu * 4 + mu] *= 0.5;
+                  }
+              }
+            }
+      }
+    }
+
+    if (COORD[0] == NP_T - 1)
+    {
+      if (T_BORDER > 0)
+      {
+        for (ix = 0; ix < X_EXT; ++ix)
+          for (iy = 0; iy < Y_EXT; ++iy)
+            for (iz = 0; iz < Z_EXT; ++iz)
+            {
+              index = ipt_ext(T + T_BORDER, ix, iy, iz);
+              if (index != -1)
+              {
+                for (mu = 0; mu < 3; mu++)
+                  for (nu = mu + 1; nu < 4; nu++)
+                  {
+                    wf_plaq_weight[index * 16 + mu * 4 + nu] *= 0.5;
+                    wf_plaq_weight[index * 16 + nu * 4 + mu] *= 0.5;
+                  }
+              }
+            }
+      }
+
+      for (ix = 0; ix < X_EXT; ++ix)
+        for (iy = 0; iy < Y_EXT; ++iy)
+          for (iz = 0; iz < Z_EXT; ++iz)
+          {
+            index = ipt_ext(T + T_BORDER - 2, ix, iy, iz);
+            if (index != -1)
+            {
+              mu = 0;
+              for (nu = mu + 1; nu < 4; nu++)
+              {
+                wf_plaq_weight[index * 16 + mu * 4 + nu] *= 0.5;
+                wf_plaq_weight[index * 16 + nu * 4 + mu] *= 0.5;
+              }
+            }
+
+            index = ipt_ext(T + T_BORDER - 1, ix, iy, iz);
+            if (index != -1)
+            {
+              for (mu = 1; mu < 3; mu++)
+                for (nu = mu + 1; nu < 4; nu++)
+                {
+                  wf_plaq_weight[index * 16 + mu * 4 + nu] *= 0.5;
+                  wf_plaq_weight[index * 16 + nu * 4 + mu] *= 0.5;
+                }
+            }
+          }
+    }
+#endif
+#if defined(PLAQ_WEIGHTS) && !defined(BC_T_OPEN)
+    wf_plaq_weight = plaq_weight;
+#endif
   }
 }
 
@@ -329,6 +422,9 @@ void WF_free()
     free_gfield(ws_gf_tmp);
     free_gfield(Vprime);
     free_gfield(u_gauge_backup);
+#ifdef BC_T_OPEN
+    free(wf_plaq_weight);
+#endif
   }
 }
 
@@ -598,8 +694,7 @@ static void WF_plaq(double *ret, suNg_field *V, int ix, int mu, int nu)
   _suNg_trace_re(*ret, w3);
 
 #ifdef PLAQ_WEIGHTS
-  if (plaq_weight != NULL)
-    *ret *= plaq_weight[ix * 16 + nu * 4 + mu];
+  *ret *= wf_plaq_weight[ix * 16 + nu * 4 + mu];
 #endif
 }
 
@@ -647,8 +742,7 @@ void WF_E_T(double *E, suNg_field *V)
           {
             WF_plaq(&p, V, ix, mu, nu);
 #ifdef PLAQ_WEIGHTS
-
-            E[2 * gt] += ((double)(NG))*plaq_weight[ix * 16 + nu * 4 + mu] - p ;
+            E[2 * gt] += ((double)(NG)) * wf_plaq_weight[ix * 16 + nu * 4 + mu] - p;
 #else
             E[2 * gt] += NG - p;
 #endif
@@ -658,7 +752,7 @@ void WF_E_T(double *E, suNg_field *V)
             {
               WF_plaq(&p, V, ix, mu, nu);
 #ifdef PLAQ_WEIGHTS
-              E[2 * gt + 1] += ((double)(NG))*plaq_weight[ix * 16 + nu * 4 + mu] - p ;
+              E[2 * gt + 1] += ((double)(NG)) * wf_plaq_weight[ix * 16 + nu * 4 + mu] - p;
 #else
               E[2 * gt + 1] += NG - p;
 #endif
@@ -694,10 +788,7 @@ static void WF_clover_F(suNg_algebra_vector *F, suNg_field *V, int ix, int mu, i
   _suNg_times_suNg_dagger(w2, w1, (*v3));
   _suNg_times_suNg_dagger(w1, w2, (*v4));
 #ifdef PLAQ_WEIGHTS
-  if (plaq_weight != NULL)
-  {
-    _suNg_mul(w1, plaq_weight[ix * 16 + nu * 4 + mu], w1);
-  }
+  _suNg_mul(w1, wf_plaq_weight[ix * 16 + nu * 4 + mu], w1);
 #endif
   _suNg_add_assign(w3, w1);
 
@@ -713,10 +804,7 @@ static void WF_clover_F(suNg_algebra_vector *F, suNg_field *V, int ix, int mu, i
   _suNg_times_suNg_dagger(w2, w1, (*v3));
   _suNg_times_suNg(w1, w2, (*v4));
 #ifdef PLAQ_WEIGHTS
-  if (plaq_weight != NULL)
-  {
-    _suNg_mul(w1, plaq_weight[iy * 16 + nu * 4 + mu], w1);
-  }
+  _suNg_mul(w1, wf_plaq_weight[iy * 16 + nu * 4 + mu], w1);
 #endif
   _suNg_add_assign(w3, w1);
 
@@ -733,10 +821,8 @@ static void WF_clover_F(suNg_algebra_vector *F, suNg_field *V, int ix, int mu, i
   _suNg_dagger_times_suNg(w2, w1, (*v3));
   _suNg_times_suNg(w1, w2, (*v4));
 #ifdef PLAQ_WEIGHTS
-  if (plaq_weight != NULL)
-  {
-    _suNg_mul(w1, plaq_weight[iz * 16 + nu * 4 + mu], w1);
-  }
+  _suNg_mul(w1, wf_plaq_weight[iz * 16 + nu * 4 + mu], w1);
+
 #endif
   _suNg_add_assign(w3, w1);
 
@@ -752,10 +838,7 @@ static void WF_clover_F(suNg_algebra_vector *F, suNg_field *V, int ix, int mu, i
   _suNg_times_suNg(w2, w1, (*v3));
   _suNg_times_suNg_dagger(w1, w2, (*v4));
 #ifdef PLAQ_WEIGHTS
-  if (plaq_weight != NULL)
-  {
-    _suNg_mul(w1, plaq_weight[iy * 16 + nu * 4 + mu], w1);
-  }
+  _suNg_mul(w1, wf_plaq_weight[iy * 16 + nu * 4 + mu], w1);
 #endif
   _suNg_add_assign(w3, w1);
 

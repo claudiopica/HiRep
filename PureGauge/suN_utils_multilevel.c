@@ -23,6 +23,8 @@ static input_pg_ml pg_var_ml = init_input_pg_ml(pg_var_ml);
 
 static input_WF WF_var = init_input_WF(WF_var);
 
+static input_poly poly_var = init_input_poly(poly_var);
+
 
 static void mk_gconf_name(char *name, pg_flow_ml *gf, int id)
 {
@@ -152,6 +154,7 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
     gf->therm = 0;
     gf->pg_v = &pg_var_ml;
     gf->wf = &WF_var;
+    gf->poly = &poly_var;
 
     read_input(pg_var_ml.read, ifile);
 
@@ -336,6 +339,10 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
 
     WF_initialize();
     
+    read_input(poly_var.read, ifile);
+
+
+
     lprintf("INIT WF", 0, "WF max integration time=%lf\n", WF_var.tmax);
     lprintf("INIT WF", 0, "WF number of measures=%d\n", WF_var.nmeas);
     lprintf("INIT WF", 0, "WF initial epsilon=%lf\n", WF_var.eps);

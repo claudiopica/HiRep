@@ -4,7 +4,6 @@
 #include "logger.h"
 #include <string.h>
 
-#ifdef HIREP_UNTESTED
 static geometry_descriptor empty_gd = {0};
 
 static void copy_gd_no_comm(geometry_descriptor *dptr, geometry_descriptor *sptr)
@@ -57,4 +56,3 @@ void empty_buffers(spinor_field *s)
 		memset(s->ptr+shift, 0, size);
 	}
 }
-#endif

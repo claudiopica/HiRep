@@ -47,6 +47,12 @@ void M(spinor_field *out, spinor_field *in)
 int main(int argc, char *argv[])
 {
 
+  setup_process(&argc, &argv);
+
+  setup_gauge_fields();
+ 
+#ifdef WITH_UNTESTED
+
   int i;
   double tau;
   spinor_field *s1, *s2;
@@ -55,13 +61,7 @@ int main(int argc, char *argv[])
   mshift_par par;
 
   int cgiters;
-
-  logger_map("DEBUG", "debug");
-
-  setup_process(&argc, &argv);
-
-  setup_gauge_fields();
-  lprintf("MAIN", 0, "Generating a random gauge field... ");
+ lprintf("MAIN", 0, "Generating a random gauge field... ");
   fflush(stdout);
   random_u(u_gauge);
   start_gf_sendrecv(u_gauge);
@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
   spinor_field_zero_f(res);
   SAP_prec(5, &cg_mshift, &par, &M, s1, res);
 
-  lprintf("SAP TEST",0,"Converged in %d iterations\n",cgiters);
+  lprintf("SAP TEST", 0, "Converged in %d iterations\n", cgiters);
   for (i = 0; i < par.n; ++i)
   {
     M(s2, &res[i]);
@@ -133,7 +133,10 @@ int main(int argc, char *argv[])
   free_spinor_field_f(res);
   free(par.shift);
 
-  finalize_process();
+#else
+ lprintf("MAIN",0,"Warning no test performed, the routine SAP_prec is in UNTESTED status");
+#endif
 
+  finalize_process();
   return 0;
 }
