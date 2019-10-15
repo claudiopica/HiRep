@@ -1,9 +1,9 @@
 // Global variables
-GLB_T = 24
+GLB_T = 32
 GLB_X = 8
 GLB_Y = 8
 GLB_Z = 8
-NP_T = 2
+NP_T = 4
 NP_X = 1
 NP_Y = 1
 NP_Z = 1
@@ -11,7 +11,7 @@ NP_Z = 1
 N_REP = 1
 
 rlx_level = 1
-rlx_seed = 12345
+rlx_seed = 43215
 
 //Logger levels (default = -1)
 log:default = -1
@@ -19,45 +19,50 @@ log:inverter = -1
 log:forcestat = 0
 
 // Pure gauge coupling
-beta  =   6.1
+beta  =   6.0
 // Bare anisotropy parameter
-anisotropy  =   2.464
+// anisotropy  =   2.464
+anisotropy  =   1.00
 // number of heathbath steps
 nhb   =   1 
 // number of overelaxations steps
 nor   =   4
 //separations steps between each ML measures 
-nskip = 10
+nskip = 50 
 ML levels = 1
 //The number of iterations per level must be written in a order string comma separated x1,x2,x3.... (one information per level)
-ML iterations per level = 10
+ML iterations per level = 0
 //The number of update skip per level must be writte n in a order string comma separated x1,x2,x3.... (one information per level) (each of these must be >=1)
-ML skip per level = 1
+ML skip per level = 1 
 // the correlators are inputed according to the structure x1-y1|x2-y2,x3-y3,...
 // where pairs separated by a | are meant to have the same distance and will be averaged
 ML correlators = 10-12,9-12|10-13,9-13,8-13|9-14,8-14,7-14|8-15,7-15,6-15|7-16,6-16,4-18,3-18|4-19,3-19,2-19|3-20,2-20,1-20|2-21,1-21,0-21|1-22,0-22
 // ML correlators = 46-48,45-48|46-49,45-49,44-49|45-50,44-50,43-50|44-51,43-51,42-51|43-52,42-52,41-52|42-53,41-53,40-53|41-54,40-54,39-54|40-55,39-55,38-55|39-56,38-56,37-56|38-57,37-57,36-57|37-58,36-58,35-58|36-59,35-59,34-59|35-60,34-60,33-60|34-61,33-61,32-61|33-62,32-62,31-62|32-63,31-63,30-63|31-64,30-64,29-64|30-65,29-65,28-65|29-66,28-66,27-66|28-67,27-67,26-67|27-68,26-68,25-68|26-69,25-69,24-69|25-70,24-70|22-72,21-72|22-73,21-73,20-73|21-74,20-74,19-74|20-75,19-75,18-75|19-76,18-76,17-76|18-77,17-77,16-77|17-78
 //number of spatial blocking level used to generate the glueballs correlators
-nblk = 2
+nblk = 0
 //APE smearing parameter value
 APEsmear = 0.33
 
+wf:make = true
 // Wilson Flow time
-WF:tmax = 20
-WF:nmeas = 60
-WF:eps = 0.001
-WF:delta = 0.000001
+WF:tmax = 2.0
+//20
+WF:nmeas = 10
+//60
+WF:eps = 0.02
+WF:delta = 0.0001
 
+polyakov:make = false
 
 
 // Run control variables
-therm = 50
+therm = 5000
 run name = run1
-save freq = 50
+save freq = 5000
 conf dir = cnfg
 gauge start = ranDoM
 //gauge start = Unit
 //gauge start = run1_24x8x8x8nc3b5.600000n3
 //rlx_state =
 //rlx_start =
-last conf = +100
+last conf = +200

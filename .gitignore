@@ -13,3 +13,8 @@ LibHR/Utils/suN_exp.c
 *.d
 *.a
 **/cinfo.c
+
+#configuration files for vscode
+.vscode
+**/.DS_Store
+**/SnoopDogg*
