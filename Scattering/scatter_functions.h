@@ -1,3 +1,4 @@
+#include "setup.h"
 /**
  *
  * @file scatter_functions.h
@@ -125,7 +126,7 @@ void free_mo(meson_observable* mo)
  * @param path directory to which the output file will be saved
  * @param name name of the output file
  */
-inline void io2pt(meson_observable* mo, int pmax, int sourceno, char* path, char* name)
+static inline void io2pt(meson_observable* mo, int pmax, int sourceno, char* path, char* name)
 {
 	FILE* file;
 	char outfile[256] = {};
@@ -151,7 +152,7 @@ inline void io2pt(meson_observable* mo, int pmax, int sourceno, char* path, char
  * @param path directory to which the output file will be saved
  * @param name name of the output file
  */
-inline void io4pt(meson_observable* mo, int pmax, int sourceno, char* path, char* name)
+static inline void io4pt(meson_observable* mo, int pmax, int sourceno, char* path, char* name)
 {
 	FILE* file;
 	char outfile[256] = {};
@@ -739,7 +740,7 @@ void setup(FILE** listlist, double* m){
   filename_t fpars;
 
   read_input(glb_var.read,input_filename);
-  setup_replicas();
+  //setup_replicas();
 
   /* logger setup */
   /* disable logger for MPI processes != 0 */
@@ -904,7 +905,7 @@ void setup(FILE** listlist, double* m){
 void IO_json_0(struct mo_0* molist[], int numsources, char* path){
     FILE* f;
 	char outfile[256] = {};
-	int px,py,pz,t;
+	int px,py,pz;
     int pmax = 2;
 	if(PID==0){
 		sprintf(outfile,"%s/p_(0,0,0)_n%s.json", path, strrchr(cnfg_filename,'n') + 1 );
@@ -935,7 +936,7 @@ void IO_json_0(struct mo_0* molist[], int numsources, char* path){
 void IO_json_p(struct mo_p* molist[], int numsources, char* path){
     FILE* f;
 	char outfile[256] = {};
-	int px,py,pz,t;
+	int px,py,pz;
     int pmax = 2;
 	if(PID==0){
 		sprintf(outfile,"%s/p_(%d,%d,%d)_n%s.json", path, molist[0]->p[0], molist[0]->p[1], molist[0]->p[2],strrchr(cnfg_filename,'n') + 1 );

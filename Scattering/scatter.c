@@ -27,6 +27,7 @@
 #include "gamma_spinor.h"
 #include "spin_matrix.h"
 #include "clover_tools.h"
+#include "setup.h"
 
 #include "cinfo.c"
 #include "IOroutines.c"

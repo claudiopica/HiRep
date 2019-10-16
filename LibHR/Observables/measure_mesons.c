@@ -235,7 +235,7 @@ void measure_mesons_core(spinor_field* psi0, spinor_field* psi1, spinor_field* e
 		      _g5_spinmatrix(sm2,smtmp2);
 		      _spinmatrix_mul_trace(tr,sm1,sm2);
 		    }
-		    else{
+		    else{ // VD this is for the disconnected contraction !
 		      spinmatrix_op(&smtmp1,&sma,motmp->ind1);
           //VD r spinmatrix, s spinmatrix, k result; Tr [ r^dag . s]
           // VD _spinmatrix_mul_trace(k, r, s)

@@ -65,7 +65,7 @@ typedef struct fourvector{
 /**
  * @brief Adds two four-vectors together replacing the first one with the sum, v1 += v2
  */
-void iadd(fourvec *v1, fourvec *v2)
+static void iadd(fourvec *v1, fourvec *v2)
 {
     for(int i=0;i<4;++i)
     {
@@ -76,7 +76,7 @@ void iadd(fourvec *v1, fourvec *v2)
 /**
  * @brief Multiply four-vector by a real number
  */
-void imul(fourvec *v1, double a)
+static void imul(fourvec *v1, double a)
 {
     for(int i=0;i<4;++i)
     {
@@ -102,7 +102,7 @@ double f1(fourvec p, double m)
 /**
  * @brief Part of the propagator
  */
-double f2(fourvec v1, fourvec v2)
+static double f2(fourvec v1, fourvec v2)
 {
     int i;
     double result = 0.0;
@@ -117,8 +117,6 @@ double f2(fourvec v1, fourvec v2)
  * @brief Part of the propagator
  */
 double b_mu(fourvec p1, int mu){
-    int i;
-    double result = 0.0;
     return sin(p1.v[mu]);
 }
 
@@ -130,12 +128,13 @@ double b_mu(fourvec p1, int mu){
  * @param LT time extent of the box
  * @param t time slice
  */
-complex twopoint(fourvec p, double m,int L, int LT, int t)
+double complex twopoint(fourvec p, double m,int L, int LT, int t)
 {
     fourvec mom1, mom2;
     int q1, q2, q3, q41, q42;
-    complex res;
-    res.re = res.im = 0.0;
+    double complex res;
+    //res.re = res.im = 0.0;
+    res = 0.;
     double tmp;
 
     for (q1=0;q1<L;++q1) for (q2=0; q2<L; ++q2)  for (q3=0; q3<L; ++q3) for (q41=0; q41<LT; ++q41) for (q42=0; q42<LT; ++q42){
@@ -146,12 +145,14 @@ complex twopoint(fourvec p, double m,int L, int LT, int t)
         imul(&mom2, 2.0* PI / L);
 
         tmp = (f1(mom1,m)*f1(mom2,m) + f2(mom1,mom2)) / ( (SQR(f1(mom1,m)) + f2(mom1,mom1)) * (SQR(f1(mom2,m)) + f2(mom2,mom2) ) );
-        res.re += tmp * cos((2.0 * PI / LT) * t * (q42 - q41));
-        res.im += tmp * sin((2.0 * PI / LT) * t * (q42 - q41));
+        res += tmp *( cos((2.0 * PI / LT) * t * (q42 - q41)) + I*sin((2.0 * PI / LT) * t * (q42 - q41)));
+        //res.re += tmp * cos((2.0 * PI / LT) * t * (q42 - q41));
+        //res.im += tmp * sin((2.0 * PI / LT) * t * (q42 - q41));
     }
 
-    res.re = 4*res.re/L/L/L/LT/LT;
-    res.im = 4*res.im/L/L/L/LT/LT;
+    //res.re = 4*res.re/L/L/L/LT/LT;
+    //res.im = 4*res.im/L/L/L/LT/LT;
+    res = 4*res/L/L/L/LT/LT;
     return res;
 }
 
@@ -163,12 +164,13 @@ complex twopoint(fourvec p, double m,int L, int LT, int t)
  * @param LT time extent of the box
  * @param t time slice
  */
-complex twopoint_rho(fourvec p, double m,int L, int LT, int t)
+double complex twopoint_rho(fourvec p, double m,int L, int LT, int t)
 {
     fourvec mom1, mom2;
     int q1, q2, q3, q41, q42;
-    complex res;
-    res.re = res.im = 0.0;
+    double complex res;
+    //res.re = res.im = 0.0;
+    res = 0.;
     double tmp;
 
     for (q1=0;q1<L;++q1) for (q2=0; q2<L; ++q2)  for (q3=0; q3<L; ++q3) for (q41=0; q41<LT; ++q41) for (q42=0; q42<LT; ++q42){
@@ -179,12 +181,14 @@ complex twopoint_rho(fourvec p, double m,int L, int LT, int t)
         imul(&mom2, 2.0* PI / L);
 
         tmp = (f1(mom1,m)*f1(mom2,m) + f2(mom1,mom2) - 2*sin(mom1.v[2])*sin(mom2.v[2])) / ( (SQR(f1(mom1,m)) + f2(mom1,mom1)) * (SQR(f1(mom2,m)) + f2(mom2,mom2) ) );
-        res.re += tmp * cos((2.0 * PI / LT) * t * (q42 - q41));
-        res.im += tmp * sin((2.0 * PI / LT) * t * (q42 - q41));
+        //res.re += tmp * cos((2.0 * PI / LT) * t * (q42 - q41));
+        //res.im += tmp * sin((2.0 * PI / LT) * t * (q42 - q41));
+         res += tmp *( cos((2.0 * PI / LT) * t * (q42 - q41)) + I*sin((2.0 * PI / LT) * t * (q42 - q41)));
     }
 
-    res.re = 4*res.re/L/L/L/LT/LT;
-    res.im = 4*res.im/L/L/L/LT/LT;
+    //res.re = 4*res.re/L/L/L/LT/LT;
+    //res.im = 4*res.im/L/L/L/LT/LT;
+    res = 4*res/L/L/L/LT/LT;
     return res;
 }
 
@@ -196,12 +200,13 @@ complex twopoint_rho(fourvec p, double m,int L, int LT, int t)
  * @param LT time extent of the box
  * @param t time slice
  */
-complex twopoint_rho12(fourvec p, double m,int L, int LT, int t)
+double complex twopoint_rho12(fourvec p, double m,int L, int LT, int t)
 {
     fourvec mom1, mom2;
     int q1, q2, q3, q41, q42;
-    complex res;
-    res.re = res.im = 0.0;
+    double complex res;
+    //res.re = res.im = 0.0;
+    res=0.;
     double tmp;
 
     for (q1=0;q1<L;++q1) for (q2=0; q2<L; ++q2)  for (q3=0; q3<L; ++q3) for (q41=0; q41<LT; ++q41) for (q42=0; q42<LT; ++q42){
@@ -212,12 +217,14 @@ complex twopoint_rho12(fourvec p, double m,int L, int LT, int t)
         imul(&mom2, 2.0* PI / L);
 
         tmp = ( -(sin(mom1.v[0])*sin(mom2.v[1]) + sin(mom1.v[1])*sin(mom2.v[0]) )) / ( (SQR(f1(mom1,m)) + f2(mom1,mom1)) * (SQR(f1(mom2,m)) + f2(mom2,mom2) ) );
-        res.re += tmp * cos((2.0 * PI / LT) * t * (q42 - q41));
-        res.im += tmp * sin((2.0 * PI / LT) * t * (q42 - q41));
+        //res.re += tmp * cos((2.0 * PI / LT) * t * (q42 - q41));
+        //res.im += tmp * sin((2.0 * PI / LT) * t * (q42 - q41));
+        res += tmp *( cos((2.0 * PI / LT) * t * (q42 - q41)) + I*sin((2.0 * PI / LT) * t * (q42 - q41)));
     }
 
-    res.re = 4*res.re/L/L/L/LT/LT;
-    res.im = 4*res.im/L/L/L/LT/LT;
+    //res.re = 4*res.re/L/L/L/LT/LT;
+    //res.im = 4*res.im/L/L/L/LT/LT;
+    res = 4*res/L/L/L/LT/LT;
     return res;
 }
 #define Q(A,L) (2*PI*(A)/(L))
@@ -231,12 +238,13 @@ complex twopoint_rho12(fourvec p, double m,int L, int LT, int t)
  * @param LT time extent of the box
  * @param t time slice
  */
-complex Triangle(fourvec p, double m, int L, int LT, int t)
+double complex Triangle(fourvec p, double m, int L, int LT, int t)
 {
     fourvec mom[3];
     int q1, q2, q3, q14, q24, q34, i,j;
-    complex res;
-    res.re = res.im = 0.0;
+    double complex res;
+    res = 0.;
+    //res.re = res.im = 0.0;
     double numerator, denominator;
     double af1[3];
     double af2[3][3];
@@ -264,12 +272,14 @@ complex Triangle(fourvec p, double m, int L, int LT, int t)
             + (af1[0]*af1[2] + af2[0][2])*sin(mom[1].v[2]) \
             - (af1[1]*af1[2] + af2[1][2])*sin(mom[0].v[2]) ;
 
-        res.re += sin((double) (t * (q24 - q34)) * 2.0 * PI/LT) * numerator / denominator;
-        res.im += -cos((double) (t * (q24 - q34)) * 2.0 * PI/LT) * numerator / denominator;
+        //res.re += sin((double) (t * (q24 - q34)) * 2.0 * PI/LT) * numerator / denominator;
+        //res.im += -cos((double) (t * (q24 - q34)) * 2.0 * PI/LT) * numerator / denominator;
+        res += ( sin((double) (t * (q24 - q34)) * 2.0 * PI/LT)  -I*cos((double) (t * (q24 - q34)) * 2.0 * PI/LT))*numerator / denominator;
     }
 
-    res.re = 4*res.re/L/L/L/LT/LT/LT;
-    res.im = 4*res.im/L/L/L/LT/LT/LT;
+    //res.re = 4*res.re/L/L/L/LT/LT/LT;
+    //res.im = 4*res.im/L/L/L/LT/LT/LT;
+    res = 4*res/L/L/L/LT/LT/LT;
     return res;
 }
 
@@ -283,12 +293,13 @@ complex Triangle(fourvec p, double m, int L, int LT, int t)
  * @param LT time extent of the box
  * @param t time slice
  */
-complex R(fourvec px, fourvec py, fourvec pz, double m, int L, int LT, int t)
+double complex R(fourvec px, fourvec py, fourvec pz, double m, int L, int LT, int t)
 {
     fourvec mom[4];
     int q11, q12, q13, q14, q24, q34, q44, i,j;
-    complex res;
-    res.re = res.im = 0.0;
+    double complex res;
+    //res.re = res.im = 0.0;
+    res = 0.;
     double numerator, denominator;
     double af1[4];
     double af2[4][4];
@@ -332,11 +343,13 @@ complex R(fourvec px, fourvec py, fourvec pz, double m, int L, int LT, int t)
             - af2[0][2] * af2[1][3] \
             + af2[0][3] * af2[1][2];
 
-        res.re += cos((double) (t * (q24-q44)) * 2.0 * PI/LT) * numerator / denominator;
-        res.im += sin((double) (t * (q24-q44)) * 2.0 * PI/LT) * numerator / denominator;
+        //res.re += cos((double) (t * (q24-q44)) * 2.0 * PI/LT) * numerator / denominator;
+        //res.im += sin((double) (t * (q24-q44)) * 2.0 * PI/LT) * numerator / denominator;
+        res += (cos((double) (t * (q24-q44)) * 2.0 * PI/LT) +I*sin((double) (t * (q24-q44)) * 2.0 * PI/LT))* numerator / denominator;
     }
-    res.re = 4*res.re/L/L/L/LT/LT/LT/LT;
-    res.im = 4*res.im/L/L/L/LT/LT/LT/LT;
+    //res.re = 4*res.re/L/L/L/LT/LT/LT/LT;
+    //res.im = 4*res.im/L/L/L/LT/LT/LT/LT;
+    res = 4*res/L/L/L/LT/LT/LT/LT;
     return res;
 }
 
@@ -349,14 +362,15 @@ complex R(fourvec px, fourvec py, fourvec pz, double m, int L, int LT, int t)
  * @param tol tolerance, the program returns an error if abs(numeric-analytic)>tol
  * @returns 0 if comparison successful, 1 otherwise
  */
-int compare_2pt(meson_observable *mo, complex *corr, int px, int py, int pz, int pmax, double tol ){
+int compare_2pt(meson_observable *mo, double complex *corr, int px, int py, int pz, int pmax, double tol ){
     int retval = 0;
     for(int t=0; t<GLB_T; t++){
         double num_re = mo->corr_re[corr_ind(px,py,pz,pmax,t,1,0)];
-        double ana_re = corr[t].re;
+        double ana_re = creal(corr[t]);
+
         double num_im = mo->corr_im[corr_ind(px,py,pz,pmax,t,1,0)];
-        double ana_im = corr[t].im;
-        if(abs(num_re - ana_re) > tol || abs(num_im - ana_im)>tol){
+        double ana_im = cimag(corr[t]);
+        if(fabs(num_re - ana_re) > tol || fabs(num_im - ana_im)>tol){
             lprintf("TEST",0,"Mismatch, t=%d, numeric = %e + I*(%e), analytic = %e + I*(%e)",t,num_re,num_im,ana_re,ana_im);
             retval = 1;
         }
@@ -384,7 +398,7 @@ int main(int argc,char *argv[])
   }
 
   int numsources = mes_var.nhits;
-  char *path=mes_var.outdir;
+  //char *path=mes_var.outdir;
   int Nmom;
   lprintf("MAIN",0,"Boundary conditions: %s\n",mes_var.bc);
   lprintf("MAIN",0,"The momenta are: %s\n",mes_var.p);
@@ -449,7 +463,7 @@ while(1){
     int err;
     fourvec ptmp, mptmp;
 #define CHECK(NAME,FUN, MO, PX,PY,PZ)\
-    complex NAME[GLB_T];\
+    double complex NAME[GLB_T];\
     lprintf("TEST",0,"Comparing %s..........",#NAME);\
     ptmp = (fourvec){{PX,PY,PZ,0}};\
     for (int i=0;i<GLB_T;++i){\
@@ -478,7 +492,7 @@ while(1){
         CHECK(rho_g1g2_p, twopoint_rho, mo_p[mom][0]->rho[0][1],px,py,pz)
         CHECK(t1_g3_p, Triangle, mo_p[mom][0]->t1[2],px,py,pz)
 
-        complex r1[GLB_T];
+        double complex r1[GLB_T];
         lprintf("TEST",0,"Comparing r1 and r2..........");
         ptmp = (fourvec){{px,py,pz,0}};
         mptmp = (fourvec){{-px,-py,-pz,0}};
@@ -493,7 +507,7 @@ while(1){
             lprintf("TEST",0,"OK\n");
         }
 
-        complex r3[GLB_T];
+        double complex r3[GLB_T];
         lprintf("TEST",0,"Comparing r3 and r4..........");
         for (int i=0;i<GLB_T;++i){
             r3[i] = R(mptmp,p,ptmp,m[0],GLB_X,GLB_T,i);
