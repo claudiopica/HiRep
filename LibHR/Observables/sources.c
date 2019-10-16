@@ -44,7 +44,7 @@ static int random_tau(){
   }
   do{
     ranlxd(&ran,1);
-    itmp=(int)(ran*counter);    
+    itmp=(int)(ran*counter);
   } while(itmp==counter);
   counter--;
   tau = slices[itmp];
@@ -56,16 +56,16 @@ static int random_tau(){
 
 /***************************************************************************\
 
-	Sources: 
-		point_source: 			
+	Sources:
+		point_source:
 						source[spin](t,x) = \delta_{a color} \delta_{s, spin} \delta( (t,x) - (tau,0) )
-		point_source_loc: 			
+		point_source_loc:
 						source[spin](t,x) = \delta_{a color} \delta_{s, spin} \delta( (t,x) - (tau,0) )
-		diluted_source_equal_eo:		
+		diluted_source_equal_eo:
 						\xi(x) = Z(2) x Z(2)  -  NF color vector at x
 						eta(t,x) = \delta(t - tau) \xi(x)
 						source[spin](x) = \delta_{s spin} eta(t,x)  -  x even
-		diluted_source_equal:		
+		diluted_source_equal:
 						\xi(x) = Z(2) x Z(2)  -  NF color vector at x
 						eta(t,x) = \delta(t - tau) \xi(x)
 						source[spin](t,x) = \delta_{s spin} eta(t,x)  -  x even & odd
@@ -80,7 +80,7 @@ static int random_tau(){
 		gauge_fixed_momentum_source:
 						source[spin](t,x) = \delta_{a color} \delta_{s spin} e^{ i p_\mu x_\mu }
 		diluted_volume_source:
-						source[spin](t,x) = \sum_{x%p == 0} \delta_{s spin} 1_color 
+						source[spin](t,x) = \sum_{x%p == 0} \delta_{s spin} 1_color
 
                 z2_volume_source:                  source[spin](t,x) = Z(2) x Z(2) (no dilution)
 \***************************************************************************/
@@ -102,7 +102,7 @@ void create_point_source(spinor_field *source,int tau, int color) {
 // creates point source for the NF color indices.
 void create_full_point_source(spinor_field *source, int tau) {
   int col,beta, idx,ix;
-        
+
   for (beta=0;beta<4*NF;++beta){
     spinor_field_zero_f(&source[beta]);
   }
@@ -111,7 +111,7 @@ void create_full_point_source(spinor_field *source, int tau) {
     ix=ipt(tau-zerocoord[0],0,0,0);
     for (col=0;col<NF;++col){
       for (beta=0;beta<4;++beta){
-        idx = beta + col*4;		
+        idx = beta + col*4;
         _FIELD_AT(&source[idx],ix)->c[beta].c[col] = 1.;
       }
     }
@@ -140,7 +140,7 @@ void create_point_source_loc(spinor_field *source, int t, int x, int y, int z, i
 }
 
 
-/* Creates four Z2xZ2 noise sources localised on time slice tau. The noise 
+/* Creates four Z2xZ2 noise sources localised on time slice tau. The noise
    vectors are equal in each source but placed at a different spin. Even sites only*/
 int create_diluted_source_equal_eo(spinor_field *source) {
   int c[4];
@@ -150,7 +150,7 @@ int create_diluted_source_equal_eo(spinor_field *source) {
   for (i=0;i<4;++i){
     spinor_field_zero_f(&source[i]);
   }
-  
+
   //  if(COORD[0]==tau/T) {// Check that tau is in this thread.
   if (zerocoord[0]<=tau && tau<zerocoord[0]+T){
     c[0]=tau-zerocoord[0];
@@ -168,7 +168,7 @@ int create_diluted_source_equal_eo(spinor_field *source) {
   return tau;
 }
 
-/* Creates four Z2xZ2 noise sources localised on time slice tau. The noise 
+/* Creates four Z2xZ2 noise sources localised on time slice tau. The noise
    vectors are equal in each source but placed at a different spin. Even sites only*/
 void create_diluted_source_equal_atau_eo(spinor_field *source, int tau){
   int c[4];
@@ -193,7 +193,7 @@ void create_diluted_source_equal_atau_eo(spinor_field *source, int tau){
   }
 }
 
-/* Creates four Z2xZ2 noise sources localised on time slice tau. The noise 
+/* Creates four Z2xZ2 noise sources localised on time slice tau. The noise
    vectors are equal in each source but placed at a different spin. Even and Odd sites*/
 int create_diluted_source_equal(spinor_field *source) {
   int c[4];
@@ -218,7 +218,7 @@ int create_diluted_source_equal(spinor_field *source) {
   return tau;
 }
 
-/* Creates four Z2xZ2 noise sources localised on time slice tau. The noise 
+/* Creates four Z2xZ2 noise sources localised on time slice tau. The noise
    vectors are equal in each source but placed at a different spin. Even and Odd sites*/
 void create_diluted_source_equal_atau(spinor_field *source, int tau) {
   int c[4];
@@ -246,7 +246,7 @@ void create_diluted_source_equal_spinorfield1(spinor_field *source,int tau) {
   int c[4];
   suNf_vector *v1;
   spinor_field_zero_f(source);
-  
+
   if(COORD[0]==tau/T) {// Check that tau is in this thread.
     c[0]=tau%T;
     for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
@@ -268,7 +268,7 @@ void create_noise_source_equal_eo(spinor_field *source) {
   for (i=0;i<4;++i){
     spinor_field_zero_f(&source[i]);
   }
-  
+
   for(c[0]=0; c[0]<T; c[0]++) for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
 	  if(((zerocoord[0]+c[0]+zerocoord[1]+c[1]+zerocoord[2]+c[2]+zerocoord[3]+c[3])&1)==0){
 	    v1 = &((_FIELD_AT(&source[0],ipt(c[0],c[1],c[2],c[3])))->c[0]);
@@ -295,7 +295,7 @@ void create_noise_source_equal_oe(spinor_field *source) {
   for (i=0;i<4;++i){
     spinor_field_zero_f(&source[i]);
   }
-  
+
   for(c[0]=0; c[0]<T; c[0]++) for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
     if(((zerocoord[0]+c[0]+zerocoord[1]+c[1]+zerocoord[2]+c[2]+zerocoord[3]+c[3])&1)==1){
 	    v1 = &((_FIELD_AT(&source[0],ipt(c[0],c[1],c[2],c[3])))->c[0]);
@@ -313,7 +313,7 @@ void create_noise_source_equal_oe(spinor_field *source) {
 
 }
 
-/* Creates four Z2xZ2 noise sources localised on time slice tau. The noise 
+/* Creates four Z2xZ2 noise sources localised on time slice tau. The noise
    vectors are equal in each source but placed at a different spin. Color dilution and Even and Odd sites */
 void create_diluted_source_equal_atau_col(spinor_field *source, int tau,int col) {
   int c[4];
@@ -402,7 +402,7 @@ void create_sequential_source(spinor_field *source, int tf, spinor_field* prop){
 
 	  ix = ipt(c[0],c[1],c[2],c[3]);
 	  for (a=0;a<NF;++a){
-	    for (beta=0;beta<4;beta++){ 
+	    for (beta=0;beta<4;beta++){
 	      _propagator_assign(sp0, *_FIELD_AT(&prop[a*4+beta],ix),a,beta);
 	    }
 	  }
@@ -410,7 +410,7 @@ void create_sequential_source(spinor_field *source, int tf, spinor_field* prop){
 	  _propagator_transpose(sp0,sp1);
 
 	  for (a=0;a<NF;++a){
-	    for (beta=0;beta<4;beta++){ 
+	    for (beta=0;beta<4;beta++){
 	      *_FIELD_AT(&source[a*4+beta],ix) = sp0.c[a].c[beta];
 	    }
 	  }
@@ -456,7 +456,7 @@ void create_gauge_fixed_momentum_source(spinor_field *source, int pt, int px, in
   lprintf("Source",0,"mom = (%d,%d,%d,%d)",pt,px,py,pz);
 
   for(c[0]=0; c[0]<T; c[0]++) for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
-	  pdotx = 2.*PI*((double)(c[0]+zerocoord[0])*(double)pt/(double)GLB_T + 
+	  pdotx = 2.*PI*((double)(c[0]+zerocoord[0])*(double)pt/(double)GLB_T +
                          (double)(c[1]+zerocoord[1])*(double)px/(double)GLB_X +
                          (double)(c[2]+zerocoord[2])*(double)py/(double)GLB_Y +
                          (double)(c[3]+zerocoord[3])*(double)pz/(double)GLB_Z );
@@ -488,7 +488,7 @@ void add_momentum(spinor_field* out, spinor_field* in, int px, int py, int pz)
                          (double)(c[3]+zerocoord[3])*(double)pz/(double)GLB_Z );
 	  for (beta=0;beta<4;++beta) for (color=0; color<NF; ++color)for (beta2=0;beta2<4;++beta2){
                 _FIELD_AT(&out[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta2].c[color] = (_FIELD_AT(&in[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta2].c[color])*(cos(pdotx) +I*sin(pdotx));
-                
+
               }
         }
 
@@ -506,7 +506,7 @@ void create_diluted_volume_source(spinor_field *source, int parity_component, in
   for (beta=0;beta<4;++beta){
     spinor_field_zero_f(&source[beta]);
   }
-  
+
   for(c[0]=0; c[0]<T; c[0]++) for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
 	  if(((zerocoord[0]+c[0]+zerocoord[1]+c[1]+zerocoord[2]+c[2]+zerocoord[3]+c[3])%mod)==parity_component){
 	    for (beta=0;beta<4;++beta){
@@ -515,7 +515,7 @@ void create_diluted_volume_source(spinor_field *source, int parity_component, in
 	      }}
 	  }
 	}
-  
+
   for (beta=0;beta<4;++beta){
     start_sf_sendrecv(source + beta);
     complete_sf_sendrecv(source + beta);
@@ -527,4 +527,19 @@ void create_diluted_volume_source(spinor_field *source, int parity_component, in
 
 void create_z2_volume_source(spinor_field *source) {
   z2_spinor_field(source);
+}
+
+// set to zero even or odd site of the source.
+void zero_even_or_odd_site_spinorfield(spinor_field *source,int nspinor,int eo)
+{
+				int c[4];
+				int i;
+				for(c[0]=0; c[0]<T; c[0]++) for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
+								if(((zerocoord[0]+c[0]+zerocoord[1]+c[1]+zerocoord[2]+c[2]+zerocoord[3]+c[3])&1)==eo){
+												for (i=0;i<nspinor;++i)
+												{
+                                _spinor_zero_f(*_FIELD_AT(&source[i],ipt(c[0],c[1],c[2],c[3])));
+												}
+								}
+				}
 }

@@ -1,12 +1,12 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 /*******************************************************************************
 *
 * File observables.h
-* 
+*
 * Functions for measuring observables
 *
 *******************************************************************************/
@@ -100,6 +100,7 @@ void create_sequential_source(spinor_field *source, int tf, spinor_field* prop);
 void restrict_timeslice(spinor_field *source, int tf, spinor_field* prop);
 void create_diluted_volume_source(spinor_field *source, int parity_component, int mod);
 void add_momentum(spinor_field* out, spinor_field* in, int px, int py, int pz);
+void zero_even_or_odd_site_spinorfield(spinor_field *source,int nspinor,int eo);
 
 void init_propagator_eo(int nm, double *m, double acc);
 void eig_init(int nev, int nevt, int kmax, int maxiter, double lbnd, double omega1, double omega2);
@@ -115,6 +116,7 @@ void init_discon_correlators();
 void init_vcvl_correlators();
 void init_cvc_correlators();
 void free_meson_observables();
+void free_triplet_discon_observables();
 
 void measure_mesons_core(spinor_field* psi0, spinor_field* psi1, spinor_field* eta, meson_observable* mo, int nm, int tau, int n_mom, int offset,int lt);
 void measure_mesons(meson_observable* mo,spinor_field *psi0, spinor_field *eta, int nm,int tau);
@@ -293,5 +295,4 @@ void init_triplet_discon_correlators();
 void ff_observables();
 
 
-#endif 
-
+#endif
