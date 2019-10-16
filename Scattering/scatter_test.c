@@ -1,443 +1,534 @@
-
-// Test code for meson scattering
-// Obectives:
-// 1. Compare the new scattering code (measure_scattering.c) with the old code (scattering_tools.c) at zero momentum. The results should agree up to numerical precision.
-// 2. Check the implementation of momenta in the new code by trying two different total momenta at the sink: one which matches the total input at the source and one that doesn't. The former should give a non-zero result while the latter should be consistent with 0 up to numerical precision.
-
-//For some reason the linker requires the following line
+// This code will contain all the contractions necessary for rho to pi pi scattering
 #define MAIN_PROGRAM
 
-#include "scattering_tools.c"
-#include "IOroutines.c"
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <math.h>
+#include "global.h"
+#include "io.h"
+#include "random.h"
+#include "error.h"
+#include "geometry.h"
+#include "memory.h"
+#include "statistics.h"
+#include "update.h"
+#include "scattering.h"
 #include "observables.h"
+#include "suN.h"
+#include "suN_types.h"
+#include "dirac.h"
+#include "linear_algebra.h"
+#include "inverters.h"
+#include "representation.h"
+#include "utils.h"
+#include "logger.h"
 #include "communications.h"
+#include "gamma_spinor.h"
+#include "spin_matrix.h"
+#include "clover_tools.h"
 
-#define INDEX(px,py,pz,n_mom,tc) ((px + n_mom)*(2*n_mom+1)*(2*n_mom+1)*(GLB_T)+(py + n_mom)*(2*n_mom+1)*(GLB_T)+(pz + n_mom)*(GLB_T)+ (tc))
-// There don't seem to be any noise sources with momentum, so I'll just add it a posteriori using the following function (I hope it's correct!)
-// If this works, perhaps it should be moved to the sources.c file?
-/*void addMomentum(spinor_field* out, spinor_field* in, int px, int py, int pz)
-{
-  int c[4];
-  int beta, color;
-  double pdotx;
+#include "cinfo.c"
+#include "IOroutines.c"
+#include "scatter_functions.h"
 
-  for (beta=0;beta<4;++beta){
-    spinor_field_zero_f(&out[beta]);
-  }
-  lprintf("Adding momentum to the source",0,"mom = (%d,%d,%d)",px,py,pz);
+#define PI 3.1415926535
+#define SQR(A) ((A) * (A))
+#define CMUL(a,b) (a).re*=b;(a).im*=b
 
-  for(c[0]=0; c[0]<T; c[0]++) for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++) for(c[3]=0; c[3]<Z; c[3]++) {
-	  pdotx = 2.*PI*((double)(c[1]+zerocoord[1])*(double)px/(double)GLB_X +
-                         (double)(c[2]+zerocoord[2])*(double)py/(double)GLB_Y +
-                         (double)(c[3]+zerocoord[3])*(double)pz/(double)GLB_Z );
-	  for (beta=0;beta<4;++beta) for (color=0; color<NF; ++color){
-	     _FIELD_AT(&out[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color].re = _FIELD_AT(&in[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color].re * cos(pdotx) - _FIELD_AT(&in[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color].im * sin(pdotx);
-	     _FIELD_AT(&out[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color].im = _FIELD_AT(&in[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color].re * sin(pdotx) + _FIELD_AT(&in[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color].im * cos(pdotx) ;
-	  }
-  }
+/**
+ * @file scatter_test.c
+ *
+ * Tests the scattering code
+ *
+ * @author Tadeusz Janowski
+ */
 
-  //Not sure what this loop does, but it's in every source definition, so it must be important?
-  for (beta=0;beta<4;++beta){
-     start_sf_sendrecv(out + beta);
-     complete_sf_sendrecv(out + beta);
-  }
-}*/
-static void do_global_sum(meson_observable* mo, double norm){
-  meson_observable* motmp=mo;
-  int i;
-  while (motmp!=NULL){
-      global_sum(motmp->corr_re,motmp->corr_size);
-      global_sum(motmp->corr_im,motmp->corr_size);
-      for(i=0; i<motmp->corr_size; i++){
-	motmp->corr_re[i] *= norm;
-	motmp->corr_im[i] *= norm;
-      }
-    motmp=motmp->next;
-  }
-}
-
-int compareSources(spinor_field* s1, spinor_field* s2, double tol)
-{
-  int c[4], beta, color;
-  int res=1;
-  double diffre, diffim = 0.0;
-
-  for(c[0]=0; c[0]<T; c[0]++) for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++) for(c[3]=0; c[3]<Z; c[3]++) {
-	  for (beta=0;beta<4;++beta) for (color=0; color<NF; ++color){
-	    diffre = _FIELD_AT(&s1[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color].re - _FIELD_AT(&s2[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color].re;
-	    diffim = _FIELD_AT(&s1[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color].im - _FIELD_AT(&s2[beta], ipt(c[0],c[1],c[2],c[3]) )->c[beta].c[color].im;
-	    res= (res && (diffre*diffre < tol) && (diffim*diffim <tol));
-	    if(res==0) return 0;
-	  }
-  }
-  return 1;
-}
-
+/**
+ * @brief Sets the configuration to unit gauge
+ */
 void unit_gauge(suNg_field *gauge){
-  int mu;
+    int mu;
     int x, y, z, t, ix; for (t=0; t<T; t++) for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++){ ix=ipt(t,x,y,z);
-	    for (mu=0; mu<4; ++mu) {
-		_suNg_unit(*_4FIELD_AT(gauge,ix,mu));
-	    }
+        for (mu=0; mu<4; ++mu) {
+            _suNg_unit(*_4FIELD_AT(gauge,ix,mu));
+        }
     }
-  start_gf_sendrecv(gauge);
-  complete_gf_sendrecv(gauge);
+    start_gf_sendrecv(gauge);
+    complete_gf_sendrecv(gauge);
 }
 
-void resetTimes(spinor_field *out, spinor_field *in, int tau)
+typedef struct fourvector{
+    double v[4];
+} fourvec;
+
+/**
+ * @brief Adds two four-vectors together replacing the first one with the sum, v1 += v2
+ */
+void iadd(fourvec *v1, fourvec *v2)
 {
-  int c[4];
-  int beta, color;
-  for (beta=0;beta<4;++beta){
-    spinor_field_zero_f(&out[beta]);
-  }
-  if(COORD[0]==tau/T){
-  for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++) for(c[3]=0; c[3]<Z; c[3]++) {
-    for (beta=0;beta<4;++beta) for (color=0; color<NF; ++color){
-      _FIELD_AT(&out[beta], ipt(tau,c[1],c[2],c[3]) )->c[beta].c[color].re = _FIELD_AT(&in[beta], ipt(tau,c[1],c[2],c[3]) )->c[beta].c[color].re;
-      _FIELD_AT(&out[beta], ipt(tau,c[1],c[2],c[3]) )->c[beta].c[color].im = _FIELD_AT(&in[beta], ipt(tau,c[1],c[2],c[3]) )->c[beta].c[color].im;
+    for(int i=0;i<4;++i)
+    {
+        v1->v[i] += v2->v[i];
     }
-  }
-  }
-  //Not sure what this loop does, but it's in every source definition, so it must be important?
-  for (beta=0;beta<4;++beta){
-     start_sf_sendrecv(out + beta);
-     complete_sf_sendrecv(out + beta);
-  }
-}
-// Function for initiating meson observable (used to store the correlation function)
-void init_mo(meson_observable* mo, char* name, int size)
-{
-  int i;
-  //ind1 and ind2 don't do anything for the moment
-  mo->ind1 = _g5;
-  mo->ind2 = _g5;
-  strcpy(mo->channel_name,name);
-  strcpy(mo->channel_type, "Pi Pi scattering");
-  mo->sign=1.0;
-  mo->corr_size=size;
-  mo->corr_re = (double * ) malloc(size * sizeof(double));
-  mo->corr_im = (double * ) malloc(size * sizeof(double));
-  if (mo->corr_re == NULL || mo->corr_im == NULL)
-  {
-    fprintf(stderr, "malloc failed in init_mo \n");
-    return;
-  }
-  mo->next=NULL;
-  for (i=0; i<size; ++i)
-  {
-    mo->corr_re[i]=0.0;
-    mo->corr_im[i]=0.0;
-  }
 }
 
-void reset_mo(meson_observable* mo)
+/**
+ * @brief Multiply four-vector by a real number
+ */
+void imul(fourvec *v1, double a)
 {
-  int i;
-  for (i=0; i< mo->corr_size; ++i)
-  {
-    mo->corr_re[i]=0.0;
-    mo->corr_im[i]=0.0;
-  }
+    for(int i=0;i<4;++i)
+    {
+        v1->v[i] *= a;
+    }
 }
 
-void free_mo(meson_observable* mo)
+/**
+ * @brief Returns sum over phat^2 + m (part of the propagator)
+ */
+double f1(fourvec p, double m)
 {
-  free(mo->corr_re);
-  free(mo->corr_im);
-  free(mo);
+    double tmp = 0.0;
+    int i;
+
+    for(i=0;i<4;++i)
+    {
+        tmp += sin(p.v[i]/2)*sin(p.v[i]/2);
+    }
+    return m + 2*tmp;
+}
+
+/**
+ * @brief Part of the propagator
+ */
+double f2(fourvec v1, fourvec v2)
+{
+    int i;
+    double result = 0.0;
+    for(i=0;i<4;++i)
+    {
+        result += sin(v1.v[i])*sin(v2.v[i]);
+    }
+    return result;
+}
+
+/**
+ * @brief Part of the propagator
+ */
+double b_mu(fourvec p1, int mu){
+    int i;
+    double result = 0.0;
+    return sin(p1.v[mu]);
+}
+
+/**
+ * @brief Calculates analytic expression for pion 2-point function
+ * @param p Momentum at the sink
+ * @param m Quark mass
+ * @param L spatial size of the box
+ * @param LT time extent of the box
+ * @param t time slice
+ */
+complex twopoint(fourvec p, double m,int L, int LT, int t)
+{
+    fourvec mom1, mom2;
+    int q1, q2, q3, q41, q42;
+    complex res;
+    res.re = res.im = 0.0;
+    double tmp;
+
+    for (q1=0;q1<L;++q1) for (q2=0; q2<L; ++q2)  for (q3=0; q3<L; ++q3) for (q41=0; q41<LT; ++q41) for (q42=0; q42<LT; ++q42){
+        mom1 = (fourvec) {{q1,q2,q3,((double) q41)*L/LT}};
+        iadd(&mom1, &p);
+        imul(&mom1, 2.0* PI / L);
+        mom2 = (fourvec) {{q1,q2,q3,((double) q42)*L/LT}};
+        imul(&mom2, 2.0* PI / L);
+
+        tmp = (f1(mom1,m)*f1(mom2,m) + f2(mom1,mom2)) / ( (SQR(f1(mom1,m)) + f2(mom1,mom1)) * (SQR(f1(mom2,m)) + f2(mom2,mom2) ) );
+        res.re += tmp * cos((2.0 * PI / LT) * t * (q42 - q41));
+        res.im += tmp * sin((2.0 * PI / LT) * t * (q42 - q41));
+    }
+
+    res.re = 4*res.re/L/L/L/LT/LT;
+    res.im = 4*res.im/L/L/L/LT/LT;
+    return res;
+}
+
+/**
+ * @brief Calculates analytic expression for rho 2-point function with gamma3 at source and sink
+ * @param p Momentum at the sink
+ * @param m Quark mass
+ * @param L spatial size of the box
+ * @param LT time extent of the box
+ * @param t time slice
+ */
+complex twopoint_rho(fourvec p, double m,int L, int LT, int t)
+{
+    fourvec mom1, mom2;
+    int q1, q2, q3, q41, q42;
+    complex res;
+    res.re = res.im = 0.0;
+    double tmp;
+
+    for (q1=0;q1<L;++q1) for (q2=0; q2<L; ++q2)  for (q3=0; q3<L; ++q3) for (q41=0; q41<LT; ++q41) for (q42=0; q42<LT; ++q42){
+        mom1 = (fourvec) {{q1,q2,q3,((double) q41)*L/LT}};
+        iadd(&mom1, &p);
+        imul(&mom1, 2.0* PI / L);
+        mom2 = (fourvec) {{q1,q2,q3,((double) q42)*L/LT}};
+        imul(&mom2, 2.0* PI / L);
+
+        tmp = (f1(mom1,m)*f1(mom2,m) + f2(mom1,mom2) - 2*sin(mom1.v[2])*sin(mom2.v[2])) / ( (SQR(f1(mom1,m)) + f2(mom1,mom1)) * (SQR(f1(mom2,m)) + f2(mom2,mom2) ) );
+        res.re += tmp * cos((2.0 * PI / LT) * t * (q42 - q41));
+        res.im += tmp * sin((2.0 * PI / LT) * t * (q42 - q41));
+    }
+
+    res.re = 4*res.re/L/L/L/LT/LT;
+    res.im = 4*res.im/L/L/L/LT/LT;
+    return res;
+}
+
+/**
+ * @brief Calculates analytic expression for rho 2-point function with gamma1 at source and gamma2 at the sink
+ * @param p Momentum at the sink
+ * @param m Quark mass
+ * @param L spatial size of the box
+ * @param LT time extent of the box
+ * @param t time slice
+ */
+complex twopoint_rho12(fourvec p, double m,int L, int LT, int t)
+{
+    fourvec mom1, mom2;
+    int q1, q2, q3, q41, q42;
+    complex res;
+    res.re = res.im = 0.0;
+    double tmp;
+
+    for (q1=0;q1<L;++q1) for (q2=0; q2<L; ++q2)  for (q3=0; q3<L; ++q3) for (q41=0; q41<LT; ++q41) for (q42=0; q42<LT; ++q42){
+        mom1 = (fourvec) {{q1,q2,q3,((double) q41)*L/LT}};
+        iadd(&mom1, &p);
+        imul(&mom1, 2.0* PI / L);
+        mom2 = (fourvec) {{q1,q2,q3,((double) q42)*L/LT}};
+        imul(&mom2, 2.0* PI / L);
+
+        tmp = ( -(sin(mom1.v[0])*sin(mom2.v[1]) + sin(mom1.v[1])*sin(mom2.v[0]) )) / ( (SQR(f1(mom1,m)) + f2(mom1,mom1)) * (SQR(f1(mom2,m)) + f2(mom2,mom2) ) );
+        res.re += tmp * cos((2.0 * PI / LT) * t * (q42 - q41));
+        res.im += tmp * sin((2.0 * PI / LT) * t * (q42 - q41));
+    }
+
+    res.re = 4*res.re/L/L/L/LT/LT;
+    res.im = 4*res.im/L/L/L/LT/LT;
+    return res;
+}
+#define Q(A,L) (2*PI*(A)/(L))
+#define FV(A,B) (fourvec) {{Q(A##1,L), Q(A##2,L), Q(A##3,L), Q(B,LT)}}
+
+/**
+ * @brief Calculates analytic expression for the triangle graph with gamma_3 at the sink
+ * @param p Momentum at the sink
+ * @param m Quark mass
+ * @param L spatial size of the box
+ * @param LT time extent of the box
+ * @param t time slice
+ */
+complex Triangle(fourvec p, double m, int L, int LT, int t)
+{
+    fourvec mom[3];
+    int q1, q2, q3, q14, q24, q34, i,j;
+    complex res;
+    res.re = res.im = 0.0;
+    double numerator, denominator;
+    double af1[3];
+    double af2[3][3];
+
+    for(q1=0; q1<L; ++q1)  for(q2=0; q2<L; ++q2) for(q3=0; q3<L; ++q3) for (q14=0; q14<LT; ++q14) for (q24=0; q24<LT; ++q24) for (q34=0; q34<LT; ++q34){
+        mom[0] = FV(q,q14);
+        mom[1] = FV(q,q24);
+        mom[2] = (fourvec) {{q1,q2,q3,((double) q34)*L/LT}};
+        iadd(&mom[2],& p);
+        imul(&mom[2], 2.0* PI / L);
+
+        denominator=1.0;
+        for(i=0;i<3;++i)
+        {
+            af1[i] = f1(mom[i],m);
+            for(j=0;j<3;++j)
+            {
+                af2[i][j] = f2(mom[i],mom[j]);
+            }
+            denominator *= (SQR(af1[i]) + af2[i][i]);
+        }
+
+        numerator \
+            = (af1[0]*af1[1] + af2[0][1])*sin(mom[2].v[2]) \
+            + (af1[0]*af1[2] + af2[0][2])*sin(mom[1].v[2]) \
+            - (af1[1]*af1[2] + af2[1][2])*sin(mom[0].v[2]) ;
+
+        res.re += sin((double) (t * (q24 - q34)) * 2.0 * PI/LT) * numerator / denominator;
+        res.im += -cos((double) (t * (q24 - q34)) * 2.0 * PI/LT) * numerator / denominator;
+    }
+
+    res.re = 4*res.re/L/L/L/LT/LT/LT;
+    res.im = 4*res.im/L/L/L/LT/LT/LT;
+    return res;
+}
+
+/**
+ * @brief Calculates analytic expression for the rectangle pipi->pipi contraction.
+ * @param px Momentum at the sink connected to the source
+ * @param py Momentum at the source
+ * @param pz Momentum at the sink on the vertex opposite to the source
+ * @param m Quark mass
+ * @param L spatial size of the box
+ * @param LT time extent of the box
+ * @param t time slice
+ */
+complex R(fourvec px, fourvec py, fourvec pz, double m, int L, int LT, int t)
+{
+    fourvec mom[4];
+    int q11, q12, q13, q14, q24, q34, q44, i,j;
+    complex res;
+    res.re = res.im = 0.0;
+    double numerator, denominator;
+    double af1[4];
+    double af2[4][4];
+
+    for (q11=0;q11<L;++q11) for (q12=0; q12<L; ++q12)  for (q13=0; q13<L; ++q13) for (q14=0; q14<LT; ++q14) for (q24=0; q24<LT; ++q24) for (q34=0; q34<LT; ++q34) for (q44=0; q44<LT; ++q44){
+        mom[0] = FV(q1,q14);
+        //        mom[1] = FV(q1,q24);
+        mom[1] = (fourvec) {{q11,q12,q13,((double) q24 )*L/LT}};
+        iadd(&mom[1],& px);
+        imul(&mom[1], 2.0* PI / L);
+        mom[2] = (fourvec) {{q11,q12,q13,((double) q34 )*L/LT}};
+        iadd(&mom[2],& px);
+        iadd(&mom[2],& pz);
+        imul(&mom[2], 2.0* PI / L);
+        mom[3] = (fourvec) {{q11,q12,q13,((double) q44 )*L/LT}};
+        iadd(&mom[3],& px);
+        iadd(&mom[3],& py);
+        iadd(&mom[3],& pz);
+        imul(&mom[3], 2.0* PI / L);
+
+        denominator=1.0;
+        for(i=0;i<4;++i)
+        {
+            af1[i] = f1(mom[i],m);
+            for(j=0;j<4;++j)
+            {
+                af2[i][j] = f2(mom[i],mom[j]);
+            }
+            denominator *= (SQR(af1[i]) + af2[i][i]);
+        }
+
+        numerator \
+            = af1[0]*af1[1]*af1[2]*af1[3] \
+            + af1[0]*af1[1]*af2[2][3] \
+            - af1[0]*af1[2]*af2[1][3] \
+            + af1[0]*af1[3]*af2[1][2] \
+            + af1[1]*af1[2]*af2[0][3] \
+            - af1[1]*af1[3]*af2[0][2] \
+            + af1[2]*af1[3]*af2[0][1] \
+            + af2[0][1] * af2[2][3] \
+            - af2[0][2] * af2[1][3] \
+            + af2[0][3] * af2[1][2];
+
+        res.re += cos((double) (t * (q24-q44)) * 2.0 * PI/LT) * numerator / denominator;
+        res.im += sin((double) (t * (q24-q44)) * 2.0 * PI/LT) * numerator / denominator;
+    }
+    res.re = 4*res.re/L/L/L/LT/LT/LT/LT;
+    res.im = 4*res.im/L/L/L/LT/LT/LT/LT;
+    return res;
+}
+
+/**
+ * @brief Compares numerical and analytic values of the correlation function.
+ * @param mo meson_observable containing the correlation funtion
+ * @param corr analytically computed correlation function
+ * @param px,py,pz momentum at the sink
+ * @param pmax maximum value of p used to generate mo
+ * @param tol tolerance, the program returns an error if abs(numeric-analytic)>tol
+ * @returns 0 if comparison successful, 1 otherwise
+ */
+int compare_2pt(meson_observable *mo, complex *corr, int px, int py, int pz, int pmax, double tol ){
+    int retval = 0;
+    for(int t=0; t<GLB_T; t++){
+        double num_re = mo->corr_re[corr_ind(px,py,pz,pmax,t,1,0)];
+        double ana_re = corr[t].re;
+        double num_im = mo->corr_im[corr_ind(px,py,pz,pmax,t,1,0)];
+        double ana_im = corr[t].im;
+        if(abs(num_re - ana_re) > tol || abs(num_im - ana_im)>tol){
+            lprintf("TEST",0,"Mismatch, t=%d, numeric = %e + I*(%e), analytic = %e + I*(%e)",t,num_re,num_im,ana_re,ana_im);
+            retval = 1;
+        }
+    }
+    return retval;
 }
 
 int main(int argc,char *argv[])
 {
-  meson_observable* mo=NULL;
-  int t, px, py, pz;
-	int i,k;
-	char tmp[256], *cptr;
-	FILE* list;
-	filename_t fpars;
-	int nm;
-	double m[256];
+  //int px,py,pz, px2, py2, pz2, px3, py3, pz3;
+
+  FILE* list;
+  int tau=0;
+  double m[256];
 
   //Copy I/O from another file
   read_cmdline(argc, argv);
   setup_process(&argc,&argv);
 
-  read_input(glb_var.read,input_filename);
-  setup_replicas();
-
-  /* logger setup */
-  /* disable logger for MPI processes != 0 */
-  logger_setlevel(0,0);
-  if (PID!=0) { logger_disable(); }
-  if (PID==0) { 
-    sprintf(tmp,">%s",output_filename); logger_stdout(tmp);
-    sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
+  setup(&list, m);
+  list=NULL;
+  if(strcmp(list_filename,"")!=0) {
+    error((list=fopen(list_filename,"r"))==NULL,1,"main [mk_mesons.c]" ,
+	"Failed to open list file\n");
   }
 
-  lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS); 
-  lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
-  lprintf("MAIN",0,"input file [%s]\n",input_filename); 
-  lprintf("MAIN",0,"output file [%s]\n",output_filename); 
-  if (list_filename!=NULL) lprintf("MAIN",0,"list file [%s]\n",list_filename); 
-  else lprintf("MAIN",0,"cnfg file [%s]\n",cnfg_filename); 
-
-
-  /* read & broadcast parameters */
-  parse_cnfg_filename(cnfg_filename,&fpars);
-
-  read_input(mes_var.read,input_filename);
-  GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
-
-  /* setup lattice geometry */
-  if (geometry_init() == 1) { finalize_process(); return 0; }
-  // geometry_mpi_eo();
-  /* test_geometry_mpi_eo(); */ 
-  // test_geometry_mpi_eo();  
-  /* setup random numbers */
-  read_input(rlx_var.read,input_filename);
-  //slower(rlx_var.rlxd_start); //convert start variable to lowercase
-  if(strcmp(rlx_var.rlxd_start,"continue")==0 && rlx_var.rlxd_state[0]!='\0') {
-    /*load saved state*/
-    lprintf("MAIN",0,"Loading rlxd state from file [%s]\n",rlx_var.rlxd_state);
-    read_ranlxd_state(rlx_var.rlxd_state);
-  } else {
-    lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
-    rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
+  int numsources = mes_var.nhits;
+  char *path=mes_var.outdir;
+  int Nmom;
+  lprintf("MAIN",0,"Boundary conditions: %s\n",mes_var.bc);
+  lprintf("MAIN",0,"The momenta are: %s\n",mes_var.p);
+  int **p = getmomlist(mes_var.p,&Nmom);
+  lprintf("MAIN",0,"Number of momenta: %d\n",Nmom);
+  lprintf("MAIN",0,"The momenta are:\n");
+  for(int i=0; i<Nmom; i++){
+    lprintf("MAIN",0,"p%d = (%d, %d, %d)\n", i+1, p[i][0], p[i][1], p[i][2]);
   }
 
-  //                                    
-  //lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed);
-  //rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
-  //srand(glb_var.rlxd_seed+PID);
+while(1){
+    struct timeval start, end, etime;
+    gettimeofday(&start,0);
+    if(list!=NULL)
+      if(fscanf(list,"%s",cnfg_filename)==0 || feof(list)) break;
 
-  lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
-  lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
+    lprintf("MAIN",0,"Configuration from %s\n", cnfg_filename);
+    read_gauge_field(cnfg_filename);
+    unit_gauge(u_gauge);
+    represent_gauge_field();
 
-  nm=0;
-  if(fpars.type==DYNAMICAL_CNFG) {
-    nm=1;
-    m[0] = fpars.m;
-  } else if(fpars.type==QUENCHED_CNFG) {
-    strcpy(tmp,mes_var.mstring);
-    cptr = strtok(tmp, ";");
-    nm=0;
-    while(cptr != NULL) {
-      m[nm]=atof(cptr);
-      nm++;
-      cptr = strtok(NULL, ";");
-      printf(" %3.3e \n",m[nm]);
-    }            
-  }
+    struct mo_0 *mo_p0[numsources]; 
+    struct mo_p *mo_p[Nmom][numsources];
+    for(int i=0; i<numsources; i++){
+        mo_p0[i] = (struct mo_0*) malloc(sizeof(struct mo_0));
+        for(int j=0; j<Nmom; j++){
+            mo_p[j][i] = (struct mo_p*) malloc(sizeof(struct mo_p));
+        }
+        lprintf("MAIN",0,"Initiating mo, source = %d\n",i);
+        init_mo_0(mo_p0[i]);
+        for (int j=0;j<Nmom;j++) init_mo_p(mo_p[j][i],p[j][0],p[j][1],p[j][2]);
+    }
 
+    for (int src=0;src<numsources;++src)
+    {
+	    struct src_common src0;
+	    struct src_p *src_pn = (struct src_p*) malloc(Nmom*sizeof(struct src_p));
+	    struct prop_common prop0;
+	    struct prop_p *p_p = (struct prop_p*) malloc(Nmom*sizeof(struct prop_p));
 
+	    init_src_common_point(&src0,tau);
+	    make_prop_common(&prop0, &src0, 4, tau,mes_var.bc);
+	    gen_mo_0(mo_p0[src], &prop0, &src0, tau);
 
-  /* setup communication geometry */
-  if (geometry_init() == 1) {
-    finalize_process();
-    return 0;
-  }
+        for(int i=0; i<Nmom; i++){
+            init_src_p(src_pn + i, &src0, p[i][0], p[i][1], p[i][2]);
+            make_prop_p(p_p + i, src_pn + i, &src0, 4, tau, mes_var.bc);
+            gen_mo_p(mo_p[i][src], &prop0, p_p + i, &src0, tau);
+        }
 
-  /* setup lattice geometry */
-  geometry_mpi_eo();
-  /* test_geometry_mpi_eo(); */
+	    free_src_common(&src0);
+	    free_prop_common(&prop0);
+        for(int i=0; i<Nmom; i++){
+            free_src_p(src_pn + i);
+            free_prop_p(p_p + i);
+        }
+    }
+    lprintf("TEST",0,"Finished lattice calculation, proceeding with analytic calculation\n");
+    fourvec p = {{0.0,0.0,0.0,0.0}};
+#define TOL 1e-5
+    int allok = 0;
+    int err;
+    fourvec ptmp, mptmp;
+#define CHECK(NAME,FUN, MO, PX,PY,PZ)\
+    complex NAME[GLB_T];\
+    lprintf("TEST",0,"Comparing %s..........",#NAME);\
+    ptmp = (fourvec){{PX,PY,PZ,0}};\
+    for (int i=0;i<GLB_T;++i){\
+        NAME[i] = FUN(ptmp,m[0],GLB_X,GLB_T,i);\
+    }\
+    err = compare_2pt(MO, NAME, PX,PY,PZ,2,TOL);  \
+    allok = allok || err;\
+    if(err){\
+        lprintf("TEST",0,"FAILED!!!\n");\
+    } else{\
+        lprintf("TEST",0,"OK\n");\
+    }
 
-  init_BCs(NULL);
+    CHECK(pi_0, twopoint, mo_p0[0]->pi,0,0,0)
+    CHECK(rho_g3_0, twopoint_rho, mo_p0[0]->rho[2][2],0,0,0)
 
+    int px,py,pz;
+    for(int mom=0; mom<Nmom; mom++){
+        px = mo_p[mom][0]->p[0];
+        py = mo_p[mom][0]->p[1];
+        pz = mo_p[mom][0]->p[2];
 
+        lprintf("TEST",0,"Running momentum (%d,%d,%d)\n",px,py,pz);
+        CHECK(pi_p, twopoint, mo_p[mom][0]->pi,px,py,pz)
+        CHECK(rho_g3_p, twopoint_rho, mo_p[mom][0]->rho[2][2],px,py,pz)
+        CHECK(rho_g1g2_p, twopoint_rho, mo_p[mom][0]->rho[0][1],px,py,pz)
+        CHECK(t1_g3_p, Triangle, mo_p[mom][0]->t1[2],px,py,pz)
 
-  /* alloc global gauge fields */
-  u_gauge=alloc_gfield(&glattice);
-#ifdef ALLOCATE_REPR_GAUGE_FIELD
-  u_gauge_f=alloc_gfield_f(&glattice);
-#endif
+        complex r1[GLB_T];
+        lprintf("TEST",0,"Comparing r1 and r2..........");
+        ptmp = (fourvec){{px,py,pz,0}};
+        mptmp = (fourvec){{-px,-py,-pz,0}};
+        for (int i=0;i<GLB_T;++i){
+            r1[i] = R(p,p,ptmp,m[0],GLB_X,GLB_T,i);
+        }
+        err = compare_2pt(mo_p[mom][0]->r1, r1, px,py,pz,2,TOL);;  
+        allok = allok || err;
+        if(err){
+            lprintf("TEST",0,"FAILED!!!\n");
+        } else{
+            lprintf("TEST",0,"OK\n");
+        }
 
-  lprintf("MAIN",0,"Inverter precision = %e\n",mes_var.precision);
-  for(k=0;k<nm;k++)
-  {
-    lprintf("MAIN",0,"Mass[%d] = %f\n",k,m[k]);
-    lprintf("CORR",0,"Mass[%d] = %f\n",k,m[k]);
-  }
+        complex r3[GLB_T];
+        lprintf("TEST",0,"Comparing r3 and r4..........");
+        for (int i=0;i<GLB_T;++i){
+            r3[i] = R(mptmp,p,ptmp,m[0],GLB_X,GLB_T,i);
+        }
+        err = compare_2pt(mo_p[mom][0]->r3, r3, px,py,pz,2,TOL);;  
+        allok = allok || err;
+        if(err){
+            lprintf("TEST",0,"FAILED!!!\n");
+        } else{
+            lprintf("TEST",0,"OK\n");
+        }
+    }
 
-  read_gauge_field(cnfg_filename);
-  represent_gauge_field();
-  //End of the I/O block
-  spinor_field* source_ts = alloc_spinor_field_f(4*NF,&glattice);
-  spinor_field* source_tsp1 = alloc_spinor_field_f(4,&glattice);
-  spinor_field* source_ts_mom = alloc_spinor_field_f(4,&glattice);
-  spinor_field* prop_ts =  alloc_spinor_field_f(4*NF ,&glattice);
-  spinor_field* prop_tsp1 =  alloc_spinor_field_f(4 ,&glattice);
-  spinor_field* prop_ts_mom =  alloc_spinor_field_f(4 ,&glattice);
+    if(allok == 0){
+        lprintf("TEST",0,"All tests passed successfully!\n");
+    } else {
+        lprintf("TEST",0,"Some tests have failed!\n");
+    }
+    // Free mos
+    for(int src=0;src<numsources;src++){
+	    free_mo_0(mo_p0[src]);
+        for(int i=0; i<Nmom;i++){
+            free_mo_p(mo_p[i][src]);
+        }
+    }
 
-  lprintf("Global vars", 0, "T=%i, T_BORDER=%i, T_EXT=%i\n",T, T_BORDER, T_EXT);
+    gettimeofday(&end,0);
+    timeval_subtract(&etime,&end,&start);
+    lprintf("MAIN",0,"Configuration : analysed in [%ld sec %ld usec]\n",etime.tv_sec,etime.tv_usec);
 
-  init_propagator_eo(nm,m,mes_var.precision);
+    if(list==NULL) break;
+}
+  lprintf("DEBUG",0,"ALL done, deallocating\n");
 
-  //Create propagators
-  spinor_field_zero_f(source_ts);
-  create_diluted_source_equal_atau(source_ts, 0);
-  calc_propagator(prop_ts,source_ts,1);
-
-  spinor_field_zero_f(source_tsp1);
-  create_diluted_source_equal_atau(source_tsp1, 1);
-  calc_propagator(prop_tsp1,source_tsp1,1);
-
-  //Add 1 unit of momentum in the z direction
-/*  addMomentum(source_ts_mom, source_ts, 0, 0, 1);
-  calc_propagator(prop_ts_mom,source_ts_mom,1);*/
-
-  //Vincent's code (IO included)
-  contract_pion_scatt_1spinorfield(prop_ts, prop_tsp1, 0 , 0);
-
-  //Create a meson observable
-  mo =  malloc(sizeof(meson_observable));
-  init_mo(mo,"Contraction A",GLB_T);
-  lprintf("DEBUG",0,"Initialise meson observable\n");
-  //New code
-  //Contraction A
-  measure_scattering_AD_core(mo, prop_ts, prop_ts, prop_tsp1, prop_tsp1, 0, 1, 0, 0, 0, 0);
-  lprintf("DEBUG",0,"New contraction\n");
-  lprintf("From a",0,"%3.10e\n", mo->corr_re[0]);
-  for(t=0;t<GLB_T;++t) lprintf("A",0,"%i %3.10e %3.10e \n",t,mo->corr_re[t]/GLB_VOL3/GLB_VOL3, mo->corr_im[t]/GLB_VOL3/GLB_VOL3);
-  lprintf("DEBUG",0,"Print output\n");
-  //Contraction B
-  reset_mo(mo);
-  measure_scattering_BC_core(mo, prop_ts, prop_ts, prop_tsp1, prop_tsp1, 0, 1, 0, 0, 0, 0);
-  for(t=0;t<GLB_T;++t) lprintf("B",0,"%i %3.10e %3.10e \n",t,mo->corr_re[t]/GLB_VOL3/GLB_VOL3, mo->corr_im[t]/GLB_VOL3/GLB_VOL3);
-  //Contraction C
-  lprintf("DEBUG",0,"Starting contraction C\n");
-  reset_mo(mo);
-  measure_scattering_BC_core(mo, prop_ts, prop_ts, prop_tsp1, prop_tsp1, 0, -1, 0, 0, 0, 0);
-  for(t=0;t<GLB_T;++t) lprintf("C",0,"%i %3.10e %3.10e \n",t,mo->corr_re[t]/GLB_VOL3/GLB_VOL3, mo->corr_im[t]/GLB_VOL3/GLB_VOL3);
-  //Contraction D
-  reset_mo(mo);
-  measure_scattering_AD_core(mo, prop_ts, prop_ts, prop_tsp1, prop_tsp1, 0, -1, 0, 0, 0, 0);
-  for(t=0;t<GLB_T;++t) lprintf("D",0,"%i %3.10e %3.10e \n",t,mo->corr_re[t]/GLB_VOL3/GLB_VOL3, mo->corr_im[t]/GLB_VOL3/GLB_VOL3);
-
-  // Test the addMomentum function - compare existing momentum source with wall source+addMomentum; the momentum of choice here is (0,0,1)
-  // The original code (Ari & Rudy)
-  spinor_field_zero_f(source_ts);
-  spinor_field_zero_f(source_ts_mom);
-  create_gauge_fixed_momentum_source(source_ts, 0, 0, 0, 1, 0);
-  //Setting all the time slices different from 0 to zero - why is it written like this anyway?!
-  resetTimes(source_ts_mom, source_ts, 0);
-  calc_propagator(prop_ts_mom,source_ts_mom,1);
-  //Creating a wall source
-  spinor_field_zero_f(source_ts);
-  create_gauge_fixed_wall_source(source_ts,0,0);
-  calc_propagator(prop_ts,source_ts,1);
-  reset_mo(mo);
-  measure_mesons_core(prop_ts,prop_ts_mom, source_ts, mo, 1, 0, 1, 0, GLB_T);
-#define corr_ind(px,py,pz,n_mom,tc,nm,cm) ((px)*(n_mom)*(n_mom)*GLB_T*(nm)+(py)*(n_mom)*GLB_T*(nm)+(pz)*GLB_T*(nm)+ ((cm)*GLB_T) +(tc))
-  do_global_sum(mo,1.0);
-  for(t=0;t<GLB_T;++t)
-  {
-    lprintf("Testing add_momentum - existing code",0,"%i %3.10e %3.10e \n", t, mo->corr_re[corr_ind(0,0,0,1,t,1,0)], mo->corr_im[corr_ind(0,0,0,1,t,1,0)]);
-  }
-  //Now try addMomentum,
-  spinor_field_zero_f(source_ts_mom);
-  spinor_field_zero_f(prop_ts_mom);
-  add_momentum(source_ts_mom, source_ts, 0, 0, 1);
-  calc_propagator(prop_ts_mom,source_ts_mom,1);
-  reset_mo(mo);
-  measure_mesons_core(prop_ts,prop_ts_mom, source_ts, mo, 1, 0, 1, 0, GLB_T);
-  do_global_sum(mo,1.0);
-  for(t=0;t<GLB_T;++t)
-  {
-    lprintf("Testing add_momentum - new code",0,"%i %3.10e %3.10e \n",t, mo->corr_re[corr_ind(0,0,0,1,t,1,0)], mo->corr_im[corr_ind(0,0,0,1,t,1,0)]);
-  }
-
-
-  //Now prepare for the correlation functions with momentum
-  free_mo(mo);
-  mo =  malloc(sizeof(meson_observable));
-  init_mo(mo,"Contraction A",GLB_T*27);
-
-  //Reset the gauge to unit gauge
-  unit_gauge(u_gauge);
-  //Create point source propagators (easy to compare with free theory results)
-  spinor_field_zero_f(source_ts);
-  create_point_source(source_ts, 0, 0);
-  calc_propagator(prop_ts,source_ts,4);
-
-/*  spinor_field_zero_f(source_tsp1);
-  create_point_source(source_ts, 1, 0);
-  calc_propagator(prop_tsp1,source_tsp1,1);*/
-
-  reset_mo(mo);
-  measure_scattering_AD_core(mo, prop_ts, prop_ts, prop_ts, prop_ts, 0, 0, 1, 0, 0, 1);
-  for(px=-1;px<=1;++px) for(py=-1;py<=1;++py) for(pz=-1;pz<=1;++pz) for(t=0;t<GLB_T;++t) lprintf("A - total momentum 0 0 1",0,"%i %i %i %i %3.10e %3.10e \n", px, py, pz, t,mo->corr_re[INDEX(px,py,pz,1,t)], mo->corr_im[INDEX(px,py,pz,1,t)]);
-  reset_mo(mo);
-  measure_scattering_BC_core(mo, prop_ts, prop_ts, prop_ts, prop_ts, 0, 0, 1, 0, 0, 0);
-  for(px=-1;px<=1;++px) for(py=-1;py<=1;++py) for(pz=-1;pz<=1;++pz) for(t=0;t<GLB_T;++t) lprintf("B - total momentum 0 0 0",0,"%i %i %i %i %3.10e %3.10e \n", px, py, pz, t,mo->corr_re[INDEX(px,py,pz,1,t)], mo->corr_im[INDEX(px,py,pz,1,t)]);
-  reset_mo(mo);
-  measure_scattering_BC_core(mo, prop_ts, prop_ts, prop_ts, prop_ts, 0, 0, 1, 0, 0, 1);
-  for(px=-1;px<=1;++px) for(py=-1;py<=1;++py) for(pz=-1;pz<=1;++pz) for(t=0;t<GLB_T;++t) lprintf("B - total momentum 0 0 1",0,"%i %i %i %i %3.10e %3.10e \n", px, py, pz, t,mo->corr_re[INDEX(px,py,pz,1,t)], mo->corr_im[INDEX(px,py,pz,1,t)]);
-
-  //Two-point functions for comparison
-  free_mo(mo);
-  mo = malloc(sizeof(meson_observable));
-  init_mo(mo, "Two-point", GLB_T*27);
-
-  double c1re, c1im, c2re, c2im = 0.0;
-
-  measure_mesons_core(prop_ts,prop_ts, source_ts, mo, 1, 0, 2, 0, GLB_T);
-//  print_mesons(mo, 1.0, 0, 1, m,GLB_T,2,"TEST");
-  do_global_sum(mo,1.0);
-  for(t=0;t<GLB_T;++t)
-  {
-    c1re = mo->corr_re[corr_ind(0,0,0,2,t,1,0)];
-    c1im = mo->corr_im[corr_ind(0,0,0,2,t,1,0)];
-    c2re = mo->corr_re[corr_ind(0,0,1,2,t,1,0)];
-    c1im = mo->corr_im[corr_ind(0,0,1,2,t,1,0)];
-    lprintf("Two-point",0,"%i %3.10e %3.10e %3.10e %3.10e %3.10e %3.10e\n",t, c1re , c1im , c2re , c2im, c1re*c2re-c1im*c2im, c1re*c2im+c2re*c1im);
-  }
-/*  measure_point_mesons_momenta(mo, prop_ts, source_ts, 1, 0, 1);
-  for(t=0;t<GLB_T;++t)
-  {
-    lprintf("Two-point",0,"%i %3.10e %3.10e %3.10e %3.10e\n",t, mo->corr_re[corr_ind(0,0,0,1,t,1,0)]/GLB_VOL3, mo->corr_im[corr_ind(0,0,0,1,t,1,0)]/GLB_VOL3, mo->corr_re[corr_ind(0,0,1,1,t,1,0)]/GLB_VOL3, mo->corr_im[corr_ind(0,0,1,1,t,1,0)]/GLB_VOL3);
-  }*/
-
-  spinor_field* source_seq0 = alloc_spinor_field_f(4*NF,&glattice);
-  spinor_field* source_seqt = alloc_spinor_field_f(4*NF,&glattice);
-  spinor_field* source_seqtmom = alloc_spinor_field_f(4*NF,&glattice);
-  spinor_field* prop_seq0 =  alloc_spinor_field_f(4*NF ,&glattice);
-  spinor_field* prop_seqt =  alloc_spinor_field_f(4*NF ,&glattice);
-  create_sequential_source(source_seq0, 0, prop_ts);
-  calc_propagator(prop_seq0,source_seq0,4);
-  free_mo(mo);
-  mo = malloc(sizeof(meson_observable));
-  init_mo(mo, "Two-point", 27*GLB_T);
-  mo->ind2=_g3;
-  measure_mesons_core(prop_ts,prop_seq0, source_ts, mo, 1, 0, 2, 0, GLB_T);
-  do_global_sum(mo,1.0);
-  mo->ind2=_g5;
-  for(t=0;t<GLB_T;++t)
-  {
-    lprintf("Triangle", 0, "%i  %3.10e %3.10e %3.10e %3.10e \n", t,  mo->corr_re[corr_ind(0,0,0,2,t,1,0)], mo->corr_im[corr_ind(0,0,0,2,t,1,0)],  mo->corr_re[corr_ind(0,0,1,2,t,1,0)], mo->corr_im[corr_ind(0,0,1,2,t,1,0)]);
-  }
-  for(t=0;t<GLB_T;++t)
-  {
-    reset_mo(mo);
-    create_sequential_source(source_seqt, t, prop_ts);
-    calc_propagator(prop_seqt,source_seqt,4);
-    measure_mesons_core(prop_seq0,prop_seqt, source_ts, mo, 1, 0, 2, 0, GLB_T);
-    do_global_sum(mo,1.0);
-    lprintf("Rectangle", 0, "%i  %3.10e %3.10e %3.10e %3.10e \n", t,  mo->corr_re[corr_ind(0,0,0,2,t,1,0)], mo->corr_im[corr_ind(0,0,0,2,t,1,0)],  mo->corr_re[corr_ind(0,0,1,2,t,1,0)], mo->corr_im[corr_ind(0,0,1,2,t,1,0)]);
-  }
-
-  for(t=0;t<GLB_T;++t)
-  {
-    reset_mo(mo);
-    create_sequential_source(source_seqt, t, prop_ts);
-    add_momentum(source_seqtmom, source_seqt, 0,0,-1);
-    calc_propagator(prop_seqt,source_seqtmom,4);
-    measure_mesons_core(prop_seq0,prop_seqt, source_ts, mo, 1, 0, 2, 0, GLB_T);
-    do_global_sum(mo,1.0);
-    lprintf("Rectangle - momentum on sequential prop", 0, "%i  %3.10e %3.10e %3.10e %3.10e \n", t,  mo->corr_re[corr_ind(0,0,0,2,t,1,0)], mo->corr_im[corr_ind(0,0,0,2,t,1,0)],  mo->corr_re[corr_ind(0,0,1,2,t,1,0)], mo->corr_im[corr_ind(0,0,1,2,t,1,0)]);
-  }
-
-  free_mo(mo);
+  if(list!=NULL) fclose(list);
   finalize_process();
   free_BCs();
   free_gfield(u_gauge);
@@ -445,4 +536,3 @@ int main(int argc,char *argv[])
 
   return 0;
 }
-
