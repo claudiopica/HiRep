@@ -304,6 +304,7 @@ int main(int argc,char *argv[])
 
   finalize_process();
 
+  printf("return_value = %d\n", return_value);
 
  return return_value;
 }

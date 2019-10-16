@@ -97,8 +97,6 @@ int main(int argc,char *argv[])
 
   lprintf("MAIN",0,"mes:masses = %f\n",mass);
 
-
-  // Vincent : set the gauge field to 1.
   unit_u(u_gauge);
 
 #ifndef REPR_FUNDAMENTAL
@@ -138,19 +136,15 @@ int main(int argc,char *argv[])
 
   /* STAMPA */
 
-  lprintf("TEST",0,"\nANALITICO\tPOINT-TO-ALL\tERROR (must be less than 1e-9)\n");
+  lprintf("TEST",0,"\nANALITICO\tPOINT-TO-ALL\tERROR (must be less than 1e-8)\n");
   for(i=0; i<8; i++) {
     lprintf("TEST",0,"TRIPLET CORRELATOR %s\n", nameT[i]);
     for(t=0; t<GLB_T; t++)
     {
       lprintf("TEST",0,"%e\t%e\t%e\n",ex_triplets[i][t], pta_triplets[i][t], fabs(ex_triplets[i][t]-pta_triplets[i][t]));
-      if (fabs(ex_triplets[i][t]-pta_triplets[i][t]) > 1e-9) return_value +=1;
+      if (fabs(ex_triplets[i][t]-pta_triplets[i][t]) > 1e-8) return_value +=1;
     }
   }
-
-
-
-  printf("return_value = %d\n", return_value);
 
   finalize_process();
 
@@ -181,7 +175,7 @@ void free_correlators(double **triplets) {
   double A2[GLB_T], B2[4][GLB_T];
   double complex A[GLB_T], B[4][GLB_T];
   double complex tmp,eit;
-  double norm2, ct, st, z;
+  double norm2, z;
   int i,j, t;
   double k[4];
   double sigma[4] = {0.,0.,0.,0.};
@@ -223,11 +217,10 @@ void free_correlators(double **triplets) {
             norm2 = tmp*conj(tmp);
 
 	          for(t = 0; t < GLB_T; t++) {
-              ct = cos((2.0*M_PI*t*k[0])/GLB_T);
-              st = sin((2.0*M_PI*t*k[0])/GLB_T);
               eit =cos((2.0*M_PI*t*k[0])/GLB_T) +I*sin((2.0*M_PI*t*k[0])/GLB_T);
               A[t] += creal(tmp)*eit/norm2;
-              for (j=0;j <4; j++)  B[j][t] += sin((2.0*M_PI*k[j])/GLB_T) * eit/ norm2;
+              B[0][t] += sin((2.0*M_PI*k[0])/GLB_T) * eit/ norm2;
+              for (j=1;j <4; j++)  B[j][t] += sin((2.0*M_PI*k[j])/GLB_X) * eit/ norm2;
 
 	           }
 	       }

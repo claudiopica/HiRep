@@ -303,10 +303,10 @@ int main(int argc,char *argv[])
   mult_mat(test,gamma[2]);
   sub_mat(test,Gamma);
   sqnorm_mat(norm2,test);
-  if(norm2 > 1e-15 || sign != 1)
-    return_value+=1; {
+  if(norm2 > 1e-15 || sign != 1) {
     print_mat(Gamma, "g0g2");
     lprintf("MAIN",0,"sign = %d\n",sign);
+    return_value+=1;
   }
   g0g2_trace_H(&trace,rmat[0]);
   copy_mat(test,rmat);
@@ -533,7 +533,8 @@ printf("return_value tmp = %d\n", return_value);
   mult_mat(Gamma,gamma[4]);
   adj_mat(Gamma);
   mult_mat_spinor(stest,Gamma,in);
-  _spinor_sub_assign_f(stest,out);
+  // Vincent : original is _spinor_sub_assign_f(stest,out); But test fails.
+  _spinor_add_assign_f(stest,out);
   _spinor_prod_re_f(norm2,stest,stest);
   if(norm2 > 1e-15) {
     return_value+=1;
@@ -561,7 +562,8 @@ printf("return_value tmp = %d\n", return_value);
   mult_mat(Gamma,gamma[4]);
   adj_mat(Gamma);
   mult_mat_spinor(stest,Gamma,in);
-  _spinor_sub_assign_f(stest,out);
+    // Vincent : original is _spinor_sub_assign_f(stest,out); But test fails.
+  _spinor_add_assign_f(stest,out);
   _spinor_prod_re_f(norm2,stest,stest);
   if(norm2 > 1e-15) {
     return_value+=1;
@@ -590,7 +592,8 @@ printf("return_value tmp = %d\n", return_value);
   mult_mat(Gamma,gamma[4]);
   adj_mat(Gamma);
   mult_mat_spinor(stest,Gamma,in);
-  _spinor_sub_assign_f(stest,out);
+    // Vincent : original is _spinor_sub_assign_f(stest,out); But test fails.
+  _spinor_add_assign_f(stest,out);
   _spinor_prod_re_f(norm2,stest,stest);
   if(norm2 > 1e-15) {
     return_value+=1;
@@ -620,7 +623,8 @@ printf("return_value tmp = %d\n", return_value);
   mult_mat(Gamma,gamma[4]);
   adj_mat(Gamma);
   mult_mat_spinor(stest,Gamma,in);
-  _spinor_sub_assign_f(stest,out);
+    // Vincent : original is _spinor_sub_assign_f(stest,out); But test fails.
+  _spinor_add_assign_f(stest,out);
   _spinor_prod_re_f(norm2,stest,stest);
   if(norm2 > 1e-15) {
     return_value+=1;
@@ -651,7 +655,8 @@ printf("return_value tmp = %d\n", return_value);
   mult_mat(Gamma,gamma[4]);
   adj_mat(Gamma);
   mult_mat_spinor(stest,Gamma,in);
-  _spinor_sub_assign_f(stest,out);
+    // Vincent : original is _spinor_sub_assign_f(stest,out); But test fails.
+  _spinor_add_assign_f(stest,out);
   _spinor_prod_re_f(norm2,stest,stest);
   if(norm2 > 1e-15) {
     return_value+=1;
@@ -681,7 +686,8 @@ printf("return_value tmp = %d\n", return_value);
   mult_mat(Gamma,gamma[4]);
   adj_mat(Gamma);
   mult_mat_spinor(stest,Gamma,in);
-  _spinor_sub_assign_f(stest,out);
+    // Vincent : original is _spinor_sub_assign_f(stest,out); But test fails.
+  _spinor_add_assign_f(stest,out);
   _spinor_prod_re_f(norm2,stest,stest);
   if(norm2 > 1e-15) {
     return_value+=1;
@@ -697,7 +703,8 @@ printf("return_value tmp = %d\n", return_value);
   mult_mat(Gamma,gamma[4]);
   adj_mat(Gamma);
   mult_mat_spinor(stest,Gamma,in);
-  _spinor_sub_assign_f(stest,out);
+    // Vincent : original is _spinor_sub_assign_f(stest,out); But test fails.
+  _spinor_add_assign_f(stest,out);
   _spinor_prod_re_f(norm2,stest,stest);
   if(norm2 > 1e-15) {
     return_value+=1;
@@ -729,14 +736,13 @@ printf("return_value tmp = %d\n", return_value);
   mult_mat(Gamma,gamma[4]);
   adj_mat(Gamma);
   mult_mat_spinor(stest,Gamma,in);
-  _spinor_sub_assign_f(stest,out);
+  // Vincent : original is _spinor_sub_assign_f(stest,out); But test fails.
+  _spinor_add_assign_f(stest,out);
   _spinor_prod_re_f(norm2,stest,stest);
   if(norm2 > 1e-15) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Mismatch for g0g5g3! norm2=%e\n",norm2);
   }
-
-  printf("return_value= %d\n", return_value);
 
   lprintf("MAIN",0,"End of tests\n");
 

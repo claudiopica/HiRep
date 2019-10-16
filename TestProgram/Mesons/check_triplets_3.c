@@ -1,10 +1,10 @@
 
 /******************************************************************************
  *
- *  NOCOMPILE= WITH_CLOVER
+ *
  * File check_triplets_3.c
  *
- * Check of the triplet mesons (free case)
+ * Check of the triplet mesons (free case): point sources case
  *
  * Author: Agostino Patella
  *
@@ -35,6 +35,7 @@
 #include "logger.h"
 #include "setup.h"
 #include "spectrum.h"
+#include "clover_tools.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338327950288419716939937510
@@ -111,7 +112,9 @@ typedef struct _input_mesons {
   char mstring[256];
 
   /* for the reading function */
-  input_record_t read[2];
+  input_record_t read[4];
+  double csw;
+  int nhits_2pt;
 
 } input_mesons;
 
@@ -119,12 +122,14 @@ typedef struct _input_mesons {
   {									\
     .read={								\
       {"quark quenched masses", "mes:masses = %s", STRING_T, (varname).mstring}, \
-      {NULL, NULL, INT_T, NULL}						\
-    }									\
+      {"csw coefficient", "mes:csw = %lg",DOUBLE_T, &(varname).csw},	\
+      {"number of noisy sources per cnfg for 2pt fn", "mes:nhits_2pt = %d", INT_T, &(varname).nhits_2pt}, \
+      {NULL, NULL,INT_T, NULL}				\
+     }							\
   }
 
 
-static double mass;
+static double mass,csw;
 void free_correlators(double **triplets);
 
 
@@ -145,7 +150,6 @@ mult_mat(tmp2,g0,tmp);
 mult_mat(Gammabar,tmp2,g0);
 mult_mat(tmp,Gammabar,Gamma);
 trace_mat(r,tmp);
-// printf("get_gid %f %f \n",creal(r)/4.,cimag(r)/4.);
 return r/4.0;
 }
 char char_t[100];
@@ -272,12 +276,17 @@ int main(int argc,char *argv[])
 
   strcpy(pame,mes_ip.mstring);
   mass=atof(strtok(pame, ";"));
+  csw = mes_ip.csw;
 
   lprintf("MAIN",0,"mes:masses = %f\n",mass);
+  lprintf("MAIN",0,"mes:csw = %f\n",csw);
 
   unit_u(u_gauge);
 #ifndef REPR_FUNDAMENTAL
   u_gauge_f=alloc_gfield_f(&glattice);
+#endif
+#ifdef WITH_CLOVER
+  clover_init(mes_ip.csw);
 #endif
   represent_gauge_field();
 
@@ -287,6 +296,7 @@ int main(int argc,char *argv[])
 
   error(!(GLB_X==GLB_Y && GLB_X==GLB_Z),1,"main", "This test works only for GLB_X=GLB_Y=GLB_Z");
 
+  //int tau, int nm, double* m, int n_mom,int nhits,int conf_num, double precision)
   measure_spectrum_pt(0,1,&mass,1,3,0,1e-14);
 
   double complex corr_triplets[16][GLB_T];
@@ -306,28 +316,22 @@ int main(int argc,char *argv[])
 //  /* CALCOLO ESPLICITO */
   free_correlators(ex_triplets);
 
-// VD
-// add a test for wall source
-// add disconnected test.
   lprintf("TEST",0,"\nANALITICO\tPOINT-TO-ALL\tERROR (must be less than 1e-9)\n");
   for(i=0; i<16; i++) {
     lprintf("TEST",0,"TRIPLET CORRELATOR %s\n", mes_channel_names[i]);
     for(t=0; t<GLB_T; t++) {
         lprintf("TEST",0,"%e\t%e\t%e\n",      ex_triplets[i][t],	      creal(corr_triplets[i][t]),	      fabs(ex_triplets[i][t]-creal(corr_triplets[i][t])));
-        if (fabs(ex_triplets[i][t]-creal(corr_triplets[i][t])) > 1e-10)
+        if (fabs(ex_triplets[i][t]-creal(corr_triplets[i][t])) > 1e-9)
         {
-          printf("%d %d %e %e  \n",i,t,ex_triplets[i][t],	      creal(corr_triplets[i][t]));
-          return_value +=1;
+                  return_value +=1;
         }
-        if (fabs(cimag(corr_triplets[i][t])) > 1e-10)
+        if (fabs(cimag(corr_triplets[i][t])) > 1e-9)
         {
-          printf("Complex part is not negligible %e \n" ,cimag(corr_triplets[i][t]));
-          return_value +=1;
+              return_value +=1;
         }
       }
   }
 
-printf("return_value = %d\n", return_value);
 
 finalize_process();
 return return_value;
@@ -396,8 +400,8 @@ void free_correlators(double **triplets) {
 	          for(t = 0; t < GLB_T; t++) {
               eit =cos((2.0*M_PI*t*k[0])/GLB_T) +I*sin((2.0*M_PI*t*k[0])/GLB_T);
               A[t] += creal(tmp)*eit/norm2;
-              for (j=0;j <4; j++)  B[j][t] += sin((2.0*M_PI*k[j])/GLB_T) * eit/ norm2;
-
+              B[0][t] += sin((2.0*M_PI*k[0])/GLB_T) * eit/ norm2;
+              for (j=1;j <4; j++)  B[j][t] += sin((2.0*M_PI*k[j])/GLB_X) * eit/ norm2;
 	           }
 	       }
 	       for(t = 0; t < GLB_T; t++) {
