@@ -39,6 +39,7 @@ int flopsite = 8 * NF * (7 + 8 * NF);
 #else
 int flopsite = 8 * NF * (7 + 16 * NF);
 #endif
+
 int singlestep;
 
 static void random_g(suNg_field *g)
@@ -159,8 +160,9 @@ int main(int argc, char *argv[])
     elapsed_mean /= repts;
     elapsed_var /= repts;
     elapsed_var = sqrt((elapsed_var - elapsed_mean * elapsed_mean) / (repts - 1));
+    lprintf("MAIN", 0, "Full Send Recv Reference +-+-+-+-+-+-+\n");
 
-    lprintf("MAIN", 0, "start_gf_send +complete_gf_recv timing in [%lf millisec] +- [%lf millisec] \n", elapsed_mean, elapsed_var);
+    lprintf("MAIN", 0, "start_gf_send +complete_gf_recv timing in [%lf millisec] +- [%lf millisec]\n", elapsed_mean, elapsed_var);
     MPI_Barrier(GLB_COMM);
     mgf = elapsed_mean;
 
@@ -189,7 +191,7 @@ int main(int argc, char *argv[])
     elapsed_var /= repts;
     elapsed_var = sqrt((elapsed_var - elapsed_mean * elapsed_mean) / (repts - 1));
 
-    lprintf("MAIN", 0, "start_sf_send +complete_gf_recv timing in [%lf millisec] +- [%lf millisec] \n", elapsed_mean, elapsed_var);
+    lprintf("MAIN", 0, "start_sf_send +complete_gf_recv timing in [%lf millisec] +- [%lf millisec]\n", elapsed_mean, elapsed_var);
     MPI_Barrier(GLB_COMM);
     msf = elapsed_mean;
 
@@ -201,7 +203,7 @@ int main(int argc, char *argv[])
         tmp = 0;
         gettimeofday(&start, 0);
 
-        for (l = 0; l < singlestep; l++)
+        for (l = 0; l < singlestep / 2; l++)
             tmp = tmp + l * 0.00021234512;
 
         gettimeofday(&end, 0);
@@ -219,13 +221,27 @@ int main(int argc, char *argv[])
 
     flopmin = (int)(0.1 * msf / mbulk);
 
-    if (flopmin > 10)
-        flopmin = 10;
+    if (flopmin > 20)
+        flopmin = 20;
 
     flopmax = (int)(4.0 * mgf / mbulk);
     df = (flopmax - flopmin) / intervals;
 
+    int *steps = malloc((intervals + 1) * sizeof(int));
+    int id = 0;
     for (k = 0; k < intervals; k++)
+    {
+        steps[id] = flopmin + df * id;
+        if (flopmin + df * (id + 1) > 100 && flopmin + df * (id) < 100)
+        {
+            id++;
+            steps[id] = 100;
+        }
+        id++;
+    }
+    lprintf("MAIN", 0, "Bulk timing +-+-+-+-+-+-+\n");
+
+    for (k = 0; k < intervals + 1; k++)
     {
         elapsed = 0.;
         elapsed_mean = 0.;
@@ -234,11 +250,12 @@ int main(int argc, char *argv[])
         {
             tmp = 0;
             gettimeofday(&start, 0);
-            for (j = 0; j < flopmin + k * df; j++)
-                for (l = 0; l < singlestep; l++)
+            for (j = 0; j < steps[k]; j++)
+                for (l = 0; l < singlestep / 2; l++)
                     tmp = tmp + l * 0.00021234512;
 
             gettimeofday(&end, 0);
+            MPI_Barrier(GLB_COMM);
             timeval_subtract(&etime, &end, &start);
             elapsed = etime.tv_sec * 1000 + etime.tv_usec * 0.001;
             elapsed_mean += elapsed;
@@ -249,11 +266,13 @@ int main(int argc, char *argv[])
         elapsed_var /= repts;
         elapsed_var = sqrt((elapsed_var - elapsed_mean * elapsed_mean) / (repts - 1));
 
-        lprintf("MAIN", 0, "%ld flop ops: time in [%lf millisec] +- [%lf millisec]  \n", 2 * (flopmin + k * df) * singlestep, elapsed_mean, elapsed_var);
+        lprintf("MAIN", 0, "%ld flop ops: time in [%lf millisec] +- [%lf millisec]\n", steps[k] * singlestep, elapsed_mean, elapsed_var);
     }
     MPI_Barrier(GLB_COMM);
     opt_trick /= norm;
-    for (k = 0; k < intervals; k++)
+    lprintf("MAIN", 0, "MPI Barrier timing +-+-+-+-+-+-+\n");
+
+    for (k = 0; k < intervals + 1; k++)
     {
         elapsed = 0.;
         elapsed_mean = 0.;
@@ -261,8 +280,8 @@ int main(int argc, char *argv[])
         for (i = 0; i < repts; i++)
         {
             tmp = 0;
-            for (j = 0; j < flopmin + k * df; j++)
-                for (l = 0; l < singlestep; l++)
+            for (j = 0; j < steps[k]; j++)
+                for (l = 0; l < singlestep / 2; l++)
                     tmp = tmp + l * 0.00021234512;
 
             gettimeofday(&start, 0);
@@ -278,13 +297,14 @@ int main(int argc, char *argv[])
         elapsed_var /= repts;
         elapsed_var = sqrt((elapsed_var - elapsed_mean * elapsed_mean) / (repts - 1));
 
-        lprintf("MAIN", 0, "MPI_Barrier after %ld flop ops: time in [%lf millisec] +- [%lf millisec] \n", 2 * (flopmin + k * df) * singlestep, elapsed_mean, elapsed_var);
+        lprintf("MAIN", 0, "MPI_Barrier after %ld flop ops: time in [%lf millisec] +- [%lf millisec]\n", steps[k] * singlestep, elapsed_mean, elapsed_var);
     }
     MPI_Barrier(GLB_COMM);
 
     opt_trick /= norm;
+    lprintf("MAIN", 0, "SF timing complete_sf_send_recv +-+-+-+-+-+-+\n");
 
-    for (k = 0; k < intervals; k++)
+    for (k = 0; k < intervals + 1; k++)
     {
         elapsed = 0.;
         elapsed_mean = 0.;
@@ -293,14 +313,14 @@ int main(int argc, char *argv[])
         {
             tmp = 0;
             start_sf_sendrecv(s1);
-            for (j = 0; j < flopmin + k * df; j++)
-                for (l = 0; l < singlestep; l++)
+            for (j = 0; j < steps[k]; j++)
+                for (l = 0; l < singlestep / 2; l++)
                     tmp = tmp + l * 0.0000021234512;
 
             gettimeofday(&start, 0);
             complete_sf_sendrecv(s1);
             gettimeofday(&end, 0);
-            transform(g, u_gauge);
+            transform_s(g, s1);
 
             timeval_subtract(&etime, &end, &start);
             elapsed = etime.tv_sec * 1000 + etime.tv_usec * 0.001;
@@ -312,81 +332,15 @@ int main(int argc, char *argv[])
         elapsed_var /= repts;
         elapsed_var = sqrt((elapsed_var - elapsed_mean * elapsed_mean) / (repts - 1));
 
-        lprintf("MAIN", 0, "complete_sf_send_recv for a bulk of %ld flop ops: time in [%lf millisec] +- [%lf millisec]  \n", 2 * (flopmin + k * df) * singlestep, elapsed_mean, elapsed_var);
+        lprintf("MAIN", 0, "complete_sf_send_recv for a bulk of %ld flop ops: time in [%lf millisec] +- [%lf millisec]\n", steps[k] * singlestep, elapsed_mean, elapsed_var);
     }
+
     opt_trick /= norm;
 
     MPI_Barrier(GLB_COMM);
+    lprintf("MAIN", 0, "SF timing start_sf_send + bulk  + complete_sf_recv +-+-+-+-+-+-+\n");
 
-    for (k = 0; k < intervals; k++)
-    {
-        elapsed = 0.;
-        elapsed_mean = 0.;
-        elapsed_var = 0.;
-        for (i = 0; i < repts; i++)
-        {
-            tmp = 0;
-            start_gf_sendrecv(u_gauge);
-            for (j = 0; j < flopmin + k * df; j++)
-                for (l = 0; l < singlestep; l++)
-                    tmp = tmp + l * 0.00021234512;
-
-            gettimeofday(&start, 0);
-            complete_gf_sendrecv(u_gauge);
-            gettimeofday(&end, 0);
-            transform(g, u_gauge);
-
-            timeval_subtract(&etime, &end, &start);
-            elapsed = etime.tv_sec * 1000 + etime.tv_usec * 0.001;
-            elapsed_mean += elapsed;
-            elapsed_var += elapsed * elapsed;
-            opt_trick += tmp;
-        }
-        elapsed_mean /= repts;
-        elapsed_var /= repts;
-        elapsed_var = sqrt((elapsed_var - elapsed_mean * elapsed_mean) / (repts - 1));
-
-        lprintf("MAIN", 0, "complete_gf_send_recv for a bulk of %ld flop ops: time in [%lf millisec] +- [%lf millisec] \n", 2 * (flopmin + k * df) * singlestep, elapsed_mean, elapsed_var);
-    }
-    opt_trick /= norm;
-
-    MPI_Barrier(GLB_COMM);
-
-    for (k = 0; k < intervals; k++)
-    {
-        elapsed = 0.;
-        elapsed_mean = 0.;
-        elapsed_var = 0.;
-        for (i = 0; i < repts; i++)
-        {
-            tmp = 0;
-            gettimeofday(&start, 0);
-            start_gf_sendrecv(u_gauge);
-            for (j = 0; j < flopmin + k * df; j++)
-                for (l = 0; l < singlestep; l++)
-                    tmp = tmp + l * 0.00021234512;
-
-            complete_gf_sendrecv(u_gauge);
-            gettimeofday(&end, 0);
-            transform(g, u_gauge);
-
-            timeval_subtract(&etime, &end, &start);
-            elapsed = etime.tv_sec * 1000 + etime.tv_usec * 0.001;
-            elapsed_mean += elapsed;
-            elapsed_var += elapsed * elapsed;
-            opt_trick += tmp;
-        }
-        elapsed_mean /= repts;
-        elapsed_var /= repts;
-        elapsed_var = sqrt((elapsed_var - elapsed_mean * elapsed_mean) / (repts - 1));
-
-        lprintf("MAIN", 0, "start_gf_send + bulk of %ld flop ops + complete_gf_recv : time in [%lf millisec] +- [%lf millisec]  \n", 2 * (flopmin + k * df) * singlestep, elapsed_mean, elapsed_var);
-    }
-    opt_trick /= norm;
-
-    MPI_Barrier(GLB_COMM);
-
-    for (k = 0; k < intervals; k++)
+    for (k = 0; k < intervals + 1; k++)
     {
         elapsed = 0.;
         elapsed_mean = 0.;
@@ -396,11 +350,47 @@ int main(int argc, char *argv[])
             tmp = 0;
             gettimeofday(&start, 0);
             start_sf_sendrecv(s1);
-            for (j = 0; j < flopmin + k * df; j++)
-                for (l = 0; l < singlestep; l++)
+            for (j = 0; j < steps[k]; j++)
+                for (l = 0; l < singlestep / 2; l++)
                     tmp = tmp + l * 0.00021234512;
 
             complete_sf_sendrecv(s1);
+            gettimeofday(&end, 0);
+            transform_s(g, s1);
+
+            timeval_subtract(&etime, &end, &start);
+            elapsed = etime.tv_sec * 1000 + etime.tv_usec * 0.001;
+            elapsed_mean += elapsed;
+            elapsed_var += elapsed * elapsed;
+            opt_trick += tmp;
+        }
+        elapsed_mean /= repts;
+        elapsed_var /= repts;
+        elapsed_var = sqrt((elapsed_var - elapsed_mean * elapsed_mean) / (repts - 1));
+
+        lprintf("MAIN", 0, "start_sf_send + bulk of %ld flop ops + complete_sf_recv : time in [%lf millisec] +- [%lf millisec]\n", steps[k] * singlestep, elapsed_mean, elapsed_var);
+    }
+
+    opt_trick /= norm;
+
+    MPI_Barrier(GLB_COMM);
+    lprintf("MAIN", 0, "Gauge timing complete_gf_send_recv +-+-+-+-+-+-+\n");
+
+    for (k = 0; k < intervals + 1; k++)
+    {
+        elapsed = 0.;
+        elapsed_mean = 0.;
+        elapsed_var = 0.;
+        for (i = 0; i < repts; i++)
+        {
+            tmp = 0;
+            start_gf_sendrecv(u_gauge);
+            for (j = 0; j < steps[k]; j++)
+                for (l = 0; l < singlestep / 2; l++)
+                    tmp = tmp + l * 0.00021234512;
+
+            gettimeofday(&start, 0);
+            complete_gf_sendrecv(u_gauge);
             gettimeofday(&end, 0);
             transform(g, u_gauge);
 
@@ -414,8 +404,44 @@ int main(int argc, char *argv[])
         elapsed_var /= repts;
         elapsed_var = sqrt((elapsed_var - elapsed_mean * elapsed_mean) / (repts - 1));
 
-        lprintf("MAIN", 0, "start_sf_send + bulk of %ld flop ops + complete_sf_recv : time in [%lf millisec] +- [%lf millisec] \n ", 2 * (flopmin + k * df) * singlestep, elapsed_mean, elapsed_var);
+        lprintf("MAIN", 0, "complete_gf_send_recv for a bulk of %ld flop ops: time in [%lf millisec] +- [%lf millisec]\n", steps[k] * singlestep, elapsed_mean, elapsed_var);
     }
+    opt_trick /= norm;
+
+    MPI_Barrier(GLB_COMM);
+    lprintf("MAIN", 0, "Gauge timing start_gf_send + bulk  + complete_gf_recv +-+-+-+-+-+-+\n");
+
+    for (k = 0; k < intervals + 1; k++)
+    {
+        elapsed = 0.;
+        elapsed_mean = 0.;
+        elapsed_var = 0.;
+        for (i = 0; i < repts; i++)
+        {
+            tmp = 0;
+            gettimeofday(&start, 0);
+            start_gf_sendrecv(u_gauge);
+            for (j = 0; j < steps[k]; j++)
+                for (l = 0; l < singlestep / 2; l++)
+                    tmp = tmp + l * 0.00021234512;
+
+            complete_gf_sendrecv(u_gauge);
+            gettimeofday(&end, 0);
+            transform(g, u_gauge);
+
+            timeval_subtract(&etime, &end, &start);
+            elapsed = etime.tv_sec * 1000 + etime.tv_usec * 0.001;
+            elapsed_mean += elapsed;
+            elapsed_var += elapsed * elapsed;
+            opt_trick += tmp;
+        }
+        elapsed_mean /= repts;
+        elapsed_var /= repts;
+        elapsed_var = sqrt((elapsed_var - elapsed_mean * elapsed_mean) / (repts - 1));
+
+        lprintf("MAIN", 0, "start_gf_send + bulk of %ld flop ops + complete_gf_recv : time in [%lf millisec] +- [%lf millisec]\n", steps[k] * singlestep, elapsed_mean, elapsed_var);
+    }
+
     lprintf("MAIN", 0, "check number %1.10e (must be differnt from zero)\n ", opt_trick);
 
     /* close communications */
