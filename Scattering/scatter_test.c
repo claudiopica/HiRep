@@ -183,7 +183,7 @@ double complex twopoint_rho(fourvec p, double m,int L, int LT, int t)
         tmp = (f1(mom1,m)*f1(mom2,m) + f2(mom1,mom2) - 2*sin(mom1.v[2])*sin(mom2.v[2])) / ( (SQR(f1(mom1,m)) + f2(mom1,mom1)) * (SQR(f1(mom2,m)) + f2(mom2,mom2) ) );
         //res.re += tmp * cos((2.0 * PI / LT) * t * (q42 - q41));
         //res.im += tmp * sin((2.0 * PI / LT) * t * (q42 - q41));
-         res += tmp *( cos((2.0 * PI / LT) * t * (q42 - q41)) + I*sin((2.0 * PI / LT) * t * (q42 - q41)));
+         res += tmp * ( cos((2.0 * PI / LT) * t * (q42 - q41)) + I*sin((2.0 * PI / LT) * t * (q42 - q41)) );
     }
 
     //res.re = 4*res.re/L/L/L/LT/LT;
@@ -381,42 +381,41 @@ int compare_2pt(meson_observable *mo, double complex *corr, int px, int py, int 
 int main(int argc,char *argv[])
 {
   //int px,py,pz, px2, py2, pz2, px3, py3, pz3;
-
-  FILE* list;
-  int tau=0;
+  int return_value=0;
+   int tau=0;
   double m[256];
+  
 
-  //Copy I/O from another file
-  read_cmdline(argc, argv);
   setup_process(&argc,&argv);
 
-  setup(&list, m);
-  list=NULL;
-  if(strcmp(list_filename,"")!=0) {
-    error((list=fopen(list_filename,"r"))==NULL,1,"main [mk_mesons.c]" ,
-	"Failed to open list file\n");
-  }
+  setup_gauge_fields();
+  
+  read_input(glb_var.read,get_input_filename());
+  read_input(mes_var.read,get_input_filename());
+  read_input(rlx_var.read,get_input_filename());
 
   int numsources = mes_var.nhits;
-  //char *path=mes_var.outdir;
+
+  
+  m[0] = atof(mes_var.mstring);
+  //M=m[0];
+  init_propagator_eo(1,m,mes_var.precision);
+  
   int Nmom;
   lprintf("MAIN",0,"Boundary conditions: %s\n",mes_var.bc);
   lprintf("MAIN",0,"The momenta are: %s\n",mes_var.p);
-  int **p = getmomlist(mes_var.p,&Nmom);
+  lprintf("MAIN",0,"mass is : %e\n",m[0]);
+  int **plist = getmomlist(mes_var.p,&Nmom);
   lprintf("MAIN",0,"Number of momenta: %d\n",Nmom);
   lprintf("MAIN",0,"The momenta are:\n");
   for(int i=0; i<Nmom; i++){
-    lprintf("MAIN",0,"p%d = (%d, %d, %d)\n", i+1, p[i][0], p[i][1], p[i][2]);
+    lprintf("MAIN",0,"p%d = (%d, %d, %d)\n", i+1, plist[i][0], plist[i][1], plist[i][2]);
   }
 
-while(1){
+
     struct timeval start, end, etime;
     gettimeofday(&start,0);
-    if(list!=NULL)
-      if(fscanf(list,"%s",cnfg_filename)==0 || feof(list)) break;
-
-    lprintf("MAIN",0,"Configuration from %s\n", cnfg_filename);
-    read_gauge_field(cnfg_filename);
+ 
     unit_gauge(u_gauge);
     represent_gauge_field();
 
@@ -429,7 +428,7 @@ while(1){
         }
         lprintf("MAIN",0,"Initiating mo, source = %d\n",i);
         init_mo_0(mo_p0[i]);
-        for (int j=0;j<Nmom;j++) init_mo_p(mo_p[j][i],p[j][0],p[j][1],p[j][2]);
+        for (int j=0;j<Nmom;j++) init_mo_p(mo_p[j][i],plist[j][0],plist[j][1],plist[j][2]);
     }
 
     for (int src=0;src<numsources;++src)
@@ -444,7 +443,7 @@ while(1){
 	    gen_mo_0(mo_p0[src], &prop0, &src0, tau);
 
         for(int i=0; i<Nmom; i++){
-            init_src_p(src_pn + i, &src0, p[i][0], p[i][1], p[i][2]);
+            init_src_p(src_pn + i, &src0, plist[i][0], plist[i][1], plist[i][2]);
             make_prop_p(p_p + i, src_pn + i, &src0, 4, tau, mes_var.bc);
             gen_mo_p(mo_p[i][src], &prop0, p_p + i, &src0, tau);
         }
@@ -458,8 +457,7 @@ while(1){
     }
     lprintf("TEST",0,"Finished lattice calculation, proceeding with analytic calculation\n");
     fourvec p = {{0.0,0.0,0.0,0.0}};
-#define TOL 1e-5
-    int allok = 0;
+#define TOL 1e-2
     int err;
     fourvec ptmp, mptmp;
 #define CHECK(NAME,FUN, MO, PX,PY,PZ)\
@@ -470,8 +468,8 @@ while(1){
         NAME[i] = FUN(ptmp,m[0],GLB_X,GLB_T,i);\
     }\
     err = compare_2pt(MO, NAME, PX,PY,PZ,2,TOL);  \
-    allok = allok || err;\
     if(err){\
+        return_value +=1;\
         lprintf("TEST",0,"FAILED!!!\n");\
     } else{\
         lprintf("TEST",0,"OK\n");\
@@ -500,8 +498,8 @@ while(1){
             r1[i] = R(p,p,ptmp,m[0],GLB_X,GLB_T,i);
         }
         err = compare_2pt(mo_p[mom][0]->r1, r1, px,py,pz,2,TOL);;  
-        allok = allok || err;
         if(err){
+            return_value+=1;
             lprintf("TEST",0,"FAILED!!!\n");
         } else{
             lprintf("TEST",0,"OK\n");
@@ -513,15 +511,15 @@ while(1){
             r3[i] = R(mptmp,p,ptmp,m[0],GLB_X,GLB_T,i);
         }
         err = compare_2pt(mo_p[mom][0]->r3, r3, px,py,pz,2,TOL);;  
-        allok = allok || err;
         if(err){
+            return_value+=1;
             lprintf("TEST",0,"FAILED!!!\n");
         } else{
             lprintf("TEST",0,"OK\n");
         }
     }
 
-    if(allok == 0){
+    if(return_value == 0){
         lprintf("TEST",0,"All tests passed successfully!\n");
     } else {
         lprintf("TEST",0,"Some tests have failed!\n");
@@ -538,11 +536,8 @@ while(1){
     timeval_subtract(&etime,&end,&start);
     lprintf("MAIN",0,"Configuration : analysed in [%ld sec %ld usec]\n",etime.tv_sec,etime.tv_usec);
 
-    if(list==NULL) break;
-}
   lprintf("DEBUG",0,"ALL done, deallocating\n");
 
-  if(list!=NULL) fclose(list);
   finalize_process();
   free_BCs();
   free_gfield(u_gauge);

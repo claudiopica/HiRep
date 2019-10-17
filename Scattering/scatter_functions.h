@@ -56,7 +56,8 @@ void init_mo(meson_observable* mo, char* name, int size)
   mo->corr_size=size;
   mo->corr_re = (double * ) malloc(size * sizeof(double));
   mo->corr_im = (double * ) malloc(size * sizeof(double));
-  if (mo->corr_re == NULL || mo->corr_im == NULL)
+  mo->corr = (double complex * ) malloc(size * sizeof(double complex));
+  if (mo->corr_re == NULL || mo->corr_im == NULL|| mo->corr== NULL)
   {
     fprintf(stderr, "malloc failed in init_mo \n");
     return;
@@ -66,6 +67,7 @@ void init_mo(meson_observable* mo, char* name, int size)
   {
     mo->corr_re[i]=0.0;
     mo->corr_im[i]=0.0;
+    mo->corr[i]=0.0;
   }
 }
 
@@ -80,6 +82,7 @@ void reset_mo(meson_observable* mo)
   {
     mo->corr_re[i]=0.0;
     mo->corr_im[i]=0.0;
+    mo->corr[i]=0.0;
   }
 }
 
@@ -94,9 +97,11 @@ static void do_global_sum(meson_observable* mo, double norm){
   while (motmp!=NULL){
       global_sum(motmp->corr_re,motmp->corr_size);
       global_sum(motmp->corr_im,motmp->corr_size);
+      global_sum((double *)(motmp->corr),2*motmp->corr_size);
       for(i=0; i<motmp->corr_size; i++){
 	motmp->corr_re[i] *= norm;
 	motmp->corr_im[i] *= norm;
+    motmp->corr[i] *= norm;
       }
     motmp=motmp->next;
   }
@@ -109,6 +114,7 @@ void free_mo(meson_observable* mo)
 {
   free(mo->corr_re);
   free(mo->corr_im);
+  free(mo->corr);
   free(mo);
 }
 
@@ -363,13 +369,10 @@ void make_prop_common(struct prop_common* prop, struct src_common* src0, int ndi
         lprintf("make_prop_common",0,"Inverting propagator with P boundary conditions");
         fun = &make_propagator_P;
     }
-
 	prop->Q_0 = alloc_spinor_field_f(4*NF,&glattice);
     fun(prop->Q_0, src0->src_0, ndilute, tau);
-
 	prop->Q_0_eta = alloc_spinor_field_f(4*NF,&glattice);
     fun(prop->Q_0_eta, src0->src_0_eta, ndilute, tau);
-
     prop->W_0_0 = (spinor_field**) malloc(GLB_T*sizeof(spinor_field*));
     for(int t=0; t<GLB_T; t++){
         prop->W_0_0[t] = alloc_spinor_field_f(4*NF,&glattice);
@@ -735,7 +738,7 @@ void setup(FILE** listlist, double* m){
   char tmp[256], *cptr;
   int nm;
 //  double m[256];
-  FILE* list;
+  FILE* list=NULL;
   *listlist = list;
   filename_t fpars;
 

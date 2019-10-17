@@ -18,7 +18,7 @@ typedef struct _input_scatt {
 	double precision;
 	int nhits;
 	int tsrc;
-	char outdir[256], bc[16], p[256];
+	char outdir[256], bc[16], p[256],list_filename[256];
 
 	/* for the reading function */
 	input_record_t read[9];
@@ -72,11 +72,12 @@ int parse_cnfg_filename(char* filename, filename_t* fn) {
 	char *tmp = NULL;
 	char *basename;
 
+	printf("%s \n", filename);	
 	basename = filename;
 	while ((tmp = strchr(basename, '/')) != NULL) {
 		basename = tmp+1;
 	}            
-
+	printf("%s \n", basename);	
 #ifdef REPR_FUNDAMENTAL
 #define repr_name "FUN"
 #elif defined REPR_SYMMETRIC
@@ -125,7 +126,7 @@ int parse_cnfg_filename(char* filename, filename_t* fn) {
 /**
  * @brief Parses the command-line input
  */
-void read_cmdline(int argc, char* argv[]) {
+/*void read_cmdline(int argc, char* argv[]) {
 	int i, ai=0, ao=0, ac=0, al=0, am=0,ap=0,as=0;
 	FILE *list=NULL;
 
@@ -174,7 +175,7 @@ void read_cmdline(int argc, char* argv[]) {
 		fclose(list);
 	}
 
-}
+}*/
 
 /**
  * @brief Converts a string of "(px,py,pz)(px2,py2,pz2)..." into a 2D array of integers.
