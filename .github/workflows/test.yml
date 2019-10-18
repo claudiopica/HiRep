@@ -6,6 +6,9 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        tag: [6, 8, 10]
     
     steps:
     - uses: actions/checkout@v1

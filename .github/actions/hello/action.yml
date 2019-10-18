@@ -12,5 +12,5 @@ runs:
   using: 'docker'
   image: 'docker://centos:7'
   args:
-    - ls
-    - /github/workspace 
+    - echo
+    - ${{ matrix.tag }}
