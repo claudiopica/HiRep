@@ -1,4 +1,13 @@
-// This code will contain all the contractions necessary for rho to pi pi scattering
+/******************************************************************************
+ *
+ *
+ * File check_scattering_rhopipi.c
+ * Checks of the rho to pi pi calculations (free case) with point source?
+ *
+ * Author: Tadeusz Janowski
+ *
+ ******************************************************************************/
+
 #define MAIN_PROGRAM
 
 #include <stdlib.h>
@@ -27,14 +36,88 @@
 #include "gamma_spinor.h"
 #include "spin_matrix.h"
 #include "clover_tools.h"
-
+#include "setup.h"
 #include "cinfo.c"
-#include "IOroutines.c"
-#include "scatter_functions.h"
+
+
 
 #define PI 3.1415926535
 #define SQR(A) ((A) * (A))
 #define CMUL(a,b) (a).re*=b;(a).im*=b
+
+
+
+/// \cond
+#define BASENAME(filename) (strrchr((filename),'/') ? strrchr((filename),'/')+1 : filename )
+
+#define corr_ind(px,py,pz,n_mom,tc,nm,cm) ((px)*(n_mom)*(n_mom)*GLB_T*(nm)+(py)*(n_mom)*GLB_T*(nm)+(pz)*GLB_T*(nm)+ ((cm)*GLB_T) +(tc))
+/// \endcond
+
+
+
+/// \cond
+#define INDEX(px,py,pz,n_mom,tc) ((px + n_mom)*(2*n_mom+1)*(2*n_mom+1)*(GLB_T)+(py + n_mom)*(2*n_mom+1)*(GLB_T)+(pz + n_mom)*(GLB_T)+ (tc))
+/// \endcond
+
+/**
+ * @brief Structure containing data from the input file relevant to scattering.
+ */
+typedef struct _input_scatt {
+	char mstring[256];
+    double csw;
+	double precision;
+	int nhits;
+	int tsrc;
+	char outdir[256], bc[16], p[256],configlist[256];
+
+	/* for the reading function */
+	input_record_t read[10];
+
+} input_scatt;
+
+#define init_input_scatt(varname) \
+{ \
+	.read={\
+		{"quark quenched masses", "mes:masses = %s", STRING_T, (varname).mstring},\
+		{"csw", "mes:csw = %lf", DOUBLE_T, &(varname).csw},\
+		{"inverter precision", "mes:precision = %lf", DOUBLE_T, &(varname).precision},\
+		{"number of inversions per cnfg", "mes:nhits = %d", INT_T, &(varname).nhits},\
+		{"Source time:", "mes:tsrc = %d", INT_T, &(varname).tsrc},\
+		{"Output directory:", "mes:outdir = %s", STRING_T, &(varname).outdir},\
+		{"Configuration list:", "mes:configlist = %s", STRING_T, &(varname).configlist},\
+		{"Boundary conditions:", "mes:bc = %s", STRING_T, &(varname).bc},\
+		{"Momenta:", "mes:p = %s", STRING_T, &(varname).p},\
+		{NULL, NULL, INT_T, NULL}\
+	}\
+}
+
+
+char cnfg_filename[256]="";
+char list_filename[256]="";
+char prop_filename[256]="";
+char source_filename[256]="";
+char input_filename[256] = "input_file";
+char output_filename[256] = "meson_scattering.out";
+int Nsource;
+double M;
+
+enum { UNKNOWN_CNFG, DYNAMICAL_CNFG, QUENCHED_CNFG };
+
+
+
+
+
+input_scatt mes_var = init_input_scatt(mes_var);
+
+typedef struct {
+	char string[256];
+  char configlist[256];
+	int t, x, y, z;
+	int nc, nf;
+	double b, m;
+	int n;
+	int type;
+} filename_t;
 
 /**
  * @file scatter_test.c
@@ -133,10 +216,9 @@ double complex twopoint(fourvec p, double m,int L, int LT, int t)
     fourvec mom1, mom2;
     int q1, q2, q3, q41, q42;
     double complex res;
-    //res.re = res.im = 0.0;
     res = 0.;
     double tmp;
-
+    
     for (q1=0;q1<L;++q1) for (q2=0; q2<L; ++q2)  for (q3=0; q3<L; ++q3) for (q41=0; q41<LT; ++q41) for (q42=0; q42<LT; ++q42){
         mom1 = (fourvec) {{q1,q2,q3,((double) q41)*L/LT}};
         iadd(&mom1, &p);
@@ -146,12 +228,8 @@ double complex twopoint(fourvec p, double m,int L, int LT, int t)
 
         tmp = (f1(mom1,m)*f1(mom2,m) + f2(mom1,mom2)) / ( (SQR(f1(mom1,m)) + f2(mom1,mom1)) * (SQR(f1(mom2,m)) + f2(mom2,mom2) ) );
         res += tmp *( cos((2.0 * PI / LT) * t * (q42 - q41)) + I*sin((2.0 * PI / LT) * t * (q42 - q41)));
-        //res.re += tmp * cos((2.0 * PI / LT) * t * (q42 - q41));
-        //res.im += tmp * sin((2.0 * PI / LT) * t * (q42 - q41));
     }
 
-    //res.re = 4*res.re/L/L/L/LT/LT;
-    //res.im = 4*res.im/L/L/L/LT/LT;
     res = 4*res/L/L/L/LT/LT;
     return res;
 }
@@ -169,7 +247,6 @@ double complex twopoint_rho(fourvec p, double m,int L, int LT, int t)
     fourvec mom1, mom2;
     int q1, q2, q3, q41, q42;
     double complex res;
-    //res.re = res.im = 0.0;
     res = 0.;
     double tmp;
 
@@ -181,13 +258,9 @@ double complex twopoint_rho(fourvec p, double m,int L, int LT, int t)
         imul(&mom2, 2.0* PI / L);
 
         tmp = (f1(mom1,m)*f1(mom2,m) + f2(mom1,mom2) - 2*sin(mom1.v[2])*sin(mom2.v[2])) / ( (SQR(f1(mom1,m)) + f2(mom1,mom1)) * (SQR(f1(mom2,m)) + f2(mom2,mom2) ) );
-        //res.re += tmp * cos((2.0 * PI / LT) * t * (q42 - q41));
-        //res.im += tmp * sin((2.0 * PI / LT) * t * (q42 - q41));
          res += tmp * ( cos((2.0 * PI / LT) * t * (q42 - q41)) + I*sin((2.0 * PI / LT) * t * (q42 - q41)) );
     }
 
-    //res.re = 4*res.re/L/L/L/LT/LT;
-    //res.im = 4*res.im/L/L/L/LT/LT;
     res = 4*res/L/L/L/LT/LT;
     return res;
 }
@@ -205,7 +278,6 @@ double complex twopoint_rho12(fourvec p, double m,int L, int LT, int t)
     fourvec mom1, mom2;
     int q1, q2, q3, q41, q42;
     double complex res;
-    //res.re = res.im = 0.0;
     res=0.;
     double tmp;
 
@@ -217,13 +289,10 @@ double complex twopoint_rho12(fourvec p, double m,int L, int LT, int t)
         imul(&mom2, 2.0* PI / L);
 
         tmp = ( -(sin(mom1.v[0])*sin(mom2.v[1]) + sin(mom1.v[1])*sin(mom2.v[0]) )) / ( (SQR(f1(mom1,m)) + f2(mom1,mom1)) * (SQR(f1(mom2,m)) + f2(mom2,mom2) ) );
-        //res.re += tmp * cos((2.0 * PI / LT) * t * (q42 - q41));
-        //res.im += tmp * sin((2.0 * PI / LT) * t * (q42 - q41));
-        res += tmp *( cos((2.0 * PI / LT) * t * (q42 - q41)) + I*sin((2.0 * PI / LT) * t * (q42 - q41)));
+//        res += tmp *( cos((2.0 * PI / LT) * t * (q42 - q41)) + I*sin((2.0 * PI / LT) * t * (q42 - q41)));
+        res += tmp* cexp( (2.0 * PI / LT) * t * (q42 - q41));
     }
 
-    //res.re = 4*res.re/L/L/L/LT/LT;
-    //res.im = 4*res.im/L/L/L/LT/LT;
     res = 4*res/L/L/L/LT/LT;
     return res;
 }
@@ -244,7 +313,6 @@ double complex Triangle(fourvec p, double m, int L, int LT, int t)
     int q1, q2, q3, q14, q24, q34, i,j;
     double complex res;
     res = 0.;
-    //res.re = res.im = 0.0;
     double numerator, denominator;
     double af1[3];
     double af2[3][3];
@@ -272,13 +340,9 @@ double complex Triangle(fourvec p, double m, int L, int LT, int t)
             + (af1[0]*af1[2] + af2[0][2])*sin(mom[1].v[2]) \
             - (af1[1]*af1[2] + af2[1][2])*sin(mom[0].v[2]) ;
 
-        //res.re += sin((double) (t * (q24 - q34)) * 2.0 * PI/LT) * numerator / denominator;
-        //res.im += -cos((double) (t * (q24 - q34)) * 2.0 * PI/LT) * numerator / denominator;
         res += ( sin((double) (t * (q24 - q34)) * 2.0 * PI/LT)  -I*cos((double) (t * (q24 - q34)) * 2.0 * PI/LT))*numerator / denominator;
     }
 
-    //res.re = 4*res.re/L/L/L/LT/LT/LT;
-    //res.im = 4*res.im/L/L/L/LT/LT/LT;
     res = 4*res/L/L/L/LT/LT/LT;
     return res;
 }
@@ -298,7 +362,6 @@ double complex R(fourvec px, fourvec py, fourvec pz, double m, int L, int LT, in
     fourvec mom[4];
     int q11, q12, q13, q14, q24, q34, q44, i,j;
     double complex res;
-    //res.re = res.im = 0.0;
     res = 0.;
     double numerator, denominator;
     double af1[4];
@@ -306,7 +369,6 @@ double complex R(fourvec px, fourvec py, fourvec pz, double m, int L, int LT, in
 
     for (q11=0;q11<L;++q11) for (q12=0; q12<L; ++q12)  for (q13=0; q13<L; ++q13) for (q14=0; q14<LT; ++q14) for (q24=0; q24<LT; ++q24) for (q34=0; q34<LT; ++q34) for (q44=0; q44<LT; ++q44){
         mom[0] = FV(q1,q14);
-        //        mom[1] = FV(q1,q24);
         mom[1] = (fourvec) {{q11,q12,q13,((double) q24 )*L/LT}};
         iadd(&mom[1],& px);
         imul(&mom[1], 2.0* PI / L);
@@ -343,12 +405,9 @@ double complex R(fourvec px, fourvec py, fourvec pz, double m, int L, int LT, in
             - af2[0][2] * af2[1][3] \
             + af2[0][3] * af2[1][2];
 
-        //res.re += cos((double) (t * (q24-q44)) * 2.0 * PI/LT) * numerator / denominator;
-        //res.im += sin((double) (t * (q24-q44)) * 2.0 * PI/LT) * numerator / denominator;
         res += (cos((double) (t * (q24-q44)) * 2.0 * PI/LT) +I*sin((double) (t * (q24-q44)) * 2.0 * PI/LT))* numerator / denominator;
     }
-    //res.re = 4*res.re/L/L/L/LT/LT/LT/LT;
-    //res.im = 4*res.im/L/L/L/LT/LT/LT/LT;
+
     res = 4*res/L/L/L/LT/LT/LT/LT;
     return res;
 }
@@ -374,17 +433,22 @@ int compare_2pt(meson_observable *mo, double complex *corr, int px, int py, int 
             lprintf("TEST",0,"Mismatch, t=%d, numeric = %e + I*(%e), analytic = %e + I*(%e)",t,num_re,num_im,ana_re,ana_im);
             retval = 1;
         }
+        else
+        {
+            lprintf("TEST",0,"Match, t=%d, numeric = %e + I*(%e), analytic = %e + I*(%e)",t,num_re,num_im,ana_re,ana_im);
+        }
+        
     }
     return retval;
 }
 
 int main(int argc,char *argv[])
 {
-  //int px,py,pz, px2, py2, pz2, px3, py3, pz3;
   int return_value=0;
-   int tau=0;
+  int tau=0;
   double m[256];
   
+  error(!(GLB_X==GLB_Y && GLB_X==GLB_Z),1,"main", "This test works only for GLB_X=GLB_Y=GLB_Z");
 
   setup_process(&argc,&argv);
 
@@ -397,15 +461,15 @@ int main(int argc,char *argv[])
   int numsources = mes_var.nhits;
 
   
-  m[0] = atof(mes_var.mstring);
-  //M=m[0];
+  m[0] = -atof(mes_var.mstring); // VD: to match the mass parsed by parse_cnfg ?
   init_propagator_eo(1,m,mes_var.precision);
   
   int Nmom;
+  int **plist = getmomlist(mes_var.p,&Nmom);
+
   lprintf("MAIN",0,"Boundary conditions: %s\n",mes_var.bc);
   lprintf("MAIN",0,"The momenta are: %s\n",mes_var.p);
   lprintf("MAIN",0,"mass is : %e\n",m[0]);
-  int **plist = getmomlist(mes_var.p,&Nmom);
   lprintf("MAIN",0,"Number of momenta: %d\n",Nmom);
   lprintf("MAIN",0,"The momenta are:\n");
   for(int i=0; i<Nmom; i++){
@@ -487,7 +551,7 @@ int main(int argc,char *argv[])
         lprintf("TEST",0,"Running momentum (%d,%d,%d)\n",px,py,pz);
         CHECK(pi_p, twopoint, mo_p[mom][0]->pi,px,py,pz)
         CHECK(rho_g3_p, twopoint_rho, mo_p[mom][0]->rho[2][2],px,py,pz)
-        CHECK(rho_g1g2_p, twopoint_rho, mo_p[mom][0]->rho[0][1],px,py,pz)
+        CHECK(rho_g1g2_p, twopoint_rho12, mo_p[mom][0]->rho[0][1],px,py,pz)
         CHECK(t1_g3_p, Triangle, mo_p[mom][0]->t1[2],px,py,pz)
 
         double complex r1[GLB_T];
@@ -538,10 +602,12 @@ int main(int argc,char *argv[])
 
   lprintf("DEBUG",0,"ALL done, deallocating\n");
 
-  finalize_process();
-  free_BCs();
-  free_gfield(u_gauge);
-  free_propagator_eo();
+  
+  global_sum_int(&return_value,1);
+  lprintf("MAIN", 0, "return_value= %d\n ",  return_value);
+  //free_propagator_eo();
 
-  return 0;
+  finalize_process();
+
+  return return_value;
 }
