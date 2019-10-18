@@ -227,7 +227,7 @@ double complex twopoint(fourvec p, double m,int L, int LT, int t)
         imul(&mom2, 2.0* PI / L);
 
         tmp = (f1(mom1,m)*f1(mom2,m) + f2(mom1,mom2)) / ( (SQR(f1(mom1,m)) + f2(mom1,mom1)) * (SQR(f1(mom2,m)) + f2(mom2,mom2) ) );
-        res += tmp *( cos((2.0 * PI / LT) * t * (q42 - q41)) + I*sin((2.0 * PI / LT) * t * (q42 - q41)));
+        res += tmp * cexp(I*(2.0 * PI / LT) * t * (q42 - q41));
     }
 
     res = 4*res/L/L/L/LT/LT;
@@ -258,7 +258,7 @@ double complex twopoint_rho(fourvec p, double m,int L, int LT, int t)
         imul(&mom2, 2.0* PI / L);
 
         tmp = (f1(mom1,m)*f1(mom2,m) + f2(mom1,mom2) - 2*sin(mom1.v[2])*sin(mom2.v[2])) / ( (SQR(f1(mom1,m)) + f2(mom1,mom1)) * (SQR(f1(mom2,m)) + f2(mom2,mom2) ) );
-         res += tmp * ( cos((2.0 * PI / LT) * t * (q42 - q41)) + I*sin((2.0 * PI / LT) * t * (q42 - q41)) );
+        res += tmp * cexp(I*(2.0 * PI / LT) * t * (q42 - q41));
     }
 
     res = 4*res/L/L/L/LT/LT;
@@ -289,8 +289,7 @@ double complex twopoint_rho12(fourvec p, double m,int L, int LT, int t)
         imul(&mom2, 2.0* PI / L);
 
         tmp = ( -(sin(mom1.v[0])*sin(mom2.v[1]) + sin(mom1.v[1])*sin(mom2.v[0]) )) / ( (SQR(f1(mom1,m)) + f2(mom1,mom1)) * (SQR(f1(mom2,m)) + f2(mom2,mom2) ) );
-//        res += tmp *( cos((2.0 * PI / LT) * t * (q42 - q41)) + I*sin((2.0 * PI / LT) * t * (q42 - q41)));
-        res += tmp* cexp( (2.0 * PI / LT) * t * (q42 - q41));
+        res += tmp* cexp( I*(2.0 * PI / LT) * t * (q42 - q41));
     }
 
     res = 4*res/L/L/L/LT/LT;
@@ -340,7 +339,8 @@ double complex Triangle(fourvec p, double m, int L, int LT, int t)
             + (af1[0]*af1[2] + af2[0][2])*sin(mom[1].v[2]) \
             - (af1[1]*af1[2] + af2[1][2])*sin(mom[0].v[2]) ;
 
-        res += ( sin((double) (t * (q24 - q34)) * 2.0 * PI/LT)  -I*cos((double) (t * (q24 - q34)) * 2.0 * PI/LT))*numerator / denominator;
+        //res += ( sin((double) (t * (q24 - q34)) * 2.0 * PI/LT)  -I*cos((double) (t * (q24 - q34)) * 2.0 * PI/LT))*numerator / denominator;
+        res += cexp(I*(t * (q24 - q34) * 2.0 * PI/LT - PI/2.))*numerator / denominator;
     }
 
     res = 4*res/L/L/L/LT/LT/LT;
@@ -405,7 +405,7 @@ double complex R(fourvec px, fourvec py, fourvec pz, double m, int L, int LT, in
             - af2[0][2] * af2[1][3] \
             + af2[0][3] * af2[1][2];
 
-        res += (cos((double) (t * (q24-q44)) * 2.0 * PI/LT) +I*sin((double) (t * (q24-q44)) * 2.0 * PI/LT))* numerator / denominator;
+              res += cexp(I*(t * (q24-q44)) * 2.0 * PI/LT)* numerator / denominator;
     }
 
     res = 4*res/L/L/L/LT/LT/LT/LT;
