@@ -13,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: My first step
-      uses: actions/hello_world@master
+      uses: actions/hello-world-docker-action@master
       with:
         first_name: Mona
         middle_name: The
