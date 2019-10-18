@@ -1,4 +1,14 @@
 // This code will contain all the contractions necessary for rho to pi pi scattering
+/******************************************************************************
+ *
+ *
+ * File check_scatter_rhopipi.c
+ * Checks of the rho to pi pi calculations (free case) with point source?
+ *
+ * Author: Tadeusz Janowski
+ *
+ ******************************************************************************/
+
 #define MAIN_PROGRAM
 
 #include <stdlib.h>
@@ -30,25 +40,98 @@
 #include "setup.h"
 
 #include "cinfo.c"
-#include "IOroutines.c"
-#include "scatter_functions.h"
+//#include "IOroutines.c"
+//#include "scatter_functions.h"
 
 #define PI M_PI
 
+
+
+/**
+ * @brief Structure containing data from the input file relevant to scattering.
+ */
+typedef struct _input_scatt {
+	char mstring[256];
+    double csw;
+	double precision;
+	int nhits;
+	int tsrc;
+	char outdir[256], bc[16], p[256],configlist[256];
+
+	/* for the reading function */
+	input_record_t read[10];
+
+} input_scatt;
+
+#define init_input_scatt(varname) \
+{ \
+	.read={\
+		{"quark quenched masses", "mes:masses = %s", STRING_T, (varname).mstring},\
+		{"csw", "mes:csw = %lf", DOUBLE_T, &(varname).csw},\
+		{"inverter precision", "mes:precision = %lf", DOUBLE_T, &(varname).precision},\
+		{"number of inversions per cnfg", "mes:nhits = %d", INT_T, &(varname).nhits},\
+		{"Source time:", "mes:tsrc = %d", INT_T, &(varname).tsrc},\
+		{"Output directory:", "mes:outdir = %s", STRING_T, &(varname).outdir},\
+		{"Configuration list:", "mes:configlist = %s", STRING_T, &(varname).configlist},\
+		{"Boundary conditions:", "mes:bc = %s", STRING_T, &(varname).bc},\
+		{"Momenta:", "mes:p = %s", STRING_T, &(varname).p},\
+		{NULL, NULL, INT_T, NULL}\
+	}\
+}
+
+char cnfg_filename[256]="";
+char list_filename[256]="";
+char prop_filename[256]="";
+char source_filename[256]="";
+char input_filename[256] = "input_file";
+char output_filename[256] = "meson_scattering.out";
+int Nsource;
+double M;
+
+enum { UNKNOWN_CNFG, DYNAMICAL_CNFG, QUENCHED_CNFG };
+
+input_scatt mes_var = init_input_scatt(mes_var);
+
+typedef struct {
+	char string[256];
+  char configlist[256];
+	int t, x, y, z;
+	int nc, nf;
+	double b, m;
+	int n;
+	int type;
+} filename_t;
+
+
+
+
+
 int main(int argc,char *argv[])
 {
-  //int px,py,pz, px2, py2, pz2, px3, py3, pz3;
-
   FILE* list;
   int tau=0;
   double m[256];
 
-  //Copy I/O from another file
-  read_cmdline(argc, argv);
+
   setup_process(&argc,&argv);
 
-  setup(&list, m);
-  list=NULL;
+  setup_gauge_fields();
+  
+  read_input(glb_var.read,get_input_filename());
+  read_input(mes_var.read,get_input_filename());
+  read_input(rlx_var.read,get_input_filename());
+
+  m[0] = -atof(mes_var.mstring); // VD: to match the mass parsed by parse_cnfg ?
+  init_propagator_eo(1,m,mes_var.precision);
+  strcpy(list_filename,mes_var.configlist);
+
+  lprintf("MAIN",0,"%s %s\n", list_filename,mes_var.configlist);
+  //Copy I/O from another file
+  //read_cmdline(argc, argv);
+  //setup_process(&argc,&argv);
+
+  //setup(&list, m);
+
   if(strcmp(list_filename,"")!=0) {
     error((list=fopen(list_filename,"r"))==NULL,1,"main [mk_mesons.c]" ,
 	"Failed to open list file\n");
@@ -57,11 +140,14 @@ int main(int argc,char *argv[])
   int numsources = mes_var.nhits;
   char *path=mes_var.outdir;
   int Nmom;
+  int **p = getmomlist(mes_var.p,&Nmom);
+
   lprintf("MAIN",0,"Boundary conditions: %s\n",mes_var.bc);
   lprintf("MAIN",0,"The momenta are: %s\n",mes_var.p);
-  int **p = getmomlist(mes_var.p,&Nmom);
+  lprintf("MAIN",0,"mass is : %s\n",mes_var.p);
   lprintf("MAIN",0,"Number of momenta: %d\n",Nmom);
   lprintf("MAIN",0,"The momenta are:\n");
+  
   for(int i=0; i<Nmom; i++){
     lprintf("MAIN",0,"p%d = (%d, %d, %d)\n", i+1, p[i][0], p[i][1], p[i][2]);
   }
@@ -114,11 +200,11 @@ while(1){
         }
     }
     lprintf("MAIN",0,"num sources: %d, path: %s\n",numsources,path);
-    //IOold_0(mo_p0, numsources, path);
-    IO_json_0(mo_p0, numsources, path);
+    //IOold_0(mo_p0, numsources, path,cnfg_filename);
+    IO_json_0(mo_p0, numsources, path,cnfg_filename);
     for(int i=0; i<Nmom; i++){
-        //IOold_p(mo_p[i], numsources, path);
-        IO_json_p(mo_p[i], numsources, path);
+        //IOold_p(mo_p[i], numsources, path,cnfg_filename);
+        IO_json_p(mo_p[i], numsources, path,cnfg_filename);
     }
 
     for(int src=0;src<numsources;src++){

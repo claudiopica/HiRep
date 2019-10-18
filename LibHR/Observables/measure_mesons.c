@@ -368,6 +368,7 @@ static void zero_corrs(meson_observable* mo){
     for(i=0; i<motmp->corr_size; i++){
       motmp->corr_re[i] = 0.;
       motmp->corr_im[i] = 0.;
+      motmp->corr[i] = 0.;
     }
     motmp=motmp->next;
   }

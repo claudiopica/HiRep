@@ -1,12 +1,9 @@
-TOPDIR = ..
+TOPDIR = ../..
 MKDIR = $(TOPDIR)/Make
 
-EXES = scatter 
-
+TESTS = check_scattering_rhopipi
 
 
 LIBS += $(TOPDIR)/LibHR/libhr.a
 
-
 include $(MKDIR)/MkRules
-

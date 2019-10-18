@@ -1,4 +1,15 @@
-#include "setup.h"
+#include <string.h>
+#include "utils.h"
+#include "suN.h"
+#include "memory.h"
+#include "io.h"
+#include "logger.h"
+#include "global.h"
+#include "meson_observables.h"
+#include "observables.h"
+#include "scattering.h"
+#include <communications.h>
+#include "linear_algebra.h"
 /**
  *
  * @file scatter_functions.h
@@ -7,37 +18,49 @@
  * @author Tadeusz Janowski
  */
 
-#ifndef SCATTER_FUNCTIONS_H
-#define SCATTER_FUNCTIONS_H
+
 
 /**
- * @brief Flips the boundary conditions in the T direction between periodic and anti-periodic.
- * @param tau Time slice corresponding to the boundary.
+ * @brief Converts a string of "(px,py,pz)(px2,py2,pz2)..." into a 2D array of integers.
+ * @param momstring input string
+ * @param N number of momenta in the string (used as an output)
  */
-static void flip_T_bc(int tau){
-  int index;
-  int ix,iy,iz;
-  suNf *u;
-  tau-=1;
-  if (tau<0) tau+= GLB_T;
-  lprintf("meson_measurements",15,"Flipping the boundary at global time slice %d\n",tau);
-  fflush(stdout);
-  if((zerocoord[0]-1<=tau && zerocoord[0]+T>tau) || (zerocoord[0]==0 && tau==GLB_T-1)) { 
-    for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
-	  if ((tau==zerocoord[0]-1) || (zerocoord[0]==0 && tau==GLB_T-1)){
-	    index=ipt_ext(0,ix,iy,iz);
-	  }
-	  else{
-	    index=ipt_ext(T_BORDER+tau-zerocoord[0],ix,iy,iz);
-	  }
-	  if(index!=-1) {
-	    u=pu_gauge_f(index,0);
-	    _suNf_minus(*u,*u);
-	  }
-	}
-  }
-  lprintf("meson_measurements",50,"Flipping DONE!\n");
+int** getmomlist(char* momstring, int* N){
+    char* tmp = momstring;
+    *N = 0;
+    while(tmp != NULL){
+        tmp = strchr(tmp+1,'(');
+        (*N)++;
+    }
+    int** plist = (int**) malloc(*N*sizeof(int*));
+    int i=0;
+    tmp = momstring;
+    lprintf("getmomlist",0,"%d %s\n",*N,tmp);
+    while(tmp != NULL){
+        plist[i] = (int*) malloc(3*sizeof(int));
+        sscanf(tmp,"(%d,%d,%d)", plist[i], plist[i]+1, plist[i]+2);
+        lprintf("getmomlist",0,"(%d,%d,%d)\n",*(plist[i]),*(plist[i]+1),*(plist[i]+2));
+        tmp = strchr(tmp+1,'(');
+        i++;
+    }
+    return plist;
 }
+
+/** 
+ * @brief Frees the 2D array of momenta allocated by getmomlist.
+ * @param p array of momenta
+ * @param N number of momenta
+ * @see getmomlist
+ */
+void freep(int **p, int N){
+    for(int i=0; i<N;i++){
+        free(p[i]);
+    }
+    free(p);
+}
+//#endif
+
+
 /** 
  * @brief Function for initiating meson observable (used to store the correlation function)
  * @param mo meson_observable to initialise.
@@ -104,7 +127,36 @@ static void do_global_sum(meson_observable* mo, double norm){
     motmp->corr[i] *= norm;
       }
     motmp=motmp->next;
+ }
+}
+
+/**
+ * @brief Flips the boundary conditions in the T direction between periodic and anti-periodic.
+ * @param tau Time slice corresponding to the boundary.
+ */
+static void flip_T_bc(int tau){
+  int index;
+  int ix,iy,iz;
+  suNf *u;
+  tau-=1;
+  if (tau<0) tau+= GLB_T;
+  lprintf("meson_measurements",15,"Flipping the boundary at global time slice %d\n",tau);
+  fflush(stdout);
+  if((zerocoord[0]-1<=tau && zerocoord[0]+T>tau) || (zerocoord[0]==0 && tau==GLB_T-1)) { 
+    for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
+	  if ((tau==zerocoord[0]-1) || (zerocoord[0]==0 && tau==GLB_T-1)){
+	    index=ipt_ext(0,ix,iy,iz);
+	  }
+	  else{
+	    index=ipt_ext(T_BORDER+tau-zerocoord[0],ix,iy,iz);
+	  }
+	  if(index!=-1) {
+	    u=pu_gauge_f(index,0);
+	    _suNf_minus(*u,*u);
+	  }
+	}
   }
+  lprintf("meson_measurements",50,"Flipping DONE!\n");
 }
 
 /**
@@ -124,78 +176,11 @@ void free_mo(meson_observable* mo)
 #define corr_ind(px,py,pz,n_mom,tc,nm,cm) ((px)*(n_mom)*(n_mom)*GLB_T*(nm)+(py)*(n_mom)*GLB_T*(nm)+(pz)*GLB_T*(nm)+ ((cm)*GLB_T) +(tc))
 /// \endcond
 
-/**
- * @brief Prints the 2-point function to a file. Not used for JSON output.
- * @param mo meson_observable to print
- * @param pmax maximum momentum at the sink
- * @param sourceno noise source number
- * @param path directory to which the output file will be saved
- * @param name name of the output file
- */
-static inline void io2pt(meson_observable* mo, int pmax, int sourceno, char* path, char* name)
-{
-	FILE* file;
-	char outfile[256] = {};
-	int px,py,pz,t;
-	if(PID==0){
-		sprintf(outfile,"%s/%s_src_%d_%s", path, name, sourceno, BASENAME(cnfg_filename) );
-		file=fopen(outfile,"w+");
-		//Factor of 2 to correct for the noise source normalisation
-		for(px=0;px<pmax;++px) for(py=0;py<pmax;++py) for(pz=0;pz<pmax;++pz) for(t=0;t<GLB_T;++t) fprintf(file,"%i %i %i %i %3.10e %3.10e \n", px, py, pz, t,2*(mo->corr_re[corr_ind(px,py,pz,pmax,t,1,0)]), 2*(mo->corr_im[corr_ind(px,py,pz,pmax,t,1,0)]));
-		fclose(file);
-	}
-	return;
-}
-
 /// \cond
 #define INDEX(px,py,pz,n_mom,tc) ((px + n_mom)*(2*n_mom+1)*(2*n_mom+1)*(GLB_T)+(py + n_mom)*(2*n_mom+1)*(GLB_T)+(pz + n_mom)*(GLB_T)+ (tc))
 /// \endcond
-/**
- * @brief Prints the 4-point function (d) to a file. Not used for JSON output.
- * @param mo meson_observable to print
- * @param pmax maximum momentum at the sink
- * @param sourceno noise source number
- * @param path directory to which the output file will be saved
- * @param name name of the output file
- */
-static inline void io4pt(meson_observable* mo, int pmax, int sourceno, char* path, char* name)
-{
-	FILE* file;
-	char outfile[256] = {};
-	int px,py,pz,t;
-	if(PID==0){
-		sprintf(outfile,"%s/%s_src_%d_%s", path, name, sourceno, BASENAME(cnfg_filename) );
-		file=fopen(outfile,"w+");
-		//Factor of 4 to correct for the noise source normalisation
-		for(px=-pmax;px<=pmax;++px) for(py=-pmax;py<=pmax;++py) for(pz=-pmax;pz<=pmax;++pz) for(t=0;t<GLB_T;++t) fprintf(file, "%i %i %i %i %3.10e %3.10e \n", px, py, pz, t,4*(mo->corr_re[INDEX(px,py,pz, pmax,t)]), 4*(mo->corr_im[INDEX(px,py,pz,pmax,t)]));
-		fclose(file);
-	}
-	return;
-}
 
 // Sources
-
-/**
- * @brief Propagator sources with zero-momentum
- */
-struct src_common{
-	spinor_field *src_0; /**< Zero momentum, noise 1 */
-	spinor_field *src_0_eta; /**< Zero momentum, noise 2 */
-	spinor_field *src_0_0; /**< Sequential source from timeslice tau with zero-momentum insertion */
-};
-
-/**
- * @brief Propagator sources with momentum p
- */
-struct src_p{
-	int p[3]; /**< Momentum */
-	spinor_field *src_p;
-	spinor_field *src_mp;
-	spinor_field *src_0_p;
-	spinor_field *src_0_mp;
-	spinor_field *src_p_0;
-	spinor_field *src_mp_0;
-};
 
 /**
  * @brief Allocates memory and creates point sources with momentum 0 (used for testing).
@@ -296,27 +281,6 @@ void free_src_p(struct src_p* src){
 }
 
 // Propagators
-
-/**
- * @brief Bundle of propagators with zero momentum.
- */
-struct prop_common{
-	spinor_field *Q_0;
-	spinor_field *Q_0_eta;
-	spinor_field **W_0_0;
-};
-
-/**
- * @brief Bundle of propagators with momentum p.
- */
-struct prop_p{
-	spinor_field *Q_p;
-	spinor_field *Q_mp;
-	spinor_field *W_0_p;
-	spinor_field *W_0_mp;
-	spinor_field *W_p_0;
-	spinor_field *W_mp_0;
-};
 
 /**
  * @brief Creates a propagator with periodic boundary conditions
@@ -457,23 +421,6 @@ void free_prop_p(struct prop_p* prop){
 // Meson observable stuff
 
 /**
- * @brief Bundle of meson_observables with momentum 0. 
- */
-struct mo_0{
-	meson_observable *rho[3][3];
-	meson_observable *pi;
-};
-
-/**
- * @brief Bundle of meson_observables with momentum p. 
- */
-struct mo_p{
-	int p[3];
-	meson_observable *d, *r1, *r2, *r3, *r4, *pi;
-	meson_observable *t1[3], *t2[3], *rho[3][3];
-};
-
-/**
  * @brief Initialises bundle of zero-momentum meson observables.
  */
 void init_mo_0(struct mo_0* mo){
@@ -483,6 +430,8 @@ void init_mo_0(struct mo_0* mo){
 	for(int i=0; i<3; i++) for (int j=0;j<3;j++){
 		mo->rho[i][j] = (meson_observable*) malloc(sizeof(meson_observable));
 		init_mo(mo->rho[i][j],"rho",27*GLB_T);
+      	mo->rho[i][j]->ind1 = i+3;
+		mo->rho[i][j]->ind2 = j+3;
         lprintf("init_mo_0",0,"rho %d,%d initiated\n",i,j);
 	}
     lprintf("MAIN",0,"Meson observable 0 initiated!\n");
@@ -660,23 +609,72 @@ void free_mo_p(struct mo_p* mo){
 	free(mo);
 }
 
+
+/**
+ * @brief Prints the 2-point function to a file. Not used for JSON output.
+ * @param mo meson_observable to print
+ * @param pmax maximum momentum at the sink
+ * @param sourceno noise source number
+ * @param path directory to which the output file will be saved
+ * @param name name of the output file
+ * @param cnfg_filename name of the configuration
+ */
+void io2pt(meson_observable* mo, int pmax, int sourceno, char* path, char* name,char * cnfg_filename)
+{
+	FILE* file;
+	char outfile[256] = {};
+	int px,py,pz,t;
+	if(PID==0){
+		sprintf(outfile,"%s/%s_src_%d_%s", path, name, sourceno, BASENAME(cnfg_filename) );
+		file=fopen(outfile,"w+");
+		//Factor of 2 to correct for the noise source normalisation
+		for(px=0;px<pmax;++px) for(py=0;py<pmax;++py) for(pz=0;pz<pmax;++pz) for(t=0;t<GLB_T;++t) fprintf(file,"%i %i %i %i %3.10e %3.10e \n", px, py, pz, t,2*(mo->corr_re[corr_ind(px,py,pz,pmax,t,1,0)]), 2*(mo->corr_im[corr_ind(px,py,pz,pmax,t,1,0)]));
+		fclose(file);
+	}
+	return;
+}
+
+/**
+ * @brief Prints the 4-point function (d) to a file. Not used for JSON output.
+ * @param mo meson_observable to print
+ * @param pmax maximum momentum at the sink
+ * @param sourceno noise source number
+ * @param path directory to which the output file will be saved
+ * @param name name of the output file
+ * @param cnfg_filename name of the configuration
+ */
+void io4pt(meson_observable* mo, int pmax, int sourceno, char* path, char* name,char * cnfg_filename)
+{
+	FILE* file;
+	char outfile[256] = {};
+	int px,py,pz,t;
+	if(PID==0){
+		sprintf(outfile,"%s/%s_src_%d_%s", path, name, sourceno, BASENAME(cnfg_filename) );
+		file=fopen(outfile,"w+");
+		//Factor of 4 to correct for the noise source normalisation
+		for(px=-pmax;px<=pmax;++px) for(py=-pmax;py<=pmax;++py) for(pz=-pmax;pz<=pmax;++pz) for(t=0;t<GLB_T;++t) fprintf(file, "%i %i %i %i %3.10e %3.10e \n", px, py, pz, t,4*(mo->corr_re[INDEX(px,py,pz, pmax,t)]), 4*(mo->corr_im[INDEX(px,py,pz,pmax,t)]));
+		fclose(file);
+	}
+	return;
+}
+
 /**
  * @brief "Old style" IO where each correlation function is saved to separate file. Prints zero-momentum only.
  * @param molist an array of mo_0 objects, where each index corresponds to a different noise source
  * @param numsources number of noise sources
  * @param path path to which the file should be saved 
- *
+ * @param cnfg_filename name of the configuration
  * @see IO_json_0
  */
-void IOold_0(struct mo_0* molist[], int numsources, char* path){
+void IOold_0(struct mo_0* molist[], int numsources, char* path, char* cnfg_filename){
 	for(int src=0; src<numsources; src++){
         lprintf("IOold_0",0,"Printing pi for source %d\n",src);
-		io2pt(molist[src]->pi, 2, src, path, "pi");
+		io2pt(molist[src]->pi, 2, src, path, "pi",cnfg_filename);
 		for(int i=0;i<3; i++){
 			char tmp[100];
             lprintf("IOold_0",0,"Printing rho %d for source %d\n",i+1,src);
 			sprintf(tmp, "rho_p0_g%d", i+1);
-			io2pt(molist[src]->rho[i][i], 2, src, path, tmp);
+			io2pt(molist[src]->rho[i][i], 2, src, path, tmp,cnfg_filename);
 		}
 	}
 }
@@ -686,10 +684,11 @@ void IOold_0(struct mo_0* molist[], int numsources, char* path){
  * @param molist an array of mo_p objects, where each index corresponds to a different noise source
  * @param numsources number of noise sources
  * @param path path to which the file should be saved 
+ * @param cnfg_filename name of the configuration
  *
  * @see IO_json_p
  */
-void IOold_p(struct mo_p* molist[], int numsources, char* path	){
+void IOold_p(struct mo_p* molist[], int numsources, char* path, char* cnfg_filename	){
 	char tmp[100];
 	for(int src=0; src<numsources; src++){
         int px = molist[src]->p[0];
@@ -697,152 +696,39 @@ void IOold_p(struct mo_p* molist[], int numsources, char* path	){
         int pz = molist[src]->p[2];
         lprintf("IOold_p",0,"Printing pi for source %d momentum (%d,%d,%d)\n",src,px,py,pz);
 		sprintf(tmp, "pi_p(%d,%d,%d)",px,py,pz);
-		io2pt(molist[src]->pi, 2, src, path, tmp);
+		io2pt(molist[src]->pi, 2, src, path, tmp,cnfg_filename);
         lprintf("IOold_p",0,"Printing d for source %d momentum (%d,%d,%d)\n",src,px,py,pz);
 		sprintf(tmp, "d_p(%d,%d,%d)",px,py,pz);
-		io4pt(molist[src]->d, 1, src, path, tmp);
+		io4pt(molist[src]->d, 1, src, path, tmp,cnfg_filename);
         lprintf("IOold_p",0,"Printing r1 for source %d momentum (%d,%d,%d)\n",src,px,py,pz);
 		sprintf(tmp, "r1_p(%d,%d,%d)",px,py,pz);
-		io2pt(molist[src]->r1,2,src,path, tmp);
+		io2pt(molist[src]->r1,2,src,path, tmp,cnfg_filename);
         lprintf("IOold_p",0,"Printing r2 for source %d momentum (%d,%d,%d)\n",src,px,py,pz);
 		sprintf(tmp, "r2_p(%d,%d,%d)",px,py,pz);
-		io2pt(molist[src]->r2,2,src,path, tmp);
+		io2pt(molist[src]->r2,2,src,path, tmp,cnfg_filename);
         lprintf("IOold_p",0,"Printing r3 for source %d momentum (%d,%d,%d)\n",src,px,py,pz);
 		sprintf(tmp, "r3_p(%d,%d,%d)",px,py,pz);
-		io2pt(molist[src]->r3,2,src,path, tmp);
+		io2pt(molist[src]->r3,2,src,path, tmp,cnfg_filename);
         lprintf("IOold_p",0,"Printing r4 for source %d momentum (%d,%d,%d)\n",src,px,py,pz);
 		sprintf(tmp, "r4_p(%d,%d,%d)",px,py,pz);
-		io2pt(molist[src]->r4,2,src,path, tmp);
+		io2pt(molist[src]->r4,2,src,path, tmp,cnfg_filename);
 
 		for(int i=0;i<3; i++){
             lprintf("IOold_p",0,"Printing for source %d momentum (%d,%d,%d) gamma %d\n",src,px,py,pz,i+1);
 			sprintf(tmp, "t1_p(%d,%d,%d)_g%d", px, py, pz, i+1);
-			io2pt(molist[src]->t1[i], 2, src, path, tmp);
+			io2pt(molist[src]->t1[i], 2, src, path, tmp,cnfg_filename);
 			sprintf(tmp, "t2_p(%d,%d,%d)_g%d", px, py, pz, i+1);
-			io2pt(molist[src]->t2[i], 2, src, path, tmp);
+			io2pt(molist[src]->t2[i], 2, src, path, tmp,cnfg_filename);
 		       	for(int j=0;j<3; j++){
 				sprintf(tmp, "rho_p(%d,%d,%d)_g%d%d", px, py, pz, i+1, j+1);
                 lprintf("IOold_p",0,"Printing for source %d momentum (%d,%d,%d) gamma %d\n",src,px,py,pz,i+1, j+1);
-				io2pt(molist[src]->rho[i][j], 2, src, path, tmp);
+				io2pt(molist[src]->rho[i][j], 2, src, path, tmp,cnfg_filename);
 			}
 		}
 	}
 }
 
-/**
- * @brief Runs the set of functions in the beginning of the code.
- * @param listlist pointer to a FILE pointer to the input file
- */
 
-void setup(FILE** listlist, double* m){
-  char tmp[256], *cptr;
-  int nm;
-//  double m[256];
-  FILE* list=NULL;
-  *listlist = list;
-  filename_t fpars;
-
-  read_input(glb_var.read,input_filename);
-  //setup_replicas();
-
-  /* logger setup */
-  /* disable logger for MPI processes != 0 */
-  logger_setlevel(0,10);
-  if (PID!=0) { logger_disable(); }
-  if (PID==0) { 
-    sprintf(tmp,">%s",output_filename); logger_stdout(tmp);
-    sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
-  }
-
-  lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS); 
-  lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
-  lprintf("MAIN",0,"input file [%s]\n",input_filename); 
-  lprintf("MAIN",0,"output file [%s]\n",output_filename); 
-  if (list_filename!=NULL) lprintf("MAIN",0,"list file [%s]\n",list_filename); 
-  else lprintf("MAIN",0,"cnfg file [%s]\n",cnfg_filename); 
-
-  /* read & broadcast parameters */
-  parse_cnfg_filename(cnfg_filename,&fpars);
-
-  read_input(mes_var.read,input_filename);
-//  printf("The momenta are (%s) and (%s) \n", mes_var.p1, mes_var.p2);
-  GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
-
-  /* setup lattice geometry */
-  if (geometry_init() == 1) { finalize_process(); exit(0); }
-  /* setup random numbers */
-  read_input(rlx_var.read,input_filename);
-  //slower(rlx_var.rlxd_start); //convert start variable to lowercase
-  if(strcmp(rlx_var.rlxd_start,"continue")==0 && rlx_var.rlxd_state[0]!='\0') {
-    /*load saved state*/
-    lprintf("MAIN",0,"Loading rlxd state from file [%s]\n",rlx_var.rlxd_state);
-    read_ranlxd_state(rlx_var.rlxd_state);
-  } else {
-    lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
-    rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
-  }
-
-  lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
-  lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
-
-  nm=0;
-  if(fpars.type==DYNAMICAL_CNFG) {
-    nm=1;
-    m[0] = fpars.m;
-  } else if(fpars.type==QUENCHED_CNFG) {
-    strcpy(tmp,mes_var.mstring);
-    cptr = strtok(tmp, ";");
-    nm=0;
-    while(cptr != NULL) {
-      m[nm]=atof(cptr);
-      nm++;
-      cptr = strtok(NULL, ";");
-      printf(" %3.3e \n",m[nm]);
-    }            
-  }
-
-
-
-  /* setup communication geometry */
-  if (geometry_init() == 1) {
-    finalize_process();
-    exit(0);
-  }
-
-  /* setup lattice geometry */
-  geometry_mpi_eo();
-  /* test_geometry_mpi_eo(); */
-
-  init_BCs(NULL);
-
-
-
-  /* alloc global gauge fields */
-  u_gauge=alloc_gfield(&glattice);
-#ifdef ALLOCATE_REPR_GAUGE_FIELD
-  u_gauge_f=alloc_gfield_f(&glattice);
-#endif
-#ifdef WITH_CLOVER
-  clover_init(mes_var.csw);
-#endif
-#ifdef WITH_SMEARING
-	init_smearing(mes_var.rho_s, mes_var.rho_t);
-#endif
-
-  lprintf("MAIN",0,"Inverter precision = %e\n",mes_var.precision);
-  for(int k=0;k<nm;k++)
-  {
-//    lprintf("MAIN",0,"Mass[%d] = %f\n",k,m[k]);
-    lprintf("CORR",0,"Mass[%d] = %f\n",k,m[k]);
-  }
-
-  read_gauge_field(cnfg_filename);
-  represent_gauge_field();
-  //End of the I/O block
-
-  init_propagator_eo(nm,m,mes_var.precision);
-
-}
 /// \cond
 #define JSON(STRUCT, NAME) \
         fprintf(f,"\t\"%s\":{\n\t\t",NAME);\
@@ -904,8 +790,9 @@ void setup(FILE** listlist, double* m){
  * @param molist an array of mo_0 objects, where each index corresponds to a different noise source
  * @param numsources number of noise sources
  * @param path path to which the file should be saved 
+ * @param cnfg_filename name of the configuration 
  */
-void IO_json_0(struct mo_0* molist[], int numsources, char* path){
+void IO_json_0(struct mo_0* molist[], int numsources, char* path,char * cnfg_filename){
     FILE* f;
 	char outfile[256] = {};
 	int px,py,pz;
@@ -935,8 +822,9 @@ void IO_json_0(struct mo_0* molist[], int numsources, char* path){
  * @param molist an array of mo_p objects, where each index corresponds to a different noise source
  * @param numsources number of noise sources
  * @param path path to which the file should be saved 
+ * @param cnfg_filename name of the configuration 
  */
-void IO_json_p(struct mo_p* molist[], int numsources, char* path){
+void IO_json_p(struct mo_p* molist[], int numsources, char* path, char* cnfg_filename){
     FILE* f;
 	char outfile[256] = {};
 	int px,py,pz;
@@ -971,4 +859,4 @@ void IO_json_p(struct mo_p* molist[], int numsources, char* path){
 	}
 	return;
 }
-#endif
+//#endif
