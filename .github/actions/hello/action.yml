@@ -11,5 +11,3 @@ outputs:
 runs:
   using: 'docker'
   image: 'docker://hello-world'
-  args:
-    - ${{ inputs.who-to-greet }}
