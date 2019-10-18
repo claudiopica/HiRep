@@ -15,9 +15,7 @@ jobs:
     - name: My first step
       uses: actions/hello-world-docker-action@master
       with:
-        first_name: Mona
-        middle_name: The
-        last_name: ${{ matrix.tag }}  
+        who-to-greet: ${{ matrix.tag }}
     - uses: ./.github/actions/hello
       with: 
         who-to-greet: ${{ matrix.tag }}
