@@ -1,15 +1,27 @@
+/** 
+ * @file IOroutines.c
+ *
+ * Functions used for reading the input file
+ *
+ * @author Tadeusz Janowski
+ */
 
-// Followed by the list of IO functions from meson_scattering.c
-/* Mesons parameters */
+#ifndef IO_ROUTINES
+#define IO_ROUTINES
+
+/**
+ * @brief Structure containing data from the input file relevant to scattering.
+ */
 typedef struct _input_scatt {
 	char mstring[256];
+    double csw;
 	double precision;
 	int nhits;
 	int tsrc;
-	char outdir[256], p1[16], p2[16];
+	char outdir[256], bc[16], p[256],list_filename[256];
 
 	/* for the reading function */
-	input_record_t read[8];
+	input_record_t read[9];
 
 } input_scatt;
 
@@ -17,12 +29,13 @@ typedef struct _input_scatt {
 { \
 	.read={\
 		{"quark quenched masses", "mes:masses = %s", STRING_T, (varname).mstring},\
+		{"csw", "mes:csw = %lf", DOUBLE_T, &(varname).csw},\
 		{"inverter precision", "mes:precision = %lf", DOUBLE_T, &(varname).precision},\
 		{"number of inversions per cnfg", "mes:nhits = %d", INT_T, &(varname).nhits},\
 		{"Source time:", "mes:tsrc = %d", INT_T, &(varname).tsrc},\
 		{"Output directory:", "mes:outdir = %s", STRING_T, &(varname).outdir},\
-		{"Momentum 1:", "mes:p1 = %s", STRING_T, &(varname).p1},\
-		{"Momentum 2:", "mes:p2 = %s", STRING_T, &(varname).p2},\
+		{"Boundary conditions:", "mes:bc = %s", STRING_T, &(varname).bc},\
+		{"Momenta:", "mes:p = %s", STRING_T, &(varname).p},\
 		{NULL, NULL, INT_T, NULL}\
 	}\
 }
@@ -51,16 +64,20 @@ typedef struct {
 } filename_t;
 
 
+/**
+ * @brief Extracts run parameters from the gauge file filename.
+ */
 int parse_cnfg_filename(char* filename, filename_t* fn) {
 	int hm;
 	char *tmp = NULL;
 	char *basename;
 
+	printf("%s \n", filename);	
 	basename = filename;
 	while ((tmp = strchr(basename, '/')) != NULL) {
 		basename = tmp+1;
 	}            
-
+	printf("%s \n", basename);	
 #ifdef REPR_FUNDAMENTAL
 #define repr_name "FUN"
 #elif defined REPR_SYMMETRIC
@@ -106,8 +123,10 @@ int parse_cnfg_filename(char* filename, filename_t* fn) {
 	return UNKNOWN_CNFG;
 }
 
-
-void read_cmdline(int argc, char* argv[]) {
+/**
+ * @brief Parses the command-line input
+ */
+/*void read_cmdline(int argc, char* argv[]) {
 	int i, ai=0, ao=0, ac=0, al=0, am=0,ap=0,as=0;
 	FILE *list=NULL;
 
@@ -156,4 +175,44 @@ void read_cmdline(int argc, char* argv[]) {
 		fclose(list);
 	}
 
+}*/
+
+/**
+ * @brief Converts a string of "(px,py,pz)(px2,py2,pz2)..." into a 2D array of integers.
+ * @param momstring input string
+ * @param N number of momenta in the string (used as an output)
+ */
+int** getmomlist(char* momstring, int* N){
+    char* tmp = momstring;
+    *N = 0;
+    while(tmp != NULL){
+        tmp = strchr(tmp+1,'(');
+        (*N)++;
+    }
+    int** plist = (int**) malloc(*N*sizeof(int*));
+    int i=0;
+    tmp = momstring;
+    lprintf("getmomlist",0,"%d %s\n",*N,tmp);
+    while(tmp != NULL){
+        plist[i] = (int*) malloc(3*sizeof(int));
+        sscanf(tmp,"(%d,%d,%d)", plist[i], plist[i]+1, plist[i]+2);
+        lprintf("getmomlist",0,"(%d,%d,%d)\n",*(plist[i]),*(plist[i]+1),*(plist[i]+2));
+        tmp = strchr(tmp+1,'(');
+        i++;
+    }
+    return plist;
 }
+
+/** 
+ * @brief Frees the 2D array of momenta allocated by getmomlist.
+ * @param p array of momenta
+ * @param N number of momenta
+ * @see getmomlist
+ */
+void freep(int **p, int N){
+    for(int i=0; i<N;i++){
+        free(p[i]);
+    }
+    free(p);
+}
+#endif

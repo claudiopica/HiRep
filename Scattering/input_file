@@ -1,16 +1,11 @@
 GLB_T = 8
-GLB_X = 8
-GLB_Y = 8
-GLB_Z = 8
+GLB_X = 4
+GLB_Y = 4
+GLB_Z = 4
 NP_T = 2
 NP_X = 1
 NP_Y = 1
 NP_Z = 1
-//NP_T = 8
-//NP_X = 8
-//NP_Y = 3
-//NP_Z = 1
-
 
 N_REP = 1
 
@@ -19,18 +14,18 @@ log:inverter = -1
 log:forcestat = 0
 
 rlx_level = 1
-rlx_seed = 13813
+rlx_seed = 83745
 rlx_start = new
 rlx_state = rand_state
 
-mes:masses = -0.6
-mes:precision = 1e-20
-mes:nhits = 3
-mes:outdir = /work/sducp/janowski/out/pipi_test/bare/
-mes:p1 = (0,0,1)
-mes:p2 = (1,1,0)
-
-masses = 2.0
+mes:masses = -0.605
+mes:csw = 0.0
+mes:precision = 1e-24
+mes:nhits = 12
+mes:outdir = output
+mes:bc = PA
+mes:p = (0,0,1)(1,1,0)(1,1,1)
+mes:tsrc = 0
 
 n_eigenvalues = 128
 eva_nevt = 128
