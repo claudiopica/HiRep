@@ -32,6 +32,11 @@ GetOptions(
   'bartiming!'   => \(my $btiming = 0),
   'memory!'   => \(my $mem = 0),
   'force!'   => \(my $force = 0),
+  'cc=s'   => \(my $cc = "gcc"),
+  'mpicc=s'   => \(my $mpicc = "mpicc"),
+  'cflags=s'   => \(my $cflags = "-Wall -std=c99 -O3"),
+  'ldflags=s'   => \(my $ldflags = ""),
+  'include=s'   => \(my $include = ""),
   'help'     =>   sub { HelpMessage(0) },
 ) or HelpMessage(1);
 
@@ -191,6 +196,12 @@ $mem && print $fh "MACRO += -DAMALLOC_MEASURE\n";
 $force && print $fh "MACRO += -DMEASURE_FORCE\n";
 # write mpi
 $mpi && print $fh "MACRO += -DWITH_MPI\n";
+# write compiler options
+print $fh "CC = $cc\n";
+print $fh "MPICC = $mpicc\n";
+print $fh "CFLAGS = $cflags\n";
+print $fh "INCLUDE = $include\n";
+print $fh "LDFLAGS = $ldflags\n";
 
 close $fh;
 #print "All done\n";
@@ -203,6 +214,8 @@ write_mkflags - write flags file for compilation of HiRep
 
   Option              Default     Description
   ----------------------------------------------------------------------------
+  --help,-h                       Print this help
+
   --file,-f           [MkFlags]   File name
   --ng,-n             [2]         Number of colors
   --repr,-r           [FUND]      Fermion representation (FUND, 2S, 2A, ADJ)
@@ -211,26 +224,35 @@ write_mkflags - write flags file for compilation of HiRep
   -x                  [P]         X boundary conditions (P, A, T)
   -y                  [P]         Y boundary conditions (P, A, T)
   -z                  [P]         Z boundary conditions (P, A, T)
+
+  --[no-]mpi          [true]      Use MPI
+  --cc                [gcc]       Compiler
+  --mpicc             [mpicc]     MPI Compiler
+  --cflags            [-O3]       Compilation options
+  --include           []          Extra include headers
+  --ldflags           []          Linking options
+  --[no-]ndebug       [true]      set ndebug flag
+
+  --[no-]eo           [true]      Even-Odd preconditioning
+  
   --[no-]twist        [false]     XYZ twisted boundary conditions
   --[no-]sf           [false]     Schrodinger functional b.c.
   --[no-]sfhalf       [false]     Schrodinger functional b.c., half field
   --[no-]sfrotate     [false]     Rotated Schrodinger functional b.c.
   --[no-]smearing     [false]     Smearing action
   --[no-]clover       [false]     Clover improved action
-  --[no-]eo           [true]      Even-Odd preconditioning
+
   --[no-]quat         [false]     Use quaternion representation (only for SU2)
-  --[no-]ndebug       [true]      set ndebug flag
   --[no-]dfloat       [false]     Use single precision acceleration
+  --[no-]unrollrepr   [false]     Unroll group representation functions
+
   --[no-]checkspinor  [false]     Check spinor field type
   --[no-]mpitiming    [false]     Enable timing of MPI calls
   --[no-]ioflush      [true]      Flush IO after each operations on logs
-  --[no-]unrollrepr   [false]     Unroll group representation functions
   --[no-]timing       [false]     Enable timing
   --[no-]bartiming    [false]     Enable MPI barriers in timing
   --[no-]memory       [false]     Print memory usage
   --[no-]force        [false]     Print statics for forces in molecular dynamics
-  --[no-]mpi          [true]      Use MPI
-  --help,-h                       Print this help
 
 =head1 VERSION
 
