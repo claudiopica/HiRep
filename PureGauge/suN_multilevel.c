@@ -87,21 +87,29 @@ int main(int argc, char *argv[])
 
     gettimeofday(&start, 0);
 
-    //update_hb_multilevel_gb_measure(0, &(flow.pg_v->beta), flow.pg_v->nhb, flow.pg_v->nor, flow.pg_v->ml_niteration, flow.pg_v->ml_nskip, flow.pg_v->nblk, &(flow.pg_v->APEsmear), &(flow.pg_v->corrs));
+    update_hb_multilevel_gb_measure(0, &(flow.pg_v->beta), flow.pg_v->nhb, flow.pg_v->nor, flow.pg_v->ml_niteration, flow.pg_v->ml_nskip, flow.pg_v->nblk, &(flow.pg_v->APEsmear), &(flow.pg_v->corrs));
 
     gettimeofday(&end, 0);
     timeval_subtract(&etime, &end, &start);
-    lprintf("MAIN", 0, "ML Measure #%d: generated in [%ld sec %ld usec]\n", i, etime.tv_sec, etime.tv_usec);
+    lprintf("MAIN", 0, "ML Measure & update#%d: generated in [%ld sec %ld usec]\n", i, etime.tv_sec, etime.tv_usec);
     lprintf("MAIN", 0, "Plaquette %1.18e\n", avr_plaquette());
 
     if (strcmp(flow.wf->make, "true") == 0)
     {
+      gettimeofday(&start, 0);
       WF_adaptive_full_measure(u_gauge, &(flow.wf->tmax), &(flow.wf->eps), &(flow.wf->delta), flow.wf->nmeas);
+      gettimeofday(&end, 0);
+      timeval_subtract(&etime, &end, &start);
+      lprintf("MAIN", 0, "WF Measure #%d: generated in [%ld sec %ld usec]\n", i, etime.tv_sec, etime.tv_usec);
     }
 
     if (strcmp(flow.poly->make, "true") == 0)
     {
+      gettimeofday(&start, 0);
       polyakov();
+      gettimeofday(&end, 0);
+      timeval_subtract(&etime, &end, &start);
+      lprintf("MAIN", 0, "Polyakov Measure #%d: generated in [%ld sec %ld usec]\n", i, etime.tv_sec, etime.tv_usec);
     }
 
     if ((i % flow.save_freq) == 0)

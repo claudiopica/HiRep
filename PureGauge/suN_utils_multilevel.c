@@ -25,7 +25,6 @@ static input_WF WF_var = init_input_WF(WF_var);
 
 static input_poly poly_var = init_input_poly(poly_var);
 
-
 static void mk_gconf_name(char *name, pg_flow_ml *gf, int id)
 {
     sprintf(name, "%s_%dx%dx%dx%dnc%db%.6fan%.6fn%d",
@@ -61,7 +60,7 @@ static int parse_gstart(pg_flow_ml *gf)
     ret = sscanf(gf->g_start, "%[^_]_%dx%dx%dx%dnc%db%lfan%lfn%d",
                  buf, &t, &x, &y, &z, &ng, &beta, &anisotropy, &gf->start);
 
-    if (ret == 8)
+    if (ret == 9)
     { /* we have a correct file name */
         /* increase gf->start: this will be the first conf id */
         gf->start++;
@@ -313,7 +312,7 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
         .chiSF_boundary_improvement_ds = 1.,
         .SF_BCs = 0};
     init_BCs(&BCs_pars);
-    
+
     /* init gauge field */
     switch (start_t)
     {
@@ -332,16 +331,13 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
     apply_BCs_on_fundamental_gauge_field();
     represent_gauge_field();
 
-
     init_gauge_anisotropy(&(pg_var_ml.anisotropy));
 
     read_input(WF_var.read, ifile);
 
     WF_initialize();
-    
+
     read_input(poly_var.read, ifile);
-
-
 
     lprintf("INIT WF", 0, "WF max integration time=%lf\n", WF_var.tmax);
     lprintf("INIT WF", 0, "WF number of measures=%d\n", WF_var.nmeas);
