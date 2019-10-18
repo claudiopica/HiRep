@@ -12,6 +12,12 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
+    - name: My first step
+      uses: actions/hello_world@master
+      with:
+        first_name: Mona
+        middle_name: The
+        last_name: ${{ matrix.tag }}  
     - uses: ./.github/actions/hello
       with: 
         who-to-greet: ${{ matrix.tag }}
