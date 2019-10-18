@@ -8,6 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+    - uses: actions/checkout
     - uses: ./.github/actions/hello
     - name: configure
       run: ls 
