@@ -13,4 +13,4 @@ runs:
   image: 'docker://centos:7'
   args:
     - echo
-    - ${{ input.who-to-greet }}
+    - ${{ inputs.who-to-greet }}
