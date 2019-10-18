@@ -13,4 +13,4 @@ runs:
   image: 'docker://centos:7'
   args:
     - echo
-    - ${{ matrix.tag }}
+    - ${{ who-to-greet }}
