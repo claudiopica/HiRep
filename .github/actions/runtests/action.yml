@@ -1,0 +1,27 @@
+name: Run Tests
+description: 'Run HiRep tests'
+inputs:
+  mpi:
+    description: "Use mpi"
+    required: true
+    default: -no-mpi
+  nc:
+    description: 'Number of colors'
+    required: true
+  repr:
+    description: 'Fermion representation'
+    required: true
+
+outputs:
+  time: # id of output
+    description: 'The time we greeted you'
+runs:
+  using: 'docker'
+  image: 'docker://cpica/hr-tests'
+  args:
+    - ./TestProgram/run_tests.sh
+    - ${{ inputs.mpi }}
+    - -n
+    - ${{ inputs.nc }}
+    - -r
+    - ${{ inputs.repr }}

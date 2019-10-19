@@ -13,3 +13,12 @@ LibHR/Utils/suN_exp.c
 *.d
 *.a
 **/cinfo.c
+**/.test_failed
+**/out_0
+**/err_0
+**/debug
+
+#configuration files for vscode
+.vscode
+**/.DS_Store
+**/SnoopDogg*
