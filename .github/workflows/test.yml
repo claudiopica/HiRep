@@ -15,6 +15,5 @@ jobs:
     - uses: actions/checkout@v1
     - uses: ./.github/actions/runtests
       with:
-        workdir: /github/workspace/TestProgram
         nc: ${{ matrix.nc }}
         repr: ${{ matrix.repr }}
