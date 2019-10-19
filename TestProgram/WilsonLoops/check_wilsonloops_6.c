@@ -1,4 +1,5 @@
 /*******************************************************************************
+*  NOCOMPILE= !NG=2
 *
 * Check gauge invariance of the Wilson loops
 *
