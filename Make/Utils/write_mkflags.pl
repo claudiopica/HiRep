@@ -37,7 +37,7 @@ GetOptions(
   'cflags=s'   => \(my $cflags = "-Wall -std=c99 -O3"),
   'ldflags=s'   => \(my $ldflags = ""),
   'include=s'   => \(my $include = ""),
-  'help'     =>   sub { HelpMessage(0) },
+  'help'     =>   sub { HelpMessage(2) },
 ) or HelpMessage(1);
 
 # validate parameters

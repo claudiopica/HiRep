@@ -1,6 +1,10 @@
 name: Run Tests
 description: 'Run HiRep tests'
 inputs:
+  mpi:
+    description: "Use mpi"
+    required: true
+    default: -no-mpi
   nc:
     description: 'Number of colors'
     required: true
@@ -16,7 +20,7 @@ runs:
   image: 'docker://cpica/hr-tests'
   args:
     - ./TestProgram/run_tests.sh
-    - -no-mpi
+    - ${{ inputs.mpi }}
     - -n
     - ${{ inputs.nc }}
     - -r

@@ -21,7 +21,8 @@ ALIBNAME = $(abspath $(LIBNAME))
 
 
 ifeq ($(findstring -DWITH_MPI,$(MACRO)),-DWITH_MPI)
-	CC=$(MPICC)
+	CC = $(MPICC)
+	RUNTEST = $(MKDIR)/Utils/mpi_test_wrapper.pl
 endif
 
 #Colorization
@@ -211,7 +212,7 @@ $(foreach prog,$(EXES),$(eval $(call LINK_template,$(prog))))
 
 define RUNTEST_template
 echo -n "$(_col_test)["$(1)"]$(_col_norm) ..." ; \
-./$(1) >/dev/null && echo " $(_cpassed)" || ( echo " $(_cfailed)" && touch .test_failed ); 
+$(RUNTEST) ./$(1) >/dev/null && echo " $(_cpassed)" || ( echo " $(_cfailed)" && touch .test_failed ); 
 endef
 
 runtests:
