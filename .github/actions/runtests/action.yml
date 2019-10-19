@@ -15,7 +15,7 @@ runs:
   using: 'docker'
   image: 'docker://cpica/hr-tests'
   args:
-    - ./run_tests.sh
+    - ./TestProgram/run_tests.sh
     - -no-mpi
     - -n
     - ${{ inputs.nc }}
