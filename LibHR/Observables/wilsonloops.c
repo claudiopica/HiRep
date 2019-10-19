@@ -660,7 +660,7 @@ void WL_correlators(double** ret, const suNg_field* gf, const suNg* poly, const 
 }
 
 
-
+#if NG==2
 void WL_wilsonloops(double HYP_weight[3]) {
   error(WL_npaths==0,1,"WL_wilsonloops [wilsonloops.c]","No path has been loaded");
   
@@ -727,4 +727,4 @@ void WL_wilsonloops(double HYP_weight[3]) {
   afree(WL[0]);
   afree(WL);
 }
-
+#endif //NG==2

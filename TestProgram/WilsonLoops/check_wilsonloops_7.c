@@ -1,4 +1,5 @@
 /*******************************************************************************
+*  NOCOMPILE= !NG=2
 *
 * Check gauge covariance of the HYP smearing
 *
