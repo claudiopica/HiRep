@@ -2,7 +2,7 @@ TOPDIR = ..
 SUBDIRS := $(shell find * -maxdepth 0 -type d)
 
 #Exclude these directories
-EXCLUDEDIR := TestConfigurations TestConfigurations-test
+EXCLUDEDIR := Update Disconnected RotatedSF
 SUBDIRS := $(filter-out $(EXCLUDEDIR), $(SUBDIRS))
 
 MKDIR = $(TOPDIR)/Make
@@ -13,5 +13,28 @@ tests:
 	do \
 	  $(MAKE) -C $$i ;\
 	done
+
+runalltests: 
+	for i in $(SUBDIRS) ; \
+	do \
+	  echo "-----------------------------------"; echo $$i ; \
+	  $(MAKE) -C $$i runtests;\
+	done
+	echo ; echo "-----------------------------------"; echo "Summary"
+	rm -f .test_failed
+	for i in $(SUBDIRS) ; \
+	do \
+	  if [ -f $$i/.test_failed ];\
+	  then \
+	  	echo "$(_col_failed) $$i failed$(_col_norm)" ;\
+		touch .test_failed ; \
+	  else\
+	  	echo "$(_col_done) $$i OK$(_col_norm)" ;\
+	  fi ;\
+	done
+	if [ -f .test_failed ];\
+	then exit 1 ; \
+	else exit 0 ; \
+	fi
 
 .PHONY: tests

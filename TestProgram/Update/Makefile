@@ -1,7 +1,8 @@
 TOPDIR = ../..
 MKDIR = $(TOPDIR)/Make
 
-EXES = check_update_1
+TESTS = check_update_1
+FAIL =
 
 check_update_1_OBJS = ../../HMC/hmc_utils.o
 

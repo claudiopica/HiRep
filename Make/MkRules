@@ -50,6 +50,7 @@ _col_comp := $(_col_bold)$(_col_blue)
 _col_link := $(_col_background)$(_col_bold)$(_col_blue)
 _col_write := $(_col_bold)$(_col_blue)
 _col_fname := $(_col_bold)
+_col_test := $(_col_background)$(_col_bold)
 _col_done := $(_col_green)
 _col_failed := $(_col_bold)$(_col_blink)$(_col_red)
 
@@ -60,6 +61,7 @@ _testdir = $(subst $(CURDIR)/,,$(dir $(abspath $(1))))
 _cfname = [$(_col_fname)$(1)$(_col_norm)]
 _cfailed := $(_col_failed)failed$(_col_norm)
 _cdone := $(_col_done)done$(_col_norm)
+_cpassed := $(_col_done)passed$(_col_norm)
 
 CDIR = $(call _rname, $(CURDIR))
 LNAME = $(call _rname, $(ALIBNAME))
@@ -207,3 +209,11 @@ endef
 
 $(foreach prog,$(EXES),$(eval $(call LINK_template,$(prog))))
 
+define RUNTEST_template
+echo -n "$(_col_test)["$(1)"]$(_col_norm) ..." ; \
+./$(1) >/dev/null && echo " $(_cpassed)" || ( echo " $(_cfailed)" && touch .test_failed ); 
+endef
+
+runtests:
+	rm -f .test_failed
+	$(foreach prog,$(EXES),$(call RUNTEST_template,$(prog)))
