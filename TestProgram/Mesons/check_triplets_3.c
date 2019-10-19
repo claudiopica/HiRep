@@ -282,9 +282,6 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"mes:csw = %f\n",csw);
 
   unit_u(u_gauge);
-#ifndef REPR_FUNDAMENTAL
-  u_gauge_f=alloc_gfield_f(&glattice);
-#endif
 #ifdef WITH_CLOVER
   clover_init(mes_ip.csw);
 #endif
@@ -298,6 +295,8 @@ int main(int argc,char *argv[])
 
   //int tau, int nm, double* m, int n_mom,int nhits,int conf_num, double precision)
   measure_spectrum_pt(0,1,&mass,1,3,0,1e-14);
+
+  lprintf("MAIN",0,"Checking results\n");
 
   double complex corr_triplets[16][GLB_T];
 

@@ -179,7 +179,7 @@ static void transpose_mat(double complex At[4][4],double complex A[4][4])
 
 
 
-static void print_mat(double complex mat[4][4], const char name[]) {
+static void print_mat2(double complex mat[4][4], const char name[]) {
   int i,j;
   lprintf("MAIN",0,"%s = \n", name);
   for(i=0; i<4; i++) {
@@ -228,7 +228,7 @@ int main(int argc,char *argv[])
   mult_mat(g[15],g[4],g[12]) //  g5g0g3
 
   for(i=0; i<5; i++) {
-    print_mat(g[i],list_g[i]);
+    print_mat2(g[i],list_g[i]);
   }
 
   /* setup process id and communications */

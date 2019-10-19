@@ -2,7 +2,7 @@ TOPDIR = ..
 SUBDIRS := $(shell find * -maxdepth 0 -type d)
 
 #Exclude these directories
-EXCLUDEDIR := Update Disconnected RotatedSF
+EXCLUDEDIR := Update Deflate Disconnected RotatedSF
 SUBDIRS := $(filter-out $(EXCLUDEDIR), $(SUBDIRS))
 
 MKDIR = $(TOPDIR)/Make
@@ -26,7 +26,7 @@ runalltests:
 	do \
 	  if [ -f $$i/.test_failed ];\
 	  then \
-	  	echo "$(_col_failed) $$i failed$(_col_norm)" ;\
+	  	echo "$(_col_failed) $$i FAIL$(_col_norm)" ;\
 		touch .test_failed ; \
 	  else\
 	  	echo "$(_col_done) $$i OK$(_col_norm)" ;\

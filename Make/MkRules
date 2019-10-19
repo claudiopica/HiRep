@@ -51,18 +51,19 @@ _col_comp := $(_col_bold)$(_col_blue)
 _col_link := $(_col_background)$(_col_bold)$(_col_blue)
 _col_write := $(_col_bold)$(_col_blue)
 _col_fname := $(_col_bold)
-_col_test := $(_col_background)$(_col_bold)
+_col_test := $(_col_bold)
 _col_done := $(_col_green)
-_col_failed := $(_col_bold)$(_col_blink)$(_col_red)
+_col_passed := $(_col_background)$(_col_bold)$(_col_green)
+_col_failed := $(_col_background)$(_col_bold)$(_col_blink)$(_col_red)
 
 endif
 
 _rname = $(subst $(abspath $(TOPDIR)),%,$(abspath $(1)))
 _testdir = $(subst $(CURDIR)/,,$(dir $(abspath $(1))))
 _cfname = [$(_col_fname)$(1)$(_col_norm)]
-_cfailed := $(_col_failed)failed$(_col_norm)
 _cdone := $(_col_done)done$(_col_norm)
-_cpassed := $(_col_done)passed$(_col_norm)
+_cfailed := $(_col_failed) FAIL $(_col_norm)
+_cpassed := $(_col_passed) OK $(_col_norm)
 
 CDIR = $(call _rname, $(CURDIR))
 LNAME = $(call _rname, $(ALIBNAME))

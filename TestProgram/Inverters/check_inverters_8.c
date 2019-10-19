@@ -51,6 +51,7 @@ int main(int argc, char *argv[])
   setup_process(&argc, &argv);
 
   setup_gauge_fields();
+  u_gauge_f_flt = alloc_gfield_f_flt(&glattice);
 
   lprintf("MAIN", 0, "Generating a random gauge field... ");
   lprintf("MAIN", 0, "done.\n");

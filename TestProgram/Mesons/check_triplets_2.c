@@ -21,7 +21,7 @@
 
 //#error "Old version of Mesons, it should be updated"
 
-void print_mat(double complex mat[4][4], const char name[]) {
+void print_mat2(double complex mat[4][4], const char name[]) {
   int i,j;
   lprintf("MAIN",0,"%s = \n", name);
   for(i=0; i<4; i++) {
@@ -179,7 +179,7 @@ int main(int argc,char *argv[])
      return_value+=1;
      lprintf("MAIN",0,"ERROR! Bad sign for gamma_5!\n");
    }
-  print_mat(gamma[4],"gamma_5");
+  print_mat2(gamma[4],"gamma_5");
   g5_trace_H(&trace,rmat[0]);
   trace_mat(ctest,rmat);
   ctest -= trace;
@@ -193,7 +193,7 @@ int main(int argc,char *argv[])
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Bad sign for gamma_0!\n");
   }
-  print_mat(gamma[0],"gamma_0");
+  print_mat2(gamma[0],"gamma_0");
   g0_trace_H(&trace,rmat[0]);
   copy_mat(test,rmat);
   mult_mat(test,gamma[4]);
@@ -210,7 +210,7 @@ int main(int argc,char *argv[])
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Bad sign for gamma_1!\n");
   }
-  print_mat(gamma[1],"gamma_1");
+  print_mat2(gamma[1],"gamma_1");
   g1_trace_H(&trace,rmat[0]);
   copy_mat(test,rmat);
   mult_mat(test,gamma[4]);
@@ -227,7 +227,7 @@ int main(int argc,char *argv[])
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Bad sign for gamma_2!\n");
   }
-  print_mat(gamma[2],"gamma_2");
+  print_mat2(gamma[2],"gamma_2");
   g2_trace_H(&trace,rmat[0]);
   copy_mat(test,rmat);
   mult_mat(test,gamma[4]);
@@ -245,7 +245,7 @@ int main(int argc,char *argv[])
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Bad sign for gamma_3!\n");
   }
-  print_mat(gamma[3],"gamma_3");
+  print_mat2(gamma[3],"gamma_3");
   g3_trace_H(&trace,rmat[0]);
   copy_mat(test,rmat);
   mult_mat(test,gamma[4]);
@@ -263,7 +263,7 @@ int main(int argc,char *argv[])
   sqnorm_mat(norm2,test);
   if(norm2 > 1e-15 || sign != 1) {
     return_value+=1;
-    print_mat(Gamma, "id");
+    print_mat2(Gamma, "id");
     lprintf("MAIN",0,"sign = %d\n",sign);
   }
   id_trace_H(&trace,rmat[0]);
@@ -284,7 +284,7 @@ int main(int argc,char *argv[])
   sqnorm_mat(norm2,test);
   if(norm2 > 1e-15 || sign != 1) {
     return_value+=1;
-    print_mat(Gamma, "g0g1");
+    print_mat2(Gamma, "g0g1");
     lprintf("MAIN",0,"sign = %d\n",sign);
   }
   g0g1_trace_H(&trace,rmat[0]);
@@ -304,7 +304,7 @@ int main(int argc,char *argv[])
   sub_mat(test,Gamma);
   sqnorm_mat(norm2,test);
   if(norm2 > 1e-15 || sign != 1) {
-    print_mat(Gamma, "g0g2");
+    print_mat2(Gamma, "g0g2");
     lprintf("MAIN",0,"sign = %d\n",sign);
     return_value+=1;
   }
@@ -325,7 +325,7 @@ int main(int argc,char *argv[])
   sub_mat(test,Gamma);
   sqnorm_mat(norm2,test);
   if(norm2 > 1e-15 || sign != 1) {
-    print_mat(Gamma, "g0g3");
+    print_mat2(Gamma, "g0g3");
     lprintf("MAIN",0,"sign = %d\n",sign);
     return_value+=1;
   }
@@ -347,7 +347,7 @@ int main(int argc,char *argv[])
   sqnorm_mat(norm2,test);
   if(norm2 > 1e-15 || sign != 1) {
     return_value+=1;
-    print_mat(Gamma, "g0g5");
+    print_mat2(Gamma, "g0g5");
     lprintf("MAIN",0,"sign = %d\n",sign);
   }
   g0g5_trace_H(&trace,rmat[0]);
@@ -368,7 +368,7 @@ int main(int argc,char *argv[])
   sqnorm_mat(norm2,test);
   if(norm2 > 1e-15 || sign != -1) {
     return_value+=1;
-    print_mat(Gamma, "g5g1");
+    print_mat2(Gamma, "g5g1");
     lprintf("MAIN",0,"sign = %d\n",sign);
   }
   g5g1_trace_H(&trace,rmat[0]);
@@ -389,7 +389,7 @@ int main(int argc,char *argv[])
   sqnorm_mat(norm2,test);
   if(norm2 > 1e-15 || sign != -1) {
     return_value+=1;
-    print_mat(Gamma, "g5g2");
+    print_mat2(Gamma, "g5g2");
     lprintf("MAIN",0,"sign = %d\n",sign);
   }
   g5g2_trace_H(&trace,rmat[0]);
@@ -410,7 +410,7 @@ int main(int argc,char *argv[])
   sqnorm_mat(norm2,test);
   if(norm2 > 1e-15 || sign != -1) {
     return_value+=1;
-    print_mat(Gamma, "g5g3");
+    print_mat2(Gamma, "g5g3");
     lprintf("MAIN",0,"sign = %d\n",sign);
   }
   g5g3_trace_H(&trace,rmat[0]);
@@ -432,7 +432,7 @@ int main(int argc,char *argv[])
   sqnorm_mat(norm2,test);
   if(norm2 > 1e-15 || sign != -1) {
     return_value+=1;
-    print_mat(Gamma, "g0g5g1");
+    print_mat2(Gamma, "g0g5g1");
     lprintf("MAIN",0,"sign = %d\n",sign);
   }
   g0g5g1_trace_H(&trace,rmat[0]);
@@ -455,7 +455,7 @@ int main(int argc,char *argv[])
   sqnorm_mat(norm2,test);
   if(norm2 > 1e-15 || sign != -1) {
     return_value+=1;
-    print_mat(Gamma, "g0g5g2");
+    print_mat2(Gamma, "g0g5g2");
     lprintf("MAIN",0,"sign = %d\n",sign);
   }
   g0g5g2_trace_H(&trace,rmat[0]);
@@ -477,7 +477,7 @@ int main(int argc,char *argv[])
   sqnorm_mat(norm2,test);
   if(norm2 > 1e-15 || sign != -1) {
     return_value+=1;
-    print_mat(Gamma, "g0g5g3");
+    print_mat2(Gamma, "g0g5g3");
     lprintf("MAIN",0,"sign = %d\n",sign);
   }
   g0g5g3_trace_H(&trace,rmat[0]);
