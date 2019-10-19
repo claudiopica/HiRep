@@ -1,7 +1,8 @@
 TOPDIR = ../..
 MKDIR = $(TOPDIR)/Make
 
-TESTS = check_deflate
+TESTS = 
+FAIL = check_deflate
 
 LIBS += $(TOPDIR)/LibHR/libhr.a
 

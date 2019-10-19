@@ -2,7 +2,7 @@ TOPDIR = ..
 SUBDIRS := $(shell find * -maxdepth 0 -type d)
 
 #Exclude these directories
-EXCLUDEDIR := Update Deflate Disconnected RotatedSF
+EXCLUDEDIR := Update Deflate RotatedSF
 SUBDIRS := $(filter-out $(EXCLUDEDIR), $(SUBDIRS))
 
 MKDIR = $(TOPDIR)/Make
