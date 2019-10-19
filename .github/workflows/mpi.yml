@@ -1,6 +1,9 @@
-name: mpi
+name: ${{ matrix.mpi }}
 
-on: [push]
+on:
+  push:
+    branches:
+      - HiRep-COMP
 
 jobs:
   build:
@@ -10,6 +13,7 @@ jobs:
       # Ensures that jobs are not cancelled is one job fails
       fail-fast: false
       matrix:
+        mpi: [mpi, no-mpi]
         nc: [2, 3]
         repr: [FUND]
     
@@ -17,9 +21,9 @@ jobs:
     - uses: actions/checkout@v1
       with:
         fetch-depth: 1
-        
+
     - uses: ./.github/actions/runtests
       with:
-        mpi: -mpi
+        mpi: -${{ matrix.mpi }}
         nc: ${{ matrix.nc }}
         repr: ${{ matrix.repr }}
