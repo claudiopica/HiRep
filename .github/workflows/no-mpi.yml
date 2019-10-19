@@ -1,4 +1,4 @@
-name: mpi
+name: no-mpi
 
 on:
   push:
@@ -13,7 +13,7 @@ jobs:
       # Ensures that jobs are not cancelled is one job fails
       fail-fast: false
       matrix:
-        mpi: mpi
+        mpi: no-mpi
         nc: [2, 3]
         repr: [FUND]
     
