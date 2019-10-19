@@ -65,7 +65,7 @@ echo "" >> ${FILENAME}
 rm cinfo.tmp
 
 if [ -x "`command -v git`" ]
-    then
+then
     len=`git rev-parse --symbolic-full-name|wc -c`+1
     echo -n "static char CI_gitinfo[${len}] = \"" `git rev-parse --symbolic-full-name` "\";" >>${FILENAME}
     echo "" >> ${FILENAME}
@@ -77,7 +77,7 @@ else
     echo -n "static char CI_gitinfo[1] = \"\";" >> ${FILENAME}
     echo "" >> ${FILENAME}
 
-    echo "static char CI_gitrevisio[11] = \""No version"\";" >>${FILENAME}
+    echo "static char CI_gitrevision[11] = \""No version"\";" >>${FILENAME}
     echo "" >> ${FILENAME}
 fi
 
