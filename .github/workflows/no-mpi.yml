@@ -13,7 +13,6 @@ jobs:
       # Ensures that jobs are not cancelled is one job fails
       fail-fast: false
       matrix:
-        mpi: no-mpi
         nc: [2, 3]
         repr: [FUND]
     
@@ -24,6 +23,6 @@ jobs:
 
     - uses: ./.github/actions/runtests
       with:
-        mpi: -${{ matrix.mpi }}
+        mpi: -no-mpi
         nc: ${{ matrix.nc }}
         repr: ${{ matrix.repr }}
