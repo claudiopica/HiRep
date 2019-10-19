@@ -48,6 +48,7 @@ int main(int argc, char *argv[])
   setup_process(&argc, &argv);
 
   setup_gauge_fields();
+  u_gauge_f_flt = alloc_gfield_f_flt(&glattice);
 
   s0 = alloc_spinor_field_f(2, &glattice);
   s1 = s0 + 1;
@@ -68,7 +69,9 @@ int main(int argc, char *argv[])
   fflush(stdout);
 
   spinor_field_zero_f(s0);
-  gaussian_spinor_field(&(s0[0]));
+  gaussian_spinor_field(s0);
+  lprintf("MAIN", 0, "done.\n");
+
   tau = 1. / sqrt(spinor_field_sqnorm_f(s0));
   spinor_field_mul_f(s0, tau, s0);
   assign_sd2s(f0, s0);
