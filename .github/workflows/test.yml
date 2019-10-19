@@ -1,4 +1,4 @@
-name: C/C++ CI
+name: no-mpi
 
 on: [push]
 
@@ -8,16 +8,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        tag: [6, 8, 10]
+        nc: [2, 3]
+        repr: [FUND]
     
     steps:
     - uses: actions/checkout@v1
-    - name: My first step
-      uses: actions/hello-world-docker-action@master
-      with:
-        who-to-greet: ${{ matrix.tag }}
-    - uses: ./.github/actions/hello
+    - uses: ./.github/actions/runtests
       with: 
-        who-to-greet: ${{ matrix.tag }}
-    - name: configure
-      run: ls 
+        nc: ${{ matrix.nc }}
+        repr: ${{ matrix.repr }}

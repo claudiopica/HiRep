@@ -1,0 +1,23 @@
+name: Run Tests
+description: 'Run HiRep tests'
+inputs:
+  nc:
+    description: 'Number of colors'
+    required: true
+  repr:
+    description: 'Fermion representation'
+    required: true
+
+outputs:
+  time: # id of output
+    description: 'The time we greeted you'
+runs:
+  using: 'docker'
+  image: 'docker://cpica/hr-tests'
+  args:
+    - ./run_tests.sh
+    - -no-mpi
+    - -n
+    - ${{ inputs.nc }}
+    - -r
+    - ${{ inputs.repr }}
