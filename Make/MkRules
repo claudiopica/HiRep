@@ -104,7 +104,7 @@ RBLD = $(if $(DFILES),,rebuild)
 
 %.o: SRC=$(patsubst %.o,%.c,$@)
 %.o: DEP=$(patsubst %.o,.%.d,$@)
-%.o: %.c .%.d $(MKDIR)/MkFlags $(INCDIR)/.autoheaders.h
+%.o: %.c .%.d $(MKDIR)/MkFlags $(INCDIR)/.autoheaders.h $(RBLD)
 	if  test "$(call _testdir, $@)" = ""; then \
 	  if test "$(DFILES)" = ""; then \
 	    MAKEFILES="$(DEP)" $(MAKE) $@ ;\
@@ -116,6 +116,7 @@ RBLD = $(if $(DFILES),,rebuild)
 	else \
 	  MAKEFILES="$(patsubst %.o,.%.d,$(notdir $@))" $(MAKE) -C $(dir $@) $(notdir $@) ;\
 	fi
+
 
 $(INCDIR)/.autoheaders.h: $(MKDIR)/MkFlags 
 	if  test "$(call _testdir, $@)" != ""; then \
@@ -157,7 +158,7 @@ $(LIBS): $(if $(call _testdir, $@),,rebuild) $(INCDIR)/.autoheaders.h
 	  fi ;\
 	fi
 
-.PRECIOUS: %.c
+.PRECIOUS: %.c .%.d
 
 #avoid the use of implicit suffix rules!
 .SUFFIXES:
