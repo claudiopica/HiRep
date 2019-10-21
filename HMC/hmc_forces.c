@@ -32,6 +32,7 @@
 #include "cinfo.c"
 #include "representation.h"
 #include "linear_algebra.h"
+#include "setup.h"
 
 
 
@@ -169,7 +170,6 @@ int main(int argc,char *argv[]) {
   }
   lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS);
   error(1,1,"MAIN","Need to set MEASURE_FORCE macro for program to measure forces\n"); 
-  (void) CI_svnrevision;
 }
 #else
   FILE* list;
