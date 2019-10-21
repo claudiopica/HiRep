@@ -37,6 +37,7 @@ GetOptions(
   'cflags=s'   => \(my $cflags = "-Wall -std=c99 -O3"),
   'ldflags=s'   => \(my $ldflags = ""),
   'include=s'   => \(my $include = ""),
+  'ccache!'   => \(my $ccache = 0),
   'help'     =>   sub { HelpMessage(2) },
 ) or HelpMessage(1);
 
@@ -197,6 +198,7 @@ $force && print $fh "MACRO += -DMEASURE_FORCE\n";
 # write mpi
 $mpi && print $fh "MACRO += -DWITH_MPI\n";
 # write compiler options
+if ($ccache!=0) { $cc="ccache ".$cc; $mpicc="ccache ".$mpicc; }
 print $fh "CC = $cc\n";
 print $fh "MPICC = $mpicc\n";
 print $fh "CFLAGS = $cflags\n";
@@ -231,7 +233,8 @@ write_mkflags - write flags file for compilation of HiRep
   --cflags            [-O3]       Compilation options
   --include           []          Extra include headers
   --ldflags           []          Linking options
-  --[no-]ndebug       [true]      set ndebug flag
+  --[no-]ndebug       [true]      Set ndebug flag
+  --[no-]ccache       [false]     Use ccache
 
   --[no-]eo           [true]      Even-Odd preconditioning
   

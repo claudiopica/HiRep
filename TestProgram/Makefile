@@ -5,14 +5,19 @@ SUBDIRS := $(shell find * -maxdepth 0 -type d)
 EXCLUDEDIR := Update Deflate RotatedSF
 SUBDIRS := $(filter-out $(EXCLUDEDIR), $(SUBDIRS))
 
+LIBS += $(TOPDIR)/LibHR/libhr.a
+
 MKDIR = $(TOPDIR)/Make
 include $(MKDIR)/MkRules
 
-tests: 
+
+tests: $(LIBS)
+	touch $(TOPDIR)/LibHR/.lib.updated
 	for i in $(SUBDIRS) ; \
 	do \
 	  $(MAKE) -C $$i ;\
 	done
+	rm -f touch $(TOPDIR)/LibHR/.lib.updated
 
 runalltests: 
 	for i in $(SUBDIRS) ; \

@@ -12,7 +12,7 @@ MAKEFLAGS += -s
 MAKEFLAGS += -r
 #NO_COLOR_OUT = 1
 
-TESTEXES ?= $(foreach _file, ${TESTS}, $(shell  ${MKDIR}/Utils/check_compile.py -f $(_file) -n ${NG} -r $(REPR)  -g ${GAUGE_GROUP} -s "$(MACRO)" ) )
+TESTEXES ?= $(foreach _file, ${TESTS}, $(shell ${MKDIR}/Utils/check_compile.py -f $(_file) -n ${NG} -r $(REPR)  -g ${GAUGE_GROUP} -s "$(MACRO)" ) )
 EXES += $(TESTEXES)
 SRCS += $(patsubst %,%.c,$(EXES))
 #OBJS = $($(filter-out $(EXCLUDE),$(SRCS)):.c=.o)
@@ -94,8 +94,7 @@ _objs: $(OBJS)
 	if test "$(call _testdir, $@)" = ""; then \
 	  echo -n "$(_col_deps)Dependences$(_col_norm) for $(call _cfname,$(call _rname,$(SRC)))..." ;\
 	  ($(GCC) -MM -MG -MT "$@ $(patsubst .%.d,%.o,$@)" $(CPPFLAGS) $(SRC) > $@ &&\
-	  echo " $(_cdone)" || ( echo " $(_cfailed)" && false ) )&&\
-	  MAKEFILES="$@" $(MAKE) $@ ;\
+	  echo " $(_cdone)" || ( echo " $(_cfailed)" && false ) )\
 	else \
 	  $(MAKE) -C $(dir $@) $(notdir $@) ;\
 	fi
@@ -105,10 +104,9 @@ RBLD = $(if $(DFILES),,rebuild)
 
 %.o: SRC=$(patsubst %.o,%.c,$@)
 %.o: DEP=$(patsubst %.o,.%.d,$@)
-%.o: %.c $(MKDIR)/MkFlags $(RBLD) $(INCDIR)/.autoheaders.h
+%.o: %.c .%.d $(MKDIR)/MkFlags $(INCDIR)/.autoheaders.h
 	if  test "$(call _testdir, $@)" = ""; then \
 	  if test "$(DFILES)" = ""; then \
-	    $(MAKE) $(DEP) &&\
 	    MAKEFILES="$(DEP)" $(MAKE) $@ ;\
 	  else \
 	    echo -n "$(_col_comp)Compiling$(_col_norm) $(call _cfname,$(call _rname,$(CURDIR)/$@))..." ;\
@@ -116,7 +114,7 @@ RBLD = $(if $(DFILES),,rebuild)
 	    echo " $(_cdone)" || ( echo " $(_cfailed)" && false) ;\
 	  fi ;\
 	else \
-	  $(MAKE) -C $(dir $@) $(notdir $@) ;\
+	  MAKEFILES="$(patsubst %.o,.%.d,$(notdir $@))" $(MAKE) -C $(dir $@) $(notdir $@) ;\
 	fi
 
 $(INCDIR)/.autoheaders.h: $(MKDIR)/MkFlags 
@@ -153,9 +151,11 @@ $(ALIBNAME) $(notdir $(ALIBNAME)): $(LIBOBJS) $(OBJ)
 
 
 $(LIBS): $(if $(call _testdir, $@),,rebuild) $(INCDIR)/.autoheaders.h
-	if  test "$(call _testdir, $@)" != ""; then \
-	  $(MAKE) -C $(dir $@) $(notdir $@) ;\
-	fi 
+	if ! test -f $(dir $@)/.lib.updated ; then \
+	  if  test "$(call _testdir, $@)" != ""; then \
+	    $(MAKE) -C $(dir $@) $(notdir $@) ;\
+	  fi ;\
+	fi
 
 .PRECIOUS: %.c
 
@@ -180,7 +180,7 @@ $(patsubst %,clean-%,$(SUBDIRS)):
 
 clean:: $(patsubst %,clean-%,$(SUBDIRS))
 	echo -n "$(_col_clean)Cleaning$(_col_norm) $(call _cfname,$(CDIR))..."
-	rm -f *.o *.rpo *~ *.il *.dyn *.ii *.s .*.d *.a cinfo.c
+	rm -f *.o *.rpo *~ *.il *.dyn *.ii *.s .*.d *.a cinfo.c .lib.updated
 	echo " $(_cdone)"
 	if test "$(EXES)" != "" -a "$(CEXE)" != "" ; then \
 	  echo -n "$(_col_clean)Removing EXEs$(_col_norm) in $(call _cfname,$(CDIR))..." ;\
