@@ -1,6 +1,10 @@
 name: Run Tests
 description: 'Run HiRep tests'
 inputs:
+  ccache:
+    description: "Use ccache"
+    required: true
+    default: -ccache
   mpi:
     description: "Use mpi"
     required: true
@@ -17,6 +21,7 @@ runs:
   image: 'docker://cpica/hr-tests'
   args:
     - ./TestProgram/run_tests.sh
+    - ${{ inputs.ccache }}
     - ${{ inputs.mpi }}
     - -n
     - ${{ inputs.nc }}
