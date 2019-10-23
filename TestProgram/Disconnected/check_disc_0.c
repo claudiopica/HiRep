@@ -340,24 +340,22 @@ int main(int argc,char *argv[])
     lprintf("TEST",0,"LOOPS %s\n", mes_channel_names[i]);
     for(j=0; j<n_mom_tot; j++) {
       lprintf("TEST",0,"%d %e+%e I \t%e(%e)+%e(%e) I \t%e+%e I \n",   i,   creal(ex_loops[i][j]), cimag(ex_loops[i][j]),	     creal(loops[i][j][0]), creal(loops[i][j][1]),	 cimag(loops[i][j][0]),  	 cimag(loops[i][j][1]) ,  creal(ex_loops[i][j]-loops[i][j][0]),  cimag(ex_loops[i][j]-loops[i][j][0]));
+     
       if (creal(ex_loops[i][j]) >  creal(loops[i][j][0]) + creal(loops[i][j][1]) || creal(ex_loops[i][j])  <  creal(loops[i][j][0]) - creal(loops[i][j][1]))
       {
-          return_value +=1;
+          return_value +=1;  
       }
       if (cimag(ex_loops[i][j]) >  cimag(loops[i][j][0]) + cimag(loops[i][j][1]) || cimag(ex_loops[i][j])  <  cimag(loops[i][j][0]) - cimag(loops[i][j][1]))
       {
-        return_value +=1;
+        return_value +=1;      
       }
 
     }
   }
-
-  // The zero momentum scalar loops should match differ from 0.1 % accuracy maximum
-  if (   fabs(creal(ex_loops[8][0] - loops[8][0][0])/creal(ex_loops[8][0])) > 1e-3  )
-  {
-      return_value +=1;
-  }
-
+ 
+  // The zero momentum scalar loops should agree at the 0.1 % level.
+  if (   fabs(creal(ex_loops[8][0] - loops[8][0][0])/creal(ex_loops[8][0])) > 1e-3  )  return_value +=1;
+ 
 
   global_sum_int(&return_value,1);
   lprintf("MAIN", 0, "return_value= %d\n ",  return_value);

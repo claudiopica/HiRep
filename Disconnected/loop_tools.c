@@ -53,12 +53,13 @@ void measure_bilinear_loops_4spinorfield(spinor_field* prop,spinor_field* source
 				double* corr_re[16];
 				double* corr_im[16];
 				suNf_spin_matrix sma,smb, sm1;
-				int size=nm*GLB_T;
+				int NGamma=16;
+				int size=NGamma;
 				int i,ix,t,x,y,z,tc,beta;
 				int tau_min=0;
 				int tau_max=GLB_T;
-			  double complex tr;
-				int NGamma=16;
+			    double complex tr;
+
 
 				int offset=0 ; /* set to 0 just to copy paste some code. I don't know what it  is  originally used for */
 				struct timeval start, end, etime;
@@ -443,6 +444,7 @@ void measure_loops(int nm, double* m, int nhits,int conf_num, double precision,i
 void measure_bilinear_loops_spinorfield(spinor_field* prop,spinor_field* source,int k,int nm, int n_mom)
 {
   int px,py,pz,ip;
+  int NGamma=16;
   int n_mom_tot = n_mom*n_mom*n_mom;
   double pdotx;
   double complex phase;
@@ -453,10 +455,10 @@ void measure_bilinear_loops_spinorfield(spinor_field* prop,spinor_field* source,
   int pt[4];
   pt[0]=pt[1]=pt[2]=pt[3]=0;
 
-  int size=nm*GLB_T;
+  int size= NGamma*n_mom_tot;
   int i,j,ix,t,x,y,z,tc;
 
-  int NGamma=16;
+
 
   int offset=0 ;
   suNf_spinor tmp_spinor;
@@ -474,14 +476,7 @@ void measure_bilinear_loops_spinorfield(spinor_field* prop,spinor_field* source,
     corr_im[j][i]=(double*) malloc(sizeof(double)*size);
   }
 
-  for (j=0;j<n_mom_tot;++j) for (i=0;i<NGamma;++i) for (t=0;t<nm*GLB_T;t++)
-			   {
-					 	_complex_0(corr[j][i][t]);
-			   /*  corr[j][i][t].re=0.0;
-			     corr[j][i][t].im=0.0;
-			     corr_re[j][i][t]=0.0;
-			     corr_im[j][i][t]=0.0;*/
-			   }
+  for (j=0;j<n_mom_tot;++j) for (i=0;i<NGamma;++i) for (t=0;t<nm*GLB_T;t++) 	_complex_0(corr[j][i][t]);
 
 				/* loop on nm if the MMS is used */
 				for(i=0; i<nm; i++)
@@ -497,7 +492,7 @@ void measure_bilinear_loops_spinorfield(spinor_field* prop,spinor_field* source,
 						  ip = 0;
 						  for (px=0;px<n_mom;++px) for (py=0;py<n_mom;++py) for (pz=0;pz<n_mom;++pz) {
 							  pdotx = 2.0*PI*(((double) px)*(x+zerocoord[1]-pt[1])/GLB_X + ((double) py)*(y+zerocoord[2]-pt[2])/GLB_Y + ((double) pz)*(z+zerocoord[3]-pt[3])/GLB_Z);
-							  phase = cos(pdotx) +I*sin(pdotx);
+							  phase = cexp(I*pdotx);
 
 							  _spinor_g5_f(tmp_spinor,*_FIELD_AT(prop,ix));
 							  _spinor_prod_f(tmp,*_FIELD_AT(source,ix),tmp_spinor);
@@ -572,7 +567,6 @@ void measure_bilinear_loops_spinorfield(spinor_field* prop,spinor_field* source,
 				} /* end loop i (nm) */
 
 
-				// the following have to be modified as well !
 				int iGamma;
 				for (t=0;t<T;t++){
 
@@ -581,14 +575,8 @@ void measure_bilinear_loops_spinorfield(spinor_field* prop,spinor_field* source,
 
 						if (iGamma!= 0  && iGamma!=1 &&iGamma!=2 && iGamma!=3 && iGamma!=8 && iGamma!=12)
 						{
-							/* multiply by -i to match old convention [and to have hermitean operators ] */
-							tmp = cimag(corr[j][iGamma][tc]) -I*cimag(corr[j][iGamma][tc]);
-							corr[j][iGamma][tc] = tmp;
-							/*tmp.re = corr[j][iGamma][tc].im;
-							tmp.im = -corr[j][iGamma][tc].re;
-							corr[j][iGamma][tc].re=tmp.re;
-							corr[j][iGamma][tc].im=tmp.im;*/
-
+							/* multiply by -i by convention [to have hermitean operators ] */
+							corr[j][iGamma][tc] = (-I)*corr[j][iGamma][tc];
 						}
 
 						corr_re[j][iGamma][tc]=creal(corr[j][iGamma][tc]);

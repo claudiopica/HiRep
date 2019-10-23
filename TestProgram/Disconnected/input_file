@@ -18,6 +18,6 @@ mes:dilution = 3
 mes:nhits_disc = 64
 
 disc:precision = 1e-20
-disc:nhits = 120
+disc:nhits = 240
 disc:n_mom = 2
 

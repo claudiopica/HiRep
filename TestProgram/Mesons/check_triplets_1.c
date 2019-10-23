@@ -33,6 +33,7 @@
 #include "utils.h"
 #include "logger.h"
 #include "setup.h"
+#include "communications.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338327950288419716939937510
@@ -122,7 +123,7 @@ int main(int argc,char *argv[])
   /* MESONI CON PROPAGATORE POINT-TO-ALL */
 
   g[0]=g[1]=g[2]=g[3]=0;
-  pta_qprop_QMR(g,pta_qprop, 1, &mass, 1e-9);
+  pta_qprop_QMR(g,pta_qprop, 1, &mass, 1e-28);
 
   id_correlator(pta_triplets[A], g[0], pta_qprop[0]);
   g0_correlator(pta_triplets[Xt], g[0], pta_qprop[0]);
@@ -136,15 +137,18 @@ int main(int argc,char *argv[])
 
   /* STAMPA */
 
-  lprintf("TEST",0,"\nANALITICO\tPOINT-TO-ALL\tERROR (must be less than 1e-8)\n");
+  lprintf("TEST",0,"\nANALITICO\tPOINT-TO-ALL\tERROR (must be less than 1e-14)\n");
   for(i=0; i<8; i++) {
     lprintf("TEST",0,"TRIPLET CORRELATOR %s\n", nameT[i]);
     for(t=0; t<GLB_T; t++)
     {
       lprintf("TEST",0,"%e\t%e\t%e\n",ex_triplets[i][t], pta_triplets[i][t], fabs(ex_triplets[i][t]-pta_triplets[i][t]));
-      if (fabs(ex_triplets[i][t]-pta_triplets[i][t]) > 1e-8) return_value +=1;
+      if (fabs(ex_triplets[i][t]-pta_triplets[i][t]) > 1e-14) return_value +=1;
     }
   }
+
+  global_sum_int(&return_value,1);
+  lprintf("MAIN", 0, "return_value= %d\n ",  return_value);
 
   finalize_process();
 
