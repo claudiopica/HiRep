@@ -1,233 +1,216 @@
-/*******************************************************************************
-*
-* Computation of the observable E(t) evolved with the Wilson flow
-*
-*******************************************************************************/
+  /*******************************************************************************
+  *
+  * Test gauge fixing. 
+  * Original : R. Arthur ?
+  * 
+  *******************************************************************************/
 
-#define MAIN_PROGRAM
+  #define MAIN_PROGRAM
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include "io.h"
-#include "random.h"
-#include "error.h"
-#include "geometry.h"
-#include "memory.h"
-#include "statistics.h"
-#include "update.h"
-#include "global.h"
-#include "observables.h"
-#include "suN.h"
-#include "suN_types.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "representation.h"
-#include "utils.h"
-#include "logger.h"
-#include "gaugefix.h"
+  #include <stdlib.h>
+  #include <stdio.h>
+  #include <string.h>
+  #include <math.h>
+  #include "io.h"
+  #include "random.h"
+  #include "error.h"
+  #include "geometry.h"
+  #include "memory.h"
+  #include "statistics.h"
+  #include "update.h"
+  #include "global.h"
+  #include "observables.h"
+  #include "suN.h"
+  #include "suN_types.h"
+  #include "dirac.h"
+  #include "linear_algebra.h"
+  #include "inverters.h"
+  #include "representation.h"
+  #include "utils.h"
+  #include "logger.h"
+  #include "gaugefix.h"
+  #include "setup.h"
+  #include "communications.h"
+  #include "cinfo.c"
 
-#include "cinfo.c"
+  static double calc_plaq_diff(suNg_field* V,suNg_field* W){
+    
+  int mu, nu;
+  int iy,iz;
+  suNg *v1,*v2,*v3,*v4,w1,w2,w3;
+  double pl, E = 0;
 
+  int t, x, y, z, ix; for (t=0; t<T; t++) for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++){ix=ipt(t,x,y,z);
+    for(mu=0;mu<4;mu++) for(nu=mu+1;nu<4;nu++) {
+    
+      iy=iup(ix,mu);
+      iz=iup(ix,nu);
 
-char cnfg_filename[256]="";
-char list_filename[256]="";
-char input_filename[256] = "input_file";
-char output_filename[256] = "gaugefix.out";
-enum { UNKNOWN_CNFG=0, DYNAMICAL_CNFG, QUENCHED_CNFG };
+      v1=_4FIELD_AT(V,ix,mu);
+      v2=_4FIELD_AT(V,iy,nu);
+      v3=_4FIELD_AT(V,iz,mu);
+      v4=_4FIELD_AT(V,ix,nu);
 
+      _suNg_times_suNg(w1,(*v1),(*v2));
+      _suNg_times_suNg(w2,(*v4),(*v3));
+      _suNg_times_suNg_dagger(w3,w1,w2);      
+          
+      _suNg_trace_re(pl,w3);
+      E += pl;
 
-typedef struct {
-  char string[256];
-  int t, x, y, z;
-  int nc, nf;
-  double b, m;
-  int n;
-  int type;
-} filename_t;
+      v1=_4FIELD_AT(W,ix,mu);
+      v2=_4FIELD_AT(W,iy,nu);
+      v3=_4FIELD_AT(W,iz,mu);
+      v4=_4FIELD_AT(W,ix,nu);
+    
+      _suNg_times_suNg(w1,(*v1),(*v2));
+      _suNg_times_suNg(w2,(*v4),(*v3));
+      _suNg_times_suNg_dagger(w3,w1,w2);      
+          
+      _suNg_trace_re(pl,w3);
+      E -= pl;
 
-
-int parse_cnfg_filename(char* filename, filename_t* fn) {
-  int hm;
-  char *tmp = NULL;
-  char *basename;
-
-  basename = filename;
-  while ((tmp = strchr(basename, '/')) != NULL) {
-    basename = tmp+1;
-  }            
-
-/*#ifdef REPR_FUNDAMENTAL*/
-/*#define repr_name "FUN"*/
-/*#elif defined REPR_SYMMETRIC*/
-/*#define repr_name "SYM"*/
-/*#elif defined REPR_ANTISYMMETRIC*/
-/*#define repr_name "ASY"*/
-/*#elif defined REPR_ADJOINT*/
-/*#define repr_name "ADJ"*/
-/*#endif*/
-  hm=sscanf(basename,"%*[^_]_%dx%dx%dx%d%*[Nn]c%dr%*[FSA]%*[UYSD]%*[NMYJ]%*[Nn]f%db%lfm%lfn%d",
-      &(fn->t),&(fn->x),&(fn->y),&(fn->z),&(fn->nc),&(fn->nf),&(fn->b),&(fn->m),&(fn->n));
-  if(hm==9) {
-    fn->m=-fn->m; /* invert sign of mass */
-    fn->type=DYNAMICAL_CNFG;
-    return DYNAMICAL_CNFG;
-  }
-/*#undef repr_name*/
-
-  double kappa;
-  hm=sscanf(basename,"%dx%dx%dx%d%*[Nn]c%d%*[Nn]f%db%lfk%lfn%d",
-      &(fn->t),&(fn->x),&(fn->y),&(fn->z),&(fn->nc),&(fn->nf),&(fn->b),&kappa,&(fn->n));
-  if(hm==9) {
-    fn->m = .5/kappa-4.;
-    fn->type=DYNAMICAL_CNFG;
-    return DYNAMICAL_CNFG;
+    #ifdef PLAQ_WEIGHTS
+      if(plaq_weight!=NULL) pl*=plaq_weight[ix*16+mu*4+nu];
+    #endif
+    
+    }
   }
 
-  hm=sscanf(basename,"%dx%dx%dx%d%*[Nn]c%db%lfn%d",
-      &(fn->t),&(fn->x),&(fn->y),&(fn->z),&(fn->nc),&(fn->b),&(fn->n));
-  if(hm==7) {
-    fn->type=QUENCHED_CNFG;
-    return QUENCHED_CNFG;
+    global_sum(&E, 1);
+    return E/(6.*NG)/GLB_VOLUME;
   }
 
-  hm=sscanf(basename,"%*[^_]_%dx%dx%dx%d%*[Nn]c%db%lfn%d",
-      &(fn->t),&(fn->x),&(fn->y),&(fn->z),&(fn->nc),&(fn->b),&(fn->n));
-  if(hm==7) {
-    fn->type=QUENCHED_CNFG;
-    return QUENCHED_CNFG;
+  static void random_g(suNg_field* g) {
+    _MASTER_FOR(g->type,ix)
+        random_suNg(_FIELD_AT(g,ix));
   }
 
-  fn->type=UNKNOWN_CNFG;
-  return UNKNOWN_CNFG;
-}
+  static void transform_u(suNg_field* out, suNg_field* in, suNg_field* g) { 
+    int iy,mu;
+    suNg v;
 
-
-void read_cmdline(int argc, char* argv[]) {
-  int i, ai=0, ao=0, am=0;
-
-  for (i=1;i<argc;i++) {
-    if (strcmp(argv[i],"-i")==0) ai=i+1;
-    else if (strcmp(argv[i],"-o")==0) ao=i+1;
-    else if (strcmp(argv[i],"-m")==0) am=i;
+    _MASTER_FOR(&glattice,ix) {
+        for (mu=0;mu<4;mu++) {
+          iy=iup(ix,mu);
+          _suNg_times_suNg_dagger(v,*_4FIELD_AT(in,ix,mu),*_FIELD_AT(g,iy));
+          _suNg_times_suNg(*_4FIELD_AT(out,ix,mu),*_FIELD_AT(g,ix),v);
+        }
+    }
   }
 
-  if (am != 0) {
-    print_compiling_info();
-    exit(0);
-  }
-
-  if (ao!=0) strcpy(output_filename,argv[ao]);
-  if (ai!=0) strcpy(input_filename,argv[ai]);
-}
 
 
-int main(int argc,char *argv[]) {
+  int main(int argc,char *argv[]) {
+    int return_value = 0;
+    double p1,p2;
+    double pdiff;
+    double act; 
 
-  char tmp[256];
-  FILE* list;
-  filename_t fpars;
+    /* setup process communications */
+    setup_process(&argc,&argv);
 
-  /* setup process id and communications */
-  read_cmdline(argc, argv);
-  setup_process(&argc,&argv);
+    setup_gauge_fields();
 
-  read_input(glb_var.read,input_filename);
-  setup_replicas();
+    suNg_field* g=alloc_gtransf(&glattice);
+    suNg_field* fixed_gauge=alloc_gfield(&glattice);
+    suNg_field* u_gauge=alloc_gfield(&glattice);
 
-  /* logger setup */
-  /* disable logger for MPI processes != 0 */
-  logger_setlevel(0,70);
-  if (PID!=0) { logger_disable(); }
-  if (PID==0) { 
-    sprintf(tmp,">%s",output_filename); logger_stdout(tmp);
-    sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
-  }
+      // initialise random gauge field
+      lprintf("TEST",0,"Perform test gauge invariance of the gauge fixing with a random gauge field\n");
+      random_u(u_gauge);
+      start_gf_sendrecv(u_gauge);
+      complete_gf_sendrecv(u_gauge);
 
-  lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS); 
-  lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
-  lprintf("MAIN",0,"input file [%s]\n",input_filename); 
-  lprintf("MAIN",0,"output file [%s]\n",output_filename); 
-  if (strcmp(list_filename,"")!=0) lprintf("MAIN",0,"list file [%s]\n",list_filename); 
-  else lprintf("MAIN",0,"cnfg file [%s]\n",cnfg_filename); 
+      // the gauge transformation 
+      random_g(g);
+      start_gt_sendrecv(g);
+      complete_gt_sendrecv(g);
+
+      p1 = calc_plaq(u_gauge);
+      lprintf("TEST",0,"original gauge plaq %1.14f\n",p1);
+
+      transform_u(fixed_gauge,u_gauge,g);
+      start_gf_sendrecv(fixed_gauge);
+      complete_gf_sendrecv(fixed_gauge); 
+
+      p2 = calc_plaq(fixed_gauge);
+      lprintf("TEST",0,"plaq after random gauge tranforamtion %1.14f\n",p2);
+      if (fabs(p1 - p2) > 1e-14 ) return_value+=1;
+    
+
+      pdiff = calc_plaq_diff(u_gauge,fixed_gauge);
+      if (fabs(pdiff) > 1e-14 ) return_value+=1;
+      lprintf("TEST",0,"sum of difference of plaquettes original/gauge transformed field %1.14f\n",pdiff);
+
+    act = gaugefix(0, //= 0, 1, 2, 3 for Coulomb guage else Landau
+    1.8,	//overrelax
+    10000,	//maxit
+    1e-10, //tolerance
+    fixed_gauge //gauge
+    );
+    lprintf("TEST",0,"action  %1.14f\n",act);
+
+    p2 = calc_plaq(fixed_gauge);
+    lprintf("TEST",0,"plaq after random gauge transformation  and gauge fixing %1.14f\n",p2);
+    if (fabs(p1 - p2) > 1e-14 ) return_value+=1;
+
+    pdiff = calc_plaq_diff(u_gauge,fixed_gauge);
+    if (fabs(pdiff) > 1e-14 ) return_value+=1;
+    lprintf("TEST",0,"sum of difference of plaquettes original/gauge transformed  and gauge fixed field %1.14f\n",pdiff);
 
 
-  /* read & broadcast parameters */
-  parse_cnfg_filename(cnfg_filename,&fpars);
 
-  lprintf("MAIN",0,"RLXD [%d,%d]\n",glb_var.rlxd_level,glb_var.rlxd_seed);
-  rlxd_init(glb_var.rlxd_level,glb_var.rlxd_seed+PID);
-  srand(glb_var.rlxd_seed+PID);
+    lprintf("TEST",0,"Perform test gauge invariance of the gauge fixing with a unit gauge field\n");
+    // initialise unit gauge field
+    unit_gauge(u_gauge);
+    start_gf_sendrecv(u_gauge);
+    complete_gf_sendrecv(u_gauge);
 
-  lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
-  lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
+      // the gauge transformation 
+      random_g(g);
+      start_gt_sendrecv(g);
+      complete_gt_sendrecv(g);
 
-  /* setup communication geometry */
-  if (geometry_init() == 1) {
+      p1 = calc_plaq(u_gauge);
+      lprintf("TEST",0,"original gauge plaq %1.14f\n",p1);
+
+      transform_u(fixed_gauge,u_gauge,g);
+      start_gf_sendrecv(fixed_gauge);
+      complete_gf_sendrecv(fixed_gauge); 
+
+      p2 = calc_plaq(fixed_gauge);
+      lprintf("TEST",0,"plaq after random gauge tranforamtion %1.14f\n",p2);
+      if (fabs(p1 - p2) > 1e-14 ) return_value+=1;
+    
+
+      pdiff = calc_plaq_diff(u_gauge,fixed_gauge);
+      if (fabs(pdiff) > 1e-14 ) return_value+=1;
+      lprintf("TEST",0,"sum of difference of plaquettes original/gauge transformed field %1.14f\n",pdiff);
+
+    act = gaugefix(0, //= 0, 1, 2, 3 for Coulomb guage else Landau
+    1.8,	//overrelax
+    10000,	//maxit
+    1e-10, //tolerance
+    fixed_gauge //gauge
+    );
+      lprintf("TEST",0,"action  %1.14f\n",act);
+
+    p2 = calc_plaq(fixed_gauge);
+    lprintf("TEST",0,"plaq after random gauge transformation  and gauge fixing %1.14f\n",p2);
+    if (fabs(p1 - p2) > 1e-14 ) return_value+=1;
+
+    pdiff = calc_plaq_diff(u_gauge,fixed_gauge);
+    if (fabs(pdiff) > 1e-14 ) return_value+=1;
+    lprintf("TEST",0,"sum of difference of plaquettes original/gauge transformed  and gauge fixed field %1.14f\n",pdiff);
+
+
+
+    global_sum_int(&return_value,1);
+    lprintf("MAIN", 0, "return_value= %d\n ",  return_value);
+
     finalize_process();
-    return 0;
+    
+    return return_value;
   }
-
-  /* setup lattice geometry */
-  geometry_mpi_eo();
-  /* test_geometry_mpi_eo(); */
-  
-  BCs_pars_t BCs_pars = {
-    .fermion_twisting_theta = {0.,0.,0.,0.},
-    .gauge_boundary_improvement_cs = 1.,
-#ifdef ROTATED_SF
-    .gauge_boundary_improvement_ct = WF_var.SF_ct,
-#else
-    .gauge_boundary_improvement_ct = 1.,
-#endif
-    .chiSF_boundary_improvement_ds = 1.,
-    .SF_BCs = 1
-  };
-
-  init_BCs(&BCs_pars);
-
-  /* alloc global gauge fields */
-  u_gauge=alloc_gfield(&glattice);
-#ifdef ALLOCATE_REPR_GAUGE_FIELD
-  u_gauge_f=alloc_gfield_f(&glattice);
-#endif
-  suNg_field* fixed_gauge=NULL;
-  fixed_gauge=alloc_gfield(&glattice);
-
-  //Set fixed_gauge to a unit config
-  unit_gauge(fixed_gauge);
-  double p2 = calc_plaq(fixed_gauge);
-    lprintf("TEST",0,"unit_gauge plaq %1.6f\n",p2);
-
-  //random gauge transform on all the links
-  random_gauge_transform(fixed_gauge);
-  p2 = calc_plaq(fixed_gauge);
-    lprintf("TEST",0,"gt unit_gauge plaq %1.6f\n",p2);
-
-    double act = gaugefix(0, //= 0, 1, 2, 3 for Coulomb guage else Landau
-	1.8,	//overrelax
-	10000,	//maxit
-	1e-10, //tolerance
-	fixed_gauge //gauge
-	);
-    lprintf("TEST",0,"action  %1.6f\n",act);
-
-  p2 = calc_plaq(fixed_gauge);
-  lprintf("TEST",0,"fixed_gauge plaq %1.6f\n",p2);
-
-  suNg_field_copy(u_gauge,fixed_gauge); //u_gauge = fixed_gauge
-  represent_gauge_field(); //u_gauge_f = represented fixed_gauge
-
-  
-
-  free_BCs();
- 
-  free_gfield(u_gauge);
-
-  finalize_process();
-  
-  return 0;
-}
 
