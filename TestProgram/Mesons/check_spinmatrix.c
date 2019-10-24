@@ -30,6 +30,7 @@
 #include "logger.h"
 #include "setup.h"
 #include "spin_matrix.h"
+#include "communications.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338327950288419716939937510
@@ -303,8 +304,8 @@ int main(int argc,char *argv[])
 
 
   finalize_process();
-
-  printf("return_value = %d\n", return_value);
+  global_sum_int(&return_value,1);
+  lprintf("MAIN", 0, "return_value= %d\n ",  return_value);
 
  return return_value;
 }

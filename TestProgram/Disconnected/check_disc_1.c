@@ -334,6 +334,10 @@ int main(int argc,char *argv[])
   }
 
 
+
+  global_sum_int(&return_value,1);
+  lprintf("MAIN", 0, "return_value= %d\n ",  return_value);
+  
   finalize_process();
   return return_value;
 }

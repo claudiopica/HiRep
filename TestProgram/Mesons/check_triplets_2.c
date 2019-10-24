@@ -17,6 +17,7 @@
 #include "observables.h"
 #include "logger.h"
 #include "random.h"
+#include "communications.h"
 
 
 //#error "Old version of Mesons, it should be updated"
@@ -745,6 +746,8 @@ printf("return_value tmp = %d\n", return_value);
   }
 
   lprintf("MAIN",0,"End of tests\n");
-
+  global_sum_int(&return_value,1);
+  lprintf("MAIN", 0, "return_value= %d\n ",  return_value);
+  
   return return_value;
   }
