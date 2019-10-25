@@ -18,7 +18,7 @@
 #include "logger.h"
 #include "random.h"
 #include "communications.h"
-
+#include "setup.h"
 
 //#error "Old version of Mesons, it should be updated"
 
@@ -166,6 +166,7 @@ int main(int argc,char *argv[])
 	double norm2;
 	suNf_spinor in, out, stest;
 
+  setup_process(&argc,&argv);
 
   rlxd_init(1,time(NULL));
   gauss((double*)rmat,32);
@@ -492,8 +493,6 @@ int main(int argc,char *argv[])
     lprintf("MAIN",0,"ERROR! Trace mismatch for g0g5g3! trace=(%f,%f) ctest=(%e,%e)\n",creal(trace),cimag(trace),creal(ctest),cimag(ctest));
   }
 
-printf("return_value tmp = %d\n", return_value);
-
 
   lprintf("MAIN",0,"*********************************************************\n");
   lprintf("MAIN",0,"Checking GAMMA_eval_g5GammaDag_times_spinor functions...\n");
@@ -749,5 +748,7 @@ printf("return_value tmp = %d\n", return_value);
   global_sum_int(&return_value,1);
   lprintf("MAIN", 0, "return_value= %d\n ",  return_value);
   
+  finalize_process();
+
   return return_value;
   }

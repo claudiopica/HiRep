@@ -4,8 +4,8 @@
 *
 * File check_disc_1.c
 *
-* Check of the  disc loops (free case): discon volume source (type = 1)
-*
+* Check of the  disc loops (free case): gauge fixed wall source (type = 1) 
+* VD: OES NOT WORK.
 * Author: Vincent Drach
 *
 ******************************************************************************/
