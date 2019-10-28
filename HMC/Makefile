@@ -3,7 +3,7 @@ MKDIR = $(TOPDIR)/Make
 
 EXES = hmc hmc_forces
 
-hmc_OBJS = hmc_utils.o ../Spectrum/meson_measurements.o ../GaugeFix/gaugefix.o
+hmc_OBJS = hmc_utils.o ../Spectrum/meson_measurements.o 
 
 hmc_forces_OBJS =  hmc_utils.o
 

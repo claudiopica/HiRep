@@ -1,8 +1,8 @@
-// This code will contain all the contractions necessary for rho to pi pi scattering
 /******************************************************************************
  *
  *
- * File check_scatter_rhopipi.c
+ * File scatter.c
+ * This code  contains all the contractions necessary for rho to pi pi scattering
  * Checks of the rho to pi pi calculations (free case) with point source?
  *
  * Author: Tadeusz Janowski
