@@ -19,7 +19,6 @@ struct meson_observable_s {
   int corr_size;
   double* corr_re;
   double* corr_im;
-  double complex * corr;
   struct meson_observable_s* next;
 };
 

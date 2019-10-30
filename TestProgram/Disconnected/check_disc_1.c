@@ -4,8 +4,8 @@
 *
 * File check_disc_1.c
 *
-* Check of the  disc loops (free case): discon volume source (type = 1)
-*
+* Check of the  disc loops (free case): gauge fixed wall source (type = 1) 
+* VD: OES NOT WORK.
 * Author: Vincent Drach
 *
 ******************************************************************************/
@@ -334,6 +334,10 @@ int main(int argc,char *argv[])
   }
 
 
+
+  global_sum_int(&return_value,1);
+  lprintf("MAIN", 0, "return_value= %d\n ",  return_value);
+  
   finalize_process();
   return return_value;
 }

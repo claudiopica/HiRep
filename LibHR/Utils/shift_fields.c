@@ -5,6 +5,7 @@
 #include "linear_algebra.h"
 #include "communications.h"
 #include "update.h"
+
 void shift_fields(int *shift, spinor_field *sin, suNg_field *uin, spinor_field *sout, suNg_field *uout)
 {
 

@@ -356,7 +356,6 @@ int main(int argc,char *argv[])
   // The zero momentum scalar loops should agree at the 0.1 % level.
   if (   fabs(creal(ex_loops[8][0] - loops[8][0][0])/creal(ex_loops[8][0])) > 1e-3  )  return_value +=1;
  
-
   global_sum_int(&return_value,1);
   lprintf("MAIN", 0, "return_value= %d\n ",  return_value);
 

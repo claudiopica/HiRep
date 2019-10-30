@@ -79,8 +79,8 @@ void init_mo(meson_observable* mo, char* name, int size)
   mo->corr_size=size;
   mo->corr_re = (double * ) malloc(size * sizeof(double));
   mo->corr_im = (double * ) malloc(size * sizeof(double));
-  mo->corr = (double complex * ) malloc(size * sizeof(double complex));
-  if (mo->corr_re == NULL || mo->corr_im == NULL|| mo->corr== NULL)
+  
+  if (mo->corr_re == NULL || mo->corr_im == NULL)
   {
     fprintf(stderr, "malloc failed in init_mo \n");
     return;
@@ -90,7 +90,6 @@ void init_mo(meson_observable* mo, char* name, int size)
   {
     mo->corr_re[i]=0.0;
     mo->corr_im[i]=0.0;
-    mo->corr[i]=0.0;
   }
 }
 
@@ -105,7 +104,6 @@ void reset_mo(meson_observable* mo)
   {
     mo->corr_re[i]=0.0;
     mo->corr_im[i]=0.0;
-    mo->corr[i]=0.0;
   }
 }
 
@@ -120,11 +118,11 @@ static void do_global_sum(meson_observable* mo, double norm){
   while (motmp!=NULL){
       global_sum(motmp->corr_re,motmp->corr_size);
       global_sum(motmp->corr_im,motmp->corr_size);
-      global_sum((double *)(motmp->corr),2*motmp->corr_size);
+
       for(i=0; i<motmp->corr_size; i++){
 	motmp->corr_re[i] *= norm;
 	motmp->corr_im[i] *= norm;
-    motmp->corr[i] *= norm;
+
       }
     motmp=motmp->next;
  }
@@ -166,7 +164,6 @@ void free_mo(meson_observable* mo)
 {
   free(mo->corr_re);
   free(mo->corr_im);
-  free(mo->corr);
   free(mo);
 }
 

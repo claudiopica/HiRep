@@ -30,6 +30,7 @@
 #include "logger.h"
 #include "setup.h"
 #include "spin_matrix.h"
+#include "communications.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338327950288419716939937510
@@ -202,9 +203,15 @@ int main(int argc,char *argv[])
   suNf_spin_matrix smb[16];
   double complex g[16][4][4];
   char *list_g[16] = {"g0","g1","g2","g3","g5","g0g5","g5g0","g5g1","g5g2","g5g3","g0g1","g0g2","g0g3","g5g0g1","g5g0g2","g5g0g3"} ;
+
   int return_value=0;
+
+  /* setup process id and communications */
+  setup_process(&argc,&argv);
+
   logger_map("DEBUG","debug");
 
+  
   set_zero_mat(g[6]);
   set_zero_mat(g[13]);
   set_zero_mat(g[14]);
@@ -231,8 +238,6 @@ int main(int argc,char *argv[])
     print_mat2(g[i],list_g[i]);
   }
 
-  /* setup process id and communications */
-  setup_process(&argc,&argv);
 
   // initialise random spinmatrix: sma
 
@@ -302,9 +307,10 @@ int main(int argc,char *argv[])
 
 
 
+  
+  global_sum_int(&return_value,1);
+  lprintf("MAIN", 0, "return_value= %d\n ",  return_value);
   finalize_process();
-
-  printf("return_value = %d\n", return_value);
-
+  
  return return_value;
 }

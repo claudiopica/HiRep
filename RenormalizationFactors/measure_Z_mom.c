@@ -36,6 +36,7 @@
 #include "gaugefix.h"
 #include "spin_matrix.h"
 #include "propagator.h"
+#include "setup.h"
 
 #include "cinfo.c"
 
@@ -54,10 +55,13 @@ static void twist_XYZ_bc(double theta_x, double theta_y, double theta_z) {
   int ix,iy,iz,it;
   suNf *u;
   suNf utmp;
-  complex eith_x, eith_y, eith_z;
-  eith_x.re = cos(PI*theta_x/(double)GLB_X); eith_x.im = sin(PI*theta_x/(double)GLB_X);
-  eith_y.re = cos(PI*theta_y/(double)GLB_Y); eith_y.im = sin(PI*theta_y/(double)GLB_Y);
-  eith_z.re = cos(PI*theta_z/(double)GLB_Z); eith_z.im = sin(PI*theta_z/(double)GLB_Z);
+  double complex eith_x, eith_y, eith_z;
+  eith_x = cexp(I*PI*theta_x/(double)GLB_X);
+  eith_y = cexp(I*PI*theta_y/(double)GLB_Y);
+  eith_z = cexp(I*PI*theta_z/(double)GLB_Z);
+  //  eith_x.re = cos(PI*theta_x/(double)GLB_X); eith_x.im = sin(PI*theta_x/(double)GLB_X);
+  //eith_y.re = cos(PI*theta_y/(double)GLB_Y); eith_y.im = sin(PI*theta_y/(double)GLB_Y);
+  //eith_z.re = cos(PI*theta_z/(double)GLB_Z); eith_z.im = sin(PI*theta_z/(double)GLB_Z);
 
   for (it=0;it<T_EXT;++it) for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
           index=ipt_ext(it,ix,iy,iz);
@@ -77,6 +81,7 @@ static void twist_XYZ_bc(double theta_x, double theta_y, double theta_z) {
 /* Renormalization parameters */
 typedef struct _input_renormalization {
   char mstring[256];
+  char configlist[256]; /* list of configuration */
   double precision;
   int ne;
   int n_mom;
@@ -91,13 +96,14 @@ typedef struct _input_renormalization {
   int pz_in;
 
   /* for the reading function */
-  input_record_t read[14];
+  input_record_t read[15];
 } input_renormalization;
 
 #define init_input_renormalization(varname)                             \
   {                                                                     \
     .read={                                                             \
       {"quark quenched masses", "mes:masses = %s", STRING_T, (varname).mstring}, \
+      {"Configuration list:", "mes:configlist = %s", STRING_T, &(varname).configlist},\
       {"inverter precision", "mes:precision = %lf", DOUBLE_T, &(varname).precision}, \
       {"non-excepional configuration or not?", "mes:ne = %d", INT_T, &(varname).ne}, \
       {"number of momenta in each direction", "mes:n_mom = %d", INT_T, &(varname).n_mom}, \
@@ -190,48 +196,10 @@ int parse_cnfg_filename(char* filename, filename_t* fn) {
 }
 
 
-void read_cmdline(int argc, char* argv[]) {
-  int i, ai=0, ao=0, ac=0, al=0, am=0;
-  FILE *list=NULL;
-  
-  for (i=1;i<argc;i++) {
-    if (strcmp(argv[i],"-i")==0) ai=i+1;
-    else if (strcmp(argv[i],"-o")==0) ao=i+1;
-    else if (strcmp(argv[i],"-c")==0) ac=i+1;
-    else if (strcmp(argv[i],"-l")==0) al=i+1;
-    else if (strcmp(argv[i],"-m")==0) am=i;
-  }
-
-  if (am != 0) {
-    print_compiling_info();
-    exit(0);
-  }
-
-  if (ao!=0) strcpy(output_filename,argv[ao]);
-  if (ai!=0) strcpy(input_filename,argv[ai]);
-
-  error((ac==0 && al==0) || (ac!=0 && al!=0),1,"parse_cmdline [measure_Z_mom.c]",
-        "Syntax: measure_Z_mom { -c <config file> | -l <list file> } [-i <input file>] [-o <output file>]");
-
-  if(ac != 0) {
-    strcpy(cnfg_filename,argv[ac]);
-    strcpy(list_filename,"");
-  } else if(al != 0) {
-    strcpy(list_filename,argv[al]);
-    error((list=fopen(list_filename,"r"))==NULL,1,"parse_cmdline [measure_Z_mom.c]" ,
-          "Failed to open list file\n");
-    error(fscanf(list,"%s",cnfg_filename)==0,1,"parse_cmdline [measure_Z_mom.c]" ,
-          "Empty list file\n");
-    fclose(list);
-  }
-
-
-}
 
 
 int main(int argc,char *argv[]) {
   int i,k;
-  char tmp[256], *cptr;
   FILE* list;
   filename_t fpars;
   int nm;
@@ -241,43 +209,20 @@ int main(int argc,char *argv[]) {
   spinor_field* prop_in;
   spinor_field* prop_out;
 
-  /* setup process id and communications */
-  read_cmdline(argc, argv);
+  /* setup process communications */
   setup_process(&argc,&argv);
 
-  read_input(glb_var.read,input_filename);
-  setup_replicas();
+  setup_gauge_fields();
 
-  /* logger setup */
-  /* disable logger for MPI processes != 0 */
-  logger_setlevel(0,10);
-  if (PID!=0) { logger_disable(); }
-  if (PID==0) { 
-    sprintf(tmp,">%s",output_filename); logger_stdout(tmp);
-    sprintf(tmp,"err_%d",PID); 
-    if (!freopen(tmp,"w",stderr)) lprintf("MAIN",0,"Error out not open\n");
-  }
-
+  read_input(mes_var.read,get_input_filename());
+  strcpy(list_filename,mes_var.configlist);
+  
   lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS); 
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
   lprintf("MAIN",0,"input file [%s]\n",input_filename); 
   lprintf("MAIN",0,"output file [%s]\n",output_filename); 
-  if (list_filename!=NULL) lprintf("MAIN",0,"list file [%s]\n",list_filename); 
+  if (strcmp(list_filename,"")!=0) lprintf("MAIN",0,"list file [%s]\n",list_filename); 
   else lprintf("MAIN",0,"cnfg file [%s]\n",cnfg_filename); 
-
-
-  /* read & broadcast parameters */
-  parse_cnfg_filename(cnfg_filename,&fpars);
-  read_input(mes_var.read,input_filename);
-
-  GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
-  error(fpars.type==UNKNOWN_CNFG,1,"measure_Z_mom.c","Bad name for a configuration file");
-  error(fpars.nc!=NG,1,"measure_Z_mom.c","Bad NG");
-
-  read_input(rlx_var.read,input_filename);
-  lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed);
-  rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
-  srand(rlx_var.rlxd_seed+MPI_PID);
 
 #ifdef GAUGE_SON
   lprintf("MAIN",0,"Gauge group: SO(%d)\n",NG);
@@ -286,43 +231,10 @@ int main(int argc,char *argv[]) {
 #endif
   lprintf("MAIN",0,"Fermion representation: " REPR_NAME " [dim=%d]\n",NF);
 
-  nm=0;
-  if(fpars.type==DYNAMICAL_CNFG) {
-    nm=1;
-    m[0] = fpars.m;
-  } else if(fpars.type==QUENCHED_CNFG) {
-    strcpy(tmp,mes_var.mstring);
-    cptr = strtok(tmp, ";");
-    nm=0;
-    while(cptr != NULL) {
-      m[nm]=atof(cptr);
-      nm++;
-      cptr = strtok(NULL, ";");
-    }            
-  }
-
-
-  /* setup communication geometry */
-  if (geometry_init() == 1) {
-    finalize_process();
-    return 0;
-  }
-
-  /* setup lattice geometry */
-  geometry_mpi_eo();
-  /* test_geometry_mpi_eo(); */
-
-  init_BCs(NULL);
-
-  /* alloc global gauge fields */
-  u_gauge=alloc_gfield(&glattice);
-  suNg_field* u_gauge_old=alloc_gfield(&glattice);
-  
-#ifdef ALLOCATE_REPR_GAUGE_FIELD
-  u_gauge_f=alloc_gfield_f(&glattice);
-#endif
+  nm=1;
 
   lprintf("MAIN",0,"Inverter precision = %e\n",mes_var.precision);
+  m[0] = -atof(mes_var.mstring);
   for(k=0;k<nm;k++)
     lprintf("MAIN",0,"Mass[%d] = %f\n",k,m[k]);
 
@@ -345,6 +257,7 @@ int main(int argc,char *argv[]) {
   prop_out = alloc_spinor_field_f(4*nm*NF,&glattice);
 
   suNf_field* u_gauge_old_f=alloc_gfield_f(&glattice);
+  suNg_field* u_gauge_old=alloc_gfield(&glattice);
 
   while(1) {
     struct timeval start, end, etime;
@@ -354,9 +267,16 @@ int main(int argc,char *argv[]) {
 
     i++;
 
+  
+    parse_cnfg_filename(cnfg_filename,&fpars);
+
+    GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
+    error(fpars.type==UNKNOWN_CNFG,1,"measure_Z_mom.c","Bad name for a configuration file");
+    error(fpars.nc!=NG,1,"measure_Z_mom.c","Bad NG");
+    
     lprintf("MAIN",0,"Configuration from %s\n", cnfg_filename);
     read_gauge_field(cnfg_filename);
-    //unit_gauge(u_gauge);
+   
     suNg_field_copy(u_gauge_old,u_gauge);
     represent_gauge_field();
 
