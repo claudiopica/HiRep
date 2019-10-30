@@ -313,6 +313,8 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
         .SF_BCs = 0};
     init_BCs(&BCs_pars);
 
+    init_gauge_anisotropy(&(pg_var_ml.anisotropy));
+
     /* init gauge field */
     switch (start_t)
     {
@@ -330,8 +332,6 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
 
     apply_BCs_on_fundamental_gauge_field();
     represent_gauge_field();
-
-    init_gauge_anisotropy(&(pg_var_ml.anisotropy));
 
     read_input(WF_var.read, ifile);
 

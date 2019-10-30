@@ -46,7 +46,7 @@ void _group_represent2(suNf *v, suNg *u)
         for (i = 0; i < NG; i++)
           for (j = i; j < NG; j++)
           {
-            *XG(mf, i, j) = I*((*XG(uf, i, a)) * conj(*XG(uf, j, b))) - I*((*XG(uf, i, b)) * conj(*XG(uf, j, a)));
+            *XG(mf, i, j) = I * ((*XG(uf, i, a)) * conj(*XG(uf, j, b))) - I * ((*XG(uf, i, b)) * conj(*XG(uf, j, a)));
             /* XG(mf,i,j)->im = XG(uf,i,a)->re*XG(uf,j,b)->re+XG(uf,i,a)->im*XG(uf,j,b)->im-XG(uf,i,b)->re*XG(uf,j,a)->re-XG(uf,i,b)->im*XG(uf,j,a)->im; */
             /* XG(mf,i,j)->re = +XG(uf,i,a)->re*XG(uf,j,b)->im-XG(uf,i,a)->im*XG(uf,j,b)->re-XG(uf,i,b)->re*XG(uf,j,a)->im+XG(uf,i,b)->im*XG(uf,j,a)->re; */
           }
@@ -231,7 +231,7 @@ void _group_represent_flt(suNf_flt *v, suNg_flt *u)
         for (i = 0; i < NG; i++)
           for (j = i; j < NG; j++)
           {
-            *XG(mf, i, j) = I*((*XG(uf, i, a)) * conj(*XG(uf, j, b))) - I*((*XG(uf, i, b)) * conj(*XG(uf, j, a)));
+            *XG(mf, i, j) = I * ((*XG(uf, i, a)) * conj(*XG(uf, j, b))) - I * ((*XG(uf, i, b)) * conj(*XG(uf, j, a)));
             /* XG(mf,i,j)->im = XG(uf,i,a)->re*XG(uf,j,b)->re+XG(uf,i,a)->im*XG(uf,j,b)->im-XG(uf,i,b)->re*XG(uf,j,a)->re-XG(uf,i,b)->im*XG(uf,j,a)->im; */
             /* XG(mf,i,j)->re = +XG(uf,i,a)->re*XG(uf,j,b)->im-XG(uf,i,a)->im*XG(uf,j,b)->re-XG(uf,i,b)->re*XG(uf,j,a)->im+XG(uf,i,b)->im*XG(uf,j,a)->re; */
           }
@@ -396,24 +396,26 @@ void represent_gauge_field()
 
 #ifdef ALLOCATE_REPR_GAUGE_FIELD
   /* loop on local lattice first */
-  _MASTER_FOR(&glattice, ix)
+  /* loop on the rest of master sites */
+  _OMP_PRAGMA(_omp_parallel)
+  for (int ip = 0; ip < glattice.local_master_pieces; ip++)
   {
-    //  for(ip=0;ip<glattice.local_master_pieces;ip++)
-    //    for(ix=glattice.master_start[ip];ix<=glattice.master_end[ip];ix++)
-    for (int mu = 0; mu < 4; mu++)
-    {
+    _OMP_PRAGMA(_omp_for)
+    for (int ix = glattice.master_start[ip]; ix <= glattice.master_end[ip]; ix++)
+      for (int mu = 0; mu < 4; mu++)
+      {
 #ifdef WITH_SMEARING
-      suNg *u = _4FIELD_AT(u_gauge_s, ix, mu);
+        suNg *u = _4FIELD_AT(u_gauge_s, ix, mu);
 #else
-      suNg *u = pu_gauge(ix, mu);
+        suNg *u = pu_gauge(ix, mu);
 #endif //WITH_SMEARING
-      suNf *Ru = pu_gauge_f(ix, mu);
+        suNf *Ru = pu_gauge_f(ix, mu);
 #ifdef UNROLL_GROUP_REPRESENT
-      _group_represent(*Ru, *u);
+        _group_represent(*Ru, *u);
 #else
-      _group_represent2(Ru, u);
+        _group_represent2(Ru, u);
 #endif
-    }
+      }
   }
 
   /* wait gauge field transfer */
