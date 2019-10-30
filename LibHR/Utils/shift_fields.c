@@ -5,6 +5,7 @@
 #include "linear_algebra.h"
 #include "communications.h"
 #include "update.h"
+#include <stdio.h>
 
 void shift_fields(int *shift, spinor_field *sin, suNg_field *uin, spinor_field *sout, suNg_field *uout)
 {
@@ -78,14 +79,21 @@ void shift_fields(int *shift, spinor_field *sin, suNg_field *uin, spinor_field *
   stmp[0] = sin;
   stmp[1] = sbuf[1];
 
-  lprintf("INSIDE", 0, "total_shift =  %d\n", total_shift);
+  if (uin != NULL)
+  {
+    start_gf_sendrecv(uin);
+    complete_gf_sendrecv(uin);
+  }
+  if (sin != NULL)
+  {
+    start_sf_sendrecv(sin);
+    complete_sf_sendrecv(sin);
+  }
 
   for (int i = 0; i < total_shift; i++)
   {
-    if (i == total_shift - 1)
+    if (i == total_shift - 1 && total_shift != 1)
     {
-      lprintf("INSIDE", 0, "ci arrivo \n");
-
       utmp[1] = uout;
       stmp[1] = sout;
     }
@@ -107,13 +115,13 @@ void shift_fields(int *shift, spinor_field *sin, suNg_field *uin, spinor_field *
       dd = 3;
     }
 
+
     for (x0 = 0; x0 < T_EXT; x0++)
       for (x1 = 0; x1 < X_EXT; x1++)
         for (x2 = 0; x2 < Y_EXT; x2++)
           for (x3 = 0; x3 < Z_EXT; x3++)
           {
-
-            ipin = ipt(x0, x1, x2, x3);
+            ipin = ipt_ext(x0, x1, x2, x3);
             ipout = iup(ipin, dd);
             if (ipin != -1 && ipout != -1)
             {
@@ -165,11 +173,17 @@ void shift_fields(int *shift, spinor_field *sin, suNg_field *uin, spinor_field *
   }
   if (uin != NULL)
   {
+    if (total_shift == 1)
+      suNg_field_copy(uout, utmp[0]);
+
     free_gfield(ubuf[0]);
     free_gfield(ubuf[1]);
   }
   if (sin != NULL)
   {
+    if (total_shift == 1)
+      spinor_field_copy_f(sout, stmp[0]);
+
     free_spinor_field_f(sbuf[0]);
     free_spinor_field_f(sbuf[1]);
   }
