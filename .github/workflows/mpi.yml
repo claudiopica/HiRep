@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         nc: [2, 3]
-        repr: [FUND]
+        repr: [FUND, ADJ]
     
     steps:
     - uses: actions/checkout@v1
