@@ -186,12 +186,12 @@ static void calculate_stfld(int comm)
 			{
 				int n = ib[k][i];
 #ifdef WITH_MPI
-				MPI_Sendrecv(stfld[k] + 3 * glattice.sbuf_start[n],
+				MPI_Sendrecv((double * )(stfld[k] + 3 * glattice.sbuf_start[n]),
 							 glattice.sbuf_len[n] * sizeof(suNg) / sizeof(double) * 3,
 							 MPI_DOUBLE,
 							 glattice.sbuf_to_proc[n],
 							 4 * k + i,
-							 stfld[k] + 3 * glattice.rbuf_start[n],
+							 (double * )(stfld[k] + 3 * glattice.rbuf_start[n]),
 							 glattice.rbuf_len[n] * sizeof(suNg) / sizeof(double) * 3,
 							 MPI_DOUBLE,
 							 glattice.rbuf_from_proc[n],

@@ -277,7 +277,7 @@ void WL_Hamiltonian_gauge(suNg_field* out, suNg_field* in) {
 #ifdef WITH_MPI  
   if(COORD[0]!=0) {
     MPI_Status status;
-    MPIRET(mpiret) MPI_Recv(buf_gtf[1], /* buffer */
+    MPIRET(mpiret) MPI_Recv((double * )(buf_gtf[1]), /* buffer */
         (X*Y*Z)*sizeof(suNg)/sizeof(double), /* lenght in units of doubles */
         MPI_DOUBLE, /* basic datatype */
         proc_dn(CID,0), /* cid of origin */
@@ -321,7 +321,7 @@ void WL_Hamiltonian_gauge(suNg_field* out, suNg_field* in) {
   
 #ifdef WITH_MPI  
   if(COORD[0]!=NP_T-1) {
-    MPIRET(mpiret) MPI_Send(buf_gtf[0], /* buffer */
+    MPIRET(mpiret) MPI_Send((double * )(buf_gtf[0]), /* buffer */
         (X*Y*Z)*sizeof(suNg)/sizeof(double), /* lenght in units of doubles */
         MPI_DOUBLE, /* basic datatype */
         proc_up(CID,0), /* cid of destination */
@@ -404,7 +404,7 @@ void WL_broadcast_polyakov(suNg* poly, suNg_field* gf) {
     int destCID=CID;
     for(int t=0; t<NP_T-1; t++) {
       destCID=proc_up(destCID,0);
-      MPIRET(mpiret) MPI_Isend(poly, /* buffer */
+      MPIRET(mpiret) MPI_Isend((double * )(poly), /* buffer */
           (X*Y*Z)*sizeof(suNg)/sizeof(double), /* lenght in units of doubles */
           MPI_DOUBLE, /* basic datatype */
           destCID, /* cid of destination */
@@ -460,7 +460,7 @@ void WL_broadcast_polyakov(suNg* poly, suNg_field* gf) {
     }
 #endif /* NDEBUG */
     MPI_Status status;
-    MPIRET(mpiret) MPI_Recv(poly, /* buffer */
+    MPIRET(mpiret) MPI_Recv((double * )(poly), /* buffer */
         (X*Y*Z)*sizeof(suNg)/sizeof(double), /* lenght in units of doubles */
         MPI_DOUBLE, /* basic datatype */
         sCID, /* cid of destination */
@@ -561,7 +561,7 @@ void WL_correlators(double** ret, const suNg_field* gf, const suNg* poly, const 
       /* start communication for DT */
       if(DT<NP_T) {
         destCID=proc_dn(destCID,0);
-        MPIRET(mpiret) MPI_Isend(buf_gtf[0], /* buffer */
+        MPIRET(mpiret) MPI_Isend((double * )(buf_gtf[0]), /* buffer */
             (T*X*Y*Z)*sizeof(suNg)/sizeof(double), /* lenght in units of doubles */
             MPI_DOUBLE, /* basic datatype */
             destCID, /* cid of destination */
@@ -580,7 +580,7 @@ void WL_correlators(double** ret, const suNg_field* gf, const suNg* poly, const 
 #endif /* NDEBUG */
   
         sendCID=proc_up(sendCID,0);
-        MPIRET(mpiret) MPI_Irecv(buf_gtf[2], /* buffer */
+        MPIRET(mpiret) MPI_Irecv((double * )(buf_gtf[2]), /* buffer */
             (T*X*Y*Z)*sizeof(suNg)/sizeof(double), /* lenght in units of doubles */
             MPI_DOUBLE, /* basic datatype */
             sendCID, /* cid of origin */
