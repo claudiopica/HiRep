@@ -47,8 +47,7 @@ void read_gauge_field_milc(char filename[])
 		   "Failed to read header from file");
 
 	     for(i=0;i<NG*NG;i++) {
-	       pu_gauge(ipt(g[0],g[1],g[2],g[3]),(mu+1)%4)->c[i].re=test[2*i];
-	       pu_gauge(ipt(g[0],g[1],g[2],g[3]),(mu+1)%4)->c[i].im=test[2*i+1];
+	       pu_gauge(ipt(g[0],g[1],g[2],g[3]),(mu+1)%4)->c[i]=test[2*i]+I*test[2*i+1];
 	     }
 	   }
    
@@ -165,8 +164,7 @@ void read_gauge_field_milc_no3row(char filename[])
 
     
 	     for(i=0;i<NG*NG;i++) {
-	       pu_gauge(ipt(g[0],g[1],g[2],g[3]),(mu+1)%4)->c[i].re=test[2*i];
-	       pu_gauge(ipt(g[0],g[1],g[2],g[3]),(mu+1)%4)->c[i].im=test[2*i+1];
+	       pu_gauge(ipt(g[0],g[1],g[2],g[3]),(mu+1)%4)->c[i]=test[2*i]+I*test[2*i+1];
 	     }
 
 	   }

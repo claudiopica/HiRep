@@ -204,7 +204,7 @@ void read_gauge_field_eolexi_BE(char filename[])
 #ifdef GAUGE_SON
           lprintf("IO",20,"(%.2f) ",pu_gauge(ix,mu)->c[i*NG+j]);
 #else
-          lprintf("IO",20,"(%.2f , %.2f) ",pu_gauge(ix,mu)->c[i*NG+j].re,pu_gauge(ix,mu)->c[i*NG+j].im);
+          lprintf("IO",20,"(%.2f , %.2f) ",creal(pu_gauge(ix,mu)->c[i*NG+j]),cimag(pu_gauge(ix,mu)->c[i*NG+j]));
 #endif //GAUGE_SON
 	}
         lprintf("IO",20,"]\n");
@@ -384,7 +384,7 @@ void read_gauge_field_eolexi_LE(char filename[])
 #ifdef GAUGE_SON
           lprintf("IO",20,"(%.2f) ",pu_gauge(ix,mu)->c[i*NG+j]);
 #else
-          lprintf("IO",20,"(%.2f , %.2f) ",pu_gauge(ix,mu)->c[i*NG+j].re,pu_gauge(ix,mu)->c[i*NG+j].im);
+          lprintf("IO",20,"(%.2f , %.2f) ",creal(pu_gauge(ix,mu)->c[i*NG+j]),cimag(pu_gauge(ix,mu)->c[i*NG+j]));
 #endif //GAUGE_SON
 	}
         lprintf("IO",20,"]\n");

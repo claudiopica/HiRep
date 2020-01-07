@@ -18,26 +18,6 @@
 #include "ranlux.h"
 
 
-static int index_eolexi(int x0,int x1,int x2,int x3)
-{
-   int y0,y1,y2,y3;
-   int ix;
-   
-   y0=x0%GLB_T;
-   y1=x1%GLB_X;
-   y2=x2%GLB_Y;
-   y3=x3%GLB_Z;
-
-   ix = (y3+GLB_Z*(y2+GLB_Y*(y1+GLB_X*y0)))/2;
-   if((y0+y1+y2+y3)&1){
-      ix+=(GLB_T*GLB_X*GLB_Y*GLB_Z)/2;
-   }
-
-   return ix;
-      
-}
-
-
 void write_gauge_field_mpieo_BE(char filename[]) 
 {
   write_gauge_field(filename);
