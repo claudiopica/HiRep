@@ -80,13 +80,15 @@ void read_gauge_field_openQCD(char filename[])
             }
 
   fclose(fp);
+  
+  double new_plaq = avr_plaquette();
 
-  if ((NG * avr_plaquette() - readplaq) * (NG * avr_plaquette() - readplaq) > 1.e-14)
+  if ((NG * new_plaq - readplaq) * (NG * new_plaq - readplaq) > 1.e-14)
     error(1, 1, "read_gauge_field_openQCD",
           "Wrong plaquette checksum");
   else
-    lprintf("IO", 0, "Plaquette checksum matches\n");
-
+    lprintf("IO", 0, "Plaquette checksum matches\n Initial plaquette: %1.8e \n", new_plaq);
+  
   gettimeofday(&end, 0);
   timeval_subtract(&etime, &end, &start);
   lprintf("IO", 0, "Configuration [%s] read [%ld sec %ld usec]\n", filename, etime.tv_sec, etime.tv_usec);
@@ -156,5 +158,6 @@ void write_gauge_field_openQCD(char filename[])
 
   gettimeofday(&end, 0);
   timeval_subtract(&etime, &end, &start);
+  lprintf("IO", 0, "Plaquette of the stored configuration: %1.8e\n", writeplaq);
   lprintf("IO", 0, "Configuration [%s] wrote [%ld sec %ld usec]\n", filename, etime.tv_sec, etime.tv_usec);
 }
