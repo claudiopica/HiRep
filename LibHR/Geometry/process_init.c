@@ -53,24 +53,21 @@ static int setup_level = 0;
 
 static void read_cmdline(int argc, char **argv)
 {
-  int i, ai = 0, ao = 0, am = 0, requested = 1;
+  int i, ai = 0, ao = 0, am = 0;
 
   for (i = 1; i < argc; i++)
   {
     if (strcmp(argv[i], "-i") == 0)
     {
       ai = i + 1;
-      requested += 2;
     }
     else if (strcmp(argv[i], "-o") == 0)
     {
       ao = i + 1;
-      requested += 2;
     }
     else if (strcmp(argv[i], "-m") == 0)
     {
       am = i;
-      requested += 1;
     }
   }
 
@@ -79,9 +76,6 @@ static void read_cmdline(int argc, char **argv)
     print_compiling_info();
     exit(0);
   }
-
-  error(argc != requested, 1, "read_cmdline [process_init.c]",
-        "Arguments: [-i <input file>] [-o <output file>] [-m]");
 
   if (ao != 0)
     strcpy(output_filename, argv[ao]);
