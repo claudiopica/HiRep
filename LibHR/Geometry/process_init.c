@@ -99,7 +99,7 @@ void setup_gauge_fields()
 #endif
 
 #ifndef ALLOCATE_REPR_GAUGE_FIELD
-  u_gauge_f = (suNf_field*)(u_gauge);
+  u_gauge_f = (suNf_field *)(u_gauge);
 #endif
 
 #ifdef DPHI_FLT
@@ -211,8 +211,15 @@ int setup_process(int *argc, char ***argv)
 static void setup_random()
 {
   read_input(rlx_var.read, get_input_filename());
-  lprintf("SETUP_RANDOM", 0, "RLXD [%d,%d]\n", rlx_var.rlxd_level, rlx_var.rlxd_seed + MPI_PID);
-  rlxd_init(rlx_var.rlxd_level, rlx_var.rlxd_seed + MPI_PID); /* use unique MPI_PID to shift seeds */
+  if (rlx_var.rlxd_level == 0)
+  {
+    lprintf("SYSTEM", 0, "No rlx_level defined, skipping init of the random number generator.\n");
+  }
+  else
+  {
+    lprintf("SETUP_RANDOM", 0, "RLXD [%d,%d]\n", rlx_var.rlxd_level, rlx_var.rlxd_seed + MPI_PID);
+    rlxd_init(rlx_var.rlxd_level, rlx_var.rlxd_seed + MPI_PID); /* use unique MPI_PID to shift seeds */
+  }
 }
 
 /* this function is intended to clean up before process ending

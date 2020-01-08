@@ -72,7 +72,8 @@ typedef struct _input_rlx {
 {"ranlux start", "rlx_start = %s", STRING_T, &(varname).rlxd_start},\
 {NULL, NULL, INT_T, NULL}				    \
 },\
-.rlxd_state=""\
+.rlxd_state="",\
+.rlxd_level=0\
 }
 
 /* Logger global variables */
