@@ -11,6 +11,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include <unistd.h>
+#include <ctype.h> 
 #include "io.h"
 #include "random.h"
 #include "error.h"
@@ -34,8 +36,16 @@
 #ifdef WITH_MPI
 #error Please compile without MPI!
 #endif
+#if !(defined(BC_X_PERIODIC)) || !(defined(BC_Y_PERIODIC)) || !(defined(BC_Z_PERIODIC)) || !(defined(BC_T_PERIODIC)) 
+#error Please compile with Periodic Boundary Conditions
+#endif
 
-
+static void slower(char *str) {
+  while (*str) {
+    *str=(char)(tolower(*str));
+    ++str;
+  }
+}
 typedef struct _format_type
 {
   char name[256];
@@ -49,62 +59,24 @@ format_type format[nformats] = {
     {.name = "openQCD to HiRep", .read = read_gauge_field_openQCD, .write = write_gauge_field},
     {.name = "HiRep to openQCD", .read = read_gauge_field, .write = write_gauge_field_openQCD}};
 
-char input_filename[1024];
-char output_filename[1024];
-
 format_type *conf_format;
 
-void print_cmdline_info()
+typedef struct _conf_details
 {
-  error(1, 1, "parse_cmdline [converter_openQCD.c]", "\nSyntax (1): converter_openQCD -m\n* Show compilation information.\n\nSyntax (2): converter_openQCD -i <input file> [-o <log_file>] -H <HiRep_config>\n* Convert HiRep_config to openQCD format \n\nSyntax (3): converter_openQCD -i <input file> [-o <log_file>] -O <openQCD_config>\n* Convert openQCD_config to HiRep format \n\n ");
-}
+  char cnfgin[256];
+  char cnfgout[256];
+  char type[128];
+  input_record_t read[3];
+} conf_details;
 
-static void converter_read_cmdline(int argc, char *argv[])
-{
-  int i;
-  int aO = 0, aH = 0;
-  int aopenqcd = 0, ahirep = 0;
-
-  for (i = 1; i < argc; i++)
-  {
-    if (strcmp(argv[i], "-O") == 0)
-    {
-      aopenqcd = 1;
-      aO = i;
-    }
-    else if (strcmp(argv[i], "-H") == 0)
-    {
-      ahirep = 1;
-      aH = i;
-    }
+#define init_conf_details(varname)                                      \
+  {                                                                     \
+    .read = {                                                           \
+      {"conf name", "conf name= %s", STRING_T, &((varname).cnfgin[0])}, \
+      {"conf type", "conf type= %s", STRING_T, &((varname).type[0])},   \
+      {NULL, NULL, 0, NULL}                                             \
+    }                                                                   \
   }
-
-  if (aopenqcd + ahirep != 1)
-  {
-    lprintf("ERROR", 0, "Incompatible options -O and -H.\n");
-    print_cmdline_info();
-  }
-
-  if (aO != 0)
-  {
-    strcpy(input_filename, argv[aO + 1]);
-    sprintf(output_filename, "HiRep_%s", input_filename);
-  }
-  if (aH != 0)
-  {
-    strcpy(input_filename, argv[aH + 1]);
-    sprintf(output_filename, "openQCD_%s", input_filename);
-  }
-
-  if (aopenqcd == 1)
-  {
-    conf_format = format;
-  }
-  else
-  {
-    conf_format = format + 1;
-  }
-}
 
 int main(int argc, char *argv[])
 {
@@ -112,15 +84,37 @@ int main(int argc, char *argv[])
   //Read general command line arguments and input file
   setup_process(&argc, &argv);
 
-  //Read specific command line arguments
-  converter_read_cmdline(argc, argv);
-
   setup_gauge_fields();
 
-  //Use reader from HiRep or OpenQCD and it writes in the other way around
-  conf_format->read(input_filename);
+  conf_details conf_info = init_conf_details(conf_info);
 
-  conf_format->write(output_filename);
+  read_input(conf_info.read, get_input_filename());
+
+  slower(conf_info.type);
+
+  if (strcmp(conf_info.type, "hirep") == 0)
+  {
+    conf_format = format + 1;
+    sprintf(conf_info.cnfgout, "openQCD_%s", conf_info.cnfgin);
+  }
+  else if (strcmp(conf_info.type, "openqcd") == 0)
+  {
+    conf_format = format ;
+    sprintf(conf_info.cnfgout, "HiRep_%s", conf_info.cnfgin);
+  }
+  else
+  {
+    error(0 == 0, 0, "MAIN", "Unknonw configuration type (hirep and openqcd) are the only allowed.");
+  }
+
+
+  lprintf("MAIN", 0, "Converting the configuration from %s\n", conf_format->name);
+
+
+  //Use reader from HiRep or OpenQCD and it writes in the other way around
+  conf_format->read(conf_info.cnfgin);
+
+  conf_format->write(conf_info.cnfgout);
 
   finalize_process();
 

@@ -53,34 +53,30 @@ static int setup_level = 0;
 
 static void read_cmdline(int argc, char **argv)
 {
-  int i, ai = 0, ao = 0, am = 0;
+  int option, ai = 0;
+  optind=1;
 
-  for (i = 1; i < argc; i++)
-  {
-    if (strcmp(argv[i], "-i") == 0)
+  while ((option = getopt(argc, argv, "i:o:mh")) != -1)
+  { //get option from the getopt() method
+    switch (option)
     {
-      ai = i + 1;
-    }
-    else if (strcmp(argv[i], "-o") == 0)
-    {
-      ao = i + 1;
-    }
-    else if (strcmp(argv[i], "-m") == 0)
-    {
-      am = i;
+    //For option i, r, l, print that these are options
+    case 'i':
+      strcpy(input_filename, optarg);
+      ai = 1;
+      break;
+    case 'o':
+      strcpy(output_filename, optarg);
+      break;
+    case 'm':
+      print_compiling_info();
+      exit(0);
+    case 'h':
+      lprintf("read_cmdline",0,"Standard cmdline:\n\t-i <input file>\n\t-o <log file>\n\t-m (compilation information)");
+      exit(0);
     }
   }
-
-  if (am != 0)
-  {
-    print_compiling_info();
-    exit(0);
-  }
-
-  if (ao != 0)
-    strcpy(output_filename, argv[ao]);
-  if (ai != 0)
-    strcpy(input_filename, argv[ai]);
+  error(ai != 1, 0, "SETUP_GAUGE_FIELDS", "An input file must be defined\n");
 }
 
 void setup_gauge_fields()

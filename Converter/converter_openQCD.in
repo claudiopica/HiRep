@@ -1,0 +1,11 @@
+GLB_T = 8
+GLB_X = 8
+GLB_Y = 8
+GLB_Z = 8
+
+log:default = -1
+log:inverter = -1
+log:forcestat = 0
+
+conf name= Snoopy137n1
+conf type= openqcd
