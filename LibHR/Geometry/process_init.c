@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <getopt.h>
 #include "utils.h"
 #include "io.h"
 #include "random.h"
