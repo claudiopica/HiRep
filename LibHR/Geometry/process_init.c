@@ -54,16 +54,15 @@ static int setup_level = 0;
 static void read_cmdline(int argc, char **argv)
 {
   int option, ai = 0;
-  optind=1;
-
+  
   while ((option = getopt(argc, argv, "i:o:mh")) != -1)
   { //get option from the getopt() method
     switch (option)
     {
     //For option i, r, l, print that these are options
     case 'i':
-      strcpy(input_filename, optarg);
       ai = 1;
+      strcpy(input_filename, optarg);
       break;
     case 'o':
       strcpy(output_filename, optarg);
