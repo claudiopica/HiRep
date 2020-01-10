@@ -307,8 +307,8 @@ int main(int argc, char *argv[])
 
   error(!(GLB_X == GLB_Y && GLB_X == GLB_Z), 1, "main", "This test works only for GLB_X=GLB_Y=GLB_Z");
 
-  //int tau, int nm, double* m, int n_mom,int nhits,int conf_num, double precision)
-  measure_spectrum_pt(0, 1, &mass, 1, 3, 0, 1e-28);
+  //int tau, int nm, double* m, int n_mom,int conf_num, double precision)
+  measure_spectrum_pt(0, 1, &mass, 1, 0, 1e-28);
 
   lprintf("MAIN", 0, "Checking results\n");
 
