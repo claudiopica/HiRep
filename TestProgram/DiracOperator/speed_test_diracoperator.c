@@ -50,22 +50,8 @@ int main(int argc,char *argv[])
   
   setup_gauge_fields();
 
-  //geometry_mpi_eo();
-
-  /* setup random numbers */
- // read_input(rlx_var.read,get_input_filename());
-  //lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
   lprintf("MAIN",0,"n_warmup = %d, n_times = %d \n",n_warmup,n_times);
   
-  //rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
-  
-  
-//  lprintf("MAIN",0,"Allocating gauge field\n");  
-//  u_gauge=alloc_gfield(&glattice);
-//#if (!defined(REPR_FUNDAMENTAL) && !defined(WITH_QUATERNIONS)) || defined(ROTATED_SF) 
-//  u_gauge_f=alloc_gfield_f(&glattice);
-//#endif
-
   /* allocate memory */
   lprintf("MAIN",0,"Allocating spinor field\n");  
   s0=alloc_spinor_field_f(4,&glattice);

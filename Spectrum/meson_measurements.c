@@ -86,7 +86,7 @@ static void flip_T_bc(int tau){
 
 #define corr_ind(px,py,pz,n_mom,tc,nm,cm) ((px)*(n_mom)*(n_mom)*(24)*(nm)+(py)*(n_mom)*(24)*(nm)+(pz)*(24)*(nm)+ ((cm)*(24)) +(tc))
 
-void measure_spectrum_pt(int tau, int nm, double* m, int n_mom,int nhits,int conf_num, double precision){
+void measure_spectrum_pt(int tau, int nm, double* m, int n_mom,int conf_num, double precision){
   spinor_field* source = alloc_spinor_field_f(4,&glattice);
   spinor_field* prop =  alloc_spinor_field_f(4*nm*NF,&glattice);
   init_propagator_eo(nm, m, precision);
@@ -112,7 +112,7 @@ void measure_spectrum_pt(int tau, int nm, double* m, int n_mom,int nhits,int con
   free_spinor_field_f(prop);
 }
 
-void measure_spectrum_pt_ext(int tau, int nm, double* m, int n_mom,int nhits,int conf_num, double precision){
+void measure_spectrum_pt_ext(int tau, int nm, double* m, int n_mom,int conf_num, double precision){
   int k,l;
   spinor_field* source = alloc_spinor_field_f(4,&glattice);
   spinor_field* prop_p = alloc_spinor_field_f(8*nm,&glattice);
@@ -153,7 +153,7 @@ void measure_spectrum_pt_ext(int tau, int nm, double* m, int n_mom,int nhits,int
   free_spinor_field_f(prop_a);
 }
 
-void measure_spectrum_pt_fixedbc(int tau, int dt, int nm, double* m, int n_mom,int nhits,int conf_num, double precision){
+void measure_spectrum_pt_fixedbc(int tau, int dt, int nm, double* m, int n_mom,int conf_num, double precision){
   int k;
   spinor_field* source = alloc_spinor_field_f(4,&glattice);
   spinor_field* prop =  alloc_spinor_field_f(4*nm,&glattice);

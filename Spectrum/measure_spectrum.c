@@ -31,7 +31,7 @@
 #include "spectrum.h"
 #include "clover_tools.h"
 #include "cinfo.c"
-
+#include "setup.h"
 
 
 
@@ -122,10 +122,10 @@ typedef struct _input_mesons {
 
 /* Turn four fermion on/off */
 typedef struct _input_ff {
-  char make[256]; 
+  char make[256];
   /* for the reading function */
   input_record_t read[2];
-  
+
 } input_ff;
 
 #define init_input_ff(varname) \
@@ -167,7 +167,7 @@ int parse_cnfg_filename(char* filename, filename_t* fn) {
   basename = filename;
   while ((tmp = strchr(basename, '/')) != NULL) {
     basename = tmp+1;
-  }            
+  }
 
 #ifdef REPR_FUNDAMENTAL
 #define repr_name "FUN"
@@ -261,31 +261,31 @@ int main(int argc,char *argv[]) {
   filename_t fpars;
   int nm;
   double m[256];
-  
+
 
   /* setup process id and communications */
   read_cmdline(argc, argv);
   setup_process(&argc,&argv);
 
   read_input(glb_var.read,input_filename);
-  setup_replicas();
+  // VD TMP FIX setup_replicas();
 
   /* logger setup */
   /* disable logger for MPI processes != 0 */
   logger_setlevel(0,10);
   if (PID!=0) { logger_disable(); }
-  if (PID==0) { 
+  if (PID==0) {
     sprintf(tmp,">%s",output_filename); logger_stdout(tmp);
-    sprintf(tmp,"err_%d",PID); 
+    sprintf(tmp,"err_%d",PID);
     if (!freopen(tmp,"w",stderr)) lprintf("MAIN",0,"Error out not open\n");
   }
 
-  lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS); 
-  lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
-  lprintf("MAIN",0,"input file [%s]\n",input_filename); 
-  lprintf("MAIN",0,"output file [%s]\n",output_filename); 
-  if (list_filename!=NULL) lprintf("MAIN",0,"list file [%s]\n",list_filename); 
-  else lprintf("MAIN",0,"cnfg file [%s]\n",cnfg_filename); 
+  lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS);
+  lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE);
+  lprintf("MAIN",0,"input file [%s]\n",input_filename);
+  lprintf("MAIN",0,"output file [%s]\n",output_filename);
+  if (list_filename!=NULL) lprintf("MAIN",0,"list file [%s]\n",list_filename);
+  else lprintf("MAIN",0,"cnfg file [%s]\n",cnfg_filename);
 
 
   /* read & broadcast parameters */
@@ -321,7 +321,7 @@ int main(int argc,char *argv[]) {
       m[nm]=atof(cptr);
       nm++;
       cptr = strtok(NULL, ";");
-    }    
+    }
   }
 
   if(mes_var.use_input_mass) {
@@ -332,7 +332,7 @@ int main(int argc,char *argv[]) {
       m[nm]=atof(cptr);
       nm++;
       cptr = strtok(NULL, ";");
-    }    
+    }
   }
 
   /* setup communication geometry */
@@ -366,37 +366,37 @@ int main(int argc,char *argv[]) {
   lprintf("MAIN",0,"\n",k,m[k]);
   lprintf("MAIN",0,"Number of noisy sources per cnfg = %d. Does not affect point sources\n",mes_var.nhits_2pt);
   if (mes_var.def_semwall){
-    lprintf("MAIN",0,"Spin Explicit Method (SEM) wall sources\n");    
+    lprintf("MAIN",0,"Spin Explicit Method (SEM) wall sources\n");
   }
   if (mes_var.def_point){
-    lprintf("MAIN",0,"Point sources\n");    
+    lprintf("MAIN",0,"Point sources\n");
   }
  	if (mes_var.def_baryon){
-    lprintf("MAIN",0,"Baryon masses\n");    
+    lprintf("MAIN",0,"Baryon masses\n");
   }
  	if (mes_var.def_glueball){
-    lprintf("MAIN",0,"Glueball masses\n");    
+    lprintf("MAIN",0,"Glueball masses\n");
   }
   if (mes_var.def_gfwall){
-    lprintf("MAIN",0,"Gauge Fixed Wall Source\n");    
+    lprintf("MAIN",0,"Gauge Fixed Wall Source\n");
   }
   if (mes_var.ext_semwall){
-    lprintf("MAIN",0,"Spin Explicit Method (SEM) wall sources on extended lattice\n");    
+    lprintf("MAIN",0,"Spin Explicit Method (SEM) wall sources on extended lattice\n");
   }
   if (mes_var.ext_point){
-    lprintf("MAIN",0,"Point sources on extended lattice\n");    
+    lprintf("MAIN",0,"Point sources on extended lattice\n");
   }
   if (mes_var.fixed_semwall){
-    lprintf("MAIN",0,"Spin Explicit Method (SEM) wall sources with Dirichlet boundary conditions\n"); 
-    lprintf("MAIN",0,"Distance between tau and the boundary: %d\n",mes_var.dt); 
+    lprintf("MAIN",0,"Spin Explicit Method (SEM) wall sources with Dirichlet boundary conditions\n");
+    lprintf("MAIN",0,"Distance between tau and the boundary: %d\n",mes_var.dt);
   }
   if (mes_var.fixed_point){
-    lprintf("MAIN",0,"Point sources with Dirichlet boundary conditions\n");    
-    lprintf("MAIN",0,"Distance between tau and the boundary: %d\n",mes_var.dt); 
+    lprintf("MAIN",0,"Point sources with Dirichlet boundary conditions\n");
+    lprintf("MAIN",0,"Distance between tau and the boundary: %d\n",mes_var.dt);
   }
   if (mes_var.fixed_gfwall){
-    lprintf("MAIN",0,"Gauge Fixed Wall Source with Dirichlet boundary conditions\n"); 
-    lprintf("MAIN",0,"Distance between tau and the boundary: %d\n",mes_var.dt); 
+    lprintf("MAIN",0,"Gauge Fixed Wall Source with Dirichlet boundary conditions\n");
+    lprintf("MAIN",0,"Distance between tau and the boundary: %d\n",mes_var.dt);
   }
   if (mes_var.n_mom>1){
     lprintf("MAIN",0,"Number of maximum monentum component %d\n",mes_var.n_mom-1);
@@ -406,9 +406,9 @@ int main(int argc,char *argv[]) {
   }
   if (mes_var.n_mom==0){ mes_var.n_mom++;}
  	if (mes_var.background_field){
-    lprintf("MAIN",0,"Electric background field in the z direction with charge Q=%1.6f , with E =  %d x 2 pi /(Q*T*L) \n",mes_var.Q,mes_var.nEz);    
+    lprintf("MAIN",0,"Electric background field in the z direction with charge Q=%1.6f , with E =  %d x 2 pi /(Q*T*L) \n",mes_var.Q,mes_var.nEz);
   }
- 
+
   list=NULL;
   if(strcmp(list_filename,"")!=0) {
     error((list=fopen(list_filename,"r"))==NULL,1,"main [mk_mesons.c]" ,
@@ -427,7 +427,7 @@ int main(int argc,char *argv[]) {
   if(strcmp(ff_var.make,"true")==0){
     four_fermion_active = 1;
     ff_sigma = alloc_sfield(1,&glattice);
-    ff_pi = alloc_sfield(1,&glattice); 
+    ff_pi = alloc_sfield(1,&glattice);
   }
 
   init_discon_correlators();
@@ -456,7 +456,7 @@ int main(int argc,char *argv[]) {
     full_plaquette();
     gettimeofday(&start,0);
 
-    if(four_fermion_active==1) ff_observables(); 
+    if(four_fermion_active==1) ff_observables();
 
     tau=0;
     if (four_fermion_active==0) {
@@ -471,7 +471,7 @@ int main(int argc,char *argv[]) {
        measure_baryons(m,i,mes_var.precision);
      }
      if (mes_var.def_glueball){
-       //measure_glueballs(); //This does not seem to exist 
+       //measure_glueballs(); //This does not seem to exist
      }
      if (mes_var.def_gfwall){
        measure_spectrum_gfwall(nm,m,i,mes_var.precision);
@@ -492,7 +492,7 @@ int main(int argc,char *argv[]) {
        measure_spectrum_gfwall_fixedbc(mes_var.dt,nm,m,i,mes_var.precision);
      }
      if (mes_var.discon_semwall){
-        measure_spectrum_discon_semwall(nm,m,mes_var.nhits_disc,i,mes_var.precision); 
+        measure_spectrum_discon_semwall(nm,m,mes_var.nhits_disc,i,mes_var.precision);
      }
      if (mes_var.discon_gfwall){
        measure_spectrum_discon_gfwall(nm,m,i,mes_var.precision);
@@ -539,4 +539,3 @@ int main(int argc,char *argv[]) {
 
   return 0;
 }
-

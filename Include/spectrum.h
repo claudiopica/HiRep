@@ -21,11 +21,11 @@ void measure_spectrum_discon_semwall(int nm, double* m, int nhits,int conf_num, 
 void measure_spectrum_discon_gfwall(int nm, double* m, int conf_num, double precision);
 void measure_spectrum_discon_volume(int nm, double* m, int conf_num, double precision, int dil);
 void measure_spectrum_gfwall(int nm, double* m, int conf_num, double precision);
-void measure_spectrum_pt(int tau, int nm, double* m, int n_mom,int nhits,int conf_num, double precision);
+void measure_spectrum_pt(int tau, int nm, double* m, int n_mom,int conf_num, double precision);
 void measure_spectrum_semwall_ext(int nm, double* m, int nhits,int conf_num, double precision);
-void measure_spectrum_pt_ext(int tau, int nm, double* m, int n_mom,int nhits,int conf_num, double precision);
+void measure_spectrum_pt_ext(int tau, int nm, double* m, int n_mom,int conf_num, double precision);
 void measure_spectrum_semwall_fixedbc(int dt, int nm, double* m, int nhits,int conf_num, double precision);
-void measure_spectrum_pt_fixedbc(int tau, int dt, int nm, double* m, int n_mom,int nhits,int conf_num, double precision);
+void measure_spectrum_pt_fixedbc(int tau, int dt, int nm, double* m, int n_mom,int conf_num, double precision);
 void measure_spectrum_gfwall_fixedbc(int dt, int nm, double* m, int conf_num, double precision);
 void measure_formfactor_pt(int ti, int tf, int nm, double* m, int n_mom, int conf_num, double precision);
 void measure_formfactor_fixed(int ti, int tf, int dt, int nm, double* m, int n_mom, int conf_num, double precision);
