@@ -2442,11 +2442,11 @@ sub write_suN_mul_add {
 		print "   do { \\\n";
 		print "      int _i;for (_i=0; _i<$md2; ){\\\n";
 		for(my $i=0;$i<$unroll;$i++){
-			print "   (u).$cname\[_i\]=(r)*(v).$cname\[_i\]+(m)*(w).$cname\[_i\]); ++_i;\\\n";
+			print "   (u).$cname\[_i\]=(r)*(v).$cname\[_i\]+(m)*(w).$cname\[_i\]; ++_i;\\\n";
 		}
 		print "      }\\\n";
 		for(my $i=0;$i<$mr2;$i++){
-			print "      (u).$cname\[_i\]=(r)*(v).$cname\[_i\]+(m)*(w).$cname\[_i\]); ++_i;\\\n";
+			print "      (u).$cname\[_i\]=(r)*(v).$cname\[_i\]+(m)*(w).$cname\[_i\]; ++_i;\\\n";
 		}
 		print "   } while(0) \n\n";
 	}
