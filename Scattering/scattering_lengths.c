@@ -55,7 +55,7 @@ typedef struct _input_scatt {
 	int tsrc;
 
 	/* for the reading function */
-	input_record_t read[8];
+	input_record_t read[9];
 
 } input_scatt;
 
@@ -76,10 +76,10 @@ typedef struct _input_scatt {
 
 char cnfg_filename[256]="";
 char list_filename[256]="";
-char prop_filename[256]="";
 char source_filename[256]="";
 char input_filename[256] = "input_file";
 char output_filename[256] = "meson_scattering.out";
+char output_dir[256] = "./output/";
 int Nsource;
 double M;
 
@@ -90,6 +90,7 @@ input_scatt mes_var = init_input_scatt(mes_var);
 typedef struct {
 	char string[256];
 	char configlist[256];
+	char outpath[256];
 	int t, x, y, z;
 	int nc, nf;
 	double b, m;
@@ -100,22 +101,6 @@ typedef struct {
 
 //to move
 
-
-
-static void zero_corrs(meson_observable *mo)
-{
-  meson_observable *motmp = mo;
-  int i;
-  while (motmp != NULL)
-  {
-    for (i = 0; i < motmp->corr_size; i++)
-    {
-      motmp->corr_re[i] = 0.;
-      motmp->corr_im[i] = 0.;
-    }
-    motmp = motmp->next;
-  }
-}
 
 
 
@@ -146,10 +131,11 @@ static int random_tau(){
 }
 
 static int gi(int i){
-if(i==1) return _g1;
-if(i==2) return _g2;
-if(i==3) return _g3;
+	if(i==1) return _g1;
+	if(i==2) return _g2;
+	if(i==3) return _g3;
 
+	return -1;
 }
 static void do_global_sum(meson_observable *mo, double norm)
 {
@@ -168,7 +154,7 @@ static void do_global_sum(meson_observable *mo, double norm)
   }
 }
 void measure_pion_scattering_I2(double* m, int numsources, double precision,char* path,char* cnfg_filename){
-	int i,j,ts;
+	int ts;
 	meson_observable *rho1[3][3],*rho2[3][3];
 	meson_observable *pi1,*pi2;
 	meson_observable *AD;
@@ -180,6 +166,17 @@ void measure_pion_scattering_I2(double* m, int numsources, double precision,char
 	spinor_field* prop_ts1 =  alloc_spinor_field_f(4 ,&glattice);
 	spinor_field* prop_ts2=  alloc_spinor_field_f(4 ,&glattice);
 
+
+	pi1 = (meson_observable*) malloc(sizeof(meson_observable));
+	pi2 = (meson_observable*) malloc(sizeof(meson_observable));
+	AD = (meson_observable*) malloc(sizeof(meson_observable));
+	BC = (meson_observable*) malloc(sizeof(meson_observable));
+	for(int i=0; i<3; i++){
+		for(int j=0; j<3; j++){
+			rho1[i][j] = (meson_observable*) malloc(sizeof(meson_observable));
+			rho2[i][j] = (meson_observable*) malloc(sizeof(meson_observable));
+		}
+	}
 	init_mo(pi1,"Pi1",GLB_T);
 	init_mo(pi2,"Pi2",GLB_T);
 	init_mo(AD,"AD",GLB_T);
@@ -189,9 +186,7 @@ void measure_pion_scattering_I2(double* m, int numsources, double precision,char
 	pi1->ind2 = _g5;
 	pi2->ind1 = _g5;
 	pi2->ind2 = _g5;
-	
-
-	
+		
 	for(int i=0; i<3; i++){
 		for(int j=0; j<3; j++){
 				init_mo(rho1[i][j],"rho1",GLB_T);
@@ -206,21 +201,17 @@ void measure_pion_scattering_I2(double* m, int numsources, double precision,char
 	for (int src=0;src<numsources;++src)
    	{
 	
-		zero_corrs(pi1);
-		zero_corrs(pi2);
-		zero_corrs(AD);
-		zero_corrs(BC);
+		reset_mo(pi1);
+		reset_mo(pi2);
+		reset_mo(AD);
+		reset_mo(BC);
 		for(int i=0; i<3; i++){
 			for(int j=0; j<3; j++){
-				zero_corrs(rho1[i][j]);
-				zero_corrs(rho2[i][j]);
+				reset_mo(rho1[i][j]);
+				reset_mo(rho2[i][j]);
 		}
 	}
 	
-
-
-	struct timeval start, end, etime;
-	gettimeofday(&start,0);
 	
 	init_propagator_eo(1, m, precision);
 	ts=random_tau();
@@ -230,12 +221,10 @@ void measure_pion_scattering_I2(double* m, int numsources, double precision,char
 	spinor_field_zero_f(source_ts2);
 	create_diluted_source_equal_atau(source_ts2, ts);
 	calc_propagator(prop_ts2,source_ts2,4);
-	lprintf("MAIN",0,"Start to perform the contractions ... \n");
+	lprintf("MAIN",0,"Start to perform the contractions ...\n");
 	
 	
-
 	// "standard" two points : pi and rho 
-
 	measure_mesons_core(prop_ts1,prop_ts1,source_ts1,pi1,1,ts,1,0,GLB_T);
 	measure_mesons_core(prop_ts2,prop_ts2,source_ts2,pi2,1,ts,1,0,GLB_T);
 	do_global_sum(pi1,1.0);
@@ -253,15 +242,14 @@ void measure_pion_scattering_I2(double* m, int numsources, double precision,char
 	}
 
 	// contraction 4 particles two-points.
-
-	measure_scattering_AD_core(AD, prop_ts1,prop_ts1,prop_ts2,prop_ts2, ts, 0,1,0,0,0); 
-	measure_scattering_BC_core(BC, prop_ts1,prop_ts1,prop_ts2,prop_ts2, ts, 0,1,0,0,0);
+	measure_scattering_AD_core(AD, prop_ts1,prop_ts1,prop_ts2,prop_ts2, ts, 0,0,0,0,0); 
+	measure_scattering_BC_core(BC, prop_ts1,prop_ts1,prop_ts2,prop_ts2, ts, 0,0,0,0,0);
 	
 
 	lprintf("MAIN",0,"Contraction done\n");
 	// Printing.
 	io2pt(pi1,1,numsources,path,"pi1",cnfg_filename);
-	io2pt(pi2,1,numsources,path,"pi1",cnfg_filename);
+	io2pt(pi2,1,numsources,path,"pi2",cnfg_filename);
 	for(int i=0; i<3; i++){	
 		for(int j=0; j<3; j++){
 			sprintf(auxname, "rho1_%d%d",i,j);
@@ -271,16 +259,13 @@ void measure_pion_scattering_I2(double* m, int numsources, double precision,char
 		}
 	}
 	io4pt(AD,1,numsources,path,"AD",cnfg_filename);
-	io4pt(BC,1,numsources,path,"AD",cnfg_filename);
+	io4pt(BC,1,numsources,path,"BC",cnfg_filename);
 	
 
-
-	free_propagator_eo(); 
   	free_spinor_field_f(source_ts1);
   	free_spinor_field_f(source_ts2);
 	free_spinor_field_f(prop_ts1);
   	free_spinor_field_f(prop_ts2);
-	
 	}
 
 	free_mo(pi1);
@@ -321,17 +306,20 @@ int main(int argc,char *argv[]) {
     read_input(rlx_var.read,get_input_filename());
 
 	strcpy(list_filename,mes_var.configlist);
+	strcpy(output_dir,mes_var.outpath);
 
-	lprintf("MAIN",0,"%s %s\n", list_filename,mes_var.configlist);	
+	lprintf("MAIN",0,"list_filename = %s %s\n", list_filename,mes_var.configlist);	
+	lprintf("MAIN",0,"output_dir : %s \n",mes_var.outpath);	
 
+  	if(strcmp(list_filename,"")!=0) {
+    	error((list=fopen(list_filename,"r"))==NULL,1,"main [mk_mesons.c]" ,
+		"Failed to open list file\n");
+  	}
 
-  if(strcmp(list_filename,"")!=0) {
-    error((list=fopen(list_filename,"r"))==NULL,1,"main [mk_mesons.c]" ,
-	"Failed to open list file\n");
-  }
-
-
-	clover_init(mes_var.csw);//  VD: not nice here.
+  	#ifdef WITH_CLOVER
+		clover_init(mes_var.csw);//  VD: not nice here.		
+  	#endif
+	
 
 	nm=0;
 	m[0] = -atof(mes_var.mstring); // 	
@@ -368,23 +356,11 @@ int main(int argc,char *argv[]) {
 
     	if(list==NULL) break;
 	}
-	lprintf("DEBUG",0,"ALL done, deallocating\n");
+  lprintf("DEBUG",0,"ALL done, deallocating\n");
 
   if(list!=NULL) fclose(list);
-  finalize_process();
-  free_BCs();
-  free_gfield(u_gauge);
-  free_propagator_eo();
-
+  
+  finalize_process();	
   return 0;
 
-
-	//gettimeofday(&end,0);
-	//timeval_subtract(&etime,&end,&start);
-	//lprintf("TIMING",0,"Inversions and contractions for configuration  [%s] done [%ld sec %ld usec]\n",cnfg_filename,etime.tv_sec,etime.tv_usec);
-
-
-
-
-	//return 0;
 }
