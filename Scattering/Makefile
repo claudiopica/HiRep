@@ -1,7 +1,7 @@
 TOPDIR = ..
 MKDIR = $(TOPDIR)/Make
 
-EXES = scatter 
+EXES = scatter scattering_lengths
 
 
 

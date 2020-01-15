@@ -108,7 +108,7 @@ typedef struct {
 
 int main(int argc,char *argv[])
 {
-  FILE* list;
+  FILE* list=NULL;
   int tau=0;
   double m[256];
 
