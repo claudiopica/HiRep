@@ -1,0 +1,29 @@
+GLB_T = 16
+GLB_X = 8
+GLB_Y = 8
+GLB_Z = 8
+NP_T = 2
+NP_X = 1
+NP_Y = 1
+NP_Z = 1
+
+N_REP = 1
+
+log:default = -1
+log:inverter = -1
+log:forcestat = 0
+
+rlx_level = 1
+rlx_seed = 83745
+rlx_start = new
+rlx_state = rand_state
+
+mes:masses = -0.605
+mes:csw = 1.23
+mes:precision = 1e-24
+mes:nhits = 3
+mes:outpath = ./output/
+mes:configlist = list_conf.txt
+
+
+

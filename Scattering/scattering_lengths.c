@@ -52,10 +52,9 @@ typedef struct _input_scatt {
     double csw;	
 	double precision;
 	int nhits;
-	int tsrc;
 
 	/* for the reading function */
-	input_record_t read[9];
+	input_record_t read[8];
 
 } input_scatt;
 
@@ -68,7 +67,6 @@ typedef struct _input_scatt {
 		{"number of inversions per cnfg", "mes:nhits = %d", INT_T, &(varname).nhits},\
 		{"Configuration list:", "mes:configlist = %s", STRING_T, &(varname).configlist},\
 		{"outpath:", "mes:outpath = %s", STRING_T, &(varname).outpath},\
-		{"Source time:", "mes:tsrc = %d", INT_T, &(varname).tsrc},\
 		{NULL, NULL, INT_T, NULL}\
 	}\
 }
@@ -166,11 +164,11 @@ void measure_pion_scattering_I2(double* m, int numsources, double precision,char
 	spinor_field* prop_ts1 =  alloc_spinor_field_f(4 ,&glattice);
 	spinor_field* prop_ts2=  alloc_spinor_field_f(4 ,&glattice);
 
-
 	pi1 = (meson_observable*) malloc(sizeof(meson_observable));
 	pi2 = (meson_observable*) malloc(sizeof(meson_observable));
 	AD = (meson_observable*) malloc(sizeof(meson_observable));
 	BC = (meson_observable*) malloc(sizeof(meson_observable));
+
 	for(int i=0; i<3; i++){
 		for(int j=0; j<3; j++){
 			rho1[i][j] = (meson_observable*) malloc(sizeof(meson_observable));
@@ -200,7 +198,6 @@ void measure_pion_scattering_I2(double* m, int numsources, double precision,char
 
 	for (int src=0;src<numsources;++src)
    	{
-	
 		reset_mo(pi1);
 		reset_mo(pi2);
 		reset_mo(AD);
@@ -212,7 +209,6 @@ void measure_pion_scattering_I2(double* m, int numsources, double precision,char
 		}
 	}
 	
-	
 	init_propagator_eo(1, m, precision);
 	ts=random_tau();
 	spinor_field_zero_f(source_ts1);
@@ -223,13 +219,11 @@ void measure_pion_scattering_I2(double* m, int numsources, double precision,char
 	calc_propagator(prop_ts2,source_ts2,4);
 	lprintf("MAIN",0,"Start to perform the contractions ...\n");
 	
-	
 	// "standard" two points : pi and rho 
 	measure_mesons_core(prop_ts1,prop_ts1,source_ts1,pi1,1,ts,1,0,GLB_T);
 	measure_mesons_core(prop_ts2,prop_ts2,source_ts2,pi2,1,ts,1,0,GLB_T);
 	do_global_sum(pi1,1.0);
 	do_global_sum(pi2,1.0);
-
 
 	for(int i=0; i<3; i++){
 			for(int j=0; j<3; j++){
@@ -245,29 +239,29 @@ void measure_pion_scattering_I2(double* m, int numsources, double precision,char
 	measure_scattering_AD_core(AD, prop_ts1,prop_ts1,prop_ts2,prop_ts2, ts, 0,0,0,0,0); 
 	measure_scattering_BC_core(BC, prop_ts1,prop_ts1,prop_ts2,prop_ts2, ts, 0,0,0,0,0);
 	
-
 	lprintf("MAIN",0,"Contraction done\n");
 	// Printing.
-	io2pt(pi1,1,numsources,path,"pi1",cnfg_filename);
-	io2pt(pi2,1,numsources,path,"pi2",cnfg_filename);
+	io2pt(pi1,1,src,path,"pi1",cnfg_filename);
+	io2pt(pi2,1,src,path,"pi2",cnfg_filename);
 	for(int i=0; i<3; i++){	
 		for(int j=0; j<3; j++){
 			sprintf(auxname, "rho1_%d%d",i,j);
-			io2pt(rho1[i][j],1,numsources,path,auxname,cnfg_filename);
+			io2pt(rho1[i][j],1,src,path,auxname,cnfg_filename);
 			sprintf(auxname, "rho2_%d%d",i,j);
-			io2pt(rho2[i][j],1,numsources,path,auxname,cnfg_filename);
+			io2pt(rho2[i][j],1,src,path,auxname,cnfg_filename);
 		}
 	}
-	io4pt(AD,1,numsources,path,"AD",cnfg_filename);
-	io4pt(BC,1,numsources,path,"BC",cnfg_filename);
+	io4pt(AD,0,src,path,"AD",cnfg_filename);
+	io4pt(BC,0,src,path,"BC",cnfg_filename);
 	
+	
+	}
 
+	//free memory
   	free_spinor_field_f(source_ts1);
   	free_spinor_field_f(source_ts2);
 	free_spinor_field_f(prop_ts1);
   	free_spinor_field_f(prop_ts2);
-	}
-
 	free_mo(pi1);
 	free_mo(pi2);
 	free_mo(AD);
@@ -336,7 +330,6 @@ int main(int argc,char *argv[]) {
 	
 
 	i=0;
-	lprintf("MAIN",0,"tsrc set to %i\n",mes_var.tsrc);
 	lprintf("CORR",0,"Number of noise vector : nhits = %i \n", mes_var.nhits);
 	while(1){
     	struct timeval start, end, etime;
