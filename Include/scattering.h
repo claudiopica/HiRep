@@ -15,6 +15,8 @@
 #include <stdio.h>
 
 void measure_pion_scattering(double* m, int nhits,int conf_num, double precision,int ts);
+void measure_pion_scattering_I2(double* m, int numsources, double precision,char* path,char* cnfg_filename);
+void measure_pion_scattering_I0(double* m, int numsources, double precision,char* path,char* cnfg_filename);
 
 /**
  * @brief Propagator sources with zero-momentum
