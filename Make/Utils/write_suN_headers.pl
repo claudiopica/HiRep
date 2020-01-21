@@ -302,6 +302,7 @@ END
 if ($su2quat==0) {
   write_suN_dagger();
   write_suN_times_suN();
+  write_suN_times_suN_assign();
   write_suN_times_suN_dagger();
   write_suN_dagger_times_suN();
  ## write_suN_zero();
@@ -309,9 +310,9 @@ if ($su2quat==0) {
   write_suN_minus();
 # write_suN_copy();
   write_suN_mul();
-	write_suN_mul_assign();
+  write_suN_mul_assign();
   write_suN_mulc();
-	write_suN_mul_add();
+  write_suN_mul_add();
   write_suN_add_assign();
   write_suN_sub_assign();
   write_suN_sqnorm();
@@ -329,6 +330,7 @@ if ($su2quat==0) {
     write_suNr_unit();
     write_suNr_dagger();
     write_suNr_times_suNr();
+    write_suNr_times_suNr_assign();
     write_suNr_times_suNr_dagger();
     write_suNr_dagger_times_suNr();
     write_suNr_add_assign();
@@ -350,7 +352,7 @@ if ($su2quat==0) {
     write_su2_minus();
     write_su2_mul();
     write_su2_mul_add();
-		write_su2_mul_assign();
+	write_su2_mul_assign();
     write_su2_add_assign();
     write_su2_sub_assign();
     write_su2_quat_det();
@@ -1896,6 +1898,116 @@ sub write_suNr_times_suNr {
 		print "   } while(0) \n\n";
 	}
 }
+
+sub write_suN_times_suN_assign {
+  print "/* u+=v*w */\n";
+  print "#define _${dataname}_times_${dataname}_assign(u,v,w) \\\n";
+	my $shift=$N*$N-$N-1;
+	my $shift2=$N-1;
+	if ($N<$Nmax) { #unroll all
+	my ($n,$k,$l)=(0,0,0);
+	for(my $i=0;$i<$N;$i++){
+		for(my $y=0;$y<$N;$y++){
+			print "      _complex_mul_assign((u).$cname\[$n\],(v).$cname\[$k\],(w).$cname\[$l\]);\\\n";
+			for(my $j=1;$j<$N;$j++){
+				$k++; $l+=$N;
+				print "      _complex_mul_assign((u).$cname\[$n\],(v).$cname\[$k\],(w).$cname\[$l\])";
+				if($i==$N-1 and $y==$N-1 and $j==$N-1) { print "\n\n"; } else { print "; \\\n"; }
+			}
+			$n++;
+			$k-=$shift2;
+			$l-=$shift;
+		}
+		$k+=$N;
+		$l=0;
+	}
+	} else { #partial unroll
+		print "   do { \\\n";
+
+		if($N<(2*$unroll+1)) {
+		    print "      int _i,_y,_n=0,_k=0,_l=0;\\\n";
+		} else {
+		    print "      int _i,_y,_j,_n=0,_k=0,_l=0;\\\n";
+		}
+
+		print "      for (_i=0; _i<$N; ++_i){\\\n";
+		print "         for (_y=0; _y<$N; ++_y){\\\n";
+		print "            _complex_mul_assign((u).$cname\[_n\],(v).$cname\[_k\],(w).$cname\[_l\]);\\\n";
+		if($N<(2*$unroll+1)) {
+			for(my $j=1;$j<$N;$j++){
+				print "            ++_k; _l+=$N; _complex_mul_assign((u).$cname\[_n\],(v).$cname\[_k\],(w).$cname\[_l\]);\\\n";
+			}
+		} else {
+			print "            for (_j=0; _j<$md; ){ \\\n";
+			for(my $i=0;$i<$unroll;$i++){
+				print "               ++_k; _l+=$N; _complex_mul_assign((u).$cname\[_n\],(v).$cname\[_k\],(w).$cname\[_l\]); ++_j;\\\n";
+			}
+			print "            } \\\n";
+			for(my $i=0;$i<$mr;$i++){
+				print "            ++_k; _l+=$N; _complex_mul_assign((u).$cname\[_n\],(v).$cname\[_k\],(w).$cname\[_l\]);\\\n";
+			}
+		}
+		print "            ++_n; _k-=$shift2; _l-=$shift;\\\n";
+		print "         } _k+=$N; _l=0;\\\n";
+		print "      }\\\n";
+		print "   } while(0) \n\n";
+	}
+}
+
+sub write_suNr_times_suNr_assign {
+  print "/* u=v*w */\n";
+  print "#define _${rdataname}_times_${rdataname}_assign(u,v,w) \\\n";
+	my $shift=$N*$N-$N-1;
+	my $shift2=$N-1;
+	if ($N<$Nmax) { #unroll all
+	my ($n,$k,$l)=(0,0,0);
+	for(my $i=0;$i<$N;$i++){
+		for(my $y=0;$y<$N;$y++){
+			print "      (u).$cname\[$n\]+=(v).$cname\[$k\]*(w).$cname\[$l\];\\\n";
+			for(my $j=1;$j<$N;$j++){
+				$k++; $l+=$N;
+				print "      (u).$cname\[$n\]+=(v).$cname\[$k\]*(w).$cname\[$l\]";
+				if($i==$N-1 and $y==$N-1 and $j==$N-1) { print "\n\n"; } else { print "; \\\n"; }
+			}
+			$n++;
+			$k-=$shift2;
+			$l-=$shift;
+		}
+		$k+=$N;
+		$l=0;
+	}
+	} else { #partial unroll
+		print "   do { \\\n";
+		if($N<(2*$unroll+1)) {
+		    print "      int _i,_y,_n=0,_k=0,_l=0;\\\n";
+		} else {
+		    print "      int _i,_y,_j,_n=0,_k=0,_l=0;\\\n";
+		}
+		print "      for (_i=0; _i<$N; ++_i){\\\n";
+		print "         for (_y=0; _y<$N; ++_y){\\\n";
+		print "            (u).$cname\[_n\]+=(v).$cname\[_k\]*(w).$cname\[_l\];\\\n";
+		if($N<(2*$unroll+1)) {
+			for(my $j=1;$j<$N;$j++){
+				print "            ++_k; _l+=$N; (u).$cname\[_n\]+=(v).$cname\[_k\]*(w).$cname\[_l\];\\\n";
+			}
+		} else {
+			print "            for (_j=0; _j<$md; ){ \\\n";
+			for(my $i=0;$i<$unroll;$i++){
+				print "               ++_k; _l+=$N; (u).$cname\[_n\]+=(v).$cname\[_k\]*(w).$cname\[_l\]; ++_j;\\\n";
+			}
+			print "            } \\\n";
+			for(my $i=0;$i<$mr;$i++){
+				print "            ++_k; _l+=$N; (u).$cname\[_n\]+=(v).$cname\[_k\]*(w).$cname\[_l\];\\\n";
+			}
+		}
+		print "            ++_n; _k-=$shift2; _l-=$shift;\\\n";
+		print "         } _k+=$N; _l=0;\\\n";
+		print "      }\\\n";
+		print "   } while(0) \n\n";
+	}
+}
+
+
 
 sub write_suN_times_suN_dagger {
   print "/* u=v*w^+ */\n";
