@@ -76,7 +76,7 @@ static void read_cmdline(int argc, char **argv)
       exit(0);
     }
   }
-  error(ai != 1, 0, "SETUP_GAUGE_FIELDS", "An input file must be defined\n");
+  error(ai != 1, -1, "SETUP_GAUGE_FIELDS", "An input file must be defined\n");
 }
 
 void setup_gauge_fields()
@@ -84,9 +84,10 @@ void setup_gauge_fields()
   if (setup_level != 1)
   {
     error(0, 1, "SETUP_GAUGE_FIELDS", "setup_process has not yet been called\n");
-  }
-  else
+  } else {
+    null_error();
     setup_level = 2;
+  }
 
   u_gauge = alloc_gfield(&glattice);
 
@@ -137,8 +138,9 @@ int setup_process(int *argc, char ***argv)
     int mesglen;
     MPI_Error_string(mpiret, mesg, &mesglen);
     lprintf("MPI", 0, "ERROR: %s\n", mesg);
-    error(1, 1, "setup_process " __FILE__, "MPI inizialization failed");
   }
+  error(mpiret != MPI_SUCCESS, 1, "setup_process " __FILE__,
+	"MPI inizialization failed");
   MPI_Comm_rank(MPI_COMM_WORLD, &MPI_PID);
   MPI_Comm_size(MPI_COMM_WORLD, &MPI_WORLD_SIZE);
   PID = MPI_PID;
@@ -161,8 +163,9 @@ int setup_process(int *argc, char ***argv)
   logger_set_input(&logger_var);
   if (PID != 0)
   {
-    logger_disable();
-  } /* disable logger for MPI processes != 0 */
+    logger_disable(); /* disable logger for MPI processes != 0 */
+    null_error();
+  }
   else
   {
     FILE *stderrp;
@@ -278,15 +281,15 @@ static int setup_replicas()
     if (!mpiret)
     {
       lprintf("MPI", 0, "ERROR: MPI has not been initialized!!!\n");
-      error(1, 1, "setup_replicas " __FILE__, "Cannot create replicas");
     }
+    error(!mpiret, 1, "setup_replicas " __FILE__, "Cannot create replicas");
 
     /* set up replicas */
     char sbuf[64];
-    if ((MPI_WORLD_SIZE % N_REP) != 0)
-    {
-      error(1, 1, "setup_replicas " __FILE__, "MPI_WORLD_SIZE is not a multiple of the number of replicas!");
-    }
+    error((MPI_WORLD_SIZE % N_REP) != 0,
+	  1,
+	  "setup_replicas " __FILE__,
+	  "MPI_WORLD_SIZE is not a multiple of the number of replicas!");
 
     RID = MPI_PID / (MPI_WORLD_SIZE / N_REP); /* Replica ID */
     mpiret = MPI_Comm_split(MPI_COMM_WORLD, RID, 0, &GLB_COMM);
@@ -296,8 +299,9 @@ static int setup_replicas()
       int mesglen;
       MPI_Error_string(mpiret, mesg, &mesglen);
       lprintf("MPI", 0, "ERROR: %s\n", mesg);
-      error(1, 1, "setup_replicas " __FILE__, "Inizialization of replicas failed");
     }
+    error(mpiret != MPI_SUCCESS, 1, "setup_replicas " __FILE__,
+	  "Inizialization of replicas failed");
     MPI_Comm_rank(GLB_COMM, &PID);
     MPI_Comm_size(GLB_COMM, &WORLD_SIZE);
 

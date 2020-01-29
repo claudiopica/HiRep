@@ -209,10 +209,14 @@ void glb_to_proc(int *g, int *p) {
   int d,r,c;
 
   /* sanity checks */
-  if (!((g[0]<GLB_T)&&(g[1]<GLB_X)&&(g[2]<GLB_Y)&&(g[3]<GLB_Z))  
-      || ((g[0]<0)||(g[1]<0)||(g[2]<0)||(g[3]<0))) { 
-    error(1,1,"glb_to_proc " __FILE__,"The global coordinates are invalid!!!");
-  }
+  error (
+    !((g[0]<GLB_T)&&(g[1]<GLB_X)&&(g[2]<GLB_Y)&&(g[3]<GLB_Z))  
+      || ((g[0]<0)||(g[1]<0)||(g[2]<0)||(g[3]<0)),
+    1,
+    "glb_to_proc " __FILE__,
+    "The global coordinates are invalid!!!"
+  );
+  
 
   d=GLB_T/NP_T; r=GLB_T-d*NP_T;
   p[0]=0; c=-1; while(1) {c+=d; if (p[0]<r) c++; if(g[0]>c) p[0]++; else break; }
@@ -254,8 +258,9 @@ int geometry_init() {
   MPI_Initialized(&mpiret);
   if(!mpiret) {
     lprintf("MPI",0,"ERROR: MPI has not been initialized!!!\n");
-    error(1,1,"setup_process " __FILE__,"Cannot create cartesian communicator");
   }
+  error(!mpiret, 1, "setup_process " __FILE__,
+	"Cannot create cartesian communicator");
 
   /* create the cartesian communicator */
   if(NP_T<2 && NP_X<2 && NP_Y<2 && NP_Z<2) {
@@ -272,8 +277,9 @@ int geometry_init() {
     int mesglen;
     MPI_Error_string(mpiret,mesg,&mesglen);
     lprintf("MPI",0,"ERROR: %s\n",mesg);
-    error(1,1,"setup_process " __FILE__,"Cannot create cartesian communicator");
   }
+  error(mpiret != MPI_SUCCESS, 1, "setup_process " __FILE__,
+	"Cannot create cartesian communicator");
   if (cart_comm == MPI_COMM_NULL) {
     lprintf("GEOMETRY",0,"WARNING: Nothing to be done for PID %d!\n",PID);
     return 1;

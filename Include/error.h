@@ -15,5 +15,6 @@
 #define ERROR_H
 
 void error(int test,int no,char *name,char *text);
+#define null_error() error(0, 0, 0, 0)
 
 #endif

@@ -60,9 +60,11 @@ static int blocking_level;
 
 void initialize_spatial_active_slices(int *tlist)
 {
-    if (NP_X != 1 || NP_Y != 1 || NP_Z != 1)
-        error(1, 1, "initialize_spatial_active_slices [spatial_transformations.c]",
-              "Error the spatial transformation module can be used only with non parallel spatial boundary conditions");
+    error((NP_X != 1 || NP_Y != 1 || NP_Z != 1),
+          1,
+          "initialize_spatial_active_slices [spatial_transformations.c]",
+          "Error the spatial transformation module can be used only with "
+          "non parallel spatial boundary conditions");
 
     if (active_slices_list == NULL)
     {

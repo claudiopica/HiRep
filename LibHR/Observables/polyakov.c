@@ -91,8 +91,11 @@ void polyakov()
                   status.MPI_TAG,
                   mesg);
         }
-        error(1, 1, "polyakov.c", "Cannot receive buf_gtf[1]");
       }
+      error(mpiret != MPI_SUCCESS, 1, "polyakov.c",
+	    "Cannot receive buf_gtf[1]");
+    } else {
+      null_error();
 #endif /* NDEBUG */
     }
 #endif /* WITH_MPI */
@@ -140,8 +143,10 @@ void polyakov()
         int mesglen;
         MPI_Error_string(mpiret, mesg, &mesglen);
         lprintf("MPI", 0, "ERROR: %s\n", mesg);
-        error(1, 1, "polyakov.c", "Cannot send buf_gtf[0]");
       }
+      error(mpiret != MPI_SUCCESS, 1, "polyakov.c", "Cannot send buf_gtf[0]");
+    } else {
+      null_error();
 #endif /* NDEBUG */
 
       memset(p, 0, sizeof(suNg) * size3d);
@@ -191,6 +196,7 @@ void polyakov()
 {
   int x[4], i4d, i3d, size3d;
   int loc[4] = {T, X, Y, Z};
+  int local_err = 0;
   suNg *p;
   suNg *lp;
   suNg *bp;
@@ -257,8 +263,11 @@ void polyakov()
                   status.MPI_TAG,
                   mesg);
         }
-        error(1, 1, "polyakov.c", "Cannot receive buf_gtf[1]");
       }
+      error(mpiret != MPI_SUCCESS, 1, "polyakov.c",
+	    "Cannot receive buf_gtf[1]");
+    } else {
+      null_error();
 #endif /* NDEBUG */
     }
 #endif /* WITH_MPI */
@@ -304,8 +313,10 @@ void polyakov()
         int mesglen;
         MPI_Error_string(mpiret, mesg, &mesglen);
         lprintf("MPI", 0, "ERROR: %s\n", mesg);
-        error(1, 1, "polyakov.c", "Cannot send buf_gtf[0]");
       }
+      error(mpiret != MPI_SUCCESS, 1, "polyakov.c", "Cannot send buf_gtf[0]");
+    } else {
+      null_error();
 #endif /* NDEBUG */
     }
 #endif /* WITH_MPI */
@@ -313,13 +324,13 @@ void polyakov()
     /* broadcast wilson lines */
 
 #ifdef WITH_MPI
-
+    local_err = 0;
     if (COORD[mu] == np[mu] - 1)
-    {
+      {
       MPI_Request comm_req[np[mu] - 1];
       int destCID = CID;
       for (int t = 0; t < np[mu] - 1; t++)
-      {
+	{
         destCID = proc_up(destCID, mu);
         MPIRET(mpiret)
         MPI_Isend(p,                                      /* buffer */
@@ -337,40 +348,54 @@ void polyakov()
           int mesglen;
           MPI_Error_string(mpiret, mesg, &mesglen);
           lprintf("MPI", 0, "ERROR: %s\n", mesg);
-          error(1, 1, "polyakov.c", "Cannot start send polyakov");
+	  local_err = 1;
+	  break;
         }
 #endif /* NDEBUG */
-      }
+	}
 
-      MPI_Status status[np[mu] - 1];
-      MPIRET(mpiret)
-      MPI_Waitall(np[mu] - 1, comm_req, status);
-#ifndef NDEBUG
-      if (mpiret != MPI_SUCCESS)
+      if (!local_err)
       {
-        char mesg[MPI_MAX_ERROR_STRING];
-        int mesglen, k;
-        MPI_Error_string(mpiret, mesg, &mesglen);
-        lprintf("MPI", 0, "ERROR: %s\n", mesg);
-        for (k = 0; k < np[mu] - 1; ++k)
+        MPI_Status status[np[mu] - 1];
+        MPIRET(mpiret)
+        MPI_Waitall(np[mu] - 1, comm_req, status);
+#ifndef NDEBUG
+        if (mpiret != MPI_SUCCESS)
         {
-          if (status[k].MPI_ERROR != MPI_SUCCESS)
+          char mesg[MPI_MAX_ERROR_STRING];
+          int mesglen, k;
+          MPI_Error_string(mpiret, mesg, &mesglen);
+          lprintf("MPI", 0, "ERROR: %s\n", mesg);
+          for (k = 0; k < np[mu] - 1; ++k)
           {
-            MPI_Error_string(status[k].MPI_ERROR, mesg, &mesglen);
-            lprintf("MPI", 0, "Req [%d] Source [%d] Tag [%] ERROR: %s\n",
-                    k,
-                    status[k].MPI_SOURCE,
-                    status[k].MPI_TAG,
-                    mesg);
+            if (status[k].MPI_ERROR != MPI_SUCCESS)
+            {
+              MPI_Error_string(status[k].MPI_ERROR, mesg, &mesglen);
+              lprintf("MPI", 0, "Req [%d] Source [%d] Tag [%] ERROR: %s\n",
+                      k,
+                      status[k].MPI_SOURCE,
+                      status[k].MPI_TAG,
+                      mesg);
+            }
           }
+	  local_err = 2;
         }
-        error(1, 1, "polyakov.c", "Cannot complete communications");
-      }
 #endif /* NDEBUG */
+      }
+      switch(local_err) {
+      case 0:
+	null_error();
+	break;
+      case 1:
+	error(1, 1, "polyakov.c", "Cannot start send polyakov");
+	break;
+      case 2:
+        error(1, 1, "polyakov.c", "Cannot complete communications");
+	break;
+      }
     }
     else
     {
-
       int sCOORD[4], sCID;
       sCOORD[0] = COORD[0];
       sCOORD[1] = COORD[1];
@@ -386,37 +411,50 @@ void polyakov()
         int mesglen;
         MPI_Error_string(mpiret, mesg, &mesglen);
         lprintf("MPI", 0, "ERROR: %s\n", mesg);
-        error(1, 1, "polyakov.c", "Cannot retrieve source CID");
+	local_err = 3;
       }
 #endif /* NDEBUG */
-      MPI_Status status;
-      MPIRET(mpiret)
-      MPI_Recv(p,                                      /* buffer */
-               size3d * sizeof(suNg) / sizeof(double), /* lenght in units of doubles */
-               MPI_DOUBLE,                             /* basic datatype */
-               sCID,                                   /* cid of destination */
-               COORD[mu],                              /* tag of communication */
-               cart_comm,                              /* use the cartesian communicator */
-               &status);
+      if(!local_err) {
+        MPI_Status status;
+        MPIRET(mpiret)
+        MPI_Recv(p,                                      /* buffer */
+                 size3d * sizeof(suNg) / sizeof(double), /* lenght in units of doubles */
+                 MPI_DOUBLE,                             /* basic datatype */
+                 sCID,                                   /* cid of destination */
+                 COORD[mu],                              /* tag of communication */
+                 cart_comm,                              /* use the cartesian communicator */
+                 &status);
 #ifndef NDEBUG
-      if (mpiret != MPI_SUCCESS)
-      {
-        char mesg[MPI_MAX_ERROR_STRING];
-        int mesglen;
-        MPI_Error_string(mpiret, mesg, &mesglen);
-        lprintf("MPI", 0, "ERROR: %s\n", mesg);
-        if (status.MPI_ERROR != MPI_SUCCESS)
+        if (mpiret != MPI_SUCCESS)
         {
-          MPI_Error_string(status.MPI_ERROR, mesg, &mesglen);
-          lprintf("MPI", 0, "Req [%d] Source [%d] Tag [%] ERROR: %s\n",
-                  0,
-                  status.MPI_SOURCE,
-                  status.MPI_TAG,
-                  mesg);
+          char mesg[MPI_MAX_ERROR_STRING];
+          int mesglen;
+          MPI_Error_string(mpiret, mesg, &mesglen);
+          lprintf("MPI", 0, "ERROR: %s\n", mesg);
+          if (status.MPI_ERROR != MPI_SUCCESS)
+          {
+            MPI_Error_string(status.MPI_ERROR, mesg, &mesglen);
+            lprintf("MPI", 0, "Req [%d] Source [%d] Tag [%] ERROR: %s\n",
+                    0,
+                    status.MPI_SOURCE,
+                    status.MPI_TAG,
+                    mesg);
+          }
+	  local_err = 4;
         }
-        error(1, 1, "polyakov.c", "Cannot receive polyakov");
-      }
 #endif /* NDEBUG */
+      }
+      switch (local_err) {
+      case 0:
+	null_error();
+	break;
+      case 3:
+	error(1, 1, "polyakov.c", "Cannot retrieve source CID");
+	break;
+      case 4:
+        error(1, 1, "polyakov.c", "Cannot receive polyakov");
+        break;
+      }
     }
 #endif /* WITH_MPI */
 

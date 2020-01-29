@@ -113,8 +113,9 @@ int main(int argc,char *argv[])
     int mesglen;
     MPI_Error_string(mpiret,mesg,&mesglen);
     lprintf("MPI",0,"ERROR: %s\n",mesg);
-    error(1,1,"main [check_wilsonloops_3.c]","Cannot compute global maximum");
   }
+  error(mpiret != MPI_SUCCESS, 1, "main [check_wilsonloops_3.c]",
+	"Cannot compute global maximum");
 #endif
 
   lprintf("MAIN",0,"Maximal normalized difference = %.2e\n",err);

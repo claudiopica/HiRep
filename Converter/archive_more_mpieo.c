@@ -63,6 +63,10 @@ void write_gauge_field_mpieo_LE(char filename[])
     error(fwrite_LE_double(&plaq,(size_t)(1),fp)!=(1),
         1,"write_gauge_field",
         "Failed to write gauge field plaquette");
+  } else {
+    null_error(); /* fopen */
+    null_error(); /* NG, global size */
+    null_error(); /* average plaquette */
   }
 
 #ifdef WITH_MPI
@@ -124,8 +128,12 @@ void write_gauge_field_mpieo_LE(char filename[])
                 int mesglen;
                 MPI_Error_string(mpiret,mesg,&mesglen);
                 lprintf("MPI",0,"ERROR: %s\n",mesg);
-                error(1,1,"write_gauge_field " __FILE__,"Cannot send buffer");
               }
+	      error(mpiret != MPI_SUCCESS, 1, "write_gauge_field " __FILE__,
+		    "Cannot send buffer");
+	    } else {
+	      null_error(); /* Z!=(GLB_Z/NP_Z+((p[3]<rz)?1:0)) */
+	      null_error(); /* mpiret != MPI_SUCCESS */
 #endif
             }
             /* receive buffer */
@@ -144,8 +152,11 @@ void write_gauge_field_mpieo_LE(char filename[])
                       st.MPI_TAG,
                       mesg);
                 }
-                error(1,1,"write_gauge_field " __FILE__,"Cannot receive buffer");
               }
+	      error(mpiret != MPI_SUCCESS, 1, "write_gauge_field " __FILE__,
+		    "Cannot receive buffer");
+	    } else {
+	      null_error();
 #endif
             }
           }
@@ -156,6 +167,8 @@ void write_gauge_field_mpieo_LE(char filename[])
             error(fwrite_LE_double(buff,(size_t)(bsize),fp)!=(bsize),
                 1,"write_gauge_field",
                 "Failed to write gauge field to file");
+	  } else {
+	    null_error();
           }
 
         } /* end loop over processors in Z direction */
@@ -178,6 +191,7 @@ void read_gauge_field_mpieo_LE(char filename[])
   int g[4], p[4];
   double *buff=NULL;
   int pid=0;
+  int local_err;
   int zsize, rz;
   double plaq, testplaq;
   struct timeval start, end, etime;
@@ -197,23 +211,37 @@ void read_gauge_field_mpieo_LE(char filename[])
     int d[5]={0}; /* contains NG,GLB_T,GLB_X,GLB_Y,GLB_Z */
     error((fp=fopen(filename,"rb"))==NULL,1,"read_gauge_field",
         "Failed to open file for reading");
+
     /* read NG and global size */
     error(fread_LE_int(d,(size_t)(5),fp)!=(5),
         1,"read_gauge_field",
         "Failed to read gauge field geometry");
+
     /* Check Gauge group and Lattice dimesions */
+    local_err = 0;
     if (NG!=d[0]) {
       lprintf("ERROR",0,"Read value of NG [%d] do not match this code [NG=%d].\nPlease recompile.\n",d[0],NG);
-      error(1,1,"read_gauge_field " __FILE__,"Gauge group mismatch");
+      local_err = 1;
     }
+    error(local_err, 1, "read_gauge_field " __FILE__, "Gauge group mismatch");
+
+    local_err = 0;
     if (GLB_T!=d[1] ||GLB_X!=d[2] ||GLB_Y!=d[3] ||GLB_Z!=d[4]) {
       lprintf("ERROR",0,"Read value of global lattice size (%d,%d,%d,%d) do not match input file (%d,%d,%d,%d).\n",
           d[1],d[2],d[3],d[4],GLB_T,GLB_X,GLB_Y,GLB_Z);
-      error(1,1,"read_gauge_field " __FILE__,"Gauge group mismatch");
+      local_err = 1;
     }
+    error(local_err, 1, "read_gauge_field " __FILE__, "Gauge group mismatch");
+
     error(fread_LE_double(&plaq,(size_t)(1),fp)!=(1),
         1,"read_gauge_field",
         "Failed to read gauge field plaquette");
+  } else {
+    null_error(); /* fopen */
+    null_error(); /* NG, global size */
+    null_error(); /* gauge group */
+    null_error(); /* lattice dimensions */
+    null_error(); /* read plaquette */
   }
 
 #ifdef WITH_MPI
@@ -242,6 +270,8 @@ void read_gauge_field_mpieo_LE(char filename[])
             error(fread_LE_double(buff,(size_t)(bsize),fp)!=(bsize),
                 1,"read_gauge_field",
                 "Failed to read gauge field from file");
+	  } else {
+	    null_error();
           }
 
 #ifdef WITH_MPI
@@ -256,8 +286,11 @@ void read_gauge_field_mpieo_LE(char filename[])
                 int mesglen;
                 MPI_Error_string(mpiret,mesg,&mesglen);
                 lprintf("MPI",0,"ERROR: %s\n",mesg);
-                error(1,1,"read_gauge_field " __FILE__,"Cannot send buffer");
               }
+	      error(mpiret != MPI_SUCCESS, 1, "read_gauge_field " __FILE__,
+		    "Cannot send buffer");
+	    } else {
+	      null_error();
 #endif
             }
             /* receive buffer */
@@ -279,8 +312,12 @@ void read_gauge_field_mpieo_LE(char filename[])
                       st.MPI_TAG,
                       mesg);
                 }
-                error(1,1,"read_gauge_field " __FILE__,"Cannot receive buffer");
               }
+	      error(mpiret != MPI_SUCCESS, 1, "read_gauge_field " __FILE__,
+		    "Cannot receive buffer");
+	    } else {
+	      null_error(); /* local lattice size mismatch */
+	      null_error(); /* cannot receive buffer */
 #endif
             }
           }
@@ -323,10 +360,15 @@ void read_gauge_field_mpieo_LE(char filename[])
   /* check average plaquette */
   testplaq=avr_plaquette();
   if (PID==0) {
+    local_error = 0;
     if (fabs(testplaq-plaq)>1.e-14) {
       lprintf("ERROR",0,"Stored plaquette value [%e] do not match the configuration! [diff=%e]\n",plaq,fabs(testplaq-plaq));
-      error(1,1,"read_gauge_field " __FILE__,"Plaquette value mismatch");
+      local_error = 1;
     }
+    error(local_error, 1, "read_gauge_field " __FILE__,
+	  "Plaquette value mismatch");
+  } else {
+    null_error();
   }
 
   gettimeofday(&end,0);

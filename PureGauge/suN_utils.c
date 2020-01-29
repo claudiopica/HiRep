@@ -56,6 +56,7 @@ static int parse_gstart(pg_flow *gf) {
   int t, x, y, z, ng;
   double beta;
   int ret=0;
+  int return_value = -1;
   char buf[256];
 
   ret=sscanf(gf->g_start,"%[^_]_%dx%dx%dx%dnc%db%lfn%d",
@@ -78,35 +79,43 @@ static int parse_gstart(pg_flow *gf) {
 
     lprintf("FLOW",0,"Starting from conf [%s]\n",gf->g_start);
 
-    return 0;
+    return_value = 0;
   }
 
-  gf->start=1; /* reset gf->start */
+  if (return_value < 0) {
+    gf->start=1; /* reset gf->start */
 
-  /* try if it match a unit or random start */
-  strcpy(buf,gf->g_start);
-  slower(buf);
-  ret=strcmp(buf,"unit");
-  if (ret==0) {
-    lprintf("FLOW",0,"Starting a new run from a unit conf!\n");
-    return 1;
+    /* try if it match a unit or random start */
+    strcpy(buf,gf->g_start);
+    slower(buf);
+    ret=strcmp(buf,"unit");
+    if (ret==0) {
+      lprintf("FLOW",0,"Starting a new run from a unit conf!\n");
+      return_value = 1;
+    }
   }
-  ret=strcmp(buf,"random");
-  if (ret==0) {
-    lprintf("FLOW",0,"Starting a new run from a random conf!\n");
-    return 2;
+  if (return_value < 0) {
+    ret=strcmp(buf,"random");
+    if (ret==0) {
+      lprintf("FLOW",0,"Starting a new run from a random conf!\n");
+      return_value = 2;
+    }
   }
-  
-  lprintf("ERROR",0,"Invalid starting gauge conf specified [%s]\n",gf->g_start);
-  error(1,1,"parse_gstart " __FILE__,"invalid config name");
 
-  return -1;
+  if (return_value < 0) {
+    lprintf("ERROR", 0, "Invalid starting gauge conf specified [%s]\n",
+	    gf->g_start);
+  }
+  error(return_value < 0, 1, "parse_gstart " __FILE__, "invalid config name");
+
+  return return_value;
 }
 
 static int parse_lastconf(pg_flow *gf) {
 
   int ret=0;
   int addtostart=0;
+  int return_value = -1;
 
   if (gf->last_conf[0]=='+') { addtostart=1; }
   if(addtostart) {
@@ -117,13 +126,16 @@ static int parse_lastconf(pg_flow *gf) {
   if (ret==1) {
     if (addtostart) gf->end+=gf->start;
     else gf->end++;
-    return 0;
+    return_value = 0;
   }
 
-  lprintf("ERROR",0,"Invalid last conf specified [%s]\n",gf->last_conf);
-  error(1,1,"parse_lastconf " __FILE__,"invalid last config name");
+  if (return_value < 0) {
+    lprintf("ERROR", 0, "Invalid last conf specified [%s]\n", gf->last_conf);
+  }
+  error(return_value < 0, 1, "parse_lastconf " __FILE__,
+	"invalid last config name");
 
-  return -1;
+  return return_value;
 }
 
 int init_mc(pg_flow *gf, char *ifile) {

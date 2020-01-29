@@ -100,8 +100,11 @@ void write_gauge_field_eolexi_BE(char filename[])
           int mesglen;
           MPI_Error_string(mpiret,mesg,&mesglen);
           lprintf("MPI",0,"ERROR: %s\n",mesg);
-          error(1,1,"write_gauge_field_eolexi " __FILE__,"Cannot send u_gauge buffer");
         }
+	error(mpiret != MPI_SUCCESS, 1, "write_gauge_field_eolexi " __FILE__,
+	      "Cannot send u_gauge buffer");
+      } else {
+	null_error();
 #endif
       }
       /* receive buffer */
@@ -120,8 +123,11 @@ void write_gauge_field_eolexi_BE(char filename[])
                 st.MPI_TAG,
                 mesg);
           }
-          error(1,1,"read_gauge_field_eolexi " __FILE__,"Cannot receive u_gauge buffer");
         }
+	error(mpiret != MPI_SUCCESS, 1, "read_gauge_field_eolexi " __FILE__,
+	      "Cannot receive u_gauge buffer");
+      } else {
+	null_error();
 #endif
       }
     }
@@ -137,6 +143,9 @@ void write_gauge_field_eolexi_BE(char filename[])
         "Failed to write gauge field to file");
     fclose(fp);
     free(eolexi_field);
+  } else {
+    null_error();
+    null_error();
   }
 
   lprintf("IO",0,"Configuration [%s] saved\n",filename);
@@ -160,6 +169,9 @@ void read_gauge_field_eolexi_BE(char filename[])
     error(fread_BE_double((double*)eolexi_field,4*GLB_T*GLB_X*GLB_Y*GLB_Z*sizeof(suNg)/sizeof(double),fp)!=4*GLB_T*GLB_X*GLB_Y*GLB_Z*(int)sizeof(suNg)/(int)sizeof(double),
         1,"read_gauge_field_eolexi",
         "Failed to read gauge field from file");
+  } else {
+    null_error();
+    null_error();
   }
 
 #ifdef WITH_MPI
@@ -280,8 +292,11 @@ void write_gauge_field_eolexi_LE(char filename[])
           int mesglen;
           MPI_Error_string(mpiret,mesg,&mesglen);
           lprintf("MPI",0,"ERROR: %s\n",mesg);
-          error(1,1,"write_gauge_field_eolexi " __FILE__,"Cannot send u_gauge buffer");
         }
+	error(mpiret != MPI_SUCCESS, 1, "write_gauge_field_eolexi " __FILE__,
+	      "Cannot send u_gauge buffer");
+      } else {
+	null_error();
 #endif
       }
       /* receive buffer */
@@ -300,8 +315,11 @@ void write_gauge_field_eolexi_LE(char filename[])
                 st.MPI_TAG,
                 mesg);
           }
-          error(1,1,"read_gauge_field_eolexi " __FILE__,"Cannot receive u_gauge buffer");
         }
+	error(mpiret != MPI_SUCCESS, 1, "read_gauge_field_eolexi " __FILE__,
+	      "Cannot receive u_gauge buffer");
+      } else {
+	null_error();
 #endif
       }
     }
@@ -317,6 +335,9 @@ void write_gauge_field_eolexi_LE(char filename[])
         "Failed to write gauge field to file");
     fclose(fp);
     free(eolexi_field);
+  } else {
+    null_error();
+    null_error();
   }
 
   lprintf("IO",0,"Configuration [%s] saved\n",filename);
@@ -340,6 +361,9 @@ void read_gauge_field_eolexi_LE(char filename[])
     error(fread_LE_double((double*)eolexi_field,4*GLB_T*GLB_X*GLB_Y*GLB_Z*sizeof(suNg)/sizeof(double),fp)!=4*GLB_T*GLB_X*GLB_Y*GLB_Z*(int)sizeof(suNg)/(int)sizeof(double),
         1,"read_gauge_field_eolexi",
         "Failed to read gauge field from file");
+  } else {
+    null_error();
+    null_error();
   }
 
 #ifdef WITH_MPI

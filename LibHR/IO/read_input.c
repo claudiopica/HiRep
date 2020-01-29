@@ -51,6 +51,7 @@ void read_input(input_record_t irec[], char *filename) {
 
   /* when using mpi only PID==0 reads the input file */
   if (PID!=0) {
+    null_error();
     mpi_broadcast_parameters(irec);
     return;
   }

@@ -55,6 +55,7 @@ static int parse_gstart(pg_flow_ml *gf)
     double beta;
     double anisotropy;
     int ret = 0;
+    int return_value = -1;
     char buf[256];
 
     ret = sscanf(gf->g_start, "%[^_]_%dx%dx%dx%dnc%db%lfan%lfn%d",
@@ -81,31 +82,36 @@ static int parse_gstart(pg_flow_ml *gf)
 
         lprintf("FLOW", 0, "Starting from conf [%s]\n", gf->g_start);
 
-        return 0;
+        return_value = 0;
     }
 
-    gf->start = 1; /* reset gf->start */
+    if (return_value < 0) {
+      gf->start = 1; /* reset gf->start */
 
-    /* try if it match a unit or random start */
-    strcpy(buf, gf->g_start);
-    slower(buf);
-    ret = strcmp(buf, "unit");
-    if (ret == 0)
-    {
-        lprintf("FLOW", 0, "Starting a new run from a unit conf!\n");
-        return 1;
+      /* try if it match a unit or random start */
+      strcpy(buf, gf->g_start);
+      slower(buf);
+      ret = strcmp(buf, "unit");
+      if (ret == 0)
+      {
+          lprintf("FLOW", 0, "Starting a new run from a unit conf!\n");
+          return_value = 1;
+      }
     }
-    ret = strcmp(buf, "random");
-    if (ret == 0)
-    {
-        lprintf("FLOW", 0, "Starting a new run from a random conf!\n");
-        return 2;
+    if (return_value < 0) {
+      ret = strcmp(buf, "random");
+      if (ret == 0)
+      {
+          lprintf("FLOW", 0, "Starting a new run from a random conf!\n");
+          return_value = 2;
+      }
     }
+    if (return_value < 0) {
+      lprintf("ERROR", 0, "Invalid starting gauge conf specified [%s]\n", gf->g_start);
+    }
+    error(return_value < 0, 1, "parse_gstart " __FILE__, "invalid config name");
 
-    lprintf("ERROR", 0, "Invalid starting gauge conf specified [%s]\n", gf->g_start);
-    error(1, 1, "parse_gstart " __FILE__, "invalid config name");
-
-    return -1;
+    return return_value;
 }
 
 static int parse_lastconf(pg_flow_ml *gf)
@@ -113,6 +119,7 @@ static int parse_lastconf(pg_flow_ml *gf)
 
     int ret = 0;
     int addtostart = 0;
+    int return_value = -1;
 
     if (gf->last_conf[0] == '+')
     {
@@ -132,18 +139,21 @@ static int parse_lastconf(pg_flow_ml *gf)
             gf->end += gf->start;
         else
             gf->end++;
-        return 0;
+        return_value = 0;
     }
+    if (return_value < 0) {
+      lprintf("ERROR", 0, "Invalid last conf specified [%s]\n", gf->last_conf);
+    }
+    error(return_value < 0, 1, "parse_lastconf " __FILE__,
+	  "invalid last config name");
 
-    lprintf("ERROR", 0, "Invalid last conf specified [%s]\n", gf->last_conf);
-    error(1, 1, "parse_lastconf " __FILE__, "invalid last config name");
-
-    return -1;
+    return return_value;
 }
 
 int init_mc_ml(pg_flow_ml *gf, char *ifile)
 {
     int start_t;
+    int local_err = 0;
 
     strcpy(gf->g_start, "invalid");
     strcpy(gf->run_name, "run_name");
@@ -171,22 +181,34 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
     /* get the first token */
     token = strtok(pg_var_ml.cml_niteration, sep);
     /* walk through other tokens */
+    local_err = 0;
     for (int i = 0; i < pg_var_ml.ml_levels; i++)
     {
-        error(token == NULL, 1, "init_mc_ml " __FILE__, "Missing one level of number of iterartions");
+        if(token == NULL) {
+          local_err = 1;
+	  break;
+	}
         pg_var_ml.ml_niteration[i] = atoi(token);
-
         token = strtok(NULL, sep);
     }
+    error(local_err, 1, "init_mc_ml " __FILE__,
+	  "Missing one level of number of iterations");
 
     token = strtok(pg_var_ml.cml_nskip, sep);
+    local_err = 0;
     /* walk through other tokens */
     for (int i = 0; i < pg_var_ml.ml_levels; i++)
     {
-        error(token == NULL, 1, "init_mc_ml " __FILE__, "Missing one level of skip iterartions");
+        if (token == NULL) {
+          local_err = 1;
+	  break;
+	}
         pg_var_ml.ml_nskip[i] = atoi(token);
         token = strtok(NULL, sep);
     }
+    error(local_err, 1, "init_mc_ml " __FILE__,
+	  "Missing one level of skip iterations");
+
     lprintf("INIT ML", 0, "number of MultiLevels=%d\n", pg_var_ml.ml_levels);
     for (int i = 0; i < pg_var_ml.ml_levels; i++)
         lprintf("INIT ML", 0, "lev %d nup=%d nskip=%d\n", i, pg_var_ml.ml_niteration[i], pg_var_ml.ml_nskip[i]);
@@ -233,6 +255,7 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
     int k, l, dt;
     i = 0;
     j = 0;
+    local_err = 0;
     do
     {
         k = 0;
@@ -240,27 +263,70 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
         do
         {
             pg_var_ml.corrs.list[j].id = i;
-            error(sscanf(token2, "%d-%d", &(pg_var_ml.corrs.list[j].t1), &(pg_var_ml.corrs.list[j].t2)) != 2, 1, "init_mc_ml " __FILE__, "Badly formatted ML correlators ");
+	    if(sscanf(token2,
+		      "%d-%d",
+		      &(pg_var_ml.corrs.list[j].t1),
+		      &(pg_var_ml.corrs.list[j].t2)) != 2) {
+	      local_err = 1;
+	      break;
+	    }
 
             k++;
             j++;
             token2 = strtok_r(NULL, sep2, &saveptr2);
         } while (token2 != NULL);
 
+	if (local_err) { break; }
+
         dt = pg_var_ml.corrs.list[j - 1].t2 - pg_var_ml.corrs.list[j - 1].t1;
 
         for (l = 0; l < k; l++)
-        {
-            error(pg_var_ml.corrs.list[j - 1 - l].t2 - pg_var_ml.corrs.list[j - 1 - l].t1 != dt, 1, "init_mc_ml " __FILE__, "Badly formatted ML correlator (different dt)");
+	  {
+	    if (pg_var_ml.corrs.list[j - 1 - l].t2
+		- pg_var_ml.corrs.list[j - 1 - l].t1 != dt) {
+	      local_err = 2;
+	      break;
+	    }
 
-            error(pg_var_ml.corrs.list[j - 1 - l].t1 < 0 || pg_var_ml.corrs.list[j - 1 - l].t1 >= GLB_T, 1, "init_mc_ml " __FILE__, "Badly formatted ML correlator (t1 out of bound)");
-            error(pg_var_ml.corrs.list[j - 1 - l].t2 < 0 || pg_var_ml.corrs.list[j - 1 - l].t2 >= GLB_T, 1, "init_mc_ml " __FILE__, "Badly formatted ML correlator (t2 out of bound)");
+	    if (pg_var_ml.corrs.list[j - 1 - l].t1 < 0
+		|| pg_var_ml.corrs.list[j - 1 - l].t1 >= GLB_T) {
+	      local_err = 3;
+	      break;
+	    }
+
+	    if (pg_var_ml.corrs.list[j - 1 - l].t2 < 0 || pg_var_ml.corrs.list[j - 1 - l].t2 >= GLB_T) {
+	      local_err = 4;
+	      break;
+	    }
 
             pg_var_ml.corrs.list[j - 1 - l].n_pairs = k;
         }
+	if (local_err) { break; }
+
         i++;
         token = strtok_r(NULL, sep, &saveptr1);
     } while (token != NULL);
+
+    switch (local_err) {
+    case 0:
+      null_error();
+      break;
+    case 1:
+      error(1, 1, "init_mc_ml " __FILE__, "Badly formatted ML correlators ");
+      break;
+    case 2:
+      error(1, 1, "init_mc_ml " __FILE__,
+	    "Badly formatted ML correlator (different dt)");
+      break;
+    case 3:
+      error(1, 1, "init_mc_ml " __FILE__,
+	    "Badly formatted ML correlator (t1 out of bound)");
+      break;
+    case 4:
+      error(1, 1, "init_mc_ml " __FILE__,
+	    "Badly formatted ML correlator (t2 out of bound)");
+      break;
+    }
 
     int tlist[GLB_T];
     for (l = 0; l < GLB_T; l++)

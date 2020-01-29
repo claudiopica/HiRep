@@ -1,10 +1,10 @@
 // Global variables 
-GLB_T = 16
+GLB_T = 8
 GLB_X = 8
 GLB_Y = 8
 GLB_Z = 8
 NP_T = 2
-NP_X = 1
+NP_X = 2
 NP_Y = 1
 NP_Z = 1
 
@@ -43,11 +43,12 @@ SF_sign = 1
 // Runtime variables
 //example: run1_8x8x8x8nc2rFUNnf0b0.000000m0.000000
 run name = run1
-save freq = 10000
+save freq = 1
 meas freq = 1
 conf dir = .
-gauge start = random // run1_6x6x6x6nc2rADJnf2b6.000000m-0.000000n10
-last conf = 100
+gauge start = run1_8x8x8x8nc2rADJnf3b4.000000m0.200000n2
+//gauge start = random // run1_6x6x6x6nc2rADJnf2b6.000000m-0.000000n10
+last conf = +1
 
 // Mesons
 mes:make = false

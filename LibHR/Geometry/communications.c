@@ -326,8 +326,9 @@ void complete_clover_force_sendrecv(suNf_field *gf) {
               mesg);
         }
       }
-      error(1,1,"complete_clover_force_sendrecv " __FILE__,"Cannot complete communications");
     }
+    error(mpiret != MPI_SUCCESS, 1, "complete_clover_force_sendrecv " __FILE__,
+	  "Cannot complete communications");
 #endif
   }
 
@@ -379,8 +380,9 @@ void start_clover_force_sendrecv(suNf_field *gf) {
       int mesglen;
       MPI_Error_string(mpiret,mesg,&mesglen);
       lprintf("MPI",0,"ERROR: %s\n",mesg);
-      error(1,1,"start_clover_force_sendrecv " __FILE__,"Cannot start send buffer");
     }
+    error(mpiret != MPI_SUCCESS, 1, "start_clover_force_sendrecv " __FILE__,
+	  "Cannot start send buffer");
 #endif
 
     /* receive ith buffer */
@@ -398,8 +400,9 @@ void start_clover_force_sendrecv(suNf_field *gf) {
       int mesglen;
       MPI_Error_string(mpiret,mesg,&mesglen);
       lprintf("MPI",0,"ERROR: %s\n",mesg);
-      error(1,1,"start_clover_force_sendrecv " __FILE__,"Cannot start receive buffer");
     }
+    error(mpiret != MPI_SUCCESS, 1, "start_clover_force_sendrecv " __FILE__,
+	  "Cannot start receive buffer");
 #endif
 
   }
@@ -434,8 +437,9 @@ void complete_gf_sendrecv(suNg_field *gf) {
               mesg);
         }
       }
-      error(1,1,"complete_gf_sendrecv " __FILE__,"Cannot complete communications");
     }
+    error(mpiret != MPI_SUCCESS, 1, "complete_gf_sendrecv " __FILE__,
+	  "Cannot complete communications");
 #endif
   }
 
@@ -487,8 +491,9 @@ void start_gf_sendrecv(suNg_field *gf) {
       int mesglen;
       MPI_Error_string(mpiret,mesg,&mesglen);
       lprintf("MPI",0,"ERROR: %s\n",mesg);
-      error(1,1,"start_gf_sendrecv " __FILE__,"Cannot start send buffer");
     }
+    error(mpiret != MPI_SUCCESS, 1, "start_gf_sendrecv " __FILE__,
+	  "Cannot start send buffer");
 #endif
 
     /* receive ith buffer */
@@ -506,8 +511,9 @@ void start_gf_sendrecv(suNg_field *gf) {
       int mesglen;
       MPI_Error_string(mpiret,mesg,&mesglen);
       lprintf("MPI",0,"ERROR: %s\n",mesg);
-      error(1,1,"start_gf_sendrecv " __FILE__,"Cannot start receive buffer");
     }
+    error(mpiret != MPI_SUCCESS, 1, "start_gf_sendrecv " __FILE__,
+	  "Cannot start receive buffer");
 #endif
 
   }
@@ -541,8 +547,9 @@ void complete_sf_sendrecv(spinor_field *sf) {
               mesg);
         }
       }
-      error(1,1,"complete_gf_sendrecv " __FILE__,"Cannot complete communications");
     }
+    error(mpiret != MPI_SUCCESS, 1, "complete_gf_sendrecv " __FILE__,
+	  "Cannot complete communications");
 #endif
   }
 
@@ -594,8 +601,9 @@ void start_sf_sendrecv(spinor_field *sf) {
       int mesglen;
       MPI_Error_string(mpiret,mesg,&mesglen);
       lprintf("MPI",0,"ERROR: %s\n",mesg);
-      error(1,1,"start_gf_sendrecv " __FILE__,"Cannot start send buffer");
     }
+    error(mpiret != MPI_SUCCESS, 1, "start_gf_sendrecv " __FILE__,
+	  "Cannot start send buffer");
 #endif
 
     /* receive ith buffer */
@@ -613,8 +621,9 @@ void start_sf_sendrecv(spinor_field *sf) {
       int mesglen;
       MPI_Error_string(mpiret,mesg,&mesglen);
       lprintf("MPI",0,"ERROR: %s\n",mesg);
-      error(1,1,"start_gf_sendrecv " __FILE__,"Cannot start receive buffer");
     }
+    error(mpiret != MPI_SUCCESS, 1, "start_gf_sendrecv " __FILE__,
+	  "Cannot start receive buffer");
 #endif
 
   }
@@ -648,8 +657,9 @@ void complete_gt_sendrecv(suNg_field *gf) {
               mesg);
         }
       }
-      error(1,1,"complete_gt_sendrecv " __FILE__,"Cannot complete communications");
     }
+    error(mpiret != MPI_ERROR, 1, "complete_gt_sendrecv " __FILE__,
+	  "Cannot complete communications");
 #endif
   }
 
@@ -686,8 +696,9 @@ void start_gt_sendrecv(suNg_field *gf) {
       int mesglen;
       MPI_Error_string(mpiret,mesg,&mesglen);
       lprintf("MPI",0,"ERROR: %s\n",mesg);
-      error(1,1,"start_gt_sendrecv " __FILE__,"Cannot start send buffer");
     }
+    error(mpiret != MPI_SUCCESS, 1, "start_gt_sendrecv " __FILE__,
+	  "Cannot start send buffer");
 #endif
 
     /* receive ith buffer */
@@ -705,8 +716,8 @@ void start_gt_sendrecv(suNg_field *gf) {
       int mesglen;
       MPI_Error_string(mpiret,mesg,&mesglen);
       lprintf("MPI",0,"ERROR: %s\n",mesg);
-      error(1,1,"start_gt_sendrecv " __FILE__,"Cannot start receive buffer");
     }
+    error(mpiret != MPI_SUCCESS, 1, "start_gt_sendrecv " __FILE__, "Cannot start receive buffer");
 #endif
 
   }
@@ -740,8 +751,9 @@ void complete_sc_sendrecv(suNg_scalar_field *sf) {
               mesg);
         }
       }
-      error(1,1,"complete_sc_sendrecv " __FILE__,"Cannot complete communications");
     }
+    error(mpiret != MPI_SUCCESS, 1, "complete_sc_sendrecv " __FILE__,
+	  "Cannot complete communications");
 #endif
   }
 
@@ -793,8 +805,9 @@ void start_sc_sendrecv(suNg_scalar_field *sf) {
       int mesglen;
       MPI_Error_string(mpiret,mesg,&mesglen);
       lprintf("MPI",0,"ERROR: %s\n",mesg);
-      error(1,1,"start_sc_sendrecv " __FILE__,"Cannot start send buffer");
     }
+    error(mpiret != MPI_SUCCESS, 1, "start_sc_sendrecv " __FILE__,
+	  "Cannot start send buffer");
 #endif
 
     /* receive ith buffer */
@@ -812,8 +825,9 @@ void start_sc_sendrecv(suNg_scalar_field *sf) {
       int mesglen;
       MPI_Error_string(mpiret,mesg,&mesglen);
       lprintf("MPI",0,"ERROR: %s\n",mesg);
-      error(1,1,"start_sc_sendrecv " __FILE__,"Cannot start receive buffer");
     }
+    error(mpiret != MPI_SUCCESS, 1, "start_sc_sendrecv " __FILE__,
+	  "Cannot start receive buffer");
 #endif
 
   }

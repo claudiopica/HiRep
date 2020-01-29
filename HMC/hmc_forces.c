@@ -159,9 +159,10 @@ int main(int argc,char *argv[]) {
   setup_process(&argc,&argv);
   read_input(logger_var.read,input_filename);
   logger_set_input(&logger_var);
-  if (PID!=0) { 
-    logger_disable(); }   /* disable logger for MPI processes != 0 */
-  else {
+  if (PID!=0) {
+    logger_disable(); /* disable logger for MPI processes != 0 */
+    null_error();
+  } else {
     FILE* stderrp;
     sprintf(sbuf,">>%s",output_filename);  logger_stdout(sbuf);
     stderrp=freopen(error_filename,"w",stderr);
@@ -188,7 +189,9 @@ int main(int argc,char *argv[]) {
   /* logger setup */
   read_input(logger_var.read,input_filename);
   logger_set_input(&logger_var);
-  if (PID!=0) { logger_disable(); }   /* disable logger for MPI processes != 0 */
+  if (PID!=0) {
+    logger_disable(); /* disable logger for MPI processes != 0 */
+    null_error();
   else {
     FILE* stderrp;
     sprintf(sbuf,">>%s",output_filename);  logger_stdout(sbuf);

@@ -866,8 +866,8 @@ static void search_all_blocks(unsigned int parity, unsigned int mask[4]) {
   if(n==0) {
     lprintf("TEST_GEOMETRY",loglevel,"ERROR search_all_blocks: Block not found");
     print_block_info(&tmp);
-    error(1,1,"test_geometry.c","Block initialization... FAILED");
   }
+  error(n==0, 1, "test_geometry.c", "Block initialization... FAILED");
   */
 }
 
@@ -1053,7 +1053,8 @@ typedef struct _geometry_descriptor {
 static void test_goemetry_descriptor(geometry_descriptor *gd, int parity) {
   int first, last, howmany;
   int n, i;
-    int test_q;
+  int test_q;
+  int local_err = 0;
   site_info *s;
   block_info *b;
   
@@ -1076,10 +1077,12 @@ static void test_goemetry_descriptor(geometry_descriptor *gd, int parity) {
   
     if(gd->gsize_gauge != howmany) {
       lprintf("TEST_GEOMETRY",loglevel,"gsize_gauge should be %d\n",howmany);
-      error(1,1,"test_geometry.c","Check gsize_gauge... FAILED");
+      local_err = 1;
+    } else {
+      lprintf("TEST_GEOMETRY",loglevel,"Check gsize_gauge... OK\n");
     }
-    lprintf("TEST_GEOMETRY",loglevel,"Check gsize_gauge... OK\n");
   }
+  error(local_err, 1, "test_geometry.c", "Check gsize_gauge... FAILED");
 
   
   /* TEST: gsize_spinor */
@@ -1097,10 +1100,12 @@ static void test_goemetry_descriptor(geometry_descriptor *gd, int parity) {
   }
   howmany=last-first+1;
 
+  local_err = 0;
   if(gd->gsize_spinor != howmany) {
     lprintf("TEST_GEOMETRY",loglevel,"gsize_spinor should be %d\n",howmany);
-    error(1,1,"test_geometry.c","Check gsize_spinor... FAILED");
+    local_err = 1;
   }
+  error(local_err, 1, "test_geometry.c", "Check gsize_spinor... FAILED");
   lprintf("TEST_GEOMETRY",loglevel,"Check gsize_spinor... OK\n");
   
   
@@ -1896,8 +1901,11 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
         int mesglen;
         MPI_Error_string(mpiret,mesg,&mesglen);
         lprintf("MPI",0,"ERROR: %s\n",mesg);
-        error(1,1,"test_goemetry_descriptor [test_geometry_mpi.c]","Cannot start send buffer");
       }
+      error(mpiret != MPI_SUCCESS,
+	    1,
+	    "test_goemetry_descriptor [test_geometry_mpi.c]",
+	    "Cannot start send buffer");
   
       /* receive ith buffer */
       mpiret=MPI_Irecv(glb_coord+4*(gd->rbuf_start[i]-gd->master_shift), /* buffer */
@@ -1913,8 +1921,11 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
         int mesglen;
         MPI_Error_string(mpiret,mesg,&mesglen);
         lprintf("MPI",0,"ERROR: %s\n",mesg);
-        error(1,1,"test_goemetry_descriptor [test_geometry_mpi.c]","Cannot start receive buffer");
       }
+      error(mpiret != MPI_SUCCESS,
+	    1,
+	    "test_goemetry_descriptor [test_geometry_mpi.c]",
+	    "Cannot start receive buffer");
         
         /* send ith buffer */
         mpiret=MPI_Isend(indices+(gd->sbuf_start[i]-gd->master_shift), /* buffer */
@@ -1930,8 +1941,11 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
             int mesglen;
             MPI_Error_string(mpiret,mesg,&mesglen);
             lprintf("MPI",0,"ERROR: %s\n",mesg);
-            error(1,1,"test_goemetry_descriptor [test_geometry_mpi.c]","Cannot start send buffer");
         }
+	error(mpiret != MPI_SUCCESS,
+	      1,
+	      "test_goemetry_descriptor [test_geometry_mpi.c]",
+	      "Cannot start send buffer");
         
         /* receive ith buffer */
         mpiret=MPI_Irecv(indices+(gd->rbuf_start[i]-gd->master_shift), /* buffer */
@@ -1947,8 +1961,11 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
             int mesglen;
             MPI_Error_string(mpiret,mesg,&mesglen);
             lprintf("MPI",0,"ERROR: %s\n",mesg);
-            error(1,1,"test_goemetry_descriptor [test_geometry_mpi.c]","Cannot start receive buffer");
         }
+	error(mpiret != MPI_SUCCESS,
+	      1,
+	      "test_goemetry_descriptor [test_geometry_mpi.c]",
+	      "Cannot start receive buffer");
 
       lprintf("TEST_GEOMETRY",loglevel,"DONE\n",i);
     
@@ -1974,8 +1991,11 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
                 mesg);
           }
         }
-        error(1,1,"test_goemetry_descriptor [test_geometry_mpi.c]","Cannot complete communications");
       }
+      error(mpiret != MPI_SUCCESS,
+	    1,
+	    "test_goemetry_descriptor [test_geometry_mpi.c]",
+	    "Cannot complete communications");
     }
     
     test_q=true;
@@ -2043,8 +2063,11 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
                 int mesglen;
                 MPI_Error_string(mpiret,mesg,&mesglen);
                 lprintf("MPI",0,"ERROR: %s\n",mesg);
-                error(1,1,"test_goemetry_descriptor [test_geometry_mpi.c]","Cannot start send buffer");
             }
+	    error(mpiret != MPI_SUCCESS,
+		  1,
+		  "test_goemetry_descriptor [test_geometry_mpi.c]",
+		  "Cannot start send buffer");
             
             /* receive ith buffer */
             mpiret=MPI_Irecv(glb_coord+4*(gd->rbuf_start[i]-gd->master_shift), /* buffer */
@@ -2060,8 +2083,11 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
                 int mesglen;
                 MPI_Error_string(mpiret,mesg,&mesglen);
                 lprintf("MPI",0,"ERROR: %s\n",mesg);
-                error(1,1,"test_goemetry_descriptor [test_geometry_mpi.c]","Cannot start receive buffer");
             }
+	    error(mpiret != MPI_SUCCESS,
+		  1,
+		  "test_goemetry_descriptor [test_geometry_mpi.c]",
+		  "Cannot start receive buffer");
             
             /* send ith buffer */
             mpiret=MPI_Isend(indices+(gd->sbuf_start[i]-gd->master_shift), /* buffer */
@@ -2077,8 +2103,11 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
                 int mesglen;
                 MPI_Error_string(mpiret,mesg,&mesglen);
                 lprintf("MPI",0,"ERROR: %s\n",mesg);
-                error(1,1,"test_goemetry_descriptor [test_geometry_mpi.c]","Cannot start send buffer");
             }
+	    error(mpiret != MPI_SUCCESS,
+		  1,
+		  "test_goemetry_descriptor [test_geometry_mpi.c]",
+		  "Cannot start send buffer");
             
             /* receive ith buffer */
             mpiret=MPI_Irecv(indices+(gd->rbuf_start[i]-gd->master_shift), /* buffer */
@@ -2094,8 +2123,11 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
                 int mesglen;
                 MPI_Error_string(mpiret,mesg,&mesglen);
                 lprintf("MPI",0,"ERROR: %s\n",mesg);
-                error(1,1,"test_goemetry_descriptor [test_geometry_mpi.c]","Cannot start receive buffer");
             }
+	    error(mpiret != MPI_SUCCESS,
+		  1,
+		  "test_goemetry_descriptor [test_geometry_mpi.c]",
+		  "Cannot start receive buffer");
             
             lprintf("TEST_GEOMETRY",loglevel,"DONE\n",i);
             
@@ -2121,8 +2153,11 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
                                 mesg);
                     }
                 }
-                error(1,1,"test_goemetry_descriptor [test_geometry_mpi.c]","Cannot complete communications");
             }
+	    error(mpiret != MPI_SUCCESS,
+		  1,
+		  "test_goemetry_descriptor [test_geometry_mpi.c]",
+		  "Cannot complete communications");
         }
         
         test_q=true;

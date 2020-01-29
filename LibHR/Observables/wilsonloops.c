@@ -298,8 +298,11 @@ void WL_Hamiltonian_gauge(suNg_field* out, suNg_field* in) {
             status.MPI_TAG, 
             mesg);
       }
-      error(1,1,"WL_Hamiltonian_gauge [wilsonloops.c]","Cannot receive buf_gtf[1]");
     }
+    error(mpiret != MPI_SUCCESS, 1, "WL_Hamiltonian_gauge [wilsonloops.c]",
+	  "Cannot receive buf_gtf[1]");
+  } else {
+    null_error();
 #endif /* NDEBUG */
   }
 #endif /* WITH_MPI */
@@ -334,8 +337,11 @@ void WL_Hamiltonian_gauge(suNg_field* out, suNg_field* in) {
       int mesglen;
       MPI_Error_string(mpiret,mesg,&mesglen);
       lprintf("MPI",0,"ERROR: %s\n",mesg);
-      error(1,1,"WL_Hamiltonian_gauge [wilsonloops.c]","Cannot send buf_gtf[0]");
     }
+    error(mpiret != MPI_SUCCESS, 1, "WL_Hamiltonian_gauge [wilsonloops.c]",
+	  "Cannot send buf_gtf[0]");
+  } else {
+    null_error();
 #endif /* NDEBUG */
   }
 #endif /* WITH_MPI */
@@ -388,6 +394,7 @@ void WL_Hamiltonian_gauge(suNg_field* out, suNg_field* in) {
 
 void WL_broadcast_polyakov(suNg* poly, suNg_field* gf) {
   int x,y,z;
+  int local_err = 0;
   if(COORD[0]==NP_T-1) {
     for(x=0;x<X;x++) for(y=0;y<Y;y++) for(z=0;z<Z;z++) {
       int i=ipt(T-1,x,y,z);
@@ -399,6 +406,7 @@ void WL_broadcast_polyakov(suNg* poly, suNg_field* gf) {
 #ifndef NDEBUG
   int mpiret;
 #endif /* WITH_MPI */
+  local_err = 0;
   if(COORD[0]==NP_T-1) {
     MPI_Request comm_req[NP_T-1];
     int destCID=CID;
@@ -418,33 +426,48 @@ void WL_broadcast_polyakov(suNg* poly, suNg_field* gf) {
         int mesglen;
         MPI_Error_string(mpiret,mesg,&mesglen);
         lprintf("MPI",0,"ERROR: %s\n",mesg);
-        error(1,1,"WL_broadcast_polyakov [wilsonloops.c]","Cannot start send polyakov");
+	local_err = 1;
+	break;
       }
 #endif /* NDEBUG */
     }
-    
-    MPI_Status status[NP_T-1];
-    MPIRET(mpiret) MPI_Waitall(NP_T-1, comm_req, status);
-#ifndef NDEBUG
-    if (mpiret != MPI_SUCCESS) {
-      char mesg[MPI_MAX_ERROR_STRING];
-      int mesglen, k;
-      MPI_Error_string(mpiret,mesg,&mesglen);
-      lprintf("MPI",0,"ERROR: %s\n",mesg);
-      for (k=0; k<NP_T-1; ++k) {
-        if (status[k].MPI_ERROR != MPI_SUCCESS) {
-          MPI_Error_string(status[k].MPI_ERROR,mesg,&mesglen);
-          lprintf("MPI",0,"Req [%d] Source [%d] Tag [%] ERROR: %s\n",
-              k, 
-              status[k].MPI_SOURCE, 
-              status[k].MPI_TAG, 
-              mesg);
-        }
-      }
-      error(1,1,"WL_broadcast_polyakov [wilsonloops.c]","Cannot complete communications");
-    }
-#endif /* NDEBUG */
 
+    if (!local_err) {
+      MPI_Status status[NP_T-1];
+      MPIRET(mpiret) MPI_Waitall(NP_T-1, comm_req, status);
+#ifndef NDEBUG
+      if (mpiret != MPI_SUCCESS) {
+        char mesg[MPI_MAX_ERROR_STRING];
+        int mesglen, k;
+        MPI_Error_string(mpiret,mesg,&mesglen);
+        lprintf("MPI",0,"ERROR: %s\n",mesg);
+        for (k=0; k<NP_T-1; ++k) {
+          if (status[k].MPI_ERROR != MPI_SUCCESS) {
+            MPI_Error_string(status[k].MPI_ERROR,mesg,&mesglen);
+            lprintf("MPI",0,"Req [%d] Source [%d] Tag [%] ERROR: %s\n",
+                k, 
+                status[k].MPI_SOURCE, 
+                status[k].MPI_TAG, 
+                mesg);
+          }
+        }
+        local_err = 2;
+      }
+#endif /* NDEBUG */
+    }
+    switch (local_err) {
+    case 0:
+      null_error();
+      break;
+    case 1:
+      error(1, 1, "WL_broadcast_polyakov [wilsonloops.c]",
+	    "Cannot start send polyakov");
+      break;
+    case 2:
+      error(1, 1, "WL_broadcast_polyakov [wilsonloops.c]",
+	    "Cannot complete communications");
+      break;
+    }
   } else {
 
     int sCOORD[4], sCID;
@@ -456,34 +479,49 @@ void WL_broadcast_polyakov(suNg* poly, suNg_field* gf) {
       int mesglen;
       MPI_Error_string(mpiret,mesg,&mesglen);
       lprintf("MPI",0,"ERROR: %s\n",mesg);
-      error(1,1,"WL_broadcast_polyakov [wilsonloops.c]","Cannot retrieve source CID");
+      local_err = 3;
     }
 #endif /* NDEBUG */
-    MPI_Status status;
-    MPIRET(mpiret) MPI_Recv((double * )(poly), /* buffer */
-        (X*Y*Z)*sizeof(suNg)/sizeof(double), /* lenght in units of doubles */
-        MPI_DOUBLE, /* basic datatype */
-        sCID, /* cid of destination */
-        COORD[0], /* tag of communication */
-        cart_comm, /* use the cartesian communicator */
-        &status);
+    if (!local_err) {
+      MPI_Status status;
+      MPIRET(mpiret) MPI_Recv((double * )(poly), /* buffer */
+          (X*Y*Z)*sizeof(suNg)/sizeof(double), /* lenght in units of doubles */
+          MPI_DOUBLE, /* basic datatype */
+          sCID, /* cid of destination */
+          COORD[0], /* tag of communication */
+          cart_comm, /* use the cartesian communicator */
+          &status);
 #ifndef NDEBUG
-    if (mpiret != MPI_SUCCESS) {
-      char mesg[MPI_MAX_ERROR_STRING];
-      int mesglen;
-      MPI_Error_string(mpiret,mesg,&mesglen);
-      lprintf("MPI",0,"ERROR: %s\n",mesg);
-      if (status.MPI_ERROR != MPI_SUCCESS) {
-        MPI_Error_string(status.MPI_ERROR,mesg,&mesglen);
-        lprintf("MPI",0,"Req [%d] Source [%d] Tag [%] ERROR: %s\n",
-            0, 
-            status.MPI_SOURCE, 
-            status.MPI_TAG, 
-            mesg);
+      if (mpiret != MPI_SUCCESS) {
+        char mesg[MPI_MAX_ERROR_STRING];
+        int mesglen;
+        MPI_Error_string(mpiret,mesg,&mesglen);
+        lprintf("MPI",0,"ERROR: %s\n",mesg);
+        if (status.MPI_ERROR != MPI_SUCCESS) {
+          MPI_Error_string(status.MPI_ERROR,mesg,&mesglen);
+          lprintf("MPI",0,"Req [%d] Source [%d] Tag [%] ERROR: %s\n",
+              0, 
+              status.MPI_SOURCE, 
+              status.MPI_TAG, 
+              mesg);
+	  local_err = 4;
+        }
       }
-      error(1,1,"WL_broadcast_polyakov [wilsonloops.c]","Cannot receive polyakov");
-    }
 #endif /* NDEBUG */
+    }
+    switch (local_err) {
+    case 0:
+      null_error();
+      break;
+    case 3:
+      error(1, 1, "WL_broadcast_polyakov [wilsonloops.c]",
+	    "Cannot retrieve source CID");
+      break;
+    case 4:
+      error(1, 1, "WL_broadcast_polyakov [wilsonloops.c]",
+	    "Cannot receive polyakov");
+      break;
+    }
   }
 #endif /* WITH_MPI */
 }
@@ -517,6 +555,7 @@ static void WL_parallel_transport(suNg* ret, const suNg_field* gf, int x, const 
 void WL_correlators(double** ret, const suNg_field* gf, const suNg* poly, const int nsteps, const int* path, const int length, const int perm[3], int sign[3]) {
   suNg tmp[2];
   int c[3];
+  int local_err = 0;
   
   c[0]=c[1]=c[2]=0;
   for(int i=0; i<length; i++) c[path[i]]++;
@@ -549,7 +588,7 @@ void WL_correlators(double** ret, const suNg_field* gf, const suNg* poly, const 
     MPI_Request comm_req[2];
     MPI_Status status[2];
 #ifndef NDEBUG
-  int mpiret;
+    int mpiret;
 #endif /* WITH_MPI */
     int destCID=CID;
     int sendCID=CID;
@@ -594,7 +633,8 @@ void WL_correlators(double** ret, const suNg_field* gf, const suNg* poly, const 
           int mesglen;
           MPI_Error_string(mpiret,mesg,&mesglen);
           lprintf("MPI",0,"ERROR: %s\n",mesg);
-          error(1,1,"WL_correlators [wilsonloops.c]","Cannot start receive buffer");
+	  local_err = 1;
+	  break;
         }
 #endif /* NDEBUG */
       }
@@ -646,7 +686,8 @@ void WL_correlators(double** ret, const suNg_field* gf, const suNg* poly, const 
                   mesg);
             }
           }
-          error(1,1,"WL_correlators [wilsonloops.c]","Cannot complete communications");
+	  local_err = 2;
+	  break;
         }
 #endif /* NDEBUG */
 
@@ -654,7 +695,19 @@ void WL_correlators(double** ret, const suNg_field* gf, const suNg* poly, const 
       }
 #endif /* WITH_MPI */
     }
-    
+    switch (local_err) {
+    case 0:
+      null_error();
+      break;
+    case 1:
+      error(1, 1, "WL_correlators [wilsonloops.c]",
+	    "Cannot start receive buffer");
+      break;
+    case 2:
+      error(1, 1, "WL_correlators [wilsonloops.c]",
+	    "Cannot complete communications");
+      break;
+    }
     global_sum(ret[s],GLB_T);
   }
 }
