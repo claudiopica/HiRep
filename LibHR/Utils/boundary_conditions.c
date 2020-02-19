@@ -19,7 +19,9 @@ static BCs_pars_t BCs_pars;
 #ifdef BC_XYZ_TWISTED
 static void init_plaq_twisted_BCs();
 #endif
+#ifdef BC_T_OPEN
 static void init_plaq_open_BCs(double ct, double cs);
+#endif
 #if defined(BASIC_SF) || defined(ROTATED_SF)
 static void init_plaq_Dirichlet_BCs(double ct);
 static void init_gf_SF_BCs(suNg *dn, suNg *up);
@@ -148,22 +150,10 @@ void init_BCs(BCs_pars_t *pars)
 
 #ifdef BC_T_OPEN
   lprintf("BCS", 0, "Open BC gauge boundary term ct=%e cs=%e\n", BCs_pars.gauge_boundary_improvement_ct, BCs_pars.gauge_boundary_improvement_cs);
-  init_plaq_open_BCs(BCs_pars.gauge_boundary_improvement_ct, BCs_pars.gauge_boundary_improvement_cs);
+  init_plaq_open_BCs(plaq_weight, rect_weight, BCs_pars.gauge_boundary_improvement_ct, BCs_pars.gauge_boundary_improvement_cs);
 #endif
 
-#ifdef BASIC_SF
-  lprintf("BCS", 0, "Dirichlet BC gauge boundary term ct=%e\n", BCs_pars.gauge_boundary_improvement_ct);
-  if (BCs_pars.SF_BCs == 0)
-  {
-    _suNg_unit(BCs_pars.gauge_boundary_dn);
-    _suNg_unit(BCs_pars.gauge_boundary_up);
-  }
-  else
-    init_gf_SF_BCs(&(BCs_pars.gauge_boundary_dn), &(BCs_pars.gauge_boundary_up));
-  init_plaq_Dirichlet_BCs(BCs_pars.gauge_boundary_improvement_ct);
-#endif
-
-#ifdef ROTATED_SF
+#if defined(BASIC_SF) || defined(ROTATED_SF)
   lprintf("BCS", 0, "Dirichlet BC gauge boundary term ct=%e\n", BCs_pars.gauge_boundary_improvement_ct);
   if (BCs_pars.SF_BCs == 0)
   {
@@ -518,7 +508,8 @@ static void init_gf_SF_BCs(suNg *dn, suNg *up)
   static double SF_eta = 0.;
   static double SF_phi0_dn[NG] = {-PI / 3., 0., PI / 3.};
   static double SF_phi1_dn[NG] = {1., -.5, -.5};
-  static double SF_phi0_up[NG] = {-PI, PI / 3., 2. * PI / 3.};
+  //static double SF_phi0_up[NG] = {-PI, PI / 3., 2. * PI / 3.};
+  static double SF_phi0_up[NG] = {-5. * PI / 3., 2. * PI / 3., PI};
   static double SF_phi1_up[NG] = {-1., .5, .5};
 
 #elif NG == 4
@@ -1191,9 +1182,9 @@ static void init_plaq_twisted_BCs()
 }
 #endif //BC_XYZ_TWISTED
 
-static void init_plaq_open_BCs(double ct, double cs)
+void init_plaq_open_BCs(double *lplaq_weight, double *lrect_weight, double ct, double cs)
 {
-  error(plaq_weight == NULL, 1, "init_plaq_open_BCs [boundary_conditions.c]",
+  error(lplaq_weight == NULL, 1, "init_plaq_open_BCs [boundary_conditions.c]",
         "Structure plaq_weight not initialized yet");
 
   int mu, nu, ix, iy, iz, index;
@@ -1212,18 +1203,22 @@ static void init_plaq_open_BCs(double ct, double cs)
               mu = 0;
               for (nu = mu + 1; nu < 4; nu++)
               {
-                plaq_weight[index * 16 + mu * 4 + nu] = 0;
-                plaq_weight[index * 16 + nu * 4 + mu] = 0;
-                rect_weight[index * 16 + mu * 4 + nu] = 0;
-                rect_weight[index * 16 + nu * 4 + mu] = 0;
+                lplaq_weight[index * 16 + mu * 4 + nu] = 0;
+                lplaq_weight[index * 16 + nu * 4 + mu] = 0;
+                if (lrect_weight != NULL)
+                  lrect_weight[index * 16 + mu * 4 + nu] = 0;
+                if (lrect_weight != NULL)
+                  lrect_weight[index * 16 + nu * 4 + mu] = 0;
               }
               for (mu = 1; mu < 3; mu++)
                 for (nu = mu + 1; nu < 4; nu++)
                 {
-                  plaq_weight[index * 16 + mu * 4 + nu] = 0.5 * cs;
-                  plaq_weight[index * 16 + nu * 4 + mu] = 0.5 * cs;
-                  rect_weight[index * 16 + mu * 4 + nu] = 0.5 * cs;
-                  rect_weight[index * 16 + nu * 4 + mu] = 0.5 * cs;
+                  lplaq_weight[index * 16 + mu * 4 + nu] = 0.5 * cs;
+                  lplaq_weight[index * 16 + nu * 4 + mu] = 0.5 * cs;
+                  if (lrect_weight != NULL)
+                    lrect_weight[index * 16 + mu * 4 + nu] = 0.5 * cs;
+                  if (lrect_weight != NULL)
+                    lrect_weight[index * 16 + nu * 4 + mu] = 0.5 * cs;
                 }
             }
           }
@@ -1239,16 +1234,18 @@ static void init_plaq_open_BCs(double ct, double cs)
             mu = 0;
             for (nu = mu + 1; nu < 4; nu++)
             {
-              plaq_weight[index * 16 + mu * 4 + nu] = ct;
-              plaq_weight[index * 16 + nu * 4 + mu] = ct;
+              lplaq_weight[index * 16 + mu * 4 + nu] = ct;
+              lplaq_weight[index * 16 + nu * 4 + mu] = ct;
             }
             for (mu = 1; mu < 3; mu++)
               for (nu = mu + 1; nu < 4; nu++)
               {
-                plaq_weight[index * 16 + mu * 4 + nu] = 0.5 * cs;
-                plaq_weight[index * 16 + nu * 4 + mu] = 0.5 * cs;
-                rect_weight[index * 16 + mu * 4 + nu] = 0.5 * cs;
-                rect_weight[index * 16 + nu * 4 + mu] = 0.5 * cs;
+                lplaq_weight[index * 16 + mu * 4 + nu] = 0.5 * cs;
+                lplaq_weight[index * 16 + nu * 4 + mu] = 0.5 * cs;
+                if (lrect_weight != NULL)
+                  lrect_weight[index * 16 + mu * 4 + nu] = 0.5 * cs;
+                if (lrect_weight != NULL)
+                  lrect_weight[index * 16 + nu * 4 + mu] = 0.5 * cs;
               }
           }
         }
@@ -1268,16 +1265,18 @@ static void init_plaq_open_BCs(double ct, double cs)
               mu = 0;
               for (nu = mu + 1; nu < 4; nu++)
               {
-                plaq_weight[index * 16 + mu * 4 + nu] = ct;
-                plaq_weight[index * 16 + nu * 4 + mu] = ct;
+                lplaq_weight[index * 16 + mu * 4 + nu] = ct;
+                lplaq_weight[index * 16 + nu * 4 + mu] = ct;
               }
               for (mu = 1; mu < 3; mu++)
                 for (nu = mu + 1; nu < 4; nu++)
                 {
-                  plaq_weight[index * 16 + mu * 4 + nu] = 0.5 * cs;
-                  plaq_weight[index * 16 + nu * 4 + mu] = 0.5 * cs;
-                  rect_weight[index * 16 + mu * 4 + nu] = 0.5 * cs;
-                  rect_weight[index * 16 + nu * 4 + mu] = 0.5 * cs;
+                  lplaq_weight[index * 16 + mu * 4 + nu] = 0.5 * cs;
+                  lplaq_weight[index * 16 + nu * 4 + mu] = 0.5 * cs;
+                  if (lrect_weight != NULL)
+                    lrect_weight[index * 16 + mu * 4 + nu] = 0.5 * cs;
+                  if (lrect_weight != NULL)
+                    lrect_weight[index * 16 + nu * 4 + mu] = 0.5 * cs;
                 }
             }
           }
@@ -1293,9 +1292,10 @@ static void init_plaq_open_BCs(double ct, double cs)
             mu = 0;
             for (nu = mu + 1; nu < 4; nu++)
             {
-              plaq_weight[index * 16 + mu * 4 + nu] = ct;
-              plaq_weight[index * 16 + nu * 4 + mu] = ct;
-              rect_weight[index * 16 + nu * 4 + mu] = 0;
+              lplaq_weight[index * 16 + mu * 4 + nu] = ct;
+              lplaq_weight[index * 16 + nu * 4 + mu] = ct;
+              if (lrect_weight != NULL)
+                lrect_weight[index * 16 + nu * 4 + mu] = 0;
             }
           }
 
@@ -1305,29 +1305,34 @@ static void init_plaq_open_BCs(double ct, double cs)
             mu = 0;
             for (nu = mu + 1; nu < 4; nu++)
             {
-              plaq_weight[index * 16 + mu * 4 + nu] = 0;
-              plaq_weight[index * 16 + nu * 4 + mu] = 0;
-              rect_weight[index * 16 + mu * 4 + nu] = 0;
-              rect_weight[index * 16 + nu * 4 + mu] = 0;
+              lplaq_weight[index * 16 + mu * 4 + nu] = 0;
+              lplaq_weight[index * 16 + nu * 4 + mu] = 0;
+              if (lrect_weight != NULL)
+                lrect_weight[index * 16 + mu * 4 + nu] = 0;
+              if (lrect_weight != NULL)
+                lrect_weight[index * 16 + nu * 4 + mu] = 0;
             }
             for (mu = 1; mu < 3; mu++)
               for (nu = mu + 1; nu < 4; nu++)
               {
-                plaq_weight[index * 16 + mu * 4 + nu] = 0.5 * cs;
-                plaq_weight[index * 16 + nu * 4 + mu] = 0.5 * cs;
-                rect_weight[index * 16 + mu * 4 + nu] = 0.5 * cs;
-                rect_weight[index * 16 + nu * 4 + mu] = 0.5 * cs;
+                lplaq_weight[index * 16 + mu * 4 + nu] = 0.5 * cs;
+                lplaq_weight[index * 16 + nu * 4 + mu] = 0.5 * cs;
+                if (lrect_weight != NULL)
+                  lrect_weight[index * 16 + mu * 4 + nu] = 0.5 * cs;
+                if (lrect_weight != NULL)
+                  lrect_weight[index * 16 + nu * 4 + mu] = 0.5 * cs;
               }
           }
         }
   }
 }
+
 #if defined(BASIC_SF) || defined(ROTATED_SF)
 static void init_plaq_Dirichlet_BCs(double ct)
 {
   error(plaq_weight == NULL, 1, "init_plaq_Dirichlet_BCs [boundary_conditions.c]",
         "Structure plaq_weight not initialized yet");
-  init_plaq_open_BCs(ct, 0.);
+  init_plaq_open_BCs(plaq_weight, rect_weight, ct, 0.);
 }
 #endif
 #endif
