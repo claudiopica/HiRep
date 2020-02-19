@@ -38,7 +38,7 @@ void measure_baryons(double* m,int conf_num, double precision);
 /* For measuring spectrum with a four fermion interaction */
 void measure_spectrum_ff_semwall(int nm, double* m, int nhits,int conf_num, double precision);
 void measure_spectrum_discon_ff_semwall(int nm, double* m, int nhits, int degree_hopping, int nhits_hopping,int conf_num, double precision);
-void measure_spectrum_ff_pt(int tau, int nm, double* m, int n_mom,int nhits,int conf_num, double precision);
+void measure_spectrum_ff_pt(int tau, int nm, double* m, int n_mom,int conf_num, double precision);
 void measure_spectrum_semwall_ff_ext(int nm, double* m, int nhits,int conf_num, double precision);
 
 

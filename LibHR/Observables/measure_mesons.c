@@ -546,6 +546,9 @@ void measure_point_mesons_momenta_ext(meson_observable *mo, spinor_field *psi0, 
 static void print_corr_core(meson_observable *mo, int lt, int conf, int nm, double *mass, char *label, int n_mom)
 {
   int i, t, px, py, pz;
+  
+  error((n_mom==0 || nm==0),1,"[measure_mesons.c]", "print_corr_core is not printing out anything");
+  
   for (px = 0; px < n_mom; ++px)
     for (py = 0; py < n_mom; ++py)
       for (pz = 0; pz < n_mom; ++pz)

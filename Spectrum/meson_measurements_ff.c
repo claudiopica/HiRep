@@ -112,7 +112,7 @@ static void flip_T_bc(int tau){
 *********************************/
 
 #define corr_ind(px,py,pz,n_mom,tc,nm,cm) ((px)*(n_mom)*(n_mom)*(24)*(nm)+(py)*(n_mom)*(24)*(nm)+(pz)*(24)*(nm)+ ((cm)*(24)) +(tc))
-void measure_spectrum_ff_pt(int tau, int nm, double* m, int n_mom,int nhits,int conf_num, double precision){
+void measure_spectrum_ff_pt(int tau, int nm, double* m, int n_mom,int conf_num, double precision){
   spinor_field* source = alloc_spinor_field_f(4,&glattice);
   spinor_field* prop =  alloc_spinor_field_f(4*nm*NF,&glattice);
   init_propagator_ff_eo(nm, m, precision);

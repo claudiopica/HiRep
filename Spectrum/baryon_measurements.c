@@ -30,7 +30,7 @@
 #include "spin_matrix.h"
 #include "propagator.h"
 #include "gaugefix.h"
-
+#if NG==3
 void measure_baryons(double* m,int conf_num, double precision){
 	// declare point sources and props  
 	spinor_field* source = alloc_spinor_field_f(4*NF,&glattice); //This isn't glat_even so that the odd sites will be set to zero explicitly
@@ -70,3 +70,4 @@ void measure_baryons(double* m,int conf_num, double precision){
 	free_spinor_field_f(source);
 	free_spinor_field_f(prop);
 }
+#endif
