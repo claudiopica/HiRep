@@ -42,7 +42,7 @@ static void g_up_Dirichlet_BCs()
                 for (iz = 0; iz < Z; ++iz)
                 {
                     index = ipt(T - 1, ix, iy, iz);
-                    for (lev = 0; lev < max_mh_level; lev++)
+                    for (int lev = 0; lev < max_mh_level; lev++)
                     {
                         dyn_gauge[lev * (glattice.gsize_gauge * 4) + index * 4] = 0;
                         dyn_gauge[lev * (glattice.gsize_gauge * 4) + index * 4 + 1] = 0;
