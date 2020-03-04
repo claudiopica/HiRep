@@ -423,6 +423,43 @@ void create_sequential_source(spinor_field *source, int tf, spinor_field* prop){
 
 }
 
+
+void create_sequential_source_stoch(spinor_field *source, int tf, spinor_field* prop){
+  int c[4];
+  int beta, a, ix;
+
+  suNf_propagator sp0,sp1;
+
+  for (beta=0;beta<4;++beta){
+    spinor_field_zero_f(&source[beta]);
+  }
+
+  if (zerocoord[0]<=tf && tf<zerocoord[0]+T){  // Check that tf is in this thread.
+    c[0]=tf-zerocoord[0];
+    for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
+
+	  ix = ipt(c[0],c[1],c[2],c[3]);
+	  
+    for (beta=0;beta<4;beta++){
+      _propagator_assign(sp0, *_FIELD_AT(&prop[beta],ix),0,beta);
+    }
+	  
+	  _g5_propagator(sp1,sp0);
+	  _propagator_transpose(sp0,sp1);
+
+	   for (beta=0;beta<4;beta++){
+	      *_FIELD_AT(&source[beta],ix) = sp0.c[0].c[beta];
+	    }
+		}
+  }
+  for (beta=0;beta<4;++beta){
+    start_sf_sendrecv(source + beta);
+    complete_sf_sendrecv(source + beta);
+  }
+
+}
+
+
 //create a e^ipx source
 /*void create_gauge_fixed_momentum_source(spinor_field *source, int pt, int px, int py, int pz, int color) {
   int c[4];

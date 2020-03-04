@@ -178,6 +178,10 @@ int main(int argc,char *argv[]) {
   read_input(ff_var.read,get_input_filename());
 	strcpy(list_filename,mes_var.configlist);
 	
+ 	#ifdef WITH_CLOVER
+	clover_init(mes_var.csw);
+ 	#endif
+
 	lprintf("MAIN",0,"list_filename = %s %s\n", list_filename,mes_var.configlist);	
  	if(strcmp(list_filename,"")!=0) {
     	error((list=fopen(list_filename,"r"))==NULL,1,"main [measure_spectrum.c]" ,

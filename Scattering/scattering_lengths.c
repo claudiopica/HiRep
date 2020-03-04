@@ -48,13 +48,14 @@
 
 /* Mesons parameters */
 typedef struct _input_scatt {
-	char mstring[256],configlist[256],outpath[256];
+	char mstring[256],configlist[256],outpath[256],seq_prop[256];
     double csw;	
 	double precision;
 	int nhits;
+	int isospin;
 
 	/* for the reading function */
-	input_record_t read[8];
+	input_record_t read[10];
 
 } input_scatt;
 
@@ -67,6 +68,8 @@ typedef struct _input_scatt {
 		{"number of inversions per cnfg", "mes:nhits = %d", INT_T, &(varname).nhits},\
 		{"Configuration list:", "mes:configlist = %s", STRING_T, &(varname).configlist},\
 		{"outpath:", "mes:outpath = %s", STRING_T, &(varname).outpath},\
+        {"Make sequential prop or not", "mes:seq_prop = %s", STRING_T, (varname).seq_prop},\
+		{"Isospin channel", "mes:isospin = %d", INT_T, &(varname).isospin},\
 		{NULL, NULL, INT_T, NULL}\
 	}\
 }
@@ -101,7 +104,7 @@ int main(int argc,char *argv[]) {
 	FILE* list;
 	int nm;
 	double m[256];
-
+	int seq_prop=0;
  	/* setup process communications */
   	setup_process(&argc,&argv);
 
@@ -110,13 +113,17 @@ int main(int argc,char *argv[]) {
 	read_input(glb_var.read,get_input_filename());
 	read_input(mes_var.read,get_input_filename());
     read_input(rlx_var.read,get_input_filename());
+	if(strcmp(mes_var.seq_prop,"true")==0)  seq_prop = 1;
 
+	if (seq_prop == 1 ) lprintf("MAIN",0,"Sequential propagators will be used.\n");
+	if (seq_prop != 1 ) lprintf("MAIN",0,"No sequential propagators will be used to estimate R.\n");
 	strcpy(list_filename,mes_var.configlist);
 	strcpy(output_dir,mes_var.outpath);
 
 	lprintf("MAIN",0,"list_filename = %s %s\n", list_filename,mes_var.configlist);	
 	lprintf("MAIN",0,"output_dir : %s \n",mes_var.outpath);	
-
+	lprintf("MAIN",0,"Isospin channel: %d \n",mes_var.isospin);	
+	
   	if(strcmp(list_filename,"")!=0) {
     	error((list=fopen(list_filename,"r"))==NULL,1,"main [mk_mesons.c]" ,
 		"Failed to open list file\n");
@@ -154,8 +161,10 @@ int main(int argc,char *argv[]) {
     	represent_gauge_field();
 		lprintf("TEST",0,"<p> %1.6f\n",avr_plaquette());
 		full_plaquette();	
-		//measure_pion_scattering_I2( m, mes_var.nhits,  mes_var.precision,mes_var.outpath,cnfg_filename);
-		measure_pion_scattering_I0( m, mes_var.nhits,  mes_var.precision,mes_var.outpath,cnfg_filename);
+		if (mes_var.isospin==2) measure_pion_scattering_I2( m, mes_var.nhits,  mes_var.precision,mes_var.outpath,cnfg_filename);
+		if (mes_var.isospin==0) measure_pion_scattering_I0( m, mes_var.nhits,  mes_var.precision,mes_var.outpath,cnfg_filename,seq_prop);
+		if (mes_var.isospin!=2 && mes_var.isospin != 0) lprintf("MAIN",0,"Isospin channel can be 0 or 2!");
+
 		gettimeofday(&end,0);
 		timeval_subtract(&etime,&end,&start);
 	    lprintf("MAIN",0,"Configuration : analysed in [%ld sec %ld usec]\n",etime.tv_sec,etime.tv_usec);

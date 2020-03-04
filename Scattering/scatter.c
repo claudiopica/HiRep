@@ -52,14 +52,14 @@
  */
 typedef struct _input_scatt {
 	char mstring[256];
-    double csw;
+  double csw;
 	double precision;
 	int nhits;
 	int tsrc;
 	char outdir[256], bc[16], p[256],configlist[256];
 
 	/* for the reading function */
-	input_record_t read[10];
+	input_record_t read[11];
 
 } input_scatt;
 
@@ -95,6 +95,7 @@ input_scatt mes_var = init_input_scatt(mes_var);
 typedef struct {
 	char string[256];
   char configlist[256];
+  char outdir[256];
 	int t, x, y, z;
 	int nc, nf;
 	double b, m;
@@ -121,10 +122,16 @@ int main(int argc,char *argv[])
   read_input(mes_var.read,get_input_filename());
   read_input(rlx_var.read,get_input_filename());
 
+
+ 	#ifdef WITH_CLOVER
+	clover_init(mes_var.csw);
+ 	#endif
+
+
   m[0] = -atof(mes_var.mstring); // VD: to match the mass parsed by parse_cnfg ?
   init_propagator_eo(1,m,mes_var.precision);
   strcpy(list_filename,mes_var.configlist);
-
+  lprintf("MAIN",0,"outdir %s\n", mes_var.outdir);
   lprintf("MAIN",0,"%s %s\n", list_filename,mes_var.configlist);
   //Copy I/O from another file
   //read_cmdline(argc, argv);
@@ -138,7 +145,8 @@ int main(int argc,char *argv[])
   }
 
   int numsources = mes_var.nhits;
-  char *path=mes_var.outdir;
+  char path[256]; 
+  strcpy(path,mes_var.outdir);
   int Nmom;
   int **p = getmomlist(mes_var.p,&Nmom);
 
@@ -200,11 +208,11 @@ while(1){
         }
     }
     lprintf("MAIN",0,"num sources: %d, path: %s\n",numsources,path);
-    //IOold_0(mo_p0, numsources, path,cnfg_filename);
-    IO_json_0(mo_p0, numsources, path,cnfg_filename);
+    IOold_0(mo_p0, numsources, path,cnfg_filename);
+    //IO_json_0(mo_p0, numsources, path,cnfg_filename);
     for(int i=0; i<Nmom; i++){
-        //IOold_p(mo_p[i], numsources, path,cnfg_filename);
-        IO_json_p(mo_p[i], numsources, path,cnfg_filename);
+        IOold_p(mo_p[i], numsources, path,cnfg_filename);
+        //IO_json_p(mo_p[i], numsources, path,cnfg_filename);
     }
 
     for(int src=0;src<numsources;src++){

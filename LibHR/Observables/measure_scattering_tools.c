@@ -9,8 +9,10 @@
 #include "observables.h"
 #include "scattering.h"
 #include "random.h"
+#include "spinor_field.h"
 #include <communications.h>
 #include "linear_algebra.h"
+#include "hr_complex.h"
 /**
  *
  * @file scatter_functions.h
@@ -187,15 +189,15 @@ void free_mo(meson_observable* mo)
  */
 void init_src_common_point(struct src_common* src, int tau){
 	// Malloc and initialise
-	src->src_0 = alloc_spinor_field_f(4*NF, &glattice);
-	src->src_0_eta = alloc_spinor_field_f(4*NF, &glattice);
-	src->src_0_0 = alloc_spinor_field_f(4*NF, &glattice);
-	for(int i=0; i< 4*NF; i++){
+	src->src_0 = alloc_spinor_field_f(4, &glattice);
+	src->src_0_eta = alloc_spinor_field_f(4, &glattice);
+	src->src_0_0 = alloc_spinor_field_f(4, &glattice);
+	for(int i=0; i< 4; i++){
 		spinor_field_zero_f(&(src->src_0[i]));
 		spinor_field_zero_f(&(src->src_0_eta[i]));
 		spinor_field_zero_f(&(src->src_0_0[i]));
 	}
-
+	
 	// Create point source
   	create_point_source(src->src_0, 0, 0);
   	create_point_source(src->src_0_eta, 0, 0);
@@ -208,10 +210,10 @@ void init_src_common_point(struct src_common* src, int tau){
  */
 void init_src_common(struct src_common* src, int tau){
 	// Malloc and initialise
-	src->src_0 = alloc_spinor_field_f(4*NF, &glattice);
-	src->src_0_eta = alloc_spinor_field_f(4*NF, &glattice);
-	src->src_0_0 = alloc_spinor_field_f(4*NF, &glattice);
-	for(int i=0; i< 4*NF; i++){
+	src->src_0 = alloc_spinor_field_f(4, &glattice);
+	src->src_0_eta = alloc_spinor_field_f(4, &glattice);
+	src->src_0_0 = alloc_spinor_field_f(4, &glattice);
+	for(int i=0; i< 4;i++){
 		spinor_field_zero_f(&(src->src_0[i]));
 		spinor_field_zero_f(&(src->src_0_eta[i]));
 		spinor_field_zero_f(&(src->src_0_0[i]));
@@ -235,14 +237,14 @@ void init_src_p(struct src_p* srcp, struct src_common* src0, int px, int py, int
 	srcp->p[1]=py;
 	srcp->p[2]=pz;
 
-	srcp->src_p = alloc_spinor_field_f(4*NF, &glattice);
-	srcp->src_mp = alloc_spinor_field_f(4*NF, &glattice);
-	srcp->src_0_p = alloc_spinor_field_f(4*NF, &glattice);
-	srcp->src_p_0 = alloc_spinor_field_f(4*NF, &glattice);
-	srcp->src_0_mp = alloc_spinor_field_f(4*NF, &glattice);
-	srcp->src_mp_0 = alloc_spinor_field_f(4*NF, &glattice);
+	srcp->src_p = alloc_spinor_field_f(4, &glattice);
+	srcp->src_mp = alloc_spinor_field_f(4, &glattice);
+	srcp->src_0_p = alloc_spinor_field_f(4, &glattice);
+	srcp->src_p_0 = alloc_spinor_field_f(4, &glattice);
+	srcp->src_0_mp = alloc_spinor_field_f(4, &glattice);
+	srcp->src_mp_0 = alloc_spinor_field_f(4, &glattice);
 
-	for(int i=0; i< 4*NF; i++){
+	for(int i=0; i< 4; i++){
 		spinor_field_zero_f(&(srcp->src_p[i]));
 		spinor_field_zero_f(&(srcp->src_mp[i]));
 		spinor_field_zero_f(&(srcp->src_p_0[i]));
@@ -299,7 +301,7 @@ void make_propagator_P(spinor_field* prop, spinor_field* src, int ndilute, int t
  * @param tau origin time slice
  */
 void make_propagator_PA(spinor_field* prop, spinor_field* src, int ndilute, int tau){
-	spinor_field* proptmp = alloc_spinor_field_f(4*NF,&glattice);
+	spinor_field* proptmp = alloc_spinor_field_f(4,&glattice);
 
 	calc_propagator(prop,src,ndilute);
 	flip_T_bc(tau);
@@ -331,19 +333,19 @@ void make_prop_common(struct prop_common* prop, struct src_common* src0, int ndi
         lprintf("make_prop_common",0,"Inverting propagator with P boundary conditions");
         fun = &make_propagator_P;
     }
-	prop->Q_0 = alloc_spinor_field_f(4*NF,&glattice);
+	prop->Q_0 = alloc_spinor_field_f(4,&glattice);
     fun(prop->Q_0, src0->src_0, ndilute, tau);
-	prop->Q_0_eta = alloc_spinor_field_f(4*NF,&glattice);
+	prop->Q_0_eta = alloc_spinor_field_f(4,&glattice);
     fun(prop->Q_0_eta, src0->src_0_eta, ndilute, tau);
     prop->W_0_0 = (spinor_field**) malloc(GLB_T*sizeof(spinor_field*));
     for(int t=0; t<GLB_T; t++){
-        prop->W_0_0[t] = alloc_spinor_field_f(4*NF,&glattice);
-        spinor_field* tmp = alloc_spinor_field_f(4*NF,&glattice);
-        create_sequential_source(tmp,(t+tau)%GLB_T,prop->Q_0);
+        prop->W_0_0[t] = alloc_spinor_field_f(4,&glattice);
+        spinor_field* tmp = alloc_spinor_field_f(4,&glattice);
+        create_sequential_source_stoch(tmp,(t+tau)%GLB_T,prop->Q_0);
         fun(prop->W_0_0[t], tmp, 4, tau);
         free_spinor_field_f(tmp);
     }
-    create_sequential_source(src0->src_0_0,tau,prop->Q_0);
+    create_sequential_source_stoch(src0->src_0_0,tau,prop->Q_0);
     lprintf("MAIN",0,"Propagator with momentum 0 inverted\n");
 }
 
@@ -368,15 +370,15 @@ void make_prop_p(struct prop_p* prop, struct src_p* srcp, struct src_common* src
     /// \cond
 #define PROPLIST X(Q_p) X(Q_mp) X(W_0_p) X(W_0_mp) X(W_p_0) X(W_mp_0)
 #define X(NAME) \
-	prop->NAME = alloc_spinor_field_f(4*NF, &glattice);
+	prop->NAME = alloc_spinor_field_f(4, &glattice);
 	PROPLIST
 #undef X
 #undef PROPLIST
     fun(prop->Q_p, srcp->src_p, ndilute, tau);
     fun(prop->Q_mp, srcp->src_mp, ndilute, tau);
 
-	create_sequential_source(srcp->src_p_0,tau,prop->Q_p);
-	create_sequential_source(srcp->src_mp_0,tau,prop->Q_mp);
+	create_sequential_source_stoch(srcp->src_p_0,tau,prop->Q_p);
+	create_sequential_source_stoch(srcp->src_mp_0,tau,prop->Q_mp);
 	add_momentum(srcp->src_0_p, src0->src_0_0, srcp->p[0], srcp->p[1], srcp->p[2]);
 	add_momentum(srcp->src_0_mp, src0->src_0_0,-(srcp->p[0]), -(srcp->p[1]), -(srcp->p[2]));
 #define PROP X(0_p) X(0_mp) X(p_0) X(mp_0)
@@ -886,6 +888,17 @@ static int random_tau(){
   return tau;
 }
 
+static int random_tau2(){
+double ran;
+int tau;
+ranlxd(&ran,1);
+tau = (int)(ran*GLB_T);
+
+bcast_int(&tau,1);
+
+return tau;	
+}
+
 static int gi(int i){
 	if(i==1) return _g1;
 	if(i==2) return _g2;
@@ -932,10 +945,10 @@ void measure_pion_scattering_I2(double* m, int numsources, double precision,char
 		for(int j=0; j<3; j++){
 				init_mo(rho1[i][j],"rho1",GLB_T);
 				init_mo(rho2[i][j],"rho2",GLB_T);
-				rho1[i][j]->ind1 = gi(i);
-				rho1[i][j]->ind2 = gi(j);
-				rho2[i][j]->ind1 = gi(i);
-				rho2[i][j]->ind2 = gi(j);
+				rho1[i][j]->ind1 = gi(i+1);
+				rho1[i][j]->ind2 = gi(j+1);
+				rho2[i][j]->ind1 = gi(i+1);
+				rho2[i][j]->ind2 = gi(j+1);
 		}
 	}
 
@@ -988,9 +1001,9 @@ void measure_pion_scattering_I2(double* m, int numsources, double precision,char
 	io2pt(pi2,1,src,path,"pi2",cnfg_filename);
 	for(int i=0; i<3; i++){	
 		for(int j=0; j<3; j++){
-			sprintf(auxname, "rho1_%d%d",i,j);
+			sprintf(auxname, "rho1_%d%d",i+1,j+1);
 			io2pt(rho1[i][j],1,src,path,auxname,cnfg_filename);
-			sprintf(auxname, "rho2_%d%d",i,j);
+			sprintf(auxname, "rho2_%d%d",i+1,j+1);
 			io2pt(rho2[i][j],1,src,path,auxname,cnfg_filename);
 		}
 	}
@@ -1019,32 +1032,84 @@ void measure_pion_scattering_I2(double* m, int numsources, double precision,char
 }
 
 
+double complex Ralt_contract(spinor_field* prop1,spinor_field* prop2,int tref ){
+	int ix0,ix1,ix2,ix3,tc,i;
+	double complex z=0.0;
+	suNf_spinor* sptr1; 
+	suNf_spinor* sptr2;
+	
+	for (ix0=0;ix0<T;ix0++){
+		tc = (zerocoord[0] + ix0 + GLB_T ) % GLB_T;
+		if(tc==tref){
+			for(ix1=0;ix1<X;ix1++) for(ix2=0;ix2<Y;ix2++) for(ix3=0;ix3<Z;ix3++) {
+	           i=ipt(ix0,ix1,ix2,ix3);
+	           sptr1 = _FIELD_AT(prop1,i);
+			   sptr2 = _FIELD_AT(prop2,i);
+			   _spinor_prod_assign_f(z,*sptr1,*sptr2);
+			}
+		}
+	}
 
-void measure_pion_scattering_I0(double* m, int numsources, double precision,char* path,char* cnfg_filename){
-	int ts;
+	return z;
+}
 
-	meson_observable *rho1[3][3];
-	meson_observable *pi1;
-	meson_observable *D;
-	meson_observable *C;
-	meson_observable *R;
-	meson_observable *V;
+static meson_observable *rho1[3][3];
+static meson_observable *pi1;
+static meson_observable *D;
+static meson_observable *C;
+static meson_observable *R;
+static meson_observable *Ralt;
+static meson_observable *V;
+
+meson_observable* get_meson_observables_rho1() {return rho1[0][0];}
+meson_observable* get_meson_observables_pi1() {return pi1;}
+meson_observable* get_meson_observables_D() {return D;}
+meson_observable* get_meson_observables_C() {return C;}
+meson_observable* get_meson_observables_R() {return R;}
+meson_observable* get_meson_observables_Ralt() {return Ralt;}
+meson_observable* get_meson_observables_V() {return V;}
+
+
+void measure_pion_scattering_I0(double* m, int numsources, double precision,char* path,char* cnfg_filename, int seq_prop){
+	int ts=0;
+	double complex A,B;
+	int ts_vec[numsources];
+	double memsize=0.;
 	meson_observable *tmp_mo;
 
 	spinor_field** source_ts1; 
 	spinor_field* source_ts2= alloc_spinor_field_f(4,&glattice);
-	spinor_field** prop_ts1;
+	spinor_field*** prop_ts1;
 	spinor_field* prop_ts2= alloc_spinor_field_f(4,&glattice);
-	spinor_field* seq_0= alloc_spinor_field_f(4,&glattice);
-	spinor_field* seq_t= alloc_spinor_field_f(4,&glattice);
-	spinor_field* seq_source =  alloc_spinor_field_f(4,&glattice);
+	spinor_field* seq_0;
+	spinor_field* seq_t;
+	spinor_field* seq_source;	
 	source_ts1= (spinor_field**)malloc(sizeof(spinor_field*)*GLB_T );
-	for(int t=0; t<GLB_T; t++)  source_ts1[t] = alloc_spinor_field_f(4,&glattice);
+
+	// VD TODO
+	// a lot of memory can be saved when the sequential sources are used. 
+	// when R is computed, still compute Ralt ?
+ 	long int spinor_field_size = 4*sizeof(suNf_spinor)*GLB_VOLUME; // 4 for the spin dilution.
+
+	if (seq_prop == 0) memsize = ((GLB_T + GLB_T*numsources + 2 ) *spinor_field_size);
+	if (seq_prop == 1) memsize = ((GLB_T + GLB_T*numsources + 5 ) *spinor_field_size);
 	
+	lprintf("MAIN",0,"measure_pion_scattering_I0 can be memory intensive! \n");
+	lprintf("MAIN",0,"Total memory used (by spinor_fields) is  %1.6g GB \n",(double) memsize/1.e9);
+	lprintf("MAIN",0,"Memory used (by spinor_fields) per task is %1.6g GB\n",(double) memsize/(1.e9*MPI_WORLD_SIZE));
 
-	prop_ts1= (spinor_field**)malloc(sizeof(spinor_field*)*GLB_T );
-	for(int t=0; t<GLB_T; t++)  prop_ts1[t] = alloc_spinor_field_f(4,&glattice);
+	for(int t=0; t<GLB_T; t++)  source_ts1[t] = alloc_spinor_field_f(4,&glattice);
 
+	if (seq_prop){ // if seq_prop==1 
+		seq_0= alloc_spinor_field_f(4,&glattice);
+		seq_t= alloc_spinor_field_f(4,&glattice);
+		seq_source =  alloc_spinor_field_f(4,&glattice);
+	}
+
+	prop_ts1= (spinor_field***)malloc(sizeof(spinor_field**)*numsources);
+	for(int src=0; src<numsources; src++) prop_ts1[src] = (spinor_field**)malloc(sizeof(spinor_field*)*GLB_T);
+
+	for(int src=0; src<numsources; src++) for(int t=0; t<GLB_T; t++)  prop_ts1[src][t] = alloc_spinor_field_f(4,&glattice);
 
 	char auxname[256];
 
@@ -1052,6 +1117,7 @@ void measure_pion_scattering_I0(double* m, int numsources, double precision,char
 	D = (meson_observable*) malloc(sizeof(meson_observable));
 	C = (meson_observable*) malloc(sizeof(meson_observable));
 	R = (meson_observable*) malloc(sizeof(meson_observable));
+	Ralt= (meson_observable*) malloc(sizeof(meson_observable));
 	tmp_mo = (meson_observable*) malloc(sizeof(meson_observable));
 	V = (meson_observable*) malloc(sizeof(meson_observable));
 
@@ -1064,6 +1130,7 @@ void measure_pion_scattering_I0(double* m, int numsources, double precision,char
 	init_mo(D,"D",GLB_T);
 	init_mo(C,"C",GLB_T);
 	init_mo(R,"R",GLB_T);
+	init_mo(Ralt,"Ralt",GLB_T);
 	init_mo(tmp_mo,"tmp_mo",GLB_T);
 	init_mo(V,"V",GLB_T);
 
@@ -1073,8 +1140,8 @@ void measure_pion_scattering_I0(double* m, int numsources, double precision,char
 	for(int i=0; i<3; i++){
 		for(int j=0; j<3; j++){
 				init_mo(rho1[i][j],"rho1",GLB_T);
-				rho1[i][j]->ind1 = gi(i);
-				rho1[i][j]->ind2 = gi(j);
+				rho1[i][j]->ind1 = gi(i+1);
+				rho1[i][j]->ind2 = gi(j+1);
 		}
 	}
 
@@ -1084,6 +1151,7 @@ void measure_pion_scattering_I0(double* m, int numsources, double precision,char
 		reset_mo(D);
 		reset_mo(C);
 		reset_mo(R);
+		reset_mo(Ralt);
 		reset_mo(V);
 		for(int i=0; i<3; i++){
 			for(int j=0; j<3; j++){
@@ -1092,46 +1160,53 @@ void measure_pion_scattering_I0(double* m, int numsources, double precision,char
 		}
 		
 		init_propagator_eo(1, m, precision);
-		ts=random_tau();
-		ts=0 ;// the case where ts!=0 should be checked.
+		//ts=random_tau();
+		ts = random_tau2(); // randomly chosen timeslice 
+		ts_vec[src] = ts;
 
-
+		lprintf("MAIN",0,"Random timeslice chosen : ts=%d\n",ts);	
 		for (int t=0;t<GLB_T;++t){
 			create_diluted_source_equal_atau(source_ts1[t], (t+ts)%GLB_T) ;
-			calc_propagator(prop_ts1[t],source_ts1[t],4);
+			calc_propagator(prop_ts1[src][t],source_ts1[t],4);
 		}
+		
 		create_diluted_source_equal_atau(source_ts2, ts);
 		calc_propagator(prop_ts2,source_ts2,4);
-		lprintf("MAIN",0,"Creating sequential source...\n");	
-		create_sequential_source(seq_source,ts,prop_ts1[0]);
-		calc_propagator(seq_0,seq_source,4);
+		if (seq_prop){ // if seq_prop==1 
+			lprintf("MAIN",0,"Creating sequential source...\n");	
+			create_sequential_source_stoch(seq_source,ts,prop_ts1[src][0]);
+			calc_propagator(seq_0,seq_source,4);
+			lprintf("MAIN",0,"Sequential source inverted.\n");
+
 		
-
-	lprintf("MAIN",0,"Contraction R...\n");
-		for (int t=0;t<GLB_T;++t){
-				create_sequential_source(seq_source,ts+t,prop_ts1[0]);
+ 			lprintf("MAIN",0,"Contraction R...\n");
+			for (int t=0;t<GLB_T;++t){
+				create_sequential_source_stoch(seq_source,(ts+t)%GLB_T,prop_ts1[src][0]);
 				calc_propagator(seq_t,seq_source,4);
-				// do contraction rectangle
-
+				
 				reset_mo(tmp_mo);
 				measure_mesons_core(seq_0,seq_t,source_ts1[0],tmp_mo,1,ts,1,0,GLB_T);
+				do_global_sum(tmp_mo,1.0); //
+
 				R->corr_re[corr_ind(0,0,0,1,t,1,0)] = tmp_mo -> corr_re[corr_ind(0,0,0,1,t,1,0)];
 				R->corr_im[corr_ind(0,0,0,1,t,1,0)] = tmp_mo -> corr_im[corr_ind(0,0,0,1,t,1,0)];
+			}
 		}
 		//  V
-
-	lprintf("MAIN",0,"Contraction V...\n");
+		lprintf("MAIN",0,"Contraction V...\n");
 		for (int t=0;t<GLB_T;++t){
 			reset_mo(tmp_mo);
-			measure_mesons_core(prop_ts1[t],prop_ts1[t],source_ts1[t],tmp_mo,1,(ts+t)%GLB_T,1,0,GLB_T); 
+			measure_mesons_core(prop_ts1[src][t],prop_ts1[src][t],source_ts1[t],tmp_mo,1,(ts+t)%GLB_T,1,0,GLB_T); 
+			do_global_sum(tmp_mo,1.0); //
 			V->corr_re[corr_ind(0,0,0,1,t,1,0)] = tmp_mo -> corr_re[corr_ind(0,0,0,1,0,1,0)];
 			V->corr_im[corr_ind(0,0,0,1,t,1,0)] = tmp_mo -> corr_im[corr_ind(0,0,0,1,0,1,0)];
 		}
+	
 
 	lprintf("MAIN",0,"Contraction pi,rho ...\n");
 		// "standard" two points : pi and rho 
 		for (int t=0;t<GLB_T;++t){
-			measure_mesons_core(prop_ts1[t],prop_ts1[t],source_ts1[t],pi1,1,(ts+t)%GLB_T,1,0,GLB_T); // this is summing over t
+			measure_mesons_core(prop_ts1[src][t],prop_ts1[src][t],source_ts1[t],pi1,1,(ts+t)%GLB_T,1,0,GLB_T); // this is summing over t
 		}
 		measure_mesons_core(prop_ts2,prop_ts2,source_ts2,pi1,1,ts,1,0,GLB_T);
 		do_global_sum(pi1,1.0/(double)(GLB_T+1)); // this is averaging over GLB_T+1 timeslices !
@@ -1140,7 +1215,7 @@ void measure_pion_scattering_I0(double* m, int numsources, double precision,char
 		for(int i=0; i<3; i++){
 			for(int j=0; j<3; j++){
 				for (int t=0;t<GLB_T;++t){
-					measure_mesons_core(prop_ts1[t],prop_ts1[t],source_ts1[t],rho1[i][j],1,(ts+t)%GLB_T,1,0,GLB_T);
+					measure_mesons_core(prop_ts1[src][t],prop_ts1[src][t],source_ts1[t],rho1[i][j],1,(ts+t)%GLB_T,1,0,GLB_T);
 				}
 				measure_mesons_core(prop_ts2,prop_ts2,source_ts2,rho1[i][j],1,ts,1,0,GLB_T);
 				do_global_sum(rho1[i][j],1.0/(double)(GLB_T+1));
@@ -1149,40 +1224,81 @@ void measure_pion_scattering_I0(double* m, int numsources, double precision,char
 
 	lprintf("MAIN",0,"Contraction D,c...\n");
 	// contraction 4 particles two-points.
-	measure_scattering_AD_core(D, prop_ts1[0],prop_ts1[0],prop_ts2,prop_ts2, ts, 0,0,0,0,0); 
-	measure_scattering_BC_core(C, prop_ts1[0],prop_ts1[0],prop_ts2,prop_ts2, ts, 0,0,0,0,0);
+	measure_scattering_AD_core(D, prop_ts1[src][0],prop_ts1[src][0],prop_ts2,prop_ts2, ts, 0,0,0,0,0); 
+	measure_scattering_BC_core(C, prop_ts1[src][0],prop_ts1[src][0],prop_ts2,prop_ts2, ts, 0,0,0,0,0);
 	
 	lprintf("MAIN",0,"Contraction done\n");
 	// Printing.
-	io2pt(pi1,1,src,path,"pi1",cnfg_filename);
-	io2pt(V,1,src,path,"V",cnfg_filename);
+	if (path!=NULL) {
+		io2pt(pi1,1,src,path,"pi1",cnfg_filename);
+		io2pt(V,1,src,path,"V",cnfg_filename);
+	
 
-	for(int i=0; i<3; i++){	
-		for(int j=0; j<3; j++){
-			sprintf(auxname, "rho1_%d%d",i,j);
-			io2pt(rho1[i][j],1,src,path,auxname,cnfg_filename);
+		for(int i=0; i<3; i++){	
+			for(int j=0; j<3; j++){
+				sprintf(auxname, "rho1_%d%d",i+1,j+1);
+				io2pt(rho1[i][j],1,src,path,auxname,cnfg_filename);
+			}
+		}
+		io4pt(D,0,src,path,"D",cnfg_filename);
+		io4pt(C,0,src,path,"C",cnfg_filename);
+		if (seq_prop) io4pt(R,0,src,path,"R",cnfg_filename);
 		}
 	}
-	io4pt(D,0,src,path,"D",cnfg_filename);
-	io4pt(C,0,src,path,"C",cnfg_filename);
-	io4pt(R,0,src,path,"R",cnfg_filename);
-	
+	//printf("helo \n");
+
+		
+	if (seq_prop == 0){
+		lprintf("MAIN",0,"Contraction R alternative...\n");
+		
+		reset_mo(Ralt);
+		int ts1,ts2;
+		for (int src1=0;src1<numsources;++src1) {
+			if (src1%100 == 0) lprintf("MAIN",0,"src1 %d\n",src1);
+			for (int src2=0;src2<numsources;++src2){
+				for (int t=0;t<GLB_T;++t) for (int dt=0;dt<GLB_T;++dt){
+					for (int alpha=0;alpha<4;alpha++) for (int beta=0;beta<4;beta++) { // dilution indices 
+
+					ts1 = ts_vec[src1];
+					ts2 = ts_vec[src2];
+
+					A = Ralt_contract(prop_ts1[src1][t]+alpha,prop_ts1[src2][(t+dt)%GLB_T]+beta,(t+ts1)%GLB_T );
+					B = Ralt_contract(prop_ts1[src2][(t+dt)%GLB_T]+beta,prop_ts1[src1][t]+alpha,(t+dt+ts2)%GLB_T );
+					
+					global_sum((double *)(&A),2);
+					global_sum((double *)(&B),2);
+					//printf("here %e %d %d %d %d %d %d \n",creal(A),alpha,beta,src1,src2,t,dt);
+
+					Ralt->corr_re[corr_ind(0,0,0,1,(dt+ ts2-ts1 + GLB_T)%GLB_T,1,0)] += creal(A*B)/(GLB_T*numsources*numsources);
+					Ralt->corr_im[corr_ind(0,0,0,1,(dt+ ts2-ts1 + GLB_T)%GLB_T,1,0)] += cimag(A*B)/(GLB_T*numsources*numsources);
+					}
+				}
+			}
+		}
+	if (path!=NULL) io4pt(Ralt,0,0,path,"Ralt",cnfg_filename);
 	}
+
+	
 
 	//free memory
 	for (int t=0;t<GLB_T;++t){
 	  	free_spinor_field_f(source_ts1[t]);
-		free_spinor_field_f(prop_ts1[t]);
+		for (int src=0;src<numsources;++src) free_spinor_field_f(prop_ts1[src][t]);
 	}
   	free_spinor_field_f(source_ts2);
   	free_spinor_field_f(prop_ts2);
-	free_spinor_field_f(seq_0);
-	free_spinor_field_f(seq_t);
-	free_spinor_field_f(seq_source);
+	if (seq_prop){ 
+		free_spinor_field_f(seq_0);
+		free_spinor_field_f(seq_t);
+		free_spinor_field_f(seq_source);
+	}
 
 	free_mo(pi1);
-	free_mo(D);
-	free_mo(C);
+	//free_mo(D);
+	//free_mo(C);
+	//free_mo(R);
+	free_mo(Ralt);
+	//free_mo(V);
 	for(int i=0; i<3; i++){
 		for(int j=0; j<3; j++){
 			free_mo(rho1[i][j]);
