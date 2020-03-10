@@ -301,7 +301,12 @@ int init_mc_ghmc(hmc_flow *rf, char *ifile)
 #ifdef BASIC_SF
 	BCs_pars.SF_BCs = 1;
 #endif
+
 	init_BCs(&BCs_pars);
+
+#ifdef WITH_CLOVER
+	set_csw(&hmc_var.hmc_p.csw);
+#endif
 
 	/* fix conf_dir name: put a / at the end of string */
 	start_t = strlen(rf->conf_dir);

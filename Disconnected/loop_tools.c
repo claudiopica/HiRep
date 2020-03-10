@@ -253,7 +253,7 @@ void measure_loops(int nm, double* m, int nhits,int conf_num, double precision,i
 								{
 												spinor_field* source = alloc_spinor_field_f(1,&glattice);
 												spinor_field* prop =  alloc_spinor_field_f(nm,&glattice);
-												z2_spinor_field(source);
+												create_z2_volume_source(source);
 												start_sf_sendrecv(source);
 												complete_sf_sendrecv(source);
 

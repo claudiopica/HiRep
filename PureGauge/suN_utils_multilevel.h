@@ -64,7 +64,7 @@ typedef struct _input_poly
   input_record_t read[2];
 } input_poly;
 
-#define init_input_poly(varname)                                             \
+#define init_input_poly(varname)                                         \
   {                                                                      \
     .read = {                                                            \
       {"make Polyakov", "polyakov:make = %s", STRING_T, (varname).make}, \
@@ -81,21 +81,23 @@ typedef struct _input_WF
   int nmeas;
   double eps;
   double delta;
+  double anisotropy;
 
   /* for the reading function */
-  input_record_t read[6];
+  input_record_t read[7];
 } input_WF;
 
-#define init_input_WF(varname)                                                   \
-  {                                                                              \
-    .read = {                                                                    \
-      {"make Wilson Flow", "wf:make = %s", STRING_T, (varname).make},            \
-      {"WF max integration time", "WF:tmax = %lf", DOUBLE_T, &((varname).tmax)}, \
-      {"WF number of measures", "WF:nmeas = %d", INT_T, &((varname).nmeas)},     \
-      {"WF initial epsilon", "WF:eps = %lf", DOUBLE_T, &((varname).eps)},        \
-      {"WF delta", "WF:delta = %lf", DOUBLE_T, &((varname).delta)},              \
-      {NULL, NULL, 0, NULL}                                                      \
-    }                                                                            \
+#define init_input_WF(varname)                                                     \
+  {                                                                                \
+    .read = {                                                                      \
+      {"make Wilson Flow", "WF:make = %s", STRING_T, (varname).make},              \
+      {"WF max integration time", "WF:tmax = %lf", DOUBLE_T, &((varname).tmax)},   \
+      {"WF number of measures", "WF:nmeas = %d", INT_T, &((varname).nmeas)},       \
+      {"WF initial epsilon", "WF:eps = %lf", DOUBLE_T, &((varname).eps)},          \
+      {"WF delta", "WF:delta = %lf", DOUBLE_T, &((varname).delta)},                \
+      {"WF anisotropy", "WF:anisotropy = %lf", DOUBLE_T, &((varname).anisotropy)}, \
+      {NULL, NULL, 0, NULL}                                                        \
+    }                                                                              \
   }
 
 /* Flow control variables variables */

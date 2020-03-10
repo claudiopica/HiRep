@@ -76,7 +76,7 @@ static void read_cmdline(int argc, char **argv)
       exit(0);
     }
   }
-  error(ai != 1, 0, "SETUP_GAUGE_FIELDS", "An input file must be defined\n");
+  error(ai != 1, 1, "SETUP_GAUGE_FIELDS", "An input file must be defined\n");
 }
 
 void setup_gauge_fields()

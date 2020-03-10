@@ -196,8 +196,12 @@
 #define BC_Z_ALREADY
 #endif
 
-#if defined(WITH_CLOVER) && defined(WITH_QUATERNIONS)
-#error Clover term has not yet been implemented with quaternions
+//#if defined(WITH_CLOVER) && defined(WITH_QUATERNIONS)
+//#error Clover term has not yet been implemented with quaternions
+//#endif
+
+#ifdef PURE_GAUGE_ANISOTROPY
+#define PLAQ_WEIGHTS
 #endif
 
 #endif /* CHECK_OPTIONS_H */

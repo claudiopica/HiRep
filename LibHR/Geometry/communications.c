@@ -365,7 +365,7 @@ void start_clover_force_sendrecv(suNf_field *gf) {
 
   for (i=0; i<(gd->nbuffers_gauge); ++i) {
     /* send ith buffer */
-    mpiret=MPI_Isend((gf->ptr)+6*gd->sbuf_start[i], /* buffer */
+    mpiret=MPI_Isend((double*)((gf->ptr)+6*gd->sbuf_start[i]), /* buffer */
         (gd->sbuf_len[i])*sizeof(suNf)/sizeof(double)*6, /* lenght in units of doubles */
         MPI_DOUBLE, /* basic datatype */
         gd->sbuf_to_proc[i], /* cid of destination */
@@ -384,7 +384,7 @@ void start_clover_force_sendrecv(suNf_field *gf) {
 #endif
 
     /* receive ith buffer */
-    mpiret=MPI_Irecv((gf->ptr)+6*gd->rbuf_start[i], /* buffer */
+    mpiret=MPI_Irecv((double*)((gf->ptr)+6*gd->rbuf_start[i]), /* buffer */
         (gd->rbuf_len[i])*sizeof(suNf)/sizeof(double)*6, /* lenght in units of doubles */
         MPI_DOUBLE, /* basic datatype */
         gd->rbuf_from_proc[i], /* cid of origin */
@@ -473,7 +473,7 @@ void start_gf_sendrecv(suNg_field *gf) {
 
   for (i=0; i<(gd->nbuffers_gauge); ++i) {
     /* send ith buffer */
-    mpiret=MPI_Isend((gf->ptr)+4*gd->sbuf_start[i], /* buffer */
+    mpiret=MPI_Isend((double*)((gf->ptr)+4*gd->sbuf_start[i]), /* buffer */
         (gd->sbuf_len[i])*sizeof(suNg)/sizeof(double)*4, /* lenght in units of doubles */
         MPI_DOUBLE, /* basic datatype */
         gd->sbuf_to_proc[i], /* cid of destination */
@@ -492,7 +492,7 @@ void start_gf_sendrecv(suNg_field *gf) {
 #endif
 
     /* receive ith buffer */
-    mpiret=MPI_Irecv((gf->ptr)+4*gd->rbuf_start[i], /* buffer */
+    mpiret=MPI_Irecv((double*)((gf->ptr)+4*gd->rbuf_start[i]), /* buffer */
         (gd->rbuf_len[i])*sizeof(suNg)/sizeof(double)*4, /* lenght in units of doubles */
         MPI_DOUBLE, /* basic datatype */
         gd->rbuf_from_proc[i], /* cid of origin */
@@ -580,7 +580,7 @@ void start_sf_sendrecv(spinor_field *sf) {
 
   for (i=0; i<(gd->nbuffers_spinor); ++i) {
     /* send ith buffer */
-    mpiret=MPI_Isend((sf->ptr)+(gd->sbuf_start[i])-(gd->master_shift), /* buffer */
+    mpiret=MPI_Isend((double*)((sf->ptr)+(gd->sbuf_start[i])-(gd->master_shift)), /* buffer */
         (gd->sbuf_len[i])*(sizeof(suNf_spinor)/sizeof(double)), /* lenght in units of doubles */
         MPI_DOUBLE, /* basic datatype */
         gd->sbuf_to_proc[i], /* cid of destination */
@@ -599,7 +599,7 @@ void start_sf_sendrecv(spinor_field *sf) {
 #endif
 
     /* receive ith buffer */
-    mpiret=MPI_Irecv((sf->ptr)+(gd->rbuf_start[i])-(gd->master_shift), /* buffer */
+    mpiret=MPI_Irecv((double*)((sf->ptr)+(gd->rbuf_start[i])-(gd->master_shift)), /* buffer */
         (gd->rbuf_len[i])*(sizeof(suNf_spinor)/sizeof(double)), /* lenght in units of doubles */
         MPI_DOUBLE, /* basic datatype */
         gd->rbuf_from_proc[i], /* cid of origin */
@@ -672,7 +672,7 @@ void start_gt_sendrecv(suNg_field *gf) {
 
   for (i=0; i<(gd->nbuffers_gauge); ++i) {
     /* send ith buffer */
-    mpiret=MPI_Isend((gf->ptr)+gd->sbuf_start[i], /* buffer */
+    mpiret=MPI_Isend((double*)((gf->ptr)+gd->sbuf_start[i]), /* buffer */
         (gd->sbuf_len[i])*sizeof(suNg)/sizeof(double), /* lenght in units of doubles */
         MPI_DOUBLE, /* basic datatype */
         gd->sbuf_to_proc[i], /* cid of destination */
@@ -691,7 +691,7 @@ void start_gt_sendrecv(suNg_field *gf) {
 #endif
 
     /* receive ith buffer */
-    mpiret=MPI_Irecv((gf->ptr)+gd->rbuf_start[i], /* buffer */
+    mpiret=MPI_Irecv((double*)((gf->ptr)+gd->rbuf_start[i]), /* buffer */
         (gd->rbuf_len[i])*sizeof(suNg)/sizeof(double), /* lenght in units of doubles */
         MPI_DOUBLE, /* basic datatype */
         gd->rbuf_from_proc[i], /* cid of origin */
@@ -779,7 +779,7 @@ void start_sc_sendrecv(suNg_scalar_field *sf) {
 
   for (i=0; i<(gd->nbuffers_spinor); ++i) {
     /* send ith buffer */
-    mpiret=MPI_Isend((sf->ptr)+(gd->sbuf_start[i])-(gd->master_shift), /* buffer */
+    mpiret=MPI_Isend((double*)((sf->ptr)+(gd->sbuf_start[i])-(gd->master_shift)), /* buffer */
         (gd->sbuf_len[i])*(sizeof(suNg_vector)/sizeof(double)), /* lenght in units of doubles */
         MPI_DOUBLE, /* basic datatype */
         gd->sbuf_to_proc[i], /* cid of destination */
@@ -798,7 +798,7 @@ void start_sc_sendrecv(suNg_scalar_field *sf) {
 #endif
 
     /* receive ith buffer */
-    mpiret=MPI_Irecv((sf->ptr)+(gd->rbuf_start[i])-(gd->master_shift), /* buffer */
+    mpiret=MPI_Irecv((double*)((sf->ptr)+(gd->rbuf_start[i])-(gd->master_shift)), /* buffer */
         (gd->rbuf_len[i])*(sizeof(suNg_vector)/sizeof(double)), /* lenght in units of doubles */
         MPI_DOUBLE, /* basic datatype */
         gd->rbuf_from_proc[i], /* cid of origin */

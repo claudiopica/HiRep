@@ -20,6 +20,8 @@
 void WF_initialize();
 void WF_free();
 
+void WF_set_bare_anisotropy(double * chi);
+
 double max_distance(suNg_field* V, suNg_field* Vprime);
 
 void WilsonFlow1(suNg_field* V, const double epsilon);

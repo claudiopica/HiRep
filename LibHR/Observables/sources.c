@@ -426,7 +426,7 @@ void create_sequential_source(spinor_field *source, int tf, spinor_field* prop){
 
 void create_sequential_source_stoch(spinor_field *source, int tf, spinor_field* prop){
   int c[4];
-  int beta, a, ix;
+  int beta, ix;
 
   suNf_propagator sp0,sp1;
 

@@ -138,7 +138,7 @@ int main(int argc,char *argv[])
 
   for (i=0;i<mes_ip.nhits;i++){
 
-    z2_spinor_field(source);
+    create_z2_volume_source(source);
     norm = spinor_field_sqnorm_f(source);
 
     if (fabs(norm/((double) 4*NF*GLB_X*GLB_Y*GLB_Z*GLB_T) - 1.) > 1e-14 )
@@ -184,7 +184,7 @@ int main(int argc,char *argv[])
     counter=0;
     for (i=0;i<mes_ip.nhits;i++) {
 
-      z2_spinor_field(source);
+      create_z2_volume_source(source);
       shift_fields(shift, source, NULL, source_shifted, NULL);
 
       for(x =  0; x < X; x += 1)   for(y = 0; y < Y; y += 1)  for(z = 0; z < Z; z += 1)    for(t = 0; t < T; t += 1) {

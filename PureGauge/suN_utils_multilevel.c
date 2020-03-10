@@ -313,7 +313,7 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
         .SF_BCs = 0};
     init_BCs(&BCs_pars);
 
-    init_gauge_anisotropy(&(pg_var_ml.anisotropy));
+    init_pure_gauge_anisotropy(&(pg_var_ml.anisotropy));
 
     /* init gauge field */
     switch (start_t)
@@ -333,6 +333,8 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
     apply_BCs_on_fundamental_gauge_field();
     represent_gauge_field();
 
+    WF_var.anisotropy = 1.0;
+
     read_input(WF_var.read, ifile);
 
     WF_initialize();
@@ -343,6 +345,12 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
     lprintf("INIT WF", 0, "WF number of measures=%d\n", WF_var.nmeas);
     lprintf("INIT WF", 0, "WF initial epsilon=%lf\n", WF_var.eps);
     lprintf("INIT WF", 0, "WF delta=%lf\n", WF_var.delta);
+
+    if (fabs(WF_var.anisotropy - 1) > 1.e-14)
+    {
+        lprintf("INIT WF", 0, "WF anisotropy=%lf\n", WF_var.anisotropy);
+        WF_set_bare_anisotropy(&(WF_var.anisotropy));
+    }
 
     return 0;
 }
