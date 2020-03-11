@@ -476,7 +476,7 @@ void clover_init(double csw)
 
 	sigma = 0xF00F;
 	csw_value = csw;
-	lprintf("CLOVER", 10, "Coefficient: csw = %1.6f\n", csw_value);
+	lprintf("CLOVER", 10, "Initial Coefficient: csw = %1.6f\n", csw_value);
 }
 
 #endif //#ifdef WITH_CLOVER

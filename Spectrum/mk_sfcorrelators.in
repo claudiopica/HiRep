@@ -2,7 +2,7 @@ GLB_T = 18
 GLB_X = 8
 GLB_Y = 8
 GLB_Z = 8
-NP_T = 4
+NP_T = 2
 NP_X = 1
 NP_Y = 1
 NP_Z = 1
@@ -17,9 +17,9 @@ rlx_state = rand_state
 sf:precision = 1e-16
 sf:beta = 12.0
 sf:mass = -0.148
+sf:ct = 1.0
 sf:background = false
 sf:configlist = list_conf_sf.txt
-sf:ct = 1.0
 
 //needed only for ROTATED_SF
 sf:rho_s = 0.0

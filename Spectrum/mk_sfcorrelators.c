@@ -34,12 +34,7 @@
 #error This main code works only if some SF boundary conditions are enabled
 #endif
 
-#ifdef ROTATED_SF
-#error This code has never been tested
-#endif
 
-
-/* we need the beta for normalization */
 typedef struct _input_sfc
 {
   double precision;
@@ -129,7 +124,7 @@ int main(int argc, char *argv[])
 #ifdef ROTATED_SF
   lprintf("MAIN", 0, "beta = %.8f\n rotatedSF ds = %.8f\n rotatedSF ct = %.8f\n", sfc_var.beta, bcpar_var.SF_ds, bcpar_var.SF_ct);
 #else
-  lprintf("MAIN", 0, "beta = %.8f\n", sfc_var.beta);
+  lprintf("MAIN", 0, "beta = %.8f ct = %.8f\n", sfc_var.beta, bcpar_var.SF_ct);
 #endif
 
   /* initialize boundary conditions */

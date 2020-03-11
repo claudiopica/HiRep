@@ -17,6 +17,14 @@
 #include "logger.h"
 #include <stdio.h>
 
+
+
+#ifdef ROTATED_SF
+#error This code has never been tested
+#endif
+
+
+
 #ifdef ROTATED_SF
 #include "update.h"
 
