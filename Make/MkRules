@@ -214,6 +214,7 @@ $(foreach prog,$(EXES),$(eval $(call LINK_template,$(prog))))
 
 define RUNTEST_template
 echo -n "$(_col_test)["$(1)"]$(_col_norm) ..." ; rm -f debug out_0 err_0 ; \
+export OMPI_MCA_btl_base_warn_component_unused=0 ;\
 $(RUNTEST) ./$(1) -i input_file >/dev/null && echo " $(_cpassed)" || ( echo " $(_cfailed)" && touch .test_failed ); 
 endef
 

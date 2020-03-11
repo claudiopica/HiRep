@@ -16,5 +16,5 @@ if ( $NZ<1 ) { $NZ = 1 }
 
 my $NP=$NT*$NX*$NY*$NZ;
 #print "NP=$NP ($NT,$NX,$NY,$NZ)\n";
-exec("mpirun", "--mca btl_base_warn_component_unused 0 -np", $NP, @ARGV);
+exec("mpirun", "-np", $NP, @ARGV);
 
