@@ -67,7 +67,7 @@ void polyakov()
       MPI_Status status;
 
       MPIRET(mpiret)
-      MPI_Recv(bp,                                     /* buffer */
+      MPI_Recv((double*)(bp),                                     /* buffer */
                size3d * sizeof(suNg) / sizeof(double), /* lenght in units of doubles */
                MPI_DOUBLE,                             /* basic datatype */
                proc_dn(CID, mu),                       /* cid of origin */
@@ -125,7 +125,7 @@ void polyakov()
     {
 
       MPIRET(mpiret)
-      MPI_Send(p,                                      /* buffer */
+      MPI_Send((double*)(p),                                      /* buffer */
                size3d * sizeof(suNg) / sizeof(double), /* lenght in units of doubles */
                MPI_DOUBLE,                             /* basic datatype */
                proc_up(CID, mu),                       /* cid of destination */

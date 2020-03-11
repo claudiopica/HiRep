@@ -33,6 +33,12 @@
 #if !(defined(BASIC_SF)) && !(defined(ROTATED_SF))
 #error This main code works only if some SF boundary conditions are enabled
 #endif
+
+#ifdef ROTATED_SF
+#error This code has never been tested
+#endif
+
+
 /* we need the beta for normalization */
 typedef struct _input_sfc
 {
