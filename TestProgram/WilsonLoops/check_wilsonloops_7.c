@@ -77,10 +77,6 @@ int main(int argc,char *argv[])
 
   suNg_field* g=alloc_gtransf(&glattice);
 
-  suNg* poly[2];
-  poly[0]=amalloc(sizeof(suNg)*X*Y*Z,ALIGN);
-  poly[1]=amalloc(sizeof(suNg)*X*Y*Z,ALIGN);
-
   random_u(u[0]);
   start_gf_sendrecv(u[0]);
   complete_gf_sendrecv(u[0]);

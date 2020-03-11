@@ -115,9 +115,9 @@ void init_BCs(BCs_pars_t *pars)
                     "\n");
 
 #if defined(ROTATED_SF)
-  lprintf("BCS", 0, "Chirally rotated Schroedinger Functional ds=%e BCs=%d\n", BCs_pars.chiSF_boundary_improvement_ds, BCs_pars.SF_BCs);
+  lprintf("BCS", 0, "Chirally rotated Schroedinger Functional ds=%e BCs=%d(1=Background, 0=no Background)\n", BCs_pars.chiSF_boundary_improvement_ds, BCs_pars.SF_BCs);
 #elif defined(BASIC_SF)
-  lprintf("BCS", 0, "Basic Schroedinger Functional BCs=%d\n", BCs_pars.SF_BCs);
+  lprintf("BCS", 0, "Basic Schroedinger Functional BCs=%d (1=Background, 0=no Background)\n", BCs_pars.SF_BCs);
 #endif
 
 #ifdef FERMION_THETA
@@ -162,6 +162,7 @@ void init_BCs(BCs_pars_t *pars)
   }
   else
     init_gf_SF_BCs(&(BCs_pars.gauge_boundary_dn), &(BCs_pars.gauge_boundary_up));
+
   init_plaq_Dirichlet_BCs(BCs_pars.gauge_boundary_improvement_ct);
 #endif
 
@@ -538,6 +539,34 @@ static void init_gf_SF_BCs(suNg *dn, suNg *up)
   {
     up->c[(1 + NG) * k] = cos((SF_phi0_up[k] + SF_phi1_up[k] * SF_eta) / (GLB_T - 2)) + I * sin((SF_phi0_up[k] + SF_phi1_up[k] * SF_eta) / (GLB_T - 2));
   }
+#if defined(BASIC_SF)
+  lprintf("BCS", 0, "SF boundary phases phi0  ( ");
+  for (k = 0; k < NG; k++)
+    lprintf("BCS", 0, "%lf ", SF_phi0_dn[k]/2.);
+  lprintf("BCS", 0, ")\n");
+  lprintf("BCS", 0, "SF boundary phases phi0'  ( ");
+  for (k = 0; k < NG; k++)
+    lprintf("BCS", 0, "%lf ", SF_phi0_up[k]/2.);
+  lprintf("BCS", 0, ")");
+#else
+  lprintf("BCS", 0, "SF boundary phases phi0'  ( ");
+  for (k = 0; k < NG; k++)
+    lprintf("BCS", 0, "%lf ", SF_phi0_up[k]/2.);
+  lprintf("BCS", 0, ")\n");
+  lprintf("BCS", 0, "SF boundary phases phi1'  ( ");
+  for (k = 0; k < NG; k++)
+    lprintf("BCS", 0, "%lf ", SF_phi1_up[k]);
+  lprintf("BCS", 0, ")\n");
+
+  lprintf("BCS", 0, "SF boundary phases phi0  ( ");
+  for (k = 0; k < NG; k++)
+    lprintf("BCS", 0, "%lf ", SF_phi0_dn[k]/2.);
+  lprintf("BCS", 0, ")");
+  lprintf("BCS", 0, "SF boundary phases phi1  ( ");
+  for (k = 0; k < NG; k++)
+    lprintf("BCS", 0, "%lf ", SF_phi1_dn[k]);
+  lprintf("BCS", 0, ")");
+#endif
 }
 #else
 static void init_gf_SF_BCs(suNg *dn, suNg *up)

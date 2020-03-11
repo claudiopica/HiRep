@@ -9,7 +9,6 @@ NP_Z = 1
 
 N_REP = 1
 
-
 rlx_level = 1
 rlx_seed = 83745
 rlx_start = new
@@ -17,9 +16,21 @@ rlx_state = rand_state
 
 sf:precision = 1e-16
 sf:beta = 12.0
-sf:mass = 0.148
-sf:csw = 1.0
-sf:rho_s = 0
-sf:rho_t = 0
+sf:mass = -0.148
+sf:background = false
 sf:configlist = list_conf_sf.txt
+sf:ct = 1.0
 
+//needed only for ROTATED_SF
+sf:rho_s = 0.0
+sf:rho_t = 0.0
+sf:ds = 1.0
+
+//needed only if compiled with CSW/EXP_CSW
+sf:csw = 1.0
+
+//needed only if compiled with FERMION_THETA
+theta_T = 0.0
+theta_X = 0.0
+theta_Y = 0.0
+theta_Z = 0.0

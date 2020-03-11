@@ -53,7 +53,6 @@ void SF_quark_propagator(spinor_field *in, double mass, spinor_field *out, doubl
   MINRESpar.err2 = acc;
   MINRESpar.max_iter = 0;
   cgiter = MINRES(&MINRESpar, &H_sf, in, out, 0);
-  lprintf("PROPAGATOR", 10, "MINRES MVM = %d", cgiter);
 #elif defined(ROTATED_SF)
 
   int cgiter;
@@ -220,11 +219,7 @@ void SF_PCAC_wall_corr(double mass, double acc)
   f_1 /= 2.0 * ((double)GLB_VOL3) * ((double)GLB_VOL3);
 
   lprintf("PC_wall_AC", 0, "f1 = %.16e\n", f_1);
-  lprintf("PC_wall_AC", 0, "ZP = %.16e\n", (sqrt(f_1) / (f_P[(int)(GLB_X / 2)])));
-
-  for (ix0 = 2; ix0 < GLB_T - 3; ix0++)
-    lprintf("PC_wall_AC", 0, "PCAC( %d )= %.16e\n", ix0, (double)(f_A[(int)(ix0) + 1] - f_A[(int)(ix0)-1]) / (4 * f_P[(int)(ix0)]));
-
+  
   /*Create wall source with g5 factor at t=T-2*/
   /*U and P- on source (again actually use P+ to account for commuting with g5 in source)*/
   for (int s = 0; s < 4 * NF; s++)
@@ -292,13 +287,7 @@ void SF_PCAC_wall_corr(double mass, double acc)
     g_A[ix0] /= 2.0 * (double)GLB_VOL3;
     lprintf("PC_wall_AC", 10, "g_A( %d )= %.16e \n", ix0, g_A[ix0]);
   }
-  lprintf("PC_wall_AC", 0, "ZP' = %.16e\n", (sqrt(f_1) / (g_P[(int)(GLB_X / 2)])));
-
-  lprintf("PC_wall_AC", 0, "ZP_avg = %.16e\n", 0.5 * (sqrt(f_1) / (g_P[(int)(GLB_X / 2)])) + 0.5 * (sqrt(f_1) / (f_P[(int)(GLB_X / 2)])));
-
-  for (ix0 = 2; ix0 < GLB_T - 3; ix0++)
-    lprintf("PC_wall_AC", 0, "PCAC'( %d )= %.16e\n", ix0, (double)(g_A[(int)(ix0) + 1] - g_A[(int)(ix0)-1]) / (4 * g_P[(int)(ix0)]));
-
+  
   free_spinor_field_f(source);
   free_spinor_field_f(prop);
 
