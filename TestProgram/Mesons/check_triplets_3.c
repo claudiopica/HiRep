@@ -248,6 +248,7 @@ int main(int argc, char *argv[])
   double *ex_triplets[16];
   char pame[256];
   int return_value = 0;
+  double tol=1.e-9;
 
   double complex g[16][4][4];
   g5_debug(g[0], &sign);
@@ -332,18 +333,18 @@ int main(int argc, char *argv[])
   //  /* CALCOLO ESPLICITO */
   free_correlators(ex_triplets);
 
-  lprintf("TEST", 0, "\nANALITICO\tPOINT-TO-ALL\tERROR (must be less than 1e-9)\n");
+  lprintf("TEST", 0, "\nANALITICO\tPOINT-TO-ALL\tERROR (must be less than %e)\n",tol);
   for (i = 0; i < 16; i++)
   {
     lprintf("TEST", 0, "TRIPLET CORRELATOR %s\n", mes_channel_names[i]);
     for (t = 0; t < GLB_T; t++)
     {
       lprintf("TEST", 0, "%e\t%e\t%e\n", ex_triplets[i][t], creal(corr_triplets[i][t]), fabs(ex_triplets[i][t] - creal(corr_triplets[i][t])));
-      if (fabs(ex_triplets[i][t] - creal(corr_triplets[i][t])) > 1e-9)
+      if (fabs(ex_triplets[i][t] - creal(corr_triplets[i][t])) > tol)
       {
         return_value += 1;
       }
-      if (fabs(cimag(corr_triplets[i][t])) > 1e-9)
+      if (fabs(cimag(corr_triplets[i][t])) > tol)
       {
         return_value += 1;
       }

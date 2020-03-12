@@ -572,7 +572,7 @@ static void print_corr_core(meson_observable *mo, int lt, int conf, int nm, doub
             }
           }
           for (t = 0; t < lt; ++t)
-            lprintf("MAIN", 0, "%e ", mo->corr_re[corr_ind(px, py, pz, n_mom, t, nm, i)]);
+            lprintf("MAIN", 0, "%.16e ", mo->corr_re[corr_ind(px, py, pz, n_mom, t, nm, i)]);
           lprintf("MAIN", 0, "\n");
           /*Imaginary */
           if (n_mom > 1)
@@ -584,7 +584,7 @@ static void print_corr_core(meson_observable *mo, int lt, int conf, int nm, doub
             lprintf("MAIN", 0, "conf #%d mass=%2.6f %s %s %s_im= ", conf, mass[i], label, mo->channel_type, mo->channel_name);
           }
           for (t = 0; t < lt; ++t)
-            lprintf("MAIN", 0, "%e ", mo->corr_im[corr_ind(px, py, pz, n_mom, t, nm, i)]);
+            lprintf("MAIN", 0, "%.16e ", mo->corr_im[corr_ind(px, py, pz, n_mom, t, nm, i)]);
           lprintf("MAIN", 0, "\n");
         }
       }
