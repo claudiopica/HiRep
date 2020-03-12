@@ -99,10 +99,6 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"mes:masses = %f\n",mass);
 
   unit_u(u_gauge);
-
-#ifndef REPR_FUNDAMENTAL
-  u_gauge_f=alloc_gfield_f(&glattice);
-#endif
   represent_gauge_field();
 
 

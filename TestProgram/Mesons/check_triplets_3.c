@@ -135,7 +135,7 @@ typedef struct _input_mesons
     }                                                                                                     \
   }
 
-static double mass, csw;
+static double mass;
 void free_correlators(double **triplets);
 
 input_glb glb_ip = init_input_glb(glb_ip);
@@ -290,16 +290,17 @@ int main(int argc, char *argv[])
 
   strcpy(pame, mes_ip.mstring);
   mass = atof(strtok(pame, ";"));
-  csw = mes_ip.csw;
-
+  
   lprintf("MAIN", 0, "mes:masses = %f\n", mass);
-  lprintf("MAIN", 0, "mes:csw = %f\n", csw);
-
+  
   unit_u(u_gauge);
-#ifdef WITH_CLOVER
-  clover_init(mes_ip.csw);
-#endif
   represent_gauge_field();
+
+#ifdef WITH_CLOVER
+  lprintf("MAIN", 0, "mes:csw = %f\n", csw);
+  set_csw(mes_ip.csw);
+#endif
+  
 
   lprintf("MAIN", 0, "Measuring Gamma Gamma correlators and PCAC-mass\n");
   init_meson_correlators(0);
@@ -349,6 +350,7 @@ int main(int argc, char *argv[])
     }
   }
 
+  free_meson_observables();
   global_sum_int(&return_value, 1);
   lprintf("MAIN", 0, "return_value= %d\n ", return_value);
 
