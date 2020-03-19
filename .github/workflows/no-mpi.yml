@@ -3,7 +3,7 @@ name: no-mpi
 on:
   push:
     branches:
-      - HiRep-COMP
+      - master
 
 jobs:
   build:
