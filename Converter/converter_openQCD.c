@@ -53,11 +53,12 @@ typedef struct _format_type
   void (*write)(char *);
 } format_type;
 
-#define nformats 2
+#define nformats 3
 
 format_type format[nformats] = {
     {.name = "openQCD to HiRep", .read = read_gauge_field_openQCD, .write = write_gauge_field},
-    {.name = "HiRep to openQCD", .read = read_gauge_field, .write = write_gauge_field_openQCD}};
+    {.name = "HiRep to openQCD", .read = read_gauge_field, .write = write_gauge_field_openQCD},
+    {.name = "SF openQCD to HiRep", .read = read_gauge_field_openQCD_SF, .write = write_gauge_field}};
 
 format_type *conf_format;
 
@@ -102,9 +103,14 @@ int main(int argc, char *argv[])
     conf_format = format ;
     sprintf(conf_info.cnfgout, "HiRep_%s", conf_info.cnfgin);
   }
+  else if (strcmp(conf_info.type, "openqcd_sf") == 0)
+  {
+    conf_format = format + 2;
+    sprintf(conf_info.cnfgout, "HiRepSF_%s", conf_info.cnfgin);
+  }
   else
   {
-    error(0 == 0, 0, "MAIN", "Unknonw configuration type (hirep and openqcd) are the only allowed.");
+    error(0 == 0, 0, "MAIN", "Unknonw configuration type (hirep, openqcd and openqcd_sf) are the only allowed.");
   }
 
 

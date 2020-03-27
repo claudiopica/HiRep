@@ -27,6 +27,7 @@
 #include "memory.h"
 #include "representation.h"
 #include "clover_tools.h"
+#include "clover_exp.h"
 
 /* setup_process
  * Assign a unique RID, PID to each process and setup
@@ -55,7 +56,7 @@ static int setup_level = 0;
 static void read_cmdline(int argc, char **argv)
 {
   int option, ai = 0;
-  
+
   while ((option = getopt(argc, argv, "i:o:mh")) != -1)
   { //get option from the getopt() method
     switch (option)
@@ -72,7 +73,7 @@ static void read_cmdline(int argc, char **argv)
       print_compiling_info();
       exit(0);
     case 'h':
-      lprintf("read_cmdline",0,"Standard cmdline:\n\t-i <input file>\n\t-o <log file>\n\t-m (compilation information)");
+      lprintf("read_cmdline", 0, "Standard cmdline:\n\t-i <input file>\n\t-o <log file>\n\t-m (compilation information)");
       exit(0);
     }
   }
@@ -106,7 +107,7 @@ void setup_gauge_fields()
   init_smearing(1.0, 1.0);
 #endif
 
-#ifdef WITH_CLOVER
+#if defined(WITH_CLOVER)|| defined(WITH_EXPCLOVER)
   clover_init(1.0);
 #endif
 
@@ -207,6 +208,15 @@ int setup_process(int *argc, char ***argv)
 static void setup_random()
 {
   read_input(rlx_var.read, get_input_filename());
+
+  if (strcmp(rlx_var.rlxd_start, "continue") == 0 && rlx_var.rlxd_state[0] != '\0')
+  {
+    /*load saved state*/
+    lprintf("MAIN", 0, "Loading rlxd state from file [%s]\n", rlx_var.rlxd_state);
+    read_ranlxd_state(rlx_var.rlxd_state);
+    return;
+  }
+
   if (rlx_var.rlxd_level == 0)
   {
     lprintf("SYSTEM", 0, "No rlx_level defined, skipping init of the random number generator.\n");

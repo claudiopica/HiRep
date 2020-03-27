@@ -19,6 +19,7 @@
 #include "memory.h"
 #include "communications.h"
 #include "clover_tools.h"
+#include "clover_exp.h"
 
 #define _print_avect(a) printf("(%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e)\n", (a).c1, (a).c2, (a).c3, (a).c4, (a).c5, (a).c6, (a).c7, (a).c8)
 
@@ -114,7 +115,7 @@
 
 static suNg_av_field *force_sum = NULL;
 
-#ifdef WITH_CLOVER
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
 
 /* ----------------------------------- */
 /* CALCULATE FORCE OF THE CLOVER TERM  */
@@ -377,8 +378,12 @@ static void force_clover_core(double dt)
 	}			  // pieces
 }
 
+#endif
+
+#if defined(WITH_CLOVER)
 void force_clover_fermion(spinor_field *Xs, spinor_field *Ys, double residue)
 {
+
 	// Construct force matrices
 	_MASTER_FOR(&glattice, ix)
 	{
@@ -448,6 +453,327 @@ void force_clover_fermion(spinor_field *Xs, spinor_field *Ys, double residue)
 	}
 }
 
+#endif
+
+#if defined(WITH_EXPCLOVER)
+
+static void A_times_spinor(suNf_spinor *out, suNfc *Aplus, suNfc *Aminus, suNf_spinor *in)
+{
+
+	suNf_vector aux;
+
+	// Comp 0 1
+	_suNfc_multiply(out->c[0], Aplus[0], in->c[0]);
+	_suNfc_multiply(aux, Aplus[1], in->c[1]);
+	_vector_add_assign_f(out->c[0], aux);
+
+	_suNfc_multiply(out->c[1], Aplus[2], in->c[0]);
+	_suNfc_multiply(aux, Aplus[3], in->c[1]);
+	_vector_add_assign_f(out->c[1], aux);
+	// Comp 2 3
+	_suNfc_multiply(out->c[2], Aminus[0], in->c[2]);
+	_suNfc_multiply(aux, Aminus[1], in->c[3]);
+	_vector_add_assign_f(out->c[2], aux);
+
+	_suNfc_multiply(out->c[3], Aminus[2], in->c[2]);
+	_suNfc_multiply(aux, Aminus[3], in->c[3]);
+	_vector_add_assign_f(out->c[3], aux);
+}
+
+//EXP CSW FORCE TERM
+void force_clover_fermion(spinor_field *Xs, spinor_field *Ys, double residue)
+{
+	double invexpmass =  get_dirac_mass();
+
+	evaluate_sw_order(&invexpmass);
+
+	invexpmass = 1.0 / (4.0 + invexpmass);
+	// Construct force matrices
+
+	suNf_spinor tmp_lhs, tmp_rhs;
+	suNf_spinor lhs_k, rhs_k;
+	suNf_spinor xi[2 * NF];
+	suNf_vector v1, v2, v3, v4;
+
+	suNf_spinor *rhs, *lhs;
+	suNf *fm, fm_tmp;
+
+	suNfc Aplus[4];
+	suNfc Aminus[4];
+	suNfc *s0, *s1, *s2, *s3;
+
+	double Cplus[2 * NF * 2 * NF];
+	double Cminus[2 * NF * 2 * NF];
+
+	int k = 0, i = 0;
+
+	_MASTER_FOR(&glattice, ix)
+	{
+		//Create matrix Aplus, Aminus
+		s0 = _4FIELD_AT(cl_term, ix, 0);
+		s1 = _4FIELD_AT(cl_term, ix, 1);
+		s2 = _4FIELD_AT(cl_term, ix, 2);
+		s3 = _4FIELD_AT(cl_term, ix, 3);
+
+		_suNf_mul(Aplus[0], invexpmass, *s0);
+		_suNf_mul(Aplus[1], invexpmass, *s1);
+		_suNf_dagger(Aplus[2], Aplus[1]);
+		_suNf_mul(Aplus[3], -invexpmass, *s0);
+
+		_suNf_mul(Aminus[0], invexpmass, *s2);
+		_suNf_mul(Aminus[1], invexpmass, *s3);
+		_suNf_dagger(Aminus[2], Aminus[1]);
+		_suNf_mul(Aminus[3], -invexpmass, *s2);
+
+		//double horner scheme
+		doublehorner(Cplus, Aplus);
+		doublehorner(Cminus, Aminus);
+
+		//Remember rhs = eta, lhs  = xi
+
+		rhs = _FIELD_AT(Xs, ix);
+		lhs = _FIELD_AT(Ys, ix);
+
+		xi[0] = *lhs;
+		for (k = 0; k < 2 * NF - 1; k++)
+		{
+			A_times_spinor(&xi[k + 1], Aplus, Aminus, &xi[k]);
+		}
+
+		for (k = 0; k < 2 * NF; k++)
+		{
+
+			//Calculate eta_k = (Aplus^k*etaplus, Aminus^k*etaminus)
+			if (k == 0)
+			{
+				rhs_k = *rhs;
+			}
+			else
+			{
+				// Comp 0 1
+				_suNfc_multiply(v1, Aplus[0], rhs_k.c[0]);
+				_suNfc_multiply(v2, Aplus[1], rhs_k.c[1]);
+				_suNfc_multiply(v3, Aplus[2], rhs_k.c[0]);
+				_suNfc_multiply(v4, Aplus[3], rhs_k.c[1]);
+				_vector_add_f(rhs_k.c[0], v1, v2);
+				_vector_add_f(rhs_k.c[1], v3, v4);
+				// Comp 2 3
+				_suNfc_multiply(v1, Aminus[0], rhs_k.c[2]);
+				_suNfc_multiply(v2, Aminus[1], rhs_k.c[3]);
+				_suNfc_multiply(v3, Aminus[2], rhs_k.c[2]);
+				_suNfc_multiply(v4, Aminus[3], rhs_k.c[3]);
+				_vector_add_f(rhs_k.c[2], v1, v2);
+				_vector_add_f(rhs_k.c[3], v3, v4);
+			}
+
+			//Calculate xi_k = sum_{l} C_{kl} A^l xi
+			_spinor_zero_f(lhs_k);
+			for (i = 0; i < 2 * NF; i++)
+			{
+
+				_vector_mulc_add_assign_f(lhs_k.c[0], Cplus[k * 2 * NF + i], xi[i].c[0]);
+				_vector_mulc_add_assign_f(lhs_k.c[1], Cplus[k * 2 * NF + i], xi[i].c[1]);
+				_vector_mulc_add_assign_f(lhs_k.c[2], Cminus[k * 2 * NF + i], xi[i].c[2]);
+				_vector_mulc_add_assign_f(lhs_k.c[3], Cminus[k * 2 * NF + i], xi[i].c[3]);
+			}
+
+			// (mu,nu) = (0,1)
+			fm = _6FIELD_AT(cl_force, ix, 0);
+			g5_sigma(&tmp_rhs, &rhs_k, 0, 1);
+			g5_sigma(&tmp_lhs, &lhs_k, 0, 1);
+			fm_tmp = fmat_create(&tmp_lhs, &rhs_k, &tmp_rhs, &lhs_k);
+			_suNf_mul(fm_tmp, residue, fm_tmp);
+			_suNf_add_assign(*fm, fm_tmp);
+
+			// (mu,nu) = (0,2)
+			fm = _6FIELD_AT(cl_force, ix, 1);
+			g5_sigma(&tmp_rhs, &rhs_k, 0, 2);
+			g5_sigma(&tmp_lhs, &lhs_k, 0, 2);
+			fm_tmp = fmat_create(&tmp_lhs, &rhs_k, &tmp_rhs, &lhs_k);
+			_suNf_mul(fm_tmp, residue, fm_tmp);
+			_suNf_add_assign(*fm, fm_tmp);
+
+			// (mu,nu) = (1,2)
+			fm = _6FIELD_AT(cl_force, ix, 2);
+			g5_sigma(&tmp_rhs, &rhs_k, 1, 2);
+			g5_sigma(&tmp_lhs, &lhs_k, 1, 2);
+			fm_tmp = fmat_create(&tmp_lhs, &rhs_k, &tmp_rhs, &lhs_k);
+			_suNf_mul(fm_tmp, residue, fm_tmp);
+			_suNf_add_assign(*fm, fm_tmp);
+
+			// (mu,nu) = (0,3)
+			fm = _6FIELD_AT(cl_force, ix, 3);
+			g5_sigma(&tmp_rhs, &rhs_k, 0, 3);
+			g5_sigma(&tmp_lhs, &lhs_k, 0, 3);
+			fm_tmp = fmat_create(&tmp_lhs, &rhs_k, &tmp_rhs, &lhs_k);
+			_suNf_mul(fm_tmp, residue, fm_tmp);
+			_suNf_add_assign(*fm, fm_tmp);
+
+			// (mu,nu) = (1,3)
+			fm = _6FIELD_AT(cl_force, ix, 4);
+			g5_sigma(&tmp_rhs, &rhs_k, 1, 3);
+			g5_sigma(&tmp_lhs, &lhs_k, 1, 3);
+			fm_tmp = fmat_create(&tmp_lhs, &rhs_k, &tmp_rhs, &lhs_k);
+			_suNf_mul(fm_tmp, residue, fm_tmp);
+			_suNf_add_assign(*fm, fm_tmp);
+
+			// (mu,nu) = (2,3)
+			fm = _6FIELD_AT(cl_force, ix, 5);
+			g5_sigma(&tmp_rhs, &rhs_k, 2, 3);
+			g5_sigma(&tmp_lhs, &lhs_k, 2, 3);
+			fm_tmp = fmat_create(&tmp_lhs, &rhs_k, &tmp_rhs, &lhs_k);
+			_suNf_mul(fm_tmp, residue, fm_tmp);
+			_suNf_add_assign(*fm, fm_tmp);
+		}
+	}
+}
+
+void force_clover_fermion_taylor(spinor_field *Xs, spinor_field *Ys, double residue)
+{
+	double invexpmass =  get_dirac_mass();
+
+	evaluate_sw_order(&invexpmass);
+
+	invexpmass = 1.0 / (4.0 + invexpmass);
+	int NNexp = get_NNexp();
+	double Coef[NNexp * NNexp];
+
+	int i, k;
+
+	suNf_spinor tmp_lhs, tmp_rhs;
+	suNf_spinor lhs_k, rhs_k;
+	suNf_spinor xi[NNexp];
+	suNf_vector v1, v2, v3, v4;
+
+	suNf_spinor *rhs, *lhs;
+	suNf *fm, fm_tmp;
+
+	suNfc Aplus[4];
+	suNfc Aminus[4];
+	suNfc *s0, *s1, *s2, *s3;
+	factorialCoef(Coef);
+	// Construct force matrices
+	_MASTER_FOR(&glattice, ix)
+	{
+		//Create matrix Aplus, Aminus
+
+		s0 = _4FIELD_AT(cl_term, ix, 0);
+		s1 = _4FIELD_AT(cl_term, ix, 1);
+		s2 = _4FIELD_AT(cl_term, ix, 2);
+		s3 = _4FIELD_AT(cl_term, ix, 3);
+
+		_suNf_mul(Aplus[0], invexpmass, *s0);
+		_suNf_mul(Aplus[1], invexpmass, *s1);
+		_suNf_dagger(Aplus[2], Aplus[1]);
+		_suNf_mul(Aplus[3], -invexpmass, *s0);
+
+		_suNf_mul(Aminus[0], invexpmass, *s2);
+		_suNf_mul(Aminus[1], invexpmass, *s3);
+		_suNf_dagger(Aminus[2], Aminus[1]);
+		_suNf_mul(Aminus[3], -invexpmass, *s2);
+
+		//Remember rhs = eta, lhs  = xi
+
+		rhs = _FIELD_AT(Xs, ix);
+		lhs = _FIELD_AT(Ys, ix);
+
+		xi[0] = *lhs;
+		for (k = 0; k < NNexp - 1; k++)
+		{
+			A_times_spinor(&xi[k + 1], Aplus, Aminus, &xi[k]);
+		}
+
+		for (k = 0; k < NNexp; k++)
+		{
+
+			//Calculate eta_k = (Aplus^k*etaplus, Aminus^k*etaminus)
+			if (k == 0)
+			{
+				rhs_k = *rhs;
+			}
+			else
+			{
+				// Comp 0 1
+				_suNfc_multiply(v1, Aplus[0], rhs_k.c[0]);
+				_suNfc_multiply(v2, Aplus[1], rhs_k.c[1]);
+				_suNfc_multiply(v3, Aplus[2], rhs_k.c[0]);
+				_suNfc_multiply(v4, Aplus[3], rhs_k.c[1]);
+				_vector_add_f(rhs_k.c[0], v1, v2);
+				_vector_add_f(rhs_k.c[1], v3, v4);
+				// Comp 2 3
+				_suNfc_multiply(v1, Aminus[0], rhs_k.c[2]);
+				_suNfc_multiply(v2, Aminus[1], rhs_k.c[3]);
+				_suNfc_multiply(v3, Aminus[2], rhs_k.c[2]);
+				_suNfc_multiply(v4, Aminus[3], rhs_k.c[3]);
+				_vector_add_f(rhs_k.c[2], v1, v2);
+				_vector_add_f(rhs_k.c[3], v3, v4);
+			}
+
+			//Calculate xi_k = sum_{l} C_{kl} A^l xi
+			_spinor_zero_f(lhs_k);
+			for (i = 0; i < NNexp; i++)
+			{
+
+				_vector_mulc_add_assign_f(lhs_k.c[0], Coef[k * NNexp + i], xi[i].c[0]);
+				_vector_mulc_add_assign_f(lhs_k.c[1], Coef[k * NNexp + i], xi[i].c[1]);
+				_vector_mulc_add_assign_f(lhs_k.c[2], Coef[k * NNexp + i], xi[i].c[2]);
+				_vector_mulc_add_assign_f(lhs_k.c[3], Coef[k * NNexp + i], xi[i].c[3]);
+			}
+
+			// (mu,nu) = (0,1)
+			fm = _6FIELD_AT(cl_force, ix, 0);
+			g5_sigma(&tmp_rhs, &rhs_k, 0, 1);
+			g5_sigma(&tmp_lhs, &lhs_k, 0, 1);
+			fm_tmp = fmat_create(&tmp_lhs, &rhs_k, &tmp_rhs, &lhs_k);
+			_suNf_mul(fm_tmp, residue, fm_tmp);
+			_suNf_add_assign(*fm, fm_tmp);
+
+			// (mu,nu) = (0,2)
+			fm = _6FIELD_AT(cl_force, ix, 1);
+			g5_sigma(&tmp_rhs, &rhs_k, 0, 2);
+			g5_sigma(&tmp_lhs, &lhs_k, 0, 2);
+			fm_tmp = fmat_create(&tmp_lhs, &rhs_k, &tmp_rhs, &lhs_k);
+			_suNf_mul(fm_tmp, residue, fm_tmp);
+			_suNf_add_assign(*fm, fm_tmp);
+
+			// (mu,nu) = (1,2)
+			fm = _6FIELD_AT(cl_force, ix, 2);
+			g5_sigma(&tmp_rhs, &rhs_k, 1, 2);
+			g5_sigma(&tmp_lhs, &lhs_k, 1, 2);
+			fm_tmp = fmat_create(&tmp_lhs, &rhs_k, &tmp_rhs, &lhs_k);
+			_suNf_mul(fm_tmp, residue, fm_tmp);
+			_suNf_add_assign(*fm, fm_tmp);
+
+			// (mu,nu) = (0,3)
+			fm = _6FIELD_AT(cl_force, ix, 3);
+			g5_sigma(&tmp_rhs, &rhs_k, 0, 3);
+			g5_sigma(&tmp_lhs, &lhs_k, 0, 3);
+			fm_tmp = fmat_create(&tmp_lhs, &rhs_k, &tmp_rhs, &lhs_k);
+			_suNf_mul(fm_tmp, residue, fm_tmp);
+			_suNf_add_assign(*fm, fm_tmp);
+
+			// (mu,nu) = (1,3)
+			fm = _6FIELD_AT(cl_force, ix, 4);
+			g5_sigma(&tmp_rhs, &rhs_k, 1, 3);
+			g5_sigma(&tmp_lhs, &lhs_k, 1, 3);
+			fm_tmp = fmat_create(&tmp_lhs, &rhs_k, &tmp_rhs, &lhs_k);
+			_suNf_mul(fm_tmp, residue, fm_tmp);
+			_suNf_add_assign(*fm, fm_tmp);
+
+			// (mu,nu) = (2,3)
+			fm = _6FIELD_AT(cl_force, ix, 5);
+			g5_sigma(&tmp_rhs, &rhs_k, 2, 3);
+			g5_sigma(&tmp_lhs, &lhs_k, 2, 3);
+			fm_tmp = fmat_create(&tmp_lhs, &rhs_k, &tmp_rhs, &lhs_k);
+			_suNf_mul(fm_tmp, residue, fm_tmp);
+			_suNf_add_assign(*fm, fm_tmp);
+		}
+	}
+}
+
+#endif
+
+#if defined(WITH_CLOVER)
 void force_clover_logdet(double mass, double residue)
 {
 	// Compute force matrices
@@ -490,7 +816,7 @@ void force_fermion_core(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, d
 
 		Dphi_(&Xo, &Xe);
 		Dphi_(&Yo, &Ye);
-#ifdef WITH_CLOVER
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
 		Cphi_diag_inv(get_dirac_mass(), &Xo, &Xo);
 		Cphi_diag_inv(get_dirac_mass(), &Yo, &Yo);
 #endif
@@ -504,8 +830,18 @@ void force_fermion_core(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, d
 	start_sf_sendrecv(Xs);
 	start_sf_sendrecv(Ys);
 
-#ifdef WITH_CLOVER
+	//HERE!!!!!
+#if defined(WITH_CLOVER)
 	force_clover_fermion(Xs, Ys, residue);
+#endif
+#if defined(WITH_EXPCLOVER)
+#if (NF == 3 || NF == 2)
+	//	force_clover_fermion_taylor(Xs, Ys, residue);
+	force_clover_fermion(Xs, Ys, residue);
+#else
+	force_clover_fermion_taylor(Xs, Ys, residue);
+#endif
+
 #endif
 
 	// Loop over lattice
@@ -611,8 +947,7 @@ void fermion_force_begin()
 		}
 	}
 
-#ifdef WITH_CLOVER
-
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
 	// Clear clover force field
 	_MASTER_FOR(&glattice, ix)
 	{
@@ -627,7 +962,7 @@ void fermion_force_begin()
 
 void fermion_force_end(double dt, suNg_av_field *force)
 {
-#ifdef WITH_CLOVER
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
 
 	// Evaluate derivative of clover term
 	force_clover_core(dt);

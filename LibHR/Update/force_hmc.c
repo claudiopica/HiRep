@@ -88,7 +88,7 @@ void force_hmc(double dt, void *vpar)
 
 		if (par->hasenbusch == 0)
 		{
-			/* Y  D^{-1} ( g5 X ) */
+			/* Y =  D^{-1} ( g5 X ) */
 			spinor_field_g5_f(eta, Xs);
 		}
 		else if (par->hasenbusch == 1)

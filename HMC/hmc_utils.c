@@ -281,6 +281,10 @@ int init_mc_ghmc(hmc_flow *rf, char *ifile)
 	/* Read the action and initialize fields */
 	read_action(ifile, &hmc_var.hmc_p.integrator);
 
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
+	set_csw(hmc_var.hmc_p.csw);
+#endif
+
 	/* initialize boundary conditions */
 	BCs_pars_t BCs_pars = {
 		.fermion_twisting_theta = {0., 0., 0., 0.},
@@ -304,9 +308,6 @@ int init_mc_ghmc(hmc_flow *rf, char *ifile)
 
 	init_BCs(&BCs_pars);
 
-#ifdef WITH_CLOVER
-	set_csw(&hmc_var.hmc_p.csw);
-#endif
 
 	/* fix conf_dir name: put a / at the end of string */
 	start_t = strlen(rf->conf_dir);

@@ -29,6 +29,7 @@
 #include "logger.h"
 #include "communications.h"
 #include "setup.h"
+#include "clover_tools.h"
 
 #if !(defined(BASIC_SF)) && !(defined(ROTATED_SF))
 #error This main code works only if some SF boundary conditions are enabled
@@ -108,7 +109,7 @@ int main(int argc, char *argv[])
   read_input(sfc_var.read, get_input_filename());
   read_input(bcpar_var.read, get_input_filename());
 
-#ifdef WITH_CLOVER
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
   set_csw(sfc_var.csw);
 #endif
 

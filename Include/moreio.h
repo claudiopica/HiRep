@@ -25,6 +25,7 @@ void read_gauge_field_ascii(char filename[]);
 void read_gauge_field_fortran(char filename[]);
 
 void read_gauge_field_openQCD(char filename[]);
+void read_gauge_field_openQCD_SF(char filename[]);
 void write_gauge_field_openQCD(char filename[]);
 
 #include "spinor_field.h"

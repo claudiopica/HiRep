@@ -2,9 +2,9 @@ GLB_T = 18
 GLB_X = 8
 GLB_Y = 8
 GLB_Z = 8
-NP_T = 1
+NP_T = 2
 NP_X = 1
-NP_Y = 1
+NP_Y = 2
 NP_Z = 1
 
 N_REP = 1
@@ -16,7 +16,7 @@ rlx_state = rand_state
 
 sf:precision = 1e-16
 sf:beta = 12.0
-sf:mass = -0.148
+sf:mass = -0.14800000308159977
 sf:ct = 1.0
 sf:background = true
 sf:configlist = list_conf_sf.txt
@@ -27,10 +27,11 @@ sf:rho_t = 0.0
 sf:ds = 1.0
 
 //needed only if compiled with CSW/EXP_CSW
-sf:csw = 0.0
+sf:csw = 1.13295 
 
 //needed only if compiled with FERMION_THETA
 theta_T = 0.0
 theta_X = 0.0
 theta_Y = 0.0
 theta_Z = 0.0
+

@@ -2,6 +2,8 @@
 /******************************************************************************
 *
 *
+*  NOCOMPILE= WITH_CLOVER
+*  NOCOMPILE= WITH_EXPCLOVER
 * File check_disc_1.c
 *
 * Check of the  disc loops (free case): gauge fixed wall source (type = 1) 

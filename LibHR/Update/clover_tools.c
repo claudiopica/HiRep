@@ -9,11 +9,12 @@
 #include "logger.h"
 #include "communications.h"
 #include "clover_tools.h"
+#include "clover_exp.h"
 #include "utils.h"
 #include <math.h>
 #include <string.h>
 
-#ifdef WITH_CLOVER
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
 static double sigma;
 static double csw_value;
 
@@ -99,19 +100,14 @@ static void ldl(int N, double complex *A)
 	{
 		for (int k = 0; k < i; k++)
 		{
-			/*re(A,i,i) -= (re(A,i,k)*re(A,i,k) + im(A,i,k)*im(A,i,k)) * re(A,k,k);*/
 			cplx(A, i, i) -= (_complex_prod(cplx(A, i, k), cplx(A, i, k))) * re(A, k, k);
 		}
 		for (int j = i + 1; j < N; j++)
 		{
 			for (int k = 0; k < i; k++)
 			{
-				/*re(A,j,i) -= (re(A,j,k)*re(A,i,k) + im(A,j,k)*im(A,i,k)) * re(A,k,k);
-				im(A,j,i) -= (im(A,j,k)*re(A,i,k) - re(A,j,k)*im(A,i,k)) * re(A,k,k);*/
 				cplx(A, j, i) -= (_complex_prod(cplx(A, i, k), cplx(A, j, k))) * re(A, k, k);
 			}
-			/*re(A,j,i) /= re(A,i,i);
-			im(A,j,i) /= re(A,i,i);*/
 			cplx(A, j, i) /= re(A, i, i);
 		}
 	}
@@ -136,25 +132,11 @@ static void _compute_ldl_decomp(int id)
 			ij = i * NF + j;
 			ji = j * NF + i;
 
-			/*re(A,m,j) =  clover_re(id,1,ji);
-			im(A,m,j) = -clover_im(id,1,ji);
-			re(B,m,j) =  clover_re(id,3,ji);
-			im(B,m,j) = -clover_im(id,3,ji);*/
-
 			cplx(A, m, j) = conj(clover(id, 1, ji));
 			cplx(B, m, j) = conj(clover(id, 3, ji));
 
 			if (i >= j)
 			{
-				/*re(A,i,j) =  clover_re(id,0,ij);
-				im(A,i,j) =  clover_im(id,0,ij);
-				re(A,m,n) = -clover_re(id,0,ij);
-				im(A,m,n) = -clover_im(id,0,ij);
-				re(B,i,j) =  clover_re(id,2,ij);
-				im(B,i,j) =  clover_im(id,2,ij);
-				re(B,m,n) = -clover_re(id,2,ij);
-				im(B,m,n) = -clover_im(id,2,ij);*/
-
 				cplx(A, i, j) = clover(id, 0, ij);
 				cplx(A, m, n) = -clover(id, 0, ij);
 				cplx(B, i, j) = clover(id, 2, ij);
@@ -162,10 +144,6 @@ static void _compute_ldl_decomp(int id)
 
 				if (i == j)
 				{
-					/*re(A,i,j) += sigma;
-					re(A,m,n) += sigma;
-					re(B,i,j) += sigma;
-					re(B,m,n) += sigma;*/
 					cplx(A, i, j) += sigma;
 					cplx(A, m, n) += sigma;
 					cplx(B, i, j) += sigma;
@@ -208,44 +186,17 @@ static void _compute_clover_term(int id)
 			int ji = j * NF + i;
 
 #ifdef REPR_IS_REAL
-			/*			atmp_re = 0;
-			atmp_im = tmp[2].c[ji] - tmp[2].c[ij];
-			btmp_re = 0;
-			btmp_im = tmp[3].c[ij] - tmp[3].c[ji];
-			ctmp_re = tmp[1].c[ji] - tmp[1].c[ij];
-			ctmp_im = tmp[0].c[ji] - tmp[0].c[ij];
-			dtmp_re = tmp[4].c[ij] - tmp[4].c[ji];
-			dtmp_im = tmp[5].c[ji] - tmp[5].c[ij];*/
 			atmp = I * (tmp[2].c[ji] - tmp[2].c[ij]);
 			btmp = I * (tmp[3].c[ij] - tmp[3].c[ji]);
 			ctmp = tmp[1].c[ji] - tmp[1].c[ij] + I * (tmp[0].c[ji] - tmp[0].c[ij]);
 			dtmp = tmp[4].c[ij] - tmp[4].c[ji] + I * (tmp[5].c[ji] - tmp[5].c[ij]);
 
 #else
-			/*atmp_re = tmp[2].c[ij].im + tmp[2].c[ji].im;
-			atmp_im = tmp[2].c[ji].re - tmp[2].c[ij].re;
-			btmp_re = tmp[3].c[ij].im + tmp[3].c[ji].im;
-			btmp_im = tmp[3].c[ij].re - tmp[3].c[ji].re;
-			ctmp_re = tmp[0].c[ij].im + tmp[0].c[ji].im - tmp[1].c[ij].re + tmp[1].c[ji].re;
-			ctmp_im = tmp[0].c[ji].re - tmp[0].c[ij].re - tmp[1].c[ij].im - tmp[1].c[ji].im;
-			dtmp_re = tmp[4].c[ij].re - tmp[4].c[ji].re + tmp[5].c[ij].im + tmp[5].c[ji].im;
-			dtmp_im = tmp[4].c[ij].im + tmp[4].c[ji].im - tmp[5].c[ij].re + tmp[5].c[ji].re;*/
-
 			atmp = I * (conj(tmp[2].c[ji]) - tmp[2].c[ij]);
 			btmp = I * (conj(tmp[3].c[ij]) - tmp[3].c[ji]);
 			ctmp = I * (conj(tmp[0].c[ji]) - tmp[0].c[ij]) - tmp[1].c[ij] + conj(tmp[1].c[ji]);
 			dtmp = tmp[4].c[ij] - conj(tmp[4].c[ji]) + I * (conj(tmp[5].c[ji]) - tmp[5].c[ij]);
 #endif
-
-			/*clover_re(id, 0, ij) = csw * (atmp_re - btmp_re);
-			clover_im(id, 0, ij) = csw * (atmp_im + btmp_im);
-			clover_re(id, 1, ij) = csw * (ctmp_re - dtmp_re);
-			clover_im(id, 1, ij) = csw * (ctmp_im - dtmp_im);
-			clover_re(id, 2, ij) = -csw * (atmp_re + btmp_re);
-			clover_im(id, 2, ij) = csw * (btmp_im - atmp_im);
-			clover_re(id, 3, ij) = -csw * (ctmp_re + dtmp_re);
-			clover_im(id, 3, ij) = -csw * (ctmp_im + dtmp_im);*/
-
 			clover(id, 0, ij) = csw * (atmp - conj(btmp));
 			clover(id, 1, ij) = csw * (ctmp - dtmp);
 			clover(id, 2, ij) = -csw * (atmp + conj(btmp));
@@ -283,28 +234,16 @@ static void _compute_clover_force(int id, double coeff)
 		{
 			for (int k = 0; k < i; k++)
 			{
-				/*A[i][n].re -= re(U, i, k) * A[k][n].re - im(U, i, k) * A[k][n].im;
-				A[i][n].im -= re(U, i, k) * A[k][n].im + im(U, i, k) * A[k][n].re;
-				B[i][n].re -= re(L, i, k) * B[k][n].re - im(L, i, k) * B[k][n].im;
-				B[i][n].im -= re(L, i, k) * B[k][n].im + im(L, i, k) * B[k][n].re;*/
 				A[i][n] -= cplx(U, i, k) * A[k][n];
 				B[i][n] -= cplx(L, i, k) * B[k][n];
 			}
 		}
 		for (int i = 2 * NF - 1; i >= n; i--)
 		{
-			/*A[i][n].re /= re(U, i, i);
-			A[i][n].im /= re(U, i, i);
-			B[i][n].re /= re(L, i, i);
-			B[i][n].im /= re(L, i, i);*/
 			A[i][n] /= re(U, i, i);
 			B[i][n] /= re(L, i, i);
 			for (int k = i + 1; k < 2 * NF; k++)
 			{
-				/*A[i][n].re -= re(U, k, i) * A[k][n].re + im(U, k, i) * A[k][n].im;
-				A[i][n].im -= re(U, k, i) * A[k][n].im - im(U, k, i) * A[k][n].re;
-				B[i][n].re -= re(L, k, i) * B[k][n].re + im(L, k, i) * B[k][n].im;
-				B[i][n].im -= re(L, k, i) * B[k][n].im - im(L, k, i) * B[k][n].re;*/
 				A[i][n] -= conj(cplx(U, k, i)) * A[k][n];
 				B[i][n] -= conj(cplx(L, k, i)) * B[k][n];
 			}
@@ -318,17 +257,6 @@ static void _compute_clover_force(int id, double coeff)
 		{
 			int ij = i * NF + j;
 
-			/*a21_re = A[i + NF][j].re;
-			a21_im = A[i + NF][j].im;
-			
-			a12_re = A[j + NF][i].re;
-			a12_im = -A[j + NF][i].im;
-
-			a43_re = B[i + NF][j].re;
-			a43_im = B[i + NF][j].im;
-
-			a34_re = B[j + NF][i].re;
-			a34_im = -B[j + NF][i].im;*/
 			a21 = A[i + NF][j];
 			a12 = conj(A[j + NF][i]);
 			a43 = B[i + NF][j];
@@ -336,14 +264,6 @@ static void _compute_clover_force(int id, double coeff)
 
 			if (i < j)
 			{
-				/*a11_re = A[j][i].re;
-				a11_im = -A[j][i].im;
-				a22_re = A[j + NF][i + NF].re;
-				a22_im = -A[j + NF][i + NF].im;
-				a33_re = B[j][i].re;
-				a33_im = -B[j][i].im;
-				a44_re = B[j + NF][i + NF].re;
-				a44_im = -B[j + NF][i + NF].im;*/
 				a11 = conj(A[j][i]);
 				a22 = conj(A[j + NF][i + NF]);
 				a33 = conj(B[j][i]);
@@ -351,14 +271,6 @@ static void _compute_clover_force(int id, double coeff)
 			}
 			else
 			{
-				/*a11_re = A[i][j].re;
-				a11_im = A[i][j].im;
-				a22_re = A[i + NF][j + NF].re;
-				a22_im = A[i + NF][j + NF].im;
-				a33_re = B[i][j].re;
-				a33_im = B[i][j].im;
-				a44_re = B[i + NF][j + NF].re;
-				a44_im = B[i + NF][j + NF].im;*/
 				a11 = A[i][j];
 				a22 = A[i + NF][j + NF];
 				a33 = B[i][j];
@@ -366,33 +278,13 @@ static void _compute_clover_force(int id, double coeff)
 			}
 
 #ifdef REPR_IS_REAL
-			/*			clover_force(id, 0, ij) += a12_im + a21_im - a34_im - a43_im;  // X_01
-			clover_force(id, 1, ij) += a12_re - a21_re + a43_re - a34_re;  // X_02
-			clover_force(id, 2, ij) += a22_im - a11_im + a44_im - a33_im;  // X_12
-			clover_force(id, 3, ij) += a11_im - a22_im + a44_im - a33_im;  // X_03
-			clover_force(id, 4, ij) += a12_re - a21_re + a34_re - a43_re;  // X_13
-			clover_force(id, 5, ij) += -a12_im - a21_im - a34_im - a43_im; // X_23
-			*/
-			clover_force(id, 0, ij) += cimag(a12 + a21 - a34 - a43); // X_01
-			clover_force(id, 1, ij) += creal(a12 - a21 + a43 - a34); // X_02
-			clover_force(id, 2, ij) += cimag(a22 - a11 + a44 - a33); // X_12
-			clover_force(id, 3, ij) += cimag(a11 - a22 + a44 - a33); // X_03
-			clover_force(id, 4, ij) += creal(a12 - a21 + a34 - a43); // X_13
-			clover_force(id, 5, ij) -= cimag(a12 + a21 + a34 + a43); // X_23
+			clover_force(id, 0, ij) += cimag(a12) + cimag(a21) - cimag(a34) - cimag(a43); // X_01
+			clover_force(id, 1, ij) += creal(a12) - creal(a21) + creal(a43) - creal(a34); // X_02
+			clover_force(id, 2, ij) += cimag(a22) - cimag(a11) + cimag(a44) - cimag(a33); // X_12
+			clover_force(id, 3, ij) += cimag(a11) - cimag(a22) + cimag(a44) - cimag(a33); // X_03
+			clover_force(id, 4, ij) += creal(a12) - creal(a21) + creal(a34) - creal(a43); // X_13
+			clover_force(id, 5, ij) -= cimag(a12) + cimag(a21) + cimag(a34) + cimag(a43); // X_23
 #else
-			/*clover_force_re(id, 0, ij) += a12_im + a21_im - a34_im - a43_im; // X_01
-			clover_force_im(id, 0, ij) += -a12_re - a21_re + a34_re + a43_re;
-			clover_force_re(id, 1, ij) += a12_re - a21_re + a43_re - a34_re; // X_02
-			clover_force_im(id, 1, ij) += a12_im - a21_im + a43_im - a34_im;
-			clover_force_re(id, 2, ij) += a22_im - a11_im + a44_im - a33_im; // X_12
-			clover_force_im(id, 2, ij) += a11_re - a22_re + a33_re - a44_re;
-			clover_force_re(id, 3, ij) += a11_im - a22_im + a44_im - a33_im; // X_03
-			clover_force_im(id, 3, ij) += a22_re - a11_re + a33_re - a44_re;
-			clover_force_re(id, 4, ij) += a12_re - a21_re + a34_re - a43_re; // X_13
-			clover_force_im(id, 4, ij) += a12_im - a21_im + a34_im - a43_im;
-			clover_force_re(id, 5, ij) += -a12_im - a21_im - a34_im - a43_im; // X_23
-			clover_force_im(id, 5, ij) += a12_re + a21_re + a34_re + a43_re;*/
-
 			clover_force(id, 0, ij) -= I * (a12 + a21 - a34 - a43); // X_01
 			clover_force(id, 1, ij) += a12 - a21 + a43 - a34;		// X_02
 			clover_force(id, 2, ij) -= I * (a22 - a11 + a44 - a33); // X_12
@@ -431,9 +323,6 @@ void clover_la_logdet(double nf, double mass, scalar_field *la)
 
 		for (int n = 0; n < 2 * NF; n++)
 		{
-			/*prod *= re(A, n, n);
-			prod *= re(B, n, n);*/
-
 			prod *= re(A, n, n) * re(B, n, n);
 		}
 
@@ -477,6 +366,10 @@ void clover_init(double csw)
 	sigma = 0xF00F;
 	csw_value = csw;
 	lprintf("CLOVER", 10, "Initial Coefficient: csw = %1.6f\n", csw_value);
+
+#if defined(WITH_EXPCLOVER)
+	init_clover_exp();
+#endif
 }
 
 #endif //#ifdef WITH_CLOVER

@@ -7,5 +7,7 @@ log:default = -1
 log:inverter = -1
 log:forcestat = 0
 
-conf name= Snoopy137n1
+conf name= Snoopynew137n1
+
+//accepted conf types are openqcd hirep openqcd_sf
 conf type= openqcd

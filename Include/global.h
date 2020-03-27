@@ -182,10 +182,6 @@ GLB_VAR(COMPLEX,eitheta[4],={{1.,0.}});
 #endif
 
 
-#if defined(ROTATED_SF) && defined(UPDATE_EO)
-#error ROTATED_SF DOES NOT WORK WITH E/O PRECONDITIONING
-#endif
-
 
 #ifdef MEASURE_FORCE
 #define MEASURE_FORCE0

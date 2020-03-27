@@ -88,6 +88,10 @@
 #error(HALFBG_SF) can be defined only if NG=2 and or BASIC_SF or ROTATED_SF is used!!!
 #endif
 
+#if defined(ROTATED_SF) && defined(UPDATE_EO)
+#error ROTATED_SF DOES NOT WORK WITH E/O PRECONDITIONING
+#endif
+
 #ifdef BC_T_ANTIPERIODIC
 
 #ifdef BC_T_ALREADY
@@ -203,5 +207,14 @@
 #ifdef PURE_GAUGE_ANISOTROPY
 #define PLAQ_WEIGHTS
 #endif
+
+#if defined(WITH_CLOVER) && defined(WITH_EXPCLOVER)
+#error Exponential and standard clover term cannot be simultaneously defined
+#endif
+
+#if defined(WITH_SMEARING) && defined(WITH_EXPCLOVER)
+#error Exponential lover term cannot be use simultaneously with the dirac smearing (not yet implemented)
+#endif
+
 
 #endif /* CHECK_OPTIONS_H */

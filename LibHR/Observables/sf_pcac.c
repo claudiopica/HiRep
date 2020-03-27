@@ -17,13 +17,9 @@
 #include "logger.h"
 #include <stdio.h>
 
-
-
 #ifdef ROTATED_SF
 #error This code has never been tested
 #endif
-
-
 
 #ifdef ROTATED_SF
 #include "update.h"
@@ -36,7 +32,11 @@ extern rhmc_par _update_par; /* Update/update_rhmc.c */
 static double hmass;
 static void H_sf(spinor_field *out, spinor_field *in)
 {
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
+  g5Cphi(hmass, out, in);
+#else
   g5Dphi(hmass, out, in);
+#endif
 }
 #endif
 #ifdef ROTATED_SF
@@ -227,7 +227,7 @@ void SF_PCAC_wall_corr(double mass, double acc)
   f_1 /= 2.0 * ((double)GLB_VOL3) * ((double)GLB_VOL3);
 
   lprintf("PC_wall_AC", 0, "f1 = %.16e\n", f_1);
-  
+
   /*Create wall source with g5 factor at t=T-2*/
   /*U and P- on source (again actually use P+ to account for commuting with g5 in source)*/
   for (int s = 0; s < 4 * NF; s++)
@@ -295,7 +295,7 @@ void SF_PCAC_wall_corr(double mass, double acc)
     g_A[ix0] /= 2.0 * (double)GLB_VOL3;
     lprintf("PC_wall_AC", 10, "g_A( %d )= %.16e \n", ix0, g_A[ix0]);
   }
-  
+
   free_spinor_field_f(source);
   free_spinor_field_f(prop);
 

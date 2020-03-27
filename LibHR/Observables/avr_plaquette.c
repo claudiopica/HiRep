@@ -122,12 +122,46 @@ double avr_plaquette()
 
 #ifdef BC_T_OPEN
   pa /= 6.0 * NG * GLB_VOLUME * (GLB_T - 1) / GLB_T;
+#elif BASIC_SF
+  pa /= 6.0 * NG * GLB_VOLUME * (GLB_T - 2) / GLB_T;
 #else
   pa /= 6.0 * NG * GLB_VOLUME;
 #endif
 
   return pa;
 }
+
+void avr_plaquette_time(double *plaqt, double *plaqs)
+{
+  int ix;
+  int tc;
+  for (int nt = 0; nt < T; nt++)
+  {
+    tc = (zerocoord[0] + nt + GLB_T) % GLB_T;
+    plaqt[tc] = plaqs[tc] = 0.0;
+    for (int nx = 0; nx < X; nx++)
+      for (int ny = 0; ny < Y; ny++)
+        for (int nz = 0; nz < Z; nz++)
+        {
+          ix = ipt(nt, nx, ny, nz);
+          plaqt[tc] += plaq(ix, 1, 0);
+          plaqt[tc] += plaq(ix, 2, 0);
+          plaqt[tc] += plaq(ix, 3, 0);
+          plaqs[tc] += plaq(ix, 2, 1);
+          plaqs[tc] += plaq(ix, 3, 1);
+          plaqs[tc] += plaq(ix, 3, 2);
+        }
+    plaqt[tc] /= 3.0 * NG * GLB_VOL3;
+    plaqs[tc] /= 3.0 * NG * GLB_VOL3;
+  }
+
+  for (int nt = 0; nt < GLB_T; nt++)
+  {
+    global_sum(&plaqt[nt], 1);
+    global_sum(&plaqs[nt], 1);
+  }
+}
+
 
 void full_plaquette()
 {
