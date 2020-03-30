@@ -15,7 +15,10 @@ inputs:
   repr:
     description: 'Fermion representation'
     required: true
-
+  ecsw:
+    description: "Use ExpCSW"
+    required: true
+    default: -no-expclover
 runs:
   using: 'docker'
   image: 'docker://cpica/hr-tests'
@@ -23,6 +26,7 @@ runs:
     - ./TestProgram/run_tests.sh
     - ${{ inputs.ccache }}
     - ${{ inputs.mpi }}
+    - ${{ inputs.ecsw }}
     - -n
     - ${{ inputs.nc }}
     - -r

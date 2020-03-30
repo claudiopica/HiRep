@@ -1,4 +1,3 @@
-#ifdef WITH_EXPCLOVER
 #ifndef CLOVER_EXP_H
 #define CLOVER_EXP_H
 #include "suN_types.h"
@@ -22,5 +21,4 @@ void doublehorner(double *C, suNfc *A);
 void init_clover_exp();
 int get_NNexp();
 void factorialCoef(double *C);
-#endif
 #endif

@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-**
+*
 *
 * Check for the implementation of the exponential using the Horner scheme 
 * by Fernando Romero-Lopez
