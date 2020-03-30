@@ -33,7 +33,7 @@ static int max_mh_level;
 #if defined(BASIC_SF) || defined(ROTATED_SF)
 static void g_up_Dirichlet_BCs()
 {
-    int ix, iy, iz, index;
+    int ix, iy, iz, index, lev;
 
     if (COORD[0] == NP_T - 1)
     {
@@ -42,7 +42,7 @@ static void g_up_Dirichlet_BCs()
                 for (iz = 0; iz < Z; ++iz)
                 {
                     index = ipt(T - 1, ix, iy, iz);
-                    for (int lev = 0; lev < max_mh_level; lev++)
+                    for (lev = 0; lev < max_mh_level; lev++)
                     {
                         dyn_gauge[lev * (glattice.gsize_gauge * 4) + index * 4] = 0;
                         dyn_gauge[lev * (glattice.gsize_gauge * 4) + index * 4 + 1] = 0;
@@ -326,7 +326,7 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
                 update_mh(lev, beta, nhb, nor);
 
             measure_1pt_glueballs(nblocking, smear_val, one_point_gb);
-         }
+        }
     }
 
     if (lev == 0)

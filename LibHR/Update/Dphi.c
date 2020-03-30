@@ -26,7 +26,6 @@
 #include "memory.h"
 #include "clover_tools.h"
 #include "clover_exp.h"
-#include "logger.h"
 
 #ifdef ROTATED_SF
 #include "update.h"
@@ -763,8 +762,7 @@ void Qhat_eopre_sq(double m0, double mu, spinor_field *out, spinor_field *in)
 
 static void Cphi_(double mass, spinor_field *dptr, spinor_field *sptr, int assign)
 {
-  evaluate_sw_order(&mass);
-
+ 
   // Correct mass term
   mass = (4. + mass);
 
@@ -977,14 +975,15 @@ void Cphi_diag_inv(double mass, spinor_field *dptr, spinor_field *sptr)
 // Assume hermiticity!!
 static void Cphi_(double mass, spinor_field *dptr, spinor_field *sptr, int assign, int inverse)
 {
+  evaluate_sw_order(&mass);
 
   // Correct mass term
   mass = (4. + mass);
 
-  double invexpmass = 1.0/mass;
+  double invexpmass = 1.0 / mass;
   if (inverse == 1)
   {
-    invexpmass = -1.0/mass;
+    invexpmass = -1.0 / mass;
     mass = 1 / mass;
   }
 
