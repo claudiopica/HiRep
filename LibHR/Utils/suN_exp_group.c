@@ -43,7 +43,6 @@ static double factorial(int N)
 #if (NG == 3)
 static void WF_Exp_NG3(suNg *u, suNg *X)
 {
-
   int NN = 30, i = 0, j = 0;
 
   double complex p[NG - 1];
@@ -66,11 +65,11 @@ static void WF_Exp_NG3(suNg *u, suNg *X)
   p[0] = -p[0] / 3;
   p[1] = -p[1] / 2;
 
-  double q[NG];
+  double complex q[NG];
   for (i = 0; i < NG; i++)
     q[i] = 0.;
 
-  double qlast;
+  double complex qlast;
   q[0] = inverse_fact[NN];
 
   for (i = NN - 1; i >= 0; i--)
@@ -78,8 +77,8 @@ static void WF_Exp_NG3(suNg *u, suNg *X)
     qlast = q[NG - 1];
     q[NG - 1] = q[NG - 2];
     for (j = NG - 2; j > 0; j--)
-      q[j] = q[j - 1] - creal(p[j]) * qlast;
-    q[0] = inverse_fact[i] - creal(p[0]) * qlast;
+      q[j] = q[j - 1] - p[j] * qlast;
+    q[0] = inverse_fact[i] - p[0] * qlast;
   }
 
   _suNg_mul_add(*u, q[0], X0, q[1], *X);
@@ -117,11 +116,11 @@ static void WF_Exp_NG4(suNg *u, suNg *X)
   p[1] = -p[1] / 3;
   p[2] = -p[2] / 2;
 
-  double q[NG];
+  double complex q[NG];
   for (i = 0; i < NG; i++)
     q[i] = 0.;
 
-  double qlast;
+  double complex qlast;
   q[0] = inverse_fact[NN];
 
   for (i = NN - 1; i >= 0; i--)
@@ -129,8 +128,8 @@ static void WF_Exp_NG4(suNg *u, suNg *X)
     qlast = q[NG - 1];
     q[NG - 1] = q[NG - 2];
     for (j = NG - 2; j > 0; j--)
-      q[j] = q[j - 1] - creal(p[j]) * qlast;
-    q[0] = inverse_fact[i] - creal(p[0]) * qlast;
+      q[j] = q[j - 1] - p[j] * qlast;
+    q[0] = inverse_fact[i] - p[0] * qlast;
   }
 
   _suNg_mul_add(*u, q[0], X0, q[1], *X);
@@ -173,11 +172,11 @@ static void WF_Exp_NG5(suNg *u, suNg *X)
   p[2] = -p[2] / 3;
   p[3] = -p[3] / 2;
 
-  double q[NG];
+  double complex q[NG];
   for (i = 0; i < NG; i++)
     q[i] = 0.;
 
-  double qlast;
+  double complex qlast;
   q[0] = inverse_fact[NN];
 
   for (i = NN - 1; i >= 0; i--)
@@ -185,8 +184,8 @@ static void WF_Exp_NG5(suNg *u, suNg *X)
     qlast = q[NG - 1];
     q[NG - 1] = q[NG - 2];
     for (j = NG - 2; j > 0; j--)
-      q[j] = q[j - 1] - creal(p[j]) * qlast;
-    q[0] = inverse_fact[i] - creal(p[0]) * qlast;
+      q[j] = q[j - 1] - p[j] * qlast;
+    q[0] = inverse_fact[i] - p[0] * qlast;
   }
 
   _suNg_mul_add(*u, q[0], X0, q[1], *X);
@@ -235,11 +234,11 @@ static void WF_Exp_NG6(suNg *u, suNg *X)
   p[3] = -p[3] / 3;
   p[4] = -p[4] / 2;
 
-  double q[NG];
+  double complex q[NG];
   for (i = 0; i < NG; i++)
     q[i] = 0.;
 
-  double qlast;
+  double complex qlast;
   q[0] = inverse_fact[NN];
 
   for (i = NN - 1; i >= 0; i--)
@@ -247,8 +246,8 @@ static void WF_Exp_NG6(suNg *u, suNg *X)
     qlast = q[NG - 1];
     q[NG - 1] = q[NG - 2];
     for (j = NG - 2; j > 0; j--)
-      q[j] = q[j - 1] - creal(p[j]) * qlast;
-    q[0] = inverse_fact[i] - creal(p[0]) * qlast;
+      q[j] = q[j - 1] - p[j] * qlast;
+    q[0] = inverse_fact[i] - p[0] * qlast;
   }
 
   _suNg_mul_add(*u, q[0], X0, q[1], *X);

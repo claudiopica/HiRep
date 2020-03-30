@@ -279,21 +279,6 @@ static void clover_exp_NF3(suNfc *Aplus, suNfc *expAplus)
     q[0] = inverse_fact[i] - creal(p[0]) * qlast;
   }
 
-  /*
-  for (i=0;i<4;i++){
-
-    //expAplus = q0*A0 + q1*A1+q2*A2
-    _suNfc_mul_add(expAplus[i],q[0],A0[i],q[1],Aplus[i]);
-    _suNfc_mul( tmp1[i] , q[2],A2[i]  );
-    _suNfc_add_assign(expAplus[i],  tmp1[i]    );
-
-    //tmp1= q3*A0 + q4*A1 + q5*A2 
-    _suNfc_mul_add( tmp1[i] , q[3],A0[i],q[4],Aplus[i]   );
-    _suNfc_mul( tmp2[i] , q[5],A2[i]  );
-    _suNfc_add_assign(tmp1[i],  tmp2[i]    );
-
-  }
-  */
 
   //Optimized to reduce operations!
 
