@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 
   _suNg_trace(tr, test);
 
-  if (creal(conj(tr)*tr) > 1e-30)
+  if (creal(conj(tr)*tr) > 1.e-30)
   {
     lprintf("ERROR", 0, "random matrix not traceless!! Trace = %f\n", tr);
     return 1;
@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
 
   lprintf("MAIN", 0, "Maximal normalized difference = %.2e\n", norm / (NG));
   lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n");
-  if (norm / (NG) > 1e-14)
+  if (norm / (NG) > 1.e-14)
     check++;
 
   finalize_process();

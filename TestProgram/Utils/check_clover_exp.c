@@ -134,5 +134,7 @@ int main(int argc, char *argv[])
       return_value++;
   }
 
+  finalize_process();
+  
   return return_value;
 }
