@@ -90,13 +90,13 @@ int main(int argc, char *argv[])
     }
 
   _suNfc_trace(tr, test[0]);
-  if (tr > 1e-20)
+  if (tr > 1.e-20)
   {
     lprintf("ERROR", 0, "random matrix not traceless!! Trace = %f\n", tr);
     return_value++;
   }
   _suNfc_trace(tr, test[3]);
-  if (tr > 1e-20)
+  if (tr > 1.e-20)
   {
     lprintf("ERROR", 0, "random matrix not traceless!! Trace = %f\n", tr);
     return_value++;
@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
     norm = sqrt(norm);
     lprintf("MAIN", 0, "NORM of the difference %2.8e [should be around 1e-15] \n", norm);
 
-    if (norm > NF * 1e-13)
+    if (norm > NF * 1.0e-13)
       return_value++;
   }
 
