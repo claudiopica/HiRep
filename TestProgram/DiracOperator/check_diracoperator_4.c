@@ -63,7 +63,7 @@ int compute_gamma(int g[4], int ic)
   int p[4], c[4], shift[4];
   double dbl;
   double complex locmy_gamma[4][4][4];
-  int return_value=0;
+  int return_value = 0;
 
   spinor_field *in, *out;
   in = alloc_spinor_field_f(1, &glattice);
@@ -116,7 +116,7 @@ int compute_gamma(int g[4], int ic)
       }
     }
     global_sum(&dbl, 1);
-    if (dbl != NF)
+    if (fabs(dbl - NF) > 1.e-14)
       lprintf("ERROR", 0, "u_gauge_f sqnorm=%f\n", dbl);
 
     for (int beta = 0; beta < 4; beta++)
@@ -128,13 +128,13 @@ int compute_gamma(int g[4], int ic)
       }
 
       dbl = spinor_field_sqnorm_f(in);
-      if (dbl != GLB_T * GLB_X * GLB_Y * GLB_Z)
+      if (fabs(dbl - GLB_T * GLB_X * GLB_Y * GLB_Z) > 1.e-14)
         lprintf("ERROR", 0, "source sqnorm=%f\n", dbl);
 
       Dphi_(out, in);
 
       dbl = spinor_field_sqnorm_f(out);
-      if (dbl == 0.)
+      if (fabs(dbl) < 1.e-14)
         lprintf("ERROR", 0, "vanishing out sqnorm\n");
 
       for (c[0] = 0; c[0] < T; c[0]++)
@@ -212,9 +212,9 @@ int compute_gamma(int g[4], int ic)
         {
           dbl += (locmy_gamma[mu][alpha][beta] - my_gamma[mu][alpha][beta]) * conj(locmy_gamma[mu][alpha][beta] - my_gamma[mu][alpha][beta]);
         }
-      if (dbl != 0.)
+      if (fabs(dbl) > 1.e-14)
       {
-        return_value=1;
+        return_value = 1;
         lprintf("ERROR", 0, "Wrong gamma matrix! g=(%d,%d,%d,%d) ic=%d mu=%d err2=%e\n", g[0], g[1], g[2], g[3], ic, mu, dbl);
         lprintf("ERROR", 0, "gamma[%d] = \n", mu);
         for (int alpha = 0; alpha < 4; alpha++)
@@ -240,7 +240,7 @@ int compute_gamma(int g[4], int ic)
 int main(int argc, char *argv[])
 {
 
-  int return_value=0;
+  int return_value = 0;
   /* setup process id and communications */
   logger_map("DEBUG", "debug");
 
@@ -266,7 +266,7 @@ int main(int argc, char *argv[])
           {
             lprintf("MAIN", 0, ".");
 
-            return_value+=compute_gamma(g, ic);
+            return_value += compute_gamma(g, ic);
           }
 
   finalize_process();
