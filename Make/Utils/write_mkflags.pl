@@ -101,11 +101,11 @@ sub validate_t {
 
 sub validate_x {
     if($XBC eq "P") {
-        $XBC = "BC_Y_PERIODIC"
+        $XBC = "BC_X_PERIODIC"
     } elsif ($XBC eq "A") { 
-        $XBC = "BC_Y_ANTIPERIODIC"
+        $XBC = "BC_X_ANTIPERIODIC"
     } elsif ($XBC eq "T") { 
-        $XBC = "BC_Y_THETA"
+        $XBC = "BC_X_THETA"
     } else {
         print "Error: The X boundary condition representation must be one of the following: P, A, T\n";
         HelpMessage(1);
