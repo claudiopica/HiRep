@@ -15,8 +15,9 @@
 #include <stdio.h>
 
 void measure_pion_scattering(double* m, int nhits,int conf_num, double precision,int ts);
-void measure_pion_scattering_I2(double* m, int numsources, double precision,char* path,char* cnfg_filename);
-void measure_pion_scattering_I0(double* m, int numsources, double precision,char* path,char* cnfg_filename, int seq_prop);
+void measure_pion_scattering_I2(double* m, int numsources, double precision,char* path,char* cnfg_filename,meson_observable** mo_arr);
+//void measure_pion_scattering_I0(double* m, int numsources, double precision,char* path,char* cnfg_filename, int seq_prop);
+void measure_pion_scattering_I0(double* m, int numsources, double precision,char* path,char* cnfg_filename, int seq_prop, meson_observable** mo_arr);
 
 /**
  * @brief Propagator sources with zero-momentum
@@ -114,10 +115,5 @@ void make_prop_p(struct prop_p* prop, struct src_p* srcp, struct src_common* src
 void free_prop_common(struct prop_common* prop);
 void free_prop_p(struct prop_p* prop);
 
-meson_observable* get_meson_observables_R();
-meson_observable* get_meson_observables_C();
-meson_observable* get_meson_observables_D();
-meson_observable* get_meson_observables_V();
-meson_observable* get_meson_observables_Ralt();
 
 #endif

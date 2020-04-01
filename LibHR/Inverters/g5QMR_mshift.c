@@ -151,6 +151,7 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
     flags[i]=1;
   }
   delta = spinor_field_g5_prod_re_f(p2,p2);
+  error( fabs(delta) < 1.e-28, 1,"g5QMR "__FILE__,"g5 norm of the initial guess is zero, change the initial guess");
   beta = delta;
   
   /* cg recursion */

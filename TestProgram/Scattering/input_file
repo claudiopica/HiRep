@@ -14,32 +14,11 @@ log:inverter = -1
 log:forcestat = 0
 
 rlx_level = 1
-rlx_seed = 83745
+rlx_seed = 8374
 rlx_start = new
 rlx_state = rand_state
 
 mes:masses = -0.605
 mes:csw = 0.0
 mes:precision = 1e-24
-mes:nhits = 1
-mes:outdir = output
-mes:bc = P
-mes:p = (0,0,1)(1,1,0)(1,1,1)
-mes:tsrc = 0
-mes:configlist = list_conf.txt
-
-n_eigenvalues = 128
-eva_nevt = 128
-eva_omega1 = 1e-16
-eva_omega2 = 1e-10
-eva_kmax = 50
-eva_imax = 500
-
-hopping_order = -1
-
-n_truncation_steps = 0
-n_sources_truncation = 1
-n_sources_correction = 1
-inverter_precision = 1e-20
-dilution = 0
-Source time:0
+mes:nhits = 200

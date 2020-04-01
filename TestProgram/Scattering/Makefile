@@ -1,7 +1,7 @@
 TOPDIR = ../..
 MKDIR = $(TOPDIR)/Make
 
-TESTS = check_scattering_rhopipi
+TESTS = check_scattering_rhopipi check_scattering_length_I0 check_scattering_length_I2
 
 
 LIBS += $(TOPDIR)/LibHR/libhr.a

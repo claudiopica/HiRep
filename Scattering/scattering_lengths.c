@@ -79,7 +79,6 @@ char cnfg_filename[256]="";
 char list_filename[256]="";
 char source_filename[256]="";
 char input_filename[256] = "input_file";
-char output_filename[256] = "meson_scattering.out";
 char output_dir[256] = "./output/";
 int Nsource;
 double M;
@@ -125,17 +124,17 @@ int main(int argc,char *argv[]) {
 	lprintf("MAIN",0,"Isospin channel: %d \n",mes_var.isospin);	
 	
   	if(strcmp(list_filename,"")!=0) {
-    	error((list=fopen(list_filename,"r"))==NULL,1,"main [mk_mesons.c]" ,
+    	error((list=fopen(list_filename,"r"))==NULL,1,"main [scattering_lengths.c]" ,
 		"Failed to open list file\n");
   	}
 
-  	#ifdef WITH_CLOVER
-		clover_init(mes_var.csw);//  VD: not nice here.		
-  	#endif
-	
 
+	#ifdef WITH_CLOVER
+ 	set_csw(mes_var.csw);
+ 	#endif
+	 
 	nm=0;
-	m[0] = -atof(mes_var.mstring); // 	
+	m[0] = atof(mes_var.mstring); // 	
   	init_propagator_eo(1,m,mes_var.precision);
 	
 
@@ -161,8 +160,8 @@ int main(int argc,char *argv[]) {
     	represent_gauge_field();
 		lprintf("TEST",0,"<p> %1.6f\n",avr_plaquette());
 		full_plaquette();	
-		if (mes_var.isospin==2) measure_pion_scattering_I2( m, mes_var.nhits,  mes_var.precision,mes_var.outpath,cnfg_filename);
-		if (mes_var.isospin==0) measure_pion_scattering_I0( m, mes_var.nhits,  mes_var.precision,mes_var.outpath,cnfg_filename,seq_prop);
+		if (mes_var.isospin==2) measure_pion_scattering_I2( m, mes_var.nhits,  mes_var.precision,mes_var.outpath,cnfg_filename,NULL);
+		if (mes_var.isospin==0) measure_pion_scattering_I0( m, mes_var.nhits,  mes_var.precision,mes_var.outpath,cnfg_filename,seq_prop,NULL);
 		if (mes_var.isospin!=2 && mes_var.isospin != 0) lprintf("MAIN",0,"Isospin channel can be 0 or 2!");
 
 		gettimeofday(&end,0);
