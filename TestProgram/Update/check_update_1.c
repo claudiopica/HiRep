@@ -76,27 +76,31 @@ int main(int argc, char *argv[])
   if (rr == 1)
   {
 
-  lprintf("REVERSIBILITY TEST", 0, "Plaquette after update: %1.8e\n", avr_plaquette());
+    lprintf("REVERSIBILITY TEST", 0, "Plaquette after update: %1.8e\n", avr_plaquette());
 
-  rr = reverse_update_ghmc();
-  /*Vincent */
-  if (rr < 0)
-  {
-    lprintf("REVERSIBILITY TEST", 0, "Error in updating the gauge field!!\n");
-    return 1;
-  }
+    rr = reverse_update_ghmc();
+    /*Vincent */
+    if (rr < 0)
+    {
+      lprintf("REVERSIBILITY TEST", 0, "Error in updating the gauge field!!\n");
+      return 1;
+    }
 
+    if (rr == 1)
+    {
+      lprintf("REVERSIBILITY TEST", 0, "Plaquette after reverse update: %1.8e\n", avr_plaquette());
+      new_plaq = avr_plaquette();
 
-  lprintf("REVERSIBILITY TEST", 0, "Plaquette after reverse update: %1.8e\n", avr_plaquette());
-  new_plaq = avr_plaquette();
-
-  diff = fabs(new_plaq - orig_plaq);
-  lprintf("REVERSIBILITY TEST", 0, "diff: %1.8e\n", diff);
-  if (diff > 1e-10)
-  {
-    lprintf("REVERSIBILITY TEST", 0, "Test failed ? \n");
-    return_value += 1;
-  }
+      diff = fabs(new_plaq - orig_plaq);
+      lprintf("REVERSIBILITY TEST", 0, "diff: %1.8e\n", diff);
+      if (diff > 1e-10)
+      {
+        lprintf("REVERSIBILITY TEST", 0, "Test failed ? \n");
+        return_value += 1;
+      }
+    }
+    else
+      lprintf("REVERSIBILITY TEST", 0, "Skipped the comparison as the configuration was not accepted\n");
   }
   else
     lprintf("REVERSIBILITY TEST", 0, "Skipped the comparison as the configuration was not accepted\n");

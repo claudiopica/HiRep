@@ -296,7 +296,7 @@ int main(int argc, char *argv[])
   represent_gauge_field();
 
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
-  set_csw(mes_ip.csw);
+  set_csw(&mes_ip.csw);
 #endif
   
 

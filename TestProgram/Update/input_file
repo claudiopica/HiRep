@@ -1,32 +1,33 @@
-GLB_T = 4
+GLB_T = 8
 GLB_X = 4
 GLB_Y = 4
 GLB_Z = 4
-NP_T = 1
+NP_T = 2
 NP_X = 1
 NP_Y = 1
 NP_Z = 1
+
+N_REP = 1
+
+
 rlx_level = 1
-rlx_seed = 12345
+rlx_seed = 35563
+
+//Logger levels (default = -1)
+log:default = -1
+log:inverter = -1
+log:forcestat = 0
+
 //Fermion twisting
 theta_T = 0.
 theta_X = 0.
 theta_Y = 0.
 theta_Z = 0.
 
-// RHMC variables
-//beta = 4.9
-//mass = -0.8
-//nf = 2
-//n_pf = 2
-//MT_prec = 1.e-10
-//MD_prec = 1.e-10
-//HB_prec = 1.e-10
-//force_prec = 1.e-20
-tlen = 1
-//nsteps = 2
-//gsteps = 5
-csw = 1.5
+// HMC variables
+nf = 2
+tlen = 0.2
+csw = 1.0
 
 run name = run1
 save freq = 10000
@@ -57,13 +58,13 @@ monomial {
 // Integrators
 integrator {
         level = 0
-        type = o2mn
-        steps = 50
+        type = o4mn
+        steps = 10
 }
 
 integrator {
       level = 1
-      type = o2mn
+      type = o4mn
       steps = 10
 }
 
