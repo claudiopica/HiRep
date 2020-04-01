@@ -179,7 +179,7 @@ int main(int argc, char *argv[])
   strcpy(list_filename, mes_var.configlist);
 
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
-  set_csw(mes_var.csw);
+  set_csw(&mes_var.csw);
 #endif
 
   lprintf("MAIN", 0, "list_filename = %s %s\n", list_filename, mes_var.configlist);

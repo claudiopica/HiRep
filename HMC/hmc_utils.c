@@ -282,7 +282,7 @@ int init_mc_ghmc(hmc_flow *rf, char *ifile)
 	read_action(ifile, &hmc_var.hmc_p.integrator);
 
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
-	set_csw(hmc_var.hmc_p.csw);
+	set_csw(&hmc_var.hmc_p.csw);
 #endif
 
 	/* initialize boundary conditions */

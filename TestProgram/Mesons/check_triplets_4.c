@@ -295,8 +295,7 @@ int main(int argc, char *argv[])
   unit_u(u_gauge);
   represent_gauge_field();
 
-#ifdef WITH_CLOVER
-  lprintf("MAIN", 0, "mes:csw = %f\n", csw);
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
   set_csw(mes_ip.csw);
 #endif
   

@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
   read_input(bcpar_var.read, get_input_filename());
 
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
-  set_csw(sfc_var.csw);
+  set_csw(&sfc_var.csw);
 #endif
 
   if (strcmp(sfc_var.configlist, "") != 0)

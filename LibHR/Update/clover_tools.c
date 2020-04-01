@@ -50,9 +50,9 @@ double get_csw()
 	return csw_value;
 }
 
-void set_csw(double csw)
+void set_csw(double * csw)
 {
-	csw_value = csw;
+	csw_value = * csw;
 	lprintf("CLOVER", 10, "Coefficient: reset to csw = %1.6f\n", csw_value);
 }
 
