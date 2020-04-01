@@ -23,7 +23,7 @@ static void init_plaq_twisted_BCs();
 static void init_plaq_open_BCs(double ct, double cs);
 #endif
 #if defined(BASIC_SF) || defined(ROTATED_SF)
-static void init_plaq_Dirichlet_BCs(double ct);
+static void init_plaq_SF_BCs(double ct);
 static void init_gf_SF_BCs(suNg *dn, suNg *up);
 #endif
 #endif
@@ -154,7 +154,7 @@ void init_BCs(BCs_pars_t *pars)
 #endif
 
 #if defined(BASIC_SF) || defined(ROTATED_SF)
-  lprintf("BCS", 0, "Dirichlet BC gauge boundary term ct=%e\n", BCs_pars.gauge_boundary_improvement_ct);
+  lprintf("BCS", 0, "BC gauge boundary term ct=%e\n", BCs_pars.gauge_boundary_improvement_ct);
   if (BCs_pars.SF_BCs == 0)
   {
     _suNg_unit(BCs_pars.gauge_boundary_dn);
@@ -162,8 +162,7 @@ void init_BCs(BCs_pars_t *pars)
   }
   else
     init_gf_SF_BCs(&(BCs_pars.gauge_boundary_dn), &(BCs_pars.gauge_boundary_up));
-
-  init_plaq_Dirichlet_BCs(BCs_pars.gauge_boundary_improvement_ct);
+  init_plaq_SF_BCs(BCs_pars.gauge_boundary_improvement_ct);
 #endif
 
 #ifdef BC_XYZ_TWISTED
@@ -226,7 +225,7 @@ void apply_BCs_on_represented_gauge_field()
 }
 
 #if defined(BASIC_SF) || defined(ROTATED_SF)
-static void gf_Dirichlet_BCs(suNg *dn, suNg *up);
+static void gf_SF_BCs(suNg *dn, suNg *up);
 #endif
 #ifdef BC_T_OPEN
 static void gf_open_BCs();
@@ -236,7 +235,7 @@ void apply_BCs_on_fundamental_gauge_field()
 {
   complete_gf_sendrecv(u_gauge);
 #if defined(BASIC_SF) || defined(ROTATED_SF)
-  gf_Dirichlet_BCs(&BCs_pars.gauge_boundary_dn, &BCs_pars.gauge_boundary_up);
+  gf_SF_BCs(&BCs_pars.gauge_boundary_dn, &BCs_pars.gauge_boundary_up);
 #endif
 #ifdef BC_T_OPEN
   gf_open_BCs();
@@ -299,14 +298,21 @@ void apply_BCs_on_spinor_field_flt(spinor_field_flt *sp)
 #endif
 }
 
-#ifdef BC_T_OPEN
+#if (defined(WITH_EXPCLOVER) || defined(WITH_CLOVER)) && defined(BC_T_OPEN)
 static void cl_open_BCs(suNfc_field *);
+#endif
+#if (defined(WITH_EXPCLOVER) || defined(WITH_CLOVER)) && (defined(BASIC_SF) || defined(ROTATED_SF))
+static void cl_SF_BCs(suNfc_field *);
 #endif
 
 void apply_BCs_on_clover_term(suNfc_field *cl)
 {
-#ifdef BC_T_OPEN
+#if (defined(WITH_EXPCLOVER) || defined(WITH_CLOVER)) && defined(BC_T_OPEN)
   cl_open_BCs(cl);
+#endif
+
+#if (defined(WITH_EXPCLOVER) || defined(WITH_CLOVER)) && (defined(BASIC_SF) || defined(ROTATED_SF))
+  cl_SF_BCs(cl);
 #endif
 }
 
@@ -509,7 +515,7 @@ static void init_gf_SF_BCs(suNg *dn, suNg *up)
   static double SF_eta = 0.;
   static double SF_phi0_dn[NG] = {-PI / 3., 0., PI / 3.};
   static double SF_phi1_dn[NG] = {1., -.5, -.5};
-  //static double SF_phi0_up[NG] = {-PI, PI / 3., 2. * PI / 3.};
+  //  static double SF_phi0_up[NG] = {-PI, PI / 3., 2. * PI / 3.};
   static double SF_phi0_up[NG] = {-5. * PI / 3., 2. * PI / 3., PI};
   static double SF_phi1_up[NG] = {-1., .5, .5};
 
@@ -523,10 +529,11 @@ static void init_gf_SF_BCs(suNg *dn, suNg *up)
 
 #else
 
-#error SF boundary conditions not defined at this NG
+  error(0, 1, "init_gf_SF_BCs "__FILE__, "SF boundary conditions not defined at this NG");
 
 #endif
 
+#if (NG <= 4)
   int k;
 
   _suNg_zero(*dn);
@@ -542,16 +549,16 @@ static void init_gf_SF_BCs(suNg *dn, suNg *up)
 #if defined(BASIC_SF)
   lprintf("BCS", 0, "SF boundary phases phi0  ( ");
   for (k = 0; k < NG; k++)
-    lprintf("BCS", 0, "%lf ", SF_phi0_dn[k]/2.);
+    lprintf("BCS", 0, "%lf ", SF_phi0_dn[k] / 2.);
   lprintf("BCS", 0, ")\n");
   lprintf("BCS", 0, "SF boundary phases phi0'  ( ");
   for (k = 0; k < NG; k++)
-    lprintf("BCS", 0, "%lf ", SF_phi0_up[k]/2.);
+    lprintf("BCS", 0, "%lf ", SF_phi0_up[k] / 2.);
   lprintf("BCS", 0, ")");
 #else
   lprintf("BCS", 0, "SF boundary phases phi0'  ( ");
   for (k = 0; k < NG; k++)
-    lprintf("BCS", 0, "%lf ", SF_phi0_up[k]/2.);
+    lprintf("BCS", 0, "%lf ", SF_phi0_up[k] / 2.);
   lprintf("BCS", 0, ")\n");
   lprintf("BCS", 0, "SF boundary phases phi1'  ( ");
   for (k = 0; k < NG; k++)
@@ -560,12 +567,13 @@ static void init_gf_SF_BCs(suNg *dn, suNg *up)
 
   lprintf("BCS", 0, "SF boundary phases phi0  ( ");
   for (k = 0; k < NG; k++)
-    lprintf("BCS", 0, "%lf ", SF_phi0_dn[k]/2.);
+    lprintf("BCS", 0, "%lf ", SF_phi0_dn[k] / 2.);
   lprintf("BCS", 0, ")");
   lprintf("BCS", 0, "SF boundary phases phi1  ( ");
   for (k = 0; k < NG; k++)
     lprintf("BCS", 0, "%lf ", SF_phi1_dn[k]);
   lprintf("BCS", 0, ")");
+#endif
 #endif
 }
 #else
@@ -577,7 +585,7 @@ static void init_gf_SF_BCs(suNg *dn, suNg *up)
 #endif
 
 #if defined(BASIC_SF) || defined(ROTATED_SF)
-static void gf_Dirichlet_BCs(suNg *dn, suNg *up)
+static void gf_SF_BCs(suNg *dn, suNg *up)
 {
   int index;
   int ix, iy, iz;
@@ -892,7 +900,52 @@ static void mf_open_BCs(suNg_av_field *force)
 /***************************************************************************/
 /* BOUNDARY CONDITIONS TO BE APPLIED ON THE CLOVER TERM                    */
 /***************************************************************************/
-#ifdef BC_T_OPEN
+#if (defined(WITH_EXPCLOVER) || defined(WITH_CLOVER)) && (defined(BASIC_SF) || defined(ROTATED_SF))
+static void cl_SF_BCs(suNfc_field *cl)
+{
+  int index;
+  suNfc u;
+  _suNfc_zero(u);
+
+  // These should reflect the boundary conditions imposed on the spinor fields
+  if (COORD[0] == 0)
+  {
+    for (int ix = 0; ix < X_EXT; ix++)
+      for (int iy = 0; iy < Y_EXT; iy++)
+        for (int iz = 0; iz < Z_EXT; iz++)
+        {
+          if (T_BORDER > 0)
+          {
+            index = ipt_ext(T_BORDER - 1, ix, iy, iz);
+            if (index != -1)
+            {
+              for (int mu = 0; mu < 4; mu++)
+              {
+                *_4FIELD_AT(cl, index, mu) = u;
+              }
+            }
+          }
+          index = ipt_ext(T_BORDER, ix, iy, iz);
+          if (index != -1)
+          {
+            for (int mu = 0; mu < 4; mu++)
+            {
+              *_4FIELD_AT(cl, index, mu) = u;
+            }
+          }
+          index = ipt_ext(T_BORDER+1, ix, iy, iz);
+          if (index != -1)
+          {
+            for (int mu = 0; mu < 4; mu++)
+            {
+              *_4FIELD_AT(cl, index, mu) = u;
+            }
+          }
+        }
+  }
+}
+#endif
+#if (defined(WITH_EXPCLOVER) || defined(WITH_CLOVER)) && defined(BC_T_OPEN)
 static void cl_open_BCs(suNfc_field *cl)
 {
   int index;
@@ -1357,11 +1410,117 @@ void init_plaq_open_BCs(double *lplaq_weight, double *lrect_weight, double ct, d
 }
 
 #if defined(BASIC_SF) || defined(ROTATED_SF)
-static void init_plaq_Dirichlet_BCs(double ct)
+
+static void init_plaq_SF_BCs(double ct)
 {
-  error(plaq_weight == NULL, 1, "init_plaq_Dirichlet_BCs [boundary_conditions.c]",
+  error(plaq_weight == NULL, 1, "init_plaq_open_BCs [boundary_conditions.c]",
         "Structure plaq_weight not initialized yet");
-  init_plaq_open_BCs(plaq_weight, rect_weight, ct, 0.);
+  int mu, nu, ix, iy, iz, index;
+
+  if (COORD[0] == 0)
+  {
+    if (T_BORDER > 0)
+    {
+      for (ix = 0; ix < X_EXT; ++ix)
+        for (iy = 0; iy < Y_EXT; ++iy)
+          for (iz = 0; iz < Z_EXT; ++iz)
+          {
+            index = ipt_ext(T_BORDER - 1, ix, iy, iz);
+            if (index != -1)
+            {
+              for (mu = 0; mu < 3; mu++)
+                for (nu = mu + 1; nu < 4; nu++)
+                {
+                  plaq_weight[index * 16 + mu * 4 + nu] = 0.0; //0.5 * cs;
+                  plaq_weight[index * 16 + nu * 4 + mu] = 0.0;
+                }
+            }
+          }
+    }
+
+    for (ix = 0; ix < X_EXT; ++ix)
+      for (iy = 0; iy < Y_EXT; ++iy)
+        for (iz = 0; iz < Z_EXT; ++iz)
+        {
+          index = ipt_ext(T_BORDER, ix, iy, iz);
+          if (index != -1)
+          {
+            for (mu = 0; mu < 3; mu++)
+              for (nu = mu + 1; nu < 4; nu++)
+              {
+                plaq_weight[index * 16 + mu * 4 + nu] = 0.0;
+                plaq_weight[index * 16 + nu * 4 + mu] = 0.0;
+              }
+          }
+          index = ipt_ext(T_BORDER + 1, ix, iy, iz);
+          if (index != -1)
+          {
+            mu = 0;
+            for (nu = mu + 1; nu < 4; nu++)
+            {
+              plaq_weight[index * 16 + mu * 4 + nu] = ct;
+              plaq_weight[index * 16 + nu * 4 + mu] = ct;
+            }
+
+            for (mu = 1; mu < 3; mu++)
+              for (nu = mu + 1; nu < 4; nu++)
+              {
+                plaq_weight[index * 16 + mu * 4 + nu] = 0.0;
+                plaq_weight[index * 16 + nu * 4 + mu] = 0.0;
+              }
+          }
+        }
+  }
+
+  if (COORD[0] == NP_T - 1)
+  {
+    if (T_BORDER > 0)
+    {
+      for (ix = 0; ix < X_EXT; ++ix)
+        for (iy = 0; iy < Y_EXT; ++iy)
+          for (iz = 0; iz < Z_EXT; ++iz)
+          {
+            index = ipt_ext(T + T_BORDER, ix, iy, iz);
+            if (index != -1)
+            {
+              for (mu = 0; mu < 3; mu++)
+                for (nu = mu + 1; nu < 4; nu++)
+                {
+                  plaq_weight[index * 16 + mu * 4 + nu] = 0.0;
+                  plaq_weight[index * 16 + nu * 4 + mu] = 0.0;
+                }
+            }
+          }
+    }
+
+    for (ix = 0; ix < X_EXT; ++ix)
+      for (iy = 0; iy < Y_EXT; ++iy)
+        for (iz = 0; iz < Z_EXT; ++iz)
+        {
+          index = ipt_ext(T + T_BORDER - 2, ix, iy, iz);
+          if (index != -1)
+          {
+            mu = 0;
+            for (nu = mu + 1; nu < 4; nu++)
+            {
+              plaq_weight[index * 16 + mu * 4 + nu] = ct;
+              plaq_weight[index * 16 + nu * 4 + mu] = ct;
+            }
+          }
+
+          index = ipt_ext(T + T_BORDER - 1, ix, iy, iz);
+          if (index != -1)
+          {
+
+            for (mu = 0; mu < 3; mu++)
+              for (nu = mu + 1; nu < 4; nu++)
+              {
+                plaq_weight[index * 16 + mu * 4 + nu] = 0.0;
+                plaq_weight[index * 16 + nu * 4 + mu] = 0.0;
+              }
+          }
+        }
+  }
 }
 #endif
 #endif

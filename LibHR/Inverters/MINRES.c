@@ -40,13 +40,6 @@ static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, spi
   _TWO_SPINORS_MATCHING(in,out);
   if(trial!=NULL) {_TWO_SPINORS_MATCHING(in,trial);}
 
-  /*
-    printf("numero vettori n=%d\n",par->n);
-    for (i=0; i<(par->n); ++i) {
-    printf("shift[%d]=%f\n",i,par->shift[i]);
-    printf("out[%d]=%p\n",i,out[i]);      
-    }
-  */
    
   /* allocate spinors fields and aux real variables */
   /* implementation note: to minimize the number of malloc calls

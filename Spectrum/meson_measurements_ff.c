@@ -57,28 +57,6 @@ static void flip_corrs(meson_observable* mo){
   }
 }
 
-static void fix_T_bc(int tau){
-  int index;
-  int ix,iy,iz;
-  suNf *u;
-  if (--tau<0) tau+= GLB_T;
-  lprintf("meson_measurements",15,"Setting Dirichlet boundary conidtion at global time slice %d (local %d)\n",tau,tau-zerocoord[0]);
-  if((zerocoord[0]-1<=tau && zerocoord[0]+T>tau) || (zerocoord[0]==0 && tau==GLB_T-1)) { 
-    for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
-	  if (tau==zerocoord[0]-1 || (zerocoord[0]==0 && tau==GLB_T-1)){
-	    index=ipt_ext(0,ix,iy,iz);
-	  }
-	  else{
-	    index=ipt_ext(T_BORDER+tau-zerocoord[0],ix,iy,iz);
-	  }
-	  if(index!=-1) {
-	    u=pu_gauge_f(index,0);
-	    _suNf_zero(*u);
-	  }
-	}
-  }
-  lprintf("meson_measurements",50,"Boundaries set!\n");
-}
 
 
 static void flip_T_bc(int tau){
@@ -237,7 +215,7 @@ void measure_spectrum_semwall_ff_ext(int nm, double* m, int nhits,int conf_num, 
 void measure_spectrum_discon_ff_semwall(int nm, double* m, int nhits, int degree_hopping, int nhits_hopping,int conf_num, double precision){
   spinor_field* source = alloc_spinor_field_f(4,&glattice);
   spinor_field* prop =  alloc_spinor_field_f(4*nm,&glattice);
-  int k,beta;
+  int k;
   char label[100];
   init_propagator_ff_eo(nm, m, precision);
 

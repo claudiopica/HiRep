@@ -246,37 +246,8 @@ write_vector_prod_add_assign_re();
 write_vector_prod_add_assign_im();
 write_vector_prod_sub_assign_re();
 write_vector_prod_sub_assign_im();
-
 write_vector_project();
 
-if ($su2quat==0) {
-  write_suN_multiply();
-  write_suN_inverse_multiply();
-  write_suN_zero();
-  if ($complex eq "R") {
-    write_suNr_multiply();
-    write_suNr_inverse_multiply();
- 	write_suNr_zero();
-  } else {
-	  print "#define _${dataname}c_multiply(a,b,c) _${dataname}_multiply(a,b,c)\n\n";
-	  print "#define _${dataname}c_inverse_multiply(a,b,c) _${dataname}_inverse_multiply(a,b,c)\n\n";
-	  print "#define _${dataname}c_zero(a) _${dataname}_zero(a)\n\n";
-  }
-} else {
-    #write_su2_decode($su2quat);
-    write_su2_multiply();
-    write_su2_inverse_multiply();
-	write_su2_zero();
-
-    my ($ldn,$lrdn)=($dataname,$rdataname);
-  	if ($complex eq "C") {
-    	$dataname="${dataname}c";
-  	}
-    write_suN_multiply();
-    write_suN_inverse_multiply();
-	write_suN_zero();
-    $dataname=$ldn;
-}
 
 if ($suff eq "g") { #algebra operations only for gauge
 	write_algebra_vector_add_assign();
@@ -323,6 +294,9 @@ if ($su2quat==0) {
   #write_suN_2TA();
   #write_suN_TA();
   write_suN_FMAT();
+  write_suN_multiply();
+  write_suN_inverse_multiply();
+  write_suN_zero();
 
   if ($complex eq "R") { # we only need these functions at the moment...
  ##   write_suNr_zero();
@@ -336,10 +310,30 @@ if ($su2quat==0) {
     write_suNr_add_assign();
     write_suNr_sub_assign();
     write_suNr_mul();
-   	write_suN_mul_add();
+    write_suNr_mul_assign();
+   	write_suNr_mul_add();
+	write_suNr_trace ();
     write_suNr_trace_re();
     write_suNr_sqnorm();
     write_suNr_minus();
+	write_suNr_multiply();
+    write_suNr_inverse_multiply();
+ 	write_suNr_zero();
+  } else {
+	print "#define _${dataname}c_multiply(a,b,c) _${dataname}_multiply(a,b,c)\n\n";
+	print "#define _${dataname}c_inverse_multiply(a,b,c) _${dataname}_inverse_multiply(a,b,c)\n\n";
+	print "#define _${dataname}c_zero(a) _${dataname}_zero(a)\n\n"; 
+	print "#define _${dataname}c_dagger(u,v) _${dataname}_dagger(u,v)\n\n"; 
+	print "#define _${dataname}c_mul(u,r,v) _${dataname}_mul(u,r,v)\n\n"; 
+	print "#define _${dataname}c_mul_assign(u,r) _${dataname}_mul_assign(u,r)\n\n"; 
+	print "#define _${dataname}c_times_${dataname}c(u,v,w) _${dataname}_times_${dataname}(u,v,w)\n\n";
+	print "#define _${dataname}c_times_${dataname}c_assign(u,v,w) _${dataname}_times_${dataname}_assign(u,v,w)\n\n";
+	print "#define _${dataname}c_trace(k,u) _${dataname}_trace(k,u)\n\n";
+	print "#define _${dataname}c_unit(u) _${dataname}_unit(u)\n\n";
+	print "#define _${dataname}c_mul_add(u,r,v,m,w) _${dataname}_mul_add(u,r,v,m,w)\n\n";
+	print "#define _${dataname}c_add_assign(u,v) _${dataname}_add_assign(u,v)\n\n";
+	print "#define _${dataname}c_sqnorm(k,u) _${dataname}_sqnorm(k,u)\n\n";
+
   }
 
 } else {
@@ -364,11 +358,22 @@ if ($su2quat==0) {
     #write_su2_2TA();
     #write_su2_TA();
     write_suN_FMAT(); #this is the same as before
-    if ($complex eq "R") {
+    write_su2_multiply();
+    write_su2_inverse_multiply();
+	write_su2_zero();
+	if ($complex eq "R") {
         write_suNr_FMAT(); #this is the same as before
     }
-
     write_su2_exp();
+
+    my ($ldn,$lrdn)=($dataname,$rdataname);
+  	if ($complex eq "C") {
+    	$dataname="${dataname}c";
+  	}
+    write_suN_multiply();
+    write_suN_inverse_multiply();
+	write_suN_zero();
+    $dataname=$ldn;
 }
 
 my ($ldn,$lrdn)=($dataname,$rdataname);
@@ -2495,6 +2500,29 @@ sub write_suNr_mul {
 	}
 }
 
+sub write_suNr_mul_assign {
+  print "/* u*=r (u mat, r real) */\n";
+  print "#define _${rdataname}_mul_assign(u,r) \\\n";
+	my $dim=$N*$N;
+	if ($N<$Nmax or $dim<(2*$unroll+1)) { #unroll all
+		for(my $i=0; $i<$dim; $i++) {
+			print "   (u).$cname\[$i\]*=(r)";
+			if($i==$dim-1) {print "\n\n";} else { print ";\\\n"; }
+		}
+	} else { #partial unroll
+		print "   do { \\\n";
+		print "      int _i;for (_i=0; _i<$md2; ){\\\n";
+		for(my $i=0;$i<$unroll;$i++){
+			print "         (u).$cname\[_i\]*=(r); ++_i;\\\n";
+		}
+		print "      }\\\n";
+		for(my $i=0;$i<$mr2;$i++){
+			print "      (u).$cname\[_i\]*=(r); ++_i;\\\n";
+		}
+		print "   } while(0) \n\n";
+	}
+}
+
 sub write_suN_add_assign {
   print "/* u+=v */\n";
   print "#define _${dataname}_add_assign(u,v) \\\n";
@@ -2544,6 +2572,29 @@ sub write_suNr_add_assign {
 sub write_suN_mul_add {
   print "/* u=r*v+m*w */\n";
   print "#define _${dataname}_mul_add(u,r,v,m,w) \\\n";
+	my $dim=$N*$N;
+	if ($N<$Nmax or $dim<(2*$unroll+1)) { #unroll all
+		for(my $i=0; $i<$dim; $i++) {
+			print "   (u).$cname\[$i\]=(r)*(v).$cname\[$i\]+(m)*(w).$cname\[$i\]";
+			if($i==$dim-1) {print "\n\n";} else { print ";\\\n"; }
+		}
+	} else { #partial unroll
+		print "   do { \\\n";
+		print "      int _i;for (_i=0; _i<$md2; ){\\\n";
+		for(my $i=0;$i<$unroll;$i++){
+			print "   (u).$cname\[_i\]=(r)*(v).$cname\[_i\]+(m)*(w).$cname\[_i\]; ++_i;\\\n";
+		}
+		print "      }\\\n";
+		for(my $i=0;$i<$mr2;$i++){
+			print "      (u).$cname\[_i\]=(r)*(v).$cname\[_i\]+(m)*(w).$cname\[_i\]; ++_i;\\\n";
+		}
+		print "   } while(0) \n\n";
+	}
+}
+
+sub write_suNr_mul_add {
+  print "/* u=r*v+m*w (with r, m real and v, w mat)*/\n";
+  print "#define _${rdataname}_mul_add(u,r,v,m,w) \\\n";
 	my $dim=$N*$N;
 	if ($N<$Nmax or $dim<(2*$unroll+1)) { #unroll all
 		for(my $i=0; $i<$dim; $i++) {
@@ -2772,6 +2823,11 @@ sub write_suN_trace_re {
 		}
 		print "   } while(0) \n\n";
 	}
+}
+sub write_suNr_trace {
+  print "/* k= Tr (u) */\n";
+  print "#define _${rdataname}_trace(k,u) \\\n"; 
+  print "   _${rdataname}_trace_re(k,u)\n\n";
 }
 
 sub write_suNr_trace_re {

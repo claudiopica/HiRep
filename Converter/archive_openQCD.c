@@ -80,15 +80,92 @@ void read_gauge_field_openQCD(char filename[])
             }
 
   fclose(fp);
-  
+
   double new_plaq = avr_plaquette();
 
-  if ((NG * new_plaq - readplaq) * (NG * new_plaq - readplaq) > 1.e-14)
-    error(1, 1, "read_gauge_field_openQCD",
-          "Wrong plaquette checksum");
+  if (sqrt((NG * new_plaq - readplaq) * (NG * new_plaq - readplaq)) > 1.e-14)
+    error(1, 1, "read_gauge_field_openQCD", "Wrong plaquette checksum");
   else
     lprintf("IO", 0, "Plaquette checksum matches\n Initial plaquette: %1.8e \n", new_plaq);
-  
+
+  gettimeofday(&end, 0);
+  timeval_subtract(&etime, &end, &start);
+  lprintf("IO", 0, "Configuration [%s] read [%ld sec %ld usec]\n", filename, etime.tv_sec, etime.tv_usec);
+}
+
+void read_gauge_field_openQCD_SF(char filename[])
+{
+  FILE *fp = NULL;
+  int g[4];
+  int mu, i, j;
+  struct timeval start, end, etime;
+  double test[2 * NG * NG];
+  int size[4];
+  double readplaq;
+
+  gettimeofday(&start, 0);
+
+  error((fp = fopen(filename, "rb")) == NULL, 1, "read_gauge_field_openQCD",
+        "Failed to open file for reading");
+
+  error(fread_LE_int(size, 4, fp) != 4,
+        1, "read_gauge_field_openQCD",
+        "Failed to read lattice size from the header of the conf file");
+
+  error(fread(&readplaq, sizeof(double), 1, fp) != 1, 1, "read_gauge_field_openQCD",
+        "Failed to read the plaquette value from the header  of the conf file");
+
+  int id;
+  error(size[0] + 2 != GLB_T, 1, "read_gauge_field_openQCD", "Wrong lattice size");
+  error(size[1] != GLB_X, 1, "read_gauge_field_openQCD", "Wrong lattice size");
+  error(size[2] != GLB_Y, 1, "read_gauge_field_openQCD", "Wrong lattice size");
+  error(size[3] != GLB_Z, 1, "read_gauge_field_openQCD", "Wrong lattice size");
+
+  for (g[0] = 0; g[0] < GLB_T - 2; g[0]++)
+    for (g[1] = 0; g[1] < GLB_X; g[1]++)
+      for (g[2] = 0; g[2] < GLB_Y; g[2]++)
+        for (g[3] = 0; g[3] < GLB_Z; g[3]++)
+          if ((g[0] + g[1] + g[2] + g[3]) % 2 == 1)
+            for (mu = 0; mu < 4; mu++)
+            {
+
+              id = ipt(g[0] + 1, g[1], g[2], g[3]);
+              error(fread(test, sizeof(double), 2 * NG * NG, fp) != 2 * NG * NG,
+                    1, "read_gauge_field_openQCD",
+                    "Failed to read header from file");
+              for (j = 0; j < NG; j++)
+                for (i = 0; i < NG; i++)
+                {
+                  int k = j + i * NG;
+                  pu_gauge(id, mu)->c[k] = test[2 * k] + I * test[2 * k + 1];
+                }
+
+              if (g[0] == 0)
+              {
+                id = ipt(GLB_T - 1, g[1], g[2], g[3]);
+              }
+              id = idn(id, mu);
+
+              error(fread(test, sizeof(double), 2 * NG * NG, fp) != 2 * NG * NG,
+                    1, "read_gauge_field_openQCD",
+                    "Failed to read header from file");
+              for (j = 0; j < NG; j++)
+                for (i = 0; i < NG; i++)
+                {
+                  int k = j + i * NG;
+                  pu_gauge(id, mu)->c[k] = test[2 * k] + I * test[2 * k + 1];
+                }
+            }
+
+  fclose(fp);
+
+  double new_plaq = avr_plaquette();
+
+  if (sqrt((NG * new_plaq - readplaq) * (NG * new_plaq - readplaq)) > 1.e-14)
+    lprintf("WARNING", 0, " Plaquette DOES NOT match!  \n");
+  else
+    lprintf("IO", 0, "Plaquette checksum matches\n Initial plaquette: %1.8e \n", new_plaq);
+
   gettimeofday(&end, 0);
   timeval_subtract(&etime, &end, &start);
   lprintf("IO", 0, "Configuration [%s] read [%ld sec %ld usec]\n", filename, etime.tv_sec, etime.tv_usec);

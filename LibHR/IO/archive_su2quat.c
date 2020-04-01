@@ -25,6 +25,12 @@
 
 #if NG == 2 && !defined(WITH_QUATERNIONS)
 
+#ifndef NDEBUG
+#define MPIRET(type) type =
+#else
+#define MPIRET(type)
+#endif
+
 /* 
  * The conversion is based on the following convention
  * for su(2) matrices:
@@ -179,7 +185,7 @@ void write_gauge_field_su2q(char filename[])
 #ifndef NDEBUG
               error(Z != (GLB_Z / NP_Z + ((p[3] < rz) ? 1 : 0)), 1, "write_gauge_field_su2q", "Local lattice size mismatch!");
 #endif
-              mpiret = MPI_Send(buff, bsize, MPI_DOUBLE, 0, 999, GLB_COMM);
+              MPIRET(mpiret) MPI_Send(buff, bsize, MPI_DOUBLE, 0, 999, GLB_COMM);
 #ifndef NDEBUG
               if (mpiret != MPI_SUCCESS)
               {
@@ -194,7 +200,7 @@ void write_gauge_field_su2q(char filename[])
             /* receive buffer */
             if (PID == 0)
             {
-              mpiret = MPI_Recv(buff, bsize, MPI_DOUBLE, pid, 999, GLB_COMM, &st);
+              MPIRET(mpiret) MPI_Recv(buff, bsize, MPI_DOUBLE, pid, 999, GLB_COMM, &st);
 #ifndef NDEBUG
               if (mpiret != MPI_SUCCESS)
               {
@@ -344,7 +350,8 @@ void read_gauge_field_su2q(char filename[])
             /* send buffer */
             if (PID == 0)
             {
-              mpiret = MPI_Send(buff, bsize, MPI_DOUBLE, pid, 999, GLB_COMM);
+            
+              MPIRET(mpiret) MPI_Send(buff, bsize, MPI_DOUBLE, pid, 999, GLB_COMM);
 #ifndef NDEBUG
               if (mpiret != MPI_SUCCESS)
               {
@@ -362,7 +369,7 @@ void read_gauge_field_su2q(char filename[])
 #ifndef NDEBUG
               error(Z != (GLB_Z / NP_Z + ((p[3] < rz) ? 1 : 0)), 1, "read_gauge_field", "Local lattice size mismatch!");
 #endif
-              mpiret = MPI_Recv(buff, bsize, MPI_DOUBLE, 0, 999, GLB_COMM, &st);
+              MPIRET(mpiret) MPI_Recv(buff, bsize, MPI_DOUBLE, 0, 999, GLB_COMM, &st);
 #ifndef NDEBUG
               if (mpiret != MPI_SUCCESS)
               {

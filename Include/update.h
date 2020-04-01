@@ -100,7 +100,10 @@ void lw_local_action(scalar_field*, double, double, double);
 void fermion_force_begin();
 void fermion_force_end(double dt, suNg_av_field*);
 void force_fermion_core(spinor_field*, spinor_field*, int, double, double);
+void force_fermion_core_taylor(spinor_field*, spinor_field*, int, double, double);
 void force_clover_logdet(double, double);
+void force_clover_fermion(spinor_field *Xs, spinor_field *Ys, double residue);
+void force_clover_fermion_taylor(spinor_field *Xs, spinor_field *Ys, double residue);
 
 void force_hmc(double, void*);
 void force_hmc_tm(double, void*);

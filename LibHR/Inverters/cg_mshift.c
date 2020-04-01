@@ -1,3 +1,4 @@
+
 /***************************************************************************\
 * Copyright (c) 2008, Claudio Pica                                          *   
 * All rights reserved.                                                      * 
@@ -153,6 +154,10 @@ int cg_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field
   #endif
   gettimeofday(&start,0);
   #endif
+
+  //  int ix = ipt(0,0,0,0);
+  //  printf( "test in 0 0 0 0 re=%f im=%f\n",   creal((*_FIELD_AT(in,ix)).c[0].c[0]), cimag( (*_FIELD_AT(in,ix)).c[0].c[0]   ) );
+
 
   int cgiter,msiter;
   int i;

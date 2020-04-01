@@ -444,7 +444,7 @@ void represent_gauge_field()
   }
 
   apply_BCs_on_represented_gauge_field();
-#else
+#else //ALLOCATE_REPR_GAUGE_FIELD
   static int first_time = 1;
   /* wait gauge field transfer */
   complete_gf_sendrecv(u_gauge);
@@ -459,10 +459,10 @@ void represent_gauge_field()
 #endif
     //    apply_BCs_on_represented_gauge_field(); //Already applied when configuration read or initialized
   }
-#endif
+#endif//ALLOCATE_REPR_GAUGE_FIELD
   assign_ud2u_f();
 
-#ifdef WITH_CLOVER
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
   compute_clover_term();
 #endif
 }

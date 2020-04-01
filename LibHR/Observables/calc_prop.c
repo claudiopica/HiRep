@@ -33,7 +33,7 @@ static double hmass_pre;
 
 static void D_pre(spinor_field *out, spinor_field *in)
 {
-#ifdef WITH_CLOVER
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
   Cphi_eopre(hmass_pre, out, in);
 #else
   Dphi_eopre(hmass_pre, out, in);
@@ -178,7 +178,7 @@ void free_propagator_eo()
 psi = D^{-1} eta
 
 \***************************************************************************/
-#ifndef WITH_CLOVER
+#if !defined(WITH_CLOVER) && !defined(WITH_EXPCLOVER)
 
 static void calc_propagator_eo_core(spinor_field *psi, spinor_field *eta, int solver)
 {
@@ -354,7 +354,7 @@ static void calc_propagator_core(spinor_field *psi, spinor_field *eta, int solve
   start_sf_sendrecv(psi);
   complete_sf_sendrecv(psi);
 }
-#ifdef WITH_CLOVER
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
 
 static void calc_propagator_clover(spinor_field *dptr, spinor_field *sptr)
 {
@@ -408,42 +408,21 @@ static void calc_propagator_clover(spinor_field *dptr, spinor_field *sptr)
     spinor_field_copy_f(stmp, sptr);
   }
 
-
   // etmp = sptr_e - D_eo D_oo^-1 sptr_o
   Cphi_diag_inv(hmass_pre, otmp, &sptr_o);
   Dphi_(etmp, otmp);
   spinor_field_minus_f(etmp, etmp);
   spinor_field_add_assign_f(etmp, &sptr_e);
-
   // Call inverter
   g5QMR_mshift(&mpar, D_pre, etmp, &dptr_e);
-
   // dptr_o = D_oo^-1 ( sptr_o - D_oe dptr_e )
   Dphi_(&dptr_o, &dptr_e);
   spinor_field_minus_f(&dptr_o, &dptr_o);
   spinor_field_add_assign_f(&dptr_o, &sptr_o);
   Cphi_diag_inv(hmass_pre, &dptr_o, &dptr_o);
 
-/*#else*/
-
-  // etmp = D_ee sptr_e - D_eo sptr_o
-  /*Dphi_(etmp, &sptr_o);
-  spinor_field_minus_f(etmp, etmp);
-  spinor_field_mul_add_assign_f(etmp, 4. + hmass_pre, &sptr_e);*/
-
-  // Call inverter
-/*  g5QMR_mshift(&mpar, D_pre, etmp, &dptr_e);*/
-
-  // dptr_o = D_oo^-1 ( sptr_o - D_oe dptr_e )
-/*  Dphi_(&dptr_o, &dptr_e);
-  spinor_field_minus_f(&dptr_o, &dptr_o);
-  spinor_field_add_assign_f(&dptr_o, &sptr_o);
-  spinor_field_mul_f(&dptr_o, 1. / (4. + hmass_pre), &dptr_o);*/
-
-/*#endif*/
 }
 #endif
-
 
 void calc_propagator(spinor_field *psi, spinor_field *eta, int ndilute)
 {
@@ -458,10 +437,10 @@ void calc_propagator(spinor_field *psi, spinor_field *eta, int ndilute)
     {
       lprintf("CALC_PROPAGATOR", 10, "n masses=%d, mass = %g\n", n_masses, mass[0]);
       hmass_pre = mass[0];
-#ifdef WITH_CLOVER
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
       calc_propagator_clover(&psi[beta * n_masses + i], &eta[beta]);
 #else
-      calc_propagator_core(&psi[beta * n_masses + i], &eta[beta], _g5QMR);
+      calc_propagator_core(&psi[beta * n_masses + i], &eta[beta], _CG);
 #endif
       mass++;
     }
@@ -473,7 +452,7 @@ void calc_propagator(spinor_field *psi, spinor_field *eta, int ndilute)
 
 void calc_propagator_eo(spinor_field *psi, spinor_field *eta, int ndilute)
 {
-#ifdef WITH_CLOVER
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
   calc_propagator(psi, eta, ndilute);
 #else
   int beta;
@@ -499,7 +478,7 @@ void calc_propagator_multisource(spinor_field *psi, spinor_field *eta, int ndilu
     hmass_pre = mass[0];
     for (beta = 0; beta < ndilute; ++beta)
     {
-#ifdef WITH_CLOVER
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
       calc_propagator_clover(&psi[beta * n_masses + i], &eta[beta * n_masses + i]);
 #else
       calc_propagator_core(&psi[beta * n_masses + i], &eta[beta * n_masses + i], _g5QMR);

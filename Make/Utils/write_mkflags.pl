@@ -20,6 +20,7 @@ GetOptions(
   'sfrotated!'   => \(my $sfrotatedbc = 0),
   'smearing!'   => \(my $smearing = 0),
   'clover|c!'   => \(my $clover = 0),
+  'expclover|e!'   => \(my $expclover = 0),
   'eo!'   => \(my $eoprec = 1),
   'quat|q!'   => \(my $quat = 0),
   'ndebug!'   => \(my $ndebug = 1),
@@ -100,11 +101,11 @@ sub validate_t {
 
 sub validate_x {
     if($XBC eq "P") {
-        $XBC = "BC_Y_PERIODIC"
+        $XBC = "BC_X_PERIODIC"
     } elsif ($XBC eq "A") { 
-        $XBC = "BC_Y_ANTIPERIODIC"
+        $XBC = "BC_X_ANTIPERIODIC"
     } elsif ($XBC eq "T") { 
-        $XBC = "BC_Y_THETA"
+        $XBC = "BC_X_THETA"
     } else {
         print "Error: The X boundary condition representation must be one of the following: P, A, T\n";
         HelpMessage(1);
@@ -171,6 +172,8 @@ $sfrotatedbc && print $fh "MACRO += -DROTATED_SF\n";
 $smearing && print $fh "MACRO += -DWITH_SMEARING\n";
 # write clover
 $clover && print $fh "MACRO += -DWITH_CLOVER\n";
+# write expclover
+$expclover && print $fh "MACRO += -DWITH_EXPCLOVER\n";
 # write eo preconditioning
 $eoprec && print $fh "MACRO += -DWITH_EO\n";
 # write quaternions 
@@ -243,9 +246,10 @@ write_mkflags - write flags file for compilation of HiRep
   --[no-]sfhalf       [false]     Schrodinger functional b.c., half field
   --[no-]sfrotate     [false]     Rotated Schrodinger functional b.c.
   --[no-]smearing     [false]     Smearing action
-  --[no-]clover       [false]     Clover improved action
+  --[no-]clover,-c    [false]     Clover improved action
+  --[no-]expclover,-e [false]     ExpClover improved action
 
-  --[no-]quat         [false]     Use quaternion representation (only for SU2)
+  --[no-]quat,-q      [false]     Use quaternion representation (only for SU2)
   --[no-]dfloat       [false]     Use single precision acceleration
   --[no-]unrollrepr   [false]     Unroll group representation functions
 

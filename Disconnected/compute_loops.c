@@ -33,6 +33,7 @@
 #include "gamma_spinor.h"
 #include "spin_matrix.h"
 #include "disconnected.h"
+#include "clover_tools.h"
 
 #define PI 3.141592653589793238462643383279502884197
 
@@ -52,20 +53,22 @@ typedef struct _input_loops {
   int nhits;
   int source_type;
   int n_mom;
+  double csw;
   /* for the reading function */
-  input_record_t read[6];
+  input_record_t read[7];
 
 } input_loops;
 
 #define init_input_loops(varname)					\
   {									\
-    .read={								\
-      {"quark quenched masses", "disc:masses = %s", STRING_T, (varname).mstring}, \
+  .read={								\
+    {"quark quenched masses", "disc:masses = %s", STRING_T, (varname).mstring}, \
       {"inverter precision", "disc:precision = %lf", DOUBLE_T, &(varname).precision}, \
       {"number of inversions per cnfg", "disc:nhits = %d", INT_T, &(varname).nhits}, \
       {"Source type " , "disc:source_type = %d", INT_T, &(varname).source_type}, \
-      {"maximum component of momentum", "disc:n_mom = %d", INT_T, &(varname).n_mom}, \	
-	    {NULL, NULL, INT_T, INT_T,NULL}			\
+      {"maximum component of momentum", "disc:n_mom = %d", INT_T, &(varname).n_mom}, \ 
+      {"csw", "disc:csw = %f", DOUBLE_T, &(varname).csw}, \	
+      {NULL, NULL, INT_T, INT_T,NULL}						\
     }									\
   }
 
@@ -300,6 +303,10 @@ int main(int argc,char *argv[]) {
 #ifdef ALLOCATE_REPR_GAUGE_FIELD
 	u_gauge_f=alloc_gfield_f(&glattice);
 #endif
+#ifdef WITH_CLOVER
+	clover_init(disc_var.csw);//  VD: not nice here.                                                                                                                
+#endif
+
 
 	lprintf("MAIN",0,"Inverter precision = %e\n",disc_var.precision);
 	for(k=0;k<nm;k++)

@@ -79,5 +79,18 @@ void random_suNg(suNg *u) {
   } while (!project_to_suNg_real(u,&tmp));
 }
 
+void random_suNf(suNf *u) {
+  suNf tmp;
+  double gr[NF*NF];
+  int i;
+  do {
+    gauss(gr,NF*NF);
+    for (i=0;i<NF*NF;i++){
+      tmp.c[i]=gr[i];
+    }
+  } while (!project_to_suNg_real(u,&tmp));
+}
+
+
 #endif
 

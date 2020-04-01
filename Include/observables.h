@@ -25,6 +25,7 @@
 double plaq(int ix,int mu,int nu);
 void cplaq(double complex *ret,int ix,int mu,int nu);
 double avr_plaquette();
+double avr_plaquette_time( double *plaqt,double *plaqs);
 double SF_action(double beta);
 double local_plaq(int ix);
 void full_plaquette();
@@ -100,6 +101,7 @@ void create_sequential_source(spinor_field *source, int tf, spinor_field* prop);
 void create_sequential_source_stoch(spinor_field *source, int tf, spinor_field* prop);
 void restrict_timeslice(spinor_field *source, int tf, spinor_field* prop);
 void create_diluted_volume_source(spinor_field *source, int parity_component, int mod);
+void create_z2_volume_source(spinor_field *source);
 void add_momentum(spinor_field* out, spinor_field* in, int px, int py, int pz);
 void zero_even_or_odd_site_spinorfield(spinor_field *source,int nspinor,int eo);
 

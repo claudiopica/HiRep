@@ -1,6 +1,8 @@
 
 /******************************************************************************
 *
+*  NOCOMPILE= WITH_CLOVER
+*  NOCOMPILE= WITH_EXPCLOVER
 *
 * File check_disc_2.c
 *
