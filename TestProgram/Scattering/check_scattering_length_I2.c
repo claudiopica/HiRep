@@ -69,44 +69,25 @@ typedef struct _input_scatt {
     double csw;
 	double precision;
 	int nhits;
-	int tsrc;
-	char outdir[256], bc[16], p[256],configlist[256];
 
 	/* for the reading function */
-	input_record_t read[12];
+	input_record_t read[7];
 
 } input_scatt;
 
 #define init_input_scatt(varname) \
 { \
 	.read={\
-		{"quark quenched masses", "mes:masses = %s", STRING_T, (varname).mstring},\
+		{"Fermion mass", "mes:mass = %s", STRING_T, (varname).mstring},\
 		{"csw", "mes:csw = %lf", DOUBLE_T, &(varname).csw},\
 		{"inverter precision", "mes:precision = %lf", DOUBLE_T, &(varname).precision},\
-		{"number of inversions per cnfg", "mes:nhits = %d", INT_T, &(varname).nhits},\
-		{"Source time:", "mes:tsrc = %d", INT_T, &(varname).tsrc},\
-		{"Output directory:", "mes:outdir = %s", STRING_T, &(varname).outdir},\
-		{"Configuration list:", "mes:configlist = %s", STRING_T, &(varname).configlist},\
-		{"Boundary conditions:", "mes:bc = %s", STRING_T, &(varname).bc},\
+		{"number of inversions per cnfg", "I2:nhits = %d", INT_T, &(varname).nhits},\
 		{NULL, NULL, INT_T, NULL}\
 	}\
 }
 
 
-char cnfg_filename[256]="";
-char list_filename[256]="";
-char prop_filename[256]="";
-char source_filename[256]="";
 char input_filename[256] = "input_file";
-char output_filename[256] = "meson_scattering.out";
-int Nsource;
-double M;
-
-enum { UNKNOWN_CNFG, DYNAMICAL_CNFG, QUENCHED_CNFG };
-
-
-
-
 
 input_scatt mes_var = init_input_scatt(mes_var);
 
@@ -421,8 +402,8 @@ int main(int argc,char *argv[])
 
   int numsources = mes_var.nhits;
 	
-  #ifdef WITH_CLOVER
-  set_csw(mes_var.csw);
+  #if defined(WITH_CLOVER) ||  defined(WITH_EXPCLOVER)
+  set_csw(&mes_var.csw);
   #endif
   m[0] = atof(mes_var.mstring); 
   init_propagator_eo(1,m,mes_var.precision);

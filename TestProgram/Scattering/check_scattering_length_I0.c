@@ -71,39 +71,25 @@ typedef struct _input_scatt {
     double csw;
 	double precision;
 	int nhits;
-	int tsrc;
-	char outdir[256], bc[16], p[256],configlist[256];
 
 	/* for the reading function */
-	input_record_t read[12];
+	input_record_t read[7];
 
 } input_scatt;
 
 #define init_input_scatt(varname) \
 { \
 	.read={\
-		{"quark quenched masses", "mes:masses = %s", STRING_T, (varname).mstring},\
+		{"Fermion masses", "mes:mass = %s", STRING_T, (varname).mstring},\
 		{"csw", "mes:csw = %lf", DOUBLE_T, &(varname).csw},\
 		{"inverter precision", "mes:precision = %lf", DOUBLE_T, &(varname).precision},\
-		{"number of inversions per cnfg", "mes:nhits = %d", INT_T, &(varname).nhits},\
-		{"Source time:", "mes:tsrc = %d", INT_T, &(varname).tsrc},\
-		{"Output directory:", "mes:outdir = %s", STRING_T, &(varname).outdir},\
-		{"Configuration list:", "mes:configlist = %s", STRING_T, &(varname).configlist},\
-		{"Boundary conditions:", "mes:bc = %s", STRING_T, &(varname).bc},\
+		{"number of inversions per cnfg", "I0:nhits = %d", INT_T, &(varname).nhits},\
 		{NULL, NULL, INT_T, NULL}\
 	}\
 }
 
-char cnfg_filename[256]="";
-char list_filename[256]="";
-char prop_filename[256]="";
-char source_filename[256]="";
 char input_filename[256] = "input_file";
-char output_filename[256] = "meson_scattering.out";
-int Nsource;
-double M;
 
-enum { UNKNOWN_CNFG, DYNAMICAL_CNFG, QUENCHED_CNFG };
 
 input_scatt mes_var = init_input_scatt(mes_var);
 
@@ -447,6 +433,23 @@ complex double C(fourvec px, fourvec py, double m, int L, int LT, int t)
 
   return 4*res/L/L/L/L/L/L/LT/LT/LT/LT;
 }
+int compare_corr_disc(double complex * corr_num, char* name, double tol ){
+    int retval = 0;
+    for(int t=0; t<GLB_T; t++){  
+         if(cabs(corr_num[t]) > tol) 
+            {
+                lprintf("TEST",0,"Mismatch %s, t=%d,  numeric = %e + I*(%e), analytic = %e + I*(%e) \n",name,t,creal(corr_num[t]),cimag(corr_num[t]),0.,0.);
+                retval += 1;
+            }
+            else
+            {
+                 lprintf("TEST",0,"Match %s, t=%d, numeric = %e + I*(%e), analytic = %e + I*(%e) \n",name,t,creal(corr_num[t]),cimag(corr_num[t]),0.,0.);
+             }
+    }
+        
+    
+    return retval;
+}
 
 int compare_corr(double complex * corr_ex, double complex * corr_num,int tstart, char* name, double tol ){
     int retval = 0;
@@ -472,8 +475,9 @@ int main(int argc,char *argv[])
 {
   int return_value=0;
   double m[256];
-  int ncorr=15;
+  int ncorr=16;
   double tol=1.e-1;
+  double tol_disc=1.e-10;
   meson_observable **mo_arr;
   fourvec zero_p = (fourvec){{0,0,0,0}};
   
@@ -488,10 +492,9 @@ int main(int argc,char *argv[])
   read_input(rlx_var.read,get_input_filename());
 
   int numsources = mes_var.nhits;
-	
-  #ifdef WITH_CLOVER
-  set_csw(mes_var.csw);
-  lprintf("MAIN",0,"mes:csw = %f\n",mes_var.csw);
+  
+  #if defined(WITH_CLOVER) ||  defined(WITH_EXPCLOVER)
+  set_csw(&mes_var.csw);
   #endif
   m[0] = atof(mes_var.mstring); 
   init_propagator_eo(1,m,mes_var.precision);
@@ -518,7 +521,8 @@ int main(int argc,char *argv[])
   double complex Dstoch[GLB_T],Dtheo[GLB_T];
   double complex Cstoch[GLB_T],Ctheo[GLB_T];
   double complex Vstoch[GLB_T],Vtheo[GLB_T];
-
+  double complex  Discstoch[GLB_T];
+  
   for (int t=0;t < GLB_T ; t++)  
    {
        Rstoch[t] = 0.0;
@@ -528,6 +532,7 @@ int main(int argc,char *argv[])
        Vstoch[t] = 0.0;
        Pistoch[t] = 0.0;
        Rhostoch[t] = 0.0;
+       Discstoch[t]  = 0.0;
    }
 
   mo_arr= (meson_observable**)malloc(sizeof(meson_observable*)*ncorr);
@@ -547,7 +552,8 @@ int main(int argc,char *argv[])
   init_mo(mo_arr[12],"rho32",GLB_T);
   init_mo(mo_arr[13],"rho33",GLB_T);
   init_mo(mo_arr[14],"Ralt",GLB_T);
-    
+  init_mo(mo_arr[15],"disc",GLB_T);
+
   for (int n=0;n<numsources;n++)
     {   
         if (n%100==0) lprintf("MAIN",0,"nhits: %d / %d \n/",n,numsources);
@@ -563,7 +569,8 @@ int main(int argc,char *argv[])
                   Pistoch[t] += (mo_arr[4]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[4]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(numsources); 
                   Rhostoch[t] += (mo_arr[5]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[5]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(3*numsources); 
                   Rhostoch[t] -= (mo_arr[9]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[9]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(3*numsources); // there is an i in the interpolating field 
-                  Rhostoch[t] += (mo_arr[13]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[13]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(3*numsources);           
+                  Rhostoch[t] += (mo_arr[13]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[13]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(3*numsources);
+                  Discstoch[t] += (mo_arr[15]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[15]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(numsources);                 
             }
         for (int i=0;i<ncorr;i++) reset_mo(mo_arr[i]);
     	
@@ -582,7 +589,7 @@ int main(int argc,char *argv[])
     }
     
   //  for (int i=0;i<GLB_T;++i)    lprintf("MAIN",0,"V analytical V %e + 1I %e  numerical %e + 1I %e  ratio (num/theo) %e + 1I %e\n" ,creal(Vtheo[i]),cimag(Vtheo[i]),creal(Vstoch[i]), cimag(Vstoch[i]),creal(Vstoch[i]/Vtheo[i]),cimag(Vstoch[i]/Vtheo[i]));
-    for (int i=0;i<GLB_T;++i)    lprintf("MAIN",0,"C analytical C %e + 1I %e  numerical %e + 1I %e  ratio (num/theo) %e + 1I %e\n" ,creal(Ctheo[i]),cimag(Ctheo[i]),creal(Cstoch[i]), cimag(Cstoch[i]),creal(Cstoch[i]/Ctheo[i]),cimag(Cstoch[i]/Ctheo[i]));
+  //  for (int i=0;i<GLB_T;++i)    lprintf("MAIN",0,"C analytical C %e + 1I %e  numerical %e + 1I %e  ratio (num/theo) %e + 1I %e\n" ,creal(Ctheo[i]),cimag(Ctheo[i]),creal(Cstoch[i]), cimag(Cstoch[i]),creal(Cstoch[i]/Ctheo[i]),cimag(Cstoch[i]/Ctheo[i]));
   //  for (int i=0;i<GLB_T;++i)    lprintf("MAIN",0,"D analytical D %e + 1I %e  numerical %e + 1I %e  ratio (num/theo) %e + 1I %e\n" ,creal(Dtheo[i]),cimag(Dtheo[i]),creal(Dstoch[i]), cimag(Dstoch[i]),creal(Dstoch[i]/Dtheo[i]),cimag(Dstoch[i]/Dtheo[i]));
   //  for (int i=0;i<GLB_T;++i)    lprintf("MAIN",0,"R analytical R %e + 1I %e  numerical %e + 1I %e  ratio (num/theo) %e + 1I %e\n" ,creal(Rtheo[i]),cimag(Rtheo[i]),creal(Rstoch[i]), cimag(Rstoch[i]),creal(Rstoch[i]/Rtheo[i]),cimag(Rstoch[i]/Rtheo[i]));
  
@@ -600,6 +607,7 @@ int main(int argc,char *argv[])
     return_value +=  compare_corr(Dtheo, Dstoch,0,"D", tol );
     return_value +=  compare_corr(Rtheo, Rstoch,0,"R", tol );
     return_value +=  compare_corr(Rtheo, Raltstoch,1,"Ralt", tol ); // t=0 is incorrect for Ralt.
+    return_value +=  compare_corr_disc(Discstoch,"disc", tol_disc );
 
     gettimeofday(&end,0);
     timeval_subtract(&etime,&end,&start);

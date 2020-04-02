@@ -1096,6 +1096,7 @@ void measure_pion_scattering_I0(double* m, int numsources, double precision,char
  	meson_observable *R;
 	meson_observable *Ralt;
     meson_observable *V;
+	meson_observable *disc;
 	spinor_field** source_ts1; 
 	spinor_field* source_ts2= alloc_spinor_field_f(4,&glattice);
 	spinor_field*** prop_ts1;
@@ -1136,6 +1137,7 @@ void measure_pion_scattering_I0(double* m, int numsources, double precision,char
 	Ralt= (meson_observable*) malloc(sizeof(meson_observable));
 	tmp_mo = (meson_observable*) malloc(sizeof(meson_observable));
 	V = (meson_observable*) malloc(sizeof(meson_observable));
+	disc = (meson_observable*) malloc(sizeof(meson_observable)); // just for the g5 loop
 
 	for(int i=0; i<3; i++){
 		for(int j=0; j<3; j++){
@@ -1149,7 +1151,9 @@ void measure_pion_scattering_I0(double* m, int numsources, double precision,char
 	init_mo(Ralt,"Ralt",GLB_T);
 	init_mo(tmp_mo,"tmp_mo",GLB_T);
 	init_mo(V,"V",GLB_T);
-
+	init_mo(disc,"disc",GLB_T);
+	disc->ind1 = _g5;
+	disc->ind2 = _NOGAMMA;
 	pi1->ind1 = _g5;
 	pi1->ind2 = _g5;
 			
@@ -1169,6 +1173,7 @@ void measure_pion_scattering_I0(double* m, int numsources, double precision,char
 		reset_mo(R);
 		reset_mo(Ralt);
 		reset_mo(V);
+		reset_mo(disc);
 		for(int i=0; i<3; i++){
 			for(int j=0; j<3; j++){
 				reset_mo(rho1[i][j]);
@@ -1214,10 +1219,14 @@ void measure_pion_scattering_I0(double* m, int numsources, double precision,char
 			reset_mo(tmp_mo);
 			measure_mesons_core(prop_ts1[src][t],prop_ts1[src][t],source_ts1[t],tmp_mo,1,(ts+t)%GLB_T,1,0,GLB_T); 
 			do_global_sum(tmp_mo,1.0); //
-			V->corr_re[corr_ind(0,0,0,1,t,1,0)] = tmp_mo -> corr_re[corr_ind(0,0,0,1,0,1,0)];
-			V->corr_im[corr_ind(0,0,0,1,t,1,0)] = tmp_mo -> corr_im[corr_ind(0,0,0,1,0,1,0)];
+			V->corr_re[corr_ind(0,0,0,1,(ts+t)%GLB_T,1,0)] = tmp_mo -> corr_re[corr_ind(0,0,0,1,0,1,0)];
+			V->corr_im[corr_ind(0,0,0,1,(ts+t)%GLB_T,1,0)] = tmp_mo -> corr_im[corr_ind(0,0,0,1,0,1,0)];
 		}
-	
+		// use the opportunity to compute disconnected loops. add all the other loops ? add test in check_scattering_length_I0
+		for (int t=0;t<GLB_T;++t){
+				measure_mesons_core(prop_ts1[src][t],prop_ts1[src][t],source_ts1[t],disc,1,0,1,0,GLB_T);	 
+		}
+		do_global_sum(disc,1.0); //
 
 		lprintf("MAIN",0,"Contraction pi,rho ...\n");
 		// "standard" two points : pi and rho 
@@ -1243,12 +1252,13 @@ void measure_pion_scattering_I0(double* m, int numsources, double precision,char
 		measure_scattering_AD_core(D, prop_ts1[src][0],prop_ts1[src][0],prop_ts2,prop_ts2, ts, 0,0,0,0,0); 
 		measure_scattering_BC_core(C, prop_ts1[src][0],prop_ts1[src][0],prop_ts2,prop_ts2, ts, 0,0,0,0,0);
 		
+
 		lprintf("MAIN",0,"Contraction done\n");
 		// Printing.
 		if (path!=NULL) {
 			io2pt(pi1,1,src,path,"pi1",cnfg_filename);
 			io2pt(V,1,src,path,"V",cnfg_filename);
-	
+			io2pt(disc,1,src,path,"disc",cnfg_filename);
 
 			for(int i=0; i<3; i++){	
 				for(int j=0; j<3; j++){
@@ -1273,6 +1283,7 @@ void measure_pion_scattering_I0(double* m, int numsources, double precision,char
 			copy_mo(mo_arr[5+j+3*i],rho1[i][j]);
 			}
 		}
+		copy_mo(mo_arr[15],disc);
 	}
 
 	lprintf("MAIN",0,"Contraction R alternative...\n");
@@ -1318,6 +1329,7 @@ void measure_pion_scattering_I0(double* m, int numsources, double precision,char
 
 	free_mo(pi1);
 	free_mo(D);
+	free_mo(disc);
 	free_mo(C);
 	free_mo(R);
 	free_mo(Ralt);

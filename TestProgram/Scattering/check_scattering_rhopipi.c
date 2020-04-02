@@ -67,45 +67,28 @@ typedef struct _input_scatt {
     double csw;
 	double precision;
 	int nhits;
-	int tsrc;
-	char outdir[256], bc[16], p[256],configlist[256];
+	char bc[16], p[256];
 
 	/* for the reading function */
-	input_record_t read[10];
+	input_record_t read[7];
 
 } input_scatt;
 
 #define init_input_scatt(varname) \
 { \
 	.read={\
-		{"quark quenched masses", "mes:masses = %s", STRING_T, (varname).mstring},\
+		{"Fermion mass", "mes:mass = %s", STRING_T, (varname).mstring},\
 		{"csw", "mes:csw = %lf", DOUBLE_T, &(varname).csw},\
 		{"inverter precision", "mes:precision = %lf", DOUBLE_T, &(varname).precision},\
-		{"number of inversions per cnfg", "mes:nhits = %d", INT_T, &(varname).nhits},\
-		{"Source time:", "mes:tsrc = %d", INT_T, &(varname).tsrc},\
-		{"Output directory:", "mes:outdir = %s", STRING_T, &(varname).outdir},\
-		{"Configuration list:", "mes:configlist = %s", STRING_T, &(varname).configlist},\
-		{"Boundary conditions:", "mes:bc = %s", STRING_T, &(varname).bc},\
-		{"Momenta:", "mes:p = %s", STRING_T, &(varname).p},\
+		{"number of inversions per cnfg", "I1:nhits = %d", INT_T, &(varname).nhits},\
+		{"Boundary conditions:", "I1:bc = %s", STRING_T, &(varname).bc},\
+		{"Momenta:", "I1:p = %s", STRING_T, &(varname).p},\
 		{NULL, NULL, INT_T, NULL}\
 	}\
 }
 
 
-char cnfg_filename[256]="";
-char list_filename[256]="";
-char prop_filename[256]="";
-char source_filename[256]="";
 char input_filename[256] = "input_file";
-char output_filename[256] = "meson_scattering.out";
-int Nsource;
-double M;
-
-enum { UNKNOWN_CNFG, DYNAMICAL_CNFG, QUENCHED_CNFG };
-
-
-
-
 
 input_scatt mes_var = init_input_scatt(mes_var);
 
@@ -430,12 +413,12 @@ int compare_2pt(meson_observable *mo, double complex *corr, int px, int py, int 
         double num_im = mo->corr_im[corr_ind(px,py,pz,pmax,t,1,0)];
         double ana_im = cimag(corr[t]);
         if(fabs(num_re - ana_re) > tol || fabs(num_im - ana_im)>tol){
-            lprintf("TEST",0,"Mismatch, t=%d, numeric = %e + I*(%e), analytic = %e + I*(%e)",t,num_re,num_im,ana_re,ana_im);
+            lprintf("TEST",0,"Mismatch, t=%d, numeric = %e + I*(%e), analytic = %e + I*(%e)\n",t,num_re,num_im,ana_re,ana_im);
             retval = 1;
         }
         else
         {
-            lprintf("TEST",0,"Match, t=%d, numeric = %e + I*(%e), analytic = %e + I*(%e)",t,num_re,num_im,ana_re,ana_im);
+            lprintf("TEST",0,"Match, t=%d, numeric = %e + I*(%e), analytic = %e + I*(%e)\n",t,num_re,num_im,ana_re,ana_im);
         }
         
     }
@@ -460,8 +443,11 @@ int main(int argc,char *argv[])
 
   int numsources = mes_var.nhits;
 
-  
-  m[0] = -atof(mes_var.mstring); // VD: to match the mass parsed by parse_cnfg ?
+  #if defined(WITH_CLOVER) ||  defined(WITH_EXPCLOVER)
+  set_csw(&mes_var.csw);
+  #endif
+
+  m[0] = atof(mes_var.mstring); 
   init_propagator_eo(1,m,mes_var.precision);
   
   int Nmom;
@@ -470,6 +456,7 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"Boundary conditions: %s\n",mes_var.bc);
   lprintf("MAIN",0,"The momenta are: %s\n",mes_var.p);
   lprintf("MAIN",0,"mass is : %e\n",m[0]);
+  lprintf("MAIN",0,"Number of sources: %d\n",numsources);
   lprintf("MAIN",0,"Number of momenta: %d\n",Nmom);
   lprintf("MAIN",0,"The momenta are:\n");
   for(int i=0; i<Nmom; i++){
@@ -482,7 +469,9 @@ int main(int argc,char *argv[])
  
     unit_gauge(u_gauge);
     represent_gauge_field();
-
+    #ifdef REPR_FUNDAMENTAL 
+    apply_BCs_on_represented_gauge_field(); //This is a trick: the BCs are not applied in the case the REPR is fundamental because represent_gauge field assumes that the right BCs are already applied on the fundamental field!
+    #endif
     struct mo_0 *mo_p0[numsources]; 
     struct mo_p *mo_p[Nmom][numsources];
     for(int i=0; i<numsources; i++){
@@ -505,11 +494,14 @@ int main(int argc,char *argv[])
 	    init_src_common_point(&src0,tau);
 	    make_prop_common(&prop0, &src0, 4, tau,mes_var.bc);
 	    gen_mo_0(mo_p0[src], &prop0, &src0, tau);
+        
 
         for(int i=0; i<Nmom; i++){
+            lprintf("GRRR",0,"src %d %d \n",src,i);
             init_src_p(src_pn + i, &src0, plist[i][0], plist[i][1], plist[i][2]);
             make_prop_p(p_p + i, src_pn + i, &src0, 4, tau, mes_var.bc);
             gen_mo_p(mo_p[i][src], &prop0, p_p + i, &src0, tau);
+            lprintf("test",0,"mom %d src %d %e \n",i,src,mo_p[i][src]->pi->corr_re[corr_ind(0,0,0,0,0,1,0)]);
         }
 
 	    free_src_common(&src0);
@@ -519,6 +511,10 @@ int main(int argc,char *argv[])
             free_prop_p(p_p + i);
         }
     }
+
+    // what about the average over the noise?
+
+
     lprintf("TEST",0,"Finished lattice calculation, proceeding with analytic calculation\n");
     fourvec p = {{0.0,0.0,0.0,0.0}};
 #define TOL 1e-2
@@ -526,7 +522,7 @@ int main(int argc,char *argv[])
     fourvec ptmp, mptmp;
 #define CHECK(NAME,FUN, MO, PX,PY,PZ)\
     double complex NAME[GLB_T];\
-    lprintf("TEST",0,"Comparing %s..........",#NAME);\
+    lprintf("TEST",0,"Comparing %s..........\n",#NAME);\
     ptmp = (fourvec){{PX,PY,PZ,0}};\
     for (int i=0;i<GLB_T;++i){\
         NAME[i] = FUN(ptmp,m[0],GLB_X,GLB_T,i);\
@@ -555,7 +551,7 @@ int main(int argc,char *argv[])
         CHECK(t1_g3_p, Triangle, mo_p[mom][0]->t1[2],px,py,pz)
 
         double complex r1[GLB_T];
-        lprintf("TEST",0,"Comparing r1 and r2..........");
+        lprintf("TEST",0,"Comparing r1 and r2..........\n");
         ptmp = (fourvec){{px,py,pz,0}};
         mptmp = (fourvec){{-px,-py,-pz,0}};
         for (int i=0;i<GLB_T;++i){
@@ -570,7 +566,7 @@ int main(int argc,char *argv[])
         }
 
         double complex r3[GLB_T];
-        lprintf("TEST",0,"Comparing r3 and r4..........");
+        lprintf("TEST",0,"Comparing r3 and r4..........\n");
         for (int i=0;i<GLB_T;++i){
             r3[i] = R(mptmp,p,ptmp,m[0],GLB_X,GLB_T,i);
         }

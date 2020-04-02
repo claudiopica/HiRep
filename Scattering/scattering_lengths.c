@@ -128,9 +128,8 @@ int main(int argc,char *argv[]) {
 		"Failed to open list file\n");
   	}
 
-
-	#ifdef WITH_CLOVER
- 	set_csw(mes_var.csw);
+	#if defined(WITH_CLOVER) ||  defined(WITH_EXPCLOVER)
+ 	set_csw(&mes_var.csw);
  	#endif
 	 
 	nm=0;
@@ -139,13 +138,7 @@ int main(int argc,char *argv[]) {
 	
 
 	lprintf("MAIN",0,"Inverter precision = %e\n",mes_var.precision);
-	for(k=0;k<nm;k++)
-	{
-		lprintf("MAIN",0,"Mass[%d] = %f\n",k,m[k]);
-		lprintf("CORR",0,"Mass[%d] = %f\n",k,m[k]);
-	}
-	/* if a propagator and a source are provided , then read them and perform contractions [ debug only ] */
-	
+	for(k=0;k<nm;k++)		lprintf("MAIN",0,"Mass[%d] = %f\n",k,m[k]);
 
 	i=0;
 	lprintf("CORR",0,"Number of noise vector : nhits = %i \n", mes_var.nhits);

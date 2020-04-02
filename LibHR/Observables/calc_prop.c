@@ -440,7 +440,7 @@ void calc_propagator(spinor_field *psi, spinor_field *eta, int ndilute)
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
       calc_propagator_clover(&psi[beta * n_masses + i], &eta[beta]);
 #else
-      calc_propagator_core(&psi[beta * n_masses + i], &eta[beta], _CG);
+      calc_propagator_core(&psi[beta * n_masses + i], &eta[beta], _g5QMR);
 #endif
       mass++;
     }
