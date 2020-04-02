@@ -321,14 +321,7 @@ int reverse_update_ghmc()
   if (u_scalar != NULL)
   {
     error(0 == 0, 1, "reverse_update_ghmc [update_mt.c]", "Reverse update does not work with scalar fields.");
-    //	  gaussian_scalar_momenta(scalar_momenta);
   }
-
-  /* generate new pseudofermions */
-  //  for (int i=0;i<num_mon();++i) {
-  //    const monomial *m = mon_n(i);
-  //    m->gaussian_pf(m);
-  //  }
 
   /* compute starting action */
   lprintf("HMC", 30, "Computing action density...\n");
@@ -371,71 +364,15 @@ int reverse_update_ghmc()
   global_sum(&deltaH, 1);
   lprintf("HMC", 10, "[DeltaS = %1.8e][exp(-DS) = %1.8e]\n", deltaH, exp(-deltaH));
 
-  if (deltaH < 0)
+  suNg_field_copy(u_gauge_old, u_gauge);
+  if (u_scalar != NULL)
   {
-    suNg_field_copy(u_gauge_old, u_gauge);
-    if (u_scalar != NULL)
-    {
-      suNg_scalar_field_copy(u_scalar_old, u_scalar);
-    }
-    if (four_fermion_active)
-    {
-      scalar_field_copy(ff_sigma_old, ff_sigma);
-      scalar_field_copy(ff_pi_old, ff_pi);
-    }
+    suNg_scalar_field_copy(u_scalar_old, u_scalar);
   }
-  else
+  if (four_fermion_active)
   {
-    double r;
-    if (PID == 0)
-    {
-      ranlxd(&r, 1);
-      if (r < exp(-deltaH))
-      {
-        r = 1.0;
-      }
-      else
-      {
-        r = -1.0;
-      }
-    }
-
-    bcast(&r, 1);
-
-    if (r > 0)
-    {
-      suNg_field_copy(u_gauge_old, u_gauge);
-      if (u_scalar != NULL)
-      {
-        suNg_scalar_field_copy(u_scalar_old, u_scalar);
-      }
-      if (four_fermion_active)
-      {
-        scalar_field_copy(ff_sigma_old, ff_sigma);
-        scalar_field_copy(ff_pi_old, ff_pi);
-      }
-    }
-    else
-    {
-      lprintf("HMC", 10, "Configuration rejected.\n");
-      suNg_field_copy(u_gauge, u_gauge_old);
-      if (u_scalar != NULL)
-      {
-        suNg_scalar_field_copy(u_scalar, u_scalar_old);
-      }
-      if (four_fermion_active)
-      {
-        scalar_field_copy(ff_sigma, ff_sigma_old);
-        scalar_field_copy(ff_pi, ff_pi_old);
-      }
-      start_gf_sendrecv(u_gauge); /* this may not be needed if we always guarantee that we copy also the buffers */
-      if (u_scalar != NULL)
-      {
-        start_sc_sendrecv(u_scalar); /* this may not be needed if we always guarantee that we copy also the buffers */
-      }
-      represent_gauge_field();
-      return 0;
-    }
+    scalar_field_copy(ff_sigma_old, ff_sigma);
+    scalar_field_copy(ff_pi_old, ff_pi);
   }
 
   lprintf("HMC", 10, "Configuration accepted.\n");
