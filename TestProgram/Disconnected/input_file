@@ -11,13 +11,9 @@ NP_Z = 1
 rlx_level = 1
 rlx_seed = 12345
 
-mes:csw = 1.
-mes:masses = -1.
-mes:nhits_2pt = 1024
-mes:dilution = 3
-mes:nhits_disc = 64
-
+disc:csw = 1.
+disc:mass = -1.
 disc:precision = 1e-20
-disc:nhits = 240
+disc:nhits = 20000
 disc:n_mom = 2
 

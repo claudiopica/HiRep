@@ -223,7 +223,7 @@ void measure_bilinear_loops_4spinorfield(spinor_field* prop,spinor_field* source
 
 
 
-void measure_loops(int nm, double* m, int nhits,int conf_num, double precision,int source_type,int n_mom)
+void measure_loops(int nm, double* m, int nhits,int conf_num, double precision,int source_type,int n_mom,double complex*** out_corr)
 {
 
 				int k,l;
@@ -262,7 +262,7 @@ void measure_loops(int nm, double* m, int nhits,int conf_num, double precision,i
 												complete_sf_sendrecv(prop);
 
 												lprintf("CORR",0,"Start to perform the contractions ... \n");
-												measure_bilinear_loops_spinorfield(prop,source,k,nm,n_mom);
+												measure_bilinear_loops_spinorfield(prop,source,k,nm,n_mom,out_corr);
 												lprintf("CORR",0,"Contraction done\n");
 												free_spinor_field_f(source);
 												free_spinor_field_f(prop);
@@ -441,14 +441,15 @@ void measure_loops(int nm, double* m, int nhits,int conf_num, double precision,i
 
 
 
-void measure_bilinear_loops_spinorfield(spinor_field* prop,spinor_field* source,int k,int nm, int n_mom)
+void measure_bilinear_loops_spinorfield(spinor_field* prop,spinor_field* source,int k,int nm, int n_mom, double complex*** out_corr)
 {
   int px,py,pz,ip;
   int NGamma=16;
   int n_mom_tot = n_mom*n_mom*n_mom;
   double pdotx;
   double complex phase;
-  double complex* corr[n_mom_tot][16];
+  //double complex* corr[n_mom_tot][16];
+  double complex*** corr;
   double* corr_re[n_mom_tot][16];
   double* corr_im[n_mom_tot][16];
 
@@ -457,8 +458,11 @@ void measure_bilinear_loops_spinorfield(spinor_field* prop,spinor_field* source,
 
   int size= NGamma*n_mom_tot;
   int i,j,ix,t,x,y,z,tc;
-
-
+  corr=(double complex***) malloc(sizeof(double complex**)*n_mom_tot);
+  
+  for(int i=0; i<n_mom_tot; i++) corr[i]=(double complex**) malloc(sizeof(double complex*)*NGamma);
+  for(int i=0; i<n_mom_tot; i++)  for(int j=0; j<NGamma; j++) corr[i][j]=(double complex*) malloc(sizeof(double complex)*GLB_T);
+  for(int i=0; i<n_mom; i++) for(int j=0; j<NGamma; j++) for(int t=0; t<GLB_T; t++) corr[i][j][t]=0.;
 
   int offset=0 ;
   suNf_spinor tmp_spinor;
@@ -471,7 +475,7 @@ void measure_bilinear_loops_spinorfield(spinor_field* prop,spinor_field* source,
   if (nm != 1) error(nm != 1, 1,"[measure_biliniear_loops_spinorfield]", "Multimass not implemented !");
 
  for (j=0;j<n_mom_tot;++j) for (i=0;i<NGamma;++i){
-    corr[j][i]=(double complex*) malloc(sizeof(double complex)*size);
+    //corr[j][i]=(double complex*) malloc(sizeof(double complex)*size);
     corr_re[j][i]=(double*) malloc(sizeof(double)*size);
     corr_im[j][i]=(double*) malloc(sizeof(double)*size);
   }
@@ -592,16 +596,19 @@ void measure_bilinear_loops_spinorfield(spinor_field* prop,spinor_field* source,
 				for (j=0;j<n_mom_tot;++j)  for(iGamma=0; iGamma<NGamma; iGamma++) {
 					global_sum(corr_re[j][iGamma],GLB_T*nm);
 					global_sum(corr_im[j][iGamma],GLB_T*nm);
+					global_sum((double *)(corr[j][iGamma]),2*GLB_T*nm);
 				}
 
 				if (k==0 ) lprintf("CORR",0,"loops for one noise vector, all local bilinear [t iGamma iSource Re Im] \n");
-
+				
 				for(t=0;t<GLB_T;++t) for(iGamma=0;iGamma<NGamma;iGamma++ ){
 					ip=0;
 					for (px=0;px<n_mom;++px) for (py=0;py<n_mom;++py) for (pz=0;pz<n_mom;++pz)
 					{
 						lprintf("CORR",0,"%i %i %i %i %i %i %3.10e %3.10e \n",t,iGamma,k,px,py,pz,corr_re[ip][iGamma][t],corr_im[ip][iGamma][t]);
+						out_corr[ip][iGamma][t] += creal(corr[ip][iGamma][t]) + I*cimag(corr[ip][iGamma][t]);
 						ip = ip+1;
+						
 					}
 				}
 				fflush(stdout);

@@ -1101,9 +1101,9 @@ void measure_pion_scattering_I0(double* m, int numsources, double precision,char
 	spinor_field* source_ts2= alloc_spinor_field_f(4,&glattice);
 	spinor_field*** prop_ts1;
 	spinor_field* prop_ts2= alloc_spinor_field_f(4,&glattice);
-	spinor_field* seq_0;
-	spinor_field* seq_t;
-	spinor_field* seq_source;	
+	spinor_field* seq_0=NULL;
+	spinor_field* seq_t=NULL;
+	spinor_field* seq_source=NULL;	
 	
 
 	// a lot of memory can be saved when the sequential sources are used. 

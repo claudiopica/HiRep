@@ -118,17 +118,17 @@ typedef struct _input_mesons {
 #define init_input_mesons(varname)					\
 {									\
   .read={								\
-    {"quark quenched masses", "mes:masses = %s", STRING_T, (varname).mstring}, \
+    {"Fermion mass", "disc:mass = %s", STRING_T, (varname).mstring}, \
     {"inverter precision", "disc:precision = %lf", DOUBLE_T, &(varname).precision}, \
     {"number of inversions per cnfg", "disc:nhits = %d", INT_T, &(varname).nhits}, \
     {"maximum component of momentum", "disc:n_mom = %d", INT_T, &(varname).n_mom}, \
-    {"csw coefficient", "mes:csw = %lg",DOUBLE_T, &(varname).csw},	\
+    {"csw coefficient", "disc:csw = %lg",DOUBLE_T, &(varname).csw},	\
     {NULL, NULL,INT_T, NULL}				\
   }							\
 }
 
 
-static double mass,csw;
+static double mass;
 void free_loops(double complex **loops,int n_mom);
 
 input_glb glb_ip = init_input_glb(glb_ip);
@@ -138,69 +138,7 @@ char char_t[100];
 FILE *fp;
 char path[1035];
 
-/* Ugly: read the correlator from the output files ! This is because the function that compute the props, make the contractions and write the output zeros the correlators after writting them.
-The purpose of this entire test is to check the function without modifying it */
-static double complex * read_and_average_output_disc(int ixG,int nhits,int px,int py, int pz){
-  char char_t[100];
-  char char_ixG[100];
-  char char_isrc[100];
-  char char_p[100];
-  FILE *fp;
-  char path[1035];
-  char command[500];
-  char command_re[500];
-  char command_im[500];
-  double tmp_re,tmp_im;
-  double tmp2_re,tmp2_im;
 
-
-  strcpy(char_t, "[0-9]+");
-  sprintf(char_isrc, "[0-9]+")  ;
-  sprintf(char_ixG, "%d", ixG);
-  sprintf(char_p, "%d %d %d", px,py,pz);
-
-
-
-
-  strcpy(command, "grep -E \'\\[CORR\\]\\[0\\]");
-  strcat(command,char_t);
-  strcat(command, " ");
-  strcat(command,char_ixG);
-  strcat(command, " ");
-  strcat(command,char_isrc);
-  strcat(command, " ");
-  strcat(command,char_p);
-  strcat(command, "\'");
-
-  strcpy(command_re,command);
-  strcpy(command_im,command);
-
-  strcat(command_re, " out_0 | awk  '{sum+=$7;sum2+=$7*$7}END{print sum, sum2;}' ") ;
-  strcat(command_im, " out_0 | awk  '{sum+=$8;sum2+=$8*$8}END{print sum, sum2;}' ") ;
-
-
-  fp = popen(command_re, "r");
-  while (fgets(path, sizeof(path)-1, fp) != NULL) {
-    sscanf(path, "%lf %lf",&tmp_re,&tmp2_re);
-  }
-
-  /* close */
-  pclose(fp);
-
-  fp = popen(command_im, "r");
-  while (fgets(path, sizeof(path)-1, fp) != NULL) {
-    sscanf(path, "%lf %lf",&tmp_im,&tmp2_im);
-  }
-  /* close */
-  pclose(fp);
-  double complex * out;
-  out =(double complex *)malloc(2*sizeof(double complex));
-
-  out[0]= (tmp_re + I*tmp_im)/(GLB_T*nhits) ; // mean
-  out[1] = sqrt(tmp2_re/(GLB_T*nhits) - creal(out[0])*creal(out[0]))  + I*sqrt(tmp2_im/(GLB_T*nhits) - cimag(out[0])*cimag(out[0])) ; // standard deviation
-
-  return out ;
-}
 /*Gamma / 4 */
 double complex get_gid(double complex Gamma[4][4]){
   double complex r;
@@ -226,13 +164,38 @@ double complex get_gmu(double complex Gamma[4][4],int mu){
   return r;
 }
 
+
+int compare_corr_abs(double complex  * corr_ex, double complex * corr_num, int ip, char* name[16], double tol ){
+    int retval = 0;
+    int nGamma = 16;
+    for(int n=0; n<nGamma; n++){  
+           if(cabs(corr_ex[n] - corr_num[n]) > tol) 
+            {
+                lprintf("TEST",0,"Mismatch %s, ip=%d, absolute diff: %e, numeric = %e + I*(%e), analytic = %e + I*(%e) \n",name[n],ip,cabs(corr_ex[n] - corr_num[n]),creal(corr_num[n]),cimag(corr_num[n]),creal(corr_ex[n]),cimag(corr_ex[n]));
+                retval += 1;
+            }
+            else
+            {
+                 lprintf("TEST",0,"Match %s, ip=%d, numeric = %e + I*(%e), analytic = %e + I*(%e) \n",name[n],ip,creal(corr_num[n]),cimag(corr_num[n]),creal(corr_ex[n]),cimag(corr_ex[n]));
+            }
+    }  
+    return retval;
+}
+
 int main(int argc,char *argv[])
 {
-  int i,j,sign;
-  int px,py,pz;
+  int i,sign;
   char pame[256];
   int source_type=0;
   int return_value=0;
+  int n_Gamma=16;
+  int n_mom_tot = 0;
+  double complex*** out_corr;
+  double complex **ex_loops;
+  double complex **mean_loops;
+  double abs_tol=1e-1;
+  double rel_tol_scalar_loop=1e-3;
+
 
 
   double complex g[16][4][4];
@@ -269,95 +232,81 @@ int main(int argc,char *argv[])
     g3[i] =  get_gmu(g[i],3);
   }
 
-
-  logger_map("DEBUG","debug");
-  logger_setlevel(0,200);
-
   /* setup process id and communications */
   setup_process(&argc,&argv);
 
   setup_gauge_fields();
 
   read_input(mes_ip.read,get_input_filename());
-
+ 
   strcpy(pame,mes_ip.mstring);
   mass=atof(strtok(pame, ";"));
-  csw = mes_ip.csw;
-
-  lprintf("MAIN",0,"disc:masses = %f\n",mass);
-  lprintf("MAIN",0,"mes:csw = %f\n",csw);
+  n_mom_tot = mes_ip.n_mom*mes_ip.n_mom*mes_ip.n_mom;
+  lprintf("MAIN",0,"disc:mass = %f\n",mass);
   lprintf("MAIN",0,"disc:nhits = %i\n",mes_ip.nhits);
   lprintf("MAIN",0,"Inverter precision = %e\n",mes_ip.precision);
+  lprintf("MAIN",0,"Number of momenta = %d\n",mes_ip.n_mom);
+  #if defined(WITH_CLOVER) ||  defined(WITH_EXPCLOVER)
+  set_csw(&mes_ip.csw);
+  #endif
+  
+
+  struct timeval start, end, etime;
+  gettimeofday(&start,0);
+ 
+
   unit_u(u_gauge);
-  #ifndef REPR_FUNDAMENTAL
-  u_gauge_f=alloc_gfield_f(&glattice);
-  #endif
-  #ifdef WITH_CLOVER
-  clover_init(mes_ip.csw);
-  #endif
   represent_gauge_field();
+  #ifdef REPR_FUNDAMENTAL 
+  apply_BCs_on_represented_gauge_field(); //This is a trick: the BCs are not applied in the case the REPR is fundamental because represent_gauge field assumes that the right BCs are already applied on the fundamental field!
+  #endif
+  
+  
 
   lprintf("MAIN",0,"source type is fixed to 0: volume source   \n");
-
   lprintf("MAIN",0,"Measuring D(t) =  sum_x psibar(x) Gamma psi(x)\n");
-  init_meson_correlators(0);
   lprintf("MAIN",0,"Zerocoord{%d,%d,%d,%d}\n",zerocoord[0],zerocoord[1],zerocoord[2],zerocoord[3]);
 
   error(!(GLB_X==GLB_Y && GLB_X==GLB_Z),1,"main", "This test works only for GLB_X=GLB_Y=GLB_Z");
 
   lprintf("CORR",0,"Number of noise vector : nhits = %i \n", mes_ip.nhits);
+  
+  
+  out_corr=(double complex***) malloc(sizeof(double complex**)*n_mom_tot);
+  
+  for(int i=0; i<n_mom_tot; i++)    out_corr[i]=(double complex**) malloc(sizeof(double complex*)*n_Gamma);
+  for(int i=0; i<n_mom_tot; i++) for(int j=0; j<n_Gamma; j++) out_corr[i][j]=(double complex*) calloc(GLB_T,sizeof(double complex));
+  
 
-  measure_loops(1, &mass, mes_ip.nhits,0,  mes_ip.precision,source_type,mes_ip.n_mom);
+  ex_loops = (double complex **)malloc(sizeof(double complex*)*n_mom_tot) ;
+  for(int i=0; i<n_mom_tot; i++) ex_loops[i] = (double complex *)calloc(n_Gamma,sizeof(double complex));
+  
+  mean_loops = (double complex **)malloc(sizeof(double complex*)*n_mom_tot) ;
+  for(int i=0; i<n_mom_tot; i++) mean_loops[i] = (double complex *)calloc(n_Gamma,sizeof(double complex));
+ 
+  measure_loops(1, &mass, mes_ip.nhits,0,  mes_ip.precision,source_type,mes_ip.n_mom,out_corr);
 
-  int n_mom_tot = mes_ip.n_mom*mes_ip.n_mom*mes_ip.n_mom;
-  double complex loops[16][n_mom_tot][2];
-  double complex *ex_loops[16];
-  ex_loops[0]=(double complex*)malloc(16*n_mom_tot*sizeof(double complex));
-  for(i=0; i<16; i++) {
-    ex_loops[i]=ex_loops[0]+i*n_mom_tot;
-  }
-
-
-
-  double complex * tmp_complex;
-  tmp_complex=(double complex *)malloc(2*sizeof(double complex));
-
-  for(i=0; i<16; i++) {
-    j=0;
-    for (px=0;px<mes_ip.n_mom;++px) for (py=0;py<mes_ip.n_mom;++py) for (pz=0;pz<mes_ip.n_mom;++pz) {
-
-      tmp_complex = read_and_average_output_disc(i,mes_ip.nhits,px,py,pz);
-      loops[i][j][0] = tmp_complex[0];
-      loops[i][j][1] = tmp_complex[1];
-      j++;
-    }
-  }
-
+  //stochastic & time average 
+  for(int i=0; i<n_mom_tot; i++) for(int j=0; j<n_Gamma; j++)   for(int t=0; t<GLB_T; t++) mean_loops[i][j] += out_corr[i][j][t]/(mes_ip.nhits*GLB_T);
+  
   //  /* CALCOLO ESPLICITO */
   free_loops(ex_loops,mes_ip.n_mom);
-
-  lprintf("TEST",0,"\nAnalytical result\t Stochastic estimate\tERROR \n");
-  for(i=0; i<16; i++) {
-    lprintf("TEST",0,"LOOPS %s\n", mes_channel_names[i]);
-    for(j=0; j<n_mom_tot; j++) {
-      lprintf("TEST",0,"%d %e+%e I \t%e(%e)+%e(%e) I \t%e+%e I \n",   i,   creal(ex_loops[i][j]), cimag(ex_loops[i][j]),	     creal(loops[i][j][0]), creal(loops[i][j][1]),	 cimag(loops[i][j][0]),  	 cimag(loops[i][j][1]) ,  creal(ex_loops[i][j]-loops[i][j][0]),  cimag(ex_loops[i][j]-loops[i][j][0]));
-     
-      if (creal(ex_loops[i][j]) >  creal(loops[i][j][0]) + creal(loops[i][j][1]) || creal(ex_loops[i][j])  <  creal(loops[i][j][0]) - creal(loops[i][j][1]))
-      {
-          return_value +=1;  
-      }
-      if (cimag(ex_loops[i][j]) >  cimag(loops[i][j][0]) + cimag(loops[i][j][1]) || cimag(ex_loops[i][j])  <  cimag(loops[i][j][0]) - cimag(loops[i][j][1]))
-      {
-        return_value +=1;      
-      }
-
-    }
-  }
- 
-  // The zero momentum scalar loops should agree at the 0.1 % level.
-  if (   fabs(creal(ex_loops[8][0] - loops[8][0][0])/creal(ex_loops[8][0])) > 1e-3  )  return_value +=1;
- 
+  
+  for(i=0; i<n_mom_tot; i++) return_value += compare_corr_abs(ex_loops[i],mean_loops[i],i,mes_channel_names,abs_tol);
   global_sum_int(&return_value,1);
+ 
+ 
+
+  // The zero momentum scalar loops should agree at the 0.1 % level.
+  if (   cabs(ex_loops[0][8] - mean_loops[0][8])/cabs(ex_loops[0][8]) > rel_tol_scalar_loop  )  return_value +=1;
+ 
+
+  gettimeofday(&end,0);
+  timeval_subtract(&etime,&end,&start);
+  lprintf("MAIN",0,"Configuration : analysed in [%ld sec %ld usec]\n",etime.tv_sec,etime.tv_usec);
+  
+  global_sum_int(&return_value,1);
+
   lprintf("MAIN", 0, "return_value= %d\n ",  return_value);
 
   finalize_process();
@@ -406,16 +355,16 @@ void free_loops(double complex **loops,int n_mom) {
   double k[4];
   double sigma[4] = {0.,0.,0.,0.};
 
-  #ifdef ANTIPERIODIC_BC_T
+  #ifdef BC_T_ANTIPERIODIC
   sigma[0] = .5;
   #endif
-  #ifdef ANTIPERIODIC_BC_X
+  #ifdef BC_X_ANTIPERIODIC
   sigma[1] = .5;
   #endif
-  #ifdef ANTIPERIODIC_BC_Y
+  #ifdef BC_Y_ANTIPERIODIC
   sigma[2] = .5;
   #endif
-  #ifdef ANTIPERIODIC_BC_Z
+  #ifdef BC_Z_ANTIPERIODIC
   sigma[3] = .5;
   #endif
 
@@ -449,7 +398,7 @@ void free_loops(double complex **loops,int n_mom) {
     phase = compute_phase(px,py,pz); // this is a delta (p,x)
     phase = phase/(GLB_X*GLB_Y*GLB_Z);
 
-    for(i = 0; i < 16; i++)  loops[i][ll] = phase*(gid[i]*A-I*(g0[i]*B[0] + g1[i]*B[1] + g2[i]*B[2] + g3[i]*B[3]))*norm ; // = sum_vec{x} psi(x) Gamma psibar(x)
+    for(i = 0; i < 16; i++)   loops[ll][i] = phase*(gid[i]*A-I*(g0[i]*B[0] + g1[i]*B[1] + g2[i]*B[2] + g3[i]*B[3]))*norm ; // = sum_vec{x} psi(x) Gamma psibar(x)]
     ll++;
   }
 

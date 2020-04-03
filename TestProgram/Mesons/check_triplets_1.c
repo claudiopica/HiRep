@@ -84,6 +84,7 @@ int main(int argc,char *argv[])
   double *ex_triplets[8];
   double *pta_triplets[8];
   char pame[256];
+  double tol=1.e-14;
   spinor_field **pta_qprop=0;
 
   /* setup process id and communications */
@@ -97,10 +98,15 @@ int main(int argc,char *argv[])
   mass=atof(strtok(pame, ";"));
 
   lprintf("MAIN",0,"mes:masses = %f\n",mass);
+  #if defined(WITH_CLOVER) ||  defined(WITH_EXPCLOVER)
+  set_csw(&mes_ip.csw);
+  #endif
 
   unit_u(u_gauge);
   represent_gauge_field();
-
+  #ifdef REPR_FUNDAMENTAL 
+  apply_BCs_on_represented_gauge_field(); //This is a trick: the BCs are not applied in the case the REPR is fundamental because represent_gauge field assumes that the right BCs are already applied on the fundamental field!
+  #endif
 
   ex_triplets[0]=(double*)malloc(8*GLB_T*sizeof(double));
   pta_triplets[0]=(double*)malloc(8*GLB_T*sizeof(double));
@@ -139,7 +145,7 @@ int main(int argc,char *argv[])
     for(t=0; t<GLB_T; t++)
     {
       lprintf("TEST",0,"%e\t%e\t%e\n",ex_triplets[i][t], pta_triplets[i][t], fabs(ex_triplets[i][t]-pta_triplets[i][t]));
-      if (fabs(ex_triplets[i][t]-pta_triplets[i][t]) > 1e-14) return_value +=1;
+      if (fabs(ex_triplets[i][t]-pta_triplets[i][t]) > tol) return_value +=1;
     }
   }
 
@@ -179,16 +185,16 @@ void free_correlators(double **triplets) {
   int i,j, t;
   double k[4];
   double sigma[4] = {0.,0.,0.,0.};
-#ifdef ANTIPERIODIC_BC_T
+#ifdef BC_T_ANTIPERIODIC
   sigma[0] = .5;
 #endif
-#ifdef ANTIPERIODIC_BC_X
+#ifdef BC_X_ANTIPERIODIC
   sigma[1] = .5;
 #endif
-#ifdef ANTIPERIODIC_BC_Y
+#ifdef BC_Y_ANTIPERIODIC
   sigma[2] = .5;
 #endif
-#ifdef ANTIPERIODIC_BC_Z
+#ifdef BC_Z_ANTIPERIODIC
   sigma[3] = .5;
 #endif
 
