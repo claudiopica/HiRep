@@ -7,7 +7,7 @@
 * File check_disc_1.c
 *
 * Check of the  disc loops (free case): gauge fixed wall source (type = 1) 
-* VD: OES NOT WORK.
+* VD: DOES NOT WORK.
 * Author: Vincent Drach
 *
 ******************************************************************************/
@@ -118,20 +118,19 @@ typedef struct _input_mesons {
 #define init_input_mesons(varname)					\
 {									\
   .read={								\
-    {"quark quenched masses", "mes:masses = %s", STRING_T, (varname).mstring}, \
+    {"Fermion mass", "disc:mass = %s", STRING_T, (varname).mstring}, \
     {"inverter precision", "disc:precision = %lf", DOUBLE_T, &(varname).precision}, \
     {"number of inversions per cnfg", "disc:nhits = %d", INT_T, &(varname).nhits}, \
     {"maximum component of momentum", "disc:n_mom = %d", INT_T, &(varname).n_mom}, \
-    {"csw coefficient", "mes:csw = %lg",DOUBLE_T, &(varname).csw},	\
+    {"csw coefficient", "disc:csw = %lg",DOUBLE_T, &(varname).csw},	\
     {NULL, NULL,INT_T, NULL}				\
   }							\
 }
 
 
-static double mass,csw;
+static double mass;
 void free_loops(double complex *loops);
 
-input_glb glb_ip = init_input_glb(glb_ip);
 input_mesons mes_ip = init_input_mesons(mes_ip);
 
 char char_t[100];
@@ -227,8 +226,10 @@ double complex get_gmu(double complex Gamma[4][4],int mu){
 
 int main(int argc,char *argv[])
 {
-  int i,j,sign;
+  int i,j,sign,n_mom_tot;
+  int n_Gamma=16;
   double complex ex_loops[16];
+  double complex*** out_corr ;
   char pame[256];
   int source_type=1;
   int return_value=0;
@@ -268,10 +269,6 @@ int main(int argc,char *argv[])
     g3[i] =  get_gmu(g[i],3);
   }
 
-
-  logger_map("DEBUG","debug");
-  logger_setlevel(0,200);
-
   /* setup process id and communications */
   setup_process(&argc,&argv);
 
@@ -281,32 +278,38 @@ int main(int argc,char *argv[])
 
   strcpy(pame,mes_ip.mstring);
   mass=atof(strtok(pame, ";"));
-  csw = mes_ip.csw;
+  
 
   lprintf("MAIN",0,"disc:masses = %f\n",mass);
-  lprintf("MAIN",0,"mes:csw = %f\n",csw);
   lprintf("MAIN",0,"disc:nhits = %i\n",mes_ip.nhits);
   lprintf("MAIN",0,"Inverter precision = %e\n",mes_ip.precision);
   unit_u(u_gauge);
-  #ifndef REPR_FUNDAMENTAL
-  u_gauge_f=alloc_gfield_f(&glattice);
-  #endif
-  #ifdef WITH_CLOVER
-  clover_init(mes_ip.csw);
+
+  #if defined(WITH_CLOVER) ||  defined(WITH_EXPCLOVER)
+  set_csw(&mes_ip.csw);
   #endif
   represent_gauge_field();
-
+  #ifdef REPR_FUNDAMENTAL 
+  apply_BCs_on_represented_gauge_field(); //This is a trick: the BCs are not applied in the case the REPR is fundamental because represent_gauge field assumes that the right BCs are already applied on the fundamental field!
+  #endif
+  
   lprintf("MAIN",0,"source type is fixed to 1:  Gauge fixed source  with time and spin dilution\n");
 
   lprintf("MAIN",0,"Measuring D(t) =  sum_x psibar(x) Gamma psi(x)\n");
-  init_meson_correlators(0);
+  init_discon_correlators(0);
   lprintf("MAIN",0,"Zerocoord{%d,%d,%d,%d}\n",zerocoord[0],zerocoord[1],zerocoord[2],zerocoord[3]);
 
   error(!(GLB_X==GLB_Y && GLB_X==GLB_Z),1,"main", "This test works only for GLB_X=GLB_Y=GLB_Z");
 
   lprintf("CORR",0,"Number of noise vector : nhits = %i \n", mes_ip.nhits);
-
-  measure_loops(1, &mass, mes_ip.nhits,0,  mes_ip.precision,source_type,mes_ip.n_mom);
+  
+  n_mom_tot = mes_ip.n_mom*mes_ip.n_mom*mes_ip.n_mom;
+  out_corr=(double complex***) malloc(sizeof(double complex**)*n_mom_tot);
+  
+  for(int i=0; i<n_mom_tot; i++)    out_corr[i]=(double complex**) malloc(sizeof(double complex*)*n_Gamma);
+  for(int i=0; i<n_mom_tot; i++) for(int j=0; j<n_Gamma; j++) out_corr[i][j]=(double complex*) calloc(GLB_T,sizeof(double complex));
+  
+  measure_loops(1, &mass, mes_ip.nhits,0,  mes_ip.precision,source_type,mes_ip.n_mom,out_corr);
 
   double complex loops[16];
 
@@ -363,16 +366,16 @@ void free_loops(double complex *loops) {
   int i,j;
   double k[4];
   double sigma[4] = {0.,0.,0.,0.};
-  #ifdef ANTIPERIODIC_BC_T
+  #ifdef BC_T_ANTIPERIODIC
   sigma[0] = .5;
   #endif
-  #ifdef ANTIPERIODIC_BC_X
+  #ifdef BC_X_ANTIPERIODIC
   sigma[1] = .5;
   #endif
-  #ifdef ANTIPERIODIC_BC_Y
+  #ifdef BC_Y_ANTIPERIODIC
   sigma[2] = .5;
   #endif
-  #ifdef ANTIPERIODIC_BC_Z
+  #ifdef BC_Z_ANTIPERIODIC
   sigma[3] = .5;
   #endif
 

@@ -12,8 +12,8 @@ rlx_level = 1
 rlx_seed = 12345
 
 disc:csw = 1.
-disc:mass = -1.
+disc:mass = -0.605
 disc:precision = 1e-20
-disc:nhits = 20000
+disc:nhits = 500
 disc:n_mom = 2
 

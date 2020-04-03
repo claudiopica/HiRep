@@ -131,7 +131,6 @@ typedef struct _input_mesons {
 static double mass;
 void free_loops(double complex **loops,int n_mom);
 
-input_glb glb_ip = init_input_glb(glb_ip);
 input_mesons mes_ip = init_input_mesons(mes_ip);
 
 char char_t[100];
@@ -190,12 +189,13 @@ int main(int argc,char *argv[])
   int return_value=0;
   int n_Gamma=16;
   int n_mom_tot = 0;
+  int nhits;
   double complex*** out_corr;
   double complex **ex_loops;
   double complex **mean_loops;
   double abs_tol=1e-1;
   double rel_tol_scalar_loop=1e-3;
-
+  struct timeval start, end, etime;
 
 
   double complex g[16][4][4];
@@ -241,19 +241,17 @@ int main(int argc,char *argv[])
  
   strcpy(pame,mes_ip.mstring);
   mass=atof(strtok(pame, ";"));
+  nhits  = GLB_X*GLB_Y*GLB_Z * mes_ip.nhits;
   n_mom_tot = mes_ip.n_mom*mes_ip.n_mom*mes_ip.n_mom;
   lprintf("MAIN",0,"disc:mass = %f\n",mass);
-  lprintf("MAIN",0,"disc:nhits = %i\n",mes_ip.nhits);
+  lprintf("MAIN",0,"nhits = %i (it has been multiplied by the spatial volume)\n",nhits);
   lprintf("MAIN",0,"Inverter precision = %e\n",mes_ip.precision);
   lprintf("MAIN",0,"Number of momenta = %d\n",mes_ip.n_mom);
   #if defined(WITH_CLOVER) ||  defined(WITH_EXPCLOVER)
   set_csw(&mes_ip.csw);
   #endif
   
-
-  struct timeval start, end, etime;
   gettimeofday(&start,0);
- 
 
   unit_u(u_gauge);
   represent_gauge_field();
@@ -269,7 +267,7 @@ int main(int argc,char *argv[])
 
   error(!(GLB_X==GLB_Y && GLB_X==GLB_Z),1,"main", "This test works only for GLB_X=GLB_Y=GLB_Z");
 
-  lprintf("CORR",0,"Number of noise vector : nhits = %i \n", mes_ip.nhits);
+  lprintf("CORR",0,"Number of noise vector : nhits = %i \n", nhits);
   
   
   out_corr=(double complex***) malloc(sizeof(double complex**)*n_mom_tot);
@@ -284,10 +282,10 @@ int main(int argc,char *argv[])
   mean_loops = (double complex **)malloc(sizeof(double complex*)*n_mom_tot) ;
   for(int i=0; i<n_mom_tot; i++) mean_loops[i] = (double complex *)calloc(n_Gamma,sizeof(double complex));
  
-  measure_loops(1, &mass, mes_ip.nhits,0,  mes_ip.precision,source_type,mes_ip.n_mom,out_corr);
+  measure_loops(1, &mass, nhits,0,  mes_ip.precision,source_type,mes_ip.n_mom,out_corr);
 
   //stochastic & time average 
-  for(int i=0; i<n_mom_tot; i++) for(int j=0; j<n_Gamma; j++)   for(int t=0; t<GLB_T; t++) mean_loops[i][j] += out_corr[i][j][t]/(mes_ip.nhits*GLB_T);
+  for(int i=0; i<n_mom_tot; i++) for(int j=0; j<n_Gamma; j++)   for(int t=0; t<GLB_T; t++) mean_loops[i][j] += out_corr[i][j][t]/(nhits*GLB_T);
   
   //  /* CALCOLO ESPLICITO */
   free_loops(ex_loops,mes_ip.n_mom);
@@ -295,11 +293,9 @@ int main(int argc,char *argv[])
   for(i=0; i<n_mom_tot; i++) return_value += compare_corr_abs(ex_loops[i],mean_loops[i],i,mes_channel_names,abs_tol);
   global_sum_int(&return_value,1);
  
- 
 
-  // The zero momentum scalar loops should agree at the 0.1 % level.
+  // The zero momentum scalar loops should agree to a much higher precision
   if (   cabs(ex_loops[0][8] - mean_loops[0][8])/cabs(ex_loops[0][8]) > rel_tol_scalar_loop  )  return_value +=1;
- 
 
   gettimeofday(&end,0);
   timeval_subtract(&etime,&end,&start);
