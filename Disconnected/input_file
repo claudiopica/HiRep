@@ -2,7 +2,7 @@ GLB_T = 8
 GLB_X = 4
 GLB_Y = 4
 GLB_Z = 4
-NP_T = 1
+NP_T = 2
 NP_X = 1
 NP_Y = 1
 NP_Z = 1
@@ -10,15 +10,14 @@ NP_Z = 1
 
 N_REP = 1
 
-rlx_start=1
-rlx_state=1
-//level = 1  seed = 1
-level = 1  seed = 12345
+rlx_level = 1
+rlx_seed = 1
+rlx_start = new
+rlx_state = rand_state
 
-disc:masses = -0.6
+disc:mass = -0.6
 disc:precision = 1e-20
 disc:nhits =2
-disc:source_type =4
-
-masses = 2.0
-
+disc:source_type =0
+disc:configlist = list_conf.txt 
+disc:n_mom = 1

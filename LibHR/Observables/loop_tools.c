@@ -33,6 +33,8 @@
 #include "gamma_spinor.h"
 #include "spin_matrix.h"
 #include "gaugefix.h"
+#include "spectrum.h"
+
 #define PI 3.141592653589793238462643383279502884197
 
 
@@ -298,6 +300,7 @@ void measure_loops(int nm, double* m, int nhits,int conf_num, double precision,i
 																				create_gauge_fixed_wall_source(source, tau, l);
 																				calc_propagator(prop,source,4);//4 for spin dilution
 																				create_point_source(source,tau,l); //to get the contraction right
+																				measure_mesons(discon_correlators,prop,source,nm,0);
 																				//measure_discon(prop,source,nm,tau);
 
 																}}
@@ -307,10 +310,10 @@ void measure_loops(int nm, double* m, int nhits,int conf_num, double precision,i
 												suNg_field_copy(u_gauge,u_gauge_old);
 												represent_gauge_field();
 
-												//	free_propagator_eo();
+												free_propagator_eo();
 												free_spinor_field_f(source);
 												free_spinor_field_f(prop);
-												//	free_gfield(u_gauge_old);
+												free_gfield(u_gauge_old);
 
 												//	measure_spectrum_discon_gfwall(nm,m,conf_num,precision);
 								}  /* gfwall */
