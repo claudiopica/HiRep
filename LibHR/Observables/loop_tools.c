@@ -609,7 +609,7 @@ void measure_bilinear_loops_spinorfield(spinor_field* prop,spinor_field* source,
 					for (px=0;px<n_mom;++px) for (py=0;py<n_mom;++py) for (pz=0;pz<n_mom;++pz)
 					{
 						lprintf("CORR",0,"%i %i %i %i %i %i %3.10e %3.10e \n",t,iGamma,k,px,py,pz,corr_re[ip][iGamma][t],corr_im[ip][iGamma][t]);
-						out_corr[ip][iGamma][t] += creal(corr[ip][iGamma][t]) + I*cimag(corr[ip][iGamma][t]);
+						if (out_corr != NULL) out_corr[ip][iGamma][t] += creal(corr[ip][iGamma][t]) + I*cimag(corr[ip][iGamma][t]);
 						ip = ip+1;
 						
 					}

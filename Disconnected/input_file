@@ -1,7 +1,7 @@
-GLB_T = 8
-GLB_X = 4
-GLB_Y = 4
-GLB_Z = 4
+GLB_T = 16
+GLB_X = 8
+GLB_Y = 8
+GLB_Z = 8
 NP_T = 2
 NP_X = 1
 NP_Y = 1
