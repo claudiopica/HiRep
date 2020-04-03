@@ -1,8 +1,8 @@
-GLB_T = 8
+GLB_T = 16
 GLB_X = 8
 GLB_Y = 8
 GLB_Z = 8
-NP_T = 1
+NP_T = 2
 NP_X = 1
 NP_Y = 1
 NP_Z = 1
@@ -19,7 +19,7 @@ rlx_state = rand_state
 mes:precision = 1.e-14
 mes:nhits = 5
 mes:nhits_disc = 0
-mes:masses = 0
+mes:mass = -0.60
 mes:use_input_mass = 0;
 mes:meas_mixed = 3
 mes:nhits_2pt = 1
@@ -38,7 +38,7 @@ mes:discon_gfwall = 0
 mes:discon_volume = 0
 mes:dilution = 1
 mes:dirichlet_dt = 2
-
+mes:configlist = list_conf.txt 
 //Whether to include the four fermion interaction
 ff:on = false
 //Parameters for hopping parameter expansion, 0 in degree_hopping to disable
