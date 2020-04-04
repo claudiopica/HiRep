@@ -10,9 +10,10 @@ NP_Z = 1
 
 rlx_level = 1
 rlx_seed = 12345
+log:default = 100
 
 mes:csw = 1.
-mes:masses = -1.
+mes:masses = -1.0
 mes:nhits_2pt = 1024
 mes:dilution = 3
 mes:nhits_disc = 64
