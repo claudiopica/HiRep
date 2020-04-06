@@ -256,7 +256,7 @@ int main(int argc,char *argv[])
   mass=atof(strtok(pame, ";"));
  
   lprintf("MAIN",0,"disc:mass = %f\n",mass);
-  lprintf("MAIN",0,"disc:nhits = %i\n",mes_ip.nhits);
+  lprintf("MAIN",0,"disc:nhits4 = %i\n",mes_ip.nhits);
   lprintf("MAIN",0,"Inverter precision = %e\n",mes_ip.precision);
   lprintf("MAIN",0,"Number of momenta = %d\n",mes_ip.n_mom);
   #if defined(WITH_CLOVER) ||  defined(WITH_EXPCLOVER)

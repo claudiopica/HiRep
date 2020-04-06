@@ -19,6 +19,7 @@
 #include "random.h"
 #include "communications.h"
 #include "setup.h"
+#include "clover_tools.h"
 
 //#error "Old version of Mesons, it should be updated"
 

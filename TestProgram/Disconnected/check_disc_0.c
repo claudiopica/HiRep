@@ -120,7 +120,7 @@ typedef struct _input_mesons {
   .read={								\
     {"Fermion mass", "disc:mass = %s", STRING_T, (varname).mstring}, \
     {"inverter precision", "disc:precision = %lf", DOUBLE_T, &(varname).precision}, \
-    {"number of inversions per cnfg", "disc:nhits = %d", INT_T, &(varname).nhits}, \
+    {"number of inversions per cnfg", "disc:nhits0 = %d", INT_T, &(varname).nhits}, \
     {"maximum component of momentum", "disc:n_mom = %d", INT_T, &(varname).n_mom}, \
     {"csw coefficient", "disc:csw = %lg",DOUBLE_T, &(varname).csw},	\
     {NULL, NULL,INT_T, NULL}				\
@@ -241,10 +241,10 @@ int main(int argc,char *argv[])
  
   strcpy(pame,mes_ip.mstring);
   mass=atof(strtok(pame, ";"));
-  nhits  = GLB_X*GLB_Y*GLB_Z * mes_ip.nhits;
+  nhits  = mes_ip.nhits;
   n_mom_tot = mes_ip.n_mom*mes_ip.n_mom*mes_ip.n_mom;
   lprintf("MAIN",0,"disc:mass = %f\n",mass);
-  lprintf("MAIN",0,"nhits = %i (it has been multiplied by the spatial volume)\n",nhits);
+  lprintf("MAIN",0,"nhits = %i\n",nhits);
   lprintf("MAIN",0,"Inverter precision = %e\n",mes_ip.precision);
   lprintf("MAIN",0,"Number of momenta = %d\n",mes_ip.n_mom);
   #if defined(WITH_CLOVER) ||  defined(WITH_EXPCLOVER)

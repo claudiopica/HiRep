@@ -476,7 +476,7 @@ int main(int argc,char *argv[])
   int return_value=0;
   double m[256];
   int ncorr=16;
-  double tol=1.e-1;
+  double tol=1.5e-1;
   double tol_disc=1.e-10;
   meson_observable **mo_arr;
   fourvec zero_p = (fourvec){{0,0,0,0}};
