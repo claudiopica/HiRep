@@ -129,7 +129,7 @@ typedef struct _input_mesons
 #define init_input_mesons(varname)                                                                        \
   {                                                                                                       \
     .read = {                                                                                             \
-      {"quark quenched masses", "mes:masses = %s", STRING_T, (varname).mstring},                          \
+      {"fermion mass", "mes:mass = %s", STRING_T, (varname).mstring},                          \
       {"csw coefficient", "mes:csw = %lg", DOUBLE_T, &(varname).csw},                                     \
       {"number of noisy sources per cnfg for 2pt fn", "mes:nhits_2pt = %d", INT_T, &(varname).nhits_2pt}, \
       {NULL, NULL, INT_T, NULL}                                                                           \
@@ -246,10 +246,10 @@ double complex get_g0(double complex Gamma[4][4])
 int main(int argc, char *argv[])
 {
   int i, t, sign;
-  double *ex_triplets[16];
+  double **ex_triplets;
   char pame[256];
   int return_value = 0;
-  double tol=1.e-9;
+  double tol=1.e-7;
 
   double complex g[16][4][4];
   g5_debug(g[0], &sign);
@@ -295,14 +295,17 @@ int main(int argc, char *argv[])
   
   lprintf("MAIN", 0, "mes:masses = %f\n", mass);
   
-  unit_u(u_gauge);
-  represent_gauge_field();
-
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
   set_csw(&mes_ip.csw);
 #endif
-  
 
+  unit_u(u_gauge);
+  represent_gauge_field();
+  #ifdef REPR_FUNDAMENTAL 
+  apply_BCs_on_represented_gauge_field(); //This is a trick: the BCs are not applied in the case the REPR is fundamental because represent_gauge field assumes that the right BCs are already applied on the fundamental field!
+  #endif
+  ex_triplets = (double **) malloc(sizeof(double*)*16);
+  for (i=0;i<16;i++) ex_triplets[i] = (double *) calloc(GLB_T,sizeof(double*));
   lprintf("MAIN", 0, "Measuring Gamma Gamma correlators and PCAC-mass\n");
   init_meson_correlators(0);
   lprintf("MAIN", 0, "Zerocoord{%d,%d,%d,%d}\n", zerocoord[0], zerocoord[1], zerocoord[2], zerocoord[3]);
@@ -322,12 +325,6 @@ int main(int argc, char *argv[])
     {
       corr_triplets[i][t] = read_output(t, i, 0) + I * read_output(t, i, 1);
     }
-  }
-
-  ex_triplets[0] = (double *)malloc(16 * GLB_T * sizeof(double));
-  for (i = 0; i < 16; i++)
-  {
-    ex_triplets[i] = ex_triplets[0] + i * GLB_T;
   }
 
   //  /* CALCOLO ESPLICITO */
@@ -354,7 +351,9 @@ int main(int argc, char *argv[])
   free_meson_observables();
   global_sum_int(&return_value, 1);
   lprintf("MAIN", 0, "return_value= %d\n ", return_value);
-
+  for (i=0;i<16;i++)     free(ex_triplets[i]);
+  free(ex_triplets);
+  
   finalize_process();
   return return_value;
 }
@@ -380,16 +379,16 @@ void free_correlators(double **triplets)
   int i, j, t;
   double k[4];
   double sigma[4] = {0., 0., 0., 0.};
-#ifdef ANTIPERIODIC_BC_T
+#ifdef BC_T_ANTIPERIODIC
   sigma[0] = .5;
 #endif
-#ifdef ANTIPERIODIC_BC_X
+#ifdef BC_X_ANTIPERIODIC
   sigma[1] = .5;
 #endif
-#ifdef ANTIPERIODIC_BC_Y
+#ifdef BC_Y_ANTIPERIODIC
   sigma[2] = .5;
 #endif
-#ifdef ANTIPERIODIC_BC_Z
+#ifdef BC_Z_ANTIPERIODIC
   sigma[3] = .5;
 #endif
 

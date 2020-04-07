@@ -14,6 +14,12 @@ rlx_seed = 12345
 disc:csw = 1.
 disc:mass = -0.605
 disc:precision = 1e-20
-disc:nhits = 2000
+disc:nhits0 = 10000
+disc:nhits1 = 200
+disc:nhits2 = 200
+disc:nhits3 = 800
+disc:nhits4 = 200
+disc:nhits5 = 500
+
 disc:n_mom = 2
 

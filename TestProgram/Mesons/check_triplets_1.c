@@ -54,16 +54,17 @@ static char nameT[8][256] = {"a", "pi", "rho", "b", "pi2", "rho2", "forbidden tr
 /* Mesons parameters */
 typedef struct _input_mesons {
   char mstring[256];
-
+  double csw;
   /* for the reading function */
-  input_record_t read[2];
+  input_record_t read[3];
 
 } input_mesons;
 
 #define init_input_mesons(varname)					\
   {									\
     .read={								\
-      {"quark quenched masses", "mes:masses = %s", STRING_T, (varname).mstring}, \
+      {"fermion mass", "mes:mass = %s", STRING_T, (varname).mstring}, \
+      {"csw", "mes:csw = %lf", DOUBLE_T, &(varname).csw},\
       {NULL, NULL, INT_T, NULL}						\
     }									\
   }
@@ -82,11 +83,11 @@ int main(int argc,char *argv[])
   int i, t;
   int return_value=0;
   int g[4];
-  double *ex_triplets[8];
-  double *pta_triplets[8];
+  double **ex_triplets;
+  double **pta_triplets;
   char pame[256];
-  double tol=1.e-14;
-  spinor_field **pta_qprop=0;
+  double tol=1.e-10;
+  spinor_field **pta_qprop=NULL;
 
   /* setup process id and communications */
   setup_process(&argc,&argv);
@@ -109,12 +110,11 @@ int main(int argc,char *argv[])
   apply_BCs_on_represented_gauge_field(); //This is a trick: the BCs are not applied in the case the REPR is fundamental because represent_gauge field assumes that the right BCs are already applied on the fundamental field!
   #endif
 
-  ex_triplets[0]=(double*)malloc(8*GLB_T*sizeof(double));
-  pta_triplets[0]=(double*)malloc(8*GLB_T*sizeof(double));
-  for(i=0; i<8; i++) {
-    ex_triplets[i]=ex_triplets[0]+i*GLB_T;
-    pta_triplets[i]=pta_triplets[0]+i*GLB_T;
-  }
+  ex_triplets = (double **) malloc(sizeof(double*)*8);  
+  for (i=0;i<8;i++) ex_triplets[i] = (double *) calloc(GLB_T,sizeof(double*));
+  pta_triplets = (double **) malloc(sizeof(double*)*8);
+  for (i=0;i<8;i++) pta_triplets[i] = (double *) calloc(GLB_T,sizeof(double*));
+
   pta_qprop=(spinor_field**)malloc(sizeof(spinor_field*));
   pta_qprop[0]=alloc_spinor_field_f(4*NF,&glattice);
 
@@ -139,8 +139,7 @@ int main(int argc,char *argv[])
 
 
   /* STAMPA */
-
-  lprintf("TEST",0,"\nANALITICO\tPOINT-TO-ALL\tERROR (must be less than 1e-14)\n");
+  lprintf("TEST",0,"\nANALITICO\tPOINT-TO-ALL\tERROR (must be less than %e)\n",tol);
   for(i=0; i<8; i++) {
     lprintf("TEST",0,"TRIPLET CORRELATOR %s\n", nameT[i]);
     for(t=0; t<GLB_T; t++)
@@ -153,9 +152,16 @@ int main(int argc,char *argv[])
   global_sum_int(&return_value,1);
   lprintf("MAIN", 0, "return_value= %d\n ",  return_value);
 
+  for (i=0;i<8;i++) 
+  {
+    free(pta_triplets[i]);
+    free(ex_triplets[i]);
+  }
+  free(pta_triplets);
+  free(ex_triplets);
+  free(pta_qprop);
+  
   finalize_process();
-
-
   return return_value;
 }
 
@@ -186,7 +192,7 @@ void free_correlators(double **triplets) {
   int i,j, t;
   double k[4];
   double sigma[4] = {0.,0.,0.,0.};
-#ifdef BC_T_ANTIPERIODIC
+#ifdef BC_T_ANTIPERIODIC 
   sigma[0] = .5;
 #endif
 #ifdef BC_X_ANTIPERIODIC

@@ -162,6 +162,7 @@ int main(int argc,char *argv[])
 	double complex test[4][4];
 	double complex rmat[4][4];
 	double complex trace, ctest;
+  double tol=1.e-15;
 	int sign;
   int return_value=0;
 	double norm2;
@@ -186,7 +187,7 @@ int main(int argc,char *argv[])
   g5_trace_H(&trace,rmat[0]);
   trace_mat(ctest,rmat);
   ctest -= trace;
-  if(cabs(ctest) > 1e-15) {
+  if(cabs(ctest) > tol) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Trace mismatch! trace=(%f,%f) ctest=(%e,%e)\n",creal(trace),cimag(trace),creal(ctest),cimag(ctest));
   }
@@ -203,7 +204,7 @@ int main(int argc,char *argv[])
   mult_mat(test,gamma[0]);
   trace_mat(ctest,test);
   ctest -= trace;
-  if(cabs(ctest) > 1e-15) {
+  if(cabs(ctest) > tol) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Trace mismatch! trace=(%f,%f) ctest=(%e,%e)\n",creal(trace),cimag(trace),creal(ctest),cimag(ctest));
   }
@@ -220,7 +221,7 @@ int main(int argc,char *argv[])
   mult_mat(test,gamma[1]);
   trace_mat(ctest,test);
   ctest -= trace;
-  if(cabs(ctest) > 1e-15) {
+  if(cabs(ctest) > tol) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Trace mismatch! trace=(%f,%f) ctest=(%e,%e)\n",creal(trace),cimag(trace),creal(ctest),cimag(ctest));
   }
@@ -237,7 +238,7 @@ int main(int argc,char *argv[])
   mult_mat(test,gamma[2]);
   trace_mat(ctest,test);
   ctest -= trace;
-  if(cabs(ctest) > 1e-15) {
+  if(cabs(ctest) > tol) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Trace mismatch! trace=(%f,%f) ctest=(%e,%e)\n",creal(trace),cimag(trace),creal(ctest),cimag(ctest));
   }
@@ -255,7 +256,7 @@ int main(int argc,char *argv[])
   mult_mat(test,gamma[3]);
   trace_mat(ctest,test);
   ctest -= trace;
-  if(cabs(ctest) > 1e-15) {
+  if(cabs(ctest) > tol) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Trace mismatch! trace=(%f,%f) ctest=(%e,%e)\n",creal(trace),cimag(trace),creal(ctest),cimag(ctest));
   }
@@ -264,7 +265,7 @@ int main(int argc,char *argv[])
   set_unit_mat(test);
   sub_mat(test,Gamma);
   sqnorm_mat(norm2,test);
-  if(norm2 > 1e-15 || sign != 1) {
+  if(norm2 > tol || sign != 1) {
     return_value+=1;
     print_mat2(Gamma, "id");
     lprintf("MAIN",0,"sign = %d\n",sign);
@@ -275,7 +276,7 @@ int main(int argc,char *argv[])
   mult_mat(test,Gamma);
   trace_mat(ctest,test);
   ctest -= trace;
-  if(cabs(ctest) > 1e-15) {
+  if(cabs(ctest) > tol) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Trace mismatch for id! trace=(%f,%f) ctest=(%e,%e)\n",creal(trace),cimag(trace),creal(ctest),cimag(ctest));
   }
@@ -285,7 +286,7 @@ int main(int argc,char *argv[])
   mult_mat(test,gamma[1]);
   sub_mat(test,Gamma);
   sqnorm_mat(norm2,test);
-  if(norm2 > 1e-15 || sign != 1) {
+  if(norm2 > tol || sign != 1) {
     return_value+=1;
     print_mat2(Gamma, "g0g1");
     lprintf("MAIN",0,"sign = %d\n",sign);
@@ -296,7 +297,7 @@ int main(int argc,char *argv[])
   mult_mat(test,Gamma);
   trace_mat(ctest,test);
   ctest -= trace;
-  if(cabs(ctest) > 1e-15) {
+  if(cabs(ctest) > tol) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Trace mismatch for g0g1! trace=(%f,%f) ctest=(%e,%e)\n",creal(trace),cimag(trace),creal(ctest),cimag(ctest));
   }
@@ -306,7 +307,7 @@ int main(int argc,char *argv[])
   mult_mat(test,gamma[2]);
   sub_mat(test,Gamma);
   sqnorm_mat(norm2,test);
-  if(norm2 > 1e-15 || sign != 1) {
+  if(norm2 > tol || sign != 1) {
     print_mat2(Gamma, "g0g2");
     lprintf("MAIN",0,"sign = %d\n",sign);
     return_value+=1;
@@ -317,7 +318,7 @@ int main(int argc,char *argv[])
   mult_mat(test,Gamma);
   trace_mat(ctest,test);
   ctest -= trace;
-  if(cabs(ctest) > 1e-15) {
+  if(cabs(ctest) > tol) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Trace mismatch for g0g2! trace=(%f,%f) ctest=(%e,%e)\n",creal(trace),cimag(trace),creal(ctest),cimag(ctest));
   }
@@ -327,7 +328,7 @@ int main(int argc,char *argv[])
   mult_mat(test,gamma[3]);
   sub_mat(test,Gamma);
   sqnorm_mat(norm2,test);
-  if(norm2 > 1e-15 || sign != 1) {
+  if(norm2 > tol || sign != 1) {
     print_mat2(Gamma, "g0g3");
     lprintf("MAIN",0,"sign = %d\n",sign);
     return_value+=1;
@@ -338,7 +339,7 @@ int main(int argc,char *argv[])
   mult_mat(test,Gamma);
   trace_mat(ctest,test);
   ctest -= trace;
-  if(cabs(ctest) > 1e-15) {
+  if(cabs(ctest) > tol) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Trace mismatch for g0g3! trace=(%f,%f) ctest=(%e,%e)\n",creal(trace),cimag(trace),creal(ctest),cimag(ctest));
   }
@@ -348,7 +349,7 @@ int main(int argc,char *argv[])
   mult_mat(test,gamma[4]);
   sub_mat(test,Gamma);
   sqnorm_mat(norm2,test);
-  if(norm2 > 1e-15 || sign != 1) {
+  if(norm2 > tol || sign != 1) {
     return_value+=1;
     print_mat2(Gamma, "g0g5");
     lprintf("MAIN",0,"sign = %d\n",sign);
@@ -359,7 +360,7 @@ int main(int argc,char *argv[])
   mult_mat(test,Gamma);
   trace_mat(ctest,test);
   ctest -= trace;
-  if(cabs(ctest) > 1e-15) {
+  if(cabs(ctest) > tol) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Trace mismatch for g0g5! trace=(%f,%f) ctest=(%e,%e)\n",creal(trace),cimag(trace),creal(ctest),cimag(ctest));
   }
@@ -369,7 +370,7 @@ int main(int argc,char *argv[])
   mult_mat(test,gamma[1]);
   sub_mat(test,Gamma);
   sqnorm_mat(norm2,test);
-  if(norm2 > 1e-15 || sign != -1) {
+  if(norm2 > tol || sign != -1) {
     return_value+=1;
     print_mat2(Gamma, "g5g1");
     lprintf("MAIN",0,"sign = %d\n",sign);
@@ -380,7 +381,7 @@ int main(int argc,char *argv[])
   mult_mat(test,Gamma);
   trace_mat(ctest,test);
   ctest -= trace;
-  if(cabs(ctest) > 1e-15) {
+  if(cabs(ctest) > tol) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Trace mismatch for g5g1! trace=(%f,%f) ctest=(%e,%e)\n",creal(trace),cimag(trace),creal(ctest),cimag(ctest));
   }
@@ -390,7 +391,7 @@ int main(int argc,char *argv[])
   mult_mat(test,gamma[2]);
   sub_mat(test,Gamma);
   sqnorm_mat(norm2,test);
-  if(norm2 > 1e-15 || sign != -1) {
+  if(norm2 > tol || sign != -1) {
     return_value+=1;
     print_mat2(Gamma, "g5g2");
     lprintf("MAIN",0,"sign = %d\n",sign);
@@ -401,7 +402,7 @@ int main(int argc,char *argv[])
   mult_mat(test,Gamma);
   trace_mat(ctest,test);
   ctest -= trace;
-  if(cabs(ctest) > 1e-15) {
+  if(cabs(ctest) > tol) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Trace mismatch for g5g2! trace=(%f,%f) ctest=(%e,%e)\n",creal(trace),cimag(trace),creal(ctest),cimag(ctest));
   }
@@ -411,7 +412,7 @@ int main(int argc,char *argv[])
   mult_mat(test,gamma[3]);
   sub_mat(test,Gamma);
   sqnorm_mat(norm2,test);
-  if(norm2 > 1e-15 || sign != -1) {
+  if(norm2 > tol || sign != -1) {
     return_value+=1;
     print_mat2(Gamma, "g5g3");
     lprintf("MAIN",0,"sign = %d\n",sign);
@@ -422,7 +423,7 @@ int main(int argc,char *argv[])
   mult_mat(test,Gamma);
   trace_mat(ctest,test);
   ctest -= trace;
-  if(cabs(ctest) > 1e-15) {
+  if(cabs(ctest) > tol) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Trace mismatch for g5g3! trace=(%f,%f) ctest=(%e,%e)\n",creal(trace),cimag(trace),creal(ctest),cimag(ctest));
   }
@@ -433,7 +434,7 @@ int main(int argc,char *argv[])
   mult_mat(test,gamma[1]);
   sub_mat(test,Gamma);
   sqnorm_mat(norm2,test);
-  if(norm2 > 1e-15 || sign != -1) {
+  if(norm2 > tol || sign != -1) {
     return_value+=1;
     print_mat2(Gamma, "g0g5g1");
     lprintf("MAIN",0,"sign = %d\n",sign);
@@ -444,7 +445,7 @@ int main(int argc,char *argv[])
   mult_mat(test,Gamma);
   trace_mat(ctest,test);
   ctest -= trace;
-  if(cabs(ctest) > 1e-15) {
+  if(cabs(ctest) > tol) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Trace mismatch for g0g5g1! trace=(%f,%f) ctest=(%e,%e)\n",creal(trace),cimag(trace),creal(ctest),cimag(ctest));
   }
@@ -456,7 +457,7 @@ int main(int argc,char *argv[])
   mult_mat(test,gamma[2]);
   sub_mat(test,Gamma);
   sqnorm_mat(norm2,test);
-  if(norm2 > 1e-15 || sign != -1) {
+  if(norm2 > tol || sign != -1) {
     return_value+=1;
     print_mat2(Gamma, "g0g5g2");
     lprintf("MAIN",0,"sign = %d\n",sign);
@@ -467,7 +468,7 @@ int main(int argc,char *argv[])
   mult_mat(test,Gamma);
   trace_mat(ctest,test);
   ctest -= trace;
-  if(cabs(ctest) > 1e-15) {
+  if(cabs(ctest) > tol) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Trace mismatch for g0g5g2! trace=(%f,%f) ctest=(%e,%e)\n",creal(trace),cimag(trace),creal(ctest),cimag(ctest));
   }
@@ -478,7 +479,7 @@ int main(int argc,char *argv[])
   mult_mat(test,gamma[3]);
   sub_mat(test,Gamma);
   sqnorm_mat(norm2,test);
-  if(norm2 > 1e-15 || sign != -1) {
+  if(norm2 > tol || sign != -1) {
     return_value+=1;
     print_mat2(Gamma, "g0g5g3");
     lprintf("MAIN",0,"sign = %d\n",sign);
@@ -489,7 +490,7 @@ int main(int argc,char *argv[])
   mult_mat(test,Gamma);
   trace_mat(ctest,test);
   ctest -= trace;
-  if(cabs(ctest) > 1e-15) {
+  if(cabs(ctest) > tol) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Trace mismatch for g0g5g3! trace=(%f,%f) ctest=(%e,%e)\n",creal(trace),cimag(trace),creal(ctest),cimag(ctest));
   }
@@ -508,7 +509,7 @@ int main(int argc,char *argv[])
   mult_mat_spinor(stest,Gamma,in);
   _spinor_sub_assign_f(stest,out);
   _spinor_prod_re_f(norm2,stest,stest);
-  if(norm2 > 1e-15) {
+  if(norm2 > tol) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Mismatch for id! norm2=%e\n",norm2);
   }
@@ -522,7 +523,7 @@ int main(int argc,char *argv[])
   mult_mat_spinor(stest,Gamma,in);
   _spinor_sub_assign_f(stest,out);
   _spinor_prod_re_f(norm2,stest,stest);
-  if(norm2 > 1e-15) {
+  if(norm2 > tol) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Mismatch for g0! norm2=%e\n",norm2);
   }
@@ -537,7 +538,7 @@ int main(int argc,char *argv[])
   // Vincent : original is _spinor_sub_assign_f(stest,out); But test fails.
   _spinor_add_assign_f(stest,out);
   _spinor_prod_re_f(norm2,stest,stest);
-  if(norm2 > 1e-15) {
+  if(norm2 > tol) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Mismatch for g1! norm2=%e\n",norm2);
   }
@@ -551,7 +552,7 @@ int main(int argc,char *argv[])
   mult_mat_spinor(stest,Gamma,in);
   _spinor_sub_assign_f(stest,out);
   _spinor_prod_re_f(norm2,stest,stest);
-  if(norm2 > 1e-15) {
+  if(norm2 > tol) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Mismatch for g2! norm2=%e\n",norm2);
   }
@@ -566,7 +567,7 @@ int main(int argc,char *argv[])
     // Vincent : original is _spinor_sub_assign_f(stest,out); But test fails.
   _spinor_add_assign_f(stest,out);
   _spinor_prod_re_f(norm2,stest,stest);
-  if(norm2 > 1e-15) {
+  if(norm2 > tol) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Mismatch for g3! norm2=%e\n",norm2);
   }
@@ -580,7 +581,7 @@ int main(int argc,char *argv[])
   mult_mat_spinor(stest,Gamma,in);
   _spinor_sub_assign_f(stest,out);
   _spinor_prod_re_f(norm2,stest,stest);
-  if(norm2 > 1e-15) {
+  if(norm2 > tol) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Mismatch for g5! norm2=%e\n",norm2);
   }
@@ -596,7 +597,7 @@ int main(int argc,char *argv[])
     // Vincent : original is _spinor_sub_assign_f(stest,out); But test fails.
   _spinor_add_assign_f(stest,out);
   _spinor_prod_re_f(norm2,stest,stest);
-  if(norm2 > 1e-15) {
+  if(norm2 > tol) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Mismatch for g0g1! norm2=%e\n",norm2);
   }
@@ -611,7 +612,7 @@ int main(int argc,char *argv[])
   mult_mat_spinor(stest,Gamma,in);
   _spinor_sub_assign_f(stest,out);
   _spinor_prod_re_f(norm2,stest,stest);
-  if(norm2 > 1e-15) {
+  if(norm2 > tol) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Mismatch for g0g2! norm2=%e\n",norm2);
   }
@@ -627,7 +628,7 @@ int main(int argc,char *argv[])
     // Vincent : original is _spinor_sub_assign_f(stest,out); But test fails.
   _spinor_add_assign_f(stest,out);
   _spinor_prod_re_f(norm2,stest,stest);
-  if(norm2 > 1e-15) {
+  if(norm2 > tol) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Mismatch for g0g3! norm2=%e\n",norm2);
   }
@@ -643,7 +644,7 @@ int main(int argc,char *argv[])
   mult_mat_spinor(stest,Gamma,in);
   _spinor_sub_assign_f(stest,out);
   _spinor_prod_re_f(norm2,stest,stest);
-  if(norm2 > 1e-15) {
+  if(norm2 > tol) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Mismatch for g0g5! norm2=%e\n",norm2);
   }
@@ -659,7 +660,7 @@ int main(int argc,char *argv[])
     // Vincent : original is _spinor_sub_assign_f(stest,out); But test fails.
   _spinor_add_assign_f(stest,out);
   _spinor_prod_re_f(norm2,stest,stest);
-  if(norm2 > 1e-15) {
+  if(norm2 > tol) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Mismatch for g5g1! norm2=%e\n",norm2);
   }
@@ -674,7 +675,7 @@ int main(int argc,char *argv[])
   mult_mat_spinor(stest,Gamma,in);
   _spinor_sub_assign_f(stest,out);
   _spinor_prod_re_f(norm2,stest,stest);
-  if(norm2 > 1e-15) {
+  if(norm2 > tol) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Mismatch for g5g2! norm2=%e\n",norm2);
   }
@@ -690,7 +691,7 @@ int main(int argc,char *argv[])
     // Vincent : original is _spinor_sub_assign_f(stest,out); But test fails.
   _spinor_add_assign_f(stest,out);
   _spinor_prod_re_f(norm2,stest,stest);
-  if(norm2 > 1e-15) {
+  if(norm2 > tol) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Mismatch for g5g3! norm2=%e\n",norm2);
   }
@@ -707,7 +708,7 @@ int main(int argc,char *argv[])
     // Vincent : original is _spinor_sub_assign_f(stest,out); But test fails.
   _spinor_add_assign_f(stest,out);
   _spinor_prod_re_f(norm2,stest,stest);
-  if(norm2 > 1e-15) {
+  if(norm2 > tol) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Mismatch for g0g5g1! norm2=%e\n",norm2);
   }
@@ -723,7 +724,7 @@ int main(int argc,char *argv[])
   mult_mat_spinor(stest,Gamma,in);
   _spinor_sub_assign_f(stest,out);
   _spinor_prod_re_f(norm2,stest,stest);
-  if(norm2 > 1e-15) {
+  if(norm2 > tol) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Mismatch for g0g5g2! norm2=%e\n",norm2);
   }
@@ -740,7 +741,7 @@ int main(int argc,char *argv[])
   // Vincent : original is _spinor_sub_assign_f(stest,out); But test fails.
   _spinor_add_assign_f(stest,out);
   _spinor_prod_re_f(norm2,stest,stest);
-  if(norm2 > 1e-15) {
+  if(norm2 > tol) {
     return_value+=1;
     lprintf("MAIN",0,"ERROR! Mismatch for g0g5g3! norm2=%e\n",norm2);
   }

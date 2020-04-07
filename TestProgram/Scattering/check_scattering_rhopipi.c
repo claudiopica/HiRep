@@ -472,6 +472,7 @@ int main(int argc,char *argv[])
     #ifdef REPR_FUNDAMENTAL 
     apply_BCs_on_represented_gauge_field(); //This is a trick: the BCs are not applied in the case the REPR is fundamental because represent_gauge field assumes that the right BCs are already applied on the fundamental field!
     #endif
+
     struct mo_0 *mo_p0[numsources]; 
     struct mo_p *mo_p[Nmom][numsources];
     for(int i=0; i<numsources; i++){
@@ -584,6 +585,13 @@ int main(int argc,char *argv[])
     } else {
         lprintf("TEST",0,"Some tests have failed!\n");
     }
+    
+
+    gettimeofday(&end,0);
+    timeval_subtract(&etime,&end,&start);
+    lprintf("MAIN",0,"Configuration : analysed in [%ld sec %ld usec]\n",etime.tv_sec,etime.tv_usec);
+
+    lprintf("DEBUG",0,"ALL done, deallocating\n");
     // Free mos
     for(int src=0;src<numsources;src++){
 	    free_mo_0(mo_p0[src]);
@@ -591,19 +599,12 @@ int main(int argc,char *argv[])
             free_mo_p(mo_p[i][src]);
         }
     }
+   
+    freep(plist,Nmom);   
+    free_propagator_eo();
+    global_sum_int(&return_value,1);
+    lprintf("MAIN", 0, "return_value= %d\n ",  return_value);
+    finalize_process();
 
-    gettimeofday(&end,0);
-    timeval_subtract(&etime,&end,&start);
-    lprintf("MAIN",0,"Configuration : analysed in [%ld sec %ld usec]\n",etime.tv_sec,etime.tv_usec);
-
-  lprintf("DEBUG",0,"ALL done, deallocating\n");
-
-  
-  global_sum_int(&return_value,1);
-  lprintf("MAIN", 0, "return_value= %d\n ",  return_value);
-  //free_propagator_eo();
-
-  finalize_process();
-
-  return return_value;
+    return return_value;
 }

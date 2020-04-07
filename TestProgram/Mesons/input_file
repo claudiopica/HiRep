@@ -13,12 +13,7 @@ rlx_seed = 12345
 log:default = 100
 
 mes:csw = 1.
-mes:masses = -1.0
-mes:nhits_2pt = 1024
-mes:dilution = 3
-mes:nhits_disc = 64
+mes:mass = -1.0
+mes:nhits_2pt = 124
 
-disc:precision = 1e-20
-disc:nhits = 120
-disc:n_mom = 2
 
