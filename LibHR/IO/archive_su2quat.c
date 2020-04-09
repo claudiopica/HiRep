@@ -25,10 +25,10 @@
 
 #if NG == 2 && !defined(WITH_QUATERNIONS)
 
-#ifndef NDEBUG
-#define MPIRET(type) type =
-#else
+#ifdef NDEBUG
 #define MPIRET(type)
+#else
+#define MPIRET(type) type =
 #endif
 
 /* 
@@ -76,7 +76,9 @@ void write_gauge_field_su2q(char filename[])
   MPI_Group wg, cg;
   MPI_Status st;
   int cid;
+#ifndef NDEBUG
   int mpiret;
+#endif
 #endif
 
 #ifndef ALLOCATE_REPR_GAUGE_FIELD
@@ -185,7 +187,8 @@ void write_gauge_field_su2q(char filename[])
 #ifndef NDEBUG
               error(Z != (GLB_Z / NP_Z + ((p[3] < rz) ? 1 : 0)), 1, "write_gauge_field_su2q", "Local lattice size mismatch!");
 #endif
-              MPIRET(mpiret) MPI_Send(buff, bsize, MPI_DOUBLE, 0, 999, GLB_COMM);
+              MPIRET(mpiret)
+              MPI_Send(buff, bsize, MPI_DOUBLE, 0, 999, GLB_COMM);
 #ifndef NDEBUG
               if (mpiret != MPI_SUCCESS)
               {
@@ -200,7 +203,8 @@ void write_gauge_field_su2q(char filename[])
             /* receive buffer */
             if (PID == 0)
             {
-              MPIRET(mpiret) MPI_Recv(buff, bsize, MPI_DOUBLE, pid, 999, GLB_COMM, &st);
+              MPIRET(mpiret)
+              MPI_Recv(buff, bsize, MPI_DOUBLE, pid, 999, GLB_COMM, &st);
 #ifndef NDEBUG
               if (mpiret != MPI_SUCCESS)
               {
@@ -269,7 +273,9 @@ void read_gauge_field_su2q(char filename[])
   MPI_Group wg, cg;
   MPI_Status st;
   int cid;
+#ifndef NDEBUG
   int mpiret;
+#endif
 #endif
 
   error((NG != 2), 1, "read_gauge_field_su2q", "This function cannot be called if NG!=2");
@@ -350,8 +356,9 @@ void read_gauge_field_su2q(char filename[])
             /* send buffer */
             if (PID == 0)
             {
-            
-              MPIRET(mpiret) MPI_Send(buff, bsize, MPI_DOUBLE, pid, 999, GLB_COMM);
+
+              MPIRET(mpiret)
+              MPI_Send(buff, bsize, MPI_DOUBLE, pid, 999, GLB_COMM);
 #ifndef NDEBUG
               if (mpiret != MPI_SUCCESS)
               {
@@ -369,7 +376,8 @@ void read_gauge_field_su2q(char filename[])
 #ifndef NDEBUG
               error(Z != (GLB_Z / NP_Z + ((p[3] < rz) ? 1 : 0)), 1, "read_gauge_field", "Local lattice size mismatch!");
 #endif
-              MPIRET(mpiret) MPI_Recv(buff, bsize, MPI_DOUBLE, 0, 999, GLB_COMM, &st);
+              MPIRET(mpiret)
+              MPI_Recv(buff, bsize, MPI_DOUBLE, 0, 999, GLB_COMM, &st);
 #ifndef NDEBUG
               if (mpiret != MPI_SUCCESS)
               {

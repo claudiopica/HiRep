@@ -1,133 +1,153 @@
 // Global variables 
-GLB_T = 16
-GLB_X = 8
-GLB_Y = 8
-GLB_Z = 8
-NP_T = 2
+GLB_T = 6
+GLB_X = 4
+GLB_Y = 4
+GLB_Z = 4
+NP_T = 1
 NP_X = 1
 NP_Y = 1
 NP_Z = 1
 
-// Replicas
 N_REP = 1
 
-// Random generator
-rlx_level = 1
-rlx_seed = 13813
+rlx_level = 1  
+rlx_seed = 60718  
 rlx_start = new
-rlx_state = rand_state
+rlx_state = rlx_state
 
-// Logger levels
+//Logger levels (default = -1)
 log:default = -1
 log:inverter = -1
 log:forcestat = 0
 
-// Fermion twisting
+//Fermion twisting
 theta_T = 0.
 theta_X = 0.
 theta_Y = 0.
 theta_Z = 0.
 
+
 // HMC variables
-tlen = 1
-csw = 1.2
-rho_s = 0.15
-rho_t = 0.15
+tlen = 1.0
+csw = 1.1329500 
 
 // Schroedinger functional
+//must 1 (background) or 0 (no background)
+SF_background = 1 
+SF_ct = 1.
+
+//needed only for ROTATED_SF
 SF_zf = 1.
 SF_ds = 1.
-SF_ct = 1.
 SF_sign = 1
 
-// Runtime variables
-//example: run1_8x8x8x8nc2rFUNnf0b0.000000m0.000000
+//needed only for STOUT_SMEARED
+rho_s = 0.0
+rho_t = 0.0
+
+//needed only if compiled with FERMION_THETA
+theta_T = 0.0
+theta_X = 0.0
+theta_Y = 0.0
+theta_Z = 0.0
+
+// Run control variables
 run name = run1
-save freq = 10000
+save freq = 1
 meas freq = 1
-conf dir = .
-gauge start = random // run1_6x6x6x6nc2rADJnf2b6.000000m-0.000000n10
-last conf = 100
+conf dir = cnfg
+gauge start = random 
+last conf = +1
 
-// Mesons
+//Mesons
 mes:make = false
-mes:precision = 1.e-20
-mes:nhits = 1
-mes:mass = -0
+mes:mesmass = -0.60
+mes:precision = 1.e-24
+mes:nhits = 3
+mes:mass = -0.60
+mes:csw = 1.0
 
-// Polyakov
+
+//Polyakov
 poly:make = false
 
-// Eigenvalues
+//Eigenvalues
 eva:make = false
 eva:nevt = 5
 eva:nev = 1
 eva:kmax = 50
 eva:maxiter = 100
-eva:omega1 = 1.e-8
+eva:omega1 = 1.e-3
 eva:omega2 = 1.e-3
-eva:mass = 0
+eva:mass = 1.0
 
 // Monomials
 monomial {
 	id = 0
 	type = gauge
-	beta = 4.0
-	level = 0
+	beta = 12.0
+	level = 1
 }
 
 monomial {
-	id = 1
-	type = hmc
-	mass = -0.2
-	mt_prec = 1e-16
-	force_prec = 1e-16
-	mre_past = 4
-	level = 0
+         id = 1
+         type = hmc
+         mass = -0.148
+         mt_prec = 1e-14
+         force_prec = 1e-14
+         mre_past = 15
+         level = 0
 }
 
-monomial {
-	id = 1
-	type = rhmc
-	n = 1
-	d = 2
-	mass = -0.2
-	mt_prec = 1e-12
-	md_prec = 1e-12
-	force_prec = 1e-16
-	mre_past = 4
-	level = 0
-}
-
-mono1mial {
-	id = 2
-	type = scalar
-	mass = 0.5
-	lambda = 0.5
-	level = 0
-}
+//monomial {
+//       id = 0
+//       type = lw_gauge
+//       c0 = 1.666667
+//       beta = 1.45
+//       level = 2
+//}
+//
+//
+//monomial {
+//       id = 1
+//       type = tm_alt
+//       mass = -0.60
+//       mu = 0.15
+//       mt_prec = 1e-18
+//       force_prec = 1e-18
+//       mre_past = 4
+//       level = 1
+//}
+//
+//monomial {
+//       id = 2
+//       type = hasenbusch_tm_alt
+//       mass = -0.60
+//       mu = 0.
+//       dmu = 0.15
+//       mt_prec = 1e-18
+//       force_prec = 1e-18
+//       mre_past = 4
+//       level = 0
+//}
 
 // Integrators
+
+
 integrator {
-	level = 0
-	type = o2mn
-	steps = 15
+        level = 1
+        type = o2mn
+        steps = 2
+}
+
+integrator {
+        level = 0
+        type = o2mn
+        steps = 25
 }
 
 //integrator {
-//	level = 1
-//	type = o2mn
-//	steps = 5
+//        level = 2
+//        type = o2mn
+//        steps = 6
 //}
-
-//auxfield_start = cold: set pi to zero and sigma to start value
-//                 anything else: read auxiliary fields from configuration file
-//monomial {
-//        id = 0
-//        type = four_fermion
-//        gamma = 0.1
-//        auxfield_start = cold
-//        start_value = 1
-//        level = 1
-//}
-

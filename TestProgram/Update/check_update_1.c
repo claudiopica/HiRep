@@ -90,12 +90,9 @@ int main(int argc, char *argv[])
     new_plaq = avr_plaquette();
 
     diff = fabs(new_plaq - orig_plaq);
-    lprintf("REVERSIBILITY TEST", 0, "diff: %1.8e\n", diff);
+    lprintf("REVERSIBILITY TEST", 0, "diff: %1.8e\n Should be 10^-12 or so\n", diff);
     if (diff > 1e-10)
-    {
-      lprintf("REVERSIBILITY TEST", 0, "Test failed ? \n");
-      return_value += 1;
-    }
+      return_value++;
   }
   else
     lprintf("REVERSIBILITY TEST", 0, "Skipped the comparison as the configuration was not accepted\n");
