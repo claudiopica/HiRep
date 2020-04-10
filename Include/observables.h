@@ -46,7 +46,7 @@ void full_rect_1x2();
 double local_rect_1x2(int ix);
 
 void SF_PCAC_wall_corr(double mass, double acc);
-void SF_quark_propagator(spinor_field *in, double mass, spinor_field *out, double acc);
+int SF_quark_propagator(spinor_field *in, double mass, spinor_field *out, double acc);
 
 void polyakov();
 

@@ -23,7 +23,7 @@
 #include "utils.h"
 #include "ranlux.h"
 
-#if NG == 2 && !defined(WITH_QUATERNIONS)
+#if NG == 2 && defined(WITH_QUATERNIONS)
 
 #ifdef NDEBUG
 #define MPIRET(type)

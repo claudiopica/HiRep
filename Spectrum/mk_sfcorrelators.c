@@ -31,11 +31,6 @@
 #include "setup.h"
 #include "clover_tools.h"
 
-#if !(defined(BASIC_SF)) && !(defined(ROTATED_SF))
-#error This main code works only if some SF boundary conditions are enabled
-#endif
-
-
 typedef struct _input_sfc
 {
   double precision;
@@ -98,6 +93,10 @@ input_bcpar bcpar_var = init_input_bcpar(bcpar_var);
 
 int main(int argc, char *argv[])
 {
+#if !(defined(BASIC_SF)) && !(defined(ROTATED_SF))
+  error(1==1,0,"main" __FILE__,"This code is to be used only if some SF BC are defined\n");
+#endif
+
   int i;
   FILE *list;
   double gsf;
@@ -181,6 +180,6 @@ int main(int argc, char *argv[])
     fclose(list);
 
   finalize_process();
-
+ 
   return 0;
 }

@@ -1,7 +1,7 @@
 TOPDIR = ..
 MKDIR = $(TOPDIR)/Make
 
-EXES = hmc hmc_forces
+EXES = hmc #hmc_forces
 
 hmc_OBJS = hmc_utils.o 
 
