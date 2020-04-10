@@ -30,17 +30,6 @@ void WF_initialize()
   error(0 == 0, 0, "WF_initialize", "WF has not yet been setup to work with BC_XYZ_TWISTED enabled");
 #endif
 
-#ifdef BASIC_SF
-  error(0 == 0, 0, "WF_initialize", "WF has not yet been setup to work with BASIC_SF enabled");
-#endif
-
-#ifdef ROTATED_SF
-  error(0 == 0, 0, "WF_initialize", "WF has not yet been setup to work with ROTATED_SF enabled");
-#endif
-
-#ifdef PURE_GAUGE_ANISOTROPY
-#endif
-
   if (ws_gf == NULL)
   {
     ws_gf = alloc_gfield(&glattice);
@@ -189,7 +178,7 @@ void WF_free()
     free_gfield(ws_gf_tmp);
     free_gfield(Vprime);
     free_gfield(u_gauge_backup);
-    if (wf_plaq_weight != NULL)
+    if (wf_plaq_weight != plaq_weight && wf_plaq_weight != NULL)
       free(wf_plaq_weight);
   }
 }
@@ -597,8 +586,6 @@ void WF_E_T(double *E, suNg_field *V)
   }
 
   global_sum(E, 2 * GLB_T);
-
-  //E[3] = 0.0;
 }
 
 /* This gives F_{\mu\nu}^A */

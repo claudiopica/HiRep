@@ -62,7 +62,7 @@ typedef struct _input_sfc
     }                                                                                \
   }
 
-input_sfc sfc_var = init_input_sfc(sfc_var);
+input_sfc SF_var = init_input_sfc(SF_var);
 
 /* BC variables */
 typedef struct _input_bcpar
@@ -105,26 +105,26 @@ int main(int argc, char *argv[])
   setup_process(&argc, &argv);
   setup_gauge_fields();
 
-  read_input(sfc_var.read, get_input_filename());
+  read_input(SF_var.read, get_input_filename());
   read_input(bcpar_var.read, get_input_filename());
 
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
-  set_csw(&sfc_var.csw);
+  set_csw(&SF_var.csw);
 #endif
 
-  if (strcmp(sfc_var.configlist, "") != 0)
+  if (strcmp(SF_var.configlist, "") != 0)
   {
-    error((list = fopen(sfc_var.configlist, "r")) == NULL, 1, "main [mk_sfcoupling.c]",
+    error((list = fopen(SF_var.configlist, "r")) == NULL, 1, "main [mk_sfcoupling.c]",
           "Failed to open list file\n");
   }
 
-  lprintf("MAIN", 0, "Config list filename = %s\n", sfc_var.configlist);
-  lprintf("MAIN", 0, "Inverter precision = %e\n", sfc_var.precision);
-  lprintf("MAIN", 0, "Mass = %f\n", sfc_var.mass);
+  lprintf("MAIN", 0, "Config list filename = %s\n", SF_var.configlist);
+  lprintf("MAIN", 0, "Inverter precision = %e\n", SF_var.precision);
+  lprintf("MAIN", 0, "Mass = %f\n", SF_var.mass);
 #ifdef ROTATED_SF
-  lprintf("MAIN", 0, "beta = %.8f\n rotatedSF ds = %.8f\n rotatedSF ct = %.8f\n", sfc_var.beta, bcpar_var.SF_ds, bcpar_var.SF_ct);
+  lprintf("MAIN", 0, "beta = %.8f\n rotatedSF ds = %.8f\n rotatedSF ct = %.8f\n", SF_var.beta, bcpar_var.SF_ds, bcpar_var.SF_ct);
 #else
-  lprintf("MAIN", 0, "beta = %.8f ct = %.8f\n", sfc_var.beta, bcpar_var.SF_ct);
+  lprintf("MAIN", 0, "beta = %.8f ct = %.8f\n", SF_var.beta, bcpar_var.SF_ct);
 #endif
 
   /* initialize boundary conditions */
@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
 #ifdef ROTATED_SF
   BCs_pars.chiSF_boundary_improvement_ds = bcpar_var.SF_ds;
 #endif
-  if (strcmp(sfc_var.background, "true") == 0)
+  if (strcmp(SF_var.background, "true") == 0)
     BCs_pars.SF_BCs = 1;
 
   init_BCs(&BCs_pars);
@@ -164,9 +164,9 @@ int main(int argc, char *argv[])
 
     gettimeofday(&start, 0);
     // perform SF measurements.
-    gsf = SF_action(sfc_var.beta);
+    gsf = SF_action(SF_var.beta);
     lprintf("SF_action", 10, "gsf = %.10e\n", gsf);
-    SF_PCAC_wall_corr(sfc_var.mass, sfc_var.precision);
+    SF_PCAC_wall_corr(SF_var.mass, SF_var.precision);
 
     gettimeofday(&end, 0);
     timeval_subtract(&etime, &end, &start);

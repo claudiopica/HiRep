@@ -200,9 +200,9 @@
 #define BC_Z_ALREADY
 #endif
 
-//#if defined(WITH_CLOVER) && defined(WITH_QUATERNIONS)
-//#error Clover term has not yet been implemented with quaternions
-//#endif
+#if (defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)) && defined(WITH_QUATERNIONS)
+#error Clover term has not yet been implemented with quaternions
+#endif
 
 #ifdef PURE_GAUGE_ANISOTROPY
 #define PLAQ_WEIGHTS
@@ -215,6 +215,5 @@
 #if defined(WITH_SMEARING) && defined(WITH_EXPCLOVER)
 #error Exponential lover term cannot be use simultaneously with the dirac smearing (not yet implemented)
 #endif
-
 
 #endif /* CHECK_OPTIONS_H */

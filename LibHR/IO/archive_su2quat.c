@@ -23,7 +23,7 @@
 #include "utils.h"
 #include "ranlux.h"
 
-#if NG == 2 && defined(WITH_QUATERNIONS)
+#if NG == 2 && !defined(WITH_QUATERNIONS)
 
 #ifdef NDEBUG
 #define MPIRET(type)
@@ -534,9 +534,19 @@ void read_gauge_field_su2(char filename[])
   MPI_Bcast(&quaternions, 1, MPI_INT, 0, GLB_COMM);
 #endif
   if (quaternions)
+  {
     read_gauge_field_su2q(filename);
+    apply_BCs_on_fundamental_gauge_field(u_gauge);
+
+#ifndef ALLOCATE_REPR_GAUGE_FIELD
+    u_gauge_f = (suNf_field *)((void *)u_gauge);
+    apply_BCs_on_represented_gauge_field();
+#endif
+  }
   else
+  {
     read_gauge_field_matrix(filename);
+  }
 }
 
 #endif /* NG==2 */

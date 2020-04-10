@@ -32,7 +32,7 @@ tlen = 1.0
 csw = 1.1329500 
 
 // Schroedinger functional
-//must 1 (background) or 0 (no background)
+//SF_background must be 1 (background) or 0 (no background)
 SF_background = 1 
 SF_ct = 1.
 
