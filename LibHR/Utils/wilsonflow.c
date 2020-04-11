@@ -178,8 +178,15 @@ void WF_free()
     free_gfield(ws_gf_tmp);
     free_gfield(Vprime);
     free_gfield(u_gauge_backup);
-    if (wf_plaq_weight != plaq_weight && wf_plaq_weight != NULL)
+    if (wf_plaq_weight != NULL)
+    {
+#ifdef PLAQ_WEIGHTS
+      if (wf_plaq_weight != plaq_weight)
+        free(wf_plaq_weight);
+#else
       free(wf_plaq_weight);
+#endif
+    }
   }
 }
 

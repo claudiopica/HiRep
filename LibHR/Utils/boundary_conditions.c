@@ -19,9 +19,7 @@ static BCs_pars_t BCs_pars;
 #ifdef BC_XYZ_TWISTED
 static void init_plaq_twisted_BCs();
 #endif
-#ifdef BC_T_OPEN
-static void init_plaq_open_BCs(double ct, double cs);
-#endif
+
 #if defined(BASIC_SF) || defined(ROTATED_SF)
 static void init_plaq_SF_BCs(double ct);
 static void init_gf_SF_BCs(suNg *dn, suNg *up);
