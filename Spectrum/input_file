@@ -15,17 +15,17 @@ rlx_seed = 1
 rlx_start = new
 rlx_state = rand_state
 
-
+mes:csw = 1.0
 mes:precision = 1.e-14
 mes:nhits = 5
 mes:nhits_disc = 0
-mes:mass = -0.60
+mes:mass = -0.45
 mes:use_input_mass = 0;
 mes:meas_mixed = 3
 mes:nhits_2pt = 1
 mes:momentum = 0
-mes:def_semwall = 1
-mes:def_point = 0
+mes:def_semwall = 0
+mes:def_point = 1
 mes:def_baryon = 0
 mes:def_gfwall = 0
 mes:ext_semwall = 0

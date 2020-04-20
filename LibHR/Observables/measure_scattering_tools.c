@@ -962,6 +962,7 @@ void  measure_pion_scattering_I2(double* m, int numsources, double precision,cha
 				rho2[i][j]->ind2 = gi(j+1);
 		}
 	}
+	init_propagator_eo(1, m, precision);
 
 	for (int src=0;src<numsources;++src)
    	{
@@ -976,7 +977,7 @@ void  measure_pion_scattering_I2(double* m, int numsources, double precision,cha
 		}
 	}
 	
-	init_propagator_eo(1, m, precision);
+	
 	ts=random_tau();
 	lprintf("MAIN",0,"ts = %d \n",ts);
 	spinor_field_zero_f(source_ts1);
@@ -1043,6 +1044,7 @@ void  measure_pion_scattering_I2(double* m, int numsources, double precision,cha
 	}
 
 	//free memory
+	free_propagator_eo();
   	free_spinor_field_f(source_ts1);
   	free_spinor_field_f(source_ts2);
 	free_spinor_field_f(prop_ts1);
@@ -1164,7 +1166,7 @@ void measure_pion_scattering_I0(double* m, int numsources, double precision,char
 				rho1[i][j]->ind2 = gi(j+1);
 		}
 	}
-
+	init_propagator_eo(1, m, precision);
 	for (int src=0;src<numsources;++src)
    	{
 		reset_mo(pi1);
@@ -1180,7 +1182,7 @@ void measure_pion_scattering_I0(double* m, int numsources, double precision,char
 			}
 		}
 		
-		init_propagator_eo(1, m, precision);
+		
 		//ts=random_tau();
 		ts = random_tau2(); // randomly chosen timeslice 
 		ts_vec[src] = ts;
@@ -1308,13 +1310,15 @@ void measure_pion_scattering_I0(double* m, int numsources, double precision,char
 			}
 				
 		}
-		
+	
+	
 	if (mo_arr != NULL) copy_mo(mo_arr[14],Ralt);
 		
 	if (path!=NULL) io4pt(Ralt,0,0,path,"Ralt",cnfg_filename);
 	
 
 	//free memory
+	free_propagator_eo();
 	for (int t=0;t<GLB_T;++t){
 	  	free_spinor_field_f(source_ts1[t]);
 		for (int src=0;src<numsources;++src) free_spinor_field_f(prop_ts1[src][t]);
@@ -1334,6 +1338,8 @@ void measure_pion_scattering_I0(double* m, int numsources, double precision,char
 	free_mo(R);
 	free_mo(Ralt);
 	free_mo(V);
+	free_mo(tmp_mo);
+
 	for(int i=0; i<3; i++){
 		for(int j=0; j<3; j++){
 			free_mo(rho1[i][j]);

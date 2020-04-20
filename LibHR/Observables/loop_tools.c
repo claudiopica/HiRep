@@ -46,7 +46,7 @@
 #error This code does not work with the fermion twisting !!!
 #endif
 
-void measure_bilinear_loops_4spinorfield(spinor_field *prop, spinor_field *source, int k, int nm, int tau, int col, int eo, double complex ***out_corr)
+void  	measure_bilinear_loops_4spinorfield(spinor_field *prop, spinor_field *source, int k, int nm, int tau, int col, int eo, double complex ***out_corr)
 {
 	double complex **corr;
 	double *corr_re[16];
@@ -302,7 +302,7 @@ void measure_loops(int nm, double *m, int nhits, int conf_num, double precision,
 		if (source_type == 0) /* generation of a volume source with Z2xZ2 noise */
 		{
 			create_z2_volume_source(source);
-
+			create_z2_volume_source(prop); // the prop is used to build the trial solution by the solver and sometimes give rise to an error.
 			calc_propagator(prop, source, 1); // No dilution
 
 			lprintf("CORR", 0, "Start to perform the contractions ... \n");

@@ -1,8 +1,6 @@
 
 /******************************************************************************
 *
-*  NOCOMPILE= WITH_CLOVER
-*  NOCOMPILE= WITH_EXPCLOVER
 * File check_disc_0.c
 *
 * Check of the  disc loops (free case): discon volume source (type = 0)

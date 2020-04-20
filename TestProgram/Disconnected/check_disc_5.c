@@ -1,8 +1,6 @@
 
 /******************************************************************************
 *
-*  NOCOMPILE= WITH_CLOVER
-*  NOCOMPILE= WITH_EXPCLOVER
 *
 * File check_disc_5.c
 *
@@ -226,7 +224,7 @@ int main(int argc,char *argv[])
   double complex*** out_corr;
   double complex *mean_loops;
   double abs_tol=1e-1;
-  double rel_tol_scalar_loop=1e-3;
+  double rel_tol_scalar_loop=1.e-3;
   struct timeval start, end, etime;
 
 
@@ -310,8 +308,8 @@ int main(int argc,char *argv[])
 
   //stochastic & time average 
   mean_loops = (double complex *)calloc(n_Gamma,sizeof(double complex));
+
   for(int j=0; j<n_Gamma; j++)   for(int t=0; t<GLB_T; t++) mean_loops[j] += out_corr[0][j][t]/(mes_ip.nhits*GLB_T);
-  
 
   //  /* CALCOLO ESPLICITO */
   ex_loops=(double complex *)calloc(16,sizeof(double complex));

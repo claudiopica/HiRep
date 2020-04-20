@@ -1,9 +1,6 @@
 
 /******************************************************************************
 *
-*  NOCOMPILE= WITH_CLOVER
-*  NOCOMPILE= WITH_EXPCLOVER
-*
 * File check_disc_4.c
 *
 * Check of the  disc loops (free case): discon volume source (type = 4)
@@ -120,7 +117,7 @@ typedef struct _input_mesons {
   .read={								\
     {"Fermion mass", "disc:mass = %s", STRING_T, (varname).mstring}, \
     {"inverter precision", "disc:precision = %lf", DOUBLE_T, &(varname).precision}, \
-    {"number of inversions per cnfg", "disc:nhits = %d", INT_T, &(varname).nhits}, \
+    {"number of inversions per cnfg", "disc:nhits4 = %d", INT_T, &(varname).nhits}, \
     {"maximum component of momentum", "disc:n_mom = %d", INT_T, &(varname).n_mom}, \
     {"csw coefficient", "mes:csw = %lg",DOUBLE_T, &(varname).csw},	\
     {NULL, NULL,INT_T, NULL}				\
