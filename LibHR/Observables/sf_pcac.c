@@ -52,19 +52,17 @@ static void H2_sf(spinor_field *out, spinor_field *in)
 */
 int SF_quark_propagator(spinor_field *in, double mass, spinor_field *out, double acc)
 {
+  int cgiter = 0;
 #ifdef BASIC_SF
 
   static MINRES_par MINRESpar;
-  int cgiter;
   hmass = mass;
 
   MINRESpar.err2 = acc;
   MINRESpar.max_iter = 0;
   cgiter = MINRES(&MINRESpar, &H_sf, in, out, 0);
-  return cgiter;
 #elif defined(ROTATED_SF)
 
-  int cgiter;
   static mshift_par inv_par;
   static spinor_field *chi = NULL;
   if (chi == NULL)
@@ -83,9 +81,9 @@ int SF_quark_propagator(spinor_field *in, double mass, spinor_field *out, double
 
   cgiter = cg_mshift(&inv_par, &H2_sf, chi, out);
   free(inv_par.shift);
-  return cgiter;
 
 #endif
+  return cgiter;
 }
 
 /*

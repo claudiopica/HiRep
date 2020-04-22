@@ -290,7 +290,7 @@ void polyakov()
     if (COORD[mu] != np[mu] - 1)
     {
       MPIRET(mpiret)
-      MPI_Send(p,                                      /* buffer */
+      MPI_Send((double *)(p),                          /* buffer */
                size3d * sizeof(suNg) / sizeof(double), /* lenght in units of doubles */
                MPI_DOUBLE,                             /* basic datatype */
                proc_up(CID, mu),                       /* cid of destination */
@@ -322,7 +322,7 @@ void polyakov()
       {
         destCID = proc_up(destCID, mu);
         MPIRET(mpiret)
-        MPI_Isend(p,                                      /* buffer */
+        MPI_Isend((double *)(p),                          /* buffer */
                   size3d * sizeof(suNg) / sizeof(double), /* lenght in units of doubles */
                   MPI_DOUBLE,                             /* basic datatype */
                   destCID,                                /* cid of destination */
