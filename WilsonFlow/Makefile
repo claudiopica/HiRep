@@ -1,7 +1,7 @@
 TOPDIR = ..
 MKDIR = $(TOPDIR)/Make
 
-EXES = WF_measure WF_measure_adaptative
+EXES = WF_measure
 
 LIBS += $(TOPDIR)/LibHR/libhr.a
 

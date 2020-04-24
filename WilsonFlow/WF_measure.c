@@ -31,237 +31,193 @@
 #include "wilsonflow.h"
 #include "setup.h"
 
-typedef struct _input_WF
+typedef struct _input_WF_meas
 {
   double tmax;
   int nmeas;
-  int nint;
-
+  double eps;
+  double delta;
+  WF_integrator_type ittype;
+  char configlist[256];
   /* for the reading function */
-  input_record_t read[4];
+  input_record_t read[7];
 
-} input_WF;
+} input_WF_meas;
 
-#define init_input_WF(varname)                                                                       \
-  {                                                                                                  \
-    .read = {                                                                                        \
-      {"WF max integration time", "WF:tmax = %lf", DOUBLE_T, &((varname).tmax)},                     \
-      {"WF number of measures", "WF:nmeas = %d", DOUBLE_T, &((varname).nmeas)},                      \
-      {"WF number of integration steps between measures", "WF:nint = %d", INT_T, &((varname).nint)}, \
-      {NULL, NULL, 0, NULL}                                                                          \
-    }                                                                                                \
+#define init_input_WF_meas(varname)                                                    \
+  {                                                                                    \
+    .read = {                                                                          \
+        {"WF integrator type", "WF:integrator = %d", INT_T, &((varname).ittype)},      \
+        {"WF integration time", "WF:tmax = %lf", DOUBLE_T, &((varname).tmax)},         \
+        {"Configuration list", "WF:configlist = %s", STRING_T, &(varname).configlist}, \
+        {"WF number of measures", "WF:nmeas = %d", DOUBLE_T, &((varname).nmeas)},      \
+        {"WF initial epsilon", "WF:eps = %lf", DOUBLE_T, &((varname).eps)},            \
+        {"WF delta", "WF:delta = %lf", DOUBLE_T, &((varname).delta)},                  \
+        {NULL, NULL, 0, NULL}},                                                        \
+    .ittype = RK3_ADAPTIVE                                                             \
   }
 
-input_WF WF_var = init_input_WF(WF_var);
+input_WF_meas WF_var = init_input_WF_meas(WF_var);
 
-#ifdef ROTATED_SF
+#if defined(BASIC_SF)
 
 typedef struct _input_SF
 {
   double ct;
   double beta;
+  int background;
 
   /* for the reading function */
-  input_record_t read[3];
+  input_record_t read[4];
 
 } input_SF;
 
-#define init_input_SF(varname)                                   \
-  {                                                              \
-    .read = {                                                    \
-      {"SF ct", "SF:ct = %lf", DOUBLE_T, &((varname).ct)},       \
-      {"SF beta", "SF:beta = %lf", DOUBLE_T, &((varname).beta)}, \
-      {NULL, NULL, 0, NULL}                                      \
-    }                                                            \
+#define init_input_SF(varname)                                                 \
+  {                                                                            \
+    .read = {                                                                  \
+      {"SF background", "SF:background = %d", INT_T, &((varname).background)}, \
+      {"SF ct", "SF:ct = %lf", DOUBLE_T, &((varname).ct)},                     \
+      {"SF beta", "SF:beta = %lf", DOUBLE_T, &((varname).beta)},               \
+      {NULL, NULL, 0, NULL}                                                    \
+    }                                                                          \
   }
 
 input_SF SF_var = init_input_SF(SF_var);
 
-#endif /* ROTATED_SF */
+#endif
+#if defined(ROTATED_SF)
 
-char cnfg_filename[256] = "";
-char list_filename[256] = "";
-char input_filename[256] = "input_file";
-char output_filename[256] = "wilsonflow.out";
-enum
+typedef struct _input_SF
 {
-  UNKNOWN_CNFG = 0,
-  DYNAMICAL_CNFG,
-  QUENCHED_CNFG
-};
+  double ct;
+  double beta;
+  double zf;
+  double ds;
+  int sign;
+  int background;
 
-typedef struct
+  /* for the reading function */
+  input_record_t read[7];
+
+} input_SF;
+
+#define init_input_SF(varname)                                                   \
+  {                                                                              \
+    .read = {                                                                    \
+        {"SF background", "SF:background = %d", INT_T, &((varname).background)}, \
+        {"SF sign", "SF:sign = %d", INT_T, &((varname).sign)},                   \
+        {"SF ct", "SF:ct = %lf", DOUBLE_T, &((varname).ct)},                     \
+        {"SF zf", "SF:zf = %lf", DOUBLE_T, &((varname).zf)},                     \
+        {"SF ds", "SF:ds = %lf", DOUBLE_T, &((varname).ds)},                     \
+        {"SF beta", "SF:beta = %lf", DOUBLE_T, &((varname).beta)},               \
+        {NULL, NULL, 0, NULL}},                                                  \
+    .sign = 1, .zf = 1., .ds = 1.                                                \
+  }
+
+input_SF SF_var = init_input_SF(SF_var);
+
+#endif
+
+typedef struct _input_bcpar
 {
-  char string[256];
-  int t, x, y, z;
-  int nc, nf;
-  double b, m;
-  int n;
-  int type;
-} filename_t;
+  /* rhmc parameters */
+  double theta[4];
+  /* for the reading function */
+  input_record_t read[5];
 
-int parse_cnfg_filename(char *filename, filename_t *fn)
-{
-  int hm;
-  char *tmp = NULL;
-  char *basename;
+} input_bcpar;
 
-  basename = filename;
-  while ((tmp = strchr(basename, '/')) != NULL)
-  {
-    basename = tmp + 1;
+#define init_input_bcpar(varname)                                  \
+  {                                                                \
+    .read = {                                                      \
+      {"theta_T", "theta_T = %lf", DOUBLE_T, &(varname).theta[0]}, \
+      {"theta_X", "theta_X = %lf", DOUBLE_T, &(varname).theta[1]}, \
+      {"theta_Y", "theta_Y = %lf", DOUBLE_T, &(varname).theta[2]}, \
+      {"theta_Z", "theta_Z = %lf", DOUBLE_T, &(varname).theta[3]}, \
+      {NULL, NULL, INT_T, NULL}                                    \
+    }                                                              \
   }
 
-  hm = sscanf(basename, "%*[^_]_%dx%dx%dx%d%*[Nn]c%dr%*[FSA]%*[UYSD]%*[NMYJ]%*[Nn]f%db%lfm%lfn%d",
-              &(fn->t), &(fn->x), &(fn->y), &(fn->z), &(fn->nc), &(fn->nf), &(fn->b), &(fn->m), &(fn->n));
-  if (hm == 9)
-  {
-    fn->m = -fn->m; /* invert sign of mass */
-    fn->type = DYNAMICAL_CNFG;
-    return DYNAMICAL_CNFG;
-  }
-  /*#undef repr_name*/
-
-  double kappa;
-  hm = sscanf(basename, "%dx%dx%dx%d%*[Nn]c%d%*[Nn]f%db%lfk%lfn%d",
-              &(fn->t), &(fn->x), &(fn->y), &(fn->z), &(fn->nc), &(fn->nf), &(fn->b), &kappa, &(fn->n));
-  if (hm == 9)
-  {
-    fn->m = .5 / kappa - 4.;
-    fn->type = DYNAMICAL_CNFG;
-    return DYNAMICAL_CNFG;
-  }
-
-  hm = sscanf(basename, "%dx%dx%dx%d%*[Nn]c%db%lfn%d",
-              &(fn->t), &(fn->x), &(fn->y), &(fn->z), &(fn->nc), &(fn->b), &(fn->n));
-  if (hm == 7)
-  {
-    fn->type = QUENCHED_CNFG;
-    return QUENCHED_CNFG;
-  }
-
-  hm = sscanf(basename, "%*[^_]_%dx%dx%dx%d%*[Nn]c%db%lfn%d",
-              &(fn->t), &(fn->x), &(fn->y), &(fn->z), &(fn->nc), &(fn->b), &(fn->n));
-  if (hm == 7)
-  {
-    fn->type = QUENCHED_CNFG;
-    return QUENCHED_CNFG;
-  }
-
-  fn->type = UNKNOWN_CNFG;
-  return UNKNOWN_CNFG;
-}
-
-void read_cmdline(int argc, char *argv[])
-{
-  int i, ai = 0, ao = 0, ac = 0, al = 0, am = 0;
-  FILE *list = NULL;
-
-  for (i = 1; i < argc; i++)
-  {
-    if (strcmp(argv[i], "-i") == 0)
-      ai = i + 1;
-    else if (strcmp(argv[i], "-o") == 0)
-      ao = i + 1;
-    else if (strcmp(argv[i], "-c") == 0)
-      ac = i + 1;
-    else if (strcmp(argv[i], "-l") == 0)
-      al = i + 1;
-    else if (strcmp(argv[i], "-m") == 0)
-      am = i;
-  }
-
-  if (am != 0)
-  {
-    print_compiling_info();
-    exit(0);
-  }
-
-  if (ao != 0)
-    strcpy(output_filename, argv[ao]);
-  if (ai != 0)
-    strcpy(input_filename, argv[ai]);
-
-  error((ac == 0 && al == 0) || (ac != 0 && al != 0), 1, "parse_cmdline [WF_measure.c]",
-        "Syntax: mk_wilsonloops { -c <config file> | -l <list file> } [-i <input file>] [-o <output file>] [-m]");
-
-  if (ac != 0)
-  {
-    strcpy(cnfg_filename, argv[ac]);
-    strcpy(list_filename, "");
-  }
-  else if (al != 0)
-  {
-    strcpy(list_filename, argv[al]);
-    error((list = fopen(list_filename, "r")) == NULL, 1, "parse_cmdline [WF_measure.c]",
-          "Failed to open list file\n");
-    error(fscanf(list, "%s", cnfg_filename) == 0, 1, "parse_cmdline [WF_measure.c]",
-          "Empty list file\n");
-    fclose(list);
-  }
-}
+input_bcpar bcpar_var = init_input_bcpar(bcpar_var);
 
 int main(int argc, char *argv[])
 {
   int i;
-  FILE *list;
-  filename_t fpars;
+  FILE *list = NULL;
 
   /* setup process id and communications */
-  read_cmdline(argc, argv);
   setup_process(&argc, &argv);
+
   setup_gauge_fields();
 
-  if (strcmp(list_filename, "") != 0)
-    lprintf("MAIN", 0, "list file [%s]\n", list_filename);
-  else
-    lprintf("MAIN", 0, "cnfg file [%s]\n", cnfg_filename);
+  read_input(WF_var.read, get_input_filename());
 
-  /* read & broadcast parameters */
-  parse_cnfg_filename(cnfg_filename, &fpars);
-
-  read_input(WF_var.read, input_filename);
-#ifdef ROTATED_SF
-  read_input(SF_var.read, input_filename);
-#endif
-  GLB_T = fpars.t;
-  GLB_X = fpars.x;
-  GLB_Y = fpars.y;
-  GLB_Z = fpars.z;
-
-  error(fpars.type == UNKNOWN_CNFG, 1, "WF_measure.c", "Bad name for a configuration file");
-  error(fpars.nc != NG, 1, "WF_measure.c", "Bad NG");
-
-  lprintf("MAIN", 0, "WF tmax: %e\n", WF_var.tmax);
-  lprintf("MAIN", 0, "WF number of measures: %d\n", WF_var.nmeas);
-  lprintf("MAIN", 0, "WF time lapse between measures: %e\n", WF_var.tmax / WF_var.nmeas);
-  lprintf("MAIN", 0, "WF number of integration intervals per measure: %d\n", WF_var.nint);
-  lprintf("MAIN", 0, "WF number of integration intervals: %d\n", WF_var.nint * WF_var.nmeas);
-  lprintf("MAIN", 0, "WF integration step: %e\n", WF_var.tmax / (WF_var.nmeas * WF_var.nint));
-
-#ifdef ROTATED_SF
-  lprintf("MAIN", 0, "SF beta=%e\n", SF_var.beta);
-  lprintf("MAIN", 0, "SF ct=%e\n", SF_var.ct);
+#if defined(ROTATED_SF) || defined(BASIC_SF)
+  read_input(SF_var.read, get_input_filename());
 #endif
 
-  list = NULL;
-  if (strcmp(list_filename, "") != 0)
+  lprintf("MAIN", 0, "list file [%s]\n", WF_var.configlist);
+
+  if (strcmp(WF_var.configlist, "") != 0)
   {
-    error((list = fopen(list_filename, "r")) == NULL, 1, "main [WF_measure.c]",
+    error((list = fopen(WF_var.configlist, "r")) == NULL, 1, "main [WF_measure.c]",
           "Failed to open list file\n");
   }
 
+  double dt = (double)WF_var.tmax / (double)WF_var.nmeas;
+
+  switch (WF_var.ittype)
+  {
+  case EUL:
+    lprintf("MAIN", 0, "WF integrator: Euler\n");
+    break;
+  case RK3:
+    lprintf("MAIN", 0, "WF integrator: Runge Kutta 3rd order\n");
+    break;
+  case RK3_ADAPTIVE:
+    lprintf("MAIN", 0, "WF integrator: Adaptive Runge Kutta 3rd order\n");
+    break;
+  }
+  lprintf("MAIN", 0, "WF tmax: %e\n", WF_var.tmax);
+  lprintf("MAIN", 0, "WF number of measures: %d\n", WF_var.nmeas);
+  lprintf("MAIN", 0, "WF initial epsilon: %e\n", WF_var.eps);
+  lprintf("MAIN", 0, "WF delta: %e\n", WF_var.delta);
+  lprintf("MAIN", 0, "WF measurement interval dt : %e\n", dt);
+
+#ifdef ROTATED_SF
+  lprintf("MAIN", 0, "beta = %.8f\n rotatedSF ds = %.8f\n rotatedSF ct = %.8f\n", SF_var.beta, SF_var.ds, SF_var.ct);
+#elif defined(BASIC_SF)
+  lprintf("MAIN", 0, "beta = %.8f ct = %.8f\n", SF_var.beta, SF_var.ct);
+#endif
+
+  /* initialize boundary conditions */
+  BCs_pars_t BCs_pars = {
+      .fermion_twisting_theta = {0., 0., 0., 0.},
+      .gauge_boundary_improvement_cs = 1.,
+      .gauge_boundary_improvement_ct = 1.,
+      .chiSF_boundary_improvement_ds = 1.,
+      .SF_BCs = 0};
+#ifdef FERMION_THETA
+  BCs_pars.fermion_twisting_theta[0] = bcpar_var.theta[0];
+  BCs_pars.fermion_twisting_theta[1] = bcpar_var.theta[1];
+  BCs_pars.fermion_twisting_theta[2] = bcpar_var.theta[2];
+  BCs_pars.fermion_twisting_theta[3] = bcpar_var.theta[3];
+#endif
+#if defined(ROTATED_SF) || defined(BASIC_SF)
+  BCs_pars.gauge_boundary_improvement_ct = SF_var.ct;
+  error(SF_var.background != 0 && SF_var.background != 1, 0, "init_mc_ghmc" __FILE__, "Wrong value of SF_background\n");
+  BCs_pars.SF_BCs = SF_var.background;
+#if defined(ROTATED_SF)
+  BCs_pars.chiSF_boundary_improvement_ds = SF_var.ds;
+#endif
+#endif
+
+  init_BCs(&BCs_pars);
+
   WF_initialize();
 
-#ifndef ROTATED_SF
-  double E, Esym, TC;
-#else
-  int j;
-  double E[2 * GLB_T];
-  double Esym[2 * GLB_T];
-  double Eavg[2];
-  double Esymavg[2];
-#endif
+  char cnfg_filename[256];
+  struct timeval start, end, etime;
 
   i = 0;
   while (1)
@@ -274,72 +230,29 @@ int main(int argc, char *argv[])
     i++;
 
     lprintf("MAIN", 0, "Configuration from %s\n", cnfg_filename);
-    /* NESSUN CHECK SULLA CONSISTENZA CON I PARAMETRI DEFINITI !!! */
 
     read_gauge_field(cnfg_filename);
 
     apply_BCs_on_fundamental_gauge_field();
 
+    gettimeofday(&start, 0);
+
     full_plaquette();
 
-    int k, n;
-    double epsilon = WF_var.tmax / (WF_var.nmeas * WF_var.nint);
-    double t = 0.;
+    WF_update_and_measure(WF_var.ittype, u_gauge, &(WF_var.tmax), &(WF_var.eps), &(WF_var.delta), WF_var.nmeas);
 
-    for (n = -1; n < WF_var.nmeas; n++)
-    {
-      if (n > -1)
-      {
-        for (k = 0; k < WF_var.nint; k++)
-        {
-          WilsonFlow3(u_gauge, epsilon);
-          t += epsilon;
-        }
-      }
-#ifndef ROTATED_SF
-
-      E = WF_E(u_gauge);
-      Esym = WF_Esym(u_gauge);
-      TC = WF_topo(u_gauge);
-      lprintf("WILSONFLOW", 0, "WF (ncnfg,t,E,t2*E,Esym,t2*Esym,TC) = %d %e %e %e %e %e %e\n", i, t, E, t * t * E, Esym, t * t * Esym, TC);
-
-#else
-
-      WF_E_T(E, u_gauge);
-      WF_Esym_T(Esym, u_gauge);
-      Eavg[0] = Eavg[1] = Esymavg[0] = Esymavg[1] = 0.0;
-      for (j = 1; j < GLB_T - 1; j++)
-      {
-        lprintf("WILSONFLOW", 0, "WF (ncnfg,T,t,Etime,Espace,Esymtime,Esymspace) = %d %d %e %e %e %e %e\n", i, j, t, E[2 * j], E[2 * j + 1], Esym[2 * j], Esym[2 * j + 1]);
-        Eavg[0] += E[2 * j];
-        Eavg[1] += E[2 * j + 1];
-        Esymavg[0] += Esym[2 * j];
-        Esymavg[1] += Esym[2 * j + 1];
-      }
-
-      Eavg[0] /= GLB_T - 2;
-      Eavg[1] /= GLB_T - 3;
-      Esymavg[0] /= GLB_T - 2;
-      Esymavg[1] /= GLB_T - 3;
-
-      lprintf("WILSONFLOW", 0, "WF avg (ncnfg,t,Etime,Espace,Esymtime,Esymspace,Pltime,Plspace) = %d %e %e %e %e %e %e %e\n", i, t, Eavg[0], Eavg[1], Esymavg[0], Esymavg[1], (NG - Eavg[0]), (NG - Eavg[1]));
-      lprintf("WILSONFLOW", 0, "SF dS/deta= %e\n", SF_action(SF_var.beta));
-
-#endif
-    }
+    gettimeofday(&end, 0);
+    timeval_subtract(&etime, &end, &start);
+    lprintf("TIMING", 0, "Wilson Flow evolution and measurements for configuration  [%s] done [%ld sec %ld usec]\n", cnfg_filename, etime.tv_sec, etime.tv_usec);
 
     if (list == NULL)
       break;
-  }
+  } // end loop configurations
 
   if (list != NULL)
     fclose(list);
 
   WF_free();
-
-  free_BCs();
-
-  free_gfield(u_gauge);
 
   finalize_process();
 

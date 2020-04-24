@@ -1,5 +1,5 @@
 // Global variables
-GLB_T = 8
+GLB_T = 18
 GLB_X = 8
 GLB_Y = 8
 GLB_Z = 8
@@ -8,37 +8,41 @@ NP_X = 1
 NP_Y = 1
 NP_Z = 1
 
-//level = 1  seed = 12345
+N_REP = 1
+
 rlx_level = 1
 rlx_seed = 13813
 rlx_start = new
 rlx_state = rand_state
 
-// Pure gauge variables
-beta  =   6.338
-nhb   =   1
-nor   =   4
-nit   =   1 
-
-// Run control variables
-therm = 0
-run name = run1
-save freq = 1
-meas freq = 1 
-conf dir = cnfg
-//gauge start = ranDoM
-gauge start = Unit
-//gauge start = run1_8x2x2x2nc2rADJnf2b2.000000m1.310000n10
-//ranlxd start =
-last conf = 1
 
 //Wilson flow parameters
-WF:tmax = 120
-WF:nmeas = 120
-WF:nint=1000
+//WF integrators type 0=Euler 1=3rd order Runge-Kutta 2=Adaptive 3rd order Runge-Kutta
+WF:integrator = 2 
+WF:tmax = 0.2
+WF:nmeas = 1
+WF:eps = 0.002
+WF:configlist = list_confs.txt
 // parameters used for the adaptative solver 
-WF:eps = 0.001
-WF:delta= 0.0000001
+WF:delta= 0.00001
+
 
 // Schroedinger functional
 SF:ct = 1.0
+// SF:beta is needed only if SF coupling is measured.
+SF:beta = 1.0
+//SF_background must be 1 (background) or 0 (no background)
+SF:background = 1 
+
+//needed only for ROTATED_SF
+Sf:zf = 0.0
+Sf:ds = 1.0
+Sf:sign = 1
+
+
+
+//needed only if compiled with FERMION_THETA
+theta_T = 0.0
+theta_X = 0.0
+theta_Y = 0.0
+theta_Z = 0.0

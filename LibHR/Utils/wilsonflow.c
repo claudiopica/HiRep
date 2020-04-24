@@ -284,7 +284,7 @@ void WilsonFlow1(suNg_field *V, const double epsilon)
 
   start_gf_sendrecv(V);
   complete_gf_sendrecv(V);
-#ifdef ROTATED_SF
+#if defined(ROTATED_SF) || defined(BASIC_SF)
   apply_BCs_on_fundamental_gauge_field();
 #endif
 }
@@ -334,7 +334,7 @@ double WilsonFlow3_adaptative(suNg_field *V, double epsilon, double delta)
 
   start_gf_sendrecv(V);
   complete_gf_sendrecv(V);
-#ifdef ROTATED_SF
+#if defined(ROTATED_SF) || defined(BASIC_SF)
   apply_BCs_on_fundamental_gauge_field();
 #endif
 
@@ -355,7 +355,7 @@ double WilsonFlow3_adaptative(suNg_field *V, double epsilon, double delta)
 
   start_gf_sendrecv(V);
   complete_gf_sendrecv(V);
-#ifdef ROTATED_SF
+#if defined(ROTATED_SF) || defined(BASIC_SF)
   apply_BCs_on_fundamental_gauge_field();
 #endif
 
@@ -383,7 +383,7 @@ double WilsonFlow3_adaptative(suNg_field *V, double epsilon, double delta)
   start_gf_sendrecv(Vprime);
   complete_gf_sendrecv(Vprime);
 
-#ifdef ROTATED_SF
+#if defined(ROTATED_SF) || defined(BASIC_SF)
   apply_BCs_on_fundamental_gauge_field();
 #endif
 
@@ -402,7 +402,7 @@ double WilsonFlow3_adaptative(suNg_field *V, double epsilon, double delta)
 
   start_gf_sendrecv(V);
   complete_gf_sendrecv(V);
-#ifdef ROTATED_SF
+#if defined(ROTATED_SF) || defined(BASIC_SF)
   apply_BCs_on_fundamental_gauge_field();
 #endif
 
@@ -440,7 +440,7 @@ void WilsonFlow3(suNg_field *V, const double epsilon)
 
   start_gf_sendrecv(V);
   complete_gf_sendrecv(V);
-#ifdef ROTATED_SF
+#if defined(ROTATED_SF) || defined(BASIC_SF)
   apply_BCs_on_fundamental_gauge_field();
 #endif
 
@@ -460,7 +460,7 @@ void WilsonFlow3(suNg_field *V, const double epsilon)
 
   start_gf_sendrecv(V);
   complete_gf_sendrecv(V);
-#ifdef ROTATED_SF
+#if defined(ROTATED_SF) || defined(BASIC_SF)
   apply_BCs_on_fundamental_gauge_field();
 #endif
 
@@ -480,7 +480,7 @@ void WilsonFlow3(suNg_field *V, const double epsilon)
 
   start_gf_sendrecv(V);
   complete_gf_sendrecv(V);
-#ifdef ROTATED_SF
+#if defined(ROTATED_SF) || defined(BASIC_SF)
   apply_BCs_on_fundamental_gauge_field();
 #endif
 
@@ -499,7 +499,7 @@ void WilsonFlow3(suNg_field *V, const double epsilon)
 
   start_gf_sendrecv(V);
   complete_gf_sendrecv(V);
-#ifdef ROTATED_SF
+#if defined(ROTATED_SF) || defined(BASIC_SF)
   apply_BCs_on_fundamental_gauge_field();
 #endif
 }
@@ -772,7 +772,7 @@ double WF_topo(suNg_field *V)
   return TC;
 }
 
-void WF_adaptive_full_measure(suNg_field *V, double *tmax, double *eps, double *delta, int nmeas)
+void WF_update_and_measure(WF_integrator_type wft, suNg_field *V, double *tmax, double *eps, double *delta, int nmeas)
 {
 
   double TC;
@@ -796,7 +796,7 @@ void WF_adaptive_full_measure(suNg_field *V, double *tmax, double *eps, double *
 #if defined(BC_T_ANTIPERIODIC) || defined(BC_T_PERIODIC) && !defined(PURE_GAUGE_ANISOTROPY)
   E = WF_E(V);
   Esym = WF_Esym(V);
-  lprintf("WILSONFLOW", 0, "WF (t,E,t2*E,Esym,t2*Esym,TC) = %e %e %e %e %e %e\n", t, E, t * t * E, Esym, t * t * Esym, TC);
+  lprintf("WILSONFLOW", 0, "WF (t,E,t2*E,Esym,t2*Esym,TC) = %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e\n", t, E, t * t * E, Esym, t * t * Esym, TC);
 #else
 
   WF_E_T(E, V);
@@ -804,7 +804,7 @@ void WF_adaptive_full_measure(suNg_field *V, double *tmax, double *eps, double *
   Eavg[0] = Eavg[1] = Esymavg[0] = Esymavg[1] = 0.0;
   for (j = 0; j < GLB_T; j++)
   {
-    lprintf("WILSONFLOW", 0, "WF (T,t,Etime,Espace,Esymtime,Esymspace) = %d %e %e %e %e %e\n", j, t, E[2 * j], E[2 * j + 1], Esym[2 * j], Esym[2 * j + 1]);
+    lprintf("WILSONFLOW", 0, "WF (T,t,Etime,Espace,Esymtime,Esymspace) = %d %1.16e %1.16e %1.16e %1.16e %1.16e\n", j, t, E[2 * j], E[2 * j + 1], Esym[2 * j], Esym[2 * j + 1]);
     Eavg[0] += E[2 * j];
     Eavg[1] += E[2 * j + 1];
     Esymavg[0] += Esym[2 * j];
@@ -815,22 +815,37 @@ void WF_adaptive_full_measure(suNg_field *V, double *tmax, double *eps, double *
   Esymavg[0] /= GLB_T - 2;
   Esymavg[1] /= GLB_T - 3;
 
-  lprintf("WILSONFLOW", 0, "WF avg (t,Etime,Espace,Esymtime,Esymspace,Pltime,Plspace,TC) = %e %e %e %e %e %e %e %e\n", t, Eavg[0], Eavg[1], Esymavg[0], Esymavg[1], (NG - Eavg[0]), (NG - Eavg[1]), TC);
+  lprintf("WILSONFLOW", 0, "WF avg (t,Etime,Espace,Esymtime,Esymspace,Pltime,Plspace,TC) = %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e\n", t, Eavg[0], Eavg[1], Esymavg[0], Esymavg[1], (NG - Eavg[0]), (NG - Eavg[1]), TC);
 
 #endif
   k = 1;
-  double epsilon_new = 0;
+  double epsilon_new;
   while (t < *tmax)
   {
     if (t + epsilon > (double)k * dt)
       epsilon = (double)k * dt - t;
 
-    epsilon_new = WilsonFlow3_adaptative(V, epsilon, *delta);
+    switch (wft)
+    {
+    case EUL:
+      WilsonFlow1(V, epsilon);
+      epsilon_new = epsilon;
+      break;
 
-    if (fabs(epsilon_new + 1.) > 1e-7)
+    case RK3:
+      WilsonFlow3(V, epsilon);
+      epsilon_new = epsilon;
+      break;
+
+    case RK3_ADAPTIVE:
+      epsilon_new = WilsonFlow3_adaptative(V, epsilon, *delta);
+      break;
+    }
+
+    if (epsilon_new > 0.)
       t = t + epsilon;
 
-    if (fabs(t - (double)k * dt) < 1e-7)
+    if (fabs(t - (double)k * dt) < epsilon / 2. && epsilon_new > 0)
     {
       k = k + 1;
 
@@ -840,15 +855,15 @@ void WF_adaptive_full_measure(suNg_field *V, double *tmax, double *eps, double *
 
       E = WF_E(V);
       Esym = WF_Esym(V);
-      lprintf("WILSONFLOW", 0, "WF (t,E,t2*E,Esym,t2*Esym,TC) = %e %e %e %e %e %e\n", t, E, t * t * E, Esym, t * t * Esym, TC);
+      lprintf("WILSONFLOW", 0, "WF (t,E,t2*E,Esym,t2*Esym,TC) = %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e\n", t, E, t * t * E, Esym, t * t * Esym, TC);
 #else
 
       WF_E_T(E, V);
       WF_Esym_T(Esym, V);
       Eavg[0] = Eavg[1] = Esymavg[0] = Esymavg[1] = 0.0;
-      for (j = 1; j < GLB_T - 1; j++)
+      for (j = 0; j < GLB_T; j++)
       {
-        lprintf("WILSONFLOW", 0, "WF (T,t,Etime,Espace,Esymtime,Esymspace) = %d %e %e %e %e %e\n", j, t, E[2 * j], E[2 * j + 1], Esym[2 * j], Esym[2 * j + 1]);
+        lprintf("WILSONFLOW", 0, "WF (T,t,Etime,Espace,Esymtime,Esymspace) = %d %1.16e %1.16e %1.16e %1.16e %1.16e\n", j, t, E[2 * j], E[2 * j + 1], Esym[2 * j], Esym[2 * j + 1]);
         Eavg[0] += E[2 * j];
         Eavg[1] += E[2 * j + 1];
         Esymavg[0] += Esym[2 * j];
@@ -860,13 +875,13 @@ void WF_adaptive_full_measure(suNg_field *V, double *tmax, double *eps, double *
       Esymavg[0] /= GLB_T - 2;
       Esymavg[1] /= GLB_T - 3;
 
-      lprintf("WILSONFLOW", 0, "WF avg (t,Etime,Espace,Esymtime,Esymspace,Pltime,Plspace,TC) = %e %e %e %e %e %e %e %e\n", t, Eavg[0], Eavg[1], Esymavg[0], Esymavg[1], (NG - Eavg[0]), (NG - Eavg[1]), TC);
+      lprintf("WILSONFLOW", 0, "WF avg (t,Etime,Espace,Esymtime,Esymspace,Pltime,Plspace,TC) = %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e\n", t, Eavg[0], Eavg[1], Esymavg[0], Esymavg[1], (NG - Eavg[0]), (NG - Eavg[1]), TC);
 
 #endif
     }
-    if (fabs(epsilon_new + 1.) > 1e-7)
+    if (epsilon_new > 0.)
       epsilon = epsilon_new;
-    if (fabs(epsilon_new + 1.) < 1e-7)
+    else
       epsilon = epsilon / 2;
   }
 }
