@@ -94,11 +94,11 @@ input_bcpar bcpar_var = init_input_bcpar(bcpar_var);
 int main(int argc, char *argv[])
 {
 #if !(defined(BASIC_SF)) && !(defined(ROTATED_SF))
-  error(1==1,0,"main" __FILE__,"This code is to be used only if some SF BC are defined\n");
+  error(1 == 1, 0, "main" __FILE__, "This code is to be used only if some SF BC are defined\n");
 #endif
 
   int i;
-  FILE *list;
+  FILE *list = NULL;
   double gsf;
   char cnfg_filename[256] = "";
 
@@ -158,14 +158,25 @@ int main(int argc, char *argv[])
       if (fscanf(list, "%s", cnfg_filename) == 0 || feof(list))
         break;
 
-    lprintf("MAIN", 0, "Configuration from %s\n", cnfg_filename);
-    read_gauge_field(cnfg_filename);
+    if (strcmp(cnfg_filename, "classical") == 0)
+    {
+      lprintf("MAIN", 0, "Generating a classical solution interpolating the SF boundaries\n");
+      fflush(stdout);
+      SF_classical_solution();
+    }
+    else
+    {
+      lprintf("MAIN", 0, "Configuration from %s\n", cnfg_filename);
+      read_gauge_field(cnfg_filename);
+    }
+
     represent_gauge_field();
 
     gettimeofday(&start, 0);
     // perform SF measurements.
     gsf = SF_action(SF_var.beta);
     lprintf("SF_action", 10, "gsf = %.10e\n", gsf);
+
     SF_PCAC_wall_corr(SF_var.mass, SF_var.precision);
 
     gettimeofday(&end, 0);
@@ -180,6 +191,6 @@ int main(int argc, char *argv[])
     fclose(list);
 
   finalize_process();
- 
+
   return 0;
 }

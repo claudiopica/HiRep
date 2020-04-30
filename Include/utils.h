@@ -20,7 +20,6 @@
 #include "geometry.h"
 #include <stdlib.h>
 
-
 /*SUN exp matrix*/
 
 void WF_Exp(suNg *u, suNg *X);
@@ -41,7 +40,7 @@ typedef struct
 } BCs_pars_t;
 
 void init_BCs(BCs_pars_t *pars);
-void init_plaq_open_BCs(double * plaq_weight,double * rect_weight,double ct, double cs);
+void init_plaq_open_BCs(double *plaq_weight, double *rect_weight, double ct, double cs);
 
 void free_BCs();
 void apply_BCs_on_represented_gauge_field();
@@ -54,18 +53,18 @@ void apply_BCs_on_clover_term(suNfc_field *);
 
 void init_pure_gauge_anisotropy(double *chi);
 
+void SF_classical_solution();
 
-inline int safe_mod(int x,int y)
+inline int safe_mod(int x, int y)
 {
-   if (x>=0)
-      return(x%y);
-   else
-      return((y-(abs(x)%y))%y);
+  if (x >= 0)
+    return (x % y);
+  else
+    return ((y - (abs(x) % y)) % y);
 }
 
 /*Global shift for fields, the routine accepts also NULL entries in which case it does nothing*/
 void shift_fields(int *shift, spinor_field *sin, suNg_field *uin, spinor_field *sout, suNg_field *uout);
-
 
 void cross_prod(suNg_vector *v1, suNg_vector *v2, suNg_vector *v3);
 void cross_prod_flt(suNg_vector_flt *v1, suNg_vector_flt *v2, suNg_vector_flt *v3);

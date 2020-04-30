@@ -1,24 +1,32 @@
-GLB_T = 18
-GLB_X = 8
-GLB_Y = 8
-GLB_Z = 8
-NP_T = 1
+GLB_T = 6
+GLB_X = 4
+GLB_Y = 4
+GLB_Z = 4
+NP_T = 2
 NP_X = 1
 NP_Y = 1
 NP_Z = 1
 
 N_REP = 1
 
+//Logger levels (default = -1)
+log:default = -1
+log:inverter = -1
+log:forcestat = 0
+
+
 rlx_level = 1
 rlx_seed = 83745
 rlx_start = new
 rlx_state = rand_state
+
 
 sf:precision = 1e-16
 sf:beta = 12.0
 sf:mass = -0.148
 sf:ct = 1.0
 sf:background = true
+// if one of the lines of the sf:configlist contains the key "classical" a classical intepolating configuration will be generated
 sf:configlist = list_conf_sf.txt
 
 //needed only for ROTATED_SF
@@ -27,7 +35,7 @@ sf:rho_t = 0.0
 sf:ds = 1.0
 
 //needed only if compiled with CSW/EXP_CSW
-sf:csw = 0.0
+sf:csw = 1.1329500 
 
 //needed only if compiled with FERMION_THETA
 theta_T = 0.0

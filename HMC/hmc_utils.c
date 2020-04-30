@@ -303,7 +303,7 @@ int init_mc_ghmc(hmc_flow *rf, char *ifile)
 #endif
 #if defined(BASIC_SF) || defined(ROTATED_SF)
 	BCs_pars.gauge_boundary_improvement_ct = hmc_var.hmc_p.SF_ct;
-	error(hmc_var.hmc_p.SF_background!=0 && hmc_var.hmc_p.SF_background!=1,0,"init_mc_ghmc" __FILE__,"Wrong value of SF_background\n" );
+	error(hmc_var.hmc_p.SF_background != 0 && hmc_var.hmc_p.SF_background != 1, 0, "init_mc_ghmc" __FILE__, "Wrong value of SF_background\n");
 	BCs_pars.SF_BCs = hmc_var.hmc_p.SF_background;
 #endif
 

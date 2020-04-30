@@ -492,58 +492,57 @@ static void chiSF_ds_BT(double ds)
 
 #if defined(BASIC_SF) || defined(ROTATED_SF)
 #ifndef GAUGE_SON
-static void init_gf_SF_BCs(suNg *dn, suNg *up)
-{
+
 #if NG == 2
 
 #ifndef HALFBG_SF
-  static double SF_eta = PI / 4.0;
-  static double SF_phi0_up[NG] = {-PI, PI};
+static double SF_eta = PI / 4.0;
+static double SF_phi0_up[NG] = {-PI, PI};
 #else
-  static double SF_eta = PI / 8.0;
-  static double SF_phi0_up[NG] = {-PI / 2, PI / 2};
+static double SF_eta = PI / 8.0;
+static double SF_phi0_up[NG] = {-PI / 2, PI / 2};
 #endif
 
-  static double SF_phi0_dn[NG] = {0., 0.};
-  static double SF_phi1_dn[NG] = {-1., 1.};
-  static double SF_phi1_up[NG] = {1., -1.};
+static double SF_phi0_dn[NG] = {0., 0.};
+static double SF_phi1_dn[NG] = {-1., 1.};
+static double SF_phi1_up[NG] = {1., -1.};
 
 #elif NG == 3
 
-  static double SF_eta = 0.;
-  static double SF_phi0_dn[NG] = {-PI / 3., 0., PI / 3.};
-  static double SF_phi1_dn[NG] = {1., -.5, -.5};
-  //  static double SF_phi0_up[NG] = {-PI, PI / 3., 2. * PI / 3.};
-  static double SF_phi0_up[NG] = {-5. * PI / 3., 2. * PI / 3., PI};
-  static double SF_phi1_up[NG] = {-1., .5, .5};
+static double SF_eta = 0.;
+static double SF_phi0_dn[NG] = {-PI / 3., 0., PI / 3.};
+static double SF_phi1_dn[NG] = {1., -.5, -.5};
+//  static double SF_phi0_up[NG] = {-PI, PI / 3., 2. * PI / 3.};
+static double SF_phi0_up[NG] = {-5. * PI / 3., 2. * PI / 3., PI};
+static double SF_phi1_up[NG] = {-1., .5, .5};
 
 #elif NG == 4
 
-  static double SF_eta = 0.;
-  static double SF_phi0_dn[NG] = {-ST * PI / 4., ST * PI / 4. - PI / 2., PI / 2. - ST * PI / 4., ST * PI / 4.};
-  static double SF_phi1_dn[NG] = {-.5, -.5, .5, .5};
-  static double SF_phi0_up[NG] = {-ST * PI / 4. - PI / 2., -PI + ST * PI / 4., PI - ST * PI / 4., PI / 2. + ST * PI / 4.};
-  static double SF_phi1_up[NG] = {.5, .5, -.5, -.5};
-
-#else
-
-  error(0, 1, "init_gf_SF_BCs "__FILE__, "SF boundary conditions not defined at this NG");
+static double SF_eta = 0.;
+static double SF_phi0_dn[NG] = {-ST * PI / 4., ST *PI / 4. - PI / 2., PI / 2. - ST *PI / 4., ST *PI / 4.};
+static double SF_phi1_dn[NG] = {-.5, -.5, .5, .5};
+static double SF_phi0_up[NG] = {-ST * PI / 4. - PI / 2., -PI + ST *PI / 4., PI - ST *PI / 4., PI / 2. + ST *PI / 4.};
+static double SF_phi1_up[NG] = {.5, .5, -.5, -.5};
 
 #endif
 
-#if (NG <= 4)
+static void init_gf_SF_BCs(suNg *dn, suNg *up)
+{
+#if (NG > 4)
+
+  error(0, 1, "init_gf_SF_BCs "__FILE__, "SF boundary conditions not defined at this NG");
+
+#else
   int k;
 
   _suNg_zero(*dn);
   for (k = 0; k < NG; k++)
-  {
     dn->c[(1 + NG) * k] = cos((SF_phi0_dn[k] + SF_phi1_dn[k] * SF_eta) / (GLB_T - 2)) + I * sin((SF_phi0_dn[k] + SF_phi1_dn[k] * SF_eta) / (GLB_T - 2));
-  }
+
   _suNg_zero(*up);
   for (k = 0; k < NG; k++)
-  {
     up->c[(1 + NG) * k] = cos((SF_phi0_up[k] + SF_phi1_up[k] * SF_eta) / (GLB_T - 2)) + I * sin((SF_phi0_up[k] + SF_phi1_up[k] * SF_eta) / (GLB_T - 2));
-  }
+
 #if defined(BASIC_SF)
   lprintf("BCS", 0, "SF boundary phases phi0  ( ");
   for (k = 0; k < NG; k++)
@@ -684,6 +683,46 @@ static void gf_SF_BCs(suNg *dn, suNg *up)
           }
     }
   }
+}
+
+void SF_classical_solution()
+{
+  double x0;
+  int ix, iy, iz, it, k, index;
+  suNg U, *u;
+
+  for (it = 0; it < T_EXT; ++it)
+  {
+    x0 = (double)(zerocoord[0] + it - T_BORDER);
+
+    if (x0 >= 1 && x0 < GLB_T - 1)
+    {
+      _suNg_zero(U);
+
+      for (k = 0; k < NG; k++)
+        U.c[(1 + NG) * k] = cos(((SF_phi0_dn[k] + SF_phi1_dn[k] * SF_eta) * (GLB_T - 1.0 - x0) + (SF_phi0_up[k] + SF_phi1_up[k] * SF_eta) * (x0 - 1.0)) / (GLB_T - 2.0) / (GLB_T - 2.0)) +
+                            I * sin(((SF_phi0_dn[k] + SF_phi1_dn[k] * SF_eta) * (GLB_T - 1.0 - x0) + (SF_phi0_up[k] + SF_phi1_up[k] * SF_eta) * (x0 - 1.0)) / (GLB_T - 2.0) / (GLB_T - 2));
+
+      for (ix = 0; ix < X_EXT; ++ix)
+        for (iy = 0; iy < Y_EXT; ++iy)
+          for (iz = 0; iz < Z_EXT; ++iz)
+          {
+            index = ipt_ext(it, ix, iy, iz);
+            if (index != -1)
+            {
+              u = pu_gauge(index, 0);
+              _suNg_unit(*u);
+              u = pu_gauge(index, 1);
+              *u = U;
+              u = pu_gauge(index, 2);
+              *u = U;
+              u = pu_gauge(index, 3);
+              *u = U;
+            }
+          }
+    }
+  }
+  apply_BCs_on_fundamental_gauge_field();
 }
 #endif
 
@@ -931,7 +970,7 @@ static void cl_SF_BCs(suNfc_field *cl)
               *_4FIELD_AT(cl, index, mu) = u;
             }
           }
-          index = ipt_ext(T_BORDER+1, ix, iy, iz);
+          index = ipt_ext(T_BORDER + 1, ix, iy, iz);
           if (index != -1)
           {
             for (int mu = 0; mu < 4; mu++)
