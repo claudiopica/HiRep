@@ -113,9 +113,10 @@ int main(int argc,char *argv[]) {
 	read_input(mes_var.read,get_input_filename());
     read_input(rlx_var.read,get_input_filename());
 	if(strcmp(mes_var.seq_prop,"true")==0)  seq_prop = 1;
-
-	if (seq_prop == 1 ) lprintf("MAIN",0,"Sequential propagators will be used.\n");
-	if (seq_prop != 1 ) lprintf("MAIN",0,"No sequential propagators will be used to estimate R.\n");
+	if(strcmp(mes_var.seq_prop,"none")==0)  seq_prop = 2;
+	if(strcmp(mes_var.seq_prop,"false")==0)  seq_prop = 0;
+	lprintf("MAIN",0,"mes_var.seq_prop = %s, seq_prop=%d (0 = false, 1 = true, 2 = none)\n",mes_var.seq_prop, seq_prop);
+	
 	strcpy(list_filename,mes_var.configlist);
 	strcpy(output_dir,mes_var.outpath);
 

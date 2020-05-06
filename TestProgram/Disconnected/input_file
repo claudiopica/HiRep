@@ -20,7 +20,7 @@ disc:nhits1 = 100
 disc:nhits2 = 100
 disc:nhits3 = 100
 disc:nhits4 = 20
-disc:nhits5 = 60
+disc:nhits5 = 100
 
 disc:n_mom = 2
 

@@ -1195,7 +1195,7 @@ void measure_pion_scattering_I0(double* m, int numsources, double precision,char
 		
 		create_diluted_source_equal_atau(source_ts2, ts);
 		calc_propagator(prop_ts2,source_ts2,4);
-		if (seq_prop){ // if seq_prop==1 
+		if (seq_prop==1){ // if seq_prop= true
 			lprintf("MAIN",0,"Creating sequential source...\n");	
 			create_sequential_source_stoch(seq_source,ts,prop_ts1[src][0]);
 			calc_propagator(seq_0,seq_source,4);
@@ -1270,7 +1270,7 @@ void measure_pion_scattering_I0(double* m, int numsources, double precision,char
 			}
 			io4pt(D,0,src,path,"D",cnfg_filename);
 			io4pt(C,0,src,path,"C",cnfg_filename);
-		 	if (seq_prop) io4pt(R,0,src,path,"R",cnfg_filename); // if seq_prop==1
+		 	if (seq_prop==1) io4pt(R,0,src,path,"R",cnfg_filename); // if seq_prop= true
 		}
 	}
 	
@@ -1287,12 +1287,14 @@ void measure_pion_scattering_I0(double* m, int numsources, double precision,char
 		}
 		copy_mo(mo_arr[15],disc);
 	}
-
-	lprintf("MAIN",0,"Contraction R alternative...\n");
+	if (seq_prop != 2) //  if seq_prop==2,  neither R or Ralt are computed. Ralt is expensive for large number of sources.
+	{
+		lprintf("MAIN",0,"Contraction R alternative...\n");
 	
-	reset_mo(Ralt);
-	int ts1,ts2;
-	for (int src1=0;src1<numsources;++src1) for (int src2=0;src2<numsources;++src2){
+
+		reset_mo(Ralt);
+		int ts1,ts2;
+		for (int src1=0;src1<numsources;++src1) for (int src2=0;src2<numsources;++src2){
 			ts1 = ts_vec[src1];
 			ts2 = ts_vec[src2];
 			for (int t=0;t<GLB_T;++t) for (int dt=0;dt<GLB_T;++dt){
@@ -1315,7 +1317,7 @@ void measure_pion_scattering_I0(double* m, int numsources, double precision,char
 	if (mo_arr != NULL) copy_mo(mo_arr[14],Ralt);
 		
 	if (path!=NULL) io4pt(Ralt,0,0,path,"Ralt",cnfg_filename);
-	
+	}
 
 	//free memory
 	free_propagator_eo();
