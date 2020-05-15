@@ -13,6 +13,7 @@
 #include "wilsonflow.h"
 #include <math.h>
 #include <string.h>
+#include "data_storage.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338327
@@ -772,10 +773,11 @@ double WF_topo(suNg_field *V)
   return TC;
 }
 
-void WF_update_and_measure(WF_integrator_type wft, suNg_field *V, double *tmax, double *eps, double *delta, int nmeas)
+data_storage_array *WF_update_and_measure(WF_integrator_type wft, suNg_field *V, double *tmax, double *eps, double *delta, int nmeas, storage_switch swc)
 {
 
   double TC;
+  data_storage_array *ret = NULL;
 #if defined(BC_T_ANTIPERIODIC) || defined(BC_T_PERIODIC) && !defined(PURE_GAUGE_ANISOTROPY)
   double E, Esym;
 #else
@@ -794,28 +796,100 @@ void WF_update_and_measure(WF_integrator_type wft, suNg_field *V, double *tmax, 
   TC = WF_topo(V);
 
 #if defined(BC_T_ANTIPERIODIC) || defined(BC_T_PERIODIC) && !defined(PURE_GAUGE_ANISOTROPY)
+  int idx[2] = {nmeas + 1, 4};
+  if (swc == STORE)
+  {
+    ret = allocate_data_storage_array(1);
+    allocate_data_storage_element(ret, 0, 2, idx); // ( nmeas+1 ) * ( 4 <=> t, E, Esym, TC)
+  }
+#else
+  int idx[3] = {nmeas + 1, GLB_T, 5};
+  if (swc == STORE)
+  {
+    ret = allocate_data_storage_array(2);
+    allocate_data_storage_element(ret, 0, 3, idx); // ( nmeas+1 ) * ( GLB_T ) * ( 5 <=> t, Etime, Espace, Esymtime, Esymspace)
+    idx[1] = 6;
+    allocate_data_storage_element(ret, 1, 2, idx); // ( nmeas+1 ) * ( 6 <=> t, Etime_tsum, Espace_tsum, Esymtime_tsum, Esymspace_tsum, TC)
+  }
+#endif
+
+#if defined(BC_T_ANTIPERIODIC) || defined(BC_T_PERIODIC) && !defined(PURE_GAUGE_ANISOTROPY)
   E = WF_E(V);
   Esym = WF_Esym(V);
   lprintf("WILSONFLOW", 0, "WF (t,E,t2*E,Esym,t2*Esym,TC) = %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e\n", t, E, t * t * E, Esym, t * t * Esym, TC);
+  if (swc == STORE)
+  {
+    idx[0] = 0;
+    idx[1] = 0;
+    *data_storage_element(ret, 0, idx) = t;
+    idx[1] = 1;
+    *data_storage_element(ret, 0, idx) = E;
+    idx[1] = 2;
+    *data_storage_element(ret, 0, idx) = Esym;
+    idx[1] = 3;
+    *data_storage_element(ret, 0, idx) = TC;
+  }
 #else
 
   WF_E_T(E, V);
   WF_Esym_T(Esym, V);
   Eavg[0] = Eavg[1] = Esymavg[0] = Esymavg[1] = 0.0;
-  for (j = 0; j < GLB_T; j++)
+
+  if (swc == STORE)
+  {
+    for (j = 0; j < GLB_T; j++)
+    {
+      idx[0] = 0;
+      idx[1] = j;
+      idx[2] = 0;
+      *data_storage_element(ret, 0, idx) = t;
+      idx[2] = 1;
+      *data_storage_element(ret, 0, idx) = E[2 * j];
+      idx[2] = 2;
+      *data_storage_element(ret, 0, idx) = E[2 * j + 1];
+      idx[2] = 3;
+      *data_storage_element(ret, 0, idx) = Esym[2 * j];
+      idx[2] = 4;
+      *data_storage_element(ret, 0, idx) = Esym[2 * j + 1];
+    }
+  }
+
+#if defined(BASIC_SF) || defined(ROTATED_SF)
+  Esym[2] = Esym[3] = 0.0;
+#endif
+
+  for (j = 1; j < GLB_T - 1; j++)
   {
     lprintf("WILSONFLOW", 0, "WF (T,t,Etime,Espace,Esymtime,Esymspace) = %d %1.16e %1.16e %1.16e %1.16e %1.16e\n", j, t, E[2 * j], E[2 * j + 1], Esym[2 * j], Esym[2 * j + 1]);
+
     Eavg[0] += E[2 * j];
     Eavg[1] += E[2 * j + 1];
     Esymavg[0] += Esym[2 * j];
     Esymavg[1] += Esym[2 * j + 1];
   }
+
   Eavg[0] /= GLB_T - 2;
   Eavg[1] /= GLB_T - 3;
-  Esymavg[0] /= GLB_T - 2;
+  Esymavg[0] /= GLB_T - 3;
   Esymavg[1] /= GLB_T - 3;
 
   lprintf("WILSONFLOW", 0, "WF avg (t,Etime,Espace,Esymtime,Esymspace,Pltime,Plspace,TC) = %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e\n", t, Eavg[0], Eavg[1], Esymavg[0], Esymavg[1], (NG - Eavg[0]), (NG - Eavg[1]), TC);
+  if (swc == STORE)
+  {
+    idx[0] = 0;
+    idx[1] = 0;
+    *data_storage_element(ret, 1, idx) = t;
+    idx[1] = 1;
+    *data_storage_element(ret, 1, idx) = Eavg[0];
+    idx[1] = 2;
+    *data_storage_element(ret, 1, idx) = Eavg[1];
+    idx[1] = 3;
+    *data_storage_element(ret, 1, idx) = Esymavg[0];
+    idx[1] = 4;
+    *data_storage_element(ret, 1, idx) = Esymavg[1];
+    idx[1] = 5;
+    *data_storage_element(ret, 1, idx) = TC;
+  }
 
 #endif
   k = 1;
@@ -856,14 +930,50 @@ void WF_update_and_measure(WF_integrator_type wft, suNg_field *V, double *tmax, 
       E = WF_E(V);
       Esym = WF_Esym(V);
       lprintf("WILSONFLOW", 0, "WF (t,E,t2*E,Esym,t2*Esym,TC) = %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e\n", t, E, t * t * E, Esym, t * t * Esym, TC);
+      if (swc == STORE)
+      {
+        idx[0] = k - 1;
+        idx[1] = 0;
+        *data_storage_element(ret, 0, idx) = t;
+        idx[1] = 1;
+        *data_storage_element(ret, 0, idx) = E;
+        idx[1] = 2;
+        *data_storage_element(ret, 0, idx) = Esym;
+        idx[1] = 3;
+        *data_storage_element(ret, 0, idx) = TC;
+      }
 #else
 
       WF_E_T(E, V);
       WF_Esym_T(Esym, V);
       Eavg[0] = Eavg[1] = Esymavg[0] = Esymavg[1] = 0.0;
-      for (j = 0; j < GLB_T; j++)
+
+      if (swc == STORE)
+      {
+        for (j = 0; j < GLB_T; j++)
+        {
+          idx[0] = k - 1;
+          idx[1] = j;
+          idx[2] = 0;
+          *data_storage_element(ret, 0, idx) = t;
+          idx[2] = 1;
+          *data_storage_element(ret, 0, idx) = E[2 * j];
+          idx[2] = 2;
+          *data_storage_element(ret, 0, idx) = E[2 * j + 1];
+          idx[2] = 3;
+          *data_storage_element(ret, 0, idx) = Esym[2 * j];
+          idx[2] = 4;
+          *data_storage_element(ret, 0, idx) = Esym[2 * j + 1];
+        }
+      }
+#if defined(BASIC_SF) || defined(ROTATED_SF)
+      Esym[2] = Esym[3] = 0.0;
+#endif
+
+      for (j = 1; j < GLB_T - 1; j++)
       {
         lprintf("WILSONFLOW", 0, "WF (T,t,Etime,Espace,Esymtime,Esymspace) = %d %1.16e %1.16e %1.16e %1.16e %1.16e\n", j, t, E[2 * j], E[2 * j + 1], Esym[2 * j], Esym[2 * j + 1]);
+
         Eavg[0] += E[2 * j];
         Eavg[1] += E[2 * j + 1];
         Esymavg[0] += Esym[2 * j];
@@ -872,11 +982,26 @@ void WF_update_and_measure(WF_integrator_type wft, suNg_field *V, double *tmax, 
 
       Eavg[0] /= GLB_T - 2;
       Eavg[1] /= GLB_T - 3;
-      Esymavg[0] /= GLB_T - 2;
+      Esymavg[0] /= GLB_T - 3;
       Esymavg[1] /= GLB_T - 3;
 
       lprintf("WILSONFLOW", 0, "WF avg (t,Etime,Espace,Esymtime,Esymspace,Pltime,Plspace,TC) = %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e\n", t, Eavg[0], Eavg[1], Esymavg[0], Esymavg[1], (NG - Eavg[0]), (NG - Eavg[1]), TC);
-
+      if (swc == STORE)
+      {
+        idx[0] = k - 1;
+        idx[1] = 0;
+        *data_storage_element(ret, 1, idx) = t;
+        idx[1] = 1;
+        *data_storage_element(ret, 1, idx) = Eavg[0];
+        idx[1] = 2;
+        *data_storage_element(ret, 1, idx) = Eavg[1];
+        idx[1] = 3;
+        *data_storage_element(ret, 1, idx) = Esymavg[0];
+        idx[1] = 4;
+        *data_storage_element(ret, 1, idx) = Esymavg[1];
+        idx[1] = 5;
+        *data_storage_element(ret, 1, idx) = TC;
+      }
 #endif
     }
     if (epsilon_new > 0.)
@@ -884,4 +1009,5 @@ void WF_update_and_measure(WF_integrator_type wft, suNg_field *V, double *tmax, 
     else
       epsilon = epsilon / 2;
   }
+  return ret;
 }

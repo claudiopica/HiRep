@@ -16,6 +16,7 @@
 #include <assert.h>
 #include "logger.h"
 #include <stdio.h>
+#include "data_storage.h"
 
 #ifdef ROTATED_SF
 #error This code has never been tested
@@ -90,7 +91,7 @@ int SF_quark_propagator(spinor_field *in, double mass, spinor_field *out, double
   f1 can be computed inserting the sources in the correlator in the lower or higher border. The two procedures give identical results. We keep only the computation with sources on the lower border.
 */
 
-void SF_PCAC_wall_corr(double mass, double acc)
+data_storage_array *SF_PCAC_wall_corr(double mass, double acc, storage_switch swh)
 {
 
 #ifdef BASIC_SF
@@ -107,7 +108,17 @@ void SF_PCAC_wall_corr(double mass, double acc)
   suNf *uptr;
   prop = alloc_spinor_field_f(4 * NF, &glattice);
   source = alloc_spinor_field_f(4 * NF, &glattice);
+  data_storage_array *ret=NULL;
 
+  if (swh == STORE)
+  {
+    ret = allocate_data_storage_array(3);
+    int idx[2] = {2, GLB_T};
+    allocate_data_storage_element(ret, 0, 2, idx);
+    allocate_data_storage_element(ret, 1, 2, idx);
+    idx[0] = 1;
+    allocate_data_storage_element(ret, 2, 1, idx);
+  }
   for (ix0 = 0; ix0 < GLB_T; ix0++)
   {
     f_A[ix0] = 0;
@@ -175,6 +186,7 @@ void SF_PCAC_wall_corr(double mass, double acc)
   /* f_A = prop^dag gamma0 prop */
 
   global_sum((double *)f_P, GLB_T);
+
   for (ix0 = 0; ix0 < GLB_T - 1; ix0++)
   {
     f_P[ix0] /= 2.0 * (double)GLB_VOL3;
@@ -185,6 +197,19 @@ void SF_PCAC_wall_corr(double mass, double acc)
   {
     f_A[ix0] /= -2.0 * (double)GLB_VOL3;
     lprintf("PC_wall_AC", 10, "f_A( %d )= %.16e\n", ix0, f_A[ix0]);
+  }
+
+  if (swh == STORE)
+  {
+    int idx[2];
+    for (ix0 = 0; ix0 < GLB_T - 1; ix0++)
+    {
+      idx[1] = ix0;
+      idx[0] = 0;
+      *data_storage_element(ret, 0, idx) = f_P[ix0];
+      idx[0] = 1;
+      *data_storage_element(ret, 0, idx) = f_A[ix0];
+    }
   }
 
   /*f_1 - NEED TO DO EACH color/dirac component separately, then combine at the end*/
@@ -227,6 +252,11 @@ void SF_PCAC_wall_corr(double mass, double acc)
   f_1 /= 2.0 * ((double)GLB_VOL3) * ((double)GLB_VOL3);
 
   lprintf("PC_wall_AC", 0, "f1 = %.16e\n", f_1);
+  if (swh == STORE)
+  {
+    int idx = 0;
+    *data_storage_element(ret, 2, &idx) = f_1;
+  }
 
   /*Create wall source with g5 factor at t=T-2*/
   /*U and P- on source (again actually use P+ to account for commuting with g5 in source)*/
@@ -296,11 +326,25 @@ void SF_PCAC_wall_corr(double mass, double acc)
     lprintf("PC_wall_AC", 10, "g_A( %d )= %.16e \n", ix0, g_A[ix0]);
   }
 
+  if (swh == STORE)
+  {
+    int idx[2];
+    for (ix0 = 0; ix0 < GLB_T - 1; ix0++)
+    {
+      idx[1] = ix0;
+      idx[0] = 0;
+      *data_storage_element(ret, 1, idx) = g_P[ix0];
+      idx[0] = 1;
+      *data_storage_element(ret, 1, idx) = g_A[ix0];
+    }
+  }
+
   free_spinor_field_f(source);
   free_spinor_field_f(prop);
 
   free(stmp);
   free(sbord);
+  return ret;
 
   /*   return (double)(f_A[(int)(GLB_T/2)] - f_A[(int)(GLB_T/2)-2])/(4*f_P[(int)((GLB_T/2)-1)]); */
 

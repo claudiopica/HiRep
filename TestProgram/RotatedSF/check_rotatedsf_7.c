@@ -112,7 +112,7 @@ int main(int argc,char *argv[])
   represent_gauge_field(); 
   full_plaquette();
  
-  SF_PCAC_wall_corr( mass,acc); 
+  SF_PCAC_wall_corr( mass,acc,NULL); 
   
   free_gfield(u_gauge);
   free_gfield_f(u_gauge_f);
