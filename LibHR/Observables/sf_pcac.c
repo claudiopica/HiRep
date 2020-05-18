@@ -108,7 +108,7 @@ data_storage_array *SF_PCAC_wall_corr(double mass, double acc, storage_switch sw
   suNf *uptr;
   prop = alloc_spinor_field_f(4 * NF, &glattice);
   source = alloc_spinor_field_f(4 * NF, &glattice);
-  data_storage_array *ret=NULL;
+  data_storage_array *ret = NULL;
 
   if (swh == STORE)
   {
@@ -239,14 +239,11 @@ data_storage_array *SF_PCAC_wall_corr(double mass, double acc, storage_switch sw
 
   global_sum((double *)sbord, sizeof(suNf_spinor) / sizeof(double) * 4 * NF);
 
-  if (PID == 0)
+  f_1 = 0;
+  for (int s = 0; s < 4 * NF; s++)
   {
-    f_1 = 0;
-    for (int s = 0; s < 4 * NF; s++)
-    {
-      _spinor_prod_re_f(temp, sbord[s], sbord[s]);
-      f_1 += temp;
-    }
+    _spinor_prod_re_f(temp, sbord[s], sbord[s]);
+    f_1 += temp;
   }
 
   f_1 /= 2.0 * ((double)GLB_VOL3) * ((double)GLB_VOL3);
