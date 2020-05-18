@@ -885,13 +885,13 @@ void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_stor
                 }
                 else
                 {
-                    MPI_Send(gb_storage + t1 * total_n_glue_op * nblocking, total_n_glue_op * nblocking * 2, MPI_DOUBLE, 0, lcor->list[icor].t1, cart_comm);
+                    MPI_Send((double*)(gb_storage + t1 * total_n_glue_op * nblocking), total_n_glue_op * nblocking * 2, MPI_DOUBLE, 0, lcor->list[icor].t1, cart_comm);
                 }
             }
 
             if (PID == 0 && t1 == -1)
             {
-                MPI_Recv(gb1, total_n_glue_op * nblocking * 2, MPI_DOUBLE, t_to_proc[lcor->list[icor].t1], lcor->list[icor].t1, cart_comm, &r1);
+                MPI_Recv((double*)(gb1), total_n_glue_op * nblocking * 2, MPI_DOUBLE, t_to_proc[lcor->list[icor].t1], lcor->list[icor].t1, cart_comm, &r1);
             }
             listsent[lcor->list[icor].t1] = 0;
         }
@@ -908,13 +908,13 @@ void evaluate_correlators(cor_list *lcor, int nblocking, double complex *gb_stor
                     }
                     else
                     {
-                        MPI_Send(gb_storage + t2 * total_n_glue_op * nblocking, total_n_glue_op * nblocking * 2, MPI_DOUBLE, 0, GLB_T + lcor->list[icor].t2, cart_comm);
+                        MPI_Send((double*)(gb_storage + t2 * total_n_glue_op * nblocking), total_n_glue_op * nblocking * 2, MPI_DOUBLE, 0, GLB_T + lcor->list[icor].t2, cart_comm);
                     }
                 }
 
                 if (PID == 0 && t2 == -1)
                 {
-                    MPI_Recv(gb2, total_n_glue_op * nblocking * 2, MPI_DOUBLE, t_to_proc[lcor->list[icor].t2], GLB_T + lcor->list[icor].t2, cart_comm, &r2);
+                    MPI_Recv((double*)(gb2), total_n_glue_op * nblocking * 2, MPI_DOUBLE, t_to_proc[lcor->list[icor].t2], GLB_T + lcor->list[icor].t2, cart_comm, &r2);
                 }
                 listsent[lcor->list[icor].t2] = 0;
             }
