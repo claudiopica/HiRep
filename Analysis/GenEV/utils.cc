@@ -201,7 +201,7 @@ void read_2pt_def(par *apar)
                             if (dt == 0 || dt == p2 - p1)
                             {
                                 dt = p2 - p1;
-                                apar->corrdef[dt].points.push_back((cpoints){.p2 = p2, .p1 = p1});
+                                apar->corrdef[dt].points.push_back(cpoints(p1, p2));
                             }
                             else
                             {

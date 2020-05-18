@@ -5,23 +5,21 @@
 #include <string>
 #include <map>
 
-//struct op_bl
-//{
-//  int status;
-//  int op_index;
-//  std::vector<int> good_bl;
-//  std::vector<int> bad_bl;
-//  bool is_set;
-//};
-
 struct datafile
 {
   std::string filename;
   int nmeas;
 };
 
-struct cpoints
+class cpoints
 {
+public:
+  cpoints(int i1, int i2)
+  {
+    p1 = i1;
+    p2 = i2;
+  };
+
   int p1;
   int p2;
 };
