@@ -15,7 +15,7 @@ inputs:
   repr:
     description: 'Fermion representation'
     required: true
-  ecsw:
+  expcsw:
     description: "Use ExpCSW"
     required: true
     default: -no-expclover
@@ -26,7 +26,7 @@ runs:
     - ./TestProgram/run_tests.sh
     - ${{ inputs.ccache }}
     - ${{ inputs.mpi }}
-    - ${{ inputs.ecsw }}
+    - ${{ inputs.expcsw }}
     - -n
     - ${{ inputs.nc }}
     - -r
