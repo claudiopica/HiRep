@@ -24,3 +24,10 @@ disc:nhits5 = 60
 
 disc:n_mom = 2
 
+// Replicas
+N_REP = 1
+
+//Logger levels (default = -1)
+log:default = -1
+log:inverter = -1
+log:forcestat = 0

@@ -7,6 +7,14 @@ NP_X = 1
 NP_Y = 1
 NP_Z = 1
 
+// Replicas
+N_REP = 1
+
+//Logger levels (default = -1)
+log:default = -1
+log:inverter = -1
+log:forcestat = 0
+
 //level = 1  seed = 1
 level = 1  seed = 38761
 

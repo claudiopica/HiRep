@@ -10,7 +10,6 @@ NP_Z = 1
 
 rlx_level = 1
 rlx_seed = 12345
-log:default = 0
 
 disc:csw = 1.
 disc:mass = 2.0
@@ -24,3 +23,10 @@ disc:nhits5 = 60
 
 disc:n_mom = 2
 
+// Replicas
+N_REP = 1
+
+//Logger levels (default = -1)
+log:default = -1
+log:inverter = -1
+log:forcestat = 0
