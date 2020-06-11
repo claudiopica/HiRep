@@ -1,13 +1,13 @@
-GLB_T = 8
-GLB_X = 8
-GLB_Y = 8
-GLB_Z = 8
+GLB_T = 4
+GLB_X = 4
+GLB_Y = 4
+GLB_Z = 4
 
 log:default = -1
 log:inverter = -1
 log:forcestat = 0
 
-conf name= Snoopynew137n1
+conf name= openQCD_qcd1_OBC_L4T4_B12.0_cxxxn1
 
-//accepted conf types are openqcd hirep openqcd_sf
-conf type= openqcd
+//accepted input conf types are openqcd_pbc openqcd_obc openqcd_sf hirep_pbc 
+conf type= openqcd_obc

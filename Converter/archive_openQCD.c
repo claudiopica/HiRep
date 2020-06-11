@@ -238,3 +238,116 @@ void write_gauge_field_openQCD(char filename[])
   lprintf("IO", 0, "Plaquette of the stored configuration: %1.8e\n", writeplaq);
   lprintf("IO", 0, "Configuration [%s] wrote [%ld sec %ld usec]\n", filename, etime.tv_sec, etime.tv_usec);
 }
+
+static void write_gauge_field_hirep(char filename[], double subs)
+{
+  FILE *fp = NULL;
+  int g[4], p[4];
+  double *buff = NULL;
+  int zsize, rz;
+  double plaq;
+  struct timeval start, end, etime;
+
+#ifndef ALLOCATE_REPR_GAUGE_FIELD
+  complete_gf_sendrecv(u_gauge);
+  apply_BCs_on_represented_gauge_field(); //Save the link variables with periodic boundary conditions
+#endif
+
+  plaq = avr_plaquette(); /* to use as a checksum in the header */
+
+  double plaqt[GLB_T], plaqs[GLB_T];
+  avr_plaquette_time(plaqt, plaqs);
+  plaq = 0.;
+  for (int kk = 1; kk < GLB_T - 1; kk++)
+  {
+    plaq += plaqt[kk] + plaqs[kk];
+  }
+  plaq += plaqt[0] + (plaqs[GLB_T - 1] + plaqs[0]) / 2.0;
+  plaq /= 2.0 * (GLB_T - subs);
+
+  int d[5] = {NG, GLB_T, GLB_X, GLB_Y, GLB_Z};
+  error((fp = fopen(filename, "wb")) == NULL, 1, "write_gauge_field",
+        "Failed to open file for writing");
+  /* write NG and global size */
+  error(fwrite_BE_int(d, (size_t)(5), fp) != (5),
+        1, "write_gauge_field",
+        "Failed to write gauge field geometry");
+  /* write average plaquette */
+  error(fwrite_BE_double(&plaq, (size_t)(1), fp) != (1),
+        1, "write_gauge_field",
+        "Failed to write gauge field plaquette");
+
+  gettimeofday(&start, 0);
+
+  zsize = GLB_Z / NP_Z;
+  rz = GLB_Z - zsize * NP_Z;
+
+  buff = malloc(sizeof(suNg) * 4 * (GLB_Z / NP_Z + ((rz > 0) ? 1 : 0)));
+
+  g[3] = 0;
+  for (g[0] = 0; g[0] < GLB_T; ++g[0])
+  { /* loop over T, X and Y direction */
+    for (g[1] = 0; g[1] < GLB_X; ++g[1])
+    {
+      for (g[2] = 0; g[2] < GLB_Y; ++g[2])
+      {
+        for (p[3] = 0; p[3] < NP_Z; ++p[3])
+        { /* loop over processors in Z direction */
+          int bsize;
+
+          bsize = sizeof(suNg) / sizeof(double) * 4 * (GLB_Z / NP_Z + ((p[3] < rz) ? 1 : 0)); /* buffer size in doubles */
+
+          /* fill link buffer */
+          int lsite[4];
+          suNg *cm;
+
+          /* convert global to local coordinate */
+          origin_coord(lsite);
+          lsite[0] = g[0] - lsite[0];
+          lsite[1] = g[1] - lsite[1];
+          lsite[2] = g[2] - lsite[2];
+
+          /* fill buffer */
+          cm = (suNg *)buff;
+          for (lsite[3] = 0; lsite[3] < Z; ++lsite[3])
+          { /* loop on local Z */
+            int ix = ipt(lsite[0], lsite[1], lsite[2], lsite[3]);
+            suNg *pm = pu_gauge(ix, 0);
+            *(cm++) = *(pm++); /* copy 4 directions */
+            *(cm++) = *(pm++);
+            *(cm++) = *(pm++);
+            *(cm++) = *(pm);
+          }
+
+          /* write buffer to file */
+          error(fwrite_BE_double(buff, (size_t)(bsize), fp) != (bsize),
+                1, "write_gauge_field",
+                "Failed to write gauge field to file");
+
+        } /* end loop over processors in Z direction */
+      }
+    }
+  } /* end loop over T, X and Y direction */
+
+  fclose(fp);
+  free(buff);
+
+  gettimeofday(&end, 0);
+  timeval_subtract(&etime, &end, &start);
+  lprintf("IO", 0, "Configuration [%s] saved [%ld sec %ld usec]\n", filename, etime.tv_sec, etime.tv_usec);
+
+#ifndef ALLOCATE_REPR_GAUGE_FIELD
+  complete_gf_sendrecv(u_gauge);
+  apply_BCs_on_represented_gauge_field(); //Restore the right boundary conditions
+#endif
+}
+
+void write_gauge_field_hirep_pbc_to_obc(char filename[])
+{
+  write_gauge_field_hirep(filename,1.0);
+}
+
+void write_gauge_field_hirep_pbc_to_sf(char filename[])
+{
+  write_gauge_field_hirep(filename,2.0);
+}

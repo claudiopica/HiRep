@@ -14,8 +14,8 @@ GAUGE_GROUP = GAUGE_SUN
 #Z => PERIODIC, ANTIPERIODIC, THETA
 
 #MACRO += -DBC_T_THETA
-#MACRO += -DBC_T_PERIODIC
-MACRO += -DBC_T_ANTIPERIODIC
+MACRO += -DBC_T_PERIODIC
+#MACRO += -DBC_T_ANTIPERIODIC
 #MACRO += -DBC_T_OPEN
 MACRO += -DBC_X_PERIODIC
 MACRO += -DBC_Y_PERIODIC
@@ -32,13 +32,14 @@ MACRO += -DBC_Z_PERIODIC
 #MACRO += -DWITH_CLOVER
 MACRO += -DWITH_EXPCLOVER
 MACRO += -DUPDATE_EO
-MACRO += -DWITH_MPI
+#MACRO += -DWITH_MPI
 #MACRO += -DWITH_QUATERNIONS
+#MACRO += -DPURE_GAUGE_ANISOTROPY
 MACRO += -DNDEBUG
 #MACRO += -DDPHI_FLOAT
 #MACRO += -DCHECK_SPINOR_MATCHING
 #MACRO += -DMPI_TIMING
-#MACRO += -DIO_FLUSH
+MACRO += -DIO_FLUSH
 #MACRO += -DUNROLL_GROUP_REPRESENT
 #MACRO += -DTIMING
 #MACRO += -DTIMING_WITH_BARRIERS
@@ -59,7 +60,7 @@ CFLAGS = -Wall -std=c99 -O3  #-g #-march=core-avx2 -mtune=core-avx2 -g
 
 CC = clang-mp-8.0
 MPICC = mpicc-mpich-clang80
-LDFLAGS =  -L /opt/local/lib/mpich-devel-clang80/ -L /opt/local/lib/ #-lprofiler #-l efence
+LDFLAGS =  -L /opt/local/lib/mpich-devel-clang80/ -L /opt/local/lib/ #-lefence #-lprofiler #-l efence
 INCLUDE = -I /opt/local/include/mpich-clang80/
 
 

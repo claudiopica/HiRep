@@ -93,6 +93,7 @@ int SF_quark_propagator(spinor_field *in, double mass, spinor_field *out, double
 
 data_storage_array *SF_PCAC_wall_corr(double mass, double acc, storage_switch swh)
 {
+  data_storage_array *ret = NULL;
 
 #ifdef BASIC_SF
 
@@ -108,7 +109,6 @@ data_storage_array *SF_PCAC_wall_corr(double mass, double acc, storage_switch sw
   suNf *uptr;
   prop = alloc_spinor_field_f(4 * NF, &glattice);
   source = alloc_spinor_field_f(4 * NF, &glattice);
-  data_storage_array *ret = NULL;
 
   if (swh == STORE)
   {
@@ -341,7 +341,6 @@ data_storage_array *SF_PCAC_wall_corr(double mass, double acc, storage_switch sw
 
   free(stmp);
   free(sbord);
-  return ret;
 
   /*   return (double)(f_A[(int)(GLB_T/2)] - f_A[(int)(GLB_T/2)-2])/(4*f_P[(int)((GLB_T/2)-1)]); */
 
@@ -481,4 +480,5 @@ data_storage_array *SF_PCAC_wall_corr(double mass, double acc, storage_switch sw
   rotated_lXdum(corr_mem, chi, prop_uu, prop_dd);
 
 #endif
+  return ret;
 }

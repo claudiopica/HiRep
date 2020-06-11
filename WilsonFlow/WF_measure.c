@@ -240,7 +240,7 @@ int main(int argc, char *argv[])
 
     full_plaquette();
 
-    WF_update_and_measure(WF_var.ittype, u_gauge, &(WF_var.tmax), &(WF_var.eps), &(WF_var.delta), WF_var.nmeas);
+    WF_update_and_measure(WF_var.ittype, u_gauge, &(WF_var.tmax), &(WF_var.eps), &(WF_var.delta), WF_var.nmeas, DONTSTORE);
 
     gettimeofday(&end, 0);
     timeval_subtract(&etime, &end, &start);

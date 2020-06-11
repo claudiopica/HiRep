@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* NOCOMPILE= !BC_T_PERIODIC
+* NOCOMPILE= !BC_T_OPEN
 * NOCOMPILE= !NG=3
 *
 *******************************************************************************/
@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
   data_storage_array *store;
   int idx[3];
 
-  char cnfg_filename[256] = "cnfg/HiRep_qcd1_pb_L8T8_b6.0_c1.234_k0.13_r0_id4n1";
+  char cnfg_filename[256] = "cnfg/HiRep_obc_openQCD_qcd1_OBC_L4T4_B12.0_cxxxn1";
 
   setup_process(&argc, &argv);
   setup_gauge_fields();
