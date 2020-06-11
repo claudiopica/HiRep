@@ -15,7 +15,7 @@ jobs:
       matrix:
         nc: [2, 3]
         repr: [FUND, ADJ]
-        expcsw: [-expcsw,-no-expcsw]
+        ecsw: [-expcsw,-no-expcsw]
 
     steps:
     - uses: actions/checkout@v1
@@ -27,4 +27,4 @@ jobs:
         mpi: -no-mpi
         nc: ${{ matrix.nc }}
         repr: ${{ matrix.repr }}
-        expcsw: ${{ matrix.expcsw }}
+        ecsw: ${{ matrix.ecsw }}
