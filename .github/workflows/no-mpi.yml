@@ -15,7 +15,7 @@ jobs:
       matrix:
         nc: [2, 3]
         repr: [FUND, ADJ]
-        ecsw: [-expcsw,-no-expcsw]
+        ecsw: [-expclover,-no-expclover]
 
     steps:
     - uses: actions/checkout@v1
