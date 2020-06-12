@@ -3,6 +3,7 @@
 * NOCOMPILE= !BASIC_SF
 * NOCOMPILE= !NG=3
 * NOCOMPILE= !WITH_EXPCLOVER
+* NOCOMPILE= !REPR_FUNDAMENTAL
 *
 *******************************************************************************/
 

@@ -2,6 +2,7 @@
 *
 * NOCOMPILE= !BC_T_PERIODIC
 * NOCOMPILE= !NG=3
+* NOCOMPILE= !REPR_FUNDAMENTAL
 *
 *******************************************************************************/
 
@@ -70,7 +71,7 @@ int main(int argc, char *argv[])
 
   input_inverter INV_var = {.precision = 1e-16, .beta = 12.0, .mass = -0.14800000308159977, .csw = 1.13295};
   input_WF_meas WF_var = {.tmax = 0.2, .nmeas = 1, .eps = .8e-5, .delta = 1.0e-5, .ittype = RK3_ADAPTIVE};
-  set_csw(&INV_var.csw);
+  set_csw(&(INV_var.csw));
 
   lprintf("MAIN", 0, "Inverter precision = %e\n", INV_var.precision);
   lprintf("MAIN", 0, "Mass = %f\n", INV_var.mass);
