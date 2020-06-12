@@ -71,7 +71,9 @@ int main(int argc, char *argv[])
 
   input_inverter INV_var = {.precision = 1e-16, .beta = 12.0, .mass = -0.14800000308159977, .csw = 1.13295};
   input_WF_meas WF_var = {.tmax = 0.2, .nmeas = 1, .eps = .8e-5, .delta = 1.0e-5, .ittype = RK3_ADAPTIVE};
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
   set_csw(&(INV_var.csw));
+#endif
 
   lprintf("MAIN", 0, "Inverter precision = %e\n", INV_var.precision);
   lprintf("MAIN", 0, "Mass = %f\n", INV_var.mass);
@@ -123,7 +125,7 @@ int main(int argc, char *argv[])
   idx[1] = 3;
   tavg[2] = *data_storage_element(store, 0, idx);
 
-  test = fabs(1. -  GLB_VOLUME * tavg[0] / openQCDWFobsl0[0]);
+  test = fabs(1. - GLB_VOLUME * tavg[0] / openQCDWFobsl0[0]);
 
   lprintf("TEST", 0, "Wl(t=0) relative difference: %.2e \n(should be around 1*10^(-7) or so)\n\n", test);
   if (test > 1e-6 && PID == 0)
@@ -132,7 +134,7 @@ int main(int argc, char *argv[])
     return_value += 1;
   }
 
-  test = fabs(1. -  GLB_VOLUME * tavg[1] / openQCDWFobsl0[1]);
+  test = fabs(1. - GLB_VOLUME * tavg[1] / openQCDWFobsl0[1]);
   lprintf("TEST", 0, "Yl(t=0) relative difference: %.2e \n(should be around 1*10^(-7) or so)\n\n", test);
   if (test > 1e-6 && PID == 0)
   {
