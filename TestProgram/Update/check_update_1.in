@@ -18,10 +18,6 @@ log:forcestat = 0
 rlx_level = 1
 rlx_seed = 35563
 
-//Logger levels (default = -1)
-log:default = -1
-log:inverter = -1
-log:forcestat = 0
 
 //Fermion twisting
 theta_T = 0.
@@ -38,7 +34,8 @@ run name = run1
 save freq = 10000
 meas freq = 1
 conf dir = .
-gauge start = random // run1_6x6x6x6nc2rADJnf2b6.000000m-0.000000n10
+gauge start = random 
+// run1_6x6x6x6nc2rADJnf2b6.000000m-0.000000n10
 
 
 // Monomials
