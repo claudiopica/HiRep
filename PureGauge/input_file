@@ -1,41 +1,57 @@
 // Global variables
-GLB_T = 8
+GLB_T = 32
 GLB_X = 8
 GLB_Y = 8
 GLB_Z = 8
 NP_T = 2
-NP_X = 2
-NP_Y = 2
+NP_X = 1
+NP_Y = 1
 NP_Z = 1
 
 N_REP = 1
 
-level = 1  seed = 12345
+rlx_level = 1
+rlx_seed = 43215
 
 //Logger levels (default = -1)
 log:default = -1
 log:inverter = -1
 log:forcestat = 0
 
-// Pure gauge variables
-beta  =   5.6
+// Pure gauge coupling
+beta  =   6.0
+// Bare anisotropy parameter
+anisotropy  =   1.0
+// number of heathbath steps
 nhb   =   1
-nor   =   4
-nit   =   1 
+// number of overelaxations steps
+nor   =   2
+
+WF:make = true
+//WF integrators type 0=Euler 1=3rd order Runge-Kutta 2=Adaptive 3rd order Runge-Kutta
+WF:integrator = 2 
+// Wilson Flow time
+WF:tmax = 2.0
+//20
+WF:nmeas = 10
+//60
+WF:eps = 0.02
+WF:delta = 0.0001
+WF:anisotropy  = 1.0
+
+polyakov:make = false
 
 // Run control variables
-therm = 10
+therm = 500
 run name = run1
-save freq = 1
-meas freq = 1 
+save freq = 5000
 conf dir = cnfg
 gauge start = ranDoM
+//separations steps between each measure
+nit = 50
 //gauge start = Unit
-//gauge start = run1_8x2x2x2nc2rADJnf2b2.000000m1.310000n10
+//gauge start = run1_32x8x8x8nc3b6.000000an1.000000n1
 //rlx_state =
 //rlx_start =
-last conf = 15
-
-//Polyakov
-poly:make = false
-
+last conf = +10000
+ 

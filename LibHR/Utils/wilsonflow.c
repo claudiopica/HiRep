@@ -883,16 +883,16 @@ data_storage_array *WF_update_and_measure(WF_integrator_type wft, suNg_field *V,
     }
 
     if (epsilon_new > 0.)
-      t = t + epsilon;
-
-    if (fabs(t - (double)k * dt) < epsilon / 2. && epsilon_new > 0)
     {
-      k++;
-      WF_measure_and_store(V, swc, &ret, nmeas, k, &t);
-    }
-
-    if (epsilon_new > 0.)
+      t = t + epsilon;
       epsilon = epsilon_new;
+
+      if (fabs(t - (double)k * dt) < epsilon / 2.)
+      {
+        k++;
+        WF_measure_and_store(V, swc, &ret, nmeas, k, &t);
+      }
+    }
     else
       epsilon = epsilon / 2;
   }
