@@ -358,7 +358,7 @@ double WilsonFlow3_adaptative(suNg_field *V, double epsilon, double delta)
   {
     suNg_field_copy(u_gauge, u_gauge_backup);
     epsilon = -1.;
-    lprintf("WARNING", 0, "d > delta ! Epsilon is set to -1 in order to repeat the calculation \n");
+    lprintf("WARNING", 0, "d > delta ! Epsilon is set to -1 in order to repeat the calculation.\n");
   }
 
   return epsilon;
@@ -760,7 +760,7 @@ static void WF_measure_and_store(suNg_field *V, storage_switch swc, data_storage
 
   E = WF_E(V);
   Esym = WF_Esym(V);
-  lprintf("WILSONFLOW", 0, "WF (t,E,t2*E,Esym,t2*Esym,TC) = %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e\n", t, E, *t * *t * E, Esym, *t * *t * Esym, TC);
+  lprintf("WILSONFLOW", 0, "WF (t,E,t2*E,Esym,t2*Esym,TC) = %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e\n", *t, E, *t * *t * E, Esym, *t * *t * Esym, TC);
   if (swc == STORE)
   {
     idx[0] = idmeas - 1;
@@ -856,7 +856,7 @@ data_storage_array *WF_update_and_measure(WF_integrator_type wft, suNg_field *V,
   double t = 0.;
   double epsilon = *eps;
   double dt = *tmax / nmeas;
-  double epsilon_new;
+  double epsilon_new = *eps;
 
   WF_measure_and_store(V, swc, &ret, nmeas, k, &t);
 
@@ -869,32 +869,31 @@ data_storage_array *WF_update_and_measure(WF_integrator_type wft, suNg_field *V,
     {
     case EUL:
       WilsonFlow1(V, epsilon);
-      epsilon_new = epsilon;
+      t += epsilon;
       break;
 
     case RK3:
       WilsonFlow3(V, epsilon);
-      epsilon_new = epsilon;
+      t += epsilon;
       break;
 
     case RK3_ADAPTIVE:
-      epsilon_new = WilsonFlow3_adaptative(V, epsilon, *delta);
+      do
+      {
+        epsilon_new = WilsonFlow3_adaptative(V, epsilon, *delta);
+        if (epsilon_new < 0.)
+          epsilon = epsilon / 2;
+      } while (epsilon_new < 0);
+      t += epsilon;
+      epsilon = epsilon_new;
       break;
     }
 
-    if (epsilon_new > 0.)
+    if (fabs(t - (double)k * dt) < epsilon / 2.)
     {
-      t = t + epsilon;
-      epsilon = epsilon_new;
-
-      if (fabs(t - (double)k * dt) < epsilon / 2.)
-      {
-        k++;
-        WF_measure_and_store(V, swc, &ret, nmeas, k, &t);
-      }
+      k++;
+      WF_measure_and_store(V, swc, &ret, nmeas, k, &t);
     }
-    else
-      epsilon = epsilon / 2;
   }
   return ret;
 }

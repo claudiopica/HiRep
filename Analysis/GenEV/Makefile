@@ -1,6 +1,6 @@
 CPP=clang++
 CFLAGS= -O3 -Wall -Wextra
-LDFLAGS= -lefence -L/opt/local/lib
+LDFLAGS= -L/opt/local/lib -lefence 
 INC = -I ./.
 
 # Location of Gnu Science Library
@@ -31,4 +31,4 @@ test_eig: test_eig.cc matrix_algebra.o Makefile
 	${CPP} -o $@  -I ${GSL_LIB}/include/   test_eig.cc matrix_algebra.o utils.o  -L ${GSL_LIB}/lib  -lm -lgsl -lgslcblas -std=c++11
 
 clean:
-	@rm -f managecorr *~ *.o test_eig test_mat
+	@rm -f gevp *~ *.o test_eig test_mat
