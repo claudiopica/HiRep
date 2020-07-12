@@ -760,7 +760,7 @@ static void WF_measure_and_store(suNg_field *V, storage_switch swc, data_storage
 
   E = WF_E(V);
   Esym = WF_Esym(V);
-  lprintf("WILSONFLOW", 0, "WF (t,E,t2*E,Esym,t2*Esym,TC) = %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e\n", *t, E, *t * *t * E, Esym, *t * *t * Esym, TC);
+  lprintf("WILSONFLOW", 0, "WF (t,E,t2*E,Esym,t2*Esym,TC) = %1.8e %1.16e %1.16e %1.16e %1.16e %1.16e\n", *t, E, *t * *t * E, Esym, *t * *t * Esym, TC);
   if (swc == STORE)
   {
     idx[0] = idmeas - 1;
@@ -808,7 +808,7 @@ static void WF_measure_and_store(suNg_field *V, storage_switch swc, data_storage
   Eavg[0] = Eavg[1] = Esymavg[0] = Esymavg[1] = 0.0;
   for (j = 0; j < GLB_T; j++)
   {
-    lprintf("WILSONFLOW", 0, "WF (T,t,Etime,Espace,Esymtime,Esymspace) = %d %1.16e %1.16e %1.16e %1.16e %1.16e\n", j, *t, E[2 * j], E[2 * j + 1], Esym[2 * j], Esym[2 * j + 1]);
+    lprintf("WILSONFLOW", 0, "WF (T,t,Etime,Espace,Esymtime,Esymspace) = %d %1.8e %1.16e %1.16e %1.16e %1.16e\n", j, *t, E[2 * j], E[2 * j + 1], Esym[2 * j], Esym[2 * j + 1]);
     Eavg[0] += E[2 * j];
     Eavg[1] += E[2 * j + 1];
     Esymavg[0] += Esym[2 * j];
@@ -827,7 +827,7 @@ static void WF_measure_and_store(suNg_field *V, storage_switch swc, data_storage
   Esymavg[1] /= GLB_T;
 #endif
 
-  lprintf("WILSONFLOW", 0, "WF avg (t,Etime,Espace,Esymtime,Esymspace,Pltime,Plspace,TC) = %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e\n", *t, Eavg[0], Eavg[1], Esymavg[0], Esymavg[1], (NG - Eavg[0]), (NG - Eavg[1]), TC);
+  lprintf("WILSONFLOW", 0, "WF avg (t,Etime,Espace,Esymtime,Esymspace,Pltime,Plspace,TC) = %1.8e %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e\n", *t, Eavg[0], Eavg[1], Esymavg[0], Esymavg[1], (NG - Eavg[0]), (NG - Eavg[1]), TC);
   if (swc == STORE)
   {
     idx[0] = idmeas - 1;
@@ -857,6 +857,7 @@ data_storage_array *WF_update_and_measure(WF_integrator_type wft, suNg_field *V,
   double epsilon = *eps;
   double dt = *tmax / nmeas;
   double epsilon_new = *eps;
+  double epsilon_meas = 0;
 
   WF_measure_and_store(V, swc, &ret, nmeas, k, &t);
 
@@ -889,10 +890,20 @@ data_storage_array *WF_update_and_measure(WF_integrator_type wft, suNg_field *V,
       break;
     }
 
-    if (fabs(t - (double)k * dt) < epsilon / 2.)
+    if ((double)k * dt - t < epsilon )
     {
-      k++;
-      WF_measure_and_store(V, swc, &ret, nmeas, k, &t);
+      if ((double)k * dt - t < 1.e-10)
+      {
+        k++;
+        WF_measure_and_store(V, swc, &ret, nmeas, k, &t);
+        if (epsilon_meas > epsilon)
+          epsilon = epsilon_meas;
+      }
+      else
+      {
+        epsilon_meas = epsilon;
+        epsilon = (double)k * dt - t;
+      }
     }
   }
   return ret;
