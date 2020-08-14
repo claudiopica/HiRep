@@ -75,16 +75,23 @@ void WF_set_bare_anisotropy(double *wf_chi)
         for (iz = 0; iz < Z_EXT; ++iz)
         {
           index = ipt_ext(it, ix, iy, iz);
-          for (mu = 1; mu < 3; mu++)
+          if (index != -1)
+          {
+            mu = 0;
             for (nu = mu + 1; nu < 4; nu++)
             {
-              if (index != -1)
-              {
-                wf_plaq_weight[index * 16 + mu * 4 + nu] *= *wf_chi;
-                wf_plaq_weight[index * 16 + nu * 4 + mu] *= *wf_chi;
-              }
+              wf_plaq_weight[index * 16 + mu * 4 + nu] *= *wf_chi * *wf_chi;
+              wf_plaq_weight[index * 16 + nu * 4 + mu] *= *wf_chi * *wf_chi;
             }
+            //for (mu = 1; mu < 3; mu++)
+            //  for (nu = mu + 1; nu < 4; nu++)
+            //  {
+            //    wf_plaq_weight[index * 16 + mu * 4 + nu] /= *wf_chi;
+            //    wf_plaq_weight[index * 16 + nu * 4 + mu] /= *wf_chi;
+            //  }
+          } //
         }
+
 #else
   error(0 == 0, 0, "WF_set_bare_anisotropy", "In order to use anisotropic lattice you must compile with PURE_GAUGE_ANISOTROPY enabled");
 #endif
@@ -254,7 +261,7 @@ double max_distance(suNg_field *V, suNg_field *Vprime)
 }
 
 // following 1301.4388
-double WilsonFlow3_adaptative(suNg_field *V, double epsilon, double delta)
+int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, double *delta)
 {
 
   suNg_field_copy(u_gauge_backup, u_gauge);
@@ -275,7 +282,7 @@ double WilsonFlow3_adaptative(suNg_field *V, double epsilon, double delta)
   apply_BCs_on_fundamental_gauge_field();
 #endif
 
-  Zeta(ws_gf, V, epsilon / 4.); //ws_gf = Z0/4
+  Zeta(ws_gf, V, *epsilon / 4.); //ws_gf = Z0/4
 
   _MASTER_FOR(&glattice, ix)
   {
@@ -296,8 +303,8 @@ double WilsonFlow3_adaptative(suNg_field *V, double epsilon, double delta)
   apply_BCs_on_fundamental_gauge_field();
 #endif
 
-  Zeta(ws_gf, V, 8. * epsilon / 9.); // ws_gf = 8 Z1 /9 - 17 Z0/36
-  Zeta(ws_gf_tmp, V, 2. * epsilon);  // ws_gf_tmp = 2 Z1 - Z0
+  Zeta(ws_gf, V, 8. * *epsilon / 9.); // ws_gf = 8 Z1 /9 - 17 Z0/36
+  Zeta(ws_gf_tmp, V, 2. * *epsilon);  // ws_gf_tmp = 2 Z1 - Z0
 
   _MASTER_FOR(&glattice, ix)
   {
@@ -324,7 +331,7 @@ double WilsonFlow3_adaptative(suNg_field *V, double epsilon, double delta)
   apply_BCs_on_fundamental_gauge_field();
 #endif
 
-  Zeta(ws_gf, V, 3. * epsilon / 4.);
+  Zeta(ws_gf, V, 3. * *epsilon / 4.);
 
   _MASTER_FOR(&glattice, ix)
   {
@@ -345,23 +352,25 @@ double WilsonFlow3_adaptative(suNg_field *V, double epsilon, double delta)
 
   // now need to get the maximum of the distance
   d = max_distance(V, Vprime);
+  varepsilon = *epsilon * pow(*delta / d, 1. / 3.);
 
-  // compute new value of epsilon
-  varepsilon = 0.95 * epsilon * pow(delta / d, 1. / 3.);
-
-  if (varepsilon < 0.1)
-    epsilon = varepsilon;
-  else
-    epsilon = 0.1;
-
-  if (d > delta)
+  if (d > *delta)
   {
     suNg_field_copy(u_gauge, u_gauge_backup);
-    epsilon = -1.;
-    lprintf("WARNING", 0, "d > delta ! Epsilon is set to -1 in order to repeat the calculation.\n");
+    *epsilon_new = 0.5 * varepsilon;
+    lprintf("WARNING", 0, "d > delta : must repeat the calculation with epsilon=%lf\n", *epsilon_new);
+    return 1 == 0;
   }
+  else
+  {
 
-  return epsilon;
+    if (varepsilon < 1.0)
+      *epsilon_new = 0.95 * varepsilon;
+    else
+      *epsilon_new = 1.0;
+
+    return 1 == 1;
+  }
 }
 
 void WilsonFlow3(suNg_field *V, const double epsilon)
@@ -866,6 +875,7 @@ data_storage_array *WF_update_and_measure(WF_integrator_type wft, suNg_field *V,
     if (t + epsilon > (double)k * dt)
       epsilon = (double)k * dt - t;
 
+    lprintf("AAA", 0, "entered with eps=%lf\n", epsilon);
     switch (wft)
     {
     case EUL:
@@ -879,30 +889,36 @@ data_storage_array *WF_update_and_measure(WF_integrator_type wft, suNg_field *V,
       break;
 
     case RK3_ADAPTIVE:
-      do
+      while (!WilsonFlow3_adaptative(V, &epsilon, &epsilon_new, delta))
       {
-        epsilon_new = WilsonFlow3_adaptative(V, epsilon, *delta);
-        if (epsilon_new < 0.)
-          epsilon = epsilon / 2;
-      } while (epsilon_new < 0);
+        lprintf("AAA", 0, "not accepted, change to eps=%lf\n", epsilon_new);
+        epsilon = epsilon_new;
+      }
+      lprintf("AAA", 0, "accepted, step of eps=%lf next eps=%lf\n", epsilon, epsilon_new);
+
       t += epsilon;
       epsilon = epsilon_new;
       break;
     }
 
-    if ((double)k * dt - t < epsilon )
+    if ((double)k * dt - t < epsilon)
     {
       if ((double)k * dt - t < 1.e-10)
       {
         k++;
+        lprintf("AAA", 0, "measure eps=%lf and meas_eps=%lf\n", epsilon, epsilon_meas);
+
         WF_measure_and_store(V, swc, &ret, nmeas, k, &t);
         if (epsilon_meas > epsilon)
           epsilon = epsilon_meas;
+        if (epsilon > dt)
+          epsilon = dt;
       }
       else
       {
         epsilon_meas = epsilon;
         epsilon = (double)k * dt - t;
+        lprintf("AAA", 0, "shift for next measure eps=%lf\n", epsilon);
       }
     }
   }

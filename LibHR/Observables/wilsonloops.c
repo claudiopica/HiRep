@@ -660,8 +660,8 @@ void WL_correlators(double** ret, const suNg_field* gf, const suNg* poly, const 
 }
 
 
-#if NG==2
 void WL_wilsonloops(double HYP_weight[3]) {
+#if NG==2
   error(WL_npaths==0,1,"WL_wilsonloops [wilsonloops.c]","No path has been loaded");
   
   HYP_smearing(HYP,u_gauge,HYP_weight);
@@ -726,5 +726,8 @@ void WL_wilsonloops(double HYP_weight[3]) {
   afree(tmp);
   afree(WL[0]);
   afree(WL);
-}
+#else
+lprintf("WILSON LOOPS",0,"Wilson Loops measure has been implmented only for NG=2\n");
 #endif //NG==2
+
+}
