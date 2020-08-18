@@ -141,10 +141,11 @@ typedef struct
 } filename_t;
 
 
-int main(int argc, char *argv[])
+int main(int argc, char *argv[]) 
 {
   int return_value=0;
   int nm;
+  int k = 0;
   double m[256];
 
   spinor_field *source;
@@ -172,7 +173,7 @@ int main(int argc, char *argv[])
 
 
   nm = 1;
-  m[0] = -atof(mes_var.mstring);
+  m[0] = atof(mes_var.mstring);
   lprintf("MAIN", 0, "Inverter precision = %e\n", mes_var.precision);
   lprintf("MAIN", 0, "Mass[%d] = %f\n", k, m[k]);
 
@@ -264,6 +265,7 @@ int main(int argc, char *argv[])
 
       if (mes_var.ne)
       {
+        // This is untested (non-exceptional momental)
         suNf_field_copy(u_gauge_f, u_gauge_old_f);
         twist_XYZ_bc(twist * mes_var.px_out, twist * mes_var.py_out, twist * mes_var.pz_out);
 
@@ -287,7 +289,7 @@ int main(int argc, char *argv[])
           spinor_field_copy_f(&prop_out[j], &prop_in[j]);
       }
       lprintf("LOOK", 10, "%g%g%g%g %g%g%g%g twist %g", p_in[0], p_in[1], p_in[2], p_in[3], p_out[0], p_out[1], p_out[2], p_out[3], twist);
-      measure_renormalization(prop_in, prop_out, nm, p_in[0], p_in[1], p_in[2], p_in[3], p_out[0], p_out[1], p_out[2], p_out[3]);
+      measure_renormalization(prop_in, prop_out, nm,   p_in[0], p_in[1], p_in[2], p_in[3],p_out[0], p_out[1], p_out[2], p_out[3]);
       char label[256];
       
       sprintf(label, "NPR mom_idx %d twist %d ", num, tw);

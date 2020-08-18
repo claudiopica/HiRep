@@ -115,7 +115,7 @@ int main(int argc,char *argv[]) {
 	if(strcmp(mes_var.seq_prop,"true")==0)  seq_prop = 1;
 	if(strcmp(mes_var.seq_prop,"none")==0)  seq_prop = 2;
 	if(strcmp(mes_var.seq_prop,"false")==0)  seq_prop = 0;
-	lprintf("MAIN",0,"mes_var.seq_prop = %s, seq_prop=%d (0 = false, 1 = true, 2 = none)\n",mes_var.seq_prop, seq_prop);
+	lprintf("MAIN",0,"mes_var.seq_prop = %s, seq_prop=%d (0 = false, 1 = true, 2 = none (R is not computed at all!)\n",mes_var.seq_prop, seq_prop);
 	
 	strcpy(list_filename,mes_var.configlist);
 	strcpy(output_dir,mes_var.outpath);
