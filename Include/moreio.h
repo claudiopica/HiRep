@@ -27,6 +27,8 @@ void read_gauge_field_fortran(char filename[]);
 void read_gauge_field_openQCD(char filename[]);
 void read_gauge_field_openQCD_SF(char filename[]);
 void write_gauge_field_openQCD(char filename[]);
+void write_gauge_field_hirep_pbc_to_obc(char filename[]);
+void write_gauge_field_hirep_pbc_to_sf(char filename[]);
 
 #include "spinor_field.h"
 /* void write_spinor_field_eo_lexi(char filename[],spinor_field *sp); */

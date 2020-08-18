@@ -66,7 +66,7 @@ int main(int argc, char *argv[])
   setup_gauge_fields();
 
   /* Init Monte Carlo */
-  init_mc_ghmc(&flow, "input_file");
+  init_mc_ghmc(&flow, get_input_filename());
 
 #ifdef WITH_EXPCLOVER
   // This is the check of the exponential clover term

@@ -1,0 +1,274 @@
+\documentclass[12pt]{article}
+
+% Packages
+\usepackage[a4paper,left=2cm,right=2cm,top=3cm,bottom=3cm]{geometry}
+\usepackage{mathpazo}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{mathrsfs}
+\usepackage{algpseudocode}
+\usepackage{fancyhdr}
+
+\thispagestyle{fancyplain}
+\renewcommand{\headrulewidth}{0pt}
+\fancyhead[R]{Fernando Romero-López, 2020 \\ fernando.romero@uv.es }
+
+% Settings
+\setlength{\parindent}{0mm}
+\newcommand{\tr}{\mathrm{tr}}
+\newcommand{\re}{\mathrm{Re}}
+
+\begin{document}
+\section*{Exponential Clover Term}
+The exponential version of the clover term  (including mass term) can be written as
+\begin{equation}
+ D_{sw} = \sum_x  (4+m_0) \exp ( A(x) ), \text{ with } A(x) =  -\frac{c_{sw}}{4(4+m_0)}\sum_{\mu,\nu}\sigma_{\mu\nu}F_{\mu\nu}(x)
+ \label{eq:clover}
+\end{equation}
+
+with the (unconventional) definition of $\sigma_{\mu\nu}$ given by
+\begin{equation}
+ \sigma_{\mu\nu} = \frac{1}{2}[\gamma_\mu,\gamma_\nu].
+\end{equation}
+
+With the Euclidean definition of the gamma matrices $\sigma_{\mu\nu}$ satisfies
+\begin{equation}
+ \sigma_{\mu\nu}^\dagger = \sigma_{\nu\mu} = -\sigma_{\mu\nu} = \sigma_{\mu\nu}^{-1}.
+\end{equation}
+
+For the Hermitian Dirac operator $\gamma^5D$ we can make the following replacement without affecting any of the calculations presented here.
+\begin{equation}
+ \sigma_{\mu\nu} \to \bar{\sigma}_{\mu\nu} = \gamma_5\sigma_{\mu\nu}.
+\end{equation}
+
+The field strength tensor is defined as
+\begin{equation}
+ F_{\mu\nu}(x) = \frac{1}{8}\left\{Q_{\mu\nu}(x) - Q_{\mu\nu}^\dagger(x)\right\}
+\end{equation}
+
+with
+\begin{align}
+\begin{split}
+ Q_{\mu\nu}(x)
+ &= U_\mu(x)U_\nu(x+\hat{\mu})U_\mu^\dagger(x+\hat{\nu})U_\nu^\dagger(x) \\
+ &+ U_\nu(x)U_\mu^\dagger(x-\hat{\mu}+\hat{\nu})U_\nu^\dagger(x-\hat{\mu})U_\mu(x-\hat{\mu}) \\
+ &+ U_\mu^\dagger(x-\hat{\mu})U_\nu^\dagger(x-\hat{\mu}-\hat{\nu})U_\mu(x-\hat{\mu}-\hat{\nu})U_\nu(x-\hat{\nu}) \\
+ &+ U_\nu^\dagger(x-\hat{\nu})U_\mu(x-\hat{\nu})U_\nu(x+\hat{\mu}-\hat{\nu})U_\mu^\dagger(x)
+\end{split}
+\end{align}
+
+Because $Q_{\mu\nu}^\dagger=Q_{\nu\mu}$ we have $F_{\mu\nu}=-F_{\nu\mu}$. For this reason we can change the sum over $\mu,\nu$ in Eq. \eqref{eq:clover} to a sum over $\mu<\nu$ and a factor of two.
+\begin{equation}
+ A(x) = -\frac{c_{sw}}{2(4+m_0)}\sum_{\mu<\nu}\sigma_{\mu\nu}F_{\mu\nu}(x)
+ \label{eq:clover2}
+\end{equation}
+
+The quantity $\sigma_{\mu\nu}F_{\mu\nu}$ is Hermitian and block diagonal. It can be written as
+\begin{align}
+A(x)=-\frac{c_{sw}}{2(4+m_0)} \sum_{\mu<\nu}\sigma_{\mu\nu}F_{\mu\nu} = 
+ \begin{pmatrix}
+ a & b & 0 & 0 \\
+ b^\dagger & -a & 0 & 0 \\
+ 0  & 0 & c & d \\
+ 0 & 0 & d^\dagger & -c
+ \end{pmatrix} \equiv \begin{pmatrix}
+ A^+ & 0 \\ 
+ 0 & A^- 
+ \end{pmatrix}, \label{eq:blocks}
+\end{align}
+where $A^\pm$ are $2 \times 2$ matrices in spin space and $a,b,c,d$ are $N_F \times N_F$. This formulation of $A(x)$ as a block matrix will be useful for the exponentiation.
+
+\subsection*{Evaluation of the operator}
+
+The evaluation of the exponential of $A(x)$ can be split as:
+\begin{equation}
+\exp A(x)  = \begin{pmatrix}
+\exp A^+ & 0 \\
+0& \exp A^-
+\end{pmatrix}
+\end{equation}
+and so, the problem is reduced to the exponential of two $(2 N_F) \times  (2 N_F)$ matrices. The evaluation can be performed in two ways. 
+\begin{enumerate}
+\item Using the Taylor expansion:
+\begin{equation}
+\exp(A^\pm) = \sum_{k=0}^N  \frac{1}{k!} (A^\pm)^k.
+\end{equation}
+\item Using the Horner scheme:
+\begin{equation}
+\exp(A^\pm) = \sum_{k=0}^{\dim A^\pm -1} b_k(A^\pm)  (A^\pm)^k, \label{eq:exphorner}
+\end{equation}
+where $b_k$ are computed recursively as follows. We start with
+\begin{align}
+q_{N,0} = 1/N!, q_{N,1 \cdots (\dim A^\pm)-1} = 0.
+\end{align}
+Then, the recursion proceeds:
+\begin{align}
+\begin{split}
+&q_{n,0} = - p_0 q_{n+1, \dim A^\pm-1}  + 1/n!, \\  &q_{n,i} = - p_i q_{n+1, \dim A^\pm-1}  + q_{n+1,i-1}, \text{ with } i=1 \cdots (\dim A^\pm) -1 , \label{eq:horner}
+\end{split}
+\end{align}
+where $p_i$ represent the coefficients of the characteristic  polynomial of the matrix $A^\pm$:
+\begin{equation}
+P(A^\pm) = \sum_{n=0}^{\dim A\pm} p_n (A^\pm)^n.
+\end{equation}
+For instance, the characteristic polynomial of a $4 \times 4$ traceless matrix has the following coefficients:
+\begin{equation}
+p_0=\frac{1}{8 } \left(\tr A^2\right)^2 - \frac{1}{4} \tr A^4 ,\ p_1 = -\frac{1}{3}\tr  A^3, \ p_2= -\frac{1}{2}\tr  A^2, \ p_3=0, \ p_3=1.
+\end{equation}
+Finally, the coefficients of Eq. \ref{eq:exphorner} are $b_k  =q_{0,k} $. 
+\end{enumerate}
+The Horner scheme method is currently implemented only for $SU(2)$ and $SU(3)$ with fundamental fermions.
+
+\subsection*{Pseudofermion Forces}
+For the forces we use the following short-hand notation for the derivative with respect to the link variables.
+\begin{equation}
+ \dot{S} = \partial_{x,\mu}^a S.
+\end{equation}
+To calculate the pseudofermion forces let us write down the action as
+\begin{equation}
+ S = \phi^\dagger(H^{-2})\phi,
+\end{equation}
+
+where $H=\gamma^5D$ is the Hermitian Dirac operator. When differentiating the action we obtain
+\begin{equation}
+ \dot{S} = -2\re~\xi^\dagger\dot{H}\eta,
+ \label{eq:dotS}
+\end{equation}
+
+with the definitions
+\begin{align}
+ \eta &= H^{-2}\phi, \\
+ \xi &= H\eta.
+\end{align}
+
+\subsubsection*{Forces}
+Here we will only consider the forces from the clover term. For the exponential version of the clover term, the implementation is very similar to the traditional clover term.
+
+The clover part of the Dirac operator is given by
+\begin{equation}
+ H_{sw} = (4+m_0) \gamma_5 \exp \left(- \frac{c_{sw}}{2(4+m_0)}  \sum_{\mu<\nu}{\sigma}_{\mu\nu}F_{\mu\nu}(x)  \right) = (4+m) \gamma_5 \exp A(x).
+ \label{eq:Hsw}
+\end{equation}
+
+An optimized way of calculating the derivative is provided by the double Horner scheme. The basic idea is that the derivative of a matrix can be expressed as:
+\begin{equation}
+d e^A = \sum_{k=0}^{\dim A -1} \sum_{l=0}^{\dim A-1} C_{kl}(A) A^l dA A^k, \label{eq:dexphorner}
+\end{equation} 
+where  the $C_{kl}$ coefficients depend on the matrix $A$, similarly to the ones Eq. \ref{eq:exphorner}. They are calculated performing first the iteration in Eq. \ref{eq:horner}, and then repeating the iteration process on the result of the first iteration. For compactness, we shall omit the limits of the sum henceforth. When inserting Eq. \eqref{eq:Hsw} in Eq. \eqref{eq:dotS}, and using Eq. \eqref{eq:dexphorner}, we obtain
+\begin{equation}
+ \dot{S} = c_{sw} \sum_{k}  \sum_{\mu<\nu}\re(  \xi_k^\dagger\bar{\sigma}_{\mu\nu}\dot{F}_{\mu\nu}\eta_k),
+\end{equation}
+with 
+\begin{equation}
+\xi_k = \sum_l \begin{pmatrix}
+C^+_{kl} (A^+)^l \xi^+ \\
+C^-_{kl} (A^-)^l \xi^-
+\end{pmatrix}, \text{ and } 
+\eta_k =  \begin{pmatrix}
+ (A^+)^k \eta^+ \\
+(A^-)^k \eta^-
+\end{pmatrix}.
+\end{equation}
+
+
+From the definition of $F_{\mu\nu}$ it follows that
+\begin{align}
+ \dot{S} &=  \frac{1}{8}c_{sw}\sum_k \sum_{\mu<\nu}\re(\xi_k^\dagger\bar{\sigma}_{\mu\nu}\dot{Q}_{\mu\nu}\eta_k + \xi_k^\dagger\bar{\sigma}_{\mu\nu}^\dagger\dot{Q}_{\mu\nu}^\dagger\eta_k), \\
+ &=
+ \frac{1}{8}c_{sw}\sum_k \sum_{\mu<\nu}\re(\xi_k^\dagger\bar{\sigma}_{\mu\nu}\dot{Q}_{\mu\nu}\eta_k + \eta_k^\dagger\bar{\sigma}_{\mu\nu}\dot{Q}_{\mu\nu}\xi_k).
+\end{align}
+
+This can in be written as
+\begin{equation}
+ \dot{S} = \frac{1}{8}c_{sw}\sum_{\mu<\nu} \re~\tr\left[\dot{Q}_{\mu\nu} \sum_k\left\{\bar{\sigma}_{\mu\nu}\eta_k(x)\otimes\xi_k^\dagger(x) + \bar{\sigma}_{\mu\nu}\xi_k(x)\otimes\eta_k^\dagger(x)\right\}\right]
+\end{equation}
+
+In a short hand notation we need to calculate
+\begin{equation}
+ \dot{S} = \frac{1}{8}c_{sw}\re~\tr[\dot{Q}_{\mu\nu}(x)X_{\mu\nu}(x)]
+ \label{eq:force}
+\end{equation}
+
+with
+\begin{equation}
+ X_{\mu\nu}(x) = \sum_k \bar{\sigma}_{\mu\nu}\eta_k(x)\otimes\xi_k^\dagger(x) + \bar{\sigma}_{\mu\nu}\xi_k(x)\otimes\eta_k^\dagger(x).
+\end{equation}
+This matrix has the properties $(X_{\mu\nu})^\dagger=X_{\nu\mu}=-X_{\mu\nu}$. Note that the difference between the standard and exponential csw enters only in the different definition of $X_{\mu\nu}$.
+
+ The expression for $\dot{Q}_{\mu\nu}(x)$ contains eight different terms (two from each of the four leafs). The eight contributions to the force can be written as
+\begin{align}
+ F_1(x) &=
+ \re~\tr[\dot{U}_\mu(x)U_\nu(x+\hat{\mu})U_\mu^\dagger(x+\hat{\nu})U_\nu^\dagger(x)X_{\mu\nu}(x)] \\
+ F_2(x) &=
+ \re~\tr[\dot{U}_\mu(x)U_\nu^\dagger(x+\hat{\mu}-\hat{\nu})U_\mu^\dagger(x-\hat{\nu})X_{\mu\nu}^\dagger(x-\hat{\nu})U_\nu(x-\hat{\nu})] \\
+ F_3(x) &=
+ \re~\tr[\dot{U}_\mu(x)U_\nu^\dagger(x+\hat{\mu}-\hat{\nu})X_{\mu\nu}^\dagger(x+\hat{\mu}-\hat{\nu})U_\mu^\dagger(x-\hat{\nu})U_\nu(x-\hat{\nu})] \\
+ F_4(x) &=
+ \re~\tr[\dot{U}_\mu(x)X_{\mu\nu}(x+\hat{\mu})U_\nu(x+\hat{\mu})U_\mu^\dagger(x+\hat{\nu})U_\nu^\dagger(x)] \\
+ F_5(x) &=
+ \re~\tr[\dot{U}_\mu(x)X_{\mu\nu}^\dagger(x+\hat{\mu})U_\nu^\dagger(x+\hat{\mu}-\hat{\nu})U_\mu^\dagger(x-\hat{\nu})U_\nu(x-\hat{\nu})] \\
+ F_6(x) &=
+ \re~\tr[\dot{U}_\mu(x)U_\nu(x+\hat{\mu})X_{\mu\nu}(x+\hat{\mu}+\hat{\nu})U_\mu^\dagger(x+\hat{\nu})U_\nu^\dagger(x)] \\
+ F_7(x) &=
+ \re~\tr[\dot{U}_\mu(x)U_\nu(x+\hat{\mu})U_\mu^\dagger(x+\hat{\nu})X_{\mu\nu}(x+\hat{\nu})U_\nu^\dagger(x)] \\
+ F_8(x) &=
+ \re~\tr[\dot{U}_\mu(x)U_\nu^\dagger(x+\hat{\mu}-\hat{\nu})U_\mu^\dagger(x-\hat{\nu})U_\nu(x-\hat{\nu})X_{\mu\nu}^\dagger(x)]
+\end{align}
+
+where each term should be multiplied by $c_{sw}/8$. The calculation can be done efficiently by noticing that several products and terms appear in multiple places. Introduce the intermediate variables
+\begin{align}
+ Z_0 &= X_{\mu\nu}(x) \\
+ Z_1 &= X_{\mu\nu}(x+\hat{\mu}) \\
+ Z_2 &= X_{\mu\nu}(x-\hat{\nu}) \\
+ Z_3 &= X_{\mu\nu}(x+\hat{\mu}-\hat{\nu}) \\
+ Z_4 &= X_{\mu\nu}(x+\hat{\mu}+\hat{\nu}) \\
+ Z_5 &= X_{\mu\nu}(x+\hat{\nu}) \\
+ W_0 &= U_\mu^\dagger(x-\hat{\nu}) \\
+ W_1 &= U_\nu(x-\hat{\nu}) \\
+ W_2 &= U_\nu(x+\hat{\mu}) \\
+ W_3 &= U_\mu^\dagger(x+\hat{\nu}) \\
+ W_4 &= U_\nu^\dagger(x) \\
+ W_5 &= U_\nu^\dagger(x+\hat{\mu}-\hat{\nu}) \\
+ W_6 &= W_0W_1 \\
+ W_7 &= W_2W_3 \\
+ W_8 &= W_7W_4-W_5W_6
+\end{align}
+
+The total force can now be written as
+\begin{equation}
+ F(x) = \frac{c_{sw}}{8}\dot{U}_\mu(x)\left\{W_8Z_0 + Z_1W_8 - W_5(W_0Z_2W_1+Z_3W_6) + (W_2Z_4W_3+W_7Z_5)W_4\right\}
+\end{equation}
+
+This brings us down to a total of 15 matrix multiplications and 6 additions.
+
+\subsubsection*{Even-odd preconditioning}
+
+Even-odd preconditioning is particularly simple for the exponential case, since the force coming from the little determinant vanished. This can be seen because of the fact that:
+\begin{equation}
+\det D_{oo}  = \exp(\log \det D_{oo} ) =\exp( \tr \log D_{oo}) =  1,
+\end{equation}
+and so it is a constant term in the action that does not contribute to the force. 
+
+\subsubsection*{Implementation of  $X_{\mu\nu}$  using Taylor series}
+
+In the current version of  the code, the horner scheme is only implemeted for $SU(2)$ and $SU(3)$ with fundamental fermions. For other theories, a less efficient  --- but more flexible--- alternative is used. For this, we use the Taylor series:
+\begin{equation}
+dA = \sum_{k=0}^N \sum_{l=0}^{N-k} \frac{1}{(k+l+1)!} A^{k} dA A^{l},
+\end{equation}
+with $N$ sufficiently large. The implementation changes only in the definition of $X_{\mu\nu}$:
+\begin{equation}
+ X_{\mu\nu}(x) = \sum_{k=0}^N \bar{\sigma}_{\mu\nu}\eta_k(x)\otimes\xi_k^\dagger(x) + \bar{\sigma}_{\mu\nu}\xi_k(x)\otimes\eta_k^\dagger(x),
+\end{equation}
+where now:
+\begin{equation}
+\xi_k = \sum_l \frac{1}{(k+l+1)!} \begin{pmatrix}
+(A^+)^l \xi^+ \\
+ (A^-)^l \xi^-
+\end{pmatrix}, \text{ and } 
+\eta_k =  \begin{pmatrix}
+ (A^+)^k \eta^+ \\
+(A^-)^k \eta^-
+\end{pmatrix}.
+\end{equation}
+\end{document}

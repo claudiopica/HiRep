@@ -12,7 +12,7 @@
 #include <string.h>
 #include <math.h>
 #include <unistd.h>
-#include <ctype.h> 
+#include <ctype.h>
 #include "io.h"
 #include "random.h"
 #include "error.h"
@@ -36,13 +36,15 @@
 #ifdef WITH_MPI
 #error Please compile without MPI!
 #endif
-#if !(defined(BC_X_PERIODIC)) || !(defined(BC_Y_PERIODIC)) || !(defined(BC_Z_PERIODIC)) || !(defined(BC_T_PERIODIC)) 
+#if !(defined(BC_X_PERIODIC)) || !(defined(BC_Y_PERIODIC)) || !(defined(BC_Z_PERIODIC)) || !(defined(BC_T_PERIODIC))
 #error Please compile with Periodic Boundary Conditions
 #endif
 
-static void slower(char *str) {
-  while (*str) {
-    *str=(char)(tolower(*str));
+static void slower(char *str)
+{
+  while (*str)
+  {
+    *str = (char)(tolower(*str));
     ++str;
   }
 }
@@ -53,12 +55,13 @@ typedef struct _format_type
   void (*write)(char *);
 } format_type;
 
-#define nformats 3
+#define nformats 4
 
 format_type format[nformats] = {
-    {.name = "openQCD to HiRep", .read = read_gauge_field_openQCD, .write = write_gauge_field},
-    {.name = "HiRep to openQCD", .read = read_gauge_field, .write = write_gauge_field_openQCD},
-    {.name = "SF openQCD to HiRep", .read = read_gauge_field_openQCD_SF, .write = write_gauge_field}};
+    {.name = "OBC openQCD to HiRep", .read = read_gauge_field_openQCD, .write = write_gauge_field_hirep_pbc_to_obc},
+    {.name = "SF  openQCD to HiRep", .read = read_gauge_field_openQCD_SF, .write = write_gauge_field_hirep_pbc_to_sf},
+    {.name = "PBC openQCD to HiRep", .read = read_gauge_field_openQCD, .write = write_gauge_field},
+    {.name = "HiRep PBC to openQCD", .read = read_gauge_field, .write = write_gauge_field_openQCD}};
 
 format_type *conf_format;
 
@@ -93,29 +96,32 @@ int main(int argc, char *argv[])
 
   slower(conf_info.type);
 
-  if (strcmp(conf_info.type, "hirep") == 0)
+  if (strcmp(conf_info.type, "openqcd_obc") == 0)
   {
-    conf_format = format + 1;
-    sprintf(conf_info.cnfgout, "openQCD_%s", conf_info.cnfgin);
-  }
-  else if (strcmp(conf_info.type, "openqcd") == 0)
-  {
-    conf_format = format ;
-    sprintf(conf_info.cnfgout, "HiRep_%s", conf_info.cnfgin);
+    conf_format = format;
+    sprintf(conf_info.cnfgout, "HiRep_obc_%s", conf_info.cnfgin);
   }
   else if (strcmp(conf_info.type, "openqcd_sf") == 0)
   {
+    conf_format = format + 1;
+    sprintf(conf_info.cnfgout, "HiRep_sf_%s", conf_info.cnfgin);
+  }
+  else if (strcmp(conf_info.type, "openqcd_pbc") == 0)
+  {
     conf_format = format + 2;
-    sprintf(conf_info.cnfgout, "HiRepSF_%s", conf_info.cnfgin);
+    sprintf(conf_info.cnfgout, "HiRep_pbc_%s", conf_info.cnfgin);
+  }
+  else if (strcmp(conf_info.type, "hirep") == 0)
+  {
+    conf_format = format + 3;
+    sprintf(conf_info.cnfgout, "openQCD_%s", conf_info.cnfgin);
   }
   else
   {
-    error(0 == 0, 0, "MAIN", "Unknonw configuration type (hirep, openqcd and openqcd_sf) are the only allowed.");
+    error(0 == 0, 0, "MAIN", "Unknonw configuration type (openqcd_pbc openqcd_obc openqcd_sf hirep) are the only allowed.");
   }
 
-
   lprintf("MAIN", 0, "Converting the configuration from %s\n", conf_format->name);
-
 
   //Use reader from HiRep or OpenQCD and it writes in the other way around
   conf_format->read(conf_info.cnfgin);

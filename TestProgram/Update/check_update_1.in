@@ -1,0 +1,83 @@
+GLB_T = 8
+GLB_X = 4
+GLB_Y = 4
+GLB_Z = 4
+NP_T = 2
+NP_X = 1
+NP_Y = 1
+NP_Z = 1
+
+// Replicas
+N_REP = 1
+
+//Logger levels (default = -1)
+log:default = -1
+log:inverter = -1
+log:forcestat = 0
+
+rlx_level = 1
+rlx_seed = 35563
+
+
+//Fermion twisting
+theta_T = 0.
+theta_X = 0.
+theta_Y = 0.
+theta_Z = 0.
+
+// HMC variables
+nf = 2
+tlen = 0.2
+csw = 1.0
+
+run name = run1
+save freq = 10000
+meas freq = 1
+conf dir = .
+gauge start = random 
+// run1_6x6x6x6nc2rADJnf2b6.000000m-0.000000n10
+
+
+// Monomials
+monomial {
+        id = 0
+        type = gauge
+        beta = 6.0
+        level = 1
+}
+
+monomial {
+        id = 1
+        type = hmc
+        mass = -0.8
+        mt_prec = 1e-16
+        force_prec = 1e-16
+        mre_past = 4
+        level = 0
+}
+
+
+// Integrators
+integrator {
+        level = 0
+        type = o4mn
+        steps = 10
+}
+
+integrator {
+      level = 1
+      type = o4mn
+      steps = 10
+}
+
+
+
+
+
+run name = run1
+save freq = 9999
+meas freq = 1
+conf dir = .
+gauge start = random
+//ranlxd start =
+last conf = 10

@@ -551,7 +551,7 @@ static void init_gf_SF_BCs(suNg *dn, suNg *up)
   lprintf("BCS", 0, "SF boundary phases phi0'  ( ");
   for (k = 0; k < NG; k++)
     lprintf("BCS", 0, "%lf ", SF_phi0_up[k] / 2.);
-  lprintf("BCS", 0, ")");
+  lprintf("BCS", 0, ")\n");
 #else
   lprintf("BCS", 0, "SF boundary phases phi0'  ( ");
   for (k = 0; k < NG; k++)
@@ -565,11 +565,11 @@ static void init_gf_SF_BCs(suNg *dn, suNg *up)
   lprintf("BCS", 0, "SF boundary phases phi0  ( ");
   for (k = 0; k < NG; k++)
     lprintf("BCS", 0, "%lf ", SF_phi0_dn[k] / 2.);
-  lprintf("BCS", 0, ")");
+  lprintf("BCS", 0, ")\n");
   lprintf("BCS", 0, "SF boundary phases phi1  ( ");
   for (k = 0; k < NG; k++)
     lprintf("BCS", 0, "%lf ", SF_phi1_dn[k]);
-  lprintf("BCS", 0, ")");
+  lprintf("BCS", 0, ")\n");
 #endif
 #endif
 }

@@ -1,0 +1,33 @@
+GLB_T = 6
+GLB_X = 4
+GLB_Y = 4
+GLB_Z = 4 
+
+NP_T = 2
+NP_X = 1
+NP_Y = 1
+NP_Z = 1
+
+rlx_level = 1
+rlx_seed = 12345
+log:default = 0
+
+disc:csw = 1.
+disc:mass = 2.0
+disc:precision = 1e-28
+disc:nhits0 = 10000
+disc:nhits1 = 100
+disc:nhits2 = 100
+disc:nhits3 = 100
+disc:nhits4 = 20
+disc:nhits5 = 60
+
+disc:n_mom = 2
+
+// Replicas
+N_REP = 1
+
+//Logger levels (default = -1)
+log:default = -1
+log:inverter = -1
+log:forcestat = 0

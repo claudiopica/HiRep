@@ -177,7 +177,7 @@ int main(int argc, char *argv[])
     gsf = SF_action(SF_var.beta);
     lprintf("SF_action", 10, "gsf = %.10e\n", gsf);
 
-    SF_PCAC_wall_corr(SF_var.mass, SF_var.precision);
+    SF_PCAC_wall_corr(SF_var.mass, SF_var.precision, DONTSTORE);
 
     gettimeofday(&end, 0);
     timeval_subtract(&etime, &end, &start);

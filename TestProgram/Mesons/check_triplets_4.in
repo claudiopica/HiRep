@@ -1,0 +1,25 @@
+GLB_T = 8
+GLB_X = 6
+GLB_Y = 6
+GLB_Z = 6 
+
+NP_T = 2
+NP_X = 1
+NP_Y = 1
+NP_Z = 1
+
+rlx_level = 1
+rlx_seed = 12345
+log:default = 100
+
+mes:csw = 1.
+mes:mass = -1.0
+mes:nhits_2pt = 124
+
+// Replicas
+N_REP = 1
+
+//Logger levels (default = -1)
+log:default = -1
+log:inverter = -1
+log:forcestat = 0

@@ -183,6 +183,7 @@ int main(int argc, char *argv[])
   lprintf("MAIN", 0, "WF initial epsilon: %e\n", WF_var.eps);
   lprintf("MAIN", 0, "WF delta: %e\n", WF_var.delta);
   lprintf("MAIN", 0, "WF measurement interval dt : %e\n", dt);
+  lprintf("MAIN", 0, "WF integrator type: %d (0=Euler 1=3rd order Runge-Kutta 2=Adaptive 3rd order Runge-Kutta)\n", WF_var.ittype);
 
 #ifdef ROTATED_SF
   lprintf("MAIN", 0, "beta = %.8f\n rotatedSF ds = %.8f\n rotatedSF ct = %.8f\n", SF_var.beta, SF_var.ds, SF_var.ct);
@@ -239,7 +240,7 @@ int main(int argc, char *argv[])
 
     full_plaquette();
 
-    WF_update_and_measure(WF_var.ittype, u_gauge, &(WF_var.tmax), &(WF_var.eps), &(WF_var.delta), WF_var.nmeas);
+    WF_update_and_measure(WF_var.ittype, u_gauge, &(WF_var.tmax), &(WF_var.eps), &(WF_var.delta), WF_var.nmeas, DONTSTORE);
 
     gettimeofday(&end, 0);
     timeval_subtract(&etime, &end, &start);

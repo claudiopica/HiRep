@@ -1,0 +1,33 @@
+GLB_T = 8
+GLB_X = 4
+GLB_Y = 4
+GLB_Z = 4
+NP_T = 2
+NP_X = 1
+NP_Y = 1
+NP_Z = 1
+
+// Replicas
+N_REP = 1
+
+//Logger levels (default = -1)
+log:default = -1
+log:inverter = -1
+log:forcestat = 0
+
+rlx_level = 1
+rlx_seed = 8374
+rlx_start = new
+rlx_state = rand_state
+
+mes:mass = -0.605
+mes:csw = 0.0
+mes:precision = 1e-24
+
+I0:nhits = 400
+
+I1:bc = P
+I1:p = (0,0,1)(1,1,0)(1,1,1)
+I1:nhits = 200
+
+I2:nhits = 800

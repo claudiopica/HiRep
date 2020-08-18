@@ -13,6 +13,7 @@
 #include "wilsonflow.h"
 #include <math.h>
 #include <string.h>
+#include "data_storage.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338327
@@ -37,101 +38,20 @@ void WF_initialize()
     Vprime = alloc_gfield(&glattice);
     u_gauge_backup = alloc_gfield(&glattice);
 
-#ifdef BC_T_OPEN
-    int ix, iy, iz, index, mu, nu;
+#if defined(PLAQ_WEIGHTS)
+#ifdef PURE_GAUGE_ANISOTROPY
+    //int ix, iy, iz, index, mu, nu;
     wf_plaq_weight = malloc(sizeof(double) * glattice.gsize_gauge * 16);
+    for (int i = 0; i < 16 * glattice.gsize_gauge; i++)
+    {
+      wf_plaq_weight[i] = 1.0;
+    }
+
     init_plaq_open_BCs(wf_plaq_weight, NULL, 1.0, 1.0);
 
-    if (COORD[0] == 0)
-    {
-      for (ix = 0; ix < X_EXT; ++ix)
-        for (iy = 0; iy < Y_EXT; ++iy)
-          for (iz = 0; iz < Z_EXT; ++iz)
-          {
-            index = ipt_ext(T_BORDER, ix, iy, iz);
-            if (index != -1)
-            {
-
-              for (mu = 0; mu < 3; mu++)
-                for (nu = mu + 1; nu < 4; nu++)
-                {
-                  wf_plaq_weight[index * 16 + mu * 4 + nu] *= 0.5;
-                  wf_plaq_weight[index * 16 + nu * 4 + mu] *= 0.5;
-                }
-            }
-          }
-      if (T_BORDER > 0)
-      {
-        for (ix = 0; ix < X_EXT; ++ix)
-          for (iy = 0; iy < Y_EXT; ++iy)
-            for (iz = 0; iz < Z_EXT; ++iz)
-            {
-              index = ipt_ext(T_BORDER - 1, ix, iy, iz);
-              if (index != -1)
-              {
-
-                for (mu = 1; mu < 3; mu++)
-                  for (nu = mu + 1; nu < 4; nu++)
-                  {
-                    wf_plaq_weight[index * 16 + mu * 4 + nu] *= 0.5;
-                    wf_plaq_weight[index * 16 + nu * 4 + mu] *= 0.5;
-                  }
-              }
-            }
-      }
-    }
-
-    if (COORD[0] == NP_T - 1)
-    {
-      if (T_BORDER > 0)
-      {
-        for (ix = 0; ix < X_EXT; ++ix)
-          for (iy = 0; iy < Y_EXT; ++iy)
-            for (iz = 0; iz < Z_EXT; ++iz)
-            {
-              index = ipt_ext(T + T_BORDER, ix, iy, iz);
-              if (index != -1)
-              {
-                for (mu = 0; mu < 3; mu++)
-                  for (nu = mu + 1; nu < 4; nu++)
-                  {
-                    wf_plaq_weight[index * 16 + mu * 4 + nu] *= 0.5;
-                    wf_plaq_weight[index * 16 + nu * 4 + mu] *= 0.5;
-                  }
-              }
-            }
-      }
-
-      for (ix = 0; ix < X_EXT; ++ix)
-        for (iy = 0; iy < Y_EXT; ++iy)
-          for (iz = 0; iz < Z_EXT; ++iz)
-          {
-            index = ipt_ext(T + T_BORDER - 2, ix, iy, iz);
-            if (index != -1)
-            {
-              mu = 0;
-              for (nu = mu + 1; nu < 4; nu++)
-              {
-                wf_plaq_weight[index * 16 + mu * 4 + nu] *= 0.5;
-                wf_plaq_weight[index * 16 + nu * 4 + mu] *= 0.5;
-              }
-            }
-
-            index = ipt_ext(T + T_BORDER - 1, ix, iy, iz);
-            if (index != -1)
-            {
-              for (mu = 1; mu < 3; mu++)
-                for (nu = mu + 1; nu < 4; nu++)
-                {
-                  wf_plaq_weight[index * 16 + mu * 4 + nu] *= 0.5;
-                  wf_plaq_weight[index * 16 + nu * 4 + mu] *= 0.5;
-                }
-            }
-          }
-    }
-#endif
-#if defined(PLAQ_WEIGHTS) && !defined(BC_T_OPEN)
+#else
     wf_plaq_weight = plaq_weight;
+#endif
 #endif
   }
 }
@@ -155,16 +75,23 @@ void WF_set_bare_anisotropy(double *wf_chi)
         for (iz = 0; iz < Z_EXT; ++iz)
         {
           index = ipt_ext(it, ix, iy, iz);
-          for (mu = 1; mu < 3; mu++)
+          if (index != -1)
+          {
+            mu = 0;
             for (nu = mu + 1; nu < 4; nu++)
             {
-              if (index != -1)
-              {
-                wf_plaq_weight[index * 16 + mu * 4 + nu] *= *wf_chi;
-                wf_plaq_weight[index * 16 + nu * 4 + mu] *= *wf_chi;
-              }
+              wf_plaq_weight[index * 16 + mu * 4 + nu] *= *wf_chi * *wf_chi;
+              wf_plaq_weight[index * 16 + nu * 4 + mu] *= *wf_chi * *wf_chi;
             }
+            //for (mu = 1; mu < 3; mu++)
+            //  for (nu = mu + 1; nu < 4; nu++)
+            //  {
+            //    wf_plaq_weight[index * 16 + mu * 4 + nu] /= *wf_chi;
+            //    wf_plaq_weight[index * 16 + nu * 4 + mu] /= *wf_chi;
+            //  }
+          } //
         }
+
 #else
   error(0 == 0, 0, "WF_set_bare_anisotropy", "In order to use anisotropic lattice you must compile with PURE_GAUGE_ANISOTROPY enabled");
 #endif
@@ -201,61 +128,78 @@ void WF_free()
  *      = T^a tr T^a ( V s - s^dag V^dag )
  *      = - 1/2 ( V s - s^dag V^dag - 1/N tr (V s - s^dag V^dag) )
  */
-static void Zeta(suNg_field *Z, const suNg_field *U, const double alpha)
+static void Zeta(suNg_field *Zu, const suNg_field *U, const double alpha)
 {
 
-  error(Z->type != &glattice, 1, "wilson_flow.c", "'Z' in Zeta must be defined on the whole lattice");
+  error(Zu->type != &glattice, 1, "wilson_flow.c", "'Z' in Zeta must be defined on the whole lattice");
   error(U->type != &glattice, 1, "wilson_flow.c", "'U' in Zeta must be defined on the whole lattice");
   suNg staple, tmp1, tmp2;
+  int ix, iy, iz, it, i;
 
-  _MASTER_FOR(&glattice, i)
-  {
-    for (int mu = 0; mu < 4; ++mu)
-    {
-      _suNg_zero(staple);
-      for (int nu = (mu + 1) % 4; nu != mu; nu = (nu + 1) % 4)
-      {
-        suNg *u1 = _4FIELD_AT(U, iup(i, mu), nu);
-        suNg *u2 = _4FIELD_AT(U, iup(i, nu), mu);
-        suNg *u3 = _4FIELD_AT(U, i, nu);
-        _suNg_times_suNg_dagger(tmp1, *u1, *u2);
-        _suNg_times_suNg_dagger(tmp2, tmp1, *u3);
+  for (it = 0; it < T; ++it)
+    for (ix = 0; ix < X; ++ix)
+      for (iy = 0; iy < Y; ++iy)
+        for (iz = 0; iz < Z; ++iz)
+        {
+          i = ipt(it, ix, iy, iz);
+
+          for (int mu = 0; mu < 4; ++mu)
+          {
+            _suNg_zero(staple);
+            for (int nu = (mu + 1) % 4; nu != mu; nu = (nu + 1) % 4)
+            {
+              suNg *u1 = _4FIELD_AT(U, iup(i, mu), nu);
+              suNg *u2 = _4FIELD_AT(U, iup(i, nu), mu);
+              suNg *u3 = _4FIELD_AT(U, i, nu);
+              _suNg_times_suNg_dagger(tmp1, *u1, *u2);
+              _suNg_times_suNg_dagger(tmp2, tmp1, *u3);
 #ifdef PLAQ_WEIGHTS
-        _suNg_mul(tmp2, wf_plaq_weight[i * 16 + nu * 4 + mu], tmp2);
+              _suNg_mul(tmp2, wf_plaq_weight[i * 16 + nu * 4 + mu], tmp2);
 #endif
-        _suNg_add_assign(staple, tmp2);
+              _suNg_add_assign(staple, tmp2);
 
-        int j = idn(i, nu);
-        u1 = _4FIELD_AT(U, iup(j, mu), nu);
-        u2 = _4FIELD_AT(U, j, mu);
-        u3 = _4FIELD_AT(U, j, nu);
-        _suNg_times_suNg(tmp1, *u2, *u1);
-        _suNg_dagger_times_suNg(tmp2, tmp1, *u3);
+              int j = idn(i, nu);
+              u1 = _4FIELD_AT(U, iup(j, mu), nu);
+              u2 = _4FIELD_AT(U, j, mu);
+              u3 = _4FIELD_AT(U, j, nu);
+              _suNg_times_suNg(tmp1, *u2, *u1);
+              _suNg_dagger_times_suNg(tmp2, tmp1, *u3);
 
 #ifdef PLAQ_WEIGHTS
-        _suNg_mul(tmp2, wf_plaq_weight[j * 16 + nu * 4 + mu], tmp2);
+              _suNg_mul(tmp2, wf_plaq_weight[j * 16 + nu * 4 + mu], tmp2);
 #endif
-        _suNg_add_assign(staple, tmp2);
-      }
+              _suNg_add_assign(staple, tmp2);
+            }
 
-      _suNg_times_suNg(tmp1, *_4FIELD_AT(U, i, mu), staple);
+            _suNg_times_suNg(tmp1, *_4FIELD_AT(U, i, mu), staple);
 
-      _suNg_dagger(tmp2, tmp1);
-      _suNg_sub_assign(tmp1, tmp2);
+            _suNg_dagger(tmp2, tmp1);
+            _suNg_sub_assign(tmp1, tmp2);
 #if !defined(GAUGE_SON) && !defined(WITH_QUATERNIONS)
-      double imtr;
-      _suNg_trace_im(imtr, tmp1);
-      imtr = imtr / NG;
-      for (int k = 0; k < NG * NG; k += NG + 1)
-      {
-        tmp1.c[k] -= I * imtr;
-      }
+            double imtr;
+            _suNg_trace_im(imtr, tmp1);
+            imtr = imtr / NG;
+            for (int k = 0; k < NG * NG; k += NG + 1)
+            {
+              tmp1.c[k] -= I * imtr;
+            }
 #endif
-      _suNg_mul(tmp1, -alpha / 2., tmp1);
-      _suNg_add_assign(*_4FIELD_AT(Z, i, mu), tmp1);
-    }
+#ifdef BC_T_OPEN
+            if (mu != 0 && ((it + zerocoord[0] == 0) || (it + zerocoord[0] == GLB_T - 1)))
+            {
+              _suNg_mul(tmp1, -alpha, tmp1);
+            }
+            else
+            {
+              _suNg_mul(tmp1, -alpha / 2., tmp1);
+            }
+#else
+            _suNg_mul(tmp1, -alpha / 2., tmp1);
+#endif
 
-  } //Master_for
+            _suNg_add_assign(*_4FIELD_AT(Zu, i, mu), tmp1);
+          }
+        }
 }
 
 void WilsonFlow1(suNg_field *V, const double epsilon)
@@ -317,7 +261,7 @@ double max_distance(suNg_field *V, suNg_field *Vprime)
 }
 
 // following 1301.4388
-double WilsonFlow3_adaptative(suNg_field *V, double epsilon, double delta)
+int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, double *delta)
 {
 
   suNg_field_copy(u_gauge_backup, u_gauge);
@@ -338,7 +282,7 @@ double WilsonFlow3_adaptative(suNg_field *V, double epsilon, double delta)
   apply_BCs_on_fundamental_gauge_field();
 #endif
 
-  Zeta(ws_gf, V, epsilon / 4.); //ws_gf = Z0/4
+  Zeta(ws_gf, V, *epsilon / 4.); //ws_gf = Z0/4
 
   _MASTER_FOR(&glattice, ix)
   {
@@ -359,8 +303,8 @@ double WilsonFlow3_adaptative(suNg_field *V, double epsilon, double delta)
   apply_BCs_on_fundamental_gauge_field();
 #endif
 
-  Zeta(ws_gf, V, 8. * epsilon / 9.); // ws_gf = 8 Z1 /9 - 17 Z0/36
-  Zeta(ws_gf_tmp, V, 2. * epsilon);  // ws_gf_tmp = 2 Z1 - Z0
+  Zeta(ws_gf, V, 8. * *epsilon / 9.); // ws_gf = 8 Z1 /9 - 17 Z0/36
+  Zeta(ws_gf_tmp, V, 2. * *epsilon);  // ws_gf_tmp = 2 Z1 - Z0
 
   _MASTER_FOR(&glattice, ix)
   {
@@ -387,7 +331,7 @@ double WilsonFlow3_adaptative(suNg_field *V, double epsilon, double delta)
   apply_BCs_on_fundamental_gauge_field();
 #endif
 
-  Zeta(ws_gf, V, 3. * epsilon / 4.);
+  Zeta(ws_gf, V, 3. * *epsilon / 4.);
 
   _MASTER_FOR(&glattice, ix)
   {
@@ -408,23 +352,25 @@ double WilsonFlow3_adaptative(suNg_field *V, double epsilon, double delta)
 
   // now need to get the maximum of the distance
   d = max_distance(V, Vprime);
+  varepsilon = *epsilon * pow(*delta / d, 1. / 3.);
 
-  // compute new value of epsilon
-  varepsilon = 0.95 * epsilon * pow(delta / d, 1. / 3.);
-
-  if (varepsilon < 0.1)
-    epsilon = varepsilon;
-  else
-    epsilon = 0.1;
-
-  if (d > delta)
+  if (d > *delta)
   {
     suNg_field_copy(u_gauge, u_gauge_backup);
-    epsilon = -1.;
-    lprintf("WARNING", 0, "d > delta ! Epsilon is set to -1 in order to repeat the calculation \n");
+    *epsilon_new = 0.5 * varepsilon;
+    lprintf("WARNING", 0, "d > delta : must repeat the calculation with epsilon=%lf\n", *epsilon_new);
+    return 1 == 0;
   }
+  else
+  {
 
-  return epsilon;
+    if (varepsilon < 1.0)
+      *epsilon_new = 0.95 * varepsilon;
+    else
+      *epsilon_new = 1.0;
+
+    return 1 == 1;
+  }
 }
 
 void WilsonFlow3(suNg_field *V, const double epsilon)
@@ -742,28 +688,46 @@ void WF_Esym_T(double *E, suNg_field *V)
 /*
   q = 1/(16 \pi^2) \epsilon_{\mu\nu\rho\sigma} \tr F_{\mu\nu} F_{\rho\sigma}
 */
+
 double WF_topo(suNg_field *V)
 {
   double TC = 0.;
+  int x, y, z, t, ix;
+  suNg_algebra_vector F1, F2;
 
-  _MASTER_FOR_SUM(&glattice, ix, TC)
-  {
-    suNg_algebra_vector F1, F2;
-    WF_clover_F(&F1, V, ix, 1, 2);
-    WF_clover_F(&F2, V, ix, 0, 3);
-    for (int i = 0; i < NG * NG - 1; i++)
-      TC += F1.c[i] * F2.c[i];
+  int t0 = 0, t1 = T;
+#if defined(BC_T_OPEN)
+  if (COORD[0] == 0)
+    t0 = 1;
+  if (COORD[0] == NP_T - 1)
+    t1 = T - 1;
+#elif (defined(BASIC_SF) || defined(ROTATED_SF))
+  if (COORD[0] == 0)
+    t0 = 2;
+#endif
 
-    WF_clover_F(&F1, V, ix, 1, 3);
-    WF_clover_F(&F2, V, ix, 0, 2);
-    for (int i = 0; i < NG * NG - 1; i++)
-      TC -= F1.c[i] * F2.c[i];
+  for (t = t0; t < t1; t++)
+    for (x = 0; x < X; x++)
+      for (y = 0; y < Y; y++)
+        for (z = 0; z < Z; z++)
+        {
+          ix = ipt(t, x, y, z);
 
-    WF_clover_F(&F1, V, ix, 0, 1);
-    WF_clover_F(&F2, V, ix, 2, 3);
-    for (int i = 0; i < NG * NG - 1; i++)
-      TC += F1.c[i] * F2.c[i];
-  }
+          WF_clover_F(&F1, V, ix, 1, 2);
+          WF_clover_F(&F2, V, ix, 0, 3);
+          for (int i = 0; i < NG * NG - 1; i++)
+            TC += F1.c[i] * F2.c[i];
+
+          WF_clover_F(&F1, V, ix, 1, 3);
+          WF_clover_F(&F2, V, ix, 0, 2);
+          for (int i = 0; i < NG * NG - 1; i++)
+            TC -= F1.c[i] * F2.c[i];
+
+          WF_clover_F(&F1, V, ix, 0, 1);
+          WF_clover_F(&F2, V, ix, 2, 3);
+          for (int i = 0; i < NG * NG - 1; i++)
+            TC += F1.c[i] * F2.c[i];
+        }
 
   TC *= _FUND_NORM2 / (4. * M_PI * M_PI);
 
@@ -772,116 +736,191 @@ double WF_topo(suNg_field *V)
   return TC;
 }
 
-void WF_update_and_measure(WF_integrator_type wft, suNg_field *V, double *tmax, double *eps, double *delta, int nmeas)
+static void WF_measure_and_store(suNg_field *V, storage_switch swc, data_storage_array **ret, int nmeas, int idmeas, double *t)
 {
-
   double TC;
 #if defined(BC_T_ANTIPERIODIC) || defined(BC_T_PERIODIC) && !defined(PURE_GAUGE_ANISOTROPY)
   double E, Esym;
+  int idx[2] = {nmeas + 1, 4};
+  if (swc == STORE && *ret == NULL)
+  {
+    *ret = allocate_data_storage_array(1);
+    allocate_data_storage_element(*ret, 0, 2, idx); // ( nmeas+1 ) * ( 4 <=> t, E, Esym, TC)
+  }
 #else
   int j;
   double E[2 * GLB_T];
   double Esym[2 * GLB_T];
   double Eavg[2];
   double Esymavg[2];
+  int idx[3] = {nmeas + 1, GLB_T, 5};
+  if (swc == STORE && *ret == NULL)
+  {
+    *ret = allocate_data_storage_array(2);
+    allocate_data_storage_element(*ret, 0, 3, idx); // ( nmeas+1 ) * ( GLB_T ) * ( 5 <=> t, Etime, Espace, Esymtime, Esymspace)
+    idx[1] = 6;
+    allocate_data_storage_element(*ret, 1, 2, idx); // ( nmeas+1 ) * ( 6 <=> t, Etime_tsum, Espace_tsum, Esymtime_tsum, Esymspace_tsum, TC)
+  }
 #endif
-
-  int k;
-  double t = 0.;
-  double epsilon = *eps;
-  double dt = *tmax / nmeas;
 
   TC = WF_topo(V);
 
 #if defined(BC_T_ANTIPERIODIC) || defined(BC_T_PERIODIC) && !defined(PURE_GAUGE_ANISOTROPY)
+
   E = WF_E(V);
   Esym = WF_Esym(V);
-  lprintf("WILSONFLOW", 0, "WF (t,E,t2*E,Esym,t2*Esym,TC) = %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e\n", t, E, t * t * E, Esym, t * t * Esym, TC);
+  lprintf("WILSONFLOW", 0, "WF (t,E,t2*E,Esym,t2*Esym,TC) = %1.8e %1.16e %1.16e %1.16e %1.16e %1.16e\n", *t, E, *t * *t * E, Esym, *t * *t * Esym, TC);
+  if (swc == STORE)
+  {
+    idx[0] = idmeas - 1;
+    idx[1] = 0;
+    *data_storage_element(*ret, 0, idx) = *t;
+    idx[1] = 1;
+    *data_storage_element(*ret, 0, idx) = E;
+    idx[1] = 2;
+    *data_storage_element(*ret, 0, idx) = Esym;
+    idx[1] = 3;
+    *data_storage_element(*ret, 0, idx) = TC;
+  }
 #else
 
   WF_E_T(E, V);
   WF_Esym_T(Esym, V);
+
+#if defined(BASIC_SF) || defined(ROTATED_SF)
+  E[0] = E[1] = Esym[0] = Esym[1] = Esym[2] = Esym[3] = 0.0;
+  E[2 * GLB_T - 2] = E[2 * GLB_T - 1] = Esym[2 * GLB_T - 2] = Esym[2 * GLB_T - 1] = 0.0;
+#elif defined(BC_T_OPEN)
+  E[2 * (GLB_T - 1)] = 0.0;
+  Esym[0] = Esym[1] = Esym[2 * GLB_T - 2] = Esym[2 * GLB_T - 1] = 0.0;
+#endif
+
+  if (swc == STORE)
+  {
+    for (j = 0; j < GLB_T; j++)
+    {
+      idx[0] = idmeas - 1;
+      idx[1] = j;
+      idx[2] = 0;
+      *data_storage_element(*ret, 0, idx) = *t;
+      idx[2] = 1;
+      *data_storage_element(*ret, 0, idx) = E[2 * j];
+      idx[2] = 2;
+      *data_storage_element(*ret, 0, idx) = E[2 * j + 1];
+      idx[2] = 3;
+      *data_storage_element(*ret, 0, idx) = Esym[2 * j];
+      idx[2] = 4;
+      *data_storage_element(*ret, 0, idx) = Esym[2 * j + 1];
+    }
+  }
+
   Eavg[0] = Eavg[1] = Esymavg[0] = Esymavg[1] = 0.0;
   for (j = 0; j < GLB_T; j++)
   {
-    lprintf("WILSONFLOW", 0, "WF (T,t,Etime,Espace,Esymtime,Esymspace) = %d %1.16e %1.16e %1.16e %1.16e %1.16e\n", j, t, E[2 * j], E[2 * j + 1], Esym[2 * j], Esym[2 * j + 1]);
+    lprintf("WILSONFLOW", 0, "WF (T,t,Etime,Espace,Esymtime,Esymspace) = %d %1.8e %1.16e %1.16e %1.16e %1.16e\n", j, *t, E[2 * j], E[2 * j + 1], Esym[2 * j], Esym[2 * j + 1]);
     Eavg[0] += E[2 * j];
     Eavg[1] += E[2 * j + 1];
     Esymavg[0] += Esym[2 * j];
     Esymavg[1] += Esym[2 * j + 1];
   }
+
+#if defined(BASIC_SF) || defined(ROTATED_SF)
   Eavg[0] /= GLB_T - 2;
   Eavg[1] /= GLB_T - 3;
-  Esymavg[0] /= GLB_T - 2;
+  Esymavg[0] /= GLB_T - 3;
   Esymavg[1] /= GLB_T - 3;
-
-  lprintf("WILSONFLOW", 0, "WF avg (t,Etime,Espace,Esymtime,Esymspace,Pltime,Plspace,TC) = %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e\n", t, Eavg[0], Eavg[1], Esymavg[0], Esymavg[1], (NG - Eavg[0]), (NG - Eavg[1]), TC);
-
+#else
+  Eavg[0] /= GLB_T;
+  Eavg[1] /= GLB_T;
+  Esymavg[0] /= GLB_T;
+  Esymavg[1] /= GLB_T;
 #endif
-  k = 1;
-  double epsilon_new;
+
+  lprintf("WILSONFLOW", 0, "WF avg (t,Etime,Espace,Esymtime,Esymspace,Pltime,Plspace,TC) = %1.8e %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e\n", *t, Eavg[0], Eavg[1], Esymavg[0], Esymavg[1], (NG - Eavg[0]), (NG - Eavg[1]), TC);
+  if (swc == STORE)
+  {
+    idx[0] = idmeas - 1;
+    idx[1] = 0;
+    *data_storage_element(*ret, 1, idx) = *t;
+    idx[1] = 1;
+    *data_storage_element(*ret, 1, idx) = Eavg[0];
+    idx[1] = 2;
+    *data_storage_element(*ret, 1, idx) = Eavg[1];
+    idx[1] = 3;
+    *data_storage_element(*ret, 1, idx) = Esymavg[0];
+    idx[1] = 4;
+    *data_storage_element(*ret, 1, idx) = Esymavg[1];
+    idx[1] = 5;
+    *data_storage_element(*ret, 1, idx) = TC;
+  }
+#endif
+}
+
+data_storage_array *WF_update_and_measure(WF_integrator_type wft, suNg_field *V, double *tmax, double *eps, double *delta, int nmeas, storage_switch swc)
+{
+
+  data_storage_array *ret = NULL;
+
+  int k = 1;
+  double t = 0.;
+  double epsilon = *eps;
+  double dt = *tmax / nmeas;
+  double epsilon_new = *eps;
+  double epsilon_meas = 0;
+
+  WF_measure_and_store(V, swc, &ret, nmeas, k, &t);
+
   while (t < *tmax)
   {
     if (t + epsilon > (double)k * dt)
       epsilon = (double)k * dt - t;
 
+    lprintf("AAA", 0, "entered with eps=%lf\n", epsilon);
     switch (wft)
     {
     case EUL:
       WilsonFlow1(V, epsilon);
-      epsilon_new = epsilon;
+      t += epsilon;
       break;
 
     case RK3:
       WilsonFlow3(V, epsilon);
-      epsilon_new = epsilon;
+      t += epsilon;
       break;
 
     case RK3_ADAPTIVE:
-      epsilon_new = WilsonFlow3_adaptative(V, epsilon, *delta);
+      while (!WilsonFlow3_adaptative(V, &epsilon, &epsilon_new, delta))
+      {
+        lprintf("AAA", 0, "not accepted, change to eps=%lf\n", epsilon_new);
+        epsilon = epsilon_new;
+      }
+      lprintf("AAA", 0, "accepted, step of eps=%lf next eps=%lf\n", epsilon, epsilon_new);
+
+      t += epsilon;
+      epsilon = epsilon_new;
       break;
     }
 
-    if (epsilon_new > 0.)
-      t = t + epsilon;
-
-    if (fabs(t - (double)k * dt) < epsilon / 2. && epsilon_new > 0)
+    if ((double)k * dt - t < epsilon)
     {
-      k = k + 1;
-
-      TC = WF_topo(V);
-
-#if defined(BC_T_ANTIPERIODIC) || defined(BC_T_PERIODIC) && !defined(PURE_GAUGE_ANISOTROPY)
-
-      E = WF_E(V);
-      Esym = WF_Esym(V);
-      lprintf("WILSONFLOW", 0, "WF (t,E,t2*E,Esym,t2*Esym,TC) = %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e\n", t, E, t * t * E, Esym, t * t * Esym, TC);
-#else
-
-      WF_E_T(E, V);
-      WF_Esym_T(Esym, V);
-      Eavg[0] = Eavg[1] = Esymavg[0] = Esymavg[1] = 0.0;
-      for (j = 0; j < GLB_T; j++)
+      if ((double)k * dt - t < 1.e-10)
       {
-        lprintf("WILSONFLOW", 0, "WF (T,t,Etime,Espace,Esymtime,Esymspace) = %d %1.16e %1.16e %1.16e %1.16e %1.16e\n", j, t, E[2 * j], E[2 * j + 1], Esym[2 * j], Esym[2 * j + 1]);
-        Eavg[0] += E[2 * j];
-        Eavg[1] += E[2 * j + 1];
-        Esymavg[0] += Esym[2 * j];
-        Esymavg[1] += Esym[2 * j + 1];
+        k++;
+        lprintf("AAA", 0, "measure eps=%lf and meas_eps=%lf\n", epsilon, epsilon_meas);
+
+        WF_measure_and_store(V, swc, &ret, nmeas, k, &t);
+        if (epsilon_meas > epsilon)
+          epsilon = epsilon_meas;
+        if (epsilon > dt)
+          epsilon = dt;
       }
-
-      Eavg[0] /= GLB_T - 2;
-      Eavg[1] /= GLB_T - 3;
-      Esymavg[0] /= GLB_T - 2;
-      Esymavg[1] /= GLB_T - 3;
-
-      lprintf("WILSONFLOW", 0, "WF avg (t,Etime,Espace,Esymtime,Esymspace,Pltime,Plspace,TC) = %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e %1.16e\n", t, Eavg[0], Eavg[1], Esymavg[0], Esymavg[1], (NG - Eavg[0]), (NG - Eavg[1]), TC);
-
-#endif
+      else
+      {
+        epsilon_meas = epsilon;
+        epsilon = (double)k * dt - t;
+        lprintf("AAA", 0, "shift for next measure eps=%lf\n", epsilon);
+      }
     }
-    if (epsilon_new > 0.)
-      epsilon = epsilon_new;
-    else
-      epsilon = epsilon / 2;
   }
+  return ret;
 }

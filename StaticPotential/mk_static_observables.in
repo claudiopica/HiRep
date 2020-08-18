@@ -1,0 +1,51 @@
+GLB_T = 8
+GLB_X = 8
+GLB_Y = 8
+GLB_Z = 8
+NP_T = 2
+NP_X = 1
+NP_Y = 1
+NP_Z = 1
+
+N_REP = 1
+
+//Logger levels (default = -1)
+log:default = -1
+log:inverter = -1
+log:forcestat = 0
+
+
+rlx_level = 1
+rlx_seed = 83745
+rlx_start = new
+rlx_state = rand_state
+
+
+so:configlist = listconf.txt
+
+so:Polyakov:make = true
+
+so:WilsonLoop:make = false
+HYP:weight0 = 0.70
+HYP:weight1 = 0.60
+HYP:weight2 = 0.30
+
+WL[0]:delta.x = 1
+WL[0]:delta.y = 0
+WL[0]:delta.z = 0
+WL[0]:nsteps = 100
+
+WL[1]:delta.x = 1
+WL[1]:delta.y = 1
+WL[1]:delta.z = 0
+WL[1]:nsteps = 100
+
+WL[2]:delta.x = 1
+WL[2]:delta.y = 1
+WL[2]:delta.z = 1
+WL[2]:nsteps = 100
+
+WL[3]:delta.x = 2
+WL[3]:delta.y = 1
+WL[3]:delta.z = 0
+WL[3]:nsteps = 100

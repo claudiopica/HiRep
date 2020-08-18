@@ -2,7 +2,7 @@ TOPDIR = ..
 SUBDIRS := $(shell find * -maxdepth 0 -type d)
 
 #Exclude these directories
-EXCLUDEDIR :=  Deflate RotatedSF
+EXCLUDEDIR :=  Deflate RotatedSF Scattering
 SUBDIRS := $(filter-out $(EXCLUDEDIR), $(SUBDIRS))
 
 LIBS += $(TOPDIR)/LibHR/libhr.a
