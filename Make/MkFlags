@@ -1,4 +1,4 @@
-NG = 3
+NG = 2
 REPR = REPR_FUNDAMENTAL
 #REPR = REPR_SYMMETRIC
 #REPR = REPR_ANTISYMMETRIC
@@ -33,7 +33,7 @@ MACRO += -DBC_Z_PERIODIC
 MACRO += -DWITH_EXPCLOVER
 MACRO += -DUPDATE_EO
 #MACRO += -DWITH_MPI
-#MACRO += -DWITH_GPU
+MACRO += -DWITH_GPU
 #MACRO += -DWITH_QUATERNIONS
 #MACRO += -DPURE_GAUGE_ANISOTROPY
 MACRO += -DNDEBUG
@@ -83,7 +83,7 @@ CC = nvcc
 #CFLAGS = -g -G -Xcompiler '-std=c99 -fgcse-sm -fgcse-las -fgcse-after-reload'
 CFLAGS = -O2 -Xcompiler '-std=c99 -fgcse-sm -fgcse-las -fgcse-after-reload'
 #GPUFLAGS = --x cu -arch=sm_20 --use_fast_math -Xptxas -v  -Xptxas -dlcm=ca 
-GPUFLAGS = --x cu -arch=sm_20 -Xptxas -v  -Xptxas -dlcm=ca 
+GPUFLAGS = --x cu -arch=sm_70 -Xptxas -v  -Xptxas -dlcm=ca 
 LDFLAGS = -lcuda
 #GPUFLAGS = --x cu -arch=sm_11 -Xptxas -v -Xptxas -dlcm=ca 
 endif

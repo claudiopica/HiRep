@@ -120,6 +120,18 @@ typedef enum _mem_t {
 
 #ifdef WITH_GPU
 #define STD_MEM_TYPE (CPU_MEM | GPU_MEM)
+#include "gpu.h" 
+#define BLOCK_SIZE 256
+#define BLOCK_SIZE_LINEAR_ALGEBRA 512
+#define BLOCK_SIZE_GLOBAL_SUM 512
+#define BLOCK_SIZE_DIRAC 512
+#define BLOCK_SIZE_DIRAC_FLT 512
+
+GLB_VAR(int,*iup_gpu,=NULL);
+GLB_VAR(int,*idn_gpu,=NULL);
+GLB_VAR(int, gpu_id,=0);
+GLB_VAR(unsigned int, grid_size_max_gpu,=65535);
+
 #else
 #define STD_MEM_TYPE (CPU_MEM)
 #endif

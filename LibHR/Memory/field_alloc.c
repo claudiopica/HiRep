@@ -56,7 +56,7 @@ f->comm_req=NULL;\
 #define _ALLOC_GPU_CODE(_name,_size)\
 if(alloc_mem_t & GPU_MEM) {\
 cudaError_t err;\
-err = cudaMallocManaged((void **) &f->gpu_ptr, _size*type->gsize_gauge*sizeof(*(f->gpu_ptr))); \
+err = cudaMallocManaged((void **) &f->gpu_ptr, _size*type->gsize_gauge*sizeof(*(f->gpu_ptr)),cudaMemAttachGlobal); \
 error(err!=cudaSuccess,1,"alloc_" #_name " [" __FILE__ "]", \
 "Could not allocate GPU memory space for field"); \
 } else f->gpu_ptr=NULL
