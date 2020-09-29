@@ -111,7 +111,7 @@ RBLD = $(if $(DFILES),,rebuild)
 	    MAKEFILES="$(DEP)" $(MAKE) $@ ;\
 	  else \
 	    echo -n "$(_col_comp)Compiling$(_col_norm) $(call _cfname,$(call _rname,$(CURDIR)/$@))..." ;\
-	    $(CC) -c $(CFLAGS) $(CPPFLAGS) $(SRC) &&\
+	    $(CC) $(GPUOPT) -c $(CFLAGS) $(CPPFLAGS) $(SRC) &&\
 	    echo " $(_cdone)" || ( echo " $(_cfailed)" && false) ;\
 	  fi ;\
 	else \

@@ -118,6 +118,7 @@ typedef enum _mem_t {
   GPU_MEM = 1<<1
 } mem_t;
 
+/* GPU stuff */
 #ifdef WITH_GPU
 #define STD_MEM_TYPE (CPU_MEM | GPU_MEM)
 #include "gpu.h" 
