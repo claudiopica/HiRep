@@ -51,7 +51,7 @@ MACRO += -DIO_FLUSH
 
 #Compiler
 ifeq (,$(findstring -DWITH_GPU,$(MACRO))) #Compile CPU only
-
+CC = gcc
 #CFLAGS = -Wall -std=c99 -O3 -fomit-frame-pointer -msse -msse2 
 CFLAGS = -Wall -std=c99 -O3  #-g #-march=core-avx2 -mtune=core-avx2 -g
 #CFLAGS = -Wall -std=c99 -O3 -qopt-prefetch=4 -qopt-report=2 -march=core-avx2 -mtune=core-avx2
@@ -62,10 +62,10 @@ CFLAGS = -Wall -std=c99 -O3  #-g #-march=core-avx2 -mtune=core-avx2 -g
 #INCLUDE = -I /opt/local/include/mpich-devel-gcc8/ #-I /usr/include
 
 
-CC = clang-mp-8.0
-MPICC = mpicc-mpich-clang80
-LDFLAGS =  -L /opt/local/lib/mpich-devel-clang80/ -L /opt/local/lib/ #-lefence #-lprofiler #-l efence
-INCLUDE = -I /opt/local/include/mpich-clang80/
+#CC = clang-mp-8.0
+#MPICC = mpicc-mpich-clang80
+#LDFLAGS =  -L /opt/local/lib/mpich-devel-clang80/ -L /opt/local/lib/ #-lefence #-lprofiler #-l efence
+#INCLUDE = -I /opt/local/include/mpich-clang80/
 
 
 #CC = clang-mp-6.0

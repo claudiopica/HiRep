@@ -28,6 +28,7 @@
 #include "representation.h"
 #include "clover_tools.h"
 #include "clover_exp.h"
+#include "geometry.h"
 
 /* setup_process
  * Assign a unique RID, PID to each process and setup
@@ -183,6 +184,10 @@ int setup_process(int *argc, char ***argv)
       lprintf("OMP", 0, "Number of Threads requested = %i\n", omp_get_num_threads());
     }
   }
+#endif
+
+#ifdef WITH_GPU
+init_gpu(gpu_var);
 #endif
 
   lprintf("SYSTEM", 0, "Gauge group: SU(%d)\n", NG);

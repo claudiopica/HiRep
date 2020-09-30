@@ -127,7 +127,7 @@ typedef enum _mem_t {
 #define BLOCK_SIZE_GLOBAL_SUM 512
 #define BLOCK_SIZE_DIRAC 512
 #define BLOCK_SIZE_DIRAC_FLT 512
-
+GLB_VAR(input_gpu,gpu_var,=init_input_gpu(gpu_var));
 GLB_VAR(int,*iup_gpu,=NULL);
 GLB_VAR(int,*idn_gpu,=NULL);
 GLB_VAR(int, gpu_id,=0);
@@ -166,6 +166,7 @@ GLB_VAR(int,gauge_field_active,=0); // whether gauge field interactions is activ
 /* input parameters */
 #include "input_par.h"
 GLB_VAR(input_glb,glb_var,=init_input_glb(glb_var));
+
 
 /* Random number generator parameters */
 GLB_VAR(input_rlx,rlx_var,=init_input_rlx(rlx_var));

@@ -20,12 +20,13 @@
 #include "logger.h"
 #include "utils.h"
 #include "error.h"
+#include "geometry.h"
 
 
 void init_gpu(input_gpu gpu_var){
   int device_count = 0;
   cudaError_t error_id;
-  cudaDeviceProp device_prop;
+  struct cudaDeviceProp device_prop;
   int mem_clock,mem_bus_width, l2_cache_size,driver_version,runtime_version; /*Device properties*/
 
   const char *sComputeMode[] = {
@@ -42,6 +43,8 @@ void init_gpu(input_gpu gpu_var){
   gpu_id = gpu_var.gpuID;
   /*Select the right GPU */
   error_id = cudaGetDeviceCount(&device_count);
+  lprintf("GPU_INIT",0,"%s\n",cudaGetErrorString(error_id));
+  lprintf("GPU_INIT",0,"Device count %d\n",device_count);
   error(error_id != cudaSuccess,1,"init_gpu","Error getting device count");
   error(gpu_id>=device_count,1,"init_gpu","Illegal device ID");
   error_id = cudaSetDevice(gpu_id);
@@ -50,7 +53,7 @@ void init_gpu(input_gpu gpu_var){
 
   /*Print out the device info assume CUDART >= 4000*/
   cudaGetDeviceProperties(&device_prop, gpu_id);
-  lprintf("GPU_INIT",10,"Device: %d\n",device_prop.name);
+  lprintf("GPU_INIT",10,"Device: %s\n",device_prop.name);
   cudaDriverGetVersion(&driver_version);
   cudaRuntimeGetVersion(&runtime_version);
   lprintf("GPU_INIT",10,"CUDA Driver Version / Runtime Version: %d.%d / %d.%d\n", driver_version/1000, driver_version%100, runtime_version/1000, runtime_version%100);

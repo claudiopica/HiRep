@@ -118,13 +118,13 @@ void spinor_field_togpuformat_flt(spinor_field_flt *out, spinor_field_flt *in) {
   _PIECE_FOR(in->type,ixp) {
     const int start = in->type->master_start[_PIECE_INDEX(ixp)];
     const int N = in->type->master_end[_PIECE_INDEX(ixp)]-in->type->master_start[_PIECE_INDEX(ixp)]+1;
-    complex_flt *cout=(complex_flt*)(_FIELD_AT(out,start));
+    hr_complex_flt *cout=(hr_complex_flt*)(_FIELD_AT(out,start));
     _SITE_FOR(in->type,ixp,ix) {
       
       r=_FIELD_AT(in,ix);
       
-      for (int j=0; j<sizeof(*r)/sizeof(complex_flt); ++j) {
-        cout[j*N]=((complex_flt*)(r))[j];
+      for (int j=0; j<sizeof(*r)/sizeof(hr_complex_flt); ++j) {
+        cout[j*N]=((hr_complex_flt*)(r))[j];
       }
       ++cout;
       
@@ -154,13 +154,13 @@ void spinor_field_tocpuformat_flt(spinor_field_flt *out, spinor_field_flt *in) {
   _PIECE_FOR(in->type,ixp) {
     int start = in->type->master_start[_PIECE_INDEX(ixp)];
     int N = in->type->master_end[_PIECE_INDEX(ixp)]-in->type->master_start[_PIECE_INDEX(ixp)]+1; 
-    complex_flt *cin=(complex_flt*)(_FIELD_AT(in,start));
+    hr_complex_flt *cin=(hr_complex_flt*)(_FIELD_AT(in,start));
     _SITE_FOR(in->type,ixp,ix) {
       
       r=_FIELD_AT(out,ix);
       
-      for (int j=0; j<sizeof(*r)/sizeof(complex_flt); ++j) {
-        ((complex_flt*)(r))[j]=cin[j*N];
+      for (int j=0; j<sizeof(*r)/sizeof(hr_complex_flt); ++j) {
+        ((hr_complex_flt*)(r))[j]=cin[j*N];
       }
       ++cin;
       
