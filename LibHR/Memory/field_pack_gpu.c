@@ -44,15 +44,15 @@ void spinor_field_togpuformat(spinor_field *out, spinor_field *in) {
 //#endif //UPDATE_EO
     
     _PIECE_FOR(in->type,ixp) {
-        const int start = in->type->master_start[_PIECE_INDEX(ixp)];
-        const int N = in->type->master_end[_PIECE_INDEX(ixp)]-in->type->master_start[_PIECE_INDEX(ixp)]+1;
-        complex *cout=(complex*)(_FIELD_AT(out,start));
+        const int start = in->type->master_start[ixp];
+        const int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1;
+        hr_complex *cout=(hr_complex*)(_FIELD_AT(out,start));
         _SITE_FOR(in->type, ixp, ix) {
         
         	r=_FIELD_AT(in,ix);
             
-            for (int j=0; j<sizeof(*r)/sizeof(complex); ++j) {
-            	cout[j*N]=((complex*)(r))[j];
+            for (int j=0; j<sizeof(*r)/sizeof(hr_complex); ++j) {
+            	cout[j*N]=((hr_complex*)(r))[j];
             }
             ++cout;
        
@@ -80,15 +80,15 @@ void spinor_field_tocpuformat(spinor_field *out, spinor_field *in) {
 //#endif //UPDATE_EO    
     
     _PIECE_FOR(in->type,ixp) {
-        int start = in->type->master_start[_PIECE_INDEX(ixp)];
-        int N = in->type->master_end[_PIECE_INDEX(ixp)]-in->type->master_start[_PIECE_INDEX(ixp)]+1; 
-        complex *cin=(complex*)(_FIELD_AT(in,start));
+        int start = in->type->master_start[ixp];
+        int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1; 
+        hr_complex *cin=(hr_complex*)(_FIELD_AT(in,start));
         _SITE_FOR(in->type,ixp,ix) {
             
         	r=_FIELD_AT(out,ix);
         	
-            for (int j=0; j<sizeof(*r)/sizeof(complex); ++j) {
-                ((complex*)(r))[j]=cin[j*N];
+            for (int j=0; j<sizeof(*r)/sizeof(hr_complex); ++j) {
+                ((hr_complex*)(r))[j]=cin[j*N];
             }
             ++cin;
             
@@ -116,8 +116,8 @@ void spinor_field_togpuformat_flt(spinor_field_flt *out, spinor_field_flt *in) {
 //#endif //UPDATE_EO
   
   _PIECE_FOR(in->type,ixp) {
-    const int start = in->type->master_start[_PIECE_INDEX(ixp)];
-    const int N = in->type->master_end[_PIECE_INDEX(ixp)]-in->type->master_start[_PIECE_INDEX(ixp)]+1;
+    const int start = in->type->master_start[ixp];
+    const int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1;
     hr_complex_flt *cout=(hr_complex_flt*)(_FIELD_AT(out,start));
     _SITE_FOR(in->type,ixp,ix) {
       
@@ -152,8 +152,8 @@ void spinor_field_tocpuformat_flt(spinor_field_flt *out, spinor_field_flt *in) {
 //#endif //UPDATE_EO    
   
   _PIECE_FOR(in->type,ixp) {
-    int start = in->type->master_start[_PIECE_INDEX(ixp)];
-    int N = in->type->master_end[_PIECE_INDEX(ixp)]-in->type->master_start[_PIECE_INDEX(ixp)]+1; 
+    int start = in->type->master_start[ixp];
+    int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1; 
     hr_complex_flt *cin=(hr_complex_flt*)(_FIELD_AT(in,start));
     _SITE_FOR(in->type,ixp,ix) {
       
@@ -189,8 +189,8 @@ void gfield_togpuformat(suNg_field *out, suNg_field *in) {
 //#endif //UPDATE_EO
   
   _PIECE_FOR(in->type,ixp) {
-    const int start = in->type->master_start[_PIECE_INDEX(ixp)];
-    const int N = in->type->master_end[_PIECE_INDEX(ixp)]-in->type->master_start[_PIECE_INDEX(ixp)]+1;
+    const int start = in->type->master_start[ixp];
+    const int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1;
     double *cout=(double*)(_4FIELD_AT(out,start,0));
     _SITE_FOR(in->type,ixp,ix) {
       
@@ -224,8 +224,8 @@ void gfield_tocpuformat(suNg_field *out, suNg_field *in) {
 //#endif //UPDATE_EO
   
   _PIECE_FOR(in->type,ixp) {
-    const int start = in->type->master_start[_PIECE_INDEX(ixp)];
-    const int N = in->type->master_end[_PIECE_INDEX(ixp)]-in->type->master_start[_PIECE_INDEX(ixp)]+1;
+    const int start = in->type->master_start[ixp];
+    const int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1;
     double *cin=(double*)(_4FIELD_AT(in,start,0));
     _SITE_FOR(in->type,ixp,ix) {
       
@@ -268,8 +268,8 @@ void gfield_togpuformat_flt(suNg_field_flt *out, suNg_field_flt *in) {
 //#endif //UPDATE_EO
   
   _PIECE_FOR(in->type,ixp) {
-    const int start = in->type->master_start[_PIECE_INDEX(ixp)];
-    const int N = in->type->master_end[_PIECE_INDEX(ixp)]-in->type->master_start[_PIECE_INDEX(ixp)]+1;
+    const int start = in->type->master_start[ixp];
+    const int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1;
     float *cout=(float*)(_4FIELD_AT(out,start,0));
     _SITE_FOR(in->type,ixp,ix) {
       
@@ -304,8 +304,8 @@ void gfield_tocpuformat_flt(suNg_field_flt *out, suNg_field_flt *in) {
 //#endif //UPDATE_EO
   
   _PIECE_FOR(in->type,ixp) {
-    const int start = in->type->master_start[_PIECE_INDEX(ixp)];
-    const int N = in->type->master_end[_PIECE_INDEX(ixp)]-in->type->master_start[_PIECE_INDEX(ixp)]+1;
+    const int start = in->type->master_start[ixp];
+    const int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1;
     float *cin=(float*)(_4FIELD_AT(in,start,0));
     _SITE_FOR(in->type,ixp,ix) {
       
@@ -348,8 +348,8 @@ void avfield_togpuformat(suNg_av_field *out, suNg_av_field *in) {
   }
   
   _PIECE_FOR(in->type,ixp) {
-    const int start = in->type->master_start[_PIECE_INDEX(ixp)];
-    const int N = in->type->master_end[_PIECE_INDEX(ixp)]-in->type->master_start[_PIECE_INDEX(ixp)]+1;
+    const int start = in->type->master_start[ixp];
+    const int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1;
     double *cout=(double*)(_4FIELD_AT(out,start,0));
     _SITE_FOR(in->type,ixp,ix) {
       
@@ -381,8 +381,8 @@ void avfield_tocpuformat(suNg_av_field *out, suNg_av_field *in) {
   }
   
   _PIECE_FOR(in->type,ixp) {
-    const int start = in->type->master_start[_PIECE_INDEX(ixp)];
-    const int N = in->type->master_end[_PIECE_INDEX(ixp)]-in->type->master_start[_PIECE_INDEX(ixp)]+1;
+    const int start = in->type->master_start[ixp];
+    const int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1;
     double *cin=(double*)(_4FIELD_AT(in,start,0));
     _SITE_FOR(in->type,ixp,ix) {
       
