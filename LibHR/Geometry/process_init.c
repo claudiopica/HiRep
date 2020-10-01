@@ -187,6 +187,7 @@ int setup_process(int *argc, char ***argv)
 #endif
 
 #ifdef WITH_GPU
+read_input(gpu_var.read, input_filename);
 init_gpu(gpu_var);
 #endif
 

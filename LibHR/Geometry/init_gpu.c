@@ -39,6 +39,7 @@ void init_gpu(input_gpu gpu_var){
   };
 
   lprintf("GPU_INIT",0,"Initializing GPU\n");
+  lprintf("GPU_INIT",0,"GPU_ID = %d\n",gpu_var.gpuID);
 
   gpu_id = gpu_var.gpuID;
   /*Select the right GPU */

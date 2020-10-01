@@ -28,10 +28,17 @@ typedef struct _input_gpu {
 
 #define init_input_gpu(varname) \
 { \
+.read={\
+{"gpuID", "gpuID = %d", INT_T, &(varname)},\
+{NULL, NULL, INT_T, NULL}\
+}\
+}
+//#define init_input_gpu(varname) \
+{ \
 .gpuID=0,\
 .read={\
 {"gpuID", "gpuID = %d", INT_T, &(varname).gpuID},\
-{NULL, NULL, 0, NULL}\
+{NULL, NULL, INT_T, NULL}\
 }\
 }
 

@@ -132,7 +132,6 @@ GLB_VAR(int,*iup_gpu,=NULL);
 GLB_VAR(int,*idn_gpu,=NULL);
 GLB_VAR(int, gpu_id,=0);
 GLB_VAR(unsigned int, grid_size_max_gpu,=65535);
-
 #else
 #define STD_MEM_TYPE (CPU_MEM)
 #endif
@@ -173,7 +172,6 @@ GLB_VAR(input_rlx,rlx_var,=init_input_rlx(rlx_var));
 
 /* logger parameters */
 GLB_VAR(input_logger,logger_var,=init_input_logger(logger_var));
-
 
 /* Does the represented field need to be allocated? */
 #if ( !defined(REPR_FUNDAMENTAL) && !defined(WITH_QUATERNIONS) ) || defined(ROTATED_SF)

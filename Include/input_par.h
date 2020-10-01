@@ -27,7 +27,7 @@ typedef struct _input_glb {
   /* THIS ARE DEFINED GLOBALLY !!! */
   /* int GLB_T, GLB_X, GLB_Y, GLB_Z; */
   /* int NP_T, NP_X, NP_Y, NP_Z; */
-  /* int N_REP; */
+  /* int N_REP; */  
 
   /* for the reading function */
   input_record_t read[10];

@@ -1,0 +1,79 @@
+[GPU_INIT][0]Initializing GPU
+[GPU_INIT][0]no error
+[GPU_INIT][0]Device count 1
+[GPU_INIT][0]Using GPU #0
+[GPU_INIT][10]Device: Tesla V100-SXM2-32GB
+[GPU_INIT][10]CUDA Driver Version / Runtime Version: 10.20 / 10.10
+[GPU_INIT][10]CUDA Capability Major/Minor version number: 7.0
+[GPU_INIT][10]Total amount of global memory: 32510 MB (34089730048B)
+[GPU_INIT][10]Multiprocessors: 80
+[GPU_INT][10]GPU Clock Speed: 1.53 GHz
+[GPU_INIT][10]Memory Clock rate: 877.000 Mhz
+[GPU_INIT][10]Memory Bus Widht: 4096-bit
+[GPU_INIT][10]L2 Cache Size: 6291456B
+[GPU_INIT][10]Max Texture dimension size (x,y,z): 1D=(131072), 2D=(131072,65536), 3D=(16384,16384,16384)
+[GPU_INIT][10]Max Layered Texture dimension size (dim) x layers: 1D=(32768) x 2048, 2D=(32768,32768) x 2048
+[GPU_INIT][10]Total amount of constant memory: 65536B
+[GPU_INIT][10]Total amount of shared memory per block: 49152B
+[GPU_INIT][10]Total number of register per block: 65536B
+[GPU_INIT][10]Warp size: 32B
+[GPU_INIT][10]Maximum number of threds per block: 1024
+[GPU_INIT][10]Maximum size of each dimension of a block (x,y,z): (1024,1024,64)
+[GPU_INIT][10]Maximum size of each dimension of a grid (x,y,z): (2147483647,65535,65535)
+[GPU_INIT][10]Maximum memory pitch: 2147483647B
+[GPU_INIT][10]Texture alignment: 512B
+[GPU_INIT][10]Concurrent copy and execution: Yes with 5 copy engine(s)
+[GPU_INIT][10]Run time limit on kernels:                     No
+[GPU_INIT][10]Integrated GPU sharing Host Memory:            No
+[GPU_INIT][10]Support host page-locked memory mapping:       Yes
+[GPU_INIT][10]Concurrent kernel execution:                   Yes
+[GPU_INIT][10]Alignment requirement for Surfaces:            Yes
+[GPU_INIT][10]Device has ECC support enabled:                Yes
+[GPU_INIT][10]Device is using TCC driver mode:               No
+[GPU_INIT][10]Device supports Unified Addressing (UVA):      Yes
+[GPU_INIT][10]Device PCI Bus ID / PCI location ID:           24 / 0
+[GPU_INIT][10]Compute Mode:
+[GPU_INIT][10]  < Default (multiple host threads can use ::cudaSetDevice() with device simultaneously) >
+[SYSTEM][0]Gauge group: SU(2)
+[SYSTEM][0]Fermion representation: dim = 2
+[SYSTEM][0][RepID: 0][world_size: 1]
+[SYSTEM][0][MPI_ID: 0][MPI_size: 1]
+[SYSTEM][0]MACROS=-DBC_T_PERIODIC -DBC_X_PERIODIC -DBC_Y_PERIODIC -DBC_Z_PERIODIC -DWITH_EXPCLOVER -DUPDATE_EO -DWITH_GPU -DNDEBUG -DIO_FLUSH -DREPR_FUNDAMENTAL -DREPR_NAME=@REPR_FUNDAMENTAL@ -DGAUGE_SUN
+[GEOMETRY_INIT][0]Global size is 4x4x4x4
+[GEOMETRY_INIT][0]Local size is 4x4x4x4
+[GEOMETRY_INIT][0]Extended local size is 4x4x4x4
+[GEOMETRY_INIT][0]The lattice borders are (0,0,0,0)
+[GEOMETRY][0]Geometry variable checked
+[GEOMETRY][0]Gauge field: size 256 nbuffer 0 
+[GEOMETRY][0]Spinor field (EO): size 256 nbuffer 0 
+[GEOMETRY][0]Even Spinor field: size 128 nbuffer 0 
+[GEOMETRY][0]Odd Spinor field: size 128 nbuffer 0 
+[READINPUT][0]Warning: input parameter [ranlux start] not found in [check_algebra_1.in]!
+[READINPUT][0]Warning: input parameter [ranlux state] not found in [check_algebra_1.in]!
+[SETUP_RANDOM][0]RLXD [1,12345]
+[CLOVER][10]Initial Coefficient: csw = 1.000000
+[MAIN][0]tr_R (T[0] T[0]): -5.0000e-01   [should be: -5.0000e-01]
+[MAIN][0]tr_f (T[0] T[0]): -5.0000e-01   [should be: -5.0000e-01]
+[MAIN][0]tr_R (T[0] T[1]): 0.0000e+00   [should be: 0.00]
+[MAIN][0]tr_f (T[0] T[1]): 0.0000e+00   [should be: 0.00]
+[MAIN][0]tr_R (T[0] T[2]): 0.0000e+00   [should be: 0.00]
+[MAIN][0]tr_f (T[0] T[2]): 0.0000e+00   [should be: 0.00]
+[MAIN][0]tr_R (T[1] T[0]): 0.0000e+00   [should be: 0.00]
+[MAIN][0]tr_f (T[1] T[0]): 0.0000e+00   [should be: 0.00]
+[MAIN][0]tr_R (T[1] T[1]): -5.0000e-01   [should be: -5.0000e-01]
+[MAIN][0]tr_f (T[1] T[1]): -5.0000e-01   [should be: -5.0000e-01]
+[MAIN][0]tr_R (T[1] T[2]): 0.0000e+00   [should be: 0.00]
+[MAIN][0]tr_f (T[1] T[2]): 0.0000e+00   [should be: 0.00]
+[MAIN][0]tr_R (T[2] T[0]): 0.0000e+00   [should be: 0.00]
+[MAIN][0]tr_f (T[2] T[0]): 0.0000e+00   [should be: 0.00]
+[MAIN][0]tr_R (T[2] T[1]): 0.0000e+00   [should be: 0.00]
+[MAIN][0]tr_f (T[2] T[1]): 0.0000e+00   [should be: 0.00]
+[MAIN][0]tr_R (T[2] T[2]): -5.0000e-01   [should be: -5.0000e-01]
+[MAIN][0]tr_f (T[2] T[2]): -5.0000e-01   [should be: -5.0000e-01]
+[MAIN][0]casimir check: 0.0000e+00
+[MAIN][0](should be around 1*10^(-15) or so)
+[MAIN][0]
+[MAIN][0]casimir check: 0.0000e+00
+[MAIN][0](should be around 1*10^(-15) or so)
+[MAIN][0]
+[SYSTEM][0]Process finalized.

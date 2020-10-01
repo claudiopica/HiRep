@@ -46,7 +46,7 @@ void spinor_field_togpuformat(spinor_field *out, spinor_field *in) {
     _PIECE_FOR(in->type,ixp) {
         const int start = in->type->master_start[ixp];
         const int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1;
-        hr_complex *cout=(hr_complex*)(_FIELD_AT(out,start));
+        hr_complex *cout=(hr_complex*)(_GPU_FIELD_AT(out,start));
         _SITE_FOR(in->type, ixp, ix) {
         
         	r=_FIELD_AT(in,ix);
@@ -82,7 +82,7 @@ void spinor_field_tocpuformat(spinor_field *out, spinor_field *in) {
     _PIECE_FOR(in->type,ixp) {
         int start = in->type->master_start[ixp];
         int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1; 
-        hr_complex *cin=(hr_complex*)(_FIELD_AT(in,start));
+        hr_complex *cin=(hr_complex*)(_GPU_FIELD_AT(in,start));
         _SITE_FOR(in->type,ixp,ix) {
             
         	r=_FIELD_AT(out,ix);

@@ -99,5 +99,8 @@ _DECLARE_FIELD_STRUCT(suNfc_field, suNfc);
 
 #define _SPINOR_PTR(s) _FIELD_AT(s,_spinor_for_is)
 
+#ifdef  WITH_GPU
+  #define _GPU_FIELD_AT(s,i) (((s)->gpu_ptr)+i-(s)->type->master_shift)
+#endif
 
 #endif
