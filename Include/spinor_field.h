@@ -101,6 +101,8 @@ _DECLARE_FIELD_STRUCT(suNfc_field, suNfc);
 
 #ifdef  WITH_GPU
   #define _GPU_FIELD_AT(s,i) (((s)->gpu_ptr)+i-(s)->type->master_shift)
+  #define _GPU_4FIELD_AT(s,i,mu) (((s)->gpu_ptr)+coord_to_index(i-(s)->type->master_shift,mu))
+  #define _GPU_6FIELD_AT(s,i,mu) (((s)->gpu_ptr)+((i-(s)->type->master_shift)*6+mu))
 #endif
 
 #endif

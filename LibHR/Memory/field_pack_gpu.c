@@ -118,7 +118,7 @@ void spinor_field_togpuformat_flt(spinor_field_flt *out, spinor_field_flt *in) {
   _PIECE_FOR(in->type,ixp) {
     const int start = in->type->master_start[ixp];
     const int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1;
-    hr_complex_flt *cout=(hr_complex_flt*)(_FIELD_AT(out,start));
+    hr_complex_flt *cout=(hr_complex_flt*)(_GPU_FIELD_AT(out,start));
     _SITE_FOR(in->type,ixp,ix) {
       
       r=_FIELD_AT(in,ix);
@@ -154,7 +154,7 @@ void spinor_field_tocpuformat_flt(spinor_field_flt *out, spinor_field_flt *in) {
   _PIECE_FOR(in->type,ixp) {
     int start = in->type->master_start[ixp];
     int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1; 
-    hr_complex_flt *cin=(hr_complex_flt*)(_FIELD_AT(in,start));
+    hr_complex_flt *cin=(hr_complex_flt*)(_GPU_FIELD_AT(in,start));
     _SITE_FOR(in->type,ixp,ix) {
       
       r=_FIELD_AT(out,ix);
@@ -191,7 +191,7 @@ void gfield_togpuformat(suNg_field *out, suNg_field *in) {
   _PIECE_FOR(in->type,ixp) {
     const int start = in->type->master_start[ixp];
     const int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1;
-    double *cout=(double*)(_4FIELD_AT(out,start,0));
+    double *cout=(double*)(_GPU_4FIELD_AT(out,start,0));
     _SITE_FOR(in->type,ixp,ix) {
       
       r=_4FIELD_AT(in,ix,0);
@@ -226,7 +226,7 @@ void gfield_tocpuformat(suNg_field *out, suNg_field *in) {
   _PIECE_FOR(in->type,ixp) {
     const int start = in->type->master_start[ixp];
     const int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1;
-    double *cin=(double*)(_4FIELD_AT(in,start,0));
+    double *cin=(double*)(_GPU_4FIELD_AT(in,start,0));
     _SITE_FOR(in->type,ixp,ix) {
       
       r=_4FIELD_AT(out,ix,0);
@@ -270,7 +270,7 @@ void gfield_togpuformat_flt(suNg_field_flt *out, suNg_field_flt *in) {
   _PIECE_FOR(in->type,ixp) {
     const int start = in->type->master_start[ixp];
     const int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1;
-    float *cout=(float*)(_4FIELD_AT(out,start,0));
+    float *cout=(float*)(_GPU_4FIELD_AT(out,start,0));
     _SITE_FOR(in->type,ixp,ix) {
       
       r=_4FIELD_AT(in,ix,0);
@@ -306,7 +306,7 @@ void gfield_tocpuformat_flt(suNg_field_flt *out, suNg_field_flt *in) {
   _PIECE_FOR(in->type,ixp) {
     const int start = in->type->master_start[ixp];
     const int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1;
-    float *cin=(float*)(_4FIELD_AT(in,start,0));
+    float *cin=(float*)(_GPU_4FIELD_AT(in,start,0));
     _SITE_FOR(in->type,ixp,ix) {
       
       r=_4FIELD_AT(out,ix,0);
@@ -350,7 +350,7 @@ void avfield_togpuformat(suNg_av_field *out, suNg_av_field *in) {
   _PIECE_FOR(in->type,ixp) {
     const int start = in->type->master_start[ixp];
     const int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1;
-    double *cout=(double*)(_4FIELD_AT(out,start,0));
+    double *cout=(double*)(_GPU_4FIELD_AT(out,start,0));
     _SITE_FOR(in->type,ixp,ix) {
       
       r=_4FIELD_AT(in,ix,0);
@@ -383,7 +383,7 @@ void avfield_tocpuformat(suNg_av_field *out, suNg_av_field *in) {
   _PIECE_FOR(in->type,ixp) {
     const int start = in->type->master_start[ixp];
     const int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1;
-    double *cin=(double*)(_4FIELD_AT(in,start,0));
+    double *cin=(double*)(_GPU_4FIELD_AT(in,start,0));
     _SITE_FOR(in->type,ixp,ix) {
       
       r=_4FIELD_AT(out,ix,0);
