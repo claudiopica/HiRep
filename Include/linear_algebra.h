@@ -6,6 +6,10 @@
 #ifndef LINEAR_ALGEBRA_H
 #define LINEAR_ALGEBRA_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* 
  * LINEAR ALGEBRA FUNCTIONS ARE DEFINED IN THE TEMPLATE
  *
@@ -37,5 +41,9 @@
 #undef _FUNC
 #undef _REAL
 #undef _COMPLEX
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
