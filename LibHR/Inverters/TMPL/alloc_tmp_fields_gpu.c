@@ -17,7 +17,7 @@ double* alloc_double_sum_field(int n){
   }
 
   if (res == NULL){
-    cudaMalloc((void **) & res,n*sizeof(double));
+    cudaMallocManaged((void **) & res,n*sizeof(double),cudaMemAttachGlobal);
     n=n_size;
   }
   return res;
@@ -31,7 +31,7 @@ complex* alloc_complex_sum_field(int n){
     res = NULL;
   }
   if (res == NULL){
-    cudaMalloc((void **) & res,n*sizeof(complex));
+    cudaMallocManaged((void **) & res,n*sizeof(complex),cudaMemAttachGlobal);
   }
   return res;
 }

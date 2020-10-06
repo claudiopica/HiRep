@@ -19,13 +19,23 @@
 
 /* double precision */
 
+#ifdef WITH_GPU
+#include "TMPL/alloc_tmp_fields_gpu.c"
+#include "TMPL/global_sum_gpu.c"
+#endif //WITH_GPU
+
 #define _SPINOR_FIELD_TYPE spinor_field
 #define _SPINOR_TYPE suNf_spinor
 #define _FUNC(a) a##_f
 #define _REAL double
 #define _COMPLEX double complex
 
+#ifdef WITH_GPU
+#include "TMPL/linear_algebra_gpu.c.sdtmpl"
+#else
 #include "TMPL/linear_algebra.c.sdtmpl"
+#endif //ifdef WITH_GPU
+
 void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
 	_TWO_SPINORS_MATCHING(s1,s2);
 	memcpy(s1->ptr,s2->ptr,s1->type->gsize_spinor*sizeof(suNf_spinor));
@@ -46,7 +56,12 @@ void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
 #define _REAL float
 #define _COMPLEX float complex
 
+#ifdef WITH_GPU
+#include "TMPL/linear_algebra_gpu.c.sdtmpl"
+#else
 #include "TMPL/linear_algebra.c.sdtmpl"
+#endif //ifdef WITH_GPU
+
 void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
 	_TWO_SPINORS_MATCHING(s1,s2);
 	memcpy(s1->ptr,s2->ptr,s1->type->gsize_spinor*sizeof(suNf_spinor_flt));
