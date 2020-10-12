@@ -472,10 +472,10 @@ write_spinor_pplus();
 
 sub write_suN_vector {
   print $structdef;
-  print "   double complex $cname\[$N\];\n";
+  print "   hr_complex $cname\[$N\];\n";
   print "} ${rdataname}_vector;\n\n";
   print $structdef;
-  print "   float complex $cname\[$N\];\n";
+  print "   hr_complex_flt $cname\[$N\];\n";
   print "} ${rdataname}_vector_flt;\n\n";
 }
 
@@ -495,10 +495,10 @@ sub write_suN_algebra_vector {
 sub write_suN {
   print $structdef;
 	my $d=($N*$N);
-  print "   double complex $cname\[$d\];\n";
+  print "   hr_complex $cname\[$d\];\n";
   print "} $dataname;\n\n";
   print $structdef;
-  print "   float complex $cname\[$d\];\n";
+  print "   hr_complex_flt $cname\[$d\];\n";
   print "} ${dataname}_flt;\n\n";
 }
 

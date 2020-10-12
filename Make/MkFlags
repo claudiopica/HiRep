@@ -81,7 +81,7 @@ CFLAGS = -Wall -std=c99 -O3  #-g #-march=core-avx2 -mtune=core-avx2 -g
 else #Compile with GPU
 CC = nvcc 
 #CFLAGS = -g -G -Xcompiler '-std=c99 -fgcse-sm -fgcse-las -fgcse-after-reload'
-CFLAGS = --x c -O2 -Xcompiler '-std=c99 -fgcse-sm -fgcse-las -fgcse-after-reload'
+CFLAGS = -O2 -Xcompiler '-std=c99 -fgcse-sm -fgcse-las -fgcse-after-reload'
 #GPUFLAGS = --x cu -arch=sm_20 --use_fast_math -Xptxas -v  -Xptxas -dlcm=ca 
 GPUFLAGS = --x cu -arch=sm_70 -Xptxas -v  -Xptxas -dlcm=ca 
 LDFLAGS = -lcuda

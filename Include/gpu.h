@@ -16,6 +16,7 @@
 #include "logger.h"
 #include "error.h"
 #include "input_par.h"
+#include "hr_complex.h"
 
 /* GPU variables */
 typedef struct _input_gpu {
@@ -42,6 +43,8 @@ typedef struct _input_gpu {
 }\
 }
 
+double* alloc_double_sum_field(int n);
+hr_complex* alloc_complex_sum_field(int n);
 
 #define START_SP_ADDRESS_GPU(sf) ((sf)->gpu_ptr + (sf)->type->master_start[0])
 
