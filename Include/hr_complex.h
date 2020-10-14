@@ -14,14 +14,14 @@
 #ifndef HR_COMPLEX_H
 #define HR_COMPLEX_H
 
+#ifdef __cplusplus
+#include "gpu_complex.h"
+#else
+
 #include <tgmath.h>
 // tgmath includes math.h and complex.h
 // and defines type-generic macros for math functions
 // e.g: float complex fc; creal(fc) invokes crealf(fc)
-
-#ifdef __cplusplus
-#include "complex.h"
-#else
 
 /*******************************************************************************
 *

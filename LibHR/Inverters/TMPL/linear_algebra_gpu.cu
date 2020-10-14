@@ -44,7 +44,7 @@ template<typename COMPLEX, typename REAL>
 
 /* <s1,s2> */
 template< typename COMPLEX>
-__global__ void spinor_field_prod_padded_gpu(COMPLEX* s1, COMPLEX* s2, complex* resField,unsigned int N){
+__global__ void spinor_field_prod_padded_gpu(COMPLEX* s1, COMPLEX* s2, hr_complex* resField,unsigned int N){
   int i = blockIdx.x*BLOCK_SIZE + threadIdx.x;
   COMPLEX c1 = s1[i];
   COMPLEX c2 = s2[i];
@@ -53,11 +53,11 @@ __global__ void spinor_field_prod_padded_gpu(COMPLEX* s1, COMPLEX* s2, complex* 
   if (i2<N) {
     COMPLEX c3 = s1[i2];
     COMPLEX c4 = s2[i2];
-    tmp1=_complex_prod(c1,c2);
-    tmp2=_complex_prod(c3,c4);
+    _complex_prod(tmp1,c1,c2);
+    _complex_prod(tmp2,c3,c4);
   }
   else{
-    tmp1=_complex_prod(c1,c2);
+    _complex_prod(tmp1,c1,c2);
     tmp2.re=tmp2.im=0.;
   }
   resField[i].re=tmp1.re+tmp2.re;
@@ -193,7 +193,7 @@ template< typename COMPLEX>
   __global__ void spinor_field_prod_gpu(COMPLEX* s1, COMPLEX* s2, COMPLEX* resField,int N){
   int i = blockIdx.x*BLOCK_SIZE + threadIdx.x;
   i=min(i,N-1);
-  resField[i]=_complex_prod(s1[i],s2[i]);
+  _complex_prod(resField[i],s1[i],s2[i]);
 }
 
 /* Re <g5*s1,s2> */

@@ -5,6 +5,12 @@
 
 #include "communications.h"
 
+/* s1=s2 */
+void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
+	_TWO_SPINORS_MATCHING(s1,s2);
+	memcpy(s1->ptr,s2->ptr,s1->type->gsize_spinor*sizeof(suNf_spinor));
+}
+
 /* Re <s1,s2> */
 double _FUNC(spinor_field_prod_re)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
@@ -46,19 +52,19 @@ _OMP_PRAGMA ( single )
 }
 
 /* <s1,s2> */
-double complex _FUNC(spinor_field_prod)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
+hr_complex _FUNC(spinor_field_prod)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
 
-    static double complex res;
+    static hr_complex res;
 _OMP_PRAGMA ( single )
     {
-      res = 0.;
+      _complex_0(res);
     }
   
   _TWO_SPINORS_FOR_SUM(s1,s2,res) {
     _COMPLEX loc_res; //needed for OMP threads
     _spinor_prod_f(loc_res,*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
-    res+=(double complex) loc_res;
+    _complex_add_assign(res,loc_res);
   }
 #ifdef WITH_MPI
 	global_sum((double*)&res,2);
