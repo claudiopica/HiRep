@@ -7,6 +7,10 @@
 #define GPU_H
 #ifdef WITH_GPU
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include <stdio.h>
 #include <cuda.h>
 #include <driver_types.h>
@@ -50,6 +54,10 @@ hr_complex* alloc_complex_sum_field(int n);
 
 #define _GPU_FIELD_BLK(s,i) (((s)->gpu_ptr) + (s)->type->master_start[(i)])
 #define _GPU_4FIELD_BLK(s,i) (((s)->gpu_ptr) + 4*(s)->type->master_start[(i)])
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif //WITH_GPU
 #endif

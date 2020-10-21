@@ -7,8 +7,9 @@
 #ifndef GLOBAL_SUM_GPU_C
 #define GLOBAL_SUM_GPU_C
 #include "hr_complex.h"
+#include "linear_algebra.h"
 #include "global.h"
- #include "gpu.h"
+#include "gpu.h"
 
 #define GSUM_BLOCK_SIZE 256     // No more than 1024 on Tesla
 #define BLOCK_SIZE_REM 64
@@ -108,7 +109,7 @@ __global__ void sum_reduce(REAL *vec,int ns){
 
 
 //Kernel calling function
-
+extern "C"
 void global_reduction_sum(double* resField, unsigned int Npow2){
   unsigned int max_grid = (grid_size_max_gpu >> 1u)+1u; 
   int ns = Npow2/GSUM_BLOCK_SIZE/max_grid;
@@ -276,7 +277,7 @@ double global_sum_gpu(double* vector, int n){
   return res;
 }
 
-hr_complex global_sum_gpu(hr_complex* vector, int n){
+hr_complex global_sum_gpu_complex(hr_complex* vector, int n){
   unsigned int new_n = next_pow2(n);
   int grid_size = new_n / BLOCK_SIZE;
   hr_complex* padded_vector;

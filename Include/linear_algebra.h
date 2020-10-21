@@ -6,10 +6,6 @@
 #ifndef LINEAR_ALGEBRA_H
 #define LINEAR_ALGEBRA_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 /* 
  * LINEAR ALGEBRA FUNCTIONS ARE DEFINED IN THE TEMPLATE
  *
@@ -52,17 +48,19 @@ extern "C" {
 #undef _REAL
 #undef _COMPLEX
 
-#ifdef __cplusplus
-}
-#endif
-
 /* GPU functions*/
 #ifdef WITH_GPU
+#ifdef __cplusplus
+extern "C" {
+#endif
 unsigned int next_pow2( unsigned int n );
 void global_reduction_sum(double* resField, unsigned int Npow2);
 void global_reduction_complex_sum(hr_complex* resField, unsigned int Npow2);
 double global_sum_gpu(double* vector, int n);
-hr_complex global_sum_gpu(hr_complex* vector, int n);
+hr_complex global_sum_gpu_complex(hr_complex* vector, int n);
+#ifdef __cplusplus
+}
+#endif
 #endif
 
 #endif

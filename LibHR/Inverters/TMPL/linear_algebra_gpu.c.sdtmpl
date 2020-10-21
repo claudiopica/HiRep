@@ -190,7 +190,7 @@ double _FUNC(spinor_field_sqnorm)(_SPINOR_FIELD_TYPE *s1)
 
 
 /* s1+=r*s2 r real */
-void _FUNC(spinor_field_mul_add_assign)(_SPINOR_FIELD_TYPE *s1, double r, _SPINOR_FIELD_TYPE *s2)
+void _FUNC(spinor_field_mul_add_assign)(_SPINOR_FIELD_TYPE *s1, _REAL r, _SPINOR_FIELD_TYPE *s2)
 {
   _REAL rr=(_REAL) r;
   unsigned int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
@@ -214,7 +214,7 @@ void _FUNC(spinor_field_mulc_add_assign)(_SPINOR_FIELD_TYPE *s1, _COMPLEX c, _SP
 }
 
 /* s1=r*s2 */
-void _FUNC(spinor_field_mul)(_SPINOR_FIELD_TYPE *s1, double r, _SPINOR_FIELD_TYPE *s2)
+void _FUNC(spinor_field_mul)(_SPINOR_FIELD_TYPE *s1, _REAL r, _SPINOR_FIELD_TYPE *s2)
 {
   _REAL rr=(_REAL) r;
   
@@ -299,7 +299,7 @@ void _FUNC(spinor_field_minus)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 }
 
 /* s1=r1*s2+r2*s3 */
-void _FUNC(spinor_field_lc)(_SPINOR_FIELD_TYPE *s1, double r1, _SPINOR_FIELD_TYPE *s2, double r2, _SPINOR_FIELD_TYPE *s3)
+void _FUNC(spinor_field_lc)(_SPINOR_FIELD_TYPE *s1, _REAL r1, _SPINOR_FIELD_TYPE *s2, _REAL r2, _SPINOR_FIELD_TYPE *s3)
 {
   _REAL rr1= (_REAL) r1;
   _REAL rr2= (_REAL) r2;
@@ -312,7 +312,7 @@ void _FUNC(spinor_field_lc)(_SPINOR_FIELD_TYPE *s1, double r1, _SPINOR_FIELD_TYP
 }
 
 /* s1+=r1*s2+r2*s3 */
-void _FUNC(spinor_field_lc_add_assign)(_SPINOR_FIELD_TYPE *s1, double r1, _SPINOR_FIELD_TYPE *s2, double r2, _SPINOR_FIELD_TYPE *s3)
+void _FUNC(spinor_field_lc_add_assign)(_SPINOR_FIELD_TYPE *s1, _REAL r1, _SPINOR_FIELD_TYPE *s2, _REAL r2, _SPINOR_FIELD_TYPE *s3)
 {
   _REAL rr1=(_REAL)r1;
   _REAL rr2=(_REAL)r2;
@@ -450,6 +450,12 @@ void _FUNC(spinor_field_copy_gpu_to_gpu)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_T
   
   _GRID_LOOP(spinor_field_copy_gpu_to_gpu_gpu<<<grid_size,BLOCK_SIZE>>>(((_COMPLEX*) START_SP_ADDRESS_GPU(s1)),((_COMPLEX*) START_SP_ADDRESS_GPU(s2)),N-offset));
   CudaCheckError();   
+}
+
+/* s1+=c*g5*s2 c complex */
+void _FUNC(spinor_field_g5_mulc_add_assign)(_SPINOR_FIELD_TYPE *s1, _COMPLEX c, _SPINOR_FIELD_TYPE *s2)
+{
+  //TODO
 }
 
 

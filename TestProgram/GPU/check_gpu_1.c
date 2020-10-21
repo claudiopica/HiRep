@@ -29,6 +29,27 @@
 #include "logger.h"
 
 static double EPSILON=1.e-12;
+void random_spinor_field_cpu(spinor_field *s)
+{
+	int i;
+	geometry_descriptor *type = s->type;
+	for (i = 0; i < type->local_master_pieces; i++)
+		gauss((double *)(s->ptr + (type->master_start[i] - type->master_shift)), (type->master_end[i] - type->master_start[i] + 1) * sizeof(suNf_spinor) / sizeof(double));
+}
+void unit_array(double *a, int len)
+{
+      for(int i=0;i<len;i++)
+      {
+            a[i]=1.;
+      }
+}
+void unit_spinor_field_cpu(spinor_field *s)
+{
+	int i;
+	geometry_descriptor *type = s->type;
+	for (i = 0; i < type->local_master_pieces; i++)
+		unit_array((double *)(s->ptr + (type->master_start[i] - type->master_shift)), (type->master_end[i] - type->master_start[i] + 1) * sizeof(suNf_spinor) / sizeof(double));
+}
 
 int main(int argc, char *argv[])
 {
@@ -42,8 +63,9 @@ int main(int argc, char *argv[])
 
       test=alloc_spinor_field_f(2, &glattice);
       original=alloc_spinor_field_f(2,&glattice);
-      gaussian_spinor_field(&original[0]);
-      spinor_field_copy_f(&test[0],&original[0]);
+      random_spinor_field_cpu(&original[0]);
+      //gaussian_spinor_field(&original[0]);
+      spinor_field_copy_f_cpu(&test[0],&original[0]);
 
       /*field copy check*/
       //spinor_field_sub_assign_f(&test[0],&original[0]);
@@ -54,8 +76,9 @@ int main(int argc, char *argv[])
       spinor_field_togpuformat(&test[1], &test[0]);
       spinor_field_tocpuformat(&test[0], &test[1]);
 
-      spinor_field_sub_assign_f(&test[0],&original[0]);
-      double d=spinor_field_sqnorm_f(&test[0])/spinor_field_sqnorm_f(&original[0]);
+      spinor_field_sub_assign_f_cpu(&test[0],&original[0]);
+      double d=spinor_field_sqnorm_f_cpu(&test[0])/spinor_field_sqnorm_f_cpu(&original[0]);
+      lprintf("GPU TEST",0,"norm: %.2e\n",spinor_field_sqnorm_f_cpu(&original[0]));
       lprintf("GPU TEST",0,"difference: %.2e\n",d);
       if (d > EPSILON){
             lprintf("GPU",0,"Test failed ?\n");
