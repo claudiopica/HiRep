@@ -129,7 +129,7 @@ int main(int argc, char **argv)
   }
 
   for (int i = 0; i < n_activeop; i++)
-    eigenval_avg_err[i] = sqrt((apar.numbinjk - 1.0) / apar.numbinjk) * sqrt(eigenval_avg_err[i] - eigenval_avg[i] * eigenval_avg[i]);
+    eigenval_avg_err[i] = sqrt(apar.numbinjk - 1.0) * sqrt(eigenval_avg_err[i] - eigenval_avg[i] * eigenval_avg[i]);
 
   std::cout << std::endl
             << "[INFO][MAIN] Eigenvalues:" << std::endl;

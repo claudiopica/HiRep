@@ -1,7 +1,7 @@
-GLB_T = 8
-GLB_X = 8
-GLB_Y = 8
-GLB_Z = 8
+GLB_T = 18
+GLB_X = 16
+GLB_Y = 16
+GLB_Z = 16
 NP_T = 2
 NP_X = 1
 NP_Y = 1
@@ -19,6 +19,19 @@ rlx_level = 1
 rlx_seed = 83745
 rlx_start = new
 rlx_state = rand_state
+
+
+//needed only if compiled with FERMION_THETA
+theta_T = 0.0
+theta_X = 0.0
+theta_Y = 0.0
+theta_Z = 0.0
+
+//needed only if compiled with BASIC or ROTATED_SF 
+sf:ct = 0.945700
+
+//if set to true imposes SF background
+sf:background = true
 
 
 so:configlist = listconf.txt

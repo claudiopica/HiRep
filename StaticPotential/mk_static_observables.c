@@ -134,6 +134,39 @@ typedef struct _input_wilson
 input_HYP HYP_var = init_input_HYP(HYP_var);
 input_WL WL_var = init_input_WL(WL_var);
 
+
+
+
+/* BC variables */
+typedef struct _input_bcpar
+{
+  /* rhmc parameters */
+  double theta[4];
+  double SF_ct;
+  double SF_ds;
+  char SF_bkg[256];
+  /* for the reading function */
+  input_record_t read[8];
+
+} input_bcpar;
+
+#define init_input_bcpar(varname)                                  \
+{                                                                \
+    .read = {                                                      \
+      {"theta_T", "theta_T = %lf", DOUBLE_T, &(varname).theta[0]}, \
+      {"theta_X", "theta_X = %lf", DOUBLE_T, &(varname).theta[1]}, \
+      {"theta_Y", "theta_Y = %lf", DOUBLE_T, &(varname).theta[2]}, \
+      {"theta_Z", "theta_Z = %lf", DOUBLE_T, &(varname).theta[3]}, \
+      {"SF_ds", "sf:ds = %lf", DOUBLE_T, &(varname).SF_ds},        \
+      {"SF_ct", "sf:ct = %lf", DOUBLE_T, &(varname).SF_ct},        \
+      {"SF_background", "sf:background = %s", STRING_T, &(varname).SF_bkg},        \
+      {NULL, NULL, INT_T, NULL}                                    \
+    }                                                              \
+  }
+
+input_bcpar bcpar_var = init_input_bcpar(bcpar_var);
+
+
 int main(int argc, char *argv[])
 {
 
@@ -146,6 +179,7 @@ int main(int argc, char *argv[])
   setup_gauge_fields();
 
   read_input(ospar_var.read, get_input_filename());
+  read_input(bcpar_var.read, get_input_filename());
 
   HYP_var.weight[0] = HYP_var.weight[1] = HYP_var.weight[2] = 0.;
   for (i = 0; i < 10; i++)
@@ -170,6 +204,19 @@ int main(int argc, char *argv[])
       .gauge_boundary_improvement_ct = 1.,
       .chiSF_boundary_improvement_ds = 1.,
       .SF_BCs = 0};
+#ifdef FERMION_THETA
+  BCs_pars.fermion_twisting_theta[0] = bcpar_var.theta[0];
+  BCs_pars.fermion_twisting_theta[1] = bcpar_var.theta[1];
+  BCs_pars.fermion_twisting_theta[2] = bcpar_var.theta[2];
+  BCs_pars.fermion_twisting_theta[3] = bcpar_var.theta[3];
+#endif
+  BCs_pars.gauge_boundary_improvement_ct = bcpar_var.SF_ct;
+#ifdef ROTATED_SF
+  BCs_pars.chiSF_boundary_improvement_ds = bcpar_var.SF_ds;
+#endif
+  if (strcmp(bcpar_var.SF_bkg, "true") == 0)
+    BCs_pars.SF_BCs = 1;
+
 
   init_BCs(&BCs_pars);
 
