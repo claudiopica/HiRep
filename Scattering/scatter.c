@@ -128,16 +128,12 @@ int main(int argc,char *argv[])
  	#endif
 
 
-  m[0] = -atof(mes_var.mstring); // VD: to match the mass parsed by parse_cnfg ?
+  m[0] = atof(mes_var.mstring); 
   init_propagator_eo(1,m,mes_var.precision);
   strcpy(list_filename,mes_var.configlist);
   lprintf("MAIN",0,"outdir %s\n", mes_var.outdir);
   lprintf("MAIN",0,"%s %s\n", list_filename,mes_var.configlist);
-  //Copy I/O from another file
-  //read_cmdline(argc, argv);
-  //setup_process(&argc,&argv);
-
-  //setup(&list, m);
+  
 
   if(strcmp(list_filename,"")!=0) {
     error((list=fopen(list_filename,"r"))==NULL,1,"main [mk_mesons.c]" ,
@@ -152,7 +148,7 @@ int main(int argc,char *argv[])
 
   lprintf("MAIN",0,"Boundary conditions: %s\n",mes_var.bc);
   lprintf("MAIN",0,"The momenta are: %s\n",mes_var.p);
-  lprintf("MAIN",0,"mass is : %s\n",mes_var.p);
+  lprintf("MAIN",0,"mass is : %s\n",mes_var.mstring);
   lprintf("MAIN",0,"Number of momenta: %d\n",Nmom);
   lprintf("MAIN",0,"The momenta are:\n");
   

@@ -16,8 +16,8 @@
 
 void measure_pion_scattering(double* m, int nhits,int conf_num, double precision,int ts);
 void measure_pion_scattering_I2(double* m, int numsources, double precision,char* path,char* cnfg_filename,meson_observable** mo_arr);
-//void measure_pion_scattering_I0(double* m, int numsources, double precision,char* path,char* cnfg_filename, int seq_prop);
 void measure_pion_scattering_I0(double* m, int numsources, double precision,char* path,char* cnfg_filename, int seq_prop, meson_observable** mo_arr);
+void measure_pion_scattering_I0_TS(double* m, int numsources, double precision,char* path,char* cnfg_filename, int seq_prop, meson_observable** mo_arr);
 
 /**
  * @brief Propagator sources with zero-momentum

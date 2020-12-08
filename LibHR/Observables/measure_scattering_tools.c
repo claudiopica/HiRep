@@ -1351,3 +1351,101 @@ void measure_pion_scattering_I0(double* m, int numsources, double precision,char
 }
 
 
+void measure_pion_scattering_I0_TS(double* m, int numsources, double precision,char* path,char* cnfg_filename, int seq_prop, meson_observable** mo_arr){
+        int ts=0;
+        int ts_vec[numsources];
+        meson_observable *sigmaconn, *sigmadisc,*Tr;
+
+
+        spinor_field* source_disc= alloc_spinor_field_f(4,&glattice);
+        spinor_field* source_tri= alloc_spinor_field_f(4,&glattice);
+        spinor_field* source_seq= alloc_spinor_field_f(4,&glattice);
+
+        spinor_field* prop_disc= alloc_spinor_field_f(4,&glattice);
+        spinor_field* prop_tri= alloc_spinor_field_f(4,&glattice);
+        spinor_field* seq_0 = alloc_spinor_field_f(4,&glattice);
+
+
+        sigmaconn = (meson_observable*) malloc(sizeof(meson_observable));
+        sigmadisc = (meson_observable*) malloc(sizeof(meson_observable));
+        Tr  = (meson_observable*) malloc(sizeof(meson_observable));
+
+
+        init_mo(sigmaconn,"sigmaconn",GLB_T);
+        init_mo(sigmadisc,"sigmadisc",GLB_T);
+        init_mo(Tr,"T",GLB_T);
+
+        sigmaconn->ind1 = _id;
+        sigmadisc->ind1 = _id;
+        sigmaconn->ind2 = _id;
+        sigmadisc->ind2 = _id;
+
+
+        Tr->ind2 = _id;
+        Tr->ind1 = _g5;
+
+
+
+        for (int src=0;src<numsources;++src)
+        {
+                reset_mo(sigmaconn);
+                reset_mo(sigmadisc);
+                reset_mo(Tr);
+                
+                init_propagator_eo(1, m, precision);
+                ts = random_tau2(); // randomly chosen timeslice 
+                ts_vec[src] = ts;
+
+                lprintf("MAIN",0,"Random timeslice chosen : ts=%d\n",ts);       
+
+                // connected sigma and triangle
+                create_diluted_source_equal_atau(source_tri, ts) ;
+                calc_propagator(prop_tri,source_tri,4);
+                create_sequential_source_stoch(source_seq,ts,prop_tri);
+                calc_propagator(seq_0,source_seq,4);
+
+                // disconected sigma
+                create_noise_source_equal_eo(source_disc);
+                calc_propagator(prop_disc,source_disc,4);
+
+
+                // contractions
+                measure_mesons_core(prop_disc,prop_disc,source_disc,sigmadisc,1,0,1,0,GLB_T); //disc
+                measure_mesons_core(prop_tri,prop_tri,source_tri,sigmaconn,1,ts,1,0,GLB_T); //conn
+                measure_mesons_core(prop_tri, seq_0,source_tri,Tr,1,ts,1,0,GLB_T); //triangle
+
+                
+                lprintf("MAIN",0,"Contractions...\n");
+                do_global_sum(sigmadisc,1.0);
+                do_global_sum(sigmaconn,0.5); //this is necessary for the factor 2 in io2pt
+                do_global_sum(Tr,1.0);
+
+
+                if (path!=NULL){
+                io2pt( sigmaconn ,1,src,path,"sigmaconn",cnfg_filename);
+                io2pt( sigmadisc ,1,src,path,"sigmadisc",cnfg_filename);
+                io2pt( Tr ,1,src,path,"T",cnfg_filename);
+                }
+
+                
+        }
+
+		if (mo_arr != NULL){
+			copy_mo(mo_arr[0],sigmaconn);
+			copy_mo(mo_arr[1],sigmadisc);
+			copy_mo(mo_arr[2],Tr);
+		}
+       
+        //free memory
+        free_spinor_field_f(source_disc);
+        free_spinor_field_f(source_tri);
+        free_spinor_field_f(source_seq);
+        free_spinor_field_f(prop_disc);
+        free_spinor_field_f(prop_tri);
+        free_spinor_field_f(seq_0);
+
+        free_mo(sigmaconn);
+        free_mo(sigmadisc);
+        free_mo(Tr);
+
+}
