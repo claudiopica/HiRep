@@ -24,5 +24,6 @@ mes:mass = -0.605
 mes:csw = 1.0
 mes:precision = 1e-24
 
+sigma_triangle:nhits = 400
 
-I2:nhits = 80
+

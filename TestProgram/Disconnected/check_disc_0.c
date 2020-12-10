@@ -191,7 +191,7 @@ int main(int argc,char *argv[])
   double complex*** out_corr;
   double complex **ex_loops;
   double complex **mean_loops;
-  double abs_tol=1e-1;
+  double abs_tol=2e-1;
   double rel_tol_scalar_loop=1e-3;
   struct timeval start, end, etime;
 

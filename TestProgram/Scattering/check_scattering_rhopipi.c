@@ -513,9 +513,6 @@ int main(int argc,char *argv[])
         }
     }
 
-    // what about the average over the noise?
-
-
     lprintf("TEST",0,"Finished lattice calculation, proceeding with analytic calculation\n");
     fourvec p = {{0.0,0.0,0.0,0.0}};
 #define TOL 1e-2
