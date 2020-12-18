@@ -1,7 +1,7 @@
 name: Run Tests
 description: 'Run HiRep tests'
 inputs:
-  dirtest:
+  dir:
     description: "Test subdir"
     required: true
   ccache:

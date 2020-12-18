@@ -16,6 +16,7 @@ jobs:
         nc: [2, 3]
         repr: [FUND, ADJ]
         ecsw: [-expclover,-no-expclover]
+        dir: [Algebra,DiracOperator,Geometry,Inverters,Mesons,PureGauge,RIMOM,Sources,StoredConfs,Utils,Disconnected,GaugeFix,Propagator,Random,Scattering,SpinorField,Update,WilsonLoops]
 
     steps:
     - uses: actions/checkout@v1
@@ -24,6 +25,7 @@ jobs:
 
     - uses: ./.github/actions/runtests
       with:
+        dir: ${{matrix.dir}}
         mpi: -no-mpi
         nc: ${{ matrix.nc }}
         repr: ${{ matrix.repr }}
