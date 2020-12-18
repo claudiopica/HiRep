@@ -1,6 +1,9 @@
 name: Run Tests
 description: 'Run HiRep tests'
 inputs:
+  dirtest:
+    description: "Test subdir"
+    required: true
   ccache:
     description: "Use ccache"
     required: true
@@ -24,6 +27,7 @@ runs:
   image: 'docker://cpica/hr-tests'
   args:
     - ./TestProgram/run_tests.sh
+    - ${{ inputs.dir }}
     - ${{ inputs.ccache }}
     - ${{ inputs.mpi }}
     - ${{ inputs.ecsw }}
