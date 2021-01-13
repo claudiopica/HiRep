@@ -339,7 +339,7 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
         for (i = 0; i < nblocking * n_active_slices * total_n_glue_op; i++)
             one_point_gb[i] /= norm;
 
-        evaluate_correlators(lcor, nblocking, one_point_gb);
+        evaluate_1pt_functions(lcor, nblocking, one_point_gb);
         gettimeofday(&start, 0);
         timeval_subtract(&etime, &start, &end);
 
