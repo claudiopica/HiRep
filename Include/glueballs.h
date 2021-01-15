@@ -26,6 +26,7 @@ typedef struct
 } cor_list;
 
 void evaluate_1pt_functions(cor_list *lcor, int nblocking, double complex *gb_storage);
+    
 
 #define total_n_glue_op 16
 #endif

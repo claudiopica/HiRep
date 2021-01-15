@@ -254,7 +254,7 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
             error(pg_var_ml.corrs.list[j - 1 - l].t2 - pg_var_ml.corrs.list[j - 1 - l].t1 != dt, 1, "init_mc_ml " __FILE__, "Badly formatted ML correlator (different dt)");
 
             error(pg_var_ml.corrs.list[j - 1 - l].t1 < 0 || pg_var_ml.corrs.list[j - 1 - l].t1 > GLB_T/2, 1, "init_mc_ml " __FILE__, "Badly formatted ML correlator (t1 out of bound)");
-            error(pg_var_ml.corrs.list[j - 1 - l].t2 <= GLB_T/2 + 1 || pg_var_ml.corrs.list[j - 1 - l].t2 >= GLB_T, 1, "init_mc_ml " __FILE__, "Badly formatted ML correlator (t2 out of bound)");
+            error(pg_var_ml.corrs.list[j - 1 - l].t2 < GLB_T/2 + 1 || pg_var_ml.corrs.list[j - 1 - l].t2 >= GLB_T, 1, "init_mc_ml " __FILE__, "Badly formatted ML correlator (t2 out of bound)");
 
             pg_var_ml.corrs.list[j - 1 - l].n_pairs = k;
         }
