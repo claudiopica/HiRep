@@ -62,7 +62,7 @@ void init_triplet_discon_correlators(){
   for (i=0;i<NGAMMA_IND;++i){
     char name[100];
     sprintf(name,"%s_disc",meson_channel_names[i]);
-    add_meson_observable(&triplet_discon_correlators,i,_NOGAMMA,name,"TRIPLET",-1);
+    add_meson_observable(&triplet_discon_correlators,i,_DISC,name,"TRIPLET",-1);
   }
 }
 

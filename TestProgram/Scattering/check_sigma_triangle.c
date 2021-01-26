@@ -231,6 +231,67 @@ double complex twopoint(fourvec p, double m,int L, int LT, int t)
     res = 4*res/L/L/L/LT/LT;
     return res;
 }
+/**
+ * @brief Calculates analytic expression for scalar 2-point function
+ * @param p Momentum at the sink
+ * @param m Quark mass
+ * @param L spatial size of the box
+ * @param LT time extent of the box
+ * @param t time slice
+ */
+double complex twopoint_id(fourvec p, double m,int L, int LT, int t)
+{
+    fourvec mom1, mom2;
+    int q1, q2, q3, q41, q42;
+    double complex res;
+    res = 0.;
+    double tmp;
+    
+    for (q1=0;q1<L;++q1) for (q2=0; q2<L; ++q2)  for (q3=0; q3<L; ++q3) for (q41=0; q41<LT; ++q41) for (q42=0; q42<LT; ++q42){
+        mom1 = (fourvec) {{q1,q2,q3,((double) q41)*L/LT}};
+        iadd(&mom1, &p);
+        imul(&mom1, 2.0* PI / L);
+        mom2 = (fourvec) {{q1,q2,q3,((double) q42)*L/LT}};
+        imul(&mom2, 2.0* PI / L);
+
+        tmp = (f1(mom1,m)*f1(mom2,m) - f2(mom1,mom2)) / ( (SQR(f1(mom1,m)) + f2(mom1,mom1)) * (SQR(f1(mom2,m)) + f2(mom2,mom2) ) );
+        res += tmp * cexp(I*(2.0 * PI / LT) * t * (q42 - q41));
+    }
+
+    res = 4*res/L/L/L/LT/LT;
+    return res;
+}
+
+
+
+/**
+ * @brief Calculates analytic expression for pion 2-point function
+ * @param p Momentum at the sink
+ * @param m Quark mass
+ * @param L spatial size of the box
+ * @param LT time extent of the box
+ * @param t time slice
+ */
+double complex disc_id(fourvec p, double m,int L, int LT, int t)
+{
+    fourvec mom1;
+    int q1, q2, q3, q41;
+    double complex res;
+    res = 0.;
+    double tmp;
+    
+    for (q1=0;q1<L;++q1) for (q2=0; q2<L; ++q2)  for (q3=0; q3<L; ++q3) for (q41=0; q41<LT; ++q41){
+        mom1 = (fourvec) {{q1,q2,q3,((double) q41)*L/LT}};
+        iadd(&mom1, &p);
+        imul(&mom1, 2.0* PI / L);
+    
+        tmp = f1(mom1,m) /  (SQR(f1(mom1,m)) + f2(mom1,mom1))  ;
+        res += tmp;
+    }
+
+    res = 4*res/L/L/L/LT;
+    return res;
+}
 
 /**
  * @brief Calculates analytic expression for rho 2-point function with gamma3 at source and sink
@@ -536,8 +597,14 @@ int main(int argc,char *argv[])
    gettimeofday(&start,0);
    //char path[100]="./output/";
    double complex Tstoch[GLB_T],Ttheo[GLB_T];
+   double complex Dstoch[GLB_T],Dtheo[GLB_T];
+   double complex Cstoch[GLB_T],Ctheo[GLB_T];
 
-   for (int t=0;t < GLB_T ; t++)    Tstoch[t] = 0.0;
+   for (int t=0;t < GLB_T ; t++)    {
+       Tstoch[t] = 0.0;
+       Dstoch[t] = 0.0;
+       Cstoch[t] = 0.0;
+   }
 
     mo_arr= (meson_observable**)malloc(sizeof(meson_observable*)*ncorr);
     for(int i=0; i<ncorr; i++) mo_arr[i] =  (meson_observable*) malloc(sizeof(meson_observable));
@@ -554,6 +621,8 @@ int main(int argc,char *argv[])
         for (int t=0;t < GLB_T ; t++) 
             {
                 Tstoch[t] += (mo_arr[2]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[2]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(numsources*GLB_X*GLB_Z*GLB_Y); 
+                Dstoch[t] += (mo_arr[1]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[1]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(numsources*GLB_X*GLB_Z*GLB_Y); 
+                Cstoch[t] += (mo_arr[0]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[0]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(numsources*GLB_X*GLB_Z*GLB_Y); 
             }
         for (int i=0;i<ncorr;i++) reset_mo(mo_arr[i]);
         
@@ -561,22 +630,32 @@ int main(int argc,char *argv[])
  
     for (int t=0;t < GLB_T ; t++)  
     {
-      Ttheo[t] =  NF*Triangle_id( zero_p, m[0],GLB_X,GLB_T,t ); // R_(zero_p,zero_p,zero_p,m[0],GLB_X,GLB_T,t);
+      Ttheo[t] =  NF*Triangle_id( zero_p, m[0],GLB_X,GLB_T,t );  // R_(zero_p,zero_p,zero_p,m[0],GLB_X,GLB_T,t);
+      Dtheo[t] =  NF*disc_id(zero_p,m[0],GLB_X,GLB_T, t)*0.5;    // factor 2 is due to the eo normalisation of the stochastic sources.
+      Ctheo[t] =  NF*twopoint_id(zero_p,m[0],GLB_X,GLB_T, t)*0.5; // source is not even/odd but the io2pt is called with a 0.5 normalisation
     }
   
   
     for (int i=0;i<GLB_T;++i)    lprintf("MAIN",0,"T analytical T %e + 1I %e  numerical %e + 1I %e\n" ,creal(Ttheo[i]),cimag(Ttheo[i]),creal(Tstoch[i]), cimag(Tstoch[i]));
     for (int i=0;i<GLB_T;++i)    lprintf("MAIN",0,"diff analytical T %e + 1I %e, and relative %e  \n" ,creal(Ttheo[i]) - creal(Tstoch[i]),cimag(Ttheo[i])- cimag(Tstoch[i]), (creal(Ttheo[i]) - creal(Tstoch[i]))/( creal(Ttheo[i])  ) );
 
+    for (int i=0;i<GLB_T;++i)    lprintf("MAIN",0,"Disc analytical Disc %e + 1I %e  numerical %e + 1I %e\n" ,creal(Dtheo[i]),cimag(Dtheo[i]),creal(Dstoch[i]), cimag(Dstoch[i]));
+    for (int i=0;i<GLB_T;++i)    lprintf("MAIN",0,"diff analytical Disc %e + 1I %e, and relative %e  \n" ,creal(Dtheo[i]) - creal(Dstoch[i]),cimag(Dtheo[i])- cimag(Dstoch[i]), (creal(Dtheo[i]) - creal(Dstoch[i]))/( creal(Dtheo[i])  ) );
+
+    for (int i=0;i<GLB_T;++i)    lprintf("MAIN",0,"Conn analytical C %e + 1I %e  numerical %e + 1I %e\n" ,creal(Ctheo[i]),cimag(Ctheo[i]),creal(Cstoch[i]), cimag(Cstoch[i]));
+    for (int i=0;i<GLB_T;++i)    lprintf("MAIN",0,"diff analytical C %e + 1I %e, and relative %e  \n" ,creal(Ctheo[i]) - creal(Cstoch[i]),cimag(Ctheo[i])- cimag(Cstoch[i]), (creal(Ctheo[i]) - creal(Cstoch[i]))/( creal(Ctheo[i])  ) );
+
 
     for (int i=0;i<GLB_T;i++){
 
       lprintf("MAIN",0,"T check %e\n",  (creal(Ttheo[i]) - creal(Tstoch[i])) /creal(Ttheo[i])    ) ;
+      lprintf("MAIN",0,"D check %e\n",  (creal(Dtheo[i]) - creal(Dstoch[i])) /creal(Dtheo[i])    ) ;
+      lprintf("MAIN",0,"Conn check %e\n",  (creal(Ctheo[i]) - creal(Cstoch[i])) /creal(Ctheo[i])    ) ;
 
 
-      if(  fabs( (creal(Ttheo[i]) - creal(Tstoch[i]))/creal(Ttheo[i]) ) > threshold  ){
-	return_value += 1;
-      }
+      if(  fabs( (creal(Ttheo[i]) - creal(Tstoch[i]))/creal(Ttheo[i]) ) > threshold  ) return_value += 1;
+      if(  fabs( (creal(Dtheo[i]) - creal(Dstoch[i]))/creal(Dtheo[i]) ) > threshold  ) return_value += 1;
+      if(  fabs( (creal(Ctheo[i]) - creal(Cstoch[i]))/creal(Ctheo[i]) ) > threshold  ) return_value += 1;
     }
 
 

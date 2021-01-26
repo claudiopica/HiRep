@@ -113,7 +113,7 @@ void init_discon_correlators()
   {
     char name[100];
     sprintf(name, "%s_disc", meson_channel_names[i]);
-    add_meson_observable(&discon_correlators, i, _NOGAMMA, name, "SINGLET", -1);
+    add_meson_observable(&discon_correlators, i, _DISC, name, "SINGLET", -1);
   }
 }
 
@@ -335,7 +335,7 @@ void measure_mesons_core(spinor_field *psi0, spinor_field *psi1, spinor_field *e
                   motmp = mo;
                   while (motmp != NULL)
                   {
-                    if (motmp->ind2 != _NOGAMMA)
+                    if (motmp->ind2 != _DISC)
                     {
                       spinmatrix_op(&smtmp1, &sma, motmp->ind2);
                       _spinmatrix_g5(sm1, smtmp1);
@@ -346,7 +346,7 @@ void measure_mesons_core(spinor_field *psi0, spinor_field *psi1, spinor_field *e
                     else
                     { // VD this is for the disconnected contraction !
                       spinmatrix_op(&smtmp1, &sma, motmp->ind1);
-                      //VD r spinmatrix, s spinmatrix, k result; Tr [ r^dag . s]
+                      // VD r spinmatrix, s spinmatrix, k result; Tr [ r^dag . s]
                       // VD _spinmatrix_mul_trace(k, r, s)
                       _spinmatrix_mul_trace(tr, smtmp1, sm_src);
                     }

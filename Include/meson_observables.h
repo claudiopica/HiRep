@@ -7,7 +7,7 @@
 #define MESON_OBSERVABLES
 
 
-typedef enum { _g5= 0,_id, _g0, _g1, _g2, _g3,  _g0g1, _g0g2, _g0g3, _g0g5, _g5g1, _g5g2, _g5g3, _g0g5g1, _g0g5g2, _g0g5g3,NGAMMA_IND,_NOGAMMA} gamma_ind;
+typedef enum { _g5= 0,_id, _g0, _g1, _g2, _g3,  _g0g1, _g0g2, _g0g3, _g0g5, _g5g1, _g5g2, _g5g3, _g0g5g1, _g0g5g2, _g0g5g3,NGAMMA_IND,_DISC} gamma_ind;
 extern char* meson_channel_names[NGAMMA_IND];
 
 struct meson_observable_s {

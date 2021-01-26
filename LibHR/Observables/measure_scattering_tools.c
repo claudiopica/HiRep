@@ -1155,7 +1155,7 @@ void measure_pion_scattering_I0(double* m, int numsources, double precision,char
 	init_mo(V,"V",GLB_T);
 	init_mo(disc,"disc",GLB_T);
 	disc->ind1 = _g5;
-	disc->ind2 = _NOGAMMA;
+	disc->ind2 = _DISC;
 	pi1->ind1 = _g5;
 	pi1->ind2 = _g5;
 			
@@ -1353,9 +1353,7 @@ void measure_pion_scattering_I0(double* m, int numsources, double precision,char
 
 void measure_pion_scattering_I0_TS(double* m, int numsources, double precision,char* path,char* cnfg_filename, int seq_prop, meson_observable** mo_arr){
         int ts=0;
-        int ts_vec[numsources];
         meson_observable *sigmaconn, *sigmadisc,*Tr;
-
 
         spinor_field* source_disc= alloc_spinor_field_f(4,&glattice);
         spinor_field* source_tri= alloc_spinor_field_f(4,&glattice);
@@ -1378,7 +1376,7 @@ void measure_pion_scattering_I0_TS(double* m, int numsources, double precision,c
         sigmaconn->ind1 = _id;
         sigmadisc->ind1 = _id;
         sigmaconn->ind2 = _id;
-        sigmadisc->ind2 = _id;
+        sigmadisc->ind2 = _DISC;
 
 
         Tr->ind2 = _id;
@@ -1394,8 +1392,7 @@ void measure_pion_scattering_I0_TS(double* m, int numsources, double precision,c
                 
                 init_propagator_eo(1, m, precision);
                 ts = random_tau2(); // randomly chosen timeslice 
-                ts_vec[src] = ts;
-
+             
                 lprintf("MAIN",0,"Random timeslice chosen : ts=%d\n",ts);       
 
                 // connected sigma and triangle

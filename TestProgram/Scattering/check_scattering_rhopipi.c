@@ -498,7 +498,7 @@ int main(int argc,char *argv[])
         
 
         for(int i=0; i<Nmom; i++){
-            lprintf("GRRR",0,"src %d %d \n",src,i);
+            lprintf("test",0,"src=%d  i=%d tau=%d \n",src,i,tau);
             init_src_p(src_pn + i, &src0, plist[i][0], plist[i][1], plist[i][2]);
             make_prop_p(p_p + i, src_pn + i, &src0, 4, tau, mes_var.bc);
             gen_mo_p(mo_p[i][src], &prop0, p_p + i, &src0, tau);
