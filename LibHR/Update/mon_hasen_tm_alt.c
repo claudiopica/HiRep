@@ -40,7 +40,7 @@ void hasen_tm_alt_correct_pf(const struct _monomial *m)
 	set_twisted_mass(par->mu + par->dmu);
 	spinor_field_zero_f(tmp_pf);
 	tm_invert_alt(tmp_pf, par->pf, &mpar);
-	set_twisted_mass(par->mu);
+	/*set_twisted_mass(par->mu);*/
 	set_twisted_mass(par->mu);
 	Qtm_p_alt(par->pf, tmp_pf);
 }

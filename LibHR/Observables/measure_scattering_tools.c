@@ -1169,6 +1169,7 @@ void measure_pion_scattering_I2(double *m, int numsources, double precision, cha
 		create_diluted_source_equal_atau(source_ts1, ts);
 		calc_propagator(prop_ts1, source_ts1, 4);
 		spinor_field_zero_f(source_ts2);
+		spinor_field_zero_f(prop_ts2);
 		create_diluted_source_equal_atau(source_ts2, ts);
 		calc_propagator(prop_ts2, source_ts2, 4);
 		lprintf("MAIN", 0, "Start to perform the contractions ...\n");

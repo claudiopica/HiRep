@@ -46,7 +46,7 @@
 #error This code does not work with the fermion twisting !!!
 #endif
 
-void  	measure_bilinear_loops_4spinorfield(spinor_field *prop, spinor_field *source, int k, int nm, int tau, int col, int eo, double complex ***out_corr)
+void measure_bilinear_loops_4spinorfield(spinor_field *prop, spinor_field *source, int k, int nm, int tau, int col, int eo, double complex ***out_corr)
 {
 	double complex **corr;
 	double *corr_re[16];
@@ -156,7 +156,7 @@ void  	measure_bilinear_loops_4spinorfield(spinor_field *prop, spinor_field *sou
 					}
 
 		} /* end loop t */
-	}	 /* end loop i (nm) */
+	}	  /* end loop i (nm) */
 
 	for (t = 0; t < T; t++)
 	{
@@ -284,7 +284,7 @@ void measure_loops(int nm, double *m, int nhits, int conf_num, double precision,
 		suNg_field_copy(u_gauge_old, u_gauge);
 		//Fix the Gauge
 		double act = gaugefix(0,	  //= 0, 1, 2, 3 for Coulomb guage else Landau
-							  1.8,	//overrelax
+							  1.8,	  //overrelax
 							  10000,  //maxit
 							  1e-12,  //tolerance
 							  u_gauge //gauge
@@ -302,7 +302,7 @@ void measure_loops(int nm, double *m, int nhits, int conf_num, double precision,
 		if (source_type == 0) /* generation of a volume source with Z2xZ2 noise */
 		{
 			create_z2_volume_source(source);
-			create_z2_volume_source(prop); // the prop is used to build the trial solution by the solver and sometimes give rise to an error.
+			create_z2_volume_source(prop);	  // the prop is used to build the trial solution by the solver and sometimes give rise to an error.
 			calc_propagator(prop, source, 1); // No dilution
 
 			lprintf("CORR", 0, "Start to perform the contractions ... \n");
@@ -312,14 +312,14 @@ void measure_loops(int nm, double *m, int nhits, int conf_num, double precision,
 
 		if (source_type == 1) // experimental Gauge Fixed Wall sources
 		{
-			error(1,1,"measure_loops [loop_tools.c]","Source_type ==1 (gauge fixed wall sources) is broken and untested.");
+			error(1, 1, "measure_loops [loop_tools.c]", "Source_type ==1 (gauge fixed wall sources) is broken and untested.");
 
 			for (tau = 0; tau < GLB_T; ++tau)
 			{
 				for (l = 0; l < NF; ++l)
 				{
 					create_gauge_fixed_wall_source(source, tau, l);
-					calc_propagator(prop, source, 4);	//4 for spin dilution
+					calc_propagator(prop, source, 4);	 //4 for spin dilution
 					create_point_source(source, tau, l); //to get the contraction right
 					measure_mesons(discon_correlators, prop, source, nm, 0);
 				}
@@ -589,4 +589,20 @@ void measure_bilinear_loops_spinorfield(spinor_field *prop, spinor_field *source
 	gettimeofday(&end, 0);
 	timeval_subtract(&etime, &end, &start);
 	lprintf("TIMING", 0, "Contractions for source %i done [%ld sec %ld usec]\n", k, etime.tv_sec, etime.tv_usec);
+
+	for (int i = 0; i < n_mom_tot; i++)
+		for (int j = 0; j < NGamma; j++)
+			free(corr[i][j]);
+
+	for (int i = 0; i < n_mom_tot; i++)
+		free(corr[i]);
+
+	free(corr);
+
+	for (j = 0; j < n_mom_tot; ++j)
+		for (i = 0; i < NGamma; ++i)
+		{
+			free(corr_re[j][i]);
+			free(corr_im[j][i]);
+		}
 }
