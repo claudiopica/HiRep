@@ -1161,15 +1161,16 @@ void measure_pion_scattering_I2(double *m, int numsources, double precision, cha
 				reset_mo(rho2[i][j]);
 			}
 		}
+		for (int i = 0; i < 4; i++)
+		{
+			spinor_field_zero_f(prop_ts1 + i);
+			spinor_field_zero_f(prop_ts2 + i);
+		}
 
 		ts = random_tau();
 		lprintf("MAIN", 0, "ts = %d \n", ts);
-		spinor_field_zero_f(source_ts1);
-		spinor_field_zero_f(prop_ts1);
 		create_diluted_source_equal_atau(source_ts1, ts);
 		calc_propagator(prop_ts1, source_ts1, 4);
-		spinor_field_zero_f(source_ts2);
-		spinor_field_zero_f(prop_ts2);
 		create_diluted_source_equal_atau(source_ts2, ts);
 		calc_propagator(prop_ts2, source_ts2, 4);
 		lprintf("MAIN", 0, "Start to perform the contractions ...\n");
@@ -1326,19 +1327,13 @@ void measure_pion_scattering_I0(double *m, int numsources, double precision, cha
 		seq_source = alloc_spinor_field_f(4, &glattice);
 	}
 
-	for (int i = 0; i < 4; i++)
-		spinor_field_zero_f(prop_ts2 + i);
-
 	prop_ts1 = (spinor_field ***)malloc(sizeof(spinor_field **) * numsources);
 	for (int src = 0; src < numsources; src++)
 		prop_ts1[src] = (spinor_field **)malloc(sizeof(spinor_field *) * GLB_T);
 	for (int src = 0; src < numsources; src++)
 		for (int t = 0; t < GLB_T; t++)
-		{
 			prop_ts1[src][t] = alloc_spinor_field_f(4, &glattice);
-			for (int i = 0; i < 4; i++)
-				spinor_field_zero_f(prop_ts2 + i);
-		}
+
 	pi1 = (meson_observable *)malloc(sizeof(meson_observable));
 	D = (meson_observable *)malloc(sizeof(meson_observable));
 	C = (meson_observable *)malloc(sizeof(meson_observable));
@@ -1380,6 +1375,13 @@ void measure_pion_scattering_I0(double *m, int numsources, double precision, cha
 	init_propagator_eo(1, m, precision);
 	for (int src = 0; src < numsources; ++src)
 	{
+		for (int i = 0; i < 4; i++)
+			spinor_field_zero_f(prop_ts2 + i);
+		for (int src = 0; src < numsources; src++)
+			for (int t = 0; t < GLB_T; t++)
+				for (int i = 0; i < 4; i++)
+					spinor_field_zero_f(prop_ts1[src][t] + i);
+
 		reset_mo(pi1);
 		reset_mo(D);
 		reset_mo(C);
