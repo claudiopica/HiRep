@@ -1326,7 +1326,8 @@ void measure_pion_scattering_I0(double *m, int numsources, double precision, cha
 		seq_source = alloc_spinor_field_f(4, &glattice);
 	}
 
-	spinor_field_zero_f(prop_ts2);
+	for (int i = 0; i < 4; i++)
+		spinor_field_zero_f(prop_ts2 + i);
 
 	prop_ts1 = (spinor_field ***)malloc(sizeof(spinor_field **) * numsources);
 	for (int src = 0; src < numsources; src++)
@@ -1335,10 +1336,8 @@ void measure_pion_scattering_I0(double *m, int numsources, double precision, cha
 		for (int t = 0; t < GLB_T; t++)
 		{
 			prop_ts1[src][t] = alloc_spinor_field_f(4, &glattice);
-			spinor_field_zero_f(prop_ts1[src][t]);
-			spinor_field_zero_f(prop_ts1[src][t] + 1);
-			spinor_field_zero_f(prop_ts1[src][t] + 2);
-			spinor_field_zero_f(prop_ts1[src][t] + 3);
+			for (int i = 0; i < 4; i++)
+				spinor_field_zero_f(prop_ts2 + i);
 		}
 	pi1 = (meson_observable *)malloc(sizeof(meson_observable));
 	D = (meson_observable *)malloc(sizeof(meson_observable));
@@ -1618,6 +1617,13 @@ void measure_pion_scattering_I0_TS(double *m, int numsources, double precision, 
 		reset_mo(sigmaconn);
 		reset_mo(sigmadisc);
 		reset_mo(Tr);
+
+		for (int i = 0; i < 4; i++)
+		{
+			spinor_field_zero_f(prop_disc + i);
+			spinor_field_zero_f(prop_tri + i);
+			spinor_field_zero_f(seq_0 + i);
+		}
 
 		init_propagator_eo(1, m, precision);
 		ts = random_tau2(); // randomly chosen timeslice
