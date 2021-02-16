@@ -1326,13 +1326,20 @@ void measure_pion_scattering_I0(double *m, int numsources, double precision, cha
 		seq_source = alloc_spinor_field_f(4, &glattice);
 	}
 
+	spinor_field_zero_f(prop_ts2);
+
 	prop_ts1 = (spinor_field ***)malloc(sizeof(spinor_field **) * numsources);
 	for (int src = 0; src < numsources; src++)
 		prop_ts1[src] = (spinor_field **)malloc(sizeof(spinor_field *) * GLB_T);
 	for (int src = 0; src < numsources; src++)
 		for (int t = 0; t < GLB_T; t++)
+		{
 			prop_ts1[src][t] = alloc_spinor_field_f(4, &glattice);
-
+			spinor_field_zero_f(prop_ts1[src][t]);
+			spinor_field_zero_f(prop_ts1[src][t] + 1);
+			spinor_field_zero_f(prop_ts1[src][t] + 2);
+			spinor_field_zero_f(prop_ts1[src][t] + 3);
+		}
 	pi1 = (meson_observable *)malloc(sizeof(meson_observable));
 	D = (meson_observable *)malloc(sizeof(meson_observable));
 	C = (meson_observable *)malloc(sizeof(meson_observable));
