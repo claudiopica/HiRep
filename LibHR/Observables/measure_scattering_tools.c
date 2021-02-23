@@ -1377,10 +1377,9 @@ void measure_pion_scattering_I0(double *m, int numsources, double precision, cha
 	{
 		for (int i = 0; i < 4; i++)
 			spinor_field_zero_f(prop_ts2 + i);
-		for (int src = 0; src < numsources; src++)
-			for (int t = 0; t < GLB_T; t++)
-				for (int i = 0; i < 4; i++)
-					spinor_field_zero_f(prop_ts1[src][t] + i);
+		for (int t = 0; t < GLB_T; t++)
+			for (int i = 0; i < 4; i++)
+				spinor_field_zero_f(prop_ts1[src][t] + i);
 
 		reset_mo(pi1);
 		reset_mo(D);

@@ -24,6 +24,6 @@ mes:mass = -0.605
 mes:csw = 1.0
 mes:precision = 1e-24
 
-I0:nhits = 100
+I0:nhits = 200
 
 
