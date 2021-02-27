@@ -38,6 +38,7 @@
 #include "clover_tools.h"
 #include "disconnected.h"
 #include "communications.h"
+#include "data_storage.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338327950288419716939937510
@@ -218,10 +219,9 @@ int main(int argc,char *argv[])
   double complex * ex_loops;
   char pame[256];
   int n_Gamma=16;
-  int n_mom_tot = 1;
   int source_type=5;
   int return_value=0;
-  double complex*** out_corr;
+  data_storage_array* out_corr=NULL;
   double complex *mean_loops;
   double abs_tol=1e-1;
   double rel_tol_scalar_loop=5.e-3;
@@ -299,17 +299,22 @@ int main(int argc,char *argv[])
 
   lprintf("CORR",0,"Number of noise vector : nhits = %i \n", mes_ip.nhits);
 
-  out_corr=(double complex***) malloc(sizeof(double complex**)*n_mom_tot);
-  
-  for(int i=0; i<n_mom_tot; i++)    out_corr[i]=(double complex**) malloc(sizeof(double complex*)*n_Gamma);
-  for(int i=0; i<n_mom_tot; i++) for(int j=0; j<n_Gamma; j++) out_corr[i][j]=(double complex*) calloc(GLB_T,sizeof(double complex));
-  
-  measure_loops(1, &mass, mes_ip.nhits,0,  mes_ip.precision,source_type,mes_ip.n_mom,out_corr);
+  measure_loops( &mass, mes_ip.nhits,0,  mes_ip.precision,source_type,mes_ip.n_mom,STORE,&out_corr);
 
   //stochastic & time average 
   mean_loops = (double complex *)calloc(n_Gamma,sizeof(double complex));
+  for (int k = 0; k < mes_ip.nhits; k++)
+    for (int eo = 0; eo < 2; eo++)
+      for (int col = 0; col < NF; col++)
+        for (int j = 0; j < n_Gamma; j++)
+          for (int t = 0; t < GLB_T; t++)
+          {
+            int idx_re[6] = {k, eo, col, j,t, 0};
+            int idx_im[6] = {k, eo, col, j,t, 1};
 
-  for(int j=0; j<n_Gamma; j++)   for(int t=0; t<GLB_T; t++) mean_loops[j] += out_corr[0][j][t]/(mes_ip.nhits*GLB_T);
+            mean_loops[j] += (*data_storage_element(out_corr, 0, idx_re) + I * *data_storage_element(out_corr, 0, idx_im)) / (mes_ip.nhits * GLB_T);
+          }
+  //for(int j=0; j<n_Gamma; j++)   for(int t=0; t<GLB_T; t++) mean_loops[j] += out_corr[0][j][t]/(mes_ip.nhits*GLB_T);
 
   //  /* CALCOLO ESPLICITO */
   ex_loops=(double complex *)calloc(16,sizeof(double complex));

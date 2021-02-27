@@ -38,6 +38,7 @@
 #include "clover_tools.h"
 #include "disconnected.h"
 #include "communications.h"
+#include "data_storage.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338327950288419716939937510
@@ -224,10 +225,9 @@ double complex get_gmu(double complex Gamma[4][4],int mu){
 
 int main(int argc,char *argv[])
 {
-  int i,j,sign,n_mom_tot;
-  int n_Gamma=16;
+  int i,j,sign;
   double complex ex_loops[16];
-  double complex*** out_corr ;
+  data_storage_array *out_corr = NULL;
   char pame[256];
   int source_type=1;
   int return_value=0;
@@ -301,13 +301,13 @@ int main(int argc,char *argv[])
 
   lprintf("CORR",0,"Number of noise vector : nhits = %i \n", mes_ip.nhits);
   
-  n_mom_tot = mes_ip.n_mom*mes_ip.n_mom*mes_ip.n_mom;
-  out_corr=(double complex***) malloc(sizeof(double complex**)*n_mom_tot);
+  ///n_mom_tot = mes_ip.n_mom*mes_ip.n_mom*mes_ip.n_mom;
+  //out_corr=(double complex***) malloc(sizeof(double complex**)*n_mom_tot);
   
-  for(int i=0; i<n_mom_tot; i++)    out_corr[i]=(double complex**) malloc(sizeof(double complex*)*n_Gamma);
-  for(int i=0; i<n_mom_tot; i++) for(int j=0; j<n_Gamma; j++) out_corr[i][j]=(double complex*) calloc(GLB_T,sizeof(double complex));
+  //for(int i=0; i<n_mom_tot; i++)    out_corr[i]=(double complex**) malloc(sizeof(double complex*)*n_Gamma);
+  //for(int i=0; i<n_mom_tot; i++) for(int j=0; j<n_Gamma; j++) out_corr[i][j]=(double complex*) calloc(GLB_T,sizeof(double complex));
   
-  measure_loops(1, &mass, mes_ip.nhits,0,  mes_ip.precision,source_type,mes_ip.n_mom,out_corr);
+  measure_loops( &mass, mes_ip.nhits,0,  mes_ip.precision,source_type,mes_ip.n_mom,STORE,&out_corr);
 
   double complex loops[16];
 
