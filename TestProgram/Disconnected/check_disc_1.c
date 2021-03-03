@@ -136,67 +136,7 @@ char char_t[100];
 FILE *fp;
 char path[1035];
 
-/* Ugly: read the correlator from the output files ! This is because the function that compute the props, make the contractions and write the output zeros the correlators after writting them.
-The purpose of this entire test is to check the function without modifying it */
-static double complex read_and_average_output_disc(int t,int ixG,int nhits){
-  char char_t[100];
-  char char_ixG[100];
-  char char_isrc[100];
-  FILE *fp;
-  char path[1035];
-  char command[500];
-  char command_re[500];
-  char command_im[500];
-  double tmp_re,tmp_im;
-  double complex out;
-  int i;
 
-  sprintf(char_t, "%d", t);
-  sprintf(char_ixG, "%d", ixG);
-  _complex_0(out);
-
-  for (i=0;i<nhits;i++){
-
-    strcpy(command, "grep \'\\[CORR\\]\\[0\\]");
-    strcat(command,char_t);
-    strcat(command, " ");
-    strcat(command,char_ixG);
-
-    sprintf(char_isrc, "%d", i)  ;
-    strcat(command, " ");
-    strcat(command,char_isrc);
-    strcat(command, " \'");
-
-    strcpy(command_re,command);
-    strcpy(command_im,command);
-
-    strcat(command_re, " out_0 | awk  '{print $4}' ") ;
-    strcat(command_im, " out_0 | awk  '{print $5}' ") ;
-
-    fp = popen(command_re, "r");
-    while (fgets(path, sizeof(path)-1, fp) != NULL) {
-      //printf("%s", path);
-      sscanf(path, "%lf", &tmp_re);
-
-    }
-    /* close */
-    pclose(fp);
-    fp = popen(command_im, "r");
-    while (fgets(path, sizeof(path)-1, fp) != NULL) {
-      //printf("%s", path);
-      sscanf(path, "%lf", &tmp_im);
-
-    }
-    /* close */
-    pclose(fp);
-
-    out += tmp_re + I*tmp_im;
-
-  }
-
-
-  return out/nhits ;
-}
 
 /*Gamma / 4 */
 double complex get_gid(double complex Gamma[4][4]){
@@ -223,15 +163,53 @@ double complex get_gmu(double complex Gamma[4][4],int mu){
   return r;
 }
 
+int compare_disc(double complex *corr_ex, double complex *corr_num, char *name[16], double tol, double tol_rel_scalar)
+{
+  int retval = 0;
+  int nGamma = 16;
+  for (int n = 0; n < nGamma; n++)
+  {
+    if (n == 8)
+    {
+      if (cabs(corr_ex[8] - corr_num[8]) / cabs(corr_ex[8]) > tol_rel_scalar)
+      {
+        lprintf("TEST", 0, "Mismatch %s, rel diff: %e, numeric = %e + I*(%e), analytic = %e + I*(%e) \n", name[n], cabs(corr_ex[n] - corr_num[n]) / cabs(corr_ex[n]), creal(corr_num[n]), cimag(corr_num[n]), creal(corr_ex[n]), cimag(corr_ex[n]));
+        retval += 1;
+      }
+      else
+      {
+        lprintf("TEST", 0, "Match %s, numeric = %e + I*(%e), analytic = %e + I*(%e) \n", name[n], creal(corr_num[n]), cimag(corr_num[n]), creal(corr_ex[n]), cimag(corr_ex[n]));
+      }
+    }
+    else
+    {
+      if (cabs(corr_ex[n] - corr_num[n]) > tol)
+      {
+        lprintf("TEST", 0, "Mismatch %s, absolute diff: %e, numeric = %e + I*(%e), analytic = %e + I*(%e) \n", name[n], cabs(corr_ex[n] - corr_num[n]), creal(corr_num[n]), cimag(corr_num[n]), creal(corr_ex[n]), cimag(corr_ex[n]));
+        retval += 1;
+      }
+      else
+      {
+        lprintf("TEST", 0, "Match %s, numeric = %e + I*(%e), analytic = %e + I*(%e) \n", name[n], creal(corr_num[n]), cimag(corr_num[n]), creal(corr_ex[n]), cimag(corr_ex[n]));
+      }
+    }
+  }
+  return retval;
+}
+
 int main(int argc,char *argv[])
 {
-  int i,j,sign;
-  double complex ex_loops[16];
+  int i,sign;
+  double complex *ex_loops;
   data_storage_array *out_corr = NULL;
+  double complex *mean_loops;
   char pame[256];
   int source_type=1;
-  int return_value=0;
-
+  int return_value=0; 
+  int n_Gamma = 16;
+  double abs_tol = 1.5e-1;
+  double rel_tol_scalar_loop = 1e-2;
+  struct timeval start, end, etime;
 
   double complex g[16][4][4];
   double complex tmp[4][4];
@@ -291,7 +269,7 @@ int main(int argc,char *argv[])
   apply_BCs_on_represented_gauge_field(); //This is a trick: the BCs are not applied in the case the REPR is fundamental because represent_gauge field assumes that the right BCs are already applied on the fundamental field!
   #endif
   
-  lprintf("MAIN",0,"source type is fixed to 1:  Gauge fixed source  with time and spin dilution\n");
+  lprintf("MAIN",0,"source type is fixed to 1:  Gauge fixed source  with time, spin  dilution\n");
 
   lprintf("MAIN",0,"Measuring D(t) =  sum_x psibar(x) Gamma psi(x)\n");
   init_discon_correlators(0);
@@ -301,104 +279,97 @@ int main(int argc,char *argv[])
 
   lprintf("CORR",0,"Number of noise vector : nhits = %i \n", mes_ip.nhits);
   
-  ///n_mom_tot = mes_ip.n_mom*mes_ip.n_mom*mes_ip.n_mom;
-  //out_corr=(double complex***) malloc(sizeof(double complex**)*n_mom_tot);
-  
-  //for(int i=0; i<n_mom_tot; i++)    out_corr[i]=(double complex**) malloc(sizeof(double complex*)*n_Gamma);
-  //for(int i=0; i<n_mom_tot; i++) for(int j=0; j<n_Gamma; j++) out_corr[i][j]=(double complex*) calloc(GLB_T,sizeof(double complex));
-  
   measure_loops( &mass, mes_ip.nhits,0,  mes_ip.precision,source_type,mes_ip.n_mom,STORE,&out_corr);
-
-  double complex loops[16];
-
-  for(i=0; i<16; i++) {
-    _complex_0(loops[i]);
-    for(j =0; j < GLB_T; j++){ // average over time.
-      loops[i]+=read_and_average_output_disc(j,i,mes_ip.nhits)/GLB_T;
-    }
-  }
-
-  //  /* CALCOLO ESPLICITO */
+  
+  mean_loops = (double complex *)calloc(n_Gamma, sizeof(double complex)); 
+  for (int k = 0; k < mes_ip.nhits; k++)
+    for (int i = 0; i < NF; i++)
+      for (int j = 0; j < n_Gamma; j++)
+        for (int t = 0; t < GLB_T; t++)
+        {
+          int idx_re[5] = {k, i, j, t, 0};
+          int idx_im[5] = {k, i, j, t, 1};
+          //VD: where does the factor 2 comes from ?
+          mean_loops[j] += (double) GLB_VOL3 *(*data_storage_element(out_corr, 0, idx_re) + I * *data_storage_element(out_corr, 0, idx_im)) / (2*mes_ip.nhits * GLB_T);
+        }
+//  /* CALCOLO ESPLICITO */
+  ex_loops = (double complex *)calloc(16, sizeof(double complex));
   free_loops(ex_loops);
 
-  lprintf("TEST",0,"\nAnalytical result\t Stochastic estimate\tERROR \n");
-  for(i=0; i<16; i++) {
-    lprintf("TEST",0,"LOOPS %s\n", mes_channel_names[i]);
-    lprintf("TEST",0,"%d %e+%e I \t%e+%e I \t%e+%e I \n",   i,   creal(ex_loops[i]), cimag(ex_loops[i]),	     creal(loops[i]),	 cimag(loops[i]),     creal(ex_loops[i]-loops[i]),  cimag(ex_loops[i]-loops[i]));
-    if (cabs(loops[i]) <1e-9) // most of loops are 0 by symmetry, in which case, the test makes sure that the both estimate have a norm below 1e-9
-    {
-      if (cabs(ex_loops[i]) > 1e-9) return_value +=1;
-    }
-    else if (cabs(ex_loops[i]-loops[i]) > 1e-1*cabs(loops[i])) // if not
-    {
-        return_value +=1;
-    }
+  return_value += compare_disc(ex_loops, mean_loops, mes_channel_names, abs_tol, rel_tol_scalar_loop);
+
+  global_sum_int(&return_value, 1);
+  lprintf("MAIN", 0, "return_value= %d\n ", return_value);
+
+  gettimeofday(&end, 0);
+  timeval_subtract(&etime, &end, &start);
+  lprintf("MAIN", 0, "Configuration : analysed in [%ld sec %ld usec]\n", etime.tv_sec, etime.tv_usec);
+
+  finalize_process();
+  return return_value;
 
   }
 
 
-
-  global_sum_int(&return_value,1);
-  lprintf("MAIN", 0, "return_value= %d\n ",  return_value);
-  
-  finalize_process();
-  return return_value;
+double square(double x)
+{
+  return x * x;
 }
 
-
-double square(double x) {
-  return x*x;
-}
-
-
-double denom(double k[4]) {
+double denom(double k[4])
+{
   double res;
-  res = square( mass+4.0 - cos((2.0*M_PI*k[0])/GLB_T)-cos((2.0*M_PI*k[1])/GLB_X)-cos((2.0*M_PI*k[2])/GLB_Y)-cos((2.0*M_PI*k[3])/GLB_Z) )
-  +  square(sin((2.0*M_PI*k[0])/GLB_T)) + square(sin((2.0*M_PI*k[1])/GLB_X)) + square(sin((2.0*M_PI*k[2])/GLB_Y)) + square(sin((2.0*M_PI*k[3])/GLB_Z)) ;
+  res = square(mass + 4.0 - cos((2.0 * M_PI * k[0]) / GLB_T) - cos((2.0 * M_PI * k[1]) / GLB_X) - cos((2.0 * M_PI * k[2]) / GLB_Y) - cos((2.0 * M_PI * k[3]) / GLB_Z)) + square(sin((2.0 * M_PI * k[0]) / GLB_T)) + square(sin((2.0 * M_PI * k[1]) / GLB_X)) + square(sin((2.0 * M_PI * k[2]) / GLB_Y)) + square(sin((2.0 * M_PI * k[3]) / GLB_Z));
   return res;
 }
 
-void free_loops(double complex *loops) {
-  double  A, B[4];
-  double  tmp,norm;
-  int i,j;
+void free_loops(double complex *loops)
+{
+
+  double A, B[4];
+  double tmp, norm;
+  int i;
   double k[4];
-  double sigma[4] = {0.,0.,0.,0.};
-  #ifdef BC_T_ANTIPERIODIC
+  double sigma[4] = {0., 0., 0., 0.};
+#ifdef BC_T_ANTIPERIODIC
   sigma[0] = .5;
-  #endif
-  #ifdef BC_X_ANTIPERIODIC
+#endif
+#ifdef BC_X_ANTIPERIODIC
   sigma[1] = .5;
-  #endif
-  #ifdef BC_Y_ANTIPERIODIC
+#endif
+#ifdef BC_Y_ANTIPERIODIC
   sigma[2] = .5;
-  #endif
-  #ifdef BC_Z_ANTIPERIODIC
+#endif
+#ifdef BC_Z_ANTIPERIODIC
   sigma[3] = .5;
-  #endif
+#endif
 
-  lprintf("FREE",0,"sigma = (%f,%f,%f,%f)\n",sigma[0],sigma[1],sigma[2],sigma[3]);
-  norm = (double) NF/GLB_T;
-  A=B[0]=B[1]=B[2]=B[3]=0.;
+  lprintf("FREE", 0, "sigma = (%f,%f,%f,%f)\n", sigma[0], sigma[1], sigma[2], sigma[3]);
+  norm = (double)NF / GLB_T;
+  A = B[0] = B[1] = B[2] = B[3] = 0.;
 
-  for(k[1] = sigma[1]; k[1] < GLB_X+sigma[1]-.5; k[1] += 1.)
-  for(k[2] = sigma[2]; k[2] < GLB_Y+sigma[2]-.5; k[2] += 1.)
-  for(k[3] = sigma[3]; k[3] < GLB_Z+sigma[3]-.5; k[3] += 1.) {
+  for (k[1] = sigma[1]; k[1] < GLB_X + sigma[1] - .5; k[1] += 1.)
+    for (k[2] = sigma[2]; k[2] < GLB_Y + sigma[2] - .5; k[2] += 1.)
+      for (k[3] = sigma[3]; k[3] < GLB_Z + sigma[3] - .5; k[3] += 1.)
+      {
 
-    for(k[0] = sigma[0]; k[0] < GLB_T+sigma[0]-.5; k[0] += 1.) {
-      tmp= denom(k);
+        for (k[0] = sigma[0]; k[0] < GLB_T + sigma[0] - .5; k[0] += 1.)
+        {
 
-      A += (mass+4.0 - cos((2.0*M_PI*k[0])/GLB_T)-cos((2.0*M_PI*k[1])/GLB_X)-cos((2.0*M_PI*k[2])/GLB_Y)-cos((2.0*M_PI*k[3])/GLB_Z))/tmp;
-      for (j=0;j <4; j++)  B[j] += sin((2.0*M_PI*k[j])/GLB_X)/tmp;
+          tmp = denom(k);
 
-    }
-  }
+          A += (mass + 4.0 - cos((2.0 * M_PI * k[0]) / GLB_T) - cos((2.0 * M_PI * k[1]) / GLB_X) - cos((2.0 * M_PI * k[2]) / GLB_Y) - cos((2.0 * M_PI * k[3]) / GLB_Z)) / tmp;
+          B[0] += sin((2.0 * M_PI * k[0]) / GLB_T) / tmp;
+          B[1] += sin((2.0 * M_PI * k[1]) / GLB_X) / tmp;
+          B[2] += sin((2.0 * M_PI * k[2]) / GLB_Y) / tmp;
+          B[3] += sin((2.0 * M_PI * k[3]) / GLB_Z) / tmp;
+        }
+      }
 
+  lprintf("FREE", 10, "A=%e\t B[0=]%e\t B[1]=%e\t B[2]=%e\t B[3]=%e\n", A, B[0], B[1], B[2], B[3]);
 
-  lprintf("FREE",10,"A=%e\t B[0=]%e\t B[1]=%e\t B[2]=%e\t B[3]=%e\n",A,B[0],B[1],B[2],B[3]);
+  for (i = 0; i < 16; i++)
+    loops[i] = (gid[i] * A - I * (g0[i] * B[0] + g1[i] * B[1] + g2[i] * B[2] + g3[i] * B[3])) * norm; // = sum_vec{x} psi(x) Gamma psibar(x)
 
-  for(i = 0; i < 16; i++)  loops[i] = (gid[i]*A-I*(g0[i]*B[0] + g1[i]*B[1] + g2[i]*B[2] + g3[i]*B[3]))*norm ; // = sum_vec{x} psi(x) Gamma psibar(x)
-
-
-  lprintf("FREE",0,"Exact free correlators computed.\n");
+  lprintf("FREE", 0, "Exact free correlators computed.\n");
 }

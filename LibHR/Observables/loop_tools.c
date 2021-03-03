@@ -195,10 +195,10 @@ void measure_bilinear_loops_4spinorfield(spinor_field *prop, spinor_field *sourc
 				lprintf("CORR", 0, "%i %i %i %3.10e %3.10e \n", t, iGamma, src_id, corr_re[iGamma][t], corr_im[iGamma][t]);
 				if (swc == STORE)
 				{
-						int idx[4] = {src_id, iGamma,t, 0};
-						*data_storage_element(*ret, 0, idx) = corr_re[iGamma][t];
-						idx[3] = 1;
-						*data_storage_element(*ret, 0, idx) = corr_im[iGamma][t];
+					int idx[4] = {src_id, iGamma, t, 0};
+					*data_storage_element(*ret, 0, idx) = corr_re[iGamma][t];
+					idx[3] = 1;
+					*data_storage_element(*ret, 0, idx) = corr_im[iGamma][t];
 				}
 			}
 
@@ -209,10 +209,10 @@ void measure_bilinear_loops_4spinorfield(spinor_field *prop, spinor_field *sourc
 				lprintf("CORR", 0, "%i %i %i %i %3.10e %3.10e \n", t, iGamma, src_id, col, corr_re[iGamma][t], corr_im[iGamma][t]);
 				if (swc == STORE)
 				{
-						int idx[5] = {src_id, col,iGamma,t, 0};
-						*data_storage_element(*ret, 0, idx) = corr_re[iGamma][t];
-						idx[4] = 1;
-						*data_storage_element(*ret, 0, idx) = corr_im[iGamma][t];
+					int idx[5] = {src_id, col, iGamma, t, 0};
+					*data_storage_element(*ret, 0, idx) = corr_re[iGamma][t];
+					idx[4] = 1;
+					*data_storage_element(*ret, 0, idx) = corr_im[iGamma][t];
 				}
 			}
 	if (col == -1 && eo != -1)
@@ -222,10 +222,10 @@ void measure_bilinear_loops_4spinorfield(spinor_field *prop, spinor_field *sourc
 				lprintf("CORR", 0, "%i %i %i %i %3.10e %3.10e \n", t, iGamma, src_id, eo, corr_re[iGamma][t], corr_im[iGamma][t]);
 				if (swc == STORE)
 				{
-						int idx[5] = {src_id, eo,iGamma,t, 0};
-						*data_storage_element(*ret, 0, idx) = corr_re[iGamma][t];
-						idx[4] = 1;
-						*data_storage_element(*ret, 0, idx) = corr_im[iGamma][t];
+					int idx[5] = {src_id, eo, iGamma, t, 0};
+					*data_storage_element(*ret, 0, idx) = corr_re[iGamma][t];
+					idx[4] = 1;
+					*data_storage_element(*ret, 0, idx) = corr_im[iGamma][t];
 				}
 			}
 	if (col != -1 && eo != -1)
@@ -235,10 +235,10 @@ void measure_bilinear_loops_4spinorfield(spinor_field *prop, spinor_field *sourc
 				lprintf("CORR", 0, "%i %i %i %i %i %3.10e %3.10e \n", t, iGamma, src_id, col, eo, corr_re[iGamma][t], corr_im[iGamma][t]);
 				if (swc == STORE)
 				{
-						int idx[6] = {src_id, eo,col,iGamma,t, 0};
-						*data_storage_element(*ret, 0, idx) = corr_re[iGamma][t];
-						idx[5] = 1;
-						*data_storage_element(*ret, 0, idx) = corr_im[iGamma][t];
+					int idx[6] = {src_id, eo, col, iGamma, t, 0};
+					*data_storage_element(*ret, 0, idx) = corr_re[iGamma][t];
+					idx[5] = 1;
+					*data_storage_element(*ret, 0, idx) = corr_im[iGamma][t];
 				}
 			}
 
@@ -270,63 +270,66 @@ void measure_loops(double *m, int nhits, int conf_num, double precision, int sou
 		lprintf("CORR", 0, "Time, spin , color and eo dilution  will be used \n");
 	if (source_type == 5)
 		lprintf("CORR", 0, "Spin , color and eo dilution  will be used \n");
-	
+
 	gettimeofday(&start, 0);
 	init_propagator_eo(1, m, precision);
 
 	spinor_field *source;
 	spinor_field *prop;
-	suNg_field *u_gauge_old;
+	suNg_field *u_gauge_old = NULL ;
 
 	if (source_type == 0)
 	{
 		source = alloc_spinor_field_f(1, &glattice);
 		prop = alloc_spinor_field_f(1, &glattice);
 		spinor_field_zero_f(prop);
-		if (swc == STORE && *ret == NULL)
-		{
-			int idx[5] = {nhits, pow(n_mom, 3), 16, GLB_T,2};
-			*ret = allocate_data_storage_array(1);
-			allocate_data_storage_element(*ret, 0, 5, idx); // ( 1 ) * (nhits*nmom^3*ngamma*GLB_T * 2 reals )
-		}
 	}
-	if (source_type == 1 || source_type == 2 || source_type == 3 || source_type == 4 || source_type == 5)
+	else
 	{
 		source = alloc_spinor_field_f(4, &glattice);
 		prop = alloc_spinor_field_f(4, &glattice);
 		for (int i = 0; i < 4; i++)
 			spinor_field_zero_f(prop + i);
-		if (swc == STORE && *ret == NULL)
-		{
-			if (source_type == 2)
-			{	
-				int idx[4] = {nhits, 16, GLB_T,2};
-				*ret = allocate_data_storage_array(1);
-				allocate_data_storage_element(*ret, 0, 4, idx); // ( 1 ) * (nhits*ngamma*GLB_T * 2 reals )
-			}
-			if (source_type == 3)
-			{	
-				int idx[5] = {nhits,NF, 16, GLB_T,2};
-				*ret = allocate_data_storage_array(1);
-				allocate_data_storage_element(*ret, 0, 5, idx); // ( 1 ) * (nhits*NF*ngamma*GLB_T * 2 reals )
-			}
-			if (source_type == 4)
-			{	
-				int idx[6] = {nhits,2,NF, 16, GLB_T,2};
-				*ret = allocate_data_storage_array(1);
-				allocate_data_storage_element(*ret, 0, 6, idx); // ( 1 ) * (nhits*2(eo)*NF*ngamma*GLB_T * 2 reals )
-			}
-			if (source_type == 5)
-			{	
-				int idx[6] = {nhits,2,NF, 16, GLB_T,2};
-				*ret = allocate_data_storage_array(1);
-				allocate_data_storage_element(*ret, 0, 6, idx); // ( 1 ) * (nhits*2(eo)*NF*ngamma*GLB_T * 2 reals )
-			}
+	}
 
+	if (swc == STORE && *ret == NULL)
+	{
+		if (source_type == 0)
+		{
+			int idx[5] = {nhits, pow(n_mom, 3), 16, GLB_T, 2};
+			*ret = allocate_data_storage_array(1);
+			allocate_data_storage_element(*ret, 0, 5, idx); // ( 1 ) * (nhits*nmom^3*ngamma*GLB_T * 2 reals )
 		}
+		else if (source_type == 2)
+		{
+			int idx[4] = {nhits, 16, GLB_T, 2};
+			*ret = allocate_data_storage_array(1);
+			allocate_data_storage_element(*ret, 0, 4, idx); // ( 1 ) * (nhits*ngamma*GLB_T * 2 reals )
+		}
+		else if (source_type == 1 || source_type == 3)
+		{
+			int idx[5] = {nhits, NF, 16, GLB_T, 2};
+			*ret = allocate_data_storage_array(1);
+			allocate_data_storage_element(*ret, 0, 5, idx); // ( 1 ) * (nhits*NF*ngamma*GLB_T * 2 reals )
+		}
+		else if (source_type == 4)
+		{
+			int idx[6] = {nhits, 2, NF, 16, GLB_T, 2};
+			*ret = allocate_data_storage_array(1);
+			allocate_data_storage_element(*ret, 0, 6, idx); // ( 1 ) * (nhits*2(eo)*NF*ngamma*GLB_T * 2 reals )
+		}
+		else if (source_type == 5)
+		{
+			int idx[6] = {nhits, 2, NF, 16, GLB_T, 2};
+			*ret = allocate_data_storage_array(1);
+			allocate_data_storage_element(*ret, 0, 6, idx); // ( 1 ) * (nhits*2(eo)*NF*ngamma*GLB_T * 2 reals )
+		}
+		else
+			error(1, 1, "measure_loops [loop_tools.c]", "Source_type not implemented");
 	}
 	if (source_type == 1)
 	{
+		
 		u_gauge_old = alloc_gfield(&glattice);
 		suNg_field_copy(u_gauge_old, u_gauge);
 		spinor_field_zero_f(prop);
@@ -359,30 +362,28 @@ void measure_loops(double *m, int nhits, int conf_num, double precision, int sou
 
 		if (source_type == 1) // experimental Gauge Fixed Wall sources
 		{
-			error(1, 1, "measure_loops [loop_tools.c]", "Source_type ==1 (gauge fixed wall sources) is broken and untested.");
+			//error(1, 1, "measure_loops [loop_tools.c]", "Source_type ==1 (gauge fixed wall sources) is broken and untested.");
 
-			for (tau = 0; tau < GLB_T; ++tau)
-			{
-				for (l = 0; l < NF; ++l)
+			for (tau = 0; tau < GLB_T; tau++)
+				for (l = 0; l < NF; l++)
 				{
 					create_gauge_fixed_wall_source(source, tau, l);
 					calc_propagator(prop, source, 4);	 //4 for spin dilution
 					create_point_source(source, tau, l); //to get the contraction right
-					measure_mesons(discon_correlators, prop, source, 1, 0);
+					//measure_mesons(discon_correlators, prop, source, 1, 0);
+					measure_bilinear_loops_4spinorfield(prop, source, k, tau, l, -1, swc, ret);
 				}
-			}
+
 			//This gets the norm of the 2pt wrong by a factor GLB_VOL3 but the norm of the disconnected right
-			print_mesons(discon_correlators, 1.0, conf_num, 1, m, GLB_T, 1, "DISCON_GFWALL");
+			//print_mesons(discon_correlators, 1.0, conf_num, 1, m, GLB_T, 1, "DISCON_GFWALL");
 
 		} /* gfwall */
 
 		if (source_type == 2)
 		{
-
 			for (tau = 0; tau < GLB_T; ++tau)
 			{
 				create_diluted_source_equal_atau(source, tau);
-
 				calc_propagator(prop, source, 4); //4 for spin dilution
 				measure_bilinear_loops_4spinorfield(prop, source, k, tau, -1, -1, swc, ret);
 			}
@@ -392,7 +393,6 @@ void measure_loops(double *m, int nhits, int conf_num, double precision, int sou
 		if (source_type == 3)
 		{
 			for (tau = 0; tau < GLB_T; ++tau)
-			{
 				for (col = 0; col < NF; ++col)
 				{
 					create_diluted_source_equal_atau_col(source, tau, col);
@@ -400,19 +400,13 @@ void measure_loops(double *m, int nhits, int conf_num, double precision, int sou
 					calc_propagator(prop, source, 4); //4 for spin dilution
 					measure_bilinear_loops_4spinorfield(prop, source, k, tau, col, -1, swc, ret);
 				}
-			}
-
 		} /* time  + spin + color dilution  */
-
 
 		if (source_type == 4)
 		{
 			n_spinor = 4;
-
 			for (tau = 0; tau < GLB_T; ++tau)
-			{
 				for (col = 0; col < NF; ++col)
-				{
 					for (eo = 0; eo < 2; ++eo)
 					{
 						create_diluted_source_equal_atau_col(source, tau, col);
@@ -420,29 +414,22 @@ void measure_loops(double *m, int nhits, int conf_num, double precision, int sou
 						calc_propagator(prop, source, 4); //4 for spin dilution
 						measure_bilinear_loops_4spinorfield(prop, source, k, tau, col, eo, swc, ret);
 					}
-				}
-			}
-
 		} /* time + spin + color +eo  dilution  */
 
 		if (source_type == 5)
 		{
 			n_spinor = 4;
 			for (col = 0; col < NF; ++col)
-			{
 				for (eo = 0; eo < 2; ++eo)
 				{
-
 					create_noise_source_equal_col_dil(source, col);
 					zero_even_or_odd_site_spinorfield(source, n_spinor, eo); //set even or odd site to zero
 					calc_propagator(prop, source, 4);						 //4 for spin dilution
 					measure_bilinear_loops_4spinorfield(prop, source, k, -1, col, eo, swc, ret);
 				}
-			}
-
 		} /* volume source + spin + color + eo  dilution  */
 	}
-	if (source_type == 1)
+	if (u_gauge_old != NULL)
 	{
 		suNg_field_copy(u_gauge, u_gauge_old);
 		represent_gauge_field();
@@ -497,7 +484,7 @@ void measure_bilinear_loops_spinorfield(spinor_field *prop, spinor_field *source
 	for (t = 0; t < T; t++)
 	{
 		/* offset set to zero here */
-		tc = (zerocoord[0] + t + GLB_T) % GLB_T  + offset;
+		tc = (zerocoord[0] + t + GLB_T) % GLB_T + offset;
 		/* loop on spatial volume */
 		for (x = 0; x < X; x++)
 			for (y = 0; y < Y; y++)
@@ -626,7 +613,7 @@ void measure_bilinear_loops_spinorfield(spinor_field *prop, spinor_field *source
 
 						if (swc == STORE)
 						{
-							int idx[5] = {src_id, ip, iGamma,t, 0};
+							int idx[5] = {src_id, ip, iGamma, t, 0};
 							*data_storage_element(*ret, 0, idx) = corr_re[ip][iGamma][t];
 							idx[4] = 1;
 							*data_storage_element(*ret, 0, idx) = corr_im[ip][iGamma][t];
