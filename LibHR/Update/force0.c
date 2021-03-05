@@ -35,7 +35,7 @@ void force0(double dt, void *vpar){
 	double coeff = -dt*par->beta/NG;
 
 	/* check input types */
-	_TWO_SPINORS_MATCHING(u_gauge,par->momenta);
+	_TWO_SPINORS_MATCHING(u_gauge,*par->momenta);
 
 #ifdef MEASURE_FORCE0
   double forcestat0=0.; /* used for computation of avr and max force */

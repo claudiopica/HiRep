@@ -175,19 +175,13 @@ unsigned long int getMVM()
 
 void Dphi_(spinor_field *out, spinor_field *in)
 {
-  //  fflush(stdout);
-  //  MPI_Barrier( GLB_COM   );
-
+#ifdef CHECK_SPINOR_MATCHING
   error((in == NULL) || (out == NULL), 1, "Dphi_ [Dphi.c]",
         "Attempt to access unallocated memory space");
-
   error(in == out, 1, "Dphi_ [Dphi.c]",
         "Input and output fields must be different");
-
-#ifndef CHECK_SPINOR_MATCHING
-  error(out->type == &glat_even && in->type != &glat_odd, 1, "Dphi_ [Dphi.c]", "Spinors don't match! (1)");
-  error(out->type == &glat_odd && in->type != &glat_even, 1, "Dphi_ [Dphi.c]", "Spinors don't match! (2)");
-  error(out->type == &glattice && in->type != &glattice, 1, "Dphi_ [Dphi.c]", "Spinors don't match! (3)");
+  error(out->type == &glat_even && in->type == &glat_even, 1, "Dphi_ [Dphi.c]", "Spinors don't match! (1)");
+  error(out->type == &glat_odd && in->type == &glat_odd, 1, "Dphi_ [Dphi.c]", "Spinors don't match! (2)");
 #endif
 
   ++MVMcounter; /* count matrix calls */

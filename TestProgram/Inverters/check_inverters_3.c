@@ -83,7 +83,7 @@ int main(int argc,char *argv[])
 
   gaussian_spinor_field(s1); 
   tau=spinor_field_sqnorm_f(s1);
-  lprintf("QMR TEST",0,"Norma iniziale: %e\n",tau);
+  lprintf("QMR TEST",0,"Initial Norm: %e\n",tau);
 
   /* TEST g5QMR_M */
 

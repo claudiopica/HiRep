@@ -25,7 +25,7 @@ GetOptions(
   'quat|q!'   => \(my $quat = 0),
   'ndebug!'   => \(my $ndebug = 1),
   'dfloat!'   => \(my $dfloat = 0),
-  'checkspinor!'   => \(my $scheck = 0),
+  'checkspinor!'   => \(my $scheck = 1),
   'mpitiming!'   => \(my $mpit = 0),
   'ioflush!'   => \(my $iof = 1),
   'unrollrepr!'   => \(my $unrollr = 0),
@@ -253,7 +253,7 @@ write_mkflags - write flags file for compilation of HiRep
   --[no-]dfloat       [false]     Use single precision acceleration
   --[no-]unrollrepr   [false]     Unroll group representation functions
 
-  --[no-]checkspinor  [false]     Check spinor field type
+  --[no-]checkspinor  [true]      Check spinor field type
   --[no-]mpitiming    [false]     Enable timing of MPI calls
   --[no-]ioflush      [true]      Flush IO after each operations on logs
   --[no-]timing       [false]     Enable timing

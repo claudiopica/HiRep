@@ -107,7 +107,7 @@ void create_full_point_source(spinor_field *source, int tau) {
     spinor_field_zero_f(&source[beta]);
   }
 
-  if(COORD[0]==tau/T && COORD[1]==0 && COORD[2]==0 && COORD[3]==0) {
+  if(zerocoord[0]<=tau && tau<zerocoord[0]+T && COORD[1]==0 && COORD[2]==0 && COORD[3]==0) {
     ix=ipt(tau-zerocoord[0],0,0,0);
     for (col=0;col<NF;++col){
       for (beta=0;beta<4;++beta){
@@ -128,7 +128,7 @@ void create_point_source_loc(spinor_field *source, int t, int x, int y, int z, i
   for (beta=0;beta<4;++beta){
     spinor_field_zero_f(&source[beta]);
   }
-  if(COORD[0]==t/T && COORD[1]==x/X && COORD[2]==y/Y && COORD[3]==z/Z) {
+  if(zerocoord[0]<=t && t<zerocoord[0]+T && zerocoord[1]<=x && x<zerocoord[1]+X && zerocoord[2]<=y && y<zerocoord[2]+Y  && zerocoord[3]<=z && z<zerocoord[3]+Z ) {
     ix=ipt(t-zerocoord[0],x-zerocoord[1],y-zerocoord[2],z-zerocoord[3]);
     for (beta=0;beta<4;++beta){
       _FIELD_AT(&source[beta],ix)->c[beta].c[color] = 1.;
@@ -247,8 +247,8 @@ void create_diluted_source_equal_spinorfield1(spinor_field *source,int tau) {
   suNf_vector *v1;
   spinor_field_zero_f(source);
 
-  if(COORD[0]==tau/T) {// Check that tau is in this thread.
-    c[0]=tau%T;
+  if(zerocoord[0]<=tau && tau<zerocoord[0]+T) {// Check that tau is in this thread.
+    c[0]=tau-zerocoord[0];
     for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
           v1 = &((_FIELD_AT(source,ipt(c[0],c[1],c[2],c[3])))->c[0]);
           ranz2((double*)(v1),sizeof(suNf_spinor)/sizeof(double)); // Make new sources
