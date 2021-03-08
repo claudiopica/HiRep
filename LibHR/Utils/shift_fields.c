@@ -1,3 +1,10 @@
+/*
+Routine to geometrically shift the fields (both spinor and/or gauge) 
+The routine is MPI friendly and allows for any shift size.
+If any input is left null the routine acts only the other field.
+*/
+
+
 //#include <stdio.h>
 #include "logger.h"
 #include "global.h"
