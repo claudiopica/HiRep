@@ -34,22 +34,22 @@
    */
 
 //Some macros for indexing
-#define INDEX(px,py,pz,n_mom,tc) ((px + n_mom)*(2*n_mom+1)*(2*n_mom+1)*(GLB_T)+(py + n_mom)*(2*n_mom+1)*(GLB_T)+(pz + n_mom)*(GLB_T)+ (tc))
+#define INDEX(px, py, pz, n_mom, tc) ((px + n_mom) * (2 * n_mom + 1) * (2 * n_mom + 1) * (GLB_T) + (py + n_mom) * (2 * n_mom + 1) * (GLB_T) + (pz + n_mom) * (GLB_T) + (tc))
 
 //Useful for splitting mesons at the sink
-int tsplit(int ipt, int delta)
+int tsplit(int ipt_in, int delta)
 {
-	if(delta>0)
+	if (delta > 0)
 	{
-		return iup(ipt,0);
+		return iup(ipt_in, 0);
 	}
-	else if(delta<0)
+	else if (delta < 0)
 	{
-		return idn(ipt,0);
+		return idn(ipt_in, 0);
 	}
 	else
 	{
-		return ipt;
+		return ipt_in;
 	}
 }
 
@@ -60,78 +60,89 @@ int tsplit(int ipt, int delta)
 // p_tot_r the total momentum in the r direction. The phase factors at the sink are exp(-ip.x), so this should be equal to the total momentum at the source.
 // mo - where the output is saved
 
-void measure_scattering_AD_core(meson_observable* mo, spinor_field* psi0,spinor_field* psi1,spinor_field* psi2,spinor_field* psi3, int tau, int split, int n_mom, int p_tot_x, int p_tot_y, int p_tot_z){
+void measure_scattering_AD_core(meson_observable *mo, spinor_field *psi0, spinor_field *psi1, spinor_field *psi2, spinor_field *psi3, int tau, int split, int n_mom, int p_tot_x, int p_tot_y, int p_tot_z)
+{
 
 	int px, py, pz, t, x, y, z, ix, ix_split, beta, tc, splittmp;
-	double complex  trtmp;
-	double tr1re[GLB_T],tr2re[GLB_T],tr1im[GLB_T],tr2im[GLB_T];
+	double complex trtmp;
+	double tr1re[GLB_T], tr2re[GLB_T], tr1im[GLB_T], tr2im[GLB_T];
 	double pdotx, cpdotx, spdotx;
 	suNf_spin_matrix sm0, sm1, sm2, sm3;
-	meson_observable* motmp;
+	meson_observable *motmp;
 
-	if((split < -1) || split > 1)
+	if ((split < -1) || split > 1)
 	{
-		lprintf("ERROR",0,"The value of split can not exceed 1");
+		lprintf("ERROR", 0, "The value of split can not exceed 1");
 		exit(-1);
 	}
 	// splittmp will be used to ensure that time is always measured to the earlier pion
-	splittmp = split>0 ? 0 : split;
-	for (px=-n_mom;px<=n_mom;++px) for (py=-n_mom;py<=n_mom;++py) for (pz=-n_mom;pz<=n_mom;++pz){
-		for(tc=0;tc<GLB_T;++tc){
-			tr1re[tc]=0.0;
-			tr1im[tc]=0.0;
-			tr2re[tc]=0.0;
-			tr2im[tc]=0.0;
-		}
-		for (t=0; t<T; t++) {	 
-			// Correlator time measured from tau to the earlier pion
-			tc = (zerocoord[0]+t+splittmp+GLB_T-tau)%GLB_T;
-			for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) { 
-				ix=ipt(t,x,y,z);
-				//ix_split=ipt(t+split,x,y,z);
-				ix_split=tsplit(ix, split);
-
-				for (beta=0;beta<4;beta++)
+	splittmp = split > 0 ? 0 : split;
+	for (px = -n_mom; px <= n_mom; ++px)
+		for (py = -n_mom; py <= n_mom; ++py)
+			for (pz = -n_mom; pz <= n_mom; ++pz)
+			{
+				for (tc = 0; tc < GLB_T; ++tc)
 				{
-					_spinmatrix_assign_row(sm0, *_FIELD_AT(&psi0[beta],ix), beta);
-					_spinmatrix_assign_row(sm1, *_FIELD_AT(&psi1[beta],ix), beta);
-					_spinmatrix_assign_row(sm2, *_FIELD_AT(&psi2[beta],ix_split), beta);
-					_spinmatrix_assign_row(sm3, *_FIELD_AT(&psi3[beta],ix_split), beta);
+					tr1re[tc] = 0.0;
+					tr1im[tc] = 0.0;
+					tr2re[tc] = 0.0;
+					tr2im[tc] = 0.0;
 				}
-				//Contracting pion 1
-				_spinmatrix_mul_trace(trtmp, sm1, sm0); // Tr(SM1^\dagger SM0)
-				pdotx = 2.0*PI*( ((double) px)*(x+zerocoord[1])/GLB_X + ((double) py)*(y+zerocoord[2])/GLB_Y + ((double) pz)*(z+zerocoord[3])/GLB_Z);
-				cpdotx=cos(pdotx);
-				spdotx=sin(pdotx);
-				tr1re[tc]+=creal(trtmp)*cpdotx+cimag(trtmp)*spdotx;
-				tr1im[tc]+=cimag(trtmp)*cpdotx-creal(trtmp)*spdotx;
+				for (t = 0; t < T; t++)
+				{
+					// Correlator time measured from tau to the earlier pion
+					tc = (zerocoord[0] + t + splittmp + GLB_T - tau) % GLB_T;
+					for (x = 0; x < X; x++)
+						for (y = 0; y < Y; y++)
+							for (z = 0; z < Z; z++)
+							{
+								ix = ipt(t, x, y, z);
+								//ix_split=ipt(t+split,x,y,z);
+								ix_split = tsplit(ix, split);
 
-				//Contracting pion 2
-				_spinmatrix_mul_trace(trtmp, sm3, sm2); // Tr(SM3^\dagger SM2)
-				pdotx = 2.0*PI*( ((double) (p_tot_x - px) )*(x+zerocoord[1])/GLB_X + ((double) (p_tot_y - py))*(y+zerocoord[2])/GLB_Y + ((double) (p_tot_z - pz))*(z+zerocoord[3])/GLB_Z);
-				cpdotx=cos(pdotx);
-				spdotx=sin(pdotx);
-				tr2re[tc]+=creal(trtmp)*cpdotx+cimag(trtmp)*spdotx;
-				tr2im[tc]+=cimag(trtmp)*cpdotx-creal(trtmp)*spdotx;
+								for (beta = 0; beta < 4; beta++)
+								{
+									_spinmatrix_assign_row(sm0, *_FIELD_AT(&psi0[beta], ix), beta);
+									_spinmatrix_assign_row(sm1, *_FIELD_AT(&psi1[beta], ix), beta);
+									_spinmatrix_assign_row(sm2, *_FIELD_AT(&psi2[beta], ix_split), beta);
+									_spinmatrix_assign_row(sm3, *_FIELD_AT(&psi3[beta], ix_split), beta);
+								}
+								//Contracting pion 1
+								_spinmatrix_mul_trace(trtmp, sm1, sm0); // Tr(SM1^\dagger SM0)
+								pdotx = 2.0 * PI * (((double)px) * (x + zerocoord[1]) / GLB_X + ((double)py) * (y + zerocoord[2]) / GLB_Y + ((double)pz) * (z + zerocoord[3]) / GLB_Z);
+								cpdotx = cos(pdotx);
+								spdotx = sin(pdotx);
+								tr1re[tc] += creal(trtmp) * cpdotx + cimag(trtmp) * spdotx;
+								tr1im[tc] += cimag(trtmp) * cpdotx - creal(trtmp) * spdotx;
+
+								//Contracting pion 2
+								_spinmatrix_mul_trace(trtmp, sm3, sm2); // Tr(SM3^\dagger SM2)
+								pdotx = 2.0 * PI * (((double)(p_tot_x - px)) * (x + zerocoord[1]) / GLB_X + ((double)(p_tot_y - py)) * (y + zerocoord[2]) / GLB_Y + ((double)(p_tot_z - pz)) * (z + zerocoord[3]) / GLB_Z);
+								cpdotx = cos(pdotx);
+								spdotx = sin(pdotx);
+								tr2re[tc] += creal(trtmp) * cpdotx + cimag(trtmp) * spdotx;
+								tr2im[tc] += cimag(trtmp) * cpdotx - creal(trtmp) * spdotx;
+							}
+				}
+
+				global_sum(tr1re, GLB_T);
+				global_sum(tr1im, GLB_T);
+				global_sum(tr2re, GLB_T);
+				global_sum(tr2im, GLB_T);
+
+				for (t = 0; t < GLB_T; t++)
+				{
+					tc = (zerocoord[0] + t + splittmp + GLB_T - tau) % GLB_T;
+					motmp = mo;
+					while (motmp != NULL)
+					{
+						// I chose not to divide by the volume to conform with Ari and Rudy's conventions
+						motmp->corr_re[INDEX(px, py, pz, n_mom, tc)] = (tr1re[tc] * tr2re[tc] - tr1im[tc] * tr2im[tc]); //(GLB_VOL3*GLB_VOL3);
+						motmp->corr_im[INDEX(px, py, pz, n_mom, tc)] = (tr1re[tc] * tr2im[tc] + tr2re[tc] * tr1im[tc]); //(GLB_VOL3*GLB_VOL3);
+						motmp = motmp->next;
+					}
+				}
 			}
-		}
-
-		global_sum(tr1re, GLB_T);
-		global_sum(tr1im, GLB_T);
-		global_sum(tr2re, GLB_T);
-		global_sum(tr2im, GLB_T);
-
-		for (t=0; t<GLB_T; t++) {	 
-			tc = (zerocoord[0]+t+splittmp+GLB_T-tau)%GLB_T;
-			motmp=mo;
-			while (motmp!=NULL){
-				// I chose not to divide by the volume to conform with Ari and Rudy's conventions
-				motmp->corr_re[INDEX(px,py,pz,n_mom,tc)] = (tr1re[tc]*tr2re[tc] - tr1im[tc]*tr2im[tc]);//(GLB_VOL3*GLB_VOL3);
-				motmp->corr_im[INDEX(px,py,pz,n_mom,tc)] = (tr1re[tc]*tr2im[tc] + tr2re[tc]*tr1im[tc]);//(GLB_VOL3*GLB_VOL3);
-				motmp=motmp->next;
-			}
-		}
-	}
 	/*  motmp=mo;
 	    while (motmp!=NULL){
 	    global_sum(motmp->corr_re, (2*n_mom+1)*(2*n_mom+1)*(2*n_mom+1)*GLB_T);
@@ -141,111 +152,149 @@ void measure_scattering_AD_core(meson_observable* mo, spinor_field* psi0,spinor_
 }
 
 //Same arguments as the AD function
-void measure_scattering_BC_core(meson_observable* mo, spinor_field* psi0,spinor_field* psi1, spinor_field* psi2,spinor_field* psi3, int tau, int split, int n_mom, int p_tot_x, int p_tot_y, int p_tot_z){
+void measure_scattering_BC_core(meson_observable *mo, spinor_field *psi0, spinor_field *psi1, spinor_field *psi2, spinor_field *psi3, int tau, int split, int n_mom, int p_tot_x, int p_tot_y, int p_tot_z)
+{
 
 	int px, py, pz, t, x, y, z, ix, ix_split, mu, gamma, tc, splittmp;
 	double complex trace, phase;
 	double pdotx;
 	suNf_spin_matrix sm00, sm11, sm21, sm30;
 	double complex B1[4][4], B2[4][4];
-	double B1re[16*GLB_T], B1im[16*GLB_T], B2re[16*GLB_T], B2im[16*GLB_T];
-	meson_observable* motmp;
+	double B1re[16 * GLB_T], B1im[16 * GLB_T], B2re[16 * GLB_T], B2im[16 * GLB_T];
+	meson_observable *motmp;
 
-	if((split < -1) || split > 1)
+	if ((split < -1) || split > 1)
 	{
-		lprintf("ERROR",0,"The value of split=%i can not exceed 1", split);
+		lprintf("ERROR", 0, "The value of split=%i can not exceed 1", split);
 		exit(-1);
 	}
-	if((n_mom!=0) || (p_tot_x != 0) || (p_tot_y != 0) || (p_tot_z != 0))
+	if ((n_mom != 0) || (p_tot_x != 0) || (p_tot_y != 0) || (p_tot_z != 0))
 	{
-		lprintf("WARNING",0,"The function measure_scattering_BC_core not tested for non-zero momentum!");
+		lprintf("WARNING", 0, "The function measure_scattering_BC_core not tested for non-zero momentum!");
 	}
 	// splittmp will be used to ensure that time is always measured to the earlier pion
-	splittmp = split>0 ? 0 : split;
-	for (px=-n_mom;px<=n_mom;++px) for (py=-n_mom;py<=n_mom;++py) for (pz=-n_mom;pz<=n_mom;++pz){
-		for(t=0;t<16*GLB_T;++t)
-		{
-			B1re[t]=B1im[t]=B2re[t]=B2im[t]=0.0;
-		}
-		for (t=0; t<T; t++) {	 
-			// Correlator time measured from tau to the earlier pion
-			tc = (zerocoord[0]+t+splittmp+GLB_T-tau)%GLB_T;
-
-			//Resetting temporary variables to 0
-			_complex_0(trace);
-			for (mu=0;mu<4;mu++){ for (gamma=0;gamma<4;gamma++){
-				_complex_0(B1[mu][gamma]);
-				_complex_0(B2[mu][gamma]);
-			}}
-
-			for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) { 
-				ix=ipt(t,x,y,z);
-				//ix_split=ipt(t+split,x,y,z);
-				ix_split=tsplit(ix, split);
-
-				for (mu=0;mu<4;mu++)
+	splittmp = split > 0 ? 0 : split;
+	for (px = -n_mom; px <= n_mom; ++px)
+		for (py = -n_mom; py <= n_mom; ++py)
+			for (pz = -n_mom; pz <= n_mom; ++pz)
+			{
+				for (t = 0; t < 16 * GLB_T; ++t)
 				{
-					// Creating spinor matrices corresponding to various propagators. 
-					_spinmatrix_assign_row(sm00, *_FIELD_AT(&psi0[mu],ix), mu);
-					_spinmatrix_assign_row(sm11, *_FIELD_AT(&psi1[mu],ix_split), mu);
-					_spinmatrix_assign_row(sm21, *_FIELD_AT(&psi2[mu],ix_split), mu);
-					_spinmatrix_assign_row(sm30, *_FIELD_AT(&psi3[mu],ix), mu);
+					B1re[t] = B1im[t] = B2re[t] = B2im[t] = 0.0;
+				}
+				for (t = 0; t < T; t++)
+				{
+					// Correlator time measured from tau to the earlier pion
+					tc = (zerocoord[0] + t + splittmp + GLB_T - tau) % GLB_T;
+
+					//Resetting temporary variables to 0
+					_complex_0(trace);
+					for (mu = 0; mu < 4; mu++)
+					{
+						for (gamma = 0; gamma < 4; gamma++)
+						{
+							_complex_0(B1[mu][gamma]);
+							_complex_0(B2[mu][gamma]);
+						}
+					}
+
+					for (x = 0; x < X; x++)
+						for (y = 0; y < Y; y++)
+							for (z = 0; z < Z; z++)
+							{
+								ix = ipt(t, x, y, z);
+								//ix_split=ipt(t+split,x,y,z);
+								ix_split = tsplit(ix, split);
+
+								for (mu = 0; mu < 4; mu++)
+								{
+									// Creating spinor matrices corresponding to various propagators.
+									_spinmatrix_assign_row(sm00, *_FIELD_AT(&psi0[mu], ix), mu);
+									_spinmatrix_assign_row(sm11, *_FIELD_AT(&psi1[mu], ix_split), mu);
+									_spinmatrix_assign_row(sm21, *_FIELD_AT(&psi2[mu], ix_split), mu);
+									_spinmatrix_assign_row(sm30, *_FIELD_AT(&psi3[mu], ix), mu);
+								}
+
+								// Multiply by phases now, rest of the code will remain unchanged
+								pdotx = 2.0 * PI * (((double)px) * (x + zerocoord[1]) / GLB_X + ((double)py) * (y + zerocoord[2]) / GLB_Y + ((double)pz) * (z + zerocoord[3]) / GLB_Z);
+								phase = cos(pdotx) - I * sin(pdotx);
+								for (mu = 0; mu < 4; mu++)
+								{
+									for (gamma = 0; gamma < 4; gamma++)
+									{
+										_vector_mulc_f(sm00.c[mu].c[gamma], phase, sm00.c[mu].c[gamma]);
+									}
+								}
+
+								pdotx = 2.0 * PI * (((double)p_tot_x - (double)px) * (x + zerocoord[1]) / GLB_X + ((double)p_tot_y - (double)py) * (y + zerocoord[2]) / GLB_Y + ((double)p_tot_z - (double)pz) * (z + zerocoord[3]) / GLB_Z);
+								phase = cos(pdotx) - I * sin(pdotx);
+								for (mu = 0; mu < 4; mu++)
+								{
+									for (gamma = 0; gamma < 4; gamma++)
+									{
+										_vector_mulc_f(sm21.c[mu].c[gamma], phase, sm21.c[mu].c[gamma]);
+									}
+								}
+								// compute a new spinmatrix  : (A_mu beta * B_gamma_beta )
+								// trace color index -> it becomes a non standard struct. with only spin indices
+								// accumulate
+								// multiply with second part and finally trace over spin indices.
+								for (mu = 0; mu < 4; mu++)
+								{
+									for (gamma = 0; gamma < 4; gamma++)
+									{
+										_spinor_prod_assign_f(B1[mu][gamma], sm30.c[gamma], sm00.c[mu]);
+										_spinor_prod_assign_f(B2[mu][gamma], sm11.c[gamma], sm21.c[mu]);
+									}
+								}
+							}
+					// Communications
+					for (mu = 0; mu < 4; mu++)
+					{
+						for (gamma = 0; gamma < 4; gamma++)
+						{
+							B1re[4 * mu + gamma + 16 * tc] = creal(B1[mu][gamma]);
+							B1im[4 * mu + gamma + 16 * tc] = cimag(B1[mu][gamma]);
+							B2re[4 * mu + gamma + 16 * tc] = creal(B2[mu][gamma]);
+							B2im[4 * mu + gamma + 16 * tc] = cimag(B2[mu][gamma]);
+						}
+					}
 				}
 
-				// Multiply by phases now, rest of the code will remain unchanged
-				pdotx = 2.0*PI*(((double) px)*(x+zerocoord[1])/GLB_X + ((double) py)*(y+zerocoord[2])/GLB_Y + ((double) pz)*(z+zerocoord[3])/GLB_Z);
-				phase = cos(pdotx) - I*sin(pdotx);
-				for (mu=0;mu<4;mu++){ for (gamma=0;gamma<4;gamma++){
-					_vector_mulc_f(sm00.c[mu].c[gamma], phase, sm00.c[mu].c[gamma]);
-				}}
-
-				pdotx = 2.0*PI*(((double) p_tot_x - (double) px)*(x+zerocoord[1])/GLB_X + ((double) p_tot_y - (double) py)*(y+zerocoord[2])/GLB_Y + ((double) p_tot_z - (double) pz)*(z+zerocoord[3])/GLB_Z);
-				phase = cos(pdotx) -I*sin(pdotx);
-				for (mu=0;mu<4;mu++){ for (gamma=0;gamma<4;gamma++){
-					_vector_mulc_f(sm21.c[mu].c[gamma], phase, sm21.c[mu].c[gamma]);
-				}}
-				// compute a new spinmatrix  : (A_mu beta * B_gamma_beta )
-				// trace color index -> it becomes a non standard struct. with only spin indices
-				// accumulate
-				// multiply with second part and finally trace over spin indices. 
-				for (mu=0;mu<4;mu++){ for (gamma=0;gamma<4;gamma++) {
-					_spinor_prod_assign_f(B1[mu][gamma],sm30.c[gamma],sm00.c[mu]);
-					_spinor_prod_assign_f(B2[mu][gamma],sm11.c[gamma],sm21.c[mu]);
-				}}
+				global_sum(B1re, 16 * GLB_T);
+				global_sum(B1im, 16 * GLB_T);
+				global_sum(B2re, 16 * GLB_T);
+				global_sum(B2im, 16 * GLB_T);
+				for (t = 0; t < GLB_T; t++)
+				{
+					tc = (zerocoord[0] + t + splittmp + GLB_T - tau) % GLB_T;
+					for (mu = 0; mu < 4; mu++)
+					{
+						for (gamma = 0; gamma < 4; gamma++)
+						{
+							B1[mu][gamma] = B1re[4 * mu + gamma + 16 * tc] + I * B1im[4 * mu + gamma + 16 * tc];
+							B2[mu][gamma] = B2re[4 * mu + gamma + 16 * tc] + I * B2im[4 * mu + gamma + 16 * tc];
+						}
+					}
+					_complex_0(trace);
+					//Trace
+					for (mu = 0; mu < 4; mu++)
+					{
+						for (gamma = 0; gamma < 4; gamma++)
+						{
+							_complex_mul_assign(trace, B1[mu][gamma], B2[gamma][mu]);
+						}
+					}
+					//It will be a miracle if this works on the first try...
+					motmp = mo;
+					while (motmp != NULL)
+					{
+						motmp->corr_re[INDEX(px, py, pz, n_mom, tc)] = creal(trace); //(GLB_VOL3*GLB_VOL3);
+						motmp->corr_im[INDEX(px, py, pz, n_mom, tc)] = cimag(trace); //(GLB_VOL3*GLB_VOL3);
+						motmp = motmp->next;
+					}
+				}
 			}
-			// Communications
-			for (mu=0;mu<4;mu++){ for (gamma=0;gamma<4;gamma++) {
-                            B1re[4*mu+gamma+16*tc] = creal(B1[mu][gamma]);
-                            B1im[4*mu+gamma+16*tc] = cimag(B1[mu][gamma]);
-                            B2re[4*mu+gamma+16*tc] = creal(B2[mu][gamma]);
-                            B2im[4*mu+gamma+16*tc] = cimag(B2[mu][gamma]);
-			}}
-		}
-
-		global_sum(B1re, 16*GLB_T);
-		global_sum(B1im, 16*GLB_T);
-		global_sum(B2re, 16*GLB_T);
-		global_sum(B2im, 16*GLB_T);
-		for (t=0; t<GLB_T; t++) {	 
-			tc = (zerocoord[0]+t+splittmp+GLB_T-tau)%GLB_T;
-			for (mu=0;mu<4;mu++){ for (gamma=0;gamma<4;gamma++) {
-				B1[mu][gamma] = B1re[4*mu+gamma+16*tc] +I*B1im[4*mu+gamma+16*tc];
-				B2[mu][gamma] = B2re[4*mu+gamma+16*tc] +I*B2im[4*mu+gamma+16*tc];
-			}}
-			_complex_0(trace);
-			//Trace
-			for (mu=0;mu<4;mu++){ for (gamma=0;gamma<4;gamma++) {
-				_complex_mul_assign(trace, B1[mu][gamma], B2[gamma][mu]);
-			}}
-			//It will be a miracle if this works on the first try...
-			motmp=mo;
-			while (motmp!=NULL){
-                          motmp->corr_re[INDEX(px,py,pz,n_mom,tc)] = creal(trace); //(GLB_VOL3*GLB_VOL3);
-                          motmp->corr_im[INDEX(px,py,pz,n_mom,tc)] = cimag(trace); //(GLB_VOL3*GLB_VOL3);
-                          motmp=motmp->next;
-			}
-		}
-            }
 	/*  motmp=mo;
 	    while (motmp!=NULL){
 	    global_sum(motmp->corr_re, (2*n_mom+1)*(2*n_mom+1)*(2*n_mom+1)*GLB_T);
@@ -253,4 +302,3 @@ void measure_scattering_BC_core(meson_observable* mo, spinor_field* psi0,spinor_
 	    motmp=motmp->next;
 	    }*/
 }
-

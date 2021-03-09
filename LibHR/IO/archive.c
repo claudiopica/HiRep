@@ -142,9 +142,9 @@ void write_gauge_field_matrix(char filename[])
               {
                 double *s_buff = (double *)cm;
                 double *s = _FIELD_AT(ff_sigma, ix);
-                double *p = _FIELD_AT(ff_pi, ix);
+                double *pl = _FIELD_AT(ff_pi, ix);
                 *(s_buff++) = *s;
-                *(s_buff++) = *p;
+                *(s_buff++) = *pl;
                 cm = (suNg *)s_buff;
               }
             }
@@ -414,9 +414,9 @@ void read_gauge_field_matrix(char filename[])
               {
                 double *s_buff = (double *)cm;
                 double *s = _FIELD_AT(ff_sigma, ix);
-                double *p = _FIELD_AT(ff_pi, ix);
+                double *pl = _FIELD_AT(ff_pi, ix);
                 *(s) = *(s_buff++);
-                *(p) = *(s_buff++);
+                *(pl) = *(s_buff++);
                 cm = (suNg *)s_buff;
               }
             }
@@ -441,8 +441,8 @@ void read_gauge_field_matrix(char filename[])
   {
     if (fabs(testplaq - plaq) > 1.e-12)
     {
-      lprintf("ERROR", 0, "Stored plaquette value [%e] do not match the configuration! [diff=%e]\n", plaq, fabs(testplaq - plaq));
-      error(1, 1, "read_gauge_field " __FILE__, "Plaquette value mismatch");
+      lprintf("WARNING", 0, "Stored plaquette value [%e] do not match the configuration! [diff=%e]\n", plaq, fabs(testplaq - plaq));
+      //error(1, 1, "read_gauge_field " __FILE__, "Plaquette value mismatch");
     }
   }
 
@@ -624,8 +624,8 @@ void read_ranlxd_state(char filename[])
     /* check if ranlxd size is the same as in the header */
     if (rsize != d[1])
     {
-      lprintf("ERROR", 0, "Read value of ranlxd size [%d] do not match this code [%d].\n", d[1], rsize);
-      error(1, 1, "read_ranlxd_state " __FILE__, "ranlxd size mismatch");
+      lprintf("WARNING", 0, "Read value of ranlxd size [%d] do not match this code [%d].\n", d[1], rsize);
+      //error(1, 1, "read_ranlxd_state " __FILE__, "ranlxd size mismatch");
     }
   }
 

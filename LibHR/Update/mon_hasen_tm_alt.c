@@ -17,13 +17,13 @@ static int mon_init = 1;
 
 void hasen_tm_alt_gaussian_pf(const struct _monomial *m)
 {
-	mon_hasenbusch_tm_par *par = (mon_hasenbusch_tm_par*)(m->data.par);
+	mon_hasenbusch_tm_par *par = (mon_hasenbusch_tm_par *)(m->data.par);
 	gaussian_spinor_field(par->pf);
 }
 
 void hasen_tm_alt_correct_pf(const struct _monomial *m)
 {
-	mon_hasenbusch_tm_par *par = (mon_hasenbusch_tm_par*)(m->data.par);
+	mon_hasenbusch_tm_par *par = (mon_hasenbusch_tm_par *)(m->data.par);
 	double shift;
 
 	mshift_par mpar;
@@ -47,7 +47,7 @@ void hasen_tm_alt_correct_pf(const struct _monomial *m)
 
 void hasen_tm_alt_correct_la_pf(const struct _monomial *m)
 {
-	mon_hasenbusch_tm_par *par = (mon_hasenbusch_tm_par*)(m->data.par);
+	mon_hasenbusch_tm_par *par = (mon_hasenbusch_tm_par *)(m->data.par);
 	double shift;
 
 	mshift_par mpar;
@@ -68,23 +68,23 @@ void hasen_tm_alt_correct_la_pf(const struct _monomial *m)
 	spinor_field_copy_f(par->pf, tmp_pf);
 }
 
-const spinor_field* hasen_tm_alt_pseudofermion(const struct _monomial *m)
+const spinor_field *hasen_tm_alt_pseudofermion(const struct _monomial *m)
 {
-   mon_hasenbusch_tm_par *par = (mon_hasenbusch_tm_par*)(m->data.par);
-   return par->pf;
+	mon_hasenbusch_tm_par *par = (mon_hasenbusch_tm_par *)(m->data.par);
+	return par->pf;
 }
 
 void hasen_tm_alt_add_local_action(const struct _monomial *m, scalar_field *loc_action)
 {
-   mon_hasenbusch_tm_par *par = (mon_hasenbusch_tm_par*)(m->data.par);
-   pf_local_action(loc_action, par->pf);
+	mon_hasenbusch_tm_par *par = (mon_hasenbusch_tm_par *)(m->data.par);
+	pf_local_action(loc_action, par->pf);
 }
 
 void hasen_tm_alt_free(struct _monomial *m)
 {
-	mon_hasenbusch_tm_par *par = (mon_hasenbusch_tm_par*)m->data.par;
+	mon_hasenbusch_tm_par *par = (mon_hasenbusch_tm_par *)m->data.par;
 
-	if(par->pf != NULL)
+	if (par->pf != NULL)
 	{
 		free_spinor_field_f(par->pf);
 	}
@@ -93,22 +93,22 @@ void hasen_tm_alt_free(struct _monomial *m)
 	free(m);
 }
 
-struct _monomial* hasen_tm_alt_create(const monomial_data *data)
+struct _monomial *hasen_tm_alt_create(const monomial_data *data)
 {
 	monomial *m = malloc(sizeof(*m));
-	mon_hasenbusch_tm_par *par = (mon_hasenbusch_tm_par*)data->par;
-  
+	mon_hasenbusch_tm_par *par = (mon_hasenbusch_tm_par *)data->par;
+
 	// Copy data structure
 	m->data = *data;
-  
+
 	// Allocate memory for spinor field
-	if(mon_init)
+	if (mon_init)
 	{
 		tmp_pf = alloc_spinor_field_f(1, &glat_default);
 		mon_init = 0;
 	}
 	par->pf = alloc_spinor_field_f(1, &glat_default);
-  
+
 	// Setup force parameters
 	par->fpar.id = data->id;
 	par->fpar.n_pf = 1;

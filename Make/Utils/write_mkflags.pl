@@ -35,7 +35,7 @@ GetOptions(
   'force!'   => \(my $force = 0),
   'cc=s'   => \(my $cc = "gcc"),
   'mpicc=s'   => \(my $mpicc = "mpicc"),
-  'cflags=s'   => \(my $cflags = "-Wall -std=c99 -O3"),
+  'cflags=s'   => \(my $cflags = "-Wall -Wshadow -std=c99 -O3"),
   'ldflags=s'   => \(my $ldflags = ""),
   'include=s'   => \(my $include = ""),
   'ccache!'   => \(my $ccache = 0),
@@ -233,7 +233,7 @@ write_mkflags - write flags file for compilation of HiRep
   --[no-]mpi          [true]      Use MPI
   --cc                [gcc]       Compiler
   --mpicc             [mpicc]     MPI Compiler
-  --cflags            [-O3]       Compilation options
+  --cflags            [-Wall -Wshadow -std=c99 -O3]       Compilation options
   --include           []          Extra include headers
   --ldflags           []          Linking options
   --[no-]ndebug       [true]      Set ndebug flag

@@ -234,7 +234,7 @@ void WilsonFlow1(suNg_field *V, const double epsilon)
 }
 
 //define distance between complex matrices
-double max_distance(suNg_field *V, suNg_field *Vprime)
+double max_distance(suNg_field *V, suNg_field *Vprimel)
 {
 
   double d, tmp;
@@ -249,7 +249,7 @@ double max_distance(suNg_field *V, suNg_field *Vprime)
     for (int mu = 0; mu < 4; ++mu)
     {
       _suNg_mul(diff, 1., *_4FIELD_AT(V, ix, mu));
-      _suNg_sub_assign(diff, *_4FIELD_AT(Vprime, ix, mu));
+      _suNg_sub_assign(diff, *_4FIELD_AT(Vprimel, ix, mu));
       _suNg_sqnorm(d, diff);
       if (d > tmp)
         tmp = d;

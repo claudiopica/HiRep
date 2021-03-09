@@ -360,25 +360,25 @@ static void calc_propagator_clover(spinor_field *dptr, spinor_field *sptr)
 {
   static spinor_field *otmp;
   static spinor_field *etmp, *stmp;
-  static int init = 0;
+  static int local_init = 0;
 
   // Inverter
   mshift_par mpar;
-  double tmp;
+  double loc_tmp;
 
   mpar.err2 = QMR_par.err2;
   mpar.max_iter = 0;
   mpar.n = 1;
-  mpar.shift = &tmp;
+  mpar.shift = &loc_tmp;
   mpar.shift[0] = 0;
 
   // Allocate temporary fields
-  if (init == 0)
+  if (local_init == 0)
   {
     etmp = alloc_spinor_field_f(1, &glat_even);
     otmp = alloc_spinor_field_f(1, &glat_odd);
     stmp = alloc_spinor_field_f(1, &glattice);
-    init = 1;
+    local_init = 1;
   }
 
   // Destination even/odd
@@ -420,7 +420,6 @@ static void calc_propagator_clover(spinor_field *dptr, spinor_field *sptr)
   spinor_field_minus_f(&dptr_o, &dptr_o);
   spinor_field_add_assign_f(&dptr_o, &sptr_o);
   Cphi_diag_inv(hmass_pre, &dptr_o, &dptr_o);
-
 }
 #endif
 

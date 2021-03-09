@@ -75,7 +75,7 @@ static int cg_mshift_flt_core(short int *sflags, mshift_par *par, spinor_operato
       spinor_field_zero_f_flt(&out[i]);
     /*    sflags[i]=1; */
   }
- 
+
   /* cg recursion */
 
   do
@@ -85,10 +85,10 @@ static int cg_mshift_flt_core(short int *sflags, mshift_par *par, spinor_operato
     alpha = spinor_field_prod_re_f_flt(k, Mk);
     oldomega = omega;
     omega = -delta / alpha;
-   
+
     for (i = 0; i < (par->n); ++i)
     {
-        if (sflags[i])
+      if (sflags[i])
       {
         z3[i] = oldomega * z1[i] * z2[i] / (omega * gamma * (z1[i] - z2[i]) + z1[i] * oldomega * (1. + par->shift[i] * omega));
         spinor_field_mul_add_assign_f_flt(&out[i], ((float)(-omega * z3[i] / z2[i])), &p[i]);
@@ -126,10 +126,10 @@ static int cg_mshift_flt_core(short int *sflags, mshift_par *par, spinor_operato
     lprintf("CGTEST", 0, "[ %d ] delta=%e\n", cgiter, delta);
     lprintf("CGTEST", 0, "[ %d ] max_iter=%d\n", cgiter, par->max_iter);*/
     ++cgiter;
-  } while ((par->max_iter == 0 || cgiter < par->max_iter) && notconverged!=0);
-  
+  } while ((par->max_iter == 0 || cgiter < par->max_iter) && notconverged != 0);
+
   /* free memory */
- 
+
   free_spinor_field_f_flt(p);
   free(z1);
   free(z2);

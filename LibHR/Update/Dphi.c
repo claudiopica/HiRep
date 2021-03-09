@@ -756,7 +756,7 @@ void Qhat_eopre_sq(double m0, double mu, spinor_field *out, spinor_field *in)
 
 static void Cphi_(double mass, spinor_field *dptr, spinor_field *sptr, int assign)
 {
- 
+
   // Correct mass term
   mass = (4. + mass);
 

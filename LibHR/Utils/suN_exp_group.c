@@ -41,7 +41,7 @@ static double factorial(int N)
 #endif
 
 #if (NG == 3)
-static void WF_Exp_NG3(suNg *u, suNg *X)
+static void WF_Exp_NG3(suNg *u, suNg *Xin)
 {
   int NN = 30, i = 0, j = 0;
 
@@ -55,8 +55,8 @@ static void WF_Exp_NG3(suNg *u, suNg *X)
       inverse_fact[i] = 1. / factorial(i);
   }
 
-  _suNg_times_suNg(X2, *X, *X);
-  _suNg_times_suNg(X3, X2, *X);
+  _suNg_times_suNg(X2, *Xin, *Xin);
+  _suNg_times_suNg(X3, X2, *Xin);
   _suNg_unit(X0);
 
   _suNg_trace(p[0], X3);
@@ -81,14 +81,14 @@ static void WF_Exp_NG3(suNg *u, suNg *X)
     q[0] = inverse_fact[i] - p[0] * qlast;
   }
 
-  _suNg_mul_add(*u, q[0], X0, q[1], *X);
+  _suNg_mul_add(*u, q[0], X0, q[1], *Xin);
   _suNg_mulc(X3, q[2], X2);
   _suNg_add_assign(*u, X3);
 }
 #endif
 
 #if (NG == 4)
-static void WF_Exp_NG4(suNg *u, suNg *X)
+static void WF_Exp_NG4(suNg *u, suNg *Xin)
 {
 
   int NN = 30, i = 0, j = 0;
@@ -103,9 +103,9 @@ static void WF_Exp_NG4(suNg *u, suNg *X)
   }
   suNg X0, X2, X3, X4;
 
-  _suNg_times_suNg(X2, *X, *X);
-  _suNg_times_suNg(X3, X2, *X);
-  _suNg_times_suNg(X4, X3, *X);
+  _suNg_times_suNg(X2, *Xin, *Xin);
+  _suNg_times_suNg(X3, X2, *Xin);
+  _suNg_times_suNg(X4, X3, *Xin);
   _suNg_unit(X0);
 
   _suNg_trace(p[0], X4);
@@ -132,7 +132,7 @@ static void WF_Exp_NG4(suNg *u, suNg *X)
     q[0] = inverse_fact[i] - p[0] * qlast;
   }
 
-  _suNg_mul_add(*u, q[0], X0, q[1], *X);
+  _suNg_mul_add(*u, q[0], X0, q[1], *Xin);
   _suNg_mulc(X4, q[2], X2);
   _suNg_add_assign(*u, X4);
   _suNg_mulc(X4, q[3], X3);
@@ -141,7 +141,7 @@ static void WF_Exp_NG4(suNg *u, suNg *X)
 #endif
 
 #if (NG == 5)
-static void WF_Exp_NG5(suNg *u, suNg *X)
+static void WF_Exp_NG5(suNg *u, suNg *Xin)
 {
 
   int NN = 30, i = 0, j = 0;
@@ -156,10 +156,10 @@ static void WF_Exp_NG5(suNg *u, suNg *X)
 
   suNg X0, X2, X3, X4, X5;
 
-  _suNg_times_suNg(X2, *X, *X);
-  _suNg_times_suNg(X3, X2, *X);
-  _suNg_times_suNg(X4, X3, *X);
-  _suNg_times_suNg(X5, X4, *X);
+  _suNg_times_suNg(X2, *Xin, *Xin);
+  _suNg_times_suNg(X3, X2, *Xin);
+  _suNg_times_suNg(X4, X3, *Xin);
+  _suNg_times_suNg(X5, X4, *Xin);
   _suNg_unit(X0);
 
   _suNg_trace(p[0], X5);
@@ -188,7 +188,7 @@ static void WF_Exp_NG5(suNg *u, suNg *X)
     q[0] = inverse_fact[i] - p[0] * qlast;
   }
 
-  _suNg_mul_add(*u, q[0], X0, q[1], *X);
+  _suNg_mul_add(*u, q[0], X0, q[1], *Xin);
   _suNg_mulc(X5, q[2], X2);
   _suNg_add_assign(*u, X5);
   _suNg_mulc(X5, q[3], X3);
@@ -199,7 +199,7 @@ static void WF_Exp_NG5(suNg *u, suNg *X)
 #endif
 
 #if (NG == 6)
-static void WF_Exp_NG6(suNg *u, suNg *X)
+static void WF_Exp_NG6(suNg *u, suNg *Xin)
 {
 
   int NN = 30, i = 0, j = 0;
@@ -215,11 +215,11 @@ static void WF_Exp_NG6(suNg *u, suNg *X)
 
   suNg X0, X2, X3, X4, X5, X6;
 
-  _suNg_times_suNg(X2, *X, *X);
-  _suNg_times_suNg(X3, X2, *X);
-  _suNg_times_suNg(X4, X3, *X);
-  _suNg_times_suNg(X5, X4, *X);
-  _suNg_times_suNg(X6, X5, *X);
+  _suNg_times_suNg(X2, *Xin, *Xin);
+  _suNg_times_suNg(X3, X2, *Xin);
+  _suNg_times_suNg(X4, X3, *Xin);
+  _suNg_times_suNg(X5, X4, *Xin);
+  _suNg_times_suNg(X6, X5, *Xin);
   _suNg_unit(X0);
 
   _suNg_trace(p[0], X6);
@@ -250,7 +250,7 @@ static void WF_Exp_NG6(suNg *u, suNg *X)
     q[0] = inverse_fact[i] - p[0] * qlast;
   }
 
-  _suNg_mul_add(*u, q[0], X0, q[1], *X);
+  _suNg_mul_add(*u, q[0], X0, q[1], *Xin);
   _suNg_mulc(X6, q[2], X2);
   _suNg_add_assign(*u, X6);
   _suNg_mulc(X6, q[3], X3);
@@ -270,13 +270,13 @@ static void WF_Exp_NG6(suNg *u, suNg *X)
  * X^dag = -X
  * tr X = 0
  */
-static void WF_Exp_NG2(suNg *u, suNg *X)
+static void WF_Exp_NG2(suNg *u, suNg *Xin)
 {
   suNg_algebra_vector h, v;
 
-  h.c[0] = cimag(X->c[1]);
-  h.c[1] = creal(X->c[1]);
-  h.c[2] = cimag(X->c[0]);
+  h.c[0] = cimag(Xin->c[1]);
+  h.c[1] = creal(Xin->c[1]);
+  h.c[2] = cimag(Xin->c[0]);
 
   double z = sqrt(h.c[0] * h.c[0] + h.c[1] * h.c[1] + h.c[2] * h.c[2]);
   double s = 1.;
@@ -294,7 +294,7 @@ static void WF_Exp_NG2(suNg *u, suNg *X)
 }
 #endif
 
-void WF_Exp_Taylor(suNg *u, suNg *X)
+void WF_Exp_Taylor(suNg *u, suNg *Xin)
 {
   suNg Xk, tmp;
   _suNg_unit(*u);
@@ -304,7 +304,7 @@ void WF_Exp_Taylor(suNg *u, suNg *X)
   double error;
   while (1)
   {
-    _suNg_times_suNg(tmp, Xk, *X);
+    _suNg_times_suNg(tmp, Xk, *Xin);
     _suNg_mul(Xk, 1. / k, tmp);
     k++;
     _suNg_add_assign(*u, Xk);
@@ -315,19 +315,19 @@ void WF_Exp_Taylor(suNg *u, suNg *X)
   }
 }
 
-inline void WF_Exp(suNg *u, suNg *X)
+inline void WF_Exp(suNg *u, suNg *Xin)
 {
 #if (NG == 2)
-  WF_Exp_NG2(u, X);
+  WF_Exp_NG2(u, Xin);
 #elif (NG == 3)
-  WF_Exp_NG3(u, X);
+  WF_Exp_NG3(u, Xin);
 #elif (NG == 4)
-  WF_Exp_NG4(u, X);
+  WF_Exp_NG4(u, Xin);
 #elif (NG == 5)
-  WF_Exp_NG5(u, X);
+  WF_Exp_NG5(u, Xin);
 #elif (NG == 6)
-  WF_Exp_NG6(u, X);
+  WF_Exp_NG6(u, Xin);
 #else
-  WF_Exp_Taylor(u, X);
+  WF_Exp_Taylor(u, Xin);
 #endif
 }

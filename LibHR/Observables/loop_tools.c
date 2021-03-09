@@ -276,7 +276,7 @@ void measure_loops(double *m, int nhits, int conf_num, double precision, int sou
 
 	spinor_field *source;
 	spinor_field *prop;
-	suNg_field *u_gauge_old = NULL ;
+	suNg_field *u_gauge_old = NULL;
 
 	if (source_type == 0)
 	{
@@ -329,7 +329,7 @@ void measure_loops(double *m, int nhits, int conf_num, double precision, int sou
 	}
 	if (source_type == 1)
 	{
-		
+
 		u_gauge_old = alloc_gfield(&glattice);
 		suNg_field_copy(u_gauge_old, u_gauge);
 		spinor_field_zero_f(prop);
@@ -460,10 +460,10 @@ void measure_bilinear_loops_spinorfield(spinor_field *prop, spinor_field *source
 	int i, j, ix, t, x, y, z, tc;
 	corr = (double complex ***)malloc(sizeof(double complex **) * n_mom_tot);
 
-	for (int i = 0; i < n_mom_tot; i++)
+	for (i = 0; i < n_mom_tot; i++)
 		corr[i] = (double complex **)malloc(sizeof(double complex *) * NGamma);
-	for (int i = 0; i < n_mom_tot; i++)
-		for (int j = 0; j < NGamma; j++)
+	for (i = 0; i < n_mom_tot; i++)
+		for (j = 0; j < NGamma; j++)
 			corr[i][j] = (double complex *)calloc(GLB_T, sizeof(double complex));
 
 	int offset = 0;
@@ -627,11 +627,11 @@ void measure_bilinear_loops_spinorfield(spinor_field *prop, spinor_field *source
 	timeval_subtract(&etime, &end, &start);
 	lprintf("TIMING", 0, "Contractions for source %i done [%ld sec %ld usec]\n", src_id, etime.tv_sec, etime.tv_usec);
 
-	for (int i = 0; i < n_mom_tot; i++)
-		for (int j = 0; j < NGamma; j++)
+	for (i = 0; i < n_mom_tot; i++)
+		for (j = 0; j < NGamma; j++)
 			free(corr[i][j]);
 
-	for (int i = 0; i < n_mom_tot; i++)
+	for (i = 0; i < n_mom_tot; i++)
 		free(corr[i]);
 
 	free(corr);

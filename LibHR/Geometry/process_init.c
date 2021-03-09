@@ -107,7 +107,7 @@ void setup_gauge_fields()
   init_smearing(1.0, 1.0);
 #endif
 
-#if defined(WITH_CLOVER)|| defined(WITH_EXPCLOVER)
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
   clover_init(1.0);
 #endif
 

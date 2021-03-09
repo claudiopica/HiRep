@@ -26,11 +26,10 @@ void inv_hermNg(suNg *a)
 
   b = *a;
   _suNg_quat_det(norm, b);
-  norm = 1/(norm);
-  _suNg_dagger(b,b);
- _suNg_mul_assign(b,norm);
+  norm = 1 / (norm);
+  _suNg_dagger(b, b);
+  _suNg_mul_assign(b, norm);
   *a = b;
-
 }
 
 #else
@@ -87,7 +86,7 @@ void ludcmp(double complex *a, int *indx, double *d, int N)
       csum = a[i * N + j];
       for (k = 0; k < i; k++)
       {
-        csum-=a[i * N + k]* a[k * N + j];
+        csum -= a[i * N + k] * a[k * N + j];
       }
       a[i * N + j] = csum;
     }
@@ -99,7 +98,7 @@ void ludcmp(double complex *a, int *indx, double *d, int N)
       csum = a[i * N + j];
       for (k = 0; k < j; ++k)
       {
-        csum-=a[i * N + k]* a[k * N + j];
+        csum -= a[i * N + k] * a[k * N + j];
       }
       a[i * N + j] = csum;
       dum = sqrt(_complex_prod_re(csum, csum));
@@ -131,9 +130,9 @@ void ludcmp(double complex *a, int *indx, double *d, int N)
     if (j != N - 1)
     {
       _complex_inv(csum, a[j * N + j]);
-      for (int i = j + 1; i < N; ++i)
+      for (int i1 = j + 1; i1 < N; ++i1)
       {
-        a[i * N + j] = csum * a[i * N + j];
+        a[i1 * N + j] = csum * a[i1 * N + j];
       }
     }
   }

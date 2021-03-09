@@ -1,8 +1,8 @@
 NG = 3
-REPR = REPR_FUNDAMENTAL
+#REPR = REPR_FUNDAMENTAL
 #REPR = REPR_SYMMETRIC
 #REPR = REPR_ANTISYMMETRIC
-#REPR = REPR_ADJOINT
+REPR = REPR_ADJOINT
 
 #CHOICES ARE GAUGE_SUN AND GAUGE_SON 
 GAUGE_GROUP = GAUGE_SUN
@@ -14,8 +14,8 @@ GAUGE_GROUP = GAUGE_SUN
 #Z => PERIODIC, ANTIPERIODIC, THETA
 
 #MACRO += -DBC_T_THETA
-MACRO += -DBC_T_PERIODIC
-#MACRO += -DBC_T_ANTIPERIODIC
+#MACRO += -DBC_T_PERIODIC
+MACRO += -DBC_T_ANTIPERIODIC
 #MACRO += -DBC_T_OPEN
 MACRO += -DBC_X_PERIODIC
 MACRO += -DBC_Y_PERIODIC
@@ -32,12 +32,12 @@ MACRO += -DBC_Z_PERIODIC
 #MACRO += -DWITH_CLOVER
 MACRO += -DWITH_EXPCLOVER
 MACRO += -DUPDATE_EO
-#MACRO += -DWITH_MPI
+MACRO += -DWITH_MPI
 #MACRO += -DWITH_QUATERNIONS
 #MACRO += -DPURE_GAUGE_ANISOTROPY
 MACRO += -DNDEBUG
 #MACRO += -DDPHI_FLOAT
-#MACRO += -DCHECK_SPINOR_MATCHING
+MACRO += -DCHECK_SPINOR_MATCHING
 #MACRO += -DMPI_TIMING
 MACRO += -DIO_FLUSH
 #MACRO += -DUNROLL_GROUP_REPRESENT
@@ -48,20 +48,20 @@ MACRO += -DIO_FLUSH
 #MACRO += -DWITH_UNTESTED
 
 #Compiler
-#CFLAGS = -Wall -std=c99 -O3 -fomit-frame-pointer -msse -msse2 
-CFLAGS = -Wall -std=c99 -O3  #-g #-march=core-avx2 -mtune=core-avx2 -g
-#CFLAGS = -Wall -std=c99 -O3 -qopt-prefetch=4 -qopt-report=2 -march=core-avx2 -mtune=core-avx2
+#CFLAGS = -Wall -Wshadow -std=c99 -O3 -fomit-frame-pointer -msse -msse2 
+CFLAGS = -Wall -Wshadow -std=c99 -O3  #-g #-march=core-avx2 -mtune=core-avx2 -g
+#CFLAGS = -Wall -Wshadow -std=c99 -O3 -qopt-prefetch=4 -qopt-report=2 -march=core-avx2 -mtune=core-avx2
 
-#CC = gcc-mp-8
-#MPICC = mpicc-mpich-gcc8
-#LDFLAGS =  -L /opt/local/lib/mpich-devel-gcc8/ -L /opt/local/lib/ #-l efence
-#INCLUDE = -I /opt/local/include/mpich-devel-gcc8/ #-I /usr/include
+CC = /opt/local/bin/gcc-mp-10
+MPICC = /opt/local/bin/mpicc-mpich-gcc10 
+LDFLAGS = -L /opt/local/lib/mpich-gcc10/ -L /opt/local/lib/ #-l efence
+INCLUDE = -I /opt/local/include/mpich-gcc10/ -I /opt/local/include/ -I /opt/local/include/gcc10/ -I /usr/include
 
 
-CC = clang-mp-8.0
-MPICC = mpicc-mpich-clang80
-LDFLAGS =  -L /opt/local/lib/mpich-devel-clang80/ -L /opt/local/lib/ #-lefence #-lprofiler #-l efence
-INCLUDE = -I /opt/local/include/mpich-clang80/
+#CC = clang
+#MPICC = mpicc
+#LDFLAGS =  #-L /opt/local/lib/mpich-devel-clang80/ -L /opt/local/lib/ #-lefence #-lprofiler #-l efence
+#INCLUDE = #-I /opt/local/include/mpich-clang80/
 
 
 #CC = clang-mp-6.0

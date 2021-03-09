@@ -279,7 +279,6 @@ static void clover_exp_NF3(suNfc *Aplus, suNfc *expAplus)
     q[0] = inverse_fact[i] - creal(p[0]) * qlast;
   }
 
-
   //Optimized to reduce operations!
 
   _suNfc_mul_add(expAplus[0], q[0], A0[0], q[1], Aplus[0]);
@@ -362,7 +361,7 @@ static void clover_exp_NF2(suNfc *Aplus, suNfc *expAplus)
 
 #endif
 
-void clover_exp_taylor(suNfc *X, suNfc *u)
+void clover_exp_taylor(suNfc *Xin, suNfc *u)
 {
   suNfc Xk[4], tmp[4];
   _su2Nfc_unit(u);
@@ -373,7 +372,7 @@ void clover_exp_taylor(suNfc *X, suNfc *u)
   double error = 0., erroraux;
   while (1)
   {
-    _su2Nfc_times_su2Nfc(tmp, Xk, X);
+    _su2Nfc_times_su2Nfc(tmp, Xk, Xin);
 
     for (i = 0; i < 4; i++)
     {
