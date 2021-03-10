@@ -71,21 +71,21 @@ int main(int argc, char *argv[])
 #ifdef WITH_EXPCLOVER
   // This is the check of the exponential clover term
 
-  spinor_field *X = alloc_spinor_field_f(1, &glattice);
-  spinor_field *Y = alloc_spinor_field_f(1, &glattice);
+  spinor_field *Xl = alloc_spinor_field_f(1, &glattice);
+  spinor_field *Yl = alloc_spinor_field_f(1, &glattice);
 
-  create_z2_volume_source(X);
-  create_z2_volume_source(Y);
+  create_z2_volume_source(Xl);
+  create_z2_volume_source(Yl);
 
   fermion_force_begin();
-  force_clover_fermion_taylor(X, Y, 1.0);
+  force_clover_fermion_taylor(Xl, Yl, 1.0);
 
   suNf_field *cl_force2;
   cl_force2 = alloc_clover_force(&glattice);
   clover_field_copy(cl_force2, cl_force);
 
   fermion_force_begin();
-  force_clover_fermion(X, Y, 1.0);
+  force_clover_fermion(Xl, Yl, 1.0);
 
   complex double aux;
   double norm = 0.;

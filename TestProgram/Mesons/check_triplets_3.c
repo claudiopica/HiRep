@@ -11,9 +11,11 @@
  ******************************************************************************/
 
 #define MAIN_PROGRAM
+#define _BSD_SOURCE
 
 #include <stdlib.h>
 #include <stdio.h>
+
 #include <string.h>
 #include <math.h>
 #include "io.h"
