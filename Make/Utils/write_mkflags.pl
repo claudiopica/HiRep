@@ -35,7 +35,7 @@ GetOptions(
   'force!'   => \(my $force = 0),
   'cc=s'   => \(my $cc = "gcc"),
   'mpicc=s'   => \(my $mpicc = "mpicc"),
-  'cflags=s'   => \(my $cflags = "-Wall -Wshadow -std=c99 -O3"),
+  'cflags=s'   => \(my $cflags = "-Wall -Wshadow -Wfatal-errors -Werror -std=c99 -O3"),
   'ldflags=s'   => \(my $ldflags = ""),
   'include=s'   => \(my $include = ""),
   'ccache!'   => \(my $ccache = 0),

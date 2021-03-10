@@ -183,17 +183,17 @@ psi = D^{-1} eta
 \***************************************************************************/
 
 
-static void z2semwall_qprop_QMR_eo(spinor_field *psi, spinor_field *eta) {
+static void z2semwall_qprop_QMR_eo(spinor_field *psi_out, spinor_field *eta_in) {
   spinor_field qprop_mask;
   int i, cgiter=0;
-  lprintf("ZSEMWALL",0,"%g\n",spinor_field_sqnorm_f(eta));
+  lprintf("ZSEMWALL",0,"%g\n",spinor_field_sqnorm_f(eta_in));
   error(init==0,1,"z2semwall.c","z2semwall method not initialized!");
 
   /* add source */
 #ifdef GAUSSIAN_NOISE
-  spinor_field_add_f(eta2,eta,QMR_noise);
+  spinor_field_add_f(eta2,eta_in,QMR_noise);
 #else
-  spinor_field_copy_f(eta2,eta);
+  spinor_field_copy_f(eta2,eta_in);
 #endif
 
 
@@ -208,18 +208,18 @@ static void z2semwall_qprop_QMR_eo(spinor_field *psi, spinor_field *eta) {
     spinor_field_sub_assign_f(&resd[i],&QMR_resdn[i]);
 #endif
     /* compute solution */
-    qprop_mask=psi[i];
+    qprop_mask=psi_out[i];
     qprop_mask.type=&glat_even;
-    /* qprop_mask.ptr=psi[i].ptr+glat_even.master_shift; */
+    /* qprop_mask.ptr=psi_out[i].ptr+glat_even.master_shift; */
     spinor_field_mul_f(&qprop_mask,(4.+mass[i]),&resd[i]);
     qprop_mask.type=&glat_odd;
-    qprop_mask.ptr=psi[i].ptr+glat_odd.master_shift; 
+    qprop_mask.ptr=psi_out[i].ptr+glat_odd.master_shift; 
     Dphi_(&qprop_mask,&resd[i]);
     spinor_field_minus_f(&qprop_mask,&qprop_mask);
     if(i&1) ++cgiter; /* count only half of calls. works because the number of sources is even */
   }
   
-  lprintf("ZSEMWALL",0,"%g\n",spinor_field_sqnorm_f(eta));
+  lprintf("ZSEMWALL",0,"%g\n",spinor_field_sqnorm_f(eta_in));
   lprintf("Z2SEMWALL NEW",10,"QMR_eo MVM = %d\n",cgiter);
 }
 

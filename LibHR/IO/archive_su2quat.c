@@ -170,9 +170,9 @@ void write_gauge_field_su2q(char filename[])
               {
                 double *s_buff = (double *)cm;
                 double *s = _FIELD_AT(ff_sigma, ix);
-                double *p = _FIELD_AT(ff_pi, ix);
+                double *pl = _FIELD_AT(ff_pi, ix);
                 *(s_buff++) = *s;
-                *(s_buff++) = *p;
+                *(s_buff++) = *pl;
                 cm = s_buff;
               }
             }
@@ -431,9 +431,9 @@ void read_gauge_field_su2q(char filename[])
               {
                 double *s_buff = (double *)cm;
                 double *s = _FIELD_AT(ff_sigma, ix);
-                double *p = _FIELD_AT(ff_pi, ix);
+                double *pl = _FIELD_AT(ff_pi, ix);
                 *(s) = *(s_buff++);
-                *(p) = *(s_buff++);
+                *(pl) = *(s_buff++);
                 cm = s_buff;
               }
             }
