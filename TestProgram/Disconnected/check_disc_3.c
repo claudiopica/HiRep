@@ -291,12 +291,12 @@ int main(int argc, char *argv[])
   //stochastic & time average
   mean_loops = (double complex *)calloc(n_Gamma, sizeof(double complex));
   for (int k = 0; k < mes_ip.nhits; k++)
-    for (int i = 0; i < NF; i++)
+    for (int l = 0; l < NF; l++)
       for (int j = 0; j < n_Gamma; j++)
         for (int t = 0; t < GLB_T; t++)
         {
-          int idx_re[5] = {k, i, j, t, 0};
-          int idx_im[5] = {k, i, j, t, 1};
+          int idx_re[5] = {k, l, j, t, 0};
+          int idx_im[5] = {k, l, j, t, 1};
 
           mean_loops[j] += (*data_storage_element(out_corr, 0, idx_re) + I * *data_storage_element(out_corr, 0, idx_im)) / (mes_ip.nhits * GLB_T);
         }

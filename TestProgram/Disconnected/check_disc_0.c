@@ -272,27 +272,25 @@ int main(int argc, char *argv[])
   lprintf("CORR", 0, "Number of noise vector : nhits = %i \n", nhits);
 
   ex_loops = (double complex **)malloc(sizeof(double complex *) * n_mom_tot);
-  for (int i = 0; i < n_mom_tot; i++)
-    ex_loops[i] = (double complex *)calloc(n_Gamma, sizeof(double complex));
-
+  for (int l = 0; l < n_mom_tot; l++)
+    ex_loops[l] = (double complex *)calloc(n_Gamma, sizeof(double complex));
 
   //stochastic & time average
   mean_loops = (double complex **)malloc(sizeof(double complex *) * n_mom_tot);
-  for (int i = 0; i < n_mom_tot; i++)
-    mean_loops[i] = (double complex *)calloc(n_Gamma, sizeof(double complex));
+  for (int l = 0; l < n_mom_tot; l++)
+    mean_loops[l] = (double complex *)calloc(n_Gamma, sizeof(double complex));
 
   measure_loops(&mass, nhits, 0, mes_ip.precision, source_type, mes_ip.n_mom, STORE, &out_corr);
 
-
   for (int k = 0; k < nhits; k++)
-    for (int i = 0; i < n_mom_tot; i++)
+    for (int l = 0; l < n_mom_tot; l++)
       for (int j = 0; j < n_Gamma; j++)
         for (int t = 0; t < GLB_T; t++)
         {
-          int idx_re[5] = {k, i, j, t, 0};
-          int idx_im[5] = {k, i, j, t, 1};
+          int idx_re[5] = {k, l, j, t, 0};
+          int idx_im[5] = {k, l, j, t, 1};
 
-          mean_loops[i][j] += (*data_storage_element(out_corr, 0, idx_re) + I * *data_storage_element(out_corr, 0, idx_im)) / (nhits * GLB_T);
+          mean_loops[l][j] += (*data_storage_element(out_corr, 0, idx_re) + I * *data_storage_element(out_corr, 0, idx_im)) / (nhits * GLB_T);
         }
   //  /* CALCOLO ESPLICITO */
   free_loops(ex_loops, mes_ip.n_mom);

@@ -44,63 +44,66 @@
 #define M_PI 3.14159265358979323846264338327950288419716939937510
 #endif
 
+static double complex gid[16] = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.}; /* gid = tr Gamma  */
+static double complex g0[16] = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.};  /*  g0 = tr gamma_0 Gamma */
+static double complex g1[16] = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.};  /*  g1 = tr gamma_1 Gamma */
+static double complex g2[16] = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.};  /*  g2 = tr gamma_2 Gamma */
+static double complex g3[16] = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.};  /*  g3 = tr gamma_3 Gamma */
 
+char *mes_channel_names[16] = {"g5", "g1", "g2", "g3", "-ig0g5", "-ig0g1", "-ig0g2", "-ig0g3", "id", "-ig5g1", "-ig5g2", "-ig5g3", "g0", "-ig5g0g1", "-ig5g0g2", "-ig5g0g3"};
 
-static double complex gid[16] = {0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0. }; /* gid = tr Gamma  */
-static double complex g0[16] = {0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0. }; /*  g0 = tr gamma_0 Gamma */
-static double complex g1[16] = {0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0. }; /*  g1 = tr gamma_1 Gamma */
-static double complex g2[16] = {0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0. }; /*  g2 = tr gamma_2 Gamma */
-static double complex g3[16] = {0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0.,0. }; /*  g3 = tr gamma_3 Gamma */
+#define mult_mat(r, A, B)                      \
+  {                                            \
+    int _i, _j, _k;                            \
+    double complex wm[4][4];                   \
+    for (_i = 0; _i < 4; _i++)                 \
+      for (_j = 0; _j < 4; _j++)               \
+      {                                        \
+        _complex_0(wm[_i][_j]);                \
+        for (_k = 0; _k < 4; _k++)             \
+        {                                      \
+          wm[_i][_j] += A[_i][_k] * B[_k][_j]; \
+        }                                      \
+      }                                        \
+    for (_i = 0; _i < 4; _i++)                 \
+      for (_j = 0; _j < 4; _j++)               \
+      {                                        \
+        r[_i][_j] = wm[_i][_j];                \
+      }                                        \
+  }
 
-char* mes_channel_names[16]={"g5","g1","g2","g3","-ig0g5","-ig0g1","-ig0g2","-ig0g3","id","-ig5g1","-ig5g2","-ig5g3","g0","-ig5g0g1","-ig5g0g2","-ig5g0g3"};
+#define mult_mat_minusI(r, A)       \
+  {                                 \
+    int _i, _j;                     \
+    for (_i = 0; _i < 4; _i++)      \
+      for (_j = 0; _j < 4; _j++)    \
+      {                             \
+        r[_i][_j] = -I * A[_i][_j]; \
+      }                             \
+  }
 
-#define mult_mat(r,A,B) \
-{ \
-  int _i, _j, _k; \
-  double complex wm[4][4]; \
-  for(_i=0; _i<4; _i++) \
-  for(_j=0; _j<4; _j++) { \
-    _complex_0(wm[_i][_j]); \
-    for(_k=0; _k<4; _k++) { \
-      wm[_i][_j] += A[_i][_k]*B[_k][_j];\
-    } \
-  } \
-  for(_i=0; _i<4; _i++) \
-  for(_j=0; _j<4; _j++) { \
-    r[_i][_j] = wm[_i][_j];\
-  } \
-}
-
-#define mult_mat_minusI(r,A) \
-{ \
-  int _i, _j; \
-  for(_i=0; _i<4; _i++) \
-  for(_j=0; _j<4; _j++) { \
-    r[_i][_j] = -I*A[_i][_j];\
-  } \
-}
-
-
-
-#define set_zero_mat(A) \
-{ \
-  int _i,_j; \
-  for(_i=0; _i<4; _i++) \
-  for(_j=0; _j<4; _j++) { \
-    A[_i][_j]=0.; \
-  } \
-}
-#define trace_mat(r,A) \
-{ \
-  int _i; \
-  _complex_0(r); \
-  for(_i=0; _i<4; _i++) { \
-    r+=A[_i][_i]; \
-  } \
-}
+#define set_zero_mat(A)          \
+  {                              \
+    int _i, _j;                  \
+    for (_i = 0; _i < 4; _i++)   \
+      for (_j = 0; _j < 4; _j++) \
+      {                          \
+        A[_i][_j] = 0.;          \
+      }                          \
+  }
+#define trace_mat(r, A)        \
+  {                            \
+    int _i;                    \
+    _complex_0(r);             \
+    for (_i = 0; _i < 4; _i++) \
+    {                          \
+      r += A[_i][_i];          \
+    }                          \
+  }
 
 /* Mesons parameters */
-typedef struct _input_mesons {
+typedef struct _input_mesons
+{
   char mstring[256];
 
   /* for the reading function */
@@ -111,21 +114,19 @@ typedef struct _input_mesons {
   int n_mom;
   double csw;
 
-
 } input_mesons;
 
-#define init_input_mesons(varname)					\
-{									\
-  .read={								\
-    {"Fermion mass", "disc:mass = %s", STRING_T, (varname).mstring}, \
-    {"inverter precision", "disc:precision = %lf", DOUBLE_T, &(varname).precision}, \
-    {"number of inversions per cnfg", "disc:nhits1 = %d", INT_T, &(varname).nhits}, \
-    {"maximum component of momentum", "disc:n_mom = %d", INT_T, &(varname).n_mom}, \
-    {"csw coefficient", "disc:csw = %lg",DOUBLE_T, &(varname).csw},	\
-    {NULL, NULL,INT_T, NULL}				\
-  }							\
-}
-
+#define init_input_mesons(varname)                                                    \
+  {                                                                                   \
+    .read = {                                                                         \
+      {"Fermion mass", "disc:mass = %s", STRING_T, (varname).mstring},                \
+      {"inverter precision", "disc:precision = %lf", DOUBLE_T, &(varname).precision}, \
+      {"number of inversions per cnfg", "disc:nhits1 = %d", INT_T, &(varname).nhits}, \
+      {"maximum component of momentum", "disc:n_mom = %d", INT_T, &(varname).n_mom},  \
+      {"csw coefficient", "disc:csw = %lg", DOUBLE_T, &(varname).csw},                \
+      {NULL, NULL, INT_T, NULL}                                                       \
+    }                                                                                 \
+  }
 
 static double mass;
 void free_loops(double complex *loops);
@@ -136,30 +137,33 @@ char char_t[100];
 FILE *fp;
 char path[1035];
 
-
-
 /*Gamma / 4 */
-double complex get_gid(double complex Gamma[4][4]){
+double complex get_gid(double complex Gamma[4][4])
+{
   double complex r;
-  trace_mat(r,Gamma );
+  trace_mat(r, Gamma);
   return r;
 }
 /* gmu = tr Gamma gamma_mu   */
-double complex get_gmu(double complex Gamma[4][4],int mu){
-  int  sign;
+double complex get_gmu(double complex Gamma[4][4], int mu)
+{
+  int sign;
   double complex tmp[4][4];
   double complex r;
   double complex gmu[4][4];
 
+  if (mu == 1)
+    g1_debug(gmu, &sign);
+  if (mu == 2)
+    g2_debug(gmu, &sign);
+  if (mu == 3)
+    g3_debug(gmu, &sign);
+  if (mu == 0)
+    g0_debug(gmu, &sign);
 
-  if (mu==1)  g1_debug(gmu, &sign);
-  if (mu==2)  g2_debug(gmu, &sign);
-  if (mu==3)  g3_debug(gmu, &sign);
-  if (mu==0)  g0_debug(gmu, &sign);
+  mult_mat(tmp, Gamma, gmu);
 
-  mult_mat(tmp,Gamma,gmu);
-
-  trace_mat(r,tmp);
+  trace_mat(r, tmp);
   return r;
 }
 
@@ -197,15 +201,15 @@ int compare_disc(double complex *corr_ex, double complex *corr_num, char *name[1
   return retval;
 }
 
-int main(int argc,char *argv[])
+int main(int argc, char *argv[])
 {
-  int i,sign;
+  int i, sign;
   double complex *ex_loops;
   data_storage_array *out_corr = NULL;
   double complex *mean_loops;
   char pame[256];
-  int source_type=1;
-  int return_value=0; 
+  int source_type = 1;
+  int return_value = 0;
   int n_Gamma = 16;
   double abs_tol = 1.5e-1;
   double rel_tol_scalar_loop = 1e-2;
@@ -218,81 +222,81 @@ int main(int argc,char *argv[])
   g2_debug(g[2], &sign);
   g3_debug(g[3], &sign);
   g0g5_debug(tmp, &sign);
-  mult_mat_minusI(g[4],tmp);
+  mult_mat_minusI(g[4], tmp);
   g0g1_debug(tmp, &sign);
-  mult_mat_minusI(g[5],tmp);
+  mult_mat_minusI(g[5], tmp);
   g0g2_debug(tmp, &sign);
-  mult_mat_minusI(g[6],tmp);
+  mult_mat_minusI(g[6], tmp);
   g0g3_debug(tmp, &sign);
-  mult_mat_minusI(g[7],tmp);
-  id_debug(g[8],&sign);
+  mult_mat_minusI(g[7], tmp);
+  id_debug(g[8], &sign);
   g5g1_debug(tmp, &sign);
-  mult_mat_minusI(g[9],tmp);
+  mult_mat_minusI(g[9], tmp);
   g5g2_debug(tmp, &sign);
-  mult_mat_minusI(g[10],tmp);
+  mult_mat_minusI(g[10], tmp);
   g5g3_debug(tmp, &sign);
-  mult_mat_minusI(g[11],tmp);
+  mult_mat_minusI(g[11], tmp);
   g0_debug(g[12], &sign);
-  mult_mat(g[13],g[0],g[5]);//  -i g5g0g1
-  mult_mat(g[14],g[0],g[6]);//  -i g5g0g2
-  mult_mat(g[15],g[0],g[7]);//  -i g5g0g3
+  mult_mat(g[13], g[0], g[5]); //  -i g5g0g1
+  mult_mat(g[14], g[0], g[6]); //  -i g5g0g2
+  mult_mat(g[15], g[0], g[7]); //  -i g5g0g3
 
-  for (i=0;i<16;i++){
-    gid[i] =  get_gid(g[i]);
-    g0[i] =  get_gmu(g[i],0);
-    g1[i] =  get_gmu(g[i],1);
-    g2[i] =  get_gmu(g[i],2);
-    g3[i] =  get_gmu(g[i],3);
+  for (i = 0; i < 16; i++)
+  {
+    gid[i] = get_gid(g[i]);
+    g0[i] = get_gmu(g[i], 0);
+    g1[i] = get_gmu(g[i], 1);
+    g2[i] = get_gmu(g[i], 2);
+    g3[i] = get_gmu(g[i], 3);
   }
 
   /* setup process id and communications */
-  setup_process(&argc,&argv);
+  setup_process(&argc, &argv);
 
   setup_gauge_fields();
 
-  read_input(mes_ip.read,get_input_filename());
+  read_input(mes_ip.read, get_input_filename());
 
-  strcpy(pame,mes_ip.mstring);
-  mass=atof(strtok(pame, ";"));
-  
+  strcpy(pame, mes_ip.mstring);
+  mass = atof(strtok(pame, ";"));
 
-  lprintf("MAIN",0,"disc:masses = %f\n",mass);
-  lprintf("MAIN",0,"disc:nhits = %i\n",mes_ip.nhits);
-  lprintf("MAIN",0,"Inverter precision = %e\n",mes_ip.precision);
+  lprintf("MAIN", 0, "disc:masses = %f\n", mass);
+  lprintf("MAIN", 0, "disc:nhits = %i\n", mes_ip.nhits);
+  lprintf("MAIN", 0, "Inverter precision = %e\n", mes_ip.precision);
   unit_u(u_gauge);
 
-  #if defined(WITH_CLOVER) ||  defined(WITH_EXPCLOVER)
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
   set_csw(&mes_ip.csw);
-  #endif
+#endif
   represent_gauge_field();
-  #ifdef REPR_FUNDAMENTAL 
+#ifdef REPR_FUNDAMENTAL
   apply_BCs_on_represented_gauge_field(); //This is a trick: the BCs are not applied in the case the REPR is fundamental because represent_gauge field assumes that the right BCs are already applied on the fundamental field!
-  #endif
-  
-  lprintf("MAIN",0,"source type is fixed to 1:  Gauge fixed source  with time, spin  dilution\n");
+#endif
 
-  lprintf("MAIN",0,"Measuring D(t) =  sum_x psibar(x) Gamma psi(x)\n");
+  lprintf("MAIN", 0, "source type is fixed to 1:  Gauge fixed source  with time, spin  dilution\n");
+
+  lprintf("MAIN", 0, "Measuring D(t) =  sum_x psibar(x) Gamma psi(x)\n");
   init_discon_correlators(0);
-  lprintf("MAIN",0,"Zerocoord{%d,%d,%d,%d}\n",zerocoord[0],zerocoord[1],zerocoord[2],zerocoord[3]);
+  lprintf("MAIN", 0, "Zerocoord{%d,%d,%d,%d}\n", zerocoord[0], zerocoord[1], zerocoord[2], zerocoord[3]);
 
-  error(!(GLB_X==GLB_Y && GLB_X==GLB_Z),1,"main", "This test works only for GLB_X=GLB_Y=GLB_Z");
+  error(!(GLB_X == GLB_Y && GLB_X == GLB_Z), 1, "main", "This test works only for GLB_X=GLB_Y=GLB_Z");
 
-  lprintf("CORR",0,"Number of noise vector : nhits = %i \n", mes_ip.nhits);
-  
-  measure_loops( &mass, mes_ip.nhits,0,  mes_ip.precision,source_type,mes_ip.n_mom,STORE,&out_corr);
-  
-  mean_loops = (double complex *)calloc(n_Gamma, sizeof(double complex)); 
+  lprintf("CORR", 0, "Number of noise vector : nhits = %i \n", mes_ip.nhits);
+
+  measure_loops(&mass, mes_ip.nhits, 0, mes_ip.precision, source_type, mes_ip.n_mom, STORE, &out_corr);
+
+  mean_loops = (double complex *)calloc(n_Gamma, sizeof(double complex));
   for (int k = 0; k < mes_ip.nhits; k++)
-    for (int i = 0; i < NF; i++)
+    for (int l = 0; l < NF; l++)
       for (int j = 0; j < n_Gamma; j++)
         for (int t = 0; t < GLB_T; t++)
         {
-          int idx_re[5] = {k, i, j, t, 0};
-          int idx_im[5] = {k, i, j, t, 1};
+          int idx_re[5] = {k, l, j, t, 0};
+          int idx_im[5] = {k, l, j, t, 1};
           //VD: where does the factor 2 comes from ?
-          mean_loops[j] += (double) GLB_VOL3 *(*data_storage_element(out_corr, 0, idx_re) + I * *data_storage_element(out_corr, 0, idx_im)) / (2*mes_ip.nhits * GLB_T);
+          mean_loops[j] += (double)GLB_VOL3 * (*data_storage_element(out_corr, 0, idx_re) + I * *data_storage_element(out_corr, 0, idx_im)) / (2 * mes_ip.nhits * GLB_T);
         }
-//  /* CALCOLO ESPLICITO */
+  //  /* CALCOLO ESPLICITO */
   ex_loops = (double complex *)calloc(16, sizeof(double complex));
   free_loops(ex_loops);
 
@@ -307,9 +311,7 @@ int main(int argc,char *argv[])
 
   finalize_process();
   return return_value;
-
-  }
-
+}
 
 double square(double x)
 {
