@@ -63,7 +63,6 @@ input_mesons mes_ip = init_input_mesons(mes_ip);
 char char_t[100];
 FILE *fp;
 char path[1035];
-int i;
 
 static double complex DeltaKronecker(int i,int j)
 {
@@ -136,7 +135,7 @@ int main(int argc,char *argv[])
   spinor_field* source_shifted = alloc_spinor_field_f(1,&glattice);
 
 
-  for (i=0;i<mes_ip.nhits;i++){
+  for (int i=0;i<mes_ip.nhits;i++){
 
     create_z2_volume_source(source);
     norm = spinor_field_sqnorm_f(source);
@@ -177,12 +176,12 @@ int main(int argc,char *argv[])
     lprintf("MAIN",0,"Random block of coord: (%d %d %d %d) \n",rand_block[0],rand_block[1],rand_block[2],rand_block[3]);
     lprintf("MAIN",0,"shift: (%d %d %d %d) \n",shift[0],shift[1],shift[2],shift[3]);
 
-    for (i=0;i<mes_ip.nhits;i++) {
+    for (int i=0;i<mes_ip.nhits;i++) {
       _complex_0(tmp_vec[i]);
     }
 
     counter=0;
-    for (i=0;i<mes_ip.nhits;i++) {
+    for (int i=0;i<mes_ip.nhits;i++) {
 
       create_z2_volume_source(source);
       shift_fields(shift, source, NULL, source_shifted, NULL);
