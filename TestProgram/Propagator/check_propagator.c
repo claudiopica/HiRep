@@ -15,7 +15,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
-#include <mpi.h>
 #include "io.h"
 #include "random.h"
 #include "error.h"
