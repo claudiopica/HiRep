@@ -80,7 +80,7 @@ void WF_set_bare_anisotropy(double *wf_chi)
             mu = 0;
             for (nu = mu + 1; nu < 4; nu++)
             {
-              wf_plaq_weight[index * 16 + mu * 4 + nu] *= *wf_chi * *wf_chi;
+              //wf_plaq_weight[index * 16 + mu * 4 + nu] *= *wf_chi * *wf_chi;
               wf_plaq_weight[index * 16 + nu * 4 + mu] *= *wf_chi * *wf_chi;
             }
             //for (mu = 1; mu < 3; mu++)
@@ -470,7 +470,7 @@ static void WF_plaq(double *ret, suNg_field *V, int ix, int mu, int nu)
   _suNg_trace_re(*ret, w3);
 
 #ifdef PLAQ_WEIGHTS
-  *ret *= wf_plaq_weight[ix * 16 + nu * 4 + mu];
+  *ret *= plaq_weight[ix * 16 + nu * 4 + mu];
 #endif
 }
 
@@ -518,7 +518,7 @@ void WF_E_T(double *E, suNg_field *V)
           {
             WF_plaq(&p, V, ix, mu, nu);
 #ifdef PLAQ_WEIGHTS
-            E[2 * gt] += ((double)(NG)) * wf_plaq_weight[ix * 16 + nu * 4 + mu] - p;
+            E[2 * gt] += ((double)(NG)) * plaq_weight[ix * 16 + nu * 4 + mu] - p;
 #else
             E[2 * gt] += NG - p;
 #endif
@@ -528,7 +528,7 @@ void WF_E_T(double *E, suNg_field *V)
             {
               WF_plaq(&p, V, ix, mu, nu);
 #ifdef PLAQ_WEIGHTS
-              E[2 * gt + 1] += ((double)(NG)) * wf_plaq_weight[ix * 16 + nu * 4 + mu] - p;
+              E[2 * gt + 1] += ((double)(NG)) * plaq_weight[ix * 16 + nu * 4 + mu] - p;
 #else
               E[2 * gt + 1] += NG - p;
 #endif
