@@ -19,9 +19,6 @@
 
 #ifndef WITH_QUATERNIONS
 
-
-#ifndef WITH_QUATERNIONS
-
 static inline void rotate(suNg_vector *pu1, suNg_vector *pu2, double *s)
 {
   int i;
