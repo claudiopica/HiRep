@@ -96,8 +96,12 @@ int main(int argc, char *argv[])
 
     if (strcmp(flow.wf->make, "true") == 0)
     {
+      static suNg_field *Vwf = NULL;
+      if (Vwf == NULL)
+        Vwf = alloc_gfield(&glattice);
       gettimeofday(&start, 0);
-      WF_update_and_measure(RK3_ADAPTIVE,u_gauge, &(flow.wf->tmax), &(flow.wf->eps), &(flow.wf->delta), flow.wf->nmeas,DONTSTORE);
+      suNg_field_copy(u_gauge, Vwf);
+      WF_update_and_measure(RK3_ADAPTIVE, Vwf, &(flow.wf->tmax), &(flow.wf->eps), &(flow.wf->delta), flow.wf->nmeas, DONTSTORE);
       gettimeofday(&end, 0);
       timeval_subtract(&etime, &end, &start);
       lprintf("MAIN", 0, "WF Measure #%d: generated in [%ld sec %ld usec]\n", i, etime.tv_sec, etime.tv_usec);

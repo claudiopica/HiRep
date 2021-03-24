@@ -22,7 +22,7 @@
 static suNg_field *ws_gf = NULL;
 static suNg_field *ws_gf_tmp = NULL;
 static suNg_field *Vprime = NULL;
-static suNg_field *u_gauge_backup = NULL;
+static suNg_field *Vtmp = NULL;
 static double *wf_plaq_weight = NULL;
 
 void WF_initialize()
@@ -36,7 +36,9 @@ void WF_initialize()
     ws_gf = alloc_gfield(&glattice);
     ws_gf_tmp = alloc_gfield(&glattice);
     Vprime = alloc_gfield(&glattice);
-    u_gauge_backup = alloc_gfield(&glattice);
+    Vtmp = alloc_gfield(&glattice);
+
+
 
 #if defined(PLAQ_WEIGHTS)
 #ifdef PURE_GAUGE_ANISOTROPY
@@ -77,19 +79,12 @@ void WF_set_bare_anisotropy(double *wf_chi)
           index = ipt_ext(it, ix, iy, iz);
           if (index != -1)
           {
-            mu = 0;
+            nu = 0;
             for (nu = mu + 1; nu < 4; nu++)
             {
-              //wf_plaq_weight[index * 16 + mu * 4 + nu] *= *wf_chi * *wf_chi;
               wf_plaq_weight[index * 16 + nu * 4 + mu] *= *wf_chi * *wf_chi;
             }
-            //for (mu = 1; mu < 3; mu++)
-            //  for (nu = mu + 1; nu < 4; nu++)
-            //  {
-            //    wf_plaq_weight[index * 16 + mu * 4 + nu] /= *wf_chi;
-            //    wf_plaq_weight[index * 16 + nu * 4 + mu] /= *wf_chi;
-            //  }
-          } //
+           } 
         }
 
 #else
@@ -104,7 +99,7 @@ void WF_free()
     free_gfield(ws_gf);
     free_gfield(ws_gf_tmp);
     free_gfield(Vprime);
-    free_gfield(u_gauge_backup);
+    free_gfield(Vtmp);
     if (wf_plaq_weight != NULL)
     {
 #ifdef PLAQ_WEIGHTS
@@ -154,7 +149,7 @@ static void Zeta(suNg_field *Zu, const suNg_field *U, const double alpha)
               _suNg_times_suNg_dagger(tmp1, *u1, *u2);
               _suNg_times_suNg_dagger(tmp2, tmp1, *u3);
 #ifdef PLAQ_WEIGHTS
-              _suNg_mul(tmp2, wf_plaq_weight[i * 16 + nu * 4 + mu], tmp2);
+#              _suNg_mul(tmp2, wf_plaq_weight[i * 16 + nu * 4 + mu], tmp2);
 #endif
               _suNg_add_assign(staple, tmp2);
 
@@ -264,7 +259,6 @@ double max_distance(suNg_field *V, suNg_field *Vprimel)
 int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, double *delta)
 {
 
-  suNg_field_copy(u_gauge_backup, u_gauge);
   double varepsilon, d;
 
   _MASTER_FOR(&glattice, ix)
@@ -272,17 +266,17 @@ int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, 
     for (int mu = 0; mu < 4; ++mu)
     {
       _suNg_zero(*_4FIELD_AT(ws_gf, ix, mu));
-      _suNg_zero(*_4FIELD_AT(ws_gf_tmp, ix, mu));
+ //     _suNg_zero(*_4FIELD_AT(ws_gf_tmp, ix, mu));
     }
   }
 
-  start_gf_sendrecv(V);
-  complete_gf_sendrecv(V);
+  start_gf_sendrecv(Vtmp);
+  complete_gf_sendrecv(Vtmp);
 #if defined(ROTATED_SF) || defined(BASIC_SF)
   apply_BCs_on_fundamental_gauge_field();
 #endif
 
-  Zeta(ws_gf, V, *epsilon / 4.); //ws_gf = Z0/4
+  Zeta(ws_gf, Vtmp, *epsilon / 4.); //ws_gf = Z0/4
 
   _MASTER_FOR(&glattice, ix)
   {
@@ -290,21 +284,21 @@ int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, 
     for (int mu = 0; mu < 4; ++mu)
     {
       WF_Exp(&utmp[0], _4FIELD_AT(ws_gf, ix, mu));
-      _suNg_times_suNg(utmp[1], utmp[0], *_4FIELD_AT(V, ix, mu));
-      *_4FIELD_AT(V, ix, mu) = utmp[1];                                             // V = exp(Z0/4) W0
+      _suNg_times_suNg(utmp[1], utmp[0], *_4FIELD_AT(Vtmp, ix, mu));
+      *_4FIELD_AT(Vtmp, ix, mu) = utmp[1];                                             // Vtmp = exp(Z0/4) W0
       _suNg_mul(*_4FIELD_AT(ws_gf_tmp, ix, mu), -4., *_4FIELD_AT(ws_gf, ix, mu));   //ws_gf_tmp = -Z0
       _suNg_mul(*_4FIELD_AT(ws_gf, ix, mu), -17. / 9., *_4FIELD_AT(ws_gf, ix, mu)); //ws_gf =  -17*Z0/36
     }
   }
 
-  start_gf_sendrecv(V);
-  complete_gf_sendrecv(V);
+  start_gf_sendrecv(Vtmp);
+  complete_gf_sendrecv(Vtmp);
 #if defined(ROTATED_SF) || defined(BASIC_SF)
   apply_BCs_on_fundamental_gauge_field();
 #endif
 
-  Zeta(ws_gf, V, 8. * *epsilon / 9.); // ws_gf = 8 Z1 /9 - 17 Z0/36
-  Zeta(ws_gf_tmp, V, 2. * *epsilon);  // ws_gf_tmp = 2 Z1 - Z0
+  Zeta(ws_gf, Vtmp, 8. * *epsilon / 9.); // ws_gf = 8 Z1 /9 - 17 Z0/36
+  Zeta(ws_gf_tmp, Vtmp, 2. * *epsilon);  // ws_gf_tmp = 2 Z1 - Z0
 
   _MASTER_FOR(&glattice, ix)
   {
@@ -313,16 +307,16 @@ int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, 
     {
       WF_Exp(&utmp[0], _4FIELD_AT(ws_gf, ix, mu));
       WF_Exp(&utmp[2], _4FIELD_AT(ws_gf_tmp, ix, mu));
-      _suNg_times_suNg(utmp[1], utmp[0], *_4FIELD_AT(V, ix, mu)); // utmp[1] = exp(8 Z1/9 - 17 Z0/36) W1
-      _suNg_times_suNg(utmp[3], utmp[2], *_4FIELD_AT(V, ix, mu)); // utmp[4] = exp( Z1 -  Z0) W1
-      *_4FIELD_AT(V, ix, mu) = utmp[1];
-      *_4FIELD_AT(Vprime, ix, mu) = utmp[3];
+      _suNg_times_suNg(utmp[1], utmp[0], *_4FIELD_AT(Vtmp, ix, mu)); // utmp[1] = exp(8 Z1/9 - 17 Z0/36) W1
+      _suNg_times_suNg(utmp[3], utmp[2], *_4FIELD_AT(Vtmp, ix, mu)); // utmp[4] = exp( Z1 -  Z0) W1
+      *_4FIELD_AT(Vtmp, ix, mu) = utmp[1];
+      *_4FIELD_AT(Vtmpprime, ix, mu) = utmp[3];
       _suNg_mul(*_4FIELD_AT(ws_gf, ix, mu), -1., *_4FIELD_AT(ws_gf, ix, mu));
     }
   }
 
-  start_gf_sendrecv(V);
-  complete_gf_sendrecv(V);
+  start_gf_sendrecv(Vtmp);
+  complete_gf_sendrecv(Vtmp);
 
   start_gf_sendrecv(Vprime);
   complete_gf_sendrecv(Vprime);
@@ -331,7 +325,7 @@ int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, 
   apply_BCs_on_fundamental_gauge_field();
 #endif
 
-  Zeta(ws_gf, V, 3. * *epsilon / 4.);
+  Zeta(ws_gf, Vtmp, 3. * *epsilon / 4.);
 
   _MASTER_FOR(&glattice, ix)
   {
@@ -339,30 +333,30 @@ int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, 
     for (int mu = 0; mu < 4; ++mu)
     {
       WF_Exp(&utmp[0], _4FIELD_AT(ws_gf, ix, mu));
-      _suNg_times_suNg(utmp[1], utmp[0], *_4FIELD_AT(V, ix, mu));
-      *_4FIELD_AT(V, ix, mu) = utmp[1];
+      _suNg_times_suNg(utmp[1], utmp[0], *_4FIELD_AT(Vtmp, ix, mu));
+      *_4FIELD_AT(Vtmp, ix, mu) = utmp[1];
     }
   }
 
-  start_gf_sendrecv(V);
-  complete_gf_sendrecv(V);
+  start_gf_sendrecv(Vtmp);
+  complete_gf_sendrecv(Vtmp);
 #if defined(ROTATED_SF) || defined(BASIC_SF)
   apply_BCs_on_fundamental_gauge_field();
 #endif
 
   // now need to get the maximum of the distance
-  d = max_distance(V, Vprime);
+  d = max_distance(Vtmp, Vprime);
   varepsilon = *epsilon * pow(*delta / d, 1. / 3.);
 
   if (d > *delta)
   {
-    suNg_field_copy(u_gauge, u_gauge_backup);
     *epsilon_new = 0.5 * varepsilon;
-    lprintf("WARNING", 0, "d > delta : must repeat the calculation with epsilon=%lf\n", *epsilon_new);
+    lprintf("WILSONFLOW", 20, "d > delta : must repeat the calculation with epsilon=%lf\n", *epsilon_new);
     return 1 == 0;
   }
   else
   {
+    suNg_field_copy(Vtmp, V);
 
     if (varepsilon < 1.0)
       *epsilon_new = 0.95 * varepsilon;
@@ -485,7 +479,11 @@ double WF_E(suNg_field *V)
       for (int nu = mu + 1; nu < 4; nu++)
       {
         WF_plaq(&p, V, ix, mu, nu);
-        E += ((double)NG) - p;
+#ifdef PLAQ_WEIGHTS
+        E += ((double)(NG)) * plaq_weight[ix * 16 + nu * 4 + mu] - p;
+#else
+        E += NG - p;
+#endif
       }
   }
 
@@ -562,7 +560,7 @@ static void WF_clover_F(suNg_algebra_vector *F, suNg_field *V, int ix, int mu, i
   _suNg_times_suNg_dagger(w2, w1, (*v3));
   _suNg_times_suNg_dagger(w1, w2, (*v4));
 #ifdef PLAQ_WEIGHTS
-  _suNg_mul(w1, wf_plaq_weight[ix * 16 + nu * 4 + mu], w1);
+//  _suNg_mul(w1, plaq_weight[ix * 16 + nu * 4 + mu], w1);
 #endif
   _suNg_add_assign(w3, w1);
 
@@ -578,7 +576,7 @@ static void WF_clover_F(suNg_algebra_vector *F, suNg_field *V, int ix, int mu, i
   _suNg_times_suNg_dagger(w2, w1, (*v3));
   _suNg_times_suNg(w1, w2, (*v4));
 #ifdef PLAQ_WEIGHTS
-  _suNg_mul(w1, wf_plaq_weight[iy * 16 + nu * 4 + mu], w1);
+//  _suNg_mul(w1, plaq_weight[iy * 16 + nu * 4 + mu], w1);
 #endif
   _suNg_add_assign(w3, w1);
 
@@ -595,8 +593,7 @@ static void WF_clover_F(suNg_algebra_vector *F, suNg_field *V, int ix, int mu, i
   _suNg_dagger_times_suNg(w2, w1, (*v3));
   _suNg_times_suNg(w1, w2, (*v4));
 #ifdef PLAQ_WEIGHTS
-  _suNg_mul(w1, wf_plaq_weight[iz * 16 + nu * 4 + mu], w1);
-
+//  _suNg_mul(w1, plaq_weight[iz * 16 + nu * 4 + mu], w1);
 #endif
   _suNg_add_assign(w3, w1);
 
@@ -612,7 +609,7 @@ static void WF_clover_F(suNg_algebra_vector *F, suNg_field *V, int ix, int mu, i
   _suNg_times_suNg(w2, w1, (*v3));
   _suNg_times_suNg_dagger(w1, w2, (*v4));
 #ifdef PLAQ_WEIGHTS
-  _suNg_mul(w1, wf_plaq_weight[iy * 16 + nu * 4 + mu], w1);
+//  _suNg_mul(w1, plaq_weight[iy * 16 + nu * 4 + mu], w1);
 #endif
   _suNg_add_assign(w3, w1);
 
@@ -875,7 +872,6 @@ data_storage_array *WF_update_and_measure(WF_integrator_type wft, suNg_field *V,
     if (t + epsilon > (double)k * dt)
       epsilon = (double)k * dt - t;
 
-    lprintf("AAA", 0, "entered with eps=%lf\n", epsilon);
     switch (wft)
     {
     case EUL:
@@ -891,10 +887,8 @@ data_storage_array *WF_update_and_measure(WF_integrator_type wft, suNg_field *V,
     case RK3_ADAPTIVE:
       while (!WilsonFlow3_adaptative(V, &epsilon, &epsilon_new, delta))
       {
-        lprintf("AAA", 0, "not accepted, change to eps=%lf\n", epsilon_new);
         epsilon = epsilon_new;
       }
-      lprintf("AAA", 0, "accepted, step of eps=%lf next eps=%lf\n", epsilon, epsilon_new);
 
       t += epsilon;
       epsilon = epsilon_new;
@@ -906,7 +900,6 @@ data_storage_array *WF_update_and_measure(WF_integrator_type wft, suNg_field *V,
       if ((double)k * dt - t < 1.e-10)
       {
         k++;
-        lprintf("AAA", 0, "measure eps=%lf and meas_eps=%lf\n", epsilon, epsilon_meas);
 
         WF_measure_and_store(V, swc, &ret, nmeas, k, &t);
         if (epsilon_meas > epsilon)
@@ -918,7 +911,6 @@ data_storage_array *WF_update_and_measure(WF_integrator_type wft, suNg_field *V,
       {
         epsilon_meas = epsilon;
         epsilon = (double)k * dt - t;
-        lprintf("AAA", 0, "shift for next measure eps=%lf\n", epsilon);
       }
     }
   }
