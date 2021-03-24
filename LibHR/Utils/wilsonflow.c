@@ -78,7 +78,7 @@ void WF_set_bare_anisotropy(double *wf_chi)
           if (index != -1)
           {
             nu = 0;
-            for (nu = mu + 1; nu < 4; nu++)
+            for (mu = nu + 1; mu < 4; mu++)
             {
               wf_plaq_weight[index * 16 + nu * 4 + mu] *= *wf_chi * *wf_chi;
             }
@@ -258,23 +258,24 @@ int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, 
 {
 
   double varepsilon, d;
+  suNg_field_copy(Vtmp, V);
 
   _MASTER_FOR(&glattice, ix)
   {
     for (int mu = 0; mu < 4; ++mu)
     {
       _suNg_zero(*_4FIELD_AT(ws_gf, ix, mu));
-      //     _suNg_zero(*_4FIELD_AT(ws_gf_tmp, ix, mu));
+      _suNg_zero(*_4FIELD_AT(ws_gf_tmp, ix, mu));
     }
   }
 
-  start_gf_sendrecv(Vtmp);
-  complete_gf_sendrecv(Vtmp);
+  start_gf_sendrecv(V);
+  complete_gf_sendrecv(V);
 #if defined(ROTATED_SF) || defined(BASIC_SF)
   apply_BCs_on_fundamental_gauge_field();
 #endif
 
-  Zeta(ws_gf, Vtmp, *epsilon / 4.); //ws_gf = Z0/4
+  Zeta(ws_gf, V, *epsilon / 4.); //ws_gf = Z0/4
 
   _MASTER_FOR(&glattice, ix)
   {
@@ -282,21 +283,21 @@ int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, 
     for (int mu = 0; mu < 4; ++mu)
     {
       WF_Exp(&utmp[0], _4FIELD_AT(ws_gf, ix, mu));
-      _suNg_times_suNg(utmp[1], utmp[0], *_4FIELD_AT(Vtmp, ix, mu));
-      *_4FIELD_AT(Vtmp, ix, mu) = utmp[1];                                          // Vtmp = exp(Z0/4) W0
+      _suNg_times_suNg(utmp[1], utmp[0], *_4FIELD_AT(V, ix, mu));
+      *_4FIELD_AT(V, ix, mu) = utmp[1];                                          // V = exp(Z0/4) W0
       _suNg_mul(*_4FIELD_AT(ws_gf_tmp, ix, mu), -4., *_4FIELD_AT(ws_gf, ix, mu));   //ws_gf_tmp = -Z0
       _suNg_mul(*_4FIELD_AT(ws_gf, ix, mu), -17. / 9., *_4FIELD_AT(ws_gf, ix, mu)); //ws_gf =  -17*Z0/36
     }
   }
 
-  start_gf_sendrecv(Vtmp);
-  complete_gf_sendrecv(Vtmp);
+  start_gf_sendrecv(V);
+  complete_gf_sendrecv(V);
 #if defined(ROTATED_SF) || defined(BASIC_SF)
   apply_BCs_on_fundamental_gauge_field();
 #endif
 
-  Zeta(ws_gf, Vtmp, 8. * *epsilon / 9.); // ws_gf = 8 Z1 /9 - 17 Z0/36
-  Zeta(ws_gf_tmp, Vtmp, 2. * *epsilon);  // ws_gf_tmp = 2 Z1 - Z0
+  Zeta(ws_gf, V, 8. * *epsilon / 9.); // ws_gf = 8 Z1 /9 - 17 Z0/36
+  Zeta(ws_gf_tmp, V, 2. * *epsilon);  // ws_gf_tmp = 2 Z1 - Z0
 
   _MASTER_FOR(&glattice, ix)
   {
@@ -305,16 +306,16 @@ int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, 
     {
       WF_Exp(&utmp[0], _4FIELD_AT(ws_gf, ix, mu));
       WF_Exp(&utmp[2], _4FIELD_AT(ws_gf_tmp, ix, mu));
-      _suNg_times_suNg(utmp[1], utmp[0], *_4FIELD_AT(Vtmp, ix, mu)); // utmp[1] = exp(8 Z1/9 - 17 Z0/36) W1
-      _suNg_times_suNg(utmp[3], utmp[2], *_4FIELD_AT(Vtmp, ix, mu)); // utmp[4] = exp( Z1 -  Z0) W1
-      *_4FIELD_AT(Vtmp, ix, mu) = utmp[1];
+      _suNg_times_suNg(utmp[1], utmp[0], *_4FIELD_AT(V, ix, mu)); // utmp[1] = exp(8 Z1/9 - 17 Z0/36) W1
+      _suNg_times_suNg(utmp[3], utmp[2], *_4FIELD_AT(V, ix, mu)); // utmp[4] = exp( Z1 -  Z0) W1
+      *_4FIELD_AT(V, ix, mu) = utmp[1];
       *_4FIELD_AT(Vprime, ix, mu) = utmp[3];
       _suNg_mul(*_4FIELD_AT(ws_gf, ix, mu), -1., *_4FIELD_AT(ws_gf, ix, mu));
     }
   }
 
-  start_gf_sendrecv(Vtmp);
-  complete_gf_sendrecv(Vtmp);
+  start_gf_sendrecv(V);
+  complete_gf_sendrecv(V);
 
   start_gf_sendrecv(Vprime);
   complete_gf_sendrecv(Vprime);
@@ -323,7 +324,7 @@ int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, 
   apply_BCs_on_fundamental_gauge_field();
 #endif
 
-  Zeta(ws_gf, Vtmp, 3. * *epsilon / 4.);
+  Zeta(ws_gf, V, 3. * *epsilon / 4.);
 
   _MASTER_FOR(&glattice, ix)
   {
@@ -331,30 +332,30 @@ int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, 
     for (int mu = 0; mu < 4; ++mu)
     {
       WF_Exp(&utmp[0], _4FIELD_AT(ws_gf, ix, mu));
-      _suNg_times_suNg(utmp[1], utmp[0], *_4FIELD_AT(Vtmp, ix, mu));
-      *_4FIELD_AT(Vtmp, ix, mu) = utmp[1];
+      _suNg_times_suNg(utmp[1], utmp[0], *_4FIELD_AT(V, ix, mu));
+      *_4FIELD_AT(V, ix, mu) = utmp[1];
     }
   }
 
-  start_gf_sendrecv(Vtmp);
-  complete_gf_sendrecv(Vtmp);
+  start_gf_sendrecv(V);
+  complete_gf_sendrecv(V);
 #if defined(ROTATED_SF) || defined(BASIC_SF)
   apply_BCs_on_fundamental_gauge_field();
 #endif
 
   // now need to get the maximum of the distance
-  d = max_distance(Vtmp, Vprime);
+  d = max_distance(V, Vprime);
   varepsilon = *epsilon * pow(*delta / d, 1. / 3.);
 
   if (d > *delta)
   {
+    suNg_field_copy(V, Vtmp);
     *epsilon_new = 0.5 * varepsilon;
     lprintf("WILSONFLOW", 20, "d > delta : must repeat the calculation with epsilon=%lf\n", *epsilon_new);
     return 1 == 0;
   }
   else
   {
-    suNg_field_copy(Vtmp, V);
 
     if (varepsilon < 1.0)
       *epsilon_new = 0.95 * varepsilon;
