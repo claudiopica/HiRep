@@ -38,8 +38,6 @@ void WF_initialize()
     Vprime = alloc_gfield(&glattice);
     Vtmp = alloc_gfield(&glattice);
 
-
-
 #if defined(PLAQ_WEIGHTS)
 #ifdef PURE_GAUGE_ANISOTROPY
     //int ix, iy, iz, index, mu, nu;
@@ -84,7 +82,7 @@ void WF_set_bare_anisotropy(double *wf_chi)
             {
               wf_plaq_weight[index * 16 + nu * 4 + mu] *= *wf_chi * *wf_chi;
             }
-           } 
+          }
         }
 
 #else
@@ -149,7 +147,7 @@ static void Zeta(suNg_field *Zu, const suNg_field *U, const double alpha)
               _suNg_times_suNg_dagger(tmp1, *u1, *u2);
               _suNg_times_suNg_dagger(tmp2, tmp1, *u3);
 #ifdef PLAQ_WEIGHTS
-#              _suNg_mul(tmp2, wf_plaq_weight[i * 16 + nu * 4 + mu], tmp2);
+              _suNg_mul(tmp2, wf_plaq_weight[i * 16 + nu * 4 + mu], tmp2);
 #endif
               _suNg_add_assign(staple, tmp2);
 
@@ -266,7 +264,7 @@ int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, 
     for (int mu = 0; mu < 4; ++mu)
     {
       _suNg_zero(*_4FIELD_AT(ws_gf, ix, mu));
- //     _suNg_zero(*_4FIELD_AT(ws_gf_tmp, ix, mu));
+      //     _suNg_zero(*_4FIELD_AT(ws_gf_tmp, ix, mu));
     }
   }
 
@@ -285,7 +283,7 @@ int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, 
     {
       WF_Exp(&utmp[0], _4FIELD_AT(ws_gf, ix, mu));
       _suNg_times_suNg(utmp[1], utmp[0], *_4FIELD_AT(Vtmp, ix, mu));
-      *_4FIELD_AT(Vtmp, ix, mu) = utmp[1];                                             // Vtmp = exp(Z0/4) W0
+      *_4FIELD_AT(Vtmp, ix, mu) = utmp[1];                                          // Vtmp = exp(Z0/4) W0
       _suNg_mul(*_4FIELD_AT(ws_gf_tmp, ix, mu), -4., *_4FIELD_AT(ws_gf, ix, mu));   //ws_gf_tmp = -Z0
       _suNg_mul(*_4FIELD_AT(ws_gf, ix, mu), -17. / 9., *_4FIELD_AT(ws_gf, ix, mu)); //ws_gf =  -17*Z0/36
     }
@@ -310,7 +308,7 @@ int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, 
       _suNg_times_suNg(utmp[1], utmp[0], *_4FIELD_AT(Vtmp, ix, mu)); // utmp[1] = exp(8 Z1/9 - 17 Z0/36) W1
       _suNg_times_suNg(utmp[3], utmp[2], *_4FIELD_AT(Vtmp, ix, mu)); // utmp[4] = exp( Z1 -  Z0) W1
       *_4FIELD_AT(Vtmp, ix, mu) = utmp[1];
-      *_4FIELD_AT(Vtmpprime, ix, mu) = utmp[3];
+      *_4FIELD_AT(Vprime, ix, mu) = utmp[3];
       _suNg_mul(*_4FIELD_AT(ws_gf, ix, mu), -1., *_4FIELD_AT(ws_gf, ix, mu));
     }
   }
@@ -515,21 +513,13 @@ void WF_E_T(double *E, suNg_field *V)
           for (nu = 1; nu < 4; nu++)
           {
             WF_plaq(&p, V, ix, mu, nu);
-#ifdef PLAQ_WEIGHTS
-            E[2 * gt] += ((double)(NG)) * plaq_weight[ix * 16 + nu * 4 + mu] - p;
-#else
             E[2 * gt] += NG - p;
-#endif
           }
           for (mu = 1; mu < 3; mu++)
             for (nu = mu + 1; nu < 4; nu++)
             {
               WF_plaq(&p, V, ix, mu, nu);
-#ifdef PLAQ_WEIGHTS
-              E[2 * gt + 1] += ((double)(NG)) * plaq_weight[ix * 16 + nu * 4 + mu] - p;
-#else
               E[2 * gt + 1] += NG - p;
-#endif
             }
         }
     E[2 * gt] /= (3. * GLB_VOL3);
@@ -559,9 +549,6 @@ static void WF_clover_F(suNg_algebra_vector *F, suNg_field *V, int ix, int mu, i
   _suNg_times_suNg(w1, (*v1), (*v2));
   _suNg_times_suNg_dagger(w2, w1, (*v3));
   _suNg_times_suNg_dagger(w1, w2, (*v4));
-#ifdef PLAQ_WEIGHTS
-//  _suNg_mul(w1, plaq_weight[ix * 16 + nu * 4 + mu], w1);
-#endif
   _suNg_add_assign(w3, w1);
 
   iy = idn(ix, mu);
@@ -575,9 +562,6 @@ static void WF_clover_F(suNg_algebra_vector *F, suNg_field *V, int ix, int mu, i
   _suNg_times_suNg_dagger(w1, (*v1), (*v2));
   _suNg_times_suNg_dagger(w2, w1, (*v3));
   _suNg_times_suNg(w1, w2, (*v4));
-#ifdef PLAQ_WEIGHTS
-//  _suNg_mul(w1, plaq_weight[iy * 16 + nu * 4 + mu], w1);
-#endif
   _suNg_add_assign(w3, w1);
 
   iy = idn(ix, mu);
@@ -592,9 +576,6 @@ static void WF_clover_F(suNg_algebra_vector *F, suNg_field *V, int ix, int mu, i
   _suNg_times_suNg(w1, (*v2), (*v1));
   _suNg_dagger_times_suNg(w2, w1, (*v3));
   _suNg_times_suNg(w1, w2, (*v4));
-#ifdef PLAQ_WEIGHTS
-//  _suNg_mul(w1, plaq_weight[iz * 16 + nu * 4 + mu], w1);
-#endif
   _suNg_add_assign(w3, w1);
 
   iy = idn(ix, nu);
@@ -608,9 +589,6 @@ static void WF_clover_F(suNg_algebra_vector *F, suNg_field *V, int ix, int mu, i
   _suNg_dagger_times_suNg(w1, (*v1), (*v2));
   _suNg_times_suNg(w2, w1, (*v3));
   _suNg_times_suNg_dagger(w1, w2, (*v4));
-#ifdef PLAQ_WEIGHTS
-//  _suNg_mul(w1, plaq_weight[iy * 16 + nu * 4 + mu], w1);
-#endif
   _suNg_add_assign(w3, w1);
 
   _fund_algebra_project(*F, w3);
