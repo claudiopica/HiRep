@@ -19,22 +19,43 @@
 
 #ifndef WITH_QUATERNIONS
 
+
+#ifndef WITH_QUATERNIONS
+
 static inline void rotate(suNg_vector *pu1, suNg_vector *pu2, double *s)
 {
   int i;
+  double complex z1,z2;
   double complex *cu1, *cu2;
-
+  
   cu1 = &((*pu1).c[0]);
   cu2 = &((*pu2).c[0]);
-
-  for (i = 0; i < NG; ++i)
-  {
-    (*cu1) = s[0] * (*cu1) + I * s[1] * (*cu2) + s[2] * (*cu2) + I * s[3] * (*cu1);
-    (*cu2) = s[0] * (*cu2) + I * s[1] * (*cu1) - s[2] * (*cu1) - I * s[3] * (*cu2);
+  
+  for (i=0; i<NG; ++i) {
+    z1=s[0]*creal(*cu1)-s[1]*cimag(*cu2)+s[2]*creal(*cu2)-s[3]*cimag(*cu1)+I*(s[0]*cimag(*cu1)+s[1]*creal(*cu2)+s[2]*cimag(*cu2)+s[3]*creal(*cu1));
+    z2=s[0]*creal(*cu2)-s[1]*cimag(*cu1)-s[2]*creal(*cu1)+s[3]*cimag(*cu2)+I*(s[0]*cimag(*cu2)+s[1]*creal(*cu1)-s[2]*cimag(*cu1)-s[3]*creal(*cu2));
+    (*cu1) = z1;
+    (*cu2) = z2;
     ++cu1;
     ++cu2;
   }
 }
+//static inline void rotate(suNg_vector *pu1, suNg_vector *pu2, double *s)
+//{
+//  int i;
+//  double complex *cu1, *cu2;
+//
+//  cu1 = &((*pu1).c[0]);
+//  cu2 = &((*pu2).c[0]);
+//
+//  for (i = 0; i < NG; ++i)
+//  {
+//    (*cu1) = s[0] * (*cu1) + I * s[1] * (*cu2) + s[2] * (*cu2) + I * s[3] * (*cu1);
+//    (*cu2) = s[0] * (*cu2) + I * s[1] * (*cu1) - s[2] * (*cu1) - I * s[3] * (*cu2);
+//    ++cu1;
+//    ++cu2;
+//  }
+//}
 
 static inline void wmatrix(suNg_vector *pu1, suNg_vector *pu2, suNg_vector *pv1, suNg_vector *pv2, double *w)
 {
