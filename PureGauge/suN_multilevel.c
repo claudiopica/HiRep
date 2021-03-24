@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
       if (Vwf == NULL)
         Vwf = alloc_gfield(&glattice);
       gettimeofday(&start, 0);
-      suNg_field_copy(u_gauge, Vwf);
+      suNg_field_copy(Vwf,u_gauge);
       WF_update_and_measure(RK3_ADAPTIVE, Vwf, &(flow.wf->tmax), &(flow.wf->eps), &(flow.wf->delta), flow.wf->nmeas, DONTSTORE);
       gettimeofday(&end, 0);
       timeval_subtract(&etime, &end, &start);
