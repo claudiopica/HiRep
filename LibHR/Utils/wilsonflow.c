@@ -462,9 +462,6 @@ static void WF_plaq(double *ret, suNg_field *V, int ix, int mu, int nu)
 
   _suNg_trace_re(*ret, w3);
 
-#ifdef PLAQ_WEIGHTS
-  *ret *= plaq_weight[ix * 16 + nu * 4 + mu];
-#endif
 }
 
 double WF_E(suNg_field *V)
@@ -478,11 +475,7 @@ double WF_E(suNg_field *V)
       for (int nu = mu + 1; nu < 4; nu++)
       {
         WF_plaq(&p, V, ix, mu, nu);
-#ifdef PLAQ_WEIGHTS
-        E += ((double)(NG)) * plaq_weight[ix * 16 + nu * 4 + mu] - p;
-#else
         E += NG - p;
-#endif
       }
   }
 
@@ -523,8 +516,8 @@ void WF_E_T(double *E, suNg_field *V)
               E[2 * gt + 1] += NG - p;
             }
         }
-    E[2 * gt] /= (3. * GLB_VOL3);
-    E[2 * gt + 1] /= (3. * GLB_VOL3);
+    E[2 * gt] /= 0.5*(GLB_VOL3);
+    E[2 * gt + 1] /= 0.5*(GLB_VOL3);
   }
 
   global_sum(E, 2 * GLB_T);
@@ -654,8 +647,8 @@ void WF_Esym_T(double *E, suNg_field *V)
               E[2 * gt + 1] += p;
             }
         }
-    E[2 * gt] *= _FUND_NORM2 / (6. * GLB_VOL3);
-    E[2 * gt + 1] *= _FUND_NORM2 / (6. * GLB_VOL3);
+    E[2 * gt] *= _FUND_NORM2 / (GLB_VOL3);
+    E[2 * gt + 1] *= _FUND_NORM2 / (GLB_VOL3);
   }
 
   global_sum(E, 2 * GLB_T);

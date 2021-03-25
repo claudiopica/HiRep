@@ -177,7 +177,6 @@ int init_mc(pg_flow *gf, char *ifile)
 
     lprintf("INIT", 0, "Separation between each measure=%d\n", gf->nit);
 
-
     BCs_pars_t BCs_pars = {
         .fermion_twisting_theta = {0., 0., 0., 0.},
         .gauge_boundary_improvement_cs = 1.,
@@ -220,12 +219,8 @@ int init_mc(pg_flow *gf, char *ifile)
     lprintf("INIT WF", 0, "WF initial epsilon=%lf\n", WF_var.eps);
     lprintf("INIT WF", 0, "WF delta=%lf\n", WF_var.delta);
     lprintf("INIT WF", 0, "WF integrator type: %d (0=Euler 1=3rd order Runge-Kutta 2=Adaptive 3rd order Runge-Kutta)\n", WF_var.ittype);
-
-    if (fabs(WF_var.anisotropy - 1) > 1.e-14)
-    {
-        lprintf("INIT WF", 0, "WF anisotropy=%lf\n", WF_var.anisotropy);
-        WF_set_bare_anisotropy(&(WF_var.anisotropy));
-    }
+    WF_set_bare_anisotropy(&(WF_var.anisotropy));
+    lprintf("INIT WF", 0, "WF anisotropy=%lf\n", WF_var.anisotropy);
 
     return 0;
 }
