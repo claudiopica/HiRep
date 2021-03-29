@@ -40,14 +40,14 @@ void WF_initialize()
 
 #if defined(PLAQ_WEIGHTS)
 #ifdef PURE_GAUGE_ANISOTROPY
-    //int ix, iy, iz, index, mu, nu;
     wf_plaq_weight = malloc(sizeof(double) * glattice.gsize_gauge * 16);
     for (int i = 0; i < 16 * glattice.gsize_gauge; i++)
     {
       wf_plaq_weight[i] = 1.0;
     }
-
+#ifdef BC_T_OPEN
     init_plaq_open_BCs(wf_plaq_weight, NULL, 1.0, 1.0);
+#endif
 
 #else
     wf_plaq_weight = plaq_weight;
@@ -62,12 +62,6 @@ void WF_set_bare_anisotropy(double *wf_chi)
 #ifdef PURE_GAUGE_ANISOTROPY
   WF_initialize();
   int ix, iy, iz, it, index, mu, nu;
-  if (wf_plaq_weight == NULL)
-  {
-    wf_plaq_weight = malloc(sizeof(double) * glattice.gsize_gauge * 16);
-    for (index = 0; index < glattice.gsize_gauge * 16; index++)
-      wf_plaq_weight[index] = 1.0;
-  }
 
   for (it = 0; it < T_EXT; ++it)
     for (ix = 0; ix < X_EXT; ++ix)
@@ -284,7 +278,7 @@ int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, 
     {
       WF_Exp(&utmp[0], _4FIELD_AT(ws_gf, ix, mu));
       _suNg_times_suNg(utmp[1], utmp[0], *_4FIELD_AT(V, ix, mu));
-      *_4FIELD_AT(V, ix, mu) = utmp[1];                                          // V = exp(Z0/4) W0
+      *_4FIELD_AT(V, ix, mu) = utmp[1];                                             // V = exp(Z0/4) W0
       _suNg_mul(*_4FIELD_AT(ws_gf_tmp, ix, mu), -4., *_4FIELD_AT(ws_gf, ix, mu));   //ws_gf_tmp = -Z0
       _suNg_mul(*_4FIELD_AT(ws_gf, ix, mu), -17. / 9., *_4FIELD_AT(ws_gf, ix, mu)); //ws_gf =  -17*Z0/36
     }
@@ -461,7 +455,6 @@ static void WF_plaq(double *ret, suNg_field *V, int ix, int mu, int nu)
   _suNg_times_suNg_dagger(w3, w1, w2);
 
   _suNg_trace_re(*ret, w3);
-
 }
 
 double WF_E(suNg_field *V)
@@ -516,8 +509,8 @@ void WF_E_T(double *E, suNg_field *V)
               E[2 * gt + 1] += NG - p;
             }
         }
-    E[2 * gt] /= 0.5*(GLB_VOL3);
-    E[2 * gt + 1] /= 0.5*(GLB_VOL3);
+    E[2 * gt] /= 0.5 * (GLB_VOL3);
+    E[2 * gt + 1] /= 0.5 * (GLB_VOL3);
   }
 
   global_sum(E, 2 * GLB_T);
