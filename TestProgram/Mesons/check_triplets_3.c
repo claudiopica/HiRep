@@ -13,7 +13,6 @@
 #define MAIN_PROGRAM
 
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
 #include <math.h>
 #include "io.h"
@@ -49,7 +48,9 @@ static double g1[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};  /* g1 
 static double g2[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};  /* g2 = tr gamma_2 \bar{Gamma} gamma_2 Gamma / 4 */
 static double g3[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};  /* g3 = tr gamma_3 \bar{Gamma} gamma_3 Gamma / 4 */
 static double gb[16] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+
 char *mes_channel_names[16] = {"g5", "id", "g0", "g1", "g2", "g3", "g0g1", "g0g2", "g0g3", "g0g5", "g5g1", "g5g2", "g5g3", "g0g5g1", "g0g5g2", "g0g5g3"};
+
 
 #define mult_mat(r, A, B)                      \
   {                                            \
@@ -102,18 +103,6 @@ static void adj_mat(double complex At[4][4], double complex A[4][4])
   }
 }
 
-/*VD: This is kept to to some debugging.
-  static void print_mat(double complex mat[4][4], const char name[]) {
-    int i,j;
-    lprintf("MAIN",0,"%s = \n", name);
-    for(i=0; i<4; i++) {
-        lprintf("MAIN",0,"[ ");
-          for(j=0; j<4; j++) {
-            lprintf("MAIN",0,"(%.2f,%.2f) ",creal(mat[i][j]),cimag(mat[i][j]));
-          }
-          lprintf("MAIN",0,"]\n");
-        }
-      }*/
 /* Mesons parameters */
 typedef struct _input_mesons
 {
@@ -149,19 +138,17 @@ double complex get_gid(double complex Gamma[4][4])
   double complex Gammabar[4][4];
   int sign;
   double complex r;
-  double complex g0[4][4];
-  g0_debug(g0, &sign);
+  double complex lg0[4][4];
+  g0_debug(lg0, &sign);
 
   adj_mat(tmp, Gamma);
-  mult_mat(tmp2, g0, tmp);
-  mult_mat(Gammabar, tmp2, g0);
+  mult_mat(tmp2, lg0, tmp);
+  mult_mat(Gammabar, tmp2, lg0);
   mult_mat(tmp, Gammabar, Gamma);
   trace_mat(r, tmp);
   return r / 4.0;
 }
-char char_t[100];
-FILE *fp;
-char path[1035];
+
 
 /* = tr gamma_mu \bar{Gamma} gamma_mu Gamma / 4 \bar{Gamma} = gamma_0 Gamma^\dagger gamma_0 */
 double complex get_gmu(double complex Gamma[4][4], int mu)
@@ -170,9 +157,9 @@ double complex get_gmu(double complex Gamma[4][4], int mu)
   double complex tmp[4][4], tmp2[4][4], tmp3[4][4];
   double complex Gammabar[4][4];
   double complex r;
-  double complex g0[4][4], gmu[4][4];
+  double complex lg0[4][4], gmu[4][4];
 
-  g0_debug(g0, &sign);
+  g0_debug(lg0, &sign);
   if (mu == 1)
     g1_debug(gmu, &sign);
   if (mu == 2)
@@ -183,15 +170,14 @@ double complex get_gmu(double complex Gamma[4][4], int mu)
     g0_debug(gmu, &sign);
   adj_mat(tmp, Gamma);
 
-  mult_mat(tmp2, g0, tmp);
-  mult_mat(Gammabar, tmp2, g0);
+  mult_mat(tmp2, lg0, tmp);
+  mult_mat(Gammabar, tmp2, lg0);
 
   mult_mat(tmp, gmu, Gammabar);
   mult_mat(tmp2, gmu, Gamma);
   mult_mat(tmp3, tmp, tmp2);
 
   trace_mat(r, tmp3);
-  //  printf("get_g1 %d %f %f \n",i,creal(r)/4.,cimag(r)/4.);
   return r / 4.0;
 }
 
@@ -202,9 +188,9 @@ double complex get_g0(double complex Gamma[4][4])
   set_zero_mat(tmp);
   mult_mat(tmp, Gamma, Gamma);
   trace_mat(r, tmp);
-  //printf("get_g0 %f %f \n",creal(r)/4.,cimag(r)/4.);
   return r / 4.0;
 }
+
 int main(int argc, char *argv[])
 {
   int i, t, sign;
@@ -231,9 +217,8 @@ int main(int argc, char *argv[])
   mult_mat(g[13], g[2], g[10]); //  g0g5g1
   mult_mat(g[14], g[2], g[11]); //  g0g5g2
   mult_mat(g[15], g[2], g[12]); //  g0g5g3
-
-  char *mes_channel_names[16] = {"g5", "id", "g0", "g1", "g2", "g3", "g0g1", "g0g2", "g0g3", "g0g5", "g5g1", "g5g2", "g5g3", "g0g5g1", "g0g5g2", "g0g5g3"};
-
+ 
+  
   for (i = 0; i < 16; i++)
   {
     gid[i] = get_gid(g[i]);
@@ -275,10 +260,7 @@ int main(int argc, char *argv[])
 
   error(!(GLB_X == GLB_Y && GLB_X == GLB_Z), 1, "main", "This test works only for GLB_X=GLB_Y=GLB_Z");
 
-  //int tau, int nm, double* m, int n_mom,int conf_num, double precision)
   measure_spectrum_pt(0, 1, &mass, 1, 0, 1e-28,STORE, &out_corr);
-
-  //   mean_loops[j] += (*data_storage_element(out_corr, 0, idx_re) + I * *data_storage_element(out_corr, 0, idx_im)) / (mes_ip.nhits * GLB_T);
   lprintf("MAIN", 0, "Checking results\n");
 
   double complex corr_triplets[16][GLB_T];

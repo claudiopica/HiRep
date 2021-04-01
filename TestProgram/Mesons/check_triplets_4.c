@@ -51,6 +51,9 @@ static double g3[16] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};  /* g3 
 static double gb[16] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 char *mes_channel_names[16] = {"g5", "id", "g0", "g1", "g2", "g3", "g0g1", "g0g2", "g0g3", "g0g5", "g5g1", "g5g2", "g5g3", "g0g5g1", "g0g5g2", "g0g5g3"};
 
+static double mass;
+void free_correlators(double **triplets);
+
 #define mult_mat(r, A, B)                      \
   {                                            \
     int _i, _j, _k;                            \
@@ -102,18 +105,6 @@ static void adj_mat(double complex At[4][4], double complex A[4][4])
   }
 }
 
-/*VD: This is kept to to some debugging.
-  static void print_mat(double complex mat[4][4], const char name[]) {
-    int i,j;
-    lprintf("MAIN",0,"%s = \n", name);
-    for(i=0; i<4; i++) {
-        lprintf("MAIN",0,"[ ");
-          for(j=0; j<4; j++) {
-            lprintf("MAIN",0,"(%.2f,%.2f) ",creal(mat[i][j]),cimag(mat[i][j]));
-          }
-          lprintf("MAIN",0,"]\n");
-        }
-      }*/
 /* Mesons parameters */
 typedef struct _input_mesons
 {
@@ -136,8 +127,6 @@ typedef struct _input_mesons
     }                                                                                                     \
   }
 
-static double mass;
-void free_correlators(double **triplets);
 
 input_glb glb_ip = init_input_glb(glb_ip);
 input_mesons mes_ip = init_input_mesons(mes_ip);
