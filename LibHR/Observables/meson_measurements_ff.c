@@ -30,6 +30,7 @@
 #include "spectrum.h"
 #include "gaugefix.h"
 #include "meson_observables.h"
+#include "data_storage.h"
 
 //The flavors are not degenerate, the pi field has opposite sign
 //We can to measure both separately and add together
@@ -90,7 +91,7 @@ static void flip_T_bc(int tau){
 *********************************/
 
 #define corr_ind(px,py,pz,n_mom,tc,nm,cm) ((px)*(n_mom)*(n_mom)*(24)*(nm)+(py)*(n_mom)*(24)*(nm)+(pz)*(24)*(nm)+ ((cm)*(24)) +(tc))
-void measure_spectrum_ff_pt(int tau, int nm, double* m, int n_mom,int conf_num, double precision){
+void measure_spectrum_ff_pt(int tau, int nm, double* m, int n_mom,int conf_num, double precision, storage_switch swc, data_storage_array **ret){
   spinor_field* source = alloc_spinor_field_f(4,&glattice);
   spinor_field* prop =  alloc_spinor_field_f(4*nm*NF,&glattice);
   init_propagator_ff_eo(nm, m, precision);
@@ -133,7 +134,7 @@ void measure_spectrum_ff_pt(int tau, int nm, double* m, int n_mom,int conf_num, 
 *	SEMWall Sources		*
 *********************************/
 
-void measure_spectrum_ff_semwall(int nm, double* m, int nhits,int conf_num, double precision){
+void measure_spectrum_ff_semwall(int nm, double* m, int nhits,int conf_num, double precision, storage_switch swc, data_storage_array **ret){
   spinor_field* source = alloc_spinor_field_f(4,&glattice);
   spinor_field* prop =  alloc_spinor_field_f(4*nm,&glattice);
   int tau,k;
@@ -159,7 +160,7 @@ void measure_spectrum_ff_semwall(int nm, double* m, int nhits,int conf_num, doub
 }
 
 
-void measure_spectrum_semwall_ff_ext(int nm, double* m, int nhits,int conf_num, double precision){
+void measure_spectrum_semwall_ff_ext(int nm, double* m, int nhits,int conf_num, double precision, storage_switch swc, data_storage_array **ret){
   int k,l,tau;
   spinor_field* source = alloc_spinor_field_f(4,&glat_even);
   spinor_field* prop_p = alloc_spinor_field_f(8*nm,&glattice);
@@ -212,7 +213,7 @@ void measure_spectrum_semwall_ff_ext(int nm, double* m, int nhits,int conf_num, 
 *	Disconnected Measurements	*
 *****************************************/
 
-void measure_spectrum_discon_ff_semwall(int nm, double* m, int nhits, int degree_hopping, int nhits_hopping,int conf_num, double precision){
+void measure_spectrum_discon_ff_semwall(int nm, double* m, int nhits, int degree_hopping, int nhits_hopping,int conf_num, double precision, storage_switch swc, data_storage_array **ret){
   spinor_field* source = alloc_spinor_field_f(4,&glattice);
   spinor_field* prop =  alloc_spinor_field_f(4*nm,&glattice);
   int k;

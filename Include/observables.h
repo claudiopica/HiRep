@@ -125,6 +125,7 @@ void free_meson_observables();
 void free_triplet_discon_observables();
 
 void measure_mesons_core(spinor_field *psi0, spinor_field *psi1, spinor_field *eta, meson_observable *mo, int nm, int tau, int n_mom, int offset, int lt);
+
 void measure_mesons(meson_observable *mo, spinor_field *psi0, spinor_field *eta, int nm, int tau);
 void measure_diquarks(meson_observable *mo, spinor_field *psi0, spinor_field *psi1, spinor_field *eta, int nm, int tau);
 void measure_conserved_currents(meson_observable *mo, spinor_field *psi0, spinor_field *eta, int nm, int tau);
@@ -133,6 +134,7 @@ void measure_point_mesons_momenta(meson_observable *mo, spinor_field *psi0, spin
 void measure_point_mesons_momenta_ext(meson_observable *mo, spinor_field *psi0, spinor_field *eta, int nm, int tau, int n_mom, int begin);
 void measure_formfactors(spinor_field *psi0, spinor_field *psi1, spinor_field *eta, int nm, int ti, int tf, int n_mom, int *pt);
 void measure_formfactors_ext(spinor_field *psi0, spinor_field *psi1, spinor_field *eta, int nm, int ti, int tf, int n_mom, int begin);
+
 void print_mesons(meson_observable *mo, double norm, int conf, int nm, double *mass, int lt, int n_mom, char *label);
 void print_formfactor(int conf, int nm, double *mass, int n_mom, char *label, int tf);
 void print_formfactor_ext(int conf, int nm, double *mass, int n_mom, char *label, int tf);
@@ -143,7 +145,7 @@ void measure_scattering_BC_core(meson_observable *mo, spinor_field *psi0, spinor
 void measure_renormalization(spinor_field *psi_in, spinor_field *psi_out, int nm, int pt_in, int px_in, int py_in, int pz_in, int pt_out, int px_out, int py_out, int pz_out);
 void print_renormalization(int conf, int nm, double *mass, char *label, int pt_in, int px_in, int py_in, int pz_in, int pt_out, int px_out, int py_out, int pz_out);
 
-void contract_baryons(spinor_field *psi0, int tau);
+void contract_baryons(spinor_field *psi0, int tau,storage_switch swc, data_storage_array **ret);
 void measure_glueballs();
 
 void id_correlator(double *out, int t0, spinor_field *qp);

@@ -148,7 +148,7 @@ void _propagator_baryon2_mul2(double complex C[4][4], suNf_propagator S, suNf_pr
 	}
 }
 
-void contract_baryons(spinor_field *psi0, int tau)
+void contract_baryons(spinor_field *psi0, int tau,storage_switch swc, data_storage_array **ret)
 {
 	int ix, tc, idx;
 

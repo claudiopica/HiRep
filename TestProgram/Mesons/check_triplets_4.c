@@ -38,7 +38,7 @@
 #include "spectrum.h"
 #include "clover_tools.h"
 #include "communications.h"
-#include "clover_tools.h"
+#include "data_storage.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338327950288419716939937510
@@ -306,7 +306,7 @@ int main(int argc, char *argv[])
   lprintf("MAIN", 0, "Zerocoord{%d,%d,%d,%d}\n", zerocoord[0], zerocoord[1], zerocoord[2], zerocoord[3]);
 
   error(!(GLB_X == GLB_Y && GLB_X == GLB_Z), 1, "main", "This test works only for GLB_X=GLB_Y=GLB_Z");
-  measure_spectrum_semwall(1, &mass, mes_ip.nhits_2pt, 0, 1e-28);
+  measure_spectrum_semwall(1, &mass, mes_ip.nhits_2pt, 0, 1e-28,DONTSTORE,NULL);
 
   double complex corr_triplets[16][GLB_T];
 

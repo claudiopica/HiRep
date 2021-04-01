@@ -30,8 +30,11 @@
 #include "spin_matrix.h"
 #include "propagator.h"
 #include "gaugefix.h"
+#include "data_storage.h"
+
+
 #if NG == 3
-void measure_baryons(double *m, int conf_num, double precision)
+void measure_baryons(double *m, int conf_num, double precision, storage_switch swc, data_storage_array **ret)
 {
 	// declare point sources and props
 	spinor_field *source = alloc_spinor_field_f(4 * NF, &glattice); //This isn't glat_even so that the odd sites will be set to zero explicitly
@@ -52,7 +55,7 @@ void measure_baryons(double *m, int conf_num, double precision)
 	calc_propagator(prop, source, 4 * NF); //4x3 for QCD
 
 	// perform contraction
-	contract_baryons(prop, tau);
+	contract_baryons(prop, tau, swc,ret);
 
 	// one should run the meson contraction as well here
 	//for (k=0;k<NF;++k){

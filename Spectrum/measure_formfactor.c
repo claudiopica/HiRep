@@ -31,6 +31,7 @@
 #include "communications.h"
 #include "gaugefix.h"
 #include "spectrum.h"
+#include "clover_tools.h"
 
 #include "cinfo.c"
 
@@ -314,10 +315,10 @@ int main(int argc,char *argv[]) {
     gettimeofday(&start,0);
 
     if (mes_var.ff_def_point){
-      measure_formfactor_pt(mes_var.ti, mes_var.tf, nm, m, mes_var.n_mom, i, mes_var.precision);
+      measure_formfactor_pt(mes_var.ti, mes_var.tf, nm, m, mes_var.n_mom, i, mes_var.precision,DONTSTORE, NULL);
     }
     if (mes_var.ff_fixed_point){
-      measure_formfactor_fixed(mes_var.ti, mes_var.tf, mes_var.dt,nm, m, mes_var.n_mom, i, mes_var.precision);
+      measure_formfactor_fixed(mes_var.ti, mes_var.tf, mes_var.dt,nm, m, mes_var.n_mom, i, mes_var.precision,DONTSTORE, NULL);
     }
 
     gettimeofday(&end,0);

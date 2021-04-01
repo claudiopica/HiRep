@@ -31,6 +31,7 @@
 #include "utils.h"
 #include "spectrum.h"
 #include "setup.h"
+#include "data_storage.h"
 
 /* Mesons parameters */
 typedef struct _input_mesons
@@ -260,7 +261,7 @@ int main(int argc, char *argv[])
       /* Mesons */
       if (strcmp(mes_var.make, "true") == 0)
       {
-        measure_spectrum_semwall(1, &mes_var.mesmass, mes_var.nhits, i, mes_var.precision);
+        measure_spectrum_semwall(1, &mes_var.mesmass, mes_var.nhits, i, mes_var.precision,DONTSTORE, NULL);
       }
 
       /* Four fermion observables */

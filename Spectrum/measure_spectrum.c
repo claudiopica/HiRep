@@ -32,6 +32,7 @@
 #include "clover_tools.h"
 #include "cinfo.c"
 #include "setup.h"
+#include "data_storage.h"
 
 #if defined(ROTATED_SF) && defined(BASIC_SF)
 #error This code does not work with the Schroedinger functional !!!
@@ -300,7 +301,7 @@ int main(int argc, char *argv[])
     // if non zero background field : apply abelian field and boundary correction. Then measure all plaquettes.
     if (mes_var.background_field)
     {
-      measure_diquark_semwall_background(nm, m, mes_var.nhits_2pt, i, mes_var.precision, mes_var.Q, mes_var.nEz);
+      measure_diquark_semwall_background(nm, m, mes_var.nhits_2pt, i, mes_var.precision, mes_var.Q, mes_var.nEz, DONTSTORE, NULL);
     }
     full_plaquette();
     gettimeofday(&start, 0);
@@ -314,16 +315,16 @@ int main(int argc, char *argv[])
 
       if (mes_var.def_semwall)
       {
-        measure_spectrum_semwall(nm, m, mes_var.nhits_2pt, i, mes_var.precision);
+        measure_spectrum_semwall(nm, m, mes_var.nhits_2pt, i, mes_var.precision,DONTSTORE, NULL);
       }
       if (mes_var.def_point)
       {
-        measure_spectrum_pt(tau, nm, m, mes_var.n_mom, i, mes_var.precision);
+        measure_spectrum_pt(tau, nm, m, mes_var.n_mom, i, mes_var.precision,DONTSTORE, NULL);
       }
       if (mes_var.def_baryon)
       {
 #if NG == 3
-        measure_baryons(m, i, mes_var.precision);
+        measure_baryons(m, i, mes_var.precision,DONTSTORE, NULL);
 #else
         error(1, 1, "main [measure_spectrum.c]", "contract_baryon not implemented for NG!=3");
 #endif
@@ -334,39 +335,39 @@ int main(int argc, char *argv[])
       }
       if (mes_var.def_gfwall)
       {
-        //       measure_spectrum_gfwall(nm,m,i,mes_var.precision);
+        //       measure_spectrum_gfwall(nm,m,i,mes_var.precision,DONTSTORE, NULL);
       }
       if (mes_var.ext_semwall)
       {
-        measure_spectrum_semwall_ext(nm, m, mes_var.nhits_2pt, i, mes_var.precision);
+        measure_spectrum_semwall_ext(nm, m, mes_var.nhits_2pt, i, mes_var.precision,DONTSTORE, NULL);
       }
       if (mes_var.ext_point)
       {
-        measure_spectrum_pt_ext(tau, nm, m, mes_var.n_mom, i, mes_var.precision);
+        measure_spectrum_pt_ext(tau, nm, m, mes_var.n_mom, i, mes_var.precision,DONTSTORE, NULL);
       }
       if (mes_var.fixed_semwall)
       {
-        measure_spectrum_semwall_fixedbc(mes_var.dt, nm, m, mes_var.nhits_2pt, i, mes_var.precision);
+        measure_spectrum_semwall_fixedbc(mes_var.dt, nm, m, mes_var.nhits_2pt, i, mes_var.precision,DONTSTORE, NULL);
       }
       if (mes_var.fixed_point)
       {
-        measure_spectrum_pt_fixedbc(tau, mes_var.dt, nm, m, mes_var.n_mom, i, mes_var.precision);
+        measure_spectrum_pt_fixedbc(tau, mes_var.dt, nm, m, mes_var.n_mom, i, mes_var.precision,DONTSTORE, NULL);
       }
       if (mes_var.fixed_gfwall)
       {
-        //       measure_spectrum_gfwall_fixedbc(mes_var.dt,nm,m,i,mes_var.precision);
+        //       measure_spectrum_gfwall_fixedbc(mes_var.dt,nm,m,i,mes_var.precision,DONTSTORE, NULL);
       }
       if (mes_var.discon_semwall)
       {
-        measure_spectrum_discon_semwall(nm, m, mes_var.nhits_disc, i, mes_var.precision);
+        measure_spectrum_discon_semwall(nm, m, mes_var.nhits_disc, i, mes_var.precision,DONTSTORE, NULL);
       }
       if (mes_var.discon_gfwall)
       {
-        //       measure_spectrum_discon_gfwall(nm,m,i,mes_var.precision);
+        //       measure_spectrum_discon_gfwall(nm,m,i,mes_var.precision,DONTSTORE, NULL);
       }
       if (mes_var.discon_volume)
       {
-        measure_spectrum_discon_volume(nm, m, i, mes_var.precision, mes_var.dilution);
+        measure_spectrum_discon_volume(nm, m, i, mes_var.precision, mes_var.dilution,DONTSTORE, NULL);
       }
     }
     else
@@ -374,19 +375,19 @@ int main(int argc, char *argv[])
       //With four fermion interactions
       if (mes_var.def_semwall)
       {
-        measure_spectrum_ff_semwall(nm, m, mes_var.nhits_2pt, i, mes_var.precision);
+        measure_spectrum_ff_semwall(nm, m, mes_var.nhits_2pt, i, mes_var.precision,DONTSTORE, NULL);
       }
       if (mes_var.def_point)
       {
-        measure_spectrum_ff_pt(tau, nm, m, mes_var.n_mom, i, mes_var.precision);
+        measure_spectrum_ff_pt(tau, nm, m, mes_var.n_mom, i, mes_var.precision,DONTSTORE, NULL);
       }
       if (mes_var.ext_semwall)
       {
-        measure_spectrum_semwall_ff_ext(nm, m, mes_var.nhits_2pt, i, mes_var.precision);
+        measure_spectrum_semwall_ff_ext(nm, m, mes_var.nhits_2pt, i, mes_var.precision,DONTSTORE, NULL);
       }
       if (mes_var.discon_semwall)
       {
-        measure_spectrum_discon_ff_semwall(nm, m, mes_var.nhits_disc, mes_var.degree_hopping, mes_var.nhits_hopping, i, mes_var.precision);
+        measure_spectrum_discon_ff_semwall(nm, m, mes_var.nhits_disc, mes_var.degree_hopping, mes_var.nhits_hopping, i, mes_var.precision,DONTSTORE, NULL);
       }
     }
 
