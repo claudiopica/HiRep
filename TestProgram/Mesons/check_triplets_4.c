@@ -14,7 +14,6 @@
 #define _BSD_SOURCE
 
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
 #include <math.h>
 #include "io.h"
@@ -161,42 +160,6 @@ double complex get_gid(double complex Gamma[4][4])
   return r / 4.0;
 }
 
-/* Ugly: read the correlator from the output files ! This is because the function that compute the props, make the contractions and write the output zeros the correlators after writting them.
-The purpose of this entire test is to check the function without modifying it */
-static double read_output(int t, int i, int re_im_flag)
-{
-  char char_t[100];
-  FILE *fp;
-  char path[1035];
-  char command[500];
-  double out;
-
-  sprintf(char_t, "%d", t + 1);
-  strcpy(command, "grep \"TRIPLET ");
-  strcat(command, mes_channel_names[i]);
-  if (re_im_flag == 0) // get the real part.
-  {
-    strcat(command, "=\" out_0 | awk -F'=' '{print $3}' | awk '{for (i=1;i<=NF;i++) print $i}' | awk 'NR==");
-  }
-  if (re_im_flag == 1)
-  {
-    strcat(command, "_im=\" out_0 | awk -F'=' '{print $3}' | awk  '{for (i=1;i<=NF;i++) print $i}' | awk 'NR==");
-  }
-  strcat(command, char_t);
-  strcat(command, "'");
-
-  fp = popen(command, "r");
-  while (fgets(path, sizeof(path) - 1, fp) != NULL)
-  {
-    sscanf(path, "%lf", &out);
-  }
-
-  /* close */
-  pclose(fp);
-
-  return out;
-}
-
 /* = tr gamma_mu \bar{Gamma} gamma_mu Gamma / 4 \bar{Gamma} = gamma_0 Gamma^\dagger gamma_0 */
 double complex get_gmu(double complex Gamma[4][4], int mu)
 {
@@ -245,6 +208,7 @@ int main(int argc, char *argv[])
   int return_value = 0;
   double tol = 1.e-4;
   double complex g[16][4][4];
+  data_storage_array *out_corr = NULL;
   g5_debug(g[0], &sign);
   id_debug(g[1], &sign);
   g0_debug(g[2], &sign);
@@ -261,8 +225,6 @@ int main(int argc, char *argv[])
   mult_mat(g[13], g[2], g[10]); //  g0g5g1
   mult_mat(g[14], g[2], g[11]); //  g0g5g2
   mult_mat(g[15], g[2], g[12]); //  g0g5g3
-
-  //char *mes_channel_names[16] = {"g5", "id", "g0", "g1", "g2", "g3", "g0g1", "g0g2", "g0g3", "g0g5", "g5g1", "g5g2", "g5g3", "g0g5g1", "g0g5g2", "g0g5g3"};
 
   for (i = 0; i < 16; i++)
   {
@@ -306,7 +268,7 @@ int main(int argc, char *argv[])
   lprintf("MAIN", 0, "Zerocoord{%d,%d,%d,%d}\n", zerocoord[0], zerocoord[1], zerocoord[2], zerocoord[3]);
 
   error(!(GLB_X == GLB_Y && GLB_X == GLB_Z), 1, "main", "This test works only for GLB_X=GLB_Y=GLB_Z");
-  measure_spectrum_semwall(1, &mass, mes_ip.nhits_2pt, 0, 1e-28,DONTSTORE,NULL);
+  measure_spectrum_semwall(1, &mass, mes_ip.nhits_2pt, 0, 1e-28, STORE, &out_corr);
 
   double complex corr_triplets[16][GLB_T];
 
@@ -314,7 +276,9 @@ int main(int argc, char *argv[])
   {
     for (t = 0; t < GLB_T; t++)
     {
-      corr_triplets[i][t] = read_output(t, i, 0) + I * read_output(t, i, 1);
+      int idx_re[4] = {0, i, t, 0};
+      int idx_im[4] = {0, i, t, 1};
+      corr_triplets[i][t] = (*data_storage_element(out_corr, 0, idx_re) + I * *data_storage_element(out_corr, 0, idx_im));
     }
   }
 

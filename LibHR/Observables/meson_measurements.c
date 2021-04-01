@@ -62,7 +62,6 @@ static void fix_T_bc(int tau)
   lprintf("meson_measurements", 50, "Boundaries set!\n");
 }
 
-
 static void flip_T_bc(int tau)
 {
   int index;
@@ -113,11 +112,10 @@ void measure_spectrum_pt(int tau, int nm, double *m, int n_mom, int conf_num, do
   // init data storage here
   if (swc == STORE)
   {
-      int idx[5] = {nm, pow(n_mom, 3), 16, GLB_T, 2};
-      *ret = allocate_data_storage_array(1);
-      allocate_data_storage_element(*ret, 0, 5, idx); // ( 1 ) * (nmom^3*ngamma*GLB_T * 2 reals )
-      lprintf("MAIN", 0, "data_storage_element allocated !\n");
-
+    int idx[5] = {nm, pow(n_mom, 3), 16, GLB_T, 2};
+    *ret = allocate_data_storage_array(1);
+    allocate_data_storage_element(*ret, 0, 5, idx); // ( 1 ) * (nmom^3*ngamma*GLB_T * 2 reals )
+    lprintf("MAIN", 0, "data_storage_element allocated !\n");
   }
 
   init_propagator_eo(nm, m, precision);
@@ -138,24 +136,23 @@ void measure_spectrum_pt(int tau, int nm, double *m, int n_mom, int conf_num, do
   }
   measure_conserved_currents(cvc_correlators, prop, source, nm, tau);
 
-
   if (swc == STORE)
   {
 
-    double norm= -(1./ GLB_VOL3);
+    double norm = -(1. / GLB_VOL3);
     meson_observable *motmp = meson_correlators;
-    
+
     int iG = 0;
     while (motmp != NULL)
     {
 
-    global_sum(motmp->corr_re, motmp->corr_size);
-    global_sum(motmp->corr_im, motmp->corr_size);
-    for (int i = 0; i < motmp->corr_size; i++)
-    {
-      motmp->corr_re[i] *= norm;
-      motmp->corr_im[i] *= norm;
-    }
+      global_sum(motmp->corr_re, motmp->corr_size);
+      global_sum(motmp->corr_im, motmp->corr_size);
+      for (int i = 0; i < motmp->corr_size; i++)
+      {
+        motmp->corr_re[i] *= norm;
+        motmp->corr_im[i] *= norm;
+      }
       int ip = 0;
       for (int px = 0; px < n_mom; ++px)
         for (int py = 0; py < n_mom; ++py)
@@ -167,7 +164,7 @@ void measure_spectrum_pt(int tau, int nm, double *m, int n_mom, int conf_num, do
               {
                 for (int t = 0; t < GLB_T; ++t)
                 {
-                  lprintf("MAIN", 0, "(px,py,pz) = (%d,%d,%d), im = %d, ip =%d, iG=%d, t=%d  %3.10e\n", px,py,pz,im, ip, iG,t,motmp->corr_re[corr_ind(px, py, pz, n_mom, t, nm, im)]);
+                  lprintf("MAIN", 0, "(px,py,pz) = (%d,%d,%d), im = %d, ip =%d, iG=%d, t=%d  %3.10e\n", px, py, pz, im, ip, iG, t, motmp->corr_re[corr_ind(px, py, pz, n_mom, t, nm, im)]);
                   int idx[5] = {im, ip, iG, t, 0};
                   *data_storage_element(*ret, 0, idx) = motmp->corr_re[corr_ind(px, py, pz, n_mom, t, nm, im)];
                   idx[4] = 1;
@@ -184,8 +181,6 @@ void measure_spectrum_pt(int tau, int nm, double *m, int n_mom, int conf_num, do
 
   print_mesons(meson_correlators, 1., conf_num, nm, m, GLB_T, n_mom, "DEFAULT_POINT");
   print_mesons(cvc_correlators, 1., conf_num, nm, m, GLB_T, n_mom, "DEFAULT_POINT");
-
-  
 
   free_propagator_eo();
   free_spinor_field_f(source);
@@ -338,6 +333,14 @@ void measure_spectrum_semwall(int nm, double *m, int nhits, int conf_num, double
   spinor_field *source = alloc_spinor_field_f(4, &glat_even);
   spinor_field *prop = alloc_spinor_field_f(4 * nm, &glattice);
 
+  // init data storage here
+  if (swc == STORE)
+  {
+    int idx[4] = {nm, 16, GLB_T, 2};
+    *ret = allocate_data_storage_array(1);
+    allocate_data_storage_element(*ret, 0, 4, idx); // ( 1 ) * (nmom^3*ngamma*GLB_T * 2 reals )
+    lprintf("MAIN", 0, "data_storage_element allocated !\n");
+  }
   for (int i = 0; i < 4 * nm; i++)
     spinor_field_zero_f(prop + i);
 
@@ -349,6 +352,43 @@ void measure_spectrum_semwall(int nm, double *m, int nhits, int conf_num, double
     calc_propagator_eo(prop, source, 4); //4 for spin dilution
     measure_mesons(meson_correlators, prop, source, nm, tau);
   }
+
+  if (swc == STORE)
+  {
+
+    double norm = -(1. / (nhits * GLB_VOL3 / 2.)) / GLB_VOL3;
+    meson_observable *motmp = meson_correlators;
+
+    int iG = 0;
+    while (motmp != NULL)
+    {
+
+      global_sum(motmp->corr_re, motmp->corr_size);
+      global_sum(motmp->corr_im, motmp->corr_size);
+      for (int i = 0; i < motmp->corr_size; i++)
+      {
+        motmp->corr_re[i] *= norm;
+        motmp->corr_im[i] *= norm;
+      }
+      for (int im = 0; im < nm; im++)
+      {
+        if (motmp->ind1 == motmp->ind2)
+        {
+          for (int t = 0; t < GLB_T; ++t)
+          {
+            lprintf("MAIN", 0, " im = %d, iG=%d, t=%d  %3.10e\n", im, iG, t, motmp->corr_re[corr_ind(0, 0, 0, 1, t, nm, im)]);
+            int idx[4] = {im, iG, t, 0};
+            *data_storage_element(*ret, 0, idx) = motmp->corr_re[corr_ind(0, 0, 0, 1, t, nm, im)];
+            idx[3] = 1;
+            *data_storage_element(*ret, 0, idx) = motmp->corr_im[corr_ind(0,0,0, 1, t, nm, im)];
+          }
+        }
+      }
+      iG += 1;
+      motmp = motmp->next;
+    }
+  }
+
   print_mesons(meson_correlators, nhits * GLB_VOL3 / 2., conf_num, nm, m, GLB_T, 1, "DEFAULT_SEMWALL");
   free_propagator_eo();
   free_spinor_field_f(source);
