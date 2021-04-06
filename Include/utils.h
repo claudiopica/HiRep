@@ -22,8 +22,8 @@
 
 /*SUN exp matrix*/
 
-void WF_Exp(suNg *u, suNg *X);
-void WF_Exp_Taylor(suNg *u, suNg *X);
+void suNg_Exp(suNg *u, suNg *X);
+void suNg_Exp_Taylor(suNg *u, suNg *X);
 void ExpX(double dt, suNg_algebra_vector *h, suNg *u);
 
 void vector_star(suNg_vector *, suNg_vector *);

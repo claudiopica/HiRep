@@ -8,7 +8,7 @@
 #include <math.h>
 
 #if (NG!=$N$) 
-#error : Mismatch between NG and ExpX!
+#error : Mismatch between NG and ExpX_legacy!
 #endif
 
 /*
@@ -28,9 +28,9 @@ static void YtoU(double* u, double *y)
 
 
 /*
-*  Applica la rotazione di SU(2) definita da
+*  Applies the SU(2) rotation defined by 
 *  U = s[0] + i*s.sigma/4
-*  al vettore (v1,v2)
+*  to the (v1,v2) vector
 */
 static void su2_rotate(double *s,double complex *v1,double complex *v2)
 {      
@@ -43,19 +43,21 @@ static void su2_rotate(double *s,double complex *v1,double complex *v2)
 #endif
 
 /*
-*  Approssima
+*  Approximate 
 *  V = exp(sum(A) iT(A)*h(A)*dt)
-*  con una matrice unitaria secondo l'algoritmo di Luscher
-*  e sostituisce
-*  V.U -> U
+*  with a unitary matrix according to the alghorithm defined in Appendix A 
+*  of https://arxiv.org/pdf/hep-lat/0409106.pdf
+*  and replaces  V.U -> U
 */
+/*Antonio: The lagacy functions have been left in the file for past reference, although at the moment they are not used and are meant to be removed.*/
+
 #ifdef GAUGE_SON
-void ExpX(double dt, suNg_algebra_vector *h, suNg *r)
+void ExpX_legacy(double dt, suNg_algebra_vector *h, suNg *r)
 {
-	error(0==0,1,"ExpX [suN_epx.c]","This functiona has yet not been implementd for SON");
+	error(0==0,1,"ExpX_legacy [suN_epx.c]","This functiona has yet not been implementd for SON");
 }
 #else
-void ExpX(double dt, suNg_algebra_vector *h, suNg *u)
+void ExpX_legacy(double dt, suNg_algebra_vector *h, suNg *u)
 {
 #ifdef WITH_QUATERNIONS
 suNg v_tmp, u_tmp;
@@ -78,7 +80,7 @@ $GROUP::EXPX:(dt):(*h):(*u)$
 #define TI(a,b) ((a)*NG+(b)-1)
 
 
-void ExpX2(double dt, suNg_algebra_vector *h, suNg *u)
+void ExpX_legacy2(double dt, suNg_algebra_vector *h, suNg *u)
 {
 #ifdef WITH_QUATERNIONS
 

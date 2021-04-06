@@ -207,7 +207,7 @@ void WilsonFlow1(suNg_field *V, const double epsilon)
     suNg utmp[2];
     for (int mu = 0; mu < 4; ++mu)
     {
-      WF_Exp(&utmp[0], _4FIELD_AT(ws_gf, ix, mu));
+      suNg_Exp(&utmp[0], _4FIELD_AT(ws_gf, ix, mu));
       _suNg_times_suNg(utmp[1], utmp[0], *_4FIELD_AT(V, ix, mu));
       *_4FIELD_AT(V, ix, mu) = utmp[1];
     }
@@ -276,7 +276,7 @@ int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, 
     suNg utmp[2];
     for (int mu = 0; mu < 4; ++mu)
     {
-      WF_Exp(&utmp[0], _4FIELD_AT(ws_gf, ix, mu));
+      suNg_Exp(&utmp[0], _4FIELD_AT(ws_gf, ix, mu));
       _suNg_times_suNg(utmp[1], utmp[0], *_4FIELD_AT(V, ix, mu));
       *_4FIELD_AT(V, ix, mu) = utmp[1];                                             // V = exp(Z0/4) W0
       _suNg_mul(*_4FIELD_AT(ws_gf_tmp, ix, mu), -4., *_4FIELD_AT(ws_gf, ix, mu));   //ws_gf_tmp = -Z0
@@ -298,8 +298,8 @@ int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, 
     suNg utmp[4];
     for (int mu = 0; mu < 4; ++mu)
     {
-      WF_Exp(&utmp[0], _4FIELD_AT(ws_gf, ix, mu));
-      WF_Exp(&utmp[2], _4FIELD_AT(ws_gf_tmp, ix, mu));
+      suNg_Exp(&utmp[0], _4FIELD_AT(ws_gf, ix, mu));
+      suNg_Exp(&utmp[2], _4FIELD_AT(ws_gf_tmp, ix, mu));
       _suNg_times_suNg(utmp[1], utmp[0], *_4FIELD_AT(V, ix, mu)); // utmp[1] = exp(8 Z1/9 - 17 Z0/36) W1
       _suNg_times_suNg(utmp[3], utmp[2], *_4FIELD_AT(V, ix, mu)); // utmp[4] = exp( Z1 -  Z0) W1
       *_4FIELD_AT(V, ix, mu) = utmp[1];
@@ -325,7 +325,7 @@ int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, 
     suNg utmp[2];
     for (int mu = 0; mu < 4; ++mu)
     {
-      WF_Exp(&utmp[0], _4FIELD_AT(ws_gf, ix, mu));
+      suNg_Exp(&utmp[0], _4FIELD_AT(ws_gf, ix, mu));
       _suNg_times_suNg(utmp[1], utmp[0], *_4FIELD_AT(V, ix, mu));
       *_4FIELD_AT(V, ix, mu) = utmp[1];
     }
@@ -384,7 +384,7 @@ void WilsonFlow3(suNg_field *V, const double epsilon)
     suNg utmp[2];
     for (int mu = 0; mu < 4; ++mu)
     {
-      WF_Exp(&utmp[0], _4FIELD_AT(ws_gf, ix, mu));
+      suNg_Exp(&utmp[0], _4FIELD_AT(ws_gf, ix, mu));
       _suNg_times_suNg(utmp[1], utmp[0], *_4FIELD_AT(V, ix, mu));
       *_4FIELD_AT(V, ix, mu) = utmp[1];
       _suNg_mul(*_4FIELD_AT(ws_gf, ix, mu), -17. / 9., *_4FIELD_AT(ws_gf, ix, mu));
@@ -404,7 +404,7 @@ void WilsonFlow3(suNg_field *V, const double epsilon)
     suNg utmp[2];
     for (int mu = 0; mu < 4; ++mu)
     {
-      WF_Exp(&utmp[0], _4FIELD_AT(ws_gf, ix, mu));
+      suNg_Exp(&utmp[0], _4FIELD_AT(ws_gf, ix, mu));
       _suNg_times_suNg(utmp[1], utmp[0], *_4FIELD_AT(V, ix, mu));
       *_4FIELD_AT(V, ix, mu) = utmp[1];
       _suNg_mul(*_4FIELD_AT(ws_gf, ix, mu), -1., *_4FIELD_AT(ws_gf, ix, mu));
@@ -424,7 +424,7 @@ void WilsonFlow3(suNg_field *V, const double epsilon)
     suNg utmp[2];
     for (int mu = 0; mu < 4; ++mu)
     {
-      WF_Exp(&utmp[0], _4FIELD_AT(ws_gf, ix, mu));
+      suNg_Exp(&utmp[0], _4FIELD_AT(ws_gf, ix, mu));
       _suNg_times_suNg(utmp[1], utmp[0], *_4FIELD_AT(V, ix, mu));
       *_4FIELD_AT(V, ix, mu) = utmp[1];
     }

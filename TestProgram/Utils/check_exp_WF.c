@@ -65,10 +65,10 @@ int main(int argc, char *argv[])
   }
 
   for (i = 0; i < evaluations; i++)
-    WF_Exp_Taylor(&exptest, &test);
+    suNg_Exp_Taylor(&exptest, &test);
 
   for (i = 0; i < evaluations; i++)
-    WF_Exp(&exptest2, &test);
+    suNg_Exp(&exptest2, &test);
 
   _suNg_sub_assign(exptest, exptest2);
 

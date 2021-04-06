@@ -931,68 +931,71 @@ void evaluate_1pt_functions(cor_list *lcor, int nblocking, double complex *gb_st
     for (i = 0; i < GLB_T; i++)
         listsent[i] = -1;
 
-    MPI_Status r1, r2;
     static double complex *gb2;
     static double complex *gb1;
+    MPI_Request req_1pt[GLB_T];
 
     for (int icor = 0; icor < lcor->n_entries; icor++)
     {
-
 
         t1 = glbT_to_active_slices[lcor->list[icor].t1];
         t2 = glbT_to_active_slices[lcor->list[icor].t2];
         gb1 = gb1_bf + total_n_glue_op * nblocking * listactive[lcor->list[icor].t1];
         gb2 = gb1_bf + total_n_glue_op * nblocking * listactive[lcor->list[icor].t2];
 
-
-
         if (listsent[lcor->list[icor].t1] == -1)
         {
             if (t1 != -1)
             {
+                listsent[lcor->list[icor].t1] = 0;
                 if (PID == 0)
                 {
                     memcpy(gb1, gb_storage + t1 * total_n_glue_op * nblocking, sizeof(double complex) * total_n_glue_op * nblocking);
                 }
                 else
                 {
-                    MPI_Send((double*)(gb_storage + t1 * total_n_glue_op * nblocking), total_n_glue_op * nblocking * 2, MPI_DOUBLE, 0, lcor->list[icor].t1, cart_comm);
+                    MPI_Isend((double *)(gb_storage + t1 * total_n_glue_op * nblocking), total_n_glue_op * nblocking * 2, MPI_DOUBLE, 0, lcor->list[icor].t1, cart_comm, req_1pt + lcor->list[icor].t1);
                 }
             }
 
             if (PID == 0 && t1 == -1)
             {
-                MPI_Recv((double*)(gb1), total_n_glue_op * nblocking * 2, MPI_DOUBLE, t_to_proc[lcor->list[icor].t1], lcor->list[icor].t1, cart_comm, &r1);
+                MPI_Irecv((double *)(gb1), total_n_glue_op * nblocking * 2, MPI_DOUBLE, t_to_proc[lcor->list[icor].t1], lcor->list[icor].t1, cart_comm, req_1pt + lcor->list[icor].t1);
+                listsent[lcor->list[icor].t1] = 1;
             }
-            listsent[lcor->list[icor].t1] = 0;
         }
 
-      if (lcor->list[icor].t1 != lcor->list[icor].t2)
+        if (listsent[lcor->list[icor].t2] == -1)
         {
-            if (listsent[lcor->list[icor].t2] == -1)
+            listsent[lcor->list[icor].t2] = 0;
+            if (t2 != -1)
             {
-                if (t2 != -1)
+                if (PID == 0)
                 {
-                    if (PID == 0)
-                    {
-                        memcpy(gb2, gb_storage + t2 * total_n_glue_op * nblocking, sizeof(double complex) * total_n_glue_op * nblocking);
-                    }
-                    else
-                    {
-                        MPI_Send((double*)(gb_storage + t2 * total_n_glue_op * nblocking), total_n_glue_op * nblocking * 2, MPI_DOUBLE, 0, GLB_T + lcor->list[icor].t2, cart_comm);
-                    }
+                    memcpy(gb2, gb_storage + t2 * total_n_glue_op * nblocking, sizeof(double complex) * total_n_glue_op * nblocking);
                 }
+                else
+                {
+                    MPI_Isend((double *)(gb_storage + t2 * total_n_glue_op * nblocking), total_n_glue_op * nblocking * 2, MPI_DOUBLE, 0, lcor->list[icor].t2, cart_comm, req_1pt + lcor->list[icor].t2);
+                }
+            }
 
-                if (PID == 0 && t2 == -1)
-                {
-                    MPI_Recv((double*)(gb2), total_n_glue_op * nblocking * 2, MPI_DOUBLE, t_to_proc[lcor->list[icor].t2], GLB_T + lcor->list[icor].t2, cart_comm, &r2);
-                }
-                listsent[lcor->list[icor].t2] = 0;
+            if (PID == 0 && t2 == -1)
+            {
+                MPI_Irecv((double *)(gb2), total_n_glue_op * nblocking * 2, MPI_DOUBLE, t_to_proc[lcor->list[icor].t2], lcor->list[icor].t2, cart_comm, req_1pt + lcor->list[icor].t2);
+                listsent[lcor->list[icor].t2] = 1;
             }
         }
     }
+    if (PID == 0)
+        for (i = 0; i < GLB_T; i++)
+            if (listsent[i] == 1)
+            {
+                MPI_Wait(req_1pt + i, MPI_STATUS_IGNORE);
+            }
+
 #else
-        gb1_bf = gb_storage;
+    gb1_bf = gb_storage;
 #endif
 
 "];

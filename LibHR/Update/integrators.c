@@ -93,12 +93,16 @@ void O2MN_multistep(double tlen, integrator_par *par)
 }
 
 /* 4th order  I.P. Omelyan, I.M. Mryglod, R. Folk, computer Physics Communications 151 (2003) 272-314 */
+/* implementation take from "Testing and tuning symplectic integrators for Hybrid Monte Carlo algorithm in lattice QCD 
+Tetsuya Takaishia and Philippe de Forcrand
+https://arxiv.org/pdf/hep-lat/0505020.pdf */
+
 void O4MN_multistep(double tlen, integrator_par *par)
 {
-	const double r1 = 0.08398315262876693;
-	const double r2 = 0.2539785108410595;
-	const double r3 = 0.6822365335719091;
-	const double r4 = -0.03230286765269967;
+	const double rho = 0.1786178958448091;
+	const double theta = -0.06626458266981843;
+	const double lambda = 0.7123418310626056;
+
 	double dt = tlen / par->nsteps;
 	int level = 10+par->level*10;
 
@@ -114,21 +118,20 @@ void O4MN_multistep(double tlen, integrator_par *par)
 	{
 		if(n == 0)
 		{
-			monomial_force(r1*dt, par);
+			monomial_force(rho*dt, par);
 		}
 		else
 		{
-			monomial_force(2*r1*dt, par);
+			monomial_force(2*rho*dt, par);
 		}
-		monomial_field(r2*dt, par);
-		monomial_force(r3*dt, par);
-		monomial_field(r4*dt, par);
-		monomial_force((0.5-r1-r3)*dt, par);
-		monomial_field((1-2*(r2+r4))*dt, par);
-		monomial_force((0.5-r1-r3)*dt, par);
-		monomial_field(r4*dt, par);
-		monomial_force(r3*dt, par);
-		monomial_field(r2*dt, par);
+		monomial_field(lambda*dt, par);
+		monomial_force(theta*dt, par);
+		monomial_field((0.5-lambda)*dt, par);
+		monomial_force((1-2*(theta+rho))*dt, par);
+		monomial_field((0.5-lambda)*dt, par);
+		monomial_force(theta*dt, par);
+		monomial_field(lambda*dt, par);
 	}
-	monomial_force(r1*dt, par);
+	monomial_force(rho*dt, par);
 }
+

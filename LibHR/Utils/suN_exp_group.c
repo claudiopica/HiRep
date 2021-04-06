@@ -41,7 +41,7 @@ static double factorial(int N)
 #endif
 
 #if (NG == 3)
-static void WF_Exp_NG3(suNg *u, suNg *Xin)
+static void suNg_Exp_NG3(suNg *u, suNg *Xin)
 {
   int NN = 30, i = 0, j = 0;
 
@@ -88,7 +88,7 @@ static void WF_Exp_NG3(suNg *u, suNg *Xin)
 #endif
 
 #if (NG == 4)
-static void WF_Exp_NG4(suNg *u, suNg *Xin)
+static void suNg_Exp_NG4(suNg *u, suNg *Xin)
 {
 
   int NN = 30, i = 0, j = 0;
@@ -141,7 +141,7 @@ static void WF_Exp_NG4(suNg *u, suNg *Xin)
 #endif
 
 #if (NG == 5)
-static void WF_Exp_NG5(suNg *u, suNg *Xin)
+static void suNg_Exp_NG5(suNg *u, suNg *Xin)
 {
 
   int NN = 30, i = 0, j = 0;
@@ -199,7 +199,7 @@ static void WF_Exp_NG5(suNg *u, suNg *Xin)
 #endif
 
 #if (NG == 6)
-static void WF_Exp_NG6(suNg *u, suNg *Xin)
+static void suNg_Exp_NG6(suNg *u, suNg *Xin)
 {
 
   int NN = 30, i = 0, j = 0;
@@ -270,7 +270,7 @@ static void WF_Exp_NG6(suNg *u, suNg *Xin)
  * X^dag = -X
  * tr X = 0
  */
-static void WF_Exp_NG2(suNg *u, suNg *Xin)
+static void suNg_Exp_NG2(suNg *u, suNg *Xin)
 {
   suNg_algebra_vector h, v;
 
@@ -294,7 +294,7 @@ static void WF_Exp_NG2(suNg *u, suNg *Xin)
 }
 #endif
 
-void WF_Exp_Taylor(suNg *u, suNg *Xin)
+void suNg_Exp_Taylor(suNg *u, suNg *Xin)
 {
   suNg Xk, tmp;
   _suNg_unit(*u);
@@ -315,19 +315,49 @@ void WF_Exp_Taylor(suNg *u, suNg *Xin)
   }
 }
 
-inline void WF_Exp(suNg *u, suNg *Xin)
+inline void suNg_Exp(suNg *u, suNg *Xin)
 {
 #if (NG == 2)
-  WF_Exp_NG2(u, Xin);
+  suNg_Exp_NG2(u, Xin);
 #elif (NG == 3)
-  WF_Exp_NG3(u, Xin);
+  suNg_Exp_NG3(u, Xin);
 #elif (NG == 4)
-  WF_Exp_NG4(u, Xin);
+  suNg_Exp_NG4(u, Xin);
 #elif (NG == 5)
-  WF_Exp_NG5(u, Xin);
+  suNg_Exp_NG5(u, Xin);
 #elif (NG == 6)
-  WF_Exp_NG6(u, Xin);
+  suNg_Exp_NG6(u, Xin);
 #else
-  WF_Exp_Taylor(u, Xin);
+  suNg_Exp_Taylor(u, Xin);
 #endif
 }
+
+
+#ifdef GAUGE_SON
+void ExpX(double dt, suNg_algebra_vector *h, suNg *r)
+{
+	error(0 == 0, 1, "ExpX [suN_epx.c]", "This functiona has yet not been implementd for SON");
+}
+#else
+void ExpX(double dt, suNg_algebra_vector *h, suNg *u)
+{
+#ifdef WITH_QUATERNIONS
+	suNg v_tmp, u_tmp;
+
+	u_tmp = *u;
+	_suNg_exp(dt, *h, v_tmp);
+	_suNg_times_suNg(*u, v_tmp, u_tmp);
+#else //WITH_QUATERNIONS
+	suNg tmp1, tmp2;
+
+	_algebra_represent(tmp1, *h);
+	_suNg_mul(tmp1, dt, tmp1);
+
+	suNg_Exp(&tmp2, &tmp1);
+	tmp1 = *u;
+
+	_suNg_times_suNg(*u, tmp2, tmp1);
+
+#endif //WITH_QUATERNIONS
+}
+#endif
