@@ -350,7 +350,7 @@ void ExpX(double dt, suNg_algebra_vector *h, suNg *u)
 #else //WITH_QUATERNIONS
 	suNg tmp1, tmp2;
 
-	_algebra_represent(tmp1, *h);
+	_fund_algebra_represent(tmp1, *h);
 	_suNg_mul(tmp1, dt, tmp1);
 
 	suNg_Exp(&tmp2, &tmp1);
