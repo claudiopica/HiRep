@@ -24,3 +24,10 @@ make -j1
 
 echo Run Tests...
 make runtests
+
+if [ -f .test_failed ]
+then 
+  exit 1 ;
+else 
+  exit 0 ;
+fi

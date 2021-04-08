@@ -113,10 +113,10 @@ int main(int argc, char *argv[])
     dt = 1.0 / (i * 10 + 20);
     scaling_deviation1 = fabs(1.0 - rt0[i] * rt1[SCALING_RANGE - 1] / rt1[i] / rt0[SCALING_RANGE - 1]);
     scaling_deviation2 = fabs(1.0 - dt*dt*rt1[i] * rt2[SCALING_RANGE - 1] / rt2[i] / rt1[SCALING_RANGE - 1]/ldt/ldt);
-    lprintf("MAIN", 0, "Scaling deviation for LF/O2 at dt=%lf %1.16e \n(should be around 1*10^(-2) or so)\n\n", dt, scaling_deviation1);
-    lprintf("MAIN", 0, "Scaling deviation for dt^2*O2/O4 at dt=%lf %1.16e \n(should be around 1*10^(-2) or so)\n\n", dt, scaling_deviation2);
+    lprintf("MAIN", 0, "Scaling deviation for LF/O2 (normalized at the smallest dt) at dt=%lf %1.16e \n(should be around 1*10^(-2) or so)\n\n", dt, scaling_deviation1);
+    lprintf("MAIN", 0, "Scaling deviation for dt^2*O2/O4 (normalized at the smallest dt) at dt=%lf %1.16e \n(should be around 1*10^(-2) or so)\n\n", dt, scaling_deviation2);
 
-    if (scaling_deviation1 > 0.1 || scaling_deviation2 > 0.1)
+    if (scaling_deviation1 > 0.01 || scaling_deviation2 > 0.01)
       return_value++;
   }
 
