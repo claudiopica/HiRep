@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
     lprintf("MAIN", 0, "Scaling deviation for LF/O2 (normalized at the smallest dt) at dt=%lf %1.16e \n(should be around 1*10^(-2) or so)\n\n", dt, scaling_deviation1);
     lprintf("MAIN", 0, "Scaling deviation for dt^2*O2/O4 (normalized at the smallest dt) at dt=%lf %1.16e \n(should be around 1*10^(-2) or so)\n\n", dt, scaling_deviation2);
 
-    if (scaling_deviation1 > 0.01 || scaling_deviation2 > 0.01)
+    if (scaling_deviation1 > 0.5 || scaling_deviation2 > 0.5)
       return_value++;
   }
 

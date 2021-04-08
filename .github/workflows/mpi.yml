@@ -16,7 +16,7 @@ jobs:
         nc: [2, 3]
         repr: [FUND, ADJ]
         ecsw: [-expclover,-no-expclover]
-        dir: [Algebra,DiracOperator,Geometry,Inverters,Integrators,PureGauge,RIMOM,Sources,StoredConfs,Utils,GaugeFix,Random,SpinorField,Update,WilsonLoops]
+        dir: [Algebra,DiracOperator,Geometry,Inverters,Integrators,Mesons,PureGauge,RIMOM,Sources,StoredConfs,Utils,Disconnected,GaugeFix,Propagator,Random,Scattering,SpinorField,Update,WilsonLoops]
         exclude:
           - nc: 3
             repr: ADJ
