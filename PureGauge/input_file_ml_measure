@@ -27,13 +27,12 @@ anisotropy  =   1.00
 nhb   =   1 
 // number of overelaxations steps
 nor   =   4
-//separations steps between each ML measures 
-nskip = 50 
+
 ML levels = 1
-//The number of iterations per level must be written in a ordered string, comma separated x1,x2,x3.... (one information per level)
+//The number of iterations per level must be written in a order string comma separated x1,x2,x3.... (one information per level)
 ML iterations per level = 10
-//The number of update skip per level must be written in a ordered string, comma separated x1,x2,x3.... (one information per level) (each of these must be >=1)
-ML skip per level = 5 
+//The number of update skip per level must be writte n in a order string comma separated x1,x2,x3.... (one information per level) (each of these must be >=1)
+ML skip per level = 3 
 // the correlators are inputed according to the structure x1-y1|x2-y2,x3-y3,...
 // where pairs separated by a | are meant to have the same distance and will be averaged
 ML correlators = 6-8,6-9|5-8,5-9
@@ -54,15 +53,6 @@ WF:anisotropy = 1.0
 
 polyakov:make = false
 
-
 // Run control variables
-therm = 20
-run name = run1
-save freq = 1
-conf dir = cnfg
-gauge start = ranDoM
-//gauge start = Unit
-//gauge start = run1_24x8x8x8nc3b5.600000n3
-//rlx_state =
-//rlx_start =
-last conf = +20
+configlist = listconf.txt 
+

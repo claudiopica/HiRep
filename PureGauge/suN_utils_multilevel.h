@@ -141,7 +141,31 @@ typedef struct _pg_flow_ml
     }                                                                                   \
   }
 
+typedef struct _pg_flow_ml_measure
+{
+  char configlist[256]; /* directory to store gconfs */
+ 
+  input_pg_ml *pg_v;
+
+  input_WF *wf;
+
+  input_poly *poly;
+
+  /* for the reading function */
+  input_record_t read[2];
+
+} pg_flow_ml_measure;
+
+#define init_pg_flow_ml_measure(varname)                                          \
+  {                                                                               \
+    .read = {                                                                     \
+      {"Configuration list", "configlist = %s", STRING_T, &(varname).configlist}, \
+      {NULL, NULL, INT_T, NULL}                                                   \
+    }                                                                             \
+  }
+
 int init_mc_ml(pg_flow_ml *rf, char *ifile);
+int init_mc_ml_measure(pg_flow_ml_measure *rf, char *ifile);
 int save_conf(pg_flow_ml *rf, int id);
 int end_mc_ml();
 

@@ -141,31 +141,8 @@ static int parse_lastconf(pg_flow_ml *gf)
     return -1;
 }
 
-int init_mc_ml(pg_flow_ml *gf, char *ifile)
+static void parse_ml_corellator_def()
 {
-    int start_t;
-
-    strcpy(gf->g_start, "invalid");
-    strcpy(gf->run_name, "run_name");
-    strcpy(gf->last_conf, "invalid");
-    strcpy(gf->conf_dir, "./");
-    gf->save_freq = 0;
-    gf->therm = 0;
-    gf->pg_v = &pg_var_ml;
-    gf->wf = &WF_var;
-    gf->poly = &poly_var;
-
-    read_input(pg_var_ml.read, ifile);
-
-    lprintf("INIT ML", 0, "beta=%lf\n", pg_var_ml.beta);
-    lprintf("INIT ML", 0, "bare anisotropy=%lf\n", pg_var_ml.anisotropy);
-    lprintf("INIT ML", 0, "nhb=%d nor=%d\n", pg_var_ml.nhb, pg_var_ml.nor);
-
-    set_max_mh_level(pg_var_ml.ml_levels);
-
-    pg_var_ml.ml_niteration = malloc(sizeof(int) * pg_var_ml.ml_levels);
-    pg_var_ml.ml_nskip = malloc(sizeof(int) * pg_var_ml.ml_levels);
-
     char sep[2] = ",";
     char *token;
     /* get the first token */
@@ -201,8 +178,6 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
     char *saveptr1, *saveptr2;
 
     char tmp[2048];
-
-    /*error(pg_var_ml.cml_corrs[0] == '\n', 1, "init_mc_ml " __FILE__, "At least one ML correpator must be defined");*/
 
     strncpy(tmp, pg_var_ml.cml_corrs, 2048);
     token = strtok_r(tmp, sep, &saveptr1);
@@ -282,6 +257,35 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
     }
 
     initialize_spatial_active_slices(tlist);
+}
+
+int init_mc_ml(pg_flow_ml *gf, char *ifile)
+{
+    int start_t;
+
+    strcpy(gf->g_start, "invalid");
+    strcpy(gf->run_name, "run_name");
+    strcpy(gf->last_conf, "invalid");
+    strcpy(gf->conf_dir, "./");
+    gf->save_freq = 0;
+    gf->therm = 0;
+    gf->pg_v = &pg_var_ml;
+    gf->wf = &WF_var;
+    gf->poly = &poly_var;
+
+    read_input(pg_var_ml.read, ifile);
+
+    lprintf("INIT ML", 0, "beta=%lf\n", pg_var_ml.beta);
+    lprintf("INIT ML", 0, "bare anisotropy=%lf\n", pg_var_ml.anisotropy);
+    lprintf("INIT ML", 0, "nhb=%d nor=%d\n", pg_var_ml.nhb, pg_var_ml.nor);
+
+    set_max_mh_level(pg_var_ml.ml_levels);
+
+    pg_var_ml.ml_niteration = malloc(sizeof(int) * pg_var_ml.ml_levels);
+    pg_var_ml.ml_nskip = malloc(sizeof(int) * pg_var_ml.ml_levels);
+
+    parse_ml_corellator_def();
+
     lprintf("INIT ML", 0, "Blocking iteration on the observables=%d\n", pg_var_ml.nblk);
     lprintf("INIT ML", 0, "Ape smearing par=%lf\n", pg_var_ml.APEsmear);
 
@@ -339,8 +343,7 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
 
     WF_initialize();
 
-    read_input(poly_var.read, ifile);
-
+    lprintf("INIT WF", 0, "WF make=%s\n", WF_var.make);
     lprintf("INIT WF", 0, "WF max integration time=%lf\n", WF_var.tmax);
     lprintf("INIT WF", 0, "WF number of measures=%d\n", WF_var.nmeas);
     lprintf("INIT WF", 0, "WF initial epsilon=%lf\n", WF_var.eps);
@@ -348,6 +351,67 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
     lprintf("INIT WF", 0, "WF anisotropy=%lf\n", WF_var.anisotropy);
 
     WF_set_bare_anisotropy(&(WF_var.anisotropy));
+
+    read_input(poly_var.read, ifile);
+    lprintf("INIT WF", 0, "Polyakov make=%s\n", poly_var.make);
+
+    return 0;
+}
+
+int init_mc_ml_measure(pg_flow_ml_measure *gf, char *ifile)
+{
+    gf->pg_v = &pg_var_ml;
+    gf->wf = &WF_var;
+    gf->poly = &poly_var;
+
+    read_input(pg_var_ml.read, ifile);
+
+    lprintf("INIT ML", 0, "beta=%lf\n", pg_var_ml.beta);
+    lprintf("INIT ML", 0, "bare anisotropy=%lf\n", pg_var_ml.anisotropy);
+    lprintf("INIT ML", 0, "nhb=%d nor=%d\n", pg_var_ml.nhb, pg_var_ml.nor);
+
+    set_max_mh_level(pg_var_ml.ml_levels);
+
+    pg_var_ml.ml_niteration = malloc(sizeof(int) * pg_var_ml.ml_levels);
+    pg_var_ml.ml_nskip = malloc(sizeof(int) * pg_var_ml.ml_levels);
+
+    parse_ml_corellator_def();
+ 
+    lprintf("INIT ML", 0, "Blocking iteration on the observables=%d\n", pg_var_ml.nblk);
+    lprintf("INIT ML", 0, "Ape smearing par=%lf\n", pg_var_ml.APEsmear);
+
+    read_input(gf->read, ifile);
+
+    /* glueballs 1pt group structure */
+    report_op_group_setup();
+
+    BCs_pars_t BCs_pars = {
+        .fermion_twisting_theta = {0., 0., 0., 0.},
+        .gauge_boundary_improvement_cs = 1.,
+        .gauge_boundary_improvement_ct = 1.,
+        .chiSF_boundary_improvement_ds = 1.,
+        .SF_BCs = 0};
+    init_BCs(&BCs_pars);
+
+    init_pure_gauge_anisotropy(&(pg_var_ml.anisotropy));
+
+    WF_var.anisotropy = 1.0;
+
+    read_input(WF_var.read, ifile);
+
+    WF_initialize();
+
+    lprintf("INIT WF", 0, "WF make=%s\n", WF_var.make);
+    lprintf("INIT WF", 0, "WF max integration time=%lf\n", WF_var.tmax);
+    lprintf("INIT WF", 0, "WF number of measures=%d\n", WF_var.nmeas);
+    lprintf("INIT WF", 0, "WF initial epsilon=%lf\n", WF_var.eps);
+    lprintf("INIT WF", 0, "WF delta=%lf\n", WF_var.delta);
+    lprintf("INIT WF", 0, "WF anisotropy=%lf\n", WF_var.anisotropy);
+
+    WF_set_bare_anisotropy(&(WF_var.anisotropy));
+
+    read_input(poly_var.read, ifile);
+    lprintf("INIT WF", 0, "Polyakov make=%s\n", poly_var.make);
 
     return 0;
 }

@@ -336,7 +336,7 @@ inline void suNg_Exp(suNg *u, suNg *Xin)
 #ifdef GAUGE_SON
 void ExpX(double dt, suNg_algebra_vector *h, suNg *r)
 {
-	error(0 == 0, 1, "ExpX [suN_epx.c]", "This functiona has yet not been implementd for SON");
+	error(0 == 0, 1, "ExpX [suN_epx.c]", "This function has yet not been implementd for SON");
 }
 #else
 void ExpX(double dt, suNg_algebra_vector *h, suNg *u)

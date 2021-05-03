@@ -1,9 +1,9 @@
 // Global variables
-GLB_T = 32
-GLB_X = 8
-GLB_Y = 8
-GLB_Z = 8
-NP_T = 2
+GLB_T = 16
+GLB_X = 16
+GLB_Y = 16
+GLB_Z = 16
+NP_T = 4
 NP_X = 1
 NP_Y = 1
 NP_Z = 1
@@ -19,9 +19,9 @@ log:inverter = -1
 log:forcestat = 0
 
 // Pure gauge coupling
-beta  =   6.0
+beta  =   6.1
 // Bare anisotropy parameter
-anisotropy  =   1.0
+anisotropy  =   2.464
 // number of heathbath steps
 nhb   =   1
 // number of overelaxations steps
@@ -31,18 +31,16 @@ WF:make = true
 //WF integrators type 0=Euler 1=3rd order Runge-Kutta 2=Adaptive 3rd order Runge-Kutta
 WF:integrator = 2 
 // Wilson Flow time
-WF:tmax = 2.0
-//20
-WF:nmeas = 10
-//60
-WF:eps = 0.02
-WF:delta = 0.0001
-WF:anisotropy  = 1.0
+WF:tmax = 14.0
+WF:nmeas = 40
+WF:eps = 0.01
+WF:delta = 0.00001
+WF:anisotropy  = 3.0
 
 polyakov:make = false
 
 // Run control variables
-therm = 500
+therm = 50
 run name = run1
 save freq = 5000
 conf dir = cnfg
