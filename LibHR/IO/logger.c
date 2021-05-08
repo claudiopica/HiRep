@@ -482,7 +482,7 @@ int lprintf(char *name, int level, char *format, ...) {
 	static record *lastrec=0;
 	static char lastname[512]={0};
 	static FILE *lastfd=0;
-	static char buf[1024]; 
+	static char buf[4096]; 
 	static char alevel[16];
 	char *cur=&buf[0];
 	int ret;
