@@ -61,8 +61,10 @@ int main(int argc, char *argv[])
     if (fscanf(list, "%s", cnfg_filename) == 0 || feof(list))
       break;
 
-    error(sscanf(cnfg_filename, "%*[^a]an%*fn%d", &i) != 1, 1, "main [suN_multilevel_measure.c]",
-                                                       "Malformed configuration name (not ending by ...n<number>) \n");
+    char *str;
+    str = strrchr(cnfg_filename, 'n');
+    error(sscanf(str, "n%d", &i) != 1, 1, "main [suN_multilevel_measure.c]",
+          "Malformed configuration name (not ending by ...n<number>) \n");
 
     lprintf("MAIN", 0, "\n\nConfiguration %d from %s\n", i, cnfg_filename);
 
