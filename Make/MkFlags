@@ -32,7 +32,8 @@ MACRO += -DBC_Z_PERIODIC
 #MACRO += -DWITH_CLOVER
 MACRO += -DWITH_EXPCLOVER
 MACRO += -DUPDATE_EO
-MACRO += -DWITH_MPI
+#MACRO += -DWITH_MPI
+MACRO += -DWITH_GPU
 #MACRO += -DWITH_QUATERNIONS
 #MACRO += -DPURE_GAUGE_ANISOTROPY
 MACRO += -DNDEBUG
@@ -48,7 +49,7 @@ MACRO += -DIO_FLUSH
 #MACRO += -DWITH_UNTESTED
 
 #Compiler
-ifeq ("False",$(findstring -DWITH_GPU,$(MACRO))) #Compile CPU only
+ifeq (,$(findstring -DWITH_GPU,$(MACRO))) #Compile CPU only
     #CFLAGS = -Wall -Wshadow -std=c99 -O3 -fomit-frame-pointer -msse -msse2 
     CFLAGS = -Wall -Wshadow -std=c99 -O3  #-g #-march=core-avx2 -mtune=core-avx2 -g
     #CFLAGS = -Wall -Wshadow -std=c99 -O3 -qopt-prefetch=4 -qopt-report=2 -march=core-avx2 -mtune=core-avx2
@@ -74,6 +75,7 @@ ifeq ("False",$(findstring -DWITH_GPU,$(MACRO))) #Compile CPU only
     #INCLUDE = -I /opt/local/include/mpich-devel-gcc7/
 else #Compile with GPU
     CC = /usr/bin/nvcc
+    #MPICC = /usr/bin/mpicc
     CFLAGS = -O2 -Xcompiler '-std=c99 -fgcse-sm -fgcse-las -fgcse-after-reload'
 endif
 
