@@ -185,6 +185,11 @@ int setup_process(int *argc, char ***argv)
   }
 #endif
 
+#ifdef WITH_GPU
+read_input(gpu_var.read, input_filename);
+init_gpu(gpu_var);
+#endif
+
   lprintf("SYSTEM", 0, "Gauge group: SU(%d)\n", NG);
   lprintf("SYSTEM", 0, "Fermion representation: dim = %d\n", NF);
   lprintf("SYSTEM", 0, "[RepID: %d][world_size: %d]\n[MPI_ID: %d][MPI_size: %d]\n", RID, WORLD_SIZE, MPI_PID, MPI_WORLD_SIZE);
