@@ -3,6 +3,10 @@
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* Re <s1,s2> */
 double _FUNC(spinor_field_prod_re)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2);
 
@@ -87,9 +91,15 @@ void _FUNC(spinor_field_g2)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2);
 /* s1=g3*s2  */
 void _FUNC(spinor_field_g3)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2);
 
-
 /* functions for eva.c  */
 void _FUNC(spinor_field_lc1)(_REAL c1, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2);
 void _FUNC(spinor_field_lc2)(_REAL c1, _REAL c2, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2);
 void _FUNC(spinor_field_lc3)(_REAL c1, _REAL c2, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2, _SPINOR_FIELD_TYPE *s3);
 
+#ifdef WITH_GPU
+void _FUNC(spinor_field_copy_gpu_to_gpu)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2);             
+#endif
+
+#ifdef __cplusplus
+}
+#endif

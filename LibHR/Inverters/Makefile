@@ -2,6 +2,7 @@ TOPDIR = ../..
 MKDIR = $(TOPDIR)/Make
 
 SRCS = $(wildcard *.c)
+GPUFILES = linear_algebra.c
 LIBNAME = ../libhr.a
 
 #Exclude this source files

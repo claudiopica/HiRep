@@ -14,19 +14,29 @@
 #ifndef HR_COMPLEX_H
 #define HR_COMPLEX_H
 
-#include <tgmath.h>
-// tgmath includes math.h and complex.h
-// and defines type-generic macros for math functions
-// e.g: float complex fc; creal(fc) invokes crealf(fc)
-
 /*******************************************************************************
 *
 * Definitions of type complex
 *
 *******************************************************************************/
 
+#ifdef __cplusplus
+#include <complex>
+#include <cmath>
+typedef std::complex<double> hr_complex;
+typedef std::complex<float> hr_complex_flt;
+#define creal(a) real(a)
+#define cimag(a) imag(a)
+using namespace std::complex_literals;
+#define I 1i
+#else
+#include <tgmath.h>
+// tgmath includes math.h and complex.h
+// and defines type-generic macros for math functions
+// e.g: float complex fc; creal(fc) invokes crealf(fc)
 typedef double complex hr_complex;
 typedef float complex hr_complex_flt;
+#endif
 
 // USE STD C99 COMPLEX INSTEAD!!!
 
