@@ -30,8 +30,8 @@
 
 typedef struct
 {
-  double complex up[NF * (2 * NF + 1)];
-  double complex dn[NF * (2 * NF + 1)];
+  hr_complex up[NF * (2 * NF + 1)];
+  hr_complex dn[NF * (2 * NF + 1)];
 } ldl_t;
 
 #define _DECLARE_FIELD_STRUCT(_name, _type) \

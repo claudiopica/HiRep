@@ -205,7 +205,7 @@ void _FUNC(spinor_field_mul_add_assign)(_SPINOR_FIELD_TYPE *s1, _REAL r, _SPINOR
 void _FUNC(spinor_field_mulc_add_assign)(_SPINOR_FIELD_TYPE *s1, _COMPLEX c, _SPINOR_FIELD_TYPE *s2)
 {
   _COMPLEX c1;
-  c1.re=(_REAL)c.re; c1.im=(_REAL)c.im; 
+  c1 = c;
   unsigned int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
   N *= _NCOM;
   unsigned int grid_size = (N-1)/BLOCK_SIZE + 1;
@@ -230,7 +230,7 @@ void _FUNC(spinor_field_mul)(_SPINOR_FIELD_TYPE *s1, _REAL r, _SPINOR_FIELD_TYPE
 void _FUNC(spinor_field_mulc)(_SPINOR_FIELD_TYPE *s1, _COMPLEX c, _SPINOR_FIELD_TYPE *s2)
 {
   _COMPLEX c1;
-  c1.re=(_REAL)c.re; c1.im=(_REAL)c.im; 
+  c1 = c; 
   unsigned int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
   N *= _NCOM;
   unsigned int grid_size = (N-1)/BLOCK_SIZE + 1;
@@ -327,8 +327,8 @@ void _FUNC(spinor_field_lc_add_assign)(_SPINOR_FIELD_TYPE *s1, _REAL r1, _SPINOR
 void _FUNC(spinor_field_clc)(_SPINOR_FIELD_TYPE *s1, _COMPLEX cd1, _SPINOR_FIELD_TYPE *s2, _COMPLEX cd2, _SPINOR_FIELD_TYPE *s3)
 { 
   _COMPLEX c1, c2;
-  c1.re=(_REAL)cd1.re; c1.im=(_REAL)cd1.im; 
-  c2.re=(_REAL)cd2.re; c2.im=(_REAL)cd2.im;
+  c1 = cd1; 
+  c2 = cd2;
    
   unsigned int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
   N *= _NCOM;
@@ -341,8 +341,8 @@ void _FUNC(spinor_field_clc)(_SPINOR_FIELD_TYPE *s1, _COMPLEX cd1, _SPINOR_FIELD
 void _FUNC(spinor_field_clc_add_assign)(_SPINOR_FIELD_TYPE *s1, _COMPLEX cd1, _SPINOR_FIELD_TYPE *s2, _COMPLEX cd2, _SPINOR_FIELD_TYPE *s3)
 {
   _COMPLEX c1, c2;
-  c1.re=(_REAL)cd1.re; c1.im=(_REAL)cd1.im; 
-  c2.re=(_REAL)cd2.re; c2.im=(_REAL)cd2.im;
+  c1 = cd1; 
+  c2 = cd2;
    
   unsigned int N = s1->type->master_end[0] -  s1->type->master_start[0] + 1;
   N *= _NCOM;
