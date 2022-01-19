@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
 
     gettimeofday(&start, 0);
 
-    update_hb_multilevel_gb_measure(0, &(flow.pg_v->beta), flow.pg_v->nhb, flow.pg_v->nor, flow.pg_v->ml_niteration, flow.pg_v->ml_nskip, flow.pg_v->nblk, &(flow.pg_v->APEsmear), &(flow.pg_v->corrs));
+    update_hb_multilevel_gb_measure(0, &(flow.pg_v->beta), flow.pg_v->nhb, flow.pg_v->nor, flow.pg_v->ml_niteration, flow.pg_v->ml_nskip, flow.pg_v->nblkstart, flow.pg_v->nblkend, &(flow.pg_v->APEsmear), &(flow.pg_v->corrs));
 
     gettimeofday(&end, 0);
     timeval_subtract(&etime, &end, &start);

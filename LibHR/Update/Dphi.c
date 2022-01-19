@@ -36,18 +36,18 @@ extern rhmc_par _update_par; /* Update/update_rhmc.c */
  * Init of Dphi
  */
 
-int init_dirac = 1;
-spinor_field *gtmp = NULL;
-spinor_field *etmp = NULL;
-spinor_field *otmp = NULL;
-spinor_field *otmp2 = NULL;
+static int init_dirac = 1;
+static spinor_field *gtmp = NULL;
+static spinor_field *etmp = NULL;
+static spinor_field *otmp = NULL;
+static spinor_field *otmp2 = NULL;
 
 static void free_mem()
 {
   if (gtmp != NULL)
   {
     free_spinor_field_f(gtmp);
-    etmp = NULL;
+    gtmp = NULL;
   }
   if (etmp != NULL)
   {
@@ -67,7 +67,7 @@ static void free_mem()
   init_dirac = 1;
 }
 
-void init_Dirac()
+static void init_Dirac()
 {
   if (init_dirac)
   {
@@ -550,7 +550,6 @@ void Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
   if (init_dirac)
   {
     init_Dirac();
-    init_dirac = 0;
   }
 
   Dphi_(otmp, in);
@@ -591,7 +590,6 @@ void Dphi_oepre(double m0, spinor_field *out, spinor_field *in)
   if (init_dirac)
   {
     init_Dirac();
-    init_dirac = 0;
   }
 
   Dphi_(etmp, in);
@@ -628,7 +626,6 @@ void g5Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
   if (init_dirac)
   {
     init_Dirac();
-    init_dirac = 0;
   }
 
   Dphi_(otmp, in);
@@ -653,7 +650,6 @@ void g5Dphi_eopre_sq(double m0, spinor_field *out, spinor_field *in)
   if (init_dirac)
   {
     init_Dirac();
-    init_dirac = 0;
   }
 
   g5Dphi_eopre(m0, etmp, in);
@@ -667,7 +663,6 @@ void g5Dphi_sq(double m0, spinor_field *out, spinor_field *in)
   if (init_dirac)
   {
     init_Dirac();
-    init_dirac = 0;
   }
 
 #ifdef ROTATED_SF
@@ -707,7 +702,6 @@ void Qhat_eopre(double m0, double mu, spinor_field *out, spinor_field *in)
   if (init_dirac)
   {
     init_Dirac();
-    init_dirac = 0;
   }
   Dphi_(otmp, in);
   apply_BCs_on_spinor_field(otmp);
@@ -732,7 +726,6 @@ void Qhat_eopre_sq(double m0, double mu, spinor_field *out, spinor_field *in)
   if (init_dirac)
   {
     init_Dirac();
-    init_dirac = 0;
   }
 
 #ifdef ROTATED_SF
@@ -959,7 +952,7 @@ void Cphi_diag_inv(double mass, spinor_field *dptr, spinor_field *sptr)
 
 /*************************************************
  * Dirac operators with clover term:             *
- * Cphi = Dphi + clover                          *
+ * Cphi = Dphi + exp clover                      *
  * Cphi_eopre = D_ee - D_eo D_oo^-1 D_oe         *
  * Cphi_diag = D_oo or D_ee                      *
  * Cphi_diag_inv = D_oo^-1 or D_ee^-1            *

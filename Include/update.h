@@ -22,7 +22,7 @@ void update(double *beta, int nhb, int nor);
 void random_su2(double rho, double s[]);
 
 void set_max_mh_level(int max_lev);
-void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, int *ml_up, int *ml_skip, int nblocking, double *smear_val, cor_list *lcor);
+void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, int *ml_up, int *ml_skip, int nblockingstart, int nblockingsend, double *smear_val, cor_list *lcor);
 
 /* functions and structures for the MRE algorithm */
 typedef struct

@@ -24,22 +24,14 @@
 #include "utils.h"
 #include "communications.h"
 
-static double hmass=0.1;
-static suNg_field *g;
-
-
-
-//static void loc_D(spinor_field *out, spinor_field *in){
-//   Dphi(hmass,out,in);
-//}
 
 
 
 int main(int argc,char *argv[])
 {
 
-  double res1,res2,res3,res_cpu,res_gpu;
-  spinor_field *s0,*s1,*s2,*s3, *tmps;
+  double res1,res2,res3;
+  spinor_field *s0,*s1,*s2;
   float elapsed, gflops;
   int flopsite, bytesite;
   int n_times=5000;
@@ -54,16 +46,14 @@ int main(int argc,char *argv[])
   
   /* allocate memory */
   lprintf("MAIN",0,"Allocating spinor field\n");  
-  s0=alloc_spinor_field_f(4,&glattice);
+  s0=alloc_spinor_field_f(3,&glattice);
   s1=s0+1;
   s2=s1+1;
-  s3=s2+1;
   
 
   lprintf("MAIN",0,"Randomizing spinor field...\n");  
   gaussian_spinor_field(s0);
   gaussian_spinor_field(s1);
-  lprintf("LA_TEST",0,"un sito %lf\n",creal(s0->ptr[2].c[0].c[0]));
 
   //
   //#pragma omp parallel num_threads(1) default(shared)
@@ -75,6 +65,7 @@ _OMP_BARRIER
     
     res2=spinor_field_sqnorm_f(s1);
   }
+
   lprintf("LA_TEST",0,"Square norm for check after gaussian spinor field %lf and %lf\n",res1,res2);
   
   
@@ -126,13 +117,11 @@ _OMP_BARRIER
 #pragma omp parallel num_threads(1) default(shared)
   {
     Dphi_(s2,s0);
-    
+  
     spinor_field_sub_assign_f(s2,s1);
     res1=spinor_field_sqnorm_f(s2);
-#pragma omp barrier 
     
     res2=spinor_field_sqnorm_f(s1);
-#pragma omp barrier 
     
     res3=spinor_field_sqnorm_f(s0);
     

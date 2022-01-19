@@ -534,7 +534,7 @@ void complete_sf_sendrecv(spinor_field *sf) {
       for (k=0; k<nreq; ++k) {
         if (status[k].MPI_ERROR != MPI_SUCCESS) {
           MPI_Error_string(status[k].MPI_ERROR,mesg,&mesglen);
-          lprintf("MPI",0,"Req [%d] Source [%d] Tag [%] ERROR: %s\n",
+          lprintf("MPI",0,"Req [%d] Source [%d] Tag [%d] ERROR: %s\n",
               k, 
               status[k].MPI_SOURCE, 
               status[k].MPI_TAG, 

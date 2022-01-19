@@ -47,38 +47,34 @@ for (( i=0; i<ntests; i++ )) ; do
 
 
    test[$((i*14+13))]=`expr  $BT \* $BX \* $BY \* $BZ `
-done
 
+   echo "GLB_T =  ${test[$((i*14+0))]} //Global T size">test_input
+   echo "GLB_X =  ${test[$((i*14+1))]}		">>test_input
+   echo "GLB_Y =  ${test[$((i*14+2))]}		">>test_input
+   echo "GLB_Z =  ${test[$((i*14+3))]}		">>test_input
+   echo "NP_T =   ${test[$((i*14+4))]}		">>test_input
+   echo "NP_X =   ${test[$((i*14+5))]}		">>test_input
+   echo "NP_Y =   ${test[$((i*14+6))]}      		">>test_input
+   echo "NP_Z =   ${test[$((i*14+7))]}		">>test_input
+   echo "// Replicas">>test_input
+   echo "N_REP = 1">>test_input
+   echo "//Logger levels (default = -1)">>test_input
+   echo "log:default = -1">>test_input
+   echo "log:inverter = -1">>test_input
+   echo "log:forcestat = 0">>test_input
+   echo "// Random generator">>test_input
+   echo "rlx_level = 1">>test_input
+   echo "rlx_seed = 13813">>test_input
+   echo "rlx_start = new">>test_input
+   echo "rlx_state = rand_state">>test_input
 
-#ntests=`expr ${#test[@]} / 14`
+   (( ${test[$((i*14+13))]} > 18 )) && ((i--)) && continue;
+   #cat test_input
+   export OMP_NUM_THREADS=1
+   rm -f out_0
+   mpirun-openmpi-gcc11 --mca shmem posix --oversubscribe -np ${test[$((i*14+13))]} ./check_geometry_1 -i ./test_input
+   if [ "$?" != "0" ] ; then exit ; fi
 
+   echo $i"/$ntests : Ok!"
 
-for (( i=0; i<ntests; i++ )) ; do
-
-echo "GLB_T =  ${test[$((i*14+0))]} //Global T size">test_input
-echo "GLB_X =  ${test[$((i*14+1))]}		">>test_input
-echo "GLB_Y =  ${test[$((i*14+2))]}		">>test_input
-echo "GLB_Z =  ${test[$((i*14+3))]}		">>test_input
-echo "NP_T =   ${test[$((i*14+4))]}		">>test_input
-echo "NP_X =   ${test[$((i*14+5))]}		">>test_input
-echo "NP_Y =   ${test[$((i*14+6))]}      		">>test_input
-echo "NP_Z =   ${test[$((i*14+7))]}		">>test_input
-echo "// Replicas">>test_input
-echo "N_REP = 1">>test_input
-
-echo "// Random generator">>test_input
-echo "rlx_level = 1">>test_input
-echo "rlx_seed = 13813">>test_input
-echo "rlx_start = new">>test_input
-echo "rlx_state = rand_state">>test_input
-
-(( ${test[$((i*14+13))]} > 18 )) && continue;
-cat test_input
-
-   mpirun -np  ${test[$((i*14+13))]} ./check_geometry_1 -i ./test_input
-   pippo=`echo $?`;
-   if [ "${pippo}" != "0" ] ; then exit ; fi
-   
-   echo "Ok!"
-   
 done

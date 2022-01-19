@@ -60,6 +60,12 @@ GLB_VAR(int,X_EXT,=0);
 GLB_VAR(int,Y_EXT,=0);
 GLB_VAR(int,Z_EXT,=0);
 
+/*path blocking size*/
+GLB_VAR(int,PB_T,=2);
+GLB_VAR(int,PB_X,=2);
+GLB_VAR(int,PB_Y,=2);
+GLB_VAR(int,PB_Z,=2);
+
 /* MPI stuff */
 GLB_VAR(int,WORLD_SIZE,=1); /* mpi rank for this process */
 GLB_VAR(int,CART_SIZE,=1); /* mpi rank for this process */

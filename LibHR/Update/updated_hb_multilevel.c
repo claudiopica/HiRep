@@ -286,12 +286,13 @@ void set_max_mh_level(int lev)
     max_mh_level = lev;
 }
 
-void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, int *ml_up, int *ml_skip, int nblocking, double *smear_val, cor_list *lcor)
+void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, int *ml_up, int *ml_skip, int nblockingstart, int nblockingend, double *smear_val, cor_list *lcor)
 {
     int i, j;
     static double complex *one_point_gb;
     static long double norm = 1.0;
     struct timeval start, end, etime;
+    int nblocking = nblockingend - nblockingstart +1;
 
     if (lev == 0)
     {
@@ -315,7 +316,7 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
             for (j = 0; j < ml_skip[lev]; j++)
                 update_mh(lev, beta, nhb, nor);
 
-            update_hb_multilevel_gb_measure(lev + 1, beta, nhb, nor, ml_up, ml_skip, nblocking, smear_val, lcor);
+            update_hb_multilevel_gb_measure(lev + 1, beta, nhb, nor, ml_up, ml_skip, nblockingstart, nblockingend, smear_val, lcor);
         }
     }
     else
@@ -325,7 +326,7 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
             for (j = 0; j < ml_skip[lev]; j++)
                 update_mh(lev, beta, nhb, nor);
 
-            measure_1pt_glueballs(nblocking, smear_val, one_point_gb);
+            measure_1pt_glueballs(nblockingstart, nblockingend, smear_val, one_point_gb);
         }
     }
 

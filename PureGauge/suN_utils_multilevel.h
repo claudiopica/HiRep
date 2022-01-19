@@ -23,7 +23,7 @@ typedef struct _input_pg_ml
 {
 
   double beta, anisotropy, APEsmear;
-  int nhb, nor, ml_levels, nblk;
+  int nhb, nor, ml_levels, nblkstart, nblkend;
   int *ml_niteration;
   int *ml_nskip;
   cor_list corrs;
@@ -33,7 +33,7 @@ typedef struct _input_pg_ml
   char cml_corrs[2048];
 
   /* for the reading function */
-  input_record_t read[11];
+  input_record_t read[12];
 
 } input_pg_ml;
 
@@ -49,7 +49,8 @@ typedef struct _input_pg_ml
       {"number of skip steps at the beginning of each level", "ML skip per level = %s", STRING_T, &((varname).cml_nskip[0])}, \
       {"number of skip steps at the beginning of each level", "ML correlators = %s", STRING_T, &((varname).cml_corrs[0])},    \
       {"APEsmear parameter", "APEsmear = %lf", DOUBLE_T, &(varname).APEsmear},                                                \
-      {"nnumber of spatial blocking level to generate lueballs", "nblk = %d", INT_T, &((varname).nblk)},                      \
+      {"start index of spatial blocking level to measure glueballs", "nblkstart = %d", INT_T, &((varname).nblkend)},                      \
+      {"end index of spatial blocking level to measure glueballs", "nblkend = %d", INT_T, &((varname).nblkstart)},                      \
       {NULL, NULL, INT_T, NULL}                                                                                               \
     }                                                                                                                         \
   }

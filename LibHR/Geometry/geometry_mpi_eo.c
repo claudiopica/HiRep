@@ -416,38 +416,52 @@ static void set_inner(int eotype)
   lprintf("INNER", REPORTLVL, "END info: start%d end %d \n", border[index_border].index_start, border[index_border].index_end);
 }
 
-static void walk_on_lattice(int id_mask, int eotype, int level, int id_zone, int *bl_start, int *incr, int *bl_width)
+void walk_on_lattice(int id_mask, int eotype, int level, int id_zone, int *bl_start, int *incr, int *bl_width)
 {
+  int evblock[4] = {PB_T, PB_X, PB_Y, PB_Z};
+  if (level != 4)
+    evblock[0] = evblock[1] = evblock[2] = evblock[3] = 1;
   int x0, x1, x2, x3;
+  int bx0, bx1, bx2, bx3;
   int x[4];
   int match_length, match_point, steps = 0, last_point;
   lprintf("GEOMETRY", REPORTLVL, "\n\n\nwalk_on_lattice The START (%d,%d,%d,%d) \n", bl_start[dir_mask[id_mask][0]], bl_start[dir_mask[id_mask][1]], bl_start[dir_mask[id_mask][2]], bl_start[dir_mask[id_mask][3]]);
   lprintf("GEOMETRY", REPORTLVL, "walk_on_lattice The WIDTH (%d,%d,%d,%d) \n", bl_width[dir_mask[id_mask][0]], bl_width[dir_mask[id_mask][1]], bl_width[dir_mask[id_mask][2]], bl_width[dir_mask[id_mask][3]]);
   lprintf("GEOMETRY", REPORTLVL, "walk_on_lattice The incr (%d,%d,%d,%d) \n", incr[dir_mask[id_mask][0]], incr[dir_mask[id_mask][1]], incr[dir_mask[id_mask][2]], incr[dir_mask[id_mask][3]]);
   lprintf("GEOMETRY", REPORTLVL, "walk_on_lattice The EO (%d) \n", eotype);
+  lprintf("GEOMETRY", REPORTLVL, "blocking of the pathsize (%d,%d,%d,%d) \n", evblock[0], evblock[1], evblock[2], evblock[3]);
+
   if (init_border(id_mask, eotype, level, id_zone, bl_start, incr, bl_width, &match_length))
   {
-    for (x3 = bl_start[3]; block_cond(bl_start[3], bl_start[3] + bl_width[3], x3); x3 += incr[3])
-      for (x2 = bl_start[2]; block_cond(bl_start[2], bl_start[2] + bl_width[2], x2); x2 += incr[2])
-        for (x1 = bl_start[1]; block_cond(bl_start[1], bl_start[1] + bl_width[1], x1); x1 += incr[1])
-          for (x0 = bl_start[0]; block_cond(bl_start[0], bl_start[0] + bl_width[0], x0); x0 += incr[0])
+    for (bx3 = bl_start[3]; block_cond(bl_start[3], bl_start[3] + bl_width[3], bx3); bx3 += incr[3] * evblock[inv_mask[id_mask][3]])
+      for (bx2 = bl_start[2]; block_cond(bl_start[2], bl_start[2] + bl_width[2], bx2); bx2 += incr[2] * evblock[inv_mask[id_mask][2]])
+        for (bx1 = bl_start[1]; block_cond(bl_start[1], bl_start[1] + bl_width[1], bx1); bx1 += incr[1] * evblock[inv_mask[id_mask][1]])
+          for (bx0 = bl_start[0]; block_cond(bl_start[0], bl_start[0] + bl_width[0], bx0); bx0 += incr[0] * evblock[inv_mask[id_mask][0]])
           {
-            x[inv_mask[id_mask][0]] = x0;
-            x[inv_mask[id_mask][1]] = x1;
-            x[inv_mask[id_mask][2]] = x2;
-            x[inv_mask[id_mask][3]] = x3;
-            if (eotype == no_eo || eotype == (x0 + x1 + x2 + x3 + T_BORDER + X_BORDER + Y_BORDER + Z_BORDER + PSIGN) % 2)
-            {
-              lprintf("GEOMETRY", REPORTLVL, "walk_on_lattice T[%d] X[%d] Y[%d] Z[%d] \n", x[0], x[1], x[2], x[3]);
-              if (match_length > steps)
-                match_point = true;
-              else
-                match_point = false;
-              steps++;
-              set_border_pointer(local_index(x[0], x[1], x[2], x[3]), match_point);
-            }
-          }
+            for (x3 = 0; (x3 < evblock[inv_mask[id_mask][3]]) && block_cond(bl_start[3], bl_start[3] + bl_width[3], bx3 + incr[3] * x3); x3++)
+              for (x2 = 0; (x2 < evblock[inv_mask[id_mask][2]]) && block_cond(bl_start[2], bl_start[2] + bl_width[2], bx2 + incr[2] * x2); x2++)
+                for (x1 = 0; (x1 < evblock[inv_mask[id_mask][1]]) && block_cond(bl_start[1], bl_start[1] + bl_width[1], bx1 + incr[1] * x1); x1++)
+                  for (x0 = 0; (x0 < evblock[inv_mask[id_mask][0]]) && block_cond(bl_start[0], bl_start[0] + bl_width[0], bx0 + incr[0] * x0); x0++)
+                  {
 
+                    x[inv_mask[id_mask][0]] = bx0 + incr[0] * x0;
+                    x[inv_mask[id_mask][1]] = bx1 + incr[1] * x1;
+                    x[inv_mask[id_mask][2]] = bx2 + incr[2] * x2;
+                    x[inv_mask[id_mask][3]] = bx3 + incr[3] * x3;
+
+                    if (eotype == no_eo || eotype == (x[0] + x[1] + x[2] + x[3] + T_BORDER + X_BORDER + Y_BORDER + Z_BORDER + PSIGN) % 2)
+                    {
+                      lprintf("GEOMETRY", REPORTLVL, "walk_on_lattice T[%d] X[%d] Y[%d] Z[%d] \n", x[0], x[1], x[2], x[3]);
+                      if (match_length > steps)
+                        match_point = true;
+                      else
+                        match_point = false;
+                      steps++;
+                      set_border_pointer(local_index(x[0], x[1], x[2], x[3]), match_point);
+                    }
+                  }
+            lprintf("GEOMETRY", REPORTLVL, "subblock\n");
+          }
     last_point = border[index_border].index_start + steps;
     close_border(last_point);
   }
