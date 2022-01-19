@@ -7,7 +7,7 @@ int **direct_spatial_rotations();
 int **inverse_spatial_rotations();
 void request_spatial_paths_evaluation();
 void eval_all_glueball_ops(int t, double complex *numerical_op);
-void measure_1pt_glueballs(int nblocking, double *smear_val, double complex *gb_storage);
+void measure_1pt_glueballs(int nblockingstart, int nblockingend, double *smear_val, double complex *gb_storage);
 void report_op_group_setup();
 
 typedef struct

@@ -49,8 +49,8 @@ typedef struct _input_pg_ml
       {"number of skip steps at the beginning of each level", "ML skip per level = %s", STRING_T, &((varname).cml_nskip[0])}, \
       {"number of skip steps at the beginning of each level", "ML correlators = %s", STRING_T, &((varname).cml_corrs[0])},    \
       {"APEsmear parameter", "APEsmear = %lf", DOUBLE_T, &(varname).APEsmear},                                                \
-      {"start index of spatial blocking level to measure glueballs", "nblkstart = %d", INT_T, &((varname).nblkend)},                      \
-      {"end index of spatial blocking level to measure glueballs", "nblkend = %d", INT_T, &((varname).nblkstart)},                      \
+      {"start index of spatial blocking level to measure glueballs", "nblkstart = %d", INT_T, &((varname).nblkstart)},                      \
+      {"end index of spatial blocking level to measure glueballs", "nblkend = %d", INT_T, &((varname).nblkend)},                      \
       {NULL, NULL, INT_T, NULL}                                                                                               \
     }                                                                                                                         \
   }

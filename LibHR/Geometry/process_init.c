@@ -131,6 +131,7 @@ int setup_process(int *argc, char ***argv)
   int mpiret;
   int required = MPI_THREAD_SINGLE;
   int provided;
+  /*Antonio we must report on the provided level*/
   mpiret = MPI_Init_thread(argc, argv, required, &provided);
   if (mpiret != MPI_SUCCESS)
   {
