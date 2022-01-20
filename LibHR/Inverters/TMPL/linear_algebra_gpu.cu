@@ -58,10 +58,9 @@ __global__ void spinor_field_prod_padded_gpu(COMPLEX* s1, COMPLEX* s2, hr_comple
   }
   else{
     COMPLEX tmp1 = _complex_prod(c1,c2);
-    tmp2.re=tmp2.im=0.;
+    tmp2=0.;
   }
-  resField[i].re=tmp1.re+tmp2.re;
-  resField[i].im=tmp1.im+tmp2.im;
+  resField[i]=tmp1+tmp2;
 }
 
 /* Re <g5*s1,s2> */
@@ -312,8 +311,7 @@ template< typename COMPLEX >
 __global__ void spinor_field_minus_assign_gpu(COMPLEX* s1,int N){
   int i = blockIdx.x*BLOCK_SIZE + threadIdx.x;
   if  (i<N){
-    s1[i].re = -s1[i].re;
-    s1[i].im = -s1[i].im;
+    s1[i] = -s1[i];
   }
 
 }

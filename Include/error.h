@@ -14,6 +14,6 @@
 #ifndef ERROR_H
 #define ERROR_H
 
-void error(int test,int no,char *name,char *text);
+void error(int test,int no,const char *name,const char *text);
 
 #endif

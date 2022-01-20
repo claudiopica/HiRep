@@ -21,14 +21,14 @@
 *******************************************************************************/
 
 #ifdef __cplusplus
-#include <complex>
+#include <thrust/complex.h>
 #include <cmath>
-typedef std::complex<double> hr_complex;
-typedef std::complex<float> hr_complex_flt;
-#define creal(a) real(a)
-#define cimag(a) imag(a)
-using namespace std::complex_literals;
-#define I 1i
+typedef thrust::complex<double> hr_complex;
+typedef thrust::complex<float> hr_complex_flt;
+#define creal(a) (a).real()
+#define cimag(a) (a).imag()
+using namespace thrust;
+#define I (thrust::complex<double> (0., 1.))
 #else
 #include <tgmath.h>
 // tgmath includes math.h and complex.h

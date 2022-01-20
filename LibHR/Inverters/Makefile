@@ -2,7 +2,7 @@ TOPDIR = ../..
 MKDIR = $(TOPDIR)/Make
 
 SRCS = $(wildcard *.c)
-GPUFILES = linear_algebra.c
+GPUFILES = linear_algebra.c TMPL/global_sum_gpu.c
 LIBNAME = ../libhr.a
 
 #Exclude this source files

@@ -16,6 +16,11 @@
  *
  */
 
+#ifdef WITH_GPU
+#include "TMPL/alloc_tmp_fields_gpu.c"
+#include "TMPL/global_sum_gpu.c"
+#endif //WITH_GPU
+
 
 /* double precision */
 
