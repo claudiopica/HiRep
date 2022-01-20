@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include "setup.h"
 #include "io.h"
 #include "update.h"
 #include "geometry.h"
