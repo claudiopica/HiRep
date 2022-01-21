@@ -129,9 +129,9 @@ int setup_process(int *argc, char ***argv)
 #ifdef WITH_MPI
   /* INIT MPI*/
   int mpiret;
-  int required = MPI_THREAD_SINGLE;
+  int required = MPI_THREAD_FUNNELED;
+
   int provided;
-  /*Antonio we must report on the provided level*/
   mpiret = MPI_Init_thread(argc, argv, required, &provided);
   if (mpiret != MPI_SUCCESS)
   {
@@ -141,6 +141,8 @@ int setup_process(int *argc, char ***argv)
     lprintf("MPI", 0, "ERROR: %s\n", mesg);
     error(1, 1, "setup_process " __FILE__, "MPI inizialization failed");
   }
+  error(provided < MPI_THREAD_FUNNELED, 1, "setup_process " __FILE__, "MPI inizialization failed, The threading support level is lesser than that demanded.\n");
+
   MPI_Comm_rank(MPI_COMM_WORLD, &MPI_PID);
   MPI_Comm_size(MPI_COMM_WORLD, &MPI_WORLD_SIZE);
   PID = MPI_PID;

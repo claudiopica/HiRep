@@ -43,6 +43,7 @@ typedef struct _geometry_descriptor {
 
 //Loop over sites of piece ip of given type
 #define _SITE_FOR_RED(type,ip,is,redop1,redop2) \
+_OMP_PRAGMA ( _omp_parallel )\
 _OMP_PRAGMA ( _omp_for redop1 redop2  )\
   for(int is=(type)->master_start[ip]; \
       is<=(type)->master_end[ip]; \
