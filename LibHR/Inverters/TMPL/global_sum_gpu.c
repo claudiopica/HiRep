@@ -9,6 +9,7 @@
 
 #include "global.h"
  #include "gpu.h"
+#include "hr_complex.h"
 
 #define GSUM_BLOCK_SIZE 256     // No more than 1024 on Tesla
 #define BLOCK_SIZE_REM 64
@@ -33,8 +34,7 @@ __global__ void copy_with_zero_padding_complex(COMPLEX* out, COMPLEX* in, int N,
     out[i]=in[i];
   }
   else {
-    out[i].re=0.0;
-    out[i].im=0.0;
+    out[i]=0.0;
   }
 }
 
@@ -179,8 +179,7 @@ __global__ void sum_reduce_complex(COMPLEX *vec, int ns){
   extern __shared__ COMPLEX sdata_cmplx[];
   unsigned int i = ns*blockIdx.x*blockSize + threadIdx.x;
   unsigned int tid = threadIdx.x;
-  sdata_cmplx[tid].re = 0.0;
-  sdata_cmplx[tid].im = 0.0;
+  sdata_cmplx[tid] = 0.0;
   for (int j=0;j<ns;++j,i+=blockSize){
     _complex_add(sdata_cmplx[tid],sdata_cmplx[tid],vec[i]);
   }
@@ -208,58 +207,58 @@ __global__ void sum_reduce_complex(COMPLEX *vec, int ns){
 
   //Unroll the last warp
   if (tid < 32){
-    warp_reduce_complex<complex,blockSize>(sdata_cmplx,tid);
+    warp_reduce_complex<hr_complex,blockSize>(sdata_cmplx,tid);
   }
 
   if (tid == 0) vec[blockIdx.x] = sdata_cmplx[0];
 }
 
 
-void global_reduction_complex_sum(complex* resField, unsigned int Npow2){
+void global_reduction_complex_sum(hr_complex* resField, unsigned int Npow2){
   unsigned int max_grid = (grid_size_max_gpu >> 1u)+1u; 
   int ns = Npow2/GSUM_BLOCK_SIZE/max_grid;
   int n;
   ns = (4>ns) ? 4 : ns;
   for (n=Npow2;n>GSUM_BLOCK_SIZE*ns;n/=GSUM_BLOCK_SIZE*ns){
     int grid = n/GSUM_BLOCK_SIZE/ns;
-    sum_reduce_complex<complex,GSUM_BLOCK_SIZE><<<grid,BLOCK_SIZE,(size_t) BLOCK_SIZE*sizeof(complex)>>>(resField,ns);
+    sum_reduce_complex<hr_complex,GSUM_BLOCK_SIZE><<<grid,BLOCK_SIZE,(size_t) BLOCK_SIZE*sizeof(hr_complex)>>>(resField,ns);
   }
   int nst = ns;
   while (nst>n) nst/=2;
   n/=nst;
   switch (n){
   case 1024:
-    sum_reduce_complex<complex,1024><<<1,n,n*sizeof(complex)>>>(resField,nst);
+    sum_reduce_complex<hr_complex,1024><<<1,n,n*sizeof(hr_complex)>>>(resField,nst);
     break;
   case 512:
-    sum_reduce_complex<complex,512><<<1,n,n*sizeof(complex)>>>(resField,nst);
+    sum_reduce_complex<hr_complex,512><<<1,n,n*sizeof(hr_complex)>>>(resField,nst);
     break;
   case 256: 
-    sum_reduce_complex<complex,256><<<1,n,n*sizeof(complex)>>>(resField,nst);
+    sum_reduce_complex<hr_complex,256><<<1,n,n*sizeof(hr_complex)>>>(resField,nst);
     break;
   case 128: 
-    sum_reduce_complex<complex,128><<<1,n,n*sizeof(complex)>>>(resField,nst);
+    sum_reduce_complex<hr_complex,128><<<1,n,n*sizeof(hr_complex)>>>(resField,nst);
     break;
   case 64: 
-    sum_reduce_complex<complex,64><<<1,n,n*sizeof(complex)>>>(resField,nst);
+    sum_reduce_complex<hr_complex,64><<<1,n,n*sizeof(hr_complex)>>>(resField,nst);
     break;
   case 32: 
-    sum_reduce_complex<complex,32><<<1,n,48*sizeof(complex)>>>(resField,nst);
+    sum_reduce_complex<hr_complex,32><<<1,n,48*sizeof(hr_complex)>>>(resField,nst);
     break;
   case 16: 
-    sum_reduce_complex<complex,16><<<1,n,24*sizeof(complex)>>>(resField,nst);
+    sum_reduce_complex<hr_complex,16><<<1,n,24*sizeof(hr_complex)>>>(resField,nst);
     break;
   case 8: 
-    sum_reduce_complex<complex,8><<<1,n,12*sizeof(complex)>>>(resField,nst);
+    sum_reduce_complex<hr_complex,8><<<1,n,12*sizeof(hr_complex)>>>(resField,nst);
     break;
   case 4: 
-    sum_reduce_complex<complex,4><<<1,n,6*sizeof(complex)>>>(resField,nst);
+    sum_reduce_complex<hr_complex,4><<<1,n,6*sizeof(hr_complex)>>>(resField,nst);
     break;
   case 2: 
-    sum_reduce_complex<complex,2><<<1,n,3*sizeof(complex)>>>(resField,nst);
+    sum_reduce_complex<hr_complex,2><<<1,n,3*sizeof(hr_complex)>>>(resField,nst);
     break;
   case 1: 
-    sum_reduce_complex<complex,1><<<1,n,2*sizeof(complex)>>>(resField,nst);
+    sum_reduce_complex<hr_complex,1><<<1,n,2*sizeof(hr_complex)>>>(resField,nst);
     break;
   }
 }
@@ -276,11 +275,11 @@ double global_sum_gpu(double* vector, int n){
   return res;
 }
 
-complex global_sum_gpu(complex* vector, int n){
+hr_complex global_sum_gpu(hr_complex* vector, int n){
   unsigned int new_n = next_pow2(n);
   int grid_size = new_n / BLOCK_SIZE;
-  complex* padded_vector;
-  complex res;
+  hr_complex* padded_vector;
+  hr_complex res;
   padded_vector=alloc_complex_sum_field(new_n);
   copy_with_zero_padding_complex<<<grid_size,BLOCK_SIZE>>>(padded_vector, vector, n, new_n);
   global_reduction_complex_sum(padded_vector,new_n);
