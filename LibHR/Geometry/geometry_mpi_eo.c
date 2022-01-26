@@ -351,6 +351,35 @@ static void geometry_mpi_init()
     lprintf("GEOMETRY", REPORTLVL, "dirmask[%c] =  %d \tinvmask[%d] =  %c\n", dc[i], dir_mask[1][i], i, dc[inv_mask[1][i]]);
 }
 
+void eval_fusemask(geometry_descriptor *lglat)
+{
+  int counter = 0;
+  for (int ip = 0; ip < lglat->local_master_pieces; ip++)
+    counter+=lglat->master_end[ip]-lglat->master_start[ip]+1;
+
+  lglat->fuse_gauge_size=counter;
+
+  lglat->fuse_mask = malloc(counter * sizeof(int)); //allocating memory for local volume
+
+
+  counter = 0;
+  /* loop through PIECEs */
+  for (int ip = 0; ip < lglat->local_master_pieces; ip++)
+  {
+    /* loop through SITEs in PIECEs */
+    for (int is = lglat->master_start[ip]; is <= lglat->master_end[ip]; is++)
+    {
+      lglat->fuse_mask[counter] = is;
+      counter++;
+    }
+
+    if (ip == lglat->inner_master_pieces)
+    {
+      lglat->fuse_inner_counter = (lglat)->master_start[ip] - (lglat)->master_shift;
+    }
+  }
+}
+
 static void geometry_mpi_finalize()
 {
   if (map_id2overlexi != NULL)
@@ -1669,6 +1698,8 @@ static void set_memory_order()
     }
 
     glattice.total_gauge_master_pieces = master_piece_number;
+
+    eval_fusemask(&glattice);
   }
 
   if (master_piece_number_e != 0)
@@ -1688,6 +1719,8 @@ static void set_memory_order()
     }
 
     glat_even.total_spinor_master_pieces = master_piece_number_e;
+
+    eval_fusemask(&glat_even);
   }
 
   if (master_piece_number_o != 0)
@@ -1707,6 +1740,8 @@ static void set_memory_order()
     }
 
     glat_odd.total_spinor_master_pieces = master_piece_number_o;
+
+    eval_fusemask(&glat_odd);
   }
 
   if (copy_piece_number != 0)

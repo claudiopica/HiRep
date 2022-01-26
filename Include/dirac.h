@@ -11,6 +11,7 @@
 
 
 void Dphi_(spinor_field *out, spinor_field *in);
+void Dphi_fused_(spinor_field *out, spinor_field *in);
 void Dphi(double m0, spinor_field *out, spinor_field *in);
 void g5Dphi(double m0, spinor_field *out, spinor_field *in);
 void g5Dphi_sq(double m0, spinor_field *out, spinor_field *in);

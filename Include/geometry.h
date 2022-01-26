@@ -30,6 +30,9 @@ typedef struct _geometry_descriptor {
   int *sbuf_to_proc, *sbuf_start;
   int gsize_spinor;
   int gsize_gauge;
+  int *fuse_mask;
+  int fuse_gauge_size;
+  int fuse_inner_counter;
 } geometry_descriptor;
 
 
@@ -65,6 +68,25 @@ _OMP_PRAGMA ( _omp_for redop1 redop2  )\
 #define _MASTER_FOR_SUM(type,is,...) _MASTER_FOR_RED(type,is,_omp_sum(__VA_ARGS__),)
 #define _MASTER_FOR_MAX(type,is,...) _MASTER_FOR_RED(type,is,_omp_max(__VA_ARGS__),)
 #define _MASTER_FOR_MIN(type,is,...) _MASTER_FOR_RED(type,is,_omp_min(__VA_ARGS__),)
+
+#define _FUSE_IDX(type,is) (type)->fuse_mask[_fuse_master_for_ip_##is]
+
+#define _FUSE_FOR_RED(type,ip,is,redop1,redop2) \
+int is;\
+_OMP_PRAGMA ( _omp_parallel )\
+_OMP_PRAGMA ( _omp_for redop1 redop2  )\
+  for(int ip=0 ; \
+      ip<type->fuse_gauge_size; \
+      ip++) 
+
+
+#define _FUSE_MASTER_FOR_RED(type,is,redop1,redop2) \
+  _FUSE_FOR_RED((type),_fuse_master_for_ip_##is,is,redop1,redop2)
+
+#define _FUSE_MASTER_FOR(type,is) _FUSE_MASTER_FOR_RED(type,is,,)
+#define _FUSE_MASTER_FOR_SUM(type,is,...) _FUSE_MASTER_FOR_RED(type,is,_omp_sum(__VA_ARGS__),)
+#define _FUSE_MASTER_FOR_MAX(type,is,...) _FUSE_MASTER_FOR_RED(type,is,_omp_max(__VA_ARGS__),)
+#define _FUSE_MASTER_FOR_MIN(type,is,...) _FUSE_MASTER_FOR_RED(type,is,_omp_min(__VA_ARGS__),)
 
 
 
