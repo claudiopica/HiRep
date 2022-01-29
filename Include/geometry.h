@@ -49,6 +49,7 @@ typedef struct _geometry_descriptor
   for (int is = (type)->master_start[ip]; is <= (type)->master_end[ip]; is++)
 
 #define _SITE_FOR(type, ip, is) _SITE_FOR_RED(type, ip, is, nowait, )
+//#define _SITE_FOR(type, ip, is) _SITE_FOR_RED(type, ip, is, , )
 #define _SITE_FOR_SUM(type, ip, is, ...) _SITE_FOR_RED(type, ip, is, _omp_sum(__VA_ARGS__), )
 #define _SITE_FOR_MAX(type, ip, is, ...) _SITE_FOR_RED(type, ip, is, _omp_max(__VA_ARGS__), )
 #define _SITE_FOR_MIN(type, ip, is, ...) _SITE_FOR_RED(type, ip, is, _omp_min(__VA_ARGS__), )
@@ -74,7 +75,7 @@ typedef struct _geometry_descriptor
 #define _FUSE_MASTER_FOR_RED(type, is, redop1, redop2) \
   _FUSE_FOR_RED((type), _fuse_master_for_ip_##is, is, redop1, redop2)
 
-#define _FUSE_MASTER_FOR(type, is) _FUSE_MASTER_FOR_RED(type, is, , )
+#define _FUSE_MASTER_FOR(type, is) _FUSE_MASTER_FOR_RED(type, is, nowait, )
 #define _FUSE_MASTER_FOR_SUM(type, is, ...) _FUSE_MASTER_FOR_RED(type, is, _omp_sum(__VA_ARGS__), )
 #define _FUSE_MASTER_FOR_MAX(type, is, ...) _FUSE_MASTER_FOR_RED(type, is, _omp_max(__VA_ARGS__), )
 #define _FUSE_MASTER_FOR_MIN(type, is, ...) _FUSE_MASTER_FOR_RED(type, is, _omp_min(__VA_ARGS__), )

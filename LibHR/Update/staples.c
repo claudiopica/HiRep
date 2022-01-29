@@ -21,9 +21,9 @@
 
 void staples(int ix, int mu, suNg *v)
 {
-  static suNg staple, tr1, tr2;
-  static suNg *p1, *p2, *p3;
-  static int nu, i, ixpmu, ixpnu, ixmnu, ixpmumnu;
+  suNg staple, tr1, tr2;
+  suNg *p1, *p2, *p3;
+  int nu, i, ixpmu, ixpnu, ixmnu, ixpmumnu;
 
   ixpmu = iup(ix, mu);
   _suNg_zero(*v);

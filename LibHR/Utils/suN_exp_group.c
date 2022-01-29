@@ -50,9 +50,13 @@ static void suNg_Exp_NG3(suNg *u, suNg *Xin)
 
   if (inverse_fact == NULL)
   {
-    inverse_fact = malloc(sizeof(double) * (NN + 1));
-    for (i = 0; i < NN + 1; i++)
-      inverse_fact[i] = 1. / factorial(i);
+    _OMP_BARRIER
+    _OMP_PRAGMA(single)
+    {
+      inverse_fact = malloc(sizeof(double) * (NN + 1));
+      for (i = 0; i < NN + 1; i++)
+        inverse_fact[i] = 1. / factorial(i);
+    }
   }
 
   _suNg_times_suNg(X2, *Xin, *Xin);
@@ -97,10 +101,15 @@ static void suNg_Exp_NG4(suNg *u, suNg *Xin)
 
   if (inverse_fact == NULL)
   {
-    inverse_fact = malloc(sizeof(double) * (NN + 1));
-    for (i = 0; i < NN + 1; i++)
-      inverse_fact[i] = 1. / factorial(i);
+    _OMP_BARRIER
+    _OMP_PRAGMA(single)
+    {
+      inverse_fact = malloc(sizeof(double) * (NN + 1));
+      for (i = 0; i < NN + 1; i++)
+        inverse_fact[i] = 1. / factorial(i);
+    }
   }
+
   suNg X0, X2, X3, X4;
 
   _suNg_times_suNg(X2, *Xin, *Xin);
@@ -149,9 +158,13 @@ static void suNg_Exp_NG5(suNg *u, suNg *Xin)
 
   if (inverse_fact == NULL)
   {
-    inverse_fact = malloc(sizeof(double) * (NN + 1));
-    for (i = 0; i < NN + 1; i++)
-      inverse_fact[i] = 1. / factorial(i);
+    _OMP_BARRIER
+    _OMP_PRAGMA(single)
+    {
+      inverse_fact = malloc(sizeof(double) * (NN + 1));
+      for (i = 0; i < NN + 1; i++)
+        inverse_fact[i] = 1. / factorial(i);
+    }
   }
 
   suNg X0, X2, X3, X4, X5;
@@ -208,9 +221,13 @@ static void suNg_Exp_NG6(suNg *u, suNg *Xin)
 
   if (inverse_fact == NULL)
   {
-    inverse_fact = malloc(sizeof(double) * (NN + 1));
-    for (i = 0; i < NN + 1; i++)
-      inverse_fact[i] = 1. / factorial(i);
+    _OMP_BARRIER
+    _OMP_PRAGMA(single)
+    {
+      inverse_fact = malloc(sizeof(double) * (NN + 1));
+      for (i = 0; i < NN + 1; i++)
+        inverse_fact[i] = 1. / factorial(i);
+    }
   }
 
   suNg X0, X2, X3, X4, X5, X6;
@@ -332,31 +349,30 @@ inline void suNg_Exp(suNg *u, suNg *Xin)
 #endif
 }
 
-
 #ifdef GAUGE_SON
 void ExpX(double dt, suNg_algebra_vector *h, suNg *r)
 {
-	error(0 == 0, 1, "ExpX [suN_epx.c]", "This function has yet not been implementd for SON");
+  error(0 == 0, 1, "ExpX [suN_epx.c]", "This function has yet not been implementd for SON");
 }
 #else
 void ExpX(double dt, suNg_algebra_vector *h, suNg *u)
 {
 #ifdef WITH_QUATERNIONS
-	suNg v_tmp, u_tmp;
+  suNg v_tmp, u_tmp;
 
-	u_tmp = *u;
-	_suNg_exp(dt, *h, v_tmp);
-	_suNg_times_suNg(*u, v_tmp, u_tmp);
+  u_tmp = *u;
+  _suNg_exp(dt, *h, v_tmp);
+  _suNg_times_suNg(*u, v_tmp, u_tmp);
 #else //WITH_QUATERNIONS
-	suNg tmp1, tmp2;
+  suNg tmp1, tmp2;
 
-	_fund_algebra_represent(tmp1, *h);
-	_suNg_mul(tmp1, dt, tmp1);
+  _fund_algebra_represent(tmp1, *h);
+  _suNg_mul(tmp1, dt, tmp1);
 
-	suNg_Exp(&tmp2, &tmp1);
-	tmp1 = *u;
+  suNg_Exp(&tmp2, &tmp1);
+  tmp1 = *u;
 
-	_suNg_times_suNg(*u, tmp2, tmp1);
+  _suNg_times_suNg(*u, tmp2, tmp1);
 
 #endif //WITH_QUATERNIONS
 }
