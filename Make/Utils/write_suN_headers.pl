@@ -472,10 +472,10 @@ write_spinor_pplus();
 
 sub write_suN_vector {
   print $structdef;
-  print "   double complex $cname\[$N\];\n";
+  print "   hr_complex $cname\[$N\];\n";
   print "} ${rdataname}_vector;\n\n";
   print $structdef;
-  print "   float complex $cname\[$N\];\n";
+  print "   hr_complex_flt $cname\[$N\];\n";
   print "} ${rdataname}_vector_flt;\n\n";
 }
 
@@ -495,10 +495,10 @@ sub write_suN_algebra_vector {
 sub write_suN {
   print $structdef;
 	my $d=($N*$N);
-  print "   double complex $cname\[$d\];\n";
+  print "   hr_complex $cname\[$d\];\n";
   print "} $dataname;\n\n";
   print $structdef;
-  print "   float complex $cname\[$d\];\n";
+  print "   hr_complex_flt $cname\[$d\];\n";
   print "} ${dataname}_flt;\n\n";
 }
 
@@ -3814,18 +3814,18 @@ sub  write_read_spinor_gpu {
     print "   do {  \\\n";
     print "      int __iz=(iy)+((x)*$N)*(stride); \\\n";
     for($i=0; $i<$N-1; $i++) {
-        print "      (v).c\[$i\]=((float complex*)(in))\[__iz\]; __iz+=(stride); \\\n";
+        print "      (v).c\[$i\]=((hr_complex_flt*)(in))\[__iz\]; __iz+=(stride); \\\n";
     }
-    print "      (v).c\[$i\]=((float complex*)(in))\[__iz\]; \\\n";
+    print "      (v).c\[$i\]=((hr_complex_flt*)(in))\[__iz\]; \\\n";
     print "   } while (0) \n\n";
 
     print "#define _${rdataname}_read_spinor_gpu(stride,v,in,iy,x) \\\n";
     print "   do {  \\\n";
     print "      int __iz=(iy)+((x)*$N)*(stride); \\\n";
     for($i=0; $i<$N-1; $i++) {
-        print "      (v).c\[$i\]=((double complex*)(in))\[__iz\]; __iz+=(stride); \\\n";
+        print "      (v).c\[$i\]=((hr_complex*)(in))\[__iz\]; __iz+=(stride); \\\n";
     }
-    print "      (v).c\[$i\]=((double complex*)(in))\[__iz\]; \\\n";
+    print "      (v).c\[$i\]=((hr_complex*)(in))\[__iz\]; \\\n";
     print "   } while (0) \n\n";
 
 }
@@ -3839,18 +3839,18 @@ sub  write_write_spinor_gpu {
     print "   do {  \\\n";
     print "      int __iz=(iy)+((x)*$N)*(stride); \\\n";
     for($i=0; $i<$N-1; $i++) {
-        print "      ((float complex*)(out))\[__iz\]=(v).c\[$i\]; __iz+=(stride); \\\n";
+        print "      ((hr_complex_flt*)(out))\[__iz\]=(v).c\[$i\]; __iz+=(stride); \\\n";
     }
-    print "      ((float complex*)(out))\[__iz\]=(v).c\[$i\]; \\\n";
+    print "      ((hr_complex_flt*)(out))\[__iz\]=(v).c\[$i\]; \\\n";
     print "   } while (0) \n\n";
 
     print "#define _${rdataname}_write_spinor_gpu(stride,v,out,iy,x) \\\n";
     print "   do {  \\\n";
     print "      int __iz=(iy)+((x)*$N)*(stride); \\\n";
     for($i=0; $i<$N-1; $i++) {
-        print "      ((double complex*)(out))\[__iz\]=(v).c\[$i\]; __iz+=(stride); \\\n";
+        print "      ((hr_complex*)(out))\[__iz\]=(v).c\[$i\]; __iz+=(stride); \\\n";
     }
-    print "      ((double complex*)(out))\[__iz\]=(v).c\[$i\]; \\\n";
+    print "      ((hr_complex*)(out))\[__iz\]=(v).c\[$i\]; \\\n";
     print "   } while (0) \n\n";
 
 }
