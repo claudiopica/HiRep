@@ -18,7 +18,7 @@
 #include "geometry.h"
 #include "setup.h"
 
-void error(int test, int no, const char *name, const char *text)
+void error(int test, int no, char *name, char *text)
 {
 	if(test != 0)
 	{

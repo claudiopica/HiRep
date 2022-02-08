@@ -181,7 +181,7 @@ $(patsubst %,clean-%,$(SUBDIRS)):
 
 clean:: $(patsubst %,clean-%,$(SUBDIRS))
 	echo -n "$(_col_clean)Cleaning$(_col_norm) $(call _cfname,$(CDIR))..."
-	rm -f *.o *.rpo *~ *.il *.dyn *.ii *.s .*.d *.a cinfo.c .lib.updated
+	rm -f *.o *.rpo *~ *.il *.dyn *.ii *.s .*.d *.a cinfo.c .lib.updated debug err_* out_*
 	echo " $(_cdone)"
 	if test "$(EXES)" != "" -a "$(CEXE)" != "" ; then \
 	  echo -n "$(_col_clean)Removing EXEs$(_col_norm) in $(call _cfname,$(CDIR))..." ;\
