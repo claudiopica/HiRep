@@ -1,43 +1,43 @@
 /* This is part of the ranlux 3.3 distribution by Martin Luesher */
 
 /*******************************************************************************
-*
-* File ranlxd.c
-*
-* Copyright (C) 2005 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* Random number generator "ranlxd". See the notes 
-*
-*   "User's guide for ranlxs and ranlxd v3.2" (December 2005)
-*
-*   "Algorithms used in ranlux v3.0" (May 2001)
-*
-* for a detailed description
-*
-* The externally accessible functions are 
-*
-*   void ranlxd(double r[],int n)
-*     Computes the next n double-precision random numbers and 
-*     assigns them to the elements r[0],...,r[n-1] of the array r[]
-* 
-*   void rlxd_init(int level,int seed)
-*     Initialization of the generator
-*
-*   int rlxd_size(void)
-*     Returns the number of integers required to save the state of
-*     the generator
-*
-*   void rlxd_get(int state[])
-*     Extracts the current state of the generator and stores the 
-*     information in the array state[N] where N>=rlxd_size()
-*
-*   void rlxd_reset(int state[])
-*     Resets the generator to the state defined by the array state[N]
-*
-*******************************************************************************/
+ *
+ * File ranlxd.c
+ *
+ * Copyright (C) 2005 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * Random number generator "ranlxd". See the notes
+ *
+ *   "User's guide for ranlxs and ranlxd v3.2" (December 2005)
+ *
+ *   "Algorithms used in ranlux v3.0" (May 2001)
+ *
+ * for a detailed description
+ *
+ * The externally accessible functions are
+ *
+ *   void ranlxd(double r[],int n)
+ *     Computes the next n double-precision random numbers and
+ *     assigns them to the elements r[0],...,r[n-1] of the array r[]
+ *
+ *   void rlxd_init(int level,int seed)
+ *     Initialization of the generator
+ *
+ *   int rlxd_size(void)
+ *     Returns the number of integers required to save the state of
+ *     the generator
+ *
+ *   void rlxd_get(int state[])
+ *     Extracts the current state of the generator and stores the
+ *     information in the array state[N] where N>=rlxd_size()
+ *
+ *   void rlxd_reset(int state[])
+ *     Resets the generator to the state defined by the array state[N]
+ *
+ *******************************************************************************/
 
 #define RANLXD_C
 
@@ -47,6 +47,36 @@
 #include <stdio.h>
 #include <math.h>
 #include "ranlux.h"
+#include "global.h"
+
+static void local_error(int no)
+{
+    switch (no)
+    {
+    case 1:
+        printf("Error in subroutine rlxd_init\n");
+        printf("Bad choice of luxury level (should be 1 or 2)\n");
+        break;
+    case 2:
+        printf("Error in subroutine rlxd_init\n");
+        printf("Bad choice of seed (should be between 1 and 2^31-1)\n");
+        break;
+    case 3:
+        printf("Error in rlxd_get\n");
+        printf("Undefined state (ranlxd is not initialized\n");
+        break;
+    case 5:
+        printf("Error in rlxd_reset\n");
+        printf("Unexpected input data\n");
+        break;
+    case 6:
+        printf("Unitialized random seed\n");
+        break;
+    }
+    printf("Program aborted\n");
+    exit(0);
+}
+
 #if (defined SSE)
 
 typedef struct
@@ -96,31 +126,6 @@ static union
                            "m"((*pj).c1),                  \
                            "m"((*pj).c2)                   \
                          : "xmm2", "xmm3", "xmm4", "xmm5", "xmm6", "xmm7")
-
-static void error(int no)
-{
-    switch (no)
-    {
-    case 1:
-        printf("Error in subroutine rlxd_init\n");
-        printf("Bad choice of luxury level (should be 1 or 2)\n");
-        break;
-    case 2:
-        printf("Error in subroutine rlxd_init\n");
-        printf("Bad choice of seed (should be between 1 and 2^31-1)\n");
-        break;
-    case 3:
-        printf("Error in rlxd_get\n");
-        printf("Undefined state (ranlxd is not initialized\n");
-        break;
-    case 5:
-        printf("Error in rlxd_reset\n");
-        printf("Unexpected input data\n");
-        break;
-    }
-    printf("Program aborted\n");
-    exit(0);
-}
 
 static void update(void)
 {
@@ -203,9 +208,9 @@ void rlxd_init(int level, int seed)
     else if (level == 2)
         pr = 397;
     else
-        error(1);
+        local_error(1);
 
-    i = seed;
+    i = seed + MPI_PID;
 
     for (k = 0; k < 31; k++)
     {
@@ -214,7 +219,7 @@ void rlxd_init(int level, int seed)
     }
 
     if ((seed <= 0) || (i != 0))
-        error(2);
+        local_error(2);
 
     ibit = 0;
     jbit = 18;
@@ -260,7 +265,7 @@ void ranlxd(double r[], int n)
     int k;
 
     if (init == 0)
-        rlxd_init(1, 1);
+        local_error(6);
 
     for (k = 0; k < n; k++)
     {
@@ -282,7 +287,7 @@ void rlxd_get(int state[])
     float base;
 
     if (init == 0)
-        error(3);
+        local_error(3);
 
     base = (float)(ldexp(1.0, 24));
     state[0] = rlxd_size();
@@ -308,12 +313,12 @@ void rlxd_reset(int state[])
     define_constants();
 
     if (state[0] != rlxd_size())
-        error(5);
+        local_error(5);
 
     for (k = 0; k < 96; k++)
     {
         if ((state[k + 1] < 0) || (state[k + 1] >= 167777216))
-            error(5);
+            local_error(5);
 
         x.num[k] = (float)(ldexp((double)(state[k + 1]), -24));
     }
@@ -322,7 +327,7 @@ void rlxd_reset(int state[])
         ((state[98] != 0) && (state[98] != 1)) ||
         ((state[99] != 0) && (state[99] != 1)) ||
         ((state[100] != 0) && (state[100] != 1)))
-        error(5);
+        local_error(5);
 
     carry.c1 = (float)(ldexp((double)(state[97]), -24));
     carry.c2 = (float)(ldexp((double)(state[98]), -24));
@@ -340,7 +345,7 @@ void rlxd_reset(int state[])
     if (((pr != 202) && (pr != 397)) ||
         (ir < 0) || (ir > 11) || (jr < 0) || (jr > 11) || (jr != ((ir + 7) % 12)) ||
         (is < 0) || (is > 91))
-        error(5);
+        local_error(5);
 }
 
 #else
@@ -366,7 +371,7 @@ typedef union
     int num[96];
 } x_struct;
 
-static int *init = NULL, *pr, *prm, *ir, *jr, *is, *is_old, *next;
+static int *init = NULL, *pr, *prm, *ir, *jr, *is, *is_old, **next;
 static double *one_bit;
 static vec_t *carry;
 static x_struct *x;
@@ -404,39 +409,6 @@ static x_struct *x;
     carry[ltid].c4 = (d < 0);                       \
     d += BASE;                                      \
     (*pi).c2.c4 = d & MASK
-
-static void error(int no)
-{
-    switch (no)
-    {
-    case 0:
-        printf("Error in rlxd_init\n");
-        printf("Arithmetic on this machine is not suitable for ranlxd\n");
-        break;
-    case 1:
-        printf("Error in subroutine rlxd_init\n");
-        printf("Bad choice of luxury level (should be 1 or 2)\n");
-        break;
-    case 2:
-        printf("Error in subroutine rlxd_init\n");
-        printf("Bad choice of seed (should be between 1 and 2^31-1)\n");
-        break;
-    case 3:
-        printf("Error in rlxd_get\n");
-        printf("Undefined state (ranlxd is not initialized)\n");
-        break;
-    case 4:
-        printf("Error in rlxd_reset\n");
-        printf("Arithmetic on this machine is not suitable for ranlxd\n");
-        break;
-    case 5:
-        printf("Error in rlxd_reset\n");
-        printf("Unexpected input data\n");
-        break;
-    }
-    printf("Program aborted\n");
-    exit(0);
-}
 
 static void update(void)
 {
@@ -482,9 +454,9 @@ static void define_constants(void)
 
     for (k = 0; k < 96; k++)
     {
-        next[k + tid * 96] = (k + 1) % 96;
+        next[tid][k] = (k + 1) % 96;
         if ((k % 4) == 3)
-            next[k + tid * 96] = (k + 5) % 96;
+            next[tid][k] = (k + 5) % 96;
     }
 }
 
@@ -493,31 +465,31 @@ void rlxd_init(int level, int seed)
     _OMP_PRAGMA(_omp_parallel)
     {
         int tid = omp_get_thread_num();
+        int nt = omp_get_num_threads();
         _OMP_PRAGMA(single)
         {
 
-            int nt = omp_get_num_threads();
-            init = malloc(nt * sizeof(int) * 103);
-            pr = init + nt;
-            prm = pr + nt;
-            ir = prm + nt;
-            jr = ir + nt;
-            is = jr + nt;
-            is_old = is + nt;
-            next = is_old + nt;
+            init = malloc(nt * sizeof(int));
+            pr = malloc(nt * sizeof(int));
+            prm = malloc(nt * sizeof(int));
+            ir = malloc(nt * sizeof(int));
+            jr = malloc(nt * sizeof(int));
+            is = malloc(nt * sizeof(int));
+            is_old = malloc(nt * sizeof(int));
+            next = malloc(nt * sizeof(int *));
 
             one_bit = malloc(nt * sizeof(double));
             carry = malloc(nt * sizeof(vec_t));
             x = malloc(nt * sizeof(x_struct));
         }
-
+        next[tid] = malloc(96 * sizeof(int));
         int i, k, l;
         int ibit, jbit, xbit[31];
         int ix, iy;
 
         if ((INT_MAX < 2147483647) || (FLT_RADIX != 2) || (FLT_MANT_DIG < 24) ||
             (DBL_MANT_DIG < 48))
-            error(0);
+            local_error(0);
 
         define_constants();
 
@@ -526,9 +498,9 @@ void rlxd_init(int level, int seed)
         else if (level == 2)
             pr[tid] = 397;
         else
-            error(1);
+            local_error(1);
 
-        i = seed;
+        i = seed + tid + nt * MPI_PID;
 
         for (k = 0; k < 31; k++)
         {
@@ -537,7 +509,7 @@ void rlxd_init(int level, int seed)
         }
 
         if ((seed <= 0) || (i != 0))
-            error(2);
+            local_error(2);
 
         ibit = 0;
         jbit = 18;
@@ -585,12 +557,12 @@ void ranlxd(double r[], int n)
     int tid = omp_get_thread_num();
 
     if (init == NULL)
-        rlxd_init(1, 1);
+        local_error(6);
 
     for (k = 0; k < n; k++)
     {
 
-        is[tid] = next[is[tid] + tid * 96];
+        is[tid] = next[tid][is[tid]];
 
         if (is[tid] == is_old[tid])
             update();
@@ -609,7 +581,7 @@ void rlxd_get(int state[])
     int tid = omp_get_thread_num();
 
     if (init[tid] == 0)
-        error(3);
+        local_error(3);
 
     state[0] = rlxd_size();
 
@@ -633,17 +605,17 @@ void rlxd_reset(int state[])
     int tid = omp_get_thread_num();
     if ((INT_MAX < 2147483647) || (FLT_RADIX != 2) || (FLT_MANT_DIG < 24) ||
         (DBL_MANT_DIG < 48))
-        error(4);
+        local_error(4);
 
     define_constants();
 
     if (state[0] != rlxd_size())
-        error(5);
+        local_error(5);
 
     for (k = 0; k < 96; k++)
     {
         if ((state[k + 1] < 0) || (state[k + 1] >= 167777216))
-            error(5);
+            local_error(5);
 
         x[tid].num[k] = state[k + 1];
     }
@@ -652,7 +624,7 @@ void rlxd_reset(int state[])
         ((state[98] != 0) && (state[98] != 1)) ||
         ((state[99] != 0) && (state[99] != 1)) ||
         ((state[100] != 0) && (state[100] != 1)))
-        error(5);
+        local_error(5);
 
     carry[tid].c1 = state[97];
     carry[tid].c2 = state[98];
@@ -670,7 +642,7 @@ void rlxd_reset(int state[])
     if (((pr[tid] != 202) && (pr[tid] != 397)) ||
         (ir[tid] < 0) || (ir[tid] > 11) || (jr[tid] < 0) || (jr[tid] > 11) || (jr[tid] != ((ir[tid] + 7) % 12)) ||
         (is[tid] < 0) || (is[tid] > 91))
-        error(5);
+        local_error(5);
 }
 #else
 
@@ -731,39 +703,6 @@ static union
     d += BASE;                                \
     (*pi).c2.c4 = d & MASK
 
-static void error(int no)
-{
-    switch (no)
-    {
-    case 0:
-        printf("Error in rlxd_init\n");
-        printf("Arithmetic on this machine is not suitable for ranlxd\n");
-        break;
-    case 1:
-        printf("Error in subroutine rlxd_init\n");
-        printf("Bad choice of luxury level (should be 1 or 2)\n");
-        break;
-    case 2:
-        printf("Error in subroutine rlxd_init\n");
-        printf("Bad choice of seed (should be between 1 and 2^31-1)\n");
-        break;
-    case 3:
-        printf("Error in rlxd_get\n");
-        printf("Undefined state (ranlxd is not initialized)\n");
-        break;
-    case 4:
-        printf("Error in rlxd_reset\n");
-        printf("Arithmetic on this machine is not suitable for ranlxd\n");
-        break;
-    case 5:
-        printf("Error in rlxd_reset\n");
-        printf("Unexpected input data\n");
-        break;
-    }
-    printf("Program aborted\n");
-    exit(0);
-}
-
 static void update(void)
 {
     int k, kmax, d;
@@ -818,7 +757,7 @@ void rlxd_init(int level, int seed)
 
     if ((INT_MAX < 2147483647) || (FLT_RADIX != 2) || (FLT_MANT_DIG < 24) ||
         (DBL_MANT_DIG < 48))
-        error(0);
+        local_error(0);
 
     define_constants();
 
@@ -827,9 +766,9 @@ void rlxd_init(int level, int seed)
     else if (level == 2)
         pr = 397;
     else
-        error(1);
+        local_error(1);
 
-    i = seed;
+    i = seed + MPI_PID;
 
     for (k = 0; k < 31; k++)
     {
@@ -838,7 +777,7 @@ void rlxd_init(int level, int seed)
     }
 
     if ((seed <= 0) || (i != 0))
-        error(2);
+        local_error(2);
 
     ibit = 0;
     jbit = 18;
@@ -884,7 +823,7 @@ void ranlxd(double r[], int n)
     int k;
 
     if (init == 0)
-        rlxd_init(1, 1);
+        local_error(6);
 
     for (k = 0; k < n; k++)
     {
@@ -907,7 +846,7 @@ void rlxd_get(int state[])
     int k;
 
     if (init == 0)
-        error(3);
+        local_error(3);
 
     state[0] = rlxd_size();
 
@@ -931,17 +870,17 @@ void rlxd_reset(int state[])
 
     if ((INT_MAX < 2147483647) || (FLT_RADIX != 2) || (FLT_MANT_DIG < 24) ||
         (DBL_MANT_DIG < 48))
-        error(4);
+        local_error(4);
 
     define_constants();
 
     if (state[0] != rlxd_size())
-        error(5);
+        local_error(5);
 
     for (k = 0; k < 96; k++)
     {
         if ((state[k + 1] < 0) || (state[k + 1] >= 167777216))
-            error(5);
+            local_error(5);
 
         x.num[k] = state[k + 1];
     }
@@ -950,7 +889,7 @@ void rlxd_reset(int state[])
         ((state[98] != 0) && (state[98] != 1)) ||
         ((state[99] != 0) && (state[99] != 1)) ||
         ((state[100] != 0) && (state[100] != 1)))
-        error(5);
+        local_error(5);
 
     carry.c1 = state[97];
     carry.c2 = state[98];
@@ -968,7 +907,7 @@ void rlxd_reset(int state[])
     if (((pr != 202) && (pr != 397)) ||
         (ir < 0) || (ir > 11) || (jr < 0) || (jr > 11) || (jr != ((ir + 7) % 12)) ||
         (is < 0) || (is > 91))
-        error(5);
+        local_error(5);
 }
 #endif
 

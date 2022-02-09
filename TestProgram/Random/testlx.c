@@ -1,34 +1,51 @@
 /* This is part of the ranlux 3.3 distribution by Martin Luesher */
 
 /*******************************************************************************
-*
-* File testlx.c
-*
-* Copyright (C) 2005 Martin Luescher
-*
-* This software is distributed under the terms of the GNU General Public
-* License (GPL)
-*
-* This program checks that ranlxs and ranlxd work correctly
-*
-*******************************************************************************/
-
+ *
+ * File testlx.c
+ *
+ * Copyright (C) 2005 Martin Luescher
+ *
+ * This software is distributed under the terms of the GNU General Public
+ * License (GPL)
+ *
+ * This program checks that ranlxs and ranlxd work correctly
+ *
+ *******************************************************************************/
+#define MAIN_PROGRAM
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include "../Include/global.h"
 #include "../Include/ranlux.h"
 #include "../Include/hr_omp.h"
+#include "../Include/logger.h"
 
 #define NXS 204
 #define NXD 99
 
-int main(void)
+int main(int argc, char *argv[])
 {
    int return_value = 0;
+   int mpiret;
+   MPI_PID = 0;
+   MPI_WORLD_SIZE = 1;
+#ifdef WITH_MPI
+   mpiret = MPI_Init(&argc, &argv);
+   if (mpiret != MPI_SUCCESS)
+   {
+      char mesg[MPI_MAX_ERROR_STRING];
+      int mesglen;
+      MPI_Error_string(mpiret, mesg, &mesglen);
+      printf("ERROR: %s\n", mesg);
+   }
+
+   MPI_Comm_rank(MPI_COMM_WORLD, &MPI_PID);
+   MPI_Comm_size(MPI_COMM_WORLD, &MPI_WORLD_SIZE);
+#endif
 
    rlxs_init(0, 32767);
    rlxd_init(1, 32767);
-
    _OMP_PRAGMA(_omp_parallel)
    {
       int local_return_value = 0;
@@ -38,6 +55,10 @@ int main(void)
       float xs[NXS], ys[NXS], xsn[96];
       double base;
       double xd[NXD], yd[NXD], xdn[48];
+      int tid = 0;
+#ifdef _OPENMP
+      tid = omp_get_thread_num();
+#endif
 
       sbase = (float)(ldexp(1.0, 24));
       base = ldexp(1.0, 48);
@@ -45,10 +66,10 @@ int main(void)
       state2 = malloc(rlxd_size() * sizeof(int));
 
       /*******************************************************************************
-*
-* Check that the correct sequences of random numbers are obtained
-*
-*******************************************************************************/
+       *
+       * Check that the correct sequences of random numbers are obtained
+       *
+       *******************************************************************************/
 
       for (k = 0; k < 20; k++)
       {
@@ -208,13 +229,32 @@ int main(void)
       for (k = 0; k < 96; k++)
       {
          if (xsn[k] != (xs[k + 60] * sbase))
-            test1 = 1;
+         {
+            if (tid == 0 && MPI_PID == 0)
+            {
+               test1 = 1;
+            }
+         }
+         else
+         {
+            if (tid != 0 || MPI_PID != 0)
+            {
+               test1 = 1;
+            }
+         }
       }
-
       for (k = 0; k < 48; k++)
       {
          if (xdn[k] != (xd[k + 39] * base))
-            test2 = 1;
+         {
+            if (tid == 0 && MPI_PID == 0)
+               test2 = 1;
+         }
+         else
+         {
+            if (tid != 0 || MPI_PID != 0)
+               test2 = 1;
+         }
       }
 
       if (test1 == 1)
@@ -236,10 +276,10 @@ int main(void)
       }
 
       /*******************************************************************************
-*
-* Check of the I/O routines
-*
-*******************************************************************************/
+       *
+       * Check of the I/O routines
+       *
+       *******************************************************************************/
 
       rlxs_get(state1);
       rlxd_get(state2);
@@ -290,10 +330,10 @@ int main(void)
       }
 
       /*******************************************************************************
-*
-* Success messages
-*
-*******************************************************************************/
+       *
+       * Success messages
+       *
+       *******************************************************************************/
 
       if ((test1 == 0) && (test2 == 0))
       {
@@ -317,8 +357,12 @@ int main(void)
          printf("\n");
       }
 
-      _OMP_PRAGMA(critical)
+      _OMP_PRAGMA(atomic)
       return_value += local_return_value;
    }
+#ifdef WITH_MPI
+   MPI_Finalize();
+#endif
+
    return return_value;
 }

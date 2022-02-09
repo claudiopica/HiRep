@@ -18,7 +18,7 @@
 #include "reweight.h"
 
 // Variables
-static char  input_filename[64] = "input_file";
+static char input_filename[64] = "input_file";
 static char output_filename[64] = "out_reweight";
 static char config_filename[64] = "";
 
@@ -47,10 +47,10 @@ void load_cnfg(char *filename)
 	char repr[4];
 
 	len = strlen(filename);
-	basename  = strrchr(filename, '/');
+	basename = strrchr(filename, '/');
 	filename[len - 1] = '\0';
 
-	if(basename == NULL)
+	if (basename == NULL)
 	{
 		basename = filename;
 	}
@@ -63,17 +63,17 @@ void load_cnfg(char *filename)
 	mass_old = -mass_old;
 	mass = mass_old;
 
-	if(t != GLB_T || x != GLB_X || y != GLB_Y || z != GLB_Z)
+	if (t != GLB_T || x != GLB_X || y != GLB_Y || z != GLB_Z)
 	{
 		lprintf("WARNING", 0, "Size read from config name (%d,%d,%d,%d) is different from the lattice size!\n", t, x, y, z);
 	}
 
-	if(nc != NG)
+	if (nc != NG)
 	{
 		lprintf("WARNING", 0, "Gauge group read from config name (NG=%d) is not the one used in this code!\n", nc);
 	}
 
-	if(strcmp(repr, repr_name) != 0)
+	if (strcmp(repr, repr_name) != 0)
 	{
 		lprintf("WARNING", 0, "Representation (repr=%s) is not the one used in this code!\n", repr);
 	}
@@ -85,13 +85,13 @@ void load_cnfg(char *filename)
 
 void set_theta(double *a)
 {
-	#ifdef FERMION_THETA
-	for(int i = 0; i < 4; i++)
+#ifdef FERMION_THETA
+	for (int i = 0; i < 4; i++)
 	{
 		eitheta[i].re = cos(a[i]);
 		eitheta[i].im = sin(a[i]);
 	}
-	#endif
+#endif
 }
 
 double apply_operator(double *old, double *new, spinor_field *in)
@@ -112,8 +112,8 @@ double apply_operator(double *old, double *new, spinor_field *in)
 	res = alloc_spinor_field_f(1, in->type);
 	spinor_field_zero_f(tmp);
 
-	// Apply dirac operators
-	#ifdef REWEIGHT_THETA
+// Apply dirac operators
+#ifdef REWEIGHT_THETA
 	set_theta(old);
 	spinor_field_g5_assign_f(in);
 	g5QMR_mshift(&mpar, &Dirac_operator, in, tmp);
@@ -123,16 +123,16 @@ double apply_operator(double *old, double *new, spinor_field *in)
 	Dirac_operator(res, tmp);
 	spinor_field_g5_assign_f(res);
 	val = spinor_field_prod_re_f(res, res);
-	#endif
+#endif
 
-	#ifdef REWEIGHT_MASS
+#ifdef REWEIGHT_MASS
 	mass = old[0];
 	g5QMR_mshift(&mpar, &Dirac_operator, in, tmp);
 
 	mass = new[0];
 	Dirac_operator(res, tmp);
 	val = spinor_field_prod_re_f(res, res);
-	#endif
+#endif
 
 	// Free spinor fields
 	free_spinor_field_f(tmp);
@@ -154,20 +154,20 @@ void reweight(double steps, double *result)
 	eta = alloc_spinor_field_f(1, &glat_even);
 
 	// Perform calculation
-	for(int n = 0; n < steps; n++)
+	for (int n = 0; n < steps; n++)
 	{
-		#ifdef REWEIGHT_THETA
-		for(int i = 0; i < 4; i++)
+#ifdef REWEIGHT_THETA
+		for (int i = 0; i < 4; i++)
 		{
 			old[i] = theta_old[i] + (theta_new[i] - theta_old[i]) * (n / steps);
 			new[i] = theta_old[i] + (theta_new[i] - theta_old[i]) * ((n + 1) / steps);
 		}
-		#endif
+#endif
 
-		#ifdef REWEIGHT_MASS
+#ifdef REWEIGHT_MASS
 		old[0] = mass_old + (mass_new - mass_old) * (n / steps);
 		new[0] = mass_old + (mass_new - mass_old) * ((n + 1) / steps);
-		#endif
+#endif
 
 		gaussian_spinor_field(eta);
 		denominator = spinor_field_prod_re_f(eta, eta);
@@ -185,36 +185,36 @@ void read_cmdline(int argc, char *argv[])
 	int ip = 0;
 	int cp = 0;
 
-	for(int i = 1; i < argc; i++)
+	for (int i = 1; i < argc; i++)
 	{
-		if(strcmp("-o", argv[i]) == 0)
+		if (strcmp("-o", argv[i]) == 0)
 		{
 			op = ++i;
 			continue;
 		}
-		if(strcmp("-i", argv[i]) == 0)
+		if (strcmp("-i", argv[i]) == 0)
 		{
 			ip = ++i;
 			continue;
 		}
-		if(strcmp("-l", argv[i]) == 0)
+		if (strcmp("-l", argv[i]) == 0)
 		{
 			cp = ++i;
 			continue;
 		}
 	}
 
-	if(op > 0 && op < argc)
+	if (op > 0 && op < argc)
 	{
 		strcpy(output_filename, argv[op]);
 	}
 
-	if(ip > 0 && ip < argc)
+	if (ip > 0 && ip < argc)
 	{
 		strcpy(input_filename, argv[ip]);
 	}
 
-	if(cp > 0 && cp < argc)
+	if (cp > 0 && cp < argc)
 	{
 		strcpy(config_filename, argv[cp]);
 	}
@@ -232,7 +232,7 @@ int main(int argc, char *argv[])
 	setup_process(&argc, &argv);
 	logger_setlevel(0, 10);
 
-	if(PID != 0)
+	if (PID != 0)
 	{
 		logger_disable();
 	}
@@ -247,12 +247,12 @@ int main(int argc, char *argv[])
 	// Read settings
 	read_input(glb_var.read, input_filename);
 	read_input(rlx_var.read, input_filename);
-	read_input(rw_var.read,  input_filename);
+	read_input(rw_var.read, input_filename);
 
 	// Initialize stuff
-	rlxd_init(rlx_var.rlxd_level, rlx_var.rlxd_seed+PID);
+	rlxd_init(rlx_var.rlxd_level, rlx_var.rlxd_seed);
 
-	if(geometry_init() == 1)
+	if (geometry_init() == 1)
 	{
 		finalize_process();
 		return 0;
@@ -290,15 +290,15 @@ int main(int argc, char *argv[])
 	lprintf("REWEIGHT", 10, "substeps = %d\n", rw_var.steps);
 	lprintf("REWEIGHT", 10, "inverter precision = %1.4e\n", rw_var.precision);
 
-	#ifdef REWEIGHT_MASS
+#ifdef REWEIGHT_MASS
 	lprintf("REWEIGHT", 10, "old mass = %1.6f\n", rw_var.old_mass);
 	lprintf("REWEIGHT", 10, "new mass = %1.6f\n", rw_var.new_mass);
-	#endif
+#endif
 
-	#ifdef REWEIGHT_THETA
+#ifdef REWEIGHT_THETA
 	lprintf("REWEIGHT", 10, "old twisting angles = %1.4f %1.4f %1.4f %1.4f\n", rw_var.old_theta_t, rw_var.old_theta_x, rw_var.old_theta_y, rw_var.old_theta_z);
 	lprintf("REWEIGHT", 10, "new twisting angles = %1.4f %1.4f %1.4f %1.4f\n", rw_var.new_theta_t, rw_var.new_theta_x, rw_var.new_theta_y, rw_var.new_theta_z);
-	#endif
+#endif
 
 	// Variables
 	FILE *fp;
@@ -310,32 +310,32 @@ int main(int argc, char *argv[])
 	// Open config file
 	fp = fopen(config_filename, "r");
 
-	if(fp == NULL)
+	if (fp == NULL)
 	{
 		lprintf("WARNING", 0, "Unable to open config file\n");
 		exit(0);
 	}
 
-	while(fgets(filename, 512, fp) != NULL)
+	while (fgets(filename, 512, fp) != NULL)
 	{
 		load_cnfg(filename);
 		memset(summed, 0, sizeof(summed));
 
-		for(int i = 0; i < rw_var.hits; i++)
+		for (int i = 0; i < rw_var.hits; i++)
 		{
 			reweight(rw_var.steps, result);
 			memset(rbuf, 0, sizeof(rbuf));
 			weight = 1;
 
-			for(int k = 0; k < rw_var.steps; k++)
+			for (int k = 0; k < rw_var.steps; k++)
 			{
 				summed[k] += exp(result[k]);
 				sprintf(sbuf, "%1.6e ", result[k]);
 				strcat(rbuf, sbuf);
-				weight *= summed[k] / (i+1);
+				weight *= summed[k] / (i + 1);
 			}
 
-			lprintf("REWEIGHT", 10, "cnfg: %d, hit: %d, weight: %1.6e, exponents: %s\n", cnfg_number, i+1, sqrt(1.0/weight), rbuf);
+			lprintf("REWEIGHT", 10, "cnfg: %d, hit: %d, weight: %1.6e, exponents: %s\n", cnfg_number, i + 1, sqrt(1.0 / weight), rbuf);
 		}
 	}
 

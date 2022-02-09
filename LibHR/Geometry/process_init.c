@@ -58,10 +58,10 @@ static void read_cmdline(int argc, char **argv)
   int option, ai = 0;
 
   while ((option = getopt(argc, argv, "i:o:mh")) != -1)
-  { //get option from the getopt() method
+  { // get option from the getopt() method
     switch (option)
     {
-    //For option i, r, l, print that these are options
+    // For option i, r, l, print that these are options
     case 'i':
       ai = 1;
       strcpy(input_filename, optarg);
@@ -227,7 +227,7 @@ static void setup_random()
   else
   {
     lprintf("SETUP_RANDOM", 0, "RLXD [%d,%d]\n", rlx_var.rlxd_level, rlx_var.rlxd_seed + MPI_PID);
-    rlxd_init(rlx_var.rlxd_level, rlx_var.rlxd_seed + MPI_PID); /* use unique MPI_PID to shift seeds */
+    rlxd_init(rlx_var.rlxd_level, rlx_var.rlxd_seed); 
   }
 }
 
@@ -319,7 +319,7 @@ static int setup_replicas()
     mpiret = chdir(sbuf);
   }
 
-#endif //ifdef WITH_MPI
+#endif // ifdef WITH_MPI
 
   return 0;
 }

@@ -94,9 +94,9 @@ int main(int argc, char *argv[])
     }
   }
   lprintf("LA TEST", 0, "Calculating massless Diracoperator %d times.\n", n_times);
+  gettimeofday(&start, 0);
   _OMP_PRAGMA(_omp_parallel)
   {
-    gettimeofday(&start, 0);
     for (int i = 0; i < n_times; ++i)
     {
       Dphi_fused_(s1, s0);
