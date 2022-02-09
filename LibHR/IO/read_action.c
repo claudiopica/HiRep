@@ -601,7 +601,6 @@ void read_action(char *filename, integrator_par **ip_ptr)
    // Find all sections in the file
    while (pos < fsz)
    {
-      lprintf("INFO", 0, "%d < %d\n", pos, fsz);
       if (sscanf(content + pos, "%s { %[^}]%n", type, lines, &count) == 2)
       {
          if (strcmp(type, "monomial") == 0)
