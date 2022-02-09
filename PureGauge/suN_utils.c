@@ -239,13 +239,4 @@ int save_conf(pg_flow *gf, int id)
     return 0;
 }
 
-int end_mc()
-{
-    WF_free();
-
-    free_BCs();
-
-    return 0;
-}
-
 #undef repr_name

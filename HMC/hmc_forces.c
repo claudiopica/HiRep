@@ -338,8 +338,6 @@ int main(int argc,char *argv[]) {
   free(n_inv_iter);
   
   
-  /* finalize Monte Carlo */
-  end_mc();
   
   /* close communications */
   finalize_process();

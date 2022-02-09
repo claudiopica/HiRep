@@ -85,7 +85,6 @@ typedef struct _hmc_flow
 int init_mc_ghmc(hmc_flow *rf, char *ifile);
 int save_conf(hmc_flow *rf, int id);
 int save_scalar_conf(hmc_flow *rf, int id);
-int end_mc();
 double integrate_ghmc(int regenerate, ghmc_par *update_par);
 void set_integrator_nsteps(ghmc_par *gpar, int nsteps);
 void set_integrator_type(ghmc_par *gpar, int type);

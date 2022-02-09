@@ -207,24 +207,6 @@ int init_mc_ghmc(hmc_flow *rf, char *ifile)
 	return 0;
 }
 
-/* clean up memory */
-int end_mc()
-{
-	free_ghmc();
-	free_BCs();
-
-	/* free memory */
-	free_gfield(u_gauge);
-#ifdef ALLOCATE_REPR_GAUGE_FIELD
-	free_gfield_f(u_gauge_f);
-#endif
-	if (u_scalar != NULL)
-	{
-		free_scalar_field(u_scalar);
-	}
-
-	return 0;
-}
 static void suNg_av_field_copy(suNg_av_field *g1, suNg_av_field *g2)
 {
 #ifdef CHECK_SPINOR_MATCHING

@@ -168,6 +168,5 @@ typedef struct _pg_flow_ml_measure
 int init_mc_ml(pg_flow_ml *rf, char *ifile);
 int init_mc_ml_measure(pg_flow_ml_measure *rf, char *ifile);
 int save_conf(pg_flow_ml *rf, int id);
-int end_mc_ml();
 
 #endif /* SUN_UTILS_ML_H */

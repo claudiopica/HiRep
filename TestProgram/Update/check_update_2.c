@@ -114,14 +114,6 @@ int main(int argc, char *argv[])
 
 #endif
 
-  /* finalize Monte Carlo */
-  end_mc();
-
-  free_gfield(u_gauge);
-#ifndef REPR_FUNDAMENTAL
-  free_gfield_f(u_gauge_f);
-#endif
-
   finalize_process();
   return return_value;
 }

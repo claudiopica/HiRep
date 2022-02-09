@@ -97,9 +97,6 @@ int main(int argc, char *argv[])
   else
     lprintf("REVERSIBILITY TEST", 0, "Skipped the comparison as the configuration was not accepted\n");
 
-  /* finalize Monte Carlo */
-  end_mc();
-
   finalize_process();
   return return_value;
 }
