@@ -62,6 +62,10 @@ spinor_field* create_spinor_mask(spinor_field* s, geometry_descriptor* masktype)
 void free_spinor_mask(spinor_field* s);
 
 #ifdef WITH_GPU
+void spinor_field_copy_to_gpu_f(spinor_field *field);
+void spinor_field_copy_from_gpu_f(spinor_field *field);
+void spinor_field_copy_to_gpu_f_flt(spinor_field_flt *field);
+void spinor_field_copy_from_gpu_f_flt(spinor_field_flt *field);
 void spinor_field_togpuformat(spinor_field *out, spinor_field* in);
 void spinor_field_tocpuformat(spinor_field *out, spinor_field* in);
 void spinor_field_togpuformat_flt(spinor_field_flt *out, spinor_field_flt *in);
@@ -78,6 +82,7 @@ void sfield_copy_to_gpu(scalar_field *field);
 void sfield_copy_from_gpu(scalar_field *field);
 void avfield_togpuformat(suNg_av_field *out, suNg_av_field *in);
 void avfield_tocpuformat(suNg_av_field *out, suNg_av_field *in);
+
 #endif
 
 #endif
