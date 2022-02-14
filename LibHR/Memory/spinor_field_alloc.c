@@ -48,7 +48,7 @@ for (int i=0; i<n; ++i) f[i].comm_req=NULL;\
 #define _ALLOC_GPU_CODE(_name,_size)\
 if(alloc_mem_t & GPU_MEM) {\
 cudaError_t err;\
-err = cudaMalloc((void **) &(f->gpu_ptr), n*_size*type->gsize_spinor*sizeof(*(f->gpu_ptr))); \
+err = cudaMallocManaged((void **) &(f->gpu_ptr), n*_size*type->gsize_spinor*sizeof(*(f->gpu_ptr)),cudaMemAttachGlobal); \
 error(err!=cudaSuccess,1,"alloc_" #_name " [" __FILE__ "]", \
 "Could not allocate GPU memory space for field"); \
 for (int i=1; i<n; ++i) f[i].gpu_ptr=f[i-1].gpu_ptr+type->gsize_spinor*_size;\

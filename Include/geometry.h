@@ -85,7 +85,10 @@ void test_geometry_mpi(void);
 void test_geometry_mpi_eo(void);
 void print_wdmatrix(char *filename);
 
+
+#ifdef WITH_GPU
 #include "gpu.h"
 void init_gpu(input_gpu gpu_var);
 
+#endif
 #endif

@@ -1,7 +1,6 @@
 TOPDIR = ..
 MKDIR = $(TOPDIR)/Make
-SUBDIRS1 = $(shell find * -maxdepth 0 -type d)
-SUBDIRS = $(filter-out Observables, $(SUBDIRS1))
+SUBDIRS = $(shell find * -maxdepth 0 -type d)
 
 LIBDIRS = $(SUBDIRS)
 LIBNAME = ./libhr.a
