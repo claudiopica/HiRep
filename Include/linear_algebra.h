@@ -54,11 +54,11 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+template <class T>
+T global_sum_gpu(T *vector, int size);
 unsigned int next_pow2( unsigned int n );
 void global_reduction_sum(double* resField, unsigned int Npow2);
 void global_reduction_complex_sum(hr_complex* resField, unsigned int Npow2);
-double global_sum_gpu(double* vector, int n);
-hr_complex global_sum_gpu_complex(hr_complex* vector, int n);
 #ifdef __cplusplus
 }
 #endif
