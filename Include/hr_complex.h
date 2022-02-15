@@ -27,8 +27,8 @@ typedef thrust::complex<double> hr_complex;
 typedef thrust::complex<float> hr_complex_flt;
 #define creal(a) (a).real()
 #define cimag(a) (a).imag()
-using namespace thrust;
 #define I (thrust::complex<double> (0., 1.))
+#define I_flt (thrust::complex<float> (0., 1.))
 #else
 #include <tgmath.h>
 // tgmath includes math.h and complex.h
