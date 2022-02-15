@@ -52,10 +52,10 @@
 /* GPU functions*/
 #ifdef WITH_GPU
 #ifdef __cplusplus
-extern "C" {
-#endif
 template <class T>
 T global_sum_gpu(T *vector, int size);
+extern "C" {
+#endif
 unsigned int next_pow2( unsigned int n );
 void global_reduction_sum(double* resField, unsigned int Npow2);
 void global_reduction_complex_sum(hr_complex* resField, unsigned int Npow2);
