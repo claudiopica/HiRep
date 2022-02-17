@@ -18,7 +18,7 @@
 extern "C" {
 #endif
 
-void error(int test,int no, char *name, char *text);
+void error(int test, int no, const char *name, const char *text);
 
 #ifdef WITH_GPU
 #include "gpu.h"
