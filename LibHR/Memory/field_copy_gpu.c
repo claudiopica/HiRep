@@ -81,6 +81,7 @@ void gfield_copy_from_gpu_f_flt(suNf_field_flt *field){
 }
 
 /* SPINORS */
+
 void spinor_field_copy_to_gpu_f(spinor_field *field){
   spinor_field *tmp = alloc_spinor_field_f(1, field->type);
   spinor_field_togpuformat(tmp, field);
@@ -94,7 +95,15 @@ void spinor_field_copy_from_gpu_f(spinor_field *field){
   spinor_field_tocpuformat(field,tmp);
   free_spinor_field_f(tmp);
 }
+/*
+void spinor_field_copy_to_gpu_f(spinor_field *field){
+  cudaMemcpy(field->gpu_ptr,field->ptr,field->type->gsize_spinor*sizeof(suNf_spinor),cudaMemcpyHostToDevice);
+}
 
+void spinor_field_copy_from_gpu_f(spinor_field *field){
+  cudaMemcpy(field->ptr,field->gpu_ptr,field->type->gsize_spinor*sizeof(suNf_spinor),cudaMemcpyDeviceToHost);
+}
+*/
 void spinor_field_copy_to_gpu_f_flt(spinor_field_flt *field){
   spinor_field_flt *tmp = alloc_spinor_field_f_flt(1, field->type);
   spinor_field_togpuformat_flt(tmp, field);
