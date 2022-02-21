@@ -119,7 +119,8 @@ typedef enum _mem_t {
 } mem_t;
 
 #ifdef WITH_GPU
-#define STD_MEM_TYPE (CPU_MEM | GPU_MEM)
+//#define STD_MEM_TYPE (CPU_MEM | GPU_MEM)
+#define STD_MEM_TYPE (CPU_MEM)
 #include "gpu.h" 
 #define BLOCK_SIZE 256
 #define BLOCK_SIZE_LINEAR_ALGEBRA 512
