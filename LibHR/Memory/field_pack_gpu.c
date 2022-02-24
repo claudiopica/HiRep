@@ -44,31 +44,20 @@ void spinor_field_togpuformat(spinor_field *out, spinor_field *in) {
 #endif //UPDATE_EO
 */    
     _PIECE_FOR(in->type,ixp) {
-        //printf("ixp = %d\n\n", ixp);
         const int start = in->type->master_start[ixp];
         const int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1;
-        hr_complex *cout=(hr_complex*)(_GPU_FIELD_AT(out,start));
-        //printf("N = %d\n", N);
-        //printf("ixp = %d\n", ixp);
-        //printf("start = %d\n", start);
-        //printf("cout = %p\n", cout);
-        //printf("shift = %d\n", in->type->master_shift);
-        //printf("shift = %d\n", out->type->master_shift);
+        hr_complex *cout=(hr_complex*)(_FIELD_AT(out,start));
         _SITE_FOR(in->type, ixp, ix) {
         
-        	r=_FIELD_AT(in,ix);
+            r=_FIELD_AT(in,ix);
             
             for (int j=0; j<sizeof(*r)/sizeof(hr_complex); ++j) {
             	cout[j*N]=((hr_complex*)(r))[j];
-                //printf("cout[%d] = %f\n", j*N, cout[j*N]);
             }
-            //printf("\nBREAK\n");
             ++cout;
        
     	}
     }
-
-   //printf("\n\nEND LATTICE to GPU fmt\n\n"); 
 }
 
 void spinor_field_tocpuformat(spinor_field *out, spinor_field *in) {
@@ -91,27 +80,21 @@ void spinor_field_tocpuformat(spinor_field *out, spinor_field *in) {
 #endif //UPDATE_EO    
 */   
 
-    //printf("sizeof(*r)/sizeof(hr_complex) = %d\n", sizeof(*r)/sizeof(hr_complex)); 
-    
     _PIECE_FOR(in->type,ixp) {
         int start = in->type->master_start[ixp];
         int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1; 
-        hr_complex *cin=(hr_complex*)(_GPU_FIELD_AT(in,start));
+        hr_complex *cin=(hr_complex*)(_FIELD_AT(in,start));
         _SITE_FOR(in->type,ixp,ix) {
             
-        	r=_FIELD_AT(out,ix);
+            r=_FIELD_AT(out,ix);
         	
             for (int j=0; j<sizeof(*r)/sizeof(hr_complex); ++j) {
                 ((hr_complex*)(r))[j]=cin[j*N];
-                //printf("cin[%d] = %f\n", j*N, cin[j*N]);
             }
-            //printf("\nBREAK\n");
             ++cin;
             
     	}
     }
- 
-    //printf("\n\nEND LATTICE to CPU fmt\n\n"); 
 }
 
 
@@ -120,7 +103,8 @@ void spinor_field_togpuformat_flt(spinor_field_flt *out, spinor_field_flt *in) {
   
   //check input and output type are the same
   error(out->type!=in->type,1,"spinor_field_togpuformat_flt " __FILE__, "Spinors don't match!");
-  
+
+/*  
 //#ifdef UPDATE_EO
   if (in->type==&glattice) {
     // we call recursively this function twice
@@ -133,11 +117,12 @@ void spinor_field_togpuformat_flt(spinor_field_flt *out, spinor_field_flt *in) {
     return;
   }
 //#endif //UPDATE_EO
+*/
   
   _PIECE_FOR(in->type,ixp) {
     const int start = in->type->master_start[ixp];
     const int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1;
-    hr_complex_flt *cout=(hr_complex_flt*)(_GPU_FIELD_AT(out,start));
+    hr_complex_flt *cout=(hr_complex_flt*)(_FIELD_AT(out,start));
     _SITE_FOR(in->type,ixp,ix) {
       
       r=_FIELD_AT(in,ix);
@@ -156,7 +141,8 @@ void spinor_field_tocpuformat_flt(spinor_field_flt *out, spinor_field_flt *in) {
   
   //check input and output type are the same
   error(out->type!=in->type,1,"spinor_field_tocpuformat_flt " __FILE__, "Spinors don't match!");
-  
+
+/*  
 //#ifdef UPDATE_EO
   if (in->type==&glattice) {
     // we call recursively this function twice
@@ -169,11 +155,12 @@ void spinor_field_tocpuformat_flt(spinor_field_flt *out, spinor_field_flt *in) {
     return;
   }
 //#endif //UPDATE_EO    
-  
+*/
+
   _PIECE_FOR(in->type,ixp) {
     int start = in->type->master_start[ixp];
     int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1; 
-    hr_complex_flt *cin=(hr_complex_flt*)(_GPU_FIELD_AT(in,start));
+    hr_complex_flt *cin=(hr_complex_flt*)(_FIELD_AT(in,start));
     _SITE_FOR(in->type,ixp,ix) {
       
       r=_FIELD_AT(out,ix);
