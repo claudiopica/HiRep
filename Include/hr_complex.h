@@ -25,5 +25,4 @@
 #else
 #include "cpu_complex.h"
 #endif
-
 #endif

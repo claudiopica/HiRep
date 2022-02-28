@@ -11,7 +11,7 @@
 #include "hr_complex.h"
 
 int reference_int(const int* vector, const int size){
-  int res = 0; 
+  int res = 0;
   for( int i = 0; i < size; i++ ){
     res += vector[i];
   }
@@ -19,7 +19,7 @@ int reference_int(const int* vector, const int size){
 }
 
 double reference_double(const double* vector, const int size){
-  double res = 0; 
+  double res = 0;
   for( int i = 0; i < size; i++ ){
     res += vector[i];
   }
@@ -27,7 +27,7 @@ double reference_double(const double* vector, const int size){
 }
 
 hr_complex reference_complex(const hr_complex* vector, const int size){
-  hr_complex res = 0; 
+  hr_complex res = 0;
   for( int i = 0; i < size; i++ ){
     res += vector[i];
   }
@@ -47,7 +47,7 @@ int main(){
     vector_double[i] = i*1.0;
     vector_complex[i] = i*1.0 + (i*1.0+1.0)*I;
   }
-
+/*
   res_int = global_sum_gpu_int(vector_int, size);
   ref_int = reference_int(vector_int, size);
   printf("%d %d\n", res_int, ref_int);
@@ -55,10 +55,8 @@ int main(){
   res_double = global_sum_gpu_double(vector_double, size);
   ref_double = reference_double(vector_double, size);
   printf("%f %f\n", res_double, ref_double);
-
-  printf("Before gpu, size = %d\n", size);
+*/
   res_complex = global_sum_gpu_complex(vector_complex, size);
-  printf("After gpu, size = %d\n", size);
   ref_complex = reference_complex(vector_complex, size);
   printf("%f+i*%f %f+i*%f\n", creal(res_complex), cimag(res_complex), creal(ref_complex), cimag(ref_complex));
   return 0;

@@ -79,3 +79,4 @@ TestProgram/WilsonLoops/check_wilsonloops_4
 TestProgram/WilsonLoops/check_wilsonloops_5
 TestProgram/WilsonLoops/check_wilsonloops_6
 TestProgram/SpinorField/check_spinorfield_1
+TestProgram/Inverters/check_global_sum_gpu

@@ -1,6 +1,6 @@
 /***************************************************************************\
- * Copyright (c) 2012, Ari Hietanen and Ulrik Søndergaard                   *   
- * All rights reserved.                                                     * 
+ * Copyright (c) 2012, Ari Hietanen and Ulrik Søndergaard                   *
+ * All rights reserved.                                                     *
 \***************************************************************************/
 /* Copyright (c) 2022, NVIDIA CORPORATION. All rights reserved.
  *
@@ -109,7 +109,7 @@ template <>
 __device__ __forceinline__ hr_complex_flt warpReduceSum(unsigned int mask, hr_complex_flt mySum) {
   for (int offset = warpSize / 2; offset > 0; offset /= 2) {
     mySum += __shfl_down_sync(mask, creal(mySum), offset);
-    mySum += __shfl_down_sync(mask, cimag(mySum), offset)*I_flt;
+    mySum += __shfl_down_sync(mask, cimag(mySum), offset)*I;
   }
   return mySum;
 }
@@ -297,29 +297,34 @@ void reduce(int size, int threads, int blocks, T *d_idata, T *d_odata) {
 
 template <class T>
 T global_sum_gpu(T *vector, int size) {
+  /*
+  for( int i = 0; i < size; i++ ){
+    printf("%f\n", creal(vector[i]));
+  }
+  for( int i = 0; i < size; i++ ){
+    printf("%f %f\n", creal(vector[i]), cimag(vector[i]));
+  }
+  */
   int threads = 32;
   // Blocks calculation from Nvidia reduction sample, see subroutine getNumBlocksAndThreads()
   int blocks = (size + (threads * 2 - 1)) / (threads * 2);
-  printf("blocks,size,threads = %d %d %d\n", blocks, size, threads);
   T res = 0;
   T *vector_host = (T *)malloc(blocks * sizeof(T));
 
   T *vector_out = NULL;
   cudaMalloc((void **)&vector_out, blocks * sizeof(T));
-  
+
   reduce<T>(size, threads, blocks, vector, vector_out);
   cudaMemcpy(vector_host, vector_out, blocks * sizeof(T), cudaMemcpyDeviceToHost);
 
   for (int i = 0; i < blocks; i++) {
-    //printf("i=%d, val=%f+i*%f\n",i, creal(vector_host[i]), cimag(vector_host[i]));
     res += vector_host[i];
   }
 
   return res;
 }
-
+/*
 int global_sum_gpu_int(int* vector, int size){
-  printf("Inside global_sum_complex, size = %d\n", size);
   int res;
   int* vector_d;
   cudaMalloc((void **)&vector_d, size*sizeof(int));
@@ -329,7 +334,6 @@ int global_sum_gpu_int(int* vector, int size){
 }
 
 double global_sum_gpu_double(double* vector, int size){
-  printf("Inside global_sum_complex, size = %d\n", size);
   double res;
   double* vector_d;
   cudaMalloc((void **)&vector_d, size*sizeof(double));
@@ -337,19 +341,14 @@ double global_sum_gpu_double(double* vector, int size){
   res = global_sum_gpu<double>(vector_d, size);
   return res;
 }
-
-extern "C"{
+*/
 hr_complex global_sum_gpu_complex(hr_complex* vector, int size){
-  printf("Inside global_sum_complex, size = %d\n", size);
-  printf("Inside global_sum_complex, vector = %p\n", vector);
-   
   hr_complex res;
   hr_complex* vector_d;
   cudaMalloc((void **)&vector_d, size*sizeof(hr_complex));
   cudaMemcpy(vector_d, vector, size*sizeof(hr_complex), cudaMemcpyHostToDevice);
   res = global_sum_gpu<hr_complex>(vector_d, size);
   return res;
-}
 }
 /*
 template int global_sum_gpu<int>(int* vector, int size);
@@ -366,4 +365,3 @@ unsigned int next_pow2( unsigned int n ) {
 void global_reduction_sum(double* resField, unsigned int Npow2){}
 void global_reduction_complex_sum(hr_complex* resField, unsigned int Npow2){}
 #endif
-

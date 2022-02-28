@@ -293,5 +293,4 @@ typedef float _Complex hr_complex_flt;
 #define _complex_clc_assign(a,z1,c1,z2,c2) \
     (a)+=(z1)*(c1)+(z2)*(c2)
 
-
 #endif
