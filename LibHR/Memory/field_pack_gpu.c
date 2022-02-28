@@ -29,27 +29,27 @@ void spinor_field_togpuformat(spinor_field *out, spinor_field *in) {
 
     //check input and output type are the same
     error(out->type!=in->type,1,"spinor_field_togpuformat " __FILE__, "Spinors don't match!");
-    
-//#ifdef UPDATE_EO
+/*    
+#ifdef UPDATE_EO
     if (in->type==&glattice) {
         // we call recursively this function twice
         // on the even and odd sublattices
         in->type=out->type=&glat_even;
         spinor_field_togpuformat(out, in);
-    		in->type=out->type=&glat_odd;
+        in->type=out->type=&glat_odd;
         spinor_field_togpuformat(out, in);
         in->type=out->type=&glattice;
         return;
     }
-//#endif //UPDATE_EO
-    
+#endif //UPDATE_EO
+*/    
     _PIECE_FOR(in->type,ixp) {
         const int start = in->type->master_start[ixp];
         const int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1;
-        hr_complex *cout=(hr_complex*)(_GPU_FIELD_AT(out,start));
+        hr_complex *cout=(hr_complex*)(_FIELD_AT(out,start));
         _SITE_FOR(in->type, ixp, ix) {
         
-        	r=_FIELD_AT(in,ix);
+            r=_FIELD_AT(in,ix);
             
             for (int j=0; j<sizeof(*r)/sizeof(hr_complex); ++j) {
             	cout[j*N]=((hr_complex*)(r))[j];
@@ -65,8 +65,8 @@ void spinor_field_tocpuformat(spinor_field *out, spinor_field *in) {
 
     //check input and output type are the same
     error(out->type!=in->type,1,"spinor_field_tocpuformat " __FILE__, "Spinors don't match!");
-    
-//#ifdef UPDATE_EO
+/*    
+#ifdef UPDATE_EO
     if (in->type==&glattice) {
         // we call recursively this function twice
         // on the even and odd sublattices
@@ -77,15 +77,16 @@ void spinor_field_tocpuformat(spinor_field *out, spinor_field *in) {
         in->type=out->type=&glattice;
         return;
     }
-//#endif //UPDATE_EO    
-    
+#endif //UPDATE_EO    
+*/   
+
     _PIECE_FOR(in->type,ixp) {
         int start = in->type->master_start[ixp];
         int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1; 
-        hr_complex *cin=(hr_complex*)(_GPU_FIELD_AT(in,start));
+        hr_complex *cin=(hr_complex*)(_FIELD_AT(in,start));
         _SITE_FOR(in->type,ixp,ix) {
             
-        	r=_FIELD_AT(out,ix);
+            r=_FIELD_AT(out,ix);
         	
             for (int j=0; j<sizeof(*r)/sizeof(hr_complex); ++j) {
                 ((hr_complex*)(r))[j]=cin[j*N];
@@ -96,12 +97,14 @@ void spinor_field_tocpuformat(spinor_field *out, spinor_field *in) {
     }
 }
 
+
 void spinor_field_togpuformat_flt(spinor_field_flt *out, spinor_field_flt *in) {
   suNf_spinor_flt *r=0;
   
   //check input and output type are the same
   error(out->type!=in->type,1,"spinor_field_togpuformat_flt " __FILE__, "Spinors don't match!");
-  
+
+/*  
 //#ifdef UPDATE_EO
   if (in->type==&glattice) {
     // we call recursively this function twice
@@ -114,11 +117,12 @@ void spinor_field_togpuformat_flt(spinor_field_flt *out, spinor_field_flt *in) {
     return;
   }
 //#endif //UPDATE_EO
+*/
   
   _PIECE_FOR(in->type,ixp) {
     const int start = in->type->master_start[ixp];
     const int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1;
-    hr_complex_flt *cout=(hr_complex_flt*)(_GPU_FIELD_AT(out,start));
+    hr_complex_flt *cout=(hr_complex_flt*)(_FIELD_AT(out,start));
     _SITE_FOR(in->type,ixp,ix) {
       
       r=_FIELD_AT(in,ix);
@@ -137,7 +141,8 @@ void spinor_field_tocpuformat_flt(spinor_field_flt *out, spinor_field_flt *in) {
   
   //check input and output type are the same
   error(out->type!=in->type,1,"spinor_field_tocpuformat_flt " __FILE__, "Spinors don't match!");
-  
+
+/*  
 //#ifdef UPDATE_EO
   if (in->type==&glattice) {
     // we call recursively this function twice
@@ -150,11 +155,12 @@ void spinor_field_tocpuformat_flt(spinor_field_flt *out, spinor_field_flt *in) {
     return;
   }
 //#endif //UPDATE_EO    
-  
+*/
+
   _PIECE_FOR(in->type,ixp) {
     int start = in->type->master_start[ixp];
     int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1; 
-    hr_complex_flt *cin=(hr_complex_flt*)(_GPU_FIELD_AT(in,start));
+    hr_complex_flt *cin=(hr_complex_flt*)(_FIELD_AT(in,start));
     _SITE_FOR(in->type,ixp,ix) {
       
       r=_FIELD_AT(out,ix);

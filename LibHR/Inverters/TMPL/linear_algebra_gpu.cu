@@ -239,6 +239,7 @@ __global__ void spinor_field_mul_gpu(COMPLEX *s1, REAL r, COMPLEX *s2,int N){
   int i = blockIdx.x*BLOCK_SIZE + threadIdx.x;
   i=min(i,N-1);
   _complex_mulr(s1[i],r,s2[i]);
+  //printf("s1[%d], s2[%d] = %f, %f\n", i, i, creal(s1[i]), creal(s2[i]));
 }
 
 /* s1+=c*s2 c complex */
