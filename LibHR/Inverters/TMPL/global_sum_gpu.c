@@ -99,8 +99,8 @@ __device__ __forceinline__ T warpReduceSum(unsigned int mask, T mySum) {
 template <>
 __device__ __forceinline__ hr_complex warpReduceSum(unsigned int mask, hr_complex mySum) {
   for (int offset = warpSize / 2; offset > 0; offset /= 2) {
-    mySum += __shfl_down_sync(mask, creal(mySum), offset);
-    mySum += __shfl_down_sync(mask, cimag(mySum), offset)*I;
+    mySum.re += __shfl_down_sync(mask, creal(mySum), offset);
+    mySum.im += __shfl_down_sync(mask, cimag(mySum), offset);
   }
   return mySum;
 }
@@ -108,8 +108,8 @@ __device__ __forceinline__ hr_complex warpReduceSum(unsigned int mask, hr_comple
 template <>
 __device__ __forceinline__ hr_complex_flt warpReduceSum(unsigned int mask, hr_complex_flt mySum) {
   for (int offset = warpSize / 2; offset > 0; offset /= 2) {
-    mySum += __shfl_down_sync(mask, creal(mySum), offset);
-    mySum += __shfl_down_sync(mask, cimag(mySum), offset)*I;
+    mySum.re += __shfl_down_sync(mask, creal(mySum), offset);
+    mySum.im += __shfl_down_sync(mask, cimag(mySum), offset);
   }
   return mySum;
 }
@@ -177,6 +177,7 @@ __global__ void reduce7(const T *__restrict__ g_idata, T *__restrict__ g_odata, 
 
   // Reduce within warp using shuffle or reduce_add if T==int & CUDA_ARCH ==
   // SM 8.0
+  //printf("mySum: %f %f\n", creal(mySum), cimag(mySum));
   mySum = warpReduceSum<T>(mask, mySum);
 
   // each thread puts its local sum into shared memory
@@ -297,17 +298,10 @@ void reduce(int size, int threads, int blocks, T *d_idata, T *d_odata) {
 
 template <class T>
 T global_sum_gpu(T *vector, int size) {
-  /*
-  for( int i = 0; i < size; i++ ){
-    printf("%f\n", creal(vector[i]));
-  }
-  for( int i = 0; i < size; i++ ){
-    printf("%f %f\n", creal(vector[i]), cimag(vector[i]));
-  }
-  */
   int threads = 32;
   // Blocks calculation from Nvidia reduction sample, see subroutine getNumBlocksAndThreads()
   int blocks = (size + (threads * 2 - 1)) / (threads * 2);
+  //printf("%d %d %d\n", size, threads, blocks);
   T res = 0;
   T *vector_host = (T *)malloc(blocks * sizeof(T));
 
@@ -318,12 +312,13 @@ T global_sum_gpu(T *vector, int size) {
   cudaMemcpy(vector_host, vector_out, blocks * sizeof(T), cudaMemcpyDeviceToHost);
 
   for (int i = 0; i < blocks; i++) {
+    //printf("%d %f %f\n", i, creal(vector_host[i]), cimag(vector_host[i]));
     res += vector_host[i];
   }
 
   return res;
 }
-/*
+
 int global_sum_gpu_int(int* vector, int size){
   int res;
   int* vector_d;
@@ -341,7 +336,7 @@ double global_sum_gpu_double(double* vector, int size){
   res = global_sum_gpu<double>(vector_d, size);
   return res;
 }
-*/
+
 hr_complex global_sum_gpu_complex(hr_complex* vector, int size){
   hr_complex res;
   hr_complex* vector_d;

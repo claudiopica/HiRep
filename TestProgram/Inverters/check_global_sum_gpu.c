@@ -47,7 +47,7 @@ int main(){
     vector_double[i] = i*1.0;
     vector_complex[i] = i*1.0 + (i*1.0+1.0)*I;
   }
-/*
+
   res_int = global_sum_gpu_int(vector_int, size);
   ref_int = reference_int(vector_int, size);
   printf("%d %d\n", res_int, ref_int);
@@ -55,7 +55,7 @@ int main(){
   res_double = global_sum_gpu_double(vector_double, size);
   ref_double = reference_double(vector_double, size);
   printf("%f %f\n", res_double, ref_double);
-*/
+
   res_complex = global_sum_gpu_complex(vector_complex, size);
   ref_complex = reference_complex(vector_complex, size);
   printf("%f+i*%f %f+i*%f\n", creal(res_complex), cimag(res_complex), creal(ref_complex), cimag(ref_complex));
