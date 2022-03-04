@@ -13,7 +13,6 @@
 
 #ifndef COMPLEX_H
 #define COMPLEX_H
-
 /*******************************************************************************
 *
 * Definitions of type complex
@@ -131,6 +130,12 @@ struct hr_complex
     im = 0.0;
     return *this;
   }
+  __host__ __device__ hr_complex operator=(const double x)
+  {
+    re = (double)x;
+    im = 0.0;
+    return *this;
+  }
   __host__ __device__ hr_complex operator=(const hr_complex_flt x)
   {
     re = (double)x.re;
@@ -240,9 +245,9 @@ __host__ __device__ hr_complex_flt hr_complex_flt::operator+=(const hr_complex x
 }
 
 #define I (hr_complex(0.0, 1.0))
-#define creal(a) (a.re)
-#define cimag(a) (a.im)
-#define conj(a) ((a.im) = -(a.im))
+#define creal(a) ((a).re)
+#define cimag(a) ((a).im)
+#define conj(a) (hr_complex((a).re, -(a).im))
 
 /*******************************************************************************
 *
@@ -256,13 +261,13 @@ __host__ __device__ hr_complex_flt hr_complex_flt::operator+=(const hr_complex x
 * Re(a) (a complex)
 */
 #define _complex_re(a) \
-   a.re
+   creal(a)
 
 /*
 * Im(a) (a complex)
 */
 #define _complex_im(a) \
-   a.im
+   cimag(a)
 
 /*
 * a=0 (a complex)
@@ -359,7 +364,7 @@ __host__ __device__ hr_complex_flt hr_complex_flt::operator+=(const hr_complex x
 * Re(a^*b) (a,b complex)
 */
 #define _complex_prod_re(a,b) \
-   creal(conj(a)*b)
+   creal(conj(a)*(b))
 
 /*
 * Re((1-a)^*(1-b)) (a,b complex)

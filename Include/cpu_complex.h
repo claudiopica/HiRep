@@ -24,8 +24,8 @@
 // and defines type-generic macros for math functions
 // e.g: float complex fc; creal(fc) invokes crealf(fc)
 
-typedef double _Complex hr_complex;
-typedef float _Complex hr_complex_flt;
+typedef double complex hr_complex;
+typedef float complex hr_complex_flt;
 
 /*******************************************************************************
 *
