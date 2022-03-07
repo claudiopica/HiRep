@@ -238,8 +238,9 @@ template< typename COMPLEX , typename REAL >
 __global__ void spinor_field_mul_gpu(COMPLEX *s1, REAL r, COMPLEX *s2,int N){
   int i = blockIdx.x*BLOCK_SIZE + threadIdx.x;
   i=min(i,N-1);
+  printf("s1[%d], s2[%d] = %f, %f\n", i, i, creal(s1[i]), creal(s2[i]));
   _complex_mulr(s1[i],r,s2[i]);
-  //printf("s1[%d], s2[%d] = %f, %f\n", i, i, creal(s1[i]), creal(s2[i]));
+  printf("s1[%d], s2[%d] = %f, %f\n", i, i, creal(s1[i]), creal(s2[i]));
 }
 
 /* s1+=c*s2 c complex */
@@ -325,7 +326,7 @@ __global__ void spinor_field_lc_gpu(COMPLEX *s1, REAL r1, COMPLEX *s2, REAL r2, 
   _complex_rlc(s1[i],r1,s2[i],r2,s3[i]);
 }
 
-/* s1+=r*s2 r real */
+/* s1+=r1*s2+r2*s3 r1,r2 real */
 template< typename COMPLEX, typename REAL >
 __global__ void spinor_field_lc_add_assign_gpu(COMPLEX *s1, REAL r1, COMPLEX *s2, REAL r2, COMPLEX *s3, int N){
   int i = blockIdx.x*BLOCK_SIZE + threadIdx.x;
@@ -334,7 +335,7 @@ __global__ void spinor_field_lc_add_assign_gpu(COMPLEX *s1, REAL r1, COMPLEX *s2
 }
 
 
-/* s1=cd1*s2+cd2*s3 cd1, cd2 complex*/
+/* s1=cd1*s2+cd2*s3 cd1, cd2 complex */
 template< typename COMPLEX >
 __global__ void spinor_field_clc_gpu(COMPLEX *s1, COMPLEX c1, COMPLEX *s2, COMPLEX c2, COMPLEX *s3, int N){
   int i = blockIdx.x*BLOCK_SIZE + threadIdx.x;
@@ -342,7 +343,7 @@ __global__ void spinor_field_clc_gpu(COMPLEX *s1, COMPLEX c1, COMPLEX *s2, COMPL
   _complex_clc(s1[i],c1,s2[i],c2,s3[i]);
 }
 
-/* s1+=r*s2 r real */
+/* s1+=cd1*s2+cd2*s3 cd1,cd2 complex */
 template< typename COMPLEX >
 __global__ void spinor_field_clc_add_assign_gpu(COMPLEX *s1, COMPLEX c1, COMPLEX *s2, COMPLEX c2, COMPLEX *s3, int N){
   int i = blockIdx.x*BLOCK_SIZE + threadIdx.x;
@@ -372,6 +373,20 @@ __global__ void spinor_field_g5_assign_gpu(COMPLEX* s1,int N){
     _complex_minus(s1[i],s1[i]);
   }
 }
+
+/* s1+=c*g5*s2 c complex  */
+template< typename COMPLEX>
+__global__ void spinor_field_g5_mulc_add_assign_gpu(COMPLEX *s1, COMPLEX c, COMPLEX *s2,int N){
+  int i = blockIdx.x*BLOCK_SIZE + threadIdx.x;
+  i=min(i,N-1);
+  if ( i < (N>>1) ) {
+    _complex_mul_assign(s1[i],c,s2[i]);
+  }
+  else{
+    _complex_mul_assign(s1[i],-c,s2[i]);
+  }
+}
+
 
 /* tools per eva.c  */
 template< typename COMPLEX , typename REAL >
