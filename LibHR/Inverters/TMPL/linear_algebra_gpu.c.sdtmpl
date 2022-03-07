@@ -220,11 +220,9 @@ void _FUNC(spinor_field_mulc_add_assign)(_SPINOR_FIELD_TYPE *s1, _COMPLEX c, _SP
 void _FUNC(spinor_field_mul)(_SPINOR_FIELD_TYPE *s1, _REAL r, _SPINOR_FIELD_TYPE *s2)
 {
   _TWO_SPINORS_MATCHING(s1,s2);
-       printf("before kernel loop.\n");
   _CUDA_FOR(s1,ixp, 
             _GRID_LOOP(spinor_field_mul_gpu<<<grid_size,BLOCK_SIZE>>>(_TOCOMPLEX(_GPU_FIELD_BLK(s1,ixp)),r,_TOCOMPLEX(_GPU_FIELD_BLK(s2,ixp)),N-offset))
   );
-       printf("after kernel loop.\n");
 
 }
 
