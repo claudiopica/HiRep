@@ -93,6 +93,7 @@ struct hr_complex_flt
   __host__ __device__ hr_complex_flt operator*(const float x)
   {
     re *= x;
+    im *= x;
     return *this;
   }
   __host__ __device__ hr_complex_flt operator*(const hr_complex_flt x)
@@ -209,6 +210,7 @@ struct hr_complex
   __host__ __device__ hr_complex operator*(const double x)
   {
     re *= x;
+    im *= x;
     return *this;
   }
   __host__ __device__ hr_complex operator*(const hr_complex x)
