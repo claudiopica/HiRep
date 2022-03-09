@@ -1,4 +1,4 @@
-/***************************************************************************\
+/**************************************************************************\
 * Copyright (c) 2008, Claudio Pica                                          *
 * All rights reserved.                                                      *
 \***************************************************************************/
@@ -98,8 +98,11 @@ struct hr_complex_flt
   }
   __host__ __device__ hr_complex_flt operator*(const hr_complex_flt x)
   {
-    re = re*x.re - im*x.im;
-    im = re*x.im + im*x.re;
+    float re_tmp, im_tmp;
+    re_tmp = re*x.re - im*x.im;
+    im_tmp = re*x.im + im*x.re;
+    re = re_tmp;
+    im = im_tmp;
     return *this;
   }
 };
@@ -215,14 +218,22 @@ struct hr_complex
   }
   __host__ __device__ hr_complex operator*(const hr_complex x)
   {
-    re = re*x.re - im*x.im;
-    im = re*x.im + im*x.re;
+    double re_tmp, im_tmp;
+    re_tmp = re*x.re - im*x.im;
+    im_tmp = re*x.im + im*x.re;
+    re = re_tmp;
+    im_im_tmp;
     return *this;
   }
   __host__ __device__ hr_complex operator*(const hr_complex_flt x)
   {
-    re = re*(double)x.re - im*(double)x.im;
-    im = re*(double)x.im + im*(double)x.re;
+    double re_tmp, im_tmp;
+    re_tmp = re*x.re - im*x.im;
+    im_tmp = re*x.im + im*x.re;
+    re_tmp = re*(double)x.re - im*(double)x.im;
+    im_tmp = re*(double)x.im + im*(double)x.re;
+    re = re_tmp;
+    im_im_tmp;
     return *this;
   }
 };
