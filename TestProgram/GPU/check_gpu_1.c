@@ -63,27 +63,6 @@ void unit_spinor_field_cpu(spinor_field *s)
 }
 
 
-void print_spinor_field_cpu(spinor_field *s)
-{
-	geometry_descriptor *type = s->type;
-        _PIECE_FOR(type, ixp){
-
-             int start = type->master_start[ixp];
-             int N = type->master_end[ixp] - type->master_start[ixp]+1;
-             double *r = (double*)(_FIELD_AT(s, start));
-
-             for(int i=0;i<N*sizeof(suNf_spinor)/sizeof(double);i++) {
-              
-                 printf("spinor[%d,%d] = %f\n", ixp, i, r[i]); 
- 
-             }
-        }
-        
-        printf("\n\nDone.\n\n");
-
-}
-
-
 int main(int argc, char *argv[])
 {
 

@@ -32,7 +32,7 @@
   do {										\
       sqn_s1 = sqn_s2 = sqn_s3 = 0.0;	 					\
       for (int i=0;i<(sfsize);i++){						\
-        unit_spinor_field_cpu(&s1[i]); 					\
+        random_spinor_field_cpu(&s1[i]); 					\
         spinor_field_copy_f_cpu(&s2[i],&s1[i]);					\
         spinor_field_copy_f_cpu(&s3[i],&s1[i]);					\
         spinor_field_copy_to_gpu_f(&s1[i]); 					\
@@ -88,11 +88,11 @@ void print_spinor_field_cpu(spinor_field *s)
 
              int start = type->master_start[ixp];
              int N = type->master_end[ixp] - type->master_start[ixp]+1;
-             double *r = (double*)(_FIELD_AT(s, start));
+             hr_complex *r = (hr_complex*)(_FIELD_AT(s, start));
 
-             for(int i=0;i<N*sizeof(suNf_spinor)/sizeof(double);i++) {
+             for(int i=0;i<N*sizeof(suNf_spinor)/sizeof(hr_complex);i++) {
 
-                 printf("spinor[%d,%d] = %f\n", ixp, i, r[i]);
+                 printf("spinor[%d,%d] = %f, %f\n", ixp, i, creal(r[i]), cimag(r[i]));
 
              }
         }
@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
 
       spinor_field *sf1, *sf2, *sf3;
       double sqnorm_sf1, sqnorm_sf2, sqnorm_sf3, check;
-      int sfsize = 1;
+      int sfsize = 10;
       
       double r, s;
       hr_complex c, d;
@@ -123,33 +123,16 @@ int main(int argc, char *argv[])
       sf2=alloc_spinor_field_f(sfsize, &glattice);
       sf3=alloc_spinor_field_f(sfsize, &glattice);
        
-        unit_spinor_field_cpu(&sf1[0]);       
-        printf("sqnorm sf1 = %e\n", spinor_field_sqnorm_f_cpu(&sf1[0]));
-      //print_spinor_field_cpu(&sf1[0]);
-
-        unit_spinor_field_cpu(&sf1[0]); 					
-        spinor_field_copy_f_cpu(&sf2[0],&sf1[0]);					
-        spinor_field_copy_to_gpu_f(&sf1[0]); 					
-        spinor_field_zero_f_cpu(&sf1[0]);    					
-        spinor_field_copy_to_gpu_f(&sf2[0]);					
-        spinor_field_zero_f_cpu(&sf2[0]);					
-	spinor_field_mul_f(&sf2[0],10.0,&sf1[0]);
-        spinor_field_copy_from_gpu_f(&sf1[0]);
-        spinor_field_copy_from_gpu_f(&sf2[0]);					
-        printf("sqnorm sf1 = %e\n", spinor_field_sqnorm_f_cpu(&sf1[0]));
-        printf("sqnorm sf2 = %e\n", spinor_field_sqnorm_f_cpu(&sf2[0]));
-        print_spinor_field_cpu(&sf2[0]);
- 
       // s2=r*s1 
       r = 10.0;
-//      _TEST_LIN_ALG(sfsize,sf1,sf2,sf3,i,
-// 		    spinor_field_mul_f(&sf2[i],r,&sf1[i]),
-//                    sqnorm_sf1,sqnorm_sf2,sqnorm_sf3
-//      );
+      _TEST_LIN_ALG(sfsize,sf1,sf2,sf3,i,
+ 		    spinor_field_mul_f(&sf2[i],r,&sf1[i]),
+                    sqnorm_sf1,sqnorm_sf2,sqnorm_sf3
+      );
       //printf("sqnorm sf2 = %f\n", sqnorm_sf2);
       //printf("sqnorm sf1 = %f\n", sqnorm_sf1*pow(r,2));
-      //check = fabs(sqnorm_sf1*pow(r,2)-sqnorm_sf2);	 		
-      //lprintf("GPU TEST",2,"Kernel Check (s2=r*s1):\t\t %e\n", check);	
+      check = fabs(sqnorm_sf1*pow(r,2)-sqnorm_sf2);	 		
+      lprintf("GPU TEST",2,"Kernel Check (s2=r*s1):\t\t %e\n", check);	
       
       // s2=c*s1 
       c = 2.0+1.0*I;
