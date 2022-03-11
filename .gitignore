@@ -42,6 +42,7 @@ TestProgram/GaugeFix/check_gaugefix
 TestProgram/Geometry/check_geometry_1
 TestProgram/Integrators/check_integrator_1
 TestProgram/Inverters/check_inverters_1
+TestProgram/Inverters/check_inverters_2
 TestProgram/Inverters/check_inverters_3
 TestProgram/Inverters/check_inverters_4
 TestProgram/Inverters/check_inverters_5
@@ -79,6 +80,7 @@ TestProgram/WilsonLoops/check_wilsonloops_4
 TestProgram/WilsonLoops/check_wilsonloops_5
 TestProgram/WilsonLoops/check_wilsonloops_6
 TestProgram/SpinorField/check_spinorfield_1
+TestProgram/SpinorField/check_spinorfield_gpu_1
 TestProgram/GPU/check_global_sum_gpu
 TestProgram/GPU/check_gpu_1
 TestProgram/GPU/check_gpu_2
