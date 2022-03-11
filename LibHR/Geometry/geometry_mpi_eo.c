@@ -355,12 +355,13 @@ void eval_fusemask(geometry_descriptor *lglat)
 {
   int counter = 0;
   for (int ip = 0; ip < lglat->local_master_pieces; ip++)
-    counter+=lglat->master_end[ip]-lglat->master_start[ip]+1;
+    counter += lglat->master_end[ip] - lglat->master_start[ip] + 1;
 
-  lglat->fuse_gauge_size=counter;
+  lglat->fuse_gauge_size = counter;
 
-  lglat->fuse_mask = malloc(counter * sizeof(int)); //allocating memory for local volume
+  lglat->fuse_mask = malloc(counter * sizeof(int)); // allocating memory for local volume
 
+  lglat->fuse_inner_counter = counter;
 
   counter = 0;
   /* loop through PIECEs */
@@ -1292,7 +1293,7 @@ static int correnspondig_buffer(int *bf, int i)
   else
     buffer_sign = (border[i].eo_type + 1) % 2;
 
-  //int myfound[10];
+  // int myfound[10];
 
   found = 0;
   for (j = 0; j < done_border; j++)
@@ -1309,7 +1310,7 @@ static int correnspondig_buffer(int *bf, int i)
     {
       found++;
 
-      //myfound[found]=j;
+      // myfound[found]=j;
       if (border[j].eo_type == buffer_sign)
         bf[0] = j;
       else
