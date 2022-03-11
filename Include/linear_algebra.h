@@ -1,12 +1,12 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 #ifndef LINEAR_ALGEBRA_H
 #define LINEAR_ALGEBRA_H
 
-/* 
+/*
  * LINEAR ALGEBRA FUNCTIONS ARE DEFINED IN THE TEMPLATE
  *
  * TMPL/linear_algebra.h.sdtmpl
@@ -52,16 +52,15 @@
 /* GPU functions*/
 #ifdef WITH_GPU
 #ifdef __cplusplus
-//template <class T>
-//T global_sum_gpu(T *vector, int size);
+template <class T>
+T global_sum_gpu(T *vector, int size);
 extern "C" {
 #endif
 int global_sum_gpu_int(int *vector, int size);
+float global_sum_gpu_float(float *vector, int size);
 double global_sum_gpu_double(double *vector, int size);
+hr_complex_flt global_sum_gpu_complex_flt(hr_complex_flt *vector, int size);
 hr_complex global_sum_gpu_complex(hr_complex *vector, int size);
-unsigned int next_pow2( unsigned int n );
-void global_reduction_sum(double* resField, unsigned int Npow2);
-void global_reduction_complex_sum(hr_complex* resField, unsigned int Npow2);
 #ifdef __cplusplus
 }
 #endif
