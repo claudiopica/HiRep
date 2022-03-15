@@ -1145,7 +1145,7 @@ __host__ __device__ hr_complex_flt hr_complex_flt::operator/=(const hr_complex x
 * End of generated code
 *
 *******************************************************************************/
-#define I (hr_complex(0.0, 1.0))
+#define I (hr_complex_int(0, 1))
 #define creal(a) ((a).re)
 #define cimag(a) ((a).im)
 #define conj(a) (hr_complex((a).re, -(a).im))
