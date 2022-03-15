@@ -117,9 +117,7 @@ struct hr_complex_int{
   __host__ __device__ hr_complex_int operator=(const hr_complex x);
   __host__ __device__ hr_complex_int operator-(void)
   {
-    re = -re;
-    im = -im;
-    return *this;
+    return hr_complex_int(-re, -im);
   }
   __host__ __device__ hr_complex_int operator+=(const int x)
   {
@@ -227,99 +225,67 @@ struct hr_complex_int{
   __host__ __device__ hr_complex_int operator/=(const hr_complex x);
   __host__ __device__ hr_complex_int operator+(const int x)
   {
-    re += (int)x;
-    return *this;
+    return hr_complex_int(re+(int)x, im);
   }
   __host__ __device__ hr_complex_int operator+(const float x)
   {
-    re += (int)x;
-    return *this;
+    return hr_complex_int(re+(int)x, im);
   }
   __host__ __device__ hr_complex_int operator+(const double x)
   {
-    re += (int)x;
-    return *this;
+    return hr_complex_int(re+(int)x, im);
   }
   __host__ __device__ hr_complex_int operator+(const hr_complex_int x)
   {
-    re += (int)x.re;
-    im += (int)x.im;
-    return *this;
+    return hr_complex_int(re+(int)x.re, im+(int)x.im);
   }
   __host__ __device__ hr_complex_int operator-(const int x)
   {
-    re -= (int)x;
-    return *this;
+    return hr_complex_int(re-(int)x, im);
   }
   __host__ __device__ hr_complex_int operator-(const float x)
   {
-    re -= (int)x;
-    return *this;
+    return hr_complex_int(re-(int)x, im);
   }
   __host__ __device__ hr_complex_int operator-(const double x)
   {
-    re -= (int)x;
-    return *this;
+    return hr_complex_int(re-(int)x, im);
   }
   __host__ __device__ hr_complex_int operator-(const hr_complex_int x)
   {
-    re -= (int)x.re;
-    im -= (int)x.im;
-    return *this;
+    return hr_complex_int(re-(int)x.re, im-(int)x.im);
   }
   __host__ __device__ hr_complex_int operator*(const int x)
   {
-    re *= (int)x;
-    im *= (int)x;
-    return *this;
+    return hr_complex_int(re*(int)x, im*(int)x);
   }
   __host__ __device__ hr_complex_int operator*(const float x)
   {
-    re *= (int)x;
-    im *= (int)x;
-    return *this;
+    return hr_complex_int(re*(int)x, im*(int)x);
   }
   __host__ __device__ hr_complex_int operator*(const double x)
   {
-    re *= (int)x;
-    im *= (int)x;
-    return *this;
+    return hr_complex_int(re*(int)x, im*(int)x);
   }
   __host__ __device__ hr_complex_int operator*(const hr_complex_int x)
   {
-    int re_tmp, im_tmp;
-    re_tmp = re*((int)x.re) - im*((int)x.im);
-    im_tmp = re*((int)x.im) + im*((int)x.re);
-    re = re_tmp;
-    im = im_tmp;
-    return *this;
+    return hr_complex_int(re*((int)x.re) - im*((int)x.im), re*((int)x.im) + im*((int)x.re));
   }
   __host__ __device__ hr_complex_int operator/(const int x)
   {
-    re /= (int)x;
-    im /= (int)x;
-    return *this;
+    return hr_complex_int(re/(int)x, im/(int)x);
   }
   __host__ __device__ hr_complex_int operator/(const float x)
   {
-    re /= (int)x;
-    im /= (int)x;
-    return *this;
+    return hr_complex_int(re/(int)x, im/(int)x);
   }
   __host__ __device__ hr_complex_int operator/(const double x)
   {
-    re /= (int)x;
-    im /= (int)x;
-    return *this;
+    return hr_complex_int(re/(int)x, im/(int)x);
   }
   __host__ __device__ hr_complex_int operator/(const hr_complex_int x)
   {
-    int re_tmp, im_tmp;
-    re_tmp = (re*((int)x.re) + im*((int)x.im)) / (((int)x.re)*((int)x.re) + ((int)x.im)*((int)x.im));
-    im_tmp = (im*((int)x.re) - re*((int)x.im)) / (((int)x.re)*((int)x.re) + ((int)x.im)*((int)x.im));
-    re = re_tmp;
-    im = im_tmp;
-    return *this;
+    return hr_complex_int((re*((int)x.re) + im*((int)x.im)) / (((int)x.re)*((int)x.re) + ((int)x.im)*((int)x.im)), (im*((int)x.re) - re*((int)x.im)) / (((int)x.re)*((int)x.re) + ((int)x.im)*((int)x.im)));
   }
 };
 struct hr_complex_flt{
@@ -424,9 +390,7 @@ struct hr_complex_flt{
   __host__ __device__ hr_complex_flt operator=(const hr_complex x);
   __host__ __device__ hr_complex_flt operator-(void)
   {
-    re = -re;
-    im = -im;
-    return *this;
+    return hr_complex_flt(-re, -im);
   }
   __host__ __device__ hr_complex_flt operator+=(const int x)
   {
@@ -560,129 +524,83 @@ struct hr_complex_flt{
   __host__ __device__ hr_complex_flt operator/=(const hr_complex x);
   __host__ __device__ hr_complex_flt operator+(const int x)
   {
-    re += (float)x;
-    return *this;
+    return hr_complex_flt(re+(float)x, im);
   }
   __host__ __device__ hr_complex_flt operator+(const float x)
   {
-    re += (float)x;
-    return *this;
+    return hr_complex_flt(re+(float)x, im);
   }
   __host__ __device__ hr_complex_flt operator+(const double x)
   {
-    re += (float)x;
-    return *this;
+    return hr_complex_flt(re+(float)x, im);
   }
   __host__ __device__ hr_complex_flt operator+(const hr_complex_int x)
   {
-    re += (float)x.re;
-    im += (float)x.im;
-    return *this;
+    return hr_complex_flt(re+(float)x.re, im+(float)x.im);
   }
   __host__ __device__ hr_complex_flt operator+(const hr_complex_flt x)
   {
-    re += (float)x.re;
-    im += (float)x.im;
-    return *this;
+    return hr_complex_flt(re+(float)x.re, im+(float)x.im);
   }
   __host__ __device__ hr_complex_flt operator-(const int x)
   {
-    re -= (float)x;
-    return *this;
+    return hr_complex_flt(re-(float)x, im);
   }
   __host__ __device__ hr_complex_flt operator-(const float x)
   {
-    re -= (float)x;
-    return *this;
+    return hr_complex_flt(re-(float)x, im);
   }
   __host__ __device__ hr_complex_flt operator-(const double x)
   {
-    re -= (float)x;
-    return *this;
+    return hr_complex_flt(re-(float)x, im);
   }
   __host__ __device__ hr_complex_flt operator-(const hr_complex_int x)
   {
-    re -= (float)x.re;
-    im -= (float)x.im;
-    return *this;
+    return hr_complex_flt(re-(float)x.re, im-(float)x.im);
   }
   __host__ __device__ hr_complex_flt operator-(const hr_complex_flt x)
   {
-    re -= (float)x.re;
-    im -= (float)x.im;
-    return *this;
+    return hr_complex_flt(re-(float)x.re, im-(float)x.im);
   }
   __host__ __device__ hr_complex_flt operator*(const int x)
   {
-    re *= (float)x;
-    im *= (float)x;
-    return *this;
+    return hr_complex_flt(re*(float)x, im*(float)x);
   }
   __host__ __device__ hr_complex_flt operator*(const float x)
   {
-    re *= (float)x;
-    im *= (float)x;
-    return *this;
+    return hr_complex_flt(re*(float)x, im*(float)x);
   }
   __host__ __device__ hr_complex_flt operator*(const double x)
   {
-    re *= (float)x;
-    im *= (float)x;
-    return *this;
+    return hr_complex_flt(re*(float)x, im*(float)x);
   }
   __host__ __device__ hr_complex_flt operator*(const hr_complex_int x)
   {
-    float re_tmp, im_tmp;
-    re_tmp = re*((float)x.re) - im*((float)x.im);
-    im_tmp = re*((float)x.im) + im*((float)x.re);
-    re = re_tmp;
-    im = im_tmp;
-    return *this;
+    return hr_complex_flt(re*((float)x.re) - im*((float)x.im), re*((float)x.im) + im*((float)x.re));
   }
   __host__ __device__ hr_complex_flt operator*(const hr_complex_flt x)
   {
-    float re_tmp, im_tmp;
-    re_tmp = re*((float)x.re) - im*((float)x.im);
-    im_tmp = re*((float)x.im) + im*((float)x.re);
-    re = re_tmp;
-    im = im_tmp;
-    return *this;
+    return hr_complex_flt(re*((float)x.re) - im*((float)x.im), re*((float)x.im) + im*((float)x.re));
   }
   __host__ __device__ hr_complex_flt operator/(const int x)
   {
-    re /= (float)x;
-    im /= (float)x;
-    return *this;
+    return hr_complex_flt(re/(float)x, im/(float)x);
   }
   __host__ __device__ hr_complex_flt operator/(const float x)
   {
-    re /= (float)x;
-    im /= (float)x;
-    return *this;
+    return hr_complex_flt(re/(float)x, im/(float)x);
   }
   __host__ __device__ hr_complex_flt operator/(const double x)
   {
-    re /= (float)x;
-    im /= (float)x;
-    return *this;
+    return hr_complex_flt(re/(float)x, im/(float)x);
   }
   __host__ __device__ hr_complex_flt operator/(const hr_complex_int x)
   {
-    float re_tmp, im_tmp;
-    re_tmp = (re*((float)x.re) + im*((float)x.im)) / (((float)x.re)*((float)x.re) + ((float)x.im)*((float)x.im));
-    im_tmp = (im*((float)x.re) - re*((float)x.im)) / (((float)x.re)*((float)x.re) + ((float)x.im)*((float)x.im));
-    re = re_tmp;
-    im = im_tmp;
-    return *this;
+    return hr_complex_flt((re*((float)x.re) + im*((float)x.im)) / (((float)x.re)*((float)x.re) + ((float)x.im)*((float)x.im)), (im*((float)x.re) - re*((float)x.im)) / (((float)x.re)*((float)x.re) + ((float)x.im)*((float)x.im)));
   }
   __host__ __device__ hr_complex_flt operator/(const hr_complex_flt x)
   {
-    float re_tmp, im_tmp;
-    re_tmp = (re*((float)x.re) + im*((float)x.im)) / (((float)x.re)*((float)x.re) + ((float)x.im)*((float)x.im));
-    im_tmp = (im*((float)x.re) - re*((float)x.im)) / (((float)x.re)*((float)x.re) + ((float)x.im)*((float)x.im));
-    re = re_tmp;
-    im = im_tmp;
-    return *this;
+    return hr_complex_flt((re*((float)x.re) + im*((float)x.im)) / (((float)x.re)*((float)x.re) + ((float)x.im)*((float)x.im)), (im*((float)x.re) - re*((float)x.im)) / (((float)x.re)*((float)x.re) + ((float)x.im)*((float)x.im)));
   }
 };
 struct hr_complex{
@@ -796,9 +714,7 @@ struct hr_complex{
   }
   __host__ __device__ hr_complex operator-(void)
   {
-    re = -re;
-    im = -im;
-    return *this;
+    return hr_complex(-re, -im);
   }
   __host__ __device__ hr_complex operator+=(const int x)
   {
@@ -958,159 +874,99 @@ struct hr_complex{
   }
   __host__ __device__ hr_complex operator+(const int x)
   {
-    re += (double)x;
-    return *this;
+    return hr_complex(re+(double)x, im);
   }
   __host__ __device__ hr_complex operator+(const float x)
   {
-    re += (double)x;
-    return *this;
+    return hr_complex(re+(double)x, im);
   }
   __host__ __device__ hr_complex operator+(const double x)
   {
-    re += (double)x;
-    return *this;
+    return hr_complex(re+(double)x, im);
   }
   __host__ __device__ hr_complex operator+(const hr_complex_int x)
   {
-    re += (double)x.re;
-    im += (double)x.im;
-    return *this;
+    return hr_complex(re+(double)x.re, im+(double)x.im);
   }
   __host__ __device__ hr_complex operator+(const hr_complex_flt x)
   {
-    re += (double)x.re;
-    im += (double)x.im;
-    return *this;
+    return hr_complex(re+(double)x.re, im+(double)x.im);
   }
   __host__ __device__ hr_complex operator+(const hr_complex x)
   {
-    re += (double)x.re;
-    im += (double)x.im;
-    return *this;
+    return hr_complex(re+(double)x.re, im+(double)x.im);
   }
   __host__ __device__ hr_complex operator-(const int x)
   {
-    re -= (double)x;
-    return *this;
+    return hr_complex(re-(double)x, im);
   }
   __host__ __device__ hr_complex operator-(const float x)
   {
-    re -= (double)x;
-    return *this;
+    return hr_complex(re-(double)x, im);
   }
   __host__ __device__ hr_complex operator-(const double x)
   {
-    re -= (double)x;
-    return *this;
+    return hr_complex(re-(double)x, im);
   }
   __host__ __device__ hr_complex operator-(const hr_complex_int x)
   {
-    re -= (double)x.re;
-    im -= (double)x.im;
-    return *this;
+    return hr_complex(re-(double)x.re, im-(double)x.im);
   }
   __host__ __device__ hr_complex operator-(const hr_complex_flt x)
   {
-    re -= (double)x.re;
-    im -= (double)x.im;
-    return *this;
+    return hr_complex(re-(double)x.re, im-(double)x.im);
   }
   __host__ __device__ hr_complex operator-(const hr_complex x)
   {
-    re -= (double)x.re;
-    im -= (double)x.im;
-    return *this;
+    return hr_complex(re-(double)x.re, im-(double)x.im);
   }
   __host__ __device__ hr_complex operator*(const int x)
   {
-    re *= (double)x;
-    im *= (double)x;
-    return *this;
+    return hr_complex(re*(double)x, im*(double)x);
   }
   __host__ __device__ hr_complex operator*(const float x)
   {
-    re *= (double)x;
-    im *= (double)x;
-    return *this;
+    return hr_complex(re*(double)x, im*(double)x);
   }
   __host__ __device__ hr_complex operator*(const double x)
   {
-    re *= (double)x;
-    im *= (double)x;
-    return *this;
+    return hr_complex(re*(double)x, im*(double)x);
   }
   __host__ __device__ hr_complex operator*(const hr_complex_int x)
   {
-    double re_tmp, im_tmp;
-    re_tmp = re*((double)x.re) - im*((double)x.im);
-    im_tmp = re*((double)x.im) + im*((double)x.re);
-    re = re_tmp;
-    im = im_tmp;
-    return *this;
+    return hr_complex(re*((double)x.re) - im*((double)x.im), re*((double)x.im) + im*((double)x.re));
   }
   __host__ __device__ hr_complex operator*(const hr_complex_flt x)
   {
-    double re_tmp, im_tmp;
-    re_tmp = re*((double)x.re) - im*((double)x.im);
-    im_tmp = re*((double)x.im) + im*((double)x.re);
-    re = re_tmp;
-    im = im_tmp;
-    return *this;
+    return hr_complex(re*((double)x.re) - im*((double)x.im), re*((double)x.im) + im*((double)x.re));
   }
   __host__ __device__ hr_complex operator*(const hr_complex x)
   {
-    double re_tmp, im_tmp;
-    re_tmp = re*((double)x.re) - im*((double)x.im);
-    im_tmp = re*((double)x.im) + im*((double)x.re);
-    re = re_tmp;
-    im = im_tmp;
-    return *this;
+    return hr_complex(re*((double)x.re) - im*((double)x.im), re*((double)x.im) + im*((double)x.re));
   }
   __host__ __device__ hr_complex operator/(const int x)
   {
-    re /= (double)x;
-    im /= (double)x;
-    return *this;
+    return hr_complex(re/(double)x, im/(double)x);
   }
   __host__ __device__ hr_complex operator/(const float x)
   {
-    re /= (double)x;
-    im /= (double)x;
-    return *this;
+    return hr_complex(re/(double)x, im/(double)x);
   }
   __host__ __device__ hr_complex operator/(const double x)
   {
-    re /= (double)x;
-    im /= (double)x;
-    return *this;
+    return hr_complex(re/(double)x, im/(double)x);
   }
   __host__ __device__ hr_complex operator/(const hr_complex_int x)
   {
-    double re_tmp, im_tmp;
-    re_tmp = (re*((double)x.re) + im*((double)x.im)) / (((double)x.re)*((double)x.re) + ((double)x.im)*((double)x.im));
-    im_tmp = (im*((double)x.re) - re*((double)x.im)) / (((double)x.re)*((double)x.re) + ((double)x.im)*((double)x.im));
-    re = re_tmp;
-    im = im_tmp;
-    return *this;
+    return hr_complex((re*((double)x.re) + im*((double)x.im)) / (((double)x.re)*((double)x.re) + ((double)x.im)*((double)x.im)), (im*((double)x.re) - re*((double)x.im)) / (((double)x.re)*((double)x.re) + ((double)x.im)*((double)x.im)));
   }
   __host__ __device__ hr_complex operator/(const hr_complex_flt x)
   {
-    double re_tmp, im_tmp;
-    re_tmp = (re*((double)x.re) + im*((double)x.im)) / (((double)x.re)*((double)x.re) + ((double)x.im)*((double)x.im));
-    im_tmp = (im*((double)x.re) - re*((double)x.im)) / (((double)x.re)*((double)x.re) + ((double)x.im)*((double)x.im));
-    re = re_tmp;
-    im = im_tmp;
-    return *this;
+    return hr_complex((re*((double)x.re) + im*((double)x.im)) / (((double)x.re)*((double)x.re) + ((double)x.im)*((double)x.im)), (im*((double)x.re) - re*((double)x.im)) / (((double)x.re)*((double)x.re) + ((double)x.im)*((double)x.im)));
   }
   __host__ __device__ hr_complex operator/(const hr_complex x)
   {
-    double re_tmp, im_tmp;
-    re_tmp = (re*((double)x.re) + im*((double)x.im)) / (((double)x.re)*((double)x.re) + ((double)x.im)*((double)x.im));
-    im_tmp = (im*((double)x.re) - re*((double)x.im)) / (((double)x.re)*((double)x.re) + ((double)x.im)*((double)x.im));
-    re = re_tmp;
-    im = im_tmp;
-    return *this;
+    return hr_complex((re*((double)x.re) + im*((double)x.im)) / (((double)x.re)*((double)x.re) + ((double)x.im)*((double)x.im)), (im*((double)x.re) - re*((double)x.im)) / (((double)x.re)*((double)x.re) + ((double)x.im)*((double)x.im)));
   }
 };
 __host__ __device__ hr_complex_int operator+(const int x, hr_complex_int c){return c+x;}
@@ -1209,39 +1065,39 @@ __host__ __device__ hr_complex_int hr_complex_int::operator-=(const hr_complex x
 }
 __host__ __device__ hr_complex_int hr_complex_int::operator*=(const hr_complex_flt x)
 {
-    int re_tmp, im_tmp;
-    re_tmp = re*((int)x.re) - im*((int)x.im);
-    im_tmp = re*((int)x.im) + im*((int)x.re);
-    re = re_tmp;
-    im = im_tmp;
-    return *this;
+  int re_tmp, im_tmp;
+  re_tmp = re*((int)x.re) - im*((int)x.im);
+  im_tmp = re*((int)x.im) + im*((int)x.re);
+  re = re_tmp;
+  im = im_tmp;
+  return *this;
 }
 __host__ __device__ hr_complex_int hr_complex_int::operator*=(const hr_complex x)
 {
-    int re_tmp, im_tmp;
-    re_tmp = re*((int)x.re) - im*((int)x.im);
-    im_tmp = re*((int)x.im) + im*((int)x.re);
-    re = re_tmp;
-    im = im_tmp;
-    return *this;
+  int re_tmp, im_tmp;
+  re_tmp = re*((int)x.re) - im*((int)x.im);
+  im_tmp = re*((int)x.im) + im*((int)x.re);
+  re = re_tmp;
+  im = im_tmp;
+  return *this;
 }
 __host__ __device__ hr_complex_int hr_complex_int::operator/=(const hr_complex_flt x)
 {
-    int re_tmp, im_tmp;
-    re_tmp = (re*((int)x.re) + im*((int)x.im)) / (((int)x.re)*((int)x.re) + ((int)x.im)*((int)x.im));
-    im_tmp = (im*((int)x.re) - re*((int)x.im)) / (((int)x.re)*((int)x.re) + ((int)x.im)*((int)x.im));
-    re = re_tmp;
-    im = im_tmp;
-    return *this;
+  int re_tmp, im_tmp;
+  re_tmp = (re*((int)x.re) + im*((int)x.im)) / (((int)x.re)*((int)x.re) + ((int)x.im)*((int)x.im));
+  im_tmp = (im*((int)x.re) - re*((int)x.im)) / (((int)x.re)*((int)x.re) + ((int)x.im)*((int)x.im));
+  re = re_tmp;
+  im = im_tmp;
+  return *this;
 }
 __host__ __device__ hr_complex_int hr_complex_int::operator/=(const hr_complex x)
 {
-    int re_tmp, im_tmp;
-    re_tmp = (re*((int)x.re) + im*((int)x.im)) / (((int)x.re)*((int)x.re) + ((int)x.im)*((int)x.im));
-    im_tmp = (im*((int)x.re) - re*((int)x.im)) / (((int)x.re)*((int)x.re) + ((int)x.im)*((int)x.im));
-    re = re_tmp;
-    im = im_tmp;
-    return *this;
+  int re_tmp, im_tmp;
+  re_tmp = (re*((int)x.re) + im*((int)x.im)) / (((int)x.re)*((int)x.re) + ((int)x.im)*((int)x.im));
+  im_tmp = (im*((int)x.re) - re*((int)x.im)) / (((int)x.re)*((int)x.re) + ((int)x.im)*((int)x.im));
+  re = re_tmp;
+  im = im_tmp;
+  return *this;
 }
 __host__ __device__  hr_complex_flt::hr_complex_flt(const hr_complex x)
 {
@@ -1268,21 +1124,21 @@ __host__ __device__ hr_complex_flt hr_complex_flt::operator-=(const hr_complex x
 }
 __host__ __device__ hr_complex_flt hr_complex_flt::operator*=(const hr_complex x)
 {
-    float re_tmp, im_tmp;
-    re_tmp = re*((float)x.re) - im*((float)x.im);
-    im_tmp = re*((float)x.im) + im*((float)x.re);
-    re = re_tmp;
-    im = im_tmp;
-    return *this;
+  float re_tmp, im_tmp;
+  re_tmp = re*((float)x.re) - im*((float)x.im);
+  im_tmp = re*((float)x.im) + im*((float)x.re);
+  re = re_tmp;
+  im = im_tmp;
+  return *this;
 }
 __host__ __device__ hr_complex_flt hr_complex_flt::operator/=(const hr_complex x)
 {
-    float re_tmp, im_tmp;
-    re_tmp = (re*((float)x.re) + im*((float)x.im)) / (((float)x.re)*((float)x.re) + ((float)x.im)*((float)x.im));
-    im_tmp = (im*((float)x.re) - re*((float)x.im)) / (((float)x.re)*((float)x.re) + ((float)x.im)*((float)x.im));
-    re = re_tmp;
-    im = im_tmp;
-    return *this;
+  float re_tmp, im_tmp;
+  re_tmp = (re*((float)x.re) + im*((float)x.im)) / (((float)x.re)*((float)x.re) + ((float)x.im)*((float)x.im));
+  im_tmp = (im*((float)x.re) - re*((float)x.im)) / (((float)x.re)*((float)x.re) + ((float)x.im)*((float)x.im));
+  re = re_tmp;
+  im = im_tmp;
+  return *this;
 }
 /*******************************************************************************
 *
