@@ -19,12 +19,13 @@ template<typename COMPLEX, typename REAL>
     COMPLEX c4 = s2[i2];
     tmp1 = _complex_prod_re(c1,c2);
     tmp2 = _complex_prod_re(c3,c4);
+    resField[i]=tmp1+tmp2;
   }
   else{
     tmp1 = _complex_prod_re(c1,c2);
     tmp2 = 0.0;
+    resField[i]=tmp1+tmp2;
   }
-  resField[i] = tmp1+tmp2;
 }
 
 /* Im <s1,s2> */
@@ -55,14 +56,13 @@ __global__ void spinor_field_prod_padded_gpu(COMPLEX* s1, COMPLEX* s2, hr_comple
     COMPLEX c4 = s2[i2];
     COMPLEX tmp1 = _complex_prod(c1,c2);
     COMPLEX tmp2 = _complex_prod(c3,c4);
-    //printf("tmp1, tmp2 = %f+%fI, %f+%fI\n", creal(tmp1),cimag(tmp1),creal(tmp2),cimag(tmp2));
+    resField[i]=tmp1+tmp2;
   }
   else{
     COMPLEX tmp1 = _complex_prod(c1,c2);
     tmp2=0.;
-    //printf("tmp1, tmp2 = %f+%fI, %f+%fI\n", creal(tmp1),cimag(tmp1),creal(tmp2),cimag(tmp2));
+    resField[i]=tmp1+tmp2;
   }
-  resField[i]=tmp1+tmp2;
 }
 
 /* Re <g5*s1,s2> */

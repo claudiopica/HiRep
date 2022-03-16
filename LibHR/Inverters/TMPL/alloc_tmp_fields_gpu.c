@@ -19,7 +19,7 @@ double* alloc_double_sum_field(int n){
 
   if (res == NULL){
     cudaMalloc((void **) & res,n*sizeof(double));
-    n=n_size;
+    n_size = n;
   }
   return res;
 }
@@ -33,6 +33,7 @@ hr_complex* alloc_complex_sum_field(int n){
   }
   if (res == NULL){
     cudaMalloc((void **) & res,n*sizeof(hr_complex));
+    n_size = n;
   }
   return res;
 }

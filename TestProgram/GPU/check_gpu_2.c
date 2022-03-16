@@ -311,26 +311,8 @@ int main(int argc, char *argv[])
                     spinor_field_prod_f_cpu(&sf2[i],&sf1[i]),
                     res 
       );
-      lprintf("GPU TEST",3,"Kernel Check (<s1,s2>):\t\t %.5e+%.5e*I\n", creal(res), cimag(res));
-/*
-        random_spinor_field_cpu(&sf1[0]); 					
-        spinor_field_copy_to_gpu_f(&sf1[0]); 					
-        spinor_field_zero_f_cpu(&sf1[0]);    					
-        random_spinor_field_cpu(&sf2[0]);					
-        spinor_field_copy_to_gpu_f(&sf2[0]);					
-        spinor_field_zero_f_cpu(&sf2[0]);					
-        spinor_field_zero_f_cpu(&sf3[0]);					
-        spinor_field_copy_to_gpu_f(&sf3[0]); 					
-	sc_gpu = spinor_field_prod_f(&sf2[0],&sf1[0]);       							
-        spinor_field_copy_from_gpu_f(&sf1[0]);					
-        spinor_field_copy_from_gpu_f(&sf2[0]);					
-        spinor_field_copy_from_gpu_f(&sf3[0]);					
-        spinor_field_zero_f_cpu(&sf4[0]);					
-	sc_cpu = spinor_field_prod_f_cpu(&sf2[0],&sf1[0]);       							
-        check = sc_cpu - sc_gpu;  				
-        printf("sc gpu = %f\n", sc_gpu);      
-        printf("sc cpu = %f\n", sc_cpu);      
-*/
+      lprintf("GPU TEST",2,"Kernel Check (<s1,s2>):\t\t %.2e+%.2eI\n", creal(res), cimag(res));
+
       free_spinor_field_f(sf1);
       free_spinor_field_f(sf2);
       free_spinor_field_f(sf3);
