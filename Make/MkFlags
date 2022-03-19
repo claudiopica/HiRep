@@ -1,8 +1,8 @@
-NG = 3
-#REPR = REPR_FUNDAMENTAL
+NG = 2
+REPR = REPR_FUNDAMENTAL
 #REPR = REPR_SYMMETRIC
 #REPR = REPR_ANTISYMMETRIC
-REPR = REPR_ADJOINT
+#REPR = REPR_ADJOINT
 
 #CHOICES ARE GAUGE_SUN AND GAUGE_SON 
 GAUGE_GROUP = GAUGE_SUN
@@ -30,7 +30,7 @@ MACRO += -DBC_Z_PERIODIC
 
 #MACRO += -DWITH_SMEARING
 #MACRO += -DWITH_CLOVER
-MACRO += -DWITH_EXPCLOVER
+#MACRO += -DWITH_EXPCLOVER
 MACRO += -DUPDATE_EO
 #MACRO += -DWITH_MPI
 MACRO += -DWITH_GPU
@@ -54,10 +54,10 @@ ifeq (,$(findstring -DWITH_GPU,$(MACRO))) #Compile CPU only
     CFLAGS = -Wall -Wshadow -std=c99 -O3  #-g #-march=core-avx2 -mtune=core-avx2 -g
     #CFLAGS = -Wall -Wshadow -std=c99 -O3 -qopt-prefetch=4 -qopt-report=2 -march=core-avx2 -mtune=core-avx2
 
-    CC = /opt/local/bin/gcc-mp-10
-    MPICC = /usr/bin/mpicc
-    LDFLAGS = -L /usr/lib/mpich/ -L /usr/lib/ #-l efence
-    INCLUDE = -I /usr/include/mpich/ -I /usr/include/ -I /usr/include/gcc/ -I /usr/include
+    CC = gcc
+    MPICC = mpicc
+    LDFLAGS = 
+    INCLUDE = 
 
     #CC = clang
     #MPICC = mpicc
@@ -76,6 +76,6 @@ ifeq (,$(findstring -DWITH_GPU,$(MACRO))) #Compile CPU only
 else #Compile with GPU
     CC = nvcc 
     CFLAGS = -O2 -Xcompiler '-std=c99 -fgcse-sm -fgcse-las -fgcse-after-reload'
-    GPUFLAGS = --x cu -arch=sm_60 -Xptxas -v  -Xptxas -dlcm=ca
+    GPUFLAGS = --x cu -arch=sm_80 -Xptxas -v  -Xptxas -dlcm=ca
     LDFLAGS = -lcuda
 endif
