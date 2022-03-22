@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
 {
 
       spinor_field *sf1, *sf2, *sf3, *sf4;
-      int sfsize = 1;
+      int sfsize = 2;
       double r, s, check, sc_cpu, sc_gpu;
       hr_complex c, d;
       
@@ -146,6 +146,8 @@ int main(int argc, char *argv[])
  		    spinor_field_mul_f_cpu(&sf4[i],r,&sf1[i]),
                     check
       );
+      //printf("sqnorm sf3 = %f\n", spinor_field_sqnorm_f_cpu(&sf3[0]));      
+      //printf("sqnorm sf4 = %f\n", spinor_field_sqnorm_f_cpu(&sf4[0]));      
       lprintf("GPU TEST",2,"Kernel Check (s2=r*s1):\t\t %.10e\n", check);
 	
       // sf3=c*sf1 
@@ -265,20 +267,16 @@ int main(int argc, char *argv[])
  		    spinor_field_g5_f_cpu(&sf4[i],&sf1[i]),
                     check
       );
-      //printf("sqnorm sf3 = %f\n", spinor_field_sqnorm_f_cpu(&sf3[0]));      
-      //printf("sqnorm sf4 = %f\n", spinor_field_sqnorm_f_cpu(&sf4[0]));      
       lprintf("GPU TEST",2,"Kernel Check (s2=g5*s1):\t\t %.10e\n", check);	
 
       // sf3+=c*g5*sf1
-      c = 1.0;
+      c = 2.0;
       _TEST_LIN_ALG(sfsize,sf1,sf2,sf3,sf4,i,
  		    spinor_field_g5_mulc_add_assign_f(&sf3[i],c,&sf1[i]),
  		    spinor_field_g5_mulc_add_assign_f_cpu(&sf4[i],c,&sf1[i]),
                     check
       );
-      //printf("sqnorm sf3 = %f\n", spinor_field_sqnorm_f_cpu(&sf3[0]));      
-      //printf("sqnorm sf4 = %f\n", spinor_field_sqnorm_f_cpu(&sf4[0]));      
-      lprintf("GPU TEST",2,"Kernel Check (s2+=c*g5*s1):\t %e\n", check);
+      lprintf("GPU TEST",2,"Kernel Check (s2+=c*g5*s1):\t %.10e\n", check);
      
       // <sf1,sf1>
       _TEST_RED_SUM(sfsize,sf1,sf2,i,
@@ -288,7 +286,7 @@ int main(int argc, char *argv[])
       );
       lprintf("GPU TEST",2,"Kernel Check (<s1,s1>):\t\t %.10e\n", check);
 
-      // Re<sf1,sf2>
+      // Re<sf2,sf1>
       _TEST_RED_SUM(sfsize,sf1,sf2,i,
                     spinor_field_prod_re_f(&sf2[i],&sf1[i]),
                     spinor_field_prod_re_f_cpu(&sf2[i],&sf1[i]),
@@ -296,7 +294,7 @@ int main(int argc, char *argv[])
       );
       lprintf("GPU TEST",2,"Kernel Check (Re<s1,s2>):\t\t %.10e\n", check);
 
-      // Im<sf1,sf2>
+      // Im<sf2,sf1>
       _TEST_RED_SUM(sfsize,sf1,sf2,i,
                     spinor_field_prod_im_f(&sf2[i],&sf1[i]),
                     spinor_field_prod_im_f_cpu(&sf2[i],&sf1[i]),
@@ -304,14 +302,30 @@ int main(int argc, char *argv[])
       );
       lprintf("GPU TEST",2,"Kernel Check (Im<s1,s2>):\t\t %.10e\n", check);
 
-      // <sf1,sf2>
+      // <sf2,sf1>
       hr_complex res;
       _TEST_RED_SUM(sfsize,sf1,sf2,i,
                     spinor_field_prod_f(&sf2[i],&sf1[i]),
                     spinor_field_prod_f_cpu(&sf2[i],&sf1[i]),
                     res 
       );
-      lprintf("GPU TEST",2,"Kernel Check (<s1,s2>):\t\t %.2e+%.2eI\n", creal(res), cimag(res));
+      lprintf("GPU TEST",2,"Kernel Check (<s1,s2>):\t\t %.2e, %.2e\n", creal(res), cimag(res));
+
+      // Re<g5*sf2,sf1>
+      _TEST_RED_SUM(sfsize,sf1,sf2,i,
+                    spinor_field_g5_prod_re_f(&sf2[i],&sf1[i]),
+                    spinor_field_g5_prod_re_f_cpu(&sf2[i],&sf1[i]),
+                    check
+      );
+      lprintf("GPU TEST",2,"Kernel Check (Re<g5*s1,s2>):\t %.10e\n", check);
+
+      // Im<g5*sf2,sf1>
+      _TEST_RED_SUM(sfsize,sf1,sf2,i,
+                    spinor_field_g5_prod_im_f(&sf2[i],&sf1[i]),
+                    spinor_field_g5_prod_im_f_cpu(&sf2[i],&sf1[i]),
+                    check
+      );
+      lprintf("GPU TEST",2,"Kernel Check (Im<g5*s1,s2>):\t %.10e\n", check);
 
       free_spinor_field_f(sf1);
       free_spinor_field_f(sf2);
