@@ -21,7 +21,7 @@
 #ifdef P4
 #define ALIGN 7
 #else
-#define ALIGN 5
+#define ALIGN 8
 #endif
 
 void *amalloc(size_t size, int p);

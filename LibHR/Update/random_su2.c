@@ -33,10 +33,13 @@ static void init_su2_rand()
    int ntd = 1;
 #ifdef _OPENMP
    ntd = omp_get_num_threads();
+   _OMP_PRAGMA(master)
+   {
+      lprintf("init_su2_rand", 0, "Init rand for threads, performing %d init", ntd);
+   }
 #endif
    _OMP_PRAGMA(single)
    {
-      lprintf("init_su2_rand", 0, "Init rand for %d threads", ntd);
 
       i_vec = malloc(sizeof(int) * ntd);
       i_y = malloc(sizeof(int) * ntd);
@@ -62,6 +65,8 @@ static void init_su2_rand()
          r[i] = malloc(sizeof(double) * NRAN);
          u[i] = malloc(sizeof(double) * NRAN);
          v[i] = malloc(sizeof(double) * NRAN);
+         y[i] = malloc(sizeof(double) * NRAN);
+
       }
    }
    _OMP_BARRIER

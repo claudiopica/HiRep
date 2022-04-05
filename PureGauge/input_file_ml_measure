@@ -37,7 +37,8 @@ ML skip per level = 3
 // where pairs separated by a | are meant to have the same distance and will be averaged
 ML correlators = 6-8,6-9|5-8,5-9
 //number of spatial blocking level used to generate the glueballs correlators
-nblk = 2
+nblkstart = 0
+nblkend = 3
 //APE smearing parameter value
 APEsmear = 0.33
 
