@@ -508,6 +508,7 @@ PathUniqueIdentifier[ain_] := PathUniqueIdentifier[ain] = Module[{ris = ain,res,
   If[Not[NumberQ[pathindex]],pathindex=0];
   If[Not[MatchQ[ris,P[__]]],Print["Requested a PathUniqueIdentifier of a non Path quantity"];Abort[]];
   If[Not[Map[IsIn, ris //. P :> List] //. List -> And],Print["Requested a PathUniqueIdentifier of non a-steps Path "];Abort[]];
+  If[Not[SameQ[(ris //. P :> Plus),0]] ,Print["Requested PathUniqueIdentifier of a non closed Path "];Abort[]];
   ris = ris //. P -> Ptemp ;
   Ptemp /: Ptemp[-(a1_), a2___] := Ptemp[a2, -a1] /; IsInPositive[a1];
   Ptemp /: Ptemp[a1_, -(a2_), a3___, b1_, b2_, a4___] :=  Ptemp[b1, b2, a4, a1, -a2, a3] /; IsInPositive[a1] && IsInPositive[a2] && IsInPositive[b1] && IsInPositive[b2];
@@ -704,8 +705,8 @@ OpGroupStringPaths[px_, py_, pz_, iridx_, charge_] :=
   WriteString[ar,"static double complex *mom_def_Cm_tr_paths=NULL;\n"];
   WriteString[ar,"static double complex *path_storage=NULL;\n"];
 
-  WriteString[ar, "int ** direct_spatial_rotations(){\nint i;\nint ** res=malloc(sizeof(int *)*48);\nint *res1=malloc(sizeof(int *)*48*4);\nfor (i=0;i<48;i++)\nres[i]=res1+4*i;\n"];
-  WriteString[ar,"\n"];
+  WriteString[ar, "int ** direct_spatial_rotations(){\nint i;\nint ** res=malloc(sizeof(int *)*48);\n int *res1=malloc(sizeof(int *)*48*4);\n for (i=0;i<48;i++)\n res[i]=res1+4*i;\n "];
+  WriteString[ar,"\n "];
   Do[
   (*write the definition of the rotations and inverse rotations for the C checks in the C file*)
     res={0,ax,ay,az} //. permutationTable[[i]];
@@ -714,13 +715,13 @@ OpGroupStringPaths[px_, py_, pz_, iridx_, charge_] :=
   ,{i,1,48}];
   WriteString[ar,"return res;\n}\n"];
 
-  WriteString[ar, "int ** inverse_spatial_rotations(){\nint i;\nint ** res=malloc(sizeof(int *)*48);\nint *res1=malloc(sizeof(int *)*48*4);\nfor (i=0;i<48;i++)\nres[i]=res1+4*i;\n"];
+  WriteString[ar, "int ** inverse_spatial_rotations(){\nint i;\nint ** res=malloc(sizeof(int *)*48);\n int *res1=malloc(sizeof(int *)*48*4);\n for (i=0;i<48;i++)\n res[i]=res1+4*i;\n "];
   Do[
     res={0,ax,ay,az} //. inversepermutationTable[[i]];
     res=res //. {bx->1,by->2,bz->3};
-    WriteString[ar, "res1[",(i-1)*4,"]=",res[[1]],";\nres1[",(i-1)*4+1,"]=",res[[2]],";\nres1[",(i-1)*4+2,"]=",res[[3]],";\nres1[",(i-1)*4+3,"]=",res[[4]],";\n"];
+    WriteString[ar, "res1[",(i-1)*4,"]=",res[[1]],";\n res1[",(i-1)*4+1,"]=",res[[2]],";\n res1[",(i-1)*4+2,"]=",res[[3]],";\n res1[",(i-1)*4+3,"]=",res[[4]],";\n "];
   ,{i,1,48}];
-  WriteString[ar,"return res;\n}\n"];
+  WriteString[ar,"return res;\n}\n "];
   Close[ar];
 
 

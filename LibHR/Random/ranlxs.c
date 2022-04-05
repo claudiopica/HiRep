@@ -462,8 +462,6 @@ void rlxs_init(int level, int seed)
         int nt = omp_get_num_threads();
         _OMP_PRAGMA(single)
         {
-
-            int nt = omp_get_num_threads();
             init = malloc(nt * sizeof(int) * 103);
             pr = init + nt;
             prm = pr + nt;
