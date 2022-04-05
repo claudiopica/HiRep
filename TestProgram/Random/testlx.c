@@ -27,10 +27,10 @@
 int main(int argc, char *argv[])
 {
    int return_value = 0;
-   int mpiret;
    MPI_PID = 0;
    MPI_WORLD_SIZE = 1;
 #ifdef WITH_MPI
+   int mpiret;
    mpiret = MPI_Init(&argc, &argv);
    if (mpiret != MPI_SUCCESS)
    {
