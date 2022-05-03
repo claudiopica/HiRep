@@ -35,7 +35,7 @@
 extern rhmc_par _update_par; /* Update/update_rhmc.c */
 #endif /* ROTATED_SF */
 
-__device__ __constant__ complex eitheta_gpu[4];
+__device__ __constant__ hr_complex eitheta_gpu[4];
 
 /*
  * the following variable is used to keep trace of

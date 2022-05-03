@@ -74,10 +74,10 @@ void project_cooling_to_suNg(suNg *g_out, suNg *g_in, int cooling);
 void covariant_project_to_suNg(suNg *u);
 
 #ifndef GAUGE_SON
-void ludcmp(double complex *a, int *indx, double *d, int N);
-void lubksb(double complex *a, int *indx, double complex *b, int N);
+void ludcmp(hr_complex *a, int *indx, double *d, int N);
+void lubksb(hr_complex *a, int *indx, hr_complex *b, int N);
 void inv_hermNg(suNg *a);
-void det_hermNg(double complex *res, suNg *a);
+void det_hermNg(hr_complex *res, suNg *a);
 #else
 int project_to_suNg_real(suNg *out, suNg *in);
 void inv_hermNg(suNg *a);
