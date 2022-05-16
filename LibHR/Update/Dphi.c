@@ -173,7 +173,7 @@ unsigned long int getMVM()
  * or on spinors with definite parity
  */
 
-void Dphi_(spinor_field *out, spinor_field *in)
+void Dphi_cpu_(spinor_field *out, spinor_field *in)
 {
 #ifdef CHECK_SPINOR_MATCHING
   error((in == NULL) || (out == NULL), 1, "Dphi_ [Dphi.c]",
@@ -359,7 +359,7 @@ void Dphi_(spinor_field *out, spinor_field *in)
 /*
  * this function takes 2 spinors defined on the whole lattice
  */
-void Dphi(double m0, spinor_field *out, spinor_field *in)
+void Dphi_cpu(double m0, spinor_field *out, spinor_field *in)
 {
   double rho;
 #ifdef ROTATED_SF
