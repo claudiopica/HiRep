@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 #ifndef DIRAC_H
@@ -9,14 +9,21 @@
 #include "suN_types.h"
 #include "utils.h"
 
-
-#ifdef WITH_GPU
-void Dphi_(spinor_field *out, spinor_field *in);
-void Dphi(double m0, spinor_field *out, spinor_field *in);
+#ifdef __cplusplus
+extern "C" {
 #endif
 
 void Dphi_cpu_(spinor_field *out, spinor_field *in);
 void Dphi_cpu(double m0, spinor_field *out, spinor_field *in);
+
+#ifdef WITH_GPU
+  void Dphi_(spinor_field *out, spinor_field *in);
+  void Dphi(double m0, spinor_field *out, spinor_field *in);
+#else //WITH_GPU (I.e. not using GPU)
+  extern void (*Dphi_) (spinor_field *out, spinor_field *in);
+  extern void (*Dphi) (double m0, spinor_field *out, spinor_field *in);
+#endif //WITH_GPU
+
 void g5Dphi(double m0, spinor_field *out, spinor_field *in);
 void g5Dphi_sq(double m0, spinor_field *out, spinor_field *in);
 
@@ -77,9 +84,6 @@ void QpQm_tm_alt(spinor_field *out, spinor_field *in);
 void tm_invert(spinor_field* out, spinor_field *in, mshift_par* mpar);
 void tm_invert_alt(spinor_field* out, spinor_field *in, mshift_par* mpar);
 
-
-
-
 /* Dirac operators with a four fermion interaction */
 void Dphi_eopre_4f(double m0, spinor_field *out, spinor_field *in, double shift);
 void Dphi_eopre_4f_dagger(double m0, spinor_field *out, spinor_field *in, double shift);
@@ -95,7 +99,8 @@ void set_ff_dirac_shift(double mass); //The shift added to four fermion Hasenbus
 void Dff(spinor_field *out, spinor_field *in);
 void Dff_dagger(spinor_field *out, spinor_field *in);
 void Dff_sq(spinor_field *out, spinor_field *in);
-
+#ifdef __cplusplus
+}
+#endif
 
 #endif
-	

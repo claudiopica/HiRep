@@ -8,6 +8,7 @@
 #include <string.h>
 #include "spinor_field.h"
 #include "gamma_spinor.h"
+#include "hr_complex.h"
 
 /*
  * LINEAR ALGEBRA FUNCTIONS ARE DEFINED IN THE TEMPLATE

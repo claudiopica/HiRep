@@ -29,6 +29,7 @@ HMC/hmc
 LibHR/.lib.updated
 TestProgram/Algebra/check_algebra_1
 TestProgram/DiracOperator/check_diracoperator_1
+TestProgram/DiracOperator/check_diracoperator_1_gpu
 TestProgram/DiracOperator/check_diracoperator_3
 TestProgram/DiracOperator/check_diracoperator_5
 TestProgram/DiracOperator/check_diracoperator_6

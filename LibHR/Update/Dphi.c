@@ -1,13 +1,13 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 /*******************************************************************************
 *
 * File Dphi.c
 *
-* Action of the Wilson-Dirac operator D and hermitian g5D on a given 
+* Action of the Wilson-Dirac operator D and hermitian g5D on a given
 * double-precision spinor field
 *
 *******************************************************************************/
@@ -26,6 +26,7 @@
 #include "memory.h"
 #include "clover_tools.h"
 #include "clover_exp.h"
+#include "hr_complex.h"
 
 #ifdef ROTATED_SF
 #include "update.h"
@@ -169,7 +170,7 @@ unsigned long int getMVM()
 
 /*
  * This function defines the massless Dirac operator
- * It can act on spinors defined on the whole lattice 
+ * It can act on spinors defined on the whole lattice
  * or on spinors with definite parity
  */
 
@@ -688,7 +689,7 @@ void Qhat_eopre(double m0, double mu, spinor_field *out, spinor_field *in)
 {
   double norm = (4 + m0) * (4 + m0) + mu * mu;
   double rho = (4 + m0) / norm;
-  double complex imu;
+  hr_complex imu;
   imu = -I * mu / norm;
 
   error((in == NULL) || (out == NULL), 1, "Qhat_eopre [Dphi.c]",
@@ -822,7 +823,7 @@ static void Cphi_inv_(double mass, spinor_field *dptr, spinor_field *sptr, int a
   // Loop over local sites
   _MASTER_FOR(dptr->type, ix)
   {
-    double complex *up, *dn, *x, c;
+    hr_complex *up, *dn, *x, c;
     suNf_spinor *out, *in, tmp;
     int n;
 
@@ -834,7 +835,7 @@ static void Cphi_inv_(double mass, spinor_field *dptr, spinor_field *sptr, int a
 
     // tmp = in
     tmp = *in;
-    x = (double complex *)&tmp;
+    x = (hr_complex *)&tmp;
 
     // Forward substitution
     for (int i = 0; i < N; i++)
@@ -1146,3 +1147,10 @@ void Cphi_diag_inv(double mass, spinor_field *dptr, spinor_field *sptr)
 }
 
 #endif //With expclover
+
+/* Make function pointers such that function calls can have the same name
+regardsless of being complied for GPU or CPU */
+#ifndef WITH_GPU
+void (*Dphi_) (spinor_field *out, spinor_field *in)=Dphi_cpu_;
+void (*Dphi) (double m0, spinor_field *out, spinor_field *in)=Dphi_cpu;
+#endif //WITH_GPU
