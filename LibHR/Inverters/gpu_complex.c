@@ -20,6 +20,7 @@
 *
 *******************************************************************************/
 #include "hr_complex.h"
+#ifdef WITH_GPU
 __host__ __device__ hr_complex_int::hr_complex_int(void){}
 __host__ __device__ hr_complex_int::hr_complex_int(const int x)
 {
@@ -1109,3 +1110,4 @@ __host__ __device__ hr_complex_flt& hr_complex_flt::operator/=(const hr_complex 
   im = im_tmp;
   return *this;
 }
+#endif //WITH_GPU
