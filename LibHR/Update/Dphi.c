@@ -88,7 +88,7 @@ void init_Dirac()
  */
 static unsigned long int MVMcounter = 0;
 
-unsigned long int getMVM()
+unsigned long int getMVM_cpu()
 {
   unsigned long int res = MVMcounter >> 1; /* divide by two */
   MVMcounter = 0;                          /* reset counter */
@@ -442,7 +442,7 @@ void Dphi_cpu(double m0, spinor_field *out, spinor_field *in)
   apply_BCs_on_spinor_field(out);
 }
 
-void g5Dphi(double m0, spinor_field *out, spinor_field *in)
+void g5Dphi_cpu(double m0, spinor_field *out, spinor_field *in)
 {
   double rho;
 #ifdef ROTATED_SF
@@ -531,7 +531,7 @@ void g5Dphi(double m0, spinor_field *out, spinor_field *in)
  * Dphi in = (4+m0)^2*in - D_EO D_OE in
  *
  */
-void Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
+void Dphi_eopre_cpu(double m0, spinor_field *out, spinor_field *in)
 {
   double rho;
 
@@ -572,7 +572,7 @@ void Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
  * Dphi in = (4+m0)^2*in - D_OE D_EO in
  *
  */
-void Dphi_oepre(double m0, spinor_field *out, spinor_field *in)
+void Dphi_oepre_cpu(double m0, spinor_field *out, spinor_field *in)
 {
   double rho;
 
@@ -609,7 +609,7 @@ void Dphi_oepre(double m0, spinor_field *out, spinor_field *in)
   apply_BCs_on_spinor_field(out);
 }
 
-void g5Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
+void g5Dphi_eopre_cpu(double m0, spinor_field *out, spinor_field *in)
 {
   double rho;
 
@@ -648,7 +648,7 @@ void g5Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
 }
 
 /* g5Dphi_eopre ^2 */
-void g5Dphi_eopre_sq(double m0, spinor_field *out, spinor_field *in)
+void g5Dphi_eopre_sq_cpu(double m0, spinor_field *out, spinor_field *in)
 {
   /* alloc memory for temporary spinor field */
   if (init_dirac)
@@ -662,7 +662,7 @@ void g5Dphi_eopre_sq(double m0, spinor_field *out, spinor_field *in)
 }
 
 /* g5Dhi ^2 */
-void g5Dphi_sq(double m0, spinor_field *out, spinor_field *in)
+void g5Dphi_sq_cpu(double m0, spinor_field *out, spinor_field *in)
 {
   /* alloc memory for temporary spinor field */
   if (init_dirac)
@@ -1153,4 +1153,11 @@ regardsless of being complied for GPU or CPU */
 #ifndef WITH_GPU
 void (*Dphi_) (spinor_field *out, spinor_field *in)=Dphi_cpu_;
 void (*Dphi) (double m0, spinor_field *out, spinor_field *in)=Dphi_cpu;
+void g5Dphi(double m0, spinor_field *out, spinor_field *in)=g5Dphi_cpu;
+void g5Dphi_sq(double m0, spinor_field *out, spinor_field *in)=g5Dphi_sq_cpu;
+unsigned long int getMVM()=getMVM_cpu;
+void Dphi_eopre(double m0, spinor_field *out, spinor_field *in)=Dphi_eopre_cpu;
+void Dphi_oepre(double m0, spinor_field *out, spinor_field *in)=Dphi_oepre_cpu;
+void g5Dphi_eopre(double m0, spinor_field *out, spinor_field *in)=g5Dphi_eopre_cpu;
+void g5Dphi_eopre_sq(double m0, spinor_field *out, spinor_field *in)=g5Dphi_eopre_sq_cpu;
 #endif //WITH_GPU

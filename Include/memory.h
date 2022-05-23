@@ -1,12 +1,12 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 /*******************************************************************************
 *
 * File memory.h
-* 
+*
 * Memory handling functions
 *
 *******************************************************************************/
@@ -22,8 +22,12 @@
 #ifdef P4
 #  define ALIGN 7
 #else
-#  define ALIGN 5 
-#endif  
+#  define ALIGN 5
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void *amalloc(size_t size,int p);
 void afree(void *addr);
@@ -77,12 +81,15 @@ void gfield_tocpuformat_f(suNf_field *out, suNf_field *in);
 void gfield_togpuformat_flt(suNg_field_flt *out, suNg_field_flt *in);
 void gfield_tocpuformat_flt(suNg_field_flt *out, suNg_field_flt *in);
 void gfield_togpuformat_f_flt(suNf_field_flt *out, suNf_field_flt *in);
-void gfield_tocpuformat_f_flt(suNf_field_flt *out, suNf_field_flt *in);  
+void gfield_tocpuformat_f_flt(suNf_field_flt *out, suNf_field_flt *in);
 void sfield_copy_to_gpu(scalar_field *field);
 void sfield_copy_from_gpu(scalar_field *field);
 void avfield_togpuformat(suNg_av_field *out, suNg_av_field *in);
 void avfield_tocpuformat(suNg_av_field *out, suNg_av_field *in);
+#endif
 
+#ifdef __cplusplus
+}
 #endif
 
 #endif
