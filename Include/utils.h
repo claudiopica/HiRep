@@ -20,6 +20,10 @@
 #include "geometry.h"
 #include <stdlib.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*SUN exp matrix*/
 
 void suNg_Exp(suNg *u, suNg *X);
@@ -169,5 +173,9 @@ int reserve_wrk_space();
 int reserve_wrk_space_with_pointers(suNg_field **g_wrk_out, int **i_up_wrk_out, int **i_dn_wrk_out);
 void release_wrk_space(int id_release);
 void free_wrk_space();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

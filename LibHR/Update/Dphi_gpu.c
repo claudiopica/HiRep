@@ -30,7 +30,6 @@
 #include "gpu.h"
 #include "hr_complex.h"
 
-
 #ifdef ROTATED_SF
 #include "update.h"
 extern rhmc_par _update_par; /* Update/update_rhmc.c */
@@ -1543,26 +1542,25 @@ void Dphi_(spinor_field *out, spinor_field *in)
 /*
  * this function takes 2 spinors defined on the whole lattice
  */
- void Dphi(double m0, spinor_field *out, spinor_field *in)
+void Dphi(double m0, spinor_field *out, spinor_field *in)
 {
-   double rho;
+  double rho;
 
-   error((in==NULL)||(out==NULL),1,"Dphi [Dphi.cu]",
-         "Attempt to access unallocated memory space");
+  error((in==NULL)||(out==NULL),1,"Dphi [Dphi.cu]",
+        "Attempt to access unallocated memory space");
 
-   error(in==out,1,"Dphi [Dphi.cu]",
-         "Input and output fields must be different");
+  error(in==out,1,"Dphi [Dphi.cu]",
+        "Input and output fields must be different");
 
 
 #ifdef CHECK_SPINOR_MATCHING
-   error(out->type!=&glattice || in->type!=&glattice,1,"Dphi [Dphi.cu]", "Spinors are not defined on all the lattice!");
+  error(out->type!=&glattice || in->type!=&glattice,1,"Dphi [Dphi.cu]", "Spinors are not defined on all the lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
   Dphi_(out,in);
 
-   rho=4.+m0;
-   spinor_field_mul_add_assign_f(out,rho,in);
-
+  rho = 4. + m0;
+  spinor_field_mul_add_assign_f(out, rho, in);
 }
 
 void g5Dphi(double m0, spinor_field *out, spinor_field *in)

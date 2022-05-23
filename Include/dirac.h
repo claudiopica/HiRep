@@ -113,6 +113,7 @@ void set_ff_dirac_shift(double mass); //The shift added to four fermion Hasenbus
 void Dff(spinor_field *out, spinor_field *in);
 void Dff_dagger(spinor_field *out, spinor_field *in);
 void Dff_sq(spinor_field *out, spinor_field *in);
+
 #ifdef __cplusplus
 }
 #endif
