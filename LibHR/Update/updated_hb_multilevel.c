@@ -1,6 +1,6 @@
 /*************************************************************************** \
- * Copyright (c)                                  *   
- * All rights reserved.                                                      * 
+ * Copyright (c)                                  *
+ * All rights reserved.                                                      *
 \***************************************************************************/
 
 /*******************************************************************************
@@ -123,7 +123,7 @@ static void free_hb_boundary()
 static void init_hb_multihit_boundary()
 {
     dyn_gauge = malloc(sizeof(*dyn_gauge) * glattice.gsize_gauge * 4 * (max_mh_level));
-    atexit(&free_hb_boundary); //register cleanup function at exit
+    atexit(&free_hb_boundary); // register cleanup function at exit
 
     for (int i = 0; i < glattice.gsize_gauge * 4 * (max_mh_level); i++)
         dyn_gauge[i] = 1;
@@ -290,9 +290,10 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
 {
     int i, j;
     static double complex *one_point_gb;
+    static double complex *one_point_tor;
     static long double norm = 1.0;
     struct timeval start, end, etime;
-    int nblocking = nblockingend - nblockingstart +1;
+    int nblocking = nblockingend - nblockingstart + 1;
 
     if (lev == 0)
     {
@@ -300,6 +301,7 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
         {
             init_hb_multihit_boundary();
             one_point_gb = malloc(sizeof(double complex) * total_n_glue_op * nblocking * n_active_slices);
+            one_point_tor = malloc(sizeof(double complex) * total_n_tor_op * n_active_slices);
             for (i = 0; i < max_mh_level; i++)
                 norm *= ml_up[i];
             norm *= GLB_VOL3 * NG;
@@ -307,6 +309,7 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
         gettimeofday(&start, 0);
 
         memset(one_point_gb, 0, sizeof(double complex) * total_n_glue_op * nblocking * n_active_slices);
+        memset(one_point_tor, 0, sizeof(double complex) * total_n_tor_op * n_active_slices);
     }
 
     if (lev < max_mh_level - 1)
@@ -326,7 +329,13 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
             for (j = 0; j < ml_skip[lev]; j++)
                 update_mh(lev, beta, nhb, nor);
 
+#if total_n_glue_op > 0
             measure_1pt_glueballs(nblockingstart, nblockingend, smear_val, one_point_gb);
+#endif
+
+#if total_n_tor_op > 0
+            measure_1pt_torellons(smear_val, one_point_tor);
+#endif
         }
     }
 
@@ -337,10 +346,21 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
         timeval_subtract(&etime, &end, &start);
         lprintf("HB MULTILEVEL", 0, "Update and 1pt measure done [%ld sec %ld usec]\n", etime.tv_sec, etime.tv_usec);
 
+#if total_n_glue_op > 0
+
         for (i = 0; i < nblocking * n_active_slices * total_n_glue_op; i++)
             one_point_gb[i] /= norm;
 
-        evaluate_1pt_functions(lcor, nblocking, one_point_gb);
+        collect_1pt_glueball_functions(lcor, nblocking, one_point_gb);
+#endif
+
+#if total_n_tor_op > 0
+        for (i = 0; i < n_active_slices * total_n_tor_op; i++)
+            one_point_tor[i] /= norm;
+
+        collect_1pt_torellon_functions(lcor, one_point_tor);
+#endif
+
         gettimeofday(&start, 0);
         timeval_subtract(&etime, &start, &end);
 

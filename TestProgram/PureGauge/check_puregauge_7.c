@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Gauge invariance of the glueball operators
+ * Gauge invariance of the torellons operators
  *
  *******************************************************************************/
 
@@ -77,19 +77,19 @@ int main(int argc, char *argv[])
   represent_gauge_field();
   lprintf("MAIN", 0, "done.\n\n");
 
-  dop = malloc(T * total_n_glue_op * sizeof(double complex));
-  dop1 = malloc(T * total_n_glue_op * sizeof(double complex));
+  dop = malloc(T * total_n_tor_op * sizeof(double complex));
+  dop1 = malloc(T * total_n_tor_op * sizeof(double complex));
 
-  for (n = 0; n < T * total_n_glue_op; n++)
+  for (n = 0; n < T * total_n_tor_op; n++)
   {
     dop[n] = 0.;
     dop1[n] = 0.;
   }
 
   for (nt = 0; nt < T; nt++)
-    eval_all_glueball_ops(nt, dop + nt * total_n_glue_op);
+    eval_all_torellon_ops(nt, dop + nt * total_n_tor_op);
 
-  for (n = 0; n < T * total_n_glue_op; n++)
+  for (n = 0; n < T * total_n_tor_op; n++)
     dop[n] /= NG * GLB_VOLUME;
 
   lprintf("MAIN", 0, "Generating and applying a random gauge transf... ");
@@ -99,20 +99,20 @@ int main(int argc, char *argv[])
   lprintf("MAIN", 0, "done.\n");
 
   for (nt = 0; nt < T; nt++)
-    eval_all_glueball_ops(nt, dop1 + nt * total_n_glue_op);
+    eval_all_torellon_ops(nt, dop1 + nt * total_n_tor_op);
 
-  for (n = 0; n < T * total_n_glue_op; n++)
+  for (n = 0; n < T * total_n_tor_op; n++)
     dop1[n] /= NG * GLB_VOLUME;
 
-  for (n = 0; n < T * total_n_glue_op; n++)
+  for (n = 0; n < T * total_n_tor_op; n++)
     dop[n] -= dop1[n];
 
-  lprintf("MAIN", 0, "Checking gauge invariance of the %d glueball operators.\n ", total_n_glue_op);
+  lprintf("MAIN", 0, "Checking gauge invariance of the %d torellon operators on each timeslice.\n ", total_n_tor_op);
 
   double max_diff[2];
   max_diff[0] = max_diff[1] = -1.0;
 
-  for (n = 0; n < T * total_n_glue_op; n++)
+  for (n = 0; n < T * total_n_tor_op; n++)
   {
     if (fabs(creal(dop[n])) > max_diff[0])
       max_diff[0] = fabs(creal(dop[n]));
@@ -120,14 +120,15 @@ int main(int argc, char *argv[])
     if (fabs(cimag(dop[n])) > max_diff[1])
       max_diff[1] = fabs(cimag(dop[n]));
 
-    if (fabs(creal(dop[n])) > 10.e-14)
+    if (fabs(creal(dop[n])) > 1.e-13)
       return_value++;
-    if (fabs(cimag(dop[n])) > 10.e-14)
+    if (fabs(cimag(dop[n])) > 1.e-13)
       return_value++;
   }
-  lprintf("MAIN", 0, "Maximal normalized real difference = %.4e\n", max_diff[0]);
+  global_sum_int(&return_value,1);
+  lprintf("MAIN", 0, "Maximal normalized real difference = %.16e\n", max_diff[0]);
   lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n");
-  lprintf("MAIN", 0, "Maximal normalized imaginary difference = %.4e\n", max_diff[1]);
+  lprintf("MAIN", 0, "Maximal normalized imaginary difference = %.16e\n", max_diff[1]);
   lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
 
   free_gtransf(g);

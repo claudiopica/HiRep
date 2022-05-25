@@ -179,8 +179,11 @@ While[True,
 Close[makefilestrm];
 
 opfilename = topdir<>"/LibHR/Observables/glueballs_op.c";
+torfilename = topdir<>"/LibHR/Observables/torellons_op.c";
+
 headerfilename = topdir<>"/Include/glueballs.h";
-checkfunctionsfilename= topdir<>"/TestProgram/Utils/check_utils_3_functions.c";
+checktorfunctionsfilename= topdir<>"/TestProgram/Utils/check_utils_3_tor_functions.c";
+checkgbfunctionsfilename= topdir<>"/TestProgram/Utils/check_utils_3_gb_functions.c";
 
 MyRangeString[min_, max_] := Module[{string = ""},
    Do[string = string <> " " <> ToString[i], {i, min, max}];
@@ -346,7 +349,7 @@ Add2trOpCorrelators[path1_,px1_, py1_, pz1_, irrepidx1_,charge1_, path2_,px2_, p
 
     Print["Generated 2tr Operator : ",cg,"\n Total P=(",pxout,",", pyout,",", pzout,")\n Irrep=",IrrepName[pxout,pyout,pzout][[irrepidxout]],
         "\n Irrep ev=",irrepevout,"/",Length[bTOrthog[pxout,pyout,pzout][[irrepidxout]]],"\n Charge=",charge]; 
-    Print["Operator added to the correlator list.\n\n"];
+    Print["Two traces glueball operator added to the correlator list.\n\n"];
  
     str = Set2trstring[pxout, pyout, pzout, irrepidxout, irrepevout, charge, path1, px1, py1, pz1, irrepidx1, charge1, path2, px2, py2, pz2, irrepidx2, charge2];
     PrependTo[cg,str];
@@ -388,7 +391,7 @@ Add1trOpCorrelators[px_, py_, pz_, irrepidx_, irrepev_, charge_, path_]:= Add1tr
 
       Print["Input path : ",path,"\n Generated 1tr Operator : ",res,"\n Total P=(",px,",", py,",", pz,")\n Irrep=",IrrepName[px,py,pz][[irrepidx]],
         "\n Irrep ev=",irrepev,"/",Length[bTOrthog[px,py,pz][[irrepidx]]],"\n Charge=",charge]; 
-      Print["Operator added to the correlator list.\n\n"];
+      Print["One trace glueball operator added to the correlator list.\n\n"];
     ];
   ];
 
@@ -549,16 +552,16 @@ MyCForm[ain_] := Module[{res, res1},
 
 (*
 This functions not meant to be called by the user.
-This function generates the C checks and writes them in the file checkfunctionsfilename .
+This function generates the C checks and writes them in the file checkgbfunctionsfilename .
 The idea is to generate the list of operators on a random con O, rotate the configuration with rotation (i) and generate again the operator Oi.
 The rotation matrix are contained in irrepsetorthog  we check component by component O=irreppsetothog.O'.
 To this end we need to evaluate that all the ev of the given irrep for the given operators have been evaluated (and only then we will generate the checks).
 The function need no input, it goes though Opindex to find the operators and uses 
 MapOptoCindex for the C indetification of the operators and Oplist for the report in case of error
 *)
-GenerateCchecks[]:=Module[{Op,OpTmp,ar,irrepdim,EvaluatedQ, RActiveOp,RMatrixOp, Px, Py, Pz, irrepindex, i, charge},
-  ar=OpenWrite[checkfunctionsfilename,FormatType->InputForm];
-  WriteString[ar,"/*This is an automatically generated function, do not edit.*/\n#define Complex(a,b) ((a)+I*(b))\nstatic int fullcheck(int rotid, double complex *rotated, double complex *unrotated)\n{\n#define rotfun(a) rotated[(a)]\n#define unrotfun(a) unrotated[(a)]\ndouble complex tmp[3];\nint return_value=0;\n"];
+GenerateCchecks[]:=Module[{Op,OpTmp,ar,irrepdim,EvaluatedQ,RMatrixOp, TorTmp,RMatrixTor,Tor,Px, Py, Pz, irrepindex, i, charge},
+  ar=OpenAppend[checkgbfunctionsfilename,FormatType->InputForm];
+  WriteString[ar,"/*This is an automatically generated function, do not edit.*/\n#define Complex(a,b) ((a)+I*(b))\nstatic int fullgbcheck(int rotid, double complex *rotated, double complex *unrotated)\n{\n#define rotfun(a) rotated[(a)]\n#define unrotfun(a) unrotated[(a)]\ndouble complex tmp[3];\nint return_value=0;\n"];
   Do[
     Do[
       Do[ 
@@ -587,7 +590,7 @@ GenerateCchecks[]:=Module[{Op,OpTmp,ar,irrepdim,EvaluatedQ, RActiveOp,RMatrixOp,
                   WriteString[ar,"tmp[0]=",MyCForm[OpTmp[[j,1]]],";\n"];
                   WriteString[ar,"tmp[1]=",MyCForm[RMatrixOp[[i,j,1]]],";\n"];
                   WriteString[ar,"_complex_mul_star(tmp[2],tmp[0]-tmp[1],tmp[0]-tmp[1]);
-if(sqrt(creal(tmp[2]))>=1.e-11){
+if(sqrt(creal(tmp[2]))>=1.e-10){
   lprintf(\"Error\",0,\" Op="];
 
   If[ListQ  [OpList[Px,Py,Pz,irrepindex,charge,Opindex[Px,Py,Pz,irrepindex,charge][[id,j]]]],
@@ -610,6 +613,63 @@ if(sqrt(creal(tmp[2]))>=1.e-11){
   ,{Px,-1,1},{Py,-1,1},{Pz,-1,1}];
   WriteString[ar,"#undef unrotfunreturn\n#undef rotfun\n#undef Complex\nreturn return_value;\n}\n"];
   Close[ar];
+  ar=OpenAppend[checktorfunctionsfilename,FormatType->InputForm];
+  WriteString[ar,"/*This is an automatically generated function, do not edit.*/\n#define Complex(a,b) ((a)+I*(b))\nstatic int fulltorcheck(int rotid, double complex *rotated, double complex *unrotated)\n{\n#define rotfun(a) rotated[(a)]\n#define unrotfun(a) unrotated[(a)]\ndouble complex tmp[3];\nint return_value=0;\n"];
+  Do[
+    Do[
+      Do[ 
+        If[ListQ[Torindex[Px,Py,Pz,irrepindex,charge]],
+          Print["Now checking P="<>ToString[{Px,Py,Pz}]<>"."];
+          irrepdim=Length[bTOrthog[Px,Py,Pz][[irrepindex]]];
+          Print["Currently checking irrep number "<>ToString[irrepindex]<>", with dim="<>ToString[irrepdim]<>"."];
+          Do[
+            (*This is to check that all evs for the given irrep have been evaluated*)
+            TorTmp=Table[
+               Not[SameQ[Torindex[Px,Py,Pz,irrepindex,charge][[id,ev]],0]]
+            ,{ev,1,irrepdim}];
+            EvaluatedQ=TorTmp//.List -> And;
+            If[EvaluatedQ,
+              TorTmp=Transpose[{Table[Tor[Px,Py,Pz,irrepindex,charge,Torindex[Px,Py,Pz,irrepindex,charge][[id,irev]]],{irev,1,irrepdim}]}];
+              RMatrixTor=Table[N[irrepSetOrthog[Px,Py,Pz][[irrepindex]][[i]]] . TorTmp,{i,1,Ord[Px,Py,Pz]}];
+              Off[Part::partd];
+              TorTmp=ExpandAll[TorTmp//.Tor[la__]:>rotfun[MapTortoCindex[la]]];
+              Print["The operators: ",TorTmp];
+              RMatrixTor=ExpandAll[RMatrixTor//.Tor[la__]:>unrotfun[MapTortoCindex[la]]];
+              Print["And their rotations: ",RMatrixTor];
+              On[Part::partd];
+              Do[
+                Do[
+                  WriteString[ar,"if(",Position[permutationTable,permTab[Px,Py,Pz][[i]]][[1,1]]-1,"==rotid)\n{\n"];
+                  WriteString[ar,"tmp[0]=",MyCForm[TorTmp[[j,1]]],";\n"];
+                  WriteString[ar,"tmp[1]=",MyCForm[RMatrixTor[[i,j,1]]],";\n"];
+                  WriteString[ar,"_complex_mul_star(tmp[2],tmp[0]-tmp[1],tmp[0]-tmp[1]);
+if(sqrt(creal(tmp[2]))>=1.e-10){
+  lprintf(\"Error\",0,\" Tor="];
+
+  If[ListQ  [TorList[Px,Py,Pz,irrepindex,charge,Torindex[Px,Py,Pz,irrepindex,charge][[id,j]]]],
+    WriteString[ar,TorList[Px,Py,Pz,irrepindex,charge,Torindex[Px,Py,Pz,irrepindex,charge][[id,j]]][[1]]];
+  ,
+    WriteString[ar,ToString[TorList[Px,Py,Pz,irrepindex,charge,Torindex[Px,Py,Pz,irrepindex,charge][[id,j]]]]];
+  ];
+  WriteString[ar,"\\n px=%d py=%d pz=%d Irrep=%d ev=%d charge=%d multiplet id=%d (%2.10e %2.10e) (%2.10e %2.10e) %2.10e \\n\","];
+  WriteString[ar,Px,",",Py,",",Pz,",",irrepindex,",",j,",",charge,",",id,",creal(tmp[0]),cimag(tmp[0]),creal(tmp[1]),cimag(tmp[1]),sqrt(creal(tmp[2])));
+  return_value++;
+  }
+}\n"];
+                ,{j,1,irrepdim}];
+              ,{i,1,Ord[Px,Py,Pz]}];
+              ];
+            ,{id,1,Length[Torindex[Px,Py,Pz,irrepindex,charge]]}];
+          ];
+      ,{charge,-1,1,2}];
+    ,{irrepindex,1,Length[bTOrthog[Px,Py,Pz]]}];
+  ,{Px,-1,1},{Py,-1,1},{Pz,-1,1}];
+  WriteString[ar,"#undef unrotfunreturn\n#undef rotfun\n#undef Complex\nreturn return_value;\n}\n"];
+  Close[ar];
+  
+  
+  
+  
   ]
 
 
@@ -617,13 +677,13 @@ if(sqrt(creal(tmp[2]))>=1.e-11){
 In C it will generate the functions pathn  where is is the unique pathid.
 *)
 
-  PathGenerateCcode[idx_] := PathGenerateCcode[idx] = Module[{steps,ar,i},
-  If[Not[MatchQ[PathList[idx],P[__]]],Print["In PathGenerateCcode, requested the generation of a path not included in PathList"];Abort[]];
+  PathGenerateCcode[lidx_] := PathGenerateCcode[lidx] = Module[{steps,ar,i},
+  If[Not[MatchQ[PathList[lidx],P[__]]],Print["In PathGenerateCcode, requested the generation of a path not included in PathList"];Abort[]];
   ar = OpenAppend[opfilename, FormatType -> InputForm];
   (**)
-  WriteString[ar, "static double complex path", idx, "(int in)\n"];
+  WriteString[ar, "static double complex path", lidx, "(int in)\n"];
   WriteString[ar, "{\nsuNg *w1, *w2;\nsuNg res, res1;\nint site=in;\ndouble complex p;\n\n"];
-  steps = PathList[idx] //. P[A__] :> List[A];
+  steps = PathList[lidx] //. P[A__] :> List[A];
   If[posdir[steps[[1]]],
     WriteString[ar, "w2 = pu_gauge_wrk(site,", dir[steps[[1]]], ");\n\n"];,
     WriteString[ar, "site = idn_wrk(site, ", dir[steps[[1]]], ");\n"];
@@ -653,9 +713,35 @@ In C it will generate the functions pathn  where is is the unique pathid.
   (**)
   WriteString[ar, "_suNg_trace(p,res);\nreturn p;\n}\n\n"];
   Close[ar];
-  WrittenPaths[idx]=1;
+  WrittenPaths[lidx]=1;
   ]
-
+(*This functions generate the report string: 
+The string will contains "na"  for each element of the multiplets missing, if the multiplet is partially evaluated*)
+TorGroupStringPaths[px_, py_, pz_, iridx_, charge_] := 
+  Module[{res = Torindex[px, py, pz, iridx, charge], string = "|",tmpstring,i,j,lpath,step},
+  Do[
+    Do[
+        If[res[[i, j]] > 0,
+          string=string<>ToString[MapTortoCindex[px, py, pz, iridx, charge, res[[i, j]]]]<>"=";
+          lpath=TorList[px, py, pz, iridx, charge,res[[i, j]]];
+          If[Head[lpath]==Plus,
+            lpath=lpath[[1]];
+          ];
+          lpath = lpath //.{ a1_.  la_[L[_]][__] lb_[A__][b__] :>  {A},a1_. lb_[A__][b__] la_[L[_]][__]:>  {A} };
+lpath=Drop[lpath,-1];
+          Do[
+            step=lpath[[i]]//.{ax -> x , ay -> y , az-> z};
+            string = string <> ToString[step];
+          ,{i,1,Length[lpath]}];
+        ,
+        string = string <> "na";
+        ];
+      If[j!=Length[res[[i]]], string = string <>","];
+    ,{j, 1, Length[res[[i]]]}];
+    string = string <> "|";
+  ,{i, 1, Length[res]}];
+  string]
+  
 (*This functions generate the report string: for 1tr operators is just the path, 
 for multi tr operator is the long identification string. 
 The string will contains "na"  for each element of the multiplets missing, if the multiplet is partially evaluated*)
@@ -696,9 +782,16 @@ OpGroupStringPaths[px_, py_, pz_, iridx_, charge_] :=
  *)
   
   GenerateCcode[]:=Module[{idop,opnumberC,localoplist,locmemorymap,testmap,cs,startbase,evalpaths,res,ir1,ir2,path1,path2,llist,lcoeff,locallistop,listelem,lcharge1,lcharge2,llpx1,llpy1,llpz1,llpx2,llpy2,llpz2,llev1,llev2,relsign,ar,opnumber},
-  ar=OpenWrite[opfilename, FormatType -> InputForm];
-  WriteString[ar, "#include <stdlib.h>\n#include \"global.h\"\n#include \"geometry.h\"\n#include \"suN.h\"\n#include \"utils.h\"\n#include \"glueballs.h\"\n\n"];
-   WriteString[ar, "#include <string.h>\n"];
+  DeleteFile[{opfilename,checkgbfunctionsfilename,checktorfunctionsfilename,headerfilename,torfilename}];
+  ar=OpenAppend[opfilename, FormatType -> InputForm];
+  WriteString[ar, "
+#include <stdlib.h>
+#include \"global.h\"
+#include \"geometry.h\"
+#include \"suN.h\"
+#include \"utils.h\"
+#include \"glueballs.h\"
+#include <string.h>\n"];
   WriteString[ar,"#define npaths ",pathindex,"\n"];
   WriteString[ar,"static double PI=3.141592653589793238462643383279502884197;\n"];
   WriteString[ar,"static double complex *mom_def_Cp_tr_paths=NULL;\n"];
@@ -723,6 +816,22 @@ OpGroupStringPaths[px_, py_, pz_, iridx_, charge_] :=
   ,{i,1,48}];
   WriteString[ar,"return res;\n}\n "];
   Close[ar];
+  
+   ar=OpenAppend[torfilename, FormatType -> InputForm];
+   WriteString[ar, "
+#include <stdlib.h>
+#include \"global.h\"
+#include \"geometry.h\"
+#include \"suN.h\"
+#include \"utils.h\"
+#include \"glueballs.h\"
+#include <string.h>\n "];
+  WriteString[ar,"#define ntors ",torindex,"\n "];
+  WriteString[ar,"static double PI=3.141592653589793238462643383279502884197;\n "];
+  WriteString[ar,"static double complex *mom_def_Cp_poly_paths=NULL;\n "];
+  WriteString[ar,"static double complex *mom_def_Cm_poly_paths=NULL;\n "];
+  WriteString[ar,"static double complex *path_storage=NULL;\n "];
+  Close[ar];
 
 
 (*This block write the one trace operators as linear combination of the momentum defined sum of paths*)
@@ -736,8 +845,443 @@ OpGroupStringPaths[px_, py_, pz_, iridx_, charge_] :=
     , {irrepidx, 1, Length[bTOrthog[px, py, pz]]}];
   , {px, -1, 1}, {py, -1, 1}, {pz, -1, 1}];
 
+(*This block write the torellon operators as linear combination of the momentum defined sum of paths*)
+  Do[
+    Do[
+      Do[
+        If[ListQ[Torindex[px, py, pz, irrepidx,charge]],
+          DyPolyGenerateCcode[px, py, pz, irrepidx,charge];
+        ];
+        ,{charge,-1,1,+2}];
+    , {irrepidx, 1, Length[bTOrthog[px, py, pz]]}];
+  , {px, -1, 1}, {py, -1, 1}, {pz, -1, 1}];
+
+ WriteGlueballsCfiles[opnumberC];
+
+ WriteTorellonsCfiles[tornumberC];
+
+  GenerateCheader[opnumberC,tornumberC];
+  
+  GenerateCchecks[];
+  
+  ]
+
+
+(*This is the function that actually writes the operator for C measurments assuming that trace momentum defined operators have been evaluated*)
+  OneTraceOpGenerateCcode[px_, py_, pz_, irrepidx_,charge_] := OneTraceOpGenerateCcode[px, py, pz, irrepidx,charge] = Module[{coeff,paths,shifts,op,oplist,listopidx},
+  listopidx=Select[Flatten[Opindex[px, py, pz, irrepidx,charge]],IntegerQ[#] && # > 0 &];
+  Do[
+    op=OpList[px, py, pz, irrepidx, charge, opidx];
+    If[FreeQ[op, Pre] && FreeQ[op, Pim]  , Print["The request operator index has not yet been evaluated"];Abort[]];
+    If[SameQ[Head[op],Plus],oplist=op//. Plus->List;,oplist={op}];
+    coeff=oplist//.{Pre[__][__]-> 1, Pim[__][__]-> 1};
+    paths=oplist//.{A_. Pre[b__][nx_,ny_,nz_] :> {P[b],Exp[-I 2 Pi /L (px nx+py ny +pz nz)],0}, A_. Pim[b__][nx_,ny_,nz_] :> {P[b],Exp[-I 2 Pi /L (px nx+py ny +pz nz)],1}};
+    If[Not[AllTrue[paths[[All,1]], Not[FreeQ[#, P[__]]] &]],Print["1 The request operator has a non P based structure:",op];Abort[]];
+    If[Not[AllTrue[coeff, NumberQ[N[#]] &]],Print["2 The request operator has a non P based structure:",op];Abort[]];
+    If[Length[coeff]!=Length[paths],Print["3 The request operator has a non P based structure:",op];Abort[]];
+  (**)
+  (**)
+
+    (*Each path code is generated only once and only if it has been requested, it imples that also some paths can be not evaluated*)
+
+    Do[
+      PathGenerateCcode[PathUniqueIndex[paths[[i,1]]]];
+    ,{i,1,Length[paths]}];
+  (**)
+  (**)
+    Do[
+      GenerateCoefficientString[coeff[[i]]];
+     ,{i,1,Length[coeff]}];
+   (**)
+
+    shifts=Complement[Union[paths[[All,2]]],{1}];
+    Do[WriteShift[shifts[[i]],opfilename],{i,1,Length[shifts]}];
+
+    ar = OpenAppend[opfilename, FormatType -> InputForm];
+    WriteString[ar, "static void OP_oneTr_p_",p[px],"_",p[py],"_",p[pz],"_Ir_",irrepidx,"_C_",p[charge],"_n_",opidx,"(double complex * op_out)\n"];
+    WriteString[ar,"{\n*op_out ="];
+    Do[
+      WriteString[ar,OpConsts[coeff[[i]]]];
+      If[Abs[coeff[[i]]]!=1,WriteString[ar,"*"]];
+      If[Not[SameQ[paths[[i,2]],1]],WriteString[ar,MapShifts[opfilename,paths[[i,2]]],"*"]];
+      If[paths[[i,3]]==0,WriteString[ar,"mom_def_Cp_tr_paths["],WriteString[ar,"mom_def_Cm_tr_paths["]];
+      WriteString[ar,PathUniqueIndex[paths[[i,1]]],"]"];
+    ,{i,1,Length[paths]}];
+    WriteString[ar,";\n}\n\n"];
+    Close[ar];
+  ,{opidx,listopidx}];
+
+  ]
+  
+  (*Map of the global shifts*)
+  stringshift[opfilename]="";
+  stringshift[torfilename]="";
+   WriteShift[shift_,filename_]:=Module[{cc=ExpandAll[shift],ar},
+  If[Not[NumberQ[stringshiftidx[filename]]],
+  stringshiftidx[filename]=0;
+ 
+    ];
+    If[Not[StringQ[MapShifts[filename,cc]]],
+      MapShifts[filename,cc]="c"<>ToString[stringshiftidx[filename]];
+      ar = OpenAppend[filename, FormatType -> InputForm];
+      WriteString[ar,"static double complex c",stringshiftidx[filename],";\n"];
+      stringshift[filename]=stringshift[filename]<>"c"<>ToString[stringshiftidx[filename]]<>"=cexp(I*PI*("<>MyCForm[N[PowerExpand[Log[cc]] L/(I Pi),18]]<>"/GLB_X));\n";
+      stringshiftidx[filename]++;
+      Close[ar];
+    ];
+  ];
+
+  sign[ain_]:=Module[{res},If[ain>0,res="+",res="-"];res];
+  
+
+    (*Function to write the coefficients in C*)
+  GenerateCoefficientString[coef_]:=GenerateCoefficientString[coef]=Module[{cc=ExpandAll[coef],string=""},    
+    If[Not[StringQ[OpConsts[cc]]],
+      If[Abs[cc]!=1,
+        If[Re[cc]!=0,string=ToString[CForm[N[Re[cc], 18]]]];
+        If[Im[cc]!=0,string=string<>sign[Im[cc]]<>"I*"<>ToString[CForm[N[Abs[Im[cc]], 18]]]];
+        OpConsts[cc]="+("<>string<>")";,
+        OpConsts[cc]=sign[cc];
+      ];
+    ];
+  ];
+(*Write the headers*)
+  GenerateCheader[maxopCnumber_,maxtorCnumber_] := Module[{res,ar},
+    ar = OpenAppend[headerfilename, FormatType -> InputForm];
+    WriteString[ar, "#ifndef GLUEBALLS_H
+#define GLUEBALLS_H
+#include \"hr_complex.h\"
+#include \"logger.h\"
+#include \"suN.h\"
+
+int **direct_spatial_rotations();
+int **inverse_spatial_rotations();
+void request_spatial_paths_evaluation();
+void eval_all_glueball_ops(int t, double complex *numerical_op);
+void measure_1pt_glueballs(int nblockingstart, int nblockingend, double *smear_val, double complex *gb_storage);
+void eval_all_torellon_ops(int t, double complex *numerical_op);
+void measure_1pt_torellons(double *smear_val, double complex *tor_storage);
+void report_gb_group_setup();
+void report_tor_group_setup();
+
+typedef struct
+{
+    int t1;
+    int t2;
+    int id;
+    int n_pairs;
+} cor_points;
+
+typedef struct
+{
+    int n_entries;
+    cor_points *list;
+    int n_corrs;
+} cor_list;
+
+typedef struct
+{
+    suNg *p;
+    int ix;
+    double complex tr;
+} wilson_lines;
+
+wilson_lines *polyleg(int ix, int d);
+
+void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, double complex *gb_storage);
+void collect_1pt_torellon_functions(cor_list *lcor, double complex *tor_storage);
+    "];
+    WriteString[ar, "\n\n"];
 (*
-This block allow for the evaluation of the momentum defined paths.
+    Do[
+      Do[
+        WriteString[ar, "#define dim_p_", p[px], "_", p[py],"_", p[pz], "_Ir_", irrepidx," ",Length[bTOrthog[px, py, pz][[irrepidx]]],"\n"];
+        Do[
+        WriteString[ar, "#define n_OP_oneTr_p_", p[px], "_", p[py],"_", p[pz], "_Ir_", irrepidx,"_C_",p[charge]," "];
+        If[ListQ[Opindex[px, py, pz, irrepidx,charge]],
+          WriteString[ar, Max[Cases[Flatten[Opindex[px, py, pz, irrepidx,charge]], _Integer]],"\n"];
+          WriteString[ar, "void OP_oneTr_p_", p[px], "_", p[py],"_", p[pz], "_Ir_", irrepidx, "_C_",p[charge],"(double complex * numop);\n"];
+          ,WriteString[ar, "0\n"];
+        ];
+      ,{charge,-1,1,2}];
+      , {irrepidx, 1, Length[bTOrthog[px, py, pz]]}];
+    , {px, -1, 1}, {py, -1, 1}, {pz, -1, 1}];
+    *)
+    WriteString[ar, "#define total_n_glue_op ",maxopCnumber,"\n"];
+    WriteString[ar, "#define total_n_tor_op ",maxtorCnumber,"\n"];
+    WriteString[ar, "#define npoly_dist ",npolydist,"\n"];
+    WriteString[ar,"#endif\n"];
+    Close[ar];
+    ];
+
+
+AddTorCorrelators[px_, py_, pz_, irrepidx_, irrepev_, charge_, path_]:= AddTorCorrelators[px, py, pz, irrepidx, irrepev, charge, path] = Module[{res=0,success=0,eval=True,multbefore},
+  If[Not[ListQ[bTOrthog[px, py, pz]]], Print["Missing Coefficient table for the given impulse"]; Abort[];];
+  If[Length[bTOrthog[px, py, pz]] < irrepidx || irrepidx < 1 , Print["Number of irreps is not compatible with the requested irrep index"]; Abort[];];
+  If[Length[bTOrthog[px, py, pz][[irrepidx]]] < irrepev || irrepev < 1,  Print["Irrep dimension is not compatible with the requested irrep ev"]; Abort[];];
+  If[Not[Or[charge==-1, charge==1]], Print["Charge can only take values +1 or -1"]; Abort[];];
+  multbefore=Torindex[px, py, pz, irrepidx, charge, TorUniqueIndex[path][[1]]];
+  If[NumberQ[multbefore],
+    If[Not[SameQ[Torindex[px, py, pz, irrepidx, charge][[multbefore,irrepev]],0]],
+      Print["Input path : ",path,"\n Exisiting Torellon Operator : ",TorList[px, py, pz, irrepidx, charge,  Torindex[px, py, pz, irrepidx, charge][[multbefore,irrepev]]],"\n Total P=(",px,",", py,",", pz,")\n Irrep=",IrrepName[px,py,pz][[irrepidx]],
+        "\n Irrep ev=",irrepev,"/",Length[bTOrthog[px,py,pz][[irrepidx]]],"\n Charge=",charge];
+      Print["Already included.\n\n"];
+      eval=False;
+    ];
+  ];
+
+  (*First generate the operator for the given simmetry channel, only if it doesn't exists in the multiplet already*)
+  If[eval,
+    res=TorGenerate[px, py, pz, irrepidx, irrepev, charge, path];
+  
+    If[SameQ[res,0],
+      Print["Input path : ",path,"\n Generated Torellon Operator : ",res,"\n Total P=(",px,",", py,",", pz,")\n Irrep=",IrrepName[px,py,pz][[irrepidx]],
+        "\n Irrep ev=",irrepev,"/",Length[bTOrthog[px,py,pz][[irrepidx]]],"\n Charge=",charge];
+      Print["The operator has zero projection onto the given symmetry channel\n\n"];
+      ,
+      success=1;
+
+      Print["Input path : ",path,"\n Generated Torellon Operator : ",res,"\n Total P=(",px,",", py,",", pz,")\n Irrep=",IrrepName[px,py,pz][[irrepidx]],
+        "\n Irrep ev=",irrepev,"/",Length[bTOrthog[px,py,pz][[irrepidx]]],"\n Charge=",charge]; 
+      Print["Torellon operator added to the correlator list.\n\n"];
+    ];
+
+  ];
+
+success];
+
+TorGenerate[px_,py_,pz_,irrepidx_,irrepev_,charge_,path_]:=Module[{res,res1,tres,tmp,nid,opnum},
+If[!ListQ[bTOrthog[px,py,pz]],Print["Missing Coefficient table for the given impulse"];Abort[];];
+If[Length[bTOrthog[px,py,pz]]<irrepidx||irrepidx<1,Print["Number of irreps is not compatible with the requested irrep index"];Abort[];];
+If[Length[bTOrthog[px,py,pz][[irrepidx]]]<irrepev||irrepev<1,Print["Irrep dimension is not compatible with the requested irrep ev"];Abort[];];
+If[!(charge==-1||charge==+1),Print["Charge can only take values +1 or -1"];Abort[];];If[!MatchQ[path,P[__]],Print["path must be a unique Path quantity P[__]"];Abort[]];
+If[!(IsIn/@(path//. P:>List)//. List->And),Print["Path written in terms of non a-steps"];Abort[]];
+res=\!\(
+\*UnderoverscriptBox[\(\[Sum]\), \(i = 1\), \(48\)]\(\(bTOrthog[px, py, pz]\)[\([irrepidx, irrepev, i]\)]\ \((path //. permutationTable[\([i]\)])\)\)\);
+res=res//. btoa;
+res=TorSimplify[res];
+If[px==0,res=res//.{ P[A__][ax_,ay_,az_]:>P[A][0,ay,az],Dagger[P[A__]][ax_,ay_,az_]:>Dagger[P[A]][0,ay,az]}];
+If[py==0,res=res//. {P[A__][ax_,ay_,az_]:>P[A][ax,0,az],Dagger[P[A__]][ax_,ay_,az_]:>Dagger[P[A]][ax,0,az]}];
+If[pz==0,res=res//.{P[A__][ax_,ay_,az_]:>P[A][ax,ay,0],Dagger[P[A__]][ax_,ay_,az_]:>Dagger[P[A]][ax,ay,0]}];
+res=res//. {Dagger[P[L[ax]]][a1x_,a1y_,a1z_]:> Dagger[P[L[ax]]][0,a1y,a1z],P[L[ax]][a1x_,a1y_,a1z_]:> P[L[ax]][0,a1y,a1z]};
+res=res//. {Dagger[P[L[ay]]][a1x_,a1y_,a1z_]:> Dagger[P[L[ay]]][a1x,0,a1z],P[L[ay]][a1x_,a1y_,a1z_]:> P[L[ay]][a1x,0,a1z]};
+res=res//. {Dagger[P[L[az]]][a1x_,a1y_,a1z_]:> Dagger[P[L[az]]][a1x,a1y,0],P[L[az]][a1x_,a1y_,a1z_]:> P[L[az]][a1x,a1y,0]};
+tres=res//.Dagger[P[A__]][ax_,ay_,az_]:>Pre[A][ax,ay,az]- I Pim[A][ax,ay,az];
+tres=tres//.P[A__][ax_,ay_,az_]:>Pre[A][ax,ay,az]+ I Pim[A][ax,ay,az];
+tres=ExpandAll[tres];
+If[charge==1,
+tres=Re[tres];
+,
+tres=Im[tres];
+];
+res1 = Expand[tres]//.{ Im[__]-> 0, Re[A__] -> A};
+If[!res1===0,
+If[!ListQ[Torindex[px,py,pz,irrepidx,charge]],Torindex[px,py,pz,irrepidx,charge]={};];
+If[!NumberQ[Torindex[px,py,pz,irrepidx,charge,TorUniqueIndex[path]]]
+,
+tmp=Torindex[px,py,pz,irrepidx,charge];
+AppendTo[tmp,Table[0,{i,1,Length[bTOrthog[px,py,pz][[irrepidx]]]}]];
+Torindex[px,py,pz,irrepidx,charge]=tmp;
+Torindex[px,py,pz,irrepidx,charge,TorUniqueIndex[path][[1]]]=Length[tmp];
+];
+nid=Torindex[px,py,pz,irrepidx,charge,TorUniqueIndex[path][[1]]];
+opnum=Torindex[px,py,pz,irrepidx,charge][[nid,irrepev]];
+If[opnum==0,
+opnum=Max[Cases[Flatten[Torindex[px,py,pz,irrepidx,charge]],_Integer]]+1;
+tmp=Torindex[px,py,pz,irrepidx,charge];tmp[[nid,irrepev]]=opnum;
+Torindex[px,py,pz,irrepidx,charge]=tmp;
+TorList[px,py,pz,irrepidx,charge,opnum]=res1;
+,
+Print["Warning, in TorGenerate, you are trying to recreate an operator that already exists"];];
+res={res1,opnum};
+,
+res=0;];
+res];
+
+TorSimplify[ain_]:=Module[{ris=ain,Ptemp,tmpris,i,normalization,sqrt},
+ris=Select[Variables[ris],MatchQ[#1,P[__]]&];
+ris=ain//. P->Ptemp;
+ris=ris//. Ptemp[b___]:>TorUniqueIdentifier[P[b]][[1]];
+ris=Expand[ris];
+ris];
+
+
+TorUniqueIdentifier[ain_] := TorUniqueIdentifier[ain] = Module[{ris = ain,res, Ptemp, tmpris, lper,listris,r3,pshift,ininv,outinv,dir,shift,absdir,polydx},
+  If[Not[MatchQ[ris,P[__]]],Print["Requested a TorUniqueIdentifier of a non Path quantity"];Abort[]];
+  ris = ris //.{P[A___,L[a2_]]->  P[A,a2],P[A___,-n_. a2_ +L[a2_]]->  P[A,a2]};
+  If[Not[Map[IsIn, ris //. P :> List] //. List -> And],Print["Requested a TorUniqueIdentifier of non a-steps Path :",ris];Abort[]];
+  If[Not[MatchQ[ris//. P :> Plus, _. ax] || MatchQ[ris//. P :> Plus, _. ay] || MatchQ[ris//. P :> Plus, _. az]] ,
+Print["TorUniqueIdentifier of a non single directed Path "];
+Abort[];
+];
+dir = Expand[(ris//. P :> Plus)/(Abs[(ris//. P :> Plus)//.{ax-> 1 ,ay->1,az->1}])];
+ris = ris //. P[A__] -> List[A];
+ris = ris //. {{dir,A1___} ->{A1},{A1___,dir} ->{A1}};
+shift = (ris//. List :> Plus);
+pshift = {0,0,0}+(shift//. {ax -> {1,0,0},ay->{0,1,0},az->{0,0,1}});
+If[IsInPositive[dir],
+absdir=dir;
+ris = ris //. List[A1___] :> P1[A1,L[dir]-shift][0,0,0];
+TorList[torindex]=ris  //.  P1[A___][_,_,_]-> P[A];
+ininv = ininv//. List[B___] ->P[B];
+outinv = ris  //. P1[B___][0,0,0] ->Dagger[ P[B]][pshift[[1]],pshift[[2]],pshift[[3]]];
+,
+absdir = -dir;
+ris = ris //. List[A1___] :> Reverse[P1[A1]];
+ris = Expand[-(ris //. P1[A___]-> List[A])];
+ris = ris//. List[B___] ->Dagger[ P1[B,L[-dir]+shift]][pshift[[1]],pshift[[2]],pshift[[3]]];
+outinv = ris  //. Dagger[P1[B___]][_,_,_] -> P[B][0,0,0];
+TorList[torindex]=outinv //.  P[A___][_,_,_]-> P[A];
+];
+torindex=torindex+1;
+(*We make sure also the simple polyakov is always measured*)
+polydx=TorUniqueIndex[P[absdir]][[1]];
+ris = ris //. P1 -> P;
+ininv = ain //. P[A1___] :> Reverse[P1[A1]];
+ininv = Expand[-(ininv //. P1[A___]-> List[A])]//.List -> P;
+outinv = outinv //. Dagger[P[B1___]][a1_,a2_,a3_] ->  Dagger[P1[B1]][a1,a2,a3] P1[L[absdir]][a1,a2,a3];
+outinv = outinv //. P[B1___][a1_,a2_,a3_] ->  P1[B1][a1,a2,a3] Dagger[P1[L[absdir]]][a1,a2,a3];
+outinv = outinv //.P1 -> P;
+TorUniqueIdentifier[ininv ]= {outinv,{torindex-1,polydx}};
+ris = ris //. Dagger[P[B1___]][a1_,a2_,a3_] ->  Dagger[P1[B1]][a1,a2,a3] P1[L[absdir]][a1,a2,a3];
+ris = ris //. P[B1___][a1_,a2_,a3_] ->  P1[B1][a1,a2,a3] Dagger[P1[L[absdir]]][a1,a2,a3];
+ris = ris //.P1 -> P;
+{ris,{torindex-1,polydx}}];
+TorUniqueIdentifier[P[ax]] = {Dagger[P[L[ax]]][0, 0, 0] P[L[ax]][0, 0, 0], {0, 0}};
+ TorUniqueIdentifier[P[-ax]] = TorUniqueIdentifier[P[ax]];
+  TorUniqueIdentifier[P[L[ax]]] = TorUniqueIdentifier[P[ax]];
+TorUniqueIdentifier[P[ay]] = {Dagger[P[L[ay]]][0, 0, 0] P[L[ay]][0, 0, 0], {1, 1}};
+  TorUniqueIdentifier[P[-ay]] = TorUniqueIdentifier[P[ay]];
+  TorUniqueIdentifier[P[L[ay]]] = TorUniqueIdentifier[P[ay]];
+TorUniqueIdentifier[P[az]] = {Dagger[P[L[az]]][0, 0, 0] P[L[az]][0, 0, 0], {2, 2}};
+TorUniqueIdentifier[P[-az]] = TorUniqueIdentifier[P[az]];
+TorUniqueIdentifier[P[L[az]]] = TorUniqueIdentifier[P[az]];
+TorList[0]=P[L[ax]];
+TorList[1]=P[L[ay]];
+TorList[2]=P[L[az]];
+torindex=3;
+npolydist=0;
+ 
+TorUniqueIndex[ain_]:=TorUniqueIdentifier[ain][[2]];
+
+
+  PolyGenerateCcode[idx_] := PolyGenerateCcode[idx] = Module[{steps,ar,i},
+  If[Not[MatchQ[TorList[idx],P[__]]],Print["In PolyGenerateCcode, requested the generation of a path not included in TorList"];Abort[]];
+  ar = OpenAppend[torfilename, FormatType -> InputForm];
+  (**)
+  WriteString[ar, "static double complex poly", idx, "(int in)\n"];
+  WriteString[ar, "{\n"];
+   steps = TorList[idx] //. P[A__] :> List[A];
+   pleg=Last[steps]//. Plus -> List;
+  
+  pleg=pleg //. {a1_,L[a2_]} :>  {-a1/a2,a2};
+  If[pleg[[1]]>npolydist,npolydist=pleg[[1]]];
+  pleg=pleg //. L[d1_] -> {0,d1};
+  
+  
+  If[Length[steps]>1,
+  WriteString[ar, "suNg *w1, *w2;\nsuNg res, res1;\nint site=in;\ndouble complex p;\nwilson_lines *wl;\n\n"];
+ If[posdir[steps[[1]]],
+    WriteString[ar, "w2 = pu_gauge_wrk(site,", dir[steps[[1]]], ");\n\n"];
+    ,
+    WriteString[ar, "site = idn_wrk(site, ", dir[steps[[1]]], ");\n"];
+    WriteString[ar, "w2 = pu_gauge_wrk(site,", dir[steps[[1]]], ");\n\n"];
+    WriteString[ar, "_suNg_dagger(res1,*w2);\n"];
+    WriteString[ar, "w2 = &res1;\n"];
+  ];
+  
+  (**)
+  Do[
+    If[posdir[steps[[i - 1]]] && posdir[steps[[i]]],  WriteString[ar, "site = iup_wrk(site, ", dir[steps[[i-1]]], ");\n"];];
+    If[Not[posdir[steps[[i - 1]]]] && Not[posdir[steps[[i]]]], WriteString[ar, "site = idn_wrk(site, ", dir[steps[[i]]], ");\n"];];
+    If[Not[posdir[steps[[i - 1]]]] && posdir[steps[[i]]], Null];
+    If[posdir[steps[[i - 1]]] && Not[posdir[steps[[i]]]],
+      WriteString[ar, "site = iup_wrk(site, ", dir[steps[[i - 1]]],");\nsite = idn_wrk(site, ", dir[steps[[i]]], ");\n"];
+    ];
+  (**)
+    WriteString[ar, "w1 = pu_gauge_wrk(site,", dir[steps[[i]]], ");\n"];
+    If[posdir[steps[[i]]], WriteString[ar, "_suNg_times_suNg("];,
+      WriteString[ar, "_suNg_times_suNg_dagger("];
+    ];
+  (**)
+    If[i == 2, WriteString[ar, " res, *w2, *w1);\n\n"];,
+      If[OddQ[i], WriteString[ar, "res1, res, *w1);\n\n"];,
+      WriteString[ar, "res, res1, *w1);\n\n"];];
+    ];
+  ,{i, 2, Length[steps]-1}];
+  
+  
+  WriteString[ar, "wl=polyleg(in,",dir[pleg[[2]]],");\n\n"];
+  WriteString[ar, "_suNg_times_suNg(res1,res,wl->p[",pleg[[1]]-1,"]);\n"];
+    (**)
+  WriteString[ar, "_suNg_trace(p,res1);\nreturn p;\n}\n\n"];,
+  WriteString[ar, "return polyleg(in,",dir[pleg[[2]]],")->tr;\n}\n\n"];
+  
+  ];
+  Close[ar];
+  WrittenPoly[idx]=1;
+  ]
+
+
+
+
+(*This is the function that actually writes the torellons for C measurments assuming that trace momentum defined operators have been evaluated*)
+  DyPolyGenerateCcode[px_, py_, pz_, irrepidx_,charge_] := DyPolyGenerateCcode[px, py, pz, irrepidx,charge] = Module[{coeff,paths,shifts,tor,torlist,listtoridx,exp},
+  listtoridx=Select[Flatten[Torindex[px, py, pz, irrepidx,charge]],IntegerQ[#] && # > 0 &];
+  Do[
+    tor=TorList[px, py, pz, irrepidx, charge, toridx];
+   If[FreeQ[tor, Pre] && FreeQ[tor, Pim]  , Print["The request operator index has not yet been evaluated"];Abort[]];
+   If[SameQ[Head[tor],Plus],torlist={};Do[AppendTo[torlist,tor[[i]]],{i,Length[tor]}];,torlist={tor}];
+   coeff=torlist//.{Pre[__][__]-> 1, Pim[__][__]-> 1};
+  paths=torlist //.{A___,d_.  C1_[a1__][a2__]C2_[b1__][b2__],B___}:> {A, {C1[a1],C2[b1],exp[a2]exp[b2]},B}/; And[Or[SameQ[C1,Pre],SameQ[C1,Pim]],Or[SameQ[C2,Pre],SameQ[C2,Pim]]] ;
+   paths=paths//. {{A___,Pre[b__],C___} :> {A,P[b],0,C}, {A___, Pim[b__],C___}:> {A,P[b],1,C}};
+  paths=paths //.exp[nx_,ny_,nz_] -> Exp[-I 2 Pi /L (px nx+py ny +pz nz)];
+   paths=paths//.{P[L[a1_]]-> P[a1],P[a1__,b_+L[a_]]-> P[a1]};
+
+    If[Not[AllTrue[paths[[All,1]], Not[FreeQ[#, P[__]]] &]],Print["1 The request operator has a non P based structure:",tor];Abort[]];
+    If[Not[AllTrue[coeff, NumberQ[N[#]] &]],Print["2 The request operator has a non P based structure:",tor];Abort[]];
+    If[Length[coeff]!=Length[paths],Print["3 The request operator has a non P based structure:",tor];Abort[]];
+  (**)
+  (**)
+
+    (*Each path code is generated only once and only if it has been requested, it imples that also some paths can be not evaluated*)
+
+  Do[
+      PolyGenerateCcode[TorUniqueIndex[paths[[i,1]]][[1]]];
+     PolyGenerateCcode[TorUniqueIndex[paths[[i,3]]][[1]]];
+    ,{i,1,Length[paths]}];
+  (**)
+(**)
+    Do[
+      GenerateCoefficientString[coeff[[i]]];
+     ,{i,1,Length[coeff]}];
+   (**)
+    shifts=Complement[Union[paths[[All,5]]],{1}];
+    Do[WriteShift[shifts[[i]],torfilename],{i,1,Length[shifts]}];
+
+    ar = OpenAppend[torfilename, FormatType -> InputForm];
+    WriteString[ar, "static void diPoly_p_",p[px],"_",p[py],"_",p[pz],"_Ir_",irrepidx,"_C_",p[charge],"_n_",toridx,"(double complex * tor_out)\n"];
+    WriteString[ar,"{\n*tor_out ="];
+    Do[
+      WriteString[ar,OpConsts[coeff[[i]]]];
+      If[Abs[coeff[[i]]]!=1,WriteString[ar,"*"]];
+      If[Not[SameQ[paths[[i,5]],1]],WriteString[ar,MapShifts[torfilename,paths[[i,5]]],"*"]];
+      If[paths[[i,2]]==0,WriteString[ar,"mom_def_Cp_poly_paths["],WriteString[ar,"mom_def_Cm_poly_paths["]];
+      WriteString[ar,TorUniqueIndex[paths[[i,1]]][[1]],"]*"];
+      If[paths[[i,4]]==0,WriteString[ar,"mom_def_Cp_poly_paths["],WriteString[ar,"mom_def_Cm_poly_paths["]];
+      WriteString[ar,TorUniqueIndex[paths[[i,3]]][[1]],"]"];
+    ,{i,1,Length[paths]}];
+    WriteString[ar,";\n}\n\n"];
+    Close[ar];
+  ,{toridx,listtoridx}];
+  ];
+  
+
+
+
+WriteGlueballsCfiles[lopnumberC_]:=Module[{ar,evalpaths,idop,opnumber,localoplist,locmemorymap,testmap,cs,startbase},
+ (*
+This block allow for the evaluation of the momentum defined OPpaths.
 The paths are evaluated only once while each different momentum projection can be re-evaluated independently.
 *)
   ar = OpenAppend[opfilename, FormatType -> InputForm];
@@ -748,7 +1292,7 @@ The paths are evaluated only once while each different momentum projection can b
     double complex ce = 0.;
     if(path_storage==NULL)
       {"];
-  WriteString[ar, stringshift];
+  WriteString[ar, stringshift[opfilename]];
   WriteString[ar,"        path_storage = malloc(npaths * X * Y * Z * sizeof(double complex));
         mom_def_Cp_tr_paths = malloc(npaths * sizeof(double complex));
         mom_def_Cm_tr_paths = malloc(npaths * sizeof(double complex));
@@ -788,7 +1332,7 @@ The paths are evaluated only once while each different momentum projection can b
         numerical_op = malloc(total_n_glue_op * sizeof(double complex));
     }
     request_space_paths_evaluation();\n"];
-  opnumberC=0;
+  lopnumberC=0;
   Do[
     evalpaths=0;
     Do[
@@ -807,13 +1351,13 @@ The paths are evaluated only once while each different momentum projection can b
                 If[Not[SameQ[idop,0]],
                   If[NumberQ[idop],
                   (*one trace operator*)
-                    WriteString[ar, "    OP_oneTr_p_", p[px], "_", p[py], "_", p[pz],"_Ir_", irrepidx, "_C_",p[charge],"_n_", idop,"(numerical_op+",opnumberC,");\n"];
-                    MapOptoCindex[px,py,pz,irrepidx,charge,idop]=opnumberC;
-                    opnumberC++;
+                    WriteString[ar, "    OP_oneTr_p_", p[px], "_", p[py], "_", p[pz],"_Ir_", irrepidx, "_C_",p[charge],"_n_", idop,"(numerical_op+",lopnumberC,");\n"];
+                    MapOptoCindex[px,py,pz,irrepidx,charge,idop]=lopnumberC;
+                    lopnumberC++;
                   ,
                   (*Multiple trace operator*)
-                    MapOptoCindex[px,py,pz,irrepidx,charge,idop]=opnumberC;
-                    opnumberC++;
+                    MapOptoCindex[px,py,pz,irrepidx,charge,idop]=lopnumberC;
+                    lopnumberC++;
                   ];
                 ];
              , {nop, 1, Length[Opindex[px, py, pz, irrepidx,charge]]}];
@@ -882,7 +1426,7 @@ WriteString[ar,"    for(int i=0;i<total_n_glue_op;i++)
 
 (*This is the evaluation and collection on the root node of the 1pt functions*)
   WriteString[ar, "
-void evaluate_1pt_functions(cor_list *lcor, int nblocking, double complex *gb_storage)
+void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, double complex *gb_storage)
 {
     int n1, n2, i;
     static double complex *gb1_bf;
@@ -1045,13 +1589,13 @@ Do[
   , {px, -1, 1}, {py, -1, 1}, {pz, -1, 1}];
   WriteString[ar, "}\n"];
 (*Report function on the operator evaluated*)
-  WriteString[ar, "void report_op_group_setup()\n{\n"];
+  WriteString[ar, "void report_gb_group_setup()\n{\n"];
   Do[
     Do[
       Do[
           If[ListQ[Opindex[px, py, pz, irrepidx, charge]],
             If[Complement[Flatten[Opindex[px, py, pz, irrepidx, charge]],{0}]!={},
-              WriteString[ar, "lprintf(\"INIT Measure ML\",0,\"\\n1pt Irrep multiplets Total P=(", px, ",", py, ",", pz, ") Irrep=", IrrepName[px,py,pz][[irrepidx]]," Charge=", stcharge[charge], "\");\n"];
+              WriteString[ar, "lprintf(\"INIT Measure ML\",0,\"\\n1pt_glb Irrep multiplets Total P=(", px, ",", py, ",", pz, ") Irrep=", IrrepName[px,py,pz][[irrepidx]]," Charge=", stcharge[charge], "\");\n"];
               WriteString[ar, "lprintf(\"INIT Measure ML\",0,\" " <> OpGroupStringPaths[px, py, pz, irrepidx, charge] <>"\");\n"];
             ];
           ];
@@ -1060,143 +1604,274 @@ Do[
   , {px, -1, 1}, {py, -1, 1}, {pz, -1, 1}];
   WriteString[ar, "}\n"];
   Close[ar];
-
-  GenerateCheader[opnumberC];
-  
-  GenerateCchecks[];
-  
-  ]
+];
 
 
-(*This is the function that actually writes the operator for C measurments assuming that trace momentum defined operators have been evaluated*)
-  OneTraceOpGenerateCcode[px_, py_, pz_, irrepidx_,charge_] := OneTraceOpGenerateCcode[px, py, pz, irrepidx,charge] = Module[{coeff,paths,shifts,op,oplist,listopidx},
-  listopidx=Select[Flatten[Opindex[px, py, pz, irrepidx,charge]],IntegerQ[#] && # > 0 &];
-  Do[
-    op=OpList[px, py, pz, irrepidx, charge, opidx];
-    If[FreeQ[op, Pre] && FreeQ[op, Pim]  , Print["The request operator index has not yet been evaluated"];Abort[]];
-    If[SameQ[Head[op],Plus],oplist=op//. Plus->List;,oplist={op}];
-    coeff=oplist//.{Pre[__][__]-> 1, Pim[__][__]-> 1};
-    paths=oplist//.{A_. Pre[b__][nx_,ny_,nz_] :> {P[b],Exp[-I 2 Pi /L (px nx+py ny +pz nz)],0}, A_. Pim[b__][nx_,ny_,nz_] :> {P[b],Exp[-I 2 Pi /L (px nx+py ny +pz nz)],1}};
-    If[Not[AllTrue[paths[[All,1]], Not[FreeQ[#, P[__]]] &]],Print["1 The request operator has a non P based structure:",op];Abort[]];
-    If[Not[AllTrue[coeff, NumberQ[N[#]] &]],Print["2 The request operator has a non P based structure:",op];Abort[]];
-    If[Length[coeff]!=Length[paths],Print["3 The request operator has a non P based structure:",op];Abort[]];
-  (**)
-  (**)
 
-    (*Each path code is generated only once and only if it has been requested, it imples that also some paths can be not evaluated*)
-
-    Do[
-      PathGenerateCcode[PathUniqueIndex[paths[[i,1]]]];
-    ,{i,1,Length[paths]}];
-  (**)
-  (**)
-    Do[
-      GenerateCoefficientString[coeff[[i]]];
-     ,{i,1,Length[coeff]}];
-   (**)
-
-    shifts=Complement[Union[paths[[All,2]]],{1}];
-    Do[WriteShift[shifts[[i]]],{i,1,Length[shifts]}];
-
-    ar = OpenAppend[opfilename, FormatType -> InputForm];
-    WriteString[ar, "static void OP_oneTr_p_",p[px],"_",p[py],"_",p[pz],"_Ir_",irrepidx,"_C_",p[charge],"_n_",opidx,"(double complex * op_out)\n"];
-    WriteString[ar,"{\n*op_out ="];
-    Do[
-      WriteString[ar,OpConsts[coeff[[i]]]];
-      If[Abs[coeff[[i]]]!=1,WriteString[ar,"*"]];
-      If[Not[SameQ[paths[[i,2]],1]],WriteString[ar,MapShifts[paths[[i,2]]],"*"]];
-      If[paths[[i,3]]==0,WriteString[ar,"mom_def_Cp_tr_paths["],WriteString[ar,"mom_def_Cm_tr_paths["]];
-      WriteString[ar,PathUniqueIndex[paths[[i,1]]],"]"];
-    ,{i,1,Length[paths]}];
-    WriteString[ar,";
-    }\n\n"];
-    Close[ar];
-  ,{opidx,listopidx}];
-
-  ]
-  
-  
-  stringshift="";
-  stringshiftidx=0;
-
-  (*Map of the global shifts*)
-  WriteShift[shift_]:=Module[{cc=ExpandAll[shift],ar},
-    If[Not[StringQ[MapShifts[cc]]],
-      MapShifts[cc]="c"<>ToString[stringshiftidx];
-      ar = OpenAppend[opfilename, FormatType -> InputForm];
-      WriteString[ar,"static double complex c",stringshiftidx,";\n"];
-      stringshift=stringshift<>"c"<>ToString[stringshiftidx]<>"=cexp(I*PI*("<>MyCForm[N[PowerExpand[Log[cc]] L/(I Pi),18]]<>"/GLB_X));\n";
-      stringshiftidx++;
-      Close[ar];
-    ];
-  ];
-
-  sign[ain_]:=Module[{res},If[ain>0,res="+",res="-"];res];
-  
-
-    (*Function to write the coefficients in C*)
-  GenerateCoefficientString[coef_]:=GenerateCoefficientString[coef]=Module[{cc=ExpandAll[coef],string=""},    
-    If[Not[StringQ[OpConsts[cc]]],
-      If[Abs[cc]!=1,
-        If[Re[cc]!=0,string=ToString[CForm[N[Re[cc], 18]]]];
-        If[Im[cc]!=0,string=string<>sign[Im[cc]]<>"I*"<>ToString[CForm[N[Abs[Im[cc]], 18]]]];
-        OpConsts[cc]="+("<>string<>")";,
-        OpConsts[cc]=sign[cc];
-      ];
-    ];
-  ];
-(*Write the headers*)
-  GenerateCheader[maxopCnumber_] := Module[{res,ar},
-    ar = OpenWrite[headerfilename, FormatType -> InputForm];
-    WriteString[ar, "#ifndef GLUEBALLS_H
-#define GLUEBALLS_H
-#include \"hr_complex.h\"
-#include \"logger.h\"
-
-int **direct_spatial_rotations();
-int **inverse_spatial_rotations();
-void request_spatial_paths_evaluation();
-void eval_all_glueball_ops(int t, double complex *numerical_op);
-void measure_1pt_glueballs(int nblockingstart, int nblockingend, double *smear_val, double complex *gb_storage);
-void report_op_group_setup();
-
-typedef struct
-{
-    int t1;
-    int t2;
-    int id;
-    int n_pairs;
-} cor_points;
-
-typedef struct
-{
-    int n_entries;
-    cor_points *list;
-    int n_corrs;
-} cor_list;
-
-void evaluate_1pt_functions(cor_list *lcor, int nblocking, double complex *gb_storage);
-    "];
-    WriteString[ar, "\n\n"];
+WriteTorellonsCfiles[ltornumberC_]:=Module[{ar,evaltors,idop,found},
 (*
+This block allow for the evaluation of the momentum defined poly and torellons.
+The paths are evaluated only once while each different momentum projection can be re-evaluated independently.
+*)
+ar=OpenAppend[torfilename,FormatType->InputForm];
+WriteString[ar,"static int last_t = -10;\nvoid request_space_tors_evaluation(){last_t=-10;}
+  static void eval_time_momentum_torellons(int t, int px, int py, int pz)
+  {
+    int n_x, n_y, n_z, idx, in;
+    double complex ce = 0.;
+    if(path_storage==NULL)
+      {"];
+WriteString[ar,stringshift[torfilename]];
+WriteString[ar,"        path_storage = malloc(ntors * X * Y * Z * sizeof(double complex));
+        mom_def_Cp_poly_paths = malloc(ntors * sizeof(double complex));
+        mom_def_Cm_poly_paths = malloc(ntors * sizeof(double complex));
+        for (in = 0; in < ntors * X * Y * Z; in++)
+            path_storage[in] = 0.;
+    }"];
+WriteString[ar,"\nfor(in = 0; in < ntors; in++)\n{\nmom_def_Cp_poly_paths[in]=0.;\n"];
+WriteString[ar,"mom_def_Cm_poly_paths[in]=0.;\n}\n"];
+WriteString[ar,"if (t != last_t)\n{\nlast_t=t;\n"];
+WriteString[ar,"for (n_y = 0; n_y < Y; n_y++)\nfor (n_z = 0; n_z < Z; n_z++)\nfor (n_x = 0; n_x < X; n_x++)\n{\n"];
+WriteString[ar,"in = ipt(t, n_x, n_y, n_z);\nce = cexp(I * 2.0 * PI * (double)(n_x * px + n_y * py + n_z * pz) / GLB_X);\n"];
+WriteString[ar,"idx = ntors * (n_x + X * (n_y + Y * n_z));\n"];
+Do[If[NumberQ[WrittenPoly[i]],If[FreeQ[TorList[i],L[az]]&&FreeQ[TorList[i],L[ay]],
+WriteString[ar,"path_storage[",i,"+idx]= poly",i,"(in);\nmom_def_Cp_poly_paths[",i,"]+=ce*creal(path_storage[",i,"+idx]);"];
+WriteString[ar,"\nmom_def_Cm_poly_paths[",i,"]+=I*ce*cimag(path_storage[",i,"+idx]);\n"];];];,{i,0,torindex-1}];
+WriteString[ar,"};\n"];
+WriteString[ar,"for (n_z = 0; n_z < Z; n_z++)\nfor (n_x = 0; n_x < X; n_x++)\nfor (n_y = 0; n_y < Y; n_y++)\n{\n"];
+WriteString[ar,"in = ipt(t, n_x, n_y, n_z);\nce = cexp(I * 2.0 * PI * (double)(n_x * px + n_y * py + n_z * pz) / GLB_X);\n"];
+WriteString[ar,"idx = ntors * (n_x + X * (n_y + Y * n_z));\n"];
+Do[If[NumberQ[WrittenPoly[i]],If[FreeQ[TorList[i],L[az]]&&FreeQ[TorList[i],L[ax]],
+WriteString[ar,"path_storage[",i,"+idx]= poly",i,"(in);\nmom_def_Cp_poly_paths[",i,"]+=ce*creal(path_storage[",i,"+idx]);"];
+WriteString[ar,"\nmom_def_Cm_poly_paths[",i,"]+=I*ce*cimag(path_storage[",i,"+idx]);\n"];];];,{i,0,torindex-1}];
+WriteString[ar,"};\n"];
+WriteString[ar,"for (n_x = 0; n_x < X; n_x++)\nfor (n_y = 0; n_y < Y; n_y++)\nfor (n_z = 0; n_z < Z; n_z++)\n{\n"];
+WriteString[ar,"in = ipt(t, n_x, n_y, n_z);\nce = cexp(I * 2.0 * PI * (double)(n_x * px + n_y * py + n_z * pz) / GLB_X);\n"];
+WriteString[ar,"idx = ntors * (n_x + X * (n_y + Y * n_z));\n"];
+Do[If[NumberQ[WrittenPoly[i]],If[FreeQ[TorList[i],L[ay]]&&FreeQ[TorList[i],L[ax]],
+WriteString[ar,"path_storage[",i,"+idx]= poly",i,"(in);\nmom_def_Cp_poly_paths[",i,"]+=ce*creal(path_storage[",i,"+idx]);"];
+WriteString[ar,"\nmom_def_Cm_poly_paths[",i,"]+=I*ce*cimag(path_storage[",i,"+idx]);\n"];];];,{i,0,torindex-1}];
+WriteString[ar,"};\n"];
+WriteString[ar,"}\nelse{\n"];
+WriteString[ar,"for (n_y = 0; n_y < Y; n_y++)\nfor (n_z = 0; n_z < Z; n_z++)\nfor (n_x = 0; n_x < X; n_x++)\n{\n"];
+WriteString[ar,"in = ipt(t, n_x, n_y, n_z);\nce = cexp(I * 2.0 * PI * (double)(n_x * px + n_y * py + n_z * pz) / GLB_X);\n"];
+WriteString[ar,"idx = ntors * (n_x + X * (n_y + Y * n_z));\n"];
+Do[If[NumberQ[WrittenPoly[i]],If[FreeQ[TorList[i],L[az]]&&FreeQ[TorList[i],L[ay]],
+WriteString[ar,"mom_def_Cp_poly_paths[",i,"]+=ce*creal(path_storage[",i,"+idx]);"];
+WriteString[ar,"\nmom_def_Cm_poly_paths[",i,"]+=I*ce*cimag(path_storage[",i,"+idx]);\n"];];];,{i,0,torindex-1}];
+WriteString[ar,"};\n"];
+WriteString[ar,"for (n_z = 0; n_z < Z; n_z++)\nfor (n_x = 0; n_x < X; n_x++)\nfor (n_y = 0; n_y < Y; n_y++)\n{\n"];
+WriteString[ar,"in = ipt(t, n_x, n_y, n_z);\nce = cexp(I * 2.0 * PI * (double)(n_x * px + n_y * py + n_z * pz) / GLB_X);\n"];
+WriteString[ar,"idx = ntors * (n_x + X * (n_y + Y * n_z));\n"];
+Do[If[NumberQ[WrittenPoly[i]],If[FreeQ[TorList[i],L[az]]&&FreeQ[TorList[i],L[ax]],
+WriteString[ar,"mom_def_Cp_poly_paths[",i,"]+=ce*creal(path_storage[",i,"+idx]);"];
+WriteString[ar,"\nmom_def_Cm_poly_paths[",i,"]+=I*ce*cimag(path_storage[",i,"+idx]);\n"];];];,{i,0,torindex-1}];
+WriteString[ar,"};\n"];
+WriteString[ar,"for (n_x = 0; n_x < X; n_x++)\nfor (n_y = 0; n_y < Y; n_y++)\nfor (n_z = 0; n_z < Z; n_z++)\n{\n"];
+WriteString[ar,"in = ipt(t, n_x, n_y, n_z);\nce = cexp(I * 2.0 * PI * (double)(n_x * px + n_y * py + n_z * pz) / GLB_X);\n"];
+WriteString[ar,"idx = ntors * (n_x + X * (n_y + Y * n_z));\n"];
+Do[If[NumberQ[WrittenPoly[i]],If[FreeQ[TorList[i],L[ay]]&&FreeQ[TorList[i],L[ax]],
+WriteString[ar,"mom_def_Cp_poly_paths[",i,"]+=ce*creal(path_storage[",i,"+idx]);"];
+WriteString[ar,"\nmom_def_Cm_poly_paths[",i,"]+=I*ce*cimag(path_storage[",i,"+idx]);\n"];];];,{i,0,torindex-1}];
+WriteString[ar,"};\n"];
+WriteString[ar,"\n}\n};\n"];
+
+(**)
+  WriteString[ar, "void eval_all_torellon_ops(int t, double complex *numerical_tor_out)
+{
+    static double complex *numerical_op = NULL;
+    if (numerical_op == NULL)
+    {
+        numerical_op = malloc(total_n_tor_op * sizeof(double complex));
+    }
+    request_space_tors_evaluation();\n"];
+  ltornumberC=0;
+  Do[
+    evaltors=0;
     Do[
       Do[
-        WriteString[ar, "#define dim_p_", p[px], "_", p[py],"_", p[pz], "_Ir_", irrepidx," ",Length[bTOrthog[px, py, pz][[irrepidx]]],"\n"];
-        Do[
-        WriteString[ar, "#define n_OP_oneTr_p_", p[px], "_", p[py],"_", p[pz], "_Ir_", irrepidx,"_C_",p[charge]," "];
-        If[ListQ[Opindex[px, py, pz, irrepidx,charge]],
-          WriteString[ar, Max[Cases[Flatten[Opindex[px, py, pz, irrepidx,charge]], _Integer]],"\n"];
-          WriteString[ar, "void OP_oneTr_p_", p[px], "_", p[py],"_", p[pz], "_Ir_", irrepidx, "_C_",p[charge],"(double complex * numop);\n"];
-          ,WriteString[ar, "0\n"];
+        If[ListQ[Torindex[px, py, pz, irrepidx,charge]],
+          If[evaltors==0 &&  Select[Flatten[Torindex[px, py, pz, irrepidx,charge]], IntegerQ[#] && # > 0 &] !={}, 
+            WriteString[ar,"    eval_time_momentum_torellons(t,",px,",",py,",",pz,");\n"];
+            evaltors=1;
+          ];
+
+          Do[
+            Do[
+              idop = Torindex[px, py, pz, irrepidx,charge][[nop, irrepev]];
+              (*We are enforcing that different operators (both 1tr and multiple traces) with same px, py, pz, irrepidx, irrepev, charge are contigous in numerical_op*)
+                If[Not[SameQ[idop,0]],
+               
+               
+                    WriteString[ar, "    diPoly_p_", p[px], "_", p[py], "_", p[pz],"_Ir_", irrepidx, "_C_",p[charge],"_n_", idop,"(numerical_op+",ltornumberC,");\n"];
+                    MapTortoCindex[px,py,pz,irrepidx,charge,idop]=ltornumberC;
+                    ltornumberC++;
+              
+                  
+                ];
+             , {nop, 1, Length[Torindex[px, py, pz, irrepidx,charge]]}];
+          , {irrepev, 1, Length[bTOrthog[px, py, pz][[irrepidx]]]}];
         ];
       ,{charge,-1,1,2}];
-      , {irrepidx, 1, Length[bTOrthog[px, py, pz]]}];
-    , {px, -1, 1}, {py, -1, 1}, {pz, -1, 1}];
-    *)
-    WriteString[ar, "#define total_n_glue_op ",maxopCnumber,"\n"];
-    WriteString[ar,"#endif\n"];
-    Close[ar];
-    ];
+    , {irrepidx, 1, Length[bTOrthog[px, py, pz]]}];
+  , {px, -1, 1}, {py, -1, 1}, {pz, -1, 1}];
+(**)
+
+WriteString[ar,"    for(int i=0;i<total_n_tor_op;i++)
+        *(numerical_tor_out+i)+=*(numerical_op+i);
+}\n"];
+
+WriteString[ar,"
+void collect_1pt_torellon_functions(cor_list *lcor, double complex *tor_storage)
+{
+    int n1, i;
+    static double complex *tor1_bf;
+    static int n_total_active_slices = 0;    
+    static int *listactive = NULL;
+    if (listactive == NULL)
+    {
+        listactive = malloc(sizeof(int) * GLB_T);
+        for (i = 0; i < GLB_T; i++)
+            listactive[i] = -1;
+
+        for (i = 0; i < lcor->n_entries; i++)
+        {
+            listactive[lcor->list[i].t1] = 1;
+            listactive[lcor->list[i].t2] = 1;
+        }
+
+        for (i = 0; i < GLB_T; i++)
+            if (listactive[i] == 1)
+            {
+                listactive[i] = n_total_active_slices;
+                n_total_active_slices++;
+            }
+    }
+
+
+#ifdef WITH_MPI
+    static int *t_to_proc = NULL;
+    static int *listsent = NULL;
+    int t1,t2;
+
+    if (t_to_proc == NULL)
+    {
+        listsent = malloc(sizeof(int) * GLB_T);
+
+        tor1_bf = malloc(sizeof(double complex) * total_n_tor_op * n_total_active_slices);
+
+        t_to_proc = malloc(sizeof(int) * GLB_T);
+        for (i = 0; i < GLB_T; i++)
+        {
+            int x[4] = {i, 0, 0, 0}, p[4];
+            glb_to_proc(x, p);
+            t_to_proc[i] = p[0];
+        }
+    }
+
+    for (i = 0; i < GLB_T; i++)
+        listsent[i] = -1;
+
+    static double complex *tor2;
+    static double complex *tor1;
+    MPI_Request req_1pt[GLB_T];
+
+    for (int icor = 0; icor < lcor->n_entries; icor++)
+    {
+
+        t1 = glbT_to_active_slices[lcor->list[icor].t1];
+        t2 = glbT_to_active_slices[lcor->list[icor].t2];
+        tor1 = tor1_bf + total_n_tor_op * listactive[lcor->list[icor].t1];
+        tor2 = tor1_bf + total_n_tor_op * listactive[lcor->list[icor].t2];
+
+        if (listsent[lcor->list[icor].t1] == -1)
+        {
+            if (t1 != -1)
+            {
+                listsent[lcor->list[icor].t1] = 0;
+                if (PID == 0)
+                {
+                    memcpy(tor1, tor_storage + t1 * total_n_tor_op, sizeof(double complex) * total_n_tor_op);
+                }
+                else
+                {
+                    MPI_Isend((double *)(tor_storage + t1 * total_n_tor_op), total_n_tor_op * 2, MPI_DOUBLE, 0, lcor->list[icor].t1, cart_comm, req_1pt + lcor->list[icor].t1);
+                }
+            }
+
+            if (PID == 0 && t1 == -1)
+            {
+                MPI_Irecv((double *)(tor1), total_n_tor_op * 2, MPI_DOUBLE, t_to_proc[lcor->list[icor].t1], lcor->list[icor].t1, cart_comm, req_1pt + lcor->list[icor].t1);
+                listsent[lcor->list[icor].t1] = 1;
+            }
+        }
+
+        if (listsent[lcor->list[icor].t2] == -1)
+        {
+            listsent[lcor->list[icor].t2] = 0;
+            if (t2 != -1)
+            {
+                if (PID == 0)
+                {
+                    memcpy(tor2, tor_storage + t2 * total_n_tor_op, sizeof(double complex) * total_n_tor_op);
+                }
+                else
+                {
+                    MPI_Isend((double *)(tor_storage + t2 * total_n_tor_op), total_n_tor_op * 2, MPI_DOUBLE, 0, lcor->list[icor].t2, cart_comm, req_1pt + lcor->list[icor].t2);
+                }
+            }
+
+            if (PID == 0 && t2 == -1)
+            {
+                MPI_Irecv((double *)(tor2), total_n_tor_op * 2, MPI_DOUBLE, t_to_proc[lcor->list[icor].t2], lcor->list[icor].t2, cart_comm, req_1pt + lcor->list[icor].t2);
+                listsent[lcor->list[icor].t2] = 1;
+            }
+        }
+    }
+    if (PID == 0)
+        for (i = 0; i < GLB_T; i++)
+            if (listsent[i] == 1)
+            {
+                MPI_Wait(req_1pt + i, MPI_STATUS_IGNORE);
+            }
+
+#else
+    tor1_bf = tor_storage;
+#endif
+
+"];
+
+startbase=0;
+
+Do[Do[Do[Do[cs=0;
+If[ListQ[Torindex[px,py,pz,irrepidx,charge]],(*this is the list of the operators,they are meant to be contigous in memory*)localtorlist=Complement[Torindex[px,py,pz,irrepidx,charge][[All,irrepev]],{0}];
+(*checking that the operators are contigous in memory*)If[localtorlist!={},locmemorymap=MapTortoCindex[px,py,pz,irrepidx,charge,#]&/@Complement[Torindex[px,py,pz,irrepidx,charge][[All,irrepev]],{0}];
+locmemorymap=Sort[locmemorymap];
+testmap=Table[i,{i,Min[locmemorymap],Max[locmemorymap]}];
+If[Not[SameQ[testmap,locmemorymap]],Print["There is an error in the MapTortoCindex ordering.",locmemorymap];Abort[];];
+cs=Max[locmemorymap]-Min[locmemorymap]+1;];];
+If[cs>0,WriteString[ar,"
+    lprintf(\"Measure ML\", 0, \"\\n1ptTor function P=(",px,",",py,",",pz,") Irrep=",IrrepName[px,py,pz][[irrepidx]]," Irrep ev=",irrepev,"/",Length[bTOrthog[px,py,pz][[irrepidx]]]," Charge=",stcharge[charge]," nop=%d\\n\",",cs," );
+    lprintf(\"Measure ML\", 0, \"Tor id=",MyRangeString[startbase,startbase-1+cs]," \\n\");
+    for (n1 = 0; n1 < GLB_T; n1++)
+        if (listactive[n1] > -1)
+        {
+            lprintf(\"Measure ML\", 0, \" t=%d\", n1);
+                for (i = ",startbase,"; i < ",startbase+cs,"; i++)
+                    lprintf(\"Measure ML\", 0, \" ( %.10e %.10e )\", creal(tor1_bf[i + total_n_glue_op  * listactive[n1]]),
+                            cimag(tor1_bf[i + total_n_glue_op  * listactive[n1]]));
+            lprintf(\"Measure ML\", 0, \"\\n\");
+        }
+"];
+startbase+=cs;];,{irrepev,1,Length[bTOrthog[px,py,pz][[irrepidx]]]}];,{charge,-1,1,2}];,{irrepidx,1,Length[bTOrthog[px,py,pz]]}];,{px,-1,1},{py,-1,1},{pz,-1,1}];
+WriteString[ar,"}\n"];
+(*Report function on the operator evaluated*)
+WriteString[ar,"void report_tor_group_setup()\n{\n"];
+Do[Do[Do[If[ListQ[Torindex[px,py,pz,irrepidx,charge]],If[Complement[Flatten[Torindex[px,py,pz,irrepidx,charge]],{0}]!={},WriteString[ar,"lprintf(\"INIT Measure ML\",0,\"\\n1pt_tor Irrep multiplets Total P=(",px,",",py,",",pz,") Irrep=",IrrepName[px,py,pz][[irrepidx]]," Charge=",stcharge[charge],"\");\n"];
+WriteString[ar,"lprintf(\"INIT Measure ML\",0,\" "<>TorGroupStringPaths[px,py,pz,irrepidx,charge]<>"\");\n"];];];,{charge,-1,1,2}];,{irrepidx,1,Length[bTOrthog[px,py,pz]]}];,{px,-1,1},{py,-1,1},{pz,-1,1}];
+WriteString[ar,"}\n"];
+Close[ar];
+];
 
 
     EndPackage[];
