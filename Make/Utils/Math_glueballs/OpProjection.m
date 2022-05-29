@@ -507,8 +507,8 @@ The new paths are identified by an index and the total number of new paths is in
 It must be a single path as input.
 
 It can be run multiple times*)
+If[Not[NumberQ[pathindex]],pathindex=0];
 PathUniqueIdentifier[ain_] := PathUniqueIdentifier[ain] = Module[{ris = ain,res, Ptemp, tmpris, lper,listris,r3},
-  If[Not[NumberQ[pathindex]],pathindex=0];
   If[Not[MatchQ[ris,P[__]]],Print["Requested a PathUniqueIdentifier of a non Path quantity"];Abort[]];
   If[Not[Map[IsIn, ris //. P :> List] //. List -> And],Print["Requested a PathUniqueIdentifier of non a-steps Path "];Abort[]];
   If[Not[SameQ[(ris //. P :> Plus),0]] ,Print["Requested PathUniqueIdentifier of a non closed Path "];Abort[]];
@@ -561,7 +561,7 @@ MapOptoCindex for the C indetification of the operators and Oplist for the repor
 *)
 GenerateCchecks[]:=Module[{Op,OpTmp,ar,irrepdim,EvaluatedQ,RMatrixOp, TorTmp,RMatrixTor,Tor,Px, Py, Pz, irrepindex, i, charge},
   ar=OpenAppend[checkgbfunctionsfilename,FormatType->InputForm];
-  WriteString[ar,"/*This is an automatically generated function, do not edit.*/\n#define Complex(a,b) ((a)+I*(b))\nstatic int fullgbcheck(int rotid, double complex *rotated, double complex *unrotated)\n{\n#define rotfun(a) rotated[(a)]\n#define unrotfun(a) unrotated[(a)]\ndouble complex tmp[3];\nint return_value=0;\n"];
+  WriteString[ar,"/*This is an automatically generated function, do not edit.*/\n#define Complex(a,b) ((a)+I*(b))\nstatic int fullgbcheck(int rotid, double complex *rotated, double complex *unrotated)\n{\n#define rotfun(a) rotated[(a)]\n#define unrotfun(a) unrotated[(a)]\n#if total_n_glue_op>0\ndouble complex tmp[3];\n#endif\nint return_value=0;\n"];
   Do[
     Do[
       Do[ 
@@ -614,7 +614,7 @@ if(sqrt(creal(tmp[2]))>=1.e-10){
   WriteString[ar,"#undef unrotfunreturn\n#undef rotfun\n#undef Complex\nreturn return_value;\n}\n"];
   Close[ar];
   ar=OpenAppend[checktorfunctionsfilename,FormatType->InputForm];
-  WriteString[ar,"/*This is an automatically generated function, do not edit.*/\n#define Complex(a,b) ((a)+I*(b))\nstatic int fulltorcheck(int rotid, double complex *rotated, double complex *unrotated)\n{\n#define rotfun(a) rotated[(a)]\n#define unrotfun(a) unrotated[(a)]\ndouble complex tmp[3];\nint return_value=0;\n"];
+  WriteString[ar,"/*This is an automatically generated function, do not edit.*/\n#define Complex(a,b) ((a)+I*(b))\nstatic int fulltorcheck(int rotid, double complex *rotated, double complex *unrotated)\n{\n#define rotfun(a) rotated[(a)]\n#define unrotfun(a) unrotated[(a)]\n#if total_n_tor_op>0\ndouble complex tmp[3];\n#endif\nint return_value=0;\n"];
   Do[
     Do[
       Do[ 
@@ -781,8 +781,10 @@ OpGroupStringPaths[px_, py_, pz_, iridx_, charge_] :=
  More deatails are included in the comments bellow.
  *)
   
-  GenerateCcode[]:=Module[{idop,opnumberC,localoplist,locmemorymap,testmap,cs,startbase,evalpaths,res,ir1,ir2,path1,path2,llist,lcoeff,locallistop,listelem,lcharge1,lcharge2,llpx1,llpy1,llpz1,llpx2,llpy2,llpz2,llev1,llev2,relsign,ar,opnumber},
-  DeleteFile[{opfilename,checkgbfunctionsfilename,checktorfunctionsfilename,headerfilename,torfilename}];
+  GenerateCcode[]:=Module[{rmfiles,idop,opnumberC,localoplist,locmemorymap,testmap,cs,startbase,evalpaths,res,ir1,ir2,path1,path2,llist,lcoeff,locallistop,listelem,lcharge1,lcharge2,llpx1,llpy1,llpz1,llpx2,llpy2,llpz2,llev1,llev2,relsign,ar,opnumber},
+  rmfiles=FileNames[{opfilename, checkgbfunctionsfilename, checktorfunctionsfilename, headerfilename, torfilename}];
+  DeleteFile[rmfiles];
+
   ar=OpenAppend[opfilename, FormatType -> InputForm];
   WriteString[ar, "
 #include <stdlib.h>
@@ -1234,10 +1236,11 @@ TorUniqueIndex[ain_]:=TorUniqueIdentifier[ain][[2]];
    If[SameQ[Head[tor],Plus],torlist={};Do[AppendTo[torlist,tor[[i]]],{i,Length[tor]}];,torlist={tor}];
    coeff=torlist//.{Pre[__][__]-> 1, Pim[__][__]-> 1};
   paths=torlist //.{A___,d_.  C1_[a1__][a2__]C2_[b1__][b2__],B___}:> {A, {C1[a1],C2[b1],exp[a2]exp[b2]},B}/; And[Or[SameQ[C1,Pre],SameQ[C1,Pim]],Or[SameQ[C2,Pre],SameQ[C2,Pim]]] ;
+  paths=paths //.{A___,d_.  C1_[a1__][a2__]^2,B___}:> {A, {C1[a1],C1[a1],exp[a2]exp[a2]},B}/; Or[SameQ[C1,Pre],SameQ[C1,Pim]] ;
    paths=paths//. {{A___,Pre[b__],C___} :> {A,P[b],0,C}, {A___, Pim[b__],C___}:> {A,P[b],1,C}};
+   (*paths=paths//. {{A___,Pre[b__]^2,C___} :> {A,P[b],0,P[b],0,C}, {A___, Pim[b__]^2,C___}:> {A,P[b],1,P[b],1,C}};*)
   paths=paths //.exp[nx_,ny_,nz_] -> Exp[-I 2 Pi /L (px nx+py ny +pz nz)];
    paths=paths//.{P[L[a1_]]-> P[a1],P[a1__,b_+L[a_]]-> P[a1]};
-
     If[Not[AllTrue[paths[[All,1]], Not[FreeQ[#, P[__]]] &]],Print["1 The request operator has a non P based structure:",tor];Abort[]];
     If[Not[AllTrue[coeff, NumberQ[N[#]] &]],Print["2 The request operator has a non P based structure:",tor];Abort[]];
     If[Length[coeff]!=Length[paths],Print["3 The request operator has a non P based structure:",tor];Abort[]];
@@ -1286,7 +1289,7 @@ The paths are evaluated only once while each different momentum projection can b
 *)
   ar = OpenAppend[opfilename, FormatType -> InputForm];
   WriteString[ar,"static int last_t = -10;\nvoid request_space_paths_evaluation(){last_t=-10;}
-  static void eval_time_momentum_glueball_paths(int t, int px, int py, int pz)
+  void eval_time_momentum_glueball_paths(int t, int px, int py, int pz)
   {
     int n_x, n_y, n_z, idx, in;
     double complex ce = 0.;
@@ -1428,7 +1431,10 @@ WriteString[ar,"    for(int i=0;i<total_n_glue_op;i++)
   WriteString[ar, "
 void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, double complex *gb_storage)
 {
-    int n1, n2, i;
+#if total_n_glue_op>0
+    int n1, n2;
+#endif
+    int i;
     static double complex *gb1_bf;
     static int n_total_active_slices = 0;    
     static int *listactive = NULL;
@@ -1858,8 +1864,8 @@ If[cs>0,WriteString[ar,"
         {
             lprintf(\"Measure ML\", 0, \" t=%d\", n1);
                 for (i = ",startbase,"; i < ",startbase+cs,"; i++)
-                    lprintf(\"Measure ML\", 0, \" ( %.10e %.10e )\", creal(tor1_bf[i + total_n_glue_op  * listactive[n1]]),
-                            cimag(tor1_bf[i + total_n_glue_op  * listactive[n1]]));
+                    lprintf(\"Measure ML\", 0, \" ( %.10e %.10e )\", creal(tor1_bf[i + total_n_tor_op  * listactive[n1]]),
+                            cimag(tor1_bf[i + total_n_tor_op  * listactive[n1]]));
             lprintf(\"Measure ML\", 0, \"\\n\");
         }
 "];

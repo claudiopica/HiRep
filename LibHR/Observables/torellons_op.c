@@ -837,8 +837,8 @@ void collect_1pt_torellon_functions(cor_list *lcor, double complex *tor_storage)
         {
             lprintf("Measure ML", 0, " t=%d", n1);
                 for (i = 0; i < 1; i++)
-                    lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(tor1_bf[i + total_n_glue_op  * listactive[n1]]),
-                            cimag(tor1_bf[i + total_n_glue_op  * listactive[n1]]));
+                    lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(tor1_bf[i + total_n_tor_op  * listactive[n1]]),
+                            cimag(tor1_bf[i + total_n_tor_op  * listactive[n1]]));
             lprintf("Measure ML", 0, "\n");
         }
 
@@ -849,8 +849,8 @@ void collect_1pt_torellon_functions(cor_list *lcor, double complex *tor_storage)
         {
             lprintf("Measure ML", 0, " t=%d", n1);
                 for (i = 1; i < 2; i++)
-                    lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(tor1_bf[i + total_n_glue_op  * listactive[n1]]),
-                            cimag(tor1_bf[i + total_n_glue_op  * listactive[n1]]));
+                    lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(tor1_bf[i + total_n_tor_op  * listactive[n1]]),
+                            cimag(tor1_bf[i + total_n_tor_op  * listactive[n1]]));
             lprintf("Measure ML", 0, "\n");
         }
 
@@ -861,8 +861,8 @@ void collect_1pt_torellon_functions(cor_list *lcor, double complex *tor_storage)
         {
             lprintf("Measure ML", 0, " t=%d", n1);
                 for (i = 2; i < 3; i++)
-                    lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(tor1_bf[i + total_n_glue_op  * listactive[n1]]),
-                            cimag(tor1_bf[i + total_n_glue_op  * listactive[n1]]));
+                    lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(tor1_bf[i + total_n_tor_op  * listactive[n1]]),
+                            cimag(tor1_bf[i + total_n_tor_op  * listactive[n1]]));
             lprintf("Measure ML", 0, "\n");
         }
 
@@ -873,8 +873,8 @@ void collect_1pt_torellon_functions(cor_list *lcor, double complex *tor_storage)
         {
             lprintf("Measure ML", 0, " t=%d", n1);
                 for (i = 3; i < 4; i++)
-                    lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(tor1_bf[i + total_n_glue_op  * listactive[n1]]),
-                            cimag(tor1_bf[i + total_n_glue_op  * listactive[n1]]));
+                    lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(tor1_bf[i + total_n_tor_op  * listactive[n1]]),
+                            cimag(tor1_bf[i + total_n_tor_op  * listactive[n1]]));
             lprintf("Measure ML", 0, "\n");
         }
 
@@ -885,8 +885,8 @@ void collect_1pt_torellon_functions(cor_list *lcor, double complex *tor_storage)
         {
             lprintf("Measure ML", 0, " t=%d", n1);
                 for (i = 4; i < 5; i++)
-                    lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(tor1_bf[i + total_n_glue_op  * listactive[n1]]),
-                            cimag(tor1_bf[i + total_n_glue_op  * listactive[n1]]));
+                    lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(tor1_bf[i + total_n_tor_op  * listactive[n1]]),
+                            cimag(tor1_bf[i + total_n_tor_op  * listactive[n1]]));
             lprintf("Measure ML", 0, "\n");
         }
 }

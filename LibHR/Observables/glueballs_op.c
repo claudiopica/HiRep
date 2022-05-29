@@ -751,7 +751,7 @@ static void OP_oneTr_p_1_0_0_Ir_1_C_1_n_1(double complex * op_out)
 
 static int last_t = -10;
 void request_space_paths_evaluation(){last_t=-10;}
-  static void eval_time_momentum_glueball_paths(int t, int px, int py, int pz)
+  void eval_time_momentum_glueball_paths(int t, int px, int py, int pz)
   {
     int n_x, n_y, n_z, idx, in;
     double complex ce = 0.;
@@ -856,7 +856,10 @@ void eval_all_glueball_ops(int t, double complex *numerical_op_out)
 
 void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, double complex *gb_storage)
 {
-    int n1, n2, i;
+#if total_n_glue_op>0
+    int n1, n2;
+#endif
+    int i;
     static double complex *gb1_bf;
     static int n_total_active_slices = 0;    
     static int *listactive = NULL;

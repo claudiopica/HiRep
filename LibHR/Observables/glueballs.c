@@ -69,7 +69,7 @@ void measure_1pt_torellons(double *smear_val, double complex *tor_storage)
     for (nt = 0; nt < n_active_slices; nt++)
     {
         eval_all_torellon_ops(active_slices_list[nt], point_tor);
-        point_tor += total_n_glue_op;
+        point_tor += total_n_tor_op;
     }
 
     release_wrk_space(wrk1);

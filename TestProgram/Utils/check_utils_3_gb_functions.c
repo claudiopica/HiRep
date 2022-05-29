@@ -4,7 +4,9 @@ static int fullgbcheck(int rotid, double complex *rotated, double complex *unrot
 {
 #define rotfun(a) rotated[(a)]
 #define unrotfun(a) unrotated[(a)]
+#if total_n_glue_op>0
 double complex tmp[3];
+#endif
 int return_value=0;
 if(0==rotid)
 {
