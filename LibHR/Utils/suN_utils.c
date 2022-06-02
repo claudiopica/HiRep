@@ -4,12 +4,12 @@
 \***************************************************************************/
 
 /*******************************************************************************
-*
-* File su3_utils.c
-*
-* Functions to project to SU(3)
-*
-*******************************************************************************/
+ *
+ * File su3_utils.c
+ *
+ * Functions to project to SU(3)
+ *
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -75,12 +75,12 @@ static void normalize_flt(suNg_vector_flt *v)
 
 void project_to_suNg(suNg *u)
 {
-  double norm;
+#ifdef GAUGE_SON
+  double complex norm;
   _suNg_sqnorm(norm, *u);
-  if (norm < 1.e-28)
+  if (creal(norm) < 1.e-28)
     return;
 
-#ifdef GAUGE_SON
   double *v1, *v2;
   int i, j, k;
   double z;
@@ -104,6 +104,10 @@ void project_to_suNg(suNg *u)
   }
 #else
 #ifdef WITH_QUATERNIONS
+  double norm;
+  _suNg_sqnorm(norm, *u);
+  if (norm < 1.e-28)
+    return;
 
   _suNg_sqnorm(norm, *u);
   norm = sqrt(0.5 * norm);
@@ -111,6 +115,11 @@ void project_to_suNg(suNg *u)
   _suNg_mul(*u, norm, *u);
 
 #else
+  double complex norm;
+  _suNg_sqnorm(norm, *u);
+  if (creal(norm) < 1.e-28)
+    return;
+
   int i, j;
   suNg_vector *v1, *v2;
   double complex z;
@@ -130,18 +139,24 @@ void project_to_suNg(suNg *u)
     ++v2;
     v1 = (suNg_vector *)(u);
   }
+
+  det_Cmplx_Ng(&norm, u);
+  norm = cpow(norm, -1. / NG);
+  _suNg_mul_assign(*u, norm);
+
 #endif
 #endif
 }
 
 void project_to_suNg_flt(suNg_flt *u)
 {
+
+#ifdef GAUGE_SON
   float norm;
   _suNg_sqnorm(norm, *u);
   if (norm < 1.e-10)
     return;
 
-#ifdef GAUGE_SON
   float *v1, *v2;
   int i, j, k;
   float z;
@@ -165,13 +180,22 @@ void project_to_suNg_flt(suNg_flt *u)
   }
 #else
 #ifdef WITH_QUATERNIONS
-
+  float norm;
+  _suNg_sqnorm(norm, *u);
+  if (norm < 1.e-10)
+    return;
   _suNg_sqnorm(norm, *u);
   norm = sqrtf(0.5f * norm);
   norm = 1.f / norm;
   _suNg_mul(*u, norm, *u);
 
 #else
+  float norm;
+  double complex dnorm;
+  suNg ud;
+  _suNg_sqnorm(norm, *u);
+  if (norm < 1.e-10)
+    return;
 
   int i, j;
   suNg_vector_flt *v1, *v2;
@@ -193,6 +217,13 @@ void project_to_suNg_flt(suNg_flt *u)
     ++v2;
     v1 = (suNg_vector_flt *)(u);
   }
+  for (i = 0; i < (NG * NG); ++i)
+    ud.c[i] = (double complex)(u->c[i]);
+
+  det_Cmplx_Ng(&dnorm, &ud);
+  dnorm = cpow(dnorm, -1. / NG);
+  _suNg_mul_assign(*u, dnorm);
+
 #endif
 #endif
 }
@@ -319,8 +350,8 @@ int project_to_suNg_real(suNg *out, suNg *in)
   _suNg_times_suNg_dagger(om, tmp, hm);
   _suNg_times_suNg(tmp, om, *in);
   *out = tmp;
-  //Fix the determinant
-  det_hermNg(&det, &tmp);
+  // Fix the determinant
+  det_Cmplx_Ng(&det, &tmp);
   /*  if (fabs(det)<1-1e-7 || fabs(det)>1+1e-7){
       lprintf("suNg_utils",10,"Error in project project_to_suNg_real: determinant not +/-1. It is %1.8g\n",det);
     }*/
@@ -331,7 +362,7 @@ int project_to_suNg_real(suNg *out, suNg *in)
   }
 
   tmp = *out;
-  det_hermNg(&det, &tmp);
+  det_Cmplx_Ng(&det, &tmp);
   if (det < 1 - 1e-7 || det > 1 + 1e-7)
   {
     lprintf("suNg_utils", 10, "Error in project project_to_suNg_real: determinant not +/-1. It is %1.8g.", det);
@@ -349,7 +380,7 @@ void covariant_project_to_suNg(suNg *u)
   double complex norm;
   double complex evec[NG * NG];
 
-  det_hermNg(&norm, u);
+  det_Cmplx_Ng(&norm, u);
   norm = cpow(norm, -1. / NG);
   _suNg_mul_assign(*u, norm);
 

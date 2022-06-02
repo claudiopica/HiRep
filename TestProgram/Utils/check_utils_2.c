@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
         {
             for (mu = 0; mu < 4; mu++)
             {
-                det_hermNg(&res, pu_gauge_wrk(i, mu));
+                det_Cmplx_Ng(&res, pu_gauge_wrk(i, mu));
                 test += (res - 1.0) / (4 * GLB_VOLUME);
             }
         }

@@ -16,7 +16,6 @@ void test_staples();
 
 void cabmar(double beta, suNg *u, suNg *v, int type);
 void project_gauge_field(void);
-void covariant_project_to_suNg(suNg *u);
 
 void update(double *beta, int nhb, int nor);
 void random_su2(double rho, double s[]);

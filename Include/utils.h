@@ -76,12 +76,12 @@ void covariant_project_to_suNg(suNg *u);
 #ifndef GAUGE_SON
 void ludcmp(double complex *a, int *indx, double *d, int N);
 void lubksb(double complex *a, int *indx, double complex *b, int N);
-void inv_hermNg(suNg *a);
-void det_hermNg(double complex *res, suNg *a);
+void inv_Cmplx_Ng(suNg *a);
+void det_Cmplx_Ng(double complex *res, suNg *a);
 #else
 int project_to_suNg_real(suNg *out, suNg *in);
-void inv_hermNg(suNg *a);
-void det_hermNg(double *res, suNg *a);
+void inv_Cmplx_Ng(suNg *a);
+void det_Cmplx_Ng(double *res, suNg *a);
 void diag_hmat(suNg *hmat, double *dag);
 #endif
 
