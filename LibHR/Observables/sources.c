@@ -61,31 +61,31 @@ static int random_tau()
 
 /***************************************************************************\
 
-	Sources:
-		point_source:
-						source[spin](t,x) = \delta_{a color} \delta_{s, spin} \delta( (t,x) - (tau,0) )
-		point_source_loc:
-						source[spin](t,x) = \delta_{a color} \delta_{s, spin} \delta( (t,x) - (tau,0) )
-		diluted_source_equal_eo:
-						\xi(x) = Z(2) x Z(2)  -  NF color vector at x
-						eta(t,x) = \delta(t - tau) \xi(x)
-						source[spin](x) = \delta_{s spin} eta(t,x)  -  x even
-		diluted_source_equal:
-						\xi(x) = Z(2) x Z(2)  -  NF color vector at x
-						eta(t,x) = \delta(t - tau) \xi(x)
-						source[spin](t,x) = \delta_{s spin} eta(t,x)  -  x even & odd
-		noise_source_equal_eo:
-						\xi(x) = Z(2) x Z(2)  -  NF color vector at x
-						eta(t,x) = \xi(t,x)
-						source[spin](t,x) = \delta_{s spin} eta(t,x)  -  x even
-		gauge_fixed_wall_source:
-						source[spin](t,x) = \delta_{a color} \delta_{s spin} \delta(t - tau) 1
-		sequential_source:
-						source[spin](tf,ti,x) = \gamma_5 S(x,tf; 0,ti)
-		gauge_fixed_momentum_source:
-						source[spin](t,x) = \delta_{a color} \delta_{s spin} e^{ i p_\mu x_\mu }
-		diluted_volume_source:
-						source[spin](t,x) = \sum_{x%p == 0} \delta_{s spin} 1_color
+  Sources:
+    point_source:
+            source[spin](t,x) = \delta_{a color} \delta_{s, spin} \delta( (t,x) - (tau,0) )
+    point_source_loc:
+            source[spin](t,x) = \delta_{a color} \delta_{s, spin} \delta( (t,x) - (tau,0) )
+    diluted_source_equal_eo:
+            \xi(x) = Z(2) x Z(2)  -  NF color vector at x
+            eta(t,x) = \delta(t - tau) \xi(x)
+            source[spin](x) = \delta_{s spin} eta(t,x)  -  x even
+    diluted_source_equal:
+            \xi(x) = Z(2) x Z(2)  -  NF color vector at x
+            eta(t,x) = \delta(t - tau) \xi(x)
+            source[spin](t,x) = \delta_{s spin} eta(t,x)  -  x even & odd
+    noise_source_equal_eo:
+            \xi(x) = Z(2) x Z(2)  -  NF color vector at x
+            eta(t,x) = \xi(t,x)
+            source[spin](t,x) = \delta_{s spin} eta(t,x)  -  x even
+    gauge_fixed_wall_source:
+            source[spin](t,x) = \delta_{a color} \delta_{s spin} \delta(t - tau) 1
+    sequential_source:
+            source[spin](tf,ti,x) = \gamma_5 S(x,tf; 0,ti)
+    gauge_fixed_momentum_source:
+            source[spin](t,x) = \delta_{a color} \delta_{s spin} e^{ i p_\mu x_\mu }
+    diluted_volume_source:
+            source[spin](t,x) = \sum_{x%p == 0} \delta_{s spin} 1_color
 
                 z2_volume_source:                  source[spin](t,x) = Z(2) x Z(2) (no dilution)
 \***************************************************************************/
@@ -165,6 +165,10 @@ void create_point_source_loc(spinor_field *source, int t, int x, int y, int z, i
    vectors are equal in each source but placed at a different spin. Even sites only*/
 int create_diluted_source_equal_eo(spinor_field *source)
 {
+#ifdef CHECK_SPINOR_MATCHING
+  error(source->type == &glat_odd, 1, "create_diluted_source_equal_eo [sources.c]", "source type must not be glat_odd!");
+#endif /* CHECK_SPINOR_MATCHING */
+
   int c[4];
   suNf_vector *v1, *v2;
   int i;
@@ -188,7 +192,7 @@ int create_diluted_source_equal_eo(spinor_field *source)
             ranz2((double *)(v1), sizeof(suNf_vector) / sizeof(double)); // Make new sources
             for (i = 1; i < 4; ++i)
             {
-              v2 = &((_FIELD_AT(&source[i], ipt(c[0], c[1], c[2], c[3])))->c[i]); //Copy previous index.
+              v2 = &((_FIELD_AT(&source[i], ipt(c[0], c[1], c[2], c[3])))->c[i]); // Copy previous index.
               *v2 = *v1;
             }
           }
@@ -204,7 +208,7 @@ void create_diluted_source_equal_atau_eo(spinor_field *source, int tau)
   int c[4];
   suNf_vector *v1, *v2;
   int i;
-  //int tau = random_tau();
+  // int tau = random_tau();
   for (i = 0; i < 4; ++i)
   {
     spinor_field_zero_f(&source[i]);
@@ -222,7 +226,7 @@ void create_diluted_source_equal_atau_eo(spinor_field *source, int tau)
             ranz2((double *)(v1), sizeof(suNf_vector) / sizeof(double)); // Make new sources
             for (i = 1; i < 4; ++i)
             {
-              v2 = &((_FIELD_AT(&source[i], ipt(c[0], c[1], c[2], c[3])))->c[i]); //Copy previous index.
+              v2 = &((_FIELD_AT(&source[i], ipt(c[0], c[1], c[2], c[3])))->c[i]); // Copy previous index.
               *v2 = *v1;
             }
           }
@@ -254,7 +258,7 @@ int create_diluted_source_equal(spinor_field *source)
           ranz2((double *)(v1), sizeof(suNf_vector) / sizeof(double)); // Make new sources
           for (i = 1; i < 4; ++i)
           {
-            v2 = &((_FIELD_AT(&source[i], ipt(c[0], c[1], c[2], c[3])))->c[i]); //Copy previous index.
+            v2 = &((_FIELD_AT(&source[i], ipt(c[0], c[1], c[2], c[3])))->c[i]); // Copy previous index.
             *v2 = *v1;
           }
         }
@@ -285,7 +289,7 @@ void create_diluted_source_equal_atau(spinor_field *source, int tau)
           ranz2((double *)(v1), sizeof(suNf_vector) / sizeof(double)); // Make new sources
           for (i = 1; i < 4; ++i)
           {
-            v2 = &((_FIELD_AT(&source[i], ipt(c[0], c[1], c[2], c[3])))->c[i]); //Copy previous index.
+            v2 = &((_FIELD_AT(&source[i], ipt(c[0], c[1], c[2], c[3])))->c[i]); // Copy previous index.
             *v2 = *v1;
           }
         }
@@ -336,7 +340,7 @@ void create_noise_source_equal_eo(spinor_field *source)
             ranz2((double *)(v1), sizeof(suNf_vector) / sizeof(double)); // Make new sources
             for (i = 1; i < 4; ++i)
             {
-              v2 = &((_FIELD_AT(&source[i], ipt(c[0], c[1], c[2], c[3])))->c[i]); //Copy previous index.
+              v2 = &((_FIELD_AT(&source[i], ipt(c[0], c[1], c[2], c[3])))->c[i]); // Copy previous index.
               *v2 = *v1;
             }
           }
@@ -372,7 +376,7 @@ void create_noise_source_equal_oe(spinor_field *source)
             ranz2((double *)(v1), sizeof(suNf_vector) / sizeof(double)); // Make new sources
             for (i = 1; i < 4; ++i)
             {
-              v2 = &((_FIELD_AT(&source[i], ipt(c[0], c[1], c[2], c[3])))->c[i]); //Copy previous index.
+              v2 = &((_FIELD_AT(&source[i], ipt(c[0], c[1], c[2], c[3])))->c[i]); // Copy previous index.
               *v2 = *v1;
             }
           }
@@ -434,7 +438,7 @@ void create_noise_source_equal_col_dil(spinor_field *source, int col)
           ranz2((double *)(v1), sizeof(double complex) / sizeof(double)); // Make new sources
           for (i = 1; i < 4; ++i)
           {
-            v2 = &((_FIELD_AT(&source[i], ipt(c[0], c[1], c[2], c[3])))->c[i].c[col]); //Copy previous index.
+            v2 = &((_FIELD_AT(&source[i], ipt(c[0], c[1], c[2], c[3])))->c[i].c[col]); // Copy previous index.
             *v2 = *v1;
           }
         }
@@ -445,7 +449,7 @@ void create_noise_source_equal_col_dil(spinor_field *source, int col)
   }
 }
 
-//create a wall source at timeslice tau, all parity sites.
+// create a wall source at timeslice tau, all parity sites.
 void create_gauge_fixed_wall_source(spinor_field *source, int tau, int color)
 {
   int c[4];
@@ -566,7 +570,7 @@ void create_sequential_source_stoch(spinor_field *source, int tf, spinor_field *
   }
 }
 
-//create a e^ipx source
+// create a e^ipx source
 /*void create_gauge_fixed_momentum_source(spinor_field *source, int pt, int px, int py, int pz, int color) {
   int c[4];
   int beta;
@@ -652,7 +656,7 @@ void add_momentum(spinor_field *out, spinor_field *in, int px, int py, int pz)
   }
 }
 
-//create a eo source
+// create a eo source
 void create_diluted_volume_source(spinor_field *source, int parity_component, int mod)
 {
   int c[4];

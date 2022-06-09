@@ -51,7 +51,7 @@ static double determine_sign(gamma_ind ind)
   }
 }
 
-//If ind2=-2 disconnected correlator
+// If ind2=-2 disconnected correlator
 static void add_meson_observable(meson_observable **mop, gamma_ind ind1, gamma_ind ind2, char *channel_name, char *channel_type, double sign)
 {
   meson_observable *motmp, *mo;
@@ -295,6 +295,11 @@ static void op_propagator(suNf_propagator *out, suNf_propagator *in, gamma_ind i
 /* spinor_fields* are 4xnm arrays of spinor_field ordered([color][spinor])*/
 void measure_mesons_core(spinor_field *psi0, spinor_field *psi1, spinor_field *eta, meson_observable *mo, int nm, int tau, int n_mom, int offset, int lt)
 {
+#ifdef CHECK_SPINOR_MATCHING
+  error(psi0->type != &glattice, 1, "measure_mesons_core [measure_mesons.c]", "psi0 type must be glattice!");
+  error(psi1->type != &glattice, 1, "measure_mesons_core [measure_mesons.c]", "psi1 type must be glattice!");
+  error(eta->type != &glattice, 1, "measure_mesons_core [measure_mesons.c]", "eta type must be glattice!");
+#endif /* CHECK_SPINOR_MATCHING */
   int i, ix, t, x, y, z, beta, px, py, pz, tc;
   double pdotx, cpdotx, spdotx;
   double complex tr;
@@ -363,6 +368,11 @@ void measure_mesons_core(spinor_field *psi0, spinor_field *psi1, spinor_field *e
 
 static void measure_conserved_core(spinor_field *psi0, spinor_field *psi1, spinor_field *eta, meson_observable *mo, int nm, int tau, int n_mom, int offset, int lt)
 {
+#ifdef CHECK_SPINOR_MATCHING
+  error(psi0->type != &glattice, 1, "measure_conserved_core [measure_mesons.c]", "psi0 type must be glattice!");
+  error(psi1->type != &glattice, 1, "measure_conserved_core [measure_mesons.c]", "psi1 type must be glattice!");
+  error(eta->type != &glattice, 1,  "measure_conserved_core [measure_mesons.c]", "eta type must be glattice!");
+#endif /* CHECK_SPINOR_MATCHING */
 
   int i, ix, t, x, y, z, beta, px, py, pz, tc, a, ixmu;
   double pdotx, cpdotx, spdotx;
@@ -415,30 +425,30 @@ static void measure_conserved_core(spinor_field *psi0, spinor_field *psi1, spino
                     {
                       for (beta = 0; beta < 4; beta++)
                       {
-                        _propagator_assign(spf, *_FIELD_AT(&psi0[a * 4 * nm + beta * nm + i], ixmu), a, beta); //S(x+mu, y)
+                        _propagator_assign(spf, *_FIELD_AT(&psi0[a * 4 * nm + beta * nm + i], ixmu), a, beta); // S(x+mu, y)
                       }
                     }
                     u1 = _4FIELD_AT(u_gauge_f, ix, motmp->ind2);
 
                     // Tr [ g5 (1+g_mu) U^(x) S(x,0) g5 g_mu S^(x+mu, y) ]
-                    _suNf_inverse_prop_multiply(Usp, *u1, sp0); //U^(x) S(x,0)
+                    _suNf_inverse_prop_multiply(Usp, *u1, sp0); // U^(x) S(x,0)
                     sptmp1 = Usp;
-                    op_propagator(&sptmp2, &sptmp1, motmp->ind1); //g_mu U^(x) S(x,0)
+                    op_propagator(&sptmp2, &sptmp1, motmp->ind1); // g_mu U^(x) S(x,0)
                     _propagator_add(sptmp1, sptmp1, sptmp2);      //(1+g_mu) U^(x) S(x,0)
-                    _g5_propagator(sptmp2, sptmp1);               //g5 (1+g_mu) U^(x) S(x,0)
-                    _propagator_dagger(sptmp1, spf);              //S^(x+mu, 0)
-                    _g5_propagator(sptmp3, sptmp1);               //g5 g_mu S^(x+mu, 0)
-                    op_propagator(&sptmp1, &sptmp3, motmp->ind1); //g_mu S^(x+mu, 0)
+                    _g5_propagator(sptmp2, sptmp1);               // g5 (1+g_mu) U^(x) S(x,0)
+                    _propagator_dagger(sptmp1, spf);              // S^(x+mu, 0)
+                    _g5_propagator(sptmp3, sptmp1);               // g5 g_mu S^(x+mu, 0)
+                    op_propagator(&sptmp1, &sptmp3, motmp->ind1); // g_mu S^(x+mu, 0)
                     _propagator_mul(spleft, sptmp2, sptmp1);
 
                     // Tr [ g5 (1+g_mu) U(x) S(x+mu,0) g5 g_mu S^(x, y) ]
-                    _suNf_prop_multiply(Usp, *u1, spf); //U(x) S(x+mu,0)
+                    _suNf_prop_multiply(Usp, *u1, spf); // U(x) S(x+mu,0)
                     sptmp1 = Usp;
-                    op_propagator(&sptmp2, &sptmp1, motmp->ind1); //g_mu U(x) S(x,0)
+                    op_propagator(&sptmp2, &sptmp1, motmp->ind1); // g_mu U(x) S(x,0)
                     _propagator_sub(sptmp1, sptmp1, sptmp2);      //(1-g_mu) U(x) S(x,0)
-                    _g5_propagator(sptmp2, sptmp1);               //g5(1-g_mu) U(x) S(x,0)
-                    _g5_propagator(sptmp1, spdag);                //g5 S^(x, 0)
-                    op_propagator(&sptmp3, &sptmp1, motmp->ind1); //g_mu g5 S^(x, 0)
+                    _g5_propagator(sptmp2, sptmp1);               // g5(1-g_mu) U(x) S(x,0)
+                    _g5_propagator(sptmp1, spdag);                // g5 S^(x, 0)
+                    op_propagator(&sptmp3, &sptmp1, motmp->ind1); // g_mu g5 S^(x, 0)
                     _propagator_mul(sptmp1, sptmp2, sptmp3);
 
                     _propagator_sub(sptmp2, spleft, sptmp1);
@@ -448,11 +458,11 @@ static void measure_conserved_core(spinor_field *psi0, spinor_field *psi1, spino
                     motmp->corr_im[corr_ind(px, py, pz, n_mom, tc, nm, i)] += 0.5 * motmp->sign * (cimag(tr) * cpdotx - creal(tr) * spdotx);
                     motmp = motmp->next;
 
-                  } //END CORRELATOR LOOP
-                }   //END SPATIAL LOOP
-          }         //END T LOOP
-        }           //END MASS LOOP
-      }             //END MOMENTUM LOOP
+                  } // END CORRELATOR LOOP
+                }   // END SPATIAL LOOP
+          }         // END T LOOP
+        }           // END MASS LOOP
+      }             // END MOMENTUM LOOP
   lprintf("measure_formfactor_core", 50, "Measuring DONE! ");
 }
 
@@ -505,7 +515,6 @@ void measure_diquarks(meson_observable *mo, spinor_field *psi0, spinor_field *ps
   init_corrs(nm, 1, mo);
   lprintf("measure_mesons", 50, "measure default diquarks");
   measure_mesons_core(psi0, psi1, eta, mo, nm, tau, 1, 0, GLB_T);
-  //  measure_mesons_core(psi1, psi0, eta, mo,nm, tau, 1, 0,GLB_T);
 }
 
 void measure_mesons(meson_observable *mo, spinor_field *psi0, spinor_field *eta, int nm, int tau)
@@ -546,9 +555,9 @@ void measure_point_mesons_momenta_ext(meson_observable *mo, spinor_field *psi0, 
 static void print_corr_core(meson_observable *mo, int lt, int conf, int nm, double *mass, char *label, int n_mom)
 {
   int i, t, px, py, pz;
-  
-  error((n_mom==0 || nm==0),1,"[measure_mesons.c]", "print_corr_core is not printing out anything");
-  
+
+  error((n_mom == 0 || nm == 0), 1, "[measure_mesons.c]", "print_corr_core is not printing out anything");
+
   for (px = 0; px < n_mom; ++px)
     for (py = 0; py < n_mom; ++py)
       for (pz = 0; pz < n_mom; ++pz)
@@ -564,7 +573,7 @@ static void print_corr_core(meson_observable *mo, int lt, int conf, int nm, doub
           {
             if (mo->ind1 == mo->ind2)
             {
-              lprintf("MAIN", 0, "conf #%d mass=%2.6f %s %s %s= ", conf, mass[i], label, mo->channel_type, mo->channel_name); //To be compatible with the old output
+              lprintf("MAIN", 0, "conf #%d mass=%2.6f %s %s %s= ", conf, mass[i], label, mo->channel_type, mo->channel_name); // To be compatible with the old output
             }
             else
             {
