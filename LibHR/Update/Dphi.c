@@ -1,16 +1,16 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 /*******************************************************************************
-*
-* File Dphi.c
-*
-* Action of the Wilson-Dirac operator D and hermitian g5D on a given 
-* double-precision spinor field
-*
-*******************************************************************************/
+ *
+ * File Dphi.c
+ *
+ * Action of the Wilson-Dirac operator D and hermitian g5D on a given
+ * double-precision spinor field
+ *
+ *******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -41,6 +41,7 @@ static spinor_field *gtmp = NULL;
 static spinor_field *etmp = NULL;
 static spinor_field *otmp = NULL;
 static spinor_field *otmp2 = NULL;
+static spinor_field *etmp2 = NULL;
 
 static void free_mem()
 {
@@ -53,6 +54,11 @@ static void free_mem()
   {
     free_spinor_field_f(etmp);
     etmp = NULL;
+  }
+  if (etmp2 != NULL)
+  {
+    free_spinor_field_f(etmp2);
+    etmp2 = NULL;
   }
   if (otmp != NULL)
   {
@@ -73,6 +79,7 @@ static void init_Dirac()
   {
     gtmp = alloc_spinor_field_f(1, &glattice);
     etmp = alloc_spinor_field_f(1, &glat_even);
+    etmp2 = alloc_spinor_field_f(1, &glat_even);
     otmp = alloc_spinor_field_f(1, &glat_odd);
     otmp2 = alloc_spinor_field_f(1, &glat_odd);
     atexit(&free_mem);
@@ -169,7 +176,7 @@ unsigned long int getMVM()
 
 /*
  * This function defines the massless Dirac operator
- * It can act on spinors defined on the whole lattice 
+ * It can act on spinors defined on the whole lattice
  * or on spinors with definite parity
  */
 
@@ -368,7 +375,7 @@ void Dphi_fused_(spinor_field *out, spinor_field *in)
 #endif
 
   //++MVMcounter; /* count matrix calls */
-  //if (out->type == &glattice)
+  // if (out->type == &glattice)
   //  ++MVMcounter;
   //
   /************************ loop over all lattice sites *************************/
@@ -1001,7 +1008,7 @@ void g5Dphi_sq(double m0, spinor_field *out, spinor_field *in)
 #endif
 }
 
-//Twisted mass operator for even odd preconditioned case
+// Twisted mass operator for even odd preconditioned case
 /* g5 (M^+-_ee-M_eo {M_oo}^{-1} M_oe*/
 void Qhat_eopre(double m0, double mu, spinor_field *out, spinor_field *in)
 {
@@ -1462,4 +1469,181 @@ void Cphi_diag_inv(double mass, spinor_field *dptr, spinor_field *sptr)
   apply_BCs_on_spinor_field(dptr);
 }
 
-#endif //With expclover
+#endif // With expclover
+
+void Dxx_tw_inv(double mass, double twmass, spinor_field *out, spinor_field *in, tw_D_type tw_type)
+{
+  double complex z;
+  double norm;
+  spinor_field *aux = NULL;
+  spinor_field *aux2 = NULL;
+
+#ifndef CHECK_SPINOR_MATCHING
+  error(in->type == &glattice, 1, "Dxx_tw_inv [Dphi.c]", "input spinors type not correct");
+#endif
+
+  if (in->type == &glat_odd)
+  {
+    aux = otmp;
+    aux2 = otmp2;
+  }
+
+  if (in->type == &glat_even)
+  {
+    aux = etmp;
+    aux2 = gtmp;
+    aux2->type = &glat_even;
+  }
+
+  spinor_field_copy_f(aux, in);
+
+  apply_BCs_on_spinor_field(aux);
+
+  norm = 1 / ((4 + mass) * (4 + mass) + twmass * twmass);
+
+  if (tw_type == DIRECT)
+    z = -I * twmass;
+  else
+    z = I * twmass;
+
+  spinor_field_g5_f(aux, in);
+  spinor_field_copy_f(aux2, aux);
+  apply_BCs_on_spinor_field(aux2);
+
+  spinor_field_mulc_f(aux, z, aux2);
+  spinor_field_mul_f(out, (4 + mass), in); // in = (4+m) in
+  spinor_field_add_f(out, out, aux);       // in = (4+m) in +- i mu g5 in
+  spinor_field_mul_f(out, norm, out);      // in= 1/((4+m)^2+mu^2)*in
+  aux2->type = &glattice;
+}
+
+/*Dirac operator with twisted mass*/
+
+void Dphi_tw(double m0, double mu, spinor_field *out, spinor_field *in)
+{
+  double rho;
+  complex z;
+#ifdef ROTATED_SF
+  error(1, "Dphi_tw", __FILE__, "Not implemented\n");
+#endif /* ROTATED_SF */
+
+#ifdef CHECK_SPINOR_MATCHING
+  error((in == NULL) || (out == NULL), 1, "Dphi_tw [Dphi.c]",
+        "Attempt to access unallocated memory space");
+
+  error(in == out, 1, "Dphi_tw [Dphi.c]",
+        "Input and output fields must be different");
+
+  error(out->type != &glattice || in->type != &glattice, 1, "Dphi_tw [Dphi.c]", "Spinors are not defined on all the lattice!");
+#endif /* CHECK_SPINOR_MATCHING */
+
+  apply_BCs_on_spinor_field(in);
+
+  Dphi_(out, in);
+
+  rho = 4. + m0;
+  spinor_field_mul_add_assign_f(out, rho, in);
+  z = I * mu;
+  spinor_field_mulc_f(gtmp, z, in);
+  spinor_field_g5_assign_f(gtmp);
+  spinor_field_add_assign_f(out, gtmp);
+
+  apply_BCs_on_spinor_field(out);
+}
+
+void g5Dphi_tw_sq(double m0, double mu, spinor_field *out, spinor_field *in)
+{
+  /* alloc memory for temporary spinor field */
+  if (init_dirac)
+  {
+    init_Dirac();
+  }
+
+#ifdef ROTATED_SF
+  error(1, "g5Dphi_tw_sq", __FILE__, "Not implemented\n");
+#endif
+  Dphi_tw(m0, -mu, etmp, in);
+  spinor_field_g5_assign_f(etmp);
+  Dphi_tw(m0, mu, out, etmp);
+  spinor_field_g5_assign_f(out);
+}
+
+void g5Dphi_eopre_tw(double m0, double mu, spinor_field *out, spinor_field *in, tw_D_type tw_type)
+{
+  double rho;
+
+  error((in == NULL) || (out == NULL), 1, "g5Dphi_eopre_tw [Dphi.c]",
+        "Attempt to access unallocated memory space");
+
+  error(in == out, 1, "g5Dphi_eopre_tw [Dphi.c]",
+        "Input and output fields must be different");
+
+#ifdef CHECK_SPINOR_MATCHING
+  error(out->type != &glat_even || in->type != &glat_even, 1, "g5Dphi_eopre_tw " __FILE__, "Spinors are not defined on even lattice!");
+#endif /* CHECK_SPINOR_MATCHING */
+
+  apply_BCs_on_spinor_field(in);
+
+  /* alloc memory for temporary spinor field */
+  if (init_dirac)
+  {
+    init_Dirac();
+  }
+
+  /*************************************************
+   *
+   * note rho = (4. +m0)^2 + mu^2
+   * D_tw_ee_(dag/direct) = rho D_tw_ee_(direct/dag)_inv
+   * D_tw_ee D_tw_ee^dag = rho
+   *************************************************/
+
+  rho = 4.0 + m0;
+  rho *= rho; /* this minus sign is taken into account below */
+  rho += mu * mu;
+
+  spinor_field_copy_f(etmp, in);
+  apply_BCs_on_spinor_field(etmp);
+
+  if (tw_type == DIRECT)
+  {
+    /*************************************************
+     * Operators here implemented is:
+     * D_pre = rho -  D_eo D_oo_tw_inv D_oe D_tw_ee^dag
+     ************************************************/
+
+    Dxx_tw_inv(m0, mu, etmp, etmp, DIRECT);
+    spinor_field_mul_f(etmp, -rho, etmp);
+    Dphi_(otmp, etmp);
+    Dxx_tw_inv(m0, mu, otmp, otmp, DIRECT);
+    Dphi_(out, otmp);
+    spinor_field_mul_add_assign_f(out, rho, in);
+  }
+  else
+  {
+    /*************************************************
+     * Operators here implemented is:
+     * D_pre = rho - D_ee_tw  D_eo D_oo_tw_inv^dag D_oe
+     ************************************************/
+
+    Dphi_(otmp, etmp);
+    Dxx_tw_inv(m0, mu, otmp, otmp, DAGGER);
+    Dphi_(out, otmp);
+    Dxx_tw_inv(m0, mu, out, out, DAGGER);
+    spinor_field_mul_f(out, -rho, out);
+    spinor_field_mul_add_assign_f(out, rho, in);
+  }
+  spinor_field_g5_assign_f(out);
+  apply_BCs_on_spinor_field(out);
+}
+
+void g5Dphi_eopre_tw_sq(double m0, double mu, spinor_field *out, spinor_field *in)
+{
+  /* alloc memory for temporary spinor field */
+  if (init_dirac)
+  {
+    init_Dirac();
+  }
+
+  g5Dphi_eopre_tw(m0, mu, etmp2, in, DIRECT);
+  g5Dphi_eopre_tw(m0, mu, out, etmp2, DAGGER);
+}
