@@ -393,8 +393,8 @@ static void calc_propagator_clover(spinor_field *dptr, spinor_field *sptr)
 {
 
 #ifdef CHECK_SPINOR_MATCHING
-  error(dptr->type != &glattice, "calc_propagator_clover [calc_prop.c]", "dptr type must be glattice!");
-  error(sptr->type == &glat_odd, "calc_propagator_clover [calc_prop.c]", "sptr type must not be glat_odd!");
+  error(dptr->type != &glattice, 1, "calc_propagator_clover [calc_prop.c]", "dptr type must be glattice!");
+  error(sptr->type == &glat_odd, 1, "calc_propagator_clover [calc_prop.c]", "sptr type must not be glat_odd!");
 #endif /* CHECK_SPINOR_MATCHING */
 
   static spinor_field *otmp;
