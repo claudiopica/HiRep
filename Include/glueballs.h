@@ -43,6 +43,6 @@ void collect_1pt_torellon_functions(cor_list *lcor, double complex *tor_storage)
     
 
 #define total_n_glue_op 14
-#define total_n_tor_op 5
+#define total_n_tor_op 4
 #define npoly_dist 2
 #endif

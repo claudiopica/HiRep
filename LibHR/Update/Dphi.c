@@ -37,6 +37,7 @@ extern rhmc_par _update_par; /* Update/update_rhmc.c */
  */
 
 static int init_dirac = 1;
+static int init_dirac_tm = 1;
 static spinor_field *gtmp = NULL;
 static spinor_field *etmp = NULL;
 static spinor_field *otmp = NULL;
@@ -81,10 +82,19 @@ static void init_Dirac()
     etmp = alloc_spinor_field_f(1, &glat_even);
     etmp2 = alloc_spinor_field_f(1, &glat_even);
     otmp = alloc_spinor_field_f(1, &glat_odd);
-    otmp2 = alloc_spinor_field_f(1, &glat_odd);
     atexit(&free_mem);
     init_dirac = 0;
   }
+}
+static void init_Dirac_tm()
+{
+  if (init_dirac_tm)
+  {
+    otmp2 = alloc_spinor_field_f(1, &glat_odd);
+    atexit(&free_mem);
+    init_dirac_tm = 0;
+  }
+  init_Dirac();
 }
 
 /*
@@ -1481,14 +1491,17 @@ void Dxx_tw_inv(double mass, double twmass, spinor_field *out, spinor_field *in,
 #ifndef CHECK_SPINOR_MATCHING
   error(in->type == &glattice, 1, "Dxx_tw_inv [Dphi.c]", "input spinors type not correct");
 #endif
+  if (init_dirac_tm)
+  {
+    init_Dirac_tm();
+  }
 
   if (in->type == &glat_odd)
   {
     aux = otmp;
     aux2 = otmp2;
   }
-
-  if (in->type == &glat_even)
+  else
   {
     aux = etmp;
     aux2 = gtmp;
@@ -1514,7 +1527,9 @@ void Dxx_tw_inv(double mass, double twmass, spinor_field *out, spinor_field *in,
   spinor_field_mul_f(out, (4 + mass), in); // in = (4+m) in
   spinor_field_add_f(out, out, aux);       // in = (4+m) in +- i mu g5 in
   spinor_field_mul_f(out, norm, out);      // in= 1/((4+m)^2+mu^2)*in
-  aux2->type = &glattice;
+
+  if (in->type == &glat_even)
+    aux2->type = &glattice;
 }
 
 /*Dirac operator with twisted mass*/
@@ -1572,22 +1587,23 @@ void g5Dphi_eopre_tw(double m0, double mu, spinor_field *out, spinor_field *in, 
 {
   double rho;
 
+#ifdef CHECK_SPINOR_MATCHING
   error((in == NULL) || (out == NULL), 1, "g5Dphi_eopre_tw [Dphi.c]",
         "Attempt to access unallocated memory space");
 
   error(in == out, 1, "g5Dphi_eopre_tw [Dphi.c]",
         "Input and output fields must be different");
 
-#ifdef CHECK_SPINOR_MATCHING
-  error(out->type != &glat_even || in->type != &glat_even, 1, "g5Dphi_eopre_tw " __FILE__, "Spinors are not defined on even lattice!");
+  error(in->type != &glat_even, 1, "g5Dphi_eopre_tw " __FILE__, "in spinor is not defined on even lattice!");
+  error(out->type != &glat_even, 1, "g5Dphi_eopre_tw " __FILE__, "out spinor is not defined on even lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
   apply_BCs_on_spinor_field(in);
 
   /* alloc memory for temporary spinor field */
-  if (init_dirac)
+  if (init_dirac_tm)
   {
-    init_Dirac();
+    init_Dirac_tm();
   }
 
   /*************************************************
@@ -1601,9 +1617,6 @@ void g5Dphi_eopre_tw(double m0, double mu, spinor_field *out, spinor_field *in, 
   rho *= rho; /* this minus sign is taken into account below */
   rho += mu * mu;
 
-  spinor_field_copy_f(etmp, in);
-  apply_BCs_on_spinor_field(etmp);
-
   if (tw_type == DIRECT)
   {
     /*************************************************
@@ -1611,7 +1624,7 @@ void g5Dphi_eopre_tw(double m0, double mu, spinor_field *out, spinor_field *in, 
      * D_pre = rho -  D_eo D_oo_tw_inv D_oe D_tw_ee^dag
      ************************************************/
 
-    Dxx_tw_inv(m0, mu, etmp, etmp, DIRECT);
+    Dxx_tw_inv(m0, mu, etmp, in, DIRECT);
     spinor_field_mul_f(etmp, -rho, etmp);
     Dphi_(otmp, etmp);
     Dxx_tw_inv(m0, mu, otmp, otmp, DIRECT);
@@ -1622,10 +1635,9 @@ void g5Dphi_eopre_tw(double m0, double mu, spinor_field *out, spinor_field *in, 
   {
     /*************************************************
      * Operators here implemented is:
-     * D_pre = rho - D_ee_tw  D_eo D_oo_tw_inv^dag D_oe
+     * D_pre^dag = rho - D_ee_tw  D_eo D_oo_tw_inv^dag D_oe
      ************************************************/
-
-    Dphi_(otmp, etmp);
+    Dphi_(otmp, in);
     Dxx_tw_inv(m0, mu, otmp, otmp, DAGGER);
     Dphi_(out, otmp);
     Dxx_tw_inv(m0, mu, out, out, DAGGER);
@@ -1639,9 +1651,9 @@ void g5Dphi_eopre_tw(double m0, double mu, spinor_field *out, spinor_field *in, 
 void g5Dphi_eopre_tw_sq(double m0, double mu, spinor_field *out, spinor_field *in)
 {
   /* alloc memory for temporary spinor field */
-  if (init_dirac)
+  if (init_dirac_tm)
   {
-    init_Dirac();
+    init_Dirac_tm();
   }
 
   g5Dphi_eopre_tw(m0, mu, etmp2, in, DIRECT);

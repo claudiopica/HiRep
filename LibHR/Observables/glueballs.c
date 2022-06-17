@@ -113,6 +113,7 @@ wilson_lines *polyleg(int ix, int d)
 
         for (int i = npoly_dist; i < LL[d] - 1; i++)
         {
+
             w1 = pu_gauge_wrk(in, d);
             _suNg_times_suNg(*w3, *w2, *w1);
             w1 = w2;
@@ -131,9 +132,10 @@ wilson_lines *polyleg(int ix, int d)
             _suNg_unit(poly[d - 1].p[npoly_dist - 1]);
         }
 
+        in = in1;
         for (int i = npoly_dist - 2; i >= 0; i--)
         {
-            in = idn_wrk(in1, d);
+            in = idn_wrk(in, d);
             w1 = pu_gauge_wrk(in, d);
             _suNg_times_suNg(poly[d - 1].p[i], *w1, poly[d - 1].p[i + 1]);
         }

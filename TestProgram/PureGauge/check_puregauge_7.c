@@ -110,7 +110,9 @@ int main(int argc, char *argv[])
   lprintf("MAIN", 0, "Checking gauge invariance of the %d torellon operators on each timeslice.\n ", total_n_tor_op);
 
   double max_diff[2];
+  double min_size;
   max_diff[0] = max_diff[1] = -1.0;
+  min_size = 10;
 
   for (n = 0; n < T * total_n_tor_op; n++)
   {
@@ -120,16 +122,26 @@ int main(int argc, char *argv[])
     if (fabs(cimag(dop[n])) > max_diff[1])
       max_diff[1] = fabs(cimag(dop[n]));
 
-    if (fabs(creal(dop[n])) > 1.e-13)
+    if (sqrt(creal(dop1[n]) * creal(dop1[n]) + cimag(dop1[n]) * cimag(dop1[n])) < min_size)
+      min_size = sqrt(creal(dop1[n]) * creal(dop1[n]) + cimag(dop1[n]) * cimag(dop1[n]));
+
+    if (fabs(creal(dop[n])) > 1.e-12)
       return_value++;
-    if (fabs(cimag(dop[n])) > 1.e-13)
+    if (fabs(cimag(dop[n])) > 1.e-12)
+      return_value++;
+    if (sqrt(creal(dop1[n]) * creal(dop1[n]) + cimag(dop1[n]) * cimag(dop1[n])) < 10.e-14)
       return_value++;
   }
-  global_sum_int(&return_value,1);
+  global_sum_int(&return_value, 1);
+  global_max(max_diff, 2);
+  global_min(&min_size, 1);
+
   lprintf("MAIN", 0, "Maximal normalized real difference = %.16e\n", max_diff[0]);
   lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n");
   lprintf("MAIN", 0, "Maximal normalized imaginary difference = %.16e\n", max_diff[1]);
-  lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
+  lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n");
+  lprintf("MAIN", 0, "Minimal amplitude of the operators = %.4e\n", min_size);
+  lprintf("MAIN", 0, "(should be greater 1*10^(-15) or so)\n\n");
 
   free_gtransf(g);
 

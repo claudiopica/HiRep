@@ -75,13 +75,12 @@ int main(int argc, char *argv[])
             for (pt = 0; pt < Ldir - j - 1; pt++)
             {
               in = idn(in, dir);
-              w1 = pu_gauge(in, dir);
+              w1 = pu_gauge_wrk(in, dir);
               _suNg_times_suNg(*w3, *w1, *w2);
               w1 = w2;
               w2 = w3;
               w3 = w1;
             }
-
             _suNg_sub_assign(*w2, pl->p[j]);
             _suNg_sqnorm(dop, *w2);
 
@@ -99,7 +98,7 @@ int main(int argc, char *argv[])
           for (pt = 0; pt < Ldir; pt++)
           {
             in = idn(in, dir);
-            w1 = pu_gauge(in, dir);
+            w1 = pu_gauge_wrk(in, dir);
             _suNg_times_suNg(*w3, *w1, *w2);
             w1 = w2;
             w2 = w3;
@@ -142,7 +141,7 @@ int main(int argc, char *argv[])
             for (pt = 0; pt < Ldir - j - 1; pt++)
             {
               in = idn(in, dir);
-              w1 = pu_gauge(in, dir);
+              w1 = pu_gauge_wrk(in, dir);
               _suNg_times_suNg(*w3, *w1, *w2);
               w1 = w2;
               w2 = w3;
@@ -166,7 +165,7 @@ int main(int argc, char *argv[])
           for (pt = 0; pt < Ldir; pt++)
           {
             in = idn(in, dir);
-            w1 = pu_gauge(in, dir);
+            w1 = pu_gauge_wrk(in, dir);
             _suNg_times_suNg(*w3, *w1, *w2);
             w1 = w2;
             w2 = w3;
@@ -209,7 +208,7 @@ int main(int argc, char *argv[])
             for (pt = 0; pt < Ldir - j - 1; pt++)
             {
               in = idn(in, dir);
-              w1 = pu_gauge(in, dir);
+              w1 = pu_gauge_wrk(in, dir);
               _suNg_times_suNg(*w3, *w1, *w2);
               w1 = w2;
               w2 = w3;
@@ -233,7 +232,7 @@ int main(int argc, char *argv[])
           for (pt = 0; pt < Ldir; pt++)
           {
             in = idn(in, dir);
-            w1 = pu_gauge(in, dir);
+            w1 = pu_gauge_wrk(in, dir);
             _suNg_times_suNg(*w3, *w1, *w2);
             w1 = w2;
             w2 = w3;
