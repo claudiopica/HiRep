@@ -85,3 +85,4 @@ TestProgram/SpinorField/check_spinorfield_gpu_1
 TestProgram/GPU/check_global_sum_gpu
 TestProgram/GPU/check_gpu_1
 TestProgram/GPU/check_gpu_2
+TestProgram/GPU/check_complex
