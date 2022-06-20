@@ -753,7 +753,7 @@ static int last_t = -10;
 void request_space_paths_evaluation(){last_t=-10;}
   void eval_time_momentum_glueball_paths(int t, int px, int py, int pz)
   {
-    int n_x, n_y, n_z, idx, in;
+    int nnx, nny, nnz, idx, in;
     double complex ce = 0.;
     if(path_storage==NULL)
       {        path_storage = malloc(npaths * X * Y * Z * sizeof(double complex));
@@ -770,13 +770,13 @@ mom_def_Cm_tr_paths[in]=0.;
 if (t != last_t)
 {
 last_t=t;
-for (n_x = 0; n_x < X; n_x++)
-for (n_y = 0; n_y < Y; n_y++)
-for (n_z = 0; n_z < Z; n_z++)
+for (nnx = 0; nnx < X; nnx++)
+for (nny = 0; nny < Y; nny++)
+for (nnz = 0; nnz < Z; nnz++)
 {
-in = ipt(t, n_x, n_y, n_z);
-ce = cexp(I * 2.0 * PI * (double)(n_x * px + n_y * py + n_z * pz) / GLB_X);
-idx = npaths * (n_x + X * (n_y + Y * n_z));
+in = ipt(t, nnx, nny, nnz);
+ce = cexp(I * 2.0 * PI * (double)(nnx * px + nny * py + nnz * pz) / GLB_X);
+idx = npaths * (nnx + X * (nny + Y * nnz));
 path_storage[0+idx]= path0(in);
 mom_def_Cp_tr_paths[0]+=ce*creal(path_storage[0+idx]);
 mom_def_Cm_tr_paths[0]+=I*ce*cimag(path_storage[0+idx]);
@@ -807,12 +807,12 @@ mom_def_Cm_tr_paths[8]+=I*ce*cimag(path_storage[8+idx]);
 }
 }
 else{
-for (n_x = 0; n_x < X; n_x++)
-for (n_y = 0; n_y < Y; n_y++)
-for (n_z = 0; n_z < Z; n_z++)
+for (nnx = 0; nnx < X; nnx++)
+for (nny = 0; nny < Y; nny++)
+for (nnz = 0; nnz < Z; nnz++)
 {
-ce = cexp(I * 2.0 * PI * (double)(n_x * px + n_y * py + n_z * pz) / GLB_X);
-idx = npaths * (n_x + X * (n_y + Y * n_z));
+ce = cexp(I * 2.0 * PI * (double)(nnx * px + nny * py + nnz * pz) / GLB_X);
+idx = npaths * (nnx + X * (nny + Y * nnz));
 for (int i = 0; i < 9; i++)
 {
 mom_def_Cp_tr_paths[i]+=ce*creal(path_storage[i+idx]);

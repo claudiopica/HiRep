@@ -28,6 +28,8 @@ static void all_g_op(double complex *pa)
 {
     suNg_field *_u = u_gauge_wrk();
     start_gf_sendrecv(_u);
+    complete_gf_sendrecv(_u);
+
     int i;
 
     for (i = 0; i < total_n_glue_op; i++)
@@ -46,6 +48,8 @@ static void all_t_op(double complex *pa)
 {
     suNg_field *_u = u_gauge_wrk();
     start_gf_sendrecv(_u);
+    complete_gf_sendrecv(_u);
+
     int i;
 
     for (i = 0; i < total_n_tor_op; i++)
@@ -124,9 +128,9 @@ int main(int argc, char *argv[])
     op = malloc(total_n_tor_op * sizeof(complex double));
     rop = malloc(total_n_tor_op * sizeof(complex double));
 
+    reset_wrk_pointers();
     lprintf("MAIN", 0, "Measuring all the torellons operators on the original configuration\n");
-    all_t_op(op);
-
+    all_t_op(op);    
     lprintf("MAIN", 0, "done.\n\n");
 
     lprintf("MAIN", 0, "Resetting and initializing (rotating) workspace gauge field once for each of the 48 cubic rotations\n\n");

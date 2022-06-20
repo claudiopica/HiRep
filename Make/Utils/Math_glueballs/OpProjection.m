@@ -63,8 +63,16 @@ bTOrthog[1,0,1]={{{1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
 bTOrthog[1,1,-1]={{{1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}},{{1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,-1,-1,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}},{{-I Sqrt[3],0,0,0,0,0,0,0,0,0,0,0,0,I Sqrt[3],0,0,0,0,0,0,0,0,0,0,0,0,-I Sqrt[3],0,0,I Sqrt[3],0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},{1,0,0,0,0,0,0,0,0,0,0,0,0,1,-2,0,0,0,0,0,0,0,0,0,0,0,1,-2,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}}};
 bTOrthog[1,1,0]={{{1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0}},{{-1,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0}},{{-1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0}},{{1,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0}}}; 
 bTOrthog[1,1,1]={{{1,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}},{{1,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,-1,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}},{{-I Sqrt[3],0,0,0,0,0,0,0,0,0,0,0,I Sqrt[3],0,0,0,0,0,0,0,0,0,0,0,0,0,-I Sqrt[3],0,0,0,I Sqrt[3],0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},{1,0,0,0,0,0,0,0,0,0,0,-2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,-2,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}}};
-
-
+bTOrthog[px_, py_, pz_] := Module[{ret = Null, gcd},
+  gcd = Max[GCD[px, py, pz], 1];
+  If[gcd != 1,
+     lpx=Expand[px/gcd];
+     lpy=Expand[py/gcd];
+     lpz=Expand[pz/gcd];
+   If[ListQ[bTOrthog[lpx,lpy,lpz]], 
+     ret = bTOrthog[lpx,lpy,lpz]];
+   ];
+  ret];
 (*Rotation coefficients for the transformation of a multiplet under a global rotation
 e.g. consider the multiplet ml={*,..,*}  ml = irrepSetOrthog[Px,Py,Pz][[irrepindex]][[i]]] . ml' 
 where ml' is the multiplet evaluated on a rotated configuration
@@ -142,8 +150,9 @@ IrrepName[0,0,0] = {A1plusOhP, A2plusOhP, EplusOhP, T1plusOhP, T2plusOhP,
 IrrepName[0,0,1] = {A1Dic4, A2Dic4, E2Dic4, B1Dic4, B2Dic4};
 IrrepName[0,1,1] = {A1Dic2, A2Dic2, B1Dic2, B2Dic2};
 IrrepName[1,1,1] = {A1Dic3, A2Dic3, EEDic3};
-IrrepName[px_,py_,pz_] := Module[{Pxsort,Pysort,Pzsort},
-  {Pxsort,Pysort,Pzsort}=Sort[{px,py,pz}//Abs];
+IrrepName[px_,py_,pz_] := Module[{Pxsort,Pysort,Pzsort,gcd},
+         gcd = Max[GCD[px, py, pz], 1];             
+  {Pxsort,Pysort,Pzsort}=Sort[{px/gcd,py/gcd,pz/gcd}//Abs];
   IrrepName[px,py,pz]=IrrepName[Pxsort,Pysort,Pzsort];
   IrrepName[px,py,pz]];
 
@@ -830,9 +839,7 @@ OpGroupStringPaths[px_, py_, pz_, iridx_, charge_] :=
 #include <string.h>\n "];
   WriteString[ar,"#define ntors ",torindex,"\n "];
   WriteString[ar,"static double PI=3.141592653589793238462643383279502884197;\n "];
-  WriteString[ar,"static double complex *mom_def_Cp_poly_paths=NULL;\n "];
-  WriteString[ar,"static double complex *mom_def_Cm_poly_paths=NULL;\n "];
-  WriteString[ar,"static double complex *path_storage=NULL;\n "];
+  WriteString[ar,"static double complex *tor_path_storage=NULL;\n "];
   Close[ar];
 
 
@@ -1250,7 +1257,8 @@ TorUniqueIndex[ain_]:=TorUniqueIdentifier[ain][[2]];
   (**)
   (**)
 
-    (*Each path code is generated only once and only if it has been requested, it imples that also some paths can be not evaluated*)
+      (*Each path code is generated only once and only if it has been requested, it imples that also some paths can be not evaluated*)
+      Print["paths",paths];
   Do[
       PolyGenerateCcode[TorUniqueIndex[paths[[i,1]]][[1]]];
      PolyGenerateCcode[TorUniqueIndex[paths[[i,3]]][[1]]];
@@ -1265,16 +1273,16 @@ TorUniqueIndex[ain_]:=TorUniqueIdentifier[ain][[2]];
     Do[WriteShift[shifts[[i]],torfilename],{i,1,Length[shifts]}];
 
     ar = OpenAppend[torfilename, FormatType -> InputForm];
-    WriteString[ar, "static void diPoly_p_",p[px],"_",p[py],"_",p[pz],"_Ir_",irrepidx,"_C_",p[charge],"_n_",toridx,"(double complex * tor_out)\n"];
-    WriteString[ar,"{\n*tor_out ="];
+    WriteString[ar, "static inline double diPoly_p_",p[px],"_",p[py],"_",p[pz],"_Ir_",irrepidx,"_C_",p[charge],"_n_",toridx,"(int idx)\n"];
+    WriteString[ar,"{\nreturn "];
     Do[
       WriteString[ar,OpConsts[coeff[[i]]]];
       If[Abs[coeff[[i]]]!=1,WriteString[ar,"*"]];
       If[Not[SameQ[paths[[i,5]],1]],WriteString[ar,MapShifts[torfilename,paths[[i,5]]],"*"]];
-      If[paths[[i,2]]==0,WriteString[ar,"mom_def_Cp_poly_paths["],WriteString[ar,"mom_def_Cm_poly_paths["]];
-      WriteString[ar,TorUniqueIndex[paths[[i,1]]][[1]],"]*"];
-      If[paths[[i,4]]==0,WriteString[ar,"mom_def_Cp_poly_paths["],WriteString[ar,"mom_def_Cm_poly_paths["]];
-      WriteString[ar,TorUniqueIndex[paths[[i,3]]][[1]],"]"];
+      If[paths[[i,2]]==0,WriteString[ar,"creal(tor_path_storage["],WriteString[ar,"cimag(tor_path_storage["]];
+      WriteString[ar,TorUniqueIndex[paths[[i,1]]][[1]],"+idx])*"];
+      If[paths[[i,4]]==0,WriteString[ar,"creal(tor_path_storage["],WriteString[ar,"cimag(tor_path_storage["]];
+        WriteString[ar,TorUniqueIndex[paths[[i,3]]][[1]],"+idx])"];
     ,{i,1,Length[paths]}];
     WriteString[ar,";\n}\n\n"];
     Close[ar];
@@ -1293,7 +1301,7 @@ The paths are evaluated only once while each different momentum projection can b
   WriteString[ar,"static int last_t = -10;\nvoid request_space_paths_evaluation(){last_t=-10;}
   void eval_time_momentum_glueball_paths(int t, int px, int py, int pz)
   {
-    int n_x, n_y, n_z, idx, in;
+    int nnx, nny, nnz, idx, in;
     double complex ce = 0.;
     if(path_storage==NULL)
       {"];
@@ -1307,9 +1315,9 @@ The paths are evaluated only once while each different momentum projection can b
   WriteString[ar,"\nfor(in = 0; in < npaths; in++)\n{\nmom_def_Cp_tr_paths[in]=0.;\n"];
   WriteString[ar,"mom_def_Cm_tr_paths[in]=0.;\n}\n"];
   WriteString[ar,"if (t != last_t)\n{\nlast_t=t;\n"];
-  WriteString[ar,"for (n_x = 0; n_x < X; n_x++)\nfor (n_y = 0; n_y < Y; n_y++)\nfor (n_z = 0; n_z < Z; n_z++)\n{\n"];
-  WriteString[ar,"in = ipt(t, n_x, n_y, n_z);\nce = cexp(I * 2.0 * PI * (double)(n_x * px + n_y * py + n_z * pz) / GLB_X);\n"];
-  WriteString[ar,"idx = npaths * (n_x + X * (n_y + Y * n_z));\n"];
+  WriteString[ar,"for (nnx = 0; nnx < X; nnx++)\nfor (nny = 0; nny < Y; nny++)\nfor (nnz = 0; nnz < Z; nnz++)\n{\n"];
+  WriteString[ar,"in = ipt(t, nnx, nny, nnz);\nce = cexp(I * 2.0 * PI * (double)(nnx * px + nny * py + nnz * pz) / GLB_X);\n"];
+  WriteString[ar,"idx = npaths * (nnx + X * (nny + Y * nnz));\n"];
   Do[ 
     If[NumberQ[WrittenPaths[i]],
       WriteString[ar,"path_storage[",i,"+idx]= path",i,"(in);\nmom_def_Cp_tr_paths[",i,"]+=ce*creal(path_storage[",i,"+idx]);"];
@@ -1317,9 +1325,9 @@ The paths are evaluated only once while each different momentum projection can b
     ];
   ,{i,0,pathindex-1}];
   WriteString[ar,"}\n}\nelse{\n"];
-  WriteString[ar,"for (n_x = 0; n_x < X; n_x++)\nfor (n_y = 0; n_y < Y; n_y++)\nfor (n_z = 0; n_z < Z; n_z++)\n{\n"];
-  WriteString[ar,"ce = cexp(I * 2.0 * PI * (double)(n_x * px + n_y * py + n_z * pz) / GLB_X);\n"];
-  WriteString[ar,"idx = npaths * (n_x + X * (n_y + Y * n_z));\n"];
+  WriteString[ar,"for (nnx = 0; nnx < X; nnx++)\nfor (nny = 0; nny < Y; nny++)\nfor (nnz = 0; nnz < Z; nnz++)\n{\n"];
+  WriteString[ar,"ce = cexp(I * 2.0 * PI * (double)(nnx * px + nny * py + nnz * pz) / GLB_X);\n"];
+  WriteString[ar,"idx = npaths * (nnx + X * (nny + Y * nnz));\n"];
   
   WriteString[ar,"for (int i = 0; i < ",pathindex,"; i++)\n{\nmom_def_Cp_tr_paths[i]+=ce*creal(path_storage[i+idx]);\n"];
   WriteString[ar,"mom_def_Cm_tr_paths[i]+=I*ce*cimag(path_storage[i+idx]);\n}\n"];
@@ -1623,53 +1631,82 @@ The paths are evaluated only once while each different momentum projection can b
 *)
 ar=OpenAppend[torfilename,FormatType->InputForm];
 WriteString[ar,"static int last_t = -10;\nvoid request_space_tors_evaluation(){last_t=-10;}
-  static void eval_time_momentum_torellons(int t, int px, int py, int pz)
+  static void eval_time_momentum_torellons(int t, int px, int py, int pz, double complex * np)
   {
-    int n_x, n_y, n_z, idx, in;
-    double complex ce = 0.;
-    if(path_storage==NULL)
+    int nnx, nny, nnz, idx=0, in;
+    double complex ce = I * 2.0 * PI / GLB_X;
+    if(tor_path_storage==NULL)
       {"];
 WriteString[ar,stringshift[torfilename]];
-WriteString[ar,"        path_storage = malloc(ntors * X * Y * Z * sizeof(double complex));
-        mom_def_Cp_poly_paths = malloc(ntors * sizeof(double complex));
-        mom_def_Cm_poly_paths = malloc(ntors * sizeof(double complex));
+WriteString[ar,"        tor_path_storage = malloc(ntors * X * Y * Z * sizeof(double complex));
         for (in = 0; in < ntors * X * Y * Z; in++)
-            path_storage[in] = 0.;
-    }"];
-WriteString[ar,"\nfor(in = 0; in < ntors; in++)\n{\nmom_def_Cp_poly_paths[in]=0.;\n"];
-WriteString[ar,"mom_def_Cm_poly_paths[in]=0.;\n}\n"];
+            tor_path_storage[in] = 0.;
+    };\n"];
 WriteString[ar,"if (t != last_t)\n{\nlast_t=t;\n"];
-WriteString[ar,"for (n_y = 0; n_y < Y; n_y++)\nfor (n_z = 0; n_z < Z; n_z++)\nfor (n_x = 0; n_x < X; n_x++)\n{\n"];
-WriteString[ar,"in = ipt(t, n_x, n_y, n_z);\nce = cexp(I * 2.0 * PI * (double)(n_x * px + n_y * py + n_z * pz) / GLB_X);\n"];
-WriteString[ar,"idx = ntors * (n_x + X * (n_y + Y * n_z));\n"];
+WriteString[ar,"for (nny = 0; nny < Y; nny++)\nfor (nnz = 0; nnz < Z; nnz++)\nfor (nnx = 0; nnx < X; nnx++)\n{\n"];
+WriteString[ar,"in = ipt(t, nnx, nny, nnz);\n"];
+WriteString[ar,"idx = ntors * (nnx + X * (nny + Y * nnz));\n"];
 Do[If[NumberQ[WrittenPoly[i]],If[FreeQ[TorList[i],L[az]]&&FreeQ[TorList[i],L[ay]],
-WriteString[ar,"path_storage[",i,"+idx]= poly",i,"(in);\nmom_def_Cp_poly_paths[",i,"]+=ce*creal(path_storage[",i,"+idx]);"];
-WriteString[ar,"\nmom_def_Cm_poly_paths[",i,"]+=I*ce*cimag(path_storage[",i,"+idx]);\n"];];];,{i,0,torindex-1}];
+WriteString[ar,"tor_path_storage[",i,"+idx]= poly",i,"(in);\n"];];];;,{i,0,torindex-1}];
 WriteString[ar,"};\n"];
-WriteString[ar,"for (n_z = 0; n_z < Z; n_z++)\nfor (n_x = 0; n_x < X; n_x++)\nfor (n_y = 0; n_y < Y; n_y++)\n{\n"];
-WriteString[ar,"in = ipt(t, n_x, n_y, n_z);\nce = cexp(I * 2.0 * PI * (double)(n_x * px + n_y * py + n_z * pz) / GLB_X);\n"];
-WriteString[ar,"idx = ntors * (n_x + X * (n_y + Y * n_z));\n"];
+WriteString[ar,"for (nnz = 0; nnz < Z; nnz++)\nfor (nnx = 0; nnx < X; nnx++)\nfor (nny = 0; nny < Y; nny++)\n{\n"];
+WriteString[ar,"in = ipt(t, nnx, nny, nnz);\n"];
+WriteString[ar,"idx = ntors * (nnx + X * (nny + Y * nnz));\n"];
 Do[If[NumberQ[WrittenPoly[i]],If[FreeQ[TorList[i],L[az]]&&FreeQ[TorList[i],L[ax]],
-WriteString[ar,"path_storage[",i,"+idx]= poly",i,"(in);\nmom_def_Cp_poly_paths[",i,"]+=ce*creal(path_storage[",i,"+idx]);"];
-WriteString[ar,"\nmom_def_Cm_poly_paths[",i,"]+=I*ce*cimag(path_storage[",i,"+idx]);\n"];];];,{i,0,torindex-1}];
+WriteString[ar,"tor_path_storage[",i,"+idx]= poly",i,"(in);\n"];];];,{i,0,torindex-1}];
 WriteString[ar,"};\n"];
-WriteString[ar,"for (n_x = 0; n_x < X; n_x++)\nfor (n_y = 0; n_y < Y; n_y++)\nfor (n_z = 0; n_z < Z; n_z++)\n{\n"];
-WriteString[ar,"in = ipt(t, n_x, n_y, n_z);\nce = cexp(I * 2.0 * PI * (double)(n_x * px + n_y * py + n_z * pz) / GLB_X);\n"];
-WriteString[ar,"idx = ntors * (n_x + X * (n_y + Y * n_z));\n"];
+WriteString[ar,"for (nnx = 0; nnx < X; nnx++)\nfor (nny = 0; nny < Y; nny++)\nfor (nnz = 0; nnz < Z; nnz++)\n{\n"];
+WriteString[ar,"in = ipt(t, nnx, nny, nnz);\n"];
+WriteString[ar,"idx = ntors * (nnx + X * (nny + Y * nnz));\n"];
 Do[If[NumberQ[WrittenPoly[i]],If[FreeQ[TorList[i],L[ay]]&&FreeQ[TorList[i],L[ax]],
-WriteString[ar,"path_storage[",i,"+idx]= poly",i,"(in);\nmom_def_Cp_poly_paths[",i,"]+=ce*creal(path_storage[",i,"+idx]);"];
-WriteString[ar,"\nmom_def_Cm_poly_paths[",i,"]+=I*ce*cimag(path_storage[",i,"+idx]);\n"];];];,{i,0,torindex-1}];
+WriteString[ar,"tor_path_storage[",i,"+idx]= poly",i,"(in);\n"];];];,{i,0,torindex-1}];
 WriteString[ar,"};\n"];
-WriteString[ar,"}\nelse{\n"];
-WriteString[ar,"for (n_x = 0; n_x < X; n_x++)\nfor (n_y = 0; n_y < Y; n_y++)\nfor (n_z = 0; n_z < Z; n_z++)\n{\n"];
-WriteString[ar,"in = ipt(t, n_x, n_y, n_z);\nce = cexp(I * 2.0 * PI * (double)(n_x * px + n_y * py + n_z * pz) / GLB_X);\n"];
-WriteString[ar,"idx = ntors * (n_x + X * (n_y + Y * n_z));\n"];
-Do[If[NumberQ[WrittenPoly[i]],
-WriteString[ar,"mom_def_Cp_poly_paths[",i,"]+=ce*creal(path_storage[",i,"+idx]);"];
-WriteString[ar,"\nmom_def_Cm_poly_paths[",i,"]+=I*ce*cimag(path_storage[",i,"+idx]);\n"];];,{i,0,torindex-1}];
 WriteString[ar,"};\n"];
-WriteString[ar,"\n}\n};\n"];
+  ltornumberC=0;
+  Do[
+        evaltors=0;
+        nltor=0;
+      Do[
+        Do[
+          If[ListQ[Torindex[px, py, pz, irrepidx,charge]],
+            Do[
+              Do[
+                  If[Not[SameQ[Torindex[px, py, pz, irrepidx,charge][[nop, irrepev]],0]],
+                  nltor++;
+                  ];
+              , {nop, 1, Length[Torindex[px, py, pz, irrepidx,charge]]}];
+              , {irrepev, 1, Length[bTOrthog[px, py, pz][[irrepidx]]]}];
+             ];
+        ,{charge,-1,1,2}];
+      , {irrepidx, 1, Length[bTOrthog[px, py, pz]]}];
+    Do[
+      Do[
+          If[ListQ[Torindex[px, py, pz, irrepidx,charge]],
+          If[evaltors==0 &&  Select[Flatten[Torindex[px, py, pz, irrepidx,charge]], IntegerQ[#] && # > 0 &] !={}, 
+            WriteString[ar,"if(px==",px," && py==",py," && pz==",pz,")\n{\n"];
+            Do[WriteString[ar,"np[",ltornumberC+lj,"]=0.0;\n"];,{lj,0,nltor-1}];
 
+            WriteString[ar,"for (nnx = 0; nnx < X; nnx++)\nfor (nny = 0; nny < Y; nny++)\nfor (nnz = 0; nnz < Z; nnz++)\n{\nidx = ntors * (nnx + X * (nny + Y * nnz));\n"];
+            evaltors=1;
+          ];
+
+          Do[
+            Do[
+              idop = Torindex[px, py, pz, irrepidx,charge][[nop, irrepev]];
+                  If[Not[SameQ[idop,0]],
+                      If[SameQ[nnx px + nny py + nnz pz,0],expstring="",expstring="cexp(ce * (double)("<>ToString[CForm[nnx*px + nny*py + nnz*pz]] <> "))*";];
+                    WriteString[ar, "np[",ltornumberC,"] +=",expstring,"diPoly_p_", p[px], "_", p[py], "_", p[pz],"_Ir_", irrepidx, "_C_",p[charge],"_n_", idop,"(idx);\n"];
+                    MapTortoCindex[px,py,pz,irrepidx,charge,idop]=ltornumberC;
+                    ltornumberC++;
+                ];
+             , {nop, 1, Length[Torindex[px, py, pz, irrepidx,charge]]}];
+          , {irrepev, 1, Length[bTOrthog[px, py, pz][[irrepidx]]]}];
+        ];
+      ,{charge,-1,1,2}];
+      , {irrepidx, 1, Length[bTOrthog[px, py, pz]]}];
+    If[evaltors==1,WriteString[ar, "};\n};\n"];];
+  , {px, -1, 1}, {py, -1, 1}, {pz, -1, 1}];
+WriteString[ar,"};\n"];
 (**)
   WriteString[ar, "void eval_all_torellon_ops(int t, double complex *numerical_tor_out)
 {
@@ -1679,40 +1716,22 @@ WriteString[ar,"\n}\n};\n"];
         numerical_op = malloc(total_n_tor_op * sizeof(double complex));
     }
     request_space_tors_evaluation();\n"];
-  ltornumberC=0;
   Do[
-    evaltors=0;
     Do[
       Do[
         If[ListQ[Torindex[px, py, pz, irrepidx,charge]],
           If[evaltors==0 &&  Select[Flatten[Torindex[px, py, pz, irrepidx,charge]], IntegerQ[#] && # > 0 &] !={}, 
-            WriteString[ar,"    eval_time_momentum_torellons(t,",px,",",py,",",pz,");\n"];
-            evaltors=1;
-          ];
-
-          Do[
-            Do[
-              idop = Torindex[px, py, pz, irrepidx,charge][[nop, irrepev]];
-              (*We are enforcing that different operators (both 1tr and multiple traces) with same px, py, pz, irrepidx, irrepev, charge are contigous in numerical_op*)
-                If[Not[SameQ[idop,0]],
-               
-               
-                    WriteString[ar, "    diPoly_p_", p[px], "_", p[py], "_", p[pz],"_Ir_", irrepidx, "_C_",p[charge],"_n_", idop,"(numerical_op+",ltornumberC,");\n"];
-                    MapTortoCindex[px,py,pz,irrepidx,charge,idop]=ltornumberC;
-                    ltornumberC++;
-              
-                  
-                ];
-             , {nop, 1, Length[Torindex[px, py, pz, irrepidx,charge]]}];
-          , {irrepev, 1, Length[bTOrthog[px, py, pz][[irrepidx]]]}];
-        ];
+            WriteString[ar,"eval_time_momentum_torellons(t,",px,",",py,",",pz,",numerical_op);\n"];
+            ];
+            ];
       ,{charge,-1,1,2}];
     , {irrepidx, 1, Length[bTOrthog[px, py, pz]]}];
-  , {px, -1, 1}, {py, -1, 1}, {pz, -1, 1}];
+    , {px, -1, 1}, {py, -1, 1}, {pz, -1, 1}];'
+ 
 (**)
 
 WriteString[ar,"    for(int i=0;i<total_n_tor_op;i++)
-        *(numerical_tor_out+i)+=*(numerical_op+i);
+       numerical_tor_out[i]+= numerical_op[i];
 }\n"];
 
 WriteString[ar,"

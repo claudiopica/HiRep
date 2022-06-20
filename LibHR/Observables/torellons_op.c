@@ -6,11 +6,9 @@
 #include "utils.h"
 #include "glueballs.h"
 #include <string.h>
-#define ntors 16
+#define ntors 29
 static double PI = 3.141592653589793238462643383279502884197;
-static double complex *mom_def_Cp_poly_paths = NULL;
-static double complex *mom_def_Cm_poly_paths = NULL;
-static double complex *path_storage = NULL;
+static double complex *tor_path_storage = NULL;
 static double complex poly0(int in)
 {
     return polyleg(in, 1)->tr;
@@ -26,9 +24,9 @@ static double complex poly2(int in)
     return polyleg(in, 3)->tr;
 }
 
-static void diPoly_p_0_0_0_Ir_1_C_1_n_1(double complex *tor_out)
+static inline double diPoly_p_0_0_0_Ir_1_C_1_n_1(int idx)
 {
-    *tor_out = +(16.) * mom_def_Cm_poly_paths[0] * mom_def_Cm_poly_paths[0] + (16.) * mom_def_Cm_poly_paths[1] * mom_def_Cm_poly_paths[1] + (16.) * mom_def_Cm_poly_paths[2] * mom_def_Cm_poly_paths[2] + (16.) * mom_def_Cp_poly_paths[0] * mom_def_Cp_poly_paths[0] + (16.) * mom_def_Cp_poly_paths[1] * mom_def_Cp_poly_paths[1] + (16.) * mom_def_Cp_poly_paths[2] * mom_def_Cp_poly_paths[2];
+    return +(16.) * cimag(tor_path_storage[0 + idx]) * cimag(tor_path_storage[0 + idx]) + (16.) * cimag(tor_path_storage[1 + idx]) * cimag(tor_path_storage[1 + idx]) + (16.) * cimag(tor_path_storage[2 + idx]) * cimag(tor_path_storage[2 + idx]) + (16.) * creal(tor_path_storage[0 + idx]) * creal(tor_path_storage[0 + idx]) + (16.) * creal(tor_path_storage[1 + idx]) * creal(tor_path_storage[1 + idx]) + (16.) * creal(tor_path_storage[2 + idx]) * creal(tor_path_storage[2 + idx]);
 }
 
 static double complex poly8(int in)
@@ -337,9 +335,9 @@ static double complex poly9(int in)
     return p;
 }
 
-static void diPoly_p_0_0_1_Ir_1_C_1_n_1(double complex *tor_out)
+static inline double diPoly_p_0_0_1_Ir_1_C_1_n_1(int idx)
 {
-    *tor_out = +mom_def_Cm_poly_paths[1] * mom_def_Cm_poly_paths[8] + mom_def_Cm_poly_paths[1] * mom_def_Cm_poly_paths[10] + mom_def_Cm_poly_paths[0] * mom_def_Cm_poly_paths[6] + mom_def_Cm_poly_paths[0] * mom_def_Cm_poly_paths[13] + mom_def_Cm_poly_paths[0] * mom_def_Cm_poly_paths[11] + mom_def_Cm_poly_paths[0] * mom_def_Cm_poly_paths[12] + mom_def_Cm_poly_paths[1] * mom_def_Cm_poly_paths[7] + mom_def_Cm_poly_paths[1] * mom_def_Cm_poly_paths[9] + mom_def_Cp_poly_paths[1] * mom_def_Cp_poly_paths[8] + mom_def_Cp_poly_paths[1] * mom_def_Cp_poly_paths[10] + mom_def_Cp_poly_paths[0] * mom_def_Cp_poly_paths[6] + mom_def_Cp_poly_paths[0] * mom_def_Cp_poly_paths[13] + mom_def_Cp_poly_paths[0] * mom_def_Cp_poly_paths[11] + mom_def_Cp_poly_paths[0] * mom_def_Cp_poly_paths[12] + mom_def_Cp_poly_paths[1] * mom_def_Cp_poly_paths[7] + mom_def_Cp_poly_paths[1] * mom_def_Cp_poly_paths[9];
+    return +cimag(tor_path_storage[1 + idx]) * cimag(tor_path_storage[8 + idx]) + cimag(tor_path_storage[1 + idx]) * cimag(tor_path_storage[10 + idx]) + cimag(tor_path_storage[0 + idx]) * cimag(tor_path_storage[6 + idx]) + cimag(tor_path_storage[0 + idx]) * cimag(tor_path_storage[13 + idx]) + cimag(tor_path_storage[0 + idx]) * cimag(tor_path_storage[11 + idx]) + cimag(tor_path_storage[0 + idx]) * cimag(tor_path_storage[12 + idx]) + cimag(tor_path_storage[1 + idx]) * cimag(tor_path_storage[7 + idx]) + cimag(tor_path_storage[1 + idx]) * cimag(tor_path_storage[9 + idx]) + creal(tor_path_storage[1 + idx]) * creal(tor_path_storage[8 + idx]) + creal(tor_path_storage[1 + idx]) * creal(tor_path_storage[10 + idx]) + creal(tor_path_storage[0 + idx]) * creal(tor_path_storage[6 + idx]) + creal(tor_path_storage[0 + idx]) * creal(tor_path_storage[13 + idx]) + creal(tor_path_storage[0 + idx]) * creal(tor_path_storage[11 + idx]) + creal(tor_path_storage[0 + idx]) * creal(tor_path_storage[12 + idx]) + creal(tor_path_storage[1 + idx]) * creal(tor_path_storage[7 + idx]) + creal(tor_path_storage[1 + idx]) * creal(tor_path_storage[9 + idx]);
 }
 
 static double complex poly4(int in)
@@ -403,9 +401,9 @@ static double complex poly5(int in)
     return p;
 }
 
-static void diPoly_p_0_0_1_Ir_3_C_1_n_1(double complex *tor_out)
+static inline double diPoly_p_0_0_1_Ir_3_C_1_n_1(int idx)
 {
-    *tor_out = +(-2.8284271247461901) * mom_def_Cm_poly_paths[4] * mom_def_Cp_poly_paths[1] + (-2.8284271247461901) * mom_def_Cm_poly_paths[5] * mom_def_Cp_poly_paths[1] + (2.8284271247461901) * mom_def_Cm_poly_paths[1] * mom_def_Cp_poly_paths[4] + (2.8284271247461901) * mom_def_Cm_poly_paths[1] * mom_def_Cp_poly_paths[5];
+    return +(-2.8284271247461901) * cimag(tor_path_storage[4 + idx]) * creal(tor_path_storage[1 + idx]) + (-2.8284271247461901) * cimag(tor_path_storage[5 + idx]) * creal(tor_path_storage[1 + idx]) + (2.8284271247461901) * cimag(tor_path_storage[1 + idx]) * creal(tor_path_storage[4 + idx]) + (2.8284271247461901) * cimag(tor_path_storage[1 + idx]) * creal(tor_path_storage[5 + idx]);
 }
 
 static double complex poly14(int in)
@@ -462,144 +460,621 @@ static double complex poly15(int in)
     return p;
 }
 
-static void diPoly_p_0_1_0_Ir_1_C_1_n_1(double complex *tor_out)
+static inline double diPoly_p_0_1_0_Ir_1_C_1_n_1(int idx)
 {
-    *tor_out = +(4.) * mom_def_Cm_poly_paths[0] * mom_def_Cm_poly_paths[14] + (4.) * mom_def_Cm_poly_paths[2] * mom_def_Cm_poly_paths[15] + (4.) * mom_def_Cp_poly_paths[0] * mom_def_Cp_poly_paths[14] + (4.) * mom_def_Cp_poly_paths[2] * mom_def_Cp_poly_paths[15];
+    return +(4.) * cimag(tor_path_storage[0 + idx]) * cimag(tor_path_storage[14 + idx]) + (4.) * cimag(tor_path_storage[2 + idx]) * cimag(tor_path_storage[15 + idx]) + (4.) * creal(tor_path_storage[0 + idx]) * creal(tor_path_storage[14 + idx]) + (4.) * creal(tor_path_storage[2 + idx]) * creal(tor_path_storage[15 + idx]);
+}
+
+static double complex poly3(int in)
+{
+    suNg *w1, *w2;
+    suNg res, res1;
+    int site = in;
+    double complex p;
+    wilson_lines *wl;
+
+    site = idn_wrk(site, 2);
+    w2 = pu_gauge_wrk(site, 2);
+
+    _suNg_dagger(res1, *w2);
+    w2 = &res1;
+    w1 = pu_gauge_wrk(site, 1);
+    _suNg_times_suNg(res, *w2, *w1);
+
+    site = iup_wrk(site, 1);
+    w1 = pu_gauge_wrk(site, 1);
+    _suNg_times_suNg(res1, res, *w1);
+
+    site = iup_wrk(site, 1);
+    w1 = pu_gauge_wrk(site, 2);
+    _suNg_times_suNg(res, res1, *w1);
+
+    wl = polyleg(in, 1);
+
+    _suNg_times_suNg(res1, res, wl->p[1]);
+    _suNg_trace(p, res1);
+    return p;
+}
+
+static double complex poly16(int in)
+{
+    suNg *w1, *w2;
+    suNg res, res1;
+    int site = in;
+    double complex p;
+    wilson_lines *wl;
+
+    w2 = pu_gauge_wrk(site, 2);
+
+    site = iup_wrk(site, 2);
+    w1 = pu_gauge_wrk(site, 1);
+    _suNg_times_suNg(res, *w2, *w1);
+
+    site = iup_wrk(site, 1);
+    w1 = pu_gauge_wrk(site, 1);
+    _suNg_times_suNg(res1, res, *w1);
+
+    site = iup_wrk(site, 1);
+    site = idn_wrk(site, 2);
+    w1 = pu_gauge_wrk(site, 2);
+    _suNg_times_suNg_dagger(res, res1, *w1);
+
+    wl = polyleg(in, 1);
+
+    _suNg_times_suNg(res1, res, wl->p[1]);
+    _suNg_trace(p, res1);
+    return p;
+}
+
+static double complex poly17(int in)
+{
+    suNg *w1, *w2;
+    suNg res, res1;
+    int site = in;
+    double complex p;
+    wilson_lines *wl;
+
+    site = idn_wrk(site, 3);
+    w2 = pu_gauge_wrk(site, 3);
+
+    _suNg_dagger(res1, *w2);
+    w2 = &res1;
+    w1 = pu_gauge_wrk(site, 1);
+    _suNg_times_suNg(res, *w2, *w1);
+
+    site = iup_wrk(site, 1);
+    w1 = pu_gauge_wrk(site, 1);
+    _suNg_times_suNg(res1, res, *w1);
+
+    site = iup_wrk(site, 1);
+    w1 = pu_gauge_wrk(site, 3);
+    _suNg_times_suNg(res, res1, *w1);
+
+    wl = polyleg(in, 1);
+
+    _suNg_times_suNg(res1, res, wl->p[1]);
+    _suNg_trace(p, res1);
+    return p;
+}
+
+static double complex poly18(int in)
+{
+    suNg *w1, *w2;
+    suNg res, res1;
+    int site = in;
+    double complex p;
+    wilson_lines *wl;
+
+    w2 = pu_gauge_wrk(site, 3);
+
+    site = iup_wrk(site, 3);
+    w1 = pu_gauge_wrk(site, 1);
+    _suNg_times_suNg(res, *w2, *w1);
+
+    site = iup_wrk(site, 1);
+    w1 = pu_gauge_wrk(site, 1);
+    _suNg_times_suNg(res1, res, *w1);
+
+    site = iup_wrk(site, 1);
+    site = idn_wrk(site, 3);
+    w1 = pu_gauge_wrk(site, 3);
+    _suNg_times_suNg_dagger(res, res1, *w1);
+
+    wl = polyleg(in, 1);
+
+    _suNg_times_suNg(res1, res, wl->p[1]);
+    _suNg_trace(p, res1);
+    return p;
+}
+
+static inline double diPoly_p_1_0_0_Ir_1_C_1_n_1(int idx)
+{
+    return +(2.) * cimag(tor_path_storage[0 + idx]) * cimag(tor_path_storage[3 + idx]) + (2.) * cimag(tor_path_storage[0 + idx]) * cimag(tor_path_storage[16 + idx]) + (2.) * cimag(tor_path_storage[0 + idx]) * cimag(tor_path_storage[17 + idx]) + (2.) * cimag(tor_path_storage[0 + idx]) * cimag(tor_path_storage[18 + idx]) + (2.) * creal(tor_path_storage[0 + idx]) * creal(tor_path_storage[3 + idx]) + (2.) * creal(tor_path_storage[0 + idx]) * creal(tor_path_storage[16 + idx]) + (2.) * creal(tor_path_storage[0 + idx]) * creal(tor_path_storage[17 + idx]) + (2.) * creal(tor_path_storage[0 + idx]) * creal(tor_path_storage[18 + idx]);
+}
+
+static double complex poly19(int in)
+{
+    suNg *w1, *w2;
+    suNg res, res1;
+    int site = in;
+    double complex p;
+    wilson_lines *wl;
+
+    w2 = pu_gauge_wrk(site, 2);
+
+    site = iup_wrk(site, 2);
+    w1 = pu_gauge_wrk(site, 1);
+    _suNg_times_suNg(res, *w2, *w1);
+
+    site = iup_wrk(site, 1);
+    site = idn_wrk(site, 2);
+    w1 = pu_gauge_wrk(site, 2);
+    _suNg_times_suNg_dagger(res1, res, *w1);
+
+    wl = polyleg(in, 1);
+
+    _suNg_times_suNg(res, res1, wl->p[0]);
+    _suNg_trace(p, res);
+    return p;
+}
+
+static double complex poly21(int in)
+{
+    suNg *w1, *w2;
+    suNg res, res1;
+    int site = in;
+    double complex p;
+    wilson_lines *wl;
+
+    site = idn_wrk(site, 3);
+    w2 = pu_gauge_wrk(site, 3);
+
+    _suNg_dagger(res1, *w2);
+    w2 = &res1;
+    w1 = pu_gauge_wrk(site, 1);
+    _suNg_times_suNg(res, *w2, *w1);
+
+    site = iup_wrk(site, 1);
+    w1 = pu_gauge_wrk(site, 3);
+    _suNg_times_suNg(res1, res, *w1);
+
+    wl = polyleg(in, 1);
+
+    _suNg_times_suNg(res, res1, wl->p[0]);
+    _suNg_trace(p, res);
+    return p;
+}
+
+static double complex poly22(int in)
+{
+    suNg *w1, *w2;
+    suNg res, res1;
+    int site = in;
+    double complex p;
+    wilson_lines *wl;
+
+    w2 = pu_gauge_wrk(site, 3);
+
+    site = iup_wrk(site, 3);
+    w1 = pu_gauge_wrk(site, 1);
+    _suNg_times_suNg(res, *w2, *w1);
+
+    site = iup_wrk(site, 1);
+    site = idn_wrk(site, 3);
+    w1 = pu_gauge_wrk(site, 3);
+    _suNg_times_suNg_dagger(res1, res, *w1);
+
+    wl = polyleg(in, 1);
+
+    _suNg_times_suNg(res, res1, wl->p[0]);
+    _suNg_trace(p, res);
+    return p;
+}
+
+static inline double diPoly_p_1_0_0_Ir_1_C_1_n_2(int idx)
+{
+    return +(2.) * cimag(tor_path_storage[0 + idx]) * cimag(tor_path_storage[14 + idx]) + (2.) * cimag(tor_path_storage[0 + idx]) * cimag(tor_path_storage[19 + idx]) + (2.) * cimag(tor_path_storage[0 + idx]) * cimag(tor_path_storage[21 + idx]) + (2.) * cimag(tor_path_storage[0 + idx]) * cimag(tor_path_storage[22 + idx]) + (2.) * creal(tor_path_storage[0 + idx]) * creal(tor_path_storage[14 + idx]) + (2.) * creal(tor_path_storage[0 + idx]) * creal(tor_path_storage[19 + idx]) + (2.) * creal(tor_path_storage[0 + idx]) * creal(tor_path_storage[21 + idx]) + (2.) * creal(tor_path_storage[0 + idx]) * creal(tor_path_storage[22 + idx]);
+}
+
+static double complex poly20(int in)
+{
+    suNg *w1, *w2;
+    suNg res, res1;
+    int site = in;
+    double complex p;
+    wilson_lines *wl;
+
+    w2 = pu_gauge_wrk(site, 2);
+
+    site = iup_wrk(site, 2);
+    w1 = pu_gauge_wrk(site, 3);
+    _suNg_times_suNg(res, *w2, *w1);
+
+    site = iup_wrk(site, 3);
+    site = idn_wrk(site, 2);
+    w1 = pu_gauge_wrk(site, 2);
+    _suNg_times_suNg_dagger(res1, res, *w1);
+
+    wl = polyleg(in, 3);
+
+    _suNg_times_suNg(res, res1, wl->p[0]);
+    _suNg_trace(p, res);
+    return p;
+}
+
+static inline double diPoly_p_1_0_1_Ir_1_C_1_n_1(int idx)
+{
+    return +cimag(tor_path_storage[0 + idx]) * cimag(tor_path_storage[14 + idx]) + cimag(tor_path_storage[2 + idx]) * cimag(tor_path_storage[15 + idx]) + cimag(tor_path_storage[0 + idx]) * cimag(tor_path_storage[19 + idx]) + cimag(tor_path_storage[2 + idx]) * cimag(tor_path_storage[20 + idx]) + creal(tor_path_storage[0 + idx]) * creal(tor_path_storage[14 + idx]) + creal(tor_path_storage[2 + idx]) * creal(tor_path_storage[15 + idx]) + creal(tor_path_storage[0 + idx]) * creal(tor_path_storage[19 + idx]) + creal(tor_path_storage[2 + idx]) * creal(tor_path_storage[20 + idx]);
+}
+
+static double complex poly23(int in)
+{
+    suNg *w1, *w2;
+    suNg res, res1;
+    int site = in;
+    double complex p;
+    wilson_lines *wl;
+
+    site = idn_wrk(site, 1);
+    w2 = pu_gauge_wrk(site, 1);
+
+    _suNg_dagger(res1, *w2);
+    w2 = &res1;
+    w1 = pu_gauge_wrk(site, 2);
+    _suNg_times_suNg(res, *w2, *w1);
+
+    site = iup_wrk(site, 2);
+    w1 = pu_gauge_wrk(site, 1);
+    _suNg_times_suNg(res1, res, *w1);
+
+    site = iup_wrk(site, 1);
+    site = idn_wrk(site, 3);
+    w1 = pu_gauge_wrk(site, 3);
+    _suNg_times_suNg_dagger(res, res1, *w1);
+
+    w1 = pu_gauge_wrk(site, 2);
+    _suNg_times_suNg(res1, res, *w1);
+
+    site = iup_wrk(site, 2);
+    w1 = pu_gauge_wrk(site, 3);
+    _suNg_times_suNg(res, res1, *w1);
+
+    wl = polyleg(in, 2);
+
+    _suNg_times_suNg(res1, res, wl->p[1]);
+    _suNg_trace(p, res1);
+    return p;
+}
+
+static double complex poly24(int in)
+{
+    suNg *w1, *w2;
+    suNg res, res1;
+    int site = in;
+    double complex p;
+    wilson_lines *wl;
+
+    site = idn_wrk(site, 2);
+    w2 = pu_gauge_wrk(site, 2);
+
+    _suNg_dagger(res1, *w2);
+    w2 = &res1;
+    w1 = pu_gauge_wrk(site, 1);
+    _suNg_times_suNg(res, *w2, *w1);
+
+    site = iup_wrk(site, 1);
+    w1 = pu_gauge_wrk(site, 2);
+    _suNg_times_suNg(res1, res, *w1);
+
+    site = iup_wrk(site, 2);
+    site = idn_wrk(site, 3);
+    w1 = pu_gauge_wrk(site, 3);
+    _suNg_times_suNg_dagger(res, res1, *w1);
+
+    w1 = pu_gauge_wrk(site, 1);
+    _suNg_times_suNg(res1, res, *w1);
+
+    site = iup_wrk(site, 1);
+    w1 = pu_gauge_wrk(site, 3);
+    _suNg_times_suNg(res, res1, *w1);
+
+    wl = polyleg(in, 1);
+
+    _suNg_times_suNg(res1, res, wl->p[1]);
+    _suNg_trace(p, res1);
+    return p;
+}
+
+static inline double diPoly_p_1_1_0_Ir_1_C_1_n_1(int idx)
+{
+    return +cimag(tor_path_storage[1 + idx]) * cimag(tor_path_storage[23 + idx]) + cimag(tor_path_storage[1 + idx]) * cimag(tor_path_storage[8 + idx]) + cimag(tor_path_storage[0 + idx]) * cimag(tor_path_storage[24 + idx]) + cimag(tor_path_storage[0 + idx]) * cimag(tor_path_storage[6 + idx]) + creal(tor_path_storage[1 + idx]) * creal(tor_path_storage[23 + idx]) + creal(tor_path_storage[1 + idx]) * creal(tor_path_storage[8 + idx]) + creal(tor_path_storage[0 + idx]) * creal(tor_path_storage[24 + idx]) + creal(tor_path_storage[0 + idx]) * creal(tor_path_storage[6 + idx]);
+}
+
+static double complex poly26(int in)
+{
+    suNg *w1, *w2;
+    suNg res, res1;
+    int site = in;
+    double complex p;
+    wilson_lines *wl;
+
+    site = idn_wrk(site, 1);
+    w2 = pu_gauge_wrk(site, 1);
+
+    _suNg_dagger(res1, *w2);
+    w2 = &res1;
+    site = idn_wrk(site, 3);
+    w1 = pu_gauge_wrk(site, 3);
+    _suNg_times_suNg_dagger(res, *w2, *w1);
+
+    w1 = pu_gauge_wrk(site, 2);
+    _suNg_times_suNg(res1, res, *w1);
+
+    site = iup_wrk(site, 2);
+    w1 = pu_gauge_wrk(site, 1);
+    _suNg_times_suNg(res, res1, *w1);
+
+    site = iup_wrk(site, 1);
+    w1 = pu_gauge_wrk(site, 3);
+    _suNg_times_suNg(res1, res, *w1);
+
+    wl = polyleg(in, 2);
+
+    _suNg_times_suNg(res, res1, wl->p[0]);
+    _suNg_trace(p, res);
+    return p;
+}
+
+static double complex poly27(int in)
+{
+    suNg *w1, *w2;
+    suNg res, res1;
+    int site = in;
+    double complex p;
+    wilson_lines *wl;
+
+    site = idn_wrk(site, 1);
+    w2 = pu_gauge_wrk(site, 1);
+
+    _suNg_dagger(res1, *w2);
+    w2 = &res1;
+    w1 = pu_gauge_wrk(site, 3);
+    _suNg_times_suNg(res, *w2, *w1);
+
+    site = iup_wrk(site, 3);
+    w1 = pu_gauge_wrk(site, 2);
+    _suNg_times_suNg(res1, res, *w1);
+
+    site = iup_wrk(site, 2);
+    w1 = pu_gauge_wrk(site, 1);
+    _suNg_times_suNg(res, res1, *w1);
+
+    site = iup_wrk(site, 1);
+    site = idn_wrk(site, 3);
+    w1 = pu_gauge_wrk(site, 3);
+    _suNg_times_suNg_dagger(res1, res, *w1);
+
+    wl = polyleg(in, 2);
+
+    _suNg_times_suNg(res, res1, wl->p[0]);
+    _suNg_trace(p, res);
+    return p;
+}
+
+static double complex poly28(int in)
+{
+    suNg *w1, *w2;
+    suNg res, res1;
+    int site = in;
+    double complex p;
+    wilson_lines *wl;
+
+    site = idn_wrk(site, 2);
+    w2 = pu_gauge_wrk(site, 2);
+
+    _suNg_dagger(res1, *w2);
+    w2 = &res1;
+    site = idn_wrk(site, 3);
+    w1 = pu_gauge_wrk(site, 3);
+    _suNg_times_suNg_dagger(res, *w2, *w1);
+
+    w1 = pu_gauge_wrk(site, 1);
+    _suNg_times_suNg(res1, res, *w1);
+
+    site = iup_wrk(site, 1);
+    w1 = pu_gauge_wrk(site, 2);
+    _suNg_times_suNg(res, res1, *w1);
+
+    site = iup_wrk(site, 2);
+    w1 = pu_gauge_wrk(site, 3);
+    _suNg_times_suNg(res1, res, *w1);
+
+    wl = polyleg(in, 1);
+
+    _suNg_times_suNg(res, res1, wl->p[0]);
+    _suNg_trace(p, res);
+    return p;
+}
+
+static double complex poly25(int in)
+{
+    suNg *w1, *w2;
+    suNg res, res1;
+    int site = in;
+    double complex p;
+    wilson_lines *wl;
+
+    site = idn_wrk(site, 2);
+    w2 = pu_gauge_wrk(site, 2);
+
+    _suNg_dagger(res1, *w2);
+    w2 = &res1;
+    w1 = pu_gauge_wrk(site, 3);
+    _suNg_times_suNg(res, *w2, *w1);
+
+    site = iup_wrk(site, 3);
+    w1 = pu_gauge_wrk(site, 1);
+    _suNg_times_suNg(res1, res, *w1);
+
+    site = iup_wrk(site, 1);
+    w1 = pu_gauge_wrk(site, 2);
+    _suNg_times_suNg(res, res1, *w1);
+
+    site = iup_wrk(site, 2);
+    site = idn_wrk(site, 3);
+    w1 = pu_gauge_wrk(site, 3);
+    _suNg_times_suNg_dagger(res1, res, *w1);
+
+    wl = polyleg(in, 1);
+
+    _suNg_times_suNg(res, res1, wl->p[0]);
+    _suNg_trace(p, res);
+    return p;
+}
+
+static inline double diPoly_p_1_1_0_Ir_1_C_1_n_2(int idx)
+{
+    return +cimag(tor_path_storage[1 + idx]) * cimag(tor_path_storage[26 + idx]) + cimag(tor_path_storage[1 + idx]) * cimag(tor_path_storage[27 + idx]) + cimag(tor_path_storage[0 + idx]) * cimag(tor_path_storage[28 + idx]) + cimag(tor_path_storage[0 + idx]) * cimag(tor_path_storage[25 + idx]) + creal(tor_path_storage[1 + idx]) * creal(tor_path_storage[26 + idx]) + creal(tor_path_storage[1 + idx]) * creal(tor_path_storage[27 + idx]) + creal(tor_path_storage[0 + idx]) * creal(tor_path_storage[28 + idx]) + creal(tor_path_storage[0 + idx]) * creal(tor_path_storage[25 + idx]);
 }
 
 static int last_t = -10;
 void request_space_tors_evaluation() { last_t = -10; }
-static void eval_time_momentum_torellons(int t, int px, int py, int pz)
+static void eval_time_momentum_torellons(int t, int px, int py, int pz, double complex *np)
 {
-    int n_x, n_y, n_z, idx, in;
-    double complex ce = 0.;
-    if (path_storage == NULL)
+    int nnx, nny, nnz, idx = 0, in;
+    double complex ce = I * 2.0 * PI / GLB_X;
+    if (tor_path_storage == NULL)
     {
-        path_storage = malloc(ntors * X * Y * Z * sizeof(double complex));
-        mom_def_Cp_poly_paths = malloc(ntors * sizeof(double complex));
-        mom_def_Cm_poly_paths = malloc(ntors * sizeof(double complex));
+        tor_path_storage = malloc(ntors * X * Y * Z * sizeof(double complex));
         for (in = 0; in < ntors * X * Y * Z; in++)
-            path_storage[in] = 0.;
-    }
-    for (in = 0; in < ntors; in++)
-    {
-        mom_def_Cp_poly_paths[in] = 0.;
-        mom_def_Cm_poly_paths[in] = 0.;
-    }
+            tor_path_storage[in] = 0.;
+    };
     if (t != last_t)
     {
         last_t = t;
-        for (n_y = 0; n_y < Y; n_y++)
-            for (n_z = 0; n_z < Z; n_z++)
-                for (n_x = 0; n_x < X; n_x++)
+        for (nny = 0; nny < Y; nny++)
+            for (nnz = 0; nnz < Z; nnz++)
+                for (nnx = 0; nnx < X; nnx++)
                 {
-                    in = ipt(t, n_x, n_y, n_z);
-                    ce = cexp(I * 2.0 * PI * (double)(n_x * px + n_y * py + n_z * pz) / GLB_X);
-                    idx = ntors * (n_x + X * (n_y + Y * n_z));
-                    path_storage[0 + idx] = poly0(in);
-                    mom_def_Cp_poly_paths[0] += ce * creal(path_storage[0 + idx]);
-                    mom_def_Cm_poly_paths[0] += I * ce * cimag(path_storage[0 + idx]);
-                    path_storage[6 + idx] = poly6(in);
-                    mom_def_Cp_poly_paths[6] += ce * creal(path_storage[6 + idx]);
-                    mom_def_Cm_poly_paths[6] += I * ce * cimag(path_storage[6 + idx]);
-                    path_storage[11 + idx] = poly11(in);
-                    mom_def_Cp_poly_paths[11] += ce * creal(path_storage[11 + idx]);
-                    mom_def_Cm_poly_paths[11] += I * ce * cimag(path_storage[11 + idx]);
-                    path_storage[12 + idx] = poly12(in);
-                    mom_def_Cp_poly_paths[12] += ce * creal(path_storage[12 + idx]);
-                    mom_def_Cm_poly_paths[12] += I * ce * cimag(path_storage[12 + idx]);
-                    path_storage[13 + idx] = poly13(in);
-                    mom_def_Cp_poly_paths[13] += ce * creal(path_storage[13 + idx]);
-                    mom_def_Cm_poly_paths[13] += I * ce * cimag(path_storage[13 + idx]);
-                    path_storage[14 + idx] = poly14(in);
-                    mom_def_Cp_poly_paths[14] += ce * creal(path_storage[14 + idx]);
-                    mom_def_Cm_poly_paths[14] += I * ce * cimag(path_storage[14 + idx]);
+                    in = ipt(t, nnx, nny, nnz);
+                    idx = ntors * (nnx + X * (nny + Y * nnz));
+                    tor_path_storage[0 + idx] = poly0(in);
+                    tor_path_storage[3 + idx] = poly3(in);
+                    tor_path_storage[6 + idx] = poly6(in);
+                    tor_path_storage[11 + idx] = poly11(in);
+                    tor_path_storage[12 + idx] = poly12(in);
+                    tor_path_storage[13 + idx] = poly13(in);
+                    tor_path_storage[14 + idx] = poly14(in);
+                    tor_path_storage[16 + idx] = poly16(in);
+                    tor_path_storage[17 + idx] = poly17(in);
+                    tor_path_storage[18 + idx] = poly18(in);
+                    tor_path_storage[19 + idx] = poly19(in);
+                    tor_path_storage[21 + idx] = poly21(in);
+                    tor_path_storage[22 + idx] = poly22(in);
+                    tor_path_storage[24 + idx] = poly24(in);
+                    tor_path_storage[25 + idx] = poly25(in);
+                    tor_path_storage[28 + idx] = poly28(in);
                 };
-        for (n_z = 0; n_z < Z; n_z++)
-            for (n_x = 0; n_x < X; n_x++)
-                for (n_y = 0; n_y < Y; n_y++)
+        for (nnz = 0; nnz < Z; nnz++)
+            for (nnx = 0; nnx < X; nnx++)
+                for (nny = 0; nny < Y; nny++)
                 {
-                    in = ipt(t, n_x, n_y, n_z);
-                    ce = cexp(I * 2.0 * PI * (double)(n_x * px + n_y * py + n_z * pz) / GLB_X);
-                    idx = ntors * (n_x + X * (n_y + Y * n_z));
-                    path_storage[1 + idx] = poly1(in);
-                    mom_def_Cp_poly_paths[1] += ce * creal(path_storage[1 + idx]);
-                    mom_def_Cm_poly_paths[1] += I * ce * cimag(path_storage[1 + idx]);
-                    path_storage[4 + idx] = poly4(in);
-                    mom_def_Cp_poly_paths[4] += ce * creal(path_storage[4 + idx]);
-                    mom_def_Cm_poly_paths[4] += I * ce * cimag(path_storage[4 + idx]);
-                    path_storage[5 + idx] = poly5(in);
-                    mom_def_Cp_poly_paths[5] += ce * creal(path_storage[5 + idx]);
-                    mom_def_Cm_poly_paths[5] += I * ce * cimag(path_storage[5 + idx]);
-                    path_storage[7 + idx] = poly7(in);
-                    mom_def_Cp_poly_paths[7] += ce * creal(path_storage[7 + idx]);
-                    mom_def_Cm_poly_paths[7] += I * ce * cimag(path_storage[7 + idx]);
-                    path_storage[8 + idx] = poly8(in);
-                    mom_def_Cp_poly_paths[8] += ce * creal(path_storage[8 + idx]);
-                    mom_def_Cm_poly_paths[8] += I * ce * cimag(path_storage[8 + idx]);
-                    path_storage[9 + idx] = poly9(in);
-                    mom_def_Cp_poly_paths[9] += ce * creal(path_storage[9 + idx]);
-                    mom_def_Cm_poly_paths[9] += I * ce * cimag(path_storage[9 + idx]);
-                    path_storage[10 + idx] = poly10(in);
-                    mom_def_Cp_poly_paths[10] += ce * creal(path_storage[10 + idx]);
-                    mom_def_Cm_poly_paths[10] += I * ce * cimag(path_storage[10 + idx]);
+                    in = ipt(t, nnx, nny, nnz);
+                    idx = ntors * (nnx + X * (nny + Y * nnz));
+                    tor_path_storage[1 + idx] = poly1(in);
+                    tor_path_storage[4 + idx] = poly4(in);
+                    tor_path_storage[5 + idx] = poly5(in);
+                    tor_path_storage[7 + idx] = poly7(in);
+                    tor_path_storage[8 + idx] = poly8(in);
+                    tor_path_storage[9 + idx] = poly9(in);
+                    tor_path_storage[10 + idx] = poly10(in);
+                    tor_path_storage[23 + idx] = poly23(in);
+                    tor_path_storage[26 + idx] = poly26(in);
+                    tor_path_storage[27 + idx] = poly27(in);
                 };
-        for (n_x = 0; n_x < X; n_x++)
-            for (n_y = 0; n_y < Y; n_y++)
-                for (n_z = 0; n_z < Z; n_z++)
+        for (nnx = 0; nnx < X; nnx++)
+            for (nny = 0; nny < Y; nny++)
+                for (nnz = 0; nnz < Z; nnz++)
                 {
-                    in = ipt(t, n_x, n_y, n_z);
-                    ce = cexp(I * 2.0 * PI * (double)(n_x * px + n_y * py + n_z * pz) / GLB_X);
-                    idx = ntors * (n_x + X * (n_y + Y * n_z));
-                    path_storage[2 + idx] = poly2(in);
-                    mom_def_Cp_poly_paths[2] += ce * creal(path_storage[2 + idx]);
-                    mom_def_Cm_poly_paths[2] += I * ce * cimag(path_storage[2 + idx]);
-                    path_storage[15 + idx] = poly15(in);
-                    mom_def_Cp_poly_paths[15] += ce * creal(path_storage[15 + idx]);
-                    mom_def_Cm_poly_paths[15] += I * ce * cimag(path_storage[15 + idx]);
+                    in = ipt(t, nnx, nny, nnz);
+                    idx = ntors * (nnx + X * (nny + Y * nnz));
+                    tor_path_storage[2 + idx] = poly2(in);
+                    tor_path_storage[15 + idx] = poly15(in);
+                    tor_path_storage[20 + idx] = poly20(in);
                 };
-    }
-    else
+    };
+    if (px == 0 && py == 0 && pz == 0)
     {
-        for (n_x = 0; n_x < X; n_x++)
-            for (n_y = 0; n_y < Y; n_y++)
-                for (n_z = 0; n_z < Z; n_z++)
+        np[0] = 0.0;
+        for (nnx = 0; nnx < X; nnx++)
+            for (nny = 0; nny < Y; nny++)
+                for (nnz = 0; nnz < Z; nnz++)
                 {
-                    in = ipt(t, n_x, n_y, n_z);
-                    ce = cexp(I * 2.0 * PI * (double)(n_x * px + n_y * py + n_z * pz) / GLB_X);
-                    idx = ntors * (n_x + X * (n_y + Y * n_z));
-                    mom_def_Cp_poly_paths[0] += ce * creal(path_storage[0 + idx]);
-                    mom_def_Cm_poly_paths[0] += I * ce * cimag(path_storage[0 + idx]);
-                    mom_def_Cp_poly_paths[1] += ce * creal(path_storage[1 + idx]);
-                    mom_def_Cm_poly_paths[1] += I * ce * cimag(path_storage[1 + idx]);
-                    mom_def_Cp_poly_paths[2] += ce * creal(path_storage[2 + idx]);
-                    mom_def_Cm_poly_paths[2] += I * ce * cimag(path_storage[2 + idx]);
-                    mom_def_Cp_poly_paths[4] += ce * creal(path_storage[4 + idx]);
-                    mom_def_Cm_poly_paths[4] += I * ce * cimag(path_storage[4 + idx]);
-                    mom_def_Cp_poly_paths[5] += ce * creal(path_storage[5 + idx]);
-                    mom_def_Cm_poly_paths[5] += I * ce * cimag(path_storage[5 + idx]);
-                    mom_def_Cp_poly_paths[6] += ce * creal(path_storage[6 + idx]);
-                    mom_def_Cm_poly_paths[6] += I * ce * cimag(path_storage[6 + idx]);
-                    mom_def_Cp_poly_paths[7] += ce * creal(path_storage[7 + idx]);
-                    mom_def_Cm_poly_paths[7] += I * ce * cimag(path_storage[7 + idx]);
-                    mom_def_Cp_poly_paths[8] += ce * creal(path_storage[8 + idx]);
-                    mom_def_Cm_poly_paths[8] += I * ce * cimag(path_storage[8 + idx]);
-                    mom_def_Cp_poly_paths[9] += ce * creal(path_storage[9 + idx]);
-                    mom_def_Cm_poly_paths[9] += I * ce * cimag(path_storage[9 + idx]);
-                    mom_def_Cp_poly_paths[10] += ce * creal(path_storage[10 + idx]);
-                    mom_def_Cm_poly_paths[10] += I * ce * cimag(path_storage[10 + idx]);
-                    mom_def_Cp_poly_paths[11] += ce * creal(path_storage[11 + idx]);
-                    mom_def_Cm_poly_paths[11] += I * ce * cimag(path_storage[11 + idx]);
-                    mom_def_Cp_poly_paths[12] += ce * creal(path_storage[12 + idx]);
-                    mom_def_Cm_poly_paths[12] += I * ce * cimag(path_storage[12 + idx]);
-                    mom_def_Cp_poly_paths[13] += ce * creal(path_storage[13 + idx]);
-                    mom_def_Cm_poly_paths[13] += I * ce * cimag(path_storage[13 + idx]);
-                    mom_def_Cp_poly_paths[14] += ce * creal(path_storage[14 + idx]);
-                    mom_def_Cm_poly_paths[14] += I * ce * cimag(path_storage[14 + idx]);
-                    mom_def_Cp_poly_paths[15] += ce * creal(path_storage[15 + idx]);
-                    mom_def_Cm_poly_paths[15] += I * ce * cimag(path_storage[15 + idx]);
+                    idx = ntors * (nnx + X * (nny + Y * nnz));
+                    np[0] += diPoly_p_0_0_0_Ir_1_C_1_n_1(idx);
                 };
-    }
+    };
+    if (px == 0 && py == 0 && pz == 1)
+    {
+        np[1] = 0.0;
+        np[2] = 0.0;
+        for (nnx = 0; nnx < X; nnx++)
+            for (nny = 0; nny < Y; nny++)
+                for (nnz = 0; nnz < Z; nnz++)
+                {
+                    idx = ntors * (nnx + X * (nny + Y * nnz));
+                    np[1] += cexp(ce * (double)(nnz)) * diPoly_p_0_0_1_Ir_1_C_1_n_1(idx);
+                    np[2] += cexp(ce * (double)(nnz)) * diPoly_p_0_0_1_Ir_3_C_1_n_1(idx);
+                };
+    };
+    if (px == 0 && py == 1 && pz == 0)
+    {
+        np[3] = 0.0;
+        for (nnx = 0; nnx < X; nnx++)
+            for (nny = 0; nny < Y; nny++)
+                for (nnz = 0; nnz < Z; nnz++)
+                {
+                    idx = ntors * (nnx + X * (nny + Y * nnz));
+                    np[3] += cexp(ce * (double)(nny)) * diPoly_p_0_1_0_Ir_1_C_1_n_1(idx);
+                };
+    };
+    if (px == 1 && py == 0 && pz == 0)
+    {
+        np[4] = 0.0;
+        np[5] = 0.0;
+        for (nnx = 0; nnx < X; nnx++)
+            for (nny = 0; nny < Y; nny++)
+                for (nnz = 0; nnz < Z; nnz++)
+                {
+                    idx = ntors * (nnx + X * (nny + Y * nnz));
+                    np[4] += cexp(ce * (double)(nnx)) * diPoly_p_1_0_0_Ir_1_C_1_n_1(idx);
+                    np[5] += cexp(ce * (double)(nnx)) * diPoly_p_1_0_0_Ir_1_C_1_n_2(idx);
+                };
+    };
+    if (px == 1 && py == 0 && pz == 1)
+    {
+        np[6] = 0.0;
+        for (nnx = 0; nnx < X; nnx++)
+            for (nny = 0; nny < Y; nny++)
+                for (nnz = 0; nnz < Z; nnz++)
+                {
+                    idx = ntors * (nnx + X * (nny + Y * nnz));
+                    np[6] += cexp(ce * (double)(nnx + nnz)) * diPoly_p_1_0_1_Ir_1_C_1_n_1(idx);
+                };
+    };
+    if (px == 1 && py == 1 && pz == 0)
+    {
+        np[7] = 0.0;
+        np[8] = 0.0;
+        for (nnx = 0; nnx < X; nnx++)
+            for (nny = 0; nny < Y; nny++)
+                for (nnz = 0; nnz < Z; nnz++)
+                {
+                    idx = ntors * (nnx + X * (nny + Y * nnz));
+                    np[7] += cexp(ce * (double)(nnx + nny)) * diPoly_p_1_1_0_Ir_1_C_1_n_1(idx);
+                    np[8] += cexp(ce * (double)(nnx + nny)) * diPoly_p_1_1_0_Ir_1_C_1_n_2(idx);
+                };
+    };
 };
 void eval_all_torellon_ops(int t, double complex *numerical_tor_out)
 {
@@ -609,15 +1084,15 @@ void eval_all_torellon_ops(int t, double complex *numerical_tor_out)
         numerical_op = malloc(total_n_tor_op * sizeof(double complex));
     }
     request_space_tors_evaluation();
-    eval_time_momentum_torellons(t, 0, 0, 0);
-    diPoly_p_0_0_0_Ir_1_C_1_n_1(numerical_op + 0);
-    eval_time_momentum_torellons(t, 0, 0, 1);
-    diPoly_p_0_0_1_Ir_1_C_1_n_1(numerical_op + 1);
-    diPoly_p_0_0_1_Ir_3_C_1_n_1(numerical_op + 2);
-    eval_time_momentum_torellons(t, 0, 1, 0);
-    diPoly_p_0_1_0_Ir_1_C_1_n_1(numerical_op + 3);
+    eval_time_momentum_torellons(t, 0, 0, 0, numerical_op);
+    eval_time_momentum_torellons(t, 0, 0, 1, numerical_op);
+    eval_time_momentum_torellons(t, 0, 0, 1, numerical_op);
+    eval_time_momentum_torellons(t, 0, 1, 0, numerical_op);
+    eval_time_momentum_torellons(t, 1, 0, 0, numerical_op);
+    eval_time_momentum_torellons(t, 1, 0, 1, numerical_op);
+    eval_time_momentum_torellons(t, 1, 1, 0, numerical_op);
     for (int i = 0; i < total_n_tor_op; i++)
-        *(numerical_tor_out + i) += *(numerical_op + i);
+        numerical_tor_out[i] += numerical_op[i];
 }
 
 void collect_1pt_torellon_functions(cor_list *lcor, double complex *tor_storage)
@@ -783,6 +1258,42 @@ void collect_1pt_torellon_functions(cor_list *lcor, double complex *tor_storage)
                         cimag(tor1_bf[i + total_n_tor_op * listactive[n1]]));
             lprintf("Measure ML", 0, "\n");
         }
+
+    lprintf("Measure ML", 0, "\n1ptTor function P=(1,0,0) Irrep=A1Dic4 Irrep ev=1/1 Charge=+ nop=%d\n", 2);
+    lprintf("Measure ML", 0, "Tor id= 4 5 \n");
+    for (n1 = 0; n1 < GLB_T; n1++)
+        if (listactive[n1] > -1)
+        {
+            lprintf("Measure ML", 0, " t=%d", n1);
+            for (i = 4; i < 6; i++)
+                lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(tor1_bf[i + total_n_tor_op * listactive[n1]]),
+                        cimag(tor1_bf[i + total_n_tor_op * listactive[n1]]));
+            lprintf("Measure ML", 0, "\n");
+        }
+
+    lprintf("Measure ML", 0, "\n1ptTor function P=(1,0,1) Irrep=A1Dic2 Irrep ev=1/1 Charge=+ nop=%d\n", 1);
+    lprintf("Measure ML", 0, "Tor id= 6 \n");
+    for (n1 = 0; n1 < GLB_T; n1++)
+        if (listactive[n1] > -1)
+        {
+            lprintf("Measure ML", 0, " t=%d", n1);
+            for (i = 6; i < 7; i++)
+                lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(tor1_bf[i + total_n_tor_op * listactive[n1]]),
+                        cimag(tor1_bf[i + total_n_tor_op * listactive[n1]]));
+            lprintf("Measure ML", 0, "\n");
+        }
+
+    lprintf("Measure ML", 0, "\n1ptTor function P=(1,1,0) Irrep=A1Dic2 Irrep ev=1/1 Charge=+ nop=%d\n", 2);
+    lprintf("Measure ML", 0, "Tor id= 7 8 \n");
+    for (n1 = 0; n1 < GLB_T; n1++)
+        if (listactive[n1] > -1)
+        {
+            lprintf("Measure ML", 0, " t=%d", n1);
+            for (i = 7; i < 9; i++)
+                lprintf("Measure ML", 0, " ( %.10e %.10e )", creal(tor1_bf[i + total_n_tor_op * listactive[n1]]),
+                        cimag(tor1_bf[i + total_n_tor_op * listactive[n1]]));
+            lprintf("Measure ML", 0, "\n");
+        }
 }
 void report_tor_group_setup()
 {
@@ -794,4 +1305,10 @@ void report_tor_group_setup()
     lprintf("INIT Measure ML", 0, " |2=-xyyx,na|");
     lprintf("INIT Measure ML", 0, "\n1pt_tor Irrep multiplets Total P=(0,1,0) Irrep=A1Dic4 Charge=+");
     lprintf("INIT Measure ML", 0, " |3=-yxy|");
+    lprintf("INIT Measure ML", 0, "\n1pt_tor Irrep multiplets Total P=(1,0,0) Irrep=A1Dic4 Charge=+");
+    lprintf("INIT Measure ML", 0, " |4=-yxxy|5=-yxy|");
+    lprintf("INIT Measure ML", 0, "\n1pt_tor Irrep multiplets Total P=(1,0,1) Irrep=A1Dic2 Charge=+");
+    lprintf("INIT Measure ML", 0, " |6=-yxy|");
+    lprintf("INIT Measure ML", 0, "\n1pt_tor Irrep multiplets Total P=(1,1,0) Irrep=A1Dic2 Charge=+");
+    lprintf("INIT Measure ML", 0, " |7=-xyx-zyz|8=-x-zyxz|");
 }

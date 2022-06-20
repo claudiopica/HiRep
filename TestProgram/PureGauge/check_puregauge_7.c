@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
   for (n = 0; n < T * total_n_tor_op; n++)
     dop[n] -= dop1[n];
 
-  lprintf("MAIN", 0, "Checking gauge invariance of the %d torellon operators on each timeslice.\n ", total_n_tor_op);
+  lprintf("MAIN", 0, "Checking gauge invariance of the %d torellon operators on each timeslice.\n", total_n_tor_op);
 
   double max_diff[2];
   double min_size;
@@ -129,8 +129,12 @@ int main(int argc, char *argv[])
       return_value++;
     if (fabs(cimag(dop[n])) > 1.e-12)
       return_value++;
-    if (sqrt(creal(dop1[n]) * creal(dop1[n]) + cimag(dop1[n]) * cimag(dop1[n])) < 10.e-14)
+    lprintf("MAIN", 0, "t=%d op=%d %.10e %.10e\n", n / total_n_tor_op, n % total_n_tor_op, creal(dop1[n]), cimag(dop1[n]));
+
+    if (sqrt(creal(dop1[n]) * creal(dop1[n]) + cimag(dop1[n]) * cimag(dop1[n])) < 10.e-10)
+    {
       return_value++;
+    }
   }
   global_sum_int(&return_value, 1);
   global_max(max_diff, 2);
