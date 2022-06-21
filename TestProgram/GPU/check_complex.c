@@ -23,7 +23,6 @@
 #include "test_complex.h"
 
 int main(int argc, char *argv[]){
-//    int test0;
     int test1;
     int gpu_test1;
     int test2;
@@ -44,8 +43,7 @@ int main(int argc, char *argv[]){
     int test16;
     int test17;
     int test18;
-    printf("%lu \n", sizeof(double complex));
-//    test0 = test_gpu_complex();
+
     test1 = test_overload_plus_rhs_double();
     gpu_test1 = test_overload_plus_rhs_double_gpu();
     test2 = test_overload_plus_lhs_double();
@@ -67,7 +65,6 @@ int main(int argc, char *argv[]){
     test17 = test_I_add();
     test18 = test_I_prod();
 
-//    printf("test0: %d\n", test0);
     printf("test1: %d\n", test1);
     printf("gpu_test1: %d\n", gpu_test1);
     printf("test2: %d\n", test2);

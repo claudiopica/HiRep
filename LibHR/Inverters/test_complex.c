@@ -5,22 +5,11 @@
 extern "C" {
 #endif
 
-/*
-int test_gpu_complex(){
-    hr_complex_int c = hr_complex_int(1, 2);
-    int result = 1;
-    if (c.is_gpu_complex){
-        result = 0;
-    }
-    return result;
-}
-*/
 int test_overload_plus_rhs_double(){
     int result = 0;
     hr_complex c = hr_complex(1.1, 2.2);
     hr_complex a;
     double b = 3.3;
-    printf("%lu \n", sizeof(c));
     a = c + b;
     if (abs(4.4 -  a.re) > pow(10, -6)){
         result += int(pow(10, 0));
