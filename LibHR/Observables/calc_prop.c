@@ -85,10 +85,10 @@ static double *mass;
 static spinor_field *QMR_noise;
 static spinor_field *QMR_resdn;
 #endif
-static spinor_field *resd;
+static spinor_field *resd_even;
 static spinor_field *tmp_even = NULL;
 static spinor_field *tmp_odd = NULL;
-// static spinor_field *tmp_odd2 = NULL;
+static spinor_field *tmp_even2 = NULL;
 // static spinor_field *tmp_norm = NULL;
 
 // EVA parameters
@@ -142,8 +142,9 @@ void init_propagator_eo(int nm, double *m, double acc)
     QMR_par.err2 = .5 * acc;
     QMR_par.max_iter = 0;
 
-    resd = alloc_spinor_field_f(QMR_par.n, &glat_even);
+    resd_even = alloc_spinor_field_f(QMR_par.n, &glat_even);
     tmp_even = alloc_spinor_field_f(1, &glat_even);
+    tmp_even2 = alloc_spinor_field_f(1, &glat_even);
     tmp_odd = alloc_spinor_field_f(1, &glat_odd);
 
 #ifdef GAUSSIAN_NOISE
@@ -180,10 +181,10 @@ void free_propagator_eo()
     free_spinor_field_f(tmp_even);
     tmp_even = NULL;
   }
-  if (resd != NULL)
+  if (resd_even != NULL)
   {
-    free_spinor_field_f(resd);
-    resd = NULL;
+    free_spinor_field_f(resd_even);
+    resd_even = NULL;
   }
   if (tmp_odd != NULL)
   {
@@ -233,7 +234,7 @@ static void calc_propagator_eo_core(spinor_field *psi, spinor_field *eta, int so
   {
     for (i = 0; i < QMR_par.n; ++i)
     {
-      spinor_field_zero_f(&resd[i]);
+      spinor_field_zero_f(&resd_even[i]);
     }
   }
   else
@@ -241,7 +242,7 @@ static void calc_propagator_eo_core(spinor_field *psi, spinor_field *eta, int so
     for (i = 0; i < QMR_par.n; ++i)
     {
       psi[i].type = &glat_even;
-      spinor_field_mul_f(&resd[i], 1 / (4. + mass[i]), &psi[i]);
+      spinor_field_mul_f(&resd_even[i], 1 / (4. + mass[i]), &psi[i]);
       psi[i].type = &glattice;
     }
   }
@@ -252,31 +253,31 @@ static void calc_propagator_eo_core(spinor_field *psi, spinor_field *eta, int so
     spinor_field_copy_f(&qprop_mask, tmp_even);
     spinor_field_g5_assign_f(&qprop_mask);
     H_pre(tmp_even, &qprop_mask);
-    cgiter += cg_mshift(&QMR_par, &H2_pre, tmp_even, resd);
+    cgiter += cg_mshift(&QMR_par, &H2_pre, tmp_even, resd_even);
   }
   else if (solver == _MINRES)
   {
     spinor_field_g5_f(tmp_even, tmp_even);
-    cgiter += MINRES_mshift(&QMR_par, &H_pre, tmp_even, resd);
+    cgiter += MINRES_mshift(&QMR_par, &H_pre, tmp_even, resd_even);
   }
   else
   {
-    cgiter += g5QMR_mshift(&QMR_par, &D_pre, tmp_even, resd);
+    cgiter += g5QMR_mshift(&QMR_par, &D_pre, tmp_even, resd_even);
   }
 
   for (i = 0; i < QMR_par.n; ++i)
   {
 #ifdef GAUSSIAN_NOISE
-    spinor_field_sub_assign_f(&resd[i], &QMR_resdn[i]);
+    spinor_field_sub_assign_f(&resd_even[i], &QMR_resdn[i]);
 #endif
     /* compute solution */
     qprop_mask = psi[i];
     qprop_mask.type = &glat_even;
-    spinor_field_mul_f(&qprop_mask, (4. + mass[i]), &resd[i]);
+    spinor_field_mul_f(&qprop_mask, (4. + mass[i]), &resd_even[i]);
     qprop_mask.type = &glat_odd;
     qprop_mask.ptr = psi[i].ptr + glat_odd.master_shift;
     spinor_field_zero_f(&qprop_mask);
-    Dphi_(&qprop_mask, &resd[i]);
+    Dphi_(&qprop_mask, &resd_even[i]);
     spinor_field_minus_f(&qprop_mask, &qprop_mask);
     if (i & 1)
       ++cgiter; /* count only half of calls. works because the number of sources is even */
@@ -315,22 +316,22 @@ static void calc_propagator_core(spinor_field *psi, spinor_field *eta, int solve
 #ifdef GAUSSIAN_NOISE
   spinor_field_add_assign_f(tmp_even, QMR_noise);
 #endif
-  // spinor_field_sub_f(resd,&qprop_mask_eta,tmp_even);
+  // spinor_field_sub_f(resd_even,&qprop_mask_eta,tmp_even);
 
   // if the solution vector is empty use zero guess
   if (spinor_field_sqnorm_f(psi) < 1e-28)
   {
-    spinor_field_zero_f(resd);
+    spinor_field_zero_f(resd_even);
   }
   else
   {
     psi[0].type = &glat_even;
-    spinor_field_mul_f(resd, 1 / (4. + mass[0]), psi);
+    spinor_field_mul_f(resd_even, 1 / (4. + mass[0]), psi);
     psi[0].type = &glattice;
   }
 
 #ifdef GAUSSIAN_NOISE
-  cgiter += g5QMR_mshift(&QMR_par, &D_pre, tmp_even, resd);
+  cgiter += g5QMR_mshift(&QMR_par, &D_pre, tmp_even, resd_even);
 #else
   if (solver == _CG)
   {
@@ -338,33 +339,33 @@ static void calc_propagator_core(spinor_field *psi, spinor_field *eta, int solve
     spinor_field_copy_f(&qprop_mask_eta, tmp_even);
     spinor_field_g5_assign_f(&qprop_mask_eta);
     H_pre(tmp_even, &qprop_mask_eta);
-    cgiter += cg_mshift(&QMR_par, &H2_pre, tmp_even, resd);
+    cgiter += cg_mshift(&QMR_par, &H2_pre, tmp_even, resd_even);
   }
   else if (solver == _MINRES)
   {
     spinor_field_g5_f(tmp_even, tmp_even);
-    cgiter += MINRES_mshift(&QMR_par, &H_pre, tmp_even, resd);
+    cgiter += MINRES_mshift(&QMR_par, &H_pre, tmp_even, resd_even);
   }
   else
   {
-    cgiter += g5QMR_mshift(&QMR_par, &D_pre, tmp_even, resd);
+    cgiter += g5QMR_mshift(&QMR_par, &D_pre, tmp_even, resd_even);
   }
 
   // spinor_field_g5_f(tmp_even,tmp_even);
-  // cgiter+=MINRES_mshift(&QMR_par, &H_pre, tmp_even, resd);
+  // cgiter+=MINRES_mshift(&QMR_par, &H_pre, tmp_even, resd_even);
 
-  // cgiter+=g5QMR_mshift(&QMR_par, &D_pre, tmp_even, resd);
+  // cgiter+=g5QMR_mshift(&QMR_par, &D_pre, tmp_even, resd_even);
 
   // cg stuff
   /*qprop_mask_eta.type=&glat_even;
   spinor_field_copy_f( &qprop_mask_eta, tmp_even );
   spinor_field_g5_assign_f( &qprop_mask_eta );
   H_pre(tmp_even, &qprop_mask_eta);
-  cgiter+=cg_mshift(&QMR_par, &H2_pre, tmp_even, resd);*/
+  cgiter+=cg_mshift(&QMR_par, &H2_pre, tmp_even, resd_even);*/
 #endif
 
 #ifdef GAUSSIAN_NOISE
-  spinor_field_sub_assign_f(resd, QMR_resdn);
+  spinor_field_sub_assign_f(resd_even, QMR_resdn);
 #endif
   /* compute solution
      psi_even = D_ee*resd_e
@@ -373,11 +374,11 @@ static void calc_propagator_core(spinor_field *psi, spinor_field *eta, int solve
 
   qprop_mask_psi = *psi;
   qprop_mask_psi.type = &glat_even;
-  spinor_field_mul_f(&qprop_mask_psi, (4. + mass[0]), resd);
+  spinor_field_mul_f(&qprop_mask_psi, (4. + mass[0]), resd_even);
 
   qprop_mask_psi.type = &glat_odd;
   qprop_mask_psi.ptr = psi->ptr + glat_odd.master_shift;
-  Dphi_(&qprop_mask_psi, resd);
+  Dphi_(&qprop_mask_psi, resd_even);
 
   spinor_field_sub_f(&qprop_mask_psi, tmp_odd, &qprop_mask_psi);
 
@@ -621,6 +622,10 @@ void calc_deflated_propagator(spinor_field *psi, spinor_field *eta, int ndilute,
 
 static void calc_propagator_eo_tw_core(spinor_field *psi, spinor_field *eta, int solver)
 {
+#ifndef CHECK_SPINOR_MATCHING
+  error(eta->type == &glattice, 1, "calc_propagator_eo_tw_core [calc_prop.c]", "incorrect type for the input (eta) spinor");
+  error(psi->type == &glattice, 1, "calc_propagator_eo_tw_core [calc_prop.c]", "incorrect type for the input (psi) spinor");
+#endif
 
   spinor_field qprop_mask_eta;
   spinor_field qprop_mask_psi;
@@ -634,58 +639,58 @@ static void calc_propagator_eo_tw_core(spinor_field *psi, spinor_field *eta, int
   qprop_mask_eta.type = &glat_odd;
   qprop_mask_eta.ptr = eta->ptr + glat_odd.master_shift;
 
-  spinor_field_copy_f(tmp_odd, &qprop_mask_eta);
-  Dxx_tw_inv(mass[0], tw_mass, tmp_odd, tmp_odd, DIRECT);
+  Dxx_tw_inv(mass[0], tw_mass, tmp_odd, &qprop_mask_eta, DIRECT);
 
   Dphi_(tmp_even, tmp_odd);
   qprop_mask_eta.type = &glat_even;
   qprop_mask_eta.ptr = eta->ptr;
 
-  spinor_field_sub_f(tmp_even, &qprop_mask_eta, tmp_even);
-
+  spinor_field_sub_assign_f(tmp_even, &qprop_mask_eta);
+  // Note tmp_even = - eta_even'
   // if the solution vector is empty use zero guess
 
   if (spinor_field_sqnorm_f(psi) < 1e-28)
   {
-    spinor_field_zero_f(resd);
+    spinor_field_zero_f(resd_even);
   }
   else
   {
 
     psi[0].type = &glat_even;
-    spinor_field_copy_f(resd, psi);
-    Dxx_tw_inv(mass[0], tw_mass, resd, resd, DAGGER);
+    Dxx_tw_inv(mass[0], tw_mass, resd_even, psi, DAGGER);
     psi[0].type = &glattice;
   }
 
   if (solver == _CG)
   {
     qprop_mask_eta.type = &glat_even;
-    spinor_field_copy_f(&qprop_mask_eta, tmp_even);
-    spinor_field_g5_assign_f(&qprop_mask_eta);
-    Q_eopre_tw_dag(tmp_even, &qprop_mask_eta);
-    cgiter += cg_mshift(&QMR_par, &Q2_eopre_tw, tmp_even, resd);
+
+    spinor_field_g5_f(tmp_even2, tmp_even);
+
+    Q_eopre_tw_dag(tmp_even, tmp_even2);
+
+    cgiter += cg_mshift(&QMR_par, &Q2_eopre_tw, tmp_even, resd_even);
   }
   else if (solver == _MINRES)
   {
     spinor_field_g5_f(tmp_even, tmp_even);
-    cgiter += MINRES_mshift(&QMR_par, &Q_eopre_tw, tmp_even, resd);
+    cgiter += MINRES_mshift(&QMR_par, &Q_eopre_tw, tmp_even, resd_even);
   }
   else
   {
-    error(1 == 1, 0, "[calc_propagator_eo_tw_core]", "Invereter not implemeted");
-    //    cgiter+=g5QMR_mshift(&QMR_par, &D_pre, tmp_even, resd);
+    error(1 == 1, 0, "[calc_propagator_eo_tw_core]", "Invereter not implemented");
   }
-  // done_up_to_here (already implemented but to be checked)
+
   /* compute solution
-     psi_even = D_ee^dag*resd_e
+     psi_even = D_ee^dag(-resd_e)
      psi_odd = D_oo^-1*eta_odd-Doo^-1 D_oe psi_even
   */
 
+  Dxx_tw_inv(mass[0], tw_mass, resd_even, resd_even, DIRECT);
+
   qprop_mask_psi = *psi;
   qprop_mask_psi.type = &glat_even;
-  Dxx_tw_inv(mass[0], tw_mass, resd, resd, DIRECT);
-  spinor_field_mul_f(&qprop_mask_psi, ((4. + mass[0]) * (4. + mass[0]) + tw_mass * tw_mass), resd);
+  spinor_field_mul_f(&qprop_mask_psi, -((4. + mass[0]) * (4. + mass[0]) + tw_mass * tw_mass), resd_even);
 
   qprop_mask_psi.type = &glat_odd;
   qprop_mask_psi.ptr = psi->ptr + glat_odd.master_shift;
@@ -696,7 +701,6 @@ static void calc_propagator_eo_tw_core(spinor_field *psi, spinor_field *eta, int
 
   qprop_mask_psi.type = &glat_even;
   qprop_mask_psi.ptr = psi->ptr;
-
   Dphi_(tmp_odd, &qprop_mask_psi);
   Dxx_tw_inv(mass[0], tw_mass, tmp_odd, tmp_odd, DIRECT);
 
@@ -710,8 +714,11 @@ static void calc_propagator_eo_tw_core(spinor_field *psi, spinor_field *eta, int
 
   start_sf_sendrecv(psi);
   complete_sf_sendrecv(psi);
-}
 
+#ifndef CHECK_SPINOR_MATCHING
+  error(psi->type == &glattice, 1, "calc_propagator_eo_tw_core [calc_prop.c]", "incorrect type for the input (psi) spinor");
+#endif
+}
 void calc_propagator_tw(double *lmass, double mu, spinor_field *psi, spinor_field *eta, int ndilute)
 {
   error(init == 0, 1, "calc_propagator_tw", "propagator not initialized!");
@@ -725,6 +732,7 @@ void calc_propagator_tw(double *lmass, double mu, spinor_field *psi, spinor_fiel
 
 #ifndef CHECK_SPINOR_MATCHING
   error(eta->type == &glattice, 1, "calc_propagator_tw [calc_prop.c]", "incorrect type for the input (eta) spinor");
+  error(psi->type == &glattice, 1, "calc_propagator_tw [calc_prop.c]", "incorrect type for the input (psi) spinor");
 #endif
 
 #ifdef WITH_CLOVER
@@ -740,8 +748,8 @@ void calc_propagator_tw(double *lmass, double mu, spinor_field *psi, spinor_fiel
     complete_sf_sendrecv(eta + beta);
     for (i = 0; i < n_masses; ++i)
     {
-      lprintf("CALC_PROPAGATOR_TW", 10, "n masses=%d, mass = %g\n", n_masses, m[0]);
-      hmass_pre = m[0];
+      lprintf("CALC_PROPAGATOR_TW", 10, "n masses=%d, mass = %g\n", n_masses, m[i]);
+      hmass_pre = m[i];
       calc_propagator_eo_tw_core(&psi[beta * n_masses + i], &eta[beta], _CG);
 
       m++;

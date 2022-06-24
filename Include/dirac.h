@@ -94,8 +94,6 @@ typedef enum
 } tw_D_type;
 
 void Dxx_tw_inv(double mass, double twmass, spinor_field *out, spinor_field *in, tw_D_type tw_type);
-void Dphi_tw(double m0, double mu, spinor_field *out, spinor_field *in);
-void g5Dphi_tw_sq(double m0, double mu, spinor_field *out, spinor_field *in);
 void g5Dphi_eopre_tw(double m0, double mu, spinor_field *out, spinor_field *in, tw_D_type tw_type);
 void g5Dphi_eopre_tw_sq(double m0, double mu, spinor_field *out, spinor_field *in);
 

@@ -470,7 +470,7 @@ int compare_corr_disc(double complex *corr_num, char *name, double tol)
     return retval;
 }
 
-int compare_corr(double complex *corr_ex, double complex *corr_num, int tstart, char *name, double tol)
+static int compare_corr(double complex *corr_ex, double complex *corr_num, int tstart, char *name, double tol)
 {
     int retval = 0;
     for (int t = tstart; t < GLB_T; t++)
