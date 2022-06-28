@@ -2,7 +2,7 @@
  *
  *
  * File check_scattering_length.c
- * Checks of the pi pi scattering length calculations 
+ * Checks of the pi pi scattering length calculations
  * Author: Vincent Drach & Fernando Romero Lopez
  * NOCOMPILE= BC_X_ANTIPERIODIC
  * NOCOMPILE= BC_Y_ANTIPERIODIC
@@ -397,11 +397,11 @@ double complex Rect(fourvec px, fourvec py, fourvec pz, double m, int L, int LT,
     return res;
 }
 
-complex double C(fourvec px, fourvec py, double m, int L, int LT, int t)
+double complex C(fourvec px, fourvec py, double m, int L, int LT, int t)
 {
     fourvec mom[4];
     int q11, q12, q13, q14, q24, q34, q44, i, j;
-    complex double res;
+    double complex res;
     res = 0.0 * I;
     double numerator, denominator;
     double af1[4];
@@ -526,7 +526,7 @@ int main(int argc, char *argv[])
     unit_gauge(u_gauge);
     represent_gauge_field();
 #ifdef REPR_FUNDAMENTAL
-    apply_BCs_on_represented_gauge_field(); //This is a trick: the BCs are not applied in the case the REPR is fundamental because represent_gauge field assumes that the right BCs are already applied on the fundamental field!
+    apply_BCs_on_represented_gauge_field(); // This is a trick: the BCs are not applied in the case the REPR is fundamental because represent_gauge field assumes that the right BCs are already applied on the fundamental field!
 #endif
 
     double complex Pistoch[GLB_T], Pitheo[GLB_T];
@@ -592,7 +592,7 @@ int main(int argc, char *argv[])
         for (int i = 0; i < ncorr; i++)
             reset_mo(mo_arr[i]);
 
-        //io4pt(R,0,n,path,"R2","test"); // to write the output to a file.
+        // io4pt(R,0,n,path,"R2","test"); // to write the output to a file.
     }
 
     for (int t = 0; t < GLB_T; t++)

@@ -601,7 +601,6 @@ GenerateCchecks[]:=Module[{Op,OpTmp,ar,irrepdim,EvaluatedQ,RMatrixOp, TorTmp,RMa
                   WriteString[ar,"_complex_mul_star(tmp[2],tmp[0]-tmp[1],tmp[0]-tmp[1]);
 if(sqrt(creal(tmp[2]))>=1.e-10){
   lprintf(\"Error\",0,\" Op="];
-
   If[ListQ[OpList[Px,Py,Pz,irrepindex,charge,Opindex[Px,Py,Pz,irrepindex,charge][[id,j]]]],
     WriteString[ar,OpList[Px,Py,Pz,irrepindex,charge,Opindex[Px,Py,Pz,irrepindex,charge][[id,j]]][[1]]];
   ,
@@ -660,7 +659,7 @@ if(sqrt(creal(tmp[2]))>=1.e-10){
   ,
     WriteString[ar,ToString[InputForm[TorList[Px,Py,Pz,irrepindex,charge,Torindex[Px,Py,Pz,irrepindex,charge][[id,j]]]]]];
   ];
-  WriteString[ar,"\\n px=%d py=%d pz=%d Irrep=%d ev=%d charge=%d multiplet id=%d (%2.10e %2.10e) (%2.10e %2.10e) %2.10e \\n\","];
+  WriteString[ar,"\\ncheck=",MyCForm[TorTmp[[j,1]]],"=",MyCForm[RMatrixTor[[i,j,1]]],"\\n px=%d py=%d pz=%d Irrep=%d ev=%d charge=%d multiplet id=%d (%2.10e %2.10e) (%2.10e %2.10e) %2.10e \\n\","];
   WriteString[ar,Px,",",Py,",",Pz,",",irrepindex,",",j,",",charge,",",id,",creal(tmp[0]),cimag(tmp[0]),creal(tmp[1]),cimag(tmp[1]),sqrt(creal(tmp[2])));
   return_value++;
   }
@@ -884,7 +883,7 @@ OpGroupStringPaths[px_, py_, pz_, iridx_, charge_] :=
     If[FreeQ[op, Pre] && FreeQ[op, Pim]  , Print["The request operator index has not yet been evaluated"];Abort[]];
     If[SameQ[Head[op],Plus],oplist=op//. Plus->List;,oplist={op}];
     coeff=oplist//.{Pre[__][__]-> 1, Pim[__][__]-> 1};
-    paths=oplist//.{A_. Pre[b__][nx_,ny_,nz_] :> {P[b],Exp[-I 2 Pi /L (px nx+py ny +pz nz)],0}, A_. Pim[b__][nx_,ny_,nz_] :> {P[b],Exp[-I 2 Pi /L (px nx+py ny +pz nz)],1}};
+    paths=oplist//.{A_. Pre[b__][nx_,ny_,nz_] :> {P[b],Exp[- I 2 Pi /L  (px nx+py ny +pz nz)],0}, A_. Pim[b__][nx_,ny_,nz_] :> {P[b],Exp[ - I 2 Pi /L  (px nx+py ny +pz nz)],1}};
     If[Not[AllTrue[paths[[All,1]], Not[FreeQ[#, P[__]]] &]],Print["1 The request operator has a non P based structure:",op];Abort[]];
     If[Not[AllTrue[coeff, NumberQ[N[#]] &]],Print["2 The request operator has a non P based structure:",op];Abort[]];
     If[Length[coeff]!=Length[paths],Print["3 The request operator has a non P based structure:",op];Abort[]];
@@ -1068,21 +1067,27 @@ If[!(IsIn/@(path//. P:>List)//. List->And),Print["Path written in terms of non a
 res=Sum[ bTOrthog[px, py, pz][[irrepidx, irrepev, i]] (path //. permutationTable[[i]]),{i,1,48}];
 res=res//. btoa;
 res=TorSimplify[res];
-If[px==0,res=res//.{ P[A__][ax_,ay_,az_]:>P[A][0,ay,az],Dagger[P[A__]][ax_,ay_,az_]:>Dagger[P[A]][0,ay,az]}];
+
+
+If[px==0,res=res//. {P[A__][ax_,ay_,az_]:>P[A][0,ay,az],Dagger[P[A__]][ax_,ay_,az_]:>Dagger[P[A]][0,ay,az]}];
 If[py==0,res=res//. {P[A__][ax_,ay_,az_]:>P[A][ax,0,az],Dagger[P[A__]][ax_,ay_,az_]:>Dagger[P[A]][ax,0,az]}];
-If[pz==0,res=res//.{P[A__][ax_,ay_,az_]:>P[A][ax,ay,0],Dagger[P[A__]][ax_,ay_,az_]:>Dagger[P[A]][ax,ay,0]}];
-res=res//. {Dagger[P[L[ax]]][a1x_,a1y_,a1z_]:> Dagger[P[L[ax]]][0,a1y,a1z],P[L[ax]][a1x_,a1y_,a1z_]:> P[L[ax]][0,a1y,a1z]};
-res=res//. {Dagger[P[L[ay]]][a1x_,a1y_,a1z_]:> Dagger[P[L[ay]]][a1x,0,a1z],P[L[ay]][a1x_,a1y_,a1z_]:> P[L[ay]][a1x,0,a1z]};
-res=res//. {Dagger[P[L[az]]][a1x_,a1y_,a1z_]:> Dagger[P[L[az]]][a1x,a1y,0],P[L[az]][a1x_,a1y_,a1z_]:> P[L[az]][a1x,a1y,0]};
-tres=res//.Dagger[P[A__]][ax_,ay_,az_]:>Pre[A][ax,ay,az]- I Pim[A][ax,ay,az];
-tres=tres//.P[A__][ax_,ay_,az_]:>Pre[A][ax,ay,az]+ I Pim[A][ax,ay,az];
+If[pz==0,res=res//. {P[A__][ax_,ay_,az_]:>P[A][ax,ay,0],Dagger[P[A__]][ax_,ay_,az_]:>Dagger[P[A]][ax,ay,0]}];
+(**)
+    (* Positive and negative charge can be obtained by a single operator.
+   Note that the coefficients btorthog can be complex, here we are exactly using C transformation as path reversal*)
+tres=res//.Dagger[P[A__]][ax_,ay_,az_]:>Pre[A][ax,ay,az]- myI Pim[A][ax,ay,az];
+tres=tres//.P[A__][ax_,ay_,az_]:>Pre[A][ax,ay,az]+ myI Pim[A][ax,ay,az];
 tres=ExpandAll[tres];
+(**)
+  tres = ExpandAll[tres] //. {myI^(n_):>(-1)^(n/2) /; EvenQ[n],myI^(n_):>(-1)^((n-1)/2) myI /; OddQ[n]};
+trescp = tres //. myI -> 0;
+trescm = Expand[1/myI(tres-trescp)];
 If[charge==1,
-tres=Re[tres];
+tres=trescp;
 ,
-tres=Im[tres];
+tres=trescm;
 ];
-res1 = Expand[tres]//.{ Im[__]-> 0, Re[A__] -> A};
+res1 = Expand[tres];
 If[!res1===0,
 If[!ListQ[Torindex[px,py,pz,irrepidx,charge]],Torindex[px,py,pz,irrepidx,charge]={};];
 If[!NumberQ[Torindex[px,py,pz,irrepidx,charge,TorUniqueIndex[path][[1]]]]
@@ -1118,26 +1123,23 @@ TorUniqueIdentifier[ain_] := TorUniqueIdentifier[ain] = Module[{ris = ain,res, P
   If[Not[MatchQ[ris,P[__]]],Print["Requested a TorUniqueIdentifier of a non Path quantity"];Abort[]];
   ris = ris //.{P[A___,L[a2_]]->  P[A,a2],P[A___,-n_. a2_ +L[a2_]]->  P[A,a2]};
   If[Not[Map[IsIn, ris //. P :> List] //. List -> And],Print["Requested a TorUniqueIdentifier of non a-steps Path :",ris];Abort[]];
-  If[Not[MatchQ[ris//. P :> Plus, _. ax] || MatchQ[ris//. P :> Plus, _. ay] || MatchQ[ris//. P :> Plus, _. az]] ,
-Print["TorUniqueIdentifier of a non single directed Path "];
-Abort[];
-];
+  If[Not[MatchQ[ris//. P :> Plus, _. ax] || MatchQ[ris//. P :> Plus, _. ay] || MatchQ[ris//. P :> Plus, _. az]] ,Print["TorUniqueIdentifier of a non single directed Path "]; Abort[];];
 dir = Expand[(ris//. P :> Plus)/(Abs[(ris//. P :> Plus)//.{ax-> 1 ,ay->1,az->1}])];
 ris = ris //. P[A__] -> List[A];
 ris = ris //. {{dir,A1___} ->{A1},{A1___,dir} ->{A1}};
 shift = (ris//. List :> Plus);
 pshift = {0,0,0}+(shift//. {ax -> {1,0,0},ay->{0,1,0},az->{0,0,1}});
+(**)  
 If[IsInPositive[dir],
 absdir=dir;
 ris = ris //. List[A1___] :> P1[A1,L[dir]-shift][0,0,0];
 TorList[torindex]=ris  //.  P1[A___][_,_,_]-> P[A];
-ininv = ininv//. List[B___] ->P[B];
 outinv = ris  //. P1[B___][0,0,0] ->Dagger[ P[B]][pshift[[1]],pshift[[2]],pshift[[3]]];
 ,
 absdir = -dir;
 ris = ris //. List[A1___] :> Reverse[P1[A1]];
 ris = Expand[-(ris //. P1[A___]-> List[A])];
-ris = ris//. List[B___] ->Dagger[ P1[B,L[-dir]+shift]][pshift[[1]],pshift[[2]],pshift[[3]]];
+ris = ris//. List[B___] ->Dagger[ P1[B,L[-dir]+shift]][-pshift[[1]],-pshift[[2]],-pshift[[3]]];
 outinv = ris  //. Dagger[P1[B___]][_,_,_] -> P[B][0,0,0];
 TorList[torindex]=outinv //.  P[A___][_,_,_]-> P[A];
 ];
@@ -1245,11 +1247,10 @@ TorUniqueIndex[ain_]:=TorUniqueIdentifier[ain][[2]];
    If[FreeQ[tor, Pre] && FreeQ[tor, Pim]  , Print["The request operator index has not yet been evaluated"];Abort[]];
    If[SameQ[Head[tor],Plus],torlist={};Do[AppendTo[torlist,tor[[i]]],{i,Length[tor]}];,torlist={tor}];
    coeff=torlist//.{Pre[__][__]-> 1, Pim[__][__]-> 1};
-  paths=torlist //.{A___,d_.  C1_[a1__][a2__]C2_[b1__][b2__],B___}:> {A, {C1[a1],C2[b1],exp[a2]exp[b2]},B}/; And[Or[SameQ[C1,Pre],SameQ[C1,Pim]],Or[SameQ[C2,Pre],SameQ[C2,Pim]]] ;
-  paths=paths //.{A___,d_.  C1_[a1__][a2__]^2,B___}:> {A, {C1[a1],C1[a1],exp[a2]exp[a2]},B}/; Or[SameQ[C1,Pre],SameQ[C1,Pim]] ;
+   paths=torlist //.{A___,d_.  C1_[a1__][a2__] C2_[b1__][a2__],B___}:> {A, {C1[a1],C2[b1],exp[a2]},B}/; And[Or[SameQ[C1,Pre],SameQ[C1,Pim]],Or[SameQ[C2,Pre],SameQ[C2,Pim]]] ;
+   paths=paths //.{A___,d_.  C1_[a1__][a2__]^2,B___}:> {A, {C1[a1],C1[a1],exp[a2]},B}/; Or[SameQ[C1,Pre],SameQ[C1,Pim]] ;
    paths=paths//. {{A___,Pre[b__],C___} :> {A,P[b],0,C}, {A___, Pim[b__],C___}:> {A,P[b],1,C}};
-   (*paths=paths//. {{A___,Pre[b__]^2,C___} :> {A,P[b],0,P[b],0,C}, {A___, Pim[b__]^2,C___}:> {A,P[b],1,P[b],1,C}};*)
-  paths=paths //.exp[nx_,ny_,nz_] -> Exp[-I 2 Pi /L (px nx+py ny +pz nz)];
+   paths=paths //.exp[nx_,ny_,nz_] -> Exp[I 2 Pi / L (px nx+py ny +pz nz)];
    paths=paths//.{P[L[a1_]]-> P[a1],P[a1__,b_+L[a_]]-> P[a1]};
     If[Not[AllTrue[paths[[All,1]], Not[FreeQ[#, P[__]]] &]],Print["1 The request operator has a non P based structure:",tor];Abort[]];
     If[Not[AllTrue[coeff, NumberQ[N[#]] &]],Print["2 The request operator has a non P based structure:",tor];Abort[]];
@@ -1258,7 +1259,6 @@ TorUniqueIndex[ain_]:=TorUniqueIdentifier[ain][[2]];
   (**)
 
       (*Each path code is generated only once and only if it has been requested, it imples that also some paths can be not evaluated*)
-      Print["paths",paths];
   Do[
       PolyGenerateCcode[TorUniqueIndex[paths[[i,1]]][[1]]];
      PolyGenerateCcode[TorUniqueIndex[paths[[i,3]]][[1]]];
@@ -1268,12 +1268,12 @@ TorUniqueIndex[ain_]:=TorUniqueIdentifier[ain][[2]];
     Do[
       GenerateCoefficientString[coeff[[i]]];
      ,{i,1,Length[coeff]}];
-   (**)
+    (**)
     shifts=Complement[Union[paths[[All,5]]],{1}];
     Do[WriteShift[shifts[[i]],torfilename],{i,1,Length[shifts]}];
 
     ar = OpenAppend[torfilename, FormatType -> InputForm];
-    WriteString[ar, "static inline double diPoly_p_",p[px],"_",p[py],"_",p[pz],"_Ir_",irrepidx,"_C_",p[charge],"_n_",toridx,"(int idx)\n"];
+    WriteString[ar, "static inline double complex diPoly_p_",p[px],"_",p[py],"_",p[pz],"_Ir_",irrepidx,"_C_",p[charge],"_n_",toridx,"(int idx)\n"];
     WriteString[ar,"{\nreturn "];
     Do[
       WriteString[ar,OpConsts[coeff[[i]]]];
@@ -1299,7 +1299,7 @@ The paths are evaluated only once while each different momentum projection can b
 *)
   ar = OpenAppend[opfilename, FormatType -> InputForm];
   WriteString[ar,"static int last_t = -10;\nvoid request_space_paths_evaluation(){last_t=-10;}
-  void eval_time_momentum_glueball_paths(int t, int px, int py, int pz)
+void eval_time_momentum_glueball_paths(int t, int px, int py, int pz)
   {
     int nnx, nny, nnz, idx, in;
     double complex ce = 0.;
@@ -1694,7 +1694,7 @@ WriteString[ar,"};\n"];
             Do[
               idop = Torindex[px, py, pz, irrepidx,charge][[nop, irrepev]];
                   If[Not[SameQ[idop,0]],
-                      If[SameQ[nnx px + nny py + nnz pz,0],expstring="",expstring="cexp(ce * (double)("<>ToString[CForm[nnx*px + nny*py + nnz*pz]] <> "))*";];
+                      If[SameQ[nnx px + nny py + nnz pz,0],expstring="",expstring="cexp(-ce * (double)("<>ToString[CForm[nnx*px + nny*py + nnz*pz]] <> "))*";];
                     WriteString[ar, "np[",ltornumberC,"] +=",expstring,"diPoly_p_", p[px], "_", p[py], "_", p[pz],"_Ir_", irrepidx, "_C_",p[charge],"_n_", idop,"(idx);\n"];
                     MapTortoCindex[px,py,pz,irrepidx,charge,idop]=ltornumberC;
                     ltornumberC++;
@@ -1720,14 +1720,13 @@ WriteString[ar,"};\n"];
     Do[
       Do[
         If[ListQ[Torindex[px, py, pz, irrepidx,charge]],
-          If[evaltors==0 &&  Select[Flatten[Torindex[px, py, pz, irrepidx,charge]], IntegerQ[#] && # > 0 &] !={}, 
+          If[Select[Flatten[Torindex[px, py, pz, irrepidx,charge]], IntegerQ[#] && # > 0 &] !={}, 
             WriteString[ar,"eval_time_momentum_torellons(t,",px,",",py,",",pz,",numerical_op);\n"];
             ];
-            ];
+           ];
       ,{charge,-1,1,2}];
-    , {irrepidx, 1, Length[bTOrthog[px, py, pz]]}];
-    , {px, -1, 1}, {py, -1, 1}, {pz, -1, 1}];'
- 
+    ,{irrepidx, 1, Length[bTOrthog[px, py, pz]]}];
+  ,{px, -1, 1}, {py, -1, 1}, {pz, -1, 1}];
 (**)
 
 WriteString[ar,"    for(int i=0;i<total_n_tor_op;i++)

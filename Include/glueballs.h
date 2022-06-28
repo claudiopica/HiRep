@@ -42,7 +42,7 @@ void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, double comple
 void collect_1pt_torellon_functions(cor_list *lcor, double complex *tor_storage);
     
 
-#define total_n_glue_op 14
-#define total_n_tor_op 9
-#define npoly_dist 2
+#define total_n_glue_op 15
+#define total_n_tor_op 8
+#define npoly_dist 1
 #endif

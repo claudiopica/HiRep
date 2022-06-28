@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Gauge invariance of the torellons operators
+ * Gauge and N-ality invariance of the torellons operators
  *
  *******************************************************************************/
 
@@ -25,6 +25,9 @@
 #include "utils.h"
 #include "observables.h"
 #include "glueballs.h"
+#ifndef M_PI
+#define M_PI 3.14159265358979323846264338327950288419716939937510
+#endif
 
 static suNg_field *g;
 
@@ -57,16 +60,42 @@ static void transform_u(void)
   represent_gauge_field();
 }
 
+static void n_ality_transform(int dir)
+{
+  int n[4];
+  double complex centre = cexp(2. * M_PI * I / NG);
+  suNg unew;
+  suNg *uold;
+  for (n[0] = 0; n[0] < T; n[0]++)
+    for (n[1] = 0; n[1] < X; n[1]++)
+      for (n[2] = 0; n[2] < Y; n[2]++)
+        for (n[3] = 0; n[3] < Z; n[3]++)
+        {
+          if (n[dir] + zerocoord[dir] == 1)
+          {
+            int ix = ipt(n[0], n[1], n[2], n[3]);
+            uold = pu_gauge(ix, dir);
+            _suNg_mul(unew, centre, *uold);
+            *uold = unew;
+          }
+        }
+  start_gf_sendrecv(u_gauge);
+  represent_gauge_field();
+}
+
 int main(int argc, char *argv[])
 {
 
   int return_value = 0, n, nt;
 
   double complex *dop, *dop1;
-
+  double max_diff[2];
+  double min_size;
   setup_process(&argc, &argv);
 
   setup_gauge_fields();
+
+  report_tor_group_setup();
 
   /* allocate additional memory */
   g = alloc_gtransf(&glattice);
@@ -105,34 +134,32 @@ int main(int argc, char *argv[])
     dop1[n] /= NG * GLB_VOLUME;
 
   for (n = 0; n < T * total_n_tor_op; n++)
-    dop[n] -= dop1[n];
+    dop1[n] -= dop[n];
 
   lprintf("MAIN", 0, "Checking gauge invariance of the %d torellon operators on each timeslice.\n", total_n_tor_op);
 
-  double max_diff[2];
-  double min_size;
   max_diff[0] = max_diff[1] = -1.0;
   min_size = 10;
 
   for (n = 0; n < T * total_n_tor_op; n++)
   {
-    if (fabs(creal(dop[n])) > max_diff[0])
-      max_diff[0] = fabs(creal(dop[n]));
+    if (fabs(creal(dop1[n])) > max_diff[0])
+      max_diff[0] = fabs(creal(dop1[n]));
 
-    if (fabs(cimag(dop[n])) > max_diff[1])
-      max_diff[1] = fabs(cimag(dop[n]));
+    if (fabs(cimag(dop1[n])) > max_diff[1])
+      max_diff[1] = fabs(cimag(dop1[n]));
 
-    if (sqrt(creal(dop1[n]) * creal(dop1[n]) + cimag(dop1[n]) * cimag(dop1[n])) < min_size)
-      min_size = sqrt(creal(dop1[n]) * creal(dop1[n]) + cimag(dop1[n]) * cimag(dop1[n]));
-
-    if (fabs(creal(dop[n])) > 1.e-12)
+    if (fabs(creal(dop1[n])) > 1.e-12)
       return_value++;
-    if (fabs(cimag(dop[n])) > 1.e-12)
+    if (fabs(cimag(dop1[n])) > 1.e-12)
       return_value++;
-    lprintf("MAIN", 0, "t=%d op=%d %.10e %.10e\n", n / total_n_tor_op, n % total_n_tor_op, creal(dop1[n]), cimag(dop1[n]));
 
-    if (sqrt(creal(dop1[n]) * creal(dop1[n]) + cimag(dop1[n]) * cimag(dop1[n])) < 10.e-10)
+    if (sqrt(creal(dop[n]) * creal(dop[n]) + cimag(dop[n]) * cimag(dop[n])) < min_size)
+      min_size = sqrt(creal(dop[n]) * creal(dop[n]) + cimag(dop[n]) * cimag(dop[n]));
+
+    if (sqrt(creal(dop[n]) * creal(dop[n]) + cimag(dop[n]) * cimag(dop[n])) < 10.e-10)
     {
+      lprintf("MAIN", 0, "Operator %d on timeslice %d seems to be numerically zero\n", n % total_n_tor_op, n / total_n_tor_op);
       return_value++;
     }
   }
@@ -148,6 +175,141 @@ int main(int argc, char *argv[])
   lprintf("MAIN", 0, "(should be greater 1*10^(-15) or so)\n\n");
 
   free_gtransf(g);
+  int inx = ipt(3, 3, 3, 3);
+
+  wilson_lines *pol = polyleg(inx, 1);
+  double complex cb = pol->tr;
+
+  lprintf("MAIN", 0, "Pa: single polyakov line:  %.10e +I*(%.10e).\n", creal(cb), cimag(cb));
+  lprintf("MAIN", 0, "Applying a N-ality transf to a X hyperplane... ");
+  n_ality_transform(1);
+  lprintf("MAIN", 0, "done.\n");
+
+  inx = ipt(3, 2, 3, 3);
+  pol = polyleg(inx, 1);
+  double complex ca = pol->tr;
+
+  lprintf("MAIN", 0, "\nPb: single polyakov line after the transf. :   %.10e +I*(%.10e).\n", creal(ca), cimag(ca));
+
+  ca = (ca / cb) / cexp(2. * M_PI * I / NG) - 1.0;
+
+  lprintf("MAIN", 0, "Checking |(Pa/Pb)/cexp(2. * M_PI * I / NG) - 1|= %.10e\n", sqrt(creal(ca) * creal(ca) + cimag(ca) * cimag(ca)));
+  lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
+  if (sqrt(creal(ca) * creal(ca) + cimag(ca) * cimag(ca)) > 1.e-12)
+    return_value++;
+
+  for (n = 0; n < T * total_n_tor_op; n++)
+    dop1[n] = 0.;
+
+  for (nt = 0; nt < T; nt++)
+    eval_all_torellon_ops(nt, dop1 + nt * total_n_tor_op);
+
+  for (n = 0; n < T * total_n_tor_op; n++)
+    dop1[n] /= NG * GLB_VOLUME;
+
+  for (n = 0; n < T * total_n_tor_op; n++)
+    dop1[n] -= dop[n];
+
+  lprintf("MAIN", 0, "Checking N-ality invariance of the %d torellon operators on each timeslice.\n", total_n_tor_op);
+
+  for (n = 0; n < T * total_n_tor_op; n++)
+  {
+
+    if (fabs(creal(dop1[n])) > max_diff[0])
+      max_diff[0] = fabs(creal(dop1[n]));
+
+    if (fabs(cimag(dop1[n])) > max_diff[1])
+      max_diff[1] = fabs(cimag(dop1[n]));
+
+    if (fabs(creal(dop1[n])) > 1.e-12)
+      return_value++;
+    if (fabs(cimag(dop1[n])) > 1.e-12)
+      return_value++;
+  }
+  global_max(max_diff, 2);
+
+  lprintf("MAIN", 0, "Maximal normalized real difference = %.16e\n", max_diff[0]);
+  lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n");
+  lprintf("MAIN", 0, "Maximal normalized imaginary difference = %.16e\n", max_diff[1]);
+  lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
+
+  lprintf("MAIN", 0, "Applying a N-ality transf to a Y hyperplane... ");
+  n_ality_transform(2);
+  lprintf("MAIN", 0, "done.\n");
+  for (n = 0; n < T * total_n_tor_op; n++)
+    dop1[n] = 0.;
+
+  for (nt = 0; nt < T; nt++)
+    eval_all_torellon_ops(nt, dop1 + nt * total_n_tor_op);
+
+  for (n = 0; n < T * total_n_tor_op; n++)
+    dop1[n] /= NG * GLB_VOLUME;
+
+  for (n = 0; n < T * total_n_tor_op; n++)
+    dop1[n] -= dop[n];
+
+  lprintf("MAIN", 0, "Checking N-ality invariance of the %d torellon operators on each timeslice.\n", total_n_tor_op);
+
+  for (n = 0; n < T * total_n_tor_op; n++)
+  {
+
+    if (fabs(creal(dop1[n])) > max_diff[0])
+      max_diff[0] = fabs(creal(dop1[n]));
+
+    if (fabs(cimag(dop1[n])) > max_diff[1])
+      max_diff[1] = fabs(cimag(dop1[n]));
+
+    if (fabs(creal(dop1[n])) > 1.e-12)
+      return_value++;
+    if (fabs(cimag(dop1[n])) > 1.e-12)
+      return_value++;
+  }
+  global_max(max_diff, 2);
+
+  lprintf("MAIN", 0, "Maximal normalized real difference = %.16e\n", max_diff[0]);
+  lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n");
+  lprintf("MAIN", 0, "Maximal normalized imaginary difference = %.16e\n", max_diff[1]);
+  lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
+
+  lprintf("MAIN", 0, "Applying a N-ality transf to a Z hyperplane... ");
+  n_ality_transform(3);
+  lprintf("MAIN", 0, "done.\n");
+  for (n = 0; n < T * total_n_tor_op; n++)
+    dop1[n] = 0.;
+
+  for (nt = 0; nt < T; nt++)
+    eval_all_torellon_ops(nt, dop1 + nt * total_n_tor_op);
+
+  for (n = 0; n < T * total_n_tor_op; n++)
+    dop1[n] /= NG * GLB_VOLUME;
+
+  for (n = 0; n < T * total_n_tor_op; n++)
+    dop1[n] -= dop[n];
+
+  lprintf("MAIN", 0, "Checking N-ality invariance of the %d torellon operators on each timeslice.\n", total_n_tor_op);
+
+  for (n = 0; n < T * total_n_tor_op; n++)
+  {
+
+    if (fabs(creal(dop1[n])) > max_diff[0])
+      max_diff[0] = fabs(creal(dop1[n]));
+
+    if (fabs(cimag(dop1[n])) > max_diff[1])
+      max_diff[1] = fabs(cimag(dop1[n]));
+
+    if (fabs(creal(dop1[n])) > 1.e-12)
+      return_value++;
+    if (fabs(cimag(dop1[n])) > 1.e-12)
+      return_value++;
+  }
+  global_max(max_diff, 2);
+
+  lprintf("MAIN", 0, "Maximal normalized real difference = %.16e\n", max_diff[0]);
+  lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n");
+  lprintf("MAIN", 0, "Maximal normalized imaginary difference = %.16e\n", max_diff[1]);
+  lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n");
+
+  global_sum_int(&return_value, 1);
 
   finalize_process();
   return return_value;

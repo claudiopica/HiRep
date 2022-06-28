@@ -1,5 +1,6 @@
 /*******************************************************************************
  *
+ * NOCOMPILE= NG=2
  * Check of the glueballs operators for active against passive rotations.
  *
  *******************************************************************************/
@@ -86,8 +87,8 @@ int main(int argc, char *argv[])
     represent_gauge_field();
     lprintf("MAIN", 0, "done.\n\n");
 
-    op = malloc(total_n_glue_op * sizeof(complex double));
-    rop = malloc(total_n_glue_op * sizeof(complex double));
+    op = malloc(total_n_glue_op * sizeof(double complex));
+    rop = malloc(total_n_glue_op * sizeof(double complex));
 
     lprintf("MAIN", 0, "Measuring all the glueballs operators on the original configuration\n");
     all_g_op(op);
@@ -114,6 +115,8 @@ int main(int argc, char *argv[])
 
         ret = fullgbcheck(j, rop, op);
 
+        global_sum_int(&ret, 1);
+
         if (ret == 0)
             lprintf("MAIN", 0, "active - passive rotation  %d: Pass\n", j);
         else
@@ -125,12 +128,12 @@ int main(int argc, char *argv[])
     }
     free(op);
     free(rop);
-    op = malloc(total_n_tor_op * sizeof(complex double));
-    rop = malloc(total_n_tor_op * sizeof(complex double));
+    op = malloc(total_n_tor_op * sizeof(double complex));
+    rop = malloc(total_n_tor_op * sizeof(double complex));
 
     reset_wrk_pointers();
     lprintf("MAIN", 0, "Measuring all the torellons operators on the original configuration\n");
-    all_t_op(op);    
+    all_t_op(op);
     lprintf("MAIN", 0, "done.\n\n");
 
     lprintf("MAIN", 0, "Resetting and initializing (rotating) workspace gauge field once for each of the 48 cubic rotations\n\n");
@@ -146,6 +149,8 @@ int main(int argc, char *argv[])
         all_t_op(rop);
 
         ret = fulltorcheck(j, rop, op);
+
+        global_sum_int(&ret, 1);
 
         if (ret == 0)
             lprintf("MAIN", 0, "active - passive rotation  %d: Pass\n", j);

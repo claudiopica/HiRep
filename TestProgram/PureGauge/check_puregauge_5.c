@@ -2,6 +2,7 @@
  *
  * Gauge invariance of the glueball operators
  *
+ * NOCOMPILE= NG!=2
  *******************************************************************************/
 
 #define MAIN_PROGRAM
@@ -68,6 +69,8 @@ int main(int argc, char *argv[])
 
   setup_gauge_fields();
 
+  report_gb_group_setup();
+
   /* allocate additional memory */
   g = alloc_gtransf(&glattice);
 
@@ -130,7 +133,10 @@ int main(int argc, char *argv[])
     if (fabs(cimag(dop[n])) > 10.e-14)
       return_value++;
     if (sqrt(creal(dop1[n]) * creal(dop1[n]) + cimag(dop1[n]) * cimag(dop1[n])) < 10.e-14)
+    {
+      lprintf("MAIN", 0, "Operator %d seems to be numerically zero\n", n % T);
       return_value++;
+    }
   }
   global_sum_int(&return_value, 1);
   global_max(max_diff, 2);

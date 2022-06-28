@@ -3854,14 +3854,94 @@ tmp[0]=rotfun(13);
 tmp[1]=1.*unrotfun(13);
 _complex_mul_star(tmp[2],tmp[0]-tmp[1],tmp[0]-tmp[1]);
 if(sqrt(creal(tmp[2]))>=1.e-10){
+  lprintf("Error",0," Op=Pre[ax, ax, -ay, -ax, az, -ax, ay, -az][0, 0, 0] + Pre[ax, ay, az, -ax, -ax, -ay, ax, -az][0, -1, 0] - Pre[ax, az, ax, ay, -az, -ax, -ax, -ay][0, -1, 0] + Pre[ay, ax, az, az, -ay, -az, -ax, -az][0, -1, 0] - Pre[ay, az, ax, ax, -ay, -ax, -az, -ax][0, -1, 0] + Pre[az, ax, az, ay, -ax, -az, -az, -ay][0, -1, 0] - Pre[az, ay, ax, -az, -az, -ay, az, -ax][0, -1, 0] - Pre[az, az, -ay, -az, ax, -az, ay, -ax][0, 0, 0]\n px=%d py=%d pz=%d Irrep=%d ev=%d charge=%d multiplet id=%d (%2.10e %2.10e) (%2.10e %2.10e) %2.10e \n",0,1,0,2,1,1,1,creal(tmp[0]),cimag(tmp[0]),creal(tmp[1]),cimag(tmp[1]),sqrt(creal(tmp[2])));
+  return_value++;
+  }
+}
+if(17==rotid)
+{
+tmp[0]=rotfun(13);
+tmp[1]=1.*unrotfun(13);
+_complex_mul_star(tmp[2],tmp[0]-tmp[1],tmp[0]-tmp[1]);
+if(sqrt(creal(tmp[2]))>=1.e-10){
+  lprintf("Error",0," Op=Pre[ax, ax, -ay, -ax, az, -ax, ay, -az][0, 0, 0] + Pre[ax, ay, az, -ax, -ax, -ay, ax, -az][0, -1, 0] - Pre[ax, az, ax, ay, -az, -ax, -ax, -ay][0, -1, 0] + Pre[ay, ax, az, az, -ay, -az, -ax, -az][0, -1, 0] - Pre[ay, az, ax, ax, -ay, -ax, -az, -ax][0, -1, 0] + Pre[az, ax, az, ay, -ax, -az, -az, -ay][0, -1, 0] - Pre[az, ay, ax, -az, -az, -ay, az, -ax][0, -1, 0] - Pre[az, az, -ay, -az, ax, -az, ay, -ax][0, 0, 0]\n px=%d py=%d pz=%d Irrep=%d ev=%d charge=%d multiplet id=%d (%2.10e %2.10e) (%2.10e %2.10e) %2.10e \n",0,1,0,2,1,1,1,creal(tmp[0]),cimag(tmp[0]),creal(tmp[1]),cimag(tmp[1]),sqrt(creal(tmp[2])));
+  return_value++;
+  }
+}
+if(18==rotid)
+{
+tmp[0]=rotfun(13);
+tmp[1]=1.*unrotfun(13);
+_complex_mul_star(tmp[2],tmp[0]-tmp[1],tmp[0]-tmp[1]);
+if(sqrt(creal(tmp[2]))>=1.e-10){
+  lprintf("Error",0," Op=Pre[ax, ax, -ay, -ax, az, -ax, ay, -az][0, 0, 0] + Pre[ax, ay, az, -ax, -ax, -ay, ax, -az][0, -1, 0] - Pre[ax, az, ax, ay, -az, -ax, -ax, -ay][0, -1, 0] + Pre[ay, ax, az, az, -ay, -az, -ax, -az][0, -1, 0] - Pre[ay, az, ax, ax, -ay, -ax, -az, -ax][0, -1, 0] + Pre[az, ax, az, ay, -ax, -az, -az, -ay][0, -1, 0] - Pre[az, ay, ax, -az, -az, -ay, az, -ax][0, -1, 0] - Pre[az, az, -ay, -az, ax, -az, ay, -ax][0, 0, 0]\n px=%d py=%d pz=%d Irrep=%d ev=%d charge=%d multiplet id=%d (%2.10e %2.10e) (%2.10e %2.10e) %2.10e \n",0,1,0,2,1,1,1,creal(tmp[0]),cimag(tmp[0]),creal(tmp[1]),cimag(tmp[1]),sqrt(creal(tmp[2])));
+  return_value++;
+  }
+}
+if(22==rotid)
+{
+tmp[0]=rotfun(13);
+tmp[1]=1.*unrotfun(13);
+_complex_mul_star(tmp[2],tmp[0]-tmp[1],tmp[0]-tmp[1]);
+if(sqrt(creal(tmp[2]))>=1.e-10){
+  lprintf("Error",0," Op=Pre[ax, ax, -ay, -ax, az, -ax, ay, -az][0, 0, 0] + Pre[ax, ay, az, -ax, -ax, -ay, ax, -az][0, -1, 0] - Pre[ax, az, ax, ay, -az, -ax, -ax, -ay][0, -1, 0] + Pre[ay, ax, az, az, -ay, -az, -ax, -az][0, -1, 0] - Pre[ay, az, ax, ax, -ay, -ax, -az, -ax][0, -1, 0] + Pre[az, ax, az, ay, -ax, -az, -az, -ay][0, -1, 0] - Pre[az, ay, ax, -az, -az, -ay, az, -ax][0, -1, 0] - Pre[az, az, -ay, -az, ax, -az, ay, -ax][0, 0, 0]\n px=%d py=%d pz=%d Irrep=%d ev=%d charge=%d multiplet id=%d (%2.10e %2.10e) (%2.10e %2.10e) %2.10e \n",0,1,0,2,1,1,1,creal(tmp[0]),cimag(tmp[0]),creal(tmp[1]),cimag(tmp[1]),sqrt(creal(tmp[2])));
+  return_value++;
+  }
+}
+if(29==rotid)
+{
+tmp[0]=rotfun(13);
+tmp[1]=-1.*unrotfun(13);
+_complex_mul_star(tmp[2],tmp[0]-tmp[1],tmp[0]-tmp[1]);
+if(sqrt(creal(tmp[2]))>=1.e-10){
+  lprintf("Error",0," Op=Pre[ax, ax, -ay, -ax, az, -ax, ay, -az][0, 0, 0] + Pre[ax, ay, az, -ax, -ax, -ay, ax, -az][0, -1, 0] - Pre[ax, az, ax, ay, -az, -ax, -ax, -ay][0, -1, 0] + Pre[ay, ax, az, az, -ay, -az, -ax, -az][0, -1, 0] - Pre[ay, az, ax, ax, -ay, -ax, -az, -ax][0, -1, 0] + Pre[az, ax, az, ay, -ax, -az, -az, -ay][0, -1, 0] - Pre[az, ay, ax, -az, -az, -ay, az, -ax][0, -1, 0] - Pre[az, az, -ay, -az, ax, -az, ay, -ax][0, 0, 0]\n px=%d py=%d pz=%d Irrep=%d ev=%d charge=%d multiplet id=%d (%2.10e %2.10e) (%2.10e %2.10e) %2.10e \n",0,1,0,2,1,1,1,creal(tmp[0]),cimag(tmp[0]),creal(tmp[1]),cimag(tmp[1]),sqrt(creal(tmp[2])));
+  return_value++;
+  }
+}
+if(30==rotid)
+{
+tmp[0]=rotfun(13);
+tmp[1]=-1.*unrotfun(13);
+_complex_mul_star(tmp[2],tmp[0]-tmp[1],tmp[0]-tmp[1]);
+if(sqrt(creal(tmp[2]))>=1.e-10){
+  lprintf("Error",0," Op=Pre[ax, ax, -ay, -ax, az, -ax, ay, -az][0, 0, 0] + Pre[ax, ay, az, -ax, -ax, -ay, ax, -az][0, -1, 0] - Pre[ax, az, ax, ay, -az, -ax, -ax, -ay][0, -1, 0] + Pre[ay, ax, az, az, -ay, -az, -ax, -az][0, -1, 0] - Pre[ay, az, ax, ax, -ay, -ax, -az, -ax][0, -1, 0] + Pre[az, ax, az, ay, -ax, -az, -az, -ay][0, -1, 0] - Pre[az, ay, ax, -az, -az, -ay, az, -ax][0, -1, 0] - Pre[az, az, -ay, -az, ax, -az, ay, -ax][0, 0, 0]\n px=%d py=%d pz=%d Irrep=%d ev=%d charge=%d multiplet id=%d (%2.10e %2.10e) (%2.10e %2.10e) %2.10e \n",0,1,0,2,1,1,1,creal(tmp[0]),cimag(tmp[0]),creal(tmp[1]),cimag(tmp[1]),sqrt(creal(tmp[2])));
+  return_value++;
+  }
+}
+if(47==rotid)
+{
+tmp[0]=rotfun(13);
+tmp[1]=-1.*unrotfun(13);
+_complex_mul_star(tmp[2],tmp[0]-tmp[1],tmp[0]-tmp[1]);
+if(sqrt(creal(tmp[2]))>=1.e-10){
+  lprintf("Error",0," Op=Pre[ax, ax, -ay, -ax, az, -ax, ay, -az][0, 0, 0] + Pre[ax, ay, az, -ax, -ax, -ay, ax, -az][0, -1, 0] - Pre[ax, az, ax, ay, -az, -ax, -ax, -ay][0, -1, 0] + Pre[ay, ax, az, az, -ay, -az, -ax, -az][0, -1, 0] - Pre[ay, az, ax, ax, -ay, -ax, -az, -ax][0, -1, 0] + Pre[az, ax, az, ay, -ax, -az, -az, -ay][0, -1, 0] - Pre[az, ay, ax, -az, -az, -ay, az, -ax][0, -1, 0] - Pre[az, az, -ay, -az, ax, -az, ay, -ax][0, 0, 0]\n px=%d py=%d pz=%d Irrep=%d ev=%d charge=%d multiplet id=%d (%2.10e %2.10e) (%2.10e %2.10e) %2.10e \n",0,1,0,2,1,1,1,creal(tmp[0]),cimag(tmp[0]),creal(tmp[1]),cimag(tmp[1]),sqrt(creal(tmp[2])));
+  return_value++;
+  }
+}
+if(45==rotid)
+{
+tmp[0]=rotfun(13);
+tmp[1]=-1.*unrotfun(13);
+_complex_mul_star(tmp[2],tmp[0]-tmp[1],tmp[0]-tmp[1]);
+if(sqrt(creal(tmp[2]))>=1.e-10){
+  lprintf("Error",0," Op=Pre[ax, ax, -ay, -ax, az, -ax, ay, -az][0, 0, 0] + Pre[ax, ay, az, -ax, -ax, -ay, ax, -az][0, -1, 0] - Pre[ax, az, ax, ay, -az, -ax, -ax, -ay][0, -1, 0] + Pre[ay, ax, az, az, -ay, -az, -ax, -az][0, -1, 0] - Pre[ay, az, ax, ax, -ay, -ax, -az, -ax][0, -1, 0] + Pre[az, ax, az, ay, -ax, -az, -az, -ay][0, -1, 0] - Pre[az, ay, ax, -az, -az, -ay, az, -ax][0, -1, 0] - Pre[az, az, -ay, -az, ax, -az, ay, -ax][0, 0, 0]\n px=%d py=%d pz=%d Irrep=%d ev=%d charge=%d multiplet id=%d (%2.10e %2.10e) (%2.10e %2.10e) %2.10e \n",0,1,0,2,1,1,1,creal(tmp[0]),cimag(tmp[0]),creal(tmp[1]),cimag(tmp[1]),sqrt(creal(tmp[2])));
+  return_value++;
+  }
+}
+if(0==rotid)
+{
+tmp[0]=rotfun(14);
+tmp[1]=1.*unrotfun(14);
+_complex_mul_star(tmp[2],tmp[0]-tmp[1],tmp[0]-tmp[1]);
+if(sqrt(creal(tmp[2]))>=1.e-10){
   lprintf("Error",0," Op=8 Pre[az, ay, -az, -ay][0, 0, 0]\n px=%d py=%d pz=%d Irrep=%d ev=%d charge=%d multiplet id=%d (%2.10e %2.10e) (%2.10e %2.10e) %2.10e \n",1,0,0,1,1,1,1,creal(tmp[0]),cimag(tmp[0]),creal(tmp[1]),cimag(tmp[1]),sqrt(creal(tmp[2])));
   return_value++;
   }
 }
 if(20==rotid)
 {
-tmp[0]=rotfun(13);
-tmp[1]=1.*unrotfun(13);
+tmp[0]=rotfun(14);
+tmp[1]=1.*unrotfun(14);
 _complex_mul_star(tmp[2],tmp[0]-tmp[1],tmp[0]-tmp[1]);
 if(sqrt(creal(tmp[2]))>=1.e-10){
   lprintf("Error",0," Op=8 Pre[az, ay, -az, -ay][0, 0, 0]\n px=%d py=%d pz=%d Irrep=%d ev=%d charge=%d multiplet id=%d (%2.10e %2.10e) (%2.10e %2.10e) %2.10e \n",1,0,0,1,1,1,1,creal(tmp[0]),cimag(tmp[0]),creal(tmp[1]),cimag(tmp[1]),sqrt(creal(tmp[2])));
@@ -3870,8 +3950,8 @@ if(sqrt(creal(tmp[2]))>=1.e-10){
 }
 if(19==rotid)
 {
-tmp[0]=rotfun(13);
-tmp[1]=1.*unrotfun(13);
+tmp[0]=rotfun(14);
+tmp[1]=1.*unrotfun(14);
 _complex_mul_star(tmp[2],tmp[0]-tmp[1],tmp[0]-tmp[1]);
 if(sqrt(creal(tmp[2]))>=1.e-10){
   lprintf("Error",0," Op=8 Pre[az, ay, -az, -ay][0, 0, 0]\n px=%d py=%d pz=%d Irrep=%d ev=%d charge=%d multiplet id=%d (%2.10e %2.10e) (%2.10e %2.10e) %2.10e \n",1,0,0,1,1,1,1,creal(tmp[0]),cimag(tmp[0]),creal(tmp[1]),cimag(tmp[1]),sqrt(creal(tmp[2])));
@@ -3880,8 +3960,8 @@ if(sqrt(creal(tmp[2]))>=1.e-10){
 }
 if(23==rotid)
 {
-tmp[0]=rotfun(13);
-tmp[1]=1.*unrotfun(13);
+tmp[0]=rotfun(14);
+tmp[1]=1.*unrotfun(14);
 _complex_mul_star(tmp[2],tmp[0]-tmp[1],tmp[0]-tmp[1]);
 if(sqrt(creal(tmp[2]))>=1.e-10){
   lprintf("Error",0," Op=8 Pre[az, ay, -az, -ay][0, 0, 0]\n px=%d py=%d pz=%d Irrep=%d ev=%d charge=%d multiplet id=%d (%2.10e %2.10e) (%2.10e %2.10e) %2.10e \n",1,0,0,1,1,1,1,creal(tmp[0]),cimag(tmp[0]),creal(tmp[1]),cimag(tmp[1]),sqrt(creal(tmp[2])));
@@ -3890,8 +3970,8 @@ if(sqrt(creal(tmp[2]))>=1.e-10){
 }
 if(27==rotid)
 {
-tmp[0]=rotfun(13);
-tmp[1]=1.*unrotfun(13);
+tmp[0]=rotfun(14);
+tmp[1]=1.*unrotfun(14);
 _complex_mul_star(tmp[2],tmp[0]-tmp[1],tmp[0]-tmp[1]);
 if(sqrt(creal(tmp[2]))>=1.e-10){
   lprintf("Error",0," Op=8 Pre[az, ay, -az, -ay][0, 0, 0]\n px=%d py=%d pz=%d Irrep=%d ev=%d charge=%d multiplet id=%d (%2.10e %2.10e) (%2.10e %2.10e) %2.10e \n",1,0,0,1,1,1,1,creal(tmp[0]),cimag(tmp[0]),creal(tmp[1]),cimag(tmp[1]),sqrt(creal(tmp[2])));
@@ -3900,8 +3980,8 @@ if(sqrt(creal(tmp[2]))>=1.e-10){
 }
 if(28==rotid)
 {
-tmp[0]=rotfun(13);
-tmp[1]=1.*unrotfun(13);
+tmp[0]=rotfun(14);
+tmp[1]=1.*unrotfun(14);
 _complex_mul_star(tmp[2],tmp[0]-tmp[1],tmp[0]-tmp[1]);
 if(sqrt(creal(tmp[2]))>=1.e-10){
   lprintf("Error",0," Op=8 Pre[az, ay, -az, -ay][0, 0, 0]\n px=%d py=%d pz=%d Irrep=%d ev=%d charge=%d multiplet id=%d (%2.10e %2.10e) (%2.10e %2.10e) %2.10e \n",1,0,0,1,1,1,1,creal(tmp[0]),cimag(tmp[0]),creal(tmp[1]),cimag(tmp[1]),sqrt(creal(tmp[2])));
@@ -3910,8 +3990,8 @@ if(sqrt(creal(tmp[2]))>=1.e-10){
 }
 if(45==rotid)
 {
-tmp[0]=rotfun(13);
-tmp[1]=1.*unrotfun(13);
+tmp[0]=rotfun(14);
+tmp[1]=1.*unrotfun(14);
 _complex_mul_star(tmp[2],tmp[0]-tmp[1],tmp[0]-tmp[1]);
 if(sqrt(creal(tmp[2]))>=1.e-10){
   lprintf("Error",0," Op=8 Pre[az, ay, -az, -ay][0, 0, 0]\n px=%d py=%d pz=%d Irrep=%d ev=%d charge=%d multiplet id=%d (%2.10e %2.10e) (%2.10e %2.10e) %2.10e \n",1,0,0,1,1,1,1,creal(tmp[0]),cimag(tmp[0]),creal(tmp[1]),cimag(tmp[1]),sqrt(creal(tmp[2])));
@@ -3920,8 +4000,8 @@ if(sqrt(creal(tmp[2]))>=1.e-10){
 }
 if(46==rotid)
 {
-tmp[0]=rotfun(13);
-tmp[1]=1.*unrotfun(13);
+tmp[0]=rotfun(14);
+tmp[1]=1.*unrotfun(14);
 _complex_mul_star(tmp[2],tmp[0]-tmp[1],tmp[0]-tmp[1]);
 if(sqrt(creal(tmp[2]))>=1.e-10){
   lprintf("Error",0," Op=8 Pre[az, ay, -az, -ay][0, 0, 0]\n px=%d py=%d pz=%d Irrep=%d ev=%d charge=%d multiplet id=%d (%2.10e %2.10e) (%2.10e %2.10e) %2.10e \n",1,0,0,1,1,1,1,creal(tmp[0]),cimag(tmp[0]),creal(tmp[1]),cimag(tmp[1]),sqrt(creal(tmp[2])));

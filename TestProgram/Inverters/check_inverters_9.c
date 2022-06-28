@@ -8,8 +8,7 @@
  * NOCOMPILE= BASIC_SF
  * NOCOMPILE= ROTATED_SF
  * NOCOMPILE= FERMION_THETA
- * NOCOMPILE= WITH_EXPCLOVER
- * NOCOMPILE= WITH_CLOVER
+ *
 ******************************************************************************/
 
 #define MAIN_PROGRAM

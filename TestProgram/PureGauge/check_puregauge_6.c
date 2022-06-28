@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
   w3 = &s2;
 
   double complex dop, dop1;
-  double max_diff[2];
+  double max_diff[2], min_val;
   double cop;
 
   setup_process(&argc, &argv);
@@ -58,6 +58,8 @@ int main(int argc, char *argv[])
   dir = 1;
   Ldir = X;
 
+  min_val = 10.;
+
   for (int t = 0; t < T; t++)
     for (int y = 0; y < Y; y++)
       for (int z = 0; z < Z; z++)
@@ -65,6 +67,11 @@ int main(int argc, char *argv[])
         {
           in1 = ipt(t, x, y, z);
           pl = polyleg(in1, dir);
+
+          if (fabs(pl->tr) < min_val)
+            min_val = fabs(pl->tr);
+          if (fabs(pl->tr) < 10.e-13)
+            return_value++;
 
           for (int j = npoly_dist - 1; j >= 0; j--)
           {
@@ -116,14 +123,16 @@ int main(int argc, char *argv[])
             return_value++;
         }
   global_max(max_diff, 2);
+  global_min(&min_val, 1);
 
   lprintf("MAIN", 0, "Maximal trace real difference in X= %.16e\n", max_diff[1]);
   lprintf("MAIN", 0, "Maximal normalized leg difference in X= %.16e\n", max_diff[0]);
+  lprintf("MAIN", 0, "Minimal amplitude for the trace of the polyakov line in X= %.16e\n", min_val);
   max_diff[0] = max_diff[1] = 0.0;
 
   dir = 2;
   Ldir = Y;
-
+  min_val = 10.;
   for (int t = 0; t < T; t++)
     for (int z = 0; z < Z; z++)
       for (int x = 0; x < X; x++)
@@ -131,6 +140,11 @@ int main(int argc, char *argv[])
         {
           in1 = ipt(t, x, y, z);
           pl = polyleg(in1, dir);
+
+          if (fabs(pl->tr) < min_val)
+            min_val = fabs(pl->tr);
+          if (fabs(pl->tr) < 10.e-13)
+            return_value++;
 
           for (int j = npoly_dist - 1; j >= 0; j--)
           {
@@ -183,9 +197,12 @@ int main(int argc, char *argv[])
             return_value++;
         }
   global_max(max_diff, 2);
+  global_min(&min_val, 1);
 
   lprintf("MAIN", 0, "Maximal trace real difference in Y= %.16e\n", max_diff[1]);
   lprintf("MAIN", 0, "Maximal normalized leg difference in Y= %.16e\n", max_diff[0]);
+  lprintf("MAIN", 0, "Minimal amplitude for the trace of the polyakov line in Y= %.16e\n", min_val);
+
   max_diff[0] = max_diff[1] = 0.0;
 
   dir = 3;
@@ -199,6 +216,11 @@ int main(int argc, char *argv[])
           in1 = ipt(t, x, y, z);
           pl = polyleg(in1, dir);
 
+          if (fabs(pl->tr) < min_val)
+            min_val = fabs(pl->tr);
+          if (fabs(pl->tr) < 10.e-13)
+            return_value++;
+
           for (int j = npoly_dist - 1; j >= 0; j--)
           {
 
@@ -251,9 +273,11 @@ int main(int argc, char *argv[])
         }
 
   global_max(max_diff, 2);
+  global_min(&min_val, 1);
 
   lprintf("MAIN", 0, "Maximal trace real difference in Z= %.16e\n", max_diff[1]);
   lprintf("MAIN", 0, "Maximal normalized leg difference in Z= %.16e\n", max_diff[0]);
+  lprintf("MAIN", 0, "Minimal amplitude for the trace of the polyakov line in Z= %.16e\n", min_val);
 
   global_sum_int(&return_value, 1);
 
