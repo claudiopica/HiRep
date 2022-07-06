@@ -1017,7 +1017,7 @@ void collect_1pt_torellon_functions(cor_list *lcor, double complex *tor_storage)
     *)
     WriteString[ar, "#define total_n_glue_op ",maxopCnumber,"\n"];
     WriteString[ar, "#define total_n_tor_op ",maxtorCnumber,"\n"];
-    WriteString[ar, "#define npoly_dist ",npolydist,"\n"];
+    WriteString[ar, "#define npoly_dist ",Max[npolydist,1],"\n"];
     WriteString[ar,"#endif\n"];
     Close[ar];
     ];
@@ -1064,10 +1064,10 @@ If[Length[bTOrthog[px,py,pz]]<irrepidx||irrepidx<1,Print["Number of irreps is no
 If[Length[bTOrthog[px,py,pz][[irrepidx]]]<irrepev||irrepev<1,Print["Irrep dimension is not compatible with the requested irrep ev"];Abort[];];
 If[!(charge==-1||charge==+1),Print["Charge can only take values +1 or -1"];Abort[];];If[!MatchQ[path,P[__]],Print["path must be a unique Path quantity P[__]"];Abort[]];
 If[!(IsIn/@(path//. P:>List)//. List->And),Print["Path written in terms of non a-steps"];Abort[]];
+If[Not[MatchQ[path//. P :> Plus, _. ax] || MatchQ[path//. P :> Plus, _. ay] || MatchQ[path//. P :> Plus, _. az]] ,Print["TorGenerate of a non single directed Path "]; Abort[];];
 res=Sum[ bTOrthog[px, py, pz][[irrepidx, irrepev, i]] (path //. permutationTable[[i]]),{i,1,48}];
 res=res//. btoa;
 res=TorSimplify[res];
-
 
 If[px==0,res=res//. {P[A__][ax_,ay_,az_]:>P[A][0,ay,az],Dagger[P[A__]][ax_,ay_,az_]:>Dagger[P[A]][0,ay,az]}];
 If[py==0,res=res//. {P[A__][ax_,ay_,az_]:>P[A][ax,0,az],Dagger[P[A__]][ax_,ay_,az_]:>Dagger[P[A]][ax,0,az]}];
@@ -1120,10 +1120,10 @@ ris];
 
 
 TorUniqueIdentifier[ain_] := TorUniqueIdentifier[ain] = Module[{ris = ain,res, Ptemp, tmpris, lper,listris,r3,pshift,ininv,outinv,dir,shift,absdir,polydx},
-  If[Not[MatchQ[ris,P[__]]],Print["Requested a TorUniqueIdentifier of a non Path quantity"];Abort[]];
-  ris = ris //.{P[A___,L[a2_]]->  P[A,a2],P[A___,-n_. a2_ +L[a2_]]->  P[A,a2]};
-  If[Not[Map[IsIn, ris //. P :> List] //. List -> And],Print["Requested a TorUniqueIdentifier of non a-steps Path :",ris];Abort[]];
-  If[Not[MatchQ[ris//. P :> Plus, _. ax] || MatchQ[ris//. P :> Plus, _. ay] || MatchQ[ris//. P :> Plus, _. az]] ,Print["TorUniqueIdentifier of a non single directed Path "]; Abort[];];
+If[Not[MatchQ[ris,P[__]]],Print["Requested a TorUniqueIdentifier of a non Path quantity"];Abort[]];
+ris = ris //.{P[A___,L[a2_]]->  P[A,a2],P[A___,-n_. a2_ +L[a2_]]->  P[A,a2]};
+If[Not[Map[IsIn, ris //. P :> List] //. List -> And],Print["Requested a TorUniqueIdentifier of non a-steps Path :",ris];Abort[]];
+If[Not[MatchQ[ris//. P :> Plus, _. ax] || MatchQ[ris//. P :> Plus, _. ay] || MatchQ[ris//. P :> Plus, _. az]] ,Print["TorUniqueIdentifier of a non single directed Path "]; Abort[];];
 dir = Expand[(ris//. P :> Plus)/(Abs[(ris//. P :> Plus)//.{ax-> 1 ,ay->1,az->1}])];
 ris = ris //. P[A__] -> List[A];
 ris = ris //. {{dir,A1___} ->{A1},{A1___,dir} ->{A1}};
@@ -1251,6 +1251,7 @@ TorUniqueIndex[ain_]:=TorUniqueIdentifier[ain][[2]];
    paths=paths //.{A___,d_.  C1_[a1__][a2__]^2,B___}:> {A, {C1[a1],C1[a1],exp[a2]},B}/; Or[SameQ[C1,Pre],SameQ[C1,Pim]] ;
    paths=paths//. {{A___,Pre[b__],C___} :> {A,P[b],0,C}, {A___, Pim[b__],C___}:> {A,P[b],1,C}};
    paths=paths //.exp[nx_,ny_,nz_] -> Exp[I 2 Pi / L (px nx+py ny +pz nz)];
+   paths=paths //. {P[a1_],a2_,P[L[a3_]],a4_,a5_}:> {P[L[a3]],a2,P[a1],a4,a5}/;FreeQ[a1, L[_]];
    paths=paths//.{P[L[a1_]]-> P[a1],P[a1__,b_+L[a_]]-> P[a1]};
     If[Not[AllTrue[paths[[All,1]], Not[FreeQ[#, P[__]]] &]],Print["1 The request operator has a non P based structure:",tor];Abort[]];
     If[Not[AllTrue[coeff, NumberQ[N[#]] &]],Print["2 The request operator has a non P based structure:",tor];Abort[]];
@@ -1273,14 +1274,21 @@ TorUniqueIndex[ain_]:=TorUniqueIdentifier[ain][[2]];
     Do[WriteShift[shifts[[i]],torfilename],{i,1,Length[shifts]}];
 
     ar = OpenAppend[torfilename, FormatType -> InputForm];
-    WriteString[ar, "static inline double complex diPoly_p_",p[px],"_",p[py],"_",p[pz],"_Ir_",irrepidx,"_C_",p[charge],"_n_",toridx,"(int idx)\n"];
-    WriteString[ar,"{\nreturn "];
+    WriteString[ar, "static inline double complex diPoly_p_",p[px],"_",p[py],"_",p[pz],"_Ir_",irrepidx,"_C_",p[charge],"_n_",toridx,"(int x1, int y1, int z1)\n"];
+    WriteString[ar,"{
+    int idx = ntors * (x1 + X * (y1 + Y * z1));
+    \nreturn "];
     Do[
       WriteString[ar,OpConsts[coeff[[i]]]];
       If[Abs[coeff[[i]]]!=1,WriteString[ar,"*"]];
       If[Not[SameQ[paths[[i,5]],1]],WriteString[ar,MapShifts[torfilename,paths[[i,5]]],"*"]];
       If[paths[[i,2]]==0,WriteString[ar,"creal(tor_path_storage["],WriteString[ar,"cimag(tor_path_storage["]];
-      WriteString[ar,TorUniqueIndex[paths[[i,1]]][[1]],"+idx])*"];
+      If[TorUniqueIndex[paths[[i,1]]][[1]]==0,
+      WriteString[ar,TorUniqueIndex[paths[[i,1]]][[1]],"+ntors * (x1 + X * ((y1+Y/2)%Y + Y *((z1+Z/2)%Z)))])*"]];
+      If[TorUniqueIndex[paths[[i,1]]][[1]]==1,
+      WriteString[ar,TorUniqueIndex[paths[[i,1]]][[1]],"+ntors * ((x1+X/2)%X + X * (y1 + Y *((z1+Z/2)%Z)))])*"]];
+      If[TorUniqueIndex[paths[[i,1]]][[1]]==2,
+      WriteString[ar,TorUniqueIndex[paths[[i,1]]][[1]],"+ntors * ((x1+X/2)%X + X * ((y1+Y/2)%Y + Y * z1))])*"]];
       If[paths[[i,4]]==0,WriteString[ar,"creal(tor_path_storage["],WriteString[ar,"cimag(tor_path_storage["]];
         WriteString[ar,TorUniqueIndex[paths[[i,3]]][[1]],"+idx])"];
     ,{i,1,Length[paths]}];
@@ -1624,14 +1632,13 @@ Do[
 
 
 
-WriteTorellonsCfiles[ltornumberC_]:=Module[{ar,evaltors,idop,found},
+WriteTorellonsCfiles[ltornumberC_]:=Module[{ar,evaltors,idop,found,once},
 (*
 This block allow for the evaluation of the momentum defined poly and torellons.
 The paths are evaluated only once while each different momentum projection can be re-evaluated independently.
 *)
 ar=OpenAppend[torfilename,FormatType->InputForm];
-WriteString[ar,"static int last_t = -10;\nvoid request_space_tors_evaluation(){last_t=-10;}
-  static void eval_time_momentum_torellons(int t, int px, int py, int pz, double complex * np)
+WriteString[ar,"static void eval_time_momentum_torellons(int t, double complex * np)
   {
     int nnx, nny, nnz, idx=0, in;
     double complex ce = I * 2.0 * PI / GLB_X;
@@ -1642,7 +1649,6 @@ WriteString[ar,"        tor_path_storage = malloc(ntors * X * Y * Z * sizeof(dou
         for (in = 0; in < ntors * X * Y * Z; in++)
             tor_path_storage[in] = 0.;
     };\n"];
-WriteString[ar,"if (t != last_t)\n{\nlast_t=t;\n"];
 WriteString[ar,"for (nny = 0; nny < Y; nny++)\nfor (nnz = 0; nnz < Z; nnz++)\nfor (nnx = 0; nnx < X; nnx++)\n{\n"];
 WriteString[ar,"in = ipt(t, nnx, nny, nnz);\n"];
 WriteString[ar,"idx = ntors * (nnx + X * (nny + Y * nnz));\n"];
@@ -1661,41 +1667,20 @@ WriteString[ar,"idx = ntors * (nnx + X * (nny + Y * nnz));\n"];
 Do[If[NumberQ[WrittenPoly[i]],If[FreeQ[TorList[i],L[ay]]&&FreeQ[TorList[i],L[ax]],
 WriteString[ar,"tor_path_storage[",i,"+idx]= poly",i,"(in);\n"];];];,{i,0,torindex-1}];
 WriteString[ar,"};\n"];
-WriteString[ar,"};\n"];
-  ltornumberC=0;
-  Do[
-        evaltors=0;
-        nltor=0;
-      Do[
-        Do[
-          If[ListQ[Torindex[px, py, pz, irrepidx,charge]],
-            Do[
-              Do[
-                  If[Not[SameQ[Torindex[px, py, pz, irrepidx,charge][[nop, irrepev]],0]],
-                  nltor++;
-                  ];
-              , {nop, 1, Length[Torindex[px, py, pz, irrepidx,charge]]}];
-              , {irrepev, 1, Length[bTOrthog[px, py, pz][[irrepidx]]]}];
-             ];
-        ,{charge,-1,1,2}];
-      , {irrepidx, 1, Length[bTOrthog[px, py, pz]]}];
-    Do[
+
+ltornumberC=0;
+
+WriteString[ar,"for (nnx = 0; nnx < X; nnx++)\nfor (nny = 0; nny < Y; nny++)\nfor (nnz = 0; nnz < Z; nnz++)\n{\n"];
+Do[        
+   Do[
       Do[
           If[ListQ[Torindex[px, py, pz, irrepidx,charge]],
-          If[evaltors==0 &&  Select[Flatten[Torindex[px, py, pz, irrepidx,charge]], IntegerQ[#] && # > 0 &] !={}, 
-            WriteString[ar,"if(px==",px," && py==",py," && pz==",pz,")\n{\n"];
-            Do[WriteString[ar,"np[",ltornumberC+lj,"]=0.0;\n"];,{lj,0,nltor-1}];
-
-            WriteString[ar,"for (nnx = 0; nnx < X; nnx++)\nfor (nny = 0; nny < Y; nny++)\nfor (nnz = 0; nnz < Z; nnz++)\n{\nidx = ntors * (nnx + X * (nny + Y * nnz));\n"];
-            evaltors=1;
-          ];
-
           Do[
             Do[
               idop = Torindex[px, py, pz, irrepidx,charge][[nop, irrepev]];
                   If[Not[SameQ[idop,0]],
                       If[SameQ[nnx px + nny py + nnz pz,0],expstring="",expstring="cexp(-ce * (double)("<>ToString[CForm[nnx*px + nny*py + nnz*pz]] <> "))*";];
-                    WriteString[ar, "np[",ltornumberC,"] +=",expstring,"diPoly_p_", p[px], "_", p[py], "_", p[pz],"_Ir_", irrepidx, "_C_",p[charge],"_n_", idop,"(idx);\n"];
+                    WriteString[ar, "np[",ltornumberC,"] +=",expstring,"diPoly_p_", p[px], "_", p[py], "_", p[pz],"_Ir_", irrepidx, "_C_",p[charge],"_n_", idop,"(nnx,nny,nnz);\n"];
                     MapTortoCindex[px,py,pz,irrepidx,charge,idop]=ltornumberC;
                     ltornumberC++;
                 ];
@@ -1703,10 +1688,9 @@ WriteString[ar,"};\n"];
           , {irrepev, 1, Length[bTOrthog[px, py, pz][[irrepidx]]]}];
         ];
       ,{charge,-1,1,2}];
-      , {irrepidx, 1, Length[bTOrthog[px, py, pz]]}];
-    If[evaltors==1,WriteString[ar, "};\n};\n"];];
-  , {px, -1, 1}, {py, -1, 1}, {pz, -1, 1}];
-WriteString[ar,"};\n"];
+    ,{irrepidx, 1, Length[bTOrthog[px, py, pz]]}];
+  ,{px, -1, 1}, {py, -1, 1}, {pz, -1, 1}];
+WriteString[ar,"};\n};\n"];
 (**)
   WriteString[ar, "void eval_all_torellon_ops(int t, double complex *numerical_tor_out)
 {
@@ -1714,15 +1698,23 @@ WriteString[ar,"};\n"];
     if (numerical_op == NULL)
     {
         numerical_op = malloc(total_n_tor_op * sizeof(double complex));
-    }
-    request_space_tors_evaluation();\n"];
+    } 
+else
+    {
+        for (int i = 0; i < total_n_tor_op; i++)
+            numerical_op[i] = 0;
+    }\n"];
+  once=True;
   Do[
     Do[
       Do[
         If[ListQ[Torindex[px, py, pz, irrepidx,charge]],
           If[Select[Flatten[Torindex[px, py, pz, irrepidx,charge]], IntegerQ[#] && # > 0 &] !={}, 
-            WriteString[ar,"eval_time_momentum_torellons(t,",px,",",py,",",pz,",numerical_op);\n"];
-            ];
+            If[once,
+              WriteString[ar,"eval_time_momentum_torellons(t,numerical_op);\n"];
+              once=False
+              ];
+             ];
            ];
       ,{charge,-1,1,2}];
     ,{irrepidx, 1, Length[bTOrthog[px, py, pz]]}];
