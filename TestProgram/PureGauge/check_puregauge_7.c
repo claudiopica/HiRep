@@ -131,6 +131,9 @@ int main(int argc, char *argv[])
   polyf[0] = amalloc(sizeof(double complex) * Y * Z * T, ALIGN);
   polyf[1] = amalloc(sizeof(double complex) * X * Z * T, ALIGN);
   polyf[2] = amalloc(sizeof(double complex) * X * Y * T, ALIGN);
+  memset(polyf[0], 0, sizeof(double complex) * Y * Z * T);
+  memset(polyf[1], 0, sizeof(double complex) * X * Z * T);
+  memset(polyf[2], 0, sizeof(double complex) * X * Y * T);
 
   for (n = 0; n < T * total_n_tor_op; n++)
   {
@@ -152,10 +155,14 @@ int main(int argc, char *argv[])
 
   lprintf("MAIN", 0, "done.\n");
 
+  memset(polyf[0], 0, sizeof(double complex) * Y * Z * T);
+  memset(polyf[1], 0, sizeof(double complex) * X * Z * T);
+  memset(polyf[2], 0, sizeof(double complex) * X * Y * T);
+
   for (nt = 0; nt < T; nt++)
     eval_all_torellon_ops(nt, dop1 + nt * total_n_tor_op, polyf);
 
-  collect_1pt_torellon_functions(&corrs, dop, polyf);
+  collect_1pt_torellon_functions(&corrs, dop1, polyf);
 
   for (n = 0; n < T * total_n_tor_op; n++)
     dop1[n] /= NG * GLB_VOLUME;

@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     86612,       1760]
-NotebookOptionsPosition[     39427,        896]
-NotebookOutlinePosition[     85766,       1751]
-CellTagsIndexPosition[     85723,       1748]
+NotebookDataLength[    145723,       3525]
+NotebookOptionsPosition[    142300,       3467]
+NotebookOutlinePosition[    142768,       3486]
+CellTagsIndexPosition[    142725,       3483]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -46,8 +46,7 @@ Cell[BoxData[
    RowBox[{"NotebookDirectory", "[", "]"}], "]"}], ";"}]], "Input",
  CellChangeTimes->{{3.751183327397894*^9, 3.751183334653039*^9}, 
    3.7567978451653833`*^9},
- CellLabel->
-  "In[521]:=",ExpressionUUID->"a9204ae2-9919-472d-b5c0-3aae98f96c89"],
+ CellLabel->"In[1]:=",ExpressionUUID->"a9204ae2-9919-472d-b5c0-3aae98f96c89"],
 
 Cell[BoxData[
  RowBox[{"Get", "[", "\"\<OpProjection.m\>\"", "]"}]], "Input",
@@ -61,8 +60,7 @@ Cell[BoxData[
    3.761217695871572*^9, 3.761217704536562*^9}, {3.762017879872128*^9, 
    3.762017881677663*^9}, {3.7621520886746607`*^9, 3.7621520963363543`*^9}, 
    3.7669477063042803`*^9},
- CellLabel->
-  "In[522]:=",ExpressionUUID->"7f0556eb-11e6-4d93-8e86-35273c8d3b29"],
+ CellLabel->"In[2]:=",ExpressionUUID->"7f0556eb-11e6-4d93-8e86-35273c8d3b29"],
 
 Cell[BoxData[{
  RowBox[{
@@ -370,8 +368,9 @@ Cell[BoxData[{
      RowBox[{"-", "ay"}], ",", 
      RowBox[{"-", "az"}]}], "]"}]}], ";"}]}], "Input",
  CellChangeTimes->{{3.766916126201436*^9, 3.766916195509633*^9}},
- CellLabel->
-  "In[523]:=",ExpressionUUID->"1986ba6f-0937-40e5-84b7-75568c370d56"],
+ CellLabel->"In[3]:=",ExpressionUUID->"1986ba6f-0937-40e5-84b7-75568c370d56"],
+
+Cell[CellGroupData[{
 
 Cell[BoxData[{
  RowBox[{"CodeControl", "=", 
@@ -405,9 +404,23 @@ Cell[BoxData[{
    3.8654813760284843`*^9}, {3.866093531547633*^9, 3.866093531648551*^9}, {
    3.866112581001959*^9, 3.866112581036693*^9}, {3.866439649315765*^9, 
    3.866439649399135*^9}, {3.866439771458282*^9, 3.8664397715478086`*^9}, {
-   3.866601536305416*^9, 3.866601540728714*^9}},
- CellLabel->
-  "In[555]:=",ExpressionUUID->"235cc05a-d3c5-4d2a-b0a4-ef29b6913572"],
+   3.866601536305416*^9, 3.866601540728714*^9}, {3.8666028685130463`*^9, 
+   3.86660286867795*^9}, {3.86660916330928*^9, 3.8666091633971577`*^9}, {
+   3.86660956751343*^9, 3.866609571377743*^9}, {3.866611426392025*^9, 
+   3.866611429700465*^9}, {3.866612104113616*^9, 
+   3.866612106302525*^9}},ExpressionUUID->"235cc05a-d3c5-4d2a-b0a4-\
+ef29b6913572"],
+
+Cell[BoxData["\<\"run\"\>"], "Output",
+ CellChangeTimes->{{3.8666028732202673`*^9, 3.8666028910901527`*^9}, 
+   3.866609490991467*^9, 3.866611432610113*^9},
+ CellLabel->"Out[35]=",ExpressionUUID->"5d3efbe7-40ec-4e82-8a86-e6eb6800ca17"],
+
+Cell[BoxData["\<\"torellons\"\>"], "Output",
+ CellChangeTimes->{{3.8666028732202673`*^9, 3.8666028910901527`*^9}, 
+   3.866609490991467*^9, 3.8666114326110983`*^9},
+ CellLabel->"Out[36]=",ExpressionUUID->"f8ea6b46-ca4f-43dd-9a71-dd31b6f4356b"]
+}, Open  ]],
 
 Cell[BoxData[
  RowBox[{
@@ -531,8 +544,7 @@ Cell[BoxData[
    3.864697750945674*^9}, 3.864699217751616*^9, {3.864729344317161*^9, 
    3.864729383118724*^9}, {3.865050231204516*^9, 3.865050270122147*^9}, {
    3.8650589045047398`*^9, 3.8650589303320713`*^9}},
- CellLabel->
-  "In[557]:=",ExpressionUUID->"83d43c5d-194c-4391-8c8b-737e48cbad4e"],
+ CellLabel->"In[37]:=",ExpressionUUID->"83d43c5d-194c-4391-8c8b-737e48cbad4e"],
 
 Cell[BoxData[
  RowBox[{
@@ -691,8 +703,9 @@ Cell[BoxData[
    3.863164931256061*^9, 3.863164931663364*^9}, {3.864527512083723*^9, 
    3.864527524698504*^9}, 3.864527662232524*^9, {3.864697765203149*^9, 
    3.864697781216297*^9}, {3.864729349495968*^9, 3.864729354349914*^9}},
- CellLabel->
-  "In[558]:=",ExpressionUUID->"a8b5aac3-4474-4b14-a145-642f7c250882"],
+ CellLabel->"In[38]:=",ExpressionUUID->"a8b5aac3-4474-4b14-a145-642f7c250882"],
+
+Cell[CellGroupData[{
 
 Cell[BoxData[
  RowBox[{
@@ -880,8 +893,1568 @@ Cell[BoxData[
    3.8654124004296627`*^9}, {3.866082324500198*^9, 3.8660823282771683`*^9}, {
    3.866083311186792*^9, 3.8660833141549683`*^9}, {3.8660864678718863`*^9, 
    3.866086469264312*^9}, {3.866089555969702*^9, 3.866089558757792*^9}},
+ CellLabel->"In[39]:=",ExpressionUUID->"0d92a956-6972-4a98-b355-8547c76b9bf3"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"Input path : \"\>", "\[InvisibleSpace]", 
+   RowBox[{"P", "[", "ax", "]"}], 
+   "\[InvisibleSpace]", "\<\"\\n Generated Torellon Operator : \"\>", 
+   "\[InvisibleSpace]", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"16", " ", 
+       SuperscriptBox[
+        RowBox[{
+         RowBox[{"Pim", "[", 
+          RowBox[{"L", "[", "ax", "]"}], "]"}], "[", 
+         RowBox[{"0", ",", "0", ",", "0"}], "]"}], "2"]}], "+", 
+      RowBox[{"16", " ", 
+       SuperscriptBox[
+        RowBox[{
+         RowBox[{"Pim", "[", 
+          RowBox[{"L", "[", "ay", "]"}], "]"}], "[", 
+         RowBox[{"0", ",", "0", ",", "0"}], "]"}], "2"]}], "+", 
+      RowBox[{"16", " ", 
+       SuperscriptBox[
+        RowBox[{
+         RowBox[{"Pim", "[", 
+          RowBox[{"L", "[", "az", "]"}], "]"}], "[", 
+         RowBox[{"0", ",", "0", ",", "0"}], "]"}], "2"]}], "+", 
+      RowBox[{"16", " ", 
+       SuperscriptBox[
+        RowBox[{
+         RowBox[{"Pre", "[", 
+          RowBox[{"L", "[", "ax", "]"}], "]"}], "[", 
+         RowBox[{"0", ",", "0", ",", "0"}], "]"}], "2"]}], "+", 
+      RowBox[{"16", " ", 
+       SuperscriptBox[
+        RowBox[{
+         RowBox[{"Pre", "[", 
+          RowBox[{"L", "[", "ay", "]"}], "]"}], "[", 
+         RowBox[{"0", ",", "0", ",", "0"}], "]"}], "2"]}], "+", 
+      RowBox[{"16", " ", 
+       SuperscriptBox[
+        RowBox[{
+         RowBox[{"Pre", "[", 
+          RowBox[{"L", "[", "az", "]"}], "]"}], "[", 
+         RowBox[{"0", ",", "0", ",", "0"}], "]"}], "2"]}]}], ",", "1"}], 
+    "}"}], "\[InvisibleSpace]", "\<\"\\n Total P=(\"\>", "\[InvisibleSpace]", 
+   "0", "\[InvisibleSpace]", "\<\",\"\>", "\[InvisibleSpace]", "0", 
+   "\[InvisibleSpace]", "\<\",\"\>", "\[InvisibleSpace]", "0", 
+   "\[InvisibleSpace]", "\<\")\\n Irrep=\"\>", "\[InvisibleSpace]", 
+   "A1plusOhP", "\[InvisibleSpace]", "\<\"\\n Irrep ev=\"\>", 
+   "\[InvisibleSpace]", "1", "\[InvisibleSpace]", "\<\"/\"\>", 
+   "\[InvisibleSpace]", "1", "\[InvisibleSpace]", "\<\"\\n Charge=\"\>", 
+   "\[InvisibleSpace]", "1"}],
+  SequenceForm["Input path : ", 
+   OpProjection`P[OpProjection`ax], "\n Generated Torellon Operator : ", {
+   16 OpProjection`Pim[
+        OpProjection`L[OpProjection`ax]][0, 0, 0]^2 + 16 OpProjection`Pim[
+        OpProjection`L[OpProjection`ay]][0, 0, 0]^2 + 16 OpProjection`Pim[
+        OpProjection`L[OpProjection`az]][0, 0, 0]^2 + 16 OpProjection`Pre[
+        OpProjection`L[OpProjection`ax]][0, 0, 0]^2 + 16 OpProjection`Pre[
+        OpProjection`L[OpProjection`ay]][0, 0, 0]^2 + 16 OpProjection`Pre[
+        OpProjection`L[OpProjection`az]][0, 0, 0]^2, 1}, "\n Total P=(", 0, 
+   ",", 0, ",", 0, ")\n Irrep=", OpProjection`A1plusOhP, "\n Irrep ev=", 1, 
+   "/", 1, "\n Charge=", 1],
+  Editable->False]], "Print",
+ CellChangeTimes->{{3.866602873960058*^9, 3.866602894601553*^9}, 
+   3.866609491275745*^9, 3.866611432660973*^9},
  CellLabel->
-  "In[559]:=",ExpressionUUID->"0d92a956-6972-4a98-b355-8547c76b9bf3"],
+  "During evaluation of \
+In[39]:=",ExpressionUUID->"50fa8b19-acc9-4457-b552-e88885bb674c"],
+
+Cell[BoxData["\<\"Torellon operator added to the correlator \
+list.\\n\\n\"\>"], "Print",
+ CellChangeTimes->{{3.866602873960058*^9, 3.866602894601553*^9}, 
+   3.866609491275745*^9, 3.866611432663395*^9},
+ CellLabel->
+  "During evaluation of \
+In[39]:=",ExpressionUUID->"c4e21d54-fc96-4a30-bbb3-37e607ca5b45"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"Input path : \"\>", "\[InvisibleSpace]", 
+   RowBox[{"P", "[", 
+    RowBox[{
+     RowBox[{"-", "ay"}], ",", "ax", ",", "ay"}], "]"}], 
+   "\[InvisibleSpace]", "\<\"\\n Generated Torellon Operator : \"\>", 
+   "\[InvisibleSpace]", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "ay", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{
+          RowBox[{"-", "ax"}], ",", "ay", ",", "ax", ",", 
+          RowBox[{
+           RowBox[{"-", "ay"}], "+", 
+           RowBox[{"L", "[", "ay", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "az", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{
+          RowBox[{"-", "ax"}], ",", "az", ",", "ax", ",", 
+          RowBox[{
+           RowBox[{"-", "az"}], "+", 
+           RowBox[{"L", "[", "az", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "ay", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"ax", ",", "ay", ",", 
+          RowBox[{"-", "ax"}], ",", 
+          RowBox[{
+           RowBox[{"-", "ay"}], "+", 
+           RowBox[{"L", "[", "ay", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "az", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"ax", ",", "az", ",", 
+          RowBox[{"-", "ax"}], ",", 
+          RowBox[{
+           RowBox[{"-", "az"}], "+", 
+           RowBox[{"L", "[", "az", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "ax", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{
+          RowBox[{"-", "ay"}], ",", "ax", ",", "ay", ",", 
+          RowBox[{
+           RowBox[{"-", "ax"}], "+", 
+           RowBox[{"L", "[", "ax", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "az", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{
+          RowBox[{"-", "ay"}], ",", "az", ",", "ay", ",", 
+          RowBox[{
+           RowBox[{"-", "az"}], "+", 
+           RowBox[{"L", "[", "az", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "ax", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"ay", ",", "ax", ",", 
+          RowBox[{"-", "ay"}], ",", 
+          RowBox[{
+           RowBox[{"-", "ax"}], "+", 
+           RowBox[{"L", "[", "ax", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "az", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"ay", ",", "az", ",", 
+          RowBox[{"-", "ay"}], ",", 
+          RowBox[{
+           RowBox[{"-", "az"}], "+", 
+           RowBox[{"L", "[", "az", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "ax", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{
+          RowBox[{"-", "az"}], ",", "ax", ",", "az", ",", 
+          RowBox[{
+           RowBox[{"-", "ax"}], "+", 
+           RowBox[{"L", "[", "ax", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "ay", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{
+          RowBox[{"-", "az"}], ",", "ay", ",", "az", ",", 
+          RowBox[{
+           RowBox[{"-", "ay"}], "+", 
+           RowBox[{"L", "[", "ay", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "ax", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"az", ",", "ax", ",", 
+          RowBox[{"-", "az"}], ",", 
+          RowBox[{
+           RowBox[{"-", "ax"}], "+", 
+           RowBox[{"L", "[", "ax", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "ay", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"az", ",", "ay", ",", 
+          RowBox[{"-", "az"}], ",", 
+          RowBox[{
+           RowBox[{"-", "ay"}], "+", 
+           RowBox[{"L", "[", "ay", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "ay", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{
+          RowBox[{"-", "ax"}], ",", "ay", ",", "ax", ",", 
+          RowBox[{
+           RowBox[{"-", "ay"}], "+", 
+           RowBox[{"L", "[", "ay", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "az", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{
+          RowBox[{"-", "ax"}], ",", "az", ",", "ax", ",", 
+          RowBox[{
+           RowBox[{"-", "az"}], "+", 
+           RowBox[{"L", "[", "az", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "ay", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"ax", ",", "ay", ",", 
+          RowBox[{"-", "ax"}], ",", 
+          RowBox[{
+           RowBox[{"-", "ay"}], "+", 
+           RowBox[{"L", "[", "ay", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "az", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"ax", ",", "az", ",", 
+          RowBox[{"-", "ax"}], ",", 
+          RowBox[{
+           RowBox[{"-", "az"}], "+", 
+           RowBox[{"L", "[", "az", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "ax", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{
+          RowBox[{"-", "ay"}], ",", "ax", ",", "ay", ",", 
+          RowBox[{
+           RowBox[{"-", "ax"}], "+", 
+           RowBox[{"L", "[", "ax", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "az", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{
+          RowBox[{"-", "ay"}], ",", "az", ",", "ay", ",", 
+          RowBox[{
+           RowBox[{"-", "az"}], "+", 
+           RowBox[{"L", "[", "az", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "ax", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"ay", ",", "ax", ",", 
+          RowBox[{"-", "ay"}], ",", 
+          RowBox[{
+           RowBox[{"-", "ax"}], "+", 
+           RowBox[{"L", "[", "ax", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "az", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"ay", ",", "az", ",", 
+          RowBox[{"-", "ay"}], ",", 
+          RowBox[{
+           RowBox[{"-", "az"}], "+", 
+           RowBox[{"L", "[", "az", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "ax", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{
+          RowBox[{"-", "az"}], ",", "ax", ",", "az", ",", 
+          RowBox[{
+           RowBox[{"-", "ax"}], "+", 
+           RowBox[{"L", "[", "ax", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "ay", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{
+          RowBox[{"-", "az"}], ",", "ay", ",", "az", ",", 
+          RowBox[{
+           RowBox[{"-", "ay"}], "+", 
+           RowBox[{"L", "[", "ay", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "ax", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"az", ",", "ax", ",", 
+          RowBox[{"-", "az"}], ",", 
+          RowBox[{
+           RowBox[{"-", "ax"}], "+", 
+           RowBox[{"L", "[", "ax", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "ay", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"az", ",", "ay", ",", 
+          RowBox[{"-", "az"}], ",", 
+          RowBox[{
+           RowBox[{"-", "ay"}], "+", 
+           RowBox[{"L", "[", "ay", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}]}], ",", "2"}], "}"}], 
+   "\[InvisibleSpace]", "\<\"\\n Total P=(\"\>", "\[InvisibleSpace]", "0", 
+   "\[InvisibleSpace]", "\<\",\"\>", "\[InvisibleSpace]", "0", 
+   "\[InvisibleSpace]", "\<\",\"\>", "\[InvisibleSpace]", "0", 
+   "\[InvisibleSpace]", "\<\")\\n Irrep=\"\>", "\[InvisibleSpace]", 
+   "A1plusOhP", "\[InvisibleSpace]", "\<\"\\n Irrep ev=\"\>", 
+   "\[InvisibleSpace]", "1", "\[InvisibleSpace]", "\<\"/\"\>", 
+   "\[InvisibleSpace]", "1", "\[InvisibleSpace]", "\<\"\\n Charge=\"\>", 
+   "\[InvisibleSpace]", "1"}],
+  SequenceForm["Input path : ", 
+   OpProjection`P[-OpProjection`ay, OpProjection`ax, OpProjection`ay], 
+   "\n Generated Torellon Operator : ", {4 OpProjection`Pim[
+       OpProjection`L[OpProjection`ay]][0, 0, 0] 
+     OpProjection`Pim[-OpProjection`ax, OpProjection`ay, 
+       OpProjection`ax, -OpProjection`ay + OpProjection`L[OpProjection`ay]][
+      0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`az]][0, 0, 0] 
+     OpProjection`Pim[-OpProjection`ax, OpProjection`az, 
+       OpProjection`ax, -OpProjection`az + OpProjection`L[OpProjection`az]][
+      0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`ay]][0, 0, 0] 
+     OpProjection`Pim[
+      OpProjection`ax, OpProjection`ay, -OpProjection`ax, -OpProjection`ay + 
+       OpProjection`L[OpProjection`ay]][0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`az]][0, 0, 0] 
+     OpProjection`Pim[
+      OpProjection`ax, OpProjection`az, -OpProjection`ax, -OpProjection`az + 
+       OpProjection`L[OpProjection`az]][0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`ax]][0, 0, 0] 
+     OpProjection`Pim[-OpProjection`ay, OpProjection`ax, 
+       OpProjection`ay, -OpProjection`ax + OpProjection`L[OpProjection`ax]][
+      0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`az]][0, 0, 0] 
+     OpProjection`Pim[-OpProjection`ay, OpProjection`az, 
+       OpProjection`ay, -OpProjection`az + OpProjection`L[OpProjection`az]][
+      0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`ax]][0, 0, 0] 
+     OpProjection`Pim[
+      OpProjection`ay, OpProjection`ax, -OpProjection`ay, -OpProjection`ax + 
+       OpProjection`L[OpProjection`ax]][0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`az]][0, 0, 0] 
+     OpProjection`Pim[
+      OpProjection`ay, OpProjection`az, -OpProjection`ay, -OpProjection`az + 
+       OpProjection`L[OpProjection`az]][0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`ax]][0, 0, 0] 
+     OpProjection`Pim[-OpProjection`az, OpProjection`ax, 
+       OpProjection`az, -OpProjection`ax + OpProjection`L[OpProjection`ax]][
+      0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`ay]][0, 0, 0] 
+     OpProjection`Pim[-OpProjection`az, OpProjection`ay, 
+       OpProjection`az, -OpProjection`ay + OpProjection`L[OpProjection`ay]][
+      0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`ax]][0, 0, 0] 
+     OpProjection`Pim[
+      OpProjection`az, OpProjection`ax, -OpProjection`az, -OpProjection`ax + 
+       OpProjection`L[OpProjection`ax]][0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`ay]][0, 0, 0] 
+     OpProjection`Pim[
+      OpProjection`az, OpProjection`ay, -OpProjection`az, -OpProjection`ay + 
+       OpProjection`L[OpProjection`ay]][0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`ay]][0, 0, 0] 
+     OpProjection`Pre[-OpProjection`ax, OpProjection`ay, 
+       OpProjection`ax, -OpProjection`ay + OpProjection`L[OpProjection`ay]][
+      0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`az]][0, 0, 0] 
+     OpProjection`Pre[-OpProjection`ax, OpProjection`az, 
+       OpProjection`ax, -OpProjection`az + OpProjection`L[OpProjection`az]][
+      0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`ay]][0, 0, 0] 
+     OpProjection`Pre[
+      OpProjection`ax, OpProjection`ay, -OpProjection`ax, -OpProjection`ay + 
+       OpProjection`L[OpProjection`ay]][0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`az]][0, 0, 0] 
+     OpProjection`Pre[
+      OpProjection`ax, OpProjection`az, -OpProjection`ax, -OpProjection`az + 
+       OpProjection`L[OpProjection`az]][0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`ax]][0, 0, 0] 
+     OpProjection`Pre[-OpProjection`ay, OpProjection`ax, 
+       OpProjection`ay, -OpProjection`ax + OpProjection`L[OpProjection`ax]][
+      0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`az]][0, 0, 0] 
+     OpProjection`Pre[-OpProjection`ay, OpProjection`az, 
+       OpProjection`ay, -OpProjection`az + OpProjection`L[OpProjection`az]][
+      0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`ax]][0, 0, 0] 
+     OpProjection`Pre[
+      OpProjection`ay, OpProjection`ax, -OpProjection`ay, -OpProjection`ax + 
+       OpProjection`L[OpProjection`ax]][0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`az]][0, 0, 0] 
+     OpProjection`Pre[
+      OpProjection`ay, OpProjection`az, -OpProjection`ay, -OpProjection`az + 
+       OpProjection`L[OpProjection`az]][0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`ax]][0, 0, 0] 
+     OpProjection`Pre[-OpProjection`az, OpProjection`ax, 
+       OpProjection`az, -OpProjection`ax + OpProjection`L[OpProjection`ax]][
+      0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`ay]][0, 0, 0] 
+     OpProjection`Pre[-OpProjection`az, OpProjection`ay, 
+       OpProjection`az, -OpProjection`ay + OpProjection`L[OpProjection`ay]][
+      0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`ax]][0, 0, 0] 
+     OpProjection`Pre[
+      OpProjection`az, OpProjection`ax, -OpProjection`az, -OpProjection`ax + 
+       OpProjection`L[OpProjection`ax]][0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`ay]][0, 0, 0] 
+     OpProjection`Pre[
+      OpProjection`az, OpProjection`ay, -OpProjection`az, -OpProjection`ay + 
+       OpProjection`L[OpProjection`ay]][0, 0, 0], 2}, "\n Total P=(", 0, ",", 
+   0, ",", 0, ")\n Irrep=", OpProjection`A1plusOhP, "\n Irrep ev=", 1, "/", 1,
+    "\n Charge=", 1],
+  Editable->False]], "Print",
+ CellChangeTimes->{{3.866602873960058*^9, 3.866602894601553*^9}, 
+   3.866609491275745*^9, 3.866611432667925*^9},
+ CellLabel->
+  "During evaluation of \
+In[39]:=",ExpressionUUID->"ef6f3545-5ee7-4ef5-8d4f-bfdf81dc51e7"],
+
+Cell[BoxData["\<\"Torellon operator added to the correlator \
+list.\\n\\n\"\>"], "Print",
+ CellChangeTimes->{{3.866602873960058*^9, 3.866602894601553*^9}, 
+   3.866609491275745*^9, 3.866611432670307*^9},
+ CellLabel->
+  "During evaluation of \
+In[39]:=",ExpressionUUID->"ed3d6eaa-68b6-4fc3-a5b4-cd48dde901dd"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"Input path : \"\>", "\[InvisibleSpace]", 
+   RowBox[{"P", "[", 
+    RowBox[{
+     RowBox[{"-", "ay"}], ",", "ax", ",", "ax", ",", "ay"}], "]"}], 
+   "\[InvisibleSpace]", "\<\"\\n Generated Torellon Operator : \"\>", 
+   "\[InvisibleSpace]", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "ay", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{
+          RowBox[{"-", "ax"}], ",", "ay", ",", "ay", ",", "ax", ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "2"}], " ", "ay"}], "+", 
+           RowBox[{"L", "[", "ay", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "az", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{
+          RowBox[{"-", "ax"}], ",", "az", ",", "az", ",", "ax", ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "2"}], " ", "az"}], "+", 
+           RowBox[{"L", "[", "az", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "ay", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"ax", ",", "ay", ",", "ay", ",", 
+          RowBox[{"-", "ax"}], ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "2"}], " ", "ay"}], "+", 
+           RowBox[{"L", "[", "ay", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "az", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"ax", ",", "az", ",", "az", ",", 
+          RowBox[{"-", "ax"}], ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "2"}], " ", "az"}], "+", 
+           RowBox[{"L", "[", "az", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "ax", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{
+          RowBox[{"-", "ay"}], ",", "ax", ",", "ax", ",", "ay", ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "2"}], " ", "ax"}], "+", 
+           RowBox[{"L", "[", "ax", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "az", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{
+          RowBox[{"-", "ay"}], ",", "az", ",", "az", ",", "ay", ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "2"}], " ", "az"}], "+", 
+           RowBox[{"L", "[", "az", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "ax", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"ay", ",", "ax", ",", "ax", ",", 
+          RowBox[{"-", "ay"}], ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "2"}], " ", "ax"}], "+", 
+           RowBox[{"L", "[", "ax", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "az", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"ay", ",", "az", ",", "az", ",", 
+          RowBox[{"-", "ay"}], ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "2"}], " ", "az"}], "+", 
+           RowBox[{"L", "[", "az", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "ax", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{
+          RowBox[{"-", "az"}], ",", "ax", ",", "ax", ",", "az", ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "2"}], " ", "ax"}], "+", 
+           RowBox[{"L", "[", "ax", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "ay", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{
+          RowBox[{"-", "az"}], ",", "ay", ",", "ay", ",", "az", ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "2"}], " ", "ay"}], "+", 
+           RowBox[{"L", "[", "ay", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "ax", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"az", ",", "ax", ",", "ax", ",", 
+          RowBox[{"-", "az"}], ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "2"}], " ", "ax"}], "+", 
+           RowBox[{"L", "[", "ax", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "ay", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"az", ",", "ay", ",", "ay", ",", 
+          RowBox[{"-", "az"}], ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "2"}], " ", "ay"}], "+", 
+           RowBox[{"L", "[", "ay", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "ay", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{
+          RowBox[{"-", "ax"}], ",", "ay", ",", "ay", ",", "ax", ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "2"}], " ", "ay"}], "+", 
+           RowBox[{"L", "[", "ay", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "az", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{
+          RowBox[{"-", "ax"}], ",", "az", ",", "az", ",", "ax", ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "2"}], " ", "az"}], "+", 
+           RowBox[{"L", "[", "az", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "ay", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"ax", ",", "ay", ",", "ay", ",", 
+          RowBox[{"-", "ax"}], ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "2"}], " ", "ay"}], "+", 
+           RowBox[{"L", "[", "ay", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "az", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"ax", ",", "az", ",", "az", ",", 
+          RowBox[{"-", "ax"}], ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "2"}], " ", "az"}], "+", 
+           RowBox[{"L", "[", "az", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "ax", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{
+          RowBox[{"-", "ay"}], ",", "ax", ",", "ax", ",", "ay", ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "2"}], " ", "ax"}], "+", 
+           RowBox[{"L", "[", "ax", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "az", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{
+          RowBox[{"-", "ay"}], ",", "az", ",", "az", ",", "ay", ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "2"}], " ", "az"}], "+", 
+           RowBox[{"L", "[", "az", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "ax", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"ay", ",", "ax", ",", "ax", ",", 
+          RowBox[{"-", "ay"}], ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "2"}], " ", "ax"}], "+", 
+           RowBox[{"L", "[", "ax", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "az", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"ay", ",", "az", ",", "az", ",", 
+          RowBox[{"-", "ay"}], ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "2"}], " ", "az"}], "+", 
+           RowBox[{"L", "[", "az", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "ax", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{
+          RowBox[{"-", "az"}], ",", "ax", ",", "ax", ",", "az", ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "2"}], " ", "ax"}], "+", 
+           RowBox[{"L", "[", "ax", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "ay", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{
+          RowBox[{"-", "az"}], ",", "ay", ",", "ay", ",", "az", ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "2"}], " ", "ay"}], "+", 
+           RowBox[{"L", "[", "ay", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "ax", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"az", ",", "ax", ",", "ax", ",", 
+          RowBox[{"-", "az"}], ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "2"}], " ", "ax"}], "+", 
+           RowBox[{"L", "[", "ax", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "ay", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"az", ",", "ay", ",", "ay", ",", 
+          RowBox[{"-", "az"}], ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "2"}], " ", "ay"}], "+", 
+           RowBox[{"L", "[", "ay", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}]}], ",", "3"}], "}"}], 
+   "\[InvisibleSpace]", "\<\"\\n Total P=(\"\>", "\[InvisibleSpace]", "0", 
+   "\[InvisibleSpace]", "\<\",\"\>", "\[InvisibleSpace]", "0", 
+   "\[InvisibleSpace]", "\<\",\"\>", "\[InvisibleSpace]", "0", 
+   "\[InvisibleSpace]", "\<\")\\n Irrep=\"\>", "\[InvisibleSpace]", 
+   "A1plusOhP", "\[InvisibleSpace]", "\<\"\\n Irrep ev=\"\>", 
+   "\[InvisibleSpace]", "1", "\[InvisibleSpace]", "\<\"/\"\>", 
+   "\[InvisibleSpace]", "1", "\[InvisibleSpace]", "\<\"\\n Charge=\"\>", 
+   "\[InvisibleSpace]", "1"}],
+  SequenceForm["Input path : ", 
+   OpProjection`P[-OpProjection`ay, OpProjection`ax, OpProjection`ax, 
+    OpProjection`ay], "\n Generated Torellon Operator : ", {4 OpProjection`Pim[
+       OpProjection`L[OpProjection`ay]][0, 0, 0] 
+     OpProjection`Pim[-OpProjection`ax, OpProjection`ay, OpProjection`ay, 
+       OpProjection`ax, (-2) OpProjection`ay + 
+       OpProjection`L[OpProjection`ay]][0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`az]][0, 0, 0] 
+     OpProjection`Pim[-OpProjection`ax, OpProjection`az, OpProjection`az, 
+       OpProjection`ax, (-2) OpProjection`az + 
+       OpProjection`L[OpProjection`az]][0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`ay]][0, 0, 0] 
+     OpProjection`Pim[
+      OpProjection`ax, OpProjection`ay, OpProjection`ay, -
+       OpProjection`ax, (-2) OpProjection`ay + 
+       OpProjection`L[OpProjection`ay]][0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`az]][0, 0, 0] 
+     OpProjection`Pim[
+      OpProjection`ax, OpProjection`az, OpProjection`az, -
+       OpProjection`ax, (-2) OpProjection`az + 
+       OpProjection`L[OpProjection`az]][0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`ax]][0, 0, 0] 
+     OpProjection`Pim[-OpProjection`ay, OpProjection`ax, OpProjection`ax, 
+       OpProjection`ay, (-2) OpProjection`ax + 
+       OpProjection`L[OpProjection`ax]][0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`az]][0, 0, 0] 
+     OpProjection`Pim[-OpProjection`ay, OpProjection`az, OpProjection`az, 
+       OpProjection`ay, (-2) OpProjection`az + 
+       OpProjection`L[OpProjection`az]][0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`ax]][0, 0, 0] 
+     OpProjection`Pim[
+      OpProjection`ay, OpProjection`ax, OpProjection`ax, -
+       OpProjection`ay, (-2) OpProjection`ax + 
+       OpProjection`L[OpProjection`ax]][0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`az]][0, 0, 0] 
+     OpProjection`Pim[
+      OpProjection`ay, OpProjection`az, OpProjection`az, -
+       OpProjection`ay, (-2) OpProjection`az + 
+       OpProjection`L[OpProjection`az]][0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`ax]][0, 0, 0] 
+     OpProjection`Pim[-OpProjection`az, OpProjection`ax, OpProjection`ax, 
+       OpProjection`az, (-2) OpProjection`ax + 
+       OpProjection`L[OpProjection`ax]][0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`ay]][0, 0, 0] 
+     OpProjection`Pim[-OpProjection`az, OpProjection`ay, OpProjection`ay, 
+       OpProjection`az, (-2) OpProjection`ay + 
+       OpProjection`L[OpProjection`ay]][0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`ax]][0, 0, 0] 
+     OpProjection`Pim[
+      OpProjection`az, OpProjection`ax, OpProjection`ax, -
+       OpProjection`az, (-2) OpProjection`ax + 
+       OpProjection`L[OpProjection`ax]][0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`ay]][0, 0, 0] 
+     OpProjection`Pim[
+      OpProjection`az, OpProjection`ay, OpProjection`ay, -
+       OpProjection`az, (-2) OpProjection`ay + 
+       OpProjection`L[OpProjection`ay]][0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`ay]][0, 0, 0] 
+     OpProjection`Pre[-OpProjection`ax, OpProjection`ay, OpProjection`ay, 
+       OpProjection`ax, (-2) OpProjection`ay + 
+       OpProjection`L[OpProjection`ay]][0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`az]][0, 0, 0] 
+     OpProjection`Pre[-OpProjection`ax, OpProjection`az, OpProjection`az, 
+       OpProjection`ax, (-2) OpProjection`az + 
+       OpProjection`L[OpProjection`az]][0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`ay]][0, 0, 0] 
+     OpProjection`Pre[
+      OpProjection`ax, OpProjection`ay, OpProjection`ay, -
+       OpProjection`ax, (-2) OpProjection`ay + 
+       OpProjection`L[OpProjection`ay]][0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`az]][0, 0, 0] 
+     OpProjection`Pre[
+      OpProjection`ax, OpProjection`az, OpProjection`az, -
+       OpProjection`ax, (-2) OpProjection`az + 
+       OpProjection`L[OpProjection`az]][0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`ax]][0, 0, 0] 
+     OpProjection`Pre[-OpProjection`ay, OpProjection`ax, OpProjection`ax, 
+       OpProjection`ay, (-2) OpProjection`ax + 
+       OpProjection`L[OpProjection`ax]][0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`az]][0, 0, 0] 
+     OpProjection`Pre[-OpProjection`ay, OpProjection`az, OpProjection`az, 
+       OpProjection`ay, (-2) OpProjection`az + 
+       OpProjection`L[OpProjection`az]][0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`ax]][0, 0, 0] 
+     OpProjection`Pre[
+      OpProjection`ay, OpProjection`ax, OpProjection`ax, -
+       OpProjection`ay, (-2) OpProjection`ax + 
+       OpProjection`L[OpProjection`ax]][0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`az]][0, 0, 0] 
+     OpProjection`Pre[
+      OpProjection`ay, OpProjection`az, OpProjection`az, -
+       OpProjection`ay, (-2) OpProjection`az + 
+       OpProjection`L[OpProjection`az]][0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`ax]][0, 0, 0] 
+     OpProjection`Pre[-OpProjection`az, OpProjection`ax, OpProjection`ax, 
+       OpProjection`az, (-2) OpProjection`ax + 
+       OpProjection`L[OpProjection`ax]][0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`ay]][0, 0, 0] 
+     OpProjection`Pre[-OpProjection`az, OpProjection`ay, OpProjection`ay, 
+       OpProjection`az, (-2) OpProjection`ay + 
+       OpProjection`L[OpProjection`ay]][0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`ax]][0, 0, 0] 
+     OpProjection`Pre[
+      OpProjection`az, OpProjection`ax, OpProjection`ax, -
+       OpProjection`az, (-2) OpProjection`ax + 
+       OpProjection`L[OpProjection`ax]][0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`ay]][0, 0, 0] 
+     OpProjection`Pre[
+      OpProjection`az, OpProjection`ay, OpProjection`ay, -
+       OpProjection`az, (-2) OpProjection`ay + 
+       OpProjection`L[OpProjection`ay]][0, 0, 0], 3}, "\n Total P=(", 0, ",", 
+   0, ",", 0, ")\n Irrep=", OpProjection`A1plusOhP, "\n Irrep ev=", 1, "/", 1,
+    "\n Charge=", 1],
+  Editable->False]], "Print",
+ CellChangeTimes->{{3.866602873960058*^9, 3.866602894601553*^9}, 
+   3.866609491275745*^9, 3.866611432691566*^9},
+ CellLabel->
+  "During evaluation of \
+In[39]:=",ExpressionUUID->"900885e8-0072-4c88-a4ab-2930c340395f"],
+
+Cell[BoxData["\<\"Torellon operator added to the correlator \
+list.\\n\\n\"\>"], "Print",
+ CellChangeTimes->{{3.866602873960058*^9, 3.866602894601553*^9}, 
+   3.866609491275745*^9, 3.866611432694439*^9},
+ CellLabel->
+  "During evaluation of \
+In[39]:=",ExpressionUUID->"26840ac2-ae08-46ef-8854-e763b45d21aa"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"Input path : \"\>", "\[InvisibleSpace]", 
+   RowBox[{"P", "[", 
+    RowBox[{
+     RowBox[{"-", "ay"}], ",", 
+     RowBox[{"-", "ay"}], ",", "ax", ",", "ax", ",", "ax", ",", "ay", ",", 
+     "ay"}], "]"}], 
+   "\[InvisibleSpace]", "\<\"\\n Generated Torellon Operator : \"\>", 
+   "\[InvisibleSpace]", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "ay", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{
+          RowBox[{"-", "ax"}], ",", 
+          RowBox[{"-", "ax"}], ",", "ay", ",", "ay", ",", "ay", ",", "ax", 
+          ",", "ax", ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "3"}], " ", "ay"}], "+", 
+           RowBox[{"L", "[", "ay", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "az", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{
+          RowBox[{"-", "ax"}], ",", 
+          RowBox[{"-", "ax"}], ",", "az", ",", "az", ",", "az", ",", "ax", 
+          ",", "ax", ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "3"}], " ", "az"}], "+", 
+           RowBox[{"L", "[", "az", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "ay", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"ax", ",", "ax", ",", "ay", ",", "ay", ",", "ay", ",", 
+          RowBox[{"-", "ax"}], ",", 
+          RowBox[{"-", "ax"}], ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "3"}], " ", "ay"}], "+", 
+           RowBox[{"L", "[", "ay", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "az", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"ax", ",", "ax", ",", "az", ",", "az", ",", "az", ",", 
+          RowBox[{"-", "ax"}], ",", 
+          RowBox[{"-", "ax"}], ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "3"}], " ", "az"}], "+", 
+           RowBox[{"L", "[", "az", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "ax", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{
+          RowBox[{"-", "ay"}], ",", 
+          RowBox[{"-", "ay"}], ",", "ax", ",", "ax", ",", "ax", ",", "ay", 
+          ",", "ay", ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "3"}], " ", "ax"}], "+", 
+           RowBox[{"L", "[", "ax", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "az", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{
+          RowBox[{"-", "ay"}], ",", 
+          RowBox[{"-", "ay"}], ",", "az", ",", "az", ",", "az", ",", "ay", 
+          ",", "ay", ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "3"}], " ", "az"}], "+", 
+           RowBox[{"L", "[", "az", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "ax", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"ay", ",", "ay", ",", "ax", ",", "ax", ",", "ax", ",", 
+          RowBox[{"-", "ay"}], ",", 
+          RowBox[{"-", "ay"}], ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "3"}], " ", "ax"}], "+", 
+           RowBox[{"L", "[", "ax", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "az", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"ay", ",", "ay", ",", "az", ",", "az", ",", "az", ",", 
+          RowBox[{"-", "ay"}], ",", 
+          RowBox[{"-", "ay"}], ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "3"}], " ", "az"}], "+", 
+           RowBox[{"L", "[", "az", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "ax", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{
+          RowBox[{"-", "az"}], ",", 
+          RowBox[{"-", "az"}], ",", "ax", ",", "ax", ",", "ax", ",", "az", 
+          ",", "az", ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "3"}], " ", "ax"}], "+", 
+           RowBox[{"L", "[", "ax", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "ay", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{
+          RowBox[{"-", "az"}], ",", 
+          RowBox[{"-", "az"}], ",", "ay", ",", "ay", ",", "ay", ",", "az", 
+          ",", "az", ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "3"}], " ", "ay"}], "+", 
+           RowBox[{"L", "[", "ay", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "ax", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"az", ",", "az", ",", "ax", ",", "ax", ",", "ax", ",", 
+          RowBox[{"-", "az"}], ",", 
+          RowBox[{"-", "az"}], ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "3"}], " ", "ax"}], "+", 
+           RowBox[{"L", "[", "ax", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"L", "[", "ay", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pim", "[", 
+         RowBox[{"az", ",", "az", ",", "ay", ",", "ay", ",", "ay", ",", 
+          RowBox[{"-", "az"}], ",", 
+          RowBox[{"-", "az"}], ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "3"}], " ", "ay"}], "+", 
+           RowBox[{"L", "[", "ay", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "ay", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{
+          RowBox[{"-", "ax"}], ",", 
+          RowBox[{"-", "ax"}], ",", "ay", ",", "ay", ",", "ay", ",", "ax", 
+          ",", "ax", ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "3"}], " ", "ay"}], "+", 
+           RowBox[{"L", "[", "ay", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "az", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{
+          RowBox[{"-", "ax"}], ",", 
+          RowBox[{"-", "ax"}], ",", "az", ",", "az", ",", "az", ",", "ax", 
+          ",", "ax", ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "3"}], " ", "az"}], "+", 
+           RowBox[{"L", "[", "az", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "ay", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"ax", ",", "ax", ",", "ay", ",", "ay", ",", "ay", ",", 
+          RowBox[{"-", "ax"}], ",", 
+          RowBox[{"-", "ax"}], ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "3"}], " ", "ay"}], "+", 
+           RowBox[{"L", "[", "ay", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "az", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"ax", ",", "ax", ",", "az", ",", "az", ",", "az", ",", 
+          RowBox[{"-", "ax"}], ",", 
+          RowBox[{"-", "ax"}], ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "3"}], " ", "az"}], "+", 
+           RowBox[{"L", "[", "az", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "ax", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{
+          RowBox[{"-", "ay"}], ",", 
+          RowBox[{"-", "ay"}], ",", "ax", ",", "ax", ",", "ax", ",", "ay", 
+          ",", "ay", ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "3"}], " ", "ax"}], "+", 
+           RowBox[{"L", "[", "ax", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "az", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{
+          RowBox[{"-", "ay"}], ",", 
+          RowBox[{"-", "ay"}], ",", "az", ",", "az", ",", "az", ",", "ay", 
+          ",", "ay", ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "3"}], " ", "az"}], "+", 
+           RowBox[{"L", "[", "az", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "ax", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"ay", ",", "ay", ",", "ax", ",", "ax", ",", "ax", ",", 
+          RowBox[{"-", "ay"}], ",", 
+          RowBox[{"-", "ay"}], ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "3"}], " ", "ax"}], "+", 
+           RowBox[{"L", "[", "ax", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "az", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"ay", ",", "ay", ",", "az", ",", "az", ",", "az", ",", 
+          RowBox[{"-", "ay"}], ",", 
+          RowBox[{"-", "ay"}], ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "3"}], " ", "az"}], "+", 
+           RowBox[{"L", "[", "az", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "ax", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{
+          RowBox[{"-", "az"}], ",", 
+          RowBox[{"-", "az"}], ",", "ax", ",", "ax", ",", "ax", ",", "az", 
+          ",", "az", ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "3"}], " ", "ax"}], "+", 
+           RowBox[{"L", "[", "ax", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "ay", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{
+          RowBox[{"-", "az"}], ",", 
+          RowBox[{"-", "az"}], ",", "ay", ",", "ay", ",", "ay", ",", "az", 
+          ",", "az", ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "3"}], " ", "ay"}], "+", 
+           RowBox[{"L", "[", "ay", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "ax", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"az", ",", "az", ",", "ax", ",", "ax", ",", "ax", ",", 
+          RowBox[{"-", "az"}], ",", 
+          RowBox[{"-", "az"}], ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "3"}], " ", "ax"}], "+", 
+           RowBox[{"L", "[", "ax", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}], "+", 
+      RowBox[{"4", " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"L", "[", "ay", "]"}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}], " ", 
+       RowBox[{
+        RowBox[{"Pre", "[", 
+         RowBox[{"az", ",", "az", ",", "ay", ",", "ay", ",", "ay", ",", 
+          RowBox[{"-", "az"}], ",", 
+          RowBox[{"-", "az"}], ",", 
+          RowBox[{
+           RowBox[{
+            RowBox[{"-", "3"}], " ", "ay"}], "+", 
+           RowBox[{"L", "[", "ay", "]"}]}]}], "]"}], "[", 
+        RowBox[{"0", ",", "0", ",", "0"}], "]"}]}]}], ",", "4"}], "}"}], 
+   "\[InvisibleSpace]", "\<\"\\n Total P=(\"\>", "\[InvisibleSpace]", "0", 
+   "\[InvisibleSpace]", "\<\",\"\>", "\[InvisibleSpace]", "0", 
+   "\[InvisibleSpace]", "\<\",\"\>", "\[InvisibleSpace]", "0", 
+   "\[InvisibleSpace]", "\<\")\\n Irrep=\"\>", "\[InvisibleSpace]", 
+   "A1plusOhP", "\[InvisibleSpace]", "\<\"\\n Irrep ev=\"\>", 
+   "\[InvisibleSpace]", "1", "\[InvisibleSpace]", "\<\"/\"\>", 
+   "\[InvisibleSpace]", "1", "\[InvisibleSpace]", "\<\"\\n Charge=\"\>", 
+   "\[InvisibleSpace]", "1"}],
+  SequenceForm["Input path : ", 
+   OpProjection`P[-OpProjection`ay, -OpProjection`ay, OpProjection`ax, 
+    OpProjection`ax, OpProjection`ax, OpProjection`ay, OpProjection`ay], 
+   "\n Generated Torellon Operator : ", {4 OpProjection`Pim[
+       OpProjection`L[OpProjection`ay]][0, 0, 0] 
+     OpProjection`Pim[-OpProjection`ax, -OpProjection`ax, OpProjection`ay, 
+       OpProjection`ay, OpProjection`ay, OpProjection`ax, 
+       OpProjection`ax, (-3) OpProjection`ay + 
+       OpProjection`L[OpProjection`ay]][0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`az]][0, 0, 0] 
+     OpProjection`Pim[-OpProjection`ax, -OpProjection`ax, OpProjection`az, 
+       OpProjection`az, OpProjection`az, OpProjection`ax, 
+       OpProjection`ax, (-3) OpProjection`az + 
+       OpProjection`L[OpProjection`az]][0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`ay]][0, 0, 0] 
+     OpProjection`Pim[
+      OpProjection`ax, OpProjection`ax, OpProjection`ay, OpProjection`ay, 
+       OpProjection`ay, -OpProjection`ax, -
+       OpProjection`ax, (-3) OpProjection`ay + 
+       OpProjection`L[OpProjection`ay]][0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`az]][0, 0, 0] 
+     OpProjection`Pim[
+      OpProjection`ax, OpProjection`ax, OpProjection`az, OpProjection`az, 
+       OpProjection`az, -OpProjection`ax, -
+       OpProjection`ax, (-3) OpProjection`az + 
+       OpProjection`L[OpProjection`az]][0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`ax]][0, 0, 0] 
+     OpProjection`Pim[-OpProjection`ay, -OpProjection`ay, OpProjection`ax, 
+       OpProjection`ax, OpProjection`ax, OpProjection`ay, 
+       OpProjection`ay, (-3) OpProjection`ax + 
+       OpProjection`L[OpProjection`ax]][0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`az]][0, 0, 0] 
+     OpProjection`Pim[-OpProjection`ay, -OpProjection`ay, OpProjection`az, 
+       OpProjection`az, OpProjection`az, OpProjection`ay, 
+       OpProjection`ay, (-3) OpProjection`az + 
+       OpProjection`L[OpProjection`az]][0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`ax]][0, 0, 0] 
+     OpProjection`Pim[
+      OpProjection`ay, OpProjection`ay, OpProjection`ax, OpProjection`ax, 
+       OpProjection`ax, -OpProjection`ay, -
+       OpProjection`ay, (-3) OpProjection`ax + 
+       OpProjection`L[OpProjection`ax]][0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`az]][0, 0, 0] 
+     OpProjection`Pim[
+      OpProjection`ay, OpProjection`ay, OpProjection`az, OpProjection`az, 
+       OpProjection`az, -OpProjection`ay, -
+       OpProjection`ay, (-3) OpProjection`az + 
+       OpProjection`L[OpProjection`az]][0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`ax]][0, 0, 0] 
+     OpProjection`Pim[-OpProjection`az, -OpProjection`az, OpProjection`ax, 
+       OpProjection`ax, OpProjection`ax, OpProjection`az, 
+       OpProjection`az, (-3) OpProjection`ax + 
+       OpProjection`L[OpProjection`ax]][0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`ay]][0, 0, 0] 
+     OpProjection`Pim[-OpProjection`az, -OpProjection`az, OpProjection`ay, 
+       OpProjection`ay, OpProjection`ay, OpProjection`az, 
+       OpProjection`az, (-3) OpProjection`ay + 
+       OpProjection`L[OpProjection`ay]][0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`ax]][0, 0, 0] 
+     OpProjection`Pim[
+      OpProjection`az, OpProjection`az, OpProjection`ax, OpProjection`ax, 
+       OpProjection`ax, -OpProjection`az, -
+       OpProjection`az, (-3) OpProjection`ax + 
+       OpProjection`L[OpProjection`ax]][0, 0, 0] + 4 OpProjection`Pim[
+       OpProjection`L[OpProjection`ay]][0, 0, 0] 
+     OpProjection`Pim[
+      OpProjection`az, OpProjection`az, OpProjection`ay, OpProjection`ay, 
+       OpProjection`ay, -OpProjection`az, -
+       OpProjection`az, (-3) OpProjection`ay + 
+       OpProjection`L[OpProjection`ay]][0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`ay]][0, 0, 0] 
+     OpProjection`Pre[-OpProjection`ax, -OpProjection`ax, OpProjection`ay, 
+       OpProjection`ay, OpProjection`ay, OpProjection`ax, 
+       OpProjection`ax, (-3) OpProjection`ay + 
+       OpProjection`L[OpProjection`ay]][0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`az]][0, 0, 0] 
+     OpProjection`Pre[-OpProjection`ax, -OpProjection`ax, OpProjection`az, 
+       OpProjection`az, OpProjection`az, OpProjection`ax, 
+       OpProjection`ax, (-3) OpProjection`az + 
+       OpProjection`L[OpProjection`az]][0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`ay]][0, 0, 0] 
+     OpProjection`Pre[
+      OpProjection`ax, OpProjection`ax, OpProjection`ay, OpProjection`ay, 
+       OpProjection`ay, -OpProjection`ax, -
+       OpProjection`ax, (-3) OpProjection`ay + 
+       OpProjection`L[OpProjection`ay]][0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`az]][0, 0, 0] 
+     OpProjection`Pre[
+      OpProjection`ax, OpProjection`ax, OpProjection`az, OpProjection`az, 
+       OpProjection`az, -OpProjection`ax, -
+       OpProjection`ax, (-3) OpProjection`az + 
+       OpProjection`L[OpProjection`az]][0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`ax]][0, 0, 0] 
+     OpProjection`Pre[-OpProjection`ay, -OpProjection`ay, OpProjection`ax, 
+       OpProjection`ax, OpProjection`ax, OpProjection`ay, 
+       OpProjection`ay, (-3) OpProjection`ax + 
+       OpProjection`L[OpProjection`ax]][0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`az]][0, 0, 0] 
+     OpProjection`Pre[-OpProjection`ay, -OpProjection`ay, OpProjection`az, 
+       OpProjection`az, OpProjection`az, OpProjection`ay, 
+       OpProjection`ay, (-3) OpProjection`az + 
+       OpProjection`L[OpProjection`az]][0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`ax]][0, 0, 0] 
+     OpProjection`Pre[
+      OpProjection`ay, OpProjection`ay, OpProjection`ax, OpProjection`ax, 
+       OpProjection`ax, -OpProjection`ay, -
+       OpProjection`ay, (-3) OpProjection`ax + 
+       OpProjection`L[OpProjection`ax]][0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`az]][0, 0, 0] 
+     OpProjection`Pre[
+      OpProjection`ay, OpProjection`ay, OpProjection`az, OpProjection`az, 
+       OpProjection`az, -OpProjection`ay, -
+       OpProjection`ay, (-3) OpProjection`az + 
+       OpProjection`L[OpProjection`az]][0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`ax]][0, 0, 0] 
+     OpProjection`Pre[-OpProjection`az, -OpProjection`az, OpProjection`ax, 
+       OpProjection`ax, OpProjection`ax, OpProjection`az, 
+       OpProjection`az, (-3) OpProjection`ax + 
+       OpProjection`L[OpProjection`ax]][0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`ay]][0, 0, 0] 
+     OpProjection`Pre[-OpProjection`az, -OpProjection`az, OpProjection`ay, 
+       OpProjection`ay, OpProjection`ay, OpProjection`az, 
+       OpProjection`az, (-3) OpProjection`ay + 
+       OpProjection`L[OpProjection`ay]][0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`ax]][0, 0, 0] 
+     OpProjection`Pre[
+      OpProjection`az, OpProjection`az, OpProjection`ax, OpProjection`ax, 
+       OpProjection`ax, -OpProjection`az, -
+       OpProjection`az, (-3) OpProjection`ax + 
+       OpProjection`L[OpProjection`ax]][0, 0, 0] + 4 OpProjection`Pre[
+       OpProjection`L[OpProjection`ay]][0, 0, 0] 
+     OpProjection`Pre[
+      OpProjection`az, OpProjection`az, OpProjection`ay, OpProjection`ay, 
+       OpProjection`ay, -OpProjection`az, -
+       OpProjection`az, (-3) OpProjection`ay + 
+       OpProjection`L[OpProjection`ay]][0, 0, 0], 4}, "\n Total P=(", 0, ",", 
+   0, ",", 0, ")\n Irrep=", OpProjection`A1plusOhP, "\n Irrep ev=", 1, "/", 1,
+    "\n Charge=", 1],
+  Editable->False]], "Print",
+ CellChangeTimes->{{3.866602873960058*^9, 3.866602894601553*^9}, 
+   3.866609491275745*^9, 3.866611432716465*^9},
+ CellLabel->
+  "During evaluation of \
+In[39]:=",ExpressionUUID->"da433d3b-7cc0-4d40-85f0-094e358079b1"],
+
+Cell[BoxData["\<\"Torellon operator added to the correlator \
+list.\\n\\n\"\>"], "Print",
+ CellChangeTimes->{{3.866602873960058*^9, 3.866602894601553*^9}, 
+   3.866609491275745*^9, 3.8666114327194033`*^9},
+ CellLabel->
+  "During evaluation of \
+In[39]:=",ExpressionUUID->"db6972a3-e31b-4210-8eb6-8e8a1041be99"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
 
 Cell[BoxData[
  RowBox[{"GenerateCcode", "[", "]"}]], "Input",
@@ -890,849 +2463,1011 @@ Cell[BoxData[
   3.762008127279314*^9}, {3.762016645844331*^9, 3.762016647245489*^9}, {
   3.8184200720291653`*^9, 3.818420073587343*^9}, {3.862299332218399*^9, 
   3.862299333224904*^9}, {3.862366998776511*^9, 3.8623670003049307`*^9}},
+ CellLabel->"In[40]:=",ExpressionUUID->"9674e250-a804-4b26-8418-c2542023b236"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData["\<\"Now checking P={0, 0, 0}.\"\>"], "Print",
+ CellChangeTimes->{{3.8666028743929234`*^9, 3.8666028955856*^9}, 
+   3.866609491579808*^9, 3.8666114327946787`*^9},
  CellLabel->
-  "In[560]:=",ExpressionUUID->"9674e250-a804-4b26-8418-c2542023b236"]
+  "During evaluation of \
+In[40]:=",ExpressionUUID->"03fc6f6d-a2d6-4830-b870-cc523d9f9896"],
+
+Cell[BoxData["\<\"Currently checking irrep number 1, with dim=1.\"\>"], \
+"Print",
+ CellChangeTimes->{{3.8666028743929234`*^9, 3.8666028955856*^9}, 
+   3.866609491579808*^9, 3.8666114327960253`*^9},
+ CellLabel->
+  "During evaluation of \
+In[40]:=",ExpressionUUID->"415871ae-1cbe-4d26-b2ba-33842c2c6b68"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"The operators: \"\>", "\[InvisibleSpace]", 
+   RowBox[{"{", 
+    RowBox[{"{", 
+     RowBox[{"rotfun", "[", "0", "]"}], "}"}], "}"}]}],
+  SequenceForm["The operators: ", {{
+     OpProjection`rotfun[0]}}],
+  Editable->False]], "Print",
+ CellChangeTimes->{{3.8666028743929234`*^9, 3.8666028955856*^9}, 
+   3.866609491579808*^9, 3.8666114327981167`*^9},
+ CellLabel->
+  "During evaluation of \
+In[40]:=",ExpressionUUID->"94669898-b51c-40a1-b1ba-f45118412003"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"And their rotations: \"\>", "\[InvisibleSpace]", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "0", "]"}]}], "}"}], "}"}]}], "}"}]}],
+  SequenceForm[
+  "And their rotations: ", {{{1. OpProjection`unrotfun[0]}}, {{
+     1. OpProjection`unrotfun[0]}}, {{1. OpProjection`unrotfun[0]}}, {{
+     1. OpProjection`unrotfun[0]}}, {{1. OpProjection`unrotfun[0]}}, {{
+     1. OpProjection`unrotfun[0]}}, {{1. OpProjection`unrotfun[0]}}, {{
+     1. OpProjection`unrotfun[0]}}, {{1. OpProjection`unrotfun[0]}}, {{
+     1. OpProjection`unrotfun[0]}}, {{1. OpProjection`unrotfun[0]}}, {{
+     1. OpProjection`unrotfun[0]}}, {{1. OpProjection`unrotfun[0]}}, {{
+     1. OpProjection`unrotfun[0]}}, {{1. OpProjection`unrotfun[0]}}, {{
+     1. OpProjection`unrotfun[0]}}, {{1. OpProjection`unrotfun[0]}}, {{
+     1. OpProjection`unrotfun[0]}}, {{1. OpProjection`unrotfun[0]}}, {{
+     1. OpProjection`unrotfun[0]}}, {{1. OpProjection`unrotfun[0]}}, {{
+     1. OpProjection`unrotfun[0]}}, {{1. OpProjection`unrotfun[0]}}, {{
+     1. OpProjection`unrotfun[0]}}, {{1. OpProjection`unrotfun[0]}}, {{
+     1. OpProjection`unrotfun[0]}}, {{1. OpProjection`unrotfun[0]}}, {{
+     1. OpProjection`unrotfun[0]}}, {{1. OpProjection`unrotfun[0]}}, {{
+     1. OpProjection`unrotfun[0]}}, {{1. OpProjection`unrotfun[0]}}, {{
+     1. OpProjection`unrotfun[0]}}, {{1. OpProjection`unrotfun[0]}}, {{
+     1. OpProjection`unrotfun[0]}}, {{1. OpProjection`unrotfun[0]}}, {{
+     1. OpProjection`unrotfun[0]}}, {{1. OpProjection`unrotfun[0]}}, {{
+     1. OpProjection`unrotfun[0]}}, {{1. OpProjection`unrotfun[0]}}, {{
+     1. OpProjection`unrotfun[0]}}, {{1. OpProjection`unrotfun[0]}}, {{
+     1. OpProjection`unrotfun[0]}}, {{1. OpProjection`unrotfun[0]}}, {{
+     1. OpProjection`unrotfun[0]}}, {{1. OpProjection`unrotfun[0]}}, {{
+     1. OpProjection`unrotfun[0]}}, {{1. OpProjection`unrotfun[0]}}, {{
+     1. OpProjection`unrotfun[0]}}}],
+  Editable->False]], "Print",
+ CellChangeTimes->{{3.8666028743929234`*^9, 3.8666028955856*^9}, 
+   3.866609491579808*^9, 3.866611432800564*^9},
+ CellLabel->
+  "During evaluation of \
+In[40]:=",ExpressionUUID->"fea4d446-7142-486b-92e3-9fb51cbcca07"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"The operators: \"\>", "\[InvisibleSpace]", 
+   RowBox[{"{", 
+    RowBox[{"{", 
+     RowBox[{"rotfun", "[", "1", "]"}], "}"}], "}"}]}],
+  SequenceForm["The operators: ", {{
+     OpProjection`rotfun[1]}}],
+  Editable->False]], "Print",
+ CellChangeTimes->{{3.8666028743929234`*^9, 3.8666028955856*^9}, 
+   3.866609491579808*^9, 3.866611432865364*^9},
+ CellLabel->
+  "During evaluation of \
+In[40]:=",ExpressionUUID->"2e236e39-c0b8-40e0-b9a9-1c638888f991"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"And their rotations: \"\>", "\[InvisibleSpace]", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "1", "]"}]}], "}"}], "}"}]}], "}"}]}],
+  SequenceForm[
+  "And their rotations: ", {{{1. OpProjection`unrotfun[1]}}, {{
+     1. OpProjection`unrotfun[1]}}, {{1. OpProjection`unrotfun[1]}}, {{
+     1. OpProjection`unrotfun[1]}}, {{1. OpProjection`unrotfun[1]}}, {{
+     1. OpProjection`unrotfun[1]}}, {{1. OpProjection`unrotfun[1]}}, {{
+     1. OpProjection`unrotfun[1]}}, {{1. OpProjection`unrotfun[1]}}, {{
+     1. OpProjection`unrotfun[1]}}, {{1. OpProjection`unrotfun[1]}}, {{
+     1. OpProjection`unrotfun[1]}}, {{1. OpProjection`unrotfun[1]}}, {{
+     1. OpProjection`unrotfun[1]}}, {{1. OpProjection`unrotfun[1]}}, {{
+     1. OpProjection`unrotfun[1]}}, {{1. OpProjection`unrotfun[1]}}, {{
+     1. OpProjection`unrotfun[1]}}, {{1. OpProjection`unrotfun[1]}}, {{
+     1. OpProjection`unrotfun[1]}}, {{1. OpProjection`unrotfun[1]}}, {{
+     1. OpProjection`unrotfun[1]}}, {{1. OpProjection`unrotfun[1]}}, {{
+     1. OpProjection`unrotfun[1]}}, {{1. OpProjection`unrotfun[1]}}, {{
+     1. OpProjection`unrotfun[1]}}, {{1. OpProjection`unrotfun[1]}}, {{
+     1. OpProjection`unrotfun[1]}}, {{1. OpProjection`unrotfun[1]}}, {{
+     1. OpProjection`unrotfun[1]}}, {{1. OpProjection`unrotfun[1]}}, {{
+     1. OpProjection`unrotfun[1]}}, {{1. OpProjection`unrotfun[1]}}, {{
+     1. OpProjection`unrotfun[1]}}, {{1. OpProjection`unrotfun[1]}}, {{
+     1. OpProjection`unrotfun[1]}}, {{1. OpProjection`unrotfun[1]}}, {{
+     1. OpProjection`unrotfun[1]}}, {{1. OpProjection`unrotfun[1]}}, {{
+     1. OpProjection`unrotfun[1]}}, {{1. OpProjection`unrotfun[1]}}, {{
+     1. OpProjection`unrotfun[1]}}, {{1. OpProjection`unrotfun[1]}}, {{
+     1. OpProjection`unrotfun[1]}}, {{1. OpProjection`unrotfun[1]}}, {{
+     1. OpProjection`unrotfun[1]}}, {{1. OpProjection`unrotfun[1]}}, {{
+     1. OpProjection`unrotfun[1]}}}],
+  Editable->False]], "Print",
+ CellChangeTimes->{{3.8666028743929234`*^9, 3.8666028955856*^9}, 
+   3.866609491579808*^9, 3.86661143287041*^9},
+ CellLabel->
+  "During evaluation of \
+In[40]:=",ExpressionUUID->"32ac0583-3a3a-42b7-9bbc-8bf78850aeec"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"The operators: \"\>", "\[InvisibleSpace]", 
+   RowBox[{"{", 
+    RowBox[{"{", 
+     RowBox[{"rotfun", "[", "2", "]"}], "}"}], "}"}]}],
+  SequenceForm["The operators: ", {{
+     OpProjection`rotfun[2]}}],
+  Editable->False]], "Print",
+ CellChangeTimes->{{3.8666028743929234`*^9, 3.8666028955856*^9}, 
+   3.866609491579808*^9, 3.866611432892981*^9},
+ CellLabel->
+  "During evaluation of \
+In[40]:=",ExpressionUUID->"fb1ae7f0-39bf-4072-a883-0ff45ae2e68f"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"And their rotations: \"\>", "\[InvisibleSpace]", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "2", "]"}]}], "}"}], "}"}]}], "}"}]}],
+  SequenceForm[
+  "And their rotations: ", {{{1. OpProjection`unrotfun[2]}}, {{
+     1. OpProjection`unrotfun[2]}}, {{1. OpProjection`unrotfun[2]}}, {{
+     1. OpProjection`unrotfun[2]}}, {{1. OpProjection`unrotfun[2]}}, {{
+     1. OpProjection`unrotfun[2]}}, {{1. OpProjection`unrotfun[2]}}, {{
+     1. OpProjection`unrotfun[2]}}, {{1. OpProjection`unrotfun[2]}}, {{
+     1. OpProjection`unrotfun[2]}}, {{1. OpProjection`unrotfun[2]}}, {{
+     1. OpProjection`unrotfun[2]}}, {{1. OpProjection`unrotfun[2]}}, {{
+     1. OpProjection`unrotfun[2]}}, {{1. OpProjection`unrotfun[2]}}, {{
+     1. OpProjection`unrotfun[2]}}, {{1. OpProjection`unrotfun[2]}}, {{
+     1. OpProjection`unrotfun[2]}}, {{1. OpProjection`unrotfun[2]}}, {{
+     1. OpProjection`unrotfun[2]}}, {{1. OpProjection`unrotfun[2]}}, {{
+     1. OpProjection`unrotfun[2]}}, {{1. OpProjection`unrotfun[2]}}, {{
+     1. OpProjection`unrotfun[2]}}, {{1. OpProjection`unrotfun[2]}}, {{
+     1. OpProjection`unrotfun[2]}}, {{1. OpProjection`unrotfun[2]}}, {{
+     1. OpProjection`unrotfun[2]}}, {{1. OpProjection`unrotfun[2]}}, {{
+     1. OpProjection`unrotfun[2]}}, {{1. OpProjection`unrotfun[2]}}, {{
+     1. OpProjection`unrotfun[2]}}, {{1. OpProjection`unrotfun[2]}}, {{
+     1. OpProjection`unrotfun[2]}}, {{1. OpProjection`unrotfun[2]}}, {{
+     1. OpProjection`unrotfun[2]}}, {{1. OpProjection`unrotfun[2]}}, {{
+     1. OpProjection`unrotfun[2]}}, {{1. OpProjection`unrotfun[2]}}, {{
+     1. OpProjection`unrotfun[2]}}, {{1. OpProjection`unrotfun[2]}}, {{
+     1. OpProjection`unrotfun[2]}}, {{1. OpProjection`unrotfun[2]}}, {{
+     1. OpProjection`unrotfun[2]}}, {{1. OpProjection`unrotfun[2]}}, {{
+     1. OpProjection`unrotfun[2]}}, {{1. OpProjection`unrotfun[2]}}, {{
+     1. OpProjection`unrotfun[2]}}}],
+  Editable->False]], "Print",
+ CellChangeTimes->{{3.8666028743929234`*^9, 3.8666028955856*^9}, 
+   3.866609491579808*^9, 3.866611432898211*^9},
+ CellLabel->
+  "During evaluation of \
+In[40]:=",ExpressionUUID->"4b49a7f7-4faa-4c4e-aed7-98ddf0e51fee"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"The operators: \"\>", "\[InvisibleSpace]", 
+   RowBox[{"{", 
+    RowBox[{"{", 
+     RowBox[{"rotfun", "[", "3", "]"}], "}"}], "}"}]}],
+  SequenceForm["The operators: ", {{
+     OpProjection`rotfun[3]}}],
+  Editable->False]], "Print",
+ CellChangeTimes->{{3.8666028743929234`*^9, 3.8666028955856*^9}, 
+   3.866609491579808*^9, 3.866611432922213*^9},
+ CellLabel->
+  "During evaluation of \
+In[40]:=",ExpressionUUID->"a84fb347-ff4e-4072-94b3-a587864fc950"],
+
+Cell[BoxData[
+ InterpretationBox[
+  RowBox[{"\<\"And their rotations: \"\>", "\[InvisibleSpace]", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}], ",", 
+     RowBox[{"{", 
+      RowBox[{"{", 
+       RowBox[{"1.`", " ", 
+        RowBox[{"unrotfun", "[", "3", "]"}]}], "}"}], "}"}]}], "}"}]}],
+  SequenceForm[
+  "And their rotations: ", {{{1. OpProjection`unrotfun[3]}}, {{
+     1. OpProjection`unrotfun[3]}}, {{1. OpProjection`unrotfun[3]}}, {{
+     1. OpProjection`unrotfun[3]}}, {{1. OpProjection`unrotfun[3]}}, {{
+     1. OpProjection`unrotfun[3]}}, {{1. OpProjection`unrotfun[3]}}, {{
+     1. OpProjection`unrotfun[3]}}, {{1. OpProjection`unrotfun[3]}}, {{
+     1. OpProjection`unrotfun[3]}}, {{1. OpProjection`unrotfun[3]}}, {{
+     1. OpProjection`unrotfun[3]}}, {{1. OpProjection`unrotfun[3]}}, {{
+     1. OpProjection`unrotfun[3]}}, {{1. OpProjection`unrotfun[3]}}, {{
+     1. OpProjection`unrotfun[3]}}, {{1. OpProjection`unrotfun[3]}}, {{
+     1. OpProjection`unrotfun[3]}}, {{1. OpProjection`unrotfun[3]}}, {{
+     1. OpProjection`unrotfun[3]}}, {{1. OpProjection`unrotfun[3]}}, {{
+     1. OpProjection`unrotfun[3]}}, {{1. OpProjection`unrotfun[3]}}, {{
+     1. OpProjection`unrotfun[3]}}, {{1. OpProjection`unrotfun[3]}}, {{
+     1. OpProjection`unrotfun[3]}}, {{1. OpProjection`unrotfun[3]}}, {{
+     1. OpProjection`unrotfun[3]}}, {{1. OpProjection`unrotfun[3]}}, {{
+     1. OpProjection`unrotfun[3]}}, {{1. OpProjection`unrotfun[3]}}, {{
+     1. OpProjection`unrotfun[3]}}, {{1. OpProjection`unrotfun[3]}}, {{
+     1. OpProjection`unrotfun[3]}}, {{1. OpProjection`unrotfun[3]}}, {{
+     1. OpProjection`unrotfun[3]}}, {{1. OpProjection`unrotfun[3]}}, {{
+     1. OpProjection`unrotfun[3]}}, {{1. OpProjection`unrotfun[3]}}, {{
+     1. OpProjection`unrotfun[3]}}, {{1. OpProjection`unrotfun[3]}}, {{
+     1. OpProjection`unrotfun[3]}}, {{1. OpProjection`unrotfun[3]}}, {{
+     1. OpProjection`unrotfun[3]}}, {{1. OpProjection`unrotfun[3]}}, {{
+     1. OpProjection`unrotfun[3]}}, {{1. OpProjection`unrotfun[3]}}, {{
+     1. OpProjection`unrotfun[3]}}}],
+  Editable->False]], "Print",
+ CellChangeTimes->{{3.8666028743929234`*^9, 3.8666028955856*^9}, 
+   3.866609491579808*^9, 3.86661143292729*^9},
+ CellLabel->
+  "During evaluation of \
+In[40]:=",ExpressionUUID->"a0727bdb-f187-4f99-bc39-35550de111bf"]
+}, Open  ]]
+}, Open  ]]
 }, Open  ]]
 },
 WindowSize->{2027, 1254},
-WindowMargins->{{-21, Automatic}, {Automatic, 0}},
-DockedCells->{
-  Cell[
-   BoxData[
-    DynamicModuleBox[{LinterUIDockedCell`Private`notebook$$}, 
-     GraphicsBox[{
-       InsetBox[
-        TemplateBox[{
-          PaneBox[
-           StyleBox[
-           "\"Code Analysis\"", FontColor -> GrayLevel[0.4], FontFamily -> 
-            "Source Sans Pro", FontWeight -> Plain, FontSize -> 13, 
-            StripOnInput -> False], 
-           BaselinePosition -> (Baseline -> Scaled[0.65])], 
-          TemplateBox[{8}, "Spacer1"], 
-          PaneBox[
-           
-           PaneSelectorBox[{{False, False} -> 
-             TemplateBox[{0}, "Spacer1"], {True, False} -> 
-             TemplateBox[{0}, "Spacer1"], {True, True} -> PaneBox[
-               InterpretationBox[
-                DynamicBox[
-                 FEPrivate`FrontEndResource[
-                 "FEExpressions", "PercolateAnimator"][Medium]], 
-                ProgressIndicator[Appearance -> "Percolate"], 
-                BaseStyle -> {"Deploy"}], BaselinePosition -> Scaled[0.05]], {
-              False, True} -> 
-             DynamicModuleBox[{
-               CodeInspector`LinterUI`Private`tracker$$ = 
-                CodeInspector`LinterUI`Private`DynamicTriggers`\
-dockedCellLintCounts}, 
-               DynamicWrapperBox[
-                DynamicBox[
-                 ToBoxes[
-                 CodeInspector`LinterUI`Private`tracker$$; 
-                  LinterUIDockedCell`Private`dockedCellSeverityCountsButton[
-                   LinterUIDockedCell`Private`notebook$$], TraditionalForm], 
-                 TrackedSymbols :> {
-                  CodeInspector`LinterUI`Private`tracker$$}], 
-                If[
-                CodeInspector`LinterUI`Private`tracker$$ =!= 
-                 CodeInspector`LinterUI`Private`DynamicTriggers`\
-dockedCellLintCounts, CodeInspector`LinterUI`Private`tracker$$ = 
-                 CodeInspector`LinterUI`Private`DynamicTriggers`\
-dockedCellLintCounts]], DynamicModuleValues :> {}]}, 
-            Dynamic[FEPrivate`EvaluatorStatus["Local"]; {
-               CodeInspector`LinterUI`Private`varValue[
-               LinterUIDockedCell`Private`notebook$$, "AnalysisInProgressQ"], 
-               
-               TrueQ[
-                CodeInspector`LinterUI`Private`varValue[
-                LinterUIDockedCell`Private`notebook$$, 
-                 "DockedCellPresentQ"]]}], ImageSize -> Automatic], 
-           BaselinePosition -> Scaled[0.15]]}, "Row", 
-         DisplayFunction -> (PaneBox[
-           RowBox[{
-             TemplateSlotSequence[1, "\[InvisibleSpace]"]}], Alignment -> 
-           Baseline]& ), InterpretationFunction -> (RowBox[{"Row", "[", 
-            RowBox[{
-              RowBox[{"{", 
-                TemplateSlotSequence[1, ","], "}"}], ",", 
-              RowBox[{"Alignment", "\[Rule]", "Baseline"}]}], "]"}]& )], 
-        Offset[{8, 0}, {-1, 0}], {-1, 0}], 
-       InsetBox[
-        PaneSelectorBox[{
-         True -> DynamicModuleBox[{
-            CodeInspector`LinterUI`Private`hoverQ$$ = False, 
-             CodeInspector`LinterUI`Private`mouseDownQ$$ = False, 
-             CodeInspector`LinterUI`Private`fontColor$$}, 
-            ButtonBox[
-             DynamicWrapperBox[
-              TemplateBox[{
-                DynamicWrapperBox[
-                 StyleBox[
-                  PaneBox[
-                  "\"Reanalyze Notebook\"", ContentPadding -> True, 
-                   FrameMargins -> None, BaselinePosition -> Baseline], 
-                  FontColor -> 
-                  Dynamic[CodeInspector`LinterUI`Private`fontColor$$], 
-                  FontColor -> GrayLevel[0.2], FontFamily -> 
-                  "Source Sans Pro", FontWeight -> Plain, FontSize -> 14, 
-                  StripOnInput -> False], 
-                 CodeInspector`LinterUI`Private`fontColor$$ = Which[
-                   TrueQ[
-                    Not[
-                    
-                    OptionValue[{
-                    ImageSize -> {Automatic, 19}, 
-                    FrameMargins -> {9 {1, 1}, 0 {1, 1}}, BaselinePosition -> 
-                    Baseline, Alignment -> {Center, Center}, Method -> 
-                    "Preemptive", "ActiveQ" -> True, "TextColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonText"], 
-                    "TextHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonTextHover"], "TextInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonTextInactive"], "BackColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonBack"], 
-                    "BackHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackHover"], "BackMouseDownColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackMouseDown"], "BackInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackInactive"], "EdgeColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonEdge"], 
-                    "EdgeHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonEdgeHover"], "EdgeInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonEdgeInactive"]}, {Method -> "Queued"}, 
-                    "ActiveQ"]]], 
-                   
-                   OptionValue[{
-                    ImageSize -> {Automatic, 19}, 
-                    FrameMargins -> {9 {1, 1}, 0 {1, 1}}, BaselinePosition -> 
-                    Baseline, Alignment -> {Center, Center}, Method -> 
-                    "Preemptive", "ActiveQ" -> True, "TextColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonText"], 
-                    "TextHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonTextHover"], "TextInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonTextInactive"], "BackColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonBack"], 
-                    "BackHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackHover"], "BackMouseDownColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackMouseDown"], "BackInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackInactive"], "EdgeColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonEdge"], 
-                    "EdgeHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonEdgeHover"], "EdgeInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonEdgeInactive"]}, {Method -> "Queued"}, 
-                    "TextInactiveColor"], 
-                   CodeInspector`LinterUI`Private`hoverQ$$, 
-                   
-                   OptionValue[{
-                    ImageSize -> {Automatic, 19}, 
-                    FrameMargins -> {9 {1, 1}, 0 {1, 1}}, BaselinePosition -> 
-                    Baseline, Alignment -> {Center, Center}, Method -> 
-                    "Preemptive", "ActiveQ" -> True, "TextColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonText"], 
-                    "TextHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonTextHover"], "TextInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonTextInactive"], "BackColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonBack"], 
-                    "BackHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackHover"], "BackMouseDownColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackMouseDown"], "BackInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackInactive"], "EdgeColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonEdge"], 
-                    "EdgeHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonEdgeHover"], "EdgeInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonEdgeInactive"]}, {Method -> "Queued"}, 
-                    "TextHoverColor"], True, 
-                   
-                   OptionValue[{
-                    ImageSize -> {Automatic, 19}, 
-                    FrameMargins -> {9 {1, 1}, 0 {1, 1}}, BaselinePosition -> 
-                    Baseline, Alignment -> {Center, Center}, Method -> 
-                    "Preemptive", "ActiveQ" -> True, "TextColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonText"], 
-                    "TextHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonTextHover"], "TextInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonTextInactive"], "BackColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonBack"], 
-                    "BackHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackHover"], "BackMouseDownColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackMouseDown"], "BackInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackInactive"], "EdgeColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonEdge"], 
-                    "EdgeHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonEdgeHover"], "EdgeInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonEdgeInactive"]}, {Method -> "Queued"}, 
-                    "TextColor"]]], ContentPadding -> False, 
-                FrameMargins -> {{9, 9}, {0, 0}}, 
-                Alignment -> {Center, Center}, ImageSize -> {Automatic, 19}, 
-                RoundingRadius -> 3, FrameStyle -> Dynamic[
-                  Directive[
-                   AbsoluteThickness[0.5], 
-                   Which[
-                    TrueQ[
-                    Not[
-                    
-                    OptionValue[{
-                    ImageSize -> {Automatic, 19}, 
-                    FrameMargins -> {9 {1, 1}, 0 {1, 1}}, BaselinePosition -> 
-                    Baseline, Alignment -> {Center, Center}, Method -> 
-                    "Preemptive", "ActiveQ" -> True, "TextColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonText"], 
-                    "TextHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonTextHover"], "TextInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonTextInactive"], "BackColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonBack"], 
-                    "BackHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackHover"], "BackMouseDownColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackMouseDown"], "BackInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackInactive"], "EdgeColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonEdge"], 
-                    "EdgeHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonEdgeHover"], "EdgeInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonEdgeInactive"]}, {Method -> "Queued"}, 
-                    "ActiveQ"]]], 
-                    
-                    OptionValue[{
-                    ImageSize -> {Automatic, 19}, 
-                    FrameMargins -> {9 {1, 1}, 0 {1, 1}}, BaselinePosition -> 
-                    Baseline, Alignment -> {Center, Center}, Method -> 
-                    "Preemptive", "ActiveQ" -> True, "TextColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonText"], 
-                    "TextHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonTextHover"], "TextInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonTextInactive"], "BackColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonBack"], 
-                    "BackHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackHover"], "BackMouseDownColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackMouseDown"], "BackInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackInactive"], "EdgeColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonEdge"], 
-                    "EdgeHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonEdgeHover"], "EdgeInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonEdgeInactive"]}, {Method -> "Queued"}, 
-                    "EdgeInactiveColor"], 
-                    CodeInspector`LinterUI`Private`hoverQ$$, 
-                    
-                    OptionValue[{
-                    ImageSize -> {Automatic, 19}, 
-                    FrameMargins -> {9 {1, 1}, 0 {1, 1}}, BaselinePosition -> 
-                    Baseline, Alignment -> {Center, Center}, Method -> 
-                    "Preemptive", "ActiveQ" -> True, "TextColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonText"], 
-                    "TextHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonTextHover"], "TextInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonTextInactive"], "BackColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonBack"], 
-                    "BackHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackHover"], "BackMouseDownColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackMouseDown"], "BackInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackInactive"], "EdgeColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonEdge"], 
-                    "EdgeHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonEdgeHover"], "EdgeInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonEdgeInactive"]}, {Method -> "Queued"}, 
-                    "EdgeHoverColor"], True, 
-                    
-                    OptionValue[{
-                    ImageSize -> {Automatic, 19}, 
-                    FrameMargins -> {9 {1, 1}, 0 {1, 1}}, BaselinePosition -> 
-                    Baseline, Alignment -> {Center, Center}, Method -> 
-                    "Preemptive", "ActiveQ" -> True, "TextColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonText"], 
-                    "TextHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonTextHover"], "TextInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonTextInactive"], "BackColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonBack"], 
-                    "BackHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackHover"], "BackMouseDownColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackMouseDown"], "BackInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackInactive"], "EdgeColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonEdge"], 
-                    "EdgeHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonEdgeHover"], "EdgeInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonEdgeInactive"]}, {Method -> "Queued"}, 
-                    "EdgeColor"]]]], Background -> Dynamic[
-                  Which[
-                   TrueQ[
-                    Not[
-                    
-                    OptionValue[{
-                    ImageSize -> {Automatic, 19}, 
-                    FrameMargins -> {9 {1, 1}, 0 {1, 1}}, BaselinePosition -> 
-                    Baseline, Alignment -> {Center, Center}, Method -> 
-                    "Preemptive", "ActiveQ" -> True, "TextColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonText"], 
-                    "TextHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonTextHover"], "TextInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonTextInactive"], "BackColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonBack"], 
-                    "BackHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackHover"], "BackMouseDownColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackMouseDown"], "BackInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackInactive"], "EdgeColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonEdge"], 
-                    "EdgeHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonEdgeHover"], "EdgeInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonEdgeInactive"]}, {Method -> "Queued"}, 
-                    "ActiveQ"]]], 
-                   
-                   OptionValue[{
-                    ImageSize -> {Automatic, 19}, 
-                    FrameMargins -> {9 {1, 1}, 0 {1, 1}}, BaselinePosition -> 
-                    Baseline, Alignment -> {Center, Center}, Method -> 
-                    "Preemptive", "ActiveQ" -> True, "TextColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonText"], 
-                    "TextHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonTextHover"], "TextInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonTextInactive"], "BackColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonBack"], 
-                    "BackHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackHover"], "BackMouseDownColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackMouseDown"], "BackInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackInactive"], "EdgeColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonEdge"], 
-                    "EdgeHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonEdgeHover"], "EdgeInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonEdgeInactive"]}, {Method -> "Queued"}, 
-                    "BackInactiveColor"], 
-                   And[
-                   CodeInspector`LinterUI`Private`hoverQ$$, 
-                    CodeInspector`LinterUI`Private`mouseDownQ$$], 
-                   
-                   OptionValue[{
-                    ImageSize -> {Automatic, 19}, 
-                    FrameMargins -> {9 {1, 1}, 0 {1, 1}}, BaselinePosition -> 
-                    Baseline, Alignment -> {Center, Center}, Method -> 
-                    "Preemptive", "ActiveQ" -> True, "TextColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonText"], 
-                    "TextHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonTextHover"], "TextInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonTextInactive"], "BackColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonBack"], 
-                    "BackHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackHover"], "BackMouseDownColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackMouseDown"], "BackInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackInactive"], "EdgeColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonEdge"], 
-                    "EdgeHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonEdgeHover"], "EdgeInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonEdgeInactive"]}, {Method -> "Queued"}, 
-                    "BackMouseDownColor"], 
-                   CodeInspector`LinterUI`Private`hoverQ$$, 
-                   
-                   OptionValue[{
-                    ImageSize -> {Automatic, 19}, 
-                    FrameMargins -> {9 {1, 1}, 0 {1, 1}}, BaselinePosition -> 
-                    Baseline, Alignment -> {Center, Center}, Method -> 
-                    "Preemptive", "ActiveQ" -> True, "TextColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonText"], 
-                    "TextHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonTextHover"], "TextInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonTextInactive"], "BackColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonBack"], 
-                    "BackHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackHover"], "BackMouseDownColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackMouseDown"], "BackInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackInactive"], "EdgeColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonEdge"], 
-                    "EdgeHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonEdgeHover"], "EdgeInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonEdgeInactive"]}, {Method -> "Queued"}, 
-                    "BackHoverColor"], True, 
-                   
-                   OptionValue[{
-                    ImageSize -> {Automatic, 19}, 
-                    FrameMargins -> {9 {1, 1}, 0 {1, 1}}, BaselinePosition -> 
-                    Baseline, Alignment -> {Center, Center}, Method -> 
-                    "Preemptive", "ActiveQ" -> True, "TextColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonText"], 
-                    "TextHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonTextHover"], "TextInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonTextInactive"], "BackColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonBack"], 
-                    "BackHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackHover"], "BackMouseDownColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackMouseDown"], "BackInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackInactive"], "EdgeColor" -> 
-                    CodeInspector`LinterUI`Private`colorData["ButtonEdge"], 
-                    "EdgeHoverColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonEdgeHover"], "EdgeInactiveColor" -> 
-                    CodeInspector`LinterUI`Private`colorData[
-                    "ButtonEdgeInactive"]}, {Method -> "Queued"}, 
-                    "BackColor"]]]}, "Highlighted"], 
-              CodeInspector`LinterUI`Private`hoverQ$$ = 
-               CurrentValue["MouseOver"]; 
-              CodeInspector`LinterUI`Private`mouseDownQ$$ = 
-               CurrentValue["MouseButtonTest"]], 
-             Appearance -> {
-              "Default" -> 
-               Image[RawArray["UnsignedInteger8",{{{255, 255, 255, 255}, {0, 
-                  0, 0, 255}, {255, 255, 255, 255}}, {{0, 0, 0, 255}, {0, 0, 
-                  0, 0}, {0, 0, 0, 255}}, {{255, 255, 255, 255}, {0, 0, 0, 
-                  255}, {255, 255, 255, 255}}}], "Byte", ColorSpace -> "RGB", 
-                 ImageResolution -> {72, 72}, Interleaving -> True], "Hover" -> 
-               Image[RawArray["UnsignedInteger8",{{{255, 255, 255, 255}, {0, 
-                  0, 0, 255}, {255, 255, 255, 255}}, {{0, 0, 0, 255}, {0, 0, 
-                  0, 0}, {0, 0, 0, 255}}, {{255, 255, 255, 255}, {0, 0, 0, 
-                  255}, {255, 255, 255, 255}}}], "Byte", ColorSpace -> "RGB", 
-                 ImageResolution -> {72, 72}, Interleaving -> True], 
-               "Pressed" -> 
-               Image[RawArray["UnsignedInteger8",{{{255, 255, 255, 255}, {0, 
-                  0, 0, 255}, {255, 255, 255, 255}}, {{0, 0, 0, 255}, {0, 0, 
-                  0, 0}, {0, 0, 0, 255}}, {{255, 255, 255, 255}, {0, 0, 0, 
-                  255}, {255, 255, 255, 255}}}], "Byte", ColorSpace -> "RGB", 
-                 ImageResolution -> {72, 72}, Interleaving -> True]}, 
-             BaselinePosition -> Baseline, 
-             ButtonFunction :> (
-              If[
-               OptionValue[{
-                  ImageSize -> {Automatic, 19}, 
-                   FrameMargins -> {9 {1, 1}, 0 {1, 1}}, BaselinePosition -> 
-                   Baseline, Alignment -> {Center, Center}, Method -> 
-                   "Preemptive", "ActiveQ" -> True, "TextColor" -> 
-                   CodeInspector`LinterUI`Private`colorData["ButtonText"], 
-                   "TextHoverColor" -> 
-                   CodeInspector`LinterUI`Private`colorData[
-                    "ButtonTextHover"], "TextInactiveColor" -> 
-                   CodeInspector`LinterUI`Private`colorData[
-                    "ButtonTextInactive"], "BackColor" -> 
-                   CodeInspector`LinterUI`Private`colorData["ButtonBack"], 
-                   "BackHoverColor" -> 
-                   CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackHover"], "BackMouseDownColor" -> 
-                   CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackMouseDown"], "BackInactiveColor" -> 
-                   CodeInspector`LinterUI`Private`colorData[
-                    "ButtonBackInactive"], "EdgeColor" -> 
-                   CodeInspector`LinterUI`Private`colorData["ButtonEdge"], 
-                   "EdgeHoverColor" -> 
-                   CodeInspector`LinterUI`Private`colorData[
-                    "ButtonEdgeHover"], "EdgeInactiveColor" -> 
-                   CodeInspector`LinterUI`Private`colorData[
-                    "ButtonEdgeInactive"]}, {Method -> "Queued"}, "ActiveQ"] =!= 
-                False, 
-                CodeInspector`LinterUI`Private`attachAnalysisAction[
-                 EvaluationNotebook[]]]; 
-              CodeInspector`LinterUI`Private`mouseDownQ$$ = False), 
-             ContentPadding -> False, Evaluator -> Automatic, Method -> 
-             "Queued"], DynamicModuleValues :> {}], False -> ButtonBox[
-            TemplateBox[{
-              StyleBox[
-              "\"Analyze Notebook\"", FontColor -> GrayLevel[0.2], FontFamily -> 
-               "Source Sans Pro", FontWeight -> Plain, FontSize -> 14, 
-               StripOnInput -> False], ImageSize -> {Automatic, 19}, 
-              FrameMargins -> {{9, 9}, {0, 0}}, BaselinePosition -> Baseline, 
-              Alignment -> {Center, Center}, Background -> GrayLevel[1], 
-              FrameStyle -> Dynamic[
-                If[
-                 CurrentValue["MouseOver"], 
-                 Hue[0.55, 0.82, 0.87], 
-                 GrayLevel[0.8]]]}, "Highlighted"], 
-            Appearance -> {
-             "Default" -> 
-              Image[RawArray["UnsignedInteger8",{{{255, 255, 255, 255}, {0, 0,
-                  0, 255}, {255, 255, 255, 255}}, {{0, 0, 0, 255}, {0, 0, 0, 
-                 0}, {0, 0, 0, 255}}, {{255, 255, 255, 255}, {0, 0, 0, 255}, {
-                 255, 255, 255, 255}}}], "Byte", ColorSpace -> "RGB", 
-                ImageResolution -> {72, 72}, Interleaving -> True], "Hover" -> 
-              Image[RawArray["UnsignedInteger8",{{{255, 255, 255, 255}, {0, 0,
-                  0, 255}, {255, 255, 255, 255}}, {{0, 0, 0, 255}, {0, 0, 0, 
-                 0}, {0, 0, 0, 255}}, {{255, 255, 255, 255}, {0, 0, 0, 255}, {
-                 255, 255, 255, 255}}}], "Byte", ColorSpace -> "RGB", 
-                ImageResolution -> {72, 72}, Interleaving -> True], "Pressed" -> 
-              Image[RawArray["UnsignedInteger8",{{{255, 255, 255, 255}, {0, 0,
-                  0, 255}, {255, 255, 255, 255}}, {{0, 0, 0, 255}, {0, 0, 0, 
-                 0}, {0, 0, 0, 255}}, {{255, 255, 255, 255}, {0, 0, 0, 255}, {
-                 255, 255, 255, 255}}}], "Byte", ColorSpace -> "RGB", 
-                ImageResolution -> {72, 72}, Interleaving -> True]}, 
-            ButtonFunction :> (CurrentValue[
-                EvaluationNotebook[], DockedCells] = 
-              With[{LinterUIDockedCell`Private`dockedCells = CurrentValue[
-                   EvaluationNotebook[], DockedCells]}, 
-                Pick[LinterUIDockedCell`Private`dockedCells, 
-                 Map[Quiet[
-                    Options[#, CellTags]] =!= {
-                   CellTags -> "CodeAnalysisDockedCell"}& , 
-                  LinterUIDockedCell`Private`dockedCells]]]; 
-             Needs["CodeInspector`"]; 
-             CodeInspector`AttachAnalysis[
-              LinterUIDockedCell`Private`notebook$$]), Evaluator -> Automatic,
-             Method -> "Queued"]}, 
-         Dynamic[FEPrivate`EvaluatorStatus["Local"]; TrueQ[
-            CodeInspector`LinterUI`Private`varValue[
-            LinterUIDockedCell`Private`notebook$$, "DockedCellPresentQ"]]], 
-         ImageSize -> Automatic], 
-        Offset[{-26, 0}, {1, 0}], {1, 0}], 
-       TagBox[
-        TagBox[
-         TooltipBox[{{
-            GrayLevel[0.6], 
-            DiskBox[
-             Offset[{-11, 0}, {1, 0}], 
-             Offset[6]]}, {
-            GrayLevel[0.97], 
-            AbsoluteThickness[1.5], 
-            CapForm["Round"], 
-            LineBox[{{
-               Offset[{-13, 2}, {1, 0}], 
-               Offset[{-9, -2}, {1, 0}]}, {
-               Offset[{-13, -2}, {1, 0}], 
-               Offset[{-9, 2}, {1, 0}]}}]}}, "\"Close analysis\"", 
-          TooltipDelay -> 0, TooltipStyle -> "TextStyling"], 
-         Annotation[#, "Close analysis", "Tooltip"]& ], 
-        EventHandlerTag[{"MouseClicked" :> (Map[NotebookDelete, 
-             Flatten[
-              CodeInspector`LinterUI`Private`varValue[
-              LinterUIDockedCell`Private`notebook$$, All, 
-               "UIAttachedCells"]]]; Map[NotebookDelete, 
-             Flatten[
-              CodeInspector`LinterUI`Private`varValue[
-              LinterUIDockedCell`Private`notebook$$, All, 
-               "CleanCellBracketMarker"]]]; CurrentValue[
-              EvaluationNotebook[], DockedCells] = 
-            With[{LinterUIDockedCell`Private`dockedCells = CurrentValue[
-                 EvaluationNotebook[], DockedCells]}, 
-              Pick[LinterUIDockedCell`Private`dockedCells, 
-               Map[Quiet[
-                  Options[#, CellTags]] =!= {
-                 CellTags -> "CodeAnalysisDockedCell"}& , 
-                LinterUIDockedCell`Private`dockedCells]]]; 
-           CodeInspector`LinterUI`Private`applyToVar[Remove, {
-              EvaluationNotebook[], All}]; 
-           CodeInspector`LinterUI`Private`varSet[{
-             LinterUIDockedCell`Private`notebook$$, "DockedCellPresentQ"}, 
-             False]), Method -> "Preemptive", PassEventsDown -> Automatic, 
-          PassEventsUp -> True}]]}, AspectRatio -> Full, 
-      ImageSize -> {Full, 23}, PlotRange -> {{-1, 1}, {-1, 1}}], 
-     Deinitialization :> 
-     CodeInspector`LinterUI`Private`varSet[{
-       LinterUIDockedCell`Private`notebook$$, "DockedCellPresentQ"}, False], 
-     DynamicModuleValues :> {}, 
-     Initialization :> ({
-       LinterUIDockedCell`Private`dockedCellSeverityCountsButton[
-          Pattern[LinterUIDockedCell`Private`notebook, 
-           Blank[NotebookObject]]] := 
-        With[{LinterUIDockedCell`Private`formatIcon = 
-           Show[#, ImageSize -> {13, 9}, BaselinePosition -> Scaled[-0.2]]& }, 
-          ActionMenu[
-           Highlighted[
-            Row[{
-              CodeInspector`LinterUI`Private`lintSeverityCountsIconRow[
-              LinterUIDockedCell`Private`notebook, "exclamSize" -> 12, 
-               FontSize -> 14, FontWeight -> Plain], 
-              Spacer[2], 
-              LinterUIDockedCell`Private`formatIcon[
-               CodeInspector`LinterUI`Private`iconData["DownChevron"][
-                CodeInspector`LinterUI`Private`colorData["UIDark"]]]}], 
-            ImageSize -> {Automatic, 19}, BaselinePosition -> Baseline, 
-            Background -> White, Frame -> True, FrameStyle -> Dynamic[
-              If[
-               CurrentValue["MouseOver"], 
-               Hue[0.55, 0.82, 0.87], 
-               GrayLevel[0.8]]], FrameMargins -> {6 {1, 1}, {1, 1}}, 
-            Alignment -> {Center, Baseline}], 
-           Map[
-           LinterUIDockedCell`Private`dockedCellMenuItem[
-            LinterUIDockedCell`Private`notebook, #]& , 
-            CodeInspector`LinterUI`Private`varValue[
-            LinterUIDockedCell`Private`notebook, All, "Cell"]], Appearance -> 
-           None]], LinterUIDockedCell`Private`dockedCellMenuItem[
-          Pattern[LinterUIDockedCell`Private`notebook, 
-           Blank[NotebookObject]], 
-          Pattern[LinterUIDockedCell`Private`cell, 
-           Blank[CellObject]]] := With[{}, Graphics[{
-             Inset[
-              With[{LinterUIDockedCell`Private`expressionString = First[
-                  FrontEndExecute[
-                   FrontEnd`ExportPacket[
-                    First[
-                    CodeInspector`LinterUI`Private`varValue[
-                    LinterUIDockedCell`Private`notebook, 
-                    LinterUIDockedCell`Private`cell, "CellContents"]], 
-                    "InputText"]]]}, {
-               LinterUIDockedCell`Private`noLineBreaks = 
-                StringReplace[
-                 LinterUIDockedCell`Private`expressionString, "\n" -> " "]}, {
-               LinterUIDockedCell`Private`previewString = 
-                StringTake[LinterUIDockedCell`Private`noLineBreaks, {1, 
-                   UpTo[LinterUIDockedCell`Private`$previewLength]}]}, 
-               CodeInspector`LinterUI`Private`styleData["FixedWidth"][
-                If[
-                StringLength[LinterUIDockedCell`Private`expressionString] > 
-                 LinterUIDockedCell`Private`$previewLength, 
-                 StringDrop[LinterUIDockedCell`Private`previewString, -1] <> 
-                 "\[Ellipsis]", 
-                 LinterUIDockedCell`Private`previewString]]], {-1, 0}, {-1, 
-              0}], 
-             Inset[
-              CodeInspector`LinterUI`Private`lintSeverityCountsIconRow[
-              LinterUIDockedCell`Private`cell], {1, 0}, {1, 0}]}, 
-            ImageSize -> {300, 25}, AspectRatio -> Full, 
-            PlotRange -> {{-1, 1}, {-1, 1}}, ImagePadding -> None] :> (
-           SelectionMove[LinterUIDockedCell`Private`cell, All, Cell]; 
-           With[{LinterUIDockedCell`Private`nb = 
-              ParentNotebook[LinterUIDockedCell`Private`cell]}, 
-             FrontEndExecute[
-              FrontEnd`FrontEndToken[
-              LinterUIDockedCell`Private`nb, "OpenSelectionParents"]]]; 
-           SelectionMove[LinterUIDockedCell`Private`cell, After, Cell])], 
-        LinterUIDockedCell`Private`$previewLength = 28, 
-        CodeInspector`LinterUI`Private`applyToVar[
-          Pattern[CodeInspector`LinterUI`Private`function, 
-           Blank[]], {
-           Pattern[CodeInspector`LinterUI`Private`notebook, 
-            Blank[NotebookObject]], All, 
-           Pattern[CodeInspector`LinterUI`Private`name, 
-            Blank[String]]}, 
-          Pattern[CodeInspector`LinterUI`Private`args, 
-           BlankNullSequence[]]] := 
-        Map[Apply[CodeInspector`LinterUI`Private`function, 
-           Join[
-            ToHeldExpression[#], 
-            Hold[CodeInspector`LinterUI`Private`args]]]& , 
-          
-          Names[(CodeInspector`LinterUI`Private`varNameString[
-             CodeInspector`LinterUI`Private`notebook] <> "*") <> 
-           CodeInspector`LinterUI`Private`name]], Null, 
-        CodeInspector`LinterUI`Private`applyToVar[
-          Pattern[CodeInspector`LinterUI`Private`function, 
-           Blank[]], {
-           Pattern[CodeInspector`LinterUI`Private`nameArguments, 
-            BlankSequence[]], 
-           Pattern[CodeInspector`LinterUI`Private`name, 
-            Blank[String]]}, 
-          Pattern[CodeInspector`LinterUI`Private`args, 
-           BlankNullSequence[]]] := 
-        Apply[CodeInspector`LinterUI`Private`function, 
-          Join[
-           ToHeldExpression[
-            CodeInspector`LinterUI`Private`varNameString[
-            CodeInspector`LinterUI`Private`nameArguments]], 
-           Hold[CodeInspector`LinterUI`Private`args]]], Null, 
-        CodeInspector`LinterUI`Private`applyToVar[
-          Pattern[CodeInspector`LinterUI`Private`function, 
-           Blank[]], {
-           Pattern[CodeInspector`LinterUI`Private`nameArguments, 
-            BlankSequence[]], All}, 
-          Pattern[CodeInspector`LinterUI`Private`args, 
-           BlankNullSequence[]]] := 
-        Map[Apply[CodeInspector`LinterUI`Private`function, 
-           Join[
-            ToHeldExpression[#], 
-            Hold[CodeInspector`LinterUI`Private`args]]]& , 
-          Names[
-          CodeInspector`LinterUI`Private`varNameString[
-            CodeInspector`LinterUI`Private`nameArguments] <> "*"]], 
-        CodeInspector`LinterUI`Private`varValue[
-          Pattern[CodeInspector`LinterUI`Private`notebook, 
-           Blank[NotebookObject]], All, 
-          Pattern[CodeInspector`LinterUI`Private`name, 
-           Blank[String]]] := Map[Symbol, 
-          
-          Names[(CodeInspector`LinterUI`Private`varNameString[
-             CodeInspector`LinterUI`Private`notebook] <> "*") <> 
-           CodeInspector`LinterUI`Private`name]], Null, 
-        CodeInspector`LinterUI`Private`varValue[
-          Pattern[CodeInspector`LinterUI`Private`nameArguments, 
-           BlankSequence[]], 
-          Pattern[CodeInspector`LinterUI`Private`name, 
-           Blank[String]]] := Symbol[
-          CodeInspector`LinterUI`Private`varNameString[
-          CodeInspector`LinterUI`Private`nameArguments, 
-           CodeInspector`LinterUI`Private`name]], Null, 
-        CodeInspector`LinterUI`Private`varValue[
-          Pattern[CodeInspector`LinterUI`Private`nameArguments, 
-           BlankSequence[]], All] := Map[Symbol, 
-          Names[
-          CodeInspector`LinterUI`Private`varNameString[
-            CodeInspector`LinterUI`Private`nameArguments] <> "*"]], 
-        CodeInspector`LinterUI`Private`varSet[{
-           Pattern[CodeInspector`LinterUI`Private`nameArguments, 
-            BlankSequence[]]}, 
-          Pattern[CodeInspector`LinterUI`Private`value, 
-           Blank[]]] := Apply[Set, 
-          Append[
-           ToHeldExpression[
-            CodeInspector`LinterUI`Private`varNameString[
-            CodeInspector`LinterUI`Private`nameArguments]], 
-           CodeInspector`LinterUI`Private`value]], 
-        CodeInspector`LinterUI`Private`varNameString[
-          Pattern[CodeInspector`LinterUI`Private`notebook, 
-           Blank[NotebookObject]]] := ((
-           "CodeInspector`LinterUI`Private`Vars`" <> "$$") <> 
-          With[{CodeInspector`LinterUI`Private`nbID = 
-             Last[CodeInspector`LinterUI`Private`notebook]}, 
-            If[
-             StringQ[CodeInspector`LinterUI`Private`nbID], 
-             StringReplace[CodeInspector`LinterUI`Private`nbID, "-" -> "$"], 
-             ToString[CodeInspector`LinterUI`Private`nbID]]]) <> "$$", Null, 
-        CodeInspector`LinterUI`Private`varNameString[
-          Pattern[CodeInspector`LinterUI`Private`cell, 
-           Blank[CellObject]]] := (
-          CodeInspector`LinterUI`Private`varNameString[
-            Replace[
-             ParentNotebook[CodeInspector`LinterUI`Private`cell], $Failed -> 
-             EvaluationNotebook[]]] <> 
-          With[{CodeInspector`LinterUI`Private`cellID = 
-             First[CodeInspector`LinterUI`Private`cell]}, 
-            If[
-             StringQ[CodeInspector`LinterUI`Private`cellID], 
-             StringReplace[CodeInspector`LinterUI`Private`cellID, "-" -> "$"], 
-             ToString[CodeInspector`LinterUI`Private`cellID]]]) <> "$$", Null,
-         CodeInspector`LinterUI`Private`varNameString[
-          Pattern[CodeInspector`LinterUI`Private`notebook, 
-           Blank[NotebookObject]], 
-          Pattern[CodeInspector`LinterUI`Private`cell, 
-           Blank[CellObject]]] := (
-          CodeInspector`LinterUI`Private`varNameString[
-           CodeInspector`LinterUI`Private`notebook] <> 
-          With[{CodeInspector`LinterUI`Private`cellID = 
-             First[CodeInspector`LinterUI`Private`cell]}, 
-            If[
-             StringQ[CodeInspector`LinterUI`Private`cellID], 
-             StringReplace[CodeInspector`LinterUI`Private`cellID, "-" -> "$"], 
-             ToString[CodeInspector`LinterUI`Private`cellID]]]) <> "$$", Null,
-         CodeInspector`LinterUI`Private`varNameString[
-          Pattern[CodeInspector`LinterUI`Private`notebook, 
-           Blank[NotebookObject]], 
-          Pattern[CodeInspector`LinterUI`Private`name, 
-           Blank[String]]] := 
-        CodeInspector`LinterUI`Private`varNameString[
-          CodeInspector`LinterUI`Private`notebook] <> 
-         CodeInspector`LinterUI`Private`name, Null, 
-        CodeInspector`LinterUI`Private`varNameString[
-          Pattern[CodeInspector`LinterUI`Private`cell, 
-           Blank[CellObject]], 
-          Pattern[CodeInspector`LinterUI`Private`name, 
-           Blank[String]]] := 
-        CodeInspector`LinterUI`Private`varNameString[
-          CodeInspector`LinterUI`Private`cell] <> 
-         CodeInspector`LinterUI`Private`name, Null, 
-        CodeInspector`LinterUI`Private`varNameString[
-          Pattern[CodeInspector`LinterUI`Private`notebook, 
-           Blank[NotebookObject]], 
-          Pattern[CodeInspector`LinterUI`Private`cell, 
-           Blank[CellObject]], 
-          Pattern[CodeInspector`LinterUI`Private`name, 
-           Blank[String]]] := 
-        CodeInspector`LinterUI`Private`varNameString[
-          CodeInspector`LinterUI`Private`notebook, 
-           CodeInspector`LinterUI`Private`cell] <> 
-         CodeInspector`LinterUI`Private`name, Null, 
-        CodeInspector`LinterUI`Private`varNameString[
-          Pattern[CodeInspector`LinterUI`Private`nameArguments, 
-           BlankSequence[]], 
-          Pattern[CodeInspector`LinterUI`Private`lint, 
-           Blank[CodeInspector`InspectionObject]], 
-          Pattern[CodeInspector`LinterUI`Private`name, 
-           Blank[String]]] := ((
-           CodeInspector`LinterUI`Private`varNameString[
-            CodeInspector`LinterUI`Private`nameArguments] <> Apply[Sequence, 
-             Riffle[
-              Map[StringDelete[
-                ToString[#], 
-                Alternatives["[", "]", "{", "}", ",", " "]]& , 
-               CodeInspector`LinterUI`Private`extractFirstList[
-                Last[CodeInspector`LinterUI`Private`lint][
-                CodeParser`Source]]], "$"]]) <> "$$") <> 
-         CodeInspector`LinterUI`Private`name, 
-        CodeInspector`LinterUI`Private`extractFirstList[
-          Pattern[CodeInspector`LinterUI`Private`expr, 
-           Blank[]]] := FirstCase[CodeInspector`LinterUI`Private`expr, 
-          Blank[List], {}, {0, Infinity}]}; 
-      LinterUIDockedCell`Private`notebook$$ = EvaluationNotebook[]), 
-     UnsavedVariables :> {LinterUIDockedCell`Private`notebook$$}]], 
-   CellFrame -> {{0, 0}, {1, 1}}, CellFrameMargins -> {{0, 0}, {0, 0}}, 
-   CellFrameColor -> GrayLevel[0.85], Background -> GrayLevel[0.97], CellTags -> 
-   "CodeAnalysisDockedCell"]},
+WindowMargins->{{Automatic, 0}, {Automatic, 31}},
+DockedCells->{},
 PrintingCopies->1,
 PrintingPageRange->{1, Automatic},
 FrontEndVersion->"13.0 for Mac OS X x86 (64-bit) (February 4, 2022)",
@@ -1753,14 +3488,44 @@ Notebook[{
 Cell[CellGroupData[{
 Cell[580, 22, 222, 3, 98, "Title",ExpressionUUID->"be4335ef-abd8-40da-b508-198e7f31797a"],
 Cell[805, 27, 644, 13, 213, "Subtitle",ExpressionUUID->"bd5946f4-a26e-4333-8f76-4023cae136b8"],
-Cell[1452, 42, 300, 7, 30, "Input",ExpressionUUID->"a9204ae2-9919-472d-b5c0-3aae98f96c89"],
-Cell[1755, 51, 845, 13, 30, "Input",ExpressionUUID->"7f0556eb-11e6-4d93-8e86-35273c8d3b29"],
-Cell[2603, 66, 10094, 307, 682, "Input",ExpressionUUID->"1986ba6f-0937-40e5-84b7-75568c370d56"],
-Cell[12700, 375, 1978, 34, 52, "Input",ExpressionUUID->"235cc05a-d3c5-4d2a-b0a4-ef29b6913572"],
-Cell[14681, 411, 5921, 123, 472, "Input",ExpressionUUID->"83d43c5d-194c-4391-8c8b-737e48cbad4e"],
-Cell[20605, 536, 8212, 158, 535, "Input",ExpressionUUID->"a8b5aac3-4474-4b14-a145-642f7c250882"],
-Cell[28820, 696, 10084, 187, 430, "Input",ExpressionUUID->"0d92a956-6972-4a98-b355-8547c76b9bf3"],
-Cell[38907, 885, 504, 8, 30, "Input",ExpressionUUID->"9674e250-a804-4b26-8418-c2542023b236"]
+Cell[1452, 42, 295, 6, 30, "Input",ExpressionUUID->"a9204ae2-9919-472d-b5c0-3aae98f96c89"],
+Cell[1750, 50, 840, 12, 30, "Input",ExpressionUUID->"7f0556eb-11e6-4d93-8e86-35273c8d3b29"],
+Cell[2593, 64, 10089, 306, 682, "Input",ExpressionUUID->"1986ba6f-0937-40e5-84b7-75568c370d56"],
+Cell[CellGroupData[{
+Cell[12707, 374, 2199, 37, 52, "Input",ExpressionUUID->"235cc05a-d3c5-4d2a-b0a4-ef29b6913572"],
+Cell[14909, 413, 235, 3, 34, "Output",ExpressionUUID->"5d3efbe7-40ec-4e82-8a86-e6eb6800ca17"],
+Cell[15147, 418, 243, 3, 34, "Output",ExpressionUUID->"f8ea6b46-ca4f-43dd-9a71-dd31b6f4356b"]
+}, Open  ]],
+Cell[15405, 424, 5917, 122, 472, "Input",ExpressionUUID->"83d43c5d-194c-4391-8c8b-737e48cbad4e"],
+Cell[21325, 548, 8208, 157, 535, "Input",ExpressionUUID->"a8b5aac3-4474-4b14-a145-642f7c250882"],
+Cell[CellGroupData[{
+Cell[29558, 709, 10080, 186, 430, "Input",ExpressionUUID->"0d92a956-6972-4a98-b355-8547c76b9bf3"],
+Cell[CellGroupData[{
+Cell[39663, 899, 3016, 69, 123, "Print",ExpressionUUID->"50fa8b19-acc9-4457-b552-e88885bb674c"],
+Cell[42682, 970, 308, 6, 63, "Print",ExpressionUUID->"c4e21d54-fc96-4a30-bbb3-37e607ca5b45"],
+Cell[42993, 978, 18096, 437, 215, "Print",ExpressionUUID->"ef6f3545-5ee7-4ef5-8d4f-bfdf81dc51e7"],
+Cell[61092, 1417, 308, 6, 63, "Print",ExpressionUUID->"ed3d6eaa-68b6-4fc3-a5b4-cd48dde901dd"],
+Cell[61403, 1425, 19793, 473, 234, "Print",ExpressionUUID->"900885e8-0072-4c88-a4ab-2930c340395f"],
+Cell[81199, 1900, 308, 6, 63, "Print",ExpressionUUID->"26840ac2-ae08-46ef-8854-e763b45d21aa"],
+Cell[81510, 1908, 22897, 536, 253, "Print",ExpressionUUID->"da433d3b-7cc0-4d40-85f0-094e358079b1"],
+Cell[104410, 2446, 310, 6, 63, "Print",ExpressionUUID->"db6972a3-e31b-4210-8eb6-8e8a1041be99"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[104769, 2458, 500, 7, 30, "Input",ExpressionUUID->"9674e250-a804-4b26-8418-c2542023b236"],
+Cell[CellGroupData[{
+Cell[105294, 2469, 280, 5, 24, "Print",ExpressionUUID->"03fc6f6d-a2d6-4830-b870-cc523d9f9896"],
+Cell[105577, 2476, 303, 6, 24, "Print",ExpressionUUID->"415871ae-1cbe-4d26-b2ba-33842c2c6b68"],
+Cell[105883, 2484, 503, 13, 24, "Print",ExpressionUUID->"94669898-b51c-40a1-b1ba-f45118412003"],
+Cell[106389, 2499, 8588, 228, 82, "Print",ExpressionUUID->"fea4d446-7142-486b-92e3-9fb51cbcca07"],
+Cell[114980, 2729, 501, 13, 24, "Print",ExpressionUUID->"2e236e39-c0b8-40e0-b9a9-1c638888f991"],
+Cell[115484, 2744, 8587, 228, 82, "Print",ExpressionUUID->"32ac0583-3a3a-42b7-9bbc-8bf78850aeec"],
+Cell[124074, 2974, 501, 13, 24, "Print",ExpressionUUID->"fb1ae7f0-39bf-4072-a883-0ff45ae2e68f"],
+Cell[124578, 2989, 8588, 228, 82, "Print",ExpressionUUID->"4b49a7f7-4faa-4c4e-aed7-98ddf0e51fee"],
+Cell[133169, 3219, 501, 13, 24, "Print",ExpressionUUID->"a84fb347-ff4e-4072-94b3-a587864fc950"],
+Cell[133673, 3234, 8587, 228, 82, "Print",ExpressionUUID->"a0727bdb-f187-4f99-bc39-35550de111bf"]
+}, Open  ]]
+}, Open  ]]
 }, Open  ]]
 }
 ]

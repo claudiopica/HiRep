@@ -308,14 +308,17 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
                 norm *= ml_up[i];
             norm *= GLB_VOL3 * NG;
             polyf = malloc(sizeof(double complex *) * 3);
-            polyf[0] = amalloc(sizeof(double complex) * VOLUME, ALIGN);
-            polyf[1] = amalloc(sizeof(double complex) * VOLUME, ALIGN);
-            polyf[2] = amalloc(sizeof(double complex) * VOLUME, ALIGN);
+            polyf[0] = amalloc(sizeof(double complex) * Y * Z * T, ALIGN);
+            polyf[1] = amalloc(sizeof(double complex) * X * Z * T, ALIGN);
+            polyf[2] = amalloc(sizeof(double complex) * X * Y * T, ALIGN);
         }
         gettimeofday(&start, 0);
 
         memset(one_point_gb, 0, sizeof(double complex) * total_n_glue_op * nblocking * n_active_slices);
         memset(one_point_tor, 0, sizeof(double complex) * total_n_tor_op * n_active_slices);
+        memset(polyf[0], 0, sizeof(double complex) * Y * Z * T);
+        memset(polyf[1], 0, sizeof(double complex) * X * Z * T);
+        memset(polyf[2], 0, sizeof(double complex) * X * Y * T);
     }
 
     if (lev < max_mh_level - 1)
@@ -363,6 +366,15 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
 #if total_n_tor_op > 0
         for (i = 0; i < n_active_slices * total_n_tor_op; i++)
             one_point_tor[i] /= norm;
+
+        for (i = 0; i < Y * Z * T; i++)
+            polyf[0][i] /= norm;
+
+        for (i = 0; i < X * Z * T; i++)
+            polyf[1][i] /= norm;
+
+        for (i = 0; i < X * Y * T; i++)
+            polyf[2][i] /= norm;
 
         collect_1pt_torellon_functions(lcor, one_point_tor, polyf);
 #endif

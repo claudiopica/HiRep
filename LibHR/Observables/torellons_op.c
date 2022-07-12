@@ -1934,7 +1934,7 @@ tor_path_storage[50+idx]= poly50(in);
 tor_path_storage[51+idx]= poly51(in);
 tor_path_storage[52+idx]= poly52(in);
 }
-pf[0][nny + Y * (nnz + Z * t)] = tor_path_storage[0 + ntors * (X * (nny + Y * nnz))];
+pf[0][nny + Y * (nnz + Z * t)] += tor_path_storage[0 + ntors * (X * (nny + Y * nnz))];
 }for (nnz = 0; nnz < Z; nnz++)
 for (nnx = 0; nnx < X; nnx++)
 {
@@ -1962,7 +1962,7 @@ tor_path_storage[54+idx]= poly54(in);
 tor_path_storage[55+idx]= poly55(in);
 tor_path_storage[56+idx]= poly56(in);
 }
-pf[1][nnx + X * (nnz + Z * t)] = tor_path_storage[1 + ntors *(nnx + X * Y * nnz)];
+pf[1][nnx + X * (nnz + Z * t)] += tor_path_storage[1 + ntors *(nnx + X * Y * nnz)];
 };
 for (nnx = 0; nnx < X; nnx++)
 for (nny = 0; nny < Y; nny++)
@@ -1991,7 +1991,7 @@ tor_path_storage[38+idx]= poly38(in);
 tor_path_storage[39+idx]= poly39(in);
 tor_path_storage[40+idx]= poly40(in);
 }
-pf[2][nnx + X * (nny  + Y * t)] = tor_path_storage[2 + ntors * (nnx + X * nny )];
+pf[2][nnx + X * (nny  + Y * t)] += tor_path_storage[2 + ntors * (nnx + X * nny )];
 };
 for (nnx = 0; nnx < X; nnx++)
 for (nny = 0; nny < Y; nny++)
@@ -2283,7 +2283,7 @@ void collect_1pt_torellon_functions(cor_list *lcor, double complex *tor_storage,
             MPI_Gather((double *)lpoly, 2 * T, MPI_DOUBLE, (double *)gpoly, 2 * T, MPI_DOUBLE, 0, GLB_COMM);
 #endif
             for (i = 0; i < lcor->n_entries; i++)
-                pcor[abs(lcor->list[i].t2 - lcor->list[i].t1)] += conj(gpoly[lcor->list[i].t1]) * gpoly[lcor->list[i].t2] / (lcor->list[i].n_pairs * X * Z);
+                pcor[abs(lcor->list[i].t2 - lcor->list[i].t1)] += conj(gpoly[lcor->list[i].t1]) * gpoly[lcor->list[i].t2] / (lcor->list[i].n_pairs * X * Y);
         }
    for (n1 = 0; n1 < GLB_T; n1++)
         lprintf("Measure ML", 0, " Polyakov Cor dt=%d ( %.10e %.10e )\n", n1, creal(pcor[n1]), cimag(pcor[n1]));
