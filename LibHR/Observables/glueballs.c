@@ -56,7 +56,7 @@ void measure_1pt_glueballs(int nblockingstart, int nblockingend, double *smear_v
     release_wrk_space(wrk2);
 }
 
-void measure_1pt_torellons(double *smear_val, double complex *tor_storage)
+void measure_1pt_torellons(double *smear_val, double complex *tor_storage, double complex **pf)
 {
     int nt;
     int wrk1;
@@ -68,7 +68,7 @@ void measure_1pt_torellons(double *smear_val, double complex *tor_storage)
 
     for (nt = 0; nt < n_active_slices; nt++)
     {
-        eval_all_torellon_ops(active_slices_list[nt], point_tor);
+        eval_all_torellon_ops(active_slices_list[nt], point_tor, pf);
         point_tor += total_n_tor_op;
     }
 

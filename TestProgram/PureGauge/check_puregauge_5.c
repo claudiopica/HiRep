@@ -71,6 +71,8 @@ int main(int argc, char *argv[])
 
   report_gb_group_setup();
 
+  initialize_spatial_active_slices(NULL);
+
   /* allocate additional memory */
   g = alloc_gtransf(&glattice);
 

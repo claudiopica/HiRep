@@ -1898,7 +1898,7 @@ static inline double complex diPoly_p_1_1_1_Ir_1_C_1_n_1(int x1, int y1, int z1)
 return +cimag(tor_path_storage[1+ntors * ((x1+X/2)%X + X * (y1 + Y *((z1+Z/2)%Z)))])*cimag(tor_path_storage[5+idx])+cimag(tor_path_storage[2+ntors * ((x1+X/2)%X + X * ((y1+Y/2)%Y + Y * z1))])*cimag(tor_path_storage[6+idx])+cimag(tor_path_storage[0+ntors * (x1 + X * ((y1+Y/2)%Y + Y *((z1+Z/2)%Z)))])*cimag(tor_path_storage[3+idx])+cimag(tor_path_storage[2+ntors * ((x1+X/2)%X + X * ((y1+Y/2)%Y + Y * z1))])*cimag(tor_path_storage[4+idx])+cimag(tor_path_storage[0+ntors * (x1 + X * ((y1+Y/2)%Y + Y *((z1+Z/2)%Z)))])*cimag(tor_path_storage[7+idx])+cimag(tor_path_storage[1+ntors * ((x1+X/2)%X + X * (y1 + Y *((z1+Z/2)%Z)))])*cimag(tor_path_storage[8+idx])+creal(tor_path_storage[1+ntors * ((x1+X/2)%X + X * (y1 + Y *((z1+Z/2)%Z)))])*creal(tor_path_storage[5+idx])+creal(tor_path_storage[2+ntors * ((x1+X/2)%X + X * ((y1+Y/2)%Y + Y * z1))])*creal(tor_path_storage[6+idx])+creal(tor_path_storage[0+ntors * (x1 + X * ((y1+Y/2)%Y + Y *((z1+Z/2)%Z)))])*creal(tor_path_storage[3+idx])+creal(tor_path_storage[2+ntors * ((x1+X/2)%X + X * ((y1+Y/2)%Y + Y * z1))])*creal(tor_path_storage[4+idx])+creal(tor_path_storage[0+ntors * (x1 + X * ((y1+Y/2)%Y + Y *((z1+Z/2)%Z)))])*creal(tor_path_storage[7+idx])+creal(tor_path_storage[1+ntors * ((x1+X/2)%X + X * (y1 + Y *((z1+Z/2)%Z)))])*creal(tor_path_storage[8+idx]);
 }
 
-static void eval_time_momentum_torellons(int t, double complex * np)
+static void eval_time_momentum_torellons(int t, double complex * np, double complex **pf)
   {
     int nnx, nny, nnz, idx=0, in;
     double complex ce = I * 2.0 * PI / GLB_X;
@@ -1909,10 +1909,11 @@ static void eval_time_momentum_torellons(int t, double complex * np)
     };
 for (nny = 0; nny < Y; nny++)
 for (nnz = 0; nnz < Z; nnz++)
+{
 for (nnx = 0; nnx < X; nnx++)
 {
 in = ipt(t, nnx, nny, nnz);
-idx = ntors * (nnx + X * (nny + Y * nnz));
+idx = ntors *(nnx + X * (nny + Y * nnz));
 tor_path_storage[0+idx]= poly0(in);
 tor_path_storage[3+idx]= poly3(in);
 tor_path_storage[7+idx]= poly7(in);
@@ -1932,13 +1933,15 @@ tor_path_storage[49+idx]= poly49(in);
 tor_path_storage[50+idx]= poly50(in);
 tor_path_storage[51+idx]= poly51(in);
 tor_path_storage[52+idx]= poly52(in);
-};
-for (nnz = 0; nnz < Z; nnz++)
+}
+pf[0][nny + Y * (nnz + Z * t)] = tor_path_storage[0 + ntors * (X * (nny + Y * nnz))];
+}for (nnz = 0; nnz < Z; nnz++)
 for (nnx = 0; nnx < X; nnx++)
+{
 for (nny = 0; nny < Y; nny++)
 {
 in = ipt(t, nnx, nny, nnz);
-idx = ntors * (nnx + X * (nny + Y * nnz));
+idx = ntors *(nnx + X * (nny + Y * nnz));
 tor_path_storage[1+idx]= poly1(in);
 tor_path_storage[5+idx]= poly5(in);
 tor_path_storage[8+idx]= poly8(in);
@@ -1958,9 +1961,12 @@ tor_path_storage[53+idx]= poly53(in);
 tor_path_storage[54+idx]= poly54(in);
 tor_path_storage[55+idx]= poly55(in);
 tor_path_storage[56+idx]= poly56(in);
+}
+pf[1][nnx + X * (nnz + Z * t)] = tor_path_storage[1 + ntors *(nnx + X * Y * nnz)];
 };
 for (nnx = 0; nnx < X; nnx++)
 for (nny = 0; nny < Y; nny++)
+{
 for (nnz = 0; nnz < Z; nnz++)
 {
 in = ipt(t, nnx, nny, nnz);
@@ -1984,6 +1990,8 @@ tor_path_storage[37+idx]= poly37(in);
 tor_path_storage[38+idx]= poly38(in);
 tor_path_storage[39+idx]= poly39(in);
 tor_path_storage[40+idx]= poly40(in);
+}
+pf[2][nnx + X * (nny  + Y * t)] = tor_path_storage[2 + ntors * (nnx + X * nny )];
 };
 for (nnx = 0; nnx < X; nnx++)
 for (nny = 0; nny < Y; nny++)
@@ -1999,26 +2007,23 @@ np[6] +=cexp(-ce * (double)(nny))*diPoly_p_0_1_0_Ir_1_C_1_n_1(nnx,nny,nnz);
 np[7] +=cexp(-ce * (double)(nnx + nny + nnz))*diPoly_p_1_1_1_Ir_1_C_1_n_1(nnx,nny,nnz);
 };
 };
-void eval_all_torellon_ops(int t, double complex *numerical_tor_out)
+void eval_all_torellon_ops(int t, double complex *numerical_tor_out, double complex ** polyf)
 {
     static double complex *numerical_op = NULL;
     if (numerical_op == NULL)
     {
         numerical_op = malloc(total_n_tor_op * sizeof(double complex));
     } 
-else
-    {
-        for (int i = 0; i < total_n_tor_op; i++)
-            numerical_op[i] = 0;
-    }
-eval_time_momentum_torellons(t,numerical_op);
+   for (int i = 0; i < total_n_tor_op; i++)
+       numerical_op[i] = 0;
+eval_time_momentum_torellons(t,numerical_op,polyf);
     for(int i=0;i<total_n_tor_op;i++)
        numerical_tor_out[i]+= numerical_op[i];
 }
 
-void collect_1pt_torellon_functions(cor_list *lcor, double complex *tor_storage)
+void collect_1pt_torellon_functions(cor_list *lcor, double complex *tor_storage, double complex ** polyf)
 {
-    int n1, i;
+    int n1, n2, n3, i;
     static double complex *tor1_bf;
     static int n_total_active_slices = 0;    
     static int *listactive = NULL;
@@ -2229,6 +2234,59 @@ void collect_1pt_torellon_functions(cor_list *lcor, double complex *tor_storage)
                             cimag(tor1_bf[i + total_n_tor_op  * listactive[n1]]));
             lprintf("Measure ML", 0, "\n");
         }
+
+    double complex *lpoly = NULL;
+    double complex *gpoly = NULL;
+    double complex *pcor = NULL;
+    if (lpoly == NULL)
+    {
+        lpoly = malloc(T * sizeof(double complex));
+#ifdef WITH_MPI
+        gpoly = malloc(GLB_T * sizeof(double complex));
+#else
+        gpoly = lpoly;
+#endif
+        pcor = malloc(GLB_T * sizeof(double complex));
+    }
+    for (n1 = 0; n1 < GLB_T; n1++)
+        pcor[n1] = 0.;
+
+    for (n1 = 0; n1 < Y; n1++)
+        for (n2 = 0; n2 < Z; n2++)
+        {
+            for (n3 = 0; n3 < T; n3++)
+                lpoly[n3] = polyf[0][(n1 + Y * (n2 + Z * n3))];
+#ifdef WITH_MPI
+            MPI_Gather((double *)lpoly, 2 * T, MPI_DOUBLE, (double *)gpoly, 2 * T, MPI_DOUBLE, 0, GLB_COMM);
+#endif
+            for (i = 0; i < lcor->n_entries; i++)
+                pcor[abs(lcor->list[i].t2 - lcor->list[i].t1)] += conj(gpoly[lcor->list[i].t1]) * gpoly[lcor->list[i].t2] / (lcor->list[i].n_pairs * Y * Z);
+        }
+    for (n1 = 0; n1 < X; n1++)
+        for (n2 = 0; n2 < Z; n2++)
+        {
+            for (n3 = 0; n3 < T; n3++)
+                lpoly[n3] = polyf[1][(n1 + X * (n2 + Z * n3))];
+#ifdef WITH_MPI
+            MPI_Gather((double *)lpoly, 2 * T, MPI_DOUBLE, (double *)gpoly, 2 * T, MPI_DOUBLE, 0, GLB_COMM);
+#endif
+
+            for (i = 0; i < lcor->n_entries; i++)
+                pcor[abs(lcor->list[i].t2 - lcor->list[i].t1)] += conj(gpoly[lcor->list[i].t1]) * gpoly[lcor->list[i].t2] / (lcor->list[i].n_pairs * X * Z);
+        }
+    for (n1 = 0; n1 < X; n1++)
+        for (n2 = 0; n2 < Y; n2++)
+        {
+            for (n3 = 0; n3 < T; n3++)
+                lpoly[n3] = polyf[2][(n1 + X * (n2 + Y * n3))];
+#ifdef WITH_MPI
+            MPI_Gather((double *)lpoly, 2 * T, MPI_DOUBLE, (double *)gpoly, 2 * T, MPI_DOUBLE, 0, GLB_COMM);
+#endif
+            for (i = 0; i < lcor->n_entries; i++)
+                pcor[abs(lcor->list[i].t2 - lcor->list[i].t1)] += conj(gpoly[lcor->list[i].t1]) * gpoly[lcor->list[i].t2] / (lcor->list[i].n_pairs * X * Z);
+        }
+   for (n1 = 0; n1 < GLB_T; n1++)
+        lprintf("Measure ML", 0, " Polyakov Cor dt=%d ( %.10e %.10e )\n", n1, creal(pcor[n1]), cimag(pcor[n1]));
 }
 void report_tor_group_setup()
 {

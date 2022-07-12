@@ -20,6 +20,7 @@
 #include "communications.h"
 #include "logger.h"
 #include "glueballs.h"
+#include "memory.h"
 
 #define PI 3.141592653589793238462643383279502884197
 #include <math.h>
@@ -294,6 +295,7 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
     static long double norm = 1.0;
     struct timeval start, end, etime;
     int nblocking = nblockingend - nblockingstart + 1;
+    static double complex **polyf;
 
     if (lev == 0)
     {
@@ -305,6 +307,10 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
             for (i = 0; i < max_mh_level; i++)
                 norm *= ml_up[i];
             norm *= GLB_VOL3 * NG;
+            polyf = malloc(sizeof(double complex *) * 3);
+            polyf[0] = amalloc(sizeof(double complex) * VOLUME, ALIGN);
+            polyf[1] = amalloc(sizeof(double complex) * VOLUME, ALIGN);
+            polyf[2] = amalloc(sizeof(double complex) * VOLUME, ALIGN);
         }
         gettimeofday(&start, 0);
 
@@ -334,7 +340,7 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
 #endif
 
 #if total_n_tor_op > 0
-            measure_1pt_torellons(smear_val, one_point_tor);
+            measure_1pt_torellons(smear_val, one_point_tor, polyf);
 #endif
         }
     }
@@ -358,7 +364,7 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
         for (i = 0; i < n_active_slices * total_n_tor_op; i++)
             one_point_tor[i] /= norm;
 
-        collect_1pt_torellon_functions(lcor, one_point_tor);
+        collect_1pt_torellon_functions(lcor, one_point_tor, polyf);
 #endif
 
         gettimeofday(&start, 0);

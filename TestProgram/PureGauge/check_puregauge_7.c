@@ -97,6 +97,24 @@ int main(int argc, char *argv[])
 
   report_tor_group_setup();
 
+  initialize_spatial_active_slices(NULL);
+  cor_list corrs;
+
+  corrs.n_entries = corrs.n_corrs = GLB_T;
+
+  corrs.list = malloc(sizeof(cor_points) * GLB_T);
+  for (n = 0; n < GLB_T / 2; n++)
+  {
+    corrs.list[n].t1 = GLB_T / 2 - 1;
+    corrs.list[n].t2 = GLB_T / 2 + n;
+    corrs.list[n].n_pairs = 1;
+  }
+  for (n = 0; n < GLB_T / 2; n++)
+  {
+    corrs.list[n + GLB_T / 2].t1 = 0;
+    corrs.list[n + GLB_T / 2].t2 = GLB_T / 2 + n;
+    corrs.list[n + GLB_T / 2].n_pairs = 1;
+  }
   /* allocate additional memory */
   g = alloc_gtransf(&glattice);
 
@@ -105,9 +123,14 @@ int main(int argc, char *argv[])
   start_gf_sendrecv(u_gauge);
   represent_gauge_field();
   lprintf("MAIN", 0, "done.\n\n");
+  double complex **polyf;
 
   dop = malloc(T * total_n_tor_op * sizeof(double complex));
   dop1 = malloc(T * total_n_tor_op * sizeof(double complex));
+  polyf = malloc(sizeof(double complex *) * 3);
+  polyf[0] = amalloc(sizeof(double complex) * Y * Z * T, ALIGN);
+  polyf[1] = amalloc(sizeof(double complex) * X * Z * T, ALIGN);
+  polyf[2] = amalloc(sizeof(double complex) * X * Y * T, ALIGN);
 
   for (n = 0; n < T * total_n_tor_op; n++)
   {
@@ -116,7 +139,9 @@ int main(int argc, char *argv[])
   }
 
   for (nt = 0; nt < T; nt++)
-    eval_all_torellon_ops(nt, dop + nt * total_n_tor_op);
+    eval_all_torellon_ops(nt, dop + nt * total_n_tor_op, polyf);
+
+  collect_1pt_torellon_functions(&corrs, dop, polyf);
 
   for (n = 0; n < T * total_n_tor_op; n++)
     dop[n] /= NG * GLB_VOLUME;
@@ -128,7 +153,9 @@ int main(int argc, char *argv[])
   lprintf("MAIN", 0, "done.\n");
 
   for (nt = 0; nt < T; nt++)
-    eval_all_torellon_ops(nt, dop1 + nt * total_n_tor_op);
+    eval_all_torellon_ops(nt, dop1 + nt * total_n_tor_op, polyf);
+
+  collect_1pt_torellon_functions(&corrs, dop, polyf);
 
   for (n = 0; n < T * total_n_tor_op; n++)
     dop1[n] /= NG * GLB_VOLUME;
@@ -202,7 +229,7 @@ int main(int argc, char *argv[])
     dop1[n] = 0.;
 
   for (nt = 0; nt < T; nt++)
-    eval_all_torellon_ops(nt, dop1 + nt * total_n_tor_op);
+    eval_all_torellon_ops(nt, dop1 + nt * total_n_tor_op, polyf);
 
   for (n = 0; n < T * total_n_tor_op; n++)
     dop1[n] /= NG * GLB_VOLUME;
@@ -240,7 +267,7 @@ int main(int argc, char *argv[])
     dop1[n] = 0.;
 
   for (nt = 0; nt < T; nt++)
-    eval_all_torellon_ops(nt, dop1 + nt * total_n_tor_op);
+    eval_all_torellon_ops(nt, dop1 + nt * total_n_tor_op, polyf);
 
   for (n = 0; n < T * total_n_tor_op; n++)
     dop1[n] /= NG * GLB_VOLUME;
@@ -278,7 +305,7 @@ int main(int argc, char *argv[])
     dop1[n] = 0.;
 
   for (nt = 0; nt < T; nt++)
-    eval_all_torellon_ops(nt, dop1 + nt * total_n_tor_op);
+    eval_all_torellon_ops(nt, dop1 + nt * total_n_tor_op, polyf);
 
   for (n = 0; n < T * total_n_tor_op; n++)
     dop1[n] /= NG * GLB_VOLUME;
@@ -310,6 +337,8 @@ int main(int argc, char *argv[])
   lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n");
 
   global_sum_int(&return_value, 1);
+
+  // write_gauge_field("myconf.dat");
 
   finalize_process();
   return return_value;
