@@ -233,7 +233,7 @@ double integrate_ghmc(int regenerate, ghmc_par *update_par)
 
 		if (u_scalar != NULL)
 		{
-			u_scalar_copy = alloc_scalar_field(&glattice);
+			u_scalar_copy = alloc_suNg_scalar_field(&glattice);
 			suNg_scalar_field_copy(u_scalar_copy, u_scalar);
 		}
 		pf_copy = (spinor_field **)malloc(num_mon() * sizeof(spinor_field *));
