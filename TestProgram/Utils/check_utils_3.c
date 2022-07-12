@@ -24,6 +24,8 @@
 #include "hr_complex.h"
 #include "check_utils_3_gb_functions.c"
 #include "check_utils_3_tor_functions.c"
+#include "memory.h"
+static double complex **polyf;
 
 static void all_g_op(double complex *pa)
 {
@@ -57,7 +59,7 @@ static void all_t_op(double complex *pa)
         pa[i] = 0.;
 
     for (i = 0; i < n_active_slices; i++)
-        eval_all_torellon_ops(active_slices_list[i], pa);
+        eval_all_torellon_ops(active_slices_list[i], pa, polyf);
 
     for (i = 0; i < total_n_tor_op; i++)
         pa[i] /= n_active_slices * NP_T;
@@ -89,7 +91,10 @@ int main(int argc, char *argv[])
 
     op = malloc(total_n_glue_op * sizeof(double complex));
     rop = malloc(total_n_glue_op * sizeof(double complex));
-
+    polyf = malloc(sizeof(double complex *) * 3);
+    polyf[0] = amalloc(sizeof(double complex) * Y * Z * T, ALIGN);
+    polyf[1] = amalloc(sizeof(double complex) * X * Z * T, ALIGN);
+    polyf[2] = amalloc(sizeof(double complex) * X * Y * T, ALIGN);
     lprintf("MAIN", 0, "Measuring all the glueballs operators on the original configuration\n");
     all_g_op(op);
 
