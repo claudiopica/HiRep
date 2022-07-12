@@ -313,7 +313,7 @@ static void sync_gauge_transf(suNg_field *gf) {
   }
 }
 
-static void sync_scalar_field(suNg_scalar_field *p) {
+static void sync_suNg_scalar_field(suNg_scalar_field *p) {
 	int i;
 	/* int j, x, y; */
 	geometry_descriptor *gd = p->type;
@@ -808,7 +808,7 @@ void start_sc_sendrecv(suNg_scalar_field *sf) {
   complete_sc_sendrecv(sf);
 
   /* fill send buffers */
-  sync_scalar_field(sf);
+  sync_suNg_scalar_field(sf);
 #ifdef MPI_TIMING
   error(sf_control>0,1,"start_sc_sendrecv " __FILE__,"Multiple send without receive");
   gettimeofday(&sfstart,0);  

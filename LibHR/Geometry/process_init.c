@@ -251,7 +251,7 @@ int finalize_process()
   free_gfield_f(u_gauge_f);
 #endif
   if (u_scalar != NULL)
-    free_scalar_field(u_scalar);
+    free_suNg_scalar_field(u_scalar);
 
   if (u_gauge_f_flt != NULL)
     free_gfield_f_flt(u_gauge_f_flt);
