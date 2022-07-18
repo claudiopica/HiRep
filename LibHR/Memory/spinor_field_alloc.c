@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 #include <stdlib.h>
@@ -48,7 +48,7 @@ for (int i=0; i<n; ++i) f[i].comm_req=NULL;\
 #define _ALLOC_GPU_CODE(_name,_size)\
 if(alloc_mem_t & GPU_MEM) {\
 cudaError_t err;\
-err = cudaMallocManaged((void **) &(f->gpu_ptr), n*_size*type->gsize_spinor*sizeof(*(f->gpu_ptr)),cudaMemAttachGlobal); \
+err = cudaMalloc((void **) &(f->gpu_ptr), n*_size*type->gsize_spinor*sizeof(*(f->gpu_ptr))); \
 error(err!=cudaSuccess,1,"alloc_" #_name " [" __FILE__ "]", \
 "Could not allocate GPU memory space for field"); \
 for (int i=1; i<n; ++i) f[i].gpu_ptr=f[i-1].gpu_ptr+type->gsize_spinor*_size;\
@@ -115,4 +115,3 @@ _DECLARE_MEMORY_FUNC(spinor_field_f, spinor_field, 1);
 _DECLARE_MEMORY_FUNC(spinor_field_f_flt, spinor_field_flt, 1);
 
 _DECLARE_MEMORY_FUNC(sfield, scalar_field, 1);
-

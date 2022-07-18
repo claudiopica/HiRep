@@ -31,6 +31,7 @@ TestProgram/Algebra/check_algebra_1
 TestProgram/DiracOperator/check_diracoperator_1
 TestProgram/DiracOperator/check_diracoperator_1_gpu
 TestProgram/DiracOperator/check_diracoperator_3
+TestProgram/DiracOperator/check_diracoperator_3_gpu
 TestProgram/DiracOperator/check_diracoperator_5
 TestProgram/DiracOperator/check_diracoperator_6
 TestProgram/Disconnected/check_disc_0

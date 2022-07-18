@@ -382,11 +382,11 @@ void Dphi_cpu(double m0, spinor_field *out, spinor_field *in)
   error(out->type != &glattice || in->type != &glattice, 1, "Dphi [Dphi.c]", "Spinors are not defined on all the lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
-  Dphi_(out, in);
+  Dphi_cpu_(out, in);
 
   rho = 4. + m0;
 
-  spinor_field_mul_add_assign_f(out, rho, in);
+  spinor_field_mul_add_assign_f_cpu(out, rho, in);
 
 #ifdef ROTATED_SF
   SFrho = 3. * _update_par.SF_ds + _update_par.SF_zf - 4.;
@@ -403,7 +403,7 @@ void Dphi_cpu(double m0, spinor_field *out, spinor_field *in)
           _spinor_mul_add_assign_f(*r, SFrho, *sp);
 
           _spinor_pminus_f(tmp, *sp);
-          _spinor_g5_assign_f(tmp);
+          _spinor_g5_assign_f_cpu(tmp);
           if (_update_par.SF_sign == 1)
           {
             _spinor_i_add_assign_f(*r, tmp);
@@ -426,7 +426,7 @@ void Dphi_cpu(double m0, spinor_field *out, spinor_field *in)
           _spinor_mul_add_assign_f(*r, SFrho, *sp);
 
           _spinor_pplus_f(tmp, *sp);
-          _spinor_g5_assign_f(tmp);
+          _spinor_g5_assign_f_cpu(tmp);
           if (_update_par.SF_sign == 1)
           {
             _spinor_i_add_assign_f(*r, tmp);
@@ -464,11 +464,11 @@ void g5Dphi_cpu(double m0, spinor_field *out, spinor_field *in)
 
   apply_BCs_on_spinor_field(in);
 
-  Dphi_(out, in);
+  Dphi_cpu_(out, in);
 
   rho = 4. + m0;
 
-  spinor_field_mul_add_assign_f(out, rho, in);
+  spinor_field_mul_add_assign_f_cpu(out, rho, in);
 
 #ifdef ROTATED_SF
   SFrho = 3. * _update_par.SF_ds + _update_par.SF_zf - 4.;
@@ -485,10 +485,10 @@ void g5Dphi_cpu(double m0, spinor_field *out, spinor_field *in)
           _spinor_mul_add_assign_f(*r, SFrho, *sp);
 
           _spinor_pminus_f(tmp, *sp);
-          _spinor_g5_assign_f(tmp);
+          _spinor_g5_assign_f_cpu(tmp);
           if (_update_par.SF_sign == 1)
           {
-            _spinor_i_add_assign_f(*r, tmp);
+            _spinor_i_add_assign_f_cpu(*r, tmp);
           }
           else
           {
@@ -505,13 +505,13 @@ void g5Dphi_cpu(double m0, spinor_field *out, spinor_field *in)
           index = ipt(T - 1, ix, iy, iz);
           r = _FIELD_AT(out, index);
           sp = _FIELD_AT(in, index);
-          _spinor_mul_add_assign_f(*r, SFrho, *sp);
+          _spinor_mul_add_assign_f_cpu(*r, SFrho, *sp);
 
           _spinor_pplus_f(tmp, *sp);
-          _spinor_g5_assign_f(tmp);
+          _spinor_g5_assign_f_cpu(tmp);
           if (_update_par.SF_sign == 1)
           {
-            _spinor_i_add_assign_f(*r, tmp);
+            _spinor_i_add_assign_f_cpu(*r, tmp);
           }
           else
           {
@@ -521,7 +521,7 @@ void g5Dphi_cpu(double m0, spinor_field *out, spinor_field *in)
   }
 #endif /* ROTATED_SF */
 
-  spinor_field_g5_assign_f(out);
+  spinor_field_g5_assign_f_cpu(out);
 
   apply_BCs_on_spinor_field(out);
 }
@@ -554,16 +554,16 @@ void Dphi_eopre_cpu(double m0, spinor_field *out, spinor_field *in)
     init_dirac = 0;
   }
 
-  Dphi_(otmp, in);
+  Dphi_cpu_(otmp, in);
   apply_BCs_on_spinor_field(otmp);
-  Dphi_(out, otmp);
+  Dphi_cpu_(out, otmp);
 
   rho = 4.0 + m0;
 
   rho *= -rho; /* this minus sign is taken into account below */
 
-  spinor_field_mul_add_assign_f(out, rho, in);
-  spinor_field_minus_f(out, out);
+  spinor_field_mul_add_assign_f_cpu(out, rho, in);
+  spinor_field_minus_f_cpu(out, out);
   apply_BCs_on_spinor_field(out);
 }
 
@@ -595,16 +595,16 @@ void Dphi_oepre_cpu(double m0, spinor_field *out, spinor_field *in)
     init_dirac = 0;
   }
 
-  Dphi_(etmp, in);
+  Dphi_cpu_(etmp, in);
   apply_BCs_on_spinor_field(etmp);
-  Dphi_(out, etmp);
+  Dphi_cpu_(out, etmp);
 
   rho = 4.0 + m0;
 
   rho *= -rho; /* this minus sign is taken into account below */
 
-  spinor_field_mul_add_assign_f(out, rho, in);
-  spinor_field_minus_f(out, out);
+  spinor_field_mul_add_assign_f_cpu(out, rho, in);
+  spinor_field_minus_f_cpu(out, out);
 
   apply_BCs_on_spinor_field(out);
 }
@@ -632,17 +632,17 @@ void g5Dphi_eopre_cpu(double m0, spinor_field *out, spinor_field *in)
     init_dirac = 0;
   }
 
-  Dphi_(otmp, in);
+  Dphi_cpu_(otmp, in);
   apply_BCs_on_spinor_field(otmp);
-  Dphi_(out, otmp);
+  Dphi_cpu_(out, otmp);
 
   rho = 4.0 + m0;
 
   rho *= -rho; /* this minus sign is taken into account below */
 
-  spinor_field_mul_add_assign_f(out, rho, in);
-  spinor_field_minus_f(out, out);
-  spinor_field_g5_assign_f(out);
+  spinor_field_mul_add_assign_f_cpu(out, rho, in);
+  spinor_field_minus_f_cpu(out, out);
+  spinor_field_g5_assign_f_cpu(out);
 
   apply_BCs_on_spinor_field(out);
 }
@@ -657,8 +657,8 @@ void g5Dphi_eopre_sq_cpu(double m0, spinor_field *out, spinor_field *in)
     init_dirac = 0;
   }
 
-  g5Dphi_eopre(m0, etmp, in);
-  g5Dphi_eopre(m0, out, etmp);
+  g5Dphi_eopre_cpu(m0, etmp, in);
+  g5Dphi_eopre_cpu(m0, out, etmp);
 }
 
 /* g5Dhi ^2 */
@@ -673,13 +673,13 @@ void g5Dphi_sq_cpu(double m0, spinor_field *out, spinor_field *in)
 
 #ifdef ROTATED_SF
   /*the switch of the SF_sign is needed to take care of the antihermiticity of the boundary term of the dirac operator*/
-  g5Dphi(m0, gtmp, in);
+  g5Dphi_cpu(m0, gtmp, in);
   _update_par.SF_sign = -_update_par.SF_sign;
-  g5Dphi(m0, out, gtmp);
+  g5Dphi_cpu(m0, out, gtmp);
   _update_par.SF_sign = -_update_par.SF_sign;
 #else
-  g5Dphi(m0, gtmp, in);
-  g5Dphi(m0, out, gtmp);
+  g5Dphi_cpu(m0, gtmp, in);
+  g5Dphi_cpu(m0, out, gtmp);
 #endif
 }
 
@@ -710,19 +710,19 @@ void Qhat_eopre(double m0, double mu, spinor_field *out, spinor_field *in)
     init_Dirac();
     init_dirac = 0;
   }
-  Dphi_(otmp, in);
+  Dphi_cpu_(otmp, in);
   apply_BCs_on_spinor_field(otmp);
-  spinor_field_mul_f(otmp2, rho, otmp);
-  spinor_field_g5_mulc_add_assign_f(otmp2, imu, otmp);
-  Dphi_(out, otmp2);
+  spinor_field_mul_f_cpu(otmp2, rho, otmp);
+  spinor_field_g5_mulc_add_assign_f_cpu(otmp2, imu, otmp);
+  Dphi_cpu_(out, otmp2);
 
   rho = -(4 + m0);
-  spinor_field_mul_add_assign_f(out, rho, in);
+  spinor_field_mul_add_assign_f_cpu(out, rho, in);
   imu = -I * mu;
-  spinor_field_g5_mulc_add_assign_f(out, imu, in);
+  spinor_field_g5_mulc_add_assign_f_cpu(out, imu, in);
 
-  spinor_field_minus_f(out, out);
-  spinor_field_g5_assign_f(out);
+  spinor_field_minus_f_cpu(out, out);
+  spinor_field_g5_assign_f_cpu(out);
 
   apply_BCs_on_spinor_field(out);
 }
@@ -882,7 +882,7 @@ static void Cphi_inv_(double mass, spinor_field *dptr, spinor_field *sptr, int a
 void Cphi(double mass, spinor_field *dptr, spinor_field *sptr)
 {
   apply_BCs_on_spinor_field(sptr);
-  Dphi_(dptr, sptr);
+  Dphi_cpu_(dptr, sptr);
   Cphi_(mass, dptr, sptr, 1);
   apply_BCs_on_spinor_field(dptr);
 }
@@ -890,7 +890,7 @@ void Cphi(double mass, spinor_field *dptr, spinor_field *sptr)
 void g5Cphi(double mass, spinor_field *dptr, spinor_field *sptr)
 {
   Cphi(mass, dptr, sptr);
-  spinor_field_g5_assign_f(dptr);
+  spinor_field_g5_assign_f_cpu(dptr);
 }
 
 void g5Cphi_sq(double mass, spinor_field *dptr, spinor_field *sptr)
@@ -912,11 +912,11 @@ void Cphi_eopre(double mass, spinor_field *dptr, spinor_field *sptr)
   }
 
   apply_BCs_on_spinor_field(sptr);
-  Dphi_(otmp, sptr);
+  Dphi_cpu_(otmp, sptr);
   Cphi_inv_(mass, otmp, otmp, 0);
   apply_BCs_on_spinor_field(otmp);
-  Dphi_(dptr, otmp);
-  spinor_field_minus_f(dptr, dptr);
+  Dphi_cpu_(dptr, otmp);
+  spinor_field_minus_f_cpu(dptr, dptr);
   Cphi_(mass, dptr, sptr, 1);
   apply_BCs_on_spinor_field(dptr);
 }
@@ -924,7 +924,7 @@ void Cphi_eopre(double mass, spinor_field *dptr, spinor_field *sptr)
 void g5Cphi_eopre(double mass, spinor_field *dptr, spinor_field *sptr)
 {
   Cphi_eopre(mass, dptr, sptr);
-  spinor_field_g5_assign_f(dptr);
+  spinor_field_g5_assign_f_cpu(dptr);
 }
 
 void g5Cphi_eopre_sq(double mass, spinor_field *dptr, spinor_field *sptr)
@@ -1072,7 +1072,7 @@ static void Cphi_(double mass, spinor_field *dptr, spinor_field *sptr, int assig
 void Cphi(double mass, spinor_field *dptr, spinor_field *sptr)
 {
   apply_BCs_on_spinor_field(sptr);
-  Dphi_(dptr, sptr);
+  Dphi_cpu_(dptr, sptr);
   Cphi_(mass, dptr, sptr, 1, 0);
   apply_BCs_on_spinor_field(dptr);
 }
@@ -1080,7 +1080,7 @@ void Cphi(double mass, spinor_field *dptr, spinor_field *sptr)
 void g5Cphi(double mass, spinor_field *dptr, spinor_field *sptr)
 {
   Cphi(mass, dptr, sptr);
-  spinor_field_g5_assign_f(dptr);
+  spinor_field_g5_assign_f_cpu(dptr);
 }
 
 void g5Cphi_sq(double mass, spinor_field *dptr, spinor_field *sptr)
@@ -1103,11 +1103,11 @@ void Cphi_eopre(double mass, spinor_field *dptr, spinor_field *sptr)
   }
 
   apply_BCs_on_spinor_field(sptr);
-  Dphi_(otmp, sptr);
+  Dphi_cpu_(otmp, sptr);
   Cphi_(mass, otmp, otmp, 0, 1);
   apply_BCs_on_spinor_field(otmp);
-  Dphi_(dptr, otmp);
-  spinor_field_minus_f(dptr, dptr);
+  Dphi_cpu_(dptr, otmp);
+  spinor_field_minus_f_cpu(dptr, dptr);
   Cphi_(mass, dptr, sptr, 1, 0);
   apply_BCs_on_spinor_field(dptr);
 }
@@ -1115,7 +1115,7 @@ void Cphi_eopre(double mass, spinor_field *dptr, spinor_field *sptr)
 void g5Cphi_eopre(double mass, spinor_field *dptr, spinor_field *sptr)
 {
   Cphi_eopre(mass, dptr, sptr);
-  spinor_field_g5_assign_f(dptr);
+  spinor_field_g5_assign_f_cpu(dptr);
 }
 
 void g5Cphi_eopre_sq(double mass, spinor_field *dptr, spinor_field *sptr)

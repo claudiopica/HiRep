@@ -27,7 +27,6 @@ MACRO += -DBC_Z_PERIODIC
 #MACRO += -DBASIC_SF
 #MACRO += -DROTATED_SF
 
-
 #MACRO += -DWITH_SMEARING
 #MACRO += -DWITH_CLOVER
 #MACRO += -DWITH_EXPCLOVER
@@ -51,7 +50,7 @@ MACRO += -DIO_FLUSH
 #Compiler
 ifeq (,$(findstring -DWITH_GPU,$(MACRO))) #Compile CPU only
     #CFLAGS = -Wall -Wshadow -std=c99 -O3 -fomit-frame-pointer -msse -msse2
-    CFLAGS = -Wall -Wshadow -std=c99 -O3  #-g #-march=core-avx2 -mtune=core-avx2 -g
+    CFLAGS = -Wall -Wshadow -std=c99 -O3 #-g #-march=core-avx2 -mtune=core-avx2 -g
     #CFLAGS = -Wall -Wshadow -std=c99 -O3 -qopt-prefetch=4 -qopt-report=2 -march=core-avx2 -mtune=core-avx2
 
     CC = gcc
@@ -61,21 +60,21 @@ ifeq (,$(findstring -DWITH_GPU,$(MACRO))) #Compile CPU only
 
     #CC = clang
     #MPICC = mpicc
-    #LDFLAGS =  #-L /opt/local/lib/mpich-devel-clang80/ -L /opt/local/lib/ #-lefence #-lprofiler #-l efence
+    #LDFLAGS = #-L /opt/local/lib/mpich-devel-clang80/ -L /opt/local/lib/ #-lefence #-lprofiler #-l efence
     #INCLUDE = #-I /opt/local/include/mpich-clang80/
 
     #CC = clang-mp-6.0
     #MPICC = mpicc-openmpi-devel-clang60
-    #LDFLAGS =  -L /opt/local/lib/openmpi-devel-clang60/ -L /opt/local/lib/ #-l efence
+    #LDFLAGS = -L /opt/local/lib/openmpi-devel-clang60/ -L /opt/local/lib/ #-l efence
     #INCLUDE = -I /opt/local/include/openmpi-devel-clang60/
 
     #CC = icc
     #MPICC = mpiicc
-    #LDFLAGS =  -L /opt/local/lib/mpich-devel-gcc7/ -L /opt/local/lib/ #-l efence
+    #LDFLAGS = -L /opt/local/lib/mpich-devel-gcc7/ -L /opt/local/lib/ #-l efence
     #INCLUDE = -I /opt/local/include/mpich-devel-gcc7/
 else #Compile with GPU
     CC = nvcc
     CFLAGS = -O2 -Xcompiler '-std=c99 -fgcse-sm -fgcse-las -fgcse-after-reload'
-    GPUFLAGS = --x cu -arch=sm_80 -Xptxas -v  -Xptxas -dlcm=ca -dc
+    GPUFLAGS = --x cu -arch=sm_80 -Xptxas -v -Xptxas -dlcm=ca -dc
     LDFLAGS = -lcuda
 endif

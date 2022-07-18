@@ -44,36 +44,36 @@ int main(int argc,char *argv[])
   int flopsite, bytesite;
   int n_times=50;
   struct timeval start, end, etime;
-  
+
   setup_process(&argc,&argv);
-  
+
   logger_setlevel(0,10000); /* log all */
   logger_map("DEBUG","debug");
 #ifdef WITH_MPI
   sprintf(tmp,">out_%d",PID); logger_stdout(tmp);
   sprintf(tmp,"err_%d",PID); freopen(tmp,"w",stderr);
 #endif
-  
-  lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
-  
+
+  lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE);
+
   read_input(glb_var.read,"test_input");
-  
-  
+
+
   /* setup communication geometry */
   if (geometry_init() == 1) {
     finalize_process();
     return 0;
   }
-  
+
   geometry_mpi_eo();
-    
+
     /* setup random numbers */
     read_input(rlx_var.read,"test_input");
     lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
     rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
-    
-  
-  
+
+
+
   lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
   lprintf("MAIN",0,"Fermion representation: dim = %d\n",NF);
   lprintf("MAIN",0,"The lattice size is %dx%dx%dx%d\n",T,X,Y,Z);
@@ -81,7 +81,7 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"The lattice borders are (%d,%d,%d,%d)\n",T_BORDER,X_BORDER,Y_BORDER,Z_BORDER);
   lprintf("MAIN",0,"\n");
   fflush(stdout);
-  
+
   lprintf("MAIN",0,"Allocating gauge field\n");
   u_gauge=alloc_gfield(&glattice);
   u_gauge_flt=alloc_gfield_flt(&glattice);
@@ -92,17 +92,17 @@ int main(int argc,char *argv[])
   u_gauge_f_flt=(suNf_field_flt*) u_gauge_flt;
 #endif
   /* allocate memory */
-  lprintf("MAIN",0,"Allocating spinor field\n");  
+  lprintf("MAIN",0,"Allocating spinor field\n");
   s0=alloc_spinor_field_f_flt(4,&glattice);
   s1=s0+1;
   s2=s1+1;
   s3=s2+1;
-  
 
-  lprintf("MAIN",0,"Randomizing spinor field...\n");  
+
+  lprintf("MAIN",0,"Randomizing spinor field...\n");
   gaussian_spinor_field_flt(s0);
   gaussian_spinor_field_flt(s1);
- 
+
   lprintf("MAIN",0,"Generating a random gauge field... ");
   fflush(stdout);
   random_u(u_gauge);
@@ -110,20 +110,20 @@ int main(int argc,char *argv[])
   start_gf_sendrecv(u_gauge);
   represent_gauge_field();
   assign_ud2u_f();
-  
- 
+
+
   lprintf("MAIN",0,"done.\n");
 
   //Check speed diracoperator
 
-  
+
 #if defined(REPR_ADJOINT)
   flopsite=8*NF*(7+8*NF);
 #else
   flopsite=8*NF*(7+16*NF);
 #endif
   bytesite=36*sizeof(suNf_vector)+16*sizeof(suNf); //add integers for geometry indexes?
-  
+
   lprintf("LA TEST",0,"Flop per site = %d\n",flopsite);
   lprintf("LA TEST",0,"Byte per site = %d\n",bytesite);
 
@@ -143,11 +143,9 @@ int main(int argc,char *argv[])
   lprintf("LA TEST",0,"BAND: %1.6g GB/s\n\n",gflops);
   lprintf("LA TEST",0,"DONE!");
 
-  
+
   free_spinor_field_f_flt(s0);
-    
+
   finalize_process();
   exit(0);
 }
-
-
