@@ -36,6 +36,7 @@ void random_spinor_field_cpu(spinor_field *s)
         int start = type->master_start[ixp];
         int N = type->master_end[ixp] - type->master_start[ixp]+1;
         gauss((double*)(_FIELD_AT(s, start)), N * sizeof(suNf_spinor) / sizeof(double));
+    }
 }
 
 
