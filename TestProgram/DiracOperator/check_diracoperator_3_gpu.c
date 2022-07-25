@@ -73,6 +73,11 @@ int test_herm_cpu(spinor_operator S, char *name)
   S(s3, s1);
   S(s4, s2);
 
+  lprintf("\n\nRESULT", 0, "s1 NORM %f on CPU\n", sqrt(spinor_field_sqnorm_f_cpu(s1)));
+  lprintf("RESULT", 0, "s2 NORM %f on CPU\n", sqrt(spinor_field_sqnorm_f_cpu(s2)));
+  lprintf("RESULT", 0, "s3 NORM %f on CPU\n", sqrt(spinor_field_sqnorm_f_cpu(s3)));
+  lprintf("RESULT", 0, "s4 NORM %f on CPU\n\n", sqrt(spinor_field_sqnorm_f_cpu(s4)));
+
   tau = spinor_field_prod_re_f_cpu(s2, s3);
   tau -= spinor_field_prod_re_f_cpu(s4, s1);
   tau += spinor_field_prod_im_f_cpu(s2, s3);
@@ -91,6 +96,7 @@ int test_herm_cpu(spinor_operator S, char *name)
   free_spinor_field_f(s1);
   return return_val;
 }
+
 
 int test_herm_gpu(spinor_operator S, char *name)
 {
@@ -111,8 +117,17 @@ int test_herm_gpu(spinor_operator S, char *name)
 
   gaussian_spinor_field(s1);
   gaussian_spinor_field(s2);
+  spinor_field_copy_to_gpu_f(s1);
+  spinor_field_copy_to_gpu_f(s2);
+  spinor_field_copy_to_gpu_f(s3);
+  spinor_field_copy_to_gpu_f(s4);
   S(s3, s1);
   S(s4, s2);
+
+  lprintf("\n\nRESULT", 0, "s1 NORM %f on GPU\n", sqrt(spinor_field_sqnorm_f(s1)));
+  lprintf("RESULT", 0, "s2 NORM %f on GPU\n", sqrt(spinor_field_sqnorm_f(s2)));
+  lprintf("RESULT", 0, "s3 NORM %f on GPU\n", sqrt(spinor_field_sqnorm_f(s3)));
+  lprintf("RESULT", 0, "s4 NORM %f on GPU\n\n", sqrt(spinor_field_sqnorm_f(s4)));
 
   tau = spinor_field_prod_re_f(s2, s3);
   tau -= spinor_field_prod_re_f(s4, s1);
@@ -132,6 +147,7 @@ int test_herm_gpu(spinor_operator S, char *name)
   free_spinor_field_f(s1);
   return return_val;
 }
+
 
 int main(int argc, char *argv[])
 {
