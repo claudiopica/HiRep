@@ -29,6 +29,7 @@
 #include "memory.h"
 #include "gpu.h"
 #include "hr_complex.h"
+#include <iostream>
 
 #ifdef ROTATED_SF
 #include "update.h"
@@ -1725,6 +1726,10 @@ void g5Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
 /* g5Dphi_eopre ^2 */
 void g5Dphi_eopre_sq(double m0, spinor_field *out, spinor_field *in) {
   /* alloc memory for temporary spinor field */
+  std::cout << "\n\nHERE!\n\n" << std::endl;
+  std::cout << "m0: " << std::to_string(m0) << std::endl;
+  std::cout << "out[0]: " << std::to_string(&out[0].re) << std::endl;
+  std::cout << "in[0]: " << std::to_string(&in[0]) << std::endl;
   if (init) { init_Dirac(); }
 
   g5Dphi_eopre(m0, etmp, in);
