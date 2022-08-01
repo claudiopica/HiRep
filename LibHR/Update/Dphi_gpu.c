@@ -1502,14 +1502,23 @@ void Dphi_(spinor_field *out, spinor_field *in)
   grid *= THREADSITE; //1 for KEPLER; 4 for FERMI
 
   if(in->type==&glat_odd) {
+    std::cout << "Dphi_ glat_odd" << std::endl;
     ++MVMcounter;
+    std::cout << "Before Dphi_gpu_eo:" << sqrt(spinor_field_sqnorm_f(in)) << std::endl;
+    std::cout << "Before Dphi_gpu_eo sanity:" << sqrt(spinor_field_sqnorm_f(in)) << std::endl;
     Dphi_gpu_eo<<<grid, BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out), START_SP_ADDRESS_GPU(in), u_gauge_f->gpu_ptr, iup_gpu, idn_gpu, vol4h);
     CudaCheckError();
+    std::cout << "After Dphi_gpu_eo:" << sqrt(spinor_field_sqnorm_f(in)) << std::endl;
   } else if (in->type==&glat_even) {
+    std::cout << "Dphi_ glat_even" << std::endl;
+    std::cout << "Before Dphi_gpu_oe:" << sqrt(spinor_field_sqnorm_f(in)) << std::endl;
+    std::cout << "Before Dphi_gpu_oe sanity:" << sqrt(spinor_field_sqnorm_f(in)) << std::endl;
     ++MVMcounter;
     Dphi_gpu_oe<<<grid, BLOCK_SIZE>>>(START_SP_ADDRESS_GPU(out), START_SP_ADDRESS_GPU(in), u_gauge_f->gpu_ptr, iup_gpu, idn_gpu, vol4h);
     CudaCheckError();
+    std::cout << "After Dphi_gpu_oe:" << sqrt(spinor_field_sqnorm_f(in)) << std::endl;
   } else if (in->type==&glattice) {
+    std::cout << "Dphi_ glattice" << std::endl;
     in->type=&glat_even;
     out->type=&glat_odd;
     ++MVMcounter;
@@ -1704,9 +1713,19 @@ void g5Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
   if (init) { init_Dirac();}
 
   std::cout << "Before Dphi_:" << sqrt(spinor_field_sqnorm_f(in)) << std::endl;
+  std::cout << "   Before in ptr:" << (in)->gpu_ptr << std::endl;
+  std::cout << "   Before out ptr:" << (out)->gpu_ptr << std::endl;
+  std::cout << "   Before otmp ptr:" << (otmp)->gpu_ptr << std::endl;
   Dphi_(otmp, in);
+  std::cout << "Between Dphi_:" << sqrt(spinor_field_sqnorm_f(in)) << std::endl;
+  std::cout << "   Between in ptr:" << (in)->gpu_ptr << std::endl;
+  std::cout << "   Between out ptr:" << (out)->gpu_ptr << std::endl;
+  std::cout << "   Between otmp ptr:" << (otmp)->gpu_ptr << std::endl;
   Dphi_(out, otmp);
   std::cout << "After Dphi_:" << sqrt(spinor_field_sqnorm_f(in)) << std::endl;
+  std::cout << "   After in ptr:" << (in)->gpu_ptr << std::endl;
+  std::cout << "   After out ptr:" << (out)->gpu_ptr << std::endl;
+  std::cout << "   After otmp ptr:" << (otmp)->gpu_ptr << std::endl;
 
   rho=4.0+m0;
   rho*=-rho; /* this minus sign is taken into account below */
