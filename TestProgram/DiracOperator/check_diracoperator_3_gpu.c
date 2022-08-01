@@ -116,8 +116,14 @@ int test_herm_gpu(spinor_operator S, char *name)
   lprintf("RESULT", 0, "Test if %s is hermitean on GPU: ", name);
 
   gaussian_spinor_field(s1);
+  for (int i=0;i<4;i++){
+    //gaussian_spinor_field(&s1[i]);
+    spinor_field_copy_to_gpu_f(&s1[i]);
+    lprintf("\n\nRESULT", 0, "s1 NORM %f on GPU\n", sqrt(spinor_field_sqnorm_f(&s1[i])));
+  }
+  //gaussian_spinor_field(s1);
   gaussian_spinor_field(s2);
-  spinor_field_copy_to_gpu_f(s1);
+  //spinor_field_copy_to_gpu_f(s1);
   spinor_field_copy_to_gpu_f(s2);
   spinor_field_copy_to_gpu_f(s3);
   spinor_field_copy_to_gpu_f(s4);
