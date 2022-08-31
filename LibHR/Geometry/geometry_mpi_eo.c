@@ -1898,6 +1898,9 @@ void geometry_mpi_eo(void)
   geometry_mem_alloc();
 
   fix_next_neightbours();
+  #ifdef WITH_GPU
+    init_neighbors_gpu();
+  #endif
 
   geometry_mpi_finalize();
 }

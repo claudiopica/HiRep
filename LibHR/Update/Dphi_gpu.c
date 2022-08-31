@@ -134,13 +134,11 @@ typedef struct _suNf_hspinor
 #define __asm_sync
 //#define GPU_KEPLER
 
-#ifdef GPU_KEPLER
-
 #define THREADSITE 1
 
 /* Takes an even input spinor and returns an odd spinor */
 __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, const suNf_spinor* __restrict__ in,
-                            const suNf* __restrict__ gauge, const int* __restrict__ iup, const int* __restrict__ idn,
+                            const suNf* __restrict__ gauge, const int* __restrict__ iup_d, const int* __restrict__ idn_d,
                             const int vol4h)
 {
   suNf_spinor r;
@@ -155,7 +153,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, const suNf_spinor* __
   ix = min(ix, vol4h-1);
 
   /******************************* direction +0 *********************************/
-  iy=iup(ix+vol4h, 0);
+  iy=iup_d[4*ix];
 
   _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
   _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
@@ -175,7 +173,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, const suNf_spinor* __
   r.c[3]=r.c[1];
 
   /******************************* direction -0 *********************************/
-  iy=idn(ix+vol4h, 0);
+  iy=idn_d[4*ix];
 
   _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
   _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
@@ -198,7 +196,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, const suNf_spinor* __
 
   __asm_sync;
   /******************************* direction +1 *********************************/
-  iy=iup(ix+vol4h, 1);
+  iy=iup_d[4*ix+1];
 
   _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
   _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
@@ -220,7 +218,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, const suNf_spinor* __
   _vector_i_sub_assign_f(r.c[2], sn.c[1]);
 
   /******************************* direction -1 *********************************/
-  iy=idn(ix+vol4h, 1);
+  iy=idn_d[4*ix+1];
 
   _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
   _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
@@ -243,7 +241,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, const suNf_spinor* __
 
   __asm_sync;
   /******************************* direction +2 *********************************/
-  iy= iup(ix+vol4h, 2);
+  iy=iup_d[4*ix+2];
 
   _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
   _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
@@ -265,7 +263,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, const suNf_spinor* __
   _vector_sub_assign_f(r.c[2], sn.c[1]);
 
   /******************************* direction -2 *********************************/
-  iy = idn(ix+vol4h, 2);
+  iy=idn_d[4*ix+2];
 
   _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
   _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
@@ -288,7 +286,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, const suNf_spinor* __
 
   __asm_sync;
   /******************************* direction +3 *********************************/
-  iy = iup(ix+vol4h, 3);
+  iy=iup_d[4*ix+3];
 
   _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
   _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
@@ -310,7 +308,7 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, const suNf_spinor* __
   _vector_i_add_assign_f(r.c[3], sn.c[1]);
 
   /******************************* direction -3 *********************************/
-  iy = idn(ix+vol4h, 3);
+  iy=idn_d[4*ix+3];
 
   _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
   _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
@@ -332,20 +330,18 @@ __global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, const suNf_spinor* __
   _vector_i_sub_assign_f(r.c[3], sn.c[1]);
 
   /******************************** end of directions *********************************/
-  //out[ix]=r;
   _spinor_mul_f(r, -0.5, r);
 
   _suNf_write_spinor_gpu(vol4h, r.c[0], out, ix, 0);
   _suNf_write_spinor_gpu(vol4h, r.c[1], out, ix, 1);
   _suNf_write_spinor_gpu(vol4h, r.c[2], out, ix, 2);
   _suNf_write_spinor_gpu(vol4h, r.c[3], out, ix, 3);
-
 }
 
 
 __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, const suNf_spinor* __restrict__ in,
-                            const suNf* __restrict__ gauge, const int* __restrict__ iup, const int* __restrict__ idn,
-                            const int vol4h)
+                            const suNf* __restrict__ gauge, const int* __restrict__ iup_d, 
+                            const int* __restrict__ idn_d, const int vol4h)
 {
   suNf_spinor r;
   suNf_hspinor sn;
@@ -359,7 +355,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, const suNf_spinor* __
   ix = min(ix, vol4h-1);
 
   /******************************* direction +0 *********************************/
-  iy=iup(ix, 0)-vol4h;
+  iy=iup_d[4*ix];
 
   _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
   _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
@@ -379,7 +375,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, const suNf_spinor* __
   r.c[3]=r.c[1];
 
   /******************************* direction -0 *********************************/
-  iy=idn(ix, 0)-vol4h;
+  iy=idn_d[4*ix];
 
   _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
   _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
@@ -402,7 +398,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, const suNf_spinor* __
 
   __asm_sync;
   /******************************* direction +1 *********************************/
-  iy=iup(ix, 1)-vol4h;
+  iy=iup_d[4*ix+1];
 
   _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
   _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
@@ -424,7 +420,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, const suNf_spinor* __
   _vector_i_sub_assign_f(r.c[2], sn.c[1]);
 
   /******************************* direction -1 *********************************/
-  iy=idn(ix, 1)-vol4h;
+  iy=idn_d[4*ix+1];
 
   _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
   _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
@@ -447,7 +443,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, const suNf_spinor* __
 
   __asm_sync;
   /******************************* direction +2 *********************************/
-  iy= iup(ix, 2)-vol4h;
+  iy=iup_d[4*ix + 2];
 
   _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
   _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
@@ -469,7 +465,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, const suNf_spinor* __
   _vector_sub_assign_f(r.c[2], sn.c[1]);
 
   /******************************* direction -2 *********************************/
-  iy = idn(ix, 2)-vol4h;
+  iy=idn_d[4*ix+2];
 
   _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
   _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
@@ -492,7 +488,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, const suNf_spinor* __
 
   __asm_sync;
   /******************************* direction +3 *********************************/
-  iy = iup(ix, 3)-vol4h;
+  iy=iup_d[4*ix+3];
 
   _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
   _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
@@ -514,7 +510,7 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, const suNf_spinor* __
   _vector_i_add_assign_f(r.c[3], sn.c[1]);
 
   /******************************* direction -3 *********************************/
-  iy = idn(ix, 3)-vol4h;
+  iy=idn_d[4*ix+3];
 
   _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
   _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
@@ -536,7 +532,6 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, const suNf_spinor* __
   _vector_i_sub_assign_f(r.c[3], sn.c[1]);
 
   /******************************** end of directions *********************************/
-  //out[ix]=r;
   _spinor_mul_f(r, -0.5, r);
 
   _suNf_write_spinor_gpu(vol4h, r.c[0], out, ix, 0);
@@ -545,926 +540,6 @@ __global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, const suNf_spinor* __
   _suNf_write_spinor_gpu(vol4h, r.c[3], out, ix, 3);
 
 }
-
-#else
-
-#define THREADSITE 4
-/*
- * This function defines the massless Dirac operator
- * It can act on spinors defined on the whole lattice
- * or on spinors with definite parity
- */
-
-/* Takes an even input spinor and returns an odd spinor */
-__global__ void Dphi_gpu_oe(suNf_spinor* __restrict__ out, const suNf_spinor* __restrict__ in,
-			    const suNf* __restrict__ gauge, const int* __restrict__ iup, const int* __restrict__ idn,
-			    const int vol4h)
-{
-  suNf_vector r;
-  suNf_hspinor sn;
-  suNf u;
-#ifdef FERMION_THETA
-  suNf_vector vtmp;
-#endif
-  int iy;
-  int ix = blockIdx.x*BLOCK_SIZE/4 + threadIdx.x%(BLOCK_SIZE/4);
-  iy=threadIdx.x/(BLOCK_SIZE/4);
-  ix = min(ix, vol4h-1);
-
-  switch (iy) {
-    case 0:
-      /******************************* direction +0 *********************************/
-      iy=iup(ix+vol4h, 0);
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
-      _vector_add_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge+4*vol4h, ix, 0);
-      _suNf_theta_T_multiply(r, u, sn.c[0]);
-
-      /******************************* direction -0 *********************************/
-      iy=idn(ix+vol4h, 0);
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
-      _vector_sub_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge, iy, 0);
-      _suNf_theta_T_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_add_assign_f(r, sn.c[1]);
-
-      __asm_sync
-      /******************************* direction +1 *********************************/
-      iy=iup(ix+vol4h, 1);
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
-      _vector_i_add_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge+4*vol4h, ix, 1);
-      _suNf_theta_X_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_add_assign_f(r, sn.c[1]);
-
-      /******************************* direction -1 *********************************/
-      iy=idn(ix+vol4h, 1);
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
-      _vector_i_sub_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge, iy, 1);
-      _suNf_theta_X_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_add_assign_f(r, sn.c[1]);
-
-      __asm_sync
-      /******************************* direction +2 *********************************/
-      iy= iup(ix+vol4h, 2);
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
-      _vector_add_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge+4*vol4h, ix, 2);
-      _suNf_theta_Y_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_add_assign_f(r, sn.c[1]);
-
-      /******************************* direction -2 *********************************/
-      iy = idn(ix+vol4h, 2);
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
-      _vector_sub_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge, iy, 2);
-      _suNf_theta_Y_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_add_assign_f(r, sn.c[1]);
-
-      __asm_sync
-      /******************************* direction +3 *********************************/
-      iy = iup(ix+vol4h, 3);
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
-      _vector_i_add_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge+4*vol4h, ix, 3);
-      _suNf_theta_Z_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_add_assign_f(r, sn.c[1]);
-
-      /******************************* direction -3 *********************************/
-      iy = idn(ix+vol4h, 3);
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
-      _vector_i_sub_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge, iy, 3);
-      _suNf_theta_Z_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_add_assign_f(r, sn.c[1]);
-
-      __asm_sync
-      /******************************** end of directions *********************************/
-      //out[ix]=r;
-      _vector_mul_f(r, -0.5, r);
-
-      _suNf_write_spinor_gpu(vol4h, r, out, ix, 0);
-
-      break;
-
-  case 1:
-
-      /******************************* direction +0 *********************************/
-      iy=iup(ix+vol4h, 0);
-
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 1);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
-      _vector_add_assign_f(sn.c[0], sn.c[1]);
-      _suNf_read_gpu(vol4h, u, gauge+4*vol4h, ix, 0);
-
-      _suNf_theta_T_multiply(r, u, sn.c[0]);
-
-      /******************************* direction -0 *********************************/
-      iy=idn(ix+vol4h, 0);
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 1);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
-      _vector_sub_assign_f(sn.c[0], sn.c[1]);
-      _suNf_read_gpu(vol4h, u, gauge, iy, 0);
-
-      _suNf_theta_T_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_add_assign_f(r, sn.c[1]);
-
-      __asm_sync
-      /******************************* direction +1 *********************************/
-      iy=iup(ix+vol4h, 1);
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 1);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
-      _vector_i_add_assign_f(sn.c[0], sn.c[1]);
-      _suNf_read_gpu(vol4h, u, gauge+4*vol4h, ix, 1);
-
-      _suNf_theta_X_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_add_assign_f(r, sn.c[1]);
-
-      /******************************* direction -1 *********************************/
-      iy=idn(ix+vol4h, 1);
-
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 1);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
-      _vector_i_sub_assign_f(sn.c[0], sn.c[1]);
-      _suNf_read_gpu(vol4h, u, gauge, iy, 1);
-
-      _suNf_theta_X_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_add_assign_f(r, sn.c[1]);
-
-      __asm_sync
-      /******************************* direction +2 *********************************/
-      iy= iup(ix+vol4h, 2);
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 1);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
-      _vector_sub_assign_f(sn.c[0], sn.c[1]);
-      _suNf_read_gpu(vol4h, u, gauge+4*vol4h, ix, 2);
-
-      _suNf_theta_Y_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_add_assign_f(r, sn.c[1]);
-
-      /******************************* direction -2 *********************************/
-      iy = idn(ix+vol4h, 2);
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 1);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
-      _vector_add_assign_f(sn.c[0], sn.c[1]);
-      _suNf_read_gpu(vol4h, u, gauge, iy, 2);
-
-      _suNf_theta_Y_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_add_assign_f(r, sn.c[1]);
-
-      __asm_sync
-      /******************************* direction +3 *********************************/
-      iy = iup(ix+vol4h, 3);
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 1);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
-      _vector_i_sub_assign_f(sn.c[0], sn.c[1]);
-      _suNf_read_gpu(vol4h, u, gauge+4*vol4h, ix, 3);
-
-      _suNf_theta_Z_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_add_assign_f(r, sn.c[1]);
-
-      /******************************* direction -3 *********************************/
-      iy = idn(ix+vol4h, 3);
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 1);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
-      _vector_i_add_assign_f(sn.c[0], sn.c[1]);
-      _suNf_read_gpu(vol4h, u, gauge, iy, 3);
-
-      _suNf_theta_Z_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_add_assign_f(r, sn.c[1]);
-
-      __asm_sync
-      /******************************** end of directions *********************************/
-      //out[ix]=r;
-      _vector_mul_f(r, -0.5, r);
-
-      _suNf_write_spinor_gpu(vol4h, r, out, ix, 1);
-
-  break;
-
-      case 2:
-      /******************************* direction +0 *********************************/
-      iy=iup(ix+vol4h, 0);
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
-      _vector_add_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge+4*vol4h, ix, 0);
-      _suNf_theta_T_multiply(r, u, sn.c[0]);
-
-
-      /******************************* direction -0 *********************************/
-      iy=idn(ix+vol4h, 0);
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
-      _vector_sub_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge, iy, 0);
-      _suNf_theta_T_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_sub_assign_f(r, sn.c[1]);
-
-      __asm_sync
-      /******************************* direction +1 *********************************/
-      iy=iup(ix+vol4h, 1);
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 1);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
-      _vector_i_add_assign_f(sn.c[0], sn.c[1]);
-      _suNf_read_gpu(vol4h, u, gauge+4*vol4h, ix, 1);
-
-      _suNf_theta_X_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_i_sub_assign_f(r, sn.c[1]);
-
-      /******************************* direction -1 *********************************/
-      iy=idn(ix+vol4h, 1);
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 1);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
-      _vector_i_sub_assign_f(sn.c[0], sn.c[1]);
-      _suNf_read_gpu(vol4h, u, gauge, iy, 1);
-
-      _suNf_theta_X_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_i_add_assign_f(r, sn.c[1]);
-
-      __asm_sync
-      /******************************* direction +2 *********************************/
-      iy= iup(ix+vol4h, 2);
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 1);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
-      _vector_sub_assign_f(sn.c[0], sn.c[1]);
-      _suNf_read_gpu(vol4h, u, gauge+4*vol4h, ix, 2);
-
-      _suNf_theta_Y_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_sub_assign_f(r, sn.c[1]);
-
-      /******************************* direction -2 *********************************/
-      iy = idn(ix+vol4h, 2);
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 1);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
-      _vector_add_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge, iy, 2);
-
-      _suNf_theta_Y_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_add_assign_f(r, sn.c[1]);
-
-      __asm_sync
-      /******************************* direction +3 *********************************/
-      iy = iup(ix+vol4h, 3);
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
-      _vector_i_add_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge+4*vol4h, ix, 3);
-      _suNf_theta_Z_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_i_sub_assign_f(r, sn.c[1]);
-
-      /******************************* direction -3 *********************************/
-      iy = idn(ix+vol4h, 3);
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
-      _vector_i_sub_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge, iy, 3);
-      _suNf_theta_Z_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_i_add_assign_f(r, sn.c[1]);
-
-      __asm_sync
-      /******************************** end of directions *********************************/
-      _vector_mul_f(r, -0.5, r);
-
-      _suNf_write_spinor_gpu(vol4h, r, out, ix, 2);
-
-        break;
-
-      case 3:
-      /******************************* direction +0 *********************************/
-      iy=iup(ix+vol4h, 0);
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 1);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
-      _vector_add_assign_f(sn.c[0], sn.c[1]);
-      _suNf_read_gpu(vol4h, u, gauge+4*vol4h, ix, 0);
-
-      _suNf_theta_T_multiply(r, u, sn.c[0]);
-
-      /******************************* direction -0 *********************************/
-      iy=idn(ix+vol4h, 0);
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 1);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
-      _vector_sub_assign_f(sn.c[0], sn.c[1]);
-      _suNf_read_gpu(vol4h, u, gauge, iy, 0);
-
-      _suNf_theta_T_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_sub_assign_f(r, sn.c[1]);
-
-      __asm_sync
-      /******************************* direction +1 *********************************/
-      iy=iup(ix+vol4h, 1);
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
-      _vector_i_add_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge+4*vol4h, ix, 1);
-      _suNf_theta_X_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_i_sub_assign_f(r, sn.c[1]);
-
-      /******************************* direction -1 *********************************/
-      iy=idn(ix+vol4h, 1);
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
-      _vector_i_sub_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge, iy, 1);
-      _suNf_theta_X_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_i_add_assign_f(r, sn.c[1]);
-
-      __asm_sync
-      /******************************* direction +2 *********************************/
-      iy= iup(ix+vol4h, 2);
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
-      _vector_add_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge+4*vol4h, ix, 2);
-      _suNf_theta_Y_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_add_assign_f(r, sn.c[1]);
-
-      /******************************* direction -2 *********************************/
-      iy = idn(ix+vol4h, 2);
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
-      _vector_sub_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge, iy, 2);
-      _suNf_theta_Y_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_sub_assign_f(r, sn.c[1]);
-
-      __asm_sync
-      /******************************* direction +3 *********************************/
-      iy = iup(ix+vol4h, 3);
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 1);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
-      _vector_i_sub_assign_f(sn.c[0], sn.c[1]);
-      _suNf_read_gpu(vol4h, u, gauge+4*vol4h, ix, 3);
-
-      _suNf_theta_Z_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_i_add_assign_f(r, sn.c[1]);
-
-      /******************************* direction -3 *********************************/
-      iy = idn(ix+vol4h, 3);
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 1);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
-      _vector_i_add_assign_f(sn.c[0], sn.c[1]);
-      _suNf_read_gpu(vol4h, u, gauge, iy, 3);
-
-      _suNf_theta_Z_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_i_sub_assign_f(r, sn.c[1]);
-
-      __asm_sync
-      /******************************** end of directions *********************************/
-      //out[ix]=r;
-      _vector_mul_f(r, -0.5, r);
-
-      _suNf_write_spinor_gpu(vol4h, r, out, ix, 3);
-
-        break;
-
-    default:
-      break;
-  }
-}
-
-__global__ void Dphi_gpu_eo(suNf_spinor* __restrict__ out, const suNf_spinor* __restrict__ in,
-                             const suNf* __restrict__ gauge, const int* __restrict__ iup, const int* __restrict__ idn,
-                             const int vol4h)
-{
-  suNf_vector r;
-  suNf_hspinor sn;
-  suNf u;
-#ifdef FERMION_THETA
-  suNf_vector vtmp;
-#endif
-  int iy;
-  int ix = blockIdx.x*BLOCK_SIZE/4 + threadIdx.x%(BLOCK_SIZE/4);
-  iy=threadIdx.x/(BLOCK_SIZE/4);
-  ix = min(ix, vol4h-1);
-
-  switch (iy) {
-    case 0:
-
-      /******************************* direction +0 *********************************/
-      iy=iup(ix, 0)-vol4h;
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
-      _vector_add_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge, ix, 0);
-      _suNf_theta_T_multiply(r, u, sn.c[0]);
-
-      /******************************* direction -0 *********************************/
-      iy=idn(ix, 0)-vol4h;
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
-      _vector_sub_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge+4*vol4h, iy, 0);
-      _suNf_theta_T_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_add_assign_f(r, sn.c[1]);
-
-      __asm_sync
-      /******************************* direction +1 *********************************/
-      iy=iup(ix, 1)-vol4h;
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
-      _vector_i_add_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge, ix, 1);
-      _suNf_theta_X_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_add_assign_f(r, sn.c[1]);
-
-      /******************************* direction -1 *********************************/
-      iy=idn(ix, 1)-vol4h;
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
-      _vector_i_sub_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge+4*vol4h, iy, 1);
-      _suNf_theta_X_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_add_assign_f(r, sn.c[1]);
-
-      __asm_sync
-      /******************************* direction +2 *********************************/
-      iy= iup(ix, 2)-vol4h;
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
-      _vector_add_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge, ix, 2);
-      _suNf_theta_Y_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_add_assign_f(r, sn.c[1]);
-
-      /******************************* direction -2 *********************************/
-      iy = idn(ix, 2)-vol4h;
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
-      _vector_sub_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge+4*vol4h, iy, 2);
-      _suNf_theta_Y_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_add_assign_f(r, sn.c[1]);
-
-      __asm_sync
-      /******************************* direction +3 *********************************/
-      iy = iup(ix, 3)-vol4h;
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
-      _vector_i_add_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge, ix, 3);
-      _suNf_theta_Z_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_add_assign_f(r, sn.c[1]);
-
-      /******************************* direction -3 *********************************/
-      iy = idn(ix, 3)-vol4h;
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
-      _vector_i_sub_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge+4*vol4h, iy, 3);
-      _suNf_theta_Z_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_add_assign_f(r, sn.c[1]);
-
-      /******************************** end of directions *********************************/
-      //out[ix]=r;
-      _vector_mul_f(r, -0.5, r);
-
-      _suNf_write_spinor_gpu(vol4h, r, out, ix, 0);
-
-      break;
-
-  case 1:
-
-      /******************************* direction +0 *********************************/
-      iy=iup(ix, 0)-vol4h;
-
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 1);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
-      _vector_add_assign_f(sn.c[0], sn.c[1]);
-      _suNf_read_gpu(vol4h, u, gauge, ix, 0);
-
-      _suNf_theta_T_multiply(r, u, sn.c[0]);
-
-      /******************************* direction -0 *********************************/
-      iy=idn(ix, 0)-vol4h;
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 1);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
-      _vector_sub_assign_f(sn.c[0], sn.c[1]);
-      _suNf_read_gpu(vol4h, u, gauge+4*vol4h, iy, 0);
-
-      _suNf_theta_T_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_add_assign_f(r, sn.c[1]);
-
-      __asm_sync
-      /******************************* direction +1 *********************************/
-      iy=iup(ix, 1)-vol4h;
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 1);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
-      _vector_i_add_assign_f(sn.c[0], sn.c[1]);
-      _suNf_read_gpu(vol4h, u, gauge, ix, 1);
-
-      _suNf_theta_X_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_add_assign_f(r, sn.c[1]);
-
-      /******************************* direction -1 *********************************/
-      iy=idn(ix, 1)-vol4h;
-
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 1);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
-      _vector_i_sub_assign_f(sn.c[0], sn.c[1]);
-      _suNf_read_gpu(vol4h, u, gauge+4*vol4h, iy, 1);
-
-      _suNf_theta_X_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_add_assign_f(r, sn.c[1]);
-
-     __asm_sync
-      /******************************* direction +2 *********************************/
-      iy= iup(ix, 2)-vol4h;
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 1);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
-      _vector_sub_assign_f(sn.c[0], sn.c[1]);
-      _suNf_read_gpu(vol4h, u, gauge, ix, 2);
-
-      _suNf_theta_Y_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_add_assign_f(r, sn.c[1]);
-
-      /******************************* direction -2 *********************************/
-      iy = idn(ix, 2)-vol4h;
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 1);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
-      _vector_add_assign_f(sn.c[0], sn.c[1]);
-      _suNf_read_gpu(vol4h, u, gauge+4*vol4h, iy, 2);
-
-      _suNf_theta_Y_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_add_assign_f(r, sn.c[1]);
-
-      __asm_sync
-      /******************************* direction +3 *********************************/
-      iy = iup(ix, 3)-vol4h;
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 1);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
-      _vector_i_sub_assign_f(sn.c[0], sn.c[1]);
-      _suNf_read_gpu(vol4h, u, gauge, ix, 3);
-
-      _suNf_theta_Z_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_add_assign_f(r, sn.c[1]);
-
-      /******************************* direction -3 *********************************/
-      iy = idn(ix, 3)-vol4h;
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 1);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
-      _vector_i_add_assign_f(sn.c[0], sn.c[1]);
-      _suNf_read_gpu(vol4h, u, gauge+4*vol4h, iy, 3);
-
-      _suNf_theta_Z_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_add_assign_f(r, sn.c[1]);
-      __asm_sync
-      /******************************** end of directions *********************************/
-      //out[ix]=r;
-      _vector_mul_f(r, -0.5, r);
-
-      _suNf_write_spinor_gpu(vol4h, r, out, ix, 1);
-
-  break;
-
-      case 2:
-      /******************************* direction +0 *********************************/
-      iy=iup(ix, 0)-vol4h;
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
-      _vector_add_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge, ix, 0);
-      _suNf_theta_T_multiply(r, u, sn.c[0]);
-
-
-      /******************************* direction -0 *********************************/
-      iy=idn(ix, 0)-vol4h;
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
-      _vector_sub_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge+4*vol4h, iy, 0);
-      _suNf_theta_T_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_sub_assign_f(r, sn.c[1]);
-
-      __asm_sync
-      /******************************* direction +1 *********************************/
-      iy=iup(ix, 1)-vol4h;
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 1);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
-      _vector_i_add_assign_f(sn.c[0], sn.c[1]);
-      _suNf_read_gpu(vol4h, u, gauge, ix, 1);
-
-      _suNf_theta_X_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_i_sub_assign_f(r, sn.c[1]);
-
-      /******************************* direction -1 *********************************/
-      iy=idn(ix, 1)-vol4h;
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 1);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
-      _vector_i_sub_assign_f(sn.c[0], sn.c[1]);
-      _suNf_read_gpu(vol4h, u, gauge+4*vol4h, iy, 1);
-
-      _suNf_theta_X_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_i_add_assign_f(r, sn.c[1]);
-
-     __asm_sync
-      /******************************* direction +2 *********************************/
-      iy= iup(ix, 2)-vol4h;
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 1);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
-      _vector_sub_assign_f(sn.c[0], sn.c[1]);
-      _suNf_read_gpu(vol4h, u, gauge, ix, 2);
-
-      _suNf_theta_Y_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_sub_assign_f(r, sn.c[1]);
-
-      /******************************* direction -2 *********************************/
-      iy = idn(ix, 2)-vol4h;
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 1);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
-      _vector_add_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge+4*vol4h, iy, 2);
-
-      _suNf_theta_Y_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_add_assign_f(r, sn.c[1]);
-
-      __asm_sync
-        /******************************* direction +3 *********************************/
-      iy = iup(ix, 3)-vol4h;
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
-      _vector_i_add_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge, ix, 3);
-      _suNf_theta_Z_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_i_sub_assign_f(r, sn.c[1]);
-
-      /******************************* direction -3 *********************************/
-      iy = idn(ix, 3)-vol4h;
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2);
-      _vector_i_sub_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge+4*vol4h, iy, 3);
-      _suNf_theta_Z_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_i_add_assign_f(r, sn.c[1]);
-
-      __asm_sync
-      /******************************** end of directions *********************************/
-      //out[ix]=r;
-      _vector_mul_f(r, -0.5, r);
-
-      _suNf_write_spinor_gpu(vol4h, r, out, ix, 2);
-
-        break;
-
-      case 3:
-      /******************************* direction +0 *********************************/
-      iy=iup(ix, 0)-vol4h;
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 1);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
-      _vector_add_assign_f(sn.c[0], sn.c[1]);
-      _suNf_read_gpu(vol4h, u, gauge, ix, 0);
-
-      _suNf_theta_T_multiply(r, u, sn.c[0]);
-
-
-      /******************************* direction -0 *********************************/
-      iy=idn(ix, 0)-vol4h;
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 1);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
-      _vector_sub_assign_f(sn.c[0], sn.c[1]);
-      _suNf_read_gpu(vol4h, u, gauge+4*vol4h, iy, 0);
-
-      _suNf_theta_T_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_sub_assign_f(r, sn.c[1]);
-
-      __asm_sync
-      /******************************* direction +1 *********************************/
-      iy=iup(ix, 1)-vol4h;
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
-      _vector_i_add_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge, ix, 1);
-      _suNf_theta_X_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_i_sub_assign_f(r, sn.c[1]);
-
-      /******************************* direction -1 *********************************/
-      iy=idn(ix, 1)-vol4h;
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
-      _vector_i_sub_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge+4*vol4h, iy, 1);
-      _suNf_theta_X_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_i_add_assign_f(r, sn.c[1]);
-
-      __asm_sync
-      /******************************* direction +2 *********************************/
-      iy= iup(ix, 2)-vol4h;
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
-      _vector_add_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge, ix, 2);
-      _suNf_theta_Y_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_add_assign_f(r, sn.c[1]);
-
-      /******************************* direction -2 *********************************/
-      iy = idn(ix, 2)-vol4h;
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
-      _vector_sub_assign_f(sn.c[0], sn.c[1]);
-
-      _suNf_read_gpu(vol4h, u, gauge+4*vol4h, iy, 2);
-      _suNf_theta_Y_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_sub_assign_f(r, sn.c[1]);
-
-      __asm_sync
-      /******************************* direction +3 *********************************/
-      iy = iup(ix, 3)-vol4h;
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 1);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
-      _vector_i_sub_assign_f(sn.c[0], sn.c[1]);
-      _suNf_read_gpu(vol4h, u, gauge, ix, 3);
-
-      _suNf_theta_Z_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_i_add_assign_f(r, sn.c[1]);
-
-      /******************************* direction -3 *********************************/
-      iy = idn(ix, 3)-vol4h;
-
-      _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 1);
-      _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3);
-      _vector_i_add_assign_f(sn.c[0], sn.c[1]);
-      _suNf_read_gpu(vol4h, u, gauge+4*vol4h, iy, 3);
-
-      _suNf_theta_Z_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-      _vector_i_sub_assign_f(r, sn.c[1]);
-
-      __asm_sync
-      /******************************** end of directions *********************************/
-      //out[ix]=r;
-      _vector_mul_f(r, -0.5, r);
-
-      _suNf_write_spinor_gpu(vol4h, r, out, ix, 3);
-
-      break;
-
-    default:
-      break;
-  }
-}
-
-#endif //GPU_KEPLER
-
 
 static void init_bc_gpu(){
 #ifdef FERMION_THETA
@@ -1480,6 +555,7 @@ static void init_bc_gpu(){
 
 void Dphi_(spinor_field *out, spinor_field *in)
 {
+  lprintf("INFO", 1, "Master shift in: %d\n", in->type->master_shift);
   int N, grid;
   const int vol4h=T*X*Y*Z/2;
 
@@ -1535,7 +611,6 @@ void Dphi_(spinor_field *out, spinor_field *in)
   } else {
     error(1, 1, "Dphi_ [Dphi_gpu.c]", "Wrong input spinor geometry!");
   }
-
    CudaCheckError();
 }
 

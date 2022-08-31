@@ -192,8 +192,6 @@ GLB_VAR(double,*rect_weight, =NULL);
 GLB_VAR(COMPLEX,eitheta[4],={{1.,0.}});
 #endif
 
-
-
 #ifdef MEASURE_FORCE
 #define MEASURE_FORCE0
 #define MEASURE_FORCEHMC
@@ -201,9 +199,6 @@ GLB_VAR(double,*force_ave,=NULL);
 GLB_VAR(double,*force_max,=NULL);
 GLB_VAR(int,*n_inv_iter,=NULL);
 #endif
-
-
-
 
 /* Fields four fermion interactions */
 /* Auxiliary fields for four fermion interactions */
@@ -213,9 +208,6 @@ GLB_VAR(scalar_field,*ff_sigma_mom,=NULL);
 GLB_VAR(scalar_field,*ff_pi_mom,=NULL);
 
 GLB_VAR(int,four_fermion_active,=0); // whether four fermion interactions are active
-
-
-
 
 #undef GLB_VAR
 

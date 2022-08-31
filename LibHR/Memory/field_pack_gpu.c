@@ -182,22 +182,22 @@ void gfield_togpuformat(suNg_field *out, suNg_field *in) {
   error(out->type!=in->type,1,"gield_togpuformat " __FILE__, "Gauge field types don't match!");
   
 //#ifdef UPDATE_EO
-  if (in->type==&glattice) {
+  //if (in->type==&glattice) {
     // we call recursively this function twice
     // on the even and odd sublattices
-    in->type=out->type=&glat_even;
-    gfield_togpuformat(out, in);
-    in->type=out->type=&glat_odd;
-    gfield_togpuformat(out, in);
-    in->type=out->type=&glattice;
-    return;
-  }
+    //in->type=out->type=&glat_even;
+    //gfield_togpuformat(out, in);
+    //in->type=out->type=&glat_odd;
+    //gfield_togpuformat(out, in);
+    //in->type=out->type=&glattice;
+    //return;
+  //}
 //#endif //UPDATE_EO
   
   _PIECE_FOR(in->type,ixp) {
     const int start = in->type->master_start[ixp];
     const int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1;
-    double *cout=(double*)(_GPU_4FIELD_AT(out,start,0));
+    double *cout=(double*)(_4FIELD_AT(out,start,0));
     _SITE_FOR(in->type,ixp,ix) {
       
       r=_4FIELD_AT(in,ix,0);

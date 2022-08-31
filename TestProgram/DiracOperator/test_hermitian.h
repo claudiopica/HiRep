@@ -15,7 +15,8 @@ bool is_hermitian_on_GPU(spinor_field*, spinor_field*,
 		         spinor_field*, spinor_field*, spinor_operator);
 bool is_hermitian_on_CPU(spinor_field*, spinor_field*, 
 		         spinor_field*, spinor_field*, spinor_operator);
-bool result_spinor_fields_not_identically_zero(spinor_field*, spinor_field*);
+bool result_spinor_fields_not_identically_zero_gpu(spinor_field*, spinor_field*);
+bool result_spinor_fields_not_identically_zero_cpu(spinor_field*, spinor_field*);
 bool gpu_and_cpu_copies_identical(spinor_field*, spinor_field*);
 void free_spinors(spinor_field**, spinor_field**, spinor_field**, spinor_field**);
 void Q_operator(spinor_field*, spinor_field*);

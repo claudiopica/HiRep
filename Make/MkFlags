@@ -75,6 +75,6 @@ ifeq (,$(findstring -DWITH_GPU,$(MACRO))) #Compile CPU only
 else #Compile with GPU
     CC = nvcc
     CFLAGS = -O2 -Xcompiler '-std=c99 -fgcse-sm -fgcse-las -fgcse-after-reload'
-    GPUFLAGS = --x cu -arch=sm_80 -Xptxas -v -Xptxas -dlcm=ca -dc
+    GPUFLAGS = --x cu -arch=sm_70 -Xptxas -v -Xptxas -dlcm=ca -dc
     LDFLAGS = -lcuda
 endif

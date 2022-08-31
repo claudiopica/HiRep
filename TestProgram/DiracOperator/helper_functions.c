@@ -40,6 +40,7 @@ void init_test(int argc, char *argv[])
     setup_gauge_fields();
     random_u(u_gauge);
     represent_gauge_field();
+    gfield_copy_to_gpu_f(u_gauge_f);
 }
 
 /*
