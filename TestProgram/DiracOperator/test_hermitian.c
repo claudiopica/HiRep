@@ -45,25 +45,25 @@ bool test_hermiticity(spinor_operator S, spinor_operator S_cpu, char *name)
     s2 = setup_infield();
     S_s1 = alloc_spinor_field_f(1, &glattice);
     S_s2 = alloc_spinor_field_f(1, &glattice);
-    //S_s1_cpu = alloc_spinor_field_f(1, &glattice);
-    //S_s2_cpu = alloc_spinor_field_f(1, &glattice);
-    lprintf("INFO", 0, "[Infield norm before: %0.15lf]\n", spinor_field_sqnorm_f(s1));
-    lprintf("INFO", 0, "[Infield2 norm before: %0.15lf]\n", spinor_field_sqnorm_f(s2));
-    lprintf("INFO", 0, "[Outfield norm before: %0.15lf]\n", spinor_field_sqnorm_f(S_s1));
-    lprintf("INFO", 0, "[Outfield2 norm before: %0.15lf]\n", spinor_field_sqnorm_f(S_s2));
+    S_s1_cpu = alloc_spinor_field_f(1, &glattice);
+    S_s2_cpu = alloc_spinor_field_f(1, &glattice);
+    //lprintf("INFO", 0, "[Infield norm before: %0.15lf]\n", spinor_field_sqnorm_f(s1));
+    //lprintf("INFO", 0, "[Infield2 norm before: %0.15lf]\n", spinor_field_sqnorm_f(s2));
+    //lprintf("INFO", 0, "[Outfield norm before: %0.15lf]\n", spinor_field_sqnorm_f(S_s1));
+    //lprintf("INFO", 0, "[Outfield2 norm before: %0.15lf]\n", spinor_field_sqnorm_f(S_s2));
     bool pass_gpu = is_hermitian_on_GPU(s1, s2, S_s1, S_s2, S);
-    //bool pass_cpu = is_hermitian_on_CPU(s1, s2, S_s1_cpu, S_s2_cpu, S_cpu);
-    lprintf("INFO", 0, "[Infield norm: %0.15lf]\n", spinor_field_sqnorm_f(s1));
+    bool pass_cpu = is_hermitian_on_CPU(s1, s2, S_s1_cpu, S_s2_cpu, S_cpu);
+    /*lprintf("INFO", 0, "[Infield norm: %0.15lf]\n", spinor_field_sqnorm_f(s1));
     lprintf("INFO", 0, "[Infield2 norm: %0.15lf]\n", spinor_field_sqnorm_f(s2));
     lprintf("INFO", 0, "[Outfield norm: %0.15lf]\n", spinor_field_sqnorm_f(S_s1));
     lprintf("INFO", 0, "[Outfield2 norm: %0.15lf]\n", spinor_field_sqnorm_f(S_s2));
     
     bool pass_sanity_check = result_spinor_fields_not_identically_zero_gpu(S_s1, S_s2);
     
-    //bool pass_sanity_check_cpu = result_spinor_fields_not_identically_zero_cpu(S_s1_cpu, S_s2_cpu);
-    //bool are_copies_identical = gpu_and_cpu_copies_identical(S_s1, S_s2);
+    bool pass_sanity_check_cpu = result_spinor_fields_not_identically_zero_cpu(S_s1_cpu, S_s2_cpu);
+    bool are_copies_identical = gpu_and_cpu_copies_identical(S_s1, S_s2);
 
-    /*spinor_field_copy_from_gpu_f(S_s1);
+    spinor_field_copy_from_gpu_f(S_s1);
     spinor_field_copy_from_gpu_f(S_s2);
 
     spinor_field *diff_1, *diff_2;
@@ -73,10 +73,11 @@ bool test_hermiticity(spinor_operator S, spinor_operator S_cpu, char *name)
     spinor_field_sub_f_cpu(diff_2, S_s2, S_s2_cpu);
 
     lprintf("INFO", 0, "[Diff norm gpu-cpu: %0.15lf]\n", spinor_field_sqnorm_f_cpu(diff_1));
-    lprintf("INFO", 0, "[Diff norm gpu-cpu: %0.15lf]\n", spinor_field_sqnorm_f_cpu(diff_2));*/
+    lprintf("INFO", 0, "[Diff norm gpu-cpu: %0.15lf]\n", spinor_field_sqnorm_f_cpu(diff_2));
 
     free_spinors(&s1, &s2, &S_s1, &S_s2);
-    return pass_gpu && pass_sanity_check;
+    return pass_gpu && pass_sanity_check;*/
+    return 0;
 }
 
 bool is_hermitian_on_GPU(spinor_field *s1, spinor_field *s2, 
@@ -85,7 +86,7 @@ bool is_hermitian_on_GPU(spinor_field *s1, spinor_field *s2,
 {
     hr_complex tau, N;
     S(S_s1, s1);
-    S(S_s2, s2);
+    /*S(S_s2, s2);
     N = sqrt(spinor_field_sqnorm_f(s1)*spinor_field_sqnorm_f(s2));
     tau = (spinor_field_prod_f(S_s2, s1) - spinor_field_prod_f(s2, S_s1))/N;
 
@@ -95,7 +96,8 @@ bool is_hermitian_on_GPU(spinor_field *s1, spinor_field *s2,
         lprintf("FAILED", 0, "The operator is not hermitian on the GPU.\n");
     }
     lprintf("RESULT", 0, "[diff gpu = %0.20lf + i%0.20lf]\n", _complex_re(tau), _complex_im(tau));
-    return pass;
+    return pass;*/
+    return 0;
 }
 
 bool is_hermitian_on_CPU(spinor_field *s1, spinor_field *s2, 
@@ -104,7 +106,7 @@ bool is_hermitian_on_CPU(spinor_field *s1, spinor_field *s2,
 {
     hr_complex tau_cpu, N;
     S(S_s1, s1);
-    S(S_s2, s2);
+    /*S(S_s2, s2);
     N = sqrt(spinor_field_sqnorm_f_cpu(s1)*spinor_field_sqnorm_f_cpu(s2));
     tau_cpu = (spinor_field_prod_f_cpu(S_s2, s1) - spinor_field_prod_f_cpu(s2, S_s1))/N;
 
@@ -115,7 +117,8 @@ bool is_hermitian_on_CPU(spinor_field *s1, spinor_field *s2,
     }
     lprintf("RESULT", 0, "[diff cpu = %0.20lf + i%0.20lf]\n", 
 		                         _complex_re(tau_cpu), _complex_im(tau_cpu));
-    return pass;
+    return pass;*/
+    return 0;
 }
 
 bool result_spinor_fields_not_identically_zero_gpu(spinor_field *S_s1, spinor_field *S_s2) 

@@ -26,8 +26,6 @@ extern int *iup_gpu, *idn_gpu;
 
 void init_neighbors_gpu() 
 {
-  printf("Init neighbors\n");
-  printf("iup[0]: %d\n", iup[0]);
   int N = T*X*Y*Z;
   cudaError_t error_id;
   error_id = cudaMalloc((void **)&iup_gpu, 4 * N * sizeof(int));

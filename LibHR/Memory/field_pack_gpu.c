@@ -197,13 +197,13 @@ void gfield_togpuformat(suNg_field *out, suNg_field *in) {
   _PIECE_FOR(in->type,ixp) {
     const int start = in->type->master_start[ixp];
     const int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1;
-    double *cout=(double*)(_4FIELD_AT(out,start,0));
+    hr_complex *cout=(hr_complex*)(_4FIELD_AT(out,start,0));
     _SITE_FOR(in->type,ixp,ix) {
       
       r=_4FIELD_AT(in,ix,0);
       
-      for (int j=0; j<4*sizeof(*r)/sizeof(double); ++j) {
-        cout[j*N]=((double*)(r))[j];
+      for (int j=0; j<4*sizeof(*r)/sizeof(hr_complex); ++j) {
+        cout[j*N]=((hr_complex*)(r))[j];
       }
       ++cout;
     }
@@ -217,28 +217,28 @@ void gfield_tocpuformat(suNg_field *out, suNg_field *in) {
   error(out->type!=in->type,1,"gield_tocpuformat " __FILE__, "Gauge field types don't match!");
   
 //#ifdef UPDATE_EO
-  if (in->type==&glattice) {
+  //if (in->type==&glattice) {
     // we call recursively this function twice
     // on the even and odd sublattices
-    in->type=out->type=&glat_even;
-    gfield_tocpuformat(out, in);
-    in->type=out->type=&glat_odd;
-    gfield_tocpuformat(out, in);
-    in->type=out->type=&glattice;
-    return;
-  }
+    //in->type=out->type=&glat_even;
+    //gfield_tocpuformat(out, in);
+    //in->type=out->type=&glat_odd;
+    //gfield_tocpuformat(out, in);
+    //in->type=out->type=&glattice;
+    //return;
+ // }
 //#endif //UPDATE_EO
   
   _PIECE_FOR(in->type,ixp) {
     const int start = in->type->master_start[ixp];
     const int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1;
-    double *cin=(double*)(_GPU_4FIELD_AT(in,start,0));
+    hr_complex *cin=(hr_complex*)(_4FIELD_AT(in,start,0));
     _SITE_FOR(in->type,ixp,ix) {
       
       r=_4FIELD_AT(out,ix,0);
       
-      for (int j=0; j<4*sizeof(*r)/sizeof(double); ++j) {
-        ((double*)(r))[j]=cin[j*N];
+      for (int j=0; j<4*sizeof(*r)/sizeof(hr_complex); ++j) {
+        ((hr_complex*)(r))[j]=cin[j*N];
       }
       ++cin;
       
