@@ -227,15 +227,6 @@ void Dphi_cpu_(spinor_field *out, spinor_field *in)
       sp = _FIELD_AT(in, iy);
       up = pu_gauge_f(ix, 0);
 
-      if (ix==0) printf(" --- EO --- ");
-      if (ix==192) printf(" --- OE --- ");
-
-      if (ix==0 || ix==192) {
-        printf("+0 Evaluated at idx: %d\n", iy);
-        printf("CPU spinor field: %0.15lf + i%0.15lf\n", (*sp).c[0].c[0]);
-        printf("CPU gauge: %0.15lf + i%0.15lf\n", (*up).c[1]);
-      }
-
       _vector_add_f(psi, (*sp).c[0], (*sp).c[2]);
       _vector_add_f(psi2, (*sp).c[1], (*sp).c[3]);
       _suNf_theta_T_multiply(chi, (*up), psi);
@@ -251,15 +242,6 @@ void Dphi_cpu_(spinor_field *out, spinor_field *in)
       iy = idn(ix, 0);
       sm = _FIELD_AT(in, iy);
       um = pu_gauge_f(iy, 0);
-
-      if (ix==0) printf(" --- EO --- ");
-      if (ix==192) printf(" --- OE --- ");
-
-      if (ix==192 || ix==0) {
-        printf("-0 Evaluated at idx: %d\n", iy);
-        printf("CPU spinor field: %0.15lf + i%0.15lf\n", (*sm).c[0].c[0]);
-        printf("CPU gauge: %0.15lf + i%0.15lf\n", (*um).c[1]);
-      }
 
       _vector_sub_f(psi, (*sm).c[0], (*sm).c[2]);
       _vector_sub_f(psi2, (*sm).c[1], (*sm).c[3]);
@@ -277,15 +259,6 @@ void Dphi_cpu_(spinor_field *out, spinor_field *in)
       sp = _FIELD_AT(in, iy);
       up = pu_gauge_f(ix, 1);
 
-      if (ix==0) printf(" --- EO --- ");
-      if (ix==192) printf(" --- OE --- ");
-
-      if (ix==0 || ix==192) {
-        printf("+1 Evaluated at idx: %d\n", iy);
-        printf("CPU spinor field: %0.15lf + i%0.15lf\n", (*sp).c[0].c[0]);
-        printf("CPU gauge: %0.15lf + i%0.15lf\n", (*up).c[1]);
-      }
-
       _vector_i_add_f(psi, (*sp).c[0], (*sp).c[3]);
       _vector_i_add_f(psi2, (*sp).c[1], (*sp).c[2]);
       _suNf_theta_X_multiply(chi, (*up), psi);
@@ -296,20 +269,13 @@ void Dphi_cpu_(spinor_field *out, spinor_field *in)
       _vector_add_assign_f((*r).c[1], chi2);
       _vector_i_sub_assign_f((*r).c[2], chi2);
 
+
+
       /******************************* direction -1 *********************************/
 
       iy = idn(ix, 1);
       sm = _FIELD_AT(in, iy);
       um = pu_gauge_f(iy, 1);
-
-      if (ix==0) printf(" --- EO --- ");
-      if (ix==192) printf(" --- OE --- ");
-
-      if (ix==0 || ix==192) {
-        printf("-1 Evaluated at idx: %d\n", iy);
-        printf("CPU spinor field: %0.15lf + i%0.15lf\n", (*sm).c[0].c[0]);
-        printf("CPU gauge: %0.15lf + i%0.15lf\n", (*um).c[1]);
-      }
 
       _vector_i_sub_f(psi, (*sm).c[0], (*sm).c[3]);
       _vector_i_sub_f(psi2, (*sm).c[1], (*sm).c[2]);
@@ -386,7 +352,6 @@ void Dphi_cpu_(spinor_field *out, spinor_field *in)
       _vector_i_sub_assign_f((*r).c[3], chi2);
 
       /******************************** end of loop *********************************/
-
       _spinor_mul_f(*r, -0.5, *r);
 
     } /* SITE_FOR */
@@ -499,11 +464,8 @@ void g5Dphi_cpu(double m0, spinor_field *out, spinor_field *in)
 #endif /* CHECK_SPINOR_MATCHING */
 
   apply_BCs_on_spinor_field(in);
-
   Dphi_cpu_(out, in);
-
   rho = 4. + m0;
-
   spinor_field_mul_add_assign_f_cpu(out, rho, in);
 
 #ifdef ROTATED_SF
