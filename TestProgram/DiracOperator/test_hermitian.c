@@ -184,12 +184,12 @@ void Q_operator(spinor_field *out, spinor_field *in)
      *
      * */
     //spinor_field_mul_f(out, 2.5, in);
-    g5Dphi(-hmass, out, in);
+    g5Dphi_sq(-hmass, out, in);
 }
 
 void Q_operator_cpu(spinor_field *out, spinor_field *in) 
 {
-    g5Dphi_cpu(-hmass, out, in);
+    g5Dphi_sq_cpu(-hmass, out, in);
 }
 
 void I_operator(spinor_field *out, spinor_field *in) 
