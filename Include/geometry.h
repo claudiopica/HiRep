@@ -65,8 +65,6 @@ _OMP_PRAGMA ( _omp_for redop1 redop2  )\
 #define _MASTER_FOR_MAX(type,is,...) _MASTER_FOR_RED(type,is,_omp_max(__VA_ARGS__),)
 #define _MASTER_FOR_MIN(type,is,...) _MASTER_FOR_RED(type,is,_omp_min(__VA_ARGS__),)
 
-
-
 void origin_coord(int *c);
 void other_proc_origin_coord(int * proc_coord, int *c);
 void glb_to_proc(int *g, int *p);
@@ -90,6 +88,8 @@ void print_wdmatrix(char *filename);
 #include "gpu.h"
 void init_gpu(input_gpu gpu_var);
 void init_neighbors_gpu();
+
+#define _SITE_IDX_GPU(ix, ixp, stride) (ix) + stride*(ixp)
 
 #endif
 #endif

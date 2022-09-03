@@ -354,6 +354,22 @@ void Dphi_cpu_(spinor_field *out, spinor_field *in)
       /******************************** end of loop *********************************/
       _spinor_mul_f(*r, -0.5, *r);
 
+      if (ix==0) {
+        printf(" ================= +0 EO CPU ===================== \n");
+        printf(" Piece IDX: %d\n", ixp);
+        printf(" Global central index: %d\n", ix);
+        printf(" Global neighbor index: %d\n", iy);
+        printf(" OE r cmp: %0.15lf + i%0.15lf\n", (*r).c[0].c[0]);
+    }
+
+    if (ix==192) {
+        printf(" ================= +0 OE CPU ===================== \n");
+        printf(" Piece IDX: %d\n", ixp);
+        printf(" Global central index: %d\n", ix);
+        printf(" Global neighbor index: %d\n", iy);
+        printf(" OE r cmp: %0.15lf + i%0.15lf\n", (*r).c[0].c[0]);
+    }
+
     } /* SITE_FOR */
   }   /* PIECE FOR */
 }

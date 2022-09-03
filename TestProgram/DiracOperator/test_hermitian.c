@@ -46,8 +46,8 @@ bool test_hermiticity(spinor_operator S, spinor_operator S_cpu, char *name)
     S_s1_cpu = alloc_spinor_field_f(1, &glattice);
     S_s2_cpu = alloc_spinor_field_f(1, &glattice);
 
-    bool pass_gpu = is_hermitian_on_GPU(s1, s2, S_s1, S_s2, S);
     bool pass_cpu = is_hermitian_on_CPU(s1, s2, S_s1_cpu, S_s2_cpu, S_cpu);
+    bool pass_gpu = is_hermitian_on_GPU(s1, s2, S_s1, S_s2, S);
     
     bool pass_sanity_check = result_spinor_fields_not_identically_zero_gpu(S_s1, S_s2);
     bool pass_sanity_check_cpu = result_spinor_fields_not_identically_zero_cpu(S_s1_cpu, S_s2_cpu);
@@ -171,25 +171,12 @@ static double hmass = 0.1;
 
 void Q_operator(spinor_field *out, spinor_field *in)
 {
-    /*
-     * Implement this for the actual GPU operator.
-     * Issues here are
-     *
-     * 1. The operator does not work yet, because of an old implementation that does not
-     *    work for newer versions of CUDA yet
-     * 2. There is some spinor allocation issue inside this operator. Using g5Dphi on the
-     *    GPU will also affect the CPU copy (for some reason) and as a result both test segments
-     *    will fail. This is, however, not an issue of the CPU code.
-     * 3. There is a temporary replacement of g5Dphi of spinor multiplication which will pass.
-     *
-     * */
-    //spinor_field_mul_f(out, 2.5, in);
-    g5Dphi_sq(-hmass, out, in);
+    g5Dphi(-hmass, out, in);
 }
 
 void Q_operator_cpu(spinor_field *out, spinor_field *in) 
 {
-    g5Dphi_sq_cpu(-hmass, out, in);
+    g5Dphi_cpu(-hmass, out, in);
 }
 
 void I_operator(spinor_field *out, spinor_field *in) 
