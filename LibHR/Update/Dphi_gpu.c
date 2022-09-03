@@ -169,12 +169,9 @@ void Dphi_(spinor_field *out, spinor_field *in)
     error(out->type==&glattice && in->type!=&glattice, 1, "Dphi_ [Dphi_gpu.c]", "Spinors don't match! (3)");
   #endif
 
-  printf("\nMarke1\n");
   _PIECE_FOR(out->type, ixp) {
       N = (out)->type->master_end[ixp]-(out)->type->master_start[ixp];
       grid = (N-1)/BLOCK_SIZE + 1; 
-      printf("BLOCK_SIZE: %d\n", BLOCK_SIZE);
-      printf("grid size: %d\n", grid);
       Dphi_gpu_kernel<<<grid, BLOCK_SIZE>>>(out->gpu_ptr, in->gpu_ptr, u_gauge_f->gpu_ptr, iup_gpu, idn_gpu, vol4h, ixp);
       CudaCheckError();
   }

@@ -197,13 +197,13 @@ void gfield_togpuformat(suNg_field *out, suNg_field *in) {
   _PIECE_FOR(in->type,ixp) {
     const int start = in->type->master_start[ixp];
     const int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1;
-    hr_complex *cout=(hr_complex*)(_4FIELD_AT(out,start,0));
+    double *cout=(double*)(_4FIELD_AT(out,start,0));
     _SITE_FOR(in->type,ixp,ix) {
       
       r=_4FIELD_AT(in,ix,0);
       
-      for (int j=0; j<4*sizeof(*r)/sizeof(hr_complex); ++j) {
-        cout[j*N]=((hr_complex*)(r))[j];
+      for (int j=0; j<4*sizeof(*r)/sizeof(double); ++j) {
+        cout[j*N]=((double*)(r))[j];
       }
       ++cout;
     }
@@ -232,13 +232,13 @@ void gfield_tocpuformat(suNg_field *out, suNg_field *in) {
   _PIECE_FOR(in->type,ixp) {
     const int start = in->type->master_start[ixp];
     const int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1;
-    hr_complex *cin=(hr_complex*)(_4FIELD_AT(in,start,0));
+    double *cin=(double*)(_4FIELD_AT(in,start,0));
     _SITE_FOR(in->type,ixp,ix) {
       
       r=_4FIELD_AT(out,ix,0);
       
-      for (int j=0; j<4*sizeof(*r)/sizeof(hr_complex); ++j) {
-        ((hr_complex*)(r))[j]=cin[j*N];
+      for (int j=0; j<4*sizeof(*r)/sizeof(double); ++j) {
+        ((double*)(r))[j]=cin[j*N];
       }
       ++cin;
       
