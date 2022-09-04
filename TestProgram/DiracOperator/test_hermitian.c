@@ -171,12 +171,12 @@ static double hmass = 0.1;
 
 void Q_operator(spinor_field *out, spinor_field *in)
 {
-    g5Dphi(-hmass, out, in);
+    g5Dphi_sq(-hmass, out, in);
 }
 
 void Q_operator_cpu(spinor_field *out, spinor_field *in) 
 {
-    g5Dphi_cpu(-hmass, out, in);
+    g5Dphi_sq_cpu(-hmass, out, in);
 }
 
 void I_operator(spinor_field *out, spinor_field *in) 

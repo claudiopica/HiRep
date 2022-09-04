@@ -150,6 +150,10 @@ static void init_bc_gpu(){
   #endif
 }
 
+__global__ void test_kernel(int ixp) {
+  printf("Hello from device operating on piece %d\n", ixp);
+}
+
 void Dphi_(spinor_field *out, spinor_field *in)
 {
   unsigned int N, grid;
@@ -169,7 +173,13 @@ void Dphi_(spinor_field *out, spinor_field *in)
     error(out->type==&glattice && in->type!=&glattice, 1, "Dphi_ [Dphi_gpu.c]", "Spinors don't match! (3)");
   #endif
 
-  _PIECE_FOR(out->type, ixp) {
+  _PIECE_FOR(out->type, ixp) 
+  {
+      cudaError_t error_code;
+      error_code = cudaSetDevice(ixp);
+      if (error_code != cudaSuccess) printf("Could not change to device %d\n", ixp);
+
+      
       N = (out)->type->master_end[ixp]-(out)->type->master_start[ixp];
       grid = (N-1)/BLOCK_SIZE + 1; 
       Dphi_gpu_kernel<<<grid, BLOCK_SIZE>>>(out->gpu_ptr, in->gpu_ptr, u_gauge_f->gpu_ptr, iup_gpu, idn_gpu, vol4h, ixp);
@@ -419,10 +429,11 @@ __global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out,
   int thread_idx = blockIdx.x*BLOCK_SIZE + threadIdx.x;
   if (thread_idx < vol4h) {
     int ix = _SITE_IDX_GPU(thread_idx, ixp, vol4h);
-    iyp=(ixp+1)%2; //This only works for two pieces: Even+Odd. For MPI this is more complicated. -> needs to possibly be calculated in every block
 
     /******************************* direction +0 *********************************/
     iy=iup_d[4*ix];
+
+    iyp=iy/vol4h;
     
     _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0, iyp);
     _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2, iyp);
@@ -444,6 +455,8 @@ __global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out,
     __syncthreads();
     /******************************* direction -0 *********************************/
     iy=idn_d[4*ix];
+
+    iyp=iy/vol4h;
 
     _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0, iyp);
     _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2, iyp);
@@ -468,6 +481,8 @@ __global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out,
     /******************************* direction +1 *********************************/
     iy=iup_d[4*ix+1];
 
+    iyp=iy/vol4h;
+
     _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0, iyp);
     _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3, iyp);
     _suNf_read_gpu(vol4h, u, gauge, ix, 1, ixp);
@@ -490,6 +505,8 @@ __global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out,
     __syncthreads();
     /******************************* direction -1 *********************************/
     iy=idn_d[4*ix+1];
+
+    iyp=iy/vol4h;
 
     _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0, iyp);
     _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3, iyp);
@@ -514,6 +531,8 @@ __global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out,
     /******************************* direction +2 *********************************/
     iy=iup_d[4*ix+2];
 
+    iyp=iy/vol4h;
+
     _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0, iyp);
     _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3, iyp);
     _vector_add_assign_f(sn.c[0], sn.c[1]);
@@ -536,6 +555,8 @@ __global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out,
     __syncthreads();
     /******************************* direction -2 *********************************/
     iy=idn_d[4*ix+2];
+
+    iyp=iy/vol4h;
 
     _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0, iyp);
     _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 3, iyp);
@@ -560,6 +581,8 @@ __global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out,
     /******************************* direction +3 *********************************/
     iy=iup_d[4*ix+3];
 
+    iyp=iy/vol4h;
+
     _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0, iyp);
     _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2, iyp);
     _vector_i_add_assign_f(sn.c[0], sn.c[1]);
@@ -582,6 +605,8 @@ __global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out,
     __syncthreads();
     /******************************* direction -3 *********************************/
     iy=idn_d[4*ix+3];
+
+    iyp=iy/vol4h;
 
     _suNf_read_spinor_gpu(vol4h, sn.c[0], in, iy, 0, iyp);
     _suNf_read_spinor_gpu(vol4h, sn.c[1], in, iy, 2, iyp);

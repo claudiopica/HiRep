@@ -522,7 +522,6 @@ void complete_sf_sendrecv(spinor_field *sf) {
 
   if(nreq>0) {
     MPI_Status status[nreq];
-
     mpiret=MPI_Waitall(nreq, sf->comm_req, status);
 
 #ifndef NDEBUG
