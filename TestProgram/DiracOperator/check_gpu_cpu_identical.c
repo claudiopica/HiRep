@@ -12,10 +12,16 @@
 #include "logger.h"
 #include "setup.h"
 #include "hr_complex.h"
-#include "test_hermitian.h"
-#include "helper_functions.h"
+#include "random.h"
+#include "representation.h"
 
-// TODO: Add explanation/comments
+int test_hermiticity(spinor_operator, spinor_operator, char*);
+void Q_operator(spinor_field*, spinor_field*);
+void Q_operator_cpu(spinor_field*, spinor_field*);
+void I_operator(spinor_field*, spinor_field*);
+void I_operator_cpu(spinor_field*, spinor_field*);
+
+
 
 int main(int argc, char *argv[])
 {
@@ -32,102 +38,55 @@ int main(int argc, char *argv[])
     gfield_copy_to_gpu_f(u_gauge_f);
 
     // Test Block
-    run_test(test_hermiticity(&I_operator, &I_operator_cpu, "Unit operator"), pass);
-    run_test(test_hermiticity(&Q_operator, &Q_operator_cpu, "Q = g5Dphi"), pass);
+    pass &= test_hermiticity(&I_operator, &I_operator_cpu, "Unit operator");
+    pass &= test_hermiticity(&Q_operator, &Q_operator_cpu, "Q = g5Dphi");
 
+    // Finalize and return
     finalize_process();
     return pass;
 }
 
-bool test_hermiticity(spinor_operator S, spinor_operator S_cpu, char *name)
+int test_hermiticity(spinor_operator S, spinor_operator S_cpu, char *name)
 {
     lprintf("INFO", 0, "[Testing %s]\n", name);
 
-    spinor_field *s1, *s2, *S_s1, *S_s2, *S_s1_cpu, *S_s2_cpu;
+    spinor_field *s, *S_s, *S_s_cpu, *diff;
     int return_val = 0;
     
     hr_complex tau, tau_cpu;
 
-    s1 = setup_infield();
-    s2 = setup_infield();
-    S_s1 = alloc_spinor_field_f(1, &glattice);
-    S_s2 = alloc_spinor_field_f(1, &glattice);
-    S_s1_cpu = alloc_spinor_field_f(1, &glattice);
-    S_s2_cpu = alloc_spinor_field_f(1, &glattice);
+    s = alloc_spinor_field_f(1, &glattice);
+    S_s = alloc_spinor_field_f(1, &glattice);
+    S_s_cpu = alloc_spinor_field_f(1, &glattice);
+    gaussian_spinor_field(s);
+    spinor_field_copy_to_gpu_f(s);
+
+    S(S_s, s);
+    S_cpu(S_s_cpu, s);
+
+    spinor_field_copy_from_gpu_f(S_s);
     
-    bool pass_sanity_check = result_spinor_fields_not_identically_zero_gpu(S_s1, S_s2);
-    bool pass_sanity_check_cpu = result_spinor_fields_not_identically_zero_cpu(S_s1_cpu, S_s2_cpu);
-    //bool are_copies_identical = gpu_and_cpu_copies_identical(S_s1, S_s2);
+    // Sanity checks: Norms are not identically zero
+    lprintf("INFO", 0, "Output spinor field norm GPU: %0.15lf\n", spinor_field_sqnorm_f(S_s));
+    lprintf("INFO", 0, "Output spinor field norm CPU: %0.15lf\n", spinor_field_sqnorm_f_cpu(S_s_cpu));
 
-    spinor_field_copy_from_gpu_f(S_s1);
-    spinor_field_copy_from_gpu_f(S_s2);
+    diff = alloc_spinor_field_f(1, &glattice);
+    spinor_field_sub_f_cpu(diff, S_s, S_s_cpu);
 
-    spinor_field *diff_1, *diff_2;
-    diff_1 = alloc_spinor_field_f(1, &glattice);
-    diff_2 = alloc_spinor_field_f(1, &glattice);
-    spinor_field_sub_f_cpu(diff_1, S_s1, S_s1_cpu);
-    spinor_field_sub_f_cpu(diff_2, S_s2, S_s2_cpu);
-
-    lprintf("INFO", 0, "[Diff norm gpu-cpu: %0.20lf]\n", spinor_field_sqnorm_f_cpu(diff_1));
-    lprintf("INFO", 0, "[Diff norm gpu-cpu: %0.20lf]\n", spinor_field_sqnorm_f_cpu(diff_2));
-
-    free_spinors(&s1, &s2, &S_s1, &S_s2);
-    free_spinor_field_f(S_s1_cpu);
-    free_spinor_field_f(S_s2_cpu);
-    return pass_gpu && pass_cpu && pass_sanity_check && pass_sanity_check_cpu;
-    return 0;
-}
-
-bool result_spinor_fields_not_identically_zero_gpu(spinor_field *S_s1, spinor_field *S_s2) 
-{
-    bool pass_gpu = spinor_field_sqnorm_f(S_s1)!=0 && spinor_field_sqnorm_f(S_s2)!=0;
-    if (!pass_gpu) 
+    double diff_norm = spinor_field_sqnorm_f_cpu(diff);
+    if (fabs(diff_norm) > 1e-14) 
     {
-        lprintf("FAILED", 0, "Result spinor fields are identically zero on GPU.\n");
+        lprintf("RESULT", 0, "FAILED \n");
+        return_val = 1;
     }
-    return pass_gpu;
-}
+    else lprintf("RESULT", 0, "OK \n");
+    lprintf("RESULT", 0, "[Diff norm gpu-cpu %0.20lf]\n", diff_norm);
 
-bool result_spinor_fields_not_identically_zero_cpu(spinor_field *S_s1_cpu, spinor_field *S_s2_cpu) 
-{
-    bool pass_cpu = spinor_field_sqnorm_f_cpu(S_s1_cpu)!=0 && spinor_field_sqnorm_f_cpu(S_s2_cpu)!=0;
-    if (!pass_cpu) 
-    {
-        lprintf("FAILED", 0, "Result spinor fields are identically zero on CPU.\n");
-    }
-    return pass_cpu;
-}
-
-bool gpu_and_cpu_copies_identical(spinor_field *S_s1, spinor_field *S_s2) 
-{
-    double diff_1, diff_2;
-    
-    diff_1 = spinor_field_sqnorm_f(S_s1) - spinor_field_sqnorm_f_cpu(S_s1);
-    diff_2 = spinor_field_sqnorm_f(S_s2) - spinor_field_sqnorm_f_cpu(S_s2);
-
-    bool pass = fabs(diff_1) < 1.e-11 && fabs(diff_2) < 1.e-11;
-    if (!pass) {
-        lprintf("FAILED", 0, "Operations on CPU and GPU do not yield the same result.\n");
-    }
-    lprintf("RESULT", 0, "[diff gpu-cpu s1: %0.20lf]\n", diff_1);
-    lprintf("RESULT", 0, "[diff gpu-cpu s2: %0.20lf]\n", diff_2);
-    return pass;
-}
-
-/*
- * Frees used spinor fields
- *
- * in: (**)spinor_field       All the fields to be freed.
- */
-void free_spinors(spinor_field **s1,
-                  spinor_field **s2,
-                  spinor_field **S_s1,
-                  spinor_field **S_s2)
-{
-    free_spinor_field_f(*s1);
-    free_spinor_field_f(*s2);
-    free_spinor_field_f(*S_s1);
-    free_spinor_field_f(*S_s2);
+    free_spinor_field_f(diff);
+    free_spinor_field_f(s);
+    free_spinor_field_f(S_s);
+    free_spinor_field_f(S_s_cpu);
+    return return_val;
 }
 
 /* ============== OPERATOR DEFINITIONS ==========================*/
