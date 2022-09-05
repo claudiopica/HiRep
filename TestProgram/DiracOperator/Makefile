@@ -2,7 +2,7 @@ TOPDIR = ../..
 MKDIR = $(TOPDIR)/Make
 
 
-TESTS = test_hermitian #check_diracoperator_1 check_diracoperator_1_gpu check_diracoperator_2 check_diracoperator_3 check_diracoperator_3_gpu check_diracoperator_3_gpu2 check_diracoperator_4 check_diracoperator_5 check_diracoperator_6 #speed_test_diracoperator speed_test_diracoperator_flt dirac_test
+TESTS = check_diracoperator_3 check_diracoperator_3_gpu check_diracoperator_3_gpu2 #check_diracoperator_1 check_diracoperator_1_gpu check_diracoperator_2 check_diracoperator_3 check_diracoperator_3_gpu check_diracoperator_3_gpu2 check_diracoperator_4 check_diracoperator_5 check_diracoperator_6 #speed_test_diracoperator speed_test_diracoperator_flt dirac_test test_hermitian
 
 test_hermitian_OBJS = helper_functions.o
 
