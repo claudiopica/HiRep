@@ -76,6 +76,8 @@ void spinor_field_togpuformat_flt(spinor_field_flt *out, spinor_field_flt *in);
 void spinor_field_tocpuformat_flt(spinor_field_flt *out, spinor_field_flt *in);
 void gfield_copy_to_gpu_f(suNf_field *field);
 void gfield_copy_from_gpu_f(suNf_field *field);
+void gfield_copy_to_gpu(suNg_field *field);
+void gfield_copy_from_gpu(suNg_field *field);
 void gfield_togpuformat(suNg_field *out, suNg_field *in);
 void gfield_tocpuformat(suNg_field *out, suNg_field *in);
 void gfield_togpuformat_f(suNf_field *out, suNf_field *in);
