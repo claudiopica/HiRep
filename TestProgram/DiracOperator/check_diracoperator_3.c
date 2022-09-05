@@ -68,7 +68,6 @@ int test_herm(spinor_operator S, char *name)
 
   // Difference tau is 0 for a hermitian operator
   tau = spinor_field_prod_re_f_cpu(s2, s3);
-  printf("tau intermediate: %0.15lf  +i%0.15lf\n", tau);
   tau -= spinor_field_prod_re_f_cpu(s4, s1);
   tau += spinor_field_prod_im_f_cpu(s2, s3);
   tau -= spinor_field_prod_im_f_cpu(s4, s1);
