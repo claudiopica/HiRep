@@ -28,7 +28,6 @@
 #include "utils.h"
 #include "logger.h"
 #include "setup.h"
-
 #include "communications.h"
 
 static double hmass = 0.1;
@@ -49,6 +48,16 @@ void MM_gpu(spinor_field *out, spinor_field *in)
   #else
     g5Dphi_sq(-hmass, out, in);
   #endif
+}
+
+void II_cpu(spinor_field *out, spinor_field *in) 
+{
+  spinor_field_mul_f_cpu(out, 1, in);
+}
+
+void II_gpu(spinor_field *out, spinor_field *in) 
+{
+  spinor_field_mul_f(out, 1, in);
 }
 
 int test_herm_cpu(spinor_operator S, char *name)
@@ -104,10 +113,9 @@ int test_herm_cpu(spinor_operator S, char *name)
   return return_val;
 }
 
-
 int test_herm_gpu(spinor_operator S, char *name)
 {
-  lprintf("RESULT", 0, "Test if %s is hermitean on GPU: \n", name);
+  lprintf("RESULT", 0, "Test if %s is hermitian on GPU: \n", name);
 
   spinor_field *s1, *s2, *s3, *s4;
   double tau;
@@ -163,6 +171,7 @@ int test_herm_gpu(spinor_operator S, char *name)
 int main(int argc, char *argv[])
 {
   int return_value_cpu, return_value_gpu;
+  int return_value_cpu_unit, return_value_gpu_unit;
 
   // setup process id and communications
   logger_map("DEBUG", "debug");
@@ -177,8 +186,14 @@ int main(int argc, char *argv[])
   represent_gauge_field();
 
   // Test block
-  return_value_cpu=test_herm_cpu(&MM_cpu, "M");
-  return_value_gpu=test_herm_gpu(&MM_gpu, "M");
+
+    // Q^2
+    return_value_cpu=test_herm_cpu(&MM_cpu, "M");
+    return_value_gpu=test_herm_gpu(&MM_gpu, "M");
+
+    // Unit operator
+    return_value_cpu_unit=test_herm_cpu(&II_cpu, "I");
+    return_value_gpu_unit=test_herm_gpu(&II_gpu, "I");
 
   // Finalize
   finalize_process();
