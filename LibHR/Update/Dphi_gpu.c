@@ -175,9 +175,9 @@ void Dphi_(spinor_field *out, spinor_field *in)
 
   _PIECE_FOR(out->type, ixp) 
   {
-      cudaError_t error_code;
+      /*cudaError_t error_code;
       error_code = cudaSetDevice(ixp);
-      if (error_code != cudaSuccess) printf("Could not change to device %d\n", ixp);
+      if (error_code != cudaSuccess) printf("Could not change to device %d\n", ixp);*/
 
       
       N = (out)->type->master_end[ixp]-(out)->type->master_start[ixp];
