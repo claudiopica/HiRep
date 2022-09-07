@@ -33,6 +33,8 @@ TestProgram/DiracOperator/check_gauge_covariance_gpu
 TestProgram/DiracOperator/check_gpu_cpu_identical
 TestProgram/DiracOperator/check_hermiticity
 TestProgram/DiracOperator/check_hermiticity_gpu
+TestProgram/DiracOperator/speed_test_diracoperator
+TestProgram/DiracOperator/speed_test_diracoperator_gpu
 TestProgram/Disconnected/check_disc_0
 TestProgram/Disconnected/check_disc_1
 TestProgram/Disconnected/check_disc_2
