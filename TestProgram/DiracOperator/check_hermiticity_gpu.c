@@ -186,7 +186,7 @@ int main(int argc, char *argv[])
   represent_gauge_field();
 
   // Test block
-
+  
     // Q^2
     return_value_cpu=test_herm_cpu(&MM_cpu, "M");
     return_value_gpu=test_herm_gpu(&MM_gpu, "M");

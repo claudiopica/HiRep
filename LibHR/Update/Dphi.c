@@ -227,6 +227,9 @@ void Dphi_cpu_(spinor_field *out, spinor_field *in)
       sp = _FIELD_AT(in, iy);
       up = pu_gauge_f(ix, 0);
 
+      if (ix==0) printf("+0 CPU spinor cmp ixp 0: %0.15lf + i%0.15lf\n", (*sp).c[0].c[0]);
+      if (ix==192) printf("+0 CPU spinor cmp ixp 1: %0.15lf + i%0.15lf\n", (*sp).c[0].c[0]);
+
       _vector_add_f(psi, (*sp).c[0], (*sp).c[2]);
       _vector_add_f(psi2, (*sp).c[1], (*sp).c[3]);
       _suNf_theta_T_multiply(chi, (*up), psi);

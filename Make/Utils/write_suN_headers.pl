@@ -3810,22 +3810,18 @@ sub  write_read_spinor_gpu {
     print "/* Read spinor field component from GPU memory */\n";
     print "/* (output) v = ${dataname}_vector ; (input) in = ${dataname}_spinor* */\n";
     print "/* (input) iy = site ; (input) x = 0..3 spinor component; */\n";
-    print "#define _${rdataname}_read_spinor_flt_gpu(stride,v,in,iy,x,ixp) \\\n";
+    print "#define _${rdataname}_read_spinor_flt_gpu(stride,v,in,iy,x) \\\n";
     print "   do {  \\\n";
-	print "		 int piece_offset = 4*$N*(stride)*(ixp); \\\n";
-	print "		 int iy_global = ((iy)%(stride)) + piece_offset; \\\n";
-    print "      int __iz=(iy_global)+((x)*$N)*(stride); \\\n";
+    print "      int __iz=(iy)+((x)*$N)*(stride); \\\n";
     for($i=0; $i<$N-1; $i++) {
         print "      (v).c\[$i\]=((hr_complex_flt*)(in))\[__iz\]; __iz+=(stride); \\\n";
     }
     print "      (v).c\[$i\]=((hr_complex_flt*)(in))\[__iz\]; \\\n";
     print "   } while (0) \n\n";
 
-    print "#define _${rdataname}_read_spinor_gpu(stride,v,in,iy,x,ixp) \\\n";
+    print "#define _${rdataname}_read_spinor_gpu(stride,v,in,iy,x) \\\n";
     print "   do {  \\\n";
-	print "		 int piece_offset = 4*$N*(stride)*(ixp); \\\n";
-	print "		 int iy_global = ((iy)%(stride)) + piece_offset; \\\n";
-    print "      int __iz=(iy_global)+((x)*$N)*(stride); \\\n";
+    print "      int __iz=(iy)+((x)*$N)*(stride); \\\n";
     for($i=0; $i<$N-1; $i++) {
         print "      (v).c\[$i\]=((hr_complex*)(in))\[__iz\]; __iz+=(stride); \\\n";
     }
@@ -3839,22 +3835,18 @@ sub  write_write_spinor_gpu {
     print "/* Write spinor field component to GPU memory */\n";
     print "/* (input) v = ${dataname}_vector ; (output) out = ${dataname}_spinor* */\n";
     print "/* (input) iy = site ; (input) x = 0..3 spinor component; */\n";
-    print "#define _${rdataname}_write_spinor_flt_gpu(stride,v,out,iy,x,ixp) \\\n";
+    print "#define _${rdataname}_write_spinor_flt_gpu(stride,v,out,iy,x) \\\n";
     print "   do {  \\\n";
-	print "		 int piece_offset = 4*$N*(stride)*(ixp); \\\n";
-	print "		 int iy_global = ((iy)%(stride)) + piece_offset; \\\n";
-    print "      int __iz=(iy_global)+((x)*$N)*(stride); \\\n";
+    print "      int __iz=(iy)+((x)*$N)*(stride); \\\n";
     for($i=0; $i<$N-1; $i++) {
         print "      ((hr_complex_flt*)(out))\[__iz\]=(v).c\[$i\]; __iz+=(stride); \\\n";
     }
     print "      ((hr_complex_flt*)(out))\[__iz\]=(v).c\[$i\]; \\\n";
     print "   } while (0) \n\n";
 
-    print "#define _${rdataname}_write_spinor_gpu(stride,v,out,iy,x,ixp) \\\n";
+    print "#define _${rdataname}_write_spinor_gpu(stride,v,out,iy,x) \\\n";
     print "   do {  \\\n";
-	print "		 int piece_offset = 4*$N*(stride)*(ixp); \\\n";
-	print "		 int iy_global = ((iy)%(stride)) + piece_offset; \\\n";
-    print "      int __iz=(iy_global)+((x)*$N)*(stride); \\\n";
+    print "      int __iz=(iy)+((x)*$N)*(stride); \\\n";
     for($i=0; $i<$N-1; $i++) {
         print "      ((hr_complex*)(out))\[__iz\]=(v).c\[$i\]; __iz+=(stride); \\\n";
     }
@@ -3936,11 +3928,9 @@ sub write_suN_read_gpu {
     print "/* (output) v = suN ; (input) in = suN* */\n";
     print "/* (input) iy = site ; (input) x = 0..3 direction; */\n";
 
-    print "#define _${dataname}_flt_read_gpu(stride,v,in,iy,x,ixp) \\\n";
+    print "#define _${dataname}_flt_read_gpu(stride,v,in,iy,x) \\\n";
     print "   do {  \\\n";
-	print "		 int piece_offset = 4*$rdim*(stride)*(ixp); \\\n";
-	print "		 int iy_global = ((iy)%(stride)) + piece_offset; \\\n";
-    print "      int __iz=(iy_global)+((x)*$rdim)*(stride); \\\n";
+    print "      int __iz=(iy)+((x)*$rdim)*(stride); \\\n";
     for($i=0; $i<$dim-1; $i++) {
         print "      (v).c\[$i\].re=((float*)(in))\[__iz\]; __iz+=(stride); \\\n";
         print "      (v).c\[$i\].im=((float*)(in))\[__iz\]; __iz+=(stride); \\\n";
@@ -3949,11 +3939,9 @@ sub write_suN_read_gpu {
     print "      (v).c\[$i\].im=((float*)(in))\[__iz\]; \\\n";
     print "   } while (0) \n\n";
 
-    print "#define _${dataname}_read_gpu(stride,v,in,iy,x,ixp) \\\n";
+    print "#define _${dataname}_read_gpu(stride,v,in,iy,x) \\\n";
     print "   do {  \\\n";
-	print "		 int piece_offset = 4*$rdim*(stride)*(ixp); \\\n";
-	print "		 int iy_global = ((iy)%(stride)) + piece_offset; \\\n";
-    print "      int __iz=(iy_global)+((x)*$rdim)*(stride); \\\n";
+    print "      int __iz=(iy)+((x)*$rdim)*(stride); \\\n";
     for($i=0; $i<$dim-1; $i++) {
         print "      (v).c\[$i\].re=((double*)(in))\[__iz\]; __iz+=(stride); \\\n";
         print "      (v).c\[$i\].im=((double*)(in))\[__iz\]; __iz+=(stride); \\\n";
