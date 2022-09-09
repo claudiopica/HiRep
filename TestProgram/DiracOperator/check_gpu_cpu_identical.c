@@ -21,29 +21,27 @@ void Q_operator_cpu(spinor_field*, spinor_field*);
 void I_operator(spinor_field*, spinor_field*);
 void I_operator_cpu(spinor_field*, spinor_field*);
 
-
-
 int main(int argc, char *argv[])
 {
     // Init
-    int pass;
+    int return_val = 0;
 
     // Setup process and communication
     setup_process(&argc, &argv);
-    setup_gauge_fields();
 
     // Setup gauge field
+    setup_gauge_fields();
     random_u(u_gauge);
     represent_gauge_field();
     gfield_copy_to_gpu_f(u_gauge_f);
 
     // Test Block
-    pass &= test_hermiticity(&I_operator, &I_operator_cpu, "Unit operator");
-    pass &= test_hermiticity(&Q_operator, &Q_operator_cpu, "Q = g5Dphi");
+    return_val += test_hermiticity(&I_operator, &I_operator_cpu, "Unit operator");
+    return_val += test_hermiticity(&Q_operator, &Q_operator_cpu, "Q = g5Dphi");
 
     // Finalize and return
     finalize_process();
-    return pass;
+    return return_val;
 }
 
 int test_hermiticity(spinor_operator S, spinor_operator S_cpu, char *name)
@@ -79,8 +77,13 @@ int test_hermiticity(spinor_operator S, spinor_operator S_cpu, char *name)
         lprintf("RESULT", 0, "FAILED \n");
         return_val = 1;
     }
-    else lprintf("RESULT", 0, "OK \n");
-    lprintf("RESULT", 0, "[Diff norm gpu-cpu %0.20lf]\n", diff_norm);
+    else 
+    {
+        lprintf("RESULT", 0, "OK \n");
+        return_val = 0;
+    }
+    
+    lprintf("RESULT", 0, "[Diff norm gpu-cpu %0.2e]\n", diff_norm);
 
     free_spinor_field_f(diff);
     free_spinor_field_f(s);
