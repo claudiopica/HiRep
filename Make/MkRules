@@ -21,7 +21,9 @@ ALIBNAME = $(abspath $(LIBNAME))
 
 
 ifeq ($(findstring -DWITH_MPI,$(MACRO)),-DWITH_MPI)
-	CC = $(MPICC)
+	ifeq (,$(findstring -DWITH_GPU,$(MACRO))) 
+		CC = $(MPICC)
+	endif
 	RUNTEST = $(MKDIR)/Utils/mpi_test_wrapper.pl
 endif
 

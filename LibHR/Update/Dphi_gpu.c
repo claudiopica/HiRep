@@ -31,6 +31,44 @@
 #include "hr_complex.h"
 #include <iostream>
 
+void global_sum(double *d, int n) {
+#ifdef WITH_MPI
+  int mpiret;(void)mpiret; // Remove warning of variable set but not used
+  double pres[n];
+  
+#ifdef MPI_TIMING
+  struct timeval start, end, etime;
+  gettimeofday(&start,0);  
+#endif
+  
+  mpiret=MPI_Allreduce(d,pres,n,MPI_DOUBLE,MPI_SUM,GLB_COMM);
+  
+    
+#ifdef MPI_TIMING
+  gettimeofday(&end,0);
+  timeval_subtract(&etime,&end,&start);
+  lprintf("MPI TIMING",0,"global_sum " __FILE__ " %ld sec %ld usec\n",etime.tv_sec,etime.tv_usec);
+#endif
+  
+#ifndef NDEBUG
+  if (mpiret != MPI_SUCCESS) {
+    char mesg[MPI_MAX_ERROR_STRING];
+    int mesglen;
+    MPI_Error_string(mpiret,mesg,&mesglen);
+    lprintf("MPI",0,"ERROR: %s\n",mesg);
+    error(1,1,"global_sum " __FILE__,"Cannot perform global_sum");
+  }
+#endif
+  while(n>0) { 
+    --n;
+    d[n]=pres[n];	
+  }
+#else
+  /* for non mpi do nothing */
+  return;
+#endif
+}
+
 __global__ void Dphi_gpu_kernel(suNf_spinor*, 
                             const suNf_spinor*,
                             const suNf*, 
@@ -151,10 +189,6 @@ static void init_bc_gpu(){
   #endif
 }
 
-__global__ void test_kernel(int ixp) {
-  printf("Hello from device operating on piece %d\n", ixp);
-}
-
 void Dphi_(spinor_field *out, spinor_field *in)
 {
   unsigned int N, grid;
@@ -181,6 +215,7 @@ void Dphi_(spinor_field *out, spinor_field *in)
       error_code = cudaSetDevice(ixp);
       if (error_code != cudaSuccess) printf("Could not change to device %d\n", ixp);*/
       
+      printf("Operating on piece: %d\n", ixp);
       int iyp = (ixp+1)%2;
       N = (out)->type->master_end[ixp]-(out)->type->master_start[ixp];
       grid = (N-1)/BLOCK_SIZE + 1;
