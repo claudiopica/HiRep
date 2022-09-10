@@ -14,6 +14,7 @@
 int test_write_read_spinor_field_f();
 int test_write_read_gauge_field_f();
 int test_write_read_gauge_field();
+int test_write_read_spinor_field_f_flt();
 
 int main(int argc, char *argv[]) 
 {
@@ -29,6 +30,9 @@ int main(int argc, char *argv[])
     return_val += test_write_read_spinor_field_f();
     return_val += test_write_read_gauge_field_f();
     return_val += test_write_read_gauge_field();
+
+    // Single precision
+    return_val += test_write_read_spinor_field_f_flt();
 
     // Finalize and return
     finalize_process();
@@ -180,5 +184,49 @@ int test_write_read_spinor_field_f()
     free_spinor_field_f(in);
     free_spinor_field_f(gpu_format);
     free_spinor_field_f(out);
+    return return_val;
+} 
+
+int test_write_read_spinor_field_f_flt()
+{
+    int vol4h = T*X*Y*Z/2;
+    int return_val = 0;
+    spinor_field_flt *in, *gpu_format, *out;
+    in = alloc_spinor_field_f_flt(1, &glattice);
+    gpu_format = alloc_spinor_field_f_flt(1, &glattice);
+    out = alloc_spinor_field_f_flt(1, &glattice);
+    gaussian_spinor_field_flt(in);
+
+    suNf_vector_flt in_vec, out_vec;
+
+    _PIECE_FOR(in->type, ixp) 
+    {
+        _SITE_FOR(in->type, ixp, ix) 
+        {
+            for (int comp=0; comp < 4; comp++) 
+            {
+                _suNf_write_spinor_flt_gpu(vol4h, (*(in->ptr+ix)).c[comp], gpu_format->ptr, ix, comp);
+                _suNf_read_spinor_flt_gpu(vol4h, (*(out->ptr+ix)).c[comp], gpu_format->ptr, ix, comp);
+            }
+        }
+    }
+
+    spinor_field_sub_assign_f_flt_cpu(out, in);
+    double diff_norm = spinor_field_sqnorm_f_flt_cpu(out);
+
+    if (diff_norm != 0) {
+        lprintf("RESULT", 0, "FAILED \n");
+        return_val = 1;
+    } 
+    else 
+    {
+        lprintf("RESULT", 0, "OK \n");
+        return_val = 0;
+    }
+    lprintf("RESULT", 0, "[Diff norm %0.2e]\n", diff_norm);
+
+    free_spinor_field_f_flt(in);
+    free_spinor_field_f_flt(gpu_format);
+    free_spinor_field_f_flt(out);
     return return_val;
 } 
