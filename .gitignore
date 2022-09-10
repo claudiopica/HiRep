@@ -44,6 +44,7 @@ TestProgram/Disconnected/check_disc_5
 TestProgram/SpinorField/check_spinorfield_1_gpu
 TestProgram/GaugeFix/check_gaugefix
 TestProgram/Geometry/check_geometry_1
+TestProgram/Geometry/check_gpu_geometry
 TestProgram/Integrators/check_integrator_1
 TestProgram/Inverters/check_inverters_1
 TestProgram/Inverters/check_inverters_2
