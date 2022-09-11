@@ -36,7 +36,23 @@ void random_u(suNg_field *gf)
   }
 
   start_gf_sendrecv(gf);
+}
 
+void random_u_f(suNf_field *gf) 
+{
+  error(gf==NULL, 1, "random_u_f [random_fields.c]", 
+  "Attempt to access unallocated memory space");
+
+  _MASTER_FOR(gf->type,ix) 
+  {
+    suNf *ptr = (gf->ptr)+coord_to_index(ix, 0);
+    random_suNf(ptr++);
+    random_suNf(ptr++);
+    random_suNf(ptr++);
+    random_suNf(ptr);
+  }
+
+  //start_gf_sendrecv(gf);
 }
 
 void unit_u(suNg_field *gf)

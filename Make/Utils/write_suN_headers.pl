@@ -3931,25 +3931,30 @@ sub write_suN_read_gpu {
     print "#define _${dataname}_flt_read_gpu(stride,v,in,iy,x) \\\n";
     print "   do {  \\\n";
     print "      int __iz=(iy)+((x)*$rdim)*(stride); \\\n";
+	print "		 double real_part, imag_part; \\\n";
     for($i=0; $i<$dim-1; $i++) {
-        print "      (v).c\[$i\].re=((float*)(in))\[__iz\]; __iz+=(stride); \\\n";
-        print "      (v).c\[$i\].im=((float*)(in))\[__iz\]; __iz+=(stride); \\\n";
-    }
-    print "      (v).c\[$i\].re=((float*)(in))\[__iz\]; __iz+=(stride); \\\n";
-    print "      (v).c\[$i\].im=((float*)(in))\[__iz\]; \\\n";
+		print "      real_part = ((float*)(in))\[__iz\]; __iz+=(stride); \\\n";
+		print "		 imag_part = ((float*)(in))\[__iz\]; __iz+=(stride); \\\n";
+		print "		 (v).c\[$i\]=hr_complex(real_part, imag_part); \\\n";
+	}
+	print "		 real_part = ((float*)(in))\[__iz\]; __iz+=(stride); \\\n";
+	print "		 imag_part = ((float*)(in))\[__iz\]; __iz+=(stride); \\\n";
+	print "		 (v).c\[$i\]=hr_complex(real_part, imag_part); \\\n";
     print "   } while (0) \n\n";
 
     print "#define _${dataname}_read_gpu(stride,v,in,iy,x) \\\n";
     print "   do {  \\\n";
     print "      int __iz=(iy)+((x)*$rdim)*(stride); \\\n";
+	print "		 double real_part, imag_part; \\\n";
     for($i=0; $i<$dim-1; $i++) {
-        print "      (v).c\[$i\].re=((double*)(in))\[__iz\]; __iz+=(stride); \\\n";
-        print "      (v).c\[$i\].im=((double*)(in))\[__iz\]; __iz+=(stride); \\\n";
-    }
-    print "      (v).c\[$i\].re=((double*)(in))\[__iz\]; __iz+=(stride); \\\n";
-    print "      (v).c\[$i\].im=((double*)(in))\[__iz\]; \\\n";
+		print "      real_part = ((double*)(in))\[__iz\]; __iz+=(stride); \\\n";
+		print "		 imag_part = ((double*)(in))\[__iz\]; __iz+=(stride); \\\n";
+		print "		 (v).c\[$i\]=hr_complex(real_part, imag_part); \\\n";
+	}
+	print "		 real_part = ((double*)(in))\[__iz\]; __iz+=(stride); \\\n";
+	print "		 imag_part = ((double*)(in))\[__iz\]; __iz+=(stride); \\\n";
+	print "		 (v).c\[$i\]=hr_complex(real_part, imag_part); \\\n";
     print "   } while (0) \n\n";
-
 }
 
 sub write_suN_write_gpu {
@@ -3965,22 +3970,22 @@ sub write_suN_write_gpu {
     print "   do {  \\\n";
     print "      int __iz=(iy)+((x)*$rdim)*(stride); \\\n";
     for($i=0; $i<$dim-1; $i++) {
-        print "      ((float*)(out))\[__iz\]=(v).c\[$i\].re; __iz+=(stride); \\\n";
-        print "      ((float*)(out))\[__iz\]=(v).c\[$i\].im; __iz+=(stride); \\\n";
+        print "      ((float*)(out))\[__iz\]=_complex_re((v).c\[$i\]); __iz+=(stride); \\\n";
+        print "      ((float*)(out))\[__iz\]=_complex_im((v).c\[$i\]); __iz+=(stride); \\\n";
     }
-    print "      ((float*)(out))\[__iz\]=(v).c\[$i\].re; __iz+=(stride); \\\n";
-    print "      ((float*)(out))\[__iz\]=(v).c\[$i\].im; \\\n";
+    print "      ((float*)(out))\[__iz\]=_complex_re((v).c\[$i\]); __iz+=(stride); \\\n";
+    print "      ((float*)(out))\[__iz\]=_complex_im((v).c\[$i\]); \\\n";
     print "   } while (0) \n\n";
 
     print "#define _${dataname}_write_gpu(stride,v,out,iy,x) \\\n";
     print "   do {  \\\n";
     print "      int __iz=(iy)+((x)*$rdim)*(stride); \\\n";
     for($i=0; $i<$dim-1; $i++) {
-        print "      ((double*)(out))\[__iz\]=(v).c\[$i\].re; __iz+=(stride); \\\n";
-        print "      ((double*)(out))\[__iz\]=(v).c\[$i\].im; __iz+=(stride); \\\n";
+        print "      ((double*)(out))\[__iz\]=_complex_re((v).c\[$i\]); __iz+=(stride); \\\n";
+        print "      ((double*)(out))\[__iz\]=_complex_im((v).c\[$i\]); __iz+=(stride); \\\n";
     }
-    print "      ((double*)(out))\[__iz\]=(v).c\[$i\].re; __iz+=(stride); \\\n";
-    print "      ((double*)(out))\[__iz\]=(v).c\[$i\].im; \\\n";
+    print "      ((double*)(out))\[__iz\]=_complex_re((v).c\[$i\]); __iz+=(stride); \\\n";
+    print "      ((double*)(out))\[__iz\]=_complex_im((v).c\[$i\]); \\\n";
     print "   } while (0) \n\n";
 
 }
@@ -4123,6 +4128,4 @@ sub write_suN_av_mul_add_assign_gpu {
     }
     print "      ((double*)(v))\[__iz\]+=(in).c\[$i\]*(r); \\\n";
     print "   } while (0) \n\n";
-
-
 }
