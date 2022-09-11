@@ -39,6 +39,7 @@ int main(int argc, char *argv[])
 
 int test_write_read_gauge_field()
 {
+    lprintf("INFO", 0, " ======= TEST GAUGE FIELD ======= ");
     int vol4h = T*X*Y*Z/2;
     int return_val = 0;
     double diff_norm = 0.0;
@@ -99,6 +100,7 @@ int test_write_read_gauge_field()
 
 int test_write_read_gauge_field_f()
 {
+    lprintf("INFO", 0, " ======= TEST GAUGE FIELD FUNDAMENTAL REP ======= ");
     int vol4h = T*X*Y*Z/2;
     int return_val = 0;
     double diff_norm = 0.0;
@@ -160,6 +162,7 @@ int test_write_read_gauge_field_f()
 
 int test_write_read_spinor_field_f()
 {
+    lprintf("INFO", 0, " ======= TEST SPINOR FIELD ======= ");
     int vol4h = T*X*Y*Z/2;
     int return_val = 0;
     spinor_field *in, *gpu_format, *out;
@@ -203,6 +206,7 @@ int test_write_read_spinor_field_f()
 
 int test_write_read_spinor_field_f_flt()
 {
+    lprintf("INFO", 0, " ======= TEST SPINOR FIELD SINGLE PRECISION ======= ");
     int vol4h = T*X*Y*Z/2;
     int return_val = 0;
     spinor_field_flt *in, *gpu_format, *out;

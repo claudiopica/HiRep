@@ -23,11 +23,58 @@
 #endif
 #include "gpu.h"
 
-/*#define _DECLARE_COPY_TO_FUNCTION(_name, _field_type, _site_type) 
-    void togpuformat_##_name(_type *out, _type *in) 
-    {
-      _site_type *r = 0;
-    }*/
+#define _DECLARE_COPY_TO_GPU_FUNCTION(_name, _field_type, _site_type, _site_vec, _dim) \
+    void togpuformat_##_name(_field_type *out, _field_type *in) \
+    { \
+      error(out->type != in->type, 1, __FILE__, "Field geometries don't match!\n"); \
+      \
+      _site_type *site_in = 0; \
+      \
+      _PIECE_FOR(in->type, ixp)  \
+      { \
+        const int start = in->type->master_start[ixp]; \
+        const int stride = in->type->master_end[ixp] - in->type->master_start[ixp]+1; \
+        const int even_odd_offset = in->type->master_shift; \
+        \
+        _SITE_FOR(in->type, ixp, ix) \
+        { \
+          site_in = _FIELD_AT(in, ix); \
+          \
+          for (int comp = 0; comp < sizeof(_site_type)/sizeof(_site_vec); ++comp) \
+          { \
+            write_gpu_##_site_vec(even_odd_offset, (*site_in).c[comp], out, ix, comp); \
+          } \
+        } \
+      } \
+    } 
+
+
+#define _DECLARE_COPY_TO_CPU_FUNCTION(_name, _field_type, _site_type, _site_vec, _dim) \
+    void fromgpuformat_##_name(_field_type *out, _field_type *in) \
+    { \
+      error(out->type != in->type, 1, __FILE__, "Field geometries don't match!\n"); \
+      \
+      _site_type *site_out = 0; \
+      \
+      _PIECE_FOR(in->type, ixp) \
+      { \
+        const int start = in->type->master_start[ixp]; \
+        const int stride = in->type->master_end[ixp] - in->type->master_start[ixp]+1; \
+        const int even_odd_offset = in->type->master_shift; \
+        _SITE_FOR(in->type, ixp, ix) \
+        { \
+          site_out = _FIELD_AT(in, ix); \
+          \
+          for (int comp = 0; comp < sizeof(_site_type)/sizeof(_site_vec); ++comp) \
+          { \
+            read_gpu_##_site_vec(even_odd_offset, (*site_out).c[comp], in, ix, comp); \
+          } \
+        } \
+      } \
+    } 
+
+_DECLARE_COPY_TO_CPU_FUNCTION(spinor_field_f, spinor_field, suNf_spinor, suNf_vector, 1);
+_DECLARE_COPY_TO_GPU_FUNCTION(spinor_field_f, spinor_field, suNf_spinor, suNf_vector, 1);
 
 void spinor_field_togpuformat(spinor_field *out, spinor_field *in) {
     suNf_spinor *r=0;
@@ -39,7 +86,7 @@ void spinor_field_togpuformat(spinor_field *out, spinor_field *in) {
     if (in->type==&glattice) {
         // we call recursively this function twice
         // on the even and odd sublattices
-        in->type=out->type=&glat_even;
+        in->type=out->type=&glat_even; 
         spinor_field_togpuformat(out, in);
         in->type=out->type=&glat_odd;
         spinor_field_togpuformat(out, in);
@@ -65,42 +112,6 @@ void spinor_field_togpuformat(spinor_field *out, spinor_field *in) {
     }
 }
 
-void spinor_field_tocpuformat(spinor_field *out, spinor_field *in) {
-    suNf_spinor *r=0;
-
-    //check input and output type are the same
-    error(out->type!=in->type,1,"spinor_field_tocpuformat " __FILE__, "Spinors don't match!");
-/*    
-#ifdef UPDATE_EO
-    if (in->type==&glattice) {
-        // we call recursively this function twice
-        // on the even and odd sublattices
-        in->type=out->type=&glat_even;
-        spinor_field_tocpuformat(out, in);
-    	in->type=out->type=&glat_odd;
-        spinor_field_tocpuformat(out, in);
-        in->type=out->type=&glattice;
-        return;
-    }
-#endif //UPDATE_EO    
-*/   
-
-    _PIECE_FOR(in->type,ixp) {
-        int start = in->type->master_start[ixp];
-        int N = in->type->master_end[ixp]-in->type->master_start[ixp]+1; 
-        hr_complex *cin=(hr_complex*)(_FIELD_AT(in,start));
-        _SITE_FOR(in->type,ixp,ix) {
-            
-            r=_FIELD_AT(out,ix);
-        	
-            for (int j=0; j<sizeof(*r)/sizeof(hr_complex); ++j) {
-                ((hr_complex*)(r))[j]=cin[j*N];
-            }
-            ++cin;
-            
-    	}
-    }
-}
 
 
 void spinor_field_togpuformat_flt(spinor_field_flt *out, spinor_field_flt *in) {
