@@ -54,27 +54,24 @@ int test_write_read_gauge_field()
     suNg in_mat, out_mat;
     int dim = sizeof(in->ptr)/sizeof(double);
     
-    _PIECE_FOR(in->type, ixp) 
+    _MASTER_FOR(in->type, ix) 
     {
-        _SITE_FOR(in->type, ixp, ix) 
+        for (int comp = 0; comp < dim; comp++) 
         {
-            for (int comp = 0; comp < dim; comp++) 
-            {
-                in_mat = *(in->ptr+ix);
-                out_mat = *(out->ptr+ix);
-                _suNg_write_gpu(vol4h, in_mat, gpu_format->ptr, ix, comp);
-                _suNg_read_gpu(vol4h, out_mat, gpu_format->ptr, ix, comp);
+            in_mat = *(in->ptr+ix);
+            out_mat = *(out->ptr+ix);
+            _suNg_write_gpu(vol4h, in_mat, gpu_format->ptr, ix, comp);
+            _suNg_read_gpu(vol4h, out_mat, gpu_format->ptr, ix, comp);
 
-                _suNg_sqnorm(sqnorm, in_mat);
-                sqnorm_in_check += sqnorm;
+            _suNg_sqnorm(sqnorm, in_mat);
+            sqnorm_in_check += sqnorm;
 
-                _suNg_sqnorm(sqnorm, out_mat);
-                sqnorm_out_check += sqnorm;
+            _suNg_sqnorm(sqnorm, out_mat);
+            sqnorm_out_check += sqnorm;
 
-                _suNg_sub_assign(out_mat, in_mat);
-                _suNg_sqnorm(sqnorm, out_mat);
-                diff_norm += sqnorm;
-            }
+            _suNg_sub_assign(out_mat, in_mat);
+            _suNg_sqnorm(sqnorm, out_mat);
+            diff_norm += sqnorm;
         }
     }
 
@@ -117,28 +114,25 @@ int test_write_read_gauge_field_f()
     suNf in_mat, out_mat;
     int dim = sizeof(in->ptr)/sizeof(double);
     
-    _PIECE_FOR(in->type, ixp) 
+    _MASTER_FOR(in->type, ix) 
     {
-        _SITE_FOR(in->type, ixp, ix) 
+        for (int comp = 0; comp < dim; comp++) 
         {
-            for (int comp = 0; comp < dim; comp++) 
-            {
-                in_mat = *(in->ptr+ix);
-                out_mat = *(out->ptr+ix);
-                _suNf_write_gpu(vol4h, in_mat, gpu_format->ptr, ix, comp);
-                _suNf_read_gpu(vol4h, out_mat, gpu_format->ptr, ix, comp);
+            in_mat = *(in->ptr+ix);
+            out_mat = *(out->ptr+ix);
+            _suNf_write_gpu(vol4h, in_mat, gpu_format->ptr, ix, comp);
+            _suNf_read_gpu(vol4h, out_mat, gpu_format->ptr, ix, comp);
 
 
-                _suNf_sqnorm(sqnorm, in_mat);
-                sqnorm_in_check += sqnorm;
+            _suNf_sqnorm(sqnorm, in_mat);
+            sqnorm_in_check += sqnorm;
 
-                _suNf_sqnorm(sqnorm, out_mat);
-                sqnorm_out_check += sqnorm;
+            _suNf_sqnorm(sqnorm, out_mat);
+            sqnorm_out_check += sqnorm;
 
-                _suNf_sub_assign(out_mat, in_mat);
-                _suNf_sqnorm(sqnorm, out_mat);
-                diff_norm += sqnorm;
-            }
+            _suNf_sub_assign(out_mat, in_mat);
+            _suNf_sqnorm(sqnorm, out_mat);
+            diff_norm += sqnorm;
         }
     }
 
@@ -177,15 +171,12 @@ int test_write_read_spinor_field_f()
 
     suNf_vector in_vec, out_vec;
 
-    _PIECE_FOR(in->type, ixp) 
+    _MASTER_FOR(in->type, ix) 
     {
-        _SITE_FOR(in->type, ixp, ix) 
+        for (int comp=0; comp < 4; comp++) 
         {
-            for (int comp=0; comp < 4; comp++) 
-            {
-                _suNf_write_spinor_gpu(vol4h, (*(in->ptr+ix)).c[comp], gpu_format->ptr, ix, comp);
-                _suNf_read_spinor_gpu(vol4h, (*(out->ptr+ix)).c[comp], gpu_format->ptr, ix, comp);
-            }
+            _suNf_write_spinor_gpu(vol4h, (*(in->ptr+ix)).c[comp], gpu_format->ptr, ix, comp);
+            _suNf_read_spinor_gpu(vol4h, (*(out->ptr+ix)).c[comp], gpu_format->ptr, ix, comp);
         }
     }
 
@@ -223,15 +214,12 @@ int test_write_read_spinor_field_f_flt()
 
     suNf_vector_flt in_vec, out_vec;
 
-    _PIECE_FOR(in->type, ixp) 
+    _MASTER_FOR(in->type, ix) 
     {
-        _SITE_FOR(in->type, ixp, ix) 
+        for (int comp=0; comp < 4; comp++) 
         {
-            for (int comp=0; comp < 4; comp++) 
-            {
-                _suNf_write_spinor_flt_gpu(vol4h, (*(in->ptr+ix)).c[comp], gpu_format->ptr, ix, comp);
-                _suNf_read_spinor_flt_gpu(vol4h, (*(out->ptr+ix)).c[comp], gpu_format->ptr, ix, comp);
-            }
+            _suNf_write_spinor_flt_gpu(vol4h, (*(in->ptr+ix)).c[comp], gpu_format->ptr, ix, comp);
+            _suNf_read_spinor_flt_gpu(vol4h, (*(out->ptr+ix)).c[comp], gpu_format->ptr, ix, comp);
         }
     }
 

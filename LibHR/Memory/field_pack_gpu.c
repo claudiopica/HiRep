@@ -23,6 +23,11 @@
 #endif
 #include "gpu.h"
 
+/*#define _DECLARE_COPY_TO_FUNCTION(_name, _field_type, _site_type) 
+    void togpuformat_##_name(_type *out, _type *in) 
+    {
+      _site_type *r = 0;
+    }*/
 
 void spinor_field_togpuformat(spinor_field *out, spinor_field *in) {
     suNf_spinor *r=0;
@@ -402,4 +407,3 @@ void avfield_tocpuformat(suNg_av_field *out, suNg_av_field *in) {
     }
   }
 }
-
