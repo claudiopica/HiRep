@@ -11,6 +11,8 @@
 #include "update.h"
 #include "geometry.h"
 
+int test_convert_back_forth_spinor_field();
+
 int main(int argc, char *argv[]) 
 {
     // Init
@@ -20,7 +22,8 @@ int main(int argc, char *argv[])
     logger_map("DEBUG", "debug");
     setup_process(&argc, &argv);
 
-    //return_val += test();
+    // Run tests
+    return_val += test_convert_back_forth_spinor_field();
 
     // Finalize and return
     finalize_process();
@@ -31,28 +34,22 @@ int test_convert_back_forth_spinor_field()
 {
     lprintf("INFO", 0, " ======= TEST SPINOR FIELD ======= \n");
     int return_val = 0;
-    spinor_field *in, *out;
+    spinor_field *in, *tmp, *out;
     in = alloc_spinor_field_f(1, &glattice);
+    tmp = alloc_spinor_field_f(1, &glattice);
     out = alloc_spinor_field_f(1, &glattice);
     gaussian_spinor_field(in);
 
-    lprintf("SANITY CHECK", 0, "[In field norm unequal zero: %0.15lf]\n", spinor_field_sqnorm_f_cpu(in));
+    // Save transformed field in CPU copy of tmp field
+    togpuformat_spinor_field_f(tmp, in);
 
-    // Copy in to out
-    spinor_field_mul_f(out, 1.0, in);
-    lprintf("SANITY CHECK", 0, "[In field and out field identical norms: in: %0.15lf out: %0.15lf]\n", 
-                spinor_field_sqnorm_f_cpu(in), spinor_field_sqnorm_f_cpu(out));
+    // Sanity checks that the CPU copy of in field 
+    // and CPU copy of the tmp field have non-zero square norms
+    lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.15lf]\n", spinor_field_sqnorm_f_cpu(in));
+    lprintf("SANITY CHECK", 0, "[Tmp field CPU copy norm unequal zero: %0.15lf]\n", spinor_field_sqnorm_f_cpu(tmp));
 
-    // Copy out field to gpu
-    togpuformat_spinor_field_f(out, in);
-    lprintf("SANITY CHECK", 0, "[Out field GPU copy not zero: %0.15lf]\n", spinor_field_sqnorm_f(out));
-
-    // Overwrite cpu copy of out field
-    spinor_field_zero_f_cpu(out);
-    lprintf("SANITY CHECK", 0, "[Out field CPU copy overwritten to zero: %0.15lf]\n", spinor_field_sqnorm_f_cpu(out));
-
-    // Copy back and check that its the same as the infield
-    //fromgpuformat_spinor_field_f(in);
+    // Transform back to out field
+    //tocpuformat_spinor_field_f(out, tmp);
     
     spinor_field_sub_assign_f_cpu(out, in);
     double diff_norm = spinor_field_sqnorm_f_cpu(out);

@@ -61,8 +61,8 @@ int test_write_read_gauge_field()
         {
             in_mat = *(in->ptr+ix);
             out_mat = *(out->ptr+ix);
-            _suNg_write_gpu(vol4h, in_mat, gpu_format->ptr, ix, comp);
-            _suNg_read_gpu(vol4h, out_mat, gpu_format->ptr, ix, comp);
+            write_gpu_suNg(vol4h, in_mat, gpu_format->ptr, ix, comp);
+            read_gpu_suNg(vol4h, out_mat, gpu_format->ptr, ix, comp);
 
             _suNg_sqnorm(sqnorm, in_mat);
             sqnorm_in_check += sqnorm;
@@ -122,8 +122,8 @@ int test_write_read_gauge_field_f()
         {
             in_mat = *(in->ptr+ix);
             out_mat = *(out->ptr+ix);
-            _suNf_write_gpu(vol4h, in_mat, gpu_format->ptr, ix, comp);
-            _suNf_read_gpu(vol4h, out_mat, gpu_format->ptr, ix, comp);
+            write_gpu_suNf(vol4h, in_mat, gpu_format->ptr, ix, comp);
+            read_gpu_suNf(vol4h, out_mat, gpu_format->ptr, ix, comp);
 
 
             _suNf_sqnorm(sqnorm, in_mat);
@@ -178,8 +178,8 @@ int test_write_read_spinor_field_f()
     {
         for (int comp=0; comp < 4; comp++) 
         {
-            _suNf_write_spinor_gpu(vol4h, (*(in->ptr+ix)).c[comp], gpu_format->ptr, ix, comp);
-            _suNf_read_spinor_gpu(vol4h, (*(out->ptr+ix)).c[comp], gpu_format->ptr, ix, comp);
+            write_gpu_suNf_vector(vol4h, (*(in->ptr+ix)).c[comp], gpu_format->ptr, ix, comp);
+            read_gpu_suNf_vector(vol4h, (*(out->ptr+ix)).c[comp], gpu_format->ptr, ix, comp);
         }
     }
 
@@ -222,8 +222,8 @@ int test_write_read_spinor_field_f_flt()
     {
         for (int comp=0; comp < 4; comp++) 
         {
-            _suNf_write_spinor_flt_gpu(vol4h, (*(in->ptr+ix)).c[comp], gpu_format->ptr, ix, comp);
-            _suNf_read_spinor_flt_gpu(vol4h, (*(out->ptr+ix)).c[comp], gpu_format->ptr, ix, comp);
+            write_gpu_suNf_vector_flt(vol4h, (*(in->ptr+ix)).c[comp], gpu_format->ptr, ix, comp);
+            read_gpu_suNf_vector_flt(vol4h, (*(out->ptr+ix)).c[comp], gpu_format->ptr, ix, comp);
         }
     }
 

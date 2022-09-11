@@ -3810,7 +3810,7 @@ sub  write_read_spinor_gpu {
     print "/* Read spinor field component from GPU memory */\n";
     print "/* (output) v = ${dataname}_vector ; (input) in = ${dataname}_spinor* */\n";
     print "/* (input) iy = site ; (input) x = 0..3 spinor component; */\n";
-    print "#define _${rdataname}_read_spinor_flt_gpu(stride,v,in,iy,x) \\\n";
+    print "#define read_gpu_${rdataname}_vector_flt(stride,v,in,iy,x) \\\n";
     print "   do {  \\\n";
     print "      int __iz=(iy)+((x)*$N)*(stride); \\\n";
     for($i=0; $i<$N-1; $i++) {
@@ -3819,7 +3819,7 @@ sub  write_read_spinor_gpu {
     print "      (v).c\[$i\]=((hr_complex_flt*)(in))\[__iz\]; \\\n";
     print "   } while (0) \n\n";
 
-    print "#define _${rdataname}_read_spinor_gpu(stride,v,in,iy,x) \\\n";
+    print "#define read_gpu_${rdataname}_vector(stride,v,in,iy,x) \\\n";
     print "   do {  \\\n";
     print "      int __iz=(iy)+((x)*$N)*(stride); \\\n";
     for($i=0; $i<$N-1; $i++) {
@@ -3835,7 +3835,7 @@ sub  write_write_spinor_gpu {
     print "/* Write spinor field component to GPU memory */\n";
     print "/* (input) v = ${dataname}_vector ; (output) out = ${dataname}_spinor* */\n";
     print "/* (input) iy = site ; (input) x = 0..3 spinor component; */\n";
-    print "#define _${rdataname}_write_spinor_flt_gpu(stride,v,out,iy,x) \\\n";
+    print "#define write_gpu_${rdataname}_vector_flt(stride,v,out,iy,x) \\\n";
     print "   do {  \\\n";
     print "      int __iz=(iy)+((x)*$N)*(stride); \\\n";
     for($i=0; $i<$N-1; $i++) {
@@ -3844,7 +3844,7 @@ sub  write_write_spinor_gpu {
     print "      ((hr_complex_flt*)(out))\[__iz\]=(v).c\[$i\]; \\\n";
     print "   } while (0) \n\n";
 
-    print "#define _${rdataname}_write_spinor_gpu(stride,v,out,iy,x) \\\n";
+    print "#define write_gpu_${rdataname}_vector(stride,v,out,iy,x) \\\n";
     print "   do {  \\\n";
     print "      int __iz=(iy)+((x)*$N)*(stride); \\\n";
     for($i=0; $i<$N-1; $i++) {
@@ -3928,7 +3928,7 @@ sub write_suN_read_gpu {
     print "/* (output) v = suN ; (input) in = suN* */\n";
     print "/* (input) iy = site ; (input) x = 0..3 direction; */\n";
 
-    print "#define _${dataname}_flt_read_gpu(stride,v,in,iy,x) \\\n";
+    print "#define read_gpu_${dataname}_flt(stride,v,in,iy,x) \\\n";
     print "   do {  \\\n";
     print "      int __iz=(iy)+((x)*$rdim)*(stride); \\\n";
 	print "		 double real_part, imag_part; \\\n";
@@ -3942,7 +3942,7 @@ sub write_suN_read_gpu {
 	print "		 (v).c\[$i\]=hr_complex(real_part, imag_part); \\\n";
     print "   } while (0) \n\n";
 
-    print "#define _${dataname}_read_gpu(stride,v,in,iy,x) \\\n";
+    print "#define read_gpu_${dataname}(stride,v,in,iy,x) \\\n";
     print "   do {  \\\n";
     print "      int __iz=(iy)+((x)*$rdim)*(stride); \\\n";
 	print "		 double real_part, imag_part; \\\n";
@@ -3966,7 +3966,7 @@ sub write_suN_write_gpu {
     print "/* (input) v = suN ; (output) out = suN* */\n";
     print "/* (input) iy = site ; (input) x = 0..3 direction; */\n";
 
-    print "#define _${dataname}_flt_write_gpu(stride,v,out,iy,x) \\\n";
+    print "#define write_gpu_${dataname}_flt(stride,v,out,iy,x) \\\n";
     print "   do {  \\\n";
     print "      int __iz=(iy)+((x)*$rdim)*(stride); \\\n";
     for($i=0; $i<$dim-1; $i++) {
@@ -3977,7 +3977,7 @@ sub write_suN_write_gpu {
     print "      ((float*)(out))\[__iz\]=_complex_im((v).c\[$i\]); \\\n";
     print "   } while (0) \n\n";
 
-    print "#define _${dataname}_write_gpu(stride,v,out,iy,x) \\\n";
+    print "#define write_gpu_${dataname}(stride,v,out,iy,x) \\\n";
     print "   do {  \\\n";
     print "      int __iz=(iy)+((x)*$rdim)*(stride); \\\n";
     for($i=0; $i<$dim-1; $i++) {
@@ -3999,7 +3999,7 @@ sub write_suNr_read_gpu {
     print "/* (output) v = suN ; (input) in = suN* */\n";
     print "/* (input) iy = site ; (input) x = 0..3 direction; */\n";
 
-    print "#define _${rdataname}_flt_read_gpu(stride,v,in,iy,x) \\\n";
+    print "#define read_gpu_${rdataname}_flt(stride,v,in,iy,x) \\\n";
     print "   do {  \\\n";
     print "      int __iz=(iy)+((x)*$dim)*(stride); \\\n";
     for($i=0; $i<$dim-1; $i++) {
@@ -4008,7 +4008,7 @@ sub write_suNr_read_gpu {
     print "      (v).c\[$i\]=((float*)(in))\[__iz\]; \\\n";
     print "   } while (0) \n\n";
 
-    print "#define _${rdataname}_read_gpu(stride,v,in,iy,x) \\\n";
+    print "#define read_gpu_${rdataname}(stride,v,in,iy,x) \\\n";
     print "   do {  \\\n";
     print "      int __iz=(iy)+((x)*$dim)*(stride); \\\n";
     for($i=0; $i<$dim-1; $i++) {
@@ -4027,7 +4027,7 @@ sub write_suNr_write_gpu {
     print "/* (input) v = suN ; (output) out = suN* */\n";
     print "/* (input) iy = site ; (input) x = 0..3 direction; */\n";
 
-    print "#define _${rdataname}_flt_write_gpu(stride,v,out,iy,x) \\\n";
+    print "#define write_gpu_${rdataname}(stride,v,out,iy,x) \\\n";
     print "   do {  \\\n";
     print "      int __iz=(iy)+((x)*$dim)*(stride); \\\n";
     for($i=0; $i<$dim-1; $i++) {
@@ -4036,7 +4036,7 @@ sub write_suNr_write_gpu {
     print "      ((float*)(out))\[__iz\]=(v).c\[$i\]; \\\n";
     print "   } while (0) \n\n";
 
-    print "#define _${rdataname}_write_gpu(stride,v,out,iy,x) \\\n";
+    print "#define write_gpu_${rdataname}(stride,v,out,iy,x) \\\n";
     print "   do {  \\\n";
     print "      int __iz=(iy)+((x)*$dim)*(stride); \\\n";
     for($i=0; $i<$dim-1; $i++) {

@@ -29,20 +29,23 @@
       error(out->type != in->type, 1, __FILE__, "Field geometries don't match!\n"); \
       \
       _site_type *site_in = 0; \
+      _site_vec vec; \
       \
       _PIECE_FOR(in->type, ixp)  \
       { \
         const int start = in->type->master_start[ixp]; \
         const int stride = in->type->master_end[ixp] - in->type->master_start[ixp]+1; \
-        const int even_odd_offset = in->type->master_shift; \
+        const int even_odd_offset = 192; \
         \
         _SITE_FOR(in->type, ixp, ix) \
         { \
           site_in = _FIELD_AT(in, ix); \
+          int dim = sizeof(_site_type)/sizeof(_site_vec); \
           \
           for (int comp = 0; comp < sizeof(_site_type)/sizeof(_site_vec); ++comp) \
           { \
-            write_gpu_##_site_vec(even_odd_offset, (*site_in).c[comp], out, ix, comp); \
+            vec = (*site_in).c[comp]; \
+            write_gpu_##_site_vec(stride, (*site_in).c[comp], out, ix, comp); \
           } \
         } \
       } \
@@ -50,7 +53,7 @@
 
 
 #define _DECLARE_COPY_TO_CPU_FUNCTION(_name, _field_type, _site_type, _site_vec, _dim) \
-    void fromgpuformat_##_name(_field_type *out, _field_type *in) \
+    void tocpuformat_##_name(_field_type *out, _field_type *in) \
     { \
       error(out->type != in->type, 1, __FILE__, "Field geometries don't match!\n"); \
       \
