@@ -41,7 +41,7 @@ int test_convert_back_forth_spinor_field()
     gaussian_spinor_field(in);
 
     // Save transformed field in CPU copy of tmp field
-    togpuformat_spinor_field_f(tmp, in);
+    spinor_field_togpuformat(tmp, in);
 
     // Sanity checks that the CPU copy of in field 
     // and CPU copy of the tmp field have non-zero square norms
@@ -49,7 +49,7 @@ int test_convert_back_forth_spinor_field()
     lprintf("SANITY CHECK", 0, "[Tmp field CPU copy norm unequal zero: %0.15lf]\n", spinor_field_sqnorm_f_cpu(tmp));
 
     // Transform back to out field
-    //tocpuformat_spinor_field_f(out, tmp);
+    spinor_field_tocpuformat(out, tmp);
     
     spinor_field_sub_assign_f_cpu(out, in);
     double diff_norm = spinor_field_sqnorm_f_cpu(out);
