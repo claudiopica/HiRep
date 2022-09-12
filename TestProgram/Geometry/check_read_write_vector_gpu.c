@@ -1,3 +1,12 @@
+/*******************************************************************************
+*
+* NOCOMPILE= !WITH_GPU
+*
+* Check that the GPU reading and writing functions defined in suN.h 
+* are bijective.
+*
+*******************************************************************************/
+
 #define MAIN_PROGRAM
 
 #include "suN.h"

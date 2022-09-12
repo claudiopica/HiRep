@@ -1,6 +1,8 @@
 /*******************************************************************************
 *
-* Gauge covariance of the Dirac operator
+* NOCOMPILE= WITH_GPU
+* 
+* Speed test of Dirac Operator for CPU double precision
 *
 *******************************************************************************/
 

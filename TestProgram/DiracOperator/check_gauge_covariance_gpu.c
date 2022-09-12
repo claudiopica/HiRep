@@ -1,6 +1,8 @@
 /*******************************************************************************
 *
-* Gauge covariance of the Dirac operator
+* NOCOMPILE= !WITH_GPU
+*
+* Gauge covariance of the Dirac operator on GPU
 *
 *******************************************************************************/
 

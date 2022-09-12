@@ -1,3 +1,12 @@
+/*******************************************************************************
+*
+* NOCOMPILE= !WITH_GPU
+*
+* Check that the conversion functions ..._togpuformat and ..._tocpuformat
+* are bijective
+*
+*******************************************************************************/
+
 #define MAIN_PROGRAM
 
 #include "suN.h"
