@@ -1,9 +1,9 @@
 /*******************************************************************************
-*                                                                              *
-* Wrapper functions for different type of measurements                         *
-* Copyright (c) 2013 Rudy Arthur, Ari Hietanen                                 *
-*                                                                              *
-*******************************************************************************/
+ *                                                                              *
+ * Wrapper functions for different type of measurements                         *
+ * Copyright (c) 2013 Rudy Arthur, Ari Hietanen                                 *
+ *                                                                              *
+ *******************************************************************************/
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -97,8 +97,8 @@ static void flip_T_bc(int tau)
 }
 
 /********************************
-*	Point Sources		*
-*********************************/
+ *	Point Sources		*
+ *********************************/
 
 #define corr_ind(px, py, pz, n_mom, tc, nm, cm) ((px) * (n_mom) * (n_mom) * (24) * (nm) + (py) * (n_mom) * (24) * (nm) + (pz) * (24) * (nm) + ((cm) * (24)) + (tc))
 
@@ -124,7 +124,7 @@ void measure_spectrum_pt(int tau, int nm, double *m, int n_mom, int conf_num, do
   for (k = 0; k < NF; ++k)
   {
     create_point_source(source, tau, k);
-    calc_propagator(prop + 4 * k, source, 4); //4 for spin components
+    calc_propagator(prop + 4 * k, source, 4); // 4 for spin components
     if (n_mom > 1)
     {
       measure_point_mesons_momenta(meson_correlators, prop + 4 * k, source, nm, tau, n_mom);
@@ -202,7 +202,7 @@ void measure_spectrum_pt_ext(int tau, int nm, double *m, int n_mom, int conf_num
   for (k = 0; k < NF; ++k)
   {
     create_point_source(source, tau, k);
-    calc_propagator(prop_p, source, 4); //4 for spin components
+    calc_propagator(prop_p, source, 4); // 4 for spin components
     if (n_mom > 0)
     {
       measure_point_mesons_momenta_ext(meson_correlators, prop_p, source, nm, tau, n_mom, 0);
@@ -212,7 +212,7 @@ void measure_spectrum_pt_ext(int tau, int nm, double *m, int n_mom, int conf_num
       measure_mesons_ext(meson_correlators, prop_p, source, nm, tau, 0);
     }
     flip_T_bc(tau);
-    calc_propagator(prop_a, source, 4); //4 for spin components
+    calc_propagator(prop_a, source, 4); // 4 for spin components
     flip_T_bc(tau);
     for (l = 0; l < 4 * nm; ++l)
     {
@@ -253,12 +253,12 @@ void measure_spectrum_pt_fixedbc(int tau, int dt, int nm, double *m, int n_mom, 
   char label[100];
   suNf_field_copy(u_gauge_old, u_gauge_f);
   init_propagator_eo(nm, m, precision);
-  fix_T_bc(tau - dt); //Apply fixed boundaryconditions by zeroing links at time slice tau to direction 0.
+  fix_T_bc(tau - dt); // Apply fixed boundaryconditions by zeroing links at time slice tau to direction 0.
   lprintf("MAIN", 0, "Point Source at (%d,0,0,0) \n", tau);
   for (k = 0; k < NF; ++k)
   {
     create_point_source(source, tau, k);
-    calc_propagator(prop, source, 4); //4 for spin components
+    calc_propagator(prop, source, 4); // 4 for spin components
     if (n_mom > 0)
     {
       measure_point_mesons_momenta(meson_correlators, prop, source, nm, tau, n_mom);
@@ -278,8 +278,8 @@ void measure_spectrum_pt_fixedbc(int tau, int dt, int nm, double *m, int n_mom, 
 }
 
 /********************************
-*	SEMWall Sources		*
-*********************************/
+ *	SEMWall Sources		*
+ *********************************/
 
 void measure_diquark_semwall_background(int nm, double *m, int nhits, int conf_num, double precision, double Q, int n, storage_switch swc, data_storage_array **ret)
 {
@@ -303,16 +303,16 @@ void measure_diquark_semwall_background(int nm, double *m, int nhits, int conf_n
   for (k = 0; k < nhits; ++k)
   {
     tau = create_diluted_source_equal_eo(source);
-    //apply background and calculate first prop
+    // apply background and calculate first prop
     apply_background_field_zdir(u_gauge, Q, n);
     represent_gauge_field();
-    calc_propagator_eo(prop_u, source, 4); //4 for spin dilution
-                                           //apply background and calculate second prop
+    calc_propagator_eo(prop_u, source, 4); // 4 for spin dilution
+                                           // apply background and calculate second prop
     suNg_field_copy(u_gauge, u_gauge_old);
 
     apply_background_field_zdir(u_gauge, -Q, n);
     represent_gauge_field();
-    calc_propagator_eo(prop_d, source, 4); //4 for spin dilution
+    calc_propagator_eo(prop_d, source, 4); // 4 for spin dilution
 
     measure_diquarks(meson_correlators, prop_u, prop_d, source, nm, tau);
 
@@ -330,7 +330,7 @@ void measure_diquark_semwall_background(int nm, double *m, int nhits, int conf_n
 
 void measure_spectrum_semwall(int nm, double *m, int nhits, int conf_num, double precision, storage_switch swc, data_storage_array **ret)
 {
-  spinor_field *source = alloc_spinor_field_f(4, &glat_even);
+  spinor_field *source = alloc_spinor_field_f(4, &glattice);
   spinor_field *prop = alloc_spinor_field_f(4 * nm, &glattice);
 
   // init data storage here
@@ -349,7 +349,9 @@ void measure_spectrum_semwall(int nm, double *m, int nhits, int conf_num, double
   for (k = 0; k < nhits; ++k)
   {
     tau = create_diluted_source_equal_eo(source);
-    calc_propagator_eo(prop, source, 4); //4 for spin dilution
+
+    calc_propagator_eo(prop, source, 4); // 4 for spin dilution
+
     measure_mesons(meson_correlators, prop, source, nm, tau);
   }
 
@@ -380,7 +382,7 @@ void measure_spectrum_semwall(int nm, double *m, int nhits, int conf_num, double
             int idx[4] = {im, iG, t, 0};
             *data_storage_element(*ret, 0, idx) = motmp->corr_re[corr_ind(0, 0, 0, 1, t, nm, im)];
             idx[3] = 1;
-            *data_storage_element(*ret, 0, idx) = motmp->corr_im[corr_ind(0,0,0, 1, t, nm, im)];
+            *data_storage_element(*ret, 0, idx) = motmp->corr_im[corr_ind(0, 0, 0, 1, t, nm, im)];
           }
         }
       }
@@ -405,7 +407,7 @@ void measure_spectrum_semwall_ext(int nm, double *m, int nhits, int conf_num, do
   for (int i = 0; i < 8 * nm; i++)
     spinor_field_zero_f(prop_p + i);
 
-  int dilution = 4; //4 for spin dilution
+  int dilution = 4; // 4 for spin dilution
   init_propagator_eo(nm, m, precision);
   for (k = 0; k < nhits; ++k)
   {
@@ -449,7 +451,7 @@ void measure_spectrum_semwall_fixedbc(int dt, int nm, double *m, int nhits, int 
   {
     tau = create_diluted_source_equal_eo(source);
     fix_T_bc(tau - dt);
-    calc_propagator_eo(prop, source, 4); //4 for spin dilution
+    calc_propagator_eo(prop, source, 4); // 4 for spin dilution
     measure_mesons(meson_correlators, prop, source, nm, tau);
     suNf_field_copy(u_gauge_f, u_gauge_old);
   }
@@ -462,8 +464,8 @@ void measure_spectrum_semwall_fixedbc(int dt, int nm, double *m, int nhits, int 
 }
 
 /****************************************
-*	Gauge Fixed Wall Sources	*
-*****************************************/
+ *	Gauge Fixed Wall Sources	*
+ *****************************************/
 void measure_spectrum_gfwall(int nm, double *m, int conf_num, double precision, storage_switch swc, data_storage_array **ret)
 {
   spinor_field *source = alloc_spinor_field_f(4, &glattice);
@@ -475,12 +477,12 @@ void measure_spectrum_gfwall(int nm, double *m, int conf_num, double precision, 
   int tau, k;
   tau = 0;
   suNg_field_copy(u_gauge_old, u_gauge);
-  //Fix the Gauge
+  // Fix the Gauge
   double act = gaugefix(0,      //= 0, 1, 2, 3 for Coulomb guage else Landau
-                        1.8,    //overrelax
-                        10000,  //maxit
-                        1e-12,  //tolerance
-                        u_gauge //gauge
+                        1.8,    // overrelax
+                        10000,  // maxit
+                        1e-12,  // tolerance
+                        u_gauge // gauge
   );
   lprintf("GFWALL", 0, "Gauge fixed action  %1.6f\n", act);
   double p2 = calc_plaq(u_gauge);
@@ -492,7 +494,7 @@ void measure_spectrum_gfwall(int nm, double *m, int conf_num, double precision, 
   for (k = 0; k < NF; ++k)
   {
     create_gauge_fixed_wall_source(source, tau, k);
-    calc_propagator(prop, source, 4); //4 for spin dilution
+    calc_propagator(prop, source, 4); // 4 for spin dilution
     measure_mesons(meson_correlators, prop, source, nm, tau);
   }
   print_mesons(meson_correlators, GLB_VOL3, conf_num, nm, m, GLB_T, 1, "DEFAULT_GFWALL");
@@ -518,12 +520,12 @@ void measure_spectrum_gfwall_fixedbc(int dt, int nm, double *m, int conf_num, do
   tau = 0;
   suNg_field_copy(u_gauge_old, u_gauge);
 
-  //Fix the Gauge
+  // Fix the Gauge
   double act = gaugefix(0,      //= 0, 1, 2, 3 for Coulomb guage else Landau
-                        1.8,    //overrelax
-                        10000,  //maxit
-                        1e-12,  //tolerance
-                        u_gauge //gauge
+                        1.8,    // overrelax
+                        10000,  // maxit
+                        1e-12,  // tolerance
+                        u_gauge // gauge
   );
   lprintf("GFWALL", 0, "Gauge fixed action  %1.6f\n", act);
   double p2 = calc_plaq(u_gauge);
@@ -531,13 +533,13 @@ void measure_spectrum_gfwall_fixedbc(int dt, int nm, double *m, int conf_num, do
   full_plaquette();
   represent_gauge_field();
 
-  fix_T_bc(tau - dt); //Apply fixed boundaryconditions by zeroing links at time slice tau to direction 0.
+  fix_T_bc(tau - dt); // Apply fixed boundaryconditions by zeroing links at time slice tau to direction 0.
 
   init_propagator_eo(nm, m, precision);
   for (k = 0; k < NF; ++k)
   {
     create_gauge_fixed_wall_source(source, tau, k);
-    calc_propagator(prop, source, 4); //4 for spin dilution
+    calc_propagator(prop, source, 4); // 4 for spin dilution
     measure_mesons(meson_correlators, prop, source, nm, tau);
   }
   print_mesons(meson_correlators, GLB_VOL3, conf_num, nm, m, GLB_T, 1, "DIRICHLET_GFWALL");
@@ -552,8 +554,8 @@ void measure_spectrum_gfwall_fixedbc(int dt, int nm, double *m, int conf_num, do
 }
 
 /****************************************
-*	Disconnected Measurements	*
-*****************************************/
+ *	Disconnected Measurements	*
+ *****************************************/
 
 void measure_spectrum_discon_semwall(int nm, double *m, int nhits, int conf_num, double precision, storage_switch swc, data_storage_array **ret)
 {
@@ -570,14 +572,14 @@ void measure_spectrum_discon_semwall(int nm, double *m, int nhits, int conf_num,
     create_noise_source_equal_eo(source);
     for (beta = 0; beta < 4; beta++)
       source[beta].type = &glat_even;
-    calc_propagator(prop, source, 4); //4 for spin dilution
+    calc_propagator(prop, source, 4); // 4 for spin dilution
     for (beta = 0; beta < 4; beta++)
       source[beta].type = &glattice;
     measure_mesons(discon_correlators, prop, source, nm, 0);
     sprintf(label, "src %d DISCON_SEMWALL", k);
     print_mesons(discon_correlators, GLB_VOL3 / 2., conf_num, nm, m, GLB_T, 1, label);
   }
-  //print_mesons(discon_correlators,nhits*GLB_VOL3/2.,conf_num,nm,m,GLB_T,1,"DISCON_SEMWALL");
+  // print_mesons(discon_correlators,nhits*GLB_VOL3/2.,conf_num,nm,m,GLB_T,1,"DISCON_SEMWALL");
   free_propagator_eo();
   free_spinor_field_f(source);
   free_spinor_field_f(prop);
@@ -596,12 +598,12 @@ void measure_spectrum_discon_gfwall(int nm, double *m, int conf_num, double prec
   tau = 0;
 
   suNg_field_copy(u_gauge_old, u_gauge);
-  //Fix the Gauge
+  // Fix the Gauge
   double act = gaugefix(0,      //= 0, 1, 2, 3 for Coulomb guage else Landau
-                        1.8,    //overrelax
-                        10000,  //maxit
-                        1e-12,  //tolerance
-                        u_gauge //gauge
+                        1.8,    // overrelax
+                        10000,  // maxit
+                        1e-12,  // tolerance
+                        u_gauge // gauge
   );
   lprintf("GFWALL", 0, "Gauge fixed action  %1.6f\n", act);
   double p2 = calc_plaq(u_gauge);
@@ -615,8 +617,8 @@ void measure_spectrum_discon_gfwall(int nm, double *m, int conf_num, double prec
     for (k = 0; k < NF; ++k)
     {
       create_gauge_fixed_wall_source(source, tau, k);
-      calc_propagator(prop, source, 4);    //4 for spin dilution
-      create_point_source(source, tau, k); //to get the contraction right
+      calc_propagator(prop, source, 4);    // 4 for spin dilution
+      create_point_source(source, tau, k); // to get the contraction right
       measure_mesons(discon_correlators, prop, source, nm, 0);
     }
   }
@@ -633,7 +635,7 @@ void measure_spectrum_discon_gfwall(int nm, double *m, int conf_num, double prec
 
 void measure_spectrum_discon_volume(int nm, double *m, int conf_num, double precision, int dil, storage_switch swc, data_storage_array **ret)
 {
-  //Spin diluted
+  // Spin diluted
   spinor_field *source = alloc_spinor_field_f(4, &glattice);
   spinor_field *prop = alloc_spinor_field_f(4 * nm, &glattice);
 
@@ -645,7 +647,7 @@ void measure_spectrum_discon_volume(int nm, double *m, int conf_num, double prec
   for (p = 0; p < dil; p++)
   {
     create_diluted_volume_source(source, p, dil);
-    calc_propagator(prop, source, 4); //spin dilution
+    calc_propagator(prop, source, 4); // spin dilution
     measure_mesons(discon_correlators, prop, source, nm, 0);
   }
   print_mesons(discon_correlators, 1., conf_num, nm, m, GLB_T, 1, "DISCON_VOLUME");
@@ -656,8 +658,8 @@ void measure_spectrum_discon_volume(int nm, double *m, int conf_num, double prec
 }
 
 /****************************************
-*	Form Factor Measurements	*
-*****************************************/
+ *	Form Factor Measurements	*
+ *****************************************/
 void measure_formfactor_pt(int ti, int tf, int nm, double *m, int n_mom, int conf_num, double precision, storage_switch swc, data_storage_array **ret)
 {
   spinor_field *source;
@@ -677,20 +679,20 @@ void measure_formfactor_pt(int ti, int tf, int nm, double *m, int n_mom, int con
     spinor_field_zero_f(prop_seq + i);
   }
 
-  init_propagator_eo(1, m, precision); //1 for number of masses
+  init_propagator_eo(1, m, precision); // 1 for number of masses
   int pt[4];
   generate_random_point(pt);
   pt[0] = pt[1] = pt[2] = pt[3] = 0;
   for (k = 0; k < NF; ++k)
   {
-    //create_point_source(source,ti,k);
+    // create_point_source(source,ti,k);
     create_point_source_loc(source, ti, pt[1], pt[2], pt[3], k);
-    calc_propagator(prop_i + 4 * k, source, 4); //4 for spin components
+    calc_propagator(prop_i + 4 * k, source, 4); // 4 for spin components
   }
   create_sequential_source(source_seq, tf, prop_i);
   calc_propagator(prop_seq, source_seq, 4 * NF);
 
-  measure_formfactors(prop_seq, prop_i, source_seq, nm, ti, tf, n_mom, pt); //eats two propagators
+  measure_formfactors(prop_seq, prop_i, source_seq, nm, ti, tf, n_mom, pt); // eats two propagators
   print_formfactor(conf_num, nm, m, n_mom, "DEFAULT_FF_POINT", tf - ti);
   free_spinor_field_f(source);
   free_spinor_field_f(source_seq);
@@ -709,11 +711,11 @@ void measure_formfactor_fixed(int ti, int tf, int dt, int nm, double *m, int n_m
   int k;
   char label[100];
   suNf_field *u_gauge_old = alloc_gfield_f(&glattice);
-  suNf_field_copy(u_gauge_old, u_gauge_f); //Save the gaugefield
+  suNf_field_copy(u_gauge_old, u_gauge_f); // Save the gaugefield
 
   double p = avr_plaquette();
   lprintf("MESON_MEASUREMENTS", 0, "<P> = %g\n", p);
-  fix_T_bc(ti - dt); //Apply fixed boundaryconditions by zeroing links at time slice tau to direction 0.
+  fix_T_bc(ti - dt); // Apply fixed boundaryconditions by zeroing links at time slice tau to direction 0.
   p = avr_plaquette();
   lprintf("MESON_MEASUREMENTS", 0, "<P> = %g\n", p);
 
@@ -728,25 +730,25 @@ void measure_formfactor_fixed(int ti, int tf, int dt, int nm, double *m, int n_m
     spinor_field_zero_f(prop_seq + i);
   }
 
-  init_propagator_eo(1, m, precision); //1 for number of masses
+  init_propagator_eo(1, m, precision); // 1 for number of masses
   int pt[4];
   generate_random_point(pt);
-  //for(k=0;k<4;k++) pt[k] = 0;
+  // for(k=0;k<4;k++) pt[k] = 0;
   lprintf("MESON_MEASUREMENTS", 0, "Source at (%d,%d,%d,%d)\n", ti, pt[1], pt[2], pt[3]);
   for (k = 0; k < NF; ++k)
   {
-    //create_point_source(source,ti,k);
+    // create_point_source(source,ti,k);
     create_point_source_loc(source, ti, pt[1], pt[2], pt[3], k);
-    calc_propagator(prop_i + 4 * k, source, 4); //4 for spin components
+    calc_propagator(prop_i + 4 * k, source, 4); // 4 for spin components
   }
-  create_sequential_source(source_seq, tf, prop_i); //prop_i = S(x,0);
-  calc_propagator(prop_seq, source_seq, 4 * NF);    //prop_seq = S(y,x) S(x,0) delta(x, (2,0,0,0) )
+  create_sequential_source(source_seq, tf, prop_i); // prop_i = S(x,0);
+  calc_propagator(prop_seq, source_seq, 4 * NF);    // prop_seq = S(y,x) S(x,0) delta(x, (2,0,0,0) )
 
-  measure_formfactors(prop_seq, prop_i, source, nm, ti, tf, n_mom, pt); //eats two propagators
+  measure_formfactors(prop_seq, prop_i, source, nm, ti, tf, n_mom, pt); // eats two propagators
 
   sprintf(label, "DIRICHLET_FF_POINT dt=%d", dt);
   print_formfactor(conf_num, nm, m, n_mom, label, tf - ti);
-  suNf_field_copy(u_gauge_f, u_gauge_old); //Restore the gaugefield
+  suNf_field_copy(u_gauge_f, u_gauge_old); // Restore the gaugefield
 
   free_spinor_field_f(source);
   free_spinor_field_f(source_seq);

@@ -84,8 +84,8 @@ void inv_hermNg(suNg *a);
 void det_hermNg(hr_complex *res, suNg *a);
 #else
 int project_to_suNg_real(suNg *out, suNg *in);
-void inv_hermNg(suNg *a);
-void det_hermNg(double *res, suNg *a);
+void inv_Cmplx_Ng(suNg *a);
+void det_Cmplx_Ng(double *res, suNg *a);
 void diag_hmat(suNg *hmat, double *dag);
 #endif
 

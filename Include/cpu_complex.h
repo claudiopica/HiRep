@@ -293,4 +293,12 @@ typedef float complex hr_complex_flt;
 #define _complex_clc_assign(a,z1,c1,z2,c2) \
     (a)+=(z1)*(c1)+(z2)*(c2)
 
+
+/*
+ * constructor analogous to GPU version
+ */ 
+ #define hr_complex(real_pt, imag_pt) \
+   real_pt + I * imag_pt
+   
+
 #endif

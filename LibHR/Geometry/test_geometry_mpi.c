@@ -1027,27 +1027,6 @@ static void initialize_blocks() {
 }
 
 
-/*
-typedef struct _geometry_descriptor {
-  int inner_master_pieces;
-  int local_master_pieces;
-  int total_spinor_master_pieces;
-  int total_gauge_master_pieces;
-  int *master_start, *master_end;
-  int master_shift;
-  int ncopies_spinor;
-  int ncopies_gauge;
-  int *copy_from, *copy_to, *copy_len;
-  int copy_odd_shift;
-  int nbuffers_spinor;
-  int nbuffers_gauge;
-  int *rbuf_len, *sbuf_len;
-  int *rbuf_from_proc, *rbuf_start;
-  int *sbuf_to_proc, *sbuf_start;
-  int gsize_spinor;
-  int gsize_gauge;
-} geometry_descriptor;
-*/
 
 
 static void test_goemetry_descriptor(geometry_descriptor *gd, int parity) {

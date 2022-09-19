@@ -22,7 +22,7 @@
 #ifdef P4
 #  define ALIGN 7
 #else
-#  define ALIGN 5
+#define ALIGN 8
 #endif
 
 #ifdef __cplusplus
@@ -66,6 +66,9 @@ spinor_field* create_spinor_mask(spinor_field* s, geometry_descriptor* masktype)
 void free_spinor_mask(spinor_field* s);
 
 #ifdef WITH_GPU
+void togpuformat_spinor_field_f(spinor_field*, spinor_field*);
+void tocpuformat_spinor_field_f(spinor_field*, spinor_field*);
+
 void spinor_field_copy_to_gpu_f(spinor_field *field);
 void spinor_field_copy_from_gpu_f(spinor_field *field);
 void spinor_field_copy_to_gpu_f_flt(spinor_field_flt *field);
@@ -74,6 +77,10 @@ void spinor_field_togpuformat(spinor_field *out, spinor_field* in);
 void spinor_field_tocpuformat(spinor_field *out, spinor_field* in);
 void spinor_field_togpuformat_flt(spinor_field_flt *out, spinor_field_flt *in);
 void spinor_field_tocpuformat_flt(spinor_field_flt *out, spinor_field_flt *in);
+void gfield_copy_to_gpu_f(suNf_field *field);
+void gfield_copy_from_gpu_f(suNf_field *field);
+void gfield_copy_to_gpu(suNg_field *field);
+void gfield_copy_from_gpu(suNg_field *field);
 void gfield_togpuformat(suNg_field *out, suNg_field *in);
 void gfield_tocpuformat(suNg_field *out, suNg_field *in);
 void gfield_togpuformat_f(suNf_field *out, suNf_field *in);

@@ -1,6 +1,8 @@
 /*******************************************************************************
 *
-* Gauge covariance of the Dirac operator
+* NOCOMPILE= !WITH_GPU
+*
+* Gauge covariance of the Dirac operator on GPU
 *
 *******************************************************************************/
 
@@ -28,7 +30,6 @@ static suNg_field *g;
 
 static void loc_D(spinor_field *out, spinor_field *in)
 {
-
   Dphi(hmass, out, in);
 }
 
@@ -83,68 +84,73 @@ int main(int argc, char *argv[])
   double sig, tau;
   spinor_field *s0, *s1, *s2, *s3;
 
+  // Setup process
   logger_map("DEBUG", "debug");
-
   setup_process(&argc, &argv);
 
+  // Setup gauge fields
   setup_gauge_fields();
-
-  /* allocate additional memory */
-  g = alloc_gtransf(&glattice);
-  s0 = alloc_spinor_field_f(4, &glattice);
-  s1 = s0 + 1;
-  s2 = s1 + 1;
-  s3 = s2 + 1;
-
+  g = alloc_gtransf(&glattice); /* allocate additional memory */
   lprintf("MAIN", 0, "Generating a random gauge field... ");
   fflush(stdout);
   random_u(u_gauge);
   start_gf_sendrecv(u_gauge);
   represent_gauge_field();
+  gfield_copy_to_gpu_f(u_gauge_f);
   lprintf("MAIN", 0, "done.\n");
 
+  // Generate random gauge transformation to apply
+  lprintf("MAIN", 0, "Generating a random gauge transf... ");
+  random_g();
+  gfield_copy_to_gpu(g);
+  lprintf("MAIN", 0, "done.\n");
+
+  // Setup initial gauge fields
+  s0 = alloc_spinor_field_f(4, &glattice);
+  s1 = s0 + 1;
+  s2 = s1 + 1;
+  s3 = s2 + 1;
   spinor_field_zero_f(s0);
   gaussian_spinor_field(&(s0[0]));
-  tau = 1. / sqrt(spinor_field_sqnorm_f(s0));
-  spinor_field_mul_f(s0, tau, s0);
-  sig = spinor_field_sqnorm_f(s0);
-
+  
+  // Normalize s0 + Sanity check
+  tau = 1. / sqrt(spinor_field_sqnorm_f_cpu(s0));
+  spinor_field_mul_f_cpu(s0, tau, s0);
+  sig = spinor_field_sqnorm_f_cpu(s0);
   lprintf("MAIN", 0, "Normalized norm = %.2e\n", sig);
 
-  lprintf("MAIN", 0, "Generating a random gauge transf... ");
-  fflush(stdout);
-  random_g();
-  start_gt_sendrecv(g);
-  complete_gt_sendrecv(g);
-  lprintf("MAIN", 0, "done.\n");
-
+  // Apply Gauge TF
   lprintf("MAIN", 0, "Gauge covariance of the Dirac operator:\n");
-
+  spinor_field_copy_to_gpu_f(s0);
   loc_D(s1, s0);
+  spinor_field_copy_from_gpu_f(s1);
 
   transform_s(s2, s1);
-
   transform_s(s3, s0);
-
   transform_u();
 
+  spinor_field_copy_to_gpu_f(s2);
+  spinor_field_copy_to_gpu_f(s3);
+  gfield_copy_to_gpu_f(u_gauge_f);
   spinor_field_zero_f(s1);
-
   loc_D(s1, s3);
-
   spinor_field_mul_add_assign_f(s1, -1.0, s2);
   sig = spinor_field_sqnorm_f(s1);
 
+  // Print test results
   lprintf("MAIN", 0, "Maximal normalized difference = %.2e\n", sqrt(sig));
   lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n");
 
-  if (sqrt(sig) < 10.e-14)
+  if (sqrt(sig) > 10.e-14) 
+  {
+    lprintf("RESULT", 0, "FAILED \n");
     return_value = 0;
+  } 
+  else lprintf("RESULT", 0, "OK \n");
 
+  // Free and return
   free_spinor_field_f(s0);
-
   free_gtransf(g);
-
   finalize_process();
   return return_value;
 }

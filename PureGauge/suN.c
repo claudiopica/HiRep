@@ -132,9 +132,6 @@ int main(int argc, char *argv[])
         }
     }
 
-    /* finalize Monte Carlo */
-    end_mc();
-
     /* close communications */
     finalize_process();
 

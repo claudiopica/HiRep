@@ -1,8 +1,8 @@
 /*******************************************************************************
 *
-* File  inv_hermNg.c
+* File  inv_Cmplx_Ng.c
 *
-* Function to calculate determinant of an hermitian-matrix using LU-decomposition
+* Function to calculate determinant of an non-hermitian-matrix using LU-decomposition
 * LU-decomposition. Modified from the real number version of Numerical Recipes.
 *
 * Ari Hietanen
@@ -19,7 +19,7 @@
 #ifndef GAUGE_SON
 
 #ifdef WITH_QUATERNIONS
-void inv_hermNg(suNg *a)
+void inv_Cmplx_Ng(suNg *a)
 {
   suNg b;
   double norm;
@@ -33,7 +33,7 @@ void inv_hermNg(suNg *a)
 }
 
 #else
-void inv_hermNg(suNg *a)
+void inv_Cmplx_Ng(suNg *a)
 {
   suNg b;
   double complex col[NG];

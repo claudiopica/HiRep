@@ -130,6 +130,5 @@ typedef struct _pg_flow
 
 int init_mc(pg_flow *rf, char *ifile);
 int save_conf(pg_flow *rf, int id);
-int end_mc();
 
 #endif /* SUN_UTILS_H */

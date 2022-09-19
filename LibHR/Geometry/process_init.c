@@ -58,10 +58,10 @@ static void read_cmdline(int argc, char **argv)
   int option, ai = 0;
 
   while ((option = getopt(argc, argv, "i:o:mh")) != -1)
-  { //get option from the getopt() method
+  { // get option from the getopt() method
     switch (option)
     {
-    //For option i, r, l, print that these are options
+    // For option i, r, l, print that these are options
     case 'i':
       ai = 1;
       strcpy(input_filename, optarg);
@@ -129,7 +129,8 @@ int setup_process(int *argc, char ***argv)
 #ifdef WITH_MPI
   /* INIT MPI*/
   int mpiret;
-  int required = MPI_THREAD_SINGLE;
+  int required = MPI_THREAD_FUNNELED;
+
   int provided;
   mpiret = MPI_Init_thread(argc, argv, required, &provided);
   if (mpiret != MPI_SUCCESS)
@@ -140,6 +141,8 @@ int setup_process(int *argc, char ***argv)
     lprintf("MPI", 0, "ERROR: %s\n", mesg);
     error(1, 1, "setup_process " __FILE__, "MPI inizialization failed");
   }
+  error(provided < MPI_THREAD_FUNNELED, 1, "setup_process " __FILE__, "MPI inizialization failed, The threading support level is lesser than that demanded.\n");
+
   MPI_Comm_rank(MPI_COMM_WORLD, &MPI_PID);
   MPI_Comm_size(MPI_COMM_WORLD, &MPI_WORLD_SIZE);
   PID = MPI_PID;
@@ -229,7 +232,7 @@ static void setup_random()
   else
   {
     lprintf("SETUP_RANDOM", 0, "RLXD [%d,%d]\n", rlx_var.rlxd_level, rlx_var.rlxd_seed + MPI_PID);
-    rlxd_init(rlx_var.rlxd_level, rlx_var.rlxd_seed + MPI_PID); /* use unique MPI_PID to shift seeds */
+    rlxd_init(rlx_var.rlxd_level, rlx_var.rlxd_seed); 
   }
 }
 
@@ -253,7 +256,7 @@ int finalize_process()
   free_gfield_f(u_gauge_f);
 #endif
   if (u_scalar != NULL)
-    free_scalar_field(u_scalar);
+    free_suNg_scalar_field(u_scalar);
 
   if (u_gauge_f_flt != NULL)
     free_gfield_f_flt(u_gauge_f_flt);
@@ -321,7 +324,7 @@ static int setup_replicas()
     mpiret = chdir(sbuf);
   }
 
-#endif //ifdef WITH_MPI
+#endif // ifdef WITH_MPI
 
   return 0;
 }

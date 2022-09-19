@@ -1,15 +1,12 @@
 // Global variables 
-GLB_T = 8 //Global T size
-GLB_X = 4
-GLB_Y = 4
-GLB_Z = 4
-NP_T = 1
+GLB_T = 6 //Global T size
+GLB_X = 6
+GLB_Y = 8
+GLB_Z = 10
+NP_T = 2
 NP_X = 1
 NP_Y = 1
 NP_Z = 1
-rlx_level = 1
-rlx_seed = 12345
-gpuID = 0
 
 // Replicas
 N_REP = 1
@@ -21,6 +18,6 @@ log:forcestat = 0
 
 // Random generator
 rlx_level = 1
-rlx_seed = 6432
+rlx_seed = 13813
 rlx_start = new
 rlx_state = rand_state

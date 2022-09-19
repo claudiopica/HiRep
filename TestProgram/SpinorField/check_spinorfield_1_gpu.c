@@ -26,7 +26,7 @@
 #include "logger.h"
 #include "utils.h"
 #include "io.h"
-
+#include "setup.h"
 #include "communications.h"
 
 #define MAX_ROTATE 50
@@ -35,7 +35,7 @@ static complex v[25];
 static double EPSILON=1.e-12;
 static spinor_field *ppk[5];
 
-double sfdiff_gpu (spinor_field* sf){
+double sfdiff_gpu(spinor_field* sf){
   spinor_field *tmp;
   double res;
   tmp=alloc_spinor_field_f(1, sf->type);
@@ -47,7 +47,7 @@ double sfdiff_gpu (spinor_field* sf){
   return res;
 }
 
-double sfdiff (spinor_field* sf){
+double sfdiff(spinor_field* sf){
   spinor_field *tmp;
   double res;
   tmp=alloc_spinor_field_f(1, sf->type);
@@ -64,7 +64,7 @@ double sfdiff (spinor_field* sf){
 
 int main(int argc,char *argv[])
 {
-  
+
   spinor_field *sf1,*sf2, *sf3;
   int sfsize = 3;
   double norm_cpu;
@@ -85,7 +85,7 @@ int main(int argc,char *argv[])
   sprintf(pame,"err_%d",PID); freopen(pame,"w",stderr);
 #endif
 
-  lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
+  lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE);
 
   /* read input file */
   read_input(glb_var.read,"test_input");
@@ -121,13 +121,13 @@ int main(int argc,char *argv[])
   read_input(gpu_var.read,"test_input");
   init_gpu(gpu_var);
 
-  // Allocates memory for cpu & gpu spinor field. 
+  // Allocates memory for cpu & gpu spinor field.
   sf1=alloc_spinor_field_f(sfsize, &glattice);
   sf2=alloc_spinor_field_f(sfsize, &glattice);
   sf3=alloc_spinor_field_f(sfsize, &glattice);
 
   lprintf("LA TEST",0,"Maximum grid size: %d\n", grid_size_max_gpu);
-	
+
 // CPU part set to gaussian
   for (i=0;i<sfsize;i++){
     gaussian_spinor_field(&sf1[i]);
@@ -143,9 +143,9 @@ int main(int argc,char *argv[])
     spinor_field_copy_f(&sf2[i],&sf1[i]);
     spinor_field_copy_f_cpu(&sf2[i],&sf1[i]);
     spinor_field_copy_f_cpu(&sf3[i],&sf1[i]);
-  }  
+  }
 
-  
+
   // Check copy to and from GPU, copy sf3 to GPU and back to CPU.
   // Check that it is still equal to sf1 on CPU.
   spinor_field_copy_to_gpu_f(&sf3[0]);
@@ -162,13 +162,13 @@ int main(int argc,char *argv[])
 
   // lprintf("LA TEST",0,"Check gaussian_spinor_field\n gpu=%1.10g, cpu=%1.10g, \n gpu-cpu= %1.10g\n\n",res_gpu,res_cpu,res_gpu-res_cpu);
 
-  
+
   lprintf("LA TEST",0,"DONE!\n");
 
 
   free_spinor_field_f(sf1);
   free_spinor_field_f(sf2);
-	
+
   finalize_process();
 
 }

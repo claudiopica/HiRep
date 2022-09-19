@@ -1,4 +1,5 @@
-#include "gpu_complex.h"
+#ifdef WITH_GPU
+#include "hr_complex.h"
 #include <stdio.h>
 
 #ifdef __cplusplus
@@ -29,7 +30,6 @@ int test_overload_plus_rhs_double(){
     return result;
 }
 
-#ifdef WITH_GPU
 __global__ void test_gpu1(double b, hr_complex c, hr_complex *a){
     *a = c + b;
 }
@@ -63,7 +63,6 @@ int test_overload_plus_rhs_double_gpu(){
     }
     return result;
 }
-#endif //WITH_GPU
 
 int test_overload_plus_lhs_double(){
     int result = 0;
@@ -266,7 +265,6 @@ int test_overload_prod_hr_complex(){
     return result;
 }
 
-#ifdef WITH_GPU
 __global__ void test_gpu9(hr_complex b, hr_complex c, hr_complex *a){
     *a = b * c;
 }
@@ -303,7 +301,6 @@ int test_overload_prod_hr_complex_gpu(){
     }
     return result;
 }
-#endif //WITH_GPU
 
 int test_overload_div_hr_complex(){
     int result = 0;
@@ -520,3 +517,4 @@ int test_I_prod(){
 #ifdef __cplusplus
 }
 #endif
+#endif //WITH_GPU

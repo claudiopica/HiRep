@@ -215,7 +215,7 @@ int main(int argc,char *argv[]) {
     read_ranlxd_state(rlx_var.rlxd_state);
   } else {
     lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
-    rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
+    rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed); 
   }
 
 #ifdef GAUGE_SUN
@@ -338,8 +338,6 @@ int main(int argc,char *argv[]) {
   free(n_inv_iter);
   
   
-  /* finalize Monte Carlo */
-  end_mc();
   
   /* close communications */
   finalize_process();

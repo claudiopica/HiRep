@@ -78,6 +78,5 @@ typedef struct _hmc_flow
 int init_mc_ghmc(hmc_flow *rf, char *ifile);
 int save_conf(hmc_flow *rf, int id);
 int save_scalar_conf(hmc_flow *rf, int id);
-int end_mc();
 
 #endif /* HMC_UTILS_H */

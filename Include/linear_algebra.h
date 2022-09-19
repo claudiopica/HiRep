@@ -24,10 +24,8 @@
 #define _FUNC(a) a##_f
 #include "TMPL/linear_algebra.h.sdtmpl"
 #undef _FUNC
-#ifdef WITH_GPU
 #define _FUNC(a) a##_f_cpu
 #include "TMPL/linear_algebra.h.sdtmpl"
-#endif
 #undef _FUNC
 #undef _SPINOR_FIELD_TYPE
 #undef _REAL
@@ -40,10 +38,8 @@
 #define _FUNC(a) a##_f_flt
 #include "TMPL/linear_algebra.h.sdtmpl"
 #undef _FUNC
-#ifdef WITH_GPU
 #define _FUNC(a) a##_f_flt_cpu
 #include "TMPL/linear_algebra.h.sdtmpl"
-#endif
 #undef _FUNC
 #undef _SPINOR_FIELD_TYPE
 #undef _REAL

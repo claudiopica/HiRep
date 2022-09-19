@@ -1,8 +1,9 @@
 /*******************************************************************************
-* NOCOMPILE= !WITH_MPI //remove this!!!
-* Gauge invariance of the glueball operators
-*
-*******************************************************************************/
+ *
+ * Gauge invariance of the glueball operators
+ *
+ * NOCOMPILE= NG=2
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 
@@ -68,6 +69,10 @@ int main(int argc, char *argv[])
 
   setup_gauge_fields();
 
+  report_gb_group_setup();
+
+  initialize_spatial_active_slices(NULL);
+
   /* allocate additional memory */
   g = alloc_gtransf(&glattice);
 
@@ -77,20 +82,19 @@ int main(int argc, char *argv[])
   represent_gauge_field();
   lprintf("MAIN", 0, "done.\n\n");
 
-  dop = malloc(total_n_glue_op * sizeof(double complex));
-  dop1 = malloc(total_n_glue_op * sizeof(double complex));
+  dop = malloc(T * total_n_glue_op * sizeof(double complex));
+  dop1 = malloc(T * total_n_glue_op * sizeof(double complex));
 
-  for (n = 0; n < total_n_glue_op; n++)
+  for (n = 0; n < T * total_n_glue_op; n++)
   {
     dop[n] = 0.;
     dop1[n] = 0.;
   }
 
   for (nt = 0; nt < T; nt++)
-    eval_all_glueball_ops(nt, dop);
+    eval_all_glueball_ops(nt, dop + nt * total_n_glue_op);
 
-  global_sum((double *)dop, 2 * total_n_glue_op);
-  for (n = 0; n < total_n_glue_op; n++)
+  for (n = 0; n < T * total_n_glue_op; n++)
     dop[n] /= NG * GLB_VOLUME;
 
   lprintf("MAIN", 0, "Generating and applying a random gauge transf... ");
@@ -100,27 +104,52 @@ int main(int argc, char *argv[])
   lprintf("MAIN", 0, "done.\n");
 
   for (nt = 0; nt < T; nt++)
-    eval_all_glueball_ops(nt, dop1);
+    eval_all_glueball_ops(nt, dop1 + nt * total_n_glue_op);
 
-  global_sum((double *)dop1, 2 * total_n_glue_op);
-  for (n = 0; n < total_n_glue_op; n++)
+  for (n = 0; n < T * total_n_glue_op; n++)
     dop1[n] /= NG * GLB_VOLUME;
 
-  for (n = 0; n < total_n_glue_op; n++)
+  for (n = 0; n < T * total_n_glue_op; n++)
     dop[n] -= dop1[n];
 
-  for (n = 0; n < total_n_glue_op; n++)
+  lprintf("MAIN", 0, "Checking gauge invariance of the %d glueball operators.\n ", total_n_glue_op);
+
+  double max_diff[2];
+  double min_size;
+  max_diff[0] = max_diff[1] = -1.0;
+  min_size = 10;
+
+  for (n = 0; n < T * total_n_glue_op; n++)
   {
-    lprintf("MAIN", 0, "Checking gauge invariance of the operator %d.\n ", n);
-    lprintf("MAIN", 0, "Maximal normalized real difference = %.4e\n", fabs(creal(dop[n])));
-    lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n");
-    lprintf("MAIN", 0, "Maximal normalized imaginary difference = %.4e\n", fabs(cimag(dop[n])));
-    lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
+    if (fabs(creal(dop[n])) > max_diff[0])
+      max_diff[0] = fabs(creal(dop[n]));
+
+    if (fabs(cimag(dop[n])) > max_diff[1])
+      max_diff[1] = fabs(cimag(dop[n]));
+
+    if (sqrt(creal(dop1[n]) * creal(dop1[n]) + cimag(dop1[n]) * cimag(dop1[n])) < min_size)
+      min_size = sqrt(creal(dop1[n]) * creal(dop1[n]) + cimag(dop1[n]) * cimag(dop1[n]));
+
     if (fabs(creal(dop[n])) > 10.e-14)
       return_value++;
     if (fabs(cimag(dop[n])) > 10.e-14)
       return_value++;
+    if (sqrt(creal(dop1[n]) * creal(dop1[n]) + cimag(dop1[n]) * cimag(dop1[n])) < 10.e-14)
+    {
+      lprintf("MAIN", 0, "Operator %d seems to be numerically zero\n", n % T);
+      return_value++;
+    }
   }
+  global_sum_int(&return_value, 1);
+  global_max(max_diff, 2);
+  global_min(&min_size, 1);
+
+  lprintf("MAIN", 0, "Maximal normalized real difference = %.4e\n", max_diff[0]);
+  lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n");
+  lprintf("MAIN", 0, "Maximal normalized imaginary difference = %.4e\n", max_diff[1]);
+  lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n");
+  lprintf("MAIN", 0, "Minimal amplitude of the operators = %.4e\n", min_size);
+  lprintf("MAIN", 0, "(should be greater 1*10^(-15) or so)\n\n");
 
   free_gtransf(g);
 

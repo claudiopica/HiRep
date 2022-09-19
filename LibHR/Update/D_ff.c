@@ -45,15 +45,30 @@ void set_ff_dirac_shift(double shift){
 
 
 //Fields for temporary storage, from Dphi.c
-extern int init_dirac;
-extern spinor_field *gtmp;
-extern spinor_field *etmp;
-extern spinor_field *otmp;
-extern spinor_field *otmp2;
-
-void init_Dirac();
+static int init_dirac=1;
+static spinor_field *gtmp;
+static spinor_field *etmp;
+static spinor_field *otmp;
+static spinor_field *otmp2;
 
 
+static void free_mem() {
+    if (gtmp!=NULL) { free_spinor_field_f(gtmp); gtmp=NULL; }
+    if (etmp!=NULL) { free_spinor_field_f(etmp); etmp=NULL; }
+    if (otmp!=NULL) { free_spinor_field_f(otmp); otmp=NULL; }
+    if (otmp2!=NULL) { free_spinor_field_f(otmp2); otmp2=NULL; }
+    init_dirac=1;
+}
+static void init_Dirac() {
+    if (init_dirac) {
+        gtmp=alloc_spinor_field_f(1,&glattice);
+        etmp=alloc_spinor_field_f(1,&glat_even);
+        otmp=alloc_spinor_field_f(1,&glat_odd);
+        otmp2=alloc_spinor_field_f(1,&glat_odd);
+        atexit(&free_mem);
+        init_dirac=0;
+    }
+}
 
 
 //NOTE: With four fermion auxiliary fields, there is a diagonal

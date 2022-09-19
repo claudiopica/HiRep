@@ -321,6 +321,7 @@ int geometry_init() {
   lprintf("GEOMETRY_INIT",0,"Local size is %dx%dx%dx%d\n",T,X,Y,Z);
   lprintf("GEOMETRY_INIT",0,"Extended local size is %dx%dx%dx%d\n",T_EXT,X_EXT,Y_EXT,Z_EXT);
   lprintf("GEOMETRY_INIT",0,"The lattice borders are (%d,%d,%d,%d)\n",T_BORDER,X_BORDER,Y_BORDER,Z_BORDER);
+  lprintf("GEOMETRY_INIT",0,"Size of the bulk subblocking (%d,%d,%d,%d)\n",PB_T,PB_X,PB_Y,PB_Z);
   
   check_geometry_variables();
   
