@@ -31,10 +31,12 @@
 #define _COMPLEX hr_complex
 #define _FUNC(a) a##_f
 #ifdef WITH_GPU
-#include "TMPL/linear_algebra_gpu.c.sdtmpl"
+  #include "TMPL/linear_algebra_gpu.c.sdtmpl"
+#else
+  #include "TMPL/linear_algebra.c.sdtmpl"
+#endif
 #undef _FUNC
 #define _FUNC(a) a##_f_cpu
-#endif
 #include "TMPL/linear_algebra.c.sdtmpl"
 #undef _FUNC
 #undef _SPINOR_FIELD_TYPE
@@ -50,10 +52,12 @@
 #define _COMPLEX hr_complex_flt
 #define _FUNC(a) a##_f_flt
 #ifdef WITH_GPU
-#include "TMPL/linear_algebra_gpu.c.sdtmpl"
+  #include "TMPL/linear_algebra_gpu.c.sdtmpl"
+#else
+  #include "TMPL/linear_algebra.c.sdtmpl"
+#endif
 #undef _FUNC
 #define _FUNC(a) a##_f_flt_cpu
-#endif
 #include "TMPL/linear_algebra.c.sdtmpl"
 #undef _FUNC
 #undef _SPINOR_FIELD_TYPE

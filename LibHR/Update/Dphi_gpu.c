@@ -344,7 +344,6 @@ void Dphi_oepre(double m0, spinor_field *out, spinor_field *in)
 void g5Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
 {
   double rho;
-  std::cout << "In g5Dphi_eopre()" << std::endl;
 
   error((in==NULL)||(out==NULL), 1, "g5Dphi_eopre [Dphi_gp.c]",
 	"Attempt to access unallocated memory space");
@@ -363,20 +362,8 @@ void g5Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
   /* alloc memory for temporary spinor field */
   if (init) { init_Dirac();}
 
-  std::cout << "Before Dphi_:" << sqrt(spinor_field_sqnorm_f(in)) << std::endl;
-  std::cout << "   Before in ptr:" << (in)->gpu_ptr << std::endl;
-  std::cout << "   Before out ptr:" << (out)->gpu_ptr << std::endl;
-  std::cout << "   Before otmp ptr:" << (otmp)->gpu_ptr << std::endl;
   Dphi_(otmp, in);
-  std::cout << "Between Dphi_:" << sqrt(spinor_field_sqnorm_f(in)) << std::endl;
-  std::cout << "   Between in ptr:" << (in)->gpu_ptr << std::endl;
-  std::cout << "   Between out ptr:" << (out)->gpu_ptr << std::endl;
-  std::cout << "   Between otmp ptr:" << (otmp)->gpu_ptr << std::endl;
   Dphi_(out, otmp);
-  std::cout << "After Dphi_:" << sqrt(spinor_field_sqnorm_f(in)) << std::endl;
-  std::cout << "   After in ptr:" << (in)->gpu_ptr << std::endl;
-  std::cout << "   After out ptr:" << (out)->gpu_ptr << std::endl;
-  std::cout << "   After otmp ptr:" << (otmp)->gpu_ptr << std::endl;
 
   rho=4.0+m0;
   rho*=-rho; /* this minus sign is taken into account below */
@@ -394,7 +381,6 @@ void g5Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
 /* g5Dphi_eopre ^2 */
 void g5Dphi_eopre_sq(double m0, spinor_field *out, spinor_field *in) {
   /* alloc memory for temporary spinor field */
-  std::cout << "In g5Dphi_eopre_sq" << std::endl;
   if (init) { init_Dirac(); }
 
   g5Dphi_eopre(m0, etmp, in);
