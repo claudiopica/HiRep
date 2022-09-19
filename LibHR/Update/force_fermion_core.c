@@ -847,10 +847,6 @@ void force_fermion_core(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, d
 	// Loop over lattice
 	_PIECE_FOR(&glattice, xp)
 	{
-		suNg_algebra_vector f;
-		suNf_vector ptmp;
-		suNf_spinor p;
-		suNf_FMAT s1;
 
 		if (xp == glattice.inner_master_pieces)
 		{
@@ -864,6 +860,11 @@ void force_fermion_core(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, d
 
 		_SITE_FOR(&glattice, xp, ix)
 		{
+			suNg_algebra_vector f;
+			suNf_vector ptmp;
+			suNf_spinor p;
+
+			suNf_FMAT s1;
 			int iy;
 			suNf_spinor *chi1, *chi2;
 

@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include "setup.h"
 #include "io.h"
 #include "update.h"
 #include "geometry.h"
@@ -73,8 +74,6 @@ int main(int argc,char *argv[])
     read_input(rlx_var.read,"test_input");
     lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
     rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID); /* use unique MPI_PID to shift seeds */
-
-
 
   lprintf("MAIN",0,"Gauge group: SU(%d)\n",NG);
   lprintf("MAIN",0,"Fermion representation: dim = %d\n",NF);

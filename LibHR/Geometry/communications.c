@@ -141,6 +141,44 @@ void global_max(double *d, int n) {
 #endif
 }
 
+void global_min(double *d, int n) {
+#ifdef WITH_MPI
+  int mpiret;(void)mpiret; // Remove warning of variable set but not used
+  double pres[n];
+
+#ifdef MPI_TIMING
+  struct timeval start, end, etime;
+  gettimeofday(&start,0);  
+#endif
+  
+  mpiret=MPI_Allreduce(d,pres,n,MPI_DOUBLE,MPI_MIN,GLB_COMM);
+
+  
+#ifdef MPI_TIMING
+  gettimeofday(&end,0);
+  timeval_subtract(&etime,&end,&start);
+  lprintf("MPI TIMING",0,"global_max " __FILE__ " %ld sec %ld usec\n",etime.tv_sec,etime.tv_usec);
+#endif
+
+#ifndef NDEBUG
+  if (mpiret != MPI_SUCCESS) {
+    char mesg[MPI_MIN_ERROR_STRING];
+    int mesglen;
+    MPI_Error_string(mpiret,mesg,&mesglen);
+    lprintf("MPI",0,"ERROR: %s\n",mesg);
+    error(1,1,"global_min " __FILE__,"Cannot perform global_sum");
+  }
+#endif
+  while(n>0) { 
+    --n;
+    d[n]=pres[n];	
+  }
+#else
+  /* for non mpi do nothing */
+  return;
+#endif
+}
+
 
 void bcast(double *d, int n) {
 #ifdef WITH_MPI
@@ -275,7 +313,7 @@ static void sync_gauge_transf(suNg_field *gf) {
   }
 }
 
-static void sync_scalar_field(suNg_scalar_field *p) {
+static void sync_suNg_scalar_field(suNg_scalar_field *p) {
 	int i;
 	/* int j, x, y; */
 	geometry_descriptor *gd = p->type;
@@ -533,7 +571,7 @@ void complete_sf_sendrecv(spinor_field *sf) {
       for (k=0; k<nreq; ++k) {
         if (status[k].MPI_ERROR != MPI_SUCCESS) {
           MPI_Error_string(status[k].MPI_ERROR,mesg,&mesglen);
-          lprintf("MPI",0,"Req [%d] Source [%d] Tag [%] ERROR: %s\n",
+          lprintf("MPI",0,"Req [%d] Source [%d] Tag [%d] ERROR: %s\n",
               k, 
               status[k].MPI_SOURCE, 
               status[k].MPI_TAG, 
@@ -769,7 +807,7 @@ void start_sc_sendrecv(suNg_scalar_field *sf) {
   complete_sc_sendrecv(sf);
 
   /* fill send buffers */
-  sync_scalar_field(sf);
+  sync_suNg_scalar_field(sf);
 #ifdef MPI_TIMING
   error(sf_control>0,1,"start_sc_sendrecv " __FILE__,"Multiple send without receive");
   gettimeofday(&sfstart,0);  

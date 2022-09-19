@@ -306,11 +306,11 @@ double complex twopoint_rho12(fourvec p, double m,int L, int LT, int t)
 #define FV(A,B) (fourvec) {{Q(A##1,L), Q(A##2,L), Q(A##3,L), Q(B,LT)}}
 
 
-complex double C(fourvec px, fourvec py, double m, int L, int LT, int t)
+double complex C(fourvec px, fourvec py, double m, int L, int LT, int t)
 {
   fourvec mom[4];
   int q11, q12, q13, q14, q24, q34, q44, i,j;
-  complex double res;
+  double complex res;
   res = 0.0*I;
   double numerator, denominator;
   double af1[4];

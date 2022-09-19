@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
   fermion_force_begin();
   force_clover_fermion(Xl, Yl, 1.0);
 
-  complex double aux;
+  double complex aux;
   double norm = 0.;
 
   _MASTER_FOR(&glattice, ix)
@@ -112,14 +112,6 @@ int main(int argc, char *argv[])
     return_value += 1;
   }
 
-#endif
-
-  /* finalize Monte Carlo */
-  end_mc();
-
-  free_gfield(u_gauge);
-#ifndef REPR_FUNDAMENTAL
-  free_gfield_f(u_gauge_f);
 #endif
 
   finalize_process();

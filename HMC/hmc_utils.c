@@ -384,22 +384,3 @@ int save_scalar_conf(hmc_flow *rf, int id)
 
 	return 0;
 }
-
-/* clean up memory */
-int end_mc()
-{
-	free_ghmc();
-	free_BCs();
-
-	/* free memory */
-	free_gfield(u_gauge);
-#ifdef ALLOCATE_REPR_GAUGE_FIELD
-	free_gfield_f(u_gauge_f);
-#endif
-	if (u_scalar != NULL)
-	{
-		free_scalar_field(u_scalar);
-	}
-
-	return 0;
-}

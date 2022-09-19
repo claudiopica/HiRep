@@ -1,0 +1,69 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+
+\title{Maximally Twisted Mass eo preconditioned Dw for propagator measurement}
+\author{Fernando }
+\date{June 2022}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+Separating the even and odd parts, the Dirac equation can be expressed as
+\begin{equation}
+\left(\begin{array}{l}
+\eta_{e} \\
+\eta_{o}
+\end{array}\right)=\left(\begin{array}{cc}
+D_{e, e} & D_{e, o} \\
+D_{o, e} & D_{o, o}
+\end{array}\right)\left(\begin{array}{l}
+\psi_{e} \\
+\psi_{o}
+\end{array}\right),
+\end{equation}
+where $\eta$ is the source and $\psi$ is the solution. This can be reduced to an equation that involves only the even sites:
+\begin{equation}
+    \eta_{e}-D_{e, o} D_{o, o}^{-1} \eta_{o}=\left[D_{e, e} D_{e, e}^{\dagger}-D_{e, o} D_{o, o}^{-1} D_{o, e} D_{e, e}^{\dagger}\right]\left(D_{e, e}^{\dagger}\right)^{-1} \psi_{e}.
+\end{equation}
+This can be seen as
+\begin{equation}
+\eta_{e}^{\prime}=D_{p r e} \psi_{e}^{\prime},
+\end{equation}
+where
+\begin{align}
+\begin{split}
+\eta_{e}^{\prime} &\equiv \eta_{e}-D_{e, o} D_{o, o}^{-1} \eta_{o}, \\
+D_{p r e} &\equiv D_{e, e} D_{e, e}^{\dagger}-D_{e, o} D_{o, o}^{-1} D_{o, e} D_{e, e}^{\dagger}, \\
+\psi_{e}^{\prime} &\equiv\left(D_{e, e}^{\dagger}\right)^{-1} \psi_{e}.
+\end{split}
+\end{align}
+To solve the equation with the CG algorithm one needs an hermitian operator. For this, we apply the conjugate of the operator:
+\begin{equation}
+\gamma_{5} D_{p r e}^{\dagger} \eta_{e}^{\prime}=\gamma_{5} D_{p r e}^{\dagger} \gamma_{5} D_{p r e} \psi_{e}^{\prime}.
+\end{equation}
+Finally, the full solution can be reconstructed as:
+\begin{align}
+\begin{split} 
+\psi_e &= D_{e, e}^{\dagger} \psi_e', \\
+\psi_{o}&=D_{o, o}^{-1} \eta_{o}-D_{o, o}^{-1} D_{o, e} \psi_{e}.
+\end{split}
+\end{align}
+
+
+This formulation can be applied to a generic Wilson operator. In particular, for the twisted mass operator, the only change is in the $(e,e)$ and $(o,o)$ part of the operator:
+\begin{equation}
+    D^{tm} = D^W + i \mu \gamma_5, 
+\end{equation}
+where $D^W$ is the Wilson operator. Therefore,
+\begin{equation}
+    D^{tm}_{e,e} = D^{tm}_{o,o} = 4 + m_0 + i \mu \gamma_5,
+\end{equation}
+while the off-diagonal terms are identical to $D^W$. Note that the inverse of the diagonal part od the operator is easy to compute:
+\begin{equation}
+    (D^{tm}_{e,e})^{-1} =\frac{ 4 + m_0 - i \mu \gamma_5}{(4+m_0)^2 + \mu^2}.
+\end{equation}
+\end{document}

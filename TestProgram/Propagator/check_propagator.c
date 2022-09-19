@@ -1,13 +1,13 @@
 /*
-* NOCOMPILE= BASIC_SF
-* NOCOMPILE= ROTATED_SF
-* NOCOMPILE= FERMION_THETA
-*/
+ * NOCOMPILE= BASIC_SF
+ * NOCOMPILE= ROTATED_SF
+ * NOCOMPILE= FERMION_THETA
+ */
 /*******************************************************************************
-*
-* Checks of propagator, spinmatrix and the sequential sources
-*
-*******************************************************************************/
+ *
+ * Checks of propagator, spinmatrix and the sequential sources
+ *
+ *******************************************************************************/
 
 #define MAIN_PROGRAM
 
@@ -65,7 +65,7 @@ typedef struct _input_mesons
 
 input_mesons mes_var;
 
-//Check: g5 D^dag(x,0) g5 = D(0,x)
+// Check: g5 D^dag(x,0) g5 = D(0,x)
 static int check_g5herm(spinor_field *prop1, int t1, spinor_field *prop2)
 {
 
@@ -75,18 +75,20 @@ static int check_g5herm(spinor_field *prop1, int t1, spinor_field *prop2)
   double complex tr = 0.;
 #ifdef WITH_MPI
   MPI_Status st;
+  MPI_Request req;
 #endif
 
   int sender_rank = 0;
-  if (t1 > zerocoord[0] && t1 < zerocoord[0] + T && COORD[1] == 0 && COORD[2] == 0 && COORD[3] == 0)
+  if (t1 >= zerocoord[0] && t1 < zerocoord[0] + T && COORD[1] == 0 && COORD[2] == 0 && COORD[3] == 0)
   {
     sender_rank = PID;
     ix1 = ipt(t1 - zerocoord[0], 0, 0, 0);
     for (a = 0; a < NF; ++a)
       for (beta = 0; beta < 4; beta++)
-        _propagator_assign(sp1, *_FIELD_AT(&prop1[a * 4 + beta], ix1), a, beta); //S( (ti,0,0,0), (0,0,0,0) )
+        _propagator_assign(sp1, *_FIELD_AT(&prop1[a * 4 + beta], ix1), a, beta); // S( (ti,0,0,0), (0,0,0,0) )
+
 #ifdef WITH_MPI
-    MPI_Send(&sp1, NF * 4 * 4 * sizeof(suNf_vector) / sizeof(double), MPI_DOUBLE, 0, 999, GLB_COMM);
+    MPI_Isend(&sp1, NF * 4 * 4 * sizeof(suNf_vector) / sizeof(double), MPI_DOUBLE, 0, 999, GLB_COMM,&req);
 #endif
   }
 
@@ -95,31 +97,33 @@ static int check_g5herm(spinor_field *prop1, int t1, spinor_field *prop2)
   if (COORD[0] == 0 && COORD[1] == 0 && COORD[2] == 0 && COORD[3] == 0)
   {
 #ifdef WITH_MPI
-    MPI_Recv(&sp1, NF * 4 * 4 * sizeof(suNf_vector) / sizeof(double), MPI_DOUBLE, sender_rank, 999, GLB_COMM, &st);
+    MPI_Irecv(&sp1, NF * 4 * 4 * sizeof(suNf_vector) / sizeof(double), MPI_DOUBLE, sender_rank, 999, GLB_COMM, &req);
+    MPI_Wait(&req,&st);
 #endif
-
     ix2 = ipt(0, 0, 0, 0);
 
     for (a = 0; a < NF; ++a)
     {
       for (beta = 0; beta < 4; beta++)
       {
-        _propagator_assign(sp2, *_FIELD_AT(&prop2[a * 4 + beta], ix2), a, beta); //S( (0,0,0,0), (ti,0,0) )
+        _propagator_assign(sp2, *_FIELD_AT(&prop2[a * 4 + beta], ix2), a, beta); // S( (0,0,0,0), (ti,0,0) )
       }
     }
     _propagator_dagger(spdag, sp2);
     _g5_propagator(sp2, spdag);
     _propagator_g5(spdag, sp2);
     lprintf("CK_G5HERM", 0, "Propagator1\n");
-    //print_prop(sp1);
+    // print_prop(sp1);
     lprintf("CK_G5HERM", 0, "g5 Propagator2^dagger g5 \n");
-    //print_prop(spdag);
+    // print_prop(spdag);
     _propagator_sub(sp2, sp1, spdag);
     lprintf("CK_G5HERM", 0, "Propagator1 - g5 Propagator2^dagger g5 \n");
-    //print_prop(sp2);
+    // print_prop(sp2);
     _propagator_trace(tr, sp2);
     lprintf("CK_G5HERM", 0, "Tr[ g5 Propagator1^dag g5 - Propagator2 ] = %g + I%g\n", creal(tr), cimag(tr));
   }
+
+  global_sum((double *)&tr, 2);
 
   if (cabs(tr) > 1.e-14)
     return 1;
@@ -127,7 +131,7 @@ static int check_g5herm(spinor_field *prop1, int t1, spinor_field *prop2)
     return 0;
 }
 
-//source = g5 prop( x, 0 ) delta( x, (tf,0,0,0) )
+// source = g5 prop( x, 0 ) delta( x, (tf,0,0,0) )
 void create_sequential_source_point(spinor_field *source, int tf, spinor_field *prop)
 {
 
@@ -148,7 +152,7 @@ void create_sequential_source_point(spinor_field *source, int tf, spinor_field *
       _propagator_assign(sp0, *_FIELD_AT(&prop[a * 4 + beta], ix), a, beta);
     }
   }
-  _g5_propagator(sp1, sp0); //g5 Prop
+  _g5_propagator(sp1, sp0); // g5 Prop
   _propagator_transpose(sp0, sp1);
 
   for (a = 0; a < NF; ++a)
@@ -165,7 +169,6 @@ void create_sequential_source_point(spinor_field *source, int tf, spinor_field *
     complete_sf_sendrecv(source + beta);
   }
 }
-
 
 int main(int argc, char *argv[])
 {
@@ -219,13 +222,13 @@ int main(int argc, char *argv[])
 
   gettimeofday(&start, 0);
 
-  init_propagator_eo(1, m, mes_var.precision); //1 for number of masses
+  init_propagator_eo(1, m, mes_var.precision); // 1 for number of masses
   for (k = 0; k < NF; ++k)
   {
     create_point_source(source, 0, k);
-    calc_propagator(prop_1 + 4 * k, source, 4); //4 for spin components
+    calc_propagator(prop_1 + 4 * k, source, 4); // 4 for spin components
     create_point_source(source, mes_var.ti, k);
-    calc_propagator(prop_2 + 4 * k, source, 4); //4 for spin components
+    calc_propagator(prop_2 + 4 * k, source, 4); // 4 for spin components
   }
   tmp = check_g5herm(prop_1, mes_var.ti, prop_2);
   return_value += tmp;

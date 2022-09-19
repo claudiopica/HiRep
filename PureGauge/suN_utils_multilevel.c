@@ -1,5 +1,5 @@
 /***************************************************************************\
- *                                    * 
+ *                                    *
  \***************************************************************************/
 
 #include <ctype.h>
@@ -286,7 +286,7 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
 
     parse_ml_corellator_def();
 
-    lprintf("INIT ML", 0, "Blocking iteration on the observables=%d\n", pg_var_ml.nblk);
+    lprintf("INIT ML", 0, "Blocking iteration on the observables (start/end)=(%d/%d)\n", pg_var_ml.nblkstart, pg_var_ml.nblkend);
     lprintf("INIT ML", 0, "Ape smearing par=%lf\n", pg_var_ml.APEsmear);
 
     read_input(gf->read, ifile);
@@ -306,8 +306,11 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
 
     lprintf("INIT ML", 0, "Separation between each measure=%d\n", gf->nskip);
 
-    /* glueballs 1pt group structure */
-    report_op_group_setup();
+    /* glueballs 1pt  group structure */
+    report_gb_group_setup();
+
+    /* Torellons 1pt group structure */
+    report_tor_group_setup();
 
     BCs_pars_t BCs_pars = {
         .fermion_twisting_theta = {0., 0., 0., 0.},
@@ -376,14 +379,17 @@ int init_mc_ml_measure(pg_flow_ml_measure *gf, char *ifile)
     pg_var_ml.ml_nskip = malloc(sizeof(int) * pg_var_ml.ml_levels);
 
     parse_ml_corellator_def();
- 
-    lprintf("INIT ML", 0, "Blocking iteration on the observables=%d\n", pg_var_ml.nblk);
+
+    lprintf("INIT ML", 0, "Blocking iteration on the observables (start/end)=(%d/%d)\n", pg_var_ml.nblkstart, pg_var_ml.nblkend);
     lprintf("INIT ML", 0, "Ape smearing par=%lf\n", pg_var_ml.APEsmear);
 
     read_input(gf->read, ifile);
 
     /* glueballs 1pt group structure */
-    report_op_group_setup();
+    report_gb_group_setup();
+
+    /* Torellons 1pt group structure */
+    report_tor_group_setup();
 
     BCs_pars_t BCs_pars = {
         .fermion_twisting_theta = {0., 0., 0., 0.},
@@ -426,15 +432,6 @@ int save_conf(pg_flow_ml *gf, int id)
 #else
     write_gauge_field(add_dirname(gf->conf_dir, buf));
 #endif
-
-    return 0;
-}
-
-int end_mc_ml()
-{
-    WF_free();
-
-    free_BCs();
 
     return 0;
 }

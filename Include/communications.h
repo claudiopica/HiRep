@@ -9,6 +9,7 @@
 void global_sum(double *d, int n);
 void global_sum_int(int *d, int n);
 void global_max(double *d, int n);
+void global_min(double *d, int n);
 void bcast(double *d, int n);
 void bcast_int(int *i, int n);
 

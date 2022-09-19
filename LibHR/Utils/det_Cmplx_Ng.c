@@ -1,8 +1,8 @@
 /*******************************************************************************
 *
-* File  det_hermNg.c
+* File  det_Cmplx_Ng.c
 *
-* Function to calculate determinant of an hermitian-matrix using
+* Function to calculate determinant of an non-hermitian-matrix using
 * LU-decomposition. See NR.
 *
 * Ari Hietanen
@@ -19,7 +19,7 @@
 #ifndef GAUGE_SON
 
 #ifdef WITH_QUATERNIONS
-void det_hermNg(double complex *res, suNg *a)
+void det_Cmplx_Ng(double complex *res, suNg *a)
 {
   suNg b;
   double det;
@@ -31,7 +31,7 @@ void det_hermNg(double complex *res, suNg *a)
 
 #else
 
-void det_hermNg(double complex *res, suNg *a)
+void det_Cmplx_Ng(double complex *res, suNg *a)
 {
   suNg b;
   int indx[NG];
@@ -54,7 +54,7 @@ void det_hermNg(double complex *res, suNg *a)
 
 /* The incoming matrix will be destroyed */
 
-void det_hermNg(double *res, suNg *a)
+void det_Cmplx_Ng(double *res, suNg *a)
 {
   double vv[NG];
   double csum, ctmp, cdum;
