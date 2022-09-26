@@ -90,7 +90,7 @@ _BODY({
 })
 
 /* Im <g5*s1,s2> */
-double _FUNC(double, spinor_field_g5_prod_im, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_FUNC(double, spinor_field_g5_prod_im, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
 _BODY({
     static double res;
     _OMP_PRAGMA ( single ) {

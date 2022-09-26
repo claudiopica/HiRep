@@ -26,12 +26,15 @@
   #include "TMPL/linear_algebra.h.sdtmpl"
   #undef _FUNC
 #endif
-#define _FUNC(a) a##_f_cpu
+#define _FUNC(a,b,...) a b##_f_cpu __VA_ARGS__
+#define _BODY(a) ;
 #include "TMPL/linear_algebra.h.sdtmpl"
 #undef _FUNC
-#define _FUNC(a) a##_f
+#undef _BODY
+#define _FUNC(a,b,...) a b##_f __VA_ARGS__
 #include "TMPL/linear_algebra.h.sdtmpl"
 #undef _FUNC
+#undef _BODY
 #undef _SPINOR_FIELD_TYPE
 #undef _REAL
 #undef _COMPLEX
@@ -45,12 +48,14 @@
   #include "TMPL/linear_algebra.h.sdtmpl"
   #undef _FUNC
 #endif
-#define _FUNC(a) a##_f_flt_cpu
+#define _FUNC(a,b,...) a b##_f_flt_cpu __VA_ARGS__
 #include "TMPL/linear_algebra.h.sdtmpl"
 #undef _FUNC
-#define _FUNC(a) a##_f_flt
+#undef _BODY
+#define _FUNC(a,b,...) a b##_f_flt __VA_ARGS__
 #include "TMPL/linear_algebra.h.sdtmpl"
 #undef _FUNC
+#undef _BODY
 #undef _SPINOR_FIELD_TYPE
 #undef _REAL
 #undef _COMPLEX

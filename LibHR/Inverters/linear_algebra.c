@@ -30,16 +30,20 @@
 #define _SPINOR_TYPE suNf_spinor
 #define _REAL double
 #define _COMPLEX hr_complex
-#define _FUNC(a) a##_f
+#define _FUNC(a,b,...) a b##_f __VA_ARGS__
+#define _BODY(a) a
 #ifdef WITH_GPU
   #include "TMPL/linear_algebra_gpu.c.sdtmpl"
 #else
   #include "TMPL/linear_algebra.c.sdtmpl"
 #endif
 #undef _FUNC
-#define _FUNC(a) a##_f_cpu
+#undef _BODY
+#define _FUNC(a,b,...) a b##_f_cpu __VA_ARGS__
+#define _BODY(a) a
 #include "TMPL/linear_algebra.c.sdtmpl"
 #undef _FUNC
+#undef _BODY
 #undef _SPINOR_FIELD_TYPE
 #undef _SPINOR_TYPE
 #undef _REAL
@@ -51,16 +55,20 @@
 #define _SPINOR_TYPE suNf_spinor_flt
 #define _REAL float
 #define _COMPLEX hr_complex_flt
-#define _FUNC(a) a##_f_flt
+#define _FUNC(a,b,...) a b##_f_flt __VA_ARGS__
+#define _BODY(a) a
 #ifdef WITH_GPU
   #include "TMPL/linear_algebra_gpu.c.sdtmpl"
 #else
   #include "TMPL/linear_algebra.c.sdtmpl"
 #endif
 #undef _FUNC
-#define _FUNC(a) a##_f_flt_cpu
+#undef _BODY
+#define _FUNC(a,b,...) a b##_f_flt_cpu __VA_ARGS__
+#define _BODY(a) a
 #include "TMPL/linear_algebra.c.sdtmpl"
 #undef _FUNC
+#undef _BODY
 #undef _SPINOR_FIELD_TYPE
 #undef _SPINOR_TYPE
 #undef _REAL
