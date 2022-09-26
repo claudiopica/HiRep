@@ -16,23 +16,26 @@
 #include "suN.h"
 #include "spinor_field.h"
 #include "hr_complex.h"
-#undef hr_complex
 
 /* double precision */
 #define _SPINOR_FIELD_TYPE spinor_field
 #define _REAL double
 #define _COMPLEX hr_complex
+#define _BODY(a) a
 #ifdef WITH_GPU
-  #define _FUNC(a) a##_f_gpu
-  #include "TMPL/linear_algebra.c.sdtmpl"
-  #undef _FUNC
+    #define _FUNC(a) a##_f_gpu
+    #include "TMPL/linear_algebra.c.sdtmpl"
+    #undef _FUNC
 #endif
 #define _FUNC(a,b,c) a b##_f_cpu c
-#define _BODY(a) ;
 #include "TMPL/linear_algebra.c.sdtmpl"
 #undef _FUNC
 #undef _BODY
-#define _FUNC(a,b,c) a (*b##_f) c
+#ifdef WITH_GPU
+    #define _FUNC(a,b,c) b##_f = b##_f_gpu
+#else
+    #define _FUNC(a,b,c) b##_f = b##_f_cpu
+#endif
 #define _BODY(a) ;
 #include "TMPL/linear_algebra.c.sdtmpl"
 #undef _FUNC
@@ -40,6 +43,8 @@
 #undef _SPINOR_FIELD_TYPE
 #undef _REAL
 #undef _COMPLEX
+
+#if 0
 
 /* single precision */
 #define _SPINOR_FIELD_TYPE spinor_field_flt
@@ -79,6 +84,7 @@
   #ifdef __cplusplus
   }
   #endif
+#endif
 #endif
 
 #endif
