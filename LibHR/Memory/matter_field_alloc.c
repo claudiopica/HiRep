@@ -126,16 +126,16 @@
             _site_type *r = 0;                                                                              \
             int number_of_elements;                                                                         \
             error(out->type != in->type, 1, "to_gpu_format_" #_name " " __FILE__,                           \
-                    "Gauge field geometries do not match!\n");                                              \
+                    "Matter field geometries do not match!\n");                                              \
             _PIECE_FOR(in->type, ixp)                                                                       \
             {                                                                                               \
                 const int start = in->type->master_start[ixp];                                              \
-                const int N = in->type->master_end[ixp] - in->type->master_start[ixp];                      \
+                const int N = in->type->master_end[ixp] - in->type->master_start[ixp] + 1;                       \
                 /* Does not work for the single precision types */                                          \
                 hr_complex *cout = (hr_complex*)(_FIELD_AT(out, start));                                    \
-                _SITE_FOR(in->type, ixp, ix)                                                                 \
+                _SITE_FOR(in->type, ixp, ix)                                                                \
                 {                                                                                           \
-                    r = _FIELD_AT(in, ix);                                                                   \
+                    r = _FIELD_AT(in, ix);                                                                  \
                                                                                                             \
                     number_of_elements = sizeof(*r)/sizeof(hr_complex);                                     \
                     for (int j = 0; j < number_of_elements; ++j)                                            \
@@ -153,21 +153,21 @@
             _site_type *r = 0;                                                                              \
             int number_of_elements;                                                                         \
             error(out->type != in->type, 1, "to_cpu_format_" #_name " " __FILE__,                           \
-                        "Gauge field geometries do not match!\n");                                          \
+                        "Matter field geometries do not match!\n");                                          \
             _PIECE_FOR(in->type, ixp)                                                                       \
             {                                                                                               \
                 const int start = in->type->master_start[ixp];                                              \
-                const int N = in->type->master_end[ixp] - in->type->master_start[ixp];                      \
-                double *cin = (double*)(_4FIELD_AT(in, start, 0));                                          \
+                const int N = in->type->master_end[ixp] - in->type->master_start[ixp] + 1;                      \
+                hr_complex *cin = (hr_complex*)(_FIELD_AT(in, start));                                          \
                                                                                                             \
                 _SITE_FOR(in->type, ixp, ix)                                                                \
                 {                                                                                           \
-                    r = _4FIELD_AT(out, ix, 0);                                                             \
+                    r = _FIELD_AT(out, ix);                                                             \
                                                                                                             \
-                    number_of_elements = _size * sizeof(*r)/sizeof(double);                                 \
+                    number_of_elements = sizeof(*r)/sizeof(hr_complex);                                 \
                     for (int j = 0; j < number_of_elements; ++j)                                            \
                     {                                                                                       \
-                        ((double*)(r))[j] = cin[j*N];                                                       \
+                        ((hr_complex*)(r))[j] = cin[j*N];                                                       \
                     }                                                                                       \
                     ++cin;                                                                                  \
                 }                                                                                           \
@@ -188,8 +188,8 @@
 /* ============================================== All cases ============================================== */
 
 /* deallocation function declaration */
-#define _DECLARE_FREE_FUNC(_name,_field_type)                                                                     \
-    void free_##_name(_field_type *u)                                                                             \
+#define _DECLARE_FREE_FUNC(_name,_field_type)                                                               \
+    void free_##_name(_field_type *u)                                                                       \
     {                                                                                                       \
         if (u!=NULL) {                                                                                      \
             if (u->ptr!=NULL)                                                                               \
@@ -202,11 +202,11 @@
     }
 
 /* allocation function declaration */
-#define _DECLARE_ALLOC_FUNC(_name, _field_type, _size)                                                              \
-    _field_type *alloc_##_name(unsigned int n, geometry_descriptor *type)                                         \
+#define _DECLARE_ALLOC_FUNC(_name, _field_type, _size)                                                      \
+    _field_type *alloc_##_name(unsigned int n, geometry_descriptor *type)                                   \
     { \
         /* Allocate field struct pointer */                                                                 \
-        _field_type *f;                                                                                           \
+        _field_type *f;                                                                                     \
                                                                                                             \
         if (n == 0)                                                                                         \
             return NULL;                                                                                    \
@@ -220,7 +220,7 @@
                                                                                                             \
         if(alloc_mem_t & CPU_MEM)                                                                           \
         {                                                                                                   \
-            int field_size = _size * type->gsize_gauge * sizeof(*(f->ptr), ALIGN);                          \
+            int field_size = _size * type->gsize_gauge * sizeof(*(f->ptr));                                 \
             f->ptr = amalloc(field_size, ALIGN);                                                            \
             for(int i = 1; i < n; ++i)                                                                      \
                 f[i].ptr=f[i-1].ptr + type->gsize_spinor * _size;                                           \
@@ -240,9 +240,9 @@
         return f;                                                                                           \
     }
 
-#define _DECLARE_MEMORY_FUNC(_name, _field_type, _site_type, _size)                                                             \
-    _DECLARE_FREE_FUNC(_name,_field_type)                                                                         \
-    _DECLARE_ALLOC_FUNC(_name,_field_type,_size)                                                                  \
+#define _DECLARE_MEMORY_FUNC(_name, _field_type, _site_type, _size)                                         \
+    _DECLARE_FREE_FUNC(_name,_field_type)                                                                   \
+    _DECLARE_ALLOC_FUNC(_name,_field_type,_size)                                                            \
     _DECLARE_COPY_TO(_name, _field_type, _size)                                                             \
     _DECLARE_COPY_FROM(_name, _field_type, _size)                                                           \
     _DECLARE_CONVERT_TO_GPU_FORMAT(_name, _field_type, _site_type, _size)                                   \

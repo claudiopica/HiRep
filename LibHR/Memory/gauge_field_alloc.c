@@ -214,7 +214,7 @@
         /* Allocate CPU field data */                                                                       \
         if (alloc_mem_t & CPU_MEM)                                                                          \
         {                                                                                                   \
-            int field_size = _size * type->gsize_gauge * sizeof(*(f->ptr), ALIGN);                          \
+            int field_size = _size * type->gsize_gauge * sizeof(*(f->ptr));                                 \
             f->ptr = amalloc(field_size, ALIGN);                                                            \
             error((f->ptr) == NULL, 1, "alloc_" #_name " [" __FILE__ "]",                                   \
                             "Could not allocate memory space for field (data)");                            \
@@ -229,8 +229,6 @@
                                                                                                             \
         return f;                                                                                           \
     }
-
-
 
 #define _DECLARE_MEMORY_FUNC(_name, _field_type, _site_type, _size)                                         \
     _DECLARE_FREE_FUNC(_name, _field_type)                                                                  \

@@ -66,6 +66,8 @@ _DECLARE_MEMORY_FUNC_MATTER(spinor_field_f, spinor_field, suNf_spinor, 1);
 _DECLARE_MEMORY_FUNC_MATTER(spinor_field_f_flt, spinor_field_flt, suNf_spinor_flt, 1);
 _DECLARE_MEMORY_FUNC_MATTER(sfield, scalar_field, double, 1);
 
+void spinor_field_togpuformat(spinor_field*, spinor_field*);
+
 #undef _DECLARE_MEMORY_FUNC
 
 #ifdef __cplusplus
