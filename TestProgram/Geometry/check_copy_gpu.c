@@ -130,10 +130,10 @@ int test_convert_back_forth_gfield_f()
     random_u_f(in);
 
     // Save transformed field in CPU copy of tmp field
-    gfield_togpuformat_f(tmp, in);
+    to_gpu_format_gfield_f(tmp, in);
 
     // Transform back to out field
-    gfield_tocpuformat_f(out, tmp);
+    to_cpu_format_gfield_f(out, tmp);
 
     suNf in_mat, tmp_mat, out_mat;
     double sqnorm = 0.0;
@@ -190,10 +190,10 @@ int test_convert_back_forth_gfield()
     random_u(in);
 
     // Save transformed field in CPU copy of tmp field
-    gfield_togpuformat(tmp, in);
+    to_gpu_format_gfield(tmp, in);
 
     // Transform back to out field
-    gfield_tocpuformat(out, tmp);
+    to_cpu_format_gfield(tmp, in);
 
     suNg in_mat, tmp_mat, out_mat;
     double sqnorm = 0.0;
