@@ -96,7 +96,7 @@
         { \
             _type *tmp = alloc_##_name(u->type);                                                            \
             togpuformat_##_name(tmp, u);                                                                    \
-            int field_size = _size * type->gsize_gauge * sizeof(*(f->gpu_ptr));                             \
+            int field_size = _size * u->type->gsize_gauge * sizeof(*(u->gpu_ptr));                             \
             cudaMemcpy(u->gpu_ptr, tmp->ptr, field_size, cudaMemcpyHostToDevice);                           \
             free_##_name(tmp);                                                                              \
         }
@@ -106,7 +106,7 @@
         void copy_from_gpu_##_name(_type *u)                                                                \
         {                                                                                                   \
             _type *tmp = alloc_##_name(u->type);                                                            \
-            int field_size = _size * type->gsize_gauge * sizeof(*(u->gpu_ptr));                             \
+            int field_size = _size * u->type->gsize_gauge * sizeof(*(u->gpu_ptr));                             \
             cudaMemcpy(tmp->ptr, u->gpu_ptr, field_size, cudaMemcpyDeviceToHost);                           \
             tocpuformat_##_name(u, tmp);                                                                    \
             free_##_name(tmp);                                                                              \
