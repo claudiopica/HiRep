@@ -7,7 +7,7 @@
 *
 * File field_alloc.c
 *
-* Functions for fields allocation and memory operations
+* Functions for gauge field allocation and memory operations
 *
 *******************************************************************************/
 
@@ -37,12 +37,13 @@
 #ifdef WITH_MPI
 
     #ifdef WITH_GPU
-        // TODO:  Implement allocation for Cudaware MPI
+        // TODO:  Implement allocation for CUDA-aware MPI
     #else
 
         #define _FREE_MPI_CODE                                                                              \
             if (u->comm_req != NULL)                                                                        \
-            afree(u->comm_req)
+                afree(u->comm_req);                                                                         \
+            do {} while (0)
 
         #define _ALLOC_MPI_CODE(_name)                                                                      \
             if (type->nbuffers_gauge > 0)                                                                   \
@@ -75,7 +76,8 @@
     /* Note: to be used inside function declaration */
     #define _FREE_GPU_CODE                                                                                  \
         if (u->gpu_ptr != NULL)                                                                             \
-            cudaFree(u->gpu_ptr)
+            cudaFree(u->gpu_ptr);                                                                           \
+        do {} while (0)
 
     /* Allocate device memory */
     /* Note: to be used inside function declaration */
@@ -89,13 +91,14 @@
                             "Could not allocate GPU memory space for field");                               \
         }                                                                                                   \
         else                                                                                                \
-            f->gpu_ptr = NULL
+            f->gpu_ptr = NULL;                                                                              \
+        do {} while (0)
 
     /* Declare function to copy field from host to device */
-    #define _DECLARE_COPY_TO(_name, _field_type, _size)                                                           \
-        void copy_to_gpu_##_name(_field_type *u)                                                                  \
+    #define _DECLARE_COPY_TO(_name, _field_type, _size)                                                     \
+        void copy_to_gpu_##_name(_field_type *u)                                                            \
         {                                                                                                   \
-            _field_type *tmp = alloc_##_name(u->type);                                                            \
+            _field_type *tmp = alloc_##_name(u->type);                                                      \
             to_gpu_format_##_name(tmp, u);                                                                  \
             int field_size = _size * u->type->gsize_gauge * sizeof(*(u->gpu_ptr));                          \
             cudaMemcpy(u->gpu_ptr, tmp->ptr, field_size, cudaMemcpyHostToDevice);                           \
@@ -103,10 +106,10 @@
         }
 
     /* Declare function to copy field from device to host */
-    #define _DECLARE_COPY_FROM(_name, _field_type, _size)                                                         \
-        void copy_from_gpu_##_name(_field_type *u)                                                                \
+    #define _DECLARE_COPY_FROM(_name, _field_type, _size)                                                   \
+        void copy_from_gpu_##_name(_field_type *u)                                                          \
         {                                                                                                   \
-            _field_type *tmp = alloc_##_name(u->type);                                                            \
+            _field_type *tmp = alloc_##_name(u->type);                                                      \
             int field_size = _size * u->type->gsize_gauge * sizeof(*(u->gpu_ptr));                          \
             cudaMemcpy(tmp->ptr, u->gpu_ptr, field_size, cudaMemcpyDeviceToHost);                           \
             to_cpu_format_##_name(u, tmp);                                                                  \
@@ -117,11 +120,11 @@
     /* This is necessary, because GPU performance is very sensitive to */
     /* memory access patterns, see documentation Doc/gpu_geometry.tex */
     #define _DECLARE_CONVERT_TO_GPU_FORMAT(_name, _field_type, _site_type, _size)                           \
-        void to_gpu_format_##_name(_field_type *out, _field_type *in)                                                   \
+        void to_gpu_format_##_name(_field_type *out, _field_type *in)                                       \
         {                                                                                                   \
             _site_type *r = 0;                                                                              \
             int number_of_elements;                                                                         \
-            error(out->type!=in->type, 1, "to_gpu_format_" #_name " " __FILE__,                            \
+            error(out->type!=in->type, 1, "to_gpu_format_" #_name " " __FILE__,                             \
                     "Gauge field geometries do not match!\n");                                              \
             _PIECE_FOR(in->type, ixp)                                                                       \
             {                                                                                               \
@@ -143,11 +146,11 @@
         }
 
     #define _DECLARE_CONVERT_TO_CPU_FORMAT(_name, _field_type, _site_type, _size)                           \
-        void to_cpu_format_##_name(_field_type *out, _field_type *in)                                                   \
+        void to_cpu_format_##_name(_field_type *out, _field_type *in)                                       \
         {                                                                                                   \
             _site_type *r = 0;                                                                              \
             int number_of_elements;                                                                         \
-            error(out->type!=in->type, 1, "to_cpu_format_" #_name " " __FILE__,                            \
+            error(out->type!=in->type, 1, "to_cpu_format_" #_name " " __FILE__,                             \
                         "Gauge field geometries do not match!\n");                                          \
             _PIECE_FOR(in->type, ixp)                                                                       \
             {                                                                                               \
@@ -182,8 +185,8 @@
 /* ============================================== All cases ============================================== */
 
 /* deallocation function declaration */
-#define _DECLARE_FREE_FUNC(_name, _field_type)                                                                    \
-    void free_##_name(_field_type *u)                                                                             \
+#define _DECLARE_FREE_FUNC(_name, _field_type)                                                              \
+    void free_##_name(_field_type *u)                                                                       \
     {                                                                                                       \
         if (u != NULL)                                                                                      \
         {                                                                                                   \
@@ -197,11 +200,11 @@
     }
 
 /* allocation function declaration */
-#define _DECLARE_ALLOC_FUNC(_name, _field_type, _size)                                                            \
-    _field_type *alloc_##_name(geometry_descriptor *type)                                                         \
+#define _DECLARE_ALLOC_FUNC(_name, _field_type, _size)                                                      \
+    _field_type *alloc_##_name(geometry_descriptor *type)                                                   \
     {                                                                                                       \
         /* Allocate field struct pointer */                                                                 \
-        _field_type *f;                                                                                           \
+        _field_type *f;                                                                                     \
                                                                                                             \
         f = amalloc(sizeof(*f), ALIGN);                                                                     \
         error(f == NULL, 1, "alloc_" #_name " [" __FILE__ "]",                                              \
@@ -229,19 +232,19 @@
 
 
 
-#define _DECLARE_MEMORY_FUNC(_name, _field_type, _site_type, _size)                                               \
-    _DECLARE_FREE_FUNC(_name, _field_type)                                                                        \
-    _DECLARE_ALLOC_FUNC(_name, _field_type, _size)                                                                \
-    _DECLARE_COPY_TO(_name, _field_type, _size)                                                                   \
-    _DECLARE_COPY_FROM(_name, _field_type, _size)                                                                 \
-    _DECLARE_CONVERT_TO_GPU_FORMAT(_name, _field_type, _site_type, _size)                                         \
+#define _DECLARE_MEMORY_FUNC(_name, _field_type, _site_type, _size)                                         \
+    _DECLARE_FREE_FUNC(_name, _field_type)                                                                  \
+    _DECLARE_ALLOC_FUNC(_name, _field_type, _size)                                                          \
+    _DECLARE_COPY_TO(_name, _field_type, _size)                                                             \
+    _DECLARE_COPY_FROM(_name, _field_type, _size)                                                           \
+    _DECLARE_CONVERT_TO_GPU_FORMAT(_name, _field_type, _site_type, _size)                                   \
     _DECLARE_CONVERT_TO_CPU_FORMAT(_name, _field_type, _site_type, _size)
 
 _DECLARE_MEMORY_FUNC(gfield, suNg_field, suNg, 4);
 _DECLARE_MEMORY_FUNC(gfield_flt, suNg_field_flt, suNg_flt, 4);
 _DECLARE_MEMORY_FUNC(gfield_f, suNf_field, suNf, 4);
 _DECLARE_MEMORY_FUNC(gfield_f_flt, suNf_field_flt, suNf_flt, 4);
-_DECLARE_MEMORY_FUNC(scalar_field, suNg_scalar_field, suNf_spinor, 1);
+_DECLARE_MEMORY_FUNC(scalar_field, suNg_scalar_field, suNg_vector, 1);
 _DECLARE_MEMORY_FUNC(avfield, suNg_av_field, suNg_algebra_vector, 4);
 _DECLARE_MEMORY_FUNC(gtransf, suNg_field, suNg, 1);
 _DECLARE_MEMORY_FUNC(clover_ldl, ldl_field, ldl_t, 1);

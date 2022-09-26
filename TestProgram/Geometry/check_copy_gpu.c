@@ -2,7 +2,7 @@
 *
 * NOCOMPILE= !WITH_GPU
 *
-* Check that the conversion functions ..._togpuformat and ..._tocpuformat
+* Check that the conversion functions from GPU to CPU format and back 
 * are bijective
 *
 *******************************************************************************/
@@ -56,7 +56,7 @@ int test_convert_back_forth_spinor_field()
     gaussian_spinor_field(in);
 
     // Save transformed field in CPU copy of tmp field
-    spinor_field_togpuformat(tmp, in);
+    to_gpu_format_spinor_field_f(tmp, in);
 
     // Sanity checks that the CPU copy of in field 
     // and CPU copy of the tmp field have non-zero square norms
@@ -64,7 +64,7 @@ int test_convert_back_forth_spinor_field()
     lprintf("SANITY CHECK", 0, "[Tmp field CPU copy norm unequal zero: %0.15lf]\n", spinor_field_sqnorm_f_cpu(tmp));
 
     // Transform back to out field
-    spinor_field_tocpuformat(out, tmp);
+    to_cpu_format_spinor_field_f(out, tmp);
     
     spinor_field_sub_assign_f_cpu(out, in);
     double diff_norm = spinor_field_sqnorm_f_cpu(out);
@@ -93,7 +93,7 @@ int test_convert_back_forth_spinor_field_flt()
     gaussian_spinor_field_flt(in);
 
     // Save transformed field in CPU copy of tmp field
-    spinor_field_togpuformat_flt(tmp, in);
+    to_gpu_format_spinor_field_f_flt(tmp, in);
 
     // Sanity checks that the CPU copy of in field 
     // and CPU copy of the tmp field have non-zero square norms
@@ -101,7 +101,7 @@ int test_convert_back_forth_spinor_field_flt()
     lprintf("SANITY CHECK", 0, "[Tmp field CPU copy norm unequal zero: %0.15lf]\n", spinor_field_sqnorm_f_flt_cpu(tmp));
 
     // Transform back to out field
-    spinor_field_tocpuformat_flt(out, tmp);
+    to_cpu_format_spinor_field_f_flt(out, tmp);
     
     spinor_field_sub_assign_f_flt_cpu(out, in);
     double diff_norm = spinor_field_sqnorm_f_flt_cpu(out);

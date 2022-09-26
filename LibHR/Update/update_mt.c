@@ -52,7 +52,7 @@ void init_ghmc(ghmc_par *par)
   if (u_scalar != NULL)
   {
     if (u_scalar_old == NULL)
-      u_scalar_old = alloc_suNg_scalar_field(&glattice);
+      u_scalar_old = alloc_scalar_field(&glattice);
     suNg_scalar_field_copy(u_scalar_old, u_scalar);
   }
 
@@ -73,7 +73,7 @@ void init_ghmc(ghmc_par *par)
   if (u_scalar != NULL)
   {
     if (scalar_momenta == NULL)
-      scalar_momenta = alloc_suNg_scalar_field(&glattice);
+      scalar_momenta = alloc_scalar_field(&glattice);
   }
 
   /* allocate pseudofermions */
@@ -110,7 +110,7 @@ void free_ghmc()
   }
   if (u_scalar_old != NULL)
   {
-    free_suNg_scalar_field(u_scalar_old);
+    free_scalar_field(u_scalar_old);
     u_scalar_old = NULL;
   }
   if (suN_momenta != NULL)
@@ -120,7 +120,7 @@ void free_ghmc()
   }
   if (scalar_momenta != NULL)
   {
-    free_suNg_scalar_field(scalar_momenta);
+    free_scalar_field(scalar_momenta);
     scalar_momenta = NULL;
   }
   if (la != NULL)
