@@ -95,8 +95,8 @@
         void copy_to_gpu_##_name(_type *u)                                                                  \
         { \
             _type *tmp = alloc_##_name(u->type);                                                            \
-            togpuformat_##_name(tmp, u);                                                                    \
-            int field_size = _size * u->type->gsize_gauge * sizeof(*(u->gpu_ptr));                             \
+            to_gpu_format_##_name(tmp, u);                                                                  \
+            int field_size = _size * u->type->gsize_gauge * sizeof(*(u->gpu_ptr));                          \
             cudaMemcpy(u->gpu_ptr, tmp->ptr, field_size, cudaMemcpyHostToDevice);                           \
             free_##_name(tmp);                                                                              \
         }
@@ -106,18 +106,75 @@
         void copy_from_gpu_##_name(_type *u)                                                                \
         {                                                                                                   \
             _type *tmp = alloc_##_name(u->type);                                                            \
-            int field_size = _size * u->type->gsize_gauge * sizeof(*(u->gpu_ptr));                             \
+            int field_size = _size * u->type->gsize_gauge * sizeof(*(u->gpu_ptr));                          \
             cudaMemcpy(tmp->ptr, u->gpu_ptr, field_size, cudaMemcpyDeviceToHost);                           \
-            tocpuformat_##_name(u, tmp);                                                                    \
+            to_cpu_format_##_name(u, tmp);                                                                  \
             free_##_name(tmp);                                                                              \
+        }
+
+    /* Declare function to convert GPU to CPU format */
+    /* This is necessary, because GPU performance is very sensitive to */
+    /* memory access patterns, see documentation Doc/gpu_geometry.tex */
+    #define _DECLARE_CONVERT_TO_GPU_FORMAT(_name, _field_type, _site_type, _size)                           \
+        void to_gpu_format_##_name(_type *out, _type *in)                                                   \
+        {                                                                                                   \
+            _site_type *r = 0;                                                                              \
+            int number_of_elements;                                                                         \
+            error(out->type!=in->type, 1, "to_gpu_format_" ##_name " " __FILE__,                            \
+                    "Gauge field geometries do not match!\n");                                              \
+            _PIECE_FOR(in->type, ixp)                                                                       \
+            {                                                                                               \
+                const int start = in->type->master_start[ixp];                                              \
+                const int N = in->type->master_end[ixp] - in->type->master_start[ixp]+1;                    \
+                double *cout = (double*)(_4FIELD_AT(out, start, 0));                                        \
+                _SITE_FOR(in->type, ixp, ix)                                                                \
+                {                                                                                           \
+                    r = _4FIELD_AT(in, ix, 0);                                                              \
+                                                                                                            \
+                    number_of_elements = _size * sizeof(*r)/sizeof(double);                                 \
+                    for (int j = 0; j < number_of_elements, ++j)                                            \
+                    {                                                                                       \
+                        cout[j*N] = ((double*)(r))[j];                                                      \
+                    }                                                                                       \
+                    ++cout;                                                                                 \
+                }                                                                                           \
+            }                                                                                               \
+        }
+
+    #define _DECLARE_CONVERT_TO_CPU_FORMAT(_name, _field_type, _site_type, _size)                           \
+        void to_cpu_format_##_name(_type *out, _type *in)                                                   \
+        {                                                                                                   \
+            _site_type *r = 0;                                                                              \
+            int number_of_elements;                                                                         \
+            error(out->type!=in->type, 1, "to_cpu_format_" ##_name " " __FILE__,                            \
+                        "Gauge field geometries do not match!\n");                                          \
+            _PIECE_FOR(in->type, ixp)                                                                       \
+            {                                                                                               \
+                const int start = in->type->master_start[ixp];                                              \
+                const int N = in->type->master_end[ixp] - in->type->master_start[ixp] + 1;                  \
+                double *cin = (double*)(_4FIELD_AT(in, start, 0));                                          \
+                _SITE_FOR(in->type, ixp, ix)                                                                \
+                {                                                                                           \
+                    r = _4FIELD_AT(out, ix, 0);                                                             \
+                                                                                                            \
+                    number_of_elements = _size * sizeof(*r)/sizeof(double);                                 \
+                    for (int j = 0; j < number_of_elements; ++j)                                            \
+                    {                                                                                       \
+                        ((double*)(r))[j] = cin[j*N];                                                       \
+                    }                                                                                       \
+                    ++cin;                                                                                  \
+                }                                                                                           \
+            }                                                                                               \
         }
 
 #else /* WITH_GPU */
 
     #define _FREE_GPU_CODE do {} while (0)
     #define _ALLOC_GPU_CODE(_name, _size) do {} while (0)
-    #define _DECLARE_COPY_TO(_name, _size) do {} while (0)
-    #define _DECLARE_COPY_FROM(_name, _size) do {} while (0)
+    #define _DECLARE_COPY_TO(_name, _size)
+    #define _DECLARE_COPY_FROM(_name, _size) 
+    #define _DECLARE_CONVERT_TO_GPU_FORMAT(_name, _field_type, _site_type, _size) 
+    #define _DECLARE_CONVERT_TO_CPU_FORMAT(_name, _field_type, _site_type, _size)
 
 #endif /* WITH_GPU */
 
@@ -171,24 +228,23 @@
 
 
 
-#define _DECLARE_MEMORY_FUNC(_name, _type, _size) \
-    _DECLARE_FREE_FUNC(_name, _type);             \
-    _DECLARE_ALLOC_FUNC(_name, _type, _size); \
-    _DECLARE_COPY_TO(_name, _type, _size); \
-    _DECLARE_COPY_FROM(_name, _type, _size); 
+#define _DECLARE_MEMORY_FUNC(_name, _type, _site_type, _size)                                               \
+    _DECLARE_FREE_FUNC(_name, _type)                                                                        \
+    _DECLARE_ALLOC_FUNC(_name, _type, _size)                                                                \
+    _DECLARE_COPY_TO(_name, _type, _size)                                                                   \
+    _DECLARE_COPY_FROM(_name, _type, _size)                                                                 \
+    _DECLARE_CONVERT_TO_GPU_FORMAT(_name, _type, _site_type, _size)                                         \
+    _DECLARE_CONVERT_TO_CPU_FORMAT(_name, _type, _site_type, size)
 
-_DECLARE_MEMORY_FUNC(gfield, suNg_field, 4);
-_DECLARE_MEMORY_FUNC(gfield_flt, suNg_field_flt, 4);
-
-_DECLARE_MEMORY_FUNC(gfield_f, suNf_field, 4);
-_DECLARE_MEMORY_FUNC(gfield_f_flt, suNf_field_flt, 4);
-_DECLARE_MEMORY_FUNC(scalar_field, suNg_scalar_field, 1);
-
-_DECLARE_MEMORY_FUNC(avfield, suNg_av_field, 4);
-_DECLARE_MEMORY_FUNC(gtransf, suNg_field, 1);
-
-_DECLARE_MEMORY_FUNC(clover_ldl, ldl_field, 1);
-_DECLARE_MEMORY_FUNC(clover_term, suNfc_field, 4);
-_DECLARE_MEMORY_FUNC(clover_force, suNf_field, 6);
+_DECLARE_MEMORY_FUNC(gfield, suNg_field, suNg, 4);
+_DECLARE_MEMORY_FUNC(gfield_flt, suNg_field_flt, suNg_flt, 4);
+_DECLARE_MEMORY_FUNC(gfield_f, suNf_field, suNf, 4);
+_DECLARE_MEMORY_FUNC(gfield_f_flt, suNf_field_flt, suNf_flt, 4);
+_DECLARE_MEMORY_FUNC(scalar_field, suNg_scalar_field, suNf_spinor, 1);
+_DECLARE_MEMORY_FUNC(avfield, suNg_av_field, suNg_algebra_vector, 4);
+_DECLARE_MEMORY_FUNC(gtransf, suNg_field, suNg, 1);
+_DECLARE_MEMORY_FUNC(clover_ldl, ldl_field, ldl_t, 1);
+_DECLARE_MEMORY_FUNC(clover_term, suNfc_field, suNfc, 4);
+_DECLARE_MEMORY_FUNC(clover_force, suNf_field, suNf, 6);
 
 #undef _DECLARE_MEMORY_FUNC
