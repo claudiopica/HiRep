@@ -631,14 +631,4 @@ __global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out,
   }
 }
 
-void (*Dphi_) (spinor_field *out, spinor_field *in)=Dphi_gpu_;
-void (*Dphi) (double m0, spinor_field *out, spinor_field *in)=Dphi_gpu;
-void (*g5Dphi) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_gpu;
-void (*g5Dphi_sq) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_sq_gpu;
-unsigned long int (*getMVM) ()=getMVM_gpu;
-void (*Dphi_eopre) (double m0, spinor_field *out, spinor_field *in)=Dphi_eopre_gpu;
-void (*Dphi_oepre) (double m0, spinor_field *out, spinor_field *in)=Dphi_oepre_gpu;
-void (*g5Dphi_eopre) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_eopre_gpu;
-void (*g5Dphi_eopre_sq) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_eopre_sq_gpu;
-
 #endif
