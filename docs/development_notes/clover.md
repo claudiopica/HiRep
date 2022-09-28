@@ -32,12 +32,10 @@ $$ \begin{aligned}
 \end{split}
 \end{aligned} $$
 
-Because $Q_{\mu\nu}^\dagger=Q_{\nu\mu}$ we have
-$F_{\mu\nu}=-F_{\nu\mu}$. For this reason we can change the sum over
-$\mu,\nu$ in equation [\[eq:clover\]](#eq:clover){reference-type="eqref"
-reference="eq:clover"} to a sum over $\mu<\nu$ and a factor of two.
+Because $Q_{\mu\nu}^\dagger=Q_{\nu\mu}$ we have $F_{\mu\nu}=-F_{\nu\mu}$.
+For this reason we can change the sum over $\mu,\nu$ in Eq. {eq}`eq:clover` to a sum over $\mu<\nu$ and a factor of two.
 
-$$ D_{sw} = -\frac{c_{sw}}{2}\sum_x\sum_{\mu<\nu}\sigma_{\mu\nu}F_{\mu\nu}(x) $$(eq:clover2)
+$$ D_{sw} = -\frac{c_{sw}}{2}\sum_x\sum_{\mu<\nu}\sigma_{\mu\nu}F_{\mu\nu}(x) $$
 
 The quantity $\sigma_{\mu\nu}F_{\mu\nu}$ is Hermitian and block diagonal.
 It can be written as
@@ -63,8 +61,7 @@ $$ \begin{aligned}
 
 ## Pseudofermion Forces
 
-For the forces we use the following short-hand notation for the
-derivative wrt. the link variables.
+For the forces we use the following short-hand notation for the derivative wrt. the link variables.
 
 $$ \dot{S} = \partial_{x,\mu}^a S $$
 
@@ -80,7 +77,8 @@ When differentiating the action we obtain
 $$ \dot{S} = -2\mathrm{Re}~\xi^\dagger\dot{H}\eta, $$(eq:dotS)
 
 with the definitions
- $$\begin{aligned}
+
+$$ \begin{aligned}
  \eta &= H^{-2}\phi, \\
  \xi &= H\eta.
 \end{aligned} $$
@@ -91,7 +89,7 @@ Here we will only consider the forces from the clover term and not the hopping t
 The clover part of the Dirac operator is given by
 $$ H_{sw} = -\frac{c_{sw}}{2}\sum_{\mu<\nu}\bar{\sigma}_{\mu\nu}F_{\mu\nu}(x) $$(eq:Hsw)
 
-When inserting equation [\[eq:Hsw\]](#eq:Hsw){reference-type="eqref" reference="eq:Hsw"} in equation [\[eq:dotS\]](#eq:dotS){reference-type="eqref" reference="eq:dotS"} we obtain
+When inserting Eq. {eq}`eq:dotS` we obtain
 
 $$ \dot{S} = c_{sw}\sum_{\mu<\nu}\mathrm{Re}(\xi^\dagger\bar{\sigma}_{\mu\nu}\dot{F}_{\mu\nu}\eta). $$
 
@@ -99,8 +97,7 @@ From the definition of $F_{\mu\nu}$ it follows that
 
 $$ \begin{aligned}
  \dot{S} &= \frac{1}{8}c_{sw}\sum_{\mu<\nu}\mathrm{Re}(\xi^\dagger\bar{\sigma}_{\mu\nu}\dot{Q}_{\mu\nu}\eta + \xi^\dagger\bar{\sigma}_{\mu\nu}^\dagger\dot{Q}_{\mu\nu}^\dagger\eta), \\
- &=
- \frac{1}{8}c_{sw}\sum_{\mu<\nu}\mathrm{Re}(\xi^\dagger\bar{\sigma}_{\mu\nu}\dot{Q}_{\mu\nu}\eta + \eta^\dagger\bar{\sigma}_{\mu\nu}\dot{Q}_{\mu\nu}\xi).
+         &= \frac{1}{8}c_{sw}\sum_{\mu<\nu}\mathrm{Re}(\xi^\dagger\bar{\sigma}_{\mu\nu}\dot{Q}_{\mu\nu}\eta + \eta^\dagger\bar{\sigma}_{\mu\nu}\dot{Q}_{\mu\nu}\xi).
 \end{aligned} $$
 
 This can in be written as
@@ -185,15 +182,14 @@ If we insert the above definition we obtain
 
 $$ \dot{S} = \frac{N_fc_{sw}}{2}\sum_{x~\mathrm{odd}}\sum_{\mu<\nu}\mathrm{tr}(D_{oo}^{-1}(x)\sigma_{\mu\nu}\dot{F}_{\mu\nu}(x)) $$
 
-$$ \dot{S} = \frac{N_fc_{sw}}{2\cdot8}\sum_{x~\mathrm{odd}}\sum_{\mu<\nu}
- \mathrm{tr}(D_{oo}^{-1}(x)\sigma_{\mu\nu}\dot{Q}_{\mu\nu}(x) + D_{oo}^{-1}(x)\sigma_{\mu\nu}^\dagger\dot{Q}_{\mu\nu}^\dagger(x)) $$
+$$ \dot{S} = \frac{N_fc_{sw}}{2\cdot8}\sum_{x~\mathrm{odd}}\sum_{\mu<\nu} \mathrm{tr}(D_{oo}^{-1}(x)\sigma_{\mu\nu}\dot{Q}_{\mu\nu}(x) + D_{oo}^{-1}(x)\sigma_{\mu\nu}^\dagger\dot{Q}_{\mu\nu}^\dagger(x)) $$
 
 Since $D_{oo}^{-1}$ is Hermitian we can write the result as two times the real part.
 To simplify the result we define $X_{\mu\nu}(x)=D_{oo}^{-1}(x)\sigma_{\mu\nu}$ such that
 
 $$ \dot{S} = \frac{N_fc_{sw}}{8}\sum_{x~\mathrm{odd}}\sum_{\mu<\nu}\mathrm{Re}~\mathrm{tr}[X_{\mu\nu}(x)\dot{Q}_{\mu\nu}(x)] $$
 
-This is equivalent to Eq. [\[eq:force\]](#eq:force){reference-type="eqref" reference="eq:force"} except from the factor $N_f$ and the definition of $X_{\mu\nu}(x)$.
+This is equivalent to Eq. {eq}`eq:force` except from the factor $N_f$ and the definition of $X_{\mu\nu}(x)$.
 Notice that we still have the identity $X_{\mu\nu}^\dagger=-X_{\mu\nu}$.
 The sum over $x$ can be extended to all sites by setting $X_{\mu\nu}$ to zero on the even sites.
 To calculate the inverse $D_{oo}^{-1}$ we introduce the definitions:
@@ -210,14 +206,14 @@ $$ D_{oo}^{-1} = \begin{pmatrix}
 
 $$ D_{+}^{-1} =
  \begin{pmatrix}
-  D_{11} &  D_{12} \\
-  D_{21} &  D_{22} \\
+  D_{11} & D_{12} \\
+  D_{21} & D_{22} \\
  \end{pmatrix} $$
 
 $$ D_{-}^{-1} =
  \begin{pmatrix}
-  D_{33} &  D_{34} \\
-  D_{43} &  D_{44} \\
+  D_{33} & D_{34} \\
+  D_{43} & D_{44} \\
  \end{pmatrix} $$
 
 Because of hermiticity we know that $D_{12} = D_{21}^\dagger$ and $D_{34} = D_{43}^\dagger$.
@@ -376,7 +372,7 @@ Calculates $x=(L^\dagger)^{-1}D^{-1}x$.
 do i=N-1, 0
     x_i = x_i/A_ii
     do k=i+1, N-1
-        x_i = x_i - conj(A_ki*) * x_k
+        x_i = x_i - conj(A_ki) * x_k
     enddo
 enddo
 ```
@@ -397,7 +393,7 @@ do i=0, N-1
     do j=N-1, i
         B_ji = B_ji/L_ii
 	do k=j+1, N-1
-	    B_ji = conj(L_kj*) * B_ki
+	    B_ji = conj(L_kj) * B_ki
 	enddo
     enddo
 enddo
