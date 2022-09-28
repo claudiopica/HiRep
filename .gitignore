@@ -23,3 +23,6 @@ LibHR/Utils/suN_exp.c
 **/.DS_Store
 **/SnoopDogg*
 Hirep-git.code-workspace
+
+#documenation
+docs/_build
