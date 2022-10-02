@@ -147,6 +147,12 @@ $ hmc -i input_file
 where ```hmc``` is the binary generated from ```hmc.c```.
 
 
+# Documentation
+
+* Development Notes [html](docs/_build/html/index.html) [pdf](docs/_build/latex/hirep-documentation.pdf)
+
+
+
 
 
 ![https://github.com/claudiopica/HiRep/actions?workflow=no-mpi](https://github.com/claudiopica/HiRep/workflows/no-mpi/badge.svg)

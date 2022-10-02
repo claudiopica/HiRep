@@ -44,7 +44,7 @@ latex_elements = {"preamble": r"\pdfimageresolution=144"}
 latex_documents = [
     (
         master_doc,
-        "hirep-documenation.tex",
+        "hirep-documentation.tex",
         "HiRep Documentation",
         "HiRep Developers",
         "manual",
