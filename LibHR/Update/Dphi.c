@@ -194,12 +194,12 @@ unsigned long int getMVM_cpu()
 void Dphi_cpu_(spinor_field *out, spinor_field *in)
 {
 #ifdef CHECK_SPINOR_MATCHING
-  error((in == NULL) || (out == NULL), 1, "Dphi_ [Dphi.c]",
+  error((in == NULL) || (out == NULL), 1, "Dphi_cpu_ [Dphi.c]",
         "Attempt to access unallocated memory space");
-  error(in == out, 1, "Dphi_ [Dphi.c]",
+  error(in == out, 1, "Dphi_cpu_ [Dphi.c]",
         "Input and output fields must be different");
-  error(out->type == &glat_even && in->type == &glat_even, 1, "Dphi_ [Dphi.c]", "Spinors don't match! (1)");
-  error(out->type == &glat_odd && in->type == &glat_odd, 1, "Dphi_ [Dphi.c]", "Spinors don't match! (2)");
+  error(out->type == &glat_even && in->type == &glat_even, 1, "Dphi_cpu_ [Dphi.c]", "Spinors don't match! (1)");
+  error(out->type == &glat_odd && in->type == &glat_odd, 1, "Dphi_cpu_ [Dphi.c]", "Spinors don't match! (2)");
 #endif
 
   ++MVMcounter; /* count matrix calls */
@@ -377,12 +377,12 @@ void Dphi_cpu_(spinor_field *out, spinor_field *in)
 void Dphi_fused_(spinor_field *out, spinor_field *in)
 {
 #ifdef CHECK_SPINOR_MATCHING
-  error((in == NULL) || (out == NULL), 1, "Dphi_ [Dphi.c]",
+  error((in == NULL) || (out == NULL), 1, "Dphi_fused_ [Dphi.c]",
         "Attempt to access unallocated memory space");
-  error(in == out, 1, "Dphi_ [Dphi.c]",
+  error(in == out, 1, "Dphi_fused_ [Dphi.c]",
         "Input and output fields must be different");
-  error(out->type == &glat_even && in->type == &glat_even, 1, "Dphi_ [Dphi.c]", "Spinors don't match! (1)");
-  error(out->type == &glat_odd && in->type == &glat_odd, 1, "Dphi_ [Dphi.c]", "Spinors don't match! (2)");
+  error(out->type == &glat_even && in->type == &glat_even, 1, "Dphi_fused_ [Dphi.c]", "Spinors don't match! (1)");
+  error(out->type == &glat_odd && in->type == &glat_odd, 1, "Dphi_fused_ [Dphi.c]", "Spinors don't match! (2)");
 #endif
 
   //++MVMcounter; /* count matrix calls */
@@ -711,16 +711,16 @@ void Dphi_cpu(double m0, spinor_field *out, spinor_field *in)
   suNf_spinor tmp;
 #endif /* ROTATED_SF */
 
-  error((in == NULL) || (out == NULL), 1, "Dphi [Dphi.c]",
+  error((in == NULL) || (out == NULL), 1, "Dphi_cpu [Dphi.c]",
         "Attempt to access unallocated memory space");
 
-  error(in == out, 1, "Dphi [Dphi.c]",
+  error(in == out, 1, "Dphi_cpu [Dphi.c]",
         "Input and output fields must be different");
 
   apply_BCs_on_spinor_field(in);
 
 #ifdef CHECK_SPINOR_MATCHING
-  error(out->type != &glattice || in->type != &glattice, 1, "Dphi [Dphi.c]", "Spinors are not defined on all the lattice!");
+  error(out->type != &glattice || in->type != &glattice, 1, "Dphi_cpu [Dphi.c]", "Spinors are not defined on all the lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
   Dphi_cpu_(out, in);
@@ -793,14 +793,14 @@ void g5Dphi_cpu(double m0, spinor_field *out, spinor_field *in)
   suNf_spinor tmp;
 #endif /* ROTATED_SF */
 
-  error((in == NULL) || (out == NULL), 1, "g5Dphi [Dphi.c]",
+  error((in == NULL) || (out == NULL), 1, "g5Dphi_cpu [Dphi.c]",
         "Attempt to access unallocated memory space");
 
-  error(in == out, 1, "g5Dphi [Dphi.c]",
+  error(in == out, 1, "g5Dphi_cpu [Dphi.c]",
         "Input and output fields must be different");
 
 #ifdef CHECK_SPINOR_MATCHING
-  error(out->type != &glattice || in->type != &glattice, 1, "g5Dphi [Dphi.c]", "Spinors are not defined on all the lattice!");
+  error(out->type != &glattice || in->type != &glattice, 1, "g5Dphi_cpu [Dphi.c]", "Spinors are not defined on all the lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
   apply_BCs_on_spinor_field(in);
@@ -873,14 +873,14 @@ void Dphi_eopre_cpu(double m0, spinor_field *out, spinor_field *in)
 {
   double rho;
 
-  error((in == NULL) || (out == NULL), 1, "Dphi_eopre [Dphi.c]",
+  error((in == NULL) || (out == NULL), 1, "Dphi_eopre_cpu [Dphi.c]",
         "Attempt to access unallocated memory space");
 
-  error(in == out, 1, "Dphi_eopre [Dphi.c]",
+  error(in == out, 1, "Dphi_eopre_cpu [Dphi.c]",
         "Input and output fields must be different");
 
 #ifdef CHECK_SPINOR_MATCHING
-  error(out->type != &glat_even || in->type != &glat_even, 1, "Dphi_eopre " __FILE__, "Spinors are not defined on even lattice!");
+  error(out->type != &glat_even || in->type != &glat_even, 1, "Dphi_eopre_cpu " __FILE__, "Spinors are not defined on even lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
   apply_BCs_on_spinor_field(in);
@@ -913,14 +913,14 @@ void Dphi_oepre_cpu(double m0, spinor_field *out, spinor_field *in)
 {
   double rho;
 
-  error((in == NULL) || (out == NULL), 1, "Dphi_oepre [Dphi.c]",
+  error((in == NULL) || (out == NULL), 1, "Dphi_oepre_cpu [Dphi.c]",
         "Attempt to access unallocated memory space");
 
-  error(in == out, 1, "Dphi_oepre [Dphi.c]",
+  error(in == out, 1, "Dphi_oepre_cpu [Dphi.c]",
         "Input and output fields must be different");
 
 #ifdef CHECK_SPINOR_MATCHING
-  error(out->type != &glat_odd || in->type != &glat_odd, 1, "Dphi_oepre " __FILE__, "Spinors are not defined on odd lattice!");
+  error(out->type != &glat_odd || in->type != &glat_odd, 1, "Dphi_oepre_cpu " __FILE__, "Spinors are not defined on odd lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
   apply_BCs_on_spinor_field(in);
@@ -949,14 +949,14 @@ void g5Dphi_eopre_cpu(double m0, spinor_field *out, spinor_field *in)
 {
   double rho;
 
-  error((in == NULL) || (out == NULL), 1, "g5Dphi_eopre [Dphi.c]",
+  error((in == NULL) || (out == NULL), 1, "g5Dphi_eopre_cpu [Dphi.c]",
         "Attempt to access unallocated memory space");
 
-  error(in == out, 1, "Dphi_eopre [Dphi.c]",
+  error(in == out, 1, "Dphi_eopre_cpu [Dphi.c]",
         "Input and output fields must be different");
 
 #ifdef CHECK_SPINOR_MATCHING
-  error(out->type != &glat_even || in->type != &glat_even, 1, "g5Dphi_eopre " __FILE__, "Spinors are not defined on even lattice!");
+  error(out->type != &glat_even || in->type != &glat_even, 1, "g5Dphi_eopre_cpu " __FILE__, "Spinors are not defined on even lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
   apply_BCs_on_spinor_field(in);
@@ -1521,11 +1521,11 @@ void Dxx_tw_inv(double mass, double twmass, spinor_field *out, spinor_field *in,
 
   // in= 1/((4+m)^2+mu^2)*((4+m) in +- i mu g5 in)
 
-  spinor_field_g5_f(aux, in);
-  spinor_field_mulc_f(aux2, z, aux);
-  spinor_field_mul_f(out, (4. + mass), in);
-  spinor_field_add_assign_f(out, aux2);
-  spinor_field_mul_f(out, norm, out);
+  spinor_field_g5_f_cpu(aux, in);
+  spinor_field_mulc_f_cpu(aux2, z, aux);
+  spinor_field_mul_f_cpu(out, (4. + mass), in);
+  spinor_field_add_assign_f_cpu(out, aux2);
+  spinor_field_mul_f_cpu(out, norm, out);
 
   gtmp->type = &glattice;
   gtmp->ptr = gtmp_ptr;
@@ -1573,11 +1573,11 @@ void g5Dphi_eopre_tw(double m0, double mu, spinor_field *out, spinor_field *in, 
      ************************************************/
 
     Dxx_tw_inv(m0, mu, etmp, in, DIRECT);
-    spinor_field_mul_f(etmp, -rho, etmp);
-    Dphi_(otmp, etmp);
+    spinor_field_mul_f_cpu(etmp, -rho, etmp);
+    Dphi_cpu_(otmp, etmp);
     Dxx_tw_inv(m0, mu, otmp, otmp, DIRECT);
-    Dphi_(out, otmp);
-    spinor_field_mul_add_assign_f(out, rho, in);
+    Dphi_cpu_(out, otmp);
+    spinor_field_mul_add_assign_f_cpu(out, rho, in);
   }
   else
   {
@@ -1585,14 +1585,14 @@ void g5Dphi_eopre_tw(double m0, double mu, spinor_field *out, spinor_field *in, 
      * Operators here implemented is:
      * D_pre^dag = rho - D_ee_tw  D_eo D_oo_tw_inv^dag D_oe
      ************************************************/
-    Dphi_(otmp, in);
+    Dphi_cpu_(otmp, in);
     Dxx_tw_inv(m0, mu, otmp, otmp, DAGGER);
-    Dphi_(out, otmp);
+    Dphi_cpu_(out, otmp);
     Dxx_tw_inv(m0, mu, out, out, DAGGER);
-    spinor_field_mul_f(out, -rho, out);
-    spinor_field_mul_add_assign_f(out, rho, in);
+    spinor_field_mul_f_cpu(out, -rho, out);
+    spinor_field_mul_add_assign_f_cpu(out, rho, in);
   }
-  spinor_field_g5_assign_f(out);
+  spinor_field_g5_assign_f_cpu(out);
   apply_BCs_on_spinor_field(out);
 }
 
