@@ -66,7 +66,7 @@ template<typename COMPLEX, typename REAL>
     }
 }
 
-/* Re <s1,s1> */ 
+/* Re <s1,s1> */
 template<typename COMPLEX, typename REAL>
 __global__ void spinor_field_sqnorm_gpu(COMPLEX* s1, REAL* resField, int N)
 {
@@ -328,28 +328,5 @@ __global__ void spinor_field_lc3_gpu(REAL r1,REAL r2, COMPLEX *s1, COMPLEX *s2, 
        _complex_minus(s3[i],s3[i]);
     }
 }
-
-template< typename COMPLEX>
-__global__ void spinor_field_copy_gpu_to_gpu_gpu(COMPLEX* dst, COMPLEX* src, int N)
-{
-  for (int i = blockIdx.x * blockDim.x + threadIdx.x;
-       i < N;
-       i += blockDim.x * gridDim.x)
-    {
-       dst[i]=src[i];
-    }
-}
-
-/* c1=0 */
-/*
-template< typename COMPLEX>
-__global__ void complex_field_zero_gpu(COMPLEX *c1,int N){
-  int i = blockIdx.x*BLOCK_SIZE + threadIdx.x;
-  if (i<N) {
-    c1[i].re=0;
-    c1[i].im=0;
-  }
-}
-*/
 
 #endif

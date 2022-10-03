@@ -237,19 +237,19 @@ _BODY({
     }
 })
 
-/* s1=cd1*s2+cd2*s3 cd1, cd2 complex*/
-_FUNC(void, spinor_field_clc, (_SPINOR_FIELD_TYPE *s1, _COMPLEX cd1, _SPINOR_FIELD_TYPE *s2, _COMPLEX cd2, _SPINOR_FIELD_TYPE *s3))
+/* s1=c1*s2+c2*s3 c1, c2 complex*/
+_FUNC(void, spinor_field_clc, (_SPINOR_FIELD_TYPE *s1, _COMPLEX c1, _SPINOR_FIELD_TYPE *s2, _COMPLEX c2, _SPINOR_FIELD_TYPE *s3))
 _BODY({
     _THREE_SPINORS_FOR(s1,s2,s3) {
-        _spinor_clc_f(*_SPINOR_PTR(s1),cd1,*_SPINOR_PTR(s2),cd2,*_SPINOR_PTR(s3));
+        _spinor_clc_f(*_SPINOR_PTR(s1),c1,*_SPINOR_PTR(s2),c2,*_SPINOR_PTR(s3));
     }
 })
 
-/* s1+=cd1*s2+cd2*s3 cd1, cd2 complex*/
-_FUNC(void, spinor_field_clc_add_assign, (_SPINOR_FIELD_TYPE *s1, _COMPLEX cd1, _SPINOR_FIELD_TYPE *s2, _COMPLEX cd2, _SPINOR_FIELD_TYPE *s3))
+/* s1+=c1*s2+c2*s3 c1, c2 complex*/
+_FUNC(void, spinor_field_clc_add_assign, (_SPINOR_FIELD_TYPE *s1, _COMPLEX c1, _SPINOR_FIELD_TYPE *s2, _COMPLEX c2, _SPINOR_FIELD_TYPE *s3))
 _BODY({
     _THREE_SPINORS_FOR(s1,s2,s3) {
-        _spinor_clc_add_assign_f(*_SPINOR_PTR(s1),cd1,*_SPINOR_PTR(s2),cd2,*_SPINOR_PTR(s3));
+        _spinor_clc_add_assign_f(*_SPINOR_PTR(s1),c1,*_SPINOR_PTR(s2),c2,*_SPINOR_PTR(s3));
     }
 })
 

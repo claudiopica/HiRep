@@ -23,10 +23,10 @@ void g5Dphi_sq_cpu(double m0, spinor_field *out, spinor_field *in);
   void g5Dphi_gpu(double m0, spinor_field *out, spinor_field *in);
   void g5Dphi_sq_gpu(double m0, spinor_field *out, spinor_field *in);
 #endif
-void (*Dphi_) (spinor_field *out, spinor_field *in);
-void (*Dphi) (double m0, spinor_field *out, spinor_field *in);
-void (*g5Dphi) (double m0, spinor_field *out, spinor_field *in);
-void (*g5Dphi_sq) (double m0, spinor_field *out, spinor_field *in);
+extern void (*Dphi_) (spinor_field *out, spinor_field *in);
+extern void (*Dphi) (double m0, spinor_field *out, spinor_field *in);
+extern void (*g5Dphi) (double m0, spinor_field *out, spinor_field *in);
+extern void (*g5Dphi_sq) (double m0, spinor_field *out, spinor_field *in);
 
 void Dphi_flt_cpu_(spinor_field_flt *out, spinor_field_flt *in);
 void Dphi_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in);
@@ -47,7 +47,7 @@ unsigned long int getMVM_cpu();
 #ifdef WITH_GPU
   unsigned long int getMVM_gpu();
 #endif
-unsigned long int (*getMVM) ();
+extern unsigned long int (*getMVM) ();
 unsigned long int getMVM_flt();
 
 // Dirac operators with clover term
@@ -71,10 +71,10 @@ void g5Dphi_eopre_sq_cpu(double m0, spinor_field *out, spinor_field *in);
   void g5Dphi_eopre_gpu(double m0, spinor_field *out, spinor_field *in);
   void g5Dphi_eopre_sq_gpu(double m0, spinor_field *out, spinor_field *in);
 #endif //WITH_GPU
-void (*Dphi_eopre) (double m0, spinor_field *out, spinor_field *in);
-void (*Dphi_oepre) (double m0, spinor_field *out, spinor_field *in);
-void (*g5Dphi_eopre) (double m0, spinor_field *out, spinor_field *in);
-void (*g5Dphi_eopre_sq) (double m0, spinor_field *out, spinor_field *in);
+extern void (*Dphi_eopre) (double m0, spinor_field *out, spinor_field *in);
+extern void (*Dphi_oepre) (double m0, spinor_field *out, spinor_field *in);
+extern void (*g5Dphi_eopre) (double m0, spinor_field *out, spinor_field *in);
+extern void (*g5Dphi_eopre_sq) (double m0, spinor_field *out, spinor_field *in);
 void Dphi_eopre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
 void Dphi_oepre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
 void g5Dphi_eopre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);

@@ -9,7 +9,7 @@
 /*
  * LINEAR ALGEBRA FUNCTIONS ARE DEFINED IN THE TEMPLATE
  *
- * TMPL/linear_algebra.h.sdtmpl
+ * TMPL/linear_algebra.c.sdtmpl
  *
  */
 
@@ -18,21 +18,27 @@
 #include "hr_complex.h"
 #undef hr_complex
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* double precision */
 #define _SPINOR_FIELD_TYPE spinor_field
 #define _REAL double
 #define _COMPLEX hr_complex
 #ifdef WITH_GPU
-  #define _FUNC(a) a##_f_gpu
+  #define _FUNC(a,b,c) a b##_f_gpu c
+  #define _BODY(a) ;
   #include "TMPL/linear_algebra.c.sdtmpl"
   #undef _FUNC
+  #undef _BODY
 #endif
 #define _FUNC(a,b,c) a b##_f_cpu c
 #define _BODY(a) ;
 #include "TMPL/linear_algebra.c.sdtmpl"
 #undef _FUNC
 #undef _BODY
-#define _FUNC(a,b,c) a (*b##_f) c
+#define _FUNC(a,b,c) extern a (*b##_f) c
 #define _BODY(a) ;
 #include "TMPL/linear_algebra.c.sdtmpl"
 #undef _FUNC
@@ -46,16 +52,18 @@
 #define _REAL float
 #define _COMPLEX hr_complex_flt
 #ifdef WITH_GPU
-  #define _FUNC(a) a##_f_flt_gpu
+  #define _FUNC(a,b,c) a b##_f_flt_gpu c
+  #define _BODY(a) ;
   #include "TMPL/linear_algebra.c.sdtmpl"
   #undef _FUNC
+  #undef _BODY
 #endif
 #define _FUNC(a,b,c) a b##_f_flt_cpu c
 #define _BODY(a) ;
 #include "TMPL/linear_algebra.c.sdtmpl"
 #undef _FUNC
 #undef _BODY
-#define _FUNC(a,b,c) a (*b##_f_flt) c
+#define _FUNC(a,b,c) extern a (*b##_f_flt) c
 #define _BODY(a) ;
 #include "TMPL/linear_algebra.c.sdtmpl"
 #undef _FUNC
@@ -63,6 +71,10 @@
 #undef _SPINOR_FIELD_TYPE
 #undef _REAL
 #undef _COMPLEX
+
+#ifdef __cplusplus
+}
+#endif
 
 /* GPU functions*/
 #ifdef WITH_GPU

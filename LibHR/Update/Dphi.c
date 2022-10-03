@@ -1608,8 +1608,7 @@ void g5Dphi_eopre_tw_sq(double m0, double mu, spinor_field *out, spinor_field *i
   g5Dphi_eopre_tw(m0, mu, out, etmp2, DAGGER);
 }
 
-/* Make function pointers such that function calls can have the same name
-regardsless of being complied for GPU or CPU */
+
 #ifndef WITH_GPU
 void (*Dphi_) (spinor_field *out, spinor_field *in)=Dphi_cpu_;
 void (*Dphi) (double m0, spinor_field *out, spinor_field *in)=Dphi_cpu;

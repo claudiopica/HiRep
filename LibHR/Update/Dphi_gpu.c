@@ -31,13 +31,13 @@
 #include "hr_complex.h"
 #include <iostream>
 
-__global__ void Dphi_gpu_kernel(suNf_spinor*, 
+__global__ void Dphi_gpu_kernel(suNf_spinor*,
                             const suNf_spinor*,
-                            const suNf*, 
                             const suNf*,
-                            const int*, 
+                            const suNf*,
                             const int*,
-                            const int, 
+                            const int*,
+                            const int,
                             const int);
 
 #ifdef ROTATED_SF
@@ -54,7 +54,7 @@ extern rhmc_par _update_par; /* Update/update_rhmc.c */
  */
 static unsigned long int MVMcounter=0;
 
-unsigned long int getMVM() {
+unsigned long int getMVM_gpu() {
 	unsigned long int res=MVMcounter>>1; /* divide by two */
 	//MVMcounter=0; /* reset counter */
 	return res;
@@ -151,7 +151,7 @@ static void init_bc_gpu(){
   #endif
 }
 
-void Dphi_(spinor_field *out, spinor_field *in)
+void Dphi_gpu_(spinor_field *out, spinor_field *in)
 {
   unsigned int N, grid;
   const int vol4h=T*X*Y*Z/2;
@@ -171,21 +171,21 @@ void Dphi_(spinor_field *out, spinor_field *in)
     error(out->type==&glattice && in->type!=&glattice, 1, "Dphi_ [Dphi_gpu.c]", "Spinors don't match! (3)");
   #endif
 
-  _PIECE_FOR(out->type, ixp) 
+  _PIECE_FOR(out->type, ixp)
   {
       /*cudaError_t error_code;
       error_code = cudaSetDevice(ixp);
       if (error_code != cudaSuccess) printf("Could not change to device %d\n", ixp);*/
-      
+
       printf("Operating on piece: %d\n", ixp);
       int iyp = (ixp+1)%2;
       N = (out)->type->master_end[ixp]-(out)->type->master_start[ixp];
       grid = (N-1)/BLOCK_SIZE + 1;
-      Dphi_gpu_kernel<<<grid, BLOCK_SIZE>>>(_GPU_FIELD_BLK(out, ixp), 
+      Dphi_gpu_kernel<<<grid, BLOCK_SIZE>>>(_GPU_FIELD_BLK(out, ixp),
                                             _GPU_FIELD_BLK(in, iyp),
-                                            _GPU_4FIELD_BLK(u_gauge_f, ixp), 
+                                            _GPU_4FIELD_BLK(u_gauge_f, ixp),
                                             _GPU_4FIELD_BLK(u_gauge_f, iyp),
-                                            iup_gpu, idn_gpu, 
+                                            iup_gpu, idn_gpu,
                                             vol4h, ixp);
       CudaCheckError();
   }
@@ -195,7 +195,7 @@ void Dphi_(spinor_field *out, spinor_field *in)
 /*
  * this function takes 2 spinors defined on the whole lattice
  */
-void Dphi(double m0, spinor_field *out, spinor_field *in)
+void Dphi_gpu(double m0, spinor_field *out, spinor_field *in)
 {
   double rho;
 
@@ -216,7 +216,7 @@ void Dphi(double m0, spinor_field *out, spinor_field *in)
 }
 
 
-void g5Dphi(double m0, spinor_field *out, spinor_field *in)
+void g5Dphi_gpu(double m0, spinor_field *out, spinor_field *in)
 {
   double rho;
 
@@ -279,7 +279,7 @@ static void init_Dirac() {
  * Dphi in = (4+m0)^2*in - D_EO D_OE in
  *
  */
-void Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
+void Dphi_eopre_gpu(double m0, spinor_field *out, spinor_field *in)
 {
   double rho;
 
@@ -312,7 +312,7 @@ void Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
  * Dphi in = (4+m0)^2*in - D_OE D_EO in
  *
  */
-void Dphi_oepre(double m0, spinor_field *out, spinor_field *in)
+void Dphi_oepre_gpu(double m0, spinor_field *out, spinor_field *in)
 {
   double rho;
 
@@ -341,7 +341,7 @@ void Dphi_oepre(double m0, spinor_field *out, spinor_field *in)
 }
 
 
-void g5Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
+void g5Dphi_eopre_gpu(double m0, spinor_field *out, spinor_field *in)
 {
   double rho;
 
@@ -379,7 +379,7 @@ void g5Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
 
 
 /* g5Dphi_eopre ^2 */
-void g5Dphi_eopre_sq(double m0, spinor_field *out, spinor_field *in) {
+void g5Dphi_eopre_sq_gpu(double m0, spinor_field *out, spinor_field *in) {
   /* alloc memory for temporary spinor field */
   if (init) { init_Dirac(); }
 
@@ -389,7 +389,7 @@ void g5Dphi_eopre_sq(double m0, spinor_field *out, spinor_field *in) {
 
 
 /* g5Dhi ^2 */
-void g5Dphi_sq(double m0, spinor_field *out, spinor_field *in) {
+void g5Dphi_sq_gpu(double m0, spinor_field *out, spinor_field *in) {
   /* alloc memory for temporary spinor field */
   if (init) { init_Dirac();  }
 
@@ -400,13 +400,13 @@ void g5Dphi_sq(double m0, spinor_field *out, spinor_field *in) {
 /* ================================== KERNEL ================================== */
 
 /* Takes an even input spinor and returns an odd spinor */
-__global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out, 
+__global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out,
                             const suNf_spinor* __restrict__ in,
-                            const suNf* __restrict__ gauge_ixp, 
+                            const suNf* __restrict__ gauge_ixp,
                             const suNf* __restrict__ gauge_iyp,
-                            const int* __restrict__ iup_d, 
+                            const int* __restrict__ iup_d,
                             const int* __restrict__ idn_d,
-                            const int vol4h, 
+                            const int vol4h,
                             const int ixp)
 {
   suNf_spinor r;
@@ -426,7 +426,7 @@ __global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out,
     iy=iup_d[4*ix];
     iyp=iy/vol4h;
     local_iy = iy % vol4h;
-    
+
     read_gpu_suNf_vector(vol4h, sn.c[0], in, local_iy, 0);
     read_gpu_suNf_vector(vol4h, sn.c[1], in, local_iy, 2);
     read_gpu_suNf(vol4h, u, gauge_ixp, local_ix, 0);
