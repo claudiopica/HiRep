@@ -122,25 +122,17 @@
     #define _DECLARE_CONVERT_TO_GPU_FORMAT(_name, _field_type, _site_type, _size)                           \
         void to_gpu_format_##_name(_field_type *out, _field_type *in)                                       \
         {                                                                                                   \
-            _site_type *r = 0;                                                                              \
-            int number_of_elements;                                                                         \
+            _site_type *source;                                                                             \
             error(out->type!=in->type, 1, "to_gpu_format_" #_name " " __FILE__,                             \
                     "Gauge field geometries do not match!\n");                                              \
-            _PIECE_FOR(in->type, ixp)                                                                       \
-            {                                                                                               \
-                const int start = in->type->master_start[ixp];                                              \
-                const int N = in->type->master_end[ixp] - in->type->master_start[ixp]+1;                    \
-                double *cout = (double*)(_4FIELD_AT(out, start, 0));                                        \
-                _SITE_FOR(in->type, ixp, ix)                                                                \
-                {                                                                                           \
-                    r = _4FIELD_AT(in, ix, 0);                                                              \
                                                                                                             \
-                    number_of_elements = _size * sizeof(*r)/sizeof(double);                                 \
-                    for (int j = 0; j < number_of_elements; ++j)                                            \
-                    {                                                                                       \
-                        cout[j*N] = ((double*)(r))[j];                                                      \
-                    }                                                                                       \
-                    ++cout;                                                                                 \
+            int vol4h = T*X*Y*Z/2;                                                                          \
+            _MASTER_FOR(in->type, ix)                                                                       \
+            {                                                                                               \
+                for (int comp = 0; comp < _size; ++comp)                                                    \
+                {                                                                                           \
+                    source = _4FIELD_AT(in, ix, comp);                                                      \
+                    write_gpu_##_site_type(vol4h, (*source), out->ptr, ix, comp);                           \
                 }                                                                                           \
             }                                                                                               \
         }
@@ -148,25 +140,17 @@
     #define _DECLARE_CONVERT_TO_CPU_FORMAT(_name, _field_type, _site_type, _size)                           \
         void to_cpu_format_##_name(_field_type *out, _field_type *in)                                       \
         {                                                                                                   \
-            _site_type *r = 0;                                                                              \
-            int number_of_elements;                                                                         \
+            _site_type *target;                                                                         \
             error(out->type!=in->type, 1, "to_cpu_format_" #_name " " __FILE__,                             \
                         "Gauge field geometries do not match!\n");                                          \
-            _PIECE_FOR(in->type, ixp)                                                                       \
-            {                                                                                               \
-                const int start = in->type->master_start[ixp];                                              \
-                const int N = in->type->master_end[ixp] - in->type->master_start[ixp] + 1;                  \
-                double *cin = (double*)(_4FIELD_AT(in, start, 0));                                          \
-                _SITE_FOR(in->type, ixp, ix)                                                                \
-                {                                                                                           \
-                    r = _4FIELD_AT(out, ix, 0);                                                             \
                                                                                                             \
-                    number_of_elements = _size * sizeof(*r)/sizeof(double);                                 \
-                    for (int j = 0; j < number_of_elements; ++j)                                            \
-                    {                                                                                       \
-                        ((double*)(r))[j] = cin[j*N];                                                       \
-                    }                                                                                       \
-                    ++cin;                                                                                  \
+            int vol4h = T*X*Y*Z/2;                                                                          \
+            _MASTER_FOR(in->type, ix)                                                                       \
+            {                                                                                               \
+                for (int comp = 0; comp < _size; ++comp)                                                    \
+                {                                                                                           \
+                    target = _4FIELD_AT(out, ix, comp);                                                     \
+                    read_gpu_##_site_type(vol4h, (*target), in->ptr, ix, comp);                         \
                 }                                                                                           \
             }                                                                                               \
         }
@@ -245,7 +229,7 @@ _DECLARE_MEMORY_FUNC(gfield_f_flt, suNf_field_flt, suNf_flt, 4);
 _DECLARE_MEMORY_FUNC(scalar_field, suNg_scalar_field, suNg_vector, 1);
 _DECLARE_MEMORY_FUNC(avfield, suNg_av_field, suNg_algebra_vector, 4);
 _DECLARE_MEMORY_FUNC(gtransf, suNg_field, suNg, 1);
-_DECLARE_MEMORY_FUNC(clover_ldl, ldl_field, ldl_t, 1);
+//_DECLARE_MEMORY_FUNC(clover_ldl, ldl_field, ldl_t, 1);
 _DECLARE_MEMORY_FUNC(clover_term, suNfc_field, suNfc, 4);
 _DECLARE_MEMORY_FUNC(clover_force, suNf_field, suNf, 6);
 

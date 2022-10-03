@@ -171,6 +171,8 @@ void Dphi_(spinor_field *out, spinor_field *in)
     error(out->type==&glattice && in->type!=&glattice, 1, "Dphi_ [Dphi_gpu.c]", "Spinors don't match! (3)");
   #endif
 
+
+  // FIXME: This also calls kernels for every piece in the buffer and this is not optimal
   _PIECE_FOR(out->type, ixp) 
   {
       /*cudaError_t error_code;

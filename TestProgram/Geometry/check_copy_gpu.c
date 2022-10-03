@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
     setup_process(&argc, &argv);
 
     // Run tests
-    return_val += test_convert_back_forth_spinor_field();
+    //return_val += test_convert_back_forth_spinor_field();
     //return_val += test_convert_back_forth_spinor_field_flt(); // FIXME: Macros for single precision do not work yet
     return_val += test_convert_back_forth_gfield_f();
     return_val += test_convert_back_forth_gfield();
@@ -56,6 +56,7 @@ int test_convert_back_forth_spinor_field()
     gaussian_spinor_field(in);
 
     // Save transformed field in CPU copy of tmp field
+    //spinor_field_togpuformat(tmp, in);
     to_gpu_format_spinor_field_f(tmp, in);
 
     // Sanity checks that the CPU copy of in field 
@@ -122,8 +123,9 @@ int test_convert_back_forth_spinor_field_flt()
 
 int test_convert_back_forth_gfield_f() 
 {
-    lprintf("INFO", 0, " ======= TEST GAUGE FIELD IN FUNDAMENTAL REP ======= \n");
+    lprintf("INFO", 0, " ======= TEST GAUGE FIELD REPRESENTED ======= \n");
     int return_val = 0;
+    int vol4h = T*X*Y*Z/2;
     suNf_field *in, *tmp, *out;
     in = alloc_gfield_f(&glattice);
     tmp = alloc_gfield_f(&glattice);
@@ -136,7 +138,8 @@ int test_convert_back_forth_gfield_f()
     // Transform back to out field
     to_cpu_format_gfield_f(out, tmp);
 
-    suNf in_mat, tmp_mat, out_mat;
+    suNf *in_mat, *tmp_mat, *out_mat;
+    tmp_mat = (suNf*)malloc(sizeof(suNf));
     double sqnorm = 0.0;
     double sqnorm_in_check = 0.0;
     double sqnorm_tmp_check = 0.0;
@@ -145,22 +148,25 @@ int test_convert_back_forth_gfield_f()
 
     _MASTER_FOR(in->type, ix) 
     {
-        in_mat = *(in->ptr+ix);
-        out_mat = *(out->ptr+ix);
-        tmp_mat = *(tmp->ptr+ix);
+        for (int comp = 0; comp < 4; ++comp) 
+        {
+            in_mat = _4FIELD_AT(in, ix, comp);
+            out_mat = _4FIELD_AT(in, ix, comp);
+            read_gpu_suNf(vol4h, (*tmp_mat), tmp->ptr, ix, comp);
 
-        _suNf_sqnorm(sqnorm, in_mat);
-        sqnorm_in_check += sqnorm;
+            _suNf_sqnorm(sqnorm, (*in_mat));
+            sqnorm_in_check += sqnorm;
 
-        _suNf_sqnorm(sqnorm, tmp_mat);
-        sqnorm_tmp_check += sqnorm;
-        
-        _suNf_sqnorm(sqnorm, out_mat);
-        sqnorm_out_check += sqnorm;
+            _suNf_sqnorm(sqnorm, (*tmp_mat));
+            sqnorm_tmp_check += sqnorm;
+            
+            _suNf_sqnorm(sqnorm, (*out_mat));
+            sqnorm_out_check += sqnorm;
 
-        _suNg_sub_assign(out_mat, in_mat);
-        _suNg_sqnorm(sqnorm, out_mat);
-        diff_norm += sqnorm;
+            _suNg_sub_assign((*out_mat), (*in_mat));
+            _suNg_sqnorm(sqnorm, (*out_mat));
+            diff_norm += sqnorm;
+        }
     }
 
     lprintf("SANITY CHECK", 0, "[Tmp sqnorm unequal zero: %0.2e]\n", sqnorm_tmp_check);
@@ -185,11 +191,11 @@ int test_convert_back_forth_gfield()
 {
     lprintf("INFO", 0, " ======= TEST GAUGE FIELD ======= \n");
     int return_val = 0;
+    int vol4h = T*X*Y*Z/2;
     suNg_field *in, *tmp, *out;
     in = alloc_gfield(&glattice);
     tmp = alloc_gfield(&glattice);
     out = alloc_gfield(&glattice);
-
     random_u(in);
 
     // Save transformed field in CPU copy of tmp field
@@ -198,7 +204,8 @@ int test_convert_back_forth_gfield()
     // Transform back to out field
     to_cpu_format_gfield(out, tmp);
 
-    suNg in_mat, tmp_mat, out_mat;
+    suNg *in_mat, *tmp_mat, *out_mat;
+    tmp_mat = (suNg*)malloc(sizeof(suNg));
     double sqnorm = 0.0;
     double sqnorm_in_check = 0.0;
     double sqnorm_tmp_check = 0.0;
@@ -207,22 +214,25 @@ int test_convert_back_forth_gfield()
 
     _MASTER_FOR(in->type, ix) 
     {
-        in_mat = *(in->ptr+ix);
-        out_mat = *(out->ptr+ix);
-        tmp_mat = *(tmp->ptr+ix);
+        for (int comp = 0; comp < 4; ++comp) 
+        {
+            in_mat = _4FIELD_AT(in, ix, comp);
+            out_mat = _4FIELD_AT(in, ix, comp);
+            read_gpu_suNg(vol4h, (*tmp_mat), tmp->ptr, ix, comp);
 
-        _suNf_sqnorm(sqnorm, in_mat);
-        sqnorm_in_check += sqnorm;
+            _suNg_sqnorm(sqnorm, (*in_mat));
+            sqnorm_in_check += sqnorm;
 
-        _suNf_sqnorm(sqnorm, tmp_mat);
-        sqnorm_tmp_check += sqnorm;
-        
-        _suNf_sqnorm(sqnorm, out_mat);
-        sqnorm_out_check += sqnorm;
+            _suNg_sqnorm(sqnorm, (*tmp_mat));
+            sqnorm_tmp_check += sqnorm;
+            
+            _suNg_sqnorm(sqnorm, (*out_mat));
+            sqnorm_out_check += sqnorm;
 
-        _suNg_sub_assign(out_mat, in_mat);
-        _suNg_sqnorm(sqnorm, out_mat);
-        diff_norm += sqnorm;
+            _suNg_sub_assign((*out_mat), (*in_mat));
+            _suNg_sqnorm(sqnorm, (*out_mat));
+            diff_norm += sqnorm;
+        }
     }
 
     lprintf("SANITY CHECK", 0, "[Tmp sqnorm unequal zero: %0.2e]\n", sqnorm_tmp_check);

@@ -123,54 +123,30 @@
     #define _DECLARE_CONVERT_TO_GPU_FORMAT(_name, _field_type, _site_type, _size)                           \
         void to_gpu_format_##_name(_field_type *out, _field_type *in)                                       \
         {                                                                                                   \
-            _site_type *r = 0;                                                                              \
-            int number_of_elements;                                                                         \
+            _site_type *source;                                                                         \
             error(out->type != in->type, 1, "to_gpu_format_" #_name " " __FILE__,                           \
-                    "Matter field geometries do not match!\n");                                              \
-            _PIECE_FOR(in->type, ixp)                                                                       \
-            {                                                                                               \
-                const int start = in->type->master_start[ixp];                                              \
-                const int N = in->type->master_end[ixp] - in->type->master_start[ixp] + 1;                       \
-                /* Does not work for the single precision types */                                          \
-                hr_complex *cout = (hr_complex*)(_FIELD_AT(out, start));                                    \
-                _SITE_FOR(in->type, ixp, ix)                                                                \
-                {                                                                                           \
-                    r = _FIELD_AT(in, ix);                                                                  \
+                    "Field geometries do not match!\n");                                                    \
                                                                                                             \
-                    number_of_elements = sizeof(*r)/sizeof(hr_complex);                                     \
-                    for (int j = 0; j < number_of_elements; ++j)                                            \
-                    {                                                                                       \
-                        cout[j*N] = ((hr_complex*)(r))[j];                                                  \
-                    }                                                                                       \
-                    ++cout;                                                                                 \
-                }                                                                                           \
+            int vol4h = T*X*Y*Z/2;                                                                          \
+            _MASTER_FOR(in->type, ix)                                                                      \
+            {                                                                                               \
+                source = _FIELD_AT(in, ix);                                                                 \
+                write_gpu_##_site_type(vol4h, (*source), out->ptr, ix);                                     \
             }                                                                                               \
         }
 
     #define _DECLARE_CONVERT_TO_CPU_FORMAT(_name, _field_type, _site_type, _size)                           \
         void to_cpu_format_##_name(_field_type *out, _field_type *in)                                       \
         {                                                                                                   \
-            _site_type *r = 0;                                                                              \
-            int number_of_elements;                                                                         \
+            _site_type *target;                                                                             \
             error(out->type != in->type, 1, "to_cpu_format_" #_name " " __FILE__,                           \
-                        "Matter field geometries do not match!\n");                                          \
-            _PIECE_FOR(in->type, ixp)                                                                       \
+                        "Field geometries do not match!\n");                                                \
+                                                                                                            \
+            int vol4h = T*X*Y*Z/2;                                                                          \
+            _MASTER_FOR(in->type, ix)                                                                       \
             {                                                                                               \
-                const int start = in->type->master_start[ixp];                                              \
-                const int N = in->type->master_end[ixp] - in->type->master_start[ixp] + 1;                      \
-                hr_complex *cin = (hr_complex*)(_FIELD_AT(in, start));                                          \
-                                                                                                            \
-                _SITE_FOR(in->type, ixp, ix)                                                                \
-                {                                                                                           \
-                    r = _FIELD_AT(out, ix);                                                             \
-                                                                                                            \
-                    number_of_elements = sizeof(*r)/sizeof(hr_complex);                                 \
-                    for (int j = 0; j < number_of_elements; ++j)                                            \
-                    {                                                                                       \
-                        ((hr_complex*)(r))[j] = cin[j*N];                                                       \
-                    }                                                                                       \
-                    ++cin;                                                                                  \
-                }                                                                                           \
+                target = _FIELD_AT(in, ix);                                                                 \
+                read_gpu_##_site_type(vol4h, (*target), in->ptr, ix);                                       \
             }                                                                                               \
         }
 
@@ -250,7 +226,11 @@
 
 _DECLARE_MEMORY_FUNC(spinor_field_f, spinor_field, suNf_spinor, 1);
 _DECLARE_MEMORY_FUNC(spinor_field_f_flt, spinor_field_flt, suNf_spinor_flt, 1);
-_DECLARE_MEMORY_FUNC(sfield, scalar_field, double, 1);
+//_DECLARE_MEMORY_FUNC(sfield, scalar_field, double, 1);
+
+scalar_field* alloc_sfield(unsigned int n, geometry_descriptor* type) {}
+void free_sfield(scalar_field* s) {}
+
 
 #undef _DECLARE_MEMORY_FUNC
 #undef _DECLARE_FREE_FUNC
