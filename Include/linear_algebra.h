@@ -16,7 +16,6 @@
 #include "suN.h"
 #include "spinor_field.h"
 #include "hr_complex.h"
-#undef hr_complex
 
 #ifdef __cplusplus
 extern "C" {
