@@ -1,5 +1,3 @@
-This repository contains the HiRep simulation code.
-
 # Getting started
 
 ## Dependencies

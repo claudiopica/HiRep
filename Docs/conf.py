@@ -29,8 +29,8 @@ dev_doc = "development_manual"
 # General information about the project.
 project = "HiRep"
 copyright = "2022"
-#author = "Rudy Arthur, Vincent Drach, Martin Hansen, Sofie Martins, Claudio Pica, Antonio Rago, Fernando Romero-López"
-author = "HiRep Developers"
+author = "Rudy Arthur, Vincent Drach, Martin Hansen, Sofie Martins, Claudio Pica, Antonio Rago, Fernando Romero-López"
+#author = "HiRep Developers"
 
 
 # Custom CSS
@@ -44,7 +44,34 @@ html_theme = "sphinx_rtd_theme"
 html_theme_path = ["_themes"]
 
 # -- Options for LaTeX output ---------------------------------------------
-latex_elements = {"preamble": r"\pdfimageresolution=144"}
+latex_elements = {
+'sphinxsetup': 'VerbatimBorderColor={rgb}{0.9,0.9,0.9}, VerbatimColor={rgb}{0.98,0.98,0.98},  HeaderFamily=\sffamily',
+"preamble": r'''
+    \pdfimageresolution=144
+    \usepackage{booktabs}
+    \usepackage{titlesec}
+    \renewcommand{\familydefault}{\sfdefault}
+    \renewcommand{\baselinestretch}{1.15}
+    \renewcommand{\arraystretch}{1.15}
+    \titleformat{\chapter}{\fontsize{27}{27}\selectfont}{\thechapter}{1em}{}
+    \titleformat{\section}{\fontsize{20}{20}\selectfont}{\thesection}{1em}{}
+    \titleformat{\subsection}{\fontsize{16}{16}\selectfont}{\thesubsection}{1em}{}
+''',
+"maketitle": r'''
+\makeatletter
+\thispagestyle{empty}
+{
+\centering
+\hrulefill
+\vspace{1cm}\\
+{\fontsize{35}{35}\selectfont\@title}
+\vspace{18cm}\\
+{\centering\large\textit{\@author}}
+\vspace{3em}
+}
+\makeatother
+''',
+}
 latex_documents = [
     (
         user_doc,
