@@ -23,12 +23,15 @@ source_suffix = [".rst", ".md"]
 
 # The master toctree document.
 master_doc = "index"
+user_doc = "user_guide"
+dev_doc = "development_manual"
 
 # General information about the project.
 project = "HiRep"
 copyright = "2022"
 #author = "Rudy Arthur, Vincent Drach, Martin Hansen, Sofie Martins, Claudio Pica, Antonio Rago, Fernando Romero-López"
 author = "HiRep Developers"
+
 
 # Custom CSS
 html_static_path = ["_static"]
@@ -44,16 +47,16 @@ html_theme_path = ["_themes"]
 latex_elements = {"preamble": r"\pdfimageresolution=144"}
 latex_documents = [
     (
-        'user_guide',
-        "hirep-documentation1.tex",
-        "HiRep Documentation", 
+        user_doc,
+        "hirep_user_guide.tex",
+        "HiRep User Guide", 
         author, 
         "manual",
     ),
     (
-        'developer_notes',
-        "hirep-documentation.tex",
-        "HiRep Documentation",
+        dev_doc,
+        "hirep_development_manual.tex",
+        "HiRep Development Manual",
         author,
         "manual",
     ), 
@@ -67,21 +70,21 @@ man_pages = [
 # -- Options for Texinfo output -------------------------------------------
 texinfo_documents = [
     (
-        'user_guide', 
-        "hiRep-documentation", 
-        "HiRep Documentation", 
+        user_doc, 
+        "hirep_user_guide", 
+        "HiRep User Guide", 
         author, 
-        "sphinx-example",
-        "One line description of project.",
+        "User Guide",
+        "Library for Numerical Simulations of Fermions in Higher Representation on the Lattice",
         "Miscellaneous",
     ),
     (
-        'developer_notes',
-        "hiRep-documentation",
-        "HiRep Documentation",
+        dev_doc,
+        "hirep_development_manual",
+        "HiRep Development Manual",
         author,
-        "sphinx-example",
-        "One line description of project.",
+        "Development Manual",
+        "Library for Numerical Simulations of Fermions on Higher Representation on the Lattice",
         "Miscellaneous",
     ),
 ]
