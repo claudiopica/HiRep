@@ -18,6 +18,10 @@
 #endif
 #include "logger.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifdef MPI_TIMING
 struct timeval gfstart, gfend, gfetime,sfstart, sfend, sfetime;
 int gf_control=0,sf_control=0;
@@ -857,3 +861,7 @@ void start_sc_sendrecv(suNg_scalar_field *sf) {
 
 #endif /* WITH_MPI */
 }
+
+#ifdef __cplusplus
+}
+#endif

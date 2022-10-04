@@ -31,13 +31,13 @@
 #include "hr_complex.h"
 #include <iostream>
 
-__global__ void Dphi_gpu_kernel(suNf_spinor*, 
+__global__ void Dphi_gpu_kernel(suNf_spinor*,
                             const suNf_spinor*,
-                            const suNf*, 
                             const suNf*,
-                            const int*, 
+                            const suNf*,
                             const int*,
-                            const int, 
+                            const int*,
+                            const int,
                             const int);
 
 #ifdef ROTATED_SF
@@ -54,7 +54,7 @@ extern rhmc_par _update_par; /* Update/update_rhmc.c */
  */
 static unsigned long int MVMcounter=0;
 
-unsigned long int getMVM() {
+unsigned long int getMVM_gpu() {
 	unsigned long int res=MVMcounter>>1; /* divide by two */
 	//MVMcounter=0; /* reset counter */
 	return res;
@@ -151,7 +151,7 @@ static void init_bc_gpu(){
   #endif
 }
 
-void Dphi_(spinor_field *out, spinor_field *in)
+void Dphi_gpu_(spinor_field *out, spinor_field *in)
 {
   unsigned int N, grid;
   const int vol4h=T*X*Y*Z/2;
@@ -159,33 +159,33 @@ void Dphi_(spinor_field *out, spinor_field *in)
 
   init_bc_gpu();
 
-  error((in==NULL)||(out==NULL), 1, "Dphi_ [Dphi_gpu.c]",
+  error((in==NULL)||(out==NULL), 1, "Dphi_gpu_ [Dphi_gpu.c]",
          "Attempt to access unallocated memory space");
 
-  error(in==out, 1, "Dphi_ [Dphi_gpu.c]",
+  error(in==out, 1, "Dphi_gpu_ [Dphi_gpu.c]",
          "Input and output fields must be different");
 
   #ifndef CHECK_SPINOR_MATCHING
-    error(out->type==&glat_even && in->type!=&glat_odd, 1, "Dphi_ [Dphi_gpu.c]", "Spinors don't match! (1)");
-    error(out->type==&glat_odd && in->type!=&glat_even, 1, "Dphi_ [Dphi_gpu.c]", "Spinors don't match! (2)");
-    error(out->type==&glattice && in->type!=&glattice, 1, "Dphi_ [Dphi_gpu.c]", "Spinors don't match! (3)");
+    error(out->type==&glat_even && in->type!=&glat_odd, 1, "Dphi_gpu_ [Dphi_gpu.c]", "Spinors don't match! (1)");
+    error(out->type==&glat_odd && in->type!=&glat_even, 1, "Dphi_gpu_ [Dphi_gpu.c]", "Spinors don't match! (2)");
+    error(out->type==&glattice && in->type!=&glattice, 1, "Dphi_gpu_ [Dphi_gpu.c]", "Spinors don't match! (3)");
   #endif
 
-  _PIECE_FOR(out->type, ixp) 
+  _PIECE_FOR(out->type, ixp)
   {
       /*cudaError_t error_code;
       error_code = cudaSetDevice(ixp);
       if (error_code != cudaSuccess) printf("Could not change to device %d\n", ixp);*/
-      
+
       printf("Operating on piece: %d\n", ixp);
       int iyp = (ixp+1)%2;
       N = (out)->type->master_end[ixp]-(out)->type->master_start[ixp];
       grid = (N-1)/BLOCK_SIZE + 1;
-      Dphi_gpu_kernel<<<grid, BLOCK_SIZE>>>(_GPU_FIELD_BLK(out, ixp), 
+      Dphi_gpu_kernel<<<grid, BLOCK_SIZE>>>(_GPU_FIELD_BLK(out, ixp),
                                             _GPU_FIELD_BLK(in, iyp),
-                                            _GPU_4FIELD_BLK(u_gauge_f, ixp), 
+                                            _GPU_4FIELD_BLK(u_gauge_f, ixp),
                                             _GPU_4FIELD_BLK(u_gauge_f, iyp),
-                                            iup_gpu, idn_gpu, 
+                                            iup_gpu, idn_gpu,
                                             vol4h, ixp);
       CudaCheckError();
   }
@@ -195,45 +195,45 @@ void Dphi_(spinor_field *out, spinor_field *in)
 /*
  * this function takes 2 spinors defined on the whole lattice
  */
-void Dphi(double m0, spinor_field *out, spinor_field *in)
+void Dphi_gpu(double m0, spinor_field *out, spinor_field *in)
 {
   double rho;
 
-  error((in==NULL)||(out==NULL), 1, "Dphi [Dphi_gpu.c]",
+  error((in==NULL)||(out==NULL), 1, "Dphi_gpu [Dphi_gpu.c]",
         "Attempt to access unallocated memory space");
 
-  error(in==out, 1, "Dphi [Dphi_gpu.c]",
+  error(in==out, 1, "Dphi_gpu [Dphi_gpu.c]",
         "Input and output fields must be different");
 
 #ifdef CHECK_SPINOR_MATCHING
-  error(out->type!=&glattice || in->type!=&glattice, 1, "Dphi [Dphi_gpu.c]", "Spinors are not defined on all the lattice!");
+  error(out->type!=&glattice || in->type!=&glattice, 1, "Dphi_gpu [Dphi_gpu.c]", "Spinors are not defined on all the lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
-  Dphi_(out, in);
+  Dphi_gpu_(out, in);
 
   rho = 4. + m0;
-  spinor_field_mul_add_assign_f(out, rho, in);
+  spinor_field_mul_add_assign_f_gpu(out, rho, in);
 }
 
 
-void g5Dphi(double m0, spinor_field *out, spinor_field *in)
+void g5Dphi_gpu(double m0, spinor_field *out, spinor_field *in)
 {
   double rho;
 
-  error((in==NULL)||(out==NULL), 1, "g5Dphi [Dphi_gpu.c]",
+  error((in==NULL)||(out==NULL), 1, "g5Dphi_gpu [Dphi_gpu.c]",
 	"Attempt to access unallocated memory space");
 
-  error(in==out, 1, "g5Dphi [Dphi_gpu.c]",
+  error(in==out, 1, "g5Dphi_gpu [Dphi_gpu.c]",
 	"Input and output fields must be different");
 
 #ifdef CHECK_SPINOR_MATCHING
-   error(out->type!=&glattice || in->type!=&glattice, 1, "g5Dphi [Dphi_gpu.c]", "Spinors are not defined on all the lattice!");
+   error(out->type!=&glattice || in->type!=&glattice, 1, "g5Dphi_gpu [Dphi_gpu.c]", "Spinors are not defined on all the lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
-  Dphi_(out, in);
+  Dphi_gpu_(out, in);
   rho=4.+m0;
-  spinor_field_mul_add_assign_f(out, rho, in);
-  spinor_field_g5_assign_f(out);
+  spinor_field_mul_add_assign_f_gpu(out, rho, in);
+  spinor_field_g5_assign_f_gpu(out);
 }
 
 
@@ -279,31 +279,31 @@ static void init_Dirac() {
  * Dphi in = (4+m0)^2*in - D_EO D_OE in
  *
  */
-void Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
+void Dphi_eopre_gpu(double m0, spinor_field *out, spinor_field *in)
 {
   double rho;
 
-  error((in==NULL)||(out==NULL), 1, "Dphi_eopre [Dphi_gpu.c]",
+  error((in==NULL)||(out==NULL), 1, "Dphi_eopre_gpu [Dphi_gpu.c]",
 	"Attempt to access unallocated memory space");
 
-  error(in==out, 1, "Dphi_eopre [Dphi_gpu.c]",
+  error(in==out, 1, "Dphi_eopre_gpu [Dphi_gpu.c]",
 	"Input and output fields must be different");
 
 #ifdef CHECK_SPINOR_MATCHING
-  error(out->type!=&glat_even || in->type!=&glat_even, 1, "Dphi_eopre " __FILE__, "Spinors are not defined on even lattice!");
+  error(out->type!=&glat_even || in->type!=&glat_even, 1, "Dphi_eopre_gpu " __FILE__, "Spinors are not defined on even lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
   /* alloc memory for temporary spinor field */
   if (init) { init_Dirac(); }
 
-  Dphi_(otmp, in);
-  Dphi_(out, otmp);
+  Dphi_gpu_(otmp, in);
+  Dphi_gpu_(out, otmp);
 
   rho=4.0+m0;
   rho*=-rho; /* this minus sign is taken into account below */
 
-  spinor_field_mul_add_assign_f(out, rho, in);
-  spinor_field_minus_f(out, out);
+  spinor_field_mul_add_assign_f_gpu(out, rho, in);
+  spinor_field_minus_f_gpu(out, out);
 }
 
 
@@ -312,47 +312,47 @@ void Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
  * Dphi in = (4+m0)^2*in - D_OE D_EO in
  *
  */
-void Dphi_oepre(double m0, spinor_field *out, spinor_field *in)
+void Dphi_oepre_gpu(double m0, spinor_field *out, spinor_field *in)
 {
   double rho;
 
-  error((in==NULL)||(out==NULL), 1, "Dphi_oepre [Dphi_gpu.c]",
+  error((in==NULL)||(out==NULL), 1, "Dphi_oepre_gpu [Dphi_gpu.c]",
 	"Attempt to access unallocated memory space");
 
-  error(in==out, 1, "Dphi_oepre [Dphi_gpu.c]",
+  error(in==out, 1, "Dphi_oepre_gpu [Dphi_gpu.c]",
 	"Input and output fields must be different");
 
 #ifdef CHECK_SPINOR_MATCHING
-  error(out->type!=&glat_odd || in->type!=&glat_odd, 1, "Dphi_oepre " __FILE__, "Spinors are not defined on odd lattice!");
+  error(out->type!=&glat_odd || in->type!=&glat_odd, 1, "Dphi_oepre_gpu " __FILE__, "Spinors are not defined on odd lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
 
   /* alloc memory for temporary spinor field */
   if (init) { init_Dirac();}
 
-  Dphi_(etmp, in);
-  Dphi_(out, etmp);
+  Dphi_gpu_(etmp, in);
+  Dphi_gpu_(out, etmp);
 
   rho=4.0+m0;
   rho*=-rho; /* this minus sign is taken into account below */
 
-  spinor_field_mul_add_assign_f(out, rho, in);
-  spinor_field_minus_f(out, out);
+  spinor_field_mul_add_assign_f_gpu(out, rho, in);
+  spinor_field_minus_f_gpu(out, out);
 }
 
 
-void g5Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
+void g5Dphi_eopre_gpu(double m0, spinor_field *out, spinor_field *in)
 {
   double rho;
 
-  error((in==NULL)||(out==NULL), 1, "g5Dphi_eopre [Dphi_gp.c]",
+  error((in==NULL)||(out==NULL), 1, "g5Dphi_eopre_gpu [Dphi_gp.c]",
 	"Attempt to access unallocated memory space");
 
-  error(in==out, 1, "Dphi_eopre [Dphi_gpu.c]",
+  error(in==out, 1, "Dphi_eopre_gpu [Dphi_gpu.c]",
 	"Input and output fields must be different");
 
 #ifdef CHECK_SPINOR_MATCHING
-  error(out->type!=&glat_even || in->type!=&glat_even, 1, "g5Dphi_eopre " __FILE__, "Spinors are not defined on even lattice!");
+  error(out->type!=&glat_even || in->type!=&glat_even, 1, "g5Dphi_eopre_gpu " __FILE__, "Spinors are not defined on even lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
 #if defined(BASIC_SF) || defined(ROTATED_SF)
@@ -362,15 +362,15 @@ void g5Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
   /* alloc memory for temporary spinor field */
   if (init) { init_Dirac();}
 
-  Dphi_(otmp, in);
-  Dphi_(out, otmp);
+  Dphi_gpu_(otmp, in);
+  Dphi_gpu_(out, otmp);
 
   rho=4.0+m0;
   rho*=-rho; /* this minus sign is taken into account below */
 
-  spinor_field_mul_add_assign_f(out, rho, in);
-  spinor_field_minus_f(out, out);
-  spinor_field_g5_assign_f(out);
+  spinor_field_mul_add_assign_f_gpu(out, rho, in);
+  spinor_field_minus_f_gpu(out, out);
+  spinor_field_g5_assign_f_gpu(out);
 
 #if defined(BASIC_SF) || defined(ROTATED_SF)
   SF_spinor_bcs(out);
@@ -379,34 +379,34 @@ void g5Dphi_eopre(double m0, spinor_field *out, spinor_field *in)
 
 
 /* g5Dphi_eopre ^2 */
-void g5Dphi_eopre_sq(double m0, spinor_field *out, spinor_field *in) {
+void g5Dphi_eopre_sq_gpu(double m0, spinor_field *out, spinor_field *in) {
   /* alloc memory for temporary spinor field */
   if (init) { init_Dirac(); }
 
-  g5Dphi_eopre(m0, etmp, in);
-  g5Dphi_eopre(m0, out, etmp);
+  g5Dphi_eopre_gpu(m0, etmp, in);
+  g5Dphi_eopre_gpu(m0, out, etmp);
 }
 
 
 /* g5Dhi ^2 */
-void g5Dphi_sq(double m0, spinor_field *out, spinor_field *in) {
+void g5Dphi_sq_gpu(double m0, spinor_field *out, spinor_field *in) {
   /* alloc memory for temporary spinor field */
   if (init) { init_Dirac();  }
 
-  g5Dphi(m0, gtmp, in);
-  g5Dphi(m0, out, gtmp);
+  g5Dphi_gpu(m0, gtmp, in);
+  g5Dphi_gpu(m0, out, gtmp);
 }
 
 /* ================================== KERNEL ================================== */
 
 /* Takes an even input spinor and returns an odd spinor */
-__global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out, 
+__global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out,
                             const suNf_spinor* __restrict__ in,
-                            const suNf* __restrict__ gauge_ixp, 
+                            const suNf* __restrict__ gauge_ixp,
                             const suNf* __restrict__ gauge_iyp,
-                            const int* __restrict__ iup_d, 
+                            const int* __restrict__ iup_d,
                             const int* __restrict__ idn_d,
-                            const int vol4h, 
+                            const int vol4h,
                             const int ixp)
 {
   suNf_spinor r;
@@ -426,7 +426,7 @@ __global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out,
     iy=iup_d[4*ix];
     iyp=iy/vol4h;
     local_iy = iy % vol4h;
-    
+
     read_gpu_suNf_vector(vol4h, sn.c[0], in, local_iy, 0);
     read_gpu_suNf_vector(vol4h, sn.c[1], in, local_iy, 2);
     read_gpu_suNf(vol4h, u, gauge_ixp, local_ix, 0);
@@ -630,5 +630,15 @@ __global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out,
     write_gpu_suNf_vector(vol4h, r.c[3], out, local_ix, 3);
   }
 }
+
+void (*Dphi_) (spinor_field *out, spinor_field *in)=Dphi_gpu_;
+void (*Dphi) (double m0, spinor_field *out, spinor_field *in)=Dphi_gpu;
+void (*g5Dphi) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_gpu;
+void (*g5Dphi_sq) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_sq_gpu;
+unsigned long int (*getMVM) ()=getMVM_gpu;
+void (*Dphi_eopre) (double m0, spinor_field *out, spinor_field *in)=Dphi_eopre_gpu;
+void (*Dphi_oepre) (double m0, spinor_field *out, spinor_field *in)=Dphi_oepre_gpu;
+void (*g5Dphi_eopre) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_eopre_gpu;
+void (*g5Dphi_eopre_sq) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_eopre_sq_gpu;
 
 #endif
