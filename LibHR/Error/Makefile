@@ -8,4 +8,3 @@ LIBNAME = ../libhr.a
 EXCLUDE =
 
 include $(MKDIR)/MkRules
-

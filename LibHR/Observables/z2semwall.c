@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2009, Agostino Patella, Antonio Rago                        *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2009, Agostino Patella, Antonio Rago                        *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 #include "global.h"

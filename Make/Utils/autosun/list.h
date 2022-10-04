@@ -8,9 +8,9 @@ protected:
 		INDEX index;
 		VALUE value;
 	};
-	
+
 	ELEMENT** data;
-	
+
 	void sort(int l, int r)
 	{
 		KEYTYPE left = l, right = r;
@@ -56,7 +56,7 @@ protected:
 
 public:
 	KEYTYPE length;
-	
+
 	orderedlist()
 	{
 		length = 0;
@@ -82,7 +82,7 @@ public:
 		cerr << "COPY CONSTRUCTOR.\n";
 	}
 	virtual ~orderedlist() = 0;
-	
+
 	ELEMENT& operator[](KEYTYPE i) const { return *(data[i]); }
 	virtual orderedlist<INDEX,VALUE>& operator=(const orderedlist<INDEX,VALUE>& list)
 	{
@@ -129,12 +129,12 @@ public:
 		for(int i = 0; i < length; i++)
 			data[i]->value *= factor;
 	}
-	
+
 	void sort()
 	{
 		sort(0, length-1);
 	}
-	
+
 	void clear()
 	{
 		for(KEYTYPE i = 0; i < length; i++)
@@ -161,7 +161,7 @@ public:
 				else if(index <= data[pos]->index) end = pos;
 				else start = pos+1;
 			}
-			
+
 			if(index == data[pos]->index)
 				return data[pos]->value;
 			else
@@ -175,7 +175,7 @@ public:
 			remove(index);
 			return;
 		}
-		
+
 		if(length == 0)
 		{
 			length = 1;
@@ -207,7 +207,7 @@ public:
 				else if(index <= data[pos]->index) end = pos;
 				else start = pos+1;
 			}
-			
+
 			if(index == data[pos]->index)
 			{
 				data[pos]->value = value;
@@ -241,7 +241,7 @@ public:
 	{
 		if(value == getzero())
 			return;
-		
+
 		if(length == 0)
 		{
 			length = 1;
@@ -273,7 +273,7 @@ public:
 				else if(index <= data[pos]->index) end = pos;
 				else start = pos+1;
 			}
-			
+
 			if(index == data[pos]->index)
 			{
 				data[pos]->value += value;
@@ -330,7 +330,7 @@ public:
 				else if(index <= data[pos]->index) end = pos;
 				else start = pos+1;
 			}
-			
+
 			if(index == data[pos]->index)
 			{
 				ELEMENT** olddata = data;

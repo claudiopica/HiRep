@@ -2,7 +2,7 @@
 *
 * NOCOMPILE= !WITH_EXPCLOVER
 *
-* Check for the implementation of the exponential using the Horner scheme 
+* Check for the implementation of the exponential using the Horner scheme
 * by Fernando Romero-Lopez
 *
 *******************************************************************************/
@@ -135,6 +135,6 @@ int main(int argc, char *argv[])
   }
 
   finalize_process();
-  
+
   return return_value;
 }

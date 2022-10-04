@@ -25,15 +25,15 @@ int read_gauge(QDP_ColorMatrix *link[], char *name)
 
 
   params->beta=atof(tag);
-  
 
-  
+
+
   printf0("---------------------------------------------------------------\n");
   printf0("record metadata(%s):\n", name);
   printf0("%s\n", QDP_string_ptr(id));
   printf0("---------------------------------------------------------------\n");
   QDP_close_read(reader);
   QDP_string_destroy(id);
-  
-  return 0;  
+
+  return 0;
 }

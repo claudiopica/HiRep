@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c)                                                             *   
-* All rights reserved.                                                      * 
+* Copyright (c)                                                             *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 /*
@@ -27,7 +27,7 @@ void set_wrk_space_and_pointers(int i, suNg_field **g_wrk_out, int **i_up_wrk_ou
     Set the workspace pointers to point to the workspace "i" (u_gauge,iup,idn) and gives a direct link to the gauge field pointer and to the geometry pointers
 
 int reserve_wrk_space()
-    Reserve one workspace and returns the id of the reserved workspace 
+    Reserve one workspace and returns the id of the reserved workspace
 
 int reserve_wrk_space_with_pointers(suNg_field **g_wrk_out, int **i_up_wrk_out, int **i_dn_wrk_out)
     Reserve one workspace and returns the id of the reserved workspace and gives a direct link to the gauge field pointer and to the geometry pointers

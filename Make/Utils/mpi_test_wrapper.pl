@@ -24,4 +24,3 @@ if ( $NZ<1 ) { $NZ = 1 }
 my $NP=$NT*$NX*$NY*$NZ;
 #print "NP=$NP ($NT,$NX,$NY,$NZ)\n";
 exec("mpirun", "-np", $NP, @ARGV,"-i",$input_file);
-

@@ -74,7 +74,7 @@ extern ratio_ctrl makmvk;
 
 int main(int argc, char* argv[]) {
   int cmdline=read_cmdline(argc, argv);
-  
+
   if(cmdline == 0 ){
     cout << "1 CMDLINE channel " << channel << "\n";
     cout << "1 CMDLINE inputfile " << inputfilename << "\n";
@@ -85,12 +85,12 @@ int main(int argc, char* argv[]) {
     cout << "1 CMDLINE nsamples1 " << nsamples1 << "\n";
     cout << "1 CMDLINE nsamples2 " << nsamples2 << "\n";
   }
-  
+
   if(!eval_ctrl::fill_dep(channel.c_str())){
     cerr << "[XXX]: No recognized channel ("<< channel <<")"<<endl;
     exit(1);
   }
-  
+
   for(set<eval_ctrl*>::iterator ctrl_it=eval_ctrl::all.begin();ctrl_it!=eval_ctrl::all.end();ctrl_it++)
     cout << "2 EVAL_CTRL " << **ctrl_it << "\n";
 
@@ -115,12 +115,12 @@ int main(int argc, char* argv[]) {
   int csize=channel.size(),comparesize=4;
   if(csize-comparesize<0) comparesize=csize;
 
-   if( channel.compare(csize-comparesize,comparesize,"_cor")!=0) { 
+   if( channel.compare(csize-comparesize,comparesize,"_cor")!=0) {
     read_cut(cutfilename.c_str());
     eval_ctrl::normalize_cuts(Lt);
     for(cut_it=eval_ctrl::left_cut.begin();cut_it!=eval_ctrl::left_cut.end();cut_it++)
       cout << "2 READCUT " << (*cut_it).first << " " << (*cut_it).second << " " << eval_ctrl::right_cut[(*cut_it).first] << "\n";
-   }  
+   }
 
    cout << "3 READING " << inputfilename;
    read_input(inputfilename.c_str());
@@ -164,20 +164,20 @@ int main(int argc, char* argv[]) {
     //create bootstrap sample
     int bs[elen];
     b_sample(len, elen, bs);
-      
+
     bool valid_sample1=true;
 
     for(set<primary_ctrl*>::iterator pctrl_it=primary_ctrl::all_pr.begin();pctrl_it!=primary_ctrl::all_pr.end();pctrl_it++) {
       valid_sample1=(*pctrl_it)->eval_cor_eff(1,bs,elen,Lt,effmass_method);
       if (valid_sample1==false) break;
     }
-  
+
     if(valid_sample1 && eval_ctrl::bs_2nd){
       int trys=0;
-      
+
       for(set<eval_ctrl*>::iterator ctrl_it=eval_ctrl::all.begin();ctrl_it!=eval_ctrl::all.end();ctrl_it++)
         (*ctrl_it)->purge_b2();
-      
+
       for (int sample2=0;sample2<nsamples2 && trys<100;++sample2) {
         int bs_tmp[elen], bs2[elen];
         b_sample(elen, elen, bs_tmp);
@@ -196,7 +196,7 @@ int main(int argc, char* argv[]) {
           for(set<primary_ctrl*>::iterator pctrl_it=primary_ctrl::all_pr.begin();pctrl_it!=primary_ctrl::all_pr.end();pctrl_it++) {
             (*pctrl_it)->store_cor_eff(2);
           }
-            
+
           if(mpcac.get_level(D_EFF_B2))
             mpcac_eval(mpcac.eff_b2,g5.cor_b2,g5.eff_b2,g5_g0g5.cor_b2);
 
@@ -280,20 +280,20 @@ int main(int argc, char* argv[]) {
         if(makmvk.get_level(R_ACTIVE)) {
            makmvk.fit.push_back(g5gk.fit.back()/gk.fit.back());
         }
- 
+
         if(gmor.get_level(R_ACTIVE)) {
           gmor.fit.push_back(g5.fit.back()*g5.fit.back()*fps.fit.back()*fps.fit.back()/mpcac.fit.back());
         }
-        
+
       } else
         valid_sample1 = false;
     }
-    
+
     if (valid_sample1) {
       for(set<primary_ctrl*>::iterator pctrl_it=primary_ctrl::all_pr.begin();pctrl_it!=primary_ctrl::all_pr.end();pctrl_it++) {
         (*pctrl_it)->store_cor_eff(1);
       }
-           
+
       if(mpcac.get_level(D_EFF_B1))
         mpcac_eval(mpcac.eff_b1,g5.cor_b1,g5.eff_b1,g5_g0g5.cor_b1);
 
@@ -313,9 +313,9 @@ int main(int argc, char* argv[]) {
 			 fak_eval(fak.eff_b1,g5gk.cor_b1,g5gk.eff_b1);
 
     } else --sample1;
-        
+
   }
-  
+
   cout << "20 EFFICIENCY_BS1 " << (nsamples1*100)/count1 << " %" << endl;
 
   ///////////////////////////////////////////////////////////////////////////
@@ -331,4 +331,3 @@ int main(int argc, char* argv[]) {
 
   return 0;
 }
-

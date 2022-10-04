@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 
@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <math.h>
 
-/*  Update the momentum of the auxiliary fields with 
+/*  Update the momentum of the auxiliary fields with
  *  the auxfield part of the action.
  */
 
@@ -30,8 +30,8 @@ void force_hmc_auxfields(double dt, void *vpar){
   double g = par->gamma*par->gamma*4.0;
   _MASTER_FOR(ff_sigma->type,i) {
     double ts = *_FIELD_AT(ff_sigma,i);
-    double dm=0; 
-    
+    double dm=0;
+
     dm = 2.*ts/g;
     *_FIELD_AT(ff_sigma_mom,i)-=dt*dm;
    // if(i==500) printf("force %g %f \n",dm,g);
@@ -43,7 +43,7 @@ void force_hmc_auxfields(double dt, void *vpar){
     *_FIELD_AT(ff_pi_mom,i)-=dt*dm;
   }
 
-  
+
 }
 
 
@@ -54,7 +54,7 @@ void force_hmc_auxfields(double dt, void *vpar){
 /* X_e = g5 (D^)^(-1) pf[k]  */
 /* X_o = (A)_o^{-1} g5 (D^)^(-1) pf[k] */
 
-/* dA/dsigma = 1 and dA/dpi = i g5 
+/* dA/dsigma = 1 and dA/dpi = i g5
  * Thus, the force for sigma is 2*ReTr(Y_e X_e^)
  * and for pi 2*ReTr(i g5 Y_e X_e^)
  */
@@ -99,7 +99,7 @@ void force_hmc_auxfields_fermion(double dt, void *vpar, scalar_field *sigma_mom,
 #ifdef UPDATE_EO
  if(hasenbusch!=2) {
    double mass = par->mass;
-  /* If EO preconditioning is used, the odd diagonal part of the 
+  /* If EO preconditioning is used, the odd diagonal part of the
    * fermion determinant is not included in the pseudo-fermion action.
    * Det(A_o) = exp( -Trlog(A_o^ A_o) ) */
    _MASTER_FOR(&glat_odd,i) {
@@ -142,6 +142,3 @@ void update_auxfields(double dt, void *vpar){
     *_FIELD_AT(ff_pi,i)+=dt*tm;
   }
 }
-
-
-

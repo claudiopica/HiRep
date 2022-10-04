@@ -34,7 +34,7 @@ run name = run1
 save freq = 10000
 meas freq = 1
 conf dir = .
-gauge start = random 
+gauge start = random
 // run1_6x6x6x6nc2rADJnf2b6.000000m-0.000000n10
 
 

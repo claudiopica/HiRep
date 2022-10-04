@@ -11,4 +11,3 @@ EXCLUDE = trunc_hairpin.c measure_mesons.c measure_baryons.c z2semwall_new.c mea
 #EXCLUDE = wilsonloops.c trunc_hairpin.c
 
 include $(MKDIR)/MkRules
-

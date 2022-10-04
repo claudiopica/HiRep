@@ -45,6 +45,5 @@ check_inverters_8            Check the single precision accelerated g5QMR
 check_update_1             Reversibility of the molecular dynamics
 
 check_triplets_1  	     Check of the triplet mesons (free case)
- 
-check_triplets_2	     Check of the Gamma matrix structure
 
+check_triplets_2	     Check of the Gamma matrix structure

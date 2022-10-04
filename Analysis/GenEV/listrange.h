@@ -8,7 +8,7 @@ using namespace std;
 class oplist : public list<op_bl> {
  public:
   oplist(par * apar);
-  
+
   bool add_op();
   void populate(char * str);
   op_bl * find_op(int op_index);

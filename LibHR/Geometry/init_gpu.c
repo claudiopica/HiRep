@@ -1,8 +1,8 @@
 /***************************************************************************\
-* Copyright (c) 2012, Ari Hietanen                                          * 
-* All rights reserved.                                                      * 
+* Copyright (c) 2012, Ari Hietanen                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
- 
+
 /*******************************************************************************
 *
 * File init_gpu.c
@@ -24,7 +24,7 @@
 
 extern int *iup_gpu, *idn_gpu;
 
-void init_neighbors_gpu() 
+void init_neighbors_gpu()
 {
   int N = T*X*Y*Z;
   cudaError_t error_id;
@@ -79,7 +79,7 @@ void init_gpu(input_gpu gpu_var)
   lprintf("GPU_INIT",10,"CUDA Driver Version / Runtime Version: %d.%d / %d.%d\n", driver_version/1000, driver_version%100, runtime_version/1000, runtime_version%100);
   lprintf("GPU_INIT",10,"CUDA Capability Major/Minor version number: %d.%d\n", device_prop.major, device_prop.minor);
 
-  lprintf("GPU_INIT",10,"Total amount of global memory: %.0f MB (%lluB)\n", 
+  lprintf("GPU_INIT",10,"Total amount of global memory: %.0f MB (%lluB)\n",
 	  (float)device_prop.totalGlobalMem/((float) (1<<20)), (unsigned long long) device_prop.totalGlobalMem);
 
   lprintf("GPU_INIT",10,"Multiprocessors: %d\n", device_prop.multiProcessorCount);
@@ -89,12 +89,12 @@ void init_gpu(input_gpu gpu_var)
 
   lprintf("GPU_INT",10,"GPU Clock Speed: %.2f GHz\n", device_prop.clockRate * 1e-6f);
   cuDeviceGetAttribute( &mem_clock,CU_DEVICE_ATTRIBUTE_MEMORY_CLOCK_RATE , gpu_id);
-  lprintf("GPU_INIT",10,"Memory Clock rate: %.3f Mhz\n",mem_clock*1e-3f); 
+  lprintf("GPU_INIT",10,"Memory Clock rate: %.3f Mhz\n",mem_clock*1e-3f);
   cuDeviceGetAttribute(&mem_bus_width, CU_DEVICE_ATTRIBUTE_GLOBAL_MEMORY_BUS_WIDTH,gpu_id);
-  lprintf("GPU_INIT",10,"Memory Bus Widht: %d-bit\n",mem_bus_width); 
+  lprintf("GPU_INIT",10,"Memory Bus Widht: %d-bit\n",mem_bus_width);
   cuDeviceGetAttribute(&l2_cache_size, CU_DEVICE_ATTRIBUTE_L2_CACHE_SIZE, gpu_id);
-  lprintf("GPU_INIT",10,"L2 Cache Size: %dB\n",l2_cache_size); 
-  
+  lprintf("GPU_INIT",10,"L2 Cache Size: %dB\n",l2_cache_size);
+
   lprintf("GPU_INIT",10,"Max Texture dimension size (x,y,z): 1D=(%d), 2D=(%d,%d), 3D=(%d,%d,%d)\n",
 	  device_prop.maxTexture1D,device_prop.maxTexture2D[0],device_prop.maxTexture2D[1],
 	  device_prop.maxTexture3D[0],device_prop.maxTexture3D[1],device_prop.maxTexture3D[2]);
@@ -104,11 +104,11 @@ void init_gpu(input_gpu gpu_var)
 	  device_prop.maxTexture2DLayered[0],device_prop.maxTexture2DLayered[1],device_prop.maxTexture2DLayered[2]);
 
   lprintf("GPU_INIT",10,"Total amount of constant memory: %dB\n",device_prop.totalConstMem);
-  lprintf("GPU_INIT",10,"Total amount of shared memory per block: %dB\n",device_prop.sharedMemPerBlock); 
-  lprintf("GPU_INIT",10,"Total number of register per block: %dB\n",device_prop.regsPerBlock); 
-  lprintf("GPU_INIT",10,"Warp size: %dB\n",device_prop.warpSize); 
-  error(device_prop.warpSize!=32,1,"init_gpu","Error: warp size 32 assumed in global sum\n");  
-  lprintf("GPU_INIT",10,"Maximum number of threds per block: %d\n",device_prop.maxThreadsPerBlock);   
+  lprintf("GPU_INIT",10,"Total amount of shared memory per block: %dB\n",device_prop.sharedMemPerBlock);
+  lprintf("GPU_INIT",10,"Total number of register per block: %dB\n",device_prop.regsPerBlock);
+  lprintf("GPU_INIT",10,"Warp size: %dB\n",device_prop.warpSize);
+  error(device_prop.warpSize!=32,1,"init_gpu","Error: warp size 32 assumed in global sum\n");
+  lprintf("GPU_INIT",10,"Maximum number of threds per block: %d\n",device_prop.maxThreadsPerBlock);
   lprintf("GPU_INIT",10,"Maximum size of each dimension of a block (x,y,z): (%d,%d,%d)\n",
 	  device_prop.maxThreadsDim[0],device_prop.maxThreadsDim[1],device_prop.maxThreadsDim[2]);
   lprintf("GPU_INIT",10,"Maximum size of each dimension of a grid (x,y,z): (%d,%d,%d)\n",

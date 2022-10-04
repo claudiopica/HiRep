@@ -9,7 +9,7 @@ The following data types are defined as C structures containing a single array o
 \begin{center}
 \begin{tabular}{llcc}
 \hline
-Name & array of & size & members name \\  
+Name & array of & size & members name \\
 \hline
 \hline
 complex & double & 2 & re, im \\
@@ -29,7 +29,7 @@ Legend: Nc=number of colors ; dr=dimension of the fermion representation
 
 The data type ``suNf'' can be real or complex depending on the representation being real or complex.
 
-Every data type has a corresponding single precision data type the name of which is obtained adding the suffix ``\_flt''. 
+Every data type has a corresponding single precision data type the name of which is obtained adding the suffix ``\_flt''.
 
 
 \section{Operations on simple data types}
@@ -39,7 +39,7 @@ The following linear algebra operations are defined as C preprocessor macros and
 
 Vector operations act on one or more suNg\_vectors or suNf\_vectors. The suffix ``\_g'' or ``\_f'' indicates the appropriate data type.\\
 
-\noindent\textbf{\_vector\_zero\_[gf](r) } : r=0 
+\noindent\textbf{\_vector\_zero\_[gf](r) } : r=0
 
 suN[gf]\_vector r \\
 
@@ -49,136 +49,136 @@ suN[gf]\_vector r \\
 suN[gf]\_vector r,s \\
 
 
-\noindent\textbf{\_vector\_mul\_[gf](r,k,s) } : r=k$*$s 
+\noindent\textbf{\_vector\_mul\_[gf](r,k,s) } : r=k$*$s
 
-suN[gf]\_vector r,s ; 
+suN[gf]\_vector r,s ;
 
 double k\\
 
 
-\noindent\textbf{\_vector\_mulc\_[gf](r,z,s) } : r=z$*$s 
+\noindent\textbf{\_vector\_mulc\_[gf](r,z,s) } : r=z$*$s
 
-suN[gf]\_vector r,s; 
+suN[gf]\_vector r,s;
 
 complex z\\
 
 
-\noindent\textbf{\_vector\_add\_[gf](r,s1,s2) } : r=s1+s2 
+\noindent\textbf{\_vector\_add\_[gf](r,s1,s2) } : r=s1+s2
 
 suN[gf]\_vector r,s1,s2\\
 
 
-\noindent\textbf{\_vector\_sub\_[gf](r,s1,s2) } : r=s1-s2 
+\noindent\textbf{\_vector\_sub\_[gf](r,s1,s2) } : r=s1-s2
 
 suN[gf]\_vector r,s1,s2\\
 
 
-\noindent\textbf{\_vector\_i\_add\_[gf](r,s1,s2) } : r=s1+i$*$s2 
+\noindent\textbf{\_vector\_i\_add\_[gf](r,s1,s2) } : r=s1+i$*$s2
 
 suN[gf]\_vector r,s1,s2\\
 
 
-\noindent\textbf{\_vector\_i\_sub\_[gf](r,s1,s2) } : r=s1-i$*$s2 
+\noindent\textbf{\_vector\_i\_sub\_[gf](r,s1,s2) } : r=s1-i$*$s2
 
 suN[gf]\_vector r,s1,s2\\
 
 
-\noindent\textbf{\_vector\_add\_assign\_[gf](r,s) } : r+=s 
+\noindent\textbf{\_vector\_add\_assign\_[gf](r,s) } : r+=s
 
 suN[gf]\_vector r,s\\
 
 
-\noindent\textbf{\_vector\_sub\_assign\_[gf](r,s) } : r-=s 
+\noindent\textbf{\_vector\_sub\_assign\_[gf](r,s) } : r-=s
 
 suN[gf]\_vector r,s\\
 
 
-\noindent\textbf{\_vector\_i\_add\_assign\_[gf](r,s) } : r+=i$*$s 
+\noindent\textbf{\_vector\_i\_add\_assign\_[gf](r,s) } : r+=i$*$s
 
 suN[gf]\_vector r,s\\
 
 
-\noindent\textbf{\_vector\_i\_sub\_assign\_[gf](r,s) } : r-=i$*$s 
+\noindent\textbf{\_vector\_i\_sub\_assign\_[gf](r,s) } : r-=i$*$s
 
 suN[gf]\_vector r,s\\
 
 
-\noindent\textbf{\_vector\_prod\_re\_[gf](k,r,s) } : k=Re(r$^\dagger$$*$s) 
-
-suN[gf]\_vector r,s; 
-
-double k\\
-
-
-\noindent\textbf{\_vector\_prod\_im\_[gf](k,r,s) } : k=Im(r$^\dagger$$*$s) 
-
-suN[gf]\_vector r,s; 
-
-double k\\
-
-
-\noindent\textbf{\_vector\_mulc\_add\_assign\_[gf](r,z,s) } : r+=z$*$s (z complex) 
-
-suN[gf]\_vector r,s; 
-
-complex z\\
-
-
-\noindent\textbf{\_vector\_mul\_add\_assign\_[gf](r,k,s) } :  r+=k$*$s (k real) 
+\noindent\textbf{\_vector\_prod\_re\_[gf](k,r,s) } : k=Re(r$^\dagger$$*$s)
 
 suN[gf]\_vector r,s;
 
 double k\\
 
 
-\noindent\textbf{\_vector\_lc\_[gf](r,k1,s1,k2,s2) } : r=k1$*$s1+k2$*$s2 
+\noindent\textbf{\_vector\_prod\_im\_[gf](k,r,s) } : k=Im(r$^\dagger$$*$s)
 
-suN[gf]\_vector r,s1,s2; 
+suN[gf]\_vector r,s;
+
+double k\\
+
+
+\noindent\textbf{\_vector\_mulc\_add\_assign\_[gf](r,z,s) } : r+=z$*$s (z complex)
+
+suN[gf]\_vector r,s;
+
+complex z\\
+
+
+\noindent\textbf{\_vector\_mul\_add\_assign\_[gf](r,k,s) } :  r+=k$*$s (k real)
+
+suN[gf]\_vector r,s;
+
+double k\\
+
+
+\noindent\textbf{\_vector\_lc\_[gf](r,k1,s1,k2,s2) } : r=k1$*$s1+k2$*$s2
+
+suN[gf]\_vector r,s1,s2;
 
 double k1,k2\\
 
 
-\noindent\textbf{\_vector\_lc\_add\_assign\_[gf](r,k1,s1,k2,s2) } : r+=k1$*$s1+k2$*$s2 
+\noindent\textbf{\_vector\_lc\_add\_assign\_[gf](r,k1,s1,k2,s2) } : r+=k1$*$s1+k2$*$s2
 
-suN[gf]\_vector r,s1,s2; 
+suN[gf]\_vector r,s1,s2;
 
 double k1,k2\\
 
 
-\noindent\textbf{\_vector\_clc\_[gf](r,z1,s1,z2,s2) } : r=z1$*$s1+z2$*$s2 
+\noindent\textbf{\_vector\_clc\_[gf](r,z1,s1,z2,s2) } : r=z1$*$s1+z2$*$s2
 
-suN[gf]\_vector r,s1,s2; 
-
-complex z1,z2\\
-
-
-\noindent\textbf{\_vector\_clc\_add\_assign\_[gf](r,z1,s1,z2,s2) } : r=z1$*$s1+z2$*$s2 
-
-suN[gf]\_vector r,s1,s2; 
+suN[gf]\_vector r,s1,s2;
 
 complex z1,z2\\
 
 
-\noindent\textbf{\_vector\_prod\_assign\_[gf](z,r,s) } : z+=r$^\dagger$$*$s 
+\noindent\textbf{\_vector\_clc\_add\_assign\_[gf](r,z1,s1,z2,s2) } : r=z1$*$s1+z2$*$s2
+
+suN[gf]\_vector r,s1,s2;
+
+complex z1,z2\\
+
+
+\noindent\textbf{\_vector\_prod\_assign\_[gf](z,r,s) } : z+=r$^\dagger$$*$s
 
 suN[gf]\_vector z,r,s\\
 
 
-\noindent\textbf{\_vector\_project\_[gf](r,z,s) } : r-=z$*$s 
+\noindent\textbf{\_vector\_project\_[gf](r,z,s) } : r-=z$*$s
 
 suN[gf]\_vector r,z,s
 
 
 \subsection{Algebra vectors operations}
 
-\noindent\textbf{\_algebra\_vector\_mul\_add\_assign\_g(r,k,s) } : r+=k$*$s 
+\noindent\textbf{\_algebra\_vector\_mul\_add\_assign\_g(r,k,s) } : r+=k$*$s
 
 suNg\_algebra\_vector r,s
 
 double k\\
 
 
-\noindent\textbf{\_algebra\_vector\_mul\_g(r,k,s) } : r=k$*$s 
+\noindent\textbf{\_algebra\_vector\_mul\_g(r,k,s) } : r=k$*$s
 
 suNg\_algebra\_vector r,s
 
@@ -198,7 +198,7 @@ double k
 
 \subsection{Matrix-Vector operations}
 
-\noindent\textbf{\_suN[gf]\_multiply(r,u,s) } : r=u$*$s  
+\noindent\textbf{\_suN[gf]\_multiply(r,u,s) } : r=u$*$s
 
 suN[gf]\_vector r,s
 
@@ -219,7 +219,7 @@ suN[gf] u
 suN[gf] u,v\\
 
 
-\noindent\textbf{\_suN[gf]\_times\_suN[gf](u,v,w) } : u=v$*$w 
+\noindent\textbf{\_suN[gf]\_times\_suN[gf](u,v,w) } : u=v$*$w
 
 suN[gf] u,v,w\\
 
@@ -229,38 +229,38 @@ suN[gf] u,v,w\\
 suN[gf] u,v,w\\
 
 
-\noindent\textbf{\_suN[gf]\_dagger\_times\_suN[gf](u,v,w) } : u=v$^\dagger$$*$w 
+\noindent\textbf{\_suN[gf]\_dagger\_times\_suN[gf](u,v,w) } : u=v$^\dagger$$*$w
 
 suN[gf] u,v,w\\
 
 
-\noindent\textbf{\_suN[gf]\_zero(u) } : u=0 
+\noindent\textbf{\_suN[gf]\_zero(u) } : u=0
 
 suN[gf] u\\
 
 
-\noindent\textbf{\_suN[gf]\_unit(u) } : u=1 
+\noindent\textbf{\_suN[gf]\_unit(u) } : u=1
 
 suN[gf] u\\
 
 
-\noindent\textbf{\_suN[gf]\_minus(u,v) } : u=-v  
+\noindent\textbf{\_suN[gf]\_minus(u,v) } : u=-v
 
 suN[gf] u,v\\
 
 
-\noindent\textbf{\_suN[gf]\_mul(u,r,v) } : u=r$*$v 
+\noindent\textbf{\_suN[gf]\_mul(u,r,v) } : u=r$*$v
 
 suN[gf] u,v
 double r\\
 
 
-\noindent\textbf{\_suN[gf]\_add\_assign(u,v) } : u+=v 
+\noindent\textbf{\_suN[gf]\_add\_assign(u,v) } : u+=v
 
 suN[gf] u,v\\
 
 
-\noindent\textbf{\_suN[gf]\_sub\_assign(u,v) } : u-=v  
+\noindent\textbf{\_suN[gf]\_sub\_assign(u,v) } : u-=v
 
 suN[gf] u,v\\
 
@@ -277,17 +277,17 @@ double  k
 suN[gf] u\\
 
 
-\noindent\textbf{\_suN[gf]\_trace\_re(k,u) } : k=Re Tr (u) 
+\noindent\textbf{\_suN[gf]\_trace\_re(k,u) } : k=Re Tr (u)
 
 suN[gf] k,u\\
 
 
-\noindent\textbf{\_suN[gf]\_trace\_im(k,u) } : k=Im Tr (u) 
+\noindent\textbf{\_suN[gf]\_trace\_im(k,u) } : k=Im Tr (u)
 
 suN[gf] k,u\\
 
 
-\noindent\textbf{\_suN[gf]\_2TA(u,v) } : u=v - v$^\dagger$ -1/N Tr(v - v$^\dagger$)$*$I 
+\noindent\textbf{\_suN[gf]\_2TA(u,v) } : u=v - v$^\dagger$ -1/N Tr(v - v$^\dagger$)$*$I
 
 suN[gf] u,v\\
 
@@ -311,12 +311,12 @@ double k\\
 In addition to the above spinor operations which act trivially on the Dirac structure, the following are also defined:
 
 
-\noindent\textbf{\_spinor\_g5\_[gf](s,r) } : s=$\gamma_5$$*$r 
+\noindent\textbf{\_spinor\_g5\_[gf](s,r) } : s=$\gamma_5$$*$r
 
 suN[gf]\_spinor s,r\\
 
 
-\noindent\textbf{\_spinor\_g5\_assign\_[gf](r) } : r=$\gamma_5$$*$r 
+\noindent\textbf{\_spinor\_g5\_assign\_[gf](r) } : r=$\gamma_5$$*$r
 
 suN[gf]\_spinor r\\
 
@@ -346,7 +346,7 @@ The following field types are defined:
 \begin{center}
 \begin{tabular}{ll}
 \hline
-Name & field of \\  
+Name & field of \\
 \hline
 \hline
 suNg\_field & suNg \\
@@ -359,7 +359,7 @@ scalar\_field & double
 
 \section{Geometry}
 
-Fields living on the 4-dimesional lattice are defined to be C arrays of elements (see Sec.\ref{fields}). 
+Fields living on the 4-dimesional lattice are defined to be C arrays of elements (see Sec.\ref{fields}).
 The geometry of the lattice is defined by assigning an index $n$ of the array to each site $(t,x,y,z)$. The mapping between the cartesian coordinates of the local lattice and the array index is given by the macro ``ipt(t,x,y,z)=n''. Neighboring relations between the sites are given by the macros ``iup(n,dir)'' and ``idn(n,dir)'' which, given the index n of the current site,  return the index of the site whose cartesian coordinate in direction dir is increased or decreased by one respectively.
 
 In the MPI version of the code, the set of indeces which correspond to the local lattice are NOT all contiguous, instead the lattice is divided into different blocks. Each of these blocks then corresponds to a contiguous set of indeces. In the MPI version, each field also contain the send/receive buffers necessary for communications. Before a communication to another MPI process can be made, the send buffer must be filled.

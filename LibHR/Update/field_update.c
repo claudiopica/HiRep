@@ -101,4 +101,3 @@ void update_scalar_field(double dt, void *vpar)
 	lprintf("TIMING",0,"update_scalar_field %.6f s\n",1.*etime.tv_sec+1.e-6*etime.tv_usec);
 #endif
 }
-

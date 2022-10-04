@@ -21,7 +21,7 @@ void representation::init()
 #endif
 
 	int N = group::N;
-	
+
 	if(N == 0)
 	{
 		cerr << "Initialization of group needed.";
@@ -30,12 +30,12 @@ void representation::init()
 
 	int A, B, C;
 	smatrix tmp(N), tmp1(N);
-	
+
 	name = "ANTISYMMETRIC";
 	DIM = N*(N-1)/2;
 	iT = new smatrix[group::DIM];
 	e = new smatrix[DIM];
-	
+
 	C = 0;
 	for(A = 1; A < N; A++)
 		for(B = 0; B < A; B++)
@@ -45,7 +45,7 @@ void representation::init()
 			e[C].set(B,A, complex(-sqrt(.5),0.0));
 			C++;
 		}
-	
+
 	for(C = 0; C < group::DIM; C++)
 	{
 		iT[C].size = DIM;
@@ -62,7 +62,7 @@ void representation::init()
 			}
 		}
 	}
-	
+
 	iTnorm = (N-2.)*group::Tnorm;
 
 #ifndef NDEBUG
@@ -78,9 +78,9 @@ string group_represent(const char* vname, const char* uname)
 	pmatrix trU(group::N);
 	pmatrix rU(representation::DIM);
 	pmatrix *Ue;
-    
+
     Ue = new pmatrix[representation::DIM];
-	
+
 	trU = U;
 	trU.transpose();
 
@@ -91,7 +91,7 @@ string group_represent(const char* vname, const char* uname)
 		mtmp.mult(e, trU);
 		Ue[A].mult(U, mtmp);
 	}
-	
+
 	for(int B = 0; B < representation::DIM; B++)
 		for(int A = 0; A < representation::DIM; A++)
 		{
@@ -105,9 +105,9 @@ string group_represent(const char* vname, const char* uname)
 		}
 
 	RET += rU.assignment("=", vname);
-	
+
     delete[] Ue;
-    
+
 	return RET;
 }
 

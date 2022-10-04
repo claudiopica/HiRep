@@ -1,6 +1,6 @@
 /*************************************************************************** \
- * Copyright (c) 2008, Claudio Pica                                          *   
- * All rights reserved.                                                      * 
+ * Copyright (c) 2008, Claudio Pica                                          *
+ * All rights reserved.                                                      *
 \***************************************************************************/
 
 /*******************************************************************************
@@ -120,7 +120,7 @@ static void init_hb_boundary()
   g_dn_Dirichlet_BCs();
 #endif
 #ifdef BC_T_MIXED
-  g_up_open_BCs();  
+  g_up_open_BCs();
   g_dn_Dirichlet_BCs();
 #endif
 #ifdef BC_T_OPEN

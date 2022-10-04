@@ -1,4 +1,4 @@
-// Global variables 
+// Global variables
 GLB_T = 8 //Global T size
 GLB_X = 8
 GLB_Y = 8
@@ -18,6 +18,3 @@ log:forcestat = 0
 
 rlx_level = 1
 rlx_seed = 12345
-
-
-

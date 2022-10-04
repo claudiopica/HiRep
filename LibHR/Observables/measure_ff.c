@@ -56,15 +56,15 @@ static void measure_formfactor_core(spinor_field* psi0, spinor_field* psi1, spin
 
   for (px=0;px<n_mom;++px) for (py=0;py<n_mom;++py) for (pz=0;pz<n_mom;++pz){
 	for(i=0; i<nm; i++) {
-	  for (t=0; t<T; t++) {	 
+	  for (t=0; t<T; t++) {
 	    tc = (zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T+offset;
 	    for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) {
-		  ix=ipt(t,x,y,z);					
+		  ix=ipt(t,x,y,z);
 		  pdotx = 2.0*PI*(((double) px)*(x+zerocoord[1]-pt[1])/GLB_X + ((double) py)*(y+zerocoord[2]-pt[2])/GLB_Y + ((double) pz)*(z+zerocoord[3]-pt[3])/GLB_Z);
 		  cpdotx=cos(pdotx);
 		  spdotx=sin(pdotx);
 		  for (a=0;a<NF;++a){
-		    for (beta=0;beta<4;beta++){ 
+		    for (beta=0;beta<4;beta++){
 		      _propagator_assign(sp0, *_FIELD_AT(&psi0[a*4*nm+beta*nm+i],ix),a,beta);
 		      _propagator_assign(sp1, *_FIELD_AT(&psi1[a*4*nm+beta*nm+i],ix),a,beta);
 		    }
@@ -73,10 +73,10 @@ static void measure_formfactor_core(spinor_field* psi0, spinor_field* psi1, spin
 
 		  //Pion
 		  _propagator_muldag_trace(tr,sp1,sp1);
-		  corr[_g5_ff][corr_ind(px,py,pz,n_mom,tc,nm)] += (cpdotx*creal(tr) + spdotx*cimag(tr));		  
+		  corr[_g5_ff][corr_ind(px,py,pz,n_mom,tc,nm)] += (cpdotx*creal(tr) + spdotx*cimag(tr));
 
 		  // Local vector current (pipig)
-		  //Sequential source  
+		  //Sequential source
 		  _g5g0_propagator(sptmp2, sp0);
 		  _propagator_mul(sptmp1, sptmp2, spdag); // g5 g0 G(x,0) S(y,0)^dagger
 		  _propagator_trace(tr,sptmp1);
@@ -90,44 +90,44 @@ static void measure_formfactor_core(spinor_field* psi0, spinor_field* psi1, spin
 		  _propagator_trace(tr,spf);
 		  corr[_pipig_ff_re][corr_ind(px,py,pz,n_mom,tc,nm)] += -0.5*(cpdotx*creal(tr) + spdotx*cimag(tr));
 		  corr[_pipig_ff_im][corr_ind(px,py,pz,n_mom,tc,nm)] += -0.5*(spdotx*creal(tr) - cpdotx*cimag(tr));
-		  
+
 		  //Conserved vector current
 
 		  u1 = _4FIELD_AT(u_gauge_f,ix,0);
 		  ixmu = iup(ix,0);
-		  
-		  // Tr [ 1/2 S^(0,y+\mu) g_5(1+g_0) U^(y) S(y,x) 
+
+		  // Tr [ 1/2 S^(0,y+\mu) g_5(1+g_0) U^(y) S(y,x)
 		  _suNf_inverse_prop_multiply(Usp,*u1,sp0);
 		  sptmp1=Usp;
 		  _g0_propagator(sptmp2,sptmp1);
 		  _propagator_add(sptmp1,sptmp1,sptmp2);
 		  _g5_propagator(sptmp2,sptmp1);
-		  for (a=0;a<NF;a++) for (beta=0;beta<4;beta++){ 
-		      _propagator_assign(spf, *_FIELD_AT(&psi1[4*a*nm+beta*nm+i],ixmu), a,beta); 
+		  for (a=0;a<NF;a++) for (beta=0;beta<4;beta++){
+		      _propagator_assign(spf, *_FIELD_AT(&psi1[4*a*nm+beta*nm+i],ixmu), a,beta);
 		    }
 		  _propagator_dagger(sptmp1,spf);
-		  _propagator_mul(sptmp3,sptmp1,sptmp2);	
-		    
+		  _propagator_mul(sptmp3,sptmp1,sptmp2);
 
-		  // Tr [ -1/2 S^(0,y) g_5(1-g_0) U(y) S(y+mu,x) 
-		  for (a=0;a<NF;a++) for (beta=0;beta<4;beta++){ 
-		      _propagator_assign(spf, *_FIELD_AT(&psi0[4*a*nm+beta*nm+i],ixmu), a,beta); 
+
+		  // Tr [ -1/2 S^(0,y) g_5(1-g_0) U(y) S(y+mu,x)
+		  for (a=0;a<NF;a++) for (beta=0;beta<4;beta++){
+		      _propagator_assign(spf, *_FIELD_AT(&psi0[4*a*nm+beta*nm+i],ixmu), a,beta);
 		    }
 		  _suNf_prop_multiply(Usp,*u1,spf);
 		  sptmp1=Usp;
 		  _g0_propagator(sptmp2,sptmp1);
 		  _propagator_sub(sptmp1,sptmp1,sptmp2);
 		  _g5_propagator(sptmp2,sptmp1);
-		  _propagator_mul(sptmp1,spdag,sptmp2);	
+		  _propagator_mul(sptmp1,spdag,sptmp2);
 		  _propagator_sub(sptmp2,sptmp3,sptmp1);
-		  _propagator_trace(tr,sptmp2);    
+		  _propagator_trace(tr,sptmp2);
 		  corr[_pipig_conserved_ff][corr_ind(px,py,pz,n_mom,tc,nm)] += 0.5*(cpdotx*creal(tr) + spdotx*cimag(tr));
 		} //END SPATIAL LOOP
 	  } //END T LOOP
 	} //END MASS LOOP
       } //END MOMENTUM LOOP
   lprintf("measure_formfactor_core",50,"Measuring DONE! ");
-}		  
+}
 
 static void init_corrs(int nm, int n_mom){
   int i,k,n_mom_tot,size;
@@ -164,28 +164,28 @@ static void init_corrs(int nm, int n_mom){
 void measure_formfactors(spinor_field* psi0, spinor_field* psi1, spinor_field* eta, int nm, int ti, int tf, int n_mom, int *pt){
   init_corrs(nm,n_mom);
   lprintf("MEASURE_FORMFACTORS",50,"psi0 = sequential prop, psi1 = point prop");
-  measure_formfactor_core(psi0, psi1, eta, nm, ti, tf, n_mom, 0, GLB_T,pt);  
+  measure_formfactor_core(psi0, psi1, eta, nm, ti, tf, n_mom, 0, GLB_T,pt);
 }
 
 /*void measure_formfactors_ext(spinor_field* psi0, spinor_field* psi1, spinor_field* eta, int nm, int ti, int tf, int n_mom, int begin){
   init_corrs(3*nm,n_mom);
   lprintf("MEASURE_FORMFACTORS",50,"psi0 = sequential prop, psi1 = point prop");
-  measure_formfactor_core(psi0, psi1, eta, nm, ti, tf, n_mom, GLB_T*begin, 3*GLB_T);  
+  measure_formfactor_core(psi0, psi1, eta, nm, ti, tf, n_mom, GLB_T*begin, 3*GLB_T);
   }*/
 
 static void print_corr_core(int channel,int lt,int conf, int nm, double* mass, char* label, int n_mom){
   int i,t,px,py,pz;
-  for (px=0;px<n_mom;++px) for (py=0;py<n_mom;++py) for (pz=0;pz<n_mom;++pz){ 
+  for (px=0;px<n_mom;++px) for (py=0;py<n_mom;++py) for (pz=0;pz<n_mom;++pz){
 	  for(i=0; i<nm; i++) {
 	    if (n_mom>1){
-	      lprintf("MAIN",0,"conf #%d mass=%2.6f %s FORM_FACTOR %s momentum(%d,%d,%d)= ",conf,mass[i],label,ff_channel_names[channel],px,py,pz); 
+	      lprintf("MAIN",0,"conf #%d mass=%2.6f %s FORM_FACTOR %s momentum(%d,%d,%d)= ",conf,mass[i],label,ff_channel_names[channel],px,py,pz);
 	    }
 	    else{
-	      lprintf("MAIN",0,"conf #%d mass=%2.6f %s FORM_FACTOR %s= ",conf,mass[i],label,ff_channel_names[channel]); 
+	      lprintf("MAIN",0,"conf #%d mass=%2.6f %s FORM_FACTOR %s= ",conf,mass[i],label,ff_channel_names[channel]);
             }
 	    for(t=0;t<lt;++t) lprintf("MAIN",0,"%e ",corr[channel][corr_ind(px,py,pz,n_mom,t+i*lt,nm)]);
-	    lprintf("MAIN",0,"\n"); 
-	    fflush(stdout); 
+	    lprintf("MAIN",0,"\n");
+	    fflush(stdout);
 	  }
       }
 }
@@ -193,7 +193,7 @@ static void print_corr_core(int channel,int lt,int conf, int nm, double* mass, c
 static void print_corr(int lt,int conf, int nm, double* mass, char* label, int n_mom){
   int i;
   for(i = 0; i<NCHANNELS_FF; ++i){
-    print_corr_core(i,lt,conf,nm,mass,label,n_mom); 
+    print_corr_core(i,lt,conf,nm,mass,label,n_mom);
   }
 }
 
@@ -227,5 +227,3 @@ void print_formfactor_ext(int conf, int nm, double* mass, int n_mom, char* label
   char str[256]; sprintf(str, "%s tf %d", label, tf); //Modify label
   print_corr(3*GLB_T,conf,nm,mass,str,n_mom);
 }
-
-

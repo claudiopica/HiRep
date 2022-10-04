@@ -2,7 +2,7 @@
 *
 * NOCOMPILE= !WITH_GPU
 *
-* Check that the GPU reading and writing functions defined in suN.h 
+* Check that the GPU reading and writing functions defined in suN.h
 * are bijective.
 *
 *******************************************************************************/
@@ -25,7 +25,7 @@ int test_write_read_gauge_field_f();
 int test_write_read_gauge_field();
 int test_write_read_spinor_field_f_flt();
 
-int main(int argc, char *argv[]) 
+int main(int argc, char *argv[])
 {
     // Init
     int return_val = 0;
@@ -63,10 +63,10 @@ int test_write_read_gauge_field()
 
     suNg in_mat, out_mat;
     int dim = sizeof(in->ptr)/sizeof(double);
-    
-    _MASTER_FOR(in->type, ix) 
+
+    _MASTER_FOR(in->type, ix)
     {
-        for (int comp = 0; comp < dim; comp++) 
+        for (int comp = 0; comp < dim; comp++)
         {
             in_mat = *(in->ptr+ix);
             out_mat = *(out->ptr+ix);
@@ -89,12 +89,12 @@ int test_write_read_gauge_field()
     lprintf("INFO", 0, "[Sanity check out field norm unequal zero: %0.15lf]\n", sqnorm_out_check);
 
     // Since this is just a copy they have to be identical
-    if (diff_norm != 0) 
+    if (diff_norm != 0)
     {
         lprintf("RESULT", 0, "FAILED \n");
         return_val = 1;
     }
-    else 
+    else
     {
         lprintf("RESULT", 0, "OK \n");
         return_val = 0;
@@ -124,10 +124,10 @@ int test_write_read_gauge_field_f()
 
     suNf in_mat, out_mat;
     int dim = sizeof(in->ptr)/sizeof(double);
-    
-    _MASTER_FOR(in->type, ix) 
+
+    _MASTER_FOR(in->type, ix)
     {
-        for (int comp = 0; comp < dim; comp++) 
+        for (int comp = 0; comp < dim; comp++)
         {
             in_mat = *(in->ptr+ix);
             out_mat = *(out->ptr+ix);
@@ -151,12 +151,12 @@ int test_write_read_gauge_field_f()
     lprintf("INFO", 0, "[Sanity check out field norm unequal zero: %0.15lf]\n", sqnorm_out_check);
 
     // Since this is just a copy they have to be identical
-    if (diff_norm != 0) 
+    if (diff_norm != 0)
     {
         lprintf("RESULT", 0, "FAILED \n");
         return_val = 1;
     }
-    else 
+    else
     {
         lprintf("RESULT", 0, "OK \n");
         return_val = 0;
@@ -183,9 +183,9 @@ int test_write_read_spinor_field_f()
 
     suNf_vector in_vec, out_vec;
 
-    _MASTER_FOR(in->type, ix) 
+    _MASTER_FOR(in->type, ix)
     {
-        for (int comp=0; comp < 4; comp++) 
+        for (int comp=0; comp < 4; comp++)
         {
             write_gpu_suNf_vector(vol4h, (*(in->ptr+ix)).c[comp], gpu_format->ptr, ix, comp);
             read_gpu_suNf_vector(vol4h, (*(out->ptr+ix)).c[comp], gpu_format->ptr, ix, comp);
@@ -199,8 +199,8 @@ int test_write_read_spinor_field_f()
     if (diff_norm != 0) {
         lprintf("RESULT", 0, "FAILED \n");
         return_val = 1;
-    } 
-    else 
+    }
+    else
     {
         lprintf("RESULT", 0, "OK \n");
         return_val = 0;
@@ -211,7 +211,7 @@ int test_write_read_spinor_field_f()
     free_spinor_field_f(gpu_format);
     free_spinor_field_f(out);
     return return_val;
-} 
+}
 
 int test_write_read_spinor_field_f_flt()
 {
@@ -227,9 +227,9 @@ int test_write_read_spinor_field_f_flt()
 
     suNf_vector_flt in_vec, out_vec;
 
-    _MASTER_FOR(in->type, ix) 
+    _MASTER_FOR(in->type, ix)
     {
-        for (int comp=0; comp < 4; comp++) 
+        for (int comp=0; comp < 4; comp++)
         {
             write_gpu_suNf_vector_flt(vol4h, (*(in->ptr+ix)).c[comp], gpu_format->ptr, ix, comp);
             read_gpu_suNf_vector_flt(vol4h, (*(out->ptr+ix)).c[comp], gpu_format->ptr, ix, comp);
@@ -243,8 +243,8 @@ int test_write_read_spinor_field_f_flt()
     if (diff_norm != 0) {
         lprintf("RESULT", 0, "FAILED \n");
         return_val = 1;
-    } 
-    else 
+    }
+    else
     {
         lprintf("RESULT", 0, "OK \n");
         return_val = 0;
@@ -255,4 +255,4 @@ int test_write_read_spinor_field_f_flt()
     free_spinor_field_f_flt(gpu_format);
     free_spinor_field_f_flt(out);
     return return_val;
-} 
+}

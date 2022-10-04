@@ -91,10 +91,10 @@ struct _monomial* hasen_create(const monomial_data *data)
 {
 	monomial *m = malloc(sizeof(*m));
 	mon_hasenbusch_par *par = (mon_hasenbusch_par*)data->par;
-  
+
 	// Copy data structure
 	m->data = *data;
-  
+
 	// Allocate memory for spinor field
 	if(mon_init)
 	{

@@ -52,12 +52,12 @@ void MM_gpu(spinor_field *out, spinor_field *in)
   #endif
 }
 
-void II_cpu(spinor_field *out, spinor_field *in) 
+void II_cpu(spinor_field *out, spinor_field *in)
 {
   spinor_field_mul_f_cpu(out, 1, in);
 }
 
-void II_gpu(spinor_field *out, spinor_field *in) 
+void II_gpu(spinor_field *out, spinor_field *in)
 {
   spinor_field_mul_f(out, 1, in);
 }
@@ -188,7 +188,7 @@ int main(int argc, char *argv[])
   represent_gauge_field();
 
   // Test block
-  
+
     // Q^2
     return_value_cpu=test_herm_cpu(&MM_cpu, "M");
     return_value_gpu=test_herm_gpu(&MM_gpu, "M");

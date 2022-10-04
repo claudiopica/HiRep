@@ -35,7 +35,7 @@ sf:rho_t = 0.0
 sf:ds = 1.0
 
 //needed only if compiled with CSW/EXP_CSW
-sf:csw = 1.1329500 
+sf:csw = 1.1329500
 
 //needed only if compiled with FERMION_THETA
 theta_T = 0.0

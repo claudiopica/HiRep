@@ -28,7 +28,7 @@ def correlator_def(l_inputfile,g_correlator_list):
                 g_correlator_list[mykey[0]]=[]
             g_correlator_list[mykey[0]].append([mykey[6],mykey[7]])
         if("[MAIN][0]ML Measure #" in line):
-            break 
+            break
 
 def correlator_meas(nmeas,corr_data,sub_data,l_correlator_list,file):
     for id in l_correlator_list.keys():
@@ -96,7 +96,7 @@ def find_outfile_list(instring,linfile_name):
             sys.exit(0)
         file_irreps=tmp_irreps
     return file_irreps
- 
+
 
 def find_timelist(linfile_name):
     lnmeas=0
@@ -216,7 +216,7 @@ if __name__ == '__main__':
     if(len(prepend)>0):
         if(not(os.path.isdir(prepend))):
             os.makedirs(prepend)
-            print("Directory" , prepend ,  "created.") 
+            print("Directory" , prepend ,  "created.")
         if(prepend[-1]!="/"):
             prepend+="/"
     if(args.b or args.y or args.c):
@@ -226,11 +226,11 @@ if __name__ == '__main__':
         if(os.path.isfile(bstat)):
             if(not(os.access(bstat, os.X_OK))):
                 sys.stderr.write("File "+bstat+" is not executable\n")
-                sys.exit()  
+                sys.exit()
         else:
             sys.stderr.write("Missing executable file for the statistica analisys (bstat)\n")
             sys.exit()
-        
+
 
     if(args.i):
         print("Reading general setup from",inputdata_filename)
@@ -289,15 +289,15 @@ if __name__ == '__main__':
         print("Performing the 1pt statistical analyis")
 
 
-        for filename in outfilelist: 
+        for filename in outfilelist:
             if(not(os.path.isfile(filename))):
                 print("Missing the file ",filename," for the analysis, you might want to run the striping (-s) also")
                 sys.exit()
-        
+
         command = bstat.split()
         separator = ' '
         nuplev=separator.join(nuplev)
-    
+
         tmpfilename=prepend+"tmpfile"
         for datafile in outfilelist:
             if "P=(0,0,0)_Irrep=A1plusOhP_Charge=+" in datafile:
@@ -317,7 +317,7 @@ if __name__ == '__main__':
 
 
                 for ti in tlist:
-                    file.seek(0)         
+                    file.seek(0)
                     tmpfile=open(tmpfilename,'w')
                     for line in file:
                         if(line.split()[1]==ti):
@@ -358,14 +358,14 @@ if __name__ == '__main__':
                             process.stdin.write(str(rdata.real)+ '\n')
                         outstring=re.split('\n|:', process.communicate()[0])
                         outlinetune.append(outstring[3])
-                        
+
 
                     datataufile.write(separator.join(outlinetau)+'\n')
                     dataavgfile.write(separator.join(outlineavr)+'\n')
                     datavarfile.write(separator.join(outlinevar)+'\n')
                     datatunefile.write(separator.join(outlinetune)+'\n')
                     tmpfile.close()
-                    
+
                 datataufile.close()
                 dataavgfile.close()
                 datavarfile.close()
@@ -377,7 +377,7 @@ if __name__ == '__main__':
         print("Creating the 2pt correlators")
         correlator_list={}
         correlator_def(inputdata_filename,correlator_list)
- 
+
         for filename in outfilelist:
             subs={}
             if "P=(0,0,0)_Irrep=A1plusOhP_Charge=+" in filename:
@@ -406,7 +406,7 @@ if __name__ == '__main__':
                 for line in datafile:
                     if(line[0]=="#"):
                         continue
-                    
+
                     tmp=line.split()
 
                     tmp1 = np.array(tmp[2:]).astype(np.float)
@@ -417,7 +417,7 @@ if __name__ == '__main__':
                         correlator_meas(n_meas,corrdata,subs,correlator_list,outfile)
 
                         corrdata={}
-                    blockcounter+=1                    
+                    blockcounter+=1
             outfile.close()
             print(corfilename)
 
@@ -454,13 +454,13 @@ if __name__ == '__main__':
                             corrdata[dt]=tmp
 
                         if(lcounter % n_elem_per_bin == n_elem_per_bin-1):
-                            databin=np.divide(corrdata[dt], n_elem_per_bin) 
+                            databin=np.divide(corrdata[dt], n_elem_per_bin)
                             bindatafile.write(str(measid)+" "+str(dt)+"\n")
                             np.savetxt(bindatafile, databin)
                             corrdata.pop(dt)
                         line=unbindatafile.readline()
                     bindatafile.close()
-      
+
     if(args.a):
         print("Performing the 2pt statistical analyis")
 
@@ -473,11 +473,11 @@ if __name__ == '__main__':
 
 
         for filename in outfilelist:
-            corfilename=filename.replace("1pt_P","2pt_P") 
+            corfilename=filename.replace("1pt_P","2pt_P")
             if(not(os.path.isfile(corfilename))):
                 print("Missing the file ",corfilename," for the analysis, you might want to run the cor creation (-c) also")
                 sys.exit()
- 
+
         for filename in outfilelist:
             corfilename=filename.replace("1pt_P","2pt_P")
             with open(corfilename) as datafile:
@@ -495,7 +495,7 @@ if __name__ == '__main__':
                     while line:
                         if(int(line.split()[1])!=dti):
                             for _ in range(nfields):
-                                next(datafile) 
+                                next(datafile)
                         else:
                             tmp=np.loadtxt(datafile,max_rows=nfields)
                             for j in range(0,nfields):

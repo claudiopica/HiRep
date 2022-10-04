@@ -2,9 +2,9 @@ TOPDIR = ..
 SUBDIRS := $(shell find * -maxdepth 0 -type d)
 
 #Exclude these directories
-EXCLUDEDIR :=  Deflate RotatedSF 
+EXCLUDEDIR :=  Deflate RotatedSF
 SUBDIRS := $(filter-out $(EXCLUDEDIR), $(SUBDIRS))
-SUBDIRS := SpinorField 
+SUBDIRS := SpinorField
 
 LIBS += $(TOPDIR)/LibHR/libhr.a
 
@@ -20,7 +20,7 @@ tests: $(LIBS)
 	done
 	rm -f touch $(TOPDIR)/LibHR/.lib.updated
 
-runalltests: 
+runalltests:
 	for i in $(SUBDIRS) ; \
 	do \
 	  echo "-----------------------------------"; echo $$i ; \

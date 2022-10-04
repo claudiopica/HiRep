@@ -74,7 +74,7 @@ static site_info* origin=NULL;
 struct _block_info;
 typedef struct _block_info {
   int index;
-  unsigned int mask[4];        /* NOT_ASSIGNED ; INNER ; LBORDER ; RBORDER ; LBUFFER ; RBUFFER ; LOCAL */  
+  unsigned int mask[4];        /* NOT_ASSIGNED ; INNER ; LBORDER ; RBORDER ; LBUFFER ; RBUFFER ; LOCAL */
   unsigned int parity;         /* NOT_ASSIGNED ; EVEN ; ODD */
   unsigned int length;
   site_info* start;
@@ -138,18 +138,18 @@ static void print_parity(site_info* s) {
 
 static void print_copies_info(site_info* s) {
   int k;
-  
+
   lprintf("TEST_GEOMETRY",loglevel," [S%d] Its original: %d\n",s->index,s->original->index);
   if(s->original->index != s->index) print_coordinates(s->original);
-  
+
   lprintf("TEST_GEOMETRY",loglevel," [S%d] Number of copies: %d\n",s->index,s->ncopies);
-  
+
   if(s->ncopies>0) {
     lprintf("TEST_GEOMETRY",loglevel," [S%d] Copies:",s->index);
     for(k=0; k<s->ncopies; k++)
       lprintf("TEST_GEOMETRY",loglevel," %d",s->copies[k]->index);
     lprintf("TEST_GEOMETRY",loglevel,"\n");
-    
+
     for(k=0; k<s->ncopies; k++)
       print_coordinates(s->copies[k]);
   }
@@ -158,7 +158,7 @@ static void print_copies_info(site_info* s) {
 
 static void print_geometric_info(site_info* s) {
   int i;
-  
+
   lprintf("TEST_GEOMETRY",loglevel," [S%d] Location:",s->index);
   for(i=0; i<4; i++) {
     if(s->b_type[i] == LBUFFER)
@@ -185,15 +185,15 @@ static void print_geometric_info(site_info* s) {
 
 static void print_full_site_info(site_info* s) {
 //  lprintf("TEST_GEOMETRY",loglevel,"Full info for site %d\n",s->index);
-  
+
   print_coordinates(s);
-  
+
   print_global_coordinates(s);
-  
+
   print_parity(s);
-  
+
   print_copies_info(s);
-  
+
   print_geometric_info(s);
 
 }
@@ -217,7 +217,7 @@ static int in_glattice_q(int c[4]) {
     }
   }
   if(howmanyoutside > 2 && flag ==0) flag = 2;
-  
+
   if(flag == 0) return true;
   return false;
 }
@@ -232,7 +232,7 @@ static void set_originals_coords(site_info* s, int *test_q) {
     *test_q = false;
     exit(-1);
   }
-  
+
   for(i=0; i<4; i++) {
     nb = iup(s->index,i);
     memcpy(c,s->coord,sizeof(int)*4);
@@ -251,7 +251,7 @@ static void set_originals_coords(site_info* s, int *test_q) {
       *test_q = false;
     }
   }
-  
+
   for(i=0; i<4; i++) {
     nb = idn(s->index,i);
     memcpy(c,s->coord,sizeof(int)*4);
@@ -272,7 +272,7 @@ static void set_originals_coords(site_info* s, int *test_q) {
   }
 
   s->parity = ((s->coord[0]+s->coord[1]+s->coord[2]+s->coord[3]+PSIGN+1)&1) ? EVEN : ODD;
-  
+
   s->local = true;
   for(i=0; i<4; i++) {
     if(s->coord[i]<0) {
@@ -304,11 +304,11 @@ static void set_duplicates_coords(int* test_q) {
   site_info *from;
   site_info *to;
   site_info** tmp;
-  
+
   for(i=0; i<ncopies; i++) {
     from = &sites[copy_from[i]];
     to = &sites[copy_to[i]];
-    
+
     if(to->c_type != NOT_ASSIGNED) {
       lprintf("TEST_GEOMETRY",loglevel,"ERROR set_duplicates_coords: attempting copy from %d to %d\n",copy_from[i],copy_to[i]);
       lprintf("TEST_GEOMETRY",loglevel,"ERROR set_duplicates_coords: but destination has been already initialized\n");
@@ -325,7 +325,7 @@ static void set_duplicates_coords(int* test_q) {
       *test_q = false;
       exit(-1);
     }
-    
+
     for(k=0; k<4; k++) {
       to->coord[k] = from->coord[k];
       to->b_type[k] = from->b_type[k];
@@ -334,7 +334,7 @@ static void set_duplicates_coords(int* test_q) {
     to->parity = from->parity;
     to->original = from;
     to->c_type = DUPLICATE;
-    
+
     tmp = from->copies;
     from->ncopies++;
     from->copies = malloc(sizeof(site_info*)*from->ncopies);
@@ -342,7 +342,7 @@ static void set_duplicates_coords(int* test_q) {
       memcpy(from->copies,tmp,sizeof(site_info*)*(from->ncopies-1));
       free(tmp);
     }
-    from->copies[from->ncopies-1] = to;    
+    from->copies[from->ncopies-1] = to;
   }
 }
 
@@ -352,17 +352,17 @@ static void set_duplicates_coords(int* test_q) {
 static void initialize_sites() {
   int i, j, k, test_q;
   site_info *s;
-  
+
   local_size[0] = T; local_size[1] = X; local_size[2] = Y; local_size[3] = Z;
   buffer_thickness[0] = T_BORDER; buffer_thickness[1] = X_BORDER; buffer_thickness[2] = Y_BORDER; buffer_thickness[3] = Z_BORDER;
-  periodic_q[0] = (NP_T==1) ? true : false; periodic_q[1] = (NP_X==1) ? true : false; periodic_q[2] = (NP_Y==1) ? true : false; periodic_q[3] = (NP_Z==1) ? true : false; 
-  
+  periodic_q[0] = (NP_T==1) ? true : false; periodic_q[1] = (NP_X==1) ? true : false; periodic_q[2] = (NP_Y==1) ? true : false; periodic_q[3] = (NP_Z==1) ? true : false;
+
   nindices = glattice.gsize_gauge;
-  
+
   ncopies = 0;
   for(i=0 ; i<glattice.ncopies_gauge ; i++)
     ncopies += glattice.copy_len[i];
-  
+
   copy_from = copy_to = NULL;
   if(ncopies != 0) {
     copy_from = malloc(sizeof(int)*ncopies);
@@ -415,13 +415,13 @@ static void initialize_sites() {
 
   error(!test_q,1,"test_geometry.c","Set the coordinates for points reached by iup, idn... FAILED");
   lprintf("TEST_GEOMETRY",loglevel,"Set the coordinates for points reached by iup, idn... OK\n");
-  
-  
+
+
   /* Set the coordinates for the duplicate points */
   test_q = true;
   set_duplicates_coords(&test_q);
   error(!test_q,1,"test_geometry.c","Set the coordinates for duplicate points... FAILED");
-  lprintf("TEST_GEOMETRY",loglevel,"Set the coordinates for duplicate points... OK\n");  
+  lprintf("TEST_GEOMETRY",loglevel,"Set the coordinates for duplicate points... OK\n");
 
 
   lprintf("TEST_GEOMETRY",loglevel,"Origin\n");
@@ -471,10 +471,10 @@ static void initialize_sites() {
   error(!test_q,1,"test_geometry.c","Coordinates are in the right range... FAILED");
   lprintf("TEST_GEOMETRY",loglevel,"Coordinates are in the right range... OK\n");
 
-  
+
   /* TEST: ipt gives the right map between coordinates and local indexes */
   test_q = true;
-  
+
   for(s=sites; s<sites+nindices; s++) {
     if(!s->local || s->c_type != ORIGINAL) continue;
     int *cx = s->coord;
@@ -484,7 +484,7 @@ static void initialize_sites() {
       test_q = false;
     }
   }
-  
+
   int c0, c1, c2, c3;
   for(c0=0; c0<local_size[0]; c0++)
   for(c1=0; c1<local_size[1]; c1++)
@@ -514,10 +514,10 @@ static void initialize_sites() {
       }
     }
   }
-  
+
   error(!test_q,1,"test_geometry.c","ipt gives the right map between coordinates and local indexes... FAILED");
   lprintf("TEST_GEOMETRY",loglevel,"ipt gives the right map between coordinates and local indexes... OK\n");
-  
+
   /* TEST: iup, idn give the right maps between neighbours */
   int id[4][4];
   for(i=0; i<4; i++) {
@@ -601,7 +601,7 @@ static void search_first_block(block_info *block) {
   int flag, n, k;
   unsigned int mask2[4]={block->mask[0],block->mask[1],block->mask[2],block->mask[3]},parity2;
   int loc[4]={T,X,Y,Z};
-  
+
   block->ninners = 0;
   block->nlocals = 0;
   block->nbuffers = 0;
@@ -612,7 +612,7 @@ static void search_first_block(block_info *block) {
     if(block->mask[k]==LBORDER || block->mask[k]==RBORDER) block->nborders++;
     if(block->mask[k]==LBUFFER || block->mask[k]==RBUFFER) block->nbuffers++;
   }
-  
+
   /* Calculate block size */
   parity2=block->parity;
   for(k=0;k<4;k++) {
@@ -631,16 +631,16 @@ static void search_first_block(block_info *block) {
     if(compare_to_b_mask(s,mask2) && compare_to_parity(s,parity2) && s->c_type==ORIGINAL)
       block->length++;
   }
-    
+
   if(block->length==0) {
     block->start=NULL;
     return;
   }
-  
+
   /* Identify consecutive sites with desired parity and b_type */
   starting_site=block->start;
   if(starting_site==NULL) starting_site=sites;
-  
+
   n=0;
   for(s=sites+nindices-1; s>=starting_site; s--) {
     if(compare_to_b_mask(s,block->mask) && compare_to_parity(s,block->parity))
@@ -649,7 +649,7 @@ static void search_first_block(block_info *block) {
       n=0;
     s->test=n;
   }
-  
+
   for(s=starting_site; s<sites+nindices; s++) {
     if(s->test < block->length) continue;
     if(!compare_to_b_mask(s,block->mask) || !compare_to_parity(s,block->parity)) {
@@ -687,7 +687,7 @@ static void search_first_block(block_info *block) {
 
 static void append_block(block_info* nb) {
   block_info *tmp, *b;
-  
+
   tmp = malloc(sizeof(block_info)*(nblocks+1));
   if(nblocks>0) {
     memcpy(tmp,blocks,sizeof(block_info)*nblocks);
@@ -718,16 +718,16 @@ static void append_block(block_info* nb) {
 
 static void print_short_block_info(block_info *b) {
   int i;
-  
+
   lprintf("TEST_GEOMETRY",loglevel," [B%d]  \tStart %d  \tLength %d", b->index, b->start->index, b->length);
-  
+
   lprintf("TEST_GEOMETRY",loglevel,"  \tFROM",b->index);
   if(b->nsenders>0) {
     for(i=0; i<b->nsenders; i++)
       lprintf("TEST_GEOMETRY",loglevel," %d",b->senders[i]->index);
   } else
     lprintf("TEST_GEOMETRY",loglevel," *  ");
-  
+
   lprintf("TEST_GEOMETRY",loglevel,"  \tTO",b->index);
   if(b->receiver!=NULL) {
     lprintf("TEST_GEOMETRY",loglevel," %d",b->receiver->index);
@@ -753,7 +753,7 @@ static void print_short_block_info(block_info *b) {
     else
       lprintf("TEST_GEOMETRY",loglevel," INVALID");
   }
-  
+
   lprintf("TEST_GEOMETRY",loglevel," )  \tParity ");
   if(b->parity == NOT_ASSIGNED)
     lprintf("TEST_GEOMETRY",loglevel,"NOT_ASSIGNED");
@@ -763,14 +763,14 @@ static void print_short_block_info(block_info *b) {
     lprintf("TEST_GEOMETRY",loglevel,"ODD");
   else
     lprintf("TEST_GEOMETRY",loglevel,"INVALID");
-  
+
   lprintf("TEST_GEOMETRY",loglevel,"\n");
 }
 
 
 static void print_block_info(block_info *b) {
   int i;
-  
+
   lprintf("TEST_GEOMETRY",loglevel," [B%d] block info\n",b->index);
 
   lprintf("TEST_GEOMETRY",loglevel," [B%d] mask:",b->index,b->index);
@@ -793,7 +793,7 @@ static void print_block_info(block_info *b) {
       lprintf("TEST_GEOMETRY",loglevel," INVALID");
   }
   lprintf("TEST_GEOMETRY",loglevel,"\n");
-  
+
   lprintf("TEST_GEOMETRY",loglevel," [B%d] ninners = %d\n",b->index,b->ninners);
   lprintf("TEST_GEOMETRY",loglevel," [B%d] nlocals = %d\n",b->index,b->nlocals);
   lprintf("TEST_GEOMETRY",loglevel," [B%d] nborders = %d\n",b->index,b->nborders);
@@ -816,15 +816,15 @@ static void print_block_info(block_info *b) {
     lprintf("TEST_GEOMETRY",loglevel," [B%d] First index: %d\n",b->index,b->start->index);
     print_full_site_info(b->start);
   }
-  
-  
+
+
   if(b->nsenders>0) {
     lprintf("TEST_GEOMETRY",loglevel," [B%d] Senders:",b->index);
     for(i=0; i<b->nsenders; i++)
       lprintf("TEST_GEOMETRY",loglevel," %d",b->senders[i]->index);
     lprintf("TEST_GEOMETRY",loglevel,"\n");
   }
-  
+
   if(b->receiver!=NULL) {
     lprintf("TEST_GEOMETRY",loglevel," [B%d] Receiver: %d\n",b->index,b->receiver->index);
   }
@@ -834,7 +834,7 @@ static void print_block_info(block_info *b) {
 static void search_all_blocks(unsigned int parity, unsigned int mask[4]) {
   block_info tmp;
   int n;
-  
+
   tmp.index = 0;
   tmp.ninners = 0;
   tmp.nlocals = 0;
@@ -850,7 +850,7 @@ static void search_all_blocks(unsigned int parity, unsigned int mask[4]) {
   tmp.nsenders = 0;
   tmp.senders = NULL;
   tmp.receiver = NULL;
-  
+
   n=0;
   while(1) {
     search_first_block(&tmp);
@@ -861,7 +861,7 @@ static void search_all_blocks(unsigned int parity, unsigned int mask[4]) {
     } else
       break;
   }
-  
+
   /*
   if(n==0) {
     lprintf("TEST_GEOMETRY",loglevel,"ERROR search_all_blocks: Block not found");
@@ -878,9 +878,9 @@ static void initialize_blocks() {
   unsigned int mask[4], parity;
   site_info *s;
   block_info *b;
-  
+
   nblocks=0;
-  
+
   mask[0]=mask[1]=mask[2]=mask[3]=INNER;
   parity=EVEN;
   search_all_blocks(parity, mask);
@@ -899,7 +899,7 @@ static void initialize_blocks() {
 #define EVEN 1
 #define ODD  2
 */
-  
+
   for(j=0; j<4; j++) {
     if(periodic_q[j]) continue;
     for(bj=LBORDER; bj<=RBUFFER; bj++)
@@ -909,7 +909,7 @@ static void initialize_blocks() {
       search_all_blocks(parity, mask);
     }
   }
-  
+
   for(j=0; j<4; j++)
   for(k=j+1; k<4; k++) {
     if(periodic_q[j] || periodic_q[k]) continue;
@@ -924,7 +924,7 @@ static void initialize_blocks() {
       search_all_blocks(parity, mask);
     }
   }
-  
+
   /* Find communication pairing */
   for(b=blocks;b<blocks+nblocks;b++) {
     if(b->nbuffers==0) continue;
@@ -945,14 +945,14 @@ static void initialize_blocks() {
       /* Find sender with the right parity, mask and length*/
       if(b2->mask[0]!=twinmask[0] || b2->mask[1]!=twinmask[1] || b2->mask[2]!=twinmask[2] || b2->mask[3]!=twinmask[3] || b2->parity!=twinparity || b2->length!=b->length)
         continue;
-      
+
       /* Sender must be obtained by shifting the original block */
       int shift[4];
       shift[0]=b2->start[0].coord[0]-b->start[0].coord[0];
       shift[1]=b2->start[0].coord[1]-b->start[0].coord[1];
       shift[2]=b2->start[0].coord[2]-b->start[0].coord[2];
       shift[3]=b2->start[0].coord[3]-b->start[0].coord[3];
-      
+
       test_q = true;
       for(j=0;j<b->length;j++) {
         if(shift[0]!=b2->start[j].coord[0]-b->start[j].coord[0] ||
@@ -962,7 +962,7 @@ static void initialize_blocks() {
           test_q = false;
       }
       if(!test_q) continue;
-    
+
       block_info **tmp=malloc(sizeof(block_info*)*(b->nsenders+1));
       if(b->nsenders!=0) {
         memcpy(tmp,b->senders,sizeof(block_info*)*b->nsenders);
@@ -971,7 +971,7 @@ static void initialize_blocks() {
       b->senders=tmp;
       b->senders[b->nsenders]=b2;
       b->nsenders++;
-      
+
       /* Sender sends only to ONE receiver */
       if(b2->receiver!=NULL) {
         lprintf("TEST_GEOMETRY",loglevel,"ERROR initialize_blocks: Block %d has already got a receiver (%d)\n",b2->index,b2->receiver->index);
@@ -984,7 +984,7 @@ static void initialize_blocks() {
   }
   lprintf("TEST_GEOMETRY",loglevel,"Find communication senders... OK\n");
 
-  
+
   /* TEST: All buffers have a sender */
   test_q=true;
   for(b=blocks;b<blocks+nblocks;b++) {
@@ -996,8 +996,8 @@ static void initialize_blocks() {
   }
   error(!test_q,1,"test_geometry.c","All buffers have a sender... FAILED");
   lprintf("TEST_GEOMETRY",loglevel,"All buffers have a sender... OK\n");
-  
-  
+
+
   /* TEST: Every site belongs to a block */
   for(s=sites; s<sites+nindices; s++)
     s->test=false;
@@ -1016,8 +1016,8 @@ static void initialize_blocks() {
   }
   error(!test_q,1,"test_geometry.c","Every site belongs to a valid block... FAILED");
   lprintf("TEST_GEOMETRY",loglevel,"Every site belongs to a valid block... OK\n");
-  
-   
+
+
   lprintf("TEST_GEOMETRY",loglevel,"List of blocks (nblocks=%d)\n",nblocks);
   for(k=0;k<nindices;k++)
   for(n=0;n<nblocks;n++) {
@@ -1035,15 +1035,15 @@ static void test_goemetry_descriptor(geometry_descriptor *gd, int parity) {
     int test_q;
   site_info *s;
   block_info *b;
-  
-  
+
+
   /* TEST: gsize_gauge */
 
   lprintf("TEST_GEOMETRY",loglevel,"gsize_gauge = %d\n",gd->gsize_gauge);
 
   if(gd->gsize_gauge!=-1) {
     first=nindices;
-    last=-1;  
+    last=-1;
     for(b=blocks; b<blocks+nblocks; b++) {
       if(parity!=NOT_ASSIGNED && parity!=b->parity) continue;
       if(b->ninners+b->nlocals>=2) {
@@ -1052,7 +1052,7 @@ static void test_goemetry_descriptor(geometry_descriptor *gd, int parity) {
       }
     }
     howmany=last-first+1;
-  
+
     if(gd->gsize_gauge != howmany) {
       lprintf("TEST_GEOMETRY",loglevel,"gsize_gauge should be %d\n",howmany);
       error(1,1,"test_geometry.c","Check gsize_gauge... FAILED");
@@ -1060,13 +1060,13 @@ static void test_goemetry_descriptor(geometry_descriptor *gd, int parity) {
     lprintf("TEST_GEOMETRY",loglevel,"Check gsize_gauge... OK\n");
   }
 
-  
+
   /* TEST: gsize_spinor */
 
   lprintf("TEST_GEOMETRY",loglevel,"gsize_spinor = %d\n",gd->gsize_spinor);
 
   first=nindices;
-  last=-1;  
+  last=-1;
   for(b=blocks; b<blocks+nblocks; b++) {
     if(parity!=NOT_ASSIGNED && parity!=b->parity) continue;
     if(b->ninners+b->nlocals>=3) {
@@ -1081,21 +1081,21 @@ static void test_goemetry_descriptor(geometry_descriptor *gd, int parity) {
     error(1,1,"test_geometry.c","Check gsize_spinor... FAILED");
   }
   lprintf("TEST_GEOMETRY",loglevel,"Check gsize_spinor... OK\n");
-  
-  
+
+
   /* TEST: inner_master_pieces spans all the original inner points, each once*/
-    
+
   lprintf("TEST_GEOMETRY",loglevel,"inner_master_pieces = %d\n",gd->inner_master_pieces);
   lprintf("TEST_GEOMETRY",loglevel,"First master index = %d\n",gd->master_start[0]);
   lprintf("TEST_GEOMETRY",loglevel,"master_shift = %d\n",gd->master_shift);
 
   for(s=sites; s<sites+nindices; s++) s->test=0;
-  
+
   test_q=true;
   for(n=0;n<gd->inner_master_pieces;n++)
   for(i=gd->master_start[n]; i<=gd->master_end[n]; i++) {
     sites[i].test++;
-    
+
     if(sites[i].c_type!=ORIGINAL) {
       lprintf("TEST_GEOMETRY",loglevel,"ERROR test_goemetry_descriptor: Site %d should be ORIGINAL\n",i);
       print_full_site_info(&sites[i]);
@@ -1118,7 +1118,7 @@ static void test_goemetry_descriptor(geometry_descriptor *gd, int parity) {
       test_q=false;
     }
   }
-  
+
   for(s=sites; s<sites+nindices; s++) {
     if(s->c_type!=ORIGINAL) continue;
     if(parity!=NOT_ASSIGNED && s->parity!=parity) continue;
@@ -1129,36 +1129,36 @@ static void test_goemetry_descriptor(geometry_descriptor *gd, int parity) {
       test_q=false;
     }
   }
-  
+
   error(!test_q,1,"test_geometry.c","Check master inner pieces... FAILED");
   lprintf("TEST_GEOMETRY",loglevel,"Check master inner pieces... OK\n");
-  
-  
+
+
   /* TEST: local_master_pieces spans all the original local points, each once*/
-  
+
   lprintf("TEST_GEOMETRY",loglevel,"local_master_pieces = %d\n",gd->local_master_pieces);
 
   for(s=sites; s<sites+nindices; s++) s->test=0;
-  
+
   test_q=true;
   for(n=0;n<gd->local_master_pieces;n++)
   for(i=gd->master_start[n]; i<=gd->master_end[n]; i++) {
     int nlocals;
-    
+
     sites[i].test++;
-    
+
     if(sites[i].c_type!=ORIGINAL) {
       lprintf("TEST_GEOMETRY",loglevel,"ERROR test_goemetry_descriptor: Site %d should be ORIGINAL\n",i);
       print_full_site_info(&sites[i]);
       test_q=false;
     }
-    
+
     if(parity!=NOT_ASSIGNED && sites[i].parity!=parity) {
       lprintf("TEST_GEOMETRY",loglevel,"ERROR test_goemetry_descriptor: Site %d has wrong parity\n",i);
       print_full_site_info(&sites[i]);
       test_q=false;
     }
-    
+
     nlocals=0;
     if(sites[i].b_type[0]!=LBUFFER && sites[i].b_type[0]!=RBUFFER) nlocals++;
     if(sites[i].b_type[1]!=LBUFFER && sites[i].b_type[1]!=RBUFFER) nlocals++;
@@ -1169,21 +1169,21 @@ static void test_goemetry_descriptor(geometry_descriptor *gd, int parity) {
       print_full_site_info(&sites[i]);
       test_q=false;
     }
-    
+
     if(sites[i].test>1) {
       lprintf("TEST_GEOMETRY",loglevel,"ERROR test_goemetry_descriptor: Site %d has already appeared in master pieces\n",i);
       print_full_site_info(&sites[i]);
       test_q=false;
     }
   }
-  
+
   for(s=sites; s<sites+nindices; s++) {
     int nlocals;
-    
+
     if(s->c_type!=ORIGINAL) continue;
-    
+
     if(parity!=NOT_ASSIGNED && s->parity!=parity) continue;
-    
+
     nlocals=0;
     if(s->b_type[0]!=LBUFFER && s->b_type[0]!=RBUFFER) nlocals++;
     if(s->b_type[1]!=LBUFFER && s->b_type[1]!=RBUFFER) nlocals++;
@@ -1196,36 +1196,36 @@ static void test_goemetry_descriptor(geometry_descriptor *gd, int parity) {
       test_q=false;
     }
   }
-  
+
   error(!test_q,1,"test_geometry.c","Check master local pieces... FAILED");
   lprintf("TEST_GEOMETRY",loglevel,"Check master local pieces... OK\n");
-  
-  
+
+
   /* TEST: total_spinor_master_pieces spans all the original local points and the 3D buffers, each once*/
-  
+
   lprintf("TEST_GEOMETRY",loglevel,"total_spinor_master_pieces = %d\n",gd->total_spinor_master_pieces);
-  
+
   for(s=sites; s<sites+nindices; s++) s->test=0;
-  
+
   test_q=true;
   for(n=0;n<gd->total_spinor_master_pieces;n++)
   for(i=gd->master_start[n]; i<=gd->master_end[n]; i++) {
     int nlocals;
-    
+
     sites[i].test++;
-    
+
     if(sites[i].c_type!=ORIGINAL) {
       lprintf("TEST_GEOMETRY",loglevel,"ERROR test_goemetry_descriptor: Site %d should be ORIGINAL\n",i);
       print_full_site_info(&sites[i]);
       test_q=false;
     }
-    
+
     if(parity!=NOT_ASSIGNED && sites[i].parity!=parity) {
       lprintf("TEST_GEOMETRY",loglevel,"ERROR test_goemetry_descriptor: Site %d has wrong parity\n",i);
       print_full_site_info(&sites[i]);
       test_q=false;
     }
-    
+
     nlocals=0;
     if(sites[i].b_type[0]!=LBUFFER && sites[i].b_type[0]!=RBUFFER) nlocals++;
     if(sites[i].b_type[1]!=LBUFFER && sites[i].b_type[1]!=RBUFFER) nlocals++;
@@ -1236,21 +1236,21 @@ static void test_goemetry_descriptor(geometry_descriptor *gd, int parity) {
       print_full_site_info(&sites[i]);
       test_q=false;
     }
-    
+
     if(sites[i].test>1) {
       lprintf("TEST_GEOMETRY",loglevel,"ERROR test_goemetry_descriptor: Site %d has already appeared in master pieces\n",i);
       print_full_site_info(&sites[i]);
       test_q=false;
     }
   }
-  
+
   for(s=sites; s<sites+nindices; s++) {
     int nlocals;
-    
+
     if(s->c_type!=ORIGINAL) continue;
-    
+
     if(parity!=NOT_ASSIGNED && s->parity!=parity) continue;
-    
+
     nlocals=0;
     if(s->b_type[0]!=LBUFFER && s->b_type[0]!=RBUFFER) nlocals++;
     if(s->b_type[1]!=LBUFFER && s->b_type[1]!=RBUFFER) nlocals++;
@@ -1263,37 +1263,37 @@ static void test_goemetry_descriptor(geometry_descriptor *gd, int parity) {
       test_q=false;
     }
   }
-  
+
   error(!test_q,1,"test_geometry.c","Check master local pieces + 3D buffers... FAILED");
   lprintf("TEST_GEOMETRY",loglevel,"Check master local pieces + 3D buffers... OK\n");
-  
-  
+
+
   /* TEST: total_gauge_master_pieces spans all the original local points and the 2/3D buffers, each once*/
-  
+
   lprintf("TEST_GEOMETRY",loglevel,"total_gauge_master_pieces = %d\n",gd->total_gauge_master_pieces);
-  
+
   if(gd->total_gauge_master_pieces!=-1) {
     for(s=sites; s<sites+nindices; s++) s->test=0;
-    
+
     test_q=true;
     for(n=0;n<gd->total_gauge_master_pieces;n++)
     for(i=gd->master_start[n]; i<=gd->master_end[n]; i++) {
       int nlocals;
-      
+
       sites[i].test++;
-      
+
       if(sites[i].c_type!=ORIGINAL) {
         lprintf("TEST_GEOMETRY",loglevel,"ERROR test_goemetry_descriptor: Site %d should be ORIGINAL\n",i);
         print_full_site_info(&sites[i]);
         test_q=false;
       }
-      
+
       if(parity!=NOT_ASSIGNED && sites[i].parity!=parity) {
         lprintf("TEST_GEOMETRY",loglevel,"ERROR test_goemetry_descriptor: Site %d has wrong parity\n",i);
         print_full_site_info(&sites[i]);
         test_q=false;
       }
-      
+
       nlocals=0;
       if(sites[i].b_type[0]!=LBUFFER && sites[i].b_type[0]!=RBUFFER) nlocals++;
       if(sites[i].b_type[1]!=LBUFFER && sites[i].b_type[1]!=RBUFFER) nlocals++;
@@ -1304,21 +1304,21 @@ static void test_goemetry_descriptor(geometry_descriptor *gd, int parity) {
         print_full_site_info(&sites[i]);
         test_q=false;
       }
-      
+
       if(sites[i].test>1) {
         lprintf("TEST_GEOMETRY",loglevel,"ERROR test_goemetry_descriptor: Site %d has already appeared in master pieces\n",i);
         print_full_site_info(&sites[i]);
         test_q=false;
       }
     }
-    
+
     for(s=sites; s<sites+nindices; s++) {
       int nlocals;
-      
+
       if(s->c_type!=ORIGINAL) continue;
-      
+
       if(parity!=NOT_ASSIGNED && s->parity!=parity) continue;
-      
+
       nlocals=0;
       if(s->b_type[0]!=LBUFFER && s->b_type[0]!=RBUFFER) nlocals++;
       if(s->b_type[1]!=LBUFFER && s->b_type[1]!=RBUFFER) nlocals++;
@@ -1331,7 +1331,7 @@ static void test_goemetry_descriptor(geometry_descriptor *gd, int parity) {
         test_q=false;
       }
     }
-    
+
     error(!test_q,1,"test_geometry.c","Check master local pieces + 2/3D buffers... FAILED");
     lprintf("TEST_GEOMETRY",loglevel,"Check master local pieces + 2/3D buffers... OK\n");
   }
@@ -1340,13 +1340,13 @@ static void test_goemetry_descriptor(geometry_descriptor *gd, int parity) {
   /* TEST: all points in 3D borders are sent where they should */
 
   lprintf("TEST_GEOMETRY",loglevel,"nbuffers_spinor = %d\n",gd->nbuffers_spinor);
-  
+
   for(b=blocks; b<blocks+nblocks; b++) b->test=0;
 
   test_q=true;
   for(n=0;n<gd->nbuffers_spinor;n++) {
     int shift[4], proc_to, mu;
-    
+
     /* Search corresponding block */
     block_info *this=NULL;
     for(b=blocks; b<blocks+nblocks; b++) {
@@ -1363,7 +1363,7 @@ static void test_goemetry_descriptor(geometry_descriptor *gd, int parity) {
         break;
       }
     }
-    
+
     if(this==NULL) {
       lprintf("TEST_GEOMETRY",loglevel,"sbuf[%d] start=%d len=%d\n",n,gd->sbuf_start[n],gd->sbuf_len[n]);
       lprintf("TEST_GEOMETRY",loglevel,"ERROR test_goemetry_descriptor: No block found!");
@@ -1374,7 +1374,7 @@ static void test_goemetry_descriptor(geometry_descriptor *gd, int parity) {
       shift[1]=sites[this->receiver->start->index].coord[1]-sites[this->start->index].coord[1];
       shift[2]=sites[this->receiver->start->index].coord[2]-sites[this->start->index].coord[2];
       shift[3]=sites[this->receiver->start->index].coord[3]-sites[this->start->index].coord[3];
-      
+
       proc_to=CID;
       mu=0;
       if(shift[mu]>0) {
@@ -1400,7 +1400,7 @@ static void test_goemetry_descriptor(geometry_descriptor *gd, int parity) {
       } else if(shift[mu]<0) {
         proc_to=proc_up(proc_to,mu);
       }
-      
+
       if(gd->sbuf_to_proc[n]!=proc_to) {
         lprintf("TEST_GEOMETRY",loglevel,"sbuf[%d] start=%d len=%d\n",n,gd->sbuf_start[n],gd->sbuf_len[n]);
         lprintf("TEST_GEOMETRY",loglevel,"ERROR test_goemetry_descriptor: Send data to processor %d, should be %d\n",gd->sbuf_to_proc[n],proc_to);
@@ -1408,7 +1408,7 @@ static void test_goemetry_descriptor(geometry_descriptor *gd, int parity) {
       }
     }
   }
-    
+
   for(b=blocks; b<blocks+nblocks; b++) {
     if(b->nbuffers!=1) continue;
     if(parity!=NOT_ASSIGNED && b->senders[0]->parity!=parity) continue;
@@ -1418,7 +1418,7 @@ static void test_goemetry_descriptor(geometry_descriptor *gd, int parity) {
       test_q=false;
     }
   }
-  
+
   error(!test_q,1,"test_geometry.c","Check 3D send communications... FAILED");
   lprintf("TEST_GEOMETRY",loglevel,"Check 3D send communications... OK\n");
 
@@ -1433,7 +1433,7 @@ static void test_goemetry_descriptor(geometry_descriptor *gd, int parity) {
   for(n=0;n<gd->nbuffers_spinor;n++) {
     int shift[4], proc_from, mu;
 lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n],gd->rbuf_len[n]);
-    
+
     /* Search corresponding block */
     block_info *this=NULL;
     for(b=blocks; b<blocks+nblocks; b++) {
@@ -1449,7 +1449,7 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
         break;
       }
     }
-    
+
     if(this==NULL) {
       lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n],gd->rbuf_len[n]);
       lprintf("TEST_GEOMETRY",loglevel,"ERROR test_goemetry_descriptor: No block found!\n");
@@ -1461,7 +1461,7 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
       shift[1]=sites[this->start->index].coord[1]-sites[this->senders[0]->start->index].coord[1];
       shift[2]=sites[this->start->index].coord[2]-sites[this->senders[0]->start->index].coord[2];
       shift[3]=sites[this->start->index].coord[3]-sites[this->senders[0]->start->index].coord[3];
-      
+
       proc_from=CID;
       mu=0;
       if(shift[mu]>0) {
@@ -1487,7 +1487,7 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
       } else if(shift[mu]<0) {
         proc_from=proc_dn(proc_from,mu);
       }
-      
+
       if(gd->rbuf_from_proc[n]!=proc_from) {
         lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n],gd->rbuf_len[n]);
         lprintf("TEST_GEOMETRY",loglevel,"ERROR test_goemetry_descriptor: Receive data from processor %d, should be %d\n",gd->rbuf_from_proc[n],proc_from);
@@ -1495,7 +1495,7 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
       }
     }
   }
-    
+
   for(b=blocks; b<blocks+nblocks; b++) {
     if(b->nbuffers!=1) continue;
     if(parity!=NOT_ASSIGNED && b->parity!=parity) continue;
@@ -1505,24 +1505,24 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
       test_q=false;
     }
   }
-  
+
   error(!test_q,1,"test_geometry.c","Check 3D receive communications... FAILED");
   lprintf("TEST_GEOMETRY",loglevel,"Check 3D receive communications... OK\n");
-  
+
 
 
   /* TEST: all points in 2/3D borders are sent where they should */
 
   lprintf("TEST_GEOMETRY",loglevel,"nbuffers_gauge = %d\n",gd->nbuffers_gauge);
-  
+
   if(gd->nbuffers_gauge>0){
-  
+
     for(b=blocks; b<blocks+nblocks; b++) b->test=0;
-  
+
     test_q=true;
     for(n=0;n<gd->nbuffers_gauge;n++) {
       int shift[4], proc_to, mu;
-      
+
       /* Search corresponding block */
       block_info *this=NULL;
       for(b=blocks; b<blocks+nblocks; b++) {
@@ -1539,7 +1539,7 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
           break;
         }
       }
-      
+
       if(this==NULL) {
         lprintf("TEST_GEOMETRY",loglevel,"sbuf[%d] start=%d len=%d\n",n,gd->sbuf_start[n],gd->sbuf_len[n]);
         lprintf("TEST_GEOMETRY",loglevel,"ERROR test_goemetry_descriptor: No block found!\n");
@@ -1550,7 +1550,7 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
         shift[1]=sites[this->receiver->start->index].coord[1]-sites[this->start->index].coord[1];
         shift[2]=sites[this->receiver->start->index].coord[2]-sites[this->start->index].coord[2];
         shift[3]=sites[this->receiver->start->index].coord[3]-sites[this->start->index].coord[3];
-        
+
         proc_to=CID;
         mu=0;
         if(shift[mu]>0) {
@@ -1576,7 +1576,7 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
         } else if(shift[mu]<0) {
           proc_to=proc_up(proc_to,mu);
         }
-        
+
         if(gd->sbuf_to_proc[n]!=proc_to) {
           lprintf("TEST_GEOMETRY",loglevel,"sbuf[%d] start=%d len=%d\n",n,gd->sbuf_start[n],gd->sbuf_len[n]);
           lprintf("TEST_GEOMETRY",loglevel,"ERROR test_goemetry_descriptor: Send data to processor %d, should be %d\n",gd->sbuf_to_proc[n],proc_to);
@@ -1584,7 +1584,7 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
         }
       }
     }
-      
+
     for(b=blocks; b<blocks+nblocks; b++) {
       if(b->nbuffers!=1 && b->nbuffers!=2) continue;
       if(parity!=NOT_ASSIGNED && b->senders[0]->parity!=parity) continue;
@@ -1594,7 +1594,7 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
         test_q=false;
       }
     }
-    
+
     error(!test_q,1,"test_geometry.c","Check 2/3D send communications... FAILED");
     lprintf("TEST_GEOMETRY",loglevel,"Check 2/3D send communications... OK\n");
 
@@ -1606,11 +1606,11 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
 
   if(gd->nbuffers_gauge>0){
     for(b=blocks; b<blocks+nblocks; b++) b->test=0;
-  
+
     test_q=true;
     for(n=0;n<gd->nbuffers_gauge;n++) {
       int shift[4], proc_from, mu;
-      
+
       /* Search corresponding block */
       block_info *this=NULL;
       for(b=blocks; b<blocks+nblocks; b++) {
@@ -1626,7 +1626,7 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
           break;
         }
       }
-      
+
       if(this==NULL) {
         lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n],gd->rbuf_len[n]);
         lprintf("TEST_GEOMETRY",loglevel,"ERROR test_goemetry_descriptor: No block found!\n");
@@ -1638,7 +1638,7 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
         shift[1]=sites[this->start->index].coord[1]-sites[this->senders[0]->start->index].coord[1];
         shift[2]=sites[this->start->index].coord[2]-sites[this->senders[0]->start->index].coord[2];
         shift[3]=sites[this->start->index].coord[3]-sites[this->senders[0]->start->index].coord[3];
-        
+
         proc_from=CID;
         mu=0;
         if(shift[mu]>0) {
@@ -1664,7 +1664,7 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
         } else if(shift[mu]<0) {
           proc_from=proc_dn(proc_from,mu);
         }
-        
+
         if(gd->rbuf_from_proc[n]!=proc_from) {
           lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n],gd->rbuf_len[n]);
           lprintf("TEST_GEOMETRY",loglevel,"ERROR test_goemetry_descriptor: Receive data from processor %d, should be %d\n",gd->rbuf_from_proc[n],proc_from);
@@ -1672,7 +1672,7 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
         }
       }
     }
-      
+
     for(b=blocks; b<blocks+nblocks; b++) {
       if(b->nbuffers!=1 && b->nbuffers!=2) continue;
       if(parity!=NOT_ASSIGNED && b->parity!=parity) continue;
@@ -1682,45 +1682,45 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
         test_q=false;
       }
     }
-    
+
     error(!test_q,1,"test_geometry.c","Check 2/3D receive communications... FAILED");
     lprintf("TEST_GEOMETRY",loglevel,"Check 2/3D receive communications... OK\n");
   }
-  
-  
-  
-  
+
+
+
+
   /* TEST: ncopies_spinor spans all the duplicate points in 3D borders, the pairing with the original is correct, each copy is done only once */
-  
+
   lprintf("TEST_GEOMETRY",loglevel,"ncopies_spinor = %d\n",gd->ncopies_spinor);
   lprintf("TEST_GEOMETRY",loglevel,"nbuffers_spinor = %d\n",gd->nbuffers_spinor);
-  
+
   for(s=sites; s<sites+nindices; s++) s->test=0;
-  
+
   test_q=true;
   for(n=0;n<gd->ncopies_spinor;n++)
   for(i=0; i<gd->copy_len[n]; i++) {
     int from, to;
     int nlocals, ninners;
-    
+
     from=gd->copy_from[n]+i;
     to=gd->copy_to[n]+i;
 
     sites[to].test++;
-    
+
     if(sites[from].c_type!=ORIGINAL || sites[to].c_type!=DUPLICATE || sites[to].original!=&sites[from]) {
       lprintf("TEST_GEOMETRY",loglevel,"ERROR test_goemetry_descriptor: Site %d should be ORIGINAL, and site %d should be one of its DUPLICATEs\n",from,to);
       print_full_site_info(&sites[from]);
       print_full_site_info(&sites[to]);
       test_q=false;
     }
-    
+
     if(parity!=NOT_ASSIGNED && sites[from].parity!=parity) {
       lprintf("TEST_GEOMETRY",loglevel,"ERROR test_goemetry_descriptor: Site %d has wrong parity\n",from);
       print_full_site_info(&sites[from]);
       test_q=false;
     }
-    
+
     nlocals=0;
     if(sites[from].b_type[0]!=LBUFFER && sites[from].b_type[0]!=RBUFFER) nlocals++;
     if(sites[from].b_type[1]!=LBUFFER && sites[from].b_type[1]!=RBUFFER) nlocals++;
@@ -1736,14 +1736,14 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
       print_full_site_info(&sites[from]);
       test_q=false;
     }
-    
+
     if(sites[to].test>1) {
       lprintf("TEST_GEOMETRY",loglevel,"ERROR test_goemetry_descriptor: Site %d has already been copied\n",to);
       print_full_site_info(&sites[to]);
       test_q=false;
     }
   }
-  
+
   for(n=0;n<gd->nbuffers_spinor;n++)
   for(i=gd->sbuf_start[n]; i<gd->sbuf_start[n]+gd->sbuf_len[n]; i++) {
     if(sites[i].c_type==DUPLICATE && sites[i].test==0) {
@@ -1752,37 +1752,37 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
       test_q=false;
     }
   }
-  
+
   error(!test_q,1,"test_geometry.c","Check copies in 3D borders... FAILED");
   lprintf("TEST_GEOMETRY",loglevel,"Check copies in 3D borders... OK\n");
-  
-  
+
+
   /* TEST: ncopies_gauge spans all the duplicate points in 2/3D borders, the pairing with the original is correct, each copy is done only once */
-  
+
   lprintf("TEST_GEOMETRY",loglevel,"ncopies_gauge = %d\n",gd->ncopies_gauge);
   lprintf("TEST_GEOMETRY",loglevel,"nbuffers_gauge = %d\n",gd->nbuffers_gauge);
-  
+
   if(gd->ncopies_gauge!=-1) {
     for(s=sites; s<sites+nindices; s++) s->test=0;
-    
+
     test_q=true;
     for(n=0;n<gd->ncopies_gauge;n++)
     for(i=0; i<gd->copy_len[n]; i++) {
       int from, to;
       int nlocals, ninners;
-      
+
       from=gd->copy_from[n]+i;
       to=gd->copy_to[n]+i;
-  
+
       sites[to].test++;
-      
+
       if(sites[from].c_type!=ORIGINAL || sites[to].c_type!=DUPLICATE || sites[to].original!=&sites[from]) {
         lprintf("TEST_GEOMETRY",loglevel,"ERROR test_goemetry_descriptor: Site %d should be ORIGINAL, and site %d should be one of its DUPLICATEs\n",from,to);
         print_full_site_info(&sites[from]);
         print_full_site_info(&sites[to]);
         test_q=false;
       }
-      
+
       if(parity!=NOT_ASSIGNED && sites[from].parity!=parity) {
         lprintf("TEST_GEOMETRY",loglevel,"ERROR test_goemetry_descriptor: Site %d has wrong parity\n",from);
         print_full_site_info(&sites[from]);
@@ -1804,14 +1804,14 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
         print_full_site_info(&sites[from]);
         test_q=false;
       }
-      
+
       if(sites[to].test>1) {
         lprintf("TEST_GEOMETRY",loglevel,"ERROR test_goemetry_descriptor: Site %d has already been copied\n",to);
         print_full_site_info(&sites[to]);
         test_q=false;
       }
     }
-    
+
     for(n=0;n<gd->nbuffers_gauge;n++)
     for(i=gd->sbuf_start[n]; i<gd->sbuf_start[n]+gd->sbuf_len[n]; i++) {
       if(sites[i].c_type==DUPLICATE && sites[i].test==0) {
@@ -1821,11 +1821,11 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
       }
     }
 
-    
+
     error(!test_q,1,"test_geometry.c","Check copies in 2/3D borders... FAILED");
     lprintf("TEST_GEOMETRY",loglevel,"Check copies in 2/3D borders... OK\n");
   }
-                                           
+
 
   /* TEST: simulate copy and communications */
 
@@ -1836,7 +1836,7 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
     int nreq=4*gd->nbuffers_gauge;
     int* glb_coord;
     int *indices;
-    
+
     indices=amalloc(gd->gsize_gauge*sizeof(int),ALIGN);
     glb_coord=amalloc(gd->gsize_gauge*sizeof(int)*4,ALIGN);
 
@@ -1848,7 +1848,7 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
 
     for(n=0;n<gd->ncopies_gauge;n++)
       memcpy(glb_coord+4*(gd->copy_to[n]-gd->master_shift), glb_coord+4*(gd->copy_from[n]-gd->master_shift), gd->copy_len[n]*sizeof(int)*4);
-    
+
     if (gd->nbuffers_gauge>0) {
       comm_req=amalloc(4*gd->nbuffers_gauge*sizeof(MPI_Request),ALIGN);
       for (i=0; i<4*gd->nbuffers_gauge; ++i)
@@ -1860,7 +1860,7 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
     for (i=0; i<gd->nbuffers_gauge; ++i) {
 
       lprintf("TEST_GEOMETRY",loglevel,"Send/receive n=%d ... ",i);
-    
+
       /* send ith buffer */
       mpiret=MPI_Isend(glb_coord+4*(gd->sbuf_start[i]-gd->master_shift), /* buffer */
                        (gd->sbuf_len[i])*4, /* lenght in units of doubles */
@@ -1877,7 +1877,7 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
         lprintf("MPI",0,"ERROR: %s\n",mesg);
         error(1,1,"test_goemetry_descriptor [test_geometry_mpi.c]","Cannot start send buffer");
       }
-  
+
       /* receive ith buffer */
       mpiret=MPI_Irecv(glb_coord+4*(gd->rbuf_start[i]-gd->master_shift), /* buffer */
                        (gd->rbuf_len[i])*4, /* lenght in units of doubles */
@@ -1894,7 +1894,7 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
         lprintf("MPI",0,"ERROR: %s\n",mesg);
         error(1,1,"test_goemetry_descriptor [test_geometry_mpi.c]","Cannot start receive buffer");
       }
-        
+
         /* send ith buffer */
         mpiret=MPI_Isend(indices+(gd->sbuf_start[i]-gd->master_shift), /* buffer */
                          gd->sbuf_len[i], /* lenght in units of doubles */
@@ -1911,7 +1911,7 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
             lprintf("MPI",0,"ERROR: %s\n",mesg);
             error(1,1,"test_goemetry_descriptor [test_geometry_mpi.c]","Cannot start send buffer");
         }
-        
+
         /* receive ith buffer */
         mpiret=MPI_Irecv(indices+(gd->rbuf_start[i]-gd->master_shift), /* buffer */
                          gd->rbuf_len[i], /* lenght in units of doubles */
@@ -1930,14 +1930,14 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
         }
 
       lprintf("TEST_GEOMETRY",loglevel,"DONE\n",i);
-    
+
     }
-  
-    lprintf("TEST_GEOMETRY",loglevel,"arrivato\n");  
+
+    lprintf("TEST_GEOMETRY",loglevel,"arrivato\n");
     if(nreq>0) {
       MPI_Status status[nreq];
       mpiret=MPI_Waitall(nreq, comm_req, status);
-  
+
       if (mpiret != MPI_SUCCESS) {
         char mesg[MPI_MAX_ERROR_STRING];
         int mesglen, k;
@@ -1956,7 +1956,7 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
         error(1,1,"test_goemetry_descriptor [test_geometry_mpi.c]","Cannot complete communications");
       }
     }
-    
+
     test_q=true;
 
 
@@ -1967,35 +1967,35 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
         print_full_site_info(&sites[indices[n]]);
         test_q=false;
       }
-        
+
 
     error(!test_q,1,"test_geometry.c","Global coordinates sent and received correctly (gauge)... FAILED");
     lprintf("TEST_GEOMETRY",loglevel,"Global coordinates sent and received correctly (gauge)... OK\n");
-  
+
     afree(comm_req);
     afree(glb_coord);
   }
 
-  
+
     if(gd->gsize_spinor!=-1) {
         int  mpiret;
         MPI_Request *comm_req;
         int nreq=4*gd->nbuffers_spinor;
         int* glb_coord;
         int *indices;
-        
+
         indices=amalloc(gd->gsize_spinor*sizeof(int),ALIGN);
         glb_coord=amalloc(gd->gsize_spinor*sizeof(int)*4,ALIGN);
-        
+
         for(n=0;n<gd->gsize_spinor;n++) indices[n]=sites[n].index;
-        
+
         for(n=0;n<gd->gsize_spinor;n++)
             if(sites[n+gd->master_shift].c_type==ORIGINAL && sites[n+gd->master_shift].local)
                 memcpy(glb_coord+4*n,sites[n+gd->master_shift].glb_coord,sizeof(int)*4);
-        
+
         for(n=0;n<gd->ncopies_spinor;n++)
             memcpy(glb_coord+4*(gd->copy_to[n]-gd->master_shift), glb_coord+4*(gd->copy_from[n]-gd->master_shift), gd->copy_len[n]*sizeof(int)*4);
-        
+
         if (gd->nbuffers_spinor>0) {
             comm_req=amalloc(4*gd->nbuffers_spinor*sizeof(MPI_Request),ALIGN);
             for (i=0; i<4*gd->nbuffers_spinor; ++i)
@@ -2003,11 +2003,11 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
         } else {
             comm_req=NULL;
         }
-        
+
         for (i=0; i<gd->nbuffers_spinor; ++i) {
-            
+
             lprintf("TEST_GEOMETRY",loglevel,"Send/receive n=%d ... ",i);
-            
+
             /* send ith buffer */
             mpiret=MPI_Isend(glb_coord+4*(gd->sbuf_start[i]-gd->master_shift), /* buffer */
                              (gd->sbuf_len[i])*4, /* lenght in units of doubles */
@@ -2024,7 +2024,7 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
                 lprintf("MPI",0,"ERROR: %s\n",mesg);
                 error(1,1,"test_goemetry_descriptor [test_geometry_mpi.c]","Cannot start send buffer");
             }
-            
+
             /* receive ith buffer */
             mpiret=MPI_Irecv(glb_coord+4*(gd->rbuf_start[i]-gd->master_shift), /* buffer */
                              (gd->rbuf_len[i])*4, /* lenght in units of doubles */
@@ -2041,7 +2041,7 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
                 lprintf("MPI",0,"ERROR: %s\n",mesg);
                 error(1,1,"test_goemetry_descriptor [test_geometry_mpi.c]","Cannot start receive buffer");
             }
-            
+
             /* send ith buffer */
             mpiret=MPI_Isend(indices+(gd->sbuf_start[i]-gd->master_shift), /* buffer */
                              gd->sbuf_len[i], /* lenght in units of doubles */
@@ -2058,7 +2058,7 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
                 lprintf("MPI",0,"ERROR: %s\n",mesg);
                 error(1,1,"test_goemetry_descriptor [test_geometry_mpi.c]","Cannot start send buffer");
             }
-            
+
             /* receive ith buffer */
             mpiret=MPI_Irecv(indices+(gd->rbuf_start[i]-gd->master_shift), /* buffer */
                              gd->rbuf_len[i], /* lenght in units of doubles */
@@ -2075,16 +2075,16 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
                 lprintf("MPI",0,"ERROR: %s\n",mesg);
                 error(1,1,"test_goemetry_descriptor [test_geometry_mpi.c]","Cannot start receive buffer");
             }
-            
+
             lprintf("TEST_GEOMETRY",loglevel,"DONE\n",i);
-            
+
         }
-        
-        
+
+
         if(nreq>0) {
             MPI_Status status[nreq];
             mpiret=MPI_Waitall(nreq, comm_req, status);
-            
+
             if (mpiret != MPI_SUCCESS) {
                 char mesg[MPI_MAX_ERROR_STRING];
                 int mesglen, k;
@@ -2103,9 +2103,9 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
                 error(1,1,"test_goemetry_descriptor [test_geometry_mpi.c]","Cannot complete communications");
             }
         }
-        
+
         test_q=true;
-        
+
         for(n=0;n<gd->gsize_spinor;n++)
             if(memcmp(glb_coord+4*n,sites[n+gd->master_shift].glb_coord,sizeof(int)*4)!=0) {
                 lprintf("TEST_GEOMETRY",loglevel,"ERROR test_goemetry_descriptor: Global coordinates (%d,%d,%d,%d), site %d on neighbour processor\n",glb_coord[4*n], glb_coord[4*n+1], glb_coord[4*n+2], glb_coord[4*n+3],indices[n]);
@@ -2113,18 +2113,18 @@ lprintf("TEST_GEOMETRY",loglevel,"rbuf[%d] start=%d len=%d\n",n,gd->rbuf_start[n
                 print_full_site_info(&sites[indices[n]]);
                 test_q=false;
             }
-        
-        
+
+
         error(!test_q,1,"test_geometry.c","Global coordinates sent and received correctly (spinor)... FAILED");
         lprintf("TEST_GEOMETRY",loglevel,"Global coordinates sent and received correctly (spinor)... OK\n");
-        
+
         afree(comm_req);
         afree(glb_coord);
     }
 
-  
+
 #endif
-  
+
 }
 
 
@@ -2133,16 +2133,15 @@ void test_geometry_mpi_eo() {
   initialize_sites();
 
   initialize_blocks();
-  
+
   lprintf("TEST_GEOMETRY",loglevel,"********************* glattice\n");
   test_goemetry_descriptor(&glattice,NOT_ASSIGNED);
-  
+
   lprintf("TEST_GEOMETRY",loglevel,"********************* glat_even\n");
   test_goemetry_descriptor(&glat_even,EVEN);
-  
+
   lprintf("TEST_GEOMETRY",loglevel,"********************* glat_odd\n");
   test_goemetry_descriptor(&glat_odd,ODD);
-  
+
   finalize_test();
 }
-

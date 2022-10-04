@@ -61,11 +61,11 @@ sub validate_ng {
 sub validate_repr {
     if($repr eq "FUND") {
         $repr = "REPR_FUNDAMENTAL"
-    } elsif ($repr eq "2S") { 
-        $repr = "REPR_SYMMETRIC"        
-    } elsif ($repr eq "2A") { 
+    } elsif ($repr eq "2S") {
+        $repr = "REPR_SYMMETRIC"
+    } elsif ($repr eq "2A") {
         $repr = "REPR_ANTISYMMETRIC"
-    } elsif ($repr eq "ADJ") { 
+    } elsif ($repr eq "ADJ") {
         $repr = "REPR_ADJOINT"
     } else {
         print "Error: The fermion representation must be one of the following: FUND, 2S, 2A, ADJ\n";
@@ -76,8 +76,8 @@ sub validate_repr {
 sub validate_gauge {
     if($gauge eq "SUN") {
         $gauge = "GAUGE_SUN"
-    } elsif ($gauge eq "SON") { 
-        $gauge = "GAUGE_SON"         
+    } elsif ($gauge eq "SON") {
+        $gauge = "GAUGE_SON"
     } else {
         print "Error: The gauge group must be one of the following: SUN, SON\n";
         HelpMessage(1);
@@ -87,11 +87,11 @@ sub validate_gauge {
 sub validate_t {
     if($TBC eq "P") {
         $TBC = "BC_T_PERIODIC"
-    } elsif ($TBC eq "A") { 
+    } elsif ($TBC eq "A") {
         $TBC = "BC_T_ANTIPERIODIC"
-    } elsif ($TBC eq "T") { 
+    } elsif ($TBC eq "T") {
         $TBC = "BC_T_THETA"
-    } elsif ($TBC eq "O") { 
+    } elsif ($TBC eq "O") {
         $TBC = "BC_T_OPEN"
     } else {
         print "Error: The T boundary condition representation must be one of the following: P, A, T, O\n";
@@ -102,9 +102,9 @@ sub validate_t {
 sub validate_x {
     if($XBC eq "P") {
         $XBC = "BC_X_PERIODIC"
-    } elsif ($XBC eq "A") { 
+    } elsif ($XBC eq "A") {
         $XBC = "BC_X_ANTIPERIODIC"
-    } elsif ($XBC eq "T") { 
+    } elsif ($XBC eq "T") {
         $XBC = "BC_X_THETA"
     } else {
         print "Error: The X boundary condition representation must be one of the following: P, A, T\n";
@@ -115,9 +115,9 @@ sub validate_x {
 sub validate_y {
     if($YBC eq "P") {
         $YBC = "BC_Y_PERIODIC"
-    } elsif ($YBC eq "A") { 
+    } elsif ($YBC eq "A") {
         $YBC = "BC_Y_ANTIPERIODIC"
-    } elsif ($YBC eq "T") { 
+    } elsif ($YBC eq "T") {
         $YBC = "BC_Y_THETA"
     } else {
         print "Error: The Y boundary condition representation must be one of the following: P, A, T\n";
@@ -128,9 +128,9 @@ sub validate_y {
 sub validate_z {
     if($ZBC eq "P") {
         $ZBC = "BC_Z_PERIODIC"
-    } elsif ($ZBC eq "A") { 
+    } elsif ($ZBC eq "A") {
         $ZBC = "BC_Z_ANTIPERIODIC"
-    } elsif ($ZBC eq "T") { 
+    } elsif ($ZBC eq "T") {
         $ZBC = "BC_Z_THETA"
     } else {
         print "Error: The Z boundary condition representation must be one of the following: P, A, T\n";
@@ -149,7 +149,7 @@ open(my $fh, '>', $file) or die "Could not open file '$file' !";
 # write ng
 print $fh "NG = $NG\n";
 # write repr
-print $fh "REPR = $repr\n"; 
+print $fh "REPR = $repr\n";
 # write gauge
 print $fh "GAUGE_GROUP = $gauge\n";
 # write T boundary condition
@@ -176,7 +176,7 @@ $clover && print $fh "MACRO += -DWITH_CLOVER\n";
 $expclover && print $fh "MACRO += -DWITH_EXPCLOVER\n";
 # write eo preconditioning
 $eoprec && print $fh "MACRO += -DWITH_EO\n";
-# write quaternions 
+# write quaternions
 $quat && print $fh "MACRO += -DWITH_QUATERNIONS\n";
 # write ndebug
 $ndebug && print $fh "MACRO += -DNDEBUG\n";
@@ -240,7 +240,7 @@ write_mkflags - write flags file for compilation of HiRep
   --[no-]ccache       [false]     Use ccache
 
   --[no-]eo           [true]      Even-Odd preconditioning
-  
+
   --[no-]twist        [false]     XYZ twisted boundary conditions
   --[no-]sf           [false]     Schrodinger functional b.c.
   --[no-]sfhalf       [false]     Schrodinger functional b.c., half field

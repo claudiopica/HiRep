@@ -14,7 +14,7 @@ void printfile(ostream& out, istream& tmpl)
 		string txt, tag;
 		getline(tmpl, txt, '$');
 		getline(tmpl, tag, '$');
-		
+
 		out << txt;
 		if(tag == "N")
 			out << group::N;
@@ -29,7 +29,7 @@ void printfile(ostream& out, istream& tmpl)
 #endif
 
 			size_t start, end;
-			
+
 			start = tag.find(":", 8);
 			_PARAMETER_CHECK(start)
 			end = tag.find(":",start+1);
@@ -38,7 +38,7 @@ void printfile(ostream& out, istream& tmpl)
 
 			start = end;
 			string hname = tag.substr(start+1);
-			
+
 			out << fundamental_algebra_represent(mname.c_str(), hname.c_str());
 #ifndef NDEBUG
 			cerr << "OK\n";
@@ -51,7 +51,7 @@ void printfile(ostream& out, istream& tmpl)
 #endif
 
 			size_t start, end;
-			
+
 			start = tag.find(":", 8);
 			_PARAMETER_CHECK(start)
 			end = tag.find(":",start+1);
@@ -60,7 +60,7 @@ void printfile(ostream& out, istream& tmpl)
 
 			start = end;
 			string mname = tag.substr(start+1);
-			
+
 			out << fundamental_algebra_project(hname.c_str(), mname.c_str());
 #ifndef NDEBUG
 			cerr << "OK\n";
@@ -73,7 +73,7 @@ void printfile(ostream& out, istream& tmpl)
 #endif
 
 			size_t start, end;
-			
+
 			start = tag.find(":", 8);
 			_PARAMETER_CHECK(start)
 			end = tag.find(":",start+1);
@@ -92,7 +92,7 @@ void printfile(ostream& out, istream& tmpl)
 
 			start = end;
 			string dtname = tag.substr(start+1);
-			
+
 			out << infinitesimal_evolution(vname.c_str(), hname.c_str(), uname.c_str(), dtname.c_str());
 #ifndef NDEBUG
 			cerr << "OK\n";
@@ -105,7 +105,7 @@ void printfile(ostream& out, istream& tmpl)
 #endif
 
 			size_t start, end;
-			
+
 			start = tag.find(":", 8);
 			_PARAMETER_CHECK(start)
 			end = tag.find(":",start+1);
@@ -119,7 +119,7 @@ void printfile(ostream& out, istream& tmpl)
 
 			start = end;
 			string uname = tag.substr(start+1);
-			
+
 			out << ExpX(dtname.c_str(), hname.c_str(), uname.c_str());
 #ifndef NDEBUG
 			cerr << "OK\n";
@@ -149,7 +149,7 @@ void printfile(ostream& out, istream& tmpl)
 #endif
 
 			size_t start, end;
-			
+
 			start = tag.find(":", 8);
 			_PARAMETER_CHECK(start)
 			end = tag.find(":",start+1);
@@ -158,7 +158,7 @@ void printfile(ostream& out, istream& tmpl)
 
 			start = end;
 			string uname = tag.substr(start+1);
-			
+
 			out << group_represent(vname.c_str(), uname.c_str());
 #ifndef NDEBUG
 			cerr << "OK\n";
@@ -171,7 +171,7 @@ void printfile(ostream& out, istream& tmpl)
 #endif
 
 			size_t start, end;
-			
+
 			start = tag.find(":", 8);
 			_PARAMETER_CHECK(start)
 			end = tag.find(":",start+1);
@@ -180,7 +180,7 @@ void printfile(ostream& out, istream& tmpl)
 
 			start = end;
 			string uname = tag.substr(start+1);
-			
+
 			out << debug_group_represent(vname.c_str(), uname.c_str());
 #ifndef NDEBUG
 			cerr << "OK\n";
@@ -192,7 +192,7 @@ void printfile(ostream& out, istream& tmpl)
 			cerr << "Writing algebra_represent..... ";
 #endif
 			size_t start, end;
-			
+
 			start = tag.find(":", 8);
 			_PARAMETER_CHECK(start)
 			end = tag.find(":",start+1);
@@ -201,7 +201,7 @@ void printfile(ostream& out, istream& tmpl)
 
 			start = end;
 			string hname = tag.substr(start+1);
-			
+
 			out << algebra_represent(mname.c_str(), hname.c_str());
 #ifndef NDEBUG
 			cerr << "OK\n";
@@ -214,7 +214,7 @@ void printfile(ostream& out, istream& tmpl)
 #endif
 
 			size_t start, end;
-			
+
 			start = tag.find(":", 8);
 			_PARAMETER_CHECK(start)
 			end = tag.find(":",start+1);
@@ -223,7 +223,7 @@ void printfile(ostream& out, istream& tmpl)
 
 			start = end;
 			string mname = tag.substr(start+1);
-			
+
 			out << algebra_project(hname.c_str(), mname.c_str());
 #ifndef NDEBUG
 			cerr << "OK\n";

@@ -192,7 +192,7 @@ double complex twopoint(fourvec p, double m,int L, int LT, int t)
     double complex res;
     res = 0.;
     double tmp;
-    
+
     for (q1=0;q1<L;++q1) for (q2=0; q2<L; ++q2)  for (q3=0; q3<L; ++q3) for (q41=0; q41<LT; ++q41) for (q42=0; q42<LT; ++q42){
         #ifdef BC_T_PERIODIC
         mom1 = (fourvec) {{q1,q2,q3,((double) q41)*L/LT}};
@@ -201,19 +201,19 @@ double complex twopoint(fourvec p, double m,int L, int LT, int t)
         #elif BC_T_ANTIPERIODIC
         mom1 = (fourvec) {{q1*2.0* PI / L,q2*2.0* PI / L,q3*2.0* PI / L,((double) (2*q41+1))*PI/LT}};
         #endif
-       
+
         #ifdef BC_T_PERIODIC
         mom2 = (fourvec) {{q1,q2,q3,((double) q42)*L/LT}};
         imul(&mom2, 2.0* PI / L);
         #elif BC_T_ANTIPERIODIC
         mom2 = (fourvec) {{q1*2.0* PI / L,q2*2.0* PI / L,q3*2.0* PI / L,((double) (2*q42+1))*PI/LT}};
         #endif
-                
-        tmp =(f1(mom1,m)*f1(mom2,m) + f2(mom1,mom2)) / ( (SQR(f1(mom1,m)) + f2(mom1,mom1)) * (SQR(f1(mom2,m)) + f2(mom2,mom2) ) ); 
-        
-       
+
+        tmp =(f1(mom1,m)*f1(mom2,m) + f2(mom1,mom2)) / ( (SQR(f1(mom1,m)) + f2(mom1,mom1)) * (SQR(f1(mom2,m)) + f2(mom2,mom2) ) );
+
+
         res += tmp * cexp(I*(2.0 * PI / LT) * t * (q42 - q41));
-        
+
     }
 
     res = 4*res/L/L/L/LT/LT;
@@ -253,7 +253,7 @@ double complex twopoint_rho(fourvec p, double m,int L, int LT, int t)
         imul(&mom2, 2.0* PI / L);
 
         tmp = (f1(mom1,m)*f1(mom2,m) + f2(mom1,mom2) - 2*sin(mom1.v[2])*sin(mom2.v[2])) / ( (SQR(f1(mom1,m)) + f2(mom1,mom1)) * (SQR(f1(mom2,m)) + f2(mom2,mom2) ) );
-      
+
         res += tmp * cexp(I*(2.0 * PI / LT) * t * (q42 - q41));
     }
 
@@ -293,7 +293,7 @@ double complex twopoint_rho12(fourvec p, double m,int L, int LT, int t)
         imul(&mom2, 2.0* PI / L);
 
         tmp = ( -(sin(mom1.v[0])*sin(mom2.v[1]) + sin(mom1.v[1])*sin(mom2.v[0]) )) / ( (SQR(f1(mom1,m)) + f2(mom1,mom1)) * (SQR(f1(mom2,m)) + f2(mom2,mom2) ) );
-        
+
         res += tmp* cexp( I*(2.0 * PI / LT) * t * (q42 - q41));
     }
 
@@ -330,7 +330,7 @@ double complex C(fourvec px, fourvec py, double m, int L, int LT, int t)
         iadd(&mom[3],& py);
         imul(&mom[3], 2.0* PI / L);
     #elif BC_T_ANTIPERIODIC
-     mom[0] = (fourvec) {{q11*2.0* PI / L,q12*2.0* PI / L,q13*2.0* PI / L,((double) 2*q14+1)*PI/(LT)}};  
+     mom[0] = (fourvec) {{q11*2.0* PI / L,q12*2.0* PI / L,q13*2.0* PI / L,((double) 2*q14+1)*PI/(LT)}};
      mom[1] = (fourvec) {{q11*2.0* PI / L,q12*2.0* PI / L,q13*2.0* PI / L,((double) 2*q24+1)*PI/(LT)}};
      mom[2] = (fourvec) {{q11*2.0* PI / L,q12*2.0* PI / L,q13*2.0* PI / L,((double) 2*q34+1)*PI/(LT)}};
      mom[3] = (fourvec) {{q11*2.0* PI / L,q12*2.0* PI / L,q13*2.0* PI / L,((double) 2*q44+1)*PI/(LT)}};
@@ -358,7 +358,7 @@ double complex C(fourvec px, fourvec py, double m, int L, int LT, int t)
 	  - af2[0][2] * af2[1][3] \
 	  + af2[0][3] * af2[1][2];
 
-    
+
 	res += cexp((double) (t * (-q14+q24-q34+q44)) * 2.0 * I * PI/LT) * numerator / denominator;
   }
 
@@ -367,8 +367,8 @@ double complex C(fourvec px, fourvec py, double m, int L, int LT, int t)
 
 int compare_corr(double complex * corr_ex, double complex * corr_num,int tstart, char* name, double tol ){
     int retval = 0;
-    for(int t=tstart; t<GLB_T; t++){  
-         if(cabs(corr_ex[t] - corr_num[t])/cabs(corr_ex[t]) > tol) 
+    for(int t=tstart; t<GLB_T; t++){
+         if(cabs(corr_ex[t] - corr_num[t])/cabs(corr_ex[t]) > tol)
             {
                 lprintf("TEST",0,"Mismatch %s, t=%d, relative diff: %e, numeric = %e + I*(%e), analytic = %e + I*(%e) \n",name,t,cabs(corr_ex[t] - corr_num[t])/cabs(corr_ex[t]),creal(corr_num[t]),cimag(corr_num[t]),creal(corr_ex[t]),cimag(corr_ex[t]));
                 retval += 1;
@@ -377,7 +377,7 @@ int compare_corr(double complex * corr_ex, double complex * corr_num,int tstart,
             {
                  lprintf("TEST",0,"Match %s, t=%d, numeric = %e + I*(%e), analytic = %e + I*(%e) \n",name,t,creal(corr_num[t]),cimag(corr_num[t]),creal(corr_ex[t]),cimag(corr_ex[t]));
             }
-    }  
+    }
     return retval;
 }
 
@@ -389,46 +389,46 @@ int main(int argc,char *argv[])
   double tol=2.e-1;
   meson_observable **mo_arr;
   fourvec zero_p = (fourvec){{0,0,0,0}};
-  
+
   error(!(GLB_X==GLB_Y && GLB_X==GLB_Z),1,"main", "This test works only for GLB_X=GLB_Y=GLB_Z");
 
   setup_process(&argc,&argv);
 
   setup_gauge_fields();
-  
+
   read_input(glb_var.read,get_input_filename());
   read_input(mes_var.read,get_input_filename());
   read_input(rlx_var.read,get_input_filename());
 
   int numsources = mes_var.nhits;
-	
+
   #if defined(WITH_CLOVER) ||  defined(WITH_EXPCLOVER)
   set_csw(&mes_var.csw);
   #endif
-  m[0] = atof(mes_var.mstring); 
+  m[0] = atof(mes_var.mstring);
   init_propagator_eo(1,m,mes_var.precision);
-  
+
   lprintf("MAIN",0,"mass is : %e\n",m[0]);
   lprintf("MAIN",0,"Number of hits : %d \n",numsources);
-  
+
   struct timeval start, end, etime;
   gettimeofday(&start,0);
- 
+
   unit_gauge(u_gauge);
   represent_gauge_field();
-  #ifdef REPR_FUNDAMENTAL 
+  #ifdef REPR_FUNDAMENTAL
   apply_BCs_on_represented_gauge_field(); //This is a trick: the BCs are not applied in the case the REPR is fundamental because represent_gauge field assumes that the right BCs are already applied on the fundamental field!
   #endif
 
   gettimeofday(&start,0);
- 
+
   double complex Pistoch[GLB_T],Pitheo[GLB_T];
   double complex Rhostoch[GLB_T],Rhotheo[GLB_T];
   double complex ADstoch[GLB_T],ADtheo[GLB_T];
   double complex BCstoch[GLB_T],BCtheo[GLB_T];
-  
 
-  for (int t=0;t < GLB_T ; t++)  
+
+  for (int t=0;t < GLB_T ; t++)
    {
        ADstoch[t] = 0.0;
        BCstoch[t] = 0.0;
@@ -460,41 +460,41 @@ int main(int argc,char *argv[])
   init_mo(mo_arr[19],"rho2_31",GLB_T);
   init_mo(mo_arr[20],"rho2_32",GLB_T);
   init_mo(mo_arr[21],"rho2_33",GLB_T);
-    
+
   for (int n=0;n<numsources;n++)
-    {   
+    {
         if (n%100==0) lprintf("MAIN",0,"nhits: %d / %d \n/",n,numsources);
         measure_pion_scattering_I2( m,1 ,mes_var.precision,NULL,NULL,mo_arr);
-        
+
         // now copy the content to a placeholder.
-        for (int t=0;t < GLB_T ; t++) 
+        for (int t=0;t < GLB_T ; t++)
             {
-                  ADstoch[t] += (mo_arr[0]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[0]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(numsources); 
-                  BCstoch[t] += (mo_arr[1]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[1]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(numsources); 
-                  Pistoch[t] += (mo_arr[2]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[2]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(2*numsources); 
-                  Pistoch[t] += (mo_arr[3]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[3]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(2*numsources); 
-                 
-                  Rhostoch[t] += (mo_arr[4]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[4]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(6*numsources); 
-                  Rhostoch[t] -= (mo_arr[8]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[8]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(6*numsources); // there is an i in the interpolating field 
+                  ADstoch[t] += (mo_arr[0]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[0]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(numsources);
+                  BCstoch[t] += (mo_arr[1]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[1]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(numsources);
+                  Pistoch[t] += (mo_arr[2]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[2]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(2*numsources);
+                  Pistoch[t] += (mo_arr[3]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[3]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(2*numsources);
+
+                  Rhostoch[t] += (mo_arr[4]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[4]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(6*numsources);
+                  Rhostoch[t] -= (mo_arr[8]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[8]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(6*numsources); // there is an i in the interpolating field
                   Rhostoch[t] += (mo_arr[12]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[12]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(6*numsources);
-                  Rhostoch[t] += (mo_arr[13]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[13]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(6*numsources); 
+                  Rhostoch[t] += (mo_arr[13]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[13]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(6*numsources);
                   Rhostoch[t] -= (mo_arr[17]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[17]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(6*numsources);// there is an i in the interpolating field
-                  Rhostoch[t] += (mo_arr[21]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[21]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(6*numsources);           
+                  Rhostoch[t] += (mo_arr[21]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[21]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(6*numsources);
             }
         for (int i=0;i<ncorr;i++) reset_mo(mo_arr[i]);
-    	
+
         //io4pt(R,0,n,path,"R2","test"); // to write the output to a file.
-    }   
-    
-    for (int t=0;t < GLB_T ; t++)  
-    {
-        ADtheo[t] = cpow(NF*GLB_X*GLB_Y*GLB_Z*twopoint(zero_p, m[0],GLB_X, GLB_T, t),2); 
-        BCtheo[t] = NF*cpow(GLB_X*GLB_Y*GLB_Z,2)*C(zero_p,zero_p,m[0],GLB_X, GLB_T, t); 
-        Pitheo[t] = NF*GLB_X*GLB_Y*GLB_Z*twopoint(zero_p, m[0],GLB_X, GLB_T, t);
-        Rhotheo[t] = NF*GLB_X*GLB_Y*GLB_Z*twopoint_rho(zero_p, m[0],GLB_X, GLB_T, t);  
     }
-    
-  
+
+    for (int t=0;t < GLB_T ; t++)
+    {
+        ADtheo[t] = cpow(NF*GLB_X*GLB_Y*GLB_Z*twopoint(zero_p, m[0],GLB_X, GLB_T, t),2);
+        BCtheo[t] = NF*cpow(GLB_X*GLB_Y*GLB_Z,2)*C(zero_p,zero_p,m[0],GLB_X, GLB_T, t);
+        Pitheo[t] = NF*GLB_X*GLB_Y*GLB_Z*twopoint(zero_p, m[0],GLB_X, GLB_T, t);
+        Rhotheo[t] = NF*GLB_X*GLB_Y*GLB_Z*twopoint_rho(zero_p, m[0],GLB_X, GLB_T, t);
+    }
+
+
     return_value +=  compare_corr(Pitheo, Pistoch,0,"Pi", tol );
     return_value +=  compare_corr(Rhotheo, Rhostoch,0,"Rho (averaged over 11,22,33) ", tol );
     return_value +=  compare_corr(ADtheo, ADstoch,0,"AD", tol );
@@ -503,7 +503,7 @@ int main(int argc,char *argv[])
     gettimeofday(&end,0);
     timeval_subtract(&etime,&end,&start);
     lprintf("MAIN",0,"Configuration : analysed in [%ld sec %ld usec]\n",etime.tv_sec,etime.tv_usec);
-  
+
   global_sum_int(&return_value,1);
   lprintf("MAIN", 0, "return_value= %d\n ",  return_value);
 
@@ -513,4 +513,3 @@ int main(int argc,char *argv[])
 
   return return_value;
 }
-

@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Agostino Patella, Claudio Pica                        *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Agostino Patella, Claudio Pica                        *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 
@@ -980,4 +980,3 @@ MESON_DEFINITION_TWO_IM(g5_g0g5)
 #undef _T2_
 #undef _T3_
 #undef _SIGN_
-

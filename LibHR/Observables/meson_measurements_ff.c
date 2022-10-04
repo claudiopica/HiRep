@@ -68,7 +68,7 @@ static void flip_T_bc(int tau){
   if (tau<0) tau+= GLB_T;
   lprintf("meson_measurements",15,"Flipping the boundary at global time slice %d\n",tau);
   fflush(stdout);
-  if((zerocoord[0]-1<=tau && zerocoord[0]+T>tau) || (zerocoord[0]==0 && tau==GLB_T-1)) { 
+  if((zerocoord[0]-1<=tau && zerocoord[0]+T>tau) || (zerocoord[0]==0 && tau==GLB_T-1)) {
     for (ix=0;ix<X_EXT;++ix) for (iy=0;iy<Y_EXT;++iy) for (iz=0;iz<Z_EXT;++iz){
 	  if ((tau==zerocoord[0]-1) || (zerocoord[0]==0 && tau==GLB_T-1)){
 	    index=ipt_ext(0,ix,iy,iz);
@@ -109,7 +109,7 @@ void measure_spectrum_ff_pt(int tau, int nm, double* m, int n_mom,int conf_num, 
   }
 
   flip_scalar_field(ff_pi);
-  
+
   for (k=0;k<NF;++k){
     create_point_source(source,tau,k);
     calc_propagator_ff_eo(prop + 4*k,source,4);//4 for spin components
@@ -123,8 +123,8 @@ void measure_spectrum_ff_pt(int tau, int nm, double* m, int n_mom,int conf_num, 
   print_mesons(meson_correlators,1.,conf_num,nm,m,GLB_T,n_mom,"DEFAULT_POINT");
   flip_scalar_field(ff_pi);
 
- 
-  free_propagator_ff_eo(); 
+
+  free_propagator_ff_eo();
   free_spinor_field_f(source);
   free_spinor_field_f(prop);
 }
@@ -230,7 +230,7 @@ void measure_spectrum_discon_ff_semwall(int nm, double* m, int nhits, int degree
       calc_propagator_ff_hopping_series(prop,source,degree_hopping,4); //4 for spin dilution
       measure_mesons(discon_correlators,prop,source,nm,0);
       measure_mesons(triplet_discon_correlators,prop,source,nm,0);
-     
+
       //Change the sign of the pi field
       flip_scalar_field(ff_pi);
       flip_corrs(triplet_discon_correlators); //For dd-uu
@@ -246,7 +246,7 @@ void measure_spectrum_discon_ff_semwall(int nm, double* m, int nhits, int degree
       calc_propagator_ff_hopping_series(prop,source,degree_hopping,4); //4 for spin dilution
       measure_mesons(discon_correlators,prop,source,nm,0);
       measure_mesons(triplet_discon_correlators,prop,source,nm,0);
-     
+
       //Change the sign of the pi field
       flip_scalar_field(ff_pi);
       flip_corrs(triplet_discon_correlators); //For dd-uu
@@ -256,12 +256,12 @@ void measure_spectrum_discon_ff_semwall(int nm, double* m, int nhits, int degree
       measure_mesons(triplet_discon_correlators,prop,source,nm,0);
       sprintf(label,"src %d DISCON_SEMWALL_HOP",k);
       flip_scalar_field(ff_pi); //back to normal
- 
+
     }
     //Now printing the average of 10 sources for each hit
     if(nhits_hopping>0) print_mesons(discon_correlators,-(2.0*(double)nhits_hopping)/2.,conf_num,nm,m,GLB_T,1,label);
     if(nhits_hopping>0) print_mesons(triplet_discon_correlators,-(2.0*(double)nhits_hopping)/2.,conf_num,nm,m,GLB_T,1,label);
-    
+
   }
 
 //The second term in the hopping expansion,
@@ -270,7 +270,7 @@ void measure_spectrum_discon_ff_semwall(int nm, double* m, int nhits, int degree
       calc_propagator_ff_hopping_oe(prop,source,degree_hopping,4);//5 for order of hopping parameter expansion,  4 for spin dilution
       measure_mesons(triplet_discon_correlators,prop,source,nm,0);
       measure_mesons(discon_correlators,prop,source,nm,0);
-     
+
       //Change the sign of the pi field
       flip_scalar_field(ff_pi);
       flip_corrs(triplet_discon_correlators); //For dd-uu
@@ -288,7 +288,7 @@ void measure_spectrum_discon_ff_semwall(int nm, double* m, int nhits, int degree
       calc_propagator_ff_hopping_oe(prop,source,degree_hopping,4);//5 for order of hopping parameter expansion,  4 for spin dilution
       measure_mesons(triplet_discon_correlators,prop,source,nm,0);
       measure_mesons(discon_correlators,prop,source,nm,0);
-     
+
       //Change the sign of the pi field
       flip_scalar_field(ff_pi);
       flip_corrs(triplet_discon_correlators); //For dd-uu
@@ -297,17 +297,12 @@ void measure_spectrum_discon_ff_semwall(int nm, double* m, int nhits, int degree
       measure_mesons(discon_correlators,prop,source,nm,0);
       sprintf(label,"src %d DISCON_SEMWALL",k);
       flip_scalar_field(ff_pi); //back to normal
-      
+
       print_mesons(triplet_discon_correlators,2./2.,conf_num,nm,m,GLB_T,1,label);
 
   }
   //print_mesons(discon_correlators,nhits*GLB_VOL3/2.,conf_num,nm,m,GLB_T,1,"DISCON_SEMWALL");
-  free_propagator_ff_eo(); 
+  free_propagator_ff_eo();
   free_spinor_field_f(source);
   free_spinor_field_f(prop);
 }
-
-
-
-
-

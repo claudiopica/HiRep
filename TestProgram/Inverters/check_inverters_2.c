@@ -51,9 +51,9 @@ int main(int argc,char *argv[])
 
   mshift_par par;
   MINRES_par MINRESpar2;
-  
+
   int cgiters;
-  
+
   logger_map("DEBUG", "debug");
 
   setup_process(&argc, &argv);
@@ -63,7 +63,7 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"Generating a random gauge field... ");
   fflush(stdout);
   random_u(u_gauge);
-  
+
   start_gf_sendrecv(u_gauge);
   complete_gf_sendrecv(u_gauge);
 
@@ -79,7 +79,7 @@ int main(int argc,char *argv[])
   res=alloc_spinor_field_f(par.n+2,&glattice);
   s1=res+par.n;
   s2=s1+1;
-  
+
   par.shift[0]=+0.1;
   par.shift[1]=-0.21;
   par.shift[2]=+0.05;

@@ -20,7 +20,7 @@ void translate(QLA_ColorMatrix *m, int coords[])
     }
   }
 }
- 
+
 
 
 void chroma_to_HiRep(QDP_ColorMatrix *link[])

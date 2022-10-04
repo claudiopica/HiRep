@@ -1,12 +1,12 @@
 /***************************************************************************\
-* Copyright (c) 2011, Agostino Patella                                      *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2011, Agostino Patella                                      *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 /*******************************************************************************
 *
 * File gaugefix.h
-* 
+*
 *******************************************************************************/
 
 #ifndef GAUGEFIX_H
@@ -37,4 +37,3 @@ double gaugefix(int fix_dir,double overrelax,int max_it,
 	      double fix_tol, suNg_field *fixed_gauge );
 
 #endif /* GAUGEFIX_H */
-

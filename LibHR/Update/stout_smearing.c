@@ -1,6 +1,6 @@
 /***************************************************************************\
 * Copyright (c) 2017, Jarno Rantaharju, Martin Hansen                       *
-* All rights reserved.                                                      * 
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 #include "global.h"

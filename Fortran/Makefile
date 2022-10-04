@@ -42,7 +42,7 @@ MODS := avr_plaquette
 MOD_OBJS := $(MOD_OBJS) $(patsubst %, $(TOPDIR)/$(MODDIR)/%.o, $(MODS))
 
 $(EXES): %: %.o $(MOD_OBJS)
-	echo -n Linking [$@]... 
+	echo -n Linking [$@]...
 	$(FC) -o $@ luesher.f $< $(MOD_OBJS) &&\
 	echo " done." || echo " failed."
 
@@ -50,4 +50,3 @@ $(EXES): %: %.o $(MOD_OBJS)
 include $(MKDIR)/MkRules
 
 .PHONY: default
-

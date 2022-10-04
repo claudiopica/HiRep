@@ -1,6 +1,6 @@
 /***************************************************************************\
- * Copyright (c) 2012, Ari Hietanen                                         *   
- * All rights reserved.                                                     * 
+ * Copyright (c) 2012, Ari Hietanen                                         *
+ * All rights reserved.                                                     *
 \***************************************************************************/
 
 #ifndef ALLOC_TMP_FIELDS_GPU_C

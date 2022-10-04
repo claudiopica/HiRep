@@ -38,27 +38,27 @@ while getopts "c:T:L:i:e:m:b:" opt; do
 done
 shift $[ OPTIND - 1 ]
 
-if [ -z "$CHANNEL" ] ||  [ -z "$LT" ] || [ -z "$LS" ] || [ -z "$INPUT" ]  || [ -z "$METHOD" ] 
+if [ -z "$CHANNEL" ] ||  [ -z "$LT" ] || [ -z "$LS" ] || [ -z "$INPUT" ]  || [ -z "$METHOD" ]
     then
-    echo "$0: Missing parameter" 
+    echo "$0: Missing parameter"
     help
 fi
 
-if [ ! -f ${EXEC} ] 
+if [ ! -f ${EXEC} ]
     then
-    echo "$0: Missing the executable file (${EXEC})" 
+    echo "$0: Missing the executable file (${EXEC})"
     exit 0
 fi
 
-if [ ! -f ${INPUT} ] 
+if [ ! -f ${INPUT} ]
     then
-    echo "$0: Missing the input file (${INPUT})" 
+    echo "$0: Missing the input file (${INPUT})"
     exit 0
 fi
 
-if [ ! "${METHOD}" -eq "0"  ] && [ ! "${METHOD}" -eq "1"  ] && [ ! "${METHOD}" -eq "2"  ]  
+if [ ! "${METHOD}" -eq "0"  ] && [ ! "${METHOD}" -eq "1"  ] && [ ! "${METHOD}" -eq "2"  ]
     then
-    echo "$0: Method can take only values 0,1,2" 
+    echo "$0: Method can take only values 0,1,2"
     exit 0
 fi
 
@@ -92,33 +92,33 @@ RIGHTCUT=$((LT/2))
 
 OUTFILE=${OUTDIR}/${NAME}_TMP
 
-while [ "$CONTROL" -eq "1" ] 
+while [ "$CONTROL" -eq "1" ]
   do
-  
+
   if ((RIGHTCUT<LEFTCUT))
       then
       echo "Unable to obtain required Efficiency"
       exit 0
   fi
-  
+
   CUTFILE=${OUTDIR}/${NAME}_rcut$RIGHTCUT
   echo "${CHANNEL} ${LEFTCUT} ${RIGHTCUT}" > $CUTFILE
   $EXEC ${CHANNEL}_eff $METHOD $INPUT $CUTFILE $LT $LS $BLKSIZE 1000 100 > $OUTFILE
 
   EFFIC=`grep $OUTFILE -e "20 EFFICIENCY_BS1" | awk '{print $3}'`
-  
+
   [ ! -f "${EFFDIR}/`basename $INPUT`" ] && echo "# Channel Efficiency Method LeftCut RightCut" > ${EFFDIR}/`basename $INPUT`
-  
+
   echo $CHANNEL $EFFIC $METHOD $LEFTCUT $RIGHTCUT >> ${EFFDIR}/`basename $INPUT`
   grep $OUTFILE -e "10 EFF " > ${MEFFDIR}/${NAME}_rcut${RIGHTCUT}
   echo -e "Efficiency: ${EFFIC}/${MIN_EFFIC}"
-  if ((EFFIC>=MIN_EFFIC)) 
+  if ((EFFIC>=MIN_EFFIC))
       then
       CONTROL=0
-      grep $OUTFILE -e "10 EFF " > ${MEFFDIR}/${NAME} 
+      grep $OUTFILE -e "10 EFF " > ${MEFFDIR}/${NAME}
       echo $CHANNEL $EFFIC $METHOD $LEFTCUT $RIGHTCUT >> ${RCUTDIR}/"`basename $INPUT`"
   fi
-  
+
   ((RIGHTCUT--))
 
   rm -f $OUTFILE

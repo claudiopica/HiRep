@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
   double test;
   suNg a, b, c;
   setup_process(&argc, &argv);
- 
+
   for (int i = 0; i < niter; i++)
   {
     random_suNg(&a);

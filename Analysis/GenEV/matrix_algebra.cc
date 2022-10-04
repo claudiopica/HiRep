@@ -486,7 +486,7 @@ void hqr(double *a, int n, double *wr, double *wi)
 /**
    Compute the eigenvectors of a matrix a
    dim   order of matrix
-   
+
 **/
 
 void getvec(double *a, double *EIG, double *EIGVEC, int dim, int max_ev)

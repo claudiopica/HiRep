@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
  * Compute some disconnected loops
- * Copyright (c) 2014, R. Arthur, V. Drach, A. Hietanen 
+ * Copyright (c) 2014, R. Arthur, V. Drach, A. Hietanen
  * All rights reserved.
  *
  *******************************************************************************/

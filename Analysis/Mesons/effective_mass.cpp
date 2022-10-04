@@ -108,7 +108,7 @@ int centered_prony_eff_mass_1(double *y, double *m1) {
   double y1,y2;
   double x1;
   y1=y[1]; y2=y[0];
-  
+
   x1=y2/y1;
 
   if(x1<1.) {
@@ -126,7 +126,7 @@ int centered_prony_eff_mass_2(double *y, double *m1, double *m2) {
   double y1,y2,y3,y4;
   double a,b,c,d,x1,x2;
   y1=y[3]; y2=y[2]; y3=y[1]; y4=y[0];
-  
+
   a=y1*y3-y2*y2;
   b=y2*y3-y1*y4;
   c=y2*y4-y3*y3;
@@ -148,7 +148,7 @@ int centered_prony_eff_mass_2(double *y, double *m1, double *m2) {
     x2=x1;
     x1=d;
   }
-  
+
   if(x1<1.) {
     //cerr<<"x1<1 !\n";
     *m1=-1.;
@@ -166,7 +166,7 @@ int centered_prony_eff_mass_2(double *y, double *m1, double *m2) {
   if (*m1<0. && *m2<0.) { return 0; }
   if (*m1<0. && *m2>0.) {
     *m1=*m2; *m2=-1;
-  } 
+  }
 
   return 1;
 
@@ -179,10 +179,10 @@ int centered_prony_eff_mass_2(double *y, double *m1, double *m2) {
 int shifted_prony_eff_mass_1(double* C, int t, int tmax, double* m1, int lt) {
 	double y[2], x1;
 	int q, tau;
-	
+
 	q = tmax-t;
 	tau = tmax;
-	
+
   for (int i=0;i<2;++i){
     double z=2.;
     y[i]=0.;
@@ -194,7 +194,7 @@ int shifted_prony_eff_mass_1(double* C, int t, int tmax, double* m1, int lt) {
     y[i]*=z;
   }
 
-    
+
   x1=y[1]/y[0];
 
   if(x1<1.) {
@@ -215,10 +215,10 @@ int shifted_prony_eff_mass_2(double* C, int t, int tmax, double* m1, double *m2,
 	double a,b,c,d;
 	double x1,x2;
 	int q, tau;
-	
+
 	q = tmax-t;
 	tau = tmax;
-	
+
   for (int i=0;i<4;++i){
     double z=2.;
     y[i]=0.;
@@ -229,11 +229,11 @@ int shifted_prony_eff_mass_2(double* C, int t, int tmax, double* m1, double *m2,
     }
     y[i]*=z;
   }
-  
+
   a=y[0]*y[2]-y[1]*y[1];
   b=y[1]*y[2]-y[0]*y[3];
   c=y[1]*y[3]-y[2]*y[2];
-  
+
   d=b*b-4.*a*c;
 
   if(d<0.) {
@@ -251,7 +251,7 @@ int shifted_prony_eff_mass_2(double* C, int t, int tmax, double* m1, double *m2,
     x2=x1;
     x1=d;
   }
-  
+
   if(x1<1.) {
     //cerr<<"x1<1 !\n";
     *m1=-1.;
@@ -269,9 +269,7 @@ int shifted_prony_eff_mass_2(double* C, int t, int tmax, double* m1, double *m2,
   if (*m1<0. && *m2<0.) { return 0; }
   if (*m1<0. && *m2>0.) {
     *m1=*m2; *m2=-1;
-  } 
+  }
 
   return 1;
 }
-
-

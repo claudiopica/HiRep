@@ -1,15 +1,15 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica and Agostino Patella                     *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica and Agostino Patella                     *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 #ifndef SUN_REPR_FUNC_H
 #define SUN_REPR_FUNC_H
 
-#if (NG!=$N$) 
+#if (NG!=$N$)
 #error : Mismatch between NG and representation functions!
 #endif
-#if (NF!=$REPR::DIM$) 
+#if (NF!=$REPR::DIM$)
 #error : Mismatch between NF and representation functions!
 #endif
 
@@ -49,7 +49,7 @@ $REPR::ALGEBRA_REPRESENT:(m):(h)$
 #define _algebra_project(h,m) \
 $REPR::ALGEBRA_PROJECT:(h):(m)$
 
-#define _algebra_project_FMAT(h,m) _algebra_project(h,m) 
+#define _algebra_project_FMAT(h,m) _algebra_project(h,m)
 
 
 /*
@@ -111,8 +111,8 @@ $REPR::ALGEBRA_PROJECT:(h):(m)$
 	(m).c[1] = 0.5*(h).c[1]; \
 	(m).c[3] = 0.5*(h).c[2]; \
 	(m).c[0] = 0.
-    
 
-#endif 
 
-#endif 
+#endif
+
+#endif

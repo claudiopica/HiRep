@@ -84,7 +84,7 @@ public:
 		{ return complex(a*b.re,a*b.im); }
 	friend complex operator*(const complex& a, const FLOATING& b)
 		{ return complex(a.re*b,a.im*b); }
- 
+
 	friend complex operator/(const complex& a, const complex& b)
 	{
 		FLOATING den = b.re*b.re+b.im*b.im;
@@ -103,13 +103,13 @@ public:
 	}
 	friend complex operator/(const complex& a, const FLOATING& b)
 		{ return complex(a.re/b,a.im/b); }
-   
+
 	friend ostream& operator<<(ostream& os, const complex& z)
 	{
 		os << "(" << z.re << "," << z.im << ")";
 		return os;
 	}
-	
+
 	friend complex conj(const complex& z) { return complex(z.re,-z.im); }
 	friend FLOATING abs(const complex& z) { return sqrt(z.re*z.re+z.im*z.im); }
 	friend FLOATING arg(const complex& z) { return atan2(z.im, z.re); }

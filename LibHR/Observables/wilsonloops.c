@@ -25,7 +25,7 @@
 
 #if defined(WITH_MPI) && !defined(NDEBUG)
 #define MPIRET(type) type =
-#else 
+#else
 #define MPIRET(type)
 #endif /* WITH_MPI */
 
@@ -58,7 +58,7 @@ int WL_max_nsteps=0;
 static int WL_init=(1==0);
 void WL_initialize() {
   if(WL_init) return;
-  
+
   error(NP_X!=1 || NP_Y!=1 || NP_Z !=1,1,"WL_initialize [wilsonloops.c]","The Wilson loops code does not work with spatial paralelization!");
 
   HYP=alloc_gfield(&glattice);
@@ -80,7 +80,7 @@ void WL_initialize() {
   #if (defined(BC_Z_ANTIPERIODIC) && defined(BC_Y_ANTIPERIODIC)) || (defined(BC_Z_PERIODIC) && defined(BC_Y_PERIODIC))
     if(GLB_Z==GLB_Y) rot23=(1==1);
   #endif
-  
+
   WL_init=(1==1);
 }
 
@@ -89,7 +89,7 @@ void WL_initialize() {
 
 void WL_free() {
   if(!WL_init) return;
-  
+
   free_gfield(HYP);
   free_gtransf(ws_gtf[0]);
   free_gtransf(ws_gtf[1]);
@@ -97,7 +97,7 @@ void WL_free() {
   afree(buf_gtf[1]);
   afree(buf_gtf[2]);
   afree(Polyakov);
-  
+
   for(int i=0; i<WL_npaths; i++) {
     afree(WL_path[i].path);
     afree(WL_path[i].perm);
@@ -110,7 +110,7 @@ void WL_free() {
 static void WL_3Dpath(int c[3], int* path) {
   int p[3], q[3];
   double dist[3];
-  
+
   c[0]=(c[0]>=0)?c[0]:-c[0];
   c[1]=(c[1]>=0)?c[1]:-c[1];
   c[2]=(c[2]>=0)?c[2]:-c[2];
@@ -126,16 +126,16 @@ static void WL_3Dpath(int c[3], int* path) {
       #undef _PROD
       #undef _SQUARE
     }
-    
+
     if(dist[0]<=dist[1] && dist[0]<=dist[2]) path[i]=0;
     else if(dist[1]<dist[0] && dist[1]<=dist[2]) path[i]=1;
     else path[i]=2;
-    
+
     p[path[i]]++;
   }
 
    error(p[0]!=c[0] || p[1]!=c[1] || p[2]!=c[2],1,"WL_make_path [wilsonloops.c]","Wrong end point");
- 
+
 }
 
 
@@ -155,7 +155,7 @@ void WL_load_path(int c[3], int nsteps) {
   c[0]=(c[0]>=0)?c[0]:-c[0];
   c[1]=(c[1]>=0)?c[1]:-c[1];
   c[2]=(c[2]>=0)?c[2]:-c[2];
-  
+
   #define _SWAP(a,b) {int tmp=a;a=b;b=tmp;}
   if(rot12) {
     if(c[0]<c[1]) _SWAP(c[0],c[1]);
@@ -170,32 +170,32 @@ void WL_load_path(int c[3], int nsteps) {
     if(c[0]<c[2]) _SWAP(c[0],c[2]);
   }
   #undef _SWAP
-  
+
   for(int i=0; i<WL_npaths; i++) {
     if(c[0]==WL_path[i].c[0] && c[1]==WL_path[i].c[1] && c[2]==WL_path[i].c[2]) return;
   }
-  
+
   WL_path[WL_npaths].c[0]=c[0];
   WL_path[WL_npaths].c[1]=c[1];
   WL_path[WL_npaths].c[2]=c[2];
   WL_path[WL_npaths].length=c[0]+c[1]+c[2];
   WL_path[WL_npaths].path=amalloc(sizeof(int)*(c[0]+c[1]+c[2]),ALIGN);
   WL_3Dpath(c,WL_path[WL_npaths].path);
-  
+
   int max_nsteps=nsteps;
   if(c[0]!=0) max_nsteps = (max_nsteps<GLB_Y/c[0])?max_nsteps:GLB_X/c[0];
   if(c[1]!=0) max_nsteps = (max_nsteps<GLB_Y/c[1])?max_nsteps:GLB_Y/c[1];
   if(c[2]!=0) max_nsteps = (max_nsteps<GLB_Z/c[2])?max_nsteps:GLB_Z/c[2];
-  
+
   if(nsteps>max_nsteps) {
     lprintf("WILSON LOOPS",0,"WARNING!!! nsteps reduced from %d to %d for c=(%d,%d,%d)\n",nsteps,max_nsteps,c[0],c[1],c[2]);
     nsteps=max_nsteps;
   }
   error(nsteps==0,1,"WL_load_path [wilsonloops.c]","nsteps == 0!");
-  
+
   WL_path[WL_npaths].nsteps=nsteps;
   if(nsteps>WL_max_nsteps) WL_max_nsteps=nsteps;
-  
+
   if(rot12 && rot23) {
     if(c[0]==c[1] && c[1]==c[2]) {
       WL_path[WL_npaths].nperms=1;
@@ -245,9 +245,9 @@ void WL_load_path(int c[3], int nsteps) {
       for(int w=0;w<WL_path[WL_npaths].nperms;w++) WL_path[WL_npaths].perm[w]=aXb_perm[w];
     }
   }
-  
-  lprintf("ARA WILSON LOOPS",0,"c=( %d , %d , %d ) path added (nsteps = %d ; length = %d ; nperms = %d )\n",c[0],c[1],c[2],nsteps,WL_path[WL_npaths].length,WL_path[WL_npaths].nperms);   
-  
+
+  lprintf("ARA WILSON LOOPS",0,"c=( %d , %d , %d ) path added (nsteps = %d ; length = %d ; nperms = %d )\n",c[0],c[1],c[2],nsteps,WL_path[WL_npaths].length,WL_path[WL_npaths].nperms);
+
   WL_npaths++;
 }
 
@@ -271,10 +271,10 @@ void WL_Hamiltonian_gauge(suNg_field* out, suNg_field* in) {
       _suNg_times_suNg(*_FIELD_AT(ws_gtf[0],i),*_FIELD_AT(ws_gtf[0],j),*_4FIELD_AT(in,i,0));
     }
   }
-  
+
 
   /* buf_gtf[1] = U_0(0) ... U_0(LOC(T-1)-T) */
-#ifdef WITH_MPI  
+#ifdef WITH_MPI
   if(COORD[0]!=0) {
     MPI_Status status;
     MPIRET(mpiret) MPI_Recv((double * )(buf_gtf[1]), /* buffer */
@@ -293,9 +293,9 @@ void WL_Hamiltonian_gauge(suNg_field* out, suNg_field* in) {
       if (status.MPI_ERROR != MPI_SUCCESS) {
         MPI_Error_string(status.MPI_ERROR,mesg,&mesglen);
         lprintf("MPI",0,"Req [%d] Source [%d] Tag [%] ERROR: %s\n",
-            0, 
-            status.MPI_SOURCE, 
-            status.MPI_TAG, 
+            0,
+            status.MPI_SOURCE,
+            status.MPI_TAG,
             mesg);
       }
       error(1,1,"WL_Hamiltonian_gauge [wilsonloops.c]","Cannot receive buf_gtf[1]");
@@ -315,11 +315,11 @@ void WL_Hamiltonian_gauge(suNg_field* out, suNg_field* in) {
     for(x=0;x<X;x++) for(y=0;y<Y;y++) for(z=0;z<Z;z++) {
       i=ipt(T-1,x,y,z);
       _suNg_times_suNg(buf_gtf[0][_WL_3VOL_INDEX(x,y,z)],buf_gtf[1][_WL_3VOL_INDEX(x,y,z)],*_FIELD_AT(ws_gtf[0],i));
-    }    
+    }
   }
-  
-  
-#ifdef WITH_MPI  
+
+
+#ifdef WITH_MPI
   if(COORD[0]!=NP_T-1) {
     MPIRET(mpiret) MPI_Send((double * )(buf_gtf[0]), /* buffer */
         (X*Y*Z)*sizeof(suNg)/sizeof(double), /* lenght in units of doubles */
@@ -364,7 +364,7 @@ void WL_Hamiltonian_gauge(suNg_field* out, suNg_field* in) {
     }
   }
   start_gt_sendrecv(ws_gtf[1]);
-  
+
   _PIECE_FOR(&glattice,ixp) {
     suNg tmp;
     if(ixp==glattice.inner_master_pieces) {
@@ -422,7 +422,7 @@ void WL_broadcast_polyakov(suNg* poly, suNg_field* gf) {
       }
 #endif /* NDEBUG */
     }
-    
+
     MPI_Status status[NP_T-1];
     MPIRET(mpiret) MPI_Waitall(NP_T-1, comm_req, status);
 #ifndef NDEBUG
@@ -435,9 +435,9 @@ void WL_broadcast_polyakov(suNg* poly, suNg_field* gf) {
         if (status[k].MPI_ERROR != MPI_SUCCESS) {
           MPI_Error_string(status[k].MPI_ERROR,mesg,&mesglen);
           lprintf("MPI",0,"Req [%d] Source [%d] Tag [%] ERROR: %s\n",
-              k, 
-              status[k].MPI_SOURCE, 
-              status[k].MPI_TAG, 
+              k,
+              status[k].MPI_SOURCE,
+              status[k].MPI_TAG,
               mesg);
         }
       }
@@ -476,9 +476,9 @@ void WL_broadcast_polyakov(suNg* poly, suNg_field* gf) {
       if (status.MPI_ERROR != MPI_SUCCESS) {
         MPI_Error_string(status.MPI_ERROR,mesg,&mesglen);
         lprintf("MPI",0,"Req [%d] Source [%d] Tag [%] ERROR: %s\n",
-            0, 
-            status.MPI_SOURCE, 
-            status.MPI_TAG, 
+            0,
+            status.MPI_SOURCE,
+            status.MPI_TAG,
             mesg);
       }
       error(1,1,"WL_broadcast_polyakov [wilsonloops.c]","Cannot receive polyakov");
@@ -493,11 +493,11 @@ void WL_broadcast_polyakov(suNg* poly, suNg_field* gf) {
 static void WL_parallel_transport(suNg* ret, const suNg_field* gf, int x, const int* path, const int length, const int perm[3], const int sign[3]) {
   suNg tmp;
   int inv[3];
-  
+
   inv[perm[0]]=0;
   inv[perm[1]]=1;
-  inv[perm[2]]=2;  
-  
+  inv[perm[2]]=2;
+
   _suNg_unit(*ret);
   for(int i=0; i<length; i++) {
     if(sign[path[i]]>0) {
@@ -517,18 +517,18 @@ static void WL_parallel_transport(suNg* ret, const suNg_field* gf, int x, const 
 void WL_correlators(double** ret, const suNg_field* gf, const suNg* poly, const int nsteps, const int* path, const int length, const int perm[3], int sign[3]) {
   suNg tmp[2];
   int c[3];
-  
+
   c[0]=c[1]=c[2]=0;
   for(int i=0; i<length; i++) c[path[i]]++;
-  
+
   sign[0]=(sign[0]>0)?1:-1;
   sign[1]=(sign[1]>0)?1:-1;
   sign[2]=(sign[2]>0)?1:-1;
-  
+
   for(int s=0; s<nsteps; s++) for(int t=0;t<GLB_T;t++) ret[s][t]=0.;
-  
+
 /*  print=0;*/
-  
+
   for(int s=0; s<nsteps; s++) {
     if(s==0) {
       for(int t=0;t<T;t++) for(int x=0;x<X;x++) for(int y=0;y<Y;y++) for(int z=0;z<Z;z++) {
@@ -544,7 +544,7 @@ void WL_correlators(double** ret, const suNg_field* gf, const suNg* poly, const 
         buf_gtf[0][_WL_4VOL_INDEX(t,x0,y0,z0)]=tmp[0];
       }
     }
-    
+
 #ifdef WITH_MPI
     MPI_Request comm_req[2];
     MPI_Status status[2];
@@ -555,7 +555,7 @@ void WL_correlators(double** ret, const suNg_field* gf, const suNg* poly, const 
     int sendCID=CID;
 #endif /* WITH_MPI */
     memcpy(buf_gtf[1],buf_gtf[0],(T*X*Y*Z)*sizeof(suNg));
-    
+
     for(int DT=1; DT<=NP_T; DT++) {
 #ifdef WITH_MPI
       /* start communication for DT */
@@ -578,7 +578,7 @@ void WL_correlators(double** ret, const suNg_field* gf, const suNg* poly, const 
           error(1,1,"WL_correlators [wilsonloops.c]","Cannot start send buffer");
         }
 #endif /* NDEBUG */
-  
+
         sendCID=proc_up(sendCID,0);
         MPIRET(mpiret) MPI_Irecv((double * )(buf_gtf[2]), /* buffer */
             (T*X*Y*Z)*sizeof(suNg)/sizeof(double), /* lenght in units of doubles */
@@ -624,7 +624,7 @@ void WL_correlators(double** ret, const suNg_field* gf, const suNg* poly, const 
           }
         }
       }
-    
+
 #ifdef WITH_MPI
       /* wait for communication for DT */
       if(DT<NP_T) {
@@ -640,9 +640,9 @@ void WL_correlators(double** ret, const suNg_field* gf, const suNg* poly, const 
             if (status[k].MPI_ERROR != MPI_SUCCESS) {
               MPI_Error_string(status[k].MPI_ERROR,mesg,&mesglen);
               lprintf("MPI",0,"Req [%d] Source [%d] Tag [%] ERROR: %s\n",
-                  k, 
-                  status[k].MPI_SOURCE, 
-                  status[k].MPI_TAG, 
+                  k,
+                  status[k].MPI_SOURCE,
+                  status[k].MPI_TAG,
                   mesg);
             }
           }
@@ -654,7 +654,7 @@ void WL_correlators(double** ret, const suNg_field* gf, const suNg* poly, const 
       }
 #endif /* WITH_MPI */
     }
-    
+
     global_sum(ret[s],GLB_T);
   }
 }
@@ -663,7 +663,7 @@ void WL_correlators(double** ret, const suNg_field* gf, const suNg* poly, const 
 void WL_wilsonloops(double HYP_weight[3]) {
 #if NG==2
   error(WL_npaths==0,1,"WL_wilsonloops [wilsonloops.c]","No path has been loaded");
-  
+
   HYP_smearing(HYP,u_gauge,HYP_weight);
 
   WL_Hamiltonian_gauge(HYP,HYP);
@@ -672,27 +672,27 @@ void WL_wilsonloops(double HYP_weight[3]) {
 
 /*
   WL_Hamiltonian_gauge(u_gauge,u_gauge);
-  
+
   WL_broadcast_polyakov(Polyakov,u_gauge);
 
   HYP_smearing(HYP,u_gauge,HYP_weight);
 */
-  
+
   double** WL;
   WL=amalloc(sizeof(double*)*WL_max_nsteps,ALIGN);
   WL[0]=amalloc(sizeof(double)*WL_max_nsteps*GLB_T,ALIGN);
   for(int s=0; s<WL_max_nsteps; s++)
     WL[s]=WL[0]+s*GLB_T;
-  
+
   double** tmp;
   tmp=amalloc(sizeof(double*)*WL_max_nsteps,ALIGN);
   tmp[0]=amalloc(sizeof(double)*WL_max_nsteps*GLB_T,ALIGN);
   for(int s=0; s<WL_max_nsteps; s++)
     tmp[s]=tmp[0]+s*GLB_T;
-  
+
   for(int n=0; n<WL_npaths; n++) {
     for(int s=0;s<WL_path[n].nsteps;s++) for(int t=0;t<GLB_T;t++) WL[s][t]=0.;
-    
+
     int counter=0;
     for(int p=0;p<WL_path[n].nperms;p++) {
       for(int w=0;w<4;w++) {
@@ -703,7 +703,7 @@ void WL_wilsonloops(double HYP_weight[3]) {
         if(WL_path[n].c[0]==0 && sign[0]==-1) continue;
         if(WL_path[n].c[1]==0 && sign[1]==-1) continue;
         if(WL_path[n].c[2]==0 && sign[2]==-1) continue;
-      
+
         WL_correlators(tmp,HYP,Polyakov,WL_path[n].nsteps,WL_path[n].path,WL_path[n].length,WL_path[n].perm[p],sign);
         for(int s=0;s<WL_path[n].nsteps;s++) for(int t=0;t<GLB_T;t++) WL[s][t]+=tmp[s][t];
         counter++;

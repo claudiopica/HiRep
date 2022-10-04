@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 #include "update.h"
@@ -58,5 +58,3 @@ void find_spec_H2(double *max, double *min) {
 
   return;
 }
-
-

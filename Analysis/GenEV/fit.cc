@@ -102,7 +102,7 @@ void fitexp(par *apar, double *diagzed_corr)
       el = 0.0;
       numdel = 10000;
     }
-    
+
     if (eu > 5.0)
       eu = 5.0;
     if (el < 0.0)

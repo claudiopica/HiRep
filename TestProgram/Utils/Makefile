@@ -6,4 +6,3 @@ TESTS = check_suNg_op check_utils_1 check_utils_4 check_utils_5 check_exp_WF che
 LIBS += $(TOPDIR)/LibHR/libhr.a
 
 include $(MKDIR)/MkRules
-

@@ -31,12 +31,12 @@ class AlgRemez
 
   // The numerator and denominator degree (n=d)
   int n, d;
-  
+
   // The bounds of the approximation
   bigfloat apstrt, apwidt, apend;
 
   // the numerator and denominator of the power we are approximating
-  unsigned long power_num; 
+  unsigned long power_num;
   unsigned long power_den;
 
   // Flag to determine whether the arrays have been allocated
@@ -68,7 +68,7 @@ class AlgRemez
   void equations();
 
   // Search for error maxima and minima
-  void search(bigfloat *step); 
+  void search(bigfloat *step);
 
   // Initialise step sizes
   void stpini(bigfloat *step);
@@ -110,7 +110,7 @@ class AlgRemez
   bigfloat approx(bigfloat x);
 
  public:
-  
+
   // Constructor
   AlgRemez(double lower, double upper, long prec);
 
@@ -121,12 +121,12 @@ class AlgRemez
   void setBounds(double lower, double upper);
 
   // Generate the rational approximation x^(pnum/pden)
-  double generateApprox(int num_degree, int den_degree, 
-			unsigned long power_num, unsigned long power_den, 
+  double generateApprox(int num_degree, int den_degree,
+			unsigned long power_num, unsigned long power_den,
 			bigfloat *dmm, int a_len, double* a_param, int* a_pow);
-  double generateApprox(int num_degree, int den_degree, 
+  double generateApprox(int num_degree, int den_degree,
 			unsigned long power_num, unsigned long power_den, bigfloat *dmm=0);
-  double generateApprox(int degree, unsigned long power_num, 
+  double generateApprox(int degree, unsigned long power_num,
 			unsigned long power_den, bigfloat *dmm=0);
 
 	void getMM(bigfloat *dmm);
@@ -157,6 +157,3 @@ class AlgRemez
 };
 
 #endif  // Include guard
-
-
-

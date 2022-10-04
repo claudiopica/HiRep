@@ -16,7 +16,7 @@ while($line=<>) {
         if ($line=~/.*Configuration rejected/) {if ($acc!=-1) {print "Error acc\n";}  $acc=0; }
         if ($line=~/.*Range = \[(.*?),(.*?)\]/) {$rl=($1+1.e-4)/0.9; $rh=$2/1.1;} #normalize range
         if ($line=~/.*?Trajectory #(\d+): .*? MVM = (\d+)/) {
-                $MVM=$2; 
+                $MVM=$2;
                 if($tc!=$1) {
                         die ("Error: trajectory numbers do not match\n");
                 }
@@ -25,10 +25,10 @@ while($line=<>) {
         }
         if ($line=~/.*Plaquette: (.*)/) {
                 my $l;
-                $plaq=$1; 
+                $plaq=$1;
                 $l=sprintf("%d %1.8e %1.8e %1.8e %1.8e %1.8e %d\n",$tc,$plaq,$MVM,$rl,$rh,$DeltaS,$acc);
-                push @output,$l; 
-                undef($tc); 
+                push @output,$l;
+                undef($tc);
                 $acc=-1;
         }
 }
@@ -57,4 +57,3 @@ while($_=shift(@$input)) {
 
 print @out;
 }
-

@@ -58,7 +58,7 @@ int test_hermiticity(spinor_operator S, spinor_operator S_cpu, char *name)
 
     spinor_field *s, *S_s, *S_s_cpu, *diff;
     int return_val = 0;
-    
+
     hr_complex tau, tau_cpu;
 
     s = alloc_spinor_field_f(1, &glattice);
@@ -71,7 +71,7 @@ int test_hermiticity(spinor_operator S, spinor_operator S_cpu, char *name)
     S_cpu(S_s_cpu, s);
 
     spinor_field_copy_from_gpu_f(S_s);
-    
+
     // Sanity checks: Norms are not identically zero
     lprintf("INFO", 0, "Output spinor field norm GPU: %0.15lf\n", spinor_field_sqnorm_f(S_s));
     lprintf("INFO", 0, "Output spinor field norm CPU: %0.15lf\n", spinor_field_sqnorm_f_cpu(S_s_cpu));
@@ -80,17 +80,17 @@ int test_hermiticity(spinor_operator S, spinor_operator S_cpu, char *name)
     spinor_field_sub_f_cpu(diff, S_s, S_s_cpu);
 
     double diff_norm = spinor_field_sqnorm_f_cpu(diff);
-    if (fabs(diff_norm) > 1e-14) 
+    if (fabs(diff_norm) > 1e-14)
     {
         lprintf("RESULT", 0, "FAILED \n");
         return_val = 1;
     }
-    else 
+    else
     {
         lprintf("RESULT", 0, "OK \n");
         return_val = 0;
     }
-    
+
     lprintf("RESULT", 0, "[Diff norm gpu-cpu %0.2e]\n", diff_norm);
 
     free_spinor_field_f(diff);
@@ -109,17 +109,17 @@ void Q_operator(spinor_field *out, spinor_field *in)
     g5Dphi_sq(-hmass, out, in);
 }
 
-void Q_operator_cpu(spinor_field *out, spinor_field *in) 
+void Q_operator_cpu(spinor_field *out, spinor_field *in)
 {
     g5Dphi_sq_cpu(-hmass, out, in);
 }
 
-void I_operator(spinor_field *out, spinor_field *in) 
+void I_operator(spinor_field *out, spinor_field *in)
 {
     spinor_field_mul_f(out, 1, in);
 }
 
-void I_operator_cpu(spinor_field *out, spinor_field *in) 
+void I_operator_cpu(spinor_field *out, spinor_field *in)
 {
     spinor_field_mul_f_cpu(out, 1, in);
 }

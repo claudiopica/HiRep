@@ -26,5 +26,3 @@ mes:outpath = ./output/
 mes:configlist = list_conf.txt
 mes:seq_prop = true
 mes:isospin = 0
-
-

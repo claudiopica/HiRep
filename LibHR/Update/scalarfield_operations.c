@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 #include "global.h"
@@ -10,12 +10,12 @@
 #include "random.h"
 
 void scalar_field_copy(scalar_field *s1, scalar_field *s2)
-{ 
+{
   error(s1==NULL,1,"scalar_field_copy [scalarfield_operations.c]",
 	"Attempt to access unallocated memory space");
   error(s2==NULL,1,"scalar_field_copy [scalarfield_operations.c]",
 	"Attempt to access unallocated memory space");
-  
+
   _MASTER_FOR(&glattice,ix) {
     double c = *_FIELD_AT(s2,ix);
     *_FIELD_AT(s1,ix) = c;
@@ -27,7 +27,7 @@ void flip_scalar_field(scalar_field *s)
 {
   error(s==NULL,1,"flip_scalar_field [scalarfield_operations.c]",
 	"Attempt to access unallocated memory space");
-  
+
   _MASTER_FOR(&glattice,ix) {
     double c = *_FIELD_AT(s,ix);
     *_FIELD_AT(s,ix) = -c;
@@ -39,7 +39,7 @@ void set_scalar_field(scalar_field *s, double c)
 {
   error(s==NULL,1,"set_scalar_field [scalarfield_operations.c]",
 	"Attempt to access unallocated memory space");
-  
+
   _MASTER_FOR(&glattice,ix) {
     *_FIELD_AT(s,ix) = c;
   }
@@ -48,8 +48,8 @@ void set_scalar_field(scalar_field *s, double c)
 void gaussian_scalar_field(scalar_field *s)
 {
   error(s==NULL,1,"gaussian_scalar_field [scalarfield_operations.c]",
-	"Attempt to access unallocated memory space");   
-  
+	"Attempt to access unallocated memory space");
+
   _MASTER_FOR(&glattice,ix) {
     double *ptr = _FIELD_AT(s,ix);
     gauss(ptr,1);
@@ -60,7 +60,7 @@ void gaussian_scalar_field(scalar_field *s)
 
 
 
-// out += (sigma(x)+rho)*in 
+// out += (sigma(x)+rho)*in
 void spinor_scalarfield_mult_add_assign(spinor_field *out,scalar_field *sigma,double rho, spinor_field *in){
   _MASTER_FOR(in->type,i) {
      suNf_spinor s,r;
@@ -182,7 +182,7 @@ void spinor_sigma_assign(spinor_field *out,scalar_field *sigma, spinor_field *in
 
 
 
-// in = (sigma(x)+rho)*in 
+// in = (sigma(x)+rho)*in
 void spinor_scalarfield_mult_add_assign_flt(spinor_field_flt *out,scalar_field *sigma,double rho, spinor_field_flt *in){
   _MASTER_FOR(in->type,i) {
      suNf_spinor_flt s,r;
@@ -201,7 +201,7 @@ void spinor_scalarfield_ig5_mult_add_assign_flt(spinor_field_flt *out,scalar_fie
      suNf_spinor_flt s,r;
      double k = *_FIELD_AT(pi,i);
      double complex z;
-     z = I*k; 
+     z = I*k;
      s = *_FIELD_AT(in,i);
      r = *_FIELD_AT(out,i);
      _spinor_g5_assign_f(s);
@@ -216,7 +216,7 @@ void spinor_scalarfield_mig5_mult_add_assign_flt(spinor_field_flt *out,scalar_fi
      suNf_spinor_flt s,r;
      double k = *_FIELD_AT(pi,i);
      double complex z;
-     z = -I*k; 
+     z = -I*k;
      s = *_FIELD_AT(in,i);
      r = *_FIELD_AT(out,i);
      _spinor_g5_assign_f(s);
@@ -261,7 +261,3 @@ void spinor_sigma_pi_dagger_rho_div_assign_flt(spinor_field_flt *out,scalar_fiel
      *_FIELD_AT(out,i) = r;
   }
 }
-
-
-
-

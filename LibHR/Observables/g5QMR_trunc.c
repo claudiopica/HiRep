@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 #include "inverters.h"
@@ -76,7 +76,7 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, int trunc_iter, spin
     printf("numero vettori n=%d\n",par->n);
     for (i=0; i<(par->n); ++i) {
     printf("shift[%d]=%f\n",i,par->shift[i]);
-    printf("out[%d]=%p\n",i,out[i]);      
+    printf("out[%d]=%p\n",i,out[i]);
     }
   */
 
@@ -328,7 +328,7 @@ int g5QMR_mshift_trunc(mshift_par *par, int trunc_iter, spinor_operator M, spino
 
   lprintf("INVERTER", 20, "g5QMR: Exit multishift after %d iterations\n", cgiter);
 
-  /* if some vector has not converged try non-multishift 
+  /* if some vector has not converged try non-multishift
      unless explicitly truncated using max_iter!=0        */
 
   if ((par->max_iter > trunc_iter) || (par->max_iter == 0))

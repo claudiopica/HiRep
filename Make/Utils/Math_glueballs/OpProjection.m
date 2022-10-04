@@ -15,13 +15,13 @@ To identify an operator you use a string for multi tr operators and a path numbe
 The string for the multi-tr operators must be unique for the choice of operators quantum numbers both in input and output:
 The standard is "pox poy poz_"irrep out""charge out"_"irrepev" joined by one string for each internal trace "pix piy piz_"irrep i""charge i"
 
-OpList[px,py,pz,irrepidx,charge,<PathUniqueIndex|string>]=Operator implementation (e.g. 2 Pre[az, ax, ay, ay, -ax, -az, -ay, -ay][-1, 0, -1] + 
- 2 Pre[az, ax, ay, ay, -ax, -az, -ay, -ay][0, 0, 0] for 1tr op or a list of list which described the 1tr op and their cg coefficients to add 
+OpList[px,py,pz,irrepidx,charge,<PathUniqueIndex|string>]=Operator implementation (e.g. 2 Pre[az, ax, ay, ay, -ax, -az, -ay, -ay][-1, 0, -1] +
+ 2 Pre[az, ax, ay, ay, -ax, -az, -ay, -ay][0, 0, 0] for 1tr op or a list of list which described the 1tr op and their cg coefficients to add
  eg. {"000_T1minusOhP+_3_011_A1Dic2+_xx-y-xz-xy-z_011_A1Dic2+_xxy-z-x-xz-y", {-(1/4), {0, -1, -1, 1, 1, 1, P[-ax, -ax, az, ax, -ay, ax, -az, ay]}, {0, 1, 1, 1, 1, 1, P[ax, ax, ay, -az, -ax, -ax, az, -ay]}}, ....
 
 Opindex[px,py,pz,irrepidx,charge,<PathUniqueIndex|string>]= multiplet id in Opindex[px,py,pz,irrepidx,charge]
 
-Opindex[px,py,pz,irrepidx,charge]= list of multiplets, each multiplet of the size of the given irrep and the element are either 0 if not evaluated or the opindex. 
+Opindex[px,py,pz,irrepidx,charge]= list of multiplets, each multiplet of the size of the given irrep and the element are either 0 if not evaluated or the opindex.
 
 
 pathlist and pathuniqueidentifier
@@ -61,7 +61,7 @@ bTOrthog[1,0,-1]={{{1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,
 bTOrthog[1,0,0]={{{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,1,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0}},{{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,1,0,0,0,-1,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,-1,0}},{{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,I Sqrt[2],-I Sqrt[2],0,0,0,0,0,0,-I Sqrt[2],I Sqrt[2],0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},{Sqrt[2],0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-Sqrt[2],0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,Sqrt[2],-Sqrt[2],0}},{{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,-1,0,0,1,0,0,0,-1,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0}},{{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,-1,0,0,1,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,-1,0}}};
 bTOrthog[1,0,1]={{{1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0}},{{-1,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0}},{{-1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0}},{{1,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0}}};
 bTOrthog[1,1,-1]={{{1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}},{{1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,-1,-1,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}},{{-I Sqrt[3],0,0,0,0,0,0,0,0,0,0,0,0,I Sqrt[3],0,0,0,0,0,0,0,0,0,0,0,0,-I Sqrt[3],0,0,I Sqrt[3],0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},{1,0,0,0,0,0,0,0,0,0,0,0,0,1,-2,0,0,0,0,0,0,0,0,0,0,0,1,-2,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}}};
-bTOrthog[1,1,0]={{{1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0}},{{-1,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0}},{{-1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0}},{{1,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0}}}; 
+bTOrthog[1,1,0]={{{1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0}},{{-1,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0}},{{-1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0}},{{1,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0}}};
 bTOrthog[1,1,1]={{{1,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}},{{1,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,-1,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}},{{-I Sqrt[3],0,0,0,0,0,0,0,0,0,0,0,I Sqrt[3],0,0,0,0,0,0,0,0,0,0,0,0,0,-I Sqrt[3],0,0,0,I Sqrt[3],0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},{1,0,0,0,0,0,0,0,0,0,0,-2,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,-2,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}}};
 bTOrthog[px_, py_, pz_] := Module[{ret = Null, gcd},
   gcd = Max[GCD[px, py, pz], 1];
@@ -69,12 +69,12 @@ bTOrthog[px_, py_, pz_] := Module[{ret = Null, gcd},
      lpx=Expand[px/gcd];
      lpy=Expand[py/gcd];
      lpz=Expand[pz/gcd];
-   If[ListQ[bTOrthog[lpx,lpy,lpz]], 
+   If[ListQ[bTOrthog[lpx,lpy,lpz]],
      ret = bTOrthog[lpx,lpy,lpz]];
    ];
   ret];
 (*Rotation coefficients for the transformation of a multiplet under a global rotation
-e.g. consider the multiplet ml={*,..,*}  ml = irrepSetOrthog[Px,Py,Pz][[irrepindex]][[i]]] . ml' 
+e.g. consider the multiplet ml={*,..,*}  ml = irrepSetOrthog[Px,Py,Pz][[irrepindex]][[i]]] . ml'
 where ml' is the multiplet evaluated on a rotated configuration
 *)
 irrepSetOrthog[0,0,0]={{{{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}},{{{1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{1}}, {{1}}, {{1}}},{{{1, 0}, {0, 1}}, {{1, 0}, {0, -1}}, {{1, 0}, {0, -1}}, {{-1/2, -Sqrt[3]/2}, {-Sqrt[3]/2, 1/2}}, {{-1/2, -Sqrt[3]/2}, {-Sqrt[3]/2, 1/2}}, {{-1/2, Sqrt[3]/2}, {Sqrt[3]/2, 1/2}}, {{-1/2, Sqrt[3]/2}, {Sqrt[3]/2, 1/2}}, {{-1/2, Sqrt[3]/2}, {-Sqrt[3]/2, -1/2}}, {{-1/2, -Sqrt[3]/2}, {Sqrt[3]/2, -1/2}}, {{-1/2, -Sqrt[3]/2}, {Sqrt[3]/2, -1/2}}, {{-1/2, Sqrt[3]/2}, {-Sqrt[3]/2, -1/2}}, {{-1/2, -Sqrt[3]/2}, {Sqrt[3]/2, -1/2}}, {{-1/2, Sqrt[3]/2}, {-Sqrt[3]/2, -1/2}}, {{-1/2, Sqrt[3]/2}, {-Sqrt[3]/2, -1/2}}, {{-1/2, -Sqrt[3]/2}, {Sqrt[3]/2, -1/2}}, {{1, 0}, {0, -1}}, {{1, 0}, {0, -1}}, {{-1/2, Sqrt[3]/2}, {Sqrt[3]/2, 1/2}}, {{-1/2, Sqrt[3]/2}, {Sqrt[3]/2, 1/2}}, {{-1/2, -Sqrt[3]/2}, {-Sqrt[3]/2, 1/2}}, {{-1/2, -Sqrt[3]/2}, {-Sqrt[3]/2, 1/2}}, {{1, 0}, {0, 1}}, {{1, 0}, {0, 1}}, {{1, 0}, {0, 1}}, {{1, 0}, {0, 1}}, {{1, 0}, {0, -1}}, {{1, 0}, {0, -1}}, {{-1/2, -Sqrt[3]/2}, {-Sqrt[3]/2, 1/2}}, {{-1/2, -Sqrt[3]/2}, {-Sqrt[3]/2, 1/2}}, {{-1/2, Sqrt[3]/2}, {Sqrt[3]/2, 1/2}}, {{-1/2, Sqrt[3]/2}, {Sqrt[3]/2, 1/2}}, {{-1/2, Sqrt[3]/2}, {-Sqrt[3]/2, -1/2}}, {{-1/2, -Sqrt[3]/2}, {Sqrt[3]/2, -1/2}}, {{-1/2, -Sqrt[3]/2}, {Sqrt[3]/2, -1/2}}, {{-1/2, Sqrt[3]/2}, {-Sqrt[3]/2, -1/2}}, {{-1/2, -Sqrt[3]/2}, {Sqrt[3]/2, -1/2}}, {{-1/2, Sqrt[3]/2}, {-Sqrt[3]/2, -1/2}}, {{-1/2, Sqrt[3]/2}, {-Sqrt[3]/2, -1/2}}, {{-1/2, -Sqrt[3]/2}, {Sqrt[3]/2, -1/2}}, {{1, 0}, {0, -1}}, {{1, 0}, {0, -1}}, {{-1/2, Sqrt[3]/2}, {Sqrt[3]/2, 1/2}}, {{-1/2, Sqrt[3]/2}, {Sqrt[3]/2, 1/2}}, {{-1/2, -Sqrt[3]/2}, {-Sqrt[3]/2, 1/2}}, {{-1/2, -Sqrt[3]/2}, {-Sqrt[3]/2, 1/2}}, {{1, 0}, {0, 1}}, {{1, 0}, {0, 1}}, {{1, 0}, {0, 1}}},{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {{0, 0, I}, {0, -1, 0}, {-I, 0, 0}}, {{0, 0, -I}, {0, -1, 0}, {I, 0, 0}}, {{-1/2, I/Sqrt[2], 1/2}, {(-I)/Sqrt[2], 0, (-I)/Sqrt[2]}, {1/2, I/Sqrt[2], -1/2}}, {{-1/2, (-I)/Sqrt[2], 1/2}, {I/Sqrt[2], 0, I/Sqrt[2]}, {1/2, (-I)/Sqrt[2], -1/2}}, {{-1/2, -(1/Sqrt[2]), -1/2}, {-(1/Sqrt[2]), 0, 1/Sqrt[2]}, {-1/2, 1/Sqrt[2], -1/2}}, {{-1/2, 1/Sqrt[2], -1/2}, {1/Sqrt[2], 0, -(1/Sqrt[2])}, {-1/2, -(1/Sqrt[2]), -1/2}}, {{-I/2, (-I)/Sqrt[2], -I/2}, {-(1/Sqrt[2]), 0, 1/Sqrt[2]}, {I/2, (-I)/Sqrt[2], I/2}}, {{I/2, -(1/Sqrt[2]), -I/2}, {I/Sqrt[2], 0, I/Sqrt[2]}, {I/2, 1/Sqrt[2], -I/2}}, {{I/2, 1/Sqrt[2], -I/2}, {(-I)/Sqrt[2], 0, (-I)/Sqrt[2]}, {I/2, -(1/Sqrt[2]), -I/2}}, {{-I/2, I/Sqrt[2], -I/2}, {1/Sqrt[2], 0, -(1/Sqrt[2])}, {I/2, I/Sqrt[2], I/2}}, {{-I/2, -(1/Sqrt[2]), I/2}, {(-I)/Sqrt[2], 0, (-I)/Sqrt[2]}, {-I/2, 1/Sqrt[2], I/2}}, {{I/2, I/Sqrt[2], I/2}, {-(1/Sqrt[2]), 0, 1/Sqrt[2]}, {-I/2, I/Sqrt[2], -I/2}}, {{I/2, (-I)/Sqrt[2], I/2}, {1/Sqrt[2], 0, -(1/Sqrt[2])}, {-I/2, (-I)/Sqrt[2], -I/2}}, {{-I/2, 1/Sqrt[2], I/2}, {I/Sqrt[2], 0, I/Sqrt[2]}, {-I/2, -(1/Sqrt[2]), I/2}}, {{-I, 0, 0}, {0, 1, 0}, {0, 0, I}}, {{I, 0, 0}, {0, 1, 0}, {0, 0, -I}}, {{1/2, -(1/Sqrt[2]), 1/2}, {1/Sqrt[2], 0, -(1/Sqrt[2])}, {1/2, 1/Sqrt[2], 1/2}}, {{1/2, 1/Sqrt[2], 1/2}, {-(1/Sqrt[2]), 0, 1/Sqrt[2]}, {1/2, -(1/Sqrt[2]), 1/2}}, {{1/2, I/Sqrt[2], -1/2}, {I/Sqrt[2], 0, I/Sqrt[2]}, {-1/2, I/Sqrt[2], 1/2}}, {{1/2, (-I)/Sqrt[2], -1/2}, {(-I)/Sqrt[2], 0, (-I)/Sqrt[2]}, {-1/2, (-I)/Sqrt[2], 1/2}}, {{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {{0, 0, 1}, {0, -1, 0}, {1, 0, 0}}, {{0, 0, -1}, {0, -1, 0}, {-1, 0, 0}}, {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {{0, 0, I}, {0, -1, 0}, {-I, 0, 0}}, {{0, 0, -I}, {0, -1, 0}, {I, 0, 0}}, {{-1/2, I/Sqrt[2], 1/2}, {(-I)/Sqrt[2], 0, (-I)/Sqrt[2]}, {1/2, I/Sqrt[2], -1/2}}, {{-1/2, (-I)/Sqrt[2], 1/2}, {I/Sqrt[2], 0, I/Sqrt[2]}, {1/2, (-I)/Sqrt[2], -1/2}}, {{-1/2, -(1/Sqrt[2]), -1/2}, {-(1/Sqrt[2]), 0, 1/Sqrt[2]}, {-1/2, 1/Sqrt[2], -1/2}}, {{-1/2, 1/Sqrt[2], -1/2}, {1/Sqrt[2], 0, -(1/Sqrt[2])}, {-1/2, -(1/Sqrt[2]), -1/2}}, {{-I/2, (-I)/Sqrt[2], -I/2}, {-(1/Sqrt[2]), 0, 1/Sqrt[2]}, {I/2, (-I)/Sqrt[2], I/2}}, {{I/2, -(1/Sqrt[2]), -I/2}, {I/Sqrt[2], 0, I/Sqrt[2]}, {I/2, 1/Sqrt[2], -I/2}}, {{I/2, 1/Sqrt[2], -I/2}, {(-I)/Sqrt[2], 0, (-I)/Sqrt[2]}, {I/2, -(1/Sqrt[2]), -I/2}}, {{-I/2, I/Sqrt[2], -I/2}, {1/Sqrt[2], 0, -(1/Sqrt[2])}, {I/2, I/Sqrt[2], I/2}}, {{-I/2, -(1/Sqrt[2]), I/2}, {(-I)/Sqrt[2], 0, (-I)/Sqrt[2]}, {-I/2, 1/Sqrt[2], I/2}}, {{I/2, I/Sqrt[2], I/2}, {-(1/Sqrt[2]), 0, 1/Sqrt[2]}, {-I/2, I/Sqrt[2], -I/2}}, {{I/2, (-I)/Sqrt[2], I/2}, {1/Sqrt[2], 0, -(1/Sqrt[2])}, {-I/2, (-I)/Sqrt[2], -I/2}}, {{-I/2, 1/Sqrt[2], I/2}, {I/Sqrt[2], 0, I/Sqrt[2]}, {-I/2, -(1/Sqrt[2]), I/2}}, {{-I, 0, 0}, {0, 1, 0}, {0, 0, I}}, {{I, 0, 0}, {0, 1, 0}, {0, 0, -I}}, {{1/2, -(1/Sqrt[2]), 1/2}, {1/Sqrt[2], 0, -(1/Sqrt[2])}, {1/2, 1/Sqrt[2], 1/2}}, {{1/2, 1/Sqrt[2], 1/2}, {-(1/Sqrt[2]), 0, 1/Sqrt[2]}, {1/2, -(1/Sqrt[2]), 1/2}}, {{1/2, I/Sqrt[2], -1/2}, {I/Sqrt[2], 0, I/Sqrt[2]}, {-1/2, I/Sqrt[2], 1/2}}, {{1/2, (-I)/Sqrt[2], -1/2}, {(-I)/Sqrt[2], 0, (-I)/Sqrt[2]}, {-1/2, (-I)/Sqrt[2], 1/2}}, {{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {{0, 0, 1}, {0, -1, 0}, {1, 0, 0}}, {{0, 0, -1}, {0, -1, 0}, {-1, 0, 0}}},{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {{0, 0, -I}, {0, 1, 0}, {I, 0, 0}}, {{0, 0, I}, {0, 1, 0}, {-I, 0, 0}}, {{1/2, I/Sqrt[2], 1/2}, {(-I)/Sqrt[2], 0, I/Sqrt[2]}, {1/2, (-I)/Sqrt[2], 1/2}}, {{1/2, (-I)/Sqrt[2], 1/2}, {I/Sqrt[2], 0, (-I)/Sqrt[2]}, {1/2, I/Sqrt[2], 1/2}}, {{1/2, 1/Sqrt[2], -1/2}, {1/Sqrt[2], 0, 1/Sqrt[2]}, {-1/2, 1/Sqrt[2], 1/2}}, {{1/2, -(1/Sqrt[2]), -1/2}, {-(1/Sqrt[2]), 0, -(1/Sqrt[2])}, {-1/2, -(1/Sqrt[2]), 1/2}}, {{I/2, I/Sqrt[2], -I/2}, {-(1/Sqrt[2]), 0, -(1/Sqrt[2])}, {I/2, (-I)/Sqrt[2], -I/2}}, {{-I/2, -(1/Sqrt[2]), -I/2}, {(-I)/Sqrt[2], 0, I/Sqrt[2]}, {I/2, -(1/Sqrt[2]), I/2}}, {{-I/2, 1/Sqrt[2], -I/2}, {I/Sqrt[2], 0, (-I)/Sqrt[2]}, {I/2, 1/Sqrt[2], I/2}}, {{I/2, (-I)/Sqrt[2], -I/2}, {1/Sqrt[2], 0, 1/Sqrt[2]}, {I/2, I/Sqrt[2], -I/2}}, {{I/2, -(1/Sqrt[2]), I/2}, {I/Sqrt[2], 0, (-I)/Sqrt[2]}, {-I/2, -(1/Sqrt[2]), -I/2}}, {{-I/2, (-I)/Sqrt[2], I/2}, {-(1/Sqrt[2]), 0, -(1/Sqrt[2])}, {-I/2, I/Sqrt[2], I/2}}, {{-I/2, I/Sqrt[2], I/2}, {1/Sqrt[2], 0, 1/Sqrt[2]}, {-I/2, (-I)/Sqrt[2], I/2}}, {{I/2, 1/Sqrt[2], I/2}, {(-I)/Sqrt[2], 0, I/Sqrt[2]}, {-I/2, 1/Sqrt[2], -I/2}}, {{-I, 0, 0}, {0, -1, 0}, {0, 0, I}}, {{I, 0, 0}, {0, -1, 0}, {0, 0, -I}}, {{-1/2, 1/Sqrt[2], 1/2}, {-(1/Sqrt[2]), 0, -(1/Sqrt[2])}, {1/2, 1/Sqrt[2], -1/2}}, {{-1/2, -(1/Sqrt[2]), 1/2}, {1/Sqrt[2], 0, 1/Sqrt[2]}, {1/2, -(1/Sqrt[2]), -1/2}}, {{-1/2, I/Sqrt[2], -1/2}, {I/Sqrt[2], 0, (-I)/Sqrt[2]}, {-1/2, (-I)/Sqrt[2], -1/2}}, {{-1/2, (-I)/Sqrt[2], -1/2}, {(-I)/Sqrt[2], 0, I/Sqrt[2]}, {-1/2, I/Sqrt[2], -1/2}}, {{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {{0, 0, -1}, {0, -1, 0}, {-1, 0, 0}}, {{0, 0, 1}, {0, -1, 0}, {1, 0, 0}}, {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {{0, 0, -I}, {0, 1, 0}, {I, 0, 0}}, {{0, 0, I}, {0, 1, 0}, {-I, 0, 0}}, {{1/2, I/Sqrt[2], 1/2}, {(-I)/Sqrt[2], 0, I/Sqrt[2]}, {1/2, (-I)/Sqrt[2], 1/2}}, {{1/2, (-I)/Sqrt[2], 1/2}, {I/Sqrt[2], 0, (-I)/Sqrt[2]}, {1/2, I/Sqrt[2], 1/2}}, {{1/2, 1/Sqrt[2], -1/2}, {1/Sqrt[2], 0, 1/Sqrt[2]}, {-1/2, 1/Sqrt[2], 1/2}}, {{1/2, -(1/Sqrt[2]), -1/2}, {-(1/Sqrt[2]), 0, -(1/Sqrt[2])}, {-1/2, -(1/Sqrt[2]), 1/2}}, {{I/2, I/Sqrt[2], -I/2}, {-(1/Sqrt[2]), 0, -(1/Sqrt[2])}, {I/2, (-I)/Sqrt[2], -I/2}}, {{-I/2, -(1/Sqrt[2]), -I/2}, {(-I)/Sqrt[2], 0, I/Sqrt[2]}, {I/2, -(1/Sqrt[2]), I/2}}, {{-I/2, 1/Sqrt[2], -I/2}, {I/Sqrt[2], 0, (-I)/Sqrt[2]}, {I/2, 1/Sqrt[2], I/2}}, {{I/2, (-I)/Sqrt[2], -I/2}, {1/Sqrt[2], 0, 1/Sqrt[2]}, {I/2, I/Sqrt[2], -I/2}}, {{I/2, -(1/Sqrt[2]), I/2}, {I/Sqrt[2], 0, (-I)/Sqrt[2]}, {-I/2, -(1/Sqrt[2]), -I/2}}, {{-I/2, (-I)/Sqrt[2], I/2}, {-(1/Sqrt[2]), 0, -(1/Sqrt[2])}, {-I/2, I/Sqrt[2], I/2}}, {{-I/2, I/Sqrt[2], I/2}, {1/Sqrt[2], 0, 1/Sqrt[2]}, {-I/2, (-I)/Sqrt[2], I/2}}, {{I/2, 1/Sqrt[2], I/2}, {(-I)/Sqrt[2], 0, I/Sqrt[2]}, {-I/2, 1/Sqrt[2], -I/2}}, {{-I, 0, 0}, {0, -1, 0}, {0, 0, I}}, {{I, 0, 0}, {0, -1, 0}, {0, 0, -I}}, {{-1/2, 1/Sqrt[2], 1/2}, {-(1/Sqrt[2]), 0, -(1/Sqrt[2])}, {1/2, 1/Sqrt[2], -1/2}}, {{-1/2, -(1/Sqrt[2]), 1/2}, {1/Sqrt[2], 0, 1/Sqrt[2]}, {1/2, -(1/Sqrt[2]), -1/2}}, {{-1/2, I/Sqrt[2], -1/2}, {I/Sqrt[2], 0, (-I)/Sqrt[2]}, {-1/2, (-I)/Sqrt[2], -1/2}}, {{-1/2, (-I)/Sqrt[2], -1/2}, {(-I)/Sqrt[2], 0, I/Sqrt[2]}, {-1/2, I/Sqrt[2], -1/2}}, {{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {{0, 0, -1}, {0, -1, 0}, {-1, 0, 0}}, {{0, 0, 1}, {0, -1, 0}, {1, 0, 0}}},{{{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}},{{{1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{1}}, {{1}}, {{1}}, {{-1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{-1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{1}}, {{-1}}, {{-1}}, {{-1}}},{{{1, 0}, {0, 1}}, {{1, 0}, {0, -1}}, {{1, 0}, {0, -1}}, {{-1/2, -Sqrt[3]/2}, {-Sqrt[3]/2, 1/2}}, {{-1/2, -Sqrt[3]/2}, {-Sqrt[3]/2, 1/2}}, {{-1/2, Sqrt[3]/2}, {Sqrt[3]/2, 1/2}}, {{-1/2, Sqrt[3]/2}, {Sqrt[3]/2, 1/2}}, {{-1/2, Sqrt[3]/2}, {-Sqrt[3]/2, -1/2}}, {{-1/2, -Sqrt[3]/2}, {Sqrt[3]/2, -1/2}}, {{-1/2, -Sqrt[3]/2}, {Sqrt[3]/2, -1/2}}, {{-1/2, Sqrt[3]/2}, {-Sqrt[3]/2, -1/2}}, {{-1/2, -Sqrt[3]/2}, {Sqrt[3]/2, -1/2}}, {{-1/2, Sqrt[3]/2}, {-Sqrt[3]/2, -1/2}}, {{-1/2, Sqrt[3]/2}, {-Sqrt[3]/2, -1/2}}, {{-1/2, -Sqrt[3]/2}, {Sqrt[3]/2, -1/2}}, {{1, 0}, {0, -1}}, {{1, 0}, {0, -1}}, {{-1/2, Sqrt[3]/2}, {Sqrt[3]/2, 1/2}}, {{-1/2, Sqrt[3]/2}, {Sqrt[3]/2, 1/2}}, {{-1/2, -Sqrt[3]/2}, {-Sqrt[3]/2, 1/2}}, {{-1/2, -Sqrt[3]/2}, {-Sqrt[3]/2, 1/2}}, {{1, 0}, {0, 1}}, {{1, 0}, {0, 1}}, {{1, 0}, {0, 1}}, {{-1, 0}, {0, -1}}, {{-1, 0}, {0, 1}}, {{-1, 0}, {0, 1}}, {{1/2, Sqrt[3]/2}, {Sqrt[3]/2, -1/2}}, {{1/2, Sqrt[3]/2}, {Sqrt[3]/2, -1/2}}, {{1/2, -Sqrt[3]/2}, {-Sqrt[3]/2, -1/2}}, {{1/2, -Sqrt[3]/2}, {-Sqrt[3]/2, -1/2}}, {{1/2, -Sqrt[3]/2}, {Sqrt[3]/2, 1/2}}, {{1/2, Sqrt[3]/2}, {-Sqrt[3]/2, 1/2}}, {{1/2, Sqrt[3]/2}, {-Sqrt[3]/2, 1/2}}, {{1/2, -Sqrt[3]/2}, {Sqrt[3]/2, 1/2}}, {{1/2, Sqrt[3]/2}, {-Sqrt[3]/2, 1/2}}, {{1/2, -Sqrt[3]/2}, {Sqrt[3]/2, 1/2}}, {{1/2, -Sqrt[3]/2}, {Sqrt[3]/2, 1/2}}, {{1/2, Sqrt[3]/2}, {-Sqrt[3]/2, 1/2}}, {{-1, 0}, {0, 1}}, {{-1, 0}, {0, 1}}, {{1/2, -Sqrt[3]/2}, {-Sqrt[3]/2, -1/2}}, {{1/2, -Sqrt[3]/2}, {-Sqrt[3]/2, -1/2}}, {{1/2, Sqrt[3]/2}, {Sqrt[3]/2, -1/2}}, {{1/2, Sqrt[3]/2}, {Sqrt[3]/2, -1/2}}, {{-1, 0}, {0, -1}}, {{-1, 0}, {0, -1}}, {{-1, 0}, {0, -1}}},{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {{0, 0, I}, {0, -1, 0}, {-I, 0, 0}}, {{0, 0, -I}, {0, -1, 0}, {I, 0, 0}}, {{-1/2, I/Sqrt[2], 1/2}, {(-I)/Sqrt[2], 0, (-I)/Sqrt[2]}, {1/2, I/Sqrt[2], -1/2}}, {{-1/2, (-I)/Sqrt[2], 1/2}, {I/Sqrt[2], 0, I/Sqrt[2]}, {1/2, (-I)/Sqrt[2], -1/2}}, {{-1/2, -(1/Sqrt[2]), -1/2}, {-(1/Sqrt[2]), 0, 1/Sqrt[2]}, {-1/2, 1/Sqrt[2], -1/2}}, {{-1/2, 1/Sqrt[2], -1/2}, {1/Sqrt[2], 0, -(1/Sqrt[2])}, {-1/2, -(1/Sqrt[2]), -1/2}}, {{-I/2, (-I)/Sqrt[2], -I/2}, {-(1/Sqrt[2]), 0, 1/Sqrt[2]}, {I/2, (-I)/Sqrt[2], I/2}}, {{I/2, -(1/Sqrt[2]), -I/2}, {I/Sqrt[2], 0, I/Sqrt[2]}, {I/2, 1/Sqrt[2], -I/2}}, {{I/2, 1/Sqrt[2], -I/2}, {(-I)/Sqrt[2], 0, (-I)/Sqrt[2]}, {I/2, -(1/Sqrt[2]), -I/2}}, {{-I/2, I/Sqrt[2], -I/2}, {1/Sqrt[2], 0, -(1/Sqrt[2])}, {I/2, I/Sqrt[2], I/2}}, {{-I/2, -(1/Sqrt[2]), I/2}, {(-I)/Sqrt[2], 0, (-I)/Sqrt[2]}, {-I/2, 1/Sqrt[2], I/2}}, {{I/2, I/Sqrt[2], I/2}, {-(1/Sqrt[2]), 0, 1/Sqrt[2]}, {-I/2, I/Sqrt[2], -I/2}}, {{I/2, (-I)/Sqrt[2], I/2}, {1/Sqrt[2], 0, -(1/Sqrt[2])}, {-I/2, (-I)/Sqrt[2], -I/2}}, {{-I/2, 1/Sqrt[2], I/2}, {I/Sqrt[2], 0, I/Sqrt[2]}, {-I/2, -(1/Sqrt[2]), I/2}}, {{-I, 0, 0}, {0, 1, 0}, {0, 0, I}}, {{I, 0, 0}, {0, 1, 0}, {0, 0, -I}}, {{1/2, -(1/Sqrt[2]), 1/2}, {1/Sqrt[2], 0, -(1/Sqrt[2])}, {1/2, 1/Sqrt[2], 1/2}}, {{1/2, 1/Sqrt[2], 1/2}, {-(1/Sqrt[2]), 0, 1/Sqrt[2]}, {1/2, -(1/Sqrt[2]), 1/2}}, {{1/2, I/Sqrt[2], -1/2}, {I/Sqrt[2], 0, I/Sqrt[2]}, {-1/2, I/Sqrt[2], 1/2}}, {{1/2, (-I)/Sqrt[2], -1/2}, {(-I)/Sqrt[2], 0, (-I)/Sqrt[2]}, {-1/2, (-I)/Sqrt[2], 1/2}}, {{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {{0, 0, 1}, {0, -1, 0}, {1, 0, 0}}, {{0, 0, -1}, {0, -1, 0}, {-1, 0, 0}}, {{-1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {{0, 0, -I}, {0, 1, 0}, {I, 0, 0}}, {{0, 0, I}, {0, 1, 0}, {-I, 0, 0}}, {{1/2, (-I)/Sqrt[2], -1/2}, {I/Sqrt[2], 0, I/Sqrt[2]}, {-1/2, (-I)/Sqrt[2], 1/2}}, {{1/2, I/Sqrt[2], -1/2}, {(-I)/Sqrt[2], 0, (-I)/Sqrt[2]}, {-1/2, I/Sqrt[2], 1/2}}, {{1/2, 1/Sqrt[2], 1/2}, {1/Sqrt[2], 0, -(1/Sqrt[2])}, {1/2, -(1/Sqrt[2]), 1/2}}, {{1/2, -(1/Sqrt[2]), 1/2}, {-(1/Sqrt[2]), 0, 1/Sqrt[2]}, {1/2, 1/Sqrt[2], 1/2}}, {{I/2, I/Sqrt[2], I/2}, {1/Sqrt[2], 0, -(1/Sqrt[2])}, {-I/2, I/Sqrt[2], -I/2}}, {{-I/2, 1/Sqrt[2], I/2}, {(-I)/Sqrt[2], 0, (-I)/Sqrt[2]}, {-I/2, -(1/Sqrt[2]), I/2}}, {{-I/2, -(1/Sqrt[2]), I/2}, {I/Sqrt[2], 0, I/Sqrt[2]}, {-I/2, 1/Sqrt[2], I/2}}, {{I/2, (-I)/Sqrt[2], I/2}, {-(1/Sqrt[2]), 0, 1/Sqrt[2]}, {-I/2, (-I)/Sqrt[2], -I/2}}, {{I/2, 1/Sqrt[2], -I/2}, {I/Sqrt[2], 0, I/Sqrt[2]}, {I/2, -(1/Sqrt[2]), -I/2}}, {{-I/2, (-I)/Sqrt[2], -I/2}, {1/Sqrt[2], 0, -(1/Sqrt[2])}, {I/2, (-I)/Sqrt[2], I/2}}, {{-I/2, I/Sqrt[2], -I/2}, {-(1/Sqrt[2]), 0, 1/Sqrt[2]}, {I/2, I/Sqrt[2], I/2}}, {{I/2, -(1/Sqrt[2]), -I/2}, {(-I)/Sqrt[2], 0, (-I)/Sqrt[2]}, {I/2, 1/Sqrt[2], -I/2}}, {{I, 0, 0}, {0, -1, 0}, {0, 0, -I}}, {{-I, 0, 0}, {0, -1, 0}, {0, 0, I}}, {{-1/2, 1/Sqrt[2], -1/2}, {-(1/Sqrt[2]), 0, 1/Sqrt[2]}, {-1/2, -(1/Sqrt[2]), -1/2}}, {{-1/2, -(1/Sqrt[2]), -1/2}, {1/Sqrt[2], 0, -(1/Sqrt[2])}, {-1/2, 1/Sqrt[2], -1/2}}, {{-1/2, (-I)/Sqrt[2], 1/2}, {(-I)/Sqrt[2], 0, (-I)/Sqrt[2]}, {1/2, (-I)/Sqrt[2], -1/2}}, {{-1/2, I/Sqrt[2], 1/2}, {I/Sqrt[2], 0, I/Sqrt[2]}, {1/2, I/Sqrt[2], -1/2}}, {{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {{0, 0, -1}, {0, 1, 0}, {-1, 0, 0}}, {{0, 0, 1}, {0, 1, 0}, {1, 0, 0}}},{{{1, 0, 0}, {0, 1, 0}, {0, 0, 1}}, {{0, 0, -I}, {0, 1, 0}, {I, 0, 0}}, {{0, 0, I}, {0, 1, 0}, {-I, 0, 0}}, {{1/2, I/Sqrt[2], 1/2}, {(-I)/Sqrt[2], 0, I/Sqrt[2]}, {1/2, (-I)/Sqrt[2], 1/2}}, {{1/2, (-I)/Sqrt[2], 1/2}, {I/Sqrt[2], 0, (-I)/Sqrt[2]}, {1/2, I/Sqrt[2], 1/2}}, {{1/2, 1/Sqrt[2], -1/2}, {1/Sqrt[2], 0, 1/Sqrt[2]}, {-1/2, 1/Sqrt[2], 1/2}}, {{1/2, -(1/Sqrt[2]), -1/2}, {-(1/Sqrt[2]), 0, -(1/Sqrt[2])}, {-1/2, -(1/Sqrt[2]), 1/2}}, {{I/2, I/Sqrt[2], -I/2}, {-(1/Sqrt[2]), 0, -(1/Sqrt[2])}, {I/2, (-I)/Sqrt[2], -I/2}}, {{-I/2, -(1/Sqrt[2]), -I/2}, {(-I)/Sqrt[2], 0, I/Sqrt[2]}, {I/2, -(1/Sqrt[2]), I/2}}, {{-I/2, 1/Sqrt[2], -I/2}, {I/Sqrt[2], 0, (-I)/Sqrt[2]}, {I/2, 1/Sqrt[2], I/2}}, {{I/2, (-I)/Sqrt[2], -I/2}, {1/Sqrt[2], 0, 1/Sqrt[2]}, {I/2, I/Sqrt[2], -I/2}}, {{I/2, -(1/Sqrt[2]), I/2}, {I/Sqrt[2], 0, (-I)/Sqrt[2]}, {-I/2, -(1/Sqrt[2]), -I/2}}, {{-I/2, (-I)/Sqrt[2], I/2}, {-(1/Sqrt[2]), 0, -(1/Sqrt[2])}, {-I/2, I/Sqrt[2], I/2}}, {{-I/2, I/Sqrt[2], I/2}, {1/Sqrt[2], 0, 1/Sqrt[2]}, {-I/2, (-I)/Sqrt[2], I/2}}, {{I/2, 1/Sqrt[2], I/2}, {(-I)/Sqrt[2], 0, I/Sqrt[2]}, {-I/2, 1/Sqrt[2], -I/2}}, {{-I, 0, 0}, {0, -1, 0}, {0, 0, I}}, {{I, 0, 0}, {0, -1, 0}, {0, 0, -I}}, {{-1/2, 1/Sqrt[2], 1/2}, {-(1/Sqrt[2]), 0, -(1/Sqrt[2])}, {1/2, 1/Sqrt[2], -1/2}}, {{-1/2, -(1/Sqrt[2]), 1/2}, {1/Sqrt[2], 0, 1/Sqrt[2]}, {1/2, -(1/Sqrt[2]), -1/2}}, {{-1/2, I/Sqrt[2], -1/2}, {I/Sqrt[2], 0, (-I)/Sqrt[2]}, {-1/2, (-I)/Sqrt[2], -1/2}}, {{-1/2, (-I)/Sqrt[2], -1/2}, {(-I)/Sqrt[2], 0, I/Sqrt[2]}, {-1/2, I/Sqrt[2], -1/2}}, {{-1, 0, 0}, {0, 1, 0}, {0, 0, -1}}, {{0, 0, -1}, {0, -1, 0}, {-1, 0, 0}}, {{0, 0, 1}, {0, -1, 0}, {1, 0, 0}}, {{-1, 0, 0}, {0, -1, 0}, {0, 0, -1}}, {{0, 0, I}, {0, -1, 0}, {-I, 0, 0}}, {{0, 0, -I}, {0, -1, 0}, {I, 0, 0}}, {{-1/2, (-I)/Sqrt[2], -1/2}, {I/Sqrt[2], 0, (-I)/Sqrt[2]}, {-1/2, I/Sqrt[2], -1/2}}, {{-1/2, I/Sqrt[2], -1/2}, {(-I)/Sqrt[2], 0, I/Sqrt[2]}, {-1/2, (-I)/Sqrt[2], -1/2}}, {{-1/2, -(1/Sqrt[2]), 1/2}, {-(1/Sqrt[2]), 0, -(1/Sqrt[2])}, {1/2, -(1/Sqrt[2]), -1/2}}, {{-1/2, 1/Sqrt[2], 1/2}, {1/Sqrt[2], 0, 1/Sqrt[2]}, {1/2, 1/Sqrt[2], -1/2}}, {{-I/2, (-I)/Sqrt[2], I/2}, {1/Sqrt[2], 0, 1/Sqrt[2]}, {-I/2, I/Sqrt[2], I/2}}, {{I/2, 1/Sqrt[2], I/2}, {I/Sqrt[2], 0, (-I)/Sqrt[2]}, {-I/2, 1/Sqrt[2], -I/2}}, {{I/2, -(1/Sqrt[2]), I/2}, {(-I)/Sqrt[2], 0, I/Sqrt[2]}, {-I/2, -(1/Sqrt[2]), -I/2}}, {{-I/2, I/Sqrt[2], I/2}, {-(1/Sqrt[2]), 0, -(1/Sqrt[2])}, {-I/2, (-I)/Sqrt[2], I/2}}, {{-I/2, 1/Sqrt[2], -I/2}, {(-I)/Sqrt[2], 0, I/Sqrt[2]}, {I/2, 1/Sqrt[2], I/2}}, {{I/2, I/Sqrt[2], -I/2}, {1/Sqrt[2], 0, 1/Sqrt[2]}, {I/2, (-I)/Sqrt[2], -I/2}}, {{I/2, (-I)/Sqrt[2], -I/2}, {-(1/Sqrt[2]), 0, -(1/Sqrt[2])}, {I/2, I/Sqrt[2], -I/2}}, {{-I/2, -(1/Sqrt[2]), -I/2}, {I/Sqrt[2], 0, (-I)/Sqrt[2]}, {I/2, -(1/Sqrt[2]), I/2}}, {{I, 0, 0}, {0, 1, 0}, {0, 0, -I}}, {{-I, 0, 0}, {0, 1, 0}, {0, 0, I}}, {{1/2, -(1/Sqrt[2]), -1/2}, {1/Sqrt[2], 0, 1/Sqrt[2]}, {-1/2, -(1/Sqrt[2]), 1/2}}, {{1/2, 1/Sqrt[2], -1/2}, {-(1/Sqrt[2]), 0, -(1/Sqrt[2])}, {-1/2, 1/Sqrt[2], 1/2}}, {{1/2, (-I)/Sqrt[2], 1/2}, {(-I)/Sqrt[2], 0, I/Sqrt[2]}, {1/2, I/Sqrt[2], 1/2}}, {{1/2, I/Sqrt[2], 1/2}, {I/Sqrt[2], 0, (-I)/Sqrt[2]}, {1/2, (-I)/Sqrt[2], 1/2}}, {{1, 0, 0}, {0, -1, 0}, {0, 0, 1}}, {{0, 0, 1}, {0, 1, 0}, {1, 0, 0}}, {{0, 0, -1}, {0, 1, 0}, {-1, 0, 0}}}};
@@ -98,7 +98,7 @@ Ord[px_,py_,pz_] := Module[{},
 rotations (written as permutation) in the little group of the chosen momentum.
 Note two tables are added for convenience:
 permutationTable == permTab[0,0,0]
-and 
+and
 inversepermutationTable == permutationTable^-1
 *)
 permutationTable = {{ax -> bx, ay -> by, az -> bz},{ax -> by, ay -> bx, az -> -bz},{ax -> -by, ay -> -bx, az -> -bz},{ax -> -bx, ay -> bz, az -> by},{ax -> -bx, ay -> -bz, az -> -by},{ax -> bz, ay -> -by, az -> bx},{ax -> -bz, ay -> -by, az -> -bx},{ax -> -by, ay -> -bz, az -> bx},{ax -> bz, ay -> -bx, az -> -by},{ax -> -bz, ay -> -bx, az -> by},{ax -> -by, ay -> bz, az -> -bx},{ax -> bz, ay -> bx, az -> by},{ax -> by, ay -> bz, az -> bx},{ax -> by, ay -> -bz, az -> -bx},{ax -> -bz, ay -> bx, az -> -by},{ax -> -by, ay -> bx, az -> bz},{ax -> by, ay -> -bx, az -> bz},{ax -> bz, ay -> by, az -> -bx},{ax -> -bz, ay -> by, az -> bx},{ax -> bx, ay -> bz, az -> -by},{ax -> bx, ay -> -bz, az -> by},{ax -> -bx, ay -> -by, az -> bz},{ax -> -bx, ay -> by, az -> -bz},{ax -> bx, ay -> -by, az -> -bz},{ax -> -bx, ay -> -by, az -> -bz},{ax -> -by, ay -> -bx, az -> bz},{ax -> by, ay -> bx, az -> bz},{ax -> bx, ay -> -bz, az -> -by},{ax -> bx, ay -> bz, az -> by},{ax -> -bz, ay -> by, az -> -bx},{ax -> bz, ay -> by, az -> bx},{ax -> by, ay -> bz, az -> -bx},{ax -> -bz, ay -> bx, az -> by},{ax -> bz, ay -> bx, az -> -by},{ax -> by, ay -> -bz, az -> bx},{ax -> -bz, ay -> -bx, az -> -by},{ax -> -by, ay -> -bz, az -> -bx},{ax -> -by, ay -> bz, az -> bx},{ax -> bz, ay -> -bx, az -> by},{ax -> by, ay -> -bx, az -> -bz},{ax -> -by, ay -> bx, az -> -bz},{ax -> -bz, ay -> -by, az -> bx},{ax -> bz, ay -> -by, az -> -bx},{ax -> -bx, ay -> -bz, az -> by},{ax -> -bx, ay -> bz, az -> -by},{ax -> bx, ay -> by, az -> -bz},{ax -> bx, ay -> -by, az -> bz},{ax -> -bx, ay -> by, az -> bz}};
@@ -145,13 +145,13 @@ findPerm[p1_, p2_] := findPerm[p1, p2] = Module[{res, i = 0, lperm = Length[perm
    permutationTable[[i]]];
 
 (*Naming conventions for the irreps of the given momentum*)
-IrrepName[0,0,0] = {A1plusOhP, A2plusOhP, EplusOhP, T1plusOhP, T2plusOhP, 
+IrrepName[0,0,0] = {A1plusOhP, A2plusOhP, EplusOhP, T1plusOhP, T2plusOhP,
     A1minusOhP, A2minusOhP, EminusOhP, T1minusOhP, T2minusOhP};
 IrrepName[0,0,1] = {A1Dic4, A2Dic4, E2Dic4, B1Dic4, B2Dic4};
 IrrepName[0,1,1] = {A1Dic2, A2Dic2, B1Dic2, B2Dic2};
 IrrepName[1,1,1] = {A1Dic3, A2Dic3, EEDic3};
 IrrepName[px_,py_,pz_] := Module[{Pxsort,Pysort,Pzsort,gcd},
-         gcd = Max[GCD[px, py, pz], 1];             
+         gcd = Max[GCD[px, py, pz], 1];
   {Pxsort,Pysort,Pzsort}=Sort[{px/gcd,py/gcd,pz/gcd}//Abs];
   IrrepName[px,py,pz]=IrrepName[Pxsort,Pysort,Pzsort];
   IrrepName[px,py,pz]];
@@ -199,9 +199,9 @@ MyRangeString[min_, max_] := Module[{string = ""},
    string];
 
 
-(*This function defines the unique string for 2tr operators  pratically defined by: 
+(*This function defines the unique string for 2tr operators  pratically defined by:
 pxout, pyout, pzout, irrepidxout, irrepevout, charge, path1, px1, py1, pz1, irrepidx1, charge1, path2, px2, py2, pz2, irrepidx2, charge2*)
-Set2trstring[pxout_, pyout_, pzout_, irrepidxout_, irrepevout_, charge_, path1_, px1_, py1_, pz1_, irrepidx1_, charge1_, path2_, px2_, py2_, pz2_, irrepidx2_, charge2_] := 
+Set2trstring[pxout_, pyout_, pzout_, irrepidxout_, irrepevout_, charge_, path1_, px1_, py1_, pz1_, irrepidx1_, charge1_, path2_, px2_, py2_, pz2_, irrepidx2_, charge2_] :=
   Module[{psx1, psy1, psz1, psx2, psy2, psz2, psxout, psyout, pszout, irnameout, irname1, irname2, stringout, string1, string2, s1, s2, string,step},
    {psx1, psy1, psz1} = Sort[{px1, py1, pz1} // Abs];
    {psx2, psy2, psz2} = Sort[{px2, py2, pz2} // Abs];
@@ -220,8 +220,8 @@ Set2trstring[pxout_, pyout_, pzout_, irrepidxout_, irrepevout_, charge_, path1_,
    Do[step = s2[[i]] //. {ax -> x, ay -> y, az -> z};
       string2 = string2 <> ToString[step];
     , {i, 1, Length[s2]}];
-   If[OrderedQ[{string1, string2}], 
-      string = string1 <> "_" <> string2;, 
+   If[OrderedQ[{string1, string2}],
+      string = string1 <> "_" <> string2;,
       string = string2 <> "_" <> string1;
     ];
   stringout <> string];
@@ -236,10 +236,10 @@ Set2trOpidx[string_, pxout_, pyout_, pzout_, irrepidxout_, irrepevout_, charge_]
   tmp = Opindex[pxout, pyout, pzout, irrepidxout, charge];
   (*lstring contains only part of the string because the multiplet is created by the same set of operators but with different ev.
   To this end we take only the part of the string that doesn't contain the ev.*)
-  
+
   lstring = StringSplit[string, "_", 4][[-1]];
 
-  (*We select all the elements that match the pattern, at most one multiplet can match*)  
+  (*We select all the elements that match the pattern, at most one multiplet can match*)
   stringelem = Position[tmp, _?(StringQ[#] &)]; (*all the strings in opindex for the given channel*)
   pos = {};
   Do[
@@ -314,8 +314,8 @@ Add2trOpCorrelators[path1_,px1_, py1_, pz1_, irrepidx1_,charge1_, path2_,px2_, p
   res1 = res1 //. aa[0,_,_] -> 0;
 
   res1 = Expand[res1 //. { oo[ {a2__}] :> oo[ a2 ] }];
-  If[Head[res1] == Plus, 
-    res2 = Table[res1[[i]], {i, 1, Length[res1]}];, 
+  If[Head[res1] == Plus,
+    res2 = Table[res1[[i]], {i, 1, Length[res1]}];,
     res2 = {res1} ;
   ];
   cg=res2 //. aa[A_,oo[B__],oo[C__]] :> {A,{B},{C}};
@@ -341,13 +341,13 @@ Add2trOpCorrelators[path1_,px1_, py1_, pz1_, irrepidx1_,charge1_, path2_,px2_, p
     lridx2=cg[[i, 3, 5]];
     lchg2=cg[[i, 3, 6]];
     lpath2=cg[[i, 3, 7]];
-    
-    
+
+
     lres+=Add1trOpCorrelators[lpx1, lpy1, lpz1, lridx1, lev1, lchg1, lpath1];
     lres+=Add1trOpCorrelators[lpx2, lpy2, lpz2, lridx2, lev2, lchg2, lpath2];
-    
+
     If[lres==2,
-      AppendTo[cg1,cg[[i]]]; 
+      AppendTo[cg1,cg[[i]]];
       res+=lres;
     ];
   ,{i,1,Length[cg]}];
@@ -357,9 +357,9 @@ Add2trOpCorrelators[path1_,px1_, py1_, pz1_, irrepidx1_,charge1_, path2_,px2_, p
   ,
 
     Print["Generated 2tr Operator : ",cg,"\n Total P=(",pxout,",", pyout,",", pzout,")\n Irrep=",IrrepName[pxout,pyout,pzout][[irrepidxout]],
-        "\n Irrep ev=",irrepevout,"/",Length[bTOrthog[pxout,pyout,pzout][[irrepidxout]]],"\n Charge=",charge]; 
+        "\n Irrep ev=",irrepevout,"/",Length[bTOrthog[pxout,pyout,pzout][[irrepidxout]]],"\n Charge=",charge];
     Print["Two traces glueball operator added to the correlator list.\n\n"];
- 
+
     str = Set2trstring[pxout, pyout, pzout, irrepidxout, irrepevout, charge, path1, px1, py1, pz1, irrepidx1, charge1, path2, px2, py2, pz2, irrepidx2, charge2];
     PrependTo[cg,str];
     Set2trOpidx[str, pxout, pyout, pzout, irrepidxout, irrepevout, charge];
@@ -367,7 +367,7 @@ Add2trOpCorrelators[path1_,px1_, py1_, pz1_, irrepidx1_,charge1_, path2_,px2_, p
   ];
 ];
 
-(* This function generates the position operator in the given irrep. 
+(* This function generates the position operator in the given irrep.
 The code checks if the path gives rise to a position operator that already exists.
 All the indexing is done in OpGenerate
 *)
@@ -390,7 +390,7 @@ Add1trOpCorrelators[px_, py_, pz_, irrepidx_, irrepev_, charge_, path_]:= Add1tr
   (*First generate the operator for the given simmetry channel, only if it doesn't exists in the multiplet already*)
   If[eval,
     res=OpGenerate[px, py, pz, irrepidx, irrepev, charge, path];
-  
+
     If[SameQ[res,0],
       Print["Input path : ",path,"\n Generated 1tr Operator : ",res,"\n Total P=(",px,",", py,",", pz,")\n Irrep=",IrrepName[px,py,pz][[irrepidx]],
         "\n Irrep ev=",irrepev,"/",Length[bTOrthog[px,py,pz][[irrepidx]]],"\n Charge=",charge];
@@ -399,7 +399,7 @@ Add1trOpCorrelators[px_, py_, pz_, irrepidx_, irrepev_, charge_, path_]:= Add1tr
       success=1;
 
       Print["Input path : ",path,"\n Generated 1tr Operator : ",res,"\n Total P=(",px,",", py,",", pz,")\n Irrep=",IrrepName[px,py,pz][[irrepidx]],
-        "\n Irrep ev=",irrepev,"/",Length[bTOrthog[px,py,pz][[irrepidx]]],"\n Charge=",charge]; 
+        "\n Irrep ev=",irrepev,"/",Length[bTOrthog[px,py,pz][[irrepidx]]],"\n Charge=",charge];
       Print["One trace glueball operator added to the correlator list.\n\n"];
     ];
   ];
@@ -430,7 +430,7 @@ OpGenerate[px_, py_, pz_, irrepidx_, irrepev_, charge_, path_] := Module[{res,re
   (* This shift represents the difference in position between the shifted and fundamental operators*)
   (* The shift doesn't affect the Conjugate *)
   res = OpSimplify[res];
-  
+
   (*Here we get rid of the shifts that are not useful*)
   If[px==0,res=res //. P[A__][ax_,ay_,az_] :>  P[A][0,ay,az]];
   If[py==0,res=res //. P[A__][ax_,ay_,az_] :>  P[A][ax,0,az]];
@@ -449,7 +449,7 @@ OpGenerate[px_, py_, pz_, irrepidx_, irrepev_, charge_, path_] := Module[{res,re
 
   (* So far we have generated and simplified the operator, we must now check that it doesn't already exist.
   Note the that the operator has to be still summed over the lattice for the given momentum, but we have already incorporated all the shifts*)
-  
+
   If[Not[SameQ[res1,0]],
     (*First we check that Opindex is initialized for the given simmetry channel*)
     If[Not[ListQ[Opindex[px, py, pz, irrepidx, charge]]],
@@ -483,14 +483,14 @@ OpGenerate[px_, py_, pz_, irrepidx_, irrepev_, charge_, path_] := Module[{res,re
     res={res1, opnum};
   ,
     res=0;
-  ];  
+  ];
 
   res
 ];
-  
-  
-  
-(*This function takes all the P[..] elements in a and writes them in terms of the fundamental paths with their shifts, 
+
+
+
+(*This function takes all the P[..] elements in a and writes them in terms of the fundamental paths with their shifts,
  it generates also the class of related operators through PathUniqueIdentifier*)
 
 OpSimplify[ain_] := Module[{ris = ain, Ptemp, tmpris, i, normalization, sqrt},
@@ -565,7 +565,7 @@ This function generates the C checks and writes them in the file checkgbfunction
 The idea is to generate the list of operators on a random con O, rotate the configuration with rotation (i) and generate again the operator Oi.
 The rotation matrix are contained in irrepsetorthog  we check component by component O=irreppsetothog.O'.
 To this end we need to evaluate that all the ev of the given irrep for the given operators have been evaluated (and only then we will generate the checks).
-The function need no input, it goes though Opindex to find the operators and uses 
+The function need no input, it goes though Opindex to find the operators and uses
 MapOptoCindex for the C indetification of the operators and Oplist for the report in case of error
 *)
 GenerateCchecks[]:=Module[{Op,OpTmp,ar,irrepdim,EvaluatedQ,RMatrixOp, TorTmp,RMatrixTor,Tor,Px, Py, Pz, irrepindex, i, charge},
@@ -573,7 +573,7 @@ GenerateCchecks[]:=Module[{Op,OpTmp,ar,irrepdim,EvaluatedQ,RMatrixOp, TorTmp,RMa
   WriteString[ar,"/*This is an automatically generated function, do not edit.*/\n#define Complex(a,b) ((a)+I*(b))\nstatic int fullgbcheck(int rotid, double complex *rotated, double complex *unrotated)\n{\n#define rotfun(a) rotated[(a)]\n#define unrotfun(a) unrotated[(a)]\n#if total_n_glue_op>0\ndouble complex tmp[3];\n#endif\nint return_value=0;\n"];
   Do[
     Do[
-      Do[ 
+      Do[
         If[ListQ[Opindex[Px,Py,Pz,irrepindex,charge]],
           Print["Now checking P="<>ToString[{Px,Py,Pz}]<>"."];
           irrepdim=Length[bTOrthog[Px,Py,Pz][[irrepindex]]];
@@ -625,7 +625,7 @@ if(sqrt(creal(tmp[2]))>=1.e-10){
   WriteString[ar,"/*This is an automatically generated function, do not edit.*/\n#define Complex(a,b) ((a)+I*(b))\nstatic int fulltorcheck(int rotid, double complex *rotated, double complex *unrotated)\n{\n#define rotfun(a) rotated[(a)]\n#define unrotfun(a) unrotated[(a)]\n#if total_n_tor_op>0\ndouble complex tmp[3];\n#endif\nint return_value=0;\n"];
   Do[
     Do[
-      Do[ 
+      Do[
         If[ListQ[Torindex[Px,Py,Pz,irrepindex,charge]],
           Print["Now checking P="<>ToString[{Px,Py,Pz}]<>"."];
           irrepdim=Length[bTOrthog[Px,Py,Pz][[irrepindex]]];
@@ -674,10 +674,10 @@ if(sqrt(creal(tmp[2]))>=1.e-10){
   ,{Px,-1,1},{Py,-1,1},{Pz,-1,1}];
   WriteString[ar,"#undef unrotfunreturn\n#undef rotfun\n#undef Complex\nreturn return_value;\n}\n"];
   Close[ar];
-  
-  
-  
-  
+
+
+
+
   ]
 
 
@@ -723,9 +723,9 @@ In C it will generate the functions pathn  where is is the unique pathid.
   Close[ar];
   WrittenPaths[lidx]=1;
   ]
-(*This functions generate the report string: 
+(*This functions generate the report string:
 The string will contains "na"  for each element of the multiplets missing, if the multiplet is partially evaluated*)
-TorGroupStringPaths[px_, py_, pz_, iridx_, charge_] := 
+TorGroupStringPaths[px_, py_, pz_, iridx_, charge_] :=
   Module[{res = Torindex[px, py, pz, iridx, charge], string = "|",tmpstring,i,j,lpath,step},
   Do[
     Do[
@@ -749,15 +749,15 @@ lpath=Drop[lpath,-1];
     string = string <> "|";
   ,{i, 1, Length[res]}];
   string]
-  
-(*This functions generate the report string: for 1tr operators is just the path, 
-for multi tr operator is the long identification string. 
+
+(*This functions generate the report string: for 1tr operators is just the path,
+for multi tr operator is the long identification string.
 The string will contains "na"  for each element of the multiplets missing, if the multiplet is partially evaluated*)
-OpGroupStringPaths[px_, py_, pz_, iridx_, charge_] := 
+OpGroupStringPaths[px_, py_, pz_, iridx_, charge_] :=
   Module[{res = Opindex[px, py, pz, iridx, charge], string = "|",tmpstring,i,j,lpath,step},
   Do[
     Do[
-      If[NumberQ[ res[[i, j]] ] , 
+      If[NumberQ[ res[[i, j]] ] ,
         If[res[[i, j]] > 0,
           string=string<>ToString[MapOptoCindex[px, py, pz, iridx, charge, res[[i, j]]]]<>"=";
           lpath=OpList[px, py, pz, iridx, charge,res[[i, j]]];
@@ -780,15 +780,15 @@ OpGroupStringPaths[px_, py_, pz_, iridx_, charge_] :=
     string = string <> "|";
   ,{i, 1, Length[res]}];
   string]
-  
- 
+
+
  (*
  This is the routine that goes through the lists and prints the code.
  This is a rather wordy routine, in the end it creates the 3 files headers, routines, checks.
  It also fills the MapOptoCindex.
  More deatails are included in the comments bellow.
  *)
-  
+
   GenerateCcode[]:=Module[{rmfiles,idop,opnumberC,localoplist,locmemorymap,testmap,cs,startbase,evalpaths,res,ir1,ir2,path1,path2,llist,lcoeff,locallistop,listelem,lcharge1,lcharge2,llpx1,llpy1,llpz1,llpx2,llpy2,llpz2,llev1,llev2,relsign,ar,opnumber},
   rmfiles=FileNames[{opfilename, checkgbfunctionsfilename, checktorfunctionsfilename, headerfilename, torfilename}];
   DeleteFile[rmfiles];
@@ -826,7 +826,7 @@ OpGroupStringPaths[px_, py_, pz_, iridx_, charge_] :=
   ,{i,1,48}];
   WriteString[ar,"return res;\n}\n "];
   Close[ar];
-  
+
    ar=OpenAppend[torfilename, FormatType -> InputForm];
    WriteString[ar, "
 #include <stdlib.h>
@@ -869,9 +869,9 @@ OpGroupStringPaths[px_, py_, pz_, iridx_, charge_] :=
  WriteTorellonsCfiles[tornumberC];
 
   GenerateCheader[opnumberC,tornumberC];
-  
+
   GenerateCchecks[];
-  
+
   ]
 
 
@@ -920,14 +920,14 @@ OpGroupStringPaths[px_, py_, pz_, iridx_, charge_] :=
   ,{opidx,listopidx}];
 
   ]
-  
+
   (*Map of the global shifts*)
   stringshift[opfilename]="";
   stringshift[torfilename]="";
    WriteShift[shift_,filename_]:=Module[{cc=ExpandAll[shift],ar},
   If[Not[NumberQ[stringshiftidx[filename]]],
   stringshiftidx[filename]=0;
- 
+
     ];
     If[Not[StringQ[MapShifts[filename,cc]]],
       MapShifts[filename,cc]="c"<>ToString[stringshiftidx[filename]];
@@ -940,10 +940,10 @@ OpGroupStringPaths[px_, py_, pz_, iridx_, charge_] :=
   ];
 
   sign[ain_]:=Module[{res},If[ain>0,res="+",res="-"];res];
-  
+
 
     (*Function to write the coefficients in C*)
-  GenerateCoefficientString[coef_]:=GenerateCoefficientString[coef]=Module[{cc=ExpandAll[coef],string=""},    
+  GenerateCoefficientString[coef_]:=GenerateCoefficientString[coef]=Module[{cc=ExpandAll[coef],string=""},
     If[Not[StringQ[OpConsts[cc]]],
       If[Abs[cc]!=1,
         If[Re[cc]!=0,string=ToString[CForm[N[Re[cc], 18]]]];
@@ -1041,7 +1041,7 @@ AddTorCorrelators[px_, py_, pz_, irrepidx_, irrepev_, charge_, path_]:= AddTorCo
   (*First generate the operator for the given simmetry channel, only if it doesn't exists in the multiplet already*)
   If[eval,
     res=TorGenerate[px, py, pz, irrepidx, irrepev, charge, path];
-  
+
     If[SameQ[res,0],
       Print["Input path : ",path,"\n Generated Torellon Operator : ",res,"\n Total P=(",px,",", py,",", pz,")\n Irrep=",IrrepName[px,py,pz][[irrepidx]],
         "\n Irrep ev=",irrepev,"/",Length[bTOrthog[px,py,pz][[irrepidx]]],"\n Charge=",charge];
@@ -1050,7 +1050,7 @@ AddTorCorrelators[px_, py_, pz_, irrepidx_, irrepev_, charge_, path_]:= AddTorCo
       success=1;
 
       Print["Input path : ",path,"\n Generated Torellon Operator : ",res,"\n Total P=(",px,",", py,",", pz,")\n Irrep=",IrrepName[px,py,pz][[irrepidx]],
-        "\n Irrep ev=",irrepev,"/",Length[bTOrthog[px,py,pz][[irrepidx]]],"\n Charge=",charge]; 
+        "\n Irrep ev=",irrepev,"/",Length[bTOrthog[px,py,pz][[irrepidx]]],"\n Charge=",charge];
       Print["Torellon operator added to the correlator list.\n\n"];
     ];
 
@@ -1129,7 +1129,7 @@ ris = ris //. P[A__] -> List[A];
 ris = ris //. {{dir,A1___} ->{A1},{A1___,dir} ->{A1}};
 shift = (ris//. List :> Plus);
 pshift = {0,0,0}+(shift//. {ax -> {1,0,0},ay->{0,1,0},az->{0,0,1}});
-(**)  
+(**)
 If[IsInPositive[dir],
 absdir=dir;
 ris = ris //. List[A1___] :> P1[A1,L[dir]-shift][0,0,0];
@@ -1171,7 +1171,7 @@ TorList[1]=P[L[ay]];
 TorList[2]=P[L[az]];
 torindex=3;
 npolydist=0;
- 
+
 TorUniqueIndex[ain_]:=TorUniqueIdentifier[ain][[2]];
 
 
@@ -1183,7 +1183,7 @@ TorUniqueIndex[ain_]:=TorUniqueIdentifier[ain][[2]];
   WriteString[ar, "{\n"];
    steps = TorList[idx] //. P[A__] :> List[A];
    pleg=Last[steps]//. Plus -> List;
-  
+
   pleg=pleg //. {a1_,L[a2_]} :>  {-a1/a2,a2};
   If[pleg[[1]]>npolydist,npolydist=pleg[[1]]];
   pleg=pleg //. L[d1_] -> {0,d1};
@@ -1197,7 +1197,7 @@ TorUniqueIndex[ain_]:=TorUniqueIdentifier[ain][[2]];
     WriteString[ar, "_suNg_dagger(res1,*w2);\n"];
     WriteString[ar, "w2 = &res1;\n"];
   ];
-  
+
   (**)
   Do[
     If[posdir[steps[[i - 1]]] && posdir[steps[[i]]],  WriteString[ar, "site = iup_wrk(site, ", dir[steps[[i-1]]], ");\n"];];
@@ -1217,8 +1217,8 @@ TorUniqueIndex[ain_]:=TorUniqueIdentifier[ain][[2]];
       WriteString[ar, "res, res1, *w1);\n\n"];];
     ];
   ,{i, 2, Length[steps]-1}];
-  
-  
+
+
   WriteString[ar, "wl=polyleg(in,",dir[pleg[[2]]],");\n\n"];
 
   If[OddQ[pleg[[1]]-1],WriteString[ar, "_suNg_times_suNg(res1,res,wl->p[",pleg[[1]]-1,"]);\n"];
@@ -1230,7 +1230,7 @@ TorUniqueIndex[ain_]:=TorUniqueIdentifier[ain][[2]];
     (**)
 
   WriteString[ar, "return polyleg(in,",dir[pleg[[2]]],")->tr;\n}\n\n"];
-  
+
   ];
   Close[ar];
   WrittenPoly[idx]=1;
@@ -1296,7 +1296,7 @@ TorUniqueIndex[ain_]:=TorUniqueIdentifier[ain][[2]];
     Close[ar];
   ,{toridx,listtoridx}];
   ];
-  
+
 
 
 
@@ -1326,7 +1326,7 @@ void eval_time_momentum_glueball_paths(int t, int px, int py, int pz)
   WriteString[ar,"for (nnx = 0; nnx < X; nnx++)\nfor (nny = 0; nny < Y; nny++)\nfor (nnz = 0; nnz < Z; nnz++)\n{\n"];
   WriteString[ar,"in = ipt(t, nnx, nny, nnz);\nce = cexp(I * 2.0 * PI * (double)(nnx * px + nny * py + nnz * pz) / GLB_X);\n"];
   WriteString[ar,"idx = npaths * (nnx + X * (nny + Y * nnz));\n"];
-  Do[ 
+  Do[
     If[NumberQ[WrittenPaths[i]],
       WriteString[ar,"path_storage[",i,"+idx]= path",i,"(in);\nmom_def_Cp_tr_paths[",i,"]+=ce*creal(path_storage[",i,"+idx]);"];
       WriteString[ar,"\nmom_def_Cm_tr_paths[",i,"]+=I*ce*cimag(path_storage[",i,"+idx]);\n"];
@@ -1336,14 +1336,14 @@ void eval_time_momentum_glueball_paths(int t, int px, int py, int pz)
   WriteString[ar,"for (nnx = 0; nnx < X; nnx++)\nfor (nny = 0; nny < Y; nny++)\nfor (nnz = 0; nnz < Z; nnz++)\n{\n"];
   WriteString[ar,"ce = cexp(I * 2.0 * PI * (double)(nnx * px + nny * py + nnz * pz) / GLB_X);\n"];
   WriteString[ar,"idx = npaths * (nnx + X * (nny + Y * nnz));\n"];
-  
+
   WriteString[ar,"for (int i = 0; i < ",pathindex,"; i++)\n{\nmom_def_Cp_tr_paths[i]+=ce*creal(path_storage[i+idx]);\n"];
   WriteString[ar,"mom_def_Cm_tr_paths[i]+=I*ce*cimag(path_storage[i+idx]);\n}\n"];
 
-  
+
   WriteString[ar,"}\n}\n};\n"];
   (**)
-  (*In this block we combine the evaluation of momentum projected trace with the evaluation of the 1tr operators first 
+  (*In this block we combine the evaluation of momentum projected trace with the evaluation of the 1tr operators first
   and then we recombine them to create the multi trace operators*)
   WriteString[ar, "void eval_all_glueball_ops(int t, double complex *numerical_op_out)
 {
@@ -1360,7 +1360,7 @@ void eval_time_momentum_glueball_paths(int t, int px, int py, int pz)
       Do[
         (*evaluation of momentum projection is needed only for 1tr operators*)
         If[ListQ[Opindex[px, py, pz, irrepidx,charge]],
-          If[evalpaths==0 &&  Select[Flatten[Opindex[px, py, pz, irrepidx,charge]], IntegerQ[#] && # > 0 &] !={}, 
+          If[evalpaths==0 &&  Select[Flatten[Opindex[px, py, pz, irrepidx,charge]], IntegerQ[#] && # > 0 &] !={},
             WriteString[ar,"    eval_time_momentum_glueball_paths(t,",px,",",py,",",pz,");\n"];
             evalpaths=1;
           ];
@@ -1397,14 +1397,14 @@ Do[
       Do[
         If[ListQ[Opindex[px, py, pz, irrepidx,charge]] ,
           Do[
-            locallistop=Select[Flatten[Opindex[px, py, pz, irrepidx,charge][[All,irrepev]]],StringQ[#]&];            
+            locallistop=Select[Flatten[Opindex[px, py, pz, irrepidx,charge][[All,irrepev]]],StringQ[#]&];
             Do[
               listelem=OpList[px, py, pz, irrepidx,charge, opstr];
               opnumber=MapOptoCindex[px,py,pz,irrepidx,charge,listelem[[1]]];
               WriteString[ar, "    *(numerical_op+",opnumber,")="];
               Do[
                 lcoeff=listelem[[cgid,1]];
-               
+
                 llpx1=listelem[[cgid, 2, 1]];
                 llpy1=listelem[[cgid, 2, 2]];
                 llpz1=listelem[[cgid, 2, 3]];
@@ -1412,7 +1412,7 @@ Do[
                 llev1=listelem[[cgid, 2, 5]];
                 lcharge1=listelem[[cgid, 2, 6]];
                 path1=listelem[[cgid, 2, 7]];
-               
+
                 llpx2=listelem[[cgid, 3, 1]];
                 llpy2=listelem[[cgid, 3, 2]];
                 llpz2=listelem[[cgid, 3, 3]];
@@ -1454,7 +1454,7 @@ void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, double comple
 #endif
     int i;
     static double complex *gb1_bf;
-    static int n_total_active_slices = 0;    
+    static int n_total_active_slices = 0;
     static int *listactive = NULL;
     if (listactive == NULL)
     {
@@ -1574,7 +1574,7 @@ startbase=0;
 Do[
     Do[
       Do[
-        Do[        
+        Do[
           cs=0;
           If[ListQ[Opindex[px, py, pz, irrepidx, charge]],
             (*this is the list of the operators, they are meant to be contigous in memory*)
@@ -1588,8 +1588,8 @@ Do[
               cs=Max[locmemorymap]-Min[locmemorymap]+1;
             ];
           ];
- 
- 
+
+
           If[cs>0,
             WriteString[ar, "
     lprintf(\"Measure ML\", 0, \"\\n1pt function P=(",px,",", py,",", pz,") Irrep=",IrrepName[px,py,pz][[irrepidx]]," Irrep ev=",irrepev,"/",Length[bTOrthog[px,py,pz][[irrepidx]]]," Charge=",stcharge[charge]," nop=%d\\n\",",cs," * nblocking );
@@ -1678,7 +1678,7 @@ pf[2][nnx + X * (nny  + Y * t)] += tor_path_storage[2 + ntors * (nnx + X * nny )
 ltornumberC=0;
 
 WriteString[ar,"for (nnx = 0; nnx < X; nnx++)\nfor (nny = 0; nny < Y; nny++)\nfor (nnz = 0; nnz < Z; nnz++)\n{\n"];
-Do[        
+Do[
    Do[
       Do[
           If[ListQ[Torindex[px, py, pz, irrepidx,charge]],
@@ -1705,7 +1705,7 @@ WriteString[ar,"};\n};\n"];
     if (numerical_op == NULL)
     {
         numerical_op = malloc(total_n_tor_op * sizeof(double complex));
-    } 
+    }
    for (int i = 0; i < total_n_tor_op; i++)
        numerical_op[i] = 0;\n"];
   once=True;
@@ -1713,7 +1713,7 @@ WriteString[ar,"};\n};\n"];
     Do[
       Do[
         If[ListQ[Torindex[px, py, pz, irrepidx,charge]],
-          If[Select[Flatten[Torindex[px, py, pz, irrepidx,charge]], IntegerQ[#] && # > 0 &] !={}, 
+          If[Select[Flatten[Torindex[px, py, pz, irrepidx,charge]], IntegerQ[#] && # > 0 &] !={},
             If[once,
               WriteString[ar,"eval_time_momentum_torellons(t,numerical_op,polyf);\n"];
               once=False
@@ -1734,7 +1734,7 @@ void collect_1pt_torellon_functions(cor_list *lcor, double complex *tor_storage,
 {
     int n1, n2, n3, i;
     static double complex *tor1_bf;
-    static int n_total_active_slices = 0;    
+    static int n_total_active_slices = 0;
     static int *listactive = NULL;
     if (listactive == NULL)
     {

@@ -24,7 +24,7 @@ rlx_state = rand_state
 
 //gauge fixing paramater
 gaugefix:maxit = 10000
-gaugefix:fixdir =  10  
+gaugefix:fixdir =  10
 //gaugefix:fixdir= 0, 1, 2, 3 for Coulomb gauge else Landau
 gaugefix:overrelax = 1.8
 gaugefix:tol = 1e-10

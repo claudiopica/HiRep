@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 #include "inverters.h"
@@ -95,7 +95,7 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
     notconverged=0; /* assume that all vectors have converged */
     for (i=0; i<(par->n); ++i) {
       /* check convergence of vectors */
-      if(delta*z3[i]*z3[i]<par->err2*innorm2) sflags[i]=0; 
+      if(delta*z3[i]*z3[i]<par->err2*innorm2) sflags[i]=0;
       if(sflags[i]){
         notconverged++;
         spinor_field_mul_f(&p[i],gamma*z3[i]*z3[i]/(z2[i]*z2[i]),&p[i]);
@@ -105,7 +105,7 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
       }
     }
 
-    /* Uncomment this to print cg recursion parameters 
+    /* Uncomment this to print cg recursion parameters
        lprintf("CGTEST",0,"[ %d ] alpha=%e\n",cgiter,alpha);
        lprintf("CGTEST",0,"[ %d ] omega=%e\n",cgiter,omega);
        lprintf("CGTEST",0,"[ %d ] still runnning=%d\n",cgiter,notconverged);
@@ -149,7 +149,7 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
  * 3) compute the inverse in the orthogonal eigenspace using cg;
  * add together the two pieces and again run cg to be sure of convergence.
  */
-int cg_mshift_def(mshift_par *par, spinor_operator M, spinor_operator P, spinor_operator_m Pinv, spinor_field *in, spinor_field *out){ 
+int cg_mshift_def(mshift_par *par, spinor_operator M, spinor_operator P, spinor_operator_m Pinv, spinor_field *in, spinor_field *out){
   int cgiter,msiter;
   int i;
   mshift_par par_save=*par;

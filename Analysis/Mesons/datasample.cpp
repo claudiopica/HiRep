@@ -40,7 +40,7 @@ estimate datasample::stderr() const {
   res.err = res.val/sqrt(2.*len);
 
   return res;
-  
+
 }
 
 /* compute the confidence interval corresponding to the low and hi quantile */
@@ -67,7 +67,7 @@ void datasample::hist(double *n, int npt, double *x, double w) const {
   double w2=0.5*w;
 
   sort( tmp.begin(), tmp.end() );
-  
+
   for (int i=0;i<npt; ++i) {
     double lo=x[i]-w2;
     double hi=x[i]+w2;
@@ -84,7 +84,7 @@ void datasample::cumhist(double *n, int npt, double *x) const {
   int len = size();
 
   sort( tmp.begin(), tmp.end() );
-  
+
   for (int i=0;i<npt; ++i) {
     n[i]=0;
     for (int j=0;j<len; ++j) {
@@ -186,7 +186,7 @@ estimate datasample::JKavr(const int blsize) const {
 
   res.val = avr;
   res.err = err;
-  
+
   return res;
 
 }
@@ -208,7 +208,7 @@ estimate JKcov(const datasample &dt1, const datasample &dt2, const int blsize) {
   double xpsum[nblocks], ypsum[nblocks], zpsum[nblocks]; //Somme parziali del blocco
   double avp[nblocks]; //Medie togliendo un blocco
   double xtsum=0.0, ytsum=0.0, ztsum=0.0; //Somme totali
-  
+
   for(int j=0; j<nblocks; j++) {
     xpsum[j]=ypsum[j]=zpsum[j]=0.0;
     for(int i=j*blsize; i<blsize*(j+1); i++) {
@@ -243,7 +243,7 @@ estimate JKcov(const datasample &dt1, const datasample &dt2, const int blsize) {
 
   res.val = susc;
   res.err = err;
-  
+
   return res;
 
 
@@ -253,4 +253,3 @@ estimate JKcov(const datasample &dt1, const datasample &dt2, const int blsize) {
 estimate datasample::JKvar(const int blsize) const {
   return JKcov(*this, *this, blsize);
 }
-

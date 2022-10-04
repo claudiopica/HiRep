@@ -49,7 +49,7 @@
 /* Mesons parameters */
 typedef struct _input_scatt {
 	char mstring[256],configlist[256],outpath[256],seq_prop[256];
-    double csw;	
+    double csw;
 	double precision;
 	int nhits;
 	int isospin;
@@ -116,14 +116,14 @@ int main(int argc,char *argv[]) {
 	if(strcmp(mes_var.seq_prop,"none")==0)  seq_prop = 2;
 	if(strcmp(mes_var.seq_prop,"false")==0)  seq_prop = 0;
 	lprintf("MAIN",0,"mes_var.seq_prop = %s, seq_prop=%d (0 = false, 1 = true, 2 = none)\n",mes_var.seq_prop, seq_prop);
-	
+
 	strcpy(list_filename,mes_var.configlist);
 	strcpy(output_dir,mes_var.outpath);
 
-	lprintf("MAIN",0,"list_filename = %s %s\n", list_filename,mes_var.configlist);	
-	lprintf("MAIN",0,"output_dir : %s \n",mes_var.outpath);	
-	lprintf("MAIN",0,"Isospin channel: %d \n",mes_var.isospin);	
-	
+	lprintf("MAIN",0,"list_filename = %s %s\n", list_filename,mes_var.configlist);
+	lprintf("MAIN",0,"output_dir : %s \n",mes_var.outpath);
+	lprintf("MAIN",0,"Isospin channel: %d \n",mes_var.isospin);
+
   	if(strcmp(list_filename,"")!=0) {
     	error((list=fopen(list_filename,"r"))==NULL,1,"main [scattering_lengths.c]" ,
 		"Failed to open list file\n");
@@ -132,11 +132,11 @@ int main(int argc,char *argv[]) {
 	#if defined(WITH_CLOVER) ||  defined(WITH_EXPCLOVER)
  	set_csw(&mes_var.csw);
  	#endif
-	 
+
 	nm=0;
-	m[0] = atof(mes_var.mstring); // 	
+	m[0] = atof(mes_var.mstring); //
   	init_propagator_eo(1,m,mes_var.precision);
-	
+
 
 	lprintf("MAIN",0,"Inverter precision = %e\n",mes_var.precision);
 	for(k=0;k<nm;k++)		lprintf("MAIN",0,"Mass[%d] = %f\n",k,m[k]);
@@ -153,7 +153,7 @@ int main(int argc,char *argv[]) {
     	read_gauge_field(cnfg_filename);
     	represent_gauge_field();
 		lprintf("TEST",0,"<p> %1.6f\n",avr_plaquette());
-		full_plaquette();	
+		full_plaquette();
 		if (mes_var.isospin==2) measure_pion_scattering_I2( m, mes_var.nhits,  mes_var.precision,mes_var.outpath,cnfg_filename,NULL);
 		if (mes_var.isospin==0) measure_pion_scattering_I0( m, mes_var.nhits,  mes_var.precision,mes_var.outpath,cnfg_filename,seq_prop,NULL);
 		if (mes_var.isospin!=2 && mes_var.isospin != 0) lprintf("MAIN",0,"Isospin channel can be 0 or 2!");
@@ -167,8 +167,8 @@ int main(int argc,char *argv[]) {
   lprintf("DEBUG",0,"ALL done, deallocating\n");
 
   if(list!=NULL) fclose(list);
-  
-  finalize_process();	
+
+  finalize_process();
   return 0;
 
 }

@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
- * Computation of Renomalization constants (Z_a,Z_q,Z_s,Z_ps,Z_t,Z_m,Z_v)  
- * factors with gauge fixed momentum sources. 
+ * Computation of Renomalization constants (Z_a,Z_q,Z_s,Z_ps,Z_t,Z_m,Z_v)
+ * factors with gauge fixed momentum sources.
  *
  * Rudy Arthur
  *
@@ -73,9 +73,9 @@ static void twist_XYZ_bc(double theta_x, double theta_y, double theta_z) {
           *u=utmp;
           u=pu_gauge_f(index,3);
           _suNf_mulc(utmp, eith_z, *u);
-          *u=utmp;      
+          *u=utmp;
         }
-    
+
 }
 
 /* Renormalization parameters */
@@ -148,7 +148,7 @@ int parse_cnfg_filename(char* filename, filename_t* fn) {
   basename = filename;
   while ((tmp = strchr(basename, '/')) != NULL) {
     basename = tmp+1;
-  }            
+  }
 
 #ifdef REPR_FUNDAMENTAL
 #define repr_name "FUN"
@@ -204,7 +204,7 @@ int main(int argc,char *argv[]) {
   filename_t fpars;
   int nm;
   double m[256];
-  
+
   spinor_field* source;
   spinor_field* prop_in;
   spinor_field* prop_out;
@@ -216,13 +216,13 @@ int main(int argc,char *argv[]) {
 
   read_input(mes_var.read,get_input_filename());
   strcpy(list_filename,mes_var.configlist);
-  
-  lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS); 
-  lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
-  lprintf("MAIN",0,"input file [%s]\n",input_filename); 
-  lprintf("MAIN",0,"output file [%s]\n",output_filename); 
-  if (strcmp(list_filename,"")!=0) lprintf("MAIN",0,"list file [%s]\n",list_filename); 
-  else lprintf("MAIN",0,"cnfg file [%s]\n",cnfg_filename); 
+
+  lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS);
+  lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE);
+  lprintf("MAIN",0,"input file [%s]\n",input_filename);
+  lprintf("MAIN",0,"output file [%s]\n",output_filename);
+  if (strcmp(list_filename,"")!=0) lprintf("MAIN",0,"list file [%s]\n",list_filename);
+  else lprintf("MAIN",0,"cnfg file [%s]\n",cnfg_filename);
 
 #ifdef GAUGE_SON
   lprintf("MAIN",0,"Gauge group: SO(%d)\n",NG);
@@ -251,7 +251,7 @@ int main(int argc,char *argv[]) {
   }
 
   i=0;
-  
+
   source = alloc_spinor_field_f(4,&glattice);
   prop_in = alloc_spinor_field_f(4*nm*NF,&glattice);
   prop_out = alloc_spinor_field_f(4*nm*NF,&glattice);
@@ -267,16 +267,16 @@ int main(int argc,char *argv[]) {
 
     i++;
 
-  
+
     parse_cnfg_filename(cnfg_filename,&fpars);
 
     GLB_T=fpars.t; GLB_X=fpars.x; GLB_Y=fpars.y; GLB_Z=fpars.z;
     error(fpars.type==UNKNOWN_CNFG,1,"measure_Z_mom.c","Bad name for a configuration file");
     error(fpars.nc!=NG,1,"measure_Z_mom.c","Bad NG");
-    
+
     lprintf("MAIN",0,"Configuration from %s\n", cnfg_filename);
     read_gauge_field(cnfg_filename);
-   
+
     suNg_field_copy(u_gauge_old,u_gauge);
     represent_gauge_field();
 
@@ -303,7 +303,7 @@ int main(int argc,char *argv[]) {
 
     represent_gauge_field();
     gettimeofday(&start,0);
-    
+
     suNf_field_copy(u_gauge_old_f,u_gauge_f);
 
     init_propagator_eo(nm, m, mes_var.precision);
@@ -323,33 +323,33 @@ int main(int argc,char *argv[]) {
         twist_XYZ_bc(twist * mes_var.px_in, twist * mes_var.py_in, twist * mes_var.pz_in);
         lprintf("TEST",0,"<p> after twist %1.6f\n",avr_plaquette());
 
-        p_in[0] = mom_in[0]*l; 
-        p_in[1] = mom_in[1]*l; 
-        p_in[2] = mom_in[2]*l; 
-        p_in[3] = mom_in[3]*l; 
+        p_in[0] = mom_in[0]*l;
+        p_in[1] = mom_in[1]*l;
+        p_in[2] = mom_in[2]*l;
+        p_in[3] = mom_in[3]*l;
 
 
         for (k=0;k<NF;++k){
           create_gauge_fixed_momentum_source(source,p_in[0],p_in[1],p_in[2],p_in[3],k);
           calc_propagator(prop_in + 4*k,source,4);//4 for spin components
-        } 
+        }
 
         if(mes_var.ne){
           suNf_field_copy(u_gauge_f,u_gauge_old_f);
           twist_XYZ_bc(twist * mes_var.px_out, twist * mes_var.py_out, twist * mes_var.pz_out);
 
-          p_out[0] = mom_out[0]*l; 
+          p_out[0] = mom_out[0]*l;
           p_out[1] = mom_out[1]*l;
-          p_out[2] = mom_out[2]*l; 
+          p_out[2] = mom_out[2]*l;
           p_out[3] = mom_out[3]*l;
           for (k=0;k<NF;++k){
             create_gauge_fixed_momentum_source(source,p_out[0],p_out[1],p_out[2],p_out[3],k);
             calc_propagator(prop_out + 4*k,source,4);//4 for spin components
-          } 
+          }
         } else {
-          p_out[0] = p_in[0]; 
+          p_out[0] = p_in[0];
           p_out[1] = p_in[1];
-          p_out[2] = p_in[2]; 
+          p_out[2] = p_in[2];
           p_out[3] = p_in[3];
           for(j=0;j<4*NF;j++) spinor_field_copy_f(&prop_out[j],&prop_in[j]);
         }
@@ -372,7 +372,7 @@ int main(int argc,char *argv[]) {
 
   if(list!=NULL) fclose(list);
 
-  free_propagator_eo(); 
+  free_propagator_eo();
 
   free_BCs();
 
@@ -387,4 +387,3 @@ int main(int argc,char *argv[]) {
 
   return 0;
 }
-

@@ -1,12 +1,12 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 /*******************************************************************************
 *
 * File gauss.c
-* 
+*
 * Generation of Gaussian random numbers
 *
 *******************************************************************************/
@@ -17,7 +17,7 @@
 #include "random.h"
 
 #ifndef M_PI
-#define M_PI 3.14159265358979323846264338327 
+#define M_PI 3.14159265358979323846264338327
 #endif
 
 void gauss(double r[],int n)
@@ -37,7 +37,7 @@ void gauss(double r[],int n)
       x2*=2.0*M_PI;
       y1=rho*sin(x2);
       y2=rho*cos(x2);
-      
+
       r[k++]=y1;
       if (k<n)
          r[k++]=y2;
@@ -62,10 +62,9 @@ void gauss_flt(float rd[],int n)
       x2*=2.0*M_PI;
       y1=rho*sin(x2);
       y2=rho*cos(x2);
-      
+
       rd[k++]=(float)y1;
       if (k<n)
          rd[k++]=(float)y2;
    }
 }
-

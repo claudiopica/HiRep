@@ -2,7 +2,7 @@
  *
  * File  diag_hmat.c
  *
- * Function to diagonalize NxN hermitean matrix 
+ * Function to diagonalize NxN hermitean matrix
  *
  * Ari Hietanen
  *
@@ -35,7 +35,7 @@ void tridiagonalize(suNg *hmat, double *diag, double* roffdiag){
   double complex f,g,ctmp;
   double h,scale,fa,hh;
   int i,j,k,l;
-  for (i=NG-1;i>0;i--){//loop over the components of column vector 
+  for (i=NG-1;i>0;i--){//loop over the components of column vector
     l = i-1;
     h = scale = 0.0;
     if (l>0){ //Not the last iteration
@@ -107,7 +107,7 @@ void tridiagonalize(suNg *hmat, double *diag, double* roffdiag){
 	}
 	for (k=0;k<l;k++){
 	  _complex_mulr(ctmp,hmat->c[NG*k+i],g);
-	  hmat->c[NG*k+j]-=creal(ctmp);	  
+	  hmat->c[NG*k+j]-=creal(ctmp);
 	}
       }
     }

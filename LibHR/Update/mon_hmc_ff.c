@@ -102,10 +102,10 @@ struct _monomial* hmc_ff_create(const monomial_data *data)
 {
 	monomial *m = malloc(sizeof(*m));
 	mon_hmc_par *par = (mon_hmc_par*)data->par;
-  
+
 	// Copy data structure
 	m->data = *data;
-  
+
 	// Allocate memory for spinor field
 	if(mon_init)
 	{

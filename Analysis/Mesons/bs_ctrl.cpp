@@ -18,10 +18,10 @@ std::map<std::string, int> eval_ctrl::left_cut;
 std::map<std::string, int> eval_ctrl::right_cut;
 std::map<std::string, Corr_t*> eval_ctrl::channel_map;
 
-  
+
 primary_ctrl id("id",1);
 primary_ctrl g0("g0",1);
-  
+
 primary_ctrl g5("g5",1);
 primary_ctrl g0g5("g0g5",1);
 
@@ -75,7 +75,7 @@ bool eval_ctrl::fill_dep(const char* arg){
 
   id.add_channel("id");
   g0.add_channel("g0");
-  
+
   g5.add_channel("g5");
   g0g5.add_channel("g0g5");
 
@@ -231,7 +231,7 @@ bool eval_ctrl::fill_dep(const char* arg){
 
   /* CORRELATORS */
 #define IF_COR(ch) if(strcmp(arg,#ch"_cor")==0 || strcmp(arg,"all_cor")==0){ch.set_level(P_AVE_COR); found=true;}
-  
+
   IF_COR(id)
   IF_COR(g0)
   IF_COR(g5)
@@ -252,12 +252,12 @@ bool eval_ctrl::fill_dep(const char* arg){
   IF_COR(g0g5g2)
   IF_COR(g0g5g3)
   IF_COR(g0g5gk)
-  
+
 #undef IF_COR
-  
+
     /* EFFECTIVE MASSES */
 #define IF_EFF(ch) if(strcmp(arg,#ch"_eff")==0 || strcmp(arg,"all_eff")==0){ch.set_level(P_AVE_EFF); found=true;}
-  
+
   IF_EFF(id)
   IF_EFF(g0)
   IF_EFF(g5)
@@ -278,13 +278,13 @@ bool eval_ctrl::fill_dep(const char* arg){
   IF_EFF(g0g5g2)
   IF_EFF(g0g5g3)
   IF_EFF(g0g5gk)
-  
+
 #undef IF_EFF
 
       /* FITS */
 
 #define IF_FIT(ch) if(strcmp(arg,#ch)==0 || strcmp(arg,"all_fit")==0){ch.set_level(P_AVE_FIT); found=true;}
-  
+
   IF_FIT(id)
   IF_FIT(g0)
   IF_FIT(g5)
@@ -305,7 +305,7 @@ bool eval_ctrl::fill_dep(const char* arg){
   IF_FIT(g0g5g2)
   IF_FIT(g0g5g3)
   IF_FIT(g0g5gk)
-  
+
 #undef IF_FIT
 
 	/* DERIVED */
@@ -317,20 +317,20 @@ bool eval_ctrl::fill_dep(const char* arg){
   IF_DER_EFF(fv)
   IF_DER_EFF(fvk)
   IF_DER_EFF(fak)
-  
+
 #undef IF_DER_EFF
-  
+
 #define IF_DER_FIT(ch) if(strcmp(arg,#ch)==0 || strcmp(arg,"all_der_fit")==0){ch.set_level(D_AVE_FIT); found=true;}
-    
+
   IF_DER_FIT(mpcac)
   IF_DER_FIT(fps)
   IF_DER_FIT(gps)
   IF_DER_FIT(fv)
   IF_DER_FIT(fvk)
   IF_DER_FIT(fak)
-  
+
 #undef IF_DER_FIT
-  
+
 	    /* RATIOS */
 #define IF_RATIO(ch) if(strcmp(arg,#ch)==0 || strcmp(arg,"all_ratio")==0){ch.set_level(R_ACTIVE); found=true;}
 
@@ -348,7 +348,7 @@ bool eval_ctrl::fill_dep(const char* arg){
     IF_RATIO(makmps);
     IF_RATIO(mamv);
     IF_RATIO(makmvk);
-    
+
 #undef IF_RATIO
 
 	    return found;
@@ -371,7 +371,7 @@ void eval_ctrl::normalize_cuts(int lt) {
     left_cut["g1"]=left_cut["g2"]=left_cut["g3"]=left_cut["gk"];
     right_cut["g1"]=right_cut["g2"]=right_cut["g3"]=right_cut["gk"];
   }
-  
+
   g1=left_cut.find("g5g1");
   g2=left_cut.find("g5g2");
   g3=left_cut.find("g5g3");
@@ -384,7 +384,7 @@ void eval_ctrl::normalize_cuts(int lt) {
     left_cut["g5g1"]=left_cut["g5g2"]=left_cut["g5g3"]=left_cut["g5gk"];
     right_cut["g5g1"]=right_cut["g5g2"]=right_cut["g5g3"]=right_cut["g5gk"];
   }
-  
+
   g1=left_cut.find("g0g1");
   g2=left_cut.find("g0g2");
   g3=left_cut.find("g0g3");
@@ -397,7 +397,7 @@ void eval_ctrl::normalize_cuts(int lt) {
     left_cut["g0g1"]=left_cut["g0g2"]=left_cut["g0g3"]=left_cut["g0gk"];
     right_cut["g0g1"]=right_cut["g0g2"]=right_cut["g0g3"]=right_cut["g0gk"];
   }
-  
+
   g1=left_cut.find("g0g5g1");
   g2=left_cut.find("g0g5g2");
   g3=left_cut.find("g0g5g3");
@@ -410,7 +410,7 @@ void eval_ctrl::normalize_cuts(int lt) {
     left_cut["g0g5g1"]=left_cut["g0g5g2"]=left_cut["g0g5g3"]=left_cut["g0g5gk"];
     right_cut["g0g5g1"]=right_cut["g0g5g2"]=right_cut["g0g5g3"]=right_cut["g0g5gk"];
   }
- 
+
 
 
   for(set<primary_ctrl*>::iterator pctrl_it=primary_ctrl::all_pr.begin();pctrl_it!=primary_ctrl::all_pr.end();pctrl_it++) {
@@ -430,7 +430,7 @@ void eval_ctrl::normalize_cuts(int lt) {
       }
     }
   }
-  
+
 
 
   for(set<eval_ctrl*>::iterator ctrl_it=eval_ctrl::all.begin();ctrl_it!=eval_ctrl::all.end();ctrl_it++)
@@ -470,17 +470,17 @@ primary_ctrl::primary_ctrl(const char* n, int nc){
 
   channel=NULL;
   chan_counter=0;
-  
+
   channel=new char*[nchan];
   for(int i=0;i<nchan;i++)
     channel[i]=new char[32];
 
   all.insert(this);
   all_pr.insert(this);
-  
+
   cor_b0=NULL;
   cor_b1=NULL;
-  
+
   ws = NULL;
 
 /*  cout << "3 PRIMARY_CTRL constructor " << name << " nchan=" << nchan << endl;*/
@@ -492,7 +492,7 @@ derived_ctrl::derived_ctrl(const char* n){
     level[i]=false;
 
   name=n;
-  
+
   for(int i=D_EFF_B1; i<=D_FIT; i++) {
     ndep[i]=0;
     dep[i]=NULL;
@@ -599,7 +599,7 @@ void derived_ctrl::set_level(int lv){
     cerr<<"[derived_ctrl:set_level]:Level must be lv>=D_EFF_B1 && lv<=D_AVE_FIT for derived operators"<< endl;
     exit(1);
   }
-  
+
   if(!level[lv]) {
     level[lv]=true;
 
@@ -735,19 +735,19 @@ void primary_ctrl::allocate_datamemory(int lt) {
       }
     }
   }
-  
+
   if(level[P_COR_B1]) {
     if(cor_b1 == NULL) cor_b1=new Corr_t(lt);
   }
-  
+
   if(level[P_EFF_B1]) {
     if(eff_b1 == NULL) eff_b1=new Corr_t(lt);
   }
-  
+
   if(level[P_COR_B2]) {
     if(cor_b2 == NULL) cor_b2=new Corr_t(lt);
   }
-  
+
   if(level[P_EFF_B2]) {
     if(eff_b2 == NULL) eff_b2=new Corr_t(lt);
   }
@@ -758,7 +758,7 @@ void derived_ctrl::allocate_datamemory(int lt) {
   if(level[D_EFF_B1]) {
     if(eff_b1 == NULL) eff_b1=new Corr_t(lt);
   }
-  
+
   if(level[D_EFF_B2]) {
     if(eff_b2 == NULL) eff_b2=new Corr_t(lt);
   }
@@ -826,12 +826,12 @@ void primary_ctrl::print() {
     for(int t=0; t<cor_b1->length; t++)
       cout << "10 COR " << name << " " << t << " " << cor_b1->d[t].avr().val << " " << cor_b1->d[t].stderr().val << " blksize " << blsize << endl;
   }
-  
+
   if(level[P_AVE_EFF]) {
     for(int t=left_cut[name]; t<=right_cut[name]; t++)
       cout << "10 EFF " << name << " " << t << " " << eff_b1->d[t].avr().val << " " << eff_b1->d[t].stderr().val << " blksize " << blsize << endl;
   }
-  
+
   if(level[P_AVE_FIT])
     cout << "10 FIT " << name << " " << fit.avr().val << " " << fit.stderr().val << " blksize " << blsize << " lcut " << left_cut[name] << " rcut " << right_cut[name] << endl;
 }
@@ -842,7 +842,7 @@ void derived_ctrl::print() {
     for(int t=left_cut[name]; t<=right_cut[name]; t++)
       cout << "10 EFF " << name << " " << t << " " << eff_b1->d[t].avr().val << " " << eff_b1->d[t].stderr().val << " blksize " << blsize << endl;
   }
-  
+
   if(level[D_AVE_FIT])
     cout << "10 FIT " << name << " " << fit.avr().val << " " << fit.stderr().val << " blksize " << blsize << " lcut " << left_cut[name] << " rcut " << right_cut[name] << endl;
 }
@@ -871,7 +871,7 @@ bool primary_ctrl::eval_cor_eff(const int bsl, const int* bs, const int len, int
   double *ws_eff;
   int P_COR;
   int P_EFF;
-  
+
   if(bsl==1) {
     P_COR=P_COR_B1;
     P_EFF=P_EFF_B1;
@@ -939,7 +939,7 @@ void primary_ctrl::store_cor_eff(const int bsl) {
   double *ws_eff;
   int P_COR;
   int P_EFF;
-  
+
   if(bsl==1) {
     P_COR=P_COR_B1;
     P_EFF=P_EFF_B1;

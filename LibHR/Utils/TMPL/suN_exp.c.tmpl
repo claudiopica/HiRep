@@ -1,13 +1,13 @@
 /***************************************************************************\
-* Copyright (c) 2008, Agostino Patella                                      *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Agostino Patella                                      *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 #include "suN.h"
 #include "utils.h"
 #include <math.h>
 
-#if (NG!=$N$) 
+#if (NG!=$N$)
 #error : Mismatch between NG and ExpX_legacy!
 #endif
 
@@ -28,12 +28,12 @@ static void YtoU(double* u, double *y)
 
 
 /*
-*  Applies the SU(2) rotation defined by 
+*  Applies the SU(2) rotation defined by
 *  U = s[0] + i*s.sigma/4
 *  to the (v1,v2) vector
 */
 static void su2_rotate(double *s,double complex *v1,double complex *v2)
-{      
+{
    double complex z1, z2;
   z1=s[0]*(*v1)+I*s[1]*(*v2)+s[2]*(*v2)+I*s[3]*(*v1);
   z2=s[0]*(*v2)+I*s[1]*(*v1)-s[2]*(*v1)-I*s[3]*(*v2);
@@ -43,9 +43,9 @@ static void su2_rotate(double *s,double complex *v1,double complex *v2)
 #endif
 
 /*
-*  Approximate 
+*  Approximate
 *  V = exp(sum(A) iT(A)*h(A)*dt)
-*  with a unitary matrix according to the alghorithm defined in Appendix A 
+*  with a unitary matrix according to the alghorithm defined in Appendix A
 *  of https://arxiv.org/pdf/hep-lat/0409106.pdf
 *  and replaces  V.U -> U
 */
@@ -65,7 +65,7 @@ suNg v_tmp, u_tmp;
 u_tmp=*u;
 _suNg_exp(dt,*h,v_tmp);
 _suNg_times_suNg(*u,v_tmp,u_tmp);
-#else //WITH_QUATERNIONS 
+#else //WITH_QUATERNIONS
 
 $GROUP::EXPX:(dt):(*h):(*u)$
 
@@ -90,7 +90,7 @@ u_tmp=*u;
 _suNg_exp(dt,*h,v_tmp);
 _suNg_times_suNg(*u,v_tmp,u_tmp);
 
-#else //WITH_QUATERNIONS 
+#else //WITH_QUATERNIONS
 
 	int i, j, k, n;
 	double y[3];
@@ -99,7 +99,7 @@ _suNg_times_suNg(*u,v_tmp,u_tmp);
 	double tmp;
 	double *hf = (double*)h;
 	double complex *uf = (double complex*)u;
-	
+
 	d[0] = 0.0;
 	for(i = 1; i < NG; i++) {
 		tmp = sqrt( 2./(i*(i+1)) ) * (*XA(hf,i));
@@ -107,7 +107,7 @@ _suNg_times_suNg(*u,v_tmp,u_tmp);
 		for(j = 0; j < i; j++)
 			d[j] += tmp;
 	}
-	
+
 	k = 0;
 	for(j = 1; j<NG; j++) /* Aggiunto il j< testare. Claudio */
 	for(i = 0; i < j; i++) {
@@ -131,6 +131,3 @@ _suNg_times_suNg(*u,v_tmp,u_tmp);
 #endif //WITH_QUATERNIONS
 
 }
-
-
-

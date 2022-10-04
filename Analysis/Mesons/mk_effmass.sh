@@ -42,31 +42,31 @@ shift $[ OPTIND - 1 ]
 
 if [ -z "$CHANNEL" ] ||  [ -z "$LT" ] || [ -z "$LS" ] || [ -z "$INPUT" ]  || [ -z "$METHOD" ]
     then
-    echo "$0: Missing parameter" 
+    echo "$0: Missing parameter"
     help
 fi
 
-if [ ! -f ${EXEC} ] 
+if [ ! -f ${EXEC} ]
     then
-    echo "$0: Missing the executable file (${EXEC})" 
+    echo "$0: Missing the executable file (${EXEC})"
     exit 0
 fi
 
-if [ ! -f ${MKEFFTABLE} ] 
+if [ ! -f ${MKEFFTABLE} ]
     then
-    echo "$0: Missing the script mk_efficiencytable.sh" 
+    echo "$0: Missing the script mk_efficiencytable.sh"
     exit 0
 fi
 
-if [ ! -f ${INPUT} ] 
+if [ ! -f ${INPUT} ]
     then
-    echo "$0: Missing the input file (${INPUT})" 
+    echo "$0: Missing the input file (${INPUT})"
     exit 0
 fi
 
-if [ ! "${METHOD}" -eq "0"  ] && [ ! "${METHOD}" -eq "1"  ] && [ ! "${METHOD}" -eq "2"  ]  
+if [ ! "${METHOD}" -eq "0"  ] && [ ! "${METHOD}" -eq "1"  ] && [ ! "${METHOD}" -eq "2"  ]
     then
-    echo "$0: Method can take only values 0,1,2" 
+    echo "$0: Method can take only values 0,1,2"
     exit 0
 fi
 
@@ -116,7 +116,7 @@ fi
 echo " Evaluating channel."
 
 if [ "$FORCEFLAG" == "-f" ] ; then
-    
+
     WANTED_PRIM_CHAN=`${EXEC} info ${CHANNEL}|  grep -e"^2 PRIMARY_CTRL .* P_EFF_B1 .* P_EFF_B2" | awk '$9==1 || $13==1 {print $3}' | tr '\n' ' '`
     WANTED_DER_CHAN=`${EXEC} info ${CHANNEL}| grep -e"^2 EVAL_CTRL .* D_EFF_B1 .* D_EFF_B2" | awk '$5==1 || $7==1 {print $3}' | tr '\n' ' '`
     WANTED_CHAN="$WANTED_PRIM_CHAN $WANTED_DER_CHAN"
@@ -134,17 +134,17 @@ if [ "$CHANTYPE" -eq "13"  ]
     WANTED_PRIM_CHAN=`${EXEC} info ${CHANNEL}|  grep -e"^2 PRIMARY_CTRL .* P_EFF_B1 .* P_EFF_B2" | awk '$9==1 || $13==1 {print $3}' | tr '\n' ' '`
     WANTED_DER_CHAN=`${EXEC} info ${CHANNEL}| grep -e"^2 EVAL_CTRL .* D_EFF_B1 .* D_EFF_B2" | awk '$5==1 || $7==1 {print $3}' | tr '\n' ' '`
 
-    for i in $WANTED_PRIM_CHAN 
+    for i in $WANTED_PRIM_CHAN
       do
-      $0 -c$i -T$LT -L$LS $CMD_EFF -i$INPUT -b$BLKSIZE -m$METHOD 
+      $0 -c$i -T$LT -L$LS $CMD_EFF -i$INPUT -b$BLKSIZE -m$METHOD
       RCUT=`awk '$1=="'$i'" {print $3}' $FINALCUTNAME`
       echo "$i 4 $RCUT" >> ${CUTFILE}
     done
 
-    for i in $WANTED_DER_CHAN 
+    for i in $WANTED_DER_CHAN
       do
       if [ "$i" != "${CHANNEL}" ] ; then
-	  $0 -c$i -T$LT -L$LS $CMD_EFF -i$INPUT -b$BLKSIZE -m$METHOD 
+	  $0 -c$i -T$LT -L$LS $CMD_EFF -i$INPUT -b$BLKSIZE -m$METHOD
 	  RCUT=`awk '$1=="'$i'" {print $3}' $FINALCUTNAME`
 	  echo "$i 4 $RCUT" >> ${CUTFILE}
       fi
@@ -155,10 +155,10 @@ if [ "$CHANTYPE" -eq "13"  ]
 
     awk '$1!="'$i'" {print}' ${FINALCUTNAME} > ${FINALCUTNAME}.tmp
     mv ${FINALCUTNAME}.tmp ${FINALCUTNAME}
-    echo -e "$i\t*\t$((LT/2))" >> ${FINALCUTNAME}      
+    echo -e "$i\t*\t$((LT/2))" >> ${FINALCUTNAME}
     grep $OUTFILE -e "10 EFF " > ${MEFFDIR}/${NAME}
-    rm ${CUTFILE} $OUTFILE 
-    
+    rm ${CUTFILE} $OUTFILE
+
 fi
 
 
@@ -167,14 +167,14 @@ if [ "$CHANTYPE" -eq "5"  ]
     WANTED_PRIM_CHAN=`${EXEC} info ${CHANNEL}|  grep -e"^2 PRIMARY_CTRL .* P_EFF_B1 .* P_EFF_B2" | awk '$9==1 || $13==1 {print $3}' | tr '\n' ' '`
     WANTED_DER_CHAN=`${EXEC} info ${CHANNEL}| grep -e"^2 EVAL_CTRL .* D_EFF_B1 .* D_EFF_B2" | awk '$5==1 || $7==1 {print $3}' | tr '\n' ' '`
 
-    for i in $WANTED_PRIM_CHAN 
+    for i in $WANTED_PRIM_CHAN
       do
-      $0 -c$i -T$LT -L$LS $CMD_EFF -i$INPUT -b$BLKSIZE -m$METHOD 
+      $0 -c$i -T$LT -L$LS $CMD_EFF -i$INPUT -b$BLKSIZE -m$METHOD
     done
 
-    for i in $WANTED_DER_CHAN 
+    for i in $WANTED_DER_CHAN
       do
-      $0 -c$i -T$LT -L$LS $CMD_EFF -i$INPUT -b$BLKSIZE -m$METHOD 
+      $0 -c$i -T$LT -L$LS $CMD_EFF -i$INPUT -b$BLKSIZE -m$METHOD
     done
 fi
 

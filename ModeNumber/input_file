@@ -16,4 +16,3 @@ eva:omega1 = 1e-4
 eva:omega2 = 1e-2
 eva:kmax = 50
 eva:maxiter = 100
-

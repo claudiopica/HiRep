@@ -25,7 +25,7 @@ int test_convert_back_forth_spinor_field_flt();
 int test_convert_back_forth_gfield_f();
 int test_convert_back_forth_gfield();
 
-int main(int argc, char *argv[]) 
+int main(int argc, char *argv[])
 {
     // Init
     int return_val = 0;
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
     return return_val;
 }
 
-int test_convert_back_forth_spinor_field() 
+int test_convert_back_forth_spinor_field()
 {
     lprintf("INFO", 0, " ======= TEST SPINOR FIELD ======= \n");
     int return_val = 0;
@@ -58,23 +58,23 @@ int test_convert_back_forth_spinor_field()
     // Save transformed field in CPU copy of tmp field
     spinor_field_togpuformat(tmp, in);
 
-    // Sanity checks that the CPU copy of in field 
+    // Sanity checks that the CPU copy of in field
     // and CPU copy of the tmp field have non-zero square norms
     lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.15lf]\n", spinor_field_sqnorm_f_cpu(in));
     lprintf("SANITY CHECK", 0, "[Tmp field CPU copy norm unequal zero: %0.15lf]\n", spinor_field_sqnorm_f_cpu(tmp));
 
     // Transform back to out field
     spinor_field_tocpuformat(out, tmp);
-    
+
     spinor_field_sub_assign_f_cpu(out, in);
     double diff_norm = spinor_field_sqnorm_f_cpu(out);
 
-    if (diff_norm != 0) 
+    if (diff_norm != 0)
     {
         lprintf("RESULT", 0, "FAILED \n");
         return_val = 1;
     }
-    else 
+    else
     {
         lprintf("RESULT", 0, "OK \n");
         return_val = 0;
@@ -82,7 +82,7 @@ int test_convert_back_forth_spinor_field()
     lprintf("RESULT", 0, "[Diff norm %0.2e]\n", diff_norm);
 }
 
-int test_convert_back_forth_spinor_field_flt() 
+int test_convert_back_forth_spinor_field_flt()
 {
     lprintf("INFO", 0, " ======= TEST SPINOR FIELD SINGLE PRECISION ======= \n");
     int return_val = 0;
@@ -95,23 +95,23 @@ int test_convert_back_forth_spinor_field_flt()
     // Save transformed field in CPU copy of tmp field
     spinor_field_togpuformat_flt(tmp, in);
 
-    // Sanity checks that the CPU copy of in field 
+    // Sanity checks that the CPU copy of in field
     // and CPU copy of the tmp field have non-zero square norms
     lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.15lf]\n", spinor_field_sqnorm_f_flt_cpu(in));
     lprintf("SANITY CHECK", 0, "[Tmp field CPU copy norm unequal zero: %0.15lf]\n", spinor_field_sqnorm_f_flt_cpu(tmp));
 
     // Transform back to out field
     spinor_field_tocpuformat_flt(out, tmp);
-    
+
     spinor_field_sub_assign_f_flt_cpu(out, in);
     double diff_norm = spinor_field_sqnorm_f_flt_cpu(out);
 
-    if (diff_norm != 0) 
+    if (diff_norm != 0)
     {
         lprintf("RESULT", 0, "FAILED \n");
         return_val = 1;
     }
-    else 
+    else
     {
         lprintf("RESULT", 0, "OK \n");
         return_val = 0;
@@ -119,7 +119,7 @@ int test_convert_back_forth_spinor_field_flt()
     lprintf("RESULT", 0, "[Diff norm %0.2e]\n", diff_norm);
 }
 
-int test_convert_back_forth_gfield_f() 
+int test_convert_back_forth_gfield_f()
 {
     lprintf("INFO", 0, " ======= TEST GAUGE FIELD IN FUNDAMENTAL REP ======= \n");
     int return_val = 0;
@@ -142,7 +142,7 @@ int test_convert_back_forth_gfield_f()
     double sqnorm_out_check = 0.0;
     double diff_norm = 0.0;
 
-    _MASTER_FOR(in->type, ix) 
+    _MASTER_FOR(in->type, ix)
     {
         in_mat = *(in->ptr+ix);
         out_mat = *(out->ptr+ix);
@@ -153,7 +153,7 @@ int test_convert_back_forth_gfield_f()
 
         _suNf_sqnorm(sqnorm, tmp_mat);
         sqnorm_tmp_check += sqnorm;
-        
+
         _suNf_sqnorm(sqnorm, out_mat);
         sqnorm_out_check += sqnorm;
 
@@ -163,15 +163,15 @@ int test_convert_back_forth_gfield_f()
     }
 
     lprintf("SANITY CHECK", 0, "[Tmp sqnorm unequal zero: %0.2e]\n", sqnorm_tmp_check);
-    lprintf("SANITY CHECK", 0, "[In and outfield sqnorms unequal zero and equal to each other: in %0.2e out %0.2e]\n", 
+    lprintf("SANITY CHECK", 0, "[In and outfield sqnorms unequal zero and equal to each other: in %0.2e out %0.2e]\n",
                     sqnorm_in_check, sqnorm_out_check);
 
-    if (diff_norm != 0) 
+    if (diff_norm != 0)
     {
         lprintf("RESULT", 0, "FAILED \n");
         return_val = 1;
     }
-    else 
+    else
     {
         lprintf("RESULT", 0, "OK \n");
         return_val = 0;
@@ -179,7 +179,7 @@ int test_convert_back_forth_gfield_f()
     lprintf("RESULT", 0, "[Diff norm %0.2e]\n", diff_norm);
 }
 
-int test_convert_back_forth_gfield() 
+int test_convert_back_forth_gfield()
 {
     lprintf("INFO", 0, " ======= TEST GAUGE FIELD ======= \n");
     int return_val = 0;
@@ -202,7 +202,7 @@ int test_convert_back_forth_gfield()
     double sqnorm_out_check = 0.0;
     double diff_norm = 0.0;
 
-    _MASTER_FOR(in->type, ix) 
+    _MASTER_FOR(in->type, ix)
     {
         in_mat = *(in->ptr+ix);
         out_mat = *(out->ptr+ix);
@@ -213,7 +213,7 @@ int test_convert_back_forth_gfield()
 
         _suNf_sqnorm(sqnorm, tmp_mat);
         sqnorm_tmp_check += sqnorm;
-        
+
         _suNf_sqnorm(sqnorm, out_mat);
         sqnorm_out_check += sqnorm;
 
@@ -223,15 +223,15 @@ int test_convert_back_forth_gfield()
     }
 
     lprintf("SANITY CHECK", 0, "[Tmp sqnorm unequal zero: %0.2e]\n", sqnorm_tmp_check);
-    lprintf("SANITY CHECK", 0, "[In and outfield sqnorms unequal zero and equal to each other: in %0.2e out %0.2e]\n", 
+    lprintf("SANITY CHECK", 0, "[In and outfield sqnorms unequal zero and equal to each other: in %0.2e out %0.2e]\n",
                     sqnorm_in_check, sqnorm_out_check);
 
-    if (diff_norm != 0) 
+    if (diff_norm != 0)
     {
         lprintf("RESULT", 0, "FAILED \n");
         return_val = 1;
     }
-    else 
+    else
     {
         lprintf("RESULT", 0, "OK \n");
         return_val = 0;

@@ -86,7 +86,7 @@ struct _monomial* tm_alt_create(const monomial_data *data)
 {
 	monomial *m = malloc(sizeof(*m));
 	mon_tm_par *par = (mon_tm_par*)data->par;
-  
+
 	// Copy data structure
 	m->data = *data;
 

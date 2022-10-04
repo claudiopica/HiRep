@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 #include "inverters.h"
@@ -29,7 +29,7 @@ static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, spi
   spinor_field *p1, *p2, *Mp;
   spinor_field *sptmp, *memall;
 
-  double alpha, beta, oldbeta, innorm2; 
+  double alpha, beta, oldbeta, innorm2;
   double r, s1, s2, c1, c2, rho1, rho2, rp;
   double d, h, k;
 
@@ -40,7 +40,7 @@ static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, spi
   _TWO_SPINORS_MATCHING(in,out);
   if(trial!=NULL) {_TWO_SPINORS_MATCHING(in,trial);}
 
-   
+
   /* allocate spinors fields and aux real variables */
   /* implementation note: to minimize the number of malloc calls
    * objects of the same type are allocated together
@@ -65,7 +65,7 @@ static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, spi
     if(out!=trial){
       spinor_field_copy_f(out,trial);
     }
-    
+
   } else {
     spinor_field_zero_f(out);
   }
@@ -73,7 +73,7 @@ static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, spi
   innorm2=spinor_field_sqnorm_f(in);
   beta=sqrt(spinor_field_sqnorm_f(p2));
   spinor_field_mul_f(p2,1./beta,p2);
-  spinor_field_zero_f(p1);  
+  spinor_field_zero_f(p1);
   r=rho2=beta;
   rho1=1.;
   c2=-1.;
@@ -86,7 +86,7 @@ static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, spi
     ++cgiter;
 
     M(Mp,p2);
-    
+
     /* compute alpha */
     alpha = spinor_field_prod_re_f(Mp,p2);
 
@@ -101,7 +101,7 @@ static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, spi
     /* update beta */
     oldbeta=beta;
     beta=sqrt(spinor_field_sqnorm_f(p2));
-    
+
     /* normalize p2 */
     spinor_field_mul_f(p2,1./beta,p2);
 
@@ -120,27 +120,27 @@ static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, spi
     q1=q2;
     q2=sptmp; /* swap q1[i]<->q2[i] */
     spinor_field_add_f(q2,p1,Mp);
-	
+
     /* update rho */
     rho1=rho2;
     rho2=k;
-	
+
     /* update solution */
     spinor_field_mul_add_assign_f(out,r*c2/k,q2);
-	
+
     /* update residuum */
     r*=s2;
 
     if((r*r)<par->err2*innorm2){
       notconverged=0;
     }
-		/* just for debug 
+		/* just for debug
 		else {
       lprintf("INVERTER",30,"MINRES iter %d res: %1.8e\n",cgiter,(r*r)/innorm2);
     }
 		*/
-	
-	
+
+
   } while ((par->max_iter==0 || cgiter<par->max_iter) && notconverged);
 
   /* test results */
@@ -154,8 +154,8 @@ static int MINRES_core(short int *valid, MINRES_par *par, spinor_operator M, spi
     lprintf("INVERTER",30,"MINRES failed: err2 = %1.8e > %1.8e\n",innorm2,par->err2);
   } else {
     lprintf("INVERTER",20,"MINRES inversion: err2 = %1.8e < %1.8e\n",innorm2,par->err2);
-  } 
-   
+  }
+
   /* free memory */
   free_spinor_field_f(memall);
 
@@ -189,7 +189,7 @@ static double spinor_field_prod_re_f_f2d(spinor_field_flt *s1, spinor_field_flt 
       res = 0.;
     }
 
-  
+
   _TWO_SPINORS_FOR_SUM(s1,s2,res) {
     float prod;
     _spinor_prod_re_f(prod,*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
@@ -208,7 +208,7 @@ static double spinor_field_sqnorm_f_f2d(spinor_field_flt *s1)
     {
       res = 0.;
     }
-   
+
   _ONE_SPINOR_FOR_SUM(s1,res) {
     float prod;
     _spinor_prod_re_f(prod,*_SPINOR_PTR(s1),*_SPINOR_PTR(s1));
@@ -227,7 +227,7 @@ static int MINRES_core_flt(short int *valid, MINRES_par *par, spinor_operator_fl
   spinor_field_flt *p1, *p2, *Mp;
   spinor_field_flt *sptmp, *memall;
 
-  double alpha, beta, oldbeta, innorm2; 
+  double alpha, beta, oldbeta, innorm2;
   double r, s1, s2, c1, c2, rho1, rho2, rp;
   double d, h, k;
 
@@ -237,7 +237,7 @@ static int MINRES_core_flt(short int *valid, MINRES_par *par, spinor_operator_fl
   /* fare qualche check sugli input */
   _TWO_SPINORS_MATCHING(in,out);
   if(trial!=NULL) {_TWO_SPINORS_MATCHING(in,trial);}
-     
+
   /* allocate spinors fields and aux real variables */
   /* implementation note: to minimize the number of malloc calls
    * objects of the same type are allocated together
@@ -262,7 +262,7 @@ static int MINRES_core_flt(short int *valid, MINRES_par *par, spinor_operator_fl
     if(out!=trial){
       spinor_field_copy_f_flt(out,trial);
     }
-    
+
   } else {
     spinor_field_zero_f_flt(out);
   }
@@ -270,7 +270,7 @@ static int MINRES_core_flt(short int *valid, MINRES_par *par, spinor_operator_fl
   innorm2=spinor_field_sqnorm_f_f2d(in);
   beta=sqrt(spinor_field_sqnorm_f_f2d(p2));
   spinor_field_mul_f_flt(p2,(float)(1./beta),p2);
-  spinor_field_zero_f_flt(p1);  
+  spinor_field_zero_f_flt(p1);
   r=rho2=beta;
   rho1=1.;
   c2=-1.;
@@ -283,7 +283,7 @@ static int MINRES_core_flt(short int *valid, MINRES_par *par, spinor_operator_fl
     ++cgiter;
 
     M(Mp,p2);
-    
+
     /* compute alpha */
     alpha = spinor_field_prod_re_f_f2d(Mp,p2);
 
@@ -298,7 +298,7 @@ static int MINRES_core_flt(short int *valid, MINRES_par *par, spinor_operator_fl
     /* update beta */
     oldbeta=beta;
     beta=sqrt(spinor_field_sqnorm_f_f2d(p2));
-    
+
     /* normalize p2 */
     spinor_field_mul_f_flt(p2,(float)(1./beta),p2);
 
@@ -317,27 +317,27 @@ static int MINRES_core_flt(short int *valid, MINRES_par *par, spinor_operator_fl
     q1=q2;
     q2=sptmp; /* swap q1[i]<->q2[i] */
     spinor_field_add_f_flt(q2,p1,Mp);
-	
+
     /* update rho */
     rho1=rho2;
     rho2=k;
-	
+
     /* update solution */
     spinor_field_mul_add_assign_f_flt(out,(float)(r*c2/k),q2);
-	
+
     /* update residuum */
     r*=s2;
 
     if((r*r)<par->err2*innorm2){
       notconverged=0;
     }
-		/* just for debug 
+		/* just for debug
 		else {
       lprintf("INVERTER",30,"MINRES iter %d res: %1.8e\n",cgiter,(r*r)/innorm2);
     }
 		*/
-	
-	
+
+
   } while ((par->max_iter==0 || cgiter<par->max_iter) && notconverged);
 
   /* test results */
@@ -351,8 +351,8 @@ static int MINRES_core_flt(short int *valid, MINRES_par *par, spinor_operator_fl
     lprintf("INVERTER",30,"MINRES failed: err2 = %1.8e > %1.8e\n",innorm2,par->err2);
   } else {
     lprintf("INVERTER",20,"MINRES inversion: err2 = %1.8e < %1.8e\n",innorm2,par->err2);
-  } 
-   
+  }
+
   /* free memory */
   free_spinor_field_f_flt(memall);
 
@@ -375,5 +375,3 @@ int MINRES_flt(MINRES_par *par, spinor_operator_flt M, spinor_field_flt *in, spi
 
   return iter;
 }
-
-

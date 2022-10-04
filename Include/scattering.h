@@ -2,8 +2,8 @@
 /*******************************************************************************
 *
 * File scattering.h
-* 
-* Functions for Finite Size Method 
+*
+* Functions for Finite Size Method
 *
 *******************************************************************************/
 
@@ -65,7 +65,7 @@ struct prop_p{
 
 
 /**
- * @brief Bundle of meson_observables with momentum 0. 
+ * @brief Bundle of meson_observables with momentum 0.
  */
 struct mo_0{
 	meson_observable *rho[3][3];
@@ -73,7 +73,7 @@ struct mo_0{
 };
 
 /**
- * @brief Bundle of meson_observables with momentum p. 
+ * @brief Bundle of meson_observables with momentum p.
  */
 struct mo_p{
 	int p[3];

@@ -1,7 +1,7 @@
 C Hi Al,
 
 C If the variable XX is supposed
-C to get a random value, just say 
+C to get a random value, just say
 
 C XX=rndnum() .
 
@@ -26,7 +26,7 @@ C Cheers, Owe.
 
 *  file random.f, Ulli Wolff, 15.9.95
 *
-*  random generator modified RCARRY, 
+*  random generator modified RCARRY,
 *  see M. Luescher, Comp. Phys. Comm. 79(1994)100
 *  and literature quoted there
 *
@@ -41,7 +41,7 @@ C Cheers, Owe.
 *  the bigger ithrow, the slower the generator!
 *
 *  0 <= rndnum < 1  (rndnum=0 DOES occur occasionally)
-*  
+*
 **************************************************************************
 
       real*8 function rndnum()
@@ -169,7 +169,7 @@ C**************************************************************************
 *==========================================================
 **************************************************************************
 
-*  initialize from a random seed iran, 0 <= iran < 259200, 
+*  initialize from a random seed iran, 0 <= iran < 259200,
 *  with the help of a "quick and dirty generator
 *
       subroutine rini(iran)
