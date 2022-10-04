@@ -7,9 +7,3 @@ HiRep
    user_guide/getting_started
    user_guide/input_file
    
-.. toctree::
-   :maxdepth: 2
-   :caption: Development Notes
-
-   development_notes/field_geometry
-

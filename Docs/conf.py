@@ -27,6 +27,7 @@ master_doc = "index"
 # General information about the project.
 project = "HiRep"
 copyright = "2022"
+#author = "Rudy Arthur, Vincent Drach, Martin Hansen, Sofie Martins, Claudio Pica, Antonio Rago, Fernando Romero-López"
 author = "HiRep Developers"
 
 # Custom CSS
@@ -43,12 +44,19 @@ html_theme_path = ["_themes"]
 latex_elements = {"preamble": r"\pdfimageresolution=144"}
 latex_documents = [
     (
-        master_doc,
+        'user_guide',
+        "hirep-documentation1.tex",
+        "HiRep Documentation", 
+        author, 
+        "manual",
+    ),
+    (
+        'developer_notes',
         "hirep-documentation.tex",
         "HiRep Documentation",
-        "HiRep Developers",
+        author,
         "manual",
-    )
+    ), 
 ]
 
 # -- Options for manual page output ---------------------------------------
@@ -59,8 +67,17 @@ man_pages = [
 # -- Options for Texinfo output -------------------------------------------
 texinfo_documents = [
     (
-        master_doc,
-        "hiRep-documenation",
+        'user_guide', 
+        "hiRep-documentation", 
+        "HiRep Documentation", 
+        author, 
+        "sphinx-example",
+        "One line description of project.",
+        "Miscellaneous",
+    ),
+    (
+        'developer_notes',
+        "hiRep-documentation",
         "HiRep Documentation",
         author,
         "sphinx-example",
