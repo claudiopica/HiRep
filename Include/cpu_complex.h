@@ -75,11 +75,13 @@ typedef float complex hr_complex_flt;
 */
 #define _complex_star(a,b) \
    (a)=conj(b)
+
 /*
 * a=-b^+ (a,b complex)
 */
 #define _complex_star_minus(a,b) \
    (a)=-conj(b)
+
 /*
 * a=a^+ (a complex)
 */
@@ -91,6 +93,7 @@ typedef float complex hr_complex_flt;
 */
 #define _complex_mul(a,b,c) \
    (a)=(b)*(c)
+
 /*
 * a=r*b (a,b complex; r real)
 */
@@ -270,7 +273,6 @@ typedef float complex hr_complex_flt;
 #define _complex_mulr_assign(a,r,b) \
    (a)+=(r)*(b)
 
-
 /*
 * a=r1*c1+r2*c2 (a,c1,c2 complex; r1,r2 real)
 */
@@ -282,23 +284,17 @@ typedef float complex hr_complex_flt;
 */
 #define _complex_rlc_assign(a,r1,c1,r2,c2) \
     (a)+=(r1)*(c1)+(r2)*(c2)
+
 /*
 * a=z1*c1+z2*c2 (a,z1,c1,z2,c2 complex)
 */
 #define _complex_clc(a,z1,c1,z2,c2) \
     (a)=(z1)*(c1)+(z2)*(c2)
+
 /*
 * a+=z1*c1+z2*c2 (a,z1,c1,z2,c2 complex)
 */
 #define _complex_clc_assign(a,z1,c1,z2,c2) \
     (a)+=(z1)*(c1)+(z2)*(c2)
-
-
-/*
- * constructor analogous to GPU version
- */ 
- #define hr_complex(real_pt, imag_pt) \
-   real_pt + I * imag_pt
-   
 
 #endif

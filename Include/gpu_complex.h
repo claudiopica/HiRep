@@ -1175,6 +1175,7 @@ __host__ __device__ inline __attribute__((always_inline)) hr_complex_flt& hr_com
 */
 #define _complex_0(a) \
    (a)=0
+
 /*
 * a=1. (a complex)
 */
@@ -1198,11 +1199,13 @@ __host__ __device__ inline __attribute__((always_inline)) hr_complex_flt& hr_com
 */
 #define _complex_star(a,b) \
    (a)=conj(b)
+
 /*
 * a=-b^+ (a,b complex)
 */
 #define _complex_star_minus(a,b) \
    (a)=-conj(b)
+
 /*
 * a=a^+ (a complex)
 */
@@ -1214,6 +1217,7 @@ __host__ __device__ inline __attribute__((always_inline)) hr_complex_flt& hr_com
 */
 #define _complex_mul(a,b,c) \
    (a)=(b)*(c)
+
 /*
 * a=r*b (a,b complex; r real)
 */
@@ -1237,6 +1241,7 @@ __host__ __device__ inline __attribute__((always_inline)) hr_complex_flt& hr_com
 */
 #define _complex_add_star(a,b,c) \
    (a)=(b)+conj(c)
+
 /*
 * a=b-c^(+) (a,b,c complex)
 */
@@ -1393,7 +1398,6 @@ __host__ __device__ inline __attribute__((always_inline)) hr_complex_flt& hr_com
 #define _complex_mulr_assign(a,r,b) \
    (a)+=(r)*(b)
 
-
 /*
 * a=r1*c1+r2*c2 (a,c1,c2 complex; r1,r2 real)
 */
@@ -1405,11 +1409,13 @@ __host__ __device__ inline __attribute__((always_inline)) hr_complex_flt& hr_com
 */
 #define _complex_rlc_assign(a,r1,c1,r2,c2) \
     (a)+=(r1)*(c1)+(r2)*(c2)
+
 /*
 * a=z1*c1+z2*c2 (a,z1,c1,z2,c2 complex)
 */
 #define _complex_clc(a,z1,c1,z2,c2) \
     (a)=(z1)*(c1)+(z2)*(c2)
+
 /*
 * a+=z1*c1+z2*c2 (a,z1,c1,z2,c2 complex)
 */
