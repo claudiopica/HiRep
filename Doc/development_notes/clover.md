@@ -87,7 +87,8 @@ $$ \begin{aligned}
 
 Here we will only consider the forces from the clover term and not the hopping term.
 The clover part of the Dirac operator is given by
-$$ H_{sw} = -\frac{c_{sw}}{2}\sum_{\mu<\nu}\bar{\sigma}_{\mu\nu}F_{\mu\nu}(x) $$(eq:Hsw)
+
+$$ H_{sw} = -\frac{c_{sw}}{2}\sum_{\mu<\nu}\bar{\sigma}_{\mu\nu}F_{\mu\nu}(x) $$
 
 When inserting Eq. {eq}`eq:dotS` we obtain
 

@@ -3,6 +3,11 @@ HiRep
 
 .. toctree::
    :maxdepth: 2
+
+   how_to_cite
+
+.. toctree::
+   :maxdepth: 2
    :caption: Development Notes
 
    development_notes/action
