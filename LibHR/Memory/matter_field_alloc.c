@@ -16,6 +16,7 @@
 #include "error.h"
 #include "memory.h"
 #include "geometry.h"
+#include "geometry_check.h"
 #include "linear_algebra.h"
 #include "global.h"
 #ifdef WITH_MPI
@@ -123,30 +124,37 @@
     #define _DECLARE_CONVERT_TO_GPU_FORMAT(_name, _field_type, _site_type, _size)                           \
         void to_gpu_format_##_name(_field_type *out, _field_type *in)                                       \
         {                                                                                                   \
-            _site_type *source;                                                                         \
-            error(out->type != in->type, 1, "to_gpu_format_" #_name " " __FILE__,                           \
-                    "Field geometries do not match!\n");                                                    \
+            _site_type *source, *target;                                                                    \
+            _CHECK_GEOMETRY_MATCHING(out, in);                                                              \
                                                                                                             \
             int vol4h = T*X*Y*Z/2;                                                                          \
-            _MASTER_FOR(in->type, ix)                                                                      \
+            _PIECE_FOR(in->type, ixp)                                                                       \
             {                                                                                               \
-                source = _FIELD_AT(in, ix);                                                                 \
-                write_gpu_##_site_type(vol4h, (*source), out->ptr, ix);                                     \
+                target  = _FIELD_BLK(in, ixp);                                                              \
+                _SITE_FOR(in->type, ixp, ix)                                                                \
+                {                                                                                           \
+                    source = _FIELD_AT(in, ix);                                                             \
+                    write_gpu_##_site_type(vol4h, (*source), target, ix % vol4h);                           \
+                }                                                                                           \
             }                                                                                               \
         }
 
     #define _DECLARE_CONVERT_TO_CPU_FORMAT(_name, _field_type, _site_type, _size)                           \
         void to_cpu_format_##_name(_field_type *out, _field_type *in)                                       \
         {                                                                                                   \
-            _site_type *target;                                                                             \
-            error(out->type != in->type, 1, "to_cpu_format_" #_name " " __FILE__,                           \
-                        "Field geometries do not match!\n");                                                \
+            _site_type *target, *source;                                                                    \
+            _CHECK_GEOMETRY_MATCHING(out, in);                                                              \
                                                                                                             \
             int vol4h = T*X*Y*Z/2;                                                                          \
-            _MASTER_FOR(in->type, ix)                                                                       \
+            _PIECE_FOR(in->type, ixp)                                                                       \
             {                                                                                               \
-                target = _FIELD_AT(in, ix);                                                                 \
-                read_gpu_##_site_type(vol4h, (*target), in->ptr, ix);                                       \
+                source = _FIELD_BLK(in, ixp);                                                               \
+                _SITE_FOR(in->type, ixp, ix)                                                                \
+                {                                                                                           \
+                    target = _FIELD_AT(in, ix);                                                             \
+                    read_gpu_##_site_type(vol4h, (*target), source, ix % vol4h);                                   \
+                }                                                                                           \
+                                                                                                            \
             }                                                                                               \
         }
 

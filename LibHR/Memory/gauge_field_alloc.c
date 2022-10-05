@@ -18,6 +18,7 @@
 #include "global.h"
 #include "spinor_field.h"
 #include "geometry.h"
+#include "geometry_check.h"
 #ifdef WITH_MPI
 #include <mpi.h>
 #endif
@@ -122,17 +123,22 @@
     #define _DECLARE_CONVERT_TO_GPU_FORMAT(_name, _field_type, _site_type, _size)                           \
         void to_gpu_format_##_name(_field_type *out, _field_type *in)                                       \
         {                                                                                                   \
-            _site_type *source;                                                                             \
+            _site_type *source, *target;                                                                    \
+            _CHECK_GEOMETRY_MATCHING(out, in);                                                              \
             error(out->type!=in->type, 1, "to_gpu_format_" #_name " " __FILE__,                             \
                     "Gauge field geometries do not match!\n");                                              \
                                                                                                             \
             int vol4h = T*X*Y*Z/2;                                                                          \
-            _MASTER_FOR(in->type, ix)                                                                       \
+            _PIECE_FOR(in->type, ixp)                                                                       \
             {                                                                                               \
-                for (int comp = 0; comp < _size; ++comp)                                                    \
+                target = _4FIELD_BLK(in, ixp);                                                              \
+                _SITE_FOR(in->type, ixp, ix)                                                                \
                 {                                                                                           \
-                    source = _4FIELD_AT(in, ix, comp);                                                      \
-                    write_gpu_##_site_type(vol4h, (*source), out->ptr, ix, comp);                           \
+                    for (int comp = 0; comp < _size; ++comp)                                                \
+                    {                                                                                       \
+                        source = _4FIELD_AT(in, ix, comp);                                                  \
+                        write_gpu_##_site_type(vol4h, (*source), target, ix, comp);                         \
+                    }                                                                                       \
                 }                                                                                           \
             }                                                                                               \
         }
@@ -140,17 +146,20 @@
     #define _DECLARE_CONVERT_TO_CPU_FORMAT(_name, _field_type, _site_type, _size)                           \
         void to_cpu_format_##_name(_field_type *out, _field_type *in)                                       \
         {                                                                                                   \
-            _site_type *target;                                                                         \
-            error(out->type!=in->type, 1, "to_cpu_format_" #_name " " __FILE__,                             \
-                        "Gauge field geometries do not match!\n");                                          \
+            _site_type *target, *source;                                                                    \
+            _CHECK_GEOMETRY_MATCHING(out, in);                                                              \
                                                                                                             \
             int vol4h = T*X*Y*Z/2;                                                                          \
-            _MASTER_FOR(in->type, ix)                                                                       \
+            _PIECE_FOR(in->type, ixp)                                                                       \
             {                                                                                               \
-                for (int comp = 0; comp < _size; ++comp)                                                    \
+                source = _4FIELD_BLK(in, ixp);\
+                _SITE_FOR(in->type, ixp, ix)                                                                \
                 {                                                                                           \
-                    target = _4FIELD_AT(out, ix, comp);                                                     \
-                    read_gpu_##_site_type(vol4h, (*target), in->ptr, ix, comp);                         \
+                    for (int comp = 0; comp < _size; ++comp)                                                \
+                    {                                                                                       \
+                        target = _4FIELD_AT(out, ix, comp);                                                     \
+                        read_gpu_##_site_type(vol4h, (*target), source, ix, comp);/* Here I should have to use a local index...*/                          \
+                    }                                                                                       \
                 }                                                                                           \
             }                                                                                               \
         }
