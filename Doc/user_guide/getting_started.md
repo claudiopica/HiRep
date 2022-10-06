@@ -65,7 +65,7 @@ MACRO += -DBC_Z_PERIODIC
 #MACRO += -DROTATED_SF
 ```
 
-Specify, whether you want to compile with MPI either with or without GPU acceleration by using 
+Specify, whether you want to compile with MPI either with or without GPU acceleration by using
 
 ```
 #MACRO += -DWITH_MPI
@@ -128,7 +128,7 @@ run name = run1
 save freq = 1
 meas freq = 1
 conf dir = cnfg
-gauge start = random 
+gauge start = random
 last conf = +1
 ```
 
@@ -136,7 +136,7 @@ The "+" in front of ```last conf``` specifies the number of trajectories to be g
 
 ### Execute Binary
 
-Run the HMC using 
+Run the HMC using
 
 ```
 $ hmc -i input_file
@@ -147,7 +147,6 @@ where ```hmc``` is the binary generated from ```hmc.c```.
 
 ## Documentation
 
-* Complete HTML Documentation [html](Docs/_build/html/index.html) 
+* Complete HTML Documentation [html](Docs/_build/html/index.html)
 * User Guide [pdf](Docs/_build/latex/hirep-documentation.pdf)
 * Developer Manual [pdf](Docs/_build/latex/hirep-documentation.pdf)
-

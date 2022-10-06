@@ -6,4 +6,3 @@ HiRep
    :caption: Development Manual
 
    development_notes/field_geometry
-

@@ -4,7 +4,7 @@
 
 The HiRep code uses a multilevel integrator and each integrator level has to be specified in the input file.
 
-```
+```c
     integrator {
         level = 0
         type = o2mn
@@ -35,7 +35,7 @@ $$ S = -\frac{\beta}{N}\sum_{x,\mu>\nu} \textrm{Re}~\textrm{tr}(U_\mu(x)U_\nu(x+
 
 The example below show how to specify a gauge monomial in the input file.
 
-```
+```c
     monomial {
         id = 0
         type = gauge
@@ -60,7 +60,7 @@ $$ S = -\frac{\beta}{N}\sum_{x,\mu>\nu} c_0\textrm{Re}~\textrm{tr}[P_{\mu\nu}(x)
 
 The example below show how to specify a gauge monomial in the input file.
 
-```
+```c
     monomial {
         id = 0
         type = lw_gauge
@@ -86,7 +86,7 @@ $$ S = \phi^\dagger(D^\dagger D)^{-1}\phi $$
 
 The example below show how to specify an HMC monomial in the input file.
 
-```
+```c
     monomial {
         id = 1
         type = hmc
@@ -117,7 +117,7 @@ The example below show how to specify an HMC monomial in the input file.
 In this monomial the twisted mass is added before the Dirac operator has been even/odd preconditioned.
 The example below shows how to specify the monomial in the input file.
 
-```
+```c
     monomial {
         id = 1
         type = tm
@@ -150,7 +150,7 @@ The example below shows how to specify the monomial in the input file.
 In this monomial the twisted mass is added after the Dirac operator has been even/odd preconditioned.
 The example below shows how to specify the monomial in the input file.
 
-```
+```c
     monomial {
         id = 1
         type = tm_alt
@@ -186,7 +186,7 @@ $$ S = \phi^\dagger\left(\frac{D^\dagger D}{(D+\Delta m)^\dagger (D+\Delta m)}\r
 
 The example below show how to specify a Hasenbusch monomial in the input file.
 
-```
+```c
     monomial {
         id = 1
         type = hasenbusch
@@ -220,7 +220,7 @@ The example below show how to specify a Hasenbusch monomial in the input file.
 
 The example below show how to specify a Hasenbusch monomial with even odd preconditioned twisted mass
 
-```
+```c
     monomial {
         id = 1
         type = hasenbusch_tm
@@ -256,7 +256,7 @@ The example below show how to specify a Hasenbusch monomial with even odd precon
 
 The example below show how to specify a Hasenbusch monomial with twisted even odd preconditioned operator.
 
-```
+```c
     monomial {
         id = 1
         type = hasenbusch_tm_alt
@@ -296,7 +296,7 @@ $$ S = \phi^\dagger(D^\dagger D)^{-n/d}\phi $$
 
 The example below show how to specify an RHMC monomial in the input file.
 
-```
+```c
     monomial {
         id = 1
         type = rhmc

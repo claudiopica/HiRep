@@ -30,7 +30,7 @@ dev_doc = "development_manual"
 project = "HiRep"
 copyright = "2022"
 author = "Rudy Arthur, Vincent Drach, Martin Hansen, Sofie Martins, Claudio Pica, Antonio Rago, Fernando Romero-López"
-#author = "HiRep Developers"
+# author = "HiRep Developers"
 
 
 # Custom CSS
@@ -45,8 +45,8 @@ html_theme_path = ["_themes"]
 
 # -- Options for LaTeX output ---------------------------------------------
 latex_elements = {
-'sphinxsetup': 'VerbatimBorderColor={rgb}{0.9,0.9,0.9}, VerbatimColor={rgb}{0.98,0.98,0.98},  HeaderFamily=\sffamily',
-"preamble": r'''
+    "sphinxsetup": "VerbatimBorderColor={rgb}{0.9,0.9,0.9}, VerbatimColor={rgb}{0.98,0.98,0.98},  HeaderFamily=\sffamily",
+    "preamble": r"""
     \pdfimageresolution=144
     \usepackage{booktabs}
     \usepackage{titlesec}
@@ -56,8 +56,8 @@ latex_elements = {
     \titleformat{\chapter}{\fontsize{27}{27}\selectfont}{\thechapter}{1em}{}
     \titleformat{\section}{\fontsize{20}{20}\selectfont}{\thesection}{1em}{}
     \titleformat{\subsection}{\fontsize{16}{16}\selectfont}{\thesubsection}{1em}{}
-''',
-"maketitle": r'''
+""",
+    "maketitle": r"""
 \makeatletter
 \thispagestyle{empty}
 {
@@ -70,14 +70,14 @@ latex_elements = {
 \vspace{3em}
 }
 \makeatother
-''',
+""",
 }
 latex_documents = [
     (
         user_doc,
         "hirep_user_guide.tex",
-        "HiRep User Guide", 
-        author, 
+        "HiRep User Guide",
+        author,
         "manual",
     ),
     (
@@ -86,7 +86,7 @@ latex_documents = [
         "HiRep Development Manual",
         author,
         "manual",
-    ), 
+    ),
 ]
 
 # -- Options for manual page output ---------------------------------------
@@ -97,10 +97,10 @@ man_pages = [
 # -- Options for Texinfo output -------------------------------------------
 texinfo_documents = [
     (
-        user_doc, 
-        "hirep_user_guide", 
-        "HiRep User Guide", 
-        author, 
+        user_doc,
+        "hirep_user_guide",
+        "HiRep User Guide",
+        author,
         "User Guide",
         "Library for Numerical Simulations of Fermions in Higher Representation on the Lattice",
         "Miscellaneous",
