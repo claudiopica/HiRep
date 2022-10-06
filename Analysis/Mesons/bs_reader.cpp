@@ -36,8 +36,8 @@ void read_cut(const char *cutFile)
 	int left, right;
 	line>>Channel;
         if(Channel.compare("")!=0)
-	  if(Channel[0]!='#'){        
-	    pair<map<string,int>::iterator,bool> ret; 
+	  if(Channel[0]!='#'){
+	    pair<map<string,int>::iterator,bool> ret;
 	    if(!(line >> left)) {
 	      cerr<<"[read_cut]:Missing entry for "<<Channel<<" for left cut"<<endl;
 	      exit(1);
@@ -93,10 +93,10 @@ static void antisym(int n, double *data) {
 }
 
 
-void read_input(const char * inputFile){  
+void read_input(const char * inputFile){
   ifstream mesinput(inputFile);
   double corr[Lt];
-  
+
   while(1) {
     stringstream line;
     stringbuf sb;
@@ -110,7 +110,7 @@ void read_input(const char * inputFile){
       line>>Word; /* trajectory index */
       line>>id; /* channel id */
       int i=0;
-      while(1) { 
+      while(1) {
     	  double d;
         line>>d;
         if(!line) break;
@@ -148,7 +148,7 @@ int read_cmdline(int argc, char*argv[]){
     cerr<<"[read_cmdline]: Usage "<<argv[0]<<" info <channel>"<<endl;
     exit(1);
   }
-  
+
   if(argc==3){
     if( strcmp(argv[1],"info") == 0 ){
       channel=argv[2];
@@ -161,9 +161,9 @@ int read_cmdline(int argc, char*argv[]){
       exit(1);
     }
   }
-  
+
   channel=argv[1];
-  
+
   effmass_method=atoi(argv[2]);
   if(effmass_method<0 || effmass_method>2) {
     cerr<<"[read_cmdline]: method can be only 0,1,2" <<endl;
@@ -196,7 +196,7 @@ int read_cmdline(int argc, char*argv[]){
     cerr<<"[read_cmdline]: Wrong value for Ls"<<endl;
     exit(1);
   }
-  
+
   svol=sqrt(double(Ls*Ls*Ls));
 
   blsize=atoi(argv[7]);
@@ -204,7 +204,7 @@ int read_cmdline(int argc, char*argv[]){
     cerr<<"[read_cmdline]: Wrong value for blocksize"<<endl;
     exit(1);
   }
-  
+
   if(argc==9){
     nsamples1=atoi(argv[8]);
     if(nsamples1<=0) {
@@ -217,6 +217,6 @@ int read_cmdline(int argc, char*argv[]){
       exit(1);
     }
   }
-  
+
   return 0;
 }

@@ -1,6 +1,6 @@
 /***************************************************************************\
- * Copyright (c) 2008, Agostino Patella, Claudio Pica                        *   
- * All rights reserved.                                                      * 
+ * Copyright (c) 2008, Agostino Patella, Claudio Pica                        *
+ * All rights reserved.                                                      *
  \***************************************************************************/
 
 
@@ -20,7 +20,7 @@ static int index_eolexi(int x0,int x1,int x2,int x3)
 {
    int y0,y1,y2,y3;
    int ix;
-   
+
    y0=x0%GLB_T;
    y1=x1%GLB_X;
    y2=x2%GLB_Y;
@@ -32,11 +32,11 @@ static int index_eolexi(int x0,int x1,int x2,int x3)
    }
 
    return ix;
-      
+
 }
 
 
-void write_gauge_field_eolexi_BE(char filename[]) 
+void write_gauge_field_eolexi_BE(char filename[])
 {
   FILE *fp=NULL;
   int pid=0;
@@ -52,9 +52,9 @@ void write_gauge_field_eolexi_BE(char filename[])
   int cid;
   int mpiret;
 #endif
-  
+
   suNg *eolexi_field=NULL;
-  
+
   if(PID==0) {
     eolexi_field=malloc(sizeof(suNg)*4*GLB_T*GLB_X*GLB_Y*GLB_Z);
   }
@@ -69,7 +69,7 @@ void write_gauge_field_eolexi_BE(char filename[])
   for(g[1]=0; g[1]<GLB_X; g[1]++)
   for(g[2]=0; g[2]<GLB_Y; g[2]++)
   for(g[3]=0; g[3]<GLB_Z; g[3]++) {
-  
+
 #ifdef WITH_MPI
     glb_to_proc(g, p); /* get the processor coordinate */
     MPI_Cart_rank(cart_comm, p, &cid);
@@ -86,7 +86,7 @@ void write_gauge_field_eolexi_BE(char filename[])
     }
 
 #ifdef WITH_MPI
-    MPI_Barrier(GLB_COMM); 
+    MPI_Barrier(GLB_COMM);
 
     if(pid!=0) {
 
@@ -144,14 +144,14 @@ void write_gauge_field_eolexi_BE(char filename[])
 
 
 
-void read_gauge_field_eolexi_BE(char filename[]) 
+void read_gauge_field_eolexi_BE(char filename[])
 {
   FILE *fp=NULL;
   int g[4], c[4];
   int mu;
   int ix_eolexi, ix_mpieo;
   double plaq;
- 
+
   suNg *eolexi_field = malloc(sizeof(suNg)*4*GLB_T*GLB_X*GLB_Y*GLB_Z);
 
   if(PID==0) {
@@ -170,7 +170,7 @@ void read_gauge_field_eolexi_BE(char filename[])
   for(c[1]=0; c[1]<X; c[1]++)
   for(c[2]=0; c[2]<Y; c[2]++)
   for(c[3]=0; c[3]<Z; c[3]++) {
-  
+
     g[0]=zerocoord[0]+c[0];
     g[1]=zerocoord[1]+c[1];
     g[2]=zerocoord[2]+c[2];
@@ -178,13 +178,13 @@ void read_gauge_field_eolexi_BE(char filename[])
 
     ix_eolexi=index_eolexi(g[0],g[1],g[2],g[3]);
     ix_mpieo=ipt(c[0],c[1],c[2],c[3]);
- 
+
     for(mu=0; mu<4;mu++)
       *pu_gauge(ix_mpieo,mu) = eolexi_field[4*ix_eolexi+mu];
-    
+
   }
-  
-  if (PID==0) fclose(fp); 
+
+  if (PID==0) fclose(fp);
 
   /* start sendrecv of global gauge field */
   start_gf_sendrecv(u_gauge);
@@ -216,7 +216,7 @@ void read_gauge_field_eolexi_BE(char filename[])
 }
 
 
-void write_gauge_field_eolexi_LE(char filename[]) 
+void write_gauge_field_eolexi_LE(char filename[])
 {
   FILE *fp=NULL;
   int pid=0;
@@ -232,9 +232,9 @@ void write_gauge_field_eolexi_LE(char filename[])
   int cid;
   int mpiret;
 #endif
-  
+
   suNg *eolexi_field=NULL;
-  
+
   if(PID==0) {
     eolexi_field=malloc(sizeof(suNg)*4*GLB_T*GLB_X*GLB_Y*GLB_Z);
   }
@@ -249,7 +249,7 @@ void write_gauge_field_eolexi_LE(char filename[])
   for(g[1]=0; g[1]<GLB_X; g[1]++)
   for(g[2]=0; g[2]<GLB_Y; g[2]++)
   for(g[3]=0; g[3]<GLB_Z; g[3]++) {
-  
+
 #ifdef WITH_MPI
     glb_to_proc(g, p); /* get the processor coordinate */
     MPI_Cart_rank(cart_comm, p, &cid);
@@ -266,7 +266,7 @@ void write_gauge_field_eolexi_LE(char filename[])
     }
 
 #ifdef WITH_MPI
-    MPI_Barrier(GLB_COMM); 
+    MPI_Barrier(GLB_COMM);
 
     if(pid!=0) {
 
@@ -324,14 +324,14 @@ void write_gauge_field_eolexi_LE(char filename[])
 
 
 
-void read_gauge_field_eolexi_LE(char filename[]) 
+void read_gauge_field_eolexi_LE(char filename[])
 {
   FILE *fp=NULL;
   int g[4], c[4];
   int mu;
   int ix_eolexi, ix_mpieo;
   double plaq;
- 
+
   suNg *eolexi_field = malloc(sizeof(suNg)*4*GLB_T*GLB_X*GLB_Y*GLB_Z);
 
   if(PID==0) {
@@ -350,7 +350,7 @@ void read_gauge_field_eolexi_LE(char filename[])
   for(c[1]=0; c[1]<X; c[1]++)
   for(c[2]=0; c[2]<Y; c[2]++)
   for(c[3]=0; c[3]<Z; c[3]++) {
-  
+
     g[0]=zerocoord[0]+c[0];
     g[1]=zerocoord[1]+c[1];
     g[2]=zerocoord[2]+c[2];
@@ -358,13 +358,13 @@ void read_gauge_field_eolexi_LE(char filename[])
 
     ix_eolexi=index_eolexi(g[0],g[1],g[2],g[3]);
     ix_mpieo=ipt(c[0],c[1],c[2],c[3]);
- 
+
     for(mu=0; mu<4;mu++)
       *pu_gauge(ix_mpieo,mu) = eolexi_field[4*ix_eolexi+mu];
-    
+
   }
-  
-  if (PID==0) fclose(fp); 
+
+  if (PID==0) fclose(fp);
 
   /* start sendrecv of global gauge field */
   start_gf_sendrecv(u_gauge);
@@ -394,6 +394,3 @@ void read_gauge_field_eolexi_LE(char filename[])
   }
 
 }
-
-
-

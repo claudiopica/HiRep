@@ -3,7 +3,7 @@ class smatrix : public sparsematrix<complex>
 public:
 	smatrix() : sparsematrix<complex>() {}
 	smatrix(int N) : sparsematrix<complex>(N) {}
-	
+
 	using sparsematrix<complex>::operator=;
 
 	complex& getzero() const
@@ -19,7 +19,7 @@ class svector : public sparsevector<complex>
 public:
 	svector() : sparsevector<complex>() {}
 	svector(int N) : sparsevector<complex>(N) {}
-	
+
 	using sparsevector<complex>::operator=;
 
 	complex& getzero() const
@@ -45,7 +45,7 @@ public:
 				set(i,j, tmp);
 			}
 	}
-	
+
 	using sparsematrix<polynomial>::operator=;
 
 	polynomial& getzero() const
@@ -53,7 +53,7 @@ public:
 		static polynomial zero;
 		return zero;
 	}
-	
+
 	bool isreal() const
 	{
 		bool RET = true;
@@ -61,7 +61,7 @@ public:
 			RET = RET && data[i]->value.isreal();
 		return RET;
 	}
-	
+
 	string assignment(const char* op, const char* name) const
 	{
 		ostringstream RET;
@@ -99,7 +99,7 @@ public:
                                   RET << name << mindex(i,j,size)  << op << " " << tmpre << "+I*(" <<tmpim << ")" ;
                                   if(i == size-1 && j == size-1) RET << _LASTENDL_;
                                   else RET << _ENDL_;
-                                  
+
                                 }
 		}
 		return RET.str();
@@ -132,7 +132,7 @@ public:
 				set(i,j, tmp);
 			}
 	}
-	
+
 	using pmatrix::operator=;
 };
 
@@ -162,7 +162,7 @@ public:
 				set(i,j, tmp);
 			}
 	}
-	
+
 	using pmatrix::operator=;
 };
 
@@ -181,15 +181,15 @@ public:
 			set(i, tmp);
 		}
 	}
-	
+
 	using sparsevector<polynomial>::operator=;
-	
+
 	polynomial& getzero() const
 	{
 		static polynomial zero;
 		return zero;
 	}
-	
+
 	bool isreal() const
 	{
 		bool RET = true;
@@ -197,7 +197,7 @@ public:
 			RET = RET && data[i]->value.isreal();
 		return RET;
 	}
-	
+
 	string assignment(const char* op, const char* name) const
 	{
 		ostringstream RET;
@@ -231,7 +231,7 @@ public:
                           tmpim = get(i).str_imag();
                           RET << _INDENT_;
                           RET << name << vindex(i,size) <<  op << " " << tmpre << "+I*(" << tmpim << ");";
-                            if(i == size-1) RET << _LASTENDL_; 
+                            if(i == size-1) RET << _LASTENDL_;
                             else RET << _ENDL_;
 
 

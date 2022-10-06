@@ -29,7 +29,7 @@ nor   =   2
 
 WF:make = true
 //WF integrators type 0=Euler 1=3rd order Runge-Kutta 2=Adaptive 3rd order Runge-Kutta
-WF:integrator = 2 
+WF:integrator = 2
 // Wilson Flow time
 WF:tmax = 14.0
 WF:nmeas = 40
@@ -52,4 +52,3 @@ nit = 50
 //rlx_state =
 //rlx_start =
 last conf = +10000
- 

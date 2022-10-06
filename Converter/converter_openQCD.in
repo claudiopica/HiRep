@@ -9,5 +9,5 @@ log:forcestat = 0
 
 conf name= openQCD_qcd1_OBC_L4T4_B12.0_cxxxn1
 
-//accepted input conf types are openqcd_pbc openqcd_obc openqcd_sf hirep_pbc 
+//accepted input conf types are openqcd_pbc openqcd_obc openqcd_sf hirep_pbc
 conf type= openqcd_obc

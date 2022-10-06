@@ -1,13 +1,13 @@
 CPP=clang++
 CFLAGS= -O3 -Wall -Wextra
-LDFLAGS= -L/opt/local/lib -lefence 
+LDFLAGS= -L/opt/local/lib -lefence
 INC = -I ./.
 
 # Location of Gnu Science Library
 GSL_LIB=/opt/local
 
 
-all: gevp test_mat test_eig 
+all: gevp test_mat test_eig
 
 gevp: gevp.cc read_arg.o utils.o matrix_algebra.o fit.o type.h Makefile
 	${CPP} fit.o read_arg.o utils.o matrix_algebra.o ${CFLAGS} ${LDFLAGS} $< -o $@

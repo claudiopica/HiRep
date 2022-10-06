@@ -7,4 +7,3 @@ SUBDIRS := $(filter-out $(EXCLUDEDIR), $(SUBDIRS))
 
 MKDIR = $(TOPDIR)/Make
 include $(MKDIR)/MkRules
-

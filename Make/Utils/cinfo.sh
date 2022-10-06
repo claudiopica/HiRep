@@ -30,7 +30,7 @@ echo "\";" >> ${FILENAME}
 echo "" >> ${FILENAME}
 rm cinfo.tmp
 
-if [[ -a /proc/cpuinfo ]] 
+if [[ -a /proc/cpuinfo ]]
 then
  awk '{printf "%s\\n",$0}' /proc/cpuinfo > cinfo.tmp
 else
@@ -43,7 +43,7 @@ echo "\";" >> ${FILENAME}
 echo "" >> ${FILENAME}
 rm cinfo.tmp
 
-if [[ -a /proc/version ]] 
+if [[ -a /proc/version ]]
 then
  awk '{printf "%s\\n",$0}' /proc/version > cinfo.tmp
 else
@@ -69,7 +69,7 @@ then
     len=`git rev-parse --symbolic-full-name|wc -c`+1
     echo -n "static char CI_gitinfo[${len}] = \"" `git rev-parse --symbolic-full-name` "\";" >>${FILENAME}
     echo "" >> ${FILENAME}
-    
+
     len=`git log --format="%H" -n 1|wc -c`+1
     echo "static char CI_gitrevision[${len}] = \"" `git log --format="%H" -n 1` "\";" >>${FILENAME}
     echo "" >> ${FILENAME}

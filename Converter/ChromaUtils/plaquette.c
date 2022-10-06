@@ -16,7 +16,7 @@ plaquette(QDP_ColorMatrix *link[])
   tmp2 = QDP_create_M();
   tmp3 = QDP_create_M();
   tmp4 = QDP_create_M();
-  
+
 
 /*   QDP_extract_C(tmp2,tmp1,QDP_all); */
 
@@ -38,4 +38,3 @@ plaquette(QDP_ColorMatrix *link[])
 
   return total;
 }
-

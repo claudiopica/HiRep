@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 #include <stdio.h>
@@ -16,9 +16,9 @@ static real arithgeom3(real z, real a, real b) {
   real diff[MAXREC], sum[MAXREC], sn;
   real pb = -1.; int n=MAXREC;
   while (n && b>pb) {
-    --n; 
+    --n;
     sum[n]=a+b; diff[n]=a-b;
-    pb=b; b=sqrt(a*b); a=0.5*(a+pb); 
+    pb=b; b=sqrt(a*b); a=0.5*(a+pb);
   }
   if(n==0 && b>pb) {
     printf("ERRORE: raggiunto numero massimo di iterazioni in arithgeom3!!\n");
@@ -33,11 +33,11 @@ static real arithgeom3(real z, real a, real b) {
 static real sn(real z, real kp) {
   real diff[MAXREC], sum[MAXREC], sn;
   real pb = -1.; real a=1.;
-  int n=MAXREC; 
+  int n=MAXREC;
   while (n && kp>pb) {
-    --n; 
+    --n;
     sum[n]=a+kp; diff[n]=a-kp;
-    pb=kp; kp=sqrt(a*kp); a=0.5*(a+pb); 
+    pb=kp; kp=sqrt(a*kp); a=0.5*(a+pb);
   }
   if(n==0 && kp>pb) {
     printf("ERRORE: raggiunto numero massimo di iterazioni in sn!!\n");
@@ -76,7 +76,7 @@ static real K_rec(real kp) {
 static real K(real kp) {
   real pb = -1.; real a=1.;
   while (kp>pb) {
-    pb=kp; kp=sqrt(a*kp); a=0.5*(a+pb); 
+    pb=kp; kp=sqrt(a*kp); a=0.5*(a+pb);
   }
   return M_PI_2/a;
 }
@@ -84,14 +84,14 @@ static real K(real kp) {
 static real dn(real z, real kp) {
   real agm;
   agm = sn(z, kp);
-  return sqrt(1.-(1.-kp*kp)*agm*agm);  
+  return sqrt(1.-(1.-kp*kp)*agm*agm);
 }
 
 /*
 static real arithgeom2( real z, real a, real b, real *sn) {
   static real pb = -1.;
   real agm;
-  
+
   if(b<=pb) { pb=-1; *sn = sin (z*a); return a;}
   pb = b;
   agm = arithgeom( z, 0.5*(a+b), sqrt(a*b), sn);
@@ -104,9 +104,9 @@ static real arithgeom3( real z, real a, real b, real *sn) {
   real diff[MAXREC], sum[MAXREC];
   real pb = -1.; int n=MAXREC;
   while (n && b>pb) {
-    --n; 
+    --n;
     sum[n]=a+b; diff[n]=a;
-    pb=b; b=sqrt(a*b); a=0.5*(a+b); 
+    pb=b; b=sqrt(a*b); a=0.5*(a+b);
   }
   if(n==0) {
     printf("ERRORE: raggiunto numero massimo di iterazioni in arithgeom3!!\n");
@@ -147,14 +147,14 @@ void zolotarev_coef(int n, real k, real *a, real *b, real *delta){
     b[n-1] = k2*inv_cp_m;
 
     inv_lambda *= (inv_xi_bar*inv_c_m-1.)/(inv_xi_bar*inv_cp_m-1.);
-    
+
     a[0] *= (inv_cp_m-1.)/(inv_c_m-1.);
   }
 
   inv_lambda *= a[0];
   a[0] *= 2./ ((1.+inv_lambda)*k);
   *delta = (inv_lambda-1.) / (1.+inv_lambda);
-  
+
 }
 
 real zolotarev_invsqrt(real x, int n, real *a, real *b){
@@ -193,7 +193,7 @@ void partial_frac_coef(int n, real *a, real*b) {
   int order = n>>1;
   int i, k;
   real ap[order];
-  
+
   for (i=0; i<order; ++i)
     ap[i] = a[i+1];
 
@@ -215,7 +215,7 @@ real pfrac_eval(real x, int n, real *a, real *b) {
     res += a[n]/(x-b[n-1]);
   }
   return res;
-  
+
 }
 
 int main()
@@ -235,7 +235,7 @@ int main()
   zolotarev_coef(APP_ORD, k, a, b, &delta);
   */
 
-  /*  
+  /*
   for (min/=1.5;min>1e-10;min/=1.2) {
     printf("[%g,%g]\t", min, max);
     for (np=3; np<APP_ORD+1; np+=2) {
@@ -273,11 +273,11 @@ int main()
       min = mean;
       err = err3;
     }
-    delta2 = min - min2; 
+    delta2 = min - min2;
     printf("Min = %g ; Min2 = %g ; Delta = %g\n", min, min2, delta2);
 
   } while (delta2>2.e-15);
-  
+
   printf("[%1.16e,%g]\t", min, max);
   printf("%d\t%g\n", np>>1, err);
   printf("[%1.16e,%g]\t", min2, max);
@@ -286,7 +286,7 @@ int main()
   norm_coef(min, max, np, a, b, &delta);
 
   partial_frac_coef(np, a, b);
- 
+
   printf("Ra_a0 = %1.16e\n",a[0]);
   for(i=0;i<(np>>1);++i) {
     /*    printf("[%d] ", (np>>1)-i-1);*/
@@ -294,19 +294,19 @@ int main()
     printf("Ra_b[%d] = %1.16e ;\n", (np>>1)-i-1,b[i]);
   }
 
-   
+
   printf("[%1.16e,%g]\t", min, max);
   delta = max-min;
   for (np=0; np<10000; ++np) {
     x = min + ((real) np) / ((real)9999) * delta;
     fn = 1./ sqrt(x);
-    /*  
+    /*
     app = zolotarev_invsqrt(x, APP_ORD, a, b);
     app2 = zolotarev_sign(x, APP_ORD, a, b);
     */
     diff = pfrac_eval(x, APP_ORD, a, b);
     printf("%g\t%g\t%g\n", x, delta, (fn-diff)/fabs(fn));
   }
-  
+
   return 0;
 }

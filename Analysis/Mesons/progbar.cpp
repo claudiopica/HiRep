@@ -5,7 +5,7 @@ using std::flush;
 
 const char CSI[]="[";
 const char eraseline[]="[2K";
-const char spin[]="(O)|"; //"/-\|", "(O)O", ".oOo", "(O)|" 
+const char spin[]="(O)|"; //"/-\|", "(O)O", ".oOo", "(O)|"
 
 void DrawBar(double p, std::ostream &out) {
   const double w=79.;
@@ -29,5 +29,3 @@ void DrawBar(double p, std::ostream &out) {
   out<<CSI<<"27m";
   out<<flush;
 }
-
-

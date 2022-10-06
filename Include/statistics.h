@@ -26,5 +26,3 @@ double sigma_jackknife(int nobs,int n,double a[],double *ave_j,double (*pobs)(do
 
 
 #endif
-
-

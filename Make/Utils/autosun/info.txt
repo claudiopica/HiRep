@@ -42,7 +42,7 @@ Per l'aggiunta:
 	matrici d(R)xd(R) reali
 Per l'antisimmetrica o la simmetrica:
 	matrici d(R)xd(R) complesse
-	
+
 
 COSA FANNO LE ROUTINES?
 

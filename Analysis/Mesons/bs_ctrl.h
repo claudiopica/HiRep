@@ -14,20 +14,20 @@ class eval_ctrl {
  protected:
   bool level[MAX_NLEVELS];
   std::string name;
-    
+
  public:
   virtual ~eval_ctrl() {};
-  
+
   virtual void prop_dep()=0;
 
   virtual void prop_cuts() {};
-  
+
   virtual void allocate_datamemory(int lt) {};
-  
+
   virtual void purge_b2() {};
-  
+
   virtual void print()=0;
-  
+
   virtual bool isprimary() {return false;}
   virtual bool isderived() {return false;}
   virtual bool isratio() {return false;}
@@ -46,7 +46,7 @@ class eval_ctrl {
   int get_right_cut();
 
   virtual std::ostream& print_utility(std::ostream& os)=0;
-  friend std::ostream& operator<<(std::ostream& os, eval_ctrl& ev); 
+  friend std::ostream& operator<<(std::ostream& os, eval_ctrl& ev);
 };
 
 
@@ -58,15 +58,15 @@ enum { R_ACTIVE=0 };
 class primary_ctrl : public eval_ctrl {
  private:
   int chan_counter;
- 
+
   void prop_dep();
 
-  std::ostream& print_utility(std::ostream& os);  
-  
+  std::ostream& print_utility(std::ostream& os);
+
  public:
   int nchan;
   char** channel;
-  
+
   Corr_t** cor_b0;
   Corr_t* cor_b1;
   Corr_t* cor_b2;
@@ -86,7 +86,7 @@ class primary_ctrl : public eval_ctrl {
   void purge_b2();
   void print();
   bool isprimary() {return true;};
-  
+
   bool eval_cor_eff(const int bsl, const int* bs, const int len, int Lt, int effmass_method);
   void store_cor_eff(int bs);
 };
@@ -98,12 +98,12 @@ class derived_ctrl : public eval_ctrl {
   void prop_cuts();
 
   std::ostream& print_utility(std::ostream& os);
-  
+
  public:
   int ndep[3];
   eval_ctrl** dep[3];
   int* dep_level[3];
-  
+
   Corr_t* eff_b1;
   Corr_t* eff_b2;
   datasample fit;
@@ -125,13 +125,13 @@ class ratio_ctrl : public eval_ctrl {
  private:
   void prop_dep();
 
-  std::ostream& print_utility(std::ostream& os);  
-  
+  std::ostream& print_utility(std::ostream& os);
+
  public:
   int ndep;
   eval_ctrl** dep;
   int* dep_level;
-  
+
   datasample fit;
 
   ratio_ctrl(const char* n);

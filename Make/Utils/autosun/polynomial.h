@@ -14,9 +14,9 @@ public:
 		static int zero = 0;
 		return zero;
 	}
-	
+
 	using orderedlist<string,int>::operator=;
-	
+
 	friend bool operator<(const rmonomial& a, const rmonomial& b) { return a.getstring() < b.getstring(); }
 	friend bool operator<=(const rmonomial& a, const rmonomial& b) { return a.getstring() <= b.getstring(); }
 	friend bool operator==(const rmonomial& a, const rmonomial& b) { return a.getstring() == b.getstring(); }
@@ -50,13 +50,13 @@ class polynomial : public orderedlist<rmonomial,complex>
 public:
 	polynomial() : orderedlist<rmonomial,complex>() {}
 	polynomial(const rmonomial& index, const complex& value) : orderedlist<rmonomial,complex>(index, value) {}
-	
+
 	complex& getzero() const
 	{
 		static complex zero = complex(0.0,0.0);
 		return zero;
 	}
-	
+
 	using orderedlist<rmonomial,complex>::operator=;
 
 	polynomial& operator+=(const polynomial& b)
@@ -80,13 +80,13 @@ public:
 			RET = RET && data[i]->value.im == 0.0;
 		return RET;
 	}
-	
+
 	string str_real() const
 	{
 		string RET;
 		FLOATING a = 0.0;
 		int counter = 0;
-		
+
 		for(KEYTYPE i = 0; i < length; i++)
 		{
 			if(equal(data[i]->value.re,0.0)) continue;
@@ -98,7 +98,7 @@ public:
 
 		if(equal(a,-1.0)) RET = "-(";
 		else if(!equal(a,1.0)) RET = ftos(a) + "*(";
-		
+
 		for(KEYTYPE i = 0; i < length; i++)
 			if(!equal(data[i]->value.re,0.0))
 			{
@@ -111,9 +111,9 @@ public:
 				else RET += coeff;
 				RET += rmon;
 			}
-		
+
 		if(!equal(a,1.0)) RET += ")";
-		
+
 		if(RET == "") RET = "0.0";
 
 		return RET;
@@ -148,9 +148,9 @@ public:
 				else RET += coeff;
 				RET += rmon;
 			}
-		
+
 		if(!equal(a,1.0)) RET += ")";
-		
+
 		if(RET == "") RET = "0.0";
 
 		return RET;
@@ -160,7 +160,7 @@ public:
 	{
 		return "(" + str_real() + "," + str_imag() + ")";
 	}
-	
+
 	void minus()
 	{
 		for(int i = 0; i < length; i++)

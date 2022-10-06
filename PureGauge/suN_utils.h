@@ -1,6 +1,6 @@
 /***************************************************************************\
- * Copyright (c) 2019, Antonio Rago                                          *   
- * All rights reserved.                                                      * 
+ * Copyright (c) 2019, Antonio Rago                                          *
+ * All rights reserved.                                                      *
  \***************************************************************************/
 
 #ifndef SUN_UTILS_H

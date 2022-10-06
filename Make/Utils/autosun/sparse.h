@@ -2,27 +2,27 @@ template<class INDEX, class VALUE> class sparselinear : public orderedlist<INDEX
 {
 public:
 	int size;
-	
+
 	sparselinear() : orderedlist<INDEX,VALUE>() { size = 0; }
 	sparselinear(int n) : orderedlist<INDEX,VALUE>() { size = n; }
 	sparselinear(const sparselinear<INDEX,VALUE>& mat) : orderedlist<INDEX,VALUE>(mat) { size = mat.size; }
-	
+
 	virtual orderedlist<INDEX,VALUE>& operator=(const orderedlist<INDEX,VALUE>& b)
 	{
 	  orderedlist<INDEX,VALUE>::operator=(b);
 	  if(dynamic_cast<const sparselinear<INDEX,VALUE>*>(&b) != NULL) {
       const sparselinear<INDEX,VALUE>& sb = *dynamic_cast<const sparselinear<INDEX,VALUE>*>(&b);
       size = sb.size;
-    }      
+    }
     return *this;
 	}
-	
+
 	virtual void minus()
 	{
 		for(int i = 0; i < orderedlist<INDEX,VALUE>::length; i++)
 			(orderedlist<INDEX,VALUE>::data)[i]->value.minus();
 	}
-	
+
 	virtual void add(const orderedlist<INDEX,VALUE>& l)
 	{
 	  if(dynamic_cast<const sparselinear<INDEX,VALUE>*>(&l) != NULL) {
@@ -46,7 +46,7 @@ public:
 		orderedlist<INDEX,VALUE>::add(l);
 		minus();
 	}
-	
+
 	friend void herm(VALUE& ret, const sparselinear<INDEX,VALUE>& l, const sparselinear<INDEX,VALUE>& k)
 	{
 		if(k.size != l.size)
@@ -73,7 +73,7 @@ struct mindex
 	int row;
 	int col;
 	int size;
-	
+
 	mindex() { row = 0; col = 0; size = 0;}
 	mindex(int r, int c, int s)
 	{
@@ -99,7 +99,7 @@ struct mindex
 		else
 			col = c;
 	}
-	
+
 	mindex& operator=(const mindex& index)
 	{
 		row = index.row;
@@ -115,7 +115,7 @@ struct mindex
 	friend bool operator>=(const mindex& a, const mindex& b) { return a.key() >= b.key(); }
 	friend bool operator==(const mindex& a, const mindex& b) { return a.key() == b.key() && a.size == b.size; }
 	friend bool operator!=(const mindex& a, const mindex& b) { return a.key() != b.key() || a.size != b.size; }
-	
+
 	friend ostream& operator<<(ostream& os, const mindex& a)
 	{
 		return os << _MINDEX_;
@@ -130,7 +130,7 @@ public:
 	sparsematrix(const sparsematrix<VALUE>& mat) : sparselinear<mindex,VALUE>(mat) {}
 
 	using sparselinear<mindex,VALUE>::operator=;
-	
+
 	const VALUE& get(int row, int col) const
 	{
 		return orderedlist<mindex,VALUE>::get(mindex(row,col,sparselinear<mindex,VALUE>::size));
@@ -157,7 +157,7 @@ public:
 		RET << "\n";
 		return RET.str();
 	}
-	
+
 	virtual void adjoint()
 	{
 		int tmp;
@@ -181,7 +181,7 @@ public:
 		}
 		this->sort();
 	}
-	
+
 	using sparselinear<mindex,VALUE>::add;
 	using sparselinear<mindex,VALUE>::sub;
 	void mult(const sparsematrix<VALUE>& p, const sparsematrix<VALUE>& q)
@@ -232,7 +232,7 @@ struct vindex
 {
 	int row;
 	int size;
-	
+
 	vindex() { row = 0; size = 0;}
 	vindex(int r, int s)
 	{
@@ -251,7 +251,7 @@ struct vindex
 		else
 			row = r;
 	}
-	
+
 	vindex& operator=(const vindex& index)
 	{
 		row = index.row;
@@ -265,7 +265,7 @@ struct vindex
 	friend bool operator>=(const vindex& a, const vindex& b) { return a.row >= b.row; }
 	friend bool operator==(const vindex& a, const vindex& b) { return a.row == b.row && a.size == b.size; }
 	friend bool operator!=(const vindex& a, const vindex& b) { return a.row != b.row || a.size != b.size; }
-	
+
 	friend ostream& operator<<(ostream& os, const vindex& a)
 	{
 		return os << _VINDEX_;

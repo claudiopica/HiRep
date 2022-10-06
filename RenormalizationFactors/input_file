@@ -28,5 +28,4 @@ mes:pt_in = 0
 mes:px_in = 1
 mes:py_in = 0
 mes:pz_in = -1
-mes:configlist = list.txt 
-
+mes:configlist = list.txt

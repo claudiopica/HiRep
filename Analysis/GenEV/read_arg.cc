@@ -20,7 +20,7 @@ static void select_opplist(par *apar, char *input);
 
 void read_arg(par *apar, int argc, char **argv)
 {
-  
+
   int c;
 
   while ((c = getopt(argc, argv, "i:f:D:J:r:Gx:d:e:vT:")) != -1)

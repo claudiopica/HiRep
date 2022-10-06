@@ -19,5 +19,5 @@ disc:mass = -0.6
 disc:precision = 1e-20
 disc:nhits =2
 disc:source_type =0
-disc:configlist = list_conf.txt 
+disc:configlist = list_conf.txt
 disc:n_mom = 1

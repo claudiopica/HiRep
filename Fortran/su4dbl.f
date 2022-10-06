@@ -1,13 +1,13 @@
 C***************************************************************
 C 20-12-01
-C D=4 SU(NCOL) code with  Q,  J=0,2   P,C=+,+  glueballs 
+C D=4 SU(NCOL) code with  Q,  J=0,2   P,C=+,+  glueballs
 C N-ality = 1,2,3 flux loops
 C
 C*****
 C
 C blocking uses products of 2 smeared links :
 C itype different parameter sets
-C 
+C
 C WARNING: POLY VACS ARE REAL -- NO GOOD FOR FINITE T!
 C
 C***************************************************************
@@ -49,7 +49,7 @@ C
         CALL MOMENTM
 C
         PARBS(1)=0.40
-        PARBDS(1)=0.16 
+        PARBDS(1)=0.16
 c        PARBS(1)=0.30
 c        PARBDS(1)=0.12
 c        PARBS(2)=0.375
@@ -63,7 +63,7 @@ C
 c        RATIO=0.25
         USTADPOLE=1.0d0
         UTTADPOLE=1.0d0
-        UST2=USTADPOLE*USTADPOLE 
+        UST2=USTADPOLE*USTADPOLE
         UTT2=UTTADPOLE*UTTADPOLE
         SRAT=RATIO/(UST2*UST2)
         TRAT=1./(RATIO*UST2*UTT2)
@@ -133,10 +133,10 @@ c     &          ,DKAPPA,IFILE,0)
            CALL fortran_read_new_gauge(u11,LX4,LX1,LX2,LX3,NCOL,NF,BETAG
      &          ,DKAPPA,IFILE,IENDIAN,ISWAPTX)
            CALL ACTION(0,ITER,TOTACT)
-           write (*,211) TOTACT 
+           write (*,211) TOTACT
            CALL POLYLOOP()
 c           if (iter.eq.(icmin+30)) goto 998
-           write (*,*) ' ' 
+           write (*,*) ' '
            CALL MEASURE(ITER,ITOT)
 C        IF(ITER.EQ.(ITER/ICALLQ)*ICALLQ) CALL QCOOL
 20      CONTINUE
@@ -363,7 +363,7 @@ C
         COR(IB,NT)=SUM
 24      CONTINUE
         IF(ABS(COR(1,1)).LE.EPS) THEN
-           write (*,*) 'COR(1,1) =',ABS(COR(1,1)),'< EPS =', EPS 
+           write (*,*) 'COR(1,1) =',ABS(COR(1,1)),'< EPS =', EPS
            GOTO20
         ENDIF
         CALL JACK(NBIN,1,LX4,NUMBIN,LMAX,COR,VAC)
@@ -536,7 +536,7 @@ C
         RETURN
         END
 C*********************************************************************
-C create blocked links by multiplying together two smeared 
+C create blocked links by multiplying together two smeared
 C links of the previous blocking level -- uses SMEAR1 which smears
 C UC11 links once using pointers put in /ASMEAR1/
 C*********************************************************************
@@ -605,7 +605,7 @@ C
 2       CONTINUE
 1       CONTINUE
 C
-        DO 40 ITY=1,ITYPE 
+        DO 40 ITY=1,ITYPE
         CALL PLNCORB(ITY)
         CALL POTB(ITY)
 40      CONTINUE
@@ -737,7 +737,7 @@ C
         RETURN
         END
 C*********************************************************************
-C form 4 'diagonal' links in plane orth to MU, from each site 
+C form 4 'diagonal' links in plane orth to MU, from each site
 C with end-pt in IDD using links and pointers in /DIAGIN/
 C -- output matrices (not suN) and pointers in /DIAGOUT/
 C*********************************************************************
@@ -1457,7 +1457,7 @@ c        ADIV=1./((LSKU+1)/2)
         ADIV=1./LSKU
         DO 55 KK=1,7
         ALINE1(KU,KK,N4,ID,ITY)=CSUM1(KK)*ADIV
-        ALINE2(KU,KK,1,N4,ID,ITY)=CSUM2(1,KK)*ADIV        
+        ALINE2(KU,KK,1,N4,ID,ITY)=CSUM2(1,KK)*ADIV
         ALINE2(KU,KK,2,N4,ID,ITY)=CSUM2(2,KK)*ADIV
         ALINE3(KU,KK,1,N4,ID,ITY)=CSUM3(1,KK)*ADIV
         ALINE3(KU,KK,2,N4,ID,ITY)=CSUM3(2,KK)*ADIV
@@ -1703,22 +1703,22 @@ C
       icoordvect(2) = LX2-1
       icoordvect(3) = LX3-1
       icoordvect(4) = LX4-1
-C     
-      cpol(:) = dcmplx(0.0d0,0.0d0) 
+C
+      cpol(:) = dcmplx(0.0d0,0.0d0)
       dnorm = 1.0/dfloat(lsizeb*ncol)
 c
       DO ipoint=1, lsizeb
          do idir=1, 4
             a11(:) = u11(:,ipoint,idir)
             ipoint1 = ipoint
-            do icoord=2,icoordvect(idir) 
-               ipoint2 = iup(ipoint1,idir) 
+            do icoord=2,icoordvect(idir)
+               ipoint2 = iup(ipoint1,idir)
                b11 = u11(:,ipoint2,idir)
                call vmx(1,a11,b11,c11,1)
                a11(:) = c11(:)
                ipoint2 = ipoint1
             enddo
-            ipoint2 = iup(ipoint1,idir) 
+            ipoint2 = iup(ipoint1,idir)
             b11 = u11(:,ipoint2,idir)
             call trvmx(1,a11,b11,cpol1,1)
             cpol(idir) = cpol(idir) + cpol1
@@ -1735,7 +1735,7 @@ C
 C
       RETURN
       END
-      
+
 
 C*********************************************************************
 C OK
@@ -1816,7 +1816,7 @@ C
       VACTS=VACTS/(3.0*LSIZE)
       VACTT=VACTT/(3.0*LSIZE)
       TOTACT = 0.5*(VACTS+VACTT)
-      write (91,*) VACTS, VACTT, TOTACT 
+      write (91,*) VACTS, VACTT, TOTACT
 C
       AVACS(JBIN)=AVACS(JBIN)+VACTS
       AVACT(JBIN)=AVACT(JBIN)+VACTT
@@ -2831,4 +2831,3 @@ C
 C
       RETURN
       END
-

@@ -2,26 +2,26 @@
 *
 * Random number generator "ranlxs"
 *
-* See the notes 
+* See the notes
 *
 *   "User's guide for ranlxs and ranlxd [C programs]" (December 1997)
 *
-*   "Double precision implementation of the random number 
+*   "Double precision implementation of the random number
 *    generator ranlux" (December 1997)
 *
 * for a detailed description
 *
-* The externally accessible functions are 
+* The externally accessible functions are
 *
 *   void ranlxs(float r[],int n)
-*     Computes the next n single-precision random numbers and 
+*     Computes the next n single-precision random numbers and
 *     assigns them to the elements r[0],...,r[n-1] of the array r[]
-* 
+*
 *   void rlxs_init(int level,int seed)
 *     Initialization of the generator
 *
 *   void rlxs_get(int state[])
-*     Extracts the current state of the generator and stores the 
+*     Extracts the current state of the generator and stores the
 *     information in the array state[25]
 *
 *   void rlxs_reset(int state[])
@@ -42,7 +42,7 @@
 #include "ranlxs.h"
 
 static int pr,ir,jr,is,is_old,init=0;
-static int next[12],snext[24]; 
+static int next[12],snext[24];
 static float xflt[24];
 static double zero,one,carry;
 static double sbase,sone_bit,base,one_bit,shift;
@@ -80,18 +80,18 @@ namespace //Local linkage functions
 	std::cerr<<"Error in rlxs_reset\n";
 	std::cerr<<"Unexpected input data\n";
 	break;
-      }         
+      }
     std::cerr<<"Program aborted\n";
     exit(0);
   }
-  
+
   extern inline void ranlux_step(double &x1, double &x2, const int i1, const int i2, const int i3)
   {
-    x1=xdbl[i1]-xdbl[i2];          
-    if(x2<zero){                              
-      x1-=one_bit;                 
-      x2+=one;                     
-    }                              
+    x1=xdbl[i1]-xdbl[i2];
+    if(x2<zero){
+      x1-=one_bit;
+      x2+=one;
+    }
     xdbl[i3]=x2;
   }
 
@@ -101,16 +101,16 @@ namespace //Local linkage functions
     int k,kmax,l;
     double x,y1,y2,y3;
 
-    for (k=0;ir>0;++k) 
+    for (k=0;ir>0;++k)
       {
 	y1=xdbl[jr]-xdbl[ir];
 	y2=y1-carry;
-	if (y2<zero) 
-	  { 
+	if (y2<zero)
+	  {
 	    carry=one_bit;
 	    y2+=one;
 	  }
-	else 
+	else
 	  carry=zero;
 	xdbl[ir]=y2;
 	ir=next[ir];
@@ -135,7 +135,7 @@ namespace //Local linkage functions
 	ranlux_step(y1,y3, 4, 9, 8);
 	ranlux_step(y2,y1, 5,10, 9);
 	ranlux_step(y3,y2, 6,11,10);
-      
+
 	if (y3<zero)
 	  {
 	    carry=one_bit;
@@ -144,20 +144,20 @@ namespace //Local linkage functions
 	else
 	  carry=zero;
 	xdbl[11]=y3;
-      }  
+      }
 
     kmax=pr;
 
-    for (;k<kmax;++k) 
+    for (;k<kmax;++k)
       {
 	y1=xdbl[jr]-xdbl[ir];
 	y2=y1-carry;
-	if (y2<zero) 
-	  { 
+	if (y2<zero)
+	  {
 	    carry=one_bit;
 	    y2+=one;
 	  }
-	else 
+	else
 	  carry=zero;
 	xdbl[ir]=y2;
 	ydbl[ir]=y2+shift;
@@ -173,7 +173,7 @@ namespace //Local linkage functions
 	k=next[k];
       }
 
-    for (k=0,l=0;k<12;++k) 
+    for (k=0,l=0;k<12;++k)
       {
 	x=xdbl[k];
 	y2=ydbl[k]-shift;
@@ -203,7 +203,7 @@ namespace //Local linkage functions
     one_bit=ldexp(one,-48);
     shift=ldexp(one,DBL_MANT_DIG-25);
 
-    for (k=0;k<12;++k) 
+    for (k=0;k<12;++k)
       {
 	next[k]=(k+1)%12;
 	snext[2*k]=(2*k+1)%24;
@@ -234,7 +234,7 @@ void rlxs_init(int level,int seed)
    define_constants();
    i=seed;
 
-   for (k=0;k<31;++k) 
+   for (k=0;k<31;++k)
    {
       xbit[k]=i%2;
       i/=2;
@@ -245,12 +245,12 @@ void rlxs_init(int level,int seed)
 
    ibit=0;
    jbit=18;
- 
-   for (k=0;k<12;++k) 
+
+   for (k=0;k<12;++k)
    {
       x=zero;
 
-      for (l=1;l<=48;++l) 
+      for (l=1;l<=48;++l)
       {
          y=(double)xbit[ibit];
          x+=x+y;
@@ -279,7 +279,7 @@ void ranlxs(float r[],int n)
       //rlxs_init(0,1);
    }
 
-   for (k=0;k<n;++k) 
+   for (k=0;k<n;++k)
    {
       is=snext[is];
       if (is==is_old)
@@ -296,7 +296,7 @@ void rlxs_get(int state[])
    if (init==0)
       error(3);
 
-   for (k=0;k<12;++k) 
+   for (k=0;k<12;++k)
    {
       x=sbase*xdbl[k];
       y1=sbase*modf(x,&y2);
@@ -322,7 +322,7 @@ void rlxs_reset(int state[])
 
    define_constants();
 
-   for (k=0;k<24;++k) 
+   for (k=0;k<24;++k)
    {
       if ((state[k]>=(int)sbase)||(state[k]<0))
          error(5);
@@ -345,7 +345,7 @@ void rlxs_reset(int state[])
        (jr!=((ir+7)%12)))
       error(5);
 
-   for (k=0;k<12;++k) 
+   for (k=0;k<12;++k)
    {
       y1=(double)state[2*k];
       y2=(double)state[2*k+1];

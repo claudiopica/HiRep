@@ -20,7 +20,7 @@ void representation::init()
 	cerr << "Initializing ADJOINT representation..... ";
 #endif
 	int N = group::N;
-	
+
 	if(N == 0)
 	{
 		cerr << "Initialization of group needed.";
@@ -38,13 +38,13 @@ void representation::init()
 #endif
 	iT = new smatrix[group::DIM];
 	e = new smatrix[DIM];
-	
+
 	for(C = 0; C < DIM; C++)
 	{
 		e[C] = group::T[C];
 		e[C].scale(1./sqrt(group::Tnorm));
 	}
-	
+
 	for(C = 0; C < group::DIM; C++)
 	{
 		iT[C].size = DIM;
@@ -53,7 +53,7 @@ void representation::init()
 			tmp.mult(e[A], group::T[C]);
 			tmp.minus();
 			tmp.add_mult(group::T[C], e[A]);
-			
+
 			for(B = 0; B < DIM; B++)
 			{
 				complex ctmp;
@@ -65,7 +65,7 @@ void representation::init()
 			}
 		}
 	}
-	
+
 	iTnorm = 2.*group::Tnorm*N;
 
 #ifndef NDEBUG
@@ -81,9 +81,9 @@ string group_represent(const char* vname, const char* uname)
 	pmatrix adjU(group::N);
 	pmatrix rU(representation::DIM);
 	pmatrix *Ue;
-    
+
         Ue = new pmatrix[representation::DIM];
-	
+
 	adjU = U;
 	adjU.adjoint();
 
@@ -94,7 +94,7 @@ string group_represent(const char* vname, const char* uname)
 		mtmp.mult(e, adjU);
 		Ue[A].mult(U, mtmp);
 	}
-	
+
 	for(int B = 0; B < representation::DIM; B++)
 		for(int A = 0; A < representation::DIM; A++)
 		{
@@ -106,11 +106,11 @@ string group_represent(const char* vname, const char* uname)
 			v.real();
 			rU.set(A,B, v);
 		}
-	
+
 	RET += rU.assignment("=", vname);
-	
+
     delete[] Ue;
-    
+
 	return RET;
 }
 
@@ -155,4 +155,3 @@ string debug_group_represent(const char* vname, const char* uname)
 	}\n";
 	return RET;
 }
-

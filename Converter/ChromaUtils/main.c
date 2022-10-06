@@ -63,8 +63,8 @@ void read_cmdline(int argc, char* argv[]) {
 
   strcpy(output_filename,argv[ao]);
   strcpy(input_filename,argv[ai]);
-  
- 
+
+
   input_filetype.size[0]=lattice_size[3];
   input_filetype.size[1]=lattice_size[0];
   input_filetype.size[2]=lattice_size[1];
@@ -72,8 +72,8 @@ void read_cmdline(int argc, char* argv[]) {
   input_filetype.ng=QDP_Nc;
   input_filetype.size_f=true;
   input_filetype.ng_f=true;
-  
-  
+
+
   GLB_T=input_filetype.size[0];
   GLB_X=input_filetype.size[1];
   GLB_Y=input_filetype.size[2];
@@ -141,7 +141,7 @@ main(int argc, char *argv[])
   input_filetype.beta_f=true;
 
   /* translate the gauge field in HiRep notation */
-  
+
   chroma_to_HiRep(U);
 
   /* Compute plaquette with QDP */
@@ -153,14 +153,14 @@ main(int argc, char *argv[])
 
 
   /* Compute plaquette with HiRep */
-  lprintf("Converter",0,"HiRep plaq = %8.6f \n", avr_plaquette()); 
+  lprintf("Converter",0,"HiRep plaq = %8.6f \n", avr_plaquette());
   full_plaquette();
 
 
   write_gauge_field(output_filename);
 
   /* delete the gauge field */
-  for (mu = 0; mu < NDIM; mu++) QDP_destroy_M(U[mu]);  
+  for (mu = 0; mu < NDIM; mu++) QDP_destroy_M(U[mu]);
 
    status = 0;
 end:

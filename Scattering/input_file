@@ -27,6 +27,3 @@ mes:bc = P
 mes:p = (0,0,1)(1,1,0)(1,1,1)
 mes:tsrc = 0
 mes:configlist = list_conf.txt
-
-
-

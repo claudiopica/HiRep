@@ -38,11 +38,9 @@ mes:discon_gfwall = 0
 mes:discon_volume = 0
 mes:dilution = 1
 mes:dirichlet_dt = 2
-mes:configlist = list_conf.txt 
+mes:configlist = list_conf.txt
 //Whether to include the four fermion interaction
 ff:on = false
 //Parameters for hopping parameter expansion, 0 in degree_hopping to disable
 mes:degree_hopping = 0
 mes:nhits_hopping = 5
-
-

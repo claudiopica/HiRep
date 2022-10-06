@@ -37,25 +37,25 @@ shift $[ OPTIND - 1 ]
 
 if [ -z "$CHANNEL" ] ||  [ -z "$LT" ] || [ -z "$LS" ] || [ -z "$INPUT" ]  || [ -z "$METHOD" ]
     then
-    echo "$0: Missing parameter" 
+    echo "$0: Missing parameter"
     help
 fi
 
-if [ ! -f ${EXEC} ] 
+if [ ! -f ${EXEC} ]
     then
-    echo "$0: Missing the executable file (${EXEC})" 
+    echo "$0: Missing the executable file (${EXEC})"
     exit 0
 fi
 
-if [ ! -f ${INPUT} ] 
+if [ ! -f ${INPUT} ]
     then
-    echo "$0: Missing the input file (${INPUT})" 
+    echo "$0: Missing the input file (${INPUT})"
     exit 0
 fi
 
-if [ ! "${METHOD}" -eq "0"  ] && [ ! "${METHOD}" -eq "1"  ] && [ ! "${METHOD}" -eq "2"  ]  
+if [ ! "${METHOD}" -eq "0"  ] && [ ! "${METHOD}" -eq "1"  ] && [ ! "${METHOD}" -eq "2"  ]
     then
-    echo "$0: Method can take only values 0,1,2" 
+    echo "$0: Method can take only values 0,1,2"
     exit 0
 fi
 
@@ -107,7 +107,7 @@ WANTED_CHAN="$WANTED_PRIM_CHAN $WANTED_DER_CHAN"
 for i in $WANTED_CHAN
   do
   LCUT=`awk '$1=="'$i'" {print $2}' ${FINALCUTNAME}`
-  if [ -z "$LCUT" ] || [ "$LCUT" == "*" ] 
+  if [ -z "$LCUT" ] || [ "$LCUT" == "*" ]
       then
       echo "$0: Right cut not defined for channel $i"
       exit 1

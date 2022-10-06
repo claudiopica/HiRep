@@ -49,7 +49,7 @@
 /* Mesons parameters */
 typedef struct _input_scatt {
 	char mstring[256],configlist[256],outpath[256],seq_prop[256];
-    double csw;	
+    double csw;
 	double precision;
 	int nhits;
 	int isospin;
@@ -118,10 +118,10 @@ int main(int argc,char *argv[]) {
 	strcpy(list_filename,mes_var.configlist);
 	strcpy(output_dir,mes_var.outpath);
 
-	lprintf("MAIN",0,"list_filename = %s %s\n", list_filename,mes_var.configlist);	
-	lprintf("MAIN",0,"output_dir : %s \n",mes_var.outpath);	
-	lprintf("MAIN",0,"Isospin channel: %d \n",mes_var.isospin);	
-	
+	lprintf("MAIN",0,"list_filename = %s %s\n", list_filename,mes_var.configlist);
+	lprintf("MAIN",0,"output_dir : %s \n",mes_var.outpath);
+	lprintf("MAIN",0,"Isospin channel: %d \n",mes_var.isospin);
+
   	if(strcmp(list_filename,"")!=0) {
     	error((list=fopen(list_filename,"r"))==NULL,1,"main [mk_mesons.c]" ,
 		"Failed to open list file\n");
@@ -133,9 +133,9 @@ int main(int argc,char *argv[]) {
 
 
 	nm=0;
-	m[0] = atof(mes_var.mstring); 
+	m[0] = atof(mes_var.mstring);
   	init_propagator_eo(1,m,mes_var.precision);
-	
+
 
 	lprintf("MAIN",0,"Inverter precision = %e\n",mes_var.precision);
 	for(k=0;k<nm;k++)
@@ -144,8 +144,8 @@ int main(int argc,char *argv[]) {
 		lprintf("CORR",0,"Mass[%d] = %f\n",k,m[k]);
 	}
 	/* if a propagator and a source are provided , then read them and perform contractions [ debug only ] */
-	
-	
+
+
 	i=0;
 	lprintf("CORR",0,"Number of noise vector : nhits = %i \n", mes_var.nhits);
 	while(1){
@@ -155,27 +155,27 @@ int main(int argc,char *argv[]) {
       		if(fscanf(list,"%s",cnfg_filename)==0 || feof(list)) break;
 
     	lprintf("MAIN",0,"Configuration from %s\n", cnfg_filename);
-		read_gauge_field(cnfg_filename); 	
-	
-    	represent_gauge_field(); 
+		read_gauge_field(cnfg_filename);
+
+    	represent_gauge_field();
 		lprintf("TEST",0,"<p> %1.6f\n",avr_plaquette());
-		full_plaquette();	
+		full_plaquette();
 		if (mes_var.isospin==0) measure_pion_scattering_I0_TS( m, mes_var.nhits,  mes_var.precision,mes_var.outpath,cnfg_filename,seq_prop,NULL);
 		if (mes_var.isospin != 0) lprintf("MAIN",0,"Isospin channel must be 0!\n");
 
 		gettimeofday(&end,0);
 		timeval_subtract(&etime,&end,&start);
 	    lprintf("MAIN",0,"Configuration : analysed in [%ld sec %ld usec]\n",etime.tv_sec,etime.tv_usec);
-	
+
     	if(list==NULL) break;
 	}
-	
+
 
   lprintf("DEBUG",0,"ALL done, deallocating\n");
 
   if(list!=NULL) fclose(list);
-  
-  finalize_process();	
+
+  finalize_process();
   return 0;
 
 }

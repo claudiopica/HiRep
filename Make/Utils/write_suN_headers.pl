@@ -322,10 +322,10 @@ if ($su2quat==0) {
   } else {
 	print "#define _${dataname}c_multiply(a,b,c) _${dataname}_multiply(a,b,c)\n\n";
 	print "#define _${dataname}c_inverse_multiply(a,b,c) _${dataname}_inverse_multiply(a,b,c)\n\n";
-	print "#define _${dataname}c_zero(a) _${dataname}_zero(a)\n\n"; 
-	print "#define _${dataname}c_dagger(u,v) _${dataname}_dagger(u,v)\n\n"; 
-	print "#define _${dataname}c_mul(u,r,v) _${dataname}_mul(u,r,v)\n\n"; 
-	print "#define _${dataname}c_mul_assign(u,r) _${dataname}_mul_assign(u,r)\n\n"; 
+	print "#define _${dataname}c_zero(a) _${dataname}_zero(a)\n\n";
+	print "#define _${dataname}c_dagger(u,v) _${dataname}_dagger(u,v)\n\n";
+	print "#define _${dataname}c_mul(u,r,v) _${dataname}_mul(u,r,v)\n\n";
+	print "#define _${dataname}c_mul_assign(u,r) _${dataname}_mul_assign(u,r)\n\n";
 	print "#define _${dataname}c_times_${dataname}c(u,v,w) _${dataname}_times_${dataname}(u,v,w)\n\n";
 	print "#define _${dataname}c_times_${dataname}c_assign(u,v,w) _${dataname}_times_${dataname}_assign(u,v,w)\n\n";
 	print "#define _${dataname}c_trace(k,u) _${dataname}_trace(k,u)\n\n";
@@ -2826,7 +2826,7 @@ sub write_suN_trace_re {
 }
 sub write_suNr_trace {
   print "/* k= Tr (u) */\n";
-  print "#define _${rdataname}_trace(k,u) \\\n"; 
+  print "#define _${rdataname}_trace(k,u) \\\n";
   print "   _${rdataname}_trace_re(k,u)\n\n";
 }
 

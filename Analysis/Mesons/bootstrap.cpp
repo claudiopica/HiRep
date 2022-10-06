@@ -14,4 +14,3 @@ void b_sample(int len, int elen, int *bs){
     }
   }
 }
-

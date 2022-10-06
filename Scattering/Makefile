@@ -9,4 +9,3 @@ LIBS += $(TOPDIR)/LibHR/libhr.a
 
 
 include $(MKDIR)/MkRules
-
