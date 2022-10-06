@@ -217,8 +217,8 @@ int main(int argc, char *argv[])
   mult_mat(g[13], g[2], g[10]); //  g0g5g1
   mult_mat(g[14], g[2], g[11]); //  g0g5g2
   mult_mat(g[15], g[2], g[12]); //  g0g5g3
- 
-  
+
+
   for (i = 0; i < 16; i++)
   {
     gid[i] = get_gid(g[i]);
@@ -240,16 +240,16 @@ int main(int argc, char *argv[])
 
   strcpy(pame, mes_ip.mstring);
   mass = atof(strtok(pame, ";"));
-  
+
   lprintf("MAIN", 0, "mes:masses = %f\n", mass);
-  
+
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
   set_csw(&mes_ip.csw);
 #endif
 
   unit_u(u_gauge);
   represent_gauge_field();
-  #ifdef REPR_FUNDAMENTAL 
+  #ifdef REPR_FUNDAMENTAL
   apply_BCs_on_represented_gauge_field(); //This is a trick: the BCs are not applied in the case the REPR is fundamental because represent_gauge field assumes that the right BCs are already applied on the fundamental field!
   #endif
   ex_triplets = (double **) malloc(sizeof(double*)*16);
@@ -271,7 +271,7 @@ int main(int argc, char *argv[])
     {
       int idx_re[5] = {0, 0, i,t, 0};
       int idx_im[5] = {0, 0, i,t, 1};
-      corr_triplets[i][t] = (*data_storage_element(out_corr, 0, idx_re) + I * *data_storage_element(out_corr, 0, idx_im)); 
+      corr_triplets[i][t] = (*data_storage_element(out_corr, 0, idx_re) + I * *data_storage_element(out_corr, 0, idx_im));
     }
   }
 
@@ -301,7 +301,7 @@ int main(int argc, char *argv[])
   lprintf("MAIN", 0, "return_value= %d\n ", return_value);
   for (i=0;i<16;i++)     free(ex_triplets[i]);
   free(ex_triplets);
-  
+
   finalize_process();
   return return_value;
 }

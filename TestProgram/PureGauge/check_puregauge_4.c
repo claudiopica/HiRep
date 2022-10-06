@@ -202,9 +202,9 @@ int main(int argc, char *argv[])
   transform_u();
 
   lprintf("MAIN", 0, "done.\n\n");
-  
+
   spatial_blocking_wrkspace(NEW_SBLK,blk_level);
-  
+
   splaq2 = splaq - spatial_plaquette_wrk();
 
   dop = sqrt(_complex_prod_re(splaq2, splaq2));

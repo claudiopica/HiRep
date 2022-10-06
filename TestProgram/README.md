@@ -18,7 +18,7 @@ from a module folder.
 
 All tests within a module must be able to run without any command line arguments and must return `0` on success. Any input file necessary for the run must be available to the test. The default input file is called `input_file`.
 
-For tests compiled with mpi support, a simple wrapper is provided to run the test, called `mpi_test_wrapper.pl`. The wrapper reads the default `input_file` to determine the number of mpi processes requested and run the test via `mpirun`. 
+For tests compiled with mpi support, a simple wrapper is provided to run the test, called `mpi_test_wrapper.pl`. The wrapper reads the default `input_file` to determine the number of mpi processes requested and run the test via `mpirun`.
 
 
 ## CI Pipeline
@@ -46,9 +46,4 @@ docker run --workdir /github/workspace -e GITHUB_WORKSPACE -v $(pwd)/HiRep:/gith
 ```
 e.g. for the case of 2 gauge colors and fermions in the fundamental representation.
 
-Github Actions workflows are defined in the `.github/` folder at the root of the `HiRep` repository. 
-
-
-
-
-
+Github Actions workflows are defined in the `.github/` folder at the root of the `HiRep` repository.

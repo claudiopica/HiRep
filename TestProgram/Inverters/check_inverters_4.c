@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
     z = -d1[i];
     spinor_field_mulc_add_assign_f(&ws[0], z, &ev[i]);
     res = spinor_field_sqnorm_f(&ws[0]);
-   
+
 
     if (i == nev)
       lprintf("MAIN", 0, "\n");

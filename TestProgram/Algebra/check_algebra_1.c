@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
                   if (i == j)
                   {
                         lprintf("MAIN", 0, "  [should be: %.4e]\n", -Tr);
-                        test_val=-Tr;      
+                        test_val=-Tr;
                   }
                   else
                   {

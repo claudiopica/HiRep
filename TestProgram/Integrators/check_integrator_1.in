@@ -1,4 +1,4 @@
-// Global variables 
+// Global variables
 GLB_T = 6
 GLB_X = 8
 GLB_Y = 8
@@ -10,8 +10,8 @@ NP_Z = 1
 
 N_REP = 1
 
-rlx_level = 1  
-rlx_seed = 60718  
+rlx_level = 1
+rlx_seed = 60718
 rlx_start = new
 rlx_state = rlx_state
 
@@ -29,11 +29,11 @@ theta_Z = 0.
 
 // HMC variables
 tlen = 1.0
-csw = 1.1329500 
+csw = 1.1329500
 
 // Schroedinger functional
 //SF_background must be 1 (background) or 0 (no background)
-SF_background = 1 
+SF_background = 1
 SF_ct = 1.
 
 //needed only for ROTATED_SF
@@ -56,7 +56,7 @@ run name = run1
 save freq = 1
 meas freq = 1
 conf dir = cnfg
-gauge start = random 
+gauge start = random
 last conf = +1
 
 

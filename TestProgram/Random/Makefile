@@ -1,9 +1,8 @@
 TOPDIR = ../..
 MKDIR = $(TOPDIR)/Make
 
-TESTS = testlx 
+TESTS = testlx
 
 LIBS += $(TOPDIR)/LibHR/libhr.a
 
 include $(MKDIR)/MkRules
-

@@ -76,12 +76,12 @@ else
     ifeq (,$(findstring -DWITH_MPI,$(MACRO))) # Compile on GPU but without MPI
         CC = nvcc
         CFLAGS = -O2 -Xcompiler '-std=c99 -fgcse-sm -fgcse-las -fgcse-after-reload'
-        GPUFLAGS = --x cu -arch=sm_70 -Xptxas -v -Xptxas -dlcm=ca -dc
+        GPUFLAGS = --x cu -arch=sm_60 -Xptxas -v -Xptxas -dlcm=ca -dc
         LDFLAGS = -lcuda
     else # Compile on GPU with MPI
         CC = nvcc
         CFLAGS = -ccbin mpicc -Xcompiler '-std=c99 -fgcse-sm -fgcse-las -fgcse-after-reload'
-        GPUFLAGS = --x cu -arch=sm_70 -Xptxas -v -Xptxas -dlcm=ca -dc
+        GPUFLAGS = --x cu -arch=sm_60 -Xptxas -v -Xptxas -dlcm=ca -dc
         LDFLAGS = -lcuda -lmpi
     endif
 endif

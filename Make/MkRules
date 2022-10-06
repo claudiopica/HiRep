@@ -1,5 +1,5 @@
 ###############################################################################
-# Copyright (c) 2008,2014, Claudio Pica                                       #   
+# Copyright (c) 2008,2014, Claudio Pica                                       #
 # All rights reserved.                                                        #
 ###############################################################################
 
@@ -21,7 +21,7 @@ ALIBNAME = $(abspath $(LIBNAME))
 
 
 ifeq ($(findstring -DWITH_MPI,$(MACRO)),-DWITH_MPI)
-	ifeq (,$(findstring -DWITH_GPU,$(MACRO))) 
+	ifeq (,$(findstring -DWITH_GPU,$(MACRO)))
 		CC = $(MPICC)
 	endif
 	RUNTEST = $(MKDIR)/Utils/mpi_test_wrapper.pl
@@ -105,7 +105,7 @@ DFILES = $(findstring .d,$(MAKEFILES))
 RBLD = $(if $(DFILES),,rebuild)
 %.o: SRC=$(patsubst %.o,%.c,$@)
 %.o: DEP=$(patsubst %.o,.%.d,$@)
-%.o: GPUOPT=$(if $(findstring -DWITH_GPU,$(MACRO)),$(patsubst %,$(GPUFLAGS),$(findstring $(patsubst %.o,%.c,$@),$(GPUFILES)))) 
+%.o: GPUOPT=$(if $(findstring -DWITH_GPU,$(MACRO)),$(patsubst %,$(GPUFLAGS),$(findstring $(patsubst %.o,%.c,$@),$(GPUFILES))))
 %.o: %.c .%.d $(MKDIR)/MkFlags $(INCDIR)/.autoheaders.h $(RBLD)
 	if  test "$(call _testdir, $@)" = ""; then \
 	  if test "$(DFILES)" = ""; then \
@@ -120,10 +120,10 @@ RBLD = $(if $(DFILES),,rebuild)
 	fi
 
 
-$(INCDIR)/.autoheaders.h: $(MKDIR)/MkFlags 
+$(INCDIR)/.autoheaders.h: $(MKDIR)/MkFlags
 	if  test "$(call _testdir, $@)" != ""; then \
 	  $(MAKE) -C $(dir $@) $(notdir $@) ;\
-	fi 
+	fi
 
 %.c:
 	if  test "$(call _testdir, $@)" != ""; then \
@@ -206,7 +206,7 @@ LDFLAGS += -lm
 
 define LINK_template
 $(1): $(1).o $$($(1)_OBJS) $$(COMMON_OBJS) $$(LIBS)
-	echo -n "$$(_col_link)Linking$$(_col_norm) $$(call _cfname,$$@)..." 
+	echo -n "$$(_col_link)Linking$$(_col_norm) $$(call _cfname,$$@)..."
 	$$(CC) -o $$@ $$< $$($(1)_OBJS) $$(COMMON_OBJS) $$(LDFLAGS) &&\
 	echo " $$(_cdone)" || ( echo " $$(_cfailed)" && false )
 endef
@@ -217,7 +217,7 @@ $(foreach prog,$(EXES),$(eval $(call LINK_template,$(prog))))
 define RUNTEST_template
 echo -n "$(_col_test)["$(1)"]$(_col_norm) ..." ; rm -f debug out_0 err_0 ; \
 export OMPI_MCA_btl_base_warn_component_unused=0 ;\
-$(RUNTEST) ./$(1) -i $(1).in >/dev/null && echo " $(_cpassed)" || ( echo " $(_cfailed)" && touch .test_failed && tail -n 80 out_0 ); 
+$(RUNTEST) ./$(1) -i $(1).in >/dev/null && echo " $(_cpassed)" || ( echo " $(_cfailed)" && touch .test_failed && tail -n 80 out_0 );
 endef
 
 runtests:

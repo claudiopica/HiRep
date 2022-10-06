@@ -28,7 +28,7 @@ int main(int argc,char *argv[])
   setup_gauge_fields();
 
   test_geometry_mpi_eo();
-  
+
   finalize_process();
 
   return 0;

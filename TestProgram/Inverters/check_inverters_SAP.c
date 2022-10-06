@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
   setup_process(&argc, &argv);
 
   setup_gauge_fields();
- 
+
 #ifdef WITH_UNTESTED
 
   int i;

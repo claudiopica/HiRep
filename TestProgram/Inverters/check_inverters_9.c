@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * Checks the invesrion of of the Dphi eopre tm 
+ * Checks the invesrion of of the Dphi eopre tm
  * Author: Antonio Rago & Fernando Romero Lopez
  * NOCOMPILE= BC_X_ANTIPERIODIC
  * NOCOMPILE= BC_Y_ANTIPERIODIC

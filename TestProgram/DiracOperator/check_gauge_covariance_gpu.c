@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
   s3 = s2 + 1;
   spinor_field_zero_f(s0);
   gaussian_spinor_field(&(s0[0]));
-  
+
   // Normalize s0 + Sanity check
   tau = 1. / sqrt(spinor_field_sqnorm_f_cpu(s0));
   spinor_field_mul_f_cpu(s0, tau, s0);
@@ -141,11 +141,11 @@ int main(int argc, char *argv[])
   lprintf("MAIN", 0, "Maximal normalized difference = %.2e\n", sqrt(sig));
   lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n");
 
-  if (sqrt(sig) > 10.e-14) 
+  if (sqrt(sig) > 10.e-14)
   {
     lprintf("RESULT", 0, "FAILED \n");
     return_value = 0;
-  } 
+  }
   else lprintf("RESULT", 0, "OK \n");
 
   // Free and return

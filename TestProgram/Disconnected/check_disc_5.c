@@ -185,7 +185,7 @@ double complex get_gmu(double complex Gamma[4][4],int mu){
 int compare_disc(double complex  * corr_ex, double complex * corr_num, char* name[16], double tol, double tol_rel_scalar ){
     int retval = 0;
     int nGamma = 16;
-    for(int n=0; n<nGamma; n++){  
+    for(int n=0; n<nGamma; n++){
           if (n==8)
           {
                if (cabs(corr_ex[8] - corr_num[8])/cabs(corr_ex[8]) > tol_rel_scalar) {
@@ -199,7 +199,7 @@ int compare_disc(double complex  * corr_ex, double complex * corr_num, char* nam
           }
           else
           {
-           if(cabs(corr_ex[n] - corr_num[n]) > tol) 
+           if(cabs(corr_ex[n] - corr_num[n]) > tol)
             {
                 lprintf("TEST",0,"Mismatch %s, absolute diff: %e, numeric = %e + I*(%e), analytic = %e + I*(%e) \n",name[n],cabs(corr_ex[n] - corr_num[n]),creal(corr_num[n]),cimag(corr_num[n]),creal(corr_ex[n]),cimag(corr_ex[n]));
                 retval += 1;
@@ -209,7 +209,7 @@ int compare_disc(double complex  * corr_ex, double complex * corr_num, char* nam
                  lprintf("TEST",0,"Match %s, numeric = %e + I*(%e), analytic = %e + I*(%e) \n",name[n],creal(corr_num[n]),cimag(corr_num[n]),creal(corr_ex[n]),cimag(corr_ex[n]));
             }
           }
-    }  
+    }
     return retval;
 }
 
@@ -280,19 +280,19 @@ int main(int argc,char *argv[])
   #if defined(WITH_CLOVER) ||  defined(WITH_EXPCLOVER)
   set_csw(&mes_ip.csw);
   #endif
-  
+
   gettimeofday(&start,0);
 
   unit_u(u_gauge);
   represent_gauge_field();
-  #ifdef REPR_FUNDAMENTAL 
+  #ifdef REPR_FUNDAMENTAL
   apply_BCs_on_represented_gauge_field(); //This is a trick: the BCs are not applied in the case the REPR is fundamental because represent_gauge field assumes that the right BCs are already applied on the fundamental field!
   #endif
 
   lprintf("MAIN",0,"source type is fixed to 5: Spin , color and eo dilution \n");
 
   lprintf("MAIN",0,"Measuring D(t) =  sum_x psibar(x) Gamma psi(x)\n");
-  
+
   lprintf("MAIN",0,"Zerocoord{%d,%d,%d,%d}\n",zerocoord[0],zerocoord[1],zerocoord[2],zerocoord[3]);
 
   error(!(GLB_X==GLB_Y && GLB_X==GLB_Z),1,"main", "This test works only for GLB_X=GLB_Y=GLB_Z");
@@ -301,7 +301,7 @@ int main(int argc,char *argv[])
 
   measure_loops( &mass, mes_ip.nhits,0,  mes_ip.precision,source_type,mes_ip.n_mom,STORE,&out_corr);
 
-  //stochastic & time average 
+  //stochastic & time average
   mean_loops = (double complex *)calloc(n_Gamma,sizeof(double complex));
   for (int k = 0; k < mes_ip.nhits; k++)
     for (int eo = 0; eo < 2; eo++)
@@ -321,14 +321,14 @@ int main(int argc,char *argv[])
   free_loops(ex_loops);
 
   return_value += compare_disc(ex_loops,mean_loops,mes_channel_names,abs_tol,rel_tol_scalar_loop);
-  
+
   global_sum_int(&return_value,1);
   lprintf("MAIN", 0, "return_value= %d\n ",  return_value);
 
   gettimeofday(&end,0);
   timeval_subtract(&etime,&end,&start);
   lprintf("MAIN",0,"Configuration : analysed in [%ld sec %ld usec]\n",etime.tv_sec,etime.tv_usec);
-  
+
 
   finalize_process();
   return return_value;
@@ -366,7 +366,7 @@ void free_loops(double complex *loops) {
   #ifdef BC_Z_ANTIPERIODIC
   sigma[3] = .5;
   #endif
-  
+
   lprintf("FREE",0,"sigma = (%f,%f,%f,%f)\n",sigma[0],sigma[1],sigma[2],sigma[3]);
   norm = (double) NF/GLB_T;
 

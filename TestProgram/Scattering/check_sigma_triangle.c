@@ -2,7 +2,7 @@
  *
  *
  * File check_scattering_length.c
- * Checks of the pi pi scattering length calculations 
+ * Checks of the pi pi scattering length calculations
  * Author: Vincent Drach & Fernando Romero Lopez
  *
  ******************************************************************************/
@@ -216,7 +216,7 @@ double complex twopoint(fourvec p, double m,int L, int LT, int t)
     double complex res;
     res = 0.;
     double tmp;
-    
+
     for (q1=0;q1<L;++q1) for (q2=0; q2<L; ++q2)  for (q3=0; q3<L; ++q3) for (q41=0; q41<LT; ++q41) for (q42=0; q42<LT; ++q42){
         mom1 = (fourvec) {{q1,q2,q3,((double) q41)*L/LT}};
         iadd(&mom1, &p);
@@ -246,7 +246,7 @@ double complex twopoint_id(fourvec p, double m,int L, int LT, int t)
     double complex res;
     res = 0.;
     double tmp;
-    
+
     for (q1=0;q1<L;++q1) for (q2=0; q2<L; ++q2)  for (q3=0; q3<L; ++q3) for (q41=0; q41<LT; ++q41) for (q42=0; q42<LT; ++q42){
         mom1 = (fourvec) {{q1,q2,q3,((double) q41)*L/LT}};
         iadd(&mom1, &p);
@@ -279,12 +279,12 @@ double complex disc_id(fourvec p, double m,int L, int LT, int t)
     double complex res;
     res = 0.;
     double tmp;
-    
+
     for (q1=0;q1<L;++q1) for (q2=0; q2<L; ++q2)  for (q3=0; q3<L; ++q3) for (q41=0; q41<LT; ++q41){
         mom1 = (fourvec) {{q1,q2,q3,((double) q41)*L/LT}};
         iadd(&mom1, &p);
         imul(&mom1, 2.0* PI / L);
-    
+
         tmp = f1(mom1,m) /  (SQR(f1(mom1,m)) + f2(mom1,mom1))  ;
         res += tmp;
     }
@@ -547,7 +547,7 @@ int compare_2pt(meson_observable *mo, double complex *corr, int px, int py, int 
         {
             lprintf("TEST",0,"Match, t=%d, numeric = %e + I*(%e), analytic = %e + I*(%e)",t,num_re,num_im,ana_re,ana_im);
         }
-        
+
     }
     return retval;
 }
@@ -559,10 +559,10 @@ int main(int argc,char *argv[])
   int return_value=0;
   int ncorr=3;
   double m[256];
-  meson_observable **mo_arr;  
-  
+  meson_observable **mo_arr;
+
   fourvec zero_p = (fourvec){{0,0,0,0}};
-  
+
   double threshold = 0.03;
 
   error(!(GLB_X==GLB_Y && GLB_X==GLB_Z),1,"main", "This test works only for GLB_X=GLB_Y=GLB_Z");
@@ -570,28 +570,28 @@ int main(int argc,char *argv[])
   setup_process(&argc,&argv);
 
   setup_gauge_fields();
-  
+
   read_input(glb_var.read,get_input_filename());
   read_input(mes_var.read,get_input_filename());
   read_input(rlx_var.read,get_input_filename());
 
   int numsources = mes_var.nhits;
-   
+
   #if defined(WITH_CLOVER) ||  defined(WITH_EXPCLOVER)
   set_csw(&mes_var.csw);
   #endif
-	
-   m[0] = atof(mes_var.mstring); 
+
+   m[0] = atof(mes_var.mstring);
    init_propagator_eo(1,m,mes_var.precision);
-  
+
    lprintf("MAIN",0,"Boundary conditions: %s\n",mes_var.bc);
    lprintf("MAIN",0,"mass is : %e\n",m[0]);
    lprintf("MAIN",0,"Number of hits : %d \n",numsources);
-  
+
 
    struct timeval start, end, etime;
    gettimeofday(&start,0);
- 
+
    unit_gauge(u_gauge);
    represent_gauge_field();
    gettimeofday(&start,0);
@@ -612,30 +612,30 @@ int main(int argc,char *argv[])
     init_mo(mo_arr[0],"sigmaconn",GLB_T);
     init_mo(mo_arr[1],"sigmadisc",GLB_T);
     init_mo(mo_arr[2],"T",GLB_T);
-   
+
    for (int n=0;n<numsources;n++)
-    {   
+    {
         if (n%100==0) lprintf("MAIN",0,"nhits: %d / %d \n/",n,numsources);
         measure_pion_scattering_I0_TS( m,1 ,mes_var.precision,NULL,"test",1,mo_arr);
-        
-        for (int t=0;t < GLB_T ; t++) 
+
+        for (int t=0;t < GLB_T ; t++)
             {
-                Tstoch[t] += (mo_arr[2]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[2]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(numsources*GLB_X*GLB_Z*GLB_Y); 
-                Dstoch[t] += (mo_arr[1]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[1]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(numsources*GLB_X*GLB_Z*GLB_Y); 
-                Cstoch[t] += (mo_arr[0]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[0]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(numsources*GLB_X*GLB_Z*GLB_Y); 
+                Tstoch[t] += (mo_arr[2]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[2]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(numsources*GLB_X*GLB_Z*GLB_Y);
+                Dstoch[t] += (mo_arr[1]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[1]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(numsources*GLB_X*GLB_Z*GLB_Y);
+                Cstoch[t] += (mo_arr[0]->corr_re[corr_ind(0,0,0,0,t,1,0)]+I*mo_arr[0]->corr_im[corr_ind(0,0,0,0,t,1,0)])/(numsources*GLB_X*GLB_Z*GLB_Y);
             }
         for (int i=0;i<ncorr;i++) reset_mo(mo_arr[i]);
-        
-    }   
- 
-    for (int t=0;t < GLB_T ; t++)  
+
+    }
+
+    for (int t=0;t < GLB_T ; t++)
     {
       Ttheo[t] =  NF*Triangle_id( zero_p, m[0],GLB_X,GLB_T,t );  // R_(zero_p,zero_p,zero_p,m[0],GLB_X,GLB_T,t);
       Dtheo[t] =  NF*disc_id(zero_p,m[0],GLB_X,GLB_T, t)*0.5;    // factor 2 is due to the eo normalisation of the stochastic sources.
       Ctheo[t] =  NF*twopoint_id(zero_p,m[0],GLB_X,GLB_T, t)*0.5; // source is not even/odd but the io2pt is called with a 0.5 normalisation
     }
-  
-  
+
+
     for (int i=0;i<GLB_T;++i)    lprintf("MAIN",0,"T analytical T %e + 1I %e  numerical %e + 1I %e\n" ,creal(Ttheo[i]),cimag(Ttheo[i]),creal(Tstoch[i]), cimag(Tstoch[i]));
     for (int i=0;i<GLB_T;++i)    lprintf("MAIN",0,"diff analytical T %e + 1I %e, and relative %e  \n" ,creal(Ttheo[i]) - creal(Tstoch[i]),cimag(Ttheo[i])- cimag(Tstoch[i]), (creal(Ttheo[i]) - creal(Tstoch[i]))/( creal(Ttheo[i])  ) );
 
@@ -662,8 +662,8 @@ int main(int argc,char *argv[])
     gettimeofday(&end,0);
     timeval_subtract(&etime,&end,&start);
     lprintf("MAIN",0,"Configuration : analysed in [%ld sec %ld usec]\n",etime.tv_sec,etime.tv_usec);
-    
-  
+
+
   global_sum_int(&return_value,1);
   lprintf("MAIN", 0, "return_value= %d\n ",  return_value);
 
