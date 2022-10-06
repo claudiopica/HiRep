@@ -1,6 +1,6 @@
 /***************************************************************************\
- * Copyright (c) 2008, Claudio Pica                                          *   
- * All rights reserved.                                                      * 
+ * Copyright (c) 2008, Claudio Pica                                          *
+ * All rights reserved.                                                      *
  \***************************************************************************/
 
 #include "global.h"
@@ -53,7 +53,7 @@ static void sync_gauge_field_flt(suNg_field_flt *gf) {
   for(i=0; i<gd->ncopies_gauge; ++i) {
     /* this assumes that the 4 directions are contiguous in memory !!! */
     memcpy(((gf->ptr)+4*gd->copy_to[i]),((gf->ptr)+4*gd->copy_from[i]),4*(gd->copy_len[i])*sizeof(*(gf->ptr)));
-    /*   
+    /*
          for(j=0; j<gd->copy_len[i]; j++) {
          x=gd->copy_from[i]+j;
          y=gd->copy_to[i]+j;
@@ -86,9 +86,9 @@ void complete_gf_sendrecv_flt(suNg_field_flt *gf) {
         if (status[k].MPI_ERROR != MPI_SUCCESS) {
           MPI_Error_string(status[k].MPI_ERROR,mesg,&mesglen);
           lprintf("MPI",0,"Req [%d] Source [%d] Tag [%] ERROR: %s\n",
-              k, 
-              status[k].MPI_SOURCE, 
-              status[k].MPI_TAG, 
+              k,
+              status[k].MPI_SOURCE,
+              status[k].MPI_TAG,
               mesg);
         }
       }
@@ -125,7 +125,7 @@ void start_gf_sendrecv_flt(suNg_field_flt *gf) {
 
 #ifdef MPI_TIMING
   error(gf_control>0,1,"start_gf_sendrecv_flt" __FILE__,"Multiple send without receive");
-  gettimeofday(&gfstart,0);  
+  gettimeofday(&gfstart,0);
   gf_control=1;
 #endif
 
@@ -195,9 +195,9 @@ if(nreq>0) {
         if (status[k].MPI_ERROR != MPI_SUCCESS) {
           MPI_Error_string(status[k].MPI_ERROR,mesg,&mesglen);
           lprintf("MPI",0,"Req [%d] Source [%d] Tag [%] ERROR: %s\n",
-              k, 
-              status[k].MPI_SOURCE, 
-              status[k].MPI_TAG, 
+              k,
+              status[k].MPI_SOURCE,
+              status[k].MPI_TAG,
               mesg);
         }
       }
@@ -237,7 +237,7 @@ void start_sf_sendrecv_flt(spinor_field_flt *sf) {
   sync_spinor_field_flt(sf);
 #ifdef MPI_TIMING
   error(sf_control>0,1,"start_sf_sendrecv_flt" __FILE__,"Multiple send without receive");
-  gettimeofday(&sfstart,0);  
+  gettimeofday(&sfstart,0);
   sf_control=1;
 #endif
 
@@ -288,4 +288,3 @@ void start_sf_sendrecv_flt(spinor_field_flt *sf) {
 
 #endif /* WITH_MPI */
 }
-

@@ -27,4 +27,3 @@ print "0.\n";
 print "};\n\n";
 
 print "#endif\n";
-

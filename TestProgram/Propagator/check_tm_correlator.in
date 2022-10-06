@@ -23,4 +23,3 @@ rlx_state = rand_state
 prop:precision = 1e-24
 prop:mass =  0.605
 prop:mu = 0.0
-

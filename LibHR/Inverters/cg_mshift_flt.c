@@ -1,6 +1,6 @@
 /***************************************************************************\
- * Copyright (c) 2008, Claudio Pica                                         *   
- * All rights reserved.                                                     * 
+ * Copyright (c) 2008, Claudio Pica                                         *
+ * All rights reserved.                                                     *
  \***************************************************************************/
 
 #include "inverters.h"
@@ -221,7 +221,7 @@ int cg_mshift_flt(mshift_par *par, spinor_operator M, spinor_operator_flt F, spi
           }
           else
           {
-            /* take the scalar product of current residual vector with the 
+            /* take the scalar product of current residual vector with the
              * normalized first one as residual norm */
             norm[i] = spinor_field_prod_im_f(res, res2);
             lprintf("CGDEBUG", 20, "Im=%e check norm=%e\n", norm[i], spinor_field_sqnorm_f(res));

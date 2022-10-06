@@ -1,6 +1,6 @@
 /***************************************************************************\
- * Copyright (c) 2008, Claudio Pica                                          *   
- * All rights reserved.                                                      * 
+ * Copyright (c) 2008, Claudio Pica                                          *
+ * All rights reserved.                                                      *
  \***************************************************************************/
 
 #include "global.h"
@@ -216,7 +216,7 @@ static int parse_gstart(hmc_flow *rf)
  * last_conf must be one of:
  * "%d" => this will be the id of the last conf generated
  * "+%d" => if a '+' is prepended then this run will be %d config long,
- *          i.e. the end will be start+%d 
+ *          i.e. the end will be start+%d
  *  rerunts:
  *  0 => string was valid
  *  -1 => invalid format
@@ -256,7 +256,7 @@ static int parse_lastconf(hmc_flow *rf)
 
 /* Initialize the Monte Carlo.
  * This performs the following operations:
- * 1) read from the specified input file the flow variables 
+ * 1) read from the specified input file the flow variables
  *    and the hmc parameters;
  * 2) set the starting gauge field
  * 3) init the hmc update

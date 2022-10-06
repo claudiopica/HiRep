@@ -112,7 +112,7 @@ int main(int argc, char *argv[])
     lprintf("MAIN", 0, "Checking that the default geometry pointer of the wrkfield %d are identical to the default ones.\n", nwrk - 2);
     for (id = 0; id < 4 * glattice.gsize_gauge; id++)
         if (iup_wrk[nwrk-2][id] != iup[id] || idn_wrk[nwrk-2][id] != idn[id])
-            {    
+            {
                 lprintf("MAIN", 0, "Different pointers in %d\n",id);
                 return_value++;
             }

@@ -1,4 +1,4 @@
-// Global variables 
+// Global variables
 GLB_T = 6 //Global T size
 GLB_X = 6
 GLB_Y = 6

@@ -76,4 +76,4 @@ chroma_converter: $(OBJS) $(MOD_OBJS) main.o plaquette.o read-gauge.o translate.
 
 
 clean::
-	rm -rf *.o *~ 
+	rm -rf *.o *~

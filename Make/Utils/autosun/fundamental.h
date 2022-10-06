@@ -20,25 +20,25 @@ void representation::init()
 
 	int A;
 	//int a, b;
-	
+
 	int N = group::N;
-	
+
 	if(N == 0)
 	{
 		cerr << "Initialization of group needed.";
 		exit(1);
 	}
-	
+
 	name = "FUNDAMENTAL";
 	DIM = N;
 	iT = new smatrix[group::DIM];
-	
+
 	for(A = 0; A < group::DIM; A++)
 	{
 		iT[A] = group::T[A];
 		iT[A].scale(complex(0.0,1.0));
 	}
-	
+
 	iTnorm = group::Tnorm;
 
 #ifndef NDEBUG
@@ -52,7 +52,7 @@ string group_represent(const char* vname, const char* uname)
 	cmatrix U(group::N,uname);
 
 	RET += U.assignment("=", vname);
-	
+
 	return RET;
 }
 

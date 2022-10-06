@@ -227,7 +227,7 @@ static void setup_random()
   else
   {
     lprintf("SETUP_RANDOM", 0, "RLXD [%d,%d]\n", rlx_var.rlxd_level, rlx_var.rlxd_seed + MPI_PID);
-    rlxd_init(rlx_var.rlxd_level, rlx_var.rlxd_seed); 
+    rlxd_init(rlx_var.rlxd_level, rlx_var.rlxd_seed);
   }
 }
 

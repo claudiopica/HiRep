@@ -32,11 +32,11 @@ static double P(int n, double *c, double y, double epsilon) {
   double z=(2.*y-1.-epsilon)/(1.-epsilon);
   double T[n+1];
   double ret = 0.;
-  
+
   Chebyshev(T,n,z);
   for(int i=0; i<=n; i++)
     ret += c[i]*T[i];
-  
+
   return ret;
 }
 
@@ -46,11 +46,11 @@ static double derP(int n, double *c, double y, double epsilon) {
   double z=(2.*y-1.-epsilon)/(1.-epsilon);
   double T[n+1], derT[n+1];
   double ret = 0.;
-  
+
   DerChebyshev(derT,T,n,z);
   for(int i=0; i<=n; i++)
     ret += c[i]*derT[i];
-  
+
   return ret*2./(1.-epsilon);
 }
 
@@ -67,7 +67,7 @@ static double dererrh(int n, double *c, double y, double epsilon) {
 }
 
 
-/* 
+/*
 Solve [ sqrt(y[m])*P(c,y[m]) + (-1)^m u == 1. , {c,u} ]
 */
 static void solvesystem(double *c, double *u, int n, double *y, double epsilon) {
@@ -77,7 +77,7 @@ static void solvesystem(double *c, double *u, int n, double *y, double epsilon) 
   double T[n+1];
   double z, sy;
   double sign=1.;
-  
+
   for(int m=0; m<=n+1; m++) {
     z = (2.*y[m]-1.-epsilon)/(1.-epsilon);
     sy = sqrt(y[m]);
@@ -129,7 +129,7 @@ static double zero(double (*fptr)(int,double*,double,double), int n, double *c, 
       h2=hmid;
     }
   }
-  
+
   return 0.;
 }
 
@@ -152,9 +152,9 @@ static int squareroot(double delta, double epsilon, double *c, int *order, doubl
   double tmp;
 
   int counter;
-  
+
   while(error > delta) {
-    
+
     n++;
     error = 1.;
     u = 0.;
@@ -184,8 +184,8 @@ static int squareroot(double delta, double epsilon, double *c, int *order, doubl
 
   *order = n;
   *err = error;
-  
-  return counter;  
+
+  return counter;
 }
 
 
@@ -193,7 +193,7 @@ static int squareroot(double delta, double epsilon, double *c, int *order, doubl
 static double h(double x, double epsilon, int order, double *c) {
   double b0,b1,b2;
   double z=(2.*x*x-1.-epsilon)/(1.-epsilon);
-  
+
   b0=b1=0.;
   for(int n=order; n>=0; n--) {
     b2=b1;
@@ -219,11 +219,11 @@ double star(double delta, double epsilon, int order, double *c) {
   double intres, interr;
   double seps = sqrt(epsilon);
   double ret;
-  
+
   error2_pars_type error2_pars;
   error2_pars.epsilon = epsilon; error2_pars.order = order; error2_pars.c = c;
   gsl_function gsl_error2={&error2,&error2_pars};
-  
+
   gsl_integration_workspace *gsl_ws_int = gsl_integration_workspace_alloc(1000000);
   gsl_integration_qag(&gsl_error2, -seps, seps, 1.e-2, 0, 1000000, GSL_INTEG_GAUSS15, gsl_ws_int, &intres, &interr);
   ret = sqrt((1.-seps)/(1.+seps)) + intres;
@@ -246,7 +246,7 @@ int main(int argc, char* argv[]) {
     printf("Usage: %s epsilon delta\n",argv[0]);
     return -1;
   }
-  
+
   epsilon = atof(argv[1]);
   delta = atof(argv[2]);
 
@@ -258,17 +258,13 @@ int main(int argc, char* argv[]) {
     printf("%e %e SIGN\n",x,h(x));
   }
 */
-  
+
   printf("%d\n", order);
   printf("%.16e\n", epsilon);
   printf("%.16e\n\n", err);
   printf("%.16e\n\n", star(delta, epsilon, order, c));
   for(int i=0; i<=order; i++)
     printf("%.16e\n", c[i]);
-  
+
   return 0;
 }
-
-
-
-

@@ -25,7 +25,7 @@ void hmc_gaussian_pf(const struct _monomial *m)
 void hmc_correct_pf(const struct _monomial *m)
 {
 	mon_hmc_par *par = (mon_hmc_par*)(m->data.par);
-   
+
 	/* compute H2^{1/2}*pf = H*pf */
 	spinor_field_copy_f(tmp_pf, par->pf);
 	set_dirac_mass(par->mass);
@@ -43,7 +43,7 @@ void hmc_correct_la_pf(const struct _monomial *m)
 	mpar.n = 1;
 	mpar.shift = &shift;
 	mpar.shift[0] = 0;
-   
+
 	/* compute H2^{-1/2}*pf = H^{-1}*pf */
 	spinor_field_g5_f(tmp_pf, par->pf);
 	set_dirac_mass(par->mass);

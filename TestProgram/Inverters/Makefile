@@ -6,4 +6,3 @@ TESTS = check_inverters_SAP check_inverters_1 check_inverters_2 check_inverters_
 LIBS += $(TOPDIR)/LibHR/libhr.a
 
 include $(MKDIR)/MkRules
-

@@ -15,8 +15,8 @@
 \section{Notation}
 This section summarizes the main formulae that are used for
 implementing the HMC for dynamical Wilson fermions in higher
-representations. The Dirac operator is constructed following 
-Ref.~\cite{Luscher:1996sc}, but using Hermitian generators 
+representations. The Dirac operator is constructed following
+Ref.~\cite{Luscher:1996sc}, but using Hermitian generators
 %
 \begin{equation}
 T^{a\dagger}=T^a.
@@ -36,7 +36,7 @@ For a generic representation $R$, we define:
 \sum_a \left(T^a T^a \right)_{AB} &=& C_2(R) \delta_{AB},
 \end{eqnarray}
 %
-which implies: 
+which implies:
 %
 \begin{equation}
 T_R = \frac{1}{N^2-1} C_2(R) d_R
@@ -53,7 +53,7 @@ C_2(R) =\frac{1}{2}\left(nN+ \sum_{i=1}^{m} n_i \left( n_i+1-2i
 %
 where $n$ is the number of boxes in the diagram, $i$ ranges over the
 rows of the Young tableau, $m$ is the number of rows, and $n_i$ is the
-number of boxes in the $i$-th row. 
+number of boxes in the $i$-th row.
 
 \begin{table}[htp]
 \begin{center}
@@ -62,7 +62,7 @@ number of boxes in the $i$-th row.
 \begin{tabular}{r|c|c|c}
 R    & $d_R$               & $T_R$           & $C_2(R)$            \\
 \hline
-fund & $N$                 & $\frac12$       & $\frac{N^2-1}{2 N}$ \\        
+fund & $N$                 & $\frac12$       & $\frac{N^2-1}{2 N}$ \\
 Adj  & $N^2-1$             & $N$             & $N$ \\
 2S   & $\frac{1}{2}N(N+1)$ & $\frac{N+2}{2}$ & $C_2(f) \frac{2(N+2)}{N+1}$ \\
 2AS  & $\frac{1}{2}N(N-1)$ & $\frac{N-2}{2}$ & $C_2(f)
@@ -89,7 +89,7 @@ scalar product of two elements of the algebra is defined as:
 The massless Dirac operator is written as in Ref.~\cite{Luscher:1996sc}:
 %
 \begin{equation}
-D = \frac12 \left\{\gamma_\mu \left(\nabla_\mu + \nabla^*_\mu \right) 
+D = \frac12 \left\{\gamma_\mu \left(\nabla_\mu + \nabla^*_\mu \right)
 - \nabla^*_\mu \nabla_\mu \right\}
 \end{equation}
 %
@@ -105,7 +105,7 @@ and therefore the action of the massive Dirac operator yields:
 \begin{eqnarray}
 D_m \phi(x) &=& (D+m) \phi(x) \nonumber \\
 &=& - \frac12 \left\{ \left(1-\gamma_\mu\right) U^R(x,\mu) \phi(x+\mu) +
-\left(1+\gamma_\mu\right) U^R(x-\mu,\mu)^\dagger \phi(x-\mu) - \right. 
+\left(1+\gamma_\mu\right) U^R(x-\mu,\mu)^\dagger \phi(x-\mu) - \right.
 \nonumber \\
 & & \left. -(8+2m) \phi(x) \right\}, \label{DM}
 \end{eqnarray}
@@ -117,14 +117,14 @@ $\sqrt{\kappa}=\left(\frac{2}{8+2m}\right)^{1/2}$, we can write the
 fermionic action as:
 %
 \begin{equation}
-S_f = \sum_{x,y} \phi^\dagger(x) D_m(x,y) \phi(y), 
+S_f = \sum_{x,y} \phi^\dagger(x) D_m(x,y) \phi(y),
 \end{equation}
 %
 where
 %
 \begin{equation}
 D_m(x,y) = \delta_{x,y} - \frac{\kappa}{2}
-\left[(1-\gamma_\mu) U^R(x,\mu) \delta_{y,x+\mu} + 
+\left[(1-\gamma_\mu) U^R(x,\mu) \delta_{y,x+\mu} +
 (1+\gamma_\mu) U^R(x-\mu,\mu)^\dagger \delta_{y,x-\mu} \right],
 \end{equation}
 %
@@ -136,7 +136,7 @@ Q_m = \gamma_5 D_m. \label{QM}
 The fermionic determinant in the path integral can be represented by
 introducing complex pseudofermionic fields:
 \begin{equation}
-\left(\det D_m\right)^{N_f} = 
+\left(\det D_m\right)^{N_f} =
 \int \mathcal D \phi \mathcal D \phi^\dagger e^{-\phi^\dagger
   Q_m^{-N_f} \phi} \equiv
 \int \mathcal D \phi \mathcal D \phi^\dagger e^{-S_\mathrm{pf}}.
@@ -216,20 +216,20 @@ and using the fact that the matrix $(Q_m^2-\beta)$ is hermitean, we can rewrite 
 \end{eqnarray}
 Inserting the explicit form of $Q_m$, Eq.s~(\ref{QM}) and (\ref{DM}), into Eq.(\ref{FF2}) we obtain
 \begin{multline}
-\dot{\mathcal{H}}_F = \mathrm{Re\ }\sum_{x,\mu} \xi(x)^\dagger \dot U^R(x,\mu) \gamma_5 (1-\gamma_\mu) \eta(x+\mu) \\ 
-+ \xi(x+\mu)^\dagger \dot U^R(x,\mu)^\dagger \gamma_5 (1+\gamma_\mu) \eta(x) = \nonumber 
+\dot{\mathcal{H}}_F = \mathrm{Re\ }\sum_{x,\mu} \xi(x)^\dagger \dot U^R(x,\mu) \gamma_5 (1-\gamma_\mu) \eta(x+\mu) \\
++ \xi(x+\mu)^\dagger \dot U^R(x,\mu)^\dagger \gamma_5 (1+\gamma_\mu) \eta(x) = \nonumber
 \end{multline}
 \begin{multline}
-\phantom{\dot{\mathcal{H}}_F} = \mathrm{Re\ }\sum_{x,\mu} \xi(x)^\dagger \dot U^R(x,\mu) \gamma_5 (1-\gamma_\mu) \eta(x+\mu) \\ 
+\phantom{\dot{\mathcal{H}}_F} = \mathrm{Re\ }\sum_{x,\mu} \xi(x)^\dagger \dot U^R(x,\mu) \gamma_5 (1-\gamma_\mu) \eta(x+\mu) \\
 + \eta(x)^\dagger \dot U^R(x,\mu) \gamma_5 (1-\gamma_\mu) \xi(x+\mu)
 \end{multline}
-where the sum over spin and color indices is intended and we made explicit the fact the the whole 
+where the sum over spin and color indices is intended and we made explicit the fact the the whole
 expression is real.
-We now use the fact that 
+We now use the fact that
 \begin{equation}
 \dot U^R (x,\mu) = \pi^R(x,\mu) U^R(x,\mu) = i \pi^a(x,\mu) T^a_R U^R(x,\mu) \label{URDOT}
 \end{equation}
-Notice that, since we define $T^a_R(x,\mu) = R_* T^a(x,\mu)$, the $\pi^a(x,\mu)$ in the above 
+Notice that, since we define $T^a_R(x,\mu) = R_* T^a(x,\mu)$, the $\pi^a(x,\mu)$ in the above
 equation are the same as those appearing in the expressions for $\dot{\mathcal{H}}_{\pi,G}$.
 Using Eq.(\ref{URDOT}) in the expression for $\dot{\mathcal{H}}_{F}$ we find
 (capitalized $Tr$ indicates the trace over color \textit{and} spin indices as opposed to the lower
@@ -264,7 +264,7 @@ The formulae derived in the previous Section can be checked against two
 known examples. The first, and almost trivial, check is obtained by
 assuming that the representation $R$ is again the fundamental
 representation. The well-known expression for the MD force for the
-usual HMC is then recovered. 
+usual HMC is then recovered.
 
 The second case that has already been studied in the literature is the
 case of fermions in the adjoint representationof the gauge group
@@ -276,8 +276,8 @@ and $b$ in that formula.
 
 We briefly review the construction of the HMC algorithm \cite{??}.
 
-Given the action $S(\phi)$ of a system of bosonic fields $\phi$, our goal is to generate a Markov process with 
-fixed probability distribution $P_S(\phi) = 1/Z \exp[-S(\phi) ]$. A sufficient condition to have such a 
+Given the action $S(\phi)$ of a system of bosonic fields $\phi$, our goal is to generate a Markov process with
+fixed probability distribution $P_S(\phi) = 1/Z \exp[-S(\phi) ]$. A sufficient condition to have such a
 Markov process is that it is ergodic and it satifies detailed balance:
 \begin{equation}
 P_S(\phi)P_M(\phi\rightarrow \phi') = P_S(\phi')P_M(\phi' \rightarrow \phi) \, .
@@ -285,12 +285,12 @@ P_S(\phi)P_M(\phi\rightarrow \phi') = P_S(\phi')P_M(\phi' \rightarrow \phi) \, .
 We define $P_M(\phi \rightarrow \phi')$ with the following three-step process:
 \begin{enumerate}
 \item we expand the configuration space with additional fields, the ``momenta" $\pi$ randomly chosen with probability
-$P_k(\pi)$ such that $P_k(\pi)=P_k(-\pi)$ -- usually one takes $P_k(\pi)\propto \exp[-\pi^2/2]$; 
+$P_k(\pi)$ such that $P_k(\pi)=P_k(-\pi)$ -- usually one takes $P_k(\pi)\propto \exp[-\pi^2/2]$;
 \item in the extended configuration space $(\phi, \pi)$, we generate a new configuration $(\phi',\pi')$ with probability
-$P_h((\phi,\pi)\rightarrow(\phi',\pi'))$ such that 
+$P_h((\phi,\pi)\rightarrow(\phi',\pi'))$ such that
 \[P_h((\phi,\pi)\rightarrow(\phi',\pi')) = P_h((\phi',-\pi')\rightarrow(\phi,-\pi))\]
 (reversibility condition);
-\item we accept the new configuration $\phi'$ with probability 
+\item we accept the new configuration $\phi'$ with probability
 \[P_A((\phi,\pi)\rightarrow(\phi',\pi')) = min \left\{ 1, \frac{P_S(\phi')P_k(\pi')}{P_S(\phi)P_k(\pi)} \right\} \, .\]
 \end{enumerate}
 It is easy to see that the resulting probability
@@ -303,10 +303,10 @@ As already stated, the distribution $P_k(\pi)$ is generally taken to be gaussian
 The process $P_h$ is instead identified with the hamiltonian flow of a yet unspecified Hamiltonian $H$ in the phase
 space $(\phi,\pi)$ (giving to $\pi$ the meaning of ``momenta"). The time reversal symmetry of classical dynamics equation of motion
 garantees the reversibility condition. The resulting probability $P_h$ is then a delta function (the process is completly deterministic).
-Numerical integration to a given accuracy will result in a broader distribution and care must be taken to garantee the reversibility condition 
+Numerical integration to a given accuracy will result in a broader distribution and care must be taken to garantee the reversibility condition
 in this case.
 Since we want a high acceptance rate (low correlation among the configurations), we must carefully choose the Hamiltonian $H$.
-One simple way is to take $P_k$ to be gaussian and to define $H(\pi,\phi)=-\ln [P_k(\pi) P_S(\phi)] = \pi^2/2 + S(\phi)$ 
+One simple way is to take $P_k$ to be gaussian and to define $H(\pi,\phi)=-\ln [P_k(\pi) P_S(\phi)] = \pi^2/2 + S(\phi)$
 (omitting irrelevant constants). If $H$ is exactly conserved by the process $P_h$ then the acceptance probability is 1.
 
 When fermionic degrees of freedom are present in the action $S$, we can first integrate them out, resulting in a non
@@ -315,10 +315,10 @@ from a numerical point a view and stocastic extimates are used.
 
 Consider a quadratic fermionic term  in the action: $S(\bar\psi,\psi) = \bar\psi M \psi$ with a generic interaction
 matrix $M(\phi)$ function of the bosonic fields $\phi$. The contribution of this term to the partition function
-is $\int d\bar\psi d\psi \exp [ -S(\bar\psi,\psi)] = det[M(\phi)]$. 
+is $\int d\bar\psi d\psi \exp [ -S(\bar\psi,\psi)] = det[M(\phi)]$.
 
 Assuming that the matrix $M(\phi)$ is positive definite,
-we can rewrite $det[M]=\int d\bar\eta d\eta \exp[ \bar\eta (M)^{-1} \eta ]$, where $\bar\eta$,$\eta$ are two new 
+we can rewrite $det[M]=\int d\bar\eta d\eta \exp[ \bar\eta (M)^{-1} \eta ]$, where $\bar\eta$,$\eta$ are two new
 complex bosonic fields, called pseudofermions.
 This term can be taken into account generating random pseudofermions $\bar\eta$, $\eta$ with the desidered probability
 distribution and keeping then fixed during the above HMC configuration generation for the remaining bosonic fields $\phi$.
@@ -327,7 +327,7 @@ distribution and keeping then fixed during the above HMC configuration generatio
 
 \section{RHMC formulation}
 
-The fermionic part of the HMC hamiltonian, for $N_f$ degenerate 
+The fermionic part of the HMC hamiltonian, for $N_f$ degenerate
 quarks and $N_{pf}$ pseudofermions, can be written as:
 %
 \begin{equation}
@@ -338,14 +338,14 @@ and $l_k>0$. For the sake of simplicity we will set all the $l_k$ to be equal:
 \forall k,\,\, l_k = \frac{N_f}{2N_{pf}}\, .
 \end{equation}
 
-In the RHMC algorithm~\cite{Clark:2005sq} rational approximations are used whenever we need to take some 
+In the RHMC algorithm~\cite{Clark:2005sq} rational approximations are used whenever we need to take some
 fractional power of the positive definite fermion matrix $Q_m^2$.
 
 In this implementation we use three different rational approximations.
 
 The first one is used to approximate Eq.~(\ref{HFN}) (we need only one approximation because all $l_k$ are equal):
 \begin{eqnarray}
-\mathcal{H}_F &=& \sum_{k=1}^{N_{pf}} \phi_k^\dagger r_{a}( Q_m^2 )\phi_k \, , \label{HFRHMC}\\ 
+\mathcal{H}_F &=& \sum_{k=1}^{N_{pf}} \phi_k^\dagger r_{a}( Q_m^2 )\phi_k \, , \label{HFRHMC}\\
 ( Q_m^2 )^{-\frac{N_f}{2N_{pf}}} \simeq r_{a}(Q_m^2) &=& \alpha_0^a + \sum_{n=1}^{d_{1}} \alpha_n^a ( Q^2_m - \beta_n^a )^{-1} \, .
 \end{eqnarray}
 Using the formulas derived in Section~\ref{SHMC}, it is easy to write the force corresponding to Eq.~(\ref{HFRHMC}).
@@ -363,8 +363,8 @@ and then we set:
 \begin{equation}
 \phi_k = (Q_m^2)^{\frac{l_k}{2}} \tilde\phi_k \, ,
 \end{equation}
-making use of the fact that $(Q_m^2)$ is hermitean (notice the plus sign in the exponent.) 
-The RHMC algorithm uses a rational approximation to compute the above quantities (again we need only one 
+making use of the fact that $(Q_m^2)$ is hermitean (notice the plus sign in the exponent.)
+The RHMC algorithm uses a rational approximation to compute the above quantities (again we need only one
 approximation since all $l_k$ are equal):
 \begin{eqnarray}
 ( Q_m^2 )^{\frac{l_k}{2}} \simeq r_{b}(Q_m^2) &=& \alpha_0^b + \sum_{n=1}^{d_{2}} \alpha_n^b ( Q^2_m - \beta_n^b )^{-1} \, .
@@ -382,7 +382,7 @@ The rational approximation needed in this case is:
 \end{eqnarray}
 Notice that if $d_2=d_3$ the coefficients for the two approximations $r_b$ and $r_c$ can each be obtained from the other.
 
-In order to compute the coefficients $\alpha_n$, $\beta_n$ appearing in the rational approximations 
+In order to compute the coefficients $\alpha_n$, $\beta_n$ appearing in the rational approximations
 the Remez algorithm is needed. In this implementation we do not compute those coefficients ``on the fly'', but rather
 we use a precomputation step to generate a table of coefficients form which we pick up the right values when needed.
 The generation of this table goes as follows.
@@ -390,9 +390,9 @@ The generation of this table goes as follows.
 First note that we need to compute rational approximations for a function $f(x)$ of the form $f(x)=x^l$ and the approximation
 must be accurate over the spectral range of the operator $Q_m^2$.
 To simplify the computation of the table we note that the following proposition holds:
-if $f(x)$ is a homogeneous function of degree $l$ and $r(x)$ is an optimal (in the sense of relative error) 
-rational approximation to $f(x)$ over the interval $[\epsilon,\mathrm{h}]$ to a given accuracy 
-then $r(kx)/k^l$ is an optimal rational approximation for the same function and the same accuracy 
+if $f(x)$ is a homogeneous function of degree $l$ and $r(x)$ is an optimal (in the sense of relative error)
+rational approximation to $f(x)$ over the interval $[\epsilon,\mathrm{h}]$ to a given accuracy
+then $r(kx)/k^l$ is an optimal rational approximation for the same function and the same accuracy
 over the interval $[\epsilon/k,\mathrm{h}/k]$. Notice that the coefficients of the ``rescaled'' rational
 approximation are easily obtained from that of the original approximation.
 A simple corollary is that, given a homogeneuos function $f(x)$, we can divide the rational approximations
@@ -401,26 +401,26 @@ the coefficients of the rational approximations are easily related to each other
 to compute one rational approximation in each class. This is what is done in our implementation.
 
 In detail: we generate a table containing the coefficients for the rational approximations
- belonging in different classes distinguished by the function $f(x)$ which we want to approximate and 
+ belonging in different classes distinguished by the function $f(x)$ which we want to approximate and
  the accuracy which is required. We arbitrary set $\mathrm{h}$ to a fixed value equal to the absolute
- upper bound on the spectrum of the matrix $Q_m^2$. This choice fixes the representative of each class, 
+ upper bound on the spectrum of the matrix $Q_m^2$. This choice fixes the representative of each class,
 because the lower bound of the approximation is now a function of $\mathrm{h}$.
 
-At run-time this table is used to generate optimal rational approximations rescaling the 
+At run-time this table is used to generate optimal rational approximations rescaling the
 precomputed coefficients to the desired interval containing the spectrum of the matrix $Q_m^2$.
-This interval is obtained by computing the maximum and minimum eigenvalue of $Q_m^2$ on 
-each configuration when needed. In our code we update this interval only before the 
+This interval is obtained by computing the maximum and minimum eigenvalue of $Q_m^2$ on
+each configuration when needed. In our code we update this interval only before the
 metropolis test, while we keep it fixed during the molecular dinamics.
 
 
 \section{Even-Odd preconditioning}
 It is a very well know fact that the time spend for a simulation with dynamical fermions
-is dominated by the time required for the inversions of the Dirac operator. 
+is dominated by the time required for the inversions of the Dirac operator.
 The convergence of such inversions can be improved using an appropriate precondining.
-The idea is to rewrite the fermionic determinant as a determinant 
+The idea is to rewrite the fermionic determinant as a determinant
 (or product of determinants) of better conditioned matrix (matrices) than the original
 Dirac operator.
-For the non-improved Wilson action this can be easily done using the \textit{even-odd} 
+For the non-improved Wilson action this can be easily done using the \textit{even-odd}
 preconditioning. We start rewriting the Dirac operator $D_m$ as a block matrix:
 \begin{equation}
 D_m = \begin{pmatrix}
@@ -428,33 +428,33 @@ D_m = \begin{pmatrix}
 D_{oe} &4+m
 \end{pmatrix}\,\,\, ,
 \end{equation}
-where each block has a dimension half that of the original Dirac matrix. The diagonal 
-blocks connecting sites with the same parity are proportional to the identity matrix, 
+where each block has a dimension half that of the original Dirac matrix. The diagonal
+blocks connecting sites with the same parity are proportional to the identity matrix,
 while off-diagonal blocks connect sites with opposite parity. We have (since $D_m$
 is $\gamma_5$-hermitean):
 \begin{equation}
-\gamma_5 D_{eo} \gamma_5 = D_{oe}^\dagger\,\, . 
+\gamma_5 D_{eo} \gamma_5 = D_{oe}^\dagger\,\, .
 \end{equation}
 The determinant of the Dirac matrix $D_m$ can be rewritten as:
 \begin{equation}
-{\rm det\ } D_m = {\rm det\ } ( (4+m)^2 - D_{oe} D_{eo} ) = {\rm det\ } ( (4+m)^2 - D_{eo} D_{oe} ) \equiv {\rm det\ } D^{eo}_m\,\, , 
+{\rm det\ } D_m = {\rm det\ } ( (4+m)^2 - D_{oe} D_{eo} ) = {\rm det\ } ( (4+m)^2 - D_{eo} D_{oe} ) \equiv {\rm det\ } D^{eo}_m\,\, ,
 \end{equation}
 using the well known formula for the determinant of a block matrix.
-Since the determinant of $D_m$ and of $D_m^{eo}$ are the same the latter can be used 
-in numercal simulations. Note that the even-odd preconditioned matrix only connects sites 
-with the same parity thus it have only half of the size of the original Dirac matrix and 
-as $D_m$ it is $\gamma_5$-hermitean. We define as before the hermitean matrix 
+Since the determinant of $D_m$ and of $D_m^{eo}$ are the same the latter can be used
+in numercal simulations. Note that the even-odd preconditioned matrix only connects sites
+with the same parity thus it have only half of the size of the original Dirac matrix and
+as $D_m$ it is $\gamma_5$-hermitean. We define as before the hermitean matrix
 $Q_m^{eo}\equiv \gamma_5 D_m^{eo}$, which will be used in practice.
 
-The formulation of the HMC algorithm does not change and the only difference is that pseudofermions fields 
+The formulation of the HMC algorithm does not change and the only difference is that pseudofermions fields
 are now only defined on half of the lattice sites, conventionally the even sites in what follows.
-We now give the explicit expression for the fermionic force for the preconditioned system described by 
+We now give the explicit expression for the fermionic force for the preconditioned system described by
 the hamiltonian:
 \begin{eqnarray}
 \mathcal{H}_F &=& \phi_e^\dagger ( (Q^{eo}_m)^2 - \beta )^{-1} \phi_e \,\, ,
 \end{eqnarray}
-where as before we are assuming $N_f=2$ or a rational approximation 
-of the actual fractional power function, and where we made explicit that $\phi_e$ is 
+where as before we are assuming $N_f=2$ or a rational approximation
+of the actual fractional power function, and where we made explicit that $\phi_e$ is
 only defined on even sites.
 Eq.(\ref{FF2}) is unchanged :
 \begin{eqnarray}
@@ -504,78 +504,78 @@ while for $x\in odd$:
 
 The hermitean generators $T^a_f$ for the fundamental representation used are of the form:
 \begin{equation}
-\begin{pmatrix} 
+\begin{pmatrix}
 0&1&0&\dots\\
 1&0&0&\dots\\
 0&0&0&\dots\\
 \hdotsfor{4}
 \end{pmatrix}\, ,
-\begin{pmatrix} 
+\begin{pmatrix}
 0&i&0&\dots\\
 -i&0&0&\dots\\
 0&0&0&\dots\\
 \hdotsfor{4}
 \end{pmatrix}\, ,
-\begin{pmatrix} 
+\begin{pmatrix}
 1&0&0&\dots\\
 0&1&0&\dots\\
 0&0&-2&\dots\\
 \hdotsfor{4}
 \end{pmatrix}\, ,
 \end{equation}
-normalized so that $T_f=1/2$. The generators for the other representations 
+normalized so that $T_f=1/2$. The generators for the other representations
 will be obtained in the following.
 
-We first give the explicit form for the representation functions $R$ which map 
-$U\rightarrow U^R$. We define for each representation an orthonormal base $e_R$ for 
-the appropriate vector space of matrices. 
+We first give the explicit form for the representation functions $R$ which map
+$U\rightarrow U^R$. We define for each representation an orthonormal base $e_R$ for
+the appropriate vector space of matrices.
 
-For the Adjoint representation we define the base $e_{Adj}$ for the $N\times N$ 
-traceless hemitean matrices to be $e_{Adj}^a=T^a_f/\sqrt{T_f}$, $a=1,\dots,N^2-1$ 
-(i.e. proportional to the generators of the fundamental representation and 
+For the Adjoint representation we define the base $e_{Adj}$ for the $N\times N$
+traceless hemitean matrices to be $e_{Adj}^a=T^a_f/\sqrt{T_f}$, $a=1,\dots,N^2-1$
+(i.e. proportional to the generators of the fundamental representation and
 normalized to 1.)
 
-For the two-index Symmetric representation the base $e^{(ij)}_{S}$, with $i\le j$, for 
+For the two-index Symmetric representation the base $e^{(ij)}_{S}$, with $i\le j$, for
 the $N\times N$ symmetric matrices is given by:
 \begin{eqnarray}
-i\neq j \, ,\,\,\,&e^{(ij)}_S&=\frac{1}{\sqrt{2}}\begin{pmatrix} 
+i\neq j \, ,\,\,\,&e^{(ij)}_S&=\frac{1}{\sqrt{2}}\begin{pmatrix}
 0&1&0&\dots\\
 1&0&0&\dots\\
 0&0&0&\dots\\
 \hdotsfor{4}
 \end{pmatrix}\, , \\
-i=j \, ,\,\,\,&e^{(ii)}_S&=\begin{pmatrix} 
+i=j \, ,\,\,\,&e^{(ii)}_S&=\begin{pmatrix}
 0&0&0&\dots\\
 0&1&0&\dots\\
 0&0&0&\dots\\
 \hdotsfor{4}
-\end{pmatrix}\, , 
+\end{pmatrix}\, ,
 \end{eqnarray}
 where the non zero entries are at position $(i,j)$, etc.
 
-For the two-index Antisymmetric representation the base $e^{(ij)}_{AS}$, with $i<j$, for 
+For the two-index Antisymmetric representation the base $e^{(ij)}_{AS}$, with $i<j$, for
 the $N\times N$ symmetric matrices is given by:
 \begin{equation}
-e^{(ij)}_{AS}=\frac{1}{\sqrt{2}}\begin{pmatrix} 
+e^{(ij)}_{AS}=\frac{1}{\sqrt{2}}\begin{pmatrix}
 0&1&0&\dots\\
 -1&0&0&\dots\\
 0&0&0&\dots\\
 \hdotsfor{4}
-\end{pmatrix}\, , 
+\end{pmatrix}\, ,
 \end{equation}
 where, as above, the non zero entries are at position $(i,j)$.
 
 The maps $R$ are explicitly given by:
 \begin{eqnarray}
-(R^{Adj} U)_{ab} &=& U^{Adj}_{ab} = \mathrm{tr\ }\left[ e^a_{Adj} U e^b_{Adj} U^\dagger\right]\,\, , a,b=1,\dots,N^2-1\, ,\\ 
-(R^{S} U)_{(ij)(lk)} &=& U^{S}_{(ij)(lk)} = \mathrm{tr\ }\left[ (e^{(ij)}_{S})^\dagger U e^{(lk)}_S U^T\right]\,\, , i\le j, l\le k\, ,\\ 
+(R^{Adj} U)_{ab} &=& U^{Adj}_{ab} = \mathrm{tr\ }\left[ e^a_{Adj} U e^b_{Adj} U^\dagger\right]\,\, , a,b=1,\dots,N^2-1\, ,\\
+(R^{S} U)_{(ij)(lk)} &=& U^{S}_{(ij)(lk)} = \mathrm{tr\ }\left[ (e^{(ij)}_{S})^\dagger U e^{(lk)}_S U^T\right]\,\, , i\le j, l\le k\, ,\\
 (R^{A} U)_{(ij)(lk)} &=& U^{A}_{(ij)(lk)} = \mathrm{tr\ }\left[ (e^{(ij)}_{A})^\dagger U e^{(lk)}_A U^T\right]\,\, , i< j, l< k\, .
 \end{eqnarray}
 
 The generators $T_R^a$ used are defined as the image of the generators in the fundamental
 under the differential of the maps $R$ defined above: $T^a_R = R_* T^a_f$.
 Explicit expression can easily be worked out form the definition above.
-The invariants $T_R$ and $C_2(R)$ for the generators defined in this way are given in 
+The invariants $T_R$ and $C_2(R)$ for the generators defined in this way are given in
 Table~(\ref{table1}).
 
 \subsection{$\gamma$ matrices}
@@ -618,7 +618,7 @@ We have:
 
 \section{Two--point functions}
 This is a summary of the formulae used for the mesonic two--pt
-functions. 
+functions.
 
 \bigskip
 
@@ -636,10 +636,10 @@ Performing the Wick contractions yields:
 \begin{eqnarray}
 \langle \bar\psi(\bfx,t) \Gamma
 \psi(\bfx,t) \bar\psi(0) \Gamma^\prime \psi(0) \rangle &=&
-- \mathrm{tr} \left[ \Gamma S(x-y) \Gamma^\prime S(y-x) \right] 
+- \mathrm{tr} \left[ \Gamma S(x-y) \Gamma^\prime S(y-x) \right]
 \nonumber \\
-&=& - \mathrm{tr} \left[ \Gamma S(x-y) \Gamma^\prime \gamma_5 
-S^\dagger(x-y) \gamma_5 \right] \nonumber 
+&=& - \mathrm{tr} \left[ \Gamma S(x-y) \Gamma^\prime \gamma_5
+S^\dagger(x-y) \gamma_5 \right] \nonumber
 \end{eqnarray}
 %
 In practice we invert the Hermitean Dirac operator $\gamma_5 D$ by
@@ -650,7 +650,7 @@ Q_{AB}(x-y) \eta^{\bar A,x_0}_B(y) = \delta_{A,\bar A} \delta_{x,x_0}
 \end{equation}
 %
 where $A=\{a,\alpha\}$ is a collective index for colour and spin, and
-$\bar A$, $x_0$ are the position of the source for the inverter. 
+$\bar A$, $x_0$ are the position of the source for the inverter.
 
 Using the field $\eta$ that we obtain from the inverter, the
 correlator above becomes:
@@ -701,7 +701,7 @@ This can be combined with even-odd preconditionning.
 Assume
 \begin{equation}
 W_{+} = \left( D_m + \delta_m\right) ,\quad W_{-} =
-W_{+}^\dagger=  \left( D^{\dagger}_m + \delta_m\right) 
+W_{+}^\dagger=  \left( D^{\dagger}_m + \delta_m\right)
 \end{equation}
 
 
@@ -712,7 +712,7 @@ Then
 \begin{equation}
   Q_m^{-1} \left( D^\dagger_m + \delta_m\right)  \left( D_m +
    \delta_m  \right) Q_m^{-1}   =  \left( \gamma_5 + \delta_m Q^{-1}
-   \right)  \left( \gamma_5 +    \delta_m Q^{-1}\right)  
+   \right)  \left( \gamma_5 +    \delta_m Q^{-1}\right)
 \end{equation}
 
 
@@ -732,15 +732,15 @@ X\equiv Q^{-1}\phi_2,\quad\textrm{and}\quad Y^{\dagger}=\phi_2^\dagger
 (\gamma_5 + \delta_m Q^{-1}) Q_m^{-1}
 \end{equation}
 
-From which we deduce 
+From which we deduce
 \begin{equation}
 Y =   Q_m^{-1}(\gamma_5 + \delta_m Q^{-1})  \phi_2 =  D^{-1} ( \phi_2  +
-\delta_m \gamma_5 X)  
+\delta_m \gamma_5 X)
 \end{equation}
 
 Which matches one comment in the the {\verb force_hmc.c } file.
 \subsection{Wilson mass shift : eo case }
-Writing 
+Writing
 \begin{equation}
 D_m = \begin{pmatrix}
 4 + m & D_{eo} \\
@@ -754,28 +754,28 @@ The determinant in the 2 flavour case can be written as follows:
 
 
 \begin{equation}
-Q = \gamma_5 \begin{pmatrix} 
+Q = \gamma_5 \begin{pmatrix}
 1 + 4m & M_{\rm{eo}} \\
 M_{\rm{oe}} & 1 +4m\\
-\end{pmatrix} \equiv \gamma_5 \begin{pmatrix} 
+\end{pmatrix} \equiv \gamma_5 \begin{pmatrix}
 M_{\rm{ee}}  & M_{\rm{eo}} \\
 M_{\rm{oe}} & M_{\rm{oo}}\\
 \end{pmatrix}
 \end{equation}
-Note that $M_{\rm{ee}}^{-1}$ can be computed : 
+Note that $M_{\rm{ee}}^{-1}$ can be computed :
 \begin{equation}
 M_{\rm{ee}}^{-1} =   \frac{1}{1+4m}
 \end{equation}
 
 
-Now we can conveniently rewrite 
+Now we can conveniently rewrite
 \begin{equation}
-Q_{\pm} =  \begin{pmatrix} 
+Q_{\pm} =  \begin{pmatrix}
 \gamma_5 M_{\rm{ee}}  & 0 \\ \gamma_5 M_{\rm{oe}} & 1\\
-\end{pmatrix} \begin{pmatrix} 
+\end{pmatrix} \begin{pmatrix}
 1  &  \left(M_{\rm{ee}}\right)^{-1} M_{\rm{eo}} \\0 & \gamma_5
   \left(M^{\rm{oo}} - \frac{1}{4+m}M_{\rm{oe}} M_{\rm{eo}} \right)\\
-\end{pmatrix} 
+\end{pmatrix}
 \end{equation}
 
 
@@ -784,24 +784,24 @@ From the last equation we deduce that :
 \det{Q} = \det{\gamma_5 M^{\rm{ee}}} \det{\gamma_5  \left(M_{\rm{oo}}
     -\frac{1}{4+m} M_{\rm{oe}}     M_{\rm{eo}} \right)} \propto
 \det{\gamma_5  \left((4+m) M_{\rm{oo}}
-    - M_{\rm{oe}}     M_{\rm{eo}} \right)} 
+    - M_{\rm{oe}}     M_{\rm{eo}} \right)}
 \end{equation}
 
 Note that the first determinant is a constant that could be computed.
 
-In the following we will denote 
+In the following we will denote
 \begin{equation}
 \hat{Q}_{m,eo} \equiv \gamma_5
   \left((4+m)^2 - M_{\rm{oe}}  M_{\rm{eo}} \right)
 \end{equation}
-where $\hat{Q}_{m,eo}$ is defined on the odd sites of the lattice. 
+where $\hat{Q}_{m,eo}$ is defined on the odd sites of the lattice.
 
 
 
-Now defining 
+Now defining
 \begin{equation}
 W_{+} = D_{m+\delta m} ,\quad W_{-} =
-W_{+}^\dagger=   D^{\dagger}_{m+\delta m} 
+W_{+}^\dagger=   D^{\dagger}_{m+\delta m}
 \end{equation}
 
 \begin{eqnarray}
@@ -810,44 +810,44 @@ W_{+}^\dagger=   D^{\dagger}_{m+\delta m}
 \end{eqnarray}
 
 
-We thus have 
+We thus have
 \begin{eqnarray}
 \mathcal{H}_{F_1} = \phi_1^\dagger \left( \hat{D}_{m+\delta m,eo} \hat{D}_{m+\delta_m,eo} \right)^{-1}\phi_1
 \end{eqnarray}
 and
 \begin{eqnarray}
-\mathcal{H}_{F_2} = \phi_2^\dagger Q_{m,eo}^{-1} \hat{D}_{m+\delta_m,eo} \hat{D}_{m+\delta_m,eo} Q_{m,eo}^{-1}\phi_2 
+\mathcal{H}_{F_2} = \phi_2^\dagger Q_{m,eo}^{-1} \hat{D}_{m+\delta_m,eo} \hat{D}_{m+\delta_m,eo} Q_{m,eo}^{-1}\phi_2
 \end{eqnarray}
 Note that as in the non-eo case this can be rewritten as :
 \begin{eqnarray}
 \mathcal{H}_{F_2} =\phi_2^{\dagger} (\gamma_5 + \delta_m (1 +
 \delta_m (4+m) )Q_{m,eo}^{-1}   (\gamma_5 + \delta_m (1 +
-\delta_m (4+m) )Q_{m,eo}^{-1}\phi_2 
+\delta_m (4+m) )Q_{m,eo}^{-1}\phi_2
 \end{eqnarray}
 
 \subsection{Twisted mass shift}
 Assume
 \begin{equation}
 W_{+} = \left( Q_m + i \mu_2  \right) ,\quad W_{-} = W_+^{\dagger}=
-  \left( Q_m - i \mu_2 \right) 
+  \left( Q_m - i \mu_2 \right)
 \end{equation}
 
 Note that $W_- W_+ = Q_m ^2 + \mu_2^2$  and that $W_\pm^{\dagger}=
 W_{\mp}$.
 
-Instead of dealing with $\det{ Q_m (W_- 
+Instead of dealing with $\det{ Q_m (W_-
  W_+)^{-1} Q_m }$, we consider the slightly more general
-case where the determinant to evaluate is  
+case where the determinant to evaluate is
 \begin{eqnarray}
-\det{ (Q_m + i \mu_1) (W_- 
- W_+)^{-1}  (Q_m - i \mu_1)}&\propto&\int D\phi_2 D\phi_2^\dagger e^{-\phi^\dagger_2 \Big(Q_+ (W_- 
+\det{ (Q_m + i \mu_1) (W_-
+ W_+)^{-1}  (Q_m - i \mu_1)}&\propto&\int D\phi_2 D\phi_2^\dagger e^{-\phi^\dagger_2 \Big(Q_+ (W_-
  W_+)^{-1}  Q_- \Big)^{-1}\phi_2 }\big] \\
 &=& \int D\phi_2 D\phi_2^\dagger e^{-\phi_2Q_-^{-1} W_- W_+
   Q_+^{-1}  \phi_2 }
 \end{eqnarray}
   The following formulae can then be
 used for the case of several hasenbusch masses.
-The case of the determinant $\det{ Q_m (W_- 
+The case of the determinant $\det{ Q_m (W_-
  W_+)^{-1} Q_m }$  can be
 recovered by setting $\mu_1=0$ in the following equations.
 
@@ -865,15 +865,15 @@ We have :
 (Q_m^2 +  \mu_1^2)^{-1} (Q_m+i\mu_1) \\
 &=& 1 +(\mu_2- \mu_1) \big(Q_m^2 + \mu_1^2\big)^{-1} \big( (\mu_2- \mu_1)
 + 2 \mu_1 \big) \\
-&=& 1 +(\mu_2^2- \mu_1^2) \big(Q_m^2 + \mu_1^2\big)^{-1} 
+&=& 1 +(\mu_2^2- \mu_1^2) \big(Q_m^2 + \mu_1^2\big)^{-1}
 \end{eqnarray}
 
 The force can then be computed : (global sign and factor $i$ have to be checked)
 \begin{eqnarray}
- \dot{\mathcal{H}_{F_2}}  &=&   i(\mu_2-\mu_1) \phi_2^{\dagger} \Big[ ( 1 - i(\mu_2 - \mu_1) 
+ \dot{\mathcal{H}_{F_2}}  &=&   i(\mu_2-\mu_1) \phi_2^{\dagger} \Big[ ( 1 - i(\mu_2 - \mu_1)
   (Q_m - i \mu_1)^{-1}) \dot{(Q_m+i\mu_1)^{-1}}  \\
  &&- \dot{(Q_m - i    \mu_1)^{-1}} (1+ i (\mu_2 - \mu_1) (Q_m+i \mu_1)^{-1})\Big] \phi_2 \\
-&=&  i(\mu_2-\mu_1) \phi_2^{\dagger} \left[  ( 1 - i(\mu_2 - \mu_1) 
+&=&  i(\mu_2-\mu_1) \phi_2^{\dagger} \left[  ( 1 - i(\mu_2 - \mu_1)
   (Q_m - i\mu_1)^{-1}) ( Q_m+i\mu_1)^{-1} \dot{Q_m} (Q_m+i\mu_1)^{-1}
 \right] \phi_2 \\  &+& \rm{h.c}
 \end{eqnarray}
@@ -883,21 +883,21 @@ X\equiv (Q_m+i\mu_1)^{-1}\phi_2,\quad\textrm{and}\quad Y^{\dagger}=i\phi_2^\dagg
 (1 -i (\mu_2-\mu_1) (Q-i\mu_1)^{-1}) (Q_m+i\mu_1)^{-1}
 \end{equation}
 
-From which we deduce 
+From which we deduce
 \begin{eqnarray}
 Y &=&   -i (Q_m - i \mu_1)^{-1}(1 +  i(\mu_2-\mu_1)(Q+i\mu_1)^{-1})
-\phi_2 \\ &=&-i (Q_m - i \mu_1)^{-1}  ( \phi_2  + i(\mu_2-\mu_1)  X)  
+\phi_2 \\ &=&-i (Q_m - i \mu_1)^{-1}  ( \phi_2  + i(\mu_2-\mu_1)  X)
 \end{eqnarray}
 
 
-Note that in the particular case where $\mu_1=0$, 
+Note that in the particular case where $\mu_1=0$,
 
 \begin{equation}
 Q_m^{-1} W_- W_+ Q_m^{-1} = ( 1 - i\mu_2Q_m^{-1}) (1+ i\mu_2Q_m^{-1}))
 = 1 + \mu_2^2 Q_m^{-2}
 \end{equation}
 
-Which leads to 
+Which leads to
 \begin{eqnarray}
  \dot{\mathcal{H}_{F_2}}  &=& \mu_2^2 \phi_2^{\dagger} \dot{Q_m^{-2}} \phi_2
 \end{eqnarray}
@@ -910,30 +910,30 @@ proportional to $\mu_2^2$.
 Note that we have : $\widetilde{\mu} \equiv 2 \kappa \mu$.
 
 \begin{equation}
-Q_{\pm}= \gamma_5 \begin{pmatrix} 
+Q_{\pm}= \gamma_5 \begin{pmatrix}
 1 \pm i \widetilde{\mu} \gamma_5 & M_{\rm{eo}} \\
 M_{\rm{oe}} & 1 \pm i \widetilde{\mu} \gamma_5\\
-\end{pmatrix} \equiv \gamma_5 \begin{pmatrix} 
+\end{pmatrix} \equiv \gamma_5 \begin{pmatrix}
 M^{\pm}_{\rm{ee}}  & M_{\rm{eo}} \\
 M_{\rm{oe}} & M^{\pm}_{\rm{oo}}\\
 \end{pmatrix}
 \end{equation}
-Note that $M_{\rm{ee}}^{-1}$ can be computed : 
+Note that $M_{\rm{ee}}^{-1}$ can be computed :
 \begin{equation}
 M_{\rm{ee}}^{-1} = ( 1 \pm i\widetilde{\mu} \gamma_5)^{-1} = \frac{1\mp
 i \widetilde{\mu}\gamma_5 }{ 1 + \widetilde{\mu}^2}
 \end{equation}
 
 
-Now we can conveniently rewrite 
+Now we can conveniently rewrite
 \begin{equation}
-Q_{\pm} =  \begin{pmatrix} 
+Q_{\pm} =  \begin{pmatrix}
 \gamma_5 M^{\pm}_{\rm{ee}}  & 0 \\ \gamma_5 M_{\rm{oe}} & 1\\
-\end{pmatrix} \begin{pmatrix} 
+\end{pmatrix} \begin{pmatrix}
 1  &  \left(M^{\pm}_{\rm{ee}}\right)^{-1} M_{\rm{eo}} \\0 & \gamma_5
   \left(M^{\pm}_{\rm{oo}} - M_{\rm{oe}}
     \left(M^{\pm}_{\rm{ee}}\right)^{-1} M_{\rm{eo}} \right)\\
-\end{pmatrix} 
+\end{pmatrix}
 \end{equation}
 
 
@@ -946,25 +946,25 @@ From the last equation we deduce that :
 
 Note that the first determinant is a constant that could be computed.
 
-In the following we will denote 
+In the following we will denote
 \begin{equation}
 \hat{Q}_{\pm} \equiv \gamma_5
   \left(M^{\pm}_{\rm{oo}} - M_{\rm{oe}}
     \left(M^{\pm}_{\rm{ee}}\right)^{-1} M_{\rm{eo}} \right)
 \end{equation}
-where $\hat{Q}_{\pm}$ is defined on the odd sites of the lattice. 
+where $\hat{Q}_{\pm}$ is defined on the odd sites of the lattice.
 
 
-We thus have 
+We thus have
 \begin{equation}
-\det{Q_+ Q_-} = \det{Q_+}\det{Q_{-}}\propto\det{\hat{Q}_+ \hat{Q}_-} 
+\det{Q_+ Q_-} = \det{Q_+}\det{Q_{-}}\propto\det{\hat{Q}_+ \hat{Q}_-}
 \end{equation}
 
 and we thus get the following Hamiltonian :
 \begin{equation}
 \mathcal{H}_{F_1} = \phi_1^{\dagger} \left(\hat{Q}_+
     \hat{Q}_-\right)^{-1} \phi_1
-\end{equation} 
+\end{equation}
 
 The corresponding force then reads :
 
@@ -979,34 +979,34 @@ can be written :
 \begin{equation}
 \dot{\mathcal{H}_{F_1}} = - \left(Y_{\rm{o}}^{\dagger} \dot{\hat{Q}}_{+} X_{\rm{o}}  + \rm{h.c}\right)
 \end{equation}
-with 
+with
 \begin{equation}
   X_{\rm{o}}=\hat{Q}_+^{-1}\phi_0,\quad. Y_{\rm{o}}= \left(\hat{Q}_+
     \hat{Q}_-\right)^{-1} \phi_0,
 \end{equation}
-where we have used that 
+where we have used that
 \begin{equation}
   \hat{Q}_\pm^{\dagger} = \hat{Q}_\mp.
 \end{equation}
-Furthermore we have 
+Furthermore we have
 \begin{equation}
 \dot{\hat{Q}}_{\pm} =  \gamma_5 \left( -  \dot{M}_{\rm{oe}}
   \left(M^{\pm}_{\rm{ee}}\right)^{-1} M_{\rm{eo}} -  M_{\rm{oe}}
     \left(M^{\pm}_{\rm{ee}}\right)^{-1} \dot{M}_{\rm{eo}}\right)
 \end{equation}
 
-Now noting that  
+Now noting that
 \begin{equation}
-  \dot{Q}_{\pm} =  \gamma_5 \begin{pmatrix} 
+  \dot{Q}_{\pm} =  \gamma_5 \begin{pmatrix}
  0  & \dot{M}_{\rm{eo}} \\
 \dot{M}_{\rm{oe}} & 0\\
 \end{pmatrix}
 \end{equation}
 
-We have 
+We have
 \begin{eqnarray}
   Y ^{\dagger} \dot{Q} X  &=& \begin{pmatrix} A^\dagger &
-    B^\dagger \end{pmatrix} \gamma_5 \begin{pmatrix} 
+    B^\dagger \end{pmatrix} \gamma_5 \begin{pmatrix}
  0  & \dot{M}_{\rm{eo}} \\
 \dot{M}_{\rm{oe}} & 0\\
 \end{pmatrix}  \begin{pmatrix} C \\  D \end{pmatrix} \\
@@ -1019,9 +1019,9 @@ $C=\left(M^{+}_{\rm{ee}}\right)^{-1} M_{\rm{eo}} X_0 $, $B^\dagger=
      \left(M^{+}_{\rm{ee}}\right)^{-1} \gamma_5$, and $D= X_0$ allows to write :
 \begin{equation}
 \dot{\mathcal{H}_{F_1}} =   Y^\dagger \dot{Q} X
-  + \rm{h.c} 
-\end{equation} 
-with 
+  + \rm{h.c}
+\end{equation}
+with
 \begin{equation}
 X=\begin{pmatrix}\left(M^{+}_{\rm{ee}}\right)^{-1} M_{\rm{eo}} X_0
   \\ X_0 \end{pmatrix},\quad \rm{and} \quad Y=\begin{pmatrix}
@@ -1033,10 +1033,10 @@ We have used that   $\dot{Q}_+= \dot{Q}_-$, $M_{\rm{eo}}^{\dagger}=
 
 \subsection{Twisted mass shift : determinant ratio  eo case}
 
-We use that $\det{ Q_+ (W_- 
+We use that $\det{ Q_+ (W_-
  W_+)^{-1} Q_-} = \det{W_+^{-1} Q_+ Q_- W_-^{-1}} \propto\det{\hat{W}_+^{-1} \hat{Q}_+ \hat{Q}_- \hat{W}_-^{-1}}  $
 
-We thus have to compute 
+We thus have to compute
 \begin{eqnarray}
 \dot{\mathcal{H}_{F_2}}  &=& \phi_2^\dagger\big[ \delta \hat{W}_-
 (\hat{Q}_+ \hat{Q}_-)^{-1} \hat{W}_+  +  \hat{W}_-
@@ -1050,20 +1050,20 @@ We thus have to compute
 \hat{W}_- \hat{Q}_-^{-1} \hat{Q}_+^{-1} \dot{\hat{Q}}_+ \hat{Q}_+^{-1} \hat{W}_+   \big] \phi_2 \\
 \end{eqnarray}
 
-Now we introduce 
+Now we introduce
 \begin{equation}
 X_W =  (\hat{Q}_+ \hat{Q}_-)^{-1} \hat{W}_+ \phi_2,  Y_W =
 \hat{Q}_+^{-1} \hat{W}_+\phi_2 = \hat{Q}_- X_W
 \end{equation}
 
-such that 
+such that
 \begin{eqnarray}
 \dot{\mathcal{H}_{F_2}} &=& \phi_2^\dagger  \dot{\hat{W}}_- X_W +
 X_W^\dagger  \delta \hat{W}_+ \phi_2 \\
 &-& Y_W^\dagger \dot{\hat{Q}}_- X_W - X_W^\dagger   \dot{\hat{Q}}_+  Y_W
 \end{eqnarray}
 
-Now recalling that 
+Now recalling that
 \begin{eqnarray}
 \dot{\hat{Q}}_{\pm} &=&  -\gamma_5 \left(   \dot{M}_{\rm{oe}}
   \left(1\pm i\mu_1 \gamma_5\right)^{-1} M_{\rm{eo}}   + M_{\rm{oe}}
@@ -1081,13 +1081,13 @@ Now can write the last expression in terms of $\dot{Q} \equiv
 &=& 2~ \rm{Re}\Big[ Y_1^\dagger \dot{Q} X_1 - Y_2^\dagger \dot{Q}
 X_2 \Big],
 \end{eqnarray}
-with 
+with
 \begin{eqnarray}
 Y_1 &=& \begin{pmatrix}  (1+i\mu_1\gamma_5)^{-1} M_{\rm{eo}} Y_W \\
   Y_W \end{pmatrix},\quad Y_2  =  \begin{pmatrix}  (1+i\mu_2\gamma_5)^{-1} M_{\rm{eo}} \phi_2 \\
   \phi_2 \end{pmatrix},\\
 X_{1,2} &=&  \begin{pmatrix}  (1-i\mu_{1,2}\gamma_5)^{-1} M_{\rm{eo}} X_W \\
-  X_W \end{pmatrix}, \dot{Q} \equiv  \dot{Q}_{\pm} =  \gamma_5 \begin{pmatrix} 
+  X_W \end{pmatrix}, \dot{Q} \equiv  \dot{Q}_{\pm} =  \gamma_5 \begin{pmatrix}
  0  & \dot{M}_{\rm{eo}} \\
 \dot{M}_{\rm{oe}} & 0\\
 \end{pmatrix}
@@ -1110,7 +1110,7 @@ Now we split the determinant as follows :
   }{W_- W_+}}
 \end{equation}
 
-And we choose 
+And we choose
 \begin{equation}
 W_{\pm} = Q_{\rm{eo}} \pm i \mu
 \end{equation}
@@ -1144,7 +1144,7 @@ W_-^{-1}\phi_1 + \rm{h.c} \\
 &=&  \phi_1^\dagger  W_+^{-1}  W_-^{-1} \dot{Q}_{\rm{eo}} W_-^{-1} \phi_1+ \rm{h.c}
 \end{eqnarray}
 
-Now we want to rewrite the last equation as a function of 
+Now we want to rewrite the last equation as a function of
 \begin{equation}
 \dot{Q} = \gamma_5  \begin{pmatrix}  0 & \dot{D}_{\rm{eo}} \\
   \dot{D}_{\rm{oe}} & 0  \end{pmatrix}
@@ -1155,20 +1155,20 @@ Now we want to rewrite the last equation as a function of
   X_{\rm{o}}=W_+^{-1}\phi_1,\quad. Y_{\rm{o}}= \left(W_+
     W_-\right)^{-1} \phi_1,
 \end{equation}
-where we have used that 
+where we have used that
 \begin{equation}
   W_\pm^{\dagger} = W_\mp.
 \end{equation}
-Furthermore we have 
+Furthermore we have
 \begin{equation}
 \dot{Q}_{\rm{eo}} =  -\gamma_5 \left(  \dot{M}_{\rm{oe}}
    M_{\rm{eo}} +  M_{\rm{oe}} \dot{M}_{\rm{eo}}\right)
 \end{equation}
 
-noting that 
+noting that
 \begin{eqnarray}
   Y ^{\dagger} \dot{Q} X  &=& \begin{pmatrix} A^\dagger &
-    B^\dagger \end{pmatrix} \gamma_5 \begin{pmatrix} 
+    B^\dagger \end{pmatrix} \gamma_5 \begin{pmatrix}
  0  & \dot{M}_{\rm{eo}} \\
 \dot{M}_{\rm{oe}} & 0\\
 \end{pmatrix}  \begin{pmatrix} C \\  D \end{pmatrix} \\
@@ -1180,9 +1180,9 @@ $C =  M_{\rm{eo}} X_0 $, $B^\dagger=
  Y_0^\dagger \gamma_5 M_{\rm{oe}}$, and $D= X_0$ allows us to write :
 \begin{equation}
 \dot{\mathcal{H}_{F_1}} = -  Y^\dagger \dot{Q} X
-  + \rm{h.c} 
-\end{equation} 
-with 
+  + \rm{h.c}
+\end{equation}
+with
 \begin{equation}
 X=\begin{pmatrix} M_{\rm{eo}} X_0
   \\ X_0 \end{pmatrix},\quad \rm{and} \quad Y=\begin{pmatrix}

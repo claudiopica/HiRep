@@ -85,7 +85,7 @@ struct _monomial* scalar_create(const monomial_data *data)
 	m->update_force = &force_scalar;
 	m->force_par = &par->force_par;
 	m->update_field = &update_scalar_field;
-	m->field_par = &par->field_par;	
+	m->field_par = &par->field_par;
 
 	m->pseudofermion = &scalar_pseudofermion;
 	m->gaussian_pf = &scalar_blank;
@@ -95,4 +95,3 @@ struct _monomial* scalar_create(const monomial_data *data)
 
 	return m;
 }
-

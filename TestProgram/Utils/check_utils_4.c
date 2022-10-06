@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
     start_gf_sendrecv(u_gauge);
     represent_gauge_field();
     lprintf("MAIN", 0, "done.\n\n");
-  
+
     lprintf("MAIN", 0, "Requesting, one workspace... ");
     reserve_wrk_space();
     lprintf("MAIN", 0, "done.\n\n");
@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
     Zeropp[1] = spat_avr_0pp_wrk();
 
     Zeropp[0] -= Zeropp[1];
-    
+
 
     dop = sqrt(_complex_prod_re(Zeropp[0], Zeropp[0]));
 

@@ -1,6 +1,6 @@
 /****************************************************************************
 * Copyright (c) 2014, Ari Hietanen
-* All rights reserved.                                                      * 
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 /*******************************************************************************
@@ -103,7 +103,7 @@ int parse_cnfg_filename(char* filename, filename_t* fn) {
   basename = filename;
   while ((tmp = strchr(basename, '/')) != NULL) {
     basename = tmp+1;
-  }            
+  }
 
 #ifdef REPR_FUNDAMENTAL
 #define repr_name "FUN"
@@ -153,13 +153,13 @@ int parse_cnfg_filename(char* filename, filename_t* fn) {
 
 int main(int argc,char *argv[]) {
   char sbuf[128];
-  
+
 #ifndef MEASURE_FORCE
   read_cmdline(argc,argv);
   setup_process(&argc,&argv);
   read_input(logger_var.read,input_filename);
   logger_set_input(&logger_var);
-  if (PID!=0) { 
+  if (PID!=0) {
     logger_disable(); }   /* disable logger for MPI processes != 0 */
   else {
     FILE* stderrp;
@@ -169,22 +169,22 @@ int main(int argc,char *argv[]) {
 	  "Cannot redirect the stderr");
   }
   lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS);
-  error(1,1,"MAIN","Need to set MEASURE_FORCE macro for program to measure forces\n"); 
+  error(1,1,"MAIN","Need to set MEASURE_FORCE macro for program to measure forces\n");
 }
 #else
   FILE* list;
   filename_t fpars;
 
   read_cmdline(argc,argv);
-  
+
   /* setup process communications */
   setup_process(&argc,&argv);
-  
+
   /* read global variables file */
   read_input(glb_var.read,input_filename);
-  
+
   setup_replicas();
-  
+
   /* logger setup */
   read_input(logger_var.read,input_filename);
   logger_set_input(&logger_var);
@@ -196,16 +196,16 @@ int main(int argc,char *argv[]) {
     error(stderrp==NULL,1,"main [hmc.c]",
 	  "Cannot redirect the stderr");
   }
-  
+
   lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS);
   lprintf("MAIN",0,"[RepID: %d][world_size: %d]\n[MPI_ID: %d][MPI_size: %d]\n\n",RID,WORLD_SIZE,MPI_PID,MPI_WORLD_SIZE);
 
   //  lprintf("MAIN",0,"Logger lelvel: %d\n",logger_getlevel(0));
-  
+
   /* setup lattice geometry */
   if (geometry_init() == 1) { finalize_process(); return 0; }
   geometry_mpi_eo();
-  /* test_geometry_mpi_eo(); */ 
+  /* test_geometry_mpi_eo(); */
   /* setup random numbers */
   read_input(rlx_var.read,input_filename);
   //slower(rlx_var.rlxd_start); //convert start variable to lowercase
@@ -215,7 +215,7 @@ int main(int argc,char *argv[]) {
     read_ranlxd_state(rlx_var.rlxd_state);
   } else {
     lprintf("MAIN",0,"RLXD [%d,%d]\n",rlx_var.rlxd_level,rlx_var.rlxd_seed+MPI_PID);
-    rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed); 
+    rlxd_init(rlx_var.rlxd_level,rlx_var.rlxd_seed);
   }
 
 #ifdef GAUGE_SUN
@@ -236,12 +236,12 @@ int main(int argc,char *argv[]) {
 	"Failed to open list file\n");
   }
 
-  lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS); 
-  lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
-  lprintf("MAIN",0,"input file [%s]\n",input_filename); 
-  lprintf("MAIN",0,"output file [%s]\n",output_filename); 
-  if (list_filename[0]!=0) lprintf("MAIN",0,"list file [%s]\n",list_filename); 
-  else lprintf("MAIN",0,"cnfg file [%s]\n",cnfg_filename); 
+  lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS);
+  lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE);
+  lprintf("MAIN",0,"input file [%s]\n",input_filename);
+  lprintf("MAIN",0,"output file [%s]\n",output_filename);
+  if (list_filename[0]!=0) lprintf("MAIN",0,"list file [%s]\n",list_filename);
+  else lprintf("MAIN",0,"cnfg file [%s]\n",cnfg_filename);
 
   parse_cnfg_filename(cnfg_filename,&fpars);
 
@@ -268,7 +268,7 @@ int main(int argc,char *argv[]) {
     if(list!=NULL)
       if(fscanf(list,"%s",cnfg_filename)==0 || feof(list)) break;
 
-    i++; 
+    i++;
 
     lprintf("MAIN",0,"Configuration from %s\n", cnfg_filename);
     read_gauge_field(cnfg_filename);
@@ -277,12 +277,12 @@ int main(int argc,char *argv[]) {
     lprintf("TEST",0,"<p> %1.6f\n",avr_plaquette());
     full_plaquette();
 
-    
+
 
     gettimeofday(&start,0);
 
     corret_pf_dist_hmc();
-    
+
     gettimeofday(&end,0);
     timeval_subtract(&etime,&end,&start);
     lprintf("MAIN",0,"Configuration %d: Time to correct pseudofermion dist: %ld sec %ld usec\n",i,etime.tv_sec,etime.tv_usec);
@@ -332,17 +332,17 @@ int main(int argc,char *argv[]) {
       lprintf("TIME_SUMMARY",0," Hasenbusch %d: %1.6f",k-2,times[k]);
     }
   }
-  
+
   free(force_ave);
   free(force_max);
   free(n_inv_iter);
-  
-  
-  
+
+
+
   /* close communications */
   finalize_process();
-  
+
   return 0;
-  
+
 }
 #endif

@@ -8,4 +8,3 @@ LIBNAME = ../libhr.a
 EXCLUDE = HBiCGstab.c BiCGstab_mshift.c HBiCGstab_mshift.c dirac_eva.c
 
 include $(MKDIR)/MkRules
-

@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 
@@ -33,7 +33,7 @@
  * two components; then we multiply these two vectors by U(x,mu) and
  * store the result in p.c[0], p.c[1]; when computing the trace we can factorize p.c[0] and p.c[1]
  * as they both multiply two components of chi1^+; we store these factors in p.c[2] and p.c[3].
- * the tensor product is performed by the macro 
+ * the tensor product is performed by the macro
  * _suNf_FMAT(u,p): u = p.c[0] # p.c[2]^+ + p.c[1] # p.c[3]^+
  */
 
@@ -128,7 +128,7 @@ void force_hmc_ff(double dt, void *vpar){
   suNg_av_field *force = *par->momenta;
   int n_iters = 0;
   (void) n_iters;
-  
+
   set_ff_dirac_mass(par->mass);
 
   /* check input types */
@@ -186,14 +186,14 @@ void force_hmc_ff(double dt, void *vpar){
     mre_guess( &par->mpar, 0, &Ye, &Dff_sq, &Xe);
     n_iters+=cg_mshift( &mpar, &Dff_sq, &Xe, &Ye );
     mre_store( &par->mpar, 0, &Ye);
-    
+
     Dff(&Xe,&Ye);
 
     if(par->hasenbusch == 2) {
       /*  X_e = D (D^ D)^{-1} (D+b) pf[k] - pf[k] */
       spinor_field_mul_add_assign_f(&Xe,-1,&pf[k]);
     }
-    
+
     spinor_field_g5_assign_f(&Xe);
 
     /* Y_o = A_o^{-1} D_oe (D^ D)^{-1} pf[k]  */
@@ -203,16 +203,16 @@ void force_hmc_ff(double dt, void *vpar){
     /* X_o = (A_o)^^{-1} D_{oe} X_e = (A_o^)^{-1} D_{oe} g5 (D^)^{-1} pf[k] */
     Dphi_(&Xo,&Xe);
     spinor_sigma_pi_dagger_rho_div_assign(&Xo,ff_sigma,ff_pi,rho, &Xo);
-    
+
     //Add the force of the fermion fields on the auxiliary fields,
     //from the derivative of the Dirac operator.
     force_hmc_auxfields_fermion( dt, vpar, ff_sigma_mom, ff_pi_mom, Xs, Ys, par->hasenbusch);
-    
+
     free_spinor_field_f(tmp_spinor_field);
-        
+
 #endif
 
-    
+
 #ifdef MEASURE_FORCEHMC
     lprintf("FORCE",50,"|Xs| = %1.8e |Ys| = %1.8e\n",
 	    sqrt(spinor_field_sqnorm_f(Xs)),
@@ -338,4 +338,3 @@ void force_hmc_ff(double dt, void *vpar){
 #undef _F_DIR1
 #undef _F_DIR2
 #undef _F_DIR3
-

@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica and Agostino Patella                     *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica and Agostino Patella                     *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 #include "communications.h"
@@ -33,7 +33,7 @@ _OMP_PRAGMA ( single )
     {
       res = 0.;
     }
-   
+
    _TWO_SPINORS_FOR_SUM(s1,s2,res) {
      _REAL prod;
      _spinor_prod_im_f(prod,*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
@@ -54,7 +54,7 @@ _OMP_PRAGMA ( single )
     {
       res = 0.;
     }
-  
+
   _TWO_SPINORS_FOR_SUM(s1,s2,res) {
     _COMPLEX loc_res; //needed for OMP threads
     _spinor_prod_f(loc_res,*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
@@ -135,7 +135,7 @@ _OMP_BARRIER
 void _FUNC(spinor_field_mul_add_assign)(_SPINOR_FIELD_TYPE *s1, _REAL r, _SPINOR_FIELD_TYPE *s2)
 {
   //_REAL rr=r;
-  
+
    _TWO_SPINORS_FOR(s1,s2) {
       _spinor_mul_add_assign_f(*_SPINOR_PTR(s1),r,*_SPINOR_PTR(s2));
    }
@@ -146,7 +146,7 @@ void _FUNC(spinor_field_mulc_add_assign)(_SPINOR_FIELD_TYPE *s1, _COMPLEX c, _SP
 {
    //_COMPLEX c1=c;
    //c1.re=(_REAL)c.re; c1.im=(_REAL)c.im;
-   
+
    _TWO_SPINORS_FOR(s1,s2) {
       _spinor_mulc_add_assign_f(*_SPINOR_PTR(s1),c,*_SPINOR_PTR(s2));
    }
@@ -169,7 +169,7 @@ void _FUNC(spinor_field_g5_mulc_add_assign)(_SPINOR_FIELD_TYPE *s1, _COMPLEX c, 
 void _FUNC(spinor_field_mul)(_SPINOR_FIELD_TYPE *s1, _REAL r, _SPINOR_FIELD_TYPE *s2)
 {
   //_REAL rr=(_REAL)r;
-  
+
    _TWO_SPINORS_FOR(s1,s2) {
       _spinor_mul_f(*_SPINOR_PTR(s1),r,*_SPINOR_PTR(s2));
    }
@@ -180,7 +180,7 @@ void _FUNC(spinor_field_mulc)(_SPINOR_FIELD_TYPE *s1, _COMPLEX c, _SPINOR_FIELD_
 {
    //_COMPLEX c1;
    //c1.re=(_REAL)c.re; c1.im=(_REAL)c.im;
-   
+
    _TWO_SPINORS_FOR(s1,s2) {
       _spinor_mulc_f(*_SPINOR_PTR(s1),c,*_SPINOR_PTR(s2));
    }
@@ -189,7 +189,7 @@ void _FUNC(spinor_field_mulc)(_SPINOR_FIELD_TYPE *s1, _COMPLEX c, _SPINOR_FIELD_
 /* r=s1+s2 */
 void _FUNC(spinor_field_add)(_SPINOR_FIELD_TYPE *r, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
-  
+
    _THREE_SPINORS_FOR(s1,s2,r) {
       _spinor_add_f(*_SPINOR_PTR(r),*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
     }
@@ -198,7 +198,7 @@ void _FUNC(spinor_field_add)(_SPINOR_FIELD_TYPE *r, _SPINOR_FIELD_TYPE *s1, _SPI
 /* r=s1-s2 */
 void _FUNC(spinor_field_sub)(_SPINOR_FIELD_TYPE *r, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
-  
+
    _THREE_SPINORS_FOR(s1,s2,r) {
       _spinor_sub_f(*_SPINOR_PTR(r),*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
    }
@@ -207,7 +207,7 @@ void _FUNC(spinor_field_sub)(_SPINOR_FIELD_TYPE *r, _SPINOR_FIELD_TYPE *s1, _SPI
 /* s1+=s2 */
 void _FUNC(spinor_field_add_assign)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
-  
+
    _TWO_SPINORS_FOR(s1,s2) {
       _spinor_add_assign_f(*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
    }
@@ -232,7 +232,7 @@ void _FUNC(spinor_field_zero)(_SPINOR_FIELD_TYPE *s1)
 /* s1=-s2 */
 void _FUNC(spinor_field_minus)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
-  
+
    _TWO_SPINORS_FOR(s1,s2) {
       _spinor_minus_f(*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
    }
@@ -243,7 +243,7 @@ void _FUNC(spinor_field_lc)(_SPINOR_FIELD_TYPE *s1, _REAL r1, _SPINOR_FIELD_TYPE
 {
   //_REAL rr1=(_REAL)r1;
   //_REAL rr2=(_REAL)r2;
-  
+
    _THREE_SPINORS_FOR(s1,s2,s3) {
      _spinor_lc_f(*_SPINOR_PTR(s1),r1,*_SPINOR_PTR(s2),r2,*_SPINOR_PTR(s3));
    }
@@ -254,7 +254,7 @@ void _FUNC(spinor_field_lc_add_assign)(_SPINOR_FIELD_TYPE *s1, _REAL r1, _SPINOR
 {
   //_REAL rr1=(_REAL)r1;
   //_REAL rr2=(_REAL)r2;
-  
+
    _THREE_SPINORS_FOR(s1,s2,s3) {
      _spinor_lc_add_assign_f(*_SPINOR_PTR(s1),r1,*_SPINOR_PTR(s2),r2,*_SPINOR_PTR(s3));
    }
@@ -266,7 +266,7 @@ void _FUNC(spinor_field_clc)(_SPINOR_FIELD_TYPE *s1, _COMPLEX cd1, _SPINOR_FIELD
    //_COMPLEX c1, c2;
    //c1.re=(_REAL)cd1.re; c1.im=(_REAL)cd1.im;
    //c2.re=(_REAL)cd2.re; c2.im=(_REAL)cd2.im;
-   
+
    _THREE_SPINORS_FOR(s1,s2,s3) {
      _spinor_clc_f(*_SPINOR_PTR(s1),cd1,*_SPINOR_PTR(s2),cd2,*_SPINOR_PTR(s3));
    }
@@ -278,7 +278,7 @@ void _FUNC(spinor_field_clc_add_assign)(_SPINOR_FIELD_TYPE *s1, _COMPLEX cd1, _S
    //_COMPLEX c1, c2;
    //c1.re=(_REAL)cd1.re; c1.im=(_REAL)cd1.im;
    //c2.re=(_REAL)cd2.re; c2.im=(_REAL)cd2.im;
-   
+
    _THREE_SPINORS_FOR(s1,s2,s3) {
      _spinor_clc_add_assign_f(*_SPINOR_PTR(s1),cd1,*_SPINOR_PTR(s2),cd2,*_SPINOR_PTR(s3));
    }
@@ -338,7 +338,7 @@ void _FUNC(spinor_field_g3)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 void _FUNC(spinor_field_lc1)(_REAL c1, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
   //_REAL cc1=(_REAL)c1;
-  
+
    _TWO_SPINORS_FOR(s1,s2) {
        _spinor_mul_add_assign_f(*_SPINOR_PTR(s1),c1,*_SPINOR_PTR(s2));
    }
@@ -349,7 +349,7 @@ void _FUNC(spinor_field_lc2)(_REAL c1, _REAL c2, _SPINOR_FIELD_TYPE *s1, _SPINOR
 {
   //_REAL cc1=(_REAL)c1;
   //_REAL cc2=(_REAL)c2;
-  
+
    _TWO_SPINORS_FOR(s1,s2) {
        _spinor_lc_f(*_SPINOR_PTR(s1),c1,*_SPINOR_PTR(s1),c2,*_SPINOR_PTR(s2));
    }
@@ -360,12 +360,11 @@ void _FUNC(spinor_field_lc3)(_REAL c1, _REAL c2, _SPINOR_FIELD_TYPE *s1, _SPINOR
 {
   _REAL cc1=-c1;
   _REAL cc2=-c2;
-  
+
    /* c1=-c1; c2=-c2; */
-   
+
    _THREE_SPINORS_FOR(s1,s2,s3) {
       _spinor_lc_add_assign_f(*_SPINOR_PTR(s3),cc1,*_SPINOR_PTR(s1),cc2,*_SPINOR_PTR(s2));
       _spinor_minus_f(*_SPINOR_PTR(s3),*_SPINOR_PTR(s3));
    }
 }
-

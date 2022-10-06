@@ -1,6 +1,6 @@
 /***************************************************************************\
- * Copyright (c) 2008, Agostino Patella, Claudio Pica                        *   
- * All rights reserved.                                                      * 
+ * Copyright (c) 2008, Agostino Patella, Claudio Pica                        *
+ * All rights reserved.                                                      *
  \***************************************************************************/
 
 
@@ -18,20 +18,20 @@
 #include "ranlux.h"
 
 
-void write_gauge_field_mpieo_BE(char filename[]) 
+void write_gauge_field_mpieo_BE(char filename[])
 {
   write_gauge_field(filename);
 }
 
 
 
-void read_gauge_field_mpieo_BE(char filename[]) 
+void read_gauge_field_mpieo_BE(char filename[])
 {
   read_gauge_field(filename);
 }
 
 
-void write_gauge_field_mpieo_LE(char filename[]) 
+void write_gauge_field_mpieo_LE(char filename[])
 {
   FILE *fp=NULL;
   int g[4], p[4];
@@ -110,8 +110,8 @@ void write_gauge_field_mpieo_LE(char filename[])
             }
           }
 #ifdef WITH_MPI
-          MPI_Barrier(GLB_COMM); 
-          if (pid!=0) { /* do send/receive only if the data is not on PID 0 */ 
+          MPI_Barrier(GLB_COMM);
+          if (pid!=0) { /* do send/receive only if the data is not on PID 0 */
             /* send buffer */
             if (pid==PID) {
 #ifndef NDEBUG
@@ -163,7 +163,7 @@ void write_gauge_field_mpieo_LE(char filename[])
     }
   } /* end loop over T, X and Y direction */
 
-  if (PID==0) fclose(fp); 
+  if (PID==0) fclose(fp);
   free(buff);
 
   gettimeofday(&end,0);
@@ -172,7 +172,7 @@ void write_gauge_field_mpieo_LE(char filename[])
 
 }
 
-void read_gauge_field_mpieo_LE(char filename[]) 
+void read_gauge_field_mpieo_LE(char filename[])
 {
   FILE *fp=NULL;
   int g[4], p[4];
@@ -246,7 +246,7 @@ void read_gauge_field_mpieo_LE(char filename[])
 
 #ifdef WITH_MPI
           /* MPI_Barrier(GLB_COMM); */
-          if (pid!=0) { /* do send/receive only if the data is not on PID 0 */ 
+          if (pid!=0) { /* do send/receive only if the data is not on PID 0 */
             /* send buffer */
             if (PID==0) {
               mpiret=MPI_Send(buff, bsize, MPI_DOUBLE, pid, 999, GLB_COMM);
@@ -313,7 +313,7 @@ void read_gauge_field_mpieo_LE(char filename[])
     }
   } /* end loop over T, X and Y direction */
 
-  if (PID==0) fclose(fp); 
+  if (PID==0) fclose(fp);
   free(buff);
 
   /* start sendrecv of global gauge field */

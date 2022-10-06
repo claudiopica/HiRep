@@ -1,11 +1,10 @@
 TOPDIR = ../..
 MKDIR = $(TOPDIR)/Make
 
-TESTS = 
+TESTS =
 FAIL = check_deflate
 
 LIBS += $(TOPDIR)/LibHR/libhr.a
 
 
 include $(MKDIR)/MkRules
-

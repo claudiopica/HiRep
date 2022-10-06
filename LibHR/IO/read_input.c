@@ -1,6 +1,6 @@
 /***************************************************************************\
- * Copyright (c) 2008, Claudio Pica                                          *   
- * All rights reserved.                                                      * 
+ * Copyright (c) 2008, Claudio Pica                                          *
+ * All rights reserved.                                                      *
  \***************************************************************************/
 
 #include "io.h"
@@ -37,7 +37,7 @@ static void mpi_broadcast_parameters(input_record_t crec[]) {
     }
   }
 #endif
-  
+
 }
 
 void read_input(input_record_t irec[], char *filename) {
@@ -81,8 +81,8 @@ void read_input(input_record_t irec[], char *filename) {
       if(fscanf(inputfile, irec[count].descr, irec[count].ptr)==1) {
         found[count]=1;
         goto NEXTLOOP;
-      } 
-      if(feof(inputfile)) goto ENDLOOP; 
+      }
+      if(feof(inputfile)) goto ENDLOOP;
       fsetpos(inputfile,&pos);
     }
 
@@ -104,7 +104,7 @@ ENDLOOP:
 
   while(npar>0) {
     --npar;
-    if (found[npar]==0 && irec[npar].descr!=NULL) 
+    if (found[npar]==0 && irec[npar].descr!=NULL)
       lprintf("READINPUT",0,
           "Warning: input parameter [%s] not found in [%s]!\n",
           irec[npar].name, filename );
@@ -114,8 +114,3 @@ ENDLOOP:
   mpi_broadcast_parameters(irec);
 
 }
-
-
-
-
-

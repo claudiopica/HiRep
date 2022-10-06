@@ -52,14 +52,14 @@ if __name__ == '__main__':
     file=args.f+".c"
 
     #sys.stderr.write(file+"AAA"+str(args.s[0])+"SSS\n")
-    
+
     macros=[]
     for item in args.s:
         macros.extend(item.replace("-D","").strip().split(' '))
     macros.append(args.g)
     macros.append(args.r)
     macros.append("NG="+args.n)
-    
+
 
     #sys.stderr.write(str(macros)+"\n")
 

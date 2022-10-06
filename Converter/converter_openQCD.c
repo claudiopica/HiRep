@@ -1,5 +1,5 @@
 /*******************************************************************************
-*  
+*
 * Converter from and to openQCD format.
 * Code modified by Fernando Romero-Lopez
 *

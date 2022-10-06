@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 #include "inverters.h"
@@ -14,14 +14,14 @@
 
 /* _compute_z(z3+i,z1+i,z2+i,&ctmp1,beta,alpha,&(par->shift[i-1])); */
 /* res = (z1*betam1)/(beta*alpha*(z1-z2)+z1*betam1*(1+sigma*beta)) (abbiamo diviso per z2) */
-__inline static void _compute_z(complex *res, complex *z1, complex *z2, 
+__inline static void _compute_z(complex *res, complex *z1, complex *z2,
 				complex *betam1, complex *beta, complex *alpha,
-				double *sigma) 
+				double *sigma)
 {
   complex ctmp1, ctmp2, ctmp3, ctmp4;
-  
+
   _complex_mul(ctmp1,*z1,*betam1);
-  _complex_mul(ctmp2,*beta,*alpha); 
+  _complex_mul(ctmp2,*beta,*alpha);
   _complex_sub(*res,*z1,*z2);
   _complex_mulr(ctmp4,*sigma,*beta);
   _complex_mul(ctmp3,ctmp2,*res);
@@ -47,7 +47,7 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor
   spinor_field *r, *r1, *o, *Ms, *Mo, *o0;
   spinor_field *sptmp;
 
-  complex delta, phi; 
+  complex delta, phi;
   complex *z1, *z2, *z3, *alpha, *beta, *chi, *rho; /* alpha is unnecessary */
   complex ctmp1, ctmp2, ctmp3,ctmp4, ctmp5, oldalpha;
   double rtmp1;
@@ -57,17 +57,17 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor
   char *sflags;
   unsigned short notconverged;
 	unsigned int spinorlen;
-   
+
   /* fare qualche check sugli input */
   /* par->n deve essere almeno 2! */
   /*
     printf("numero vettori n=%d\n",par->n);
     for (i=0; i<(par->n); ++i) {
     printf("shift[%d]=%f\n",i,par->shift[i]);
-    printf("out[%d]=%p\n",i,out[i]);      
+    printf("out[%d]=%p\n",i,out[i]);
     }
   */
-   
+
   /* allocate spinors fields and aux real variables */
   /* implementation note: to minimize the number of malloc calls
    * objects of the same type are allocated together
@@ -90,7 +90,7 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor
   rho = chi+(par->n);
 
   sflags = (char *)malloc(sizeof(char)*(par->n));
-   
+
   /* init recursion */
   cgiter = 0;
   notconverged = 1;
@@ -105,7 +105,7 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor
   }
   /* choose omega so that delta and phi are not zero */
   /* spinor_field_copy_f(o, in);  omega = in ; this may be changed */
-  gaussian_spinor_field(o0); 
+  gaussian_spinor_field(o0);
   /* spinor_field_copy_f(o0, in); */
   spinor_field_copy_f(o, o0);
   delta = spinor_field_prod_f(o, r);
@@ -132,16 +132,16 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor
     /* compute omega and chi[0] */
     spinor_field_mulc_f(o,beta[0],Ms);
     spinor_field_add_assign_f(o,r);
-    
+
     M(Mo,o);
 
     ctmp2=spinor_field_prod_f(Mo,o);
     rtmp1=1./spinor_field_sqnorm_f(Mo);
     _complex_mulr(chi[0],rtmp1,ctmp2);
-    
+
     /* compute r1 */
     spinor_field_mulc_f(r1,chi[0],Mo);
-    spinor_field_sub_f(r1,o,r1); 
+    spinor_field_sub_f(r1,o,r1);
 
     /* update delta and alpha[0] */
     oldalpha=alpha[0];
@@ -212,7 +212,7 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor
 	_complex_mul(ctmp2,z2[i],rho[i]);
 	_complex_mul(ctmp5,ctmp2,ctmp4);
 	spinor_field_clc_add_assign_f(&s[i],ctmp3,o,ctmp5,r1); /* not done yet */
-	
+
 	ctmp3=rho[i];
 	_complex_mulr(ctmp2,-par->shift[i-1],chi[0]);
 	_complex_add_1(ctmp2);
@@ -221,7 +221,7 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor
 
 	_complex_mul(ctmp2,z3[i],rho[i]);
 	spinor_field_clc_f(Mo,ctmp2,r,alpha[i],&s[i]); /* use Mo as temporary storage */
-	 spinor_field_copy_f(&s[i],Mo); 
+	 spinor_field_copy_f(&s[i],Mo);
 	/* change pointers instead */
 	/*
 	  sptmp=s[i];
@@ -240,7 +240,7 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor
 
     if(rtmp1<par->err2)
       notconverged=0;
-	
+
     printf("[ %d ] residuo=%e\n",cgiter,rtmp1);
 
     /* Uncomment this to print cg recursion parameters
@@ -251,7 +251,7 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor
        printf("\n[ %d ] gamma=%e\n",cgiter,gamma);
        printf("[ %d ] delta=%e\n",cgiter,delta);
     */
-      
+
   } while ((par->max_iter==0 || cgiter<par->max_iter) && notconverged);
 
   /* test results */
@@ -268,7 +268,7 @@ int BiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor
       printf("BiCGstab Failed: err2[%d] = %e\n",i,norm);
   }
 #endif
-   
+
   /* free memory */
   free_spinor_field_f(s);
   free(z1);

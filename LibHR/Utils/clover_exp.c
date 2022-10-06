@@ -251,7 +251,7 @@ static void clover_exp_NF3(suNfc *Aplus, suNfc *expAplus)
   p[1] = -p[1]/5 + p[4]*p[3]/6;
   p[2] = -p[2]/4 + p[4]*p[4]/8;
   p[3] = -p[3]/3;
-  p[4] = -p[4]/2;  
+  p[4] = -p[4]/2;
   */
 
   p[4] = -p[4] / 2;

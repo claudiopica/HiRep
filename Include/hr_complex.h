@@ -1,13 +1,13 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 /*******************************************************************************
 *
 * File hirep_complex.h
 *
-* Type definitions and macros for complex numbers  
+* Type definitions and macros for complex numbers
 *
 *******************************************************************************/
 
@@ -134,7 +134,7 @@ typedef float complex hr_complex_flt;
 */
 #define _complex_inv(a,b) \
   (a)=1/(b)
-  
+
 /*
 * a^*b (a,b complex)
 */

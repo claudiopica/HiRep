@@ -2,7 +2,7 @@ CC = gcc
 CXX = g++
 GMPHOME = /opt/local
 
-LDFLAGS =  -L$(GMPHOME)/lib -lmpfr -lgmp 
+LDFLAGS =  -L$(GMPHOME)/lib -lmpfr -lgmp
 INCLIST = -I$(GMPHOME)/include
 
 BIN = remez
@@ -27,7 +27,7 @@ CCOBJ=$(CCSRC:.C=.o)
 OBJS_SRC = $(SOBJ) $(CCOBJ) $(COBJ)
 OBJS := $(notdir $(OBJS_SRC))
 
-$(BIN):  $(OBJS) 
+$(BIN):  $(OBJS)
 	$(CXX) $(OBJS) $(LDFLAGS) -o $(BIN)
 
 .c.o:

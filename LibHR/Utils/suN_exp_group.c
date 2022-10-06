@@ -19,8 +19,8 @@
 #endif
 
 // Here I start modifying FRL
-/*                                                                                                                                                                                    
- *  u = exp(X), with X traceless 
+/*
+ *  u = exp(X), with X traceless
  */
 #if (NG >= 3) && (NG <= 6)
 

@@ -4,7 +4,7 @@ NG = 3
 #REPR = REPR_ANTISYMMETRIC
 REPR = REPR_ADJOINT
 
-#CHOICES ARE GAUGE_SUN AND GAUGE_SON 
+#CHOICES ARE GAUGE_SUN AND GAUGE_SON
 GAUGE_GROUP = GAUGE_SUN
 #GAUGE_GROUP = GAUGE_SON
 
@@ -48,12 +48,12 @@ MACRO += -DIO_FLUSH
 #MACRO += -DWITH_UNTESTED
 
 #Compiler
-#CFLAGS = -Wall -Wshadow -std=c99 -O3 -fomit-frame-pointer -msse -msse2 
+#CFLAGS = -Wall -Wshadow -std=c99 -O3 -fomit-frame-pointer -msse -msse2
 CFLAGS = -Wall -Wshadow -std=c99 -O3  #-g #-march=core-avx2 -mtune=core-avx2 -g
 #CFLAGS = -Wall -Wshadow -std=c99 -O3 -qopt-prefetch=4 -qopt-report=2 -march=core-avx2 -mtune=core-avx2
 
 CC = /opt/local/bin/gcc-mp-10
-MPICC = /opt/local/bin/mpicc-mpich-gcc10 
+MPICC = /opt/local/bin/mpicc-mpich-gcc10
 LDFLAGS = -L /opt/local/lib/mpich-gcc10/ -L /opt/local/lib/ #-l efence
 INCLUDE = -I /opt/local/include/mpich-gcc10/ -I /opt/local/include/ -I /opt/local/include/gcc10/ -I /usr/include
 

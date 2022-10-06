@@ -7,4 +7,3 @@ TESTS = check_diracoperator_1 check_diracoperator_2 check_diracoperator_3 check_
 LIBS += $(TOPDIR)/LibHR/libhr.a
 
 include $(MKDIR)/MkRules
-

@@ -161,7 +161,7 @@ int main(int argc, char *argv[])
 
     rs = (double *)(&s);
     r = 0.0f;
-    
+
 
     while ((1.0f + r) == 1.0f)
     {
@@ -230,10 +230,10 @@ int main(int argc, char *argv[])
 
     start_sf_sendrecv(ps0);
     complete_sf_sendrecv(ps0);
-   
+
     Dphi(hmass, ps2, ps0);
 
-    
+
     start_sf_sendrecv(ps1);
     complete_sf_sendrecv(ps1);
 
@@ -244,7 +244,7 @@ int main(int argc, char *argv[])
             np[0], np[1], np[2], np[3]);
     lprintf("MAIN", 0, "should be around 1*10^(-15) or so)\n\n");
 
-    if(sqrt(sig)>10.e-14) 
+    if(sqrt(sig)>10.e-14)
       return_value=1;
   }
 

@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 /*******************************************************************************
@@ -32,7 +32,7 @@ static int block_size(int L)
 
 }
 
-static void init_block_size() 
+static void init_block_size()
 {
 	xbl=block_size(X);
 	xnl=X/xbl;
@@ -49,12 +49,12 @@ static int index2(int x0,int x1,int x2,int x3)
    int xb1,xb2,xb3;
    int xn1,xn2,xn3;
    int ib,in;
-   
+
    if (init==0) {
       init_block_size();
 			init=1;
 	 }
-   
+
    y0=safe_mod(x0,T);
    y1=safe_mod(x1,X);
    y2=safe_mod(x2,Y);
@@ -66,7 +66,7 @@ static int index2(int x0,int x1,int x2,int x3)
 
    xn1=y1/xbl;
    xn2=y2/ybl;
-   xn3=y3/zbl;   
+   xn3=y3/zbl;
 
    if ((y0%2)==0)
       ib=y0*xbl*ybl*zbl+2*(xb3+xb2*zbl+xb1*zbl*ybl);
@@ -116,14 +116,14 @@ static int index_noT(int x0,int x1,int x2,int x3)
    int xb1,xb2,xb3;
    int xn1,xn2,xn3;
    int ib,in;
-   
+
 	 geometry_init();
 
    if (init==0) {
       init_block_size();
 			init=1;
 	 }
-   
+
    y0=safe_mod(x0,T);
    y1=safe_mod(x1,X);
    y2=safe_mod(x2,Y);
@@ -135,7 +135,7 @@ static int index_noT(int x0,int x1,int x2,int x3)
 
    xn1=y1/xbl;
    xn2=y2/ybl;
-   xn3=y3/zbl;   
+   xn3=y3/zbl;
 
    ib=y0*xbl*ybl*zbl+(xb3+xb2*zbl+xb1*ybl*zbl);
 
@@ -172,4 +172,3 @@ void geometry_blocked_noT(void)
      }
    }
 }
-

@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* Wrapper functions for different type of measurements 
+* Wrapper functions for different type of measurements
 *
 *******************************************************************************/
 #include <stdlib.h>

@@ -10,4 +10,3 @@ check_update_2_OBJS = ../../HMC/hmc_utils.o
 LIBS += $(TOPDIR)/LibHR/libhr.a
 
 include $(MKDIR)/MkRules
-

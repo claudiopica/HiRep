@@ -17,7 +17,7 @@ int ** res=malloc(sizeof(int *)*48);
  int *res1=malloc(sizeof(int *)*48*4);
  for (i=0;i<48;i++)
  res[i]=res1+4*i;
- 
+
  res1[0]=0;
 res1[1]=1;
 res1[2]=2;
@@ -1229,7 +1229,7 @@ void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, double comple
 #endif
     int i;
     static double complex *gb1_bf;
-    static int n_total_active_slices = 0;    
+    static int n_total_active_slices = 0;
     static int *listactive = NULL;
     if (listactive == NULL)
     {

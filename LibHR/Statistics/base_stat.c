@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 /*******************************************************************************
@@ -26,13 +26,13 @@ double average(int n,double a[])
    double abar;
 
    abar=0.0;
-   
+
    for (i=0;i<n;i++)
       abar+=a[i];
 
    abar/=(double)(n);
-   
-   return(abar);   
+
+   return(abar);
 }
 
 
@@ -47,7 +47,7 @@ double sigma0(int n,double a[])
 
    abar=0.0;
    var=0.0;
-   
+
    for (i=0;i<n;i++)
    {
       abar+=a[i];
@@ -79,7 +79,7 @@ void auto_corr(int n,double a[],int tmax,double gamma[])
       sl+=a[i];
 
    sh=sl;
-      
+
    for (t=0;t<tmax;t++)
    {
       fact=1.0/(double)(n-t);
@@ -87,21 +87,21 @@ void auto_corr(int n,double a[],int tmax,double gamma[])
 
       for (i=t;i<n;i++)
          s+=a[i-t]*a[i];
-      
+
       gamma[t]=fact*s;
-      
+
       sl-=a[n-t-1];
-      sh-=a[t];      
+      sh-=a[t];
    }
 }
 
 
 double sigma(int n,double a[],double *tau,int *flag)
   /*
-   *     Returns the statistical error associated with the data series a[n] 
+   *     Returns the statistical error associated with the data series a[n]
    *     taking auto-correlations into account. The calculated integrated
    *     auto-correlation time is assigned to the parameter tau. On exit
-   *     flag=0 if the error estimation was stable and flag=1 otherwise 
+   *     flag=0 if the error estimation was stable and flag=1 otherwise
    */
 {
    int tmax,i,j,itest;
@@ -110,13 +110,13 @@ double sigma(int n,double a[],double *tau,int *flag)
 
    tmax=n/30+1;
    g=malloc(tmax*sizeof(double));
-   t=malloc(tmax*sizeof(double));   
+   t=malloc(tmax*sizeof(double));
 
    auto_corr(n,a,tmax,g);
 
    abar=average(n,a);
    sig0=sigma0(n,a);
-   
+
    if (((fabs(abar)+sig0)==fabs(abar))||(g[0]==0.0))
    {
       *tau=0.5;
@@ -124,7 +124,7 @@ double sigma(int n,double a[],double *tau,int *flag)
      free(g); free(t);
       return(sig0);
    }
-   
+
    t[0]=0.5;
 
    for (i=1;i<tmax;i++)
@@ -136,12 +136,12 @@ double sigma(int n,double a[],double *tau,int *flag)
    }
 
    taumax=0.0;
-   
+
    for (i=0;i<tmax;i++)
    {
       if (t[i]>taumax)
          taumax=t[i];
-      
+
       if (i>=(int)(5.0*t[i]))
       {
          itest=0;
@@ -150,7 +150,7 @@ double sigma(int n,double a[],double *tau,int *flag)
          {
             if (j>(i+(int)(3.0*t[i])))
                break;
-            
+
             dt=t[j]-t[i];
             del=(double)(2*(2*j+1))/(double)(n);
 
@@ -163,7 +163,7 @@ double sigma(int n,double a[],double *tau,int *flag)
             var=2.0*t[i]*g[0]/(double)(n);
             *tau=t[i];
             *flag=0;
-           
+
            free(g); free(t);
             return(sqrt(var));
          }
@@ -177,4 +177,3 @@ double sigma(int n,double a[],double *tau,int *flag)
   free(g); free(t);
    return(sqrt(var));
 }
-

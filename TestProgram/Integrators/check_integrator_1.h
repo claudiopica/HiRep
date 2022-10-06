@@ -1,6 +1,6 @@
 /***************************************************************************\
- * Copyright (c) 2008, Claudio Pica, Agostino Patella                        *   
- * All rights reserved.                                                      * 
+ * Copyright (c) 2008, Claudio Pica, Agostino Patella                        *
+ * All rights reserved.                                                      *
  \***************************************************************************/
 
 #ifndef CHE_INTEGRATOR_UTILS_1_H

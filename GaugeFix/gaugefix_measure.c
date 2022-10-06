@@ -48,10 +48,10 @@
         double overrelax; /* overrelaxation */
         double tol; /* tolerance */
         char configlist[256]; /* list of configuration */
-        
+
         /* for the reading function */
         input_record_t read[7];
-        
+
       } input_gaugefix;
 
       #define init_input_gaugefix(varname) \
@@ -89,7 +89,7 @@
           basename = filename;
           while ((tmp = strchr(basename, '/')) != NULL) {
             basename = tmp+1;
-          }            
+          }
 
         /*#ifdef REPR_FUNDAMENTAL*/
         /*#define repr_name "FUN"*/
@@ -137,7 +137,7 @@
         }
 
 
-        
+
 
 
         int main(int argc,char *argv[]) {
@@ -150,15 +150,15 @@
 
           setup_gauge_fields();
 
-        
+
           read_input(gaugefix_var.read,get_input_filename());
 
           strcpy(list_filename,gaugefix_var.configlist);
-          
-          lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS); 
-          lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
-          lprintf("MAIN",0,"input file [%s]\n",input_filename); 
-          if (strcmp(list_filename,"")!=0) lprintf("MAIN",0,"list file [%s]\n",list_filename); 
+
+          lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS);
+          lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE);
+          lprintf("MAIN",0,"input file [%s]\n",input_filename);
+          if (strcmp(list_filename,"")!=0) lprintf("MAIN",0,"list file [%s]\n",list_filename);
           else error(1,1,"main [gaugefix_measure.c]","No list provided");
 
 
@@ -167,11 +167,11 @@
           lprintf("MAIN",0,"Gauge Fixing overrelax %e \n",gaugefix_var.overrelax);
           lprintf("MAIN",0,"Gauge Fixing tol %e \n",gaugefix_var.tol);
           lprintf("MAIN",0,"Gauge Fixing make %s\n",gaugefix_var.make);
-        
+
           suNg_field* fixed_gauge=NULL;
           fixed_gauge=alloc_gfield(&glattice);
 
-          
+
           list=NULL;
           if(strcmp(list_filename,"")!=0) {
             error((list=fopen(list_filename,"r"))==NULL,1,"main [gaugefix_measure.c]" ,
@@ -179,7 +179,7 @@
           }
 
 
-          
+
           i=0;
           while(1) {
 
@@ -232,10 +232,9 @@
 
           if(list!=NULL) fclose(list);
 
-          
+
 
           finalize_process();
-          
+
           return 0;
         }
-

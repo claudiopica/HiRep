@@ -2,26 +2,26 @@
 *
 * Random number generator "ranlxs"
 *
-* See the notes 
+* See the notes
 *
 *   "User's guide for ranlxs and ranlxd [C programs]" (December 1997)
 *
-*   "Double precision implementation of the random number 
+*   "Double precision implementation of the random number
 *    generator ranlux" (December 1997)
 *
 * for a detailed description
 *
-* The externally accessible functions are 
+* The externally accessible functions are
 *
 *   void ranlxs(float r[],int n)
-*     Computes the next n single-precision random numbers and 
+*     Computes the next n single-precision random numbers and
 *     assigns them to the elements r[0],...,r[n-1] of the array r[]
-* 
+*
 *   void rlxs_init(int level,int seed)
 *     Initialization of the generator
 *
 *   void rlxs_get(int state[])
-*     Extracts the current state of the generator and stores the 
+*     Extracts the current state of the generator and stores the
 *     information in the array state[25]
 *
 *   void rlxs_reset(int state[])

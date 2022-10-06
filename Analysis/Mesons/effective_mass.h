@@ -3,7 +3,7 @@
 
 #include "bs_type.h"
 
-double fit(int left, int right,  Corr_t *data); 
+double fit(int left, int right,  Corr_t *data);
 
 /* Effective mass defined as in JHEP 0702:082,2007 [hep-lat/0701009] */
 double effm_err();
@@ -38,4 +38,3 @@ int shifted_prony_eff_mass_2(double* C, int t, int tmax, double* m1, double *m2,
 
 
 #endif
-

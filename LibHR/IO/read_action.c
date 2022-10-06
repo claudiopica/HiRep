@@ -613,7 +613,7 @@ void read_action(char *filename, integrator_par **ip_ptr)
          {
             parse_lines(&sec_int[n_int], lines);
             n_int++;
-         }  
+         }
 
          pos += count + 1;
       }

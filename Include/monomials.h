@@ -1,6 +1,6 @@
 /***************************************************************************\
 * Copyright (c) 2017, Martin Hansen, Claudio Pica                           *
-* All rights reserved.                                                      * 
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 #ifndef MONOMIALS_H

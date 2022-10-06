@@ -4,8 +4,8 @@
 * NOCOMPILE= !REPR_FUNDAMENTAL
 * Check the horner scheme for the implementation of the exp csw.
 * This test is performed only for fundamental SU(2) and SU(3) fermions
-* By: Fernando Romero-López 
-* 
+* By: Fernando Romero-López
+*
 *******************************************************************************/
 
 #define MAIN_PROGRAM

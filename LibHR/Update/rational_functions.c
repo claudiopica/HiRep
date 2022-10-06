@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 #include "global.h"
@@ -40,7 +40,7 @@ void r_app_free(rational_app *app) {
 }
 
 /* r_app_realloc:
- * read the new app->order and make enough space for 
+ * read the new app->order and make enough space for
  * the coefficients
  */
 void r_app_realloc(rational_app *app){
@@ -73,7 +73,7 @@ static void r_app_rp2pfe(rational_app *app) {
   }
 
   free(ctmp);
-  
+
 }
 
 /* converts the coef from the root/poles form to the partial fraction exp
@@ -82,7 +82,7 @@ static void r_app_rp2pfe(rational_app *app) {
 static void r_app_rp2pfe_inv(rational_app *app) {
   unsigned int i;
   double ctmp;
-  
+
   app->a[0]=1./app->a[0];
   /* swap poles and roots: a[i+1] <-> b[i] */
   for(i=0;i<app->order;++i) {
@@ -90,12 +90,12 @@ static void r_app_rp2pfe_inv(rational_app *app) {
     app->a[i+1]=app->b[i];
     app->b[i]=ctmp;
   }
-  
+
   r_app_rp2pfe(app);
 
 }
 
-/* rescale the approximation of a factor k 
+/* rescale the approximation of a factor k
  * used by r_app_set to adjust approximation intervals
  */
 void r_app_rescale(rational_app *app, double k) {
@@ -147,7 +147,7 @@ void r_app_rescale(rational_app *app, double k) {
   }
 */
 /* DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG */
-/* END END END END END END END END END END END END END END END END */ 
+/* END END END END END END END END END END END END END END END END */
 
 /* fill up rational_app structure with a r_app
  * of degree app->order which is an approximant for the function
@@ -214,7 +214,7 @@ void r_app_set(rational_app *app, double min, double max) {
   r_app_rescale(app,max/bmax);
   app->min=min;
   app->max=max;
-	
+
   /* change to pfe representation */
   if((app->n*app->d)<0) { /* check sign for inverse function */
     /* this is indeed correct: the database contains coef for f(x)=x^-k */
@@ -227,7 +227,7 @@ void r_app_set(rational_app *app, double min, double max) {
 
 /*
  * computes: out = (a[0]*I + \sum_i a[i]*(Q-b[i])^-1 ) in
- * this MUST work in the case: out==in 
+ * this MUST work in the case: out==in
  * where Q is a linear operator acting on spinors
  * This implementation uses CG_mshift => Q must be hermitean and positive definite!
  */
@@ -253,7 +253,7 @@ void rational_func(rational_app *coef, spinor_operator Q, spinor_field *out, spi
   if(inv_par.err2<EPSILON) inv_par.err2=EPSILON;
 #undef EPSILON
   inv_par.max_iter=0; /* no limit */
-   
+
   /* compute inverse vectors */
   if (inv_par.n==1) { spinor_field_zero_f(inv_out); }
   cg_mshift(&inv_par, Q, in, inv_out);

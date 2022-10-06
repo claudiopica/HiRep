@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 #include "linear_algebra.h"
@@ -9,7 +9,7 @@
 #include "spinor_field.h"
 #include "gamma_spinor.h"
 
-/* 
+/*
  * LINEAR ALGEBRA FUNCTIONS ARE DEFINED IN THE TEMPLATE
  *
  * TMPL/linear_algebra.c.sdtmpl
@@ -57,5 +57,3 @@ void _FUNC(spinor_field_copy)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2) {
 #undef _FUNC
 #undef _REAL
 #undef _COMPLEX
-
-

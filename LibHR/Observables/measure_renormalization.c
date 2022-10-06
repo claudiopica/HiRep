@@ -38,8 +38,8 @@ static void measure_renormalization_core(spinor_field* psi_in, spinor_field* psi
   suNf_propagator Sin,Sout,Sout_dag,Stmp1,Stmp2,Stmp3, Stmp4, Sf;
 
   for(i=0; i<nm; i++) {
-    for (t=0; t<T; t++) for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) { 
-	  ix=ipt(t,x,y,z);					
+    for (t=0; t<T; t++) for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) {
+	  ix=ipt(t,x,y,z);
 	  pinx = 2.0*PI*(((double) pt_in)*(t+zerocoord[0])/GLB_T + ((double) px_in)*(x+zerocoord[1])/GLB_X + ((double) py_in)*(y+zerocoord[2])/GLB_Y + ((double) pz_in)*(z+zerocoord[3])/GLB_Z);
 	  poutx = 2.0*PI*(((double) pt_out)*(t+zerocoord[0])/GLB_T + ((double) px_out)*(x+zerocoord[1])/GLB_X + ((double) py_out)*(y+zerocoord[2])/GLB_Y + ((double) pz_out)*(z+zerocoord[3])/GLB_Z);
 
@@ -47,7 +47,7 @@ static void measure_renormalization_core(spinor_field* psi_in, spinor_field* psi
 	  eipoutx= cos(poutx)-I*sin(poutx);
 
 	  for (a=0;a<NF;++a){
-	    for (beta=0;beta<4;beta++){ 
+	    for (beta=0;beta<4;beta++){
 	      _propagator_assign(Sin, *_FIELD_AT(&psi_in[a*4+beta],ix),a,beta);
 	      _propagator_assign(Sout, *_FIELD_AT(&psi_out[a*4+beta],ix),a,beta);
 	    }
@@ -57,19 +57,19 @@ static void measure_renormalization_core(spinor_field* psi_in, spinor_field* psi
 	  _propagator_mulc_assign(Sout, eipoutx);
 	  _propagator_dagger(Sout_dag,Sout);
 
-	  _propagator_add(tr_corr[_Sin][i],tr_corr[_Sin][i],Sin); 
-	  _propagator_add(tr_corr[_Sout][i],tr_corr[_Sout][i],Sout); 
+	  _propagator_add(tr_corr[_Sin][i],tr_corr[_Sin][i],Sin);
+	  _propagator_add(tr_corr[_Sout][i],tr_corr[_Sout][i],Sout);
 
 	  //g5
           _g5_propagator(Stmp1, Sout_dag);
 	  _propagator_mul(Stmp2, Stmp1, Sin);
-	  _propagator_add(tr_corr[_g5r][i],tr_corr[_g5r][i],Stmp2); 
+	  _propagator_add(tr_corr[_g5r][i],tr_corr[_g5r][i],Stmp2);
 
 	  //id
           _g5_propagator(Stmp1, Sout_dag);
           _g5_propagator(Stmp2, Sin);
 	  _propagator_mul(Stmp3, Stmp1, Stmp2);
-	  _propagator_add(tr_corr[_idr][i],tr_corr[_idr][i],Stmp3); 
+	  _propagator_add(tr_corr[_idr][i],tr_corr[_idr][i],Stmp3);
 
 	  //g0
           _g5_propagator(Stmp1, Sout_dag);
@@ -85,12 +85,12 @@ static void measure_renormalization_core(spinor_field* psi_in, spinor_field* psi
           _g5_propagator(Stmp1, Sout_dag);
           _g5g2_propagator(Stmp2, Sin);
 	  _propagator_mul(Stmp3, Stmp1, Stmp2);
-	  _propagator_add(tr_corr[_g2r][i],tr_corr[_g2r][i],Stmp3); 
+	  _propagator_add(tr_corr[_g2r][i],tr_corr[_g2r][i],Stmp3);
 	  //g3
           _g5_propagator(Stmp1, Sout_dag);
           _g5g3_propagator(Stmp2, Sin);
 	  _propagator_mul(Stmp3, Stmp1, Stmp2);
-	  _propagator_add(tr_corr[_g3r][i],tr_corr[_g3r][i],Stmp3); 
+	  _propagator_add(tr_corr[_g3r][i],tr_corr[_g3r][i],Stmp3);
 
 	  //g5g0
           _g5_propagator(Stmp1, Sout_dag);
@@ -106,12 +106,12 @@ static void measure_renormalization_core(spinor_field* psi_in, spinor_field* psi
           _g5_propagator(Stmp1, Sout_dag);
           _g2_propagator(Stmp2, Sin);
 	  _propagator_mul(Stmp3, Stmp1, Stmp2);
-	  _propagator_add(tr_corr[_g5g2r][i],tr_corr[_g5g2r][i],Stmp3); 
+	  _propagator_add(tr_corr[_g5g2r][i],tr_corr[_g5g2r][i],Stmp3);
 	  //g5g3
           _g5_propagator(Stmp1, Sout_dag);
           _g3_propagator(Stmp2, Sin);
 	  _propagator_mul(Stmp3, Stmp1, Stmp2);
-	  _propagator_add(tr_corr[_g5g3r][i],tr_corr[_g5g3r][i],Stmp3); 
+	  _propagator_add(tr_corr[_g5g3r][i],tr_corr[_g5g3r][i],Stmp3);
 
 	  //g0g1
           _g5_propagator(Stmp1, Sout_dag);
@@ -122,28 +122,28 @@ static void measure_renormalization_core(spinor_field* psi_in, spinor_field* psi
           _g5_propagator(Stmp1, Sout_dag);
           _g5g0g2_propagator(Stmp2, Sin);
 	  _propagator_mul(Stmp3, Stmp1, Stmp2);
-	  _propagator_add(tr_corr[_g0g2r][i],tr_corr[_g0g2r][i],Stmp3); 
+	  _propagator_add(tr_corr[_g0g2r][i],tr_corr[_g0g2r][i],Stmp3);
 	  //g0g3
           _g5_propagator(Stmp1, Sout_dag);
           _g5g0g3_propagator(Stmp2, Sin);
 	  _propagator_mul(Stmp3, Stmp1, Stmp2);
-	  _propagator_add(tr_corr[_g0g3r][i],tr_corr[_g0g3r][i],Stmp3); 
+	  _propagator_add(tr_corr[_g0g3r][i],tr_corr[_g0g3r][i],Stmp3);
 
 	  //g5g0g1
           _g5_propagator(Stmp1, Sout_dag);
           _g0g1_propagator(Stmp2, Sin);
 	  _propagator_mul(Stmp3, Stmp1, Stmp2);
-	  _propagator_add(tr_corr[_g5g0g1r][i],tr_corr[_g5g0g1r][i],Stmp3); 
+	  _propagator_add(tr_corr[_g5g0g1r][i],tr_corr[_g5g0g1r][i],Stmp3);
 	  //g5g0g2
           _g5_propagator(Stmp1, Sout_dag);
           _g0g2_propagator(Stmp2, Sin);
 	  _propagator_mul(Stmp3, Stmp1, Stmp2);
-	  _propagator_add(tr_corr[_g5g0g2r][i],tr_corr[_g5g0g2r][i],Stmp3); 
+	  _propagator_add(tr_corr[_g5g0g2r][i],tr_corr[_g5g0g2r][i],Stmp3);
 	  //g5g0g3
           _g5_propagator(Stmp1, Sout_dag);
           _g0g3_propagator(Stmp2, Sin);
 	  _propagator_mul(Stmp3, Stmp1, Stmp2);
-	  _propagator_add(tr_corr[_g5g0g3r][i],tr_corr[_g5g0g3r][i],Stmp3); 
+	  _propagator_add(tr_corr[_g5g0g3r][i],tr_corr[_g5g0g3r][i],Stmp3);
 
 //cg0
 	  suNf *u1 = _4FIELD_AT(u_gauge_f,ix,0); //U_mu (x)
@@ -155,17 +155,17 @@ static void measure_renormalization_core(spinor_field* psi_in, spinor_field* psi
 	  _g0_propagator(Stmp2, Stmp1); // g0 U^(z) S(p,z)
 	  _propagator_add(Stmp1,Stmp1,Stmp2);// (1 + g0) U^(z) S(p,z)
 	  _g5_propagator(Stmp2,Stmp1); // g5 (1 + g0) U^(z) S(p,z)
-	  for (a=0;a<NF;a++) for (beta=0;beta<4;beta++){ 
+	  for (a=0;a<NF;a++) for (beta=0;beta<4;beta++){
 	  	_propagator_assign(Sf, *_FIELD_AT(&psi_out[4*a+beta],ixmu), a,beta); //S(p,z+mu)
 	  }
 	  _propagator_dagger(Stmp1,Sf); //S^(p, z+mu)
 	  _propagator_mul(Stmp3,Stmp1,Stmp2);	// S^(p, z+mu) g5 (1 + g0) U^(z) S(p,z)
           _g5_propagator(Stmp4, Stmp3); // g5 S^(p, z+mu) g5 (1 + g0) U^(z) S(p,z)
 
-          _propagator_add(tr_corr[_cg0r][i],tr_corr[_cg0r][i],Stmp4); 
+          _propagator_add(tr_corr[_cg0r][i],tr_corr[_cg0r][i],Stmp4);
 
           // g5 S^(p, z) g5 (1 + g0) U^(z) S(p,z+mu)
-	  for (a=0;a<NF;a++) for (beta=0;beta<4;beta++){ 
+	  for (a=0;a<NF;a++) for (beta=0;beta<4;beta++){
 	  	_propagator_assign(Sf, *_FIELD_AT(&psi_in[4*a+beta],ixmu), a,beta); //S(p,z+mu)
 	  }
 	  _suNf_inverse_prop_multiply(Stmp1,*u1,Sf); //U^(z) S(p,z+mu)
@@ -173,11 +173,11 @@ static void measure_renormalization_core(spinor_field* psi_in, spinor_field* psi
 	  _g0_propagator(Stmp2, Stmp1); // g0 U^(z) S(p,z+mu)
 	  _propagator_sub(Stmp1,Stmp1,Stmp2);// (1 - g0) U^(z) S(p,z+mu)
 	  _g5_propagator(Stmp2,Stmp1); // g5 (1 - g0) U^(z) S(p,z+mu)
-	  
+
 	  _propagator_mul(Stmp3,Sout_dag,Stmp2); // S^(p, z) g5 (1 - g0) U^(z) S(p,z+mu)
           _g5_propagator(Stmp4, Stmp3); // g5 S^(p, z) g5 (1 - g0) U^(z) S(p,z+mu)
 
-          _propagator_sub(tr_corr[_cg0r][i],tr_corr[_cg0r][i],Stmp4); 
+          _propagator_sub(tr_corr[_cg0r][i],tr_corr[_cg0r][i],Stmp4);
 
 
 //cg1
@@ -190,17 +190,17 @@ static void measure_renormalization_core(spinor_field* psi_in, spinor_field* psi
 	  _g1_propagator(Stmp2, Stmp1); // g1 U^(z) S(p,z)
 	  _propagator_add(Stmp1,Stmp1,Stmp2);// (1 + g1) U^(z) S(p,z)
 	  _g5_propagator(Stmp2,Stmp1); // g5 (1 + g1) U^(z) S(p,z)
-	  for (a=0;a<NF;a++) for (beta=0;beta<4;beta++){ 
+	  for (a=0;a<NF;a++) for (beta=0;beta<4;beta++){
 	  	_propagator_assign(Sf, *_FIELD_AT(&psi_out[4*a+beta],ixmu), a,beta); //S(p,z+mu)
 	  }
 	  _propagator_dagger(Stmp1,Sf); //S^(p, z+mu)
 	  _propagator_mul(Stmp3,Stmp1,Stmp2);	// S^(p, z+mu) g5 (1 + g1) U^(z) S(p,z)
           _g5_propagator(Stmp4, Stmp3); // g5 S^(p, z+mu) g5 (1 + g1) U^(z) S(p,z)
 
-          _propagator_add(tr_corr[_cg1r][i],tr_corr[_cg1r][i],Stmp4); 
+          _propagator_add(tr_corr[_cg1r][i],tr_corr[_cg1r][i],Stmp4);
 
           // g5 S^(p, z) g5 (1 + g1) U^(z) S(p,z+mu)
-	  for (a=0;a<NF;a++) for (beta=0;beta<4;beta++){ 
+	  for (a=0;a<NF;a++) for (beta=0;beta<4;beta++){
 	  	_propagator_assign(Sf, *_FIELD_AT(&psi_in[4*a+beta],ixmu), a,beta); //S(p,z+mu)
 	  }
 	  _suNf_inverse_prop_multiply(Stmp1,*u1,Sf); //U^(z) S(p,z+mu)
@@ -208,11 +208,11 @@ static void measure_renormalization_core(spinor_field* psi_in, spinor_field* psi
 	  _g1_propagator(Stmp2, Stmp1); // g1 U^(z) S(p,z+mu)
 	  _propagator_sub(Stmp1,Stmp1,Stmp2);// (1 - g1) U^(z) S(p,z+mu)
 	  _g5_propagator(Stmp2,Stmp1); // g5 (1 - g1) U^(z) S(p,z+mu)
-	  
+
 	  _propagator_mul(Stmp3,Sout_dag,Stmp2); // S^(p, z) g5 (1 - g1) U^(z) S(p,z+mu)
           _g5_propagator(Stmp4, Stmp3); // g5 S^(p, z) g5 (1 - g1) U^(z) S(p,z+mu)
 
-          _propagator_sub(tr_corr[_cg1r][i],tr_corr[_cg1r][i],Stmp4); 
+          _propagator_sub(tr_corr[_cg1r][i],tr_corr[_cg1r][i],Stmp4);
 
 
 
@@ -226,17 +226,17 @@ static void measure_renormalization_core(spinor_field* psi_in, spinor_field* psi
 	  _g2_propagator(Stmp2, Stmp1); // g2 U^(z) S(p,z)
 	  _propagator_add(Stmp1,Stmp1,Stmp2);// (1 + g2) U^(z) S(p,z)
 	  _g5_propagator(Stmp2,Stmp1); // g5 (1 + g2) U^(z) S(p,z)
-	  for (a=0;a<NF;a++) for (beta=0;beta<4;beta++){ 
+	  for (a=0;a<NF;a++) for (beta=0;beta<4;beta++){
 	  	_propagator_assign(Sf, *_FIELD_AT(&psi_out[4*a+beta],ixmu), a,beta); //S(p,z+mu)
 	  }
 	  _propagator_dagger(Stmp1,Sf); //S^(p, z+mu)
 	  _propagator_mul(Stmp3,Stmp1,Stmp2);	// S^(p, z+mu) g5 (1 + g2) U^(z) S(p,z)
           _g5_propagator(Stmp4, Stmp3); // g5 S^(p, z+mu) g5 (1 + g2) U^(z) S(p,z)
 
-          _propagator_add(tr_corr[_cg2r][i],tr_corr[_cg2r][i],Stmp4); 
+          _propagator_add(tr_corr[_cg2r][i],tr_corr[_cg2r][i],Stmp4);
 
           // g5 S^(p, z) g5 (1 + g2) U^(z) S(p,z+mu)
-	  for (a=0;a<NF;a++) for (beta=0;beta<4;beta++){ 
+	  for (a=0;a<NF;a++) for (beta=0;beta<4;beta++){
 	  	_propagator_assign(Sf, *_FIELD_AT(&psi_in[4*a+beta],ixmu), a,beta); //S(p,z+mu)
 	  }
 	  _suNf_inverse_prop_multiply(Stmp1,*u1,Sf); //U^(z) S(p,z+mu)
@@ -244,11 +244,11 @@ static void measure_renormalization_core(spinor_field* psi_in, spinor_field* psi
 	  _g2_propagator(Stmp2, Stmp1); // g2 U^(z) S(p,z+mu)
 	  _propagator_sub(Stmp1,Stmp1,Stmp2);// (1 - g2) U^(z) S(p,z+mu)
 	  _g5_propagator(Stmp2,Stmp1); // g5 (1 - g2) U^(z) S(p,z+mu)
-	  
+
 	  _propagator_mul(Stmp3,Sout_dag,Stmp2); // S^(p, z) g5 (1 - g2) U^(z) S(p,z+mu)
           _g5_propagator(Stmp4, Stmp3); // g5 S^(p, z) g5 (1 - g2) U^(z) S(p,z+mu)
 
-          _propagator_sub(tr_corr[_cg2r][i],tr_corr[_cg2r][i],Stmp4); 
+          _propagator_sub(tr_corr[_cg2r][i],tr_corr[_cg2r][i],Stmp4);
 
 
 
@@ -263,17 +263,17 @@ static void measure_renormalization_core(spinor_field* psi_in, spinor_field* psi
 	  _g3_propagator(Stmp2, Stmp1); // g3 U^(z) S(p,z)
 	  _propagator_add(Stmp1,Stmp1,Stmp2);// (1 + g3) U^(z) S(p,z)
 	  _g5_propagator(Stmp2,Stmp1); // g5 (1 + g3) U^(z) S(p,z)
-	  for (a=0;a<NF;a++) for (beta=0;beta<4;beta++){ 
+	  for (a=0;a<NF;a++) for (beta=0;beta<4;beta++){
 	  	_propagator_assign(Sf, *_FIELD_AT(&psi_out[4*a+beta],ixmu), a,beta); //S(p,z+mu)
 	  }
 	  _propagator_dagger(Stmp1,Sf); //S^(p, z+mu)
 	  _propagator_mul(Stmp3,Stmp1,Stmp2);	// S^(p, z+mu) g5 (1 + g3) U^(z) S(p,z)
           _g5_propagator(Stmp4, Stmp3); // g5 S^(p, z+mu) g5 (1 + g3) U^(z) S(p,z)
 
-          _propagator_add(tr_corr[_cg3r][i],tr_corr[_cg3r][i],Stmp4); 
+          _propagator_add(tr_corr[_cg3r][i],tr_corr[_cg3r][i],Stmp4);
 
           // g5 S^(p, z) g5 (1 + g3) U^(z) S(p,z+mu)
-	  for (a=0;a<NF;a++) for (beta=0;beta<4;beta++){ 
+	  for (a=0;a<NF;a++) for (beta=0;beta<4;beta++){
 	  	_propagator_assign(Sf, *_FIELD_AT(&psi_in[4*a+beta],ixmu), a,beta); //S(p,z+mu)
 	  }
 	  _suNf_inverse_prop_multiply(Stmp1,*u1,Sf); //U^(z) S(p,z+mu)
@@ -281,19 +281,19 @@ static void measure_renormalization_core(spinor_field* psi_in, spinor_field* psi
 	  _g3_propagator(Stmp2, Stmp1); // g3 U^(z) S(p,z+mu)
 	  _propagator_sub(Stmp1,Stmp1,Stmp2);// (1 - g3) U^(z) S(p,z+mu)
 	  _g5_propagator(Stmp2,Stmp1); // g5 (1 - g3) U^(z) S(p,z+mu)
-	  
+
 	  _propagator_mul(Stmp3,Sout_dag,Stmp2); // S^(p, z) g5 (1 - g3) U^(z) S(p,z+mu)
           _g5_propagator(Stmp4, Stmp3); // g5 S^(p, z) g5 (1 - g3)) U^(z) S(p,z+mu)
 
-          _propagator_sub(tr_corr[_cg3r][i],tr_corr[_cg3r][i],Stmp4); 
+          _propagator_sub(tr_corr[_cg3r][i],tr_corr[_cg3r][i],Stmp4);
 
 
 
 
 	} //END SPACETIME
   } //END NM LOOP
-	
-      
+
+
 }
 
 
@@ -326,7 +326,7 @@ void measure_renormalization(spinor_field* psi_in, spinor_field* psi_out, int nm
 static void print_renormalization_core(int channel,int conf, int nm, double* mass, char* label, int pt_in, int px_in, int py_in, int pz_in, int pt_out, int px_out, int py_out, int pz_out ){
   int i,a,b,alpha,beta;
 
-  for(i=0; i<nm; i++) { 
+  for(i=0; i<nm; i++) {
 
     lprintf("MAIN",0,"conf #%d mass=%2.6f %s %s p_in(%d,%d,%d,%d) p_out(%d,%d,%d,%d) =",conf,mass[i],label,tr_channel_names[channel], pt_in, px_in, py_in, pz_in, pt_out, px_out, py_out, pz_out );
 
@@ -334,9 +334,9 @@ static void print_renormalization_core(int channel,int conf, int nm, double* mas
             lprintf("MAIN",0," ( %1.12g , %1.12g ) ", creal(_PROP_AT(tr_corr[channel][i],a,alpha,beta,b)), creal(_PROP_AT(tr_corr[channel][i],a,alpha,beta,b)) );
     	}
     lprintf("MAIN",0,"\n");
-     
+
     fflush(stdout);
-	
+
   }
 }
 
@@ -345,7 +345,7 @@ void print_renormalization(int conf, int nm, double* mass, char* label, int pt_i
 
   double loc[2];
   if (init !=0 ){
-   for(i=0; i<nm; i++) { 
+   for(i=0; i<nm; i++) {
     for(k=0; k<NCHANNELSR; k++) {
       for(a=0;a<NF;a++) for(alpha=0;alpha<4;alpha++) for(beta=0;beta<4;beta++) for(b=0;b<NF;b++) {
               loc[0]=creal(_PROP_AT(tr_corr[k][i],a,alpha,beta,b));
@@ -361,6 +361,3 @@ void print_renormalization(int conf, int nm, double* mass, char* label, int pt_i
   init = 0;
 
 }
-
-
-

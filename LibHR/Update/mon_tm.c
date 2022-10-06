@@ -81,10 +81,10 @@ struct _monomial* tm_create(const monomial_data *data)
 {
 	monomial *m = malloc(sizeof(*m));
 	mon_tm_par *par = (mon_tm_par*)data->par;
-  
+
 	// Copy data structure
 	m->data = *data;
-  
+
 	// Allocate memory for spinor field
 	if(mon_init)
 	{
@@ -107,7 +107,7 @@ struct _monomial* tm_create(const monomial_data *data)
 
 	// Setup chronological inverter
 	mre_init(&(par->fpar.mpar), par->mre_past, data->force_prec);
-  
+
 	// Setup pointers to update functions
 	m->free = &tm_free;
 	m->update_force = &force_hmc_tm;

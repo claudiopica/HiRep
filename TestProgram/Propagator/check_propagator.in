@@ -26,5 +26,3 @@ mes:ti = 2
 mes:tf = 9
 mes:ff_dirichlet_point = 1
 mes:dirichlet_dt = 2
-
-

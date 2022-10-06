@@ -31,7 +31,7 @@
 *              (init=0), or only the last nevt-nev eigenvectors (init=1)
 *              or none of them (init!=0 or 1)
 *
-*     kmax     Maximal degree of the Chebyshev polynomials used for the 
+*     kmax     Maximal degree of the Chebyshev polynomials used for the
 *              acceleration of the algorithm
 *
 *     imax     Maximal number of subspace iterations
@@ -69,9 +69,9 @@
 * in hep-lat/0512021
 *
 * Author: Luigi Del Debbio <luigi.del.debbio@ed.ac.uk>
-*	
-*	Modified: Claudio Pica 
-*	Modified: Agostino Patella 
+*
+*	Modified: Claudio Pica
+*	Modified: Agostino Patella
 *
 *******************************************************************************/
 
@@ -102,10 +102,10 @@ static suNf_spinor *psi=NULL;
 
 static void alloc_ws_rotate(void) {
   psi=calloc(MAX_ROTATE,sizeof(suNf_spinor));
-  
+
   error((psi==NULL),1,"alloc_ws_rotate [linalg.c]",
         "Unable to allocate workspace");
-  
+
 }
 
 static void rotate(int n,spinor_field *pkk,double complex v[])
@@ -115,33 +115,33 @@ static void rotate(int n,spinor_field *pkk,double complex v[])
         "Parameter n is out of range");
 
   if (psi==NULL) alloc_ws_rotate();
-  
+
   //Avoid OMP parallel region in MASTER_FOR
 #undef _OMP_PRAGMA
 #define _OMP_PRAGMA(s)
-  
+
   _MASTER_FOR(pkk->type,ix) {
     for (int k=0;k<n;k++) {
       suNf_spinor *pk=&(psi[k]);
       suNf_spinor *pj=_FIELD_AT(&pkk[0],ix);
       double complex *z=&v[k];
-      
+
       _vector_mulc_f((*pk).c[0],*z,(*pj).c[0]);
       _vector_mulc_f((*pk).c[1],*z,(*pj).c[1]);
       _vector_mulc_f((*pk).c[2],*z,(*pj).c[2]);
       _vector_mulc_f((*pk).c[3],*z,(*pj).c[3]);
-      
+
       for (int j=1;j<n;j++) {
         pj=_FIELD_AT(&pkk[j],ix);
         z+=n;
-        
+
         _vector_mulc_add_assign_f((*pk).c[0],*z,(*pj).c[0]);
         _vector_mulc_add_assign_f((*pk).c[1],*z,(*pj).c[1]);
         _vector_mulc_add_assign_f((*pk).c[2],*z,(*pj).c[2]);
         _vector_mulc_add_assign_f((*pk).c[3],*z,(*pj).c[3]);
       }
     }
-    
+
     for (int k=0;k<n;k++) {
       *_FIELD_AT(&pkk[k],ix)=psi[k];
     }
@@ -157,7 +157,7 @@ static int alloc_aux(int nevt)
 	  free(aa);
 	  free(dd);
 	}
-      
+
       aa=malloc(4*nevt*nevt*sizeof(double complex));
       dd=malloc(2*nevt*sizeof(double));
 
@@ -167,7 +167,7 @@ static int alloc_aux(int nevt)
       ee=dd+nevt;
       nvc=nevt;
     }
-   
+
   error((aa==NULL)||(dd==NULL),1,"alloc_aux [eva.c]",
 	"Unable to allocate auxiliary arrays");
   return 0;
@@ -184,9 +184,9 @@ static void project(spinor_field *pk,spinor_field *pl)
 #endif
 
   sp=-spinor_field_prod_re_f(pl,pk) -I*spinor_field_prod_im_f(pl,pk);
-  
+
   spinor_field_mulc_add_assign_f(pk,sp,pl);
-}   
+}
 
 
 static double normalize(spinor_field *ps)
@@ -207,7 +207,7 @@ static double normalize(spinor_field *ps)
 static void mgm_subsp(int n, spinor_field *ev)
 {
   int k;
-   
+
   for (k=0;k<n;k++)
     project(&ev[n],&ev[k]);
 
@@ -237,15 +237,15 @@ static void ritz_subsp(int nlock,int nevt,spinor_operator Op,
   double complex z;
 
   neff=nevt-nlock;
-   
-  for (i=0;i<neff;i++) 
+
+  for (i=0;i<neff;i++)
     {
       Op(&ws[0],&ev[nlock+i]);
-      nop+=1;      
-      
+      nop+=1;
+
       aa[neff*i+i]=spinor_field_prod_re_f(&ev[nlock+i],&ws[0]);
 
-      for (j=0;j<i;j++) 
+      for (j=0;j<i;j++)
 	{
 	  z=spinor_field_prod_f(&ws[0],&ev[nlock+j]);
 
@@ -264,7 +264,7 @@ static void submat(int nev,int ia,int ib)
   int i,j,n;
 
   n=0;
-   
+
   for (i=ia;i<ib;i++)
     {
       for (j=ia;j<ib;j++)
@@ -304,8 +304,8 @@ static int res_subsp(int nlock,int nev,double omega1,double omega2,
 
   eps1=0.0f;
   ia=nlock;
-   
-  for (ib=nlock;ib<nev;ib++) 
+
+  for (ib=nlock;ib<nev;ib++)
     {
       if (ib>ia)
 	{
@@ -330,22 +330,22 @@ static int res_subsp(int nlock,int nev,double omega1,double omega2,
       eps2=sqrt(creal(bb[nev*ib+ib]));
       absd2=fabs(d[ib]);
       ee[ib]=eps2;
-      
+
       if (ib>ia)
 	{
 	  if ((d[ib]-d[ib-1])>(eps1+eps2))
             ia=ib;
 	}
-          
+
       if ((eps2>omega1)&&(eps2>(omega2*absd2)))
 	return ia;
 
       if (ib>ia)
 	{
 	  Op(&ws[1],&ws[0]);
-	  nop+=1;      
+	  nop+=1;
 
-	  for (i=ia;i<ib;i++) 
+	  for (i=ia;i<ib;i++)
 	    {
 	      z=spinor_field_prod_f(&ws[1],&ev[i]);
 
@@ -361,11 +361,11 @@ static int res_subsp(int nlock,int nev,double omega1,double omega2,
   absd1=min_eva(ia,ib,d);
 
   for (i=ia;i<ib;i++)
-    ee[i]=eps1;   
-      
+    ee[i]=eps1;
+
   if ((eps1>omega1)&&(eps1>(omega2*absd1)))
     return ia;
-   
+
   return nev;
 }
 
@@ -376,13 +376,13 @@ static double set_lbnd(int nevt,int kmax,double ubnd,double d[],int *k)
 
   mu1=d[0];
   mu2=d[nevt-1];
-   
+
   nu1=GAMMA*GAMMA;
   nu1=log(nu1+sqrt(nu1*nu1-1.0));
 
   nu2=GAMMA;
   nu2=log(nu2+sqrt(nu2*nu2-1.0));
-   
+
   (*k)=(int)(0.5*sqrt(((ubnd-mu1)*nu1*nu1-(ubnd-mu2)*nu2*nu2)/(mu2-mu1)));
   (*k)&=~0x1;
 
@@ -435,15 +435,15 @@ static void apply_cheby(int k,double lbnd,double ubnd,
 int eva(int nev,int nevt,int init,int kmax,
         int imax,double ubnd,double omega1,double omega2,
         spinor_operator Op,
-        spinor_field *ev,double d[],int *status)   
+        spinor_field *ev,double d[],int *status)
 {
   int i,k,n;
   int nlock,nupd,nlst;
   double lbnd;
   spinor_field *ws;
-  
+
   *status=0;
-   
+
   error((nev<=0)||(nevt<nev)||(kmax<2)||(imax<1),1,
 	"eva [eva.c]",
 	"Improper parameters nev,nevt,kmax or imax");
@@ -454,15 +454,15 @@ int eva(int nev,int nevt,int init,int kmax,
   nop=0;
   nlock=0;
   nupd=(nevt+nev)/2;
-   
+
   if (alloc_aux(nevt)!=0)
     return -3;
-  
+
   ws=alloc_spinor_field_f(2,ev->type);
-  
+
   init_subsp(nev,nupd,init,ev);
   ritz_subsp(nlock,nupd,Op,ws,ev,d);
-   
+
   for (i=0;i<imax;i++){
     if (i>0){
       lbnd=set_lbnd(nupd,kmax,ubnd,d,&k);
@@ -477,20 +477,20 @@ int eva(int nev,int nevt,int init,int kmax,
       }else if (i>0)
         mgm_subsp(n,ev);
     }
-    
+
     if (i>0)
       nlst=nevt;
     else
       nlst=nupd;
-    
+
     ritz_subsp(nlock,nlst,Op,ws,ev,d);
-    n=nlock;      
+    n=nlock;
     nlock=res_subsp(n,nev,omega1,omega2,Op,ws,ev,d);
     *status=nop;
-    
+
     lprintf("EVA",10,"i=%3d, k=%3d, d[%2d]=% .6e, d[%2d]=% .6e, lbnd=% .6e, eps[%2d]=% .1e\n",
       i,k,n,d[n],nlst-1,d[nlst-1],lbnd,n,ee[n]);
-    
+
     error(d[nlst-1]>ubnd,1,"eva [eva.c]",
           "Parameter ubnd is too low");
 
@@ -502,25 +502,25 @@ int eva(int nev,int nevt,int init,int kmax,
   }
 
   lprintf("EVA",10,"Unable to reach required precision. MVM = %d\n",*status);
-  
+
   free_spinor_field_f(ws);
-  
+
   return -1;
 }
 
 int eva_tuned(int nev,int nevt,int init,int kmax,
         int imax,double lbnd, double ubnd,double omega1,double omega2,
         spinor_operator Op,
-        spinor_field *ev,double d[],int *status)   
+        spinor_field *ev,double d[],int *status)
 {
   int i,k,n;
   int nlock,nupd,nlst;
   //double lbnd;
   spinor_field *ws;
-  
+
 
   *status=0;
-   
+
   error((nev<=0)||(nevt<nev)||(kmax<2)||(imax<1),1,
 	"eva [eva.c]",
 	"Improper parameters nev,nevt,kmax or imax");
@@ -531,15 +531,15 @@ int eva_tuned(int nev,int nevt,int init,int kmax,
   nop=0;
   nlock=0;
   nupd=(nevt+nev)/2;
-   
+
   if (alloc_aux(nevt)!=0)
     return -3;
-  
+
   ws=alloc_spinor_field_f(2,ev->type);
-    
+
   init_subsp(nev,nupd,init,ev);
   ritz_subsp(nlock,nupd,Op,ws,ev,d);
-   
+
   for (i=0;i<imax;i++){
     if (i>0){
 //      lbnd=set_lbnd(nupd,kmax,ubnd,d,&k);
@@ -556,20 +556,20 @@ k = kmax;
       }else if (i>0)
         mgm_subsp(n,ev);
     }
-    
+
     if (i>0)
       nlst=nevt;
     else
       nlst=nupd;
-    
+
     ritz_subsp(nlock,nlst,Op,ws,ev,d);
-    n=nlock;      
+    n=nlock;
     nlock=res_subsp(n,nev,omega1,omega2,Op,ws,ev,d);
     *status=nop;
-    
+
     lprintf("EVA",10,"i=%3d, k=%3d, d[%2d]=% .6e, d[%2d]=% .6e, lbnd=% .6e, eps[%2d]=% .1e\n",
       i,k,n,d[n],nlst-1,d[nlst-1],lbnd,n,ee[n]);
-    
+
     error(d[nlst-1]>ubnd,1,"eva [eva.c]",
           "Parameter ubnd is too low");
 
@@ -581,8 +581,8 @@ k = kmax;
   }
 
   lprintf("EVA",10,"Unable to reach required precision. MVM = %d\n",*status);
-  
+
   free_spinor_field_f(ws);
-  
+
   return -1;
 }

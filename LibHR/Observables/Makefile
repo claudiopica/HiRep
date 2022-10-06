@@ -10,4 +10,3 @@ EXCLUDE = trunc_hairpin.c #glueballs.c glueballs_op.c
 #EXCLUDE = wilsonloops.c trunc_hairpin.c
 
 include $(MKDIR)/MkRules
-

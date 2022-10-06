@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 /*******************************************************************************
@@ -26,16 +26,16 @@ double auto_corr_time(int n,int tmax,double g[],int *flag)
    */
 {
    int i,j,itest;
-   double par1,par2;   
+   double par1,par2;
    double *t,dt,del,taumax;
-      
+
    par1=5.0;
    par2=3.0;
-         
+
    t=malloc(tmax*sizeof(*t));
-         
-   t[0]=0.5;  
-         
+
+   t[0]=0.5;
+
    for (i=1;i<tmax;i++)
    {
       t[i]=t[i-1]+g[i]/g[0];
@@ -45,28 +45,28 @@ double auto_corr_time(int n,int tmax,double g[],int *flag)
    }
 
    taumax=0.0;
-      
+
    for (i=0;i<tmax;i++)
    {
       if (t[i]>taumax)
          taumax=t[i];
-         
+
       if (i>=(int)(par1*t[i]))
-      {  
+      {
          itest=0;
-    
+
          for (j=i+1;j<tmax;j++)
          {
             if (j>(i+(int)(par2*t[i])))
                break;
-    
+
             dt=t[j]-t[i];
             del=(double)(2*(2*j+1))/(double)(n);
-      
+
             if ((dt*dt)>(del*t[i]*t[i]))
                itest=1;
          }
-         
+
          if (itest==0)
          {
             *flag=0;
@@ -76,10 +76,10 @@ double auto_corr_time(int n,int tmax,double g[],int *flag)
          }
       }
    }
-            
+
    *flag=1;
   free(t);
-  
+
    return taumax;
 }
 
@@ -87,19 +87,19 @@ double auto_corr_time(int n,int tmax,double g[],int *flag)
 double sigma_bin(int n,int binsize,double a[])
   /*
    *     Forms from the data in the array a[n], a new set of data b[numbin]
-   *     consisting of bin averages of a[] of bin-length binsize. 
-   *     Returns the standard deviation of b[] from its mean value 
+   *     consisting of bin averages of a[] of bin-length binsize.
+   *     Returns the standard deviation of b[] from its mean value
    *     divided by sqrt(numbin)
    */
 {
    int i,j,icount,numbin;
    double *b,s0;
-      
+
    numbin=n/binsize;
    b=malloc(numbin*sizeof(*b));
-   
+
    icount=0;
-   for (i=0;i<numbin;i++)   
+   for (i=0;i<numbin;i++)
    {
       b[i]=0.0;
       for (j=0;j<binsize;j++)
@@ -109,10 +109,10 @@ double sigma_bin(int n,int binsize,double a[])
       }
       b[i]/=(double)(binsize);
    }
- 
+
    s0=sigma0(numbin,b);
   free(b);
-  
+
   return s0;
 }
 
@@ -121,12 +121,12 @@ double sigma_replicas(int n,int r,double a[],double *tau,int *flag)
   /*
    *     Returns the statistical error associated with the data series a[n]
    *     containing the measurements from r replicas.
-   *     It is assumed that the series a[] is arranged 
+   *     It is assumed that the series a[] is arranged
    *     starting with all data from replica 1,
    *     followed by all those from replica 2, etc.
    *     The auto-correlation functions from each replica are computed
    *     separately and then an average is made over them.
-   *     The calculated integrated auto-correlation time from this 
+   *     The calculated integrated auto-correlation time from this
    *     averaged auto-correlation function is assigned to the parameter tau
    *     On exit flag=0 if the error estimation was stable and flag=1 otherwise
    */
@@ -142,10 +142,10 @@ double sigma_replicas(int n,int r,double a[],double *tau,int *flag)
 
    g=malloc(tmax*sizeof(double));
    for (i=0;i<tmax;i++)
-      g[i]=0.0;   
+      g[i]=0.0;
 
    gr=malloc(tmax*sizeof(double));
-   ar=malloc(n*sizeof(double)); 
+   ar=malloc(n*sizeof(double));
 
    icount=0;
    for (j=0;j<r;j++)
@@ -154,20 +154,20 @@ double sigma_replicas(int n,int r,double a[],double *tau,int *flag)
       {
          ar[i]=a[icount];
          icount++;
-      }   
+      }
 
       auto_corr(n,ar,tmax,gr);
- 
+
       for (i=0;i<tmax;i++)
          g[i]+=gr[i];
-   } 
-          
+   }
+
    for (i=0;i<tmax;i++)
       g[i]/=(double)(r);
 
    abar=average(nr,a);
    sig0=sigma0(nr,a);
-   
+
    if (((fabs(abar)+sig0)==fabs(abar))||(g[0]==0.0))
    {
       *tau=0.5;
@@ -186,7 +186,7 @@ double sigma_replicas(int n,int r,double a[],double *tau,int *flag)
   free(g);
   free(gr);
   free(ar);
-  
+
    return(sqrt(var));
 }
 
@@ -198,20 +198,20 @@ double sigma_jackknife(int nobs,int n,double a[],double *ave_j,
    *     a[0],...,a[n-1]  contains the measurements of obervable1
    *     a[n],...,a[2n-1] contains the measurements of obervable2
    *     etc
-   *     *pobs is a pointer to a function F of the average of the obervables 
-   *     *ave_j gives the best estimate of F, 
+   *     *pobs is a pointer to a function F of the average of the obervables
+   *     *ave_j gives the best estimate of F,
    *     and sigma_jackknife returns the estimated jackknife error.
    */
 {
    int i,j,k;
    double fact,*f,*atot,*aj;
-   
+
    atot=malloc(nobs*sizeof(double));
    aj=malloc(nobs*sizeof(double));
    f=malloc(n*sizeof(double));
 
    fact=1.0/(double)(n);
-   
+
    k=0;
    for (i=0;i<nobs;i++)
    {
@@ -220,34 +220,33 @@ double sigma_jackknife(int nobs,int n,double a[],double *ave_j,
       for (j=0;j<n;j++)
       {
          atot[i]+=a[k];
-         k++; 
-      } 
+         k++;
+      }
 
       aj[i]=atot[i]*fact;
    }
-   
-   *ave_j=pobs(aj); 
-      
+
+   *ave_j=pobs(aj);
+
    fact=1.0/(double)(n-1);
 
-   for (j=0;j<n;j++)   
-   {  
+   for (j=0;j<n;j++)
+   {
       k=j;
       for (i=0;i<nobs;i++)
-      {   
+      {
          aj[i]=(atot[i]-a[k])*fact;
          k+=n;
       }
 
       f[j]=pobs(aj);
-   } 
-   
+   }
+
    fact=sigma0(n,f)*(double)(n-1);
-  
+
   free(atot);
   free(aj);
   free(f);
-  
+
   return fact;
 }
-

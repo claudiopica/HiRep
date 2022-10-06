@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 #include "spinor_field.h"
@@ -17,14 +17,14 @@
 
 void gaussian_momenta(suNg_av_field *momenta) {
   geometry_descriptor *gd=momenta->type;
-  
+
   const double c3=1./sqrt(_FUND_NORM2);
   const int ngen=NG*NG-1;
   //const int ngen=NG*(NG-1)/2;
-  
 
 
-  
+
+
   _PIECE_FOR(gd,ixp) {
     int start=gd->master_start[ixp];
     int len=ngen*4*(gd->master_end[ixp]-start+1); /* length in doubles */
@@ -34,7 +34,7 @@ void gaussian_momenta(suNg_av_field *momenta) {
       *(dptr)*=c3;
     }
   }
-  
+
   apply_BCs_on_momentum_field(momenta);
 }
 
@@ -48,6 +48,6 @@ void gaussian_scalar_momenta(suNg_scalar_field *momenta)
 		gauss((double*)dptr, sizeof(suNg_vector)/sizeof(double));
 		_vector_mul_g(*dptr, c2, *dptr);
 	}
-  
+
 	//apply_BCs_on_scalar_momentum_field(momenta);
 }

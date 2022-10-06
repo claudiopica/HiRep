@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 #include "inverters.h"
@@ -26,7 +26,7 @@ int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spino
   spinor_field *r, *r1, *o, *Ms, *Mo, *o0;
   spinor_field *sptmp;
 
-  double delta, phi; 
+  double delta, phi;
   double *z1, *z2, *z3, *alpha, *beta, *chi, *rho;
   double rtmp1,rtmp2,rtmp3, oldalpha,oldchi;
 
@@ -34,17 +34,17 @@ int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spino
   int cgiter;
   char *sflags;
   unsigned short notconverged;
-   
+
   /* fare qualche check sugli input */
   /* par->n deve essere almeno 2! */
   /*
     printf("numero vettori n=%d\n",par->n);
     for (i=0; i<(par->n); ++i) {
     printf("shift[%d]=%f\n",i,par->shift[i]);
-    printf("out[%d]=%p\n",i,out[i]);      
+    printf("out[%d]=%p\n",i,out[i]);
     }
   */
-   
+
   /* allocate spinors fields and aux real variables */
   /* implementation note: to minimize the number of malloc calls
    * objects of the same type are allocated together
@@ -71,7 +71,7 @@ int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spino
   rho = chi+(par->n);
 
   sflags = (char *)malloc(sizeof(char)*(par->n));
-   
+
   /* init recursion */
   cgiter = 0;
   notconverged = 1;
@@ -88,7 +88,7 @@ int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spino
   /* choose omega so that delta and phi are not zero */
   /* spinor_field_copy_f(o, in);  omega = in ; this may be changed */
   /* gaussian_spinor_field(o0); */
-  spinor_field_copy_f(o0, in); 
+  spinor_field_copy_f(o0, in);
   spinor_field_copy_f(o, o0);
   delta = spinor_field_prod_re_f(o, r);
 
@@ -112,15 +112,15 @@ int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spino
     /* compute omega and chi[0] */
     spinor_field_mul_f(o,beta[0],Ms);
     spinor_field_add_assign_f(o,r);
-    
+
     M(Mo, o);
 
     oldchi=chi[0];
     chi[0]=spinor_field_prod_re_f(Mo,o)/spinor_field_sqnorm_f(Mo);
-    
+
     /* compute r1 */
     spinor_field_mul_f(r1,chi[0],Mo);
-    spinor_field_sub_f(r1,o,r1); 
+    spinor_field_sub_f(r1,o,r1);
 
     /* update delta and alpha[0] */
     oldalpha=alpha[0];
@@ -176,15 +176,15 @@ int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spino
 	/* update s[i] */
 	rtmp2=chi[i]/beta[i]*rho[i];
 	rtmp3=rtmp2*z2[i];
-	rtmp2*=-z3[i];	  
+	rtmp2*=-z3[i];
 	spinor_field_lc_add_assign_f(&s[i],rtmp2,o,rtmp3,r1); /* not done yet */
-	
+
 	rho[i]/=(1.-rho[0]*par->shift[i-1]); /* update rho */
 	_print_par(rho[i]);
 
 	rtmp2=z3[i]*rho[i];
 	spinor_field_lc_f(Mo,rtmp2,r,alpha[i],&s[i]); /* use Mo as temporary storage */
-	spinor_field_copy_f(&s[i],Mo); 
+	spinor_field_copy_f(&s[i],Mo);
 
 	/* change pointers instead */
 	/*
@@ -204,9 +204,9 @@ int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spino
 
     if(rtmp1<par->err2)
       notconverged=0;
-	
+
     //    printf("[ %d ] residuo=%e\n",cgiter,rtmp1);
-    
+
     /* Uncomment this to print cg recursion parameters
        printf("[ %d ] alpha=%e\n",cgiter,alpha);
        printf("[ %d ] omega=%e\n",cgiter,omega);
@@ -215,7 +215,7 @@ int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spino
        printf("\n[ %d ] gamma=%e\n",cgiter,gamma);
        printf("[ %d ] delta=%e\n",cgiter,delta);
     */
-      
+
   } while ((par->max_iter==0 || cgiter<par->max_iter) && notconverged);
 
   /* test results */
@@ -232,7 +232,7 @@ int HBiCGstab_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spino
       printf("BiCGstab Failed: err2[%d] = %e\n",i,norm);
   }
 #endif
-   
+
   /* free memory */
   free_spinor_field_f(s);
   free(z1);

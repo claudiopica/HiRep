@@ -6,4 +6,3 @@ LIBDIRS = $(SUBDIRS)
 LIBNAME = ./libhr.a
 
 include $(MKDIR)/MkRules
-

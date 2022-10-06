@@ -80,7 +80,7 @@
   _vector_minus_f((out).c[0],(in).c[3]); \
   (out).c[1] = (in).c[2]; \
   _vector_minus_f((out).c[2],(in).c[1]);\
-  (out).c[3] = (in).c[0] 
+  (out).c[3] = (in).c[0]
 
 #define _spinor_g5g3_f(out,in) \
   _vector_i_minus_f((out).c[0],(in).c[2]); \

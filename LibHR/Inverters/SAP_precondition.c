@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include "geometry.h"
-#include "global.h" 
+#include "global.h"
 #include "error.h"
 #include "logger.h"
-#include "inverters.h" 
+#include "inverters.h"
 #include "linear_algebra.h"
 #include "memory.h"
 

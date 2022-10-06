@@ -2,8 +2,8 @@
  * NOCOMPILE= BASIC_SF
  * NOCOMPILE= ROTATED_SF
  * NOCOMPILE= FERMION_THETA
- * Computation of Renomalization constants (Z_a,Z_q,Z_s,Z_ps,Z_t,Z_m,Z_v)  
- * factors with gauge fixed momentum sources. 
+ * Computation of Renomalization constants (Z_a,Z_q,Z_s,Z_ps,Z_t,Z_m,Z_v)
+ * factors with gauge fixed momentum sources.
  *
  * Originally written by Rudy Arthur
  *
@@ -162,7 +162,7 @@ int main(int argc, char *argv[])
   lprintf("MAIN", 0, "PId =  %d [world_size: %d]\n\n", PID, WORLD_SIZE);
   lprintf("MAIN", 0, "input file [%s]\n", input_filename);
   lprintf("MAIN", 0, "output file [%s]\n", output_filename);
-  
+
 #ifdef GAUGE_SON
   lprintf("MAIN", 0, "Gauge group: SO(%d)\n", NG);
 #else
@@ -289,10 +289,10 @@ int main(int argc, char *argv[])
       lprintf("LOOK", 10, "%g%g%g%g %g%g%g%g twist %g", p_in[0], p_in[1], p_in[2], p_in[3], p_out[0], p_out[1], p_out[2], p_out[3], twist);
       measure_renormalization(prop_in, prop_out, nm, p_in[0], p_in[1], p_in[2], p_in[3], p_out[0], p_out[1], p_out[2], p_out[3]);
       char label[256];
-      
+
       sprintf(label, "NPR mom_idx %d twist %d ", num, tw);
       print_renormalization(0, nm, m, label, p_in[0], p_in[1], p_in[2], p_in[3], p_out[0], p_out[1], p_out[2], p_out[3]);
-     
+
       num++;
     }
   }
@@ -303,10 +303,10 @@ int main(int argc, char *argv[])
   // VD Now the analytical calculation must be done.
 
 
-  
+
 
   global_sum_int(&return_value,1);
-  
+
   free_spinor_field_f(source);
   free_spinor_field_f(prop_in);
   free_spinor_field_f(prop_out);

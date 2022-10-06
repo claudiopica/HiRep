@@ -4,7 +4,7 @@ REPR = REPR_FUNDAMENTAL
 #REPR = REPR_ANTISYMMETRIC
 #REPR = REPR_ADJOINT
 
-#CHOICES ARE GAUGE_SUN AND GAUGE_SON 
+#CHOICES ARE GAUGE_SUN AND GAUGE_SON
 GAUGE_GROUP = GAUGE_SUN
 
 #T => PERIODIC, ANTIPERIODIC, OPEN, THETA
@@ -44,8 +44,8 @@ MACRO += -DIO_FLUSH
 
 #CC = mpicc
 CC = clang
-#CFLAGS = -Wall -std=c99 -O3 -fomit-frame-pointer -msse -msse2 
+#CFLAGS = -Wall -std=c99 -O3 -fomit-frame-pointer -msse -msse2
 CFLAGS = -Wall -std=c99 -O3 #-march=core-avx2 -mtune=core-avx2 -g
 
 
-LDFLAGS = 
+LDFLAGS =

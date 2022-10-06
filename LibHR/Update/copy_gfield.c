@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 #include <string.h>
@@ -31,4 +31,3 @@ void suNg_scalar_field_copy(suNg_scalar_field *g1, suNg_scalar_field *g2)
 #endif
   memcpy(g1->ptr,g2->ptr,g1->type->gsize_spinor*sizeof(*(g1->ptr)));
 }
-

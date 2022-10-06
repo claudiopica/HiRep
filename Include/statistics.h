@@ -1,12 +1,12 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 /*******************************************************************************
 *
 * File statistics.h
-* 
+*
 * Functions for statistical analysis of data series
 *
 *******************************************************************************/
@@ -26,5 +26,3 @@ double sigma_jackknife(int nobs,int n,double a[],double *ave_j,double (*pobs)(do
 
 
 #endif
-
- 

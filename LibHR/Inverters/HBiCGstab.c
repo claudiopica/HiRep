@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 #include "inverters.h"
@@ -23,14 +23,14 @@ int HBiCGstab(MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field
   spinor_field *r, *r1, *o, *Ms, *Mo, *o0;
   spinor_field *sptmp;
 
-  double delta, phi; 
+  double delta, phi;
   double alpha, beta, chi;
   double rtmp1,rtmp2,rtmp3;
 
   int cgiter;
   char sflags;
   unsigned short notconverged;
-   
+
   /* allocate spinors fields and aux real variables */
   /* implementation note: to minimize the number of malloc calls
    * objects of the same type are allocated together
@@ -63,7 +63,7 @@ int HBiCGstab(MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field
   /* choose omega so that delta and phi are not zero */
   /* spinor_field_copy_f(o, in);  omega = in ; this may be changed */
   /* gaussian_spinor_field(o0); */
-  spinor_field_copy_f(o0, in); 
+  spinor_field_copy_f(o0, in);
   spinor_field_copy_f(o, o0);
   delta = spinor_field_prod_re_f(o, r);
 
@@ -82,15 +82,15 @@ int HBiCGstab(MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field
     /* compute omega and chi[0] */
     spinor_field_mul_f(o,beta,Ms);
     spinor_field_add_assign_f(o,r);
-    
+
     M(Mo, o);
 
     oldchi=chi;
     chi=spinor_field_prod_re_f(Mo,o)/spinor_field_sqnorm_f(Mo);
-    
+
     /* compute r1 */
     spinor_field_mul_f(r1,chi,Mo);
-    spinor_field_sub_f(r1,o,r1); 
+    spinor_field_sub_f(r1,o,r1);
 
     /* update delta and alpha[0] */
     oldalpha=alpha;
@@ -120,7 +120,7 @@ int HBiCGstab(MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field
 
     if(rtmp1<par->err2)
       notconverged=0;
-    
+
 #ifndef NDEBUG
     lprintf("INVERTER",100,"HBiCGstab iter %d res: %1.8e\n",cgiter,rtmp1);
     fflush(stdout);
@@ -145,7 +145,7 @@ int HBiCGstab(MINRES_par *par, spinor_operator M, spinor_field *in, spinor_field
     if (fabs(norm)>par->err2)
       lprintf("INVERTER",30,"HBiCGstab failed: err2 = %1.8e > %1.8e\n",norm,par->err2);
 #endif
-   
+
   /* free memory */
   free_spinor_field_f(s);
 
@@ -163,14 +163,14 @@ int HBiCGstab_flt(MINRES_par *par, spinor_operator_flt M, spinor_field_flt *in, 
   spinor_field_flt *r, *r1, *o, *Ms, *Mo, *o0;
   spinor_field_flt *sptmp;
 
-  float delta, phi; 
+  float delta, phi;
   float z1, z2, alpha, beta, chi, rho;
   float rtmp1,rtmp2,rtmp3, oldalpha,oldchi;
 
   int cgiter;
   char sflags;
   unsigned short notconverged;
-   
+
   /* allocate spinors fields and aux real variables */
   /* implementation note: to minimize the number of malloc calls
    * objects of the same type are allocated together
@@ -203,7 +203,7 @@ int HBiCGstab_flt(MINRES_par *par, spinor_operator_flt M, spinor_field_flt *in, 
   /* choose omega so that delta and phi are not zero */
   /* spinor_field_copy_f(o, in);  omega = in ; this may be changed */
   /* gaussian_spinor_field(o0); */
-  spinor_field_copy_f_flt(o0, in); 
+  spinor_field_copy_f_flt(o0, in);
   spinor_field_copy_f_flt(o, o0);
   delta = spinor_field_prod_re_f_flt(o, r);
 
@@ -222,15 +222,15 @@ int HBiCGstab_flt(MINRES_par *par, spinor_operator_flt M, spinor_field_flt *in, 
     /* compute omega and chi[0] */
     spinor_field_mul_f_flt(o,beta,Ms);
     spinor_field_add_assign_f_flt(o,r);
-    
+
     M(Mo, o);
 
     oldchi=chi;
     chi=spinor_field_prod_re_f_flt(Mo,o)/spinor_field_sqnorm_f_flt(Mo);
-    
+
     /* compute r1 */
     spinor_field_mul_f_flt(r1,chi,Mo);
-    spinor_field_sub_f_flt(r1,o,r1); 
+    spinor_field_sub_f_flt(r1,o,r1);
 
     /* update delta and alpha[0] */
     oldalpha=alpha;
@@ -284,12 +284,10 @@ int HBiCGstab_flt(MINRES_par *par, spinor_operator_flt M, spinor_field_flt *in, 
     if (fabsf(norm)>(float)(par->err2))
       lprintf("INVERTER",30,"HBiCGstab_flt failed: err2 = %1.8e > %1.8e\n",norm,par->err2);
 #endif
-   
+
   /* free memory */
   free_spinor_field_f_flt(s);
 
   /* return number of cg iter */
   return cgiter;
 }
-
-

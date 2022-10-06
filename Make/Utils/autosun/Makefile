@@ -6,7 +6,7 @@
 TOPDIR = ../../..
 MKDIR = $(TOPDIR)/Make
 
-#SRCS = 
+#SRCS =
 
 EXEC = writeREPR
 
