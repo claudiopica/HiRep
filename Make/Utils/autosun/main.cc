@@ -38,13 +38,13 @@ int main(int argc, char* argv[]) {
 		cerr << "tmpldir => template file\n";
 		return 1;
 	}
-	
+
 	int N = atoi(argv[1]);
 	if(N < 2) {
 		cerr << argv[0] <<": ERROR: number of color must be >1 !\n";
 		return 2;
 	}
-	
+
 	group::init(N);
 	representation::init();
 
@@ -68,16 +68,16 @@ int main(int argc, char* argv[]) {
 		cerr << argv[0]<<": ERROR: cannot open template file (" << h_tmpl_name << ")!\n";
 		return 3;
 	}
-	
+
 #ifndef NDEBUG
 	cerr << "OK\n";
 #endif
-	
+
 	printfile(cout, h_tmpl);
 
 	/*
 	printfile(h_out, h_tmpl);
-	
+
 	h_out.close();
 	h_tmpl.close();
 
@@ -93,15 +93,15 @@ int main(int argc, char* argv[]) {
 		cerr << "ERROR (" << h_tmpl_name << ")\n";
 		return 0;
 	}
-	
+
 	cerr << "OK\n";
-	
+
 	printfile(h_out2, h_tmpl2);
-	
+
 	h_out2.close();
 	h_tmpl2.close();
 	*/
 //#endif
-	
+
 	return 0;
 }

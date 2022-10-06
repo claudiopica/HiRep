@@ -19,6 +19,3 @@ mes:tf = 8
 mes:ff_def_point = 0
 mes:ff_dirichlet_point = 1
 mes:dirichlet_dt = 0
-
-
-

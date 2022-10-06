@@ -20,14 +20,14 @@ echo Cleaning...
 cd ./${1}
 
 echo Building...
-make -j1 
+make -j1
 
 echo Run Tests...
 make runtests
 
 if [ -f .test_failed ]
-then 
+then
   exit 1 ;
-else 
+else
   exit 0 ;
 fi

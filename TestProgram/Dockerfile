@@ -9,7 +9,7 @@ RUN yum install -y epel-release && \
 
 RUN yum install -y git && yum clean all -y
 
-RUN mkdir -p /github/workspace &&\ 
+RUN mkdir -p /github/workspace &&\
     cd /github/workspace &&\
     git clone --depth 1 https://github.com/claudiopica/HiRep.git --branch HiRep-COMP --single-branch
 
