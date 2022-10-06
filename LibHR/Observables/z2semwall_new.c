@@ -1,6 +1,6 @@
 /***************************************************************************\
 * Copyright (c) 2009, Agostino Patella, Antonio Rago                        *
-* All rights reserved.                                                      * 
+* All rights reserved.                                                      *
 *                                                                           *
 *   Modified by Rudy Arthur, Ari Hietanen                                   *
 \***************************************************************************/
@@ -31,9 +31,9 @@
 
 /* #define RESTRICTED_SET */
 
-/*  Introduces small gaussian noise for source field 
+/*  Introduces small gaussian noise for source field
     Gives smaller errors with one extra inversion */
-#define GAUSSIAN_NOISE 
+#define GAUSSIAN_NOISE
 
 #ifdef RESTRICTED_SET
   #define G1_CHANNEL
@@ -71,7 +71,7 @@ static void create_diluted_source_equal_even(spinor_field *source, int tau) {
   for (i=0;i<4;++i){
     spinor_field_zero_f(&source[i]);
   }
-  
+
   if(COORD[0]==tau/T) {// Check that tau is in this thread.
     c[0]=tau%T;
     for(c[1]=0; c[1]<X; c[1]++) for(c[2]=0; c[2]<Y; c[2]++)  for(c[3]=0; c[3]<Z; c[3]++){
@@ -168,7 +168,7 @@ void z2semwall_qprop_free_new() {
 
   free(shift);
   free(mass);
-  
+
 #ifdef GAUSSIAN_NOISE
   free_spinor_field_f(QMR_noise);
 #endif
@@ -213,12 +213,12 @@ static void z2semwall_qprop_QMR_eo(spinor_field *psi_out, spinor_field *eta_in) 
     /* qprop_mask.ptr=psi_out[i].ptr+glat_even.master_shift; */
     spinor_field_mul_f(&qprop_mask,(4.+mass[i]),&resd[i]);
     qprop_mask.type=&glat_odd;
-    qprop_mask.ptr=psi_out[i].ptr+glat_odd.master_shift; 
+    qprop_mask.ptr=psi_out[i].ptr+glat_odd.master_shift;
     Dphi_(&qprop_mask,&resd[i]);
     spinor_field_minus_f(&qprop_mask,&qprop_mask);
     if(i&1) ++cgiter; /* count only half of calls. works because the number of sources is even */
   }
-  
+
   lprintf("ZSEMWALL",0,"%g\n",spinor_field_sqnorm_f(eta_in));
   lprintf("Z2SEMWALL NEW",10,"QMR_eo MVM = %d\n",cgiter);
 }
@@ -263,7 +263,7 @@ void z2semwall_mesons_new(int conf, int nhits, int nm, double *m, double acc) {
   int slices[GLB_T];
   int counter = 0;
   int itmp;
-  
+
   error(nhits<1,1,"z2semwall_new.c","Bad value for nhits!");
 
   z2semwall_qprop_init(nm, m, acc);
@@ -282,7 +282,7 @@ void z2semwall_mesons_new(int conf, int nhits, int nm, double *m, double acc) {
     }
     do{
       ranlxd(&ran,1);
-      itmp=(int)(ran*counter);    
+      itmp=(int)(ran*counter);
     } while(itmp==counter);
     counter--;
     tau = slices[itmp];
@@ -297,10 +297,10 @@ void z2semwall_mesons_new(int conf, int nhits, int nm, double *m, double acc) {
       z2semwall_qprop_QMR_eo(&psi0[beta*nm],&eta[beta]);
     }
 
-    for(i=0; i<nm; i++) {						
-      for (t=0; t<T; t++) {						
-	for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) { 
-	      ix=ipt(t,x,y,z);					
+    for(i=0; i<nm; i++) {
+      for (t=0; t<T; t++) {
+	for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) {
+	      ix=ipt(t,x,y,z);
 	      for (beta=0;beta<4;beta++){
 		_spinor_prod_re_f(tmp,*_FIELD_AT(&psi0[beta*nm+i],ix),*_FIELD_AT(&psi0[beta*nm+i],ix));
 		corr[_g5][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T]+=tmp;
@@ -311,54 +311,54 @@ void z2semwall_mesons_new(int conf, int nhits, int nm, double *m, double acc) {
 	      _spinor_g5_f(sp1,*psi0p);
 	      sp2=*psi0p;
 	      _spinor_prod_re_f(tmp,sp1,sp2);
-	      corr[_id][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      corr[_id][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[nm+i],ix);
 	      _spinor_g5_f(sp1,*psi0p);
 	      sp2=*psi0p;
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
+	      _spinor_prod_re_f(tmp,sp1,sp2);
 	      corr[_id][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[2*nm+i],ix);
 	      _spinor_g5_f(sp1,*psi0p);
 	      _spinor_minus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_id][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_id][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[3*nm+i],ix);
 	      _spinor_g5_f(sp1,*psi0p);
 	      _spinor_minus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_id][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_id][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 #endif
 #ifdef G0_CHANNEL
 	      psi0p = _FIELD_AT(&psi0[i],ix);
 	      _spinor_g5g0_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[2*nm+i],ix);
 	      sp2 = *psi0p;
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g0][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g0][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[nm+i],ix);
 	      _spinor_g5g0_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[3*nm+i],ix);
 	      sp2 = *psi0p;
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
+	      _spinor_prod_re_f(tmp,sp1,sp2);
 	      corr[_g0][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[2*nm+i],ix);
 	      _spinor_g5g0_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[0*nm+i],ix);
 	      _spinor_minus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g0][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g0][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[3*nm+i],ix);
 	      _spinor_g5g0_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[1*nm+i],ix);
 	      _spinor_minus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g0][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g0][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 #endif
 
 #ifdef G1_CHANNEL
@@ -366,58 +366,58 @@ void z2semwall_mesons_new(int conf, int nhits, int nm, double *m, double acc) {
 	      _spinor_g5g1_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[3*nm+i],ix);
 	      _spinor_i_plus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g1][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g1][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[nm+i],ix);
 	      _spinor_g5g1_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[2*nm+i],ix);
 	      _spinor_i_plus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
+	      _spinor_prod_re_f(tmp,sp1,sp2);
 	      corr[_g1][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[2*nm+i],ix);
 	      _spinor_g5g1_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[1*nm+i],ix);
 	      _spinor_i_plus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g1][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g1][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[3*nm+i],ix);
 	      _spinor_g5g1_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[0*nm+i],ix);
 	      _spinor_i_plus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g1][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 	      
-#endif	      
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g1][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
+#endif
 #ifdef G2_CHANNEL
 	      psi0p = _FIELD_AT(&psi0[i],ix);
 	      _spinor_g5g2_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[3*nm+i],ix);
 	      _spinor_minus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g2][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g2][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[nm+i],ix);
 	      _spinor_g5g2_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[2*nm+i],ix);
 	      sp2 = *psi0p;
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
+	      _spinor_prod_re_f(tmp,sp1,sp2);
 	      corr[_g2][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[2*nm+i],ix);
 	      _spinor_g5g2_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[1*nm+i],ix);
 	      _spinor_minus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g2][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g2][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[3*nm+i],ix);
 	      _spinor_g5g2_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[0*nm+i],ix);
 	      sp2 = *psi0p;
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g2][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g2][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 #endif
 
 #ifdef G3_CHANNEL
@@ -425,29 +425,29 @@ void z2semwall_mesons_new(int conf, int nhits, int nm, double *m, double acc) {
 	      _spinor_g5g3_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[2*nm+i],ix);
 	      _spinor_i_plus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g3][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g3][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[nm+i],ix);
 	      _spinor_g5g3_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[3*nm+i],ix);
 	      _spinor_i_minus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
+	      _spinor_prod_re_f(tmp,sp1,sp2);
 	      corr[_g3][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[2*nm+i],ix);
 	      _spinor_g5g3_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[0*nm+i],ix);
 	      _spinor_i_plus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g3][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g3][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[3*nm+i],ix);
 	      _spinor_g5g3_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[1*nm+i],ix);
 	      _spinor_i_minus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g3][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g3][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 #endif
 
 #ifdef G0G5_CHANNEL
@@ -455,29 +455,29 @@ void z2semwall_mesons_new(int conf, int nhits, int nm, double *m, double acc) {
 	      _spinor_g0_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[2*nm+i],ix);
 	      sp2 = *psi0p;
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g0g5][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g0g5][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[nm+i],ix);
 	      _spinor_g0_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[3*nm+i],ix);
 	      sp2 = *psi0p;
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
+	      _spinor_prod_re_f(tmp,sp1,sp2);
 	      corr[_g0g5][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[2*nm+i],ix);
 	      _spinor_g0_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[0*nm+i],ix);
 	      sp2 = *psi0p;
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g0g5][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g0g5][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[3*nm+i],ix);
 	      _spinor_g0_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[1*nm+i],ix);
 	      sp2 = *psi0p;
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g0g5][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g0g5][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 #endif
 
 #ifdef G5G1_CHANNEL
@@ -485,58 +485,58 @@ void z2semwall_mesons_new(int conf, int nhits, int nm, double *m, double acc) {
 	      _spinor_g1_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[3*nm+i],ix);
 	      _spinor_i_plus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g5g1][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g5g1][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[nm+i],ix);
 	      _spinor_g1_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[2*nm+i],ix);
 	      _spinor_i_plus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
+	      _spinor_prod_re_f(tmp,sp1,sp2);
 	      corr[_g5g1][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[2*nm+i],ix);
 	      _spinor_g1_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[1*nm+i],ix);
 	      _spinor_i_minus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g5g1][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g5g1][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[3*nm+i],ix);
 	      _spinor_g1_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[0*nm+i],ix);
 	      _spinor_i_minus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g5g1][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 	      
-#endif	      
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g5g1][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
+#endif
 #ifdef G5G2_CHANNEL
 	      psi0p = _FIELD_AT(&psi0[i],ix);
 	      _spinor_g2_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[3*nm+i],ix);
 	      _spinor_minus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g5g2][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g5g2][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[nm+i],ix);
 	      _spinor_g2_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[2*nm+i],ix);
 	      sp2 = *psi0p;
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
+	      _spinor_prod_re_f(tmp,sp1,sp2);
 	      corr[_g5g2][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[2*nm+i],ix);
 	      _spinor_g2_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[1*nm+i],ix);
 	      sp2 = *psi0p;
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g5g2][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g5g2][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[3*nm+i],ix);
 	      _spinor_g2_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[0*nm+i],ix);
 	      _spinor_minus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g5g2][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g5g2][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 #endif
 
 #ifdef G5G3_CHANNEL
@@ -544,29 +544,29 @@ void z2semwall_mesons_new(int conf, int nhits, int nm, double *m, double acc) {
 	      _spinor_g3_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[2*nm+i],ix);
 	      _spinor_i_plus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g5g3][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g5g3][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[nm+i],ix);
 	      _spinor_g3_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[3*nm+i],ix);
 	      _spinor_i_minus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
+	      _spinor_prod_re_f(tmp,sp1,sp2);
 	      corr[_g5g3][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[2*nm+i],ix);
 	      _spinor_g3_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[0*nm+i],ix);
 	      _spinor_i_minus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g5g3][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g5g3][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[3*nm+i],ix);
 	      _spinor_g3_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[1*nm+i],ix);
 	      _spinor_i_plus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g5g3][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g5g3][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 #endif
 
 #ifdef G0G1_CHANNEL
@@ -574,29 +574,29 @@ void z2semwall_mesons_new(int conf, int nhits, int nm, double *m, double acc) {
 	      _spinor_g5g0g1_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[1*nm+i],ix);
 	      _spinor_i_plus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g0g1][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g0g1][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[nm+i],ix);
 	      _spinor_g5g0g1_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[0*nm+i],ix);
 	      _spinor_i_plus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
+	      _spinor_prod_re_f(tmp,sp1,sp2);
 	      corr[_g0g1][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[2*nm+i],ix);
 	      _spinor_g5g0g1_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[3*nm+i],ix);
 	      _spinor_i_plus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g0g1][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g0g1][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[3*nm+i],ix);
 	      _spinor_g5g0g1_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[2*nm+i],ix);
 	      _spinor_i_plus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g0g1][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g0g1][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 #endif
 
 #ifdef G0G2_CHANNEL
@@ -604,146 +604,146 @@ void z2semwall_mesons_new(int conf, int nhits, int nm, double *m, double acc) {
 	      _spinor_g5g0g2_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[1*nm+i],ix);
 	      _spinor_minus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g0g2][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g0g2][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[nm+i],ix);
 	      _spinor_g5g0g2_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[0*nm+i],ix);
 	      sp2 = *psi0p;
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
+	      _spinor_prod_re_f(tmp,sp1,sp2);
 	      corr[_g0g2][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[2*nm+i],ix);
 	      _spinor_g5g0g2_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[3*nm+i],ix);
 	      _spinor_minus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g0g2][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g0g2][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[3*nm+i],ix);
 	      _spinor_g5g0g2_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[2*nm+i],ix);
 	      sp2 = *psi0p;
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g0g2][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 	      
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g0g2][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 #endif
 #ifdef G0G3_CHANNEL
 	      psi0p = _FIELD_AT(&psi0[i],ix);
 	      _spinor_g5g0g3_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[0*nm+i],ix);
 	      _spinor_i_plus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g0g3][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g0g3][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[nm+i],ix);
 	      _spinor_g5g0g3_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[1*nm+i],ix);
 	      _spinor_i_minus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
+	      _spinor_prod_re_f(tmp,sp1,sp2);
 	      corr[_g0g3][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[2*nm+i],ix);
 	      _spinor_g5g0g3_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[2*nm+i],ix);
 	      _spinor_i_plus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g0g3][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g0g3][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[3*nm+i],ix);
 	      _spinor_g5g0g3_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[3*nm+i],ix);
 	      _spinor_i_minus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g0g3][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 	      
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g0g3][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 #endif
 #ifdef G0G5G1_CHANNEL
 	      psi0p = _FIELD_AT(&psi0[i],ix);
 	      _spinor_g0g1_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[1*nm+i],ix);
 	      _spinor_i_minus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g0g5g1][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g0g5g1][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[nm+i],ix);
 	      _spinor_g0g1_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[0*nm+i],ix);
 	      _spinor_i_minus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
+	      _spinor_prod_re_f(tmp,sp1,sp2);
 	      corr[_g0g5g1][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[2*nm+i],ix);
 	      _spinor_g0g1_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[3*nm+i],ix);
 	      _spinor_i_plus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g0g5g1][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g0g5g1][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[3*nm+i],ix);
 	      _spinor_g0g1_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[2*nm+i],ix);
 	      _spinor_i_plus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g0g5g1][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g0g5g1][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 #endif
 #ifdef G0G5G2_CHANNEL
 	      psi0p = _FIELD_AT(&psi0[i],ix);
 	      _spinor_g0g2_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[1*nm+i],ix);
 	      sp2 = *psi0p;
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g0g5g2][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g0g5g2][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[nm+i],ix);
 	      _spinor_g0g2_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[0*nm+i],ix);
 	      _spinor_minus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
+	      _spinor_prod_re_f(tmp,sp1,sp2);
 	      corr[_g0g5g2][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[2*nm+i],ix);
 	      _spinor_g0g2_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[3*nm+i],ix);
 	      _spinor_minus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g0g5g2][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g0g5g2][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[3*nm+i],ix);
 	      _spinor_g0g2_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[2*nm+i],ix);
 	      sp2 = *psi0p;
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g0g5g2][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g0g5g2][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 #endif
-  
+
 #ifdef G0G5G3_CHANNEL
 	      psi0p = _FIELD_AT(&psi0[i],ix);
 	      _spinor_g0g3_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[0*nm+i],ix);
 	      _spinor_i_minus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g0g5g3][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g0g5g3][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[nm+i],ix);
 	      _spinor_g0g3_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[1*nm+i],ix);
 	      _spinor_i_plus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
+	      _spinor_prod_re_f(tmp,sp1,sp2);
 	      corr[_g0g5g3][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[2*nm+i],ix);
 	      _spinor_g0g3_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[2*nm+i],ix);
 	      _spinor_i_plus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g0g5g3][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g0g5g3][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 	      psi0p = _FIELD_AT(&psi0[3*nm+i],ix);
 	      _spinor_g0g3_f(sp1,*psi0p);
 	      psi0p = _FIELD_AT(&psi0[3*nm+i],ix);
 	      _spinor_i_minus_f(sp2,*psi0p);
-	      _spinor_prod_re_f(tmp,sp1,sp2);	
-	      corr[_g0g5g3][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 	      
+	      _spinor_prod_re_f(tmp,sp1,sp2);
+	      corr[_g0g5g3][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 
 #endif
 
@@ -752,8 +752,8 @@ void z2semwall_mesons_new(int conf, int nhits, int nm, double *m, double acc) {
 		psi0p = _FIELD_AT(&psi0[beta*nm+i],ix);
 		_spinor_g0_f(sp1,*psi0p);
 		_spinor_minus_f(sp2,*psi0p);
-		_spinor_prod_re_f(tmp,sp1,sp2);	
-		corr[_g5_g0g5_re][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp; 
+		_spinor_prod_re_f(tmp,sp1,sp2);
+		corr[_g5_g0g5_re][(zerocoord[0]+t+GLB_T-tau)%GLB_T+i*GLB_T] += tmp;
 	      }
 #endif
 	      if (t+zerocoord[0]==tau){
@@ -776,14 +776,14 @@ void z2semwall_mesons_new(int conf, int nhits, int nm, double *m, double acc) {
     }
   }
 
-  
+
   for(k=0; k<NCHANNELS; k++) {
     global_sum(corr[k],GLB_T*nm);
     for(i=0; i<nm*GLB_T; i++)
       corr[k][i] *= -((2./nhits)/GLB_VOL3)/GLB_VOL3;
   }
 
-  
+
 #define PRINT_CORR(name) \
   for(i=0; i<nm; i++) { \
     lprintf("MAIN",0,"conf #%d mass=%2.6f TRIPLET " #name "= ",conf,mass[i]); \
@@ -818,8 +818,8 @@ void z2semwall_mesons_new(int conf, int nhits, int nm, double *m, double acc) {
       corr[_g2][i] *= -1.;*/
   PRINT_CORR(g2);
 #endif
-  
-  
+
+
 #ifdef G3_CHANNEL
   /*  for(i=0; i<nm*GLB_T; i++)
     corr[_g3][i] *= -1.;*/
@@ -831,15 +831,15 @@ void z2semwall_mesons_new(int conf, int nhits, int nm, double *m, double acc) {
       corr[_g0g5][i] *= -1.;*/
   PRINT_CORR(g0g5);
 #endif
-  
+
 #ifdef G5G1_CHANNEL
   PRINT_CORR(g5g1);
 #endif
-  
+
 #ifdef G5G2_CHANNEL
   PRINT_CORR(g5g2);
 #endif
-  
+
 #ifdef G5G3_CHANNEL
   PRINT_CORR(g5g3);
 #endif
@@ -855,21 +855,21 @@ void z2semwall_mesons_new(int conf, int nhits, int nm, double *m, double acc) {
       corr[_g0g2][i] *= -1.;*/
   PRINT_CORR(g0g2);
 #endif
-  
+
 #ifdef G0G3_CHANNEL
   /*  for(i=0; i<nm*GLB_T; i++)
       corr[_g0g3][i] *= -1.;*/
   PRINT_CORR(g0g3);
 #endif
-  
+
 #ifdef G0G5G1_CHANNEL
   PRINT_CORR(g0g5g1);
 #endif
-  
+
 #ifdef G0G5G2_CHANNEL
   PRINT_CORR(g0g5g2);
 #endif
-  
+
 #ifdef G0G5G3_CHANNEL
   PRINT_CORR(g0g5g3);
 #endif

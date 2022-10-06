@@ -1,6 +1,6 @@
 /***************************************************************************\
- * Copyright (c) 2008, Claudio Pica                                          *   
- * All rights reserved.                                                      * 
+ * Copyright (c) 2008, Claudio Pica                                          *
+ * All rights reserved.                                                      *
  \***************************************************************************/
 
 /*******************************************************************************
@@ -31,7 +31,7 @@
 #define MPIRET(type) type =
 #endif
 
-/* 
+/*
  * The conversion is based on the following convention
  * for su(2) matrices:
  * | c0 c1 |   | q0+i*q3 -q2+i*q1 |

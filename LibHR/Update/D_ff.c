@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica, Jarno Rantaharju                        *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica, Jarno Rantaharju                        *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 
@@ -81,13 +81,13 @@ static void init_Dirac() {
 void Dphi_eopre_4f(double m0, spinor_field *out, spinor_field *in, double shift)
 {
    double rho;
-  
+
   error((in==NULL)||(out==NULL),1,"Dphi_eopre [Dphi.c]",
 	"Attempt to access unallocated memory space");
-  
+
   error(in==out,1,"Dphi_eopre [Dphi.c]",
 	"Input and output fields must be different");
-  
+
 #ifdef CHECK_SPINOR_MATCHING
   error(out->type!=&glat_even || in->type!=&glat_even,1,"Dphi_eopre " __FILE__, "Spinors are not defined on even lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
@@ -96,7 +96,7 @@ void Dphi_eopre_4f(double m0, spinor_field *out, spinor_field *in, double shift)
 
   /* alloc memory for temporary spinor field */
   if (init_dirac) { init_Dirac(); init_dirac=0; }
-  
+
   rho=4.0+m0;
 
   Dphi_(otmp, in);
@@ -104,7 +104,7 @@ void Dphi_eopre_4f(double m0, spinor_field *out, spinor_field *in, double shift)
   apply_BCs_on_spinor_field(otmp);
   Dphi_(out, otmp);
   spinor_field_minus_f(out,out);
-  
+
   spinor_scalarfield_mult_add_assign(out,ff_sigma,rho,in);
   spinor_scalarfield_ig5_mult_add_assign(out,ff_pi,in);
 
@@ -120,13 +120,13 @@ void Dphi_eopre_4f(double m0, spinor_field *out, spinor_field *in, double shift)
 void Dphi_eopre_4f_dagger(double m0, spinor_field *out, spinor_field *in, double shift)
 {
    double rho;
-  
+
   error((in==NULL)||(out==NULL),1,"Dphi_eopre [Dphi.c]",
 	"Attempt to access unallocated memory space");
-  
+
   error(in==out,1,"Dphi_eopre [Dphi.c]",
 	"Input and output fields must be different");
-  
+
 #ifdef CHECK_SPINOR_MATCHING
   error(out->type!=&glat_even || in->type!=&glat_even,1,"Dphi_eopre " __FILE__, "Spinors are not defined on even lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
@@ -135,7 +135,7 @@ void Dphi_eopre_4f_dagger(double m0, spinor_field *out, spinor_field *in, double
 
   /* alloc memory for temporary spinor field */
   if (init_dirac) { init_Dirac(); init_dirac=0; }
-  
+
   rho=4.0+m0;
 
   //Get dagger with g5, for now
@@ -149,7 +149,7 @@ void Dphi_eopre_4f_dagger(double m0, spinor_field *out, spinor_field *in, double
   Dphi_(out, otmp);
   spinor_field_g5_assign_f(out);
   spinor_field_minus_f(out,out);
-  
+
 
   spinor_scalarfield_mult_add_assign(out,ff_sigma,rho,in);
   spinor_scalarfield_mig5_mult_add_assign(out,ff_pi,in);
@@ -168,7 +168,7 @@ void Dphieopre_4f_sq(double m0, spinor_field *out, spinor_field *in, double shif
   Dphi_eopre_4f(m0, etmp, in, shift);
   Dphi_eopre_4f_dagger(m0, out, etmp, shift);
 
-  
+
 }
 void Dphieopre_4f_DDdagger(double m0, spinor_field *out, spinor_field *in, double shift) {
   /* alloc memory for temporary spinor field */
@@ -181,13 +181,13 @@ void Dphieopre_4f_DDdagger(double m0, spinor_field *out, spinor_field *in, doubl
 void Dphi_4f(double m0, spinor_field *out, spinor_field *in)
 {
    double rho;
-  
+
   error((in==NULL)||(out==NULL),1,"Dphi_eopre [Dphi.c]",
 	"Attempt to access unallocated memory space");
-  
+
   error(in==out,1,"Dphi_eopre [Dphi.c]",
 	"Input and output fields must be different");
-  
+
 #ifdef CHECK_SPINOR_MATCHING
   error(out->type!=&glattice || in->type!=&glattice,1,"Dphi_eopre " __FILE__, "Spinors are not defined on full lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
@@ -196,7 +196,7 @@ void Dphi_4f(double m0, spinor_field *out, spinor_field *in)
 
   /* alloc memory for temporary spinor field */
   if (init_dirac) { init_Dirac(); init_dirac=0; }
-  
+
   rho=4.0+m0;
 
   Dphi_(out, in);
@@ -209,13 +209,13 @@ void Dphi_4f(double m0, spinor_field *out, spinor_field *in)
 void Dphi_4f_dagger(double m0, spinor_field *out, spinor_field *in)
 {
    double rho;
-  
+
   error((in==NULL)||(out==NULL),1,"Dphi_eopre [Dphi.c]",
 	"Attempt to access unallocated memory space");
-  
+
   error(in==out,1,"Dphi_eopre [Dphi.c]",
 	"Input and output fields must be different");
-  
+
 #ifdef CHECK_SPINOR_MATCHING
   error(out->type!=&glattice || in->type!=&glattice,1,"Dphi_eopre " __FILE__, "Spinors are not defined on even lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
@@ -224,7 +224,7 @@ void Dphi_4f_dagger(double m0, spinor_field *out, spinor_field *in)
 
   /* alloc memory for temporary spinor field */
   if (init_dirac) { init_Dirac(); init_dirac=0; }
-  
+
   rho=4.0+m0;
 
   //Get dagger with g5, for now
@@ -232,7 +232,7 @@ void Dphi_4f_dagger(double m0, spinor_field *out, spinor_field *in)
   Dphi_(out, in);
   spinor_field_g5_assign_f(in);
   spinor_field_g5_assign_f(out);
-  apply_BCs_on_spinor_field(otmp);  
+  apply_BCs_on_spinor_field(otmp);
 
   spinor_scalarfield_mult_add_assign(out,ff_sigma,rho,in);
   spinor_scalarfield_mig5_mult_add_assign(out,ff_pi,in);
@@ -278,7 +278,3 @@ void Dff_sq(spinor_field *out, spinor_field *in){
   // Not implemented
 #endif
 }
-
-
-
-

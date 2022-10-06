@@ -36,7 +36,7 @@ int main (int argc, char* argv[]) {
 
 	// Set the exponent
 	sscanf(argv[++i],"%d",&y);
-	sscanf(argv[++i],"%d",&z);  
+	sscanf(argv[++i],"%d",&z);
 
 	//precision required by the approximations
 	sscanf(argv[++i],"%le",&reqprec);
@@ -52,7 +52,7 @@ int main (int argc, char* argv[]) {
 	// Set the precision of the arithmetic
 	sscanf(argv[++i],"%d",&precision);
 
-	// The partial fraction expansion takes the form 
+	// The partial fraction expansion takes the form
 	// r(x) = norm + sum_{k=1}^{n} res[k] / (x + pole[k])
 	double norm,oldnorm, olderror;
 
@@ -78,7 +78,7 @@ int main (int argc, char* argv[]) {
 		bigfloat *dmm=0;
 		while ((fabs(reqprec-error)/reqprec)>.01 || reqprec<error) {
 
-			
+
 			// Instantiate the Remez class
 			AlgRemez remez(lambda_low,lambda_high,precision);
 
@@ -138,14 +138,14 @@ int main (int argc, char* argv[]) {
 		fprintf(output, "Approximation to f(x) = x^(-%d/%d)=a0*(x-a1)/(x-b1)*(x-a2)/(x-b2)*...\n\n", y, z);
 		fprintf(output, "app->a[0] = %18.16e;\n", 1./norm);
 		for (int i = 0; i < n; i++) {
-			fprintf(output, "app->a[%d] = %18.16e ; app->b[%d] = %18.16e ;\n", 
+			fprintf(output, "app->a[%d] = %18.16e ; app->b[%d] = %18.16e ;\n",
 					n-i, pole[i], n-i-1, res[i]);
 		}
 
 
 		/*
-		// Find the partial fraction expansion of the approximation 
-		// to the function x^{y/z} (this only works currently for 
+		// Find the partial fraction expansion of the approximation
+		// to the function x^{y/z} (this only works currently for
 		// the special case that n = d)
 		fprintf(output, "Approximation to f(x) = x^(%d/%d)\n\n", y, z);
 
@@ -154,18 +154,18 @@ int main (int argc, char* argv[]) {
 		fprintf(output, "constant min_epsilon = %18.16e\n\n", lambda_low);
 		fprintf(output, "Ra_a0 = %18.16e\n", norm);
 		for (int i = 0; i < n; i++) {
-		fprintf(output, "Ra_a[%d] = %18.16e ; Ra_b[%d] = %18.16e ;\n", 
+		fprintf(output, "Ra_a[%d] = %18.16e ; Ra_b[%d] = %18.16e ;\n",
 		n-i-1, res[i], n-i-1, -pole[i]);
 		}
 		*/
-		/* 
+		/*
 		// Find pfe of inverse function
 		remez.getIPFE(res,pole,&norm);
 		fprintf(output, "\nApproximation to f(x) = x^(-%d/%d)\n\n", y, z);
 		fprintf(output, "constant min_epsilon = %18.16e\n\n", lambda_low);
 		fprintf(output, "Ra_a0 = %18.16e\n", norm);
 		for (int i = 0; i < n; i++) {
-		fprintf(output, "Ra_a[%d] = %18.16e ; Ra_b[%d] = %18.16e ;\n", 
+		fprintf(output, "Ra_a[%d] = %18.16e ; Ra_b[%d] = %18.16e ;\n",
 		n-i-1, res[i], n-i-1, -pole[i]);
 		}
 		*/
@@ -217,4 +217,4 @@ int main (int argc, char* argv[]) {
 
 	exit(0);
 
-}     
+}

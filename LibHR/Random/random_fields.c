@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 /*******************************************************************************
@@ -24,8 +24,8 @@
 void random_u(suNg_field *gf)
 {
   error(gf==NULL,1,"random_u [random_fields.c]",
-	"Attempt to access unallocated memory space");   
-  
+	"Attempt to access unallocated memory space");
+
   _MASTER_FOR(gf->type,ix) {
     /* unroll 4 directions */
     suNg *ptr=(gf->ptr)+coord_to_index(ix,0);
@@ -38,12 +38,12 @@ void random_u(suNg_field *gf)
   start_gf_sendrecv(gf);
 }
 
-void random_u_f(suNf_field *gf) 
+void random_u_f(suNf_field *gf)
 {
-  error(gf==NULL, 1, "random_u_f [random_fields.c]", 
+  error(gf==NULL, 1, "random_u_f [random_fields.c]",
   "Attempt to access unallocated memory space");
 
-  _MASTER_FOR(gf->type,ix) 
+  _MASTER_FOR(gf->type,ix)
   {
     suNf *ptr = (gf->ptr)+coord_to_index(ix, 0);
     random_suNf(ptr++);
@@ -60,8 +60,8 @@ void unit_u(suNg_field *gf)
   suNg unity;
 
   error(gf==NULL,1,"unit_u [random_fields.c]",
-	"Attempt to access unallocated memory space");   
-  
+	"Attempt to access unallocated memory space");
+
    _suNg_unit(unity);
   _MASTER_FOR(gf->type,ix) {
     /* unroll 4 directions */

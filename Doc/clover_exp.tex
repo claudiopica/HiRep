@@ -66,15 +66,15 @@ Because $Q_{\mu\nu}^\dagger=Q_{\nu\mu}$ we have $F_{\mu\nu}=-F_{\nu\mu}$. For th
 
 The quantity $\sigma_{\mu\nu}F_{\mu\nu}$ is Hermitian and block diagonal. It can be written as
 \begin{align}
-A(x)=-\frac{c_{sw}}{2(4+m_0)} \sum_{\mu<\nu}\sigma_{\mu\nu}F_{\mu\nu} = 
+A(x)=-\frac{c_{sw}}{2(4+m_0)} \sum_{\mu<\nu}\sigma_{\mu\nu}F_{\mu\nu} =
  \begin{pmatrix}
  a & b & 0 & 0 \\
  b^\dagger & -a & 0 & 0 \\
  0  & 0 & c & d \\
  0 & 0 & d^\dagger & -c
  \end{pmatrix} \equiv \begin{pmatrix}
- A^+ & 0 \\ 
- 0 & A^- 
+ A^+ & 0 \\
+ 0 & A^-
  \end{pmatrix}, \label{eq:blocks}
 \end{align}
 where $A^\pm$ are $2 \times 2$ matrices in spin space and $a,b,c,d$ are $N_F \times N_F$. This formulation of $A(x)$ as a block matrix will be useful for the exponentiation.
@@ -88,7 +88,7 @@ The evaluation of the exponential of $A(x)$ can be split as:
 0& \exp A^-
 \end{pmatrix}
 \end{equation}
-and so, the problem is reduced to the exponential of two $(2 N_F) \times  (2 N_F)$ matrices. The evaluation can be performed in two ways. 
+and so, the problem is reduced to the exponential of two $(2 N_F) \times  (2 N_F)$ matrices. The evaluation can be performed in two ways.
 \begin{enumerate}
 \item Using the Taylor expansion:
 \begin{equation}
@@ -116,7 +116,7 @@ For instance, the characteristic polynomial of a $4 \times 4$ traceless matrix h
 \begin{equation}
 p_0=\frac{1}{8 } \left(\tr A^2\right)^2 - \frac{1}{4} \tr A^4 ,\ p_1 = -\frac{1}{3}\tr  A^3, \ p_2= -\frac{1}{2}\tr  A^2, \ p_3=0, \ p_3=1.
 \end{equation}
-Finally, the coefficients of Eq. \ref{eq:exphorner} are $b_k  =q_{0,k} $. 
+Finally, the coefficients of Eq. \ref{eq:exphorner} are $b_k  =q_{0,k} $.
 \end{enumerate}
 The Horner scheme method is currently implemented only for $SU(2)$ and $SU(3)$ with fundamental fermions.
 
@@ -154,17 +154,17 @@ The clover part of the Dirac operator is given by
 An optimized way of calculating the derivative is provided by the double Horner scheme. The basic idea is that the derivative of a matrix can be expressed as:
 \begin{equation}
 d e^A = \sum_{k=0}^{\dim A -1} \sum_{l=0}^{\dim A-1} C_{kl}(A) A^l dA A^k, \label{eq:dexphorner}
-\end{equation} 
+\end{equation}
 where  the $C_{kl}$ coefficients depend on the matrix $A$, similarly to the ones Eq. \ref{eq:exphorner}. They are calculated performing first the iteration in Eq. \ref{eq:horner}, and then repeating the iteration process on the result of the first iteration. For compactness, we shall omit the limits of the sum henceforth. When inserting Eq. \eqref{eq:Hsw} in Eq. \eqref{eq:dotS}, and using Eq. \eqref{eq:dexphorner}, we obtain
 \begin{equation}
  \dot{S} = c_{sw} \sum_{k}  \sum_{\mu<\nu}\re(  \xi_k^\dagger\bar{\sigma}_{\mu\nu}\dot{F}_{\mu\nu}\eta_k),
 \end{equation}
-with 
+with
 \begin{equation}
 \xi_k = \sum_l \begin{pmatrix}
 C^+_{kl} (A^+)^l \xi^+ \\
 C^-_{kl} (A^-)^l \xi^-
-\end{pmatrix}, \text{ and } 
+\end{pmatrix}, \text{ and }
 \eta_k =  \begin{pmatrix}
  (A^+)^k \eta^+ \\
 (A^-)^k \eta^-
@@ -248,7 +248,7 @@ Even-odd preconditioning is particularly simple for the exponential case, since 
 \begin{equation}
 \det D_{oo}  = \exp(\log \det D_{oo} ) =\exp( \tr \log D_{oo}) =  1,
 \end{equation}
-and so it is a constant term in the action that does not contribute to the force. 
+and so it is a constant term in the action that does not contribute to the force.
 
 \subsubsection*{Implementation of  $X_{\mu\nu}$  using Taylor series}
 
@@ -265,7 +265,7 @@ where now:
 \xi_k = \sum_l \frac{1}{(k+l+1)!} \begin{pmatrix}
 (A^+)^l \xi^+ \\
  (A^-)^l \xi^-
-\end{pmatrix}, \text{ and } 
+\end{pmatrix}, \text{ and }
 \eta_k =  \begin{pmatrix}
  (A^+)^k \eta^+ \\
 (A^-)^k \eta^-

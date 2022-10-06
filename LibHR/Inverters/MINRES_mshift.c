@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 #include "inverters.h"
@@ -28,7 +28,7 @@ static int MINRES_mshift_core(short int *flags,mshift_par *par, spinor_operator 
   spinor_field *p1, *p2, *Mp;
   spinor_field *sptmp, *memall;
 
-  double alpha, beta, oldbeta,innorm2; 
+  double alpha, beta, oldbeta,innorm2;
   double *r, *s1, *s2, *c1, *c2, *rho1, *rho2, *rp;
 
   int i;
@@ -47,7 +47,7 @@ static int MINRES_mshift_core(short int *flags,mshift_par *par, spinor_operator 
     printf("numero vettori n=%d\n",par->n);
     for (i=0; i<(par->n); ++i) {
     printf("shift[%d]=%f\n",i,par->shift[i]);
-    printf("out[%d]=%p\n",i,out[i]);      
+    printf("out[%d]=%p\n",i,out[i]);
     }
   */
 
@@ -93,7 +93,7 @@ static int MINRES_mshift_core(short int *flags,mshift_par *par, spinor_operator 
   innorm2=spinor_field_sqnorm_f(in);
   beta=sqrt(spinor_field_sqnorm_f(p2));
   spinor_field_mul_f(p2,1./beta,p2);
-  spinor_field_zero_f(p1);  
+  spinor_field_zero_f(p1);
   for (i=0; i<(par->n); ++i) {
     r[i]=rho2[i]=beta;
     rho1[i]=1.;
@@ -167,7 +167,7 @@ static int MINRES_mshift_core(short int *flags,mshift_par *par, spinor_operator 
 
       }
 
-    }    
+    }
 
   } while ((par->max_iter==0 || cgiter<par->max_iter) && notconverged);
 
@@ -185,7 +185,7 @@ static int MINRES_mshift_core(short int *flags,mshift_par *par, spinor_operator 
       lprintf("INVERTER",30,"MINRES failed on vect %d: err2 = %1.8e > %1.8e\n",i,norm,par->err2);
     } else {
       lprintf("INVERTER",20,"MINRES inversion: err2 = %1.8e < %1.8e\n",norm,par->err2);
-    } 
+    }
   }
 
 
@@ -204,7 +204,7 @@ int MINRES_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_f
   int i;
   mshift_par par_save=*par;
   short int *valid = malloc(sizeof(*valid)*(par->n));
-	
+
   iter=MINRES_mshift_core(valid, par, M, in, out);
   msiter=iter;
 
@@ -222,7 +222,7 @@ int MINRES_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_f
   *par=par_save;
 
   free(valid);
-	
+
   lprintf("INVERTER",10,"MINRES_mshift: MVM = %d/%d\n",msiter,iter);
 
   return iter;

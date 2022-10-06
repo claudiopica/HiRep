@@ -35,7 +35,7 @@
  * two components; then we multiply these two vectors by U(x,mu) and
  * store the result in p.c[0], p.c[1]; when computing the trace we can factorize p.c[0] and p.c[1]
  * as they both multiply two components of chi1^+; we store these factors in p.c[2] and p.c[3].
- * the tensor product is performed by the macro 
+ * the tensor product is performed by the macro
  * _suNf_FMAT(u,p): u = p.c[0] # p.c[2]^+ + p.c[1] # p.c[3]^+
  */
 

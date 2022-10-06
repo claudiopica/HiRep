@@ -139,7 +139,7 @@ void QpQm_tm(spinor_field *out, spinor_field *in){
 void Qtm_p_alt(spinor_field *out, spinor_field *in){
 #ifdef UPDATE_EO
   double complex imu;
-  imu=I*static_mu; 	
+  imu=I*static_mu;
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
 	g5Cphi_eopre(static_mass,out,in);
 #else
@@ -229,6 +229,3 @@ void tm_invert_alt(spinor_field* out, spinor_field *in, mshift_par* mpar){
   cg_mshift(mpar,QpQm_tm_alt,in,tmp);
   Qtm_m_alt(out,tmp);
 }
-
-
-

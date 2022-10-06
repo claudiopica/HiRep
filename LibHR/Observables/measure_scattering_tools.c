@@ -50,7 +50,7 @@ int **getmomlist(char *momstring, int *N)
 	return plist;
 }
 
-/** 
+/**
  * @brief Frees the 2D array of momenta allocated by getmomlist.
  * @param p array of momenta
  * @param N number of momenta
@@ -66,7 +66,7 @@ void freep(int **p, int N)
 }
 //#endif
 
-/** 
+/**
  * @brief Function for initiating meson observable (used to store the correlation function)
  * @param mo meson_observable to initialise.
  * @param name name of the channel (e.g. "pi").
@@ -789,7 +789,7 @@ void io4pt(meson_observable *mo, int pmax, int sourceno, char *path, char *name,
  * @brief "Old style" IO where each correlation function is saved to separate file. Prints zero-momentum only.
  * @param molist an array of mo_0 objects, where each index corresponds to a different noise source
  * @param numsources number of noise sources
- * @param path path to which the file should be saved 
+ * @param path path to which the file should be saved
  * @param cnfg_filename name of the configuration
  * @see IO_json_0
  */
@@ -813,7 +813,7 @@ void IOold_0(struct mo_0 *molist[], int numsources, char *path, char *cnfg_filen
  * @brief "Old style" IO where each correlation function is saved to separate file. Prints momentum p contractions.
  * @param molist an array of mo_p objects, where each index corresponds to a different noise source
  * @param numsources number of noise sources
- * @param path path to which the file should be saved 
+ * @param path path to which the file should be saved
  * @param cnfg_filename name of the configuration
  *
  * @see IO_json_p
@@ -950,8 +950,8 @@ void IOold_p(struct mo_p *molist[], int numsources, char *path, char *cnfg_filen
  * @brief Prints a bundle of meson_observables with momentum 0 to a json file.
  * @param molist an array of mo_0 objects, where each index corresponds to a different noise source
  * @param numsources number of noise sources
- * @param path path to which the file should be saved 
- * @param cnfg_filename name of the configuration 
+ * @param path path to which the file should be saved
+ * @param cnfg_filename name of the configuration
  */
 void IO_json_0(struct mo_0 *molist[], int numsources, char *path, char *cnfg_filename)
 {
@@ -988,8 +988,8 @@ void IO_json_0(struct mo_0 *molist[], int numsources, char *path, char *cnfg_fil
  * @brief Prints a bundle of meson_observables with momentum p to a json file.
  * @param molist an array of mo_p objects, where each index corresponds to a different noise source
  * @param numsources number of noise sources
- * @param path path to which the file should be saved 
- * @param cnfg_filename name of the configuration 
+ * @param path path to which the file should be saved
+ * @param cnfg_filename name of the configuration
  */
 void IO_json_p(struct mo_p *molist[], int numsources, char *path, char *cnfg_filename)
 {

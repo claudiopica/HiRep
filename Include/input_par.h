@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 
@@ -31,7 +31,7 @@ typedef struct _input_glb {
 
   /* for the reading function */
   input_record_t read[10];
-  
+
 } input_glb;
 
 #define init_input_glb(varname) \
@@ -52,15 +52,15 @@ typedef struct _input_glb {
 
 /* Global or common variables */
 typedef struct _input_rlx {
-    
+
     /* random numbers */
     int rlxd_level, rlxd_seed;
     char rlxd_state[256];
     char rlxd_start[256];
-    
+
     /* for the reading function */
     input_record_t read[5];
-    
+
 } input_rlx;
 
 #define init_input_rlx(varname) \
@@ -87,7 +87,7 @@ typedef struct _input_logger {
   int forcestat_log_lvl;
   /* for the reading function */
   input_record_t read[4];
-  
+
 } input_logger;
 
 #define init_input_logger(varname) \

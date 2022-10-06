@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 #include <stdio.h>
@@ -11,7 +11,7 @@
 #include "logger.h"
 #include "global.h"
 
-/* 
+/*
  * ***********************************************
  * Simple output logging facility
  * ***********************************************
@@ -60,7 +60,7 @@ static void cleanup() {
 		free(tmp);
 	}
 	files=0;
-	
+
 	/* now free map list */
 	curr=filemap;
 	while(curr!=0) {
@@ -180,7 +180,7 @@ static void delrecord(record **list, record *rd) {
 		pcur=cur;
 		cur=cur->next;
 	} while(cur!=0);
-		
+
 	assert(0); /* this means the the record wasn't in the list */
 
 }
@@ -210,7 +210,7 @@ static void dellrecord(lrecord **list, lrecord *rd) {
 		pcur=cur;
 		cur=cur->next;
 	} while(cur!=0);
-		
+
 	assert(0); /* this means the the record wasn't in the list */
 
 }
@@ -343,7 +343,7 @@ void logger_setlevel(char *name, int v){
 void logger_set_input(input_logger *logger){
   if(logger->def_log_lvl==-1)
     logger->def_log_lvl=10;
-  
+
   logger_setlevel(0,logger->def_log_lvl);
 
 
@@ -383,11 +383,11 @@ void logger_rmlevel(char *name){
 		return; /* nothing to do */
 
 	rd=lfindname(levels,name);
-	if(rd==0) 
+	if(rd==0)
 		return; /* no record found: already at defaut level */
 
 	dellrecord(&levels,rd);
-	
+
 }
 
 int logger_stdout(char *filename) {
@@ -408,7 +408,7 @@ int logger_stdout(char *filename) {
 		/* reset default_out to zero */
 		return 0;
 	}
-	
+
 	/* if filename start with >> open the file in open mode */
 	if(filename[0]=='>'){
 		++filename;
@@ -460,7 +460,7 @@ static int mycpytonl(char **dst, char **src){
 		if(*((*src)++)=='\n') {
 			if(**src=='\0')
 				return 0;
-			else 
+			else
 				return 1;
 		}
 	}
@@ -482,7 +482,7 @@ int lprintf(char *name, int level, char *format, ...) {
 	static record *lastrec=0;
 	static char lastname[512]={0};
 	static FILE *lastfd=0;
-	static char buf[4096]; 
+	static char buf[4096];
 	static char alevel[16];
 	char *cur=&buf[0];
 	int ret;
@@ -541,8 +541,5 @@ int lprintf(char *name, int level, char *format, ...) {
 	va_end(args);
 
 	return ret;
-	
+
 }
-
-
-

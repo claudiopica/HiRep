@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 /*******************************************************************************
@@ -8,9 +8,9 @@
 * Diagonalization of a square matrix using the Jacobi method
 *
 * See chapter 11 in
-* 
+*
 *   W.H. Press, S.A. Teukolsky, W.T. Vetterling and B.P. Flannery,
-*   Numerical Recipes in FORTRAN, 2nd Edition 
+*   Numerical Recipes in FORTRAN, 2nd Edition
 *   (Cambridge University Press, Cambridge, 1992)
 *
 * for a description of the algorithm in the real case
@@ -24,7 +24,7 @@
 *     Computes the eigenvalues and eigenvectors of a complex hermitian matrix
 *
 * In both cases the matrix elements are assumed to be given by a[n*i+j],
-* where the indices i and j range from 0 to n-1. On output the eigenvalues 
+* where the indices i and j range from 0 to n-1. On output the eigenvalues
 * and the associated orthonormal eigenvectors are d[j] and v[n*i+j] such
 * that sum_k a[n*i+k]*v[n*k+j]=d[j]*v[n*i+j]. The eigenvalues are sorted
 * in ascending order
@@ -302,7 +302,7 @@ void jacobi2(int n, double complex a[], double d[], double complex v[])
 			v[n * l + k] = zd0;
 
 			a[n * k + l] = conj(a[n * l + k]);
-			
+
 			abs_sum += (fabs(creal(a[n * k + l]) + fabs(cimag(a[n * k + l]))));
 		}
 	}

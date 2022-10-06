@@ -1,6 +1,6 @@
 /***************************************************************************\
- * Copyright (c) 2008, Claudio Pica                                          *   
- * All rights reserved.                                                      * 
+ * Copyright (c) 2008, Claudio Pica                                          *
+ * All rights reserved.                                                      *
  \***************************************************************************/
 
 /*******************************************************************************
@@ -32,7 +32,7 @@
 #  define MPIRET(type)
 #endif
 
-void write_spinor_field(char filename[],spinor_field* sp) 
+void write_spinor_field(char filename[],spinor_field* sp)
 {
   FILE *fp=NULL;
   int g[4], p[4];
@@ -105,8 +105,8 @@ void write_spinor_field(char filename[],spinor_field* sp)
             }
           }
 #ifdef WITH_MPI
-          MPI_Barrier(GLB_COMM); 
-          if (pid!=0) { /* do send/receive only if the data is not on PID 0 */ 
+          MPI_Barrier(GLB_COMM);
+          if (pid!=0) { /* do send/receive only if the data is not on PID 0 */
             /* send buffer */
             if (pid==PID) {
 #ifndef NDEBUG
@@ -156,7 +156,7 @@ void write_spinor_field(char filename[],spinor_field* sp)
     }
   } /* end loop over T, X and Y direction */
 
-  if (PID==0) fclose(fp); 
+  if (PID==0) fclose(fp);
   free(buff);
 
   gettimeofday(&end,0);
@@ -166,7 +166,7 @@ void write_spinor_field(char filename[],spinor_field* sp)
 }
 
 
-void read_spinor_field(char filename[], spinor_field *sp) 
+void read_spinor_field(char filename[], spinor_field *sp)
 {
   FILE *fp=NULL;
   int g[4], p[4];
@@ -240,7 +240,7 @@ void read_spinor_field(char filename[], spinor_field *sp)
 
 #ifdef WITH_MPI
           /* MPI_Barrier(GLB_COMM); */
-          if (pid!=0) { /* do send/receive only if the data is not on PID 0 */ 
+          if (pid!=0) { /* do send/receive only if the data is not on PID 0 */
             /* send buffer */
             if (PID==0) {
               MPIRET(mpiret) MPI_Send(buff, bsize, MPI_DOUBLE, pid, 999, GLB_COMM);
@@ -304,7 +304,7 @@ void read_spinor_field(char filename[], spinor_field *sp)
     }
   } /* end loop over T, X and Y direction */
 
-  if (PID==0) fclose(fp); 
+  if (PID==0) fclose(fp);
   free(buff);
 
   /* check sq. norm */
@@ -322,5 +322,3 @@ void read_spinor_field(char filename[], spinor_field *sp)
   lprintf("IO",0,"Pseudofermion [%s] read [%ld sec %ld usec] Sq. norm=%e\n",filename,etime.tv_sec,etime.tv_usec,testnorm2);
 
 }
-
-

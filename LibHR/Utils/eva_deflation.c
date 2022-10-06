@@ -29,8 +29,8 @@ static int alloc_loc_mem(unsigned int nevt, geometry_descriptor *type) {
     atexit(&free_loc_mem);
     init=0;
   }
-  
-  if (nevt<1) { return 1; } 
+
+  if (nevt<1) { return 1; }
   if (nevt!=oldnevt || type!=oldtype) {
     free_loc_mem();
     if (ev==NULL) {
@@ -120,9 +120,9 @@ void set_def_matrix(eva_prec *e_par, spinor_operator H, geometry_descriptor *typ
   H_loc=H;
 
   changed=alloc_loc_mem(e_par->nevt, type);
-  if (changed) 
+  if (changed)
     find_low_eig_H2(e_par,type,0);
-  else 
+  else
     find_low_eig_H2(e_par,type,2);
 
   /*check_ortho(ev,e_par->nev);*/
@@ -150,13 +150,3 @@ void eva_def_inv(spinor_field *out, spinor_field *in, double m){
     spinor_field_mulc_add_assign_f(out,p,&ev[i]);
   }
 }
-
-
-
-
-
-
-
-
-
-

@@ -1,6 +1,6 @@
 /***************************************************************************\
- * Copyright (c) 2008, Claudio Pica                                          *   
- * All rights reserved.                                                      * 
+ * Copyright (c) 2008, Claudio Pica                                          *
+ * All rights reserved.                                                      *
  \***************************************************************************/
 
 #include "global.h"
@@ -31,21 +31,21 @@ void global_sum(double *d, int n) {
 #ifdef WITH_MPI
   int mpiret;(void)mpiret; // Remove warning of variable set but not used
   double pres[n];
-  
+
 #ifdef MPI_TIMING
   struct timeval start, end, etime;
-  gettimeofday(&start,0);  
+  gettimeofday(&start,0);
 #endif
-  
+
   mpiret=MPI_Allreduce(d,pres,n,MPI_DOUBLE,MPI_SUM,GLB_COMM);
-  
-    
+
+
 #ifdef MPI_TIMING
   gettimeofday(&end,0);
   timeval_subtract(&etime,&end,&start);
   lprintf("MPI TIMING",0,"global_sum " __FILE__ " %ld sec %ld usec\n",etime.tv_sec,etime.tv_usec);
 #endif
-  
+
 #ifndef NDEBUG
   if (mpiret != MPI_SUCCESS) {
     char mesg[MPI_MAX_ERROR_STRING];
@@ -55,9 +55,9 @@ void global_sum(double *d, int n) {
     error(1,1,"global_sum " __FILE__,"Cannot perform global_sum");
   }
 #endif
-  while(n>0) { 
+  while(n>0) {
     --n;
-    d[n]=pres[n];	
+    d[n]=pres[n];
   }
 #else
   /* for non mpi do nothing */
@@ -74,12 +74,12 @@ void global_sum_int(int *d, int n) {
 
 #ifdef MPI_TIMING
   struct timeval start, end, etime;
-  gettimeofday(&start,0);  
+  gettimeofday(&start,0);
 #endif
-  
+
   mpiret=MPI_Allreduce(d,pres,n,MPI_INT,MPI_SUM,GLB_COMM);
 
-  
+
 #ifdef MPI_TIMING
   gettimeofday(&end,0);
   timeval_subtract(&etime,&end,&start);
@@ -95,9 +95,9 @@ void global_sum_int(int *d, int n) {
     error(1,1,"global_sum_int " __FILE__,"Cannot perform global_sum");
   }
 #endif
-  while(n>0) { 
+  while(n>0) {
     --n;
-    d[n]=pres[n];	
+    d[n]=pres[n];
   }
 #else
   /* for non mpi do nothing */
@@ -114,12 +114,12 @@ void global_max(double *d, int n) {
 
 #ifdef MPI_TIMING
   struct timeval start, end, etime;
-  gettimeofday(&start,0);  
+  gettimeofday(&start,0);
 #endif
-  
+
   mpiret=MPI_Allreduce(d,pres,n,MPI_DOUBLE,MPI_MAX,GLB_COMM);
 
-  
+
 #ifdef MPI_TIMING
   gettimeofday(&end,0);
   timeval_subtract(&etime,&end,&start);
@@ -135,9 +135,9 @@ void global_max(double *d, int n) {
     error(1,1,"global_max " __FILE__,"Cannot perform global_sum");
   }
 #endif
-  while(n>0) { 
+  while(n>0) {
     --n;
-    d[n]=pres[n];	
+    d[n]=pres[n];
   }
 #else
   /* for non mpi do nothing */
@@ -152,12 +152,12 @@ void global_min(double *d, int n) {
 
 #ifdef MPI_TIMING
   struct timeval start, end, etime;
-  gettimeofday(&start,0);  
+  gettimeofday(&start,0);
 #endif
-  
+
   mpiret=MPI_Allreduce(d,pres,n,MPI_DOUBLE,MPI_MIN,GLB_COMM);
 
-  
+
 #ifdef MPI_TIMING
   gettimeofday(&end,0);
   timeval_subtract(&etime,&end,&start);
@@ -173,9 +173,9 @@ void global_min(double *d, int n) {
     error(1,1,"global_min " __FILE__,"Cannot perform global_sum");
   }
 #endif
-  while(n>0) { 
+  while(n>0) {
     --n;
-    d[n]=pres[n];	
+    d[n]=pres[n];
   }
 #else
   /* for non mpi do nothing */
@@ -190,7 +190,7 @@ void bcast(double *d, int n) {
 
 #ifdef MPI_TIMING
   struct timeval start, end, etime;
-  gettimeofday(&start,0);  
+  gettimeofday(&start,0);
 #endif
 
   mpiret=MPI_Bcast(d, n, MPI_DOUBLE, 0,GLB_COMM);
@@ -224,7 +224,7 @@ void bcast_int(int *i, int n) {
 
 #ifdef MPI_TIMING
   struct timeval start, end, etime;
-  gettimeofday(&start,0);  
+  gettimeofday(&start,0);
 #endif
 
   mpiret=MPI_Bcast(i, n, MPI_INT, 0,GLB_COMM);
@@ -261,7 +261,7 @@ static void sync_gauge_field(suNg_field *gf) {
   for(i=0; i<gd->ncopies_gauge; ++i) {
     /* this assumes that the 4 directions are contiguous in memory !!! */
     memcpy(((gf->ptr)+4*gd->copy_to[i]),((gf->ptr)+4*gd->copy_from[i]),4*(gd->copy_len[i])*sizeof(*(gf->ptr)));
-    /*   
+    /*
          for(j=0; j<gd->copy_len[i]; j++) {
          x=gd->copy_from[i]+j;
          y=gd->copy_to[i]+j;
@@ -280,7 +280,7 @@ static void sync_clover_force_field(suNf_field *gf) {
   for(i=0; i<gd->ncopies_gauge; ++i) {
     /* this assumes that the 6 directions are contiguous in memory !!! */
     memcpy(((gf->ptr)+6*gd->copy_to[i]),((gf->ptr)+6*gd->copy_from[i]),6*(gd->copy_len[i])*sizeof(*(gf->ptr)));
-    /*   
+    /*
          for(j=0; j<gd->copy_len[i]; j++) {
          x=gd->copy_from[i]+j;
          y=gd->copy_to[i]+j;
@@ -321,7 +321,7 @@ static void sync_suNg_scalar_field(suNg_scalar_field *p) {
 	int i;
 	/* int j, x, y; */
 	geometry_descriptor *gd = p->type;
-	
+
 	for(i=0; i<gd->ncopies_spinor; ++i) {
 		memcpy((p->ptr+gd->copy_to[i]-gd->master_shift),(p->ptr+gd->copy_from[i]-gd->master_shift),(gd->copy_len[i])*sizeof(*(p->ptr)));
 		/*
@@ -339,7 +339,7 @@ static void sync_suNg_scalar_field(suNg_scalar_field *p) {
  * Values:
  * 0 => No communications pending
  *
- */ 
+ */
 /* static unsigned int comm_status=0; */
 
 void complete_clover_force_sendrecv(suNf_field *gf) {
@@ -362,9 +362,9 @@ void complete_clover_force_sendrecv(suNf_field *gf) {
         if (status[k].MPI_ERROR != MPI_SUCCESS) {
           MPI_Error_string(status[k].MPI_ERROR,mesg,&mesglen);
           lprintf("MPI",0,"Req [%d] Source [%d] Tag [%] ERROR: %s\n",
-              k, 
-              status[k].MPI_SOURCE, 
-              status[k].MPI_TAG, 
+              k,
+              status[k].MPI_SOURCE,
+              status[k].MPI_TAG,
               mesg);
         }
       }
@@ -401,7 +401,7 @@ void start_clover_force_sendrecv(suNf_field *gf) {
 
 #ifdef MPI_TIMING
   error(gf_control>0,1,"start_clover_force_sendrecv " __FILE__,"Multiple send without receive");
-  gettimeofday(&gfstart,0);  
+  gettimeofday(&gfstart,0);
   gf_control=1;
 #endif
 
@@ -470,9 +470,9 @@ void complete_gf_sendrecv(suNg_field *gf) {
         if (status[k].MPI_ERROR != MPI_SUCCESS) {
           MPI_Error_string(status[k].MPI_ERROR,mesg,&mesglen);
           lprintf("MPI",0,"Req [%d] Source [%d] Tag [%] ERROR: %s\n",
-              k, 
-              status[k].MPI_SOURCE, 
-              status[k].MPI_TAG, 
+              k,
+              status[k].MPI_SOURCE,
+              status[k].MPI_TAG,
               mesg);
         }
       }
@@ -509,7 +509,7 @@ void start_gf_sendrecv(suNg_field *gf) {
 
 #ifdef MPI_TIMING
   error(gf_control>0,1,"start_gf_sendrecv " __FILE__,"Multiple send without receive");
-  gettimeofday(&gfstart,0);  
+  gettimeofday(&gfstart,0);
   gf_control=1;
 #endif
 
@@ -576,9 +576,9 @@ void complete_sf_sendrecv(spinor_field *sf) {
         if (status[k].MPI_ERROR != MPI_SUCCESS) {
           MPI_Error_string(status[k].MPI_ERROR,mesg,&mesglen);
           lprintf("MPI",0,"Req [%d] Source [%d] Tag [%d] ERROR: %s\n",
-              k, 
-              status[k].MPI_SOURCE, 
-              status[k].MPI_TAG, 
+              k,
+              status[k].MPI_SOURCE,
+              status[k].MPI_TAG,
               mesg);
         }
       }
@@ -615,7 +615,7 @@ void start_sf_sendrecv(spinor_field *sf) {
   sync_spinor_field(sf);
 #ifdef MPI_TIMING
   error(sf_control>0,1,"start_sf_sendrecv " __FILE__,"Multiple send without receive");
-  gettimeofday(&sfstart,0);  
+  gettimeofday(&sfstart,0);
   sf_control=1;
 #endif
 
@@ -683,9 +683,9 @@ void complete_gt_sendrecv(suNg_field *gf) {
         if (status[k].MPI_ERROR != MPI_SUCCESS) {
           MPI_Error_string(status[k].MPI_ERROR,mesg,&mesglen);
           lprintf("MPI",0,"Req [%d] Source [%d] Tag [%] ERROR: %s\n",
-              k, 
-              status[k].MPI_SOURCE, 
-              status[k].MPI_TAG, 
+              k,
+              status[k].MPI_SOURCE,
+              status[k].MPI_TAG,
               mesg);
         }
       }
@@ -699,7 +699,7 @@ void complete_gt_sendrecv(suNg_field *gf) {
 
 void start_gt_sendrecv(suNg_field *gf) {
 #ifdef WITH_MPI
-  int i, mpiret; 
+  int i, mpiret;
   (void)mpiret; // Remove warning of variable set but not used
   geometry_descriptor *gd=gf->type;
 
@@ -775,9 +775,9 @@ void complete_sc_sendrecv(suNg_scalar_field *sf) {
         if (status[k].MPI_ERROR != MPI_SUCCESS) {
           MPI_Error_string(status[k].MPI_ERROR,mesg,&mesglen);
           lprintf("MPI",0,"Req [%d] Source [%d] Tag [%] ERROR: %s\n",
-              k, 
-              status[k].MPI_SOURCE, 
-              status[k].MPI_TAG, 
+              k,
+              status[k].MPI_SOURCE,
+              status[k].MPI_TAG,
               mesg);
         }
       }
@@ -814,7 +814,7 @@ void start_sc_sendrecv(suNg_scalar_field *sf) {
   sync_suNg_scalar_field(sf);
 #ifdef MPI_TIMING
   error(sf_control>0,1,"start_sc_sendrecv " __FILE__,"Multiple send without receive");
-  gettimeofday(&sfstart,0);  
+  gettimeofday(&sfstart,0);
   sf_control=1;
 #endif
 

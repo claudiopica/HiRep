@@ -64,19 +64,19 @@ void force_hmc_tm(double dt, void *vpar)
 #ifndef UPDATE_EO
 	error(1, 1, "FORCE_HMC_TM", "Use only with even odd preconditioned case\n");
 #endif
-	
+
 	init_force_hmc_tm();
 	fermion_force_begin();
 	spinor_field Xo, Yo;
-	
+
 	Yo = *Ys;
 	Yo.type = &glat_odd;
 	Yo.ptr += glat_odd.master_shift;
-	
+
 	Xo = *Xs;
 	Xo.type = &glat_odd;
 	Xo.ptr += glat_odd.master_shift;
-	
+
 	int n_iters = 0;
 	force_hmc_par *par = (force_hmc_par*)vpar;
 	suNg_av_field *force = *par->momenta;
@@ -91,7 +91,7 @@ void force_hmc_tm(double dt, void *vpar)
 	mpar.n = 1;
 	mpar.shift = &tmp;
 	mpar.shift[0] = 0;
-	
+
 	if(par->hasenbusch == 0) // 1/(Q^2+mu^2)
 	{
 		/* Ye = (\hat{Q}_+ \hat{Q}_-)^(-1)\phi */
@@ -151,4 +151,3 @@ void force_hmc_tm(double dt, void *vpar)
 
 	fermion_force_end(dt, force);
 }
-

@@ -40,7 +40,7 @@ wilson_lines *polyleg(int ix, int d);
 
 void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, double complex *gb_storage);
 void collect_1pt_torellon_functions(cor_list *lcor, double complex *tor_storage, double complex ** polyf);
-    
+
 
 #define total_n_glue_op 15
 #define total_n_tor_op 8

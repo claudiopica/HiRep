@@ -72,7 +72,7 @@ struct _monomial* ff_create(const monomial_data *data)
 {
 	monomial *m = malloc(sizeof(*m));
 	mon_ff_par *par = (mon_ff_par*)(data->par);
- 
+
 	// Copy data structure
 	m->data = *data;
 	four_fermion_active = 1;

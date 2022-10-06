@@ -123,7 +123,7 @@ static void measure_mesons_disconnected_core(spinor_field* psi0, spinor_field* p
 
 	  for (t=0; t<T; t++) {
 	    tc = (zerocoord[0]+t+GLB_T )%GLB_T+offset;
-	    for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) { 
+	    for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++) {
 		  ix=ipt(t,x,y,z);
 		  sma=*_FIELD_AT(psi0,ix);
         sm_src=*_FIELD_AT(eta,ix);
@@ -137,7 +137,7 @@ static void measure_mesons_disconnected_core(spinor_field* psi0, spinor_field* p
 		  }
             }
 	  }
-      
+
   lprintf("measure_mesons_core",50,"Measuring DONE! ");
 }
 
@@ -155,7 +155,7 @@ static void init_corrs(int nm, int n_mom, meson_observable* mo){
       free(motmp->corr_re);
       free(motmp->corr_im);
       motmp->corr_re=malloc(sizeof(double)*size);
-      motmp->corr_im=malloc(sizeof(double)*size);    
+      motmp->corr_im=malloc(sizeof(double)*size);
       motmp->corr_size=size;
       for(i=0; i<motmp->corr_size; i++){
 	motmp->corr_re[i] = 0.;
@@ -172,5 +172,3 @@ void measure_mesons_disconnected(meson_observable* mo,spinor_field* psi0, spinor
   lprintf("measure_mesons",50,"measure default mesons");
   measure_mesons_disconnected_core(psi0, psi0, eta, mo, 0,GLB_T);
 }
-
-

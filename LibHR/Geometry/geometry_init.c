@@ -1,6 +1,6 @@
 /***************************************************************************\
- * Copyright (c) 2008, Claudio Pica                                          *   
- * All rights reserved.                                                      * 
+ * Copyright (c) 2008, Claudio Pica                                          *
+ * All rights reserved.                                                      *
  \***************************************************************************/
 
 /*******************************************************************************
@@ -50,7 +50,7 @@ static void check_geometry_variables() {
   error(NP_X<=0,1,"check_geometry_variables " __FILE__,"NP_X <= 0");
   error(NP_Y<=0,1,"check_geometry_variables " __FILE__,"NP_Y <= 0");
   error(NP_Z<=0,1,"check_geometry_variables " __FILE__,"NP_Z <= 0");
-  
+
   error(T_BORDER<0,1,"check_geometry_variables " __FILE__,"T_BORDER < 0");
   error(X_BORDER<0,1,"check_geometry_variables " __FILE__,"X_BORDER < 0");
   error(Y_BORDER<0,1,"check_geometry_variables " __FILE__,"Y_BORDER < 0");
@@ -63,63 +63,63 @@ static void check_geometry_variables() {
 
   error(WORLD_SIZE<=0,1,"check_geometry_variables " __FILE__,"WORLD_SIZE < 0");
   error(CART_SIZE<=0,1,"check_geometry_variables " __FILE__,"CART_SIZE < 0");
-  
+
   error(
       (((VOLUME/T)/X)/Y)/Z!=1 || VOLUME%T!=0 || (VOLUME/T)%X!=0 || ((VOLUME/T)/X)%Y!=0 || (((VOLUME/T)/X)/Y)%Z!=0 || VOLUME <= 0,
       1,"check_geometry_variables " __FILE__,"(long) T*X*Y*Z overflows"
     );
-  
+
   error(
       ((VOL3/X)/Y)/Z!=1 || VOL3%X!=0 || (VOL3/X)%Y!=0 || ((VOL3/X)/Y)%Z!=0 || VOL3 <= 0,
       1,"check_geometry_variables " __FILE__,"(long) T*X*Y*Z overflows"
     );
-  
+
   error(
       (((GLB_VOLUME/GLB_T)/GLB_X)/GLB_Y)/GLB_Z!=1 || GLB_VOLUME%GLB_T!=0 || (GLB_VOLUME/GLB_T)%GLB_X!=0 || ((GLB_VOLUME/GLB_T)/GLB_X)%GLB_Y!=0 || (((GLB_VOLUME/GLB_T)/GLB_X)/GLB_Y)%GLB_Z!=0 || GLB_VOLUME <= 0,
       1,"check_geometry_variables " __FILE__,"(long) GLB_T*GLB_X*GLB_Y*GLB_Z overflows"
     );
-  
+
   error(
       ((GLB_VOL3/GLB_X)/GLB_Y)/GLB_Z!=1 || GLB_VOL3%GLB_X!=0 || (GLB_VOL3/GLB_X)%GLB_Y!=0 || ((GLB_VOL3/GLB_X)/GLB_Y)%GLB_Z!=0 || GLB_VOL3 <= 0,
       1,"check_geometry_variables " __FILE__,"(long) GLB_X*GLB_Y*GLB_Z overflows"
     );
-  
+
   ltmp = 24*NG*GLB_VOLUME;
   error(ltmp/(24*NG)!=GLB_VOLUME || ltmp%(24*NG)!=0,
       1,"check_geometry_variables " __FILE__,"(long) 24*NG*GLB_VOLUME overflows (used in Update/staples.c)"
     );
 
-  
+
   tmp = GLB_X*GLB_Y*GLB_Z;
   if((long int)tmp!=GLB_VOL3) {
     lprintf("WARNING",0,"(int) GLB_X*GLB_Y*GLB_Z overflows\n");
   }
-  
+
   tmp = GLB_T*GLB_X*GLB_Y*GLB_Z;
   if((long int)tmp!=GLB_VOLUME) {
     lprintf("WARNING",0,"(int) GLB_T*GLB_X*GLB_Y*GLB_Z overflows\n");
   }
-  
+
   tmp = X*Y*Z;
   if((long int)tmp!=VOL3) {
     lprintf("WARNING",0,"(int) X*Y*Z overflows\n");
   }
-  
+
   tmp = T*X*Y*Z;
   if((long int)tmp!=VOLUME) {
     lprintf("WARNING",0,"(int) T*X*Y*Z overflows\n");
   }
-  
+
   tmp = GLB_VOL3*GLB_VOL3;
   if(tmp/GLB_VOL3!=GLB_VOL3 || tmp%GLB_VOL3!=0) {
     lprintf("WARNING",0,"(int) GLB_VOL3*GLB_VOL3 overflows\n");
   }
-  
+
   tmp = T_EXT*X_EXT*Y_EXT*Z_EXT;
   if((((tmp/T_EXT)/X_EXT)/Y_EXT)/Z_EXT!=1 || tmp%T_EXT!=0 || (tmp/T_EXT)%X_EXT!=0 || ((tmp/T_EXT)/X_EXT)%Y_EXT!=0 || (((tmp/T_EXT)/X_EXT)/Y_EXT)%Z_EXT!=0 || tmp <= 0) {
     lprintf("WARNING",0,"(int) T_EXT*X_EXT*Y_EXT*Z_EXT overflows\n");
   }
-  
+
   tmp = 24*NG*GLB_VOLUME;
   if(tmp/(24*NG)!=GLB_VOLUME || tmp%(24*NG)!=0) {
     lprintf("WARNING",0,"(int) 24*NG*GLB_VOLUME overflows\n");
@@ -134,8 +134,8 @@ static void check_geometry_variables() {
 }
 
 
-/* compute the size of the local lattice in the given direction given 
- * the cartesian coordinate of the node, global lattice size and the 
+/* compute the size of the local lattice in the given direction given
+ * the cartesian coordinate of the node, global lattice size and the
  * number of processes on that coordinate */
 /* can return 0 if the npx is too big for the requested lattice */
 static int compute_dim(int cx, int glb_x, int npx) {
@@ -144,7 +144,7 @@ static int compute_dim(int cx, int glb_x, int npx) {
 
   /* do some sanity checks... */
   /* require a minimum size of 2*BORDERSIZE sites on all nodes */
-  if (n<=(2*BORDERSIZE) && npx>1) { 
+  if (n<=(2*BORDERSIZE) && npx>1) {
     error(1,1,"compute_dim " __FILE__,"The local lattice size is too small!!!");
   }
 
@@ -202,15 +202,15 @@ static void compute_psign() {
 #endif
 
 
-/* given the global coordinate of a site, this function returns the cartesian coordinates 
+/* given the global coordinate of a site, this function returns the cartesian coordinates
  * of the process on which the site is
  */
 void glb_to_proc(int *g, int *p) {
   int d,r,c;
 
   /* sanity checks */
-  if (!((g[0]<GLB_T)&&(g[1]<GLB_X)&&(g[2]<GLB_Y)&&(g[3]<GLB_Z))  
-      || ((g[0]<0)||(g[1]<0)||(g[2]<0)||(g[3]<0))) { 
+  if (!((g[0]<GLB_T)&&(g[1]<GLB_X)&&(g[2]<GLB_Y)&&(g[3]<GLB_Z))
+      || ((g[0]<0)||(g[1]<0)||(g[2]<0)||(g[3]<0))) {
     error(1,1,"glb_to_proc " __FILE__,"The global coordinates are invalid!!!");
   }
 
@@ -228,7 +228,7 @@ void glb_to_proc(int *g, int *p) {
 /* this function set up the cartesian communicator */
 /* return codes:
  * 0 => success
- * 1 => there is nothing to be done on this process node. 
+ * 1 => there is nothing to be done on this process node.
  *      The caller should wait for other processes to finish.
  * 2 => error during inizialization
  *
@@ -306,28 +306,28 @@ int geometry_init() {
 
   VOL3=((long int)X)*((long int)Y)*((long int)Z);
   VOLUME=VOL3*((long int)T);
-  
+
   X_BORDER=(NP_X>1)?BORDERSIZE:0;
 	Y_BORDER=(NP_Y>1)?BORDERSIZE:0;
 	Z_BORDER=(NP_Z>1)?BORDERSIZE:0;
 	T_BORDER=(NP_T>1)?BORDERSIZE:0;
-	
+
   X_EXT=X+2*X_BORDER;
   Y_EXT=Y+2*Y_BORDER;
   Z_EXT=Z+2*Z_BORDER;
   T_EXT=T+2*T_BORDER;
-  
+
   lprintf("GEOMETRY_INIT",0,"Global size is %dx%dx%dx%d\n",GLB_T,GLB_X,GLB_Y,GLB_Z);
   lprintf("GEOMETRY_INIT",0,"Local size is %dx%dx%dx%d\n",T,X,Y,Z);
   lprintf("GEOMETRY_INIT",0,"Extended local size is %dx%dx%dx%d\n",T_EXT,X_EXT,Y_EXT,Z_EXT);
   lprintf("GEOMETRY_INIT",0,"The lattice borders are (%d,%d,%d,%d)\n",T_BORDER,X_BORDER,Y_BORDER,Z_BORDER);
   lprintf("GEOMETRY_INIT",0,"Size of the bulk subblocking (%d,%d,%d,%d)\n",PB_T,PB_X,PB_Y,PB_Z);
-  
+
   check_geometry_variables();
-  
+
 
   /*Set the global coordinate of the local {0,0,0,0} point*/
-  origin_coord(zerocoord); 
+  origin_coord(zerocoord);
 
 
   /*Set the communication buffers and structure of the geometry identificator */
@@ -354,7 +354,7 @@ void geometry_mem_alloc() {
 	"Cannot allocate memory");
 
     cur=alloc_mem;
-#define ALLOC(ptr,size) ptr=cur; cur+=(size) 
+#define ALLOC(ptr,size) ptr=cur; cur+=(size)
 
     /* iup and idn */
     ALLOC(iup,4*VOL_SIZE);
@@ -374,16 +374,16 @@ void geometry_mem_alloc() {
 }
 
 
-int proc_up(int id, int dir) 
+int proc_up(int id, int dir)
 {
 #ifdef WITH_MPI
   int coords[4];
 	int outid;
-	
+
 	MPI_Cart_coords(cart_comm, id, 4, coords);
 	++coords[dir];
 	MPI_Cart_rank(cart_comm, coords, &outid);
-  
+
 	return outid;
 #else
 	return 0;
@@ -395,11 +395,11 @@ int proc_dn(int id, int dir)
 #ifdef WITH_MPI
   int coords[4];
 	int outid;
-	
+
 	MPI_Cart_coords(cart_comm, id, 4, coords);
 	--coords[dir];
 	MPI_Cart_rank(cart_comm, coords, &outid);
-  
+
 	return outid;
 #else
 	return 0;

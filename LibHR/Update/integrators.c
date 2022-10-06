@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Agostino Patella, Claudio Pica, Ari Hietanen          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Agostino Patella, Claudio Pica, Ari Hietanen          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 #include "global.h"
@@ -44,7 +44,7 @@ void leapfrog_multistep(double tlen, integrator_par *par)
 
 	lprintf("MD_INT", level, "Starting new MD trajectory with Leapfrog\n");
 	lprintf("MD_INT", level, "MD parameters: level=%d tlen=%1.6f nsteps=%d => dt=%1.6f\n", par->level, tlen, par->nsteps, dt);
-	
+
 	for(int n = 0; n < par->nsteps; n++)
 	{
 		if(n == 0)
@@ -74,7 +74,7 @@ void O2MN_multistep(double tlen, integrator_par *par)
 
 	lprintf("MD_INT", level, "Starting new MD trajectory with O2MN_multistep\n");
 	lprintf("MD_INT", level, "MD parameters: level=%d tlen=%1.6f nsteps=%d => dt=%1.6f\n", par->level, tlen, par->nsteps, dt);
- 
+
 	for(int n = 0; n < par->nsteps; n++)
 	{
 		if(n == 0)
@@ -93,7 +93,7 @@ void O2MN_multistep(double tlen, integrator_par *par)
 }
 
 /* 4th order  I.P. Omelyan, I.M. Mryglod, R. Folk, computer Physics Communications 151 (2003) 272-314 */
-/* implementation take from "Testing and tuning symplectic integrators for Hybrid Monte Carlo algorithm in lattice QCD 
+/* implementation take from "Testing and tuning symplectic integrators for Hybrid Monte Carlo algorithm in lattice QCD
 Tetsuya Takaishia and Philippe de Forcrand
 https://arxiv.org/pdf/hep-lat/0505020.pdf */
 
@@ -134,4 +134,3 @@ void O4MN_multistep(double tlen, integrator_par *par)
 	}
 	monomial_force(rho*dt, par);
 }
-

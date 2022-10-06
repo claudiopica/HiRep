@@ -98,10 +98,10 @@ struct _monomial* hasen_tm_create(const monomial_data *data)
 {
 	monomial *m = malloc(sizeof(*m));
 	mon_hasenbusch_tm_par *par = (mon_hasenbusch_tm_par*)data->par;
-  
+
 	// Copy data structure
 	m->data = *data;
-  
+
 	// Allocate memory for spinor field
 	if(mon_init)
 	{

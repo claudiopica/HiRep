@@ -1,6 +1,6 @@
 /***************************************************************************\
 * Copyright (c) 2014, Claudio Pica, Martin Hansen                           *
-* All rights reserved.                                                      * 
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 #include "inverters.h"
@@ -131,7 +131,7 @@ int BiCGstab(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field 
 	{
 		lprintf("INVERTER", 20, "BiCGstab inversion: err2 = %1.8e < %1.8e\n", innorm2, par->err2);
 	}
-	
+
 	// Free memory
 	free_spinor_field_f(s);
 

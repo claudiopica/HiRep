@@ -1,6 +1,6 @@
 /***************************************************************************\
- * Copyright (c) 2008, Claudio Pica                                          *   
- * All rights reserved.                                                      * 
+ * Copyright (c) 2008, Claudio Pica                                          *
+ * All rights reserved.                                                      *
  \***************************************************************************/
 
 #ifndef GPU_H
@@ -25,10 +25,10 @@ extern "C" {
 /* GPU variables */
 typedef struct _input_gpu {
   unsigned int gpuID;
-  
+
   /* for the reading function */
   input_record_t read[2];
-  
+
 } input_gpu;
 
 #define init_input_gpu(varname) \

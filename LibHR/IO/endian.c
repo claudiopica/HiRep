@@ -17,7 +17,7 @@
 static void swapendian16(void* ptr) {
   uint16_t x;
   memcpy(&x,ptr,16/CHAR_BIT);
-  x = (uint16_t) ((x>>8) | 
+  x = (uint16_t) ((x>>8) |
                   (x<<8));
   memcpy(ptr,&x,16/CHAR_BIT);
 }
@@ -25,7 +25,7 @@ static void swapendian16(void* ptr) {
 static void swapendian32(void* ptr) {
   uint32_t x;
   memcpy(&x,ptr,32/CHAR_BIT);
-  x = (uint32_t) ((x>>24) | 
+  x = (uint32_t) ((x>>24) |
                   ((x<<8) & 0x00FF0000) |
                   ((x>>8) & 0x0000FF00) |
                   (x<<24));
@@ -35,7 +35,7 @@ static void swapendian32(void* ptr) {
 static void swapendian64(void* ptr) {
   uint64_t x;
   memcpy(&x,ptr,64/CHAR_BIT);
-  x = (uint64_t) ((x>>56) | 
+  x = (uint64_t) ((x>>56) |
                   ((x<<40) & 0x00FF000000000000) |
                   ((x<<24) & 0x0000FF0000000000) |
                   ((x<<8)  & 0x000000FF00000000) |
@@ -238,4 +238,3 @@ int fread_LE_double(double* ptr, size_t n, FILE* fp) {
   }
   return ret;
 }
-
