@@ -139,14 +139,8 @@ The "+" in front of ```last conf``` specifies the number of trajectories to be g
 Run the HMC using
 
 ```
-$ hmc -i input_file
+$ ./hmc -i input_file
 ```
 
 where ```hmc``` is the binary generated from ```hmc.c```.
 
-
-## Documentation
-
-* Complete HTML Documentation [html](Docs/_build/html/index.html)
-* User Guide [pdf](Docs/_build/latex/hirep-documentation.pdf)
-* Developer Manual [pdf](Docs/_build/latex/hirep-documentation.pdf)
