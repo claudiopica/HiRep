@@ -64,29 +64,29 @@ sub write_gpu_geometry_functions {
 
             my $typename = $dataname.$site_element.$precision_suffix;
 
-            print "#define read_gpu_${typename}(stride, v, out, ix, comp) \\\n";
+            print "#define read_gpu_${typename}(_stride, _v, _in, _ix, _comp) \\\n";
             print "\tdo { \\\n";
             print "\t\t${type} real_pt, imag_pt; \\\n";
-            print "\t\tint __iz = (ix) + ((comp)*$N)*(stride); \\\n";
+            print "\t\tint __iz = (_ix) + ((_comp)*$N)*(_stride); \\\n";
             for ($i=0; $i<($N-2)/2; $i++) {
-                print "\t\treal_pt = ((${type}*)(in))\[__iz\]; __iz+=(stride); \\\n";
-                print "\t\timag_pt = ((${type}*)(in))\[__iz\]; __iz+=(stride); \\\n";
-                print "\t\t(v).c\[$i\]=hr_complex(real_pt, imag_pt); \\\n\t\t\\\n";
+                print "\t\treal_pt = ((${type}*)(_in))\[__iz\]; __iz+=(_stride); \\\n";
+                print "\t\timag_pt = ((${type}*)(_in))\[__iz\]; __iz+=(_stride); \\\n";
+                print "\t\t(_v).c\[$i\]=hr_complex(real_pt, imag_pt); \\\n\t\t\\\n";
             }
-                print "\t\treal_pt = ((${type}*)(in))\[__iz\]; __iz+=(stride); \\\n";
-                print "\t\timag_pt = ((${type}*)(in))\[__iz\]; \\\n";
-                print "\t\t(v).c\[$i\]=hr_complex(real_pt, imag_pt); \\\n";
+                print "\t\treal_pt = ((${type}*)(_in))\[__iz\]; __iz+=(_stride); \\\n";
+                print "\t\timag_pt = ((${type}*)(_in))\[__iz\]; \\\n";
+                print "\t\t(_v).c\[$i\]=hr_complex(real_pt, imag_pt); \\\n";
             print "\t} while (0) \n\n";
 
-            print "#define write_gpu_${typename}(stride, v, out, ix, comp) \\\n";
+            print "#define write_gpu_${typename}(_stride, _v, _out, _ix, _comp) \\\n";
             print "\tdo { \\\n";
-            print "\t\tint __iz = (ix) + ((comp)*$N)*(stride); \\\n";
+            print "\t\tint __iz = (_ix) + ((_comp)*$N)*(_stride); \\\n";
             for ($i=0; $i<($N-2)/2; $i++) {
-                print "\t\t((${type}*)(out))\[__iz\]=_complex_re((v).c\[$i\]); __iz+=(stride);\\\n";
-                print "\t\t((${type}*)(out))\[__iz\]=_complex_im((v).c\[$i\]); __iz+=(stride);\\\n";
+                print "\t\t((${type}*)(_out))\[__iz\]=_complex_re((_v).c\[$i\]); __iz+=(_stride);\\\n";
+                print "\t\t((${type}*)(_out))\[__iz\]=_complex_im((_v).c\[$i\]); __iz+=(_stride);\\\n";
             }
-            print "\t\t((${type}*)(out))\[__iz\]=_complex_re((v).c\[$i\]); __iz+=(stride);\\\n";
-            print "\t\t((${type}*)(out))\[__iz\]=_complex_im((v).c\[$i\]);\\\n";
+            print "\t\t((${type}*)(_out))\[__iz\]=_complex_re((_v).c\[$i\]); __iz+=(_stride);\\\n";
+            print "\t\t((${type}*)(_out))\[__iz\]=_complex_im((_v).c\[$i\]);\\\n";
             print "\t} while (0) \n\n";
         }
     }
@@ -109,5 +109,3 @@ sub write_gpu_geometry_function_scalar {
         print "\t} while (0) \n\n";
     }
 }
-
-

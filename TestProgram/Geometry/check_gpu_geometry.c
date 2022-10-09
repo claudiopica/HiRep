@@ -22,10 +22,10 @@
 #include "gpu_geometry.h"
 
 //int test_write_read_spinor_field_f_vector_wise();
-//int test_write_read_gauge_field_f();
+int test_write_read_gauge_field_f();
 int test_write_read_gauge_field();
 //int test_write_read_spinor_field_f_flt_vector_wise();
-//int test_write_read_spinor_field_f_spinor_wise();
+int test_write_read_spinor_field_f_spinor_wise();
 
 int main(int argc, char *argv[]) 
 {
@@ -37,8 +37,8 @@ int main(int argc, char *argv[])
     setup_process(&argc, &argv);
 
     //return_val += test_write_read_spinor_field_f_vector_wise();
-    //return_val += test_write_read_spinor_field_f_spinor_wise();
-    //return_val += test_write_read_gauge_field_f();
+    return_val += test_write_read_spinor_field_f_spinor_wise();
+    return_val += test_write_read_gauge_field_f();
     return_val += test_write_read_gauge_field();
 
     // Single precision
@@ -172,7 +172,7 @@ int test_write_read_gauge_field_f()
     return return_val;
 }
 
-/*int test_write_read_spinor_field_f_spinor_wise() 
+int test_write_read_spinor_field_f_spinor_wise() 
 {
     int vol4h = T*X*Y*Z/2;
     int return_val = 0;
@@ -183,12 +183,17 @@ int test_write_read_gauge_field_f()
     gaussian_spinor_field(in);
     lprintf("SANITY CHECK", 0, "[Sanity check]");
 
-    suNf_spinor in_spinor, out_spinor;
+    suNf_spinor *in_spinor, *out_spinor;
 
     _MASTER_FOR(in->type, ix) 
     {
-        write_gpu_suNf_spinor(vol4h, (*(in->ptr+ix)), gpu_format->ptr, ix, 0);//TODO: try this with _FIELD_AT
-        read_gpu_suNf_spinor(vol4h, (*(in->ptr+ix)), gpu_format->ptr, ix, 0);//TODO: read all components. Is this the right structure for the generalization in the memory functions to work?
+        in_spinor = _FIELD_AT(in, ix);
+        out_spinor = _FIELD_AT(out, ix);
+        for (int comp = 0; comp < 4; ++comp) 
+        {
+            write_gpu_suNf_spinor(vol4h, (*in_spinor), gpu_format->ptr, ix, comp);
+            read_gpu_suNf_spinor(vol4h, (*out_spinor), gpu_format->ptr, ix, comp);
+        }
     }
 
     lprintf("SANITY CHECK", 0, "[Sanity check out field norm unequal zero: %0.15lf]\n", spinor_field_sqnorm_f_cpu(out));
@@ -210,7 +215,7 @@ int test_write_read_gauge_field_f()
     free_spinor_field_f(gpu_format);
     free_spinor_field_f(out);
     return return_val;
-}*/
+}
 
 /*int test_write_read_spinor_field_f_vector_wise()
 {
