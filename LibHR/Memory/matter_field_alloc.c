@@ -17,6 +17,7 @@
 #include "memory.h"
 #include "geometry.h"
 #include "geometry_check.h"
+#include "gpu_geometry.h"
 #include "linear_algebra.h"
 #include "global.h"
 #ifdef WITH_MPI
@@ -134,7 +135,7 @@
                 _SITE_FOR(in->type, ixp, ix)                                                                \
                 {                                                                                           \
                     source = _FIELD_AT(in, ix);                                                             \
-                    write_gpu_##_site_type(vol4h, (*source), target, ix % vol4h);                           \
+                    /*write_gpu_##_site_type(vol4h, (*source), target, ix % vol4h, 0); */                          \
                 }                                                                                           \
             }                                                                                               \
         }
@@ -152,7 +153,7 @@
                 _SITE_FOR(in->type, ixp, ix)                                                                \
                 {                                                                                           \
                     target = _FIELD_AT(in, ix);                                                             \
-                    read_gpu_##_site_type(vol4h, (*target), source, ix % vol4h);                                   \
+                    /*read_gpu_##_site_type(vol4h, (*target), source, ix % vol4h, 0);  */                   \
                 }                                                                                           \
                                                                                                             \
             }                                                                                               \

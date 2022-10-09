@@ -19,6 +19,7 @@
 #include "spinor_field.h"
 #include "geometry.h"
 #include "geometry_check.h"
+#include "gpu_geometry.h"
 #ifdef WITH_MPI
 #include <mpi.h>
 #endif

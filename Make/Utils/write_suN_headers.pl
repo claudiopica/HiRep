@@ -426,31 +426,31 @@ write_spinor_pminus();
 write_spinor_pplus();
 
     ## GPU READ/WRITE Functions ##
-    write_read_vector_gpu();
-    write_write_vector_gpu();
-	write_read_spinor_gpu();
-	write_write_spinor_gpu();
-    write_suN_av_read_gpu();
-    write_suN_av_write_gpu();
-    write_suN_av_mul_add_assign_gpu();
-	write_write_double_gpu();
-	write_read_double_gpu();
-	write_write_ldl_t_gpu();
-	write_read_ldl_t_gpu();
-	write_write_suNfc_gpu();
-	write_read_suNfc_gpu();
+    #write_read_vector_gpu();
+    #write_write_vector_gpu();
+	#write_read_spinor_gpu();
+	#write_write_spinor_gpu();
+    #write_suN_av_read_gpu();
+    #write_suN_av_write_gpu();
+    #write_suN_av_mul_add_assign_gpu();
+	#write_write_double_gpu();
+	#write_read_double_gpu();
+	#write_write_ldl_t_gpu();
+	#write_read_ldl_t_gpu();
+	#write_write_suNfc_gpu();
+	#write_read_suNfc_gpu();
 
-    if ($su2quat==0) {
-        if ($complex eq "R") {
-            write_suNr_read_gpu();
-            write_suNr_write_gpu();
-        }
-        write_suN_read_gpu();
-        write_suN_write_gpu();
-    } else {
-        write_su2_read_gpu();
-        write_su2_write_gpu();
-    }
+    #if ($su2quat==0) {
+    #    if ($complex eq "R") {
+    #        write_suNr_read_gpu();
+    #        write_suNr_write_gpu();
+    #    }
+    #    write_suN_read_gpu();
+    #    write_suN_write_gpu();
+    #} else {
+    #    write_su2_read_gpu();
+    #    write_su2_write_gpu();
+    #}
 
 # COMMENTATO
 # print <<END
