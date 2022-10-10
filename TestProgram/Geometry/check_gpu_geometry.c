@@ -20,11 +20,10 @@
 #include "update.h"
 #include "geometry.h"
 #include "gpu_geometry.h"
+#include "basis_linear_algebra.h"
 
-//int test_write_read_spinor_field_f_vector_wise();
 int test_write_read_gauge_field_f();
 int test_write_read_gauge_field();
-//int test_write_read_spinor_field_f_flt_vector_wise();
 int test_write_read_spinor_field_f_spinor_wise();
 
 int main(int argc, char *argv[]) 
@@ -36,13 +35,9 @@ int main(int argc, char *argv[])
     logger_map("DEBUG", "debug");
     setup_process(&argc, &argv);
 
-    //return_val += test_write_read_spinor_field_f_vector_wise();
     return_val += test_write_read_spinor_field_f_spinor_wise();
     return_val += test_write_read_gauge_field_f();
     return_val += test_write_read_gauge_field();
-
-    // Single precision
-    //return_val += test_write_read_spinor_field_f_flt_vector_wise();
 
     // Finalize and return
     finalize_process();
@@ -54,42 +49,29 @@ int test_write_read_gauge_field()
     lprintf("INFO", 0, " ======= TEST GAUGE FIELD ======= ");
     int vol4h = T*X*Y*Z/2;
     int return_val = 0;
-    double diff_norm = 0.0;
-    double sqnorm = 0.0;
-    double sqnorm_in_check = 0.0; // For sanity checks
-    double sqnorm_out_check = 0.0; // For sanity checks
     suNg_field *in, *gpu_format, *out;
+
     in = alloc_gfield(&glattice);
     out = alloc_gfield(&glattice);
     gpu_format = alloc_gfield(&glattice);
     random_u(in);
 
-    suNg *in_mat, *out_mat;
-    int dim = sizeof(in->ptr)/sizeof(double);
-    
+    suNg *in_mat, *out_mat;    
     _MASTER_FOR(in->type, ix) 
     {
-        for (int comp = 0; comp < dim; comp++) 
+        for (int comp = 0; comp < 4; comp++) 
         {
             in_mat = _4FIELD_AT(in, ix, comp);
             out_mat = _4FIELD_AT(out, ix, comp);
             write_gpu_suNg(vol4h, (*in_mat), gpu_format->ptr, ix, comp);
             read_gpu_suNg(vol4h, (*out_mat), gpu_format->ptr, ix, comp);
-
-            _suNg_sqnorm(sqnorm, (*in_mat));
-            sqnorm_in_check += sqnorm;
-
-            _suNg_sqnorm(sqnorm, (*out_mat));
-            sqnorm_out_check += sqnorm;
-
-            _suNg_sub_assign((*out_mat), (*in_mat));
-            _suNg_sqnorm(sqnorm, (*out_mat));
-            diff_norm += sqnorm;
         }
     }
 
-    lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.15lf]\n", sqnorm_in_check);
-    lprintf("SANITY CHECK", 0, "[Sanity check out field norm unequal zero: %0.15lf]\n", sqnorm_out_check);
+    lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.15lf]\n", sqnorm_suNg_field_cpu(in));
+    lprintf("SANITY CHECK", 0, "[Sanity check out field norm unequal zero: %0.15lf]\n", sqnorm_suNg_field_cpu(out));
+    sub_assign_suNg_field_cpu(out, in);
+    double diff_norm = sqnorm_suNg_field_cpu(out);
 
     // Since this is just a copy they have to be identical
     if (diff_norm != 0) 
@@ -115,43 +97,29 @@ int test_write_read_gauge_field_f()
     lprintf("INFO", 0, " ======= TEST GAUGE FIELD FUNDAMENTAL REP ======= ");
     int vol4h = T*X*Y*Z/2;
     int return_val = 0;
-    double diff_norm = 0.0;
-    double sqnorm = 0.0;
-    double sqnorm_in_check = 0.0; // For sanity checks
-    double sqnorm_out_check = 0.0; // For sanity checks
     suNf_field *in, *gpu_format, *out;
+
     in = alloc_gfield_f(&glattice);
     out = alloc_gfield_f(&glattice);
     gpu_format = alloc_gfield_f(&glattice);
     random_u_f(in);
-    random_u_f(out);
 
-    suNf *in_mat, *out_mat, *tmp_mat;
-    int dim = sizeof(in->ptr)/sizeof(double);
-
+    suNf *in_mat, *out_mat;
     _MASTER_FOR(in->type, ix) 
     {
-        for (int comp = 0; comp < dim; comp++) 
+        for (int comp = 0; comp < 4; comp++) 
         {
             in_mat = _4FIELD_AT(in, ix, comp);
-            out_mat = _4FIELD_AT(in, ix, comp);
+            out_mat = _4FIELD_AT(out, ix, comp);
             write_gpu_suNf(vol4h, (*in_mat), gpu_format->ptr, ix, comp);
             read_gpu_suNf(vol4h, (*out_mat), gpu_format->ptr, ix, comp);
-
-            _suNf_sqnorm(sqnorm, (*in_mat));
-            sqnorm_in_check += sqnorm;
-
-            _suNf_sqnorm(sqnorm, (*out_mat));
-            sqnorm_out_check += sqnorm;
-
-            _suNf_sub_assign((*out_mat), (*in_mat));
-            _suNf_sqnorm(sqnorm, (*out_mat));
-            diff_norm += sqnorm;
         }
     }
 
-    lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.15lf]\n", sqnorm_in_check);
-    lprintf("SANITY CHECK", 0, "[Sanity check out field norm unequal zero: %0.15lf]\n", sqnorm_out_check);
+    lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.15lf]\n", sqnorm_suNf_field_cpu(in));
+    lprintf("SANITY CHECK", 0, "[Sanity check out field norm unequal zero: %0.15lf]\n", sqnorm_suNf_field_cpu(out));
+    sub_assign_suNf_field_cpu(out, in);
+    double diff_norm = sqnorm_suNf_field_cpu(out);
 
     // Since this is just a copy they have to be identical
     if (diff_norm != 0) 
