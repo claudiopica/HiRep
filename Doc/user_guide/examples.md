@@ -1,4 +1,4 @@
-# Examples
+# Analysis
 
 ## Contractions
 
@@ -579,7 +579,7 @@ If the code is executed with the following additional arguments
 
 the code will read the two files and perform the contraction accordingly computing $\chi^{\dagger}\Gamma \psi$
 
-# Mesonic Correlators of the Isotriplet
+## Mesonic Correlators of the Isotriplet
 
 The two fermionic flavors are denoted by $u$ and $d$. We are interested in the mesonic correlators
 
@@ -633,7 +633,7 @@ $$\begin{aligned}
 \left[ H_{\sigma_\alpha(\gamma_5 \Gamma_1), \beta}(x,y) H_{\alpha, \sigma_\beta(\gamma_5 \Gamma_2)}(x,y)^\dagger \right]
 \right> \; .\label{triplet_corr}\end{aligned}$$
 
-## Implementation of the Point-To-All Propagator
+### Implementation of the Point-To-All Propagator
 
 In order to calculate mesonic masses we are interested in correlators satisfying $\Gamma_1=\Gamma_2$. Using translational invariance, we can set $y=0$. In this case the formula simplifies to
 
@@ -678,7 +678,7 @@ This is implemented into HiRep in the following way
     `      _S4_ = `$-i t_4(\gamma_5 \Gamma)$\
     `      `
 
-# Mesonic Correlators of the Isosinglet
+## Mesonic Correlators of the Isosinglet
 
 We are now concerned with the genertic mesonic correlator given by
 
@@ -717,7 +717,7 @@ $$\left< \mathrm{tr}
 \right>
 \; .$$(eq:hairpin)
 
-## All-to-all Propagator
+### All-to-all Propagator
 
 It is clear from {eq}`eq:hairpin`, from the fact that we are employing point source, that one must compute the entire inverse matrix of the Dirac operator. The alternative is to use a statistic estimate for $H$ followed by variance reduction procedures.
 
@@ -737,7 +737,7 @@ $$\mathrm{tr}\left[ \Gamma_1 G(x,y) \Gamma_2 G(y,x) \right] = \sum_{ij} \xi^{(i)
 
 $$\mathrm{tr}\left[ \Gamma G(x,x) \right] = \sum_i \xi^{(i)}(x)^\dagger \gamma_5 \Gamma \eta^{(i)}(x)\, .$$
 
-## Variance reduction
+### Variance reduction
 
 The noise obtained from stochastic estimation of the matrix $G$ in the formula {eq}`naive_noisy_estimate` can be reduced using the trick from [@McNeile:2000xx] for Wilson fermions. Here, the Dirac operator has the form $D = 1 - K$. As a result, for the matrix $G$ the following formula applies 
 
@@ -760,7 +760,7 @@ $$\begin{aligned}
 
 [@McNeile:2000xx] use this trick only for the calculation of the hairpin diagram. It might be possible to generalize it to the the isotriplet part as well, as an alternative to the point-to-all propagator. 
 
-## Time dilution
+### Time dilution
 
 This is a trick introduced in [@Foley:2005ac] for noise reduction in the computation of null-moment propagators. Whenever stochastic estimation of the $H$ matrix is required, such as in {eq}`eq:naive_noisy_estimate`, it is possible to replace each stochastic source $\xi^{(i)}$ with a set of sources each with support on a different time slice.
 
@@ -772,7 +772,7 @@ Stochastic estimation is now obtained similarly to the naive case:
 
 $$H_{\alpha \beta}^{a b}(x,y) \simeq \sum_{i=1}^{N_s} \sum_{\tau=1}^{N_t} \eta^{(i,\tau)}_{\alpha a}(x) \xi^{(i,\tau)}_{\beta b}(y)^\dagger  \eta^{(i,\tau)} \equiv H \xi^{(i,\tau)}$$(eq:diluted_noisy_estimate)
 
-## Implementation Scheme 
+### Implementation Scheme 
 
 TODO: Add this to function reference instead if this is still implemented this way
 

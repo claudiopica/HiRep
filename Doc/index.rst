@@ -19,4 +19,5 @@ Subsection
    :maxdepth: 2
    :caption: Development Manual
 
+   development_manual/coding_conventions
    development_manual/field_geometry
