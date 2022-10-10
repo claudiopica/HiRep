@@ -68,10 +68,10 @@ int test_write_read_gauge_field()
         }
     }
 
-    lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.15lf]\n", sqnorm_suNg_field_cpu(in));
-    lprintf("SANITY CHECK", 0, "[Sanity check out field norm unequal zero: %0.15lf]\n", sqnorm_suNg_field_cpu(out));
-    sub_assign_suNg_field_cpu(out, in);
-    double diff_norm = sqnorm_suNg_field_cpu(out);
+    lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.15lf]\n", sqnorm_gfield_cpu(in));
+    lprintf("SANITY CHECK", 0, "[Sanity check out field norm unequal zero: %0.15lf]\n", sqnorm_gfield_cpu(out));
+    sub_assign_gfield_cpu(out, in);
+    double diff_norm = sqnorm_gfield_cpu(out);
 
     // Since this is just a copy they have to be identical
     if (diff_norm != 0) 
@@ -116,10 +116,10 @@ int test_write_read_gauge_field_f()
         }
     }
 
-    lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.15lf]\n", sqnorm_suNf_field_cpu(in));
-    lprintf("SANITY CHECK", 0, "[Sanity check out field norm unequal zero: %0.15lf]\n", sqnorm_suNf_field_cpu(out));
-    sub_assign_suNf_field_cpu(out, in);
-    double diff_norm = sqnorm_suNf_field_cpu(out);
+    lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.15lf]\n", sqnorm_gfield_f_cpu(in));
+    lprintf("SANITY CHECK", 0, "[Sanity check out field norm unequal zero: %0.15lf]\n", sqnorm_gfield_f_cpu(out));
+    sub_assign_gfield_f_cpu(out, in);
+    double diff_norm = sqnorm_gfield_f_cpu(out);
 
     // Since this is just a copy they have to be identical
     if (diff_norm != 0) 

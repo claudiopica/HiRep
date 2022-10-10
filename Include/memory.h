@@ -66,7 +66,7 @@ _DECLARE_MEMORY_FUNC_GAUGE(clover_force, suNf_field, suNf, 6);
 // Matter Fields
 _DECLARE_MEMORY_FUNC_MATTER(spinor_field_f, spinor_field, suNf_spinor, 1);
 _DECLARE_MEMORY_FUNC_MATTER(spinor_field_f_flt, spinor_field_flt, suNf_spinor_flt, 1);
-//_DECLARE_MEMORY_FUNC_MATTER(sfield, scalar_field, double, 1);
+_DECLARE_MEMORY_FUNC_MATTER(sfield, scalar_field, double, 1);
 scalar_field* alloc_sfield(unsigned int, geometry_descriptor*);
 void free_sfield(scalar_field*);
 
