@@ -22,7 +22,7 @@ void copy_clover_force_cpu(suNf_field*, suNf_field*);
 
 // SUB ASSIGN
 void sub_assign_gfield_cpu(suNg_field*, suNg_field*);
-void sub_assign_gfield_flt_cpu(suNg_field_flt*, suNf_field_flt*);
+void sub_assign_gfield_flt_cpu(suNg_field_flt*, suNg_field_flt*);
 void sub_assign_gfield_f_cpu(suNf_field*, suNf_field*);
 void sub_assign_gfield_f_flt_cpu(suNf_field_flt*, suNf_field_flt*);
 void sub_assign_scalar_field_cpu(suNg_scalar_field*, suNg_scalar_field*);

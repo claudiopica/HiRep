@@ -23,10 +23,15 @@
 #include "gpu_geometry.h"
 #include "hr_complex.h"
 
+/* Double precision tests */
 int test_convert_back_forth_spinor_field();
-int test_convert_back_forth_spinor_field_flt();
 int test_convert_back_forth_gfield_f();
 int test_convert_back_forth_gfield();
+
+/* Single precision tests */
+int test_convert_back_forth_spinor_field_flt();
+int test_convert_back_forth_gfield_f_flt();
+int test_convert_back_forth_gfield_flt();
 
 int main(int argc, char *argv[]) 
 {
@@ -45,6 +50,8 @@ int main(int argc, char *argv[])
 
       /* Single precision */
     return_val += test_convert_back_forth_spinor_field_flt();
+    return_val += test_convert_back_forth_gfield_f_flt();
+    return_val += test_convert_back_forth_gfield_flt();
 
     // Finalize and return
     finalize_process();
@@ -123,6 +130,30 @@ int test_convert_back_forth_gfield_f()
     return check_diff_norm_zero(diff_norm);
 }
 
+int test_convert_back_forth_gfield_f_flt() 
+{
+    lprintf("INFO", 0, " ======= TEST GAUGE FIELD REPRESENTED SINGLE PRECISION ======= \n");
+
+    // Setup gfields
+    suNf_field_flt *in, *tmp, *out;
+    in = alloc_gfield_f_flt(&glattice);
+    tmp = alloc_gfield_f_flt(&glattice);
+    out = alloc_gfield_f_flt(&glattice);
+    random_u_f((suNf_field*)in); // FIXME: Implement single/double precision for this w/ macros
+    lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.15lf]\n", sqnorm_gfield_f_flt_cpu(in));
+
+    // Convert twice
+    to_gpu_format_gfield_f_flt(tmp, in);
+    to_cpu_format_gfield_f_flt(out, tmp);
+    lprintf("SANITY CHECK", 0, "[In and outfield sqnorms unequal zero and equal to each other: in %0.2e out %0.2e]\n", 
+                    sqnorm_gfield_f_flt_cpu(in), sqnorm_gfield_f_flt_cpu(out));
+
+    // Assert fields are equal over sqnorm
+    sub_assign_gfield_f_flt_cpu(out, in);
+    double diff_norm = sqnorm_gfield_f_flt_cpu(out);
+    return check_diff_norm_zero(diff_norm);
+}
+
 int test_convert_back_forth_gfield() 
 {
     lprintf("INFO", 0, " ======= TEST GAUGE FIELD ======= \n");
@@ -144,5 +175,29 @@ int test_convert_back_forth_gfield()
     // Assert fields are equal over sqnorm
     sub_assign_gfield_cpu(out,in);
     double diff_norm = sqnorm_gfield_cpu(out);
+    return check_diff_norm_zero(diff_norm);
+}
+
+int test_convert_back_forth_gfield_flt() 
+{
+    lprintf("INFO", 0, " ======= TEST GAUGE FIELD SINGLE PRECISION ======= \n");
+
+    // Setup gfields
+    suNg_field_flt *in, *tmp, *out;
+    in = alloc_gfield_flt(&glattice);
+    tmp = alloc_gfield_flt(&glattice);
+    out = alloc_gfield_flt(&glattice);
+    random_u((suNg_field*)in); // FIXME: Implement single/double precision for this w/ macros
+    lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.15lf]\n", sqnorm_gfield_flt_cpu(in));
+
+    // Convert twice
+    to_gpu_format_gfield_flt(tmp, in);
+    to_cpu_format_gfield_flt(out, tmp);
+    lprintf("SANITY CHECK", 0, "[In and outfield sqnorms unequal zero and equal to each other: in %0.2e out %0.2e]\n", 
+                    sqnorm_gfield_flt_cpu(in), sqnorm_gfield_flt_cpu(out));
+
+    // Assert fields are equal over sqnorm
+    sub_assign_gfield_flt_cpu(out, in);
+    double diff_norm = sqnorm_gfield_flt_cpu(out);
     return check_diff_norm_zero(diff_norm);
 }
