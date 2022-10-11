@@ -1,6 +1,13 @@
 #ifndef BASIS_LINEAR_ALGEBRA_H
 #define BASIS_LINEAR_ALGEBRA_H
 
+// TODO: Merge everything into testing utilities.
+
+// Testing utils
+int check_diff_norm(double, double);
+int check_diff_norm_zero(double);
+
+
 // COPY 
 void copy_gfield_cpu(suNg_field*, suNg_field*);
 void copy_scalar_field_cpu(suNg_scalar_field*, suNg_scalar_field*);
