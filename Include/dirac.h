@@ -13,6 +13,12 @@
 extern "C" {
 #endif
 
+/**
+* @brief Massless Dirac oprator
+* @param out Spinor field with Dirac operator applied
+* @param in Input spinor field before Dirac operator operation
+* @return out Spinor field with Dirac operator applied
+*/
 void Dphi_cpu_(spinor_field *out, spinor_field *in);
 void Dphi_cpu(double m0, spinor_field *out, spinor_field *in);
 void g5Dphi_cpu(double m0, spinor_field *out, spinor_field *in);

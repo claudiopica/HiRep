@@ -14,3 +14,9 @@ HiRep
    :caption: Development Manual
 
    development_notes/field_geometry
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Reference Manual
+
+   api
