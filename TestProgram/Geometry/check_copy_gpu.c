@@ -14,11 +14,14 @@
 #include "setup.h"
 #include "global.h"
 #include "linear_algebra.h"
+#include "basis_linear_algebra.h"
 #include "logger.h"
 #include "random.h"
 #include "memory.h"
 #include "update.h"
 #include "geometry.h"
+#include "gpu_geometry.h"
+#include "hr_complex.h"
 
 int test_convert_back_forth_spinor_field();
 int test_convert_back_forth_spinor_field_flt();
@@ -36,7 +39,7 @@ int main(int argc, char *argv[])
 
     // Run tests
     return_val += test_convert_back_forth_spinor_field();
-    //return_val += test_convert_back_forth_spinor_field_flt(); // FIXME: Macros for single precision do not work yet
+    return_val += test_convert_back_forth_spinor_field_flt(); 
     return_val += test_convert_back_forth_gfield_f();
     return_val += test_convert_back_forth_gfield();
 
@@ -54,17 +57,9 @@ int test_convert_back_forth_spinor_field()
     tmp = alloc_spinor_field_f(1, &glattice);
     out = alloc_spinor_field_f(1, &glattice);
     gaussian_spinor_field(in);
-
-    // Save transformed field in CPU copy of tmp field
-    //spinor_field_togpuformat(tmp, in);
-    to_gpu_format_spinor_field_f(tmp, in);
-
-    // Sanity checks that the CPU copy of in field 
-    // and CPU copy of the tmp field have non-zero square norms
     lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.15lf]\n", spinor_field_sqnorm_f_cpu(in));
-    //lprintf("SANITY CHECK", 0, "[Tmp field CPU copy norm unequal zero: %0.15lf]\n", spinor_field_sqnorm_f_cpu(tmp));
 
-    // Transform back to out field
+    to_gpu_format_spinor_field_f(tmp, in);
     to_cpu_format_spinor_field_f(out, tmp);
     
     spinor_field_sub_assign_f_cpu(out, in);
@@ -93,17 +88,14 @@ int test_convert_back_forth_spinor_field_flt()
     tmp = alloc_spinor_field_f_flt(1, &glattice);
     out = alloc_spinor_field_f_flt(1, &glattice);
     gaussian_spinor_field_flt(in);
+    lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.15lf]\n", spinor_field_sqnorm_f_flt_cpu(in));
 
     // Save transformed field in CPU copy of tmp field
     to_gpu_format_spinor_field_f_flt(tmp, in);
-
-    // Sanity checks that the CPU copy of in field 
-    // and CPU copy of the tmp field have non-zero square norms
-    lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.15lf]\n", spinor_field_sqnorm_f_flt_cpu(in));
-    lprintf("SANITY CHECK", 0, "[Tmp field CPU copy norm unequal zero: %0.15lf]\n", spinor_field_sqnorm_f_flt_cpu(tmp));
-
-    // Transform back to out field
     to_cpu_format_spinor_field_f_flt(out, tmp);
+
+    lprintf("SANITY CHECK", 0, "[In and outfield sqnorms unequal zero and equal to each other: in %0.2e out %0.2e]\n", 
+                    spinor_field_sqnorm_f_flt_cpu(in), spinor_field_sqnorm_f_flt_cpu(out));
     
     spinor_field_sub_assign_f_flt_cpu(out, in);
     double diff_norm = spinor_field_sqnorm_f_flt_cpu(out);
@@ -131,51 +123,17 @@ int test_convert_back_forth_gfield_f()
     tmp = alloc_gfield_f(&glattice);
     out = alloc_gfield_f(&glattice);
     random_u_f(in);
+    lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.15lf]\n", sqnorm_gfield_f_cpu(in));
 
     // Save transformed field in CPU copy of tmp field
     to_gpu_format_gfield_f(tmp, in);
-
-    // Transform back to out field
     to_cpu_format_gfield_f(out, tmp);
 
-    suNf *in_mat, *tmp_mat, *out_mat, *tmp_src;
-    tmp_mat = (suNf*)malloc(sizeof(suNf));
-    double sqnorm = 0.0;
-    double sqnorm_in_check = 0.0;
-    double sqnorm_tmp_check = 0.0;
-    double sqnorm_out_check = 0.0;
-    double diff_norm = 0.0;
-
-    _PIECE_FOR(in->type, ixp) 
-    {
-        tmp_src = _4FIELD_BLK(tmp, ixp);
-        _SITE_FOR(in->type, ixp, ix) 
-        {
-            for (int comp = 0; comp < 4; ++comp) 
-            {
-                in_mat = _4FIELD_AT(in, ix, comp);
-                out_mat = _4FIELD_AT(in, ix, comp);
-                read_gpu_suNf(vol4h, (*tmp_mat), tmp_src, ix, comp);
-
-                _suNf_sqnorm(sqnorm, (*in_mat));
-                sqnorm_in_check += sqnorm;
-
-                _suNf_sqnorm(sqnorm, (*tmp_mat));
-                sqnorm_tmp_check += sqnorm;
-                
-                _suNf_sqnorm(sqnorm, (*out_mat));
-                sqnorm_out_check += sqnorm;
-
-                _suNg_sub_assign((*out_mat), (*in_mat));
-                _suNg_sqnorm(sqnorm, (*out_mat));
-                diff_norm += sqnorm;
-            }
-        }
-    }
-
-    lprintf("SANITY CHECK", 0, "[Tmp sqnorm unequal zero: %0.2e]\n", sqnorm_tmp_check);
     lprintf("SANITY CHECK", 0, "[In and outfield sqnorms unequal zero and equal to each other: in %0.2e out %0.2e]\n", 
-                    sqnorm_in_check, sqnorm_out_check);
+                    sqnorm_gfield_f_cpu(in), sqnorm_gfield_f_cpu(out));
+
+    sub_assign_gfield_f_cpu(out, in);
+    double diff_norm = sqnorm_gfield_f_cpu(out);
 
     if (diff_norm != 0) 
     {
@@ -201,51 +159,16 @@ int test_convert_back_forth_gfield()
     tmp = alloc_gfield(&glattice);
     out = alloc_gfield(&glattice);
     random_u(in);
+    lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.15lf]\n", sqnorm_gfield_cpu(in));
 
-    // Save transformed field in CPU copy of tmp field
     to_gpu_format_gfield(tmp, in);
-
-    // Transform back to out field
     to_cpu_format_gfield(out, tmp);
 
-    suNg *in_mat, *tmp_mat, *out_mat, *tmp_src;
-    tmp_mat = (suNg*)malloc(sizeof(suNg));
-    double sqnorm = 0.0;
-    double sqnorm_in_check = 0.0;
-    double sqnorm_tmp_check = 0.0;
-    double sqnorm_out_check = 0.0;
-    double diff_norm = 0.0;
-
-    _PIECE_FOR(in->type, ixp) 
-    {
-        tmp_src = _4FIELD_BLK(tmp, ixp);
-        _SITE_FOR(in->type, ixp, ix) 
-        {
-            for (int comp = 0; comp < 4; ++comp) 
-            {
-                in_mat = _4FIELD_AT(in, ix, comp);
-                out_mat = _4FIELD_AT(in, ix, comp);
-                read_gpu_suNg(vol4h, (*tmp_mat), tmp_src, ix, comp);
-
-                _suNg_sqnorm(sqnorm, (*in_mat));
-                sqnorm_in_check += sqnorm;
-
-                _suNg_sqnorm(sqnorm, (*tmp_mat));
-                sqnorm_tmp_check += sqnorm;
-                
-                _suNg_sqnorm(sqnorm, (*out_mat));
-                sqnorm_out_check += sqnorm;
-
-                _suNg_sub_assign((*out_mat), (*in_mat));
-                _suNg_sqnorm(sqnorm, (*out_mat));
-                diff_norm += sqnorm;
-            }
-        }
-    }
-
-    lprintf("SANITY CHECK", 0, "[Tmp sqnorm unequal zero: %0.2e]\n", sqnorm_tmp_check);
     lprintf("SANITY CHECK", 0, "[In and outfield sqnorms unequal zero and equal to each other: in %0.2e out %0.2e]\n", 
-                    sqnorm_in_check, sqnorm_out_check);
+                    sqnorm_gfield_cpu(in), sqnorm_gfield_cpu(out));
+
+    sub_assign_gfield_cpu(out,in);
+    double diff_norm = sqnorm_gfield_cpu(out);
 
     if (diff_norm != 0) 
     {

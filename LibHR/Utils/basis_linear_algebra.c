@@ -6,6 +6,7 @@
 #include "suN_types.h"
 #include "hr_complex.h"
 #include <string.h>
+#include "error.h"
 
 // The following functions are primarily for testing purposes
 // This is all for CPU
@@ -78,7 +79,7 @@ void sub_assign_gfield_cpu(suNg_field *out, suNg_field *in)
     }
 }
 
-void sub_assign_gfield_cpu(suNg_field_flt *out, suNg_field_flt *in) 
+void sub_assign_gfield_flt_cpu(suNg_field_flt *out, suNg_field_flt *in) 
 {
     suNg_flt *site_out, *site_in;
     for (int ix = 0; ix < T*X*Y*Z; ix++) 
@@ -139,9 +140,12 @@ void sub_assign_avfield_cpu(suNg_av_field *out, suNg_av_field *in)
     suNg_algebra_vector *site_in, *site_out;
     for (int ix = 0; ix < T*X*Y*Z; ix++) 
     {
-        site_out = _4FIELD_AT(out, ix, comp);
-        site_in = _4FIELD_AT(in, ix, comp);
-        _algebra_vector_sub_assign_g((*site_out), (*site_in));
+        for (int comp = 0; comp < T*X*Y*Z; comp++) 
+        {
+            site_out = _4FIELD_AT(out, ix, comp);
+            site_in = _4FIELD_AT(in, ix, comp);
+            _algebra_vector_sub_assign_g((*site_out), (*site_in));
+        } 
     }
 }
 
@@ -152,7 +156,7 @@ void sub_assign_gtransf(suNg_field* out, suNg_field* in)
 
 void sub_assign_clover_ldl(ldl_field* out, ldl_field* in) 
 {
-    /* No functions available */ 
+    error(1, 1, "ERROR", "sub assign clover ldl not yet implemented.\n"); 
 }
 
 void sub_assign_clover_term(suNfc_field* out, suNfc_field* in) 
@@ -197,13 +201,17 @@ float sqnorm_gfield_flt_cpu(suNg_field_flt *f)
 {
     suNg_flt *site;
     float sqnorm = 0.0;
-    for (int comp = 0; comp < 4; comp++) 
+    for (int ix = 0; ix < T*X*Y*Z; ix++) 
     {
-        float tmp;
-        site = _4FIELD_AT(f, ix, comp);
-        _suNg_sqnorm(tmp, (*site));
-        sqnorm += tmp;
+        for (int comp = 0; comp < 4; comp++) 
+        {
+            float tmp;
+            site = _4FIELD_AT(f, ix, comp);
+            _suNg_sqnorm(tmp, (*site));
+            sqnorm += tmp;
+        }
     }
+    
     return sqnorm;
 }
 
@@ -290,6 +298,7 @@ double sqnorm_clover_ldl_cpu(ldl_field *f)
         for (int comp = 0; comp < 4; comp++) {
             double tmp = 0.0;
             site = _4FIELD_AT(f, ix, comp);
+            error(1, 1, "ERROR", "sqnorm clover ldl cpu not yet imeplemented.\n");
             /*Sqnorm missing from suN.h macros*/
             sqnorm += tmp;
         }
@@ -317,6 +326,19 @@ double sqnorm_clover_force_cpu(suNf_field *f)
     return sqnorm_gfield_f_cpu(f);
 }
 
+// Set field to zero
+void zero_gfield_cpu(suNg_field *f) 
+{
+    suNg *site;
+    for (int ix = 0; ix < T*X*Y*Z; ix++) 
+    {
+        for (int comp = 0; comp < 4; comp++) 
+        {
+            site = _4FIELD_AT(f, ix, comp);
+            _vector_zero_g((*site));
+        }
+    }
+}
 
 
 

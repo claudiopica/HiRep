@@ -13,6 +13,7 @@
 #include "setup.h"
 #include "global.h"
 #include "linear_algebra.h"
+#include "basis_linear_algebra.h"
 #include "logger.h"
 #include "random.h"
 #include "memory.h"
@@ -48,55 +49,18 @@ int test_gfield_bijectivity()
 
     random_u(in);
 
-    // FIXME replace this with linear algebra functions, as soon as they are implemented
-    // this will also support MPI, eventually
-    _MASTER_FOR(in->type, ix) 
-    {
-        in_copy->ptr + ix = in->ptr + ix;
-    }
-    float sqnorm = 0;
-    suNg site_val;
-    _MASTER_FOR(in->type, ix) 
-    {
-        site_val = _4FIELD_AT(in, ix);
-        sqnorm += suNg_sqnorm(site_val);
-    }
-    lprintf("SANITY CHECK", 0, "CPU sqnorm: %0.2e\n", sqnorm);
-
-    sqnorm = 0;
-    _MASTER_FOR(in_copy->type, ix) {
-        site_val = _4FIELD_AT(in_copy, ix);
-        sqnorm += suNg_sqnorm(site_val);
-    }
-    lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", sqnorm);
+    copy_gfield_cpu(in_copy, in);
+    lprintf("SANITY CHECK", 0, "CPU sqnorm: %0.2e\n", sqnorm_gfield_cpu(in));
+    lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", sqnorm_gfield_cpu(in_copy));
 
     copy_to_gpu_gfield(in);
 
-    // Setting field to zero to check, that copying back actually changes something.
-    _MASTER_FOR(in->type ix) 
-    {
-        in->ptr + ix = 0.0;
-    }
+    zero_gfield_cpu(in);
+    lprintf("SANITY CHECK", 0, "CPU copy should be zero in intermediate step: %0.2e\n", sqnorm_gfield_cpu(in));
+    copy_from_gpu_gfield(in);
 
-    // Sanity check, that this makes the field actually identically zero.
-    _MASTER_FOR(in->type, ix) 
-    {
-        site_val = _4FIELD_AT(in, ix);
-        sqnorm += suNg_sqnorm(site_val);
-    }
-    lprintf("SANITY CHECK", 0, "CPU sqnorm (should be zero here): %0.2e\n", sqnorm);
-
-    copy_from_gpu(in);
-
-    sqnorm = 0;
-    suNg site_val_copy;
-    _MASTER_FOR(in->type, ix) 
-    {
-        site_val = _4FIELD_AT(in, ix);
-        site_val_copy = _4FIELD_AT(in_copy, ix);
-        suNg_sub_assign(site_val, site_val_copy);
-        sqnorm += suNg_sqnorm(site_val)''
-    }
+    sub_assign_gfield_cpu(in, in_copy);
+    double diff_norm = sqnorm_gfield_cpu(in);
 
     if (diff_norm != 0) 
     {

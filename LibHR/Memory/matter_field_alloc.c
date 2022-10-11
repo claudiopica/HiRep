@@ -18,6 +18,7 @@
 #include "geometry.h"
 #include "geometry_check.h"
 #include "gpu_geometry.h"
+#include "gpu_geometry.h"
 #include "linear_algebra.h"
 #include "global.h"
 #ifdef WITH_MPI
@@ -131,11 +132,15 @@
             int vol4h = T*X*Y*Z/2;                                                                          \
             _PIECE_FOR(in->type, ixp)                                                                       \
             {                                                                                               \
-                target  = _FIELD_BLK(in, ixp);                                                              \
+                target  = _FIELD_BLK(out, ixp);                                                              \
                 _SITE_FOR(in->type, ixp, ix)                                                                \
                 {                                                                                           \
                     source = _FIELD_AT(in, ix);                                                             \
-                    /*write_gpu_##_site_type(vol4h, (*source), target, ix % vol4h, 0); */                          \
+                    for (int comp = 0; comp < 4; comp++)                                                    \
+                    {                                                                                       \
+                        int ix_loc = (ix % vol4h);\
+                        write_gpu_##_site_type(vol4h, (*source).c[comp], target, ix_loc, comp);         \
+                    }                                                                                       \
                 }                                                                                           \
             }                                                                                               \
         }
@@ -152,10 +157,12 @@
                 source = _FIELD_BLK(in, ixp);                                                               \
                 _SITE_FOR(in->type, ixp, ix)                                                                \
                 {                                                                                           \
-                    target = _FIELD_AT(in, ix);                                                             \
-                    /*read_gpu_##_site_type(vol4h, (*target), source, ix % vol4h, 0);  */                   \
+                    target = _FIELD_AT(out, ix);                                                             \
+                    for (int comp = 0; comp < 4; comp++)                                                    \
+                    {                                                                                       \
+                        read_gpu_##_site_type(vol4h, (*target).c[comp], source, ix % vol4h, comp);                     \
+                    }                                                                                       \
                 }                                                                                           \
-                                                                                                            \
             }                                                                                               \
         }
 

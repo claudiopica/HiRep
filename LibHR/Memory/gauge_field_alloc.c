@@ -132,13 +132,14 @@
             int vol4h = T*X*Y*Z/2;                                                                          \
             _PIECE_FOR(in->type, ixp)                                                                       \
             {                                                                                               \
-                target = _4FIELD_BLK(in, ixp);                                                              \
+                target = _4FIELD_BLK(out, ixp);                                                              \
                 _SITE_FOR(in->type, ixp, ix)                                                                \
                 {                                                                                           \
                     for (int comp = 0; comp < _size; ++comp)                                                \
                     {                                                                                       \
                         source = _4FIELD_AT(in, ix, comp);                                                  \
-                        write_gpu_##_site_type(vol4h, (*source), target, ix, comp);                         \
+                        int ix_loc = (ix % vol4h);                                                          \
+                        write_gpu_##_site_type(vol4h, (*source), target, ix_loc, comp);                     \
                     }                                                                                       \
                 }                                                                                           \
             }                                                                                               \
@@ -158,8 +159,9 @@
                 {                                                                                           \
                     for (int comp = 0; comp < _size; ++comp)                                                \
                     {                                                                                       \
-                        target = _4FIELD_AT(out, ix, comp);                                                     \
-                        read_gpu_##_site_type(vol4h, (*target), source, ix, comp);/* Here I should have to use a local index...*/                          \
+                        target = _4FIELD_AT(out, ix, comp);                                                 \
+                        int ix_loc = (ix % vol4h);\
+                        read_gpu_##_site_type(vol4h, (*target), source, ix_loc, comp);                          \
                     }                                                                                       \
                 }                                                                                           \
             }                                                                                               \
