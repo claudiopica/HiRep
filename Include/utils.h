@@ -20,6 +20,10 @@
 #include "geometry.h"
 #include <stdlib.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*SUN exp matrix*/
 
 void suNg_Exp(suNg *u, suNg *X);
@@ -74,10 +78,10 @@ void project_cooling_to_suNg(suNg *g_out, suNg *g_in, int cooling);
 void covariant_project_to_suNg(suNg *u);
 
 #ifndef GAUGE_SON
-void ludcmp(double complex *a, int *indx, double *d, int N);
-void lubksb(double complex *a, int *indx, double complex *b, int N);
-void inv_Cmplx_Ng(suNg *a);
-void det_Cmplx_Ng(double complex *res, suNg *a);
+void ludcmp(hr_complex *a, int *indx, double *d, int N);
+void lubksb(hr_complex *a, int *indx, hr_complex *b, int N);
+void inv_hermNg(suNg *a);
+void det_hermNg(hr_complex *res, suNg *a);
 #else
 int project_to_suNg_real(suNg *out, suNg *in);
 void inv_Cmplx_Ng(suNg *a);
@@ -169,5 +173,9 @@ int reserve_wrk_space();
 int reserve_wrk_space_with_pointers(suNg_field **g_wrk_out, int **i_up_wrk_out, int **i_dn_wrk_out);
 void release_wrk_space(int id_release);
 void free_wrk_space();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

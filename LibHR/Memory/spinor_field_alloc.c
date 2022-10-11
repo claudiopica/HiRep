@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 #include <stdlib.h>
@@ -115,4 +115,3 @@ _DECLARE_MEMORY_FUNC(spinor_field_f, spinor_field, 1);
 _DECLARE_MEMORY_FUNC(spinor_field_f_flt, spinor_field_flt, 1);
 
 _DECLARE_MEMORY_FUNC(sfield, scalar_field, 1);
-

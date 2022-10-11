@@ -1,5 +1,7 @@
 /*******************************************************************************
 *
+* NOCOMPILE= WITH_GPU
+* 
 * Gauge covariance of the Dirac operator
 *
 *******************************************************************************/
@@ -10,10 +12,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <math.h>
+#include "global.h"
 #include "io.h"
 #include "update.h"
 #include "geometry.h"
-#include "global.h"
 #include "logger.h"
 #include "random.h"
 #include "memory.h"
@@ -28,6 +30,7 @@ static suNg_field *g;
 
 static void loc_D(spinor_field *out, spinor_field *in)
 {
+
   Dphi(hmass, out, in);
 }
 
@@ -55,6 +58,7 @@ static void transform_u(void)
 
   start_gf_sendrecv(u_gauge);
   represent_gauge_field();
+  smear_gauge_field();
 }
 
 static void transform_s(spinor_field *out, spinor_field *in)
@@ -76,19 +80,18 @@ static void transform_s(spinor_field *out, spinor_field *in)
 
 int main(int argc, char *argv[])
 {
-  int return_value = 0;
 
-  /* setup process id and communications */
+  int return_value = 1;
+  double sig, tau;
+  spinor_field *s0, *s1, *s2, *s3;
+
   logger_map("DEBUG", "debug");
 
   setup_process(&argc, &argv);
 
   setup_gauge_fields();
 
-  double sig, tau;
-  spinor_field *s0, *s1, *s2, *s3;
-
-  /* allocate memory */
+  /* allocate additional memory */
   g = alloc_gtransf(&glattice);
   s0 = alloc_spinor_field_f(4, &glattice);
   s1 = s0 + 1;
@@ -106,6 +109,9 @@ int main(int argc, char *argv[])
   gaussian_spinor_field(&(s0[0]));
   tau = 1. / sqrt(spinor_field_sqnorm_f(s0));
   spinor_field_mul_f(s0, tau, s0);
+  sig = spinor_field_sqnorm_f(s0);
+
+  lprintf("MAIN", 0, "Normalized norm = %.2e\n", sig);
 
   lprintf("MAIN", 0, "Generating a random gauge transf... ");
   fflush(stdout);
@@ -125,18 +131,20 @@ int main(int argc, char *argv[])
   transform_u();
 
   spinor_field_zero_f(s1);
+
   loc_D(s1, s3);
 
   spinor_field_mul_add_assign_f(s1, -1.0, s2);
   sig = spinor_field_sqnorm_f(s1);
 
   lprintf("MAIN", 0, "Maximal normalized difference = %.2e\n", sqrt(sig));
-  lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
+  lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n");
 
-  if (sqrt(sig) > 10.e-14)
-    return_value = 1;
+  if (sqrt(sig) < 10.e-14)
+    return_value = 0;
 
   free_spinor_field_f(s0);
+
   free_gtransf(g);
 
   finalize_process();

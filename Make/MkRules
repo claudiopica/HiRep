@@ -21,7 +21,9 @@ ALIBNAME = $(abspath $(LIBNAME))
 
 
 ifeq ($(findstring -DWITH_MPI,$(MACRO)),-DWITH_MPI)
-	CC = $(MPICC)
+	ifeq (,$(findstring -DWITH_GPU,$(MACRO))) 
+		CC = $(MPICC)
+	endif
 	RUNTEST = $(MKDIR)/Utils/mpi_test_wrapper.pl
 endif
 
@@ -101,16 +103,16 @@ _objs: $(OBJS)
 
 DFILES = $(findstring .d,$(MAKEFILES))
 RBLD = $(if $(DFILES),,rebuild)
-
 %.o: SRC=$(patsubst %.o,%.c,$@)
 %.o: DEP=$(patsubst %.o,.%.d,$@)
+%.o: GPUOPT=$(if $(findstring -DWITH_GPU,$(MACRO)),$(patsubst %,$(GPUFLAGS),$(findstring $(patsubst %.o,%.c,$@),$(GPUFILES)))) 
 %.o: %.c .%.d $(MKDIR)/MkFlags $(INCDIR)/.autoheaders.h $(RBLD)
 	if  test "$(call _testdir, $@)" = ""; then \
 	  if test "$(DFILES)" = ""; then \
 	    MAKEFILES="$(DEP)" $(MAKE) $@ ;\
 	  else \
 	    echo -n "$(_col_comp)Compiling$(_col_norm) $(call _cfname,$(call _rname,$(CURDIR)/$@))..." ;\
-	    $(CC) -c $(CFLAGS) $(CPPFLAGS) $(SRC) &&\
+	    $(CC) $(GPUOPT) -c $(CFLAGS) $(CPPFLAGS) $(SRC) &&\
 	    echo " $(_cdone)" || ( echo " $(_cfailed)" && false) ;\
 	  fi ;\
 	else \
@@ -181,7 +183,7 @@ $(patsubst %,clean-%,$(SUBDIRS)):
 
 clean:: $(patsubst %,clean-%,$(SUBDIRS))
 	echo -n "$(_col_clean)Cleaning$(_col_norm) $(call _cfname,$(CDIR))..."
-	rm -f *.o *.rpo *~ *.il *.dyn *.ii *.s .*.d *.a cinfo.c .lib.updated
+	rm -f *.o *.rpo *~ *.il *.dyn *.ii *.s .*.d *.a cinfo.c .lib.updated debug err_* out_*
 	echo " $(_cdone)"
 	if test "$(EXES)" != "" -a "$(CEXE)" != "" ; then \
 	  echo -n "$(_col_clean)Removing EXEs$(_col_norm) in $(call _cfname,$(CDIR))..." ;\

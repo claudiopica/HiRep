@@ -6,6 +6,10 @@
 #ifndef COMMUNICATIONS_H
 #define COMMUNICATIONS_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void global_sum(double *d, int n);
 void global_sum_int(int *d, int n);
 void global_max(double *d, int n);
@@ -35,5 +39,8 @@ void start_gf_sendrecv_flt(suNg_field_flt *gf);
 void complete_sf_sendrecv_flt(spinor_field_flt *gf);
 void start_sf_sendrecv_flt(spinor_field_flt *gf);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* COMMUNICATIONS_H */

@@ -1,6 +1,8 @@
 /*******************************************************************************
 *
-* Gauge covariance of the Dirac operator
+* NOCOMPILE= WITH_GPU
+* 
+* Speed test of Dirac Operator for CPU double precision
 *
 *******************************************************************************/
 
@@ -50,6 +52,7 @@ int main(int argc, char *argv[])
   lprintf("MAIN", 0, "Randomizing spinor field...\n");
   gaussian_spinor_field(s0);
   gaussian_spinor_field(s1);
+  lprintf("LA TEST", 0, "un sito %lf\n", creal(s0->ptr[2].c[0].c[0]));
 
   //
   //#pragma omp parallel num_threads(1) default(shared)

@@ -1,10 +1,10 @@
-NG = 3
-#REPR = REPR_FUNDAMENTAL
+NG = 2
+REPR = REPR_FUNDAMENTAL
 #REPR = REPR_SYMMETRIC
 #REPR = REPR_ANTISYMMETRIC
-REPR = REPR_ADJOINT
+#REPR = REPR_ADJOINT
 
-#CHOICES ARE GAUGE_SUN AND GAUGE_SON 
+#CHOICES ARE GAUGE_SUN AND GAUGE_SON
 GAUGE_GROUP = GAUGE_SUN
 #GAUGE_GROUP = GAUGE_SON
 
@@ -27,12 +27,12 @@ MACRO += -DBC_Z_PERIODIC
 #MACRO += -DBASIC_SF
 #MACRO += -DROTATED_SF
 
-
 #MACRO += -DWITH_SMEARING
 #MACRO += -DWITH_CLOVER
-MACRO += -DWITH_EXPCLOVER
-MACRO += -DUPDATE_EO
-MACRO += -DWITH_MPI
+#MACRO += -DWITH_EXPCLOVER
+#MACRO += -DUPDATE_EO
+#MACRO += -DWITH_MPI
+MACRO += -DWITH_GPU
 #MACRO += -DWITH_QUATERNIONS
 #MACRO += -DPURE_GAUGE_ANISOTROPY
 MACRO += -DNDEBUG
@@ -48,28 +48,40 @@ MACRO += -DIO_FLUSH
 #MACRO += -DWITH_UNTESTED
 
 #Compiler
-#CFLAGS = -Wall -Wshadow -std=c99 -O3 -fomit-frame-pointer -msse -msse2 
-CFLAGS = -Wall -Wshadow -std=c99 -O3  #-g #-march=core-avx2 -mtune=core-avx2 -g
-#CFLAGS = -Wall -Wshadow -std=c99 -O3 -qopt-prefetch=4 -qopt-report=2 -march=core-avx2 -mtune=core-avx2
+ifeq (,$(findstring -DWITH_GPU,$(MACRO))) #Compile CPU only
+    #CFLAGS = -Wall -Wshadow -std=c99 -O3 -fomit-frame-pointer -msse -msse2
+    CFLAGS = -Wall -Wshadow -std=c99 -O3 #-g #-march=core-avx2 -mtune=core-avx2 -g
+    #CFLAGS = -Wall -Wshadow -std=c99 -O3 -qopt-prefetch=4 -qopt-report=2 -march=core-avx2 -mtune=core-avx2
 
-CC = /opt/local/bin/gcc-mp-10
-MPICC = /opt/local/bin/mpicc-mpich-gcc10 
-LDFLAGS = -L /opt/local/lib/mpich-gcc10/ -L /opt/local/lib/ #-l efence
-INCLUDE = -I /opt/local/include/mpich-gcc10/ -I /opt/local/include/ -I /opt/local/include/gcc10/ -I /usr/include
+    CC = gcc
+    MPICC = mpicc
+    LDFLAGS =
+    INCLUDE =
 
+    #CC = clang
+    #MPICC = mpicc
+    #LDFLAGS = #-L /opt/local/lib/mpich-devel-clang80/ -L /opt/local/lib/ #-lefence #-lprofiler #-l efence
+    #INCLUDE = #-I /opt/local/include/mpich-clang80/
 
-#CC = clang
-#MPICC = mpicc
-#LDFLAGS =  #-L /opt/local/lib/mpich-devel-clang80/ -L /opt/local/lib/ #-lefence #-lprofiler #-l efence
-#INCLUDE = #-I /opt/local/include/mpich-clang80/
+    #CC = clang-mp-6.0
+    #MPICC = mpicc-openmpi-devel-clang60
+    #LDFLAGS = -L /opt/local/lib/openmpi-devel-clang60/ -L /opt/local/lib/ #-l efence
+    #INCLUDE = -I /opt/local/include/openmpi-devel-clang60/
 
-
-#CC = clang-mp-6.0
-#MPICC = mpicc-openmpi-devel-clang60
-#LDFLAGS =  -L /opt/local/lib/openmpi-devel-clang60/ -L /opt/local/lib/ #-l efence
-#INCLUDE = -I /opt/local/include/openmpi-devel-clang60/
-
-#CC = icc
-#MPICC = mpiicc
-#LDFLAGS =  -L /opt/local/lib/mpich-devel-gcc7/ -L /opt/local/lib/ #-l efence
-#INCLUDE = -I /opt/local/include/mpich-devel-gcc7/
+    #CC = icc
+    #MPICC = mpiicc
+    #LDFLAGS = -L /opt/local/lib/mpich-devel-gcc7/ -L /opt/local/lib/ #-l efence
+    #INCLUDE = -I /opt/local/include/mpich-devel-gcc7/
+else
+    ifeq (,$(findstring -DWITH_MPI,$(MACRO))) # Compile on GPU but without MPI
+        CC = nvcc
+        CFLAGS = -O2 -Xcompiler '-std=c99 -fgcse-sm -fgcse-las -fgcse-after-reload'
+        GPUFLAGS = --x cu -arch=sm_70 -Xptxas -v -Xptxas -dlcm=ca -dc
+        LDFLAGS = -lcuda
+    else # Compile on GPU with MPI
+        CC = nvcc
+        CFLAGS = -ccbin mpicc -Xcompiler '-std=c99 -fgcse-sm -fgcse-las -fgcse-after-reload'
+        GPUFLAGS = --x cu -arch=sm_70 -Xptxas -v -Xptxas -dlcm=ca -dc
+        LDFLAGS = -lcuda -lmpi
+    endif
+endif
