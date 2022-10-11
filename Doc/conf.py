@@ -77,6 +77,7 @@ latex_elements = {
 }
 \makeatother
 """,
+'figure_align': 'H',
 }
 latex_documents = [
     (

@@ -3,6 +3,8 @@ HiRep
 
 .. toctree::
    :maxdepth: 2
-   :caption: Development Manual
+   :caption: Table of Contents
 
-   development_notes/field_geometry
+   development_manual/coding_conventions
+   development_manual/field_geometry
+   
