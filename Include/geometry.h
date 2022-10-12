@@ -97,4 +97,13 @@ void test_geometry_mpi(void);
 void test_geometry_mpi_eo(void);
 void print_wdmatrix(char *filename);
 
+
+#ifdef WITH_GPU
+#include "gpu.h"
+void init_gpu(input_gpu gpu_var);
+void init_neighbors_gpu();
+
+#define _SITE_IDX_GPU(ix, ixp, stride) (ix) + stride*(ixp)
+
+#endif
 #endif

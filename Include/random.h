@@ -26,8 +26,10 @@ void random_suNg_unit_vector(suNg_vector *v);
 void gaussian_suNg_vector(suNg_vector *v);
 
 void random_suNg(suNg *u);
+void random_suNf(suNf *u);
 
 void random_u(suNg_field *gf);
+void random_u_f(suNf_field*);
 void unit_u(suNg_field *gf);
 
 void random_s(suNg_scalar_field*);

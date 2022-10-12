@@ -7,8 +7,14 @@ sys.path.insert(0, os.path.abspath(".."))
 
 # -- General configuration ------------------------------------------------
 extensions = [
+    "breathe",
     "myst_parser",
+    "sphinx.ext.autodoc",
+    "sphinx.ext.doctest",
+    "sphinx.ext.imgmath",
     "sphinx.ext.mathjax",
+    "sphinx.ext.todo",
+    "sphinx.ext.viewcode",
 ]
 myst_enable_extensions = [
     "colon_fence",
@@ -116,3 +122,12 @@ texinfo_documents = [
         "Miscellaneous",
     ),
 ]
+
+# -- Extension configuration -------------------------------------------------
+import subprocess
+
+subprocess.call("make clean", shell=True)
+subprocess.call("cd doxygen ; doxygen", shell=True)
+
+breathe_projects = {"HiRep": "doxygen/build/xml/"}
+breathe_default_project = "HiRep"

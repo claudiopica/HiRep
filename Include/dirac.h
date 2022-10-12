@@ -9,18 +9,51 @@
 #include "suN_types.h"
 #include "utils.h"
 
-void Dphi_(spinor_field *out, spinor_field *in);
-void Dphi_fused_(spinor_field *out, spinor_field *in);
-void Dphi(double m0, spinor_field *out, spinor_field *in);
-void g5Dphi(double m0, spinor_field *out, spinor_field *in);
-void g5Dphi_sq(double m0, spinor_field *out, spinor_field *in);
+#ifdef __cplusplus
+extern "C" {
+#endif
 
+/**
+* @brief Massless Dirac oprator
+* @param out Spinor field with Dirac operator applied
+* @param in Input spinor field before Dirac operator operation
+* @return out Spinor field with Dirac operator applied
+*/
+void Dphi_cpu_(spinor_field *out, spinor_field *in);
+void Dphi_cpu(double m0, spinor_field *out, spinor_field *in);
+void g5Dphi_cpu(double m0, spinor_field *out, spinor_field *in);
+void g5Dphi_sq_cpu(double m0, spinor_field *out, spinor_field *in);
+#ifdef WITH_GPU
+  void Dphi_gpu_(spinor_field *out, spinor_field *in);
+  void Dphi_gpu(double m0, spinor_field *out, spinor_field *in);
+  void g5Dphi_gpu(double m0, spinor_field *out, spinor_field *in);
+  void g5Dphi_sq_gpu(double m0, spinor_field *out, spinor_field *in);
+#endif
+extern void (*Dphi_) (spinor_field *out, spinor_field *in);
+extern void (*Dphi) (double m0, spinor_field *out, spinor_field *in);
+extern void (*g5Dphi) (double m0, spinor_field *out, spinor_field *in);
+extern void (*g5Dphi_sq) (double m0, spinor_field *out, spinor_field *in);
+
+void Dphi_flt_cpu_(spinor_field_flt *out, spinor_field_flt *in);
+void Dphi_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in);
+void g5Dphi_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in);
+void g5Dphi_sq_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in);
+#ifdef WITH_GPU
+  void Dphi_flt_gpu_(spinor_field_flt *out, spinor_field_flt *in);
+  void Dphi_flt_gpu(double m0, spinor_field_flt *out, spinor_field_flt *in);
+  void g5Dphi_flt_gpu(double m0, spinor_field_flt *out, spinor_field_flt *in);
+  void g5Dphi_sq_flt_gpu(double m0, spinor_field_flt *out, spinor_field_flt *in);
+#endif
 void Dphi_flt_(spinor_field_flt *out, spinor_field_flt *in);
 void Dphi_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
 void g5Dphi_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
 void g5Dphi_sq_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
 
-unsigned long int getMVM();
+unsigned long int getMVM_cpu();
+#ifdef WITH_GPU
+  unsigned long int getMVM_gpu();
+#endif
+extern unsigned long int (*getMVM) ();
 unsigned long int getMVM_flt();
 
 // Dirac operators with clover term
@@ -34,11 +67,20 @@ void Cphi_diag(double, spinor_field *, spinor_field *);
 void Cphi_diag_inv(double, spinor_field *, spinor_field *);
 
 /* Even/Odd preconditioned matrix */
-void Dphi_eopre(double m0, spinor_field *out, spinor_field *in);
-void Dphi_oepre(double m0, spinor_field *out, spinor_field *in);
-void g5Dphi_eopre(double m0, spinor_field *out, spinor_field *in);
-void g5Dphi_eopre_sq(double m0, spinor_field *out, spinor_field *in);
-
+void Dphi_eopre_cpu(double m0, spinor_field *out, spinor_field *in);
+void Dphi_oepre_cpu(double m0, spinor_field *out, spinor_field *in);
+void g5Dphi_eopre_cpu(double m0, spinor_field *out, spinor_field *in);
+void g5Dphi_eopre_sq_cpu(double m0, spinor_field *out, spinor_field *in);
+#ifdef WITH_GPU
+  void Dphi_eopre_gpu(double m0, spinor_field *out, spinor_field *in);
+  void Dphi_oepre_gpu(double m0, spinor_field *out, spinor_field *in);
+  void g5Dphi_eopre_gpu(double m0, spinor_field *out, spinor_field *in);
+  void g5Dphi_eopre_sq_gpu(double m0, spinor_field *out, spinor_field *in);
+#endif //WITH_GPU
+extern void (*Dphi_eopre) (double m0, spinor_field *out, spinor_field *in);
+extern void (*Dphi_oepre) (double m0, spinor_field *out, spinor_field *in);
+extern void (*g5Dphi_eopre) (double m0, spinor_field *out, spinor_field *in);
+extern void (*g5Dphi_eopre_sq) (double m0, spinor_field *out, spinor_field *in);
 void Dphi_eopre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
 void Dphi_oepre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
 void g5Dphi_eopre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
@@ -49,7 +91,6 @@ void Qhat_eopre(double m0, double mu, spinor_field *out, spinor_field *in);
 void Qhat_eopre_sq(double m0, double mu, spinor_field *out, spinor_field *in);
 
 /* Dirac operators used in the Update */
-
 void set_dirac_mass(double mass); // this is the mass used in the following operators
 double get_dirac_mass();
 void set_twisted_mass(double mass); // this is the twisted mass used in the twisted mass operators (Q)
@@ -96,5 +137,8 @@ typedef enum
 void Dxx_tw_inv(double mass, double twmass, spinor_field *out, spinor_field *in, tw_D_type tw_type);
 void g5Dphi_eopre_tw(double m0, double mu, spinor_field *out, spinor_field *in, tw_D_type tw_type);
 void g5Dphi_eopre_tw_sq(double m0, double mu, spinor_field *out, spinor_field *in);
+#ifdef __cplusplus
+}
+#endif
 
 #endif

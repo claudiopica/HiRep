@@ -19,5 +19,12 @@ Subsection
    :maxdepth: 2
    :caption: Development Manual
 
+   development_notes/field_geometry
    development_manual/coding_conventions
    development_manual/field_geometry
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Reference Manual
+
+   api

@@ -1,6 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *   
-* All rights reserved.                                                      * 
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 /*******************************************************************************
@@ -25,18 +25,18 @@
 #endif
 
 /* local lattice attributes */
-GLB_VAR(int,T,=0); /* local lattice size in direction T */ 
+GLB_VAR(int,T,=0); /* local lattice size in direction T */
 GLB_VAR(int,X,=0); /* local lattice size in direction X */
 GLB_VAR(int,Y,=0); /* local lattice size in direction Y */
 GLB_VAR(int,Z,=0); /* local lattice size in direction Z */
-GLB_VAR(long int,GLB_VOL3,=0); 
+GLB_VAR(long int,GLB_VOL3,=0);
 GLB_VAR(long int,GLB_VOLUME,=0);
 /* this two probably are not more needed... */
-GLB_VAR(long int,VOL3,=0); 
+GLB_VAR(long int,VOL3,=0);
 GLB_VAR(long int,VOLUME,=0);
 
 /* Nodes attributes
- * NP = number of processes in each direction 
+ * NP = number of processes in each direction
  * 1 => local direction
  */
 GLB_VAR(int,NP_T,=1); /* number of processes in direction T */
@@ -106,9 +106,9 @@ GLB_VAR(geometry_descriptor,glattice,={0}); /* global lattice */
 GLB_VAR(geometry_descriptor,glat_even,={0}); /* global even lattice */
 GLB_VAR(geometry_descriptor,glat_odd,={0}); /* global odd lattice */
 GLB_VAR(geometry_descriptor,glat_even_red,={0});
-GLB_VAR(geometry_descriptor,glat_odd_red,={0}); 
+GLB_VAR(geometry_descriptor,glat_odd_red,={0});
 GLB_VAR(geometry_descriptor,glat_even_black,={0});
-GLB_VAR(geometry_descriptor,glat_odd_black,={0}); 
+GLB_VAR(geometry_descriptor,glat_odd_black,={0});
 GLB_VAR(geometry_descriptor,glat_red,={0});
 GLB_VAR(geometry_descriptor,glat_black,={0});
 
@@ -126,6 +126,17 @@ typedef enum _mem_t {
 
 #ifdef WITH_GPU
 #define STD_MEM_TYPE (CPU_MEM | GPU_MEM)
+#include "gpu.h"
+#define BLOCK_SIZE 256
+#define BLOCK_SIZE_LINEAR_ALGEBRA 512
+#define BLOCK_SIZE_GLOBAL_SUM 512
+#define BLOCK_SIZE_DIRAC 512
+#define BLOCK_SIZE_DIRAC_FLT 512
+GLB_VAR(input_gpu,gpu_var,=init_input_gpu(gpu_var));
+GLB_VAR(int,*iup_gpu,=NULL);
+GLB_VAR(int,*idn_gpu,=NULL);
+GLB_VAR(int, gpu_id,=0);
+GLB_VAR(unsigned int, grid_size_max_gpu,=65535);
 #else
 #define STD_MEM_TYPE (CPU_MEM)
 #endif
@@ -187,8 +198,6 @@ GLB_VAR(double,*rect_weight, =NULL);
 GLB_VAR(COMPLEX,eitheta[4],={{1.,0.}});
 #endif
 
-
-
 #ifdef MEASURE_FORCE
 #define MEASURE_FORCE0
 #define MEASURE_FORCEHMC
@@ -197,10 +206,7 @@ GLB_VAR(double,*force_max,=NULL);
 GLB_VAR(int,*n_inv_iter,=NULL);
 #endif
 
-
-
-
-/* Fields four fermion interactions */ 
+/* Fields four fermion interactions */
 /* Auxiliary fields for four fermion interactions */
 GLB_VAR(scalar_field,*ff_sigma,=NULL);
 GLB_VAR(scalar_field,*ff_pi,=NULL);
@@ -209,12 +215,7 @@ GLB_VAR(scalar_field,*ff_pi_mom,=NULL);
 
 GLB_VAR(int,four_fermion_active,=0); // whether four fermion interactions are active
 
-
-
-
 #undef GLB_VAR
 
 
 #endif
-
-

@@ -9,7 +9,7 @@ help:
 
 .PHONY: clean
 clean:
-	rm -rf _build/*
+	rm -rf _build/* doxygen/build
 
 .PHONY: html
 html:
