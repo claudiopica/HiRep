@@ -1,5 +1,7 @@
-# Field Geometry on GPUs
-In ```HiRep```, field data is stored in field ```struct```s that contain an array of values on sites or links that will be allocated on the CPU and one that will be allocated on the GPU. The definitions of different fields are defined in ```LibHR/spinor_field.h```. New field types can be declared by using the macro
+# Geometry of Field Data in Memory
+
+## Definition of Field Structures
+In ```HiRep```, field data is stored in field ```struct```s that contain an array of values on sites or links that will be allocated on the CPU and, if compiled with GPU acceleration, one that will be allocated on the GPU. The definitions of different fields are defined in ```LibHR/spinor_field.h```. New field types can be declared by using the macro
 
 ```
 #define _DECLARE_FIELD_STRUCT(_name, _type) \
@@ -26,16 +28,16 @@ The field value copy of the CPU is defined by ```_type *ptr```, which is a 1D ar
 
 We need this macro instead of outright declaring the copy because we do not want to have a GPU copy in the field ```struct```s if we are only compiling for CPU. As can be seen from the macro ```_GPU_FIELD_DATA(_type)``` is defined to return nothing, but in the case of compilation with GPUs, it is overwritten to give a 1D array called ```gpu_ptr```, which can later be allocated on and accessed from the device.
 
+Since memory access patterns have a high impact on application performance, the way that field data is stored on the GPU is different from how it is stored on the CPU in several ways that will be explained in the following. Further, in ```HiRep``` memory is managed manually instead of using a unified memory setup, which implies that from a kernel, only pointers to sites will be available but not the complete field structures. This has an impact on which functions and macros that work on the CPU are available to call from a CUDA kernel.
 
-Since memory access patterns have a high impact on application performance, the way that field data is stored on the GPU is different from how it is stored on the CPU in several ways that will be explained in the following. Further, ```HiRep``` does not support unified memory, which implies that from a kernel, only pointers to sites will be available but not the complete field structures, which has an impact on which functions and macros that work on the CPU are available to call from a CUDA kernel. \par
-
-For example, if we declare a spinor field
+This means, that if we declare a spinor field
 
 ```
 spinor_field *s;
 ```
 
 we may access its geometry description and sites on the CPU from a regular host function
+
 ```
 int main(void)
 {
@@ -48,7 +50,8 @@ int main(void)
     if (s->type == &glat_odd) printf("Spinor is odd.\n")
 
     suNf_spinor *gpu_field_value = s->gpu_ptr;
-    // This fails, because it points to memory allocated on the GPU
+
+    // The following fails, because it points to memory allocated on the GPU
     // and is therefore unavailable from the host.
     suNf_vector spinor_comp = (*gpu_field_value).c[0];
 }
@@ -61,7 +64,7 @@ __global__ void example_kernel(spinor_field *s)
 {
     // This fails because s is a host pointer, unless it was transferred
     // before being passed to the kernel.
-    suNf_spinor *field_value = s->ptr;
+    suNf_spinor field_value = *(s->ptr);
 
     // This fails because the geometry descriptor is saved on the host
     if (s->type == &glat_odd) printf("Spinor is odd.\n");
@@ -74,7 +77,6 @@ __global__ void example_kernel(spinor_field *s)
 
 The correct way to run a kernel that operates on the GPU field data copy is to pass the first site in the copy to the kernel and then access other sites. For example
 
-
 ```
 __global__ void example_kernel(suNf_spinor *start)
 {
@@ -86,8 +88,10 @@ __global__ void example_kernel(suNf_spinor *start)
 
 The index in the 1D array is bijectively mapped to the coordinates in space and time.
 
-## Even-Odd Decomposition
-### CPU
+## Block Decomposition
+
+### Even-Odd Decomposition
+#### CPU
 A sufficiently local operator only operates on the site value and its nearest neighbors.
 As a result, we can decompose the operation into a step that can be executed site by site and is therefore diagonal and another step where every site only depends on the nearest neighbors. This we can further decompose into two steps, one acting on the even lattice sites while the odd sites are frozen and then another step acting on the odd lattice sites while the even ones are frozen. As a result, this decomposition enables us to effectively evaluate local operators on the lattice because it can be done in parallel, using multiple CPU cores or GPUs.
 In order to efficiently work with this decomposition on the CPU and the GPU, the even and odd sites are stored in separate blocks on the lattice. This means for the CPU that for a field that is defined on both even and odd sites, one can easily iterate through the even sites by iterating through the first half of the allocated memory.
@@ -136,7 +140,7 @@ int main(void)
 
 In practice, the programmer should not be forced to think about lattice geometry. For this, the corresponding for loops are replaced by the macros ```_PIECE_FOR```, ```_SITE_FOR``` and ```_MASTER_FOR``` that are defined in ```Include/geometry.h```.
 
-#### \_MASTER\_FOR
+##### \_MASTER\_FOR
  This macro iterates over all sites without considering which piece they are located. For example, for the spinor field, this would simplify to
 
 ```
@@ -253,7 +257,7 @@ int main(void)
 }
 ```
 
-### GPU
+##### GPU
 We will not want to use any for-loop macros to iterate over the sites on the GPU. Instead, we want to distribute the operations on the sites over different threads. Further, in anticipation of a later MPI decomposition, any kernel operation on the fields should launch a separate kernel for each piece. At the point of a simple even-odd decomposition, we need to do the following:
 
 * Wrap the kernel call in ```_PIECE_FOR```. This will take care of any block decomposition identically to the CPU.
@@ -278,7 +282,7 @@ int main(void)
     // Stride that separated even and odd sites in memory is half the
     // number of lattice points
     int vol4h = T*X*Y*Z/2;
-
+/
     spinor_field *s;
     s = allocate_spinor_field_f(1, &glattice);
 
@@ -355,7 +359,7 @@ __global__ void example_kernel(suNf_spinor *s, int vol4h, int block_size)
 
 The writing functions work analogous.
 
-## Contingency
+### Contingency
 These reading and writing functions are necessary to access memory in a contingent way when performing operations on the fields. If we store the spinors in the same way they are stored on the CPU this will not be contingent. To understand the problem, we can look at the implementation of the inner product of two spinors at the kernel level.
 
 ```
@@ -456,5 +460,7 @@ __global__ void example_kernel(suNf_spinor *start, int stride)
 This shuffles how the ```struct```s are organized in the previously allocated space.
 
 
-### Gauge Fields
-For the gauge fields for every site, there are four link directions. These directions are now stored analogously to the vector components in the spinor field separated by a stride.
+#### Gauge Fields
+For the gauge fields for every site, there are four link directions. Since the matrices stored on the links can be complex or real, the real and imaginary part of the matrices are additionally separated by a stride. 
+
+### MPI 
