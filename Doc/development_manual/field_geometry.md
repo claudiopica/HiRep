@@ -1,94 +1,98 @@
 # Geometry of Field Data in Memory
 
-## Definition of Field Structures
-In ```HiRep```, field data is stored in field ```struct```s that contain an array of values on sites or links that will be allocated on the CPU and, if compiled with GPU acceleration, one that will be allocated on the GPU. The definitions of different fields are defined in ```LibHR/spinor_field.h```. New field types can be declared by using the macro
+## Summary
+
+Section TODO:
+* Add more pictures
+
+Fields living on the 4-dimensional lattice are defined to be C arrays of elements using the data structures in the corresponding section. The geometry of the lattice is defined by assigning an index $n$ of the array to each site $(t, x, y, z)$. The mapping between the cartesian coordinates of the local lattice and the array index is given by the macros `iup(n,dir) and `idn(n,dir)` which, given the index $n$ of the current site, return the index of the site whose cartesian coordinate in direction `dir` is increased or decreased by one respectively. 
+
+### Geometry Descriptor
+
+In the MPI version of the code the set of indices which correspond the the local lattice are not all contiguous, instead the lattice is divided into different blocks. Each of these blocks then corresponds to a contiguous set of indices. As a result, we need to additionally allocate field memory for buffers that we can use to send and receive information between different cores and nodes. In order to communicate correctly, we need to first fill the buffer of data to be sent. The division of the local lattice into blocks, the location of the different buffers and buffer copies are described in the following C structure in `Include/geometry.h`.
 
 ```
-#define _DECLARE_FIELD_STRUCT(_name, _type) \
-  typedef struct _##_name                   \
-  {                                         \
-    _type *ptr;                             \
-    geometry_descriptor *type;              \
-    _MPI_FIELD_DATA                         \
-    _GPU_FIELD_DATA(_type)                  \
-  } _name
-```
-
-The ```_name``` will define the field's new name, which can be anything, while the ```_type``` variable has to refer to a type that was already defined. ```_type``` defines the types of values on the lattice sites.
-
-The field value copy of the CPU is defined by ```_type *ptr```, which is a 1D array containing the field's values at the lattice sites. The GPU copy is hidden behind the macro ```_GPU_FIELD_DATA(_type)```.
-
-```
-#define _GPU_FIELD_DATA(_type)
-#ifdef WITH_GPU
-#undef _GPU_FIELD_DATA
-#define _GPU_FIELD_DATA(_type) _type *gpu_ptr;
-#endif //WITH_MPI
-```
-
-We need this macro instead of outright declaring the copy because we do not want to have a GPU copy in the field ```struct```s if we are only compiling for CPU. As can be seen from the macro ```_GPU_FIELD_DATA(_type)``` is defined to return nothing, but in the case of compilation with GPUs, it is overwritten to give a 1D array called ```gpu_ptr```, which can later be allocated on and accessed from the device.
-
-Since memory access patterns have a high impact on application performance, the way that field data is stored on the GPU is different from how it is stored on the CPU in several ways that will be explained in the following. Further, in ```HiRep``` memory is managed manually instead of using a unified memory setup, which implies that from a kernel, only pointers to sites will be available but not the complete field structures. This has an impact on which functions and macros that work on the CPU are available to call from a CUDA kernel.
-
-This means, that if we declare a spinor field
-
-```
-spinor_field *s;
-```
-
-we may access its geometry description and sites on the CPU from a regular host function
-
-```
-int main(void)
+typedef struct _geometry_descriptor
 {
-    spinor_field *s;
-
-    // Query the value at the site with index 0
-    suNf_spinor *field_value = s->ptr;
-
-    // Check, whether the spinor field is odd
-    if (s->type == &glat_odd) printf("Spinor is odd.\n")
-
-    suNf_spinor *gpu_field_value = s->gpu_ptr;
-
-    // The following fails, because it points to memory allocated on the GPU
-    // and is therefore unavailable from the host.
-    suNf_vector spinor_comp = (*gpu_field_value).c[0];
-}
-```
-
-In a kernel, it is impossible to check whether the spinor is even or odd. Every call to the spinor field structure will fail.
-
-```
-__global__ void example_kernel(spinor_field *s)
-{
-    // This fails because s is a host pointer, unless it was transferred
-    // before being passed to the kernel.
-    suNf_spinor field_value = *(s->ptr);
-
-    // This fails because the geometry descriptor is saved on the host
-    if (s->type == &glat_odd) printf("Spinor is odd.\n");
-
-    // This fails, because s is located on the host and it is accessed in
-    // order to access the field
-    suNf_spinor *gpu_field_value = s->gpu_ptr;
-}
-```
-
-The correct way to run a kernel that operates on the GPU field data copy is to pass the first site in the copy to the kernel and then access other sites. For example
+  int inner_master_pieces; 
+  int local_master_pieces; 
+  int total_spinor_master_pieces;
+  int total_gauge_master_pieces;
+  int *master_start, *master_end;
+  int master_shift;
+  int ncopies_spinor;
+  int ncopies_gauge;
+  int *copy_from, *copy_to, *copy_len;
+  int copy_shift; 
+  int nbuffers_spinor;
+  int nbuffers_gauge;
+  int *rbuf_len, *sbuf_len;
+  int *rbuf_from_proc, *rbuf_start;
+  int *sbuf_to_proc, *sbuf_start;
+  int gsize_spinor;
+  int gsize_gauge;
+  int *fuse_mask;
+  int fuse_gauge_size;
+  int fuse_inner_counter;
+} geometry_descriptor;
 
 ```
-__global__ void example_kernel(suNf_spinor *start)
-{
-    int ix = blockIdx.x * blockDim.x  + threadIdx.x;
-    // Get site with index ix
-    suNf_spinor *site = start+ix;
-}
+
+#### Number of Sites
+In order to allocate memory for the field data, we need to know how many elementary field types we need to allocate. This is different for fields that are located on the sites or the links of the lattice. Correspondingly, for the given lattice geometry, the number of sites and the number of links are calculated and saved in the fields `gsize_spinor` and `gsize_gauge` respectively.
+
+#### Master Pieces
+
+##### Local Master Pieces
+The local master pieces are the pieces of local lattices. A piece is called _master_ if it does not contain copies of other sites, as for example is the case for buffer pieces. These are copies of sites already stored in a master pieces. The field `local_master_pieces` identifies the number of local master pieces. 
+
+For example, take a lattice of size $8^3\times 16$ split up with an MPI layout of `1.1.1.2` into two local lattices of size $8^4$. In addition to this decomposition, the blocks are even-odd preconditioned, meaning each of these local lattices will be split up again into a block of even and odd sites. We will end up with four blocks which are denoted _local master pieces_. The integer saved in `local_master_pieces` would therefore be equal to four. 
+
+TODO:  illustration
+
+##### Total Master Pieces
+Additionally, the geometry descriptor contains two numbers of _total master pieces_, one for spinors and one for gauge fields. This counts the number of local master pieces plus the number of receive buffers, but not send buffers. The local master pieces including receive buffers can be thought of as an extension of the local lattice in the directions that are parallelized, i.e. the global lattice is split in this direction. Iterating over the total number of master pieces equates therefore to an iteration over the local lattices including their halo regions.
+
+TODO: illustration
+
+
+The number of interfacing elements does not only depend on this decomposition but also whether the saved field is saved on the lattice links or sites. Consequently, while the master pieces are identical, the buffer structure depends on whether the field that needs to be communicated is a gauge field or a spinor field. For this, the geometry descriptor contains both an integer for the total number of master pieces for a spinor field and the total number of master pieces for a gauge field. Additionally, there are fields that contain corresponding counts of buffers for both field geometries, `nbuffers_spinor` and `nbuffers_gauge`.
+
+#### Block Arrangement Conventions
+In order to work with the block structure efficiently and optimize memory access patterns, the sites belonging to a single piece are stored consecutively in memory. Since the field data is stored in a one-dimensional array, we can access the sites stored in a block by consecutive indices. As a result, in order to access all sites in a block, we need to know the index where it starts and where it ends. This information is stored in the arrays `master_start` and `master_end`. 
+
+Here, every block is identified by an index, in the code often called `ixp`. The mapping of the index to the block is persistent but arbitrary aside from the convention, that the first indices will go to the local master pieces and higher indices then identify buffers. In order to find the starting index of a piece with index 5 belonging to a decomposed spinor field, one would write
+
+```
+spinor_field s = /* initialize a field */
+int index_start = s->type->master_start[5];
 ```
 
-The index in the 1D array is bijectively mapped to the coordinates in space and time.
+One could find out the length of the block, which is not constant because the length of the buffer pieces is variable, by writing
 
-## Block Decomposition
+```
+int block_length = s-type->master_start[5] - s->type->master_end[5] + 1;
+```
+
+#### Buffer Synchronization
+For complex decompositions, that are usual in lattice simulations, the blocks have to communicate in a highly non-trivial way. For example decomposing a $32^3\times 64$ lattice into $8^4$ local lattices requires 512 processes to communicate the three dimensional surfaces of each four-dimensional local lattice with all interfacing blocks. In order to perform this communication we need to know both the indices of the sending blocks and map them to the receiving blocks. This information is stored in the arrays `copy_from` and `copy_to`. I can iterate through these arrays to find pairs of sending and receiving blocks and perform the communication. The size of the memory transfer is further stored in the array `copy_len`.
+
+#### Even-Odd Decomposition
+
+As already mentioned it is convention to first store the local master pieces and then the receive buffers. In each of these subcategories, we want to also store first the even and then the odd blocks. For the local master pieces this means that there is a big block of memory containing all local master pieces that is split in two halfs of contiguous memory that contain all even or odd sites respectively. 
+
+%% TODO illustration
+
+Resultingly, there is a shift in the local master piece block that is the starting index of the odd sites, i.e. the index of the first odd entry in the full geometry. This index is identified by the integer `master_shift` in the geometry descriptor. 
+
+Buffers are decomposed analogously, but split in two in the buffer block. 
+
+TODO: illustration. Also make sure this is right, and we do not for some reason
+split the complete thing in two.
+
+The block index of the first odd copy in the full geometry is identified by the integer `copy_shift` in the geometry descriptor.
+
+## Technical Details and Examples
 
 ### Even-Odd Decomposition
 #### CPU

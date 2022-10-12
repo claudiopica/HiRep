@@ -19,8 +19,9 @@ Subsection
    :maxdepth: 2
    :caption: Development Manual
 
-   development_notes/field_geometry
    development_manual/coding_conventions
+   development_manual/data_structures
+   development_manula/auto_generation
    development_manual/field_geometry
 
 .. toctree::
