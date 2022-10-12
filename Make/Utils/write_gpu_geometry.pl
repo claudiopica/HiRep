@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 use strict;
 
-## TODO: Prolog, Epilog, Macro docs, pl script docs
+## TODO: pl script docs clean up
 ## Problems: Spinor field layers, scalar fields need separate def
 ## remove stride, because it is always half number of lattice points->just compile with this
 ## TODO: Possibly it is faster, if we do the cast only once (double*)
@@ -9,11 +9,17 @@ use strict;
 ## is a math operation internally while in reality it is just moving memory around.
 
 # Read arguments from MkRules
+# Ng ... Number of Colors
+# rep ... Fermion Representation String Descriptor
+# su2quat ... SU(2) with Quaternions true/false
+# Gauge group ... SU(N) or SO(N), possible strings GAUGE_SUN, GAUGE_SON
 my ($Ng,$rep,$su2quat,$gauge_group)=@ARGV;
 
 open STDOUT, ">gpu_geometry.h";
 
+
 my $Nf = 0;
+my $complex = "C"; # Need this for suN-matrices
 
 if ($rep eq "REPR_FUNDAMENTAL") {
     $Nf=$Ng;
@@ -23,9 +29,15 @@ if ($rep eq "REPR_FUNDAMENTAL") {
     $Nf=$Ng*($Ng-1)/2;
 } elsif ($rep eq "REPR_ADJOINT") {
     $Nf=$Ng*$Ng - 1;
+    $complex="R";
 } else {
     print "Fermion representation unspecified. Check Make/MkFlags.";
     exit(1);
+}
+
+## SO(N) are always real
+if ($gauge_group eq "GAUGE_SON") {
+    $complex="R";
 }
 
 ## Single precision/double precision
@@ -44,11 +56,13 @@ my @a = (0,1);
 for my $prec (@a) {
     for my $repr (@a) {
         write_gpu_spinor($prec, $repr);
+        write_gpu_suN($prec, $repr);
     }
+
+    write_su2quat_redefinitions($prec);
 }
 
 write_epilog();
-###
 
 ## Write functions
 #write_gpu_spinor();
@@ -144,4 +158,86 @@ sub write_gpu_spinor {
     }
     print "\t\t((${type}*)(_out))\[__iz\]=(_v).c\[$i\]; \\\n";
     print "\t} while (0) \n\n";
+}
+
+sub write_gpu_suN {
+    my ($prec, $repr) = @_;
+    my @dim_suN = ($Ng*$Ng, $Nf*$Nf);
+    my $i;
+
+    # Generate basename for given representation
+    my $dataname = $basename.$rep_suffixes[$repr];
+    
+    # Generate precision suffix
+    my $precision_suffix = $precision_suffixes[$prec];
+
+    # Complete typename with suffixes
+    my $typename = $dataname.$precision_suffix;
+
+    # If the representation is real, then we want to separated the 
+    # real components (double or float) by the stride otherwise, the components 
+    # will be complex numbers, which occupy twice as much memory.
+    my $type;
+    if ($complex eq "C") {
+        $type = $precision_c_types[$prec];
+    } else {
+        $type = $precision_types[$prec];
+    }
+
+    my $N = $dim_suN[$repr];
+
+    # Generate read macro
+    print "/**\n";
+    print " * \@brief Read ${typename} matrix according to device geometry structure \n";
+    print " * \@param _stride\t\tInteger valued stride with which the components are stored\n";
+    print " * \@param _v     \t\t${typename} target to read to from the field _in\n";
+    print " * \@param _in    \t\tInput field to read from \n";
+    print " * \@param _ix    \t\tIndex at which to read \n";
+    print " * \@param _comp  \t\tLink direction to read.\n";
+    print " */\n";
+    print "#define read_gpu_${typename}(_stride, _v, _in, _ix, _comp) \\\n";
+    print "\tdo { \\\n";
+    print "\t\tint __iz = (_ix) + ((_comp)*$N)*(_stride); \\\n";
+    for ($i=0; $i<$N-1; $i++) {
+        print "\t\t(_v).c\[$i\]=((${type}*)(_in))\[__iz\]; __iz+=(_stride); \\\n";
+    }
+    print "\t\t(_v).c\[$i\]=((${type}*)(_in))\[__iz\]; \\\n";
+    print "\t} while (0) \n\n";
+
+    # Generate write macro
+    print "/**\n";
+    print " * \@brief Write ${typename} matrix according to device geometry structure \n";
+    print " * \@param _stride\t\tInteger valued stride with which the components are stored\n";
+    print " * \@param _v     \t\t${typename} target to write to the field _out\n";
+    print " * \@param _out   \t\tInput field to write to\n";
+    print " * \@param _ix    \t\tIndex at which to write \n";
+    print " * \@param _comp  \t\tLink direction to write. \n";
+    print " */\n";
+    print "#define write_gpu_${typename}(_stride, _v, _out, _ix, _comp) \\\n";
+    print "\tdo { \\\n";
+    print "\t\tint __iz = (_ix) + ((_comp)*$N)*(_stride); \\\n";
+    for ($i=0; $i<$N-1; $i++) {
+        print "\t\t((${type}*)(_out))\[__iz\]=(_v).c\[$i\]; __iz+=(_stride);\\\n";
+    }
+    print "\t\t((${type}*)(_out))\[__iz\]=(_v).c\[$i\]; \\\n";
+    print "\t} while (0) \n\n";
+}
+
+sub write_su2quat_redefinitions {
+    my $prec = @_;
+    if ($su2quat==1) {
+        # Basenames for both representations
+        my $dataname = $basename.$rep_suffixes[0];
+        my $datanameR = $basename.$rep_suffixes[1];
+        
+        # Generate precision suffix
+        my $precision_suffix = $precision_suffixes[$prec];
+
+        # Complete typenames with suffixes
+        my $typename = $dataname.$precision_suffix;
+        my $typenameR = $datanameR.$precision_suffix;
+    
+        print "#define write_gpu_${typename}(_stride, _v, _out, _ix, _comp) ";
+        print "write_gpu_${typenameR}(_stride, _v, _out, _ix, _comp)\n\n";
+    }
 }
