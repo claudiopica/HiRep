@@ -36,6 +36,8 @@ typedef struct _geometry_descriptor
   int fuse_inner_counter;
 } geometry_descriptor;
 
+
+
 #include "hr_omp.h"
 
 //Loop over pieces of given type

@@ -160,8 +160,8 @@
                     for (int comp = 0; comp < _size; ++comp)                                                \
                     {                                                                                       \
                         target = _4FIELD_AT(out, ix, comp);                                                 \
-                        int ix_loc = (ix % vol4h);\
-                        read_gpu_##_site_type(vol4h, (*target), source, ix_loc, comp);                          \
+                        int ix_loc = (ix % vol4h);                                                          \
+                        read_gpu_##_site_type(vol4h, (*target), source, ix_loc, comp);                      \
                     }                                                                                       \
                 }                                                                                           \
             }                                                                                               \
