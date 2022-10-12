@@ -5,11 +5,6 @@
 ### Definition
 The following data types are defined as C structures containing a single array of elements. These can be used to create fields in `Include/spinor_field.h` using the macro `_DECLARE_FIELD_STRUCT`. 
 
-## Elementary Data Types
-
-### Definition
-The following data types are defined as C structures containing a single array of elements. These can be used to create fields in `Include/spinor_field.h` using the macro `_DECLARE_FIELD_STRUCT`. 
-
 
 | Name                   | Array of               | Size                               |
 |:-----------------------|:-----------------------|:-----------------------------------|
