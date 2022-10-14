@@ -175,7 +175,7 @@ void sub_assign_clover_term(suNfc_field* out, suNfc_field* in)
 
 void sub_assign_clover_force(suNf_field* out, suNf_field* in) 
 {
-    sub_assign_gfield_cpu(out, in);
+    sub_assign_gfield_f_cpu(out, in);
 }
 
 

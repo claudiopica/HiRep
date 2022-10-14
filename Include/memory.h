@@ -59,7 +59,7 @@ _DECLARE_MEMORY_FUNC_GAUGE(gfield_f_flt, suNf_field_flt, suNf_flt, 4);
 _DECLARE_MEMORY_FUNC_GAUGE(scalar_field, suNg_scalar_field, suNg_vector, 1);
 _DECLARE_MEMORY_FUNC_GAUGE(avfield, suNg_av_field, suNg_algebra_vector, 4);
 _DECLARE_MEMORY_FUNC_GAUGE(gtransf, suNg_field, suNg, 1);
-_DECLARE_MEMORY_FUNC_GAUGE(clover_ldl, ldl_field, ldl_t, 1);
+//_DECLARE_MEMORY_FUNC_GAUGE(clover_ldl, ldl_field, ldl_t, 1);
 _DECLARE_MEMORY_FUNC_GAUGE(clover_term, suNfc_field, suNfc, 4);
 _DECLARE_MEMORY_FUNC_GAUGE(clover_force, suNf_field, suNf, 6);
 
