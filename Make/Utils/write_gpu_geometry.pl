@@ -137,7 +137,6 @@ sub write_gpu_spinor {
     print " */\n";
     print "#define read_gpu_${typename}(_stride, _v, _in, _ix, _comp) \\\n";
     print "\tdo { \\\n";
-    print "\t\t${type} real_pt, imag_pt; \\\n";
     print "\t\tint __iz = (_ix) + ((_comp)*$N)*(_stride); \\\n";
     for ($i=0; $i<$N-1; $i++) {
         print "\t\t(_v).c\[$i\]=((${type}*)(_in))\[__iz\]; __iz+=(_stride); \\\n";
