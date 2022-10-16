@@ -42,11 +42,17 @@ typedef struct _geometry_descriptor
 In order to allocate memory for the field data, we need to know how many elementary field types we need to allocate. This is different for fields that are located on the sites or the links of the lattice. Correspondingly, for the given lattice geometry, the number of sites and the number of links are calculated and saved in the fields `gsize_spinor` and `gsize_gauge` respectively.
 
 #### Master Pieces
+A piece is called _master_ if it does not contain copies of other sites, as for example is the case for buffer pieces. These are copies of sites already stored in a master piece. 
+
+#### Inner Master Pieces
+The first decomposition of the lattice site is the even-odd preconditioning. This splits  any lattice in two pieces: an even and an odd one. These pieces are stored contiguously in memory like in the following illustration
+
+TODO: illustration
+
+meaning that at the first indices one can only read sites of the even lattice and after an offset we are only reading odd sites. For an even-odd preconditioned lattice the number of inner master pieces is therefore two and can be accessed in the variable `inner_master_pieces` of the geometry descriptor.
 
 ##### Local Master Pieces
-The local master pieces are the pieces of local lattices. A piece is called _master_ if it does not contain copies of other sites, as for example is the case for buffer pieces. These are copies of sites already stored in a master pieces. The field `local_master_pieces` identifies the number of local master pieces. 
-
-For example, take a lattice of size $8^3\times 16$ split up with an MPI layout of `1.1.1.2` into two local lattices of size $8^4$. In addition to this decomposition, the blocks are even-odd preconditioned, meaning each of these local lattices will be split up again into a block of even and odd sites. We will end up with four blocks which are denoted _local master pieces_. The integer saved in `local_master_pieces` would therefore be equal to four. 
+The local master pieces are the pieces of local lattices, the blocks that the lattice is decomposed into to be processed either by multiple cores or GPUs. For example, take a lattice of size $8^3\times 16$ split up with an MPI layout of `1.1.1.2` into two local lattices of size $8^4$. Then the blocks are further split up into two. The field `local_master_pieces` identifies the number of local master pieces. In this case the integer saved in `local_master_pieces` would therefore be equal to four. 
 
 TODO:  illustration
 
@@ -54,7 +60,6 @@ TODO:  illustration
 Additionally, the geometry descriptor contains two numbers of _total master pieces_, one for spinors and one for gauge fields. This counts the number of local master pieces plus the number of receive buffers, but not send buffers. The local master pieces including receive buffers can be thought of as an extension of the local lattice in the directions that are parallelized, i.e. the global lattice is split in this direction. Iterating over the total number of master pieces equates therefore to an iteration over the local lattices including their halo regions.
 
 TODO: illustration
-
 
 The number of interfacing elements does not only depend on this decomposition but also whether the saved field is saved on the lattice links or sites. Consequently, while the master pieces are identical, the buffer structure depends on whether the field that needs to be communicated is a gauge field or a spinor field. For this, the geometry descriptor contains both an integer for the total number of master pieces for a spinor field and the total number of master pieces for a gauge field. Additionally, there are fields that contain corresponding counts of buffers for both field geometries, `nbuffers_spinor` and `nbuffers_gauge`.
 
@@ -74,8 +79,9 @@ One could find out the length of the block, which is not constant because the le
 int block_length = s-type->master_start[5] - s->type->master_end[5] + 1;
 ```
 
+
 #### Buffer Synchronization
-For complex decompositions, that are usual in lattice simulations, the blocks have to communicate in a highly non-trivial way. For example decomposing a $32^3\times 64$ lattice into $8^4$ local lattices requires 512 processes to communicate the three dimensional surfaces of each four-dimensional local lattice with all interfacing blocks. In order to perform this communication we need to know both the indices of the sending blocks and map them to the receiving blocks. This information is stored in the arrays `copy_from` and `copy_to`. I can iterate through these arrays to find pairs of sending and receiving blocks and perform the communication. The size of the memory transfer is further stored in the array `copy_len`.
+For complex decompositions, that are usual in lattice simulations, the blocks have to communicate in a highly non-trivial way. For example decomposing a $32^3\times 64$ lattice into $8^4$ local lattices requires 512 processes to communicate the three dimensional surfaces of each four-dimensional local lattice with all interfacing blocks. In order to perform this communication we need to know both the indices of the sending blocks and map them to the receiving blocks. This information is stored in the arrays `copy_from` and `copy_to`. We can iterate through these arrays to find pairs of sending and receiving blocks and perform the communication. The size of the memory transfer is further stored in the array `copy_len`.
 
 #### Even-Odd Decomposition
 
