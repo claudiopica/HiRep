@@ -1,7 +1,7 @@
 TOPDIR = ../..
 MKDIR = $(TOPDIR)/Make
 
-TESTS = check_field_copy
+TESTS = check_field_copy check_alloc_CPU
 
 LIBS += $(TOPDIR)/LibHR/libhr.a
 

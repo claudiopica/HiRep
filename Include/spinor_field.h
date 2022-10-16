@@ -28,7 +28,7 @@
 #define _GPU_FIELD_DATA(_type) _type *gpu_ptr;
 #endif //WITH_MPI
 
-typedef struct {
+typedef struct {// TODO: this is probably not the right complex type
 	double _Complex up[NF*(2*NF+1)];
 	double _Complex dn[NF*(2*NF+1)];
 } ldl_t;

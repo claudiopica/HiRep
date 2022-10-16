@@ -1,5 +1,14 @@
 #include <math.h>
 #include "logger.h"
+#include "ranlux.h"
+
+void test_setup() 
+{
+    // TODO: other settings
+    rlxd_init(1, 205);
+    rlxs_init(1, 205);
+}
+
 
 int check_diff_norm(double diff_norm, double tol) 
 {

@@ -5,9 +5,9 @@
 
 /*******************************************************************************
 *
-* File field_alloc.c
+* File spinor_field_alloc.c
 *
-* Functions for matter field allocation and memory operations
+* Functions for spinor field allocation and memory operations
 *
 *******************************************************************************/
 
@@ -15,15 +15,16 @@
 #include "suN.h"
 #include "error.h"
 #include "memory.h"
+#include "global.h"
+#include "spinor_field.h"
 #include "geometry.h"
 #include "geometry_check.h"
 #include "gpu_geometry.h"
-#include "gpu_geometry.h"
-#include "linear_algebra.h"
-#include "global.h"
 #ifdef WITH_MPI
 #include <mpi.h>
 #endif
+
+// TODO: Doxygen docs
 
 /*
  * Here we use for all macros the parameters:
@@ -35,17 +36,140 @@
  *
  */
 
-/* ================================================= MPI ================================================= */
-/* MPI allocation and deallocation code */
-#ifdef WITH_MPI
 
-    #ifdef WITH_GPU
-        //TODO: Implement allocation for CUDA-aware MPI
-    #else
+/* ================================================= MPI and GPU ================================================= */
+
+#if defined(WITH_MPI) && defined(WITH_GPU)
+
+    #define _QUERY_NGPUS(_name) \
+        int ngpus = 0;\
+        err = cudaGetDeviceCount(&ngpus);\
+        error(err != cudaSuccess, 1, "alloc_" #_name " [" __FILE__ "]" \
+                        "Could not query GPU device count.\n");
+
+    #define _CHANGE_DEVICE(_name) \
+        err = cudaSetDevice(active_device);\
+        error(err != cudaSuccess, 1, "alloc_" #_name " [" __FILE__ "]"\
+                        "Unable to change devices.\n");
+
+    #define _FREE_GPU_FIELD_DATA(_site_type) \
+        if (f->gpu_ptr != NULL) \
+        {\
+            cudaError_t err;\
+            int active_device = 0;\
+            _site_type *block_start;\
+                _QUERY_NGPUS((_name));\
+                _PIECE_FOR(f->type, ixp) \
+                {\
+                    block_start = _GPU_FIELD_BLK(f, in->type->master_start[ixp]);\
+                    active_device = ixp / ngpus;\
+                    _CHANGE_DEVICE((_name));\
+                    cudaFree(block_start);\
+                }\
+        }
+    
+    #define _ALLOC_GPU_FIELD_DATA(_name, _size) \
+        if (alloc_mem_t & GPU_MEM) \
+        {\
+            cudaError_t err;\
+            _QUERY_NGPUS((_name));\
+\
+            int block_size = 0;\
+            int active_device = 0;\
+            _site_type *block_start;\
+            _PIECE_FOR(f->type, ixp) \
+            {\
+                block_size = f->type->master_end[ixp] - f->type->master_start[ixp] + 1;\
+                block_start = _GPU_FIELD_BLK(f, in->type->master_start[ixp]);\
+\
+                active_device = ixp / ngpus;\
+                _CHANGE_DEVICE((_name));\
+\
+                err = cudaMalloc((void **)&block_start, block_size);\
+                error(err != cudaSuccess, 1, "alloc_" #_name " [" __FILE__ "]"\
+                                "Could not allocate GPU memory on device number %d\n", active_device);\
+            }\
+        }\
+        else \
+            f->gpu_ptr = NULL;
+
+    #define _FREE_MPI_FIELD_DATA \
+        if (f->comm_req != NULL) \
+            cudaFree(f->comm_req);
+
+    #define _ALLOC_MPI_FIELD_DATA(_name) \
+        if (type->nbuffers_gauge > 0) \
+        {\
+            cudaError_t err;\
+            err = cudaMalloc((void **)f->comm_req, 2 * type->nbuffers_gauge * sizeof(MPI_Request), ALIGN);\
+            error(err != cudaSuccess, 1, "alloc_" #_name " [" __FILE__ "]"\
+                            "Could not allocate buffers for multi-GPU communication.\n");\
+            for(int ix = 0; ix < 2 * type->nbuffers_gauge; ++ix) \
+                f->comm_req[ix] = MPI_REQUEST_NULL;\
+        }\
+        else\
+        {\
+            f->comm_req = NULL;\
+        }
+
+    #define _DECLARE_COPY_TO(_name, _field_type, _site_type, _size) \
+        void copy_to_gpu_##_name(_field_type *f)\
+        {\
+            _field_type *tmp = alloc_##_name(f->type);\
+            to_gpu_format_##_name(tmp, f);\
+\
+            _QUERY_NGPUS((_name));\
+            int block_size = 0;\
+            int active_device = 0;\
+            _site_type block_start;\
+            _PIECE_FOR(u->type, ixp) \
+            {\
+                block_size = f->type->master_end[ixp] - f->type->master_start[ixp] + 1;\
+                block_start_tmp = _FIELD_BLK(tmp, tmp->type->master_start[ixp], 0);\
+                block_start_in = _GPU_FIELD_BLK(f, f->type->master_start[ixp], 0);\
+\
+                active_device = ixp / ngpus;\
+                _CHANGE_DEVICE((_name));\
+                cudaMemcpy(block_start_in, block_start_tmp, block_size, cudaMemcpyHostToDevice);\
+            }\
+            free_##_name(tmp);\
+        }
+    
+    #define _DECLARE_COPY_FROM(_name, _field_type, _site_type, _size) \
+        void copy_from_gpu_##_name(_field_type *f) \
+        {\
+            _field_type *tmp = alloc_##_name(f->type);\
+\
+            _QUERY_NGPUS(_name);\
+            int block_size = 0;\
+            int active_device = 0;\
+            _site_type block_start;\
+            _PIECE_FOR(f->type, ixp) \
+            {\
+                block_size = f->type->master_end[ixp] - f->type->master_start[ixp] + 1;\
+                block_start_tmp = _FIELD_BLK(tmp, tmp->type->master_start[ixp]);\
+                block_start_in = _FIELD_BLK(f, f->type->master_start[ixp]);\
+\
+                active_device = ixp / ngpus; \
+                _CHANGE_DEVICE(_name); \
+                cudaMemcpy(block_start_tmp, block_start_in, block_size, cudaMemcpyDeviceToHost);\
+            }\
+            to_cpu_format_##_name(f, tmp);\
+            free_##_name(tmp);\
+        }
+
+    #undef _QUERY_NGPUS
+    #undef _CHANGE_DEVICE
+
+#endif
+
+/* ================================================= MPI and CPU ========================================= */
+
+#if defined(WITH_MPI) && !defined(WITH_GPU)
 
         #define _FREE_MPI_CODE                                                                              \
             if(u->comm_req != NULL)                                                                         \
-            afree(u->comm_req)
+                afree(u->comm_req)
 
         #define _ALLOC_MPI_CODE(_name)                                                                      \
             if (type->nbuffers_spinor > 0)                                                                  \
@@ -60,29 +184,21 @@
             else                                                                                            \
             {                                                                                               \
                 for (int i = 0; i < n; ++i) f[i].comm_req = NULL;                                           \
-            }                                                                                               \
-            do {} while (0)
-    #endif
+            }
 
-#else /* WITH_MPI */
+#endif 
 
-    #define _FREE_MPI_CODE do {} while(0)
-    #define _ALLOC_MPI_CODE(_name) do {} while(0)
+/* ================================================= Single GPU ========================================== */
 
-#endif /* WITH_MPI */
-
-/* ================================================= GPU ================================================= */
-/* GPU allocation and deallocation code */
-#ifdef WITH_GPU
+#if defined(WITH_GPU) && !defined(WITH_MPI)
 
     /* Free device memory */
     /* Note: to be used inside function declaration */
-    #define _FREE_GPU_CODE                                                                                  \
+    #define _FREE_GPU_FIELD_DATA                                                                                  \
         if(u->gpu_ptr != NULL)                                                                              \
             cudaFree(u->gpu_ptr);                                                                           \
-        do {} while (0)
 
-    #define _ALLOC_GPU_CODE(_name,_size)                                                                    \
+    #define _ALLOC_GPU_FIELD_DATA(_name,_size)                                                                    \
         if(alloc_mem_t & GPU_MEM)                                                                           \
         {                                                                                                   \
             cudaError_t err;                                                                                \
@@ -95,10 +211,9 @@
         } else                                                                                              \
             for (int i = 0; i < n; ++i)                                                                     \
                 f[i].gpu_ptr = NULL;                                                                        \
-        do {} while (0);
 
     /* Declare function to copy field from host to device */
-    #define _DECLARE_COPY_TO(_name, _field_type, _size)                                                     \
+    #define _DECLARE_COPY_TO(_name, _field_type, _site_type, _size)                                                     \
         void copy_to_gpu_##_name(_field_type *f)                                                            \
         {                                                                                                   \
             /* FIXME: Do not only copy one layer. */                                                        \
@@ -110,7 +225,7 @@
         }
 
     /* Declare function to copy field from device to host */
-    #define _DECLARE_COPY_FROM(_name, _field_type, _size)                                                   \
+    #define _DECLARE_COPY_FROM(_name, _field_type, _site_type, _size)                                                   \
         void copy_from_gpu_##_name(_field_type *f)                                                          \
         {                                                                                                   \
             _field_type *tmp = alloc_##_name(1, f->type);                                                   \
@@ -119,6 +234,12 @@
             to_cpu_format_##_name(f, tmp);                                                                  \
             free_##_name(tmp);                                                                              \
         }
+#endif
+
+/* ================================================= Single and Multi-GPU ================================ */
+
+/* These macros work with or without MPI! */
+#ifdef WITH_GPU
 
     /* Declare function to convert GPU to CPU format */
     /* This is necessary, because GPU performance is very sensitive to */
@@ -129,17 +250,18 @@
             _site_type *source, *target;                                                                    \
             _CHECK_GEOMETRY_MATCHING(out, in);                                                              \
                                                                                                             \
-            int vol4h = T*X*Y*Z/2;                                                                          \
+            int stride = 0;                                                                                 \
             _PIECE_FOR(in->type, ixp)                                                                       \
             {                                                                                               \
-                target  = _FIELD_BLK(out, ixp);                                                              \
+                stride = in->type->master_end[ixp] - in->type->master_start[ixp] + 1;\
+                target  = _FIELD_BLK(out, ixp);                                                             \
                 _SITE_FOR(in->type, ixp, ix)                                                                \
                 {                                                                                           \
                     source = _FIELD_AT(in, ix);                                                             \
+                    int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);                                            \
                     for (int comp = 0; comp < 4; comp++)                                                    \
                     {                                                                                       \
-                        int ix_loc = (ix % vol4h);\
-                        write_gpu_##_site_type(vol4h, (*source).c[comp], target, ix_loc, comp);         \
+                        write_gpu_##_site_type(stride, (*source).c[comp], target, ix_loc, comp);             \
                     }                                                                                       \
                 }                                                                                           \
             }                                                                                               \
@@ -151,31 +273,45 @@
             _site_type *target, *source;                                                                    \
             _CHECK_GEOMETRY_MATCHING(out, in);                                                              \
                                                                                                             \
-            int vol4h = T*X*Y*Z/2;                                                                          \
+            int stride = 0;                                                                          \
+            int ix_loc = 0;\
             _PIECE_FOR(in->type, ixp)                                                                       \
             {                                                                                               \
+                stride = in->type->master_end[ixp] - in->type->master_start[ixp] + 1;\
                 source = _FIELD_BLK(in, ixp);                                                               \
                 _SITE_FOR(in->type, ixp, ix)                                                                \
                 {                                                                                           \
+                    ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);\
                     target = _FIELD_AT(out, ix);                                                             \
                     for (int comp = 0; comp < 4; comp++)                                                    \
                     {                                                                                       \
-                        read_gpu_##_site_type(vol4h, (*target).c[comp], source, ix % vol4h, comp);                     \
+                        read_gpu_##_site_type(stride, (*target).c[comp], source, ix_loc, comp);                     \
                     }                                                                                       \
                 }                                                                                           \
             }                                                                                               \
         }
 
-#else /* WITH_GPU */
+#endif
 
-    #define _FREE_GPU_CODE do {} while(0)
-    #define _ALLOC_GPU_CODE(_name,_size) do {} while(0)
+/* ================================================= Empty defs ========================================= */
+
+#ifndef WITH_GPU
+
+    #define _FREE_GPU_FIELD_DATA(_name, _site_type) do {} while(0)
+    #define _ALLOC_GPU_FIELD_DATA(_name, _size) do {} while(0)
+    #define _DECLARE_COPY_TO(_name, _field_type, _site_type, _size)
+    #define _DECLARE_COPY_FROM(_name, _field_type, _site_type, _size) 
     #define _DECLARE_CONVERT_TO_GPU_FORMAT(_name, _field_type, _site_type, _size) 
     #define _DECLARE_CONVERT_TO_CPU_FORMAT(_name, _field_type, _site_type, _size)
-    #define _DECLARE_COPY_TO(_name, _size)
-    #define _DECLARE_COPY_FROM(_name, _size) 
+    
+#endif
 
-#endif /* WITH_GPU */
+#ifndef WITH_MPI
+
+    #define _FREE_MPI_FIELD_DATA do {} while(0)
+    #define _ALLOC_MPI_FIELD_DATA(_name) do {} while(0)
+
+#endif
 
 /* ============================================== All cases ============================================== */
 
@@ -186,8 +322,8 @@
         if (u!=NULL) {                                                                                      \
             if (u->ptr!=NULL)                                                                               \
                 afree(u->ptr);                                                                              \
-            _FREE_GPU_CODE;                                                                                 \
-            _FREE_MPI_CODE;                                                                                 \
+            _FREE_GPU_FIELD_DATA(_name, _site_type);                                                                                 \
+            _FREE_MPI_FIELD_DATA;                                                                                 \
             afree(u);                                                                                       \
             u = NULL;                                                                                       \
         }                                                                                                   \
@@ -224,10 +360,10 @@
         }	                                                                                                \
                                                                                                             \
         /* Allocate GPU field, if compiling with GPU */                                                     \
-        _ALLOC_GPU_CODE(_name,_size);                                                                       \
+        _ALLOC_GPU_FIELD_DATA(_name,_size);                                                                       \
                                                                                                             \
         /* Allocate buffers for MPI comms, if compiling with MPI */                                         \
-        _ALLOC_MPI_CODE(_name);                                                                             \
+        _ALLOC_MPI_FIELD_DATA(_name);                                                                             \
                                                                                                             \
         return f;                                                                                           \
     }
@@ -235,8 +371,8 @@
 #define _DECLARE_MEMORY_FUNC(_name, _field_type, _site_type, _size)                                         \
     _DECLARE_FREE_FUNC(_name,_field_type)                                                                   \
     _DECLARE_ALLOC_FUNC(_name,_field_type,_size)                                                            \
-    _DECLARE_COPY_TO(_name, _field_type, _size)                                                             \
-    _DECLARE_COPY_FROM(_name, _field_type, _size)                                                           \
+    _DECLARE_COPY_TO(_name, _field_type, _site_type, _size)                                                             \
+    _DECLARE_COPY_FROM(_name, _field_type, _site_type, _size)                                                           \
     _DECLARE_CONVERT_TO_GPU_FORMAT(_name, _field_type, _site_type, _size)                                   \
     _DECLARE_CONVERT_TO_CPU_FORMAT(_name, _field_type, _site_type, _size)
 
@@ -255,3 +391,7 @@ void free_sfield(scalar_field* s) {}
 #undef _DECLARE_COPY_FROM
 #undef _DECLARE_CONVERT_TO_GPU_FORMAT
 #undef _DECLARE_CONVERT_TO_CPU_FORMAT
+#undef _ALLOC_GPU_FIELD_DATA
+#undef _ALLOC_MPI_FIELD_DATA
+#undef _FREE_GPU_FIELD_DATA
+#undef _FREE_MPI_FIELD_DATA
