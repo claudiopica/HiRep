@@ -309,6 +309,7 @@ double sqnorm_clover_term_cpu(suNfc_field *f)
             sqnorm += tmp;
         }
     }
+    return sqnorm;
 }
 
 double sqnorm_clover_force_cpu(suNf_field *f) 
@@ -370,6 +371,12 @@ void random_avfield_cpu(suNg_av_field *f)
 void random_sfield_cpu(scalar_field *f) 
 {
     int n = f->type->gsize_gauge*sizeof(double);
+    ranlxd((double*)(f->ptr), n);
+}
+
+void random_gtransf_cpu(suNg_field *f) 
+{
+    int n = f->type->gsize_gauge*sizeof(suNg)/sizeof(double);
     ranlxd((double*)(f->ptr), n);
 }
 

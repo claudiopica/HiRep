@@ -28,6 +28,7 @@ void random_gfield_f_cpu(suNf_field*);
 void random_gfield_f_flt_cpu(suNf_field_flt*);
 void random_avfield_cpu(suNg_av_field*);
 void random_sfield_cpu(scalar_field*);
+void random_gtransf_cpu(suNg_field*);
 void random_clover_term_cpu(suNfc_field*);
 void random_clover_force_cpu(suNf_field*);
 
