@@ -6,7 +6,7 @@ void test_setup()
 {
     // TODO: other settings
     rlxd_init(1, 205);
-    rlxs_init(1, 205);
+    rlxs_init(2, 208);
 }
 
 

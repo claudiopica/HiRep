@@ -8,6 +8,8 @@
 #include <string.h>
 #include "error.h"
 #include "ranlux.h"
+#include <math.h>
+#include <stdlib.h>
 
 
 // The following functions are primarily for testing purposes
@@ -18,14 +20,14 @@
 void rand_field_dbl(double* d, int n) {
     for (int i = 0; i < n; ++i) 
     {
-        d[i] = (double)rand();
+        d[i] = (double)rand()/(double)RAND_MAX;
     }
 }
 
 void rand_field_flt(float* f, int n) {
     for (int i = 0; i < n; i++) 
     {
-        f[i] = (double)rand();
+        f[i] = (float)rand()/(float)RAND_MAX;
     }
 }
 
@@ -152,12 +154,23 @@ void sub_assign_avfield_cpu(suNg_av_field *out, suNg_av_field *in)
     suNg_algebra_vector *site_in, *site_out;
     _MASTER_FOR(in->type, ix) 
     {
-        for (int comp = 0; comp < T*X*Y*Z; comp++) 
+        for (int comp = 0; comp < 4; comp++) 
         {
             site_out = _4FIELD_AT(out, ix, comp);
             site_in = _4FIELD_AT(in, ix, comp);
             _algebra_vector_sub_assign_g((*site_out), (*site_in));
         } 
+    }
+}
+
+void sub_assign_sfield(scalar_field *out, scalar_field *in) 
+{
+    double *site_in, *site_out;
+    _MASTER_FOR(in->type, ix) 
+    {
+        site_out = _FIELD_AT(out, ix);
+        site_in = _FIELD_AT(in, ix);
+        (*site_out) += (*site_in);
     }
 }
 
@@ -184,7 +197,6 @@ void sub_assign_clover_force(suNf_field* out, suNf_field* in)
 {
     sub_assign_gfield_f_cpu(out, in);
 }
-
 
 // ** SQNORM **
 double sqnorm_gfield_cpu(suNg_field *f) 
@@ -218,7 +230,6 @@ float sqnorm_gfield_flt_cpu(suNg_field_flt *f)
             sqnorm += tmp;
         }
     }
-    
     return sqnorm;
 }
 
@@ -290,9 +301,30 @@ double sqnorm_avfield_cpu(suNg_av_field *f)
     return sqnorm;
 }
 
+double sqnorm_sfield_cpu(scalar_field *f) 
+{
+    double *site;
+    double sqnorm = 0.0;
+    _MASTER_FOR(f->type, ix) 
+    {
+        site = _FIELD_AT(f, ix);
+        sqnorm += (*site)*(*site);
+    }
+    return sqnorm;
+}
+
 double sqnorm_gtransf_cpu(suNg_field *f) 
 {
-    return sqnorm_gfield_cpu(f);
+    suNg *site;
+    double sqnorm = 0.0;
+    _MASTER_FOR(f->type, ix) 
+    {
+        double tmp;
+        site = _FIELD_AT(f, ix);
+        _suNg_sqnorm(tmp, (*site));
+        sqnorm += tmp;
+    }
+    return sqnorm;
 }
 
 double sqnorm_clover_term_cpu(suNfc_field *f) 
@@ -314,7 +346,19 @@ double sqnorm_clover_term_cpu(suNfc_field *f)
 
 double sqnorm_clover_force_cpu(suNf_field *f) 
 {
-    return sqnorm_gfield_f_cpu(f);
+    suNf *site;
+    double sqnorm = 0.0;
+    _MASTER_FOR(f->type, ix)
+    {
+        for (int comp = 0; comp < 6; comp++) 
+        {
+            double tmp;
+            site = _6FIELD_AT(f, ix, comp);
+            _suNf_sqnorm(tmp, (*site));
+            sqnorm += tmp;
+        }
+    }
+    return sqnorm;
 }
 
 // Set field to zero
@@ -334,7 +378,7 @@ void zero_gfield_cpu(suNg_field *f)
 // ** RANDOM FIELDS FOR TESTING **
 void random_gfield_cpu(suNg_field* f) 
 {
-    int n = f->type->gsize_gauge*sizeof(suNg)/sizeof(double);
+    int n = 4*f->type->gsize_gauge*sizeof(suNg)/sizeof(double);
     ranlxd((double*)(f->ptr), n);
 }
 
@@ -345,32 +389,32 @@ void random_scalar_field_cpu(suNg_scalar_field *f)
 }
 
 void random_gfield_flt_cpu(suNg_field_flt *f) 
-{
-    int n = f->type->gsize_gauge*sizeof(suNg_flt)/sizeof(float);
+{ 
+    int n = 4*f->type->gsize_gauge*sizeof(suNg_flt)/sizeof(float);
     ranlxs((float*)(f->ptr), n);
 }
 
 void random_gfield_f_cpu(suNf_field* f) 
 {
-    int n = f->type->gsize_gauge*sizeof(suNf)/sizeof(double);
+    int n = 4*f->type->gsize_gauge*sizeof(suNf)/sizeof(double);
     ranlxd((double*)(f->ptr), n);
 }
 
 void random_gfield_f_flt_cpu(suNf_field_flt *f) 
 {
-    int n = f->type->gsize_gauge*sizeof(suNf_flt)/sizeof(float);
+    int n = 4*f->type->gsize_gauge*sizeof(suNf_flt)/sizeof(float);
     ranlxs((float*)(f->ptr), n);
 }
 
 void random_avfield_cpu(suNg_av_field *f) 
 {
-    int n = f->type->gsize_gauge*sizeof(suNg_algebra_vector)/sizeof(double);
+    int n = 4*f->type->gsize_gauge*sizeof(suNg_algebra_vector)/sizeof(double);
     ranlxd((double*)(f->ptr), n);
 }
 
 void random_sfield_cpu(scalar_field *f) 
 {
-    int n = f->type->gsize_gauge*sizeof(double);
+    int n = f->type->gsize_spinor*sizeof(double);
     ranlxd((double*)(f->ptr), n);
 }
 
@@ -382,13 +426,13 @@ void random_gtransf_cpu(suNg_field *f)
 
 void random_clover_term_cpu(suNfc_field *f) 
 {
-    int n = f->type->gsize_gauge*sizeof(suNfc)/sizeof(double);
+    int n = 4*f->type->gsize_gauge*sizeof(suNfc)/sizeof(double);
     ranlxd((double*)(f->ptr), n);
 }
 
 void random_clover_force_cpu(suNf_field *f) 
 {
-    int n = f->type->gsize_gauge*sizeof(suNf)/sizeof(double);
+    int n = 6*f->type->gsize_gauge*sizeof(suNf)/sizeof(double);
     ranlxd((double*)(f->ptr), n);
 }
 

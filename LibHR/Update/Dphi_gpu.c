@@ -30,7 +30,6 @@
 #include "memory.h"
 #include "gpu.h"
 #include "hr_complex.h"
-#include <iostream>
 
 __global__ void Dphi_gpu_kernel(suNf_spinor*, 
                             const suNf_spinor*,
@@ -412,7 +411,7 @@ __global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out,
                             const int vol4h, 
                             const int ixp)
 {
-  suNf_spinor r;
+  /*suNf_spinor r;
   suNf_hspinor sn;
   suNf u;
   #ifdef FERMION_THETA
@@ -423,10 +422,10 @@ __global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out,
   int local_ix, local_iy;
   local_ix = blockIdx.x*BLOCK_SIZE + threadIdx.x;
   if (local_ix < vol4h) {
-    ix = _SITE_IDX_GPU(local_ix, ixp, vol4h);
+    ix = _SITE_IDX_GPU(local_ix, ixp, vol4h);*/
 
     /******************************* direction +0 *********************************/
-    iy=iup_d[4*ix];
+    /*iy=iup_d[4*ix];
     iyp=iy/vol4h;
     local_iy = iy % vol4h;
     
@@ -447,9 +446,9 @@ __global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out,
 
     r.c[3]=r.c[1];
 
-    __syncthreads();
+    __syncthreads();*/
     /******************************* direction -0 *********************************/
-    iy=idn_d[4*ix];
+    /*iy=idn_d[4*ix];
     iyp=iy/vol4h;
     local_iy = iy % vol4h;
 
@@ -473,9 +472,9 @@ __global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out,
     _vector_add_assign_f(r.c[1], sn.c[1]);
     _vector_sub_assign_f(r.c[3], sn.c[1]);
 
-    __syncthreads();
+    __syncthreads();*/
     /******************************* direction +1 *********************************/
-    iy=iup_d[4*ix+1];
+    /*iy=iup_d[4*ix+1];
     iyp=iy/vol4h;
     local_iy = iy % vol4h;
 
@@ -498,9 +497,9 @@ __global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out,
     _vector_add_assign_f(r.c[1], sn.c[1]);
     _vector_i_sub_assign_f(r.c[2], sn.c[1]);
 
-    __syncthreads();
+    __syncthreads();*/
     /******************************* direction -1 *********************************/
-    iy=idn_d[4*ix+1];
+    /*iy=idn_d[4*ix+1];
     iyp=iy/vol4h;
     local_iy = iy % vol4h;
 
@@ -523,9 +522,9 @@ __global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out,
     _vector_add_assign_f(r.c[1], sn.c[1]);
     _vector_i_add_assign_f(r.c[2], sn.c[1]);
 
-    __syncthreads();
+    __syncthreads();*/
     /******************************* direction +2 *********************************/
-    iy=iup_d[4*ix+2];
+    /*iy=iup_d[4*ix+2];
     iyp=iy/vol4h;
     local_iy = iy % vol4h;
 
@@ -548,9 +547,9 @@ __global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out,
     _vector_add_assign_f(r.c[1], sn.c[1]);
     _vector_sub_assign_f(r.c[2], sn.c[1]);
 
-    __syncthreads();
+    __syncthreads();*/
     /******************************* direction -2 *********************************/
-    iy=idn_d[4*ix+2];
+    /*iy=idn_d[4*ix+2];
     iyp=iy/vol4h;
     local_iy = iy % vol4h;
 
@@ -573,9 +572,9 @@ __global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out,
     _vector_add_assign_f(r.c[1], sn.c[1]);
     _vector_add_assign_f(r.c[2], sn.c[1]);
 
-    __syncthreads();
+    __syncthreads();*/
     /******************************* direction +3 *********************************/
-    iy=iup_d[4*ix+3];
+    /*iy=iup_d[4*ix+3];
     iyp=iy/vol4h;
     local_iy = iy % vol4h;
 
@@ -598,9 +597,9 @@ __global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out,
     _vector_add_assign_f(r.c[1], sn.c[1]);
     _vector_i_add_assign_f(r.c[3], sn.c[1]);
 
-    __syncthreads();
+    __syncthreads();*/
     /******************************* direction -3 *********************************/
-    iy=idn_d[4*ix+3];
+    /*iy=idn_d[4*ix+3];
     iyp=iy/vol4h;
     local_iy = iy % vol4h;
 
@@ -623,15 +622,15 @@ __global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out,
     _vector_add_assign_f(r.c[1], sn.c[1]);
     _vector_i_sub_assign_f(r.c[3], sn.c[1]);
 
-    __syncthreads();
+    __syncthreads();*/
     /******************************** end of directions *********************************/
-    _spinor_mul_f(r, -0.5, r);
+    /*_spinor_mul_f(r, -0.5, r);
 
     write_gpu_suNf_spinor(vol4h, r.c[0], out, local_ix, 0);
     write_gpu_suNf_spinor(vol4h, r.c[1], out, local_ix, 1);
     write_gpu_suNf_spinor(vol4h, r.c[2], out, local_ix, 2);
     write_gpu_suNf_spinor(vol4h, r.c[3], out, local_ix, 3);
-  }
+  }*/
 }
 
 #endif

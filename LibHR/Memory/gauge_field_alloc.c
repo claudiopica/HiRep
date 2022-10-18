@@ -20,6 +20,7 @@
 #include "geometry.h"
 #include "geometry_check.h"
 #include "gpu_geometry.h"
+#include "gpu.h"
 #ifdef WITH_MPI
 #include <mpi.h>
 #endif
@@ -49,33 +50,32 @@
 
     #define _CHANGE_DEVICE(_name) \
         err = cudaSetDevice(active_device);                                                                 \
-        error(err != cudaSuccess, 1, "alloc_" #_name " [" __FILE__ "]",                                     \
-                "Unable to change devices.\n");  
+        error(err != cudaSuccess, 1, "alloc_" #_name " [" __FILE__ "]", "Unable to change devices.\n");  \
 
     #define _FREE_GPU_FIELD_DATA(_name, _site_type)                                                         \
-    if (f->gpu_ptr != NULL)                                                                                 \
-    {                                                                                                       \
-        cudaError_t err;                                                                                    \
-        int active_device = 0;                                                                              \
-        _site_type *block_start;                                                                            \
-            _QUERY_NGPUS((_name));                                                                          \
-            _PIECE_FOR(f->type, ixp)                                                                        \
-            {                                                                                               \
-                block_start = _GPU_4FIELD_BLK(f, in->type->master_start[ixp], 0);                           \
-                active_device = ixp / ngpus;                                                                \
-                _CHANGE_DEVICE((_name));                                                                    \
-                cudaFree(block_start);                                                                      \
-            }                                                                                               \
-    }
+        if (f->gpu_ptr != NULL)                                                                                 \
+        {                                                                                                       \
+            cudaError_t err;                                                                                    \
+            int active_device = 0;                                                                              \
+            _site_type *block_start;                                                                            \
+                _QUERY_NGPUS(_name);                                                                          \
+                _PIECE_FOR(f->type, ixp)                                                                        \
+                {                                                                                               \
+                    block_start = _GPU_4FIELD_BLK(f, f->type->master_start[ixp]);                           \
+                    active_device = ixp / ngpus;                                                                \
+                    _CHANGE_DEVICE(_name);                                                                    \
+                    cudaFree(block_start);                                                                      \
+                }                                                                                               \
+        }
 
     /* Allocate device memory */
     /* Note: to be used inside function declaration */
-    #define _ALLOC_GPU_FIELD_DATA(_name, _size)                                                             \
+    #define _ALLOC_GPU_FIELD_DATA(_name, _site_type, _size)                                                             \
         if (alloc_mem_t & GPU_MEM)                                                                          \
         {                                                                                                   \
             /* Query number of GPUs to navigate between them */                                             \
             cudaError_t err;                                                                                \
-            _QUERY_NGPUS((_name));                                                                          \
+            _QUERY_NGPUS(_name);                                                                          \
                                                                                                             \
             int block_size = 0;                                                                             \
             int active_device = 0;                                                                          \
@@ -85,30 +85,30 @@
                 /*The e-o are ixp-numbered adjacent, so if might be better to do them ad once with the same device*/\
                 /* Calculate block dimensions */                                                            \
                 block_size = f->type->master_end[ixp] - f->type->master_start[ixp] + 1;                     \
-                block_start = _GPU_4FIELD_BLK(f, in->type->master_start[ixp], 0);                           \
+                block_start = _GPU_4FIELD_BLK(f, f->type->master_start[ixp]);                           \
                                                                                                             \
-                active_device = ixp / ngpus;                                                                \                                                                                          \
-                _CHANGE_DEVICE((_name));                                                                    \
+                active_device = ixp / ngpus;                                                                \
+                _CHANGE_DEVICE(_name);                                                                    \
                                                                                                             \
                 /* Allocate current piece starting at block start */                                        \
                 err = cudaMalloc((void **)&block_start, block_size);                                        \
                 error(err != cudaSuccess, 1, "alloc_" #_name " [" __FILE__ "]",                             \
-                            "Could not allocate GPU memory on device number %d\n", active_device);          \
+                            "Could not allocate GPU memory.\n");          \
             }                                                                                               \
         }                                                                                                   \
         else                                                                                                \
             f->gpu_ptr = NULL;                                                                              \
 
-    #define _FREE_MPI_FIELD_DATA                                                                            \
-        if (f->comm_req != NULL)                                                                            \
-            cudaFree(f->comm_req);
+    #define _FREE_MPI_FIELD_DATA                                                                            
+        /*if (f->comm_req != NULL)                                                                            \
+            cudaFree(f->comm_req);*/
 
-    #define _ALLOC_MPI_FIELD_DATA(_name)                                                                    \
-        if (type->nbuffers_gauge > 0)                                                                       \
+    #define _ALLOC_MPI_FIELD_DATA(_name)                                                                    
+       /* if (type->nbuffers_gauge > 0)                                                                       \
         {                                                                                                   \
             cudaError_t err;                                                                                \
-            /* How do we allocate on the right device? */                                                   \
-            err = cudaMalloc((void **)f->comm_req, 2 * type->nbuffers_gauge * sizeof(MPI_Request), ALIGN);  \
+            *//* How do we allocate on the right device? *//*                                                   \
+            err = cudaMalloc((void **)f->comm_req, 2 * type->nbuffers_gauge * sizeof(MPI_Request));  \
             error(err != cudaSuccess, 1, "alloc_" #_name " [" __FILE__ "]",                                 \
                             "Could not allocate buffers for multi-GPU communication.\n");                   \
             for (int ix = 0; ix < 2 * type->nbuffers_gauge; ++ix)                                           \
@@ -117,7 +117,7 @@
         else                                                                                                \
         {                                                                                                   \
             f->comm_req = NULL;                                                                             \
-        }
+        }*/
 
         /* Declare function to copy field from host to device */
     #define _DECLARE_COPY_TO(_name, _field_type, _site_type, _size)                                         \
@@ -125,19 +125,19 @@
         {                                                                                                   \
             _field_type *tmp = alloc_##_name(f->type);                                                      \
             to_gpu_format_##_name(tmp, f);                                                                  \
-                                                                                                            \
-            _QUERY_NGPUS((_name));                                                                          \
+            cudaError_t err;                                                                                                \
+            _QUERY_NGPUS(_name);                                                                          \
             int block_size = 0;                                                                             \
             int active_device = 0;                                                                          \
-            _site_type block_start;                                                                         \
-            _PIECE_FOR(u->type, ixp)                                                                        \
+            _site_type *block_start_in, *block_start_tmp;                                                                         \
+            _PIECE_FOR(f->type, ixp)                                                                        \
             {                                                                                               \
                 block_size = f->type->master_end[ixp] - f->type->master_start[ixp] + 1;                     \
-                block_start_tmp = _4FIELD_BLK(tmp, tmp->type->master_start[ixp], 0);                        \
-                block_start_in = _GPU_4FIELD_BLK(f, f->type->master_start[ixp], 0);                         \
+                block_start_tmp = _4FIELD_BLK(tmp, tmp->type->master_start[ixp]);                        \
+                block_start_in = _GPU_4FIELD_BLK(f, f->type->master_start[ixp]);                         \
                                                                                                             \
                 active_device = ixp / ngpus;                                                                \
-                _CHANGE_DEVICE((_name));                                                                    \
+                _CHANGE_DEVICE(_name);                                                                    \
                 cudaMemcpy(block_start_in, block_start_tmp, block_size, cudaMemcpyHostToDevice);            \
             }                                                                                               \
             free_##_name(tmp);                                                                              \
@@ -148,27 +148,24 @@
         void copy_from_gpu_##_name(_field_type *f)                                                          \
         {                                                                                                   \
             _field_type *tmp = alloc_##_name(f->type);                                                      \
-                                                                                                            \
-            _QUERY_NGPUS((_name));                                                                          \
+            cudaError_t err;                                                                                \
+            _QUERY_NGPUS(_name);                                                                          \
             int block_size = 0;                                                                             \
             int active_device = 0;                                                                          \
-            _site_type block_start;                                                                         \
+            _site_type *block_start_in, *block_start_tmp;                                                                         \
             _PIECE_FOR(f->type, ixp)                                                                        \
             {                                                                                               \
                 block_size = f->type->master_end[ixp] - f->type->master_start[ixp] + 1;                     \
-                block_start_tmp = _4FIELD_BLK(tmp, tmp->type->master_start[ixp], 0);                        \
-                block_start_in = _GPU_4FIELD_BLK(f, f->type->master_start[ixp], 0);                         \
+                block_start_tmp = _4FIELD_BLK(tmp, tmp->type->master_start[ixp]);                        \
+                block_start_in = _GPU_4FIELD_BLK(f, f->type->master_start[ixp]);                         \
                                                                                                             \
                 active_device = ixp / ngpus;                                                                \
-                _CHANGE_DEVICE((_name));                                                                    \
+                _CHANGE_DEVICE(_name);                                                                    \
                 cudaMemcpy(block_start_tmp, block_start_in, block_size, cudaMemcpyDeviceToHost);            \
             }                                                                                               \
             to_cpu_format_##_name(f, tmp);                                                                  \
             free_##_name(tmp);                                                                              \
         }
-
-    #undef _QUERY_NGPUS
-    #undef _CHANGE_DEVICE
 
 #endif
 
@@ -203,12 +200,12 @@
         /* Free device memory */
         /* Note: to be used inside function declaration */
         #define _FREE_GPU_FIELD_DATA(_name, _site_type)                                                     \
-            if (u->gpu_ptr != NULL)                                                                         \
-                cudaFree(u->gpu_ptr);                                                                       \
+            if (f->gpu_ptr != NULL)                                                                         \
+                cudaFree(f->gpu_ptr);                                                                       \
 
         /* Allocate device memory */
         /* Note: to be used inside function declaration */
-        #define _ALLOC_GPU_FIELD_DATA(_name, _size)                                                         \
+        #define _ALLOC_GPU_FIELD_DATA(_name, _site_type, _size)                                                         \
             if (alloc_mem_t & GPU_MEM)                                                                      \
             {                                                                                               \
                 cudaError_t err;                                                                            \
@@ -222,23 +219,23 @@
 
         /* Declare function to copy field from host to device */
         #define _DECLARE_COPY_TO(_name, _field_type, _site_type, _size)                                     \
-            void copy_to_gpu_##_name(_field_type *u)                                                        \
+            void copy_to_gpu_##_name(_field_type *f)                                                        \
             {                                                                                               \
-                _field_type *tmp = alloc_##_name(u->type);                                                  \
-                to_gpu_format_##_name(tmp, u);                                                              \
-                int field_size = _size * u->type->gsize_gauge * sizeof(*(u->gpu_ptr));                      \
-                cudaMemcpy(u->gpu_ptr, tmp->ptr, field_size, cudaMemcpyHostToDevice);                       \
+                _field_type *tmp = alloc_##_name(f->type);                                                  \
+                to_gpu_format_##_name(tmp, f);                                                              \
+                int field_size = _size * f->type->gsize_gauge * sizeof(*(f->gpu_ptr));                      \
+                cudaMemcpy(f->gpu_ptr, tmp->ptr, field_size, cudaMemcpyHostToDevice);                       \
                 free_##_name(tmp);                                                                          \
             }
 
         /* Declare function to copy field from device to host */
         #define _DECLARE_COPY_FROM(_name, _field_type, _site_type, _size)                                   \
-            void copy_from_gpu_##_name(_field_type *u)                                                      \
+            void copy_from_gpu_##_name(_field_type *f)                                                      \
             {                                                                                               \
-                _field_type *tmp = alloc_##_name(u->type);                                                  \
-                int field_size = _size * u->type->gsize_gauge * sizeof(*(u->gpu_ptr));                      \
-                cudaMemcpy(tmp->ptr, u->gpu_ptr, field_size, cudaMemcpyDeviceToHost);                       \
-                to_cpu_format_##_name(u, tmp);                                                              \
+                _field_type *tmp = alloc_##_name(f->type);                                                  \
+                int field_size = _size * f->type->gsize_gauge * sizeof(*(f->gpu_ptr));                      \
+                cudaMemcpy(tmp->ptr, f->gpu_ptr, field_size, cudaMemcpyDeviceToHost);                       \
+                to_cpu_format_##_name(f, tmp);                                                              \
                 free_##_name(tmp);                                                                          \
             }
 
@@ -289,7 +286,7 @@
                 source = _4FIELD_BLK(in, ixp);                                                              \
                 _SITE_FOR(in->type, ixp, ix)                                                                \
                 {                                                                                           \
-                    ix_lock = _GPU_IDX_TO_LOCAL(in, ix, ixp);                                               \
+                    ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);                                               \
                     for (int comp = 0; comp < _size; ++comp)                                                \
                     {                                                                                       \
                         target = _4FIELD_AT(out, ix, comp);                                                 \
@@ -306,7 +303,7 @@
 #ifndef WITH_GPU
 
     #define _FREE_GPU_FIELD_DATA(_name, _site_type) do {} while (0)
-    #define _ALLOC_GPU_FIELD_DATA(_name, _size) do {} while (0)
+    #define _ALLOC_GPU_FIELD_DATA(_name, _site_type, _size) do {} while (0)
     #define _DECLARE_COPY_TO(_name, _field_type, _site_type, _size)
     #define _DECLARE_COPY_FROM(_name, _field_type, _site_type, _size)
     #define _DECLARE_CONVERT_TO_GPU_FORMAT(_name, _field_type, _site_type, _size) 
@@ -332,7 +329,7 @@
 #define _ALLOC_CPU_FIELD_DATA(_name, _size)                                                                 \
     if (alloc_mem_t & CPU_MEM)                                                                              \
     {                                                                                                       \
-        int field_size = _size * type->gsize_gauge * sizeof(*(f->ptr));                                     \
+        int field_size = (_size) * type->gsize_gauge * sizeof(*(f->ptr));                                   \
         f->ptr = amalloc(field_size, ALIGN);                                                                \
         error((f->ptr) == NULL, 1, "alloc_" #_name " [" __FILE__ "]",                                       \
                     "Could not allocate memory space for field (data)");                                    \
@@ -348,21 +345,21 @@
         {                                                                                                   \
             if (f->ptr != NULL)                                                                             \
                 afree(f->ptr);                                                                              \
-            _FREE_GPU_FIELD_DATA((_name), (_site_type));                                                    \
+            _FREE_GPU_FIELD_DATA(_name, _site_type);                                                    \
             _FREE_MPI_FIELD_DATA;                                                                           \
             afree(f);                                                                                       \
             f = NULL;                                                                                       \
         }                                                                                                   \
     }
 
-#define _DECLARE_ALLOC_FUNC(_name, _field_type, _size)                                                      \
+#define _DECLARE_ALLOC_FUNC(_name, _field_type, _site_type, _size)                                                      \
     _field_type *alloc_##_name(geometry_descriptor *type)                                                   \
     {                                                                                                       \
         _field_type *f;                                                                                     \
                                                                                                             \
         _ALLOC_FIELD_STRUCT(_name);                                                                       \
         _ALLOC_CPU_FIELD_DATA(_name, _size);                                                            \
-        _ALLOC_GPU_FIELD_DATA(_name, _size);                                                                \
+        _ALLOC_GPU_FIELD_DATA(_name, _site_type, _size);                                                                \
         _ALLOC_MPI_FIELD_DATA(_name);                                                                       \
                                                                                                             \
         return f;                                                                                           \
@@ -370,7 +367,7 @@
 
 #define _DECLARE_MEMORY_FUNC(_name, _field_type, _site_type, _size)                                         \
     _DECLARE_FREE_FUNC(_name, _field_type, _site_type)                                                      \
-    _DECLARE_ALLOC_FUNC(_name, _field_type, _size)                                                          \
+    _DECLARE_ALLOC_FUNC(_name, _field_type, _site_type, _size)                                                          \
     _DECLARE_COPY_TO(_name, _field_type, _site_type, _size)                                                 \
     _DECLARE_COPY_FROM(_name, _field_type, _site_type, _size)                                               \
     _DECLARE_CONVERT_TO_GPU_FORMAT(_name, _field_type, _site_type, _size)                                   \

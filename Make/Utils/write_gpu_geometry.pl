@@ -57,7 +57,8 @@ my @a = (0,1);
 for my $prec (@a) {
     for my $repr (@a) {
         write_gpu_spinor($prec, $repr);
-        write_gpu_scalar_field($prec, $repr);
+        write_gpu_vector($prec, $repr);
+        write_gpu_scalar($prec, $repr);
         write_gpu_suN($prec, $repr);
         write_gpu_suN_av($prec, $repr);
         write_gpu_clover_term($prec, $repr);
@@ -67,19 +68,6 @@ for my $prec (@a) {
 }
 
 write_epilog();
-
-## Write functions
-#write_gpu_spinor();
-#write_gpu_geometry_functions("_vector", @dim_vector);
-
-#my @dim_suN = ($Ng*$Ng, $Nf*$Nf);
-#write_gpu_geometry_functions("", @dim_suN); # suNg, suNf, ...
-#write_gpu_geometry_functions("c", @dim_suN); # suNgc, suNfc, ...
-
-#my @dim_algebra_vector = (($Ng*$Ng)-1, ($Nf*$Nf)-1);
-#write_gpu_geometry_functions("_algebra_vector", @dim_algebra_vector);
-
-#write_gpu_geometry_function_scalar();
 
 sub write_prolog {
     print "/*******************************************************************************\n";
@@ -130,10 +118,66 @@ sub write_gpu_spinor {
     print "/**\n";
     print " * \@brief Read ${typename} according to device geometry structure \n";
     print " * \@param _stride\t\tInteger valued stride with which the components are stored\n";
-    print " * \@param _v     \t\t${component_type} target to read to from the field _in\n";
+    print " * \@param _v     \t\t${typename} target to read to from the field _in\n";
     print " * \@param _in    \t\tInput field to read from \n";
     print " * \@param _ix    \t\tIndex at which to read \n";
-    print " * \@param _comp  \t\tSpinor component of the ${typename} to read.\n";
+    print " * \@param _comp  \t\tComponent to read, choose 0 for spinor fields.\n";
+    print " */\n";
+    print "#define read_gpu_${typename}(_stride, _v, _in, _ix, _comp) \\\n";
+    print "\tdo { \\\n";
+    print "\t\tread_gpu_${component_type}((_stride), (_v).c[(_comp)], (_in), (_ix), 0);\\\n";
+    print "\t\tread_gpu_${component_type}((_stride), (_v).c[(_comp)], (_in), (_ix), 1);\\\n";
+    print "\t\tread_gpu_${component_type}((_stride), (_v).c[(_comp)], (_in), (_ix), 2);\\\n";
+    print "\t\tread_gpu_${component_type}((_stride), (_v).c[(_comp)], (_in), (_ix), 3);\\\n";
+    print "\t} while (0) \n\n";
+
+    # Generate write macro
+    print "/**\n";
+    print " * \@brief Write ${typename} according to device geometry structure \n";
+    print " * \@param _stride\t\tInteger valued stride with which the components are stored\n";
+    print " * \@param _v     \t\t${component_type} target to write to the field _out\n";
+    print " * \@param _out   \t\tInput field to write to\n";
+    print " * \@param _ix    \t\tIndex at which to write \n";
+    print " * \@param _comp  \t\tComponent to write, choose 0 for spinor fields. \n";
+    print " */\n";
+    print "#define write_gpu_${typename}(_stride, _v, _out, _ix, _comp) \\\n";
+    print "\tdo { \\\n";
+    print "\t\twrite_gpu_${component_type}((_stride), (_v).c[(_comp)], (_out), (_ix), 0);\\\n";
+    print "\t\twrite_gpu_${component_type}((_stride), (_v).c[(_comp)], (_out), (_ix), 1);\\\n";
+    print "\t\twrite_gpu_${component_type}((_stride), (_v).c[(_comp)], (_out), (_ix), 2);\\\n";
+    print "\t\twrite_gpu_${component_type}((_stride), (_v).c[(_comp)], (_out), (_ix), 3);\\\n";
+    print "\t} while (0) \n\n";
+}
+
+sub write_gpu_vector {
+    my ($prec, $repr) = @_;
+    my @dim_vector = ($Ng, $Nf);
+    my $i;
+
+    # Generate basename for given representation
+    my $dataname = $basename.$rep_suffixes[$repr]."_vector";
+    
+    # Generate precision suffix
+    my $precision_suffix = $precision_suffixes[$prec];
+
+    # Complete typename with suffixes
+    my $typename = $dataname.$precision_suffix;
+
+    # Complex vector components to be separated by stride
+    # here we need elementary complex types.
+    my $type = $precision_c_types[$prec];
+
+    # representation dimension
+    my $N = $dim_vector[$repr];
+
+    # Generate read macro
+    print "/**\n";
+    print " * \@brief Read ${typename} according to device geometry structure \n";
+    print " * \@param _stride\t\tInteger valued stride with which the components are stored\n";
+    print " * \@param _v     \t\t${typename} target to read to from the field _in\n";
+    print " * \@param _in    \t\tInput field to read from \n";
+    print " * \@param _ix    \t\tIndex at which to read \n";
+    print " * \@param _comp  \t\tComponent of the ${typename} to read.\n";
     print " */\n";
     print "#define read_gpu_${typename}(_stride, _v, _in, _ix, _comp) \\\n";
     print "\tdo { \\\n";
@@ -148,7 +192,7 @@ sub write_gpu_spinor {
     print "/**\n";
     print " * \@brief Write ${typename} according to device geometry structure \n";
     print " * \@param _stride\t\tInteger valued stride with which the components are stored\n";
-    print " * \@param _v     \t\t${component_type} target to write to the field _out\n";
+    print " * \@param _v     \t\t${typename} target to write to the field _out\n";
     print " * \@param _out   \t\tInput field to write to\n";
     print " * \@param _ix    \t\tIndex at which to write \n";
     print " * \@param _comp  \t\tComponent of the ${typename} to write. \n";
@@ -161,44 +205,6 @@ sub write_gpu_spinor {
     }
     print "\t\t((${type}*)(_out))\[__iz\]=(_v).c\[$i\]; \\\n";
     print "\t} while (0) \n\n";
-}
-
-sub write_gpu_scalar_field {
-    my ($prec, $repr) = @_;
-    # Generate basename for given representation
-    my $dataname = $basename.$rep_suffixes[$repr]."_spinor";
-    
-    # Generate precision suffix
-    my $precision_suffix = $precision_suffixes[$prec];
-
-    # Complete typename with suffixes
-    my $typename = $dataname.$precision_suffix;
-    my $component_type = $basename.$rep_suffixes[$repr]."_vector".$precision_suffix;
-
-    print "/**\n";
-    print " * \@brief Read ${component_type} according to device geometry structure \n";
-    print " * \@param _stride\t\tInteger valued stride with which the components are stored\n";
-    print " * \@param _v     \t\t${component_type} target to read to from the field _in\n";
-    print " * \@param _in    \t\tInput field to read from \n";
-    print " * \@param _ix    \t\tIndex at which to read \n";
-    print " * \@param _comp  \t\tComponent to read for argument consistency between different GPU read/write functions.\\\n";
-    print "                  \t\tUse this macro here always with _comp=0, because this is for a scalar field!\n";
-    print "*/\n";
-    print "#define read_gpu_${component_type}(_stride, _v, _in, _ix, _comp) \\\n";
-    print "\t\t\tread_gpu_${typename}((_stride), (_v), (_in), (_ix), (_comp))\n";
-
-    # Generate write macro
-    print "/**\n";
-    print " * \@brief Write ${component_type} according to device geometry structure \n";
-    print " * \@param _stride\t\tInteger valued stride with which the components are stored\n";
-    print " * \@param _v     \t\t${component_type} target to write to the field _out\n";
-    print " * \@param _out   \t\tInput field to write to\n";
-    print " * \@param _ix    \t\tIndex at which to write \n";
-    print " * \@param _comp  \t\tComponent to write for argument consistency between different GPU read/write functions.\\\n";
-    print "                  \t\tUse this macro here always with _comp=0, because this is for a scalar field!\n";
-    print " */\n";
-    print "#define write_gpu_${component_type}(_stride, _v, _out, _ix, _comp) \\\n";
-    print "\t\t\twrite_gpu_${typename}((_stride), (_v), (_out), (_ix), (_comp))\n";
 }
 
 sub write_gpu_suN {
@@ -384,4 +390,42 @@ sub write_gpu_suN_av {
     }
     print "\t\t((${type}*)(_out))\[__iz\]=(_v).c\[$i\]; \\\n";
     print "\t} while (0) \n\n"; 
+}
+
+sub write_gpu_scalar {
+    my ($prec, $repr) = @_;
+    my @dim_vector = ($Ng, $Nf);
+    my $i;
+
+    # Complex vector components to be separated by stride
+    # here we need elementary complex types.
+    my $type = $precision_types[$prec];
+
+    # Generate read macro
+    print "/**\n";
+    print " * \@brief Read ${type} according to device geometry structure \n";
+    print " * \@param _stride\t\tInteger valued stride with which the components are stored\n";
+    print " * \@param _v     \t\t${type} target to read to from the field _in\n";
+    print " * \@param _in    \t\tInput field to read from \n";
+    print " * \@param _ix    \t\tIndex at which to read \n";
+    print " * \@param _comp  \t\tComponent of the ${type} to read.\n";
+    print " */\n";
+    print "#define read_gpu_${type}(_stride, _v, _in, _ix, _comp) \\\n";
+    print "\tdo { \\\n";
+    print "\t\t(_v)=*((_in)+(_ix));\\\n";
+    print "\t} while (0) \n\n";
+
+    # Generate write macro
+    print "/**\n";
+    print " * \@brief Write ${type} according to device geometry structure \n";
+    print " * \@param _stride\t\tInteger valued stride with which the components are stored\n";
+    print " * \@param _v     \t\t${type} target to write to the field _out\n";
+    print " * \@param _out   \t\tInput field to write to\n";
+    print " * \@param _ix    \t\tIndex at which to write \n";
+    print " * \@param _comp  \t\tComponent of the ${type} to write. \n";
+    print " */\n";
+    print "#define write_gpu_${type}(_stride, _v, _out, _ix, _comp) \\\n";
+    print "\tdo { \\\n";
+    print "\t\t(*((_out)+(_ix)))=(_v);\\\n";
+    print "\t} while (0) \n\n";
 }

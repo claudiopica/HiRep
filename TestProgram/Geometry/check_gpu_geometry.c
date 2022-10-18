@@ -41,13 +41,13 @@ int main(int argc, char *argv[])
     test_setup();
 
     // Double Precision Tests
-    return_val += test_write_read_spinor_field_f();
-    return_val += test_write_read_gauge_field_f();
+    //return_val += test_write_read_spinor_field_f();
+    //return_val += test_write_read_gauge_field_f();
     return_val += test_write_read_gauge_field();
 
     //Single Precision Tests
     //return_val += test_write_read_gauge_field_flt();
-    return_val += test_write_read_spinor_field_f_flt();
+    //return_val += test_write_read_spinor_field_f_flt();
 
 
     // Finalize and return

@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* NOCOMPILE= WITH_MPI
+* NOCOMPILE= WITH_GPU
 *
 * Check that after allocating a field, we can write to and read from it.
 * This is supposed to be run without MPI as a baseline test
@@ -30,6 +30,7 @@ int test_spinor_field_allocation();
 int test_avfield_allocation();
 int test_clover_term_allocation();
 int test_clover_force_allocation();
+int test_sfield_allocation();
 
 // Single precision
 int test_gfield_flt_allocation();
@@ -53,6 +54,7 @@ int main(int argc, char *argv[])
     return_val += test_avfield_allocation();
     return_val += test_clover_term_allocation();
     return_val += test_clover_force_allocation();
+    //return_val += test_sfield_allocation(); // FIXME: Bus error
 
     // Single precision test block
     return_val += test_gfield_flt_allocation();
@@ -125,7 +127,7 @@ int test_gfield_flt_allocation()
     random_gfield_flt_cpu(f);
 
     // Check that sqnorm is unequal to zero, nan or inf
-    double sqnorm = sqnorm_gfield_flt_cpu(f);
+    float sqnorm = sqnorm_gfield_flt_cpu(f);
     if (!isfinite(sqnorm) || fabs(sqnorm) < 1e-14) {
         lprintf("RESULT", 0, "FAILED\n");
         return_val = 1;
@@ -151,7 +153,7 @@ int test_gfield_f_flt_allocation()
     random_gfield_f_flt_cpu(f);
 
     // Check that sqnorm is unequal to zero, nan or inf
-    double sqnorm = sqnorm_gfield_f_flt_cpu(f);
+    float sqnorm = sqnorm_gfield_f_flt_cpu(f);
     if (!isfinite(sqnorm) || fabs(sqnorm) < 1e-14) {
         lprintf("RESULT", 0, "FAILED\n");
         return_val = 1;
@@ -322,6 +324,33 @@ int test_spinor_field_flt_allocation()
     free_spinor_field_f_flt(f);
     return return_val;
 }
+
+int test_sfield_allocation() 
+{
+    lprintf("INFO", 0, " ======= TEST SPINOR FIELD ======= \n");
+    int return_val = 0;
+    scalar_field *f = alloc_sfield(1, &glattice);
+
+    // Fill with random numbers
+    random_sfield_cpu(f);
+
+    // Check that sqnorm is unequal to zero, nan or inf
+    double sqnorm = sqnorm_sfield_cpu(f);
+    if (!isfinite(sqnorm) || fabs(sqnorm) < 1e-14) {
+        lprintf("RESULT", 0, "FAILED\n");
+        return_val = 1;
+    } 
+    else 
+    {
+        lprintf("RESULT", 0, "OK\n");
+        return_val = 0;
+    }
+    lprintf("RESULT", 0, "[Square norm (should be any finite value) %0.2e]\n", sqnorm);
+
+    free_sfield(f);
+    return return_val;
+}
+
 
 
 
