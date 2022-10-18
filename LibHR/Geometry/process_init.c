@@ -28,6 +28,10 @@
 #include "representation.h"
 #include "clover_tools.h"
 #include "clover_exp.h"
+#ifdef WITH_GPU
+  #include "gpu.h"
+#endif 
+
 
 /* setup_process
  * Assign a unique RID, PID to each process and setup
@@ -50,6 +54,7 @@ char *get_error_filename() { return error_filename; }
 
 static int setup_replicas();
 static void setup_random();
+static int bind_GPUs_to_MPI_proc();
 
 static int setup_level = 0;
 
@@ -159,10 +164,11 @@ int setup_process(int *argc, char ***argv)
   read_input(glb_var.read, input_filename);
 
   setup_replicas();
-
+  
   /* logger setup */
   read_input(logger_var.read, input_filename);
   logger_set_input(&logger_var);
+
   if (PID != 0)
   {
     logger_disable();
@@ -191,6 +197,7 @@ int setup_process(int *argc, char ***argv)
 #ifdef WITH_GPU
 read_input(gpu_var.read, input_filename);
 init_gpu(gpu_var);
+bind_GPUs_to_MPI_proc();//TODO: This only prints output for PID==0, somehow integrate this so that only here all processes output will be printed.
 #endif
 
   lprintf("SYSTEM", 0, "Gauge group: SU(%d)\n", NG);
@@ -287,7 +294,6 @@ int finalize_process()
 static int setup_replicas()
 {
 #ifdef WITH_MPI
-
   if (N_REP > 1)
   {
     int mpiret;
@@ -323,8 +329,21 @@ static int setup_replicas()
     sprintf(sbuf, "Rep_%d", RID);
     mpiret = chdir(sbuf);
   }
-
 #endif // ifdef WITH_MPI
 
+  return 0;
+}
+
+static int bind_GPUs_to_MPI_proc() 
+{
+   /* If set up with MPI, bind GPU to local rank */
+   /* TODO: This is very naive (GPU 0 maps to PID==0) the better way is to use hwloc to analyze the */
+   /* CPU topology and then do the ideal mapping */
+  #if defined(WITH_MPI) && defined(WITH_GPU)
+    cudaSetDevice(PID);
+    int current_device;
+    cudaGetDevice(&current_device);
+    lprintf("GPU_INIT", 0, "GPU Affinity: GPU Node %d has been bound to MPI Thread of Rank %d\n", current_device, PID);
+  #endif
   return 0;
 }

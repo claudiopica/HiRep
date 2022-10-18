@@ -65,7 +65,9 @@
                     block_start = _GPU_FIELD_BLK(f, f->type->master_start[ixp]);\
                     active_device = ixp / ngpus;\
                     _CHANGE_DEVICE(_name);\
-                    cudaFree(block_start);\
+                    err = cudaFree(block_start);\
+                    error(err != cudaSuccess, 1, "free_" #_name " [" __FILE__ "]",\
+                            "Unable to free device memory.\n");\
                 }\
         }
     
@@ -192,11 +194,11 @@
 
     /* Free device memory */
     /* Note: to be used inside function declaration */
-    #define _FREE_GPU_FIELD_DATA(_name, _site_type)                                                                                  \
+    #define _FREE_GPU_FIELD_DATA(_name, _site_type)                                                         \
         if(f->gpu_ptr != NULL)                                                                              \
             cudaFree(f->gpu_ptr);                                                                           \
 
-    #define _ALLOC_GPU_FIELD_DATA(_name, _site_type, _size)                                                                    \
+    #define _ALLOC_GPU_FIELD_DATA(_name, _site_type, _size)                                                 \
         if(alloc_mem_t & GPU_MEM)                                                                           \
         {                                                                                                   \
             cudaError_t err;                                                                                \
@@ -211,7 +213,7 @@
                 f[i].gpu_ptr = NULL;                                                                        \
 
     /* Declare function to copy field from host to device */
-    #define _DECLARE_COPY_TO(_name, _field_type, _site_type, _size)                                                     \
+    #define _DECLARE_COPY_TO(_name, _field_type, _site_type, _size)                                         \
         void copy_to_gpu_##_name(_field_type *f)                                                            \
         {                                                                                                   \
             /* FIXME: Do not only copy one layer. */                                                        \
@@ -223,7 +225,7 @@
         }
 
     /* Declare function to copy field from device to host */
-    #define _DECLARE_COPY_FROM(_name, _field_type, _site_type, _size)                                                   \
+    #define _DECLARE_COPY_FROM(_name, _field_type, _site_type, _size)                                       \
         void copy_from_gpu_##_name(_field_type *f)                                                          \
         {                                                                                                   \
             _field_type *tmp = alloc_##_name(1, f->type);                                                   \
@@ -309,21 +311,21 @@
 /* ============================================== All cases ============================================== */
 
 /* deallocation function declaration */
-#define _DECLARE_FREE_FUNC(_name, _field_type, _site_type)                                                               \
+#define _DECLARE_FREE_FUNC(_name, _field_type, _site_type)                                                  \
     void free_##_name(_field_type *f)                                                                       \
     {                                                                                                       \
         if (f!=NULL) {                                                                                      \
             if (f->ptr!=NULL)                                                                               \
                 afree(f->ptr);                                                                              \
-            _FREE_GPU_FIELD_DATA(_name, _site_type);                                                                                 \
-            _FREE_MPI_FIELD_DATA;                                                                                 \
+            _FREE_GPU_FIELD_DATA(_name, _site_type);                                                        \
+            _FREE_MPI_FIELD_DATA;                                                                           \
             afree(f);                                                                                       \
             f = NULL;                                                                                       \
         }                                                                                                   \
     }
 
 /* allocation function declaration */
-#define _DECLARE_ALLOC_FUNC(_name, _field_type, _site_type, _size)                                                      \
+#define _DECLARE_ALLOC_FUNC(_name, _field_type, _site_type, _size)                                          \
     _field_type *alloc_##_name(unsigned int n, geometry_descriptor *type)                                   \
     { \
         /* Allocate field struct pointer */                                                                 \
@@ -353,19 +355,19 @@
         }	                                                                                                \
                                                                                                             \
         /* Allocate GPU field, if compiling with GPU */                                                     \
-        _ALLOC_GPU_FIELD_DATA(_name, _site_type, _size);                                                                       \
+        _ALLOC_GPU_FIELD_DATA(_name, _site_type, _size);                                                    \
                                                                                                             \
         /* Allocate buffers for MPI comms, if compiling with MPI */                                         \
-        _ALLOC_MPI_FIELD_DATA(_name);                                                                             \
+        _ALLOC_MPI_FIELD_DATA(_name);                                                                       \
                                                                                                             \
         return f;                                                                                           \
     }
 
 #define _DECLARE_MEMORY_FUNC(_name, _field_type, _site_type, _size)                                         \
-    _DECLARE_FREE_FUNC(_name, _field_type, _site_type)                                                                   \
-    _DECLARE_ALLOC_FUNC(_name,_field_type, _site_type, _size)                                                            \
-    _DECLARE_COPY_TO(_name, _field_type, _site_type, _size)                                                             \
-    _DECLARE_COPY_FROM(_name, _field_type, _site_type, _size)                                                           \
+    _DECLARE_FREE_FUNC(_name, _field_type, _site_type)                                                      \
+    _DECLARE_ALLOC_FUNC(_name,_field_type, _site_type, _size)                                               \
+    _DECLARE_COPY_TO(_name, _field_type, _site_type, _size)                                                 \
+    _DECLARE_COPY_FROM(_name, _field_type, _site_type, _size)                                               \
     _DECLARE_CONVERT_TO_GPU_FORMAT(_name, _field_type, _site_type, _size)                                   \
     _DECLARE_CONVERT_TO_CPU_FORMAT(_name, _field_type, _site_type, _size)
 

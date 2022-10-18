@@ -21,6 +21,9 @@
 #include "utils.h"
 #include "error.h"
 #include "geometry.h"
+#ifdef WITH_MPI
+  #include "mpi.h"
+#endif
 
 extern int *iup_gpu, *idn_gpu;
 
@@ -61,7 +64,7 @@ void init_gpu(input_gpu gpu_var)
   lprintf("GPU_INIT",0,"GPU_ID = %d\n",gpu_var.gpuID);
 
   gpu_id = gpu_var.gpuID;
-  /*Select the right GPU */
+  /* Select the right GPU */
   error_id = cudaGetDeviceCount(&device_count);
   lprintf("GPU_INIT",0,"%s\n",cudaGetErrorString(error_id));
   lprintf("GPU_INIT",0,"Device count %d\n",device_count);
@@ -91,7 +94,7 @@ void init_gpu(input_gpu gpu_var)
   cuDeviceGetAttribute( &mem_clock,CU_DEVICE_ATTRIBUTE_MEMORY_CLOCK_RATE , gpu_id);
   lprintf("GPU_INIT",10,"Memory Clock rate: %.3f Mhz\n",mem_clock*1e-3f); 
   cuDeviceGetAttribute(&mem_bus_width, CU_DEVICE_ATTRIBUTE_GLOBAL_MEMORY_BUS_WIDTH,gpu_id);
-  lprintf("GPU_INIT",10,"Memory Bus Widht: %d-bit\n",mem_bus_width); 
+  lprintf("GPU_INIT",10,"Memory Bus Width: %d-bit\n",mem_bus_width); 
   cuDeviceGetAttribute(&l2_cache_size, CU_DEVICE_ATTRIBUTE_L2_CACHE_SIZE, gpu_id);
   lprintf("GPU_INIT",10,"L2 Cache Size: %dB\n",l2_cache_size); 
   
@@ -108,7 +111,7 @@ void init_gpu(input_gpu gpu_var)
   lprintf("GPU_INIT",10,"Total number of register per block: %dB\n",device_prop.regsPerBlock); 
   lprintf("GPU_INIT",10,"Warp size: %dB\n",device_prop.warpSize); 
   error(device_prop.warpSize!=32,1,"init_gpu","Error: warp size 32 assumed in global sum\n");  
-  lprintf("GPU_INIT",10,"Maximum number of threds per block: %d\n",device_prop.maxThreadsPerBlock);   
+  lprintf("GPU_INIT",10,"Maximum number of threads per block: %d\n",device_prop.maxThreadsPerBlock);   
   lprintf("GPU_INIT",10,"Maximum size of each dimension of a block (x,y,z): (%d,%d,%d)\n",
 	  device_prop.maxThreadsDim[0],device_prop.maxThreadsDim[1],device_prop.maxThreadsDim[2]);
   lprintf("GPU_INIT",10,"Maximum size of each dimension of a grid (x,y,z): (%d,%d,%d)\n",
