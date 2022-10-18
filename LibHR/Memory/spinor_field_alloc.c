@@ -193,8 +193,8 @@
     /* Free device memory */
     /* Note: to be used inside function declaration */
     #define _FREE_GPU_FIELD_DATA(_name, _site_type)                                                                                  \
-        if(u->gpu_ptr != NULL)                                                                              \
-            cudaFree(u->gpu_ptr);                                                                           \
+        if(f->gpu_ptr != NULL)                                                                              \
+            cudaFree(f->gpu_ptr);                                                                           \
 
     #define _ALLOC_GPU_FIELD_DATA(_name, _site_type, _size)                                                                    \
         if(alloc_mem_t & GPU_MEM)                                                                           \
