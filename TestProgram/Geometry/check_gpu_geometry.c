@@ -95,7 +95,6 @@ int test_write_read_gauge_field()
 
     check_diff_norm_zero(diff_norm);*/
 
-    MPI_Barrier(MPI_COMM_WORLD);
     free_gfield(in);
     //free_gfield(out);
     //free_gfield(gpu_format);

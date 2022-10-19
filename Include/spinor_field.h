@@ -14,19 +14,25 @@
 #include <mpi.h>
 #endif
 
-/* MPI data */
-#define _MPI_FIELD_DATA
-#ifdef WITH_MPI
-#undef _MPI_FIELD_DATA
-#define _MPI_FIELD_DATA MPI_Request *comm_req;
-#endif //WITH_MPI
-
 /* GPU data */
 #define _GPU_FIELD_DATA(_type)
 #ifdef WITH_GPU
 #undef _GPU_FIELD_DATA
 #define _GPU_FIELD_DATA(_type) _type *gpu_ptr;
+#endif //WITH_GPU
+
+/* MPI data */
+#define _MPI_FIELD_DATA
+#ifdef WITH_MPI
+#undef _MPI_FIELD_DATA
+#define _MPI_FIELD_DATA(_type) MPI_Request *comm_req;
 #endif //WITH_MPI
+
+#if defined(WITH_GPU) && defined(WITH_MPI) /* MPI + GPU Block handles */
+#undef _MPI_FIELD_DATA
+#define _MPI_FIELD_DATA(_type) MPI_Request *comm_req; \
+                        _type **block_handles[2];//This assumes decomp according to #of threads(MPI_WORLD_SIZE) + even-odd (2)
+#endif //WITH MPI AND GPU
 
 typedef struct {// TODO: this is probably not the right complex type
 	double _Complex up[NF*(2*NF+1)];
@@ -37,7 +43,7 @@ typedef struct {// TODO: this is probably not the right complex type
 typedef struct _##_name { \
 _type *ptr; \
 geometry_descriptor *type;\
-_MPI_FIELD_DATA \
+_MPI_FIELD_DATA(_type) \
 _GPU_FIELD_DATA(_type) \
 } _name
 
