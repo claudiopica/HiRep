@@ -58,12 +58,9 @@
         if (f->gpu_ptr != NULL)                                                                             \
         {                                                                                                   \
             cudaError_t err;                                                                                \
-            int device_id;                                                                                  \
-            cudaGetDevice(&device_id);                                                                      \
-            for (int ixp = device_id*2; ixp<2*(device_id+1); ++ixp)                                         \
+            _PIECE_FOR_MPI(f->type, ixp)                                                                    \
             {                                                                                               \
-                printf("Deallocating piece %d on device %d\n", ixp, device_id);                             \
-                CHECK(cudaFree(f->block_handles[ixp][device_id]));                                          \
+                CHECK(cudaFree(f->block_handles[ixp][PID]));                                                \
             }                                                                                               \
             /*TODO: Deallocate handles.*/\
         }
@@ -73,16 +70,12 @@
     #define _ALLOC_GPU_FIELD_DATA(_name, _site_type, _size)                                                 \
         cudaError_t err;                                                                                    \
         int block_size = 0;                                                                                 \
-        int device_id;                                                                                      \
-        cudaGetDevice(&device_id);                                                                          \
-        /* TODO: The map 2*device_id -> ixp might not be ideal. */                                          \
-        for (int ixp = device_id*2; ixp<(2*device_id)+2; ++ixp)                                             \
+        _PIECE_FOR_MPI(f->type, ixp)                                                                        \
         {                                                                                                   \
-            f->block_handles[ixp] = (_site_type**)malloc(MPI_WORLD_SIZE*sizeof(_site_type*));                \
+            f->block_handles[ixp] = (_site_type**)malloc(MPI_WORLD_SIZE*sizeof(_site_type*));               \
             block_size = f->type->master_end[ixp] - f->type->master_start[ixp] + 1;                         \
-            f->block_handles[ixp][device_id] = _GPU_4FIELD_BLK(f, ixp);                                     \
-            printf("Allocating piece %d on device %d\n", ixp, device_id);                                   \
-            CHECK(cudaMalloc((void **)&(f->block_handles[ixp][device_id]), (_size)*block_size*sizeof(*(f->gpu_ptr))));\
+            f->block_handles[ixp][PID] = _GPU_4FIELD_BLK(f, ixp);                                           \
+            CHECK(cudaMalloc((void **)&(f->block_handles[ixp][PID]), (_size)*block_size*sizeof(*(f->gpu_ptr))));\
         }
 
     //#define _FREE_MPI_FIELD_DATA                                                                            
@@ -325,13 +318,13 @@
 #define _DECLARE_FREE_FUNC(_name, _field_type, _site_type)                                                  \
     void free_##_name(_field_type *f)                                                                       \
     {                                                                                                       \
-        printf("Executing free on dev %d\n", PID);\
         if (f != NULL)                                                                                      \
         {                                                                                                   \
             if (f->ptr != NULL)                                                                             \
                 afree(f->ptr);                                                                              \
             _FREE_GPU_FIELD_DATA(_name, _site_type);/* Every MPI process needs to free -> check, whether its null differently...*/\
             _FREE_MPI_FIELD_DATA;                                                                           \
+            MPI_Barrier(MPI_COMM_WORLD); /* Collect ranks */                                                \
             afree(f);                                                                                       \
             f = NULL;                                                                                       \
         }                                                                                                   \
@@ -346,6 +339,7 @@
         _ALLOC_CPU_FIELD_DATA(_name, _size);                                                                \
         _ALLOC_GPU_FIELD_DATA(_name, _site_type, _size);                                                    \
         _ALLOC_MPI_FIELD_DATA(_name);                                                                       \
+        MPI_Barrier(MPI_COMM_WORLD);    /* Collect ranks */                                                 \
                                                                                                             \
         return f;                                                                                           \
     }

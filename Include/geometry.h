@@ -44,6 +44,10 @@ typedef struct _geometry_descriptor
 #define _PIECE_FOR(type, ip) \
   for (int ip = 0; ip < (type)->local_master_pieces; ip++)
 
+//Loop over pieces located on device
+#define _PIECE_FOR_MPI(type, ip) \
+  for (int ixp = PID*2; ixp<2*(PID+1); ++ixp)
+
 //Loop over sites of piece ip of given type
 #define _SITE_FOR_RED(type, ip, is, redop1, redop2) \
   _OMP_PRAGMA(_omp_parallel)                        \
