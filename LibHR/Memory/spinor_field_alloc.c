@@ -12,6 +12,7 @@
 *******************************************************************************/
 
 #include <stdlib.h>
+#include <stdio.h>
 #include "suN.h"
 #include "error.h"
 #include "memory.h"
@@ -42,65 +43,36 @@
 
 #if defined(WITH_MPI) && defined(WITH_GPU)
 
-    #define _QUERY_NGPUS(_name) \
-        int ngpus = 0;\
-        err = cudaGetDeviceCount(&ngpus);\
-        error(err != cudaSuccess, 1, "alloc_" #_name " [" __FILE__ "]", \
-                        "Could not query GPU device count.\n");
-
-    #define _CHANGE_DEVICE(_name) \
-        err = cudaSetDevice(active_device);\
-        error(err != cudaSuccess, 1, "alloc_" #_name " [" __FILE__ "]",\
-                        "Unable to change devices.\n");
-
     #define _FREE_GPU_FIELD_DATA(_name, _site_type) \
         if (f->gpu_ptr != NULL) \
         {\
             cudaError_t err;\
-            int active_device = 0;\
-            _site_type *block_start;\
-                _QUERY_NGPUS(_name);\
-                _PIECE_FOR(f->type, ixp) \
-                {\
-                    block_start = _GPU_FIELD_BLK(f, f->type->master_start[ixp]);\
-                    active_device = ixp / ngpus;\
-                    _CHANGE_DEVICE(_name);\
-                    err = cudaFree(block_start);\
-                    error(err != cudaSuccess, 1, "free_" #_name " [" __FILE__ "]",\
-                            "Unable to free device memory.\n");\
-                }\
+            _PIECE_FOR_MPI(f->type, ixp)\
+            {\
+                CHECK(cudaFree(f->block_handles[ixp][PID]));\
+            }\
+            /* TODO: Deallocate handles. */\
         }
     
+    /* This only works for n=1 */
     #define _ALLOC_GPU_FIELD_DATA(_name, _site_type, _size) \
-        if (alloc_mem_t & GPU_MEM) \
+        cudaError_t err;\
+        int block_size = 0;\
+        _PIECE_FOR_MPI(f->type, ixp) \
         {\
-            cudaError_t err;\
-            _QUERY_NGPUS(_name);\
-\
-            int block_size = 0;\
-            int active_device = 0;\
-            _site_type *block_start;\
-            _PIECE_FOR(f->type, ixp) \
-            {\
-                block_size = f->type->master_end[ixp] - f->type->master_start[ixp] + 1;\
-                block_start = _GPU_FIELD_BLK(f, f->type->master_start[ixp]);\
-\
-                active_device = ixp / ngpus;\
-                _CHANGE_DEVICE(_name);\
-\
-                err = cudaMalloc((void **)&block_start, block_size);\
-                error(err != cudaSuccess, 1, "alloc_" #_name " [" __FILE__ "]",\
-                                "Could not allocate GPU memory.\n");\
-            }\
-        }\
-        else \
-            f->gpu_ptr = NULL;
+            f->block_handles[ixp] = (_site_type**)malloc(MPI_WORLD_SIZE*sizeof(_site_type*));\
+            block_size = f->type->master_end[ixp] - f->type->master_start[ixp] + 1;\
+            f->block_handles[ixp][PID] = _GPU_FIELD_BLK(f, ixp);\
+            int mem_size = (_size)*block_size*sizeof(*(f->gpu_ptr));\
+            CHECK(cudaMalloc((void **)&(f->block_handles[ixp][PID]), mem_size));\
+        }
 
-    #define _FREE_MPI_FIELD_DATA 
+
+    /*#define _FREE_MPI_FIELD_DATA */
         /*if (f->comm_req != NULL) \
             cudaFree(f->comm_req);*/
 
-    #define _ALLOC_MPI_FIELD_DATA(_name) 
+    /*#define _ALLOC_MPI_FIELD_DATA(_name) */
         /*if (type->nbuffers_gauge > 0) \
         {\
             cudaError_t err;\
@@ -118,7 +90,7 @@
     #define _DECLARE_COPY_TO(_name, _field_type, _site_type, _size) \
         void copy_to_gpu_##_name(_field_type *f)\
         {\
-            _field_type *tmp = alloc_##_name(1, f->type);\
+           /* _field_type *tmp = alloc_##_name(1, f->type);\
             to_gpu_format_##_name(tmp, f);\
             cudaError_t err;\
             _QUERY_NGPUS(_name);\
@@ -135,13 +107,13 @@
                 _CHANGE_DEVICE(_name);\
                 cudaMemcpy(block_start_in, block_start_tmp, block_size, cudaMemcpyHostToDevice);\
             }\
-            free_##_name(tmp);\
+            free_##_name(tmp);*/\
         }
     
     #define _DECLARE_COPY_FROM(_name, _field_type, _site_type, _size) \
         void copy_from_gpu_##_name(_field_type *f) \
         {\
-            _field_type *tmp = alloc_##_name(1, f->type);\
+            /*_field_type *tmp = alloc_##_name(1, f->type);\
             cudaError_t err;\
             _QUERY_NGPUS(_name);\
             int block_size = 0;\
@@ -158,20 +130,20 @@
                 cudaMemcpy(block_start_tmp, block_start_in, block_size, cudaMemcpyDeviceToHost);\
             }\
             to_cpu_format_##_name(f, tmp);\
-            free_##_name(tmp);\
+            free_##_name(tmp);*/\
         }
 
 #endif
 
 /* ================================================= MPI and CPU ========================================= */
 
-#if defined(WITH_MPI) && !defined(WITH_GPU)
+#if defined(WITH_MPI) //&& !defined(WITH_GPU)
 
-        #define _FREE_MPI_CODE                                                                              \
-            if(u->comm_req != NULL)                                                                         \
-                afree(u->comm_req)
+        #define _FREE_MPI_FIELD_DATA                                                                              \
+            if(f->comm_req != NULL)                                                                         \
+                afree(f->comm_req)
 
-        #define _ALLOC_MPI_CODE(_name)                                                                      \
+        #define _ALLOC_MPI_FIELD_DATA(_name)                                                                      \
             if (type->nbuffers_spinor > 0)                                                                  \
             {                                                                                               \
                 f->comm_req = amalloc( n * 2 * type->nbuffers_spinor * sizeof(MPI_Request), ALIGN);         \
@@ -319,6 +291,7 @@
                 afree(f->ptr);                                                                              \
             _FREE_GPU_FIELD_DATA(_name, _site_type);                                                        \
             _FREE_MPI_FIELD_DATA;                                                                           \
+            MPI_Barrier(MPI_COMM_WORLD);/* Collect ranks */                                                 \
             afree(f);                                                                                       \
             f = NULL;                                                                                       \
         }                                                                                                   \
@@ -359,6 +332,7 @@
                                                                                                             \
         /* Allocate buffers for MPI comms, if compiling with MPI */                                         \
         _ALLOC_MPI_FIELD_DATA(_name);                                                                       \
+        MPI_Barrier(MPI_COMM_WORLD);                                                                        \
                                                                                                             \
         return f;                                                                                           \
     }

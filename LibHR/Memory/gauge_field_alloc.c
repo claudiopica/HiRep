@@ -40,19 +40,7 @@
 
 /* ================================================= MPI and GPU ========================================= */
 
-#if defined(WITH_MPI) && defined(WITH_GPU)
-
-    /* From the book */
-    #define CHECK(call)										                                                \
-    {												                                                        \
-        const cudaError_t error = call;								                                        \
-        if (error != cudaSuccess) 									                                        \
-        {												                                                    \
-            fprintf(stderr, "Error: %s:%d, ", __FILE__, __LINE__);					                        \
-	        fprintf(stderr, "code: %d, reason: %s\n", error, cudaGetErrorString(error));		            \
-	        exit(1);										                                                \
-        }												                                                    \
-    }	
+#if defined(WITH_MPI) && defined(WITH_GPU)	
 
     #define _FREE_GPU_FIELD_DATA(_name, _site_type)                                                         \
         if (f->gpu_ptr != NULL)                                                                             \
@@ -187,7 +175,7 @@
             {                                                                                               \
                 cudaError_t err;                                                                            \
                 int field_size = _size * type->gsize_gauge * sizeof(*(f->gpu_ptr));                         \
-                err = cudaMalloc((void **)&f->gpu_ptr, field_size);                                         \
+                err = cudaMalloc((void **)&(f->gpu_ptr), field_size);                                         \
                 error(err != cudaSuccess, 1, "alloc_" #_name " [" __FILE__ "]",                             \
                                 "Could not allocate GPU memory space for field");                           \
             }                                                                                               \

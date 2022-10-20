@@ -376,6 +376,12 @@ void zero_gfield_cpu(suNg_field *f)
 }
 
 // ** RANDOM FIELDS FOR TESTING **
+void random_spinor_field_f_cpu(spinor_field* f) 
+{
+    int n = f->type->gsize_spinor*sizeof(spinor_field)/sizeof(double);
+    ranlxd((double*)(f->ptr), n);
+}
+
 void random_gfield_cpu(suNg_field* f) 
 {
     int n = 4*f->type->gsize_gauge*sizeof(suNg)/sizeof(double);
