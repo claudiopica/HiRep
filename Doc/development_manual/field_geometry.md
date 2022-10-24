@@ -1,9 +1,6 @@
 # Geometry of Field Data in Memory
 
-## Summary
-
-Section TODO:
-* Add more pictures
+## Geometry Properties
 
 Fields living on the four-dimensional lattice are defined to be C arrays of elements using the data structures in the corresponding section. The geometry of the lattice is defined by assigning an index $n$ of the array to each site $(t, x, y, z)$. The mapping between the cartesian coordinates of the local lattice and the array index is given by the macros `iup(n,dir)` and `idn(n,dir)` which, given the index $n$ of the current site, return the index of the site whose cartesian coordinate in direction `dir` is increased or decreased by one respectively. 
 
@@ -38,6 +35,11 @@ typedef struct _geometry_descriptor
 
 ```
 
+
+#### Global Geometry Descriptors
+
+Usually, we want to initialize fields either on the full lattice or only with even or odd parity. In order to do this efficiently, the global geometry descriptors `glattice`, `glat_even` and `glat_odd` are initialized globally on host memory. These can then be used to allocate fields correspondingly 
+
 #### Number of Sites
 In order to allocate memory for the field data, we need to know how many elementary field types we need to allocate. This is different for fields that are located on the sites or the links of the lattice. Correspondingly, for the given lattice geometry, the number of sites and the number of links are calculated and saved in the fields `gsize_spinor` and `gsize_gauge` respectively.
 
@@ -58,8 +60,14 @@ The sites in a master piece can be categorized by their function in computation 
 	- Function in computation: Halo elements are only accessible to the thread in order to perform the calculations on the boundary, usually, we do not want to perform calculations on the halo. One exception, however, is, if the computation is faster than the communication, it might be easier to perform the operations on the extended lattices without communication, rather than only computing for bulk and boundary and then synchronize the extension.
 	- Function in communication: We synchronize the extended lattice by writing to it so that this data is available to the current thread, but never read from and communicate the extended lattice somewhere else. 
 	
-
-%% Picture
+The following figure depicts these categories of sites on a two-dimensional $4\times 4$-lattice.
+	
+```{image} ../img/development_notes/field_geometry/bulk_boundary_halo.pdf
+:alt: Illustration of bulk boundary and halo sites on a 2D lattice
+:class: bg-primary
+:width: 400px
+:align: center
+```
 
 #### Inner Master Pieces
 The first decomposition of the lattice site is the even-odd preconditioning. This splits  any lattice in two pieces: an even and an odd one. These pieces are stored contiguously in memory like in the following illustration
@@ -112,20 +120,22 @@ For complex decompositions, that are usual in lattice simulations, the blocks ha
 
 #### Even-Odd Decomposition
 
-As already mentioned it is convention to first store the local master pieces and then the receive buffers. In each of these subcategories, we want to also store first the even and then the odd blocks. For the local master pieces this means that there is a big block of memory containing all local master pieces that is split in two halfs of contiguous memory that contain all even or odd sites respectively. 
+As already mentioned it is convention to first store the local master pieces, that is the inner master pieces and then the boundary, and finally the receive buffers. In each of these subcategories, we want to also store first the even and then the odd blocks. For the local master pieces this means that there is a big block of memory containing all local master pieces that is split in two halfs of contiguous memory that contain all even or odd sites respectively. 
 
 %% TODO illustration
 
 Resultingly, there is a shift in the local master piece block that is the starting index of the odd sites. For this, one can use the field `master_shift`. This field contains the offset of a lattice geometry relative to the full lattice. The even lattice is not offset and overlaps with the first half of the full lattice. The odd lattice, however, overlaps with the last half, so it is offset by half the number of lattice points compared to the full lattice. As a result, the odd lattice geometry, saved in the global variables as `&glat_odd` has the `master_shift` agreeing with the first index of the odd block of the full lattice.
 
-Buffers are decomposed analogously, but split in two in the buffer block. 
+```c
+int shift_full = glattice->master_shift /* = 0 */
+int shift_even = glat_even->master_shift /* =0 */
+int shift_odd = glat_odd->master_shift /* not 0, index of first odd entry */
+```
 
-TODO: illustration. Also make sure this is right, and we do not for some reason
-split the complete thing in two.
 
-The block index of the first odd copy in the full geometry is identified by the integer `copy_shift` in the geometry descriptor. TODO: is this correct?
+The block index of the first odd copy in the full geometry is identified by the integer `copy_shift` in the geometry descriptor. 
 
-## Technical Details and Examples
+## Field Operations
 
 ### Even-Odd Decomposition
 #### CPU
@@ -415,8 +425,8 @@ __global__ void spinor_field_prod_gpu(COMPLEX* s1, COMPLEX* s2, hr_complex* resF
 
 In every thread we iterate over the components of the input arrays ```s1``` and ```s2```. Which are located at the same site. The different threads in this kernel now operate on the different sites of the lattice. Now, when this kernel is launched, the threads all try first to access all the first elements of all sites. However, when the sites are stored identically as on the CPU, this means that we access memory segments separated by a stride, as in the following illustration:
 
-```{image} ../img/development_notes/field_geometry/1.png
-:alt: fishy
+```{image} ../img/development_notes/field_geometry/1.pdf
+:alt: Illustration of a Non-Contingent Access of Vector Elements
 :class: bg-primary
 :width: 300px
 :align: center
@@ -424,8 +434,8 @@ In every thread we iterate over the components of the input arrays ```s1``` and 
 
 We can optimize this significantly by not saving one site after another but instead saving first all first components, then all seconds components and so on in the order they are accessed in the loop.
 
-```{image} ../img/development_notes/field_geometry/2.png
-:alt: fishy
+```{image} ../img/development_notes/field_geometry/2.pdf
+:alt: Illustration of Contingent Access of Vector Elements
 :class: bg-primary
 :width: 300px
 :align: center
