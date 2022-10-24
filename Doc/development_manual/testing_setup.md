@@ -11,19 +11,19 @@ The testing `Makefile`s have therefore been configured to only run certain tests
 ```
 /*******************************************************************************
 *
-* NOCOMPILE = WITH_GPU
+* NOCOMPILE= WITH_GPU
 *
 * This test is only compiled if the WITH_GPU flag is inactive
 *
 *******************************************************************************/
 ```
 
-Conversely, we can configure tests that only test the GPU-version by negation
+Notice, that there is no space between `NOCOMPILE` and `=`. Conversely, we can configure tests that only test the GPU-version by negation
 
 ```
 /*******************************************************************************
 *
-* NOCOMPILE = !WITH_GPU
+* NOCOMPILE= !WITH_GPU
 *
 * This tests only the GPU-version of HiRep
 *
@@ -35,7 +35,7 @@ If we want to make sure that multiple flags are active, we can connect them over
 ```
 /*******************************************************************************
 *
-* NOCOMPILE = !WITH_GPU && !WITH_MPI
+* NOCOMPILE= !WITH_GPU && !WITH_MPI
 *
 * This tests only the Multi-GPU compiled version of HiRep
 *
@@ -47,8 +47,8 @@ If the test does test multiple, but not all possible setups, we can write them d
 ```
 /*******************************************************************************
 *
-* NOCOMPILE = WITH_GPU
-* NOCOMPILE = WITH_MPI
+* NOCOMPILE= WITH_GPU
+* NOCOMPILE= WITH_MPI
 *
 * This test can be compiled either if MPI or GPU acceleration is disabled.
 *

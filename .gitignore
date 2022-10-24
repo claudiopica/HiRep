@@ -4,6 +4,7 @@ Include/macro_opt.h
 Include/suN.h
 Include/suN_types.h
 Include/suN_repr_func.h
+Include/gpu_geometry.h
 Make/Utils/autosun/writeREPR
 LibHR/Update/approx_data.db
 LibHR/Utils/suN_exp.c

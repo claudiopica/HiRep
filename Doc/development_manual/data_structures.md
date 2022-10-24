@@ -54,7 +54,7 @@ In ```HiRep```, field data is stored in field ```struct```s that contain an arra
 
 New field types can be declared by using the macro
 
-```
+```c
 #define _DECLARE_FIELD_STRUCT(_name, _type) \
   typedef struct _##_name                   \
   {                                         \
@@ -69,7 +69,7 @@ The ```_name``` will define the field's new name, which can be anything, while t
 
 The field value copy of the CPU is defined by ```_type *ptr```, which is a 1D array containing the field's values at the lattice sites. The GPU copy is hidden behind the macro ```_GPU_FIELD_DATA(_type)```.
 
-```
+```c
 #define _GPU_FIELD_DATA(_type)
 #ifdef WITH_GPU
 #undef _GPU_FIELD_DATA
@@ -83,13 +83,13 @@ Since memory access patterns have a high impact on application performance, the 
 
 This means, that if we declare a spinor field
 
-```
+```c
 spinor_field *s;
 ```
 
 we may access its geometry description and sites on the CPU from a regular host function
 
-```
+```c
 int main(void)
 {
     spinor_field *s;
@@ -110,7 +110,7 @@ int main(void)
 
 In a kernel, it is impossible to check whether the spinor is even or odd. Every call to the spinor field structure will fail.
 
-```
+```c
 __global__ void example_kernel(spinor_field *s)
 {
     // This fails because s is a host pointer, unless it was transferred
@@ -128,7 +128,7 @@ __global__ void example_kernel(spinor_field *s)
 
 The correct way to run a kernel that operates on the GPU field data copy is to pass the first site in the copy to the kernel and then access other sites. For example
 
-```
+```c
 __global__ void example_kernel(suNf_spinor *start)
 {
     int ix = blockIdx.x * blockDim.x  + threadIdx.x;

@@ -39,7 +39,7 @@ REPR = REPR_FUNDAMENTAL
 
 * Boundary Conditions
 
-Uncomment the line here, when you want to establish certain boundary conditions into the respective direction.
+Comment out the line here, when you want to establish certain boundary conditions into the respective direction.
 ```
 #T => PERIODIC, ANTIPERIODIC, OPEN, THETA
 #X => PERIODIC, ANTIPERIODIC, THETA
@@ -138,13 +138,19 @@ The "+" in front of ```last conf``` specifies the number of trajectories to be g
 
 ### Execute Binary
 
-Run the HMC using 
+Run using a single thread using
 
 ```
-$ hmc -i input_file
+$ ./hmc -i input_file
 ```
 
-where ```hmc``` is the binary generated from ```hmc.c```.
+where ```hmc``` is the binary generated from ```hmc.c```. For the MPI version
+
+```
+$ mpirun -np <number of processes> ./hmc -i input_file
+```
+
+Here, the number of processes corresponds to either the number of cores used or the number of GPUs for the GPU version. Results are printed to `out_0` in the current directory.
 
 
 # Documentation
