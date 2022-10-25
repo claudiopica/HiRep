@@ -69,11 +69,18 @@ int test_convert_back_forth_spinor_field()
     tmp = alloc_spinor_field_f(1, &glattice);
     out = alloc_spinor_field_f(1, &glattice);
     gaussian_spinor_field(in);
+
     lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.2e]\n", spinor_field_sqnorm_f_cpu(in));
 
     // Convert twice
     to_gpu_format_spinor_field_f(tmp, in);
     to_cpu_format_spinor_field_f(out, tmp);
+
+    _MASTER_FOR(out->type, ix) 
+    {
+        suNf_spinor *s = _FIELD_AT(out, ix);
+        printf("%0.2e + i%0.2e\t", (*s).c[1].c[0]);
+    }
     lprintf("SANITY CHECK", 0, "[In and outfield sqnorms unequal zero and equal to each other: in %0.2e out %0.2e]\n", 
                     spinor_field_sqnorm_f_cpu(in), spinor_field_sqnorm_f_cpu(out));
     

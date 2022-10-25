@@ -22,7 +22,7 @@
 #endif //WITH_GPU
 
 /* MPI data */
-#define _MPI_FIELD_DATA
+#define _MPI_FIELD_DATA(_type)
 #ifdef WITH_MPI
 #undef _MPI_FIELD_DATA
 #define _MPI_FIELD_DATA(_type) MPI_Request *comm_req;
@@ -30,8 +30,9 @@
 
 #if defined(WITH_GPU) && defined(WITH_MPI) /* MPI + GPU Block handles */
 #undef _MPI_FIELD_DATA
-#define _MPI_FIELD_DATA(_type) MPI_Request *comm_req; \
-                        _type **block_handles[2];//This assumes decomp according to #of threads(MPI_WORLD_SIZE) + even-odd (2)
+#define _MPI_FIELD_DATA(_type) \
+      MPI_Request *comm_req; \
+      _type **block_handles[2];//This assumes decomp according to #of threads(MPI_WORLD_SIZE) + even-odd (2)
 #endif //WITH MPI AND GPU
 
 typedef struct {// TODO: this is probably not the right complex type

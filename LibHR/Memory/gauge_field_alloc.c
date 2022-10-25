@@ -27,6 +27,9 @@
 
 // TODO: Doxygen docs
 // TODO: Remove brackets from macro params
+// TODO: Generalize to Ddimensions (some gauge fields have d=1)
+// TODO: spinor n parameter
+// TODO: to_gpu_format: Alias _PIECE_FOR_MPI to _PIECE_FOR -> How should this really be implemented?
 
 /*
  * Here we use for all macros the parameters:
@@ -45,7 +48,6 @@
     #define _FREE_GPU_FIELD_DATA(_name, _site_type)                                                         \
         if (f->gpu_ptr != NULL)                                                                             \
         {                                                                                                   \
-            cudaError_t err;                                                                                \
             _PIECE_FOR_MPI(f->type, ixp)                                                                    \
             {                                                                                               \
                 CHECK(cudaFree(f->block_handles[ixp][PID]));                                                \
@@ -56,14 +58,14 @@
     /* Allocate device memory */
     /* Note: to be used inside function declaration */
     #define _ALLOC_GPU_FIELD_DATA(_name, _site_type, _size)                                                 \
-        cudaError_t err;                                                                                    \
         int block_size = 0;                                                                                 \
         _PIECE_FOR_MPI(f->type, ixp)                                                                        \
         {                                                                                                   \
             f->block_handles[ixp] = (_site_type**)malloc(MPI_WORLD_SIZE*sizeof(_site_type*));               \
             block_size = f->type->master_end[ixp] - f->type->master_start[ixp] + 1;                         \
             f->block_handles[ixp][PID] = _GPU_4FIELD_BLK(f, ixp);                                           \
-            CHECK(cudaMalloc((void **)&(f->block_handles[ixp][PID]), (_size)*block_size*sizeof(*(f->gpu_ptr))));\
+            int mem_size = (_size)*block_size*sizeof(*(f->gpu_ptr));                                        \
+            CHECK(cudaMalloc((void **)&(f->block_handles[ixp][PID]), mem_size));                            \
         }
 
     //#define _FREE_MPI_FIELD_DATA                                                                            
