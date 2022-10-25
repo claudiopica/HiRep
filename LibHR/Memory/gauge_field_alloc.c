@@ -92,20 +92,15 @@
         {                                                                                                   \
             _field_type *tmp = alloc_##_name(f->type);                                                      \
             to_gpu_format_##_name(tmp, f);                                                                  \
-            cudaError_t err;                                                                                \
             int block_size = 0;                                                                             \
-            int device_id;                                                                                  \
-            cudaGetDevice(&device_id);                                                                      \
             _site_type *block_start_in, *block_start_tmp;                                                   \
-            for (int ixp = device_id*2; ixp<(2*device_id)+2; ++ixp)                                         \
+            _PIECE_FOR_MPI(f->type, ixp)                                                                    \
             {                                                                                               \
                 block_size = f->type->master_end[ixp] - f->type->master_start[ixp] + 1;                     \
                 block_start_tmp = _4FIELD_BLK(tmp, tmp->type->master_start[ixp]);                           \
                 block_start_in = _GPU_4FIELD_BLK(f, f->type->master_start[ixp]);                            \
-                                                                                                            \
-                cudaMemcpy(block_start_in, block_start_tmp, block_size, cudaMemcpyHostToDevice);            \
+                CHECK(cudaMemcpy(block_start_in, block_start_tmp, block_size, cudaMemcpyHostToDevice));     \
             }                                                                                               \
-            cudaDeviceSynchronize();                                                                        \
             free_##_name(tmp);                                                                              \
         }
 
@@ -114,20 +109,15 @@
         void copy_from_gpu_##_name(_field_type *f)                                                          \
         {                                                                                                   \
             _field_type *tmp = alloc_##_name(f->type);                                                      \
-            cudaError_t err;                                                                                \
             int block_size = 0;                                                                             \
-            int device_id;                                                                                  \
-            cudaGetDevice(&device_id);                                                                      \
             _site_type *block_start_in, *block_start_tmp;                                                   \
-            for (int ixp = device_id*2; ixp<(2*device_id)+2; ++ixp)                                         \
+            _PIECE_FOR_MPI(f->type, ixp)                                                                    \
             {                                                                                               \
                 block_size = f->type->master_end[ixp] - f->type->master_start[ixp] + 1;                     \
                 block_start_tmp = _4FIELD_BLK(tmp, tmp->type->master_start[ixp]);                           \
                 block_start_in = _GPU_4FIELD_BLK(f, f->type->master_start[ixp]);                            \
-                                                                                                            \
-                cudaMemcpy(block_start_tmp, block_start_in, block_size, cudaMemcpyDeviceToHost);            \
+                CHECK(cudaMemcpy(block_start_tmp, block_start_in, block_size, cudaMemcpyDeviceToHost));     \
             }                                                                                               \
-            cudaDeviceSynchronize();                                                                        \
             to_cpu_format_##_name(f, tmp);                                                                  \
             free_##_name(tmp);                                                                              \
         }

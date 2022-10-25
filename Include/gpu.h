@@ -73,21 +73,10 @@ void __cudaCheckError( const char *file, const int line );
         if (error != cudaSuccess)\
         {\
           fprintf(stderr, "Error: %s:%d, ", __FILE__, __LINE__);\
-          fprintf(stderr, "call exited with code %d: %s\n", error, cudaGetErrorString(err));\
+          fprintf(stderr, "call exited with code %d: %s\n", error, cudaGetErrorString(error));\
           exit(1);\
         } \
     }
-
-/*#define CHECK(call)										\
-{												\
-    const cudaError_t error = call;								\
-    if (error != cudaSuccess) 									\
-    {												\
-        fprintf(stderr, "Error: %s:%d, ", __FILE__, __LINE__);					\
-	fprintf(stderr, "code: %d, reason: %s\n", error, cudaGetErrorString(error));		\
-	exit(1);										\
-    }												\
-}	*/
 
 #ifdef __cplusplus
 }

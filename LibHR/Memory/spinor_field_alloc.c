@@ -93,7 +93,6 @@
             /*_field_type *tmp = alloc_##_name(1, f->type);\
             to_gpu_format_##_name(tmp, f);\
             cudaError_t err;\
-            _QUERY_NGPUS(_name);\
             int block_size = 0;\
             int active_device = 0;\
             _site_type *block_start_in, *block_start_tmp;\
