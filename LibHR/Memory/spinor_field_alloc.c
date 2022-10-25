@@ -90,7 +90,7 @@
     #define _DECLARE_COPY_TO(_name, _field_type, _site_type, _size) \
         void copy_to_gpu_##_name(_field_type *f)\
         {\
-           /* _field_type *tmp = alloc_##_name(1, f->type);\
+            /*_field_type *tmp = alloc_##_name(1, f->type);\
             to_gpu_format_##_name(tmp, f);\
             cudaError_t err;\
             _QUERY_NGPUS(_name);\
@@ -139,11 +139,11 @@
 
 #if defined(WITH_MPI) //&& !defined(WITH_GPU)
 
-        #define _FREE_MPI_FIELD_DATA                                                                              \
+        #define _FREE_MPI_FIELD_DATA                                                                        \
             if(f->comm_req != NULL)                                                                         \
                 afree(f->comm_req)
 
-        #define _ALLOC_MPI_FIELD_DATA(_name)                                                                      \
+        #define _ALLOC_MPI_FIELD_DATA(_name)                                                                \
             if (type->nbuffers_spinor > 0)                                                                  \
             {                                                                                               \
                 f->comm_req = amalloc( n * 2 * type->nbuffers_spinor * sizeof(MPI_Request), ALIGN);         \
@@ -291,7 +291,6 @@
                 afree(f->ptr);                                                                              \
             _FREE_GPU_FIELD_DATA(_name, _site_type);                                                        \
             _FREE_MPI_FIELD_DATA;                                                                           \
-            MPI_Barrier(MPI_COMM_WORLD);/* Collect ranks */                                                 \
             afree(f);                                                                                       \
             f = NULL;                                                                                       \
         }                                                                                                   \
@@ -332,7 +331,6 @@
                                                                                                             \
         /* Allocate buffers for MPI comms, if compiling with MPI */                                         \
         _ALLOC_MPI_FIELD_DATA(_name);                                                                       \
-        MPI_Barrier(MPI_COMM_WORLD);                                                                        \
                                                                                                             \
         return f;                                                                                           \
     }

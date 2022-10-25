@@ -312,7 +312,6 @@
                 afree(f->ptr);                                                                              \
             _FREE_GPU_FIELD_DATA(_name, _site_type);/* Every MPI process needs to free -> check, whether its null differently...*/\
             _FREE_MPI_FIELD_DATA;                                                                           \
-            MPI_Barrier(MPI_COMM_WORLD); /* Collect ranks */                                                \
             afree(f);                                                                                       \
             f = NULL;                                                                                       \
         }                                                                                                   \
@@ -327,7 +326,6 @@
         _ALLOC_CPU_FIELD_DATA(_name, _size);                                                                \
         _ALLOC_GPU_FIELD_DATA(_name, _site_type, _size);                                                    \
         _ALLOC_MPI_FIELD_DATA(_name);                                                                       \
-        MPI_Barrier(MPI_COMM_WORLD);    /* Collect ranks */                                                 \
                                                                                                             \
         return f;                                                                                           \
     }

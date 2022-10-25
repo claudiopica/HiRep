@@ -1,5 +1,7 @@
 /*******************************************************************************
 *
+* NOCOMPILE= !WITH_GPU
+*
 * Check that the GPU reading and writing functions defined in suN.h 
 * are bijective.
 *
@@ -24,6 +26,7 @@
 
 // TODO: spinor fields do not work, because linear algebra
 //       does not seem to work with MPI
+// TODO: &glat_even, &glat_odd
 
 // Double precision
 int test_write_read_gauge_field_f();
@@ -47,10 +50,10 @@ int main(int argc, char *argv[])
     // Double Precision Tests
     //return_val += test_write_read_spinor_field_f();
     return_val += test_write_read_gauge_field_f();
-    return_val += test_write_read_gauge_field();
+    //return_val += test_write_read_gauge_field();
 
     //Single Precision Tests
-    return_val += test_write_read_gauge_field_flt();
+    //return_val += test_write_read_gauge_field_flt();
     //return_val += test_write_read_spinor_field_f_flt();
 
 
@@ -160,45 +163,43 @@ int test_write_read_gauge_field_f()
     int return_val = 0;
     suNf_field *in, *gpu_format, *out;
 
-    in = alloc_gfield_f(&glattice);
+    /*in = alloc_gfield_f(&glattice);
     out = alloc_gfield_f(&glattice);
     gpu_format = alloc_gfield_f(&glattice);
 
-    if (PID == 0) 
-    {
-        random_u_f(in);
-        lprintf("SANITY CHECK", 0, "[In field norm unequal zero: %0.2e]\n", sqnorm_gfield_f_cpu(in));
+    random_u_f(in);
+    lprintf("SANITY CHECK", 0, "[In field norm unequal zero: %0.2e]\n", sqnorm_gfield_f_cpu(in));
 
-        suNf *in_mat, *block_start, *out_mat;
-        int stride = 0;
-        _PIECE_FOR(in->type, ixp) 
+    suNf *in_mat, *block_start, *out_mat;
+    int stride = 0;
+    _PIECE_FOR_MPI(in->type, ixp) 
+    {
+        printf("Operating on piece %d\n", ixp);
+        block_start = _4FIELD_BLK(gpu_format, ixp);
+        stride = in->type->master_end[ixp] - in->type->master_start[ixp] + 1;
+        _SITE_FOR(in->type, ixp, ix) 
         {
-            block_start = _4FIELD_BLK(gpu_format, ixp);
-            stride = in->type->master_end[ixp] - in->type->master_start[ixp] + 1;
-            _SITE_FOR(in->type, ixp, ix) 
+            int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
+            for (int comp = 0; comp < 4; comp++) 
             {
-                int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
-                for (int comp = 0; comp < 4; comp++) 
-                {
-                    in_mat = _4FIELD_AT(in, ix, comp);
-                    out_mat = _4FIELD_AT(out, ix, comp);
-                    write_gpu_suNf(stride, (*in_mat), block_start, ix_loc, comp);
-                    read_gpu_suNf(stride, (*out_mat), block_start, ix_loc, comp);
-                }
+                in_mat = _4FIELD_AT(in, ix, comp);
+                out_mat = _4FIELD_AT(out, ix, comp);
+                write_gpu_suNf(stride, (*in_mat), block_start, ix_loc, comp);
+                read_gpu_suNf(stride, (*out_mat), block_start, ix_loc, comp);
             }
         }
-
-        lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.15lf]\n", sqnorm_gfield_f_cpu(in));
-        lprintf("SANITY CHECK", 0, "[Sanity check out field norm unequal zero: %0.15lf]\n", sqnorm_gfield_f_cpu(out));
-        sub_assign_gfield_f_cpu(out, in);
-        double diff_norm = sqnorm_gfield_f_cpu(out);
-
-        check_diff_norm_zero(diff_norm);
     }
 
+    lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.15lf]\n", sqnorm_gfield_f_cpu(in));
+    lprintf("SANITY CHECK", 0, "[Sanity check out field norm unequal zero: %0.15lf]\n", sqnorm_gfield_f_cpu(out));
+    sub_assign_gfield_f_cpu(out, in);
+    double diff_norm = sqnorm_gfield_f_cpu(out);
+
+    check_diff_norm_zero(diff_norm);*/
+
     free_gfield_f(in);
-    free_gfield_f(out);
-    free_gfield_f(gpu_format);
+    //free_gfield_f(out);
+    //free_gfield_f(gpu_format);
     return return_val;
 }
 
@@ -212,34 +213,30 @@ int test_write_read_spinor_field_f()
     gpu_format = alloc_spinor_field_f(1, &glattice);
     out = alloc_spinor_field_f(1, &glattice);
 
-    if (PID == 0) 
+    /*gaussian_spinor_field(in);
+    random_spinor_field_f_cpu(in);
+    lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.15lf]\n", spinor_field_sqnorm_f_cpu(in));
+
+    suNf_spinor *in_spinor, *block_start, *out_spinor;
+    int stride = 0;
+    _PIECE_FOR(in->type, ixp)
     {
-        lprintf("SANITY CHECK", 0, "Test");
-        //gaussian_spinor_field(in);
-        random_spinor_field_f_cpu(in);
-        //lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.15lf]\n", spinor_field_sqnorm_f_cpu(in));
-
-        /*suNf_spinor *in_spinor, *block_start, *out_spinor;
-        int stride = 0;
-        _PIECE_FOR(in->type, ixp)
+        block_start = _FIELD_BLK(gpu_format, ixp);
+        stride = in->type->master_end[ixp] - in->type->master_start[ixp] + 1;
+        _SITE_FOR(in->type, ixp, ix) 
         {
-            block_start = _FIELD_BLK(gpu_format, ixp);
-            stride = in->type->master_end[ixp] - in->type->master_start[ixp] + 1;
-            _SITE_FOR(in->type, ixp, ix) 
-            {
-                in_spinor = _FIELD_AT(in, ix);
-                out_spinor = _FIELD_AT(out, ix);
-                int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
-                write_gpu_suNf_spinor(stride, (*in_spinor), block_start, ix_loc, 0);
-                read_gpu_suNf_spinor(stride, (*out_spinor), block_start, ix_loc, 0);
-            } 
-        }
-
-        lprintf("SANITY CHECK", 0, "[Sanity check out field norm unequal zero: %0.15lf]\n", spinor_field_sqnorm_f_cpu(out));
-        spinor_field_sub_assign_f_cpu(out, in);
-        double diff_norm = spinor_field_sqnorm_f_cpu(out);
-        check_diff_norm_zero(diff_norm);*/
+            in_spinor = _FIELD_AT(in, ix);
+            out_spinor = _FIELD_AT(out, ix);
+            int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
+            write_gpu_suNf_spinor(stride, (*in_spinor), block_start, ix_loc, 0);
+            read_gpu_suNf_spinor(stride, (*out_spinor), block_start, ix_loc, 0);
+        } 
     }
+
+    lprintf("SANITY CHECK", 0, "[Sanity check out field norm unequal zero: %0.15lf]\n", spinor_field_sqnorm_f_cpu(out));
+    spinor_field_sub_assign_f_cpu(out, in);
+    double diff_norm = spinor_field_sqnorm_f_cpu(out);
+    check_diff_norm_zero(diff_norm);*/
 
     free_spinor_field_f(in);
     free_spinor_field_f(gpu_format);
