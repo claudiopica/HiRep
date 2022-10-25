@@ -24,7 +24,7 @@
 struct hr_complex_int;
 struct hr_complex_flt;
 struct hr_complex;
-struct hr_complex_int{
+struct __align__(16) hr_complex_int{
   int re, im;
   __host__ __device__ hr_complex_int(void){}
   __host__ __device__ hr_complex_int(const int x)
@@ -288,7 +288,7 @@ struct hr_complex_int{
     return hr_complex_int((re*(x.re) + im*(x.im)) / ((x.re)*(x.re) + (x.im)*(x.im)), (im*(x.re) - re*(x.im)) / ((x.re)*(x.re) + (x.im)*(x.im)));
   }
 };
-struct hr_complex_flt{
+struct __align__(16) hr_complex_flt{
   float re, im;
   __host__ __device__ hr_complex_flt(void){}
   __host__ __device__ hr_complex_flt(const int x)
@@ -603,7 +603,7 @@ struct hr_complex_flt{
     return hr_complex_flt((re*(x.re) + im*(x.im)) / ((x.re)*(x.re) + (x.im)*(x.im)), (im*(x.re) - re*(x.im)) / ((x.re)*(x.re) + (x.im)*(x.im)));
   }
 };
-struct hr_complex{
+struct __align__(16) hr_complex{
   double re, im;
   __host__ __device__ hr_complex(void){}
   __host__ __device__ hr_complex(const int x)
@@ -1175,6 +1175,7 @@ __host__ __device__ inline __attribute__((always_inline)) hr_complex_flt& hr_com
 */
 #define _complex_0(a) \
    (a)=0
+
 /*
 * a=1. (a complex)
 */
@@ -1198,11 +1199,13 @@ __host__ __device__ inline __attribute__((always_inline)) hr_complex_flt& hr_com
 */
 #define _complex_star(a,b) \
    (a)=conj(b)
+
 /*
 * a=-b^+ (a,b complex)
 */
 #define _complex_star_minus(a,b) \
    (a)=-conj(b)
+
 /*
 * a=a^+ (a complex)
 */
@@ -1214,6 +1217,7 @@ __host__ __device__ inline __attribute__((always_inline)) hr_complex_flt& hr_com
 */
 #define _complex_mul(a,b,c) \
    (a)=(b)*(c)
+
 /*
 * a=r*b (a,b complex; r real)
 */
@@ -1237,6 +1241,7 @@ __host__ __device__ inline __attribute__((always_inline)) hr_complex_flt& hr_com
 */
 #define _complex_add_star(a,b,c) \
    (a)=(b)+conj(c)
+
 /*
 * a=b-c^(+) (a,b,c complex)
 */
@@ -1393,7 +1398,6 @@ __host__ __device__ inline __attribute__((always_inline)) hr_complex_flt& hr_com
 #define _complex_mulr_assign(a,r,b) \
    (a)+=(r)*(b)
 
-
 /*
 * a=r1*c1+r2*c2 (a,c1,c2 complex; r1,r2 real)
 */
@@ -1405,11 +1409,13 @@ __host__ __device__ inline __attribute__((always_inline)) hr_complex_flt& hr_com
 */
 #define _complex_rlc_assign(a,r1,c1,r2,c2) \
     (a)+=(r1)*(c1)+(r2)*(c2)
+
 /*
 * a=z1*c1+z2*c2 (a,z1,c1,z2,c2 complex)
 */
 #define _complex_clc(a,z1,c1,z2,c2) \
     (a)=(z1)*(c1)+(z2)*(c2)
+
 /*
 * a+=z1*c1+z2*c2 (a,z1,c1,z2,c2 complex)
 */

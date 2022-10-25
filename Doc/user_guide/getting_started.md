@@ -1,5 +1,3 @@
-This repository contains the HiRep simulation code.
-
 # Getting started
 
 ## Dependencies
@@ -39,7 +37,7 @@ REPR = REPR_FUNDAMENTAL
 
 * Boundary Conditions
 
-Comment out the line here, when you want to establish certain boundary conditions into the respective direction.
+Uncomment the line here, when you want to establish certain boundary conditions into the respective direction.
 ```
 #T => PERIODIC, ANTIPERIODIC, OPEN, THETA
 #X => PERIODIC, ANTIPERIODIC, THETA
@@ -67,7 +65,7 @@ MACRO += -DBC_Z_PERIODIC
 #MACRO += -DROTATED_SF
 ```
 
-Specify, whether you want to compile with MPI either with or without GPU acceleration by using 
+Specify, whether you want to compile with MPI either with or without GPU acceleration by using
 
 ```
 #MACRO += -DWITH_MPI
@@ -130,7 +128,7 @@ run name = run1
 save freq = 1
 meas freq = 1
 conf dir = cnfg
-gauge start = random 
+gauge start = random
 last conf = +1
 ```
 
@@ -138,30 +136,11 @@ The "+" in front of ```last conf``` specifies the number of trajectories to be g
 
 ### Execute Binary
 
-Run using a single thread using
+Run the HMC using
 
 ```
 $ ./hmc -i input_file
 ```
 
-where ```hmc``` is the binary generated from ```hmc.c```. For the MPI version
+where ```hmc``` is the binary generated from ```hmc.c```.
 
-```
-$ mpirun -np <number of processes> ./hmc -i input_file
-```
-
-Here, the number of processes corresponds to either the number of cores used or the number of GPUs for the GPU version. Results are printed to `out_0` in the current directory.
-
-
-# Documentation
-
-* Complete HTML Documentation [html](Docs/_build/html/index.html) 
-* User Guide [pdf](Docs/_build/latex/hirep-documentation.pdf)
-* Developer Manual [pdf](Docs/_build/latex/hirep-documentation.pdf)
-
-
-
-
-
-![https://github.com/claudiopica/HiRep/actions?workflow=no-mpi](https://github.com/claudiopica/HiRep/workflows/no-mpi/badge.svg)
-![https://github.com/claudiopica/HiRep/actions?workflow=mpi](https://github.com/claudiopica/HiRep/workflows/mpi/badge.svg)

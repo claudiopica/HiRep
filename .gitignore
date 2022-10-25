@@ -25,6 +25,10 @@ LibHR/Utils/suN_exp.c
 **/SnoopDogg*
 Hirep-git.code-workspace
 
+#documentation
+Doc/_build
+Doc/doxygen/build
+
 # Files from compilation
 HMC/hmc
 LibHR/.lib.updated
