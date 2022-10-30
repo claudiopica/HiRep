@@ -22,6 +22,7 @@ void copy_clover_force_cpu(suNf_field*, suNf_field*);
 
 // RANDOM
 void random_spinor_field_f_cpu(spinor_field*);
+void random_spinor_field_f_flt_cpu(spinor_field_flt*);
 void random_gfield_cpu(suNg_field*);
 void random_scalar_field_cpu(suNg_scalar_field*);
 void random_gfield_flt_cpu(suNg_field_flt*);

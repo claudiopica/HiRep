@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 
     // Run tests 
       /* Double precision */
-    return_val += test_convert_back_forth_spinor_field();
+    //return_val += test_convert_back_forth_spinor_field();
     return_val += test_convert_back_forth_gfield_f();
     return_val += test_convert_back_forth_gfield();
 

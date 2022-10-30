@@ -109,7 +109,7 @@ void print_wdmatrix(char *filename);
 void init_gpu(input_gpu gpu_var);
 void init_neighbors_gpu();
 
-#define _GPU_IDX_TO_GLOBAL(ix, ixp) (ix) + in->type-master_start[(ixp)]
+#define _GPU_IDX_TO_GLOBAL(in, ix, ixp) (ix) + in->type-master_start[(ixp)]
 #define _GPU_IDX_TO_LOCAL(in, ix, ixp) (ix) - in->type->master_start[(ixp)];
 #define _SITE_IDX_GPU(ix, ixp, stride) (ix) + stride*(ixp)
 

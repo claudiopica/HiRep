@@ -99,8 +99,8 @@
             _PIECE_FOR_MPI(f->type, ixp)                                                                    \
             {                                                                                               \
                 block_size = f->type->master_end[ixp] - f->type->master_start[ixp] + 1;                     \
-                block_start_tmp = _4FIELD_BLK(tmp, tmp->type->master_start[ixp]);                           \
-                block_start_in = _GPU_4FIELD_BLK(f, f->type->master_start[ixp]);                            \
+                block_start_tmp = _4FIELD_BLK(tmp, ixp);                                                    \
+                block_start_in = _GPU_4FIELD_BLK(f, ixp);                                                   \
                 CHECK(cudaMemcpy(block_start_in, block_start_tmp, block_size, cudaMemcpyHostToDevice));     \
             }                                                                                               \
             free_##_name(tmp);                                                                              \
@@ -116,8 +116,8 @@
             _PIECE_FOR_MPI(f->type, ixp)                                                                    \
             {                                                                                               \
                 block_size = f->type->master_end[ixp] - f->type->master_start[ixp] + 1;                     \
-                block_start_tmp = _4FIELD_BLK(tmp, tmp->type->master_start[ixp]);                           \
-                block_start_in = _GPU_4FIELD_BLK(f, f->type->master_start[ixp]);                            \
+                block_start_tmp = _4FIELD_BLK(tmp, ixp);                                                    \
+                block_start_in = _GPU_4FIELD_BLK(f, ixp);                                                   \
                 CHECK(cudaMemcpy(block_start_tmp, block_start_in, block_size, cudaMemcpyDeviceToHost));     \
             }                                                                                               \
             to_cpu_format_##_name(f, tmp);                                                                  \

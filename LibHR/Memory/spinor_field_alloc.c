@@ -53,16 +53,18 @@
             /* TODO: Deallocate handles. */                                                                         \
         }
     
-    /* This only works for n=1 */
     #define _ALLOC_GPU_FIELD_DATA(_name, _site_type, _size)                                                         \
         int block_size = 0;                                                                                         \
-        _PIECE_FOR_MPI(f->type, ixp)                                                                                \
+        for (int i = 0; i < n; ++i)                                                                                 \
         {                                                                                                           \
-            f->block_handles[ixp] = (_site_type**)malloc(MPI_WORLD_SIZE*sizeof(_site_type*));                       \
-            block_size = f->type->master_end[ixp] - f->type->master_start[ixp] + 1;                                 \
-            f->block_handles[ixp][PID] = _GPU_FIELD_BLK(f, ixp);                                                    \
-            int mem_size = (_size)*block_size*sizeof(*(f->gpu_ptr));                                                \
-            CHECK(cudaMalloc((void **)&(f->block_handles[ixp][PID]), mem_size));                                    \
+            _PIECE_FOR_MPI(f[i].type, ixp)                                                                          \
+            {                                                                                                       \
+                f[i].block_handles[ixp] = (_site_type**)malloc(MPI_WORLD_SIZE*sizeof(_site_type*));                 \
+                block_size = f[i].type->master_end[ixp] - f[i].type->master_start[ixp] + 1;                         \
+                f[i].block_handles[ixp][PID] = _GPU_FIELD_BLK(&f[i], ixp);                                          \
+                int mem_size = (_size)*block_size*sizeof(*(f->gpu_ptr));                                            \
+                CHECK(cudaMalloc((void **)&(f[i].block_handles[ixp][PID]), mem_size));                              \
+            }                                                                                                       \
         }
 
 
@@ -95,8 +97,8 @@
             _PIECE_FOR_MPI(f->type, ixp)                                                                            \
             {                                                                                                       \
                 block_size = f->type->master_end[ixp] - f->type->master_start[ixp] + 1;                             \
-                block_start_tmp = _FIELD_BLK(tmp, tmp->type->master_start[ixp]);                                    \
-                block_start_in = _GPU_FIELD_BLK(f, f->type->master_start[ixp]);                                     \
+                block_start_tmp = _FIELD_BLK(tmp, ixp);                                                             \
+                block_start_in = _GPU_FIELD_BLK(f, ixp);                                                            \
                 CHECK(cudaMemcpy(block_start_in, block_start_tmp, block_size, cudaMemcpyHostToDevice));             \
             }                                                                                                       \
             free_##_name(tmp);                                                                                      \
@@ -111,8 +113,8 @@
             _PIECE_FOR_MPI(f->type, ixp)                                                                            \
             {                                                                                                       \
                 block_size = f->type->master_end[ixp] - f->type->master_start[ixp] + 1;                             \
-                block_start_tmp = _FIELD_BLK(tmp, tmp->type->master_start[ixp]);                                    \
-                block_start_in = _FIELD_BLK(f, f->type->master_start[ixp]);                                         \
+                block_start_tmp = _FIELD_BLK(tmp, ixp);                                                             \
+                block_start_in = _FIELD_BLK(f, ixp);                                                                \
                 CHECK(cudaMemcpy(block_start_tmp, block_start_in, block_size, cudaMemcpyDeviceToHost));             \
             }                                                                                                       \
             to_cpu_format_##_name(f, tmp);                                                                          \
@@ -174,7 +176,6 @@
     #define _DECLARE_COPY_TO(_name, _field_type, _site_type, _size)                                                 \
         void copy_to_gpu_##_name(_field_type *f)                                                                    \
         {                                                                                                           \
-            /* FIXME: Do not only copy one layer. */                                                                \
             _field_type *tmp = alloc_##_name(1, f->type);                                                           \
             to_gpu_format_##_name(tmp, f);                                                                          \
             int field_size = _size * f->type->gsize_spinor * sizeof(*(f->gpu_ptr));                                  \
