@@ -12,9 +12,9 @@ Subsection
 
    user_guide/getting_started
    user_guide/input_file
-   user_guide/physics_background
-   user_guide/examples
-   user_guide/examples2
+   user_guide/supported_features
+   user_guide/analysis
+   user_guide/writing_programs
 
 .. toctree::
    :maxdepth: 2
@@ -32,3 +32,6 @@ Subsection
    :caption: Reference Manual
 
    api
+   
+.. bibliography::
+   :all:

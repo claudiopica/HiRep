@@ -12,3 +12,6 @@ HiRep
    development_manual/field_geometry
    development_manual/global_objects
    
+.. bibliography::
+   :all:
+   
