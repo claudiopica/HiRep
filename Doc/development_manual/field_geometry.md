@@ -142,12 +142,64 @@ One could find out the length of the block, which is not necessarily constant, b
 int block_length = s-type->master_start[5] - s->type->master_end[5] + 1;
 ```
 
-#### Site Arrangement in Local Block Memory
-As already described the local blocks decompose further into even and odd pieces, sites of the halo, boundary and bulk. We want to access these pieces separately, because they have different roles in computation and communication. Manipulating these different elements in the field data therefore requires different code. However, in order to conserve optimal access patterns, every data access has to be an access to a single block of contiguous memory. When storing all sites in the extended lattice naively, one might have to access multiple blocks of memory. This negatively impacts memory access performance due to suboptimal bus-utilization, data reuse and automatic caching patterns.
+#### OpenMP
 
-As a result, we want to store the data in a local block first of all in such a way, that the inner sites are all consecutive, are then followed by boundary elements and finally halo elements/receive buffers. Here in particular the arrangement of the boundary elements is crucial, because different overlapping parts of the boundary are requested by different nodes. Making sure that every request results in a contiguous memory access, requires another copy of certain boundary elements to be present in the boundary block of the local lattice.
+The integers
 
-%% TODO: Expand
+```c
+  int *fuse_mask;
+  int fuse_gauge_size;
+  int fuse_inner_counter;
+```
+
+are necessary for optimizing communications between cores on a single node.
+
+#### Optimizing Communications
+
+As already described the local blocks decompose further into even and odd pieces, sites of the halo, boundary and bulk. We want to access these pieces separately, because they have different roles in computation and communication. Manipulating these different elements in the field data therefore requires different code. However, in order to conserve optimal access patterns, every data access has to be an access to a single block of contiguous memory. When storing all sites in the extended lattice naively, one might have to access multiple blocks of memory for a particular computation or communication step. This negatively impacts memory access performance due to suboptimal bus-utilization, data reuse and automatic caching patterns. The challenge is, therefore, to arrange the sites in memory in such a way that every memory access is an access to a single continguous block of memory.
+
+As a result, we want to store the data in a local block first of all in such a way, that the inner sites are all consecutive, are then followed by boundary elements and finally halo elements/receive buffers. 
+
+##### Boundary and Receive Buffers
+
+Here in particular the arrangement of the boundary elements is crucial, because different overlapping parts of the boundary are requested by different nodes. At this point, we do not need to worry about the concrete arrangement of points in the bulk, because computations on the inner points can be executed in a single block, a caveat being discussed in the next section.
+
+We arrange memory as in the following 4-by-4 2D example
+
+```{image} ../img/development_notes/field_geometry/contingent_numbering.png
+:alt: Example Of Contingent Numbering
+:class: bg-primary
+:width: 400px
+:align: center
+```
+
+ * The lattice is decomposed into an even and an odd part, which are contiguous in memory respectively. The first index with an odd entry, the master shift of the odd lattice, is 17.
+ * The bulk consists for each sublattice of only two sites. Sites 0-1 and 17-18 are the inner sites of the even and odd lattice respectively.
+ * We do not need to consider the edges of the square in the extended lattice, because they are not used in any computations, since they are not neighbors to any of the sites in the local lattice.
+ * For the even lattice we walk around the inner sites to label the boundary elements. If this local lattice is parallelized in both dimensions, then we need to exchange all boundary elements with other nodes. 2-3 with another node, then 4-5 and then 5-6. These three memory accesses do no pose a problem, since they are continguous. However, the next send buffer will try to access elements 7 and 2. These are not contiguous. As a result, we have to allocate space for site 2 twice, so that we can copy it, to a site with index 8. We have to make sure that whenever we need this information, it is in sync with the information stored at site 2.
+ * We can now proceed to label the receive buffers. Here we want the memory that we write to again be contiguous. This works out naturally, the receive buffers are 9-10, then 11-12, then 13-14 and finally 15-16.
+ * Proceed analogously for the odd lattice. In contrast to the even lattice, we do not have any holes in the numbering.
+
+##### Bulk Arrangement
+As mentioned above, inner elements are always accessed as a block in memory and therefore the accesses are continguous. However, the order of access can have an impact on L1 and L2 caching and therefore the speed of memory transfer. Caching is optimal, if the bulk elements are subdivided into smaller block elements. This is implemented under the name _path blocking_. The dimensions of the bulk subblocks are stored in the global variables (`Include/global.h`)
+
+```c
+/*path blocking size*/
+GLB_VAR(int,PB_T,=2);
+GLB_VAR(int,PB_X,=2);
+GLB_VAR(int,PB_Y,=2);
+GLB_VAR(int,PB_Z,=2);
+```
+
+as `PB_T`, `PB_X`, `PB_Y` and `PB_Z`. On a 6-by-6 2D lattice `PB_X=2` and `PB_Y=2` would imply a decomposition as in the following illustration
+
+```{image} ../img/development_notes/field_geometry/path_blocking.png
+:alt: Path Blocking Illustration
+:class: bg-primary
+:width: 200px
+:align: center
+```
+
 
 #### Buffer Synchronization
 For complex decompositions, that are usual in lattice simulations, the blocks have to communicate in a highly non-trivial way. For example decomposing a $32^3\times 64$ lattice into $8^4$ local lattices requires 512 processes to communicate the three dimensional surfaces of each four-dimensional local lattice with all interfacing blocks. In order to perform this communication we need to know both the indices of the sending blocks and map them to the receiving blocks. This information is stored in the arrays `copy_from` and `copy_to`. We can iterate through these arrays to find pairs of sending and receiving blocks and perform the communication. The size of the memory transfer is further stored in the array `copy_len`.
