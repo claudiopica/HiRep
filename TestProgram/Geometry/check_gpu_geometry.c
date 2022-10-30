@@ -222,13 +222,13 @@ int test_write_read_spinor_field_f()
             in_spinor = _FIELD_AT(in, ix);
             out_spinor = _FIELD_AT(out, ix);
             int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
-            for (int comp = 0; comp < 4; ++comp) 
+            /*for (int comp = 0; comp < 4; ++comp) 
             {
                 write_gpu_suNf_vector(stride, (*in_spinor).c[comp], block_start, ix_loc, comp);
                 read_gpu_suNf_vector(stride, (*out_spinor).c[comp], block_start, ix_loc, comp);
-            }
-            //write_gpu_suNf_spinor(stride, (*in_spinor), block_start, ix_loc, 0);
-            //read_gpu_suNf_spinor(stride, (*out_spinor), block_start, ix_loc, 0);
+            }*/
+            write_gpu_suNf_spinor(stride, (*in_spinor), block_start, ix_loc, 0);
+            read_gpu_suNf_spinor(stride, (*out_spinor), block_start, ix_loc, 0);
         } 
     }
 
@@ -268,13 +268,13 @@ int test_write_read_spinor_field_f_flt()
             in_spinor = _FIELD_AT(in, ix);
             out_spinor = _FIELD_AT(out, ix);
             int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
-            for (int comp = 0; comp < 4; ++comp)
+            /*for (int comp = 0; comp < 4; ++comp)
             {
                 write_gpu_suNf_vector(stride, (*in_spinor).c[comp], block_start, ix_loc, comp);
                 read_gpu_suNf_vector(stride, (*out_spinor).c[comp], block_start, ix_loc, comp);
-            }
-            //write_gpu_suNf_spinor_flt(stride, (*in_spinor), block_start, ix_loc, 0);
-            //read_gpu_suNf_spinor_flt(stride, (*out_spinor), block_start, ix_loc, 0);
+            }*/
+            write_gpu_suNf_spinor_flt(stride, (*in_spinor), block_start, ix_loc, 0);
+            read_gpu_suNf_spinor_flt(stride, (*out_spinor), block_start, ix_loc, 0);
         }
     }
 

@@ -96,6 +96,7 @@ sub write_gpu_spinor {
     my ($prec, $repr) = @_;
     my @dim_vector = ($Ng, $Nf);
     my $i;
+    my $comp;
 
     # Generate basename for given representation
     my $dataname = $basename.$rep_suffixes[$repr]."_spinor";
@@ -118,34 +119,46 @@ sub write_gpu_spinor {
     print "/**\n";
     print " * \@brief Read ${typename} according to device geometry structure \n";
     print " * \@param _stride\t\tInteger valued stride with which the components are stored\n";
-    print " * \@param _v     \t\t${typename} target to read to from the field _in\n";
+    print " * \@param _s     \t\t${typename} target to read to from the field _in\n";
     print " * \@param _in    \t\tInput field to read from \n";
     print " * \@param _ix    \t\tIndex at which to read \n";
     print " * \@param _comp  \t\tComponent to read, choose 0 for spinor fields.\n";
     print " */\n";
-    print "#define read_gpu_${typename}(_stride, _v, _in, _ix, _comp) \\\n";
+    print "#define read_gpu_${typename}(_stride, _s, _in, _ix, _comp) \\\n";
     print "\tdo { \\\n";
-    print "\t\tread_gpu_${component_type}((_stride), (_v).c[(_comp)], (_in), (_ix), 0);\\\n";
-    print "\t\tread_gpu_${component_type}((_stride), (_v).c[(_comp)], (_in), (_ix), 1);\\\n";
-    print "\t\tread_gpu_${component_type}((_stride), (_v).c[(_comp)], (_in), (_ix), 2);\\\n";
-    print "\t\tread_gpu_${component_type}((_stride), (_v).c[(_comp)], (_in), (_ix), 3);\\\n";
+    print "\t\tint __iz = (_ix); \\\n";
+    for ($comp=0; $comp<3; $comp++) {
+        for ($i=0; $i<$N; $i++) {
+            print "\t\t(_s).c\[$comp\].c\[$i\]=((hr_complex*)(_in))\[__iz\]; __iz+=(_stride); \\\n";
+        }
+    }
+    for ($i=0; $i<$N-1; $i++) {
+        print "\t\t(_s).c\[$comp\].c\[$i\]=((hr_complex*)(_in))\[__iz\]; __iz+=(_stride); \\\n";
+    }
+    print "\t\t(_s).c\[$comp\].c\[$i\]=((hr_complex*)(_in))\[__iz\]; \\\n";
     print "\t} while (0) \n\n";
 
     # Generate write macro
     print "/**\n";
     print " * \@brief Write ${typename} according to device geometry structure \n";
     print " * \@param _stride\t\tInteger valued stride with which the components are stored\n";
-    print " * \@param _v     \t\t${component_type} target to write to the field _out\n";
+    print " * \@param _s     \t\t${component_type} target to write to the field _out\n";
     print " * \@param _out   \t\tInput field to write to\n";
     print " * \@param _ix    \t\tIndex at which to write \n";
     print " * \@param _comp  \t\tComponent to write, choose 0 for spinor fields. \n";
     print " */\n";
-    print "#define write_gpu_${typename}(_stride, _v, _out, _ix, _comp) \\\n";
+    print "#define write_gpu_${typename}(_stride, _s, _out, _ix, _comp) \\\n";
     print "\tdo { \\\n";
-    print "\t\twrite_gpu_${component_type}((_stride), (_v).c[(_comp)], (_out), (_ix), 0);\\\n";
-    print "\t\twrite_gpu_${component_type}((_stride), (_v).c[(_comp)], (_out), (_ix), 1);\\\n";
-    print "\t\twrite_gpu_${component_type}((_stride), (_v).c[(_comp)], (_out), (_ix), 2);\\\n";
-    print "\t\twrite_gpu_${component_type}((_stride), (_v).c[(_comp)], (_out), (_ix), 3);\\\n";
+    print "\t\tint __iz = (_ix); \\\n";
+    for ($comp=0; $comp<3; $comp++) {
+        for ($i=0; $i<$N; $i++) {
+            print "\t\t((hr_complex*)(_out))\[__iz\]=(_s).c\[$comp\].c\[$i\]; __iz+=(_stride); \\\n";
+        }
+    }
+    for ($i=0; $i<$N-1; $i++) {
+        print "\t\t((hr_complex*)(_out))\[__iz\]=(_s).c\[$comp\].c\[$i\]; __iz+=(_stride); \\\n";
+    }
+    print "\t\t((hr_complex*)(_out))\[__iz\]=(_s).c\[$comp\].c\[$i\]; \\\n";
     print "\t} while (0) \n\n";
 }
 
