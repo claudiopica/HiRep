@@ -23,6 +23,9 @@
 #include "geometry.h"
 #include <math.h>
 
+// TODO: This test relies on too many high level things.
+//       I am not sure, we can run such a test at all.
+
 // Double precision
 int test_gfield_allocation();
 int test_gfield_f_allocation();

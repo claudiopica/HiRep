@@ -30,6 +30,8 @@
 // TODO: Generalize to Ddimensions (some gauge fields have d=1)
 // TODO: spinor n parameter
 // TODO: to_gpu_format: Alias _PIECE_FOR_MPI to _PIECE_FOR -> How should this really be implemented?
+// TODO: block handle allocation right? It seems that we have a handle for every block/process combination, 
+//       which we do not need, because every process only deals with a subset of blocks
 
 /*
  * Here we use for all macros the parameters:
@@ -63,32 +65,12 @@
         {                                                                                                   \
             f->block_handles[ixp] = (_site_type**)malloc(MPI_WORLD_SIZE*sizeof(_site_type*));               \
             block_size = f->type->master_end[ixp] - f->type->master_start[ixp] + 1;                         \
-            f->block_handles[ixp][PID] = _GPU_4FIELD_BLK(f, ixp);                                           \
+            f->block_handles[ixp][PID] = _GPU_DFIELD_BLK(f, ixp, (_size));                                  \
             int mem_size = (_size)*block_size*sizeof(*(f->gpu_ptr));                                        \
             CHECK(cudaMalloc((void **)&(f->block_handles[ixp][PID]), mem_size));                            \
         }
 
-    //#define _FREE_MPI_FIELD_DATA                                                                            
-        /*if (f->comm_req != NULL)                                                                          \
-            cudaFree(f->comm_req);*/
-
-    //#define _ALLOC_MPI_FIELD_DATA(_name)                                                                    
-       /* if (type->nbuffers_gauge > 0)                                                                     \
-        {                                                                                                   \
-            cudaError_t err;                                                                                \
-            *//* How do we allocate on the right device? *//*                                               \
-            err = cudaMalloc((void **)f->comm_req, 2 * type->nbuffers_gauge * sizeof(MPI_Request));         \
-            error(err != cudaSuccess, 1, "alloc_" #_name " [" __FILE__ "]",                                 \
-                            "Could not allocate buffers for multi-GPU communication.\n");                   \
-            for (int ix = 0; ix < 2 * type->nbuffers_gauge; ++ix)                                           \
-                f->comm_req[ix] = MPI_REQUEST_NULL;                                                         \
-        }                                                                                                   \
-        else                                                                                                \
-        {                                                                                                   \
-            f->comm_req = NULL;                                                                             \
-        }*/
-
-        /* Declare function to copy field from host to device */
+    /* Declare function to copy field from host to device */
     #define _DECLARE_COPY_TO(_name, _field_type, _site_type, _size)                                         \
         void copy_to_gpu_##_name(_field_type *f)                                                            \
         {                                                                                                   \
@@ -99,9 +81,9 @@
             _PIECE_FOR_MPI(f->type, ixp)                                                                    \
             {                                                                                               \
                 block_size = f->type->master_end[ixp] - f->type->master_start[ixp] + 1;                     \
-                block_start_tmp = _4FIELD_BLK(tmp, ixp);                                                    \
-                block_start_in = _GPU_4FIELD_BLK(f, ixp);                                                   \
-                CHECK(cudaMemcpy(block_start_in, block_start_tmp, block_size, cudaMemcpyHostToDevice));     \
+                block_start_tmp = _DFIELD_BLK(tmp, ixp, (_size));                                           \
+                int mem_size = (_size)*block_size*sizeof(*(f->ptr));                                        \
+                cudaMemcpy(f->block_handles[ixp][PID], block_start_tmp, mem_size, cudaMemcpyHostToDevice);  \
             }                                                                                               \
             free_##_name(tmp);                                                                              \
         }
@@ -116,9 +98,9 @@
             _PIECE_FOR_MPI(f->type, ixp)                                                                    \
             {                                                                                               \
                 block_size = f->type->master_end[ixp] - f->type->master_start[ixp] + 1;                     \
-                block_start_tmp = _4FIELD_BLK(tmp, ixp);                                                    \
-                block_start_in = _GPU_4FIELD_BLK(f, ixp);                                                   \
-                CHECK(cudaMemcpy(block_start_tmp, block_start_in, block_size, cudaMemcpyDeviceToHost));     \
+                block_start_tmp = _DFIELD_BLK(tmp, ixp, (_size));                                           \
+                int mem_size = (_size)*block_size*sizeof(*(f->ptr));\
+                cudaMemcpy(block_start_tmp, f->block_handles[ixp][PID], mem_size, cudaMemcpyDeviceToHost);\
             }                                                                                               \
             to_cpu_format_##_name(f, tmp);                                                                  \
             free_##_name(tmp);                                                                              \
@@ -216,13 +198,13 @@
             _PIECE_FOR(in->type, ixp)                                                                       \
             {                                                                                               \
                 stride = in->type->master_end[ixp] - in->type->master_start[ixp] + 1;                       \
-                target = _4FIELD_BLK(out, ixp);                                                             \
+                target = _DFIELD_BLK(out, ixp, (_size));                                                    \
                 _SITE_FOR(in->type, ixp, ix)                                                                \
                 {                                                                                           \
                     ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);                                                \
                     for (int comp = 0; comp < _size; ++comp)                                                \
                     {                                                                                       \
-                        source = _4FIELD_AT(in, ix, comp);                                                  \
+                        source = _DFIELD_AT(in, ix, comp, (_size));                                         \
                         write_gpu_##_site_type(stride, (*source), target, ix_loc, comp);                    \
                     }                                                                                       \
                 }                                                                                           \
@@ -240,13 +222,13 @@
             _PIECE_FOR(in->type, ixp)                                                                       \
             {                                                                                               \
                 stride = in->type->master_end[ixp] - in->type->master_start[ixp] + 1;                       \
-                source = _4FIELD_BLK(in, ixp);                                                              \
+                source = _DFIELD_BLK(in, ixp, (_size));                                                     \
                 _SITE_FOR(in->type, ixp, ix)                                                                \
                 {                                                                                           \
                     ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);                                                \
                     for (int comp = 0; comp < _size; ++comp)                                                \
                     {                                                                                       \
-                        target = _4FIELD_AT(out, ix, comp);                                                 \
+                        target = _DFIELD_AT(out, ix, comp, (_size));                                        \
                         read_gpu_##_site_type(stride, (*target), source, ix_loc, comp);                     \
                     }                                                                                       \
                 }                                                                                           \

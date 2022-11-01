@@ -10,13 +10,11 @@
 #include "geometry.h"
 #include "spinor_field.h"
 #include "suN_types.h"
-#include "global.h"
 #include "utils.h"
 #include <string.h>
 #ifdef WITH_MPI
 #include <mpi.h>
 #endif
-#include "logger.h"
 
 #ifdef __cplusplus
 extern "C" {

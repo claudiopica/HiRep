@@ -103,6 +103,7 @@ _DECLARE_FIELD_STRUCT(suNfc_field, suNfc);
 #define _FIELD_AT(s,i) (((s)->ptr)+i-(s)->type->master_shift)
 #define _4FIELD_AT(s,i,mu) (((s)->ptr)+coord_to_index(i-(s)->type->master_shift,mu))
 #define _6FIELD_AT(s,i,mu) (((s)->ptr)+((i-(s)->type->master_shift)*6+mu))
+#define _DFIELD_AT(s,i,mu,size) (size == 1) ? _FIELD_AT(s,i) : ((size == 4) ? _4FIELD_AT(s,i,mu) : _6FIELD_AT(s,i,mu))
 
 #define _SPINOR_PTR(s) _FIELD_AT(s,_spinor_for_is)
 

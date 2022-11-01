@@ -41,11 +41,11 @@ void sub_assign_gfield_f_cpu(suNf_field*, suNf_field*);
 void sub_assign_gfield_f_flt_cpu(suNf_field_flt*, suNf_field_flt*);
 void sub_assign_scalar_field_cpu(suNg_scalar_field*, suNg_scalar_field*);
 void sub_assign_avfield_cpu(suNg_av_field*, suNg_av_field*);
-void sub_assign_sfield_cpu(scalar_field*);
-void sub_assign_gtransf(suNg_field*, suNg_field*);
-void sub_assign_clover_ldl(ldl_field*, ldl_field*);
-void sub_assign_clover_term(suNfc_field*, suNfc_field*);
-void sub_assign_clover_force(suNf_field*, suNf_field*);
+void sub_assign_sfield_cpu(scalar_field*, scalar_field*);
+void sub_assign_gtransf_cpu(suNg_field*, suNg_field*);
+void sub_assign_clover_ldl_cpu(ldl_field*, ldl_field*);
+void sub_assign_clover_term_cpu(suNfc_field*, suNfc_field*);
+void sub_assign_clover_force_cpu(suNf_field*, suNf_field*);
 
 // SQNORM
 double sqnorm_gfield_cpu(suNg_field*);

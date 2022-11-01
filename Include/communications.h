@@ -39,6 +39,11 @@ void start_gf_sendrecv_flt(suNg_field_flt *gf);
 void complete_sf_sendrecv_flt(spinor_field_flt *gf);
 void start_sf_sendrecv_flt(spinor_field_flt *gf);
 
+#if defined(WITH_GPU) & defined(WITH_MPI)
+    void sync_gpu_spinor_field_f(spinor_field *f);
+    void start_sendrecv_spinor_field_f_gpu(spinor_field *f);
+#endif
+
 #ifdef __cplusplus
 }
 #endif

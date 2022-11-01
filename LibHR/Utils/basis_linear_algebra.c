@@ -14,7 +14,6 @@
 
 // The following functions are primarily for testing purposes
 // This is all for CPU
-// TODO: This needs to work for MPI, so that tests can be run for MPI
 // TODO: Use randlxd and randlxs for random number generation
 
 void rand_field_dbl(double* d, int n) {
@@ -32,9 +31,28 @@ void rand_field_flt(float* f, int n) {
 }
 
 // ** COPY **
-void copy_gfield_cpu(suNg_field* out, suNg_field* in) 
+/*void copy_gfield_cpu(suNg_field* out, suNg_field* in) 
 {
     memcpy(out->ptr, in->ptr, out->type->gsize_gauge*sizeof(suNg));
+}*/
+
+void copy_gfield_cpu(suNg_field* out, suNg_field* in) 
+{
+    suNg *out_mat, *in_mat;
+    int dim = sizeof(suNg)/sizeof(hr_complex);// This does not work if the representation is real
+    _MASTER_FOR(in->type, ix) 
+    {
+        for (int comp = 0; comp < 4; ++comp) 
+        {
+            out_mat = _4FIELD_AT(out, ix, comp);
+            in_mat = _4FIELD_AT(in, ix, comp);
+            
+            for (int elem =0; elem < dim; ++elem) 
+            {
+                (*out_mat).c[elem] = (*in_mat).c[elem];
+            }
+        }     
+    }
 }
 
 void copy_scalar_field_cpu(suNg_scalar_field *out, suNg_scalar_field *in) 
@@ -49,7 +67,20 @@ void copy_gfield_flt_cpu(suNg_field_flt *out, suNg_field_flt *in)
 
 void copy_gfield_f_cpu(suNf_field* out, suNf_field* in) 
 {
-    memcpy(out->ptr, in->ptr, out->type->gsize_gauge*sizeof(suNf));
+    suNf *out_mat, *in_mat;
+    int dim = sizeof(suNf)/sizeof(hr_complex);
+    _MASTER_FOR(in->type, ix) 
+    {
+        for (int comp = 0; comp < 4; ++comp) 
+        {
+            out_mat = _4FIELD_AT(out, ix, comp);
+            in_mat = _4FIELD_AT(in, ix, comp);
+            for (int elem =0; elem < dim; ++elem) 
+            {
+                (*out_mat).c[elem] = (*in_mat).c[elem];
+            }
+        }     
+    }
 }
 
 void copy_gfield_f_flt_cpu(suNf_field_flt *out, suNf_field_flt *in) 
@@ -163,7 +194,7 @@ void sub_assign_avfield_cpu(suNg_av_field *out, suNg_av_field *in)
     }
 }
 
-void sub_assign_sfield(scalar_field *out, scalar_field *in) 
+void sub_assign_sfield_cpu(scalar_field *out, scalar_field *in) 
 {
     double *site_in, *site_out;
     _MASTER_FOR(in->type, ix) 
@@ -174,12 +205,12 @@ void sub_assign_sfield(scalar_field *out, scalar_field *in)
     }
 }
 
-void sub_assign_gtransf(suNg_field* out, suNg_field* in) 
+void sub_assign_gtransf_cpu(suNg_field* out, suNg_field* in) 
 {
     sub_assign_gfield_cpu(out, in); 
 }
 
-void sub_assign_clover_term(suNfc_field* out, suNfc_field* in) 
+void sub_assign_clover_term_cpu(suNfc_field* out, suNfc_field* in) 
 {
     suNfc *site_out, *site_in;
     _MASTER_FOR(in->type, ix) 
@@ -193,7 +224,7 @@ void sub_assign_clover_term(suNfc_field* out, suNfc_field* in)
     }
 }
 
-void sub_assign_clover_force(suNf_field* out, suNf_field* in) 
+void sub_assign_clover_force_cpu(suNf_field* out, suNf_field* in) 
 {
     sub_assign_gfield_f_cpu(out, in);
 }
@@ -364,13 +395,11 @@ double sqnorm_clover_force_cpu(suNf_field *f)
 // Set field to zero
 void zero_gfield_cpu(suNg_field *f) 
 {
-    suNg *site;
     _MASTER_FOR(f->type, ix) 
     {
         for (int comp = 0; comp < 4; comp++) 
         {
-            site = _4FIELD_AT(f, ix, comp);
-            _vector_zero_g((*site));
+            _vector_zero_g((*_4FIELD_AT(f, ix, comp)));
         }
     }
 }
@@ -384,7 +413,7 @@ void random_spinor_field_f_cpu(spinor_field* f)
 
 void random_spinor_field_f_flt_cpu(spinor_field_flt* f) 
 {
-    int n = f->type->gsize_spinor*sizeof(suNf_spinor_flt)/sizeof(double);
+    int n = f->type->gsize_spinor*sizeof(suNf_spinor_flt)/sizeof(float);
     ranlxs((float*)(f->ptr), n);
 }
 

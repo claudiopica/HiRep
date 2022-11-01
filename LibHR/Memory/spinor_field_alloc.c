@@ -303,7 +303,7 @@
                                                                                                                     \
         if(alloc_mem_t & CPU_MEM)                                                                                   \
         {                                                                                                           \
-            int field_size = _size * type->gsize_spinor * sizeof(*(f->ptr));                                         \
+            int field_size = _size * type->gsize_spinor * sizeof(*(f->ptr));                                        \
             f->ptr = amalloc(field_size, ALIGN);                                                                    \
             for(int i = 1; i < n; ++i)                                                                              \
                 f[i].ptr=f[i-1].ptr + type->gsize_spinor * _size;                                                   \
