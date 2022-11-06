@@ -280,14 +280,9 @@ int test_spinor_field_allocation()
 
     // Fill with random numbers
     gaussian_spinor_field(f);
-    //random_spinor_field_f_cpu(f);
-
-    printf("In function %s\n", __func__);
-    printf("f->ptr size %d\n", sizeof(*(f->ptr)));
 
     // Check that sqnorm is unequal to zero, nan or inf
     double sqnorm = spinor_field_sqnorm_f_cpu(f);
-    //double sqnorm = sqnorm_spinor_field_f_cpu(f);
     if (!isfinite(sqnorm) || fabs(sqnorm) < 1e-14) {
         lprintf("RESULT", 0, "FAILED\n");
         return_val = 1;
@@ -310,15 +305,10 @@ int test_spinor_field_flt_allocation()
     spinor_field_flt *f = alloc_spinor_field_f_flt(1, &glattice);
 
     // Fill with random numbers
-    //gaussian_spinor_field_flt(f);
-    random_spinor_field_f_flt_cpu(f);
-
-    printf("In function %s\n", __func__);
-    printf("f->ptr size %d\n", sizeof(*(f->ptr)));
+    gaussian_spinor_field_flt(f);
 
     // Check that sqnorm is unequal to zero, nan or inf
     double sqnorm = spinor_field_sqnorm_f_flt_cpu(f);
-    //float sqnorm = sqnorm_spinor_field_f_flt_cpu(f);
     if (!isfinite(sqnorm) || fabs(sqnorm) < 1e-14) {
         lprintf("RESULT", 0, "FAILED\n");
         return_val = 1;

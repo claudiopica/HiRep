@@ -10,6 +10,8 @@
 #include "gamma_spinor.h"
 #include "hr_complex.h"
 #include "communications.h"
+#include "suN.h"
+#include "suN_types.h"
 
 /*
  * LINEAR ALGEBRA FUNCTIONS ARE DEFINED IN THE TEMPLATE
