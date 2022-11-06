@@ -26,8 +26,14 @@
 
 /* Double precision tests */
 int test_convert_back_forth_spinor_field();
+int test_convert_back_forth_sfield();
 int test_convert_back_forth_gfield_f();
 int test_convert_back_forth_gfield();
+int test_convert_back_forth_scalar_field();
+int test_convert_back_forth_avfield();
+int test_convert_back_forth_gtransf();
+int test_convert_back_forth_clover_term();
+int test_convert_back_forth_clover_force();
 
 /* Single precision tests */
 int test_convert_back_forth_spinor_field_flt();
@@ -48,8 +54,14 @@ int main(int argc, char *argv[])
     // Run tests 
       /* Double precision */
     return_val += test_convert_back_forth_spinor_field();
+    return_val += test_convert_back_forth_sfield();
     return_val += test_convert_back_forth_gfield_f();
     return_val += test_convert_back_forth_gfield();
+    return_val += test_convert_back_forth_scalar_field();
+    return_val += test_convert_back_forth_avfield();
+    return_val += test_convert_back_forth_gtransf();
+    return_val += test_convert_back_forth_clover_term();
+    return_val += test_convert_back_forth_clover_force();
 
       /* Single precision */
     return_val += test_convert_back_forth_spinor_field_flt();
@@ -242,5 +254,179 @@ int test_convert_back_forth_gfield_flt()
     free_gfield_flt(in);
     free_gfield_flt(tmp);
     free_gfield_flt(out);
+    return check_diff_norm_zero(diff_norm);
+}
+
+int test_convert_back_forth_scalar_field() 
+{
+    lprintf("INFO", 0, " ======= TEST SCALAR FIELD ======= \n");
+
+    // Setup scalar fields
+    suNg_scalar_field *in, *tmp, *out;
+    in = alloc_scalar_field(&glattice);
+    tmp = alloc_scalar_field(&glattice);
+    out = alloc_scalar_field(&glattice);
+
+    random_scalar_field_cpu(in);
+    lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.2e]\n", sqnorm_scalar_field_cpu(in)); 
+
+    // Convert twice
+    to_gpu_format_scalar_field(tmp, in);
+    to_cpu_format_scalar_field(out, tmp);
+    lprintf("SANITY CHECK", 0, "[In and outfield sqnorm unequal zero and equal to each other: in %0.2e out %0.2e]\n", 
+                    sqnorm_scalar_field_cpu(in), sqnorm_scalar_field_cpu(out));
+
+    // Assert field are equal over sqnorm
+    sub_assign_scalar_field_cpu(out, in);
+    double diff_norm = sqnorm_scalar_field_cpu(out);
+
+    free_scalar_field(in);
+    free_scalar_field(tmp);
+    free_scalar_field(out);
+    return check_diff_norm_zero(diff_norm);
+}
+
+int test_convert_back_forth_avfield() 
+{
+    lprintf("INFO", 0, " ======= TEST AVFIELD ======= \n");
+
+    // Setup fields
+    suNg_av_field *in, *tmp, *out;
+    in = alloc_avfield(&glattice);
+    tmp = alloc_avfield(&glattice);
+    out = alloc_avfield(&glattice);
+
+    random_avfield_cpu(in);
+    lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.2e]\n", sqnorm_avfield_cpu(in)); 
+
+    // Convert twice
+    to_gpu_format_avfield(tmp, in);
+    to_cpu_format_avfield(out, tmp);
+    lprintf("SANITY CHECK", 0, "[In and outfield sqnorm unequal zero and equal to each other: in %0.2e out %0.2e]\n", 
+                    sqnorm_avfield_cpu(in), sqnorm_avfield_cpu(out));
+
+    // Assert field are equal over sqnorm
+    sub_assign_avfield_cpu(out, in);
+    double diff_norm = sqnorm_avfield_cpu(out);
+
+    free_avfield(in);
+    free_avfield(tmp);
+    free_avfield(out);
+    return check_diff_norm_zero(diff_norm);
+}
+
+int test_convert_back_forth_gtransf() 
+{
+    lprintf("INFO", 0, " ======= TEST GTRANSF ======= \n");
+
+    // Setup fields
+    suNg_field *in, *tmp, *out;
+    in = alloc_gtransf(&glattice);
+    tmp = alloc_gtransf(&glattice);
+    out = alloc_gtransf(&glattice);
+
+    random_gtransf_cpu(in);
+    lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.2e]\n", sqnorm_gtransf_cpu(in)); 
+
+    // Convert twice
+    to_gpu_format_gtransf(tmp, in);
+    to_cpu_format_gtransf(out, tmp);
+    lprintf("SANITY CHECK", 0, "[In and outfield sqnorm unequal zero and equal to each other: in %0.2e out %0.2e]\n", 
+                    sqnorm_gtransf_cpu(in), sqnorm_gtransf_cpu(out));
+
+    // Assert fields are equal over sqnorm
+    sub_assign_gtransf_cpu(out, in);
+    double diff_norm = sqnorm_gtransf_cpu(out);
+
+    free_gtransf(in);
+    free_gtransf(tmp);
+    free_gtransf(out);
+    return check_diff_norm_zero(diff_norm);
+}
+
+int test_convert_back_forth_clover_term() 
+{
+    lprintf("INFO", 0, " ======= TEST CLOVER TERM ======= \n");
+
+    // Setup fields
+    suNfc_field *in, *tmp, *out;
+    in = alloc_clover_term(&glattice);
+    tmp = alloc_clover_term(&glattice);
+    out = alloc_clover_term(&glattice);
+
+    random_clover_term_cpu(in);
+    lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.2e]\n", sqnorm_clover_term_cpu(in)); 
+
+    // Convert twice
+    to_gpu_format_clover_term(tmp, in);
+    to_cpu_format_clover_term(out, tmp);
+    lprintf("SANITY CHECK", 0, "[In and outfield sqnorm unequal zero and equal to each other: in %0.2e out %0.2e]\n", 
+                    sqnorm_clover_term_cpu(in), sqnorm_clover_term_cpu(out));
+
+    // Assert fields are equal over sqnorm
+    sub_assign_clover_term_cpu(out, in);
+    double diff_norm = sqnorm_clover_term_cpu(out);
+
+    free_clover_term(in);
+    free_clover_term(tmp);
+    free_clover_term(out);
+    return check_diff_norm_zero(diff_norm);
+}
+
+int test_convert_back_forth_clover_force() 
+{
+    lprintf("INFO", 0, " ======= TEST CLOVER FORCE ======= \n");
+
+    // Setup fields
+    suNf_field *in, *tmp, *out;
+    in = alloc_clover_force(&glattice);
+    tmp = alloc_clover_force(&glattice);
+    out = alloc_clover_force(&glattice);
+
+    random_clover_force_cpu(in);
+    lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.2e]\n", sqnorm_clover_force_cpu(in)); 
+
+    // Convert twice
+    to_gpu_format_clover_force(tmp, in);
+    to_cpu_format_clover_force(out, tmp);
+    lprintf("SANITY CHECK", 0, "[In and outfield sqnorm unequal zero and equal to each other: in %0.2e out %0.2e]\n", 
+                    sqnorm_clover_force_cpu(in), sqnorm_clover_force_cpu(out));
+
+    // Assert fields are equal over sqnorm
+    sub_assign_clover_force_cpu(out, in);
+    double diff_norm = sqnorm_clover_force_cpu(out);
+
+    free_clover_force(in);
+    free_clover_force(tmp);
+    free_clover_force(out);
+    return check_diff_norm_zero(diff_norm);
+}
+
+int test_convert_back_forth_sfield() 
+{
+    lprintf("INFO", 0, " ======= TEST SFIELD ======= \n");
+
+    // Setup fields
+    scalar_field *in, *tmp, *out;
+    in = alloc_sfield(1, &glattice);
+    tmp = alloc_sfield(1, &glattice);
+    out = alloc_sfield(1, &glattice);
+
+    random_sfield_cpu(in);
+    lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.2e]\n", sqnorm_sfield_cpu(in)); 
+
+    // Convert twice
+    to_gpu_format_sfield(tmp, in);
+    to_cpu_format_sfield(out, tmp);
+    lprintf("SANITY CHECK", 0, "[In and outfield sqnorm unequal zero and equal to each other: in %0.2e out %0.2e]\n", 
+                    sqnorm_sfield_cpu(in), sqnorm_sfield_cpu(out));
+
+    // Assert fields are equal over sqnorm
+    sub_assign_sfield_cpu(out, in);
+    double diff_norm = sqnorm_sfield_cpu(out);
+
+    free_sfield(in);
+    free_sfield(tmp);
+    free_sfield(out);
     return check_diff_norm_zero(diff_norm);
 }

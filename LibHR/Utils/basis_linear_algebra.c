@@ -172,12 +172,9 @@ void sub_assign_scalar_field_cpu(suNg_scalar_field *out, suNg_scalar_field *in)
     suNg_vector *site_out, *site_in;
     _MASTER_FOR(in->type, ix) 
     {
-        for (int comp = 0; comp < 4; comp++) 
-        {
-            site_out = _4FIELD_AT(out, ix, comp);
-            site_in = _4FIELD_AT(in, ix, comp);
-            _vector_sub_assign_g((*site_out), (*site_in));
-        }
+        site_out = _FIELD_AT(out, ix);
+        site_in = _FIELD_AT(in, ix);
+        _vector_sub_assign_g((*site_out), (*site_in));
     }
 }
 
@@ -202,13 +199,19 @@ void sub_assign_sfield_cpu(scalar_field *out, scalar_field *in)
     {
         site_out = _FIELD_AT(out, ix);
         site_in = _FIELD_AT(in, ix);
-        (*site_out) += (*site_in);
+        (*site_out) -= (*site_in);
     }
 }
 
 void sub_assign_gtransf_cpu(suNg_field* out, suNg_field* in) 
 {
-    sub_assign_gfield_cpu(out, in); 
+    suNg *site_in, *site_out;
+    _MASTER_FOR(in->type, ix) 
+    {
+        site_out = _FIELD_AT(out, ix);
+        site_in = _FIELD_AT(in, ix);
+        _suNg_sub_assign((*site_out), (*site_in));
+    }
 }
 
 void sub_assign_clover_term_cpu(suNfc_field* out, suNfc_field* in) 
@@ -227,7 +230,16 @@ void sub_assign_clover_term_cpu(suNfc_field* out, suNfc_field* in)
 
 void sub_assign_clover_force_cpu(suNf_field* out, suNf_field* in) 
 {
-    sub_assign_gfield_f_cpu(out, in);
+    suNf *site_out, *site_in;
+    _MASTER_FOR(in->type, ix) 
+    {
+        for (int comp = 0; comp < 6; comp++) 
+        {
+            site_out = _6FIELD_AT(out, ix, comp);
+            site_in = _6FIELD_AT(in, ix, comp);
+            _suNf_sub_assign((*site_out), (*site_in));
+        }
+    }
 }
 
 // ** SQNORM **
@@ -305,13 +317,8 @@ double sqnorm_scalar_field_cpu(suNg_scalar_field *f)
     double sqnorm = 0.0;
     _MASTER_FOR(f->type, ix) 
     {
-        for (int comp = 0; comp < 4; comp++) 
-        {
-            double tmp = 0.0;
-            site = _4FIELD_AT(f, ix, comp);
-            /*Sqnorm missing from suN.h macros */
-            sqnorm += tmp;
-        }
+        site = _FIELD_AT(f, ix);
+        _vector_prod_add_assign_re_g(sqnorm, (*site), (*site));
     }
     return sqnorm;
 }
@@ -482,7 +489,7 @@ void random_avfield_cpu(suNg_av_field *f)
 
 void random_sfield_cpu(scalar_field *f) 
 {
-    int n = f->type->gsize_spinor*sizeof(double);
+    int n = f->type->gsize_spinor;
     ranlxd((double*)(f->ptr), n);
 }
 

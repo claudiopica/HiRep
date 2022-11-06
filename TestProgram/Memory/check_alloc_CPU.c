@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
     return_val += test_avfield_allocation();
     return_val += test_clover_term_allocation();
     return_val += test_clover_force_allocation();
-    //return_val += test_sfield_allocation(); // FIXME: Bus error
+    return_val += test_sfield_allocation(); // FIXME: Bus error
 
     // Single precision test block
     return_val += test_gfield_flt_allocation();
@@ -326,7 +326,7 @@ int test_spinor_field_flt_allocation()
 
 int test_sfield_allocation() 
 {
-    lprintf("INFO", 0, " ======= TEST SPINOR FIELD ======= \n");
+    lprintf("INFO", 0, " ======= TEST SFIELD ======= \n");
     int return_val = 0;
     scalar_field *f = alloc_sfield(1, &glattice);
 
