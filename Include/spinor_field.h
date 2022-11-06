@@ -28,13 +28,6 @@
 #define _MPI_FIELD_DATA(_type) MPI_Request *comm_req;
 #endif //WITH_MPI
 
-#if defined(WITH_GPU) && defined(WITH_MPI) /* MPI + GPU Block handles */
-#undef _MPI_FIELD_DATA
-#define _MPI_FIELD_DATA(_type) \
-      MPI_Request *comm_req; \
-      _type **block_handles[2];//This assumes decomp according to #of threads(MPI_WORLD_SIZE) + even-odd (2)
-#endif //WITH MPI AND GPU
-
 typedef struct {// TODO: this is probably not the right complex type
 	double _Complex up[NF*(2*NF+1)];
 	double _Complex dn[NF*(2*NF+1)];
@@ -70,8 +63,8 @@ _DECLARE_FIELD_STRUCT(suNfc_field, suNfc);
 	error((s1)->type!=(s2)->type,1,__FILE__ ": ", "Spinors don't match!");
 
 #define _ARRAY_SPINOR_MATCHING(s,n) \
-	for(int i=0; i<n; i++) \
-		error((s)->type!=((s)+i)->type,1,__FILE__ ": ", "Spinors don't match!");
+	for(int _i=0; _i<n; _i++) \
+		error((s)->type!=((s)+_i)->type,1,__FILE__ ": ", "Spinors don't match!");
 
 #else /* CHECK_SPINOR_MATCHING */
 

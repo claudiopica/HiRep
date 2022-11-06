@@ -22,6 +22,7 @@
 
 int test_bijectivity_gfield();
 int test_bijectivity_gfield_f();
+int test_bijectivity_spinor_field();
 
 int main(int argc, char *argv[]) 
 {
@@ -35,6 +36,7 @@ int main(int argc, char *argv[])
     // Test block
     return_val += test_bijectivity_gfield();
     return_val += test_bijectivity_gfield_f();
+    return_val += test_bijectivity_spinor_field();
 
     // Finalize and return
     finalize_process();
@@ -50,7 +52,7 @@ int test_bijectivity_gfield()
     in_copy = alloc_gfield(&glattice);
 
     random_gfield_cpu(in);
-    random_gfield_cpu(in_copy);
+    //random_gfield_cpu(in_copy);
 
     copy_gfield_cpu(in_copy, in);
     lprintf("SANITY CHECK", 0, "CPU sqnorm: %0.2e\n", sqnorm_gfield_cpu(in));
@@ -126,6 +128,42 @@ int test_bijectivity_gfield_f()
 int test_bijectivity_spinor_field() 
 {
     lprintf("INFO", 0, " ====== TEST SPINOR FIELD ======= ");
+    int return_val = 0;
+    spinor_field *in, *in_copy;
+    in = alloc_spinor_field_f(1, &glattice);
+    in_copy = alloc_spinor_field_f(1, &glattice);
+
+    gaussian_spinor_field(in);
+
+    spinor_field_copy_f_cpu(in_copy, in);
+    lprintf("SANITY CHECK", 0, "CPU sqnorm: %0.2e\n", spinor_field_sqnorm_f_cpu(in));
+    lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", spinor_field_sqnorm_f_cpu(in_copy));
+
+    copy_to_gpu_spinor_field_f(in);
+
+    spinor_field_zero_f_cpu(in);
+    lprintf("SANITY CHECK", 0, "CPU copy should be zero in intermediate step: %0.2e\n", spinor_field_sqnorm_f_cpu(in));
+    lprintf("SANITY CHECK", 0, "GPU copy should be equal to ealier in square norms: %0.2e\n", spinor_field_sqnorm_f(in));
+    copy_from_gpu_spinor_field_f(in);
+
+    spinor_field_sub_assign_f_cpu(in, in_copy);
+    double diff_norm = spinor_field_sqnorm_f_cpu(in);
+
+    if (diff_norm != 0) 
+    {
+        lprintf("RESULT", 0, "FAILED\n");
+        return_val = 1;
+    }
+    else 
+    {
+        lprintf("RESULT", 0, "OK \n");
+        return_val = 0;
+    }
+    lprintf("RESULT", 0, "[Diff norm %0.2e]\n", diff_norm);
+
+    free_spinor_field_f(in);
+    free_spinor_field_f(in_copy);
+    return return_val;
 }
 
 

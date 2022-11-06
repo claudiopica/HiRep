@@ -1,10 +1,7 @@
 /*******************************************************************************
 *
-* NOCOMPILE= WITH_GPU
-*
-* Check that after allocating a field, we can write to and read from it.
-* This is supposed to be run without MPI as a baseline test
-* Identify problems with MPI allocation using the dedicated memory tests.
+* Check that after allocating a field, we can write to and read from it on 
+* the CPU.
 *
 *******************************************************************************/
 
@@ -22,6 +19,7 @@
 #include "update.h"
 #include "geometry.h"
 #include <math.h>
+#include <stdio.h>
 
 // Double precision
 int test_gfield_allocation();
@@ -59,6 +57,7 @@ int main(int argc, char *argv[])
     // Single precision test block
     return_val += test_gfield_flt_allocation();
     return_val += test_gfield_f_flt_allocation();
+    return_val += test_spinor_field_flt_allocation();
 
     // Finalize and return
     finalize_process();
@@ -281,9 +280,14 @@ int test_spinor_field_allocation()
 
     // Fill with random numbers
     gaussian_spinor_field(f);
+    //random_spinor_field_f_cpu(f);
+
+    printf("In function %s\n", __func__);
+    printf("f->ptr size %d\n", sizeof(*(f->ptr)));
 
     // Check that sqnorm is unequal to zero, nan or inf
     double sqnorm = spinor_field_sqnorm_f_cpu(f);
+    //double sqnorm = sqnorm_spinor_field_f_cpu(f);
     if (!isfinite(sqnorm) || fabs(sqnorm) < 1e-14) {
         lprintf("RESULT", 0, "FAILED\n");
         return_val = 1;
@@ -301,15 +305,20 @@ int test_spinor_field_allocation()
 
 int test_spinor_field_flt_allocation() 
 {
-    lprintf("INFO", 0, " ======= TEST SPINOR FIELD ======= \n");
+    lprintf("INFO", 0, " ======= TEST SPINOR FIELD SINGLE PRECISION ======= \n");
     int return_val = 0;
     spinor_field_flt *f = alloc_spinor_field_f_flt(1, &glattice);
 
     // Fill with random numbers
-    gaussian_spinor_field_flt(f);
+    //gaussian_spinor_field_flt(f);
+    random_spinor_field_f_flt_cpu(f);
+
+    printf("In function %s\n", __func__);
+    printf("f->ptr size %d\n", sizeof(*(f->ptr)));
 
     // Check that sqnorm is unequal to zero, nan or inf
     double sqnorm = spinor_field_sqnorm_f_flt_cpu(f);
+    //float sqnorm = sqnorm_spinor_field_f_flt_cpu(f);
     if (!isfinite(sqnorm) || fabs(sqnorm) < 1e-14) {
         lprintf("RESULT", 0, "FAILED\n");
         return_val = 1;

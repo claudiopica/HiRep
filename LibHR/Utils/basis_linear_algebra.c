@@ -10,6 +10,7 @@
 #include "ranlux.h"
 #include <math.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 
 // The following functions are primarily for testing purposes
@@ -388,6 +389,32 @@ double sqnorm_clover_force_cpu(suNf_field *f)
             _suNf_sqnorm(tmp, (*site));
             sqnorm += tmp;
         }
+    }
+    return sqnorm;
+}
+
+double sqnorm_spinor_field_f_cpu(spinor_field *f) {
+    suNf_spinor *site;
+    double sqnorm = 0.0;
+    _MASTER_FOR(f->type, ix) 
+    {
+        site = _FIELD_AT(f, ix);
+        double tmp;
+        _spinor_prod_re_f(tmp, (*site), (*site));
+        sqnorm += tmp;
+    }
+    return sqnorm;
+}
+
+float sqnorm_spinor_field_f_flt_cpu(spinor_field_flt *f) {
+    suNf_spinor_flt *site;
+    float sqnorm = 0.0;
+    _MASTER_FOR(f->type, ix) 
+    {
+        site = _FIELD_AT(f, ix);
+        float tmp;
+        _spinor_prod_re_f(tmp, (*site), (*site));
+        sqnorm += tmp;
     }
     return sqnorm;
 }

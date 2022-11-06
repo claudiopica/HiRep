@@ -24,7 +24,7 @@ _BODY({
     _TWO_SPINORS_FOR_SUM(s1,s2,res) {
         _REAL prod;
         _spinor_prod_re_f(prod,*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
-       res+=(double)prod;
+        res+=(double)prod;
     }
 #ifdef WITH_MPI
     global_sum(&res,1);
@@ -111,11 +111,14 @@ _BODY({
 /* Re <s1,s1> */
 _FUNC(double, spinor_field_sqnorm, (_SPINOR_FIELD_TYPE *s1))
 _BODY({
+    printf("Function %s\n", __func__);
+    _SPINOR_TYPE *s = _FIELD_AT(s1, 5);
+    printf("field size: %d\n", sizeof(*s));
     static double res;
     _OMP_PRAGMA ( single ) {
         res = 0.;
     }
-
+    
     _ONE_SPINOR_FOR_SUM(s1,res) {
         _REAL prod;
         _spinor_prod_re_f(prod,*_SPINOR_PTR(s1),*_SPINOR_PTR(s1));

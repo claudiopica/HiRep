@@ -129,13 +129,13 @@ sub write_gpu_spinor {
     print "\t\tint __iz = (_ix); \\\n";
     for ($comp=0; $comp<3; $comp++) {
         for ($i=0; $i<$N; $i++) {
-            print "\t\t(_s).c\[$comp\].c\[$i\]=((hr_complex*)(_in))\[__iz\]; __iz+=(_stride); \\\n";
+            print "\t\t(_s).c\[$comp\].c\[$i\]=(($type*)(_in))\[__iz\]; __iz+=(_stride); \\\n";
         }
     }
     for ($i=0; $i<$N-1; $i++) {
-        print "\t\t(_s).c\[$comp\].c\[$i\]=((hr_complex*)(_in))\[__iz\]; __iz+=(_stride); \\\n";
+        print "\t\t(_s).c\[$comp\].c\[$i\]=(($type*)(_in))\[__iz\]; __iz+=(_stride); \\\n";
     }
-    print "\t\t(_s).c\[$comp\].c\[$i\]=((hr_complex*)(_in))\[__iz\]; \\\n";
+    print "\t\t(_s).c\[$comp\].c\[$i\]=(($type*)(_in))\[__iz\]; \\\n";
     print "\t} while (0) \n\n";
 
     # Generate write macro
@@ -152,13 +152,13 @@ sub write_gpu_spinor {
     print "\t\tint __iz = (_ix); \\\n";
     for ($comp=0; $comp<3; $comp++) {
         for ($i=0; $i<$N; $i++) {
-            print "\t\t((hr_complex*)(_out))\[__iz\]=(_s).c\[$comp\].c\[$i\]; __iz+=(_stride); \\\n";
+            print "\t\t(($type*)(_out))\[__iz\]=(_s).c\[$comp\].c\[$i\]; __iz+=(_stride); \\\n";
         }
     }
     for ($i=0; $i<$N-1; $i++) {
-        print "\t\t((hr_complex*)(_out))\[__iz\]=(_s).c\[$comp\].c\[$i\]; __iz+=(_stride); \\\n";
+        print "\t\t(($type*)(_out))\[__iz\]=(_s).c\[$comp\].c\[$i\]; __iz+=(_stride); \\\n";
     }
-    print "\t\t((hr_complex*)(_out))\[__iz\]=(_s).c\[$comp\].c\[$i\]; \\\n";
+    print "\t\t(($type*)(_out))\[__iz\]=(_s).c\[$comp\].c\[$i\]; \\\n";
     print "\t} while (0) \n\n";
 }
 

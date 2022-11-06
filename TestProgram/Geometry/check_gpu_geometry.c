@@ -41,6 +41,7 @@ int test_write_read_scalar_field();
 // Single precision
 int test_write_read_gauge_field_flt();
 int test_write_read_spinor_field_f_flt();
+int test_write_read_spinor_field_f_flt_vector_wise();
 
 int main(int argc, char *argv[]) 
 {
@@ -63,6 +64,7 @@ int main(int argc, char *argv[])
     //Single Precision Tests
     return_val += test_write_read_gauge_field_flt();
     //return_val += test_write_read_spinor_field_f_flt();
+    return_val += test_write_read_spinor_field_f_flt_vector_wise();
 
 
     // Finalize and return
@@ -317,11 +319,6 @@ int test_write_read_spinor_field_f_flt()
             in_spinor = _FIELD_AT(in, ix);
             out_spinor = _FIELD_AT(out, ix);
             int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
-            for (int comp = 0; comp < 4; ++comp)
-            {
-                write_gpu_suNf_vector(stride, (*in_spinor).c[comp], block_start, ix_loc, comp);
-                read_gpu_suNf_vector(stride, (*out_spinor).c[comp], block_start, ix_loc, comp);
-            }
             write_gpu_suNf_spinor_flt(stride, (*in_spinor), block_start, ix_loc, 0);
             read_gpu_suNf_spinor_flt(stride, (*out_spinor), block_start, ix_loc, 0);
         }
@@ -331,6 +328,51 @@ int test_write_read_spinor_field_f_flt()
     spinor_field_sub_assign_f_flt_cpu(out, in);
     double diff_norm = spinor_field_sqnorm_f_flt_cpu(out);
     check_diff_norm_zero(diff_norm);
+
+    free_spinor_field_f_flt(in);
+    free_spinor_field_f_flt(gpu_format);
+    free_spinor_field_f_flt(out);
+    return return_val;
+}
+
+int test_write_read_spinor_field_f_flt_vector_wise() 
+{
+    lprintf("INFO", 0, " ======= TEST SPINOR FIELD SINGLE PRECISION II ======= ");
+    int return_val = 0;
+    spinor_field_flt *in, *gpu_format, *out;
+
+    in = alloc_spinor_field_f_flt(1, &glattice);
+    gpu_format = alloc_spinor_field_f_flt(1, &glattice);
+    out = alloc_spinor_field_f_flt(1, &glattice);
+
+    gaussian_spinor_field_flt(in);
+    //random_spinor_field_f_flt_cpu(in);
+
+    lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.2e]\n", spinor_field_sqnorm_f_flt_cpu(in));
+
+    suNf_spinor_flt *in_spinor, *block_start, *out_spinor;
+    int stride = 0;
+    _PIECE_FOR(in->type, ixp) 
+    {
+        block_start = _FIELD_BLK(gpu_format, ixp);
+        stride = in->type->master_end[ixp] - in->type->master_start[ixp] + 1;
+        _SITE_FOR(in->type, ixp, ix) 
+        {
+            in_spinor = _FIELD_AT(in, ix);
+            out_spinor = _FIELD_AT(out, ix);
+            int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
+            for (int comp = 0; comp < 4; ++comp)
+            {
+                write_gpu_suNf_vector(stride, (*in_spinor).c[comp], block_start, ix_loc, comp);
+                read_gpu_suNf_vector(stride, (*out_spinor).c[comp], block_start, ix_loc, comp);
+            }
+        }
+    }
+
+    lprintf("SANITY CHECK", 0, "[Sanity check out field norm unequal zero: %0.2e]\n", spinor_field_sqnorm_f_flt_cpu(out));
+    /*spinor_field_sub_assign_f_flt_cpu(out, in);
+    double diff_norm = spinor_field_sqnorm_f_flt_cpu(out);
+    check_diff_norm_zero(diff_norm);*/
 
     free_spinor_field_f_flt(in);
     free_spinor_field_f_flt(gpu_format);

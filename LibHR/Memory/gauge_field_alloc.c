@@ -27,9 +27,7 @@
 
 // TODO: Doxygen docs
 // TODO: Remove brackets from macro params
-// TODO: Generalize to Ddimensions (some gauge fields have d=1)
 // TODO: spinor n parameter
-// TODO: to_gpu_format: Alias _PIECE_FOR_MPI to _PIECE_FOR -> How should this really be implemented?
 // TODO: block handle allocation right? It seems that we have a handle for every block/process combination, 
 //       which we do not need, because every process only deals with a subset of blocks
 
@@ -43,74 +41,9 @@
  *
  */
 
-/* ================================================= MPI and GPU ========================================= */
+/* ================================================= MPI ================================================= */
 
-#if defined(WITH_MPI) && defined(WITH_GPU)	
-
-    #define _FREE_GPU_FIELD_DATA(_name, _site_type)                                                         \
-        if (f->gpu_ptr != NULL)                                                                             \
-        {                                                                                                   \
-            _PIECE_FOR_MPI(f->type, ixp)                                                                    \
-            {                                                                                               \
-                CHECK(cudaFree(f->block_handles[ixp][PID]));                                                \
-            }                                                                                               \
-            /*TODO: Deallocate handles.*/\
-        }
-
-    /* Allocate device memory */
-    /* Note: to be used inside function declaration */
-    #define _ALLOC_GPU_FIELD_DATA(_name, _site_type, _size)                                                 \
-        int block_size = 0;                                                                                 \
-        _PIECE_FOR_MPI(f->type, ixp)                                                                        \
-        {                                                                                                   \
-            f->block_handles[ixp] = (_site_type**)malloc(MPI_WORLD_SIZE*sizeof(_site_type*));               \
-            block_size = f->type->master_end[ixp] - f->type->master_start[ixp] + 1;                         \
-            f->block_handles[ixp][PID] = _GPU_DFIELD_BLK(f, ixp, (_size));                                  \
-            int mem_size = (_size)*block_size*sizeof(*(f->gpu_ptr));                                        \
-            CHECK(cudaMalloc((void **)&(f->block_handles[ixp][PID]), mem_size));                            \
-        }
-
-    /* Declare function to copy field from host to device */
-    #define _DECLARE_COPY_TO(_name, _field_type, _site_type, _size)                                         \
-        void copy_to_gpu_##_name(_field_type *f)                                                            \
-        {                                                                                                   \
-            _field_type *tmp = alloc_##_name(f->type);                                                      \
-            to_gpu_format_##_name(tmp, f);                                                                  \
-            int block_size = 0;                                                                             \
-            _site_type *block_start_in, *block_start_tmp;                                                   \
-            _PIECE_FOR_MPI(f->type, ixp)                                                                    \
-            {                                                                                               \
-                block_size = f->type->master_end[ixp] - f->type->master_start[ixp] + 1;                     \
-                block_start_tmp = _DFIELD_BLK(tmp, ixp, (_size));                                           \
-                int mem_size = (_size)*block_size*sizeof(*(f->ptr));                                        \
-                cudaMemcpy(f->block_handles[ixp][PID], block_start_tmp, mem_size, cudaMemcpyHostToDevice);  \
-            }                                                                                               \
-            free_##_name(tmp);                                                                              \
-        }
-
-    /* Declare function to copy field from device to host */
-    #define _DECLARE_COPY_FROM(_name, _field_type, _site_type, _size)                                       \
-        void copy_from_gpu_##_name(_field_type *f)                                                          \
-        {                                                                                                   \
-            _field_type *tmp = alloc_##_name(f->type);                                                      \
-            int block_size = 0;                                                                             \
-            _site_type *block_start_in, *block_start_tmp;                                                   \
-            _PIECE_FOR_MPI(f->type, ixp)                                                                    \
-            {                                                                                               \
-                block_size = f->type->master_end[ixp] - f->type->master_start[ixp] + 1;                     \
-                block_start_tmp = _DFIELD_BLK(tmp, ixp, (_size));                                           \
-                int mem_size = (_size)*block_size*sizeof(*(f->ptr));\
-                cudaMemcpy(block_start_tmp, f->block_handles[ixp][PID], mem_size, cudaMemcpyDeviceToHost);\
-            }                                                                                               \
-            to_cpu_format_##_name(f, tmp);                                                                  \
-            free_##_name(tmp);                                                                              \
-        }
-
-#endif
-
-/* ================================================= MPI and CPU ========================================= */
-
-#if defined(WITH_MPI) //&& !defined(WITH_GPU)
+#if defined(WITH_MPI)
 
         #define _FREE_MPI_FIELD_DATA                                                                        \
             if (f->comm_req != NULL)                                                                        \
@@ -132,9 +65,9 @@
   
 #endif
 
-/* ================================================= Single GPU ========================================== */
+/* ================================================= GPU ================================================= */
 
-#if defined(WITH_GPU) && !defined(WITH_MPI)
+#if defined(WITH_GPU)
 
         /* Free device memory */
         /* Note: to be used inside function declaration */
@@ -149,7 +82,7 @@
             {                                                                                               \
                 cudaError_t err;                                                                            \
                 int field_size = _size * type->gsize_gauge * sizeof(*(f->gpu_ptr));                         \
-                err = cudaMalloc((void **)&(f->gpu_ptr), field_size);                                         \
+                err = cudaMalloc((void **)&(f->gpu_ptr), field_size);                                       \
                 error(err != cudaSuccess, 1, "alloc_" #_name " [" __FILE__ "]",                             \
                                 "Could not allocate GPU memory space for field");                           \
             }                                                                                               \
@@ -178,12 +111,6 @@
                 free_##_name(tmp);                                                                          \
             }
 
-#endif
-
-/* ================================================= Single and Multi-GPU ================================ */
-
-/* These macros work with or without MPI! */
-#ifdef WITH_GPU
     /* Declare function to convert GPU to CPU format */
     /* This is necessary, because GPU performance is very sensitive to */
     /* memory access patterns, see documentation on GPU Geometry */
@@ -237,7 +164,7 @@
 
 #endif
 
-/* ================================================= Empty defs ========================================= */
+/* ================================================= Empty defs ========================================== */
 
 #ifndef WITH_GPU
 
@@ -284,7 +211,7 @@
         {                                                                                                   \
             if (f->ptr != NULL)                                                                             \
                 afree(f->ptr);                                                                              \
-            _FREE_GPU_FIELD_DATA(_name, _site_type);/* Every MPI process needs to free -> check, whether its null differently...*/\
+            _FREE_GPU_FIELD_DATA(_name, _site_type);                                                        \
             _FREE_MPI_FIELD_DATA;                                                                           \
             afree(f);                                                                                       \
             f = NULL;                                                                                       \

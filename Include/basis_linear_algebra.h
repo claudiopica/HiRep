@@ -48,6 +48,8 @@ void sub_assign_clover_term_cpu(suNfc_field*, suNfc_field*);
 void sub_assign_clover_force_cpu(suNf_field*, suNf_field*);
 
 // SQNORM
+double sqnorm_spinor_field_f_cpu(spinor_field*);
+float sqnorm_spinor_field_f_flt_cpu(spinor_field_flt*);
 double sqnorm_gfield_cpu(suNg_field*);
 double sqnorm_gfield_f_cpu(suNf_field*);
 float sqnorm_gfield_flt_cpu(suNg_field_flt*);

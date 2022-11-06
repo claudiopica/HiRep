@@ -29,23 +29,23 @@
 #define _REAL double
 #define _COMPLEX hr_complex
 #ifdef WITH_GPU
-  #define _FUNC(a,b,c) a b##_f_gpu c
-  #define _BODY(a) a
+  #define _FUNC(a2,b2,c2) a2 b2##_f_gpu c2
+  #define _BODY(a2) a2
   #include "TMPL/linear_algebra_gpu.c.sdtmpl"
   #undef _FUNC
   #undef _BODY
 #endif
-#define _FUNC(a,b,c) a b##_f_cpu c
-#define _BODY(a) a
+#define _FUNC(a2,b2,c2) a2 b2##_f_cpu c2
+#define _BODY(a2) a2
 #include "TMPL/linear_algebra.c.sdtmpl"
 #undef _FUNC
 #undef _BODY
 #ifdef WITH_GPU
-  #define _FUNC(a,b,c) a (*b##_f) c = b##_f_gpu
+  #define _FUNC(a2,b2,c2) a2 (*b2##_f) c2 = b2##_f_gpu
 #else
-  #define _FUNC(a,b,c) a (*b##_f) c = b##_f_cpu
+  #define _FUNC(a2,b2,c2) a2 (*b2##_f) c2 = b2##_f_cpu
 #endif
-#define _BODY(a) ;
+#define _BODY(a2) ;
 #include "TMPL/linear_algebra.c.sdtmpl"
 #undef _FUNC
 #undef _BODY
@@ -60,23 +60,23 @@
 #define _REAL float
 #define _COMPLEX hr_complex_flt
 #ifdef WITH_GPU
-  #define _FUNC(a,b,c) a b##_f_flt_gpu c
-  #define _BODY(a) a
+  #define _FUNC(a1,b1,c1) a1 b1##_f_flt_gpu c1
+  #define _BODY(a1) a1
   #include "TMPL/linear_algebra_gpu.c.sdtmpl"
   #undef _FUNC
   #undef _BODY
 #endif
-#define _FUNC(a,b,c) a b##_f_flt_cpu c
-#define _BODY(a) a
+#define _FUNC(a1,b1,c1) a1 b1##_f_flt_cpu c1
+#define _BODY(a1) a1
 #include "TMPL/linear_algebra.c.sdtmpl"
 #undef _FUNC
 #undef _BODY
 #ifdef WITH_GPU
-  #define _FUNC(a,b,c) a (*b##_f_flt) c = b##_f_flt_gpu
+  #define _FUNC(a1,b1,c1) a1 (*b1##_f_flt) c1 = b1##_f_flt_gpu
 #else
-  #define _FUNC(a,b,c) a (*b##_f_flt) c = b##_f_flt_cpu
+  #define _FUNC(a1,b1,c1) a1 (*b1##_f_flt) c1 = b1##_f_flt_cpu
 #endif
-#define _BODY(a) ;
+#define _BODY(a1) ;
 #include "TMPL/linear_algebra.c.sdtmpl"
 #undef _FUNC
 #undef _BODY

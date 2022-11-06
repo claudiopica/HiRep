@@ -69,11 +69,11 @@ void __cudaCheckError( const char *file, const int line );
 /* Check CUDA call, similar to the code in the book. */
 #define CHECK(call)\
     do {\
-        const cudaError_t error = call;\
-        if (error != cudaSuccess)\
+        const cudaError_t err1 = call;\
+        if (err1 != cudaSuccess)\
         {\
           fprintf(stderr, "Error: %s:%d, ", __FILE__, __LINE__);\
-          fprintf(stderr, "call exited with code %d: %s\n", error, cudaGetErrorString(error));\
+          fprintf(stderr, "call exited with code %d: %s\n", err1, cudaGetErrorString(err1));\
           exit(1);\
         } \
     } while (0)

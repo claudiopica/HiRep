@@ -4,7 +4,7 @@ GLB_X = 4
 GLB_Y = 4
 GLB_Z = 4
 
-NP_T = 2
+NP_T = 1 
 NP_X = 1
 NP_Y = 1
 NP_Z = 1

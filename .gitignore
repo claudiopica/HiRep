@@ -61,9 +61,11 @@ TestProgram/Geometry/check_geometry_1
 TestProgram/Geometry/check_gpu_1
 TestProgram/Geometry/check_gpu_geometry
 TestProgram/Geometry/test_com_speed
+TestProgram/Geometry/check_format_convert_gpu
 TestProgram/Memory/check_alloc_GPU
 TestProgram/Memory/check_alloc_CPU
 TestProgram/Memory/check_field_copy
+TestProgram/Memory/check_comms_GPU
 TestProgram/Integrators/check_integrator_1
 TestProgram/Integrators/check_integrator_utils_1
 TestProgram/Inverters/check_inverters_1
