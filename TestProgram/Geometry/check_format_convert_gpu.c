@@ -47,14 +47,14 @@ int main(int argc, char *argv[])
 
     // Run tests 
       /* Double precision */
-    //return_val += test_convert_back_forth_spinor_field();
-    //return_val += test_convert_back_forth_gfield_f();
-    //return_val += test_convert_back_forth_gfield();
+    return_val += test_convert_back_forth_spinor_field();
+    return_val += test_convert_back_forth_gfield_f();
+    return_val += test_convert_back_forth_gfield();
 
       /* Single precision */
     return_val += test_convert_back_forth_spinor_field_flt();
-    //return_val += test_convert_back_forth_gfield_f_flt();
-    //return_val += test_convert_back_forth_gfield_flt();
+    return_val += test_convert_back_forth_gfield_f_flt();
+    return_val += test_convert_back_forth_gfield_flt();
 
     // Finalize and return
     finalize_process();
@@ -89,8 +89,7 @@ int test_convert_back_forth_spinor_field()
     free_spinor_field_f(in);
     free_spinor_field_f(tmp);
     free_spinor_field_f(out);
-    //return check_diff_norm_zero(diff_norm);
-    return 0;
+    return check_diff_norm_zero(diff_norm);
 }
 
 int test_convert_back_forth_spinor_field_flt() 
@@ -98,31 +97,30 @@ int test_convert_back_forth_spinor_field_flt()
     lprintf("INFO", 0, " ======= TEST SPINOR FIELD SINGLE PRECISION ======= \n");
 
     // Setup spinor fields
-    spinor_field_flt *in; //, *tmp, *out;
+    spinor_field_flt *in, *tmp, *out;
     in = alloc_spinor_field_f_flt(1, &glattice);
-    //tmp = alloc_spinor_field_f_flt(1, &glattice);
-    //out = alloc_spinor_field_f_flt(1, &glattice);
+    tmp = alloc_spinor_field_f_flt(1, &glattice);
+    out = alloc_spinor_field_f_flt(1, &glattice);
     gaussian_spinor_field_flt(in);
 
     double sqnorm = spinor_field_sqnorm_f_flt_cpu(in);
     lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.2e]\n", sqnorm);
 
     // Convert twice 
-    /*to_gpu_format_spinor_field_f_flt(tmp, in);
+    to_gpu_format_spinor_field_f_flt(tmp, in);
     to_cpu_format_spinor_field_f_flt(out, tmp);
     lprintf("SANITY CHECK", 0, "[In and outfield sqnorms unequal zero and equal to each other: in: %0.2e out: %0.2e]\n", 
                     spinor_field_sqnorm_f_flt_cpu(in), spinor_field_sqnorm_f_flt_cpu(out));
     
     // Assert fields are equal over sqnorm
     spinor_field_sub_assign_f_flt_cpu(out, in);
-    double diff_norm = spinor_field_sqnorm_f_flt_cpu(out);*/
+    double diff_norm = spinor_field_sqnorm_f_flt_cpu(out);
 
     // Free and return
     free_spinor_field_f_flt(in);
-    //free_spinor_field_f_flt(tmp);
-    //free_spinor_field_f_flt(out);
-    //return check_diff_norm_zero(diff_norm);
-    return 0;
+    free_spinor_field_f_flt(tmp);
+    free_spinor_field_f_flt(out);
+    return check_diff_norm_zero(diff_norm);
 }
 
 int test_convert_back_forth_gfield_f() 
