@@ -15,6 +15,7 @@ extensions = [
     "sphinx.ext.mathjax",
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
+    "sphinxcontrib.bibtex",
 ]
 myst_enable_extensions = [
     "colon_fence",
@@ -131,3 +132,5 @@ subprocess.call("cd doxygen ; doxygen", shell=True)
 
 breathe_projects = {"HiRep": "doxygen/build/xml/"}
 breathe_default_project = "HiRep"
+
+bibtex_bibfiles = ["literature.bib"]

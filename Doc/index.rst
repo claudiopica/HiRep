@@ -12,8 +12,9 @@ Subsection
 
    user_guide/getting_started
    user_guide/input_file
-   user_guide/physics_background
-   user_guide/examples
+   user_guide/supported_features
+   user_guide/analysis
+   user_guide/writing_programs
 
 .. toctree::
    :maxdepth: 2
@@ -24,9 +25,13 @@ Subsection
    development_manual/data_structures
    development_manual/auto_generation
    development_manual/field_geometry
+   development_manual/global_objects
 
 .. toctree::
    :maxdepth: 2
    :caption: Reference Manual
 
    api
+   
+.. bibliography::
+   :all:

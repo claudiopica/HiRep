@@ -10,4 +10,8 @@ HiRep
    development_manual/data_structures
    development_manual/auto_generation
    development_manual/field_geometry
+   development_manual/global_objects
+   
+.. bibliography::
+   :all:
    

@@ -725,7 +725,7 @@ Suppose there are $N_s$ available random fermion sources $\xi^{(i)}$ such that t
 
 $$\left< \xi^{(i)}_{\alpha a}(x)^\dagger \xi^{(j)}_{\beta b}(y) \right> = \delta_{\alpha,\beta} \delta_{a,b} \delta_{x,y} \delta_{i,j} \; .$$
 
-Current literature proposes mainly either Gaussian noise or $Z_2$ noise. In the following, we will choose $Z_2$ noise, following [@Foster:1998vw]. Each component of the spinor is randomly chosen from the values $\pm 1/\sqrt{2}$.
+Current literature proposes mainly either Gaussian noise or $Z_2$ noise. In the following, we will choose $Z_2$ noise, following {cite}`Foster_1999`. Each component of the spinor is randomly chosen from the values $\pm 1/\sqrt{2}$.
 
 Then the matrix $H$ can be estimated as follows:
 
@@ -739,7 +739,7 @@ $$\mathrm{tr}\left[ \Gamma G(x,x) \right] = \sum_i \xi^{(i)}(x)^\dagger \gamma_5
 
 ### Variance reduction
 
-The noise obtained from stochastic estimation of the matrix $G$ in the formula {eq}`naive_noisy_estimate` can be reduced using the trick from [@McNeile:2000xx] for Wilson fermions. Here, the Dirac operator has the form $D = 1 - K$. As a result, for the matrix $G$ the following formula applies 
+The noise obtained from stochastic estimation of the matrix $G$ in the formula {eq}`naive_noisy_estimate` can be reduced using the trick from {cite}`McNeile_2001` for Wilson fermions. Here, the Dirac operator has the form $D = 1 - K$. As a result, for the matrix $G$ the following formula applies 
 
 $$\begin{aligned}
 && G = D^{-1} = \left( 1 - K \right)^{-1} = \\
@@ -758,11 +758,11 @@ $$\begin{aligned}
 & + \mathrm{tr}\left[ \Gamma K^{2k} \right](x,x) + \sum_{iy} \xi^{(i)}(y)^\dagger \gamma_5 K^{n_2}(y,x) \Gamma K^{n_1}(x,y) \eta^{(i)}(y) \nonumber \\
 \end{aligned}$$(eq:hairpin_with_variance_reduction)
 
-[@McNeile:2000xx] use this trick only for the calculation of the hairpin diagram. It might be possible to generalize it to the the isotriplet part as well, as an alternative to the point-to-all propagator. 
+{cite}`McNeile_2001` use this trick only for the calculation of the hairpin diagram. It might be possible to generalize it to the the isotriplet part as well, as an alternative to the point-to-all propagator. 
 
 ### Time dilution
 
-This is a trick introduced in [@Foley:2005ac] for noise reduction in the computation of null-moment propagators. Whenever stochastic estimation of the $H$ matrix is required, such as in {eq}`eq:naive_noisy_estimate`, it is possible to replace each stochastic source $\xi^{(i)}$ with a set of sources each with support on a different time slice.
+This is a trick introduced in {cite}`Foley_2005` for noise reduction in the computation of null-moment propagators. Whenever stochastic estimation of the $H$ matrix is required, such as in {eq}`eq:naive_noisy_estimate`, it is possible to replace each stochastic source $\xi^{(i)}$ with a set of sources each with support on a different time slice.
 
 $$\begin{aligned}
  \label{time_dilution}
@@ -847,22 +847,5 @@ The following functions will be implemented
 	    
 
 The functions above implement the formula {eq}`eq:hairpin_with_variance_reduction`, summing exact terms and the statistical term, generated with `nrs` to dilute, for a total of $\times N_t$ matrix invertions for each mass value and returns the result as `out`.
-
-TODO: Add this to bibliography
-
-J. Foley, K. Jimmy Juge, A. O'Cais, M. Peardon, S. M. Ryan and
-J. I. Skullerud, Comput. Phys. Commun. **172**, 145 (2005)
-\[arXiv:hep-lat/0505023\].
-
-C. McNeile and C. Michael \[UKQCD Collaboration\], Phys. Rev. D **63**,
-114503 (2001) \[arXiv:hep-lat/0010019\].
-
-M. Foster and C. Michael \[UKQCD Collaboration\], Phys. Rev. D **59**,
-074503 (1999) \[arXiv:hep-lat/9810021\].
-
-A. Hart, C. McNeile, C. Michael and J. Pickavance \[UKQCD
-Collaboration\], Phys. Rev. D **74**, 114504 (2006)
-\[arXiv:hep-lat/0608026\].
-:::
 
 
