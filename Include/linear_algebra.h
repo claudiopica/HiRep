@@ -80,15 +80,6 @@ extern "C" {
   #ifdef __cplusplus
   template <class T>
   T global_sum_gpu(T *vector, int size);
-  extern "C" {
-  #endif
-  int global_sum_gpu_int(int *vector, int size);
-  float global_sum_gpu_float(float *vector, int size);
-  double global_sum_gpu_double(double *vector, int size);
-  hr_complex_flt global_sum_gpu_complex_flt(hr_complex_flt *vector, int size);
-  hr_complex global_sum_gpu_complex(hr_complex *vector, int size);
-  #ifdef __cplusplus
-  }
   #endif
 #endif
 

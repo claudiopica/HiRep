@@ -39,21 +39,7 @@ void rand_field_flt(float* f, int n) {
 
 void copy_gfield_cpu(suNg_field* out, suNg_field* in) 
 {
-    suNg *out_mat, *in_mat;
-    int dim = sizeof(suNg)/sizeof(hr_complex);// This does not work if the representation is real
-    _MASTER_FOR(in->type, ix) 
-    {
-        for (int comp = 0; comp < 4; ++comp) 
-        {
-            out_mat = _4FIELD_AT(out, ix, comp);
-            in_mat = _4FIELD_AT(in, ix, comp);
-            
-            for (int elem =0; elem < dim; ++elem) 
-            {
-                (*out_mat).c[elem] = (*in_mat).c[elem];
-            }
-        }     
-    }
+    memcpy(out->ptr, in->ptr, out->type->gsize_gauge*sizeof(suNg));
 }
 
 void copy_scalar_field_cpu(suNg_scalar_field *out, suNg_scalar_field *in) 
@@ -68,20 +54,7 @@ void copy_gfield_flt_cpu(suNg_field_flt *out, suNg_field_flt *in)
 
 void copy_gfield_f_cpu(suNf_field* out, suNf_field* in) 
 {
-    suNf *out_mat, *in_mat;
-    int dim = sizeof(suNf)/sizeof(hr_complex);
-    _MASTER_FOR(in->type, ix) 
-    {
-        for (int comp = 0; comp < 4; ++comp) 
-        {
-            out_mat = _4FIELD_AT(out, ix, comp);
-            in_mat = _4FIELD_AT(in, ix, comp);
-            for (int elem =0; elem < dim; ++elem) 
-            {
-                (*out_mat).c[elem] = (*in_mat).c[elem];
-            }
-        }     
-    }
+    memcpy(out->ptr, in->ptr, out->type->gsize_gauge*sizeof(suNf));
 }
 
 void copy_gfield_f_flt_cpu(suNf_field_flt *out, suNf_field_flt *in) 
@@ -257,13 +230,17 @@ double sqnorm_gfield_cpu(suNg_field *f)
             sqnorm += tmp;
         }
     }
+
+    #ifdef WITH_MPI
+        global_sum(&sqnorm, 1);
+    #endif 
     return sqnorm;
 }
 
 float sqnorm_gfield_flt_cpu(suNg_field_flt *f) 
 {
     suNg_flt *site;
-    float sqnorm = 0.0;
+    double sqnorm = 0.0;
     _MASTER_FOR(f->type, ix) 
     {
         for (int comp = 0; comp < 4; comp++) 
@@ -271,10 +248,14 @@ float sqnorm_gfield_flt_cpu(suNg_field_flt *f)
             float tmp;
             site = _4FIELD_AT(f, ix, comp);
             _suNg_sqnorm(tmp, (*site));
-            sqnorm += tmp;
+            sqnorm += (double)tmp;
         }
     }
-    return sqnorm;
+
+    #ifdef WITH_MPI
+        global_sum(&sqnorm, 1);
+    #endif 
+    return (float)sqnorm;
 }
 
 double sqnorm_gfield_f_cpu(suNf_field *f) 
@@ -291,13 +272,17 @@ double sqnorm_gfield_f_cpu(suNf_field *f)
             sqnorm += tmp;
         }
     }
+
+    #ifdef WITH_MPI
+        global_sum(&sqnorm, 1);
+    #endif 
     return sqnorm;
 }
 
 float sqnorm_gfield_f_flt_cpu(suNf_field_flt *f) 
 {
     suNf_flt *site;
-    float sqnorm = 0.0;
+    double sqnorm = 0.0;
     _MASTER_FOR(f->type, ix) 
     {
         for (int comp = 0; comp < 4; comp++) 
@@ -305,10 +290,14 @@ float sqnorm_gfield_f_flt_cpu(suNf_field_flt *f)
             float tmp;
             site = _4FIELD_AT(f, ix, comp);
             _suNf_sqnorm(tmp, (*site));
-            sqnorm += tmp;
+            sqnorm += (double)tmp;
         }
     }
-    return sqnorm;
+
+    #ifdef WITH_MPI
+        global_sum(&sqnorm, 1);
+    #endif 
+    return (float)sqnorm;
 }
 
 double sqnorm_scalar_field_cpu(suNg_scalar_field *f) 
@@ -320,6 +309,10 @@ double sqnorm_scalar_field_cpu(suNg_scalar_field *f)
         site = _FIELD_AT(f, ix);
         _vector_prod_add_assign_re_g(sqnorm, (*site), (*site));
     }
+
+    #ifdef WITH_MPI
+        global_sum(&sqnorm, 1);
+    #endif 
     return sqnorm;
 }
 
@@ -337,6 +330,10 @@ double sqnorm_avfield_cpu(suNg_av_field *f)
             sqnorm += tmp;
         }
     }
+
+    #ifdef WITH_MPI
+        global_sum(&sqnorm, 1);
+    #endif 
     return sqnorm;
 }
 
@@ -349,6 +346,10 @@ double sqnorm_sfield_cpu(scalar_field *f)
         site = _FIELD_AT(f, ix);
         sqnorm += (*site)*(*site);
     }
+
+    #ifdef WITH_MPI
+        global_sum(&sqnorm, 1);
+    #endif 
     return sqnorm;
 }
 
@@ -363,6 +364,10 @@ double sqnorm_gtransf_cpu(suNg_field *f)
         _suNg_sqnorm(tmp, (*site));
         sqnorm += tmp;
     }
+
+    #ifdef WITH_MPI
+        global_sum(&sqnorm, 1);
+    #endif 
     return sqnorm;
 }
 
@@ -380,6 +385,10 @@ double sqnorm_clover_term_cpu(suNfc_field *f)
             sqnorm += tmp;
         }
     }
+
+    #ifdef WITH_MPI
+        global_sum(&sqnorm, 1);
+    #endif 
     return sqnorm;
 }
 
@@ -397,6 +406,10 @@ double sqnorm_clover_force_cpu(suNf_field *f)
             sqnorm += tmp;
         }
     }
+
+    #ifdef WITH_MPI
+        global_sum(&sqnorm, 1);
+    #endif 
     return sqnorm;
 }
 
@@ -410,20 +423,28 @@ double sqnorm_spinor_field_f_cpu(spinor_field *f) {
         _spinor_prod_re_f(tmp, (*site), (*site));
         sqnorm += tmp;
     }
+
+    #ifdef WITH_MPI
+        global_sum(&sqnorm,1);
+    #endif
     return sqnorm;
 }
 
 float sqnorm_spinor_field_f_flt_cpu(spinor_field_flt *f) {
     suNf_spinor_flt *site;
-    float sqnorm = 0.0;
+    double sqnorm = 0.0;
     _MASTER_FOR(f->type, ix) 
     {
         site = _FIELD_AT(f, ix);
         float tmp;
         _spinor_prod_re_f(tmp, (*site), (*site));
-        sqnorm += tmp;
+        sqnorm += (double)tmp;
     }
-    return sqnorm;
+
+    #ifdef WITH_MPI
+        global_sum(&sqnorm, 1);
+    #endif 
+    return (float)sqnorm;
 }
 
 // Set field to zero

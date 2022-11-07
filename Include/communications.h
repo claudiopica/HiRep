@@ -7,7 +7,7 @@
 #define COMMUNICATIONS_H
 
 #ifdef __cplusplus
-extern "C" {
+    extern "C" {
 #endif
 
 void global_sum(double *d, int n);
@@ -39,13 +39,38 @@ void start_gf_sendrecv_flt(suNg_field_flt *gf);
 void complete_sf_sendrecv_flt(spinor_field_flt *gf);
 void start_sf_sendrecv_flt(spinor_field_flt *gf);
 
-#if defined(WITH_GPU) & defined(WITH_MPI)
-    void sync_gpu_spinor_field_f(spinor_field *f);
-    void start_sendrecv_spinor_field_f_gpu(spinor_field *f);
+
+#ifdef WITH_GPU
+    int global_sum_gpu_int(int *vector, int size);
+    float global_sum_gpu_float(float *vector, int size);
+    double global_sum_gpu_double(double *vector, int size);
+    hr_complex_flt global_sum_gpu_complex_flt(hr_complex_flt *vector, int size);
+    hr_complex global_sum_gpu_complex(hr_complex *vector, int size);
 #endif
 
 #ifdef __cplusplus
 }
 #endif
+
+#ifdef WITH_GPU
+    #define _DECLARE_COMMS(_name, _field_type) \
+        void sync_gpu_##_name(_field_type*); \
+        void start_sendrecv_gpu_##_name(_field_type*); \
+        void complete_sendrecv_gpu_##_name(_field_type*); 
+
+    _DECLARE_COMMS(spinor_field_f, spinor_field);
+    _DECLARE_COMMS(spinor_field_f_flt, spinor_field_flt);
+    _DECLARE_COMMS(gfield, suNg_field);
+    _DECLARE_COMMS(gfield_flt, suNg_field_flt);
+    _DECLARE_COMMS(gfield_f, suNf_field);
+    _DECLARE_COMMS(gfield_f_flt, suNg_field);
+    _DECLARE_COMMS(scalar_field, suNg_scalar_field);
+    _DECLARE_COMMS(avfield, suNg_av_field);
+    _DECLARE_COMMS(gtransf, suNg_field);
+    _DECLARE_COMMS(clover_term, suNfc_field);
+    _DECLARE_COMMS(clover_force, suNf_field);
+
+    #undef _DECLARE_COMMS
+#endif 
 
 #endif /* COMMUNICATIONS_H */

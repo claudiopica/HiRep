@@ -67,7 +67,10 @@ void __cudaSafeCall( cudaError_t err, const char *file, const int line );
 void __cudaCheckError( const char *file, const int line );
 
 /* Check CUDA call, similar to the code in the book. */
-#define CHECK(call)\
+// TODO: Rename all CHECKs to CHECK_CUDAs
+#define CHECK CHECK_CUDA
+
+#define CHECK_CUDA(call)\
     do {\
         const cudaError_t err1 = call;\
         if (err1 != cudaSuccess)\
@@ -77,6 +80,21 @@ void __cudaCheckError( const char *file, const int line );
           exit(1);\
         } \
     } while (0)
+
+#ifdef WITH_MPI
+  #define CHECK_MPI(call) \
+    do {\
+      const int mpireturn = call; \
+      if (mpireturn != MPI_SUCCESS) \
+      { \
+        char message[MPI_MAX_ERROR_STRING]; \
+        int message_length; \
+        MPI_Error_string(mpireturn, message, &message_length); \
+        lprintf("MPI", 0, "ERROR: %s\n", message); \
+        error(1, 1, __func__, ": Communications failed.\n"); \
+      } \
+    } while (0)
+#endif
 
 #ifdef __cplusplus
 }
