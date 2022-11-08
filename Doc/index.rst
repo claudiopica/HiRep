@@ -16,6 +16,7 @@ Subsection
    user_guide/analysis
    user_guide/writing_programs
 
+
 .. toctree::
    :maxdepth: 2
    :caption: Development Manual
@@ -29,9 +30,10 @@ Subsection
 
 .. toctree::
    :maxdepth: 2
-   :caption: Reference Manual
+   :caption: References
 
    api
-   
+   Full Reference <../../doxygen/build/html/index.html#http://>
+
 .. bibliography::
    :all:

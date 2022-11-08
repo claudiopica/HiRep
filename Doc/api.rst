@@ -1,5 +1,5 @@
-HiRep Reference Documentation
-=============================
+Quick Reference
+===============
 
 update.h
 --------
@@ -15,3 +15,8 @@ gpu_geometry.h
 --------------
 
 .. doxygenfile:: gpu_geometry.h
+
+memory.h
+--------
+
+.. doxygenfile:: memory.h

@@ -202,7 +202,9 @@ as `PB_T`, `PB_X`, `PB_Y` and `PB_Z`. On a 6-by-6 2D lattice `PB_X=2` and `PB_Y=
 
 
 #### Buffer Synchronization
-For complex decompositions, that are usual in lattice simulations, the blocks have to communicate in a highly non-trivial way. For example decomposing a $32^3\times 64$ lattice into $8^4$ local lattices requires 512 processes to communicate the three dimensional surfaces of each four-dimensional local lattice with all interfacing blocks. In order to perform this communication we need to know both the indices of the sending blocks and map them to the receiving blocks. This information is stored in the arrays `copy_from` and `copy_to`. We can iterate through these arrays to find pairs of sending and receiving blocks and perform the communication. The size of the memory transfer is further stored in the array `copy_len`.
+For complex decompositions, that are usual in lattice simulations, the blocks have to communicate in a highly non-trivial way. For example decomposing a $32^3\times 64$ lattice into $8^4$ local lattices requires 512 processes to communicate the three dimensional surfaces of each four-dimensional local lattice with all interfacing blocks. In order to perform this communication we need to know both the indices of the sending blocks and map them to the receiving blocks. This information is stored in the arrays `rbuf_from_proc` and `sbuf_to_proc`, which tell us which processes send to which processes by id, and further the arrays `rbuf_start` and `sbuf_start`, which tell us at which index in the local lattice we need to start reading. We can iterate through these arrays to find pairs of sending and receiving processes and perform the communication. The size of the memory transfer is further stored in the array `sbuf_len` and `rbuf_len`.
+
+The number of copies necessary depends on whether the field is a spinor field or gauge field and saved in the fields `nbuffers_spinor` and `nbuffers_gauge`.
 
 ## Field Operations
 

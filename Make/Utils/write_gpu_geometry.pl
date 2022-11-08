@@ -79,6 +79,7 @@ sub write_prolog {
     print "*******************************************************************************/\n";
     print "\n";
     print "/**\n";
+    print " * \@file\n";
     print " * \@brief Memory access patterns are crucial to achieve best performance.     \n";
     print " *        Due to this, we store lattice field data differently in device memory\n";
     print " *        than in host memory. Documentation on this can be found in the HiRep \n";
