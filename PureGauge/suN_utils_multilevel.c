@@ -320,7 +320,9 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
         .SF_BCs = 0};
     init_BCs(&BCs_pars);
 
+#ifdef PURE_GAUGE_ANISOTROPY
     init_pure_gauge_anisotropy(&(pg_var_ml.anisotropy));
+#endif
 
     /* init gauge field */
     switch (start_t)
@@ -399,7 +401,9 @@ int init_mc_ml_measure(pg_flow_ml_measure *gf, char *ifile)
         .SF_BCs = 0};
     init_BCs(&BCs_pars);
 
+#ifdef PURE_GAUGE_ANISOTROPY
     init_pure_gauge_anisotropy(&(pg_var_ml.anisotropy));
+#endif
 
     WF_var.anisotropy = 1.0;
 
