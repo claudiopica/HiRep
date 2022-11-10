@@ -355,7 +355,9 @@ int init_mc_ml(pg_flow_ml *gf, char *ifile)
     lprintf("INIT WF", 0, "WF delta=%lf\n", WF_var.delta);
     lprintf("INIT WF", 0, "WF anisotropy=%lf\n", WF_var.anisotropy);
 
+#ifdef PURE_GAUGE_ANISOTROPY
     WF_set_bare_anisotropy(&(WF_var.anisotropy));
+#endif
 
     read_input(poly_var.read, ifile);
     lprintf("INIT WF", 0, "Polyakov make=%s\n", poly_var.make);
@@ -418,7 +420,9 @@ int init_mc_ml_measure(pg_flow_ml_measure *gf, char *ifile)
     lprintf("INIT WF", 0, "WF delta=%lf\n", WF_var.delta);
     lprintf("INIT WF", 0, "WF anisotropy=%lf\n", WF_var.anisotropy);
 
+#ifdef PURE_GAUGE_ANISOTROPY
     WF_set_bare_anisotropy(&(WF_var.anisotropy));
+#endif
 
     read_input(poly_var.read, ifile);
     lprintf("INIT WF", 0, "Polyakov make=%s\n", poly_var.make);
