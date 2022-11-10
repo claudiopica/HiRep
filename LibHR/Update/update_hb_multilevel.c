@@ -293,6 +293,7 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
     static double complex *one_point_gb;
     static double complex *one_point_tor;
     static long double norm = 1.0;
+    static long double poly_norm;
     struct timeval start, end, etime;
     int nblocking = nblockingend - nblockingstart + 1;
     static double complex **polyf;
@@ -306,7 +307,9 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
             one_point_tor = malloc(sizeof(double complex) * total_n_tor_op * n_active_slices);
             for (i = 0; i < max_mh_level; i++)
                 norm *= ml_up[i];
+            poly_norm = norm * NG;
             norm *= GLB_VOL3 * NG;
+
             polyf = malloc(sizeof(double complex *) * 3);
             polyf[0] = amalloc(sizeof(double complex) * Y * Z * T, ALIGN);
             polyf[1] = amalloc(sizeof(double complex) * X * Z * T, ALIGN);
@@ -368,13 +371,15 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
             one_point_tor[i] /= norm;
 
         for (i = 0; i < Y * Z * T; i++)
-            polyf[0][i] /= norm;
+            polyf[0][i] /= poly_norm;
 
         for (i = 0; i < X * Z * T; i++)
-            polyf[1][i] /= norm;
+            polyf[1][i] /= poly_norm;
 
         for (i = 0; i < X * Y * T; i++)
-            polyf[2][i] /= norm;
+            polyf[2][i] /= poly_norm;
+
+        lprintf("HB MULTILEVEL", 0, "1polyf %lf\n", creal(polyf[2][3]));
 
         collect_1pt_torellon_functions(lcor, one_point_tor, polyf);
 #endif
