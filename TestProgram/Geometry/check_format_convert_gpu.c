@@ -25,20 +25,20 @@
 #include "gpu.h"
 
 /* Double precision tests */
-int test_convert_back_forth_spinor_field();
-int test_convert_back_forth_sfield();
-int test_convert_back_forth_gfield_f();
 int test_convert_back_forth_gfield();
+int test_convert_back_forth_gfield_f();
 int test_convert_back_forth_scalar_field();
 int test_convert_back_forth_avfield();
 int test_convert_back_forth_gtransf();
 int test_convert_back_forth_clover_term();
 int test_convert_back_forth_clover_force();
+int test_convert_back_forth_spinor_field();
+int test_convert_back_forth_sfield();
 
 /* Single precision tests */
-int test_convert_back_forth_spinor_field_flt();
-int test_convert_back_forth_gfield_f_flt();
 int test_convert_back_forth_gfield_flt();
+int test_convert_back_forth_gfield_f_flt();
+int test_convert_back_forth_spinor_field_flt();
 
 int main(int argc, char *argv[]) 
 {
@@ -53,21 +53,21 @@ int main(int argc, char *argv[])
 
     // Run tests 
       /* Double precision */
-    return_val += test_convert_back_forth_spinor_field();
-    return_val += test_convert_back_forth_sfield();
-    return_val += test_convert_back_forth_gfield_f();
     return_val += test_convert_back_forth_gfield();
+    return_val += test_convert_back_forth_gfield_f();
     return_val += test_convert_back_forth_scalar_field();
     return_val += test_convert_back_forth_avfield();
     return_val += test_convert_back_forth_gtransf();
     return_val += test_convert_back_forth_clover_term();
     return_val += test_convert_back_forth_clover_force();
+    return_val += test_convert_back_forth_spinor_field();
+    return_val += test_convert_back_forth_sfield();
 
       /* Single precision */
-    return_val += test_convert_back_forth_spinor_field_flt();
-    return_val += test_convert_back_forth_gfield_f_flt();
     return_val += test_convert_back_forth_gfield_flt();
-
+    return_val += test_convert_back_forth_gfield_f_flt();
+    return_val += test_convert_back_forth_spinor_field_flt();
+    
     // Finalize and return
     finalize_process();
     return return_val;

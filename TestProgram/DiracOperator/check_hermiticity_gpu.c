@@ -32,6 +32,8 @@
 #include "setup.h"
 #include "communications.h"
 
+// TODO test for glat_odd and glat_even
+
 static double hmass = 0.1;
 
 void MM_cpu(spinor_field *out, spinor_field *in)
@@ -71,14 +73,11 @@ int test_herm_cpu(spinor_operator S, char *name)
   int return_val = 0;
 
   // Prepare initial spinor fields
-  #ifdef UPDATE_EO
-    s1 = alloc_spinor_field_f(4, &glat_even);
-  #else
-    s1 = alloc_spinor_field_f(4, &glattice);
-  #endif
-  s2 = s1 + 1;
-  s3 = s2 + 1;
-  s4 = s3 + 1;
+  s1 = alloc_spinor_field_f(1, &glattice);
+  s2 = alloc_spinor_field_f(1, &glattice);
+  s3 = alloc_spinor_field_f(1, &glattice);
+  s4 = alloc_spinor_field_f(1, &glattice);
+
   gaussian_spinor_field(s1);
   gaussian_spinor_field(s2);
 
@@ -112,6 +111,9 @@ int test_herm_cpu(spinor_operator S, char *name)
 
   // Free and return
   free_spinor_field_f(s1);
+  free_spinor_field_f(s2);
+  free_spinor_field_f(s3);
+  free_spinor_field_f(s4);
   return return_val;
 }
 
@@ -124,18 +126,15 @@ int test_herm_gpu(spinor_operator S, char *name)
   int return_val = 0;
 
   // Prepare inital spinor fields
-  #ifdef UPDATE_EO
-    s1 = alloc_spinor_field_f(4, &glat_even);
-  #else
-    s1 = alloc_spinor_field_f(4, &glattice);
-  #endif
-  s2 = s1 + 1;
-  s3 = s2 + 1;
-  s4 = s3 + 1;
+  s1 = alloc_spinor_field_f(1, &glattice);
+  s2 = alloc_spinor_field_f(1, &glattice);
+  s3 = alloc_spinor_field_f(1, &glattice);
+  s4 = alloc_spinor_field_f(1, &glattice);
+
   gaussian_spinor_field(s1);
   gaussian_spinor_field(s2);
-  spinor_field_copy_to_gpu_f(s1);
-  spinor_field_copy_to_gpu_f(s2);
+  copy_to_gpu_spinor_field_f(s1);
+  copy_to_gpu_spinor_field_f(s2);
 
   // Apply operator
   S(s3, s1);
@@ -167,6 +166,9 @@ int test_herm_gpu(spinor_operator S, char *name)
 
   // Free and return
   free_spinor_field_f(s1);
+  free_spinor_field_f(s2);
+  free_spinor_field_f(s3);
+  free_spinor_field_f(s4);
   return return_val;
 }
 
@@ -189,13 +191,13 @@ int main(int argc, char *argv[])
 
   // Test block
   
-    // Q^2
-    return_value_cpu=test_herm_cpu(&MM_cpu, "M");
-    return_value_gpu=test_herm_gpu(&MM_gpu, "M");
-
     // Unit operator
     return_value_cpu_unit=test_herm_cpu(&II_cpu, "I");
     return_value_gpu_unit=test_herm_gpu(&II_gpu, "I");
+
+    // Q^2
+    return_value_cpu=test_herm_cpu(&MM_cpu, "M");
+    return_value_gpu=test_herm_gpu(&MM_gpu, "M");
 
   // Finalize
   finalize_process();

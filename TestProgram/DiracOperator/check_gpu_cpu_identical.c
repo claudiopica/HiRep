@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
     setup_gauge_fields();
     random_u(u_gauge);
     represent_gauge_field();
-    gfield_copy_to_gpu_f(u_gauge_f);
+    copy_to_gpu_gfield_f(u_gauge_f);
 
     // Test Block
     return_val += test_hermiticity(&I_operator, &I_operator_cpu, "Unit operator");
@@ -65,12 +65,12 @@ int test_hermiticity(spinor_operator S, spinor_operator S_cpu, char *name)
     S_s = alloc_spinor_field_f(1, &glattice);
     S_s_cpu = alloc_spinor_field_f(1, &glattice);
     gaussian_spinor_field(s);
-    spinor_field_copy_to_gpu_f(s);
+    copy_to_gpu_spinor_field_f(s);
 
     S(S_s, s);
     S_cpu(S_s_cpu, s);
 
-    spinor_field_copy_from_gpu_f(S_s);
+    copy_from_gpu_spinor_field_f(S_s);
     
     // Sanity checks: Norms are not identically zero
     lprintf("INFO", 0, "Output spinor field norm GPU: %0.15lf\n", spinor_field_sqnorm_f(S_s));

@@ -14,7 +14,8 @@
 // TODO: Single precision will not work, because then we need to cast to flt
 // TODO: put gpu as last suffix
 
-#if defined(WITH_MPI) && defined(WITH_GPU)
+#if defined(WITH_GPU) && defined(WITH_MPI)
+
 #define _DECLARE_SYNC(_name, _field_type, _site_type, _size, _geom)\
     void sync_gpu_##_name(_field_type *f) \
     { \
