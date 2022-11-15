@@ -198,7 +198,6 @@ void Dphi_gpu_(spinor_field *out, spinor_field *in)
       int read_stride = in->type->master_end[iyp] - in->type->master_start[iyp] + 1;
       int write_stride = out->type->master_end[ixp] - out->type->master_start[ixp] + 1;
       grid = (write_stride-1)/BLOCK_SIZE + 1;
-      printf("Working on block: %d start: %d end: %d\n", ixp, out->type->master_start[ixp], out->type->master_end[ixp]);
       Dphi_gpu_kernel<<<grid, BLOCK_SIZE>>>(_GPU_FIELD_BLK(out, ixp),
                                             _GPU_FIELD_BLK(in, iyp),
                                             _GPU_4FIELD_BLK(u_gauge_f, ixp),
@@ -641,8 +640,6 @@ __global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out,
     __syncthreads();
     /******************************** end of directions *********************************/
     _spinor_mul_f(r, -0.5, r);
-
-    printf("ixp: %d ix: %d -- %0.2e + i%0.2e\t", ixp, ix, creal(r.c[0].c[0]), cimag(r.c[0].c[0]));
 
     write_gpu_suNf_vector(write_stride, r.c[0], out, local_ix, 0);
     write_gpu_suNf_vector(write_stride, r.c[1], out, local_ix, 1);

@@ -86,10 +86,10 @@ int test_herm_cpu(spinor_operator S, char *name)
   S(s4, s2);
 
   // Spinor field sanity checks
-  lprintf("RESULT", 0, "s1 NORM %f on CPU\n", sqrt(spinor_field_sqnorm_f_cpu(s1)));
-  lprintf("RESULT", 0, "s2 NORM %f on CPU\n", sqrt(spinor_field_sqnorm_f_cpu(s2)));
-  lprintf("RESULT", 0, "s3 NORM %f on CPU\n", sqrt(spinor_field_sqnorm_f_cpu(s3)));
-  lprintf("RESULT", 0, "s4 NORM %f on CPU\n", sqrt(spinor_field_sqnorm_f_cpu(s4)));
+  lprintf("RESULT", 0, "s1 NORM %0.2e on CPU\n", sqrt(spinor_field_sqnorm_f_cpu(s1)));
+  lprintf("RESULT", 0, "s2 NORM %0.2e on CPU\n", sqrt(spinor_field_sqnorm_f_cpu(s2)));
+  lprintf("RESULT", 0, "s3 NORM %0.2e on CPU\n", sqrt(spinor_field_sqnorm_f_cpu(s3)));
+  lprintf("RESULT", 0, "s4 NORM %0.2e on CPU\n", sqrt(spinor_field_sqnorm_f_cpu(s4)));
 
   // Difference tau is 0 for a hermitian operator
   tau = spinor_field_prod_re_f_cpu(s2, s3);
@@ -133,6 +133,8 @@ int test_herm_gpu(spinor_operator S, char *name)
 
   gaussian_spinor_field(s1);
   gaussian_spinor_field(s2);
+  lprintf("SANITY CHECK", 0, "gaussian spinor field norm s1 before copy: %0.2e\n", sqrt(spinor_field_sqnorm_f_cpu(s1)));
+  lprintf("SANITY CHECK", 0, "gaussian spinor field norm s2 before copy: %0.2e\n", sqrt(spinor_field_sqnorm_f_cpu(s2)));
   copy_to_gpu_spinor_field_f(s1);
   copy_to_gpu_spinor_field_f(s2);
 
@@ -141,10 +143,10 @@ int test_herm_gpu(spinor_operator S, char *name)
   S(s4, s2);
 
   // Spinor field sanity checks
-  lprintf("RESULT", 0, "s1 NORM %f on GPU\n", sqrt(spinor_field_sqnorm_f(s1)));
-  lprintf("RESULT", 0, "s2 NORM %f on GPU\n", sqrt(spinor_field_sqnorm_f(s2)));
-  lprintf("RESULT", 0, "s3 NORM %f on GPU\n", sqrt(spinor_field_sqnorm_f(s3)));
-  lprintf("RESULT", 0, "s4 NORM %f on GPU\n", sqrt(spinor_field_sqnorm_f(s4)));
+  lprintf("RESULT", 0, "s1 NORM %0.2e on GPU\n", sqrt(spinor_field_sqnorm_f(s1)));
+  lprintf("RESULT", 0, "s2 NORM %0.2e on GPU\n", sqrt(spinor_field_sqnorm_f(s2)));
+  lprintf("RESULT", 0, "s3 NORM %0.2e on GPU\n", sqrt(spinor_field_sqnorm_f(s3)));
+  lprintf("RESULT", 0, "s4 NORM %0.2e on GPU\n", sqrt(spinor_field_sqnorm_f(s4)));
 
   // Difference tau is 0 for a hermitian operator
   tau = spinor_field_prod_re_f(s2, s3);
