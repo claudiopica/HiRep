@@ -24,7 +24,7 @@
 struct hr_complex_int;
 struct hr_complex_flt;
 struct hr_complex;
-struct hr_complex_int{
+struct __align__(4) hr_complex_int{
   int re, im;
   __host__ __device__ hr_complex_int(void){}
   __host__ __device__ hr_complex_int(const int x)
@@ -288,7 +288,7 @@ struct hr_complex_int{
     return hr_complex_int((re*(x.re) + im*(x.im)) / ((x.re)*(x.re) + (x.im)*(x.im)), (im*(x.re) - re*(x.im)) / ((x.re)*(x.re) + (x.im)*(x.im)));
   }
 };
-struct hr_complex_flt{
+struct __align__(4) hr_complex_flt{
   float re, im;
   __host__ __device__ hr_complex_flt(void){}
   __host__ __device__ hr_complex_flt(const int x)
@@ -603,7 +603,7 @@ struct hr_complex_flt{
     return hr_complex_flt((re*(x.re) + im*(x.im)) / ((x.re)*(x.re) + (x.im)*(x.im)), (im*(x.re) - re*(x.im)) / ((x.re)*(x.re) + (x.im)*(x.im)));
   }
 };
-struct hr_complex{
+struct __align__(8) hr_complex{
   double re, im;
   __host__ __device__ hr_complex(void){}
   __host__ __device__ hr_complex(const int x)

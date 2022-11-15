@@ -155,9 +155,10 @@ Here, the number of processes corresponds to either the number of cores used or 
 
 # Documentation
 
-* Complete HTML Documentation [html](Docs/_build/html/index.html) 
-* User Guide [pdf](Docs/_build/latex/hirep-documentation.pdf)
-* Developer Manual [pdf](Docs/_build/latex/hirep-documentation.pdf)
+* Complete HTML Documentation [html](https://sofiemartins.github.io)
+* User Guide [pdf](https://sofiemartins.github.io/hirep_development_manual.pdf)
+* Developer Manual [pdf](https://sofiemartins.github.io/hirep_user_guide.pdf)
+* [Full Doxygen Function Reference](https://sofiemartins.github.io/doxygen/build/html/index.html)
 
 
 # How To Cite
