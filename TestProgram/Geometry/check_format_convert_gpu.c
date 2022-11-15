@@ -88,6 +88,7 @@ int test_convert_back_forth_spinor_field()
 
     // Convert twice
     to_gpu_format_spinor_field_f(tmp, in);
+    fill_buffers_spinor_field_f(tmp);
     to_cpu_format_spinor_field_f(out, tmp);
 
     lprintf("SANITY CHECK", 0, "[In and outfield sqnorms unequal zero and equal to each other: in %0.2e out %0.2e]\n", 
@@ -116,20 +117,17 @@ int test_convert_back_forth_spinor_field_flt()
     gaussian_spinor_field_flt(in);
 
     double sqnorm = spinor_field_sqnorm_f_flt_cpu(in);
-    //float sqnorm = sqnorm_spinor_field_f_flt_cpu(in);
     lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.2e]\n", sqnorm);
 
     // Convert twice 
     to_gpu_format_spinor_field_f_flt(tmp, in);
+    fill_buffers_spinor_field_f_flt(tmp);
     to_cpu_format_spinor_field_f_flt(out, tmp);
-    //lprintf("SANITY CHECK", 0, "[In and outfield sqnorms unequal zero and equal to each other: in: %0.2e out: %0.2e]\n", 
-    //                sqnorm_spinor_field_f_flt_cpu(in), sqnorm_spinor_field_f_flt_cpu(out));
     lprintf("SANITY CHECK", 0, "[In and outfield sqnorms unequal zero and equal to each other: in: %0.2e out: %0.2e]\n", 
                     spinor_field_sqnorm_f_flt_cpu(in), spinor_field_sqnorm_f_flt_cpu(out));
     
     // Assert fields are equal over sqnorm
     spinor_field_sub_assign_f_flt_cpu(out, in);
-    //double diff_norm = sqnorm_spinor_field_f_flt_cpu(out);
     double diff_norm = spinor_field_sqnorm_f_flt_cpu(out);
 
     // Free and return
@@ -147,7 +145,6 @@ int test_convert_back_forth_gfield_f()
     suNf_field *in, *tmp, *out;
     in = alloc_gfield_f(&glattice);
 
-
     tmp = alloc_gfield_f(&glattice);
     out = alloc_gfield_f(&glattice);
 
@@ -156,6 +153,7 @@ int test_convert_back_forth_gfield_f()
 
     // Convert twice
     to_gpu_format_gfield_f(tmp, in);
+    fill_buffers_gfield_f(tmp);
     to_cpu_format_gfield_f(out, tmp);
 
     lprintf("SANITY CHECK", 0, "[In and outfield sqnorms unequal zero and equal to each other: in %0.2e out %0.2e]\n", 
@@ -187,6 +185,7 @@ int test_convert_back_forth_gfield_f_flt()
 
     // Convert twice
     to_gpu_format_gfield_f_flt(tmp, in);
+    fill_buffers_gfield_f_flt(tmp);
     to_cpu_format_gfield_f_flt(out, tmp);
     lprintf("SANITY CHECK", 0, "[In and outfield sqnorms unequal zero and equal to each other: in %0.2e out %0.2e]\n", 
                     sqnorm_gfield_f_flt_cpu(in), sqnorm_gfield_f_flt_cpu(out));
@@ -217,6 +216,7 @@ int test_convert_back_forth_gfield()
 
     // Convert twice
     to_gpu_format_gfield(tmp, in);
+    fill_buffers_gfield(tmp);
     to_cpu_format_gfield(out, tmp);
     lprintf("SANITY CHECK", 0, "[In and outfield sqnorms unequal zero and equal to each other: in %0.2e out %0.2e]\n", 
                     sqnorm_gfield_cpu(in), sqnorm_gfield_cpu(out));
@@ -247,6 +247,7 @@ int test_convert_back_forth_gfield_flt()
 
     // Convert twice
     to_gpu_format_gfield_flt(tmp, in);
+    fill_buffers_gfield_flt(tmp);
     to_cpu_format_gfield_flt(out, tmp);
     lprintf("SANITY CHECK", 0, "[In and outfield sqnorms unequal zero and equal to each other: in %0.2e out %0.2e]\n", 
                     sqnorm_gfield_flt_cpu(in), sqnorm_gfield_flt_cpu(out));
@@ -276,6 +277,7 @@ int test_convert_back_forth_scalar_field()
 
     // Convert twice
     to_gpu_format_scalar_field(tmp, in);
+    fill_buffers_scalar_field(tmp);
     to_cpu_format_scalar_field(out, tmp);
     lprintf("SANITY CHECK", 0, "[In and outfield sqnorm unequal zero and equal to each other: in %0.2e out %0.2e]\n", 
                     sqnorm_scalar_field_cpu(in), sqnorm_scalar_field_cpu(out));
@@ -305,6 +307,7 @@ int test_convert_back_forth_avfield()
 
     // Convert twice
     to_gpu_format_avfield(tmp, in);
+    fill_buffers_avfield(tmp);
     to_cpu_format_avfield(out, tmp);
     lprintf("SANITY CHECK", 0, "[In and outfield sqnorm unequal zero and equal to each other: in %0.2e out %0.2e]\n", 
                     sqnorm_avfield_cpu(in), sqnorm_avfield_cpu(out));
@@ -334,6 +337,7 @@ int test_convert_back_forth_gtransf()
 
     // Convert twice
     to_gpu_format_gtransf(tmp, in);
+    fill_buffers_gtransf(tmp);
     to_cpu_format_gtransf(out, tmp);
     lprintf("SANITY CHECK", 0, "[In and outfield sqnorm unequal zero and equal to each other: in %0.2e out %0.2e]\n", 
                     sqnorm_gtransf_cpu(in), sqnorm_gtransf_cpu(out));
@@ -363,6 +367,7 @@ int test_convert_back_forth_clover_term()
 
     // Convert twice
     to_gpu_format_clover_term(tmp, in);
+    fill_buffers_clover_term(tmp);
     to_cpu_format_clover_term(out, tmp);
     lprintf("SANITY CHECK", 0, "[In and outfield sqnorm unequal zero and equal to each other: in %0.2e out %0.2e]\n", 
                     sqnorm_clover_term_cpu(in), sqnorm_clover_term_cpu(out));
@@ -392,6 +397,7 @@ int test_convert_back_forth_clover_force()
 
     // Convert twice
     to_gpu_format_clover_force(tmp, in);
+    fill_buffers_clover_force(tmp);
     to_cpu_format_clover_force(out, tmp);
     lprintf("SANITY CHECK", 0, "[In and outfield sqnorm unequal zero and equal to each other: in %0.2e out %0.2e]\n", 
                     sqnorm_clover_force_cpu(in), sqnorm_clover_force_cpu(out));
@@ -421,6 +427,7 @@ int test_convert_back_forth_sfield()
 
     // Convert twice
     to_gpu_format_sfield(tmp, in);
+    fill_buffers_sfield(tmp);
     to_cpu_format_sfield(out, tmp);
     lprintf("SANITY CHECK", 0, "[In and outfield sqnorm unequal zero and equal to each other: in %0.2e out %0.2e]\n", 
                     sqnorm_sfield_cpu(in), sqnorm_sfield_cpu(out));

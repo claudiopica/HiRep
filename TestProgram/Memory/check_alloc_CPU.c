@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
     return_val += test_avfield_allocation();
     return_val += test_clover_term_allocation();
     return_val += test_clover_force_allocation();
-    return_val += test_sfield_allocation(); // FIXME: Bus error
+    return_val += test_sfield_allocation(); 
 
     // Single precision test block
     return_val += test_gfield_flt_allocation();

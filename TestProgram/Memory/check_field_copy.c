@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
     return_val += test_bijectivity_spinor_field_f_flt();
 
      /* Single precision */
-    //return_val += test_bijectivity_spinor_field_f_flt();
+    return_val += test_bijectivity_spinor_field_f_flt();
 
 
     // Finalize and return

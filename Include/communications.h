@@ -53,17 +53,20 @@ void start_sf_sendrecv_flt(spinor_field_flt *gf);
 #endif
 
 #ifdef WITH_GPU
+
     #define _DECLARE_COMMS(_name, _field_type) \
         void sync_gpu_##_name(_field_type*); \
         void start_sendrecv_gpu_##_name(_field_type*); \
-        void complete_sendrecv_gpu_##_name(_field_type*); 
+        void complete_sendrecv_gpu_##_name(_field_type*); \
+        void fill_buffers_##_name(_field_type*);
 
     _DECLARE_COMMS(spinor_field_f, spinor_field);
     _DECLARE_COMMS(spinor_field_f_flt, spinor_field_flt);
+    _DECLARE_COMMS(sfield, scalar_field);
     _DECLARE_COMMS(gfield, suNg_field);
     _DECLARE_COMMS(gfield_flt, suNg_field_flt);
     _DECLARE_COMMS(gfield_f, suNf_field);
-    _DECLARE_COMMS(gfield_f_flt, suNg_field);
+    _DECLARE_COMMS(gfield_f_flt, suNf_field_flt);
     _DECLARE_COMMS(scalar_field, suNg_scalar_field);
     _DECLARE_COMMS(avfield, suNg_av_field);
     _DECLARE_COMMS(gtransf, suNg_field);
