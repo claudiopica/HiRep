@@ -15,7 +15,7 @@
 
 // The following functions are primarily for testing purposes
 // This is all for CPU
-// TODO: Use randlxd and randlxs for random number generation
+// TODO: Turn this into macros for easier extensibility
 
 void rand_field_dbl(double* d, int n) {
     for (int i = 0; i < n; ++i) 
@@ -31,15 +31,9 @@ void rand_field_flt(float* f, int n) {
     }
 }
 
-// ** COPY **
-/*void copy_gfield_cpu(suNg_field* out, suNg_field* in) 
-{
-    memcpy(out->ptr, in->ptr, out->type->gsize_gauge*sizeof(suNg));
-}*/
-
 void copy_gfield_cpu(suNg_field* out, suNg_field* in) 
 {
-    memcpy(out->ptr, in->ptr, out->type->gsize_gauge*sizeof(suNg));
+    memcpy(out->ptr, in->ptr, 4*out->type->gsize_gauge*sizeof(suNg));
 }
 
 void copy_scalar_field_cpu(suNg_scalar_field *out, suNg_scalar_field *in) 
@@ -49,22 +43,22 @@ void copy_scalar_field_cpu(suNg_scalar_field *out, suNg_scalar_field *in)
 
 void copy_gfield_flt_cpu(suNg_field_flt *out, suNg_field_flt *in) 
 {
-    memcpy(out->ptr, in->ptr, out->type->gsize_gauge*sizeof(suNg_flt));
+    memcpy(out->ptr, in->ptr, 4*out->type->gsize_gauge*sizeof(suNg_flt));
 }
 
 void copy_gfield_f_cpu(suNf_field* out, suNf_field* in) 
 {
-    memcpy(out->ptr, in->ptr, out->type->gsize_gauge*sizeof(suNf));
+    memcpy(out->ptr, in->ptr, 4*out->type->gsize_gauge*sizeof(suNf));
 }
 
 void copy_gfield_f_flt_cpu(suNf_field_flt *out, suNf_field_flt *in) 
 {
-    memcpy(out->ptr, in->ptr, out->type->gsize_gauge*sizeof(suNf_flt));
+    memcpy(out->ptr, in->ptr, 4*out->type->gsize_gauge*sizeof(suNf_flt));
 }
 
 void copy_avfield_cpu(suNg_av_field *out, suNg_av_field *in) 
 {
-    memcpy(out->ptr, in->ptr, out->type->gsize_gauge*sizeof(suNg_algebra_vector));
+    memcpy(out->ptr, in->ptr, 4*out->type->gsize_gauge*sizeof(suNg_algebra_vector));
 }
 
 void copy_sfield_cpu(scalar_field *out, scalar_field *in) 
@@ -72,14 +66,19 @@ void copy_sfield_cpu(scalar_field *out, scalar_field *in)
     memcpy(out->ptr, in->ptr, out->type->gsize_spinor*sizeof(double));
 }
 
+void copy_gtransf_cpu(suNg_field *out, suNg_field *in) 
+{
+    memcpy(out->ptr, in->ptr, out->type->gsize_spinor*sizeof(suNg));
+}
+
 void copy_clover_term_cpu(suNfc_field *out, suNfc_field *in) 
 {
-    memcpy(out->ptr, in->ptr, out->type->gsize_gauge*sizeof(suNfc));
+    memcpy(out->ptr, in->ptr, 4*out->type->gsize_gauge*sizeof(suNfc));
 }
 
 void copy_clover_force_cpu(suNf_field *out, suNf_field *in) 
 {
-    memcpy(out->ptr, in->ptr, out->type->gsize_gauge*sizeof(suNf));
+    memcpy(out->ptr, in->ptr, 6*out->type->gsize_gauge*sizeof(suNf));
 }
 
 
@@ -450,12 +449,91 @@ float sqnorm_spinor_field_f_flt_cpu(spinor_field_flt *f) {
 // Set field to zero
 void zero_gfield_cpu(suNg_field *f) 
 {
-    _MASTER_FOR(f->type, ix) 
+    int len = 4*f->type->gsize_gauge*sizeof(suNg)/sizeof(double);
+    double* dbl_ptr = (double*)(f->ptr);
+    for (int i = 0; i < len; ++i) 
     {
-        for (int comp = 0; comp < 4; comp++) 
-        {
-            _vector_zero_g((*_4FIELD_AT(f, ix, comp)));
-        }
+        dbl_ptr[i] = 0.0;
+    }
+}
+
+void zero_gfield_f_cpu(suNf_field *f) 
+{
+    int len = 4*f->type->gsize_gauge*sizeof(suNf)/sizeof(double);
+    double* dbl_ptr = (double*)(f->ptr);
+    for (int i = 0; i < len; ++i) 
+    {
+        dbl_ptr[i] = 0.0;
+    }
+}
+
+void zero_gfield_flt_cpu(suNg_field_flt *f) 
+{
+    int len = 4*f->type->gsize_gauge*sizeof(suNg_flt)/sizeof(float);
+    float* flt_ptr = (float*)(f->ptr);
+    for (int i = 0; i < len; ++i) 
+    {
+        flt_ptr[i] = 0.0f;
+    }
+}
+
+void zero_gfield_f_flt_cpu(suNf_field_flt *f) 
+{
+    int len = 4*f->type->gsize_gauge*sizeof(suNf_flt)/sizeof(float);
+    float* flt_ptr = (float*)(f->ptr);
+    for (int i = 0; i < len; ++i) 
+    {
+        flt_ptr[i] = 0.0f;
+    }
+}
+
+void zero_scalar_field_cpu(suNg_scalar_field *f) 
+{
+    int len = f->type->gsize_gauge*sizeof(suNg_vector)/sizeof(double);
+    double* dbl_ptr = (double*)(f->ptr);
+    for (int i = 0; i < len; ++i) 
+    {
+        dbl_ptr[i] = 0.0;
+    }
+}
+
+void zero_avfield_cpu(suNg_av_field *f) 
+{
+    int len = 4*f->type->gsize_gauge*sizeof(suNg_algebra_vector)/sizeof(double);
+    double* dbl_ptr = (double*)(f->ptr);
+    for (int i = 0; i < len; ++i) 
+    {
+        dbl_ptr[i] = 0.0;
+    }
+}
+
+void zero_gtransf_cpu(suNg_field *f) 
+{
+    int len = f->type->gsize_gauge*sizeof(suNg_field)/sizeof(double);
+    double* dbl_ptr = (double*)(f->ptr);
+    for (int i = 0; i < len; ++i) 
+    {
+        dbl_ptr[i] = 0.0;
+    }
+}
+
+void zero_clover_term_cpu(suNfc_field *f) 
+{
+    int len = 4*f->type->gsize_gauge*sizeof(suNfc)/sizeof(double);
+    double* dbl_ptr = (double*)(f->ptr);
+    for (int i = 0; i < len; ++i) 
+    {
+        dbl_ptr[i] = 0.0;
+    }
+}
+
+void zero_clover_force_cpu(suNf_field *f) 
+{
+    int len = 6*f->type->gsize_gauge*sizeof(suNf)/sizeof(double);
+    double* dbl_ptr = (double*)(f->ptr);
+    for (int i = 0; i < len; ++i) 
+    {
+        dbl_ptr[i] = 0.0;
     }
 }
 

@@ -12,7 +12,7 @@
 _FUNC(void, spinor_field_copy, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
 _BODY({
     _TWO_SPINORS_MATCHING(s1,s2);
-    memcpy(s1->ptr,s2->ptr,s1->type->gsize_spinor*sizeof(suNf_spinor));
+    memcpy(s1->ptr,s2->ptr,s1->type->gsize_spinor*sizeof(_SPINOR_TYPE));
 })
 
 /* Re <s1,s2> */
