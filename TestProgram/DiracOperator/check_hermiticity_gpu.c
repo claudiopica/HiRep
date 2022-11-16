@@ -185,11 +185,9 @@ int main(int argc, char *argv[])
 
   // Setup gauge field
   setup_gauge_fields();
-  lprintf("MAIN", 0, "Generating a random gauge field... ");
   random_u(u_gauge);
-  lprintf("MAIN", 0, "done.\n");
-  start_gf_sendrecv(u_gauge);
   represent_gauge_field();
+  copy_to_gpu_gfield_f(u_gauge_f);
 
   // Test block
   

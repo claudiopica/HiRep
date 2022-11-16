@@ -35,7 +35,7 @@ void global_sum(double *d, int n) {
   gettimeofday(&start,0);  
 #endif
   
- /* mpiret=MPI_Allreduce(d,pres,n,MPI_DOUBLE,MPI_SUM,GLB_COMM);
+ mpiret=MPI_Allreduce(d,pres,n,MPI_DOUBLE,MPI_SUM,GLB_COMM);
   
     
 #ifdef MPI_TIMING
@@ -58,7 +58,7 @@ void global_sum(double *d, int n) {
     d[n]=pres[n];	
   }
 #else
-*/
+
   /* for non mpi do nothing */
   return;
 #endif
