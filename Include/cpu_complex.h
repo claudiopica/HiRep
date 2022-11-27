@@ -151,7 +151,7 @@ typedef float complex hr_complex_flt;
 * Re((1-a)^*(1-b)) (a,b complex)
 */
 #define _complex_prod_m1_re(a,b) \
-   creal(conj(1-a)*b)
+   creal(conj(1-a)*(1-b))
 
 /*
 * Im(a^*b) (a,b complex)

@@ -89,6 +89,7 @@ void geometry_mpi_eo(void);
 void geometry_mem_alloc(void);
 int proc_up(int id, int dir);
 int proc_dn(int id, int dir);
+int proc_id(int coords[4]);
 
 void free_geometry_mpi_eo(void);
 
@@ -97,6 +98,10 @@ void test_geometry_mpi(void);
 void test_geometry_mpi_eo(void);
 void print_wdmatrix(char *filename);
 
+//New geometry test
+void define_geometry();
+void sync_field(geometry_descriptor *gd, int byte_per_site, int is_spinor_like, void *latticebuf);
+int test_define_geometry();
 
 #ifdef WITH_GPU
 #include "gpu.h"

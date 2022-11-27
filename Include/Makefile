@@ -31,5 +31,5 @@ suN_repr_func.h: $(WRREPR)
 suN.h suN_types.h: $(WRHEAD)
 
 macro_opt.h: $(MKDIR)/MkFlags
-	perl -e '$$_="$(CPPFLAGS)"."\n"; s/\s+/\n/g; s/-I\s*.*?\n//g; s/-D/#define /g; s/=/ /g; print; print "\n";' > $@
+	perl -e '$$_="$(MACRO)"."\n"; s/\s+/\n/g; s/-D/#define /g; s/=/ /g; print;' > $@
 

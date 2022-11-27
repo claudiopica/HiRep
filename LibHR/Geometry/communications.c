@@ -253,6 +253,11 @@ void bcast_int(int *i, int n) {
 
 /* functions for filling sending buffer */
 #ifdef WITH_MPI
+#ifdef WITH_NEW_GEOMETRY
+static void sync_gauge_field(suNg_field *gf) {
+  sync_field(gf->type, 4*sizeof(*gf->ptr), 0, gf->ptr);
+}
+#else
 static void sync_gauge_field(suNg_field *gf) {
   int i;
   geometry_descriptor *gd=gf->type;
@@ -271,6 +276,7 @@ static void sync_gauge_field(suNg_field *gf) {
      */
   }
 }
+#endif
 
 static void sync_clover_force_field(suNf_field *gf) {
   int i;
@@ -291,6 +297,11 @@ static void sync_clover_force_field(suNf_field *gf) {
   }
 }
 
+#ifdef WITH_NEW_GEOMETRY
+static void sync_spinor_field(spinor_field *p) {
+  sync_field(p->type, sizeof(*p->ptr), 1, p->ptr);
+}
+#else
 static void sync_spinor_field(spinor_field *p) {
   int i;
   /* int j, x, y; */
@@ -307,6 +318,7 @@ static void sync_spinor_field(spinor_field *p) {
        */
   }
 }
+#endif
 
 static void sync_gauge_transf(suNg_field *gf) {
   int i;

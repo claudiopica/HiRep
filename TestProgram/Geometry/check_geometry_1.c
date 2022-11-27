@@ -25,10 +25,16 @@ int main(int argc,char *argv[])
 
   setup_process(&argc, &argv);
 
+
   setup_gauge_fields();
 
+  // sync_field(u_gauge->type, 4*sizeof(*u_gauge->ptr), 0, u_gauge->ptr);
+#ifdef WITH_NEW_GEOMETRY
+  test_define_geometry();  
+#else
   test_geometry_mpi_eo();
-  
+#endif
+
   finalize_process();
 
   return 0;
