@@ -835,10 +835,9 @@ OpGroupStringPaths[px_, py_, pz_, iridx_, charge_] :=
 #include \"suN.h\"
 #include \"utils.h\"
 #include \"glueballs.h\"
-#include <string.h>\n "];
-  WriteString[ar,"#define ntors ",torindex,"\n "];
-  WriteString[ar,"static double PI=3.141592653589793238462643383279502884197;\n "];
-  WriteString[ar,"static double complex *tor_path_storage=NULL;\n "];
+#include <string.h>\n"];
+  WriteString[ar,"#define ntors ",torindex,"\n"];
+  WriteString[ar,"static double complex *tor_path_storage=NULL;\n"];
   Close[ar];
 
 
@@ -1641,31 +1640,29 @@ ar=OpenAppend[torfilename,FormatType->InputForm];
 WriteString[ar,"static void eval_time_momentum_torellons(int t, double complex * np, double complex **pf)
   {
     int nnx, nny, nnz, idx=0, in;
-    double complex ce = I * 2.0 * PI / GLB_X;
     if(tor_path_storage==NULL)
       {"];
 WriteString[ar,stringshift[torfilename]];
 WriteString[ar,"        tor_path_storage = malloc(ntors * X * Y * Z * sizeof(double complex));
         for (in = 0; in < ntors * X * Y * Z; in++)
             tor_path_storage[in] = 0.;
-    };\n"];
+    }\n"];
 WriteString[ar,"for (nny = 0; nny < Y; nny++)\nfor (nnz = 0; nnz < Z; nnz++)\n{\nfor (nnx = 0; nnx < X; nnx++)\n{\n"];
 WriteString[ar,"in = ipt(t, nnx, nny, nnz);\n"];
 WriteString[ar,"idx = ntors *(nnx + X * (nny + Y * nnz));\n"];
 Do[If[NumberQ[WrittenPoly[i]],If[FreeQ[TorList[i],L[az]]&&FreeQ[TorList[i],L[ay]],
-WriteString[ar,"tor_path_storage[",i,"+idx]= poly",i,"(in);\n"];];];;,{i,0,torindex-1}];
+WriteString[ar,"tor_path_storage[",i,"+idx]= poly",i,"(in);\n"];];];,{i,0,torindex-1}];
 WriteString[ar,"}
 pf[0][nny + Y * (nnz + Z * t)] += tor_path_storage[0 + ntors * (X * (nny + Y * nnz))];
-}"];
+}\n"];
 WriteString[ar,"for (nnz = 0; nnz < Z; nnz++)\nfor (nnx = 0; nnx < X; nnx++)\n{\nfor (nny = 0; nny < Y; nny++)\n{\n"];
 WriteString[ar,"in = ipt(t, nnx, nny, nnz);\n"];
-WriteString[ar,"idx = ntors *(nnx + X * (nny + Y * nnz));
-"];
+WriteString[ar,"idx = ntors *(nnx + X * (nny + Y * nnz));\n"];
 Do[If[NumberQ[WrittenPoly[i]],If[FreeQ[TorList[i],L[az]]&&FreeQ[TorList[i],L[ax]],
 WriteString[ar,"tor_path_storage[",i,"+idx]= poly",i,"(in);\n"];];];,{i,0,torindex-1}];
 WriteString[ar,"}
 pf[1][nnx + X * (nnz + Z * t)] += tor_path_storage[1 + ntors *(nnx + X * Y * nnz)];
-};\n"];
+}\n"];
 WriteString[ar,"for (nnx = 0; nnx < X; nnx++)\nfor (nny = 0; nny < Y; nny++)\n{\nfor (nnz = 0; nnz < Z; nnz++)\n{\n"];
 WriteString[ar,"in = ipt(t, nnx, nny, nnz);\n"];
 WriteString[ar,"idx = ntors * (nnx + X * (nny + Y * nnz));\n"];
@@ -1673,7 +1670,27 @@ Do[If[NumberQ[WrittenPoly[i]],If[FreeQ[TorList[i],L[ay]]&&FreeQ[TorList[i],L[ax]
 WriteString[ar,"tor_path_storage[",i,"+idx]= poly",i,"(in);\n"];];];,{i,0,torindex-1}];
 WriteString[ar,"}
 pf[2][nnx + X * (nny  + Y * t)] += tor_path_storage[2 + ntors * (nnx + X * nny )];
-};\n"];
+}\n"];
+
+cestring="";
+Do[        
+   Do[
+      Do[
+          If[ListQ[Torindex[px, py, pz, irrepidx,charge]],
+          Do[
+            Do[
+              idop = Torindex[px, py, pz, irrepidx,charge][[nop, irrepev]];
+              If[Not[SameQ[idop,0]],
+                  If[Not[SameQ[nnx px + nny py + nnz pz,0]],cestring="double complex ce = I * 2.0 * 3.141592653589793238462643383279502884197 / GLB_X;"];
+                ];
+             , {nop, 1, Length[Torindex[px, py, pz, irrepidx,charge]]}];
+          , {irrepev, 1, Length[bTOrthog[px, py, pz][[irrepidx]]]}];
+        ];
+      ,{charge,-1,1,2}];
+    ,{irrepidx, 1, Length[bTOrthog[px, py, pz]]}];
+  ,{px, -1, 1}, {py, -1, 1}, {pz, -1, 1}];
+WriteString[ar,cestring];
+
 
 ltornumberC=0;
 
@@ -1697,7 +1714,7 @@ Do[
       ,{charge,-1,1,2}];
     ,{irrepidx, 1, Length[bTOrthog[px, py, pz]]}];
   ,{px, -1, 1}, {py, -1, 1}, {pz, -1, 1}];
-WriteString[ar,"};\n};\n"];
+WriteString[ar,"}\n}\n"];
 (**)
   WriteString[ar, "void eval_all_torellon_ops(int t, double complex *numerical_tor_out, double complex ** polyf)
 {
@@ -1898,7 +1915,7 @@ WriteString[ar,"
             MPI_Gather((double *)lpoly, 2 * T, MPI_DOUBLE, (double *)gpoly, 2 * T, MPI_DOUBLE, 0, GLB_COMM);
 #endif
             for (i = 0; i < lcor->n_entries; i++)
-                pcor[abs(lcor->list[i].t2 - lcor->list[i].t1)] += conj(gpoly[lcor->list[i].t1]) * gpoly[lcor->list[i].t2] / (lcor->list[i].n_pairs * Y * Z);
+                pcor[abs(lcor->list[i].t2 - lcor->list[i].t1)] += conj(gpoly[lcor->list[i].t1]) * gpoly[lcor->list[i].t2] / (3.0 * lcor->list[i].n_pairs * Y * Z);
         }
     for (n1 = 0; n1 < X; n1++)
         for (n2 = 0; n2 < Z; n2++)
@@ -1910,7 +1927,7 @@ WriteString[ar,"
 #endif
 
             for (i = 0; i < lcor->n_entries; i++)
-                pcor[abs(lcor->list[i].t2 - lcor->list[i].t1)] += conj(gpoly[lcor->list[i].t1]) * gpoly[lcor->list[i].t2] / (lcor->list[i].n_pairs * X * Z);
+                pcor[abs(lcor->list[i].t2 - lcor->list[i].t1)] += conj(gpoly[lcor->list[i].t1]) * gpoly[lcor->list[i].t2] / (3.0 * lcor->list[i].n_pairs * X * Z);
         }
     for (n1 = 0; n1 < X; n1++)
         for (n2 = 0; n2 < Y; n2++)
@@ -1921,7 +1938,7 @@ WriteString[ar,"
             MPI_Gather((double *)lpoly, 2 * T, MPI_DOUBLE, (double *)gpoly, 2 * T, MPI_DOUBLE, 0, GLB_COMM);
 #endif
             for (i = 0; i < lcor->n_entries; i++)
-                pcor[abs(lcor->list[i].t2 - lcor->list[i].t1)] += conj(gpoly[lcor->list[i].t1]) * gpoly[lcor->list[i].t2] / (lcor->list[i].n_pairs * X * Y);
+                pcor[abs(lcor->list[i].t2 - lcor->list[i].t1)] += conj(gpoly[lcor->list[i].t1]) * gpoly[lcor->list[i].t2] / (3.0 * lcor->list[i].n_pairs * X * Y);
         }
    for (n1 = 0; n1 < GLB_T; n1++)
         lprintf(\"Measure ML\", 0, \" Polyakov Cor dt=%d ( %.10e %.10e )\\n\", n1, creal(pcor[n1]), cimag(pcor[n1]));
