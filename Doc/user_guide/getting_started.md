@@ -18,7 +18,7 @@ git clone https://github.com/claudiopica/HiRep
 ### Adjust Make Flags
 Adjust the file ```Make/MkFlags``` for the right compilation
 
-* Gauge group SU(NG) or SO(NG)
+#### Gauge group SU(NG) or SO(NG)
 ```
 NG=3
 
@@ -27,7 +27,7 @@ GAUGE_GROUP = GAUGE_SUN
 #GAUGE_GROUP = GAUGE_SON
 ```
 
-* Representation
+#### Representation
 ```
 REPR = REPR_FUNDAMENTAL
 #REPR = REPR_SYMMETRIC
@@ -35,7 +35,7 @@ REPR = REPR_FUNDAMENTAL
 #REPR = REPR_ADJOINT
 ```
 
-* Boundary Conditions
+#### Boundary Conditions
 
 Uncomment the line here, when you want to establish certain boundary conditions into the respective direction.
 ```
@@ -45,7 +45,7 @@ Uncomment the line here, when you want to establish certain boundary conditions 
 #Z => PERIODIC, ANTIPERIODIC, THETA
 ```
 
-* Macro parameters
+#### Macro parameters
 
 Then a number of macro parameters follow. Here you have to specify if you want to compile for certain boundary conditions by adding the identifier to the ```MACRO``` variable.
 
@@ -77,7 +77,7 @@ For compilation with GPU acceleration for CUDA GPUs, add the identifier ```-DWIT
 MACRO += -DWITH_GPU
 ```
 
-* Compilers, wrappers, preprocessors
+#### Compilers, wrappers, preprocessors
 
 A number of example combinations are already given in ```MkFlags```.
 
@@ -132,7 +132,7 @@ gauge start = random
 last conf = +1
 ```
 
-The "+" in front of ```last conf``` specifies the number of trajectories to be generated after the chosen startup configuration. I.e. if the startup configuration is trajectory number 5 and ```last conf = 6``` then one additional trajectory will be generated. If ```last conf = +6``` then six additional trajectories will be generated.
+The "+" in front of ```last conf``` specifies the number of trajectories to be generated after the chosen startup configuration. I.e. if the startup configuration is trajectory number 5 and ```last conf = 6``` then one additional trajectory will be generated. If ```last conf = +6``` then six additional trajectories will be generated, up until trajectory number 11.
 
 ### Execute Binary
 
