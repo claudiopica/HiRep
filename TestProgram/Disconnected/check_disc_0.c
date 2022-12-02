@@ -43,18 +43,18 @@
 #define M_PI 3.14159265358979323846264338327950288419716939937510
 #endif
 
-static double complex gid[16] = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.}; /* gid = tr Gamma  */
-static double complex g0[16] = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.};  /*  g0 = tr gamma_0 Gamma */
-static double complex g1[16] = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.};  /*  g1 = tr gamma_1 Gamma */
-static double complex g2[16] = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.};  /*  g2 = tr gamma_2 Gamma */
-static double complex g3[16] = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.};  /*  g3 = tr gamma_3 Gamma */
+static hr_complex gid[16] = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.}; /* gid = tr Gamma  */
+static hr_complex g0[16] = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.};  /*  g0 = tr gamma_0 Gamma */
+static hr_complex g1[16] = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.};  /*  g1 = tr gamma_1 Gamma */
+static hr_complex g2[16] = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.};  /*  g2 = tr gamma_2 Gamma */
+static hr_complex g3[16] = {0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.};  /*  g3 = tr gamma_3 Gamma */
 
 char *mes_channel_names[16] = {"g5", "g1", "g2", "g3", "-ig0g5", "-ig0g1", "-ig0g2", "-ig0g3", "id", "-ig5g1", "-ig5g2", "-ig5g3", "g0", "-ig5g0g1", "-ig5g0g2", "-ig5g0g3"};
 
 #define mult_mat(r, A, B)                      \
   {                                            \
     int _i, _j, _k;                            \
-    double complex wm[4][4];                   \
+    hr_complex wm[4][4];                   \
     for (_i = 0; _i < 4; _i++)                 \
       for (_j = 0; _j < 4; _j++)               \
       {                                        \
@@ -128,7 +128,7 @@ typedef struct _input_mesons
   }
 
 static double mass;
-void free_loops(double complex **loops, int n_mom);
+void free_loops(hr_complex **loops, int n_mom);
 
 input_mesons mes_ip = init_input_mesons(mes_ip);
 
@@ -137,19 +137,19 @@ FILE *fp;
 char path[1035];
 
 /*Gamma / 4 */
-double complex get_gid(double complex Gamma[4][4])
+hr_complex get_gid(hr_complex Gamma[4][4])
 {
-  double complex r;
+  hr_complex r;
   trace_mat(r, Gamma);
   return r;
 }
 /* gmu = tr Gamma gamma_mu   */
-double complex get_gmu(double complex Gamma[4][4], int mu)
+hr_complex get_gmu(hr_complex Gamma[4][4], int mu)
 {
   int sign;
-  double complex tmp[4][4];
-  double complex r;
-  double complex gmu[4][4];
+  hr_complex tmp[4][4];
+  hr_complex r;
+  hr_complex gmu[4][4];
 
   if (mu == 1)
     g1_debug(gmu, &sign);
@@ -166,7 +166,7 @@ double complex get_gmu(double complex Gamma[4][4], int mu)
   return r;
 }
 
-int compare_corr_abs(double complex *corr_ex, double complex *corr_num, int ip, char *name[16], double tol)
+int compare_corr_abs(hr_complex *corr_ex, hr_complex *corr_num, int ip, char *name[16], double tol)
 {
   int retval = 0;
   int nGamma = 16;
@@ -195,14 +195,14 @@ int main(int argc, char *argv[])
   int n_mom_tot = 0;
   int nhits;
   data_storage_array *out_corr = NULL;
-  double complex **ex_loops;
-  double complex **mean_loops;
+  hr_complex **ex_loops;
+  hr_complex **mean_loops;
   double abs_tol = 3e-1;
   double rel_tol_scalar_loop = 1e-3;
   struct timeval start, end, etime;
 
-  double complex g[16][4][4];
-  double complex tmp[4][4];
+  hr_complex g[16][4][4];
+  hr_complex tmp[4][4];
   g5_debug(g[0], &sign);
   g1_debug(g[1], &sign);
   g2_debug(g[2], &sign);
@@ -271,14 +271,14 @@ int main(int argc, char *argv[])
 
   lprintf("CORR", 0, "Number of noise vector : nhits = %i \n", nhits);
 
-  ex_loops = (double complex **)malloc(sizeof(double complex *) * n_mom_tot);
+  ex_loops = (hr_complex **)malloc(sizeof(hr_complex *) * n_mom_tot);
   for (int l = 0; l < n_mom_tot; l++)
-    ex_loops[l] = (double complex *)calloc(n_Gamma, sizeof(double complex));
+    ex_loops[l] = (hr_complex *)calloc(n_Gamma, sizeof(hr_complex));
 
   //stochastic & time average
-  mean_loops = (double complex **)malloc(sizeof(double complex *) * n_mom_tot);
+  mean_loops = (hr_complex **)malloc(sizeof(hr_complex *) * n_mom_tot);
   for (int l = 0; l < n_mom_tot; l++)
-    mean_loops[l] = (double complex *)calloc(n_Gamma, sizeof(double complex));
+    mean_loops[l] = (hr_complex *)calloc(n_Gamma, sizeof(hr_complex));
 
   measure_loops(&mass, nhits, 0, mes_ip.precision, source_type, mes_ip.n_mom, STORE, &out_corr);
 
@@ -328,10 +328,10 @@ double denom(double k[4])
   res = square(mass + 4.0 - cos((2.0 * M_PI * k[0]) / GLB_T) - cos((2.0 * M_PI * k[1]) / GLB_X) - cos((2.0 * M_PI * k[2]) / GLB_Y) - cos((2.0 * M_PI * k[3]) / GLB_Z)) + square(sin((2.0 * M_PI * k[0]) / GLB_T)) + square(sin((2.0 * M_PI * k[1]) / GLB_X)) + square(sin((2.0 * M_PI * k[2]) / GLB_Y)) + square(sin((2.0 * M_PI * k[3]) / GLB_Z));
   return res;
 }
-double complex compute_phase(int px, int py, int pz)
+hr_complex compute_phase(int px, int py, int pz)
 {
 
-  double complex res, phase;
+  hr_complex res, phase;
   double x, y, z, pdotx;
 
   _complex_0(res);
@@ -350,11 +350,11 @@ double complex compute_phase(int px, int py, int pz)
   //printf("%e %e %e \n",creal(res*conj(res)),cimag(res*conj(res)), ((double) px)*x/GLB_X);
   return res;
 }
-void free_loops(double complex **loops, int n_mom)
+void free_loops(hr_complex **loops, int n_mom)
 {
   double A, B[4];
   double tmp, norm;
-  double complex phase;
+  hr_complex phase;
   int i, ll;
   int px, py, pz;
   double k[4];

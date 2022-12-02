@@ -83,7 +83,17 @@ write_suN_h($Ng,$fundsuff,$c1,"O");
 #system("./write_suN_def.pl $Nf f $c2 O");
 write_suN_h($Nf,$repsuff,$c2,"O");
 
+write_avx_support();
+
 write_epilog();
+
+sub write_avx_support {
+  print <<END
+
+#include "avx2_hirep.h"
+
+END
+}
 
 
 #end main program
@@ -295,7 +305,9 @@ if ($su2quat==0) {
   #write_suN_TA();
   write_suN_FMAT();
   write_suN_multiply();
+  write_suN_double_multiply();
   write_suN_inverse_multiply();
+  write_suN_double_inverse_multiply();
   write_suN_zero();
 
   if ($complex eq "R") { # we only need these functions at the moment...
@@ -317,7 +329,9 @@ if ($su2quat==0) {
     write_suNr_sqnorm();
     write_suNr_minus();
 	write_suNr_multiply();
+	write_suNr_double_multiply();
     write_suNr_inverse_multiply();
+    write_suNr_double_inverse_multiply();
  	write_suNr_zero();
   } else {
 	print "#define _${dataname}c_multiply(a,b,c) _${dataname}_multiply(a,b,c)\n\n";
@@ -472,10 +486,10 @@ write_spinor_pplus();
 
 sub write_suN_vector {
   print $structdef;
-  print "   double complex $cname\[$N\];\n";
+  print "   hr_complex $cname\[$N\];\n";
   print "} ${rdataname}_vector;\n\n";
   print $structdef;
-  print "   float complex $cname\[$N\];\n";
+  print "   hr_complex_flt $cname\[$N\];\n";
   print "} ${rdataname}_vector_flt;\n\n";
 }
 
@@ -495,10 +509,10 @@ sub write_suN_algebra_vector {
 sub write_suN {
   print $structdef;
 	my $d=($N*$N);
-  print "   double complex $cname\[$d\];\n";
+  print "   hr_complex $cname\[$d\];\n";
   print "} $dataname;\n\n";
   print $structdef;
-  print "   float complex $cname\[$d\];\n";
+  print "   hr_complex_flt $cname\[$d\];\n";
   print "} ${dataname}_flt;\n\n";
 }
 
@@ -1449,6 +1463,15 @@ sub write_suN_multiply {
 	}
 }
 
+sub write_suN_double_multiply {
+  print "/* SU(N) matrix u times SU(N) vectors s1,s2 */\n";
+  print "/* r1=u*s1 */\n";
+  print "/* r2=u*s2 */\n";
+  print "#define _${dataname}_double_multiply(r1,r2,u,s1,s2)\\\n";
+  print "      _${dataname}_multiply(r1,u,s1);\\\n";
+  print "      _${dataname}_multiply(r2,u,s2)\n\n";
+}
+
 sub write_suNr_multiply {
   print "/* SU(N) matrix u times SU(N) vector s */\n";
   print "/* r=u*s */\n";
@@ -1485,6 +1508,15 @@ sub write_suNr_multiply {
 		print "      }\\\n";
 		print "   } while(0) \n\n";
 	}
+}
+
+sub write_suNr_double_multiply {
+  print "/* SU(N) matrix u times SU(N) vectors s1,s2 */\n";
+  print "/* r1=u*s1 */\n";
+  print "/* r2=u*s2 */\n";
+  print "#define _${rdataname}_double_multiply(r1,r2,u,s1,s2)\\\n";
+  print "      _${rdataname}_multiply(r1,u,s1);\\\n";
+  print "      _${rdataname}_multiply(r2,u,s2)\n\n";
 }
 
 sub write_su2_decode {
@@ -1665,6 +1697,15 @@ sub write_suN_inverse_multiply {
 	}
 }
 
+sub write_suN_double_inverse_multiply {
+  print "/* SU(N) matrix u^dagger times SU(N) vectors s1,s2 */\n";
+  print "/* r1=(u^dagger)*s1 */\n";
+  print "/* r2=(u^dagger)*s2 */\n";
+  print "#define _${dataname}_double_inverse_multiply(r1,r2,u,s1,s2)\\\n";
+  print "      _${dataname}_inverse_multiply(r1,u,s1);\\\n";
+  print "      _${dataname}_inverse_multiply(r2,u,s2)\n\n";
+}
+
 sub write_suNr_inverse_multiply {
   print "/* SU(N) matrix u^dagger times SU(N) vector s */\n";
   print "/* r=(u^dagger)*s */\n";
@@ -1705,6 +1746,14 @@ sub write_suNr_inverse_multiply {
 	}
 }
 
+sub write_suNr_double_inverse_multiply {
+  print "/* SU(N) matrix u^dagger times SU(N) vectors s1,s2 */\n";
+  print "/* r1=(u^dagger)*s1 */\n";
+  print "/* r2=(u^dagger)*s2 */\n";
+  print "#define _${rdataname}_double_inverse_multiply(r1,r2,u,s1,s2)\\\n";
+  print "      _${rdataname}_inverse_multiply(r1,u,s1);\\\n";
+  print "      _${rdataname}_inverse_multiply(r2,u,s2)\n\n";
+}
 #
 # MATRIX-MATRIX OPERATIONS
 #
@@ -3814,18 +3863,18 @@ sub  write_read_spinor_gpu {
     print "   do {  \\\n";
     print "      int __iz=(iy)+((x)*$N)*(stride); \\\n";
     for($i=0; $i<$N-1; $i++) {
-        print "      (v).c\[$i\]=((float complex*)(in))\[__iz\]; __iz+=(stride); \\\n";
+        print "      (v).c\[$i\]=((hr_complex_flt*)(in))\[__iz\]; __iz+=(stride); \\\n";
     }
-    print "      (v).c\[$i\]=((float complex*)(in))\[__iz\]; \\\n";
+    print "      (v).c\[$i\]=((hr_complex_flt*)(in))\[__iz\]; \\\n";
     print "   } while (0) \n\n";
 
     print "#define _${rdataname}_read_spinor_gpu(stride,v,in,iy,x) \\\n";
     print "   do {  \\\n";
     print "      int __iz=(iy)+((x)*$N)*(stride); \\\n";
     for($i=0; $i<$N-1; $i++) {
-        print "      (v).c\[$i\]=((double complex*)(in))\[__iz\]; __iz+=(stride); \\\n";
+        print "      (v).c\[$i\]=((hr_complex*)(in))\[__iz\]; __iz+=(stride); \\\n";
     }
-    print "      (v).c\[$i\]=((double complex*)(in))\[__iz\]; \\\n";
+    print "      (v).c\[$i\]=((hr_complex*)(in))\[__iz\]; \\\n";
     print "   } while (0) \n\n";
 
 }
@@ -3839,18 +3888,18 @@ sub  write_write_spinor_gpu {
     print "   do {  \\\n";
     print "      int __iz=(iy)+((x)*$N)*(stride); \\\n";
     for($i=0; $i<$N-1; $i++) {
-        print "      ((float complex*)(out))\[__iz\]=(v).c\[$i\]; __iz+=(stride); \\\n";
+        print "      ((hr_complex_flt*)(out))\[__iz\]=(v).c\[$i\]; __iz+=(stride); \\\n";
     }
-    print "      ((float complex*)(out))\[__iz\]=(v).c\[$i\]; \\\n";
+    print "      ((hr_complex_flt*)(out))\[__iz\]=(v).c\[$i\]; \\\n";
     print "   } while (0) \n\n";
 
     print "#define _${rdataname}_write_spinor_gpu(stride,v,out,iy,x) \\\n";
     print "   do {  \\\n";
     print "      int __iz=(iy)+((x)*$N)*(stride); \\\n";
     for($i=0; $i<$N-1; $i++) {
-        print "      ((double complex*)(out))\[__iz\]=(v).c\[$i\]; __iz+=(stride); \\\n";
+        print "      ((hr_complex*)(out))\[__iz\]=(v).c\[$i\]; __iz+=(stride); \\\n";
     }
-    print "      ((double complex*)(out))\[__iz\]=(v).c\[$i\]; \\\n";
+    print "      ((hr_complex*)(out))\[__iz\]=(v).c\[$i\]; \\\n";
     print "   } while (0) \n\n";
 
 }

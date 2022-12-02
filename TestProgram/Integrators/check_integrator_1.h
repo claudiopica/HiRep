@@ -87,5 +87,6 @@ int save_conf(hmc_flow *rf, int id);
 int save_scalar_conf(hmc_flow *rf, int id);
 double integrate_ghmc(int regenerate, ghmc_par *update_par);
 void set_integrator_nsteps(ghmc_par *gpar, int nsteps);
+void set_first_integrator_nsteps(ghmc_par *gpar, int nsteps);
 void set_integrator_type(ghmc_par *gpar, int type);
 #endif /* HMC_UTILS_H */
