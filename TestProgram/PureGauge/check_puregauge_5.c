@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
 
   int return_value = 0, n, nt;
 
-  double complex *dop, *dop1;
+  hr_complex *dop, *dop1;
 
   setup_process(&argc, &argv);
 
@@ -82,8 +82,8 @@ int main(int argc, char *argv[])
   represent_gauge_field();
   lprintf("MAIN", 0, "done.\n\n");
 
-  dop = malloc(T * total_n_glue_op * sizeof(double complex));
-  dop1 = malloc(T * total_n_glue_op * sizeof(double complex));
+  dop = malloc(T * total_n_glue_op * sizeof(hr_complex));
+  dop1 = malloc(T * total_n_glue_op * sizeof(hr_complex));
 
   for (n = 0; n < T * total_n_glue_op; n++)
   {

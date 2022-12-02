@@ -56,13 +56,13 @@
 //}
 
 static int init_gamma = 0;
-double complex my_gamma[4][4][4];
+hr_complex my_gamma[4][4][4];
 
 int compute_gamma(int g[4], int ic)
 {
   int p[4], c[4], shift[4];
   double dbl;
-  double complex locmy_gamma[4][4][4];
+  hr_complex locmy_gamma[4][4][4];
   int return_value = 0;
 
   spinor_field *in, *out;

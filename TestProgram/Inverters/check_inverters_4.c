@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
   int i;
   int nev, nevt, ie, status;
   double omega1, omega2, res, ubnd;
-  double complex z;
+  hr_complex z;
 
   logger_map("DEBUG", "debug");
 

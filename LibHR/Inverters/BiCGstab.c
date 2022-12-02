@@ -23,9 +23,9 @@ int BiCGstab(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field 
 	spinor_field *r, *r1, *o, *Ms, *Mo, *o0;
 	spinor_field *sptmp;
 
-	double complex delta, phi;
-	double complex alpha, beta, chi;
-	double complex ctmp1, ctmp2;
+	hr_complex delta, phi;
+	hr_complex alpha, beta, chi;
+	hr_complex ctmp1, ctmp2;
 	double rtmp1;
 	double innorm2;
 

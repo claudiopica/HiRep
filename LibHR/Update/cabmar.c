@@ -22,8 +22,8 @@
 static inline void rotate(suNg_vector *pu1, suNg_vector *pu2, double *s)
 {
   int i;
-  double complex z1,z2;
-  double complex *cu1, *cu2;
+  hr_complex z1,z2;
+  hr_complex *cu1, *cu2;
   
   cu1 = &((*pu1).c[0]);
   cu2 = &((*pu2).c[0]);
@@ -40,7 +40,7 @@ static inline void rotate(suNg_vector *pu1, suNg_vector *pu2, double *s)
 //static inline void rotate(suNg_vector *pu1, suNg_vector *pu2, double *s)
 //{
 //  int i;
-//  double complex *cu1, *cu2;
+//  hr_complex *cu1, *cu2;
 //
 //  cu1 = &((*pu1).c[0]);
 //  cu2 = &((*pu2).c[0]);

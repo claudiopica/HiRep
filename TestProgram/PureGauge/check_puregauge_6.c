@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
   w2 = &s1;
   w3 = &s2;
 
-  double complex dop, dop1;
+  hr_complex dop, dop1;
   double max_diff[2], min_val;
   double cop;
 

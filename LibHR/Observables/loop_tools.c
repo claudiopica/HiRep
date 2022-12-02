@@ -49,7 +49,7 @@
 
 void measure_bilinear_loops_4spinorfield(spinor_field *prop, spinor_field *source, int src_id, int tau, int col, int eo, storage_switch swc, data_storage_array **ret)
 {
-	double complex **corr;
+	hr_complex **corr;
 	double *corr_re[16];
 	double *corr_im[16];
 	suNf_spin_matrix sma, smb, sm1;
@@ -58,7 +58,7 @@ void measure_bilinear_loops_4spinorfield(spinor_field *prop, spinor_field *sourc
 	int iGamma;
 	int tau_min = 0;
 	int tau_max = GLB_T;
-	double complex tr;
+	hr_complex tr;
 
 	struct timeval start, end, etime;
 
@@ -70,9 +70,9 @@ void measure_bilinear_loops_4spinorfield(spinor_field *prop, spinor_field *sourc
 		corr_im[i] = (double *)calloc(GLB_T, sizeof(double));
 	}
 
-	corr = (double complex **)malloc(sizeof(double complex *) * NGamma);
+	corr = (hr_complex **)malloc(sizeof(hr_complex *) * NGamma);
 	for (int i = 0; i < NGamma; i++)
-		corr[i] = (double complex *)calloc(GLB_T, sizeof(double complex));
+		corr[i] = (hr_complex *)calloc(GLB_T, sizeof(hr_complex));
 
 	if (tau != -1)
 	{
@@ -449,8 +449,8 @@ void measure_bilinear_loops_spinorfield(spinor_field *prop, spinor_field *source
 	int NGamma = 16;
 	int n_mom_tot = n_mom * n_mom * n_mom;
 	double pdotx;
-	double complex phase;
-	double complex ***corr;
+	hr_complex phase;
+	hr_complex ***corr;
 	double *corr_re[n_mom_tot][16];
 	double *corr_im[n_mom_tot][16];
 
@@ -458,17 +458,17 @@ void measure_bilinear_loops_spinorfield(spinor_field *prop, spinor_field *source
 	pt[0] = pt[1] = pt[2] = pt[3] = 0;
 
 	int i, j, ix, t, x, y, z, tc;
-	corr = (double complex ***)malloc(sizeof(double complex **) * n_mom_tot);
+	corr = (hr_complex ***)malloc(sizeof(hr_complex **) * n_mom_tot);
 
 	for (i = 0; i < n_mom_tot; i++)
-		corr[i] = (double complex **)malloc(sizeof(double complex *) * NGamma);
+		corr[i] = (hr_complex **)malloc(sizeof(hr_complex *) * NGamma);
 	for (i = 0; i < n_mom_tot; i++)
 		for (j = 0; j < NGamma; j++)
-			corr[i][j] = (double complex *)calloc(GLB_T, sizeof(double complex));
+			corr[i][j] = (hr_complex *)calloc(GLB_T, sizeof(hr_complex));
 
 	int offset = 0;
 	suNf_spinor tmp_spinor;
-	double complex tmp;
+	hr_complex tmp;
 	struct timeval start, end, etime;
 
 	gettimeofday(&start, 0);
@@ -476,7 +476,7 @@ void measure_bilinear_loops_spinorfield(spinor_field *prop, spinor_field *source
 	for (j = 0; j < n_mom_tot; ++j)
 		for (i = 0; i < NGamma; ++i)
 		{
-			//corr[j][i]=(double complex*) malloc(sizeof(double complex)*size);
+			//corr[j][i]=(hr_complex*) malloc(sizeof(hr_complex)*size);
 			corr_re[j][i] = (double *)calloc(GLB_T, sizeof(double));
 			corr_im[j][i] = (double *)calloc(GLB_T, sizeof(double));
 		}

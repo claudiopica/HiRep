@@ -108,7 +108,7 @@ void Qtm_p(spinor_field *out, spinor_field *in){
 #ifdef UPDATE_EO
     Qhat_eopre(static_mass, static_mu,out, in);
 #else
-  double complex imu;
+  hr_complex imu;
   imu=I*static_mu;
   g5Dphi(static_mass, out, in);
   spinor_field_mulc_add_assign_f(out,imu,in);
@@ -119,7 +119,7 @@ void Qtm_m(spinor_field *out, spinor_field *in){
 #ifdef UPDATE_EO
     Qhat_eopre(static_mass, -static_mu,out, in);
 #else
-  double complex imu;
+  hr_complex imu;
   imu=-I*static_mu;
   g5Dphi(static_mass, out, in);
   spinor_field_mulc_add_assign_f(out,imu,in);
@@ -138,7 +138,7 @@ void QpQm_tm(spinor_field *out, spinor_field *in){
 
 void Qtm_p_alt(spinor_field *out, spinor_field *in){
 #ifdef UPDATE_EO
-  double complex imu;
+  hr_complex imu;
   imu=I*static_mu; 	
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
 	g5Cphi_eopre(static_mass,out,in);
@@ -147,7 +147,7 @@ void Qtm_p_alt(spinor_field *out, spinor_field *in){
 #endif
 	spinor_field_mulc_add_assign_f(out,imu,in);
 #else
-	double complex imu;
+	hr_complex imu;
 	imu=I*static_mu;
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
 	g5Cphi(static_mass,out,in);
@@ -160,7 +160,7 @@ void Qtm_p_alt(spinor_field *out, spinor_field *in){
 
 void Qtm_m_alt(spinor_field *out, spinor_field *in){
 #ifdef UPDATE_EO
-	double complex imu;
+	hr_complex imu;
 	imu=-I*static_mu;
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
 	g5Cphi_eopre(static_mass,out,in);
@@ -169,7 +169,7 @@ void Qtm_m_alt(spinor_field *out, spinor_field *in){
 #endif
 	spinor_field_mulc_add_assign_f(out,imu,in);
 #else
-	double complex imu;
+	hr_complex imu;
 	imu=-I*static_mu;
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
 	g5Cphi(static_mass,out,in);

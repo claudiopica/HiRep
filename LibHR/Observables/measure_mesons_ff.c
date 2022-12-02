@@ -109,7 +109,7 @@ static void op_spinor(suNf_spinor* out, suNf_spinor* in, gamma_ind i){
 #define corr_ind(px,py,pz,n_mom,tc,nm,cm) ((px)*(n_mom)*(n_mom)*(lt)*(nm)+(py)*(n_mom)*(lt)*(nm)+(pz)*(lt)*(nm)+ ((cm)*(lt)) +(tc))
 static void measure_mesons_disconnected_core(spinor_field* psi0, spinor_field* psi1, spinor_field* eta, meson_observable* mo, int offset,int lt){
   int ix,t,x,y,z,tc;
-  double complex tr;
+  hr_complex tr;
   //suNf_spin_matrix sma,smb, sm1,sm2,smtmp1,smtmp2,sm_src;
   meson_observable* motmp=mo;
   suNf_spinor sma, smtmp1,sm_src;

@@ -82,7 +82,7 @@ int eva_tuned(int nev,int nevt,int init,int kmax,
                spinor_field *ev,double d[],int *status);
 
 void jacobi1(int n,double a[],double d[],double v[]);
-void jacobi2(int n,double complex a[],double d[],double complex v[]);
+void jacobi2(int n,hr_complex a[],double d[],hr_complex v[]);
 
 
 

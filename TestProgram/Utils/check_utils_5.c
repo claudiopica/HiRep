@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
     int shift[4];
     double plaq[2];
     spinor_field *ss, *ss_e, *ss_o;
-    double complex sobs[7];
+    hr_complex sobs[7];
 
     setup_process(&argc, &argv);
 

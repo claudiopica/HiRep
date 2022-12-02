@@ -96,9 +96,9 @@ void propagator_mul_left_right(suNf_propagator *out, suNf_propagator *in, int mu
 }
 
 // baryons 1 ; C[beta][delta]  = S^ii' StildeT^jj' S^ kk'
-void _propagator_baryon1_mul2(double complex C[4][4], suNf_propagator S, suNf_propagator Stilde, int i, int ip, int j, int jp, int k, int kp)
+void _propagator_baryon1_mul2(hr_complex C[4][4], suNf_propagator S, suNf_propagator Stilde, int i, int ip, int j, int jp, int k, int kp)
 {
-	double complex tmp[4][4];
+	hr_complex tmp[4][4];
 
 	for (int alpha = 0; alpha < 4; ++alpha)
 	{
@@ -126,9 +126,9 @@ void _propagator_baryon1_mul2(double complex C[4][4], suNf_propagator S, suNf_pr
 }
 
 // baryons 2 ; C[beta][delta]  = S^ii'_*tr(_S^ jj' StilteT^kk'
-void _propagator_baryon2_mul2(double complex C[4][4], suNf_propagator S, suNf_propagator Stilde, int i, int ip, int j, int jp, int k, int kp)
+void _propagator_baryon2_mul2(hr_complex C[4][4], suNf_propagator S, suNf_propagator Stilde, int i, int ip, int j, int jp, int k, int kp)
 {
-	double complex tmp;
+	hr_complex tmp;
 	_complex_0(tmp);
 
 	for (int alpha = 0; alpha < 4; ++alpha)
@@ -156,11 +156,11 @@ void contract_baryons(spinor_field *psi0, int tau,storage_switch swc, data_stora
 	suNf_propagator Snucleon[2][2]; // Stilde for the nucleon
 	suNf_propagator Sdelta[4][4];   // Stilde for the delta
 
-	double complex C1[4][4]; // to initialize
-	double complex C2[4][4]; // to initialize
+	hr_complex C1[4][4]; // to initialize
+	hr_complex C2[4][4]; // to initialize
 
-	double complex corr_nucleon[GLB_T][2][2][4][4];
-	double complex corr_delta[GLB_T][4][4][4][4];
+	hr_complex corr_nucleon[GLB_T][2][2][4][4];
+	hr_complex corr_delta[GLB_T][4][4][4][4];
 
 	double col_factor[NF][NF][NF][NF][NF][NF];
 	double eps[NF][NF][NF];

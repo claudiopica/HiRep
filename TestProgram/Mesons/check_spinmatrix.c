@@ -69,10 +69,10 @@ static void print_spin_matrix(suNf_spin_matrix S, const char name[])
     }
   }
 }
-static double complex spin_matrix_norm_diff(suNf_spin_matrix sm1, suNf_spin_matrix sm2)
+static hr_complex spin_matrix_norm_diff(suNf_spin_matrix sm1, suNf_spin_matrix sm2)
 {
   int k;
-  double complex z = 0.;
+  hr_complex z = 0.;
   suNf_spin_matrix sm_diff;
 
   _spinmatrix_sub(sm_diff, sm1, sm2);
@@ -83,7 +83,7 @@ static double complex spin_matrix_norm_diff(suNf_spin_matrix sm1, suNf_spin_matr
   }
   return z;
 }
-static void transpose_mat(double complex At[4][4], double complex A[4][4])
+static void transpose_mat(hr_complex At[4][4], hr_complex A[4][4])
 {
   int i, j;
   for (i = 0; i < 4; i++)
@@ -114,7 +114,7 @@ static void transpose_mat(double complex At[4][4], double complex A[4][4])
 #define mult_mat(r, A, B)                      \
   {                                            \
     int _i, _j, _k;                            \
-    double complex wm[4][4];                   \
+    hr_complex wm[4][4];                   \
     for (_i = 0; _i < 4; _i++)                 \
       for (_j = 0; _j < 4; _j++)               \
       {                                        \
@@ -177,7 +177,7 @@ static void transpose_mat(double complex At[4][4], double complex A[4][4])
 // compute the transpose of (A^T * sm^T)^T = sm A
 #define mult_4spinor_mat(sm, A, in)          \
   {                                          \
-    double complex At[4][4];                 \
+    hr_complex At[4][4];                 \
     suNf_spin_matrix smtmp1, smtmp2, out;    \
     suNf_spinor tmp_spinor[4];               \
     transpose_mat(At, A);                    \
@@ -191,7 +191,7 @@ static void transpose_mat(double complex At[4][4], double complex A[4][4])
     transpose_spin_matrix(sm, smtmp2);       \
   }
 
-static void print_mat2(double complex mat[4][4], const char name[])
+static void print_mat2(hr_complex mat[4][4], const char name[])
 {
   int i, j;
   lprintf("MAIN", 0, "%s = \n", name);
@@ -209,11 +209,11 @@ static void print_mat2(double complex mat[4][4], const char name[])
 int main(int argc, char *argv[])
 {
   int sign, i;
-  double complex ctest = 0.;
+  hr_complex ctest = 0.;
   suNf_spinor in[4];
   suNf_spin_matrix sma, smc;
   suNf_spin_matrix smb[16];
-  double complex g[16][4][4];
+  hr_complex g[16][4][4];
   char *list_g[16] = {"g0", "g1", "g2", "g3", "g5", "g0g5", "g5g0", "g5g1", "g5g2", "g5g3", "g0g1", "g0g2", "g0g3", "g5g0g1", "g5g0g2", "g5g0g3"};
 
   int return_value = 0;

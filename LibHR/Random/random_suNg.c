@@ -28,8 +28,8 @@ void gaussian_suNg_vector(suNg_vector *v)
 /* generates a random SU(N) matrix via SU(2) rotations */
 static void rotate(suNg_vector *pu1, suNg_vector *pu2, double s[4]) /* same as in cabmar */
 {
-	  double complex z1,z2;
-	  double complex *cu1, *cu2;
+	  hr_complex z1,z2;
+	  hr_complex *cu1, *cu2;
   
 	  cu1 = &((*pu1).c[0]);
 	  cu2 = &((*pu2).c[0]);

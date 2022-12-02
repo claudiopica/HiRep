@@ -55,7 +55,7 @@ double plaq(int ix, int mu, int nu)
 #endif
 }
 
-void cplaq(double complex *ret, int ix, int mu, int nu)
+void cplaq(hr_complex *ret, int ix, int mu, int nu)
 {
   int iy, iz;
   suNg *v1, *v2, *v3, *v4, w1, w2, w3;
@@ -166,13 +166,13 @@ void avr_plaquette_time(double *plaqt, double *plaqs)
 
 void full_plaquette()
 {
-  static double complex pa[6];
-  static double complex r0;
-  static double complex r1;
-  static double complex r2;
-  static double complex r3;
-  static double complex r4;
-  static double complex r5;
+  static hr_complex pa[6];
+  static hr_complex r0;
+  static hr_complex r1;
+  static hr_complex r2;
+  static hr_complex r3;
+  static hr_complex r4;
+  static hr_complex r5;
 
   _OMP_PRAGMA(single)
   {
@@ -196,7 +196,7 @@ void full_plaquette()
 
     _SITE_FOR_SUM(&glattice, ixp, ix, r0, r1, r2, r3, r4, r5)
     {
-      double complex tmp;
+      hr_complex tmp;
 
       cplaq(&tmp, ix, 1, 0);
       r0 += tmp;
@@ -335,7 +335,7 @@ void full_momenta(suNg_av_field *momenta)
   free_sfield(la);
 }
 
-void cplaq_wrk(double complex *ret, int ix, int mu, int nu)
+void cplaq_wrk(hr_complex *ret, int ix, int mu, int nu)
 {
   int iy, iz;
   suNg *v1, *v2, *v3, *v4, w1, w2, w3;
@@ -369,9 +369,9 @@ void cplaq_wrk(double complex *ret, int ix, int mu, int nu)
 #endif
 }
 
-double complex avr_plaquette_wrk()
+hr_complex avr_plaquette_wrk()
 {
-  static double complex pa, tmp;
+  static hr_complex pa, tmp;
   suNg_field *_u = u_gauge_wrk();
   start_gf_sendrecv(_u);
 

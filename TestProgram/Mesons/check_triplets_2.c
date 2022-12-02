@@ -23,7 +23,7 @@
 
 //#error "Old version of Mesons, it should be updated"
 
-void print_mat2(double complex mat[4][4], const char name[]) {
+void print_mat2(hr_complex mat[4][4], const char name[]) {
   int i,j;
   lprintf("MAIN",0,"%s = \n", name);
   for(i=0; i<4; i++) {
@@ -88,7 +88,7 @@ void print_mat2(double complex mat[4][4], const char name[]) {
     for(_i=0; _i<4; _i++) { \
       A[_i][_i]=conj(A[_i][_i]); \
       for(_j=_i+1; _j<4; _j++) { \
-        double complex _tmp; \
+        hr_complex _tmp; \
         _tmp=A[_i][_j]; \
         A[_i][_j]=conj(A[_j][_i]); \
         A[_j][_i]=conj(_tmp); \
@@ -100,7 +100,7 @@ void print_mat2(double complex mat[4][4], const char name[]) {
 #define adj_mat_alt(A) \
   { \
     int _i, _j; \
-    double complex B[4][4]; \
+    hr_complex B[4][4]; \
     for(_i=0; _i<4; _i++) \
     for(_j=0; _j<4; _j++) { \
         B[_i][_j]=A[_i][_j]; \
@@ -119,7 +119,7 @@ void print_mat2(double complex mat[4][4], const char name[]) {
 #define mult_mat(A,B) \
   { \
     int _i, _j, _k; \
-    double complex wm[4][4]; \
+    hr_complex wm[4][4]; \
     for(_i=0; _i<4; _i++) \
     for(_j=0; _j<4; _j++) { \
       wm[_i][_j] = 0. +I*0.; \
@@ -157,11 +157,11 @@ void print_mat2(double complex mat[4][4], const char name[]) {
 
 int main(int argc,char *argv[])
 {
-	double complex gamma[5][4][4];
-	double complex Gamma[4][4];
-	double complex test[4][4];
-	double complex rmat[4][4];
-	double complex trace, ctest;
+	hr_complex gamma[5][4][4];
+	hr_complex Gamma[4][4];
+	hr_complex test[4][4];
+	hr_complex rmat[4][4];
+	hr_complex trace, ctest;
   double tol=1.e-15;
 	int sign;
   int return_value=0;

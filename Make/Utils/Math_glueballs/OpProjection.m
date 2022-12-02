@@ -570,7 +570,7 @@ MapOptoCindex for the C indetification of the operators and Oplist for the repor
 *)
 GenerateCchecks[]:=Module[{Op,OpTmp,ar,irrepdim,EvaluatedQ,RMatrixOp, TorTmp,RMatrixTor,Tor,Px, Py, Pz, irrepindex, i, charge},
   ar=OpenAppend[checkgbfunctionsfilename,FormatType->InputForm];
-  WriteString[ar,"/*This is an automatically generated function, do not edit.*/\n#define Complex(a,b) ((a)+I*(b))\nstatic int fullgbcheck(int rotid, double complex *rotated, double complex *unrotated)\n{\n#define rotfun(a) rotated[(a)]\n#define unrotfun(a) unrotated[(a)]\n#if total_n_glue_op>0\ndouble complex tmp[3];\n#endif\nint return_value=0;\n"];
+  WriteString[ar,"/*This is an automatically generated function, do not edit.*/\n#define Complex(a,b) ((a)+I*(b))\nstatic int fullgbcheck(int rotid, hr_complex *rotated, hr_complex *unrotated)\n{\n#define rotfun(a) rotated[(a)]\n#define unrotfun(a) unrotated[(a)]\n#if total_n_glue_op>0\nhr_complex tmp[3];\n#endif\nint return_value=0;\n"];
   Do[
     Do[
       Do[ 
@@ -622,7 +622,7 @@ if(sqrt(creal(tmp[2]))>=1.e-10){
   WriteString[ar,"#undef unrotfunreturn\n#undef rotfun\n#undef Complex\nreturn return_value;\n}\n"];
   Close[ar];
   ar=OpenAppend[checktorfunctionsfilename,FormatType->InputForm];
-  WriteString[ar,"/*This is an automatically generated function, do not edit.*/\n#define Complex(a,b) ((a)+I*(b))\nstatic int fulltorcheck(int rotid, double complex *rotated, double complex *unrotated)\n{\n#define rotfun(a) rotated[(a)]\n#define unrotfun(a) unrotated[(a)]\n#if total_n_tor_op>0\ndouble complex tmp[3];\n#endif\nint return_value=0;\n"];
+  WriteString[ar,"/*This is an automatically generated function, do not edit.*/\n#define Complex(a,b) ((a)+I*(b))\nstatic int fulltorcheck(int rotid, hr_complex *rotated, hr_complex *unrotated)\n{\n#define rotfun(a) rotated[(a)]\n#define unrotfun(a) unrotated[(a)]\n#if total_n_tor_op>0\nhr_complex tmp[3];\n#endif\nint return_value=0;\n"];
   Do[
     Do[
       Do[ 
@@ -689,8 +689,8 @@ In C it will generate the functions pathn  where is is the unique pathid.
   If[Not[MatchQ[PathList[lidx],P[__]]],Print["In PathGenerateCcode, requested the generation of a path not included in PathList"];Abort[]];
   ar = OpenAppend[opfilename, FormatType -> InputForm];
   (**)
-  WriteString[ar, "static double complex path", lidx, "(int in)\n"];
-  WriteString[ar, "{\nsuNg *w1, *w2;\nsuNg res, res1;\nint site=in;\ndouble complex p;\n\n"];
+  WriteString[ar, "static hr_complex path", lidx, "(int in)\n"];
+  WriteString[ar, "{\nsuNg *w1, *w2;\nsuNg res, res1;\nint site=in;\nhr_complex p;\n\n"];
   steps = PathList[lidx] //. P[A__] :> List[A];
   If[posdir[steps[[1]]],
     WriteString[ar, "w2 = pu_gauge_wrk(site,", dir[steps[[1]]], ");\n\n"];,
@@ -804,9 +804,9 @@ OpGroupStringPaths[px_, py_, pz_, iridx_, charge_] :=
 #include <string.h>\n"];
   WriteString[ar,"#define npaths ",pathindex,"\n"];
   WriteString[ar,"static double PI=3.141592653589793238462643383279502884197;\n"];
-  WriteString[ar,"static double complex *mom_def_Cp_tr_paths=NULL;\n"];
-  WriteString[ar,"static double complex *mom_def_Cm_tr_paths=NULL;\n"];
-  WriteString[ar,"static double complex *path_storage=NULL;\n"];
+  WriteString[ar,"static hr_complex *mom_def_Cp_tr_paths=NULL;\n"];
+  WriteString[ar,"static hr_complex *mom_def_Cm_tr_paths=NULL;\n"];
+  WriteString[ar,"static hr_complex *path_storage=NULL;\n"];
 
   WriteString[ar, "int ** direct_spatial_rotations(){\nint i;\nint ** res=malloc(sizeof(int *)*48);\n int *res1=malloc(sizeof(int *)*48*4);\n for (i=0;i<48;i++)\n res[i]=res1+4*i;\n "];
   WriteString[ar,"\n "];
@@ -837,7 +837,7 @@ OpGroupStringPaths[px_, py_, pz_, iridx_, charge_] :=
 #include \"glueballs.h\"
 #include <string.h>\n"];
   WriteString[ar,"#define ntors ",torindex,"\n"];
-  WriteString[ar,"static double complex *tor_path_storage=NULL;\n"];
+  WriteString[ar,"static hr_complex *tor_path_storage=NULL;\n"];
   Close[ar];
 
 
@@ -905,7 +905,7 @@ OpGroupStringPaths[px_, py_, pz_, iridx_, charge_] :=
     Do[WriteShift[shifts[[i]],opfilename],{i,1,Length[shifts]}];
 
     ar = OpenAppend[opfilename, FormatType -> InputForm];
-    WriteString[ar, "static void OP_oneTr_p_",p[px],"_",p[py],"_",p[pz],"_Ir_",irrepidx,"_C_",p[charge],"_n_",opidx,"(double complex * op_out)\n"];
+    WriteString[ar, "static void OP_oneTr_p_",p[px],"_",p[py],"_",p[pz],"_Ir_",irrepidx,"_C_",p[charge],"_n_",opidx,"(hr_complex * op_out)\n"];
     WriteString[ar,"{\n*op_out ="];
     Do[
       WriteString[ar,OpConsts[coeff[[i]]]];
@@ -931,7 +931,7 @@ OpGroupStringPaths[px_, py_, pz_, iridx_, charge_] :=
     If[Not[StringQ[MapShifts[filename,cc]]],
       MapShifts[filename,cc]="c"<>ToString[stringshiftidx[filename]];
       ar = OpenAppend[filename, FormatType -> InputForm];
-      WriteString[ar,"static double complex c",stringshiftidx[filename],";\n"];
+      WriteString[ar,"static hr_complex c",stringshiftidx[filename],";\n"];
       stringshift[filename]=stringshift[filename]<>"c"<>ToString[stringshiftidx[filename]]<>"=cexp(I*PI*("<>MyCForm[N[PowerExpand[Log[cc]] L/(I Pi),18]]<>"/GLB_X));\n";
       stringshiftidx[filename]++;
       Close[ar];
@@ -964,10 +964,10 @@ OpGroupStringPaths[px_, py_, pz_, iridx_, charge_] :=
 int **direct_spatial_rotations();
 int **inverse_spatial_rotations();
 void request_spatial_paths_evaluation();
-void eval_all_glueball_ops(int t, double complex *numerical_op);
-void measure_1pt_glueballs(int nblockingstart, int nblockingend, double *smear_val, double complex *gb_storage);
-void eval_all_torellon_ops(int t, double complex *numerical_op, double complex ** polyf);
-void measure_1pt_torellons(double *smear_val, double complex *tor_storage, double complex **pf);
+void eval_all_glueball_ops(int t, hr_complex *numerical_op);
+void measure_1pt_glueballs(int nblockingstart, int nblockingend, double *smear_val, hr_complex *gb_storage);
+void eval_all_torellon_ops(int t, hr_complex *numerical_op, hr_complex ** polyf);
+void measure_1pt_torellons(double *smear_val, hr_complex *tor_storage, hr_complex **pf);
 void report_gb_group_setup();
 void report_tor_group_setup();
 
@@ -990,13 +990,13 @@ typedef struct
 {
     suNg *p;
     int ix;
-    double complex tr;
+    hr_complex tr;
 } wilson_lines;
 
 wilson_lines *polyleg(int ix, int d);
 
-void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, double complex *gb_storage);
-void collect_1pt_torellon_functions(cor_list *lcor, double complex *tor_storage, double complex ** polyf);
+void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, hr_complex *gb_storage);
+void collect_1pt_torellon_functions(cor_list *lcor, hr_complex *tor_storage, hr_complex ** polyf);
     "];
     WriteString[ar, "\n\n"];
 (*
@@ -1007,7 +1007,7 @@ void collect_1pt_torellon_functions(cor_list *lcor, double complex *tor_storage,
         WriteString[ar, "#define n_OP_oneTr_p_", p[px], "_", p[py],"_", p[pz], "_Ir_", irrepidx,"_C_",p[charge]," "];
         If[ListQ[Opindex[px, py, pz, irrepidx,charge]],
           WriteString[ar, Max[Cases[Flatten[Opindex[px, py, pz, irrepidx,charge]], _Integer]],"\n"];
-          WriteString[ar, "void OP_oneTr_p_", p[px], "_", p[py],"_", p[pz], "_Ir_", irrepidx, "_C_",p[charge],"(double complex * numop);\n"];
+          WriteString[ar, "void OP_oneTr_p_", p[px], "_", p[py],"_", p[pz], "_Ir_", irrepidx, "_C_",p[charge],"(hr_complex * numop);\n"];
           ,WriteString[ar, "0\n"];
         ];
       ,{charge,-1,1,2}];
@@ -1178,7 +1178,7 @@ TorUniqueIndex[ain_]:=TorUniqueIdentifier[ain][[2]];
   If[Not[MatchQ[TorList[idx],P[__]]],Print["In PolyGenerateCcode, requested the generation of a path not included in TorList"];Abort[]];
   ar = OpenAppend[torfilename, FormatType -> InputForm];
   (**)
-  WriteString[ar, "static double complex poly", idx, "(int in)\n"];
+  WriteString[ar, "static hr_complex poly", idx, "(int in)\n"];
   WriteString[ar, "{\n"];
    steps = TorList[idx] //. P[A__] :> List[A];
    pleg=Last[steps]//. Plus -> List;
@@ -1187,7 +1187,7 @@ TorUniqueIndex[ain_]:=TorUniqueIdentifier[ain][[2]];
   If[pleg[[1]]>npolydist,npolydist=pleg[[1]]];
   pleg=pleg //. L[d1_] -> {0,d1};
   If[Length[steps]>1,
-  WriteString[ar, "suNg *w1, *w2;\nsuNg res, res1;\nint site=in;\ndouble complex p;\nwilson_lines *wl;\n\n"];
+  WriteString[ar, "suNg *w1, *w2;\nsuNg res, res1;\nint site=in;\nhr_complex p;\nwilson_lines *wl;\n\n"];
  If[posdir[steps[[1]]],
     WriteString[ar, "w2 = pu_gauge_wrk(site,", dir[steps[[1]]], ");\n\n"];
     ,
@@ -1273,7 +1273,7 @@ TorUniqueIndex[ain_]:=TorUniqueIdentifier[ain][[2]];
     Do[WriteShift[shifts[[i]],torfilename],{i,1,Length[shifts]}];
 
     ar = OpenAppend[torfilename, FormatType -> InputForm];
-    WriteString[ar, "static inline double complex diPoly_p_",p[px],"_",p[py],"_",p[pz],"_Ir_",irrepidx,"_C_",p[charge],"_n_",toridx,"(int x1, int y1, int z1)\n"];
+    WriteString[ar, "static inline hr_complex diPoly_p_",p[px],"_",p[py],"_",p[pz],"_Ir_",irrepidx,"_C_",p[charge],"_n_",toridx,"(int x1, int y1, int z1)\n"];
     WriteString[ar,"{
     int idx = ntors * (x1 + X * (y1 + Y * z1));
     \nreturn "];
@@ -1309,13 +1309,13 @@ The paths are evaluated only once while each different momentum projection can b
 void eval_time_momentum_glueball_paths(int t, int px, int py, int pz)
   {
     int nnx, nny, nnz, idx, in;
-    double complex ce = 0.;
+    hr_complex ce = 0.;
     if(path_storage==NULL)
       {"];
   WriteString[ar, stringshift[opfilename]];
-  WriteString[ar,"        path_storage = malloc(npaths * X * Y * Z * sizeof(double complex));
-        mom_def_Cp_tr_paths = malloc(npaths * sizeof(double complex));
-        mom_def_Cm_tr_paths = malloc(npaths * sizeof(double complex));
+  WriteString[ar,"        path_storage = malloc(npaths * X * Y * Z * sizeof(hr_complex));
+        mom_def_Cp_tr_paths = malloc(npaths * sizeof(hr_complex));
+        mom_def_Cm_tr_paths = malloc(npaths * sizeof(hr_complex));
         for (in = 0; in < npaths * X * Y * Z; in++)
             path_storage[in] = 0.;
     }"];
@@ -1344,12 +1344,12 @@ void eval_time_momentum_glueball_paths(int t, int px, int py, int pz)
   (**)
   (*In this block we combine the evaluation of momentum projected trace with the evaluation of the 1tr operators first 
   and then we recombine them to create the multi trace operators*)
-  WriteString[ar, "void eval_all_glueball_ops(int t, double complex *numerical_op_out)
+  WriteString[ar, "void eval_all_glueball_ops(int t, hr_complex *numerical_op_out)
 {
-    static double complex *numerical_op = NULL;
+    static hr_complex *numerical_op = NULL;
     if (numerical_op == NULL)
     {
-        numerical_op = malloc(total_n_glue_op * sizeof(double complex));
+        numerical_op = malloc(total_n_glue_op * sizeof(hr_complex));
     }
     request_space_paths_evaluation();\n"];
   lopnumberC=0;
@@ -1446,13 +1446,13 @@ WriteString[ar,"    for(int i=0;i<total_n_glue_op;i++)
 
 (*This is the evaluation and collection on the root node of the 1pt functions*)
   WriteString[ar, "
-void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, double complex *gb_storage)
+void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, hr_complex *gb_storage)
 {
 #if total_n_glue_op>0
     int n1, n2;
 #endif
     int i;
-    static double complex *gb1_bf;
+    static hr_complex *gb1_bf;
     static int n_total_active_slices = 0;    
     static int *listactive = NULL;
     if (listactive == NULL)
@@ -1485,7 +1485,7 @@ void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, double comple
     {
         listsent = malloc(sizeof(int) * GLB_T);
 
-        gb1_bf = malloc(sizeof(double complex) * total_n_glue_op * nblocking * n_total_active_slices);
+        gb1_bf = malloc(sizeof(hr_complex) * total_n_glue_op * nblocking * n_total_active_slices);
 
         t_to_proc = malloc(sizeof(int) * GLB_T);
         for (i = 0; i < GLB_T; i++)
@@ -1499,8 +1499,8 @@ void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, double comple
     for (i = 0; i < GLB_T; i++)
         listsent[i] = -1;
 
-    static double complex *gb2;
-    static double complex *gb1;
+    static hr_complex *gb2;
+    static hr_complex *gb1;
     MPI_Request req_1pt[GLB_T];
 
     for (int icor = 0; icor < lcor->n_entries; icor++)
@@ -1518,7 +1518,7 @@ void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, double comple
                 listsent[lcor->list[icor].t1] = 0;
                 if (PID == 0)
                 {
-                    memcpy(gb1, gb_storage + t1 * total_n_glue_op * nblocking, sizeof(double complex) * total_n_glue_op * nblocking);
+                    memcpy(gb1, gb_storage + t1 * total_n_glue_op * nblocking, sizeof(hr_complex) * total_n_glue_op * nblocking);
                 }
                 else
                 {
@@ -1540,7 +1540,7 @@ void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, double comple
             {
                 if (PID == 0)
                 {
-                    memcpy(gb2, gb_storage + t2 * total_n_glue_op * nblocking, sizeof(double complex) * total_n_glue_op * nblocking);
+                    memcpy(gb2, gb_storage + t2 * total_n_glue_op * nblocking, sizeof(hr_complex) * total_n_glue_op * nblocking);
                 }
                 else
                 {
@@ -1637,13 +1637,13 @@ This block allow for the evaluation of the momentum defined poly and torellons.
 The paths are evaluated only once while each different momentum projection can be re-evaluated independently.
 *)
 ar=OpenAppend[torfilename,FormatType->InputForm];
-WriteString[ar,"static void eval_time_momentum_torellons(int t, double complex * np, double complex **pf)
+WriteString[ar,"static void eval_time_momentum_torellons(int t, hr_complex * np, hr_complex **pf)
   {
     int nnx, nny, nnz, idx=0, in;
     if(tor_path_storage==NULL)
       {"];
 WriteString[ar,stringshift[torfilename]];
-WriteString[ar,"        tor_path_storage = malloc(ntors * X * Y * Z * sizeof(double complex));
+WriteString[ar,"        tor_path_storage = malloc(ntors * X * Y * Z * sizeof(hr_complex));
         for (in = 0; in < ntors * X * Y * Z; in++)
             tor_path_storage[in] = 0.;
     }\n"];
@@ -1681,7 +1681,7 @@ Do[
             Do[
               idop = Torindex[px, py, pz, irrepidx,charge][[nop, irrepev]];
               If[Not[SameQ[idop,0]],
-                  If[Not[SameQ[nnx px + nny py + nnz pz,0]],cestring="double complex ce = I * 2.0 * 3.141592653589793238462643383279502884197 / GLB_X;"];
+                  If[Not[SameQ[nnx px + nny py + nnz pz,0]],cestring="hr_complex ce = I * 2.0 * 3.141592653589793238462643383279502884197 / GLB_X;"];
                 ];
              , {nop, 1, Length[Torindex[px, py, pz, irrepidx,charge]]}];
           , {irrepev, 1, Length[bTOrthog[px, py, pz][[irrepidx]]]}];
@@ -1716,12 +1716,12 @@ Do[
   ,{px, -1, 1}, {py, -1, 1}, {pz, -1, 1}];
 WriteString[ar,"}\n}\n"];
 (**)
-  WriteString[ar, "void eval_all_torellon_ops(int t, double complex *numerical_tor_out, double complex ** polyf)
+  WriteString[ar, "void eval_all_torellon_ops(int t, hr_complex *numerical_tor_out, hr_complex ** polyf)
 {
-    static double complex *numerical_op = NULL;
+    static hr_complex *numerical_op = NULL;
     if (numerical_op == NULL)
     {
-        numerical_op = malloc(total_n_tor_op * sizeof(double complex));
+        numerical_op = malloc(total_n_tor_op * sizeof(hr_complex));
     } 
    for (int i = 0; i < total_n_tor_op; i++)
        numerical_op[i] = 0;\n"];
@@ -1747,10 +1747,10 @@ WriteString[ar,"    for(int i=0;i<total_n_tor_op;i++)
 }\n"];
 
 WriteString[ar,"
-void collect_1pt_torellon_functions(cor_list *lcor, double complex *tor_storage, double complex ** polyf)
+void collect_1pt_torellon_functions(cor_list *lcor, hr_complex *tor_storage, hr_complex ** polyf)
 {
     int n1, n2, n3, i;
-    static double complex *tor1_bf;
+    static hr_complex *tor1_bf;
     static int n_total_active_slices = 0;    
     static int *listactive = NULL;
     if (listactive == NULL)
@@ -1783,7 +1783,7 @@ void collect_1pt_torellon_functions(cor_list *lcor, double complex *tor_storage,
     {
         listsent = malloc(sizeof(int) * GLB_T);
 
-        tor1_bf = malloc(sizeof(double complex) * total_n_tor_op * n_total_active_slices);
+        tor1_bf = malloc(sizeof(hr_complex) * total_n_tor_op * n_total_active_slices);
 
         t_to_proc = malloc(sizeof(int) * GLB_T);
         for (i = 0; i < GLB_T; i++)
@@ -1797,8 +1797,8 @@ void collect_1pt_torellon_functions(cor_list *lcor, double complex *tor_storage,
     for (i = 0; i < GLB_T; i++)
         listsent[i] = -1;
 
-    static double complex *tor2;
-    static double complex *tor1;
+    static hr_complex *tor2;
+    static hr_complex *tor1;
     MPI_Request req_1pt[GLB_T];
 
     for (int icor = 0; icor < lcor->n_entries; icor++)
@@ -1816,7 +1816,7 @@ void collect_1pt_torellon_functions(cor_list *lcor, double complex *tor_storage,
                 listsent[lcor->list[icor].t1] = 0;
                 if (PID == 0)
                 {
-                    memcpy(tor1, tor_storage + t1 * total_n_tor_op, sizeof(double complex) * total_n_tor_op);
+                    memcpy(tor1, tor_storage + t1 * total_n_tor_op, sizeof(hr_complex) * total_n_tor_op);
                 }
                 else
                 {
@@ -1838,7 +1838,7 @@ void collect_1pt_torellon_functions(cor_list *lcor, double complex *tor_storage,
             {
                 if (PID == 0)
                 {
-                    memcpy(tor2, tor_storage + t2 * total_n_tor_op, sizeof(double complex) * total_n_tor_op);
+                    memcpy(tor2, tor_storage + t2 * total_n_tor_op, sizeof(hr_complex) * total_n_tor_op);
                 }
                 else
                 {
@@ -1890,18 +1890,18 @@ If[cs>0,WriteString[ar,"
 "];
 startbase+=cs;];,{irrepev,1,Length[bTOrthog[px,py,pz][[irrepidx]]]}];,{charge,-1,1,2}];,{irrepidx,1,Length[bTOrthog[px,py,pz]]}];,{px,-1,1},{py,-1,1},{pz,-1,1}];
 WriteString[ar,"
-    double complex *lpoly = NULL;
-    double complex *gpoly = NULL;
-    double complex *pcor = NULL;
+    hr_complex *lpoly = NULL;
+    hr_complex *gpoly = NULL;
+    hr_complex *pcor = NULL;
     if (lpoly == NULL)
     {
-        lpoly = malloc(T * sizeof(double complex));
+        lpoly = malloc(T * sizeof(hr_complex));
 #ifdef WITH_MPI
-        gpoly = malloc(GLB_T * sizeof(double complex));
+        gpoly = malloc(GLB_T * sizeof(hr_complex));
 #else
         gpoly = lpoly;
 #endif
-        pcor = malloc(GLB_T * sizeof(double complex));
+        pcor = malloc(GLB_T * sizeof(hr_complex));
     }
     for (n1 = 0; n1 < GLB_T; n1++)
         pcor[n1] = 0.;

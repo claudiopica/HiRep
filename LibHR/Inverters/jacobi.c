@@ -81,11 +81,11 @@ static void sort1(int n, double d[], double v[])
 	}
 }
 
-static void sort2(int n, double d[], double complex v[])
+static void sort2(int n, double d[], hr_complex v[])
 {
 	int i, j, k;
 	double p;
-	double complex q;
+	hr_complex q;
 
 	for (i = 0; i < n - 1; i++)
 	{
@@ -266,16 +266,16 @@ void jacobi1(int n, double a[], double d[], double v[])
 	sort1(n, d, v);
 }
 
-void jacobi2(int n, double complex a[], double d[], double complex v[])
+void jacobi2(int n, hr_complex a[], double d[], hr_complex v[])
 {
 	int k, l, j, sweep;
 	double tol, abs_sum, thresh_factor, sd_factor, thresh;
 	double r1, r2, r3, r4;
 	double t, s, c, tau;
 	double xn, xd0, xdh, xd1;
-	double complex z1, z2;
-	double complex e;
-	double complex zd0, zd1;
+	hr_complex z1, z2;
+	hr_complex e;
+	hr_complex zd0, zd1;
 
 	xd0 = 0.0f;
 	xdh = 0.5f;

@@ -63,7 +63,7 @@ static void transform_u(void)
 static void n_ality_transform(int dir)
 {
   int n[4];
-  double complex centre = cexp(2. * M_PI * I / NG);
+  hr_complex centre = cexp(2. * M_PI * I / NG);
   suNg unew;
   suNg *uold;
   for (n[0] = 0; n[0] < T; n[0]++)
@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
 
   int return_value = 0, n, nt;
 
-  double complex *dop, *dop1;
+  hr_complex *dop, *dop1;
   double max_diff[2];
   double min_size;
   setup_process(&argc, &argv);
@@ -123,17 +123,17 @@ int main(int argc, char *argv[])
   start_gf_sendrecv(u_gauge);
   represent_gauge_field();
   lprintf("MAIN", 0, "done.\n\n");
-  double complex **polyf;
+  hr_complex **polyf;
 
-  dop = malloc(T * total_n_tor_op * sizeof(double complex));
-  dop1 = malloc(T * total_n_tor_op * sizeof(double complex));
-  polyf = malloc(sizeof(double complex *) * 3);
-  polyf[0] = amalloc(sizeof(double complex) * Y * Z * T, ALIGN);
-  polyf[1] = amalloc(sizeof(double complex) * X * Z * T, ALIGN);
-  polyf[2] = amalloc(sizeof(double complex) * X * Y * T, ALIGN);
-  memset(polyf[0], 0, sizeof(double complex) * Y * Z * T);
-  memset(polyf[1], 0, sizeof(double complex) * X * Z * T);
-  memset(polyf[2], 0, sizeof(double complex) * X * Y * T);
+  dop = malloc(T * total_n_tor_op * sizeof(hr_complex));
+  dop1 = malloc(T * total_n_tor_op * sizeof(hr_complex));
+  polyf = malloc(sizeof(hr_complex *) * 3);
+  polyf[0] = amalloc(sizeof(hr_complex) * Y * Z * T, ALIGN);
+  polyf[1] = amalloc(sizeof(hr_complex) * X * Z * T, ALIGN);
+  polyf[2] = amalloc(sizeof(hr_complex) * X * Y * T, ALIGN);
+  memset(polyf[0], 0, sizeof(hr_complex) * Y * Z * T);
+  memset(polyf[1], 0, sizeof(hr_complex) * X * Z * T);
+  memset(polyf[2], 0, sizeof(hr_complex) * X * Y * T);
 
   for (n = 0; n < T * total_n_tor_op; n++)
   {
@@ -155,9 +155,9 @@ int main(int argc, char *argv[])
 
   lprintf("MAIN", 0, "done.\n");
 
-  memset(polyf[0], 0, sizeof(double complex) * Y * Z * T);
-  memset(polyf[1], 0, sizeof(double complex) * X * Z * T);
-  memset(polyf[2], 0, sizeof(double complex) * X * Y * T);
+  memset(polyf[0], 0, sizeof(hr_complex) * Y * Z * T);
+  memset(polyf[1], 0, sizeof(hr_complex) * X * Z * T);
+  memset(polyf[2], 0, sizeof(hr_complex) * X * Y * T);
 
   for (nt = 0; nt < T; nt++)
     eval_all_torellon_ops(nt, dop1 + nt * total_n_tor_op, polyf);
@@ -212,7 +212,7 @@ int main(int argc, char *argv[])
   int inx = ipt(3, 3, 3, 3);
 
   wilson_lines *pol = polyleg(inx, 1);
-  double complex cb = pol->tr;
+  hr_complex cb = pol->tr;
 
   lprintf("MAIN", 0, "Pa: single polyakov line:  %.10e +I*(%.10e).\n", creal(cb), cimag(cb));
   lprintf("MAIN", 0, "Applying a N-ality transf to a X hyperplane... ");
@@ -221,7 +221,7 @@ int main(int argc, char *argv[])
 
   inx = ipt(3, 2, 3, 3);
   pol = polyleg(inx, 1);
-  double complex ca = pol->tr;
+  hr_complex ca = pol->tr;
 
   lprintf("MAIN", 0, "\nPb: single polyakov line after the transf. :   %.10e +I*(%.10e).\n", creal(ca), cimag(ca));
 

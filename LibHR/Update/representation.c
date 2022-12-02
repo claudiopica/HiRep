@@ -22,10 +22,10 @@ void _group_represent2(suNf *v, suNg *u)
   int A, C;
   int a, b, i, j, k, c, d;
   double *vf = (double *)v;
-  double complex *uf = (double complex *)u;
+  hr_complex *uf = (hr_complex *)u;
 
   suNg m;
-  double complex *mf = (double complex *)(&m);
+  hr_complex *mf = (hr_complex *)(&m);
 
   A = 0;
   for (a = 0; a < NG; a++)
@@ -102,11 +102,11 @@ void _group_represent2(suNf *v, suNg *u)
   const double st = sqrt(2.);
   int A, C;
   int a, b, i, j, c, d;
-  double complex *vf = (double complex *)v;
-  double complex *uf = (double complex *)u;
+  hr_complex *vf = (hr_complex *)v;
+  hr_complex *uf = (hr_complex *)u;
 
   suNg m;
-  double complex *mf = (double complex *)(&m);
+  hr_complex *mf = (hr_complex *)(&m);
 
   A = 0;
   for (a = 0; a < NG; a++)
@@ -164,11 +164,11 @@ void _group_represent2(suNf *v, suNg *u)
 
   int A, C;
   int a, b, i, j, c, d;
-  double complex *vf = (double complex *)v;
-  double complex *uf = (double complex *)u;
+  hr_complex *vf = (hr_complex *)v;
+  hr_complex *uf = (hr_complex *)u;
 
   suNg m;
-  double complex *mf = (double complex *)(&m);
+  hr_complex *mf = (hr_complex *)(&m);
 
   A = 0;
   for (a = 1; a < NG; a++)
@@ -207,10 +207,10 @@ void _group_represent_flt(suNf_flt *v, suNg_flt *u)
   int A, C;
   int a, b, i, j, k, c, d;
   float *vf = (float *)v;
-  float complex *uf = (float complex *)u;
+  hr_complex_flt *uf = (hr_complex_flt *)u;
 
   suNg_flt m;
-  float complex *mf = (float complex *)(&m);
+  hr_complex_flt *mf = (hr_complex_flt *)(&m);
 
   A = 0;
   for (a = 0; a < NG; a++)
@@ -287,11 +287,11 @@ void _group_represent_flt(suNf_flt *v, suNg_flt *u)
   const double st = sqrt(2.);
   int A, C;
   int a, b, i, j, c, d;
-  float complex *vf = (float complex *)v;
-  float complex *uf = (float complex *)u;
+  hr_complex_flt *vf = (hr_complex_flt *)v;
+  hr_complex_flt *uf = (hr_complex_flt *)u;
 
   suNg_flt m;
-  float complex *mf = (float complex *)(&m);
+  hr_complex_flt *mf = (hr_complex_flt *)(&m);
 
   A = 0;
   for (a = 0; a < NG; a++)
@@ -348,11 +348,11 @@ void _group_represent_flt(suNf_flt *v, suNg_flt *u)
 
   int A, C;
   int a, b, i, j, c, d;
-  float complex *vf = (float complex *)v;
-  float complex *uf = (float complex *)u;
+  hr_complex_flt *vf = (hr_complex_flt *)v;
+  hr_complex_flt *uf = (hr_complex_flt *)u;
 
   suNg_flt m;
-  float complex *mf = (float complex *)(&m);
+  hr_complex_flt *mf = (hr_complex_flt *)(&m);
 
   A = 0;
   for (a = 1; a < NG; a++)

@@ -8,9 +8,9 @@
 #include <string.h>
 #define npaths 17
 static double PI=3.141592653589793238462643383279502884197;
-static double complex *mom_def_Cp_tr_paths=NULL;
-static double complex *mom_def_Cm_tr_paths=NULL;
-static double complex *path_storage=NULL;
+static hr_complex *mom_def_Cp_tr_paths=NULL;
+static hr_complex *mom_def_Cm_tr_paths=NULL;
+static hr_complex *path_storage=NULL;
 int ** direct_spatial_rotations(){
 int i;
 int ** res=malloc(sizeof(int *)*48);
@@ -412,12 +412,12 @@ int ** res=malloc(sizeof(int *)*48);
  res1[191]=3;
  return res;
 }
- static double complex path0(int in)
+ static hr_complex path0(int in)
 {
 suNg *w1, *w2;
 suNg res, res1;
 int site=in;
-double complex p;
+hr_complex p;
 
 w2 = pu_gauge_wrk(site,1);
 
@@ -438,12 +438,12 @@ _suNg_trace(p,res);
 return p;
 }
 
-static double complex path1(int in)
+static hr_complex path1(int in)
 {
 suNg *w1, *w2;
 suNg res, res1;
 int site=in;
-double complex p;
+hr_complex p;
 
 w2 = pu_gauge_wrk(site,3);
 
@@ -464,17 +464,17 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_m1_0_0_Ir_1_C_1_n_1(double complex * op_out)
+static void OP_oneTr_p_m1_0_0_Ir_1_C_1_n_1(hr_complex * op_out)
 {
 *op_out =+(4.)*mom_def_Cp_tr_paths[0]+(4.)*mom_def_Cp_tr_paths[1];
 }
 
-static double complex path16(int in)
+static hr_complex path16(int in)
 {
 suNg *w1, *w2;
 suNg res, res1;
 int site=in;
-double complex p;
+hr_complex p;
 
 w2 = pu_gauge_wrk(site,3);
 
@@ -495,27 +495,27 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_m1_0_0_Ir_1_C_1_n_2(double complex * op_out)
+static void OP_oneTr_p_m1_0_0_Ir_1_C_1_n_2(hr_complex * op_out)
 {
 *op_out =+(8.)*mom_def_Cp_tr_paths[16];
 }
 
-static void OP_oneTr_p_0_m1_0_Ir_1_C_1_n_1(double complex * op_out)
+static void OP_oneTr_p_0_m1_0_Ir_1_C_1_n_1(hr_complex * op_out)
 {
 *op_out =+(8.)*mom_def_Cp_tr_paths[1];
 }
 
-static void OP_oneTr_p_0_0_m1_Ir_1_C_1_n_1(double complex * op_out)
+static void OP_oneTr_p_0_0_m1_Ir_1_C_1_n_1(hr_complex * op_out)
 {
 *op_out =+(8.)*mom_def_Cp_tr_paths[0];
 }
 
-static double complex path2(int in)
+static hr_complex path2(int in)
 {
 suNg *w1, *w2;
 suNg res, res1;
 int site=in;
-double complex p;
+hr_complex p;
 
 w2 = pu_gauge_wrk(site,1);
 
@@ -544,12 +544,12 @@ _suNg_trace(p,res);
 return p;
 }
 
-static double complex path3(int in)
+static hr_complex path3(int in)
 {
 suNg *w1, *w2;
 suNg res, res1;
 int site=in;
-double complex p;
+hr_complex p;
 
 w2 = pu_gauge_wrk(site,1);
 
@@ -578,12 +578,12 @@ _suNg_trace(p,res);
 return p;
 }
 
-static double complex path4(int in)
+static hr_complex path4(int in)
 {
 suNg *w1, *w2;
 suNg res, res1;
 int site=in;
-double complex p;
+hr_complex p;
 
 w2 = pu_gauge_wrk(site,2);
 
@@ -612,12 +612,12 @@ _suNg_trace(p,res);
 return p;
 }
 
-static double complex path5(int in)
+static hr_complex path5(int in)
 {
 suNg *w1, *w2;
 suNg res, res1;
 int site=in;
-double complex p;
+hr_complex p;
 
 w2 = pu_gauge_wrk(site,2);
 
@@ -646,12 +646,12 @@ _suNg_trace(p,res);
 return p;
 }
 
-static double complex path6(int in)
+static hr_complex path6(int in)
 {
 suNg *w1, *w2;
 suNg res, res1;
 int site=in;
-double complex p;
+hr_complex p;
 
 w2 = pu_gauge_wrk(site,3);
 
@@ -680,12 +680,12 @@ _suNg_trace(p,res);
 return p;
 }
 
-static double complex path7(int in)
+static hr_complex path7(int in)
 {
 suNg *w1, *w2;
 suNg res, res1;
 int site=in;
-double complex p;
+hr_complex p;
 
 w2 = pu_gauge_wrk(site,3);
 
@@ -714,42 +714,42 @@ _suNg_trace(p,res);
 return p;
 }
 
-static void OP_oneTr_p_0_0_0_Ir_2_C_1_n_1(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_2_C_1_n_1(hr_complex * op_out)
 {
 *op_out =+(8.)*mom_def_Cp_tr_paths[2]+(-8.)*mom_def_Cp_tr_paths[3]+(-8.)*mom_def_Cp_tr_paths[4]+(8.)*mom_def_Cp_tr_paths[5]+(8.)*mom_def_Cp_tr_paths[6]+(-8.)*mom_def_Cp_tr_paths[7];
 }
 
-static void OP_oneTr_p_0_0_0_Ir_4_C_m1_n_1(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_4_C_m1_n_1(hr_complex * op_out)
 {
 *op_out =+(-I*8.)*mom_def_Cm_tr_paths[3]+(-8.)*mom_def_Cm_tr_paths[5]+(+I*8.)*mom_def_Cm_tr_paths[6]+(8.)*mom_def_Cm_tr_paths[7];
 }
 
-static void OP_oneTr_p_0_0_0_Ir_4_C_m1_n_2(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_4_C_m1_n_2(hr_complex * op_out)
 {
 *op_out =+(11.3137084989847604)*mom_def_Cm_tr_paths[2]+(-11.3137084989847604)*mom_def_Cm_tr_paths[4];
 }
 
-static void OP_oneTr_p_0_0_0_Ir_4_C_m1_n_3(double complex * op_out)
+static void OP_oneTr_p_0_0_0_Ir_4_C_m1_n_3(hr_complex * op_out)
 {
 *op_out =+(-I*8.)*mom_def_Cm_tr_paths[3]+(8.)*mom_def_Cm_tr_paths[5]+(+I*8.)*mom_def_Cm_tr_paths[6]+(-8.)*mom_def_Cm_tr_paths[7];
 }
 
-static void OP_oneTr_p_0_0_1_Ir_1_C_1_n_1(double complex * op_out)
+static void OP_oneTr_p_0_0_1_Ir_1_C_1_n_1(hr_complex * op_out)
 {
 *op_out =+(8.)*mom_def_Cp_tr_paths[0];
 }
 
-static void OP_oneTr_p_0_1_0_Ir_1_C_1_n_1(double complex * op_out)
+static void OP_oneTr_p_0_1_0_Ir_1_C_1_n_1(hr_complex * op_out)
 {
 *op_out =+(8.)*mom_def_Cp_tr_paths[1];
 }
 
-static double complex path8(int in)
+static hr_complex path8(int in)
 {
 suNg *w1, *w2;
 suNg res, res1;
 int site=in;
-double complex p;
+hr_complex p;
 
 w2 = pu_gauge_wrk(site,1);
 
@@ -786,12 +786,12 @@ _suNg_trace(p,res);
 return p;
 }
 
-static double complex path9(int in)
+static hr_complex path9(int in)
 {
 suNg *w1, *w2;
 suNg res, res1;
 int site=in;
-double complex p;
+hr_complex p;
 
 w2 = pu_gauge_wrk(site,1);
 
@@ -828,12 +828,12 @@ _suNg_trace(p,res);
 return p;
 }
 
-static double complex path10(int in)
+static hr_complex path10(int in)
 {
 suNg *w1, *w2;
 suNg res, res1;
 int site=in;
-double complex p;
+hr_complex p;
 
 w2 = pu_gauge_wrk(site,1);
 
@@ -870,12 +870,12 @@ _suNg_trace(p,res);
 return p;
 }
 
-static double complex path14(int in)
+static hr_complex path14(int in)
 {
 suNg *w1, *w2;
 suNg res, res1;
 int site=in;
-double complex p;
+hr_complex p;
 
 w2 = pu_gauge_wrk(site,2);
 
@@ -912,12 +912,12 @@ _suNg_trace(p,res);
 return p;
 }
 
-static double complex path11(int in)
+static hr_complex path11(int in)
 {
 suNg *w1, *w2;
 suNg res, res1;
 int site=in;
-double complex p;
+hr_complex p;
 
 w2 = pu_gauge_wrk(site,2);
 
@@ -954,12 +954,12 @@ _suNg_trace(p,res);
 return p;
 }
 
-static double complex path13(int in)
+static hr_complex path13(int in)
 {
 suNg *w1, *w2;
 suNg res, res1;
 int site=in;
-double complex p;
+hr_complex p;
 
 w2 = pu_gauge_wrk(site,3);
 
@@ -996,12 +996,12 @@ _suNg_trace(p,res);
 return p;
 }
 
-static double complex path12(int in)
+static hr_complex path12(int in)
 {
 suNg *w1, *w2;
 suNg res, res1;
 int site=in;
-double complex p;
+hr_complex p;
 
 w2 = pu_gauge_wrk(site,3);
 
@@ -1038,12 +1038,12 @@ _suNg_trace(p,res);
 return p;
 }
 
-static double complex path15(int in)
+static hr_complex path15(int in)
 {
 suNg *w1, *w2;
 suNg res, res1;
 int site=in;
-double complex p;
+hr_complex p;
 
 w2 = pu_gauge_wrk(site,3);
 
@@ -1080,13 +1080,13 @@ _suNg_trace(p,res);
 return p;
 }
 
-static double complex c0;
-static void OP_oneTr_p_0_1_0_Ir_2_C_1_n_1(double complex * op_out)
+static hr_complex c0;
+static void OP_oneTr_p_0_1_0_Ir_2_C_1_n_1(hr_complex * op_out)
 {
 *op_out =+mom_def_Cp_tr_paths[8]+c0*mom_def_Cp_tr_paths[9]-c0*mom_def_Cp_tr_paths[10]+c0*mom_def_Cp_tr_paths[14]-c0*mom_def_Cp_tr_paths[11]+c0*mom_def_Cp_tr_paths[13]-c0*mom_def_Cp_tr_paths[12]-mom_def_Cp_tr_paths[15];
 }
 
-static void OP_oneTr_p_1_0_0_Ir_1_C_1_n_1(double complex * op_out)
+static void OP_oneTr_p_1_0_0_Ir_1_C_1_n_1(hr_complex * op_out)
 {
 *op_out =+(8.)*mom_def_Cp_tr_paths[16];
 }
@@ -1096,12 +1096,12 @@ void request_space_paths_evaluation(){last_t=-10;}
 void eval_time_momentum_glueball_paths(int t, int px, int py, int pz)
   {
     int nnx, nny, nnz, idx, in;
-    double complex ce = 0.;
+    hr_complex ce = 0.;
     if(path_storage==NULL)
       {c0=cexp(I*PI*(2./GLB_X));
-        path_storage = malloc(npaths * X * Y * Z * sizeof(double complex));
-        mom_def_Cp_tr_paths = malloc(npaths * sizeof(double complex));
-        mom_def_Cm_tr_paths = malloc(npaths * sizeof(double complex));
+        path_storage = malloc(npaths * X * Y * Z * sizeof(hr_complex));
+        mom_def_Cp_tr_paths = malloc(npaths * sizeof(hr_complex));
+        mom_def_Cm_tr_paths = malloc(npaths * sizeof(hr_complex));
         for (in = 0; in < npaths * X * Y * Z; in++)
             path_storage[in] = 0.;
     }
@@ -1188,12 +1188,12 @@ mom_def_Cm_tr_paths[i]+=I*ce*cimag(path_storage[i+idx]);
 }
 }
 };
-void eval_all_glueball_ops(int t, double complex *numerical_op_out)
+void eval_all_glueball_ops(int t, hr_complex *numerical_op_out)
 {
-    static double complex *numerical_op = NULL;
+    static hr_complex *numerical_op = NULL;
     if (numerical_op == NULL)
     {
-        numerical_op = malloc(total_n_glue_op * sizeof(double complex));
+        numerical_op = malloc(total_n_glue_op * sizeof(hr_complex));
     }
     request_space_paths_evaluation();
     eval_time_momentum_glueball_paths(t,-1,0,0);
@@ -1222,13 +1222,13 @@ void eval_all_glueball_ops(int t, double complex *numerical_op_out)
         *(numerical_op_out+i)+=*(numerical_op+i);
 }
 
-void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, double complex *gb_storage)
+void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, hr_complex *gb_storage)
 {
 #if total_n_glue_op>0
     int n1, n2;
 #endif
     int i;
-    static double complex *gb1_bf;
+    static hr_complex *gb1_bf;
     static int n_total_active_slices = 0;    
     static int *listactive = NULL;
     if (listactive == NULL)
@@ -1261,7 +1261,7 @@ void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, double comple
     {
         listsent = malloc(sizeof(int) * GLB_T);
 
-        gb1_bf = malloc(sizeof(double complex) * total_n_glue_op * nblocking * n_total_active_slices);
+        gb1_bf = malloc(sizeof(hr_complex) * total_n_glue_op * nblocking * n_total_active_slices);
 
         t_to_proc = malloc(sizeof(int) * GLB_T);
         for (i = 0; i < GLB_T; i++)
@@ -1275,8 +1275,8 @@ void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, double comple
     for (i = 0; i < GLB_T; i++)
         listsent[i] = -1;
 
-    static double complex *gb2;
-    static double complex *gb1;
+    static hr_complex *gb2;
+    static hr_complex *gb1;
     MPI_Request req_1pt[GLB_T];
 
     for (int icor = 0; icor < lcor->n_entries; icor++)
@@ -1294,7 +1294,7 @@ void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, double comple
                 listsent[lcor->list[icor].t1] = 0;
                 if (PID == 0)
                 {
-                    memcpy(gb1, gb_storage + t1 * total_n_glue_op * nblocking, sizeof(double complex) * total_n_glue_op * nblocking);
+                    memcpy(gb1, gb_storage + t1 * total_n_glue_op * nblocking, sizeof(hr_complex) * total_n_glue_op * nblocking);
                 }
                 else
                 {
@@ -1316,7 +1316,7 @@ void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, double comple
             {
                 if (PID == 0)
                 {
-                    memcpy(gb2, gb_storage + t2 * total_n_glue_op * nblocking, sizeof(double complex) * total_n_glue_op * nblocking);
+                    memcpy(gb2, gb_storage + t2 * total_n_glue_op * nblocking, sizeof(hr_complex) * total_n_glue_op * nblocking);
                 }
                 else
                 {

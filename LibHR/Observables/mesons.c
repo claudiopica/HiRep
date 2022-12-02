@@ -183,7 +183,7 @@ g0 Gamma^\dag g0 = sign Gamma
 \***************************************************************************/
 
 #define SINGLE_TRACE_DEBUG(name) \
-void name##_debug(double complex Gamma[4][4], int* sign) { \
+void name##_debug(hr_complex Gamma[4][4], int* sign) { \
   int i,j; \
   for(i=0;i<4;i++) \
   for(j=0;j<4;j++) { \
@@ -216,7 +216,7 @@ out = Re tr (g5 Gamma smat)
 \***************************************************************************/
 
 #define GAMMA_TRACE_RE_DEFINITION(name) \
-void name##_trace_H(double complex* out, double complex* smat) { \
+void name##_trace_H(hr_complex* out, hr_complex* smat) { \
            *out = _S0_*smat[SPIN_2D_INDEX(_C0_,0)] \
                 + _S1_*smat[SPIN_2D_INDEX(_C1_,1)] \
                 + _S2_*smat[SPIN_2D_INDEX(_C2_,2)] \
@@ -231,7 +231,7 @@ out = Im tr (g5 Gamma smat)
 \***************************************************************************/
 
 #define GAMMA_TRACE_IM_DEFINITION(name) \
-void name##_trace_H(double complex* out, double complex* smat) { \
+void name##_trace_H(hr_complex* out, hr_complex* smat) { \
         *out    = _S0_*I*smat[SPIN_2D_INDEX(_C0_,0)] \
                 + _S1_*I*smat[SPIN_2D_INDEX(_C1_,1)] \
                 + _S2_*I*smat[SPIN_2D_INDEX(_C2_,2)] \

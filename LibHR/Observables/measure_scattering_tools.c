@@ -1253,10 +1253,10 @@ void measure_pion_scattering_I2(double *m, int numsources, double precision, cha
 	}
 }
 
-double complex Ralt_contract(spinor_field *prop1, spinor_field *prop2, int tref)
+hr_complex Ralt_contract(spinor_field *prop1, spinor_field *prop2, int tref)
 {
 	int ix0, ix1, ix2, ix3, tc, i;
-	double complex z = 0.0;
+	hr_complex z = 0.0;
 	suNf_spinor *sptr1;
 	suNf_spinor *sptr2;
 
@@ -1283,7 +1283,7 @@ double complex Ralt_contract(spinor_field *prop1, spinor_field *prop2, int tref)
 void measure_pion_scattering_I0(double *m, int numsources, double precision, char *path, char *cnfg_filename, int seq_prop, meson_observable **mo_arr)
 {
 	int ts = 0;
-	double complex A, B;
+	hr_complex A, B;
 	int ts_vec[numsources];
 	double memsize = 0.;
 	char auxname[256];

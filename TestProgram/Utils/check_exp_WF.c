@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
 {
   int i = 3, j = 0, evaluations = 1;
   suNg test, exptest, exptest2;
-  double complex tr;
+  hr_complex tr;
 
   setup_process(&argc, &argv);
   setup_gauge_fields();

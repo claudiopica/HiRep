@@ -36,7 +36,7 @@ void inv_Cmplx_Ng(suNg *a)
 void inv_Cmplx_Ng(suNg *a)
 {
   suNg b;
-  double complex col[NG];
+  hr_complex col[NG];
   int indx[NG];
   double d;
   int i, j;
@@ -57,13 +57,13 @@ void inv_Cmplx_Ng(suNg *a)
 
 #endif
 
-void ludcmp(double complex *a, int *indx, double *d, int N)
+void ludcmp(hr_complex *a, int *indx, double *d, int N)
 {
   const double tiny = 1.0e-20;
   int i, j, k, imax;
   double big, tmp, dum;
   double vv[N];
-  double complex ctmp, csum;
+  hr_complex ctmp, csum;
   *d = 1;
   for (j = 0; j < N; ++j)
   {
@@ -138,10 +138,10 @@ void ludcmp(double complex *a, int *indx, double *d, int N)
   }
 }
 
-void lubksb(double complex *a, int *indx, double complex *b, int N)
+void lubksb(hr_complex *a, int *indx, hr_complex *b, int N)
 {
   int i, ii, ip, j;
-  double complex csum, ctmp;
+  hr_complex csum, ctmp;
   double tmp;
   ii = 0;
   for (i = 0; i < N; ++i)

@@ -94,7 +94,7 @@
 
 static int nop,nvc=0;
 static double *dd,*ee;
-static double complex *aa,*bb,*cc,*vv;
+static hr_complex *aa,*bb,*cc,*vv;
 
 static double EPSILON=1.e-12;
 
@@ -108,7 +108,7 @@ static void alloc_ws_rotate(void) {
   
 }
 
-static void rotate(int n,spinor_field *pkk,double complex v[])
+static void rotate(int n,spinor_field *pkk,hr_complex v[])
 {
 
   error((n<1)||(n>MAX_ROTATE),1,"rotate [eva.c]",
@@ -124,7 +124,7 @@ static void rotate(int n,spinor_field *pkk,double complex v[])
     for (int k=0;k<n;k++) {
       suNf_spinor *pk=&(psi[k]);
       suNf_spinor *pj=_FIELD_AT(&pkk[0],ix);
-      double complex *z=&v[k];
+      hr_complex *z=&v[k];
       
       _vector_mulc_f((*pk).c[0],*z,(*pj).c[0]);
       _vector_mulc_f((*pk).c[1],*z,(*pj).c[1]);
@@ -158,7 +158,7 @@ static int alloc_aux(int nevt)
 	  free(dd);
 	}
       
-      aa=malloc(4*nevt*nevt*sizeof(double complex));
+      aa=malloc(4*nevt*nevt*sizeof(hr_complex));
       dd=malloc(2*nevt*sizeof(double));
 
       bb=aa+nevt*nevt;
@@ -176,7 +176,7 @@ static int alloc_aux(int nevt)
 
 static void project(spinor_field *pk,spinor_field *pl)
 {
-  double complex sp;
+  hr_complex sp;
 
   /* check input types */
 #ifndef CHECK_SPINOR_MATCHING
@@ -234,7 +234,7 @@ static void ritz_subsp(int nlock,int nevt,spinor_operator Op,
                        spinor_field *ws,spinor_field *ev,double d[])
 {
   int neff,i,j;
-  double complex z;
+  hr_complex z;
 
   neff=nevt-nlock;
    
@@ -300,7 +300,7 @@ static int res_subsp(int nlock,int nev,double omega1,double omega2,
 {
   int i,ia,ib;
   double eps1,eps2,absd1,absd2;
-  double complex z;
+  hr_complex z;
 
   eps1=0.0f;
   ia=nlock;

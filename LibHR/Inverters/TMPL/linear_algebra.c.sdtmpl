@@ -46,10 +46,10 @@ _OMP_PRAGMA ( single )
 }
 
 /* <s1,s2> */
-double complex _FUNC(spinor_field_prod)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
+hr_complex _FUNC(spinor_field_prod)(_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 {
 
-    static double complex res;
+    static hr_complex res;
 _OMP_PRAGMA ( single )
     {
       res = 0.;
@@ -58,7 +58,7 @@ _OMP_PRAGMA ( single )
   _TWO_SPINORS_FOR_SUM(s1,s2,res) {
     _COMPLEX loc_res; //needed for OMP threads
     _spinor_prod_f(loc_res,*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
-    res+=(double complex) loc_res;
+    res+=(hr_complex) loc_res;
   }
 #ifdef WITH_MPI
 	global_sum((double*)&res,2);

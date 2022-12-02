@@ -94,7 +94,7 @@ static void clover_loop(int id, int mu, int nu, suNf *u)
 	_suNf_add_assign(*u, s3);
 }
 
-static void ldl(int N, double complex *A)
+static void ldl(int N, hr_complex *A)
 {
 	for (int i = 0; i < N; i++)
 	{
@@ -116,7 +116,7 @@ static void ldl(int N, double complex *A)
 static void _compute_ldl_decomp(int id)
 {
 	int m, n, ij, ji;
-	double complex *A, *B;
+	hr_complex *A, *B;
 
 	// Setup pointers
 	A = _FIELD_AT(cl_ldl, id)->up;
@@ -163,10 +163,10 @@ static void _compute_clover_term(int id)
 	suNf tmp[6];
 	double csw;
 
-	double complex atmp;
-	double complex btmp;
-	double complex ctmp;
-	double complex dtmp;
+	hr_complex atmp;
+	hr_complex btmp;
+	hr_complex ctmp;
+	hr_complex dtmp;
 
 	csw = csw_value;
 	csw = -csw / 16.0;
@@ -207,22 +207,22 @@ static void _compute_clover_term(int id)
 
 static void _compute_clover_force(int id, double coeff)
 {
-	double complex A[2 * NF][2 * NF];
-	double complex B[2 * NF][2 * NF];
+	hr_complex A[2 * NF][2 * NF];
+	hr_complex B[2 * NF][2 * NF];
 	memset(A, 0, sizeof(A));
 	memset(B, 0, sizeof(B));
 
-	double complex a11;
-	double complex a12;
-	double complex a21;
-	double complex a22;
-	double complex a33;
-	double complex a34;
-	double complex a43;
-	double complex a44;
+	hr_complex a11;
+	hr_complex a12;
+	hr_complex a21;
+	hr_complex a22;
+	hr_complex a33;
+	hr_complex a34;
+	hr_complex a43;
+	hr_complex a44;
 
-	double complex *U = _FIELD_AT(cl_ldl, id)->up;
-	double complex *L = _FIELD_AT(cl_ldl, id)->dn;
+	hr_complex *U = _FIELD_AT(cl_ldl, id)->up;
+	hr_complex *L = _FIELD_AT(cl_ldl, id)->dn;
 
 	// Calculate inverse from LDL
 	for (int n = 0; n < 2 * NF; n++)
@@ -318,8 +318,8 @@ void clover_la_logdet(double nf, double mass, scalar_field *la)
 	_MASTER_FOR(&glat_odd, id)
 	{
 		double prod = 1;
-		double complex *A = _FIELD_AT(cl_ldl, id)->up;
-		double complex *B = _FIELD_AT(cl_ldl, id)->dn;
+		hr_complex *A = _FIELD_AT(cl_ldl, id)->up;
+		hr_complex *B = _FIELD_AT(cl_ldl, id)->dn;
 
 		for (int n = 0; n < 2 * NF; n++)
 		{

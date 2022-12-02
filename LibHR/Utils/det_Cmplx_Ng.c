@@ -19,7 +19,7 @@
 #ifndef GAUGE_SON
 
 #ifdef WITH_QUATERNIONS
-void det_Cmplx_Ng(double complex *res, suNg *a)
+void det_Cmplx_Ng(hr_complex *res, suNg *a)
 {
   suNg b;
   double det;
@@ -31,13 +31,13 @@ void det_Cmplx_Ng(double complex *res, suNg *a)
 
 #else
 
-void det_Cmplx_Ng(double complex *res, suNg *a)
+void det_Cmplx_Ng(hr_complex *res, suNg *a)
 {
   suNg b;
   int indx[NG];
   double d;
   int i;
-  double complex tmp;
+  hr_complex tmp;
   b = *a;
   ludcmp(b.c, indx, &d, NG);
   *res = d;

@@ -220,11 +220,11 @@ static double f2(fourvec v1, fourvec v2)
  * @param LT time extent of the box
  * @param t time slice
  */
-double complex tw_twopoint(fourvec p, double m, double mu, int L, int LT, int t)
+hr_complex tw_twopoint(fourvec p, double m, double mu, int L, int LT, int t)
 {
     fourvec mom1, mom2;
     int q1, q2, q3, q41, q42;
-    double complex res;
+    hr_complex res;
     res = 0.;
     double tmp;
 
@@ -258,7 +258,7 @@ double complex tw_twopoint(fourvec p, double m, double mu, int L, int LT, int t)
     return res;
 }
 
-static int compare_corr(double complex *corr_ex, double complex *corr_num, int tstart, char *name, double tol)
+static int compare_corr(hr_complex *corr_ex, hr_complex *corr_num, int tstart, char *name, double tol)
 {
     int retval = 0;
     for (int t = tstart; t < GLB_T; t++)
@@ -343,8 +343,8 @@ int main(int argc, char *argv[])
 
     gettimeofday(&start, 0);
 
-    double complex Piseq[GLB_T];
-    double complex Pith[GLB_T];
+    hr_complex Piseq[GLB_T];
+    hr_complex Pith[GLB_T];
 
     for (int t = 0; t < GLB_T; t++)
     {
