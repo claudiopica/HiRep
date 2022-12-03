@@ -94,7 +94,7 @@ void complete_gt_sendrecv(suNg_field*);
  */
 void start_gt_sendrecv(suNg_field*);
 
-// TODO: What is this?
+// TODO: What is this? (SAM)
 //void test_spinor_field(spinor_field *p);
 
 /**
