@@ -45,8 +45,8 @@
  */
 
 static char input_filename[256] = "input_file";
-static char output_filename[256] = "out_0";
-static char error_filename[256] = "err_0";
+static char output_filename[256] = "out";
+static char error_filename[256] = "err";
 
 char *get_input_filename() { return input_filename; }
 char *get_output_filename() { return output_filename; }
@@ -83,7 +83,7 @@ static void read_cmdline(int argc, char **argv)
       exit(0);
     }
   }
-  error(ai != 1, 1, "SETUP_GAUGE_FIELDS", "An input file must be defined\n");
+  // error(ai != 1, 1, "SETUP_GAUGE_FIELDS", "An input file must be defined\n");
 }
 
 void setup_gauge_fields()
@@ -170,17 +170,20 @@ int setup_process(int *argc, char ***argv)
   read_input(logger_var.read, input_filename);
   logger_set_input(&logger_var);
 
+#ifndef LOG_ALLPIDS
   if (PID != 0)
   {
     logger_disable();
   } /* disable logger for MPI processes != 0 */
   else
+#endif
   {
     FILE *stderrp;
     char sbuf[270];
-    sprintf(sbuf, ">>%s", output_filename);
+    sprintf(sbuf, ">>%s_%d", output_filename,PID);
     logger_stdout(sbuf);
-    stderrp = freopen(error_filename, "w", stderr);
+    sprintf(sbuf, "%s_%d", error_filename,PID);
+    stderrp = freopen(sbuf, "w", stderr);
     error(stderrp == NULL, 1, "setup_process [process_init.c]",
           "Cannot redirect the stderr");
   }
@@ -270,8 +273,9 @@ int finalize_process()
   if (u_gauge_f_flt != NULL)
     free_gfield_f_flt(u_gauge_f_flt);
 
+#ifndef WITH_NEW_GEOMETRY
   free_geometry_mpi_eo();
-
+#endif
   lprintf("SYSTEM", 0, "Process finalized.\n");
 
 #ifdef WITH_MPI

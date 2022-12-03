@@ -1,7 +1,8 @@
 
 /******************************************************************************
  *
- * File check11.c
+ *
+ *  NOCOMPILE= !WITH_GPU
  *
  * Consistency checks on the programs in the module linalg
  *

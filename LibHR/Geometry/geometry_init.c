@@ -322,6 +322,7 @@ int geometry_init() {
   lprintf("GEOMETRY_INIT",0,"Extended local size is %dx%dx%dx%d\n",T_EXT,X_EXT,Y_EXT,Z_EXT);
   lprintf("GEOMETRY_INIT",0,"The lattice borders are (%d,%d,%d,%d)\n",T_BORDER,X_BORDER,Y_BORDER,Z_BORDER);
   lprintf("GEOMETRY_INIT",0,"Size of the bulk subblocking (%d,%d,%d,%d)\n",PB_T,PB_X,PB_Y,PB_Z);
+  lprintf("GEOMETRY_INIT",0,"Process sign is %d\n",PSIGN);
   
   check_geometry_variables();
   
@@ -331,14 +332,19 @@ int geometry_init() {
 
 
   /*Set the communication buffers and structure of the geometry identificator */
+#ifdef WITH_NEW_GEOMETRY
+  define_geometry();
+#else
   geometry_mpi_eo();
-
+#endif
 
   return 0;
 }
 
-
+//CP: this allocation/free is moved into new_geom.c
+//CP: it must be removed from this file
 void geometry_mem_alloc() {
+#ifndef WITH_NEW_GEOMETRY
   static int init=1;
 
   if (init) {
@@ -371,6 +377,7 @@ void geometry_mem_alloc() {
 #undef ALLOC
 
   }
+#endif
 }
 
 
@@ -398,6 +405,19 @@ int proc_dn(int id, int dir)
 	
 	MPI_Cart_coords(cart_comm, id, 4, coords);
 	--coords[dir];
+	MPI_Cart_rank(cart_comm, coords, &outid);
+  
+	return outid;
+#else
+	return 0;
+#endif
+}
+
+int proc_id(int coords[4])
+{
+#ifdef WITH_MPI
+	int outid;
+	
 	MPI_Cart_rank(cart_comm, coords, &outid);
   
 	return outid;

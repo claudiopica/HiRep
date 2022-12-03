@@ -155,14 +155,6 @@ int main(int argc, char *argv[])
   /* setup process id and communications */
   setup_process(&argc, &argv);
 
-  lprintf("CPTEST", 0, "spinor gsize=%d\n", glattice.gsize_spinor);
-  lprintf("CPTEST", 0, "spinor nbuffers=%d\n", glattice.nbuffers_spinor);
-  lprintf("CPTEST", 0, "spinor ncopies=%d\n", glattice.ncopies_spinor);
-  lprintf("CPTEST", 0, "gauge gsize=%d\n", glattice.gsize_gauge);
-  lprintf("CPTEST", 0, "gauge nbuffers=%d\n", glattice.nbuffers_gauge);
-  lprintf("CPTEST", 0, "gauge ncopies=%d\n", glattice.ncopies_gauge);
-  lprintf("CPTEST", 0, "lmp=%d\n", glattice.local_master_pieces);
-
   lprintf("LA TEST", 0, "Consistency of the programs in the module linalg\n");
   lprintf("LA TEST", 0, "------------------------------------------------\n");
 

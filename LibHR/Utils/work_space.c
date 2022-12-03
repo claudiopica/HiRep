@@ -141,8 +141,11 @@ int reserve_wrk_space()
         error((_g_wrk[n_alloc] == NULL), 1, "reserve_wrk_space [work_space.c]",
               "Cannot allocate memory");
 
+#ifdef WITH_NEW_GEOMETRY
+        size_t req_mem = 4 * T_EXT*X_EXT*Y_EXT*Z_EXT;
+#else
         size_t req_mem = 4 * glattice.gsize_gauge;
-
+#endif
         _iup_wrk[n_alloc] = malloc(2 * req_mem * sizeof(int));
         error((_iup_wrk[n_alloc] == NULL), 1, "reserve_wrk_space [work_space.c]",
               "Cannot allocate memory");
