@@ -59,7 +59,15 @@ hr_complex* alloc_complex_sum_field(int n);
 
 #define _FIELD_BLK(s,i) (((s)->ptr) + (s)->type->master_start[(i)])
 #define _4FIELD_BLK(s,i) (((s)->ptr) + 4*(s)->type->master_start[(i)])
-#define _DFIELD_BLK(s,i,size) (((s)->ptr) + size*(s)->type->master_start[(i)])
+#define _DFIELD_BLK(s,i,size) (((s)->ptr) + size*(s)->type->master_start[(i)]) 
+
+#define _BUF_FIELD_BLK(s,i) (((s)->ptr) + (s)->type->sbuf_start[(i)])
+#define _BUF_4FIELD_BLK(s,i) (((s)->ptr) + 4*(s)->type->sbuf_start[(i)])
+#define _BUF_DFIELD_BLK(s,i,_size) (((s)->ptr) + (_size)*(s)->type->sbuf_start[(i)]) 
+
+#define _BUF_GPU_FIELD_BLK(s,i) (((s)->gpu_ptr) + (s)->type->sbuf_start[(i)])
+#define _BUF_GPU_4FIELD_BLK(s,i) (((s)->gpu_ptr) + 4*(s)->type->sbuf_start[(i)])
+#define _BUF_GPU_DFIELD_BLK(s,i,size) (((s)->gpu_ptr) + size*(s)->type->sbuf_start[(i)])
 
 #define CudaSafeCall( err )     __cudaSafeCall( err, __FILE__, __LINE__ )
 #define CudaCheckError()        __cudaCheckError( __FILE__, __LINE__ )

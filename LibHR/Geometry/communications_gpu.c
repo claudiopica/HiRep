@@ -21,13 +21,29 @@
 #define random_double ranlxd
 #define random_float ranlxs
 
+void zeroes_double(double* dbl, int n) 
+{
+    for (int i = 0; i < n; ++i) 
+    {
+        dbl[i] = 0.0;
+    }
+}
+
+void zeroes_float(float* flt, int n) 
+{
+    for (int i = 0; i < n; ++i) 
+    {
+        flt[i] = 0.0f;
+    }
+}
+
 #define _DECLARE_SYNC(_name, _field_type, _site_type, _size, _geom)\
     void sync_gpu_##_name(_field_type *f) \
     { \
         for (int i = 0; i < f->type->ncopies_##_geom; ++i) \
         { \
-            _site_type *target = _GPU_DFIELD_BLK(f, f->type->copy_to[i], (_size));\
-            _site_type *source = _GPU_DFIELD_BLK(f, f->type->copy_from[i], (_size));\
+            _site_type *target = f->gpu_ptr + (_size)*f->type->copy_to[i];\
+            _site_type *source = f->gpu_ptr + (_size)*f->type->copy_from[i];\
             int mem_size = (_size)*(f->type->copy_len[i])*sizeof(*(f->gpu_ptr));\
             CHECK_CUDA(cudaMemcpy(target, source, mem_size, cudaMemcpyDeviceToDevice)); \
         } \
@@ -36,23 +52,24 @@
 #define _DECLARE_START_SENDRECV(_name, _field_type, _site_type, _size, _geom) \
     void start_sendrecv_gpu_##_name(_field_type *f) \
     { \
+        MPI_Status status[f->type->nbuffers_##_geom];\
         for (int i = 0; i < f->type->nbuffers_##_geom; ++i) \
         { \
             /* Destination Parameters */ \
-            double *dest = (double*)_GPU_DFIELD_BLK(f, f->type->rbuf_start[i], (_size)); \
-            int dest_proc = f->type->sbuf_to_proc[i];\
+            double *recv_buffer = (double*)(f->gpu_ptr + (_size)*f->type->rbuf_start[i]);\
+            int recv_proc = f->type->rbuf_from_proc[i];\
             int recv_size_in_dbl = (_size)*(f->type->rbuf_len[i])*sizeof(*(f->gpu_ptr))/sizeof(double);\
             \
             /* Origin Parameters */ \
-            double *origin = (double*)_GPU_DFIELD_BLK(f, f->type->sbuf_start[i], (_size)); \
-            int origin_proc = f->type->rbuf_from_proc[i];\
+            double *send_buffer = (double*)(f->gpu_ptr + (_size)*f->type->sbuf_start[i]);\
+            int send_proc = f->type->sbuf_to_proc[i];\
             int send_size_in_dbl = (_size)*(f->type->sbuf_len[i])*sizeof(*(f->gpu_ptr))/sizeof(double); \
             \
             /* Start to send */\
-            CHECK_MPI(MPI_Isend(origin, send_size_in_dbl, MPI_DOUBLE, dest_proc, i, cart_comm, &(f->comm_req[2*i])));\
+            CHECK_MPI(MPI_Isend(send_buffer, send_size_in_dbl, MPI_DOUBLE, send_proc, i, cart_comm, &(f->comm_req[2*i])));\
             \
             /* Start to receive */\
-            CHECK_MPI(MPI_Irecv(dest, recv_size_in_dbl, MPI_DOUBLE, origin_proc, i, cart_comm, &(f->comm_req[2*i + 1])));\
+            CHECK_MPI(MPI_Irecv(recv_buffer, recv_size_in_dbl, MPI_DOUBLE, recv_proc, i, cart_comm, &(f->comm_req[2*i+1])));\
         } \
     }
 
@@ -64,10 +81,22 @@
             int rlen = (_size)*(f->type->rbuf_len[i])*sizeof(*(f->gpu_ptr))/sizeof(_prec_type); \
             _prec_type* buf = (_prec_type*)malloc(rlen*sizeof(*(f->gpu_ptr)));\
             random_##_prec_type(buf, rlen); \
-            /*CHECK_CUDA(cudaMemcpy((_prec_type*)_GPU_FIELD_BLK(f, f->type->rbuf_start[i]),*/ \
-                                  /*buf, rlen*sizeof(_prec_type), cudaMemcpyHostToDevice));*/ \
+            CHECK_CUDA(cudaMemcpy((_prec_type*)(f->gpu_ptr + (_size)*f->type->rbuf_start[i]), \
+                                buf, rlen*sizeof(_prec_type), cudaMemcpyHostToDevice));\
         }\
-    }
+    }\
+    \
+    void fill_buffers_with_zeroes_##_name(_field_type *f) \
+    { \
+        for (int i = 0; i < f->type->nbuffers_##_geom; ++i) \
+        { \
+            int rlen = (_size)*(f->type->rbuf_len[i])*sizeof(*(f->gpu_ptr))/sizeof(_prec_type); \
+            _prec_type* buf = (_prec_type*)malloc(rlen*sizeof(*(f->gpu_ptr)));\
+            zeroes_##_prec_type(buf, rlen); \
+            CHECK_CUDA(cudaMemcpy((_prec_type*)(f->gpu_ptr + (_size)*f->type->rbuf_start[i]),  \
+                                buf, rlen*sizeof(_prec_type), cudaMemcpyHostToDevice));\
+        }\
+    } 
 
 #define _DECLARE_COMPLETE_SENDRECV(_name, _field_type, _site_type, _size, _geom) \
     void complete_sendrecv_gpu_##_name(_field_type *f) \

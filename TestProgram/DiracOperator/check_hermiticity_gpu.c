@@ -137,6 +137,8 @@ int test_herm_gpu(spinor_operator S, char *name)
   lprintf("SANITY CHECK", 0, "gaussian spinor field norm s2 before copy: %0.2e\n", sqrt(spinor_field_sqnorm_f_cpu(s2)));
   copy_to_gpu_spinor_field_f(s1);
   copy_to_gpu_spinor_field_f(s2);
+  lprintf("SANITY CHECK", 0, "gaussian spinor field norm s1 after copy: %0.2e\n", sqrt(spinor_field_sqnorm_f(s1)));
+  lprintf("SANITY CHECK", 0, "gaussian spinor field norm s2 after copy: %0.2e\n", sqrt(spinor_field_sqnorm_f(s2)));
 
   // Apply operator
   S(s3, s1);

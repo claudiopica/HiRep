@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-*  NOCOMPILE= !WITH_GPU
+* NOCOMPILE= !WITH_GPU
 *
 * Test of modules
 *
@@ -32,10 +32,10 @@
   do {                                                                   \
       check = 0.0;                                                       \
       for (int i=0;i<(sfsize);i++){                                      \
-        gaussian_spinor_field(&s1[i]);                                 \
+        gaussian_spinor_field(&s1[i]);                                   \
         copy_to_gpu_spinor_field_f(&s1[i]);                              \
         spinor_field_zero_f_cpu(&s1[i]);                                 \
-        gaussian_spinor_field(&s2[i]);                                 \
+        gaussian_spinor_field(&s2[i]);                                   \
         copy_to_gpu_spinor_field_f(&s2[i]);                              \
         spinor_field_zero_f_cpu(&s2[i]);                                 \
         spinor_field_zero_f_cpu(&s3[i]);                                 \
@@ -55,10 +55,10 @@
   do {                                                                   \
       check = 0.0;                                                       \
       for (int i=0;i<(sfsize);i++){                                      \
-        gaussian_spinor_field(&s1[i]);                                 \
+        gaussian_spinor_field(&s1[i]);                                   \
         copy_to_gpu_spinor_field_f(&s1[i]);                              \
         spinor_field_zero_f_cpu(&s1[i]);                                 \
-        gaussian_spinor_field(&s2[i]);                                 \
+        gaussian_spinor_field(&s2[i]);                                   \
         copy_to_gpu_spinor_field_f(&s2[i]);                              \
         spinor_field_zero_f_cpu(&s2[i]);                                 \
         check += opt_gpu;                                                \

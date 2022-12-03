@@ -58,7 +58,8 @@ void start_sf_sendrecv_flt(spinor_field_flt *gf);
         void sync_gpu_##_name(_field_type*); \
         void start_sendrecv_gpu_##_name(_field_type*); \
         void complete_sendrecv_gpu_##_name(_field_type*); \
-        void fill_buffers_##_name(_field_type*);
+        void fill_buffers_##_name(_field_type*); \
+        void fill_buffers_with_zeroes_##_name(_field_type*);
 
     _DECLARE_COMMS(spinor_field_f, spinor_field);
     _DECLARE_COMMS(spinor_field_f_flt, spinor_field_flt);
