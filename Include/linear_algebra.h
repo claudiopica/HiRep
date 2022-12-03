@@ -75,12 +75,5 @@ extern "C" {
 }
 #endif
 
-/* GPU functions*/
-#ifdef WITH_GPU
-  #ifdef __cplusplus
-  template <class T>
-  T global_sum_gpu(T *vector, int size);
-  #endif
 #endif
-
 #endif

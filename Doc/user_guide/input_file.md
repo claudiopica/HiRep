@@ -33,7 +33,7 @@ This gauge monomial is the standard Wilson plaquette action.
 
 $$ S = -\frac{\beta}{N}\sum_{x,\mu>\nu} \textrm{Re}~\textrm{tr}(U_\mu(x)U_\nu(x+\hat{\mu})U_\mu^\dagger(x+\hat{\nu})U_\nu^\dagger(x)) $$
 
-The example below show how to specify a gauge monomial in the input file.
+The following example shows how to specify a gauge monomial in the input file.
 
 ```
     monomial {
@@ -58,7 +58,7 @@ The two coefficients below are related through $c_0+8c_1=1$ to ensure the correc
 
 $$ S = -\frac{\beta}{N}\sum_{x,\mu>\nu} c_0\textrm{Re}~\textrm{tr}[P_{\mu\nu}(x)] + c_1\textrm{Re}~\textrm{tr}[R_{\mu\nu}(x)+R_{\nu\mu}(x)] $$
 
-The example below show how to specify a gauge monomial in the input file.
+Specify a gauge monomial in the input file as in the following example:
 
 ```
     monomial {
@@ -82,9 +82,9 @@ The example below show how to specify a gauge monomial in the input file.
 
 The HMC monomial is the standard term for simulating two mass degenerate fermions.
 
-$$ S = \phi^\dagger(D^\dagger D)^{-1}\phi $$
+$$ S = \phi^\dagger(D^\dagger D)^{-1}\phi\,, $$
 
-The example below show how to specify an HMC monomial in the input file.
+corresponding to the following input file configurations with example parameters:
 
 ```
     monomial {
@@ -108,12 +108,9 @@ The example below show how to specify an HMC monomial in the input file.
 |`mre_past`  |number of past solutions used in the chronological inverter|
 |`level`     |integrator level where the monomial force is evaluated     |
 
-When using the chronological inverter the force precision should be $10^{-14}$ or better to ensure reversibility in the algorithm.
-
 ## Twisted Mass
 
-In this monomial the twisted mass is added before the Dirac operator has been even/odd preconditioned.
-The example below shows how to specify the monomial in the input file.
+In this monomial the twisted mass is added before the Dirac operator has been even/odd preconditioned. Specify as follows:
 
 ```
     monomial {
@@ -139,12 +136,9 @@ The example below shows how to specify the monomial in the input file.
 |`mre_past`  |number of past solutions used in the chronological inverter|
 |`level`     |integrator level where the monomial force is evaluated     |
 
-When using the chronological inverter the force precision should be $10^{-14}$ or better to ensure reversibility in the algorithm.
-
 ## Twisted Mass Alternative
 
-In this monomial the twisted mass is added after the Dirac operator has been even/odd preconditioned.
-The example below shows how to specify the monomial in the input file.
+In this monomial the twisted mass is added after the Dirac operator has been even-odd preconditioned.
 
 ```
     monomial {
@@ -170,15 +164,11 @@ The example below shows how to specify the monomial in the input file.
 |`mre_past`  |number of past solutions used in the chronological inverter|
 |`level`     |integrator level where the monomial force is evaluated     |
 
-When using the chronological inverter the force precision should be $10^{-14}$ or better to ensure reversibility in the algorithm.
-
 ## Hasenbusch
 
 The Hasenbusch term is a mass preconditioned term, used in connection with an HMC monomial.
 
 $$ S = \phi^\dagger\left(\frac{D^\dagger D}{(D+\Delta m)^\dagger (D+\Delta m)}\right)\phi $$
-
-The example below show how to specify a Hasenbusch monomial in the input file.
 
 ```
     monomial {
@@ -204,11 +194,10 @@ The example below show how to specify a Hasenbusch monomial in the input file.
 |`mre_past`  |number of past solutions used in the chronological inverter|
 |`level`     |integrator level where the monomial force is evaluated     |
 
-When using the chronological inverter the force precision should be $10^{-14}$ or better to ensure reversibility in the algorithm. In addition, the mass used in the associated HMC monomial should be the mass of this monomial plus the mass shift.
-
 ## TM Hasenbusch
 
-The example below show how to specify a Hasenbusch monomial with even odd preconditioned twisted mass
+To include a Hasenbusch monomial with even-odd preconditioned twisted mass, adjust starting from the following template parameters
+
 
 ```
     monomial {
@@ -236,11 +225,9 @@ The example below show how to specify a Hasenbusch monomial with even odd precon
 |`mre_past`  |number of past solutions used in the chronological inverter|
 |`level`     |integrator level where the monomial force is evaluated     |
 
-When using the chronological inverter the force precision should be $10^{-14}$ or better to ensure reversibility in the algorithm. Further, the twisted mass $\mu$ used in the associated TM monomial should be the twisted mass of this monomial plus the twisted mass shift.
-
 ## TM Hasenbusch Alternative
 
-The example below show how to specify a Hasenbusch monomial with twisted even odd preconditioned operator.
+For a twisted even-odd preconditioned operator use the type `hasenbusch_tm_alt`.
 
 ```
     monomial {
@@ -268,15 +255,13 @@ The example below show how to specify a Hasenbusch monomial with twisted even od
 |`mre_past`  |number of past solutions used in the chronological inverter|
 |`level`     |integrator level where the monomial force is evaluated     |
 
-When using the chronological inverter the force precision should be $10^{-14}$ or better to ensure reversibility in the algorithm. Further, the twisted mass $\mu$ used in the associated TM monomial should be the twisted mass of this monomial plus the twisted mass shift.
-
 ## RHMC
 
 The RHMC monomial uses a rational approximation to simulate an odd number of mass degenerate fermions.
 
 $$ S = \phi^\dagger(D^\dagger D)^{-n/d}\phi $$
 
-The example below show how to specify an RHMC monomial in the input file.
+Include this in the input file using the type `rhmc`. One further needs to specify numerator and denominator fractions in the rational approximation.  
 
 ```
     monomial {
@@ -303,3 +288,7 @@ The example below show how to specify an RHMC monomial in the input file.
 |`md_prec`   |precision of the rational approximation               |
 |`force_prec`|inverter precision used when calculating the force    |
 |`level`     |integrator level where the monomial force is evaluated|
+
+## Chronological Inverter
+
+When using the chronological inverter the force precision should be $10^{-14}$ or better to ensure reversibility in the algorithm. Further, masses given in monomials should include the mass shift.

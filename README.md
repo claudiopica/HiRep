@@ -7,6 +7,7 @@ This repository contains the HiRep simulation code.
 * GCC or different C-compiler
 * MPI implementation, i.e. OpenMPI or MPICH for MPI support
 * In order to make use of CUDA GPU acceleration compile with CUDA 11.x, for multi-GPU using a CUDA-aware MPI implementation
+* Perl on compilation
 
 
 ## Compilation
