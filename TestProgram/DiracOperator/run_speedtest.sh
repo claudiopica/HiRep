@@ -1,10 +1,10 @@
 #!/bin/bash
-MAXCORE=44
+MAXCORE=64
 NSOCKETS=2
 NODES=$1
 localt=(4 6 8 10)
 locall=6
-MAXT=80
+MAXT=120
 
 EXEC="speed_test_diracoperator"
 outfile="out_0_n${NODES}"
@@ -20,6 +20,7 @@ rm -rf $jobmpi
 
 echo "export  OMP_PROC_BIND=close" > $jobmpi
 echo "export  OMP_PLACES=cores" >> $jobmpi
+echo "scontrol show hostname \$SLURM_JOB_NODELIST | perl -ne 'chomb; print \"\$_\"x1'> myhostall_nodes${NODES}">> $jobmpi
 
 
 cat <<EOF >$reportfile
@@ -81,6 +82,8 @@ for paral in $(seq 0 3); do
 
     for npt in ${NPTLIST[*]}; do
         (( ( ( ( npt * NPX * NPY * NPZ ) / 2 ) * 2 ) != npt*NPX*NPY*NPZ )) && continue
+        (( ( ( ( npt * NPX * NPY * NPZ ) / NODES ) * NODES ) != npt*NPX*NPY*NPZ )) && continue
+        (( npt * NPX * NPY * NPZ  < NODES )) && continue        
         for lct in ${localt[*]}; do
             ((glbt = npt * lct ))
             ((glbt > MAXT)) && continue
@@ -108,12 +111,10 @@ EOF
             omplist=(`seq 2 2 $maxompproc`)
             omplist=(1 ${omplist[@]})
             for ompproc in ${omplist[@]}; do
-                (( ompproc * npt * NPX * NPY * NPZ >  MAXPROC )) && break
-                numactl=""
-                #((procpernode == 1)) && numactl="numactl –physcpubind=0  –localalloc"
+                (( ompproc * npt * NPX * NPY * NPZ >  MAXPROC )) && continue
                 echo export OMP_NUM_THREADS=$ompproc >>$jobmpi
                 echo rm -f ${outfile}_${npt}_${lct}_${ompproc} >>$jobmpi
-                echo $numactl mpirun -n $(( npt * NPX * NPY * NPZ )) ./$EXEC -i loc_speed_${NODES}_${npt}_${lct}_${paral}.in -o ${outfile}_${NODES}_${npt}_${lct}_${paral}_${ompproc} >>$jobmpi
+                echo mpirun  -hostfile myhostall_nodes${NODES} -n $(( npt * NPX * NPY * NPZ )) --map-by node ./$EXEC -i loc_speed_${NODES}_${npt}_${lct}_${paral}.in -o ${outfile}_${NODES}_${npt}_${lct}_${paral}_${ompproc} >>$jobmpi
                 echo -e "$parse_out_script ${outfile}_${NODES}_${npt}_${lct}_${paral}_${ompproc} >>$reportfile\n" >>$jobmpi
             done
         done
