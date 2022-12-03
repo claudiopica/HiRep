@@ -254,19 +254,11 @@ void Dphi_cpu_(spinor_field *out, spinor_field *in)
       (*r).c[1] = chi2;
       (*r).c[3] = chi2;
 
-      //if (ix == 69) printf("CPU res(0): %0.2e + i%0.2e\n", 
-      //    creal((*r).c[0].c[0]), cimag((*r).c[0].c[0]));
-
       /******************************* direction -0 *********************************/
 
       iy = idn(ix, 0);
       sm = _FIELD_AT(in, iy);
       um = pu_gauge_f(iy, 0);
-
-      if (iy == 5) printf("CPU spinor comp: %0.2e + i%0.2e\n", 
-                     creal((*sm).c[0].c[0]), cimag((*sm).c[0].c[0]));
-      //if (ix == 69) printf("CPU gauge: %0.2e + i%0.2e\n", 
-      //               creal((*um).c[0]), cimag((*um).c[0]));
 
       _vector_sub_f(psi, (*sm).c[0], (*sm).c[2]);
       _vector_sub_f(psi2, (*sm).c[1], (*sm).c[3]);
@@ -277,9 +269,6 @@ void Dphi_cpu_(spinor_field *out, spinor_field *in)
       _vector_sub_assign_f((*r).c[2], chi);
       _vector_add_assign_f((*r).c[1], chi2);
       _vector_sub_assign_f((*r).c[3], chi2);
-
-      //if (ix == 69) printf("CPU res(0): %0.2e + i%0.2e\n", 
-      //   creal((*r).c[0].c[0]), cimag((*r).c[0].c[0]));
 
       /******************************* direction +1 *********************************/
 
@@ -318,11 +307,6 @@ void Dphi_cpu_(spinor_field *out, spinor_field *in)
       iy = iup(ix, 2);
       sp = _FIELD_AT(in, iy);
       up = pu_gauge_f(ix, 2);
-
-      //if (ix == 69) printf("CPU res spinor comp: %0.2e + i%0.2e \n", 
-      //      creal((*sp).c[0].c[0]), cimag((*sp).c[0].c[0]));
-      //if (ix == 69) printf("CPU gauge: %0.2e + i%0.2e\n", 
-      //                    creal((*up).c[0]), cimag((*up).c[0]));
 
       _vector_add_f(psi, (*sp).c[0], (*sp).c[3]);
       _vector_sub_f(psi2, (*sp).c[1], (*sp).c[2]);

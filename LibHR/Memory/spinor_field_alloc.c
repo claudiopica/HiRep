@@ -123,7 +123,7 @@
                                                                                                                     \
             int stride = 0;                                                                                         \
             int ix_loc = 0;                                                                                         \
-            _INNER_PIECE_FOR(in->type, ixp)                                                                         \
+            _PIECE_FOR(in->type, ixp)                                                                               \
             {                                                                                                       \
                 stride = in->type->master_end[ixp] - in->type->master_start[ixp] + 1;                               \
                 target  = _FIELD_BLK(out, ixp);                                                                     \
@@ -132,17 +132,6 @@
                     source = _FIELD_AT(in, ix);                                                                     \
                     ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);                                                        \
                     write_gpu_##_site_type(stride, (*source), target, ix_loc, 0);                                   \
-                }                                                                                                   \
-            }                                                                                                       \
-                                                                                                                    \
-            for (int i = 0; i < in->type->nbuffers_spinor; ++i)                                                     \
-            {                                                                                                       \
-                stride = in->type->sbuf_len[i];                                                                     \
-                target = _BUF_DFIELD_BLK(out, i, (_size));                                                          \
-                for (int ix = 0; ix < in->type->sbuf_len[i]; ++ix)                                                  \
-                {                                                                                                   \
-                    source = _FIELD_AT(in, out->type->sbuf_start[i] + ix);                                          \
-                    write_gpu_##_site_type(stride, (*source), target, ix, 0);                                       \
                 }                                                                                                   \
             }                                                                                                       \
         }
@@ -155,7 +144,7 @@
                                                                                                                     \
             int stride = 0;                                                                                         \
             int ix_loc = 0;\
-            _INNER_PIECE_FOR(in->type, ixp)                                                                               \
+            _PIECE_FOR(in->type, ixp)                                                                               \
             {                                                                                                       \
                 stride = in->type->master_end[ixp] - in->type->master_start[ixp] + 1;                               \
                 source = _FIELD_BLK(in, ixp);                                                                       \
@@ -164,18 +153,6 @@
                     ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);                                                        \
                     target = _FIELD_AT(out, ix);                                                                    \
                     read_gpu_##_site_type(stride, (*target), source, ix_loc, 0);                                    \
-                }                                                                                                   \
-            }                                                                                                       \
-                                                                                                                    \
-            for (int i = 0; i < in->type->nbuffers_spinor; ++i)                                                     \
-            {                                                                                                       \
-                stride = in->type->sbuf_len[i];                                                                     \
-                source = _BUF_FIELD_BLK(in, i);                                                                     \
-                source = in->ptr + (_size)*in->type->sbuf_start[i];                                                 \
-                for (int ix = 0; ix < in->type->sbuf_len[i]; ++ix)                                                  \
-                {                                                                                                   \
-                    target = _FIELD_AT(out, ix + in->type->sbuf_start[i]);                                          \
-                    read_gpu_##_site_type(stride, (*target), source, ix, 0);                                        \
                 }                                                                                                   \
             }                                                                                                       \
         }

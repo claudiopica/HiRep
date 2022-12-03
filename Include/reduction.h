@@ -65,67 +65,74 @@ void bcast_int(int *i, int n);
 #endif
 
 #ifdef WITH_GPU
-    /**
-     * @brief Sums across GPU nodes after finding the local sum (integer)
-     *
-     * @param vector		Vector with local results
-     * @param size		Size of vector
-     *
-     * @return int 		Result of sum
-     */
-    int global_sum_gpu_int(int *vector, int size);
+   // TODO: Here the cross compilation does not work (SAM)
+   //#ifdef __cplusplus
+   //   /**
+   //   * @brief Sums across GPU nodes after finding the local sum (generics)
+   //   *
+   //   * @param vector		Vector with local results
+   //   * @param size		Size of vector
+   //   *
+   //   * @return T		Result of sum of generic type T.
+   //   */
+   //   template <class T>
+   //   T global_sum_gpu(T *vector, int size);
+   //   extern "C" {
+   //#endif
 
-    /**
-     * @brief Sums across GPU nodes after finding the local sum (single precision reals)
-     *
-     * @param vector		Vector with local results
-     * @param size		Size of vector
-     *
-     * @return float		Result of sum
-     */
-    float global_sum_gpu_float(float *vector, int size);
+   /**
+   * @brief Sums across GPU nodes after finding the local sum (integer)
+   *
+   * @param vector		Vector with local results
+   * @param size		Size of vector
+   *
+   * @return int 		Result of sum
+   */
+   int global_sum_gpu_int(int *vector, int size);
 
-    /**
-     * @brief Sums across GPU nodes after finding the local sum (double precision reals)
-     *
-     * @param vector 		Vector with local results
-     * @param size		Size of vector
-     *
-     * @return double		Result of sum
-     */
-    double global_sum_gpu_double(double *vector, int size);
+   /**
+   * @brief Sums across GPU nodes after finding the local sum (single precision reals)
+   *
+   * @param vector		Vector with local results
+   * @param size		Size of vector
+   *
+   * @return float		Result of sum
+   */
+   float global_sum_gpu_float(float *vector, int size);
 
-    /**
-     * @brief Sums across GPU nodes after finding the local sum (single precision complex)
-     *
-     * @param vector 		Vector with local results
-     * @param size		Size of vector
-     *
-     * @return hr_complex_flt	Result of sum
-     */
-    hr_complex_flt global_sum_gpu_complex_flt(hr_complex_flt *vector, int size);
+   /**
+   * @brief Sums across GPU nodes after finding the local sum (double precision reals)
+   *
+   * @param vector 		Vector with local results
+   * @param size		Size of vector
+   *
+   * @return double		Result of sum
+   */
+   double global_sum_gpu_double(double *vector, int size);
 
-    /**
-     * @brief Sums across GPU nodes after finding the local sum (double precision complex)
-     *
-     * @param vector		Vector with local results
-     * @param size		Size of vector
-     *
-     * @return hr_complex	Result of sum
-     */
-    hr_complex global_sum_gpu_complex(hr_complex *vector, int size);
+   /**
+   * @brief Sums across GPU nodes after finding the local sum (single precision complex)
+   *
+   * @param vector 		Vector with local results
+   * @param size		Size of vector
+   *
+   * @return hr_complex_flt	Result of sum
+   */
+   hr_complex_flt global_sum_gpu_complex_flt(hr_complex_flt *vector, int size);
 
-    #ifdef __cplusplus
-        /**
-         * @brief Sums across GPU nodes after finding the local sum (generics)
-         *
-         * @param vector		Vector with local results
-         * @param size		Size of vector
-         *
-         * @return T		Result of sum of generic type T.
-         */
-         T global_sum_gpu(T *vector, int size);
-    #endif
+   /**
+   * @brief Sums across GPU nodes after finding the local sum (double precision complex)
+   *
+   * @param vector		Vector with local results
+   * @param size		Size of vector
+   *
+   * @return hr_complex	Result of sum
+   */
+   hr_complex global_sum_gpu_complex(hr_complex *vector, int size);
+    
+   //#ifdef __cplusplus
+   //   }
+   //#endif
 
 #endif
 #endif 

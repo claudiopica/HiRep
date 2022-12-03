@@ -11,6 +11,7 @@
 #include "utils.h"
 #include "logger.h"
 #include "communications.h"
+#include "geometry_check.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -100,7 +101,7 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
   /* par->n deve essere almeno 1! */
   assert(par->n>0);
   _TWO_SPINORS_MATCHING(in,&out[0]);
-  _ARRAY_SPINOR_MATCHING(out,par->n)
+  _ARRAY_SPINOR_MATCHING(out,par->n);
   
   /* allocate spinors fields and aux real variables */
   /* implementation note: to minimize the number of malloc calls

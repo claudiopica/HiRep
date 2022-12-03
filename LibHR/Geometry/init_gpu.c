@@ -29,7 +29,7 @@ extern int *iup_gpu, *idn_gpu;
 
 void init_neighbors_gpu() 
 {
-  int N = T_EXT*X_EXT*Y_EXT*Z_EXT;
+  int N = T*X*Y*Z;
   cudaError_t error_id;
   error_id = cudaMalloc((void **)&iup_gpu, 4 * N * sizeof(int));
   error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error allocating iup_gpu neighbors array.\n");

@@ -69,6 +69,9 @@ hr_complex* alloc_complex_sum_field(int n);
 #define _BUF_GPU_4FIELD_BLK(s,i) (((s)->gpu_ptr) + 4*(s)->type->sbuf_start[(i)])
 #define _BUF_GPU_DFIELD_BLK(s,i,size) (((s)->gpu_ptr) + size*(s)->type->sbuf_start[(i)])
 
+#define _GPU_IDX_TO_LOCAL(in, ix, ixp) ix - in->type->master_start[(ixp)];
+#define _SITE_IDX_GPU(ix, ixp, stride) (ix) + stride*(ixp)
+
 #define CudaSafeCall( err )     __cudaSafeCall( err, __FILE__, __LINE__ )
 #define CudaCheckError()        __cudaCheckError( __FILE__, __LINE__ )
 void __cudaSafeCall( cudaError_t err, const char *file, const int line );

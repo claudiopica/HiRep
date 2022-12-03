@@ -162,7 +162,7 @@ void start_sf_sendrecv_flt(spinor_field_flt*);
     _DECLARE_COMMS(scalar_field, suNg_scalar_field, "SU(N_g) scalar field");
     _DECLARE_COMMS(avfield, suNg_av_field, "SU(N_g) algebra vector field");
     _DECLARE_COMMS(gtransf, suNg_field, "Gauge transformation");
-    _DECLARE_COMMS(clover_term, suNfc_field "Clover term");
+    _DECLARE_COMMS(clover_term, suNfc_field, "Clover term");
     _DECLARE_COMMS(clover_force, suNf_field, "Clover force");
 
     #undef _DECLARE_COMMS

@@ -30,4 +30,6 @@ void print_wdmatrix(char *filename);
    void init_neighbors_gpu();
 #endif
 
+#endif
+
 

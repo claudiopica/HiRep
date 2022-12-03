@@ -23,6 +23,7 @@
 #include "geometry_fuse.h"
 #include "geometry_init.h"
 #include "cpu_geometry.h"
+#include "geometry_check.h"
 #ifdef WITH_GPU
    #include "gpu_geometry.h"
 #endif

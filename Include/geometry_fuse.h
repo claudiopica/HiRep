@@ -15,3 +15,5 @@
 #define _FUSE_MASTER_FOR_MAX(type, is, ...) _FUSE_MASTER_FOR_RED(type, is, _omp_max(__VA_ARGS__), )
 #define _FUSE_MASTER_FOR_MIN(type, is, ...) _FUSE_MASTER_FOR_RED(type, is, _omp_min(__VA_ARGS__), )
 
+#endif
+

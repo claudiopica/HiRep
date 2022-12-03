@@ -28,6 +28,8 @@
 // TODO: Doxygen docs
 // TODO: Remove brackets from macro params
 // TODO: spinor n parameter
+// TODO: block handle allocation right? It seems that we have a handle for every block/process combination, 
+//       which we do not need, because every process only deals with a subset of blocks
 
 /*
  * Here we use for all macros the parameters:
@@ -120,7 +122,7 @@
                                                                                                             \
             int stride = 0;                                                                                 \
             int ix_loc = 0;                                                                                 \
-            _INNER_PIECE_FOR(in->type, ixp)                                                                 \
+            _PIECE_FOR(in->type, ixp)                                                                       \
             {                                                                                               \
                 stride = in->type->master_end[ixp] - in->type->master_start[ixp] + 1;                       \
                 target = _DFIELD_BLK(out, ixp, (_size));                                                    \
@@ -134,20 +136,6 @@
                     }                                                                                       \
                 }                                                                                           \
             }                                                                                               \
-                                                                                                            \
-            for (int i = 0; i < in->type->nbuffers_gauge; ++i)                                              \
-            {                                                                                               \
-                stride = in->type->sbuf_len[i];                                                             \
-                target = _BUF_DFIELD_BLK(out, i, (_size));                                                  \
-                for (int ix = 0; ix < in->type->sbuf_len[i]; ++ix)                                          \
-                {                                                                                           \
-                    for (int comp = 0; comp < _size; ++comp)                                                \
-                    {                                                                                       \
-                        source = _DFIELD_AT(in, out->type->sbuf_start[i] + ix, comp, (_size));                                         \
-                        write_gpu_##_site_type(stride, (*source), target, ix, comp);                        \
-                    }                                                                                       \
-                }                                                                                           \
-            }                                                                                               \
         }
 
     #define _DECLARE_CONVERT_TO_CPU_FORMAT(_name, _field_type, _site_type, _size)                           \
@@ -158,7 +146,7 @@
                                                                                                             \
             int ix_loc = 0;                                                                                 \
             int stride = 0;                                                                                 \
-            _INNER_PIECE_FOR(in->type, ixp)                                                                 \
+            _PIECE_FOR(in->type, ixp)                                                                       \
             {                                                                                               \
                 stride = in->type->master_end[ixp] - in->type->master_start[ixp] + 1;                       \
                 source = _DFIELD_BLK(in, ixp, (_size));                                                     \
@@ -169,20 +157,6 @@
                     {                                                                                       \
                         target = _DFIELD_AT(out, ix, comp, (_size));                                        \
                         read_gpu_##_site_type(stride, (*target), source, ix_loc, comp);                     \
-                    }                                                                                       \
-                }                                                                                           \
-            }                                                                                               \
-                                                                                                            \
-            for (int i = 0; i < in->type->nbuffers_gauge; ++i)                                              \
-            {                                                                                               \
-                stride = in->type->sbuf_len[i];                                                             \
-                source = in->ptr + (_size)*in->type->sbuf_start[i];                                         \
-                for (int ix = 0; ix < in->type->sbuf_len[i]; ++ix)                                          \
-                {                                                                                           \
-                    for (int comp = 0; comp < _size; ++comp)                                                \
-                    {                                                                                       \
-                        target = _DFIELD_AT(out, ix + in->type->sbuf_start[i], comp, (_size));              \
-                        read_gpu_##_site_type(stride, (*target), source, ix, comp);                         \
                     }                                                                                       \
                 }                                                                                           \
             }                                                                                               \

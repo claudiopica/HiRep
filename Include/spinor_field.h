@@ -13,6 +13,7 @@
 #ifndef SPINOR_FIELD_H
 #define SPINOR_FIELD_H
 
+#include "geometry.h"
 #include "suN_types.h"
 #ifdef WITH_MPI
 	#include <mpi.h>
@@ -225,7 +226,7 @@ _DECLARE_FIELD_STRUCT(scalar_field, double);
  * @struct _ldl_field
  * @brief FIXME: Add docs
  */
-_DECLARE_FIELD_STRUCT(ldl_field, ldl_t);
+//_DECLARE_FIELD_STRUCT(ldl_field, ldl_t);
 
 /**
  * @struct _suNfc_field
