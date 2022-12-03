@@ -1,7 +1,10 @@
-#ifndef BASIS_LINEAR_ALGEBRA_H
-#define BASIS_LINEAR_ALGEBRA_H
+/**
+ * @file test_utils.h
+ * @brief utilities to simplify testing
+ */
 
-// TODO: Merge everything into testing utilities.
+#ifndef TEST_UTILS_H
+#define TEST_UTILS_H
 
 // Testing utils
 void test_setup();

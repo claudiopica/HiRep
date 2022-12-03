@@ -3,14 +3,6 @@
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
-/**************************************************************************\
- *
- * File spinor_field.h
- *
- * Definitions of field structures
- *
- **************************************************************************/
-
 /**
  * @file
  * @brief The elementary site structures defined in suN.h are used in this 
@@ -21,47 +13,51 @@
 #ifndef SPINOR_FIELD_H
 #define SPINOR_FIELD_H
 
-#include "geometry.h"
 #include "suN_types.h"
-#include "error.h"
-#include "hr_complex.h"
 #ifdef WITH_MPI
-#include <mpi.h>
+	#include <mpi.h>
 #endif
 
-/* GPU data */
+/**
+ * @brief This macro corresponds to a field declaration line to be used 
+ *        inside a struct declaration. It only adds a GPU field data
+ *        array, if the code is compiled with the flag WITH_GPU.
+ *
+ * @param _type Elementary site/link type of the field data
+ */
 #define _GPU_FIELD_DATA(_type)
 #ifdef WITH_GPU
-#undef _GPU_FIELD_DATA
-#define _GPU_FIELD_DATA(_type) _type *gpu_ptr;
-#endif //WITH_GPU
+	#undef _GPU_FIELD_DATA
+	#define _GPU_FIELD_DATA(_type) _type *gpu_ptr;
+#endif 
 
-/* MPI data */
-#define _MPI_FIELD_DATA(_type)
+/**
+ * @brief This macro corresponds to a field declaration line to be used
+ * 	  inside a struct declaration. It only add MPI communication 
+ * 	  handles if the code is compiled with the flag WITH_MPI.
+ */
+#define _MPI_FIELD_DATA
 #ifdef WITH_MPI
-#undef _MPI_FIELD_DATA
-#define _MPI_FIELD_DATA(_type) MPI_Request *comm_req;
-#endif //WITH_MPI
+	#undef _MPI_FIELD_DATA
+	#define _MPI_FIELD_DATA MPI_Request *comm_req;
+#endif 
 
-typedef struct {// TODO: this is probably not the right complex type
-	double _Complex up[NF*(2*NF+1)];
-	double _Complex dn[NF*(2*NF+1)];
-} ldl_t;
 
+/**
+ * @brief This macro declares a field struct that contains all necessary 
+ *        field data arrays, geometry information and communication handles.
+ *
+ * @param _name The name of the field type
+ * @param _type The elementary type struct of data stored at each site/link.
+ */
 #define _DECLARE_FIELD_STRUCT(_name,_type) \
-	typedef struct { \
+	typedef struct \
+	{ \
 		_type *ptr; \
 		geometry_descriptor *type; \
-		_MPI_FIELD_DATA(_type) \
+		_MPI_FIELD_DATA \
 		_GPU_FIELD_DATA(_type) \
 	} _name
-
-//typedef struct _##_name { \
-//_type *ptr; \
-//geometry_descriptor *type;\
-//_MPI_FIELD_DATA(_type) \
-//_GPU_FIELD_DATA(_type) \
-//} _name
 
 
 /**
@@ -236,57 +232,5 @@ _DECLARE_FIELD_STRUCT(ldl_field, ldl_t);
  * @brief FIXME: Add docs
  */
 _DECLARE_FIELD_STRUCT(suNfc_field, suNfc);
-
-
-/* LOOPING MACRO */
-
-#ifdef CHECK_SPINOR_MATCHING
-
-#define _TWO_SPINORS_MATCHING(s1,s2) \
-	error((s1)->type!=(s2)->type,1,__FILE__ ": ", "Spinors don't match!");
-
-#define _ARRAY_SPINOR_MATCHING(s,n) \
-	for(int _i=0; _i<n; _i++) \
-		error((s)->type!=((s)+_i)->type,1,__FILE__ ": ", "Spinors don't match!");
-
-#else /* CHECK_SPINOR_MATCHING */
-
-#define _TWO_SPINORS_MATCHING(s1,s2)
-
-#define _ARRAY_SPINOR_MATCHING(s,n)
-
-#endif /* CHECK_SPINOR_MATCHING */
-
-
-#define _ONE_SPINOR_FOR_RED(s,redop1,redop2) _MASTER_FOR_RED((s)->type,_spinor_for_is,redop1,redop2)
-#define _ONE_SPINOR_FOR(s) _ONE_SPINOR_FOR_RED(s,,)
-#define _ONE_SPINOR_FOR_SUM(s,...) _ONE_SPINOR_FOR_RED(s,_omp_sum(__VA_ARGS__),)
-
-#define _TWO_SPINORS_FOR_RED(s1,s2,redop1,redop2) \
-  _TWO_SPINORS_MATCHING(s1,s2); \
-  _ONE_SPINOR_FOR_RED(s1,redop1,redop2)
-#define _TWO_SPINORS_FOR(s1,s2) _TWO_SPINORS_FOR_RED(s1,s2,,)
-#define _TWO_SPINORS_FOR_SUM(s1,s2,...) _TWO_SPINORS_FOR_RED(s1,s2,_omp_sum(__VA_ARGS__),)
-
-#define _THREE_SPINORS_FOR_RED(s1,s2,s3,redop1,redop2) \
-  _TWO_SPINORS_MATCHING(s1,s2); \
-  _TWO_SPINORS_MATCHING(s1,s3); \
-  _ONE_SPINOR_FOR_RED(s1,redop1,redop2)
-#define _THREE_SPINORS_FOR(s1,s2,s3) _THREE_SPINORS_FOR_RED(s1,s2,s3,,)
-
-#include "field_ordering.h"
-
-#define _FIELD_AT(s,i) (((s)->ptr)+i-(s)->type->master_shift)
-#define _4FIELD_AT(s,i,mu) (((s)->ptr)+coord_to_index(i-(s)->type->master_shift,mu))
-#define _6FIELD_AT(s,i,mu) (((s)->ptr)+((i-(s)->type->master_shift)*6+mu))
-#define _DFIELD_AT(s,i,mu,size) (size == 1) ? _FIELD_AT(s,i) : ((size == 4) ? _4FIELD_AT(s,i,mu) : _6FIELD_AT(s,i,mu))
-
-#define _SPINOR_PTR(s) _FIELD_AT(s,_spinor_for_is)
-
-#ifdef  WITH_GPU
-  #define _GPU_FIELD_AT(s,i) (((s)->gpu_ptr)+i-(s)->type->master_shift)
-  #define _GPU_4FIELD_AT(s,i,mu) (((s)->gpu_ptr)+coord_to_index(i-(s)->type->master_shift,mu))
-  #define _GPU_6FIELD_AT(s,i,mu) (((s)->gpu_ptr)+((i-(s)->type->master_shift)*6+mu))
-#endif
 
 #endif
