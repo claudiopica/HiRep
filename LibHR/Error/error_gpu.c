@@ -32,7 +32,7 @@ void __cudaSafeCall( cudaError_t err, const char *file, const int line )
     return;
 }
 
-inline void __cudaCheckError( const char *file, const int line )
+inline void __cudaCheckError( const char *file, int line )
 {
 #ifdef CUDA_CHECK_ERROR
 

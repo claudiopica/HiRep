@@ -27,7 +27,6 @@
 #endif
 
 #ifdef __cplusplus
-
 void select_GPU(input_gpu gpu_var);
 int enable_GPU_peer_to_peer_access();
 
@@ -41,12 +40,14 @@ int enable_GPU_peer_to_peer_access();
 void init_gpu(input_gpu gpu_var)
 {
   lprintf("GPU_INIT", 0, "Initializing GPU\n");
+  struct cudaDeviceProp device_prop;
+  CHECK_CUDA(cudaGetDeviceProperties(&device_prop, gpu_var.gpuID));
 
   // Print GPU info
-  print_device_count_info(gpu_var);
-  print_driver_info(gpu_var);
-  print_runtime_info(gpu_var);
-  print_hardware_info(gpu_var);
+  print_device_count_info(device_prop, gpu_var);
+  print_driver_info();
+  print_runtime_info(device_prop);
+  print_hardware_info(device_prop, gpu_var);
 
   // Select a card (no MPI) or bind cards to processes (MPI)
   select_GPU(gpu_var);

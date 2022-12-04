@@ -232,10 +232,8 @@ void print_supported_features(cudaDeviceProp device_prop)
  *
  * @param input_gpu             A struct containing parameters on the current GPU.
  */
-void print_hardware_info(input_gpu gpu_var) 
+void print_hardware_info(cudaDeviceProp device_prop, input_gpu gpu_var) 
 {
-  struct cudaDeviceProp device_prop;
-  CHECK_CUDA(cudaGetDeviceProperties(&device_prop, gpu_var.gpuID));
   lprintf("GPU_INIT", 10, "Device: %s\n", device_prop.name);
 
   print_memory_info(device_prop, gpu_var);

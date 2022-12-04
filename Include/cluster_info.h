@@ -28,7 +28,7 @@
      *
      * @param input_gpu             A struct containing parameters on the current GPU.
      */
-    void print_runtime_info(input_gpu);
+    void print_runtime_info(cudaDeviceProp);
     /**
      * @brief Print Global memory information including bandwidth 
      *        paramters and supported features
@@ -88,6 +88,6 @@
      *
      * @param input_gpu             A struct containing parameters on the current GPU.
      */
-    void print_hardware_info(input_gpu)
+    void print_hardware_info(cudaDeviceProp, input_gpu)
 #endif
 #endif
