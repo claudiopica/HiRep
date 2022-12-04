@@ -419,6 +419,7 @@ __global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out,
 
     /******************************* direction +0 *********************************/
     iy=iup_d[4*ix];
+    if (ix==5) printf("iy: %d\n", iy);
     iyp=iy/vol4h;
     local_iy = iy % vol4h;
 

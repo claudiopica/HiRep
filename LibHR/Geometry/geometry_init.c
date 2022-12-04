@@ -15,6 +15,7 @@
 #include "global.h"
 #include "error.h"
 #include "logger.h"
+#include "new_geometry.h"
 #include <stdlib.h>
 
 static int *alloc_mem=NULL;

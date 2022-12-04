@@ -39,7 +39,8 @@ extern "C" {
 }
 #endif
 
-// GPU declarations, will be empty if not compiled WITH_GPU
-#include "dirac_gpu.h" 
+#ifdef WITH_GPU
+   #include "dirac_gpu.h" 
+#endif
 
 #endif
