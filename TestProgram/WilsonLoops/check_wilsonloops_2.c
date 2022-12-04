@@ -36,7 +36,7 @@ int main(int argc,char *argv[])
   start_gf_sendrecv(u_gauge);
   complete_gf_sendrecv(u_gauge);
 
-  double complex plaq[T*X*Y*Z][6];
+  hr_complex plaq[T*X*Y*Z][6];
   int t,x,y,z,i,j,k,mu,nu;
   j=0;
 
@@ -59,7 +59,7 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"\n");
 
 
-  double complex ctmp;
+  hr_complex ctmp;
   double dtmp;
   double err=0.;
 

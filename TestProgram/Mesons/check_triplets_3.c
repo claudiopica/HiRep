@@ -55,7 +55,7 @@ char *mes_channel_names[16] = {"g5", "id", "g0", "g1", "g2", "g3", "g0g1", "g0g2
 #define mult_mat(r, A, B)                      \
   {                                            \
     int _i, _j, _k;                            \
-    double complex wm[4][4];                   \
+    hr_complex wm[4][4];                   \
     for (_i = 0; _i < 4; _i++)                 \
       for (_j = 0; _j < 4; _j++)               \
       {                                        \
@@ -91,7 +91,7 @@ char *mes_channel_names[16] = {"g5", "id", "g0", "g1", "g2", "g3", "g0g1", "g0g2
     }                          \
   }
 
-static void adj_mat(double complex At[4][4], double complex A[4][4])
+static void adj_mat(hr_complex At[4][4], hr_complex A[4][4])
 {
   int i, j;
   for (i = 0; i < 4; i++)
@@ -132,13 +132,13 @@ input_glb glb_ip = init_input_glb(glb_ip);
 input_mesons mes_ip = init_input_mesons(mes_ip);
 
 /*\bar{Gamma} Gamma / 4 */
-double complex get_gid(double complex Gamma[4][4])
+hr_complex get_gid(hr_complex Gamma[4][4])
 {
-  double complex tmp[4][4], tmp2[4][4];
-  double complex Gammabar[4][4];
+  hr_complex tmp[4][4], tmp2[4][4];
+  hr_complex Gammabar[4][4];
   int sign;
-  double complex r;
-  double complex lg0[4][4];
+  hr_complex r;
+  hr_complex lg0[4][4];
   g0_debug(lg0, &sign);
 
   adj_mat(tmp, Gamma);
@@ -151,13 +151,13 @@ double complex get_gid(double complex Gamma[4][4])
 
 
 /* = tr gamma_mu \bar{Gamma} gamma_mu Gamma / 4 \bar{Gamma} = gamma_0 Gamma^\dagger gamma_0 */
-double complex get_gmu(double complex Gamma[4][4], int mu)
+hr_complex get_gmu(hr_complex Gamma[4][4], int mu)
 {
   int sign;
-  double complex tmp[4][4], tmp2[4][4], tmp3[4][4];
-  double complex Gammabar[4][4];
-  double complex r;
-  double complex lg0[4][4], gmu[4][4];
+  hr_complex tmp[4][4], tmp2[4][4], tmp3[4][4];
+  hr_complex Gammabar[4][4];
+  hr_complex r;
+  hr_complex lg0[4][4], gmu[4][4];
 
   g0_debug(lg0, &sign);
   if (mu == 1)
@@ -181,10 +181,10 @@ double complex get_gmu(double complex Gamma[4][4], int mu)
   return r / 4.0;
 }
 
-double complex get_g0(double complex Gamma[4][4])
+hr_complex get_g0(hr_complex Gamma[4][4])
 {
-  double complex tmp[4][4];
-  double complex r;
+  hr_complex tmp[4][4];
+  hr_complex r;
   set_zero_mat(tmp);
   mult_mat(tmp, Gamma, Gamma);
   trace_mat(r, tmp);
@@ -200,7 +200,7 @@ int main(int argc, char *argv[])
   double tol=1.e-7;
   data_storage_array* out_corr=NULL;
 
-  double complex g[16][4][4];
+  hr_complex g[16][4][4];
   g5_debug(g[0], &sign);
   id_debug(g[1], &sign);
   g0_debug(g[2], &sign);
@@ -263,7 +263,7 @@ int main(int argc, char *argv[])
   measure_spectrum_pt(0, 1, &mass, 1, 0, 1e-28,STORE, &out_corr);
   lprintf("MAIN", 0, "Checking results\n");
 
-  double complex corr_triplets[16][GLB_T];
+  hr_complex corr_triplets[16][GLB_T];
 
   for (i = 0; i < 16; i++)
   {
@@ -311,9 +311,9 @@ double square(double x)
   return x * x;
 }
 
-double complex ev(double k[4])
+hr_complex ev(double k[4])
 {
-  double complex z;
+  hr_complex z;
   z = mass + 4.0 + cos((2.0 * M_PI * k[0]) / GLB_T) + cos((2.0 * M_PI * k[1]) / GLB_X) + cos((2.0 * M_PI * k[2]) / GLB_Y) + cos((2.0 * M_PI * k[3]) / GLB_Z) + I * sqrt(square(sin((2.0 * M_PI * k[0]) / GLB_T)) + square(sin((2.0 * M_PI * k[1]) / GLB_X)) + square(sin((2.0 * M_PI * k[2]) / GLB_Y)) + square(sin((2.0 * M_PI * k[3]) / GLB_Z)));
   return z;
 }
@@ -321,8 +321,8 @@ double complex ev(double k[4])
 void free_correlators(double **triplets)
 {
   double A2[GLB_T], B2[4][GLB_T];
-  double complex A[GLB_T], B[4][GLB_T];
-  double complex tmp, eit;
+  hr_complex A[GLB_T], B[4][GLB_T];
+  hr_complex tmp, eit;
   double norm2, z;
   int i, j, t;
   double k[4];

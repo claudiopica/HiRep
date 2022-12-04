@@ -81,7 +81,7 @@ static void find_low_eig_H2(const eva_prec *e_par, geometry_descriptor *type, in
 /*
 static void check_ortho(spinor_field *in, int n) {
   int i,j;
-  double complex p;
+  hr_complex p;
   for (i=0;i<n;++i) {
     for (j=i;j<n;++j) {
       p=spinor_field_prod_f(&in[i],&in[j]);
@@ -92,7 +92,7 @@ static void check_ortho(spinor_field *in, int n) {
 }
 */
 static void orthogonalize(spinor_field *out, spinor_field *in, int n) {
-  double complex p;
+  hr_complex p;
   while(n>0) {
     --n;
     p=spinor_field_prod_f(&in[n],out);
@@ -134,7 +134,7 @@ void eva_def(spinor_field *out, spinor_field *in){
   orthogonalize(out,ev,loc_par.nev);
   /*
   for (i=0;i<loc_par.nev;++i) {
-    double complex p=spinor_field_prod_f(&ev[i],out);
+    hr_complex p=spinor_field_prod_f(&ev[i],out);
     _complex_mulr(p,(1./eigval[i]-1.),p);
     spinor_field_mulc_add_assign_f(out,p,&ev[i]);
   }
@@ -145,7 +145,7 @@ void eva_def_inv(spinor_field *out, spinor_field *in, double m){
   int i;
   spinor_field_zero_f(out);
   for (i=0;i<loc_par.nev;++i) {
-    double complex p=spinor_field_prod_f(&ev[i],in);
+    hr_complex p=spinor_field_prod_f(&ev[i],in);
     _complex_mulr(p,1./(eigval[i]-m),p);
     spinor_field_mulc_add_assign_f(out,p,&ev[i]);
   }

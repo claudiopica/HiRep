@@ -1,6 +1,6 @@
 /***************************************************************************\
 * Copyright (c) 2008, Claudio Pica, Martin Hansen                           *
-* All rights reserved.                                                      * 
+* All rights reserved.                                                      *
 \***************************************************************************/
 
 #include "global.h"
@@ -58,7 +58,7 @@ void init_force_hmc()
 
 void force_hmc(double dt, void *vpar)
 {
-	int n_iters = 0;
+	// int n_iters = 0;
 	force_hmc_par *par = (force_hmc_par *)vpar;
 	suNg_av_field *force = *par->momenta;
 	spinor_field *pf = par->pf;
@@ -83,7 +83,8 @@ void force_hmc(double dt, void *vpar)
 		/* X = H^{-1} pf = D^{-1} g5 pf */
 		spinor_field_zero_f(Xs);
 		spinor_field_g5_assign_f(pf);
-		n_iters += g5QMR_mshift(&mpar, &D, pf, Xs);
+		// n_iters +=
+		g5QMR_mshift(&mpar, &D, pf, Xs);
 		spinor_field_g5_assign_f(pf);
 
 		if (par->hasenbusch == 0)
@@ -109,23 +110,25 @@ void force_hmc(double dt, void *vpar)
 		}
 
 		spinor_field_zero_f(Ys);
-		n_iters += g5QMR_mshift(&mpar, &D, eta, Ys);
+		// n_iters +=
+		g5QMR_mshift(&mpar, &D, eta, Ys);
 	}
 	else
 	{
-		n_iters += cg_mshift(&mpar, QpQm_tm_alt, pf, Xs);
+		// n_iters +=
+		cg_mshift(&mpar, QpQm_tm_alt, pf, Xs);
 		Qtm_p_alt(Ys, Xs);
 	}
 
 #else
-	//there should be an error from here
 	if (par->mu == 0)
 	{
 		/* X_e = H^{-1} pf */
 		/* X_o = D_{oe} X_e = D_{oe} H^{-1} pf */
 		spinor_field_g5_assign_f(pf);
 		mre_guess(&par->mpar, 0, Xs, &D, pf);
-		n_iters += g5QMR_mshift(&mpar, &D, pf, Xs);
+		// n_iters +=
+		g5QMR_mshift(&mpar, &D, pf, Xs);
 		mre_store(&par->mpar, 0, Xs);
 		spinor_field_g5_assign_f(pf);
 
@@ -143,7 +146,8 @@ void force_hmc(double dt, void *vpar)
 
 		spinor_field_g5_assign_f(eta);
 		mre_guess(&par->mpar, 1, Ys, &D, eta);
-		n_iters += g5QMR_mshift(&mpar, &D, eta, Ys);
+		// n_iters +=
+		g5QMR_mshift(&mpar, &D, eta, Ys);
 		mre_store(&par->mpar, 1, Ys);
 		spinor_field_g5_assign_f(eta);
 
@@ -157,7 +161,8 @@ void force_hmc(double dt, void *vpar)
 	{
 		/* Ye = 1/(QpQm+mu^2) \phi */
 		mre_guess(&par->mpar, 0, Ys, QpQm_tm_alt, pf);
-		n_iters += 2 * cg_mshift(&mpar, QpQm_tm_alt, pf, Ys);
+		// n_iters += 2 *
+		cg_mshift(&mpar, QpQm_tm_alt, pf, Ys);
 		mre_store(&par->mpar, 0, Ys);
 		Qtm_m_alt(Xs, Ys);
 
@@ -169,7 +174,7 @@ void force_hmc(double dt, void *vpar)
 			spinor_field_mul_f(Xs, muS, Xs);
 		}
 	}
-	//to here
+	// to here
 
 #endif
 

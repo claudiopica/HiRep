@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
     int *iup_wrk[nwrk + 1];
     int *idn_wrk[nwrk + 1];
     int idx_wrk[nwrk + 1];
-    double complex plaq[nwrk + 1], test;
+    hr_complex plaq[nwrk + 1], test;
     double dop;
 
     setup_process(&argc, &argv);

@@ -39,12 +39,12 @@ static void random_g(void)
   complete_gt_sendrecv(g);
 }
 
-double complex doubleop(int in, int mu, int nu)
+hr_complex doubleop(int in, int mu, int nu)
 {
   suNg *w1, *w2;
   suNg res, res1;
   int pit;
-  double complex p;
+  hr_complex p;
 
   w2 = pu_gauge(in, mu);
 
@@ -81,10 +81,10 @@ double complex doubleop(int in, int mu, int nu)
   return p;
 }
 
-double complex spatial_plaquette_wrk()
+hr_complex spatial_plaquette_wrk()
 {
-  static double complex pa;
-  static double complex r0;
+  static hr_complex pa;
+  static hr_complex r0;
 
   _OMP_PRAGMA(single)
   {
@@ -96,7 +96,7 @@ double complex spatial_plaquette_wrk()
 
     _SITE_FOR_SUM(&glattice, ixp, ix, r0)
     {
-      double complex tmp;
+      hr_complex tmp;
 
       cplaq_wrk(&tmp, ix, 2, 1);
       r0 += tmp;
@@ -145,7 +145,7 @@ int main(int argc, char *argv[])
 
   int return_value = 0;
 
-  double complex splaq, splaq2, dplaq=0.;
+  hr_complex splaq, splaq2, dplaq=0.;
 
   setup_process(&argc, &argv);
 

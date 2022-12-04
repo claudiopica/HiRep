@@ -117,17 +117,29 @@ unsigned long int getMVM_cpu()
 #ifdef BC_T_THETA
 
 #define _suNf_theta_T_multiply(r, u, s) \
-  _suNf_multiply(vtmp, (u), (s));       \
-  _vector_mulc_f((r), eitheta[0], vtmp)
+  _suNf_multiply(vtmp[0], (u), (s));    \
+  _vector_mulc_f((r), eitheta[0], vtmp[0])
 
 #define _suNf_theta_T_inverse_multiply(r, u, s) \
-  _suNf_inverse_multiply(vtmp, (u), (s));       \
-  _vector_mulc_star_f((r), eitheta[0], vtmp)
+  _suNf_inverse_multiply(vtmp[0], (u), (s));    \
+  _vector_mulc_star_f((r), eitheta[0], vtmp[0])
+
+#define _suNf_double_theta_T_multiply(r1, r2, u, s1, s2)    \
+  _suNf_double_multiply(vtmp[0], vtmp[1], (u), (s1), (s2)); \
+  _vector_mulc_f((r1), eitheta[0], vtmp[0]);                \
+  _vector_mulc_f((r2), eitheta[0], vtmp[1])
+
+#define _suNf_double_theta_T_inverse_multiply(r1, r2, u, s1, s2)    \
+  _suNf_double_inverse_multiply(vtmp[0], vtmp[1], (u), (s1), (s2)); \
+  _vector_mulc_star_f((r1), eitheta[0], vtmp[0]);                   \
+  _vector_mulc_star_f((r2), eitheta[0], vtmp[1])
 
 #else
 
 #define _suNf_theta_T_multiply(r, u, s) _suNf_multiply((r), (u), (s))
 #define _suNf_theta_T_inverse_multiply(r, u, s) _suNf_inverse_multiply((r), (u), (s))
+#define _suNf_double_theta_T_multiply(r1, r2, u, s1, s2) _suNf_double_multiply((r1), (r2), (u), (s1), (s2))
+#define _suNf_double_theta_T_inverse_multiply(r1, r2, u, s1, s2) _suNf_double_inverse_multiply((r1), (r2), (u), (s1), (s2))
 
 #endif
 
@@ -135,35 +147,58 @@ unsigned long int getMVM_cpu()
 #ifdef BC_X_THETA
 
 #define _suNf_theta_X_multiply(r, u, s) \
-  _suNf_multiply(vtmp, (u), (s));       \
-  _vector_mulc_f((r), eitheta[1], vtmp)
+  _suNf_multiply(vtmp[0], (u), (s));    \
+  _vector_mulc_f((r), eitheta[1], vtmp[0])
 
 #define _suNf_theta_X_inverse_multiply(r, u, s) \
-  _suNf_inverse_multiply(vtmp, (u), (s));       \
-  _vector_mulc_star_f((r), eitheta[1], vtmp)
+  _suNf_inverse_multiply(vtmp[0], (u), (s));    \
+  _vector_mulc_star_f((r), eitheta[1], vtmp[0])
+
+#define _suNf_double_theta_X_multiply(r1, r2, u, s1, s2)    \
+  _suNf_double_multiply(vtmp[0], vtmp[1], (u), (s1), (s2)); \
+  _vector_mulc_f((r1), eitheta[1], vtmp[0]);                \
+  _vector_mulc_f((r2), eitheta[1], vtmp[1])
+
+#define _suNf_double_theta_X_inverse_multiply(r1, r2, u, s1, s2)    \
+  _suNf_double_inverse_multiply(vtmp[0], vtmp[1], (u), (s1), (s2)); \
+  _vector_mulc_star_f((r1), eitheta[1], vtmp[0]);                   \
+  _vector_mulc_star_f((r2), eitheta[1], vtmp[1])
 
 #else
 
 #define _suNf_theta_X_multiply(r, u, s) _suNf_multiply((r), (u), (s))
 #define _suNf_theta_X_inverse_multiply(r, u, s) _suNf_inverse_multiply((r), (u), (s))
-
+#define _suNf_double_theta_X_multiply(r1, r2, u, s1, s2) _suNf_double_multiply((r1), (r2), (u), (s1), (s2))
+#define _suNf_double_theta_X_inverse_multiply(r1, r2, u, s1, s2) _suNf_double_inverse_multiply((r1), (r2), (u), (s1), (s2))
 #endif
 
 /* r=t*u*s */
 #ifdef BC_Y_THETA
 
 #define _suNf_theta_Y_multiply(r, u, s) \
-  _suNf_multiply(vtmp, (u), (s));       \
-  _vector_mulc_f((r), eitheta[2], vtmp)
+  _suNf_multiply(vtmp[0], (u), (s));    \
+  _vector_mulc_f((r), eitheta[2], vtmp[0])
 
 #define _suNf_theta_Y_inverse_multiply(r, u, s) \
-  _suNf_inverse_multiply(vtmp, (u), (s));       \
-  _vector_mulc_star_f((r), eitheta[2], vtmp)
+  _suNf_inverse_multiply(vtmp[0], (u), (s));    \
+  _vector_mulc_star_f((r), eitheta[2], vtmp[0])
+
+#define _suNf_double_theta_Y_multiply(r1, r2, u, s1, s2)    \
+  _suNf_double_multiply(vtmp[0], vtmp[1], (u), (s1), (s2)); \
+  _vector_mulc_f((r1), eitheta[2], vtmp[0]);                \
+  _vector_mulc_f((r2), eitheta[2], vtmp[1])
+
+#define _suNf_double_theta_Y_inverse_multiply(r1, r2, u, s1, s2)    \
+  _suNf_double_inverse_multiply(vtmp[0], vtmp[1], (u), (s1), (s2)); \
+  _vector_mulc_star_f((r1), eitheta[2], vtmp[0]);                   \
+  _vector_mulc_star_f((r2), eitheta[2], vtmp[1])
 
 #else
 
 #define _suNf_theta_Y_multiply(r, u, s) _suNf_multiply((r), (u), (s))
 #define _suNf_theta_Y_inverse_multiply(r, u, s) _suNf_inverse_multiply((r), (u), (s))
+#define _suNf_double_theta_Y_multiply(r1, r2, u, s1, s2) _suNf_double_multiply((r1), (r2), (u), (s1), (s2))
+#define _suNf_double_theta_Y_inverse_multiply(r1, r2, u, s1, s2) _suNf_double_inverse_multiply((r1), (r2), (u), (s1), (s2))
 
 #endif
 
@@ -171,17 +206,29 @@ unsigned long int getMVM_cpu()
 #ifdef BC_Z_THETA
 
 #define _suNf_theta_Z_multiply(r, u, s) \
-  _suNf_multiply(vtmp, (u), (s));       \
-  _vector_mulc_f((r), eitheta[3], vtmp)
+  _suNf_multiply(vtmp[0], (u), (s));    \
+  _vector_mulc_f((r), eitheta[3], vtmp[0])
 
 #define _suNf_theta_Z_inverse_multiply(r, u, s) \
-  _suNf_inverse_multiply(vtmp, (u), (s));       \
-  _vector_mulc_star_f((r), eitheta[3], vtmp)
+  _suNf_inverse_multiply(vtmp[0], (u), (s));    \
+  _vector_mulc_star_f((r), eitheta[3], vtmp[0])
+
+#define _suNf_double_theta_T_multiply(r1, r2, u, s1, s2)    \
+  _suNf_double_multiply(vtmp[0], vtmp[1], (u), (s1), (s2)); \
+  _vector_mulc_f((r1), eitheta[3], vtmp[0]);                \
+  _vector_mulc_f((r2), eitheta[3], vtmp[1])
+
+#define _suNf_double_theta_T_inverse_multiply(r1, r2, u, s1, s2)    \
+  _suNf_double_inverse_multiply(vtmp[0], vtmp[1], (u), (s1), (s2)); \
+  _vector_mulc_star_f((r1), eitheta[3], vtmp[0]);                   \
+  _vector_mulc_star_f((r2), eitheta[3], vtmp[1])
 
 #else
 
 #define _suNf_theta_Z_multiply(r, u, s) _suNf_multiply((r), (u), (s))
 #define _suNf_theta_Z_inverse_multiply(r, u, s) _suNf_inverse_multiply((r), (u), (s))
+#define _suNf_double_theta_Z_multiply(r1, r2, u, s1, s2) _suNf_double_multiply((r1), (r2), (u), (s1), (s2))
+#define _suNf_double_theta_Z_inverse_multiply(r1, r2, u, s1, s2) _suNf_double_inverse_multiply((r1), (r2), (u), (s1), (s2))
 
 #endif
 
@@ -212,11 +259,14 @@ void Dphi_cpu_(spinor_field *out, spinor_field *in)
   {
     start_sf_sendrecv(in);
   }
+  _OMP_BARRIER
+
   _PIECE_FOR(out->type, ixp)
   {
 #ifdef WITH_MPI
     if (ixp == out->type->inner_master_pieces)
     {
+
       /* wait for spinor to be transfered */
       _OMP_PRAGMA(master)
       {
@@ -233,7 +283,7 @@ void Dphi_cpu_(spinor_field *out, spinor_field *in)
       suNf_vector psi, chi, psi2, chi2;
       suNf_spinor *r, *sp, *sm;
 #if defined(BC_T_THETA) || defined(BC_X_THETA) || defined(BC_Y_THETA) || defined(BC_Z_THETA)
-      suNf_vector vtmp;
+      suNf_vector vtmp[2];
 #endif
 
       r = _FIELD_AT(out, ix);
@@ -403,7 +453,7 @@ void Dphi_fused_(spinor_field *out, spinor_field *in)
   suNf_vector psi, chi, psi2, chi2;
   suNf_spinor *r, *sp, *sm;
 #if defined(BC_T_THETA) || defined(BC_X_THETA) || defined(BC_Y_THETA) || defined(BC_Z_THETA)
-  suNf_vector vtmp;
+  suNf_vector vtmp[2];
 #endif
 
   _OMP_PRAGMA(_omp_for nowait)
@@ -422,8 +472,7 @@ void Dphi_fused_(spinor_field *out, spinor_field *in)
 
     _vector_add_f(psi, (*sp).c[0], (*sp).c[2]);
     _vector_add_f(psi2, (*sp).c[1], (*sp).c[3]);
-    _suNf_theta_T_multiply(chi, (*up), psi);
-    _suNf_theta_T_multiply(chi2, (*up), psi2);
+    _suNf_double_theta_T_multiply(chi, chi2, (*up), psi, psi2);
 
     (*r).c[0] = chi;
     (*r).c[2] = chi;
@@ -438,8 +487,7 @@ void Dphi_fused_(spinor_field *out, spinor_field *in)
 
     _vector_sub_f(psi, (*sm).c[0], (*sm).c[2]);
     _vector_sub_f(psi2, (*sm).c[1], (*sm).c[3]);
-    _suNf_theta_T_inverse_multiply(chi, (*um), psi);
-    _suNf_theta_T_inverse_multiply(chi2, (*um), psi2);
+    _suNf_double_theta_T_inverse_multiply(chi, chi2, (*um), psi, psi2);
 
     _vector_add_assign_f((*r).c[0], chi);
     _vector_sub_assign_f((*r).c[2], chi);
@@ -454,8 +502,7 @@ void Dphi_fused_(spinor_field *out, spinor_field *in)
 
     _vector_i_add_f(psi, (*sp).c[0], (*sp).c[3]);
     _vector_i_add_f(psi2, (*sp).c[1], (*sp).c[2]);
-    _suNf_theta_X_multiply(chi, (*up), psi);
-    _suNf_theta_X_multiply(chi2, (*up), psi2);
+    _suNf_double_theta_X_multiply(chi, chi2, (*up), psi, psi2);
 
     _vector_add_assign_f((*r).c[0], chi);
     _vector_i_sub_assign_f((*r).c[3], chi);
@@ -470,8 +517,7 @@ void Dphi_fused_(spinor_field *out, spinor_field *in)
 
     _vector_i_sub_f(psi, (*sm).c[0], (*sm).c[3]);
     _vector_i_sub_f(psi2, (*sm).c[1], (*sm).c[2]);
-    _suNf_theta_X_inverse_multiply(chi, (*um), psi);
-    _suNf_theta_X_inverse_multiply(chi2, (*um), psi2);
+    _suNf_double_theta_X_inverse_multiply(chi, chi2, (*um), psi, psi2);
 
     _vector_add_assign_f((*r).c[0], chi);
     _vector_i_add_assign_f((*r).c[3], chi);
@@ -486,8 +532,7 @@ void Dphi_fused_(spinor_field *out, spinor_field *in)
 
     _vector_add_f(psi, (*sp).c[0], (*sp).c[3]);
     _vector_sub_f(psi2, (*sp).c[1], (*sp).c[2]);
-    _suNf_theta_Y_multiply(chi, (*up), psi);
-    _suNf_theta_Y_multiply(chi2, (*up), psi2);
+    _suNf_double_theta_Y_multiply(chi, chi2, (*up), psi, psi2);
 
     _vector_add_assign_f((*r).c[0], chi);
     _vector_add_assign_f((*r).c[3], chi);
@@ -502,8 +547,7 @@ void Dphi_fused_(spinor_field *out, spinor_field *in)
 
     _vector_sub_f(psi, (*sm).c[0], (*sm).c[3]);
     _vector_add_f(psi2, (*sm).c[1], (*sm).c[2]);
-    _suNf_theta_Y_inverse_multiply(chi, (*um), psi);
-    _suNf_theta_Y_inverse_multiply(chi2, (*um), psi2);
+    _suNf_double_theta_Y_inverse_multiply(chi, chi2, (*um), psi, psi2);
 
     _vector_add_assign_f((*r).c[0], chi);
     _vector_sub_assign_f((*r).c[3], chi);
@@ -518,8 +562,7 @@ void Dphi_fused_(spinor_field *out, spinor_field *in)
 
     _vector_i_add_f(psi, (*sp).c[0], (*sp).c[2]);
     _vector_i_sub_f(psi2, (*sp).c[1], (*sp).c[3]);
-    _suNf_theta_Z_multiply(chi, (*up), psi);
-    _suNf_theta_Z_multiply(chi2, (*up), psi2);
+    _suNf_double_theta_Z_multiply(chi, chi2, (*up), psi, psi2);
 
     _vector_add_assign_f((*r).c[0], chi);
     _vector_i_sub_assign_f((*r).c[2], chi);
@@ -534,8 +577,7 @@ void Dphi_fused_(spinor_field *out, spinor_field *in)
 
     _vector_i_sub_f(psi, (*sm).c[0], (*sm).c[2]);
     _vector_i_add_f(psi2, (*sm).c[1], (*sm).c[3]);
-    _suNf_theta_Z_inverse_multiply(chi, (*um), psi);
-    _suNf_theta_Z_inverse_multiply(chi2, (*um), psi2);
+    _suNf_double_theta_Z_inverse_multiply(chi, chi2, (*um), psi, psi2);
 
     _vector_add_assign_f((*r).c[0], chi);
     _vector_i_add_assign_f((*r).c[2], chi);
@@ -571,8 +613,7 @@ void Dphi_fused_(spinor_field *out, spinor_field *in)
 
     _vector_add_f(psi, (*sp).c[0], (*sp).c[2]);
     _vector_add_f(psi2, (*sp).c[1], (*sp).c[3]);
-    _suNf_theta_T_multiply(chi, (*up), psi);
-    _suNf_theta_T_multiply(chi2, (*up), psi2);
+    _suNf_double_theta_T_multiply(chi, chi2, (*up), psi, psi2);
 
     (*r).c[0] = chi;
     (*r).c[2] = chi;
@@ -587,8 +628,7 @@ void Dphi_fused_(spinor_field *out, spinor_field *in)
 
     _vector_sub_f(psi, (*sm).c[0], (*sm).c[2]);
     _vector_sub_f(psi2, (*sm).c[1], (*sm).c[3]);
-    _suNf_theta_T_inverse_multiply(chi, (*um), psi);
-    _suNf_theta_T_inverse_multiply(chi2, (*um), psi2);
+    _suNf_double_theta_T_inverse_multiply(chi, chi2, (*um), psi, psi2);
 
     _vector_add_assign_f((*r).c[0], chi);
     _vector_sub_assign_f((*r).c[2], chi);
@@ -603,8 +643,7 @@ void Dphi_fused_(spinor_field *out, spinor_field *in)
 
     _vector_i_add_f(psi, (*sp).c[0], (*sp).c[3]);
     _vector_i_add_f(psi2, (*sp).c[1], (*sp).c[2]);
-    _suNf_theta_X_multiply(chi, (*up), psi);
-    _suNf_theta_X_multiply(chi2, (*up), psi2);
+    _suNf_double_theta_X_multiply(chi, chi2, (*up), psi, psi2);
 
     _vector_add_assign_f((*r).c[0], chi);
     _vector_i_sub_assign_f((*r).c[3], chi);
@@ -619,8 +658,7 @@ void Dphi_fused_(spinor_field *out, spinor_field *in)
 
     _vector_i_sub_f(psi, (*sm).c[0], (*sm).c[3]);
     _vector_i_sub_f(psi2, (*sm).c[1], (*sm).c[2]);
-    _suNf_theta_X_inverse_multiply(chi, (*um), psi);
-    _suNf_theta_X_inverse_multiply(chi2, (*um), psi2);
+    _suNf_double_theta_X_inverse_multiply(chi, chi2, (*um), psi, psi2);
 
     _vector_add_assign_f((*r).c[0], chi);
     _vector_i_add_assign_f((*r).c[3], chi);
@@ -635,8 +673,7 @@ void Dphi_fused_(spinor_field *out, spinor_field *in)
 
     _vector_add_f(psi, (*sp).c[0], (*sp).c[3]);
     _vector_sub_f(psi2, (*sp).c[1], (*sp).c[2]);
-    _suNf_theta_Y_multiply(chi, (*up), psi);
-    _suNf_theta_Y_multiply(chi2, (*up), psi2);
+    _suNf_double_theta_Y_multiply(chi, chi2, (*up), psi, psi2);
 
     _vector_add_assign_f((*r).c[0], chi);
     _vector_add_assign_f((*r).c[3], chi);
@@ -651,8 +688,7 @@ void Dphi_fused_(spinor_field *out, spinor_field *in)
 
     _vector_sub_f(psi, (*sm).c[0], (*sm).c[3]);
     _vector_add_f(psi2, (*sm).c[1], (*sm).c[2]);
-    _suNf_theta_Y_inverse_multiply(chi, (*um), psi);
-    _suNf_theta_Y_inverse_multiply(chi2, (*um), psi2);
+    _suNf_double_theta_Y_inverse_multiply(chi, chi2, (*um), psi, psi2);
 
     _vector_add_assign_f((*r).c[0], chi);
     _vector_sub_assign_f((*r).c[3], chi);
@@ -667,8 +703,7 @@ void Dphi_fused_(spinor_field *out, spinor_field *in)
 
     _vector_i_add_f(psi, (*sp).c[0], (*sp).c[2]);
     _vector_i_sub_f(psi2, (*sp).c[1], (*sp).c[3]);
-    _suNf_theta_Z_multiply(chi, (*up), psi);
-    _suNf_theta_Z_multiply(chi2, (*up), psi2);
+    _suNf_double_theta_Z_multiply(chi, chi2, (*up), psi, psi2);
 
     _vector_add_assign_f((*r).c[0], chi);
     _vector_i_sub_assign_f((*r).c[2], chi);
@@ -683,8 +718,7 @@ void Dphi_fused_(spinor_field *out, spinor_field *in)
 
     _vector_i_sub_f(psi, (*sm).c[0], (*sm).c[2]);
     _vector_i_add_f(psi2, (*sm).c[1], (*sm).c[3]);
-    _suNf_theta_Z_inverse_multiply(chi, (*um), psi);
-    _suNf_theta_Z_inverse_multiply(chi2, (*um), psi2);
+    _suNf_double_theta_Z_inverse_multiply(chi, chi2, (*um), psi, psi2);
 
     _vector_add_assign_f((*r).c[0], chi);
     _vector_i_add_assign_f((*r).c[2], chi);
@@ -1483,7 +1517,7 @@ void Cphi_diag_inv(double mass, spinor_field *dptr, spinor_field *sptr)
 
 void Dxx_tw_inv(double mass, double twmass, spinor_field *out, spinor_field *in, tw_D_type tw_type)
 {
-  double complex z;
+  hr_complex z;
   double norm;
   spinor_field *aux = NULL;
   spinor_field *aux2 = NULL;

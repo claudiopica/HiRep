@@ -201,11 +201,11 @@ double b_mu(fourvec p1, int mu)
  * @param LT time extent of the box
  * @param t time slice
  */
-double complex twopoint(fourvec p, double m, int L, int LT, int t)
+hr_complex twopoint(fourvec p, double m, int L, int LT, int t)
 {
     fourvec mom1, mom2;
     int q1, q2, q3, q41, q42;
-    double complex res;
+    hr_complex res;
     res = 0.;
     double tmp;
 
@@ -237,11 +237,11 @@ double complex twopoint(fourvec p, double m, int L, int LT, int t)
  * @param LT time extent of the box
  * @param t time slice
  */
-double complex twopoint_rho(fourvec p, double m, int L, int LT, int t)
+hr_complex twopoint_rho(fourvec p, double m, int L, int LT, int t)
 {
     fourvec mom1, mom2;
     int q1, q2, q3, q41, q42;
-    double complex res;
+    hr_complex res;
     res = 0.;
     double tmp;
 
@@ -273,11 +273,11 @@ double complex twopoint_rho(fourvec p, double m, int L, int LT, int t)
  * @param LT time extent of the box
  * @param t time slice
  */
-double complex twopoint_rho12(fourvec p, double m, int L, int LT, int t)
+hr_complex twopoint_rho12(fourvec p, double m, int L, int LT, int t)
 {
     fourvec mom1, mom2;
     int q1, q2, q3, q41, q42;
-    double complex res;
+    hr_complex res;
     res = 0.;
     double tmp;
 
@@ -317,11 +317,11 @@ double complex twopoint_rho12(fourvec p, double m, int L, int LT, int t)
  * @param LT time extent of the box
  * @param t time slice
  */
-double complex Triangle(fourvec p, double m, int L, int LT, int t)
+hr_complex Triangle(fourvec p, double m, int L, int LT, int t)
 {
     fourvec mom[3];
     int q1, q2, q3, q14, q24, q34, i, j;
-    double complex res;
+    hr_complex res;
     res = 0.;
     double numerator, denominator;
     double af1[3];
@@ -371,11 +371,11 @@ double complex Triangle(fourvec p, double m, int L, int LT, int t)
  * @param LT time extent of the box
  * @param t time slice
  */
-double complex R(fourvec px, fourvec py, fourvec pz, double m, int L, int LT, int t)
+hr_complex R(fourvec px, fourvec py, fourvec pz, double m, int L, int LT, int t)
 {
     fourvec mom[4];
     int q11, q12, q13, q14, q24, q34, q44, i, j;
-    double complex res;
+    hr_complex res;
     res = 0.;
     double numerator, denominator;
     double af1[4];
@@ -432,7 +432,7 @@ double complex R(fourvec px, fourvec py, fourvec pz, double m, int L, int LT, in
  * @param tol tolerance, the program returns an error if abs(numeric-analytic)>tol
  * @returns 0 if comparison successful, 1 otherwise
  */
-int compare_2pt(meson_observable *mo, double complex *corr, int px, int py, int pz, int pmax, double tol)
+int compare_2pt(meson_observable *mo, hr_complex *corr, int px, int py, int pz, int pmax, double tol)
 {
     int retval = 0;
     for (int t = 0; t < GLB_T; t++)
@@ -553,7 +553,7 @@ int main(int argc, char *argv[])
     int err;
     fourvec ptmp, mptmp;
 #define CHECK(NAME, FUN, MO, PX, PY, PZ)                   \
-    double complex NAME[GLB_T];                            \
+    hr_complex NAME[GLB_T];                            \
     lprintf("TEST", 0, "Comparing %s..........\n", #NAME); \
     ptmp = (fourvec){{PX, PY, PZ, 0}};                     \
     for (int i = 0; i < GLB_T; ++i)                        \
@@ -587,7 +587,7 @@ int main(int argc, char *argv[])
         CHECK(rho_g1g2_p, twopoint_rho12, mo_p[mom][0]->rho[0][1], px, py, pz)
         CHECK(t1_g3_p, Triangle, mo_p[mom][0]->t1[2], px, py, pz)
 
-        double complex r1[GLB_T];
+        hr_complex r1[GLB_T];
         lprintf("TEST", 0, "Comparing r1 and r2..........\n");
         ptmp = (fourvec){{px, py, pz, 0}};
         mptmp = (fourvec){{-px, -py, -pz, 0}};
@@ -607,7 +607,7 @@ int main(int argc, char *argv[])
             lprintf("TEST", 0, "OK\n");
         }
 
-        double complex r3[GLB_T];
+        hr_complex r3[GLB_T];
         lprintf("TEST", 0, "Comparing r3 and r4..........\n");
         for (int i = 0; i < GLB_T; ++i)
         {

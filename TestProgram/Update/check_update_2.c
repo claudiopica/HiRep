@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
   fermion_force_begin();
   force_clover_fermion(Xl, Yl, 1.0);
 
-  double complex aux;
+  hr_complex aux;
   double norm = 0.;
 
   _MASTER_FOR(&glattice, ix)

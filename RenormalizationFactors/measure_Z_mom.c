@@ -55,7 +55,7 @@ static void twist_XYZ_bc(double theta_x, double theta_y, double theta_z) {
   int ix,iy,iz,it;
   suNf *u;
   suNf utmp;
-  double complex eith_x, eith_y, eith_z;
+  hr_complex eith_x, eith_y, eith_z;
   eith_x = cexp(I*PI*theta_x/(double)GLB_X);
   eith_y = cexp(I*PI*theta_y/(double)GLB_Y);
   eith_z = cexp(I*PI*theta_z/(double)GLB_Z);

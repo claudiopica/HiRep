@@ -22,9 +22,9 @@
 
 #include "setup.h"
 
-static double complex spat_avr_0pp_wrk()
+static hr_complex spat_avr_0pp_wrk()
 {
-    static double complex pa, tmp;
+    static hr_complex pa, tmp;
     suNg_field *_u = u_gauge_wrk();
     start_gf_sendrecv(_u);
 
@@ -75,9 +75,9 @@ int main(int argc, char *argv[])
 
     int return_value = 0;
     int idx_wrk;
-    double complex plaq[2], test;
+    hr_complex plaq[2], test;
     double dop;
-    double complex res;
+    hr_complex res;
     int mu, j;
     int **space_rotations;
 

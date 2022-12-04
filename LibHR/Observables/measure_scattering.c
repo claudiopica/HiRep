@@ -64,7 +64,7 @@ void measure_scattering_AD_core(meson_observable *mo, spinor_field *psi0, spinor
 {
 
 	int px, py, pz, t, x, y, z, ix, ix_split, beta, tc, splittmp;
-	double complex trtmp;
+	hr_complex trtmp;
 	double tr1re[GLB_T], tr2re[GLB_T], tr1im[GLB_T], tr2im[GLB_T];
 	double pdotx, cpdotx, spdotx;
 	suNf_spin_matrix sm0, sm1, sm2, sm3;
@@ -156,10 +156,10 @@ void measure_scattering_BC_core(meson_observable *mo, spinor_field *psi0, spinor
 {
 
 	int px, py, pz, t, x, y, z, ix, ix_split, mu, gamma, tc, splittmp;
-	double complex trace, phase;
+	hr_complex trace, phase;
 	double pdotx;
 	suNf_spin_matrix sm00, sm11, sm21, sm30;
-	double complex B1[4][4], B2[4][4];
+	hr_complex B1[4][4], B2[4][4];
 	double B1re[16 * GLB_T], B1im[16 * GLB_T], B2re[16 * GLB_T], B2im[16 * GLB_T];
 	meson_observable *motmp;
 

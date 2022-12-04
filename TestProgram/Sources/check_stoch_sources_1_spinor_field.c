@@ -64,16 +64,16 @@ char char_t[100];
 FILE *fp;
 char path[1035];
 
-static double complex DeltaKronecker(int i,int j)
+static hr_complex DeltaKronecker(int i,int j)
 {
   if (i==j)     return 1.  ;
   else return 0.;
 }
 
-static double complex average(double complex a[], int n)
+static hr_complex average(hr_complex a[], int n)
 {
 
-  double complex sum;
+  hr_complex sum;
   _complex_0(sum);
   for (int i=0; i<n; i++)
   {
@@ -82,12 +82,12 @@ static double complex average(double complex a[], int n)
   return sum/n;
 }
 
-static double complex sd(double complex a[], int n)
+static hr_complex sd(hr_complex a[], int n)
 {
-  double complex mean;
+  hr_complex mean;
   mean = average(a,n);
 
-  double complex sum = 0;
+  hr_complex sum = 0;
   for (int i=0; i<n; i++)
   {
     sum += creal(a[i] - mean)*creal(a[i] - mean) + I*cimag(a[i] - mean)*cimag(a[i] - mean);
@@ -118,7 +118,7 @@ int main(int argc,char *argv[])
   int shift[4];
   int b1,b2,c1,c2;
   int counter;
-  double complex av_, sd_;
+  hr_complex av_, sd_;
 
   logger_map("DEBUG","debug");
   logger_setlevel(0,200);
@@ -150,7 +150,7 @@ int main(int argc,char *argv[])
   if (return_value == 0)   lprintf("MAIN", 0, "test norm passed\n ");
   else   lprintf("MAIN", 0, "test norm FAILED: return_value= %d\n ",  return_value);
 
-  double complex tmp_vec[mes_ip.nhits];
+  hr_complex tmp_vec[mes_ip.nhits];
 
   for (int ll=0;ll<10*MPI_WORLD_SIZE;ll++){
     if (ll==0){

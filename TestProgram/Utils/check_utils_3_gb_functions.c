@@ -1,11 +1,11 @@
 /*This is an automatically generated function, do not edit.*/
 #define Complex(a,b) ((a)+I*(b))
-static int fullgbcheck(int rotid, double complex *rotated, double complex *unrotated)
+static int fullgbcheck(int rotid, hr_complex *rotated, hr_complex *unrotated)
 {
 #define rotfun(a) rotated[(a)]
 #define unrotfun(a) unrotated[(a)]
 #if total_n_glue_op>0
-double complex tmp[3];
+hr_complex tmp[3];
 #endif
 int return_value=0;
 if(0==rotid)

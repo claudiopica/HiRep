@@ -25,9 +25,9 @@
 #include "check_utils_3_gb_functions.c"
 #include "check_utils_3_tor_functions.c"
 #include "memory.h"
-static double complex **polyf;
+static hr_complex **polyf;
 
-static void all_g_op(double complex *pa)
+static void all_g_op(hr_complex *pa)
 {
     suNg_field *_u = u_gauge_wrk();
     start_gf_sendrecv(_u);
@@ -47,7 +47,7 @@ static void all_g_op(double complex *pa)
     global_sum((double *)(pa), 2 * total_n_glue_op);
 }
 
-static void all_t_op(double complex *pa)
+static void all_t_op(hr_complex *pa)
 {
     suNg_field *_u = u_gauge_wrk();
     start_gf_sendrecv(_u);
@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
 
     int return_value = 0;
     int idx_wrk;
-    double complex *op, *rop;
+    hr_complex *op, *rop;
     int j, ret;
     int **space_rotations;
     int **inverse_space_rotations;
@@ -89,12 +89,12 @@ int main(int argc, char *argv[])
     represent_gauge_field();
     lprintf("MAIN", 0, "done.\n\n");
 
-    op = malloc(total_n_glue_op * sizeof(double complex));
-    rop = malloc(total_n_glue_op * sizeof(double complex));
-    polyf = malloc(sizeof(double complex *) * 3);
-    polyf[0] = amalloc(sizeof(double complex) * Y * Z * T, ALIGN);
-    polyf[1] = amalloc(sizeof(double complex) * X * Z * T, ALIGN);
-    polyf[2] = amalloc(sizeof(double complex) * X * Y * T, ALIGN);
+    op = malloc(total_n_glue_op * sizeof(hr_complex));
+    rop = malloc(total_n_glue_op * sizeof(hr_complex));
+    polyf = malloc(sizeof(hr_complex *) * 3);
+    polyf[0] = amalloc(sizeof(hr_complex) * Y * Z * T, ALIGN);
+    polyf[1] = amalloc(sizeof(hr_complex) * X * Z * T, ALIGN);
+    polyf[2] = amalloc(sizeof(hr_complex) * X * Y * T, ALIGN);
     lprintf("MAIN", 0, "Measuring all the glueballs operators on the original configuration\n");
     all_g_op(op);
 
@@ -133,8 +133,8 @@ int main(int argc, char *argv[])
     }
     free(op);
     free(rop);
-    op = malloc(total_n_tor_op * sizeof(double complex));
-    rop = malloc(total_n_tor_op * sizeof(double complex));
+    op = malloc(total_n_tor_op * sizeof(hr_complex));
+    rop = malloc(total_n_tor_op * sizeof(hr_complex));
 
     reset_wrk_pointers();
     lprintf("MAIN", 0, "Measuring all the torellons operators on the original configuration\n");

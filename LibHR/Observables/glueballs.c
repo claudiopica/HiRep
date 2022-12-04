@@ -7,11 +7,11 @@
 #include "glueballs.h"
 #include "global.h"
 
-void measure_1pt_glueballs(int nblockingstart, int nblockingend, double *smear_val, double complex *gb_storage)
+void measure_1pt_glueballs(int nblockingstart, int nblockingend, double *smear_val, hr_complex *gb_storage)
 {
     int i, nt;
     int wrk1, wrk2 = -1;
-    double complex *point_gb;
+    hr_complex *point_gb;
 
     point_gb = gb_storage;
 
@@ -56,11 +56,11 @@ void measure_1pt_glueballs(int nblockingstart, int nblockingend, double *smear_v
     release_wrk_space(wrk2);
 }
 
-void measure_1pt_torellons(double *smear_val, double complex *tor_storage, double complex **pf)
+void measure_1pt_torellons(double *smear_val, hr_complex *tor_storage, hr_complex **pf)
 {
     int nt;
     int wrk1;
-    double complex *point_tor;
+    hr_complex *point_tor;
 
     point_tor = tor_storage;
 

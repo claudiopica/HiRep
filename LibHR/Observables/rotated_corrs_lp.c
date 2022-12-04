@@ -3,20 +3,20 @@
 #include "communications.h"
 #include "observables.h"
 #include "logger.h"
-#include "double complex.h"
+#include "hr_complex.h"
 
 void rotated_lXuup(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd) {
 
-  double complex *lauu_p=corr_mem->g1, *lvuu_p=corr_mem->g2, *ltuu_p=corr_mem->g3, *lttuu_p=corr_mem->g4, **M=corr_mem->M;
+  hr_complex *lauu_p=corr_mem->g1, *lvuu_p=corr_mem->g2, *ltuu_p=corr_mem->g3, *lttuu_p=corr_mem->g4, **M=corr_mem->M;
 
-  double complex *lauu_1p=corr_mem->l11, *lvuu_1p=corr_mem->l21, *ltuu_1p=corr_mem->l31, *lttuu_1p=corr_mem->l41;
-  double complex *lauu_2p=corr_mem->l12, *lvuu_2p=corr_mem->l22, *ltuu_2p=corr_mem->l32, *lttuu_2p=corr_mem->l42;
-  double complex *lauu_3p=corr_mem->l13, *lvuu_3p=corr_mem->l23, *ltuu_3p=corr_mem->l33, *lttuu_3p=corr_mem->l43;
+  hr_complex *lauu_1p=corr_mem->l11, *lvuu_1p=corr_mem->l21, *ltuu_1p=corr_mem->l31, *lttuu_1p=corr_mem->l41;
+  hr_complex *lauu_2p=corr_mem->l12, *lvuu_2p=corr_mem->l22, *ltuu_2p=corr_mem->l32, *lttuu_2p=corr_mem->l42;
+  hr_complex *lauu_3p=corr_mem->l13, *lvuu_3p=corr_mem->l23, *ltuu_3p=corr_mem->l33, *lttuu_3p=corr_mem->l43;
 
-  double complex ***la1_ij=corr_mem->l11_ij, ***la2_ij=corr_mem->l12_ij, ***la3_ij=corr_mem->l13_ij;
-  double complex ***lv1_ij=corr_mem->l21_ij, ***lv2_ij=corr_mem->l22_ij, ***lv3_ij=corr_mem->l23_ij;
-  double complex ***lt1_ij=corr_mem->l31_ij, ***lt2_ij=corr_mem->l32_ij, ***lt3_ij=corr_mem->l33_ij;
-  double complex ***ltt1_ij=corr_mem->g1_ij,  ***ltt2_ij=corr_mem->g2_ij,  ***ltt3_ij=corr_mem->g3_ij;
+  hr_complex ***la1_ij=corr_mem->l11_ij, ***la2_ij=corr_mem->l12_ij, ***la3_ij=corr_mem->l13_ij;
+  hr_complex ***lv1_ij=corr_mem->l21_ij, ***lv2_ij=corr_mem->l22_ij, ***lv3_ij=corr_mem->l23_ij;
+  hr_complex ***lt1_ij=corr_mem->l31_ij, ***lt2_ij=corr_mem->l32_ij, ***lt3_ij=corr_mem->l33_ij;
+  hr_complex ***ltt1_ij=corr_mem->g1_ij,  ***ltt2_ij=corr_mem->g2_ij,  ***ltt3_ij=corr_mem->g3_ij;
 
   int i,ix0,ix1,ix2,ix3,s1,s2;
 
@@ -24,7 +24,7 @@ void rotated_lXuup(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu,
   suNf_spinor stmp1[2];
   suNf_spinor *sptr2[2];
   suNf_spinor *sptr1[2];
-  double complex temp_comp;
+  hr_complex temp_comp;
 
 
 
@@ -539,16 +539,16 @@ lttuu+ = - i 1/6 sum_k=1^3 sum tr csi^dag U0(1,z) Huu^(-1)(2,z;x)    sig0k     H
 
 void rotated_lXddp(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd) {
 
-  double complex *ladd_p=corr_mem->g1, *lvdd_p=corr_mem->g2, *ltdd_p=corr_mem->g3, *lttdd_p=corr_mem->g4, **M=corr_mem->M;
+  hr_complex *ladd_p=corr_mem->g1, *lvdd_p=corr_mem->g2, *ltdd_p=corr_mem->g3, *lttdd_p=corr_mem->g4, **M=corr_mem->M;
 
-  double complex *ladd_1p=corr_mem->l11, *lvdd_1p=corr_mem->l21, *ltdd_1p=corr_mem->l31, *lttdd_1p=corr_mem->l41;
-  double complex *ladd_2p=corr_mem->l12, *lvdd_2p=corr_mem->l22, *ltdd_2p=corr_mem->l32, *lttdd_2p=corr_mem->l42;
-  double complex *ladd_3p=corr_mem->l13, *lvdd_3p=corr_mem->l23, *ltdd_3p=corr_mem->l33, *lttdd_3p=corr_mem->l43;
+  hr_complex *ladd_1p=corr_mem->l11, *lvdd_1p=corr_mem->l21, *ltdd_1p=corr_mem->l31, *lttdd_1p=corr_mem->l41;
+  hr_complex *ladd_2p=corr_mem->l12, *lvdd_2p=corr_mem->l22, *ltdd_2p=corr_mem->l32, *lttdd_2p=corr_mem->l42;
+  hr_complex *ladd_3p=corr_mem->l13, *lvdd_3p=corr_mem->l23, *ltdd_3p=corr_mem->l33, *lttdd_3p=corr_mem->l43;
 
-  double complex ***la1_ij=corr_mem->l11_ij, ***la2_ij=corr_mem->l12_ij, ***la3_ij=corr_mem->l13_ij;
-  double complex ***lv1_ij=corr_mem->l21_ij, ***lv2_ij=corr_mem->l22_ij, ***lv3_ij=corr_mem->l23_ij;
-  double complex ***lt1_ij=corr_mem->l31_ij, ***lt2_ij=corr_mem->l32_ij, ***lt3_ij=corr_mem->l33_ij;
-  double complex ***ltt1_ij=corr_mem->g1_ij,  ***ltt2_ij=corr_mem->g2_ij,  ***ltt3_ij=corr_mem->g3_ij;
+  hr_complex ***la1_ij=corr_mem->l11_ij, ***la2_ij=corr_mem->l12_ij, ***la3_ij=corr_mem->l13_ij;
+  hr_complex ***lv1_ij=corr_mem->l21_ij, ***lv2_ij=corr_mem->l22_ij, ***lv3_ij=corr_mem->l23_ij;
+  hr_complex ***lt1_ij=corr_mem->l31_ij, ***lt2_ij=corr_mem->l32_ij, ***lt3_ij=corr_mem->l33_ij;
+  hr_complex ***ltt1_ij=corr_mem->g1_ij,  ***ltt2_ij=corr_mem->g2_ij,  ***ltt3_ij=corr_mem->g3_ij;
 
   int i,ix0,ix1,ix2,ix3,s1,s2;
 
@@ -556,7 +556,7 @@ void rotated_lXddp(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu,
   suNf_spinor stmp1[2];
   suNf_spinor *sptr2[2];
   suNf_spinor *sptr1[2];
-  double complex temp_comp;
+  hr_complex temp_comp;
 
 
  /**************************************************
@@ -1068,16 +1068,16 @@ lttdd+ = i 1/6 sum_k=1^3 sum tr csi^dag U0(1,z) Hdd^(-1)(2,z;x)    sig0k     Hdd
 
 void rotated_lXudp(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd) {
 
-  double complex *laud_p=corr_mem->g1, *lvud_p=corr_mem->g2, *ltud_p=corr_mem->g3, *lttud_p=corr_mem->g4, **M=corr_mem->M;
+  hr_complex *laud_p=corr_mem->g1, *lvud_p=corr_mem->g2, *ltud_p=corr_mem->g3, *lttud_p=corr_mem->g4, **M=corr_mem->M;
 
-  double complex *laud_1p=corr_mem->l11, *lvud_1p=corr_mem->l21, *ltud_1p=corr_mem->l31, *lttud_1p=corr_mem->l41;
-  double complex *laud_2p=corr_mem->l12, *lvud_2p=corr_mem->l22, *ltud_2p=corr_mem->l32, *lttud_2p=corr_mem->l42;
-  double complex *laud_3p=corr_mem->l13, *lvud_3p=corr_mem->l23, *ltud_3p=corr_mem->l33, *lttud_3p=corr_mem->l43;
+  hr_complex *laud_1p=corr_mem->l11, *lvud_1p=corr_mem->l21, *ltud_1p=corr_mem->l31, *lttud_1p=corr_mem->l41;
+  hr_complex *laud_2p=corr_mem->l12, *lvud_2p=corr_mem->l22, *ltud_2p=corr_mem->l32, *lttud_2p=corr_mem->l42;
+  hr_complex *laud_3p=corr_mem->l13, *lvud_3p=corr_mem->l23, *ltud_3p=corr_mem->l33, *lttud_3p=corr_mem->l43;
 
-  double complex ***la1_ij=corr_mem->l11_ij, ***la2_ij=corr_mem->l12_ij, ***la3_ij=corr_mem->l13_ij;
-  double complex ***lv1_ij=corr_mem->l21_ij, ***lv2_ij=corr_mem->l22_ij, ***lv3_ij=corr_mem->l23_ij;
-  double complex ***lt1_ij=corr_mem->l31_ij, ***lt2_ij=corr_mem->l32_ij, ***lt3_ij=corr_mem->l33_ij;
-  double complex ***ltt1_ij=corr_mem->g1_ij,  ***ltt2_ij=corr_mem->g2_ij,  ***ltt3_ij=corr_mem->g3_ij;
+  hr_complex ***la1_ij=corr_mem->l11_ij, ***la2_ij=corr_mem->l12_ij, ***la3_ij=corr_mem->l13_ij;
+  hr_complex ***lv1_ij=corr_mem->l21_ij, ***lv2_ij=corr_mem->l22_ij, ***lv3_ij=corr_mem->l23_ij;
+  hr_complex ***lt1_ij=corr_mem->l31_ij, ***lt2_ij=corr_mem->l32_ij, ***lt3_ij=corr_mem->l33_ij;
+  hr_complex ***ltt1_ij=corr_mem->g1_ij,  ***ltt2_ij=corr_mem->g2_ij,  ***ltt3_ij=corr_mem->g3_ij;
 
   int i,ix0,ix1,ix2,ix3,s1,s2;
 
@@ -1085,7 +1085,7 @@ void rotated_lXudp(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu,
   suNf_spinor stmp1[2];
   suNf_spinor *sptr2[2];
   suNf_spinor *sptr1[2];
-  double complex temp_comp,temp_comp2;
+  hr_complex temp_comp,temp_comp2;
 
 
   /**************************************************
@@ -1609,16 +1609,16 @@ lttud+ = - 1/6 sum_k=1^3 sum tr csi^dag U0(1,z) Huu^(-1)(2,z;x)    sig0k     Hdd
 
 void rotated_lXdup(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd) {
 
-  double complex *ladu_p=corr_mem->g1, *lvdu_p=corr_mem->g2, *ltdu_p=corr_mem->g3, *lttdu_p=corr_mem->g4, **M=corr_mem->M;
+  hr_complex *ladu_p=corr_mem->g1, *lvdu_p=corr_mem->g2, *ltdu_p=corr_mem->g3, *lttdu_p=corr_mem->g4, **M=corr_mem->M;
 
-  double complex *ladu_1p=corr_mem->l11, *lvdu_1p=corr_mem->l21, *ltdu_1p=corr_mem->l31, *lttdu_1p=corr_mem->l41;
-  double complex *ladu_2p=corr_mem->l12, *lvdu_2p=corr_mem->l22, *ltdu_2p=corr_mem->l32, *lttdu_2p=corr_mem->l42;
-  double complex *ladu_3p=corr_mem->l13, *lvdu_3p=corr_mem->l23, *ltdu_3p=corr_mem->l33, *lttdu_3p=corr_mem->l43;
+  hr_complex *ladu_1p=corr_mem->l11, *lvdu_1p=corr_mem->l21, *ltdu_1p=corr_mem->l31, *lttdu_1p=corr_mem->l41;
+  hr_complex *ladu_2p=corr_mem->l12, *lvdu_2p=corr_mem->l22, *ltdu_2p=corr_mem->l32, *lttdu_2p=corr_mem->l42;
+  hr_complex *ladu_3p=corr_mem->l13, *lvdu_3p=corr_mem->l23, *ltdu_3p=corr_mem->l33, *lttdu_3p=corr_mem->l43;
 
-  double complex ***la1_ij=corr_mem->l11_ij, ***la2_ij=corr_mem->l12_ij, ***la3_ij=corr_mem->l13_ij;
-  double complex ***lv1_ij=corr_mem->l21_ij, ***lv2_ij=corr_mem->l22_ij, ***lv3_ij=corr_mem->l23_ij;
-  double complex ***lt1_ij=corr_mem->l31_ij, ***lt2_ij=corr_mem->l32_ij, ***lt3_ij=corr_mem->l33_ij;
-  double complex ***ltt1_ij=corr_mem->g1_ij,  ***ltt2_ij=corr_mem->g2_ij,  ***ltt3_ij=corr_mem->g3_ij;
+  hr_complex ***la1_ij=corr_mem->l11_ij, ***la2_ij=corr_mem->l12_ij, ***la3_ij=corr_mem->l13_ij;
+  hr_complex ***lv1_ij=corr_mem->l21_ij, ***lv2_ij=corr_mem->l22_ij, ***lv3_ij=corr_mem->l23_ij;
+  hr_complex ***lt1_ij=corr_mem->l31_ij, ***lt2_ij=corr_mem->l32_ij, ***lt3_ij=corr_mem->l33_ij;
+  hr_complex ***ltt1_ij=corr_mem->g1_ij,  ***ltt2_ij=corr_mem->g2_ij,  ***ltt3_ij=corr_mem->g3_ij;
 
   int i,ix0,ix1,ix2,ix3,s1,s2;
 
@@ -1626,7 +1626,7 @@ void rotated_lXdup(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu,
   suNf_spinor stmp1[2];
   suNf_spinor *sptr2[2];
   suNf_spinor *sptr1[2];
-  double complex temp_comp,temp_comp2;
+  hr_complex temp_comp,temp_comp2;
 
 
 

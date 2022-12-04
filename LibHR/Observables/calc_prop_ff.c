@@ -259,7 +259,7 @@ static void calc_propagator_ff_hopping_series_core(spinor_field *psi, spinor_fie
     free_spinor_field_f(gtmp2);
   }
 
-  //lprintf("CALC_PROP",10," MVM = %d\n",cgiter);
+  lprintf("CALC_PROP",10," MVM = %d\n",cgiter);
   
   start_sf_sendrecv(psi);
   complete_sf_sendrecv(psi);

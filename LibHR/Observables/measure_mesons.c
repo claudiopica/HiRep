@@ -302,7 +302,7 @@ void measure_mesons_core(spinor_field *psi0, spinor_field *psi1, spinor_field *e
 #endif /* CHECK_SPINOR_MATCHING */
   int i, ix, t, x, y, z, beta, px, py, pz, tc;
   double pdotx, cpdotx, spdotx;
-  double complex tr;
+  hr_complex tr;
   suNf_spin_matrix sma, smb, sm1, sm2, smtmp1, smtmp2, sm_src;
   meson_observable *motmp = mo;
   _spinmatrix_zero(smtmp1);
@@ -376,7 +376,7 @@ static void measure_conserved_core(spinor_field *psi0, spinor_field *psi1, spino
 
   int i, ix, t, x, y, z, beta, px, py, pz, tc, a, ixmu;
   double pdotx, cpdotx, spdotx;
-  double complex tr;
+  hr_complex tr;
   suNf_propagator sp0, sp1, Usp, spf, sptmp1, sptmp2, sptmp3, spleft, spdag;
   suNf *u1;
   meson_observable *motmp = mo;

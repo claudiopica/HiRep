@@ -32,7 +32,7 @@
 
 #define MAX_ROTATE 50
 
-static double complex v[25];
+static hr_complex v[25];
 static double EPSILON = 1.e-12;
 static spinor_field *ppk[5];
 
@@ -50,7 +50,7 @@ static void alloc_ws_rotate(void)
   initr = 1;
 }
 
-static void rotate_ptr(int n, spinor_field *pkk[], double complex vl[])
+static void rotate_ptr(int n, spinor_field *pkk[], hr_complex vl[])
 {
   if (initr == 0)
     alloc_ws_rotate();
@@ -70,7 +70,7 @@ static void rotate_ptr(int n, spinor_field *pkk[], double complex vl[])
     {
       suNf_spinor *pk = &(psi[k]);
       suNf_spinor *pj = _FIELD_AT(pkk[0], ix);
-      double complex *z = &vl[k];
+      hr_complex *z = &vl[k];
 
       _spinor_mulc_f(*pk, *z, *pj);
 
@@ -90,7 +90,7 @@ static void rotate_ptr(int n, spinor_field *pkk[], double complex vl[])
 
 static void project(spinor_field *pk, spinor_field *pl)
 {
-  double complex sp;
+  hr_complex sp;
 
   sp = -spinor_field_prod_f(pl, pk);
 
@@ -111,17 +111,17 @@ static double normalize(spinor_field *ps)
   return (double)(r);
 }
 
-static double complex sp(spinor_field *pk, spinor_field *pl)
+static hr_complex sp(spinor_field *pk, spinor_field *pl)
 {
 
-  double complex z = 0.0;
+  hr_complex z = 0.0;
 
   _TWO_SPINORS_FOR_SUM(pk, pl, x, y)
   {
     for (int i = 0; i < (4 * NF); i++)
     {
-      double complex *rpk = (double complex *)_SPINOR_PTR(pk) + i;
-      double complex *rpl = (double complex *)_SPINOR_PTR(pl) + i;
+      hr_complex *rpk = (hr_complex *)_SPINOR_PTR(pk) + i;
+      hr_complex *rpl = (hr_complex *)_SPINOR_PTR(pl) + i;
       z += conj(*rpk) * (*rpl);
       /* x+=(double)((*rpk).re*(*rpl).re+(*rpk).im*(*rpl).im); */
       /* y+=(double)((*rpk).re*(*rpl).im-(*rpk).im*(*rpl).re); */
@@ -143,8 +143,8 @@ int main(int argc, char *argv[])
   double r;
   double rd, zsqd;
   double d, dmax;
-  double complex w;
-  double complex zd, wd;
+  hr_complex w;
+  hr_complex zd, wd;
   spinor_field *ws;
   spinor_field *pk, *pl;
   spinor_field *tmp;

@@ -19,7 +19,7 @@
 #include "setup.h"
 #include "communications.h"
 
-void print_cmplx(double complex c)
+void print_cmplx(hr_complex c)
 {
   lprintf("MAIN", 0, "%.14e", creal(c));
   if (cimag(c) > 0)
@@ -73,7 +73,7 @@ void printML(suNg *a)
 int main(int argc, char *argv[])
 {
   int return_value = 0;
-  double complex det, detinv;
+  hr_complex det, detinv;
   double test;
   suNg a, b, c;
   setup_process(&argc, &argv);

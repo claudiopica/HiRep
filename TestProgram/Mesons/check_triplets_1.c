@@ -179,9 +179,9 @@ double square(double x)
   return x * x;
 }
 
-double complex ev(double k[4])
+hr_complex ev(double k[4])
 {
-  double complex z;
+  hr_complex z;
   z = mass + 4.0 + cos((2.0 * M_PI * k[0]) / GLB_T) + cos((2.0 * M_PI * k[1]) / GLB_X) + cos((2.0 * M_PI * k[2]) / GLB_Y) + cos((2.0 * M_PI * k[3]) / GLB_Z) + I * sqrt(square(sin((2.0 * M_PI * k[0]) / GLB_T)) + square(sin((2.0 * M_PI * k[1]) / GLB_X)) + square(sin((2.0 * M_PI * k[2]) / GLB_Y)) + square(sin((2.0 * M_PI * k[3]) / GLB_Z)));
   return z;
 }
@@ -189,8 +189,8 @@ double complex ev(double k[4])
 void free_correlators(double **triplets)
 {
   double A2[GLB_T], B2[4][GLB_T];
-  double complex AA[GLB_T], BB[4][GLB_T];
-  double complex tmp, eit;
+  hr_complex AA[GLB_T], BB[4][GLB_T];
+  hr_complex tmp, eit;
   double norm2, z;
   int i, j, t;
   double k[4];

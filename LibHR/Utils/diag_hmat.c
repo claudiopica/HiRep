@@ -32,7 +32,7 @@ void diag_hmat(suNg *hmat, double *diag){
 
 void tridiagonalize(suNg *hmat, double *diag, double* roffdiag){
   suNg_vector offdiag,realtrans;
-  double complex f,g,ctmp;
+  hr_complex f,g,ctmp;
   double h,scale,fa,hh;
   int i,j,k,l;
   for (i=NG-1;i>0;i--){//loop over the components of column vector 
