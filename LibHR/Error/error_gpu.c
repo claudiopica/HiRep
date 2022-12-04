@@ -1,9 +1,13 @@
-// Enable this for error checking
-
+/**
+ * @file error_gpu.c
+ * @brief Error checking on the GPU
+ */
 #include "error.h"
-#include "gpu.h"
-
 #ifdef WITH_GPU
+    #include "gpu.h"
+#endif
+
+#if defined(WITH_GPU) && defined(__cplusplus)
 
 void __cudaSafeCall( cudaError_t err, const char *file, const int line )
 {
@@ -60,6 +64,5 @@ inline void __cudaCheckError( const char *file, const int line )
 
     return;
 }
-
 
 #endif

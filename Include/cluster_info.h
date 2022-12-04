@@ -9,10 +9,10 @@
 #define CLUSTER_INFO_H
 
 #ifdef WITH_GPU
-    #include "gpu.h:
+    #include "gpu.h"
 #endif
- 
-#ifdef WITH_GPU
+
+#if defined(WITH_GPU) && defined(__cplusplus)
     /**
      * @brief Query number of GPUs and print related information
      *
@@ -90,6 +90,4 @@
      */
     void print_hardware_info(input_gpu)
 #endif
-
-
 #endif

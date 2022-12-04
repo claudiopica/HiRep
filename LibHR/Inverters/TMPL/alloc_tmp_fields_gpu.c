@@ -6,7 +6,7 @@
 #ifndef ALLOC_TMP_FIELDS_GPU_C
 #define ALLOC_TMP_FIELDS_GPU_C
 
-#include <gpu.h>
+#include "gpu.h"
 #include "hr_complex.h"
 
 double* alloc_double_sum_field(int n){

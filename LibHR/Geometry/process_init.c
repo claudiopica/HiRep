@@ -54,8 +54,6 @@ char *get_error_filename() { return error_filename; }
 
 static int setup_replicas();
 static void setup_random();
-static int bind_GPUs_to_MPI_proc();
-static int setup_GPU_peer_to_peer_access();
 
 static int setup_level = 0;
 
@@ -201,8 +199,6 @@ int setup_process(int *argc, char ***argv)
 #ifdef WITH_GPU
 read_input(gpu_var.read, input_filename);
 init_gpu(gpu_var);
-bind_GPUs_to_MPI_proc();//TODO: This only prints output for PID==0, somehow integrate this so that only here all processes output will be printed.
-//setup_GPU_peer_to_peer_access();//TODO: this, too
 #endif
 
   lprintf("SYSTEM", 0, "Gauge group: SU(%d)\n", NG);
@@ -340,39 +336,4 @@ static int setup_replicas()
   return 0;
 }
 
-static int bind_GPUs_to_MPI_proc() 
-{
-   /* If set up with MPI, bind GPU to local rank */
-   /* TODO: This is very naive (GPU 0 maps to PID==0) the better way is to use hwloc to analyze the */
-   /* CPU topology and then do the ideal mapping */
-  #if defined(WITH_MPI) && defined(WITH_GPU)
-    cudaSetDevice(PID);
-    int current_device;
-    CHECK(cudaGetDevice(&current_device));
-    lprintf("GPU_INIT", 0, "GPU Affinity: GPU Node %d has been bound to MPI Thread of Rank %d\n", current_device, PID);
-  #endif
-  return 0;
-}
 
-static int setup_GPU_peer_to_peer_access() 
-{
-  #if defined(WITH_MPI) && defined(WITH_GPU)
-    int device_count = 0;
-    CHECK(cudaGetDeviceCount(&device_count));
-
-    for (int i = 0; i < device_count; ++i) 
-    {
-      if (i > PID) 
-      {
-        int peer_access_available = 0;
-        CHECK(cudaDeviceCanAccessPeer(&peer_access_available, PID, i));
-        lprintf("INFO", 0, "Peer-to-peer access: GPU Node %d can access node %d\n", PID, i);
-        error(peer_access_available == 0, 1, "setup_GPU_peer_to_peer_access", "Unable to enable peer-to-peer access.\n");
-
-        CHECK(cudaDeviceEnablePeerAccess(PID, i));
-        lprintf("INFO", 0, "Enabled peer-to-peer access from node %d to %d\n", PID, i);
-      }
-    }
-  #endif
-  return 0;
-}

@@ -1,3 +1,5 @@
+#include "global.h"
+
 extern int *iup_gpu, *idn_gpu;
 
 void init_neighbors_gpu() 

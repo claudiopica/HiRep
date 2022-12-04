@@ -19,9 +19,12 @@
 #include "utils.h"
 #include "error.h"
 #include "geometry.h"
+#include "gpu.h"
 #ifdef WITH_MPI
   #include "mpi.h"
 #endif
+
+#ifdef __cplusplus
 
 const char *sComputeMode[] = {
     "Default (multiple host threads can use ::cudaSetDevice() with device simultaneously)",
@@ -239,4 +242,5 @@ void print_hardware_info(input_gpu gpu_var)
   print_compute_info(device_prop);
 }
 
+#endif
 #endif

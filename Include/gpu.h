@@ -2,14 +2,13 @@
  * Copyright (c) 2008, Claudio Pica                                          *   
  * All rights reserved.                                                      * 
  \***************************************************************************/
-
+/**
+ * @file gpu.h
+ * @brief Basic gpu imports and structs. Include this in files that define GPU logic.
+ */
 #ifndef GPU_H
 #define GPU_H
 #ifdef WITH_GPU
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include <stdio.h>
 #include <cuda.h>
@@ -22,94 +21,25 @@ extern "C" {
 #include "input_par.h"
 #include "hr_complex.h"
 
-/* GPU variables */
-typedef struct _input_gpu {
+_LANGUAGE_C
+
+typedef struct {
   unsigned int gpuID;
-  
-  /* for the reading function */
-  input_record_t read[2];
-  
+  input_record_t read[2]; /* for the reading function */
 } input_gpu;
 
 #define init_input_gpu(varname) \
-{ \
-.read={\
-{"gpuID", "gpuID = %d", INT_T, &(varname)},\
-{NULL, NULL, INT_T, NULL}\
-}\
-}
-//#define init_input_gpu(varname) \
-{ \
-.gpuID=0,\
-.read={\
-{"gpuID", "gpuID = %d", INT_T, &(varname).gpuID},\
-{NULL, NULL, INT_T, NULL}\
-}\
-}
+  { \
+    .read={\
+      {"gpuID", "gpuID = %d", INT_T, &(varname)},\
+      {NULL, NULL, INT_T, NULL}\
+    }\
+  }
 
 double* alloc_double_sum_field(int n);
 hr_complex* alloc_complex_sum_field(int n);
 
-#define START_SP_ADDRESS_GPU(sf) ((sf)->gpu_ptr + (sf)->type->master_start[0])
-#define START_GF_ADDRESS_GPU(gf) ((gf)->gpu_ptr + (gf)->type->master_start[0])
+_LANGUAGE_C_END
 
-#define _GPU_FIELD_BLK(s,i) (((s)->gpu_ptr) + (s)->type->master_start[(i)])
-#define _GPU_4FIELD_BLK(s,i) (((s)->gpu_ptr) + 4*(s)->type->master_start[(i)])
-#define _GPU_DFIELD_BLK(s,i,size) (((s)->gpu_ptr) + size*(s)->type->master_start[(i)])
-
-#define _FIELD_BLK(s,i) (((s)->ptr) + (s)->type->master_start[(i)])
-#define _4FIELD_BLK(s,i) (((s)->ptr) + 4*(s)->type->master_start[(i)])
-#define _DFIELD_BLK(s,i,size) (((s)->ptr) + size*(s)->type->master_start[(i)]) 
-
-#define _BUF_FIELD_BLK(s,i) (((s)->ptr) + (s)->type->sbuf_start[(i)])
-#define _BUF_4FIELD_BLK(s,i) (((s)->ptr) + 4*(s)->type->sbuf_start[(i)])
-#define _BUF_DFIELD_BLK(s,i,_size) (((s)->ptr) + (_size)*(s)->type->sbuf_start[(i)]) 
-
-#define _BUF_GPU_FIELD_BLK(s,i) (((s)->gpu_ptr) + (s)->type->sbuf_start[(i)])
-#define _BUF_GPU_4FIELD_BLK(s,i) (((s)->gpu_ptr) + 4*(s)->type->sbuf_start[(i)])
-#define _BUF_GPU_DFIELD_BLK(s,i,size) (((s)->gpu_ptr) + size*(s)->type->sbuf_start[(i)])
-
-#define _GPU_IDX_TO_LOCAL(in, ix, ixp) ix - in->type->master_start[(ixp)];
-#define _SITE_IDX_GPU(ix, ixp, stride) (ix) + stride*(ixp)
-
-#define CudaSafeCall( err )     __cudaSafeCall( err, __FILE__, __LINE__ )
-#define CudaCheckError()        __cudaCheckError( __FILE__, __LINE__ )
-void __cudaSafeCall( cudaError_t err, const char *file, const int line );
-void __cudaCheckError( const char *file, const int line );
-
-/* Check CUDA call, similar to the code in the book. */
-// TODO: Rename all CHECKs to CHECK_CUDAs
-#define CHECK CHECK_CUDA
-
-#define CHECK_CUDA(call)\
-    do {\
-        const cudaError_t err1 = call;\
-        if (err1 != cudaSuccess)\
-        {\
-          fprintf(stderr, "Error: %s:%d, ", __FILE__, __LINE__);\
-          fprintf(stderr, "call exited with code %d: %s\n", err1, cudaGetErrorString(err1));\
-          exit(1);\
-        } \
-    } while (0)
-
-#ifdef WITH_MPI
-  #define CHECK_MPI(call) \
-    do {\
-      const int mpireturn = call; \
-      if (mpireturn != MPI_SUCCESS) \
-      { \
-        char message[MPI_MAX_ERROR_STRING]; \
-        int message_length; \
-        MPI_Error_string(mpireturn, message, &message_length); \
-        lprintf("MPI", 0, "ERROR: %s\n", message); \
-        error(1, 1, __func__, ": Communications failed.\n"); \
-      } \
-    } while (0)
-#endif
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif //WITH_GPU
+#endif 
 #endif

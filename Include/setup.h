@@ -12,6 +12,10 @@
 #ifndef SETUP_H
 #define SETUP_H
 
+#ifdef WITH_GPU
+    #include "gpu.h"
+#endif
+
 /**
  * @brief Read input filename from command line
  */
@@ -45,5 +49,17 @@ int finalize_process(void);
  * @brief Initialize gauge fields
  */
 void setup_gauge_fields();
+
+#ifdef WITH_GPU
+    /**
+     * @brief Call this in an init function to setup available graphics card for
+     *        use. This also logs information on available software and hardware.
+     * 
+     * @param input_gpu             A struct containing information on the current active
+     *                              GPU
+     */
+    void init_gpu(input_gpu gpu_var);
+#endif
+
 
 #endif
