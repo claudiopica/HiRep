@@ -25,52 +25,46 @@
 /* MPI allocation and deallocation code */
 #ifdef WITH_MPI
 
-#define _FREE_MPI_CODE       \
-    if (u->comm_req != NULL) \
-    afree(u->comm_req)
+#define _FREE_MPI_CODE  if (u->comm_req != NULL) afree(u->comm_req)
+#ifdef WITH_NEW_GEOMETRY
+#define _SENDBUF_ALLOC(_size) f->sendbuf_ptr = sendbuf_alloc((_size)*sizeof(*(f->ptr)))
+#else
+#define _SENDBUF_ALLOC(_size) f->sendbuf_ptr = f->ptr
+#endif
 
-#define _ALLOC_MPI_CODE(_name)                                                        \
-    if (type->nbuffers_gauge > 0)                                                     \
+#define _ALLOC_MPI_CODE(_name, _size)                                                 \
+    if (gd->nbuffers_gauge > 0)                                                       \
     {                                                                                 \
-        f->comm_req = amalloc(2 * type->nbuffers_gauge * sizeof(MPI_Request), ALIGN); \
+        f->comm_req = amalloc(2 * gd->nbuffers_gauge * sizeof(MPI_Request), ALIGN);   \
         error((f->comm_req) == NULL, 1, "alloc_" #_name " [" __FILE__ "]",            \
               "Could not allocate memory space for field (MPI)");                     \
-        for (int ix = 0; ix < 2 * type->nbuffers_gauge; ++ix)                         \
+        for (int ix = 0; ix < 2 * gd->nbuffers_gauge; ++ix)                           \
             f->comm_req[ix] = MPI_REQUEST_NULL;                                       \
+        _SENDBUF_ALLOC(_size);                                                        \
     }                                                                                 \
     else                                                                              \
     {                                                                                 \
         f->comm_req = NULL;                                                           \
     }                                                                                 \
-    do                                                                                \
-    {                                                                                 \
-    } while (0)
+    do {} while (0)
 
 #else /* WITH_MPI */
 
-#define _FREE_MPI_CODE \
-    do                 \
-    {                  \
-    } while (0)
-#define _ALLOC_MPI_CODE(_name) \
-    do                         \
-    {                          \
-    } while (0)
+#define _FREE_MPI_CODE do{}while(0)
+#define _ALLOC_MPI_CODE(_name) do{}while(0)
 
 #endif /* WITH_MPI */
 
 /* GPU allocation and deallocation code */
 #ifdef WITH_GPU
 
-#define _FREE_GPU_CODE      \
-    if (u->gpu_ptr != NULL) \
-    cudaFree(u->gpu_ptr)
+#define _FREE_GPU_CODE if (u->gpu_ptr != NULL) cudaFree(u->gpu_ptr)
 
 #define _ALLOC_GPU_CODE(_name, _size)                                                              \
     if (alloc_mem_t & GPU_MEM)                                                                     \
     {                                                                                              \
         cudaError_t err;                                                                           \
-        err = cudaMalloc((void **)&f->gpu_ptr, _size * type->gsize_gauge * sizeof(*(f->gpu_ptr))); \
+        err = cudaMalloc((void **)&f->gpu_ptr, _size * gd->gsize_gauge * sizeof(*(f->gpu_ptr)));   \
         error(err != cudaSuccess, 1, "alloc_" #_name " [" __FILE__ "]",                            \
               "Could not allocate GPU memory space for field");                                    \
     }                                                                                              \
@@ -79,14 +73,8 @@
 
 #else /* WITH_GPU */
 
-#define _FREE_GPU_CODE \
-    do                 \
-    {                  \
-    } while (0)
-#define _ALLOC_GPU_CODE(_name, _size) \
-    do                                \
-    {                                 \
-    } while (0)
+#define _FREE_GPU_CODE do{}while(0)
+#define _ALLOC_GPU_CODE(_name, _size) do{}while(0)
 
 #endif /* WITH_GPU */
 
@@ -107,18 +95,16 @@
 
 /* allocation function */
 #define _DECLARE_ALLOC_FUNC(_name, _type, _size)                                    \
-    _type *alloc_##_name(geometry_descriptor *type)                                 \
+    _type *alloc_##_name(geometry_descriptor *gd)                                   \
     {                                                                               \
-        _type *f;                                                                   \
-                                                                                    \
-        f = amalloc(sizeof(*f), ALIGN);                                             \
+        _type *f=amalloc(sizeof(*f), ALIGN);                                        \
         error(f == NULL, 1, "alloc_" #_name " [" __FILE__ "]",                      \
               "Could not allocate memory space for field (structure)");             \
-        f->type = type;                                                             \
+        f->type = gd;                                                               \
                                                                                     \
         if (alloc_mem_t & CPU_MEM)                                                  \
         {                                                                           \
-            f->ptr = amalloc(_size * type->gsize_gauge * sizeof(*(f->ptr)), ALIGN); \
+            f->ptr = amalloc(_size * gd->gsize_gauge * sizeof(*(f->ptr)), ALIGN);   \
             error((f->ptr) == NULL, 1, "alloc_" #_name " [" __FILE__ "]",           \
                   "Could not allocate memory space for field (data)");              \
         }                                                                           \
@@ -129,7 +115,7 @@
                                                                                     \
         _ALLOC_GPU_CODE(_name, _size);                                              \
                                                                                     \
-        _ALLOC_MPI_CODE(_name);                                                     \
+        _ALLOC_MPI_CODE(_name, _size);                                              \
                                                                                     \
         return f;                                                                   \
     }

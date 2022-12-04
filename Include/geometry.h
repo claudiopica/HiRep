@@ -99,9 +99,13 @@ void test_geometry_mpi_eo(void);
 void print_wdmatrix(char *filename);
 
 //New geometry test
+#include <stddef.h> //for size_t
 void define_geometry();
-void sync_field(geometry_descriptor *gd, int byte_per_site, int is_spinor_like, void *latticebuf);
+void* sendbuf_alloc(size_t bytes_per_site);
+void sync_field(geometry_descriptor *gd, int byte_per_site, int is_spinor_like, void *latticebuf, void *sb_ptr);
 int test_define_geometry();
+void sendbuf_report();
+
 
 #ifdef WITH_GPU
 #include "gpu.h"

@@ -1,11 +1,11 @@
-GLB_T =  3 //Global T size
-GLB_X =  3		
-GLB_Y =  3		
-GLB_Z =  3		
-NP_T =   1		
-NP_X =   1		
+GLB_T =  16 //Global T size
+GLB_X =  16		
+GLB_Y =  16		
+GLB_Z =  16		
+NP_T =   2		
+NP_X =   2		
 NP_Y =   1      		
-NP_Z =   1		
+NP_Z =   2		
 
 // Replicas
 N_REP = 1

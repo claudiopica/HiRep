@@ -166,7 +166,7 @@ void global_min(double *d, int n) {
 
 #ifndef NDEBUG
   if (mpiret != MPI_SUCCESS) {
-    char mesg[MPI_MIN_ERROR_STRING];
+    char mesg[MPI_MAX_ERROR_STRING];
     int mesglen;
     MPI_Error_string(mpiret,mesg,&mesglen);
     lprintf("MPI",0,"ERROR: %s\n",mesg);
@@ -255,7 +255,7 @@ void bcast_int(int *i, int n) {
 #ifdef WITH_MPI
 #ifdef WITH_NEW_GEOMETRY
 static void sync_gauge_field(suNg_field *gf) {
-  sync_field(gf->type, 4*sizeof(*gf->ptr), 0, gf->ptr);
+  sync_field(gf->type, 4*sizeof(*gf->ptr), 0, gf->ptr, gf->sendbuf_ptr);
 }
 #else
 static void sync_gauge_field(suNg_field *gf) {
@@ -299,7 +299,7 @@ static void sync_clover_force_field(suNf_field *gf) {
 
 #ifdef WITH_NEW_GEOMETRY
 static void sync_spinor_field(spinor_field *p) {
-  sync_field(p->type, sizeof(*p->ptr), 1, p->ptr);
+  sync_field(p->type, sizeof(*p->ptr), 1, p->ptr, p->sendbuf_ptr);
 }
 #else
 static void sync_spinor_field(spinor_field *p) {
@@ -527,7 +527,7 @@ void start_gf_sendrecv(suNg_field *gf) {
 
   for (i=0; i<(gd->nbuffers_gauge); ++i) {
     /* send ith buffer */
-    mpiret=MPI_Isend((double*)((gf->ptr)+4*gd->sbuf_start[i]), /* buffer */
+    mpiret=MPI_Isend((double*)((gf->sendbuf_ptr)+4*gd->sbuf_start[i]), /* buffer */
         (gd->sbuf_len[i])*sizeof(suNg)/sizeof(double)*4, /* lenght in units of doubles */
         MPI_DOUBLE, /* basic datatype */
         gd->sbuf_to_proc[i], /* cid of destination */
@@ -633,7 +633,7 @@ void start_sf_sendrecv(spinor_field *sf) {
 
   for (i=0; i<(gd->nbuffers_spinor); ++i) {
     /* send ith buffer */
-    mpiret=MPI_Isend((double*)((sf->ptr)+(gd->sbuf_start[i])-(gd->master_shift)), /* buffer */
+    mpiret=MPI_Isend((double*)((sf->sendbuf_ptr)+(gd->sbuf_start[i])-(gd->master_shift)), /* buffer */
         (gd->sbuf_len[i])*(sizeof(suNf_spinor)/sizeof(double)), /* lenght in units of doubles */
         MPI_DOUBLE, /* basic datatype */
         gd->sbuf_to_proc[i], /* cid of destination */
