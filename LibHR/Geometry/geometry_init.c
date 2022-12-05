@@ -335,6 +335,10 @@ int geometry_init() {
   /*Set the communication buffers and structure of the geometry identificator */
 #ifdef WITH_NEW_GEOMETRY
   define_geometry();
+  #ifdef WITH_GPU
+  printf("Initializing GPU neighbors with new geometry...\n");
+    init_neighbors_gpu();
+  #endif
 #else
   geometry_mpi_eo();
 #endif

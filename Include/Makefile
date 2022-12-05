@@ -1,6 +1,5 @@
 TOPDIR = ..
 MKDIR = $(TOPDIR)/Make
-GPUFILES = cluster_info.h gpu.h error.h
 
 #the default target cannot start with .
 default: .autoheaders.h

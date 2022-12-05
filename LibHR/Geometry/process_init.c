@@ -23,6 +23,8 @@
 #include "utils.h"
 #include "io.h"
 #include "random.h"
+#include "geometry.h"
+#include "geometry_init.h"
 #include "setup.h"
 #include "memory.h"
 #include "representation.h"
@@ -196,9 +198,10 @@ int setup_process(int *argc, char ***argv)
   }
 #endif
 
-#if defined(WITH_GPU) && defined(__cplusplus)
+#ifdef WITH_GPU
+  printf("Init GPU\n");
   read_input(gpu_var.read, input_filename);
-  init_gpu(gpu_var);
+  //gpu(gpu_var);
 #endif
 
   lprintf("SYSTEM", 0, "Gauge group: SU(%d)\n", NG);

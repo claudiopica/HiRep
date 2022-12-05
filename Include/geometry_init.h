@@ -26,6 +26,13 @@ void print_wdmatrix(char *filename);
 
 #ifdef WITH_GPU
 #include "gpu.h"
+   /**
+    * @brief Call this in an init function to setup available graphics card for
+    *        use. This also logs information on available software and hardware.
+    * 
+    * @param input_gpu             A struct containing information on the current active
+    *                              GPU
+    */
    void init_gpu(input_gpu gpu_var);
    void init_neighbors_gpu();
 #endif

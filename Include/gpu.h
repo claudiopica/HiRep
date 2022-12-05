@@ -21,7 +21,8 @@
 #include "input_par.h"
 #include "hr_complex.h"
 
-typedef struct _input_gpu {
+typedef struct 
+{
   unsigned int gpuID;
   input_record_t read[2]; /* for the reading function */
 } input_gpu;
