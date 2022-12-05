@@ -196,9 +196,9 @@ int setup_process(int *argc, char ***argv)
   }
 #endif
 
-#ifdef WITH_GPU
-read_input(gpu_var.read, input_filename);
-init_gpu(gpu_var);
+#if defined(WITH_GPU) && defined(__cplusplus)
+  read_input(gpu_var.read, input_filename);
+  init_gpu(gpu_var);
 #endif
 
   lprintf("SYSTEM", 0, "Gauge group: SU(%d)\n", NG);

@@ -173,6 +173,7 @@ void Dphi_gpu_(spinor_field *out, spinor_field *in)
 
   _PIECE_FOR(out->type, ixp)
   {
+      printf("Operating on piece: %d\n", ixp);
       int iyp = (ixp+1)%2;
       N = (out)->type->master_end[ixp]-(out)->type->master_start[ixp];
       grid = (N-1)/BLOCK_SIZE + 1;

@@ -26,7 +26,6 @@
   #include "mpi.h"
 #endif
 
-#ifdef __cplusplus
 void select_GPU(input_gpu gpu_var);
 int enable_GPU_peer_to_peer_access();
 
@@ -112,5 +111,4 @@ int enable_GPU_peer_to_peer_access()
   return 0;
 }
 
-#endif
 #endif

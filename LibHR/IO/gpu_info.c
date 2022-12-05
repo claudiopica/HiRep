@@ -24,8 +24,6 @@
   #include "mpi.h"
 #endif
 
-#ifdef __cplusplus
-
 const char *sComputeMode[] = {
     "Default (multiple host threads can use ::cudaSetDevice() with device simultaneously)",
     "Exclusive (only one host thread in one process is able to use ::cudaSetDevice() with this device)",
@@ -50,12 +48,17 @@ void print_device_count_info(input_gpu gpu_var)
 }
 
 /**
- * @brief Print CUDA driver version information
+ * @brief Print CUDA driver and runtime version information
+ *
+ * @param input_gpu             A struct containing parameters on the current GPU.
  */
 void print_driver_info() 
 {
-  int driver_version;
-  CHECK_CUDA(cudaDriverGetVersion(&driver_version));
+  int driver_version, runtime_version;
+  cudaDriverGetVersion(&driver_version);
+  cudaRuntimeGetVersion(&runtime_version);
+  lprintf("GPU_INIT", 10, "CUDA Capability Major/Minor version number: %d.%d\n", 
+                          device_prop.major, device_prop.minor);
   lprintf("GPU_INIT", 10, "CUDA Driver Version / Runtime Version: %d.%d / %d.%d\n", 
                            driver_version/1000, 
                            driver_version%100, 
@@ -66,14 +69,11 @@ void print_driver_info()
 /**
  * @brief Print CUDA runtime version information
  *
- * @param input_gpu             A struct containing parameters on the current GPU.
  */
 void print_runtime_info(cudaDeviceProp device_prop) 
 {
-  int runtime_version;
-  CHECK_CUDA(cudaRuntimeGetVersion(&runtime_version));
-  lprintf("GPU_INIT", 10, "CUDA Capability Major/Minor version number: %d.%d\n", 
-                          device_prop.major, device_prop.minor);
+  
+  // TODO: Remove this at some point
 }
 
 /**
@@ -88,7 +88,7 @@ void print_global_memory_info(cudaDeviceProp device_prop, input_gpu gpu_var)
   int mem_bus_width;
 
   // Query properties
-  CHECK_CUDA(cuDeviceGetAttribute(&mem_bus_width, CU_DEVICE_ATTRIBUTE_GLOBAL_MEMORY_BUS_WIDTH,gpu_var.gpuID));
+  cuDeviceGetAttribute(&mem_bus_width, CU_DEVICE_ATTRIBUTE_GLOBAL_MEMORY_BUS_WIDTH,gpu_var.gpuID);
 
   // Print formatted
   lprintf("GPU_INIT",10,"Total amount of global memory: %.0f MB (%lluB)\n", 
@@ -124,7 +124,7 @@ void print_cache_info(cudaDeviceProp device_prop, input_gpu gpu_var)
   int l2_cache_size;
 
   // Query properties
-  CHECK_CUDA(cuDeviceGetAttribute(&l2_cache_size, CU_DEVICE_ATTRIBUTE_L2_CACHE_SIZE, gpu_var.gpuID));
+  cuDeviceGetAttribute(&l2_cache_size, CU_DEVICE_ATTRIBUTE_L2_CACHE_SIZE, gpu_var.gpuID);
 
   // Print formatted
   lprintf("GPU_INIT",10,"L2 Cache Size: %dB\n",l2_cache_size); 
@@ -166,9 +166,9 @@ void print_constant_memory_info(cudaDeviceProp device_prop)
 void print_memory_info(cudaDeviceProp device_prop, input_gpu gpu_var) 
 {
   print_global_memory_info(device_prop, gpu_var);
-  print_shared_memory_info(device_prop, gpu_var);
+  print_shared_memory_info(device_prop);
   print_cache_info(device_prop, gpu_var);
-  print_constant_memory_info(device_prop, gpu_var);
+  print_constant_memory_info(device_prop);
 }
 
 /**
@@ -182,7 +182,7 @@ void print_compute_info(cudaDeviceProp device_prop, input_gpu gpu_var)
   int mem_clock;
 
   // Query properties
-  CHECK_CUDA(cuDeviceGetAttribute(&mem_clock, CU_DEVICE_ATTRIBUTE_MEMORY_CLOCK_RATE, gpu_var.gpuID));
+  cuDeviceGetAttribute(&mem_clock, CU_DEVICE_ATTRIBUTE_MEMORY_CLOCK_RATE, gpu_var.gpuID);
 
   // Print formatted
   lprintf("GPU_INIT", 10, "Multiprocessors: %d\n", device_prop.multiProcessorCount);
@@ -237,8 +237,7 @@ void print_hardware_info(cudaDeviceProp device_prop, input_gpu gpu_var)
   lprintf("GPU_INIT", 10, "Device: %s\n", device_prop.name);
 
   print_memory_info(device_prop, gpu_var);
-  print_compute_info(device_prop);
+  print_compute_info(device_prop, gpu_var);
 }
 
-#endif
 #endif
