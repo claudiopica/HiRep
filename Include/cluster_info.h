@@ -12,7 +12,7 @@
     #include "gpu.h"
 #endif
 
-#if defined(WITH_GPU) && defined(__cplusplus)
+#ifdef WITH_GPU
     /**
      * @brief Query number of GPUs and print related information
      *
@@ -22,7 +22,7 @@
     /**
      * @brief Print CUDA driver version information
      */
-    void print_driver_info();
+    void print_driver_info(cudaDeviceProp);
     /**
      * @brief Print CUDA runtime version information
      *
@@ -88,6 +88,6 @@
      *
      * @param input_gpu             A struct containing parameters on the current GPU.
      */
-    void print_hardware_info(cudaDeviceProp, input_gpu)
+    void print_hardware_info(cudaDeviceProp, input_gpu);
 #endif
 #endif

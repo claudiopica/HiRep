@@ -7,10 +7,10 @@
 int **direct_spatial_rotations();
 int **inverse_spatial_rotations();
 void request_spatial_paths_evaluation();
-void eval_all_glueball_ops(int t, double complex *numerical_op);
-void measure_1pt_glueballs(int nblockingstart, int nblockingend, double *smear_val, double complex *gb_storage);
-void eval_all_torellon_ops(int t, double complex *numerical_op, double complex ** polyf);
-void measure_1pt_torellons(double *smear_val, double complex *tor_storage, double complex **pf);
+void eval_all_glueball_ops(int t, hr_complex *numerical_op);
+void measure_1pt_glueballs(int nblockingstart, int nblockingend, double *smear_val, hr_complex *gb_storage);
+void eval_all_torellon_ops(int t, hr_complex *numerical_op, hr_complex ** polyf);
+void measure_1pt_torellons(double *smear_val, hr_complex *tor_storage, hr_complex **pf);
 void report_gb_group_setup();
 void report_tor_group_setup();
 
@@ -33,13 +33,13 @@ typedef struct
 {
     suNg *p;
     int ix;
-    double complex tr;
+    hr_complex tr;
 } wilson_lines;
 
 wilson_lines *polyleg(int ix, int d);
 
-void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, double complex *gb_storage);
-void collect_1pt_torellon_functions(cor_list *lcor, double complex *tor_storage, double complex ** polyf);
+void collect_1pt_glueball_functions(cor_list *lcor, int nblocking, hr_complex *gb_storage);
+void collect_1pt_torellon_functions(cor_list *lcor, hr_complex *tor_storage, hr_complex ** polyf);
     
 
 #define total_n_glue_op 15

@@ -58,7 +58,7 @@ _LANGUAGE_C
 
 _LANGUAGE_C_END
 
-#if defined(WITH_GPU) && defined(__cplusplus)
+#ifdef WITH_GPU
     /**
      * @brief Check CUDA call and log error message on failure
      *
@@ -88,7 +88,7 @@ _LANGUAGE_C_END
     /**
      * @brief Check last error after CUDA calls
      */
-    #define CudaCheckError()        __cudaCheckError( __FILE__, __LINE__ )
+    #define CudaCheckError()        __cudaCheckError( (const char*)__FILE__, (int)__LINE__ ) /*Apparently these casts are necessary. Why? (SAM)*/ 
 
     /**
      * @brief Check CUDA call and log error message on failure.
@@ -100,10 +100,11 @@ _LANGUAGE_C_END
             const cudaError_t err1 = call; \
             if (err1 != cudaSuccess) \
             { \
-                error(1, 1, "Error in: %s:%d, function: %s\n" \
-                            "CUDA call exited with code %d: %s\n", \
-                             __FILE__, __LINE__, __func__, \
-                             err1, cudaGetErrorString(err1));\
+                error(1, 1, "Error", "Error"); \
+                /*error(1, 1, "Error in: %s:%d, function: %s\n" */\
+                            /*"CUDA call exited with code %d: %s\n", */\
+                            /*__FILE__, __LINE__, __func__, */\
+                            /*err1, cudaGetErrorString(err1)); */\
             } \
         } while (0)
 

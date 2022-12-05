@@ -9,9 +9,14 @@
  *        cluster relating to GPUs.
  */
 #ifdef WITH_GPU
+extern "C" {
+  #include "logger.h"
+}
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <iostream>
 #include "gpu.h"
 #include "io.h"
 #include "global.h"
@@ -52,7 +57,7 @@ void print_device_count_info(input_gpu gpu_var)
  *
  * @param input_gpu             A struct containing parameters on the current GPU.
  */
-void print_driver_info() 
+void print_driver_info(cudaDeviceProp device_prop) 
 {
   int driver_version, runtime_version;
   cudaDriverGetVersion(&driver_version);
@@ -86,9 +91,12 @@ void print_runtime_info(cudaDeviceProp device_prop)
 void print_global_memory_info(cudaDeviceProp device_prop, input_gpu gpu_var) 
 {
   int mem_bus_width;
+  int mem_clock;
 
   // Query properties
   cuDeviceGetAttribute(&mem_bus_width, CU_DEVICE_ATTRIBUTE_GLOBAL_MEMORY_BUS_WIDTH,gpu_var.gpuID);
+  cuDeviceGetAttribute(&mem_clock, CU_DEVICE_ATTRIBUTE_MEMORY_CLOCK_RATE, gpu_var.gpuID);
+
 
   // Print formatted
   lprintf("GPU_INIT",10,"Total amount of global memory: %.0f MB (%lluB)\n", 
@@ -179,11 +187,6 @@ void print_memory_info(cudaDeviceProp device_prop, input_gpu gpu_var)
  */
 void print_compute_info(cudaDeviceProp device_prop, input_gpu gpu_var) 
 {
-  int mem_clock;
-
-  // Query properties
-  cuDeviceGetAttribute(&mem_clock, CU_DEVICE_ATTRIBUTE_MEMORY_CLOCK_RATE, gpu_var.gpuID);
-
   // Print formatted
   lprintf("GPU_INIT", 10, "Multiprocessors: %d\n", device_prop.multiProcessorCount);
   lprintf("GPU_INT", 10, "GPU Clock Speed: %.2f GHz\n", device_prop.clockRate * 1e-6f);

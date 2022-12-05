@@ -21,9 +21,7 @@
 #include "input_par.h"
 #include "hr_complex.h"
 
-_LANGUAGE_C
-
-typedef struct {
+typedef struct _input_gpu {
   unsigned int gpuID;
   input_record_t read[2]; /* for the reading function */
 } input_gpu;
@@ -38,8 +36,6 @@ typedef struct {
 
 double* alloc_double_sum_field(int n);
 hr_complex* alloc_complex_sum_field(int n);
-
-_LANGUAGE_C_END
 
 #endif 
 #endif

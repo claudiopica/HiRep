@@ -13,6 +13,11 @@
 #include "suN.h"
 #include "suN_types.h"
 
+
+_LANGUAGE_C
+#include "error.h"
+_LANGUAGE_C_END
+
 /*
  * LINEAR ALGEBRA FUNCTIONS ARE DEFINED IN THE TEMPLATE
  *

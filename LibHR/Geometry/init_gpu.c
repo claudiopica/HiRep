@@ -11,13 +11,16 @@
  */
 
 #ifdef WITH_GPU
+extern "C" {
+  #include "logger.h"
+}
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
 #include "gpu.h"
 #include "io.h"
 #include "global.h"
-#include "logger.h"
 #include "utils.h"
 #include "error.h"
 #include "geometry.h"
@@ -26,7 +29,7 @@
   #include "mpi.h"
 #endif
 
-void select_GPU(input_gpu gpu_var);
+void select_GPU(input_gpu);
 int enable_GPU_peer_to_peer_access();
 
 /**
@@ -43,8 +46,8 @@ void init_gpu(input_gpu gpu_var)
   CHECK_CUDA(cudaGetDeviceProperties(&device_prop, gpu_var.gpuID));
 
   // Print GPU info
-  print_device_count_info(device_prop, gpu_var);
-  print_driver_info();
+  print_device_count_info(gpu_var);
+  print_driver_info(device_prop);
   print_runtime_info(device_prop);
   print_hardware_info(device_prop, gpu_var);
 
