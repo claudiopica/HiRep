@@ -1,3 +1,6 @@
+#ifndef DIRAC_4F_H
+#define DIRAC_4F_H
+
 /* Dirac operators with a four fermion interaction */
 #ifdef __cplusplus
     extern "C" {
@@ -13,4 +16,5 @@ void Dphieopre_4f_sq_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
 
 #ifdef __cplusplus
     }
+#endif
 #endif

@@ -24,7 +24,7 @@ extern "C" {
 #include "utils.h"
 #include "error.h"
 #include "geometry.h"
-#include "cluster_info.h"
+#include "gpu_info.h"
 #ifdef WITH_MPI
   #include "mpi.h"
 #endif

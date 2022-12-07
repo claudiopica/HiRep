@@ -1,3 +1,6 @@
+#ifndef DIRAC_CLOVER_H
+#define DIRAC_CLOVER_H
+
 // Dirac operators with clover term
 #ifdef __cplusplus
     extern "C" {
@@ -14,4 +17,6 @@ void Cphi_diag_inv(double, spinor_field *, spinor_field *);
 
 #ifdef __cplusplus
     }
+#endif
+
 #endif

@@ -1,3 +1,6 @@
+#ifndef DIRAC_TM_H
+#define DIRAC_TM_H
+
 // Twisted mass operators
 #ifdef __cplusplus
   extern "C" {
@@ -45,5 +48,7 @@ void g5Dphi_eopre_tw_sq(double m0, double mu, spinor_field *out, spinor_field *i
 
 #ifdef __cplusplus
   }
+#endif
+
 #endif
 
