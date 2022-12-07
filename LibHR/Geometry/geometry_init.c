@@ -336,7 +336,6 @@ int geometry_init() {
 #ifdef WITH_NEW_GEOMETRY
   define_geometry();
   #ifdef WITH_GPU
-  printf("Initializing GPU neighbors with new geometry...\n");
     init_neighbors_gpu();
   #endif
 #else

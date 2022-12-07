@@ -199,9 +199,8 @@ int setup_process(int *argc, char ***argv)
 #endif
 
 #ifdef WITH_GPU
-  printf("Init GPU\n");
   read_input(gpu_var.read, input_filename);
-  //gpu(gpu_var);
+  //init_gpu(gpu_var);
 #endif
 
   lprintf("SYSTEM", 0, "Gauge group: SU(%d)\n", NG);
