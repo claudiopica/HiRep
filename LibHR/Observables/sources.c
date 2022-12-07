@@ -394,7 +394,7 @@ void create_diluted_source_equal_atau_col(spinor_field *source, int tau, int col
 {
   int c[4];
   // suNf_vector *v1,*v2;
-  double complex *v1;
+  hr_complex *v1;
   int i;
   for (i = 0; i < 4; ++i)
   {
@@ -410,7 +410,7 @@ void create_diluted_source_equal_atau_col(spinor_field *source, int tau, int col
           for (i = 0; i < 4; ++i)
           {
             v1 = &((_FIELD_AT(&source[i], ipt(c[0], c[1], c[2], c[3])))->c[i].c[col]);
-            ranz2((double *)(v1), sizeof(double complex) / sizeof(double)); // Make new sources
+            ranz2((double *)(v1), sizeof(hr_complex) / sizeof(double)); // Make new sources
           }
         }
   }
@@ -421,7 +421,7 @@ void create_diluted_source_equal_atau_col(spinor_field *source, int tau, int col
 void create_noise_source_equal_col_dil(spinor_field *source, int col)
 {
   int c[4];
-  double complex *v1, *v2;
+  hr_complex *v1, *v2;
   int i;
 
   for (i = 0; i < 4; ++i)
@@ -435,7 +435,7 @@ void create_noise_source_equal_col_dil(spinor_field *source, int col)
         for (c[3] = 0; c[3] < Z; c[3]++)
         {
           v1 = &((_FIELD_AT(&source[0], ipt(c[0], c[1], c[2], c[3])))->c[0].c[col]);
-          ranz2((double *)(v1), sizeof(double complex) / sizeof(double)); // Make new sources
+          ranz2((double *)(v1), sizeof(hr_complex) / sizeof(double)); // Make new sources
           for (i = 1; i < 4; ++i)
           {
             v2 = &((_FIELD_AT(&source[i], ipt(c[0], c[1], c[2], c[3])))->c[i].c[col]); // Copy previous index.

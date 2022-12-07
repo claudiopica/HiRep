@@ -91,7 +91,6 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
   double *r, *s1, *s2, *c1, *c2;
   double maxm;
   
-  int i;
   int cgiter;
   unsigned int notconverged;
   
@@ -110,7 +109,7 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
   memall = alloc_spinor_field_f(2*(par->n)+3,in->type);
   q1 = (spinor_field**)malloc(sizeof(spinor_field*)*par->n);
   q2 = (spinor_field**)malloc(sizeof(spinor_field*)*par->n);
-  for(i=0; i<par->n; i++) {
+  for(int i=0; i<par->n; i++) {
     q1[i] = memall+i;
     q2[i] = memall+par->n+i;
   }
@@ -142,7 +141,7 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
   
   spinor_field_mul_f(p2,1./rho,p2);
   spinor_field_zero_f(p1);
-  for (i=0; i<(par->n); ++i) {
+  for (int i=0; i<(par->n); ++i) {
     r[i]=rho;
     c2[i]=c1[i]=1.;
     s1[i]=s2[i]=0.;
@@ -178,7 +177,7 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
     
     maxm=1.e-10; /* to check if the error is going down */
     
-    for (i=0; i<(par->n); ++i) { /* update solutions */
+    for (int i=0; i<(par->n); ++i) { /* update solutions */
       if (flags[i]) {
         double a, t, e, d, m;
         a=(alpha-par->shift[i]+par->shift[0]);
@@ -250,7 +249,7 @@ static int g5QMR_mshift_core(short *valid, mshift_par *par, spinor_operator M, s
   } while ((par->max_iter==0 || cgiter<par->max_iter) && notconverged);
   
   /* test results */
-  for(i=0;i<par->n;++i){
+  for(int i=0;i<par->n;++i){
     double norm;
     M(Mp,&out[i]);
     ++cgiter;

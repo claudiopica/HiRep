@@ -80,8 +80,8 @@ void covariant_project_to_suNg(suNg *u);
 #ifndef GAUGE_SON
 void ludcmp(hr_complex *a, int *indx, double *d, int N);
 void lubksb(hr_complex *a, int *indx, hr_complex *b, int N);
-void inv_hermNg(suNg *a);
-void det_hermNg(hr_complex *res, suNg *a);
+void inv_Cmplx_Ng(suNg *a);
+void det_Cmplx_Ng(hr_complex *res, suNg *a);
 #else
 int project_to_suNg_real(suNg *out, suNg *in);
 void inv_Cmplx_Ng(suNg *a);

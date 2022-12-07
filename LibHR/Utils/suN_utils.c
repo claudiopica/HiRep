@@ -76,7 +76,7 @@ static void normalize_flt(suNg_vector_flt *v)
 void project_to_suNg(suNg *u)
 {
 #ifdef GAUGE_SON
-  double complex norm;
+  hr_complex norm;
   _suNg_sqnorm(norm, *u);
   if (creal(norm) < 1.e-28)
     return;
@@ -115,14 +115,14 @@ void project_to_suNg(suNg *u)
   _suNg_mul(*u, norm, *u);
 
 #else
-  double complex norm;
+  hr_complex norm;
   _suNg_sqnorm(norm, *u);
   if (creal(norm) < 1.e-28)
     return;
 
   int i, j;
   suNg_vector *v1, *v2;
-  double complex z;
+  hr_complex z;
 
   v1 = (suNg_vector *)(u);
   v2 = v1 + 1;
@@ -191,7 +191,7 @@ void project_to_suNg_flt(suNg_flt *u)
 
 #else
   float norm;
-  double complex dnorm;
+  hr_complex dnorm;
   suNg ud;
   _suNg_sqnorm(norm, *u);
   if (norm < 1.e-10)
@@ -199,7 +199,7 @@ void project_to_suNg_flt(suNg_flt *u)
 
   int i, j;
   suNg_vector_flt *v1, *v2;
-  float complex z;
+  hr_complex_flt z;
 
   v1 = (suNg_vector_flt *)(u);
   v2 = v1 + 1;
@@ -218,7 +218,7 @@ void project_to_suNg_flt(suNg_flt *u)
     v1 = (suNg_vector_flt *)(u);
   }
   for (i = 0; i < (NG * NG); ++i)
-    ud.c[i] = (double complex)(u->c[i]);
+    ud.c[i] = (hr_complex)(u->c[i]);
 
   det_Cmplx_Ng(&dnorm, &ud);
   dnorm = cpow(dnorm, -1. / NG);
@@ -239,7 +239,7 @@ void project_cooling_to_suNg(suNg *g_out, suNg *g_in, int cooling)
   int k, l;
   int j, i, ncool;
   double c[NG];
-  double complex f[2];
+  hr_complex f[2];
   double norm;
 
   Ug[0] = *g_in;
@@ -377,8 +377,8 @@ void covariant_project_to_suNg(suNg *u)
   int i, j, k;
   suNg tmp, tmp1;
   double eval[NG];
-  double complex norm;
-  double complex evec[NG * NG];
+  hr_complex norm;
+  hr_complex evec[NG * NG];
 
   det_Cmplx_Ng(&norm, u);
   norm = cpow(norm, -1. / NG);

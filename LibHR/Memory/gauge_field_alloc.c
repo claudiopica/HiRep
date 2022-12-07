@@ -45,11 +45,18 @@
 
 #if defined(WITH_MPI)
 
+        #define _FREE_MPI_CODE  if (u->comm_req != NULL) afree(u->comm_req)
+        #ifdef WITH_NEW_GEOMETRY
+            #define _SENDBUF_ALLOC(_size) f->sendbuf_ptr = sendbuf_alloc((_size)*sizeof(*(f->ptr)))
+        #else
+            #define _SENDBUF_ALLOC(_size) f->sendbuf_ptr = f->ptr
+        #endif
+
         #define _FREE_MPI_FIELD_DATA                                                                        \
             if (f->comm_req != NULL)                                                                        \
                 afree(f->comm_req)                                                                          \
 
-        #define _ALLOC_MPI_FIELD_DATA(_name)                                                                \
+        #define _ALLOC_MPI_FIELD_DATA(_name, _size)                                                                \
             if (type->nbuffers_gauge > 0)                                                                   \
             {                                                                                               \
                 f->comm_req = amalloc(2 * type->nbuffers_gauge * sizeof(MPI_Request), ALIGN);               \
@@ -57,6 +64,7 @@
                     "Could not allocate memory space for field (MPI)");                                     \
                 for (int ix = 0; ix < 2 * type->nbuffers_gauge; ++ix)                                       \
                     f->comm_req[ix] = MPI_REQUEST_NULL;                                                     \
+                _SENDBUF_ALLOC(_size);                                                                      \
             }                                                                                               \
             else                                                                                            \
             {                                                                                               \
@@ -180,7 +188,7 @@
 #ifndef WITH_MPI
 
     #define _FREE_MPI_FIELD_DATA do {} while (0)
-    #define _ALLOC_MPI_FIELD_DATA(_name) do {} while (0)
+    #define _ALLOC_MPI_FIELD_DATA(_name, _size) do {} while (0)
 
 #endif
 
@@ -226,7 +234,7 @@
         _ALLOC_FIELD_STRUCT(_name);                                                                         \
         _ALLOC_CPU_FIELD_DATA(_name, _size);                                                                \
         _ALLOC_GPU_FIELD_DATA(_name, _site_type, _size);                                                    \
-        _ALLOC_MPI_FIELD_DATA(_name);                                                                       \
+        _ALLOC_MPI_FIELD_DATA(_name, _size);                                                                       \
                                                                                                             \
         return f;                                                                                           \
     }

@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
   suNg A;
   suNf a, s, tmp;
   int i, j;
-  double complex zp, zm;
+  hr_complex zp, zm;
 
   lprintf("MAIN", 0, "Gauge group: SU(%d)\n", NG);
   lprintf("MAIN", 0, "Fermion representation: dim = %d\n", NF);

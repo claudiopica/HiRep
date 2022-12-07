@@ -9,10 +9,10 @@ void _su2Nfc_times_su2Nfc_herm(suNfc *C, suNfc *B, suNfc *A);
 void _su2Nfc_times_su2Nf(suNfc *C, suNfc *B, suNfc *A);
 void _su2Nfc_times_su2Nfc_assign(suNfc *C, suNfc *B, suNfc *A);
 void _su2Nfc_times_su2Nfc_assign_herm(suNfc *C, suNfc *B, suNfc *A);
-void _su2Nfc_times_su2Nfc_trace(double complex *trace, suNfc *B, suNfc *A);
-void _su2Nfc_times_su2Nfc_trace_herm_sq(double complex *trace, suNfc *B);
+void _su2Nfc_times_su2Nfc_trace(hr_complex *trace, suNfc *B, suNfc *A);
+void _su2Nfc_times_su2Nfc_trace_herm_sq(hr_complex *trace, suNfc *B);
 void _su2Nfc_unit(suNfc *A);
-void _su2Nfc_trace(double complex *p, suNfc *A);
+void _su2Nfc_trace(hr_complex *p, suNfc *A);
 void clover_exp(suNfc *Aplus, suNfc *expAplus);
 void evaluate_sw_order(double * mass);
 

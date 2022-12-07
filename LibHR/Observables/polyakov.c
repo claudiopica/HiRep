@@ -27,7 +27,7 @@ void polyakov()
   suNg *lp;
   suNg *bp;
   suNg tmp;
-  double complex poly[GLB_T];
+  hr_complex poly[GLB_T];
   double adjpoly[GLB_T];
   double dtmp;
 #ifdef WITH_MPI
@@ -149,7 +149,7 @@ void polyakov()
 #endif /* WITH_MPI */
 
     /* trace and average */
-    memset(poly, 0, sizeof(double complex) * GLB_T);
+    memset(poly, 0, sizeof(hr_complex) * GLB_T);
     memset(adjpoly, 0, sizeof(double) * GLB_T);
 
     i3d = 0;
@@ -195,7 +195,7 @@ void polyakov()
   suNg *lp;
   suNg *bp;
   suNg tmp;
-  double complex poly;
+  hr_complex poly;
   double adjpoly;
   double dtmp;
 #ifdef WITH_MPI
@@ -377,46 +377,50 @@ void polyakov()
       sCOORD[2] = COORD[2];
       sCOORD[3] = COORD[3];
       sCOORD[mu] = np[mu] - 1;
-      MPIRET(mpiret)
-      MPI_Cart_rank(cart_comm, sCOORD, &sCID);
-#ifndef NDEBUG
-      if (mpiret != MPI_SUCCESS)
       {
-        char mesg[MPI_MAX_ERROR_STRING];
-        int mesglen;
-        MPI_Error_string(mpiret, mesg, &mesglen);
-        lprintf("MPI", 0, "ERROR: %s\n", mesg);
-        error(1, 1, "polyakov.c", "Cannot retrieve source CID");
-      }
-#endif /* NDEBUG */
-      MPI_Status status;
-      MPIRET(mpiret)
-      MPI_Recv((double *)(p),                          /* buffer */
-               size3d * sizeof(suNg) / sizeof(double), /* lenght in units of doubles */
-               MPI_DOUBLE,                             /* basic datatype */
-               sCID,                                   /* cid of destination */
-               COORD[mu],                              /* tag of communication */
-               cart_comm,                              /* use the cartesian communicator */
-               &status);
+        MPIRET(mpiret)
+        MPI_Cart_rank(cart_comm, sCOORD, &sCID);
 #ifndef NDEBUG
-      if (mpiret != MPI_SUCCESS)
-      {
-        char mesg[MPI_MAX_ERROR_STRING];
-        int mesglen;
-        MPI_Error_string(mpiret, mesg, &mesglen);
-        lprintf("MPI", 0, "ERROR: %s\n", mesg);
-        if (status.MPI_ERROR != MPI_SUCCESS)
+        if (mpiret != MPI_SUCCESS)
         {
-          MPI_Error_string(status.MPI_ERROR, mesg, &mesglen);
-          lprintf("MPI", 0, "Req [%d] Source [%d] Tag [%] ERROR: %s\n",
-                  0,
-                  status.MPI_SOURCE,
-                  status.MPI_TAG,
-                  mesg);
+          char mesg[MPI_MAX_ERROR_STRING];
+          int mesglen;
+          MPI_Error_string(mpiret, mesg, &mesglen);
+          lprintf("MPI", 0, "ERROR: %s\n", mesg);
+          error(1, 1, "polyakov.c", "Cannot retrieve source CID");
         }
-        error(1, 1, "polyakov.c", "Cannot receive polyakov");
-      }
 #endif /* NDEBUG */
+      }
+      MPI_Status status;
+      {
+        MPIRET(mpiret)
+        MPI_Recv((double *)(p),                          /* buffer */
+                 size3d * sizeof(suNg) / sizeof(double), /* lenght in units of doubles */
+                 MPI_DOUBLE,                             /* basic datatype */
+                 sCID,                                   /* cid of destination */
+                 COORD[mu],                              /* tag of communication */
+                 cart_comm,                              /* use the cartesian communicator */
+                 &status);
+#ifndef NDEBUG
+        if (mpiret != MPI_SUCCESS)
+        {
+          char mesg[MPI_MAX_ERROR_STRING];
+          int mesglen;
+          MPI_Error_string(mpiret, mesg, &mesglen);
+          lprintf("MPI", 0, "ERROR: %s\n", mesg);
+          if (status.MPI_ERROR != MPI_SUCCESS)
+          {
+            MPI_Error_string(status.MPI_ERROR, mesg, &mesglen);
+            lprintf("MPI", 0, "Req [%d] Source [%d] Tag [%] ERROR: %s\n",
+                    0,
+                    status.MPI_SOURCE,
+                    status.MPI_TAG,
+                    mesg);
+          }
+          error(1, 1, "polyakov.c", "Cannot receive polyakov");
+        }
+#endif /* NDEBUG */
+      }
     }
 #endif /* WITH_MPI */
 

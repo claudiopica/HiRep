@@ -64,14 +64,14 @@ FILE *fp;
 char path[1035];
 int i;
 
-static double complex DeltaKronecker(int l, int j)
+static hr_complex DeltaKronecker(int l, int j)
 {
   if (l == j)
     return 1.;
   else
     return 0.;
 }
-static double complex is_eo(int t, int x, int y, int z, int eo)
+static hr_complex is_eo(int t, int x, int y, int z, int eo)
 {
   if (((zerocoord[0] + t + zerocoord[1] + x + zerocoord[2] + y + zerocoord[3] + z) & 1) == eo)
     return 1.;
@@ -79,10 +79,10 @@ static double complex is_eo(int t, int x, int y, int z, int eo)
     return 0.;
 }
 
-static double complex average(double complex a[], int n)
+static hr_complex average(hr_complex a[], int n)
 {
 
-  double complex sum;
+  hr_complex sum;
   _complex_0(sum);
   for (int l = 0; l < n; l++)
   {
@@ -91,12 +91,12 @@ static double complex average(double complex a[], int n)
   return sum / n;
 }
 
-static double complex sd(double complex a[], int n)
+static hr_complex sd(hr_complex a[], int n)
 {
-  double complex mean;
+  hr_complex mean;
   mean = average(a, n);
 
-  double complex sum = 0;
+  hr_complex sum = 0;
   for (int l = 0; l < n; l++)
   {
     sum += creal(a[l] - mean) * creal(a[l] - mean) + I * cimag(a[l] - mean) * cimag(a[l] - mean);
@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
   int b1, b2, c1, c2;
   int col, tau, eo, j;
   int k, counter;
-  double complex av_, sd_;
+  hr_complex av_, sd_;
 
   logger_map("DEBUG", "debug");
   logger_setlevel(0, 200);
@@ -228,7 +228,7 @@ int main(int argc, char *argv[])
   else
     lprintf("MAIN", 0, "test norm FAILED: return_value= %d\n ", return_value);
 
-  double complex tmp_vec[mes_ip.nhits];
+  hr_complex tmp_vec[mes_ip.nhits];
 
   for (int ll = 0; ll < 10 * MPI_WORLD_SIZE; ll++)
   {

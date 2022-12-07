@@ -1,10 +1,10 @@
 /***************************************************************************
-* Copyright (c) 2014, Martin Hansen                                        *
-* All rights reserved.                                                     *
-*                                                                          *
-* Chronological inverter using the MRE algorithm                           *
-* arXiv: hep-lat/9509012                                                   *
-***************************************************************************/
+ * Copyright (c) 2014, Martin Hansen                                        *
+ * All rights reserved.                                                     *
+ *                                                                          *
+ * Chronological inverter using the MRE algorithm                           *
+ * arXiv: hep-lat/9509012                                                   *
+ ***************************************************************************/
 
 #include "update.h"
 #include "linear_algebra.h"
@@ -23,15 +23,15 @@ static spinor_field *Dv;
 static int num_init = 0;
 
 // Variables used in in the LU solver
-static double complex A[MAX][MAX];
-static double complex b[MAX];
-static double complex x[MAX];
-static double complex y[MAX];
+static hr_complex A[MAX][MAX];
+static hr_complex b[MAX];
+static hr_complex x[MAX];
+static hr_complex y[MAX];
 static int mutate[MAX];
 
 void gram_schmidt(mre_par *par, int p, int max)
 {
-	double complex rij;
+	hr_complex rij;
 	double rii;
 
 	for (int i = 0; i < max; i++)
@@ -58,7 +58,7 @@ void lu_solve(int max)
 {
 	double big;
 	int row;
-	double complex ctmp;
+	hr_complex ctmp;
 	int itmp;
 
 	// Setup mutate
@@ -233,6 +233,7 @@ void mre_guess(mre_par *par, int p, spinor_field *out, spinor_operator DD, spino
 
 	if (num_init == 0 || par->init == 0 || par->max <= 0)
 	{
+		spinor_field_zero_f(out);
 		return;
 	}
 

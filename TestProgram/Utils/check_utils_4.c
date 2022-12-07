@@ -54,9 +54,9 @@ static void transform_u(void)
     // smear_gauge_field();
 }
 
-static double complex spat_avr_0pp_wrk()
+static hr_complex spat_avr_0pp_wrk()
 {
-    static double complex pa, tmp;
+    static hr_complex pa, tmp;
     suNg_field *_u = u_gauge_wrk();
     start_gf_sendrecv(_u);
 
@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
 {
 
     int return_value = 0;
-    double complex Zeropp[2];
+    hr_complex Zeropp[2];
     double dop;
 
 

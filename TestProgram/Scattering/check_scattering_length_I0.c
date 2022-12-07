@@ -195,11 +195,11 @@ double b_mu(fourvec p1, int mu)
  * @param LT time extent of the box
  * @param t time slice
  */
-double complex twopoint(fourvec p, double m, int L, int LT, int t)
+hr_complex twopoint(fourvec p, double m, int L, int LT, int t)
 {
     fourvec mom1, mom2;
     int q1, q2, q3, q41, q42;
-    double complex res;
+    hr_complex res;
     res = 0.;
     double tmp;
 
@@ -239,11 +239,11 @@ double complex twopoint(fourvec p, double m, int L, int LT, int t)
  * @param LT time extent of the box
  * @param t time slice
  */
-double complex twopoint_rho(fourvec p, double m, int L, int LT, int t)
+hr_complex twopoint_rho(fourvec p, double m, int L, int LT, int t)
 {
     fourvec mom1, mom2;
     int q1, q2, q3, q41, q42;
-    double complex res;
+    hr_complex res;
     res = 0.;
     double tmp;
 
@@ -284,11 +284,11 @@ double complex twopoint_rho(fourvec p, double m, int L, int LT, int t)
  * @param LT time extent of the box
  * @param t time slice
  */
-double complex twopoint_rho12(fourvec p, double m, int L, int LT, int t)
+hr_complex twopoint_rho12(fourvec p, double m, int L, int LT, int t)
 {
     fourvec mom1, mom2;
     int q1, q2, q3, q41, q42;
-    double complex res;
+    hr_complex res;
     res = 0.;
     double tmp;
 
@@ -339,11 +339,11 @@ double complex twopoint_rho12(fourvec p, double m, int L, int LT, int t)
  * @param LT time extent of the box
  * @param t time slice
  */
-double complex Rect(fourvec px, fourvec py, fourvec pz, double m, int L, int LT, int t)
+hr_complex Rect(fourvec px, fourvec py, fourvec pz, double m, int L, int LT, int t)
 {
     fourvec mom[4];
     int q11, q12, q13, q14, q24, q34, q44, i, j;
-    double complex res;
+    hr_complex res;
     res = 0.;
     double numerator, denominator;
     double af1[4];
@@ -397,11 +397,11 @@ double complex Rect(fourvec px, fourvec py, fourvec pz, double m, int L, int LT,
     return res;
 }
 
-double complex C(fourvec px, fourvec py, double m, int L, int LT, int t)
+hr_complex C(fourvec px, fourvec py, double m, int L, int LT, int t)
 {
     fourvec mom[4];
     int q11, q12, q13, q14, q24, q34, q44, i, j;
-    double complex res;
+    hr_complex res;
     res = 0.0 * I;
     double numerator, denominator;
     double af1[4];
@@ -451,7 +451,7 @@ double complex C(fourvec px, fourvec py, double m, int L, int LT, int t)
 
     return 4 * res / L / L / L / L / L / L / LT / LT / LT / LT;
 }
-int compare_corr_disc(double complex *corr_num, char *name, double tol)
+int compare_corr_disc(hr_complex *corr_num, char *name, double tol)
 {
     int retval = 0;
     for (int t = 0; t < GLB_T; t++)
@@ -470,7 +470,7 @@ int compare_corr_disc(double complex *corr_num, char *name, double tol)
     return retval;
 }
 
-static int compare_corr(double complex *corr_ex, double complex *corr_num, int tstart, char *name, double tol)
+static int compare_corr(hr_complex *corr_ex, hr_complex *corr_num, int tstart, char *name, double tol)
 {
     int retval = 0;
     for (int t = tstart; t < GLB_T; t++)
@@ -529,14 +529,14 @@ int main(int argc, char *argv[])
     apply_BCs_on_represented_gauge_field(); // This is a trick: the BCs are not applied in the case the REPR is fundamental because represent_gauge field assumes that the right BCs are already applied on the fundamental field!
 #endif
 
-    double complex Pistoch[GLB_T], Pitheo[GLB_T];
-    double complex Rhostoch[GLB_T], Rhotheo[GLB_T];
-    double complex Rstoch[GLB_T], Rtheo[GLB_T];
-    double complex Raltstoch[GLB_T];
-    double complex Dstoch[GLB_T], Dtheo[GLB_T];
-    double complex Cstoch[GLB_T], Ctheo[GLB_T];
-    double complex Vstoch[GLB_T], Vtheo[GLB_T];
-    double complex Discstoch[GLB_T];
+    hr_complex Pistoch[GLB_T], Pitheo[GLB_T];
+    hr_complex Rhostoch[GLB_T], Rhotheo[GLB_T];
+    hr_complex Rstoch[GLB_T], Rtheo[GLB_T];
+    hr_complex Raltstoch[GLB_T];
+    hr_complex Dstoch[GLB_T], Dtheo[GLB_T];
+    hr_complex Cstoch[GLB_T], Ctheo[GLB_T];
+    hr_complex Vstoch[GLB_T], Vtheo[GLB_T];
+    hr_complex Discstoch[GLB_T];
 
     for (int t = 0; t < GLB_T; t++)
     {

@@ -35,7 +35,7 @@
  * two components; then we multiply these two vectors by U(x,mu) and
  * store the result in p.c[0], p.c[1]; when computing the trace we can factorize p.c[0] and p.c[1]
  * as they both multiply two components of chi1^+; we store these factors in p.c[2] and p.c[3].
- * the tensor product is performed by the macro 
+ * the tensor product is performed by the macro
  * _suNf_FMAT(u,p): u = p.c[0] # p.c[2]^+ + p.c[1] # p.c[3]^+
  */
 
@@ -480,7 +480,7 @@ static void A_times_spinor(suNf_spinor *out, suNfc *Aplus, suNfc *Aminus, suNf_s
 	_vector_add_assign_f(out->c[3], aux);
 }
 
-//EXP CSW FORCE TERM
+// EXP CSW FORCE TERM
 void force_clover_fermion(spinor_field *Xs, spinor_field *Ys, double residue)
 {
 	double invexpmass = get_dirac_mass();
@@ -509,7 +509,7 @@ void force_clover_fermion(spinor_field *Xs, spinor_field *Ys, double residue)
 
 	_MASTER_FOR(&glattice, ix)
 	{
-		//Create matrix Aplus, Aminus
+		// Create matrix Aplus, Aminus
 		s0 = _4FIELD_AT(cl_term, ix, 0);
 		s1 = _4FIELD_AT(cl_term, ix, 1);
 		s2 = _4FIELD_AT(cl_term, ix, 2);
@@ -525,11 +525,11 @@ void force_clover_fermion(spinor_field *Xs, spinor_field *Ys, double residue)
 		_suNf_dagger(Aminus[2], Aminus[1]);
 		_suNf_mul(Aminus[3], -invexpmass, *s2);
 
-		//double horner scheme
+		// double horner scheme
 		doublehorner(Cplus, Aplus);
 		doublehorner(Cminus, Aminus);
 
-		//Remember rhs = eta, lhs  = xi
+		// Remember rhs = eta, lhs  = xi
 
 		rhs = _FIELD_AT(Xs, ix);
 		lhs = _FIELD_AT(Ys, ix);
@@ -543,7 +543,7 @@ void force_clover_fermion(spinor_field *Xs, spinor_field *Ys, double residue)
 		for (k = 0; k < 2 * NF; k++)
 		{
 
-			//Calculate eta_k = (Aplus^k*etaplus, Aminus^k*etaminus)
+			// Calculate eta_k = (Aplus^k*etaplus, Aminus^k*etaminus)
 			if (k == 0)
 			{
 				rhs_k = *rhs;
@@ -566,7 +566,7 @@ void force_clover_fermion(spinor_field *Xs, spinor_field *Ys, double residue)
 				_vector_add_f(rhs_k.c[3], v3, v4);
 			}
 
-			//Calculate xi_k = sum_{l} C_{kl} A^l xi
+			// Calculate xi_k = sum_{l} C_{kl} A^l xi
 			_spinor_zero_f(lhs_k);
 			for (i = 0; i < 2 * NF; i++)
 			{
@@ -655,7 +655,7 @@ void force_clover_fermion_taylor(spinor_field *Xs, spinor_field *Ys, double resi
 	// Construct force matrices
 	_MASTER_FOR(&glattice, ix)
 	{
-		//Create matrix Aplus, Aminus
+		// Create matrix Aplus, Aminus
 
 		s0 = _4FIELD_AT(cl_term, ix, 0);
 		s1 = _4FIELD_AT(cl_term, ix, 1);
@@ -672,7 +672,7 @@ void force_clover_fermion_taylor(spinor_field *Xs, spinor_field *Ys, double resi
 		_suNf_dagger(Aminus[2], Aminus[1]);
 		_suNf_mul(Aminus[3], -invexpmass, *s2);
 
-		//Remember rhs = eta, lhs  = xi
+		// Remember rhs = eta, lhs  = xi
 
 		rhs = _FIELD_AT(Xs, ix);
 		lhs = _FIELD_AT(Ys, ix);
@@ -686,7 +686,7 @@ void force_clover_fermion_taylor(spinor_field *Xs, spinor_field *Ys, double resi
 		for (k = 0; k < NNexp; k++)
 		{
 
-			//Calculate eta_k = (Aplus^k*etaplus, Aminus^k*etaminus)
+			// Calculate eta_k = (Aplus^k*etaplus, Aminus^k*etaminus)
 			if (k == 0)
 			{
 				rhs_k = *rhs;
@@ -709,7 +709,7 @@ void force_clover_fermion_taylor(spinor_field *Xs, spinor_field *Ys, double resi
 				_vector_add_f(rhs_k.c[3], v3, v4);
 			}
 
-			//Calculate xi_k = sum_{l} C_{kl} A^l xi
+			// Calculate xi_k = sum_{l} C_{kl} A^l xi
 			_spinor_zero_f(lhs_k);
 			for (i = 0; i < NNexp; i++)
 			{
@@ -830,7 +830,7 @@ void force_fermion_core(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, d
 	start_sf_sendrecv(Xs);
 	start_sf_sendrecv(Ys);
 
-	//HERE!!!!!
+	// HERE!!!!!
 #if defined(WITH_CLOVER)
 	force_clover_fermion(Xs, Ys, residue);
 #endif
@@ -925,6 +925,8 @@ void force_fermion_core(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, d
 	// Reset spinor geometry
 	Xs->type = Xtmp.type;
 	Ys->type = Ytmp.type;
+
+	//lprintf("Check", 0, "step spinor in force on a point %.14e %.14e\n", creal((*_FIELD_AT(Xs, ipt(1, 1, 1, 1))).c[0].c[0]), creal((*_FIELD_AT(Ys, ipt(1, 1, 1, 1))).c[0].c[0]));
 }
 
 #undef _F_DIR0

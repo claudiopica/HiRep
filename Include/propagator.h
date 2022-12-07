@@ -129,7 +129,7 @@ typedef struct
     {                                                   \
       for (JTMP = 0; JTMP < 4 * NF; JTMP++)             \
       {                                                 \
-        double complex tmp;                             \
+        hr_complex tmp;                             \
         tmp = _PROP_IDX(S, ITMP, JTMP);                 \
         _complex_mul(_PROP_IDX(S, ITMP, JTMP), k, tmp); \
       }                                                 \

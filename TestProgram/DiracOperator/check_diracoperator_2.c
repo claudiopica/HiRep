@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
   double ran[4], sp[4];
   double pi, p[4];
   double *rs, r, mp, sig, px;
-  double complex z;
+  hr_complex z;
   suNf_spinor s, s0, s1, s2, s3;
   spinor_field *ps0, *ps1, *ps2;
   int return_value=0;

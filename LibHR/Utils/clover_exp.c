@@ -181,7 +181,7 @@ void _su2Nfc_times_su2Nfc_assign_herm(suNfc *C, suNfc *B, suNfc *A)
 }
 
 //trace of B*A
-void _su2Nfc_times_su2Nfc_trace(double complex *trace, suNfc *B, suNfc *A)
+void _su2Nfc_times_su2Nfc_trace(hr_complex *trace, suNfc *B, suNfc *A)
 {
 
   suNfc aux;
@@ -195,7 +195,7 @@ void _su2Nfc_times_su2Nfc_trace(double complex *trace, suNfc *B, suNfc *A)
 }
 
 //trace of the square of a 2NF hermitian matrix
-void _su2Nfc_times_su2Nfc_trace_herm_sq(double complex *trace, suNfc *B)
+void _su2Nfc_times_su2Nfc_trace_herm_sq(hr_complex *trace, suNfc *B)
 {
 
   suNfc aux;
@@ -220,10 +220,10 @@ void _su2Nfc_unit(suNfc *A)
   _suNfc_zero(A[2]);
 }
 
-void _su2Nfc_trace(double complex *p, suNfc *A)
+void _su2Nfc_trace(hr_complex *p, suNfc *A)
 {
 
-  double complex aux = 0.;
+  hr_complex aux = 0.;
   _suNfc_trace(aux, A[0]);
   _suNfc_trace(*p, A[3]);
   *p = *p + aux;
@@ -235,7 +235,7 @@ static void clover_exp_NF3(suNfc *Aplus, suNfc *expAplus)
 {
 
   int i = 0, j = 0;
-  double complex p[2 * NF - 1];
+  hr_complex p[2 * NF - 1];
   _su2Nfc_times_su2Nfc_herm(A2, Aplus, Aplus);
   _su2Nfc_times_su2Nfc_herm(A3, A2, Aplus);
   _su2Nfc_unit(A0);
@@ -317,7 +317,7 @@ static void clover_exp_NF2(suNfc *Aplus, suNfc *expAplus)
 {
 
   int i = 0, j = 0;
-  double complex p[2 * NF - 1];
+  hr_complex p[2 * NF - 1];
   _su2Nfc_times_su2Nfc_herm(A2, Aplus, Aplus);
   _su2Nfc_unit(A0);
 
@@ -411,7 +411,7 @@ inline void clover_exp(suNfc *Aplus, suNfc *expAplus)
 static void doublehornerNF3(double *C, suNfc *A)
 {
 
-  double complex p[2 * NF - 1];
+  hr_complex p[2 * NF - 1];
 
   _su2Nfc_times_su2Nfc_herm(A2, A, A);
   _su2Nfc_times_su2Nfc_herm(A3, A2, A);
@@ -493,7 +493,7 @@ static void doublehornerNF3(double *C, suNfc *A)
 static void doublehornerNF2(double *C, suNfc *A)
 {
 
-  double complex p[2 * NF - 1];
+  hr_complex p[2 * NF - 1];
   _su2Nfc_times_su2Nfc_herm(A2, A, A);
   _su2Nfc_unit(A0);
 

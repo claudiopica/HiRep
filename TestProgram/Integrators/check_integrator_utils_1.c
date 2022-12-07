@@ -1,6 +1,6 @@
 /***************************************************************************\
- * Copyright (c) 2008, Claudio Pica                                          *   
- * All rights reserved.                                                      * 
+ * Copyright (c) 2008, Claudio Pica                                          *
+ * All rights reserved.                                                      *
  \***************************************************************************/
 
 #include "global.h"
@@ -102,7 +102,7 @@ static int parse_gstart(hmc_flow *rf)
 
 /* Initialize the Monte Carlo.
  * This performs the following operations:
- * 1) read from the specified input file the flow variables 
+ * 1) read from the specified input file the flow variables
  *    and the hmc parameters;
  * 2) set the starting gauge field
  * 3) init the hmc update
@@ -247,7 +247,7 @@ double integrate_ghmc(int regenerate, ghmc_par *update_par)
 	if (regenerate == 0)
 	{
 		/* generate new momenta */
-		lprintf("HMC", 30, "Generating gaussian momenta and pseudofermions...\n");
+		lprintf("HMC", 30, "Generating gaussian momenta and pseudofermions...");
 
 		gaussian_momenta(suN_momenta);
 		suNg_av_field_copy(suN_momenta_copy, suN_momenta);
@@ -255,8 +255,9 @@ double integrate_ghmc(int regenerate, ghmc_par *update_par)
 		if (u_scalar != NULL)
 		{
 			gaussian_scalar_momenta(scalar_momenta);
-			//suNg_av_field_copy(scalar_momenta_copy, scalar_momenta);
+			// to be done scalar_av_field_copy(scalar_momenta_copy, scalar_momenta);
 		}
+		lprintf("HMC", 30, " done.\n");
 	}
 
 	/* generate new pseudofermions */
@@ -273,7 +274,7 @@ double integrate_ghmc(int regenerate, ghmc_par *update_par)
 			if (msf != NULL)
 			{
 				if (pf_copy[i] == NULL)
-					pf_copy[i] = alloc_spinor_field_f(1, &glattice);
+					pf_copy[i] = alloc_spinor_field_f(1, msf->type);
 
 				spinor_field_copy_f(pf_copy[i], msf);
 			}
@@ -292,7 +293,7 @@ double integrate_ghmc(int regenerate, ghmc_par *update_par)
 	}
 
 	/* integrate molecular dynamics */
-	lprintf("HMC", 30, "MD integration...\n");
+	lprintf("HMC", 30, "MD integration... %lf\n", update_par->tlen);
 	update_par->integrator->integrator(update_par->tlen, update_par->integrator);
 
 	/* project and represent gauge field */
@@ -320,10 +321,10 @@ double integrate_ghmc(int regenerate, ghmc_par *update_par)
 
 	global_sum(&deltaH, 1);
 
-	//Restore the copies
+	// Restore the copies
 
 	suNg_av_field_copy(suN_momenta, suN_momenta_copy);
-	//we need to wreite the function for the scalar momenta Antonio
+	// we need to write the function for the scalar momenta Antonio
 	suNg_field_copy(u_gauge, u_gauge_copy);
 	if (u_scalar != NULL)
 	{
@@ -356,6 +357,13 @@ void set_integrator_nsteps(ghmc_par *gpar, int nsteps)
 		pint->nsteps = nsteps;
 		pint = pint->next;
 	} while (pint != NULL);
+}
+
+void set_first_integrator_nsteps(ghmc_par *gpar, int nsteps)
+{
+	lprintf("set_integrator_nsteps", 0, "Setting all the integrator nsteps to %d\n", nsteps);
+	integrator_par *pint = gpar->integrator;
+	pint->nsteps = nsteps;
 }
 
 void set_integrator_type(ghmc_par *gpar, int type)

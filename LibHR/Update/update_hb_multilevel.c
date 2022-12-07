@@ -290,38 +290,38 @@ void set_max_mh_level(int lev)
 void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, int *ml_up, int *ml_skip, int nblockingstart, int nblockingend, double *smear_val, cor_list *lcor)
 {
     int i, j;
-    static double complex *one_point_gb;
-    static double complex *one_point_tor;
+    static hr_complex *one_point_gb;
+    static hr_complex *one_point_tor;
     static long double norm = 1.0;
     static long double poly_norm;
     struct timeval start, end, etime;
     int nblocking = nblockingend - nblockingstart + 1;
-    static double complex **polyf;
+    static hr_complex **polyf;
 
     if (lev == 0)
     {
         if (dyn_gauge == NULL)
         {
             init_hb_multihit_boundary();
-            one_point_gb = malloc(sizeof(double complex) * total_n_glue_op * nblocking * n_active_slices);
-            one_point_tor = malloc(sizeof(double complex) * total_n_tor_op * n_active_slices);
+            one_point_gb = malloc(sizeof(hr_complex) * total_n_glue_op * nblocking * n_active_slices);
+            one_point_tor = malloc(sizeof(hr_complex) * total_n_tor_op * n_active_slices);
             for (i = 0; i < max_mh_level; i++)
                 norm *= ml_up[i];
             poly_norm = norm * NG;
             norm *= GLB_VOL3 * NG;
 
-            polyf = malloc(sizeof(double complex *) * 3);
-            polyf[0] = amalloc(sizeof(double complex) * Y * Z * T, ALIGN);
-            polyf[1] = amalloc(sizeof(double complex) * X * Z * T, ALIGN);
-            polyf[2] = amalloc(sizeof(double complex) * X * Y * T, ALIGN);
+            polyf = malloc(sizeof(hr_complex *) * 3);
+            polyf[0] = amalloc(sizeof(hr_complex) * Y * Z * T, ALIGN);
+            polyf[1] = amalloc(sizeof(hr_complex) * X * Z * T, ALIGN);
+            polyf[2] = amalloc(sizeof(hr_complex) * X * Y * T, ALIGN);
         }
         gettimeofday(&start, 0);
 
-        memset(one_point_gb, 0, sizeof(double complex) * total_n_glue_op * nblocking * n_active_slices);
-        memset(one_point_tor, 0, sizeof(double complex) * total_n_tor_op * n_active_slices);
-        memset(polyf[0], 0, sizeof(double complex) * Y * Z * T);
-        memset(polyf[1], 0, sizeof(double complex) * X * Z * T);
-        memset(polyf[2], 0, sizeof(double complex) * X * Y * T);
+        memset(one_point_gb, 0, sizeof(hr_complex) * total_n_glue_op * nblocking * n_active_slices);
+        memset(one_point_tor, 0, sizeof(hr_complex) * total_n_tor_op * n_active_slices);
+        memset(polyf[0], 0, sizeof(hr_complex) * Y * Z * T);
+        memset(polyf[1], 0, sizeof(hr_complex) * X * Z * T);
+        memset(polyf[2], 0, sizeof(hr_complex) * X * Y * T);
     }
 
     if (lev < max_mh_level - 1)

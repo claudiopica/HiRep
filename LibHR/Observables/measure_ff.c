@@ -41,7 +41,7 @@ static int init = 0;
 static void measure_formfactor_core(spinor_field* psi0, spinor_field* psi1, spinor_field* eta, int nm, int tau, int tf, int n_mom, int offset,int lt, int* pt){
   int i,ix,t,x,y,z,beta,px,py,pz,tc,a,ixmu;
   double pdotx,cpdotx,spdotx;
-  double complex tr;
+  hr_complex tr;
   suNf_propagator sp0,sp1,Usp,spf,sptmp1,sptmp2,sptmp3,spdag;
   suNf *u1;
 

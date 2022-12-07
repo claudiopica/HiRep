@@ -44,15 +44,112 @@ int main(int argc, char *argv[])
 
     setup_gauge_fields();
 
+    lprintf("test",1,"GLATTICE GSIZE=%d SPINORSIZE=%d SHIFT=%d\n",glattice.gsize_gauge,glattice.gsize_spinor, glattice.master_shift);
+    lprintf("test",1,"GLATTICE LOCAL MASTER=%d TOTAL MASTER=%d\n",glattice.local_master_pieces, glattice.total_gauge_master_pieces);
+    lprintf("test",1,"GLATTICE MASTER start[0]=%d MASTER end[0]=%d\n",glattice.master_start[0],glattice.master_end[0]);
+    lprintf("test",1,"GLATTICE MASTER start[1]=%d MASTER end[1]=%d\n",glattice.master_start[1],glattice.master_end[1]);
+
+
     unit_u(u_gauge);
+
+
+    suNg unity;
+
+    //check that field is unity
+    for (int t=0; t<T; t++) 
+    for (int x=0; x<X; x++) 
+    for (int y=0; y<Y; y++) 
+    for (int z=0; z<Z; z++) { 
+        int ix=ipt(t,x,y,z);
+        suNg *U; double d;
+
+        U=_4FIELD_AT(u_gauge,ix,0);
+        _suNg_unit(unity);
+        _suNg_sub_assign(unity,*U);
+        _suNg_sqnorm(d,unity);
+        if(d>1.e-10) {
+            _print_mat(*U);
+            lprintf("UNITY TEST",1,"Dir 0 Norm [%d,%d,%d,%d]=%g ix=%d\n",t,x,y,z,d,ix);
+        }
+        U=_4FIELD_AT(u_gauge,ix,1);
+        _suNg_unit(unity);
+        _suNg_sub_assign(unity,*U);
+        _suNg_sqnorm(d,unity);
+        if(d>1.e-10) {
+            _print_mat(*U);
+            lprintf("UNITY TEST",1,"Dir 1 Norm [%d,%d,%d,%d]=%g ix=%d\n",t,x,y,z,d,ix);
+        }
+        U=_4FIELD_AT(u_gauge,ix,2);
+        _suNg_unit(unity);
+        _suNg_sub_assign(unity,*U);
+        _suNg_sqnorm(d,unity);
+        if(d>1.e-10) {
+            _print_mat(*U);
+            lprintf("UNITY TEST",1,"Dir 2 Norm [%d,%d,%d,%d]=%g ix=%d\n",t,x,y,z,d,ix);
+        }
+        U=_4FIELD_AT(u_gauge,ix,3);
+        _suNg_unit(unity);
+        _suNg_sub_assign(unity,*U);
+        _suNg_sqnorm(d,unity);
+        if(d>1.e-10) {
+            _print_mat(*U);
+            lprintf("UNITY TEST",1,"Dir 3 Norm [%d,%d,%d,%d]=%g ix=%d\n",t,x,y,z,d,ix);
+        }
+    }
+
+
     complete_gf_sendrecv(u_gauge);
+
+    //check that field is unity
+    for (int t=0; t<T; t++) 
+    for (int x=0; x<X; x++) 
+    for (int y=0; y<Y; y++) 
+    for (int z=0; z<Z; z++) { 
+        int ix=ipt(t,x,y,z);
+        suNg *U; double d;
+
+        U=_4FIELD_AT(u_gauge,ix,0);
+        _suNg_unit(unity);
+        _suNg_sub_assign(unity,*U);
+        _suNg_sqnorm(d,unity);
+        if(d>1.e-10) {
+            _print_mat(*U);
+            lprintf("UNITY TEST",1,"Dir 0 Norm [%d,%d,%d,%d]=%g ix=%d\n",t,x,y,z,d,ix);
+        }
+        U=_4FIELD_AT(u_gauge,ix,1);
+        _suNg_unit(unity);
+        _suNg_sub_assign(unity,*U);
+        _suNg_sqnorm(d,unity);
+        if(d>1.e-10) {
+            _print_mat(*U);
+            lprintf("UNITY TEST",1,"Dir 1 Norm [%d,%d,%d,%d]=%g ix=%d\n",t,x,y,z,d,ix);
+        }
+        U=_4FIELD_AT(u_gauge,ix,2);
+        _suNg_unit(unity);
+        _suNg_sub_assign(unity,*U);
+        _suNg_sqnorm(d,unity);
+        if(d>1.e-10) {
+            _print_mat(*U);
+            lprintf("UNITY TEST",1,"Dir 2 Norm [%d,%d,%d,%d]=%g ix=%d\n",t,x,y,z,d,ix);
+        }
+        U=_4FIELD_AT(u_gauge,ix,3);
+        _suNg_unit(unity);
+        _suNg_sub_assign(unity,*U);
+        _suNg_sqnorm(d,unity);
+        if(d>1.e-10) {
+            _print_mat(*U);
+            lprintf("UNITY TEST",1,"Dir 3 Norm [%d,%d,%d,%d]=%g ix=%d\n",t,x,y,z,d,ix);
+        }
+    }
+
+
+    lprintf("UNITY TEST",1,"Unity tests done\n");
+
 
     double p=avr_plaquette();
     lprintf("TEST",1,"Plaquette= %lf\n",p);
 
 
-    suNg unity;
-    
     for (int x=0; x<X; x++) 
     for (int y=0; y<Y; y++) 
     for (int z=0; z<Z; z++) { 

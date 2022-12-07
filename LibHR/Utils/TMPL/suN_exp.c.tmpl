@@ -32,9 +32,9 @@ static void YtoU(double* u, double *y)
 *  U = s[0] + i*s.sigma/4
 *  to the (v1,v2) vector
 */
-static void su2_rotate(double *s,double complex *v1,double complex *v2)
+static void su2_rotate(double *s,hr_complex *v1,hr_complex *v2)
 {      
-   double complex z1, z2;
+   hr_complex z1, z2;
   z1=s[0]*(*v1)+I*s[1]*(*v2)+s[2]*(*v2)+I*s[3]*(*v1);
   z2=s[0]*(*v2)+I*s[1]*(*v1)-s[2]*(*v1)-I*s[3]*(*v2);
    (*v1)=z1;
@@ -98,7 +98,7 @@ _suNg_times_suNg(*u,v_tmp,u_tmp);
 	double s[NG*(NG-1)/2][4];
 	double tmp;
 	double *hf = (double*)h;
-	double complex *uf = (double complex*)u;
+	hr_complex *uf = (hr_complex*)u;
 	
 	d[0] = 0.0;
 	for(i = 1; i < NG; i++) {

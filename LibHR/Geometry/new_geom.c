@@ -8,6 +8,7 @@
 #include "error.h"
 #include "logger.h"
 #include "utils.h"
+#include "memory.h"
 
 // #define _INCLUDE_UP_UP_L2
 
@@ -24,6 +25,15 @@ char *const LOGTAG = "GEOMETRY DEFINE";
   (byte & 0x02 ? '1' : '0'), \
   (byte & 0x01 ? '1' : '0') 
 
+// ██ ███    ██ ██████  ███████ ██   ██ ██ ███    ██  ██████  
+// ██ ████   ██ ██   ██ ██       ██ ██  ██ ████   ██ ██       
+// ██ ██ ██  ██ ██   ██ █████     ███   ██ ██ ██  ██ ██   ███ 
+// ██ ██  ██ ██ ██   ██ ██       ██ ██  ██ ██  ██ ██ ██    ██ 
+// ██ ██   ████ ██████  ███████ ██   ██ ██ ██   ████  ██████  
+
+///////////////////////////////////////////////////////////////////
+// Basic functions to index points in a 4D box
+///////////////////////////////////////////////////////////////////
 
 static inline int lexi(int b0, int b1, int b2, int b3, int x0, int x1, int x2, int x3) {
     return x0 + x1*b0 + x2*b1*b0 + x3*b2*b1*b0;
@@ -53,7 +63,9 @@ static int index_blocked(
     int b0, int b1, int b2, int b3, 
     int X0, int X1, int X2, int X3, 
     int x0, int x1, int x2, int x3,
-    int sign
+    int sign,
+    int base_index_even,
+    int base_index_odd
     ) 
 {
     int xb0,xb1,xb2,xb3; //coordinates inside the block
@@ -94,197 +106,31 @@ static int index_blocked(
     //all even sites go in the first half
     //NB: box_volume can be odd
     idx = idx / 2; 
-    const int box_vol= X0*X1*X2*X3;
+    // const int box_vol= X0*X1*X2*X3;
     // lprintf("TEST",1,"BOX=vol=%d ODD start=%d\n",box_vol,box_vol/2 + (box_vol&1));
-    if (parity) idx += box_vol/2 + (box_vol&(1^sign)); //beware for overflows!!!
+    if (parity) {
+        //ODD SITES
+        // idx += box_vol/2 + (box_vol&(1^sign)); //beware for overflows!!!
+        idx += base_index_odd;
+    } else {
+        idx += base_index_even;
+    }
 
     return idx;
 }
 
-static void gd_free_mem(geometry_descriptor *gd) {
-    if(gd->rbuf_len) {
-        free(gd->rbuf_len);
-        gd->rbuf_len         = NULL;
-        gd->sbuf_len         = NULL;
-        gd->sbuf_to_proc     = NULL;
-        gd->sbuf_start       = NULL;
-        gd->rbuf_from_proc   = NULL;
-        gd->rbuf_start       = NULL;
-    }    
-}
+// ██████   ██████  ██   ██ 
+// ██   ██ ██    ██  ██ ██  
+// ██████  ██    ██   ███   
+// ██   ██ ██    ██  ██ ██  
+// ██████   ██████  ██   ██ 
 
-// if N>0 this allocates memory for the send/rec index buffers
-// otherwise sets them to NULL
-static void gd_alloc_mem(geometry_descriptor *gd, int N) {
-    int *buf = NULL;
-    if (N>0) {
-        buf = malloc(6 * N * sizeof(int));
-        error((buf == NULL), 1, __func__ , "Cannot allocate memory");
-    }
+///////////////////////////////////////////////////////////////////
+//  Functions for handling BOXes
+///////////////////////////////////////////////////////////////////
 
-    gd->rbuf_len         = buf; if (buf) buf += N;
-    gd->sbuf_len         = buf; if (buf) buf += N;
-    gd->sbuf_to_proc     = buf; if (buf) buf += N;
-    gd->sbuf_start       = buf; if (buf) buf += N;
-    gd->rbuf_from_proc   = buf; if (buf) buf += N;
-    gd->rbuf_start       = buf;
 
-}
-
-// in this geometry we don't need to copy pieces of geometry
-// this functions sets the number of copies to zero e NULLs the arrays for copies 
-static void gd_set_copy(geometry_descriptor *gd) {
-    gd->ncopies_gauge = 0;
-    gd->ncopies_spinor = 0;
-    gd->copy_from = NULL;
-    gd->copy_to = NULL;
-    gd->copy_len = NULL;
-    gd->copy_shift = 0;
-}
-
-// TODO: this should be in geometry.h and geometry descriptor should contain it
-// enum to define geometry type
-enum gd_type {GLOBAL, EVEN, ODD};
-
-// in this geometry we always have only 2 (global) or 1 (even/odd) master piece(s)
-static void gd_set_master_pieces(geometry_descriptor *gd, enum gd_type gd_t) {
-    //this contains the start and end of the master pieces
-    // 0 -> global geometry
-    // 1 -> even geometry
-    // 2 -> odd geometry
-    static int master_start[3], master_end[3];
-
-    const int even_volume = VOLUME/2 + ((PSIGN==0)? (VOLUME&1) : 0);
-    master_start[0] = 0; master_end[0] = VOLUME-1; //TODO: remove the -1
-    master_start[1] = 0; master_end[1] = even_volume-1; //TODO: remove the -1
-    master_start[2] = master_end[1]+1; master_end[2] = master_end[0]; //TODO: remove the -1
-
-    gd->inner_master_pieces = 1;
-    gd->local_master_pieces = 1;
-    gd->total_gauge_master_pieces = 1;
-    gd->total_spinor_master_pieces = 1;
-
-    if (gd_t==GLOBAL) {
-        gd->master_start = &master_start[0];
-        gd->master_end = &master_end[0];
-        gd->master_shift = 0;
-    } else if (gd_t==EVEN) {
-        gd->master_start = &master_start[1];
-        gd->master_end = &master_end[1];
-        gd->master_shift = 0;
-    } else if (gd_t==ODD) {
-        gd->master_start = &master_start[2];
-        gd->master_end = &master_end[2];
-        gd->master_shift = even_volume;
-    } else {
-        error(1,1, "GEOMETRY: "__FILE__,"Incorrect geometry type used in gd_set_master_pieces");
-    }
-}
-
-static void gd_set_size(geometry_descriptor *gd, enum gd_type gd_t){
-    const int halo_volume = T_EXT*X_EXT*Y_EXT*Z_EXT-VOLUME;
-    const int l3_border = (X * Y * Z * T_BORDER +
-                     X * Y * Z_BORDER * T +
-                     X * Y_BORDER * Z * T +
-                     X_BORDER * Y * Z * T);
-    //NB: the total number of sites in the local lattice can be odd
-    //e.g. if T=X=Y=Z=3 (or any odd number)
-    //we can't assume that the even and odd part of the lattice have the same number of points!
-    if (gd_t==GLOBAL) {
-        gd->gsize_gauge = VOLUME + 2*halo_volume; //master points + 2x halo for buffers TODO: does it makes sense if non global?
-        gd->gsize_spinor = VOLUME + 2*l3_border; // master points + 2x L3(=dimension 3) borders for buffers
-    } else if (gd_t==EVEN) {
-        int even_volume = VOLUME/2 + ((PSIGN==0)? (VOLUME&1) : 0); //add one if VOLUME IS ODD and parity of local lattice is even
-        gd->gsize_gauge = even_volume + halo_volume; //master points + 2x halo for buffers TODO: does it makes sense if non global?
-        gd->gsize_spinor = even_volume + l3_border; // master points + 2x L3(=dimension 3) borders for buffers
-    } else if (gd_t==ODD) {
-        int odd_volume = VOLUME/2 + ((PSIGN==0)? 0 : (VOLUME&1) ); //add one if VOLUME IS ODD and parity of local lattice is even
-        gd->gsize_gauge = odd_volume + halo_volume; //master points + 2x halo for buffers TODO: does it makes sense if non global?
-        gd->gsize_spinor = odd_volume + l3_border; // master points + 2x L3(=dimension 3) borders for buffers
-    } else {
-        error(1,1, "GEOMETRY: "__FILE__,"Incorrect geometry type used in gd_set_size");
-    }
-    // lprintf("TEST",1,"HALO VOL=%d L3 VOL=%d\n",halo_volume,l3_border);
-    // lprintf("TEST",1,"GSIZE_GAUGE=%d GSIZE_SPINOR=%d\n",gd->gsize_gauge,gd->gsize_spinor);
-}
-
-//allocate memory for global indexes
-// ipt, iup, idn, imask
-static void index_alloc() {
-    const int ext_volume = T_EXT*X_EXT*Y_EXT*Z_EXT;
-    const int N = (1+2*4)*ext_volume; // 1 for ipt + 4 dir x 2 for iup and idn
-    ipt = malloc(N * sizeof(*ipt));
-    error((ipt == NULL), 1, __func__ , "Cannot allocate memory for ipt, iup, idn");
-    iup = ipt + ext_volume;
-    idn = iup + (4*ext_volume);
-
-    imask = malloc(ext_volume * sizeof(*imask));
-    error((imask == NULL), 1, __func__ , "Cannot allocate memory for imask");
-}
-
-static void index_free() {
-    if (ipt) {
-        free(ipt);
-        ipt = NULL;
-        iup = NULL;
-        idn = NULL;
-    }
-    if (imask) {
-        free(imask);
-        imask = NULL;
-    }
-}
-
-static void geometry_index_init() {
-    //number of parallel directions
-    const int NPAR = (NP_T>1 ? 1 : 0) + (NP_X>1? 1 : 0) + (NP_Y>1 ? 1 : 0) + (NP_Z>1 ? 1 : 0);
-    // Dimension 3 borders. These are for both gauge fields and spinors
-    const int L3_BORDER = 2 * NPAR;
-    // Dimension 2 borders. These are for the gauge fields
-#ifdef _INCLUDE_UP_UP_L2
-    const int L2_BORDER = 4*NPAR*(NPAR-1)/2; //TODO: change from 4->3. the last one is not needed actually
-#else
-    const int L2_BORDER = 3*NPAR*(NPAR-1)/2; //TODO: change from 4->3. the last one is not needed actually
-#endif
-
-    lprintf(LOGTAG,200,"L3 BORDERS=%d  L2 BORDERS=%d\n", L3_BORDER, L2_BORDER);
-
-    //set up global lattice    
-    glattice.nbuffers_gauge = L3_BORDER+L2_BORDER;
-    glattice.nbuffers_spinor = L3_BORDER;
-    gd_alloc_mem(&glattice, L3_BORDER+L2_BORDER);
-    gd_set_copy(&glattice);
-    gd_set_master_pieces(&glattice, GLOBAL);
-    gd_set_size(&glattice, GLOBAL);
-
-    //set up even lattice
-    glat_even.nbuffers_gauge = L3_BORDER+L2_BORDER; //TODO: why is this not allowed? it would make no difference for this geometry
-    glat_even.nbuffers_spinor = L3_BORDER;
-    gd_alloc_mem(&glat_even, L3_BORDER+L2_BORDER); //TODO: do we want only L3 here?
-    gd_set_copy(&glat_even);
-    gd_set_master_pieces(&glat_even, EVEN);
-    gd_set_size(&glat_even, EVEN);
-    
-    //set up odd lattice
-    glat_odd.nbuffers_gauge = L3_BORDER+L2_BORDER;
-    glat_odd.nbuffers_spinor = L3_BORDER;
-    gd_alloc_mem(&glat_odd, L3_BORDER+L2_BORDER); //TODO: do we want only L3 here?
-    gd_set_copy(&glat_odd);
-    gd_set_master_pieces(&glat_odd, ODD);
-    gd_set_size(&glat_odd, ODD);
-
-    //alloc memory for global indexes
-    index_alloc();
-
-}
-
-static void geometry_index_free() {
-    gd_free_mem(&glattice);
-    gd_free_mem(&glat_even);
-    gd_free_mem(&glat_odd);
-    index_free();
-}
-
+// this MUST fit in a char
 enum MaskState {
     T_UP_MASK = (1u << 0),
     T_DN_MASK = (1u << 1),
@@ -302,10 +148,15 @@ char invertMask(char mask) {
 }
 
 enum box_type {
-    INNER = 4,
+    // L0 = 0, //unused
+    // L1 = 1, //unused
+    L2 = 2,
     L3 = 3,
-    L2 = 2
+    INNER = 4,
+    SENDBUF = 5
 };
+
+static const char*bt_names[]={"L0","L1","L2","L3","INNER","SENDBUF"};
 
 //  ----h
 //  ....|  NB: the h[4] is not in the box,   
@@ -315,6 +166,8 @@ typedef struct _box_t {
     int l[4]; // the lower left corner, the box base point (e.g. in the extended lattice)
     int h[4]; // the upper right corner
     int base_index;
+    int base_index_odd;
+    int parity; //0 -> base point is even; 1 -> basepoint is odd
     char mask; //tells if the box is a border, e.g. if T_UP_MASK is set the box is in top T border of the extended lattice
     enum box_type type; // tell the type of the box, just a convenience for testing
     struct _box_t *sendBox; //if this is a border corresponding to a Recv buffer, this is the box to copy data from, i.e. corresponding to the Send buffer
@@ -322,7 +175,8 @@ typedef struct _box_t {
 } box_t;
 
 // This is to keep a list of boxes to fill out the field buffers
-static box_t geometryBoxes;
+static box_t *geometryBoxes=NULL;
+// TODO: make this into an array instead of a list?
 
 box_t* duplicateBox(box_t *B) {
     box_t *b=malloc(sizeof(box_t));
@@ -400,37 +254,66 @@ void splitBorderList(box_t *B, int border_size, int dir) {
     }
 }
 
-//Free memory for boxex in the list, 
-//but not the first one which is passed
+//Free memory for boxes in the list
 void freeBoxList(box_t *B) {
-    while(B->next) {
-        box_t *next = B->next->next;
-        if (B->next->sendBox) { free(B->next->sendBox); B->next->sendBox=NULL; } 
-        free(B->next);
-        B->next = next;
+    while(B) {
+        box_t *b=B->next;
+        if (B->sendBox) { free(B->sendBox); }
+        free(B); 
+        B=b;
     }
 }
 
-void freeGeometryBoxes(){
-    freeBoxList(&geometryBoxes);
+static void freeGeometryBoxes(){
+    freeBoxList(geometryBoxes);
+    geometryBoxes=NULL;
+}
+
+int boxVolume(box_t *B){
+    return (B->h[0]-B->l[0])*(B->h[1]-B->l[1])*(B->h[2]-B->l[2])*(B->h[3]-B->l[3]);
+
+}
+int boxEvenVolume(box_t *B){
+    const int box_vol=boxVolume(B);
+    int even_vol=box_vol/2 + (box_vol&(1^(B->parity)));
+    return even_vol;
+}
+int boxOddVolume(box_t *B){
+    const int odd_vol=boxVolume(B)-boxEvenVolume(B);
+    return odd_vol;
+}
+
+//calculate if the base point of the box is even (0) or odd (1)
+//the box coordinates refers to the extended lattice
+int boxParity(box_t *B) {
+    return B->parity;
+}
+void setBoxParity(box_t *B) {
+    int p = (B->l[0]+B->l[1]+B->l[2]+B->l[3]+PSIGN+T_BORDER+X_BORDER+Y_BORDER+Z_BORDER)%2; //remember global parity!
+    B->parity=p;
 }
 
 void printBox(box_t *B, int level) {
-    lprintf(LOGTAG, level, "[%2d,%2d,%2d,%2d]..[%2d,%2d,%2d,%2d] sizes=[%2d,%2d,%2d,%2d] baseIndex=%9d",
+    static int i=1;
+    lprintf(LOGTAG, level, "%s %c [%2d,%2d,%2d,%2d]..[%2d,%2d,%2d,%2d] = [%2d,%2d,%2d,%2d] Idx=(%d+%d / %d+%d)",
+        bt_names[B->type], 
+        boxParity(B) ? '-' : '+',
         B->l[0],B->l[1],B->l[2],B->l[3],
         B->h[0],B->h[1],B->h[2],B->h[3],
         B->h[0]-B->l[0],B->h[1]-B->l[1],B->h[2]-B->l[2],B->h[3]-B->l[3],
-        B->base_index
+        B->base_index,
+        boxEvenVolume(B),
+        B->base_index_odd,
+        boxOddVolume(B)
     );
     if (B->sendBox) {
         box_t *S=B->sendBox;
-        lprintf(LOGTAG, level, " Send Box [%2d,%2d,%2d,%2d]..[%2d,%2d,%2d,%2d] sizes=[%2d,%2d,%2d,%2d]",
-        S->l[0],S->l[1],S->l[2],S->l[3],
-        S->h[0],S->h[1],S->h[2],S->h[3],
-        S->h[0]-S->l[0],S->h[1]-S->l[1],S->h[2]-S->l[2],S->h[3]-S->l[3]
-        );
+        lprintf(LOGTAG, level, "\t");
+        i--; //disable print \n
+        printBox(S, level);
+        i++; //re-enable print \n
     }
-    lprintf(LOGTAG, 1, "\n");
+    if(i) lprintf(LOGTAG, level, "\n");
 }
 
 void printBoxList(box_t *B, int level){
@@ -443,29 +326,75 @@ void printBoxList(box_t *B, int level){
     lprintf(LOGTAG,level,"Number of boxes = %d\n", i);
 }
 
-int boxVolume(box_t *B){
-    return (B->h[0]-B->l[0])*(B->h[1]-B->l[1])*(B->h[2]-B->l[2])*(B->h[3]-B->l[3]);
-
-}
+//Compute the base index and base_index_odd of each box in the list
+//The order is: EVEN INNER, EVEN L3, ODD INNER, ODD L3, EVEN L2, ODD L2 
+//assume the first box in the list is the INNER volume
 void setBoxListBaseIndex(box_t *B) {
+    error((B->type != INNER), 1, __func__ , "Box list deos not start with INNER box");
     int i=B->base_index;
-    while(B) {
+    int sendbox_i=0; //base index of send buffers
+    box_t *saveBox=B; //save start of list
+    // count INNER and L3 EVEN part
+    while(B && (B->type != L2)) {
         B->base_index = i;
-        i += boxVolume(B);
+        const int vol = boxEvenVolume(B);
+        i += vol;
+        //set sendbox
+        if(B->type==L3) {
+            if (B->sendBox) B->sendBox->base_index=sendbox_i;
+            sendbox_i += boxEvenVolume(B->sendBox);
+        }
         B=B->next;
     }
+    //count INNER and L3 ODD part
+    B=saveBox; //restart from the beginning of the list
+    while(B && (B->type != L2)) {
+        B->base_index_odd = i;
+        const int vol = boxOddVolume(B);
+        i += vol;
+        //set sendbox
+        if(B->type==L3) {
+            if (B->sendBox) B->sendBox->base_index_odd=sendbox_i;
+            sendbox_i += boxOddVolume(B->sendBox);
+        }
+        B=B->next;
+    }
+    saveBox=B; //save start of L2 list 
+    //count L2 EVEN part
+    B=saveBox; //restart from the beginning of the list
+    while(B) {
+        B->base_index = i;
+        const int vol = boxEvenVolume(B);
+        i += vol;
+        if (B->sendBox) B->sendBox->base_index=sendbox_i;
+        sendbox_i += boxEvenVolume(B->sendBox);
+        B=B->next;
+    }
+    //count L2 ODD part
+    B=saveBox; //restart from the beginning of the list
+    while(B) {
+        B->base_index_odd = i;
+        const int vol = boxOddVolume(B);
+        i += vol;
+        if (B->sendBox) B->sendBox->base_index_odd=sendbox_i;
+        sendbox_i += boxOddVolume(B->sendBox);
+        B=B->next;
+    }
+
 }
 
-//calculate if the base point of the box is even (0) or odd (1)
-//the box coordinates refers to the extended lattice
-int boxParity(box_t *B) {
-    return (B->l[0]+B->l[1]+B->l[2]+B->l[3]+PSIGN+T_BORDER+X_BORDER+Y_BORDER+Z_BORDER)%2; //remember global parity!
+//check if a point at index idx is inside the box
+//returns 1 (true) or 0 (false)
+int isInsideBox(box_t *B, int ix) {
+    return (ix>=B->base_index && ix<(B->base_index+boxEvenVolume(B))) || 
+            (ix>=B->base_index_odd && ix<(B->base_index_odd+boxOddVolume(B)));
 }
+
 int safe_ipt_ext(int x0_ext, int x1_ext, int x2_ext, int x3_ext) {
     const int ix = ipt_ext(safe_mod(x0_ext,T_EXT),safe_mod(x1_ext,X_EXT),safe_mod(x2_ext,Y_EXT),safe_mod(x3_ext,Z_EXT)); 
 #ifndef NDEBUG
     if (ix<0 || ix>(T_EXT*X_EXT*Y_EXT*Z_EXT-1)) { 
-        lprintf("GEOMETRY",1,"Error3 ix=%d site [%d, %d, %d, %d]\n", ix,safe_mod(x0_ext,T_EXT),safe_mod(x1_ext,X_EXT),safe_mod(x2_ext,Y_EXT),safe_mod(x3_ext,Z_EXT));
+        lprintf(LOGTAG,1,"Error3 ix=%d site [%d, %d, %d, %d]\n", ix,safe_mod(x0_ext,T_EXT),safe_mod(x1_ext,X_EXT),safe_mod(x2_ext,Y_EXT),safe_mod(x3_ext,Z_EXT));
     }
 #endif
     return ix;
@@ -484,15 +413,17 @@ int nearProc(char mask) {
     return proc_id(mycoord);
 }
 
-box_t *makeLocalBox(){
+static box_t *makeLocalBox(){
     box_t B = { .l={T_BORDER,X_BORDER,Y_BORDER,Z_BORDER}, 
                 .h={T+T_BORDER,X+X_BORDER,Y+Y_BORDER,Z+Z_BORDER}, 
                 .base_index=0, 
+                .base_index_odd=0, 
                 .mask=0, 
                 .type=INNER,
                 .sendBox=NULL,
                 .next=NULL
               };
+    setBoxParity(&B);
     return duplicateBox(&B);
 }
 
@@ -500,7 +431,10 @@ box_t *makeLocalBox(){
 //and a mask of directions
 //the box returned corrsponds to a border of the box in the 
 //directions indicated by the mask
-box_t *makeBorderBox(char mask) {
+static box_t *makeBorderBox(char mask) {
+        //check that this is actually a border box otherwise return NULL
+        if (mask==0) return NULL;
+
         box_t *b=makeLocalBox(); 
         b->mask=mask; b->type = 4;
         if (mask & T_UP_MASK) { b->l[0] = T+T_BORDER; b->h[0] = T_EXT;    b->type--;} else     
@@ -512,9 +446,11 @@ box_t *makeBorderBox(char mask) {
         if (mask & Z_UP_MASK) { b->l[3] = Z+Z_BORDER; b->h[3] = Z_EXT;    b->type--;} else
         if (mask & Z_DN_MASK) { b->l[3] = 0;          b->h[3] = Z_BORDER; b->type--;} 
         //TODO: we don't check explicitly that only one of UP and DN bits per directions are set
+        setBoxParity(b);
+
         //make sendBox
         box_t *s=makeLocalBox(); 
-        s->mask=FULL_MASK; s->type = 4; //we don't need these
+        s->mask=0; s->type = SENDBUF;
         if (mask & T_UP_MASK) { s->h[0] = 2*T_BORDER; } else     
         if (mask & T_DN_MASK) { s->l[0] = T; }
         if (mask & X_UP_MASK) { s->h[1] = 2*X_BORDER; } else
@@ -523,10 +459,72 @@ box_t *makeBorderBox(char mask) {
         if (mask & Y_DN_MASK) { s->l[2] = Y; }     
         if (mask & Z_UP_MASK) { s->h[3] = 2*Z_BORDER; } else
         if (mask & Z_DN_MASK) { s->l[3] = Z; } 
+        setBoxParity(s);
 
         //link sendBox in b
         b->sendBox=s;
+
         return b;
+}
+
+// ███████ ███    ██ ██    ██ ███    ███ ███████ ██████   █████  ████████ ███████ 
+// ██      ████   ██ ██    ██ ████  ████ ██      ██   ██ ██   ██    ██    ██      
+// █████   ██ ██  ██ ██    ██ ██ ████ ██ █████   ██████  ███████    ██    █████   
+// ██      ██  ██ ██ ██    ██ ██  ██  ██ ██      ██   ██ ██   ██    ██    ██      
+// ███████ ██   ████  ██████  ██      ██ ███████ ██   ██ ██   ██    ██    ███████ 
+////////////////////////////////////////////////////////////
+// Functions to assign to each 4D lattice point an id
+// This is the core part of the geometry definition
+// Defines a global lookup table called ipt_ext
+// based on ipt_ext, other look up tables are defined:
+// iup, idn, imask
+////////////////////////////////////////////////////////////
+
+// Lattice memory layout is as follows:
+// |<- 0 index EVEN   
+// | EVEN LOCAL VOL | EVEN L3 #1 | ... | EVEN L3 #n |
+// | ODD  LOCAL VOL | ODD  L3 #1 | ... | ODD  L3 #n |
+// and only for the gauge (glattice)
+// | EVEN L2 #1 | ... | EVEN L2 #m |
+// | ODD  L2 #1 | ... | ODD  L2 #m |
+//
+// Send buffers are outside the fields
+// they are organized similarly:
+// | SBUF EVEN L3 #1 | ... | SBUF EVEN L3 #n | 
+// | SBUF ODD  L3 #1 | ... | SBUF ODD  L3 #n | 
+// | SBUF EVEN L2 #1 | ... | SBUF EVEN L2 #m |
+// | SBUF ODD  L2 #1 | ... | SBUF ODD  L2 #m |
+//
+// Send buffers are shared among all fields of same size
+// they are always allocated as glattice 
+// i.e. they contain all L3 and L2 buffers
+// TODO: change this: make sendbuf_alloc take the full size of the sendbuffer, not the size per site
+
+//allocate memory for global indexes
+// ipt, iup, idn, imask
+static void index_alloc() {
+    const int ext_volume = T_EXT*X_EXT*Y_EXT*Z_EXT;
+    const int N = (1+2*4)*ext_volume; // 1 for ipt + 4 dir x 2 for iup and idn
+    ipt = malloc(N * sizeof(*ipt));
+    error((ipt == NULL), 1, __func__ , "Cannot allocate memory for ipt, iup, idn");
+    iup = ipt + ext_volume;
+    idn = iup + (4*ext_volume);
+
+    imask = malloc(ext_volume * sizeof(*imask));
+    error((imask == NULL), 1, __func__ , "Cannot allocate memory for imask");
+}
+
+static void index_free() {
+    if (ipt) {
+        free(ipt);
+        ipt = NULL;
+        iup = NULL;
+        idn = NULL;
+    }
+    if (imask) {
+        free(imask);
+        imask = NULL;
+    }
 }
 
 // fill out ipt, iup, idn, imask
@@ -535,7 +533,7 @@ static void enumerate_lattice() {
     // const int size[4] = { T, X, Y, Z };
     // const int borders[4] = { T_BORDER, X_BORDER, Y_BORDER, Z_BORDER };
     // const int ext_size[4] = { T_EXT, X_EXT, Y_EXT, Z_EXT };
-    const int ext_vol = T_EXT*X_EXT*Y_EXT*Z_EXT;
+    // const int ext_vol = T_EXT*X_EXT*Y_EXT*Z_EXT;
     const char up_masks[4] = { T_UP_MASK, X_UP_MASK, Y_UP_MASK, Z_UP_MASK };
     const char dn_masks[4] = { T_DN_MASK, X_DN_MASK, Y_DN_MASK, Z_DN_MASK };
 
@@ -547,10 +545,15 @@ static void enumerate_lattice() {
     if (NP_Z>1) { n_parallel[par_dirs] = 3; par_dirs++; }
     lprintf(LOGTAG,10,"Number of parallel directions: %d\n", par_dirs);
 
-    //define local lattice box
-    box_t B = *makeLocalBox();
-    box_t *L=&B; //this is our list of boxes. first box is the local lattice B
+    //allocate memory for global indexes
+    index_alloc();
+    atexit(&index_free);
 
+    //define local lattice box
+    geometryBoxes = makeLocalBox();
+    atexit(&freeGeometryBoxes); //free list of geometry boxes at exit
+
+    box_t *L=geometryBoxes; //this is our list of boxes. first box is the local lattice B
     //add L3 borders
     for (int i=0; i<par_dirs; i++){
         int d1=n_parallel[i];
@@ -595,25 +598,16 @@ static void enumerate_lattice() {
         }
     }
 
-#if 0
-    //CP:OLD code. Delete.
-    //define extended lattice box
-    box_t B = {.l={0,0,0,0}, .h={T_EXT,X_EXT,Y_EXT,Z_EXT}, .base_index=0, .next=NULL};
-    
-    if (NP_T>1) { splitBorderList(&B, T_BORDER, 0); }
-    if (NP_X>1) { splitBorderList(&B, X_BORDER, 1); }
-    if (NP_Y>1) { splitBorderList(&B, Y_BORDER, 2); }
-    if (NP_Z>1) { splitBorderList(&B, Z_BORDER, 3); }
-#endif
-
-    setBoxListBaseIndex(&B); //don't need to do this before hand, but for now we do it here for convenience
-    printBoxList(&B, 10);
+    setBoxListBaseIndex(geometryBoxes); //don't need to do this before hand, but for now we do it here for convenience
+    printBoxList(geometryBoxes, 10);
 
     const int INVALID_POINT = -1;
     //now the list of boxes is not going to cover the whole
     //extended lattice (e.g. L1 or L0 blocks or even some L2 might not there)
     //so we prefill the ipt, iup, idn array with INVALID_POINT
     // we prefill imask = 0 
+#if 0
+    //plain implementation
     for (int ix=0, x0_ext=0;x0_ext<T_EXT;x0_ext++){
     for (int x1_ext=0;x1_ext<X_EXT;x1_ext++){
     for (int x2_ext=0;x2_ext<Y_EXT;x2_ext++){
@@ -621,6 +615,7 @@ static void enumerate_lattice() {
         //prefill tables with INVALID_POINT
         ipt_ext(x0_ext,x1_ext,x2_ext,x3_ext) = INVALID_POINT;
 #ifndef NDEBUG
+        const int ext_vol = T_EXT*X_EXT*Y_EXT*Z_EXT;
         if (ix<0 || ix>(ext_vol-1)) lprintf(LOGTAG,1,"ERROR ix=%d @ (%d, %d, %d, %d)\n", ix, x0_ext, x1_ext, x2_ext, x3_ext);
 #endif
         imask(ix)=0;
@@ -634,24 +629,32 @@ static void enumerate_lattice() {
         idn(ix,3) = INVALID_POINT;
         ix++;
     }}}}
+#else
+    //use memset instead
+    //NB: memset only works with 0 and -1 (assuming 2's complement numbers)
+    memset(ipt, -1, sizeof(int)*T_EXT*X_EXT*Y_EXT*Z_EXT*5); //assume ipt, iup and idn are contiguous in memory
+    memset(imask, 0, T_EXT*X_EXT*Y_EXT*Z_EXT); 
+#endif
 
     //enumerate points in each box
     //fill out ipt_ext
-    box_t *b = &B;
+    box_t *b = geometryBoxes;
     while(b) {
         const int sign = boxParity(b);
         for (int x0_ext=b->l[0];x0_ext<b->h[0];x0_ext++){
         for (int x1_ext=b->l[1];x1_ext<b->h[1];x1_ext++){
         for (int x2_ext=b->l[2];x2_ext<b->h[2];x2_ext++){
         for (int x3_ext=b->l[3];x3_ext<b->h[3];x3_ext++){
-            int ix = b->base_index; 
-            const int idx = index_blocked(BLK_T,BLK_X,BLK_Y,BLK_Z,
-                                b->h[0]-b->l[0],b->h[1]-b->l[1],b->h[2]-b->l[2],b->h[3]-b->l[3],
-                                x0_ext-b->l[0],x1_ext-b->l[1],x2_ext-b->l[2],x3_ext-b->l[3], sign);
-            ix += idx;
+            const int ix = index_blocked(BLK_T,BLK_X,BLK_Y,BLK_Z,
+                                         b->h[0]-b->l[0],b->h[1]-b->l[1],b->h[2]-b->l[2],b->h[3]-b->l[3],
+                                         x0_ext-b->l[0],x1_ext-b->l[1],x2_ext-b->l[2],x3_ext-b->l[3], 
+                                         sign,
+                                         b->base_index,
+                                         b->base_index_odd
+                                        );
 #ifndef NDEBUG
-            if (idx<0 || !(idx<boxVolume(b))) lprintf(LOGTAG,1,"ERROR in ipt: Volume=%d idx=%d  @ (%d, %d, %d, %d)\n", boxVolume(b), idx, x0_ext, x1_ext, x2_ext, x3_ext);
-            if (ix<0 || ix>(ext_vol-1)) lprintf(LOGTAG,1,"ERROR2 ix=%d @ (%d, %d, %d, %d)\n", ix, x0_ext, x1_ext, x2_ext, x3_ext);
+            // if (idx<0 || !(idx<boxVolume(b))) lprintf(LOGTAG,1,"ERROR in ipt: Volume=%d idx=%d  @ (%d, %d, %d, %d)\n", boxVolume(b), idx, x0_ext, x1_ext, x2_ext, x3_ext);
+            if (ix<0 || ix>(T_EXT*X_EXT*Y_EXT*Z_EXT-1)) lprintf(LOGTAG,1,"ERROR2 ix=%d @ (%d, %d, %d, %d)\n", ix, x0_ext, x1_ext, x2_ext, x3_ext);
 #endif
             ipt_ext(x0_ext,x1_ext,x2_ext,x3_ext) = ix;
         }}}}
@@ -670,71 +673,394 @@ static void enumerate_lattice() {
         const int ix = ipt_ext(x0_ext,x1_ext,x2_ext,x3_ext);
         if (ix == INVALID_POINT) continue;
 #ifndef NDEBUG
-        if (ix<0 || ix>(ext_vol-1)) {
+        if (ix<0 || ix>(T_EXT*X_EXT*Y_EXT*Z_EXT-1)) {
             lprintf("GEOMETRY",1,"Error ix=%d site [%d, %d, %d, %d]\n", ix,x0_ext,x1_ext,x2_ext,x3_ext);
         }
 #endif
 
         char xmask=0; int iy=0;
-        iy=safe_ipt_ext(x0_ext+1,x1_ext,x2_ext,x3_ext); iup(ix,0)=iy; if(iy>=0 && iy<VOLUME) xmask |= T_UP_MASK; 
-        iy=safe_ipt_ext(x0_ext-1,x1_ext,x2_ext,x3_ext); idn(ix,0)=iy; if(iy>=0 && iy<VOLUME) xmask |= T_DN_MASK; 
-        iy=safe_ipt_ext(x0_ext,x1_ext+1,x2_ext,x3_ext); iup(ix,1)=iy; if(iy>=0 && iy<VOLUME) xmask |= X_UP_MASK; 
-        iy=safe_ipt_ext(x0_ext,x1_ext-1,x2_ext,x3_ext); idn(ix,1)=iy; if(iy>=0 && iy<VOLUME) xmask |= X_DN_MASK; 
-        iy=safe_ipt_ext(x0_ext,x1_ext,x2_ext+1,x3_ext); iup(ix,2)=iy; if(iy>=0 && iy<VOLUME) xmask |= Y_UP_MASK; 
-        iy=safe_ipt_ext(x0_ext,x1_ext,x2_ext-1,x3_ext); idn(ix,2)=iy; if(iy>=0 && iy<VOLUME) xmask |= Y_DN_MASK; 
-        iy=safe_ipt_ext(x0_ext,x1_ext,x2_ext,x3_ext+1); iup(ix,3)=iy; if(iy>=0 && iy<VOLUME) xmask |= Z_UP_MASK; 
-        iy=safe_ipt_ext(x0_ext,x1_ext,x2_ext,x3_ext-1); idn(ix,3)=iy; if(iy>=0 && iy<VOLUME) xmask |= Z_DN_MASK; 
+        iy=safe_ipt_ext(x0_ext+1,x1_ext,x2_ext,x3_ext); iup(ix,0)=iy; if(isInsideBox(geometryBoxes, iy)) xmask |= T_UP_MASK; 
+        iy=safe_ipt_ext(x0_ext-1,x1_ext,x2_ext,x3_ext); idn(ix,0)=iy; if(isInsideBox(geometryBoxes, iy)) xmask |= T_DN_MASK; 
+        iy=safe_ipt_ext(x0_ext,x1_ext+1,x2_ext,x3_ext); iup(ix,1)=iy; if(isInsideBox(geometryBoxes, iy)) xmask |= X_UP_MASK; 
+        iy=safe_ipt_ext(x0_ext,x1_ext-1,x2_ext,x3_ext); idn(ix,1)=iy; if(isInsideBox(geometryBoxes, iy)) xmask |= X_DN_MASK; 
+        iy=safe_ipt_ext(x0_ext,x1_ext,x2_ext+1,x3_ext); iup(ix,2)=iy; if(isInsideBox(geometryBoxes, iy)) xmask |= Y_UP_MASK; 
+        iy=safe_ipt_ext(x0_ext,x1_ext,x2_ext-1,x3_ext); idn(ix,2)=iy; if(isInsideBox(geometryBoxes, iy)) xmask |= Y_DN_MASK; 
+        iy=safe_ipt_ext(x0_ext,x1_ext,x2_ext,x3_ext+1); iup(ix,3)=iy; if(isInsideBox(geometryBoxes, iy)) xmask |= Z_UP_MASK; 
+        iy=safe_ipt_ext(x0_ext,x1_ext,x2_ext,x3_ext-1); idn(ix,3)=iy; if(isInsideBox(geometryBoxes, iy)) xmask |= Z_DN_MASK; 
 
         imask(ix)=xmask;
 
-
     }}}}
 
+
+}
+
+
+//  ██████  ███████  ██████  ███    ███ ███████ ████████ ██████  ██    ██ 
+// ██       ██      ██    ██ ████  ████ ██         ██    ██   ██  ██  ██  
+// ██   ███ █████   ██    ██ ██ ████ ██ █████      ██    ██████    ████   
+// ██    ██ ██      ██    ██ ██  ██  ██ ██         ██    ██   ██    ██    
+//  ██████  ███████  ██████  ██      ██ ███████    ██    ██   ██    ██    
+
+// ██████  ███████ ███████  ██████ ██████  ██ ██████  ████████  ██████  ██████  
+// ██   ██ ██      ██      ██      ██   ██ ██ ██   ██    ██    ██    ██ ██   ██ 
+// ██   ██ █████   ███████ ██      ██████  ██ ██████     ██    ██    ██ ██████  
+// ██   ██ ██           ██ ██      ██   ██ ██ ██         ██    ██    ██ ██   ██ 
+// ██████  ███████ ███████  ██████ ██   ██ ██ ██         ██     ██████  ██   ██ 
+
+///////////////////////////////////////////////////////////////////
+// Fills out global variables for lattice geometry description:
+// glattice, glat_even and glat_odd
+///////////////////////////////////////////////////////////////////
+
+
+static void gd_free_mem(geometry_descriptor *gd) {
+    if(gd->rbuf_len) {
+        free(gd->rbuf_len);
+        gd->rbuf_len       = NULL;
+        gd->sbuf_len       = NULL;
+        gd->sbuf_to_proc   = NULL;
+        gd->sbuf_start     = NULL;
+        gd->rbuf_from_proc = NULL;
+        gd->rbuf_start     = NULL;
+    }    
+    if(gd->master_start) {
+        free(gd->master_start);
+        gd->master_start   = NULL;
+        gd->master_end     = NULL;
+    }
+}
+
+// if N>0 this allocates memory for the send/rec index buffers and 
+// master pieces indices. The number of master pieces is NBuf+NInner
+// otherwise sets them to NULL
+static void gd_alloc_mem(geometry_descriptor *gd, int NBuf, int NInner) {
+    int *buf = NULL;
+    if (NBuf>0) {
+        buf = malloc((6*NBuf) * sizeof(int));
+        error((buf == NULL), 1, __func__ , "Cannot allocate memory");
+    }
+
+    gd->rbuf_len         = buf; if (buf) buf += NBuf;
+    gd->sbuf_len         = buf; if (buf) buf += NBuf;
+    gd->sbuf_to_proc     = buf; if (buf) buf += NBuf;
+    gd->sbuf_start       = buf; if (buf) buf += NBuf;
+    gd->rbuf_from_proc   = buf; if (buf) buf += NBuf;
+    gd->rbuf_start       = buf;
+
+    buf = NULL;
+    if (NInner>0) {
+        buf = malloc((2*(NInner+NBuf)) * sizeof(int));
+        error((buf == NULL), 1, __func__ , "Cannot allocate memory");
+    }
+    gd->master_start     = buf; if (buf) buf += NBuf+NInner; //+1 because of the local lattice box
+    gd->master_end       = buf; //same size as master_start
+
+}
+
+// in this geometry we don't need to copy pieces of geometry
+// this functions sets the number of copies to zero e NULLs the arrays for copies 
+static void gd_set_copy(geometry_descriptor *gd) {
+    gd->ncopies_gauge = 0;
+    gd->ncopies_spinor = 0;
+    gd->copy_from = NULL;
+    gd->copy_to = NULL;
+    gd->copy_len = NULL;
+    gd->copy_shift = 0;
+}
+
+// TODO: this should be in geometry.h and geometry descriptor should contain it
+// enum to define geometry type
+enum gd_type {GLOBAL, EVEN, ODD};
+
+
+#if 0
+static void gd_set_size(geometry_descriptor *gd, enum gd_type gd_t){
+    const int halo_volume = T_EXT*X_EXT*Y_EXT*Z_EXT-VOLUME;
+    const int l3_border = 2*(X * Y * Z * T_BORDER +
+                     X * Y * Z_BORDER * T +
+                     X * Y_BORDER * Z * T +
+                     X_BORDER * Y * Z * T);
+    //NB: the total number of sites in the local lattice can be odd
+    //e.g. if T=X=Y=Z=3 (or any odd number)
+    //we can't assume that the even and odd part of the lattice have the same number of points!
+    //TODO: gsize for gauge can be reduced. We don't cover the whole halo with buffers now
+    if (gd_t==GLOBAL) {
+        gd->gsize_gauge = VOLUME + 2*halo_volume; //master points + 2x halo for buffers TODO: does it makes sense if non global?
+        gd->gsize_spinor = VOLUME + 2*l3_border; // master points + 2x L3(=dimension 3) borders for buffers
+    } else if (gd_t==EVEN) {
+        int even_volume = VOLUME/2 + ((PSIGN==0)? (VOLUME&1) : 0); //add one if VOLUME IS ODD and parity of local lattice is even
+        gd->gsize_gauge = even_volume + halo_volume; //master points + 2x halo for buffers TODO: does it makes sense if non global?
+        gd->gsize_spinor = even_volume + l3_border; // master points + 2x L3(=dimension 3) borders for buffers
+    } else if (gd_t==ODD) {
+        int odd_volume = VOLUME/2 + ((PSIGN==0)? 0 : (VOLUME&1) ); //add one if VOLUME IS ODD and parity of local lattice is even
+        gd->gsize_gauge = odd_volume + halo_volume; //master points + 2x halo for buffers TODO: does it makes sense if non global?
+        gd->gsize_spinor = odd_volume + l3_border; // master points + 2x L3(=dimension 3) borders for buffers
+    } else {
+        error(1,1, "GEOMETRY: "__FILE__,"Incorrect geometry type used in gd_set_size");
+    }
+    // lprintf("TEST",1,"HALO VOL=%d L3 VOL=%d\n",halo_volume,l3_border);
+    // lprintf("TEST",1,"GSIZE_GAUGE=%d GSIZE_SPINOR=%d\n",gd->gsize_gauge,gd->gsize_spinor);
+}
+#endif
+
+
+static void gd_free() {
+    gd_free_mem(&glattice);
+    gd_free_mem(&glat_even);
+    gd_free_mem(&glat_odd);
+}
+
+static void gd_init() {
+    //number of parallel directions
+    const int NPAR = (NP_T>1 ? 1 : 0) + (NP_X>1? 1 : 0) + (NP_Y>1 ? 1 : 0) + (NP_Z>1 ? 1 : 0);
+    // Dimension 3 borders. These are for both gauge fields and spinors
+    const int L3_BORDER = 2 * NPAR;
+    // Dimension 2 borders. These are for the gauge fields
+#ifdef _INCLUDE_UP_UP_L2
+    const int L2_BORDER = 4*NPAR*(NPAR-1)/2; //TODO: change from 4->3. the last one is not needed actually
+#else
+    const int L2_BORDER = 3*NPAR*(NPAR-1)/2; //TODO: change from 4->3. the last one is not needed actually
+#endif
+
+    const int volume = boxVolume(geometryBoxes);
+    const int even_volume = boxEvenVolume(geometryBoxes); //VOLUME/2 + ((PSIGN==0)? (VOLUME&1) : 0);
+    const int odd_volume = volume-even_volume;
+
+    lprintf(LOGTAG,50,"L3 BORDERS=%d  L2 BORDERS=%d\n", L3_BORDER, L2_BORDER);
+
+    //set up global lattice    
+    gd_alloc_mem(&glattice, 2*(L3_BORDER+L2_BORDER), 2);
+    gd_set_copy(&glattice);
+    glattice.nbuffers_gauge = 2*(L3_BORDER+L2_BORDER);
+    glattice.nbuffers_spinor = 2*L3_BORDER;
+    glattice.inner_master_pieces = 2;
+    glattice.local_master_pieces = 2;
+    glattice.master_start[0]=geometryBoxes->base_index;
+    glattice.master_end[0]=glattice.master_start[0]+even_volume-1;    
+    glattice.master_start[1]=geometryBoxes->base_index_odd;
+    glattice.master_end[1]=glattice.master_start[1]+odd_volume-1;
+    glattice.master_shift=0;
+    glattice.total_gauge_master_pieces=2+2*(L3_BORDER+L2_BORDER);
+    glattice.total_spinor_master_pieces=2+2*(L3_BORDER);
+    glattice.gsize_gauge=volume;  //this will be increased in gd_set_boxIndices()
+    glattice.gsize_spinor=volume;  //this will be increased in gd_set_boxIndices()
+
+    //set up even lattice
+    gd_alloc_mem(&glat_even, L3_BORDER, 1);
+    gd_set_copy(&glat_even);
+    glat_even.nbuffers_gauge = -1; //TODO: can we do better?
+    glat_even.nbuffers_spinor = L3_BORDER;
+    glat_even.inner_master_pieces = 1;
+    glat_even.local_master_pieces = 1;
+    glat_even.master_start[0]=geometryBoxes->base_index;
+    glat_even.master_end[0]=glat_even.master_start[0]+even_volume-1;
+    glat_even.master_shift=0;
+    glat_even.total_gauge_master_pieces=-1; //TODO: can we do better?
+    glat_even.total_spinor_master_pieces=1+L3_BORDER;
+    glat_even.gsize_gauge=-1;  //TODO: can we do better?
+    glat_even.gsize_spinor=even_volume;  //this will be increased in gd_set_boxIndices()
+    
+    //set up odd lattice
+    gd_alloc_mem(&glat_odd, L3_BORDER, 1);
+    gd_set_copy(&glat_odd);
+    glat_odd.nbuffers_gauge = -1;
+    glat_odd.nbuffers_spinor = L3_BORDER;
+    glat_odd.inner_master_pieces = 1;
+    glat_odd.local_master_pieces = 1;
+    glat_odd.master_start[0]=geometryBoxes->base_index_odd;
+    glat_odd.master_end[0]=glat_odd.master_start[0]+odd_volume-1;
+    glat_odd.master_shift=geometryBoxes->base_index_odd;
+    glat_odd.total_gauge_master_pieces=-1; //TODO: can we do better?
+    glat_odd.total_spinor_master_pieces=1+L3_BORDER;
+    glat_odd.gsize_gauge=-1;  //TODO: can we do better?
+    glat_odd.gsize_spinor=odd_volume;  //this will be increased in gd_set_boxIndices()
+
+    //free memory at exit
+    atexit(&gd_free);
+
+}
+
+void gd_set_boxIndices() {
+    //const int ext_vol = T_EXT*X_EXT*Y_EXT*Z_EXT;
+
     //set rbuf_len, sbuf_len, rbuf_from_proc, rbuf_start, sbuf_to_proc, sbuf_start;
-    int sbuf_base=ext_vol; //send buffers are at the end of the extended lattice. If we move to a global send buffer this should be set to 0.
     int ib=0; //index of buffer in geometry descriptor
-    L=B.next; //first border buffer. L3 are first, then L2
+    box_t *L=geometryBoxes->next; //first border buffer. L3 are first, then L2
     while(L) {
         //each box contains an even and odd part
         //these are two separate buffers for spinors
         const int vol = boxVolume(L);
-        const int sign = boxParity(L);
-        const int even_vol = vol/2 + ((sign==0)? (vol&1) : 0); //add one if parity is even and vol is odd
+        //const int sign = boxParity(L);
+        const int even_vol = boxEvenVolume(L); //vol/2 + ((sign==0)? (vol&1) : 0); //add one if parity is even and vol is odd
         const int odd_vol = vol - even_vol;
+        const int send_even_vol = boxEvenVolume(L->sendBox); //vol/2 + ((sign==0)? (vol&1) : 0); //add one if parity is even and vol is odd
+        const int send_odd_vol = boxOddVolume(L->sendBox);
         const int recv_proc=nearProc(L->mask);
         const int send_proc=nearProc(invertMask(L->mask));
-        lprintf(LOGTAG,20,"ID=%d Base=%d vol=%d Level=%d mask=" _PRINT_BYTE " Recv proc=%d Send proc=%d\n", ib,L->base_index, vol, (int)(L->type),_BINARY(L->mask), recv_proc, send_proc);
+        lprintf(LOGTAG,50,"ID=%d Level=%d mask=" _PRINT_BYTE " Recv proc=%d Send proc=%d even_vol=%d odd_vol=%d send_even_vol=%d send_odd_vol=%d\n", ib, (int)(L->type),_BINARY(L->mask), recv_proc, send_proc, even_vol, odd_vol, send_even_vol, send_odd_vol);
         
-        glattice.rbuf_len[ib]=vol;
-        glattice.sbuf_len[ib]=vol;
-        glattice.rbuf_start[ib]=L->base_index;
-        glattice.sbuf_start[ib]=sbuf_base;
-        glattice.rbuf_from_proc[ib]=recv_proc;
-        glattice.sbuf_to_proc[ib]=send_proc;
+        //There are two send/recv buffers per box: EVEN and ODD
+        //EVEN part
+        const int ib_even = 2*ib;
+        glattice.rbuf_len[ib_even]=even_vol;
+        glattice.sbuf_len[ib_even]=send_even_vol;
+        glattice.rbuf_start[ib_even]=L->base_index;
+        glattice.sbuf_start[ib_even]=L->sendBox->base_index;
+        glattice.rbuf_from_proc[ib_even]=recv_proc;
+        glattice.sbuf_to_proc[ib_even]=send_proc;
+        glattice.master_start[ib_even+2]=L->base_index; //+2 because index 0 and 1 is the local master piece
+        glattice.master_end[ib_even+2]=L->base_index+even_vol-1;
+        //ODD part
+        // const int ib_odd=ib+glattice.nbuffers_gauge/2; //nbuffers_gauge is always even
+        const int ib_odd = 2*ib+1;
+        glattice.rbuf_len[ib_odd]=odd_vol;
+        glattice.sbuf_len[ib_odd]=send_odd_vol;
+        glattice.rbuf_start[ib_odd]=L->base_index_odd;
+        glattice.sbuf_start[ib_odd]=L->sendBox->base_index_odd;
+        glattice.rbuf_from_proc[ib_odd]=recv_proc;
+        glattice.sbuf_to_proc[ib_odd]=send_proc;
+        glattice.master_start[ib_odd+2]=L->base_index_odd; //+2 because index 0 and 1 is the local master piece
+        glattice.master_end[ib_odd+2]=L->base_index_odd+odd_vol-1;
+        //add to size 
+        glattice.gsize_gauge+=vol; //send buffers are not included
+        if(L->type==L3) { glattice.gsize_spinor+=vol; }
 
-        glat_even.rbuf_len[ib]=even_vol;
-        glat_even.sbuf_len[ib]=even_vol;
-        glat_even.rbuf_start[ib]=L->base_index;
-        glat_even.sbuf_start[ib]=sbuf_base;
-        glat_even.rbuf_from_proc[ib]=recv_proc;
-        glat_even.sbuf_to_proc[ib]=send_proc;
+        //EVEN / ODD geometries contain only L3 borders
+        if (L->type==L3) {
+            glat_even.rbuf_len[ib]=even_vol;
+            glat_even.sbuf_len[ib]=send_even_vol;
+            glat_even.rbuf_start[ib]=L->base_index;
+            glat_even.sbuf_start[ib]=L->sendBox->base_index;
+            glat_even.rbuf_from_proc[ib]=recv_proc;
+            glat_even.sbuf_to_proc[ib]=send_proc;
+            glat_even.master_start[ib+1]=L->base_index; //+1 because index 0 is the local master piece
+            glat_even.master_end[ib+1]=L->base_index+even_vol-1;
+            glat_even.gsize_spinor+=even_vol;
 
-        glat_odd.rbuf_len[ib]=odd_vol;
-        glat_odd.sbuf_len[ib]=odd_vol;
-        glat_odd.rbuf_start[ib]=L->base_index+even_vol;
-        glat_odd.sbuf_start[ib]=sbuf_base+even_vol;
-        glat_odd.rbuf_from_proc[ib]=recv_proc;
-        glat_odd.sbuf_to_proc[ib]=send_proc;
+            glat_odd.rbuf_len[ib]=odd_vol;
+            glat_odd.sbuf_len[ib]=send_odd_vol;
+            glat_odd.rbuf_start[ib]=L->base_index_odd;
+            glat_odd.sbuf_start[ib]=L->sendBox->base_index_odd;
+            glat_odd.rbuf_from_proc[ib]=recv_proc;
+            glat_odd.sbuf_to_proc[ib]=send_proc;
+            glat_odd.master_start[ib+1]=L->base_index_odd; //+1 because index 0 is the local master piece
+            glat_odd.master_end[ib+1]=L->base_index_odd+odd_vol-1;
+            glat_odd.gsize_spinor+=odd_vol; 
+        }
 
-        sbuf_base += vol;
         L=L->next; ib++;
     }
 
-    //save geometry boxes
-    geometryBoxes = B;
-    atexit(&freeGeometryBoxes);
+}
+
+
+// ███████ ███████ ███    ██ ██████      ██████  ██    ██ ███████ ███████ ███████ ██████  ███████ 
+// ██      ██      ████   ██ ██   ██     ██   ██ ██    ██ ██      ██      ██      ██   ██ ██      
+// ███████ █████   ██ ██  ██ ██   ██     ██████  ██    ██ █████   █████   █████   ██████  ███████ 
+//      ██ ██      ██  ██ ██ ██   ██     ██   ██ ██    ██ ██      ██      ██      ██   ██      ██ 
+// ███████ ███████ ██   ████ ██████      ██████   ██████  ██      ██      ███████ ██   ██ ███████ 
+/////////////////////////////////////////////////////
+// functions for sendbuffers
+// send buffers are always allocated with a glattice geometry
+// they are reused for all instances of a given field
+/////////////////////////////////////////////////////
+
+//we keep a list of send buffers created
+typedef struct _SB_t {
+    size_t bytes_per_site;
+    void *buf;
+} SB_t;
+
+#define _MAX_SENDBUF 8
+static SB_t send_buffers[_MAX_SENDBUF] = { 0 };
+typedef int sb_handle;
+
+#ifndef NDEBUG
+static int isValidHandle(sb_handle h) {
+    return (h>=0) && (h<_MAX_SENDBUF);
+}
+#endif
+
+static void sendbuf_free() {
+    for (int i=0; i<_MAX_SENDBUF; i++) {
+        void *buf=send_buffers[i].buf;
+        if (buf) afree(buf); //this was allocated with amalloc
+        const SB_t empty_sb = { 0 };
+        send_buffers[i] = empty_sb;
+    }
+}
+
+static void sendbuf_init() {
+    atexit(&sendbuf_free);
+}
+
+static SB_t* getSB(sb_handle h){
+#ifndef NDEBUG
+    if (!isValidHandle(h)) 
+        error(1, 1, __func__ , "Attempt to access invalid sendbuf handle");
+#endif
+    return &send_buffers[h];
+}
+
+//find send buf of given size
+//if not already existing returns first free slot
+//if no free slots left, exit with error
+static sb_handle findSB(size_t bytes_per_site){
+    for (int i=0; i<_MAX_SENDBUF; i++) {
+        if ((send_buffers[i].buf == NULL) || (send_buffers[i].bytes_per_site==bytes_per_site)) {
+            //this is the first empty slot
+            return i;
+        }       
+    }
+    //not enough slots for sendbuffers
+    error(1, 1, __func__ , "Not enough slots for sendbuffers: increase _MAX_SENDBUF.");
+    return -1; //invalid handle 
 
 }
+
+//allocate a new sendbuffer on the glattice geometry
+static sb_handle allocSB(size_t bytes_per_site) {
+    //find slot for send buffer
+    sb_handle sb_h = findSB(bytes_per_site);
+    SB_t *new_sb=getSB(sb_h);
+    //if this is an already filled slot, just return it
+    if (new_sb->buf) return sb_h;
+
+    //otherwise allocate memory
+    //gsize_gauge is the local volume + rsend buffers. 
+    //We subtract the local volume to obtain rsend buffer size = send buffer size
+    const int nsites = glattice.gsize_gauge - boxVolume(geometryBoxes);
+    lprintf(LOGTAG, 10, "Allocating SEND buf: %.1fkB [bytes per site:%zu sites=%d]\n", ((float)(bytes_per_site*nsites)/1024.), bytes_per_site, nsites);
+    void *buf = amalloc(nsites*bytes_per_site, ALIGN); 
+    error(buf == NULL, 1, __func__ , "Could not allocate memory space for sendbuffer"); 
+    // fill our new structure
+    new_sb->bytes_per_site = bytes_per_site;
+    new_sb->buf=buf;
+
+    return sb_h;
+}
+
+// function to allocate a sendbuffer
+// returns memory buffer
+// TODO: do we need EVEN/ODD here?
+void *sendbuf_alloc(size_t bytes_per_site) {
+    const sb_handle sb_h = allocSB(bytes_per_site);
+    return getSB(sb_h)->buf;
+}
+
+//this prints out the state of the send buffer list
+void sendbuf_report() {
+    for (int i=0; i<_MAX_SENDBUF; i++) {
+        SB_t * const sb=getSB(i);
+        if (sb->buf==NULL) break;
+        lprintf(LOGTAG, 1, "%d size=%zu\n", i, sb->bytes_per_site);
+    }
+}
+
+#ifndef NDEBUG
+static int isSiteParityCorrect(int idx, int parity, box_t *B);  //this is defined below in the testing section
+#endif
 
 //this function fill out MPI send buffers
 //it copies memory corresponding to a box of sites on the lattice 
@@ -744,13 +1070,14 @@ static void enumerate_lattice() {
 // src, dst : source and destination geometry boxes. Must have same size.
 // bytes_per_site : size in bytes of the local object to copy. Could be 4 gauge fields or a (half)spinor
 // sendbuf : memory destination to be send over MPI to a matching recv buffer in the extended lattice (dst)
-void syncBoxToBuffer(enum gd_type gd_t, int bytes_per_site, box_t *src, box_t *dst, void *lattice, void *sendbuf) {
+static void syncBoxToBuffer(enum gd_type gd_t, int bytes_per_site, box_t *src, box_t *dst, void *lattice, void *sendbuf) {
     const int srcparity = boxParity(src);
-    const int dstparity = boxParity(dst);
-    const int isParityDifferent = (srcparity==dstparity)?0:1;
-    const int vol = boxVolume(dst); //src is assumed to be equal
-    const int dst_even_vol = vol/2 + (vol&(1^dstparity)); //if the number of sites in volume is odd and parity is even, then add 1 to vol/2
-    const int base_dix=dst->base_index;
+    // const int dstparity = boxParity(dst);
+    // const int isParityDifferent = (srcparity==dstparity)?0:1;
+    // const int vol = boxVolume(dst); //src is assumed to be equal
+    // const int dst_even_vol = boxEvenVolume(dst); //if the number of sites in volume is odd and parity is even, then add 1 to vol/2
+    // const int base_dix=src->base_index;
+    // const int base_dix_odd=src->base_index_odd;
 
 #ifndef NDEBUG
     //Check that src and dst have the same geometry!!
@@ -759,8 +1086,8 @@ void syncBoxToBuffer(enum gd_type gd_t, int bytes_per_site, box_t *src, box_t *d
     error(((src->h[2]-src->l[2]) != (dst->h[2]-dst->l[2])), 1, __func__ , "Send/Recv buffer dimension 2 do not match!");
     error(((src->h[3]-src->l[3]) != (dst->h[3]-dst->l[3])), 1, __func__ , "Send/Recv buffer dimension 3 do not match!");
 
-    const int src_even_vol = vol/2 + (vol&(1^srcparity)); //if the number of sites in volume is odd and parity is even, then add 1 to vol/2
-    lprintf("SYNC",200,"VOLUME/PARITY: SRC=%d[even=%d]/%d  DST=%d[even=%d]/%d\n", vol, src_even_vol, srcparity, vol, dst_even_vol, dstparity);
+    const int src_even_vol = boxEvenVolume(src); //if the number of sites in volume is odd and parity is even, then add 1 to vol/2
+    lprintf("SYNC",1,"VOLUME/PARITY: SRC=%d[even=%d]/%d  DST=%d[even=%d]/%d DST_BASE=%d\n", vol, src_even_vol, srcparity, vol, dst_even_vol, dstparity, base_dix);
 #endif 
 
     for (int x0=0;x0<(src->h[0]-src->l[0]);x0++){
@@ -772,7 +1099,14 @@ void syncBoxToBuffer(enum gd_type gd_t, int bytes_per_site, box_t *src, box_t *d
         if (gd_t==EVEN && parity==1) continue;
         if (gd_t==ODD && parity==0) continue;
         int six=ipt_ext(x0+src->l[0],x1+src->l[1],x2+src->l[2],x3+src->l[3]);
-        int dix=ipt_ext(x0+dst->l[0],x1+dst->l[1],x2+dst->l[2],x3+dst->l[3])-base_dix;
+        // int dix=ipt_ext(x0+dst->l[0],x1+dst->l[1],x2+dst->l[2],x3+dst->l[3])-base_dix;
+        int dix=index_blocked(BLK_T,BLK_X,BLK_Y,BLK_Z,
+                                         src->h[0]-src->l[0],src->h[1]-src->l[1],src->h[2]-src->l[2],src->h[3]-src->l[3],
+                                         x0,x1,x2,x3, 
+                                         srcparity,
+                                         src->base_index,
+                                         src->base_index_odd
+                                        );
         // if srcparity!=dstparity, the destination parity needs to be changed
         // i.e. the dstparity must always match the srcparity
         // this is because on the receiving neighbor processor the parity
@@ -792,17 +1126,16 @@ void syncBoxToBuffer(enum gd_type gd_t, int bytes_per_site, box_t *src, box_t *d
         }
 #else
         //this avoid a branch otherwise it's equivalent to the code above
-        dix += isParityDifferent*((parity*vol)-dst_even_vol);
+        // dix += isParityDifferent*((parity*vol)-dst_even_vol);
 #endif
         // if ( !(parity) && !(dix<vol/2)) dix -= vol/2; //must be even
         // if (  (parity) &&  (dix<vol/2)) dix += vol/2; //must be odd
         char *srcbuf = ((char*)lattice)+six*bytes_per_site;
         char *dstbuf = ((char*)sendbuf)+dix*bytes_per_site;
 #ifndef NDEBUG
-        lprintf("SYNC",200,"Writing [%d] bytes: %d -> %d [%d,%d,%d,%d] sizeof(suNg)=%d\n", bytes_per_site, six, dix, x0, x1, x2, x3,sizeof(suNg));
-        if (dix<0 || !(dix<vol)) lprintf("SYNC",1,"ERROR in SYNC: dix=%d vol=%d\n", dix, vol);
-        if (six<0 || !(six<VOLUME)) lprintf("SYNC",1,"ERROR in SYNC: six=%d\n", six);
-        if (parity!=((dix<src_even_vol)?0:1)) lprintf("SYNC",1,"ERROR in SYNC: parity mismatch: six=%d[parity=%d] dix=%d[parity=%d]\n", six, parity, dix, ((dix<src_even_vol)?0:1));
+        lprintf("SYNC",1,"Writing %d bytes: %d -> %d [%d,%d,%d,%d] sizeof(suNg)=%d\n", bytes_per_site, six, dix, x0, x1, x2, x3,sizeof(suNg));
+        if (!isSiteParityCorrect(six,parity,geometryBoxes)) lprintf("SYNC",1,"ERROR in SYNC: site parity=%d but six=%d [even vol=%d vol=%d]\n", parity,six,boxEvenVolume(geometryBoxes),boxVolume(geometryBoxes));
+        if (!isSiteParityCorrect(dix,parity,src)) lprintf("SYNC",1,"ERROR in SYNC: site parity=%d but dix=%d [even vol=%d vol=%d]\n", parity,dix,boxEvenVolume(src),boxVolume(src));
 #endif
 
         memcpy(dstbuf, srcbuf, bytes_per_site);
@@ -810,60 +1143,91 @@ void syncBoxToBuffer(enum gd_type gd_t, int bytes_per_site, box_t *src, box_t *d
     }}}}
 }
 
-void sync_field(geometry_descriptor *gd, int bytes_per_site, int is_spinor_like, void *latticebuf) {
+void sync_field(geometry_descriptor *gd, int bytes_per_site, int is_spinor_like, void *latticebuf, void *sb_ptr) {
     enum gd_type gd_t = GLOBAL;
     //TODO: the type should really be in the descriptor itself
     // we shouldn't compare pointers...
     if (gd == &glat_even) gd_t = EVEN;
     if (gd == &glat_odd) gd_t = ODD;
 
-    void *const sendbuf_base=latticebuf; //TODO: we could move the sendbuffers outside the fields. for now the memory is together with lattice data.
-    const int n_buffers = is_spinor_like ? gd->nbuffers_spinor : gd->nbuffers_gauge;
+    latticebuf = ((char*) latticebuf)-(bytes_per_site*gd->master_shift); //shift buffer by master_shift
+    char *const sendbuf_base=sb_ptr; //TODO: we could move the sendbuffers outside the fields. for now the memory is together with lattice data.
+    int n_buffers = is_spinor_like ? gd->nbuffers_spinor : gd->nbuffers_gauge;
+    if (gd_t == GLOBAL) n_buffers /= 2; //we fill even and odd buffers at the same time
 #ifndef NDEBUG
-    lprintf(LOGTAG,200,"Geometry size: %d \n", is_spinor_like? gd->gsize_spinor : gd->gsize_gauge );
-    lprintf(LOGTAG,200,"SPINOR_LIKE: %d  NBUFFERS: %d\n", is_spinor_like, n_buffers );
+    lprintf(LOGTAG,50,"Geometry size: %d \n", is_spinor_like? gd->gsize_spinor : gd->gsize_gauge );
+    lprintf(LOGTAG,50,"SPINOR_LIKE: %d  NBUFFERS: %d\n", is_spinor_like, n_buffers );
 #endif
     int i=0;
-    box_t *L=geometryBoxes.next; //first border buffer. L3 are first, then L2
+    box_t *L=geometryBoxes->next; //first border buffer. L3 are first, then L2
     while(L && i<n_buffers) {
 #ifndef NDEBUG
-        lprintf(LOGTAG,200,"Copying TO RECV box:\n");
-        printBox(L,200);
-        lprintf(LOGTAG,200,"Copying to index %d -> %d\n", gd->sbuf_start[i], gd->sbuf_start[i]+boxVolume(L));
+        lprintf(LOGTAG,50,"Copying to RECV box:\n");
+        printBox(L,50);
+        lprintf(LOGTAG,50,"EVEN copying to memory index %d -> %d [len=%d]\n", gd->sbuf_start[2*i], gd->sbuf_start[2*i]+gd->sbuf_len[2*i], gd->sbuf_len[2*i]);
+        lprintf(LOGTAG,50,"ODD copying to memory index %d -> %d [len=%d]\n", gd->sbuf_start[2*i+1], gd->sbuf_start[2*i+1]+gd->sbuf_len[2*i+1], gd->sbuf_len[2*i+1]);
 #endif
-        syncBoxToBuffer(gd_t, bytes_per_site, L->sendBox, L, latticebuf, ((char*)sendbuf_base)+bytes_per_site*gd->sbuf_start[i]);
+        syncBoxToBuffer(gd_t, bytes_per_site, L->sendBox, L, latticebuf, sendbuf_base);
+        // syncBoxToBuffer(EVEN, bytes_per_site, L->sendBox, L, latticebuf, sendbuf_base);
+        // syncBoxToBuffer(ODD, bytes_per_site, L->sendBox, L, latticebuf, sendbuf_base);
         L=L->next; i++;
     }
 
 }
 
+// ███    ███      █████      ██     ███    ██ 
+// ████  ████     ██   ██     ██     ████   ██ 
+// ██ ████ ██     ███████     ██     ██ ██  ██ 
+// ██  ██  ██     ██   ██     ██     ██  ██ ██ 
+// ██      ██     ██   ██     ██     ██   ████ 
+
 // this function fills out a number of global variables:
-// glattice, glat_even, glat_odd: geometry descriptors
 // ipt, iup, idn: look up tables to move around the lattice
 // imask: bitfield to encode some properties of the point 
+// glattice, glat_even, glat_odd: geometry descriptors
 void define_geometry() {
     lprintf(LOGTAG,1,"Define Lattice Geometry...\n");
-    geometry_index_init();
     enumerate_lattice();
-    atexit(&geometry_index_free);
-    lprintf(LOGTAG,1,"Define Lattice Geometry... Done.\n");
+    gd_init();
+    gd_set_boxIndices();
+    sendbuf_init();
+    // gd_set_size(&glattice, GLOBAL);
+    // gd_set_size(&glat_even, EVEN);
+    // gd_set_size(&glat_odd, ODD);
+    lprintf(LOGTAG,1,"Define Lattice Geometry... Done.\n"); 
+    // lprintf(LOGTAG,1,"GLATTICE GSIZE=%d SPINORSIZE=%d\n",glattice.gsize_gauge,glattice.gsize_spinor);
+    // lprintf(LOGTAG,1,"GLATEVEN GSIZE=%d SPINORSIZE=%d\n",glat_even.gsize_gauge,glat_even.gsize_spinor);
+    // lprintf(LOGTAG,1,"GLAT_ODD GSIZE=%d SPINORSIZE=%d\n",glat_odd.gsize_gauge,glat_odd.gsize_spinor);
 }
 
 
-//////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////
-//             TESTING FUNCTIONS
-//////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////
+// ████████ ███████ ███████ ████████ ██ ███    ██  ██████  
+//    ██    ██      ██         ██    ██ ████   ██ ██       
+//    ██    █████   ███████    ██    ██ ██ ██  ██ ██   ███ 
+//    ██    ██           ██    ██    ██ ██  ██ ██ ██    ██ 
+//    ██    ███████ ███████    ██    ██ ██   ████  ██████  
 
-void resetArray(char *array, int len) {
+#ifndef NDEBUG
+
+//checks if a point with given idx and parity has correct ranges
+//in the box.
+static int isSiteParityCorrect(int idx, int parity, box_t *B) {
+    if (parity==0) {
+        //even site
+        return (idx>=B->base_index && idx<(B->base_index+boxEvenVolume(B)));
+    }
+    //odd site
+    return (idx>=B->base_index_odd && idx<(B->base_index_odd+boxOddVolume(B)));
+}
+#endif
+
+static void resetArray(char *array, int len) {
     for(int i=0;i<len;i++) array[i]=0;
 }
 
-
 static char *LOGTESTTAG="GEOMETRY TEST";
 
-int checkArray(char *array, int len, int local_len) {
+static int checkArray(char *array, int len, int local_len) {
     int errors=0;
     for(int i=0;i<len;i++) {
         if (i<local_len && array[i]!=1) {
@@ -879,7 +1243,7 @@ int checkArray(char *array, int len, int local_len) {
 }
 
 //check if a point is inside the local lattice
-int isLocal(int x0_ext, int x1_ext, int x2_ext, int x3_ext) {
+static int isLocal(int x0_ext, int x1_ext, int x2_ext, int x3_ext) {
     x0_ext=safe_mod(x0_ext,T_EXT);
     x1_ext=safe_mod(x1_ext,X_EXT);
     x2_ext=safe_mod(x2_ext,Y_EXT);
@@ -894,7 +1258,7 @@ int isLocal(int x0_ext, int x1_ext, int x2_ext, int x3_ext) {
 //we test that moving int he direction active in the mask
 //we end up inside the LOCAL lattice (no halos allowed)
 //NB: the starting point can be in the halo
-int checkMask(char mask, int x0_ext, int x1_ext, int x2_ext, int x3_ext ) {
+static int checkMask(char mask, int x0_ext, int x1_ext, int x2_ext, int x3_ext ) {
     int errors=0;
     if ((mask & T_UP_MASK) && !isLocal(x0_ext+1, x1_ext, x2_ext, x3_ext)) {
         errors++;
@@ -941,6 +1305,33 @@ int checkMask(char mask, int x0_ext, int x1_ext, int x2_ext, int x3_ext ) {
 
 }
 
+static int checkBoxNumbers(int boxnumber) {
+        //number of parallel directions
+    const int NPAR = (NP_T>1 ? 1 : 0) + (NP_X>1? 1 : 0) + (NP_Y>1 ? 1 : 0) + (NP_Z>1 ? 1 : 0);
+    // Dimension 3 borders. These are for both gauge fields and spinors
+    const int L3_BORDER = 2 * NPAR;
+    // Dimension 2 borders. These are for the gauge fields
+#ifdef _INCLUDE_UP_UP_L2
+    const int L2_BORDER = 4*NPAR*(NPAR-1)/2; 
+#else
+    const int L2_BORDER = 3*NPAR*(NPAR-1)/2; 
+#endif
+
+    int correct_boxnumber=1+L3_BORDER+L2_BORDER;
+
+    int errors = 0;
+
+    if (boxnumber!=correct_boxnumber) {
+        errors++;
+        lprintf(LOGTESTTAG,1,"ERROR: Number of boxes incorrect. Expected %d but %d boxes found\n", correct_boxnumber, boxnumber);
+
+    }
+
+    return errors;
+
+
+}
+
 int test_define_geometry() {
 
     char *idxcheck;
@@ -952,16 +1343,18 @@ int test_define_geometry() {
     //check that ipt returns values within range
     //check that values for even and odd sites are correct
     int boxnumber=0;
-    box_t *b = &geometryBoxes;
+    box_t *b = geometryBoxes;
     while(b) {
-        lprintf(LOGTESTTAG,1,"Testing Box #%d\n",boxnumber++);
+        lprintf(LOGTESTTAG,1,"Testing Box #%d\n",++boxnumber);
         printBox(b,1);
 
         const int sign = boxParity(b);
         const int base_idx = b->base_index;
+        const int base_idx_odd = b->base_index_odd;
         const int vol = boxVolume(b);
         const int even_vol = vol/2 + (vol&(1^sign));
-        lprintf(LOGTESTTAG,1,"Box: sign=%d vol=%d even_vol=%d\n",sign, vol, even_vol);
+        const int odd_vol = vol-even_vol;
+        lprintf(LOGTESTTAG,1,"Box: sign=%d vol=%d even_vol=%d odd_vol=%d\n",sign, vol, even_vol, odd_vol);
 
         //reset array to check local idx in geometry boxes
         resetArray(idxcheck,ext_vol);
@@ -974,7 +1367,8 @@ int test_define_geometry() {
             const int site_parity=((x0_ext-b->l[0])+(x1_ext-b->l[1])+(x2_ext-b->l[2])+(x3_ext-b->l[3])+sign)%2;
             const int ix = ipt_ext(x0_ext,x1_ext,x2_ext,x3_ext);
             const char mask = imask(ix);
-            const int idx = ix-base_idx; //local idx 
+            const int shift = (site_parity) ? base_idx_odd-even_vol : base_idx;
+            const int idx = ix-shift; //local idx 
             int site_errors=0;
 
             //add ix to idxcheck
@@ -1005,10 +1399,7 @@ int test_define_geometry() {
             //test mask
             site_errors += checkMask(mask, x0_ext, x1_ext, x2_ext, x3_ext);
 
-            if (site_errors) {lprintf(LOGTESTTAG,1,"ERROR: %d errors  @ (%d, %d, %d, %d)\n", site_errors, x0_ext, x1_ext, x2_ext, x3_ext);}
-
-            if (idx==4) {lprintf(LOGTESTTAG,1,"TEST: idx=%d (%d, %d, %d, %d)\n", idx, x0_ext, x1_ext, x2_ext, x3_ext);}
-
+            if (site_errors) {lprintf(LOGTESTTAG,1,"ERROR: %d errors  ix=%d idx=%d shift=%d @ (%d, %d, %d, %d)\n", site_errors, ix, idx, shift, x0_ext, x1_ext, x2_ext, x3_ext);}
 
             errors += site_errors;
         }}}}
@@ -1021,6 +1412,7 @@ int test_define_geometry() {
         b=b->next;
     }
     
+    total_errors+=checkBoxNumbers(boxnumber);
 
     free(idxcheck);
 

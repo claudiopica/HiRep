@@ -209,11 +209,11 @@ double b_mu(fourvec p1, int mu){
  * @param LT time extent of the box
  * @param t time slice
  */
-double complex twopoint(fourvec p, double m,int L, int LT, int t)
+hr_complex twopoint(fourvec p, double m,int L, int LT, int t)
 {
     fourvec mom1, mom2;
     int q1, q2, q3, q41, q42;
-    double complex res;
+    hr_complex res;
     res = 0.;
     double tmp;
     
@@ -239,11 +239,11 @@ double complex twopoint(fourvec p, double m,int L, int LT, int t)
  * @param LT time extent of the box
  * @param t time slice
  */
-double complex twopoint_id(fourvec p, double m,int L, int LT, int t)
+hr_complex twopoint_id(fourvec p, double m,int L, int LT, int t)
 {
     fourvec mom1, mom2;
     int q1, q2, q3, q41, q42;
-    double complex res;
+    hr_complex res;
     res = 0.;
     double tmp;
     
@@ -272,11 +272,11 @@ double complex twopoint_id(fourvec p, double m,int L, int LT, int t)
  * @param LT time extent of the box
  * @param t time slice
  */
-double complex disc_id(fourvec p, double m,int L, int LT, int t)
+hr_complex disc_id(fourvec p, double m,int L, int LT, int t)
 {
     fourvec mom1;
     int q1, q2, q3, q41;
-    double complex res;
+    hr_complex res;
     res = 0.;
     double tmp;
     
@@ -301,11 +301,11 @@ double complex disc_id(fourvec p, double m,int L, int LT, int t)
  * @param LT time extent of the box
  * @param t time slice
  */
-double complex twopoint_rho(fourvec p, double m,int L, int LT, int t)
+hr_complex twopoint_rho(fourvec p, double m,int L, int LT, int t)
 {
     fourvec mom1, mom2;
     int q1, q2, q3, q41, q42;
-    double complex res;
+    hr_complex res;
     res = 0.;
     double tmp;
 
@@ -332,11 +332,11 @@ double complex twopoint_rho(fourvec p, double m,int L, int LT, int t)
  * @param LT time extent of the box
  * @param t time slice
  */
-double complex twopoint_rho12(fourvec p, double m,int L, int LT, int t)
+hr_complex twopoint_rho12(fourvec p, double m,int L, int LT, int t)
 {
     fourvec mom1, mom2;
     int q1, q2, q3, q41, q42;
-    double complex res;
+    hr_complex res;
     res=0.;
     double tmp;
 
@@ -365,11 +365,11 @@ double complex twopoint_rho12(fourvec p, double m,int L, int LT, int t)
  * @param LT time extent of the box
  * @param t time slice
  */
-double complex Triangle(fourvec p, double m, int L, int LT, int t)
+hr_complex Triangle(fourvec p, double m, int L, int LT, int t)
 {
     fourvec mom[3];
     int q1, q2, q3, q14, q24, q34, i,j;
-    double complex res;
+    hr_complex res;
     res = 0.;
     double numerator, denominator;
     double af1[3];
@@ -416,11 +416,11 @@ double complex Triangle(fourvec p, double m, int L, int LT, int t)
  * @param LT time extent of the box
  * @param t time slice
  */
-double complex Triangle_id(fourvec p, double m, int L, int LT, int t)
+hr_complex Triangle_id(fourvec p, double m, int L, int LT, int t)
 {
     fourvec mom[3];
     int q1, q2, q3, q14, q24, q34, i,j;
-    double complex res;
+    hr_complex res;
     res = 0.;
     double numerator, denominator;
     double af1[3];
@@ -467,11 +467,11 @@ double complex Triangle_id(fourvec p, double m, int L, int LT, int t)
  * @param LT time extent of the box
  * @param t time slice
  */
-double complex R_(fourvec px, fourvec py, fourvec pz, double m, int L, int LT, int t)
+hr_complex R_(fourvec px, fourvec py, fourvec pz, double m, int L, int LT, int t)
 {
     fourvec mom[4];
     int q11, q12, q13, q14, q24, q34, q44, i,j;
-    double complex res;
+    hr_complex res;
     res = 0.;
     double numerator, denominator;
     double af1[4];
@@ -531,7 +531,7 @@ double complex R_(fourvec px, fourvec py, fourvec pz, double m, int L, int LT, i
  * @param tol tolerance, the program returns an error if abs(numeric-analytic)>tol
  * @returns 0 if comparison successful, 1 otherwise
  */
-int compare_2pt(meson_observable *mo, double complex *corr, int px, int py, int pz, int pmax, double tol ){
+int compare_2pt(meson_observable *mo, hr_complex *corr, int px, int py, int pz, int pmax, double tol ){
     int retval = 0;
     for(int t=0; t<GLB_T; t++){
         double num_re = mo->corr_re[corr_ind(px,py,pz,pmax,t,1,0)];
@@ -596,9 +596,9 @@ int main(int argc,char *argv[])
    represent_gauge_field();
    gettimeofday(&start,0);
    //char path[100]="./output/";
-   double complex Tstoch[GLB_T],Ttheo[GLB_T];
-   double complex Dstoch[GLB_T],Dtheo[GLB_T];
-   double complex Cstoch[GLB_T],Ctheo[GLB_T];
+   hr_complex Tstoch[GLB_T],Ttheo[GLB_T];
+   hr_complex Dstoch[GLB_T],Dtheo[GLB_T];
+   hr_complex Cstoch[GLB_T],Ctheo[GLB_T];
 
    for (int t=0;t < GLB_T ; t++)    {
        Tstoch[t] = 0.0;

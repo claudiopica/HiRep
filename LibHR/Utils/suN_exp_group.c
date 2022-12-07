@@ -45,7 +45,7 @@ static void suNg_Exp_NG3(suNg *u, suNg *Xin)
 {
   int NN = 30, i = 0, j = 0;
 
-  double complex p[NG - 1];
+  hr_complex p[NG - 1];
   suNg X0, X2, X3;
 
   if (inverse_fact == NULL)
@@ -69,11 +69,11 @@ static void suNg_Exp_NG3(suNg *u, suNg *Xin)
   p[0] = -p[0] / 3;
   p[1] = -p[1] / 2;
 
-  double complex q[NG];
+  hr_complex q[NG];
   for (i = 0; i < NG; i++)
     q[i] = 0.;
 
-  double complex qlast;
+  hr_complex qlast;
   q[0] = inverse_fact[NN];
 
   for (i = NN - 1; i >= 0; i--)
@@ -97,7 +97,7 @@ static void suNg_Exp_NG4(suNg *u, suNg *Xin)
 
   int NN = 30, i = 0, j = 0;
 
-  double complex p[NG - 1];
+  hr_complex p[NG - 1];
 
   if (inverse_fact == NULL)
   {
@@ -125,11 +125,11 @@ static void suNg_Exp_NG4(suNg *u, suNg *Xin)
   p[1] = -p[1] / 3;
   p[2] = -p[2] / 2;
 
-  double complex q[NG];
+  hr_complex q[NG];
   for (i = 0; i < NG; i++)
     q[i] = 0.;
 
-  double complex qlast;
+  hr_complex qlast;
   q[0] = inverse_fact[NN];
 
   for (i = NN - 1; i >= 0; i--)
@@ -154,7 +154,7 @@ static void suNg_Exp_NG5(suNg *u, suNg *Xin)
 {
 
   int NN = 30, i = 0, j = 0;
-  double complex p[NG - 1];
+  hr_complex p[NG - 1];
 
   if (inverse_fact == NULL)
   {
@@ -185,11 +185,11 @@ static void suNg_Exp_NG5(suNg *u, suNg *Xin)
   p[2] = -p[2] / 3;
   p[3] = -p[3] / 2;
 
-  double complex q[NG];
+  hr_complex q[NG];
   for (i = 0; i < NG; i++)
     q[i] = 0.;
 
-  double complex qlast;
+  hr_complex qlast;
   q[0] = inverse_fact[NN];
 
   for (i = NN - 1; i >= 0; i--)
@@ -217,7 +217,7 @@ static void suNg_Exp_NG6(suNg *u, suNg *Xin)
 
   int NN = 30, i = 0, j = 0;
 
-  double complex p[NG - 1];
+  hr_complex p[NG - 1];
 
   if (inverse_fact == NULL)
   {
@@ -251,11 +251,11 @@ static void suNg_Exp_NG6(suNg *u, suNg *Xin)
   p[3] = -p[3] / 3;
   p[4] = -p[4] / 2;
 
-  double complex q[NG];
+  hr_complex q[NG];
   for (i = 0; i < NG; i++)
     q[i] = 0.;
 
-  double complex qlast;
+  hr_complex qlast;
   q[0] = inverse_fact[NN];
 
   for (i = NN - 1; i >= 0; i--)

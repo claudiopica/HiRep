@@ -28,7 +28,7 @@ void apply_background_field_zdir(suNg_field *V, double Q, int n)
 #ifdef DEBUG_BACKGROUND
   static suNg_field *Vtest_old = NULL;
   static suNg_field *Vtest_new = NULL;
-  double complex tmp, tmp2;
+  hr_complex tmp, tmp2;
   double diff_re, diff_im;
 
   Vtest_old = alloc_gfield(&glattice);
@@ -40,7 +40,7 @@ void apply_background_field_zdir(suNg_field *V, double Q, int n)
 #endif
   int index;
   double A = 0;
-  double complex phase;
+  hr_complex phase;
   suNg utmp;
   static suNg_field *V_old = NULL;
   int c[4];

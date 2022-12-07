@@ -72,7 +72,7 @@ static int check_g5herm(spinor_field *prop1, int t1, spinor_field *prop2)
   int beta, a, ix1, ix2;
 
   suNf_propagator sp1, sp2, spdag;
-  double complex tr = 0.;
+  hr_complex tr = 0.;
 #ifdef WITH_MPI
   MPI_Status st;
   MPI_Request req;

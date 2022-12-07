@@ -185,11 +185,11 @@ double b_mu(fourvec p1, int mu){
  * @param LT time extent of the box
  * @param t time slice
  */
-double complex twopoint(fourvec p, double m,int L, int LT, int t)
+hr_complex twopoint(fourvec p, double m,int L, int LT, int t)
 {
     fourvec mom1, mom2;
     int q1, q2, q3, q41,q42;
-    double complex res;
+    hr_complex res;
     res = 0.;
     double tmp;
     
@@ -228,11 +228,11 @@ double complex twopoint(fourvec p, double m,int L, int LT, int t)
  * @param LT time extent of the box
  * @param t time slice
  */
-double complex twopoint_rho(fourvec p, double m,int L, int LT, int t)
+hr_complex twopoint_rho(fourvec p, double m,int L, int LT, int t)
 {
     fourvec mom1, mom2;
     int q1, q2, q3, q41, q42;
-    double complex res;
+    hr_complex res;
     res = 0.;
     double tmp;
 
@@ -269,11 +269,11 @@ double complex twopoint_rho(fourvec p, double m,int L, int LT, int t)
  * @param LT time extent of the box
  * @param t time slice
  */
-double complex twopoint_rho12(fourvec p, double m,int L, int LT, int t)
+hr_complex twopoint_rho12(fourvec p, double m,int L, int LT, int t)
 {
     fourvec mom1, mom2;
     int q1, q2, q3, q41, q42;
-    double complex res;
+    hr_complex res;
     res=0.;
     double tmp;
 
@@ -306,11 +306,11 @@ double complex twopoint_rho12(fourvec p, double m,int L, int LT, int t)
 #define FV(A,B) (fourvec) {{Q(A##1,L), Q(A##2,L), Q(A##3,L), Q(B,LT)}}
 
 
-double complex C(fourvec px, fourvec py, double m, int L, int LT, int t)
+hr_complex C(fourvec px, fourvec py, double m, int L, int LT, int t)
 {
   fourvec mom[4];
   int q11, q12, q13, q14, q24, q34, q44, i,j;
-  double complex res;
+  hr_complex res;
   res = 0.0*I;
   double numerator, denominator;
   double af1[4];
@@ -365,7 +365,7 @@ double complex C(fourvec px, fourvec py, double m, int L, int LT, int t)
   return 4*res/L/L/L/L/L/L/LT/LT/LT/LT;
 }
 
-int compare_corr(double complex * corr_ex, double complex * corr_num,int tstart, char* name, double tol ){
+int compare_corr(hr_complex * corr_ex, hr_complex * corr_num,int tstart, char* name, double tol ){
     int retval = 0;
     for(int t=tstart; t<GLB_T; t++){  
          if(cabs(corr_ex[t] - corr_num[t])/cabs(corr_ex[t]) > tol) 
@@ -422,10 +422,10 @@ int main(int argc,char *argv[])
 
   gettimeofday(&start,0);
  
-  double complex Pistoch[GLB_T],Pitheo[GLB_T];
-  double complex Rhostoch[GLB_T],Rhotheo[GLB_T];
-  double complex ADstoch[GLB_T],ADtheo[GLB_T];
-  double complex BCstoch[GLB_T],BCtheo[GLB_T];
+  hr_complex Pistoch[GLB_T],Pitheo[GLB_T];
+  hr_complex Rhostoch[GLB_T],Rhotheo[GLB_T];
+  hr_complex ADstoch[GLB_T],ADtheo[GLB_T];
+  hr_complex BCstoch[GLB_T],BCtheo[GLB_T];
   
 
   for (int t=0;t < GLB_T ; t++)  

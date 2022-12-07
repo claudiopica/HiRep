@@ -34,7 +34,7 @@ static int init = 0;
 static void measure_renormalization_core(spinor_field* psi_in, spinor_field* psi_out, int nm, int pt_in, int px_in, int py_in, int pz_in, int pt_out, int px_out, int py_out, int pz_out){
   int i, ix,t,x,y,z,a,beta;
   double pinx, poutx;
-  double complex eipinx, eipoutx;
+  hr_complex eipinx, eipoutx;
   suNf_propagator Sin,Sout,Sout_dag,Stmp1,Stmp2,Stmp3, Stmp4, Sf;
 
   for(i=0; i<nm; i++) {
