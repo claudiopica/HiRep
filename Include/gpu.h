@@ -21,6 +21,10 @@
 #include "input_par.h"
 #include "hr_complex.h"
 
+#ifdef __cplusplus
+  extern "C" {
+#endif
+
 typedef struct 
 {
   unsigned int gpuID;
@@ -37,6 +41,10 @@ typedef struct
 
 double* alloc_double_sum_field(int n);
 hr_complex* alloc_complex_sum_field(int n);
+
+#ifdef __cplusplus
+  }
+#endif
 
 #endif 
 #endif

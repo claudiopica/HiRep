@@ -13,16 +13,15 @@
 
 #ifndef UTILS_H
 #define UTILS_H
+#ifdef __cplusplus
+  extern "C" {
+#endif
 
 #include "suN_types.h"
 #include "spinor_field.h"
 #include "inverters.h"
 #include "geometry.h"
 #include <stdlib.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /*SUN exp matrix*/
 

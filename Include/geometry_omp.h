@@ -6,6 +6,9 @@
 
 #ifndef GEOMETRY_OMP_H
 #define GEOMETRY_OMP_H
+#ifdef __cplusplus
+  extern "C" {
+#endif
 
 #include "hr_omp.h"
 
@@ -135,4 +138,8 @@
   _TWO_SPINORS_MATCHING(s1,s2); \
   _TWO_SPINORS_MATCHING(s1,s3); \
   _ONE_SPINOR_FOR_RED(s1,redop1,redop2)
+
+#ifdef __cplusplus
+  }
+#endif
 #endif

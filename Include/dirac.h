@@ -14,32 +14,23 @@
 #include "suN_types.h"
 #include "utils.h"
 
-// For cross-compilation we need to mark CPU functions as C code. We only cross-compile
-// C&C++ for the CUDA version.
-#ifdef __cplusplus
-extern "C" {
-#endif
+// Default declarations for Dirac Operator
+#include "dirac_default.h"
 
-   // Default declarations for Dirac Operator
-   #include "dirac_default.h"
+// CPU declarations
+#include "dirac_cpu.h"
 
-   // CPU declarations
-   #include "dirac_cpu.h"
+// Clover Operations
+#include "dirac_clover.h"
 
-   // Clover Operations
-   #include "dirac_clover.h"
+// Four-fermion interactions
+#include "dirac_4f.h"
 
-   // Four-fermion interactions
-   #include "dirac_4f.h"
-
-   // Twisted-Mass
-   #include "dirac_tm.h"
-
-#ifdef __cplusplus
-}
-#endif
+// Twisted-Mass
+#include "dirac_tm.h"
 
 #ifdef WITH_GPU
+   // GPU Dirac operator implementations
    #include "dirac_gpu.h" 
 #endif
 

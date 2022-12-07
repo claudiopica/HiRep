@@ -10,6 +10,9 @@
 
 #ifndef MEMORY_H
 #define MEMORY_H
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #include <stdlib.h>
 #include "suN.h"
@@ -21,9 +24,7 @@
 #define ALIGN 8
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+
 
 /**
  * @brief Allocated memory aligned, because this improves bandwidth

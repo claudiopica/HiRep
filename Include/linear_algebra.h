@@ -12,25 +12,27 @@
  * TMPL/linear_algebra.c.sdtmpl
  *
  */
-
 #include "suN.h"
 #include "spinor_field.h"
 #include "hr_complex.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include "reduction.h"
 
 /* double precision */
 #define _SPINOR_FIELD_TYPE spinor_field
 #define _REAL double
 #define _COMPLEX hr_complex
+
+// TODO: If I wrap this in extern 'C' compilation fails. Why? (SAM)
 #ifdef WITH_GPU
   #define _FUNC(a,b,c) a b##_f_gpu c
   #define _BODY(a) ;
   #include "TMPL/linear_algebra.c.sdtmpl"
   #undef _FUNC
   #undef _BODY
+#endif
+
+#ifdef __cplusplus
+  extern "C" {
 #endif
 #define _FUNC(a,b,c) a b##_f_cpu c
 #define _BODY(a) ;
@@ -40,6 +42,10 @@ extern "C" {
 #define _FUNC(a,b,c) extern a (*b##_f) c
 #define _BODY(a) ;
 #include "TMPL/linear_algebra.c.sdtmpl"
+#ifdef __cplusplus
+  }
+#endif
+
 #undef _FUNC
 #undef _BODY
 #undef _SPINOR_FIELD_TYPE
@@ -57,6 +63,10 @@ extern "C" {
   #undef _FUNC
   #undef _BODY
 #endif
+
+#ifdef __cplusplus
+  extern "C" {
+#endif
 #define _FUNC(a,b,c) a b##_f_flt_cpu c
 #define _BODY(a) ;
 #include "TMPL/linear_algebra.c.sdtmpl"
@@ -65,14 +75,14 @@ extern "C" {
 #define _FUNC(a,b,c) extern a (*b##_f_flt) c
 #define _BODY(a) ;
 #include "TMPL/linear_algebra.c.sdtmpl"
+#ifdef __cplusplus
+  }
+#endif
+
 #undef _FUNC
 #undef _BODY
 #undef _SPINOR_FIELD_TYPE
 #undef _REAL
 #undef _COMPLEX
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

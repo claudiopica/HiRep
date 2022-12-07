@@ -6,6 +6,9 @@
 
  #ifndef NEW_GEOMETRY_H
  #define NEW_GEOMETRY_H
+ #ifdef __cplusplus
+    extern "C" {
+ #endif
 
 static inline int lexi(int b0, int b1, int b2, int b3, int x0, int x1, int x2, int x3);
 static int index_blocked(int b0, int b1, int b2, int b3, 
@@ -31,4 +34,7 @@ int checkArray(char *array, int len, int local_len);
 int isLocal(int x0_ext, int x1_ext, int x2_ext, int x3_ext);
 int checkMask(char mask, int x0_ext, int x1_ext, int x2_ext, int x3_ext);
 
+#ifdef __cplusplus
+    }
+#endif
  #endif

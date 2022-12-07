@@ -10,6 +10,10 @@
 #include "suN_types.h"
 #include "utils.h"
 
+#ifdef __cplusplus
+    extern "C" {
+#endif
+
 /**
  * @brief Number of times the Dirac operator was applied.
  *
@@ -212,5 +216,7 @@ void g5Dphi_eopre_sq_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
 void set_dirac_mass(double mass); // this is the mass used in the following operators
 double get_dirac_mass();
 
-
+#ifdef __cplusplus
+    }
+#endif
 #endif

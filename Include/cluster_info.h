@@ -5,14 +5,12 @@
  *        To be logged to simulation outfiles.
  */
 
+#ifdef WITH_GPU
 #ifndef CLUSTER_INFO_H
 #define CLUSTER_INFO_H
 
-#ifdef WITH_GPU
-    #include "gpu.h"
-#endif
+#include "gpu.h"
 
-#ifdef WITH_GPU
     /**
      * @brief Query number of GPUs and print related information
      *
@@ -89,5 +87,6 @@
      * @param input_gpu             A struct containing parameters on the current GPU.
      */
     void print_hardware_info(cudaDeviceProp, input_gpu);
+    
 #endif
 #endif

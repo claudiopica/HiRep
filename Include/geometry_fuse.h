@@ -5,6 +5,9 @@
 
 #ifndef GEOMETRY_FUSE_H
 #define GEOMETRY_FUSE_H
+#ifdef __cplusplus
+    extern "C" {
+#endif
 
 #include "geometry_omp.h"
 
@@ -15,5 +18,8 @@
 #define _FUSE_MASTER_FOR_MAX(type, is, ...) _FUSE_MASTER_FOR_RED(type, is, _omp_max(__VA_ARGS__), )
 #define _FUSE_MASTER_FOR_MIN(type, is, ...) _FUSE_MASTER_FOR_RED(type, is, _omp_min(__VA_ARGS__), )
 
+#ifdef __cplusplus
+    }
+#endif
 #endif
 

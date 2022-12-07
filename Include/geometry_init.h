@@ -6,6 +6,9 @@
 
 #ifndef GEOMETRY_INIT_H
 #define GEOMETRY_INIT_H
+#ifdef __cplusplus
+   extern "C" {
+#endif
 
 void origin_coord(int *c);
 void other_proc_origin_coord(int *proc_coord, int *c);
@@ -37,6 +40,9 @@ void print_wdmatrix(char *filename);
    void init_neighbors_gpu();
 #endif
 
+#ifdef __cplusplus
+   }
+#endif
 #endif
 
 

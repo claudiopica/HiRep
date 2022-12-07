@@ -5,6 +5,9 @@
 
 #ifndef UPDATE_H
 #define UPDATE_H
+#ifdef __cplusplus
+  extern "C" {
+#endif
 
 #include "suN.h"
 #include "inverters.h"
@@ -209,4 +212,7 @@ void flip_scalar_field(scalar_field *s);
 void set_scalar_field(scalar_field *s, double c);
 void gaussian_scalar_field(scalar_field *s);
 
+#ifdef __cplusplus
+  }
+#endif
 #endif

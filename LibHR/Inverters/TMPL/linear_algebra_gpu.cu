@@ -1,10 +1,8 @@
 #ifndef LINEAR_ALGEBRA_GPU_CU
 #define LINEAR_ALGEBRA_GPU_CU
 
-extern "C" {
 #include "global.h"
 #include "gpu.h"
-}
 
 /* Re <s1,s2> */
 template<typename COMPLEX, typename REAL>

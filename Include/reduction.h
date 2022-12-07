@@ -6,6 +6,8 @@
 #ifndef REDUCTION_H
 #define REDUCTION_H
 
+#include "hr_complex.h"
+
 // This needs to be there due to the cross-compilation that 
 // we need to do if we are compiling WITH_GPU.
 #ifdef __cplusplus
@@ -66,19 +68,19 @@ void bcast_int(int *i, int n);
 
 #ifdef WITH_GPU
    // TODO: Here the cross compilation does not work (SAM)
-   //#ifdef __cplusplus
-   //   /**
-   //   * @brief Sums across GPU nodes after finding the local sum (generics)
-   //   *
-   //   * @param vector		Vector with local results
-   //   * @param size		Size of vector
-   //   *
-   //   * @return T		Result of sum of generic type T.
-   //   */
-   //   template <class T>
-   //   T global_sum_gpu(T *vector, int size);
-   //   extern "C" {
-   //#endif
+   #ifdef __cplusplus
+      /**
+      * @brief Sums across GPU nodes after finding the local sum (generics)
+      *
+      * @param vector		Vector with local results
+      * @param size		Size of vector
+      *
+      * @return T		Result of sum of generic type T.
+      */
+      template <class T>
+      T global_sum_gpu(T *vector, int size);
+      extern "C" {
+   #endif
 
    /**
    * @brief Sums across GPU nodes after finding the local sum (integer)
@@ -130,9 +132,9 @@ void bcast_int(int *i, int n);
    */
    hr_complex global_sum_gpu_complex(hr_complex *vector, int size);
     
-   //#ifdef __cplusplus
-   //   }
-   //#endif
+   #ifdef __cplusplus
+      }
+   #endif
 
 #endif
 #endif 

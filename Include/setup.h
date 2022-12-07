@@ -11,6 +11,9 @@
 
 #ifndef SETUP_H
 #define SETUP_H
+#ifdef __cplusplus
+    extern "C" {
+#endif
 
 /**
  * @brief Read input filename from command line
@@ -46,4 +49,7 @@ int finalize_process(void);
  */
 void setup_gauge_fields();
 
+#ifdef __cplusplus
+    }
+#endif
 #endif

@@ -18,6 +18,11 @@
 
 #include "check_options.h"
 
+#ifdef __cplusplus
+  extern "C" {
+#endif 
+
+
 #ifdef MAIN_PROGRAM
 #  define GLB_VAR(type,name,...) type name __VA_ARGS__
 #else
@@ -230,5 +235,7 @@ GLB_VAR(int,four_fermion_active,=0); // whether four fermion interactions are ac
 
 #undef GLB_VAR
 
-
+#ifdef __cplusplus
+  }
+#endif
 #endif

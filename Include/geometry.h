@@ -17,6 +17,9 @@
 
 #ifndef GEOMETRY_H
 #define GEOMETRY_H
+#ifdef __cplusplus
+  extern "C" {
+#endif 
 
 #include "hr_omp.h"
 #include "geometry_omp.h"
@@ -212,4 +215,7 @@ typedef struct
  */
 #define _SPINOR_PTR(s) _FIELD_AT(s,_spinor_for_is)
 
+#ifdef __cplusplus
+  }
+#endif
 #endif

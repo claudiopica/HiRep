@@ -8,6 +8,10 @@
 
 #include "field_ordering.h"
 
+#ifdef __cplusplus
+	extern "C" {
+#endif
+
 #define _FIELD_AT(s,i) (((s)->ptr) + i - (s)->type->master_shift)
 #define _4FIELD_AT(s,i,mu) (((s)->ptr) + coord_to_index(i-(s)->type->master_shift,mu))
 #define _6FIELD_AT(s,i,mu) (((s)->ptr) + (( i - (s)->type->master_shift)*6+mu))
@@ -37,4 +41,7 @@
 #define _GPU_IDX_TO_LOCAL(in, ix, ixp) ix - in->type->master_start[(ixp)];
 #define _SITE_IDX_GPU(ix, ixp, stride) (ix) + stride*(ixp)
 
+#ifdef __cplusplus
+	}
+#endif
 #endif

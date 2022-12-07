@@ -12,6 +12,9 @@
 
 #ifndef SPINOR_FIELD_H
 #define SPINOR_FIELD_H
+#ifdef __cplusplus
+	extern "C" {
+#endif
 
 #include "geometry.h"
 #include "suN_types.h"
@@ -234,4 +237,7 @@ _DECLARE_FIELD_STRUCT(scalar_field, double);
  */
 _DECLARE_FIELD_STRUCT(suNfc_field, suNfc);
 
+#ifdef __cplusplus
+	}
+#endif
 #endif

@@ -8,6 +8,10 @@
 
 #include "spinor_field.h"
 
+#ifdef __cplusplus
+    extern "C" {
+#endif
+
 /**
  * @brief Number of times the dirac operator was applied to the CPU field data copy of a
  *        spinor field. Note, that this is internally implemented to count every application
@@ -141,4 +145,7 @@ void g5Dphi_eopre_cpu(double m0, spinor_field *out, spinor_field *in);
  */
 void g5Dphi_eopre_sq_cpu(double m0, spinor_field *out, spinor_field *in);
 
+#ifdef __cplusplus
+    }
+#endif 
 #endif

@@ -10,15 +10,13 @@
 
 #ifndef COMMUNICATIONS_H
 #define COMMUNICATIONS_H
-
-#include "spinor_field.h"
-
-// If people include communications, they have to also have the reductions loaded.
-#include "reduction.h" 
+#include "reduction.h"
 
 #ifdef __cplusplus
     extern "C" {
 #endif
+
+#include "spinor_field.h"
 
 /**
  * @brief Wait for communications to finish before continuing.
@@ -129,11 +127,6 @@ void complete_sf_sendrecv_flt(spinor_field_flt*);
  */
 void start_sf_sendrecv_flt(spinor_field_flt*);
 
-
-#ifdef __cplusplus
-}
-#endif
-
 #ifdef WITH_GPU
 
     #define _DECLARE_COMMS(_name, _field_type, _human_readable) \
@@ -166,6 +159,11 @@ void start_sf_sendrecv_flt(spinor_field_flt*);
     _DECLARE_COMMS(clover_force, suNf_field, "Clover force");
 
     #undef _DECLARE_COMMS
+
 #endif 
 
+
+#ifdef __cplusplus
+}
+#endif
 #endif 

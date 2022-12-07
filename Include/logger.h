@@ -5,6 +5,9 @@
 
 #ifndef LOGGER_H
 #define LOGGER_H
+#ifdef __cplusplus
+    extern "C" {
+#endif
 #include "input_par.h"
 
 /* ***********************************************
@@ -110,5 +113,7 @@ void logger_disable();
  */
 int lprintf(char *name, int level, char *format, ...);
 
-
+#ifdef __cplusplus
+    }
+#endif
 #endif

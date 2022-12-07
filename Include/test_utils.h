@@ -5,6 +5,9 @@
 
 #ifndef TEST_UTILS_H
 #define TEST_UTILS_H
+#ifdef __cplusplus
+    extern "C" {
+#endif
 
 // Testing utils
 void test_setup();
@@ -77,4 +80,7 @@ void zero_gtransf_cpu(suNg_field*);
 void zero_clover_term_cpu(suNfc_field*);
 void zero_clover_force_cpu(suNf_field*);
 
+#ifdef __cplusplus
+    }
+#endif
 #endif

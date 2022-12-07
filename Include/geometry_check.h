@@ -1,5 +1,8 @@
 #ifndef GEOMETRY_CHECK_H
 #define GEOMETRY_CHECK_H
+#ifdef __cplusplus
+    extern "C" {
+#endif
 
 #include "geometry.h"
 #include "error.h"
@@ -32,5 +35,7 @@
 
 #endif /* CHECK_SPINOR_MATCHING */
 
-
+#ifdef __cplusplus
+    }
+#endif
 #endif

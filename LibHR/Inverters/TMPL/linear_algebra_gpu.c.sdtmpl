@@ -7,6 +7,7 @@
 #include "gpu.h"
 #include <stdio.h>
 #include "error.h"
+#include "linear_algebra_gpu.cu"
 
 #define _TOCOMPLEX(sp) ((_COMPLEX *)(sp))
 #define _NCOM (sizeof(_SPINOR_TYPE)/sizeof(_COMPLEX))
@@ -21,8 +22,6 @@
        CudaCheckError(); 									\
     }												\
   } while(0)
-
-#include "linear_algebra_gpu.cu"
 
 _FUNC(void, spinor_field_copy, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
 _BODY({

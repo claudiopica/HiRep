@@ -1,6 +1,10 @@
 
 #ifndef DATA_STORAGE_H
 #define DATA_STORAGE_H
+#ifdef __cplusplus
+    extern "C" {
+#endif
+
 typedef enum
 {
     STORE,
@@ -30,4 +34,8 @@ void free_data_storage(data_storage_array *dat);
 double *data_storage_element(data_storage_array *dat, int iel, int *ni);
 
 void print_data_storage(data_storage_array *dat);
+
+#ifdef __cplusplus
+    }
+#endif
 #endif
