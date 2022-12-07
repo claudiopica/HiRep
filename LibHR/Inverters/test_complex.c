@@ -1,6 +1,6 @@
 #ifdef WITH_GPU
 #include "hr_complex.h"
-#include <stdio.h>
+//#include <stdio.h>
 
 #ifdef __cplusplus
 extern "C" {

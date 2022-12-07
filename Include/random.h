@@ -13,6 +13,9 @@
 
 #ifndef RANDOM_H
 #define RANDOM_H
+#ifdef __cplusplus
+    extern "C" {
+#endif
 
 #include "suN.h"
 #include "spinor_field.h"
@@ -38,4 +41,7 @@ void zero_s(suNg_scalar_field *sf);
 void ranz2(double r[],int n);
 void generate_random_point(int *pr);
 
+#ifdef __cplusplus
+    }
+#endif
 #endif

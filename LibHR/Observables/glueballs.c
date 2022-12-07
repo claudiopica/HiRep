@@ -6,6 +6,7 @@
 #include "utils.h"
 #include "glueballs.h"
 #include "global.h"
+#include "hr_complex.h"
 
 void measure_1pt_glueballs(int nblockingstart, int nblockingend, double *smear_val, hr_complex *gb_storage)
 {

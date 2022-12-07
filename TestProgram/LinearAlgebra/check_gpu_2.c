@@ -1,7 +1,6 @@
 /*******************************************************************************
 *
-*  NOCOMPILE= WITH_MPI
-*  NOCOMPILE= !WITH_GPU
+* NOCOMPILE= !WITH_GPU
 *
 * Test of modules
 *
@@ -33,18 +32,18 @@
   do {                                                                   \
       check = 0.0;                                                       \
       for (int i=0;i<(sfsize);i++){                                      \
-        random_spinor_field_cpu(&s1[i]);                                 \
-        spinor_field_copy_to_gpu_f(&s1[i]);                              \
+        gaussian_spinor_field(&s1[i]);                                   \
+        copy_to_gpu_spinor_field_f(&s1[i]);                              \
         spinor_field_zero_f_cpu(&s1[i]);                                 \
-        random_spinor_field_cpu(&s2[i]);                                 \
-        spinor_field_copy_to_gpu_f(&s2[i]);                              \
+        gaussian_spinor_field(&s2[i]);                                   \
+        copy_to_gpu_spinor_field_f(&s2[i]);                              \
         spinor_field_zero_f_cpu(&s2[i]);                                 \
         spinor_field_zero_f_cpu(&s3[i]);                                 \
-        spinor_field_copy_to_gpu_f(&s3[i]);                              \
+        copy_to_gpu_spinor_field_f(&s3[i]);                              \
         opt_gpu;                                                         \
-        spinor_field_copy_from_gpu_f(&s1[i]);                            \
-        spinor_field_copy_from_gpu_f(&s2[i]);                            \
-        spinor_field_copy_from_gpu_f(&s3[i]);                            \
+        copy_from_gpu_spinor_field_f(&s1[i]);                            \
+        copy_from_gpu_spinor_field_f(&s2[i]);                            \
+        copy_from_gpu_spinor_field_f(&s3[i]);                            \
         spinor_field_zero_f_cpu(&s4[i]);                                 \
         opt_cpu;                                                         \
         spinor_field_sub_assign_f_cpu(&s4[i],&s3[i]);                    \
@@ -56,15 +55,15 @@
   do {                                                                   \
       check = 0.0;                                                       \
       for (int i=0;i<(sfsize);i++){                                      \
-        random_spinor_field_cpu(&s1[i]);                                 \
-        spinor_field_copy_to_gpu_f(&s1[i]);                              \
+        gaussian_spinor_field(&s1[i]);                                   \
+        copy_to_gpu_spinor_field_f(&s1[i]);                              \
         spinor_field_zero_f_cpu(&s1[i]);                                 \
-        random_spinor_field_cpu(&s2[i]);                                 \
-        spinor_field_copy_to_gpu_f(&s2[i]);                              \
+        gaussian_spinor_field(&s2[i]);                                   \
+        copy_to_gpu_spinor_field_f(&s2[i]);                              \
         spinor_field_zero_f_cpu(&s2[i]);                                 \
         check += opt_gpu;                                                \
-        spinor_field_copy_from_gpu_f(&s1[i]);                            \
-        spinor_field_copy_from_gpu_f(&s2[i]);                            \
+        copy_from_gpu_spinor_field_f(&s1[i]);                            \
+        copy_from_gpu_spinor_field_f(&s2[i]);                            \
         check -= opt_cpu;                                                \
       }                                                                  \
   } while(0)
@@ -74,28 +73,19 @@
       check = 0.0;                                                       \
       for (int i=0;i<(sfsize);i++){                                      \
         gaussian_spinor_field(&s1[i]);                                   \
-        spinor_field_copy_to_gpu_f(&s1[i]);                              \
+        copy_to_gpu_spinor_field_f(&s1[i]);                              \
         spinor_field_zero_f_cpu(&s1[i]);                                 \
         gaussian_spinor_field(&s2[i]);                                   \
-        spinor_field_copy_to_gpu_f(&s2[i]);                              \
+        copy_to_gpu_spinor_field_f(&s2[i]);                              \
         spinor_field_zero_f_cpu(&s2[i]);                                 \
         check += opt_gpu;                                                \
-        spinor_field_copy_from_gpu_f(&s1[i]);                            \
-        spinor_field_copy_from_gpu_f(&s2[i]);                            \
+        copy_from_gpu_spinor_field_f(&s1[i]);                            \
+        copy_from_gpu_spinor_field_f(&s2[i]);                            \
         check -= opt_cpu;                                                \
       }                                                                  \
   } while(0)
 
 static double EPSILON=1.e-12;
-void random_spinor_field_cpu(spinor_field *s)
-{
-        geometry_descriptor *type = s->type;
-        _PIECE_FOR(type, ixp){
-             int start = type->master_start[ixp];
-             int N = type->master_end[ixp] - type->master_start[ixp]+1;
-             gauss((double*)(_FIELD_AT(s, start)), N * sizeof(suNf_spinor) / sizeof(double));
-        }
-}
 
 void unit_array(double *a, int len)
 {
@@ -145,7 +135,6 @@ int main(int argc, char *argv[])
       /* setup process id and communications */
       //logger_setlevel(0,10000);
       logger_map("DEBUG", "debug");
-
       setup_process(&argc, &argv);
 
       // Allocate memory for CPU and GPU spinor fields
@@ -352,4 +341,6 @@ int main(int argc, char *argv[])
       free_spinor_field_f(sf2);
       free_spinor_field_f(sf3);
       free_spinor_field_f(sf4);
+
+       finalize_process();
 }

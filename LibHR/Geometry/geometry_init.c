@@ -15,6 +15,7 @@
 #include "global.h"
 #include "error.h"
 #include "logger.h"
+#include "new_geometry.h"
 #include <stdlib.h>
 
 static int *alloc_mem=NULL;
@@ -334,6 +335,9 @@ int geometry_init() {
   /*Set the communication buffers and structure of the geometry identificator */
 #ifdef WITH_NEW_GEOMETRY
   define_geometry();
+  #ifdef WITH_GPU
+    init_neighbors_gpu();
+  #endif
 #else
   geometry_mpi_eo();
 #endif

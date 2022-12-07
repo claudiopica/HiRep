@@ -46,27 +46,30 @@ void MM(spinor_field *out, spinor_field *in)
 
 int test_herm(spinor_operator S, char *name)
 {
-  lprintf("RESULT", 0, "Test if %s is hermitian: ", name);
+  lprintf("RESULT", 0, "Test if %s is hermitian: \n", name);
 
   spinor_field *s1, *s2, *s3, *s4;
   double tau;
   int return_val = 0;
 
   // Prepare initial spinor fields
-  #ifdef UPDATE_EO
-    s1 = alloc_spinor_field_f(4, &glat_even);
-  #else
-    s1 = alloc_spinor_field_f(4, &glattice);
-  #endif
-  s2 = s1 + 1;
-  s3 = s2 + 1;
-  s4 = s3 + 1;
+  s1 = alloc_spinor_field_f(1, &glattice);
+  s2 = alloc_spinor_field_f(1, &glattice);
+  s3 = alloc_spinor_field_f(1, &glattice);
+  s4 = alloc_spinor_field_f(1, &glattice);
+
   gaussian_spinor_field(s1);
   gaussian_spinor_field(s2);
 
   // Apply operator
   S(s3, s1);
   S(s4, s2);
+
+  // Spinor field sanity checks
+  lprintf("RESULT", 0, "s1 NORM %f on CPU\n", sqrt(spinor_field_sqnorm_f_cpu(s1)));
+  lprintf("RESULT", 0, "s2 NORM %f on CPU\n", sqrt(spinor_field_sqnorm_f_cpu(s2)));
+  lprintf("RESULT", 0, "s3 NORM %f on CPU\n", sqrt(spinor_field_sqnorm_f_cpu(s3)));
+  lprintf("RESULT", 0, "s4 NORM %f on CPU\n", sqrt(spinor_field_sqnorm_f_cpu(s4)));
 
   // Difference tau is 0 for a hermitian operator
   tau = spinor_field_prod_re_f_cpu(s2, s3);
@@ -88,6 +91,9 @@ int test_herm(spinor_operator S, char *name)
 
   // Free and return
   free_spinor_field_f(s1);
+  free_spinor_field_f(s2);
+  free_spinor_field_f(s3);
+  free_spinor_field_f(s4);
   return return_val;
 }
 

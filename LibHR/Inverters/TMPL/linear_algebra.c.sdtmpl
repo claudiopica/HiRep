@@ -5,12 +5,14 @@
 
 #include "communications.h"
 #include "hr_complex.h"
+#include "suN.h"
+#include "suN_types.h"
 
 /* s1=s2 */
 _FUNC(void, spinor_field_copy, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
 _BODY({
     _TWO_SPINORS_MATCHING(s1,s2);
-    memcpy(s1->ptr,s2->ptr,s1->type->gsize_spinor*sizeof(suNf_spinor));
+    memcpy(s1->ptr,s2->ptr,s1->type->gsize_spinor*sizeof(_SPINOR_TYPE));
 })
 
 /* Re <s1,s2> */
@@ -24,7 +26,7 @@ _BODY({
     _TWO_SPINORS_FOR_SUM(s1,s2,res) {
         _REAL prod;
         _spinor_prod_re_f(prod,*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
-       res+=(double)prod;
+        res+=(double)prod;
     }
 #ifdef WITH_MPI
     global_sum(&res,1);
@@ -115,12 +117,13 @@ _BODY({
     _OMP_PRAGMA ( single ) {
         res = 0.;
     }
-
+    
     _ONE_SPINOR_FOR_SUM(s1,res) {
         _REAL prod;
         _spinor_prod_re_f(prod,*_SPINOR_PTR(s1),*_SPINOR_PTR(s1));
         res+=(double)prod;
    }
+   
 #ifdef WITH_MPI
     _OMP_PRAGMA ( master ) {
         global_sum(&res,1);

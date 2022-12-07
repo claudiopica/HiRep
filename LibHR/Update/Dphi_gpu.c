@@ -173,11 +173,6 @@ void Dphi_gpu_(spinor_field *out, spinor_field *in)
 
   _PIECE_FOR(out->type, ixp)
   {
-      /*cudaError_t error_code;
-      error_code = cudaSetDevice(ixp);
-      if (error_code != cudaSuccess) printf("Could not change to device %d\n", ixp);*/
-
-      printf("Operating on piece: %d\n", ixp);
       int iyp = (ixp+1)%2;
       N = (out)->type->master_end[ixp]-(out)->type->master_start[ixp];
       grid = (N-1)/BLOCK_SIZE + 1;
@@ -450,7 +445,6 @@ __global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out,
     iyp=iy/vol4h;
     local_iy = iy % vol4h;
 
-
     read_gpu_suNf_vector(vol4h, sn.c[0], in, local_iy, 0);
     read_gpu_suNf_vector(vol4h, sn.c[1], in, local_iy, 2);
     read_gpu_suNf(vol4h, u, gauge_iyp, local_iy, 0);
@@ -631,6 +625,8 @@ __global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out,
   }
 }
 
+
+// Do this in the header, just as for the linear algebra functions
 void (*Dphi_) (spinor_field *out, spinor_field *in)=Dphi_gpu_;
 void (*Dphi) (double m0, spinor_field *out, spinor_field *in)=Dphi_gpu;
 void (*g5Dphi) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_gpu;

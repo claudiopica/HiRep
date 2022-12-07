@@ -1,0 +1,141 @@
+#include "global.h"
+#include "logger.h"
+#include "error.h"
+#include "geometry.h"
+#include "random.h"
+#include "spinor_field.h"
+#include "suN_types.h"
+#include "utils.h"
+#include <string.h>
+#ifdef WITH_MPI
+    #include <mpi.h>
+#endif
+
+
+// TODO: Single precision will not work, because then we need to cast to flt
+// TODO: put gpu as last suffix
+// TODO: fill buffers needs gpu suffix
+
+#if defined(WITH_GPU) && defined(WITH_MPI)
+
+#define random_double ranlxd
+#define random_float ranlxs
+
+void zeroes_double(double* dbl, int n) 
+{
+    for (int i = 0; i < n; ++i) 
+    {
+        dbl[i] = 0.0;
+    }
+}
+
+void zeroes_float(float* flt, int n) 
+{
+    for (int i = 0; i < n; ++i) 
+    {
+        flt[i] = 0.0f;
+    }
+}
+
+#define _DECLARE_SYNC(_name, _field_type, _site_type, _size, _geom)\
+    void sync_gpu_##_name(_field_type *f) \
+    { \
+        for (int i = 0; i < f->type->ncopies_##_geom; ++i) \
+        { \
+            _site_type *target = f->gpu_ptr + (_size)*f->type->copy_to[i];\
+            _site_type *source = f->gpu_ptr + (_size)*f->type->copy_from[i];\
+            int mem_size = (_size)*(f->type->copy_len[i])*sizeof(*(f->gpu_ptr));\
+            CHECK_CUDA(cudaMemcpy(target, source, mem_size, cudaMemcpyDeviceToDevice)); \
+        } \
+    }
+
+#define _DECLARE_START_SENDRECV(_name, _field_type, _site_type, _size, _geom) \
+    void start_sendrecv_gpu_##_name(_field_type *f) \
+    { \
+        MPI_Status status[f->type->nbuffers_##_geom];\
+        for (int i = 0; i < f->type->nbuffers_##_geom; ++i) \
+        { \
+            /* Destination Parameters */ \
+            double *recv_buffer = (double*)(f->gpu_ptr + (_size)*f->type->rbuf_start[i]);\
+            int recv_proc = f->type->rbuf_from_proc[i];\
+            int recv_size_in_dbl = (_size)*(f->type->rbuf_len[i])*sizeof(*(f->gpu_ptr))/sizeof(double);\
+            \
+            /* Origin Parameters */ \
+            double *send_buffer = (double*)(f->gpu_ptr + (_size)*f->type->sbuf_start[i]);\
+            int send_proc = f->type->sbuf_to_proc[i];\
+            int send_size_in_dbl = (_size)*(f->type->sbuf_len[i])*sizeof(*(f->gpu_ptr))/sizeof(double); \
+            \
+            /* Start to send */\
+            CHECK_MPI(MPI_Isend(send_buffer, send_size_in_dbl, MPI_DOUBLE, send_proc, i, cart_comm, &(f->comm_req[2*i])));\
+            \
+            /* Start to receive */\
+            CHECK_MPI(MPI_Irecv(recv_buffer, recv_size_in_dbl, MPI_DOUBLE, recv_proc, i, cart_comm, &(f->comm_req[2*i+1])));\
+        } \
+    }
+
+#define _DECLARE_FILL_BUFFERS(_name, _field_type, _prec_type, _size, _geom) \
+    void fill_buffers_##_name(_field_type *f) \
+    { \
+        for (int i = 0; i < f->type->nbuffers_##_geom; ++i) \
+        { \
+            int rlen = (_size)*(f->type->rbuf_len[i])*sizeof(*(f->gpu_ptr))/sizeof(_prec_type); \
+            _prec_type* buf = (_prec_type*)malloc(rlen*sizeof(*(f->gpu_ptr)));\
+            random_##_prec_type(buf, rlen); \
+            CHECK_CUDA(cudaMemcpy((_prec_type*)(f->gpu_ptr + (_size)*f->type->rbuf_start[i]), \
+                                buf, rlen*sizeof(_prec_type), cudaMemcpyHostToDevice));\
+        }\
+    }\
+    \
+    void fill_buffers_with_zeroes_##_name(_field_type *f) \
+    { \
+        for (int i = 0; i < f->type->nbuffers_##_geom; ++i) \
+        { \
+            int rlen = (_size)*(f->type->rbuf_len[i])*sizeof(*(f->gpu_ptr))/sizeof(_prec_type); \
+            _prec_type* buf = (_prec_type*)malloc(rlen*sizeof(*(f->gpu_ptr)));\
+            zeroes_##_prec_type(buf, rlen); \
+            CHECK_CUDA(cudaMemcpy((_prec_type*)(f->gpu_ptr + (_size)*f->type->rbuf_start[i]),  \
+                                buf, rlen*sizeof(_prec_type), cudaMemcpyHostToDevice));\
+        }\
+    } 
+
+#define _DECLARE_COMPLETE_SENDRECV(_name, _field_type, _site_type, _size, _geom) \
+    void complete_sendrecv_gpu_##_name(_field_type *f) \
+    { \
+        int nreq = 2 * f->type->nbuffers_##_geom;\
+        if (nreq > 0) \
+        { \
+            MPI_Status status[nreq]; \
+            CHECK_MPI(MPI_Waitall(nreq, f->comm_req, status)); \
+        } \
+    } 
+
+#define _DECLARE_COMMS(_name, _field_type, _site_type, _size, _geom, _prec_type) \
+    _DECLARE_SYNC(_name, _field_type, _site_type, _size, _geom) \
+    _DECLARE_START_SENDRECV(_name, _field_type, _site_type, _size, _geom) \
+    _DECLARE_COMPLETE_SENDRECV(_name, _field_type, _site_type, _size, _geom)  \
+    _DECLARE_FILL_BUFFERS(_name, _field_type, _prec_type, _size, _geom)
+
+/* Spinor fields */
+_DECLARE_COMMS(spinor_field_f, spinor_field, suNf_spinor, 1, spinor, double);
+_DECLARE_COMMS(spinor_field_f_flt, spinor_field_flt, suNf_spinor_flt, 1, spinor, float);
+_DECLARE_COMMS(sfield, scalar_field, double, 1, spinor, double);
+
+/* Gauge fields */
+_DECLARE_COMMS(gfield, suNg_field, suNg, 4, gauge, double);
+_DECLARE_COMMS(gfield_flt, suNg_field_flt, suNg_flt, 4, gauge, float);
+_DECLARE_COMMS(gfield_f, suNf_field, suNf, 4, gauge, double);
+_DECLARE_COMMS(gfield_f_flt, suNf_field_flt, suNf_flt, 4, gauge, float);
+_DECLARE_COMMS(scalar_field, suNg_scalar_field, suNg_vector, 1, gauge, double);
+_DECLARE_COMMS(avfield, suNg_av_field, suNg_algebra_vector, 4, gauge, double);
+_DECLARE_COMMS(gtransf, suNg_field, suNg, 1, gauge, double);
+_DECLARE_COMMS(clover_term, suNfc_field, suNfc, 4, gauge, double);
+_DECLARE_COMMS(clover_force, suNf_field, suNf, 6, gauge, double);
+
+#undef _DECLARE_COMMS
+#undef _DECLARE_SYNC
+#undef _DECLARE_START_SENDRECV
+#undef _DECLARE_COMPLETE_SENDRECV
+#undef random_double
+#undef random_float
+
+#endif

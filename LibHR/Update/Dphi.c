@@ -277,7 +277,6 @@ void Dphi_cpu_(spinor_field *out, spinor_field *in)
 #endif
     _SITE_FOR(out->type, ixp, ix)
     {
-
       int iy;
       suNf *up, *um;
       suNf_vector psi, chi, psi2, chi2;
@@ -296,6 +295,7 @@ void Dphi_cpu_(spinor_field *out, spinor_field *in)
 
       _vector_add_f(psi, (*sp).c[0], (*sp).c[2]);
       _vector_add_f(psi2, (*sp).c[1], (*sp).c[3]);
+
       _suNf_theta_T_multiply(chi, (*up), psi);
       _suNf_theta_T_multiply(chi2, (*up), psi2);
 
@@ -336,8 +336,6 @@ void Dphi_cpu_(spinor_field *out, spinor_field *in)
       _vector_add_assign_f((*r).c[1], chi2);
       _vector_i_sub_assign_f((*r).c[2], chi2);
 
-
-
       /******************************* direction -1 *********************************/
 
       iy = idn(ix, 1);
@@ -362,6 +360,7 @@ void Dphi_cpu_(spinor_field *out, spinor_field *in)
 
       _vector_add_f(psi, (*sp).c[0], (*sp).c[3]);
       _vector_sub_f(psi2, (*sp).c[1], (*sp).c[2]);
+
       _suNf_theta_Y_multiply(chi, (*up), psi);
       _suNf_theta_Y_multiply(chi2, (*up), psi2);
 
@@ -420,6 +419,7 @@ void Dphi_cpu_(spinor_field *out, spinor_field *in)
 
       /******************************** end of loop *********************************/
       _spinor_mul_f(*r, -0.5, *r);
+
     } /* SITE_FOR */
   }   /* PIECE FOR */
 }

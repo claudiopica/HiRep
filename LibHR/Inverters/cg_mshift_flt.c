@@ -35,7 +35,7 @@ static int cg_mshift_flt_core(short int *sflags, mshift_par *par, spinor_operato
   /* fare qualche check sugli input */
   assert(par->n > 0);
   _TWO_SPINORS_MATCHING(in, &out[0]);
-  _ARRAY_SPINOR_MATCHING(out, par->n)
+  _ARRAY_SPINOR_MATCHING(out, par->n);
 
   /* allocate spinors fields and aux real variables */
   p = alloc_spinor_field_f_flt(3 + par->n, in->type);

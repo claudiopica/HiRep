@@ -23,11 +23,17 @@
 #include "utils.h"
 #include "io.h"
 #include "random.h"
+#include "geometry.h"
+#include "geometry_init.h"
 #include "setup.h"
 #include "memory.h"
 #include "representation.h"
 #include "clover_tools.h"
 #include "clover_exp.h"
+#ifdef WITH_GPU
+  #include "gpu.h"
+#endif 
+
 
 /* setup_process
  * Assign a unique RID, PID to each process and setup
@@ -159,10 +165,11 @@ int setup_process(int *argc, char ***argv)
   read_input(glb_var.read, input_filename);
 
   setup_replicas();
-
+  
   /* logger setup */
   read_input(logger_var.read, input_filename);
   logger_set_input(&logger_var);
+
 #ifndef LOG_ALLPIDS
   if (PID != 0)
   {
@@ -192,8 +199,8 @@ int setup_process(int *argc, char ***argv)
 #endif
 
 #ifdef WITH_GPU
-read_input(gpu_var.read, input_filename);
-init_gpu(gpu_var);
+  read_input(gpu_var.read, input_filename);
+  init_gpu(gpu_var);
 #endif
 
   lprintf("SYSTEM", 0, "Gauge group: SU(%d)\n", NG);
@@ -259,7 +266,7 @@ int finalize_process()
   free_gfield_f(u_gauge_f);
 #endif
   if (u_scalar != NULL)
-    free_suNg_scalar_field(u_scalar);
+      free_scalar_field(u_scalar);
 
   if (u_gauge_f_flt != NULL)
     free_gfield_f_flt(u_gauge_f_flt);
@@ -291,7 +298,6 @@ int finalize_process()
 static int setup_replicas()
 {
 #ifdef WITH_MPI
-
   if (N_REP > 1)
   {
     int mpiret;
@@ -327,8 +333,9 @@ static int setup_replicas()
     sprintf(sbuf, "Rep_%d", RID);
     mpiret = chdir(sbuf);
   }
-
 #endif // ifdef WITH_MPI
 
   return 0;
 }
+
+

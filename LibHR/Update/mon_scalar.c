@@ -66,7 +66,7 @@ struct _monomial* scalar_create(const monomial_data *data)
 	// Allocate global field
 	if(u_scalar == NULL)
 	{
-		u_scalar = alloc_suNg_scalar_field(&glattice);
+		u_scalar = alloc_scalar_field(&glattice);
 	}
 
 	// Copy data structure
