@@ -40,10 +40,12 @@
  * 	  inside a struct declaration. It only add MPI communication 
  * 	  handles if the code is compiled with the flag WITH_MPI.
  */
-#define _MPI_FIELD_DATA
+#define _MPI_FIELD_DATA(_type)
 #ifdef WITH_MPI
 	#undef _MPI_FIELD_DATA
-	#define _MPI_FIELD_DATA MPI_Request *comm_req;
+	#define _MPI_FIELD_DATA(_type) \
+		MPI_Request *comm_req; \
+		_type *sendbuf_ptr;
 #endif 
 
 
@@ -59,7 +61,7 @@
 	{ \
 		_type *ptr; \
 		geometry_descriptor *type; \
-		_MPI_FIELD_DATA \
+		_MPI_FIELD_DATA(_type) \
 		_GPU_FIELD_DATA(_type) \
 	} _name
 

@@ -271,9 +271,9 @@ int finalize_process()
   if (u_gauge_f_flt != NULL)
     free_gfield_f_flt(u_gauge_f_flt);
 
-#ifndef WITH_NEW_GEOMETRY
-  free_geometry_mpi_eo();
-#endif
+// #ifndef WITH_NEW_GEOMETRY
+//   free_geometry_mpi_eo();
+// #endif
   lprintf("SYSTEM", 0, "Process finalized.\n");
 
 #ifdef WITH_MPI

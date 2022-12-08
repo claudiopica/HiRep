@@ -36,6 +36,7 @@
 int main(int argc, char *argv[])
 {
     setup_process(&argc, &argv);
+    atexit(&finalize_process);
 
     if (!(NP_T>1)) {
         lprintf("TEST",1,"This test only works with NP_T>1. Exiting now...\n");
@@ -185,8 +186,6 @@ int main(int argc, char *argv[])
 
     }
 
-    /* close communications */
-    finalize_process();
 
     return 0;
 }
