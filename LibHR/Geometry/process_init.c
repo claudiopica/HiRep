@@ -83,7 +83,7 @@ static void read_cmdline(int argc, char **argv)
       exit(0);
     }
   }
-  // error(ai != 1, 1, "SETUP_GAUGE_FIELDS", "An input file must be defined\n");
+  if (ai != 1) lprintf("PROCESS INIT",1, "Using default input file [%s]\n",input_filename);
 }
 
 void setup_gauge_fields()
@@ -248,10 +248,8 @@ static void setup_random()
 
 /* this function is intended to clean up before process ending
  *
- * return codes:
- * 0 => success
  */
-int finalize_process()
+void finalize_process()
 {
 
   free_ghmc();
@@ -283,8 +281,6 @@ int finalize_process()
   if (init)
     MPI_Finalize();
 #endif
-
-  return 0;
 }
 
 /* setup_replicas

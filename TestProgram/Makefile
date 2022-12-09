@@ -4,7 +4,6 @@ SUBDIRS := $(shell find * -maxdepth 0 -type d)
 #Exclude these directories
 EXCLUDEDIR :=  Deflate RotatedSF 
 SUBDIRS := $(filter-out $(EXCLUDEDIR), $(SUBDIRS))
-SUBDIRS := SpinorField 
 
 LIBS += $(TOPDIR)/LibHR/libhr.a
 

@@ -20,6 +20,7 @@ int proc_id(int coords[4]);
 int geometry_init(void);
 void init_geometry_SAP(void);
 void print_wdmatrix(char *filename);
+void print_gd(geometry_descriptor *gd);
 
 
 // needed when WITH_NEW_GEOMETRY

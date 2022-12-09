@@ -378,3 +378,15 @@ int proc_id(int coords[4])
 	return 0;
 #endif
 }
+
+void print_gd(geometry_descriptor *gd) {
+    lprintf("test",1,"gsize=%d SPINORSIZE=%d SHIFT=%d\n",gd->gsize_gauge,gd->gsize_spinor, gd->master_shift);
+    lprintf("test",1,"local_master=%d total gauge=%d total spinor=%d\n",gd->local_master_pieces, gd->total_gauge_master_pieces, gd->total_spinor_master_pieces);
+    const int nbuffers=(gd->total_gauge_master_pieces > gd->total_spinor_master_pieces) ? gd->total_gauge_master_pieces : gd->total_spinor_master_pieces;
+    for (int i=0; i<nbuffers; i++) {
+        const char *sp=" [spinor]";
+        const int is_spinor=(i<gd->total_spinor_master_pieces);
+        lprintf("test",1,"master start[%d]=%d end[%d]=%d%s\n",i, gd->master_start[i],i, gd->master_end[i],is_spinor?sp:"");
+    }
+}
+

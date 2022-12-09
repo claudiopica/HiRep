@@ -14,6 +14,30 @@
    extern "C" {
 #endif
 
+
+
+#if defined(__clang__)
+    #define _ACCURATE_MATH optnone
+#elif defined(__GNUC__)
+    #define _ACCURATE_MATH optimize("-fno-fast-math")
+#elif defined(__FAST_MATH__)
+#warning Compensated summation is unsafe with -ffast-math
+#endif
+
+/**
+ * @brief Perform Kahan summation
+ *
+ * @param sum		Pointer that contains sum
+ * @param c			Pointer that contains the sum compensation
+ * @param y			Number to add
+ */
+static inline void __attribute__((always_inline,_ACCURATE_MATH)) kadd(double *sum, double *c, double y) {
+  y -= (*c);
+  double t = (*sum) + y;
+  (*c) = (t - (*sum)) - y;
+  (*sum) = t;
+}
+
 /**
  * @brief Collects sum results from the local lattices and sums over all nodes (double).
  *

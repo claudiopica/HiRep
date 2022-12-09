@@ -1020,8 +1020,9 @@ static void syncBoxToBuffer(enum gd_type gd_t, int bytes_per_site, box_t *src, v
     lprintf("SYNC",1,"VOLUME/PARITY: SRC=%d[even=%d]/%d\n", boxVolume(src), boxEvenVolume(src), boxParity(src));
 #endif 
     //EVEN part
-    if (gd_t | EVEN) {
+    if (gd_t & EVEN) {
         const int vol = boxEvenVolume(src);
+        // lprintf("SYNC",1," Copy EVEN\n");
         // printBox(src,1);
         for (int dix=src->base_index; dix<(src->base_index+vol);dix++){
             // lprintf("SYNC",1,"ptr=%p %p\n",src->icoord,sb_icoord);
@@ -1034,8 +1035,9 @@ static void syncBoxToBuffer(enum gd_type gd_t, int bytes_per_site, box_t *src, v
         }
     }
     //ODD part
-    if (gd_t | ODD) {
+    if (gd_t & ODD) {
         const int vol = boxOddVolume(src);
+        // lprintf("SYNC",1," Copy ODD\n");
         for (int dix=src->base_index_odd; dix<(src->base_index_odd+vol);dix++){
             coord4 c = src->icoord[dix];
             int six=ipt_ext(c.x[0],c.x[1],c.x[2],c.x[3]);
@@ -1067,8 +1069,12 @@ void sync_field(geometry_descriptor *gd, int bytes_per_site, int is_spinor_like,
 #ifndef NDEBUG
         lprintf(LOGTAG,50,"Copying to RECV box:\n");
         printBox(L,50);
-        lprintf(LOGTAG,50,"EVEN copying to memory index %d -> %d [len=%d]\n", gd->sbuf_start[2*i], gd->sbuf_start[2*i]+gd->sbuf_len[2*i], gd->sbuf_len[2*i]);
-        lprintf(LOGTAG,50,"ODD copying to memory index %d -> %d [len=%d]\n", gd->sbuf_start[2*i+1], gd->sbuf_start[2*i+1]+gd->sbuf_len[2*i+1], gd->sbuf_len[2*i+1]);
+        if (gd_t == GLOBAL) {
+            lprintf(LOGTAG,50,"EVEN copying to memory index %d -> %d [len=%d]\n", gd->sbuf_start[2*i], gd->sbuf_start[2*i]+gd->sbuf_len[2*i], gd->sbuf_len[2*i]);
+            lprintf(LOGTAG,50,"ODD copying to memory index %d -> %d [len=%d]\n", gd->sbuf_start[2*i+1], gd->sbuf_start[2*i+1]+gd->sbuf_len[2*i+1], gd->sbuf_len[2*i+1]);
+        } else {
+            lprintf(LOGTAG,50,"%s copying to memory index %d -> %d [len=%d]\n", (gd_t==EVEN)?"EVEN":"ODD",gd->sbuf_start[i], gd->sbuf_start[i]+gd->sbuf_len[i], gd->sbuf_len[i]);
+        }
 #endif
         // syncBoxToBuffer_old(gd_t, bytes_per_site, L->sendBox, L, latticebuf, sendbuf_base);
         syncBoxToBuffer(gd_t, bytes_per_site, L->sendBox, latticebuf, sendbuf_base);
