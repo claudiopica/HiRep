@@ -18,16 +18,6 @@
 #include "new_geometry.h"
 #include <stdlib.h>
 
-static int *alloc_mem=NULL;
-
-static void free_memory() {
-  if(alloc_mem!=NULL) {
-    free(alloc_mem);
-    alloc_mem=NULL;
-    iup=idn=NULL;
-    ipt=NULL;
-  }
-}
 static void check_geometry_variables() {
   int tmp;
   long int ltmp;
@@ -345,46 +335,6 @@ int geometry_init() {
   return 0;
 }
 
-//CP: this allocation/free is moved into new_geom.c
-//CP: it must be removed from this file
-void geometry_mem_alloc() {
-#ifndef WITH_NEW_GEOMETRY
-  static int init=1;
-
-  if (init) {
-    int *cur;
-    size_t req_mem=0;
-    unsigned int VOL_SIZE=glattice.gsize_gauge;
-
-    req_mem+=2*4*VOL_SIZE; /* for iup and idn */
-    req_mem+=(X+2*X_BORDER)*(Y+2*Y_BORDER)*(Z+2*Z_BORDER)*(T+2*T_BORDER);     /* for ipt */
-
-    alloc_mem=malloc(req_mem*sizeof(int));
-    error((alloc_mem==NULL),1,"geometry_init [geometry_init.c]",
-	"Cannot allocate memory");
-
-    cur=alloc_mem;
-#define ALLOC(ptr,size) ptr=cur; cur+=(size) 
-
-    /* iup and idn */
-    ALLOC(iup,4*VOL_SIZE);
-    ALLOC(idn,4*VOL_SIZE);
-    /* ipt */
-
-    ALLOC(ipt,(X+2*X_BORDER)*(Y+2*Y_BORDER)*(Z+2*Z_BORDER)*(T+2*T_BORDER));
-    /* ipt_4d */
-
-
-    atexit(&free_memory);
-
-    init=0;
-#undef ALLOC
-
-  }
-#endif
-}
-
-
 int proc_up(int id, int dir) 
 {
 #ifdef WITH_MPI
@@ -429,3 +379,15 @@ int proc_id(int coords[4])
 	return 0;
 #endif
 }
+
+void print_gd(geometry_descriptor *gd) {
+    lprintf("test",1,"gsize=%d SPINORSIZE=%d SHIFT=%d\n",gd->gsize_gauge,gd->gsize_spinor, gd->master_shift);
+    lprintf("test",1,"local_master=%d total gauge=%d total spinor=%d\n",gd->local_master_pieces, gd->total_gauge_master_pieces, gd->total_spinor_master_pieces);
+    const int nbuffers=(gd->total_gauge_master_pieces > gd->total_spinor_master_pieces) ? gd->total_gauge_master_pieces : gd->total_spinor_master_pieces;
+    for (int i=0; i<nbuffers; i++) {
+        const char *sp=" [spinor]";
+        const int is_spinor=(i<gd->total_spinor_master_pieces);
+        lprintf("test",1,"master start[%d]=%d end[%d]=%d%s\n",i, gd->master_start[i],i, gd->master_end[i],is_spinor?sp:"");
+    }
+}
+

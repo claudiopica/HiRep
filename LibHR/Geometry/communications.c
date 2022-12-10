@@ -703,7 +703,11 @@ void start_sf_sendrecv(spinor_field *sf)
   for (i = 0; i < (gd->nbuffers_spinor); ++i)
   {
     /* send ith buffer */
-    mpiret = MPI_Isend((double *)((sf->sendbuf_ptr) + (gd->sbuf_start[i]) - (gd->master_shift)), /* buffer */
+    int shift = gd->master_shift;
+#ifdef WITH_NEW_GEOMETRY
+    shift = 0;
+#endif
+    mpiret = MPI_Isend((double *)((sf->sendbuf_ptr) + (gd->sbuf_start[i]) - shift), /* buffer */
                        (gd->sbuf_len[i]) * (sizeof(suNf_spinor) / sizeof(double)),       /* lenght in units of doubles */
                        MPI_DOUBLE,                                                       /* basic datatype */
                        gd->sbuf_to_proc[i],                                              /* cid of destination */

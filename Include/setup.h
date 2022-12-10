@@ -42,7 +42,7 @@ int setup_process(int *argc, char ***argv);
 /**
  * @brief Finalize process at the end of each run
  */
-int finalize_process(void);
+void finalize_process(void);
 
 /**
  * @brief Initialize gauge fields

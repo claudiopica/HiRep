@@ -23,6 +23,33 @@
   for (int ip = 0; ip < (type)->local_master_pieces; ip++)
 
 /**
+ * @brief Reduced iteration over sites of a given piece. Variables given as redop parameters
+ * 	  are reduced using an OpenMP reduction sum.
+ *
+ * @param type		geometry_descriptor that contains information on the geometry
+ * 			of the local and global lattice
+ * @param ip		Identifying index of the current piece
+ * @param is		Local variable that runs over all site indices on the piece
+ * @param redop1        Variable to reduce
+ * @param redop2	Variable to reduce
+ *
+ */
+#define _SITE_FOR_RED(type, ip, is, redop1, redop2) \
+  _OMP_PRAGMA(_omp_parallel)                        \
+  _OMP_PRAGMA(_omp_for redop1 redop2)               \
+  for (int is = (type)->master_start[ip]; is <= (type)->master_end[ip]; is++)
+
+/**
+ * @brief Iterate over sites of a given piece.
+ *
+ * @param type		geometry_descriptor that contains information on the geometry of
+ * 			the local lattice
+ * @param ip		Identifying index of the current piece
+ * @param is		Local variable that runs over all site indices on the given piece
+ */
+#define _SITE_FOR(type, ip, is) _SITE_FOR_RED(type, ip, is, nowait, )
+
+/**
  * @brief Iterate over sites on a given piece and omp-reduce using a sum.
  *
  * @param type		geometry_descriptor that contains information on the geometry
@@ -65,6 +92,15 @@
 #define _MASTER_FOR_RED(type, is, redop1, redop2) \
   _PIECE_FOR((type), _master_for_ip_##is)         \
   _SITE_FOR_RED((type), _master_for_ip_##is, is, redop1, redop2)
+
+/**
+ * @brief Iterate over all sites of the local lattice
+ *
+ * @param type		geometry_descriptor that contains information on the geometry
+ * 			of the local lattice
+ * @param is		Local variable that runs over all site indices
+ */
+#define _MASTER_FOR(type, is) _MASTER_FOR_RED(type, is, , )
 
 /**
  * @brief Reduced iteration over all sites of the local lattice and omp-reduce using a sum.
@@ -138,6 +174,43 @@
   _TWO_SPINORS_MATCHING(s1,s2); \
   _TWO_SPINORS_MATCHING(s1,s3); \
   _ONE_SPINOR_FOR_RED(s1,redop1,redop2)
+
+
+/**
+ * @brief Iterate over all sites of the local lattice but not by index in memory but by
+ *        spinor. The current spinor can be found using _SPINOR_PTR(s). 
+ *
+ * @param s		Input spinor field
+ */
+#define _ONE_SPINOR_FOR(s) _ONE_SPINOR_FOR_RED(s,,)
+
+/**
+ * @brief Iterate over two corresponding spinors on the given fields. The current spinors 
+ * 	  can be found using _SPINOR_PTR(s1) and _SPINOR_PTR(s2).
+ *
+ * @param s1		First input spinor field
+ * @param s2		Second input spinor field
+ */
+#define _TWO_SPINORS_FOR(s1,s2) _TWO_SPINORS_FOR_RED(s1,s2,,)
+
+/**
+ * @brief Iterate over all three corresponding spinors on the given fields. The current 
+ * 	  spinors can be found using _SPINOR_PTR(s1), _SPINOR_PTR(s2), _SPINOR_PTR(s3).
+ *
+ * @param s1		First input spinor field
+ * @param s2		Second input spinor field
+ * @param s3		Third input spinor field
+ */
+#define _THREE_SPINORS_FOR(s1,s2,s3) _THREE_SPINORS_FOR_RED(s1,s2,s3,,)
+
+/**
+ * @brief Retrieve current spinor field. This macro only works insite _SPINOR_FOR, 
+ * 	  _TWO_SPINORS_FOR or _THREE_SPINORS_FOR.
+ *
+ * @param s 		Spinor field that is being iterated over.
+ */
+#define _SPINOR_PTR(s) _FIELD_AT(s,_spinor_for_is)
+
 
 #ifdef __cplusplus
   }

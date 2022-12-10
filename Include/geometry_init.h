@@ -13,19 +13,30 @@
 void origin_coord(int *c);
 void other_proc_origin_coord(int *proc_coord, int *c);
 void glb_to_proc(int *g, int *p);
-
-int geometry_init(void);
-void geometry_mpi_eo(void);
-void geometry_mem_alloc(void);
 int proc_up(int id, int dir);
 int proc_dn(int id, int dir);
+int proc_id(int coords[4]);
 
-void free_geometry_mpi_eo(void);
-
+int geometry_init(void);
 void init_geometry_SAP(void);
+void print_wdmatrix(char *filename);
+void print_gd(geometry_descriptor *gd);
+
+
+// needed when WITH_NEW_GEOMETRY
+#include <stddef.h>
+void define_geometry();
+void* sendbuf_alloc(size_t bytes_per_site);
+void sync_field(geometry_descriptor *gd, int byte_per_site, int is_spinor_like, void *latticebuf, void *sb_ptr);
+int test_define_geometry();
+void sendbuf_report();
+
+// needed for old gemetry
+void geometry_mpi_eo(void);
+void geometry_mem_alloc(void);
 void test_geometry_mpi(void);
 void test_geometry_mpi_eo(void);
-void print_wdmatrix(char *filename);
+void free_geometry_mpi_eo(void);
 
 #ifdef WITH_GPU
 #include "gpu.h"

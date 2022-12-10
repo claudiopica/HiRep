@@ -128,6 +128,99 @@ static void init_hb_boundary()
 #endif
 }
 
+#ifdef WITH_NEW_GEOMETRY
+#define FULL_MASK ((1u << 8)-1)
+static void update_all(double *beta, int type)
+{
+  static int count = PROJECT_INTERVAL;
+
+  if (count >= PROJECT_INTERVAL)
+  {
+    project_gauge_field();
+    count = 0;
+  }
+  ++count;
+
+  _OMP_PRAGMA(_omp_parallel)
+  {
+    suNg v;
+
+    for (int mu = 0; mu < 4; mu++)
+    {
+      char mask=FULL_MASK;
+#ifdef WITH_MPI
+      _OMP_PRAGMA(master)
+      {
+        start_gf_sendrecv(u_gauge);
+      }
+      _OMP_PRAGMA(barrier)
+#endif
+      _OMP_PRAGMA(_omp_for)
+      for (int j = glat_even.master_start[0]; j <= glat_even.master_end[0]; j++)
+      {
+        if (dyn_gauge[j * 4 + mu] != 0 && (imask[j]==mask))
+        {
+          staples(j, mu, &v);
+          cabmar(*beta, pu_gauge(j, mu), &v, type);
+        }
+      }
+#ifdef WITH_MPI
+      _OMP_PRAGMA(master)
+      {
+        complete_gf_sendrecv(u_gauge);
+      }
+      _OMP_PRAGMA(barrier)
+#endif
+      _OMP_PRAGMA(_omp_for)
+      for (int j = glat_even.master_start[0]; j <= glat_even.master_end[0]; j++)
+      {
+        if (dyn_gauge[j * 4 + mu] != 0 && !(imask[j]==mask))
+        {
+          staples(j, mu, &v);
+          cabmar(*beta, pu_gauge(j, mu), &v, type);
+        }
+      }
+    }
+
+    for (int mu = 0; mu < 4; mu++)
+    {
+      char mask=FULL_MASK;
+#ifdef WITH_MPI
+      _OMP_PRAGMA(master)
+      {
+        start_gf_sendrecv(u_gauge);
+      }
+      _OMP_PRAGMA(barrier)
+#endif
+      _OMP_PRAGMA(_omp_for)
+      for (int j = glat_odd.master_start[0]; j <= glat_odd.master_end[0]; j++)
+      {
+        if (dyn_gauge[j * 4 + mu] != 0 && (imask[j]==mask))
+        {
+          staples(j, mu, &v);
+          cabmar(*beta, pu_gauge(j, mu), &v, type);
+        }
+      }
+#ifdef WITH_MPI
+      _OMP_PRAGMA(master)
+      {
+        complete_gf_sendrecv(u_gauge);
+      }
+      _OMP_PRAGMA(barrier)
+#endif
+      _OMP_PRAGMA(_omp_for)
+      for (int j = glat_odd.master_start[0]; j <= glat_odd.master_end[0]; j++)
+      {
+        if (dyn_gauge[j * 4 + mu] != 0 && !(imask[j]==mask))
+        {
+          staples(j, mu, &v);
+          cabmar(*beta, pu_gauge(j, mu), &v, type);
+        }
+      }
+    }
+  }
+}
+#else
 static void update_all(double *beta, int type)
 {
   static int count = PROJECT_INTERVAL;
@@ -222,6 +315,7 @@ static void update_all(double *beta, int type)
     }
   }
 }
+#endif
 
 void update(double *beta, int nhb, int nor)
 {

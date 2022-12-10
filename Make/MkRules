@@ -87,18 +87,19 @@ ifndef REPR
 endif
 
 
-_MkRules_default_target: $(EXES) $(OBJS) $(ALIBNAME)
+_MkRules_default_target: 
+	$(MAKE) -Otarget $(EXES) $(OBJS) $(ALIBNAME)
 
 _objs: $(OBJS)
 
 .%.d: SRC=$(patsubst .%.d,%.c,$@)
 .%.d: %.c $(INCDIR)/.autoheaders.h
 	if test "$(call _testdir, $@)" = ""; then \
-	  echo -n "$(_col_deps)Dependences$(_col_norm) for $(call _cfname,$(call _rname,$(SRC)))..." ;\
+	  echo -n "$(_col_deps)Dependences$(_col_norm) for $(call _cfname,$(call _rname,$(SRC)))..." &&\
 	  ($(GCC) -MM -MG -MT "$@ $(patsubst .%.d,%.o,$@)" $(CPPFLAGS) $(SRC) > $@ &&\
 	  echo " $(_cdone)" || ( echo " $(_cfailed)" && false ) )\
 	else \
-	  $(MAKE) -C $(dir $@) $(notdir $@) ;\
+	  $(MAKE) -Orecurse -C $(dir $@) $(notdir $@) ;\
 	fi
 
 DFILES = $(findstring .d,$(MAKEFILES))
@@ -111,23 +112,23 @@ RBLD = $(if $(DFILES),,rebuild)
 	  if test "$(DFILES)" = ""; then \
 	    MAKEFILES="$(DEP)" $(MAKE) $@ ;\
 	  else \
-	    echo -n "$(_col_comp)Compiling$(_col_norm) $(call _cfname,$(call _rname,$(CURDIR)/$@))..." ;\
+	    echo -n "$(_col_comp)Compiling$(_col_norm) $(call _cfname,$(call _rname,$(CURDIR)/$@))..." &&\
 	    $(CC) $(GPUOPT) -c $(CFLAGS) $(CPPFLAGS) $(SRC) &&\
 	    echo " $(_cdone)" || ( echo " $(_cfailed)" && false) ;\
 	  fi ;\
 	else \
-	  MAKEFILES="$(patsubst %.o,.%.d,$(notdir $@))" $(MAKE) -C $(dir $@) $(notdir $@) ;\
+	  MAKEFILES="$(patsubst %.o,.%.d,$(notdir $@))" $(MAKE) -Orecurse -C $(dir $@) $(notdir $@) ;\
 	fi
 
 
 $(INCDIR)/.autoheaders.h: $(MKDIR)/MkFlags 
 	if  test "$(call _testdir, $@)" != ""; then \
-	  $(MAKE) -C $(dir $@) $(notdir $@) ;\
+	  $(MAKE) -Orecurse -C $(dir $@) $(notdir $@) ;\
 	fi 
 
 %.c:
 	if  test "$(call _testdir, $@)" != ""; then \
-	  $(MAKE) -C $(dir $@) $(notdir $@) ;\
+	  $(MAKE) -Orecurse -C $(dir $@) $(notdir $@) ;\
 	fi
 
 %.h:
@@ -142,12 +143,12 @@ LIBOBJS=$(if $(LIBDIRS),$(shell find $(LIBDIRS) -name *.o),)
 %.a: $(if $(ALIBNAME),$(OBJS),) | $(patsubst %,lib-%,$(LIBDIRS))
 	if  test "$(call _testdir, $@)" = ""; then \
 		if test "$(strip $(LIBOBJS))" != ""; then \
-			echo -n "$(_col_link)Creating library$(_col_norm) $(call _cfname,$(LNAME))..." ;\
+			echo -n "$(_col_link)Creating library$(_col_norm) $(call _cfname,$(LNAME))..." &&\
 			ar -rcs $(ALIBNAME) $(LIBOBJS) 2>/dev/null &&\
 			echo " $(_cdone)" || ( echo " $(_cfailed)" && false) ;\
 		fi ;\
 	else \
-	  $(MAKE) -C $(dir $@) $(notdir $@) ;\
+	  $(MAKE) -Orecurse -C $(dir $@) $(notdir $@) ;\
 	fi
 
 $(ALIBNAME) $(notdir $(ALIBNAME)): $(LIBOBJS) $(OBJ)
@@ -156,7 +157,7 @@ $(ALIBNAME) $(notdir $(ALIBNAME)): $(LIBOBJS) $(OBJ)
 $(LIBS): $(if $(call _testdir, $@),,rebuild) $(INCDIR)/.autoheaders.h
 	if ! test -f $(dir $@)/.lib.updated ; then \
 	  if  test "$(call _testdir, $@)" != ""; then \
-	    $(MAKE) -C $(dir $@) $(notdir $@) ;\
+	    $(MAKE) -Orecurse -C $(dir $@) $(notdir $@) ;\
 	  fi ;\
 	fi
 
@@ -173,7 +174,7 @@ WRREPRDIR = $(MKDIR)/Utils/autosun
 WRREPR = $(WRREPRDIR)/writeREPR
 
 $(WRREPR): $(MKDIR)/MkFlags
-	make -C $(WRREPRDIR) $(notdir $@)
+	make -Orecurse -C $(WRREPRDIR) $(notdir $@)
 
 
 .PHONY: rebuild clean _objs $(patsubst %,clean-%,$(SUBDIRS)) $(patsubst %,lib-%,$(LIBDIRS)) cleanall _MkRules_default_target default
@@ -182,17 +183,17 @@ $(patsubst %,clean-%,$(SUBDIRS)):
 	$(MAKE) -C $(patsubst clean-%,%,$@) clean
 
 clean:: $(patsubst %,clean-%,$(SUBDIRS))
-	echo -n "$(_col_clean)Cleaning$(_col_norm) $(call _cfname,$(CDIR))..."
-	rm -f *.o *.rpo *~ *.il *.dyn *.ii *.s .*.d *.a cinfo.c .lib.updated debug err_* out_*
+	echo -n "$(_col_clean)Cleaning$(_col_norm) $(call _cfname,$(CDIR))..." &&\
+	rm -f *.o *.rpo *~ *.il *.dyn *.ii *.s .*.d *.a cinfo.c .lib.updated debug err_* out_* &&\
 	echo " $(_cdone)"
 	if test "$(EXES)" != "" -a "$(CEXE)" != "" ; then \
-	  echo -n "$(_col_clean)Removing EXEs$(_col_norm) in $(call _cfname,$(CDIR))..." ;\
-	  rm -f $(EXES) ;\
+	  echo -n "$(_col_clean)Removing EXEs$(_col_norm) in $(call _cfname,$(CDIR))..." &&\
+	  rm -f $(EXES) &&\
 	  echo " $(_cdone)" ;\
 	fi
 
 cleanall::
-	CEXE="all" $(MAKE) clean
+	CEXE="all" $(MAKE) -Oline clean
 
 LOCK_CINFO:= lock.cinfo
 
@@ -206,7 +207,7 @@ LDFLAGS += -lm
 
 define LINK_template
 $(1): $(1).o $$($(1)_OBJS) $$(COMMON_OBJS) $$(LIBS)
-	echo -n "$$(_col_link)Linking$$(_col_norm) $$(call _cfname,$$@)..." 
+	echo -n "$$(_col_link)Linking$$(_col_norm) $$(call _cfname,$$@)..." &&\
 	$$(CC) -o $$@ $$< $$($(1)_OBJS) $$(COMMON_OBJS) $$(LDFLAGS) &&\
 	echo " $$(_cdone)" || ( echo " $$(_cfailed)" && false )
 endef

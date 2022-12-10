@@ -56,7 +56,7 @@
             if (f->comm_req != NULL)                                                                        \
                 afree(f->comm_req)                                                                          \
 
-        #define _ALLOC_MPI_FIELD_DATA(_name, _size)                                                                \
+        #define _ALLOC_MPI_FIELD_DATA(_name, _size)                                                         \
             if (type->nbuffers_gauge > 0)                                                                   \
             {                                                                                               \
                 f->comm_req = amalloc(2 * type->nbuffers_gauge * sizeof(MPI_Request), ALIGN);               \
