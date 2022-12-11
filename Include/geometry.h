@@ -27,6 +27,7 @@
 #include "geometry_init.h"
 #include "cpu_geometry.h"
 #include "geometry_check.h"
+#include "geometry_maskstate.h"
 #ifdef WITH_GPU
    #include "gpu_geometry.h"
 #endif

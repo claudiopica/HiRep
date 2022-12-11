@@ -56,8 +56,9 @@ MACRO += -DWITH_NEW_GEOMETRY
 ifeq (,$(findstring -DWITH_GPU,$(MACRO))) #Compile CPU only
     CFLAGS = -Wall -Wshadow -std=c99 -O3 -g
     CC = gcc
+    # OMPI_MPICC = gcc
     MPICC = mpicc
-    LDFLAGS =
+    LDFLAGS = -rdynamic
     INCLUDE =
 else
     ifeq (,$(findstring -DWITH_MPI,$(MACRO))) # Compile on GPU but without MPI

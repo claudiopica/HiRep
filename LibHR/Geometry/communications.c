@@ -269,46 +269,30 @@ static void sync_gauge_field(suNg_field *gf) {
 }
 #else
 static void sync_gauge_field(suNg_field *gf) {
-  int i;
   geometry_descriptor *gd = gf->type;
-  /* int j, mu, x, y; */
-
-  for (i = 0; i < gd->ncopies_gauge; ++i)
+  for (int i = 0; i < gd->ncopies_gauge; ++i)
   {
     /* this assumes that the 4 directions are contiguous in memory !!! */
     memcpy(((gf->ptr) + 4 * gd->copy_to[i]), ((gf->ptr) + 4 * gd->copy_from[i]), 4 * (gd->copy_len[i]) * sizeof(*(gf->ptr)));
-    /*
-         for(j=0; j<gd->copy_len[i]; j++) {
-         x=gd->copy_from[i]+j;
-         y=gd->copy_to[i]+j;
-         for(mu=0; mu<4; mu++)
-     *pu_gauge(y,mu) = *pu_gauge(x,mu);
-     }
-     */
   }
 }
 #endif
 
+#ifdef WITH_NEW_GEOMETRY
+static void sync_clover_force_field(suNf_field *gf) {
+  sync_field(gf->type, 6*sizeof(*gf->ptr), 0, gf->ptr, gf->sendbuf_ptr);
+}
+#else
 static void sync_clover_force_field(suNf_field *gf)
 {
-  int i;
   geometry_descriptor *gd = gf->type;
-  /* int j, mu, x, y; */
-
-  for (i = 0; i < gd->ncopies_gauge; ++i)
+  for (int i = 0; i < gd->ncopies_gauge; ++i)
   {
     /* this assumes that the 6 directions are contiguous in memory !!! */
     memcpy(((gf->ptr) + 6 * gd->copy_to[i]), ((gf->ptr) + 6 * gd->copy_from[i]), 6 * (gd->copy_len[i]) * sizeof(*(gf->ptr)));
-    /*
-         for(j=0; j<gd->copy_len[i]; j++) {
-         x=gd->copy_from[i]+j;
-         y=gd->copy_to[i]+j;
-         for(mu=0; mu<4; mu++)
-     *pu_gauge(y,mu) = *pu_gauge(x,mu);
-     }
-     */
   }
 }
+#endif
 
 #ifdef WITH_NEW_GEOMETRY
 static void sync_spinor_field(spinor_field *p) {
@@ -316,24 +300,19 @@ static void sync_spinor_field(spinor_field *p) {
 }
 #else
 static void sync_spinor_field(spinor_field *p) {
-  int i;
-  /* int j, x, y; */
   geometry_descriptor *gd = p->type;
-
-  for (i = 0; i < gd->ncopies_spinor; ++i)
+  for (int i = 0; i < gd->ncopies_spinor; ++i)
   {
     memcpy((p->ptr + gd->copy_to[i] - gd->master_shift), (p->ptr + gd->copy_from[i] - gd->master_shift), (gd->copy_len[i]) * sizeof(*(p->ptr)));
-    /*
-       for(j=0; j<gd->copy_len[i]; j++) {
-       x=gd->copy_from[i]+j;
-       y=gd->copy_to[i]+j;
-       p->ptr[y] = p->ptr[x];
-       }
-       */
   }
 }
 #endif
 
+#ifdef WITH_NEW_GEOMETRY
+static void sync_gauge_transf(suNg_field *gf) {
+  sync_field(gf->type, sizeof(*gf->ptr), 0, gf->ptr, gf->sendbuf_ptr);
+}
+#else
 static void sync_gauge_transf(suNg_field *gf)
 {
   int i;
@@ -344,25 +323,22 @@ static void sync_gauge_transf(suNg_field *gf)
     memcpy(((gf->ptr) + gd->copy_to[i]), ((gf->ptr) + gd->copy_from[i]), (gd->copy_len[i]) * sizeof(*(gf->ptr)));
   }
 }
+#endif
 
+#ifdef WITH_NEW_GEOMETRY
+static void sync_suNg_scalar_field(suNg_scalar_field *gf) {
+  sync_field(gf->type, sizeof(*gf->ptr), 1, gf->ptr, gf->sendbuf_ptr);
+}
+#else
 static void sync_suNg_scalar_field(suNg_scalar_field *p)
 {
-  int i;
-  /* int j, x, y; */
   geometry_descriptor *gd = p->type;
-
-  for (i = 0; i < gd->ncopies_spinor; ++i)
+  for (int i = 0; i < gd->ncopies_spinor; ++i)
   {
     memcpy((p->ptr + gd->copy_to[i] - gd->master_shift), (p->ptr + gd->copy_from[i] - gd->master_shift), (gd->copy_len[i]) * sizeof(*(p->ptr)));
-    /*
-     for(j=0; j<gd->copy_len[i]; j++) {
-     x=gd->copy_from[i]+j;
-     y=gd->copy_to[i]+j;
-     p->ptr[y] = p->ptr[x];
-     }
-     */
   }
 }
+#endif
 #endif /* WITH_MPI */
 
 /* This variable contains the information of the current status of communications
@@ -446,7 +422,7 @@ void start_clover_force_sendrecv(suNf_field *gf)
   for (i = 0; i < (gd->nbuffers_gauge); ++i)
   {
     /* send ith buffer */
-    mpiret = MPI_Isend((double *)((gf->ptr) + 6 * gd->sbuf_start[i]),         /* buffer */
+    mpiret = MPI_Isend((double *)((gf->sendbuf_ptr) + 6 * gd->sbuf_start[i]),         /* buffer */
                        (gd->sbuf_len[i]) * sizeof(suNf) / sizeof(double) * 6, /* lenght in units of doubles */
                        MPI_DOUBLE,                                            /* basic datatype */
                        gd->sbuf_to_proc[i],                                   /* cid of destination */
@@ -489,12 +465,21 @@ void start_clover_force_sendrecv(suNf_field *gf)
 #endif /* WITH_MPI */
 }
 
+
+static void *gf_sendrecv_guard=NULL;
+
 void complete_gf_sendrecv(suNg_field *gf)
 {
 #ifdef WITH_MPI
   int mpiret;
   (void)mpiret; // Remove warning of variable set but not used
   int nreq = 2 * gf->type->nbuffers_gauge;
+
+#ifdef WITH_NEW_GEOMETRY
+  if (gf_sendrecv_guard!=NULL && gf_sendrecv_guard != gf->comm_req)  
+    error(1, 1, "complete_gf_sendrecv " __FILE__, "More simultaneous communication attempted. Existing...\n");
+  gf_sendrecv_guard = NULL;
+#endif
 
   if (nreq > 0)
   {
@@ -551,6 +536,10 @@ void start_gf_sendrecv(suNg_field *gf)
   /* bisognerebbe forse avere una variabile di stato nei campi?? */
   complete_gf_sendrecv(gf);
 
+#ifdef WITH_NEW_GEOMETRY
+  gf_sendrecv_guard=(void*)gf->comm_req;
+#endif
+
   /* fill send buffers */
   sync_gauge_field(gf);
 
@@ -606,6 +595,9 @@ void start_gf_sendrecv(suNg_field *gf)
 #endif /* WITH_MPI */
 }
 
+
+static void *sf_sendrecv_guard=NULL;
+
 void complete_sf_sendrecv(spinor_field *sf)
 {
 #ifdef WITH_MPI
@@ -613,10 +605,17 @@ void complete_sf_sendrecv(spinor_field *sf)
   (void)mpiret; // Remove warning of variable set but not used
   int nreq = 2 * sf->type->nbuffers_spinor;
 
+#ifdef WITH_NEW_GEOMETRY
+  if (sf_sendrecv_guard!=NULL && sf_sendrecv_guard != sf->comm_req) {
+    print_trace();
+    error(1, 1, "complete_sf_sendrecv " __FILE__, "More simultaneous communication attempted. Existing...\n");
+  }
+  sf_sendrecv_guard = NULL;
+#endif
+
   if (nreq > 0)
   {
     MPI_Status status[nreq];
-
     mpiret = MPI_Waitall(nreq, sf->comm_req, status);
 
 #ifndef NDEBUG
@@ -668,6 +667,10 @@ void start_sf_sendrecv(spinor_field *sf)
   /* bisognerebbe forse avere una variabile di stato nei campi?? */
   complete_sf_sendrecv(sf);
 
+#ifdef WITH_NEW_GEOMETRY
+  sf_sendrecv_guard=(void*)sf->comm_req;
+#endif
+
   /* fill send buffers */
   sync_spinor_field(sf);
 #ifdef MPI_TIMING
@@ -678,7 +681,6 @@ void start_sf_sendrecv(spinor_field *sf)
 
   for (i = 0; i < (gd->nbuffers_spinor); ++i)
   {
-
     /* receive ith buffer */
     mpiret = MPI_Irecv((double *)((sf->ptr) + (gd->rbuf_start[i]) - (gd->master_shift)), /* buffer */
                        (gd->rbuf_len[i]) * (sizeof(suNf_spinor) / sizeof(double)),       /* lenght in units of doubles */
@@ -700,13 +702,14 @@ void start_sf_sendrecv(spinor_field *sf)
 #endif
   }
 
+  int shift = gd->master_shift;
+#ifdef WITH_NEW_GEOMETRY
+  shift = 0;
+#endif
+
+    /* send ith buffer */
   for (i = 0; i < (gd->nbuffers_spinor); ++i)
   {
-    /* send ith buffer */
-    int shift = gd->master_shift;
-#ifdef WITH_NEW_GEOMETRY
-    shift = 0;
-#endif
     mpiret = MPI_Isend((double *)((sf->sendbuf_ptr) + (gd->sbuf_start[i]) - shift), /* buffer */
                        (gd->sbuf_len[i]) * (sizeof(suNf_spinor) / sizeof(double)),       /* lenght in units of doubles */
                        MPI_DOUBLE,                                                       /* basic datatype */
@@ -788,7 +791,7 @@ void start_gt_sendrecv(suNg_field *gf)
   for (i = 0; i < (gd->nbuffers_gauge); ++i)
   {
     /* send ith buffer */
-    mpiret = MPI_Isend((double *)((gf->ptr) + gd->sbuf_start[i]),         /* buffer */
+    mpiret = MPI_Isend((double *)((gf->sendbuf_ptr) + gd->sbuf_start[i]),         /* buffer */
                        (gd->sbuf_len[i]) * sizeof(suNg) / sizeof(double), /* lenght in units of doubles */
                        MPI_DOUBLE,                                        /* basic datatype */
                        gd->sbuf_to_proc[i],                               /* cid of destination */
@@ -901,10 +904,15 @@ void start_sc_sendrecv(suNg_scalar_field *sf)
   sf_control = 1;
 #endif
 
+  int shift = gd->master_shift;
+#ifdef WITH_NEW_GEOMETRY
+  shift = 0;
+#endif
+
   for (i = 0; i < (gd->nbuffers_spinor); ++i)
   {
     /* send ith buffer */
-    mpiret = MPI_Isend((double *)((sf->ptr) + (gd->sbuf_start[i]) - (gd->master_shift)), /* buffer */
+    mpiret = MPI_Isend((double *)((sf->sendbuf_ptr) + (gd->sbuf_start[i]) - shift), /* buffer */
                        (gd->sbuf_len[i]) * (sizeof(suNg_vector) / sizeof(double)),       /* lenght in units of doubles */
                        MPI_DOUBLE,                                                       /* basic datatype */
                        gd->sbuf_to_proc[i],                                              /* cid of destination */

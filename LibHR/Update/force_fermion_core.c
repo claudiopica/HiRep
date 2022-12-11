@@ -785,6 +785,138 @@ void force_clover_logdet(double mass, double residue)
 /* ------------------------------------ */
 /* CALCULATE FORCE OF THE HOPPING TERM  */
 /* ------------------------------------ */
+#ifdef WITH_NEW_GEOMETRY
+void force_fermion_core(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, double dt, double residue)
+{
+	double coeff;
+	spinor_field Xtmp, Ytmp;
+
+	coeff = residue * dt * (_REPR_NORM2 / _FUND_NORM2);
+	Xtmp = *Xs;
+	Ytmp = *Ys;
+	Xs->type = &glattice;
+	Ys->type = &glattice;
+
+#ifdef UPDATE_EO
+
+	if (auto_fill_odd)
+	{
+		spinor_field Xe, Xo, Ye, Yo;
+
+		Xe = *Xs;
+		Xe.type = &glat_even;
+		Xo = *Xs;
+		Xo.ptr = Xs->ptr + glat_odd.master_shift;
+		Xo.type = &glat_odd;
+
+		Ye = *Ys;
+		Ye.type = &glat_even;
+		Yo = *Ys;
+		Yo.type = &glat_odd;
+		Yo.ptr = Ys->ptr + glat_odd.master_shift;
+
+		Dphi_(&Xo, &Xe);
+		Dphi_(&Yo, &Ye);
+#if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
+		Cphi_diag_inv(get_dirac_mass(), &Xo, &Xo);
+		Cphi_diag_inv(get_dirac_mass(), &Yo, &Yo);
+#endif
+	}
+
+	coeff = -coeff;
+
+#endif //UPDATE_EO
+
+	// Communicate spinor field
+	start_sf_sendrecv(Xs);
+	complete_sf_sendrecv(Xs);
+	start_sf_sendrecv(Ys);
+	complete_sf_sendrecv(Ys);
+
+	// HERE!!!!!
+#if defined(WITH_CLOVER)
+	force_clover_fermion(Xs, Ys, residue);
+#endif
+#if defined(WITH_EXPCLOVER)
+#if (NF == 3 || NF == 2)
+	//	force_clover_fermion_taylor(Xs, Ys, residue);
+	force_clover_fermion(Xs, Ys, residue);
+#else
+	force_clover_fermion_taylor(Xs, Ys, residue);
+#endif
+#endif //EXP_CLOVER
+
+	// Loop over lattice
+	_MASTER_FOR(&glattice, ix)
+	{
+		suNg_algebra_vector f;
+		suNf_vector ptmp;
+		suNf_spinor p;
+
+		suNf_FMAT s1;
+		int iy;
+		suNf_spinor *chi1, *chi2;
+
+		// Direction 0
+		iy = iup(ix, 0);
+		_suNf_FMAT_zero(s1);
+		chi1 = _FIELD_AT(Xs, ix);
+		chi2 = _FIELD_AT(Ys, iy);
+		_F_DIR0(s1, chi1, chi2);
+		chi1 = _FIELD_AT(Ys, ix);
+		chi2 = _FIELD_AT(Xs, iy);
+		_F_DIR0(s1, chi1, chi2);
+
+		_algebra_project_FMAT(f, s1);
+		_algebra_vector_mul_add_assign_g(*_4FIELD_AT(force_sum, ix, 0), coeff, f);
+
+		// Direction 1
+		iy = iup(ix, 1);
+		_suNf_FMAT_zero(s1);
+		chi1 = _FIELD_AT(Xs, ix);
+		chi2 = _FIELD_AT(Ys, iy);
+		_F_DIR1(s1, chi1, chi2);
+		chi1 = _FIELD_AT(Ys, ix);
+		chi2 = _FIELD_AT(Xs, iy);
+		_F_DIR1(s1, chi1, chi2);
+
+		_algebra_project_FMAT(f, s1);
+		_algebra_vector_mul_add_assign_g(*_4FIELD_AT(force_sum, ix, 1), coeff, f);
+
+		// Direction 2
+		iy = iup(ix, 2);
+		_suNf_FMAT_zero(s1);
+		chi1 = _FIELD_AT(Xs, ix);
+		chi2 = _FIELD_AT(Ys, iy);
+		_F_DIR2(s1, chi1, chi2);
+		chi1 = _FIELD_AT(Ys, ix);
+		chi2 = _FIELD_AT(Xs, iy);
+		_F_DIR2(s1, chi1, chi2);
+
+		_algebra_project_FMAT(f, s1);
+		_algebra_vector_mul_add_assign_g(*_4FIELD_AT(force_sum, ix, 2), coeff, f);
+
+		// Direction 3
+		iy = iup(ix, 3);
+		_suNf_FMAT_zero(s1);
+		chi1 = _FIELD_AT(Xs, ix);
+		chi2 = _FIELD_AT(Ys, iy);
+		_F_DIR3(s1, chi1, chi2);
+		chi1 = _FIELD_AT(Ys, ix);
+		chi2 = _FIELD_AT(Xs, iy);
+		_F_DIR3(s1, chi1, chi2);
+
+		_algebra_project_FMAT(f, s1);
+		_algebra_vector_mul_add_assign_g(*_4FIELD_AT(force_sum, ix, 3), coeff, f);
+	}	  // master for
+
+	// Reset spinor geometry
+	Xs->type = Xtmp.type;
+	Ys->type = Ytmp.type;
+
+	//lprintf("Check", 0, "step spinor in force on a point %.14e %.14e\n", creal((*_FIELD_AT(Xs, ipt(1, 1, 1, 1))).c[0].c[0]), creal((*_FIELD_AT(Ys, ipt(1, 1, 1, 1))).c[0].c[0]));
+}
+#else
 void force_fermion_core(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, double dt, double residue)
 {
 	double coeff;
@@ -928,6 +1060,7 @@ void force_fermion_core(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, d
 
 	//lprintf("Check", 0, "step spinor in force on a point %.14e %.14e\n", creal((*_FIELD_AT(Xs, ipt(1, 1, 1, 1))).c[0].c[0]), creal((*_FIELD_AT(Ys, ipt(1, 1, 1, 1))).c[0].c[0]));
 }
+#endif
 
 #undef _F_DIR0
 #undef _F_DIR1
