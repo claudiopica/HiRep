@@ -117,6 +117,8 @@ GLB_VAR(int,BLK_Z,=3);
 #define iup(site,dir) iup[(site)*4+(dir)]
 #define idn(site,dir) idn[(site)*4+(dir)]
 
+#define ipt_ext_gpu(t, x, y, z) ipt_gpu[_lexi(T_EXT, X_EXT, Y_EXT, Z_EXT, t, x, y, z)]
+
 /* Geometry structures */
 #include "geometry.h"
 
@@ -151,9 +153,11 @@ typedef enum _mem_t {
 #define BLOCK_SIZE_DIRAC 512
 #define BLOCK_SIZE_DIRAC_FLT 512
 GLB_VAR(input_gpu,gpu_var,=init_input_gpu(gpu_var));
+GLB_VAR(int,*ipt_gpu,=NULL);
 GLB_VAR(int,*iup_gpu,=NULL);
 GLB_VAR(int,*idn_gpu,=NULL);
 GLB_VAR(int, gpu_id,=0);
+GLB_VAR(char,*imask_gpu,=NULL);
 GLB_VAR(unsigned int, grid_size_max_gpu,=65535);
 #else
 #define STD_MEM_TYPE (CPU_MEM)

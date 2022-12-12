@@ -46,11 +46,13 @@
 #if defined(WITH_MPI)
 
         #define _FREE_MPI_CODE  if (u->comm_req != NULL) afree(u->comm_req)
+
         #ifdef WITH_NEW_GEOMETRY
             #define _SENDBUF_ALLOC(_size) f->sendbuf_ptr = sendbuf_alloc((_size)*sizeof(*(f->ptr)))
         #else
             #define _SENDBUF_ALLOC(_size) f->sendbuf_ptr = f->ptr
         #endif
+
 
         #define _FREE_MPI_FIELD_DATA                                                                        \
             if (f->comm_req != NULL)                                                                        \

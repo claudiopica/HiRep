@@ -48,10 +48,10 @@ void error(int test, int no, const char *name, const char *text);
                 char message[MPI_MAX_ERROR_STRING]; \
                 int message_length; \
                 MPI_Error_string(mpireturn, message, &message_length); \
-                error(1, 1, "Error in: %s:%d, function: %s\n" \
-                            "Communications call exited with code %d: %s\n", \
-                            __FILE__, __LINE__, __func__, \
-                            mpireturn, message); \
+                /*error(1, 1, "Error in: %s:%d, function: %s\n"*/ \
+                /*            "Communications call exited with code %d: %s\n",*/ \
+                /*            __FILE__, __LINE__, __func__, */\
+                /*            mpireturn, message);*/ \
             } \
         } while (0)
 #endif
@@ -104,18 +104,7 @@ void error(int test, int no, const char *name, const char *text);
      *
      * @param call           Function call that should be checked.
      */
-    #define CHECK_CUDA(call) \
-        do {\
-            const cudaError_t err1 = call; \
-            if (err1 != cudaSuccess) \
-            { \
-                error(1, 1, "Error", "Error"); \
-                /*error(1, 1, "Error in: %s:%d, function: %s\n" */\
-                            /*"CUDA call exited with code %d: %s\n", */\
-                            /*__FILE__, __LINE__, __func__, */\
-                            /*err1, cudaGetErrorString(err1)); */\
-            } \
-        } while (0)
+    #define CHECK_CUDA(call) CudaSafeCall(call)
 
 #endif
 #endif

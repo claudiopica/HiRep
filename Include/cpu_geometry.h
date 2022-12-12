@@ -26,6 +26,10 @@
 #define _GPU_4FIELD_BLK(s,i) (((s)->gpu_ptr) + 4*(s)->type->master_start[(i)])
 #define _GPU_DFIELD_BLK(s,i,size) (((s)->gpu_ptr) + size*(s)->type->master_start[(i)])
 
+#define _GPU_FIELD_BLK_BUF(s,i) (((s)->gpu_ptr) + (s)->type->master_end[(i)])
+#define _GPU_4FIELD_BLK_BUF(s,i) (((s)->gpu_ptr) + 4*(s)->type->master_end[(i)])
+#define _GPU_DFIELD_BLK_BUF(s,i,size) (((s)->gpu_ptr) + size*(s)->type->master_end[(i)])
+
 #define _FIELD_BLK(s,i) (((s)->ptr) + (s)->type->master_start[(i)])
 #define _4FIELD_BLK(s,i) (((s)->ptr) + 4*(s)->type->master_start[(i)])
 #define _DFIELD_BLK(s,i,size) (((s)->ptr) + size*(s)->type->master_start[(i)]) 

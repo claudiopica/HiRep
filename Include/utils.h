@@ -13,15 +13,16 @@
 
 #ifndef UTILS_H
 #define UTILS_H
-#ifdef __cplusplus
-  extern "C" {
-#endif
 
 #include "suN_types.h"
 #include "spinor_field.h"
 #include "inverters.h"
 #include "geometry.h"
 #include <stdlib.h>
+
+#ifdef __cplusplus
+  extern "C" {
+#endif
 
 /*SUN exp matrix*/
 
@@ -57,14 +58,6 @@ void apply_BCs_on_clover_term(suNfc_field *);
 void init_pure_gauge_anisotropy(double *chi);
 
 void SF_classical_solution();
-
-inline int safe_mod(int x, int y)
-{
-  if (x >= 0)
-    return (x % y);
-  else
-    return ((y - (abs(x) % y)) % y);
-}
 
 /*Global shift for fields, the routine accepts also NULL entries in which case it does nothing*/
 void shift_fields(int *shift, spinor_field *sin, suNg_field *uin, spinor_field *sout, suNg_field *uout);

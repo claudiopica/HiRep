@@ -140,10 +140,18 @@ void start_sf_sendrecv_flt(spinor_field_flt*);
 	/** \
 	  @brief Fill buffers and start MPI requests to send and receive.\
 	 \
-	  @param ##_field_type		##_human_readable that needs to be synchonized \
+	  @param ##_field_type		##_human_readable that needs to be synchronized \
 	  				            across nodes \
 	 */ \
-	void start_sendrecv_gpu_##_name(_field_type*);
+	void start_sendrecv_gpu_##_name(_field_type*); \
+    /** \
+     @brief Sync field before communications. This can mean different things \
+            depending on geometry implementation. \
+        \
+     @param ##_field_type       ##_human_readable that needs to be synchronized \
+                                on the local lattice. \
+    */ \
+    void sync_gpu_##_name(_field_type*);
 
     _DECLARE_COMMS(spinor_field_f, spinor_field, "Spinor field");
     _DECLARE_COMMS(spinor_field_f_flt, spinor_field_flt, "Single precision spinor field");

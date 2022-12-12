@@ -27,6 +27,7 @@
 #include "geometry_init.h"
 #include "cpu_geometry.h"
 #include "geometry_check.h"
+#include "new_geometry.h"
 #ifdef WITH_GPU
    #include "gpu_geometry.h"
 #endif
@@ -39,6 +40,7 @@
 
 #define BORDERSIZE 1
 
+int safe_mod(int x, int y);
 
 #ifdef __cplusplus
   }

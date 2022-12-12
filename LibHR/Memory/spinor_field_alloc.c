@@ -45,7 +45,8 @@
 
 #ifdef WITH_MPI
 
-        #define _FREE_MPI_FIELD_DATA  if (u->comm_req != NULL) afree(u->comm_req)
+        #define _FREE_MPI_FIELD_DATA  if (f->comm_req != NULL) afree(f->comm_req)
+        
         #ifdef WITH_NEW_GEOMETRY
             #define _SENDBUF_ALLOC(_size) f->sendbuf_ptr = sendbuf_alloc((_size)*sizeof(*(f->ptr)))
         #else
@@ -179,7 +180,7 @@
 #ifndef WITH_MPI
 
     #define _FREE_MPI_FIELD_DATA do {} while(0)
-    #define _ALLOC_MPI_FIELD_DATA(_name) do {} while(0)
+    #define _ALLOC_MPI_FIELD_DATA(_name, _size) do {} while(0)
 
 #endif
 
@@ -233,11 +234,7 @@
         _ALLOC_GPU_FIELD_DATA(_name, _field_type, _site_type, _size);                                               \
                                                                                                                     \
         /* Allocate buffers for MPI comms, if compiling with MPI */                                                 \
-<<<<<<< HEAD
-        _ALLOC_MPI_FIELD_DATA(_name);                                                                               \
-=======
         _ALLOC_MPI_FIELD_DATA(_name, _size);                                                                               \
->>>>>>> remotes/upstream/HiRep-CUDA
                                                                                                                     \
         return f;                                                                                                   \
     }

@@ -9,6 +9,23 @@
 #include "logger.h"
 #include "utils.h"
 #include "memory.h"
+#include "new_geometry.h"
+
+#ifdef __cplusplus
+    extern "C" {
+#endif
+
+inline int safe_mod(int x, int y)
+{
+  if (x >= 0)
+    return (x % y);
+  else
+    return ((y - (abs(x) % y)) % y);
+}
+
+// This is to keep a list of boxes to fill out the field buffers
+static box_t *geometryBoxes;
+// TODO: make this into an array instead of a list?
 
 // this will include the 4th L2 corner in the geometry
 // it's not needed, was here for testng purposed
@@ -116,68 +133,17 @@ static int index_blocked(
 //  Functions for handling BOXes
 ///////////////////////////////////////////////////////////////////
 
-// this MUST fit in a char
-enum MaskState {
-    T_UP_MASK = (1u << 0),
-    T_DN_MASK = (1u << 1),
-    X_UP_MASK = (1u << 2),
-    X_DN_MASK = (1u << 3),
-    Y_UP_MASK = (1u << 4),
-    Y_DN_MASK = (1u << 5),
-    Z_UP_MASK = (1u << 6),
-    Z_DN_MASK = (1u << 7),
-    FULL_MASK = (1u << 8)-1
-};
-
 char invertMask(char mask) {
     return mask ^ FULL_MASK;
 }
 
-enum box_type {
-    // L0 = 0, //unused
-    // L1 = 1, //unused
-    L2 = 2,
-    L3 = 3,
-    INNER = 4,
-    SENDBUF = 5
-};
-
 static const char*bt_names[]={"L0","L1","L2","L3","INNER","SENDBUF"};
-
-#include <stdint.h>
-typedef struct _coord4 {
-    uint8_t x[4];
-} coord4;
 
 static coord4 *rb_icoord=NULL; //global lookup table for recv buffers (L3+L2 borders)
 static coord4 *sb_icoord=NULL; //global lookup table for send buffers
 
-//  ----h
-//  ....|  NB: the h[4] is not in the box,   
-//  ....|  i.e. coordinates needs to be l[]<= p[] <h[] 
-//  l...|
-typedef struct _box_t {
-    int l[4]; // the lower left corner, the box base point (e.g. in the extended lattice)
-    int h[4]; // the upper right corner
-    int base_index;
-    int base_index_odd;
-    int parity; //0 -> base point is even; 1 -> basepoint is odd
-    char mask; //tells if the box is a border, e.g. if T_UP_MASK is set the box is in top T border of the extended lattice
-    enum box_type type; // tell the type of the box, just a convenience for testing
-    int *ipt_ext; //given the cordinate of a point in the box returns an index
-    coord4 *icoord; //given an index in the box return the 4D coordinates of the point in the box relative to the l[4]
-    struct _box_t *sendBox; //if this is a border corresponding to a Recv buffer, this is the box to copy data from, i.e. corresponding to the Send buffer
-    struct _box_t *next; // link to next box. NULL if last
-} box_t;
-//TODO: do we want to add vol, even_vol, odd_vol for avoid recomputing them every time?
-//TODO: do we want to precompute ipt_ext for sendboxes?
-
-// This is to keep a list of boxes to fill out the field buffers
-static box_t *geometryBoxes=NULL;
-// TODO: make this into an array instead of a list?
-
 box_t* duplicateBox(box_t *B) {
-    box_t *b=malloc(sizeof(box_t));
+    box_t *b=(box_t*)malloc(sizeof(box_t));
     error((b == NULL), 1, __func__ , "Cannot allocate memory for box");
     *b=*B; //make copy
     return b;
@@ -441,12 +407,12 @@ static box_t *makeBorderBox(char mask) {
 static void index_alloc() {
     const int ext_volume = T_EXT*X_EXT*Y_EXT*Z_EXT;
     const int N = (1+2*4)*ext_volume; // 1 for ipt + 4 dir x 2 for iup and idn
-    ipt = malloc(N * sizeof(*ipt));
+    ipt = (int*)malloc(N * sizeof(*ipt));
     error((ipt == NULL), 1, __func__ , "Cannot allocate memory for ipt, iup, idn");
     iup = ipt + ext_volume;
     idn = iup + (4*ext_volume);
 
-    imask = malloc(ext_volume * sizeof(*imask));
+    imask = (char*)malloc(ext_volume * sizeof(*imask));
     error((imask == NULL), 1, __func__ , "Cannot allocate memory for imask");
 
     //allocate memory for send/recv buffers icoord
@@ -454,7 +420,7 @@ static void index_alloc() {
     box_t *L=geometryBoxes->next; //first border buffer. L3 are first, then L2
     while(L) { sb_volume += boxVolume(L); L=L->next; }
     const int rb_volume = sb_volume+boxVolume(geometryBoxes); //TODO: can we not count the INNER volume?
-    rb_icoord=malloc((rb_volume+sb_volume)*sizeof(coord4));
+    rb_icoord=(coord4*)malloc((rb_volume+sb_volume)*sizeof(coord4));
     error((rb_icoord == NULL), 1, __func__ , "Cannot allocate memory for send/recv icoord");
     sb_icoord=rb_icoord+rb_volume;
 }
@@ -710,7 +676,7 @@ static void gd_free_mem(geometry_descriptor *gd) {
 static void gd_alloc_mem(geometry_descriptor *gd, int NBuf, int NInner) {
     int *buf = NULL;
     if (NBuf>0) {
-        buf = malloc((6*NBuf) * sizeof(int));
+        buf = (int*)malloc((6*NBuf) * sizeof(int));
         error((buf == NULL), 1, __func__ , "Cannot allocate memory");
     }
 
@@ -723,7 +689,7 @@ static void gd_alloc_mem(geometry_descriptor *gd, int NBuf, int NInner) {
 
     buf = NULL;
     if (NInner>0) {
-        buf = malloc((2*(NInner+NBuf)) * sizeof(int));
+        buf = (int*)malloc((2*(NInner+NBuf)) * sizeof(int));
         error((buf == NULL), 1, __func__ , "Cannot allocate memory");
     }
     gd->master_start     = buf; if (buf) buf += NBuf+NInner; //+1 because of the local lattice box
@@ -1056,7 +1022,7 @@ void sync_field(geometry_descriptor *gd, int bytes_per_site, int is_spinor_like,
     if (gd == &glat_odd) gd_t = ODD;
 
     latticebuf = ((char*) latticebuf)-(bytes_per_site*gd->master_shift); //shift buffer by master_shift
-    char *const sendbuf_base=sb_ptr;
+    char *const sendbuf_base=(char*)sb_ptr;
     int n_buffers = is_spinor_like ? gd->nbuffers_spinor : gd->nbuffers_gauge;
     if (gd_t == GLOBAL) n_buffers /= 2; //we fill even and odd buffers at the same time
 #ifndef NDEBUG
@@ -1081,8 +1047,83 @@ void sync_field(geometry_descriptor *gd, int bytes_per_site, int is_spinor_like,
 
         L=L->next; i++;
     }
-
 }
+
+
+#ifdef __cplusplus
+    }
+#endif
+
+#ifdef WITH_GPU
+#define _DECLARE_KERNEL(_name, _type) \
+    __global__ void box_to_buffer_kernel_##_name(void *dst, _type *lattice, int base_index, int stride, coord4* icoord, int bytes_per_site) \
+    { \
+        _type* src_uncast; \
+        int dix = threadIdx.x*BLOCK_SIZE + blockIdx.x + base_index; \
+        coord4 c = icoord[dix]; \
+        int six = ipt_ext_gpu(c.x[0], c.x[1], c.x[2], c.x[3]); \
+        read_gpu_##_type(stride, (*src_uncast), lattice, six, 0);\
+        char *srcbuf = (char*)src_uncast;\
+        char *dstbuf = ((char*)dst) + dix*bytes_per_site; \
+        /*Make this work for CUDA-aware MPI by adding a sendbuf that is allocated on the device! (SAM)*/ \
+        cudaMemcpy(dstbuf, srcbuf, bytes_per_site, cudaMemcpyDeviceToHost); \
+    }
+
+#define _DECLARE_SYNC_BOX(_name, _type, _size) \
+    static void sync_box_to_buffer_gpu_##_name(geometry_descriptor *gd, \
+                                    box_t *src, \
+                                    _type *lattice, \
+                                    void *sendbuf) \
+    { \
+        const int bytes_per_site = (_size)*sizeof(*lattice); \
+        _PIECE_FOR(gd, ixp) \
+        { \
+            int vol = 0; \
+            int stride = 0; \
+            if ((ixp%2)==0) vol = boxEvenVolume(src); \
+            else vol = boxOddVolume(src); \
+            coord4 *c = src->icoord; \
+            coord4 *d_c; \
+            cudaMalloc((void**)&d_c, sizeof(c)); \
+            cudaMemcpy(d_c, c, sizeof(c), cudaMemcpyHostToDevice); \
+            int grid = (vol -1)/BLOCK_SIZE +1; \
+            stride = gd->master_start[ixp] - gd->master_end[ixp] + 1; \
+            box_to_buffer_kernel_##_name<<<grid, BLOCK_SIZE>>>(sendbuf, lattice, src->base_index, stride, d_c, bytes_per_site); \
+        } \
+    }
+
+#define _DECLARE_SYNC_FIELD(_name, _type, _geom) \
+    void sync_field_gpu_##_name(geometry_descriptor *gd, \
+                        _type *lattice,  \
+                        void *sendbuf) \
+    { \
+        if (geometryBoxes==NULL) printf("geometryBoxes are not initialized.\n");\
+        box_t *L = geometryBoxes->next; \
+        int i = 0; \
+        while (L && i < gd->nbuffers_##_geom) \
+        { \
+            sync_box_to_buffer_gpu_##_name(gd, L->sendBox, lattice, sendbuf); \
+            L=L->next; i++; \
+        } \
+    }
+
+#define _DECLARE_NEW_GEOM(_name, _type, _geom, _size) \
+    _DECLARE_KERNEL(_name, _type) \
+    _DECLARE_SYNC_BOX(_name, _type, _size) \
+    _DECLARE_SYNC_FIELD(_name, _type, _geom)
+
+_DECLARE_NEW_GEOM(gfield_f, suNf, gauge, 4);
+_DECLARE_NEW_GEOM(spinor_field_f, suNf_spinor, spinor, 1);
+
+#undef _DECLARE_NEW_GEOM
+#undef _DECLARE_SYNC_BOX
+#undef _DECLARE_SYNC_FIELD
+
+#endif
+
+#ifdef __cplusplus
+    extern "C" {
+#endif
 
 // ███    ███      █████      ██     ███    ██ 
 // ████  ████     ██   ██     ██     ████   ██ 
@@ -1239,7 +1280,7 @@ int test_define_geometry() {
 
     char *idxcheck;
     const int ext_vol=T_EXT*X_EXT*Y_EXT*Z_EXT;
-    idxcheck=malloc(ext_vol*sizeof(char));
+    idxcheck=(char*)malloc(ext_vol*sizeof(char));
 
     int total_errors=0;
     
@@ -1323,3 +1364,7 @@ int test_define_geometry() {
 
     return total_errors;
 }
+
+#ifdef __cplusplus
+    }
+#endif
