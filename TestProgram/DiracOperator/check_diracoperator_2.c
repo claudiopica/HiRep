@@ -227,12 +227,10 @@ int main(int argc, char *argv[])
             *_FIELD_AT(ps1, ix) = s1;
           }
 
-
     start_sf_sendrecv(ps0);
     complete_sf_sendrecv(ps0);
 
     Dphi(hmass, ps2, ps0);
-
 
     start_sf_sendrecv(ps1);
     complete_sf_sendrecv(ps1);

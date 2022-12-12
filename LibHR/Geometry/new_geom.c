@@ -33,17 +33,6 @@ static box_t *geometryBoxes;
 
 char *const LOGTAG = "GEOMETRY DEFINE";
 
-#define _PRINT_BYTE "%c%c%c%c%c%c%c%c"
-#define _BINARY(byte)  \
-  (byte & 0x80 ? '1' : '0'), \
-  (byte & 0x40 ? '1' : '0'), \
-  (byte & 0x20 ? '1' : '0'), \
-  (byte & 0x10 ? '1' : '0'), \
-  (byte & 0x08 ? '1' : '0'), \
-  (byte & 0x04 ? '1' : '0'), \
-  (byte & 0x02 ? '1' : '0'), \
-  (byte & 0x01 ? '1' : '0') 
-
 // ██ ███    ██ ██████  ███████ ██   ██ ██ ███    ██  ██████  
 // ██ ████   ██ ██   ██ ██       ██ ██  ██ ████   ██ ██       
 // ██ ██ ██  ██ ██   ██ █████     ███   ██ ██ ██  ██ ██   ███ 
@@ -132,10 +121,14 @@ static int index_blocked(
 ///////////////////////////////////////////////////////////////////
 //  Functions for handling BOXes
 ///////////////////////////////////////////////////////////////////
-
-char invertMask(char mask) {
-    return mask ^ FULL_MASK;
-}
+enum __attribute__((__packed__)) box_type {
+    // L0 = 0, //unused
+    // L1 = 1, //unused
+    L2 = 2,
+    L3 = 3,
+    INNER = 4,
+    SENDBUF = 5
+};
 
 static const char*bt_names[]={"L0","L1","L2","L3","INNER","SENDBUF"};
 
@@ -321,7 +314,7 @@ static box_t *makeLocalBox(){
                 .mask=0, 
                 .type=INNER,
                 .sendBox=NULL,
-                .ipt_ext=NULL,
+                // .ipt_ext=NULL,
                 .icoord=NULL,
                 .next=NULL
               };
@@ -563,14 +556,6 @@ static void enumerate_lattice() {
         for (int x1=0;x1<(b->h[1]-b->l[1]);x1++){
         for (int x2=0;x2<(b->h[2]-b->l[2]);x2++){
         for (int x3=0;x3<(b->h[3]-b->l[3]);x3++){
-            // const int ix = index_blocked(BLK_T,BLK_X,BLK_Y,BLK_Z,
-            //                              b->h[0]-b->l[0],b->h[1]-b->l[1],b->h[2]-b->l[2],b->h[3]-b->l[3],
-            //                              x0_ext-b->l[0],x1_ext-b->l[1],x2_ext-b->l[2],x3_ext-b->l[3], 
-            //                              sign,
-            //                              b->base_index,
-            //                              b->base_index_odd
-            //                             );
-
             const int idx = index_blocked(BLK_T,BLK_X,BLK_Y,BLK_Z,
                                          b->h[0]-b->l[0],b->h[1]-b->l[1],b->h[2]-b->l[2],b->h[3]-b->l[3],
                                          x0,x1,x2,x3
@@ -578,8 +563,8 @@ static void enumerate_lattice() {
             const int parity = (x0+x1+x2+x3+sign)%2;
             const int ix = idx + (parity ? b->base_index_odd : b->base_index );
 #ifndef NDEBUG
-            // if (idx<0 || !(idx<boxVolume(b))) lprintf(LOGTAG,1,"ERROR in ipt: Volume=%d idx=%d  @ (%d, %d, %d, %d)\n", boxVolume(b), idx, x0_ext, x1_ext, x2_ext, x3_ext);
-            if (ix<0 || ix>(T_EXT*X_EXT*Y_EXT*Z_EXT-1)) lprintf(LOGTAG,1,"ERROR2 ix=%d @ (%d, %d, %d, %d)\n", ix, x0_ext, x1_ext, x2_ext, x3_ext);
+            if (idx<0 || !(idx<(boxVolume(b)/2))) lprintf(LOGTAG,1,"ERROR in ipt: Volume/2=%d idx=%d  @ (%d, %d, %d, %d)\n", boxVolume(b)/2, idx, x0+b->l[0], x1+b->l[1], x2+b->l[2], x3+b->l[3]);
+            if (ix<0 || ix>(T_EXT*X_EXT*Y_EXT*Z_EXT-1)) lprintf(LOGTAG,1,"ERROR2 ix=%d @ (%d, %d, %d, %d)\n", ix, x0+b->l[0], x1+b->l[1], x2+b->l[2], x3+b->l[3]);
 #endif
             ipt_ext(x0+b->l[0],x1+b->l[1],x2+b->l[2],x3+b->l[3]) = ix;
 
