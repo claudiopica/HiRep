@@ -24,21 +24,6 @@ int test_define_geometry();
 void sendbuf_report();
 void sync_field_gpu(geometry_descriptor*, int, int, void*, void*);
 
-// this MUST fit in a char
-enum MaskState {
-    T_UP_MASK = (1u << 0),
-    T_DN_MASK = (1u << 1),
-    X_UP_MASK = (1u << 2),
-    X_DN_MASK = (1u << 3),
-    Y_UP_MASK = (1u << 4),
-    Y_DN_MASK = (1u << 5),
-    Z_UP_MASK = (1u << 6),
-    Z_DN_MASK = (1u << 7),
-    FULL_MASK = (1u << 8)-1
-};
-
-char invertMask(char mask);
-
 typedef struct _coord4 {
     uint8_t x[4];
 } coord4;
@@ -72,8 +57,13 @@ typedef struct _box_t {
 //TODO: do we want to add vol, even_vol, odd_vol for avoid recomputing them every time?
 //TODO: do we want to precompute ipt_ext for sendboxes?
 
-void sync_field_gpu_gfield_f(geometry_descriptor*, suNf*, void*);
-void sync_field_gpu_spinor_field_f(geometry_descriptor*, suNf_spinor*, void*);
+void sync_field_to_buffer_gpu_gfield_f(geometry_descriptor*, suNf*, void*);
+void sync_field_to_buffer_gpu_spinor_field_f(geometry_descriptor*, suNf_spinor*, void*);
+void sync_buffer_to_field_gpu_gfield_f(geometry_descriptor*, suNf*, void*);
+void sync_buffer_to_field_gpu_spinor_field_f(geometry_descriptor*, suNf_spinor*, void*);
+
+int boxEvenVolume(box_t *B);
+int boxOddVolume(box_t *B);
 
 #ifdef __cplusplus
     }

@@ -694,8 +694,8 @@ void Dphi_gpu_(spinor_field *out, spinor_field *in)
     start_sendrecv_gpu_spinor_field_f(in);
     complete_sendrecv_gpu_spinor_field_f(in);
 
-    start_sendrecv_gpu_gfield_f(u_gauge_f);
-    complete_sendrecv_gpu_gfield_f(u_gauge_f);
+    //start_sendrecv_gpu_gfield_f(u_gauge_f);
+    //complete_sendrecv_gpu_gfield_f(u_gauge_f);
   #endif
 
   error((in==NULL)||(out==NULL), 1, "Dphi_gpu_ [Dphi_gpu.c]",

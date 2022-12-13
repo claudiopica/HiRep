@@ -42,28 +42,27 @@ void zeroes_float(float* flt, int n)
     }
 }
 
-#define _DECLARE_SYNC(_name, _field_type, _site_type, _size, _geom)\
-    void sync_gpu_##_name(_field_type *f) \
-    { \
-            printf("Syncing field.\n");\
-            sync_field_gpu_##_name(f->type, f->gpu_ptr, f->sendbuf_ptr); \
-    }
+//#define _DECLARE_SYNC(_name, _field_type, _site_type, _size, _geom)\
+//    void sync_gpu_##_name(_field_type *f) \
+//    { \
+//            sync_field_gpu_##_name(f->type, f->gpu_ptr, f->sendbuf_gpu_ptr); \
+//    }
 
 #define _DECLARE_START_SENDRECV(_name, _field_type, _site_type, _size, _geom) \
     void start_sendrecv_gpu_##_name(_field_type *f) \
     { \
         printf("Starting comms...\n");\
-        sync_gpu_##_name(f); \
+        sync_field_to_buffer_gpu_##_name(f->type, f->gpu_ptr, f->sendbuf_gpu_ptr); \
         MPI_Status status[f->type->nbuffers_##_geom];\
         for (int i = 0; i < f->type->nbuffers_##_geom; ++i) \
         { \
             /* Destination Parameters */ \
-            double *recv_buffer = (double*)(f->gpu_ptr + (_size)*f->type->rbuf_start[i]);\
+            double *recv_buffer = (double*)(f->recvbuf_gpu_ptr + (_size)*f->type->rbuf_start[i]);\
             int recv_proc = f->type->rbuf_from_proc[i];\
             int recv_size_in_dbl = (_size)*(f->type->rbuf_len[i])*sizeof(*(f->gpu_ptr))/sizeof(double);\
             \
             /* Origin Parameters */ \
-            double *send_buffer = (double*)(f->sendbuf_ptr + (_size)*f->type->sbuf_start[i]);\
+            double *send_buffer = (double*)(f->sendbuf_gpu_ptr + (_size)*f->type->sbuf_start[i]);\
             int send_proc = f->type->sbuf_to_proc[i];\
             int send_size_in_dbl = (_size)*(f->type->sbuf_len[i])*sizeof(*(f->gpu_ptr))/sizeof(double); \
             \
@@ -109,10 +108,11 @@ void zeroes_float(float* flt, int n)
             MPI_Status status[nreq]; \
             CHECK_MPI(MPI_Waitall(nreq, f->comm_req, status)); \
         } \
+        sync_buffer_to_field_gpu_##_name(f->type, f->gpu_ptr, f->recvbuf_gpu_ptr); \
     } 
 
 #define _DECLARE_COMMS(_name, _field_type, _site_type, _size, _geom, _prec_type) \
-    _DECLARE_SYNC(_name, _field_type, _site_type, _size, _geom) \
+    /*_DECLARE_SYNC(_name, _field_type, _site_type, _size, _geom)*/ \
     _DECLARE_START_SENDRECV(_name, _field_type, _site_type, _size, _geom) \
     _DECLARE_COMPLETE_SENDRECV(_name, _field_type, _site_type, _size, _geom)  \
     _DECLARE_FILL_BUFFERS(_name, _field_type, _prec_type, _size, _geom)

@@ -1,10 +1,10 @@
 #include "global.h"
-
-extern int *iup_gpu, *idn_gpu;
+#include "global_gpu.h"
+#include "gpu.h"
 
 void init_neighbors_gpu() 
 {
-#ifdef WITH_GPU
+  #ifdef WITH_GPU
   #ifdef WITH_MPI
     int N = T_EXT*X_EXT*Y_EXT*Z_EXT;
   #else
@@ -15,7 +15,7 @@ void init_neighbors_gpu()
   error_id = cudaMalloc((void **)&iup_gpu, 4 * N * sizeof(int));
   error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error allocating iup_gpu neighbors array.\n");
 
-  error_id = cudaMalloc((void **)&idn_gpu, 4 * N * sizeof(int));
+  /*error_id = cudaMalloc((void **)&idn_gpu, 4 * N * sizeof(int));
   error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error allocating idn_gpu neighbors array.\n");
 
   error_id = cudaMalloc((void **)&imask_gpu, N * sizeof(*imask));
@@ -34,6 +34,19 @@ void init_neighbors_gpu()
   error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error copying imask lookup table to device memory.\n");
 
   error_id = cudaMemcpy(ipt_gpu, ipt, (X+2*X_BORDER)*(Y+2*Y_BORDER)*(Z+2*Z_BORDER)*(T+2*T_BORDER), cudaMemcpyHostToDevice);
-  error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error copying ipt to device memory.\n");
-#endif
+  error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error copying ipt to device memory.\n");*/
+
+ /* error_id = cudaMemcpyToSymbol(T_EXT_GPU, &T_EXT, sizeof(int), 0, cudaMemcpyHostToDevice);
+  error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error adding T_EXT to global constant memory.\n");
+
+  error_id = cudaMemcpyToSymbol(X_EXT_GPU, &X_EXT, sizeof(int), 0, cudaMemcpyHostToDevice);
+  error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error adding X_EXT to global constant memory.\n");
+
+  error_id = cudaMemcpyToSymbol(Y_EXT_GPU, &Y_EXT, sizeof(int), 0, cudaMemcpyHostToDevice);
+  error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error adding Y_EXT to global constant memory.\n");
+
+  error_id = cudaMemcpyToSymbol(Z_EXT_GPU, &Z_EXT, sizeof(int), 0, cudaMemcpyHostToDevice);
+  error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error adding Z_EXT to global constant memory.\n");*/
+  #endif
 }
+

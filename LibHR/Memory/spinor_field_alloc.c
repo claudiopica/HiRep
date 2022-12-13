@@ -48,9 +48,17 @@
         #define _FREE_MPI_FIELD_DATA  if (f->comm_req != NULL) afree(f->comm_req)
         
         #ifdef WITH_NEW_GEOMETRY
-            #define _SENDBUF_ALLOC(_size, _i) f[_i].sendbuf_ptr = sendbuf_alloc((_size)*sizeof(*(f[_i].ptr)))
+            #define _SENDBUF_ALLOC(_size, _i) \
+                    f[_i].sendbuf_ptr = sendbuf_alloc((_size)*sizeof(*(f[_i].ptr))); \
+                    /*cudaMalloc((void **)&(f[_i].sendbuf_gpu_ptr), sizeof(f[_i].sendbuf_ptr));*/ \
+                    /*cudaMalloc((void **)&(f[_i].recvbuf_gpu_ptr), sizeof(f[_i].sendbuf_ptr));*/
+
         #else
-            #define _SENDBUF_ALLOC(_size, _i) f[_i].sendbuf_ptr = f[_i].ptr
+            #define _SENDBUF_ALLOC(_size, _i) \
+                    f[_i].sendbuf_ptr = f[_i].ptr; \
+                    f[_i].sendbuf_gpu_ptr = f[_i].gpu_ptr; \
+                    f[_i].recvbuf_gpu_ptr = f[_i].gpu_ptr; 
+
         #endif
 
         #define _ALLOC_MPI_FIELD_DATA(_name, _size)                                                                 \
@@ -62,7 +70,10 @@
                 for (int ix = 0; ix < n * 2 * type->nbuffers_spinor; ++ix)                                          \
                     f->comm_req[ix]=MPI_REQUEST_NULL;                                                               \
                 for (int i = 1; i < n; ++i) f[i].comm_req=f[i-1].comm_req + 2 * type->nbuffers_spinor;              \
-                for (int i = 0; i < n; ++i) _SENDBUF_ALLOC(_size,i);                                                \
+                for (int i = 0; i < n; ++i)                                                                         \
+                {                                                                                                   \
+                    _SENDBUF_ALLOC(_size,i);                                                                        \
+                }                                                                                                   \
             }                                                                                                       \
             else                                                                                                    \
             {                                                                                                       \
@@ -262,3 +273,4 @@ _DECLARE_MEMORY_FUNC(sfield, scalar_field, double, 1);
 #undef _ALLOC_MPI_FIELD_DATA
 #undef _FREE_GPU_FIELD_DATA
 #undef _FREE_MPI_FIELD_DATA
+#undef _SENDBUF_ALLOC

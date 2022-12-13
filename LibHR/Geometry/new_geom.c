@@ -10,10 +10,7 @@
 #include "utils.h"
 #include "memory.h"
 #include "new_geometry.h"
-
-#ifdef __cplusplus
-    extern "C" {
-#endif
+#include "new_geom_gpu.h"
 
 inline int safe_mod(int x, int y)
 {
@@ -121,14 +118,6 @@ static int index_blocked(
 ///////////////////////////////////////////////////////////////////
 //  Functions for handling BOXes
 ///////////////////////////////////////////////////////////////////
-enum __attribute__((__packed__)) box_type {
-    // L0 = 0, //unused
-    // L1 = 1, //unused
-    L2 = 2,
-    L3 = 3,
-    INNER = 4,
-    SENDBUF = 5
-};
 
 static const char*bt_names[]={"L0","L1","L2","L3","INNER","SENDBUF"};
 
@@ -1034,51 +1023,11 @@ void sync_field(geometry_descriptor *gd, int bytes_per_site, int is_spinor_like,
     }
 }
 
-
-#ifdef __cplusplus
-    }
-#endif
-
 #ifdef WITH_GPU
-#define _DECLARE_KERNEL(_name, _type) \
-    __global__ void box_to_buffer_kernel_##_name(void *dst, _type *lattice, int base_index, int stride, coord4* icoord, int bytes_per_site) \
-    { \
-        _type* src_uncast; \
-        int dix = threadIdx.x*BLOCK_SIZE + blockIdx.x + base_index; \
-        coord4 c = icoord[dix]; \
-        int six = ipt_ext_gpu(c.x[0], c.x[1], c.x[2], c.x[3]); \
-        read_gpu_##_type(stride, (*src_uncast), lattice, six, 0);\
-        char *srcbuf = (char*)src_uncast;\
-        char *dstbuf = ((char*)dst) + dix*bytes_per_site; \
-        /*Make this work for CUDA-aware MPI by adding a sendbuf that is allocated on the device! (SAM)*/ \
-        cudaMemcpy(dstbuf, srcbuf, bytes_per_site, cudaMemcpyDeviceToHost); \
-    }
-
-#define _DECLARE_SYNC_BOX(_name, _type, _size) \
-    static void sync_box_to_buffer_gpu_##_name(geometry_descriptor *gd, \
-                                    box_t *src, \
-                                    _type *lattice, \
-                                    void *sendbuf) \
-    { \
-        const int bytes_per_site = (_size)*sizeof(*lattice); \
-        _PIECE_FOR(gd, ixp) \
-        { \
-            int vol = 0; \
-            int stride = 0; \
-            if ((ixp%2)==0) vol = boxEvenVolume(src); \
-            else vol = boxOddVolume(src); \
-            coord4 *c = src->icoord; \
-            coord4 *d_c; \
-            cudaMalloc((void**)&d_c, sizeof(c)); \
-            cudaMemcpy(d_c, c, sizeof(c), cudaMemcpyHostToDevice); \
-            int grid = (vol -1)/BLOCK_SIZE +1; \
-            stride = gd->master_start[ixp] - gd->master_end[ixp] + 1; \
-            box_to_buffer_kernel_##_name<<<grid, BLOCK_SIZE>>>(sendbuf, lattice, src->base_index, stride, d_c, bytes_per_site); \
-        } \
-    }
+#include "new_geom_gpu.h"
 
 #define _DECLARE_SYNC_FIELD(_name, _type, _geom) \
-    void sync_field_gpu_##_name(geometry_descriptor *gd, \
+    void sync_field_to_buffer_gpu_##_name(geometry_descriptor *gd, \
                         _type *lattice,  \
                         void *sendbuf) \
     { \
@@ -1090,24 +1039,28 @@ void sync_field(geometry_descriptor *gd, int bytes_per_site, int is_spinor_like,
             sync_box_to_buffer_gpu_##_name(gd, L->sendBox, lattice, sendbuf); \
             L=L->next; i++; \
         } \
+    } \
+    \
+    void sync_buffer_to_field_gpu_##_name(geometry_descriptor *gd, \
+                        _type *lattice, \
+                        void *recvbuf) \
+    { \
+        if (geometryBoxes==NULL) printf("geometryBoxes are not initialized.\n");\
+        box_t *L = geometryBoxes->next; \
+        int i = 0; \
+        while(L && i < gd->nbuffers_##_geom) \
+        { \
+            sync_buffer_to_box_gpu_##_name(gd, L->sendBox, lattice, recvbuf); \
+        } \
     }
 
-#define _DECLARE_NEW_GEOM(_name, _type, _geom, _size) \
-    _DECLARE_KERNEL(_name, _type) \
-    _DECLARE_SYNC_BOX(_name, _type, _size) \
-    _DECLARE_SYNC_FIELD(_name, _type, _geom)
-
-_DECLARE_NEW_GEOM(gfield_f, suNf, gauge, 4);
-_DECLARE_NEW_GEOM(spinor_field_f, suNf_spinor, spinor, 1);
+_DECLARE_SYNC_FIELD(gfield_f, suNf, gauge);
+_DECLARE_SYNC_FIELD(spinor_field_f, suNf_spinor, spinor);
 
 #undef _DECLARE_NEW_GEOM
 #undef _DECLARE_SYNC_BOX
 #undef _DECLARE_SYNC_FIELD
 
-#endif
-
-#ifdef __cplusplus
-    extern "C" {
 #endif
 
 // ███    ███      █████      ██     ███    ██ 
@@ -1349,7 +1302,3 @@ int test_define_geometry() {
 
     return total_errors;
 }
-
-#ifdef __cplusplus
-    }
-#endif

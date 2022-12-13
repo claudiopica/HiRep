@@ -22,7 +22,6 @@
   extern "C" {
 #endif 
 
-
 #ifdef MAIN_PROGRAM
 #  define GLB_VAR(type,name,...) type name __VA_ARGS__
 #else
@@ -116,8 +115,6 @@ GLB_VAR(int,BLK_Z,=3);
 #define ipt_4d(t,x) ipt_4d[(t)*(VOL3)+(x)]
 #define iup(site,dir) iup[(site)*4+(dir)]
 #define idn(site,dir) idn[(site)*4+(dir)]
-
-#define ipt_ext_gpu(t, x, y, z) ipt_gpu[_lexi(T_EXT, X_EXT, Y_EXT, Z_EXT, t, x, y, z)]
 
 /* Geometry structures */
 #include "geometry.h"
@@ -242,4 +239,5 @@ GLB_VAR(int,four_fermion_active,=0); // whether four fermion interactions are ac
 #ifdef __cplusplus
   }
 #endif
+
 #endif
