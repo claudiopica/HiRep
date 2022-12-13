@@ -150,7 +150,7 @@ __global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out,
   local_ix = blockIdx.x*BLOCK_SIZE + threadIdx.x;
   if (local_ix < vol4h) {
     ix = _SITE_IDX_GPU(local_ix, ixp, vol4h);
-    mask = imask_gpu[ix] ^ MASK;
+    mask = imask_gpu[ix] ^ MASK;//No
 
     /******************************* direction +0 *********************************/
     #ifdef WITH_NEW_GEOMETRY
@@ -410,6 +410,9 @@ __global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out,
 }
 
 /* Takes an even input spinor and returns an odd spinor */
+
+//Start a kernel for each buffer piece
+// use the same kernel as for the bulk calculation
 __global__ void Dphi_gpu_kernel_buf(suNf_spinor* __restrict__ out,
                             const suNf_spinor* __restrict__ in,
                             const suNf* __restrict__ gauge_ixp,

@@ -48,6 +48,8 @@
 		_type *sendbuf_ptr; \
 		_type *sendbuf_gpu_ptr; \
 		_type *recvbuf_gpu_ptr;
+
+		//
 #endif 
 
 

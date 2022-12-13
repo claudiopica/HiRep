@@ -19,10 +19,12 @@
         int six = ipt_ext_gpu(c.x[0], c.x[1], c.x[2], c.x[3]); \
         read_gpu_##_type(stride, (*src_uncast), lattice, six, 0); \
         char *srcbuf = (char*)src_uncast;\
+        /* Use write geometry */ \
         char *dstbuf = ((char*)dst) + dix*bytes_per_site; \
         cudaMemcpyAsync(dstbuf, srcbuf, bytes_per_site, cudaMemcpyDeviceToDevice); \
     } \
     \
+    /*Don't do this copy back*/ \
     __global__ void buffer_to_box_kernel_##_name(void *src, _type *lattice, int base_index, int stride, coord4* icoord, int bytes_per_site, \
                                             int* ipt_gpu) \
     { \

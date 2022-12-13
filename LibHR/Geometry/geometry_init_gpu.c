@@ -13,7 +13,7 @@ void init_neighbors_gpu()
 
   cudaError_t error_id;
   error_id = cudaMalloc((void **)&iup_gpu, 4 * N * sizeof(int));
-  error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error allocating iup_gpu neighbors array.\n");
+  error(error_id != cudaSuccess, 1, "init_neighbors_gpu", cudaGetErrorString(error_id));
 
   /*error_id = cudaMalloc((void **)&idn_gpu, 4 * N * sizeof(int));
   error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error allocating idn_gpu neighbors array.\n");
