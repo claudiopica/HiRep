@@ -10,6 +10,9 @@
 #define GPU_INFO_H
 
 #include "gpu.h"
+#ifdef __cplusplus
+    extern "C" {
+#endif
 
     /**
      * @brief Query number of GPUs and print related information
@@ -87,6 +90,10 @@
      * @param input_gpu             A struct containing parameters on the current GPU.
      */
     void print_hardware_info(cudaDeviceProp, input_gpu);
+
+#ifdef __cplusplus
+    }
+#endif
     
 #endif
 #endif

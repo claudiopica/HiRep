@@ -9,10 +9,7 @@
  *        cluster relating to GPUs.
  */
 #ifdef WITH_GPU
-extern "C" {
-  #include "logger.h"
-}
-
+#include "logger.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
@@ -27,6 +24,10 @@ extern "C" {
 #include "gpu.h"
 #ifdef WITH_MPI
   #include "mpi.h"
+#endif
+
+#ifdef __cplusplus
+  extern "C" {
 #endif
 
 const char *sComputeMode[] = {
@@ -242,5 +243,9 @@ void print_hardware_info(cudaDeviceProp device_prop, input_gpu gpu_var)
   print_memory_info(device_prop, gpu_var);
   print_compute_info(device_prop, gpu_var);
 }
+
+#ifdef __cplusplus
+  }
+#endif
 
 #endif
