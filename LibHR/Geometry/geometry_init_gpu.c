@@ -1,7 +1,12 @@
+#define GLB_GPU
+
 #include "global.h"
 #include "global_gpu.h"
 #include "gpu.h"
 
+#ifdef __cplusplus
+  extern "C" {
+#endif
 void init_neighbors_gpu() 
 {
   #ifdef WITH_GPU
@@ -15,7 +20,7 @@ void init_neighbors_gpu()
   error_id = cudaMalloc((void **)&iup_gpu, 4 * N * sizeof(int));
   error(error_id != cudaSuccess, 1, "init_neighbors_gpu", cudaGetErrorString(error_id));
 
-  /*error_id = cudaMalloc((void **)&idn_gpu, 4 * N * sizeof(int));
+  error_id = cudaMalloc((void **)&idn_gpu, 4 * N * sizeof(int));
   error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error allocating idn_gpu neighbors array.\n");
 
   error_id = cudaMalloc((void **)&imask_gpu, N * sizeof(*imask));
@@ -34,9 +39,9 @@ void init_neighbors_gpu()
   error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error copying imask lookup table to device memory.\n");
 
   error_id = cudaMemcpy(ipt_gpu, ipt, (X+2*X_BORDER)*(Y+2*Y_BORDER)*(Z+2*Z_BORDER)*(T+2*T_BORDER), cudaMemcpyHostToDevice);
-  error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error copying ipt to device memory.\n");*/
+  error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error copying ipt to device memory.\n");
 
- /* error_id = cudaMemcpyToSymbol(T_EXT_GPU, &T_EXT, sizeof(int), 0, cudaMemcpyHostToDevice);
+  error_id = cudaMemcpyToSymbol(T_EXT_GPU, &T_EXT, sizeof(int), 0, cudaMemcpyHostToDevice);
   error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error adding T_EXT to global constant memory.\n");
 
   error_id = cudaMemcpyToSymbol(X_EXT_GPU, &X_EXT, sizeof(int), 0, cudaMemcpyHostToDevice);
@@ -46,7 +51,13 @@ void init_neighbors_gpu()
   error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error adding Y_EXT to global constant memory.\n");
 
   error_id = cudaMemcpyToSymbol(Z_EXT_GPU, &Z_EXT, sizeof(int), 0, cudaMemcpyHostToDevice);
-  error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error adding Z_EXT to global constant memory.\n");*/
+  error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error adding Z_EXT to global constant memory.\n");
   #endif
 }
+
+#ifdef __cplusplus
+  }
+#endif
+
+#undef GLB_GPU
 

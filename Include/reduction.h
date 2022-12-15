@@ -91,7 +91,6 @@ void bcast_int(int *i, int n);
 #endif
 
 #ifdef WITH_GPU
-   // TODO: Here the cross compilation does not work (SAM)
    #ifdef __cplusplus
       /**
       * @brief Sums across GPU nodes after finding the local sum (generics)

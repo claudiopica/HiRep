@@ -9,6 +9,10 @@
 #include "error.h"
 #include "linear_algebra_gpu.cu"
 
+#ifdef __cplusplus
+  extern "C" {
+#endif
+
 #define _TOCOMPLEX(sp) ((_COMPLEX *)(sp))
 #define _NCOM (sizeof(_SPINOR_TYPE)/sizeof(_COMPLEX))
 
@@ -339,3 +343,7 @@ _BODY({})
 
 #undef _TOCOMPLEX
 #undef _NCOM
+
+#ifdef __cplusplus
+  }
+#endif

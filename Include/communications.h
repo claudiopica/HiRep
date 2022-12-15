@@ -151,7 +151,7 @@ void start_sf_sendrecv_flt(spinor_field_flt*);
      @param ##_field_type       ##_human_readable that needs to be synchronized \
                                 on the local lattice. \
     */ \
-    //void sync_gpu_##_name(_field_type*);
+    void sync_gpu_##_name(_field_type*);
 
     _DECLARE_COMMS(spinor_field_f, spinor_field, "Spinor field");
     _DECLARE_COMMS(spinor_field_f_flt, spinor_field_flt, "Single precision spinor field");

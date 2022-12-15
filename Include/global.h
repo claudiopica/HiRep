@@ -15,7 +15,6 @@
 #define GLOBAL_H
 
 #include <stddef.h>
-
 #include "check_options.h"
 
 #ifdef __cplusplus

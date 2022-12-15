@@ -1039,20 +1039,7 @@ void sync_field(geometry_descriptor *gd, int bytes_per_site, int is_spinor_like,
             sync_box_to_buffer_gpu_##_name(gd, L->sendBox, lattice, sendbuf); \
             L=L->next; i++; \
         } \
-    } \
-    \
-    void sync_buffer_to_field_gpu_##_name(geometry_descriptor *gd, \
-                        _type *lattice, \
-                        void *recvbuf) \
-    { \
-        if (geometryBoxes==NULL) printf("geometryBoxes are not initialized.\n");\
-        box_t *L = geometryBoxes->next; \
-        int i = 0; \
-        while(L && i < gd->nbuffers_##_geom) \
-        { \
-            sync_buffer_to_box_gpu_##_name(gd, L->sendBox, lattice, recvbuf); \
-        } \
-    }
+    } 
 
 _DECLARE_SYNC_FIELD(gfield_f, suNf, gauge);
 _DECLARE_SYNC_FIELD(spinor_field_f, suNf_spinor, spinor);

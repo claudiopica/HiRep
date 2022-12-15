@@ -42,11 +42,17 @@ void zeroes_float(float* flt, int n)
     }
 }
 
+#define _DECLARE_SYNC(_name, _field_type, _site_type, _size, _geom) \
+    void sync_gpu_##_name(_field_type *f) \
+    { \
+        sync_field_to_buffer_gpu_##_name(f->type, f->gpu_ptr, f->sendbuf_gpu_ptr); \
+    }
+
 #define _DECLARE_START_SENDRECV(_name, _field_type, _site_type, _size, _geom) \
     void start_sendrecv_gpu_##_name(_field_type *f) \
     { \
         printf("Starting comms...\n");\
-        sync_field_to_buffer_gpu_##_name(f->type, f->gpu_ptr, f->sendbuf_gpu_ptr); \
+        sync_gpu_##_name(f); \
         MPI_Status status[f->type->nbuffers_##_geom];\
         for (int i = 0; i < f->type->nbuffers_##_geom; ++i) \
         { \
@@ -102,10 +108,10 @@ void zeroes_float(float* flt, int n)
             MPI_Status status[nreq]; \
             CHECK_MPI(MPI_Waitall(nreq, f->comm_req, status)); \
         } \
-        sync_buffer_to_field_gpu_##_name(f->type, f->gpu_ptr, f->recvbuf_gpu_ptr); \
     } 
 
 #define _DECLARE_COMMS(_name, _field_type, _site_type, _size, _geom, _prec_type) \
+    _DECLARE_SYNC(_name, _field_type, _site_type, _size, _geom) \
     _DECLARE_START_SENDRECV(_name, _field_type, _site_type, _size, _geom) \
     _DECLARE_COMPLETE_SENDRECV(_name, _field_type, _site_type, _size, _geom)  \
     _DECLARE_FILL_BUFFERS(_name, _field_type, _prec_type, _size, _geom)
