@@ -52,7 +52,7 @@ void init_gpu(input_gpu gpu_var)
   print_hardware_info(device_prop, gpu_var);
 
   // Select a card (no MPI) or bind cards to processes (MPI)
-  //select_GPU(gpu_var);
+  select_GPU(gpu_var);
 
   // Setup global variables necessary for optimal kernel execution
   grid_size_max_gpu = device_prop.maxGridSize[0];
@@ -80,7 +80,7 @@ void select_GPU(input_gpu gpu_var)
     int current_device;
     CHECK_CUDA(cudaGetDevice(&current_device));
     lprintf("GPU_INIT", 0, "GPU Affinity: GPU Node %d has been bound to MPI Thread of Rank %d\n", current_device, PID);
-    //enable_GPU_peer_to_peer_access();
+    enable_GPU_peer_to_peer_access();
   #endif
 }
 

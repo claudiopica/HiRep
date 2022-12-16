@@ -412,7 +412,6 @@ __global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out,
 //Start a kernel for each buffer piece
 // use the same kernel as for the bulk calculation
 __global__ void Dphi_gpu_kernel_buf(suNf_spinor* __restrict__ out,
-                            suNf_spinor* __restrict__ copy,
                             const suNf_spinor* __restrict__ in,
                             const suNf* __restrict__ gauge_ixp,
                             const suNf* __restrict__ gauge_iyp,
@@ -763,10 +762,6 @@ void Dphi_gpu_(spinor_field *out, spinor_field *in)
       CudaCheckError();
   }
 
-  // TODO: Change this to something else... This is very inefficient.
-  spinor_field *copy;
-  copy = alloc_spinor_field_f(1, &glattice);
-  spinor_field_mul_f(copy, 1.0, out);
   cudaDeviceSynchronize();
   
   #if defined(WITH_MPI) && defined(WITH_NEW_GEOMETRY)
@@ -779,7 +774,6 @@ void Dphi_gpu_(spinor_field *out, spinor_field *in)
       grid = (block_stride-1)/BLOCK_SIZE + 1;
       int start_piece = in->type->master_start[ixp];
       Dphi_gpu_kernel_buf<<<grid, BLOCK_SIZE>>>(_GPU_FIELD_BLK(out, ixp),
-                                                _GPU_FIELD_BLK(copy, ixp),
                                                 _BUF_GPU_FIELD_BLK(in, i),
                                                 _GPU_4FIELD_BLK(u_gauge_f, ixp),
                                                 _BUF_GPU_4FIELD_BLK(u_gauge_f, i),
