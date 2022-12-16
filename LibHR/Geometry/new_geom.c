@@ -20,10 +20,6 @@ inline int safe_mod(int x, int y)
     return ((y - (abs(x) % y)) % y);
 }
 
-// This is to keep a list of boxes to fill out the field buffers
-static box_t *geometryBoxes;
-// TODO: make this into an array instead of a list?
-
 // this will include the 4th L2 corner in the geometry
 // it's not needed, was here for testng purposed
 // #define _INCLUDE_UP_UP_L2
@@ -153,8 +149,8 @@ static void freeGeometryBoxes(){
 
 int boxVolume(box_t *B){
     return (B->h[0]-B->l[0])*(B->h[1]-B->l[1])*(B->h[2]-B->l[2])*(B->h[3]-B->l[3]);
-
 }
+
 int boxEvenVolume(box_t *B){
     const int box_vol=boxVolume(B);
     int even_vol=box_vol/2 + (box_vol&(1^(B->parity)));
@@ -682,14 +678,7 @@ static void gd_set_copy(geometry_descriptor *gd) {
     gd->copy_shift = 0;
 }
 
-// TODO: this should be in geometry.h and geometry descriptor should contain it
-// enum to define geometry type
-// this is a simple bitmask with GLOBAL = EVEN | ODD
-enum gd_type {
-    EVEN   = 1, 
-    ODD    = 2,
-    GLOBAL = 3
-};
+
 
 static void gd_free() {
     gd_free_mem(&glattice);

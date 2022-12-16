@@ -8,24 +8,34 @@
 #ifdef WITH_GPU
 #include "global_gpu.h"
 
+//TODO the code in this file is broken
 
-#define _DECLARE_KERNEL(_name, _type) \
-    __global__ void box_to_buffer_kernel_##_name(void *dst, _type *lattice, int base_index, int stride, coord4* icoord, int bytes_per_site, \
-                                                int* ipt_gpu) \
+#define _DECLARE_KERNEL(_name, _type, _size) \
+    __global__ void box_to_buffer_kernel_##_name(void *dst, _type *lattice_block, int base_index, int stride, coord4* icoord, \
+                                                int* ipt_gpu, int vol, int block_start) \
     { \
-        _type* src_uncast; \
-        int dix = threadIdx.x*BLOCK_SIZE + blockIdx.x + base_index;\
-        coord4 c = icoord[dix]; \
-        int six = ipt_ext_gpu(c.x[0], c.x[1], c.x[2], c.x[3]); \
-        read_gpu_##_type(stride, (*src_uncast), lattice, six, 0); \
-        char *srcbuf = (char*)src_uncast;\
-        /* Use write geometry */ \
-        char *dstbuf = ((char*)dst) + dix*bytes_per_site; \
-        cudaMemcpyAsync(dstbuf, srcbuf, bytes_per_site, cudaMemcpyDeviceToDevice); \
+        _type src_uncast; \
+        int dix_loc = blockIdx.x*BLOCK_SIZE + threadIdx.x; \
+        int dix = dix_loc + base_index; \
+        if (dix_loc < vol) { \
+            coord4 c = icoord[dix]; \
+            int six = ipt_ext_gpu(c.x[0], c.x[1], c.x[2], c.x[3]); \
+            int six_loc = six - block_start; \
+            _type* dst_in = (_type*)dst; \
+            _type* dst_uncast = _DFIELD_AT_PTR(dst_in, base_index, 0, 0, (_size));/* Add master shift here*/ \
+            /*_type* dst_uncast = dst_in + (_size)*base_index;*/ \
+            for (int comp = 0; comp < (_size); ++comp) { \
+                read_gpu_##_type(stride, src_uncast, lattice_block, six_loc, comp); \
+                write_gpu_##_type(vol, src_uncast, dst_uncast, dix_loc, comp); \
+            } \
+        } \
     }
 
-_DECLARE_KERNEL(gfield_f, suNf);
-_DECLARE_KERNEL(spinor_field_f, suNf_spinor);
+
+//__global__ void box_to_buffer_kernel_gfield_f(void *dst, suNf *lattice, int base_index, int stride, coord4* icoord, int bytes_per_site, \
+                                                int* ipt_gpu, int vol) {}
+_DECLARE_KERNEL(gfield_f, suNf, 4);
+_DECLARE_KERNEL(spinor_field_f, suNf_spinor, 1);
 
 #ifdef __cplusplus
     extern "C" {
@@ -37,25 +47,37 @@ _DECLARE_KERNEL(spinor_field_f, suNf_spinor);
                                     _type *lattice, \
                                     void *sendbuf) \
     { \
-        const int bytes_per_site = (_size)*sizeof(*lattice); \
+        int full_vol = boxVolume(src); \
+        coord4 *c = src->icoord; \
+        coord4 *d_c; \
+        /*TODO: This is incorrect, we need to calculate the volume right.*/ \
+        cudaMalloc((void**)&d_c, 4*full_vol*sizeof(*c)); \
+        cudaMemcpy(d_c, c, 4*full_vol*sizeof(*c), cudaMemcpyHostToDevice); \
         _PIECE_FOR(gd, ixp) \
         { \
             int vol = 0; \
             int stride = 0; \
+            int base_idx = 0; \
+            if ((ixp % 2)==0) { \
+                vol = boxEvenVolume(src); \
+                base_idx = src->base_index; \
+            } else { \
+                vol = boxOddVolume(src); \
+                base_idx = src->base_index_odd; \
+            } \
             if ((ixp%2)==0) vol = boxEvenVolume(src); \
             else vol = boxOddVolume(src); \
-            coord4 *c = src->icoord; \
-            coord4 *d_c; \
-            /* These memory transfers might be a performance problem (SAM) */ \
-            cudaMalloc((void**)&d_c, sizeof(c)); \
-            cudaMemcpy(d_c, c, sizeof(c), cudaMemcpyHostToDevice); \
             int grid = (vol -1)/BLOCK_SIZE +1; \
-            stride = gd->master_start[ixp] - gd->master_end[ixp] + 1; \
-            box_to_buffer_kernel_##_name<<<grid, BLOCK_SIZE>>>(sendbuf, lattice, src->base_index, vol, d_c, bytes_per_site, ipt_gpu); \
+            stride = gd->master_end[ixp] - gd->master_start[ixp] + 1; \
+            int block_start = gd->master_start[ixp]; \
+            _type* lattice_block = lattice + (_size)*block_start; \
+            box_to_buffer_kernel_##_name<<<grid, BLOCK_SIZE>>>(sendbuf, lattice_block, base_idx, stride, d_c, ipt_gpu, vol, block_start); \
         } \
     } 
 
 _DECLARE_SYNC_BOX(gfield_f, suNf, 4);
+//void sync_box_to_buffer_gpu_gfield_f(geometry_descriptor *gd, box_t *src, suNf *lattice, void *sendbuf) {}
+
 _DECLARE_SYNC_BOX(spinor_field_f, suNf_spinor, 1);
 
 #ifdef __cplusplus

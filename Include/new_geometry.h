@@ -11,11 +11,19 @@
  #include "suN_types.h"
 
 
+#ifdef MAIN_PROGRAM
+#  define GLB_VAR(type,name,...) type name __VA_ARGS__
+#else
+#  define GLB_VAR(type,name,...) extern type name
+#endif
+
+
  #ifdef __cplusplus
     extern "C" {
  #endif
 
 #include <stdint.h>
+#include <stddef.h>
 
 void define_geometry();
 void* sendbuf_alloc(size_t bytes_per_site);
@@ -57,6 +65,15 @@ typedef struct _box_t {
 //TODO: do we want to add vol, even_vol, odd_vol for avoid recomputing them every time?
 //TODO: do we want to precompute ipt_ext for sendboxes?
 
+// TODO: this should be in geometry.h and geometry descriptor should contain it
+// enum to define geometry type
+// this is a simple bitmask with GLOBAL = EVEN | ODD
+enum gd_type {
+    EVEN   = 1, 
+    ODD    = 2,
+    GLOBAL = 3
+};
+
 void sync_field_to_buffer_gpu_gfield_f(geometry_descriptor*, suNf*, void*);
 void sync_field_to_buffer_gpu_spinor_field_f(geometry_descriptor*, suNf_spinor*, void*);
 void sync_buffer_to_field_gpu_gfield_f(geometry_descriptor*, suNf*, void*);
@@ -64,8 +81,16 @@ void sync_buffer_to_field_gpu_spinor_field_f(geometry_descriptor*, suNf_spinor*,
 
 int boxEvenVolume(box_t *B);
 int boxOddVolume(box_t *B);
+int boxVolume(box_t*);
+
+// This is to keep a list of boxes to fill out the field buffers
+GLB_VAR(box_t*,geometryBoxes);
+//static box_t *geometryBoxes;
+// TODO: make this into an array instead of a list?
 
 #ifdef __cplusplus
     }
 #endif
- #endif
+
+#undef GLB_VAR
+#endif

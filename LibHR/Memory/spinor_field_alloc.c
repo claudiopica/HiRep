@@ -50,14 +50,13 @@
         #ifdef WITH_NEW_GEOMETRY
             #define _SENDBUF_ALLOC(_size, _i) \
                     f[_i].sendbuf_ptr = sendbuf_alloc((_size)*sizeof(*(f[_i].ptr))); \
-                    /*cudaMalloc((void **)&(f[_i].sendbuf_gpu_ptr), sizeof(f[_i].sendbuf_ptr));*/ \
-                    /*cudaMalloc((void **)&(f[_i].recvbuf_gpu_ptr), sizeof(f[_i].sendbuf_ptr));*/
+                    int alloc_length = (_size)*sizeof(*(f[_i].ptr))*(glattice.gsize_gauge - boxVolume(geometryBoxes)); \
+                    cudaMalloc((void **)&(f[_i].sendbuf_gpu_ptr), alloc_length);
 
         #else
             #define _SENDBUF_ALLOC(_size, _i) \
                     f[_i].sendbuf_ptr = f[_i].ptr; \
-                    f[_i].sendbuf_gpu_ptr = f[_i].gpu_ptr; \
-                    f[_i].recvbuf_gpu_ptr = f[_i].gpu_ptr; 
+                    f[_i].sendbuf_gpu_ptr = f[_i].gpu_ptr;
 
         #endif
 

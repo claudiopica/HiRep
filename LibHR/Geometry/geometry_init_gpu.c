@@ -23,10 +23,10 @@ void init_neighbors_gpu()
   error_id = cudaMalloc((void **)&idn_gpu, 4 * N * sizeof(int));
   error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error allocating idn_gpu neighbors array.\n");
 
-  error_id = cudaMalloc((void **)&imask_gpu, N * sizeof(*imask));
+  error_id = cudaMalloc((void **)&imask_gpu, 8 * N * sizeof(char));
   error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error allocating imask_gpu lookup table.\n");
 
-  error_id = cudaMalloc((void **)&ipt_gpu, (X+2*X_BORDER)*(Y+2*Y_BORDER)*(Z+2*Z_BORDER)*(T+2*T_BORDER));
+  error_id = cudaMalloc((void **)&ipt_gpu, (X+2*X_BORDER)*(Y+2*Y_BORDER)*(Z+2*Z_BORDER)*(T+2*T_BORDER)*sizeof(int));
   error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error allocating ipt_gpu lookup table.\n");
 
   error_id = cudaMemcpy(iup_gpu, iup, 4 * N * sizeof(int), cudaMemcpyHostToDevice);
@@ -38,7 +38,7 @@ void init_neighbors_gpu()
   error_id = cudaMemcpy(imask_gpu, imask, N * sizeof(*imask), cudaMemcpyHostToDevice);
   error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error copying imask lookup table to device memory.\n");
 
-  error_id = cudaMemcpy(ipt_gpu, ipt, (X+2*X_BORDER)*(Y+2*Y_BORDER)*(Z+2*Z_BORDER)*(T+2*T_BORDER), cudaMemcpyHostToDevice);
+  error_id = cudaMemcpy(ipt_gpu, ipt, (X+2*X_BORDER)*(Y+2*Y_BORDER)*(Z+2*Z_BORDER)*(T+2*T_BORDER)*sizeof(int), cudaMemcpyHostToDevice);
   error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error copying ipt to device memory.\n");
 
   error_id = cudaMemcpyToSymbol(T_EXT_GPU, &T_EXT, sizeof(int), 0, cudaMemcpyHostToDevice);

@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     copy_to_gpu_gfield_f(u_gauge_f);
 
     // Test Block
-    return_val += test_hermiticity(&I_operator, &I_operator_cpu, "Unit operator");
+    //return_val += test_hermiticity(&I_operator, &I_operator_cpu, "Unit operator");
     return_val += test_hermiticity(&Q_operator, &Q_operator_cpu, "Q = g5Dphi");
 
     // Finalize and return

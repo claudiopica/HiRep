@@ -12,7 +12,6 @@
     #include <mpi.h>
 #endif
 
-
 // TODO: Single precision will not work, because then we need to cast to flt
 // TODO: put gpu as last suffix
 // TODO: fill buffers needs gpu suffix
@@ -51,13 +50,12 @@ void zeroes_float(float* flt, int n)
 #define _DECLARE_START_SENDRECV(_name, _field_type, _site_type, _size, _geom) \
     void start_sendrecv_gpu_##_name(_field_type *f) \
     { \
-        printf("Starting comms...\n");\
         sync_gpu_##_name(f); \
         MPI_Status status[f->type->nbuffers_##_geom];\
         for (int i = 0; i < f->type->nbuffers_##_geom; ++i) \
         { \
             /* Destination Parameters */ \
-            double *recv_buffer = (double*)(f->recvbuf_gpu_ptr + (_size)*f->type->rbuf_start[i]);\
+            double *recv_buffer = (double*)(f->gpu_ptr + (_size)*f->type->rbuf_start[i]);\
             int recv_proc = f->type->rbuf_from_proc[i];\
             int recv_size_in_dbl = (_size)*(f->type->rbuf_len[i])*sizeof(*(f->gpu_ptr))/sizeof(double);\
             \
@@ -66,11 +64,26 @@ void zeroes_float(float* flt, int n)
             int send_proc = f->type->sbuf_to_proc[i];\
             int send_size_in_dbl = (_size)*(f->type->sbuf_len[i])*sizeof(*(f->gpu_ptr))/sizeof(double); \
             \
-            /* Start to send */\
-            CHECK_MPI(MPI_Isend(send_buffer, send_size_in_dbl, MPI_DOUBLE, send_proc, i, cart_comm, &(f->comm_req[2*i])));\
-            \
             /* Start to receive */\
-            CHECK_MPI(MPI_Irecv(recv_buffer, recv_size_in_dbl, MPI_DOUBLE, recv_proc, i, cart_comm, &(f->comm_req[2*i+1])));\
+            int mpiret; (void)mpiret; \
+            mpiret = MPI_Irecv(recv_buffer, recv_size_in_dbl, MPI_DOUBLE, recv_proc, i, cart_comm, &(f->comm_req[2*i+1]));\
+            if (mpiret != MPI_SUCCESS) { \
+                char mesg[MPI_MAX_ERROR_STRING]; \
+                int mesglen; \
+                MPI_Error_string(mpiret, mesg, &mesglen); \
+                lprintf("MPI", 0, "ERROR: %s\n", mesg); \
+                error(1, 1, "global_sum_gpu " __FILE__, ": Cannot start recv comms.\n"); \
+            } \
+            \
+            /* Start to send */\
+            mpiret = MPI_Isend(send_buffer, send_size_in_dbl, MPI_DOUBLE, send_proc, i, cart_comm, &(f->comm_req[2*i]));\
+            if (mpiret != MPI_SUCCESS) { \
+                char mesg[MPI_MAX_ERROR_STRING]; \
+                int mesglen; \
+                MPI_Error_string(mpiret, mesg, &mesglen); \
+                lprintf("MPI", 0, "ERROR: %s\n", mesg); \
+                error(1, 1, "global_sum_gpu " __FILE__, ": Cannot start send comms.\n");\
+            } \
         } \
     }
 
@@ -106,7 +119,7 @@ void zeroes_float(float* flt, int n)
         if (nreq > 0) \
         { \
             MPI_Status status[nreq]; \
-            CHECK_MPI(MPI_Waitall(nreq, f->comm_req, status)); \
+            MPI_Waitall(nreq, f->comm_req, status); \
         } \
     } 
 

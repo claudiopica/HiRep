@@ -162,6 +162,8 @@ int test_bijectivity_spinor_field_f()
     lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", spinor_field_sqnorm_f_cpu(in_copy));
 
     copy_to_gpu_spinor_field_f(in);
+    start_sendrecv_gpu_spinor_field_f(in);
+    complete_sendrecv_gpu_spinor_field_f(in);
 
     spinor_field_zero_f_cpu(in);
     lprintf("SANITY CHECK", 0, "CPU copy should be zero in intermediate step: %0.2e\n", spinor_field_sqnorm_f_cpu(in));

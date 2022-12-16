@@ -1,6 +1,8 @@
 #ifndef GLOBAL_GPU_H
 #define GLOBAL_GPU_H
 
+#include "global.h"
+
 #ifdef WITH_GPU
 
 #ifdef GLB_GPU

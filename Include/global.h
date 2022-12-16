@@ -16,6 +16,7 @@
 
 #include <stddef.h>
 #include "check_options.h"
+#include "new_geometry.h"
 
 #ifdef __cplusplus
   extern "C" {
@@ -26,6 +27,8 @@
 #else
 #  define GLB_VAR(type,name,...) extern type name
 #endif
+
+
 
 /* local lattice attributes */
 GLB_VAR(int,T,=0); /* local lattice size in direction T */
@@ -239,4 +242,5 @@ GLB_VAR(int,four_fermion_active,=0); // whether four fermion interactions are ac
   }
 #endif
 
+#undef GLB_VAR
 #endif
