@@ -48,15 +48,26 @@
         #define _FREE_MPI_FIELD_DATA  if (f->comm_req != NULL) afree(f->comm_req)
         
         #ifdef WITH_NEW_GEOMETRY
-            #define _SENDBUF_ALLOC(_size, _i) \
+            #ifdef WITH_GPU
+                #define _SENDBUF_ALLOC(_size, _i) \
                     f[_i].sendbuf_ptr = sendbuf_alloc((_size)*sizeof(*(f[_i].ptr))); \
                     int alloc_length = (_size)*sizeof(*(f[_i].ptr))*(glattice.gsize_gauge - boxVolume(geometryBoxes)); \
                     cudaMalloc((void **)&(f[_i].sendbuf_gpu_ptr), alloc_length);
+            #else 
+                #define _SENDBUF_ALLOC(_size, _i) \
+                    f[_i].sendbuf_ptr = sendbuf_alloc((_size)*sizeof(*(f[_i].ptr))); 
+            #endif
+
 
         #else
-            #define _SENDBUF_ALLOC(_size, _i) \
+            #ifdef WITH_GPU
+                #define _SENDBUF_ALLOC(_size, _i) \
                     f[_i].sendbuf_ptr = f[_i].ptr; \
                     f[_i].sendbuf_gpu_ptr = f[_i].gpu_ptr;
+            #else
+                #define _SENDBUF_ALLOC(_size, _i) \
+                    f[_i].sendbuf_ptr = f[_i].ptr; 
+            #endif
 
         #endif
 

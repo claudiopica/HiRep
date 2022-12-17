@@ -8,6 +8,7 @@
 #define DIRAC_GPU_H
 
 #include "spinor_field.h"
+#include "dirac_default.h"
 
 #ifdef __cplusplus
     extern "C" {

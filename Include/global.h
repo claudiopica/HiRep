@@ -241,6 +241,4 @@ GLB_VAR(int,four_fermion_active,=0); // whether four fermion interactions are ac
 #ifdef __cplusplus
   }
 #endif
-
-#undef GLB_VAR
 #endif
