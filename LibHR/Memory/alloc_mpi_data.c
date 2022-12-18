@@ -12,7 +12,7 @@
     #ifdef WITH_NEW_GEOMETRY
         #ifdef WITH_GPU
             #define _SENDBUF_ALLOC(_size, _i) \
-            /*TODO: GPU sendbuf not allocated correctly. (SAM)*/ \
+            /*TODO: GPU sendbuf not allocated correctly, use handles instead of allocating for every field. (SAM)*/ \
                 f[_i].sendbuf_ptr = sendbuf_alloc((_size)*sizeof(*(f[_i].ptr))); \
                 int alloc_length = (_size)*sizeof(*(f[_i].ptr))*(glattice.gsize_gauge - boxVolume(geometryBoxes)); \
                 cudaMalloc((void **)&(f[_i].sendbuf_gpu_ptr), alloc_length);

@@ -1,4 +1,4 @@
-
+#ifdef WITH_GPU
 #include "suN.h"
 #include "suN_types.h"
 #include "spinor_field.h"
@@ -8,7 +8,8 @@
 #ifdef WITH_GPU
 #include "global_gpu.h"
 
-//TODO the code in this file is broken
+//TODO this code is chaotic and needs better integration with the concepts in the
+//     new geometry.
 
 #define _DECLARE_KERNEL(_name, _type, _size) \
     __global__ void box_to_buffer_kernel_##_name(void *dst, _type *lattice_block, int base_index, int stride, coord4* icoord, \
@@ -31,9 +32,6 @@
         } \
     }
 
-
-//__global__ void box_to_buffer_kernel_gfield_f(void *dst, suNf *lattice, int base_index, int stride, coord4* icoord, int bytes_per_site, \
-                                                int* ipt_gpu, int vol) {}
 _DECLARE_KERNEL(gfield_f, suNf, 4);
 _DECLARE_KERNEL(spinor_field_f, suNf_spinor, 1);
 
@@ -47,12 +45,15 @@ _DECLARE_KERNEL(spinor_field_f, suNf_spinor, 1);
                                     _type *lattice, \
                                     void *sendbuf) \
     { \
-        int full_vol = boxVolume(src); \
+        /* icoord array gives coordinates of inner lattice given a buffer index */ \
         coord4 *c = src->icoord; \
         coord4 *d_c; \
         /*TODO: This is incorrect, we need to calculate the volume right.*/ \
-        cudaMalloc((void**)&d_c, 4*full_vol*sizeof(*c)); \
-        cudaMemcpy(d_c, c, 4*full_vol*sizeof(*c), cudaMemcpyHostToDevice); \
+        int full_vol = boxVolume(src); \
+        cudaMalloc((void**)&d_c, gd->nbuffers_gauge*full_vol*sizeof(coord4)); \
+        cudaMemcpy(d_c, c, gd->nbuffers_gauge*full_vol*sizeof(coord4), cudaMemcpyHostToDevice); \
+        \
+        /* Iterate over pieces and fill out buffers */\
         _PIECE_FOR(gd, ixp) \
         { \
             int vol = 0; \
@@ -67,7 +68,7 @@ _DECLARE_KERNEL(spinor_field_f, suNf_spinor, 1);
             } \
             if ((ixp%2)==0) vol = boxEvenVolume(src); \
             else vol = boxOddVolume(src); \
-            int grid = (vol -1)/BLOCK_SIZE +1; \
+            int grid = (vol - 1)/BLOCK_SIZE +1; \
             stride = gd->master_end[ixp] - gd->master_start[ixp] + 1; \
             int block_start = gd->master_start[ixp]; \
             _type* lattice_block = lattice + (_size)*block_start; \
@@ -75,12 +76,37 @@ _DECLARE_KERNEL(spinor_field_f, suNf_spinor, 1);
         } \
     } 
 
-_DECLARE_SYNC_BOX(gfield_f, suNf, 4);
-//void sync_box_to_buffer_gpu_gfield_f(geometry_descriptor *gd, box_t *src, suNf *lattice, void *sendbuf) {}
+#define _DECLARE_SYNC_FIELD(_name, _type, _geom) \
+    void sync_field_to_buffer_gpu_##_name(geometry_descriptor *gd, \
+                        _type *lattice,  \
+                        void *sendbuf) \
+    { \
+        error(geometryBoxes==NULL, 1, __func__, "geometryBoxes are not initialized.\n"); \
+        \
+        /* Query first buffer box in the list */ \
+        box_t *L = geometryBoxes->next; \
+        \
+        /* Iterate over all boxes*/ \
+        /* The i-counter is necessary, because spinor-like and gauge-like fields have */ \
+        /* different numbers of buffers */ \
+        int i = 0; \
+        while (L && i < gd->nbuffers_##_geom) \
+        { \
+            sync_box_to_buffer_gpu_##_name(gd, L->sendBox, lattice, sendbuf); \
+            L=L->next; i++; \
+        } \
+    } 
 
-_DECLARE_SYNC_BOX(spinor_field_f, suNf_spinor, 1);
+#define _DECLARE_SYNC_FUNCTIONS(_name, _type, _size, _geom) \
+    _DECLARE_SYNC_BOX(_name, _type, _size) \
+    _DECLARE_SYNC_FIELD(_name, _type, _geom)
+
+_DECLARE_SYNC_FUNCTIONS(gfield_f, suNf, 4, gauge);
+_DECLARE_SYNC_FUNCTIONS(spinor_field_f, suNf_spinor, 1, spinor);
 
 #ifdef __cplusplus
     }
+#endif
+
 #endif
 #endif

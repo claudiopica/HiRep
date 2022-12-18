@@ -10,7 +10,6 @@
 #include "utils.h"
 #include "memory.h"
 #include "new_geometry.h"
-#include "new_geom_gpu.h"
 
 inline int safe_mod(int x, int y)
 {
@@ -119,6 +118,7 @@ static const char*bt_names[]={"L0","L1","L2","L3","INNER","SENDBUF"};
 
 static coord4 *rb_icoord=NULL; //global lookup table for recv buffers (L3+L2 borders)
 static coord4 *sb_icoord=NULL; //global lookup table for send buffers
+static int icoord_idx=NULL;
 
 box_t* duplicateBox(box_t *B) {
     box_t *b=(box_t*)malloc(sizeof(box_t));
@@ -301,6 +301,7 @@ static box_t *makeLocalBox(){
                 .sendBox=NULL,
                 // .ipt_ext=NULL,
                 .icoord=NULL,
+                .icoord_idx=NULL,
                 .next=NULL
               };
     setBoxParity(&B);
@@ -401,6 +402,7 @@ static void index_alloc() {
     rb_icoord=(coord4*)malloc((rb_volume+sb_volume)*sizeof(coord4));
     error((rb_icoord == NULL), 1, __func__ , "Cannot allocate memory for send/recv icoord");
     sb_icoord=rb_icoord+rb_volume;
+
 }
 
 static void index_free() {
@@ -1011,33 +1013,6 @@ void sync_field(geometry_descriptor *gd, int bytes_per_site, int is_spinor_like,
         L=L->next; i++;
     }
 }
-
-#ifdef WITH_GPU
-#include "new_geom_gpu.h"
-
-#define _DECLARE_SYNC_FIELD(_name, _type, _geom) \
-    void sync_field_to_buffer_gpu_##_name(geometry_descriptor *gd, \
-                        _type *lattice,  \
-                        void *sendbuf) \
-    { \
-        if (geometryBoxes==NULL) printf("geometryBoxes are not initialized.\n");\
-        box_t *L = geometryBoxes->next; \
-        int i = 0; \
-        while (L && i < gd->nbuffers_##_geom) \
-        { \
-            sync_box_to_buffer_gpu_##_name(gd, L->sendBox, lattice, sendbuf); \
-            L=L->next; i++; \
-        } \
-    } 
-
-_DECLARE_SYNC_FIELD(gfield_f, suNf, gauge);
-_DECLARE_SYNC_FIELD(spinor_field_f, suNf_spinor, spinor);
-
-#undef _DECLARE_NEW_GEOM
-#undef _DECLARE_SYNC_BOX
-#undef _DECLARE_SYNC_FIELD
-
-#endif
 
 // ███    ███      █████      ██     ███    ██ 
 // ████  ████     ██   ██     ██     ████   ██ 

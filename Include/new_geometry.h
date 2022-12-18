@@ -59,6 +59,7 @@ typedef struct _box_t {
     enum box_type type; // tell the type of the box, just a convenience for testing
     int *ipt_ext; //given the cordinate of a point in the box returns an index
     coord4 *icoord; //given an index in the box return the 4D coordinates of the point in the box relative to the l[4]
+    int *icoord_idx; //given an index in the box return the index of the point in the box relative to the l[4]
     struct _box_t *sendBox; //if this is a border corresponding to a Recv buffer, this is the box to copy data from, i.e. corresponding to the Send buffer
     struct _box_t *next; // link to next box. NULL if last
 } box_t;
