@@ -50,7 +50,7 @@
 #define _BUF_GPU_DFIELD_BLK(s,i,size) (((s)->gpu_ptr) + size*(s)->type->rbuf_start[(i)])
 
 #define _GPU_IDX_TO_LOCAL(in, ix, ixp) ix - in->type->master_start[(ixp)];
-#define _SITE_IDX_GPU(ix, ixp, stride) (ix) + stride*(ixp)
+//#define _SITE_IDX_GPU(ix, ixp, stride) (ix) + stride*(ixp)
 
 #ifdef __cplusplus
 	}

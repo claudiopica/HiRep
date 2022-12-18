@@ -13,7 +13,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include <iostream>
 #include "gpu.h"
 #include "io.h"
 #include "global.h"
