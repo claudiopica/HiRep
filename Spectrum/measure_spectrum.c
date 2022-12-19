@@ -30,7 +30,6 @@
 #include "communications.h"
 #include "spectrum.h"
 #include "clover_tools.h"
-#include "cinfo.c"
 #include "setup.h"
 #include "data_storage.h"
 

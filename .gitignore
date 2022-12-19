@@ -10,10 +10,11 @@ LibHR/Update/approx_data.db
 LibHR/Utils/suN_exp.c
 
 #object, dependences, library and info files
+build
 *.o
 *.d
 *.a
-**/cinfo.c
+**/cinfo.h
 **/.test_failed
 **/out_0
 **/err_0

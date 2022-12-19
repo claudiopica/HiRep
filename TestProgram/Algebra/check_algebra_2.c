@@ -1,6 +1,6 @@
 /*******************************************************************************
 *
-* NOCOMPILE= !NG=3
+* NOCOMPILE= !NG==3
 * NOCOMPILE= !REPR_ANTISYMMETRIC
 * NOCOMPILE= WITH_MPI
 *
@@ -27,18 +27,6 @@
 #include "update.h"
 #include "setup.h"
 #include "logger.h"
-
-#if (NG != 3)
-#error : check_algebra_2 only works for SU(3)
-#endif
-
-#ifndef REPR_ANTISYMMETRIC
-#error : check_algebra_2 only works for 2AS representation
-#endif
-
-#ifdef WITH_MPI
-#error : check_algebra_2 only works only on serial jobs
-#endif
 
 int main(int argc, char *argv[])
 {

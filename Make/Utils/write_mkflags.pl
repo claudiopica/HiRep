@@ -22,6 +22,7 @@ GetOptions(
   'clover|c!'   => \(my $clover = 0),
   'expclover|e!'   => \(my $expclover = 0),
   'eo!'   => \(my $eoprec = 1),
+  'newgeo!'   => \(my $newgeo = 0),
   'quat|q!'   => \(my $quat = 0),
   'ndebug!'   => \(my $ndebug = 1),
   'dfloat!'   => \(my $dfloat = 0),
@@ -176,6 +177,8 @@ $clover && print $fh "MACRO += -DWITH_CLOVER\n";
 $expclover && print $fh "MACRO += -DWITH_EXPCLOVER\n";
 # write eo preconditioning
 $eoprec && print $fh "MACRO += -DWITH_EO\n";
+# write new geometry
+$newgoe && print $fh "MACRO += -DWITH_NEW_GEOMETRY\n";
 # write quaternions 
 $quat && print $fh "MACRO += -DWITH_QUATERNIONS\n";
 # write ndebug
@@ -240,6 +243,7 @@ write_mkflags - write flags file for compilation of HiRep
   --[no-]ccache       [false]     Use ccache
 
   --[no-]eo           [true]      Even-Odd preconditioning
+  --[no-]newgeo       [false]     Use new geometry
   
   --[no-]twist        [false]     XYZ twisted boundary conditions
   --[no-]sf           [false]     Schrodinger functional b.c.

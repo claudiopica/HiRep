@@ -178,10 +178,10 @@
 
     #define _FREE_GPU_FIELD_DATA(_name, _site_type) do {} while (0)
     #define _ALLOC_GPU_FIELD_DATA(_name, _site_type, _size) do {} while (0)
-    #define _DECLARE_COPY_TO(_name, _field_type, _site_type, _size)
-    #define _DECLARE_COPY_FROM(_name, _field_type, _site_type, _size)
-    #define _DECLARE_CONVERT_TO_GPU_FORMAT(_name, _field_type, _site_type, _size) 
-    #define _DECLARE_CONVERT_TO_CPU_FORMAT(_name, _field_type, _site_type, _size)
+    #define _DECLARE_COPY_TO(_name, _field_type, _site_type, _size) void copy_to_gpu_##_name(_field_type *f) {}
+    #define _DECLARE_COPY_FROM(_name, _field_type, _site_type, _size) void copy_from_gpu_##_name(_field_type *f) {}
+    #define _DECLARE_CONVERT_TO_GPU_FORMAT(_name, _field_type, _site_type, _size) void to_gpu_format_##_name(_field_type *out, _field_type *in) {}
+    #define _DECLARE_CONVERT_TO_CPU_FORMAT(_name, _field_type, _site_type, _size) void to_cpu_format_##_name(_field_type *out, _field_type *in) {}
 
 #endif
 

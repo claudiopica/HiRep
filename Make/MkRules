@@ -184,7 +184,7 @@ $(patsubst %,clean-%,$(SUBDIRS)):
 
 clean:: $(patsubst %,clean-%,$(SUBDIRS))
 	echo -n "$(_col_clean)Cleaning$(_col_norm) $(call _cfname,$(CDIR))..." &&\
-	rm -f *.o *.rpo *~ *.il *.dyn *.ii *.s .*.d *.a cinfo.c .lib.updated debug err_* out_* &&\
+	rm -f *.o *.rpo *~ *.il *.dyn *.ii *.s .*.d *.a .lib.updated debug err_* out_* &&\
 	echo " $(_cdone)"
 	if test "$(EXES)" != "" -a "$(CEXE)" != "" ; then \
 	  echo -n "$(_col_clean)Removing EXEs$(_col_norm) in $(call _cfname,$(CDIR))..." &&\
@@ -194,12 +194,6 @@ clean:: $(patsubst %,clean-%,$(SUBDIRS))
 
 cleanall::
 	CEXE="all" $(MAKE) -Oline clean
-
-LOCK_CINFO:= lock.cinfo
-
-cinfo.c: $(MKDIR)/MkFlags $(MKDIR)/MkRules $(MKDIR)/Utils/cinfo.sh
-	$(MKDIR)/Utils/cinfo.sh $(MKDIR) $(TOPDIR) $(MACRO)
-
 
 LDFLAGS += $(foreach _lib, $(LIBS),-L$(dir $(_lib)))
 LDFLAGS += $(foreach _lib, $(LIBS),-l$(patsubst lib%.a,%,$(notdir $(_lib))))

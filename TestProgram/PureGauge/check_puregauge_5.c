@@ -2,7 +2,7 @@
  *
  * Gauge invariance of the glueball operators
  *
- * NOCOMPILE= NG=2
+ * NOCOMPILE= NG==2
  *******************************************************************************/
 
 #define MAIN_PROGRAM

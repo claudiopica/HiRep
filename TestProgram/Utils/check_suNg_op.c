@@ -1,5 +1,5 @@
 /*
- * NOCOMPILE = SO
+ * NOCOMPILE = !GAUGE_SUN
  */
 #define MAIN_PROGRAM
 

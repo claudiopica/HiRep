@@ -26,50 +26,48 @@ int gf_control=0,sf_control=0;
 
 /* functions for filling sending buffer */
 #ifdef WITH_MPI
-
-
-static void sync_spinor_field_flt(spinor_field_flt *p) {
-  int i;
-  /* int j, x, y; */
-  geometry_descriptor *gd = p->type;
-
-  for(i=0; i<gd->ncopies_spinor; ++i) {
-    memcpy((p->ptr+gd->copy_to[i]-gd->master_shift),(p->ptr+gd->copy_from[i]-gd->master_shift),(gd->copy_len[i])*sizeof(*(p->ptr)));
-    /*
-       for(j=0; j<gd->copy_len[i]; j++) {
-       x=gd->copy_from[i]+j;
-       y=gd->copy_to[i]+j;
-       p->ptr[y] = p->ptr[x];
-       }
-       */
-  }
-}
-
+#ifdef WITH_NEW_GEOMETRY
 static void sync_gauge_field_flt(suNg_field_flt *gf) {
-  int i;
+  sync_field(gf->type, 4*sizeof(*gf->ptr), 0, gf->ptr, gf->sendbuf_ptr);
+}
+#else
+static void sync_gauge_field_flt(suNg_field_flt *gf) {
   geometry_descriptor *gd=gf->type;
-  /* int j, mu, x, y; */
-
-  for(i=0; i<gd->ncopies_gauge; ++i) {
+  for(int i=0; i<gd->ncopies_gauge; ++i) {
     /* this assumes that the 4 directions are contiguous in memory !!! */
     memcpy(((gf->ptr)+4*gd->copy_to[i]),((gf->ptr)+4*gd->copy_from[i]),4*(gd->copy_len[i])*sizeof(*(gf->ptr)));
-    /*   
-         for(j=0; j<gd->copy_len[i]; j++) {
-         x=gd->copy_from[i]+j;
-         y=gd->copy_to[i]+j;
-         for(mu=0; mu<4; mu++)
-     *pu_gauge(y,mu) = *pu_gauge(x,mu);
-     }
-     */
   }
 }
+#endif
+
+#ifdef WITH_NEW_GEOMETRY
+static void sync_spinor_field_flt(spinor_field_flt *p) {
+  sync_field(p->type, sizeof(*p->ptr), 1, p->ptr, p->sendbuf_ptr);
+}
+#else
+static void sync_spinor_field_flt(spinor_field_flt *p) {
+  geometry_descriptor *gd = p->type;
+  for(int i=0; i<gd->ncopies_spinor; ++i) {
+    memcpy((p->ptr+gd->copy_to[i]-gd->master_shift),(p->ptr+gd->copy_from[i]-gd->master_shift),(gd->copy_len[i])*sizeof(*(p->ptr)));
+  }
+}
+#endif
+
 #endif /* WITH_MPI */
 
+
+static void *gf_sendrecv_guard=NULL;
 
 void complete_gf_sendrecv_flt(suNg_field_flt *gf) {
 #ifdef WITH_MPI
   int mpiret; (void)mpiret; // Remove warning of variable set but not used
   int nreq=2*gf->type->nbuffers_gauge;
+
+#ifdef WITH_NEW_GEOMETRY
+  if (gf_sendrecv_guard!=NULL && gf_sendrecv_guard != gf->comm_req)  
+    error(1, 1, "complete_gf_sendrecv " __FILE__, "More simultaneous communication attempted. Existing...\n");
+  gf_sendrecv_guard = NULL;
+#endif
 
   if(nreq>0) {
     MPI_Status status[nreq];
@@ -120,6 +118,10 @@ void start_gf_sendrecv_flt(suNg_field_flt *gf) {
   /* bisognerebbe forse avere una variabile di stato nei campi?? */
   complete_gf_sendrecv_flt(gf);
 
+#ifdef WITH_NEW_GEOMETRY
+  gf_sendrecv_guard=(void*)gf->comm_req;
+#endif
+
   /* fill send buffers */
   sync_gauge_field_flt(gf);
 
@@ -131,13 +133,13 @@ void start_gf_sendrecv_flt(suNg_field_flt *gf) {
 
   for (i=0; i<(gd->nbuffers_gauge); ++i) {
     /* send ith buffer */
-    mpiret=MPI_Isend((float*)((gf->ptr)+4*gd->sbuf_start[i]), /* buffer */
-        (gd->sbuf_len[i])*sizeof(suNg_flt)/sizeof(float)*4, /* lenght in units of flaots */
-        MPI_FLOAT, /* basic datatype */
-        gd->sbuf_to_proc[i], /* cid of destination */
-        i, /* tag of communication */
-        cart_comm, /* use the cartesian communicator */
-        &(gf->comm_req[2*i]) /* handle to communication request */
+    mpiret=MPI_Isend((float*)((gf->sendbuf_ptr)+4*gd->sbuf_start[i]), /* buffer */
+        (gd->sbuf_len[i])*sizeof(suNg_flt)/sizeof(float)*4,   /* lenght in units of flaots */
+        MPI_FLOAT,                                            /* basic datatype */
+        gd->sbuf_to_proc[i],                                  /* cid of destination */
+        i,                                                    /* tag of communication */
+        cart_comm,                                            /* use the cartesian communicator */
+        &(gf->comm_req[2*i])                                  /* handle to communication request */
         );
 #ifndef NDEBUG
     if (mpiret != MPI_SUCCESS) {
@@ -151,12 +153,12 @@ void start_gf_sendrecv_flt(suNg_field_flt *gf) {
 
     /* receive ith buffer */
     mpiret=MPI_Irecv((float*)((gf->ptr)+4*gd->rbuf_start[i]), /* buffer */
-        (gd->rbuf_len[i])*sizeof(suNg_flt)/sizeof(float)*4, /* lenght in units of floats */
-        MPI_FLOAT, /* basic datatype */
-        gd->rbuf_from_proc[i], /* cid of origin */
-        i, /* tag of communication */
-        cart_comm, /* use the cartesian communicator */
-        &(gf->comm_req[2*i+1]) /* handle to communication request */
+        (gd->rbuf_len[i])*sizeof(suNg_flt)/sizeof(float)*4,   /* lenght in units of floats */
+        MPI_FLOAT,                                            /* basic datatype */
+        gd->rbuf_from_proc[i],                                /* cid of origin */
+        i,                                                    /* tag of communication */
+        cart_comm,                                            /* use the cartesian communicator */
+        &(gf->comm_req[2*i+1])                                /* handle to communication request */
         );
 #ifndef NDEBUG
     if (mpiret != MPI_SUCCESS) {
@@ -173,11 +175,20 @@ void start_gf_sendrecv_flt(suNg_field_flt *gf) {
 #endif /* WITH_MPI */
 }
 
+static void *sf_sendrecv_guard=NULL;
 
 void complete_sf_sendrecv_flt(spinor_field_flt *sf) {
 #ifdef WITH_MPI
   int mpiret; (void)mpiret; // Remove warning of variable set but not used
   int nreq=2*sf->type->nbuffers_spinor;
+
+#ifdef WITH_NEW_GEOMETRY
+  if (sf_sendrecv_guard!=NULL && sf_sendrecv_guard != sf->comm_req) {
+    print_trace();
+    error(1, 1, "complete_sf_sendrecv " __FILE__, "More simultaneous communication attempted. Existing...\n");
+  }
+  sf_sendrecv_guard = NULL;
+#endif
 
 
 if(nreq>0) {
@@ -219,12 +230,9 @@ if(nreq>0) {
 #endif /* WITH_MPI */
 }
 
-
-
-
 void start_sf_sendrecv_flt(spinor_field_flt *sf) {
 #ifdef WITH_MPI
-  int i, mpiret, nreq; (void)mpiret; // Remove warning of variable set but not used
+  int i, mpiret; (void)mpiret; // Remove warning of variable set but not used
   geometry_descriptor *gd=sf->type;
 
 
@@ -232,6 +240,10 @@ void start_sf_sendrecv_flt(spinor_field_flt *sf) {
   /* questo credo che non sia il modo piu' efficiente!!! */
   /* bisognerebbe forse avere una variabile di stato nei campi?? */
   complete_sf_sendrecv_flt(sf);
+
+#ifdef WITH_NEW_GEOMETRY
+  sf_sendrecv_guard=(void*)sf->comm_req;
+#endif
 
   /* fill send buffers */
   sync_spinor_field_flt(sf);
@@ -241,39 +253,15 @@ void start_sf_sendrecv_flt(spinor_field_flt *sf) {
   sf_control=1;
 #endif
 
-  nreq=0;
   for (i=0; i<(gd->nbuffers_spinor); ++i) {
-
-    /* send ith buffer */
-    mpiret=MPI_Isend((float*)((sf->ptr)+(gd->sbuf_start[i])-(gd->master_shift)), /* buffer */
-        (gd->sbuf_len[i])*(sizeof(suNf_spinor_flt)/sizeof(float)), /* lenght in units of floats */
-        MPI_FLOAT, /* basic datatype */
-        gd->sbuf_to_proc[i], /* cid of destination */
-        i, /* tag of communication */
-        cart_comm, /* use the cartesian communicator */
-        &(sf->comm_req[nreq]) /* handle to communication request */
+    mpiret=MPI_Irecv((float*)((sf->ptr)+(gd->rbuf_start[i])-(gd->master_shift)),  /* buffer */
+        (gd->rbuf_len[i])*(sizeof(suNf_spinor_flt)/sizeof(float)),                /* lenght in units of float */
+        MPI_FLOAT,                                                                /* basic datatype */
+        gd->rbuf_from_proc[i],                                                    /* cid of origin */
+        i,                                                                        /* tag of communication */
+        cart_comm,                                                                /* use the cartesian communicator */
+        &(sf->comm_req[2*i+1])                                                     /* handle to communication request */
         );
-    nreq++;
-#ifndef NDEBUG
-    if (mpiret != MPI_SUCCESS) {
-      char mesg[MPI_MAX_ERROR_STRING];
-      int mesglen;
-      MPI_Error_string(mpiret,mesg,&mesglen);
-      lprintf("MPI",0,"ERROR: %s\n",mesg);
-      error(1,1,"start_gf_sendrecv_flt" __FILE__,"Cannot start send buffer");
-    }
-#endif
-
-    /* receive ith buffer */
-    mpiret=MPI_Irecv((float*)((sf->ptr)+(gd->rbuf_start[i])-(gd->master_shift)), /* buffer */
-        (gd->rbuf_len[i])*(sizeof(suNf_spinor_flt)/sizeof(float)), /* lenght in units of float */
-        MPI_FLOAT, /* basic datatype */
-        gd->rbuf_from_proc[i], /* cid of origin */
-        i, /* tag of communication */
-        cart_comm, /* use the cartesian communicator */
-        &(sf->comm_req[nreq]) /* handle to communication request */
-        );
-    nreq++;
 #ifndef NDEBUG
     if (mpiret != MPI_SUCCESS) {
       char mesg[MPI_MAX_ERROR_STRING];
@@ -283,7 +271,31 @@ void start_sf_sendrecv_flt(spinor_field_flt *sf) {
       error(1,1,"start_gf_sendrecv_flt" __FILE__,"Cannot start receive buffer");
     }
 #endif
+  }
 
+  int shift = gd->master_shift;
+#ifdef WITH_NEW_GEOMETRY
+  shift = 0;
+#endif
+
+  for (i=0; i<(gd->nbuffers_spinor); ++i) {
+    mpiret=MPI_Isend((float*)((sf->sendbuf_ptr)+(gd->sbuf_start[i])-shift),  /* buffer */
+        (gd->sbuf_len[i])*(sizeof(suNf_spinor_flt)/sizeof(float)),                /* lenght in units of floats */
+        MPI_FLOAT,                                                                /* basic datatype */
+        gd->sbuf_to_proc[i],                                                      /* cid of destination */
+        i,                                                                        /* tag of communication */
+        cart_comm,                                                                /* use the cartesian communicator */
+        &(sf->comm_req[2*i])                                                     /* handle to communication request */
+        );
+#ifndef NDEBUG
+    if (mpiret != MPI_SUCCESS) {
+      char mesg[MPI_MAX_ERROR_STRING];
+      int mesglen;
+      MPI_Error_string(mpiret,mesg,&mesglen);
+      lprintf("MPI",0,"ERROR: %s\n",mesg);
+      error(1,1,"start_gf_sendrecv_flt" __FILE__,"Cannot start send buffer");
+    }
+#endif
   }
 
 #endif /* WITH_MPI */

@@ -4,7 +4,7 @@ MKDIR = $(TOPDIR)/Make
 #the default target cannot start with .
 default: .autoheaders.h
  
-.autoheaders.h: suN.h suN_types.h suN_repr_func.h macro_opt.h gpu_geometry.h
+.autoheaders.h: suN.h suN_types.h suN_repr_func.h macro_opt.h gpu_geometry.h cinfo.h
 	echo done > $@
 
 
@@ -23,6 +23,12 @@ gpu_geometry.h: $(MKDIR)/MkFlags $(MKDIR)/Utils/write_gpu_geometry.pl
 	echo -n "$(_col_write)Writing GPU geometry macros$(_col_norm)..."
 	$(MKDIR)/Utils/write_gpu_geometry.pl $(NG) $(REPR) $(WQUAT) $(GAUGE_GROUP) && \
 		echo " $(_cdone)" || ( echo " $(c_failed)" && false )
+
+LOCK_CINFO:= lock.cinfo
+
+cinfo.h: $(MKDIR)/MkFlags $(MKDIR)/Utils/cinfo.sh
+	$(MKDIR)/Utils/cinfo.sh $(MKDIR) $(TOPDIR) $(MACRO)
+
 
 
 clean::

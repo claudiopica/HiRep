@@ -31,7 +31,6 @@
 #include "gaugefix.h"
 #include "setup.h"
 #include "communications.h"
-#include "cinfo.c"
 
 static double calc_plaq_diff(suNg_field *V, suNg_field *W)
 {

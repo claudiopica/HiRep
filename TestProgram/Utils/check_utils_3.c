@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * NOCOMPILE= NG=2
+ * NOCOMPILE= NG==2
  * Check of the glueballs operators for active against passive rotations.
  *
  *******************************************************************************/

@@ -1,7 +1,5 @@
 /*******************************************************************************
 *
-* NOCOMPILE= !WITH_GPU
-*
 * Check that the GPU reading and writing functions defined in suN.h 
 * are bijective.
 *
@@ -20,9 +18,8 @@
 #include "update.h"
 #include "geometry.h"
 #include "gpu_geometry.h"
-#include "basis_linear_algebra.h"
+#include "test_utils.h"
 #include <stdio.h>
-#include "mpi.h"
 #include "hr_complex.h"
 
 // TODO: get gaussian spinor fields to work with MPI-CUDA
@@ -242,8 +239,8 @@ int test_write_read_gauge_field_f_flt()
             {
                 in_mat = _4FIELD_AT(in, ix, comp);
                 out_mat = _4FIELD_AT(out, ix, comp);
-                write_gpu_suNf(stride, (*in_mat), block_start, ix_loc, comp);
-                read_gpu_suNf(stride, (*out_mat), block_start, ix_loc, comp);
+                write_gpu_suNf_flt(stride, (*in_mat), block_start, ix_loc, comp);
+                read_gpu_suNf_flt(stride, (*out_mat), block_start, ix_loc, comp);
             }
         }
     }
@@ -348,7 +345,7 @@ int test_write_read_spinor_field_f_vector_wise()
 
 int test_write_read_spinor_field_f_flt() 
 {
-    lprintf("INFO", 0, " ======= TEST SPINOR FIELD SINGLE PRECISION ======= ");
+    lprintf("INFO", 0, " ======= TEST SPINOR FIELD SINGLE PRECISION ======= \n");
     int return_val = 0;
     spinor_field_flt *in, *gpu_format, *out;
 
@@ -414,8 +411,8 @@ int test_write_read_spinor_field_f_flt_vector_wise()
             int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
             for (int comp = 0; comp < 4; ++comp)
             {
-                write_gpu_suNf_vector(stride, (*in_spinor).c[comp], block_start, ix_loc, comp);
-                read_gpu_suNf_vector(stride, (*out_spinor).c[comp], block_start, ix_loc, comp);
+                write_gpu_suNf_vector_flt(stride, (*in_spinor).c[comp], block_start, ix_loc, comp);
+                read_gpu_suNf_vector_flt(stride, (*out_spinor).c[comp], block_start, ix_loc, comp);
             }
         }
     }

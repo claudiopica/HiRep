@@ -96,13 +96,13 @@ int main(int argc, char *argv[])
   random_u(u_gauge);
   start_gf_sendrecv(u_gauge);
   represent_gauge_field();
-  gfield_copy_to_gpu_f(u_gauge_f);
+  copy_to_gpu_gfield_f(u_gauge_f);
   lprintf("MAIN", 0, "done.\n");
 
   // Generate random gauge transformation to apply
   lprintf("MAIN", 0, "Generating a random gauge transf... ");
   random_g();
-  gfield_copy_to_gpu(g);
+  copy_to_gpu_gfield(g);
   lprintf("MAIN", 0, "done.\n");
 
   // Setup initial gauge fields
@@ -121,17 +121,17 @@ int main(int argc, char *argv[])
 
   // Apply Gauge TF
   lprintf("MAIN", 0, "Gauge covariance of the Dirac operator:\n");
-  spinor_field_copy_to_gpu_f(s0);
+  copy_to_gpu_spinor_field_f(s0);
   loc_D(s1, s0);
-  spinor_field_copy_from_gpu_f(s1);
+  copy_from_gpu_spinor_field_f(s1);
 
   transform_s(s2, s1);
   transform_s(s3, s0);
   transform_u();
 
-  spinor_field_copy_to_gpu_f(s2);
-  spinor_field_copy_to_gpu_f(s3);
-  gfield_copy_to_gpu_f(u_gauge_f);
+  copy_to_gpu_spinor_field_f(s2);
+  copy_to_gpu_spinor_field_f(s3);
+  copy_to_gpu_gfield_f(u_gauge_f);
   spinor_field_zero_f(s1);
   loc_D(s1, s3);
   spinor_field_mul_add_assign_f(s1, -1.0, s2);

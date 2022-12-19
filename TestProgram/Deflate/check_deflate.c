@@ -34,6 +34,7 @@
 #include "spin_matrix.h"
 #include "propagator.h"
 #include "setup.h"
+#include "cinfo.h"
 
 #if defined(ROTATED_SF) && defined(BASIC_SF)
 #error This code does not work with the Schroedinger functional !!!

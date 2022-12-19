@@ -14,7 +14,7 @@
 #include "setup.h"
 #include "global.h"
 #include "linear_algebra.h"
-#include "basis_linear_algebra.h"
+#include "test_utils.h"
 #include "logger.h"
 #include "random.h"
 #include "memory.h"

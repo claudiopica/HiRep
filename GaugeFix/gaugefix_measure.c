@@ -30,7 +30,7 @@
         #include "gaugefix.h"
         #include "setup.h"
 
-        #include "cinfo.c"
+        #include "cinfo.h"
 
 
         char cnfg_filename[256]="";

@@ -880,7 +880,7 @@ typedef struct _SB_t {
     void *buf;
 } SB_t;
 
-#define _MAX_SENDBUF 8
+#define _MAX_SENDBUF 12
 static SB_t send_buffers[_MAX_SENDBUF] = { 0 };
 typedef int sb_handle;
 

@@ -2,6 +2,8 @@
  *
  * Generate random cnfg
  *
+ * NOCOMPILE= ROTATED_SF || BASIC_SF || FERMION_THETA
+ * 
  *******************************************************************************/
 
 #define MAIN_PROGRAM

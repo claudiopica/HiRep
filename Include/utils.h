@@ -58,7 +58,7 @@ void init_pure_gauge_anisotropy(double *chi);
 
 void SF_classical_solution();
 
-inline int safe_mod(int x, int y)
+inline static int safe_mod(int x, int y)
 {
   if (x >= 0)
     return (x % y);
@@ -126,10 +126,6 @@ int HYP_best_parameters(double mtp[6859], double w[3]);
 /* Timing */
 #include <sys/time.h>
 int timeval_subtract(struct timeval *result, struct timeval *x, struct timeval *y);
-
-/* CINFO */
-void print_compiling_info();
-void print_compiling_info_short();
 
 /* Spatial Trasformations*/
 void initialize_spatial_active_slices(int *tlist);

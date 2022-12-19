@@ -1,6 +1,6 @@
 /*******************************************************************************
 * NOCOMPILE= !WITH_EXPCLOVER
-* NOCOMPILE= !NG=2 !NG=3
+* NOCOMPILE= !NG==2 && !NG==3
 * NOCOMPILE= !REPR_FUNDAMENTAL
 * Check the horner scheme for the implementation of the exp csw.
 * This test is performed only for fundamental SU(2) and SU(3) fermions

@@ -57,10 +57,10 @@ int main(int argc,char *argv[])
   gaussian_spinor_field(s0);
   gaussian_spinor_field(s1);
   lprintf("LA TEST",0,"un sito %lf\n",creal(s0->ptr[2].c[0].c[0]));
-  spinor_field_copy_to_gpu_f(s0);
-  spinor_field_copy_to_gpu_f(s1);
-  spinor_field_copy_to_gpu_f(s2);
-  spinor_field_copy_to_gpu_f(s3);
+  copy_to_gpu_spinor_field_f(s0);
+  copy_to_gpu_spinor_field_f(s1);
+  copy_to_gpu_spinor_field_f(s2);
+  copy_to_gpu_spinor_field_f(s3);
   //
   //#pragma omp parallel num_threads(1) default(shared)
 #pragma omp parallel
@@ -80,7 +80,7 @@ _OMP_BARRIER
   random_u(u_gauge);
   start_gf_sendrecv(u_gauge);
   represent_gauge_field();
-  gfield_copy_to_gpu_f(u_gauge_f);
+  copy_to_gpu_gfield_f(u_gauge_f);
 
   lprintf("MAIN",0,"done.\n");
 

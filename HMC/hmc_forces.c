@@ -29,7 +29,7 @@
 #include "observables.h"
 #include "utils.h"
 #include "spectrum.h"
-#include "cinfo.c"
+#include "cinfo.h"
 #include "representation.h"
 #include "linear_algebra.h"
 #include "setup.h"

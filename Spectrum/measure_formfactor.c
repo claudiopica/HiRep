@@ -33,7 +33,7 @@
 #include "spectrum.h"
 #include "clover_tools.h"
 
-#include "cinfo.c"
+#include "cinfo.h"
 
 #if defined(ROTATED_SF) && defined(BASIC_SF)
 #error This code does not work with the Schroedinger functional !!!
