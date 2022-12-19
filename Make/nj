@@ -37,6 +37,7 @@ foreach ( @ARGV ) {
     # consider targets as relative to cwd
     $ntargets ++;
     my $target = "$cwd$_";
+    if ($target =~ /\.[coh]$/) { $target = "$builddir/$target"; }
     push(@ninja_args, $target);
 }
 # nj without arguments build the current dir

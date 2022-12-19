@@ -38,6 +38,7 @@ AR = ar
 
 INCLUDE = $INCLUDE -I$root/Include
 CFLAGS = $MACRO $CFLAGS $INCLUDE
+GPUFLAGS = $MACRO $GPUFLAGS $INCLUDE
 LDFLAGS = -L$builddir $LDFLAGS
 
 wr_head = $makedir/Utils/write_suN_headers.pl
@@ -50,12 +51,18 @@ rule cc
   depfile = $out.d
   deps = gcc
 
+rule nvcc
+  command = $NVCC -ccbin $CC -MMD -MF $out.d $GPUFLAGS --device-c $in -o $out
+  description = $setbg NVCC $setnorm $out
+  depfile = $out.d
+  deps = gcc
+
 rule ar
   command = rm -f $out && $AR crs $out $in
   description = $setbg AR $setnorm $out
 
 rule link
-  command = $CC $LDFLAGS -o $out $in $libs -lm
+  command = $LINK $LDFLAGS -o $out $in $libs -lm 
   description = $setbg LINK $setnorm $out
 
 rule suN_headers
@@ -84,7 +91,7 @@ build $wr_repr_build/writeREPR.o: cc $makedir/Utils/autosun/main.cc
   CC = $CXX
   CFLAGS = -D_${REPR}_ -D_${GAUGE_GROUP}_ -D_PICA_STYLE_ -DNDEBUG -O3
 build $wr_repr: link $wr_repr_build/writeREPR.o
-  CC = $CXX
+  LINK = $CXX
   LDFLAGS =
 build writeREPR: phony $wr_repr
 
@@ -144,13 +151,14 @@ sub obj_rules {
     my @c_objs = ();
     foreach ( @c_sources ) {
         my $obj = $_;
-        $obj=~s/\.c$/\.o/;
+        $obj=~s/\.cu?$/\.o/;
         my $absobj = abs_path($obj);
         $absobj =~ s/^$absroot\///;
         $obj = "\$builddir/$absobj";
         if (not exists $targets{$obj}) {
             my $abssrc = abs_path("$_");
-            print "build $obj: cc $abssrc || generated_files\n";
+            my $cc_cmd = /\.cu$/ ? "nvcc" : "cc";
+            print "build $obj: $cc_cmd $abssrc || generated_files\n";
             $targets{$obj} = "";
         }
         # $obj .= " ";
@@ -220,7 +228,7 @@ sub add_exes {
 #
 sub read_conf {
     my ($filename) = @_;
-    open my $fh, '<', $filename or die "Could not open '$filename' $!";
+    open my $fh, '<', $filename or die "Can not open '$filename' $!";
 
     my %options;
 
@@ -232,7 +240,7 @@ sub read_conf {
         if ($line =~ /^([^=]+?)\s*\+?=\s*(.*?)\s*$/) {
             my ($field, $value) = ($1, $2);
             if (not exists $options{$field}) { $options{$field} = []; }
-            push(@{$options{$field}},"$value");
+            if ($value) { push(@{$options{$field}},"$value"); }
             next; 
         }
     }
@@ -252,6 +260,29 @@ sub read_conf {
     # handle WITH_MPI compiler 
     if (contains($options{'MACRO'},"-DWITH_MPI")) {
         $options{'CC'} = $options{'MPICC'};
+    }
+
+    #set linker 
+    $options{'LINK'} = [ $options{'CC'}[0] ] ;
+
+    # handle WITH_GPU
+    if (contains($options{'MACRO'},"-DWITH_GPU")) {
+        if (not exists $options{'NVCC'}) {
+            die("'WITH_GPU' is set but no 'NVCC' compiler given!\n");
+        }
+        # find CUDA install dir
+        # ideally we would ask the NVCC compiler, but it does not seems to be supported
+        my $nvcc = $options{'NVCC'}[0];
+        my $nvcc_path = `echo 'command -v $nvcc' | sh`;
+        $nvcc_path =~ m{(.*?)/bin/$nvcc} or die("Cannot locate NVCC compiler [$nvcc]!\n");
+        my $cuda_path = $1;
+        print ("CUDA= $cuda_path\n");
+        #add standard CUDA include and lib dirs
+        push(@{$options{'INCLUDE'}},"-I$cuda_path/include/");
+        push(@{$options{'LDFLAGS'}},"-lcuda");
+
+        #set linker 
+        unshift @{$options{'LINK'}}, "$nvcc -ccbin "; 
     }
 
     #add standard definitions to MACRO
@@ -289,13 +320,12 @@ sub no_compile {
     my $max_lines = 20; #max number of lines we read to process NOCOMPILE options
     my ($source) = @_;
     my @options = ();
-    open my $FH,'<',$source or die $!;
+    open my $FH,'<',$source or die "[$source]: $!\n";
     while (<$FH>) {
         if (/^\s*\*\s* NOCOMPILE\s*=\s*(.*?)\s*$/) { push(@options, $1); }
         last if $. >= $max_lines;
     }
     close $FH;
-
     # if no NOCOMPILE options are given exit
     if (!@options) { return 0; }
 
@@ -417,12 +447,16 @@ EOF
         }
         print FH "\n";
     }
-
+    my $includelist="";
+    foreach(@{$options{"INCLUDE"}}) {
+        /-I(.*)/ or die("Wrong format for INCLUDE!\n");
+        $includelist .= ",\"$1\"";
+    }
     print FH <<EOF;
             ],
             "compilerPath": "$compiler",
             "intelliSenseMode": "$compilermode",
-            "includePath": ["$rootdir/Include"],
+            "includePath": ["$rootdir/Include"$includelist],
             "cStandard": "c99",
             "cppStandard": "c++14"
         }
@@ -431,6 +465,23 @@ EOF
 }
 EOF
     close(FH);
+
+    $optfile = "$rootdir/.vscode/settings.json";
+    open(FH, '>', $optfile) or die $!;
+    print FH <<EOF;
+{
+    "files.associations": {
+        "*.h": "c",
+        "*.c": "c",
+        "*.c.sdtmpl": "c",
+        "*.hpp": "cuda",
+        "*.cu": "cuda",
+        "*.cu.sdtmpl": "cuda",
+    }
+}
+EOF
+    close(FH);
+
 }
 
 # this is needed

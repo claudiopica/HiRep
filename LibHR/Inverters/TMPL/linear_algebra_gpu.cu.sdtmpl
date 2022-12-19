@@ -7,7 +7,6 @@
 #include "gpu.h"
 #include <stdio.h>
 #include "error.h"
-#include "linear_algebra_gpu.cu"
 
 #define _TOCOMPLEX(sp) ((_COMPLEX *)(sp))
 #define _NCOM (sizeof(_SPINOR_TYPE)/sizeof(_COMPLEX))
@@ -28,6 +27,52 @@ _BODY({
   _TWO_SPINORS_MATCHING(s1,s2);
   cudaMemcpy(s1->gpu_ptr,s2->gpu_ptr,s1->type->gsize_spinor*sizeof(_SPINOR_TYPE),cudaMemcpyDeviceToDevice);
 })
+
+/* auxillary functions for GPU reductions */
+#ifndef ALLOC_AUX_GPU
+#define ALLOC_AUX_GPU
+
+static double* alloc_double_sum_field(int n){
+  static double* res = NULL;
+  static int n_size=0;
+  if (n>n_size && res!=NULL){
+    cudaFree(res);
+    res = NULL;
+  }
+
+  if (res == NULL){
+    cudaMalloc((void **) & res,n*sizeof(double));
+    n_size = n;
+  }
+  return res;
+}
+
+static hr_complex* alloc_complex_sum_field(int n){
+  static hr_complex* res = NULL;
+  static int n_size = 0;
+  if (n>n_size && res!=NULL){
+    cudaFree(res);
+    res = NULL;
+  }
+  if (res == NULL){
+    cudaMalloc((void **) & res,n*sizeof(hr_complex));
+    n_size = n;
+  }
+  return res;
+}
+#endif 
+
+/**
+* @brief Sums across GPU nodes after finding the local sum (generics)
+*
+* @param vector		Vector with local results
+* @param size		Size of vector
+*
+* @return T		Result of sum of generic type T.
+*/
+template <class T>
+T global_sum_gpu(T *vector, int size);
+// This function is defined in global_sum_gpu.cu
 
 /* Re <s1,s2> */
 _FUNC(double, spinor_field_prod_re, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))

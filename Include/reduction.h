@@ -86,25 +86,7 @@ void bcast(double *d, int n);
  */
 void bcast_int(int *i, int n);
 
-#ifdef __cplusplus
-   }
-#endif
-
 #ifdef WITH_GPU
-   // TODO: Here the cross compilation does not work (SAM)
-   #ifdef __cplusplus
-      /**
-      * @brief Sums across GPU nodes after finding the local sum (generics)
-      *
-      * @param vector		Vector with local results
-      * @param size		Size of vector
-      *
-      * @return T		Result of sum of generic type T.
-      */
-      template <class T>
-      T global_sum_gpu(T *vector, int size);
-      extern "C" {
-   #endif
 
    /**
    * @brief Sums across GPU nodes after finding the local sum (integer)
@@ -155,10 +137,10 @@ void bcast_int(int *i, int n);
    * @return hr_complex	Result of sum
    */
    hr_complex global_sum_gpu_complex(hr_complex *vector, int size);
-    
-   #ifdef __cplusplus
-      }
-   #endif
 
+#endif
+    
+#ifdef __cplusplus
+   }
 #endif
 #endif 

@@ -1,10 +1,16 @@
 #!/usr/bin/env perl
 use warnings;
 use strict;
+use Cwd qw(abs_path);
 
-my $rootdir = ".";
+my $ownpath = abs_path($0);
+$ownpath =~ m{^(.*?)/Make/.*} or die("Wrong install dir for b script!\n");
+my $rootdir = $1;
 require "$rootdir/Make/NinjaBuild.pl";
+#change to $rootdir
+chdir $rootdir;
 
+# set $rootdir and write build rules
 build_rules($rootdir);
 
 ###############################################################################
@@ -25,7 +31,7 @@ build_rules($rootdir);
   my @lib_objs =();
   for ( @subdirs ) {
       my $dir = "$topdir/$_";
-      my @c_sources = glob($dir . "/*.c");
+      my @c_sources = glob("$dir/*.c $dir/*.cu");
       exclude_files(\@c_sources, $exclude{$_});
       my @c_objs = obj_rules($dir, @c_sources);
       push(@lib_objs, @c_objs);

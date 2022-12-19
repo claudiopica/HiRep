@@ -21,7 +21,7 @@
 *******************************************************************************/
 
 #ifdef __cplusplus
-#include "gpu_complex.h"
+#include "gpu_complex.hpp"
 #else
 #include "cpu_complex.h"
 #endif

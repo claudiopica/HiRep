@@ -9,15 +9,11 @@
  *        cluster relating to GPUs.
  */
 #ifdef WITH_GPU
-extern "C" {
-  #include "logger.h"
-}
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
-#include <iostream>
-#include "gpu.h"
+#include "gpu_info.h"
 #include "io.h"
 #include "global.h"
 #include "logger.h"
@@ -43,11 +39,11 @@ const char *sComputeMode[] = {
  *
  * @param input_gpu             A struct containing parameters on the current GPU.
  */
-void print_device_count_info(input_gpu gpu_var) 
+void print_device_count_info(input_gpu gpu_var_init) 
 {
   int device_count;
   CHECK_CUDA(cudaGetDeviceCount(&device_count));
-  lprintf("GPU_INIT", 0, "GPU_ID = %d\n", gpu_var.gpuID);
+  lprintf("GPU_INIT", 0, "GPU_ID = %d\n", gpu_var_init.gpuID);
   //error(gpu_id > device_count, 1, "init_gpu", "Illegal device ID"); 
   // I don't see what we need this for (SAM)
 }
@@ -88,14 +84,14 @@ void print_runtime_info(cudaDeviceProp device_prop)
  * @param cudaDeviceProp        A CUDA class containing information on the device.
  * @param input_gpu             A struct containing parameters on the current GPU.
  */
-void print_global_memory_info(cudaDeviceProp device_prop, input_gpu gpu_var) 
+void print_global_memory_info(cudaDeviceProp device_prop, input_gpu gpu_var_init) 
 {
   int mem_bus_width;
   int mem_clock;
 
   // Query properties
-  cuDeviceGetAttribute(&mem_bus_width, CU_DEVICE_ATTRIBUTE_GLOBAL_MEMORY_BUS_WIDTH,gpu_var.gpuID);
-  cuDeviceGetAttribute(&mem_clock, CU_DEVICE_ATTRIBUTE_MEMORY_CLOCK_RATE, gpu_var.gpuID);
+  cuDeviceGetAttribute(&mem_bus_width, CU_DEVICE_ATTRIBUTE_GLOBAL_MEMORY_BUS_WIDTH,gpu_var_init.gpuID);
+  cuDeviceGetAttribute(&mem_clock, CU_DEVICE_ATTRIBUTE_MEMORY_CLOCK_RATE, gpu_var_init.gpuID);
 
 
   // Print formatted
@@ -127,12 +123,12 @@ void print_shared_memory_info(cudaDeviceProp device_prop)
  * @param cudaDeviceProp        A CUDA class containing information on the device.
  * @param input_gpu             A struct containing parameters on the current GPU.
  */
-void print_cache_info(cudaDeviceProp device_prop, input_gpu gpu_var) 
+void print_cache_info(cudaDeviceProp device_prop, input_gpu gpu_var_init) 
 {
   int l2_cache_size;
 
   // Query properties
-  cuDeviceGetAttribute(&l2_cache_size, CU_DEVICE_ATTRIBUTE_L2_CACHE_SIZE, gpu_var.gpuID);
+  cuDeviceGetAttribute(&l2_cache_size, CU_DEVICE_ATTRIBUTE_L2_CACHE_SIZE, gpu_var_init.gpuID);
 
   // Print formatted
   lprintf("GPU_INIT",10,"L2 Cache Size: %dB\n",l2_cache_size); 
@@ -171,11 +167,11 @@ void print_constant_memory_info(cudaDeviceProp device_prop)
  * @param cudaDeviceProp        A CUDA class containing information on the device.
  * @param input_gpu             A struct containing parameters on the current GPU.
  */
-void print_memory_info(cudaDeviceProp device_prop, input_gpu gpu_var) 
+void print_memory_info(cudaDeviceProp device_prop, input_gpu gpu_var_init) 
 {
-  print_global_memory_info(device_prop, gpu_var);
+  print_global_memory_info(device_prop, gpu_var_init);
   print_shared_memory_info(device_prop);
-  print_cache_info(device_prop, gpu_var);
+  print_cache_info(device_prop, gpu_var_init);
   print_constant_memory_info(device_prop);
 }
 
@@ -185,7 +181,7 @@ void print_memory_info(cudaDeviceProp device_prop, input_gpu gpu_var)
  * @param cudaDeviceProp        A CUDA class containing information on the device.
  * @param input_gpu             A struct containing parameters on the current GPU.
  */
-void print_compute_info(cudaDeviceProp device_prop, input_gpu gpu_var) 
+void print_compute_info(cudaDeviceProp device_prop, input_gpu gpu_var_init) 
 {
   // Print formatted
   lprintf("GPU_INIT", 10, "Multiprocessors: %d\n", device_prop.multiProcessorCount);
@@ -235,12 +231,12 @@ void print_supported_features(cudaDeviceProp device_prop)
  *
  * @param input_gpu             A struct containing parameters on the current GPU.
  */
-void print_hardware_info(cudaDeviceProp device_prop, input_gpu gpu_var) 
+void print_hardware_info(cudaDeviceProp device_prop, input_gpu gpu_var_init) 
 {
   lprintf("GPU_INIT", 10, "Device: %s\n", device_prop.name);
 
-  print_memory_info(device_prop, gpu_var);
-  print_compute_info(device_prop, gpu_var);
+  print_memory_info(device_prop, gpu_var_init);
+  print_compute_info(device_prop, gpu_var_init);
 }
 
 #endif

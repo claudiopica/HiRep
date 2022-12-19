@@ -5,12 +5,12 @@
 
 #ifndef DIRAC_CPU_H
 #define	DIRAC_CPU_H
-
-#include "spinor_field.h"
-
 #ifdef __cplusplus
     extern "C" {
 #endif
+
+#include "spinor_field.h"
+
 
 /**
  * @brief Number of times the dirac operator was applied to the CPU field data copy of a

@@ -11,9 +11,6 @@
  */
 
 #ifdef WITH_GPU
-extern "C" {
-  #include "logger.h"
-}
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -25,6 +22,7 @@ extern "C" {
 #include "error.h"
 #include "geometry.h"
 #include "gpu_info.h"
+#include "logger.h"
 #ifdef WITH_MPI
   #include "mpi.h"
 #endif
@@ -39,20 +37,20 @@ int enable_GPU_peer_to_peer_access();
  * @param input_gpu             A struct containing information on the current active
  *                              GPU
  */ 
-void init_gpu(input_gpu gpu_var)
+void init_gpu(input_gpu gpu_var_init)
 {
   lprintf("GPU_INIT", 0, "Initializing GPU\n");
   struct cudaDeviceProp device_prop;
-  CHECK_CUDA(cudaGetDeviceProperties(&device_prop, gpu_var.gpuID));
+  CHECK_CUDA(cudaGetDeviceProperties(&device_prop, gpu_var_init.gpuID));
 
   // Print GPU info
-  print_device_count_info(gpu_var);
+  print_device_count_info(gpu_var_init);
   print_driver_info(device_prop);
   print_runtime_info(device_prop);
-  print_hardware_info(device_prop, gpu_var);
+  print_hardware_info(device_prop, gpu_var_init);
 
   // Select a card (no MPI) or bind cards to processes (MPI)
-  select_GPU(gpu_var);
+  select_GPU(gpu_var_init);
 
   // Setup global variables necessary for optimal kernel execution
   grid_size_max_gpu = device_prop.maxGridSize[0];
@@ -64,11 +62,11 @@ void init_gpu(input_gpu gpu_var)
  * @param input_gpu             A struct containing information on the current active
  *                              GPU
  */
-void select_GPU(input_gpu gpu_var) 
+void select_GPU(input_gpu gpu_var_init) 
 {
   #ifndef WITH_MPI /* For Single GPU -> select device with ID=0 */
-    CHECK_CUDA(cudaSetDevice(gpu_var.gpuID));
-    lprintf("GPU_INIT", 0, "Using GPU #%d\n", gpu_var.gpuID);
+    CHECK_CUDA(cudaSetDevice(gpu_var_init.gpuID));
+    lprintf("GPU_INIT", 0, "Using GPU #%d\n", gpu_var_init.gpuID);
   #else /* For Multi-GPU -> bind devices to local ranks using hwloc */
     /*
     TODO: The following code is wrong. What we need is

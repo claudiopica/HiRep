@@ -2,6 +2,8 @@
 * Copyright (c) 2008, Claudio Pica                                          *
 * All rights reserved.                                                      *
 \***************************************************************************/
+#ifdef WITH_GPU
+//This file should not be compiled if !WITH_GPU
 
 #include "global.h"
 #include <string.h>
@@ -14,6 +16,8 @@
 #include "error.h"
 #include "linear_algebra.h"
 
+#include "./linear_algebra_gpu_kernels.hpp"
+
 /*
  * LINEAR ALGEBRA FUNCTIONS ARE DEFINED IN THE TEMPLATE
  *
@@ -22,28 +26,19 @@
  */
 
 /* double precision */
-// Declare types for double precision template parsing
+  // Declare types for double precision template parsing
 #define _SPINOR_FIELD_TYPE spinor_field
 #define _SPINOR_TYPE suNf_spinor
 #define _REAL double
 #define _COMPLEX hr_complex
 
-#define _FUNC(a,b,c) a b##_f_cpu c
+// Use GPU template to declare double precision functions (C++)
+#define _FUNC(a,b,c) a b##_f_gpu c
 #define _BODY(a) a
-#include "TMPL/linear_algebra.c.sdtmpl"
+#include "TMPL/linear_algebra_gpu.cu.sdtmpl"
 #undef _FUNC
 #undef _BODY
 
-//set double precision function aliases
-#ifdef WITH_GPU
-  #define _FUNC(a,b,c) a (*b##_f) c = b##_f_gpu
-#else
-  #define _FUNC(a,b,c) a (*b##_f) c = b##_f_cpu
-#endif
-#define _BODY(a) ;
-#include "TMPL/linear_algebra.c.sdtmpl"
-
- //Undefine all definitions to move on to single precision
 #undef _FUNC
 #undef _BODY
 #undef _SPINOR_FIELD_TYPE
@@ -58,25 +53,19 @@
 #define _REAL float
 #define _COMPLEX hr_complex_flt
 
-#define _FUNC(a,b,c) a b##_f_flt_cpu c
+// C++ GPU function template
+#define _FUNC(a,b,c) a b##_f_flt_gpu c
 #define _BODY(a) a
-#include "TMPL/linear_algebra.c.sdtmpl"
+#include "TMPL/linear_algebra_gpu.cu.sdtmpl"
 #undef _FUNC
 #undef _BODY
 
-//set single precision function aliases
-#ifdef WITH_GPU
-  #define _FUNC(a,b,c) a (*b##_f_flt) c = b##_f_flt_gpu
-#else
-  #define _FUNC(a,b,c) a (*b##_f_flt) c = b##_f_flt_cpu
-#endif
-#define _BODY(a) ;
-#include "TMPL/linear_algebra.c.sdtmpl"
-
-//Undefine single precision definitions.
+  //Undefine single precision definitions.
 #undef _FUNC
 #undef _BODY
 #undef _SPINOR_FIELD_TYPE
 #undef _SPINOR_TYPE
 #undef _REAL
 #undef _COMPLEX
+
+#endif

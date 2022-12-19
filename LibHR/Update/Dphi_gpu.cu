@@ -29,7 +29,7 @@
 #include "memory.h"
 #include "gpu.h"
 #include "hr_complex.h"
-#include <iostream>
+// #include <iostream>
 
 __global__ void Dphi_gpu_kernel(suNf_spinor*,
                             const suNf_spinor*,
