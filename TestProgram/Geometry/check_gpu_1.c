@@ -86,13 +86,13 @@ int main(int argc, char *argv[])
     for (int i=0;i<sfsize;i++){
         spinor_field_copy_f_cpu(&sf2[i],&sf1[i]);
                //print_spinor_field_cpu(&sf2[i]);
-        spinor_field_copy_to_gpu_f(&sf2[i]);
+        copy_to_gpu_spinor_field_f(&sf2[i]);
         spinor_field_zero_f_cpu(&sf2[i]);
                //print_spinor_field_cpu(&sf2[i]);
         spinor_field_copy_f(&sf3[i],&sf2[i]);
-        spinor_field_copy_from_gpu_f(&sf2[i]);
+        copy_from_gpu_spinor_field_f(&sf2[i]);
                //print_spinor_field_cpu(&sf2[i]);
-        spinor_field_copy_from_gpu_f(&sf3[i]);
+        copy_from_gpu_spinor_field_f(&sf3[i]);
     }
 
     // Calculate norm on CPU

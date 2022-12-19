@@ -268,9 +268,9 @@ int test_convert_back_forth_scalar_field()
 
     // Setup scalar fields
     suNg_scalar_field *in, *tmp, *out;
-    in = alloc_scalar_field(&glattice);
-    tmp = alloc_scalar_field(&glattice);
-    out = alloc_scalar_field(&glattice);
+    in = alloc_suNg_scalar_field(&glattice);
+    tmp = alloc_suNg_scalar_field(&glattice);
+    out = alloc_suNg_scalar_field(&glattice);
 
     random_scalar_field_cpu(in);
     lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.2e]\n", sqnorm_scalar_field_cpu(in)); 
@@ -286,9 +286,9 @@ int test_convert_back_forth_scalar_field()
     sub_assign_scalar_field_cpu(out, in);
     double diff_norm = sqnorm_scalar_field_cpu(out);
 
-    free_scalar_field(in);
-    free_scalar_field(tmp);
-    free_scalar_field(out);
+    free_suNg_scalar_field(in);
+    free_suNg_scalar_field(tmp);
+    free_suNg_scalar_field(out);
     return check_diff_norm_zero(diff_norm);
 }
 

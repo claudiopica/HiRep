@@ -1,8 +1,9 @@
 #!/usr/bin/env perl
 use warnings;
 use strict;
+use File::Path qw(make_path);
 use Cwd qw(abs_path);
-use Data::Dumper;
+# use Data::Dumper;
 
 my $disable_color = 0;
 my $create_vscode_c_cpp_properties = 1;
@@ -11,6 +12,7 @@ my $create_vscode_c_cpp_properties = 1;
 
 my $inifile = "MkFlags.ini";
 my %options = ();
+my $with_gpu = 0; #this is also in the %options
 
 my %targets = ();
 my $absroot;
@@ -152,13 +154,17 @@ sub obj_rules {
     foreach ( @c_sources ) {
         my $obj = $_;
         $obj=~s/\.cu?$/\.o/;
+        my $cc_rule = "cc";
+        if (/\.cu$/) {
+            $cc_rule = "nvcc";
+            if(!$with_gpu) { next; } #skip cuda files if not with_gpu
+        } 
         my $absobj = abs_path($obj);
         $absobj =~ s/^$absroot\///;
         $obj = "\$builddir/$absobj";
         if (not exists $targets{$obj}) {
             my $abssrc = abs_path("$_");
-            my $cc_cmd = /\.cu$/ ? "nvcc" : "cc";
-            print "build $obj: $cc_cmd $abssrc || generated_files\n";
+            print "build $obj: $cc_rule $abssrc || generated_files\n";
             $targets{$obj} = "";
         }
         # $obj .= " ";
@@ -270,6 +276,8 @@ sub read_conf {
         if (not exists $options{'NVCC'}) {
             die("'WITH_GPU' is set but no 'NVCC' compiler given!\n");
         }
+        $with_gpu = 1;
+
         # find CUDA install dir
         # ideally we would ask the NVCC compiler, but it does not seems to be supported
         my $nvcc = $options{'NVCC'}[0];
@@ -430,6 +438,9 @@ sub print_c_cpp_properties {
     my $compiler = `echo 'command -v ${$options{'CC'}}[0]' | sh`;
     chomp($compiler);
     my $compilermode = "gcc-x64";
+    
+    #make sure path exists
+    make_path("$rootdir/.vscode/");
 
     open(FH, '>', $optfile) or die $!;
     print FH <<EOF;

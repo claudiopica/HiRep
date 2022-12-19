@@ -41,7 +41,7 @@ double sfdiff_gpu(spinor_field* sf){
   double res;
   tmp=alloc_spinor_field_f(1, sf->type);
   spinor_field_copy_f_cpu(tmp,sf);
-  spinor_field_copy_to_gpu_f(tmp);
+  copy_to_gpu_spinor_field_f(tmp);
   spinor_field_sub_f(tmp,tmp,sf);
   res=spinor_field_sqnorm_f(tmp);
   free_spinor_field_f(tmp);
@@ -54,7 +54,7 @@ double sfdiff(spinor_field* sf){
   tmp=alloc_spinor_field_f(1, sf->type);
 
   spinor_field_copy_f(tmp,sf);
-  spinor_field_copy_from_gpu_f(tmp);
+  copy_from_gpu_spinor_field_f(tmp);
   spinor_field_sub_f_cpu(tmp,tmp,sf);
 
   res=spinor_field_sqnorm_f_cpu(tmp);
@@ -136,7 +136,7 @@ int main(int argc,char *argv[])
 
 // Copy content of CPU field to GPU field
   for (i=0;i<sfsize;i++){
-    spinor_field_copy_to_gpu_f(&sf1[i]);
+    copy_to_gpu_spinor_field_f(&sf1[i]);
   }
 
 // Copying to the other spinor field... Now all fields are equal, Copy from 2nd arg to 1st
@@ -149,8 +149,8 @@ int main(int argc,char *argv[])
 
   // Check copy to and from GPU, copy sf3 to GPU and back to CPU.
   // Check that it is still equal to sf1 on CPU.
-  spinor_field_copy_to_gpu_f(&sf3[0]);
-  spinor_field_copy_from_gpu_f(&sf3[0]);
+  copy_to_gpu_spinor_field_f(&sf3[0]);
+  copy_from_gpu_spinor_field_f(&sf3[0]);
   res_cpu = spinor_field_sqnorm_f_cpu(&sf1[0]);
   res_cpu2 = spinor_field_sqnorm_f_cpu(&sf3[0]);
 
