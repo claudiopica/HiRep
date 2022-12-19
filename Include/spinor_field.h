@@ -227,11 +227,16 @@ _DECLARE_FIELD_STRUCT(suNg_av_field, suNg_algebra_vector);
  */
 _DECLARE_FIELD_STRUCT(scalar_field, double);
 
+typedef struct {
+  hr_complex up[NF * (2 * NF + 1)];
+  hr_complex dn[NF * (2 * NF + 1)];
+} ldl_t;
+
 /**
  * @struct _ldl_field
  * @brief FIXME: Add docs
  */
-//_DECLARE_FIELD_STRUCT(ldl_field, ldl_t);
+_DECLARE_FIELD_STRUCT(ldl_field, ldl_t);
 
 /**
  * @struct _suNfc_field

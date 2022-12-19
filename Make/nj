@@ -2,6 +2,7 @@
 use warnings;
 use strict;
 use Cwd qw(abs_path getcwd);
+use File::Path qw(make_path);
 
 my $ownpath = abs_path($0);
 my $cwd = getcwd;
@@ -10,7 +11,18 @@ my $rootdir = $1;
 $cwd =~ s{^$rootdir/?}{};
 if ($cwd) { $cwd .= "/"; }
 
-my $ninja_cmd = "ninja -C $rootdir -f $rootdir/build/build.ninja ";
+my $builddir = "$rootdir/build";
+my $ninja_file = "$builddir/build.ninja";
+if (not (-e $builddir)) {
+     print "Creating build dir [$builddir]\n";
+     make_path($builddir);
+}
+if (not (-s $ninja_file)) {
+     print "Generating Ninja build file [$ninja_file]\n";
+     system("$rootdir/Make/build.pl > $ninja_file");
+}
+
+my $ninja_cmd = "ninja -C $rootdir -f $ninja_file ";
 my @ninja_args = ();
 my $skip = 0;
 my $ntargets = 0;
