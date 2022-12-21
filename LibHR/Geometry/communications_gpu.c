@@ -131,19 +131,20 @@ void zeroes_float(float* flt, int n)
 
 /* Spinor fields */
 _DECLARE_COMMS(spinor_field_f, spinor_field, suNf_spinor, 1, spinor, double);
-//_DECLARE_COMMS(spinor_field_f_flt, spinor_field_flt, suNf_spinor_flt, 1, spinor, float);
-//_DECLARE_COMMS(sfield, scalar_field, double, 1, spinor, double);
+_DECLARE_COMMS(spinor_field_f_flt, spinor_field_flt, suNf_spinor_flt, 1, spinor, float);
+_DECLARE_COMMS(sfield, scalar_field, double, 1, spinor, double);
 
 /* Gauge fields */
-//_DECLARE_COMMS(gfield, suNg_field, suNg, 4, gauge, double);
-//_DECLARE_COMMS(gfield_flt, suNg_field_flt, suNg_flt, 4, gauge, float);
+_DECLARE_COMMS(gfield, suNg_field, suNg, 4, gauge, double);
+_DECLARE_COMMS(gfield_flt, suNg_field_flt, suNg_flt, 4, gauge, float);
 _DECLARE_COMMS(gfield_f, suNf_field, suNf, 4, gauge, double);
-//_DECLARE_COMMS(gfield_f_flt, suNf_field_flt, suNf_flt, 4, gauge, float);
-//_DECLARE_COMMS(scalar_field, suNg_scalar_field, suNg_vector, 1, gauge, double);
-//_DECLARE_COMMS(avfield, suNg_av_field, suNg_algebra_vector, 4, gauge, double);
-//_DECLARE_COMMS(gtransf, suNg_field, suNg, 1, gauge, double);
-//_DECLARE_COMMS(clover_term, suNfc_field, suNfc, 4, gauge, double);
-//_DECLARE_COMMS(clover_force, suNf_field, suNf, 6, gauge, double);
+_DECLARE_COMMS(gfield_f_flt, suNf_field_flt, suNf_flt, 4, gauge, float);
+_DECLARE_COMMS(scalar_field, suNg_scalar_field, suNg_vector, 1, gauge, double);
+_DECLARE_COMMS(avfield, suNg_av_field, suNg_algebra_vector, 4, gauge, double);
+_DECLARE_COMMS(gtransf, suNg_field, suNg, 1, gauge, double);
+_DECLARE_COMMS(clover_ldl, ldl_field, ldl_t, 1, gauge, double);
+_DECLARE_COMMS(clover_term, suNfc_field, suNfc, 4, gauge, double);
+_DECLARE_COMMS(clover_force, suNf_field, suNf, 6, gauge, double);
 
 #undef _DECLARE_COMMS
 #undef _DECLARE_SYNC

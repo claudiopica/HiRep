@@ -149,7 +149,7 @@ _DECLARE_MEMORY_FUNC_GAUGE(gfield_f_flt, suNf_field_flt, suNf_flt, 4, "represent
 _DECLARE_MEMORY_FUNC_GAUGE(scalar_field, suNg_scalar_field, suNg_vector, 1, "scalar field");
 _DECLARE_MEMORY_FUNC_GAUGE(avfield, suNg_av_field, suNg_algebra_vector, 4, "algebra vector field");
 _DECLARE_MEMORY_FUNC_GAUGE(gtransf, suNg_field, suNg, 1, "gauge transformation");
-//_DECLARE_MEMORY_FUNC_GAUGE(clover_ldl, ldl_field, ldl_t, 1);
+_DECLARE_MEMORY_FUNC_GAUGE(clover_ldl, ldl_field, ldl_t, 1, "clover ldl field");
 _DECLARE_MEMORY_FUNC_GAUGE(clover_term, suNfc_field, suNfc, 4, "clover term");
 _DECLARE_MEMORY_FUNC_GAUGE(clover_force, suNf_field, suNf, 6, "clover force");
 

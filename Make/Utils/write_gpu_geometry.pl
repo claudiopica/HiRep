@@ -67,6 +67,8 @@ for my $prec (@a) {
     write_su2quat_redefinitions($prec);
 }
 
+write_gpu_ldl_field();
+
 write_epilog();
 
 sub write_prolog {
@@ -441,5 +443,58 @@ sub write_gpu_scalar {
     print "#define write_gpu_${type}(_stride, _v, _out, _ix, _comp) \\\n";
     print "\tdo { \\\n";
     print "\t\t(*((_out)+(_ix)))=(_v);\\\n";
+    print "\t} while (0) \n\n";
+}
+
+
+sub write_gpu_ldl_field {
+    my $i;
+    my $N = $Nf * (2 * $Nf + 1);
+
+    # Complete typename with suffixes
+    my $typename = "ldl_t";
+    my $type = "hr_complex";
+
+    # Generate read macro
+    print "/**\n";
+    print " * \@brief Read ${typename} according to device geometry structure \n";
+    print " * \@param _stride\t\tInteger valued stride with which the components are stored\n";
+    print " * \@param _v     \t\t${typename} target to read to from the field _in\n";
+    print " * \@param _in    \t\tInput field to read from \n";
+    print " * \@param _ix    \t\tIndex at which to read \n";
+    print " * \@param _comp  \t\tComponent to read for consistency (put 0 for this type).\n";
+    print " */\n";
+    print "#define read_gpu_${typename}(_stride, _v, _in, _ix, _comp) \\\n";
+    print "\tdo { \\\n";
+    print "\t\tint __iz = (_ix) + ((_comp)*2*$N)*(_stride); \\\n";
+    for ($i=0; $i<$N; $i++) {
+        print "\t\t(_v).up\[$i\]=((${type}*)(_in))\[__iz\]; __iz+=(_stride); \\\n";
+    }
+    for ($i=0; $i<$N-1; $i++) {
+        print "\t\t(_v).dn\[$i\]=((${type}*)(_in))\[__iz\]; __iz+=(_stride); \\\n";
+    } 
+    print "\t\t(_v).dn\[$i\]=((${type}*)(_in))\[__iz\]; \\\n";
+
+    print "\t} while (0) \n\n";
+
+    # Generate write macro
+    print "/**\n";
+    print " * \@brief Write ${typename} according to device geometry structure \n";
+    print " * \@param _stride\t\tInteger valued stride with which the components are stored\n";
+    print " * \@param _v     \t\t${typename} target to write to the field _out\n";
+    print " * \@param _out   \t\tInput field to write to\n";
+    print " * \@param _ix    \t\tIndex at which to write \n";
+    print " * \@param _comp  \t\tComponent to write for consistency (put 0 for this type).\n";
+    print " */\n";
+    print "#define write_gpu_${typename}(_stride, _v, _out, _ix, _comp) \\\n";
+    print "\tdo { \\\n";
+    print "\t\tint __iz = (_ix) + ((_comp)*2*$N)*(_stride); \\\n";
+    for ($i=0; $i<$N; $i++) {
+        print "\t\t((${type}*)(_out))\[__iz\]=(_v).up\[$i\]; __iz+=(_stride);\\\n";
+    }
+    for ($i=0; $i<$N-1; $i++) {
+        print "\t\t((${type}*)(_out))\[__iz\]=(_v).dn\[$i\]; __iz+=(_stride);\\\n";
+    }
+    print "\t\t((${type}*)(_out))\[__iz\]=(_v).dn\[$i\]; \\\n";
     print "\t} while (0) \n\n";
 }

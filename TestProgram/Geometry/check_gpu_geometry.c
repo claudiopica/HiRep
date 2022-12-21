@@ -20,7 +20,7 @@
 #include "update.h"
 #include "geometry.h"
 #include "gpu_geometry.h"
-#include "basis_linear_algebra.h"
+#include "test_utils.h"
 #include <stdio.h>
 #include "mpi.h"
 #include "hr_complex.h"
@@ -41,6 +41,7 @@ int test_write_read_clover_force();
 int test_write_read_spinor_field_f();
 int test_write_read_spinor_field_f_vector_wise();
 int test_write_read_sfield();
+int test_write_read_clover_ldl();
 
 // Single precision
 int test_write_read_gauge_field_flt();
@@ -64,6 +65,7 @@ int main(int argc, char *argv[])
     return_val += test_write_read_scalar_field();
     return_val += test_write_read_avfield();
     return_val += test_write_read_gtransf();
+    return_val += test_write_read_clover_ldl();
     return_val += test_write_read_clover_term();
     return_val += test_write_read_clover_force();
     
@@ -242,8 +244,8 @@ int test_write_read_gauge_field_f_flt()
             {
                 in_mat = _4FIELD_AT(in, ix, comp);
                 out_mat = _4FIELD_AT(out, ix, comp);
-                write_gpu_suNf(stride, (*in_mat), block_start, ix_loc, comp);
-                read_gpu_suNf(stride, (*out_mat), block_start, ix_loc, comp);
+                write_gpu_suNf_flt(stride, (*in_mat), block_start, ix_loc, comp);
+                read_gpu_suNf_flt(stride, (*out_mat), block_start, ix_loc, comp);
             }
         }
     }
@@ -414,8 +416,8 @@ int test_write_read_spinor_field_f_flt_vector_wise()
             int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
             for (int comp = 0; comp < 4; ++comp)
             {
-                write_gpu_suNf_vector(stride, (*in_spinor).c[comp], block_start, ix_loc, comp);
-                read_gpu_suNf_vector(stride, (*out_spinor).c[comp], block_start, ix_loc, comp);
+                write_gpu_suNf_vector_flt(stride, (*in_spinor).c[comp], block_start, ix_loc, comp);
+                read_gpu_suNf_vector_flt(stride, (*out_spinor).c[comp], block_start, ix_loc, comp);
             }
         }
     }
@@ -691,3 +693,46 @@ int test_write_read_clover_force()
     free_clover_force(gpu_format);
     return return_val;
 }
+
+int test_write_read_clover_ldl() 
+{
+    lprintf("INFO", 0, " ======= TEST LDL FIELD ======= ");
+    int return_val = 0;
+    ldl_field *in, *gpu_format, *out;
+
+    in = alloc_clover_ldl(&glattice);
+    out = alloc_clover_ldl(&glattice);
+    gpu_format = alloc_clover_ldl(&glattice);
+
+    random_clover_ldl_cpu(in);
+    lprintf("SANITY CHECK", 0, "[In field norm unequal zero: %0.2e]\n", sqnorm_clover_ldl_cpu(in)); // sqnorm Not implemented
+
+    ldl_t *site_in, *block_start, *site_out;
+    int stride = 0;
+    _PIECE_FOR(in->type, ixp) 
+    {
+        block_start = _DFIELD_BLK(gpu_format, ixp, 0);
+        stride = in->type->master_end[ixp] - in->type->master_end[ixp] + 1;
+        _SITE_FOR(in->type, ixp, ix) 
+        {
+            int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
+            site_in = _FIELD_AT(in, ix);
+            site_out = _FIELD_AT(out, ix);
+            write_gpu_ldl_t(stride, (*site_in), block_start, ix_loc, 0);
+            read_gpu_ldl_t(stride, (*site_out), block_start, ix_loc, 0);
+        }
+    }
+
+    lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.2e]\n", sqnorm_clover_ldl_cpu(in));
+    lprintf("SANITY CHECK", 0, "[Sanity check out field norm unequal zero: %0.2e]\n", sqnorm_clover_ldl_cpu(out));
+
+    sub_assign_clover_ldl_cpu(out, in);
+    double diff_norm = sqnorm_clover_ldl_cpu(out);
+    check_diff_norm_zero(diff_norm);
+
+    free_clover_ldl(in);
+    free_clover_ldl(out);
+    free_clover_ldl(gpu_format);
+    return return_val;
+}
+

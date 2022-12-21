@@ -32,8 +32,20 @@
         } \
     }
 
-_DECLARE_KERNEL(gfield_f, suNf, 4);
 _DECLARE_KERNEL(spinor_field_f, suNf_spinor, 1);
+_DECLARE_KERNEL(spinor_field_f_flt, suNf_spinor_flt, 1);
+_DECLARE_KERNEL(sfield, double, 1);
+
+_DECLARE_KERNEL(gfield, suNg, 4);
+_DECLARE_KERNEL(gfield_f, suNf, 4);
+_DECLARE_KERNEL(gfield_flt, suNg_flt, 4);
+_DECLARE_KERNEL(gfield_f_flt, suNf_flt, 4);
+_DECLARE_KERNEL(scalar_field, suNg_vector, 1);
+_DECLARE_KERNEL(avfield, suNg_algebra_vector, 4);
+_DECLARE_KERNEL(gtransf, suNg, 1);
+_DECLARE_KERNEL(clover_ldl, ldl_t, 1);
+_DECLARE_KERNEL(clover_term, suNfc, 4);
+_DECLARE_KERNEL(clover_force, suNf, 6);
 
 #ifdef __cplusplus
     extern "C" {
@@ -101,8 +113,20 @@ _DECLARE_KERNEL(spinor_field_f, suNf_spinor, 1);
     _DECLARE_SYNC_BOX(_name, _type, _size) \
     _DECLARE_SYNC_FIELD(_name, _type, _geom)
 
-_DECLARE_SYNC_FUNCTIONS(gfield_f, suNf, 4, gauge);
 _DECLARE_SYNC_FUNCTIONS(spinor_field_f, suNf_spinor, 1, spinor);
+_DECLARE_SYNC_FUNCTIONS(spinor_field_f_flt, suNf_spinor_flt, 1, spinor);
+_DECLARE_SYNC_FUNCTIONS(sfield, double, 1, spinor);
+
+_DECLARE_SYNC_FUNCTIONS(gfield, suNg, 4, gauge);
+_DECLARE_SYNC_FUNCTIONS(gfield_flt, suNg_flt, 4, gauge);
+_DECLARE_SYNC_FUNCTIONS(gfield_f, suNf, 4, gauge);
+_DECLARE_SYNC_FUNCTIONS(gfield_f_flt, suNf_flt, 4, gauge);
+_DECLARE_SYNC_FUNCTIONS(scalar_field, suNg_vector, 1, gauge);
+_DECLARE_SYNC_FUNCTIONS(avfield, suNg_algebra_vector, 4, gauge);
+_DECLARE_SYNC_FUNCTIONS(gtransf, suNg, 1, gauge);
+_DECLARE_SYNC_FUNCTIONS(clover_ldl, ldl_t, 1, gauge);
+_DECLARE_SYNC_FUNCTIONS(clover_term, suNfc, 4, gauge);
+_DECLARE_SYNC_FUNCTIONS(clover_force, suNf, 6, gauge);
 
 #ifdef __cplusplus
     }

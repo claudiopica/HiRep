@@ -18,7 +18,6 @@
 #include "logger.h"
 #include "random.h"
 #include "setup.h"
-#include "new_geom_gpu.h"
 #include "representation.h"
 #include "memory.h"
 #include "communications.h"

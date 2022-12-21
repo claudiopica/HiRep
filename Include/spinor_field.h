@@ -235,7 +235,7 @@ _DECLARE_FIELD_STRUCT(scalar_field, double);
  * @struct _ldl_field
  * @brief FIXME: Add docs
  */
-//_DECLARE_FIELD_STRUCT(ldl_field, ldl_t);
+_DECLARE_FIELD_STRUCT(ldl_field, ldl_t);
 
 /**
  * @struct _suNfc_field
