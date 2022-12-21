@@ -37,7 +37,6 @@
 #include "spin_matrix.h"
 #include "clover_tools.h"
 #include "setup.h"
-#include "cinfo.c"
 
 #define PI 3.1415926535
 #define SQR(A) ((A) * (A))

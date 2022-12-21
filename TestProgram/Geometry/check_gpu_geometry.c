@@ -1,7 +1,5 @@
 /*******************************************************************************
 *
-* NOCOMPILE= !WITH_GPU
-*
 * Check that the GPU reading and writing functions defined in suN.h 
 * are bijective.
 *
@@ -22,7 +20,6 @@
 #include "gpu_geometry.h"
 #include "test_utils.h"
 #include <stdio.h>
-#include "mpi.h"
 #include "hr_complex.h"
 
 // TODO: get gaussian spinor fields to work with MPI-CUDA
@@ -350,7 +347,7 @@ int test_write_read_spinor_field_f_vector_wise()
 
 int test_write_read_spinor_field_f_flt() 
 {
-    lprintf("INFO", 0, " ======= TEST SPINOR FIELD SINGLE PRECISION ======= ");
+    lprintf("INFO", 0, " ======= TEST SPINOR FIELD SINGLE PRECISION ======= \n");
     int return_val = 0;
     spinor_field_flt *in, *gpu_format, *out;
 
@@ -481,9 +478,9 @@ int test_write_read_scalar_field()
     int return_val = 0;
     suNg_scalar_field *in, *gpu_format, *out;
 
-    in = alloc_scalar_field(&glattice);
-    out = alloc_scalar_field(&glattice);
-    gpu_format = alloc_scalar_field(&glattice);
+    in = alloc_suNg_scalar_field(&glattice);
+    out = alloc_suNg_scalar_field(&glattice);
+    gpu_format = alloc_suNg_scalar_field(&glattice);
 
     random_scalar_field_cpu(in);
     lprintf("SANITY CHECK", 0, "[In field norm unequal zero: %0.2e]\n", sqnorm_scalar_field_cpu(in));
@@ -511,9 +508,9 @@ int test_write_read_scalar_field()
 
     check_diff_norm_zero(diff_norm);
 
-    free_scalar_field(in);
-    free_scalar_field(gpu_format);
-    free_scalar_field(out);
+    free_suNg_scalar_field(in);
+    free_suNg_scalar_field(gpu_format);
+    free_suNg_scalar_field(out);
     return return_val;
 }
 

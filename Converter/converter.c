@@ -2,6 +2,7 @@
 *
 * Converter from different formats
 *
+* NOCOMPILE = WITH_MPI
 *******************************************************************************/
 
 #define MAIN_PROGRAM
@@ -29,6 +30,7 @@
 #include "logger.h"
 #include "moreio.h"
 #include "setup.h"
+#include "cinfo.h"
 
 #ifdef WITH_MPI
 #error Please compile without MPI!

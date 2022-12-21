@@ -1,3 +1,8 @@
+#ifndef GEOMETRY_MASKSTATE_H
+#define GEOMETRY_MASKSTATE_H
+#ifdef __cplusplus
+   extern "C" {
+#endif
 
 // this MUST fit in a char
 enum MaskState {
@@ -26,4 +31,10 @@ static inline char invertMask(char mask) {
   (byte & 0x04 ? '1' : '0'), \
   (byte & 0x02 ? '1' : '0'), \
   (byte & 0x01 ? '1' : '0') 
+
+
+#ifdef __cplusplus
+   }
+#endif
+#endif
 

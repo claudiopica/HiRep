@@ -1,10 +1,8 @@
 #ifdef WITH_GPU
 #include "hr_complex.h"
+#include "test_complex.h"
 //#include <stdio.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 int test_overload_plus_rhs_double(){
     int result = 0;
@@ -514,7 +512,4 @@ int test_I_prod(){
     return result;
 }
 
-#ifdef __cplusplus
-}
-#endif
 #endif //WITH_GPU

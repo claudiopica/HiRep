@@ -3,16 +3,15 @@
  * @brief Implementation of the Dirac operator to run on GPUs
  */
 
-#ifdef WITH_GPU
 #ifndef DIRAC_GPU_H
 #define DIRAC_GPU_H
 
-#include "spinor_field.h"
-#include "dirac_default.h"
-
+#ifdef WITH_GPU
 #ifdef __cplusplus
     extern "C" {
 #endif
+
+#include "spinor_field.h"
 
 /**
  * @brief Number of times the dirac operator was applied to the GPU field data copy
@@ -151,6 +150,7 @@ void g5Dphi_eopre_sq_gpu(double m0, spinor_field *out, spinor_field *in);
 #ifdef __cplusplus
     }
 #endif
+
 #endif
 #endif
 

@@ -63,7 +63,9 @@ open STDOUT, ">suN_types.h";
 
 write_prolog_suN_types();
 
+print "#ifndef NG\n";
 print "#define NG $Ng\n";
+print "#endif\n";
 #system("./write_suN_def.pl $Ng g $c1 T");
 write_suN_h($Ng,$fundsuff,$c1,"T");
 

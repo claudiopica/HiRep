@@ -59,6 +59,14 @@ void init_pure_gauge_anisotropy(double *chi);
 
 void SF_classical_solution();
 
+inline static int safe_mod(int x, int y)
+{
+  if (x >= 0)
+    return (x % y);
+  else
+    return ((y - (abs(x) % y)) % y);
+}
+
 /*Global shift for fields, the routine accepts also NULL entries in which case it does nothing*/
 void shift_fields(int *shift, spinor_field *sin, suNg_field *uin, spinor_field *sout, suNg_field *uout);
 
@@ -119,10 +127,6 @@ int HYP_best_parameters(double mtp[6859], double w[3]);
 /* Timing */
 #include <sys/time.h>
 int timeval_subtract(struct timeval *result, struct timeval *x, struct timeval *y);
-
-/* CINFO */
-void print_compiling_info();
-void print_compiling_info_short();
 
 /* Spatial Trasformations*/
 void initialize_spatial_active_slices(int *tlist);

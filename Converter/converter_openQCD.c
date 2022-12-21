@@ -3,6 +3,7 @@
 * Converter from and to openQCD format.
 * Code modified by Fernando Romero-Lopez
 *
+* NOCOMPILE = WITH_MPI || !BC_T_PERIODIC || !BC_X_PERIODIC || !BC_Y_PERIODIC || !BC_Z_PERIODIC
 *******************************************************************************/
 
 #define MAIN_PROGRAM

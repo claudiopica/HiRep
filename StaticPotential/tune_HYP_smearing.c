@@ -28,7 +28,7 @@
 #include "utils.h"
 #include "logger.h"
 
-#include "cinfo.c"
+#include "cinfo.h"
 
 #if defined(ROTATED_SF) && defined(BASIC_SF)
 #error This code does not work with the Schroedinger functional

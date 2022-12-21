@@ -7,6 +7,8 @@
  *
  * Modified by Vincent Drach and Ari Hietanen
  *
+ * NOCOMPILE= ROTATED_SF || BASIC_SF || FERMION_THETA
+ * 
  *******************************************************************************/
 
 #define MAIN_PROGRAM
@@ -37,8 +39,6 @@
 #include "spin_matrix.h"
 #include "propagator.h"
 #include "setup.h"
-
-#include "cinfo.c"
 
 #if defined(ROTATED_SF) && defined(BASIC_SF)
 #error This code does not work with the Schroedinger functional !!!
@@ -217,7 +217,6 @@ int main(int argc,char *argv[]) {
   read_input(mes_var.read,get_input_filename());
   strcpy(list_filename,mes_var.configlist);
   
-  lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS); 
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
   lprintf("MAIN",0,"input file [%s]\n",input_filename); 
   lprintf("MAIN",0,"output file [%s]\n",output_filename); 

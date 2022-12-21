@@ -3,7 +3,7 @@ LOCKFILE=cinfo.lock
 [ -f "$LOCKFILE" ] && exit 0
 > ${LOCKFILE}
 
-FILENAME=cinfo.c
+FILENAME=cinfo.h
 MKDIR=$1
 TOPDIR=$2
 PWD=`pwd`
@@ -13,6 +13,8 @@ MACROS=$@
 
 > ${FILENAME}
 
+echo "#ifndef CINFO_H" >> ${FILENAME}
+echo "#define CINFO_H" >> ${FILENAME}
 
 echo -n ${MACROS} | tr '"' '@' > cinfo.tmp
 len=`cat cinfo.tmp | wc -c`+1
@@ -30,11 +32,16 @@ echo "\";" >> ${FILENAME}
 echo "" >> ${FILENAME}
 rm cinfo.tmp
 
+if command -v lscpu >/dev/null 2>&1
+then
+    lscpu | awk '{printf "%s\\n",$0}' > cinfo.tmp
+else
 if [[ -a /proc/cpuinfo ]] 
 then
  awk '{printf "%s\\n",$0}' /proc/cpuinfo > cinfo.tmp
 else
  echo -n "No CPU info\n" > cinfo.tmp
+fi
 fi
 len=`cat cinfo.tmp | wc -c`+1
 echo -n "static char CI_cpuinfo[${len}] = \"" >> ${FILENAME}
@@ -82,5 +89,8 @@ else
 fi
 
 cat ${MKDIR}/Utils/${FILENAME}.tmpl >> ${FILENAME}
+
+echo "#endif" >> ${FILENAME}
+echo "" >> ${FILENAME}
 
 rm -f ${LOCKFILE}

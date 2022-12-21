@@ -8,10 +8,11 @@
 #include "spinor_field.h"
 #include "gamma_spinor.h"
 #include "hr_complex.h"
-#include "communications.h"
+// #include "communications.h"
 #include "suN.h"
 #include "suN_types.h"
 #include "error.h"
+#include "linear_algebra.h"
 
 #ifdef WITH_GPU
   #include "TMPL/alloc_tmp_fields_gpu.c"
@@ -26,7 +27,7 @@
  */
 
 /* double precision */
-  // Declare types for double precision template parsing
+// Declare types for double precision template parsing
 #define _SPINOR_FIELD_TYPE spinor_field
 #define _SPINOR_TYPE suNf_spinor
 #define _REAL double
@@ -47,6 +48,8 @@
 #include "TMPL/linear_algebra.c.sdtmpl"
 #undef _FUNC
 #undef _BODY
+
+//set double precision function aliases
 #ifdef WITH_GPU
   #define _FUNC(a,b,c) a (*b##_f) c = b##_f_gpu
 #else
@@ -55,7 +58,7 @@
 #define _BODY(a) ;
 #include "TMPL/linear_algebra.c.sdtmpl"
 
-  //Undefine all definitions to move on to single precision
+ //Undefine all definitions to move on to single precision
 #undef _FUNC
 #undef _BODY
 #undef _SPINOR_FIELD_TYPE
@@ -82,6 +85,7 @@
 #undef _FUNC
 #undef _BODY
 
+//set single precision function aliases
 #ifdef WITH_GPU
   #define _FUNC(a,b,c) a (*b##_f_flt) c = b##_f_flt_gpu
 #else

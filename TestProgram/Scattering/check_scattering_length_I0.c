@@ -41,7 +41,6 @@
 #include "spin_matrix.h"
 #include "clover_tools.h"
 #include "setup.h"
-#include "cinfo.c"
 #include "clover_tools.h"
 
 #define PI 3.14159265358979323846264338327950288419716939937510

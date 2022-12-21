@@ -25,8 +25,6 @@
 #include "memory.h"
 #include "gpu.h"
 #include "hr_complex.h"
-#include <iostream>
-#include "twisted_bc.h"
 
 #include "Dphi_gpu_kernels.cu"
 #include "Dirac_utils.c"

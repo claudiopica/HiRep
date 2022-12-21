@@ -33,7 +33,7 @@
 #ifdef WITH_GPU
   #include "gpu.h"
 #endif 
-
+#include "cinfo.h"
 
 /* setup_process
  * Assign a unique RID, PID to each process and setup
@@ -130,6 +130,8 @@ int setup_process(int *argc, char ***argv)
   else
     setup_level = 1;
 
+  register_sighandlers();
+  
   read_cmdline(*argc, *argv);
 
 #ifdef WITH_MPI
@@ -264,7 +266,7 @@ void finalize_process()
   free_gfield_f(u_gauge_f);
 #endif
   if (u_scalar != NULL)
-      free_scalar_field(u_scalar);
+      free_suNg_scalar_field(u_scalar);
 
   if (u_gauge_f_flt != NULL)
     free_gfield_f_flt(u_gauge_f_flt);

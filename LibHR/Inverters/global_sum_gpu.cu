@@ -30,12 +30,11 @@
  */
 
 
-#ifndef GLOBAL_SUM_GPU_C
-#define GLOBAL_SUM_GPU_C
+#ifdef WITH_GPU
+//This file should not be compiled if !WITH_GPU
 
 #include "global.h"
-#include "gpu.h"
-#include "hr_complex.h"
+#include "reduction.h"
 
 #define GSUM_BLOCK_SIZE 256     // No more than 1024 on Tesla
 #define BLOCK_SIZE_REM 64
@@ -202,7 +201,7 @@ __global__ void reduce7(const T *__restrict__ g_idata, T *__restrict__ g_odata, 
   }
 }
 
-extern "C" bool isPow2(unsigned int x) { return ((x & (x - 1)) == 0); }
+static bool isPow2(unsigned int x) { return ((x & (x - 1)) == 0); }
 
 ////////////////////////////////////////////////////////////////////////////////
 // Wrapper function for kernel launch

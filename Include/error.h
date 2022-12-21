@@ -32,7 +32,8 @@
     * @param text              Error message text
     */
 void error(int test, int no, const char *name, const char *text);
-void print_trace (void);
+void print_trace ();
+void register_sighandlers();
 
 #ifdef WITH_MPI
 

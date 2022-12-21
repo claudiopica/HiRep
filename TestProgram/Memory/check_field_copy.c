@@ -318,8 +318,8 @@ int test_bijectivity_scalar_field()
     lprintf("INFO", 0, " ====== TEST GAUGE FIELD REPRESENTED SINGLE PRECISION ======= ");
     int return_val = 0;
     suNg_scalar_field *in, *in_copy;
-    in = alloc_scalar_field(&glattice);
-    in_copy = alloc_scalar_field(&glattice);
+    in = alloc_suNg_scalar_field(&glattice);
+    in_copy = alloc_suNg_scalar_field(&glattice);
 
     random_scalar_field_cpu(in);
 
@@ -327,11 +327,11 @@ int test_bijectivity_scalar_field()
     lprintf("SANITY CHECK", 0, "CPU sqnorm: %0.2e\n", sqnorm_scalar_field_cpu(in));
     lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", sqnorm_scalar_field_cpu(in_copy));
 
-    copy_to_gpu_scalar_field(in);
+    copy_to_gpu_suNg_scalar_field(in);
 
     zero_scalar_field_cpu(in);
     lprintf("SANITY CHECK", 0, "CPU copy should be zero in intermediate step: %0.2e\n", sqnorm_scalar_field_cpu(in));
-    copy_from_gpu_scalar_field(in);
+    copy_from_gpu_suNg_scalar_field(in);
 
     sub_assign_scalar_field_cpu(in, in_copy);
     double diff_norm = sqnorm_scalar_field_cpu(in);
@@ -348,8 +348,8 @@ int test_bijectivity_scalar_field()
     }
     lprintf("RESULT", 0, "[Diff norm %0.2e]\n", diff_norm);
 
-    free_scalar_field(in);
-    free_scalar_field(in_copy);
+    free_suNg_scalar_field(in);
+    free_suNg_scalar_field(in_copy);
     return return_val;
 }
 

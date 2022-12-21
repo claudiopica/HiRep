@@ -146,7 +146,7 @@ _DECLARE_MEMORY_FUNC_GAUGE(gfield, suNg_field, suNg, 4, "gauge field");
 _DECLARE_MEMORY_FUNC_GAUGE(gfield_flt, suNg_field_flt, suNg_flt, 4, "single precision gauge field");
 _DECLARE_MEMORY_FUNC_GAUGE(gfield_f, suNf_field, suNf, 4, "represented gauge field");
 _DECLARE_MEMORY_FUNC_GAUGE(gfield_f_flt, suNf_field_flt, suNf_flt, 4, "represented single precision gauge field");
-_DECLARE_MEMORY_FUNC_GAUGE(scalar_field, suNg_scalar_field, suNg_vector, 1, "scalar field");
+_DECLARE_MEMORY_FUNC_GAUGE(suNg_scalar_field, suNg_scalar_field, suNg_vector, 1, "scalar field");
 _DECLARE_MEMORY_FUNC_GAUGE(avfield, suNg_av_field, suNg_algebra_vector, 4, "algebra vector field");
 _DECLARE_MEMORY_FUNC_GAUGE(gtransf, suNg_field, suNg, 1, "gauge transformation");
 _DECLARE_MEMORY_FUNC_GAUGE(clover_ldl, ldl_field, ldl_t, 1, "clover ldl field");

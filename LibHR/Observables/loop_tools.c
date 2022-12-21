@@ -37,8 +37,6 @@
 
 #define PI 3.141592653589793238462643383279502884197
 
-#include "cinfo.c"
-
 #if defined(ROTATED_SF) && defined(BASIC_SF)
 #error This code does not work with the Schroedinger functional !!!
 #endif

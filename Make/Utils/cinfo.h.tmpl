@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "logger.h"
 
-void print_compiling_info() {
+static void print_compiling_info() {
   printf("MACROS\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
   printf("%s",MACROS);
   printf("MkFlags\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");
@@ -24,6 +24,6 @@ void print_compiling_info() {
 }
 
 
-void print_compiling_info_short() {
+static void print_compiling_info_short() {
   lprintf("SYSTEM",0,"MACROS=%s",MACROS);
 }
