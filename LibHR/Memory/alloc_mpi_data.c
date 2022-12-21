@@ -53,7 +53,7 @@
                 f->comm_req[ix] = MPI_REQUEST_NULL;                                                     \
             for (int i = 1; i < _n; ++i)                                                                \
                 f[i].comm_req = f[i-1].comm_req + 2 * type->nbuffers_##_geom;                           \
-            for (int i = 1; i < _n; ++i)                                                                \
+            for (int i = 0; i < _n; ++i)                                                                \
             {                                                                                           \
                 _SENDBUF_ALLOC(_size, i);                                                               \
             }                                                                                           \

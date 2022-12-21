@@ -9,6 +9,8 @@
       }
 
 #define boundary_calculation(__macro, __mask, __ix, __nb, __nb_idx) \
+      /*Don't invert, use buffer indices */ \
+      /* Or: */ \
       if (!(imask_gpu[ix]&__mask)) { \
         iy = __nb[__nb_idx]; \
         local_iy = iy - start; \

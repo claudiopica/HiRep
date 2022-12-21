@@ -13,9 +13,9 @@ EXCLUDE =
 #EXCLUDE += measure_renormalization.c
 
 #needed by Puregauge
-#EXCLUDE += loop_tools.c mesons.c polyakov.c
-#EXCLUDE += glueballs.c glueballs_op.c
-#EXCLUDE += wilsonloops.c
+EXCLUDE += loop_tools.c mesons.c polyakov.c
+EXCLUDE += glueballs.c glueballs_op.c
+EXCLUDE += wilsonloops.c
 
 EXCLUDE += trunc_hairpin.c
 
