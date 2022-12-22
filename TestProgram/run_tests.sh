@@ -12,21 +12,18 @@ done
 
 [ ! -d "$1" ] && echo First argument must be a subdirectory of TestProgram && exit 1
 
-../Make/Utils/write_mkflags.pl -f ../Make/MkFlags ${@: 2} || exit 1
-
-echo Cleaning...
-( cd .. && make cleanall )
-
-cd ./${1}
+../Make/Utils/write_mkflags.pl -f ../Make/MkFlags.ini "${@: 2}" || exit 1
 
 echo Building...
-make -j1 
+../Make/nj ${1}
+
+rm -f ${1}/.test_failed
 
 echo Run Tests...
-make runtests
+../Make/nj ${1}_tests
 
-if [ -f .test_failed ]
-then 
+if compgen -G "${1}/.test_failed_*" >/dev/null ; then 
+  touch ${1}/.test_failed
   exit 1 ;
 else 
   exit 0 ;

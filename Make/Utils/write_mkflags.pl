@@ -37,6 +37,8 @@ GetOptions(
   'cc=s'   => \(my $cc = "gcc"),
   'mpicc=s'   => \(my $mpicc = "mpicc"),
   'cflags=s'   => \(my $cflags = "-Wall -Wshadow -Wfatal-errors -Werror -std=c99 -O3"),
+  'nvcc=s'   => \(my $nvcc = "nvcc"),
+  'gpuflags=s'   => \(my $gpuflags = ""),
   'ldflags=s'   => \(my $ldflags = ""),
   'include=s'   => \(my $include = ""),
   'ccache!'   => \(my $ccache = 0),
@@ -178,7 +180,7 @@ $expclover && print $fh "MACRO += -DWITH_EXPCLOVER\n";
 # write eo preconditioning
 $eoprec && print $fh "MACRO += -DWITH_EO\n";
 # write new geometry
-$newgoe && print $fh "MACRO += -DWITH_NEW_GEOMETRY\n";
+$newgeo && print $fh "MACRO += -DWITH_NEW_GEOMETRY\n";
 # write quaternions 
 $quat && print $fh "MACRO += -DWITH_QUATERNIONS\n";
 # write ndebug
@@ -208,6 +210,10 @@ if ($ccache!=0) { $cc="ccache ".$cc; $mpicc="ccache ".$mpicc; }
 print $fh "CC = $cc\n";
 print $fh "MPICC = $mpicc\n";
 print $fh "CFLAGS = $cflags\n";
+
+print $fh "NVCC = $nvcc\n";
+print $fh "GPUFLAGS = $gpuflags\n";
+
 print $fh "INCLUDE = $include\n";
 print $fh "LDFLAGS = $ldflags\n";
 
@@ -237,6 +243,8 @@ write_mkflags - write flags file for compilation of HiRep
   --cc                [gcc]       Compiler
   --mpicc             [mpicc]     MPI Compiler
   --cflags            [-Wall -Wshadow -std=c99 -O3]       Compilation options
+  --nvcc              [nvcc]      CUDA compiler
+  --gpuflags          []          CUDA compilation options
   --include           []          Extra include headers
   --ldflags           []          Linking options
   --[no-]ndebug       [true]      Set ndebug flag

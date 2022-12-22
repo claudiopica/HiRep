@@ -34,9 +34,9 @@ int main(int argc,char *argv[])
   printf("Fermion representation: dim = %d\n",NF);
   printf("\n");
 
-  level=0;
+  level=1;
   seed=123;
-  rlxs_init(level,seed);
+  rlxd_init(level,seed);
   printf("ranlux: level = %d, seed = %d\n\n",level,seed);
   fflush(stdout);
 

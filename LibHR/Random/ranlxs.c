@@ -74,7 +74,7 @@ static void local_error(int no)
         break;
     }
     printf("Program aborted\n");
-    exit(0);
+    exit(1);
 }
 
 #if (defined SSE)

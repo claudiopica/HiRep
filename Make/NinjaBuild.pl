@@ -11,11 +11,14 @@ my $create_vscode_c_cpp_properties = 1;
 #package NinjaBuild;
 
 my $inifile = "MkFlags.ini";
+my $test_wrapper_cmd = "test_wrapper.pl";
+
 my %options = ();
 my $with_gpu = 0; #this is also in the %options
+my $with_mpi = 0; #this is also in the %options
 
-my %targets = ();
-my $absroot;
+my %targets = (); #global list of objects for which rules have been emitted. This is to avoid duplicate rules
+my $absroot; #absolute path to root project directory
 
 sub build_rules {
     my ($rootdir) = @_; 
@@ -30,9 +33,8 @@ EOF
     print_options(%options);
     $absroot = abs_path($rootdir);
     print("root = $absroot\n");
+    print("TESTWRAPPER = \$root/Make/Utils/$test_wrapper_cmd" . ($with_mpi ? " --mpi\n" : "\n"));
     print <<'EOF';
-
-
 builddir = $root/build
 makedir = $root/Make
 incdir = $root/Include
@@ -65,7 +67,12 @@ rule ar
 
 rule link
   command = $LINK $LDFLAGS -o $out $in $libs -lm 
-  description = $setbg LINK $setnorm $out
+  description = $setbg LINK $setnorm $out 
+
+rule test
+  command = cd $builddir && $TESTWRAPPER -t $root/$in
+  description = $setbg TEST $setnorm $out
+  pool = console
 
 rule suN_headers
   command = cd $incdir && $wr_head $NG $REPR $WQUAT $GAUGE_GROUP
@@ -226,7 +233,19 @@ sub add_exes {
         push(@target_exes,$exe_name);
     }
     print "build $topdir: phony @target_exes\n";
+    return @target_exes;
     # print "default $topdir\n";
+}
+
+
+sub add_tests {
+    my ($topdir, $tests_ref) = @_;
+    my $alias = "build ${topdir}_tests: phony";
+    foreach (@$tests_ref) {
+        print("build ${_}_test: test $_\n");
+        $alias .= " ${_}_test";
+    }
+    print("$alias\n");
 }
 
 #
@@ -236,12 +255,11 @@ sub read_conf {
     my ($filename) = @_;
     open my $fh, '<', $filename or die "Can not open '$filename' $!";
 
+    # parse INI file
     my %options;
-
     while (my $line = <$fh>) {
         if ($line =~ /^\s*#/) { next; }  # skip comments
         if ($line =~ /^\s*$/) { next; }  # skip empty lines
-
         # handle assignments = or +=
         if ($line =~ /^([^=]+?)\s*\+?=\s*(.*?)\s*$/) {
             my ($field, $value) = ($1, $2);
@@ -251,7 +269,7 @@ sub read_conf {
         }
     }
 
-    #TODO: we should do some validation
+    #TODO: we should do some input validation
 
     # set a default C++ compiler if none is given
     if (not exists $options{'CXX'}) {$options{'CXX'} = [ "g++" ] ; }
@@ -266,6 +284,7 @@ sub read_conf {
     # handle WITH_MPI compiler 
     if (contains($options{'MACRO'},"-DWITH_MPI")) {
         $options{'CC'} = $options{'MPICC'};
+        $with_mpi = 1;
     }
 
     #set linker 
@@ -309,8 +328,8 @@ sub print_options {
     if (!$disable_color) {
         push(@{$options{'CFLAGS'}},"-fdiagnostics-color=always");
         print "# Color Options\n\n";
-        print "setbg = [07;1;31m\n";
-        print "setnorm = [0m\n";
+        print "setbg = \e[07;1;31m\n";
+        print "setnorm = \e[0m\n";
         print "\n";
     }
 
@@ -369,8 +388,8 @@ sub parse_expr {
     /\G(?:\s+|#.*)+/gc; # skip whitespace or comments
     if ($p <= 3 && $negate) { $answer ^= 1; }
     while ($p <= 2 && /\G\&\&/gc) { $answer &= parse_expr(3); }
-    while ($p <= 1 && /\G\|\|/gc) { $answer |= parse_expr(2); }
-    return $answer; # lowest precedence
+    while ($p <= 1 && /\G\|\|/gc) { $answer |= parse_expr(2); } # lowest precedence
+    return $answer; 
 }
 
 sub parse_logical_expr { # takes expression string and ref to dictionary hash
@@ -485,6 +504,7 @@ EOF
         "*.h": "c",
         "*.c": "c",
         "*.c.sdtmpl": "c",
+        "*.h.tmpl": "c",
         "*.hpp": "cuda",
         "*.cu": "cuda",
         "*.cu.sdtmpl": "cuda",
