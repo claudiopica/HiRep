@@ -10,9 +10,6 @@
 
 #ifndef ERROR_H
 #define ERROR_H
-#ifdef WITH_GPU
-    #include "gpu.h"
-#endif
 
 #ifdef __cplusplus
     extern "C" {
@@ -58,14 +55,9 @@ void register_sighandlers();
         } while (0)
 #endif
 
-#ifdef __cplusplus
-    }
-#endif
-
 #ifdef WITH_GPU
-    #ifdef __cplusplus
-        extern "C" {
-    #endif
+    #include "gpu.h"
+
     /**
      * @brief Check last error
      *
@@ -88,10 +80,6 @@ void register_sighandlers();
      */
     #define CudaCheckError()        __cudaCheckError( (const char*)__FILE__, (int)__LINE__ ) /*Apparently these casts are necessary. Why? (SAM)*/ 
 
-    #ifdef __cplusplus
-        }
-    #endif
-
     /**
      * @brief Check CUDA call and log error message on failure
      *
@@ -108,5 +96,8 @@ void register_sighandlers();
      */
     #define CHECK_CUDA(call) CudaSafeCall(call)
 
+#endif
+#ifdef __cplusplus
+    }
 #endif
 #endif

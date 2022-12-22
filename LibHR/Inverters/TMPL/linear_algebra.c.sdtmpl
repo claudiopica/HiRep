@@ -8,10 +8,6 @@
 #include "suN.h"
 #include "suN_types.h"
 
-#ifdef __cplusplus
-    extern "C" {
-#endif
-
 /* s1=s2 */
 _FUNC(void, spinor_field_copy, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
 _BODY({
@@ -118,16 +114,13 @@ _BODY({
 _FUNC(double, spinor_field_sqnorm, (_SPINOR_FIELD_TYPE *s1))
 _BODY({
     static double res;
-    static double c;
     _OMP_PRAGMA ( single ) {
         res = 0.;
-        c = 0.;
     }
     
     _ONE_SPINOR_FOR_SUM(s1,res) {
         _REAL prod;
         _spinor_prod_re_f(prod,*_SPINOR_PTR(s1),*_SPINOR_PTR(s1));
-//        kadd(&res, &c, (double)prod);
         res += (double)prod;
    }
    
@@ -338,6 +331,3 @@ _BODY({
     }
 })
 
-#ifdef __cplusplus
-    }
-#endif

@@ -18,9 +18,6 @@
 #include "check_options.h"
 #include "new_geometry.h"
 
-#ifdef __cplusplus
-  extern "C" {
-#endif 
 
 #ifdef MAIN_PROGRAM
 #  define GLB_VAR(type,name,...) type name __VA_ARGS__
@@ -79,7 +76,7 @@ GLB_VAR(int,N_REP,=1); /* number of replicas*/
 GLB_VAR(int,MPI_WORLD_SIZE,=1); /* mpi rank for this process */
 GLB_VAR(int,MPI_PID,=0); /* mpi rank inside MPI_COMM_WORLD (unique across replicas) */
 #ifdef WITH_MPI
-#include <mpi.h>
+#include <hr_mpi.h>
 GLB_VAR(MPI_Comm,GLB_COMM,=MPI_COMM_WORLD); /* this is the global communicator for a replica */
 GLB_VAR(MPI_Comm,cart_comm,=MPI_COMM_NULL); /* cartesian communicator for the replica */
 #endif
@@ -238,7 +235,4 @@ GLB_VAR(int,four_fermion_active,=0); // whether four fermion interactions are ac
 
 #undef GLB_VAR
 
-#ifdef __cplusplus
-  }
-#endif
 #endif

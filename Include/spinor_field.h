@@ -19,7 +19,7 @@
 #include "geometry.h"
 #include "suN_types.h"
 #ifdef WITH_MPI
-	#include <mpi.h>
+	#include <hr_mpi.h>
 #endif
 
 /**

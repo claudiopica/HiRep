@@ -477,7 +477,7 @@ void logger_disable() {
   logger_inactive=1;
 }
 
-int lprintf(char *name, int level, char *format, ...) {
+int lprintf(const char *name, int level, const char *format, ...) {
 	va_list args;
 	static record *lastrec=0;
 	static char lastname[512]={0};

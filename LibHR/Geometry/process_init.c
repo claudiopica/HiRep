@@ -33,7 +33,7 @@
 #ifdef WITH_GPU
   #include "gpu.h"
 #endif 
-#include "cinfo.h"
+#include "print_compile_options.h"
 
 /* setup_process
  * Assign a unique RID, PID to each process and setup

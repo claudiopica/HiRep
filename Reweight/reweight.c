@@ -16,6 +16,7 @@
 #include "representation.h"
 #include "logger.h"
 #include "reweight.h"
+#include "setup.h"
 
 // Variables
 static char input_filename[64] = "input_file";

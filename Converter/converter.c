@@ -30,7 +30,7 @@
 #include "logger.h"
 #include "moreio.h"
 #include "setup.h"
-#include "cinfo.h"
+#include "print_compile_options.h"
 
 #ifdef WITH_MPI
 #error Please compile without MPI!

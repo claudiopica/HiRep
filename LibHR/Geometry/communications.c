@@ -12,9 +12,6 @@
 #include "suN_types.h"
 #include "utils.h"
 #include <string.h>
-#ifdef WITH_MPI
-#include <mpi.h>
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -466,7 +463,9 @@ void start_clover_force_sendrecv(suNf_field *gf)
 }
 
 
+#if defined(WITH_NEW_GEOMETRY) && defined(WITH_MPI)
 static void *gf_sendrecv_guard=NULL;
+#endif
 
 void complete_gf_sendrecv(suNg_field *gf)
 {
@@ -606,8 +605,9 @@ void start_gf_sendrecv(suNg_field *gf)
 #endif /* WITH_MPI */
 }
 
-
+#if defined(WITH_NEW_GEOMETRY) && defined(WITH_MPI)
 static void *sf_sendrecv_guard=NULL;
+#endif
 
 void complete_sf_sendrecv(spinor_field *sf)
 {

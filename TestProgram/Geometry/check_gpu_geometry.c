@@ -444,11 +444,10 @@ int test_write_read_sfield()
     lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.2e]\n", sqnorm_sfield_cpu(in));
 
     double *in_site, *block_start, *out_site;
-    int stride = 0;
     _PIECE_FOR(in->type, ixp) 
     {
         block_start = _FIELD_BLK(gpu_format, ixp);
-        stride = in->type->master_end[ixp] - in->type->master_start[ixp] + 1;
+        // int stride = in->type->master_end[ixp] - in->type->master_start[ixp] + 1; //double doesn't use stride
         _SITE_FOR(in->type, ixp, ix) 
         {
             int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);

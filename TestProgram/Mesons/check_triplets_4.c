@@ -11,7 +11,7 @@
  ******************************************************************************/
 
 #define MAIN_PROGRAM
-#define _BSD_SOURCE
+// #define _BSD_SOURCE
 
 #include <stdlib.h>
 #include <string.h>

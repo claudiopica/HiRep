@@ -107,17 +107,10 @@ build writeREPR: phony $wr_repr
 # Autoheaders
 build autoheaders: phony $incdir/suN.h $incdir/suN_types.h $incdir/suN_repr_func.h $incdir/gpu_geometry.h $incdir/cinfo.h
 #build $incdir/macro_opt.h: macro_opt
-build $incdir/suN.h $incdir/suN_types.h: suN_headers
+build $incdir/suN.h $incdir/suN_types.h: suN_headers | $wr_head
 build $incdir/suN_repr_func.h: suN_repr $incdir/TMPL/suN_repr_func.h.tmpl | $wr_repr
-build $incdir/gpu_geometry.h: gpu_geometry
-build $incdir/cinfo.h: cinfo
-
-rule vscode_defines
-  command = echo -n '$MACRO' |  perl -pe 's/"//g;s/\s+/\",\"/g;s/-D//g;$$_="\{\"configurations\":[\{\"defines\":[\"$$_\"]\}]\}\n";' > $out
-  description = $setbg VSCODE DEFINES $setnorm $out
-
-build $root/.vscode/c_cpp_properties.json: vscode_defines
-build vscode_def: phony $root/.vscode/c_cpp_properties.json
+build $incdir/gpu_geometry.h: gpu_geometry | $wr_gpugeo
+build $incdir/cinfo.h: cinfo | $makedir/Utils/cinfo.sh
 
 updatedir = $root/LibHR/Update/
 rule approx_db
@@ -327,6 +320,7 @@ sub print_options {
 
     if (!$disable_color) {
         push(@{$options{'CFLAGS'}},"-fdiagnostics-color=always");
+        # push(@{$options{'GPUFLAGS'}},"-Xcompiler '-fdiagnostics-color=always'");
         print "# Color Options\n\n";
         print "setbg = \e[07;1;31m\n";
         print "setnorm = \e[0m\n";

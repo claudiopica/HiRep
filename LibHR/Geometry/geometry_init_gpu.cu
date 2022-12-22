@@ -1,3 +1,4 @@
+//this definition is to define global variable for GPU
 #define GLB_GPU
 
 #include "global.h"
@@ -52,6 +53,4 @@ void init_neighbors_gpu()
   error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error adding Z_EXT to global constant memory.\n");
   #endif
 }
-
-#undef GLB_GPU
 

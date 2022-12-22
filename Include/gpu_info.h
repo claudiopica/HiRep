@@ -7,11 +7,11 @@
 
 #ifndef GPU_INFO_H
 #define GPU_INFO_H
-#include "gpu.h"
-
 #ifdef __cplusplus
     extern "C" {
 #endif
+
+#include "gpu.h"
 
 #ifdef WITH_GPU
 
