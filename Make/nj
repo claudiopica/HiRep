@@ -27,20 +27,23 @@ my @ninja_args = ();
 my $skip = 0;
 my $ntargets = 0;
 foreach ( @ARGV ) {
-    # we skip ninja option parameters
-    if ( $skip ) { $skip=0; push(@ninja_args, $_); next; }
-    if ( $_ eq "--version" || $_ eq "-v" || $_ eq "--verbose" || 
-         $_ eq "--quit" || $_ eq "-n" || $_ eq "-h" ) { push(@ninja_args, $_); next; }
-    if ( $_ eq "-C" || $_ eq "-f" || $_ eq "-C" || $_ eq "-j" || 
-         $_ eq "-k" || $_ eq "-l" || $_ eq "-d" || $_ eq "-t" || $_ eq "-w" ) { $skip=1; push(@ninja_args, $_); next; }
-    
-    # consider targets as relative to cwd
-    $ntargets ++;
-    my $target = "$cwd$_";
-    if ($target =~ /\.[coh]$/) { $target = "$builddir/$target"; }
-    push(@ninja_args, $target);
+     # we skip ninja option parameters
+     if ( $skip ) { $skip=0; push(@ninja_args, $_); next; }
+     if ( $_ eq "--version" || $_ eq "-v" || $_ eq "--verbose" || 
+          $_ eq "--quit" || $_ eq "-n" || $_ eq "-h" ) { push(@ninja_args, $_); next; }
+     if ( $_ eq "-C" || $_ eq "-f" || $_ eq "-C" || $_ eq "-j" || 
+          $_ eq "-k" || $_ eq "-l" || $_ eq "-d" || $_ eq "-t" || $_ eq "-w" ) { $skip=1; push(@ninja_args, $_); next; }
+
+     # consider targets as relative to cwd
+     $ntargets ++;
+     my $target = "$_";
+     $target = "$cwd$target" unless (($target eq "autoheaders") || ($target eq "libhr.a"));
+     if ($target =~ /\.[co]$/) { $target = "$builddir/$target"; }
+     if ($target =~ /\.h$/) { $target = "$rootdir/$target"; }
+     push(@ninja_args, $target);
 }
 # nj without arguments build the current dir
 if (!$ntargets) { push(@ninja_args, $cwd); }
 # print "ARGV=@ninja_args ntargtes=$ntargets CWD=$cwd\n";
-system("$ninja_cmd @ninja_args");
+# execute ninja
+exec("$ninja_cmd @ninja_args");

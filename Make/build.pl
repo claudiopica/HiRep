@@ -110,6 +110,8 @@ my @libs = ("libhr.a"); #this is for later programs to use
                   Utils => [ "check_utils_3_gb_functions.c", "check_utils_3_tor_functions.c", # these 2 files are included directly in the main c test file
                             "check_complex.c", #this is broken
                   ], 
+                  DiracOperator => ["speed_test_diracoperator.c", "speed_test_diracoperator_flt.c",
+                  ], #not a test, this should be a separate exe
   );
 
   my %extra_sources = ( "check_integrator_1" => [ "check_integrator_utils_1.c"],
@@ -130,12 +132,17 @@ my @libs = ("libhr.a"); #this is for later programs to use
           $exes{$exe_name} = [ @c_sources ] ;
           push(@testnames, "$topdir/$exe_name");
       }
-      add_exes("$topdir/$dir", \%exes, \@libs);
+      @tests = add_exes("$topdir/$dir", \%exes, \@libs);
+      add_tests("$topdir/$dir", \@tests);
   }
 
   @subdirs = map { "$topdir/$_" } @subdirs;
   print "build $topdir: phony @subdirs\n";
   print "default $topdir\n";
+
+  #add test target
+  @subdirs = map { "${_}_tests" } @subdirs;
+  print "build ${topdir}_tests: phony @subdirs\n";
 }
 
 ###############################################################################

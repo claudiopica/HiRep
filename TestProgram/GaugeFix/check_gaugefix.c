@@ -200,7 +200,7 @@ int main(int argc, char *argv[])
     return_value += 1;
   lprintf("TEST", 0, "sum of difference of plaquettes original/gauge transformed field %1.14f\n", pdiff);
 
-  act = gaugefix(0,          //= 0, 1, 2, 3 for Coulomb guage else Landau
+  act = gaugefix(0,          //= 0, 1, 2, 3 for Coulomb gauge else Landau
                  1.8,        //overrelax
                  10000,      //maxit
                  1e-10,      //tolerance
