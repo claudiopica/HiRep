@@ -5,7 +5,7 @@ SRCS = $(wildcard *.c)
 LIBNAME = ../libhr.a
 
 #Exclude this source files
-EXCLUDE =
+EXCLUDE = 
 
 include $(MKDIR)/MkRules
 

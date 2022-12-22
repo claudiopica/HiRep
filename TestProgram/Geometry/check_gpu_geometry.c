@@ -30,7 +30,7 @@
 // Double precision
 int test_write_read_gauge_field();
 int test_write_read_gauge_field_f();
-int test_write_read_scalar_field();
+int test_write_read_suNg_scalar_field();
 int test_write_read_avfield();
 int test_write_read_gtransf();
 int test_write_read_clover_term();
@@ -38,6 +38,7 @@ int test_write_read_clover_force();
 int test_write_read_spinor_field_f();
 int test_write_read_spinor_field_f_vector_wise();
 int test_write_read_sfield();
+int test_write_read_clover_ldl();
 
 // Single precision
 int test_write_read_gauge_field_flt();
@@ -58,9 +59,10 @@ int main(int argc, char *argv[])
     // Double Precision Tests
     return_val += test_write_read_gauge_field();
     return_val += test_write_read_gauge_field_f();
-    return_val += test_write_read_scalar_field();
+    return_val += test_write_read_suNg_scalar_field();
     return_val += test_write_read_avfield();
     return_val += test_write_read_gtransf();
+    return_val += test_write_read_clover_ldl();
     return_val += test_write_read_clover_term();
     return_val += test_write_read_clover_force();
     
@@ -470,7 +472,7 @@ int test_write_read_sfield()
     return return_val;
 }
 
-int test_write_read_scalar_field() 
+int test_write_read_suNg_scalar_field() 
 {
     lprintf("INFO", 0, " ======= TEST SU(NG) SCALAR FIELD ======= ");
     int return_val = 0;
@@ -480,8 +482,8 @@ int test_write_read_scalar_field()
     out = alloc_suNg_scalar_field(&glattice);
     gpu_format = alloc_suNg_scalar_field(&glattice);
 
-    random_scalar_field_cpu(in);
-    lprintf("SANITY CHECK", 0, "[In field norm unequal zero: %0.2e]\n", sqnorm_scalar_field_cpu(in));
+    random_suNg_scalar_field_cpu(in);
+    lprintf("SANITY CHECK", 0, "[In field norm unequal zero: %0.2e]\n", sqnorm_suNg_scalar_field_cpu(in));
 
     suNg_vector *in_vec, *block_start, *out_vec;
     int stride = 0;
@@ -499,10 +501,10 @@ int test_write_read_scalar_field()
         }
     }
 
-    lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.2e]\n", sqnorm_scalar_field_cpu(in));
-    lprintf("SANITY CHECK", 0, "[Sanity check out field norm unequal zero: %0.2e]\n", sqnorm_scalar_field_cpu(out));
-    sub_assign_scalar_field_cpu(out, in);
-    double diff_norm = sqnorm_scalar_field_cpu(out);
+    lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.2e]\n", sqnorm_suNg_scalar_field_cpu(in));
+    lprintf("SANITY CHECK", 0, "[Sanity check out field norm unequal zero: %0.2e]\n", sqnorm_suNg_scalar_field_cpu(out));
+    sub_assign_suNg_scalar_field_cpu(out, in);
+    double diff_norm = sqnorm_suNg_scalar_field_cpu(out);
 
     check_diff_norm_zero(diff_norm);
 
@@ -688,3 +690,46 @@ int test_write_read_clover_force()
     free_clover_force(gpu_format);
     return return_val;
 }
+
+int test_write_read_clover_ldl() 
+{
+    lprintf("INFO", 0, " ======= TEST LDL FIELD ======= ");
+    int return_val = 0;
+    ldl_field *in, *gpu_format, *out;
+
+    in = alloc_clover_ldl(&glattice);
+    out = alloc_clover_ldl(&glattice);
+    gpu_format = alloc_clover_ldl(&glattice);
+
+    random_clover_ldl_cpu(in);
+    lprintf("SANITY CHECK", 0, "[In field norm unequal zero: %0.2e]\n", sqnorm_clover_ldl_cpu(in)); // sqnorm Not implemented
+
+    ldl_t *site_in, *block_start, *site_out;
+    int stride = 0;
+    _PIECE_FOR(in->type, ixp) 
+    {
+        block_start = _DFIELD_BLK(gpu_format, ixp, 0);
+        stride = in->type->master_end[ixp] - in->type->master_end[ixp] + 1;
+        _SITE_FOR(in->type, ixp, ix) 
+        {
+            int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
+            site_in = _FIELD_AT(in, ix);
+            site_out = _FIELD_AT(out, ix);
+            write_gpu_ldl_t(stride, (*site_in), block_start, ix_loc, 0);
+            read_gpu_ldl_t(stride, (*site_out), block_start, ix_loc, 0);
+        }
+    }
+
+    lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.2e]\n", sqnorm_clover_ldl_cpu(in));
+    lprintf("SANITY CHECK", 0, "[Sanity check out field norm unequal zero: %0.2e]\n", sqnorm_clover_ldl_cpu(out));
+
+    sub_assign_clover_ldl_cpu(out, in);
+    double diff_norm = sqnorm_clover_ldl_cpu(out);
+    check_diff_norm_zero(diff_norm);
+
+    free_clover_ldl(in);
+    free_clover_ldl(out);
+    free_clover_ldl(gpu_format);
+    return return_val;
+}
+

@@ -1,4 +1,4 @@
-NG = 3
+NG = 2
 REPR = REPR_FUNDAMENTAL
 #REPR = REPR_SYMMETRIC
 #REPR = REPR_ANTISYMMETRIC
@@ -31,9 +31,9 @@ MACRO += -DBC_Z_PERIODIC
 #MACRO += -DWITH_SMEARING
 #MACRO += -DWITH_CLOVER
 #MACRO += -DWITH_EXPCLOVER
-MACRO += -DUPDATE_EO
+#MACRO += -DUPDATE_EO
 MACRO += -DWITH_MPI
-# MACRO += -DWITH_GPU
+MACRO += -DWITH_GPU
 #MACRO += -DWITH_QUATERNIONS
 #MACRO += -DPURE_GAUGE_ANISOTROPY
 MACRO += -DNDEBUG
@@ -50,7 +50,7 @@ MACRO += -DIO_FLUSH
 #MACRO += -DAVX2_HIREP
 
 MACRO += -DWITH_NEW_GEOMETRY
-# MACRO += -DLOG_ALLPIDS
+#MACRO += -DLOG_ALLPIDS
 
 #Compiler
 ifeq (,$(findstring -DWITH_GPU,$(MACRO))) #Compile CPU only
@@ -72,4 +72,10 @@ else
         GPUFLAGS = --x cu -arch=sm_70 -Xptxas -v -Xptxas -dlcm=ca -dc
         LDFLAGS = -lcuda -lmpi
     endif
+    #else
+    #    CC = nvcc
+    #    CFLAGS = -ccbin mpicc
+    #    GPUFLAGS = --x cu -arch=sm_70
+    #    LDFLAGS = -lcuda -lmpi
+    #endif
 endif

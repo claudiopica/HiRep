@@ -551,6 +551,7 @@ void start_gf_sendrecv(suNg_field *gf)
 
   for (i = 0; i < (gd->nbuffers_gauge); ++i)
   {
+    //#ifdef WITH_NEW_GEOMETRY
     /* send ith buffer */
     mpiret = MPI_Isend((double *)((gf->sendbuf_ptr) + 4 * gd->sbuf_start[i]), /* buffer */
                        (gd->sbuf_len[i]) * sizeof(suNg) / sizeof(double) * 4, /* lenght in units of doubles */
@@ -560,6 +561,16 @@ void start_gf_sendrecv(suNg_field *gf)
                        cart_comm,                                             /* use the cartesian communicator */
                        &(gf->comm_req[2 * i])                                 /* handle to communication request */
     );
+   /* #else 
+    mpiret = MPI_Isend((double *)((gf->ptr) + 4 * gd->sbuf_start[i]), 
+                       (gd->sbuf_len[i]) * sizeof(suNg) / sizeof(double) * 4,
+                       MPI_DOUBLE,                                            
+                       gd->sbuf_to_proc[i],                                  
+                       i,                                                 
+                       cart_comm,                                          
+                       &(gf->comm_req[2 * i])                                 
+    );
+    #endif*/
 #ifndef NDEBUG
     if (mpiret != MPI_SUCCESS)
     {
@@ -716,7 +727,7 @@ void start_sf_sendrecv(spinor_field *sf)
                        gd->sbuf_to_proc[i],                                              /* cid of destination */
                        i,                                                                /* tag of communication */
                        cart_comm,                                                        /* use the cartesian communicator */
-                       &(sf->comm_req[2 * i])                                            /* handle to communication request */
+                       &(sf->comm_req[2 * i])                                           /* handle to communication request */
     );
 #ifndef NDEBUG
     if (mpiret != MPI_SUCCESS)

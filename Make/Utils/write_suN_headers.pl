@@ -73,6 +73,13 @@ print "#define NF $Nf\n";
 #system("./write_suN_def.pl $Nf f $c2 T");
 write_suN_h($Nf,$repsuff,$c2,"T");
 
+my $dim_ldl = $Nf * (2 * $Nf + 1);
+print "/* LDL field definition */\n\n";
+print "typedef struct {\n";
+print "   hr_complex up[$dim_ldl];\n";
+print "   hr_complex dn[$dim_ldl];\n";
+print "} ldl_t;\n";
+
 write_epilog();
 
 open STDOUT, ">suN.h";
@@ -206,8 +213,6 @@ if ($su2quat==0) {
     $rdataname=$lrdn;
 
 }
-
-
 
 write_spinor();
 if ($suff eq $fundsuff) { #algebra operations only for gauge

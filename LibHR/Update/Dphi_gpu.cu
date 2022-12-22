@@ -3,15 +3,11 @@
 * All rights reserved.                                                      *
 \***************************************************************************/
 
-/*******************************************************************************
-*
-* File Dphi_gpu.c
-*
-* Action of the Wilson-Dirac operator D and hermitian g5D on a given
-* double-precision spinor field
-*
-*******************************************************************************/
-
+/**
+ * @file Dphi_gpu.c
+ * @brief GPU implementation of the Wilson-Dirac operator D and its hermitian version
+ *        on a given double-precision spinor field.
+ */
 
 #ifdef WITH_GPU
 
@@ -29,117 +25,21 @@
 #include "memory.h"
 #include "gpu.h"
 #include "hr_complex.h"
-// #include <iostream>
-
-__global__ void Dphi_gpu_kernel(suNf_spinor*,
-                            const suNf_spinor*,
-                            const suNf*,
-                            const suNf*,
-                            const int*,
-                            const int*,
-                            const int,
-                            const int);
+#include "./Dphi_gpu_kernels.hpp"
 
 #ifdef ROTATED_SF
-#include "update.h"
-extern rhmc_par _update_par; /* Update/update_rhmc.c */
-#endif /* ROTATED_SF */
+  #include "update.h"
+  extern rhmc_par _update_par; /* Update/update_rhmc.c */
+#endif 
 
-//__device__ __constant__ hr_complex eitheta_gpu[4];
+static int init=1;
+static spinor_field *gtmp=NULL;
+static spinor_field *etmp=NULL;
+static spinor_field *otmp=NULL;
 
-/*
- * the following variable is used to keep trace of
- * matrix-vector multiplication.
- * we count how many time the function Dphi_ is called
+/**
+ * @brief Initializes the boundary conditions for fermion twisting
  */
-static unsigned long int MVMcounter=0;
-
-unsigned long int getMVM_gpu() {
-	unsigned long int res=MVMcounter>>1; /* divide by two */
-	//MVMcounter=0; /* reset counter */
-	return res;
-}
-
-/* r=t*u*s */
-#ifdef BC_T_THETA
-
-#define _suNf_theta_T_multiply(r, u, s)\
-    _suNf_multiply(vtmp, (u), (s));\
-    _vector_mulc_f((r), eitheta_gpu[0], vtmp)
-
-#define _suNf_theta_T_inverse_multiply(r, u, s)\
-    _suNf_inverse_multiply(vtmp, (u), (s));\
-    _vector_mulc_star_f((r), eitheta_gpu[0], vtmp)
-
-#else
-
-#define _suNf_theta_T_multiply(r, u, s) _suNf_multiply((r), (u), (s))
-#define _suNf_theta_T_inverse_multiply(r, u, s) _suNf_inverse_multiply((r), (u), (s))
-
-#endif
-
-/* r=t*u*s */
-#ifdef BC_X_THETA
-
-#define _suNf_theta_X_multiply(r, u, s)\
-_suNf_multiply(vtmp, (u), (s));\
-_vector_mulc_f((r), eitheta_gpu[1], vtmp)
-
-#define _suNf_theta_X_inverse_multiply(r, u, s)\
-_suNf_inverse_multiply(vtmp, (u), (s));\
-_vector_mulc_star_f((r), eitheta_gpu[1], vtmp)
-
-#else
-
-#define _suNf_theta_X_multiply(r, u, s) _suNf_multiply((r), (u), (s))
-#define _suNf_theta_X_inverse_multiply(r, u, s) _suNf_inverse_multiply((r), (u), (s))
-
-#endif
-
-/* r=t*u*s */
-#ifdef BC_Y_THETA
-
-#define _suNf_theta_Y_multiply(r, u, s)\
-_suNf_multiply(vtmp, (u), (s));\
-_vector_mulc_f((r), eitheta_gpu[2], vtmp)
-
-#define _suNf_theta_Y_inverse_multiply(r, u, s)\
-_suNf_inverse_multiply(vtmp, (u), (s));\
-_vector_mulc_star_f((r), eitheta_gpu[2], vtmp)
-
-#else
-
-#define _suNf_theta_Y_multiply(r, u, s) _suNf_multiply((r), (u), (s))
-#define _suNf_theta_Y_inverse_multiply(r, u, s) _suNf_inverse_multiply((r), (u), (s))
-
-#endif
-
-/* r=t*u*s */
-#ifdef BC_Z_THETA
-
-#define _suNf_theta_Z_multiply(r, u, s)\
-_suNf_multiply(vtmp, (u), (s));\
-_vector_mulc_f((r), eitheta_gpu[3], vtmp)
-
-#define _suNf_theta_Z_inverse_multiply(r, u, s)\
-_suNf_inverse_multiply(vtmp, (u), (s));\
-_vector_mulc_star_f((r), eitheta_gpu[3], vtmp)
-
-#else
-
-#define _suNf_theta_Z_multiply(r, u, s) _suNf_multiply((r), (u), (s))
-#define _suNf_theta_Z_inverse_multiply(r, u, s) _suNf_inverse_multiply((r), (u), (s))
-
-#endif
-
-
-typedef struct _suNf_hspinor
-{
-  suNf_vector c[2];
-} suNf_hspinor;
-
-#define THREADSITE 1
-
 static void init_bc_gpu(){
   #ifdef FERMION_THETA
   static int initialized=0;
@@ -151,92 +51,31 @@ static void init_bc_gpu(){
   #endif
 }
 
-void Dphi_gpu_(spinor_field *out, spinor_field *in)
-{
-  unsigned int N, grid;
-  const int vol4h=T*X*Y*Z/2;
-  const int test_block=vol4h/2;
-
-  init_bc_gpu();
-
-  error((in==NULL)||(out==NULL), 1, "Dphi_gpu_ [Dphi_gpu.c]",
-         "Attempt to access unallocated memory space");
-
-  error(in==out, 1, "Dphi_gpu_ [Dphi_gpu.c]",
-         "Input and output fields must be different");
-
-  #ifndef CHECK_SPINOR_MATCHING
-    error(out->type==&glat_even && in->type!=&glat_odd, 1, "Dphi_gpu_ [Dphi_gpu.c]", "Spinors don't match! (1)");
-    error(out->type==&glat_odd && in->type!=&glat_even, 1, "Dphi_gpu_ [Dphi_gpu.c]", "Spinors don't match! (2)");
-    error(out->type==&glattice && in->type!=&glattice, 1, "Dphi_gpu_ [Dphi_gpu.c]", "Spinors don't match! (3)");
-  #endif
-
-  _PIECE_FOR(out->type, ixp)
-  {
-      int iyp = (ixp+1)%2;
-      N = (out)->type->master_end[ixp]-(out)->type->master_start[ixp];
-      grid = (N-1)/BLOCK_SIZE + 1;
-      Dphi_gpu_kernel<<<grid, BLOCK_SIZE>>>(_GPU_FIELD_BLK(out, ixp),
-                                            _GPU_FIELD_BLK(in, iyp),
-                                            _GPU_4FIELD_BLK(u_gauge_f, ixp),
-                                            _GPU_4FIELD_BLK(u_gauge_f, iyp),
-                                            iup_gpu, idn_gpu,
-                                            vol4h, ixp);
-      CudaCheckError();
-  }
-}
-
-
-/*
- * this function takes 2 spinors defined on the whole lattice
+/**
+ * @brief the following variable is used to keep trace of
+ *        matrix-vector multiplication.
+ *        we count how many time the function Dphi_ is called
  */
-void Dphi_gpu(double m0, spinor_field *out, spinor_field *in)
-{
-  double rho;
+static unsigned long int MVMcounter=0;
 
-  error((in==NULL)||(out==NULL), 1, "Dphi_gpu [Dphi_gpu.c]",
-        "Attempt to access unallocated memory space");
-
-  error(in==out, 1, "Dphi_gpu [Dphi_gpu.c]",
-        "Input and output fields must be different");
-
-#ifdef CHECK_SPINOR_MATCHING
-  error(out->type!=&glattice || in->type!=&glattice, 1, "Dphi_gpu [Dphi_gpu.c]", "Spinors are not defined on all the lattice!");
-#endif /* CHECK_SPINOR_MATCHING */
-
-  Dphi_gpu_(out, in);
-
-  rho = 4. + m0;
-  spinor_field_mul_add_assign_f_gpu(out, rho, in);
+/**
+ * @brief Getter for number of applications of the Dirac operator
+ */
+unsigned long int getMVM_gpu() {
+	unsigned long int res=MVMcounter>>1; /* divide by two */
+	return res;
 }
 
-
-void g5Dphi_gpu(double m0, spinor_field *out, spinor_field *in)
-{
-  double rho;
-
-  error((in==NULL)||(out==NULL), 1, "g5Dphi_gpu [Dphi_gpu.c]",
-	"Attempt to access unallocated memory space");
-
-  error(in==out, 1, "g5Dphi_gpu [Dphi_gpu.c]",
-	"Input and output fields must be different");
-
-#ifdef CHECK_SPINOR_MATCHING
-   error(out->type!=&glattice || in->type!=&glattice, 1, "g5Dphi_gpu [Dphi_gpu.c]", "Spinors are not defined on all the lattice!");
-#endif /* CHECK_SPINOR_MATCHING */
-
-  Dphi_gpu_(out, in);
-  rho=4.+m0;
-  spinor_field_mul_add_assign_f_gpu(out, rho, in);
-  spinor_field_g5_assign_f_gpu(out);
+/**
+ * @brief Reset counter for number of applications of the Dirac operator
+ */
+void resetMVM_gpu() {
+  MVMcounter = 0;
 }
 
-
-static int init=1;
-static spinor_field *gtmp=NULL;
-static spinor_field *etmp=NULL;
-static spinor_field *otmp=NULL;
-
+/**
+ * @brief Free fields allocated for intermediate storage of field data.
+ */
 static void free_mem() {
   if (gtmp!=NULL) {
     free_spinor_field_f(gtmp);
@@ -253,6 +92,10 @@ static void free_mem() {
   init=1;
 }
 
+/**
+ * @brief Allocate fields intended for storage of field data in intermediate
+ *        steps
+ */
 static void init_Dirac() {
   if (init) {
     alloc_mem_t=GPU_MEM;
@@ -268,365 +111,265 @@ static void init_Dirac() {
   }
 }
 
-
-/* Even/Odd preconditioned dirac operator
- * this function takes 2 spinors defined on the even lattice
- * Dphi in = (4+m0)^2*in - D_EO D_OE in
+/**
+ * @brief Applies the Wilson-Dirac operator only where the calculation
+ *        does not depend on the communications. Use this calculation
+ *        to mask communication latency.
  *
+ * @param in                  Input spinor field, defined on GPU copy
+ * @param out                 Output spinor field to save result
  */
+static void Dphi_inner_gpu_(spinor_field *out, spinor_field *in) {
+  int grid, iyp, write_stride, start_piece_ixp, start_piece_iyp;
+  _PIECE_FOR(out->type, ixp)
+  {
+      iyp = (ixp+1)%2;
+      write_stride = out->type->master_end[ixp] - out->type->master_start[ixp] + 1;
+      grid = (write_stride-1)/BLOCK_SIZE + 1;
+      start_piece_ixp = in->type->master_start[ixp];
+      start_piece_iyp = in->type->master_start[iyp];
+
+      Dphi_gpu_inner_kernel<<<grid, BLOCK_SIZE>>>(
+            _GPU_FIELD_BLK(out, ixp), _GPU_FIELD_BLK(in, iyp),
+            _GPU_4FIELD_BLK(u_gauge_f, ixp), _GPU_4FIELD_BLK(u_gauge_f, iyp),
+            iup_gpu, idn_gpu, imask_gpu,
+            write_stride, start_piece_ixp, start_piece_iyp);
+      CudaCheckError();
+  }
+  cudaDeviceSynchronize();
+}
+
+/**
+ * @brief Applies the Wilson-Dirac operator only where the calculation
+ *        depends on the communications. Call this after having
+ *        completed the spinor field communications.
+ *
+ * @param in                  Input spinor field defined on the extended
+ *                            lattice on the GPU copy.
+ * @param out                 Output spinor field to save result
+ */
+void Dphi_boundary_gpu_(spinor_field *out, spinor_field *in) {
+  #if defined(WITH_MPI) && defined(WITH_NEW_GEOMETRY)
+  int grid, ixp, block_stride, buffer_stride, block_start, buffer_start;
+  for (int i = 0; i < in->type->nbuffers_spinor; ++i)
+  {
+      ixp = (i%2==0);
+      block_stride = in->type->master_end[ixp] - in->type->master_start[ixp] + 1;
+      buffer_stride = in->type->rbuf_len[i];
+      buffer_start = in->type->rbuf_start[i];
+      grid = (block_stride-1)/BLOCK_SIZE + 1;
+      block_start = in->type->master_start[ixp];
+
+      Dphi_gpu_boundary_kernel<<<grid, BLOCK_SIZE>>>(
+            _GPU_FIELD_BLK(out, ixp), _BUF_GPU_FIELD_BLK(in, i),
+            _GPU_4FIELD_BLK(u_gauge_f, ixp), _BUF_GPU_4FIELD_BLK(u_gauge_f, i),
+            iup_gpu, idn_gpu, imask_gpu,
+            block_stride, buffer_stride,
+            buffer_start, block_start);
+      CudaCheckError();
+  }
+  #endif
+}
+
+/**
+ * @brief Implementation of the massless Wilson-Dirac operator on the GPU
+ *
+ * @param in                      Input spinor field
+ * @param out                     Output spinor field to save result
+ */
+void Dphi_gpu_(spinor_field *out, spinor_field *in)
+{
+  // Input parameter validity checks
+  _CHECK_GEOMETRY_EO(in, out);
+  // TODO: Possibly add: Fields are not null, fields are unequal (SAM)
+
+  init_bc_gpu();
+
+  #ifdef WITH_MPI
+      //TODO: gfield comms after copy, not necessary for every Dphi_gpu_ (SAM)
+    start_sendrecv_gpu_gfield_f(u_gauge_f);
+    complete_sendrecv_gpu_gfield_f(u_gauge_f);
+
+    start_sendrecv_gpu_spinor_field_f(in);
+  #endif
+
+  // Mask communication latency with calculating the points
+  // that do no rely on communications  
+  Dphi_inner_gpu_(out, in);
+  complete_sendrecv_gpu_spinor_field_f(in);
+
+  // After completion of communications add missing calculations
+  // that relied on communications.
+  Dphi_boundary_gpu_(out, in);
+}
+
+/**
+ * @brief Implementation of the Wilson-Dirac operator with mass on the GPU.
+ *
+ * @param in                    Input spinor field defined on the full lattice
+ * @param out                   Output spinor field defined on the full lattice that is 
+ *                              the result of the application of the Wilson-Dirac operator 
+ *                              on the input spinor field.
+ * @param m0                    Mass parameter
+ */
+void Dphi_gpu(double m0, spinor_field *out, spinor_field *in)
+{
+  //Input argument validity checks
+  _CHECK_GEOMETRY_FULL(in);
+  _CHECK_GEOMETRY_FULL(out);
+
+  // Operation
+  double rho = 4. + m0;
+  Dphi_gpu_(out, in);
+  spinor_field_mul_add_assign_f_gpu(out, rho, in);
+}
+
+/**
+ * @brief Implementation of the Hermitian Wilson-Dirac operator with mass on the GPU.
+ *
+ * @param in                    Input spinor field defined on the full lattice
+ * @param out                   Output spinor field defined on the full lattice that is 
+ *                              the result of the application of the Hermitian Wilson-Dirac 
+ *                              operator on the input spinor field
+ * @param m0                    Mass parameter
+ */
+void g5Dphi_gpu(double m0, spinor_field *out, spinor_field *in)
+{
+  // Input argument validity checks
+  _CHECK_GEOMETRY_FULL(in);
+  _CHECK_GEOMETRY_FULL(out);
+
+  // Operation
+  double rho = 4. + m0;
+  Dphi_gpu_(out, in);
+  spinor_field_mul_add_assign_f_gpu(out, rho, in);
+  spinor_field_g5_assign_f_gpu(out);
+}
+
+ /**
+  * @brief Even-odd preconditioned Wilson-Dirac operator with mass on the GPU.
+  *
+  * @param in                 Even input spinor field
+  * @param out                Even output spinor field that is the result of the application
+  *                           of the even-odd preconditioned Wilson-Dirac operator on the 
+  *                           input spinor field
+  * @param m0                 Mass parameter
+  */
 void Dphi_eopre_gpu(double m0, spinor_field *out, spinor_field *in)
 {
-  double rho;
+  // Input argument validity checks
+  _CHECK_GEOMETRY_EVEN(in);
+  _CHECK_GEOMETRY_EVEN(out);
 
-  error((in==NULL)||(out==NULL), 1, "Dphi_eopre_gpu [Dphi_gpu.c]",
-	"Attempt to access unallocated memory space");
-
-  error(in==out, 1, "Dphi_eopre_gpu [Dphi_gpu.c]",
-	"Input and output fields must be different");
-
-#ifdef CHECK_SPINOR_MATCHING
-  error(out->type!=&glat_even || in->type!=&glat_even, 1, "Dphi_eopre_gpu " __FILE__, "Spinors are not defined on even lattice!");
-#endif /* CHECK_SPINOR_MATCHING */
-
-  /* alloc memory for temporary spinor field */
+  // alloc memory for temporary spinor field
   if (init) { init_Dirac(); }
 
+  // Operation
   Dphi_gpu_(otmp, in);
   Dphi_gpu_(out, otmp);
-
-  rho=4.0+m0;
+  double rho = 4. + m0;
   rho*=-rho; /* this minus sign is taken into account below */
-
   spinor_field_mul_add_assign_f_gpu(out, rho, in);
   spinor_field_minus_f_gpu(out, out);
 }
 
-
-/* Even/Odd preconditioned dirac operator
- * this function takes 2 spinors defined on the odd lattice
- * Dphi in = (4+m0)^2*in - D_OE D_EO in
- *
- */
+ /**
+  * @brief Even-odd preconditioned Wilson-Dirac operator with mass on the GPU.
+  *
+  * @param in                 Odd input spinor field
+  * @param out                Odd output spinor field that is the result of the application
+  *                           of the even-odd preconditioned Wilson-Dirac operator on the 
+  *                           input spinor field
+  * @param m0                 Mass parameter
+  */
 void Dphi_oepre_gpu(double m0, spinor_field *out, spinor_field *in)
 {
-  double rho;
+  // Input argument validity checks
+  _CHECK_GEOMETRY_ODD(in);
+  _CHECK_GEOMETRY_ODD(out);
 
-  error((in==NULL)||(out==NULL), 1, "Dphi_oepre_gpu [Dphi_gpu.c]",
-	"Attempt to access unallocated memory space");
-
-  error(in==out, 1, "Dphi_oepre_gpu [Dphi_gpu.c]",
-	"Input and output fields must be different");
-
-#ifdef CHECK_SPINOR_MATCHING
-  error(out->type!=&glat_odd || in->type!=&glat_odd, 1, "Dphi_oepre_gpu " __FILE__, "Spinors are not defined on odd lattice!");
-#endif /* CHECK_SPINOR_MATCHING */
-
-
-  /* alloc memory for temporary spinor field */
+  // alloc memory for temporary spinor field 
   if (init) { init_Dirac();}
 
   Dphi_gpu_(etmp, in);
   Dphi_gpu_(out, etmp);
-
-  rho=4.0+m0;
+  double rho = 4. + m0;
   rho*=-rho; /* this minus sign is taken into account below */
-
   spinor_field_mul_add_assign_f_gpu(out, rho, in);
   spinor_field_minus_f_gpu(out, out);
 }
 
-
+ /**
+  * @brief Even-odd preconditioned Hermitian Wilson-Dirac operator with mass on the GPU.
+  *
+  * @param in                 Even input spinor field
+  * @param out                Even output spinor field that is the result of the application
+  *                           of the even-odd preconditioned Wilson-Dirac operator on the 
+  *                           input spinor field
+  * @param m0                 Mass parameter
+  */
 void g5Dphi_eopre_gpu(double m0, spinor_field *out, spinor_field *in)
 {
-  double rho;
+  // Input argument validity checks
+  _CHECK_GEOMETRY_EVEN(in);
+  _CHECK_GEOMETRY_EVEN(out);
 
-  error((in==NULL)||(out==NULL), 1, "g5Dphi_eopre_gpu [Dphi_gp.c]",
-	"Attempt to access unallocated memory space");
+  #if defined(BASIC_SF) || defined(ROTATED_SF)
+    SF_spinor_bcs(in);
+  #endif
 
-  error(in==out, 1, "Dphi_eopre_gpu [Dphi_gpu.c]",
-	"Input and output fields must be different");
-
-#ifdef CHECK_SPINOR_MATCHING
-  error(out->type!=&glat_even || in->type!=&glat_even, 1, "g5Dphi_eopre_gpu " __FILE__, "Spinors are not defined on even lattice!");
-#endif /* CHECK_SPINOR_MATCHING */
-
-#if defined(BASIC_SF) || defined(ROTATED_SF)
-  SF_spinor_bcs(in);
-#endif /* defined(BASIC_SF) || defined(ROTATED_SF) */
-
-  /* alloc memory for temporary spinor field */
+  // alloc memory for temporary spinor field 
   if (init) { init_Dirac();}
 
+  // Operation
   Dphi_gpu_(otmp, in);
   Dphi_gpu_(out, otmp);
-
-  rho=4.0+m0;
+  double rho = 4. + m0;
   rho*=-rho; /* this minus sign is taken into account below */
-
   spinor_field_mul_add_assign_f_gpu(out, rho, in);
   spinor_field_minus_f_gpu(out, out);
   spinor_field_g5_assign_f_gpu(out);
 
-#if defined(BASIC_SF) || defined(ROTATED_SF)
-  SF_spinor_bcs(out);
-#endif /* defined(BASIC_SF) || defined(ROTATED_SF) */
+  #if defined(BASIC_SF) || defined(ROTATED_SF)
+    SF_spinor_bcs(out);
+  #endif 
 }
 
-
-/* g5Dphi_eopre ^2 */
+ /**
+  * @brief Even-odd preconditioned squared Hermitian Wilson-Dirac operator with mass on the GPU.
+  *
+  * @param in                 Even input spinor field
+  * @param out                Even output spinor field that is the result of the application
+  *                           of the even-odd preconditioned Wilson-Dirac operator on the 
+  *                           input spinor field
+  * @param m0                 Mass parameter
+  */
 void g5Dphi_eopre_sq_gpu(double m0, spinor_field *out, spinor_field *in) {
-  /* alloc memory for temporary spinor field */
+  // alloc memory for temporary spinor field
   if (init) { init_Dirac(); }
 
   g5Dphi_eopre_gpu(m0, etmp, in);
   g5Dphi_eopre_gpu(m0, out, etmp);
 }
 
-
-/* g5Dhi ^2 */
+/**
+ * @brief Implementation of the squared Hermitian Wilson-Dirac operator with mass on the GPU.
+ *
+ * @param in                    Input spinor field defined on the full lattice
+ * @param out                   Output spinor field defined on the full lattice that is 
+ *                              the result of the application of the Hermitian Wilson-Dirac 
+ *                              operator on the input spinor field
+ * @param m0                    Mass parameter
+ */
 void g5Dphi_sq_gpu(double m0, spinor_field *out, spinor_field *in) {
-  /* alloc memory for temporary spinor field */
+  // alloc memory for temporary spinor field 
   if (init) { init_Dirac();  }
 
   g5Dphi_gpu(m0, gtmp, in);
   g5Dphi_gpu(m0, out, gtmp);
 }
 
-/* ================================== KERNEL ================================== */
-
-/* Takes an even input spinor and returns an odd spinor */
-__global__ void Dphi_gpu_kernel(suNf_spinor* __restrict__ out,
-                            const suNf_spinor* __restrict__ in,
-                            const suNf* __restrict__ gauge_ixp,
-                            const suNf* __restrict__ gauge_iyp,
-                            const int* __restrict__ iup_d,
-                            const int* __restrict__ idn_d,
-                            const int vol4h,
-                            const int ixp)
-{
-  suNf_spinor r;
-  suNf_hspinor sn;
-  suNf u;
-  #ifdef FERMION_THETA
-    suNf_vector vtmp;
-  #endif
-
-  int ix, iy, iyp;
-  int local_ix, local_iy;
-  local_ix = blockIdx.x*BLOCK_SIZE + threadIdx.x;
-  if (local_ix < vol4h) {
-    ix = _SITE_IDX_GPU(local_ix, ixp, vol4h);
-
-    /******************************* direction +0 *********************************/
-    iy=iup_d[4*ix];
-    iyp=iy/vol4h;
-    local_iy = iy % vol4h;
-
-    read_gpu_suNf_vector(vol4h, sn.c[0], in, local_iy, 0);
-    read_gpu_suNf_vector(vol4h, sn.c[1], in, local_iy, 2);
-    read_gpu_suNf(vol4h, u, gauge_ixp, local_ix, 0);
-
-    _vector_add_assign_f(sn.c[0], sn.c[1]);
-    _suNf_theta_T_multiply(r.c[0], u, sn.c[0]);
-
-    r.c[2]=r.c[0];
-
-    read_gpu_suNf_vector(vol4h, sn.c[0], in, local_iy, 1);
-    read_gpu_suNf_vector(vol4h, sn.c[1], in, local_iy, 3);
-    _vector_add_assign_f(sn.c[0], sn.c[1]);
-
-    _suNf_theta_T_multiply(r.c[1], u, sn.c[0]);
-
-    r.c[3]=r.c[1];
-
-    __syncthreads();
-    /******************************* direction -0 *********************************/
-    iy=idn_d[4*ix];
-    iyp=iy/vol4h;
-    local_iy = iy % vol4h;
-
-    read_gpu_suNf_vector(vol4h, sn.c[0], in, local_iy, 0);
-    read_gpu_suNf_vector(vol4h, sn.c[1], in, local_iy, 2);
-    read_gpu_suNf(vol4h, u, gauge_iyp, local_iy, 0);
-
-    _vector_sub_assign_f(sn.c[0], sn.c[1]);
-    _suNf_theta_T_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-    _vector_add_assign_f(r.c[0], sn.c[1]);
-    _vector_sub_assign_f(r.c[2], sn.c[1]);
-
-    read_gpu_suNf_vector(vol4h, sn.c[0], in, local_iy, 1);
-    read_gpu_suNf_vector(vol4h, sn.c[1], in, local_iy, 3);
-    _vector_sub_assign_f(sn.c[0], sn.c[1]);
-
-    _suNf_theta_T_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-    _vector_add_assign_f(r.c[1], sn.c[1]);
-    _vector_sub_assign_f(r.c[3], sn.c[1]);
-
-    __syncthreads();
-    /******************************* direction +1 *********************************/
-    iy=iup_d[4*ix+1];
-    iyp=iy/vol4h;
-    local_iy = iy % vol4h;
-
-    read_gpu_suNf_vector(vol4h, sn.c[0], in, local_iy, 0);
-    read_gpu_suNf_vector(vol4h, sn.c[1], in, local_iy, 3);
-    read_gpu_suNf(vol4h, u, gauge_ixp, local_ix, 1);
-
-    _vector_i_add_assign_f(sn.c[0], sn.c[1]);
-    _suNf_theta_X_multiply(sn.c[1], u, sn.c[0]);
-
-    _vector_add_assign_f(r.c[0], sn.c[1]);
-    _vector_i_sub_assign_f(r.c[3], sn.c[1]);
-
-    read_gpu_suNf_vector(vol4h, sn.c[0], in, local_iy, 1);
-    read_gpu_suNf_vector(vol4h, sn.c[1], in, local_iy, 2);
-    _vector_i_add_assign_f(sn.c[0], sn.c[1]);
-
-    _suNf_theta_X_multiply(sn.c[1], u, sn.c[0]);
-
-    _vector_add_assign_f(r.c[1], sn.c[1]);
-    _vector_i_sub_assign_f(r.c[2], sn.c[1]);
-
-    __syncthreads();
-    /******************************* direction -1 *********************************/
-    iy=idn_d[4*ix+1];
-    iyp=iy/vol4h;
-    local_iy = iy % vol4h;
-
-    read_gpu_suNf_vector(vol4h, sn.c[0], in, local_iy, 0);
-    read_gpu_suNf_vector(vol4h, sn.c[1], in, local_iy, 3);
-    read_gpu_suNf(vol4h, u, gauge_iyp, local_iy, 1);
-
-    _vector_i_sub_assign_f(sn.c[0], sn.c[1]);
-    _suNf_theta_X_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-    _vector_add_assign_f(r.c[0], sn.c[1]);
-    _vector_i_add_assign_f(r.c[3], sn.c[1]);
-
-    read_gpu_suNf_vector(vol4h, sn.c[0], in, local_iy, 1);
-    read_gpu_suNf_vector(vol4h, sn.c[1], in, local_iy, 2);
-    _vector_i_sub_assign_f(sn.c[0], sn.c[1]);
-
-    _suNf_theta_X_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-    _vector_add_assign_f(r.c[1], sn.c[1]);
-    _vector_i_add_assign_f(r.c[2], sn.c[1]);
-
-    __syncthreads();
-    /******************************* direction +2 *********************************/
-    iy=iup_d[4*ix+2];
-    iyp=iy/vol4h;
-    local_iy = iy % vol4h;
-
-    read_gpu_suNf_vector(vol4h, sn.c[0], in, local_iy, 0);
-    read_gpu_suNf_vector(vol4h, sn.c[1], in, local_iy, 3);
-    _vector_add_assign_f(sn.c[0], sn.c[1]);
-
-    read_gpu_suNf(vol4h, u, gauge_ixp, local_ix, 2);
-    _suNf_theta_Y_multiply(sn.c[1], u, sn.c[0]);
-
-    _vector_add_assign_f(r.c[0], sn.c[1]);
-    _vector_add_assign_f(r.c[3], sn.c[1]);
-
-    read_gpu_suNf_vector(vol4h, sn.c[0], in, local_iy, 1);
-    read_gpu_suNf_vector(vol4h, sn.c[1], in, local_iy, 2);
-    _vector_sub_assign_f(sn.c[0], sn.c[1]);
-
-    _suNf_theta_Y_multiply(sn.c[1], u, sn.c[0]);
-
-    _vector_add_assign_f(r.c[1], sn.c[1]);
-    _vector_sub_assign_f(r.c[2], sn.c[1]);
-
-    __syncthreads();
-    /******************************* direction -2 *********************************/
-    iy=idn_d[4*ix+2];
-    iyp=iy/vol4h;
-    local_iy = iy % vol4h;
-
-    read_gpu_suNf_vector(vol4h, sn.c[0], in, local_iy, 0);
-    read_gpu_suNf_vector(vol4h, sn.c[1], in, local_iy, 3);
-    _vector_sub_assign_f(sn.c[0], sn.c[1]);
-
-    read_gpu_suNf(vol4h, u, gauge_iyp, local_iy, 2);
-    _suNf_theta_Y_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-    _vector_add_assign_f(r.c[0], sn.c[1]);
-    _vector_sub_assign_f(r.c[3], sn.c[1]);
-
-    read_gpu_suNf_vector(vol4h, sn.c[0], in, local_iy, 1);
-    read_gpu_suNf_vector(vol4h, sn.c[1], in, local_iy, 2);
-    _vector_add_assign_f(sn.c[0], sn.c[1]);
-
-    _suNf_theta_Y_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-    _vector_add_assign_f(r.c[1], sn.c[1]);
-    _vector_add_assign_f(r.c[2], sn.c[1]);
-
-    __syncthreads();
-    /******************************* direction +3 *********************************/
-    iy=iup_d[4*ix+3];
-    iyp=iy/vol4h;
-    local_iy = iy % vol4h;
-
-    read_gpu_suNf_vector(vol4h, sn.c[0], in, local_iy, 0);
-    read_gpu_suNf_vector(vol4h, sn.c[1], in, local_iy, 2);
-    _vector_i_add_assign_f(sn.c[0], sn.c[1]);
-
-    read_gpu_suNf(vol4h, u, gauge_ixp, local_ix, 3);
-    _suNf_theta_Z_multiply(sn.c[1], u, sn.c[0]);
-
-    _vector_add_assign_f(r.c[0], sn.c[1]);
-    _vector_i_sub_assign_f(r.c[2], sn.c[1]);
-
-    read_gpu_suNf_vector(vol4h, sn.c[0], in, local_iy, 1);
-    read_gpu_suNf_vector(vol4h, sn.c[1], in, local_iy, 3);
-    _vector_i_sub_assign_f(sn.c[0], sn.c[1]);
-
-    _suNf_theta_Z_multiply(sn.c[1], u, sn.c[0]);
-
-    _vector_add_assign_f(r.c[1], sn.c[1]);
-    _vector_i_add_assign_f(r.c[3], sn.c[1]);
-
-    __syncthreads();
-    /******************************* direction -3 *********************************/
-    iy=idn_d[4*ix+3];
-    iyp=iy/vol4h;
-    local_iy = iy % vol4h;
-
-    read_gpu_suNf_vector(vol4h, sn.c[0], in, local_iy, 0);
-    read_gpu_suNf_vector(vol4h, sn.c[1], in, local_iy, 2);
-    _vector_i_sub_assign_f(sn.c[0], sn.c[1]);
-
-    read_gpu_suNf(vol4h, u, gauge_iyp, local_iy, 3);
-    _suNf_theta_Z_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-    _vector_add_assign_f(r.c[0], sn.c[1]);
-    _vector_i_add_assign_f(r.c[2], sn.c[1]);
-
-    read_gpu_suNf_vector(vol4h, sn.c[0], in, local_iy, 1);
-    read_gpu_suNf_vector(vol4h, sn.c[1], in, local_iy, 3);
-    _vector_i_add_assign_f(sn.c[0], sn.c[1]);
-
-    _suNf_theta_Z_inverse_multiply(sn.c[1], u, sn.c[0]);
-
-    _vector_add_assign_f(r.c[1], sn.c[1]);
-    _vector_i_sub_assign_f(r.c[3], sn.c[1]);
-
-    __syncthreads();
-    /******************************** end of directions *********************************/
-    _spinor_mul_f(r, -0.5, r);
-
-    write_gpu_suNf_vector(vol4h, r.c[0], out, local_ix, 0);
-    write_gpu_suNf_vector(vol4h, r.c[1], out, local_ix, 1);
-    write_gpu_suNf_vector(vol4h, r.c[2], out, local_ix, 2);
-    write_gpu_suNf_vector(vol4h, r.c[3], out, local_ix, 3);
-  }
-}
-
-
-// Do this in the header, just as for the linear algebra functions
+/* For WITH_GPU: Map the GPU functions to the default functions. */
 void (*Dphi_) (spinor_field *out, spinor_field *in)=Dphi_gpu_;
 void (*Dphi) (double m0, spinor_field *out, spinor_field *in)=Dphi_gpu;
 void (*g5Dphi) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_gpu;

@@ -213,8 +213,12 @@ void g5Dphi_eopre_sq_flt(double m0, spinor_field_flt *out, spinor_field_flt *in)
 
 /* Dirac operators used in the Update */
 //TODO: put this somewhere else (SAM)
+//TODO: I am not sure these functions work at the moment (SAM)
 void set_dirac_mass(double mass); // this is the mass used in the following operators
 double get_dirac_mass();
+
+/* Alias functions to active default depending on whether WITH_GPU is compile flag */
+
 
 #ifdef __cplusplus
     }

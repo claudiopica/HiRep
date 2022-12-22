@@ -2,7 +2,7 @@ TOPDIR = ../..
 MKDIR = $(TOPDIR)/Make
 
 SRCS = $(wildcard *.c)
-GPUFILES = Dphi_gpu.c
+GPUFILES = Dphi_gpu.c Dphi_gpu_kernels.c
 LIBNAME = ../libhr.a
 
 #Exclude these source files

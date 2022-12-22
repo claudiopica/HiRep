@@ -25,6 +25,10 @@
   #include "mpi.h"
 #endif
 
+#ifdef __cplusplus
+  extern "C" {
+#endif
+
 const char *sComputeMode[] = {
     "Default (multiple host threads can use ::cudaSetDevice() with device simultaneously)",
     "Exclusive (only one host thread in one process is able to use ::cudaSetDevice() with this device)",
@@ -42,7 +46,7 @@ const char *sComputeMode[] = {
 void print_device_count_info(input_gpu gpu_var_init) 
 {
   int device_count;
-  CHECK_CUDA(cudaGetDeviceCount(&device_count));
+  cudaGetDeviceCount(&device_count);
   lprintf("GPU_INIT", 0, "GPU_ID = %d\n", gpu_var_init.gpuID);
   //error(gpu_id > device_count, 1, "init_gpu", "Illegal device ID"); 
   // I don't see what we need this for (SAM)
@@ -238,5 +242,9 @@ void print_hardware_info(cudaDeviceProp device_prop, input_gpu gpu_var_init)
   print_memory_info(device_prop, gpu_var_init);
   print_compute_info(device_prop, gpu_var_init);
 }
+
+#ifdef __cplusplus
+  }
+#endif
 
 #endif

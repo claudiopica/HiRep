@@ -1,3 +1,4 @@
+
 /******************************************************************************
 *
 * NOCOMPILE= !WITH_GPU
@@ -140,23 +141,27 @@ int test_herm_gpu(spinor_operator S, char *name)
   lprintf("SANITY CHECK", 0, "gaussian spinor field norm s1 after copy: %0.2e\n", sqrt(spinor_field_sqnorm_f(s1)));
   lprintf("SANITY CHECK", 0, "gaussian spinor field norm s2 after copy: %0.2e\n", sqrt(spinor_field_sqnorm_f(s2)));
 
+  
   // Apply operator
   S(s3, s1);
   S(s4, s2);
 
+  copy_from_gpu_spinor_field_f(s3);
+  copy_from_gpu_spinor_field_f(s4);
+
   // Spinor field sanity checks
-  lprintf("RESULT", 0, "s1 NORM %0.2e on GPU\n", sqrt(spinor_field_sqnorm_f(s1)));
-  lprintf("RESULT", 0, "s2 NORM %0.2e on GPU\n", sqrt(spinor_field_sqnorm_f(s2)));
-  lprintf("RESULT", 0, "s3 NORM %0.2e on GPU\n", sqrt(spinor_field_sqnorm_f(s3)));
-  lprintf("RESULT", 0, "s4 NORM %0.2e on GPU\n", sqrt(spinor_field_sqnorm_f(s4)));
+  lprintf("RESULT", 0, "s1 NORM %0.2e on GPU\n", sqrt(spinor_field_sqnorm_f_cpu(s1)));
+  lprintf("RESULT", 0, "s2 NORM %0.2e on GPU\n", sqrt(spinor_field_sqnorm_f_cpu(s2)));
+  lprintf("RESULT", 0, "s3 NORM %0.2e on GPU\n", sqrt(spinor_field_sqnorm_f_cpu(s3)));
+  lprintf("RESULT", 0, "s4 NORM %0.2e on GPU\n", sqrt(spinor_field_sqnorm_f_cpu(s4)));
 
   // Difference tau is 0 for a hermitian operator
-  tau = spinor_field_prod_re_f(s2, s3);
-  tau -= spinor_field_prod_re_f(s4, s1);
-  tau += spinor_field_prod_im_f(s2, s3);
-  tau -= spinor_field_prod_im_f(s4, s1);
-  tau /= sqrt(spinor_field_sqnorm_f(s1));
-  tau /= sqrt(spinor_field_sqnorm_f(s2));
+  tau = spinor_field_prod_re_f_cpu(s2, s3);
+  tau -= spinor_field_prod_re_f_cpu(s4, s1);
+  tau += spinor_field_prod_im_f_cpu(s2, s3);
+  tau -= spinor_field_prod_im_f_cpu(s4, s1);
+  tau /= sqrt(spinor_field_sqnorm_f_cpu(s1));
+  tau /= sqrt(spinor_field_sqnorm_f_cpu(s2));
 
   // Print test result info
   if (fabs(tau) > 1.e-14)
@@ -166,7 +171,7 @@ int test_herm_gpu(spinor_operator S, char *name)
   }
   else
     lprintf("RESULT", 0, "OK \n");
-  lprintf("RESULT", 0, "[norm = %e]\n", tau);
+  lprintf("RESULT", 0, "[norm = %e]\n", tau); 
 
   // Free and return
   free_spinor_field_f(s1);
@@ -178,8 +183,10 @@ int test_herm_gpu(spinor_operator S, char *name)
 
 int main(int argc, char *argv[])
 {
-  int return_value_cpu, return_value_gpu;
-  int return_value_cpu_unit, return_value_gpu_unit;
+  int return_value_cpu = 0;
+  int return_value_gpu = 0;
+  int return_value_cpu_unit = 0; 
+  int return_value_gpu_unit = 0;
 
   // setup process id and communications
   logger_map("DEBUG", "debug");
@@ -192,7 +199,6 @@ int main(int argc, char *argv[])
   copy_to_gpu_gfield_f(u_gauge_f);
 
   // Test block
-  
     // Unit operator
     return_value_cpu_unit=test_herm_cpu(&II_cpu, "I");
     return_value_gpu_unit=test_herm_gpu(&II_gpu, "I");

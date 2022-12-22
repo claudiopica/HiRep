@@ -7,13 +7,14 @@
 
 #ifndef GPU_INFO_H
 #define GPU_INFO_H
+#include "gpu.h"
+
 #ifdef __cplusplus
     extern "C" {
 #endif
 
 #ifdef WITH_GPU
 
-#include "gpu.h"
 
 typedef struct cudaDeviceProp cudaDeviceProp;
 

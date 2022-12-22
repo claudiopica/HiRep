@@ -35,6 +35,7 @@
 
 #include "global.h"
 #include "reduction.h"
+#include "logger.h"
 
 #define GSUM_BLOCK_SIZE 256     // No more than 1024 on Tesla
 #define BLOCK_SIZE_REM 64
@@ -301,6 +302,7 @@ T global_sum_gpu(T *vector, int size) {
   T res = 0;
   T *vector_host = (T *)malloc(blocks * sizeof(T));
 
+  // Reduction over blocks
   T *vector_out = NULL;
   cudaMalloc((void **)&vector_out, blocks * sizeof(T));
 
@@ -311,6 +313,30 @@ T global_sum_gpu(T *vector, int size) {
     res += vector_host[i];
   }
 
+  // Reduction over MPI threads
+  #ifdef WITH_MPI
+    int mpiret;
+    (void)mpiret;
+    int number_of_mpi_threads = 2; 
+    double pres[number_of_mpi_threads];
+    T* d = &res;
+    mpiret = MPI_Allreduce(d, pres, number_of_mpi_threads, MPI_DOUBLE, MPI_SUM, GLB_COMM);
+
+    if (mpiret != MPI_SUCCESS) {
+      char mesg[MPI_MAX_ERROR_STRING];
+      int mesglen;
+      MPI_Error_string(mpiret, mesg, &mesglen);
+      lprintf("MPI", 0, "ERROR: %s\n", mesg);
+      error(1, 1, "global_sum_gpu " __FILE__, ": Cannot perform global_sum_gpu");
+    }
+
+    while (number_of_mpi_threads > 0) {
+      --number_of_mpi_threads;
+      d[number_of_mpi_threads] = pres[number_of_mpi_threads];
+    }
+  #endif
+
+  // free and return
   free(vector_host);
   cudaFree(vector_out);
   return res;
@@ -322,6 +348,10 @@ template double global_sum_gpu<double>(double* vector, int size);
 template hr_complex_flt global_sum_gpu<hr_complex_flt>(hr_complex_flt* vector, int size);
 template hr_complex global_sum_gpu<hr_complex>(hr_complex* vector, int size);
 
+
+#ifdef __cplusplus
+  extern "C" {
+#endif
 // The following function is to expose the global sum to C code
 int global_sum_gpu_int(int* vector, int size){
   int res;
@@ -376,5 +406,9 @@ hr_complex global_sum_gpu_complex(hr_complex* vector, int size){
   cudaFree(vector_d);
   return res;
 }
+
+#ifdef __cplusplus
+  }
+#endif
 
 #endif

@@ -28,6 +28,7 @@
 #define _REAL double
 #define _COMPLEX hr_complex
 
+  // Use CPU templates for double precision functions & aliasing (C)
 #define _FUNC(a,b,c) a b##_f_cpu c
 #define _BODY(a) a
 #include "TMPL/linear_algebra.c.sdtmpl"
@@ -51,8 +52,6 @@
 #undef _REAL
 #undef _COMPLEX
 
-/* single precision */
-//Declare types for single precision
 #define _SPINOR_FIELD_TYPE spinor_field_flt
 #define _SPINOR_TYPE suNf_spinor_flt
 #define _REAL float
@@ -73,7 +72,6 @@
 #define _BODY(a) ;
 #include "TMPL/linear_algebra.c.sdtmpl"
 
-//Undefine single precision definitions.
 #undef _FUNC
 #undef _BODY
 #undef _SPINOR_FIELD_TYPE

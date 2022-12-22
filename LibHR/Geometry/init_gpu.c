@@ -23,6 +23,7 @@
 #include "geometry.h"
 #include "gpu_info.h"
 #include "logger.h"
+#include "geometry_init.h"
 #ifdef WITH_MPI
   #include "mpi.h"
 #endif
@@ -41,7 +42,7 @@ void init_gpu(input_gpu gpu_var_init)
 {
   lprintf("GPU_INIT", 0, "Initializing GPU\n");
   struct cudaDeviceProp device_prop;
-  CHECK_CUDA(cudaGetDeviceProperties(&device_prop, gpu_var_init.gpuID));
+  cudaGetDeviceProperties(&device_prop, gpu_var_init.gpuID);
 
   // Print GPU info
   print_device_count_info(gpu_var_init);
@@ -65,7 +66,7 @@ void init_gpu(input_gpu gpu_var_init)
 void select_GPU(input_gpu gpu_var_init) 
 {
   #ifndef WITH_MPI /* For Single GPU -> select device with ID=0 */
-    CHECK_CUDA(cudaSetDevice(gpu_var_init.gpuID));
+    cudaSetDevice(gpu_var_init.gpuID);
     lprintf("GPU_INIT", 0, "Using GPU #%d\n", gpu_var_init.gpuID);
   #else /* For Multi-GPU -> bind devices to local ranks using hwloc */
     /*
@@ -76,7 +77,7 @@ void select_GPU(input_gpu gpu_var_init)
     */
     cudaSetDevice(PID);
     int current_device;
-    CHECK(cudaGetDevice(&current_device));
+    cudaGetDevice(&current_device);
     lprintf("GPU_INIT", 0, "GPU Affinity: GPU Node %d has been bound to MPI Thread of Rank %d\n", current_device, PID);
     enable_GPU_peer_to_peer_access();
   #endif
@@ -93,18 +94,18 @@ int enable_GPU_peer_to_peer_access()
   // TODO: For more than one node we need to use local MPI ranks instead of PIDs (SAM)
   #if defined(WITH_MPI) 
     int device_count = 0;
-    CHECK(cudaGetDeviceCount(&device_count));
+    cudaGetDeviceCount(&device_count);
 
     for (int i = 0; i < device_count; ++i) 
     {
       if (i > PID) 
       {
         int peer_access_available = 0;
-        CHECK(cudaDeviceCanAccessPeer(&peer_access_available, PID, i));
+        cudaDeviceCanAccessPeer(&peer_access_available, PID, i);
         lprintf("INFO", 0, "Peer-to-peer access: GPU Node %d can access node %d\n", PID, i);
         error(peer_access_available == 0, 1, "setup_GPU_peer_to_peer_access", "Unable to enable peer-to-peer access.\n");
 
-        CHECK(cudaDeviceEnablePeerAccess(PID, i));
+        cudaDeviceEnablePeerAccess(PID, i);
         lprintf("INFO", 0, "Enabled peer-to-peer access from node %d to %d\n", PID, i);
       }
     }

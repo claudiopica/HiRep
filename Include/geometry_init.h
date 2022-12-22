@@ -6,6 +6,9 @@
 
 #ifndef GEOMETRY_INIT_H
 #define GEOMETRY_INIT_H
+
+#include "new_geometry.h"
+
 #ifdef __cplusplus
    extern "C" {
 #endif

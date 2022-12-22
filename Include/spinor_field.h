@@ -45,7 +45,11 @@
 	#undef _MPI_FIELD_DATA
 	#define _MPI_FIELD_DATA(_type) \
 		MPI_Request *comm_req; \
-		_type *sendbuf_ptr;
+		_type *sendbuf_ptr; \
+		_type *sendbuf_gpu_ptr; \
+		_type *recvbuf_gpu_ptr;
+
+		//
 #endif 
 
 
@@ -226,11 +230,6 @@ _DECLARE_FIELD_STRUCT(suNg_av_field, suNg_algebra_vector);
  * 				Only active for WITH_MPI
  */
 _DECLARE_FIELD_STRUCT(scalar_field, double);
-
-typedef struct {
-  hr_complex up[NF * (2 * NF + 1)];
-  hr_complex dn[NF * (2 * NF + 1)];
-} ldl_t;
 
 /**
  * @struct _ldl_field

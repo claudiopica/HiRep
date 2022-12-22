@@ -23,9 +23,10 @@
 // Double precision
 int test_bijectivity_gfield();
 int test_bijectivity_gfield_f();
-int test_bijectivity_scalar_field();
+int test_bijectivity_suNg_scalar_field();
 int test_bijectivity_avfield();
 int test_bijectivity_gtransf();
+int test_bijectivity_clover_ldl();
 int test_bijectivity_clover_term();
 int test_bijectivity_clover_force();
 int test_bijectivity_spinor_field_f();
@@ -49,9 +50,10 @@ int main(int argc, char *argv[])
      /* Double precision */
     return_val += test_bijectivity_gfield();
     return_val += test_bijectivity_gfield_f();
-    return_val += test_bijectivity_scalar_field();
+    return_val += test_bijectivity_suNg_scalar_field();
     return_val += test_bijectivity_avfield();
     return_val += test_bijectivity_gtransf();
+    return_val += test_bijectivity_clover_ldl();
     return_val += test_bijectivity_clover_term();
     return_val += test_bijectivity_clover_force();
     return_val += test_bijectivity_spinor_field_f();
@@ -162,6 +164,8 @@ int test_bijectivity_spinor_field_f()
     lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", spinor_field_sqnorm_f_cpu(in_copy));
 
     copy_to_gpu_spinor_field_f(in);
+    start_sendrecv_gpu_spinor_field_f(in);
+    complete_sendrecv_gpu_spinor_field_f(in);
 
     spinor_field_zero_f_cpu(in);
     lprintf("SANITY CHECK", 0, "CPU copy should be zero in intermediate step: %0.2e\n", spinor_field_sqnorm_f_cpu(in));
@@ -309,7 +313,7 @@ int test_bijectivity_gfield_f_flt()
     return return_val;
 }
 
-int test_bijectivity_scalar_field() 
+int test_bijectivity_suNg_scalar_field() 
 {
     lprintf("INFO", 0, " ====== TEST GAUGE FIELD REPRESENTED SINGLE PRECISION ======= ");
     int return_val = 0;
@@ -317,20 +321,20 @@ int test_bijectivity_scalar_field()
     in = alloc_suNg_scalar_field(&glattice);
     in_copy = alloc_suNg_scalar_field(&glattice);
 
-    random_scalar_field_cpu(in);
+    random_suNg_scalar_field_cpu(in);
 
-    copy_scalar_field_cpu(in_copy, in);
-    lprintf("SANITY CHECK", 0, "CPU sqnorm: %0.2e\n", sqnorm_scalar_field_cpu(in));
-    lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", sqnorm_scalar_field_cpu(in_copy));
+    copy_suNg_scalar_field_cpu(in_copy, in);
+    lprintf("SANITY CHECK", 0, "CPU sqnorm: %0.2e\n", sqnorm_suNg_scalar_field_cpu(in));
+    lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", sqnorm_suNg_scalar_field_cpu(in_copy));
 
     copy_to_gpu_suNg_scalar_field(in);
 
-    zero_scalar_field_cpu(in);
-    lprintf("SANITY CHECK", 0, "CPU copy should be zero in intermediate step: %0.2e\n", sqnorm_scalar_field_cpu(in));
+    zero_suNg_scalar_field_cpu(in);
+    lprintf("SANITY CHECK", 0, "CPU copy should be zero in intermediate step: %0.2e\n", sqnorm_suNg_scalar_field_cpu(in));
     copy_from_gpu_suNg_scalar_field(in);
 
-    sub_assign_scalar_field_cpu(in, in_copy);
-    double diff_norm = sqnorm_scalar_field_cpu(in);
+    sub_assign_suNg_scalar_field_cpu(in, in_copy);
+    double diff_norm = sqnorm_suNg_scalar_field_cpu(in);
 
     if (diff_norm != 0) 
     {
@@ -506,6 +510,46 @@ int test_bijectivity_clover_force()
 
     free_clover_force(in);
     free_clover_force(in_copy);
+    return return_val;
+}
+
+int test_bijectivity_clover_ldl() 
+{
+    lprintf("INFO", 0, " ====== TEST CLOVER LDL ======= ");
+    int return_val = 0;
+    ldl_field *in, *in_copy;
+    in = alloc_clover_ldl(&glattice);
+    in_copy = alloc_clover_ldl(&glattice);
+
+    random_clover_ldl_cpu(in);
+    
+    copy_clover_ldl_cpu(in_copy, in);
+    lprintf("SANITY CHECK", 0, "CPU sqnorm: %0.2e\n", sqnorm_clover_ldl_cpu(in));
+    lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", sqnorm_clover_ldl_cpu(in_copy));
+
+    copy_to_gpu_clover_ldl(in);
+
+    zero_clover_ldl_cpu(in);
+    lprintf("SANITY CHECK", 0, "CPU copy should be zero in intermediate step: %0.2e\n", sqnorm_clover_ldl_cpu(in));
+    copy_from_gpu_clover_ldl(in);
+
+    sub_assign_clover_ldl_cpu(in, in_copy);
+    double diff_norm = sqnorm_clover_ldl_cpu(in);
+
+    if (diff_norm != 0) 
+    {
+        lprintf("RESULT", 0, "FAILED\n");
+        return_val = 1;
+    } 
+    else
+    {
+        lprintf("RESULT", 0, "OK\n");
+        return_val = 0;
+    }
+    lprintf("RESULT", 0, "[Diff norm %0.2e]\n", diff_norm);
+
+    free_clover_ldl(in);
+    free_clover_ldl(in_copy);
     return return_val;
 }
 
