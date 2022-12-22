@@ -46,7 +46,7 @@ const char *sComputeMode[] = {
 void print_device_count_info(input_gpu gpu_var_init) 
 {
   int device_count;
-  CHECK_CUDA(cudaGetDeviceCount(&device_count));
+  cudaGetDeviceCount(&device_count);
   lprintf("GPU_INIT", 0, "GPU_ID = %d\n", gpu_var_init.gpuID);
   //error(gpu_id > device_count, 1, "init_gpu", "Illegal device ID"); 
   // I don't see what we need this for (SAM)

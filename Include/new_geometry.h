@@ -75,10 +75,24 @@ enum gd_type {
     GLOBAL = 3
 };
 
-void sync_field_to_buffer_gpu_gfield_f(geometry_descriptor*, suNf*, void*);
-void sync_field_to_buffer_gpu_spinor_field_f(geometry_descriptor*, suNf_spinor*, void*);
-void sync_buffer_to_field_gpu_gfield_f(geometry_descriptor*, suNf*, void*);
-void sync_buffer_to_field_gpu_spinor_field_f(geometry_descriptor*, suNf_spinor*, void*);
+#define _DECLARE_SYNC_TO_BUFFER(_name, _type) \
+    void sync_box_to_buffer_gpu_##_name(geometry_descriptor*,box_t*,_type*,void*); \
+    void sync_field_to_buffer_##_name(geometry_descriptor*,_type*,void*);
+
+_DECLARE_SYNC_TO_BUFFER(spinor_field_f, suNf_spinor);
+_DECLARE_SYNC_TO_BUFFER(spinor_field_f_flt, suNf_spinor_flt);
+_DECLARE_SYNC_TO_BUFFER(sfield, double);
+
+_DECLARE_SYNC_TO_BUFFER(gfield, suNg);
+_DECLARE_SYNC_TO_BUFFER(gfield_f, suNf);
+_DECLARE_SYNC_TO_BUFFER(gfield_flt, suNg_flt);
+_DECLARE_SYNC_TO_BUFFER(gfield_f_flt, suNf_flt);
+_DECLARE_SYNC_TO_BUFFER(suNg_scalar_field, suNg_vector);
+_DECLARE_SYNC_TO_BUFFER(avfield, suNg_algebra_vector);
+_DECLARE_SYNC_TO_BUFFER(gtransf, suNg);
+_DECLARE_SYNC_TO_BUFFER(clover_ldl, ldl_t);
+_DECLARE_SYNC_TO_BUFFER(clover_term, suNfc);
+_DECLARE_SYNC_TO_BUFFER(clover_force, suNf);
 
 int boxEvenVolume(box_t *B);
 int boxOddVolume(box_t *B);

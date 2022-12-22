@@ -75,7 +75,7 @@ void copy_gfield_cpu(suNg_field* out, suNg_field* in)
     memcpy(out->ptr, in->ptr, 4*out->type->gsize_gauge*sizeof(suNg));
 }
 
-void copy_scalar_field_cpu(suNg_scalar_field *out, suNg_scalar_field *in) 
+void copy_suNg_scalar_field_cpu(suNg_scalar_field *out, suNg_scalar_field *in) 
 {
     memcpy(out->ptr, in->ptr, out->type->gsize_gauge*sizeof(suNg_vector));
 }
@@ -183,7 +183,7 @@ void sub_assign_gfield_f_flt_cpu(suNf_field_flt *out, suNf_field_flt *in)
     }
 }
 
-void sub_assign_scalar_field_cpu(suNg_scalar_field *out, suNg_scalar_field *in) 
+void sub_assign_suNg_scalar_field_cpu(suNg_scalar_field *out, suNg_scalar_field *in) 
 {
     suNg_vector *site_out, *site_in;
     _MASTER_FOR(in->type, ix) 
@@ -358,7 +358,7 @@ float sqnorm_gfield_f_flt_cpu(suNf_field_flt *f)
     return (float)sqnorm;
 }
 
-double sqnorm_scalar_field_cpu(suNg_scalar_field *f) 
+double sqnorm_suNg_scalar_field_cpu(suNg_scalar_field *f) 
 {
     suNg_vector *site;
     double sqnorm = 0.0;
@@ -568,7 +568,7 @@ void zero_gfield_f_flt_cpu(suNf_field_flt *f)
     }
 }
 
-void zero_scalar_field_cpu(suNg_scalar_field *f) 
+void zero_suNg_scalar_field_cpu(suNg_scalar_field *f) 
 {
     int len = f->type->gsize_gauge*sizeof(suNg_vector)/sizeof(double);
     double* dbl_ptr = (double*)(f->ptr);
@@ -647,7 +647,7 @@ void random_gfield_cpu(suNg_field* f)
     ranlxd((double*)(f->ptr), n);
 }
 
-void random_scalar_field_cpu(suNg_scalar_field *f) 
+void random_suNg_scalar_field_cpu(suNg_scalar_field *f) 
 {
     int n = f->type->gsize_gauge*sizeof(suNg_vector)/sizeof(double);
     ranlxd((double*)(f->ptr), n);

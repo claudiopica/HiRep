@@ -14,11 +14,6 @@
 #include "error.h"
 #include "linear_algebra.h"
 
-#ifdef WITH_GPU
-  #include "TMPL/alloc_tmp_fields_gpu.c"
-  #include "TMPL/global_sum_gpu.c"
-#endif
-
 /*
  * LINEAR ALGEBRA FUNCTIONS ARE DEFINED IN THE TEMPLATE
  *
@@ -32,15 +27,6 @@
 #define _SPINOR_TYPE suNf_spinor
 #define _REAL double
 #define _COMPLEX hr_complex
-
-  // Use GPU template to declare double precision functions (C++)
-#ifdef WITH_GPU
-  #define _FUNC(a,b,c) a b##_f_gpu c
-  #define _BODY(a) a
-  #include "TMPL/linear_algebra_gpu.c.sdtmpl"
-  #undef _FUNC
-  #undef _BODY
-#endif
 
   // Use CPU templates for double precision functions & aliasing (C)
 #define _FUNC(a,b,c) a b##_f_cpu c
@@ -70,14 +56,6 @@
 #define _SPINOR_TYPE suNf_spinor_flt
 #define _REAL float
 #define _COMPLEX hr_complex_flt
-
-#ifdef WITH_GPU
-  #define _FUNC(a,b,c) a b##_f_flt_gpu c
-  #define _BODY(a) a
-  #include "TMPL/linear_algebra_gpu.c.sdtmpl"
-  #undef _FUNC
-  #undef _BODY
-#endif
 
 #define _FUNC(a,b,c) a b##_f_flt_cpu c
 #define _BODY(a) a

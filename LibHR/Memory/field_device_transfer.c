@@ -47,7 +47,7 @@ _DECLARE_TRANSFER_FUNC(gfield, suNg_field, suNg, 4, 0);
 _DECLARE_TRANSFER_FUNC(gfield_flt, suNg_field_flt, suNg_flt, 4, 0);
 _DECLARE_TRANSFER_FUNC(gfield_f, suNf_field, suNf, 4, 0);
 _DECLARE_TRANSFER_FUNC(gfield_f_flt, suNf_field_flt, suNf_flt, 4, 0);
-_DECLARE_TRANSFER_FUNC(scalar_field, suNg_scalar_field, suNg_vector, 1, 0);
+_DECLARE_TRANSFER_FUNC(suNg_scalar_field, suNg_scalar_field, suNg_vector, 1, 0);
 _DECLARE_TRANSFER_FUNC(avfield, suNg_av_field, suNg_algebra_vector, 4, 0);
 _DECLARE_TRANSFER_FUNC(gtransf, suNg_field, suNg, 1, 0);
 _DECLARE_TRANSFER_FUNC(clover_ldl, ldl_field, ldl_t, 1, 0);

@@ -11,14 +11,6 @@
 #include "memory.h"
 #include "new_geometry.h"
 
-inline int safe_mod(int x, int y)
-{
-  if (x >= 0)
-    return (x % y);
-  else
-    return ((y - (abs(x) % y)) % y);
-}
-
 // this will include the 4th L2 corner in the geometry
 // it's not needed, was here for testng purposed
 // #define _INCLUDE_UP_UP_L2

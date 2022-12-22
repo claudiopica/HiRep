@@ -162,7 +162,7 @@ void start_sf_sendrecv_flt(spinor_field_flt*);
     _DECLARE_COMMS(gfield_flt, suNg_field_flt, "Single precision gauge field");
     _DECLARE_COMMS(gfield_f, suNf_field, "Represented gauge field");
     _DECLARE_COMMS(gfield_f_flt, suNf_field_flt, "Represented single precision gauge field");
-    _DECLARE_COMMS(scalar_field, suNg_scalar_field, "SU(N_g) scalar field");
+    _DECLARE_COMMS(suNg_scalar_field, suNg_scalar_field, "SU(N_g) scalar field");
     _DECLARE_COMMS(avfield, suNg_av_field, "SU(N_g) algebra vector field");
     _DECLARE_COMMS(gtransf, suNg_field, "Gauge transformation");
     _DECLARE_COMMS(clover_ldl, ldl_field, "Clover ldl field");

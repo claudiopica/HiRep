@@ -41,8 +41,6 @@
 
 #define BORDERSIZE 1
 
-int safe_mod(int x, int y);
-
 #ifdef __cplusplus
   }
 #endif

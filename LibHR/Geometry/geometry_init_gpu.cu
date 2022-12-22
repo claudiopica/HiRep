@@ -3,10 +3,8 @@
 #include "global.h"
 #include "global_gpu.h"
 #include "gpu.h"
+#include "geometry_init.h"
 
-#ifdef __cplusplus
-  extern "C" {
-#endif
 void init_neighbors_gpu() 
 {
   #ifdef WITH_GPU
@@ -54,10 +52,6 @@ void init_neighbors_gpu()
   error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error adding Z_EXT to global constant memory.\n");
   #endif
 }
-
-#ifdef __cplusplus
-  }
-#endif
 
 #undef GLB_GPU
 

@@ -23,7 +23,7 @@
 // Double precision
 int test_bijectivity_gfield();
 int test_bijectivity_gfield_f();
-int test_bijectivity_scalar_field();
+int test_bijectivity_suNg_scalar_field();
 int test_bijectivity_avfield();
 int test_bijectivity_gtransf();
 int test_bijectivity_clover_ldl();
@@ -50,7 +50,7 @@ int main(int argc, char *argv[])
      /* Double precision */
     return_val += test_bijectivity_gfield();
     return_val += test_bijectivity_gfield_f();
-    return_val += test_bijectivity_scalar_field();
+    return_val += test_bijectivity_suNg_scalar_field();
     return_val += test_bijectivity_avfield();
     return_val += test_bijectivity_gtransf();
     return_val += test_bijectivity_clover_ldl();
@@ -313,7 +313,7 @@ int test_bijectivity_gfield_f_flt()
     return return_val;
 }
 
-int test_bijectivity_scalar_field() 
+int test_bijectivity_suNg_scalar_field() 
 {
     lprintf("INFO", 0, " ====== TEST GAUGE FIELD REPRESENTED SINGLE PRECISION ======= ");
     int return_val = 0;
@@ -321,20 +321,20 @@ int test_bijectivity_scalar_field()
     in = alloc_suNg_scalar_field(&glattice);
     in_copy = alloc_suNg_scalar_field(&glattice);
 
-    random_scalar_field_cpu(in);
+    random_suNg_scalar_field_cpu(in);
 
-    copy_scalar_field_cpu(in_copy, in);
-    lprintf("SANITY CHECK", 0, "CPU sqnorm: %0.2e\n", sqnorm_scalar_field_cpu(in));
-    lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", sqnorm_scalar_field_cpu(in_copy));
+    copy_suNg_scalar_field_cpu(in_copy, in);
+    lprintf("SANITY CHECK", 0, "CPU sqnorm: %0.2e\n", sqnorm_suNg_scalar_field_cpu(in));
+    lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", sqnorm_suNg_scalar_field_cpu(in_copy));
 
     copy_to_gpu_suNg_scalar_field(in);
 
-    zero_scalar_field_cpu(in);
-    lprintf("SANITY CHECK", 0, "CPU copy should be zero in intermediate step: %0.2e\n", sqnorm_scalar_field_cpu(in));
+    zero_suNg_scalar_field_cpu(in);
+    lprintf("SANITY CHECK", 0, "CPU copy should be zero in intermediate step: %0.2e\n", sqnorm_suNg_scalar_field_cpu(in));
     copy_from_gpu_suNg_scalar_field(in);
 
-    sub_assign_scalar_field_cpu(in, in_copy);
-    double diff_norm = sqnorm_scalar_field_cpu(in);
+    sub_assign_suNg_scalar_field_cpu(in, in_copy);
+    double diff_norm = sqnorm_suNg_scalar_field_cpu(in);
 
     if (diff_norm != 0) 
     {

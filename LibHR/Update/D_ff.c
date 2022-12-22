@@ -24,8 +24,6 @@
 extern rhmc_par _update_par; /* Update/update_rhmc.c */
 #endif /* ROTATED_SF */
 
-
-
 void spinor_sigma_pi_rho_div_assign(spinor_field *out,scalar_field *sigma,scalar_field *pi,double rho, spinor_field *in);
 void spinor_scalarfield_mult_add_assign(spinor_field *out,scalar_field *sigma,double rho, spinor_field *in);
 void spinor_scalarfield_ig5_mult_add_assign(spinor_field *out,scalar_field *pi, spinor_field *in);
@@ -69,7 +67,6 @@ static void init_Dirac() {
         init_dirac=0;
     }
 }
-
 
 //NOTE: With four fermion auxiliary fields, there is a diagonal
 //      term: A = sigma + i*g5*pi.

@@ -16,10 +16,6 @@
 // TODO: put gpu as last suffix
 // TODO: fill buffers needs gpu suffix
 
-#ifdef __cplusplus
-    extern "C" {
-#endif
-
 #if defined(WITH_GPU) && defined(WITH_MPI)
 
 #define random_double ranlxd
@@ -40,6 +36,45 @@ void zeroes_float(float* flt, int n)
         flt[i] = 0.0f;
     }
 }
+
+#define _DECLARE_SYNC_FIELD(_name, _type, _geom) \
+    void sync_field_to_buffer_gpu_##_name(geometry_descriptor *gd, \
+                        _type *lattice,  \
+                        void *sendbuf) \
+    { \
+        error(geometryBoxes==NULL, 1, __func__, "geometryBoxes are not initialized.\n"); \
+        \
+        /* Query first buffer box in the list */ \
+        box_t *L = geometryBoxes->next; \
+        \
+        /* Iterate over all boxes*/ \
+        /* The i-counter is necessary, because spinor-like and gauge-like fields have */ \
+        /* different numbers of buffers */ \
+        int i = 0; \
+        while (L && i < gd->nbuffers_##_geom) \
+        { \
+            sync_box_to_buffer_gpu_##_name(gd, L->sendBox, lattice, sendbuf); \
+            L=L->next; i++; \
+        } \
+    } 
+
+#define _DECLARE_SYNC_FUNCTIONS(_name, _type, _size, _geom) \
+    _DECLARE_SYNC_FIELD(_name, _type, _geom)
+
+_DECLARE_SYNC_FUNCTIONS(spinor_field_f, suNf_spinor, 1, spinor);
+_DECLARE_SYNC_FUNCTIONS(spinor_field_f_flt, suNf_spinor_flt, 1, spinor);
+_DECLARE_SYNC_FUNCTIONS(sfield, double, 1, spinor);
+
+_DECLARE_SYNC_FUNCTIONS(gfield, suNg, 4, gauge);
+_DECLARE_SYNC_FUNCTIONS(gfield_flt, suNg_flt, 4, gauge);
+_DECLARE_SYNC_FUNCTIONS(gfield_f, suNf, 4, gauge);
+_DECLARE_SYNC_FUNCTIONS(gfield_f_flt, suNf_flt, 4, gauge);
+_DECLARE_SYNC_FUNCTIONS(suNg_scalar_field, suNg_vector, 1, gauge);
+_DECLARE_SYNC_FUNCTIONS(avfield, suNg_algebra_vector, 4, gauge);
+_DECLARE_SYNC_FUNCTIONS(gtransf, suNg, 1, gauge);
+_DECLARE_SYNC_FUNCTIONS(clover_ldl, ldl_t, 1, gauge);
+_DECLARE_SYNC_FUNCTIONS(clover_term, suNfc, 4, gauge);
+_DECLARE_SYNC_FUNCTIONS(clover_force, suNf, 6, gauge);
 
 #define _DECLARE_SYNC(_name, _field_type, _site_type, _size, _geom) \
     void sync_gpu_##_name(_field_type *f) \
@@ -139,7 +174,7 @@ _DECLARE_COMMS(gfield, suNg_field, suNg, 4, gauge, double);
 _DECLARE_COMMS(gfield_flt, suNg_field_flt, suNg_flt, 4, gauge, float);
 _DECLARE_COMMS(gfield_f, suNf_field, suNf, 4, gauge, double);
 _DECLARE_COMMS(gfield_f_flt, suNf_field_flt, suNf_flt, 4, gauge, float);
-_DECLARE_COMMS(scalar_field, suNg_scalar_field, suNg_vector, 1, gauge, double);
+_DECLARE_COMMS(suNg_scalar_field, suNg_scalar_field, suNg_vector, 1, gauge, double);
 _DECLARE_COMMS(avfield, suNg_av_field, suNg_algebra_vector, 4, gauge, double);
 _DECLARE_COMMS(gtransf, suNg_field, suNg, 1, gauge, double);
 _DECLARE_COMMS(clover_ldl, ldl_field, ldl_t, 1, gauge, double);
@@ -152,8 +187,4 @@ _DECLARE_COMMS(clover_force, suNf_field, suNf, 6, gauge, double);
 #undef _DECLARE_COMPLETE_SENDRECV
 #undef random_double
 #undef random_float
-
-#ifdef __cplusplus
-    }
-#endif
 #endif

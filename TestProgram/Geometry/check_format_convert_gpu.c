@@ -27,7 +27,7 @@
 /* Double precision tests */
 int test_convert_back_forth_gfield();
 int test_convert_back_forth_gfield_f();
-int test_convert_back_forth_scalar_field();
+int test_convert_back_forth_suNg_scalar_field();
 int test_convert_back_forth_avfield();
 int test_convert_back_forth_gtransf();
 int test_convert_back_forth_clover_ldl();
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
       /* Double precision */
     return_val += test_convert_back_forth_gfield();
     return_val += test_convert_back_forth_gfield_f();
-    return_val += test_convert_back_forth_scalar_field();
+    return_val += test_convert_back_forth_suNg_scalar_field();
     return_val += test_convert_back_forth_avfield();
     return_val += test_convert_back_forth_gtransf();
     return_val += test_convert_back_forth_clover_ldl();
@@ -264,7 +264,7 @@ int test_convert_back_forth_gfield_flt()
     return check_diff_norm_zero(diff_norm);
 }
 
-int test_convert_back_forth_scalar_field() 
+int test_convert_back_forth_suNg_scalar_field() 
 {
     lprintf("INFO", 0, " ======= TEST SCALAR FIELD ======= \n");
 
@@ -274,19 +274,19 @@ int test_convert_back_forth_scalar_field()
     tmp = alloc_suNg_scalar_field(&glattice);
     out = alloc_suNg_scalar_field(&glattice);
 
-    random_scalar_field_cpu(in);
-    lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.2e]\n", sqnorm_scalar_field_cpu(in)); 
+    random_suNg_scalar_field_cpu(in);
+    lprintf("SANITY CHECK", 0, "[In field CPU copy norm unequal zero: %0.2e]\n", sqnorm_suNg_scalar_field_cpu(in)); 
 
     // Convert twice
-    to_gpu_format_scalar_field(tmp, in);
-    fill_buffers_scalar_field(tmp);
-    to_cpu_format_scalar_field(out, tmp);
+    to_gpu_format_suNg_scalar_field(tmp, in);
+    fill_buffers_suNg_scalar_field(tmp);
+    to_cpu_format_suNg_scalar_field(out, tmp);
     lprintf("SANITY CHECK", 0, "[In and outfield sqnorm unequal zero and equal to each other: in %0.2e out %0.2e]\n", 
-                    sqnorm_scalar_field_cpu(in), sqnorm_scalar_field_cpu(out));
+                    sqnorm_suNg_scalar_field_cpu(in), sqnorm_suNg_scalar_field_cpu(out));
 
     // Assert field are equal over sqnorm
-    sub_assign_scalar_field_cpu(out, in);
-    double diff_norm = sqnorm_scalar_field_cpu(out);
+    sub_assign_suNg_scalar_field_cpu(out, in);
+    double diff_norm = sqnorm_suNg_scalar_field_cpu(out);
 
     free_suNg_scalar_field(in);
     free_suNg_scalar_field(tmp);

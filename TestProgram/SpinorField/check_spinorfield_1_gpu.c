@@ -82,8 +82,10 @@ int main(int argc,char *argv[])
   logger_map("DEBUG","debug");
 
 #ifdef WITH_MPI
-  sprintf(pame,">out_%d",PID); logger_stdout(pame);
-  sprintf(pame,"err_%d",PID); freopen(pame,"w",stderr);
+  // Throws errors during compilation. 
+  // For logging, lprintf should be used. (SAM)
+  //sprintf(pame,">out_%d",PID); logger_stdout(pame);
+  //sprintf(pame,"err_%d",PID); freopen(pame,"w",stderr);
 #endif
 
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE);

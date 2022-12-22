@@ -35,6 +35,7 @@
 
 #include "global.h"
 #include "reduction.h"
+#include "logger.h"
 
 #define GSUM_BLOCK_SIZE 256     // No more than 1024 on Tesla
 #define BLOCK_SIZE_REM 64

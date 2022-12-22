@@ -30,7 +30,7 @@
 // Double precision
 int test_write_read_gauge_field();
 int test_write_read_gauge_field_f();
-int test_write_read_scalar_field();
+int test_write_read_suNg_scalar_field();
 int test_write_read_avfield();
 int test_write_read_gtransf();
 int test_write_read_clover_term();
@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
     // Double Precision Tests
     return_val += test_write_read_gauge_field();
     return_val += test_write_read_gauge_field_f();
-    return_val += test_write_read_scalar_field();
+    return_val += test_write_read_suNg_scalar_field();
     return_val += test_write_read_avfield();
     return_val += test_write_read_gtransf();
     return_val += test_write_read_clover_ldl();
@@ -472,7 +472,7 @@ int test_write_read_sfield()
     return return_val;
 }
 
-int test_write_read_scalar_field() 
+int test_write_read_suNg_scalar_field() 
 {
     lprintf("INFO", 0, " ======= TEST SU(NG) SCALAR FIELD ======= ");
     int return_val = 0;
@@ -482,8 +482,8 @@ int test_write_read_scalar_field()
     out = alloc_suNg_scalar_field(&glattice);
     gpu_format = alloc_suNg_scalar_field(&glattice);
 
-    random_scalar_field_cpu(in);
-    lprintf("SANITY CHECK", 0, "[In field norm unequal zero: %0.2e]\n", sqnorm_scalar_field_cpu(in));
+    random_suNg_scalar_field_cpu(in);
+    lprintf("SANITY CHECK", 0, "[In field norm unequal zero: %0.2e]\n", sqnorm_suNg_scalar_field_cpu(in));
 
     suNg_vector *in_vec, *block_start, *out_vec;
     int stride = 0;
@@ -501,10 +501,10 @@ int test_write_read_scalar_field()
         }
     }
 
-    lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.2e]\n", sqnorm_scalar_field_cpu(in));
-    lprintf("SANITY CHECK", 0, "[Sanity check out field norm unequal zero: %0.2e]\n", sqnorm_scalar_field_cpu(out));
-    sub_assign_scalar_field_cpu(out, in);
-    double diff_norm = sqnorm_scalar_field_cpu(out);
+    lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.2e]\n", sqnorm_suNg_scalar_field_cpu(in));
+    lprintf("SANITY CHECK", 0, "[Sanity check out field norm unequal zero: %0.2e]\n", sqnorm_suNg_scalar_field_cpu(out));
+    sub_assign_suNg_scalar_field_cpu(out, in);
+    double diff_norm = sqnorm_suNg_scalar_field_cpu(out);
 
     check_diff_norm_zero(diff_norm);
 
