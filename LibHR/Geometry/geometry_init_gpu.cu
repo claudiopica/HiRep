@@ -54,8 +54,5 @@ void init_neighbors_gpu()
   #endif
 }
 
-<<<<<<< HEAD
 #undef GLB_GPU
 
-=======
->>>>>>> remotes/upstream/HiRep-CUDA

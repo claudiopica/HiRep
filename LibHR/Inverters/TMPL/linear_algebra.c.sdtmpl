@@ -335,9 +335,3 @@ _BODY({
     }
 })
 
-<<<<<<< HEAD
-#ifdef __cplusplus
-    }
-#endif
-=======
->>>>>>> remotes/upstream/HiRep-CUDA

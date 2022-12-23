@@ -313,23 +313,12 @@ T global_sum_gpu(T *vector, int size) {
   }
 
   // Reduction over MPI threads
-<<<<<<< HEAD
-  #ifdef WITH_MPI
-    int mpiret;
-    (void)mpiret;
-    int number_of_mpi_threads = 2; 
-    double pres[number_of_mpi_threads];
-    T* d = &res;
-    mpiret = MPI_Allreduce(d, pres, number_of_mpi_threads, MPI_DOUBLE, MPI_SUM, GLB_COMM);
-
-=======
 #ifdef WITH_MPI
     int number_of_mpi_threads = 2; 
     double pres[number_of_mpi_threads];
     T* d = &res;
     int mpiret = MPI_Allreduce(d, pres, number_of_mpi_threads, MPI_DOUBLE, MPI_SUM, GLB_COMM);
 #ifndef NDEBUG
->>>>>>> remotes/upstream/HiRep-CUDA
     if (mpiret != MPI_SUCCESS) {
       char mesg[MPI_MAX_ERROR_STRING];
       int mesglen;
@@ -337,20 +326,12 @@ T global_sum_gpu(T *vector, int size) {
       lprintf("MPI", 0, "ERROR: %s\n", mesg);
       error(1, 1, "global_sum_gpu " __FILE__, ": Cannot perform global_sum_gpu");
     }
-<<<<<<< HEAD
-
-=======
 #endif
->>>>>>> remotes/upstream/HiRep-CUDA
     while (number_of_mpi_threads > 0) {
       --number_of_mpi_threads;
       d[number_of_mpi_threads] = pres[number_of_mpi_threads];
     }
-<<<<<<< HEAD
-  #endif
-=======
 #endif
->>>>>>> remotes/upstream/HiRep-CUDA
 
   // free and return
   free(vector_host);

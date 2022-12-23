@@ -185,8 +185,6 @@ _DECLARE_COMMS(clover_force, suNf_field, suNf, 6, gauge, double);
 #undef _DECLARE_COMPLETE_SENDRECV
 #undef random_double
 #undef random_float
-<<<<<<< HEAD
-=======
 
 #else //not WITH_MPI
 
@@ -228,5 +226,4 @@ _DECLARE_COMMS(clover_force, suNf_field, suNf, 6, gauge, double);
 
 #endif
 
->>>>>>> remotes/upstream/HiRep-CUDA
 #endif
