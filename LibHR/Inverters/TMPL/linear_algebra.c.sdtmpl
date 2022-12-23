@@ -118,16 +118,13 @@ _BODY({
 _FUNC(double, spinor_field_sqnorm, (_SPINOR_FIELD_TYPE *s1))
 _BODY({
     static double res;
-    static double c;
     _OMP_PRAGMA ( single ) {
         res = 0.;
-        c = 0.;
     }
     
     _ONE_SPINOR_FOR_SUM(s1,res) {
         _REAL prod;
         _spinor_prod_re_f(prod,*_SPINOR_PTR(s1),*_SPINOR_PTR(s1));
-//        kadd(&res, &c, (double)prod);
         res += (double)prod;
    }
    
@@ -338,6 +335,9 @@ _BODY({
     }
 })
 
+<<<<<<< HEAD
 #ifdef __cplusplus
     }
 #endif
+=======
+>>>>>>> remotes/upstream/HiRep-CUDA

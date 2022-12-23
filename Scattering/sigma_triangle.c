@@ -97,7 +97,7 @@ typedef struct {
 } filename_t;
 
 int main(int argc,char *argv[]) {
-	int i,k;
+	int k;
 	FILE* list;
 	int nm;
 	double m[256];
@@ -142,8 +142,6 @@ int main(int argc,char *argv[]) {
 	}
 	/* if a propagator and a source are provided , then read them and perform contractions [ debug only ] */
 	
-	
-	i=0;
 	lprintf("CORR",0,"Number of noise vector : nhits = %i \n", mes_var.nhits);
 	while(1){
     	struct timeval start, end, etime;

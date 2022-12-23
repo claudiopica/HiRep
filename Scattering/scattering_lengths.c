@@ -96,7 +96,7 @@ typedef struct {
 } filename_t;
 
 int main(int argc,char *argv[]) {
-	int i,k;
+	int k;
 	FILE* list;
 	int nm;
 	double m[256];
@@ -138,7 +138,6 @@ int main(int argc,char *argv[]) {
 	lprintf("MAIN",0,"Inverter precision = %e\n",mes_var.precision);
 	for(k=0;k<nm;k++)		lprintf("MAIN",0,"Mass[%d] = %f\n",k,m[k]);
 
-	i=0;
 	lprintf("CORR",0,"Number of noise vector : nhits = %i \n", mes_var.nhits);
 	while(1){
     	struct timeval start, end, etime;

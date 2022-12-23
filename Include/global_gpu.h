@@ -1,9 +1,9 @@
 #ifndef GLOBAL_GPU_H
 #define GLOBAL_GPU_H
 
-#include "global.h"
-
 #ifdef WITH_GPU
+
+#include "global.h"
 
 #ifdef GLB_GPU
 #  define GLB_VAR_DEV(type,name,...) __device__ type name __VA_ARGS__

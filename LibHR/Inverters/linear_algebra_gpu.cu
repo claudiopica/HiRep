@@ -16,7 +16,7 @@
 #include "error.h"
 #include "linear_algebra.h"
 
-#include "linear_algebra_gpu_kernels.cu"
+#include "linear_algebra_gpu_kernels.hpp"
 
 /*
  * LINEAR ALGEBRA FUNCTIONS ARE DEFINED IN THE TEMPLATE

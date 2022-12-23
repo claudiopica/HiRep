@@ -71,7 +71,7 @@ echo "\";" >> ${FILENAME}
 echo "" >> ${FILENAME}
 rm cinfo.tmp
 
-if [ -x "`command -v git`" ]
+if command -v git >/dev/null 2>&1
 then
     len=`git rev-parse --symbolic-full-name|wc -c`+1
     echo -n "static char CI_gitinfo[${len}] = \"" `git rev-parse --symbolic-full-name` "\";" >>${FILENAME}
@@ -87,8 +87,6 @@ else
     echo "static char CI_gitrevision[11] = \""No version"\";" >>${FILENAME}
     echo "" >> ${FILENAME}
 fi
-
-cat ${MKDIR}/Utils/${FILENAME}.tmpl >> ${FILENAME}
 
 echo "#endif" >> ${FILENAME}
 echo "" >> ${FILENAME}

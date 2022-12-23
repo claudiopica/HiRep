@@ -111,7 +111,7 @@ void logger_disable();
  * the same as printf
  *
  */
-int lprintf(char *name, int level, char *format, ...);
+int lprintf(const char *name, int level, const char *format, ...);
 
 #ifdef __cplusplus
     }

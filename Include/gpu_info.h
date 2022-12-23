@@ -13,6 +13,8 @@
     extern "C" {
 #endif
 
+#include "gpu.h"
+
 #ifdef WITH_GPU
 
 

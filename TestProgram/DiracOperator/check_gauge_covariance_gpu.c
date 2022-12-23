@@ -80,7 +80,7 @@ static void transform_s(spinor_field *out, spinor_field *in)
 int main(int argc, char *argv[])
 {
 
-  int return_value = 1;
+  int return_value = 0;
   double sig, tau;
   spinor_field *s0, *s1, *s2, *s3;
 
@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
   if (sqrt(sig) > 10.e-14) 
   {
     lprintf("RESULT", 0, "FAILED \n");
-    return_value = 0;
+    return_value = 1;
   } 
   else lprintf("RESULT", 0, "OK \n");
 

@@ -6,6 +6,10 @@
 
  #ifndef NEW_GEOMETRY_H
  #define NEW_GEOMETRY_H
+#ifdef __cplusplus
+    extern "C" {
+ #endif
+
  #include "spinor_field.h"
  #include "suN.h"
  #include "suN_types.h"
@@ -18,9 +22,6 @@
 #endif
 
 
- #ifdef __cplusplus
-    extern "C" {
- #endif
 
 #include <stdint.h>
 #include <stddef.h>

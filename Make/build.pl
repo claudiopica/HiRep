@@ -99,10 +99,11 @@ my @libs = ("libhr.a"); #this is for later programs to use
   my $topdir = "TestProgram";
   my @subdirs = ( "PureGauge", "GaugeFix", "Inverters", "Random", 
                   "DiracOperator", "Algebra", "Disconnected", "Scattering", 
-                  "Memory", "Sources", "RIMOM", "Deflate", "Utils", "Propagator", 
+                  "Memory", "Sources", "RIMOM", "Utils", "Propagator", 
                   "Integrators", "StoredConfs", "SpinorField", "WilsonLoops", 
                   "Update", "Mesons", "Geometry", "LinearAlgebra",
-              #    "RotatedSF", # this is broken 
+              #    "RotatedSF", # this is broken
+              #    "Deflate",  # this is broken
   );
 
   my %exclude = ( Integrators => [ "check_integrator_utils_1.c", ], 

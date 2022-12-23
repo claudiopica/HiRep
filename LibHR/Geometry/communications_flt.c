@@ -14,7 +14,7 @@
 #include "utils.h"
 #include <string.h>
 #ifdef WITH_MPI
-#include <mpi.h>
+#include <hr_mpi.h>
 #endif
 #include "logger.h"
 
@@ -55,8 +55,9 @@ static void sync_spinor_field_flt(spinor_field_flt *p) {
 
 #endif /* WITH_MPI */
 
-
+#if defined(WITH_NEW_GEOMETRY) && defined(WITH_MPI)
 static void *gf_sendrecv_guard=NULL;
+#endif
 
 void complete_gf_sendrecv_flt(suNg_field_flt *gf) {
 #ifdef WITH_MPI
@@ -175,7 +176,9 @@ void start_gf_sendrecv_flt(suNg_field_flt *gf) {
 #endif /* WITH_MPI */
 }
 
+#if defined(WITH_NEW_GEOMETRY) && defined(WITH_MPI)
 static void *sf_sendrecv_guard=NULL;
+#endif
 
 void complete_sf_sendrecv_flt(spinor_field_flt *sf) {
 #ifdef WITH_MPI

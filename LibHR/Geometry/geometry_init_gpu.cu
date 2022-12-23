@@ -1,3 +1,4 @@
+//this definition is to define global variable for GPU
 #define GLB_GPU
 
 #include "global.h"
@@ -53,5 +54,8 @@ void init_neighbors_gpu()
   #endif
 }
 
+<<<<<<< HEAD
 #undef GLB_GPU
 
+=======
+>>>>>>> remotes/upstream/HiRep-CUDA

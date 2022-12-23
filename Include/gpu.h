@@ -10,6 +10,10 @@
 #define GPU_H
 #ifdef WITH_GPU
 
+#ifdef __cplusplus
+  extern "C" {
+#endif
+
 #include <stdio.h>
 #include <cuda.h>
 #include <driver_types.h>
@@ -21,9 +25,6 @@
 #include "input_par.h"
 #include "hr_complex.h"
 
-#ifdef __cplusplus
-  extern "C" {
-#endif
 
 typedef struct 
 {
