@@ -29,7 +29,7 @@
 #include "observables.h"
 #include "utils.h"
 #include "spectrum.h"
-#include "cinfo.h"
+#include "print_compile_options.h"
 #include "representation.h"
 #include "linear_algebra.h"
 #include "setup.h"
@@ -168,7 +168,7 @@ int main(int argc,char *argv[]) {
     error(stderrp==NULL,1,"main [hmc.c]",
 	  "Cannot redirect the stderr");
   }
-  lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS);
+  print_compiling_info_short();
   error(1,1,"MAIN","Need to set MEASURE_FORCE macro for program to measure forces\n"); 
 }
 #else
@@ -197,7 +197,7 @@ int main(int argc,char *argv[]) {
 	  "Cannot redirect the stderr");
   }
   
-  lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS);
+  print_compiling_info_short();
   lprintf("MAIN",0,"[RepID: %d][world_size: %d]\n[MPI_ID: %d][MPI_size: %d]\n\n",RID,WORLD_SIZE,MPI_PID,MPI_WORLD_SIZE);
 
   //  lprintf("MAIN",0,"Logger lelvel: %d\n",logger_getlevel(0));
@@ -236,7 +236,7 @@ int main(int argc,char *argv[]) {
 	"Failed to open list file\n");
   }
 
-  lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS); 
+  print_compiling_info_short();
   lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE); 
   lprintf("MAIN",0,"input file [%s]\n",input_filename); 
   lprintf("MAIN",0,"output file [%s]\n",output_filename); 

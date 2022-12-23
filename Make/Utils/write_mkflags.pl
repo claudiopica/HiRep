@@ -5,48 +5,50 @@ use Getopt::Long 'HelpMessage';
 use File::Copy qw(move);
 
 GetOptions(
-  'file|f=s' => \( my $file = 'MkFlags'),
-  'ng|n=i' => \( my $NG = 2),
-  'repr|r=s'   => \(my $repr = 'FUND'),
-  'gauge=s'   => \(my $gauge = 'SUN'),
-  'mpi!'   => \(my $mpi = 1),
-  't=s'   => \(my $TBC = 'P'),
-  'x=s'   => \(my $XBC = 'P'),
-  'y=s'   => \(my $YBC = 'P'),
-  'z=s'   => \(my $ZBC = 'P'),
-  'twisted!'   => \(my $xyz_twist = 0),
-  'sf!'   => \(my $sfbc = 0),
-  'sfhalf!'   => \(my $sfhalfbc = 0),
+  'file|f=s'     => \(my $file = 'MkFlags'),
+  'ng|n=i'       => \(my $NG = 2),
+  'repr|r=s'     => \(my $repr = 'FUND'),
+  'gauge=s'      => \(my $gauge = 'SUN'),
+  'mpi!'         => \(my $mpi = 1),
+  't=s'          => \(my $TBC = 'P'),
+  'x=s'          => \(my $XBC = 'P'),
+  'y=s'          => \(my $YBC = 'P'),
+  'z=s'          => \(my $ZBC = 'P'),
+  'twisted!'     => \(my $xyz_twist = 0),
+  'sf!'          => \(my $sfbc = 0),
+  'sfhalf!'      => \(my $sfhalfbc = 0),
   'sfrotated!'   => \(my $sfrotatedbc = 0),
-  'smearing!'   => \(my $smearing = 0),
-  'clover|c!'   => \(my $clover = 0),
-  'expclover|e!'   => \(my $expclover = 0),
-  'eo!'   => \(my $eoprec = 1),
-  'newgeo!'   => \(my $newgeo = 0),
-  'quat|q!'   => \(my $quat = 0),
-  'ndebug!'   => \(my $ndebug = 1),
-  'dfloat!'   => \(my $dfloat = 0),
-  'checkspinor!'   => \(my $scheck = 1),
+  'smearing!'    => \(my $smearing = 0),
+  'clover|c!'    => \(my $clover = 0),
+  'expclover|e!' => \(my $expclover = 0),
+  'eo!'          => \(my $eoprec = 1),
+  'newgeo!'      => \(my $newgeo = 0),
+  'quat|q!'      => \(my $quat = 0),
+  'ndebug!'      => \(my $ndebug = 1),
+  'dfloat!'      => \(my $dfloat = 0),
+  'checkspinor!' => \(my $scheck = 1),
   'mpitiming!'   => \(my $mpit = 0),
-  'ioflush!'   => \(my $iof = 1),
-  'unrollrepr!'   => \(my $unrollr = 0),
-  'timing!'   => \(my $timing = 0),
+  'ioflush!'     => \(my $iof = 1),
+  'logallpids!'  => \(my $logallpids = 0),
+  'unrollrepr!'  => \(my $unrollr = 0),
+  'timing!'      => \(my $timing = 0),
   'bartiming!'   => \(my $btiming = 0),
-  'memory!'   => \(my $mem = 0),
-  'force!'   => \(my $force = 0),
-  'cc=s'   => \(my $cc = "gcc"),
-  'mpicc=s'   => \(my $mpicc = "mpicc"),
-  'cflags=s'   => \(my $cflags = "-Wall -Wshadow -Wfatal-errors -Werror -std=c99 -O3"),
-  'nvcc=s'   => \(my $nvcc = "nvcc"),
+  'memory!'      => \(my $mem = 0),
+  'force!'       => \(my $force = 0),
+  'cc=s'         => \(my $cc = "gcc"),
+  'mpicc=s'      => \(my $mpicc = "mpicc"),
+  'cflags=s'     => \(my $cflags = "-Wall -O3"),
+  'nvcc=s'       => \(my $nvcc = "nvcc"),
   'gpuflags=s'   => \(my $gpuflags = ""),
-  'ldflags=s'   => \(my $ldflags = ""),
-  'include=s'   => \(my $include = ""),
-  'ccache!'   => \(my $ccache = 0),
-  'help'     =>   sub { HelpMessage(2) },
+  'ldflags=s'    => \(my $ldflags = ""),
+  'include=s'    => \(my $include = ""),
+  'ccache!'      => \(my $ccache = 0),
+  'help'         => sub { HelpMessage(2) },
 ) or HelpMessage(1);
 
 # validate parameters
 validate_ng();
+validate_quat();
 validate_repr();
 validate_gauge();
 validate_t();
@@ -57,6 +59,13 @@ validate_z();
 sub validate_ng {
     if($NG<2) {
         print "Error: Number of colors (--ng|n) must be 2 or bigger\n";
+        HelpMessage(1);
+    }
+}
+
+sub validate_quat {
+    if($quat && ($NG != 2)) {
+        print "Error: Quaternions (--quat|q) can only be used when colors (--ng|n) is 2\n";
         HelpMessage(1);
     }
 }
@@ -193,6 +202,8 @@ $scheck && print $fh "MACRO += -DCHECK_SPINOR_MATCHING\n";
 $mpit && print $fh "MACRO += -DMPI_TIMING\n";
 # write io flush
 $iof && print $fh "MACRO += -DIO_FLUSH\n";
+# log all pids
+$logallpids && print $fh "MACRO += -DLOG_ALLPIDS\n";
 # write unroll representation
 $unrollr && print $fh "MACRO += -DUNROLL_GROUP_REPRESENT\n";
 # write timing
@@ -242,7 +253,7 @@ write_mkflags - write flags file for compilation of HiRep
   --[no-]mpi          [true]      Use MPI
   --cc                [gcc]       Compiler
   --mpicc             [mpicc]     MPI Compiler
-  --cflags            [-Wall -Wshadow -std=c99 -O3]       Compilation options
+  --cflags            [-Wall -O3] Compilation options
   --nvcc              [nvcc]      CUDA compiler
   --gpuflags          []          CUDA compilation options
   --include           []          Extra include headers
@@ -261,13 +272,14 @@ write_mkflags - write flags file for compilation of HiRep
   --[no-]clover,-c    [false]     Clover improved action
   --[no-]expclover,-e [false]     ExpClover improved action
 
-  --[no-]quat,-q      [false]     Use quaternion representation (only for SU2)
+  --[no-]quat,-q      [false]     Use quaternion representation (only valid for SU2)
   --[no-]dfloat       [false]     Use single precision acceleration
   --[no-]unrollrepr   [false]     Unroll group representation functions
 
   --[no-]checkspinor  [true]      Check spinor field type
   --[no-]mpitiming    [false]     Enable timing of MPI calls
   --[no-]ioflush      [true]      Flush IO after each operations on logs
+  --[no-]logallpids   [false]     Write log output for all MPI processes
   --[no-]timing       [false]     Enable timing
   --[no-]bartiming    [false]     Enable MPI barriers in timing
   --[no-]memory       [false]     Print memory usage

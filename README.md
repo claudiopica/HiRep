@@ -4,10 +4,11 @@ This repository contains the HiRep simulation code.
 
 ## Dependencies
 
-* GCC or different C-compiler
-* MPI implementation, i.e. OpenMPI or MPICH for MPI support
-* In order to make use of CUDA GPU acceleration compile with CUDA 11.x, for multi-GPU using a CUDA-aware MPI implementation
-* Perl on compilation
+* A C99 compliant compiler (GCC, clang, icc). OpenMP can be used if supported by the compiler.  
+* If MPI is needed, an MPI implementation, i.e. OpenMPI or MPICH for MPI support. Use a CUDA-aware MPI implementation for multi-GPU support.
+* If GPU acceleration if needed, CUDA 11.x and nvcc compiler to make use of CUDA GPU acceleration.
+* Perl 5.x for compilation.
+* [ninja build](https://ninja-build.org/) for compilation.
 
 
 ## Compilation
@@ -18,19 +19,29 @@ This repository contains the HiRep simulation code.
 git clone https://github.com/claudiopica/HiRep
 ```
 
-### Adjust Make Flags
-Adjust the file ```Make/MkFlags``` for the right compilation
+Make sure the build command ```Make/nj``` and ```ninja``` are in your ```PATH```. 
+
+### Adjust compilation cptions 
+Adjust the file ```Make/MkFlags``` to set the desired options.
+The option file can be written using the ```Make/Utils/write_mkflags.pl``` tools.
+Use:
+```
+write_mkflags.pl -h
+```
+for a list of available options. The most important ones include:
+
+* Number of colors (NG)
+```
+NG=3
+```
 
 * Gauge group SU(NG) or SO(NG)
 ```
-NG=3
-
-#CHOICES ARE GAUGE_SUN AND GAUGE_SON
 GAUGE_GROUP = GAUGE_SUN
 #GAUGE_GROUP = GAUGE_SON
 ```
 
-* Representation
+* Representation of fermion fields
 ```
 REPR = REPR_FUNDAMENTAL
 #REPR = REPR_SYMMETRIC
@@ -38,93 +49,78 @@ REPR = REPR_FUNDAMENTAL
 #REPR = REPR_ADJOINT
 ```
 
-* Boundary Conditions
+* Lattice boundary Conditions
 
 Comment out the line here, when you want to establish certain boundary conditions into the respective direction.
 ```
+#Available choices of boundary conditions:
 #T => PERIODIC, ANTIPERIODIC, OPEN, THETA
 #X => PERIODIC, ANTIPERIODIC, THETA
 #Y => PERIODIC, ANTIPERIODIC, THETA
 #Z => PERIODIC, ANTIPERIODIC, THETA
-```
-
-* Macro parameters
-
-Then a number of macro parameters follow. Here you have to specify if you want to compile for certain boundary conditions by adding the identifier to the ```MACRO``` variable.
-
-```
-#MACRO += -DBC_T_THETA
-#MACRO += -DBC_T_PERIODIC
 MACRO += -DBC_T_ANTIPERIODIC
-#MACRO += -DBC_T_OPEN
 MACRO += -DBC_X_PERIODIC
 MACRO += -DBC_Y_PERIODIC
 MACRO += -DBC_Z_PERIODIC
-
-#MACRO += -DBC_XYZ_TWISTED
-
-#MACRO += -DHALFBG_SF
-#MACRO += -DBASIC_SF
-#MACRO += -DROTATED_SF
 ```
 
-Specify, whether you want to compile with MPI either with or without GPU acceleration by using 
+* MACRO options
+
+You can select a number of features via the ```MACRO``` variable. The most important ones are:
+
+Specify, whether you want to compile with MPI by using 
 
 ```
 #MACRO += -DWITH_MPI
 ```
 
-For compilation with GPU acceleration for CUDA GPUs, add the identifier ```-DWITH_GPU``` to ```MACRO```.
+For compilation with GPU acceleration for CUDA GPUs use:
 
 ```
 MACRO += -DWITH_GPU
 ```
 
-* Compilers, wrappers, preprocessors
+* Compiler options
 
-A number of example combinations are already given in ```MkFlags```.
-
-For compiling with ```GCC``` and ```OpenMPI``` one would compile with
-
+You can set your choice of C, C++, MPI and CUDA compiler and their options by using the variables:
 ```
 CC = gcc
 MPICC = mpicc
-LDFLAGS =
-INCLUDE =
+NVCC = nvcc
+CXX = g++
+LDFLAGS = -Wall -O3
+GPUFLAGS = -arch=sm_80 
+INCLUDE = 
 ```
 
-Using Intel compilers and Intel's MPI implementation, one can use for example
+For example, to use the Intel compiler and Intel's MPI implementation, and no CUDA, one could use:
 
 ```
 CC = icc
 MPICC = mpiicc
-LDFLAGS = -L /opt/local/lib/mpich-devel-gcc7/ -L /opt/local/lib/
-INCLUDE = -I /opt/local/include/mpich-devel-gcc7/
+LDFLAGS = -O3
+INCLUDE = 
 ```
 
-For CUDA acceleration, use ```nvcc``` and adjust the flag ```-arch``` according to the compute capability of the CUDA capable device.
+### Compile the code
+From the root folder just type:
+```
+nj
+```
+(this is a tool in the `Make/` folder: make sure it is in your path!)
+The above will compile the `libhr.a` library and all the available executable in the HiRep distribution, including executable for dnamical fermions `hmc` and pure gauge `suN` simulations and all the applicable tests.
+If you wish to compile only one of the executable, e.g. `suN`, just change to the corresponding directory, e.g. `PureGauge`, and execute the `nj` command from there.
 
-```
-CC = nvcc
-CFLAGS = -O2 -Xcompiler '-std=c99 -fgcse-sm -fgcse-las -fgcse-after-reload'
-GPUFLAGS = --x cu -arch=sm_70 -Xptxas -v -Xptxas -dlcm=ca -dc
-LDFLAGS = -lcuda
-```
+All build artefacts, except the final executables, are located in the `build` folder at the root directory of the distribution.
 
-For compilation with CUDA-aware MPI one needs to pass the MPI wrapper of the MPI implementation to the CUDA preprocessor using the flag ```-ccbin```. For OpenMPI this is ```mpicc```.
-
-```
-CC = nvcc
-CFLAGS = -ccbin mpicc -Xcompiler '-std=c99 -fgcse-sm -fgcse-las -fgcse-after-reload'
-GPUFLAGS = --x cu -arch=sm_70 -Xptxas -v -Xptxas -dlcm=ca -dc
-LDFLAGS = -lcuda -lmpi
-```
 
 ## Run
 
 ### Adjust input file
-
-Compile the HiRep library for example in ```LibHR``` by typing ```make```. An example of a C-file that generates a binary to run the HMC can be found in ```HMC```, you can navigate into this directory and type ```make``` to create a binary. It is necessary to specify a number of parameters using an input file, see ```HMC/input_file``` for an example. For basic run variables, one can have a look at the section ```Run control variables```.
+As example we will use the `hmc` program which can be found in the ```HMC``` directory (to create the executable type `nj` in that directory). 
+The `hmc` program will run the generation of lattice configurations with dynamical fermions by using a hybrid Monte Carlo algorithm. The program uses a number of parameters which needs to be specified in an input file, see ```HMC/input_file``` for an example. 
+Input parameters are divided in different sections, such as: global lattice size, number of MPI processes per direction, random number generator, run control variables, definition of the lattice action to use for the run, etc.
+For example, for basic run control variables, one can have a look at the section ```Run control variables```.
 
 ```
 run name = run1
@@ -135,23 +131,29 @@ gauge start = random
 last conf = +1
 ```
 
-The "+" in front of ```last conf``` specifies the number of trajectories to be generated after the chosen startup configuration. I.e. if the startup configuration is trajectory number 5 and ```last conf = 6``` then one additional trajectory will be generated. If ```last conf = +6``` then six additional trajectories will be generated.
+The "+" in front of ```last conf``` specifies the number of additional trajectories to be generated after the chosen startup configuration. I.e. if the startup configuration is trajectory number 5 and ```last conf = 6``` then one additional trajectory will be generated, while if ```last conf = +6``` then six additional trajectories will be generated (i.e. the last configuration generated will be number 11).
 
 ### Execute Binary
 
-Run using a single thread using
+When not using MPI, simply run:
 
 ```
 $ ./hmc -i input_file
 ```
 
-where ```hmc``` is the binary generated from ```hmc.c```. For the MPI version
+where ```hmc``` is the binary generated from ```hmc.c```. If you are using openmp, remeber to set `OMP_NUM_THREADS` and other relevant environment variables to the desired value.
+
+For the MPI version, run
 
 ```
 $ mpirun -np <number of processes> ./hmc -i input_file
 ```
 
-Here, the number of processes corresponds to either the number of cores used or the number of GPUs for the GPU version. Results are printed to `out_0` in the current directory.
+The GPU version of the code uses 1 GPU per MPI process.
+
+The output file is written only by the MPI process rank 0, by default in a file called `out_0` in the current directory. A different name for the output file can be set by using the `-o` option.
+
+For debug purposes it is sometimes useful to have output files from all MPI processes. This can be enabled with the compilation option: `MACRO += -DLOG_ALLPIDS`.
 
 
 # Documentation

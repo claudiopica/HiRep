@@ -21,8 +21,7 @@
 #include "representation.h"
 #include "utils.h"
 #include "logger.h"
-
-#include "cinfo.h"
+#include "print_compile_options.h"
 
 #if defined(ROTATED_SF) && defined(BASIC_SF)
 #error This code does not work with the Schroedinger functional !!!
@@ -227,8 +226,8 @@ int main(int argc, char *argv[])
     sprintf(tmp, "err_%d", PID);
     freopen(tmp, "w", stderr);
   }
-
-  lprintf("MAIN", 0, "Compiled with macros: %s\n", MACROS);
+  
+  print_compiling_info_short();
   lprintf("MAIN", 0, "PId =  %d [world_size: %d]\n\n", PID, WORLD_SIZE);
   lprintf("MAIN", 0, "input file [%s]\n", input_filename);
   lprintf("MAIN", 0, "output file [%s]\n", output_filename);
