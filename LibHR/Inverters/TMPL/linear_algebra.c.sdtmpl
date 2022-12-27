@@ -8,10 +8,6 @@
 #include "suN.h"
 #include "suN_types.h"
 
-#ifdef __cplusplus
-    extern "C" {
-#endif
-
 /* s1=s2 */
 _FUNC(void, spinor_field_copy, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
 _BODY({

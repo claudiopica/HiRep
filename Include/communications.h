@@ -173,8 +173,7 @@ void start_sf_sendrecv_flt(spinor_field_flt*);
 
 #endif 
 
-
 #ifdef __cplusplus
-}
+    }
 #endif
 #endif 

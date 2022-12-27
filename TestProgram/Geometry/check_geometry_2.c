@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     unit_u(u_gauge);
     complete_gf_sendrecv(u_gauge);
 
-    //test plauette value
+    // test plaquette value
     double p=avr_plaquette();
     lprintf("TEST",1,"Plaquette= %lf\n",p);
     if (isNotZero(1.-p, 1.e-10)) {

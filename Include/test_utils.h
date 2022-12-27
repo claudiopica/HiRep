@@ -13,6 +13,7 @@
 void test_setup();
 int check_diff_norm(double, double);
 int check_diff_norm_zero(double);
+int check_finiteness(double);
 
 // COPY 
 void copy_gfield_cpu(suNg_field*, suNg_field*);

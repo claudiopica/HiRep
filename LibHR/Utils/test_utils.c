@@ -12,6 +12,7 @@
 #include "error.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include "test_utils.h"
 
 // The following functions are primarily for testing purposes
 // This is all for CPU
@@ -53,6 +54,38 @@ int check_diff_norm_zero(double diff_norm)
         return_val = 0;
     }
     lprintf("RESULT", 0, "[Diff norm %0.2e]\n", diff_norm);
+    return return_val;
+}
+
+int check_not_zero(double value, double tolerance) 
+{
+    int return_val = 0;
+    if (fabs(value) < tolerance) 
+    {
+        lprintf("RESULT", 0, "FAILED \n");
+        return_val = 1;
+    } else 
+    {
+        lprintf("RESULT", 0, "OK \n");
+        return_val = 0;
+    }
+    lprintf("RESULT", 0, "[Value %0.2e is not zero up to tolerance.]\n", value);
+    return return_val;
+}
+
+int check_finiteness(double value) 
+{
+    int return_val = 0;
+    if (!isfinite(value)) 
+    {
+        lprintf("RESULT", 0, "FAILED \n");
+        return_val = 1;
+    } else 
+    {
+        lprintf("RESULT", 0, "OK \n");
+        return_val = 0;
+    }
+    lprintf("RESULT", 0, "[Value %0.2e is finite.]\n", value);
     return return_val;
 }
 
@@ -706,6 +739,11 @@ void random_clover_force_cpu(suNf_field *f)
     int n = 6*f->type->gsize_gauge*sizeof(suNf)/sizeof(double);
     ranlxd((double*)(f->ptr), n);
 }
+
+#ifdef WITH_GPU
+
+    
+#endif
 
 
 

@@ -84,7 +84,6 @@ _DECLARE_SYNC_FUNCTIONS(clover_force, suNf, 6, gauge);
     void start_sendrecv_gpu_##_name(_field_type *f) \
     { \
         sync_gpu_##_name(f); \
-        MPI_Status status[f->type->nbuffers_##_geom];\
         for (int i = 0; i < f->type->nbuffers_##_geom; ++i) \
         { \
             /* Destination Parameters */ \
