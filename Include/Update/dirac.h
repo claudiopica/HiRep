@@ -88,6 +88,7 @@ void g5Dphi_eopre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
 void g5Dphi_eopre_sq_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
 
 // Dphi_gpu.cu
+#ifdef WITH_GPU
 unsigned long int getMVM_gpu();
 void resetMVM_gpu();
 void Dphi_gpu_(spinor_field *out, spinor_field *in); //TODO: is this the correct naming?
@@ -98,6 +99,7 @@ void Dphi_eopre_gpu(double m0, spinor_field *out, spinor_field *in);
 void Dphi_oepre_gpu(double m0, spinor_field *out, spinor_field *in);
 void g5Dphi_eopre_gpu(double m0, spinor_field *out, spinor_field *in);
 void g5Dphi_eopre_sq_gpu(double m0, spinor_field *out, spinor_field *in);
+#endif
 
 // D_update.c
 void set_dirac_mass(double mass); // this is the mass used in the following operators
