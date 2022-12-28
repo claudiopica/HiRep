@@ -4,24 +4,7 @@
  *
  *******************************************************************************/
 
-#define MAIN_PROGRAM
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include "io.h"
-#include "update.h"
-#include "observables.h"
-#include "geometry.h"
-#include "global.h"
-#include "logger.h"
-#include "random.h"
-#include "memory.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include "representation.h"
-#include "communications.h"
+#include "libhr.h"
 
 rhmc_par _update_par = {0};
 /* double M_PI=3.141592653589793238462643383279502884197; */

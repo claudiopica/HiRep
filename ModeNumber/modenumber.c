@@ -1,19 +1,10 @@
-#include "global.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "suN.h"
-#include "dirac.h"
-#include "memory.h"
-#include "error.h"
-#include "random.h"
-#include "update.h"
-#include "logger.h"
-#include "communications.h"
-#include "ranlux.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
+#include "libhr.h"
+// #include <stdlib.h>
+// #include <stdio.h>
+// #include <math.h>
 
+//local header
+#include "modenumber.h"
 
 #define NMAX 1000
 

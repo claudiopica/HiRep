@@ -4,18 +4,10 @@
 \***************************************************************************/
 
 #include "update.h"
-#include "dirac.h"
-#include "inverters.h"
-#include "linear_algebra.h"
-#include "suN.h"
-#include "random.h"
+#include "libhr_core.h"
 #include "memory.h"
+#include "io.h"
 #include "utils.h"
-#include "global.h"
-#include <math.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include "logger.h"
 
 static spinor_field *ev;
 

@@ -3,29 +3,13 @@
 *                                                                           *
 \***************************************************************************/
 
-#include "global.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "suN.h"
 #include "observables.h"
-#include "dirac.h"
-#include "utils.h"
-#include "memory.h"
-#include "update.h"
-#include "error.h"
-#include <stdlib.h>
-#include <math.h>
-#include <assert.h>
-#include "logger.h"
+#include "libhr_core.h"
 #include "io.h"
-#include "random.h"
-#include "communications.h"
-#include "ranlux.h"
-#include "gamma_spinor.h"
-#include "spin_matrix.h"
-#include "propagator.h"
+#include "memory.h"
+#include "utils.h"
 #include <string.h>
-#include "meson_observables.h"
+
 #define PI 3.141592653589793238462643383279502884197
 
 #define corr_left_mult_g5(C)            \
@@ -51,7 +35,7 @@
 #if NG==3
 
 // The function computes: out = Cg_\mu * in * g0(Cg_\nu)^\dagger*g0
-void propagator_mul_left_right(suNf_propagator *out, suNf_propagator *in, int mu, int nu)
+static void propagator_mul_left_right(suNf_propagator *out, suNf_propagator *in, int mu, int nu)
 {
 	suNf_propagator tmp;
 
@@ -96,7 +80,7 @@ void propagator_mul_left_right(suNf_propagator *out, suNf_propagator *in, int mu
 }
 
 // baryons 1 ; C[beta][delta]  = S^ii' StildeT^jj' S^ kk'
-void _propagator_baryon1_mul2(hr_complex C[4][4], suNf_propagator S, suNf_propagator Stilde, int i, int ip, int j, int jp, int k, int kp)
+static void _propagator_baryon1_mul2(hr_complex C[4][4], suNf_propagator S, suNf_propagator Stilde, int i, int ip, int j, int jp, int k, int kp)
 {
 	hr_complex tmp[4][4];
 
@@ -126,7 +110,7 @@ void _propagator_baryon1_mul2(hr_complex C[4][4], suNf_propagator S, suNf_propag
 }
 
 // baryons 2 ; C[beta][delta]  = S^ii'_*tr(_S^ jj' StilteT^kk'
-void _propagator_baryon2_mul2(hr_complex C[4][4], suNf_propagator S, suNf_propagator Stilde, int i, int ip, int j, int jp, int k, int kp)
+static void _propagator_baryon2_mul2(hr_complex C[4][4], suNf_propagator S, suNf_propagator Stilde, int i, int ip, int j, int jp, int k, int kp)
 {
 	hr_complex tmp;
 	_complex_0(tmp);

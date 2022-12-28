@@ -11,20 +11,28 @@
 
 #ifdef WITH_GPU
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "suN.h"
-#include "global.h"
+// #include <stdlib.h>
+// #include <stdio.h>
+// #include <math.h>
+// #include "suN.h"
+// #include "global.h"
+// #include "error.h"
+// #include "dirac.h"
+// #include "linear_algebra.h"
+// #include "spinor_field.h"
+// #include "geometry.h"
+// #include "communications.h"
+// #include "memory.h"
+// #include "gpu.h"
+// #include "hr_complex.h"
+#include "update.h"
+#include "libhr_core.h"
+#include "Inverters/linear_algebra.h"
 #include "error.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include "spinor_field.h"
-#include "geometry.h"
-#include "communications.h"
+#include "io.h"
 #include "memory.h"
-#include "gpu.h"
-#include "hr_complex.h"
+#include "utils.h"
+
 #include "./Dphi_gpu_kernels.hpp"
 
 #ifdef ROTATED_SF
@@ -148,7 +156,7 @@ static void Dphi_inner_gpu_(spinor_field *out, spinor_field *in) {
  *                            lattice on the GPU copy.
  * @param out                 Output spinor field to save result
  */
-void Dphi_boundary_gpu_(spinor_field *out, spinor_field *in) {
+static void Dphi_boundary_gpu_(spinor_field *out, spinor_field *in) {
   #if defined(WITH_MPI) && defined(WITH_NEW_GEOMETRY)
   int grid, ixp, block_stride, buffer_stride, block_start, buffer_start;
   for (int i = 0; i < in->type->nbuffers_spinor; ++i)
@@ -370,11 +378,11 @@ void g5Dphi_sq_gpu(double m0, spinor_field *out, spinor_field *in) {
 }
 
 /* For WITH_GPU: Map the GPU functions to the default functions. */
+unsigned long int (*getMVM) ()=getMVM_gpu;
 void (*Dphi_) (spinor_field *out, spinor_field *in)=Dphi_gpu_;
 void (*Dphi) (double m0, spinor_field *out, spinor_field *in)=Dphi_gpu;
 void (*g5Dphi) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_gpu;
 void (*g5Dphi_sq) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_sq_gpu;
-unsigned long int (*getMVM) ()=getMVM_gpu;
 void (*Dphi_eopre) (double m0, spinor_field *out, spinor_field *in)=Dphi_eopre_gpu;
 void (*Dphi_oepre) (double m0, spinor_field *out, spinor_field *in)=Dphi_oepre_gpu;
 void (*g5Dphi_eopre) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_eopre_gpu;

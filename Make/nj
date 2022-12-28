@@ -37,9 +37,12 @@ foreach ( @ARGV ) {
      # consider targets as relative to cwd
      $ntargets ++;
      my $target = "$_";
-     $target = "$cwd$target" unless (($target eq "autoheaders") || ($target eq "libhr.a"));
-     if ($target =~ /\.[co]$/) { $target = "$builddir/$target"; }
-     if ($target =~ /\.h$/) { $target = "$rootdir/$target"; }
+     $target = "$cwd$target" unless (($target eq "autoheaders") || 
+                                     ($target eq "generated_files") || 
+                                     ($target eq "libhr.a")
+                                    );
+     if ($target =~ /\.o$/) { $target = "$builddir/$target"; }
+     if ($target =~ /\.[ch]$/) { $target = "$rootdir/$target"; }
      push(@ninja_args, $target);
 }
 # nj without arguments build the current dir

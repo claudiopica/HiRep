@@ -5,8 +5,10 @@
 
 #ifndef SUN_UTILS_H
 #define SUN_UTILS_H
-#include "wilsonflow.h"
-#include "input_par.h"
+
+#include "Utils/wilsonflow.h"
+#include "IO/input_par.h"
+
 #define GENERIC_MAX(x, y) ((x) > (y) ? (x) : (y))
 
 #define ENSURE_int(i) _Generic((i), int \

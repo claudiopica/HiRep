@@ -3,20 +3,9 @@
  * All rights reserved.                                                      * 
  \***************************************************************************/
 
-#include "global.h"
-#include "communications.h"
-#include "logger.h"
-#include "error.h"
 #include "geometry.h"
-#include "spinor_field.h"
-#include "suN_types.h"
-#include "global.h"
-#include "utils.h"
+#include "libhr_core.h"
 #include <string.h>
-#ifdef WITH_MPI
-#include <hr_mpi.h>
-#endif
-#include "logger.h"
 
 #ifdef MPI_TIMING
 struct timeval gfstart, gfend, gfetime,sfstart, sfend, sfetime;

@@ -4,15 +4,11 @@
 \***************************************************************************/
 
 #include "utils.h"
-#include "linear_algebra.h"
-#include "update.h"
+#include "libhr_core.h"
+#include "io.h"
+#include "inverters.h"
 #include "random.h"
 #include "memory.h"
-#include "geometry.h"
-#include "global.h"
-#include <math.h>
-#include <stdlib.h>
-#include "logger.h"
 
 /* use power method to find max eigvalue */
 int max_H(spinor_operator H, geometry_descriptor *type, double *max)

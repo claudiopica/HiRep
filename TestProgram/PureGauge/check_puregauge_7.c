@@ -4,27 +4,9 @@
  *
  *******************************************************************************/
 
-#define MAIN_PROGRAM
-
-#include <stdlib.h>
-#include <stdio.h>
+#include "libhr.h"
 #include <string.h>
-#include <math.h>
-#include "global.h"
-#include "io.h"
-#include "update.h"
-#include "geometry.h"
-#include "logger.h"
-#include "random.h"
-#include "memory.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include "representation.h"
-#include "communications.h"
-#include "setup.h"
-#include "utils.h"
-#include "observables.h"
-#include "glueballs.h"
+
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338327950288419716939937510
 #endif

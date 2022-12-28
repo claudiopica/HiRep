@@ -66,30 +66,10 @@
 *
 ******************************************************************************/
 
-#include "global.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "suN.h"
 #include "observables.h"
-#include "dirac.h"
+#include "libhr_core.h"
 #include "utils.h"
-#include "error.h"
-#include "logger.h"
-#include "memory.h"
-#include "random.h"
-#include "update.h"
-#include "communications.h"
-#include <stdlib.h>
-#include <math.h>
-#include <assert.h>
-#include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <errno.h>
-#include <dirent.h>
-
+#include "io.h"
 
 #define QMR_INVERTER
 #define EO_PRE
@@ -118,13 +98,13 @@ static void compute_evs();
 static void project_on_higher_evs(spinor_field *sp, int m);
 
 static spinor_field* ev_propagator_ws;
-static void ev_propagator(complex** prop);
+static void ev_propagator(hr_complex** prop);
 
 static spinor_field* stoc_propagator_ws;
-static void stoc_propagator(complex** prop, int n_src, int mode);
+static void stoc_propagator(hr_complex** prop, int n_src, int mode);
 
 static spinor_field* hopping_propagator_ws;
-static void hopping_propagator(complex** prop);
+static void hopping_propagator(hr_complex** prop);
 
 static spinor_field* hopping_remainder_ws;
 static void hopping_remainder(spinor_field *out, spinor_field *in, int m);
@@ -135,7 +115,7 @@ static spinor_field* create_sinks_QMR_ws;
 enum {INVERSION, TRUNCATION, CORRECTION};
 static void create_sinks_QMR(spinor_field *source, spinor_field *sink, int mode);
 
-static void add_source_sink_contraction(complex *out, spinor_field *source, spinor_field *sink, double z);
+static void add_source_sink_contraction(hr_complex *out, spinor_field *source, spinor_field *sink, double z);
 
 
 #ifdef QMR_INVERTER
@@ -168,7 +148,7 @@ static void D_qmr_oe(spinor_field *out, spinor_field *in);
 * xp = 0, ... , n_points (n_points independent stochastic estimates)
 *******************************************************************************/
 
-void traced_ata_qprop(complex*** prop, int n_points) {
+void traced_ata_qprop(hr_complex*** prop, int n_points) {
 /*
 	prop[x][m][t*16+i]
 	x in [0, n_points-1]
@@ -185,7 +165,7 @@ void traced_ata_qprop(complex*** prop, int n_points) {
 
 	for(xp = 0; xp < n_points; xp++)
 	for(m = 0; m < pars.n_masses; m++)
-	  memset(prop[xp][m], '\0', sizeof(complex)*GLB_T*16);
+	  memset(prop[xp][m], '\0', sizeof(hr_complex)*GLB_T*16);
 
 	/* If performing exact calculation (dilution==3) just invert fully
            using point sources. Otherwise, use ev, hopexp, truncation, etc. */
@@ -196,7 +176,7 @@ void traced_ata_qprop(complex*** prop, int n_points) {
 	  stoc_propagator(prop[0],1,INVERSION);
 	  for(xp = 1; xp < n_points; xp++)
 	    for(m = 0; m < pars.n_masses; m++)
-	      memcpy(prop[xp][m], prop[0][m], sizeof(complex)*GLB_T*16);
+	      memcpy(prop[xp][m], prop[0][m], sizeof(hr_complex)*GLB_T*16);
 
 	} else {
 
@@ -207,7 +187,7 @@ void traced_ata_qprop(complex*** prop, int n_points) {
 	  
 	  for(xp = 1; xp < n_points; xp++)
 	    for(m = 0; m < pars.n_masses; m++) {
-	      memcpy(prop[xp][m], prop[0][m], sizeof(complex)*GLB_T*16);
+	      memcpy(prop[xp][m], prop[0][m], sizeof(hr_complex)*GLB_T*16);
 	    }
 	
 	for(xp = 0; xp < n_points; xp++) {
@@ -366,7 +346,7 @@ static void compute_evs() {
 ******************************************************************************/
 static void project_on_higher_evs(spinor_field *sp, int m) {
 	int a;
-	complex alpha;
+	hr_complex alpha;
 	
 	for(a=0; a<pars.n_eigenvalues; a++) {
 		alpha.re = -spinor_field_prod_re_f(&ev[m][a],sp);
@@ -387,7 +367,7 @@ static void project_on_higher_evs(spinor_field *sp, int m) {
 * required workspace: 3
 *
 ******************************************************************************/
-static void ev_propagator(complex** prop) {
+static void ev_propagator(hr_complex** prop) {
   mshift_par QMR_par;
   int m,p;
   int cgiter=0;
@@ -450,7 +430,7 @@ static void ev_propagator(complex** prop) {
 * required workspace: 2+n_masses
 *
 ******************************************************************************/
-static void stoc_propagator(complex** prop, int n_src, int mode) {
+static void stoc_propagator(hr_complex** prop, int n_src, int mode) {
   int r, di, m;
  spinor_field *source,*sinks,*tmp;
 
@@ -487,7 +467,7 @@ static void stoc_propagator(complex** prop, int n_src, int mode) {
 * NB: Routine correct only for global L,T >= 4
 * 
 ******************************************************************************/
-static void hopping_propagator(complex** prop) {
+static void hopping_propagator(hr_complex** prop) {
   if (pars.hopping_order<0) return;
   
   int i, m;
@@ -514,7 +494,7 @@ static void hopping_propagator(complex** prop) {
 
     /* Generate exact sources (not noisy!) */
 
-    for(di = 0; di < GLB_X*GLB_Y*GLB_Z*GLB_T*sizeof(suNf_spinor)/sizeof(complex); di++) {
+    for(di = 0; di < GLB_X*GLB_Y*GLB_Z*GLB_T*sizeof(suNf_spinor)/sizeof(hr_complex); di++) {
     
       create_diluted_source(source,di,EXACT);
       for(m = 0; m < pars.n_masses; m++) {
@@ -618,7 +598,7 @@ static void create_diluted_source(spinor_field *source, int di, int dilution) {
 	  x[3]=(site/GLB_T/GLB_X/GLB_Y) % GLB_Z;
 	  spinor_field_zero_f(source);
 	  if(COORD[0]==x[0]/T && COORD[1]==x[1]/X && COORD[2]==x[2]/Y && COORD[3]==x[3]/Z)
-	    ((complex*)_FIELD_AT(source, ipt(x[0]%T, x[1]%X, x[2]%Y, x[3]%Z)))[component].re = 1.;
+	    ((hr_complex*)_FIELD_AT(source, ipt(x[0]%T, x[1]%X, x[2]%Y, x[3]%Z)))[component].re = 1.;
 	}
 }
 
@@ -853,7 +833,7 @@ static void create_sinks_QMR(spinor_field *source, spinor_field *sink, int mode)
 #endif /* QMR_INVERTER */
 
 
-static void add_source_sink_contraction(complex *out, spinor_field *source, spinor_field *sink, double z) {
+static void add_source_sink_contraction(hr_complex *out, spinor_field *source, spinor_field *sink, double z) {
   int i, j, t, x, index;
   suNf_vector *eta, *csi;
   complex tmp;

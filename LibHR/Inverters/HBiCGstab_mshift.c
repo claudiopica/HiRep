@@ -4,12 +4,7 @@
 \***************************************************************************/
 
 #include "inverters.h"
-#include "linear_algebra.h"
-#include "complex.h"
-#include "memory.h"
-#include "update.h"
-#include <stdlib.h>
-#include <stdio.h>
+#include "libhr_core.h"
 #include <math.h>
 
 #define _print_par(c) \

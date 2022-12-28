@@ -10,18 +10,14 @@
  * Write and read routines for archiving configurations
  *
  *******************************************************************************/
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
+// #include "libhr.h"
+#include "Core/global.h"
+#include "Geometry/communications.h"
+#include "Utils/boundary_conditions.h"
+#include "Utils/timing.h"
+#include "Observables/avr_plaquette.h"
+#include "Random/ranlux.h"
 #include "io.h"
-#include "error.h"
-#include "global.h"
-#include "logger.h"
-#include "observables.h"
-#include "communications.h"
-#include "utils.h"
-#include "ranlux.h"
 
 #if NG == 2 && !defined(WITH_QUATERNIONS)
 

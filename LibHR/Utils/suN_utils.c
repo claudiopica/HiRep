@@ -11,13 +11,11 @@
  *
  *******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
 #include "utils.h"
-#include "suN.h"
-#include "representation.h"
-#include "logger.h"
+#include "libhr_core.h"
+#include "error.h"
+#include "IO/logger.h"
+
 
 void vector_star(suNg_vector *v1, suNg_vector *v2)
 {

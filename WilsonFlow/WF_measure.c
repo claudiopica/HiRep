@@ -4,32 +4,8 @@
 *
 *******************************************************************************/
 
-#define MAIN_PROGRAM
-
-#include <stdlib.h>
-#include <stdio.h>
+#include "libhr.h"
 #include <string.h>
-#include <math.h>
-#include "io.h"
-#include "random.h"
-#include "error.h"
-#include "geometry.h"
-#include "memory.h"
-#include "statistics.h"
-#include "update.h"
-#include "global.h"
-#include "observables.h"
-#include "suN.h"
-#include "suN_types.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "representation.h"
-#include "utils.h"
-#include "logger.h"
-#include "random.h"
-#include "wilsonflow.h"
-#include "setup.h"
 
 typedef struct _input_WF_meas
 {

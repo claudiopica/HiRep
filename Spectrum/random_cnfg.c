@@ -6,30 +6,8 @@
  * 
  *******************************************************************************/
 
-#define MAIN_PROGRAM
-
-#include <stdlib.h>
-#include <stdio.h>
+#include "libhr.h"
 #include <string.h>
-#include <math.h>
-#include "io.h"
-#include "random.h"
-#include "error.h"
-#include "geometry.h"
-#include "memory.h"
-#include "statistics.h"
-#include "update.h"
-#include "global.h"
-#include "observables.h"
-#include "suN.h"
-#include "suN_types.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "representation.h"
-#include "utils.h"
-#include "logger.h"
-#include "moreio.h"
 
 #if defined(ROTATED_SF) && defined(BASIC_SF)
 #error This code does not work with the Schroedinger functional !!!
@@ -39,8 +17,8 @@
 #error This code does not work with the fermion twisting !!!
 #endif
 
-char input_filename[256] = "input_file";
-char output_filename[256] = "random_cnfg.out";
+char input_filename[255] = "input_file";
+char output_filename[255] = "random_cnfg.out";
 
 void read_cmdline(int argc, char *argv[])
 {
@@ -71,7 +49,6 @@ int main(int argc, char *argv[])
   setup_process(&argc, &argv);
 
   read_input(rlx_var.read, input_filename);
-  setup_replicas();
 
   /* logger setup */
   /* disable logger for MPI processes != 0 */
@@ -131,7 +108,7 @@ int main(int argc, char *argv[])
 #ifdef GAUGE_SON
         lprintf("IO", 20, "(%.2f) ", pu_gauge(ix, 0)->c[i * NG + j]);
 #else
-        lprintf("IO", 20, "(%.2f , %.2f) ", pu_gauge(ix, 0)->c[i * NG + j].re, pu_gauge(ix, 0)->c[i * NG + j].im);
+        lprintf("IO", 20, "(%.2f , %.2f) ", creal(pu_gauge(ix, 0)->c[i * NG + j]), cimag(pu_gauge(ix, 0)->c[i * NG + j]));
 #endif
       }
       lprintf("IO", 20, "]\n");

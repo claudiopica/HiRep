@@ -10,16 +10,8 @@
  */
 #ifdef WITH_GPU
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "gpu_info.h"
 #include "io.h"
-#include "global.h"
-#include "logger.h"
-#include "utils.h"
 #include "error.h"
-#include "geometry.h"
 #include "gpu.h"
 #ifdef WITH_MPI
   #include "mpi.h"
@@ -254,9 +246,5 @@ void print_hardware_info(cudaDeviceProp device_prop, input_gpu gpu_var_init)
   print_memory_info(device_prop, gpu_var_init);
   print_compute_info(device_prop, gpu_var_init);
 }
-
-#ifdef __cplusplus
-  }
-#endif
 
 #endif

@@ -3,19 +3,11 @@
 * All rights reserved.                                                      *
 \***************************************************************************/
 
-#include "global.h"
 #include "update.h"
-#include "suN.h"
-#include "utils.h"
-#include "dirac.h"
-#include "inverters.h"
-#include "rational_functions.h"
-#include "representation.h"
-#include "logger.h"
-#include "linear_algebra.h"
+#include "libhr_core.h"
 #include "memory.h"
-#include "clover_tools.h"
-#include "communications.h"
+#include "inverters.h"
+#include "io.h"
 
 spinor_field *Xs = NULL;
 spinor_field *Ys = NULL;

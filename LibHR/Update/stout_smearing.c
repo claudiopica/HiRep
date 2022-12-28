@@ -3,25 +3,10 @@
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
-#include "global.h"
-#include "representation.h"
-#include "utils.h"
-#include "spinor_field.h"
-#include "suN_repr_func.h"
-#include "random.h"
 #include "update.h"
-#include "random.h"
-#include "io.h"
-#include "utils.h"
-#include "suN.h"
+#include "libhr_core.h"
 #include "memory.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "logger.h"
-#include "communications.h"
+#include "io.h"
 
 // Smearing parameters
 static double rho_s = -0.2;

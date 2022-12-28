@@ -4,13 +4,11 @@
 \***************************************************************************/
 
 #include "inverters.h"
-#include "linear_algebra.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "global.h"
+#include "libhr_core.h"
+#include "random.h"
+#include "io.h"
 #include "memory.h"
-#include "logger.h"
+#include <math.h>
 #include <assert.h>
 
 /*

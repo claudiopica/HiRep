@@ -4,24 +4,18 @@
 \***************************************************************************/
 
 #include "inverters.h"
-#include "linear_algebra.h"
-#include "complex.h"
+#include "libhr_core.h"
+#include "random.h"
+#include "io.h"
 #include "memory.h"
-#include "update.h"
-#include "utils.h"
-#include "logger.h"
-#include "communications.h"
-#include "geometry_check.h"
-#include <stdlib.h>
-#include <stdio.h>
+#include "Utils/single_double_utils.h"
 #include <math.h>
 #include <assert.h>
 
 // Uncomment to use BiCGstab instead of MINRES (does not work with multishift!)
 //#define USE_BICGSTAB
 
-/* DA ELIMINARE */
-#include "observables.h"
+//TODO: why is this here?
 #undef NDEBUG
 
 

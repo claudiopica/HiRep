@@ -1,5 +1,5 @@
 #ifndef REWEIGHT_H
-#define REWERIGHT_H
+#define REWEIGHT_H
 
 typedef struct {
 	int hits;

@@ -4,23 +4,7 @@
 *
 *******************************************************************************/
 
-#define MAIN_PROGRAM
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include "io.h"
-#include "random.h"
-#include "error.h"
-#include "global.h"
-#include "suN.h"
-#include "suN_types.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "representation.h"
-#include "utils.h"
-
+#include "libhr.h"
 
 int main(int argc,char *argv[])
 {

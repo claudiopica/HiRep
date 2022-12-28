@@ -1,9 +1,8 @@
 #ifdef ROTATED_SF
-#include "global.h"
-#include "communications.h"
 #include "observables.h"
-#include "logger.h"
-#include <stdlib.h>
+#include "libhr_core.h"
+#include "io.h"
+
 
 chisf_mem * init_rotated_corr_mem(){
 

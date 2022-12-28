@@ -1,22 +1,6 @@
-#define MAIN_PROGRAM
-#include <stdlib.h>
-#include <stdio.h>
+#include "libhr.h"
 #include <string.h>
-#include <math.h>
-#include "io.h"
-#include "random.h"
-#include "error.h"
-#include "geometry.h"
-#include "memory.h"
-#include "update.h"
-#include "global.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "representation.h"
-#include "logger.h"
 #include "reweight.h"
-#include "setup.h"
 
 // Variables
 static char input_filename[64] = "input_file";

@@ -11,14 +11,9 @@
 *
 *******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "suN.h"
 #include "random.h"
-#include "utils.h"
+#include "libhr_core.h"
 
-extern void random_su2(double rho,double s[]);
 
 void gaussian_suNg_vector(suNg_vector *v)
 {

@@ -12,22 +12,12 @@
 
 #ifdef WITH_GPU
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "gpu.h"
-#include "io.h"
-#include "global.h"
-#include "utils.h"
-#include "error.h"
 #include "geometry.h"
-#include "gpu_info.h"
-#include "logger.h"
-#include "geometry_init.h"
-#ifdef WITH_MPI
-  #include "mpi.h"
-#endif
+#include "libhr_core.h"
+#include "io.h"
 
+//TODO: should these two be static?
+//otherwise move to header file
 void select_GPU(input_gpu);
 int enable_GPU_peer_to_peer_access();
 

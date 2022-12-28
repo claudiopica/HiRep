@@ -4,31 +4,8 @@
  *
  *******************************************************************************/
 
-#define MAIN_PROGRAM
-
-#include <stdlib.h>
-#include <stdio.h>
+#include "libhr.h"
 #include <string.h>
-#include <math.h>
-#include "io.h"
-#include "random.h"
-#include "error.h"
-#include "geometry.h"
-#include "memory.h"
-#include "statistics.h"
-#include "update.h"
-#include "global.h"
-#include "observables.h"
-#include "suN.h"
-#include "suN_types.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "representation.h"
-#include "utils.h"
-#include "logger.h"
-#include "communications.h"
-#include "print_compile_options.h"
 
 #if defined(ROTATED_SF) && defined(BASIC_SF)
 #error This code does not work with the Schroedinger functional !!!
@@ -62,8 +39,8 @@ typedef struct _input_mesons
 
 char cnfg_filename[256] = "";
 char list_filename[256] = "";
-char input_filename[256] = "input_file";
-char output_filename[256] = "mesons.out";
+char input_filename[255] = "input_file";
+char output_filename[255] = "mesons.out";
 enum
 {
   UNKNOWN_CNFG,
@@ -273,7 +250,6 @@ int main(int argc, char *argv[])
 
   read_input(glb_var.read, input_filename);
   read_input(rlx_var.read, input_filename);
-  setup_replicas();
 
   /* logger setup */
   /* disable logger for MPI processes != 0 */

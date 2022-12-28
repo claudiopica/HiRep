@@ -3,25 +3,13 @@
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
-#include "global.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "suN.h"
 #include "observables.h"
-#include "dirac.h"
-#include "utils.h"
+#include "libhr_core.h"
 #include "memory.h"
-#include "update.h"
-#include "error.h"
-#include <stdlib.h>
-#include <math.h>
-#include <assert.h>
-#include "logger.h"
 #include "io.h"
+#include "Inverters/linear_algebra.h"
 #include "random.h"
-#include "communications.h"
-#include "ranlux.h"
-#include "meson_observables.h"
+#include "Update/dirac.h"
 
 /*#define POINT_TO_ALL*/
 

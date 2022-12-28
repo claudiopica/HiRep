@@ -19,14 +19,12 @@ Doc/doxygen/build
 HMC/*
 PureGauge/*
 GaugeFix/*
-TestProgram/*
 Spectrum/*
 Disconnected/*
 ModeNumber/*
 Scattering/*
 RenormalizationFactors/*
 Converter/*
-Include/*
 WilsonFlow/*
 Fortran/*
 Reweight/*
@@ -45,13 +43,11 @@ TestProgram/*/*
 !**/*.pl
 
 #Auto-generated files
-Include/.autoheaders.h
-Include/macro_opt.h
-Include/cinfo.h
-Include/suN.h
-Include/suN_types.h
-Include/suN_repr_func.h
-Include/gpu_geometry.h
+LibHR/Utils/cinfo.h
+Include/Core/suN.h
+Include/Core/suN_types.h
+Include/Core/suN_repr_func.h
+Include/Geometry/gpu_geometry.h
 Make/Utils/autosun/writeREPR
 LibHR/Update/approx_data.db
 LibHR/Utils/suN_exp.c

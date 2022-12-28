@@ -1,11 +1,9 @@
-
-#include <stdlib.h>
-#include "global.h"
-#include "geometry.h"
-#include "suN.h"
+#include "observables.h"
+#include "libhr_core.h"
 #include "utils.h"
-#include "glueballs.h"
+#include "io.h"
 #include <string.h>
+
 #define ntors 57
 static hr_complex *tor_path_storage=NULL;
 static hr_complex poly0(int in)

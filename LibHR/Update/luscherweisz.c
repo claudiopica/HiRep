@@ -47,20 +47,12 @@ Test functions:
 
 */
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include "global.h"
-#include "communications.h"
-#include "memory.h"
 #include "update.h"
-#include "suN.h"
+#include "libhr_core.h"
+#include "memory.h"
+#include "io.h"
+#include <string.h>
 #include "utils.h"
-#include "representation.h"
-#include "logger.h"
-#include "observables.h"
-#include "random.h"
 
 #define COMM (1 == 1)
 #define NOCOMM (1 == 0)

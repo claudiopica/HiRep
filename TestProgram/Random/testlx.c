@@ -12,14 +12,8 @@
  * This program checks that ranlxs and ranlxd work correctly
  *
  *******************************************************************************/
-#define MAIN_PROGRAM
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "../Include/global.h"
-#include "../Include/ranlux.h"
-#include "../Include/hr_omp.h"
-#include "../Include/logger.h"
+
+#include "libhr.h"
 
 #define NXS 204
 #define NXD 99

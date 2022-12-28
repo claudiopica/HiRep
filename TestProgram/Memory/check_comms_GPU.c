@@ -8,6 +8,7 @@
 *
 *******************************************************************************/
 
+<<<<<<< HEAD
 #define MAIN_PROGRAM
 
 #ifdef WITH_GPU
@@ -27,6 +28,9 @@
 #include "hr_complex.h"
 #include "communications.h"
 #include "test_utils.h"
+=======
+#include "libhr.h"
+>>>>>>> remotes/upstream/HiRep-CUDA
 
 int test_comms_spinor_field_f();
 int test_comms_spinor_field_f_flt();

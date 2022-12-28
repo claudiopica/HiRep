@@ -75,19 +75,13 @@
 *
 *******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "error.h"
-#include "update.h"
-#include "hr_complex.h"
-#include "linear_algebra.h"
 #include "inverters.h"
-#include "logger.h"
-#include "suN.h"
+#include "libhr_core.h"
+#include "random.h"
+#include "io.h"
 #include "memory.h"
-#include "global.h"
-#include "dirac.h"
+#include "Utils/boundary_conditions.h"
+#include <math.h>
 
 #define GAMMA 3.0
 #define MAX_ROTATE 1000 /*50*/

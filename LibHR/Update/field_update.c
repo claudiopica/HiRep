@@ -3,13 +3,10 @@
  * All rights reserved.                                                      *
  \***************************************************************************/
 
-#include "global.h"
-#include "suN.h"
-#include "utils.h"
 #include "update.h"
-#include "representation.h"
-#include "logger.h"
-#include "communications.h"
+#include "libhr_core.h"
+#include "utils.h"
+
 
 // Project gauge field every 2^_PROJ_BIT changes
 static unsigned int count = 0;

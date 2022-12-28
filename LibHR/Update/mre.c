@@ -7,12 +7,10 @@
  ***************************************************************************/
 
 #include "update.h"
-#include "linear_algebra.h"
+#include "libhr_core.h"
 #include "memory.h"
-#include "global.h"
-#include "dirac.h"
-#include "logger.h"
-#include <math.h>
+#include "io.h"
+#include "Inverters/linear_algebra.h"
 
 //#define cabs(a) sqrt(_complex_prod_re(a,a))
 #define MAX 15
@@ -29,7 +27,7 @@ static hr_complex x[MAX];
 static hr_complex y[MAX];
 static int mutate[MAX];
 
-void gram_schmidt(mre_par *par, int p, int max)
+static void gram_schmidt(mre_par *par, int p, int max)
 {
 	hr_complex rij;
 	double rii;
@@ -54,7 +52,7 @@ void gram_schmidt(mre_par *par, int p, int max)
 	}
 }
 
-void lu_solve(int max)
+static void lu_solve(int max)
 {
 	double big;
 	int row;
@@ -145,7 +143,9 @@ void lu_solve(int max)
 	}
 }
 
-int factorial(int k)
+#if 0
+//these are not used anymore
+static int factorial(int k)
 {
 	int f = 1;
 	for (; k > 1; k--)
@@ -153,13 +153,14 @@ int factorial(int k)
 	return f;
 }
 
-int coefficient(int k, int n)
+static int coefficient(int k, int n)
 {
 	int c = factorial(n) / (factorial(k) * factorial(n - k));
 	if ((k - 1) % 2)
 		c = -c;
 	return c;
 }
+#endif
 
 void mre_init(mre_par *par, int max, double prec)
 {

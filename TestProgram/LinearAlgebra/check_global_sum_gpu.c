@@ -6,11 +6,7 @@
 *
 ******************************************************************************/
 
-#define MAIN_PROGRAM
-
-#include "global.h"
-#include "linear_algebra.h"
-#include "hr_complex.h"
+#include "libhr.h"
 
 int reference_int(const int* vector, const int size){
   int res = 0;

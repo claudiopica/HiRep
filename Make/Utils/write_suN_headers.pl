@@ -122,6 +122,10 @@ sub write_prolog_suN {
 
 #include "suN_types.h"
 
+#ifdef __cplusplus
+  extern "C" {
+#endif
+
 END
 }
 
@@ -140,11 +144,19 @@ sub write_prolog_suN_types {
 
 #include "hr_complex.h"
 
+#ifdef __cplusplus
+  extern "C" {
+#endif
+
 END
 }
 
 sub write_epilog {
   print <<END
+
+#ifdef __cplusplus
+  }
+#endif
 
 #endif
 END

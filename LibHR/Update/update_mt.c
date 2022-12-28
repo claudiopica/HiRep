@@ -3,22 +3,13 @@
  * All rights reserved.                                                      *
 \***************************************************************************/
 
-#include "global.h"
-#include "suN.h"
-#include "utils.h"
 #include "update.h"
+#include "libhr_core.h"
 #include "memory.h"
+#include "io.h"
+#include "utils.h"
 #include "random.h"
-#include "dirac.h"
-#include "representation.h"
-#include "linear_algebra.h"
-#include "monomials.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "logger.h"
-#include "communications.h"
-#include "observables.h"
+#include "Inverters/scalarfield_operations.h"
 
 /* State quantities for HMC */
 static suNg_field *u_gauge_old = NULL;
@@ -381,7 +372,7 @@ int reverse_update_ghmc()
 
 #ifdef MEASURE_FORCEHMC
 /*Functions to check forces */
-void corret_pf_dist_hmc()
+void correct_pf_dist_hmc()
 {
   /* init monomials */
   for (int i = 0; i < num_mon(); ++i)

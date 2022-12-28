@@ -7,7 +7,7 @@
 #define HMC_UTILS_H
 
 #include "update.h"
-#include "input_par.h"
+#include "IO/input_par.h"
 
 /* HMC variables */
 typedef struct _input_hmc

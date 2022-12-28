@@ -4,29 +4,8 @@
 *
 *******************************************************************************/
 
-#define MAIN_PROGRAM
+#include "libhr.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <string.h>
-#include <math.h>
-#include "io.h"
-#include "ranlux.h"
-#include "geometry.h"
-#include "update.h"
-#include "global.h"
-#include "observables.h"
-#include "dirac.h"
-#include "logger.h"
-#include "memory.h"
-#include "communications.h"
-#include "observables.h"
-#include "utils.h"
-#include "setup.h"
-#include "random.h"
-#include "suN.h"
-#include "linear_algebra.h"
 
 #define _print_mat(a) lprintf("TEST",1,"(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n(%3.5f,%3.5f,%3.5f)\n",creal((a).c[0]),creal((a).c[1]),creal((a).c[2]),creal((a).c[3]),creal((a).c[4]),creal((a).c[5]),creal((a).c[6]),creal((a).c[7]),creal((a).c[8]), \
   cimag((a).c[0]), cimag((a).c[1]), cimag((a).c[2]), cimag((a).c[3]), cimag((a).c[4]), cimag((a).c[5]), cimag((a).c[6]), cimag((a).c[7]), cimag((a).c[8]))

@@ -32,13 +32,12 @@
 
 #ifdef WITH_GPU
 //This file should not be compiled if !WITH_GPU
-#include "reduction.h"
-#include "logger.h"
-#include "global.h"
+
+#include "inverters.h"
+#include "libhr_core.h"
 
 #define GSUM_BLOCK_SIZE 256     // No more than 1024 on Tesla
 #define BLOCK_SIZE_REM 64
-
 
 /************************************************************************************************/
 /************************************************************************************************/
@@ -257,7 +256,7 @@ void reduce(int size, int threads, int blocks, T *d_idata, T *d_odata) {
   } else {
     switch (threads) {
       case 1024:
-        reduce7<T, 1024, true><<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
+        reduce7<T, 1024, false><<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
         break;
       case 512:
         reduce7<T, 512, false><<<dimGrid, dimBlock, smemSize>>>(d_idata, d_odata, size);
@@ -295,7 +294,7 @@ void reduce(int size, int threads, int blocks, T *d_idata, T *d_odata) {
 
 template <class T>
 T global_sum_gpu(T *vector, int size) {
-  const int threads = 32;
+  int threads = 1024; while (size<threads) { threads /= 2; }
   // Blocks calculation from Nvidia reduction sample, see subroutine getNumBlocksAndThreads()
   const int blocks = (size + (threads * 2 - 1)) / (threads * 2);
   T res = 0;
@@ -311,27 +310,6 @@ T global_sum_gpu(T *vector, int size) {
   for (int i = 0; i < blocks; i++) {
     res += vector_host[i];
   }
-
-  // Reduction over MPI threads
-#ifdef WITH_MPI
-    int number_of_mpi_threads = 2; 
-    double pres[number_of_mpi_threads];
-    T* d = &res;
-    int mpiret = MPI_Allreduce(d, pres, number_of_mpi_threads, MPI_DOUBLE, MPI_SUM, GLB_COMM);
-#ifndef NDEBUG
-    if (mpiret != MPI_SUCCESS) {
-      char mesg[MPI_MAX_ERROR_STRING];
-      int mesglen;
-      MPI_Error_string(mpiret, mesg, &mesglen);
-      lprintf("MPI", 0, "ERROR: %s\n", mesg);
-      error(1, 1, "global_sum_gpu " __FILE__, ": Cannot perform global_sum_gpu");
-    }
-#endif
-    while (number_of_mpi_threads > 0) {
-      --number_of_mpi_threads;
-      d[number_of_mpi_threads] = pres[number_of_mpi_threads];
-    }
-#endif
 
   // free and return
   free(vector_host);

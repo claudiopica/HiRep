@@ -4,22 +4,8 @@
 *
 ******************************************************************************/
 
-#define MAIN_PROGRAM
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
+#include "libhr.h"
 #include <time.h>
-#include "global.h"
-#include "io.h"
-#include "error.h"
-#include "observables.h"
-#include "logger.h"
-#include "random.h"
-#include "communications.h"
-#include "setup.h"
-#include "clover_tools.h"
 
 //#error "Old version of Mesons, it should be updated"
 

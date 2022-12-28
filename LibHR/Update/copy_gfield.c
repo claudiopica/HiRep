@@ -3,9 +3,9 @@
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
-#include <string.h>
-#include "spinor_field.h"
 #include "update.h"
+#include "libhr_core.h"
+#include <string.h>
 
 /* g1=g2 */
 void suNg_field_copy(suNg_field *g1, suNg_field *g2)

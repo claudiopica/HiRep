@@ -2,30 +2,8 @@
 
 *
 *******************************************************************************/
-
-#define MAIN_PROGRAM
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <getopt.h>
-#include <math.h>
-#include "io.h"
-#include "ranlux.h"
-#include "geometry.h"
-#include "update.h"
-#include "global.h"
-#include "observables.h"
-#include "dirac.h"
-#include "logger.h"
 #include "check_integrator_1.h"
-#include "memory.h"
-#include "communications.h"
-#include "observables.h"
-#include "utils.h"
-#include "spectrum.h"
-#include "setup.h"
-#include "linear_algebra.h"
+
 #define SCALING_RANGE 20
 
 /* flow control variable */

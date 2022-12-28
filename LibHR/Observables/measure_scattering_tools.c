@@ -1,18 +1,12 @@
-#include <string.h>
-#include "utils.h"
-#include "suN.h"
-#include "memory.h"
-#include "io.h"
-#include "logger.h"
-#include "global.h"
-#include "meson_observables.h"
 #include "observables.h"
-#include "scattering.h"
+#include "libhr_core.h"
+#include "io.h"
+#include "memory.h"
+#include "utils.h"
 #include "random.h"
-#include "spinor_field.h"
-#include <communications.h>
-#include "linear_algebra.h"
-#include "hr_complex.h"
+#include <string.h>
+#include "Inverters/linear_algebra.h"
+
 /**
  *
  * @file scatter_functions.h

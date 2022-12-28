@@ -1,18 +1,8 @@
 /* Exponential of a SU(N) matrix using the Caley Hamilton or Taylor representation */
 /* arXiv:1006.4518 [hep-lat] */
 
-#include "global.h"
-#include "geometry.h"
-#include "suN.h"
-#include "suN_repr_func.h"
-#include "memory.h"
-#include "global.h"
-#include "logger.h"
-#include "update.h"
 #include "utils.h"
-#include "communications.h"
-#include <math.h>
-#include <string.h>
+#include "libhr_core.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338327
@@ -332,22 +322,20 @@ void suNg_Exp_Taylor(suNg *u, suNg *Xin)
   }
 }
 
-inline void suNg_Exp(suNg *u, suNg *Xin)
-{
+void (*suNg_Exp)(suNg *u, suNg *Xin) =
 #if (NG == 2)
-  suNg_Exp_NG2(u, Xin);
+  suNg_Exp_NG2;
 #elif (NG == 3)
-  suNg_Exp_NG3(u, Xin);
+  suNg_Exp_NG3;
 #elif (NG == 4)
-  suNg_Exp_NG4(u, Xin);
+  suNg_Exp_NG4;
 #elif (NG == 5)
-  suNg_Exp_NG5(u, Xin);
+  suNg_Exp_NG5;
 #elif (NG == 6)
-  suNg_Exp_NG6(u, Xin);
+  suNg_Exp_NG6;
 #else
-  suNg_Exp_Taylor(u, Xin);
+  suNg_Exp_Taylor;
 #endif
-}
 
 #ifdef GAUGE_SON
 void ExpX(double dt, suNg_algebra_vector *h, suNg *r)

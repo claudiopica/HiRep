@@ -3,24 +3,11 @@
 * Check that the GPU reading and writing functions defined in suN.h 
 * are bijective.
 *
+* NOCOMPILE = !WITH_GPU
+* 
 *******************************************************************************/
 
-#define MAIN_PROGRAM
-
-#include "suN.h"
-#include "suN_types.h"
-#include "setup.h"
-#include "global.h"
-#include "linear_algebra.h"
-#include "logger.h"
-#include "random.h"
-#include "memory.h"
-#include "update.h"
-#include "geometry.h"
-#include "gpu_geometry.h"
-#include "test_utils.h"
-#include <stdio.h>
-#include "hr_complex.h"
+#include "libhr.h"
 
 // TODO: get gaussian spinor fields to work with MPI-CUDA
 // TODO: &glat_even, &glat_odd

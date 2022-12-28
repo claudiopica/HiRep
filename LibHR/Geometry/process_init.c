@@ -11,29 +11,18 @@
  *
  *******************************************************************************/
 
-#include "global.h"
-#include "error.h"
-#include "logger.h"
-#include "hr_omp.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <getopt.h>
-#include "utils.h"
-#include "io.h"
-#include "random.h"
 #include "geometry.h"
-#include "geometry_init.h"
-#include "setup.h"
+#include "libhr_core.h"
 #include "memory.h"
-#include "representation.h"
-#include "clover_tools.h"
-#include "clover_exp.h"
-#ifdef WITH_GPU
-  #include "gpu.h"
-#endif 
-#include "print_compile_options.h"
+#include "io.h"
+#include "utils.h"
+#include "random.h"
+#include "update.h"
+#include <stdlib.h>
+#include <getopt.h>
+#include <string.h>
+#include <unistd.h>
+
 
 /* setup_process
  * Assign a unique RID, PID to each process and setup

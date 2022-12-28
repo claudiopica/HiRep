@@ -3,17 +3,7 @@
  * All rights reserved.                                                      * 
  \***************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "suN.h"
-#include "io.h"
-#include "error.h"
-#include "global.h"
-#include "logger.h"
-#include "communications.h"
-#include "moreio.h"
-#include "utils.h"
+#include "libhr.h"
 
 void read_gauge_field_ascii(char filename[])
 {

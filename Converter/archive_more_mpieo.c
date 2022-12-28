@@ -3,20 +3,7 @@
  * All rights reserved.                                                      * 
  \***************************************************************************/
 
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "io.h"
-#include "error.h"
-#include "global.h"
-#include "logger.h"
-#include "communications.h"
-#include "moreio.h"
-#include "observables.h"
-#include "utils.h"
-#include "ranlux.h"
-
+#include "libhr.h"
 
 void write_gauge_field_mpieo_BE(char filename[]) 
 {

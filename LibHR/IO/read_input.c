@@ -4,13 +4,9 @@
  \***************************************************************************/
 
 #include "io.h"
-#include "error.h"
 #include "global.h"
-#include "logger.h"
-#include <memory.h>
 #include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
+
 
 static void mpi_broadcast_parameters(input_record_t crec[]) {
 #ifdef WITH_MPI

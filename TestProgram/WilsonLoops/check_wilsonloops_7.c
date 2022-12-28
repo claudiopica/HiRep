@@ -5,25 +5,7 @@
 *
 *******************************************************************************/
 
-#define MAIN_PROGRAM
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include "io.h"
-#include "geometry.h"
-#include "global.h"
-#include "logger.h"
-#include "random.h"
-#include "memory.h"
-#include "linear_algebra.h"
-#include "communications.h"
-#include "observables.h"
-#include "error.h"
-#include "utils.h"
-#include "setup.h"
-
+#include "libhr.h"
 
 static void random_g(suNg_field* g) {
   //   _DECLARE_INT_ITERATOR(ix);
@@ -45,19 +27,6 @@ static void transform_u(suNg_field* out, suNg_field* in, suNg_field* g) {
       }
    }
 }
-
-
-extern struct {
-  int c[3];
-  int* path;
-  int length;
-  int** perm;
-  int nperms;
-  int nsteps;
-} WL_path[256];
-extern int WL_npaths;
-extern int WL_max_nsteps;
-
 
 
 int main(int argc,char *argv[])

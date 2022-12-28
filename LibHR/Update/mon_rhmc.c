@@ -3,16 +3,11 @@
  * All rights reserved.                                                   *
  \***************************************************************************/
 
-#include "global.h"
 #include "update.h"
-#include "logger.h"
+#include "libhr_core.h"
 #include "memory.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "rational_functions.h"
-#include "clover_tools.h"
-#include <stdlib.h>
+#include "random.h"
+#include "Inverters/linear_algebra.h"
 
 static spinor_field *tmp_pf = NULL;
 static rational_app r_APP = {0};  /* used for computing HB and MT for RHMC monomials */
@@ -30,7 +25,7 @@ static void reduce_fraction(int *a, int *b)
 	if (*b!=0 && f!=1){ *a/=f; *b/=f; }
 }
 
-void rhmc_gaussian_pf(const struct _monomial *m)
+static void rhmc_gaussian_pf(const struct _monomial *m)
 {
 	mon_rhmc_par *par = (mon_rhmc_par*)(m->data.par);
 	gaussian_spinor_field(par->pf);
@@ -42,7 +37,7 @@ void rhmc_gaussian_pf(const struct _monomial *m)
 	r_app_set(&(par->ratio), minev, maxev);
 }
 
-void rhmc_correct_pf(const struct _monomial *m)
+static void rhmc_correct_pf(const struct _monomial *m)
 {
 	mon_rhmc_par *par = (mon_rhmc_par*)(m->data.par);
 
@@ -58,7 +53,7 @@ void rhmc_correct_pf(const struct _monomial *m)
 	rational_func(&r_APP, &H2, par->pf, par->pf);
 }
 
-void rhmc_correct_la_pf(const struct _monomial *m)
+static void rhmc_correct_la_pf(const struct _monomial *m)
 {
 	mon_rhmc_par *par = (mon_rhmc_par*)(m->data.par);
 
@@ -74,13 +69,13 @@ void rhmc_correct_la_pf(const struct _monomial *m)
 	rational_func(&r_APP, &H2, par->pf, par->pf);
 }
 
-const spinor_field* rhmc_pseudofermion(const struct _monomial *m)
+static const spinor_field* rhmc_pseudofermion(const struct _monomial *m)
 {
 	mon_rhmc_par *par = (mon_rhmc_par*)(m->data.par);
 	return par->pf;
 }
 
-void rhmc_add_local_action(const struct _monomial *m, scalar_field *loc_action)
+static void rhmc_add_local_action(const struct _monomial *m, scalar_field *loc_action)
 {
 	mon_rhmc_par *par = (mon_rhmc_par*)(m->data.par);
 	pf_local_action(loc_action, par->pf);
@@ -91,8 +86,7 @@ void rhmc_add_local_action(const struct _monomial *m, scalar_field *loc_action)
 #endif
 }
 
-
-void rhmc_free(struct _monomial *m)
+static void rhmc_free(struct _monomial *m)
 {
 	mon_rhmc_par *par = (mon_rhmc_par*)m->data.par;
 

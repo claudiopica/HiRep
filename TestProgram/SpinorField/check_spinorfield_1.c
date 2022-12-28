@@ -9,26 +9,7 @@
  *
  ******************************************************************************/
 
-#define MAIN_PROGRAM
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "suN.h"
-#include "random.h"
-#include "error.h"
-#include "geometry.h"
-#include "memory.h"
-#include "update.h"
-#include "linear_algebra.h"
-#include "representation.h"
-#include "global.h"
-#include "logger.h"
-#include "utils.h"
-#include "io.h"
-#include "setup.h"
-
-#include "communications.h"
+#include "libhr.h"
 
 #define MAX_ROTATE 50
 

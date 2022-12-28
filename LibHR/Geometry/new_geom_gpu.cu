@@ -1,10 +1,5 @@
-#include "suN.h"
-#include "suN_types.h"
-#include "spinor_field.h"
-#include "gpu.h"
-#include "global.h"
-#include "new_geometry.h"
-#include "global_gpu.h"
+#include "geometry.h"
+#include "libhr_core.h"
 
 #include "./new_geom_gpu.hpp"
 

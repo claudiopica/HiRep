@@ -17,7 +17,7 @@
 #ifdef AMALLOC_MEASURE
 
 #include <string.h>
-#include "logger.h"
+#include "IO/logger.h"
 
 typedef struct
 {

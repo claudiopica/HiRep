@@ -9,35 +9,8 @@
 *
 ******************************************************************************/
 
-#define MAIN_PROGRAM
-
-#include <stdlib.h>
-#include <stdio.h>
+#include "libhr.h"
 #include <string.h>
-#include <math.h>
-#include "io.h"
-#include "random.h"
-#include "error.h"
-#include "geometry.h"
-#include "memory.h"
-#include "statistics.h"
-#include "update.h"
-#include "global.h"
-#include "observables.h"
-#include "suN.h"
-#include "suN_types.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "representation.h"
-#include "utils.h"
-#include "logger.h"
-#include "setup.h"
-#include "spectrum.h"
-#include "clover_tools.h"
-#include "disconnected.h"
-#include "communications.h"
-#include "data_storage.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338327950288419716939937510

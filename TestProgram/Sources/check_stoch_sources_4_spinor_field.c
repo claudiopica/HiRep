@@ -1,6 +1,5 @@
 /******************************************************************************
 *
-*
 * File check_sources.c
 *
 * Checks of the stochastic sources with 4 spinor fields
@@ -9,22 +8,7 @@
 *
 ******************************************************************************/
 
-#define MAIN_PROGRAM
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include "communications.h"
-#include "io.h"
-#include "memory.h"
-#include "global.h"
-#include "observables.h"
-#include "disconnected.h"
-#include "utils.h"
-#include "setup.h"
-#include "linear_algebra.h"
-#include "logger.h"
+#include "libhr.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338327950288419716939937510
@@ -79,7 +63,7 @@ static hr_complex is_eo(int t, int x, int y, int z, int eo)
     return 0.;
 }
 
-static hr_complex average(hr_complex a[], int n)
+static hr_complex average_complex(hr_complex a[], int n)
 {
 
   hr_complex sum;
@@ -94,7 +78,7 @@ static hr_complex average(hr_complex a[], int n)
 static hr_complex sd(hr_complex a[], int n)
 {
   hr_complex mean;
-  mean = average(a, n);
+  mean = average_complex(a, n);
 
   hr_complex sum = 0;
   for (int l = 0; l < n; l++)
@@ -292,7 +276,7 @@ int main(int argc, char *argv[])
       counter += 1;
     } //loop nhits
 
-    av_ = average(tmp_vec, mes_ip.nhits);
+    av_ = average_complex(tmp_vec, mes_ip.nhits);
     sd_ = sd(tmp_vec, mes_ip.nhits);
 
     if (test_passed(creal(av_), creal(sd_)) == 1 || test_passed(cimag(av_), cimag(sd_)) == 1)
@@ -336,7 +320,7 @@ int main(int argc, char *argv[])
       counter += 1;
     } //loop nhits
 
-    av_ = average(tmp_vec, mes_ip.nhits);
+    av_ = average_complex(tmp_vec, mes_ip.nhits);
     sd_ = sd(tmp_vec, mes_ip.nhits);
 
     if (test_passed(creal(av_), creal(sd_)) == 1 || test_passed(cimag(av_), cimag(sd_)) == 1)
@@ -382,7 +366,7 @@ int main(int argc, char *argv[])
         counter += 1;
       } //loop nhits
 
-      av_ = average(tmp_vec, mes_ip.nhits);
+      av_ = average_complex(tmp_vec, mes_ip.nhits);
       sd_ = sd(tmp_vec, mes_ip.nhits);
 
       if (test_passed(creal(av_), creal(sd_)) == 1 || test_passed(cimag(av_), cimag(sd_)) == 1)

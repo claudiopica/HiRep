@@ -8,20 +8,7 @@
 *
 *******************************************************************************/
 
-#define MAIN_PROGRAM
-
-#include "suN.h"
-#include "suN_types.h"
-#include "setup.h"
-#include "global.h"
-#include "linear_algebra.h"
-#include "test_utils.h"
-#include "logger.h"
-#include "random.h"
-#include "memory.h"
-#include "update.h"
-#include "geometry.h"
-#include <math.h>
+#include "libhr.h"
 
 // TODO: This test relies on too many high level things.
 //       I am not sure, we can run such a test at all.
@@ -336,8 +323,8 @@ int test_spinor_field_allocation()
     }
     lprintf("RESULT", 0, "[Square norm (should be any finite value) %0.2e]\n", sqnorm);
 
-    free_spinor_field_f(f);
-    return return_val;*/
+    free_spinor_field_f(f); */
+    return return_val;
 }
 
 int test_spinor_field_flt_allocation() 

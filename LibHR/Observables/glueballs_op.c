@@ -1,11 +1,10 @@
 
-#include <stdlib.h>
-#include "global.h"
-#include "geometry.h"
-#include "suN.h"
+#include "observables.h"
+#include "libhr_core.h"
+#include "io.h"
 #include "utils.h"
-#include "glueballs.h"
 #include <string.h>
+
 #define npaths 17
 static double PI=3.141592653589793238462643383279502884197;
 static hr_complex *mom_def_Cp_tr_paths=NULL;
@@ -14,11 +13,11 @@ static hr_complex *path_storage=NULL;
 int ** direct_spatial_rotations(){
 int i;
 int ** res=malloc(sizeof(int *)*48);
- int *res1=malloc(sizeof(int *)*48*4);
- for (i=0;i<48;i++)
- res[i]=res1+4*i;
- 
- res1[0]=0;
+int *res1=malloc(sizeof(int *)*48*4);
+for (i=0;i<48;i++)
+res[i]=res1+4*i;
+
+res1[0]=0;
 res1[1]=1;
 res1[2]=2;
 res1[3]=3;

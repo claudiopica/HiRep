@@ -1,10 +1,5 @@
-#include <stdlib.h>
-#include "geometry.h"
-#include "global.h" 
-#include "error.h"
-#include "logger.h"
 #include "inverters.h" 
-#include "linear_algebra.h"
+#include "libhr_core.h"
 #include "memory.h"
 
 void SAP_prec(int nu, inverter_ptr inv, mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out)

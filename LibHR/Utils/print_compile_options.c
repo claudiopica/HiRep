@@ -1,8 +1,7 @@
-#include "print_compile_options.h"
+#include "Utils/print_compile_options.h"
 #include "cinfo.h"
-
+#include "IO/logger.h"
 #include <stdio.h>
-#include "logger.h"
 
 void print_compiling_info() {
   printf("MACROS\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@\n");

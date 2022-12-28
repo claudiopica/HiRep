@@ -9,29 +9,9 @@
 *
 *******************************************************************************/
 
-#define MAIN_PROGRAM
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <getopt.h>
-#include <math.h>
-#include "io.h"
-#include "ranlux.h"
-#include "geometry.h"
-#include "update.h"
-#include "global.h"
-#include "observables.h"
-#include "dirac.h"
-#include "logger.h"
+#include "libhr.h"
 #include "hmc_utils.h"
-#include "memory.h"
-#include "communications.h"
-#include "observables.h"
-#include "utils.h"
-#include "spectrum.h"
-#include "setup.h"
-#include "data_storage.h"
+#include <string.h>
 
 /* Mesons parameters */
 typedef struct _input_mesons

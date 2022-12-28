@@ -4,31 +4,13 @@
 *                                                                           *
 \***************************************************************************/
 
-#include "global.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "suN.h"
 #include "observables.h"
-#include "dirac.h"
-#include "utils.h"
-#include "memory.h"
-#include "update.h"
-#include "error.h"
-#include <stdlib.h>
-#include <math.h>
-#include <assert.h>
-#include "logger.h"
+#include "libhr_core.h"
 #include "io.h"
-#include "random.h"
-#include "communications.h"
-#include "ranlux.h"
-
-//Utility functions from scalarfield_operations.c
-void spinor_sigma_rho_minus_div_assign(spinor_field *out,scalar_field *sigma,double rho, spinor_field *in);
-void spinor_pi_div_assign(spinor_field *out,scalar_field *pi, spinor_field *in);
-void spinor_sigma_pi_rho_div_assign(spinor_field *out,scalar_field *sigma,scalar_field *pi,double rho, spinor_field *in);
-void spinor_sigma_pi_dagger_rho_div_assign(spinor_field *out,scalar_field *sigma,scalar_field *pi,double rho, spinor_field *in);
-
+#include "memory.h"
+#include "utils.h"
+#include "inverters.h"
+#include "update.h"
 
 #define PI 3.141592653589793238462643383279502884197
 

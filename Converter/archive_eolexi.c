@@ -3,18 +3,7 @@
  * All rights reserved.                                                      * 
  \***************************************************************************/
 
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "io.h"
-#include "error.h"
-#include "global.h"
-#include "logger.h"
-#include "communications.h"
-#include "moreio.h"
-#include "observables.h"
-
+#include "libhr.h"
 
 static int index_eolexi(int x0,int x1,int x2,int x3)
 {

@@ -1,10 +1,7 @@
 #ifdef WITH_GPU
 
-#include "error.h"
-#include "suN.h"
-#include "spinor_field.h"
-#include "gpu.h"
 #include "memory.h"
+#include "gpu.h"
 
 //TODO: inline comments
 //TODO: doxygen docstrings

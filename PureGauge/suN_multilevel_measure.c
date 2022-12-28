@@ -9,29 +9,10 @@
 *
 *******************************************************************************/
 
-#define MAIN_PROGRAM
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <string.h>
-#include <math.h>
-#include "io.h"
-#include "ranlux.h"
-#include "geometry.h"
-#include "update.h"
-#include "global.h"
-#include "observables.h"
-#include "dirac.h"
-#include "logger.h"
-#include "memory.h"
-#include "communications.h"
-#include "observables.h"
-#include "utils.h"
 #include "suN_utils_multilevel.h"
-#include "setup.h"
-#include "glueballs.h"
-#include "wilsonflow.h"
+#include "libhr.h"
+#include <string.h>
+#include <ctype.h>
 
 pg_flow_ml_measure flow = init_pg_flow_ml_measure(flow);
 

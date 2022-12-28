@@ -1,27 +1,10 @@
-#define MAIN_PROGRAM
+/*
+ * NOCOMPILE = ROTATED_SF || BASIC_SF || FERMION_THETA
+ */  
 
-#include <stdlib.h>
-#include <stdio.h>
+#include "libhr.h"
+#include "modenumber.h"
 #include <string.h>
-#include <math.h>
-#include "io.h"
-#include "random.h"
-#include "error.h"
-#include "geometry.h"
-#include "memory.h"
-#include "statistics.h"
-#include "update.h"
-#include "global.h"
-#include "observables.h"
-#include "suN.h"
-#include "suN_types.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "representation.h"
-#include "utils.h"
-#include "logger.h"
-#include "print_compile_options.h"
 
 #if defined(ROTATED_SF) && defined(BASIC_SF)
 #error This code does not work with the Schroedinger functional !!!
@@ -209,7 +192,6 @@ int main(int argc, char *argv[])
   setup_process(&argc, &argv);
 
   read_input(glb_var.read, input_filename);
-  setup_replicas();
 
   /* logger setup */
   /* disable logger for MPI processes != 0 */

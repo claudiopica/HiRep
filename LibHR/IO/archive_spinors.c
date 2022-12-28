@@ -10,21 +10,15 @@
  * Write and read routines for archiving configurations
  *
  *******************************************************************************/
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "io.h"
-#include "error.h"
+// #include "libhr.h"
 #include "global.h"
-#include "logger.h"
-#include "observables.h"
-#include "communications.h"
-#include "utils.h"
-#include "ranlux.h"
-#include "moreio.h"
-#include "linear_algebra.h"
-#include "spinor_field.h"
+#include "Geometry/communications.h"
+#include "Utils/boundary_conditions.h"
+#include "Utils/timing.h"
+#include "Observables/avr_plaquette.h"
+#include "Random/ranlux.h"
+#include "Inverters/linear_algebra.h"
+#include "io.h"
 
 #ifndef NDEBUG
 #  define MPIRET(type) type =

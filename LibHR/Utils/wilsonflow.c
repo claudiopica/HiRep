@@ -1,19 +1,11 @@
 /* arXiv:1006.4518 [hep-lat] */
 
-#include "global.h"
-#include "geometry.h"
-#include "suN.h"
-#include "suN_repr_func.h"
-#include "memory.h"
-#include "global.h"
-#include "logger.h"
-#include "update.h"
 #include "utils.h"
-#include "communications.h"
-#include "wilsonflow.h"
-#include <math.h>
-#include <string.h>
-#include "data_storage.h"
+#include "libhr_core.h"
+#include "memory.h"
+#include "Update/copy_gfield.h"
+#include "IO/logger.h"
+
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846264338327

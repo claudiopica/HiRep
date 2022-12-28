@@ -3,17 +3,11 @@
  * All rights reserved.                                                    *
  ***************************************************************************/
 
-#include <stdio.h>
+#include "io.h"
+#include "Geometry/setup.h"
+#include <stdarg.h>
 #include <string.h>
 #include <stdlib.h>
-#include <stdarg.h>
-#include "update.h"
-#include "geometry.h"
-#include "logger.h"
-#include "memory.h"
-#include "global.h"
-#include "linear_algebra.h"
-#include "setup.h"
 
 #define MAX_SECTIONS 16
 #define MAX_VALUES 16

@@ -11,11 +11,10 @@
 *
 *******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "suN.h"
 #include "update.h"
+#include "libhr_core.h"
+#include "random.h"
+#include <math.h>
 
 #ifndef WITH_QUATERNIONS
 

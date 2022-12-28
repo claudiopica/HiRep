@@ -1,7 +1,7 @@
 #include "geometry.h"
 #include "global.h"
 #include "error.h"
-#include "logger.h"
+#include "io.h"
 #include <string.h>
 
 static geometry_descriptor empty_gd = {0};

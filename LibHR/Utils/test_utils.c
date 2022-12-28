@@ -1,18 +1,8 @@
-#include <math.h>
-#include "logger.h"
-#include "ranlux.h"
-#include "communications.h"
-#include "hr_complex.h"
-#include "geometry_check.h"
-#include "global.h"
-#include "suN.h"
-#include "suN_types.h"
-#include "hr_complex.h"
+#include "utils.h"
+#include "libhr_core.h"
+#include "random.h"
+#include "io.h"
 #include <string.h>
-#include "error.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include "test_utils.h"
 
 // The following functions are primarily for testing purposes
 // This is all for CPU

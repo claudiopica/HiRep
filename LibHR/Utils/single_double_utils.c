@@ -11,12 +11,8 @@
 *
 *******************************************************************************/
 
-#include <stdlib.h>
 #include "utils.h"
-#include "suN.h"
-#include "error.h"
-#include "global.h"
-#include "spinor_field.h"
+#include "libhr_core.h"
 
 /*
 void assign_u2ud(void)

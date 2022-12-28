@@ -5,43 +5,24 @@
 * Copyright (c) 2013 Rudy Arthur, Ari Hietanen, Jarno Rantaharju               *
 *                                                                              *
 *******************************************************************************/
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include "io.h"
-#include "random.h"
-#include "error.h"
-#include "geometry.h"
-#include "memory.h"
-#include "statistics.h"
-#include "update.h"
-#include "global.h"
 #include "observables.h"
-#include "suN.h"
-#include "suN_types.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "representation.h"
+#include "libhr_core.h"
+#include "io.h"
+#include "memory.h"
 #include "utils.h"
-#include "logger.h"
-#include "communications.h"
-#include "spectrum.h"
-#include "gaugefix.h"
-#include "meson_observables.h"
-#include "data_storage.h"
+#include "Inverters/linear_algebra.h"
+#include "Inverters/scalarfield_operations.h"
 
 //The flavors are not degenerate, the pi field has opposite sign
 //We can to measure both separately and add together
 
 //This changes the sign of the pi field
-void flip_scalar_field(scalar_field *f);
-
-void create_noise_source_eo(spinor_field *source);
-void calc_propagator_hopping_series(spinor_field *psi, spinor_field *eta, int hopping, int ndilute);
-void calc_propagator_hopping_oe(spinor_field *psi, spinor_field *eta, int hopping, int ndilute);
-void create_noise_source_equal_oe(spinor_field *source);
+//TODO: cleanup: these prototypes shouldn't be needed
+// void flip_scalar_field(scalar_field *f);
+// void create_noise_source_eo(spinor_field *source);
+// void calc_propagator_hopping_series(spinor_field *psi, spinor_field *eta, int hopping, int ndilute);
+// void calc_propagator_hopping_oe(spinor_field *psi, spinor_field *eta, int hopping, int ndilute);
+// void create_noise_source_equal_oe(spinor_field *source);
 
 
 //We often need corr_u-corr_d,

@@ -11,20 +11,11 @@
 *
 *******************************************************************************/
 
-#include "global.h"
-#include "suN.h"
-#include "utils.h"
-#include "update.h"
+#include "observables.h"
+#include "libhr_core.h"
+#include "io.h"
 #include "memory.h"
-#include "random.h"
-#include "dirac.h"
-#include "representation.h"
-#include "linear_algebra.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "logger.h"
-#include "communications.h"
+#include "utils.h"
 
 double plaq(int ix, int mu, int nu)
 {

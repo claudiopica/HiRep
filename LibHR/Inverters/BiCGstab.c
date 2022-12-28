@@ -4,14 +4,11 @@
 \***************************************************************************/
 
 #include "inverters.h"
-#include "linear_algebra.h"
-#include "hr_complex.h"
-#include "update.h"
+#include "libhr_core.h"
+#include "random.h"
+#include "io.h"
 #include "memory.h"
-#include "logger.h"
-#include <stdio.h>
 #include <math.h>
-#include <stdlib.h>
 
 /*
  * Performs BiCGstab inversions: out = M^-1*in

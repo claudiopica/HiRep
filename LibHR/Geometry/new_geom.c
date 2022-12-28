@@ -1,15 +1,11 @@
+#include "geometry.h"
+#include "libhr_core.h"
+#include "memory.h"
+#include "io.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <stddef.h>
 #include <string.h>
-
-#include "geometry.h"
-#include "global.h"
-#include "error.h"
-#include "logger.h"
-#include "utils.h"
-#include "memory.h"
-#include "new_geometry.h"
 
 // this will include the 4th L2 corner in the geometry
 // it's not needed, was here for testng purposed
@@ -835,8 +831,11 @@ void gd_set_boxIndices() {
 
 //we keep a list of send buffers created
 typedef struct _SB_t {
-    size_t bytes_per_site;
     void *buf;
+#ifdef WITH_GPU
+    void *gpubuf;
+#endif
+    size_t bytes_per_site;
 } SB_t;
 
 #define _MAX_SENDBUF 12
@@ -849,10 +848,16 @@ static int isValidHandle(sb_handle h) {
 }
 #endif
 
+#include "gpu.h"
+
 static void sendbuf_free() {
     for (int i=0; i<_MAX_SENDBUF; i++) {
         void *buf=send_buffers[i].buf;
         if (buf) afree(buf); //this was allocated with amalloc
+#ifdef WITH_GPU
+        void *gpubuf=send_buffers[i].gpubuf;
+        if (gpubuf) cudaFree(buf); 
+#endif
         const SB_t empty_sb = { 0 };
         send_buffers[i] = empty_sb;
     }
@@ -900,7 +905,13 @@ static sb_handle allocSB(size_t bytes_per_site) {
     const int nsites = glattice.gsize_gauge - boxVolume(geometryBoxes);
     lprintf(LOGTAG, 10, "Allocating SEND buf: %.1fkB [bytes per site:%zu sites=%d]\n", ((float)(bytes_per_site*nsites)/1024.), bytes_per_site, nsites);
     void *buf = amalloc(nsites*bytes_per_site, ALIGN); 
-    error(buf == NULL, 1, __func__ , "Could not allocate memory space for sendbuffer"); 
+    error(buf == NULL, 1, __func__ , "Could not allocate memory space for sendbuffer");
+#ifdef WITH_GPU
+    void *gpubuf; 
+    cudaError_t err = cudaMalloc((void **)&gpubuf, nsites*bytes_per_site);
+    error(err != cudaSuccess, 1, __func__ , "Could not allocate memory space for GPU sendbuffer");
+    new_sb->gpubuf=gpubuf;
+#endif
     // fill our new structure
     new_sb->bytes_per_site = bytes_per_site;
     new_sb->buf=buf;
@@ -915,6 +926,13 @@ void *sendbuf_alloc(size_t bytes_per_site) {
     const sb_handle sb_h = allocSB(bytes_per_site);
     return getSB(sb_h)->buf;
 }
+
+#ifdef WITH_GPU
+void *sendbuf_alloc_gpu(size_t bytes_per_site) {
+    const sb_handle sb_h = allocSB(bytes_per_site);
+    return getSB(sb_h)->gpubuf;
+}
+#endif
 
 //this prints out the state of the send buffer list
 void sendbuf_report() {

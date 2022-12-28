@@ -281,7 +281,7 @@ int main(int argc,char *argv[]) {
 
     gettimeofday(&start,0);
 
-    corret_pf_dist_hmc();
+    correct_pf_dist_hmc(); 
     
     gettimeofday(&end,0);
     timeval_subtract(&etime,&end,&start);

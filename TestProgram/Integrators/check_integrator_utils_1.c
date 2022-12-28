@@ -3,20 +3,7 @@
  * All rights reserved.                                                      *
  \***************************************************************************/
 
-#include "global.h"
-#include "logger.h"
 #include "check_integrator_1.h"
-#include "random.h"
-#include "io.h"
-#include "representation.h"
-#include "update.h"
-#include "memory.h"
-#include "utils.h"
-#include "communications.h"
-#include "clover_tools.h"
-#include "linear_algebra.h"
-
-#include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 

@@ -7,20 +7,16 @@
 //and through a four fermions interaction. The monomial four_fermion needs to be
 //included to define the auxiliary fields.
 
-#include "global.h"
 #include "update.h"
-#include "logger.h"
+#include "libhr_core.h"
 #include "memory.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include <stdlib.h>
-#include <math.h>
+#include "random.h"
+#include "Inverters/linear_algebra.h"
 
 static spinor_field *tmp_pf = NULL;
 static int mon_init = 1;
 
-void hasen_ff_gaussian_pf(const struct _monomial *m)
+static void hasen_ff_gaussian_pf(const struct _monomial *m)
 {
 	mon_hasenbusch_par *par = (mon_hasenbusch_par*)(m->data.par);
 	gaussian_spinor_field(par->pf);
@@ -33,10 +29,10 @@ void hasen_ff_gaussian_pf(const struct _monomial *m)
 /* S = | (a D +b) D^{-1} g5 psi |^2 */
 /* (a D +b) D^{-1} g5 psi = A */
 /* psi = g5 D (a D + b)^{-1} A */
-void hasen_ff_correct_pf(const struct _monomial *m)
+static void hasen_ff_correct_pf(const struct _monomial *m)
 {
 	mon_hasenbusch_par *par = (mon_hasenbusch_par*)(m->data.par);
-   double shift;
+    double shift;
 
 	mshift_par cgpar;
 	shift = 0.;
@@ -57,7 +53,7 @@ void hasen_ff_correct_pf(const struct _monomial *m)
 	Dff_dagger(par->pf,tmp_pf);
 }
 
-void hasen_ff_correct_la_pf(const struct _monomial *m)
+static void hasen_ff_correct_la_pf(const struct _monomial *m)
 {
 	mon_hasenbusch_par *par = (mon_hasenbusch_par*)(m->data.par);
 	double shift;
@@ -83,19 +79,19 @@ void hasen_ff_correct_la_pf(const struct _monomial *m)
 	set_ff_dirac_shift(0.);
 }
 
-const spinor_field* hasen_ff_pseudofermion(const struct _monomial *m)
+static const spinor_field* hasen_ff_pseudofermion(const struct _monomial *m)
 {
 	mon_hasenbusch_par *par = (mon_hasenbusch_par*)(m->data.par);
 	return par->pf;
 }
 
-void hasen_ff_add_local_action(const struct _monomial *m, scalar_field *loc_action)
+static void hasen_ff_add_local_action(const struct _monomial *m, scalar_field *loc_action)
 {
 	mon_hasenbusch_par *par = (mon_hasenbusch_par*)(m->data.par);
 	pf_local_action(loc_action, par->pf);
 }
 
-void hasen_ff_free(struct _monomial *m)
+static void hasen_ff_free(struct _monomial *m)
 {
 	mon_hasenbusch_par *par = (mon_hasenbusch_par*)m->data.par;
 
@@ -107,8 +103,6 @@ void hasen_ff_free(struct _monomial *m)
 	free(par);
 	free(m);
 }
-
-
 
 struct _monomial* hasen_ff_create(const monomial_data *data)
 {

@@ -3,19 +3,9 @@
  * All rights reserved.                                                      *
  \***************************************************************************/
 
-#include "global.h"
-#include "communications.h"
-#include "logger.h"
-#include "error.h"
 #include "geometry.h"
-#include "spinor_field.h"
-#include "suN_types.h"
-#include "utils.h"
+#include "libhr_core.h"
 #include <string.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #ifdef MPI_TIMING
 struct timeval gfstart, gfend, gfetime, sfstart, sfend, sfetime;
@@ -966,6 +956,3 @@ void start_sc_sendrecv(suNg_scalar_field *sf)
 #endif /* WITH_MPI */
 }
 
-#ifdef __cplusplus
-}
-#endif

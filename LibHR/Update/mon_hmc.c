@@ -3,26 +3,22 @@
  * All rights reserved.                                                   *
  \***************************************************************************/
 
-#include "global.h"
 #include "update.h"
-#include "logger.h"
+#include "libhr_core.h"
 #include "memory.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "clover_tools.h"
-#include <stdlib.h>
+#include "random.h"
+#include "Inverters/linear_algebra.h"
 
 static spinor_field *tmp_pf = NULL;
 static int mon_init = 1;
 
-void hmc_gaussian_pf(const struct _monomial *m)
+static void hmc_gaussian_pf(const struct _monomial *m)
 {
 	mon_hmc_par *par = (mon_hmc_par*)(m->data.par);
 	gaussian_spinor_field(par->pf);
 }
 
-void hmc_correct_pf(const struct _monomial *m)
+static void hmc_correct_pf(const struct _monomial *m)
 {
 	mon_hmc_par *par = (mon_hmc_par*)(m->data.par);
    
@@ -32,7 +28,7 @@ void hmc_correct_pf(const struct _monomial *m)
 	H(par->pf, tmp_pf);
 }
 
-void hmc_correct_la_pf(const struct _monomial *m)
+static void hmc_correct_la_pf(const struct _monomial *m)
 {
 	mon_hmc_par *par = (mon_hmc_par*)(m->data.par);
 	double shift;
@@ -51,13 +47,13 @@ void hmc_correct_la_pf(const struct _monomial *m)
 	g5QMR_mshift(&mpar, &D, tmp_pf, par->pf);
 }
 
-const spinor_field* hmc_pseudofermion(const struct _monomial *m)
+static const spinor_field* hmc_pseudofermion(const struct _monomial *m)
 {
 	mon_hmc_par *par = (mon_hmc_par*)(m->data.par);
 	return par->pf;
 }
 
-void hmc_add_local_action(const struct _monomial *m, scalar_field *loc_action)
+static void hmc_add_local_action(const struct _monomial *m, scalar_field *loc_action)
 {
 	mon_hmc_par *par = (mon_hmc_par*)(m->data.par);
 	pf_local_action(loc_action, par->pf);
@@ -66,7 +62,7 @@ void hmc_add_local_action(const struct _monomial *m, scalar_field *loc_action)
 #endif
 }
 
-void hmc_free(struct _monomial *m)
+static void hmc_free(struct _monomial *m)
 {
 	mon_hmc_par *par = (mon_hmc_par*)m->data.par;
 
