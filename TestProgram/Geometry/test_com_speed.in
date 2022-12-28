@@ -1,0 +1,24 @@
+GLB_T =  16 //Global T size
+GLB_X =  16
+GLB_Y =  16	
+GLB_Z =  16	
+NP_T =   2		
+NP_X =   2		
+NP_Y =   2      		
+NP_Z =   1		
+
+// Replicas
+N_REP = 1
+
+//Logger levels (default = -1)
+log:default = -1
+log:inverter = -1
+log:forcestat = 0
+
+// Random generator
+rlx_level = 1
+rlx_seed = 13813
+rlx_start = new
+rlx_state = rand_state
+
+
