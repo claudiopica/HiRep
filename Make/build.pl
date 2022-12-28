@@ -113,6 +113,8 @@ my @libs = ("libhr.a"); #this is for later programs to use
                   ], 
                   DiracOperator => ["speed_test_diracoperator.c", "speed_test_diracoperator_flt.c", "speed_test_diracoperator_gpu.c", #not a test, this should be a separate exe
                   ], 
+                  Geometry => ["test_com_speed.c", #not a test, this should be a separate exe. It is also broken
+                  ], 
   );
 
   my %extra_sources = ( "check_integrator_1" => [ "check_integrator_utils_1.c"],

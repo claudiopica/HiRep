@@ -26,15 +26,27 @@
 #endif
 
 //global function pointers
-extern unsigned long int(*getMVM)(void);
-extern void(*Dphi_)(spinor_field *restrict out, spinor_field *restrict in);
-extern void(*Dphi)(double m0, spinor_field *out, spinor_field *in);
-extern void(*g5Dphi)(double m0, spinor_field *out, spinor_field *in);
-extern void(*g5Dphi_sq)(double m0, spinor_field *out, spinor_field *in);
-extern void(*Dphi_eopre)(double m0, spinor_field *out, spinor_field *in);
-extern void(*Dphi_oepre)(double m0, spinor_field *out, spinor_field *in);
-extern void(*g5Dphi_eopre)(double m0, spinor_field *out, spinor_field *in);
-extern void(*g5Dphi_eopre_sq)(double m0, spinor_field *out, spinor_field *in);
+//double precision
+extern unsigned long int (*getMVM) (void);
+extern void (*Dphi_) (spinor_field *restrict out, spinor_field *restrict in);
+extern void (*Dphi) (double m0, spinor_field *out, spinor_field *in);
+extern void (*g5Dphi) (double m0, spinor_field *out, spinor_field *in);
+extern void (*g5Dphi_sq) (double m0, spinor_field *out, spinor_field *in);
+extern void (*Dphi_eopre) (double m0, spinor_field *out, spinor_field *in);
+extern void (*Dphi_oepre) (double m0, spinor_field *out, spinor_field *in);
+extern void (*g5Dphi_eopre) (double m0, spinor_field *out, spinor_field *in);
+extern void (*g5Dphi_eopre_sq) (double m0, spinor_field *out, spinor_field *in);
+
+//single precision
+extern unsigned long int (*getMVM_flt) (void);
+extern void (*Dphi_flt_) (spinor_field_flt *out, spinor_field_flt *in);
+extern void (*Dphi_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in);
+extern void (*g5Dphi_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in);
+extern void (*g5Dphi_sq_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in);
+extern void (*Dphi_eopre_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in);
+extern void (*Dphi_oepre_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in);
+extern void (*g5Dphi_eopre_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in);
+extern void (*g5Dphi_eopre_sq_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in);
 
 // Dphi.c
 unsigned long int getMVM_cpu(void);
@@ -77,15 +89,15 @@ void Cphi_diag_inv(double mass, spinor_field *dptr, spinor_field *sptr);
 #endif
 
 // Dphi_flt.c
-unsigned long int getMVM_flt();
-void Dphi_flt_(spinor_field_flt *out, spinor_field_flt *in);
-void Dphi_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
-void g5Dphi_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
-void g5Dphi_sq_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
-void Dphi_eopre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
-void Dphi_oepre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
-void g5Dphi_eopre_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
-void g5Dphi_eopre_sq_flt(double m0, spinor_field_flt *out, spinor_field_flt *in);
+unsigned long int getMVM_flt_cpu();
+void Dphi_flt_cpu_(spinor_field_flt *out, spinor_field_flt *in);
+void Dphi_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in);
+void g5Dphi_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in);
+void g5Dphi_sq_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in);
+void Dphi_eopre_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in);
+void Dphi_oepre_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in);
+void g5Dphi_eopre_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in);
+void g5Dphi_eopre_sq_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in);
 
 // Dphi_gpu.cu
 #ifdef WITH_GPU
