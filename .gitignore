@@ -19,7 +19,6 @@ Doc/doxygen/build
 HMC/*
 PureGauge/*
 GaugeFix/*
-TestProgram/*
 Spectrum/*
 Disconnected/*
 ModeNumber/*
