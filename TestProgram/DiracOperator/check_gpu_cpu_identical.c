@@ -56,11 +56,9 @@ int test_hermiticity(spinor_operator S, spinor_operator S_cpu, char *name)
 {
     lprintf("INFO", 0, "[Testing %s]\n", name);
 
-    spinor_field *s, *S_s, *S_s_cpu, *diff;
+    spinor_field *s, *S_s, *S_s_cpu;
     int return_val = 0;
     
-    hr_complex tau, tau_cpu;
-
     s = alloc_spinor_field_f(1, &glattice);
     S_s = alloc_spinor_field_f(1, &glattice);
     S_s_cpu = alloc_spinor_field_f(1, &glattice);

@@ -209,5 +209,5 @@ int main(int argc, char *argv[])
 
   // Finalize
   finalize_process();
-  return return_value_cpu + return_value_gpu;
+  return return_value_cpu + return_value_gpu + return_value_cpu_unit + return_value_gpu_unit;
 }

@@ -97,7 +97,7 @@ static record *findfile(record *curr, FILE *file) {
 }
 
 /* find a record with the given name in the record list *curr */
-static record *findname(record *curr, char *name) {
+static record *findname(record *curr, const char *name) {
 
 	assert(name!=0);
 	while(curr!=0) {
@@ -109,7 +109,7 @@ static record *findname(record *curr, char *name) {
 }
 
 /* find a record with the given name in the verbosity list */
-static lrecord *lfindname(lrecord *curr, char *name) {
+static lrecord *lfindname(lrecord *curr, const char *name) {
 
 	assert(name!=0);
 	while(curr!=0) {
@@ -446,7 +446,7 @@ int logger_stdout(char *filename) {
 	return 0;
 }
 
-static void mycpyname(char **dst, char *src){
+static void mycpyname(char **dst, const char *src){
 	*((*dst)++)='[';
 	while(*src) {
 		*((*dst)++)=*(src++);
@@ -454,7 +454,7 @@ static void mycpyname(char **dst, char *src){
 	*((*dst)++)=']';
 }
 
-static int mycpytonl(char **dst, char **src){
+static int mycpytonl(char **dst, const char **src){
 	while(**src) {
 		*((*dst)++)=**src;
 		if(*((*src)++)=='\n') {

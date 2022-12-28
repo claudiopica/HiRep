@@ -18,7 +18,7 @@
             _site_type *source, *target;                                                                            \
             _CHECK_GEOMETRY_MATCHING(out, in);                                                                      \
                                                                                                                     \
-            int stride = 0;                                                                                         \
+            int stride = 0; (void)stride;                                                                           \
             int ix_loc = 0;                                                                                         \
             _PIECE_FOR(in->type, ixp)                                                                               \
             {                                                                                                       \
@@ -43,7 +43,7 @@
             _site_type *target, *source;                                                                            \
             _CHECK_GEOMETRY_MATCHING(out, in);                                                                      \
                                                                                                                     \
-            int stride = 0;                                                                                         \
+            int stride = 0; (void)stride;                                                                           \
             int ix_loc = 0;                                                                                         \
             _PIECE_FOR(in->type, ixp)                                                                               \
             {                                                                                                       \
