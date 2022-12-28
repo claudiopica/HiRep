@@ -3,11 +3,11 @@
 * All rights reserved.                                                      *
 \***************************************************************************/
 
-#include "global.h"
 #include "update.h"
-#include "logger.h"
+#include "libhr_core.h"
+#include "io.h"
 
-void monomial_force(double dt, integrator_par *par)
+static void monomial_force(double dt, integrator_par *par)
 {
 	for (int n = 0; n < par->nmon; n++)
 	{
@@ -16,7 +16,7 @@ void monomial_force(double dt, integrator_par *par)
 	}
 }
 
-void monomial_field(double dt, integrator_par *par)
+static void monomial_field(double dt, integrator_par *par)
 {
 	for (int n = 0; n < par->nmon; n++)
 	{

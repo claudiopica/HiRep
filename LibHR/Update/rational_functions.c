@@ -3,16 +3,11 @@
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
-#include "global.h"
-#include "inverters.h"
-#include "linear_algebra.h"
-#include "rational_functions.h"
-#include "error.h"
+#include "update.h"
+#include "libhr_core.h"
 #include "memory.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "logger.h"
+#include "Inverters/linear_algebra.h"
+#include "io.h"
 
 /* include rational approximations database */
 #include "approx_data.db"

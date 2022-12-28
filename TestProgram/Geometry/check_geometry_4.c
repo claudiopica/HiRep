@@ -4,29 +4,7 @@
 *
 *******************************************************************************/
 
-#define MAIN_PROGRAM
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <string.h>
-#include <math.h>
-#include "io.h"
-#include "ranlux.h"
-#include "geometry.h"
-#include "update.h"
-#include "global.h"
-#include "observables.h"
-#include "dirac.h"
-#include "logger.h"
-#include "memory.h"
-#include "communications.h"
-#include "observables.h"
-#include "utils.h"
-#include "setup.h"
-#include "random.h"
-#include "suN.h"
-#include "linear_algebra.h"
+#include "libhr.h"
 
 int isNotZero(double zero, double tolerance) {
     return (fabs(zero)>tolerance);

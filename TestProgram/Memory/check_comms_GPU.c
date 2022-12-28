@@ -7,22 +7,7 @@
 *
 *******************************************************************************/
 
-#define MAIN_PROGRAM
-
-#include "suN.h"
-#include "suN_types.h"
-#include "setup.h"
-#include "global.h"
-#include "linear_algebra.h"
-#include "test_utils.h"
-#include "logger.h"
-#include "random.h"
-#include "memory.h"
-#include "update.h"
-#include "geometry.h"
-#include "gpu_geometry.h"
-#include "hr_complex.h"
-#include "communications.h"
+#include "libhr.h"
 
 /* Double precision tests */
 int test_sync_spinor_field();

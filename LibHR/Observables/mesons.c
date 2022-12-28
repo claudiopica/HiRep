@@ -3,12 +3,8 @@
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
-
-#include "global.h"
-#include "linear_algebra.h"
-#include "suN.h"
 #include "observables.h"
-#include "communications.h"
+#include "libhr_core.h"
 
 #define _INDEX_(i,s) ( (s)*NF+(i) )
 

@@ -1,35 +1,14 @@
 /*******************************************************************************
 *
-* NOCOMPILE= WITH_MPI
 * NOCOMPILE= !WITH_GPU
 *
 * Test of modules
 *
 *******************************************************************************/
 
-#define MAIN_PROGRAM
+#include "libhr.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include "io.h"
-#include "random.h"
-#include "error.h"
-#include "global.h"
-#include "geometry.h"
-#include "memory.h"
-#include "update.h"
-#include "suN.h"
-#include "suN_types.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "representation.h"
-#include "utils.h"
-#include "setup.h"
-#include "logger.h"
-
-static double EPSILON=1.e-12;
+// static double EPSILON=1.e-12;
 void random_spinor_field_cpu(spinor_field *s)
 {
     geometry_descriptor *type = s->type;

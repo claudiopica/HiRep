@@ -3,32 +3,25 @@
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
-
-#include "stddef.h"
-#include "logger.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "suN.h"
-#include "global.h"
+#include "update.h"
+#include "libhr_core.h"
+#include "Inverters/linear_algebra.h"
 #include "error.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include "spinor_field.h"
-#include "geometry.h"
-#include "communications.h"
 #include "memory.h"
+#include "utils.h"
+
 
 #ifdef ROTATED_SF
 #include "update.h"
 extern rhmc_par _update_par; /* Update/update_rhmc.c */
 #endif /* ROTATED_SF */
 
-void spinor_sigma_pi_rho_div_assign(spinor_field *out,scalar_field *sigma,scalar_field *pi,double rho, spinor_field *in);
-void spinor_scalarfield_mult_add_assign(spinor_field *out,scalar_field *sigma,double rho, spinor_field *in);
-void spinor_scalarfield_ig5_mult_add_assign(spinor_field *out,scalar_field *pi, spinor_field *in);
-void spinor_sigma_pi_dagger_rho_div_assign(spinor_field *out,scalar_field *sigma,scalar_field *pi,double rho, spinor_field *in);
-void spinor_scalarfield_mig5_mult_add_assign(spinor_field *out,scalar_field *pi, spinor_field *in);
+#include "Inverters/scalarfield_operations.h"
+//void spinor_sigma_pi_rho_div_assign(spinor_field *out,scalar_field *sigma,scalar_field *pi,double rho, spinor_field *in);
+//void spinor_scalarfield_mult_add_assign(spinor_field *out,scalar_field *sigma,double rho, spinor_field *in);
+//void spinor_scalarfield_ig5_mult_add_assign(spinor_field *out,scalar_field *pi, spinor_field *in);
+//void spinor_sigma_pi_dagger_rho_div_assign(spinor_field *out,scalar_field *sigma,scalar_field *pi,double rho, spinor_field *in);
+//void spinor_scalarfield_mig5_mult_add_assign(spinor_field *out,scalar_field *pi, spinor_field *in);
 
 static double static_mass=0.;
 static double static_shift=0.;
@@ -163,10 +156,9 @@ void Dphieopre_4f_sq(double m0, spinor_field *out, spinor_field *in, double shif
   if (init_dirac) { init_Dirac(); init_dirac=0; }
 
   Dphi_eopre_4f(m0, etmp, in, shift);
-  Dphi_eopre_4f_dagger(m0, out, etmp, shift);
-
-  
+  Dphi_eopre_4f_dagger(m0, out, etmp, shift); 
 }
+
 void Dphieopre_4f_DDdagger(double m0, spinor_field *out, spinor_field *in, double shift) {
   /* alloc memory for temporary spinor field */
   if (init_dirac) { init_Dirac(); init_dirac=0; }

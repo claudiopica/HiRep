@@ -4,14 +4,14 @@ The routine is MPI friendly and allows for any shift size.
 If any input is left null the routine acts only the other field.
 */
 
-//#include <stdio.h>
-#include "logger.h"
-#include "global.h"
+#include "utils.h"
+#include "libhr_core.h"
+#include "error.h"
 #include "memory.h"
-#include "linear_algebra.h"
-#include "communications.h"
-#include "update.h"
-#include <stdio.h>
+#include "inverters.h"
+#include "Update/copy_gfield.h"
+#include "io.h"
+
 
 void shift_fields(int *shift, spinor_field *sin, suNg_field *uin, spinor_field *sout, suNg_field *uout)
 {

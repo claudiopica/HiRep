@@ -13,14 +13,14 @@
 
 #define PROJECT_INTERVAL 10
 
-#include "suN.h"
-#include "utils.h"
-#include "global.h"
 #include "update.h"
-#include "communications.h"
-#define PI 3.141592653589793238462643383279502884197
+#include "libhr_core.h"
+#include "memory.h"
+#include "io.h"
+#include "utils.h"
 #include <math.h>
-#include <stdlib.h>
+
+#define PI 3.141592653589793238462643383279502884197
 
 static int *dyn_gauge = NULL;
 

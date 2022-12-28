@@ -7,31 +7,7 @@
 *
 ******************************************************************************/
 
-#define MAIN_PROGRAM
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include "io.h"
-#include "random.h"
-#include "error.h"
-#include "geometry.h"
-#include "memory.h"
-#include "statistics.h"
-#include "update.h"
-#include "global.h"
-#include "observables.h"
-#include "suN.h"
-#include "suN_types.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "representation.h"
-#include "utils.h"
-#include "logger.h"
-#include "setup.h"
-#include "communications.h"
+#include "libhr.h"
 
 // TODO test for glat_odd and glat_even
 
@@ -209,5 +185,5 @@ int main(int argc, char *argv[])
 
   // Finalize
   finalize_process();
-  return return_value_cpu + return_value_gpu;
+  return return_value_cpu + return_value_gpu + return_value_cpu_unit + return_value_gpu_unit;
 }

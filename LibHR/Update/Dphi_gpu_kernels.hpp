@@ -1,7 +1,10 @@
 #include "spinor_field.h"
-#include "twisted_bc.h"
 #include "global_gpu.h"
-#include "directions.h"
+#include "Geometry/gpu_geometry.h"
+#include "suN.h"
+
+#include "Dphi_gpu_twisted_bc.h"
+#include "Dphi_gpu_directions.h"
 
 typedef struct _suNf_hspinor
 {

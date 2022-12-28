@@ -39,42 +39,32 @@
  *
  *******************************************************************************/
 
-#define RANLXD_C
-
+#include "random.h"
+#include "libhr_core.h"
+#include "error.h"
 #include <limits.h>
 #include <float.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "ranlux.h"
-#include "global.h"
 
 static void local_error(int no)
 {
     switch (no)
     {
     case 1:
-        printf("Error in subroutine rlxd_init\n");
-        printf("Bad choice of luxury level (should be 1 or 2)\n");
+        error(1,1,"RANDOM","Error in rlxd_init\nBad choice of luxury level (should be 1 or 2)\n");
         break;
     case 2:
-        printf("Error in subroutine rlxd_init\n");
-        printf("Bad choice of seed (should be between 1 and 2^31-1)\n");
+        error(1,1,"RANDOM","Error in rlxd_init\nBad choice of seed (should be between 1 and 2^31-1)\n");
         break;
     case 3:
-        printf("Error in rlxd_get\n");
-        printf("Undefined state (ranlxd is not initialized\n");
+        error(1,1,"RANDOM","Error in rlxd_get\nUndefined state (ranlxd is not initialized\n");
         break;
     case 5:
-        printf("Error in rlxd_reset\n");
-        printf("Unexpected input data\n");
+        error(1,1,"RANDOM","Error in rlxd_reset\nUnexpected input data\n");
         break;
     case 6:
-        printf("Unitialized random seed\n");
+        error(1,1,"RANDOM","Unitialized random seed\n");
         break;
     }
-    printf("Program aborted\n");
-    exit(1);
 }
 
 #if (defined SSE)

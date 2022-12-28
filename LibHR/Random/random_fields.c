@@ -11,15 +11,8 @@
 *
 *******************************************************************************/
 
-#include <stdlib.h>
-
-#include "global.h"
 #include "random.h"
-#include "error.h"
-#include "field_ordering.h"
-#include "spinor_field.h"
-#include "communications.h"
-#include <math.h>
+#include "libhr_core.h"
 
 void random_u(suNg_field *gf)
 {

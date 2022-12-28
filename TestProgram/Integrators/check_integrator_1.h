@@ -6,8 +6,7 @@
 #ifndef CHE_INTEGRATOR_UTILS_1_H
 #define CHE_INTEGRATOR_UTILS_1_H
 
-#include "update.h"
-#include "input_par.h"
+#include "libhr.h"
 
 enum
 {

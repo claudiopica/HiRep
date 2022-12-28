@@ -1,12 +1,8 @@
 #ifdef ROTATED_SF
 
-#include "global.h"
-#include "communications.h"
 #include "observables.h"
-#include "logger.h"
-
-
-
+#include "libhr_core.h"
+#include "io.h"
 
 /***************************************************************
 

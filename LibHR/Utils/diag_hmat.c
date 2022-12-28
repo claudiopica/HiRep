@@ -10,19 +10,9 @@
 
 #ifdef GAUGE_SON
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
 #include "utils.h"
-#include "suN.h"
-#include "representation.h"
-
-
-
-void tridiagonalize(suNg* hmat, double *diag, double* roffdiag);
-void diag_tridiag(suNg* hmat, double *diag, double* roffdiag);
-double pythag(double a, double b);
-double sign(double a, double b);
+#include "libhr_core.h"
+#include "io.h"
 
 void diag_hmat(suNg *hmat, double *diag){
   double offdiag[NG];

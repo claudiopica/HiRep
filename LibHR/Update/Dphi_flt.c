@@ -12,18 +12,14 @@
 *
 *******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "suN.h"
-#include "global.h"
+#include "update.h"
+#include "libhr_core.h"
+#include "Inverters/linear_algebra.h"
 #include "error.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include "spinor_field.h"
-#include "geometry.h"
-#include "communications.h"
+#include "io.h"
 #include "memory.h"
+#include "utils.h"
+
 
 #ifdef ROTATED_SF
 #include "update.h"

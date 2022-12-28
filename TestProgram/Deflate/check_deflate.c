@@ -2,39 +2,12 @@
  *
  * Checks of propagator, spinmatrix and the sequential sources
  *
+ * NOCOMPILE = ROTATED_SF || BASIC_SF || FERMION_THETA
+ * 
  *******************************************************************************/
 
-#define MAIN_PROGRAM
-
-#include <stdlib.h>
-#include <stdio.h>
+#include "libhr.h"
 #include <string.h>
-#include <math.h>
-#include "io.h"
-#include "random.h"
-#include "error.h"
-#include "geometry.h"
-#include "memory.h"
-#include "statistics.h"
-#include "update.h"
-#include "global.h"
-#include "observables.h"
-#include "suN.h"
-#include "suN_types.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "representation.h"
-#include "utils.h"
-#include "logger.h"
-#include "communications.h"
-#include "gaugefix.h"
-#include "spectrum.h"
-#include "gamma_spinor.h"
-#include "spin_matrix.h"
-#include "propagator.h"
-#include "setup.h"
-#include "cinfo.h"
 
 #if defined(ROTATED_SF) && defined(BASIC_SF)
 #error This code does not work with the Schroedinger functional !!!
@@ -247,35 +220,18 @@ int main(int argc, char *argv[])
   /* setup process id and communications */
   logger_map("DEBUG", "debug");
 
+  read_cmdline(argc, argv);
   setup_process(&argc, &argv);
 
   setup_gauge_fields();
 
   /* setup process id and communications */
-  /*read_cmdline(argc, argv);
   setup_process(&argc,&argv);
 
   read_input(glb_var.read,input_filename);
-  setup_replicas();*/
-
-  /* logger setup */
-  /* disable logger for MPI processes != 0 */
-  /*logger_setlevel(0,10);
-  if (PID!=0) { logger_disable(); }
-  if (PID==0) {
-    sprintf(tmp,">%s",output_filename); logger_stdout(tmp);
-    sprintf(tmp,"err_%d",PID);
-    if (!freopen(tmp,"w",stderr)) lprintf("MAIN",0,"Error out not open\n");
-  }
-
-  lprintf("MAIN",0,"Compiled with macros: %s\n",MACROS);
-  lprintf("MAIN",0,"PId =  %d [world_size: %d]\n\n",PID,WORLD_SIZE);
-  lprintf("MAIN",0,"input file [%s]\n",input_filename);
-  lprintf("MAIN",0,"output file [%s]\n",output_filename);
-  lprintf("MAIN",0,"list file [%s]\n",list_filename); */
 
   /* read & broadcast parameters */
-  /*parse_cnfg_filename(cnfg_filename,&fpars);*/
+  parse_cnfg_filename(cnfg_filename,&fpars);
 
   read_input(mes_var.read, input_filename);
   GLB_T = fpars.t;

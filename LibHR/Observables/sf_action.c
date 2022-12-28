@@ -6,14 +6,9 @@
 
 #if defined(GAUGE_SUN) && (defined(BASIC_SF) || defined(ROTATED_SF))
 
-#include "global.h"
-#include "suN.h"
-#include "error.h"
-#include "communications.h"
-#include "geometry.h"
 #include "observables.h"
-#include "error.h"
-#include <stdio.h>
+#include "libhr_core.h"
+
 
 /*
  * Bottom E_8 component

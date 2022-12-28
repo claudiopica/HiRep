@@ -4,10 +4,8 @@
  */
 
 #ifdef WITH_GPU
-    #include "gpu.h"
-#endif
-
-#ifdef WITH_GPU
+#include "gpu.h"
+#include "error.h"
 
 void __cudaSafeCall( cudaError_t err, const char *file, const int line )
 {

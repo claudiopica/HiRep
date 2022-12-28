@@ -4,22 +4,7 @@
 *
 *******************************************************************************/
 
-#define MAIN_PROGRAM
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include "global.h"
-#include "utils.h"
-#include "update.h"
-#include "observables.h"
-#include "random.h"
-#include "logger.h"
-#include "communications.h"
-#include "representation.h"
-
-#include "setup.h"
+#include "libhr.h"
 
 #define nwrk 5
 

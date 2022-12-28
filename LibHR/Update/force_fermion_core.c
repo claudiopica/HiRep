@@ -4,22 +4,11 @@
 * All rights reserved.                                                      *
 \***************************************************************************/
 
-#include <stdio.h>
-#include <string.h>
-#include "global.h"
 #include "update.h"
-#include "suN.h"
-#include "utils.h"
-#include "dirac.h"
-#include "inverters.h"
-#include "rational_functions.h"
-#include "representation.h"
-#include "logger.h"
-#include "linear_algebra.h"
+#include "libhr_core.h"
 #include "memory.h"
-#include "communications.h"
-#include "clover_tools.h"
-#include "clover_exp.h"
+#include "utils.h"
+
 
 #define _print_avect(a) printf("(%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e)\n", (a).c1, (a).c2, (a).c3, (a).c4, (a).c5, (a).c6, (a).c7, (a).c8)
 
@@ -381,7 +370,7 @@ static void force_clover_core(double dt)
 #endif
 
 #if defined(WITH_CLOVER)
-void force_clover_fermion(spinor_field *Xs, spinor_field *Ys, double residue)
+static void force_clover_fermion(spinor_field *Xs, spinor_field *Ys, double residue)
 {
 
 	// Construct force matrices
@@ -770,7 +759,6 @@ void force_clover_fermion_taylor(spinor_field *Xs, spinor_field *Ys, double resi
 		}
 	}
 }
-
 #endif
 
 #if defined(WITH_CLOVER)

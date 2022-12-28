@@ -6,22 +6,7 @@
 *
 ********************************************************************************/
 
-#define MAIN_PROGRAM
-
-#include <stdbool.h>
-#include "geometry.h"
-#include "memory.h"
-#include "update.h"
-#include "global.h"
-#include "suN_types.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "logger.h"
-#include "setup.h"
-#include "hr_complex.h"
-#include "random.h"
-#include "representation.h"
+#include "libhr.h"
 
 int test_hermiticity(spinor_operator, spinor_operator, char*);
 void Q_operator(spinor_field*, spinor_field*);
@@ -56,11 +41,9 @@ int test_hermiticity(spinor_operator S, spinor_operator S_cpu, char *name)
 {
     lprintf("INFO", 0, "[Testing %s]\n", name);
 
-    spinor_field *s, *S_s, *S_s_cpu, *diff;
+    spinor_field *s, *S_s, *S_s_cpu;
     int return_val = 0;
     
-    hr_complex tau, tau_cpu;
-
     s = alloc_spinor_field_f(1, &glattice);
     S_s = alloc_spinor_field_f(1, &glattice);
     S_s_cpu = alloc_spinor_field_f(1, &glattice);

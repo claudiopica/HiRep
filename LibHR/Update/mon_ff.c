@@ -3,42 +3,37 @@
  * All rights reserved.                                                    *
  \***************************************************************************/
 
-#include "global.h"
 #include "update.h"
-#include "logger.h"
+#include "libhr_core.h"
 #include "memory.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "observables.h"
-#include <stdlib.h>
+#include "Inverters/scalarfield_operations.h"
 #include <string.h>
 
-void write_ff_scalar_fields(char filename[]);
-void read_ff_scalar_fields(char filename[]);
+// void write_ff_scalar_fields(char filename[]);
+// void read_ff_scalar_fields(char filename[]);
 
-void ff_gaussian_pf(const struct _monomial *m)
+static void ff_gaussian_pf(const struct _monomial *m)
 {
 	gaussian_scalar_field( ff_sigma_mom );
 	gaussian_scalar_field( ff_pi_mom );
 }
 
-void ff_correct_pf(const struct _monomial *m)
+static void ff_correct_pf(const struct _monomial *m)
 {
 	/* empty */
 }
 
-void ff_correct_la_pf(const struct _monomial *m)
+static void ff_correct_la_pf(const struct _monomial *m)
 {
 	/* empty */
 }
 
-const spinor_field* ff_pseudofermion(const struct _monomial *m)
+static const spinor_field* ff_pseudofermion(const struct _monomial *m)
 {
 	return NULL;
 }
 
-void ff_add_local_action(const struct _monomial *m, scalar_field *loc_action)
+static void ff_add_local_action(const struct _monomial *m, scalar_field *loc_action)
 {
 	mon_ff_par *par = (mon_ff_par*)(m->data.par);
 	_MASTER_FOR(&glattice,ix)
@@ -57,7 +52,7 @@ void ff_add_local_action(const struct _monomial *m, scalar_field *loc_action)
 	}
 }
 
-void ff_free(struct _monomial *m)
+static void ff_free(struct _monomial *m)
 {
 	mon_ff_par *par = (mon_ff_par*)m->data.par;
 	free(ff_sigma);

@@ -1,8 +1,5 @@
 #ifdef WITH_GPU
-#include "hr_complex.h"
-#include "test_complex.h"
-//#include <stdio.h>
-
+#include "inverters.h"
 
 int test_overload_plus_rhs_double(){
     int result = 0;

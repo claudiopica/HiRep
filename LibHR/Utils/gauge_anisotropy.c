@@ -3,8 +3,9 @@
 * All rights reserved.                                                      *
 \***************************************************************************/
 
-#include "global.h"
-#include "logger.h"
+#include "utils.h"
+#include "libhr_core.h"
+#include "error.h"
 
 void init_pure_gauge_anisotropy(double *chi)
 {

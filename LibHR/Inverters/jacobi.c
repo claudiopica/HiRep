@@ -36,14 +36,10 @@
 *
 *******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
+#include "inverters.h"
+#include "error.h"
 #include <math.h>
 #include <float.h>
-#include "error.h"
-#include "hr_complex.h"
-#include "suN.h"
-#include "inverters.h"
 
 #define MAX_SWEEP 100
 

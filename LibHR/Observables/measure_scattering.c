@@ -1,11 +1,8 @@
-#include "spin_matrix.h"
-#include "hr_complex.h"
-#include "global.h"
-#include "meson_observables.h"
-#include <math.h>
-#include "communications.h"
-#include "logger.h"
-#include <stdlib.h>
+#include "observables.h"
+#include "libhr_core.h"
+#include "io.h"
+#include "memory.h"
+#include "utils.h"
 
 #define PI 3.141592653589793238462643383279502884197
 
@@ -15,23 +12,23 @@
    Scattering is organised in four contractions:
 
    A.	src1<=====>snk1
-   src2<=====>snk2
+        src2<=====>snk2
 
    B.   src1<----->snk1
-   \   /
-   X
-   / \
-   src2<---->snk2
+              \ /
+               X
+              / \
+        src2<---->snk2
 
    C.   src1<----->snk2
-   \   /
-   X
-   / \
-   src2<---->snk1
+              \ /
+               X
+              / \
+        src2<---->snk1
 
    D.	src1<=====>snk2
-   src2<=====>snk1
-   */
+        src2<=====>snk1
+*/
 
 //Some macros for indexing
 #define INDEX(px, py, pz, n_mom, tc) ((px + n_mom) * (2 * n_mom + 1) * (2 * n_mom + 1) * (GLB_T) + (py + n_mom) * (2 * n_mom + 1) * (GLB_T) + (pz + n_mom) * (GLB_T) + (tc))

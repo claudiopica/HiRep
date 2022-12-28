@@ -1,12 +1,6 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "error.h"
-#include "ranlux.h"
 #include "random.h"
-#include "global.h"
-#include "communications.h"
-
+#include "libhr_core.h"
+#include <math.h>
 
 //Random array of +/- 1/\sqrt(2)
 void ranz2(double r[],int n)

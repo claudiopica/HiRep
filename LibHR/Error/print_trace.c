@@ -1,10 +1,11 @@
 #include <execinfo.h>
 #include <stdlib.h>
-#include "logger.h"
 
 #include <stdio.h>
 #include <signal.h>
 #include <string.h>
+#include "IO/logger.h"
+#include "error.h"
 
 /* Obtain a backtrace and print it to stdout. */
 void print_trace () {

@@ -1,11 +1,7 @@
-#include "global.h"
-#include "suN.h"
-#include "memory.h"
-#include "global.h"
-#include "logger.h"
-#include "communications.h"
 #include "observables.h"
-#include "string.h"
+#include "libhr_core.h"
+#include "io.h"
+#include <string.h>
 
 #define _MIN(x, y) ((x) > (y) ? (y) : (x))
 

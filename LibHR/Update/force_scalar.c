@@ -3,15 +3,12 @@
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
-#include "global.h"
 #include "update.h"
-#include "suN.h"
+#include "libhr_core.h"
+#include "memory.h"
+#include "inverters.h"
+#include "io.h"
 #include "utils.h"
-#include "representation.h"
-#include "logger.h"
-#include "communications.h"
-#include <stdio.h>
-#include <math.h>
 
 #ifndef WITH_QUATERNIONS
 

@@ -2,19 +2,10 @@
  *                                    * 
  \***************************************************************************/
 
-#include <ctype.h>
-#include "global.h"
-#include "logger.h"
 #include "suN_utils.h"
-#include "random.h"
-#include "io.h"
-#include "representation.h"
-#include "update.h"
-#include "memory.h"
-#include "utils.h"
-#include "wilsonflow.h"
-#include <stdio.h>
+#include "libhr.h"
 #include <string.h>
+#include <ctype.h>
 
 extern char *strtok_r(char *, const char *, char **);
 

@@ -3,25 +3,22 @@
  * All rights reserved.                                                   *
  \***************************************************************************/
 
-#include "global.h"
 #include "update.h"
-#include "logger.h"
+#include "libhr_core.h"
 #include "memory.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include <stdlib.h>
+#include "random.h"
+#include "Inverters/linear_algebra.h"
 
 static spinor_field *tmp_pf = NULL;
 static int mon_init = 1;
 
-void hasen_tm_gaussian_pf(const struct _monomial *m)
+static void hasen_tm_gaussian_pf(const struct _monomial *m)
 {
 	mon_hasenbusch_tm_par *par = (mon_hasenbusch_tm_par*)(m->data.par);
 	gaussian_spinor_field(par->pf);
 }
 
-void hasen_tm_correct_pf(const struct _monomial *m)
+static void hasen_tm_correct_pf(const struct _monomial *m)
 {
 	mon_hasenbusch_tm_par *par = (mon_hasenbusch_tm_par*)(m->data.par);
 	double shift;
@@ -48,7 +45,7 @@ void hasen_tm_correct_pf(const struct _monomial *m)
 	spinor_field_copy_f(par->pf, tmp_pf);
 }
 
-void hasen_tm_correct_la_pf(const struct _monomial *m)
+static void hasen_tm_correct_la_pf(const struct _monomial *m)
 {
 	mon_hasenbusch_tm_par *par = (mon_hasenbusch_tm_par*)(m->data.par);
 	double shift;
@@ -69,19 +66,19 @@ void hasen_tm_correct_la_pf(const struct _monomial *m)
 	tm_invert(par->pf, tmp_pf, &mpar);
 }
 
-const spinor_field* hasen_tm_pseudofermion(const struct _monomial *m)
+static const spinor_field* hasen_tm_pseudofermion(const struct _monomial *m)
 {
 	mon_hasenbusch_tm_par *par = (mon_hasenbusch_tm_par*)(m->data.par);
 	return par->pf;
 }
 
-void hasen_tm_add_local_action(const struct _monomial *m, scalar_field *loc_action)
+static void hasen_tm_add_local_action(const struct _monomial *m, scalar_field *loc_action)
 {
 	mon_hasenbusch_tm_par *par = (mon_hasenbusch_tm_par*)(m->data.par);
 	pf_local_action(loc_action, par->pf);
 }
 
-void hasen_tm_free(struct _monomial *m)
+static void hasen_tm_free(struct _monomial *m)
 {
 	mon_hasenbusch_tm_par *par = (mon_hasenbusch_tm_par*)m->data.par;
 

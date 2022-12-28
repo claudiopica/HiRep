@@ -11,13 +11,8 @@
 *
 *******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "suN.h"
-#include "global.h"
-#include "communications.h"
 #include "update.h"
+#include "libhr_core.h"
 
 void staples(int ix, int mu, suNg *v)
 {

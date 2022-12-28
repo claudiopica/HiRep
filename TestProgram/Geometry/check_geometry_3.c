@@ -4,38 +4,16 @@
 *
 *******************************************************************************/
 
-#define MAIN_PROGRAM
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <string.h>
-#include <math.h>
-#include "io.h"
-#include "ranlux.h"
-#include "geometry.h"
-#include "update.h"
-#include "global.h"
-#include "observables.h"
-#include "dirac.h"
-#include "logger.h"
-#include "memory.h"
-#include "communications.h"
-#include "observables.h"
-#include "utils.h"
-#include "setup.h"
-#include "random.h"
-#include "suN.h"
-#include "linear_algebra.h"
+#include "libhr.h"
 
 int isNotZero(double zero, double tolerance) {
     return (fabs(zero)>tolerance);
 }
 
 int checkNorm(char *name, double norm_diff) {
-    const double tolerance = (1.e-15*(GLB_VOLUME)*sizeof(suNf_spinor)/sizeof(double));
+    const double tolerance = 1.e-15;
     if (isNotZero(norm_diff, tolerance)) { 
-        lprintf("ERROR",1,"%s SPINOR norm is wrong [diff=%e >%e]\n",name, norm_diff, tolerance);
+        lprintf("ERROR",1,"%s SPINOR norm is wrong [rel diff=%e >%e]\n",name, norm_diff, tolerance);
         return 1;
     }
     return 0;
@@ -48,10 +26,13 @@ int checkNorm(char *name, double norm_diff) {
     in_diff = spinor_field_sqnorm_f(in)-in_norm; \
     even_diff = spinor_field_sqnorm_f(even)-even_norm; \
     odd_diff = spinor_field_sqnorm_f(odd)-odd_norm; \
-    lprintf("TEST",1,_LABEL " Diff Norm^2=global=%e even=%e odd=%e\n",in_diff, even_diff, odd_diff); \
-    errors += checkNorm("GLOBAL", in_diff); \
-    errors += checkNorm("EVEN", even_diff); \
-    errors += checkNorm("ODD", odd_diff)
+    reldiff = in_diff/in_norm; \
+    reldiff_even = even_diff/even_norm; \
+    reldiff_odd = odd_diff/odd_norm; \
+    lprintf("TEST",1,_LABEL " Diff Norm^2=global=%.10e even=%.10e odd=%.10e Rel Diff: global=%.10e even=%.10e odd=%.10e \n",in_diff, even_diff, odd_diff, reldiff, reldiff_even, reldiff_odd); \
+    errors += checkNorm("GLOBAL", reldiff); \
+    errors += checkNorm("EVEN", reldiff_even); \
+    errors += checkNorm("ODD", reldiff_odd)
 
 int main(int argc, char *argv[])
 {
@@ -84,14 +65,16 @@ int main(int argc, char *argv[])
     double in_norm = spinor_field_sqnorm_f(in);
     double even_norm = spinor_field_sqnorm_f(even);
     double odd_norm = spinor_field_sqnorm_f(odd);
-    lprintf("TEST",1,"[START] Norm^2: global=%lf even=%lf odd=%lf\n", in_norm, even_norm, odd_norm);
-    const double tolerance = (1.e-15*(GLB_VOLUME)*sizeof(suNf_spinor)/sizeof(double));
-    if (isNotZero(in_norm-(even_norm+odd_norm),tolerance)) {
-        lprintf("ERROR",1,"[START] Norm^2 do not match diff=%e\n", in_norm-(even_norm+odd_norm));
+    double diff = (in_norm-(even_norm+odd_norm));
+    double reldiff = diff / in_norm;
+    lprintf("TEST",1,"[START] Norm^2: global=%.10e even=%.10e odd=%.10e TEST: relative diff=%.10e  diff=%.10e\n", in_norm, even_norm, odd_norm, reldiff, diff);
+    const double tolerance = 1.e-15;
+    if (isNotZero(reldiff,tolerance)) {
+        lprintf("ERROR",1,"[START] Norm^2 do not match rel=%.10e diff=%.10e\n", reldiff, diff);
         errors++;
     }
 
-    double in_diff, even_diff, odd_diff;
+    double in_diff, even_diff, odd_diff, reldiff_even, reldiff_odd;
 
     checkForErrors("[SENDRECV]");
 

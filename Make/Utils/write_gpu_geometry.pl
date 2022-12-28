@@ -72,27 +72,31 @@ write_gpu_ldl_field();
 write_epilog();
 
 sub write_prolog {
-    print "/*******************************************************************************\n";
-    print "*\n";
-    print "* File gpu_geometry.h\n";
-    print "*\n";
-    print "* Reading and writing according to the GPU geometry \n";
-    print "*\n";
-    print "*******************************************************************************/\n";
-    print "\n";
-    print "/**\n";
-    print " * \@file\n";
-    print " * \@brief Memory access patterns are crucial to achieve best performance.     \n";
-    print " *        Due to this, we store lattice field data differently in device memory\n";
-    print " *        than in host memory. Documentation on this can be found in the HiRep \n";
-    print " *        Development Guide, section GPU Geometry.\n";
-    print "*/\n\n";
-    print "#ifndef GPU_GEOMETRY_H\n";
-    print "#define GPU_GEOMETRY_H\n\n";
+    print <<END
+/*******************************************************************************\n";
+*
+* File gpu_geometry.h
+*
+* Reading and writing according to the GPU geometry 
+*
+*******************************************************************************/
+
+/**
+ * \@file
+ * \@brief Memory access patterns are crucial to achieve best performance.     
+ *        Due to this, we store lattice field data differently in device memory
+ *        than in host memory. Documentation on this can be found in the HiRep 
+ *        Development Guide, section GPU Geometry.
+*/
+#ifndef GPU_GEOMETRY_H
+#define GPU_GEOMETRY_H
+
+#ifdef WITH_GPU
+END
 }
 
 sub write_epilog {
-    print "\n\n\n#endif";
+    print "\n\n#endif\n#endif";
 }
 
 sub write_gpu_spinor {

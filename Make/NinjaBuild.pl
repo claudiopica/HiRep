@@ -38,10 +38,11 @@ EOF
 builddir = $root/build
 makedir = $root/Make
 incdir = $root/Include
+coreincdir = $root/Include/Core
 AR = ar
 
-INCLUDE = $INCLUDE -I$root/Include
-CFLAGS = $MACRO $CFLAGS $INCLUDE
+INCLUDE = $INCLUDE -I$incdir -I$coreincdir
+CFLAGS = -std=c99 $MACRO $CFLAGS $INCLUDE
 GPUFLAGS = $MACRO $GPUFLAGS $INCLUDE
 LDFLAGS = -L$builddir $LDFLAGS
 
@@ -75,7 +76,7 @@ rule test
   pool = console
 
 rule suN_headers
-  command = cd $incdir && $wr_head $NG $REPR $WQUAT $GAUGE_GROUP
+  command = cd $coreincdir && $wr_head $NG $REPR $WQUAT $GAUGE_GROUP
   description = $setbg SUN HEADERS $setnorm $out
 
 rule suN_repr
@@ -83,7 +84,7 @@ rule suN_repr
   description = $setbg SUN REPRESENTATION $setnorm $out
 
 rule gpu_geometry
-  command = cd $incdir && $wr_gpugeo $NG $REPR $WQUAT $GAUGE_GROUP
+  command = cd $outdir && $wr_gpugeo $NG $REPR $WQUAT $GAUGE_GROUP
   description = $setbg GPU GOMETRY HEADERS $setnorm $out
 
 rule macro_opt
@@ -91,7 +92,7 @@ rule macro_opt
   description = $setbg OPTION HEADER $setnorm $out
 
 rule cinfo
-  command = cd $incdir && $makedir/Utils/cinfo.sh $makedir $root $MACRO
+  command = cd $outdir && $makedir/Utils/cinfo.sh $makedir $root $MACRO
   description = $setbg OPTION HEADER $setnorm $out
 
 # build writeREPR
@@ -105,13 +106,18 @@ build $wr_repr: link $wr_repr_build/writeREPR.o
 build writeREPR: phony $wr_repr
 
 # Autoheaders
-build autoheaders: phony $incdir/suN.h $incdir/suN_types.h $incdir/suN_repr_func.h $incdir/gpu_geometry.h $incdir/cinfo.h
-#build $incdir/macro_opt.h: macro_opt
-build $incdir/suN.h $incdir/suN_types.h: suN_headers | $wr_head
-build $incdir/suN_repr_func.h: suN_repr $incdir/TMPL/suN_repr_func.h.tmpl | $wr_repr
-build $incdir/gpu_geometry.h: gpu_geometry | $wr_gpugeo
-build $incdir/cinfo.h: cinfo | $makedir/Utils/cinfo.sh
+build autoheaders: phony $coreincdir/suN.h $coreincdir/suN_types.h $coreincdir/suN_repr_func.h $root/Include/Geometry/gpu_geometry.h $root/LibHR/Utils/cinfo.h
+#build $coreincdir/macro_opt.h: macro_opt
+build $coreincdir/suN.h $coreincdir/suN_types.h: suN_headers | $wr_head
+build $coreincdir/suN_repr_func.h: suN_repr $coreincdir/TMPL/suN_repr_func.h.tmpl | $wr_repr
+build $root/Include/Geometry/gpu_geometry.h: gpu_geometry | $wr_gpugeo
+  outdir = $root/Include/Geometry/
 
+#build $coreincdir/cinfo.h: cinfo | $makedir/Utils/cinfo.sh
+build $root/LibHR/Utils/cinfo.h: cinfo | $makedir/Utils/cinfo.sh
+  outdir = $root/LibHR/Utils/
+
+# LibHR/Update
 updatedir = $root/LibHR/Update/
 rule approx_db
   command = cd $updatedir/remez && cat approx_* | ./mkappdata.pl > $out
@@ -120,7 +126,17 @@ rule approx_db
 build remez_db: phony $updatedir/approx_data.db
 build $updatedir/approx_data.db: approx_db
 
+## LibHR/Utils
+#utilsdir = $root/LibHR/Utils/
+#build $utilsdir/suN_exp.c: suN_repr $utilsdir/TMPL/suN_exp.c.tmpl | $wr_repr
+
 build generated_files: phony autoheaders remez_db
+
+# Ad hoc rules - these are not build by default
+build $root/ModeNumber/approx_for_modenumber.o: cc $root/ModeNumber/approx_for_modenumber.c
+build $root/ModeNumber/approx_for_modenumber: link $root/ModeNumber/approx_for_modenumber.o
+  LDFLAGS = -lm -lgsl -lgslcblas
+build ModeNumber/approx_for_modenumber: phony $root/ModeNumber/approx_for_modenumber
 
 # Regenerate build files if build script changes.
 rule configure
@@ -480,7 +496,7 @@ EOF
             ],
             "compilerPath": "$compiler",
             "intelliSenseMode": "$compilermode",
-            "includePath": ["$rootdir/Include"$includelist],
+            "includePath": ["$rootdir/Include","$rootdir/Include/Core"$includelist],
             "cStandard": "c99",
             "cppStandard": "c++14"
         }
@@ -497,7 +513,7 @@ EOF
     "files.associations": {
         "*.h": "c",
         "*.c": "c",
-        "*.c.sdtmpl": "c",
+        "*.[hc].sdtmpl": "c",
         "*.h.tmpl": "c",
         "*.hpp": "cuda",
         "*.cu": "cuda",

@@ -1,18 +1,8 @@
-#include <stdlib.h>
-#include <stdio.h>
 #include "io.h"
-#include "error.h"
-#include "global.h"
-#include "logger.h"
-#include "observables.h"
-#include "communications.h"
-#include "memory.h"
 #include <string.h>
+#include <stdlib.h>
 #include <limits.h>
 #include <stdint.h>
-#include <math.h>
-
-
 
 static void swapendian16(void* ptr) {
   uint16_t x;

@@ -1,23 +1,8 @@
 /*
  * NOCOMPILE = !GAUGE_SUN
  */
-#define MAIN_PROGRAM
 
-#include <stdio.h>
-#include <math.h>
-
-#include "io.h"
-#include "random.h"
-#include "error.h"
-#include "global.h"
-#include "suN.h"
-#include "suN_types.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "representation.h"
-#include "utils.h"
-#include "setup.h"
-#include "communications.h"
+#include "libhr.h"
 
 void print_cmplx(hr_complex c)
 {

@@ -9,12 +9,9 @@
 *
 *******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
 #include "utils.h"
-#include "suN.h"
-#include "representation.h"
+#include "libhr_core.h"
+#include "io.h"
 
 #ifndef GAUGE_SON
 

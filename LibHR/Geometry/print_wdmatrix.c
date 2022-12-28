@@ -11,12 +11,10 @@
 *
 *******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
 #include "geometry.h"
-#include "global.h"
+#include "libhr_core.h"
 #include "error.h"
+#include <stdio.h>
 
 /* write a .pbm file containing an image of the wilson-dirac matrix:
  * every black dot represents a non-zero entry of the matrix in (x,mu) space

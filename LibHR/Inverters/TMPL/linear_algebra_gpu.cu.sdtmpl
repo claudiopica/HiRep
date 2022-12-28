@@ -3,23 +3,18 @@
 * All rights reserved.                                                      *
 \***************************************************************************/
 
-#include "communications.h"
-#include "gpu.h"
-#include <stdio.h>
-#include "error.h"
-
 #define _TOCOMPLEX(sp) ((_COMPLEX *)(sp))
 #define _NCOM (sizeof(_SPINOR_TYPE)/sizeof(_COMPLEX))
 
-#define _CUDA_FOR(s,ixp,body)       								\
-  do {												\
-    _PIECE_FOR((s)->type, (ixp)){   								\
-       unsigned int N = (s)->type->master_end[(ixp)] - (s)->type->master_start[(ixp)] + 1;  	\
-       N *= _NCOM;  										\
-       unsigned int grid_size = (N-1)/BLOCK_SIZE + 1;  						\
-       body; 											\
-       CudaCheckError(); 									\
-    }												\
+#define _CUDA_FOR(s,ixp,body) \
+  do { \
+    _PIECE_FOR((s)->type, (ixp)){ \
+       unsigned int N = (s)->type->master_end[(ixp)] - (s)->type->master_start[(ixp)] + 1; \
+       N *= _NCOM; \
+       unsigned int grid_size = (N-1)/BLOCK_SIZE + 1; \
+       body; \
+       CudaCheckError(); \
+    }	\
   } while(0)
 
 _FUNC(void, spinor_field_copy, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
@@ -41,7 +36,7 @@ static double* alloc_double_sum_field(int n){
   }
 
   if (res == NULL){
-    cudaMalloc((void **) & res,n*sizeof(double));
+    cudaMalloc((void **) &res, n*sizeof(double));
     n_size = n;
   }
   return res;
@@ -55,7 +50,7 @@ static hr_complex* alloc_complex_sum_field(int n){
     res = NULL;
   }
   if (res == NULL){
-    cudaMalloc((void **) & res,n*sizeof(hr_complex));
+    cudaMalloc((void **) &res, n*sizeof(hr_complex));
     n_size = n;
   }
   return res;
@@ -86,6 +81,10 @@ _BODY({
             (spinor_field_prod_re_gpu<<<grid_size,BLOCK_SIZE>>>(_TOCOMPLEX(_GPU_FIELD_BLK(s1,ixp)),_TOCOMPLEX(_GPU_FIELD_BLK(s2,ixp)),resPiece,N));
             res += global_sum_gpu(resPiece,N);
   );
+#ifdef WITH_MPI
+  global_sum(&res,1);
+#endif
+
   return res;
 })
 
@@ -101,6 +100,10 @@ _BODY({
             (spinor_field_prod_im_gpu<<<grid_size,BLOCK_SIZE>>>(_TOCOMPLEX(_GPU_FIELD_BLK(s1,ixp)),_TOCOMPLEX(_GPU_FIELD_BLK(s2,ixp)),resPiece,N));
             res += global_sum_gpu(resPiece,N);
   );
+#ifdef WITH_MPI
+  global_sum(&res,1);
+#endif
+
   return res;
 })
 
@@ -116,6 +119,10 @@ _BODY({
             (spinor_field_prod_gpu<<<grid_size,BLOCK_SIZE>>>(_TOCOMPLEX(_GPU_FIELD_BLK(s1,ixp)),_TOCOMPLEX(_GPU_FIELD_BLK(s2,ixp)),resPiece,N));
             res += global_sum_gpu(resPiece,N);
   );
+#ifdef WITH_MPI
+  global_sum((double*)&res,2);
+#endif
+
   return res;
 })
 
@@ -136,6 +143,10 @@ _BODY({
       res += global_sum_gpu(resPiece,N);
       CudaCheckError();
   }
+#ifdef WITH_MPI
+  global_sum(&res,1);
+#endif
+
   return res;
 })
 
@@ -156,6 +167,10 @@ _BODY({
       res += global_sum_gpu(resPiece,N);
       CudaCheckError();
   }
+#ifdef WITH_MPI
+  global_sum(&res,1);
+#endif
+
   return res;
 })
 
@@ -170,6 +185,10 @@ _BODY({
             (spinor_field_sqnorm_gpu<<<grid_size,BLOCK_SIZE>>>(_TOCOMPLEX(_GPU_FIELD_BLK(s1,ixp)),resPiece,N));
             res += global_sum_gpu(resPiece,N);
   );
+#ifdef WITH_MPI
+  global_sum(&res,1);
+#endif
+
   return res;
 })
 

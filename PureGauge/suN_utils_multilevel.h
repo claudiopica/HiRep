@@ -6,8 +6,9 @@
 #ifndef SUN_UTILS_ML_H
 #define SUN_UTILS_ML_H
 
-#include "input_par.h"
-#include "glueballs.h"
+#include "IO/input_par.h"
+#include "Observables/glueballs.h"
+
 #define GENERIC_MAX(x, y) ((x) > (y) ? (x) : (y))
 
 #define ENSURE_int(i) _Generic((i), int \

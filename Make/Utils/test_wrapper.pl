@@ -10,7 +10,7 @@ GetOptions(
     'help'     =>   sub { HelpMessage(2) },
  ) or HelpMessage(1);
 
-system("rm -f debug err_0 out_0");
+system("rm -f debug err_* out_*");
 my $input_file = "$test_file.in";
 
 print ("[\e[1m $test_file \e[0m ] ... ");

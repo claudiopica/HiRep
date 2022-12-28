@@ -10,8 +10,9 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include "logger.h"
-#include "setup.h"
+#include "IO/logger.h"
+#include "Geometry/setup.h"
+#include "error.h"
 
 /**
  * @brief Print message to error file defined on startup.
@@ -32,6 +33,7 @@ void error(int test, int no, const char *name, const char *text)
 	{
 		lprintf("ERROR", 0, "%s:\n%s\n", name, text);
 		lprintf("ERROR", 0, "Exiting program...\n");
+		print_trace();
 		if(no < 0)
 		{
 			exit(0);

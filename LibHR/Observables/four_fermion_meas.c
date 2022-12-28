@@ -11,28 +11,16 @@
 *
 *******************************************************************************/
 
-#include "global.h"
-#include "suN.h"
-#include "communications.h"
-#include "logger.h"
 #include "observables.h"
-#include "geometry.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include "global.h"
-#include "error.h"
-#include "linear_algebra.h"
-#include "spinor_field.h"
-#include "communications.h"
+#include "libhr_core.h"
+#include "io.h"
 #include "memory.h"
-#include "random.h"
-
+#include "utils.h"
+#include "inverters.h"
 #include "update.h"
 
 
-void spinor_scalarfield_mult_add_assign(spinor_field *out,scalar_field *sigma,double rho, spinor_field *in);
+// void spinor_scalarfield_mult_add_assign(spinor_field *out,scalar_field *sigma,double rho, spinor_field *in);
 
 
 //Basic observables involving auxiliary fields

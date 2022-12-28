@@ -4,34 +4,8 @@
 *
 *******************************************************************************/
 
-#define MAIN_PROGRAM
-
-#include <stdlib.h>
-#include <stdio.h>
+#include "libhr.h"
 #include <string.h>
-#include <math.h>
-#include "io.h"
-#include "random.h"
-#include "error.h"
-#include "geometry.h"
-#include "memory.h"
-#include "statistics.h"
-#include "update.h"
-#include "global.h"
-#include "observables.h"
-#include "suN.h"
-#include "suN_types.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "representation.h"
-#include "utils.h"
-#include "logger.h"
-#include "communications.h"
-#include "spectrum.h"
-#include "clover_tools.h"
-#include "setup.h"
-#include "data_storage.h"
 
 #if defined(ROTATED_SF) && defined(BASIC_SF)
 #error This code does not work with the Schroedinger functional !!!
@@ -164,7 +138,7 @@ typedef struct
 int main(int argc, char *argv[])
 {
   int i, tau;
-  FILE *list;
+  FILE *list=NULL;
   int nm;
   double m[256];
   /* setup process communications */
@@ -190,7 +164,6 @@ int main(int argc, char *argv[])
   }
 
   init_BCs(NULL);
-
 
   nm = 1;
   m[0] = atof(mes_var.mstring); //

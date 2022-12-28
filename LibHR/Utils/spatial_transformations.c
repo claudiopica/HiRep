@@ -29,19 +29,17 @@ int spatial_APE_smear_wrkspace(double *smear_val,int wrkspace_in)
     The routine returns the id of the new workspace and set the pointer to the new workspace automatically.
 */
 
-#include <math.h>
-#include <string.h>
-#include <stdlib.h>
-#include "global.h"
 #include "utils.h"
-#include "suN.h"
-#include "memory.h"
-#include "communications.h"
-#include "logger.h"
-#include "hr_complex.h"
-#include "random.h"
+#include "libhr_core.h"
+#include "io.h"
+#include <string.h>
 
 #define gauge_field_pointer(u, ix, mu) ((u->ptr) + coord_to_index(ix, mu))
+
+//Global variables 
+int *active_slices_list = NULL;
+int *glbT_to_active_slices = NULL;
+int n_active_slices;
 
 static int wrk_idx1;
 static int wrk_idx2;

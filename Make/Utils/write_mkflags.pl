@@ -187,7 +187,7 @@ $clover && print $fh "MACRO += -DWITH_CLOVER\n";
 # write expclover
 $expclover && print $fh "MACRO += -DWITH_EXPCLOVER\n";
 # write eo preconditioning
-$eoprec && print $fh "MACRO += -DWITH_EO\n";
+$eoprec && print $fh "MACRO += -DUPDATE_EO\n";
 # write new geometry
 $newgeo && print $fh "MACRO += -DWITH_NEW_GEOMETRY\n";
 # write quaternions 

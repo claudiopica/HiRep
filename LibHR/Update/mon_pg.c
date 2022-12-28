@@ -3,37 +3,31 @@
  * All rights reserved.                                                   *
  \***************************************************************************/
 
-#include "global.h"
 #include "update.h"
-#include "logger.h"
-#include "memory.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "observables.h"
-#include <stdlib.h>
+#include "libhr_core.h"
+#include "Observables/avr_plaquette.h"
 
-void pg_gaussian_pf(const struct _monomial *m)
+static void pg_gaussian_pf(const struct _monomial *m)
 {
 	/* empty */
 }
 
-void pg_correct_pf(const struct _monomial *m)
+static void pg_correct_pf(const struct _monomial *m)
 {
 	/* empty */
 }
 
-void pg_correct_la_pf(const struct _monomial *m)
+static void pg_correct_la_pf(const struct _monomial *m)
 {
 	/* empty */
 }
 
-const spinor_field* pg_pseudofermion(const struct _monomial *m)
+static const spinor_field* pg_pseudofermion(const struct _monomial *m)
 {
 	return NULL;
 }
 
-void pg_add_local_action(const struct _monomial *m, scalar_field *loc_action)
+static void pg_add_local_action(const struct _monomial *m, scalar_field *loc_action)
 {
 	mon_pg_par *par = (mon_pg_par*)(m->data.par);
 	_MASTER_FOR(&glattice,ix)
@@ -42,7 +36,7 @@ void pg_add_local_action(const struct _monomial *m, scalar_field *loc_action)
 	}
 }
 
-void pg_free(struct _monomial *m)
+static void pg_free(struct _monomial *m)
 {
 	mon_pg_par *par = (mon_pg_par*)m->data.par;
 	free(par);

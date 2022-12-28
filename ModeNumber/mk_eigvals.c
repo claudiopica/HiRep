@@ -9,30 +9,8 @@
  *
  *******************************************************************************/
 
-#define MAIN_PROGRAM
-
-#include <stdlib.h>
-#include <stdio.h>
+#include "libhr.h"
 #include <string.h>
-#include <math.h>
-#include "io.h"
-#include "random.h"
-#include "error.h"
-#include "geometry.h"
-#include "memory.h"
-#include "statistics.h"
-#include "update.h"
-#include "global.h"
-#include "observables.h"
-#include "suN.h"
-#include "suN_types.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "representation.h"
-#include "utils.h"
-#include "logger.h"
-#include "print_compile_options.h"
 
 #if defined(ROTATED_SF) && defined(BASIC_SF)
 #error This code does not work with the Schroedinger functional !!!
@@ -75,8 +53,8 @@ typedef struct _input_eigval
 
 char cnfg_filename[256] = "";
 char list_filename[256] = "";
-char input_filename[256] = "input_file";
-char output_filename[256] = "eigval.out";
+char input_filename[255] = "input_file";
+char output_filename[255] = "eigval.out";
 enum
 {
   UNKNOWN_CNFG,
@@ -228,7 +206,6 @@ int main(int argc, char *argv[])
   setup_process(&argc, &argv);
 
   read_input(glb_var.read, input_filename);
-  setup_replicas();
 
   /* logger setup */
   /* disable logger for MPI processes != 0 */
@@ -249,7 +226,7 @@ int main(int argc, char *argv[])
   lprintf("MAIN", 0, "PId =  %d [world_size: %d]\n\n", PID, WORLD_SIZE);
   lprintf("MAIN", 0, "input file [%s]\n", input_filename);
   lprintf("MAIN", 0, "output file [%s]\n", output_filename);
-  if (list_filename != NULL)
+  if (strcmp(list_filename, "") != 0)
     lprintf("MAIN", 0, "list file [%s]\n", list_filename);
   else
     lprintf("MAIN", 0, "cnfg file [%s]\n", cnfg_filename);

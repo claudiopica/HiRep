@@ -1,22 +1,10 @@
-#include "global.h"
-#include "communications.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "suN.h"
 #include "observables.h"
-#include "dirac.h"
-#include "utils.h"
+#include "libhr_core.h"
+#include "io.h"
 #include "memory.h"
-#include "error.h"
-#include "geometry.h"
-#include "spinor_field.h"
-#include "gamma_spinor.h"
-#include <stdlib.h>
-#include <math.h>
-#include <assert.h>
-#include "logger.h"
-#include <stdio.h>
-#include "data_storage.h"
+#include "Inverters/linear_algebra.h"
+#include "Update/dirac.h"
+ 
 
 #ifdef ROTATED_SF
 #error This code has never been tested

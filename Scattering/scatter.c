@@ -9,37 +9,8 @@
  *
  ******************************************************************************/
 
-#define MAIN_PROGRAM
-
-#include <stdlib.h>
-#include <stdio.h>
+#include "libhr.h"
 #include <string.h>
-#include <math.h>
-#include "global.h"
-#include "io.h"
-#include "random.h"
-#include "error.h"
-#include "geometry.h"
-#include "memory.h"
-#include "statistics.h"
-#include "update.h"
-#include "scattering.h"
-#include "observables.h"
-#include "suN.h"
-#include "suN_types.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "representation.h"
-#include "utils.h"
-#include "logger.h"
-#include "communications.h"
-#include "gamma_spinor.h"
-#include "spin_matrix.h"
-#include "clover_tools.h"
-#include "setup.h"
-//#include "IOroutines.c"
-//#include "scatter_functions.h"
 
 #define PI M_PI
 

@@ -2,34 +2,11 @@
 *
 * Computation of the SF coupling and observables
 *
+* NOCOMPILE= !(BASIC_SF) || !(ROTATED_SF)
 *******************************************************************************/
 
-#define MAIN_PROGRAM
-
-#include <stdlib.h>
-#include <stdio.h>
+#include "libhr.h"
 #include <string.h>
-#include <math.h>
-#include "io.h"
-#include "random.h"
-#include "error.h"
-#include "geometry.h"
-#include "memory.h"
-#include "statistics.h"
-#include "update.h"
-#include "global.h"
-#include "observables.h"
-#include "suN.h"
-#include "suN_types.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "representation.h"
-#include "utils.h"
-#include "logger.h"
-#include "communications.h"
-#include "setup.h"
-#include "clover_tools.h"
 
 typedef struct _input_sfc
 {
@@ -95,7 +72,7 @@ int main(int argc, char *argv[])
 {
 #if !(defined(BASIC_SF)) && !(defined(ROTATED_SF))
   error(1 == 1, 0, "main" __FILE__, "This code is to be used only if some SF BC are defined\n");
-#endif
+#else
 
   int i;
   FILE *list = NULL;
@@ -192,5 +169,6 @@ int main(int argc, char *argv[])
 
   finalize_process();
 
+#endif //check SF is enabled
   return 0;
 }

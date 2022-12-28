@@ -1,32 +1,23 @@
 /* arXiv:1006.4518 [hep-lat] */
 
-#include "global.h"
-#include "geometry.h"
-#include "suN.h"
-#include "suN_repr_func.h"
-#include "memory.h"
-#include "global.h"
-#include "logger.h"
-#include "update.h"
 #include "utils.h"
+#include "libhr_core.h"
+#include "memory.h"
+#include "io.h"
 #include "random.h"
-#include "communications.h"
-#include "wilsonflow.h"
-#include <math.h>
 
 #define REUNIT 10
 
-void unit_gauge(suNg_field *gauge){
-  int mu;
-    int x, y, z, t, ix; for (t=0; t<T; t++) for (x=0; x<X; x++) for (y=0; y<Y; y++) for (z=0; z<Z; z++){ ix=ipt(t,x,y,z);
-	    for (mu=0; mu<4; ++mu) {
-		_suNg_unit(*_4FIELD_AT(gauge,ix,mu));
+void unit_gauge(suNg_field *gauge) {
+	for (int t=0; t<T; t++) for (int x=0; x<X; x++) for (int y=0; y<Y; y++) for (int z=0; z<Z; z++){ 
+		int ix=ipt(t,x,y,z);
+	    for (int mu=0; mu<4; ++mu) {
+			_suNg_unit(*_4FIELD_AT(gauge,ix,mu));
 	    }
     }
   start_gf_sendrecv(gauge);
   complete_gf_sendrecv(gauge);
 }
-
 
 suNg_field* g;
 static int init = 0;

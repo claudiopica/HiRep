@@ -7,26 +7,22 @@
 //and trough a four fermions interaction. The monomial four_fermion needs to be
 //included to define the auxiliary fields.
 
-#include "global.h"
 #include "update.h"
-#include "logger.h"
+#include "libhr_core.h"
 #include "memory.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include <stdlib.h>
-#include <math.h>
+#include "random.h"
+#include "Inverters/linear_algebra.h"
 
 static spinor_field *tmp_pf = NULL;
 static int mon_init = 1;
 
-void hmc_ff_gaussian_pf(const struct _monomial *m)
+static void hmc_ff_gaussian_pf(const struct _monomial *m)
 {
 	mon_hmc_par *par = (mon_hmc_par*)(m->data.par);
 	gaussian_spinor_field(par->pf);
 }
 
-void hmc_ff_correct_pf(const struct _monomial *m)
+static void hmc_ff_correct_pf(const struct _monomial *m)
 {
 	mon_hmc_par *par = (mon_hmc_par*)(m->data.par);
 
@@ -36,7 +32,7 @@ void hmc_ff_correct_pf(const struct _monomial *m)
 	Dff_dagger(par->pf, tmp_pf);
 }
 
-void hmc_ff_correct_la_pf(const struct _monomial *m)
+static void hmc_ff_correct_la_pf(const struct _monomial *m)
 {
 	mon_hmc_par *par = (mon_hmc_par*)(m->data.par);
 	double shift;
@@ -55,13 +51,13 @@ void hmc_ff_correct_la_pf(const struct _monomial *m)
 	spinor_field_g5_assign_f(par->pf);
 }
 
-const spinor_field* hmc_ff_pseudofermion(const struct _monomial *m)
+static const spinor_field* hmc_ff_pseudofermion(const struct _monomial *m)
 {
 	mon_hmc_par *par = (mon_hmc_par*)(m->data.par);
 	return par->pf;
 }
 
-void hmc_ff_add_local_action(const struct _monomial *m, scalar_field *loc_action)
+static void hmc_ff_add_local_action(const struct _monomial *m, scalar_field *loc_action)
 {
 	mon_hmc_par *par = (mon_hmc_par*)(m->data.par);
 	pf_local_action(loc_action, par->pf);
@@ -85,7 +81,7 @@ void hmc_ff_add_local_action(const struct _monomial *m, scalar_field *loc_action
 #endif
 }
 
-void hmc_ff_free(struct _monomial *m)
+static void hmc_ff_free(struct _monomial *m)
 {
 	mon_hmc_par *par = (mon_hmc_par*)m->data.par;
 

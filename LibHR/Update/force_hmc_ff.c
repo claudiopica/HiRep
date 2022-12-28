@@ -3,23 +3,12 @@
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
-
-#include "global.h"
 #include "update.h"
-#include "suN.h"
-#include "utils.h"
-#include "dirac.h"
-#include "inverters.h"
-#include "rational_functions.h"
-#include "representation.h"
-#include "logger.h"
-#include "linear_algebra.h"
+#include "libhr_core.h"
 #include "memory.h"
-#include "communications.h"
+#include "inverters.h"
+#include "io.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
 
 #define _print_avect(a) printf("(%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e)\n",(a).c1,(a).c2,(a).c3,(a).c4,(a).c5,(a).c6,(a).c7,(a).c8)
 
@@ -105,17 +94,9 @@
   _suNf_FMAT((u),p)
 
 
-
 //Temporary storage fields from force_hmc.c
 extern spinor_field *Xs, *Ys, *eta;
 extern spinor_field_flt *eta_flt;
-
-void init_force_hmc();
-void free_force_hmc();
-
-void spinor_sigma_pi_rho_div_assign(spinor_field *out,scalar_field *sigma,scalar_field *pi,double rho, spinor_field *in);
-void spinor_sigma_pi_dagger_rho_div_assign(spinor_field *out,scalar_field *sigma,scalar_field *pi,double rho, spinor_field *in);
-void force_hmc_auxfields_fermion(double dt, void *vpar, scalar_field *sigma_mom, scalar_field *pi_mom,spinor_field *Xs, spinor_field *Ys, int hasenbusch );
 
 void force_hmc_ff(double dt, void *vpar){
 

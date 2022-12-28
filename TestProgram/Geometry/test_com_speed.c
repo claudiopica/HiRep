@@ -4,29 +4,8 @@
  *
  *******************************************************************************/
 
-#define MAIN_PROGRAM
+#include "libhr.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <getopt.h>
-#include <math.h>
-#include "io.h"
-#include "ranlux.h"
-#include "geometry.h"
-#include "update.h"
-#include "global.h"
-#include "observables.h"
-#include "dirac.h"
-#include "logger.h"
-#include "memory.h"
-#include "communications.h"
-#include "observables.h"
-#include "utils.h"
-#include "spectrum.h"
-#include "setup.h"
-#include "random.h"
-#include "representation.h"
 #define repts 100
 
 int flopmin;

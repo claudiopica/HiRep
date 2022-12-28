@@ -3,14 +3,9 @@
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
-#include "global.h"
-#include "observables.h"
 #include "update.h"
-#include "suN.h"
-#include "linear_algebra.h"
-#include "error.h"
-#include "representation.h"
-#include "logger.h"
+#include "libhr_core.h"
+#include "io.h"
 
 /*
  * compute the local action at every site for the HMC

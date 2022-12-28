@@ -3,14 +3,11 @@
 * All rights reserved.                                                      *
 \***************************************************************************/
 
-#include "global.h"
 #include "utils.h"
-#include "suN.h"
-#include "communications.h"
-#include "logger.h"
-#include "clover_tools.h"
+#include "libhr_core.h"
+#include "memory.h"
+#include "io.h"
 #include <math.h>
-#include <stdlib.h>
 
 static int init = 0;
 static BCs_pars_t BCs_pars;

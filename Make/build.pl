@@ -18,7 +18,7 @@ build_rules($rootdir);
 ###############################################################################
 {
   my $topdir = "LibHR";
-  my @subdirs = ("Observables", "Error", "Geometry", "Inverters", "IO","Makefile", "Memory", "Random","Statistics", "Update", "Utils");
+  my @subdirs = ("Core", "Observables", "Error", "Geometry", "Inverters", "IO","Makefile", "Memory", "Random","Statistics", "Update", "Utils");
 
   my %exclude = ( Inverters => [ "HBiCGstab.c", "HBiCGstab_mshift.c", "BiCGstab_mshift.c", "dirac_eva.c", ], 
                   Observables => [ 
@@ -83,9 +83,10 @@ my @libs = ("libhr.a"); #this is for later programs to use
     "mk_mesons_with_z2semwall" => [ "mk_mesons_with_z2semwall.c", ],
     "mk_mesons_with_z2semwall_new" => [ "mk_mesons_with_z2semwall_new.c", ],
     "measure_formfactor" => [ "measure_formfactor.c", ],
-    # "mk_sfcoupling" => [ "mk_sfcoupling.c", ],
+    "measure_spectrum" => [ "measure_spectrum.c", ],
+    "mk_sfcorrelators" => [ "mk_sfcorrelators.c", ],
     # "trunc_mesons" => [ "trunc_mesons.c", ],
-    # "mk_mesons" => [ "mk_mesons.c", ],
+    "mk_mesons" => [ "mk_mesons.c", ],
   );
 
   add_exes($topdir, \%exes, \@libs);
@@ -102,17 +103,16 @@ my @libs = ("libhr.a"); #this is for later programs to use
                   "Memory", "Sources", "RIMOM", "Utils", "Propagator", 
                   "Integrators", "StoredConfs", "SpinorField", "WilsonLoops", 
                   "Update", "Mesons", "Geometry", "LinearAlgebra",
-              #    "RotatedSF", # this is broken
-              #    "Deflate",  # this is broken
+                #  "RotatedSF", # this is broken
+                #  "Deflate", # this is broken
   );
 
   my %exclude = ( Integrators => [ "check_integrator_utils_1.c", ], 
                   PureGauge => [ "check_puregauge_3.c", ], # this test is broken
                   Utils => [ "check_utils_3_gb_functions.c", "check_utils_3_tor_functions.c", # these 2 files are included directly in the main c test file
-                            "check_complex.c", #this is broken
                   ], 
-                  DiracOperator => ["speed_test_diracoperator.c", "speed_test_diracoperator_flt.c",
-                  ], #not a test, this should be a separate exe
+                  DiracOperator => ["speed_test_diracoperator.c", "speed_test_diracoperator_flt.c", "speed_test_diracoperator_gpu.c", #not a test, this should be a separate exe
+                  ], 
   );
 
   my %extra_sources = ( "check_integrator_1" => [ "check_integrator_utils_1.c"],
@@ -194,12 +194,12 @@ my @libs = ("libhr.a"); #this is for later programs to use
 {
   my $topdir = "ModeNumber";
   my %exes = (
-    "mk_modenumber" => [ "mk_modenumber.c", ],
+    "mk_modenumber" => [ "mk_modenumber.c", "modenumber.c"],
     "mk_eigvals" => [ "mk_eigvals.c", ],
   );
 
   add_exes($topdir, \%exes, \@libs);
-  # print "default $topdir\n";
+  print "default $topdir\n";
 }
 
 ###############################################################################
@@ -251,7 +251,7 @@ my @libs = ("libhr.a"); #this is for later programs to use
   my $topdir = "StaticPotential";
   my %exes = (
     "mk_static_observables" => [ "mk_static_observables.c", ],
-    # "tune_HYP_smearing" => [ "tune_HYP_smearing.c", ],
+    "tune_HYP_smearing" => [ "tune_HYP_smearing.c", ],
   );
 
   add_exes($topdir, \%exes, \@libs);

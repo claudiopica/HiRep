@@ -4,13 +4,11 @@
 \***************************************************************************/
 
 #include "inverters.h"
-#include "linear_algebra.h"
-#include "complex.h"
-#include "update.h"
+#include "libhr_core.h"
+#include "random.h"
+#include "io.h"
 #include "memory.h"
-#include <stdio.h>
 #include <math.h>
-#include <stdlib.h>
 
 /* _compute_z(z3+i,z1+i,z2+i,&ctmp1,beta,alpha,&(par->shift[i-1])); */
 /* res = (z1*betam1)/(beta*alpha*(z1-z2)+z1*betam1*(1+sigma*beta)) (abbiamo diviso per z2) */

@@ -11,19 +11,18 @@
 *
 *******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
 #include "statistics.h"
+#include "error.h"
+#include <math.h>
+#include <stdlib.h>
 
-
+/*
+*     Returns the auto-corelation time associated with auto-correlation
+*     function g[tmax] formed from n measurements
+*     On exit flag=0 if the estimation of the auto-correlation time was
+*     stable  and flag=1 otherwise
+*/
 double auto_corr_time(int n,int tmax,double g[],int *flag)
-  /*
-   *     Returns the auto-corelation time associated with auto-correlation
-   *     function g[tmax] formed from n measurements
-   *     On exit flag=0 if the estimation of the auto-correlation time was
-   *     stable  and flag=1 otherwise
-   */
 {
    int i,j,itest;
    double par1,par2;   
@@ -84,13 +83,13 @@ double auto_corr_time(int n,int tmax,double g[],int *flag)
 }
 
 
+/*
+*     Forms from the data in the array a[n], a new set of data b[numbin]
+*     consisting of bin averages of a[] of bin-length binsize. 
+*     Returns the standard deviation of b[] from its mean value 
+*     divided by sqrt(numbin)
+*/
 double sigma_bin(int n,int binsize,double a[])
-  /*
-   *     Forms from the data in the array a[n], a new set of data b[numbin]
-   *     consisting of bin averages of a[] of bin-length binsize. 
-   *     Returns the standard deviation of b[] from its mean value 
-   *     divided by sqrt(numbin)
-   */
 {
    int i,j,icount,numbin;
    double *b,s0;
@@ -117,19 +116,19 @@ double sigma_bin(int n,int binsize,double a[])
 }
 
 
+/*
+*     Returns the statistical error associated with the data series a[n]
+*     containing the measurements from r replicas.
+*     It is assumed that the series a[] is arranged 
+*     starting with all data from replica 1,
+*     followed by all those from replica 2, etc.
+*     The auto-correlation functions from each replica are computed
+*     separately and then an average is made over them.
+*     The calculated integrated auto-correlation time from this 
+*     averaged auto-correlation function is assigned to the parameter tau
+*     On exit flag=0 if the error estimation was stable and flag=1 otherwise
+*/
 double sigma_replicas(int n,int r,double a[],double *tau,int *flag)
-  /*
-   *     Returns the statistical error associated with the data series a[n]
-   *     containing the measurements from r replicas.
-   *     It is assumed that the series a[] is arranged 
-   *     starting with all data from replica 1,
-   *     followed by all those from replica 2, etc.
-   *     The auto-correlation functions from each replica are computed
-   *     separately and then an average is made over them.
-   *     The calculated integrated auto-correlation time from this 
-   *     averaged auto-correlation function is assigned to the parameter tau
-   *     On exit flag=0 if the error estimation was stable and flag=1 otherwise
-   */
 {
    int tmax,i,j,icount,ipar,nr;
    double *ar,*gr,*g,var,abar,sig0;
@@ -191,17 +190,16 @@ double sigma_replicas(int n,int r,double a[],double *tau,int *flag)
 }
 
 
-double sigma_jackknife(int nobs,int n,double a[],double *ave_j,
-                       double (*pobs)(double v[]))
-  /*
-   *     Here a[] stores n measurements of nobs different observables
-   *     a[0],...,a[n-1]  contains the measurements of obervable1
-   *     a[n],...,a[2n-1] contains the measurements of obervable2
-   *     etc
-   *     *pobs is a pointer to a function F of the average of the obervables 
-   *     *ave_j gives the best estimate of F, 
-   *     and sigma_jackknife returns the estimated jackknife error.
-   */
+/*
+*     Here a[] stores n measurements of nobs different observables
+*     a[0],...,a[n-1]  contains the measurements of obervable1
+*     a[n],...,a[2n-1] contains the measurements of obervable2
+*     etc
+*     *pobs is a pointer to a function F of the average of the obervables 
+*     *ave_j gives the best estimate of F, 
+*     and sigma_jackknife returns the estimated jackknife error.
+*/
+double sigma_jackknife(int nobs,int n,double a[],double *ave_j,double (*pobs)(double v[]))
 {
    int i,j,k;
    double fact,*f,*atot,*aj;

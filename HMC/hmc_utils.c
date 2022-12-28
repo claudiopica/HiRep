@@ -3,18 +3,8 @@
  * All rights reserved.                                                      * 
  \***************************************************************************/
 
-#include "global.h"
-#include "logger.h"
 #include "hmc_utils.h"
-#include "random.h"
-#include "io.h"
-#include "representation.h"
-#include "update.h"
-#include "memory.h"
-#include "utils.h"
-#include "communications.h"
-#include "clover_tools.h"
-
+#include "libhr.h"
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>

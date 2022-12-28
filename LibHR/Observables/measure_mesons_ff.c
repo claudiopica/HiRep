@@ -4,29 +4,13 @@
 *                                                                           *
 \***************************************************************************/
 
-#include "global.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "suN.h"
 #include "observables.h"
-#include "dirac.h"
-#include "utils.h"
-#include "memory.h"
-#include "update.h"
-#include "error.h"
-#include <stdlib.h>
-#include <math.h>
-#include <assert.h>
-#include "logger.h"
+#include "libhr_core.h"
 #include "io.h"
-#include "random.h"
-#include "communications.h"
-#include "ranlux.h"
-#include "gamma_spinor.h"
-#include "spin_matrix.h"
-#include "propagator.h"
+#include "memory.h"
+#include "utils.h"
 #include <string.h>
-#include "meson_observables.h"
+
 #define PI 3.141592653589793238462643383279502884197
 
 meson_observable *triplet_discon_correlators = NULL; //For four fermion interaction

@@ -12,23 +12,13 @@
 *
 *******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "suN.h"
-#include "global.h"
+#include "update.h"
+#include "libhr_core.h"
+#include "Inverters/linear_algebra.h"
 #include "error.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include "spinor_field.h"
-#include "geometry.h"
-#include "communications.h"
+#include "io.h"
 #include "memory.h"
-#include "clover_tools.h"
-#include "clover_exp.h"
-#include "hr_complex.h"
-#include "logger.h"
-
+#include "utils.h"
 
 #ifdef ROTATED_SF
 #include "update.h"
@@ -263,7 +253,6 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
 #ifdef WITH_MPI
   _OMP_PRAGMA(master)
   {
-    // lprintf("MAIN", 0, "Start sendrecv\n");
     start_sf_sendrecv(in);
   }
   _OMP_BARRIER //why do we need this barrier?
@@ -275,7 +264,6 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
     //this is achieved with comparing the condition to be different than repeat=0,1 
 
     _MASTER_FOR(out->type, ix) {
-      // lprintf("MAIN", 0, "Inside Dphi_cpu_mass_ piece=%d site=%d repeat=%d mask=" _PRINT_BYTE,_master_for_ip_ix,ix,repeat,_BINARY(imask[ix]));
 
       suNf_spinor acc; 
       suNf_spinor *r = &acc;
@@ -659,6 +647,7 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
 }
 #endif
 
+#if (NG==3) && defined(REPR_FUNDAMENTAL)
 void Dphi_fused_(spinor_field *out, spinor_field *in)
 {
 #ifdef CHECK_SPINOR_MATCHING
@@ -966,6 +955,7 @@ void Dphi_fused_(spinor_field *out, spinor_field *in)
 
   } /* FUSE FOR */
 }
+#endif
 
 /*
  * this function takes 2 spinors defined on the whole lattice
@@ -1159,16 +1149,12 @@ void Dphi_eopre_cpu(double m0, spinor_field *out, spinor_field *in)
   {
     init_Dirac();
   }
-  lprintf("TEST",555,"Calling Dphi_eopre_cpu\n");
 
   Dphi_cpu_(otmp, in);
-  lprintf("TEST",555,"First Dphi_cpu_ done\n");
   apply_BCs_on_spinor_field(otmp);
   Dphi_cpu_(out, otmp);
-  lprintf("TEST",555,"Second Dphi_cpu_ done\n");
 
   rho = 4.0 + m0;
-
   rho *= -rho; /* this minus sign is taken into account below */
 
   spinor_field_mul_add_assign_f_cpu(out, rho, in);
@@ -1882,11 +1868,11 @@ void g5Dphi_eopre_tw_sq(double m0, double mu, spinor_field *out, spinor_field *i
 
 
 #ifndef WITH_GPU
+unsigned long int (*getMVM) ()=getMVM_cpu;
 void (*Dphi_) (spinor_field *restrict out, spinor_field *restrict in)=Dphi_cpu_;
 void (*Dphi) (double m0, spinor_field *out, spinor_field *in)=Dphi_cpu;
 void (*g5Dphi) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_cpu;
 void (*g5Dphi_sq) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_sq_cpu;
-unsigned long int (*getMVM) ()=getMVM_cpu;
 void (*Dphi_eopre) (double m0, spinor_field *out, spinor_field *in)=Dphi_eopre_cpu;
 void (*Dphi_oepre) (double m0, spinor_field *out, spinor_field *in)=Dphi_oepre_cpu;
 void (*g5Dphi_eopre) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_eopre_cpu;

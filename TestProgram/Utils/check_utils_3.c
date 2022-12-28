@@ -5,26 +5,10 @@
  *
  *******************************************************************************/
 
-#define MAIN_PROGRAM
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include "global.h"
-#include "utils.h"
-#include "update.h"
-#include "observables.h"
-#include "random.h"
-#include "logger.h"
-#include "communications.h"
-#include "representation.h"
-#include "glueballs.h"
-#include "setup.h"
-#include "hr_complex.h"
+#include "libhr.h"
 #include "check_utils_3_gb_functions.c"
 #include "check_utils_3_tor_functions.c"
-#include "memory.h"
+
 static hr_complex **polyf;
 
 static void all_g_op(hr_complex *pa)

@@ -1,24 +1,9 @@
-#include "global.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "suN.h"
 #include "observables.h"
-#include "dirac.h"
-#include "utils.h"
-#include "memory.h"
-#include "update.h"
-#include "error.h"
-#include <stdlib.h>
-#include <math.h>
-#include <assert.h>
-#include "logger.h"
+#include "libhr_core.h"
 #include "io.h"
-#include "random.h"
-#include "communications.h"
-#include "ranlux.h"
-#include "gamma_spinor.h"
-#include "spin_matrix.h"
-#include "propagator.h"
+#include "memory.h"
+#include "utils.h"
+
 #define PI 3.141592653589793238462643383279502884197
 
 enum { _Sin=0, _Sout, _g5r, _idr, _g0r, _g1r, _g2r, _g3r,  _g0g1r, _g0g2r, _g0g3r, _g5g0r, _g5g1r, _g5g2r, _g5g3r, _g5g0g1r, _g5g0g2r, _g5g0g3r, _cg0r, _cg1r, _cg2r, _cg3r, NCHANNELSR };

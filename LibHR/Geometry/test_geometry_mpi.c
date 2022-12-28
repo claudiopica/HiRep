@@ -6,16 +6,22 @@
 *
 *******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include <string.h>
+// #include <stdlib.h>
+// #include <stdio.h>
+// #include <math.h>
+// #include <string.h>
+// #include "global.h"
+// #include "utils.h"
+// #include "logger.h"
+// #include "error.h"
+// #include "memory.h"
+
 #include "geometry.h"
-#include "global.h"
-#include "utils.h"
-#include "logger.h"
-#include "error.h"
+#include "libhr_core.h"
 #include "memory.h"
+#include "io.h"
+#include <string.h>
+
 
 #define true 1
 #define false 0

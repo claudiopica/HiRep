@@ -9,26 +9,7 @@
 *
 *******************************************************************************/
 
-#define MAIN_PROGRAM
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
-#include "suN.h"
-#include "random.h"
-#include "error.h"
-#include "geometry.h"
-#include "memory.h"
-#include "linear_algebra.h"
-#include "update.h"
-#include "inverters.h"
-#include "dirac.h"
-#include "representation.h"
-#include "global.h"
-#include "logger.h"
-#include "io.h"
-#include "communications.h"
-#include "setup.h"
+#include "libhr.h"
 
 static int iw;
 static double hmass = -7.94871867e-01f;

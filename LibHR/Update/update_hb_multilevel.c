@@ -13,20 +13,15 @@
 
 #define PROJECT_INTERVAL 10
 
-#include "suN.h"
-#include "utils.h"
-#include "global.h"
 #include "update.h"
-#include "communications.h"
-#include "logger.h"
-#include "glueballs.h"
+#include "libhr_core.h"
 #include "memory.h"
+#include "io.h"
+#include "utils.h"
+#include <math.h>
+#include <string.h>
 
 #define PI 3.141592653589793238462643383279502884197
-#include <math.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
 
 static int *dyn_gauge = NULL;
 static int max_mh_level;

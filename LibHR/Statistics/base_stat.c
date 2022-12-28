@@ -11,98 +11,78 @@
 *
 *******************************************************************************/
 
-#include <stdlib.h>
-#include <math.h>
 #include "statistics.h"
 #include "error.h"
+#include <math.h>
+#include <stdlib.h>
 
-
-double average(int n,double a[])
-  /*
-   *     Returns the average of the data stored in the array a[n]
-   */
+/*
+ *     Returns the average of the data stored in the array a[n]
+ */
+double average(int n, double a[])
 {
-   int i;
-   double abar;
-
-   abar=0.0;
-   
-   for (i=0;i<n;i++)
-      abar+=a[i];
-
-   abar/=(double)(n);
-   
-   return(abar);   
+   double abar = 0.;
+   for (int i=0; i<n; i++) abar+=a[i];
+   abar /= (double)(n);   
+   return abar;   
 }
 
 
+/*
+*     Returns the standard deviation of the data in the array a[n]
+*     from their mean value divided by sqrt(n)
+*/
 double sigma0(int n,double a[])
-  /*
-   *     Returns the standard deviation of the data in the array a[n]
-   *     from their mean value divided by sqrt(n)
-   */
 {
-   int i;
-   double abar,var,fact;
-
-   abar=0.0;
-   var=0.0;
-   
-   for (i=0;i<n;i++)
-   {
-      abar+=a[i];
-      var+=(a[i]*a[i]);
+   double abar = 0.0;
+   double var = 0.0;   
+   for (int i=0; i<n; i++) {
+      abar += a[i];
+      var += a[i]*a[i];
    }
 
-   fact=1.0/(double)(n);
-   abar*=fact;
-   var=fact*var-abar*abar;
+   double fact = 1.0/(double)(n);
+   abar *= fact;
+   var = fact*var - abar*abar;
 
-   return(sqrt(fact*fabs(var)));
+   return sqrt(fact*fabs(var));
 }
 
-
+/*
+*     Computes the auto-correlation function gamma[tmax] of the data
+*     in the array a[n]
+*/
 void auto_corr(int n,double a[],int tmax,double gamma[])
-  /*
-   *     Computes the auto-correlation function gamma[tmax] of the data
-   *     in the array a[n]
-   */
 {
-   int i,t;
-   double fact,sh,sl,s;
-
    error((n<1)||(tmax<1)||(n<tmax),1,"auto_corr [stat.c]",
          "Arguments out of range");
-   sl=0.0;
+   double sl=0.0;
 
-   for (i=0;i<n;i++)
-      sl+=a[i];
+   for (int i=0; i<n; i++) sl += a[i];
 
-   sh=sl;
+   double sh = sl;
       
-   for (t=0;t<tmax;t++)
-   {
-      fact=1.0/(double)(n-t);
-      s=-fact*sl*sh;
+   for (int t=0; t<tmax; t++) {
+      double fact = 1.0/(double)(n-t);
+      double s = -fact*sl*sh;
 
-      for (i=t;i<n;i++)
-         s+=a[i-t]*a[i];
+      for (int i= t; i<n; i++)
+         s += a[i-t]*a[i];
       
-      gamma[t]=fact*s;
+      gamma[t] = fact*s;
       
-      sl-=a[n-t-1];
-      sh-=a[t];      
+      sl -= a[n-t-1];
+      sh -= a[t];      
    }
 }
 
-
+/*
+*     Returns the statistical error associated with the data series a[n] 
+*     taking auto-correlations into account. The calculated integrated
+*     auto-correlation time is assigned to the parameter tau. On exit
+*     flag=0 if the error estimation was stable and flag=1 otherwise 
+*/
 double sigma(int n,double a[],double *tau,int *flag)
-  /*
-   *     Returns the statistical error associated with the data series a[n] 
-   *     taking auto-correlations into account. The calculated integrated
-   *     auto-correlation time is assigned to the parameter tau. On exit
-   *     flag=0 if the error estimation was stable and flag=1 otherwise 
-   */
 {
    int tmax,i,j,itest;
    double abar,sig0;

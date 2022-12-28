@@ -3,27 +3,23 @@
  * All rights reserved.                                                   *
  \***************************************************************************/
 
-#include "global.h"
 #include "update.h"
-#include "logger.h"
+#include "libhr_core.h"
 #include "memory.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "observables.h"
-#include <stdlib.h>
+#include "random.h"
+#include "Inverters/linear_algebra.h"
 
 void scalar_blank(const struct _monomial *m)
 {
 	/* empty */
 }
 
-const spinor_field* scalar_pseudofermion(const struct _monomial *m)
+static const spinor_field* scalar_pseudofermion(const struct _monomial *m)
 {
 	return NULL;
 }
 
-void scalar_add_local_action(const struct _monomial *m, scalar_field *loc_action)
+static void scalar_add_local_action(const struct _monomial *m, scalar_field *loc_action)
 {
 	mon_scalar_par *par = (mon_scalar_par*)m->data.par;
 	double Msq = par->mass;
@@ -51,7 +47,7 @@ void scalar_add_local_action(const struct _monomial *m, scalar_field *loc_action
 	}
 }
 
-void scalar_free(struct _monomial *m)
+static void scalar_free(struct _monomial *m)
 {
 	mon_scalar_par *par = (mon_scalar_par*)m->data.par;
 	free(par);

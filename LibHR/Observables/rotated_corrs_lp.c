@@ -1,9 +1,8 @@
 #ifdef ROTATED_SF
-#include "global.h"
-#include "communications.h"
 #include "observables.h"
-#include "logger.h"
-#include "hr_complex.h"
+#include "libhr_core.h"
+#include "io.h"
+
 
 void rotated_lXuup(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd) {
 

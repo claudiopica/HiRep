@@ -1,13 +1,8 @@
-#include "inverters.h"
-#include "linear_algebra.h"
-#include "global.h"
 #include "utils.h"
-#include "memory.h"
-#include "logger.h"
-#include "update.h"
+#include "libhr_core.h"
+#include "io.h"
 #include "inverters.h"
-#include <stdlib.h>
-#include <math.h>
+#include "memory.h"
 
 static spinor_field *ev=NULL;
 static double *eigval=NULL;

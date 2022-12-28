@@ -1,8 +1,8 @@
 #ifdef ROTATED_SF
-#include "global.h"
-#include "communications.h"
 #include "observables.h"
-#include "logger.h"
+#include "libhr_core.h"
+#include "io.h"
+
 
 void rotated_lXuum(chisf_mem* corr_mem,suNf_spinor *chi, spinor_field * prop_uu,spinor_field * prop_dd) {
 
@@ -514,24 +514,21 @@ lttuu- = - i 1/6 sum_k=1^3 sum tr csi^dag U0(1,z) Huu^(-1)(2,z;x)    sig0k     H
 
   /************************************ END of set lY_uu_-*********************/
 
+	for(ix0=0;ix0<GLB_T-1;ix0++)
+		lprintf("PC_twisted_AC",10," la_uu_-[%d] = %.10e,%.10e\n",ix0,creal(lauu_m[ix0]),cimag(lauu_m[ix0]));
+	lprintf("PC_twisted_AC",10,"\n");
 
+	for(ix0=0;ix0<GLB_T-1;ix0++)
+		lprintf("PC_twisted_AC",10," lv_uu_-[%d] = %.10e,%.10e\n",ix0,creal(lvuu_m[ix0]),cimag(lvuu_m[ix0]));
+	lprintf("PC_twisted_AC",10,"\n");
 
+	for(ix0=0;ix0<GLB_T-1;ix0++)
+		lprintf("PC_twisted_AC",10," lt_uu_-[%d] = %.10e,%.10e\n",ix0,creal(ltuu_m[ix0]),cimag(ltuu_m[ix0]));
+	lprintf("PC_twisted_AC",10,"\n");
 
-  for(ix0=0;ix0<GLB_T-1;ix0++)
-    lprintf("PC_twisted_AC",10," la_uu_-[%d] = %.10e,%.10e\n",ix0,creal(lauu_m[ix0]),cimag(lauu_m[ix0]));
-    lprintf("PC_twisted_AC",10,"\n");
-
-  for(ix0=0;ix0<GLB_T-1;ix0++)
-    lprintf("PC_twisted_AC",10," lv_uu_-[%d] = %.10e,%.10e\n",ix0,creal(lvuu_m[ix0]),cimag(lvuu_m[ix0]));
-    lprintf("PC_twisted_AC",10,"\n");
-
-  for(ix0=0;ix0<GLB_T-1;ix0++)
-    lprintf("PC_twisted_AC",10," lt_uu_-[%d] = %.10e,%.10e\n",ix0,creal(ltuu_m[ix0]),cimag(ltuu_m[ix0]));
-    lprintf("PC_twisted_AC",10,"\n");
-
-  for(ix0=0;ix0<GLB_T-1;ix0++)
-    lprintf("PC_twisted_AC",10," ltt_uu_-[%d] = %.10e,%.10e\n",ix0,creal(lttuu_m[ix0]),cimag(lttuu_m[ix0]));
-    lprintf("PC_twisted_AC",10,"\n");
+	for(ix0=0;ix0<GLB_T-1;ix0++)
+		lprintf("PC_twisted_AC",10," ltt_uu_-[%d] = %.10e,%.10e\n",ix0,creal(lttuu_m[ix0]),cimag(lttuu_m[ix0]));
+	lprintf("PC_twisted_AC",10,"\n");
 
 }
 

@@ -3,17 +3,10 @@
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
-#include "global.h"
 #include "utils.h"
-#include "suN.h"
-#include "update.h"
+#include "libhr_core.h"
 #include "memory.h"
-#include "communications.h"
-#include "observables.h"
-#include "logger.h"
-#include "hr_complex.h"
 #include <math.h>
-#include <stdlib.h>
 
 #define PI 3.141592653589793238462643383279502884197
 

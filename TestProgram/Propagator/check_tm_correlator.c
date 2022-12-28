@@ -12,35 +12,8 @@
  * NOCOMPILE= FERMION_THETA
  ******************************************************************************/
 
-#define MAIN_PROGRAM
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include "global.h"
-#include "io.h"
-#include "random.h"
-#include "error.h"
-#include "geometry.h"
-#include "memory.h"
-#include "statistics.h"
-#include "update.h"
-#include "scattering.h"
-#include "observables.h"
-#include "suN.h"
-#include "suN_types.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "representation.h"
-#include "utils.h"
-#include "logger.h"
-#include "communications.h"
-#include "gamma_spinor.h"
-#include "spin_matrix.h"
-#include "setup.h"
-#include "clover_tools.h"
+#include "libhr.h"
+// #include <string.h>
 
 #define PI 3.14159265358979323846264338327950288419716939937510
 #define SQR(A) ((A) * (A))
@@ -115,28 +88,6 @@ static int random_tau()
     slices[counter] = tau;
     bcast_int(&tau, 1);
     return tau;
-}
-
-/**
- * @brief Sets the configuration to unit gauge
- */
-static void unit_gauge(suNg_field *gauge)
-{
-    int mu;
-    int x, y, z, t, ix;
-    for (t = 0; t < T; t++)
-        for (x = 0; x < X; x++)
-            for (y = 0; y < Y; y++)
-                for (z = 0; z < Z; z++)
-                {
-                    ix = ipt(t, x, y, z);
-                    for (mu = 0; mu < 4; ++mu)
-                    {
-                        _suNg_unit(*_4FIELD_AT(gauge, ix, mu));
-                    }
-                }
-    start_gf_sendrecv(gauge);
-    complete_gf_sendrecv(gauge);
 }
 
 typedef struct fourvector

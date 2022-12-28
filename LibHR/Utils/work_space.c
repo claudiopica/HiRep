@@ -39,17 +39,16 @@ void free_wrk_space();
     Free all the workspaces
 */
 
-#include "global.h"
-#include "suN.h"
+#include "utils.h"
+#include "libhr_core.h"
 #include "memory.h"
-#include <stdlib.h>
 #include <string.h>
-#include "logger.h"
 
 static suNg_field **_g_wrk = NULL;
 static int **_iup_wrk;
 static int **_idn_wrk;
 
+//TODO: should this be global or static?
 suNg_field *_g = NULL;
 int *_iup;
 int *_idn;

@@ -1,14 +1,8 @@
-#include "global.h"
-#include "geometry.h"
-#include "suN.h"
-#include "memory.h"
-#include "global.h"
-#include "logger.h"
-#include "update.h"
-#include "utils.h"
-#include "communications.h"
 #include "observables.h"
-#include <math.h>
+#include "libhr_core.h"
+#include "memory.h"
+#include "Utils/HYP_smearing.h"
+#include "io.h"
 #include <string.h>
 
 #if defined(ROTATED_SF) && defined(BASIC_SF)
@@ -42,18 +36,10 @@ static int rot12=(1==0);
 static int rot13=(1==0);
 static int rot23=(1==0);
 
-struct {
-  int c[3];
-  int* path;
-  int length;
-  int** perm;
-  int nperms;
-  int nsteps;
-} WL_path[256];
+WL_path_t WL_path[256];
+
 int WL_npaths=0;
 int WL_max_nsteps=0;
-
-
 
 static int WL_init=(1==0);
 void WL_initialize() {

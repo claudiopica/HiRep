@@ -1,13 +1,7 @@
-#include "global.h"
-#include "logger.h"
-#include "error.h"
 #include "geometry.h"
+#include "libhr_core.h"
+#include "io.h"
 #include "random.h"
-#include "spinor_field.h"
-#include "suN_types.h"
-#include "utils.h"
-#include <string.h>
-#include "new_geometry.h"
 
 // TODO: Single precision will not work, because then we need to cast to flt
 // TODO: put gpu as last suffix
@@ -19,20 +13,12 @@
 #define random_double ranlxd
 #define random_float ranlxs
 
-void zeroes_double(double* dbl, int n) 
-{
-    for (int i = 0; i < n; ++i) 
-    {
-        dbl[i] = 0.0;
-    }
+static inline void zeroes_double(double* dbl, int n) {
+    for (int i = 0; i < n; ++i) { dbl[i] = 0.0; }
 }
 
-void zeroes_float(float* flt, int n) 
-{
-    for (int i = 0; i < n; ++i) 
-    {
-        flt[i] = 0.0f;
-    }
+static inline void zeroes_float(float* flt, int n) {
+    for (int i = 0; i < n; ++i) { flt[i] = 0.0f; }
 }
 
 #define _DECLARE_SYNC_FIELD(_name, _type, _geom) \
@@ -84,7 +70,6 @@ _DECLARE_SYNC_FUNCTIONS(clover_force, suNf, 6, gauge);
     void start_sendrecv_gpu_##_name(_field_type *f) \
     { \
         sync_gpu_##_name(f); \
-        MPI_Status status[f->type->nbuffers_##_geom];\
         for (int i = 0; i < f->type->nbuffers_##_geom; ++i) \
         { \
             /* Destination Parameters */ \

@@ -3,16 +3,12 @@
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
-#include "global.h"
 #include "update.h"
-#include "suN.h"
+#include "libhr_core.h"
+#include "memory.h"
+#include "inverters.h"
+#include "io.h"
 #include "utils.h"
-#include "representation.h"
-#include "logger.h"
-#include "communications.h"
-
-#include <stdio.h>
-#include <math.h>
 
 #define _print_avect(a) printf("(%3.5f,%3.5f,%3.5f,%3.5f,%3.5f,%3.5f,%3.5f,%3.5f)\n", (a).c1, (a).c2, (a).c3, (a).c4, (a).c5, (a).c6, (a).c7, (a).c8)
 

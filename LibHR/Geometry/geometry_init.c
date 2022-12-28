@@ -12,11 +12,9 @@
  *******************************************************************************/
 
 #include "geometry.h"
-#include "global.h"
+#include "libhr_core.h"
+#include "io.h"
 #include "error.h"
-#include "logger.h"
-#include "new_geometry.h"
-#include <stdlib.h>
 
 static void check_geometry_variables() {
   int tmp;
@@ -284,7 +282,6 @@ int geometry_init() {
   PSIGN=0;
 #endif
 
-
   /* from here on there are no more free parameters to set */
   GLB_VOL3=((long int)GLB_X)*((long int)GLB_Y)*((long int)GLB_Z);
   GLB_VOLUME=GLB_VOL3*((long int)GLB_T);
@@ -317,10 +314,8 @@ int geometry_init() {
   
   check_geometry_variables();
   
-
   /*Set the global coordinate of the local {0,0,0,0} point*/
   origin_coord(zerocoord); 
-
 
   /*Set the communication buffers and structure of the geometry identificator */
 #ifdef WITH_NEW_GEOMETRY

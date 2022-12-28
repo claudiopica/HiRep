@@ -3,11 +3,10 @@
  * All rights reserved.                                                      *
 \***************************************************************************/
 
-#include "global.h"
-#include "representation.h"
-#include "utils.h"
-#include "clover_tools.h"
 #include "update.h"
+#include "libhr_core.h"
+#include "Utils/single_double_utils.h"
+#include "Utils/boundary_conditions.h"
 #include <math.h>
 
 #define XG(m, a, b) ((m) + (a)*NG + (b))
@@ -385,8 +384,6 @@ void _group_represent_flt(suNf_flt *v, suNg_flt *u)
 
 #undef XG
 #undef XF
-
-#include "communications.h"
 
 void represent_gauge_field()
 {

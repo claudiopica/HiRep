@@ -1,17 +1,9 @@
 /* hep-lat/0103029 */
 
-#include "global.h"
-#include "geometry.h"
-#include "suN.h"
-#include "memory.h"
-#include "global.h"
-#include "logger.h"
-#include "update.h"
 #include "utils.h"
-#include "communications.h"
-#include <math.h>
-#include <stdio.h>
-
+#include "libhr_core.h"
+#include "memory.h"
+#include "io.h"
 
 #if NG==2
 static void project_on_suN(suNg *A) {

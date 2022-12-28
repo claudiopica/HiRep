@@ -3,35 +3,12 @@
 * Wrapper functions for different type of measurements 
 *
 *******************************************************************************/
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include "io.h"
-#include "random.h"
-#include "error.h"
-#include "geometry.h"
-#include "memory.h"
-#include "statistics.h"
-#include "update.h"
-#include "global.h"
-#include "observables.h"
-#include "suN.h"
-#include "suN_types.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include "inverters.h"
-#include "representation.h"
-#include "utils.h"
-#include "logger.h"
-#include "communications.h"
-#include "spectrum.h"
-#include "gamma_spinor.h"
-#include "spin_matrix.h"
-#include "propagator.h"
-#include "gaugefix.h"
-#include "data_storage.h"
 
+#include "observables.h"
+#include "libhr_core.h"
+#include "io.h"
+#include "memory.h"
+#include "utils.h"
 
 #if NG == 3
 void measure_baryons(double *m, int conf_num, double precision, storage_switch swc, data_storage_array **ret)

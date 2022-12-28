@@ -5,17 +5,8 @@
 #ifdef WITH_GPU
 //This file should not be compiled if !WITH_GPU
 
-#include "global.h"
-#include <string.h>
-#include "spinor_field.h"
-#include "gamma_spinor.h"
-#include "hr_complex.h"
-// #include "communications.h"
-#include "suN.h"
-#include "suN_types.h"
-#include "error.h"
-#include "linear_algebra.h"
-
+#include "inverters.h"
+#include "libhr_core.h"
 #include "linear_algebra_gpu_kernels.hpp"
 
 /*
