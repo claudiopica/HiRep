@@ -1,5 +1,7 @@
 /*******************************************************************************
 *
+* NOCOMPILE= WITH_GPU
+*
 * coherence of the dirac float with the dirac op
 *
 *******************************************************************************/
@@ -51,12 +53,11 @@ int main(int argc, char *argv[])
   lprintf("MAIN", 0, "Generating a random spinor field... ");
   fflush(stdout);
 
-  spinor_field_zero_f(s0);
   gaussian_spinor_field(s0);
   lprintf("MAIN", 0, "done.\n");
 
-  tau = 1. / sqrt(spinor_field_sqnorm_f(s0));
-  spinor_field_mul_f(s0, tau, s0);
+  tau = 1. / sqrt(spinor_field_sqnorm_f_cpu(s0));
+  spinor_field_mul_f_cpu(s0, tau, s0);
   assign_sd2s(f0, s0);
 
   assign_ud2u_f();
@@ -92,8 +93,8 @@ int main(int argc, char *argv[])
 
   assign_sd2s(f0, s1);
 
-  spinor_field_mul_add_assign_f_flt(f0, -1.0, f1);
-  sig = spinor_field_sqnorm_f_flt(f0);
+  spinor_field_mul_add_assign_f_flt_cpu(f0, -1.0, f1);
+  sig = spinor_field_sqnorm_f_flt_cpu(f0);
 
   lprintf("MAIN", 0, "Maximal normalized difference = %.2e\n", sqrt(sig));
   lprintf("MAIN", 0, "(should be around 1*10^(-8) or so)\n\n");

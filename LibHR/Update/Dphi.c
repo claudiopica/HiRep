@@ -280,6 +280,7 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
         suNf_vector vtmp[2];
   #endif
 
+        if (ix == 0 && repeat) printf("CPU spinor comp: %0.2e + i%0.2e\n", creal((*sp).c[0].c[0]), cimag((*sp).c[0].c[0]));
         _vector_add_f(psi, (*sp).c[0], (*sp).c[2]);
         _vector_add_f(psi2, (*sp).c[1], (*sp).c[3]);
         _suNf_theta_T_multiply(chi, (*up), psi);
@@ -301,6 +302,7 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
         suNf_vector vtmp[2];
   #endif
 
+        if (repeat) printf("ix: %d\t", ix);
         _vector_sub_f(psi, (*sm).c[0], (*sm).c[2]);
         _vector_sub_f(psi2, (*sm).c[1], (*sm).c[3]);
         _suNf_theta_T_inverse_multiply(chi, (*um), psi);

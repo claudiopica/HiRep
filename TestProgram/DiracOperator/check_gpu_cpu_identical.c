@@ -127,7 +127,7 @@ int test_hermiticity_flt(spinor_operator_flt S, spinor_operator_flt S_cpu, char 
     spinor_field_sub_assign_f_flt_cpu(S_s_cpu, S_s);
 
     double diff_norm = spinor_field_sqnorm_f_flt_cpu(S_s_cpu);
-    if (fabs(diff_norm) > 1e-14 || !isfinite(diff_norm)) 
+    if (fabs(diff_norm) > 1e-8 || !isfinite(diff_norm)) 
     {
         lprintf("RESULT", 0, "FAILED \n");
         return_val = 1;
