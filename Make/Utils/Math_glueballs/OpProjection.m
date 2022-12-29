@@ -570,7 +570,7 @@ MapOptoCindex for the C indetification of the operators and Oplist for the repor
 *)
 GenerateCchecks[]:=Module[{Op,OpTmp,ar,irrepdim,EvaluatedQ,RMatrixOp, TorTmp,RMatrixTor,Tor,Px, Py, Pz, irrepindex, i, charge},
   ar=OpenAppend[checkgbfunctionsfilename,FormatType->InputForm];
-  WriteString[ar,"/*This is an automatically generated function, do not edit.*/\n#define Complex(a,b) ((a)+I*(b))\nstatic int fullgbcheck(int rotid, hr_complex *rotated, hr_complex *unrotated)\n{\n#define rotfun(a) rotated[(a)]\n#define unrotfun(a) unrotated[(a)]\n#if total_n_glue_op>0\nhr_complex tmp[3];\n#endif\nint return_value=0;\n"];
+  WriteString[ar,"/*This is an automatically generated function, do not edit.*/\n#include \"libhr.h\"\n#define Complex(a,b) ((a)+I*(b))\nstatic int fullgbcheck(int rotid, hr_complex *rotated, hr_complex *unrotated)\n{\n#define rotfun(a) rotated[(a)]\n#define unrotfun(a) unrotated[(a)]\n#if total_n_glue_op>0\nhr_complex tmp[3];\n#endif\nint return_value=0;\n"];
   Do[
     Do[
       Do[ 
@@ -622,7 +622,7 @@ if(sqrt(creal(tmp[2]))>=1.e-10){
   WriteString[ar,"#undef unrotfunreturn\n#undef rotfun\n#undef Complex\nreturn return_value;\n}\n"];
   Close[ar];
   ar=OpenAppend[checktorfunctionsfilename,FormatType->InputForm];
-  WriteString[ar,"/*This is an automatically generated function, do not edit.*/\n#define Complex(a,b) ((a)+I*(b))\nstatic int fulltorcheck(int rotid, hr_complex *rotated, hr_complex *unrotated)\n{\n#define rotfun(a) rotated[(a)]\n#define unrotfun(a) unrotated[(a)]\n#if total_n_tor_op>0\nhr_complex tmp[3];\n#endif\nint return_value=0;\n"];
+  WriteString[ar,"/*This is an automatically generated function, do not edit.*/\n#include \"libhr.h\"\n#define Complex(a,b) ((a)+I*(b))\nstatic int fulltorcheck(int rotid, hr_complex *rotated, hr_complex *unrotated)\n{\n#define rotfun(a) rotated[(a)]\n#define unrotfun(a) unrotated[(a)]\n#if total_n_tor_op>0\nhr_complex tmp[3];\n#endif\nint return_value=0;\n"];
   Do[
     Do[
       Do[ 
