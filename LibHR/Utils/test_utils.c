@@ -730,6 +730,15 @@ void random_clover_force_cpu(suNf_field *f)
     ranlxd((double*)(f->ptr), n);
 }
 
+void sync_single_precision_gauge_field() {
+    float* tmp;
+    double* in = (double*)u_gauge_f->ptr;
+    int len_in_dbl = 4*u_gauge_f->type->gsize_gauge * sizeof(*(u_gauge_f->ptr)) / sizeof(double);
+    tmp = (float*)malloc(len_in_dbl * sizeof(float));
+    for (int i = 0; i < len_in_dbl; ++i) tmp[i] = (float)in[i];
+    memcpy((float*)(u_gauge_f_flt->ptr), tmp, len_in_dbl * sizeof(float));
+}
+
 #ifdef WITH_GPU
 
     

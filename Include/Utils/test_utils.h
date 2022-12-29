@@ -86,6 +86,9 @@ void zero_clover_ldl_cpu(ldl_field*);
 void zero_clover_term_cpu(suNfc_field*);
 void zero_clover_force_cpu(suNf_field*);
 
+// DOUBLE PRECISION TO SINGLE PRECISION
+void sync_single_precision_gauge_field();
+
 #ifdef __cplusplus
     }
 #endif

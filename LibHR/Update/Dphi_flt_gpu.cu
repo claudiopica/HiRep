@@ -19,16 +19,16 @@
 #include "memory.h"
 #include "utils.h"
 
-#include "./Dphi_gpu_kernels.hpp"
+#include "./Dphi_gpu_kernels_flt.hpp"
 
 #ifdef ROTATED_SF
   extern rhmc_par _update_par; /* Update/update_rhmc.c */
 #endif 
 
 static int init=1;
-static spinor_field *gtmp=NULL;
-static spinor_field *etmp=NULL;
-static spinor_field *otmp=NULL;
+static spinor_field_flt *gtmp=NULL;
+static spinor_field_flt *etmp=NULL;
+static spinor_field_flt *otmp=NULL;
 
 /**
  * @brief Initializes the boundary conditions for fermion twisting
@@ -54,7 +54,7 @@ static unsigned long int MVMcounter=0;
 /**
  * @brief Getter for number of applications of the Dirac operator
  */
-unsigned long int getMVM_gpu() {
+unsigned long int getMVM_flt_gpu() {
 	unsigned long int res=MVMcounter>>1; /* divide by two */
 	return res;
 }
@@ -62,7 +62,7 @@ unsigned long int getMVM_gpu() {
 /**
  * @brief Reset counter for number of applications of the Dirac operator
  */
-void resetMVM_gpu() {
+void resetMVM_flt_gpu() {
   MVMcounter = 0;
 }
 
@@ -71,15 +71,15 @@ void resetMVM_gpu() {
  */
 static void free_mem() {
   if (gtmp!=NULL) {
-    free_spinor_field_f(gtmp);
+    free_spinor_field_f_flt(gtmp);
     etmp=NULL;
   }
   if (etmp!=NULL) {
-    free_spinor_field_f(etmp);
+    free_spinor_field_f_flt(etmp);
     etmp=NULL;
   }
   if (otmp!=NULL) {
-    free_spinor_field_f(otmp);
+    free_spinor_field_f_flt(otmp);
     otmp=NULL;
   }
   init=1;
@@ -93,9 +93,9 @@ static void init_Dirac() {
   if (init) {
     alloc_mem_t=GPU_MEM;
 
-    gtmp=alloc_spinor_field_f(1, &glattice);
-    etmp=alloc_spinor_field_f(1, &glat_even);
-    otmp=alloc_spinor_field_f(1, &glat_odd);
+    gtmp=alloc_spinor_field_f_flt(1, &glattice);
+    etmp=alloc_spinor_field_f_flt(1, &glat_even);
+    otmp=alloc_spinor_field_f_flt(1, &glat_odd);
 
     alloc_mem_t=std_mem_t;
 
@@ -107,12 +107,12 @@ static void init_Dirac() {
 /**
  * @brief Applies the Wilson-Dirac operator only where the calculation
  *        does not depend on the communications. Use this calculation
- *        to mask communication latency.
+ *        to mask communication latency. Single precision version.
  *
  * @param in                  Input spinor field, defined on GPU copy
  * @param out                 Output spinor field to save result
  */
-static void Dphi_inner_gpu_(spinor_field *out, spinor_field *in) {
+static void Dphi_inner_gpu_flt_(spinor_field_flt *out, spinor_field_flt *in) {
   int grid, iyp, write_stride, start_piece_ixp, start_piece_iyp;
   _PIECE_FOR(out->type, ixp)
   {
@@ -122,9 +122,9 @@ static void Dphi_inner_gpu_(spinor_field *out, spinor_field *in) {
       start_piece_ixp = in->type->master_start[ixp];
       start_piece_iyp = in->type->master_start[iyp];
 
-      Dphi_gpu_inner_kernel<<<grid, BLOCK_SIZE>>>(
+      Dphi_gpu_inner_kernel_flt<<<grid, BLOCK_SIZE>>>(
             _GPU_FIELD_BLK(out, ixp), _GPU_FIELD_BLK(in, iyp),
-            _GPU_4FIELD_BLK(u_gauge_f, ixp), _GPU_4FIELD_BLK(u_gauge_f, iyp),
+            _GPU_4FIELD_BLK(u_gauge_f_flt, ixp), _GPU_4FIELD_BLK(u_gauge_f_flt, iyp),
             iup_gpu, idn_gpu, imask_gpu,
             write_stride, start_piece_ixp, start_piece_iyp);
       CudaCheckError();
@@ -135,13 +135,14 @@ static void Dphi_inner_gpu_(spinor_field *out, spinor_field *in) {
 /**
  * @brief Applies the Wilson-Dirac operator only where the calculation
  *        depends on the communications. Call this after having
- *        completed the spinor field communications.
+ *        completed the spinor field communications. Single precision
+ *        version.
  *
  * @param in                  Input spinor field defined on the extended
  *                            lattice on the GPU copy.
  * @param out                 Output spinor field to save result
  */
-static void Dphi_boundary_gpu_(spinor_field *out, spinor_field *in) {
+static void Dphi_boundary_gpu_flt_(spinor_field_flt *out, spinor_field_flt *in) {
   #if defined(WITH_MPI) && defined(WITH_NEW_GEOMETRY)
   int grid, ixp, block_stride, buffer_stride, block_start, buffer_start;
   for (int i = 0; i < in->type->nbuffers_spinor; ++i)
@@ -153,9 +154,9 @@ static void Dphi_boundary_gpu_(spinor_field *out, spinor_field *in) {
       grid = (block_stride-1)/BLOCK_SIZE + 1;
       block_start = in->type->master_start[ixp];
 
-      Dphi_gpu_boundary_kernel<<<grid, BLOCK_SIZE>>>(
+      Dphi_gpu_boundary_kernel_flt<<<grid, BLOCK_SIZE>>>(
             _GPU_FIELD_BLK(out, ixp), _BUF_GPU_FIELD_BLK(in, i),
-            _GPU_4FIELD_BLK(u_gauge_f, ixp), _BUF_GPU_4FIELD_BLK(u_gauge_f, i),
+            _GPU_4FIELD_BLK(u_gauge_f_flt, ixp), _BUF_GPU_4FIELD_BLK(u_gauge_f_flt, i),
             iup_gpu, idn_gpu, imask_gpu,
             block_stride, buffer_stride,
             buffer_start, block_start);
@@ -166,11 +167,12 @@ static void Dphi_boundary_gpu_(spinor_field *out, spinor_field *in) {
 
 /**
  * @brief Implementation of the massless Wilson-Dirac operator on the GPU
+ *        Single precision version
  *
  * @param in                      Input spinor field
  * @param out                     Output spinor field to save result
  */
-void Dphi_gpu_(spinor_field *out, spinor_field *in)
+void Dphi_flt_gpu_(spinor_field_flt *out, spinor_field_flt *in)
 {
   // Input parameter validity checks
   _CHECK_GEOMETRY_EO(in, out);
@@ -179,21 +181,22 @@ void Dphi_gpu_(spinor_field *out, spinor_field *in)
   init_bc_gpu();
 
   #ifdef WITH_MPI
-    start_sendrecv_gpu_spinor_field_f(in);
+    start_sendrecv_gpu_spinor_field_f_flt(in);
   #endif
 
   // Mask communication latency with calculating the points
   // that do no rely on communications  
-  Dphi_inner_gpu_(out, in);
-  complete_sendrecv_gpu_spinor_field_f(in);
+  Dphi_inner_gpu_flt_(out, in);
+  complete_sendrecv_gpu_spinor_field_f_flt(in);
 
   // After completion of communications add missing calculations
   // that relied on communications.
-  Dphi_boundary_gpu_(out, in);
+  Dphi_boundary_gpu_flt_(out, in);
 }
 
 /**
  * @brief Implementation of the Wilson-Dirac operator with mass on the GPU.
+ *        Single precision version.
  *
  * @param in                    Input spinor field defined on the full lattice
  * @param out                   Output spinor field defined on the full lattice that is 
@@ -201,20 +204,21 @@ void Dphi_gpu_(spinor_field *out, spinor_field *in)
  *                              on the input spinor field.
  * @param m0                    Mass parameter
  */
-void Dphi_gpu(double m0, spinor_field *out, spinor_field *in)
+void Dphi_flt_gpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
 {
   //Input argument validity checks
   _CHECK_GEOMETRY_FULL(in);
   _CHECK_GEOMETRY_FULL(out);
 
   // Operation
-  double rho = 4. + m0;
-  Dphi_gpu_(out, in);
-  spinor_field_mul_add_assign_f_gpu(out, rho, in);
+  float rho = 4.f + (float)m0;
+  Dphi_flt_gpu_(out, in);
+  spinor_field_mul_add_assign_f_flt_gpu(out, rho, in);
 }
 
 /**
  * @brief Implementation of the Hermitian Wilson-Dirac operator with mass on the GPU.
+ *        Single precision version.
  *
  * @param in                    Input spinor field defined on the full lattice
  * @param out                   Output spinor field defined on the full lattice that is 
@@ -222,21 +226,24 @@ void Dphi_gpu(double m0, spinor_field *out, spinor_field *in)
  *                              operator on the input spinor field
  * @param m0                    Mass parameter
  */
-void g5Dphi_gpu(double m0, spinor_field *out, spinor_field *in)
+void g5Dphi_flt_gpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
 {
   // Input argument validity checks
   _CHECK_GEOMETRY_FULL(in);
   _CHECK_GEOMETRY_FULL(out);
 
   // Operation
-  double rho = 4. + m0;
-  Dphi_gpu_(out, in);
-  spinor_field_mul_add_assign_f_gpu(out, rho, in);
-  spinor_field_g5_assign_f_gpu(out);
+  apply_BCs_on_spinor_field_flt(in);
+  float rho = 4.f + (float)m0;
+  Dphi_flt_gpu_(out, in);
+  spinor_field_mul_add_assign_f_flt_gpu(out, rho, in);
+  spinor_field_g5_assign_f_flt_gpu(out);
+  apply_BCs_on_spinor_field_flt(out);
 }
 
  /**
   * @brief Even-odd preconditioned Wilson-Dirac operator with mass on the GPU.
+  *         Single precision version.
   *
   * @param in                 Even input spinor field
   * @param out                Even output spinor field that is the result of the application
@@ -244,7 +251,7 @@ void g5Dphi_gpu(double m0, spinor_field *out, spinor_field *in)
   *                           input spinor field
   * @param m0                 Mass parameter
   */
-void Dphi_eopre_gpu(double m0, spinor_field *out, spinor_field *in)
+void Dphi_eopre_flt_gpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
 {
   // Input argument validity checks
   _CHECK_GEOMETRY_EVEN(in);
@@ -254,16 +261,20 @@ void Dphi_eopre_gpu(double m0, spinor_field *out, spinor_field *in)
   if (init) { init_Dirac(); }
 
   // Operation
-  Dphi_gpu_(otmp, in);
-  Dphi_gpu_(out, otmp);
-  double rho = 4. + m0;
+  apply_BCs_on_spinor_field_flt(in);
+  Dphi_flt_gpu_(otmp, in);
+  apply_BCs_on_spinor_field_flt(otmp);
+  Dphi_flt_gpu_(out, otmp);
+  float rho = 4.f + (double)m0;
   rho*=-rho; /* this minus sign is taken into account below */
-  spinor_field_mul_add_assign_f_gpu(out, rho, in);
-  spinor_field_minus_f_gpu(out, out);
+  spinor_field_mul_add_assign_f_flt_gpu(out, rho, in);
+  spinor_field_minus_f_flt_gpu(out, out);
+  apply_BCs_on_spinor_field_flt(out);
 }
 
- /**
+/**
   * @brief Even-odd preconditioned Wilson-Dirac operator with mass on the GPU.
+  *         Single precision version
   *
   * @param in                 Odd input spinor field
   * @param out                Odd output spinor field that is the result of the application
@@ -271,7 +282,7 @@ void Dphi_eopre_gpu(double m0, spinor_field *out, spinor_field *in)
   *                           input spinor field
   * @param m0                 Mass parameter
   */
-void Dphi_oepre_gpu(double m0, spinor_field *out, spinor_field *in)
+void Dphi_oepre_flt_gpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
 {
   // Input argument validity checks
   _CHECK_GEOMETRY_ODD(in);
@@ -280,16 +291,20 @@ void Dphi_oepre_gpu(double m0, spinor_field *out, spinor_field *in)
   // alloc memory for temporary spinor field 
   if (init) { init_Dirac();}
 
-  Dphi_gpu_(etmp, in);
-  Dphi_gpu_(out, etmp);
-  double rho = 4. + m0;
+  apply_BCs_on_spinor_field_flt(in);
+  Dphi_flt_gpu_(etmp, in);
+  apply_BCs_on_spinor_field_flt(etmp);
+  Dphi_flt_gpu_(out, etmp);
+  float rho = 4.f + (float)m0;
   rho*=-rho; /* this minus sign is taken into account below */
-  spinor_field_mul_add_assign_f_gpu(out, rho, in);
-  spinor_field_minus_f_gpu(out, out);
+  spinor_field_mul_add_assign_f_flt_gpu(out, rho, in);
+  spinor_field_minus_f_flt_gpu(out, out);
+  apply_BCs_on_spinor_field_flt(out);
 }
 
- /**
+/**
   * @brief Even-odd preconditioned Hermitian Wilson-Dirac operator with mass on the GPU.
+  *        Single precision version.
   *
   * @param in                 Even input spinor field
   * @param out                Even output spinor field that is the result of the application
@@ -297,7 +312,7 @@ void Dphi_oepre_gpu(double m0, spinor_field *out, spinor_field *in)
   *                           input spinor field
   * @param m0                 Mass parameter
   */
-void g5Dphi_eopre_gpu(double m0, spinor_field *out, spinor_field *in)
+void g5Dphi_eopre_flt_gpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
 {
   // Input argument validity checks
   _CHECK_GEOMETRY_EVEN(in);
@@ -311,21 +326,25 @@ void g5Dphi_eopre_gpu(double m0, spinor_field *out, spinor_field *in)
   if (init) { init_Dirac();}
 
   // Operation
-  Dphi_gpu_(otmp, in);
-  Dphi_gpu_(out, otmp);
-  double rho = 4. + m0;
+  apply_BCs_on_spinor_field_flt(in);
+  Dphi_flt_gpu_(otmp, in);
+  apply_BCs_on_spinor_field_flt(otmp);
+  Dphi_flt_gpu_(out, otmp);
+  float rho = 4.f + (float)m0;
   rho*=-rho; /* this minus sign is taken into account below */
-  spinor_field_mul_add_assign_f_gpu(out, rho, in);
-  spinor_field_minus_f_gpu(out, out);
-  spinor_field_g5_assign_f_gpu(out);
+  spinor_field_mul_add_assign_f_flt_gpu(out, rho, in);
+  spinor_field_minus_f_flt_gpu(out, out);
+  spinor_field_g5_assign_f_flt_gpu(out);
+  apply_BCs_on_spinor_field_flt(out);
 
-  #if defined(BASIC_SF) || defined(ROTATED_SF)
-    SF_spinor_bcs(out);
-  #endif 
+  //#if defined(BASIC_SF) || defined(ROTATED_SF)
+  //  SF_spinor_bcs(out);
+  //#endif 
 }
 
- /**
+/**
   * @brief Even-odd preconditioned squared Hermitian Wilson-Dirac operator with mass on the GPU.
+  *         Single precision version.
   *
   * @param in                 Even input spinor field
   * @param out                Even output spinor field that is the result of the application
@@ -333,16 +352,17 @@ void g5Dphi_eopre_gpu(double m0, spinor_field *out, spinor_field *in)
   *                           input spinor field
   * @param m0                 Mass parameter
   */
-void g5Dphi_eopre_sq_gpu(double m0, spinor_field *out, spinor_field *in) {
+void g5Dphi_eopre_sq_flt_gpu(double m0, spinor_field_flt *out, spinor_field_flt *in) {
   // alloc memory for temporary spinor field
   if (init) { init_Dirac(); }
 
-  g5Dphi_eopre_gpu(m0, etmp, in);
-  g5Dphi_eopre_gpu(m0, out, etmp);
+  g5Dphi_eopre_flt_gpu(m0, etmp, in);
+  g5Dphi_eopre_flt_gpu(m0, out, etmp);
 }
 
 /**
  * @brief Implementation of the squared Hermitian Wilson-Dirac operator with mass on the GPU.
+ *        Single precision version.
  *
  * @param in                    Input spinor field defined on the full lattice
  * @param out                   Output spinor field defined on the full lattice that is 
@@ -350,23 +370,24 @@ void g5Dphi_eopre_sq_gpu(double m0, spinor_field *out, spinor_field *in) {
  *                              operator on the input spinor field
  * @param m0                    Mass parameter
  */
-void g5Dphi_sq_gpu(double m0, spinor_field *out, spinor_field *in) {
+void g5Dphi_sq_flt_gpu(double m0, spinor_field_flt *out, spinor_field_flt *in) {
   // alloc memory for temporary spinor field 
   if (init) { init_Dirac();  }
 
-  g5Dphi_gpu(m0, gtmp, in);
-  g5Dphi_gpu(m0, out, gtmp);
+  g5Dphi_flt_gpu(m0, gtmp, in);
+  g5Dphi_flt_gpu(m0, out, gtmp);
 }
 
-/* For WITH_GPU: Map the GPU functions to the default functions. */
-unsigned long int (*getMVM) ()=getMVM_gpu;
-void (*Dphi_) (spinor_field *out, spinor_field *in)=Dphi_gpu_;
-void (*Dphi) (double m0, spinor_field *out, spinor_field *in)=Dphi_gpu;
-void (*g5Dphi) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_gpu;
-void (*g5Dphi_sq) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_sq_gpu;
-void (*Dphi_eopre) (double m0, spinor_field *out, spinor_field *in)=Dphi_eopre_gpu;
-void (*Dphi_oepre) (double m0, spinor_field *out, spinor_field *in)=Dphi_oepre_gpu;
-void (*g5Dphi_eopre) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_eopre_gpu;
-void (*g5Dphi_eopre_sq) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_eopre_sq_gpu;
+#ifdef WITH_GPU
+  unsigned long int (*getMVM_flt) ()=getMVM_flt_gpu;
+  void (*Dphi_flt_) (spinor_field_flt *out, spinor_field_flt *in)=Dphi_flt_gpu_;
+  void (*Dphi_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in)=Dphi_flt_gpu;
+  void (*g5Dphi_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in)=g5Dphi_flt_gpu;
+  void (*g5Dphi_sq_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in)=g5Dphi_sq_flt_gpu;
+  void (*Dphi_eopre_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in)=Dphi_eopre_flt_gpu;
+  void (*Dphi_oepre_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in)=Dphi_oepre_flt_gpu;
+  void (*g5Dphi_eopre_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in)=g5Dphi_eopre_flt_gpu;
+  void (*g5Dphi_eopre_sq_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in)=g5Dphi_eopre_sq_flt_gpu;
+#endif
 
 #endif

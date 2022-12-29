@@ -4,34 +4,12 @@
  *        will replace the current geometry in the future
  */
 
-<<<<<<< HEAD:Include/new_geometry.h
- #ifndef NEW_GEOMETRY_H
- #define NEW_GEOMETRY_H
-#ifdef __cplusplus
-    extern "C" {
- #endif
-
- #include "spinor_field.h"
- #include "suN.h"
- #include "suN_types.h"
-
-
-#ifdef MAIN_PROGRAM
-#  define GLB_VAR(type,name,...) type name __VA_ARGS__
-#else
-#  define GLB_VAR(type,name,...) extern type name
-#endif
-
-
-
-=======
 #ifndef NEW_GEOMETRY_H
 #define NEW_GEOMETRY_H
 
 #include "spinor_field.h"
 #include "suN.h"
 #include "suN_types.h"
->>>>>>> remotes/upstream/HiRep-CUDA:Include/Geometry/new_geometry.h
 #include <stdint.h>
 #include <stddef.h>
 

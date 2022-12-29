@@ -8,29 +8,7 @@
 *
 *******************************************************************************/
 
-<<<<<<< HEAD
-#define MAIN_PROGRAM
-
-#ifdef WITH_GPU
-
-#include "suN.h"
-#include "suN_types.h"
-#include "setup.h"
-#include "global.h"
-#include "linear_algebra.h"
-#include "test_utils.h"
-#include "logger.h"
-#include "random.h"
-#include "memory.h"
-#include "update.h"
-#include "geometry.h"
-#include "gpu_geometry.h"
-#include "hr_complex.h"
-#include "communications.h"
-#include "test_utils.h"
-=======
 #include "libhr.h"
->>>>>>> remotes/upstream/HiRep-CUDA
 
 int test_comms_spinor_field_f();
 int test_comms_spinor_field_f_flt();
