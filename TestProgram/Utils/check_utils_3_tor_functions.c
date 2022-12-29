@@ -1,6 +1,7 @@
 /*This is an automatically generated function, do not edit.*/
+#include "libhr.h"
 #define Complex(a,b) ((a)+I*(b))
-static int fulltorcheck(int rotid, hr_complex *rotated, hr_complex *unrotated)
+int fulltorcheck(int rotid, hr_complex *rotated, hr_complex *unrotated)
 {
 #define rotfun(a) rotated[(a)]
 #define unrotfun(a) unrotated[(a)]

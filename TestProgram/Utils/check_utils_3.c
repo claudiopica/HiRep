@@ -6,8 +6,8 @@
  *******************************************************************************/
 
 #include "libhr.h"
-#include "check_utils_3_gb_functions.c"
-#include "check_utils_3_tor_functions.c"
+int fullgbcheck(int rotid, hr_complex *rotated, hr_complex *unrotated);
+int fulltorcheck(int rotid, hr_complex *rotated, hr_complex *unrotated);
 
 static hr_complex **polyf;
 
