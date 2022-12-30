@@ -158,9 +158,8 @@ For debug purposes it is sometimes useful to have output files from all MPI proc
 
 # Documentation
 
-* Complete HTML Documentation [html](https://sofiemartins.github.io)
-* User Guide [pdf](https://sofiemartins.github.io/hirep_development_manual.pdf)
-* Developer Manual [pdf](https://sofiemartins.github.io/hirep_user_guide.pdf)
+* User Guide [pdf](https://sofiemartins.github.io/hirep_user_guide.pdf)
+* Developer Manual [pdf](https://sofiemartins.github.io/hirep_development_manual.pdf)
 * [Full Doxygen Function Reference](https://sofiemartins.github.io/doxygen/build/html/index.html)
 
 

@@ -106,7 +106,6 @@ static const char*bt_names[]={"L0","L1","L2","L3","INNER","SENDBUF"};
 
 static coord4 *rb_icoord=NULL; //global lookup table for recv buffers (L3+L2 borders)
 static coord4 *sb_icoord=NULL; //global lookup table for send buffers
-// static int icoord_idx=NULL;
 
 box_t* duplicateBox(box_t *B) {
     box_t *b=(box_t*)malloc(sizeof(box_t));

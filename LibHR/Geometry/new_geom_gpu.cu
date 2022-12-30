@@ -30,8 +30,6 @@
                 vol = boxOddVolume(src); \
                 base_idx = src->base_index_odd; \
             } \
-            if ((ixp%2)==0) vol = boxEvenVolume(src); \
-            else vol = boxOddVolume(src); \
             int grid = (vol - 1)/BLOCK_SIZE +1; \
             stride = gd->master_end[ixp] - gd->master_start[ixp] + 1; \
             int block_start = gd->master_start[ixp]; \

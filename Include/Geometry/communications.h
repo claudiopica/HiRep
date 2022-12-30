@@ -40,6 +40,7 @@ void global_sum_int(int *d, int n);
  * @param n			Number of nodes
  */
 void global_max(double *d, int n);
+void global_max_flt(float *d, int n);
 
 /**
  * @brief Finds minimum across nodes after finding the local minimum.
@@ -172,6 +173,6 @@ void complete_sf_sendrecv_flt(spinor_field_flt*);
 void start_sf_sendrecv_flt(spinor_field_flt*);
 
 #ifdef __cplusplus
-}
+    }
 #endif
 #endif 

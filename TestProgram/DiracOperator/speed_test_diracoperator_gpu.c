@@ -26,14 +26,11 @@
 #include "utils.h"
 #include "communications.h"
 
-static double hmass=0.1;
-static suNg_field *g;
-
 int main(int argc,char *argv[])
 {
 
-  double res1,res2,res3,res_cpu,res_gpu;
-  spinor_field *s0,*s1,*s2,*s3, *tmps;
+  double res1,res2,res3;
+  spinor_field *s0,*s1,*s2,*s3;
   float elapsed, gflops;
   int flopsite, bytesite;
   int n_times=5000;
@@ -63,11 +60,11 @@ int main(int argc,char *argv[])
   copy_to_gpu_spinor_field_f(s3);
   //
   //#pragma omp parallel num_threads(1) default(shared)
-#pragma omp parallel
+//#pragma omp parallel (Not necessary for GPU version? (SAM))
   {
     res1=spinor_field_sqnorm_f(s0);
 
-_OMP_BARRIER
+//_OMP_BARRIER
 
     res2=spinor_field_sqnorm_f(s1);
   }

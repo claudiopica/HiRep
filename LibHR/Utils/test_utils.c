@@ -47,6 +47,38 @@ int check_diff_norm_zero(double diff_norm)
     return return_val;
 }
 
+int check_not_zero(double value, double tolerance) 
+{
+    int return_val = 0;
+    if (fabs(value) < tolerance) 
+    {
+        lprintf("RESULT", 0, "FAILED \n");
+        return_val = 1;
+    } else 
+    {
+        lprintf("RESULT", 0, "OK \n");
+        return_val = 0;
+    }
+    lprintf("RESULT", 0, "[Value %0.2e is not zero up to tolerance.]\n", value);
+    return return_val;
+}
+
+int check_finiteness(double value) 
+{
+    int return_val = 0;
+    if (!isfinite(value)) 
+    {
+        lprintf("RESULT", 0, "FAILED \n");
+        return_val = 1;
+    } else 
+    {
+        lprintf("RESULT", 0, "OK \n");
+        return_val = 0;
+    }
+    lprintf("RESULT", 0, "[Value %0.2e is finite.]\n", value);
+    return return_val;
+}
+
 void rand_field_dbl(double* d, int n) {
     for (int i = 0; i < n; ++i) 
     {
@@ -697,6 +729,20 @@ void random_clover_force_cpu(suNf_field *f)
     int n = 6*f->type->gsize_gauge*sizeof(suNf)/sizeof(double);
     ranlxd((double*)(f->ptr), n);
 }
+
+void sync_single_precision_gauge_field() {
+    float* tmp;
+    double* in = (double*)u_gauge_f->ptr;
+    int len_in_dbl = 4*u_gauge_f->type->gsize_gauge * sizeof(*(u_gauge_f->ptr)) / sizeof(double);
+    tmp = (float*)malloc(len_in_dbl * sizeof(float));
+    for (int i = 0; i < len_in_dbl; ++i) tmp[i] = (float)in[i];
+    memcpy((float*)(u_gauge_f_flt->ptr), tmp, len_in_dbl * sizeof(float));
+}
+
+#ifdef WITH_GPU
+
+    
+#endif
 
 
 

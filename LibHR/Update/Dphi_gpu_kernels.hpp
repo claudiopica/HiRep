@@ -30,7 +30,7 @@ __global__ void Dphi_gpu_inner_kernel(suNf_spinor* __restrict__ out,
   _spinor_zero_f(r);
 
   suNf_hspinor sn;
-  suNf_hspinor sn_t_plus, sn_t_minus; // .. and so on
+  //suNf_hspinor sn_t_plus, sn_t_minus; // .. and so on
   suNf u;
   #ifdef FERMION_THETA
     suNf_vector vtmp;
@@ -103,5 +103,6 @@ __global__ void Dphi_gpu_boundary_kernel(suNf_spinor* __restrict__ out,
     write_gpu_suNf_spinor(vol4h, res, out, local_ix, 0);
   }
 }
+
 
 

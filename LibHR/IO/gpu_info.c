@@ -13,6 +13,10 @@
 #include "io.h"
 #include "error.h"
 #include "gpu.h"
+#ifdef WITH_MPI
+  #include "mpi.h"
+  #include <mpi-ext.h> // Needed for CUDA-awareness check, see https://docs.open-mpi.org/en/v5.0.x/man-openmpi/man3/MPIX_Query_cuda_support.3.html
+#endif
 
 const char *sComputeMode[] = {
     "Default (multiple host threads can use ::cudaSetDevice() with device simultaneously)",
@@ -210,6 +214,17 @@ void print_supported_features(cudaDeviceProp device_prop)
   lprintf("GPU_INIT",10,"Device PCI Bus ID / PCI location ID:           %d / %d\n", device_prop.pciBusID, device_prop.pciDeviceID );
   lprintf("GPU_INIT",10,"Compute Mode:\n");
   lprintf("GPU_INIT",10,"  < %s >\n", sComputeMode[device_prop.computeMode]);
+
+  #ifdef WITH_MPI
+    int cuda_aware_support = 0;
+    // TODO: This possibly only works for OpenMPI (SAM)
+    #if defined(OMPI_HAVE_MPI_EXT_CUDA) && OMPI_HAVE_MPI_EXT_CUDA
+      cuda_aware_support = MPIX_Query_cuda_support();
+    #endif
+
+    if (cuda_aware_support) lprintf("GPU_INIT", 10, "MPI implementation CUDA-aware? yes.\n");
+    else lprintf("GPU_INIT", 10, "MPI implementation CUDA-aware? no.\n");
+  #endif
 }
 
 /*Print out the device info assume CUDART >= 4000*/

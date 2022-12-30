@@ -201,7 +201,6 @@ void Dphi_flt_cpu_(spinor_field_flt * restrict out, spinor_field_flt * restrict 
 
       /******************************* direction +0 *********************************/
       if ((!(imask[ix] & T_UP_MASK)) == repeat) {
-        // lprintf("MAIN", 0, " T+");
         const int iy = iup(ix, 0);
         const suNf_spinor_flt *sp = _FIELD_AT(in, iy);
         const suNf_flt *up = pu_gauge_f_flt(ix, 0);
@@ -222,7 +221,6 @@ void Dphi_flt_cpu_(spinor_field_flt * restrict out, spinor_field_flt * restrict 
       }
       /******************************* direction -0 *********************************/
       if ((!(imask[ix] & T_DN_MASK)) == repeat) {
-        // lprintf("MAIN", 0, " T-");
         const int iy = idn(ix, 0);
         const suNf_spinor_flt *sm = _FIELD_AT(in, iy);
         const suNf_flt *um = pu_gauge_f_flt(iy, 0);
@@ -243,7 +241,6 @@ void Dphi_flt_cpu_(spinor_field_flt * restrict out, spinor_field_flt * restrict 
       }
       /******************************* direction +1 *********************************/
       if ((!(imask[ix] & X_UP_MASK)) == repeat) {
-        // lprintf("MAIN", 0, " X+");
         const int iy = iup(ix, 1);
         const suNf_spinor_flt *sp = _FIELD_AT(in, iy);
         const suNf_flt *up = pu_gauge_f_flt(ix, 1);
@@ -264,7 +261,6 @@ void Dphi_flt_cpu_(spinor_field_flt * restrict out, spinor_field_flt * restrict 
       }
       /******************************* direction -1 *********************************/
       if ((!(imask[ix] & X_DN_MASK)) == repeat) {
-        // lprintf("MAIN", 0, " X-");
         const int iy = idn(ix, 1);
         const suNf_spinor_flt *sm = _FIELD_AT(in, iy);
         const suNf_flt *um = pu_gauge_f_flt(iy, 1);
@@ -285,7 +281,6 @@ void Dphi_flt_cpu_(spinor_field_flt * restrict out, spinor_field_flt * restrict 
       }
       /******************************* direction +2 *********************************/
       if ((!(imask[ix] & Y_UP_MASK)) == repeat) {
-        // lprintf("MAIN", 0, " Y+");
         const int iy = iup(ix, 2);
         const suNf_spinor_flt *sp = _FIELD_AT(in, iy);
         const suNf_flt *up = pu_gauge_f_flt(ix, 2);
@@ -306,7 +301,6 @@ void Dphi_flt_cpu_(spinor_field_flt * restrict out, spinor_field_flt * restrict 
       }
       /******************************* direction -2 *********************************/
       if ((!(imask[ix] & Y_DN_MASK)) == repeat) {
-        // lprintf("MAIN", 0, " Y-");
         const int iy = idn(ix, 2);
         const suNf_spinor_flt *sm = _FIELD_AT(in, iy);
         const suNf_flt *um = pu_gauge_f_flt(iy, 2);
@@ -327,7 +321,6 @@ void Dphi_flt_cpu_(spinor_field_flt * restrict out, spinor_field_flt * restrict 
       }
       /******************************* direction +3 *********************************/
       if ((!(imask[ix] & Z_UP_MASK)) == repeat) {
-        // lprintf("MAIN", 0, " Z+");
         const int iy = iup(ix, 3);
         const suNf_spinor_flt *sp = _FIELD_AT(in, iy);
         const suNf_flt *up = pu_gauge_f_flt(ix, 3);
@@ -348,7 +341,6 @@ void Dphi_flt_cpu_(spinor_field_flt * restrict out, spinor_field_flt * restrict 
       }
       /******************************* direction -3 *********************************/
       if ((!(imask[ix] & Z_DN_MASK)) == repeat) {
-        // lprintf("MAIN", 0, " Z-");
         const int iy = idn(ix, 3);
         const suNf_spinor_flt *sm = _FIELD_AT(in, iy);
         const suNf_flt *um = pu_gauge_f_flt(iy, 3);
@@ -621,8 +613,8 @@ void Dphi_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
    Dphi_flt_cpu_(out, in);
 
    rho=4.f+(float)(m0);
-   spinor_field_mul_add_assign_f_flt(out,rho,in);
-    
+   spinor_field_mul_add_assign_f_flt_cpu(out,rho,in);
+
 #ifdef ROTATED_SF
    SFrho=(float)(3.*_update_par.SF_ds+_update_par.SF_zf-4.);
     
@@ -658,10 +650,9 @@ void Dphi_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
 			}
 		}
 	}
-#endif /* ROTATED_SF */
-    
+#endif 
+  
    apply_BCs_on_spinor_field_flt(out);
-
 }
 
 void g5Dphi_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
@@ -684,8 +675,8 @@ void g5Dphi_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
    
    rho=4.f+(float)(m0);
 
-   spinor_field_mul_add_assign_f_flt(out,rho,in);
-   spinor_field_g5_assign_f_flt(out);
+   spinor_field_mul_add_assign_f_flt_cpu(out,rho,in);
+   spinor_field_g5_assign_f_flt_cpu(out);
    apply_BCs_on_spinor_field_flt(out);
 }
 
@@ -721,8 +712,8 @@ void Dphi_eopre_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
   rho=4.f+(float)(m0);
   rho*=-rho; /* this minus sign is taken into account below */
   
-  spinor_field_mul_add_assign_f_flt(out,rho,in);
-  spinor_field_minus_f_flt(out,out);
+  spinor_field_mul_add_assign_f_flt_cpu(out,rho,in);
+  spinor_field_minus_f_flt_cpu(out,out);
   apply_BCs_on_spinor_field_flt(out);
 }
 
@@ -757,8 +748,8 @@ void Dphi_oepre_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
   rho=4.f+(float)(m0);
   rho*=-rho; /* this minus sign is taken into account below */
   
-  spinor_field_mul_add_assign_f_flt(out,rho,in);
-  spinor_field_minus_f_flt(out,out);
+  spinor_field_mul_add_assign_f_flt_cpu(out,rho,in);
+  spinor_field_minus_f_flt_cpu(out,out);
   apply_BCs_on_spinor_field_flt(out);
 }
 
@@ -789,9 +780,9 @@ void g5Dphi_eopre_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in
   rho=4.f+(float)(m0);
   rho*=-rho; /* this minus sign is taken into account below */
   
-  spinor_field_mul_add_assign_f_flt(out,rho,in);
-  spinor_field_minus_f_flt(out,out);
-  spinor_field_g5_assign_f_flt(out);
+  spinor_field_mul_add_assign_f_flt_cpu(out,rho,in);
+  spinor_field_minus_f_flt_cpu(out,out);
+  spinor_field_g5_assign_f_flt_cpu(out);
   apply_BCs_on_spinor_field_flt(out);
 }
 
