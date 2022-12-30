@@ -615,7 +615,6 @@ void Dphi_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
    rho=4.f+(float)(m0);
    spinor_field_mul_add_assign_f_flt_cpu(out,rho,in);
 
- /*   
 #ifdef ROTATED_SF
    SFrho=(float)(3.*_update_par.SF_ds+_update_par.SF_zf-4.);
     
@@ -652,7 +651,6 @@ void Dphi_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
 		}
 	}
 #endif 
-*/
   
    apply_BCs_on_spinor_field_flt(out);
 }

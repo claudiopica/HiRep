@@ -271,7 +271,6 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
 
       /******************************* direction +0 *********************************/
       if ((!(imask[ix] & T_UP_MASK)) == repeat) {
-        // lprintf("MAIN", 0, " T+");
         const int iy = iup(ix, 0);
         const suNf_spinor *sp = _FIELD_AT(in, iy);
         const suNf *up = pu_gauge_f(ix, 0);
@@ -280,7 +279,6 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
         suNf_vector vtmp[2];
   #endif
 
-        if (ix == 0 && repeat) printf("CPU spinor comp: %0.2e + i%0.2e\n", creal((*sp).c[0].c[0]), cimag((*sp).c[0].c[0]));
         _vector_add_f(psi, (*sp).c[0], (*sp).c[2]);
         _vector_add_f(psi2, (*sp).c[1], (*sp).c[3]);
         _suNf_theta_T_multiply(chi, (*up), psi);
@@ -293,7 +291,6 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
       }
       /******************************* direction -0 *********************************/
       if ((!(imask[ix] & T_DN_MASK)) == repeat) {
-        // lprintf("MAIN", 0, " T-");
         const int iy = idn(ix, 0);
         const suNf_spinor *sm = _FIELD_AT(in, iy);
         const suNf *um = pu_gauge_f(iy, 0);
@@ -302,7 +299,6 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
         suNf_vector vtmp[2];
   #endif
 
-        if (repeat) printf("ix: %d\t", ix);
         _vector_sub_f(psi, (*sm).c[0], (*sm).c[2]);
         _vector_sub_f(psi2, (*sm).c[1], (*sm).c[3]);
         _suNf_theta_T_inverse_multiply(chi, (*um), psi);
@@ -315,7 +311,6 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
       }
       /******************************* direction +1 *********************************/
       if ((!(imask[ix] & X_UP_MASK)) == repeat) {
-        // lprintf("MAIN", 0, " X+");
         const int iy = iup(ix, 1);
         const suNf_spinor *sp = _FIELD_AT(in, iy);
         const suNf *up = pu_gauge_f(ix, 1);
@@ -336,7 +331,6 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
       }
       /******************************* direction -1 *********************************/
       if ((!(imask[ix] & X_DN_MASK)) == repeat) {
-        // lprintf("MAIN", 0, " X-");
         const int iy = idn(ix, 1);
         const suNf_spinor *sm = _FIELD_AT(in, iy);
         const suNf *um = pu_gauge_f(iy, 1);
@@ -357,7 +351,6 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
       }
       /******************************* direction +2 *********************************/
       if ((!(imask[ix] & Y_UP_MASK)) == repeat) {
-        // lprintf("MAIN", 0, " Y+");
         const int iy = iup(ix, 2);
         const suNf_spinor *sp = _FIELD_AT(in, iy);
         const suNf *up = pu_gauge_f(ix, 2);
@@ -378,7 +371,6 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
       }
       /******************************* direction -2 *********************************/
       if ((!(imask[ix] & Y_DN_MASK)) == repeat) {
-        // lprintf("MAIN", 0, " Y-");
         const int iy = idn(ix, 2);
         const suNf_spinor *sm = _FIELD_AT(in, iy);
         const suNf *um = pu_gauge_f(iy, 2);
@@ -399,7 +391,6 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
       }
       /******************************* direction +3 *********************************/
       if ((!(imask[ix] & Z_UP_MASK)) == repeat) {
-        // lprintf("MAIN", 0, " Z+");
         const int iy = iup(ix, 3);
         const suNf_spinor *sp = _FIELD_AT(in, iy);
         const suNf *up = pu_gauge_f(ix, 3);
@@ -420,7 +411,6 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
       }
       /******************************* direction -3 *********************************/
       if ((!(imask[ix] & Z_DN_MASK)) == repeat) {
-        // lprintf("MAIN", 0, " Z-");
         const int iy = idn(ix, 3);
         const suNf_spinor *sm = _FIELD_AT(in, iy);
         const suNf *um = pu_gauge_f(iy, 3);

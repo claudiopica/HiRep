@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
 
   random_u(u_gauge);
 
-  //start_gf_sendrecv(u_gauge); // Is this necessary? (SAM)
+  start_gf_sendrecv(u_gauge);
 
   represent_gauge_field();
   lprintf("MAIN", 0, "done.\n");
@@ -62,31 +62,8 @@ int main(int argc, char *argv[])
 
   assign_ud2u_f();
 
-  #ifdef WITH_GPU
-    copy_to_gpu_spinor_field_f(s0);
-    copy_to_gpu_spinor_field_f(s1);
-    copy_to_gpu_spinor_field_f_flt(f0);
-    copy_to_gpu_spinor_field_f_flt(f1);
-    copy_to_gpu_gfield_f(u_gauge_f);
-  #endif
-
-  #ifdef WITH_MPI
-    start_sendrecv_gpu_gfield_f(u_gauge_f);
-    complete_sendrecv_gpu_gfield_f(u_gauge_f);
-
-    start_sendrecv_gpu_gfield_f_flt(u_gauge_f_flt);
-    complete_sendrecv_gpu_gfield_f_flt(u_gauge_f_flt);
-  #endif
-
   loc_D(s1, s0);
   loc_D_flt(f1, f0);
-
-  #ifdef WITH_GPU
-    copy_from_gpu_spinor_field_f(s0);
-    copy_from_gpu_spinor_field_f(s1);
-    copy_from_gpu_spinor_field_f_flt(f0);
-    copy_from_gpu_spinor_field_f_flt(f1);
-  #endif
 
   lprintf("INFO", 0, "Spinor sqnorm result double precision: %0.2e\n", spinor_field_sqnorm_f_cpu(s1));
   lprintf("INFO", 0, "Spinor sqnorm result single precision: %0.2e\n", spinor_field_sqnorm_f_flt_cpu(f1));

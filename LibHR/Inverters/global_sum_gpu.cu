@@ -324,9 +324,6 @@ template hr_complex_flt global_sum_gpu<hr_complex_flt>(hr_complex_flt* vector, i
 template hr_complex global_sum_gpu<hr_complex>(hr_complex* vector, int size);
 
 
-#ifdef __cplusplus
-  extern "C" {
-#endif
 // The following function is to expose the global sum to C code
 int global_sum_gpu_int(int* vector, int size){
   int res;
@@ -381,9 +378,5 @@ hr_complex global_sum_gpu_complex(hr_complex* vector, int size){
   cudaFree(vector_d);
   return res;
 }
-
-#ifdef __cplusplus
-  }
-#endif
 
 #endif
