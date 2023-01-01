@@ -2,12 +2,9 @@
 use strict;
 
 ## TODO: pl script docs clean up
-## Problems: Spinor field layers, scalar fields need separate def
 ## TODO: Possibly it is faster, if we do the cast only once (double*)
 ## Readout with assigning the complex from the doubles might not be ideal, because it 
 ## is a math operation internally while in reality it is just moving memory around.
-## suNfc -- not working for Ad for example
-## TODO: MPI
 
 # Read arguments from MkRules
 # Ng ... Number of Colors
@@ -73,7 +70,7 @@ write_epilog();
 
 sub write_prolog {
     print <<END
-/*******************************************************************************\n";
+/*******************************************************************************
 *
 * File gpu_geometry.h
 *

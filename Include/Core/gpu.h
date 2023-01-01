@@ -1,7 +1,3 @@
-/***************************************************************************\
- * Copyright (c) 2008, Claudio Pica                                          *   
- * All rights reserved.                                                      * 
- \***************************************************************************/
 /**
  * @file gpu.h
  * @brief Basic gpu imports and structs. Include this in files that define GPU logic.

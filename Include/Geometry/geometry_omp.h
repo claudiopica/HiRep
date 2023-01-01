@@ -144,7 +144,7 @@
 /**
  * @brief Fuse reduce on the whole local lattice FIXME: more desc
  *
- *  * @param type          geometry_descriptor that contains information on the geometry
+ * @param type          geometry_descriptor that contains information on the geometry
  *                      of the local lattice.
  * @param is            Local variable that runs over all site indices on the given piece.
  * @param redop1        Variable to reduce
@@ -154,24 +154,65 @@
   _FUSE_FOR_RED((type), _fuse_master_for_ip_##is, is, redop1, redop2)
 
 /**
- * @brief Have the spinor to iterate
+ * @brief Iterate over all sites of the local lattice but not by index in memory
+ *        but by spinor, applying a OpenMP reduction to the other variables.
+ *        The current spinor can be found using _SPINOR_PTR(s). 
+ *
+ * @param s             Input spinor field
+ * @param redop1        Variable to reduce
+ * @param redop2        Variable to reduce
  */
 #define _ONE_SPINOR_FOR_RED(s,redop1,redop2) _MASTER_FOR_RED((s)->type,_spinor_for_is,redop1,redop2)
 
+/**
+ * @brief Iterate over all sites of the local lattice but not by index in memory
+ *        but by spinor, applyin an OpenMP sum reduction to the other variables.
+ *        The current spinor can be found using _SPINOR_PTR(s).
+ *
+ * @param s             Input spinor field
+ * @param ...           Variables to reduce
+ */
 #define _ONE_SPINOR_FOR_SUM(s,...) _ONE_SPINOR_FOR_RED(s,_omp_sum(__VA_ARGS__),)
 
+/**
+ * @brief Iterate over two corresponding spinors on the given fields, applying
+ *        an OpenMP reduction operation on the other given variables. The current 
+ *        spinors can be found using _SPINOR_PTR(s1) and _SPINOR_PTR(s2).
+ *
+ * @param s1            First input spinor field
+ * @param s2            Second input spinor field
+ * @param redop1        Variable to reduce
+ * @param redop2        Variable to reduce
+ */
 #define _TWO_SPINORS_FOR_RED(s1,s2,redop1,redop2) \
   _TWO_SPINORS_MATCHING(s1,s2); \
   _ONE_SPINOR_FOR_RED(s1,redop1,redop2)
 
+/**
+ * @brief Iterate over two corresponding spinors on the given fields, applying
+ *        an OpenMP sum reduction on the other given variables. The current
+ *        spinors can be found using _SPINOR_PTR(s1) and _SPINOR_PTR(s2).
+ *
+ * @param s1            First input spinor field
+ * @param s2            Second input spinor field
+ * @param ...           Variables to reduce
+ */
 #define _TWO_SPINORS_FOR_SUM(s1,s2,...) _TWO_SPINORS_FOR_RED(s1,s2,_omp_sum(__VA_ARGS__),)
 
-
+/**
+ * @brief Iterate over three corresponding spinors on the given fields, applying
+ *        an OpenMP reduction on the other given variables. The current
+ *        spinors can be found using _SPINOR_PTR(s1) and _SPINOR_PTR(s2).
+ * 
+ * @param s1            First input spinor field
+ * @param s2            Second input spinor field
+ * @param redop1        Variable to reduce
+ * @param redop2        Variable to reduce
+ */
 #define _THREE_SPINORS_FOR_RED(s1,s2,s3,redop1,redop2) \
   _TWO_SPINORS_MATCHING(s1,s2); \
   _TWO_SPINORS_MATCHING(s1,s3); \
   _ONE_SPINOR_FOR_RED(s1,redop1,redop2)
-
 
 /**
  * @brief Iterate over all sites of the local lattice but not by index in memory but by

@@ -1,5 +1,5 @@
 /**
- * @file cluster_info.h
+ * @file gpu_info.h
  * @brief Functions that print collective information on cluster 
  *        drivers, necessary software and available hardware.
  *        To be logged to simulation outfiles.

@@ -44,9 +44,7 @@ Usually, we want to initialize fields either on the full lattice or only with ev
 ### Number of Sites
 In order to allocate memory for the field data, we need to know how many elementary field types we need to allocate. This is different for fields that are located on the sites or the links of the lattice. Correspondingly, for the given lattice geometry, the number of sites and the number of links are calculated and saved in the fields `gsize_spinor` and `gsize_gauge` respectively.
 
-### Master Pieces
-%% TODO: We also include the halo region into total master pieces and this collides with this definition
-
+#### Master Pieces
 A piece is called _master_ if it does not contain copies of other sites, as for example is the case for buffer pieces. These are copies of sites already stored in a master piece. 
 
 The sites in a master piece can be categorized by their function in computation and communications. 

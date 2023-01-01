@@ -29,6 +29,10 @@
 void init_gpu(input_gpu gpu_var);
 
 // geometry_init_gpu.c
+/**
+ * @brief This function transfers geometry lookup tables and global variables to the 
+ *        device so that they are globally available.
+ */
 void init_neighbors_gpu(void);
 
 #ifdef __cplusplus
