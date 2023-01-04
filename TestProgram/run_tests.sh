@@ -17,10 +17,12 @@ done
 echo Building...
 ../Make/nj ${1}
 
-rm -f ${1}/.test_failed
+rm -f ${1}/.test_failed ${1}/.test_failed_*
 
 echo Run Tests...
 ../Make/nj ${1}_tests
+
+./mk_summary.sh ${1}
 
 if compgen -G "${1}/.test_failed_*" >/dev/null ; then 
   touch ${1}/.test_failed

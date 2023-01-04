@@ -267,8 +267,9 @@ sub read_conf {
     # parse INI file
     my %options;
     while (my $line = <$fh>) {
-        if ($line =~ /^\s*#/) { next; }  # skip comments
         if ($line =~ /^\s*$/) { next; }  # skip empty lines
+        $line =~ s/#.*$//;  # strip comments
+        
         # handle assignments = or +=
         if ($line =~ /^([^=]+?)\s*\+?=\s*(.*?)\s*$/) {
             my ($field, $value) = ($1, $2);

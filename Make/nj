@@ -4,6 +4,11 @@ use strict;
 use Cwd qw(abs_path getcwd);
 use File::Path qw(make_path);
 
+# set this option to re-generate the ninja.build file every time
+# this is useful if new files are added or files are deleted
+# or if NOCOMPILE options are changed often
+my $always_generate_ninja = 1;
+
 my $ownpath = abs_path($0);
 my $cwd = getcwd;
 $ownpath =~ m{^(.*?)/Make/.*} or die("Wrong install dir for b script!\n");
@@ -17,7 +22,7 @@ if (not (-e $builddir)) {
      print "Creating build dir [$builddir]\n";
      make_path($builddir);
 }
-if (not (-s $ninja_file)) {
+if (not (-s $ninja_file) || $always_generate_ninja) {
      print "Generating Ninja build file [$ninja_file]\n";
      system("$rootdir/Make/build.pl > $ninja_file");
 }

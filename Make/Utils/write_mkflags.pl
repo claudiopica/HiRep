@@ -10,6 +10,7 @@ GetOptions(
   'repr|r=s'     => \(my $repr = 'FUND'),
   'gauge=s'      => \(my $gauge = 'SUN'),
   'mpi!'         => \(my $mpi = 1),
+  'gpu!'         => \(my $gpu = 0),
   't=s'          => \(my $TBC = 'P'),
   'x=s'          => \(my $XBC = 'P'),
   'y=s'          => \(my $YBC = 'P'),
@@ -216,6 +217,8 @@ $mem && print $fh "MACRO += -DAMALLOC_MEASURE\n";
 $force && print $fh "MACRO += -DMEASURE_FORCE\n";
 # write mpi
 $mpi && print $fh "MACRO += -DWITH_MPI\n";
+# write GPU
+$gpu && print $fh "MACRO += -DWITH_GPU\n";
 # write compiler options
 if ($ccache!=0) { $cc="ccache ".$cc; $mpicc="ccache ".$mpicc; }
 print $fh "CC = $cc\n";
@@ -251,6 +254,7 @@ write_mkflags - write flags file for compilation of HiRep
   -z                  [P]         Z boundary conditions (P, A, T)
 
   --[no-]mpi          [true]      Use MPI
+  --[no-]gpu          [false]     Use GPU acceleration
   --cc                [gcc]       Compiler
   --mpicc             [mpicc]     MPI Compiler
   --cflags            [-Wall -O3] Compilation options
