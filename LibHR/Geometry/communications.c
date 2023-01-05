@@ -6,6 +6,7 @@
 #include "geometry.h"
 #include "libhr_core.h"
 #include <string.h>
+#include "IO/logger.h"
 
 #ifdef MPI_TIMING
 struct timeval gfstart, gfend, gfetime, sfstart, sfend, sfetime;
@@ -282,6 +283,22 @@ static void sync_clover_force_field(suNf_field *gf)
 #endif
 
 #ifdef WITH_NEW_GEOMETRY
+static void sync_staple_field(suNg_field *sf) {
+  sync_field(sf->type, 3*sizeof(*sf->ptr), 0, sf->ptr, sf->sendbuf_ptr);
+}
+#else
+static void sync_staple_field(suNg_field *gf)
+{
+  geometry_descriptor *gd = gf->type;
+  for (int i = 0; i < gd->ncopies_gauge; ++i)
+  {
+    /* this assumes that the 6 directions are contiguous in memory !!! */
+    memcpy(((gf->ptr) + 3 * gd->copy_to[i]), ((gf->ptr) + 3 * gd->copy_from[i]), 3 * (gd->copy_len[i]) * sizeof(*(gf->ptr)));
+  }
+}
+#endif
+
+#ifdef WITH_NEW_GEOMETRY
 static void sync_spinor_field(spinor_field *p) {
   sync_field(p->type, sizeof(*p->ptr), 1, p->ptr, p->sendbuf_ptr);
 }
@@ -451,6 +468,134 @@ void start_clover_force_sendrecv(suNf_field *gf)
 
 #endif /* WITH_MPI */
 }
+
+
+/* This variable contains the information of the current status of communications
+ * Values:
+ * 0 => No communications pending
+ *
+ */
+/* static unsigned int comm_status=0; */
+
+void complete_staple_field_sendrecv(suNg_field *gf)
+{
+#ifdef WITH_MPI
+  int mpiret;
+  (void)mpiret; // Remove warning of variable set but not used
+  int nreq = 2 * gf->type->nbuffers_gauge;
+
+  if (nreq > 0)
+  {
+    MPI_Status status[nreq];
+
+    mpiret = MPI_Waitall(nreq, gf->comm_req, status);
+
+#ifndef NDEBUG
+    if (mpiret != MPI_SUCCESS)
+    {
+      char mesg[MPI_MAX_ERROR_STRING];
+      int mesglen, k;
+      MPI_Error_string(mpiret, mesg, &mesglen);
+      lprintf("MPI", 0, "ERROR: %s\n", mesg);
+      for (k = 0; k < nreq; ++k)
+      {
+        if (status[k].MPI_ERROR != MPI_SUCCESS)
+        {
+          MPI_Error_string(status[k].MPI_ERROR, mesg, &mesglen);
+          lprintf("MPI", 0, "Req [%d] Source [%d] Tag [%] ERROR: %s\n",
+                  k,
+                  status[k].MPI_SOURCE,
+                  status[k].MPI_TAG,
+                  mesg);
+        }
+      }
+      error(1, 1, "complete_staple_field_sendrecv " __FILE__, "Cannot complete communications");
+    }
+#endif
+  }
+
+#ifdef MPI_TIMING
+  if (gf_control > 0)
+  {
+    gettimeofday(&gfend, 0);
+    timeval_subtract(&gfetime, &gfend, &gfstart);
+    lprintf("MPI TIMING", 0, "complete_staple_field_sendrecv" __FILE__ " %ld sec %ld usec\n", gfetime.tv_sec, gfetime.tv_usec);
+    gf_control = 0;
+  }
+#endif
+
+#endif /* WITH_MPI */
+}
+
+void start_staple_field_sendrecv(suNg_field *gf)
+{
+#ifdef WITH_MPI
+  int i, mpiret;
+  (void)mpiret; // Remove warning of variable set but not used
+  geometry_descriptor *gd = gf->type;
+
+  /* check communication status */
+  /* questo credo che non sia il modo piu' efficiente!!! */
+  /* bisognerebbe forse avere una variabile di stato nei campi?? */
+  complete_staple_field_sendrecv(gf);
+
+  /* fill send buffers */
+  sync_staple_field(gf);
+
+#ifdef MPI_TIMING
+  error(gf_control > 0, 1, "start_clover_force_sendrecv " __FILE__, "Multiple send without receive");
+  gettimeofday(&gfstart, 0);
+  gf_control = 1;
+#endif
+
+  for (i = 0; i < (gd->nbuffers_gauge); ++i)
+  {
+    /* send ith buffer */
+    mpiret = MPI_Isend((double *)((gf->sendbuf_ptr) + 3 * gd->sbuf_start[i]),         /* buffer */
+                       (gd->sbuf_len[i]) * sizeof(suNf) / sizeof(double) * 3, /* lenght in units of doubles */
+                       MPI_DOUBLE,                                            /* basic datatype */
+                       gd->sbuf_to_proc[i],                                   /* cid of destination */
+                       i,                                                     /* tag of communication */
+                       cart_comm,                                             /* use the cartesian communicator */
+                       &(gf->comm_req[2 * i])                                 /* handle to communication request */
+    );
+#ifndef NDEBUG
+    if (mpiret != MPI_SUCCESS)
+    {
+      char mesg[MPI_MAX_ERROR_STRING];
+      int mesglen;
+      MPI_Error_string(mpiret, mesg, &mesglen);
+      lprintf("MPI", 0, "ERROR: %s\n", mesg);
+      error(1, 1, "start_clover_force_sendrecv " __FILE__, "Cannot start send buffer");
+    }
+#endif
+
+    /* receive ith buffer */
+    mpiret = MPI_Irecv((double *)((gf->ptr) + 3 * gd->rbuf_start[i]),         /* buffer */
+                       (gd->rbuf_len[i]) * sizeof(suNf) / sizeof(double) * 3, /* lenght in units of doubles */
+                       MPI_DOUBLE,                                            /* basic datatype */
+                       gd->rbuf_from_proc[i],                                 /* cid of origin */
+                       i,                                                     /* tag of communication */
+                       cart_comm,                                             /* use the cartesian communicator */
+                       &(gf->comm_req[2 * i + 1])                             /* handle to communication request */
+    );
+#ifndef NDEBUG
+    if (mpiret != MPI_SUCCESS)
+    {
+      char mesg[MPI_MAX_ERROR_STRING];
+      int mesglen;
+      MPI_Error_string(mpiret, mesg, &mesglen);
+      lprintf("MPI", 0, "ERROR: %s\n", mesg);
+      error(1, 1, "start_clover_force_sendrecv " __FILE__, "Cannot start receive buffer");
+    }
+#endif
+  }
+
+#endif /* WITH_MPI */
+}
+
+
+
 
 
 #if defined(WITH_NEW_GEOMETRY) && defined(WITH_MPI)

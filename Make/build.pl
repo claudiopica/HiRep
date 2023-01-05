@@ -108,7 +108,6 @@ my @libs = ("libhr.a"); #this is for later programs to use
   );
 
   my %exclude = ( Integrators => [ "check_integrator_utils_1.c", ], 
-                  PureGauge => [ "check_puregauge_3.c", ], # this test is broken
                   Utils => [ "check_utils_3_gb_functions.c", "check_utils_3_tor_functions.c", 
                   ], 
                   DiracOperator => ["speed_test_diracoperator.c", "speed_test_diracoperator_flt.c", "speed_test_diracoperator_gpu.c", #not a test, this should be a separate exe
