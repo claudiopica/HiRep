@@ -1,4 +1,6 @@
+breathe==4.34.0
 myst==1.0.4
 myst_parser==0.18.0
 sphinx==5.0.2
 sphinx-rtd-theme==1.0.0
+sphinxcontrib-bibtexi==2.5.0

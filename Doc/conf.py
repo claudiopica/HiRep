@@ -2,8 +2,13 @@
 
 import os
 import sys
+import subprocess
+from sphinx.builders.html import StandaloneHTMLBuilder
 
 sys.path.insert(0, os.path.abspath(".."))
+
+subprocess.call("make clean", shell=True)
+subprocess.call("cd ./doxygen ; doxygen Doxyfile", shell=True)
 
 # -- General configuration ------------------------------------------------
 extensions = [
@@ -125,11 +130,6 @@ texinfo_documents = [
 ]
 
 # -- Extension configuration -------------------------------------------------
-import subprocess
-
-subprocess.call("make clean", shell=True)
-subprocess.call("cd doxygen ; doxygen", shell=True)
-
 breathe_projects = {"HiRep": "doxygen/build/xml/"}
 breathe_default_project = "HiRep"
 
