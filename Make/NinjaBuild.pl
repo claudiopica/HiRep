@@ -87,10 +87,6 @@ rule gpu_geometry
   command = cd $outdir && $wr_gpugeo $NG $REPR $WQUAT $GAUGE_GROUP
   description = $setbg GPU GOMETRY HEADERS $setnorm $out
 
-rule macro_opt
-  command = echo -n '$MACRO' | perl -pe 's/\s+/\n/g; s/-D/#define /g; s/=/ /g;' > $out
-  description = $setbg OPTION HEADER $setnorm $out
-
 rule cinfo
   command = cd $outdir && $makedir/Utils/cinfo.sh $makedir $root $MACRO
   description = $setbg OPTION HEADER $setnorm $out
@@ -107,7 +103,6 @@ build writeREPR: phony $wr_repr
 
 # Autoheaders
 build autoheaders: phony $coreincdir/suN.h $coreincdir/suN_types.h $coreincdir/suN_repr_func.h $root/Include/Geometry/gpu_geometry.h $root/LibHR/Utils/cinfo.h
-#build $coreincdir/macro_opt.h: macro_opt
 build $coreincdir/suN.h $coreincdir/suN_types.h: suN_headers | $wr_head
 build $coreincdir/suN_repr_func.h: suN_repr $coreincdir/TMPL/suN_repr_func.h.tmpl | $wr_repr
 build $root/Include/Geometry/gpu_geometry.h: gpu_geometry | $wr_gpugeo
@@ -285,14 +280,14 @@ sub read_conf {
     if (not exists $options{'CXX'}) {$options{'CXX'} = [ "g++" ] ; }
     
     # set WQUAT option
-    if (contains($options{'MACRO'},"-DWITH_QUATERNIONS")) {
+    if (contains($options{'MACRO'},"WITH_QUATERNIONS")) {
         $options{'WQUAT'} = [ "1" ] ; 
     } else {
         $options{'WQUAT'} = [ "0" ] ;
     }
 
     # handle WITH_MPI compiler 
-    if (contains($options{'MACRO'},"-DWITH_MPI")) {
+    if (contains($options{'MACRO'},"WITH_MPI")) {
         $options{'CC'} = $options{'MPICC'};
         $with_mpi = 1;
     }
@@ -301,7 +296,7 @@ sub read_conf {
     $options{'LINK'} = [ $options{'CC'}[0] ] ;
 
     # handle WITH_GPU
-    if (contains($options{'MACRO'},"-DWITH_GPU")) {
+    if (contains($options{'MACRO'},"WITH_GPU")) {
         if (not exists $options{'NVCC'}) {
             die("'WITH_GPU' is set but no 'NVCC' compiler given!\n");
         }
@@ -313,20 +308,20 @@ sub read_conf {
         my $nvcc_path = `echo 'command -v $nvcc' | sh`;
         $nvcc_path =~ m{(.*?)/bin/$nvcc} or die("Cannot locate NVCC compiler [$nvcc]!\n");
         my $cuda_path = $1;
-        print ("CUDA= $cuda_path\n");
+        # print ("CUDA= $cuda_path\n");
         #add standard CUDA include and lib dirs
         push(@{$options{'INCLUDE'}},"-I$cuda_path/include/");
         push(@{$options{'LDFLAGS'}},"-lcuda");
 
         #set linker 
-        unshift @{$options{'LINK'}}, "$nvcc -ccbin "; 
+        unshift @{$options{'LINK'}}, "$nvcc --forward-unknown-to-host-compiler -ccbin"; 
     }
 
     #add standard definitions to MACRO
-    push(@{$options{'MACRO'}},"-DNG=${$options{'NG'}}[0]");
-    push(@{$options{'MACRO'}},"-D${$options{'GAUGE_GROUP'}}[0]");
-    push(@{$options{'MACRO'}},"-D${$options{'REPR'}}[0]");
-    push(@{$options{'MACRO'}},"-DREPR_NAME=\\\"${$options{'REPR'}}[0]\\\"");
+    push(@{$options{'MACRO'}},"NG=${$options{'NG'}}[0]");
+    push(@{$options{'MACRO'}},"${$options{'GAUGE_GROUP'}}[0]");
+    push(@{$options{'MACRO'}},"${$options{'REPR'}}[0]");
+    push(@{$options{'MACRO'}},"REPR_NAME=\\\"${$options{'REPR'}}[0]\\\"");
 
     #print Dumper(\%options);
     return %options;
@@ -346,7 +341,12 @@ sub print_options {
 
     print "# Compilation Options\n\n";
     while ( my ($k,$v) = each %options ) {
-        print "$k = @$v\n";
+        if ($k eq "MACRO") {
+            my @o = map { "-D" . $_ } @$v;
+            print "$k = @o\n";
+        } else {
+            print "$k = @$v\n";
+        }
     }
     print "\n";
 }
@@ -368,7 +368,7 @@ sub no_compile {
     if (!@options) { return 0; }
 
     # parse list of defined MACROS
-    my @defined = map { local $_ = $_; s/-D//; s/=/==/g; s/=/_/g; s/[\"\\]//g; $_ }  @{$options{"MACRO"}};
+    my @defined = map { local $_ = $_; s/=/==/g; s/=/_/g; s/[\"\\]//g; $_ }  @{$options{"MACRO"}};
     # create a dictionary where each defined macro is true = 1
     my %dictionary; foreach ( @defined ) { $dictionary{$_}=1; }
     # build logical expression and parse it
@@ -481,7 +481,6 @@ sub print_c_cpp_properties {
             "defines": [
 EOF
     foreach (@{$options{'MACRO'}}) {
-        $_ =~ s/^-D//;
         print FH "                \"$_\"";
         if (not ($_ eq ${$options{'MACRO'}}[-1])) {
             print FH ",";

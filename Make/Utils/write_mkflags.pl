@@ -166,59 +166,59 @@ print $fh "REPR = $repr\n";
 # write gauge
 print $fh "GAUGE_GROUP = $gauge\n";
 # write T boundary condition
-print $fh "MACRO += -D$TBC\n";
+print $fh "MACRO += $TBC\n";
 # write X boundary condition
-print $fh "MACRO += -D$XBC\n";
+print $fh "MACRO += $XBC\n";
 # write Y boundary condition
-print $fh "MACRO += -D$YBC\n";
+print $fh "MACRO += $YBC\n";
 # write Z boundary condition
-print $fh "MACRO += -D$ZBC\n";
+print $fh "MACRO += $ZBC\n";
 # write twisted boundary condition
-$xyz_twist && print $fh "MACRO += -DBC_XYZ_TWISTED\n";
+$xyz_twist && print $fh "MACRO += BC_XYZ_TWISTED\n";
 # write sf boundary condition
-$sfbc && print $fh "MACRO += -DBASIC_SF\n";
+$sfbc && print $fh "MACRO += BASIC_SF\n";
 # write sf half field boundary condition
-$sfhalfbc && print $fh "MACRO += -DHALFBG_SF\n";
+$sfhalfbc && print $fh "MACRO += HALFBG_SF\n";
 # write sf rotated boundary condition
-$sfrotatedbc && print $fh "MACRO += -DROTATED_SF\n";
+$sfrotatedbc && print $fh "MACRO += ROTATED_SF\n";
 # write smearing
-$smearing && print $fh "MACRO += -DWITH_SMEARING\n";
+$smearing && print $fh "MACRO += WITH_SMEARING\n";
 # write clover
-$clover && print $fh "MACRO += -DWITH_CLOVER\n";
+$clover && print $fh "MACRO += WITH_CLOVER\n";
 # write expclover
-$expclover && print $fh "MACRO += -DWITH_EXPCLOVER\n";
+$expclover && print $fh "MACRO += WITH_EXPCLOVER\n";
 # write eo preconditioning
-$eoprec && print $fh "MACRO += -DUPDATE_EO\n";
+$eoprec && print $fh "MACRO += UPDATE_EO\n";
 # write new geometry
-$newgeo && print $fh "MACRO += -DWITH_NEW_GEOMETRY\n";
+$newgeo && print $fh "MACRO += WITH_NEW_GEOMETRY\n";
 # write quaternions 
-$quat && print $fh "MACRO += -DWITH_QUATERNIONS\n";
+$quat && print $fh "MACRO += WITH_QUATERNIONS\n";
 # write ndebug
-$ndebug && print $fh "MACRO += -DNDEBUG\n";
+$ndebug && print $fh "MACRO += NDEBUG\n";
 # write dphi float
-$dfloat && print $fh "MACRO += -DDPHI_FLOAT\n";
+$dfloat && print $fh "MACRO += DPHI_FLOAT\n";
 # write check spinor
-$scheck && print $fh "MACRO += -DCHECK_SPINOR_MATCHING\n";
+$scheck && print $fh "MACRO += CHECK_SPINOR_MATCHING\n";
 # write mpitiming
-$mpit && print $fh "MACRO += -DMPI_TIMING\n";
+$mpit && print $fh "MACRO += MPI_TIMING\n";
 # write io flush
-$iof && print $fh "MACRO += -DIO_FLUSH\n";
+$iof && print $fh "MACRO += IO_FLUSH\n";
 # log all pids
-$logallpids && print $fh "MACRO += -DLOG_ALLPIDS\n";
+$logallpids && print $fh "MACRO += LOG_ALLPIDS\n";
 # write unroll representation
-$unrollr && print $fh "MACRO += -DUNROLL_GROUP_REPRESENT\n";
+$unrollr && print $fh "MACRO += UNROLL_GROUP_REPRESENT\n";
 # write timing
-$timing && print $fh "MACRO += -DTIMING\n";
+$timing && print $fh "MACRO += TIMING\n";
 # write timing
-$btiming && print $fh "MACRO += -DTIMING_WITH_BARRIERS\n";
+$btiming && print $fh "MACRO += TIMING_WITH_BARRIERS\n";
 # write memory
-$mem && print $fh "MACRO += -DAMALLOC_MEASURE\n";
+$mem && print $fh "MACRO += AMALLOC_MEASURE\n";
 # write force
-$force && print $fh "MACRO += -DMEASURE_FORCE\n";
+$force && print $fh "MACRO += MEASURE_FORCE\n";
 # write mpi
-$mpi && print $fh "MACRO += -DWITH_MPI\n";
+$mpi && print $fh "MACRO += WITH_MPI\n";
 # write GPU
-$gpu && print $fh "MACRO += -DWITH_GPU\n";
+$gpu && print $fh "MACRO += WITH_GPU\n";
 # write compiler options
 if ($ccache!=0) { $cc="ccache ".$cc; $mpicc="ccache ".$mpicc; }
 print $fh "CC = $cc\n";

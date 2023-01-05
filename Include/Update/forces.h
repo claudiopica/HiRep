@@ -40,6 +40,8 @@ void force0(double, void *);
 double lw_action(double beta, double c0, double c1);
 void lw_local_action(scalar_field *loc_action, double beta, double c0, double c1);
 void lw_force(double dt, void *vpar);
+void calculate_stfld(int comm);
+double lw_action_density(int ix, double beta, double c0, double c1);
 
 //fermion_force_core.c
 #ifdef WITH_CLOVER

@@ -156,6 +156,7 @@ _DECLARE_MEMORY_FUNC_GAUGE(gtransf, suNg_field, suNg, 1, "gauge transformation")
 _DECLARE_MEMORY_FUNC_GAUGE(clover_ldl, ldl_field, ldl_t, 1, "clover ldl field");
 _DECLARE_MEMORY_FUNC_GAUGE(clover_term, suNfc_field, suNfc, 4, "clover term");
 _DECLARE_MEMORY_FUNC_GAUGE(clover_force, suNf_field, suNf, 6, "clover force");
+_DECLARE_MEMORY_FUNC_GAUGE(staple_field, suNg_field, suNg, 3, "staple field");
 
 // Matter Fields
 _DECLARE_MEMORY_FUNC_SPINOR(spinor_field_f, spinor_field, suNf_spinor, 1, "spinor field");

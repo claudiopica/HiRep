@@ -298,6 +298,7 @@ _DECLARE_MEMORY_FUNC(gtransf, suNg_field, suNg, 1, gauge);
 _DECLARE_MEMORY_FUNC(clover_ldl, ldl_field, ldl_t, 1, gauge);
 _DECLARE_MEMORY_FUNC(clover_term, suNfc_field, suNfc, 4, gauge);
 _DECLARE_MEMORY_FUNC(clover_force, suNf_field, suNf, 6, gauge);
+_DECLARE_MEMORY_FUNC(staple_field, suNg_field, suNg, 3, gauge);
 #undef _n
 #undef _ALLOCATE
 

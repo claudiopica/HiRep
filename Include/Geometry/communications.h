@@ -21,7 +21,7 @@
  * @brief Collects sum results from the local lattices and sums over all nodes (double).
  *
  * @param d			Pointer that contains the local result
- * @param n			Number of nodes
+ * @param n			Size of the array
  */
 void global_sum(double *d, int n);
 
@@ -29,7 +29,7 @@ void global_sum(double *d, int n);
  * @brief Collects sum results from the local lattices and sums over all nodes (integer).
  *
  * @param d			Pointer that contains the local result
- * @param n			Number of nodes
+ * @param n			Size of the array
  */
 void global_sum_int(int *d, int n);
 
@@ -37,7 +37,7 @@ void global_sum_int(int *d, int n);
  * @brief Finds maximum across nodes after finding the local maximum.
  *
  * @param d			Pointer that contains the local result
- * @param n			Number of nodes
+ * @param n			Size of the array
  */
 void global_max(double *d, int n);
 void global_max_flt(float *d, int n);
@@ -46,7 +46,7 @@ void global_max_flt(float *d, int n);
  * @brief Finds minimum across nodes after finding the local minimum.
  *
  * @param d			Pointer that contains the local result
- * @param n			Number of nodes
+ * @param n			Size of the array
  */
 void global_min(double *d, int n);
 
@@ -171,6 +171,24 @@ void complete_sf_sendrecv_flt(spinor_field_flt*);
  * 				across nodes.
  */
 void start_sf_sendrecv_flt(spinor_field_flt*);
+
+
+void complete_staple_field_sendrecv(suNg_field *);
+
+/**
+ * @brief Wait for communications to finish before continuing.
+ *
+ * @param staple field that needs to be synchronized across
+ * 				nodes
+ */
+void start_staple_field_sendrecv(suNg_field*);
+
+/**
+ * @brief Fill buffers and start MPI requests to send and receive.
+ *
+ * @param staple field that needs to be synchronized across
+ * 				nodes
+ */
 
 #ifdef __cplusplus
     }
