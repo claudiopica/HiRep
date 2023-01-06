@@ -14,7 +14,7 @@ jobs:
           pip install myst==1.0.4 myst_parser==0.18.0 sphinx==5.0.2 sphinxcontrib-bibtex==2.5.0 sphinx-rtd-theme==1.0.0
       - name: Sphinx build
         run: |
-          cd Doc
+          cd Doc && mkdir doxygen
           doxygen doxygen/Doxyfile
           sphinx-build . _build
       - name: Deploy
