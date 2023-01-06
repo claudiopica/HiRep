@@ -31,8 +31,8 @@ Subsection
 .. toctree::
    :maxdepth: 2
    :caption: Code Documentation
-   
-   Full Reference <./doxygen/html/index.html#http://>
+
+   Full Reference <https://claudiopica.github.io/HiRep/doxygen/html/index.html>
 
 .. bibliography::
    :all:
