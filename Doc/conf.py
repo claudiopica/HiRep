@@ -7,7 +7,7 @@ from sphinx.builders.html import StandaloneHTMLBuilder
 
 sys.path.insert(0, os.path.abspath(".."))
 
-subprocess.call("make clean", shell=True)
+# subprocess.call("rm -rf ./_build/* doxygen/build", shell=True)
 subprocess.call("cd ./doxygen ; doxygen Doxyfile", shell=True)
 
 # -- General configuration ------------------------------------------------
@@ -16,7 +16,7 @@ extensions = [
     "myst_parser",
     "sphinx.ext.autodoc",
     "sphinx.ext.doctest",
-    "sphinx.ext.imgmath",
+    # "sphinx.ext.imgmath",
     "sphinx.ext.mathjax",
     "sphinx.ext.todo",
     "sphinx.ext.viewcode",
