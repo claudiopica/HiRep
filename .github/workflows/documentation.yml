@@ -8,7 +8,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update && sudo apt-get install -y graphviz
-          wget -qO- "https://yihui.org/tinytex/install-bin-unix.sh" | sh
+          HOME=/usr wget -qO- "https://yihui.org/tinytex/install-bin-unix.sh" | sh
       - name: Install Doxygen 1.9.6
         uses: engineerd/configurator@v0.0.8
         with:
