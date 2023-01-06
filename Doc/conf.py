@@ -8,11 +8,11 @@ from sphinx.builders.html import StandaloneHTMLBuilder
 sys.path.insert(0, os.path.abspath(".."))
 
 # subprocess.call("rm -rf ./_build/* doxygen/build", shell=True)
-subprocess.call("cd ./doxygen ; doxygen Doxyfile", shell=True)
+#subprocess.call("cd ./doxygen ; doxygen Doxyfile", shell=True)
 
 # -- General configuration ------------------------------------------------
 extensions = [
-    "breathe",
+    # "breathe",
     "myst_parser",
     "sphinx.ext.autodoc",
     "sphinx.ext.doctest",
@@ -130,7 +130,7 @@ texinfo_documents = [
 ]
 
 # -- Extension configuration -------------------------------------------------
-breathe_projects = {"HiRep": "doxygen/build/xml/"}
-breathe_default_project = "HiRep"
+# breathe_projects = {"HiRep": "_build/doxygen/xml/"}
+# breathe_default_project = "HiRep"
 
 bibtex_bibfiles = ["literature.bib"]

@@ -30,10 +30,8 @@ Subsection
 
 .. toctree::
    :maxdepth: 2
-   :caption: References
-
-   api
-   Full Reference <../../doxygen/build/html/index.html#http://>
+   :caption: Code Documentation
+   Full Reference <./doxygen/html/index.html#http://>
 
 .. bibliography::
    :all:
