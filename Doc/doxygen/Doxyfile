@@ -751,7 +751,7 @@ LAYOUT_FILE            = doxygen/DoxygenLayout.xml
 # LATEX_BIB_STYLE. To use this feature you need bibtex and perl available in the
 # search path. See also \cite for info how to create references.
 
-CITE_BIB_FILES         =
+CITE_BIB_FILES         = literature.bib 
 
 #---------------------------------------------------------------------------
 # Configuration options related to warning and progress messages
@@ -1606,7 +1606,7 @@ MATHJAX_EXTENSIONS     = TeX/AMSmath TeX/AMSsymbols
 # example see the documentation.
 # This tag requires that the tag USE_MATHJAX is set to YES.
 
-MATHJAX_CODEFILE       = mathconf.js
+MATHJAX_CODEFILE       = doxygen/mathconf.js
 
 # When the SEARCHENGINE tag is enabled doxygen will generate a search box for
 # the HTML output. The underlying search engine uses javascript and DHTML and

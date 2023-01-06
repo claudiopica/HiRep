@@ -49,7 +49,7 @@ correlator is:
 
 We now use \f$ \gamma_5 \f$  Hermiticity: \f$ \gamma_5 S^\dagger(x,y) \gamma_5 = S(y,x) \f$, 
 
-\f{equation}{C(t - \tau, 0) = -\sum_{\vec{x} \vec{y}} \text{Tr}\left[ \gamma_5 \Gamma S^{(2)} (x,y) \bar{ \Gamma }' \gamma_5 S^{\dagger (1)} (x,y) \right]\f}(eqn:corr)
+\f{equation}{C(t - \tau, 0) = -\sum_{\vec{x} \vec{y}} \text{Tr}\left[ \gamma_5 \Gamma S^{(2)} (x,y) \bar{ \Gamma }' \gamma_5 S^{\dagger (1)} (x,y) \right]\label{eqn:corr}\f}
 
 ### Point Sources
 
@@ -61,11 +61,11 @@ point propagator,
 usually \f$ z = (\vec{0}, 0) \f$  so we get  \f$ S(y,0) = \gamma_5 S^{\dagger} (0,y) \gamma_5 \f$. Then we use these to
 calculate correlation functions, 
 
-\f{equation}{C(t, 0) = -\sum_{\vec{x}} \text{Tr} e^{-i \vec{p} \vec{x}} \left[ \gamma_5 \Gamma S (x,0) \bar{ \Gamma }' \gamma_5 S (x,0) \right]\f}(eqn:pointcorr)
+\f{equation}{C(t, 0) = -\sum_{\vec{x}} \text{Tr} e^{-i \vec{p} \vec{x}} \left[ \gamma_5 \Gamma S (x,0) \bar{ \Gamma }' \gamma_5 S (x,0) \right]\label{eqn:pointcorr}\f}
 
 Translational invariance in the limit of infinitely many gauge
 configurations implies  \f$ S(x,y) = S(|x - y|) \f$, so the sum over \f$ \vec{y} \f$ 
-in equation eq.(\f$\ref{eqn:corr}\f$) just gives \f$ V \f$  times equation eq.(\f$\ref{eqn:pointcorr}\f$). We place the source at the time origin so  \f$ \tau = 0 \f$.
+in equation eq.\f$(\ref{eqn:corr})\f$ just gives \f$ V \f$  times equation eq.\f$(\ref{eqn:pointcorr})\f$. We place the source at the time origin so  \f$ \tau = 0 \f$.
 
 ### One-end Trick
 
@@ -178,7 +178,7 @@ same type in the hadron interpolator \f$ O_M \f$ :
 
 \f{equation}{O_M(x) = \bar{ \psi } (x) \Gamma \psi(x)\f}
 
-The same manipulations that lead to equation eq.(\f$\ref{eq:2ptcorr}\f$) give, 
+The same manipulations that lead to equation eq.\f$(\ref{eq:2ptcorr})\f$ give, 
 
 \f{equation}{\langle O_M(x) \bar{O}_M'(y) \rangle = \langle \bar{\psi}(x) \Gamma \psi(x) \bar{\psi}(y) \bar{ \Gamma }' \psi(y) \rangle = \Gamma_{\alpha \beta} \bar{ \Gamma }'_{\gamma \delta} \langle \bar{\psi}_\alpha(x)  \psi_\beta(y) \bar{\psi}_\gamma(y)  \psi_\delta(x) \rangle\f}
 
@@ -358,7 +358,7 @@ place of the local current
 
 \f{equation}{V_\mu = \frac{1}{2} \left[ \bar{\psi}(x + \mu)(1 + \gamma_\mu)U_\mu^\dagger(x) \psi(x) - \bar{\psi}(x)(1 - \gamma_\mu)U_\mu^\dagger(x) \psi(x + \mu) \right]\,.\f}
 
-The trace in eq.(\f$\ref{eq:3ptfn}\f$) becomes 
+The trace in eq.\f$(\ref{eq:3ptfn})\f$ becomes 
 
 \f{equation}{\begin{aligned}Tr[ S_d(\vec{y},t+1;\vec{z},t_i) &\gamma_5 (1 + \gamma_0)U_0^\dagger(\vec{y},t) G_{ud}(\vec{z}, t_i; t_f; \vec{p_f}; \vec{y}, t ) -\\ &S_d(\vec{y},t;\vec{z},t_i) \gamma_5 (1 - \gamma_0)U_0(\vec{y},t) G_{ud}(\vec{z}, t_i; t_f; \vec{p_f}; \vec{y}, t+1 ) ]\end{aligned}\f}
 
@@ -651,7 +651,7 @@ This is implemented into HiRep in the following way
 	
    \f{equation}{\eta^{(\alpha,a)} = H \xi^{(\alpha,a)} \qquad \eta^{(\alpha,a)}_{\beta b}(x) = H_{\beta \alpha}^{b a}(x,0) \; .\f}
 
--   The functions `void *_correlator(float *out, suNf_spinor **qp)`in `Observables/mesons.c` implement the formulae eq.(\f$\ref{eq:triplet_point_to_all_corr}\f$), where `out` stands for the correlator and `qp` for the spinor array. The functions \f$ s(\Gamma) \f$, \f$ t_\alpha(\gamma_5 \Gamma) \f$ and \f$ \sigma_\alpha(\gamma_5 \Gamma) \f$ where calculated using `Mathematica`, see file `mesons.nd` and implemented in the code using macros, defined as follows\
+-   The functions `void *_correlator(float *out, suNf_spinor **qp)`in `Observables/mesons.c` implement the formulae eq.\f$(\ref{eq:triplet_point_to_all_corr})\f$, where `out` stands for the correlator and `qp` for the spinor array. The functions \f$ s(\Gamma) \f$, \f$ t_\alpha(\gamma_5 \Gamma) \f$ and \f$ \sigma_\alpha(\gamma_5 \Gamma) \f$ where calculated using `Mathematica`, see file `mesons.nd` and implemented in the code using macros, defined as follows\
     
     `      `\
     `      _C1_ = `\f$\sigma_1(\gamma_5 \Gamma)\f$\
@@ -709,7 +709,7 @@ C_{\Gamma_1,\Gamma_2}(x-y) =&- \left< \mathrm{tr}
 \right>
 \; .\end{aligned}\f}
 
-All other contributions are identical to the contributions to the isotriplet correlator. We can, therefore, focus on the contribution through the hairpin diagram. Using the formulae eq.(\f$\ref{eq:gamma0_adj}\f$) we can write
+All other contributions are identical to the contributions to the isotriplet correlator. We can, therefore, focus on the contribution through the hairpin diagram. Using the formulae eq.\f$(\ref{eq:gamma0_adj})\f$ we can write
 
 \f{equation}{\left< \mathrm{tr}
 \left[ \gamma_0 \Gamma_1^\dagger \gamma_0 G(x,x) \right]
@@ -721,13 +721,13 @@ All other contributions are identical to the contributions to the isotriplet cor
 
 ### All-to-all Propagator
 
-It is clear from eq.(\f$\ref{eq:hairpin}\f$), from the fact that we are employing point source, that one must compute the entire inverse matrix of the Dirac operator. The alternative is to use a statistic estimate for \f$ H \f$ followed by variance reduction procedures.
+It is clear from eq.\f$(\ref{eq:hairpin})\f$, from the fact that we are employing point source, that one must compute the entire inverse matrix of the Dirac operator. The alternative is to use a statistic estimate for \f$ H \f$ followed by variance reduction procedures.
 
 Suppose there are \f$ N_s \f$ available random fermion sources \f$ \xi^{(i)} \f$ such that the only non-zero correlators are 
 
 \f{equation}{\left< \xi^{(i)}_{\alpha a}(x)^\dagger \xi^{(j)}_{\beta b}(y) \right> = \delta_{\alpha,\beta} \delta_{a,b} \delta_{x,y} \delta_{i,j} \; .\f}
 
-Current literature proposes mainly either Gaussian noise or \f$ Z_2 \f$ noise. In the following, we will choose \f$ Z_2 \f$ noise, following {cite}`Foster_1999`. Each component of the spinor is randomly chosen from the values \f$ \pm 1/\sqrt{2} \f$.
+Current literature proposes mainly either Gaussian noise or \f$ Z_2 \f$ noise. In the following, we will choose \f$ Z_2 \f$ noise, following @cite Foster_1999. Each component of the spinor is randomly chosen from the values \f$ \pm 1/\sqrt{2} \f$.
 
 Then the matrix \f$ H \f$ can be estimated as follows:
 
@@ -741,7 +741,7 @@ Stochastic estimation can then be used to calculate the relevant tracks for corr
 
 ### Variance reduction
 
-The noise obtained from stochastic estimation of the matrix \f$ G \f$ in the formula eq.`naive_noisy_estimate` can be reduced using the trick from {cite}`McNeile_2001` for Wilson fermions. Here, the Dirac operator has the form \f$ D = 1 - K \f$. As a result, for the matrix \f$ G \f$ the following formula applies 
+The noise obtained from stochastic estimation of the matrix \f$ G \f$ in the formula eq.`naive_noisy_estimate` can be reduced using the trick from @cite McNeile_2001 for Wilson fermions. Here, the Dirac operator has the form \f$ D = 1 - K \f$. As a result, for the matrix \f$ G \f$ the following formula applies 
 
 \f{equation}{\begin{aligned}
 && G = D^{-1} = \left( 1 - K \right)^{-1} = \\
@@ -760,11 +760,11 @@ with \f$ m=2k \f$. (TODO: fix this sentence) Here, we can use the fact that the 
 & + \mathrm{tr}\left[ \Gamma K^{2k} \right](x,x) + \sum_{iy} \xi^{(i)}(y)^\dagger \gamma_5 K^{n_2}(y,x) \Gamma K^{n_1}(x,y) \eta^{(i)}(y) \nonumber \\
 \end{aligned}\label{eq:hairpin_with_variance_reduction}\f}
 
-{cite}`McNeile_2001` use this trick only for the calculation of the hairpin diagram. It might be possible to generalize it to the the isotriplet part as well, as an alternative to the point-to-all propagator. 
+@cite McNeile_2001 use this trick only for the calculation of the hairpin diagram. It might be possible to generalize it to the the isotriplet part as well, as an alternative to the point-to-all propagator. 
 
 ### Time dilution
 
-This is a trick introduced in {cite}`Foley_2005` for noise reduction in the computation of null-moment propagators. Whenever stochastic estimation of the \f$ H \f$ matrix is required, such as in eq.(\f$\ref{eq:naive_noisy_estimate}\f$), it is possible to replace each stochastic source \f$ \xi^{(i)} \f$ with a set of sources each with support on a different time slice.
+This is a trick introduced in @cite Foley_2005 for noise reduction in the computation of null-moment propagators. Whenever stochastic estimation of the \f$ H \f$ matrix is required, such as in eq.\f$(\ref{eq:naive_noisy_estimate})\f$, it is possible to replace each stochastic source \f$ \xi^{(i)} \f$ with a set of sources each with support on a different time slice.
 
 \f{equation}{\begin{aligned}
  \label{time_dilution}
@@ -848,6 +848,6 @@ The following functions will be implemented
 	    ` `\
 	    
 
-The functions above implement the formula eq.(\f$\ref{eq:hairpin_with_variance_reduction}\f$), summing exact terms and the statistical term, generated with `nrs` to dilute, for a total of \f$ \times N_t \f$ matrix invertions for each mass value and returns the result as `out`.
+The functions above implement the formula eq.\f$(\ref{eq:hairpin_with_variance_reduction})\f$, summing exact terms and the statistical term, generated with `nrs` to dilute, for a total of \f$ \times N_t \f$ matrix invertions for each mass value and returns the result as `out`.
 
 
