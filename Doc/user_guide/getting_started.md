@@ -1,4 +1,4 @@
-# Getting started
+@page get_started Getting Started
 
 ## Dependencies
 

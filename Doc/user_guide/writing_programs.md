@@ -1,3 +1,4 @@
+@page writing_program Writing a Program
 # Writing A Program in HiRep
 
 ## Global Objects

@@ -1,4 +1,4 @@
-# Supported Features
+@page supported_features Supported Features
 
 ## Introduction
 

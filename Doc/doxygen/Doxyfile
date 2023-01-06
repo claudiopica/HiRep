@@ -261,7 +261,7 @@ TAB_SIZE               = 4
 # commands \{ and \} for these it is advised to use the version @{ and @} or use
 # a double escape (\\{ and \\})
 
-ALIASES                =
+ALIASES                = putImage{3}="\htmlonly <style>div.image img[src=\"\1\"]{align:center;margin:8px;\3}</style>\endhtmlonly \image html \1 \"\2\""
 
 # This tag can be used to specify a number of word-keyword mappings (TCL only).
 # A mapping has the form "name=value". For example adding "class=itcl::class"
@@ -323,7 +323,7 @@ OPTIMIZE_OUTPUT_SLICE  = NO
 # Note that for custom extensions you also need to set FILE_PATTERNS otherwise
 # the files are not read by doxygen.
 
-EXTENSION_MAPPING      =
+EXTENSION_MAPPING      = cu=C++ hpp=C++
 
 # If the MARKDOWN_SUPPORT tag is enabled then doxygen pre-processes all comments
 # according to the Markdown format, which allows for more readable
@@ -741,7 +741,7 @@ FILE_VERSION_FILTER    =
 # DoxygenLayout.xml, doxygen will parse it automatically even if the LAYOUT_FILE
 # tag is left empty.
 
-LAYOUT_FILE            =
+LAYOUT_FILE            = doxygen/DoxygenLayout.xml 
 
 # The CITE_BIB_FILES tag can be used to specify one or more bib files containing
 # the reference definitions. This must be a list of .bib files. The .bib
@@ -829,7 +829,9 @@ WARN_LOGFILE           =
 # spaces. See also FILE_PATTERNS and EXTENSION_MAPPING
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = ../Include ../LibHR
+INPUT                  = user_guide/ \
+                         developer_guide/ \
+                         ../Include ../LibHR
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -859,7 +861,8 @@ INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.c \
                          *.cu \
                          *.h \
-                         *.hpp
+                         *.hpp \
+                         *.md
 
 
 # The RECURSIVE tag can be used to specify whether or not subdirectories should
@@ -928,7 +931,7 @@ EXAMPLE_RECURSIVE      = NO
 # that contain images that are to be included in the documentation (see the
 # \image command).
 
-IMAGE_PATH             =
+IMAGE_PATH             = img
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program
@@ -1169,7 +1172,7 @@ HTML_FILE_EXTENSION    = .html
 # of the possible markers and block names see the documentation.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_HEADER            =
+HTML_HEADER            = doxygen/header.html
 
 # The HTML_FOOTER tag can be used to specify a user-defined HTML footer for each
 # generated HTML page. If the tag is left blank doxygen will generate a standard
@@ -1204,7 +1207,9 @@ HTML_STYLESHEET        =
 # list). For an example see the documentation.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_EXTRA_STYLESHEET  = doxygen/awesome.css
+HTML_EXTRA_STYLESHEET  = doxygen/awesome.css \
+                         doxygen/custom.css \
+                         doxygen/sidebar-only.css
 
 # The HTML_EXTRA_FILES tag can be used to specify one or more extra images or
 # other source files which should be copied to the HTML output directory. Note
@@ -1214,7 +1219,7 @@ HTML_EXTRA_STYLESHEET  = doxygen/awesome.css
 # files will be copied as-is; there are no commands or markers available.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_EXTRA_FILES       =
+HTML_EXTRA_FILES       = doxygen/doxygen-awesome-darkmode-toggle.js doxygen/doxygen-awesome-interactive-toc.js
 
 # The HTML_COLORSTYLE_HUE tag controls the color of the HTML output. Doxygen
 # will adjust the colors in the style sheet and background images according to
@@ -1562,7 +1567,7 @@ FORMULA_MACROFILE      =
 # The default value is: NO.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-USE_MATHJAX            = NO
+USE_MATHJAX            = YES
 
 # When MathJax is enabled you can set the default output format to be used for
 # the MathJax output. See the MathJax site (see:
@@ -1572,7 +1577,7 @@ USE_MATHJAX            = NO
 # The default value is: HTML-CSS.
 # This tag requires that the tag USE_MATHJAX is set to YES.
 
-MATHJAX_FORMAT         = HTML-CSS
+MATHJAX_FORMAT         = SVG
 
 # When MathJax is enabled you need to specify the location relative to the HTML
 # output directory using the MATHJAX_RELPATH option. The destination directory
@@ -1592,7 +1597,8 @@ MATHJAX_RELPATH        = https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/
 # MATHJAX_EXTENSIONS = TeX/AMSmath TeX/AMSsymbols
 # This tag requires that the tag USE_MATHJAX is set to YES.
 
-MATHJAX_EXTENSIONS     =
+MATHJAX_EXTENSIONS     = TeX/AMSmath TeX/AMSsymbols
+
 
 # The MATHJAX_CODEFILE tag can be used to specify a file with javascript pieces
 # of code that will be used on startup of the MathJax code. See the MathJax site
@@ -1600,7 +1606,7 @@ MATHJAX_EXTENSIONS     =
 # example see the documentation.
 # This tag requires that the tag USE_MATHJAX is set to YES.
 
-MATHJAX_CODEFILE       =
+MATHJAX_CODEFILE       = mathconf.js
 
 # When the SEARCHENGINE tag is enabled doxygen will generate a search box for
 # the HTML output. The underlying search engine uses javascript and DHTML and
@@ -1764,7 +1770,7 @@ PAPER_TYPE             = a4
 # If left blank no extra packages will be included.
 # This tag requires that the tag GENERATE_LATEX is set to YES.
 
-EXTRA_PACKAGES         =
+EXTRA_PACKAGES         = amsmath amssymb
 
 # The LATEX_HEADER tag can be used to specify a personal LaTeX header for the
 # generated LaTeX document. The header should contain everything until the first

@@ -1,4 +1,4 @@
-# Data Structures
+@page data_structures Data Structures
 
 ## Elementary Data Types
 

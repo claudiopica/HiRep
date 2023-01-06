@@ -1,5 +1,4 @@
-# Testing Setup
-
+@page testing_setup Testing Setup
 ## Unit Tests
 
 ### Nocompile

@@ -1,4 +1,4 @@
-# Input File Configuration
+@page input_file Input File Configuration
 
 ## Integrator
 

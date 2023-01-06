@@ -1,4 +1,4 @@
-# Geometry of Field Data in Memory
+@page geometry Geometry
 
 ## Geometry Properties
 
@@ -61,22 +61,14 @@ The sites in a master piece can be categorized by their function in computation 
 	- Function in communication: We synchronize the extended lattice by writing to it so that this data is available to the current thread, but never read from and communicate the extended lattice somewhere else. 
 	
 The following figure depicts these categories of sites on a two-dimensional $4\times 4$-lattice.
-	
-```{image} ../img/development_notes/field_geometry/bulk_boundary_halo.png
-:alt: Illustration of bulk boundary and halo sites on a 2D lattice
-:class: bg-primary
-:width: 400px
-:align: center
-```
+
+@image html development_notes/field_geometry/bulk_boundary_halo.png "bulk boundary and halo sites on a 2D lattice" width=400px
+@image latex development_notes/field_geometry/bulk_boundary_halo.png "bulk boundary and halo sites on a 2D lattice" width=8cm
 
 A single boundary communication between two 2D local lattices would accordingly work as in the following illustration
 
-```{image} ../img/development_notes/field_geometry/comms.png
-:alt: Communication between to 2D local lattice blocks
-:class: bg-primary
-:width: 400px
-:align: center
-```
+@image html development_notes/field_geometry/comms.png "Communication between to 2D local lattice blocks" width=400px
+@image latex development_notes/field_geometry/comms.png "Communication between to 2D local lattice blocks" width=8cm
 
 Here the boundary elements are being communicated to the respective boundary of the other block. Bulk elements are unaffected.
 
@@ -93,22 +85,15 @@ int shift_odd = glat_odd->master_shift /* not 0, index of first odd entry */
 
 which corresponds to a full lattice being decomposed like the following illustration:
 
-```{image} ../img/development_notes/field_geometry/eo_linear.png
-:alt: Illustration of Decomposition of 1D Array into Even and Odd Sites
-:class: bg-primary
-:width: 400px
-:align: center
-```
+@image html development_notes/field_geometry/eo_linear.png "Decomposition of 1D Array into Even and Odd Sites" width=400px
+@image latex development_notes/field_geometry/eo_linear.png "Decomposition of 1D Array into Even and Odd Sites" width=8cm
  
 ##### Local Master Pieces
 The local master pieces are the pieces of local lattices, the blocks that the lattice is decomposed into to be processed either by a single thread/core or GPU. For example, take a lattice of size $8^3\times 16$ split up with an MPI layout of `1.1.1.2` into two local lattices of size $8^4$. Due to the even-odd preconditioning the blocks are further split up into two. The field `local_master_pieces` identifies the number of local master pieces. In this case the integer saved in `local_master_pieces` is equal to four. This is saved in memory in the following way: First the even parts of the two blocks and then the odd parts. 
 
-```{image} ../img/development_notes/field_geometry/eo_block_decomp.png
-:alt: Combination of Even-Odd-Preconditioning and Block Decomposition in Memory
-:class: bg-primary
-:width: 400px
-:align: center
-```
+
+@image html development_notes/field_geometry/eo_block_decomp.png "Combination of Even-Odd-Preconditioning and Block Decomposition in Memory" width=400px
+@image latex development_notes/field_geometry/eo_block_decomp.png "Combination of Even-Odd-Preconditioning and Block Decomposition in Memory" width=8cm
 
 ##### Total Master Pieces
 Additionally, the geometry descriptor contains two numbers of _total master pieces_, one for spinors and one for gauge fields. This counts the number of local master pieces plus the number of receive buffers, but not send buffers. This is exactly the extended lattice in the directions that are parallelized, i.e. the global lattice is split in this direction. Iterating over the total number of master pieces equates therefore to an iteration over the local lattices including their halo regions.
@@ -120,12 +105,8 @@ In order to work with the block structure efficiently and optimize memory access
 
 Here, every block is identified by an index, in the code often called `ixp`. The mapping of the index to the block is persistent but arbitrary and therefore subject to convention. In memory, and correspondingly at site index level, the blocks are stored such that first there is a large block of field data of local lattices with even parity and then with odd parity. However, at block index level, the even `ixp` identify even lattices and odd `ixp` odd lattices, with lattices of two parities belonging to the same local lattices adjacent. This means for example, that if the even part of my local lattice is stored at `ixp=4`, then the odd part can be found at `ixp=5`. For a simple decomposition into two blocks with even-odd preconditioning are arranged in memory as in the following illustration
 
-```{image} ../img/development_notes/field_geometry/ixp_numbering.png
-:alt: Block Index Assignment Illustration
-:class: bg-primary
-:width: 400px
-:align: center
-```
+@image html development_notes/field_geometry/ixp_numbering.png "Block Index Assignment" width=400px
+@image latex development_notes/field_geometry/ixp_numbering.png "Block Index Assignment" width=8cm
 
 with block indices being assigned in a non-contingent way described above.
 
@@ -166,12 +147,8 @@ Here in particular the arrangement of the boundary elements is crucial, because 
 
 We arrange memory as in the following 4-by-4 2D example
 
-```{image} ../img/development_notes/field_geometry/contingent_numbering.png
-:alt: Example Of Contingent Numbering
-:class: bg-primary
-:width: 400px
-:align: center
-```
+@image html development_notes/field_geometry/contingent_numbering.png "Example Of Contingent Numbering" width=400px
+@image latex development_notes/field_geometry/contingent_numbering.png "Example Of Contingent Numbering" width=8cm
 
  * The lattice is decomposed into an even and an odd part, which are contiguous in memory respectively. The first index with an odd entry, the master shift of the odd lattice, is 17.
  * The bulk consists for each sublattice of only two sites. Sites 0-1 and 17-18 are the inner sites of the even and odd lattice respectively.
@@ -193,12 +170,8 @@ GLB_VAR(int,PB_Z,=2);
 
 as `PB_T`, `PB_X`, `PB_Y` and `PB_Z`. On a 6-by-6 2D lattice `PB_X=2` and `PB_Y=2` would imply a decomposition as in the following illustration
 
-```{image} ../img/development_notes/field_geometry/path_blocking.png
-:alt: Path Blocking Illustration
-:class: bg-primary
-:width: 200px
-:align: center
-```
+@image html development_notes/field_geometry/path_blocking.png "Path Blocking Illustration" width=200px
+@image latex development_notes/field_geometry/path_blocking.png "Path Blocking Illustration" width=4cm
 
 
 #### Buffer Synchronization
@@ -256,7 +229,7 @@ int main(void)
 }
 ```
 
-In practice, the programmer should not be forced to think about lattice geometry. For this, the corresponding for loops are replaced by the macros ```_PIECE_FOR```, ```_SITE_FOR``` and ```_MASTER_FOR``` that are defined in ```Include/geometry.h```.
+In practice, the programmer should not be forced to think about lattice geometry. For this, the corresponding for loops are replaced by the macros `_PIECE_FOR`, `_SITE_FOR` and `_MASTER_FOR` that are defined in `Include/geometry.h`.
 
 ##### \_MASTER\_FOR
  This macro iterates over all sites without considering which piece they are located. For example, for the spinor field, this would simplify to
@@ -282,7 +255,7 @@ int main(void)
 }
 ```
 
-Take $V$ to be the number of lattice sites. Then ```ix``` runs from 0 to $V-1$. If the lattice geometry is given as even, it runs from 0 to $\tfrac{V}{2}-1$. If it is odd, it runs from $\tfrac{V}{2}$ to $V-1$. It is possible to iterate over an even spinor in the following way
+Take $V$ to be the number of lattice sites. Then `ix` runs from 0 to $V-1$. If the lattice geometry is given as even, it runs from 0 to $\tfrac{V}{2}-1$. If it is odd, it runs from $\tfrac{V}{2}$ to $V-1$. It is possible to iterate over an even spinor in the following way
 
 ```c
 #include "global.h"
@@ -306,7 +279,7 @@ int main(void)
 ```
 
 Nevertheless, iterating over an odd spinor the same way will yield a segmentation fault. This is because, in the odd spinor, only the odd sites are allocated starting at 0. As a result, we need to iterate from 0 to $\tfrac{V}{2}-1$ for the odd spinor. This, however, clashed with the fact that if we have a spinor that is defined on all lattice sites, we want to have the indices start at $\tfrac{V}{2}$. \par
-To solve this problem, instead of accessing the elements directly, there is a macro that correctly accesses given a global index provided by either ```_SITE\_FOR``` or ```_MASTER_FOR```: ```_FIELD_AT``` in ```Include/spinor_field.h```.
+To solve this problem, instead of accessing the elements directly, there is a macro that correctly accesses given a global index provided by either `_SITE\_FOR` or `_MASTER_FOR`: `_FIELD_AT` in `Include/spinor_field.h`.
 The right way to iterate over any geometry is to use the following pattern, with the corresponding geometry substituted in the allocation function.
 
 ```c
@@ -330,7 +303,7 @@ int main(void)
 }
 ```
 
-```_PIECE_FOR``` Depending on the operation we need to perform on the field, we might need to know whether we are currently operating on the even or the odd part of the field. Leaving aside MPI decomposition, which will be explained later, the field is decomposed into only two pieces: The odd and the even part. If the spinor is only odd or even and there is no further MPI decomposition, there will be only a single piece. An index labels the pieces often called `ixp` in the order they appear in memory. Therefore (without any MPI decomposition), the even part has the index ```ixp```=0, and the odd part ```ixp```=1.
+`_PIECE_FOR` Depending on the operation we need to perform on the field, we might need to know whether we are currently operating on the even or the odd part of the field. Leaving aside MPI decomposition, which will be explained later, the field is decomposed into only two pieces: The odd and the even part. If the spinor is only odd or even and there is no further MPI decomposition, there will be only a single piece. An index labels the pieces often called `ixp` in the order they appear in memory. Therefore (without any MPI decomposition), the even part has the index `ixp`=0, and the odd part `ixp`=1.
 
 ```c
 #include "global.h"
@@ -351,7 +324,7 @@ int main(void)
 }
 ```
 
-```_SITE_FOR``` We can now decompose the ```_MASTER_FOR``` into ```_PIECE_FOR``` and ```_SITE_FOR```. This might be necessary if we want to iterate over the sites and always have the information on which piece we are currently operating.
+`_SITE_FOR` We can now decompose the `_MASTER_FOR` into `_PIECE_FOR` and `_SITE_FOR`. This might be necessary if we want to iterate over the sites and always have the information on which piece we are currently operating.
 
 ```c
 #include "global.h"
@@ -378,11 +351,11 @@ int main(void)
 ##### GPU
 We will not want to use any for-loop macros to iterate over the sites on the GPU. Instead, we want to distribute the operations on the sites over different threads. Further, in anticipation of a later MPI decomposition, any kernel operation on the fields should launch a separate kernel for each piece. At the point of a simple even-odd decomposition, we need to do the following:
 
-* Wrap the kernel call in ```_PIECE_FOR```. This will take care of any block decomposition identically to the CPU.
-* Only pass the odd or even block to the kernel at the correct offset. The global thread/block index will then be used to iterate over the sites, and we do not need to worry about any global indices. All the kernel knows about is the block. This serves as a replacement of ```_SITE_FOR```.
-* Read out the field value for a given local block index having only the offset starting pointer at hand. Due to the special memory structure discussed in the next section, this has to be done using the GPU reading, and writing functions declared in ```Include/suN.h```. These serve as a replacement to ```_FIELD_AT```. They are not completely analogous because, depending on the structure, they do not read out the complete site. For the spinor field, for example, the reading must be done spinor component-wise.
+* Wrap the kernel call in `_PIECE_FOR`. This will take care of any block decomposition identically to the CPU.
+* Only pass the odd or even block to the kernel at the correct offset. The global thread/block index will then be used to iterate over the sites, and we do not need to worry about any global indices. All the kernel knows about is the block. This serves as a replacement of `_SITE_FOR`.
+* Read out the field value for a given local block index having only the offset starting pointer at hand. Due to the special memory structure discussed in the next section, this has to be done using the GPU reading, and writing functions declared in `Include/suN.h`. These serve as a replacement to `_FIELD_AT`. They are not completely analogous because, depending on the structure, they do not read out the complete site. For the spinor field, for example, the reading must be done spinor component-wise.
 
-For a spinor field in the fundamental representation, one would use the function ```read_gpu_suNf_vector``` because the components of the spinor are vectors, and it is necessary to read the spinor vector-wise. Further, to only pass the block the kernel is supposed to operate on, we are using the macro ```_GPU_FIELD_BLK``` in ```Include/gpu.h```. This macro takes the spinor field and the piece index ```ixp``` and returns the starting pointer of the local block in the GPU field data copy.
+For a spinor field in the fundamental representation, one would use the function `read_gpu_suNf_vector` because the components of the spinor are vectors, and it is necessary to read the spinor vector-wise. Further, to only pass the block the kernel is supposed to operate on, we are using the macro `_GPU_FIELD_BLK` in `Include/gpu.h`. This macro takes the spinor field and the piece index `ixp` and returns the starting pointer of the local block in the GPU field data copy.
 
 ```c
 #include "global.h"
@@ -429,7 +402,7 @@ __global__ void example_kernel(suNf_spinor *s, int vol4h, int block_size)
 }
 ```
 
-Reading an element of the gauge field is slightly different. We can transfer the loop over the different pieces, but since the gauge field is a vector field, we have more components to consider. Therefore we need to replace ```_GPU_FIELD_BLK``` with ```_GPU_4FIELD_BLK```. For the gauge field the readout functions is simply ```read_gpu_suNf```, which is also located in ```suN.h```. This function reads out the vector component-wise.
+Reading an element of the gauge field is slightly different. We can transfer the loop over the different pieces, but since the gauge field is a vector field, we have more components to consider. Therefore we need to replace `_GPU_FIELD_BLK` with `_GPU_4FIELD_BLK`. For the gauge field the readout functions is simply `read_gpu_suNf`, which is also located in `suN.h`. This function reads out the vector component-wise.
 
 ```c
 #include "global.h"
@@ -494,23 +467,16 @@ __global__ void spinor_field_prod_gpu(COMPLEX* s1, COMPLEX* s2, hr_complex* resF
 }
 ```
 
-In every thread we iterate over the components of the input arrays ```s1``` and ```s2```. Which are located at the same site. The different threads in this kernel now operate on the different sites of the lattice. Now, when this kernel is launched, the threads all try first to access all the first elements of all sites. However, when the sites are stored identically as on the CPU, this means that we access memory segments separated by a stride, as in the following illustration:
+In every thread we iterate over the components of the input arrays `s1` and `s2`. Which are located at the same site. The different threads in this kernel now operate on the different sites of the lattice. Now, when this kernel is launched, the threads all try first to access all the first elements of all sites. However, when the sites are stored identically as on the CPU, this means that we access memory segments separated by a stride, as in the following illustration:
 
-```{image} ../img/development_notes/field_geometry/1.png
-:alt: Illustration of a Non-Contingent Access of Vector Elements
-:class: bg-primary
-:width: 300px
-:align: center
-```
+@image html development_notes/field_geometry/access_1.png "Non-Contingent Access of Vector Elements" width=300px
+@image latex development_notes/field_geometry/access_1.png "Non-Contingent Access of Vector Elements" width=6cm
+
 
 We can optimize this significantly by not saving one site after another but instead saving first all first components, then all seconds components and so on in the order they are accessed in the loop.
 
-```{image} ../img/development_notes/field_geometry/2.png
-:alt: Illustration of Contingent Access of Vector Elements
-:class: bg-primary
-:width: 300px
-:align: center
-```
+@image html development_notes/field_geometry/access_2.png "Contingent Access of Vector Elements" width=300px
+@image latex development_notes/field_geometry/access_2.png "Contingent Access of Vector Elements" width=6cm
 
 This means that memory is accessed contiguously as a single block. This is more efficient because it maximizes bus utilization and L1 cache hit rate.
 
@@ -585,7 +551,7 @@ __global__ void example_kernel(suNf_spinor *start, int stride)
 ```
 
 
-This shuffles how the ```struct```s are organized in the previously allocated space.
+This shuffles how the `struct`s are organized in the previously allocated space.
 
 
 #### Gauge Fields
