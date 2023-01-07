@@ -18,7 +18,6 @@
 #include "hr_complex.h"
 #include "hr_mpi.h"
 #include "hr_omp.h"
-#include "libhr_core.h"
 #include "spin_matrix.h"
 #include "spinor_field.h"
 #include "suN.h"
