@@ -1,8 +1,8 @@
 @page supported_features Supported Features
+[TOC]
+# Introduction
 
-## Introduction
-
-### Conventions
+## Conventions
 
 This section summarizes the main formulae that are used for implementing
 the HMC for dynamical Wilson fermions in higher representations. The
@@ -49,7 +49,7 @@ scalar product of two elements of the algebra is defined as
 \f{equation}{\Vert X \Vert^2 = \mathrm{tr } \left(X^\dagger X\right)
  = \sum_{ij} \left| X_{ij} \right|^2\, .\f}
  
-#### \f$ \gamma\f$ matrices
+### \f$ \gamma\f$ matrices
 
 We use the chiral representation for the Dirac \f$ \gamma\f$ matrices where
 
@@ -81,7 +81,7 @@ Finally
 0&-1
 \end{pmatrix}\, .\f}
 
-### The Dirac operator
+## The Dirac operator
 
 The massless Dirac operator is written as in @cite Luscher:1996sc
 
@@ -125,7 +125,7 @@ The fermionic determinant in the path integral can be represented by introducing
 
 \f{equation}{\left(\det D_m\right)^{N_f} = \int \mathcal D \phi \mathcal D \phi^\dagger e^{-\phi^\dagger Q_m^{-N_f} \phi} \equiv \int \mathcal D \phi \mathcal D \phi^\dagger e^{-S_\mathrm{pf}}.\f}
 
-### Force for the HMC molecular dynamics 
+## Force for the HMC molecular dynamics 
 
 The HMC Hamiltonian is given by
 
@@ -238,7 +238,7 @@ which can be used to rewrite eqs eq.\f$(\ref{eq:PIDOT2})\f$ and eq.\f$(\ref{eq:P
 \dot\pi^a_G(x,\mu) &= - \frac{\beta}{N} P^a_f \left( U(x,\mu) V^\dagger(x,\mu) \right) \, ,\\
 \dot\pi^a_F(x,\mu) &= \frac{T_R}{T_f} P^a_R \left( U^R(x,\mu) \mathrm{tr_{spin}} \left[ \gamma_5 (1-\gamma_\mu) \left\{ \eta(x+\mu)\otimes\xi(x)^\dagger + \xi(x+\mu)\otimes\eta(x)^\dagger \right\} \right] \right)\, . \end{aligned}\label{eq:HFFORCE}\f}
 
-### Checks of the MD force
+## Checks of the MD force
 
 The formulae derived in the previous section can be checked against two
 known examples. The first, and almost trivial, check is obtained by
@@ -252,7 +252,7 @@ SU(\f$ 2\f$) @cite Donini:1996nr. We agree with eq. (16) in
 @cite Donini:1996nr, provided that we exchange the indices \f$ a\f$ and
 \f$ b\f$ in that formula.
 
-### HMC Algorithm
+## HMC Algorithm
 
 Given the action \f$ S(\phi)\f$ of a system of bosonic fields \f$ \phi\f$, our
 goal is to generate a Markov process with fixed probability distribution
@@ -329,7 +329,7 @@ pseudofermions \f$ \bar\eta\f$, \f$ \eta\f$ with the desired probability
 distribution and keeping then fixed during the above HMC configuration
 generation for the remaining bosonic fields \f$ \phi\f$.
 
-### RHMC formulation
+## RHMC formulation
 
 The fermionic part of the HMC Hamiltonian, for \f$ N_f\f$ degenerate quarks
 and \f$ N_{pf}\f$ pseudofermions, can be written as:
@@ -427,7 +427,7 @@ obtained by computing the maximum and minimum eigenvalue of \f$ Q_m^2\f$ on
 each configuration when needed. In our code we update this interval only
 before the metropolis test, while we keep it fixed during the molecular dynamics.
 
-### Even-Odd preconditioning
+## Even-Odd preconditioning
 
 It is a very well know fact that the time spend for a simulation with
 dynamical fermions is dominated by the time required for the inversions
@@ -510,7 +510,7 @@ while for \f$ x\in \mathrm{odd}\f$:
 \f{equation}{\begin{aligned}
 \dot\pi^a_F(x,\mu) &= - \frac{T_R}{T_f} P^a_R \left( U^R(x,\mu) \mathrm{tr_{spin}} \left[ \gamma_5 (1-\gamma_\mu) \left\{\xi_e(x+\mu)\otimes\sigma_o(x)^\dagger + \eta_e(x+\mu)\otimes\rho_o(x)^\dagger   \right\} \right] \right)\, .\end{aligned}\f}
 
-## Two-point functions
+# Two-point functions
 
 This is a summary of the formulae used for the mesonic two-point
 functions. Let \f$ \Gamma\f$ and \f$ \Gamma^\prime\f$ be two generic matrices in the Clifford
@@ -538,7 +538,7 @@ above becomes:
 where \f$ \tilde \Gamma= \gamma_5 \Gamma\f$, and $\tilde \Gamma^\prime =
 \gamma_5 \Gamma^\prime$.
 
-## Hasenbusch acceleration
+# Hasenbusch acceleration
 
 Let us summarize the Hasenbusch trick (for two flavours)
 
@@ -563,7 +563,7 @@ In any case the two term can be evaluated independently, and we have:
 
 This can be combined with even-odd preconditioning.
 
-### Wilson Mass Shift
+## Wilson Mass Shift
 
 Assume 
 
@@ -602,7 +602,7 @@ From which we deduce
 
 Which matches one comment in the the force_hmc.c file.
 
-#### Even-Odd Preconditioning
+### Even-Odd Preconditioning
 
 Writing 
 
@@ -678,7 +678,7 @@ Note that as in the non-even-odd case this can be rewritten as:
 \delta_m (4+m) )Q_{m,eo}^{-1}   (\gamma_5 + \delta_m (1 +
 \delta_m (4+m) )Q_{m,eo}^{-1}\phi_2 \end{aligned}\f}
 
-### Twisted-Mass Shift
+## Twisted-Mass Shift
 
 Assume
 
@@ -745,7 +745,7 @@ Which leads to
 
 Note also that the forces are explicitly proportional to \f$ \mu_2^2\f$.
 
-#### Even-Odd Preconditioning
+### Even-Odd Preconditioning
 
 Note that we have \f$ \widetilde{\mu} \equiv 2 \kappa \mu\f$.
 
@@ -853,7 +853,7 @@ Here, we have used that \f$ \dot{Q}_+= \dot{Q}_{-}\f$ and
 
 \f{equation}{ M_{\rm{eo}}^{\dagger}=\gamma_5 M_{\rm{oe}} \gamma_5 \,.\f}
 
-##### Determinant Ratio
+#### Determinant Ratio
 
 We use that 
 
@@ -913,7 +913,7 @@ X_{1,2} =&  \begin{pmatrix}  (1-i\mu_{1,2}\gamma_5)^{-1} M_{\rm{eo}} X_W \\
 \dot{M}_{\rm{oe}} & 0\\
 \end{pmatrix}\end{aligned}\,.\f}
 
-##### Twisted Wilson-Dirac Operator
+#### Twisted Wilson-Dirac Operator
 
 Instead of applying the even-odd preconditioning to the twisted-mass operator
 we can use the Wilson-Dirac even-odd operator and do a different splitting.
@@ -992,7 +992,7 @@ Similarly for the second Hamiltonian we get
 
 which is exactly the force that appears in case of a pure Wilson-Dirac even-odd preconditioned operator up to a multiplicative factor.
 
-## Clover Term
+# Clover Term
 
 The clover term can be written as
 
@@ -1051,7 +1051,7 @@ with the definitions
  D &= iF_{01}+F_{02}-F_{13}+iF_{23}
 \end{aligned} \f}
 
-### Pseudofermion Forces
+## Pseudofermion Forces
 
 For the forces we use the following short-hand notation for the derivative with respect to the link variables.
 
@@ -1073,7 +1073,7 @@ with the definitions
  \xi &= H\eta.
 \end{aligned} \f}
 
-#### Forces
+### Forces
 
 Here we will only consider the forces from the clover term and not the hopping term.
 The clover part of the Dirac operator is given by
@@ -1154,7 +1154,7 @@ The total force can now be written as
 
 This brings us down to a total of 15 matrix multiplications and 6 additions.
 
-#### Logarithmic Forces
+### Logarithmic Forces
 
 In the case of even-odd preconditioning the action of the small determinant \f$ D_{oo}\f$ can be written as
 
@@ -1220,9 +1220,9 @@ The six independent elements of \f$ X_{\mu\nu}\f$ can now be written as
 \end{aligned} \f}
 
 
-### Even-odd Preconditioning
+## Even-odd Preconditioning
 
-#### Method 1
+### Method 1
 
 We can write the determinant as
 
@@ -1239,7 +1239,7 @@ The action is
 
 \f{equation}{ S = S_1 + S_2 = \phi_1^\dagger Q_{oo}^{-2}\phi_1 + \phi_2^\dagger Q^{-2}\phi_2 \f}
 
-##### Forces for \f$ \phi_1\f$-term
+#### Forces for \f$ \phi_1\f$-term
 
 The derivative is
 
@@ -1256,7 +1256,7 @@ with
  \xi &= Q_{oo}\eta.
 \end{aligned} \f}
 
-##### Forces for \f$ \phi_2\f$-term
+#### Forces for \f$ \phi_2\f$-term
 
 The derivative is
 
@@ -1296,7 +1296,7 @@ with
   \xi_1 &= D_{oo}^{-1}D_{oe}\xi
 \end{aligned} \f}
 
-#### Method 2
+### Method 2
 
 The action of \f$ D_{oo}\f$ can also be expressed directly as the logarithm of the determinant.
 
@@ -1304,7 +1304,7 @@ The action of \f$ D_{oo}\f$ can also be expressed directly as the logarithm of t
 
 This is the approach implemented in the code.
 
-### LDL factorization
+## LDL factorization
 
 With even-odd preconditioning we need to calculate the inverse \f$ D_{oo}^{-1}\f$ when applying the dirac operator and when calculating the forces.
 Because this matrix is Hermitian and block diagonal it can be inverted locally with an exact solver.
@@ -1324,75 +1324,75 @@ The determinant is given by
 
 \f{equation}{ \det(A) = \prod_k D_k \f}
 
-#### LDL Decomposition
+### LDL Decomposition
 
 Calculates the LDL decomposition \f$ A=LDL^\dagger\f$ in-place.
 After the decomposition, the lower triangular part of \f$ A\f$ is \f$ L\f$ and the diagonal is \f$ D\f$.
 
 ```
 do i=0, N-1
+  do k=0, i-1
+    A_ii = A_ii - L_ik * conj(L_ik) * A_kk
+  enddo
+  do j=i+1, N-1
     do k=0, i-1
-        A_ii = A_ii - L_ik * conj(L_ik) * A_kk
+      A_ji = A_ji - A_jk * conj(L_ik) * A_kk
     enddo
-    do j=i+1, N-1
-        do k=0, i-1
-	    A_ji = A_ji - A_jk * conj(L_ik) * A_kk
-	enddo
-	A_ji = A_ji/A_ii
-    enddo
+    A_ji = A_ji/A_ii
+  enddo
 enddo
 ```
 
-#### Forward substitution
+### Forward substitution
 
 Calculates \f$ x=L^{-1}b\f$.
 
 ```
 do i=0, N-1
-    x_i = b_i
-    do k=0, i-1
-        x_i = x_i - A_ik * x_k
-    enddo
+  x_i = b_i
+  do k=0, i-1
+    x_i = x_i - A_ik * x_k
+  enddo
 enddo
 ```
 
-#### Backward substitution with diagonal
+### Backward substitution with diagonal
 
 Calculates \f$ x=(L^\dagger)^{-1}D^{-1}x\f$.
 
 ```
 do i=N-1, 0
-    x_i = x_i/A_ii
-    do k=i+1, N-1
-        x_i = x_i - conj(A_ki) * x_k
-    enddo
+  x_i = x_i/A_ii
+  do k=i+1, N-1
+    x_i = x_i - conj(A_ki) * x_k
+  enddo
 enddo
 ```
 
-#### Full inversion
+### Full inversion
 
 This algorithm calculates the inverse \f$ B=A^{-1}\f$ from the LDL decomposition.
 Because the inverse is Hermitian we only calculate the lower triangular part.
 
 ```
 do i=0, N-1
-    B_ii = 1
-    do j=i, N-1
-        do k=i, j-1
-	    B_ji = L_jk * B_ki
-	enddo
+  B_ii = 1
+  do j=i, N-1
+    do k=i, j-1
+      B_ji = L_jk * B_ki
     enddo
-    do j=N-1, i
-        B_ji = B_ji/L_ii
-	do k=j+1, N-1
-	    B_ji = conj(L_kj) * B_ki
-	enddo
+  enddo
+  do j=N-1, i
+    B_ji = B_ji/L_ii
+    do k=j+1, N-1
+      B_ji = conj(L_kj) * B_ki
     enddo
+  enddo
 enddo
 ```
 
 
-## Exponential Clover Term
+# Exponential Clover Term
 
 The exponential version of the clover term (including mass term) can be
 written as
@@ -1426,7 +1426,7 @@ where \f$ A^\pm\f$ are \f$ 2 \times 2\f$ matrices in spin space and \f$ a,b,c,d\
 This formulation of \f$ A(x)\f$ as a block matrix will be useful for the
 exponentiation.
 
-### Evaluation of the operator
+## Evaluation of the operator
 
 The evaluation of the exponential of \f$ A(x)\f$ can be split as:
 
@@ -1470,7 +1470,7 @@ Finally, the coefficients of eq.\f$(\ref{eq:exphorner})\f$ are \f$ b_k  =q_{0,k}
 The Horner scheme method is currently implemented only for \f$ SU(2)\f$ and
 \f$ SU(3)\f$ with fundamental fermions.
 
-### Pseudofermion Forces
+## Pseudofermion Forces
 
 For the forces we use the following shorthand notation for the
 derivative with respect to the link variables.
@@ -1546,7 +1546,7 @@ now with
 
 The total force can now be expressed as in the clover term above. 
 
-### Even-odd Preconditioning
+## Even-odd Preconditioning
 
 Even-odd preconditioning is particularly simple for the exponential
 case, since the force coming from the little determinant vanished. This
@@ -1557,7 +1557,7 @@ can be seen because of the fact that:
 and so it is a constant term in the action that does not contribute to
 the force.
 
-### Implementation of \f$ X_{\mu\nu}\f$ using Taylor Series 
+## Implementation using Taylor Series 
 
 In the current version of the code, the Horner scheme is only implemented
 for \f$ SU(2)\f$ and \f$ SU(3)\f$ with fundamental fermions. For other theories, a
@@ -1581,7 +1581,7 @@ where now
 (A^-)^k \eta^-
 \end{pmatrix}.\f}
 
-## Stout smearing 
+# Stout smearing 
 
 The implementation follows @cite Morningstar:2003gk closely. We define the
 smeared links as 

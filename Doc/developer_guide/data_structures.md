@@ -1,8 +1,8 @@
 @page data_structures Data Structures
+[TOC]
+# Elementary Data Types
 
-## Elementary Data Types
-
-### Definition
+## Definition
 The following data types are defined as C structures containing a single array of elements. These can be used to create fields in `Include/spinor_field.h` using the macro `_DECLARE_FIELD_STRUCT`. 
 
 
@@ -22,7 +22,7 @@ Here $N_c$ corresponds to the number of colors and $D_{\mathrm{R}}$ is the dimen
 
 Every data type has a corresponding single precision data type, the name of which is obtained adding the suffix `_flt`.
 
-### Operations
+## Operations
 
 Linear algebra operations require us to loop over the elements in the arrays of the structures. However, in order to achieve best performance, `for`-loops in bottleneck functions should be unrolled. As a result, these linear algebra functions have to be defined as macros, that expand the unrolled code. Since the number of iterations in the `for`-loop depends for many of the structures above on the number of colors and dimension of fermion representation, which have to be known at compile time. As a result, the definition of these macros depends on the compilation parameters. 
 
@@ -35,7 +35,7 @@ The resulting macros can act both on single and double precision types. A list o
 
 TODO: Since these are auto-generated, you have to first compile HiRep and then compile the function reference. This needs to be pointed out somewhere.
 
-## Field Data Types
+# Field Data Types
 
 In ```HiRep```, field data is stored in field ```struct```s that contain an array of values on sites or links that will be allocated on the CPU and, if compiled with GPU acceleration, one that will be allocated on the GPU. The definitions of different fields are defined in ```LibHR/spinor_field.h```. Available types are
 

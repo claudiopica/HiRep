@@ -16,13 +16,12 @@ jobs:
           pathInArchive: "doxygen-1.9.4/bin/doxygen"
       - name: Doxygen build
         run: |
-          cd Doc && mkdir -p _build/doxygen
-          doxygen doxygen/Doxyfile
+          cd Doc/ && mkdir -p _build/ && doxygen ../doxygen/Doxyfile
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/HiRep-CUDA' }}
         with:
           publish_branch: gh-pages
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: Doc/_build/doxygen/html/
+          publish_dir: Doc/_build/html/
           force_orphan: true

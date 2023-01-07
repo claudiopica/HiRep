@@ -1,5 +1,5 @@
 @page input_file Input File Configuration
-
+[TOC]
 ## Integrator
 
 The HiRep code uses a multilevel integrator and each integrator level has to be specified in the input file.
@@ -31,7 +31,7 @@ The last column in the table show how many times the next integrator level will 
 
 This gauge monomial is the standard Wilson plaquette action.
 
-$$ S = -\frac{\beta}{N}\sum_{x,\mu>\nu} \textrm{Re}~\textrm{tr}(U_\mu(x)U_\nu(x+\hat{\mu})U_\mu^\dagger(x+\hat{\nu})U_\nu^\dagger(x)) $$
+\f{equation}{ S = -\frac{\beta}{N}\sum_{x,\mu>\nu} \textrm{Re}~\textrm{tr}(U_\mu(x)U_\nu(x+\hat{\mu})U_\mu^\dagger(x+\hat{\nu})U_\nu^\dagger(x)) \f}
 
 The following example shows how to specify a gauge monomial in the input file.
 
@@ -53,10 +53,10 @@ The following example shows how to specify a gauge monomial in the input file.
 
 ## Lüscher-Weisz gauge
 
-This gauge monomial is the Lüscher-Weisz (tree-level Symanzik) gauge action, including the $1\times1$ plaquettes $P_{\mu\nu}$ and the $1\times2$ rectangular loops $R_{\mu\nu}$.
-The two coefficients below are related through $c_0+8c_1=1$ to ensure the correct continuum limit.
+This gauge monomial is the Lüscher-Weisz (tree-level Symanzik) gauge action, including the \f$1\times1\f$ plaquettes \f$P_{\mu\nu}\f$ and the \f$1\times2\f$ rectangular loops \f$R_{\mu\nu}\f$.
+The two coefficients below are related through \f$c_0+8c_1=1\f$ to ensure the correct continuum limit.
 
-$$ S = -\frac{\beta}{N}\sum_{x,\mu>\nu} c_0\textrm{Re}~\textrm{tr}[P_{\mu\nu}(x)] + c_1\textrm{Re}~\textrm{tr}[R_{\mu\nu}(x)+R_{\nu\mu}(x)] $$
+\f{equation}{ S = -\frac{\beta}{N}\sum_{x,\mu>\nu} c_0\textrm{Re}~\textrm{tr}[P_{\mu\nu}(x)] + c_1\textrm{Re}~\textrm{tr}[R_{\mu\nu}(x)+R_{\nu\mu}(x)] \f}
 
 Specify a gauge monomial in the input file as in the following example:
 
@@ -82,7 +82,7 @@ Specify a gauge monomial in the input file as in the following example:
 
 The HMC monomial is the standard term for simulating two mass degenerate fermions.
 
-$$ S = \phi^\dagger(D^\dagger D)^{-1}\phi\,, $$
+\f{equation}{ S = \phi^\dagger(D^\dagger D)^{-1}\phi\,, \f}
 
 corresponding to the following input file configurations with example parameters:
 
@@ -168,7 +168,7 @@ In this monomial the twisted mass is added after the Dirac operator has been eve
 
 The Hasenbusch term is a mass preconditioned term, used in connection with an HMC monomial.
 
-$$ S = \phi^\dagger\left(\frac{D^\dagger D}{(D+\Delta m)^\dagger (D+\Delta m)}\right)\phi $$
+\f{equation}{ S = \phi^\dagger\left(\frac{D^\dagger D}{(D+\Delta m)^\dagger (D+\Delta m)}\right)\phi \f}
 
 ```
     monomial {
@@ -259,7 +259,7 @@ For a twisted even-odd preconditioned operator use the type `hasenbusch_tm_alt`.
 
 The RHMC monomial uses a rational approximation to simulate an odd number of mass degenerate fermions.
 
-$$ S = \phi^\dagger(D^\dagger D)^{-n/d}\phi $$
+\f{equation}{ S = \phi^\dagger(D^\dagger D)^{-n/d}\phi \f}
 
 Include this in the input file using the type `rhmc`. One further needs to specify numerator and denominator fractions in the rational approximation.  
 
@@ -291,4 +291,4 @@ Include this in the input file using the type `rhmc`. One further needs to speci
 
 ## Chronological Inverter
 
-When using the chronological inverter the force precision should be $10^{-14}$ or better to ensure reversibility in the algorithm. Further, masses given in monomials should include the mass shift.
+When using the chronological inverter the force precision should be \f$10^{-14}\f$ or better to ensure reversibility in the algorithm. Further, masses given in monomials should include the mass shift.

@@ -7,7 +7,7 @@
     <tab type="usergroup" visible="yes" url="[none]" title="User Guide">
       <tab type="user" visible="yes" url="@ref input_file" title="Input File Configuration" />
       <tab type="user" visible="yes" url="@ref supported_features" title="Supported Features" />
-      <tab type="user" visible="yes" url="@ref writing_program" title="Writing a Program" />
+      <!-- <tab type="user" visible="yes" url="@ref writing_program" title="Writing a Program" /> -->
       <tab type="user" visible="yes" url="@ref analysis" title="Analysis" />
     </tab>
     <tab type="usergroup" visible="yes" url="[none]" title="Developer Guide">

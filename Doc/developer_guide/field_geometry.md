@@ -1,10 +1,11 @@
 @page geometry Geometry
+[TOC]
 
-## Geometry Properties
+# Geometry Properties
 
 Fields living on the four-dimensional lattice are defined to be C arrays of elements using the data structures in the corresponding section. The geometry of the lattice is defined by assigning an index $n$ of the array to each site $(t, x, y, z)$. The mapping between the cartesian coordinates of the local lattice and the array index is given by the macros `iup(n,dir)` and `idn(n,dir)` which, given the index $n$ of the current site, return the index of the site whose cartesian coordinate in direction `dir` is increased or decreased by one respectively. 
 
-### Geometry Descriptor
+## Geometry Descriptor
 
 In the MPI version of the code the lattice is broken up into local lattices in addition to an even-odd preconditioning forming blocks of data in memory. Each of these blocks then corresponds to a contiguous set of indices. As a result, we need to additionally allocate field memory for buffers that we can use to send and receive information between different cores and nodes. In order to communicate correctly, we need to first fill the buffer of data to be sent. The division of the local lattice into blocks, the location of the different buffers and buffer copies are described in the following C structure in `Include/geometry.h`.
 
@@ -36,14 +37,14 @@ typedef struct _geometry_descriptor
 ```
 
 
-#### Global Geometry Descriptors
+### Global Geometry Descriptors
 
 Usually, we want to initialize fields either on the full lattice or only with even or odd parity. In order to do this efficiently, the global geometry descriptors `glattice`, `glat_even` and `glat_odd` are initialized globally on host memory. These can then be used to allocate fields correspondingly 
 
-#### Number of Sites
+### Number of Sites
 In order to allocate memory for the field data, we need to know how many elementary field types we need to allocate. This is different for fields that are located on the sites or the links of the lattice. Correspondingly, for the given lattice geometry, the number of sites and the number of links are calculated and saved in the fields `gsize_spinor` and `gsize_gauge` respectively.
 
-#### Master Pieces
+### Master Pieces
 %% TODO: We also include the halo region into total master pieces and this collides with this definition
 
 A piece is called _master_ if it does not contain copies of other sites, as for example is the case for buffer pieces. These are copies of sites already stored in a master piece. 
@@ -72,7 +73,7 @@ A single boundary communication between two 2D local lattices would accordingly 
 
 Here the boundary elements are being communicated to the respective boundary of the other block. Bulk elements are unaffected.
 
-#### Inner Master Pieces
+### Inner Master Pieces
 The first decomposition of the lattice site is the even-odd preconditioning. This splits  any lattice in two pieces: an even and an odd one. These pieces are stored contiguously in memory meaning that at the first indices one can only read sites of the even lattice and after an offset we are only reading odd sites. For an even-odd preconditioned lattice the number of inner master pieces is therefore two and can be accessed in the variable `inner_master_pieces` of the geometry descriptor. In this context, an _inner_ master piece comprises all sites that are in the _bulk_ of a local lattice of given parity.
 
 Resultingly, there is a shift in the local master piece block that is the starting index of the odd sites. For this, one can use the field `master_shift`. This field contains the offset of a lattice geometry relative to the full lattice. The even lattice is not offset and overlaps with the first half of the full lattice. The odd lattice, however, overlaps with the last half, so it is offset by half the number of lattice points compared to the full lattice. As a result, the odd lattice geometry, saved in the global variables as `&glat_odd` has the `master_shift` agreeing with the first index of the odd block of the full lattice.
@@ -100,7 +101,7 @@ Additionally, the geometry descriptor contains two numbers of _total master piec
 
 The number of interfacing elements does not only depend on this decomposition but also whether the saved field is saved on the lattice links or sites. Consequently, while the master pieces are identical, the buffer structure depends on whether the field that needs to be communicated is a gauge field or a spinor field. For this, the geometry descriptor contains both an integer for the total number of master pieces for a spinor field and the total number of master pieces for a gauge field. Additionally, there are fields that contain corresponding counts of buffers for both field geometries, `nbuffers_spinor` and `nbuffers_gauge`.
 
-#### Block Arrangement in Memory
+### Block Arrangement in Memory
 In order to work with the block structure efficiently and optimize memory access patterns, the sites belonging to a single piece are stored consecutively in memory. Since the field data is stored in a one-dimensional array, we can access the sites stored in a block by consecutive indices. As a result, in order to access all sites in a block, we need to know the index where it starts and where it ends. This information is stored in the arrays `master_start` and `master_end`. 
 
 Here, every block is identified by an index, in the code often called `ixp`. The mapping of the index to the block is persistent but arbitrary and therefore subject to convention. In memory, and correspondingly at site index level, the blocks are stored such that first there is a large block of field data of local lattices with even parity and then with odd parity. However, at block index level, the even `ixp` identify even lattices and odd `ixp` odd lattices, with lattices of two parities belonging to the same local lattices adjacent. This means for example, that if the even part of my local lattice is stored at `ixp=4`, then the odd part can be found at `ixp=5`. For a simple decomposition into two blocks with even-odd preconditioning are arranged in memory as in the following illustration
@@ -123,7 +124,7 @@ One could find out the length of the block, which is not necessarily constant, b
 int block_length = s-type->master_start[5] - s->type->master_end[5] + 1;
 ```
 
-#### OpenMP
+### OpenMP
 
 The integers
 
@@ -135,7 +136,7 @@ The integers
 
 are necessary for optimizing communications between cores on a single node.
 
-#### Optimizing Communications
+### Optimizing Communications
 
 As already described the local blocks decompose further into even and odd pieces, sites of the halo, boundary and bulk. We want to access these pieces separately, because they have different roles in computation and communication. Manipulating these different elements in the field data therefore requires different code. However, in order to conserve optimal access patterns, every data access has to be an access to a single block of contiguous memory. When storing all sites in the extended lattice naively, one might have to access multiple blocks of memory for a particular computation or communication step. This negatively impacts memory access performance due to suboptimal bus-utilization, data reuse and automatic caching patterns. The challenge is, therefore, to arrange the sites in memory in such a way that every memory access is an access to a single continguous block of memory.
 
@@ -174,15 +175,15 @@ as `PB_T`, `PB_X`, `PB_Y` and `PB_Z`. On a 6-by-6 2D lattice `PB_X=2` and `PB_Y=
 @image latex development_notes/field_geometry/path_blocking.png "Path Blocking Illustration" width=4cm
 
 
-#### Buffer Synchronization
+### Buffer Synchronization
 For complex decompositions, that are usual in lattice simulations, the blocks have to communicate in a highly non-trivial way. For example decomposing a $32^3\times 64$ lattice into $8^4$ local lattices requires 512 processes to communicate the three dimensional surfaces of each four-dimensional local lattice with all interfacing blocks. In order to perform this communication we need to know both the indices of the sending blocks and map them to the receiving blocks. This information is stored in the arrays `rbuf_from_proc` and `sbuf_to_proc`, which tell us which processes send to which processes by id, and further the arrays `rbuf_start` and `sbuf_start`, which tell us at which index in the local lattice we need to start reading. We can iterate through these arrays to find pairs of sending and receiving processes and perform the communication. The size of the memory transfer is further stored in the array `sbuf_len` and `rbuf_len`.
 
 The number of copies necessary depends on whether the field is a spinor field or gauge field and saved in the fields `nbuffers_spinor` and `nbuffers_gauge`.
 
-## Field Operations
+# Field Operations
 
-### Even-Odd Decomposition
-#### CPU
+## Even-Odd Decomposition
+### CPU
 A sufficiently local operator only operates on the site value and its nearest neighbors.
 As a result, we can decompose the operation into a step that can be executed site by site and is therefore diagonal and another step where every site only depends on the nearest neighbors. This we can further decompose into two steps, one acting on the even lattice sites while the odd sites are frozen and then another step acting on the odd lattice sites while the even ones are frozen. As a result, this decomposition enables us to effectively evaluate local operators on the lattice because it can be done in parallel, using multiple CPU cores or GPUs.
 In order to efficiently work with this decomposition on the CPU and the GPU, the even and odd sites are stored in separate blocks on the lattice. This means for the CPU that for a field that is defined on both even and odd sites, one can easily iterate through the even sites by iterating through the first half of the allocated memory.
@@ -450,7 +451,7 @@ __global__ void example_kernel(suNf_spinor *s, int vol4h, int block_size)
 
 The writing functions work analogous.
 
-### Contingency
+## Contingency
 These reading and writing functions are necessary to access memory in a contingent way when performing operations on the fields. If we store the spinors in the same way they are stored on the CPU this will not be contingent. To understand the problem, we can look at the implementation of the inner product of two spinors at the kernel level.
 
 ```c
@@ -480,7 +481,7 @@ We can optimize this significantly by not saving one site after another but inst
 
 This means that memory is accessed contiguously as a single block. This is more efficient because it maximizes bus utilization and L1 cache hit rate.
 
-#### Spinor Fields
+### Spinor Fields
 At a code level, this is achieved by requesting the start pointer at a given index as usual, then performing a cast to the corresponding complex type and writing or reading from memory a stride away. For example, if one wanted to read out the second component of the first component vector of a spinor on the CPU, one would do that as follows
 
 ```c
@@ -554,5 +555,5 @@ __global__ void example_kernel(suNf_spinor *start, int stride)
 This shuffles how the `struct`s are organized in the previously allocated space.
 
 
-#### Gauge Fields
+### Gauge Fields
 For the gauge fields for every site, there are four link directions. Since the matrices stored on the links can be complex or real, the real and imaginary part of the matrices are additionally separated by a stride. 

@@ -1,8 +1,8 @@
 @page analysis Analysis
+[TOC]
+# Contractions
 
-## Contractions
-
-### Connected Two-Point Correlation Functions
+## Connected Two-Point Correlation Functions
 
 First we choose interpolating operators with the quantum numbers of the
 meson we would like to study:
@@ -51,7 +51,7 @@ We now use \f$ \gamma_5 \f$  Hermiticity: \f$ \gamma_5 S^\dagger(x,y) \gamma_5 =
 
 \f{equation}{C(t - \tau, 0) = -\sum_{\vec{x} \vec{y}} \text{Tr}\left[ \gamma_5 \Gamma S^{(2)} (x,y) \bar{ \Gamma }' \gamma_5 S^{\dagger (1)} (x,y) \right]\label{eqn:corr}\f}
 
-### Point Sources
+## Point Sources
 
 Using a delta function source and solving the Dirac equation gives a
 point propagator,
@@ -67,7 +67,7 @@ Translational invariance in the limit of infinitely many gauge
 configurations implies  \f$ S(x,y) = S(|x - y|) \f$, so the sum over \f$ \vec{y} \f$ 
 in equation eq.\f$(\ref{eqn:corr})\f$ just gives \f$ V \f$  times equation eq.\f$(\ref{eqn:pointcorr})\f$. We place the source at the time origin so  \f$ \tau = 0 \f$.
 
-### One-end Trick
+## One-end Trick
 
 For this method it helps to write all the indices out,
 
@@ -100,7 +100,7 @@ the correlator can be evaluated as,
 
 \f{equation}{C(t - \tau, 0) = -\frac{1}{K} \sum_{k = 0}^{K} \sum_{\vec{x} } (\gamma_5 \Gamma)_{\alpha \beta} \phi^{(k)}_{\beta, b}(\vec{x}, t; \tau) \phi^{\Gamma \dagger (k)}_{\alpha, b}(\vec{x}, t; \tau)\f}
 
-#### Implementation in HiRep
+### Implementation in HiRep
 
 In HiRep the code ```Spectrum/mk_mesons_with_z2semwall.c``` does two solves to
 calculate  \f$ S^{(1)} | \eta \rangle \f$ and \f$ S^{(2)} (\bar{ \Gamma }' \gamma_5)^{\dagger} | \eta \rangle \f$. HiRep has
@@ -171,7 +171,7 @@ as before. By using the spin_matrix object in HiRep to construct the
 objects \f$ \chi^{\lambda}_{\beta, b} \f$ the correlators can be calculated
 with only \f$ 4 N_F \f$ inversions.
 
-### Disconnected
+## Disconnected
 
 The disconnected contributions occur when we have fermion species of the
 same type in the hadron interpolator \f$ O_M \f$ :
@@ -232,7 +232,7 @@ with
 
 \f{equation}{\phi^{(k)}_{\beta, b}(\vec{x}, t) = \sum_{\vec{y}} S_{\beta\gamma,b c} (\vec{x}, t; \vec{y}, \tau) | \eta^{(k)}_{\gamma c }(\vec{y}, \tau)\,.\rangle\f}
 
-### Cancelling Backwards Propagation
+## Cancelling Backwards Propagation
 
 The two-point function evaluated in the center of the lattice is
 (including the backward propagating part to give the extra factor of
@@ -301,7 +301,7 @@ where  \f$ C_{+}(t - \tau, 0) \f$  gives the forward propagating part from  \f$ 
 to  \f$ T \f$  and  \f$ C_{-}(t - \tau, 0) \f$  gives the backwards propagating part
 from  \f$ 2T \f$  to  \f$ T \f$.
 
-### Form Factors and Sequential Sources
+## Form Factors and Sequential Sources
 
 The electromagnetic form factor of a 'pion' requires the evaluation of
 the matrix element
@@ -378,7 +378,7 @@ Z_V \frac{1}{K} \sum_{i=0}^K \sum_{\vec{x} \vec{y} } e^{-i\vec{p_f}(\vec{x} - \v
 Using this method we can inject arbitrary momentum at the source without
 the need for extra inversions.
 
-#### Two-Point Functions
+### Two-Point Functions
 
 A complete set of hadrons is given by,
 
@@ -424,7 +424,7 @@ where
 
 \f{equation}{Z_\pi = \langle \pi(p) | O^\dagger_\pi (\vec{0}, 0)| 0 \rangle\f}
 
-#### Three-Point Functions
+### Three-Point Functions
 
 In less detail we insert two complete sets of states into the correlator
 ( point sources so \f$ (\vec{x_i}, t_i) = (\vec{0}, 0) \f$ ) 
@@ -438,7 +438,7 @@ changes to
 
 \f{equation}{-e^{-(t - t_f) E_\pi(\vec{p_f}) -(T - t + t_i) E_\pi(\vec{p_i}) }\f}
 
-#### Correlator Ratios: \f$Z_V\f$
+### Correlator Ratios: \f$Z_V\f$
 
  \f$ Z_V \f$  can be obtained as follows: The ratio, 
 
@@ -449,11 +449,11 @@ changes to
 
 Where we used that the renormalized form factor \f$ f(0) = 1 \f$ 
 
-#### Correlator Ratios: \f$ f(q) \f$ 
+### Correlator Ratios: \f$ f(q) \f$ 
 
 There are various ways to cancel the unwanted terms and get \f$ f(q) \f$.
 
-##### RBC-UKQCD Ratio
+#### RBC-UKQCD Ratio
 
 We examine the ratio,
 
@@ -475,7 +475,7 @@ Cancelling leaves,
 
 note there is no \f$ Z_V \f$  here.
 
-##### Bonnet et. al. Ratio
+#### Bonnet et. al. Ratio
 
 \f{equation}{\frac{2 Z_V m_\pi}{E(\vec{p}) + m_\pi} \frac{ C_{3} (t, t_f, \vec{p}, \vec{0} )  C_{\rightarrow}(t, \vec{0}) }{ C_{\rightarrow} (t, \vec{p} )  C_{\rightarrow}(t_f, \vec{0}) }\f}
 
@@ -498,9 +498,9 @@ the kinematic factors are cancelled
 you need to actually know  \f$ Z_V \f$  or use the conserved current.
 
 
-## Estimation of Disconnected Contributions
+# Estimation of Disconnected Contributions
 
-### Conventions
+## Conventions
 
 We choose the hermitian basis of gamma matrices given in Tab. 1. Each element of the basis is referred by an index in \[0,15\] shown in the following table
 
@@ -523,7 +523,7 @@ We choose the hermitian basis of gamma matrices given in Tab. 1. Each element of
 | 14 | \f$ -\mathrm{i}\gamma_5\gamma_0\gamma_2 \f$  |
 | 15 | \f$ -\mathrm{i}\gamma_5\gamma_0\gamma_3 \f$  |
 
-### Singlet Two-Point Functions
+## Singlet Two-Point Functions
 
 Consider a gauge theory on a group G coupled to  \f$ N_f \f$  fermions in an arbitrary representation  \f$ R \f$. Let us denote:
 
@@ -533,7 +533,7 @@ where  \f$ q \f$, \f$\bar{q} \f$  are the  \f$ N_f \f$  quark fields and  \f$ \G
 
 \f{equation}{C(t, x_0) = \sum_{\vec{x}} \langle -\mathrm{tr}\left(\Gamma S(x,x_0)\Gamma S(x_0,x)\right) + N_f\,\mathrm{tr}\left(\Gamma S(x,x)\right)\mathrm{tr}\left(\Gamma S(x_0,x_0)\right)\rangle\f}
 
-### Stochastic Evaluation of Disconnected Loops
+## Stochastic Evaluation of Disconnected Loops
 
 The simple one consist to evaluate stochastically the disconnected contribution without any variance reduction techniques. Considering a general volume source  \f$ \xi \f$, we define  \f$ \phi \f$  using the Dirac operator  \f$ D \f$ :
 
@@ -547,7 +547,7 @@ where the symbol  \f$ (\ldots)_{R} \f$  refers to the average over R samples of 
 
 It should be observed that in evaluating the disconnected contributions to the neutral meson correlators each one of the two quark loops arising from Wick contractions must be averaged over completely independent samples of stochastic sources for the purpose of avoiding unwanted biases.
 
-#### Implemented Source Types
+### Implemented Source Types
 
 TODO: XX
 We use XX noise sources. The user can switch between the following different source types
@@ -559,7 +559,7 @@ We use XX noise sources. The user can switch between the following different sou
 * type 4: Volume source with time, spin, color and even-odd dilution
 * type 6: Volume source with spin, color and even-odd dilution
 
-### Output
+## Output
 
 The code does not perform any average on the stochastic noise or on the dilution indices. This allows to keep as much information as possible and to vary the number of stochastic sources at the analysis level.
 
@@ -571,7 +571,7 @@ TODO: Notation
 
 where iGamma refers to the index of the Gamma matrix defined in Table 1.
 
-### Debugging Options
+## Debugging Options
 
 If the code is executed with the following additional arguments
 
@@ -581,7 +581,7 @@ If the code is executed with the following additional arguments
 
 This will read the two files and perform the contraction accordingly computing \f$ \chi^{\dagger}\Gamma \psi \f$.
 
-## Mesonic Correlators of the Isotriplet
+# Mesonic Correlators of the Isotriplet
 
 The two fermionic flavors are denoted by \f$ u \f$ and \f$ d \f$. We are interested in the mesonic correlators
 
@@ -635,7 +635,7 @@ where \f$ \sigma(\Gamma) \f$ constitutes a permutation of four elements. Putting
 \left[ H_{\sigma_\alpha(\gamma_5 \Gamma_1), \beta}(x,y) H_{\alpha, \sigma_\beta(\gamma_5 \Gamma_2)}(x,y)^\dagger \right]
 \right> \; .\label{triplet_corr}\end{aligned}\f}
 
-### Implementation of the Point-To-All Propagator
+## Implementation of the Point-To-All Propagator
 
 In order to calculate mesonic masses we are interested in correlators satisfying \f$ \Gamma_1=\Gamma_2 \f$. Using translational invariance, we can set \f$ y=0 \f$. In this case the formula simplifies to
 
@@ -680,7 +680,7 @@ This is implemented into HiRep in the following way
     `      _S4_ = `\f$-i t_4(\gamma_5 \Gamma)\f$\
     `      `
 
-## Mesonic Correlators of the Isosinglet
+# Mesonic Correlators of the Isosinglet
 
 We are now concerned with the genertic mesonic correlator given by
 
@@ -719,7 +719,7 @@ All other contributions are identical to the contributions to the isotriplet cor
 \right>
 \; .\label{eq:hairpin}\f}
 
-### All-to-all Propagator
+## All-to-all Propagator
 
 It is clear from eq.\f$(\ref{eq:hairpin})\f$, from the fact that we are employing point source, that one must compute the entire inverse matrix of the Dirac operator. The alternative is to use a statistic estimate for \f$ H \f$ followed by variance reduction procedures.
 
@@ -739,7 +739,7 @@ Stochastic estimation can then be used to calculate the relevant tracks for corr
 
 \f{equation}{\mathrm{tr}\left[ \Gamma G(x,x) \right] = \sum_i \xi^{(i)}(x)^\dagger \gamma_5 \Gamma \eta^{(i)}(x)\, .\f}
 
-### Variance reduction
+## Variance reduction
 
 The noise obtained from stochastic estimation of the matrix \f$ G \f$ in the formula eq.`naive_noisy_estimate` can be reduced using the trick from @cite McNeile_2001 for Wilson fermions. Here, the Dirac operator has the form \f$ D = 1 - K \f$. As a result, for the matrix \f$ G \f$ the following formula applies 
 
@@ -762,7 +762,7 @@ with \f$ m=2k \f$. (TODO: fix this sentence) Here, we can use the fact that the 
 
 @cite McNeile_2001 use this trick only for the calculation of the hairpin diagram. It might be possible to generalize it to the the isotriplet part as well, as an alternative to the point-to-all propagator. 
 
-### Time dilution
+## Time dilution
 
 This is a trick introduced in @cite Foley_2005 for noise reduction in the computation of null-moment propagators. Whenever stochastic estimation of the \f$ H \f$ matrix is required, such as in eq.\f$(\ref{eq:naive_noisy_estimate})\f$, it is possible to replace each stochastic source \f$ \xi^{(i)} \f$ with a set of sources each with support on a different time slice.
 
@@ -774,7 +774,7 @@ Stochastic estimation is now obtained similarly to the naive case:
 
 \f{equation}{H_{\alpha \beta}^{a b}(x,y) \simeq \sum_{i=1}^{N_s} \sum_{\tau=1}^{N_t} \eta^{(i,\tau)}_{\alpha a}(x) \xi^{(i,\tau)}_{\beta b}(y)^\dagger  \eta^{(i,\tau)} \equiv H \xi^{(i,\tau)}\label{eq:diluted_noisy_estimate}\f}
 
-### Implementation Scheme 
+## Implementation Scheme 
 
 TODO: Add this to function reference instead if this is still implemented this way
 
