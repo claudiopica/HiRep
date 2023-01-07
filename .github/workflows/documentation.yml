@@ -13,7 +13,7 @@ jobs:
         with:
           name: "doxygen"
           url: "https://github.com/doxygen/doxygen/releases/download/Release_1_9_4/doxygen-1.9.4.linux.bin.tar.gz"
-          pathInArchive: "doxygen-1.9.6/bin/doxygen"
+          pathInArchive: "doxygen-1.9.4/bin/doxygen"
       - name: Doxygen build
         run: |
           cd Doc && mkdir -p _build/doxygen
