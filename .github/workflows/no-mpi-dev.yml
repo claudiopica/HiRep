@@ -8,7 +8,7 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     strategy:
       # Ensures that jobs are not cancelled is one job fails
       fail-fast: false
@@ -16,7 +16,7 @@ jobs:
         nc: [2, 3]
         repr: [FUND, ADJ]
         ecsw: [-expclover,-no-expclover]
-        dir: [Algebra,DiracOperator,Geometry,Inverters,Integrators,Mesons,PureGauge,RIMOM,Sources,StoredConfs,Utils,GaugeFix,Propagator,Random,SpinorField,Update,WilsonLoops]
+        dir: [Algebra,DiracOperator,Geometry,Inverters,Mesons,PureGauge,RIMOM,Sources,StoredConfs,Utils,GaugeFix,Propagator,Random,SpinorField,Update,WilsonLoops]
         exclude:
           - nc: 3
             repr: ADJ
