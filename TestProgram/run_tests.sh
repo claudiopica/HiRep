@@ -24,14 +24,15 @@ dirList=$1;
 echo "Testing: $dirList"
 echo "With flags:" "${@: 2}"
 
-for dir in $dirList ; do
-
-[ ! -d "$dir" ] && echo Argument must be a subdirectory of TestProgram && exit 1
-
+# write flags file
 ../Make/Utils/write_mkflags.pl -f ../Make/MkFlags.ini "${@: 2}" || exit 1
 
 echo Building...
-../Make/nj $dir
+../Make/nj $dirList
+
+for dir in $dirList ; do
+
+[ ! -d "$dir" ] && echo Argument must be a subdirectory of TestProgram && exit 1
 
 rm -f $dir/.test_failed $dir/.test_failed_*
 

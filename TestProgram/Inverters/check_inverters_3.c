@@ -42,7 +42,13 @@ int main(int argc, char *argv[])
   par.shift = (double *)malloc(sizeof(double) * (par.n));
   par.err2 = 1.e-28;
   par.max_iter = 0;
-  res = alloc_spinor_field_f(par.n + 2, &glattice);
+  res = alloc_spinor_field_f(par.n + 2, 
+#ifdef UPDATE_EO
+                                        &glat_even
+#else
+                                        &glattice
+#endif
+  );
   s1 = res + par.n;
   s2 = s1 + 1;
 

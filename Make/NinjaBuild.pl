@@ -71,7 +71,7 @@ rule link
   description = $setbg LINK $setnorm $out 
 
 rule test
-  command = cd $builddir && $TESTWRAPPER -t $root/$in
+  command = $TESTWRAPPER -t $root/$in
   description = $setbg TEST $setnorm $out
   pool = console
 

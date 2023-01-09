@@ -10,8 +10,8 @@ GetOptions(
     'help'     =>   sub { HelpMessage(2) },
  ) or HelpMessage(1);
 
-system("rm -f debug err_* out_*");
 my $input_file = "$test_file.in";
+my $output_file = "$test_file.out";
 
 print ("[\e[1m $test_file \e[0m ] ... ");
 my $mpicmd="";
@@ -37,11 +37,15 @@ if ($mpi) {
 
 my $testdir = dirname($test_file);
 my $testbn = basename($test_file);
-my $ret = system("rm -f $testdir/.test_failed_$testbn && $mpicmd $test_file -i $input_file 2>&1 >/dev/null");
+#clean outputs
+system("rm -f debug err_* out_* ${output_file}_* $testdir/.test_failed_$testbn");
+
+#runt test in its folder
+my $ret = system("cd $testdir && $mpicmd $test_file -i $input_file -o $output_file 2>&1 >/dev/null");
 if ($ret) {
     print ("\e[1;31mFAILED\e[0m\n");
-    system("touch $testdir/.test_failed_$testbn && tail -n 80 out_0");
-    exit(0);
+    system("touch $testdir/.test_failed_$testbn && tail -n 80 ${output_file}_*");
+    exit(0); #this always returns 0 so other tests are executed
 }
 print ("PASSED\n");
 
