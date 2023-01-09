@@ -158,7 +158,7 @@ sub backup_oldflags {
 }
 
 backup_oldflags();
-open(my $fh, '>', $file) or die "Could not open file '$file' !";
+open(my $fh, '>', $file) or die "Can not open '$file' $!";
 # write ng
 print $fh "NG = $NG\n";
 # write repr

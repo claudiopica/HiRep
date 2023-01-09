@@ -10,6 +10,8 @@ done
 # if we are running inside a github action, change workdir
 [ ! -z "$GITHUB_WORKSPACE" ] && cd $GITHUB_WORKSPACE/TestProgram
 
+echo Working directory: `pwd`
+
 # if we run inside a docker container, remove openmpi weirdness
 [ -f /.dockerenv ] && export OMPI_MCA_btl_vader_single_copy_mechanism=none
 

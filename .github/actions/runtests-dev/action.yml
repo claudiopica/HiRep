@@ -7,7 +7,7 @@ inputs:
   ccache:
     description: "Use ccache"
     required: true
-    default: -ccache
+    default: -no-ccache
   mpi:
     description: "Use mpi"
     required: true
