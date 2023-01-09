@@ -21,15 +21,14 @@ done
 [ -f /.dockerenv ] && export OMPI_MCA_btl_vader_single_copy_mechanism=none
 
 dirList=$1;
-wrFlagsOpt="${@: 2}"
 echo "Testing: $dirList"
-echo "With flags: $wrFlagsOpt"
+echo "With flags:" "${@: 2}"
 
 for dir in $dirList ; do
 
 [ ! -d "$dir" ] && echo Argument must be a subdirectory of TestProgram && exit 1
 
-../Make/Utils/write_mkflags.pl -f ../Make/MkFlags.ini $wrFlagsOpt || exit 1
+../Make/Utils/write_mkflags.pl -f ../Make/MkFlags.ini "${@: 2}" || exit 1
 
 echo Building...
 ../Make/nj $dir
