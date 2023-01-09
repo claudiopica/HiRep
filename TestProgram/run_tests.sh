@@ -8,7 +8,11 @@ do
 done
 
 # if we are running inside a github action, change workdir
-[ ! -z "$GITHUB_WORKSPACE" ] && cd $GITHUB_WORKSPACE/TestProgram
+if [ ! -z "$GITHUB_WORKSPACE" ] ; then 
+  cd $GITHUB_WORKSPACE/TestProgram
+  export OMPI_ALLOW_RUN_AS_ROOT=1
+  export OMPI_ALLOW_RUN_AS_ROOT_CONFIRM=1
+fi
 
 echo Working directory: `pwd`
 
