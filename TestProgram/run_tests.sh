@@ -1,11 +1,4 @@
 #!/bin/bash -e
-while getopts 'h' c
-do
-  case $c in
-    h) ../Make/Utils/write_mkflags.pl -h
-    ;;
-  esac
-done
 
 # if we are running inside a github action, change workdir
 if [ ! -z "$GITHUB_WORKSPACE" ] ; then 
@@ -16,26 +9,37 @@ fi
 
 echo Working directory: `pwd`
 
+while getopts ':h' c
+do
+  case $c in
+    h) ../Make/Utils/write_mkflags.pl -h
+    ;;
+  esac
+done
+
 # if we run inside a docker container, remove openmpi weirdness
 [ -f /.dockerenv ] && export OMPI_MCA_btl_vader_single_copy_mechanism=none
 
-[ ! -d "$1" ] && echo First argument must be a subdirectory of TestProgram && exit 1
+dirList=$1;
+wrFlagsOpt="${@: 2}"
+echo "Testing: $dirList"
+echo "With flags: $wrFlagsOpt"
 
-../Make/Utils/write_mkflags.pl -f ../Make/MkFlags.ini "${@: 2}" || exit 1
+for dir in $dirList ; do
+
+[ ! -d "$dir" ] && echo Argument must be a subdirectory of TestProgram && exit 1
+
+../Make/Utils/write_mkflags.pl -f ../Make/MkFlags.ini $wrFlagsOpt || exit 1
 
 echo Building...
-../Make/nj ${1}
+../Make/nj $dir
 
-rm -f ${1}/.test_failed ${1}/.test_failed_*
+rm -f $dir/.test_failed $dir/.test_failed_*
 
 echo Run Tests...
-../Make/nj ${1}_tests
+../Make/nj ${dir}_tests
 
-./mk_summary.sh ${1}
+done
 
-if compgen -G "${1}/.test_failed_*" >/dev/null ; then 
-  touch ${1}/.test_failed
-  exit 1 ;
-else 
-  exit 0 ;
-fi
+./mk_summary.sh "${dirList[*]}"
+exit $?
