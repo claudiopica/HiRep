@@ -1,4 +1,4 @@
-name: no-mpi
+name: no-mpi-dev
 
 on:
   push:

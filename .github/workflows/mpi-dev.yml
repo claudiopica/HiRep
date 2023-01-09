@@ -1,4 +1,4 @@
-name: mpi
+name: mpi-dev
 
 on:
   push:
