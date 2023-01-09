@@ -16,6 +16,7 @@ jobs:
         nc: [2, 3]
         repr: [FUND, ADJ]
         ecsw: [-expclover,-no-expclover]
+        dir: [Algebra,DiracOperator,Geometry,Inverters,Integrators,Mesons,PureGauge,RIMOM,Sources,StoredConfs,Utils,GaugeFix,Propagator,Random,SpinorField,Update,WilsonLoops]
         exclude:
           - nc: 3
             repr: ADJ
@@ -27,7 +28,7 @@ jobs:
 
     - uses: ./.github/actions/runtests-dev
       with:
-        dir:  "Algebra DiracOperator Geometry Inverters Integrators Mesons PureGauge RIMOM Sources StoredConfs Utils Disconnected GaugeFix Propagator Random SpinorField Update WilsonLoops"
+        dir: ${{matrix.dir}}
         mpi: -mpi
         nc: ${{ matrix.nc }}
         repr: ${{ matrix.repr }}
