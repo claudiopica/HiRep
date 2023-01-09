@@ -1,7 +1,7 @@
-GLB_T =  64 //Global T size
-GLB_X =  64
-GLB_Y =  64	
-GLB_Z =  64	
+GLB_T =  8 //Global T size
+GLB_X =  8
+GLB_Y =  8	
+GLB_Z =  8	
 NP_T =   2		
 NP_X =   2		
 NP_Y =   2      		

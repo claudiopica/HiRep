@@ -1,9 +1,9 @@
-name: no-mpi
+name: mpi
 
 on:
   push:
     branches:
-      - master
+      - HiRep-CUDA
 
 jobs:
   build:
@@ -16,7 +16,7 @@ jobs:
         nc: [2, 3]
         repr: [FUND, ADJ]
         ecsw: [-expclover,-no-expclover]
-        dir: [Algebra,DiracOperator,Geometry,Inverters,Integrators,Mesons,PureGauge,RIMOM,Sources,StoredConfs,Utils,Disconnected,GaugeFix,Propagator,Random,Scattering,SpinorField,Update,WilsonLoops]
+        dir: [Algebra,DiracOperator,Geometry,Inverters,Integrators,Mesons,PureGauge,RIMOM,Sources,StoredConfs,Utils,Disconnected,GaugeFix,Propagator,Random,SpinorField,Update,WilsonLoops]
         exclude:
           - nc: 3
             repr: ADJ
@@ -26,10 +26,10 @@ jobs:
       with:
         fetch-depth: 1
 
-    - uses: ./.github/actions/runtests
+    - uses: ./.github/actions/runtests-dev
       with:
         dir: ${{matrix.dir}}
-        mpi: -no-mpi
+        mpi: -mpi
         nc: ${{ matrix.nc }}
         repr: ${{ matrix.repr }}
         ecsw: ${{ matrix.ecsw }}

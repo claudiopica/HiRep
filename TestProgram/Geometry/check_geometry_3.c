@@ -2,6 +2,7 @@
 *
 * Check communication of gauge field in T direction
 *
+* NOCOMPILE = !WITH_MPI
 *******************************************************************************/
 
 #include "libhr.h"

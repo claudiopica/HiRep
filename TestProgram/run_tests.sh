@@ -10,6 +10,9 @@ done
 # if we are running inside a github action, change workdir
 [ ! -z "$GITHUB_WORKSPACE" ] && cd $GITHUB_WORKSPACE/TestProgram
 
+# if we run inside a docker container, remove openmpi weirdness
+[ -f /.dockerenv ] && export OMPI_MCA_btl_vader_single_copy_mechanism=none
+
 [ ! -d "$1" ] && echo First argument must be a subdirectory of TestProgram && exit 1
 
 ../Make/Utils/write_mkflags.pl -f ../Make/MkFlags.ini "${@: 2}" || exit 1

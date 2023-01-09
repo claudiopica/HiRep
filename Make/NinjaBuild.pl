@@ -67,7 +67,7 @@ rule ar
   description = $setbg AR $setnorm $out
 
 rule link
-  command = $LINK $LDFLAGS -o $out $in $libs -lm 
+  command = $LINK -o $out $in $libs -lm $LDFLAGS
   description = $setbg LINK $setnorm $out 
 
 rule test
