@@ -28,6 +28,8 @@ int test_comms_clover_term();
 int test_comms_clover_force();
 
 int test_sync_identical_to_cpu_spinor_field_f(geometry_descriptor*);
+int test_sync_identical_to_cpu_spinor_field_f_flt(geometry_descriptor *gd);
+
 
 int main(int argc, char *argv[]) 
 {
@@ -56,6 +58,10 @@ int main(int argc, char *argv[])
     return_val += test_sync_identical_to_cpu_spinor_field_f(&glattice);
     return_val += test_sync_identical_to_cpu_spinor_field_f(&glat_even);
     return_val += test_sync_identical_to_cpu_spinor_field_f(&glat_odd);
+
+    return_val += test_sync_identical_to_cpu_spinor_field_f_flt(&glattice);
+    return_val += test_sync_identical_to_cpu_spinor_field_f_flt(&glat_even);
+    return_val += test_sync_identical_to_cpu_spinor_field_f_flt(&glat_odd);
 
       /* Single precision */
     return_val += test_comms_spinor_field_f_flt(&glattice);
@@ -118,7 +124,6 @@ int test_sync_identical_to_cpu_spinor_field_f(geometry_descriptor *gd)
     int return_val = 0;
     spinor_field *f = alloc_spinor_field_f(1, gd);
     gaussian_spinor_field(f);
-    suNf_spinor *s = _FIELD_AT(f, 194);
     copy_to_gpu_spinor_field_f(f);
 
     //gd = &glattice;
@@ -197,6 +202,65 @@ int test_comms_spinor_field_f_flt(geometry_descriptor *gd)
 
     free_spinor_field_f_flt(f);
 
+    return return_val;
+}
+
+int test_sync_identical_to_cpu_spinor_field_f_flt(geometry_descriptor *gd) 
+{
+    lprintf("INFO", 0, " ======= TEST SPINOR FIELD ======= \n");
+    lprintf("INFO", 0, "Check sendbuffers filled by sync are identical on CPU and GPU\n");
+
+    // Setup fields on GPU
+    int return_val = 0;
+    spinor_field_flt *f = alloc_spinor_field_f_flt(1, gd);
+    gaussian_spinor_field_flt(f);
+    copy_to_gpu_spinor_field_f_flt(f);
+
+    //gd = &glattice;
+    int sendbuf_len = 0;
+    box_t *L = geometryBoxes->next;
+    int m = 0;
+    while (L && m < glattice.nbuffers_spinor) 
+    {
+        sendbuf_len += boxVolume(L->sendBox);
+        L=L->next; m++;
+    }
+
+    // Sync to buffer on CPU and save the sendbuffer in an array
+    sync_field(gd, sizeof(*(f->ptr)), 1, f->ptr, f->sendbuf_ptr);
+    suNf_spinor_flt* sendbuf_cpu = (suNf_spinor_flt*)malloc(sendbuf_len*sizeof(suNf_spinor_flt));
+    memcpy(sendbuf_cpu, f->sendbuf_ptr, sendbuf_len*sizeof(suNf_spinor_flt));
+
+    // Sync to buffer on GPU and save the sendbuffer in another array
+    sync_gpu_spinor_field_f_flt(f);
+    suNf_spinor_flt* sendbuf_gpu = (suNf_spinor_flt*)malloc(sendbuf_len*sizeof(suNf_spinor_flt));
+    cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, sendbuf_len*sizeof(suNf_spinor_flt), cudaMemcpyDeviceToHost);
+
+    // Iterate over the arrays and check
+    double diff = 0.0;
+    for (int i = 0; i < gd->nbuffers_spinor; ++i) 
+    {
+        for (int j = 0; j < gd->sbuf_len[i]; ++j) 
+        {
+            suNf_spinor_flt *spinor_cpu = sendbuf_cpu + j + gd->sbuf_start[i];
+            suNf_spinor_flt *spinor_gpu = (suNf_spinor_flt*)malloc(sizeof(suNf_spinor_flt));
+            suNf_spinor_flt *in_block = sendbuf_gpu + gd->sbuf_start[i];
+            int stride = gd->sbuf_len[i];
+            read_gpu_suNf_spinor_flt(stride, *(spinor_gpu), in_block, j, 0);
+
+            for (int k = 0; k < 4; ++k) 
+            {
+                for (int comp = 0; comp < NF; ++comp) 
+                {
+                    diff += creal((*spinor_cpu).c[k].c[comp])-creal((*spinor_gpu).c[k].c[comp]);
+                    diff += cimag((*spinor_cpu).c[k].c[comp])-cimag((*spinor_gpu).c[k].c[comp]);
+                }
+            }
+        }
+    }
+
+    return_val += check_diff_norm_zero(diff);
+    free_spinor_field_f_flt(f);
     return return_val;
 }
 
