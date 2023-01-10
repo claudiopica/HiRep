@@ -166,5 +166,4 @@ For debug purposes it is sometimes useful to have output files from all MPI proc
 Luigi Del Debbio, Agostino Patella and Claudio Pica. "Higher representations on the lattice: Numerical simulations, SU(2) with adjoint fermions". In: _Phys. Rev. D_ **81** (9 2010) p. 094503. DOI: [10.1103/PhysRevD.81.094503](https://doi.org/10.1103/PhysRevD.81.094503). URL: [https://link.aps.org/doi/10.1103/PhysRevD.81.094503](https://link.aps.org/doi/10.1103/PhysRevD.81.094503)
 
 
-![https://github.com/claudiopica/HiRep/actions?workflow=no-mpi-dev](https://github.com/claudiopica/HiRep/workflows/no-mpi-dev/badge.svg)
-![https://github.com/claudiopica/HiRep/actions?workflow=mpi-dev](https://github.com/claudiopica/HiRep/workflows/mpi-dev/badge.svg)
+[![ci](https://github.com/claudiopica/HiRep/actions/workflows/ci.yml/badge.svg)](https://github.com/claudiopica/HiRep/actions/workflows/ci.yml)
