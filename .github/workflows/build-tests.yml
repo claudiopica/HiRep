@@ -27,6 +27,7 @@ jobs:
       with:
         packages: openmpi-bin openmpi-common libopenmpi3 libopenmpi-dev ninja-build
         version: 1.0
+        execute_install_scripts: true
     - uses: actions/checkout@v3
       with:
         fetch-depth: 1
@@ -41,7 +42,7 @@ jobs:
   run-tests:
     needs: build
     runs-on: ubuntu-latest
-    
+
     strategy:
       # Ensures that jobs are not cancelled is one job fails
       fail-fast: false
@@ -63,6 +64,7 @@ jobs:
       with:
         packages: openmpi-bin openmpi-common libopenmpi3 libopenmpi-dev ninja-build
         version: 1.0
+        execute_install_scripts: true
     - uses: actions/download-artifact@v3
       with:
         name: build-${{ github.sha }}-${{ matrix.mpi }}-${{ matrix.nc }}-${{ matrix.repr }}-${{ matrix.ecsw }}
