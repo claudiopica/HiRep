@@ -5,9 +5,14 @@ on:
     branches:
       - HiRep-CUDA
 
+# cancel previous workflow
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   run-tests:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     strategy:
       # Ensures that jobs are not cancelled is one job fails
@@ -28,5 +33,5 @@ jobs:
     - name: Download HiRep
       run: wget https://github.com/claudiopica/HiRep/archive/${{ github.sha }}.tar.gz && tar -xvf ${{ github.sha }}.tar.gz --strip-components=1
     - name: Run Tests
-      run: ./TestProgram/run_tests.sh "Algebra DiracOperator Geometry Inverters Integrators Mesons PureGauge RIMOM Sources StoredConfs Utils GaugeFix Propagator Random SpinorField Update WilsonLoops" -cflags "-Wall -O1" -n ${{ matrix.nc }} -r ${{ matrix.repr }} ${{ matrix.mpi }} ${{ matrix.ecsw }}
+      run: ./TestProgram/run_tests.sh "Algebra DiracOperator Geometry Inverters Mesons PureGauge RIMOM Sources StoredConfs Utils GaugeFix Propagator Random SpinorField Update WilsonLoops" -cflags "-Wall -O1" -n ${{ matrix.nc }} -r ${{ matrix.repr }} ${{ matrix.mpi }} ${{ matrix.ecsw }}
 

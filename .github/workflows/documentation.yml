@@ -5,6 +5,11 @@ on:
     branches:
       - HiRep-CUDA
 
+# cancel previous workflow
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   docs:
     runs-on: ubuntu-20.04

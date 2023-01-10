@@ -3,6 +3,9 @@ use warnings;
 use strict;
 use Getopt::Long 'HelpMessage';
 use File::Basename qw(dirname basename);
+use Time::HiRes qw( usleep ualarm gettimeofday tv_interval nanosleep
+                    clock_gettime clock_getres clock_nanosleep clock
+                    stat lstat utime);
 
 GetOptions(
     'test|t=s' => \(my $test_file),
@@ -41,14 +44,16 @@ my $testbn = basename($test_file);
 system("rm -f debug err_* out_* ${output_file}_* $testdir/.test_failed_$testbn");
 
 #runt test in its folder
+my $t0 = [gettimeofday];
 my $ret = system("cd $testdir && $mpicmd $test_file -i $input_file -o $output_file 2>&1 >/dev/null");
+my $elapsed = tv_interval ( $t0 );
 if ($ret) {
     print ("\e[1;31mFAILED\e[0m\n");
     system("touch $testdir/.test_failed_$testbn && tail -n 80 ${output_file}_*");
     exit(0); #this always returns 0 so other tests are executed
 }
 print ("PASSED\n");
-
+print ("Test took: \e[1m$elapsed seconds\e[0m\n");
 exit(0);
 
 =head1 NAME
