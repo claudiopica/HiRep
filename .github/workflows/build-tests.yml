@@ -49,7 +49,6 @@ jobs:
         repr: [FUND, ADJ]
         mpi: [-no-mpi, -mpi]
         ecsw: [-expclover,-no-expclover]
-        dir: [Algebra,DiracOperator,Geometry,Inverters,Mesons,PureGauge,RIMOM,Sources,StoredConfs,Utils,GaugeFix,Propagator,Random,SpinorField,Update,WilsonLoops]
         exclude:
           - nc: 3
             repr: ADJ
@@ -64,13 +63,11 @@ jobs:
     - uses: actions/download-artifact@v3
       with:
         name: build-${{ github.sha }}-${{ matrix.mpi }}-${{ matrix.nc }}-${{ matrix.repr }}-${{ matrix.ecsw }}
-        path: build.tgz
-    - name: Display structure of downloaded files
-      run: ls -R
-    - run: tar -xzf build-${{ github.sha }}-${{ matrix.mpi }}-${{ matrix.nc }}-${{ matrix.repr }}-${{ matrix.ecsw }} 
+        path: build_archive
+    - run: tar -xzf build_archive/build.tgz
     - uses: ./.github/actions/runtests-dev
       with:
-        dir: ${{matrix.dir}}
+        dir: "Algebra DiracOperator Geometry Inverters Integrators Mesons PureGauge RIMOM Sources StoredConfs Utils GaugeFix Propagator Random SpinorField Update WilsonLoops"
         mpi: ${{matrix.mpi}}
         nc: ${{ matrix.nc }}
         repr: ${{ matrix.repr }}
