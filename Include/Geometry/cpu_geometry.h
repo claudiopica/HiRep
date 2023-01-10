@@ -47,7 +47,7 @@ inline static int safe_mod_fast(int x, int y) {
 				 _6FIELD_AT(s,i,mu))
 
 #define _FIELD_AT_PTR(s,i,_master_shift) (s + i - _master_shift)
-#define _4FIELD_AT_PTR(s,i,mu,_master_shift) (s + coord_to_index(i-_master_shift,mu))
+#define _4FIELD_AT_PTR(s,__i,mu,_master_shift) (s + coord_to_index(__i-_master_shift,mu))
 #define _6FIELD_AT_PTR(s,i,mu,_master_shift) (s + ((i - _master_shift)*6+mu))
 #define _DFIELD_AT_PTR(s,i,mu,_master_shift,__size) (__size == 1) ? _FIELD_AT_PTR(s,i,_master_shift) : \
 				((__size == 4) ? _4FIELD_AT_PTR(s,i,mu,_master_shift) : \
