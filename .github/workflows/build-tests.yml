@@ -25,7 +25,7 @@ jobs:
     steps:
     - uses: awalsh128/cache-apt-pkgs-action@latest
       with:
-        packages: openmpi-bin openmpi-common libopenmpi3 ninja-build
+        packages: openmpi-bin openmpi-common libopenmpi3 libopenmpi-dev ninja-build
         version: 1.0
     - uses: actions/checkout@v3
       with:
