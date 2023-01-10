@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   run-tests:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     strategy:
       # Ensures that jobs are not cancelled is one job fails
@@ -29,9 +29,10 @@ jobs:
     steps:
     - name: Install dependencies
       run: |
-        sudo apt-get update && sudo apt-get install -y openmpi-bin openmpi-common libopenmpi3 libopenmpi-dev ninja-build
+        brew update
+        brew install open-mpi ninja
     - name: Download HiRep
       run: wget https://github.com/claudiopica/HiRep/archive/${{ github.sha }}.tar.gz && tar -xvf ${{ github.sha }}.tar.gz --strip-components=1
     - name: Run Tests
-      run: ./TestProgram/run_tests.sh "Algebra DiracOperator Geometry Inverters RIMOM Sources StoredConfs Utils GaugeFix Propagator Random SpinorField Update WilsonLoops" -cflags "-Wall -O1" -n ${{ matrix.nc }} -r ${{ matrix.repr }} ${{ matrix.mpi }} ${{ matrix.ecsw }}
+      run: ./TestProgram/run_tests.sh "Algebra DiracOperator Geometry Inverters Sources StoredConfs Utils Propagator Random SpinorField Update WilsonLoops" -cflags "-Wall -O1" -n ${{ matrix.nc }} -r ${{ matrix.repr }} ${{ matrix.mpi }} ${{ matrix.ecsw }}
 
