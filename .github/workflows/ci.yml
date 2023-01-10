@@ -1,4 +1,4 @@
-name: build-tests
+name: ci
 
 on:
   push:
@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   run-tests:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
 
     strategy:
       # Ensures that jobs are not cancelled is one job fails
@@ -29,7 +29,7 @@ jobs:
     steps:
     - name: Install dependencies
       run: |
-        brew install open-mpi ninja
+        sudo apt-get update && sudo apt-get install -y openmpi-bin openmpi-common libopenmpi3 libopenmpi-dev ninja-build
     - name: Download HiRep
       run: wget https://github.com/claudiopica/HiRep/archive/${{ github.sha }}.tar.gz && tar -xvf ${{ github.sha }}.tar.gz --strip-components=1
     - name: Run Tests
