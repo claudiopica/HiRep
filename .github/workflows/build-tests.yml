@@ -23,11 +23,9 @@ jobs:
 
     name: Build Tests ${{ github.ref_name }} / ${{ github.sha }}
     steps:
-    - uses: awalsh128/cache-apt-pkgs-action@latest
-      with:
-        packages: openmpi-bin openmpi-common libopenmpi3 libopenmpi-dev ninja-build
-        version: 1.0
-        execute_install_scripts: true
+    - name: Install dependencies
+      run: |
+        sudo apt-get update && sudo apt-get install -y openmpi-bin openmpi-common libopenmpi3 libopenmpi-dev ninja-build
     - uses: actions/checkout@v3
       with:
         fetch-depth: 1
@@ -60,11 +58,9 @@ jobs:
     - uses: actions/checkout@v3
       with:
         fetch-depth: 1
-    - uses: awalsh128/cache-apt-pkgs-action@latest
-      with:
-        packages: openmpi-bin openmpi-common libopenmpi3 libopenmpi-dev ninja-build
-        version: 1.0
-        execute_install_scripts: true
+    - name: Install dependencies
+      run: |
+        sudo apt-get update && sudo apt-get install -y openmpi-bin openmpi-common libopenmpi3 libopenmpi-dev ninja-build
     - uses: actions/download-artifact@v3
       with:
         name: build-${{ github.sha }}-${{ matrix.mpi }}-${{ matrix.nc }}-${{ matrix.repr }}-${{ matrix.ecsw }}
