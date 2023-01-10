@@ -35,5 +35,5 @@ jobs:
     - run: tar -czf build.tgz build
     - uses: actions/upload-artifact@v3
       with:
-        name: build-${{ $env:GITHUB_SHA }}-${{ matrix.mpi }}-${{ matrix.nc }}-${{ matrix.repr }}-${{ matrix.ecsw }}
+        name: build-${{ env:GITHUB_SHA }}-${{ matrix.mpi }}-${{ matrix.nc }}-${{ matrix.repr }}-${{ matrix.ecsw }}
         path: build.tgz
