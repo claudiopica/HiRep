@@ -552,7 +552,7 @@ void start_staple_field_sendrecv(suNg_field *gf)
   {
     /* send ith buffer */
     mpiret = MPI_Isend((double *)((gf->sendbuf_ptr) + 3 * gd->sbuf_start[i]),         /* buffer */
-                       (gd->sbuf_len[i]) * sizeof(suNf) / sizeof(double) * 3, /* lenght in units of doubles */
+                       (gd->sbuf_len[i]) * sizeof(suNg) / sizeof(double) * 3, /* lenght in units of doubles */
                        MPI_DOUBLE,                                            /* basic datatype */
                        gd->sbuf_to_proc[i],                                   /* cid of destination */
                        i,                                                     /* tag of communication */
@@ -572,7 +572,7 @@ void start_staple_field_sendrecv(suNg_field *gf)
 
     /* receive ith buffer */
     mpiret = MPI_Irecv((double *)((gf->ptr) + 3 * gd->rbuf_start[i]),         /* buffer */
-                       (gd->rbuf_len[i]) * sizeof(suNf) / sizeof(double) * 3, /* lenght in units of doubles */
+                       (gd->rbuf_len[i]) * sizeof(suNg) / sizeof(double) * 3, /* lenght in units of doubles */
                        MPI_DOUBLE,                                            /* basic datatype */
                        gd->rbuf_from_proc[i],                                 /* cid of origin */
                        i,                                                     /* tag of communication */
