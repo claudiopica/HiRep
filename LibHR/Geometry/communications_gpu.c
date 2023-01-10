@@ -73,13 +73,13 @@ _DECLARE_SYNC_FUNCTIONS(clover_force, suNf, 6, gauge);
         for (int i = 0; i < f->type->nbuffers_##_geom; ++i) \
         { \
             /* Destination Parameters */ \
-            _ctype *recv_buffer = (_ctype*)(f->gpu_ptr + (_size)*f->type->rbuf_start[i]);\
+            _ctype *recv_buffer = (_ctype*)(f->gpu_ptr + (_size)*(f->type->rbuf_start[i] - f->type->master_shift));\
             int recv_proc = f->type->rbuf_from_proc[i];\
             int recv_size_in_dbl = (_size)*(f->type->rbuf_len[i])*sizeof(*(f->gpu_ptr))/sizeof(_ctype);\
             \
             /* Origin Parameters */ \
-            _ctype *send_buffer = (_ctype*)(f->sendbuf_gpu_ptr + (_size)*f->type->sbuf_start[i]);\
-            int send_proc = f->type->sbuf_to_proc[i];\
+            _ctype *send_buffer = (_ctype*)(f->sendbuf_gpu_ptr + (_size)*f->type->sbuf_start[i]); \
+            int send_proc = f->type->sbuf_to_proc[i]; \
             int send_size_in_dbl = (_size)*(f->type->sbuf_len[i])*sizeof(*(f->gpu_ptr))/sizeof(_ctype); \
             \
             /* Start to receive */\

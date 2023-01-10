@@ -8,11 +8,14 @@
 *
 *******************************************************************************/
 
-#include "libhr.h"
+// TODO: Odd sfield comms & single precision spinor not working
 
-int test_comms_spinor_field_f();
-int test_comms_spinor_field_f_flt();
-int test_comms_sfield();
+#include "libhr.h"
+#include <string.h>
+
+int test_comms_spinor_field_f(geometry_descriptor*);
+int test_comms_spinor_field_f_flt(geometry_descriptor*);
+int test_comms_sfield(geometry_descriptor*);
 int test_comms_gfield();
 int test_comms_gfield_flt();
 int test_comms_gfield_f();
@@ -23,6 +26,8 @@ int test_comms_gtransf();
 int test_comms_clover_ldl();
 int test_comms_clover_term();
 int test_comms_clover_force();
+
+int test_sync_identical_to_cpu_spinor_field_f(geometry_descriptor*);
 
 int main(int argc, char *argv[]) 
 {
@@ -36,8 +41,9 @@ int main(int argc, char *argv[])
 
     // Run tests
       /* Double precision */
-    return_val += test_comms_spinor_field_f();
-    return_val += test_comms_sfield();
+    lprintf("INFO", 0, "\n\nFull lattice tests\n\n");
+    return_val += test_comms_spinor_field_f(&glattice);
+    return_val += test_comms_sfield(&glattice);
     return_val += test_comms_gfield();
     return_val += test_comms_gfield_f();
     return_val += test_comms_suNg_scalar_field();
@@ -47,24 +53,38 @@ int main(int argc, char *argv[])
     return_val += test_comms_clover_term();
     return_val += test_comms_clover_force();
 
+    return_val += test_sync_identical_to_cpu_spinor_field_f(&glattice);
+    return_val += test_sync_identical_to_cpu_spinor_field_f(&glat_even);
+    return_val += test_sync_identical_to_cpu_spinor_field_f(&glat_odd);
+
       /* Single precision */
-    return_val += test_comms_spinor_field_f_flt();
+    return_val += test_comms_spinor_field_f_flt(&glattice);
     return_val += test_comms_gfield_flt();
     return_val += test_comms_gfield_f_flt();
+
+    lprintf("INFO", 0, "\n\nSpinor tests on even lattice\n\n");
+    return_val += test_comms_spinor_field_f(&glat_even);
+    return_val += test_comms_spinor_field_f_flt(&glat_even);
+    return_val += test_comms_sfield(&glat_even);
+
+    lprintf("INFO", 0, "\n\nSpinor tests on odd lattice\n\n");
+    return_val += test_comms_spinor_field_f(&glat_odd);
+    return_val += test_comms_spinor_field_f_flt(&glat_odd);
+    return_val += test_comms_sfield(&glat_odd);
 
     // Finalize and return
     finalize_process();
     return return_val;
 }
 
-int test_comms_spinor_field_f() 
+int test_comms_spinor_field_f(geometry_descriptor *gd) 
 {
     lprintf("INFO", 0, " ======= TEST SPINOR FIELD ======= \n");
     lprintf("INFO", 0, "Sqnorm testing\n");
 
     // Setup fields on GPU
     int return_val = 0;
-    spinor_field *f = alloc_spinor_field_f(1, &glattice);
+    spinor_field *f = alloc_spinor_field_f(1, gd);
     gaussian_spinor_field(f);
     copy_to_gpu_spinor_field_f(f);
 
@@ -83,19 +103,79 @@ int test_comms_spinor_field_f()
     return_val += check_finiteness(sqnorm_start);
     return_val += check_finiteness(sqnorm_end);
     return_val += check_diff_norm_zero(sqnorm_start-sqnorm_end);// TODO: Check diff not diff norm (SAM)
-
+    
     free_spinor_field_f(f);
 
     return return_val;
 }
 
-int test_comms_spinor_field_f_flt() 
+int test_sync_identical_to_cpu_spinor_field_f(geometry_descriptor *gd) 
+{
+    lprintf("INFO", 0, " ======= TEST SPINOR FIELD ======= \n");
+    lprintf("INFO", 0, "Check sendbuffers filled by sync are identical on CPU and GPU\n");
+
+    // Setup fields on GPU
+    int return_val = 0;
+    spinor_field *f = alloc_spinor_field_f(1, gd);
+    gaussian_spinor_field(f);
+    suNf_spinor *s = _FIELD_AT(f, 194);
+    copy_to_gpu_spinor_field_f(f);
+
+    //gd = &glattice;
+    int sendbuf_len = 0;
+    box_t *L = geometryBoxes->next;
+    int m = 0;
+    while (L && m < glattice.nbuffers_spinor) 
+    {
+        sendbuf_len += boxVolume(L->sendBox);
+        L=L->next; m++;
+    }
+
+    // Sync to buffer on CPU and save the sendbuffer in an array
+    sync_field(gd, sizeof(*(f->ptr)), 1, f->ptr, f->sendbuf_ptr);
+    suNf_spinor* sendbuf_cpu = (suNf_spinor*)malloc(sendbuf_len*sizeof(suNf_spinor));
+    memcpy(sendbuf_cpu, f->sendbuf_ptr, sendbuf_len*sizeof(suNf_spinor));
+
+    // Sync to buffer on GPU and save the sendbuffer in another array
+    sync_gpu_spinor_field_f(f);
+    suNf_spinor* sendbuf_gpu = (suNf_spinor*)malloc(sendbuf_len*sizeof(suNf_spinor));
+    cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, sendbuf_len*sizeof(suNf_spinor), cudaMemcpyDeviceToHost);
+
+    // Iterate over the arrays and check
+    double diff = 0.0;
+    for (int i = 0; i < gd->nbuffers_spinor; ++i) 
+    {
+        for (int j = 0; j < gd->sbuf_len[i]; ++j) 
+        {
+            suNf_spinor *spinor_cpu = sendbuf_cpu + j + gd->sbuf_start[i];
+            suNf_spinor *spinor_gpu = (suNf_spinor*)malloc(sizeof(suNf_spinor));
+            suNf_spinor *in_block = sendbuf_gpu + gd->sbuf_start[i];
+            int stride = gd->sbuf_len[i];
+            read_gpu_suNf_spinor(stride, *(spinor_gpu), in_block, j, 0);
+
+            for (int k = 0; k < 4; ++k) 
+            {
+                for (int comp = 0; comp < NF; ++comp) 
+                {
+                    diff += creal((*spinor_cpu).c[k].c[comp])-creal((*spinor_gpu).c[k].c[comp]);
+                    diff += cimag((*spinor_cpu).c[k].c[comp])-cimag((*spinor_gpu).c[k].c[comp]);
+                }
+            }
+        }
+    }
+
+    return_val += check_diff_norm_zero(diff);
+    free_spinor_field_f(f);
+    return return_val;
+}
+
+int test_comms_spinor_field_f_flt(geometry_descriptor *gd) 
 {
     lprintf("INFO", 0, " ======= TEST SPINOR FIELD SINGLE PRECISION ======= \n");
 
     // Setup fields on GPU
     int return_val = 0;
-    spinor_field_flt *f = alloc_spinor_field_f_flt(1, &glattice);
+    spinor_field_flt *f = alloc_spinor_field_f_flt(1, gd);
     gaussian_spinor_field_flt(f);
     copy_to_gpu_spinor_field_f_flt(f);
 
@@ -120,13 +200,13 @@ int test_comms_spinor_field_f_flt()
     return return_val;
 }
 
-int test_comms_sfield() 
+int test_comms_sfield(geometry_descriptor *gd) 
 {
     lprintf("INFO", 0, " ======= TEST SFIELD ======= \n");
 
     // Setup fields on GPU
     int return_val = 0;
-    scalar_field *f = alloc_sfield(1, &glattice);
+    scalar_field *f = alloc_sfield(1, gd);
     random_sfield_cpu(f);
 
     // Evaluate sqnorm in the beginning

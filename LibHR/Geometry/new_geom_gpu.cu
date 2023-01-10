@@ -12,10 +12,9 @@
         /* icoord array gives coordinates of inner lattice given a buffer index */ \
         coord4 *c = src->icoord; \
         coord4 *d_c; \
-        /*TODO: This is incorrect, we need to calculate the volume right.*/ \
         int full_vol = boxVolume(src); \
-        cudaMalloc((void**)&d_c, gd->nbuffers_gauge*full_vol*sizeof(coord4)); \
-        cudaMemcpy(d_c, c, gd->nbuffers_gauge*full_vol*sizeof(coord4), cudaMemcpyHostToDevice); \
+        cudaMalloc((void**)&d_c, glattice.nbuffers_gauge*full_vol*sizeof(coord4)); \
+        cudaMemcpy(d_c, c, glattice.nbuffers_gauge*full_vol*sizeof(coord4), cudaMemcpyHostToDevice); \
         \
         /* Iterate over pieces and fill out buffers */\
         _PIECE_FOR(gd, ixp) \
@@ -23,18 +22,26 @@
             int vol = 0; \
             int stride = 0; \
             int base_idx = 0; \
-            if ((ixp % 2)==0) { \
+            if (gd == &glat_even) { \
                 vol = boxEvenVolume(src); \
                 base_idx = src->base_index; \
-            } else { \
+            } else if (gd == &glat_odd) { \
                 vol = boxOddVolume(src); \
                 base_idx = src->base_index_odd; \
+            } else { \
+                if ((ixp % 2)==0) { \
+                    vol = boxEvenVolume(src); \
+                    base_idx = src->base_index; \
+                } else { \
+                    vol = boxOddVolume(src); \
+                    base_idx = src->base_index_odd; \
+                } \
             } \
             int grid = (vol - 1)/BLOCK_SIZE +1; \
             stride = gd->master_end[ixp] - gd->master_start[ixp] + 1; \
-            int block_start = gd->master_start[ixp]; \
-            _type* lattice_block = lattice + (_size)*block_start; \
-            box_to_buffer_kernel_##_name<<<grid, BLOCK_SIZE>>>(sendbuf, lattice_block, base_idx, stride, d_c, ipt_gpu, vol, block_start); \
+            _type* lattice_block = _DFIELD_AT_PTR(lattice, gd->master_start[ixp], 0, gd->master_shift, (_size)); \
+            int block_start = gd->master_start[ixp] - gd->master_shift; \
+            box_to_buffer_kernel_##_name<<<grid, BLOCK_SIZE>>>(sendbuf, lattice_block, base_idx, stride, d_c, ipt_gpu, vol, block_start, gd->master_shift); \
         } \
     } 
 

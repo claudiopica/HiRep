@@ -29,7 +29,15 @@ __global__ void Dphi_gpu_inner_kernel(suNf_spinor* __restrict__ out,
   suNf_spinor r;
   _spinor_zero_f(r);
 
-  int local_ix = blockIdx.x*BLOCK_SIZE + threadIdx.x;
+  suNf_hspinor sn;
+  suNf u;
+  #ifdef FERMION_THETA
+    suNf_vector vtmp;
+  #endif
+
+  int ix, iy;
+  int local_ix, local_iy;
+  local_ix = blockIdx.x*BLOCK_SIZE + threadIdx.x;
   if (local_ix < vol4h) {
     int ix = block_start_ixp + local_ix;
 

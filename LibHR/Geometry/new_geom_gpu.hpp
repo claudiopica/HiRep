@@ -3,7 +3,7 @@
 
 #define _DECLARE_KERNEL(_name, _type, _size) \
     __global__ void box_to_buffer_kernel_##_name(void *dst, _type *lattice_block, int base_index, int stride, coord4* icoord, \
-                                                int* ipt_gpu, int vol, int block_start) \
+                                                int* ipt_gpu, int vol, int block_start, int master_shift) \
     { \
         _type src_uncast; \
         int dix_loc = blockIdx.x*BLOCK_SIZE + threadIdx.x; \
@@ -11,10 +11,10 @@
         if (dix_loc < vol) { \
             coord4 c = icoord[dix]; \
             int six = ipt_ext_gpu(c.x[0], c.x[1], c.x[2], c.x[3]); \
-            int six_loc = six - block_start; \
+            int six_loc = six - block_start - master_shift; \
             _type* dst_in = (_type*)dst; \
-            _type* dst_uncast = _DFIELD_AT_PTR(dst_in, base_index, 0, 0, (_size));/* Add master shift here*/ \
-            /*_type* dst_uncast = dst_in + (_size)*base_index;*/ \
+            /*_type* dst_uncast = _DFIELD_AT_PTR(dst_in, base_index, 0, 0, (_size));*/ \
+            _type* dst_uncast = dst_in + (_size)*base_index; \
             for (int comp = 0; comp < (_size); ++comp) { \
                 read_gpu_##_type(stride, src_uncast, lattice_block, six_loc, comp); \
                 write_gpu_##_type(vol, src_uncast, dst_uncast, dix_loc, comp); \

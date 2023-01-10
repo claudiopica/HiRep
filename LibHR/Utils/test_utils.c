@@ -43,7 +43,7 @@ int check_diff_norm_zero(double diff_norm)
         lprintf("RESULT", 0, "OK \n");
         return_val = 0;
     }
-    lprintf("RESULT", 0, "[Diff norm %0.2e]\n", diff_norm);
+    lprintf("RESULT", 0, "[Diff norm is %0.2e]\n", diff_norm);
     return return_val;
 }
 
@@ -75,7 +75,7 @@ int check_finiteness(double value)
         lprintf("RESULT", 0, "OK \n");
         return_val = 0;
     }
-    lprintf("RESULT", 0, "[Value %0.2e is finite.]\n", value);
+    lprintf("RESULT", 0, "[Value is %0.2e.]\n", value);
     return return_val;
 }
 

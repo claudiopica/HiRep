@@ -1,3 +1,8 @@
+/***************************************************************************\
+* Copyright (c) 2008, Claudio Pica                                          *
+* All rights reserved.                                                      *
+\***************************************************************************/
+
 /**
  * @file hr_complex.h
  * @brief Type definitions and macros for complex numbers

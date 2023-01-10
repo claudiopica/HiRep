@@ -15,12 +15,12 @@
             _CHECK_GEOMETRY_MATCHING(out, in);                                            \
             _PIECE_FOR(in->type, ixp) {                                                   \
                 int stride = in->type->master_end[ixp] - in->type->master_start[ixp] + 1; \
+                (void)stride;                                                             \
                 _site_type *target  = _DFIELD_BLK(out, ixp, (_size));                     \
                 _SITE_FOR(in->type, ixp, ix) {                                            \
-                    _site_type *source = _FIELD_AT(in, ix);                               \
                     int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);                          \
                     for (int comp = 0; comp < _size; ++comp) {                            \
-                        source = _DFIELD_AT(in, ix, comp, (_size));                       \
+                        _site_type *source = _DFIELD_AT(in, ix, comp, (_size));           \
                         write_gpu_##_site_type(stride, (*source), target, ix_loc, comp);  \
                     }                                                                     \
                 }                                                                         \
@@ -33,6 +33,7 @@
             _CHECK_GEOMETRY_MATCHING(out, in);                                            \
             _PIECE_FOR(in->type, ixp) {                                                   \
                 int stride = in->type->master_end[ixp] - in->type->master_start[ixp] + 1; \
+                (void)stride;                                                             \
                 _site_type *source = _DFIELD_BLK(in, ixp, (_size));                       \
                 _SITE_FOR(in->type, ixp, ix) {                                            \
                     int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);                          \

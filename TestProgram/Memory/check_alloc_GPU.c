@@ -14,20 +14,21 @@
 //       I am not sure, we can run such a test at all.
 // TODO: Test for GPU whether CPU allocation works, too. The CPU test is not enough because the function names are different
 // TODO: Also do not copy back, but check with GPU norm.
+// TODO: Fix problem with the sfield
 
 // Double precision
 int test_gfield_allocation();
 int test_gfield_f_allocation();
-int test_spinor_field_allocation();
+int test_spinor_field_allocation(geometry_descriptor*);
 int test_avfield_allocation();
 int test_clover_term_allocation();
 int test_clover_force_allocation();
-int test_sfield_allocation();
+int test_sfield_allocation(geometry_descriptor*);
 
 // Single precision
 int test_gfield_flt_allocation();
 int test_gfield_f_flt_allocation();
-int test_spinor_field_flt_allocation();
+int test_spinor_field_flt_allocation(geometry_descriptor*);
 
 int main(int argc, char *argv[]) 
 {
@@ -40,17 +41,31 @@ int main(int argc, char *argv[])
     test_setup();
 
     // Double precision test block
+    lprintf("INFO", 0, "\n\nFull lattice tests\n\n");
     return_val += test_gfield_allocation();
     return_val += test_gfield_f_allocation();
-    return_val += test_spinor_field_allocation();
-    //return_val += test_avfield_allocation();
-    //return_val += test_clover_term_allocation();
-    //return_val += test_clover_force_allocation();
-    //return_val += test_sfield_allocation(); // FIXME: Bus error
+    return_val += test_spinor_field_allocation(&glattice);
+    return_val += test_avfield_allocation();
+    return_val += test_clover_term_allocation();
+    return_val += test_clover_force_allocation();
+    return_val += test_sfield_allocation(&glattice); 
 
     // Single precision test block
-    //return_val += test_gfield_flt_allocation();
-    //return_val += test_gfield_f_flt_allocation();
+    return_val += test_gfield_flt_allocation();
+    return_val += test_gfield_f_flt_allocation();
+    return_val += test_spinor_field_flt_allocation(&glattice);
+
+    // Spinor-like with even parity
+    lprintf("INFO", 0, "\n\n Even parity\n\n");
+    return_val += test_spinor_field_allocation(&glat_even);
+    return_val += test_spinor_field_flt_allocation(&glat_even);
+    return_val += test_sfield_allocation(&glat_even);
+
+    // Spinor-like with odd parity
+    lprintf("INFO", 0, "\n\n Odd parity\n\n");
+    return_val += test_spinor_field_allocation(&glat_odd);
+    return_val += test_spinor_field_flt_allocation(&glat_odd);
+    //return_val += test_sfield_allocation(&glat_odd);
 
     // Finalize and return
     finalize_process();
@@ -297,17 +312,17 @@ int test_clover_force_allocation()
     return return_val;
 }
 
-int test_spinor_field_allocation() 
+int test_spinor_field_allocation(geometry_descriptor *gd) 
 {
     lprintf("INFO", 0, " ======= TEST SPINOR FIELD ======= \n");
     int return_val = 0;
-    spinor_field *f = alloc_spinor_field_f(1, &glattice);
+    spinor_field *f = alloc_spinor_field_f(1, gd);
 
     // Fill with random numbers
     gaussian_spinor_field(f);
 
     // Copy back and forth
-    /*copy_to_gpu_spinor_field_f(f);
+    copy_to_gpu_spinor_field_f(f);
     copy_from_gpu_spinor_field_f(f);
 
     // Check that sqnorm is unequal to zero, nan or inf
@@ -323,15 +338,15 @@ int test_spinor_field_allocation()
     }
     lprintf("RESULT", 0, "[Square norm (should be any finite value) %0.2e]\n", sqnorm);
 
-    free_spinor_field_f(f); */
+    free_spinor_field_f(f); 
     return return_val;
 }
 
-int test_spinor_field_flt_allocation() 
+int test_spinor_field_flt_allocation(geometry_descriptor *gd) 
 {
-    lprintf("INFO", 0, " ======= TEST SPINOR FIELD ======= \n");
+    lprintf("INFO", 0, " ======= TEST SPINOR FIELD SINGLE PRECISION ======= \n");
     int return_val = 0;
-    spinor_field_flt *f = alloc_spinor_field_f_flt(1, &glattice);
+    spinor_field_flt *f = alloc_spinor_field_f_flt(1, gd);
 
     // Fill with random numbers
     gaussian_spinor_field_flt(f);
@@ -357,11 +372,11 @@ int test_spinor_field_flt_allocation()
     return return_val;
 }
 
-int test_sfield_allocation() 
+int test_sfield_allocation(geometry_descriptor *gd) 
 {
-    lprintf("INFO", 0, " ======= TEST SPINOR FIELD ======= \n");
+    lprintf("INFO", 0, " ======= TEST SCALAR FIELD ======= \n");
     int return_val = 0;
-    scalar_field *f = alloc_sfield(1, &glattice);
+    scalar_field *f = alloc_sfield(1, gd);
 
     // Fill with random numbers
     random_sfield_cpu(f);
