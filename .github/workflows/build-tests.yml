@@ -65,7 +65,9 @@ jobs:
       with:
         name: build-${{ github.sha }}-${{ matrix.mpi }}-${{ matrix.nc }}-${{ matrix.repr }}-${{ matrix.ecsw }}
         path: build.tgz
-    - run: tar -xzf build.tgz 
+    - name: Display structure of downloaded files
+      run: ls -R
+    - run: tar -xzf build-${{ github.sha }}-${{ matrix.mpi }}-${{ matrix.nc }}-${{ matrix.repr }}-${{ matrix.ecsw }} 
     - uses: ./.github/actions/runtests-dev
       with:
         dir: ${{matrix.dir}}
