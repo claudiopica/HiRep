@@ -21,7 +21,7 @@ jobs:
           - nc: 3
             repr: ADJ
 
-    name: Build Tests $env:GITHUB_REF_NAME / $env:GITHUB_SHA
+    name: Build Tests ${{ github.ref_name }} / ${{ github.sha }}
     steps:
     - uses: awalsh128/cache-apt-pkgs-action@latest
       with:
@@ -35,5 +35,5 @@ jobs:
     - run: tar -czf build.tgz build
     - uses: actions/upload-artifact@v3
       with:
-        name: build-${{ env:GITHUB_SHA }}-${{ matrix.mpi }}-${{ matrix.nc }}-${{ matrix.repr }}-${{ matrix.ecsw }}
+        name: build-${{ github.sha }}-${{ matrix.mpi }}-${{ matrix.nc }}-${{ matrix.repr }}-${{ matrix.ecsw }}
         path: build.tgz

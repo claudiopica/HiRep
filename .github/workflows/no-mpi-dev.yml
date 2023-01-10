@@ -3,7 +3,7 @@ name: no-mpi-dev
 on:
   push:
     branches:
-      - HiRep-CUDA
+      - HiRep
 
 jobs:
   build:

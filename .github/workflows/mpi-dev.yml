@@ -3,12 +3,12 @@ name: mpi-dev
 on:
   push:
     branches:
-      - HiRep-CUDA
+      - HiRep
 
 jobs:
   build:
 
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     strategy:
       # Ensures that jobs are not cancelled is one job fails
       fail-fast: false
