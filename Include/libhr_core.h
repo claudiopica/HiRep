@@ -10,7 +10,6 @@
 //we include it first here
 #include "check_options.h"
 
-#include "avx2_hirep.h"
 #include "gamma_spinor.h"
 #include "global_gpu.h"
 #include "global.h"

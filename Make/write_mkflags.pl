@@ -36,6 +36,7 @@ GetOptions(
   'bartiming!'   => \(my $btiming = 0),
   'memory!'      => \(my $mem = 0),
   'force!'       => \(my $force = 0),
+  'avx2!'        => \(my $avx2 = 0),
   'cc=s'         => \(my $cc = "gcc"),
   'mpicc=s'      => \(my $mpicc = "mpicc"),
   'cflags=s'     => \(my $cflags = "-Wall -O3"),
@@ -215,6 +216,8 @@ $btiming && print $fh "MACRO += TIMING_WITH_BARRIERS\n";
 $mem && print $fh "MACRO += AMALLOC_MEASURE\n";
 # write force
 $force && print $fh "MACRO += MEASURE_FORCE\n";
+# write avx2
+$avx2 && print $fh "MACRO += AVX2_HIREP\n";
 # write mpi
 $mpi && print $fh "MACRO += WITH_MPI\n";
 # write GPU
@@ -280,6 +283,7 @@ write_mkflags - write flags file for compilation of HiRep
   --[no-]dfloat       [false]     Use single precision acceleration
   --[no-]unrollrepr   [false]     Unroll group representation functions
 
+  --[no-]avx2         [false]     Enable avx2 kernels of (some) linear algebra functions
   --[no-]checkspinor  [true]      Check spinor field type
   --[no-]mpitiming    [false]     Enable timing of MPI calls
   --[no-]ioflush      [true]      Flush IO after each operations on logs

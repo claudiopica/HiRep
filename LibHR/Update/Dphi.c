@@ -4,13 +4,13 @@
 \***************************************************************************/
 
 /*******************************************************************************
-*
-* File Dphi.c
-*
-* Action of the Wilson-Dirac operator D and hermitian g5D on a given
-* double-precision spinor field
-*
-*******************************************************************************/
+ *
+ * File Dphi.c
+ *
+ * Action of the Wilson-Dirac operator D and hermitian g5D on a given
+ * double-precision spinor field
+ *
+ *******************************************************************************/
 
 #include "update.h"
 #include "libhr_core.h"
@@ -234,7 +234,7 @@ unsigned long int getMVM_cpu()
  * or on spinors with definite parity
  */
 #ifdef WITH_NEW_GEOMETRY
-void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
+void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
 {
 #ifdef CHECK_SPINOR_MATCHING
   error((in == NULL) || (out == NULL), 1, "Dphi_cpu_ [Dphi.c]",
@@ -246,43 +246,46 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
 #endif
 
   ++MVMcounter; /* count matrix calls */
-  if (out->type == &glattice) ++MVMcounter;
+  if (out->type == &glattice)
+    ++MVMcounter;
 
-  /************************ loop over all lattice sites *************************/
-  /* start communication of input spinor field */
+    /************************ loop over all lattice sites *************************/
+    /* start communication of input spinor field */
 #ifdef WITH_MPI
   _OMP_PRAGMA(master)
   {
     start_sf_sendrecv(in);
   }
-  _OMP_BARRIER //why do we need this barrier?
+  _OMP_BARRIER // why do we need this barrier?
 #endif
 
-  for (int repeat=0; repeat<2; repeat++) {
-    //we repeat the loop over the master lattice twice
-    //the second pass we invert the mask
-    //this is achieved with comparing the condition to be different than repeat=0,1 
+      for (int repeat = 0; repeat < 2; repeat++)
+  {
+    // we repeat the loop over the master lattice twice
+    // the second pass we invert the mask
+    // this is achieved with comparing the condition to be different than repeat=0,1
 
-    _MASTER_FOR(out->type, ix) {
+    _MASTER_FOR(out->type, ix)
+    {
 
-      suNf_spinor acc; 
+      suNf_spinor acc;
       suNf_spinor *r = &acc;
       _spinor_zero_f(*r);
 
       /******************************* direction +0 *********************************/
-      if ((!(imask[ix] & T_UP_MASK)) == repeat) {
+      if ((!(imask[ix] & T_UP_MASK)) == repeat)
+      {
         const int iy = iup(ix, 0);
         const suNf_spinor *sp = _FIELD_AT(in, iy);
         const suNf *up = pu_gauge_f(ix, 0);
         suNf_vector psi, chi, psi2, chi2;
-  #ifdef _USING_THETA
+#ifdef _USING_THETA
         suNf_vector vtmp[2];
-  #endif
+#endif
 
         _vector_add_f(psi, (*sp).c[0], (*sp).c[2]);
         _vector_add_f(psi2, (*sp).c[1], (*sp).c[3]);
-        _suNf_theta_T_multiply(chi, (*up), psi);
-        _suNf_theta_T_multiply(chi2, (*up), psi2);
+        _suNf_double_theta_T_multiply(chi, chi2, (*up), psi, psi2);
 
         _vector_add_assign_f((*r).c[0], chi);
         _vector_add_assign_f((*r).c[2], chi);
@@ -290,19 +293,19 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
         _vector_add_assign_f((*r).c[3], chi2);
       }
       /******************************* direction -0 *********************************/
-      if ((!(imask[ix] & T_DN_MASK)) == repeat) {
+      if ((!(imask[ix] & T_DN_MASK)) == repeat)
+      {
         const int iy = idn(ix, 0);
         const suNf_spinor *sm = _FIELD_AT(in, iy);
         const suNf *um = pu_gauge_f(iy, 0);
         suNf_vector psi, chi, psi2, chi2;
-  #ifdef _USING_THETA
+#ifdef _USING_THETA
         suNf_vector vtmp[2];
-  #endif
+#endif
 
         _vector_sub_f(psi, (*sm).c[0], (*sm).c[2]);
         _vector_sub_f(psi2, (*sm).c[1], (*sm).c[3]);
-        _suNf_theta_T_inverse_multiply(chi, (*um), psi);
-        _suNf_theta_T_inverse_multiply(chi2, (*um), psi2);
+        _suNf_double_theta_T_inverse_multiply(chi, chi2, (*um), psi, psi2);
 
         _vector_add_assign_f((*r).c[0], chi);
         _vector_sub_assign_f((*r).c[2], chi);
@@ -310,19 +313,19 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
         _vector_sub_assign_f((*r).c[3], chi2);
       }
       /******************************* direction +1 *********************************/
-      if ((!(imask[ix] & X_UP_MASK)) == repeat) {
+      if ((!(imask[ix] & X_UP_MASK)) == repeat)
+      {
         const int iy = iup(ix, 1);
         const suNf_spinor *sp = _FIELD_AT(in, iy);
         const suNf *up = pu_gauge_f(ix, 1);
         suNf_vector psi, chi, psi2, chi2;
-  #ifdef _USING_THETA
+#ifdef _USING_THETA
         suNf_vector vtmp[2];
-  #endif
+#endif
 
         _vector_i_add_f(psi, (*sp).c[0], (*sp).c[3]);
         _vector_i_add_f(psi2, (*sp).c[1], (*sp).c[2]);
-        _suNf_theta_X_multiply(chi, (*up), psi);
-        _suNf_theta_X_multiply(chi2, (*up), psi2);
+        _suNf_double_theta_X_multiply(chi, chi2, (*up), psi, psi2);
 
         _vector_add_assign_f((*r).c[0], chi);
         _vector_i_sub_assign_f((*r).c[3], chi);
@@ -330,19 +333,19 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
         _vector_i_sub_assign_f((*r).c[2], chi2);
       }
       /******************************* direction -1 *********************************/
-      if ((!(imask[ix] & X_DN_MASK)) == repeat) {
+      if ((!(imask[ix] & X_DN_MASK)) == repeat)
+      {
         const int iy = idn(ix, 1);
         const suNf_spinor *sm = _FIELD_AT(in, iy);
         const suNf *um = pu_gauge_f(iy, 1);
         suNf_vector psi, chi, psi2, chi2;
-  #ifdef _USING_THETA
+#ifdef _USING_THETA
         suNf_vector vtmp[2];
-  #endif
+#endif
 
         _vector_i_sub_f(psi, (*sm).c[0], (*sm).c[3]);
         _vector_i_sub_f(psi2, (*sm).c[1], (*sm).c[2]);
-        _suNf_theta_X_inverse_multiply(chi, (*um), psi);
-        _suNf_theta_X_inverse_multiply(chi2, (*um), psi2);
+        _suNf_double_theta_X_inverse_multiply(chi, chi2, (*um), psi, psi2);
 
         _vector_add_assign_f((*r).c[0], chi);
         _vector_i_add_assign_f((*r).c[3], chi);
@@ -350,19 +353,19 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
         _vector_i_add_assign_f((*r).c[2], chi2);
       }
       /******************************* direction +2 *********************************/
-      if ((!(imask[ix] & Y_UP_MASK)) == repeat) {
+      if ((!(imask[ix] & Y_UP_MASK)) == repeat)
+      {
         const int iy = iup(ix, 2);
         const suNf_spinor *sp = _FIELD_AT(in, iy);
         const suNf *up = pu_gauge_f(ix, 2);
         suNf_vector psi, chi, psi2, chi2;
-  #ifdef _USING_THETA
+#ifdef _USING_THETA
         suNf_vector vtmp[2];
-  #endif
+#endif
 
         _vector_add_f(psi, (*sp).c[0], (*sp).c[3]);
         _vector_sub_f(psi2, (*sp).c[1], (*sp).c[2]);
-        _suNf_theta_Y_multiply(chi, (*up), psi);
-        _suNf_theta_Y_multiply(chi2, (*up), psi2);
+        _suNf_double_theta_Y_multiply(chi, chi2, (*up), psi, psi2);
 
         _vector_add_assign_f((*r).c[0], chi);
         _vector_add_assign_f((*r).c[3], chi);
@@ -370,19 +373,19 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
         _vector_sub_assign_f((*r).c[2], chi2);
       }
       /******************************* direction -2 *********************************/
-      if ((!(imask[ix] & Y_DN_MASK)) == repeat) {
+      if ((!(imask[ix] & Y_DN_MASK)) == repeat)
+      {
         const int iy = idn(ix, 2);
         const suNf_spinor *sm = _FIELD_AT(in, iy);
         const suNf *um = pu_gauge_f(iy, 2);
         suNf_vector psi, chi, psi2, chi2;
-  #ifdef _USING_THETA
+#ifdef _USING_THETA
         suNf_vector vtmp[2];
-  #endif
+#endif
 
         _vector_sub_f(psi, (*sm).c[0], (*sm).c[3]);
         _vector_add_f(psi2, (*sm).c[1], (*sm).c[2]);
-        _suNf_theta_Y_inverse_multiply(chi, (*um), psi);
-        _suNf_theta_Y_inverse_multiply(chi2, (*um), psi2);
+        _suNf_double_theta_Y_inverse_multiply(chi, chi2, (*um), psi, psi2);
 
         _vector_add_assign_f((*r).c[0], chi);
         _vector_sub_assign_f((*r).c[3], chi);
@@ -390,19 +393,19 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
         _vector_add_assign_f((*r).c[2], chi2);
       }
       /******************************* direction +3 *********************************/
-      if ((!(imask[ix] & Z_UP_MASK)) == repeat) {
+      if ((!(imask[ix] & Z_UP_MASK)) == repeat)
+      {
         const int iy = iup(ix, 3);
         const suNf_spinor *sp = _FIELD_AT(in, iy);
         const suNf *up = pu_gauge_f(ix, 3);
         suNf_vector psi, chi, psi2, chi2;
-  #ifdef _USING_THETA
+#ifdef _USING_THETA
         suNf_vector vtmp[2];
-  #endif
+#endif
 
         _vector_i_add_f(psi, (*sp).c[0], (*sp).c[2]);
         _vector_i_sub_f(psi2, (*sp).c[1], (*sp).c[3]);
-        _suNf_theta_Z_multiply(chi, (*up), psi);
-        _suNf_theta_Z_multiply(chi2, (*up), psi2);
+        _suNf_double_theta_Z_multiply(chi, chi2, (*up), psi, psi2);
 
         _vector_add_assign_f((*r).c[0], chi);
         _vector_i_sub_assign_f((*r).c[2], chi);
@@ -410,19 +413,19 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
         _vector_i_add_assign_f((*r).c[3], chi2);
       }
       /******************************* direction -3 *********************************/
-      if ((!(imask[ix] & Z_DN_MASK)) == repeat) {
+      if ((!(imask[ix] & Z_DN_MASK)) == repeat)
+      {
         const int iy = idn(ix, 3);
         const suNf_spinor *sm = _FIELD_AT(in, iy);
         const suNf *um = pu_gauge_f(iy, 3);
         suNf_vector psi, chi, psi2, chi2;
-  #ifdef _USING_THETA
+#ifdef _USING_THETA
         suNf_vector vtmp[2];
-  #endif
+#endif
 
         _vector_i_sub_f(psi, (*sm).c[0], (*sm).c[2]);
         _vector_i_add_f(psi2, (*sm).c[1], (*sm).c[3]);
-        _suNf_theta_Z_inverse_multiply(chi, (*um), psi);
-        _suNf_theta_Z_inverse_multiply(chi2, (*um), psi2);
+        _suNf_double_theta_Z_inverse_multiply(chi, chi2, (*um), psi, psi2);
 
         _vector_add_assign_f((*r).c[0], chi);
         _vector_i_add_assign_f((*r).c[2], chi);
@@ -431,18 +434,22 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
       }
       /******************************** end of loop *********************************/
       r = _FIELD_AT(out, ix);
-      if(!repeat) {
+      if (!repeat)
+      {
         // at first iteration write to output
         _spinor_mul_f(*r, -0.5, acc);
-      } else {
-        //second iteration accumulate on output
+      }
+      else
+      {
+        // second iteration accumulate on output
         _spinor_mul_add_assign_f(*r, -0.5, acc);
       }
 
     } /* MASTER_FOR */
 
 #ifdef WITH_MPI
-    if(!repeat) {
+    if (!repeat)
+    {
       // lprintf("MAIN", 0, "Doing complete sendrecv repeat=%d\n",repeat);
       /* wait for spinor to be transfered */
       _OMP_PRAGMA(master)
@@ -455,7 +462,7 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
   }
 }
 #else
-void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
+void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
 {
 #ifdef CHECK_SPINOR_MATCHING
   error((in == NULL) || (out == NULL), 1, "Dphi_cpu_ [Dphi.c]",
@@ -512,8 +519,7 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
 
       _vector_add_f(psi, (*sp).c[0], (*sp).c[2]);
       _vector_add_f(psi2, (*sp).c[1], (*sp).c[3]);
-      _suNf_theta_T_multiply(chi, (*up), psi);
-      _suNf_theta_T_multiply(chi2, (*up), psi2);
+      _suNf_double_theta_T_multiply(chi, chi2, (*up), psi, psi2);
 
       (*r).c[0] = chi;
       (*r).c[2] = chi;
@@ -528,8 +534,7 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
 
       _vector_sub_f(psi, (*sm).c[0], (*sm).c[2]);
       _vector_sub_f(psi2, (*sm).c[1], (*sm).c[3]);
-      _suNf_theta_T_inverse_multiply(chi, (*um), psi);
-      _suNf_theta_T_inverse_multiply(chi2, (*um), psi2);
+      _suNf_double_theta_T_inverse_multiply(chi, chi2, (*um), psi, psi2);
 
       _vector_add_assign_f((*r).c[0], chi);
       _vector_sub_assign_f((*r).c[2], chi);
@@ -544,8 +549,7 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
 
       _vector_i_add_f(psi, (*sp).c[0], (*sp).c[3]);
       _vector_i_add_f(psi2, (*sp).c[1], (*sp).c[2]);
-      _suNf_theta_X_multiply(chi, (*up), psi);
-      _suNf_theta_X_multiply(chi2, (*up), psi2);
+      _suNf_double_theta_X_multiply(chi, chi2, (*up), psi, psi2);
 
       _vector_add_assign_f((*r).c[0], chi);
       _vector_i_sub_assign_f((*r).c[3], chi);
@@ -560,8 +564,7 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
 
       _vector_i_sub_f(psi, (*sm).c[0], (*sm).c[3]);
       _vector_i_sub_f(psi2, (*sm).c[1], (*sm).c[2]);
-      _suNf_theta_X_inverse_multiply(chi, (*um), psi);
-      _suNf_theta_X_inverse_multiply(chi2, (*um), psi2);
+      _suNf_double_theta_X_inverse_multiply(chi, chi2, (*um), psi, psi2);
 
       _vector_add_assign_f((*r).c[0], chi);
       _vector_i_add_assign_f((*r).c[3], chi);
@@ -576,8 +579,7 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
 
       _vector_add_f(psi, (*sp).c[0], (*sp).c[3]);
       _vector_sub_f(psi2, (*sp).c[1], (*sp).c[2]);
-      _suNf_theta_Y_multiply(chi, (*up), psi);
-      _suNf_theta_Y_multiply(chi2, (*up), psi2);
+      _suNf_double_theta_Y_multiply(chi, chi2, (*up), psi, psi2);
 
       _vector_add_assign_f((*r).c[0], chi);
       _vector_add_assign_f((*r).c[3], chi);
@@ -592,8 +594,7 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
 
       _vector_sub_f(psi, (*sm).c[0], (*sm).c[3]);
       _vector_add_f(psi2, (*sm).c[1], (*sm).c[2]);
-      _suNf_theta_Y_inverse_multiply(chi, (*um), psi);
-      _suNf_theta_Y_inverse_multiply(chi2, (*um), psi2);
+      _suNf_double_theta_Y_inverse_multiply(chi, chi2, (*um), psi, psi2);
 
       _vector_add_assign_f((*r).c[0], chi);
       _vector_sub_assign_f((*r).c[3], chi);
@@ -608,8 +609,7 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
 
       _vector_i_add_f(psi, (*sp).c[0], (*sp).c[2]);
       _vector_i_sub_f(psi2, (*sp).c[1], (*sp).c[3]);
-      _suNf_theta_Z_multiply(chi, (*up), psi);
-      _suNf_theta_Z_multiply(chi2, (*up), psi2);
+      _suNf_double_theta_Z_multiply(chi, chi2, (*up), psi, psi2);
 
       _vector_add_assign_f((*r).c[0], chi);
       _vector_i_sub_assign_f((*r).c[2], chi);
@@ -624,8 +624,7 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
 
       _vector_i_sub_f(psi, (*sm).c[0], (*sm).c[2]);
       _vector_i_add_f(psi2, (*sm).c[1], (*sm).c[3]);
-      _suNf_theta_Z_inverse_multiply(chi, (*um), psi);
-      _suNf_theta_Z_inverse_multiply(chi2, (*um), psi2);
+      _suNf_double_theta_Z_inverse_multiply(chi, chi2, (*um), psi, psi2);
 
       _vector_add_assign_f((*r).c[0], chi);
       _vector_i_add_assign_f((*r).c[2], chi);
@@ -639,7 +638,7 @@ void Dphi_cpu_(spinor_field * restrict out, spinor_field * restrict in)
 }
 #endif
 
-#if (NG==3) && defined(REPR_FUNDAMENTAL)
+#if (NG == 3) && defined(REPR_FUNDAMENTAL)
 void Dphi_fused_(spinor_field *out, spinor_field *in)
 {
 #ifdef CHECK_SPINOR_MATCHING
@@ -1535,7 +1534,7 @@ void Cphi_diag_inv(double mass, spinor_field *dptr, spinor_field *sptr)
   apply_BCs_on_spinor_field(dptr);
 }
 
-#endif //#ifdef WITH_CLOVER
+#endif // #ifdef WITH_CLOVER
 
 #ifdef WITH_EXPCLOVER
 
@@ -1858,15 +1857,14 @@ void g5Dphi_eopre_tw_sq(double m0, double mu, spinor_field *out, spinor_field *i
   g5Dphi_eopre_tw(m0, mu, out, etmp2, DAGGER);
 }
 
-
 #ifndef WITH_GPU
-unsigned long int (*getMVM) ()=getMVM_cpu;
-void (*Dphi_) (spinor_field *restrict out, spinor_field *restrict in)=Dphi_cpu_;
-void (*Dphi) (double m0, spinor_field *out, spinor_field *in)=Dphi_cpu;
-void (*g5Dphi) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_cpu;
-void (*g5Dphi_sq) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_sq_cpu;
-void (*Dphi_eopre) (double m0, spinor_field *out, spinor_field *in)=Dphi_eopre_cpu;
-void (*Dphi_oepre) (double m0, spinor_field *out, spinor_field *in)=Dphi_oepre_cpu;
-void (*g5Dphi_eopre) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_eopre_cpu;
-void (*g5Dphi_eopre_sq) (double m0, spinor_field *out, spinor_field *in)=g5Dphi_eopre_sq_cpu;
-#endif //WITH_GPU
+unsigned long int (*getMVM)() = getMVM_cpu;
+void (*Dphi_)(spinor_field *restrict out, spinor_field *restrict in) = Dphi_cpu_;
+void (*Dphi)(double m0, spinor_field *out, spinor_field *in) = Dphi_cpu;
+void (*g5Dphi)(double m0, spinor_field *out, spinor_field *in) = g5Dphi_cpu;
+void (*g5Dphi_sq)(double m0, spinor_field *out, spinor_field *in) = g5Dphi_sq_cpu;
+void (*Dphi_eopre)(double m0, spinor_field *out, spinor_field *in) = Dphi_eopre_cpu;
+void (*Dphi_oepre)(double m0, spinor_field *out, spinor_field *in) = Dphi_oepre_cpu;
+void (*g5Dphi_eopre)(double m0, spinor_field *out, spinor_field *in) = g5Dphi_eopre_cpu;
+void (*g5Dphi_eopre_sq)(double m0, spinor_field *out, spinor_field *in) = g5Dphi_eopre_sq_cpu;
+#endif // WITH_GPU

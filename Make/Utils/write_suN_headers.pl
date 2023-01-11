@@ -1493,9 +1493,10 @@ sub write_suN_double_multiply {
   print "/* SU(N) matrix u times SU(N) vectors s1,s2 */\n";
   print "/* r1=u*s1 */\n";
   print "/* r2=u*s2 */\n";
-  print "#define _${dataname}_double_multiply(r1,r2,u,s1,s2)\\\n";
+  print "#define _${dataname}_double_multiply_default(r1,r2,u,s1,s2)\\\n";
   print "      _${dataname}_multiply(r1,u,s1);\\\n";
   print "      _${dataname}_multiply(r2,u,s2)\n\n";
+  print "#define _${dataname}_double_multiply(r1,r2,u,s1,s2) _${dataname}_double_multiply_default(r1,r2,u,s1,s2)\n\n";
 }
 
 sub write_suNr_multiply {
@@ -1540,9 +1541,10 @@ sub write_suNr_double_multiply {
   print "/* SU(N) matrix u times SU(N) vectors s1,s2 */\n";
   print "/* r1=u*s1 */\n";
   print "/* r2=u*s2 */\n";
-  print "#define _${rdataname}_double_multiply(r1,r2,u,s1,s2)\\\n";
+  print "#define _${rdataname}_double_multiply_default(r1,r2,u,s1,s2)\\\n";
   print "      _${rdataname}_multiply(r1,u,s1);\\\n";
   print "      _${rdataname}_multiply(r2,u,s2)\n\n";
+  print "#define _${rdataname}_double_multiply(r1,r2,u,s1,s2) _${rdataname}_double_multiply_default(r1,r2,u,s1,s2)\n\n";
 }
 
 sub write_su2_decode {
