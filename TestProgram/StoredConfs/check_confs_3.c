@@ -1,5 +1,6 @@
 /*******************************************************************************
-*
+* NOCOMPILE= BASIC_SF
+* NOCOMPILE= ROTATED_SF
 * NOCOMPILE= !BC_T_PERIODIC
 * NOCOMPILE= !NG=3
 * NOCOMPILE= !REPR_FUNDAMENTAL
