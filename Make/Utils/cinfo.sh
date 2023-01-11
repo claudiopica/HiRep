@@ -24,7 +24,7 @@ echo "\";" >> ${FILENAME}
 echo "" >> ${FILENAME}
 rm cinfo.tmp
 
-awk '{printf "%s\\n",$0}' ${MKDIR}/MkFlags > cinfo.tmp
+awk '{printf "%s\\n",$0}' ${MKDIR}/MkFlags.ini > cinfo.tmp
 len=`cat cinfo.tmp | wc -c`+1
 echo -n "static char CI_mkflags[${len}] = \"" >> ${FILENAME}
 cat cinfo.tmp >> ${FILENAME}

@@ -1,8 +1,0 @@
-#Include this file at the end of MkFlags
-
-#Compiler
-#CC = gcc
-CC = mpicc
-CFLAGS = -Wall -std=c99 -O2
-
-INC += -I/usr/lib64/openmpi/1.2.5-gcc/include

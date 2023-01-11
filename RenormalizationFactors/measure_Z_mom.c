@@ -8,6 +8,7 @@
  * Modified by Vincent Drach and Ari Hietanen
  *
  * NOCOMPILE= ROTATED_SF || BASIC_SF || FERMION_THETA || WITH_QUATERNIONS
+ * NOCOMPILE= REPR_ADJOINT
  * 
  *******************************************************************************/
 

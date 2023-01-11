@@ -5,7 +5,7 @@ use Getopt::Long 'HelpMessage';
 use File::Copy qw(move);
 
 GetOptions(
-  'file|f=s'     => \(my $file = 'MkFlags'),
+  'file|f=s'     => \(my $file = 'MkFlags.ini'),
   'ng|n=i'       => \(my $NG = 2),
   'repr|r=s'     => \(my $repr = 'FUND'),
   'gauge=s'      => \(my $gauge = 'SUN'),

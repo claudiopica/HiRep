@@ -1,7 +1,0 @@
-#Include this file at the end of MkFlags
-
-#Compiler
-CC = mpicc
-#CC = icc
-CFLAGS = -Wall -wd593 -wd188 -wd981 -wd177 -wd869 -std=c99 -O2
-
