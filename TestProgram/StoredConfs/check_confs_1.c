@@ -1,11 +1,11 @@
 /*******************************************************************************
-*
-* NOCOMPILE= !BASIC_SF
-* NOCOMPILE= !NG==3
-* NOCOMPILE= !WITH_EXPCLOVER
-* NOCOMPILE= !REPR_FUNDAMENTAL
-*
-*******************************************************************************/
+ *
+ * NOCOMPILE= !BASIC_SF
+ * NOCOMPILE= !NG==3
+ * NOCOMPILE= !WITH_EXPCLOVER
+ * NOCOMPILE= !REPR_FUNDAMENTAL
+ *
+ *******************************************************************************/
 
 #include "libhr.h"
 
@@ -278,8 +278,8 @@ int main(int argc, char *argv[])
       idx[2] = 2;
       comb[1] += *data_storage_element(store, 0, idx);
 
-      comb[0] *= VOL3 * NG;
-      comb[1] *= VOL3 * NG;
+      comb[0] *= GLB_VOL3 * NG / 6.0;
+      comb[1] *= GLB_VOL3 * NG / 6.0;
     }
     else
     {
@@ -301,8 +301,8 @@ int main(int argc, char *argv[])
       idx[2] = 2;
       comb[1] += 2 * (*data_storage_element(store, 0, idx));
 
-      comb[0] *= VOL3 * NG;
-      comb[1] *= VOL3 * NG;
+      comb[0] *= GLB_VOL3 * NG / 6.0;
+      comb[1] *= GLB_VOL3 * NG / 6.0;
     }
     test += fabs((comb[0] - openQCDWsl0[i - 1]) / comb[0]);
     test += fabs((comb[1] - openQCDWsl2[i - 1]) / comb[1]);
@@ -323,8 +323,8 @@ int main(int argc, char *argv[])
       idx[2] = 4;
       comb[1] += *data_storage_element(store, 0, idx);
 
-      comb[0] *= 2 * VOL3 * NG;
-      comb[1] *= 2 * VOL3 * NG;
+      comb[0] *= 2 * GLB_VOL3 * NG / 6.0;
+      comb[1] *= 2 * GLB_VOL3 * NG / 6.0;
 
       test += fabs((comb[0] - openQCDYsl0[i - 1]) / comb[0]);
       test += fabs((comb[1] - openQCDYsl2[i - 1]) / comb[1]);
@@ -358,7 +358,7 @@ int main(int argc, char *argv[])
   idx[1] = 5;
   tavg[5] = *data_storage_element(store, 1, idx);
 
-  test = fabs(1. - 2.0 * GLB_VOL3 * NG * ((GLB_T - 2) * tavg[1] + (GLB_T - 3) * tavg[2]) / openQCDWFobsl0[0]);
+  test = fabs(1. - 1. / 3. * GLB_VOL3 * NG * ((GLB_T - 2) * tavg[1] + (GLB_T - 3) * tavg[2]) / openQCDWFobsl0[0]);
   lprintf("TEST", 0, "Wl(t=0) relative difference: %.2e \n(should be around 1*10^(-7) or so)\n\n", test);
   if (test > 1e-6 && PID == 0)
   {
@@ -366,7 +366,7 @@ int main(int argc, char *argv[])
     return_value += 1;
   }
 
-  test = fabs(1.0 - 2 * GLB_VOL3 * NG * (GLB_T - 3) * (tavg[3] + tavg[4]) / openQCDWFobsl0[1]);
+  test = fabs(1.0 - 1. / 3. * GLB_VOL3 * NG * (GLB_T - 3) * (tavg[3] + tavg[4]) / openQCDWFobsl0[1]);
   lprintf("TEST", 0, "Yl(t=0) relative difference: %.2e \n(should be around 1*10^(-7) or so)\n\n", test);
   if (test > 1e-6 && PID == 0)
   {
@@ -396,7 +396,7 @@ int main(int argc, char *argv[])
   idx[1] = 5;
   tavg[5] = *data_storage_element(store, 1, idx);
 
-  test = fabs(1. - 2.0 * GLB_VOL3 * NG * ((GLB_T - 2) * tavg[1] + (GLB_T - 3) * tavg[2]) / openQCDWFobsl2[0]);
+  test = fabs(1. - 1. / 3. * GLB_VOL3 * NG * ((GLB_T - 2) * tavg[1] + (GLB_T - 3) * tavg[2]) / openQCDWFobsl2[0]);
   lprintf("TEST", 0, "Wl(t=0.2) relative difference: %.2e \n(should be around 1*10^(-7) or so)\n\n", test);
   if (test > 1e-5 && PID == 0)
   {
@@ -404,9 +404,9 @@ int main(int argc, char *argv[])
     return_value += 1;
   }
 
-  test = fabs(1.0 - 2 * GLB_VOL3 * NG * (GLB_T - 3) * (tavg[3] + tavg[4]) / openQCDWFobsl2[1]);
+  test = fabs(1.0 - 1. / 3. * GLB_VOL3 * NG * (GLB_T - 3) * (tavg[3] + tavg[4]) / openQCDWFobsl2[1]);
   lprintf("TEST", 0, "Yl(t=0.2) relative difference: %.2e \n(should be around 1*10^(-7) or so)\n\n", test);
-  if (test > 1e-6)
+  if (test > 1e-6 && PID == 0)
   {
     lprintf("TEST", 0, "Test failed\n");
     return_value += 1;
@@ -414,7 +414,7 @@ int main(int argc, char *argv[])
 
   test = fabs(1.0 - tavg[5] / openQCDWFobsl2[2]);
   lprintf("TEST", 0, "TC(t=0.2) relative difference: %.2e \n(should be around 1*10^(-3) or so)\n\n", test);
-  if (test > 1e-2)
+  if (test > 1e-2 && PID == 0)
   {
     lprintf("TEST", 0, "Test failed\n");
     return_value += 1;
