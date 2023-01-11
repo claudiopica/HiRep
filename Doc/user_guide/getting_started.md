@@ -1,6 +1,10 @@
 @page get_started Getting Started
 
 [TOC]
+
+# Quick start
+
+[![asciicast](https://asciinema.org/a/550942.svg)](https://asciinema.org/a/550942)
 # Dependencies
 
 * A C99 compiler (GCC, clang, icc). OpenMP can be used if supported by the compiler.  

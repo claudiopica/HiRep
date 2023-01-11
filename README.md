@@ -6,7 +6,7 @@ This repository contains the HiRep simulation code.
 
 # Getting started
 
-<script id="asciicast-550942" src="https://asciinema.org/a/550942.js" async></script>
+[![asciicast](https://asciinema.org/a/550942.svg)](https://asciinema.org/a/550942)
 
 ## Dependencies
 
