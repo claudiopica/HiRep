@@ -6,6 +6,8 @@ This repository contains the HiRep simulation code.
 
 # Getting started
 
+<script id="asciicast-550942" src="https://asciinema.org/a/550942.js" async></script>
+
 ## Dependencies
 
 * A C99 compiler (GCC, clang, icc). OpenMP can be used if supported by the compiler.  
