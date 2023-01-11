@@ -7,27 +7,27 @@
 #include "libhr_core.h"
 #include "Observables/avr_plaquette.h"
 
-static void pg_gaussian_pf(const struct _monomial *m)
+static void pg_gaussian_pf(monomial const *m)
 {
 	/* empty */
 }
 
-static void pg_correct_pf(const struct _monomial *m)
+static void pg_correct_pf(monomial const *m)
 {
 	/* empty */
 }
 
-static void pg_correct_la_pf(const struct _monomial *m)
+static void pg_correct_la_pf(monomial const *m)
 {
 	/* empty */
 }
 
-static const spinor_field* pg_pseudofermion(const struct _monomial *m)
+static const spinor_field* pg_pseudofermion(monomial const *m)
 {
 	return NULL;
 }
 
-static void pg_add_local_action(const struct _monomial *m, scalar_field *loc_action)
+static void pg_add_local_action(monomial const *m, scalar_field *loc_action)
 {
 	mon_pg_par *par = (mon_pg_par*)(m->data.par);
 	_MASTER_FOR(&glattice,ix)
@@ -36,14 +36,14 @@ static void pg_add_local_action(const struct _monomial *m, scalar_field *loc_act
 	}
 }
 
-static void pg_free(struct _monomial *m)
+static void pg_free(monomial *m)
 {
 	mon_pg_par *par = (mon_pg_par*)m->data.par;
 	free(par);
 	free(m);
 }
 
-struct _monomial* pg_create(const monomial_data *data)
+monomial* pg_create(monomial_data const *data)
 {
 	monomial *m = malloc(sizeof(*m));
 	mon_pg_par *par = (mon_pg_par*)(data->par);

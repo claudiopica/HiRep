@@ -18,7 +18,7 @@ typedef enum _datatype_t {
   STRING_T
 } datatype_t;
 
-typedef struct _input_record_t {
+typedef struct input_record_t {
   char *name;
   char *descr;
   datatype_t type;
@@ -26,7 +26,7 @@ typedef struct _input_record_t {
 } input_record_t;
 
 /* Global or common variables */
-typedef struct _input_glb {
+typedef struct input_glb {
   /* global size of lattice and processing grid */
   /* THIS ARE DEFINED GLOBALLY !!! */
   /* int GLB_T, GLB_X, GLB_Y, GLB_Z; */
@@ -55,7 +55,7 @@ typedef struct _input_glb {
 }
 
 /* Global or common variables */
-typedef struct _input_rlx {
+typedef struct input_rlx {
     
     /* random numbers */
     int rlxd_level, rlxd_seed;
@@ -81,7 +81,7 @@ typedef struct _input_rlx {
 }
 
 /* Logger global variables */
-typedef struct _input_logger {
+typedef struct input_logger {
 /* Logger level defined globally */
 /* They are defined at input level */
 /* If you need to separate the log level for a channel insert it here */

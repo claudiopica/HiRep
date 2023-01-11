@@ -27,7 +27,7 @@ int test_define_geometry(void);
 void sendbuf_report(void);
 void sync_field_gpu(geometry_descriptor*, int, int, void*, void*);
 
-typedef struct _coord4 {
+typedef struct coord4 {
     uint8_t x[4];
 } coord4;
 
@@ -44,7 +44,7 @@ enum box_type {
 //  ....|  NB: the h[4] is not in the box,   
 //  ....|  i.e. coordinates needs to be l[]<= p[] <h[] 
 //  l...|
-typedef struct _box_t {
+typedef struct box_t {
     int l[4]; // the lower left corner, the box base point (e.g. in the extended lattice)
     int h[4]; // the upper right corner
     int base_index;
@@ -55,8 +55,8 @@ typedef struct _box_t {
     int *ipt_ext; //given the cordinate of a point in the box returns an index
     coord4 *icoord; //given an index in the box return the 4D coordinates of the point in the box relative to the l[4]
     int *icoord_idx; //given an index in the box return the index of the point in the box relative to the l[4]
-    struct _box_t *sendBox; //if this is a border corresponding to a Recv buffer, this is the box to copy data from, i.e. corresponding to the Send buffer
-    struct _box_t *next; // link to next box. NULL if last
+    struct box_t *sendBox; //if this is a border corresponding to a Recv buffer, this is the box to copy data from, i.e. corresponding to the Send buffer
+    struct box_t *next; // link to next box. NULL if last
 } box_t;
 //TODO: do we want to add vol, even_vol, odd_vol for avoid recomputing them every time?
 //TODO: do we want to precompute ipt_ext for sendboxes?

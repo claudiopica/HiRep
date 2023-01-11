@@ -59,17 +59,17 @@ static int** rec_global_coord;
 #define EVEN 1
 #define ODD  2
 
-struct _site_info;
-typedef struct _site_info {
+struct site_info;
+typedef struct site_info {
   int index;
   int coord[4];                    /* local coordinates */
   int glb_coord[4];                /* global coordinates */
   unsigned int parity;             /* NOT_ASSIGNED ; EVEN ; ODD */
   unsigned int c_type;             /* NOT_ASSIGNED ; ORIGINAL; DUPLICATE */
   unsigned int local;              /* false ; true */
-  struct _site_info* original;     /* if it is a DUPLICATE: pointer to its original */
+  struct site_info* original;     /* if it is a DUPLICATE: pointer to its original */
   unsigned int ncopies;            /* if it is an ORIGINAL: number of copies */
-  struct _site_info** copies;      /* if it is an ORIGINAL: list of copies */
+  struct site_info** copies;      /* if it is an ORIGINAL: list of copies */
   unsigned int b_type[4];          /* NOT_ASSIGNED ; INNER ; LBORDER ; RBORDER ; LBUFFER ; RBUFFER */
   int test;
 } site_info;
@@ -77,8 +77,8 @@ static site_info* sites=NULL;
 static site_info* origin=NULL;
 
 
-struct _block_info;
-typedef struct _block_info {
+struct block_info;
+typedef struct block_info {
   int index;
   unsigned int mask[4];        /* NOT_ASSIGNED ; INNER ; LBORDER ; RBORDER ; LBUFFER ; RBUFFER ; LOCAL */  
   unsigned int parity;         /* NOT_ASSIGNED ; EVEN ; ODD */
@@ -89,8 +89,8 @@ typedef struct _block_info {
   unsigned int nborders;       /* how many directions are labeled as L/RBORDER */
   unsigned int nbuffers;       /* how many directions are labeled as L/RBUFFER */
   unsigned int nsenders;
-  struct _block_info** senders;    /* communication possible senders */
-  struct _block_info* receiver;    /* communication receiver */
+  struct block_info** senders;    /* communication possible senders */
+  struct block_info* receiver;    /* communication receiver */
   unsigned int test;
 } block_info;
 static unsigned int nblocks;

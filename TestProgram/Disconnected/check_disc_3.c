@@ -75,7 +75,7 @@ char *mes_channel_names[16] = {"g5", "g1", "g2", "g3", "-ig0g5", "-ig0g1", "-ig0
   }
 
 /* Mesons parameters */
-typedef struct _input_mesons
+typedef struct input_mesons
 {
   char mstring[256];
 

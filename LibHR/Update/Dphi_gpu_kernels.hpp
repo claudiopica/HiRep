@@ -6,7 +6,7 @@
 #include "Dphi_gpu_twisted_bc.h"
 #include "Dphi_gpu_directions.h"
 
-typedef struct _suNf_hspinor
+typedef struct suNf_hspinor
 {
   suNf_vector c[2];
 } suNf_hspinor;

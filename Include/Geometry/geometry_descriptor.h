@@ -86,7 +86,7 @@
  *
  *
  */
-typedef struct {
+typedef struct geometry_descriptor {
   int inner_master_pieces; 
   int local_master_pieces; 
   int total_spinor_master_pieces;

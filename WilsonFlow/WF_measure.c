@@ -7,7 +7,7 @@
 #include "libhr.h"
 #include <string.h>
 
-typedef struct _input_WF_meas
+typedef struct input_WF_meas
 {
   double tmax;
   int nmeas;
@@ -37,7 +37,7 @@ input_WF_meas WF_var = init_input_WF_meas(WF_var);
 
 #if defined(BASIC_SF)
 
-typedef struct _input_SF
+typedef struct input_SF
 {
   double ct;
   double beta;
@@ -63,7 +63,7 @@ input_SF SF_var = init_input_SF(SF_var);
 #endif
 #if defined(ROTATED_SF)
 
-typedef struct _input_SF
+typedef struct input_SF
 {
   double ct;
   double beta;
@@ -94,7 +94,7 @@ input_SF SF_var = init_input_SF(SF_var);
 
 #endif
 
-typedef struct _input_bcpar
+typedef struct input_bcpar
 {
   /* rhmc parameters */
   double theta[4];

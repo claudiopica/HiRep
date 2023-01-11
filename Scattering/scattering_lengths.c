@@ -17,7 +17,7 @@
 #endif
 
 /* Mesons parameters */
-typedef struct _input_scatt {
+typedef struct input_scatt {
 	char mstring[256],configlist[256],outpath[256],seq_prop[256];
     double csw;	
 	double precision;

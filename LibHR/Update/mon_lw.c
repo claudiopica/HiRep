@@ -6,40 +6,40 @@
 #include "update.h"
 #include "libhr_core.h"
 
-static void lw_gaussian_pf(const struct _monomial *m)
+static void lw_gaussian_pf(monomial const *m)
 {
 	/* empty */
 }
 
-static void lw_correct_pf(const struct _monomial *m)
+static void lw_correct_pf(monomial const *m)
 {
 	/* empty */
 }
 
-static void lw_correct_la_pf(const struct _monomial *m)
+static void lw_correct_la_pf(monomial const *m)
 {
 	/* empty */
 }
 
-static const spinor_field* lw_pseudofermion(const struct _monomial *m)
+static const spinor_field* lw_pseudofermion(monomial const *m)
 {
 	return NULL;
 }
 
-static void lw_add_local_action(const struct _monomial *m, scalar_field *loc_action)
+static void lw_add_local_action(monomial const *m, scalar_field *loc_action)
 {
 	mon_lw_par *par = (mon_lw_par*)(m->data.par);
 	lw_local_action(loc_action, par->beta, par->c0, par->c1);
 }
 
-static void lw_free(struct _monomial *m)
+static void lw_free(monomial *m)
 {
 	mon_lw_par *par = (mon_lw_par*)m->data.par;
 	free(par);
 	free(m);
 }
 
-struct _monomial* lw_create(const monomial_data *data)
+monomial* lw_create(monomial_data const *data)
 {
 	monomial *m = malloc(sizeof(*m));
 	mon_lw_par *par = (mon_lw_par*)(data->par);

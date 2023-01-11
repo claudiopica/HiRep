@@ -38,7 +38,7 @@ static int gb[8] = {1, 1, 1, -1, -1, -1, 1, -1};
 static char nameT[8][256] = {"a", "pi", "rho", "b", "pi2", "rho2", "forbidden triplet 0+-", "forbidden triplet 1++"};
 
 /* Mesons parameters */
-typedef struct _input_mesons
+typedef struct input_mesons
 {
   char mstring[256];
   double csw;

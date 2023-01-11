@@ -62,7 +62,7 @@
  * @param _type The elementary type struct of data stored at each site/link.
  */
 #define _DECLARE_FIELD_STRUCT(_name,_type) \
-	typedef struct \
+	typedef struct _name\
 	{ \
 		_type *ptr; \
 		geometry_descriptor *type; \
@@ -233,13 +233,13 @@ _DECLARE_FIELD_STRUCT(suNg_av_field, suNg_algebra_vector);
 _DECLARE_FIELD_STRUCT(scalar_field, double);
 
 /**
- * @struct _ldl_field
+ * @struct ldl_field
  * @brief FIXME: Add docs
  */
 _DECLARE_FIELD_STRUCT(ldl_field, ldl_t);
 
 /**
- * @struct _suNfc_field
+ * @struct suNfc_field
  * @brief FIXME: Add docs
  */
 _DECLARE_FIELD_STRUCT(suNfc_field, suNfc);

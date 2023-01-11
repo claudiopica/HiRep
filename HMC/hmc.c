@@ -14,7 +14,7 @@
 #include <string.h>
 
 /* Mesons parameters */
-typedef struct _input_mesons
+typedef struct input_mesons
 {
   char make[256];
   double precision;
@@ -40,7 +40,7 @@ typedef struct _input_mesons
 input_mesons mes_var = init_input_mesons(mes_var);
 
 /* Polyakov-loop parameters */
-typedef struct _input_polyakov
+typedef struct input_polyakov
 {
   char make[256];
 
@@ -60,7 +60,7 @@ typedef struct _input_polyakov
 input_polyakov poly_var = init_input_polyakov(poly_var);
 
 /* Lowest-eigenvalue parameters */
-typedef struct _input_eigval
+typedef struct input_eigval
 {
   char make[256];
   int nevt;       /* search space dimension */

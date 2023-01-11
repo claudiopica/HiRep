@@ -15,7 +15,7 @@ typedef enum
   EXACT
 } dilution_mode;
 
-typedef struct _ata_qprop_pars
+typedef struct ata_qprop_pars
 {
   int n_masses;
   double mass[256];

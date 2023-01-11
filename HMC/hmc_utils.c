@@ -26,7 +26,7 @@ static double beta()
 	double beta = 0;
 	for (int i = 0; i < num_mon(); i++)
 	{
-		const monomial *m = mon_n(i);
+		monomial const *m = mon_n(i);
 		void *mpar = m->data.par;
 		switch (m->data.type)
 		{
@@ -48,7 +48,7 @@ static double mass()
 	double mass = 1. / 0.;
 	for (int i = 0; i < num_mon(); i++)
 	{
-		const monomial *m = mon_n(i);
+		monomial const *m = mon_n(i);
 		void *mpar = m->data.par;
 		double nm = mass;
 		switch (m->data.type)
@@ -85,7 +85,7 @@ static int nf()
 	int nf = 0;
 	for (int i = 0; i < num_mon(); i++)
 	{
-		const monomial *m = mon_n(i);
+		monomial const *m = mon_n(i);
 		switch (m->data.type)
 		{
 		case HMC:

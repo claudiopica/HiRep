@@ -17,7 +17,7 @@
 /**
  * @brief Structure containing data from the input file relevant to scattering.
  */
-typedef struct _input_scatt
+typedef struct input_scatt
 {
   char mstring[256];
   double csw;

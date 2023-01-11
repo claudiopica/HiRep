@@ -20,7 +20,7 @@
   (type) GENERIC_MAX(ENSURE_##type(x), ENSURE_##type(y))
 
 /* suN variables */
-typedef struct _input_pg
+typedef struct input_pg
 {
 
   double beta, anisotropy;
@@ -43,7 +43,7 @@ typedef struct _input_pg
 
 /* Polyakov variables */
 
-typedef struct _input_poly
+typedef struct input_poly
 {
   char make[256];
 
@@ -61,7 +61,7 @@ typedef struct _input_poly
 
 /* WF variables */
 
-typedef struct _input_WF
+typedef struct input_WF
 {
   char make[256];
   double tmax;
@@ -90,7 +90,7 @@ typedef struct _input_WF
   }
 
 /* Flow control variables variables */
-typedef struct _pg_flow
+typedef struct pg_flow
 {
   char run_name[64]; /* name for this run */
   char g_start[64];  /* for gauge fields => unit, random, file */

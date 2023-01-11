@@ -18,7 +18,7 @@ void WL_broadcast_polyakov(suNg *poly, suNg_field *gf);
 void WL_correlators(double **ret, const suNg_field *gf, const suNg *poly, const int nsteps, const int *path, const int length, const int perm[3], int sign[3]);
 void WL_wilsonloops(double HYP_weight[3]);
 
-typedef struct {
+typedef struct WL_path_t {
   int c[3];
   int* path;
   int length;

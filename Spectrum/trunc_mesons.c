@@ -16,7 +16,7 @@
 #endif
 
 /* Mesons parameters */
-typedef struct _input_ata_qprop
+typedef struct input_ata_qprop
 {
   char mstring[256];
   ata_qprop_pars pars;

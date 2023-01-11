@@ -9,7 +9,7 @@
 #endif
 
 /* functions and structures for the MRE algorithm */
-typedef struct {
+typedef struct mre_par {
   spinor_field *s[2];
   int num[2];
   int max;

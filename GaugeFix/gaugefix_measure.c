@@ -15,7 +15,7 @@ enum { UNKNOWN_CNFG=0, DYNAMICAL_CNFG, QUENCHED_CNFG };
 
 
 /* Gauge fixing parameters */
-typedef struct _input_gaugefix {
+typedef struct input_gaugefix {
 char make[256];
 int maxit; /* max number of iteration */
 int fixdir; /* fixed direction ? 0, 1, 2, 3 for Coulomb gauge else Landau  */

@@ -8,13 +8,13 @@
 #endif
 
 //integrators.c
-typedef struct _integrator_par
+typedef struct integrator_par
 {
   int nsteps;
   int nmon;
-  const monomial **mon_list;
-  void (*integrator)(double, struct _integrator_par *);
-  struct _integrator_par *next;
+  monomial const **mon_list;
+  void (*integrator)(double, struct integrator_par *);
+  struct integrator_par *next;
   int level;
 } integrator_par;
 

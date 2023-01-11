@@ -9,17 +9,17 @@
 #include "random.h"
 #include "Inverters/linear_algebra.h"
 
-void scalar_blank(const struct _monomial *m)
+void scalar_blank(monomial const *m)
 {
 	/* empty */
 }
 
-static const spinor_field* scalar_pseudofermion(const struct _monomial *m)
+static const spinor_field* scalar_pseudofermion(monomial const *m)
 {
 	return NULL;
 }
 
-static void scalar_add_local_action(const struct _monomial *m, scalar_field *loc_action)
+static void scalar_add_local_action(monomial const *m, scalar_field *loc_action)
 {
 	mon_scalar_par *par = (mon_scalar_par*)m->data.par;
 	double Msq = par->mass;
@@ -47,14 +47,14 @@ static void scalar_add_local_action(const struct _monomial *m, scalar_field *loc
 	}
 }
 
-static void scalar_free(struct _monomial *m)
+static void scalar_free(monomial *m)
 {
 	mon_scalar_par *par = (mon_scalar_par*)m->data.par;
 	free(par);
 	free(m);
 }
 
-struct _monomial* scalar_create(const monomial_data *data)
+monomial* scalar_create(monomial_data const *data)
 {
 	monomial *m = malloc(sizeof(*m));
 	mon_scalar_par *par = (mon_scalar_par*)data->par;

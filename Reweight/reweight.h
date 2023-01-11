@@ -1,7 +1,7 @@
 #ifndef REWEIGHT_H
 #define REWEIGHT_H
 
-typedef struct {
+typedef struct input_reweight {
 	int hits;
 	int steps;
 	double precision;

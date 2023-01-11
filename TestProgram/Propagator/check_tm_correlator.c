@@ -34,7 +34,7 @@
 /**
  * @brief Structure containing data from the input file relevant to scattering.
  */
-typedef struct _input_cor
+typedef struct input_cor
 {
     char mstring[256];
     char mustring[256];

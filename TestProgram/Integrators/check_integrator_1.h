@@ -16,7 +16,7 @@ enum
 };
 
 /* HMC variables */
-typedef struct _input_hmc
+typedef struct input_hmc
 {
   /* hmc parameters */
   ghmc_par hmc_p;
@@ -46,7 +46,7 @@ typedef struct _input_hmc
   }
 
 /* Flow control variables variables */
-typedef struct _hmc_flow
+typedef struct hmc_flow
 {
   char run_name[128]; /* name for this run */
   char g_start[128];  /* for gauge fields => unit, random, file */

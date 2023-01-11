@@ -16,7 +16,7 @@
 #define false (0 == 1)
 
 static char error_filename[256] = "err_0";
-typedef struct _format_type
+typedef struct format_type
 {
   char name[256];
   void (*read)(char *);
@@ -51,7 +51,7 @@ enum
   UNKNOWN_CNFG
 };
 
-typedef struct _filename_type
+typedef struct filename_type
 {
   char string[1024];
   char label[256];

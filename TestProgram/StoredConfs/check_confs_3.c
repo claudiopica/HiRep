@@ -12,7 +12,7 @@ double openQCDWFobsl0[3] = {1.472098e+05, 8.273978e+03, -1.37e-01};
 
 double openQCDWFobsl2[3] = {9.293370e+04, 1.122513e+04, 4.21e-01};
 
-typedef struct _input_inverter
+typedef struct input_inverter
 {
   double precision;
   double mass;
@@ -20,7 +20,7 @@ typedef struct _input_inverter
   double beta;
 } input_inverter;
 
-typedef struct _input_WF_meas
+typedef struct input_WF_meas
 {
   double tmax;
   int nmeas;

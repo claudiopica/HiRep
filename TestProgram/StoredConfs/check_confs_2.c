@@ -151,7 +151,7 @@ double openQCDWFobsl0[3] = {4.938097e+04, 7.368043e+03, -1.95e-03};
 
 double openQCDWFobsl2[3] = {5.014492e+03, 1.664379e+03, 5.29e-03};
 
-typedef struct _input_sfc
+typedef struct input_sfc
 {
   double precision;
   double mass;
@@ -159,7 +159,7 @@ typedef struct _input_sfc
   double beta;
 } input_sfc;
 
-typedef struct _input_WF_meas
+typedef struct input_WF_meas
 {
   double tmax;
   int nmeas;

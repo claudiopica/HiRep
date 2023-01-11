@@ -7,10 +7,10 @@
 #include "libhr_core.h"
 #include "io.h"
 
-typedef struct _mon_list
+typedef struct mon_list
 {
   monomial *m;
-  struct _mon_list *next;
+  struct mon_list *next;
 } mon_list;
 
 static int nmon = 0;
@@ -40,7 +40,7 @@ static void free_mem()
   free_mon_list(action);
 }
 
-const monomial *add_mon(monomial_data *mon_dat)
+monomial const *add_mon(monomial_data *mon_dat)
 {
   if (nmon == 0)
   {
@@ -106,7 +106,7 @@ int num_mon()
   return nmon;
 }
 
-const monomial *mon_n(int i)
+monomial const *mon_n(int i)
 {
   mon_list *curr = action;
 #ifndef NDEBUG

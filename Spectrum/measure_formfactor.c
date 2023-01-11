@@ -23,7 +23,7 @@ typedef enum
   gfwall_src
 } source_type_t;
 /* Mesons parameters */
-typedef struct _input_mesons
+typedef struct input_mesons
 {
   char mstring[256];
   double precision;

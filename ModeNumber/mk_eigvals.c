@@ -21,7 +21,7 @@
 #endif
 
 /* Mesons parameters */
-typedef struct _input_eigval
+typedef struct input_eigval
 {
   /* EVA parameters */
   int nevt;      /* search space dimension */

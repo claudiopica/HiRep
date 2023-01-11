@@ -11,7 +11,7 @@
 
 //eva_deflation.c
 /* EVA preconditioning */
-typedef struct _eva_prec
+typedef struct eva_prec
 {
   /* EVA parameters */
   int nevt;      /* search space dimension */

@@ -4,6 +4,7 @@
 * Code modified by Fernando Romero-Lopez
 *
 * NOCOMPILE = WITH_MPI || !BC_T_PERIODIC || !BC_X_PERIODIC || !BC_Y_PERIODIC || !BC_Z_PERIODIC
+* NOCOMPILE = BASIC_SF || ROTATED_SF
 *******************************************************************************/
 
 #include "libhr.h"
@@ -25,7 +26,7 @@ static void slower(char *str)
     ++str;
   }
 }
-typedef struct _format_type
+typedef struct format_type
 {
   char name[256];
   void (*read)(char *);
@@ -42,7 +43,7 @@ format_type format[nformats] = {
 
 format_type *conf_format;
 
-typedef struct _conf_details
+typedef struct conf_details
 {
   char cnfgin[256];
   char cnfgout[256];

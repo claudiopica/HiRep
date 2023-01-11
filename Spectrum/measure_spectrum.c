@@ -17,7 +17,7 @@
 
 //typedef enum {semwall_src,point_src} source_type_t;
 /* Mesons parameters */
-typedef struct _input_mesons
+typedef struct input_mesons
 {
   char configlist[256], mstring[1024];
   int use_input_mass;
@@ -95,7 +95,7 @@ typedef struct _input_mesons
   }
 
 /* Turn four fermion on/off */
-typedef struct _input_ff
+typedef struct input_ff
 {
   char make[256];
   /* for the reading function */

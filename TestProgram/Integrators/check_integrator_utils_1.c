@@ -253,7 +253,7 @@ double integrate_ghmc(int regenerate, ghmc_par *update_par)
 	{
 		for (int i = 0; i < num_mon(); ++i)
 		{
-			const monomial *m = mon_n(i);
+			monomial const *m = mon_n(i);
 			msf = (spinor_field *)m->pseudofermion(m);
 
 			m->gaussian_pf(m);
@@ -275,7 +275,7 @@ double integrate_ghmc(int regenerate, ghmc_par *update_par)
 	/* correct pseudofermion distribution */
 	for (int i = 0; i < num_mon(); ++i)
 	{
-		const monomial *m = mon_n(i);
+		monomial const *m = mon_n(i);
 		m->correct_pf(m);
 	}
 
@@ -291,7 +291,7 @@ double integrate_ghmc(int regenerate, ghmc_par *update_par)
 	lprintf("HMC", 30, "Computing new action density...\n");
 	for (int i = 0; i < num_mon(); ++i)
 	{
-		const monomial *m = mon_n(i);
+		monomial const *m = mon_n(i);
 		m->correct_la_pf(m);
 	}
 	local_hmc_action(DELTA, la, suN_momenta, scalar_momenta);
@@ -320,7 +320,7 @@ double integrate_ghmc(int regenerate, ghmc_par *update_par)
 
 	for (int i = 0; i < num_mon(); ++i)
 	{
-		const monomial *m = mon_n(i);
+		monomial const *m = mon_n(i);
 		msf = (spinor_field *)m->pseudofermion(m);
 
 		m->gaussian_pf(m);

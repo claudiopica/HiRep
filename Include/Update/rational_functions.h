@@ -13,7 +13,7 @@
 	extern "C" {
 #endif
 
-typedef struct _rational_app {
+typedef struct rational_app {
   /* approximate function = x^(n/d) */
   /* in the range [min,max] with relative precision rel_error */
 	int n,d;

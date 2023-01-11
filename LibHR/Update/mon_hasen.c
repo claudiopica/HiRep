@@ -13,13 +13,13 @@
 static spinor_field *tmp_pf = NULL;
 static int mon_init = 1;
 
-static void hasen_gaussian_pf(const struct _monomial *m)
+static void hasen_gaussian_pf(monomial const *m)
 {
 	mon_hasenbusch_par *par = (mon_hasenbusch_par*)(m->data.par);
 	gaussian_spinor_field(par->pf);
 }
 
-static void hasen_correct_pf(const struct _monomial *m)
+static void hasen_correct_pf(monomial const *m)
 {
 	mon_hasenbusch_par *par = (mon_hasenbusch_par*)(m->data.par);
 	double shift;
@@ -39,7 +39,7 @@ static void hasen_correct_pf(const struct _monomial *m)
 	H(par->pf, tmp_pf);
 }
 
-static void hasen_correct_la_pf(const struct _monomial *m)
+static void hasen_correct_la_pf(monomial const *m)
 {
 	mon_hasenbusch_par *par = (mon_hasenbusch_par*)(m->data.par);
 	double shift;
@@ -60,19 +60,19 @@ static void hasen_correct_la_pf(const struct _monomial *m)
 	D(par->pf, tmp_pf);
 }
 
-static const spinor_field* hasen_pseudofermion(const struct _monomial *m)
+static const spinor_field* hasen_pseudofermion(monomial const *m)
 {
 	mon_hasenbusch_par *par = (mon_hasenbusch_par*)(m->data.par);
 	return par->pf;
 }
 
-static void hasen_add_local_action(const struct _monomial *m, scalar_field *loc_action)
+static void hasen_add_local_action(monomial const *m, scalar_field *loc_action)
 {
 	mon_hasenbusch_par *par = (mon_hasenbusch_par*)(m->data.par);
 	pf_local_action(loc_action, par->pf);
 }
 
-static void hasen_free(struct _monomial *m)
+static void hasen_free(monomial *m)
 {
 	mon_hasenbusch_par *par = (mon_hasenbusch_par*)m->data.par;
 
@@ -84,7 +84,7 @@ static void hasen_free(struct _monomial *m)
 	free(par);
 	free(m);
 }
-struct _monomial* hasen_create(const monomial_data *data)
+monomial* hasen_create(monomial_data const *data)
 {
 	monomial *m = malloc(sizeof(*m));
 	mon_hasenbusch_par *par = (mon_hasenbusch_par*)data->par;

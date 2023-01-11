@@ -11,14 +11,14 @@ typedef enum
     DONTSTORE
 } storage_switch;
 
-typedef struct _data_storage
+typedef struct data_storage
 {
     int n;
     int *ni;
     double *data;
 } data_storage;
 
-typedef struct _data_storage_array
+typedef struct data_storage_array
 {
     int n;
     data_storage *element;

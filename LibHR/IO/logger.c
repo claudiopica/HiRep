@@ -15,16 +15,16 @@
  * ***********************************************
  */
 
-typedef struct _record {
+typedef struct record {
 	char *name;
 	FILE *file;
-	struct _record *next;
+	struct record *next;
 } record;
 
-typedef struct _lrecord {
+typedef struct lrecord {
 	char *name;
 	int level;
-	struct _lrecord *next;
+	struct lrecord *next;
 } lrecord;
 
 static record *filemap=0; /* list the mappings to files */

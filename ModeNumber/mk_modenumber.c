@@ -14,7 +14,7 @@
 #error This code does not work with the fermion twisting !!!
 #endif
 
-typedef struct _input_nu
+typedef struct input_nu
 {
   double inverr2;
   char approx[512];

@@ -11,7 +11,7 @@ static void monomial_force(double dt, integrator_par *par)
 {
 	for (int n = 0; n < par->nmon; n++)
 	{
-		const monomial *m = par->mon_list[n];
+		monomial const *m = par->mon_list[n];
 		m->update_force(dt, m->force_par);
 	}
 }
@@ -20,7 +20,7 @@ static void monomial_field(double dt, integrator_par *par)
 {
 	for (int n = 0; n < par->nmon; n++)
 	{
-		const monomial *m = par->mon_list[n];
+		monomial const *m = par->mon_list[n];
 		if (m->update_field)
 		{
 			m->update_field(dt, m->field_par);

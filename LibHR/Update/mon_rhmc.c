@@ -25,7 +25,7 @@ static void reduce_fraction(int *a, int *b)
 	if (*b!=0 && f!=1){ *a/=f; *b/=f; }
 }
 
-static void rhmc_gaussian_pf(const struct _monomial *m)
+static void rhmc_gaussian_pf(monomial const *m)
 {
 	mon_rhmc_par *par = (mon_rhmc_par*)(m->data.par);
 	gaussian_spinor_field(par->pf);
@@ -37,7 +37,7 @@ static void rhmc_gaussian_pf(const struct _monomial *m)
 	r_app_set(&(par->ratio), minev, maxev);
 }
 
-static void rhmc_correct_pf(const struct _monomial *m)
+static void rhmc_correct_pf(monomial const *m)
 {
 	mon_rhmc_par *par = (mon_rhmc_par*)(m->data.par);
 
@@ -53,7 +53,7 @@ static void rhmc_correct_pf(const struct _monomial *m)
 	rational_func(&r_APP, &H2, par->pf, par->pf);
 }
 
-static void rhmc_correct_la_pf(const struct _monomial *m)
+static void rhmc_correct_la_pf(monomial const *m)
 {
 	mon_rhmc_par *par = (mon_rhmc_par*)(m->data.par);
 
@@ -69,13 +69,13 @@ static void rhmc_correct_la_pf(const struct _monomial *m)
 	rational_func(&r_APP, &H2, par->pf, par->pf);
 }
 
-static const spinor_field* rhmc_pseudofermion(const struct _monomial *m)
+static const spinor_field* rhmc_pseudofermion(monomial const *m)
 {
 	mon_rhmc_par *par = (mon_rhmc_par*)(m->data.par);
 	return par->pf;
 }
 
-static void rhmc_add_local_action(const struct _monomial *m, scalar_field *loc_action)
+static void rhmc_add_local_action(monomial const *m, scalar_field *loc_action)
 {
 	mon_rhmc_par *par = (mon_rhmc_par*)(m->data.par);
 	pf_local_action(loc_action, par->pf);
@@ -86,7 +86,7 @@ static void rhmc_add_local_action(const struct _monomial *m, scalar_field *loc_a
 #endif
 }
 
-static void rhmc_free(struct _monomial *m)
+static void rhmc_free(monomial *m)
 {
 	mon_rhmc_par *par = (mon_rhmc_par*)m->data.par;
 
@@ -100,7 +100,7 @@ static void rhmc_free(struct _monomial *m)
 	free(m);
 }
 
-struct _monomial* rhmc_create(const monomial_data *data)
+monomial* rhmc_create(monomial_data const *data)
 {
 	monomial *m = malloc(sizeof(*m));
 	mon_rhmc_par *par = (mon_rhmc_par*)data->par;

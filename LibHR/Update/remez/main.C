@@ -13,7 +13,7 @@
 
 #include"alg_remez.h"
 
-typedef struct _guess_inf {
+typedef struct guess_inf {
 	int c;
 	int n1,n2;
 	double l1,l2;

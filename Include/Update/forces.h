@@ -27,7 +27,7 @@
 #endif
 
 //force0.c
-typedef struct {
+typedef struct force_gauge_par {
   double beta;
   double c0;
   double c1;
@@ -56,7 +56,7 @@ void fermion_force_begin(void);
 void fermion_force_end(double dt, suNg_av_field *force);
 
 //force_hmc.c
-typedef struct {
+typedef struct force_hmc_par {
   int id;
   int n_pf;
   spinor_field *pf;
@@ -78,7 +78,7 @@ void force_hmc(double, void *);
 void force_hmc_tm(double, void *); //uses force_hmc_par
 
 //force_rhmc.c
-typedef struct {
+typedef struct force_rhmc_par {
   int id;
   int n_pf;
   spinor_field *pf;
@@ -94,7 +94,7 @@ void force_rhmc(double, void *);
 void force_hmc_ff(double dt, void *vpar); //Force from a HMC_ff or Hasenbusch_ff monomial. Uses force_hmc_par
 
 //force_4f.c
-typedef struct {
+typedef struct force_auxfield_par {
   double gamma;
 } force_auxfield_par;
 
@@ -103,7 +103,7 @@ void force_hmc_auxfields_fermion(double dt, void *vpar, scalar_field *sigma_mom,
 void update_auxfields(double dt, void *vpar);
 
 //force_scalar.c
-typedef struct {
+typedef struct force_scalar_par {
   double mass;
   double lambda;
   suNg_scalar_field **momenta;

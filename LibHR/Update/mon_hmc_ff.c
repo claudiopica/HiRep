@@ -16,13 +16,13 @@
 static spinor_field *tmp_pf = NULL;
 static int mon_init = 1;
 
-static void hmc_ff_gaussian_pf(const struct _monomial *m)
+static void hmc_ff_gaussian_pf(monomial const *m)
 {
 	mon_hmc_par *par = (mon_hmc_par*)(m->data.par);
 	gaussian_spinor_field(par->pf);
 }
 
-static void hmc_ff_correct_pf(const struct _monomial *m)
+static void hmc_ff_correct_pf(monomial const *m)
 {
 	mon_hmc_par *par = (mon_hmc_par*)(m->data.par);
 
@@ -32,7 +32,7 @@ static void hmc_ff_correct_pf(const struct _monomial *m)
 	Dff_dagger(par->pf, tmp_pf);
 }
 
-static void hmc_ff_correct_la_pf(const struct _monomial *m)
+static void hmc_ff_correct_la_pf(monomial const *m)
 {
 	mon_hmc_par *par = (mon_hmc_par*)(m->data.par);
 	double shift;
@@ -51,13 +51,13 @@ static void hmc_ff_correct_la_pf(const struct _monomial *m)
 	spinor_field_g5_assign_f(par->pf);
 }
 
-static const spinor_field* hmc_ff_pseudofermion(const struct _monomial *m)
+static const spinor_field* hmc_ff_pseudofermion(monomial const *m)
 {
 	mon_hmc_par *par = (mon_hmc_par*)(m->data.par);
 	return par->pf;
 }
 
-static void hmc_ff_add_local_action(const struct _monomial *m, scalar_field *loc_action)
+static void hmc_ff_add_local_action(monomial const *m, scalar_field *loc_action)
 {
 	mon_hmc_par *par = (mon_hmc_par*)(m->data.par);
 	pf_local_action(loc_action, par->pf);
@@ -81,7 +81,7 @@ static void hmc_ff_add_local_action(const struct _monomial *m, scalar_field *loc
 #endif
 }
 
-static void hmc_ff_free(struct _monomial *m)
+static void hmc_ff_free(monomial *m)
 {
 	mon_hmc_par *par = (mon_hmc_par*)m->data.par;
 
@@ -94,7 +94,7 @@ static void hmc_ff_free(struct _monomial *m)
 	free(m);
 }
 
-struct _monomial* hmc_ff_create(const monomial_data *data)
+monomial* hmc_ff_create(monomial_data const *data)
 {
 	monomial *m = malloc(sizeof(*m));
 	mon_hmc_par *par = (mon_hmc_par*)data->par;

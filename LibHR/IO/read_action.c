@@ -73,7 +73,7 @@ static double find_double(section *sec, char *key)
    return 0;
 }
 
-static void add_monomial_to_integrator(const monomial *m, int level)
+static void add_monomial_to_integrator(monomial const *m, int level)
 {
    integrator_par *iter = ip;
    while (iter->level != level)
@@ -85,7 +85,7 @@ static void add_monomial_to_integrator(const monomial *m, int level)
 static void setup_monomials()
 {
    monomial_data data;
-   const monomial *mret;
+   monomial const *mret;
    section *cur;
    char *type;
    int level;

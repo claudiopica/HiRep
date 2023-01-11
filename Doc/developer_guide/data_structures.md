@@ -56,7 +56,7 @@ New field types can be declared by using the macro
 
 ```c
 #define _DECLARE_FIELD_STRUCT(_name, _type) \
-  typedef struct _##_name                   \
+  typedef struct _name                   \
   {                                         \
     _type *ptr;                             \
     geometry_descriptor *type;              \

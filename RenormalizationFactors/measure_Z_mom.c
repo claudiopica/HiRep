@@ -54,7 +54,7 @@ static void twist_XYZ_bc(double theta_x, double theta_y, double theta_z) {
 }
 
 /* Renormalization parameters */
-typedef struct _input_renormalization {
+typedef struct input_renormalization {
   char mstring[256];
   char configlist[256]; /* list of configuration */
   double precision;

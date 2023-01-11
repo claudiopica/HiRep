@@ -25,7 +25,7 @@ typedef enum
 } source_type_t;
 
 /* Mesons parameters */
-typedef struct _input_mesons
+typedef struct input_mesons
 {
   char mstring[256];
   double precision;
@@ -43,7 +43,7 @@ typedef struct _input_mesons
   }
 
 /* Mesons parameters */
-typedef struct _input_eigval
+typedef struct input_eigval
 {
   /* EVA parameters */
   int nevt;      /* search space dimension */

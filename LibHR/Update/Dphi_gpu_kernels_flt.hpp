@@ -7,7 +7,7 @@
 #include "Dphi_gpu_directions.h"
 #include "Dphi_gpu_directions_flt.h"
 
-typedef struct _suNf_hspinor_flt
+typedef struct suNf_hspinor_flt
 {
   suNf_vector_flt c[2];
 } suNf_hspinor_flt;

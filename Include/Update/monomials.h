@@ -46,7 +46,7 @@ typedef enum {
 	Scalar
 } mon_type;
 
-typedef struct {
+typedef struct monomial_data {
 	int id;
 	mon_type type;
 	void *par; //generic pointer to a monomial parameter structure of given type
@@ -55,35 +55,35 @@ typedef struct {
 	double force_prec;
 } monomial_data;
 
-typedef struct _monomial {
+typedef struct monomial {
 	monomial_data data;
 	void *force_par;
 	void *field_par;
 	void (*update_force)(double, void*);
 	void (*update_field)(double, void*);
-	void (*free)(struct _monomial*);
-	void (*gaussian_pf)(const struct _monomial*);
-	void (*correct_pf)(const struct _monomial*);
-	void (*correct_la_pf)(const struct _monomial*);
-	const spinor_field *(*pseudofermion)(const struct _monomial*);
-	void (*add_local_action)(const struct _monomial*, scalar_field*);
+	void (*free)(struct monomial *);
+	void (*gaussian_pf)(struct monomial const*);
+	void (*correct_pf)(struct monomial const*);
+	void (*correct_la_pf)(struct monomial const*);
+	const spinor_field *(*pseudofermion)(struct monomial const*);
+	void (*add_local_action)(struct monomial const*, scalar_field*);
 } monomial;
 
-const monomial *add_mon(monomial_data *mon_dat);
-const monomial *mon_n(int i);
+monomial const *add_mon(monomial_data *mon_dat);
+monomial const *mon_n(int i);
 int num_mon(void);
 
 //mon_pg.c
-typedef struct {
+typedef struct mon_pg_par {
 	double beta;
 	force_gauge_par force_par;
 	field_gauge_par field_par;
 } mon_pg_par;
 
-monomial *pg_create(const monomial_data *data);
+monomial *pg_create(monomial_data const *data);
 
 //mon_lw.c
-typedef struct {
+typedef struct mon_lw_par {
 	double beta;
 	double c0;
 	double c1;
@@ -91,30 +91,30 @@ typedef struct {
 	field_gauge_par field_par;
 } mon_lw_par;
 
-monomial *lw_create(const monomial_data *data);
+monomial *lw_create(monomial_data const *data);
 
 //mon_hmc.c
-typedef struct {
+typedef struct mon_hmc_par {
 	double mass;
 	int mre_past;
 	force_hmc_par fpar;
 	spinor_field *pf;
 } mon_hmc_par;
 
-monomial *hmc_create(const monomial_data *data);
+monomial *hmc_create(monomial_data const *data);
 
 //mon_rhmc.c
-typedef struct {
+typedef struct mon_rhmc_par {
 	double mass;
 	rational_app ratio;
 	force_rhmc_par fpar;
 	spinor_field *pf;
 } mon_rhmc_par;
 
-monomial *rhmc_create(const monomial_data *data);
+monomial *rhmc_create(monomial_data const *data);
 
 //mon_tm.c
-typedef struct {
+typedef struct mon_tm_par {
 	double mass;
 	double mu;
 	int mre_past;
@@ -122,13 +122,13 @@ typedef struct {
 	spinor_field *pf;
 } mon_tm_par;
 
-monomial *tm_create(const monomial_data *data);
+monomial *tm_create(monomial_data const *data);
 
 //mon_tm_alt.c
-monomial *tm_alt_create(const monomial_data *data);
+monomial *tm_alt_create(monomial_data const *data);
 
 //mon_hasen.c
-typedef struct {
+typedef struct mon_hasenbusch_par {
 	double mass;
 	double dm;
 	int mre_past;
@@ -136,10 +136,10 @@ typedef struct {
 	spinor_field *pf;
 } mon_hasenbusch_par;
 
-monomial *hasen_create(const monomial_data *data);
+monomial *hasen_create(monomial_data const *data);
 
 //mon_hasen_tm.c 
-typedef struct {
+typedef struct mon_hasenbusch_tm_par {
 	double mass;
 	double mu;
 	double dmu;
@@ -148,36 +148,36 @@ typedef struct {
 	spinor_field *pf;
 } mon_hasenbusch_tm_par;
 
-monomial *hasen_tm_create(const monomial_data *data);
+monomial *hasen_tm_create(monomial_data const *data);
 
 //mon_hasen_tm_alt.c
-monomial *hasen_tm_alt_create(const monomial_data *data);
+monomial *hasen_tm_alt_create(monomial_data const *data);
 
 //mon_ff.c
-typedef struct {
+typedef struct mon_ff_par {
 	double gamma;
 	char *start_config;
 	double start_value;
 	force_auxfield_par fpar;
 } mon_ff_par;
 
-monomial *ff_create(const monomial_data *data);
+monomial *ff_create(monomial_data const *data);
 
 //mon_hmc_ff.c
-monomial *hmc_ff_create(const monomial_data *data);
+monomial *hmc_ff_create(monomial_data const *data);
 
 //mon_hasen_ff.c
-monomial *hasen_ff_create(const monomial_data *data);
+monomial *hasen_ff_create(monomial_data const *data);
 
 //mon_scalar.c
-typedef struct {
+typedef struct mon_scalar_par {
 	double mass;
 	double lambda;
 	force_scalar_par force_par;
 	field_scalar_par field_par;
 } mon_scalar_par;
 
-monomial *scalar_create(const monomial_data *data);
+monomial *scalar_create(monomial_data const *data);
 
 
 #ifdef __cplusplus

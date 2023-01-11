@@ -158,7 +158,7 @@ int update_ghmc()
   /* generate new pseudofermions */
   for (int i = 0; i < num_mon(); ++i)
   {
-    const monomial *m = mon_n(i);
+    monomial const *m = mon_n(i);
     m->gaussian_pf(m);
   }
 
@@ -169,7 +169,7 @@ int update_ghmc()
   /* correct pseudofermion distribution */
   for (int i = 0; i < num_mon(); ++i)
   {
-    const monomial *m = mon_n(i);
+    monomial const *m = mon_n(i);
     m->correct_pf(m);
   }
 
@@ -185,7 +185,7 @@ int update_ghmc()
   lprintf("HMC", 30, "Computing new action density...\n");
   for (int i = 0; i < num_mon(); ++i)
   {
-    const monomial *m = mon_n(i);
+    monomial const *m = mon_n(i);
     m->correct_la_pf(m);
   }
   local_hmc_action(DELTA, la, suN_momenta, scalar_momenta);
@@ -321,7 +321,7 @@ int reverse_update_ghmc()
   /* correct pseudofermion distribution */
   for (int i = 0; i < num_mon(); ++i)
   {
-    const monomial *m = mon_n(i);
+    monomial const *m = mon_n(i);
     m->correct_pf(m);
   }
 
@@ -337,7 +337,7 @@ int reverse_update_ghmc()
   lprintf("HMC", 30, "Computing new action density...\n");
   for (int i = 0; i < num_mon(); ++i)
   {
-    const monomial *m = mon_n(i);
+    monomial const *m = mon_n(i);
     m->correct_la_pf(m);
   }
   local_hmc_action(DELTA, la, suN_momenta, scalar_momenta);
@@ -377,7 +377,7 @@ void correct_pf_dist_hmc()
   /* init monomials */
   for (int i = 0; i < num_mon(); ++i)
   {
-    const monomial *m = mon_n(i);
+    monomial const *m = mon_n(i);
     m->init_traj(m);
   }
 
@@ -388,7 +388,7 @@ void correct_pf_dist_hmc()
   /* generate new pseudofermions */
   for (int i = 0; i < num_mon(); ++i)
   {
-    const monomial *m = mon_n(i);
+    monomial const *m = mon_n(i);
     m->gaussian_pf(m);
   }
 
@@ -399,7 +399,7 @@ void correct_pf_dist_hmc()
   /* correct pseudofermion distribution */
   for (int i = 0; i < num_mon(); ++i)
   {
-    const monomial *m = mon_n(i);
+    monomial const *m = mon_n(i);
     m->correct_pf(m);
   }
 }
@@ -412,7 +412,7 @@ void calc_one_force(int n_force)
     error(ip == NULL, 1, "calc_one_force", "Error in force index\n");
     for (int n = 0; n < ip->nmon; n++)
     {
-      const monomial *m = ip->mon_list[n];
+      monomial const *m = ip->mon_list[n];
       if (m->data.id == n_force)
       {
         m->force_f(1, m->force_par);

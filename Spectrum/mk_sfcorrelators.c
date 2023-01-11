@@ -8,7 +8,7 @@
 #include "libhr.h"
 #include <string.h>
 
-typedef struct _input_sfc
+typedef struct input_sfc
 {
   double precision;
   double mass;
@@ -42,7 +42,7 @@ typedef struct _input_sfc
 input_sfc SF_var = init_input_sfc(SF_var);
 
 /* BC variables */
-typedef struct _input_bcpar
+typedef struct input_bcpar
 {
   /* rhmc parameters */
   double theta[4];

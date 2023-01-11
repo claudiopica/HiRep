@@ -54,7 +54,6 @@ my ($N,$suff,$complex,$to);
 my $dataname;
 my $rdataname;
 my $cname="c";
-my $structdef="typedef struct\n{\n";
 
 my ($basename,$fundsuff,$repsuff)=("suN","g","f"); #basename for types and suffix for fundamental representation
 
@@ -74,8 +73,8 @@ print "#define NF $Nf\n";
 write_suN_h($Nf,$repsuff,$c2,"T");
 
 my $dim_ldl = $Nf * (2 * $Nf + 1);
-print "/* LDL field definition */\n\n";
-print "typedef struct {\n";
+print "/* LDL field definition */\n";
+print "typedef struct ldl_t {\n";
 print "   hr_complex up[$dim_ldl];\n";
 print "   hr_complex dn[$dim_ldl];\n";
 print "} ldl_t;\n";
@@ -512,33 +511,33 @@ write_spinor_pplus();
 #
 
 sub write_suN_vector {
-  print $structdef;
+  print "typedef struct ${rdataname}_vector {\n";
   print "   hr_complex $cname\[$N\];\n";
   print "} ${rdataname}_vector;\n\n";
-  print $structdef;
+  print "typedef struct ${rdataname}_vector_flt {\n";
   print "   hr_complex_flt $cname\[$N\];\n";
   print "} ${rdataname}_vector_flt;\n\n";
 }
 
 sub write_suN_algebra_vector {
-  print $structdef;
   my $d=($N*$N)-1;
   if ($gauge_group eq "GAUGE_SON"){ #N*(N-1)/2 generators
       $d=$N*($N-1)/2;
   }
+  print "typedef struct ${rdataname}_algebra_vector {\n";
   print "   double $cname\[$d\];\n";
   print "} ${rdataname}_algebra_vector;\n\n";
-  print $structdef;
+  print "typedef struct ${rdataname}_algebra_vector_flt {\n";
   print "   float $cname\[$d\];\n";
   print "} ${rdataname}_algebra_vector_flt;\n\n";
 }
 
 sub write_suN {
-  print $structdef;
-	my $d=($N*$N);
+  my $d=($N*$N);
+  print "typedef struct $dataname {\n";
   print "   hr_complex $cname\[$d\];\n";
   print "} $dataname;\n\n";
-  print $structdef;
+  print "typedef struct ${dataname}_flt {\n";
   print "   hr_complex_flt $cname\[$d\];\n";
   print "} ${dataname}_flt;\n\n";
 }
@@ -554,30 +553,30 @@ sub write_su2 {
     die("Unknown su2 quaternionic form. Exiting...\n");
   }
 
-  print $structdef;
+  print "typedef struct $rdataname {\n";
   print "   double $cname\[$d\];\n";
   print "} $rdataname;\n\n";
-  print $structdef;
+  print "typedef struct ${rdataname}_flt {\n";
   print "   float $cname\[$d\];\n";
   print "} ${rdataname}_flt;\n\n";
 }
 
 sub write_suNr {
-  print $structdef;
-	my $d=($N*$N);
+  my $d=($N*$N);
+  print "typedef struct $rdataname {\n";
   print "   double $cname\[$d\];\n";
   print "} $rdataname;\n\n";
-  print $structdef;
+  print "typedef struct ${rdataname}_flt {\n";
   print "   float $cname\[$d\];\n";
   print "} ${rdataname}_flt;\n\n";
 }
 
 sub write_spinor {
-  print $structdef;
   my $slen=4;
+  print "typedef struct ${rdataname}_spinor {\n";
   print "   ${rdataname}_vector $cname\[$slen\];\n";
   print "} ${rdataname}_spinor;\n\n";
-  print $structdef;
+  print "typedef struct ${rdataname}_spinor_flt {\n";
   print "   ${rdataname}_vector_flt $cname\[$slen\];\n";
   print "} ${rdataname}_spinor_flt;\n\n";
 }

@@ -79,7 +79,7 @@ static void adj_mat(hr_complex At[4][4], hr_complex A[4][4])
 }
 
 /* Mesons parameters */
-typedef struct _input_mesons
+typedef struct input_mesons
 {
   char mstring[256];
 

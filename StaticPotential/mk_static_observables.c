@@ -8,7 +8,7 @@
 #include <string.h>
 
 /* Static Observables variables */
-typedef struct _input_static_os_par
+typedef struct input_static_os_par
 {
   /* observable parameters */
   char polymake[256];
@@ -31,7 +31,7 @@ typedef struct _input_static_os_par
 
 input_static_os_par ospar_var = init_input_ospar(ospar_var);
 
-typedef struct _input_HYP
+typedef struct input_HYP
 {
   /*  int nsteps;*/
   double weight[3];
@@ -51,7 +51,7 @@ typedef struct _input_HYP
     }                                                                                    \
   }
 
-typedef struct _input_wilson
+typedef struct input_WL
 {
   int c[10][3];
   int nsteps[10];
@@ -115,7 +115,7 @@ input_WL WL_var = init_input_WL(WL_var);
 
 
 /* BC variables */
-typedef struct _input_bcpar
+typedef struct input_bcpar
 {
   /* rhmc parameters */
   double theta[4];

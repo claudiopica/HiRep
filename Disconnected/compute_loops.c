@@ -19,7 +19,7 @@
 #error This code does not work with the fermion twisting !!!
 #endif
 /* Disonnected parameters */
-typedef struct _input_loops
+typedef struct input_loops
 {
 	char mstring[256];
 	double precision;

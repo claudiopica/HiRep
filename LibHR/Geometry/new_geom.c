@@ -830,7 +830,7 @@ void gd_set_boxIndices() {
 /////////////////////////////////////////////////////
 
 //we keep a list of send buffers created
-typedef struct _SB_t {
+typedef struct SB_t {
     void *buf;
 #ifdef WITH_GPU
     void *gpubuf;

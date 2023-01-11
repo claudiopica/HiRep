@@ -12,28 +12,28 @@
 // void write_ff_scalar_fields(char filename[]);
 // void read_ff_scalar_fields(char filename[]);
 
-static void ff_gaussian_pf(const struct _monomial *m)
+static void ff_gaussian_pf(monomial const *m)
 {
 	gaussian_scalar_field( ff_sigma_mom );
 	gaussian_scalar_field( ff_pi_mom );
 }
 
-static void ff_correct_pf(const struct _monomial *m)
+static void ff_correct_pf(monomial const *m)
 {
 	/* empty */
 }
 
-static void ff_correct_la_pf(const struct _monomial *m)
+static void ff_correct_la_pf(monomial const *m)
 {
 	/* empty */
 }
 
-static const spinor_field* ff_pseudofermion(const struct _monomial *m)
+static const spinor_field* ff_pseudofermion(monomial const *m)
 {
 	return NULL;
 }
 
-static void ff_add_local_action(const struct _monomial *m, scalar_field *loc_action)
+static void ff_add_local_action(monomial const *m, scalar_field *loc_action)
 {
 	mon_ff_par *par = (mon_ff_par*)(m->data.par);
 	_MASTER_FOR(&glattice,ix)
@@ -52,7 +52,7 @@ static void ff_add_local_action(const struct _monomial *m, scalar_field *loc_act
 	}
 }
 
-static void ff_free(struct _monomial *m)
+static void ff_free(monomial *m)
 {
 	mon_ff_par *par = (mon_ff_par*)m->data.par;
 	free(ff_sigma);
@@ -63,7 +63,7 @@ static void ff_free(struct _monomial *m)
 	free(m);
 }
 
-struct _monomial* ff_create(const monomial_data *data)
+monomial* ff_create(monomial_data const *data)
 {
 	monomial *m = malloc(sizeof(*m));
 	mon_ff_par *par = (mon_ff_par*)(data->par);

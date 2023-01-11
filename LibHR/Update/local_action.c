@@ -62,7 +62,7 @@ void local_hmc_action(local_action_type type,
   int nmon = num_mon();
   for (int i = 0; i < nmon; ++i)
   {
-    const monomial *m = mon_n(i);
+    monomial const *m = mon_n(i);
 
     m->add_local_action(m, loc_action);
   }

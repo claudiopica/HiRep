@@ -12,13 +12,13 @@
 static spinor_field *tmp_pf = NULL;
 static int mon_init = 1;
 
-void tm_alt_gaussian_pf(const struct _monomial *m)
+void tm_alt_gaussian_pf(monomial const *m)
 {
 	mon_tm_par *par = (mon_tm_par*)(m->data.par);
 	gaussian_spinor_field(par->pf);
 }
 
-void tm_alt_correct_pf(const struct _monomial *m)
+void tm_alt_correct_pf(monomial const *m)
 {
 	mon_tm_par *par = (mon_tm_par*)(m->data.par);
 
@@ -29,7 +29,7 @@ void tm_alt_correct_pf(const struct _monomial *m)
 	Qtm_p_alt(par->pf, tmp_pf);
 }
 
-void tm_alt_correct_la_pf(const struct _monomial *m)
+void tm_alt_correct_la_pf(monomial const *m)
 {
 	mon_tm_par *par = (mon_tm_par*)(m->data.par);
 	double shift;
@@ -49,13 +49,13 @@ void tm_alt_correct_la_pf(const struct _monomial *m)
 	tm_invert_alt(par->pf, tmp_pf, &mpar);
 }
 
-const spinor_field* tm_alt_pseudofermion(const struct _monomial *m)
+const spinor_field* tm_alt_pseudofermion(monomial const *m)
 {
 	mon_tm_par *par = (mon_tm_par*)(m->data.par);
 	return par->pf;
 }
 
-void tm_alt_add_local_action(const struct _monomial *m, scalar_field *loc_action)
+void tm_alt_add_local_action(monomial const *m, scalar_field *loc_action)
 {
 	mon_tm_par *par = (mon_tm_par*)(m->data.par);
    pf_local_action(loc_action, par->pf);
@@ -65,7 +65,7 @@ void tm_alt_add_local_action(const struct _monomial *m, scalar_field *loc_action
 #endif
 }
 
-void tm_alt_free(struct _monomial *m)
+void tm_alt_free(monomial *m)
 {
 	mon_tm_par *par = (mon_tm_par*)m->data.par;
 
@@ -78,7 +78,7 @@ void tm_alt_free(struct _monomial *m)
 	free(m);
 }
 
-struct _monomial* tm_alt_create(const monomial_data *data)
+monomial* tm_alt_create(monomial_data const *data)
 {
 	monomial *m = malloc(sizeof(*m));
 	mon_tm_par *par = (mon_tm_par*)data->par;

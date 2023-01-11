@@ -22,7 +22,7 @@ void set_max_mh_level(int max_lev);
 void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, int *ml_up, int *ml_skip, int nblockingstart, int nblockingsend, double *smear_val, cor_list *lcor);
 
 //update_mt.c
-typedef struct _ghmc_par {
+typedef struct ghmc_par {
   /* integrator */
   integrator_par *integrator;
   double tlen;
