@@ -12,7 +12,7 @@ echo Working directory: `pwd`
 while getopts ':h' c
 do
   case $c in
-    h) ../Make/Utils/write_mkflags.pl -h
+    h) ../Make/write_mkflags.pl -h
     ;;
   esac
 done
@@ -25,7 +25,7 @@ echo "Testing: $dirList"
 echo "With flags:" "${@: 2}"
 
 # write flags file
-../Make/Utils/write_mkflags.pl -f ../Make/MkFlags.ini "${@: 2}" || exit 1
+../Make/write_mkflags.pl -f ../Make/MkFlags.ini "${@: 2}" || exit 1
 
 echo Building...
 ../Make/nj $dirList
