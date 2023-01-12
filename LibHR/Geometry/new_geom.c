@@ -31,7 +31,7 @@ static inline int lexi(int b0, int b1, int b2, int b3, int x0, int x1, int x2, i
 //input b: requested block size
 static int set_block_size(int L, int b) {
 #ifndef NDEBUG
-    error(b>0,1, "GEOMETRY: "__FILE__,"Incorrect inner blocking dimensions used");
+    error(!(b>0),1, "GEOMETRY: "__FILE__,"Incorrect inner blocking dimensions used");
 #endif
     if (L%b==0) return b;
     //keep decreasing b to find a good value

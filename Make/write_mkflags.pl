@@ -291,7 +291,7 @@ write_mkflags - write flags file for compilation of HiRep
   --[no-]timing       [false]     Enable timing
   --[no-]bartiming    [false]     Enable MPI barriers in timing
   --[no-]memory       [false]     Print memory usage
-  --[no-]force        [false]     Print statics for forces in molecular dynamics
+  --[no-]force        [false]     Print statistics for forces in molecular dynamics
 
 =head1 VERSION
 

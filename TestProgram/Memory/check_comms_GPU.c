@@ -471,5 +471,3 @@ int test_comms_clover_force()
 
     return return_val;
 }
-
-#endif
