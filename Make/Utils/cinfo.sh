@@ -42,7 +42,7 @@ echo "char CI_gcc[] = \""$CMDOUT"\\n\";" >> ${FILENAME}
 
 if command -v git >/dev/null 2>/dev/null
 then
-    echo "char CI_gitinfo[] = \""`git rev-parse --symbolic-full-name`"\";" >>${FILENAME}
+    echo "char CI_gitinfo[] = \""`git status -s -b -uno --ahead-behind | perl -pe 's/\n/\\\n/g'`"\";" >>${FILENAME}
     echo "char CI_gitrevision[] = \""`git log --format="%H" -n 1`"\";" >>${FILENAME}
 else
     echo "char CI_gitinfo[] = \"\";" >> ${FILENAME}
