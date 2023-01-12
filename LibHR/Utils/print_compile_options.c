@@ -1,5 +1,4 @@
 #include "Utils/print_compile_options.h"
-#include "cinfo.h"
 #include "IO/logger.h"
 #include <stdio.h>
 

@@ -87,10 +87,6 @@ rule gpu_geometry
   command = cd $outdir && $wr_gpugeo $NG $REPR $WQUAT $GAUGE_GROUP
   description = $setbg GPU GOMETRY HEADERS $setnorm $out
 
-rule cinfo
-  command = cd $outdir && $makedir/Utils/cinfo.sh $makedir $root $MACRO
-  description = $setbg OPTION HEADER $setnorm $out
-
 # build writeREPR
 wr_repr_build = $builddir/Make/Utils/autosun/
 build $wr_repr_build/writeREPR.o: cc $makedir/Utils/autosun/main.cc
@@ -102,14 +98,18 @@ build $wr_repr: link $wr_repr_build/writeREPR.o
 build writeREPR: phony $wr_repr
 
 # Autoheaders
-build autoheaders: phony $coreincdir/suN.h $coreincdir/suN_types.h $coreincdir/suN_repr_func.h $root/Include/Geometry/gpu_geometry.h $root/LibHR/Utils/cinfo.h
+build autoheaders: phony $coreincdir/suN.h $coreincdir/suN_types.h $coreincdir/suN_repr_func.h $root/Include/Geometry/gpu_geometry.h
 build $coreincdir/suN.h $coreincdir/suN_types.h: suN_headers | $wr_head
 build $coreincdir/suN_repr_func.h: suN_repr $coreincdir/TMPL/suN_repr_func.h.tmpl | $wr_repr
 build $root/Include/Geometry/gpu_geometry.h: gpu_geometry | $wr_gpugeo
   outdir = $root/Include/Geometry/
 
-#build $coreincdir/cinfo.h: cinfo | $makedir/Utils/cinfo.sh
-build $root/LibHR/Utils/cinfo.h: cinfo | $makedir/Utils/cinfo.sh
+# CInfo
+rule cinfo
+  command = cd $outdir && $makedir/Utils/cinfo.sh $makedir $root $MACRO
+  description = $setbg CINFO $setnorm $out
+
+build $root/LibHR/Utils/cinfo.c: cinfo | $makedir/Utils/cinfo.sh
   outdir = $root/LibHR/Utils/
 
 # LibHR/Update
@@ -132,6 +132,14 @@ build $root/ModeNumber/approx_for_modenumber.o: cc $root/ModeNumber/approx_for_m
 build $root/ModeNumber/approx_for_modenumber: link $root/ModeNumber/approx_for_modenumber.o
   LDFLAGS = -lm -lgsl -lgslcblas
 build ModeNumber/approx_for_modenumber: phony $root/ModeNumber/approx_for_modenumber
+
+# Doxygen documentation
+docdir = $root/Doc/
+rule docs
+  command = cd $docdir && doxygen doxygen/Doxyfile 2>/dev/null >/dev/null 
+  description = $setbg DOXYGEN $setnorm Documentation
+build docs: docs
+build Doc: phony docs
 
 # Regenerate build files if build script changes.
 rule configure
@@ -309,7 +317,7 @@ sub read_conf {
         $nvcc_path =~ m{(.*?)/bin/$nvcc} or die("Cannot locate NVCC compiler [$nvcc]!\n");
         my $cuda_path = $1;
         # print ("CUDA= $cuda_path\n");
-        #add standard CUDA include and lib dirs
+        # add standard CUDA include and lib dirs
         push(@{$options{'INCLUDE'}},"-I$cuda_path/include/");
         push(@{$options{'LDFLAGS'}},"-lcuda");
 
@@ -317,7 +325,7 @@ sub read_conf {
         unshift @{$options{'LINK'}}, "$nvcc --forward-unknown-to-host-compiler -ccbin"; 
     }
 
-    #add standard definitions to MACRO
+    # add standard definitions to MACRO
     push(@{$options{'MACRO'}},"NG=${$options{'NG'}}[0]");
     push(@{$options{'MACRO'}},"${$options{'GAUGE_GROUP'}}[0]");
     push(@{$options{'MACRO'}},"${$options{'REPR'}}[0]");

@@ -1,9 +1,6 @@
 #!/bin/bash
-LOCKFILE=cinfo.lock
-[ -f "$LOCKFILE" ] && exit 0
-> ${LOCKFILE}
 
-FILENAME=cinfo.h
+FILENAME=cinfo.c
 MKDIR=$1
 TOPDIR=$2
 PWD=`pwd`
@@ -13,82 +10,41 @@ MACROS=$@
 
 > ${FILENAME}
 
-echo "#ifndef CINFO_H" >> ${FILENAME}
-echo "#define CINFO_H" >> ${FILENAME}
+CMDOUT=`echo ${MACROS} | perl -pe 's/"/\\\"/g'`
+echo "char MACROS[] = \""$CMDOUT"\\n\";" >> ${FILENAME}
 
-echo -n ${MACROS} | tr '"' '@' > cinfo.tmp
-len=`cat cinfo.tmp | wc -c`+1
-echo -n "static char MACROS[${len}] = \"" >> ${FILENAME}
-cat cinfo.tmp >> ${FILENAME}
-echo "\";" >> ${FILENAME}
-echo "" >> ${FILENAME}
-rm cinfo.tmp
-
-awk '{printf "%s\\n",$0}' ${MKDIR}/MkFlags.ini > cinfo.tmp
-len=`cat cinfo.tmp | wc -c`+1
-echo -n "static char CI_mkflags[${len}] = \"" >> ${FILENAME}
-cat cinfo.tmp >> ${FILENAME}
-echo "\";" >> ${FILENAME}
-echo "" >> ${FILENAME}
-rm cinfo.tmp
+CMDOUT=`perl -pe 's/\n/\\\n/g' ${MKDIR}/MkFlags.ini`
+echo "char CI_mkflags[] = \""$CMDOUT"\\n\";" >> ${FILENAME}
 
 if command -v lscpu >/dev/null 2>&1
 then
-    lscpu | awk '{printf "%s\\n",$0}' > cinfo.tmp
+    CMDOUT=`lscpu | perl -pe 's/\n/\\\n/g'`
 else
 if [[ -a /proc/cpuinfo ]] 
 then
- awk '{printf "%s\\n",$0}' /proc/cpuinfo > cinfo.tmp
+ CMDOUT=`perl -pe 's/\n/\\\n/g' /proc/cpuinfo`
 else
- echo -n "No CPU info\n" > cinfo.tmp
+ CMDOUT="No CPU info"
 fi
 fi
-len=`cat cinfo.tmp | wc -c`+1
-echo -n "static char CI_cpuinfo[${len}] = \"" >> ${FILENAME}
-cat cinfo.tmp >> ${FILENAME}
-echo "\";" >> ${FILENAME}
-echo "" >> ${FILENAME}
-rm cinfo.tmp
+echo "char CI_cpuinfo[] = \""$CMDOUT"\\n\";" >> ${FILENAME}
 
-if [[ -a /proc/version ]] 
+if uname >/dev/null 2>/dev/null
 then
- awk '{printf "%s\\n",$0}' /proc/version > cinfo.tmp
+ CMDOUT=`uname -a`
 else
- echo -n "No VERSION info\n" > cinfo.tmp
+ CMDOUT="No VERSION info\n"
 fi
-len=`cat cinfo.tmp | wc -c`+1
-echo -n "static char CI_linux[${len}] = \"" >> ${FILENAME}
-cat cinfo.tmp >> ${FILENAME}
-echo "\";" >> ${FILENAME}
-echo "" >> ${FILENAME}
-rm cinfo.tmp
+echo "char CI_linux[] = \""$CMDOUT"\\n\";" >> ${FILENAME}
 
-gcc -v 2>&1 | awk '{printf "%s\\n",$0}' > cinfo.tmp
-len=`cat cinfo.tmp | wc -c`+1
-echo -n "static char CI_gcc[${len}] = \"" >> ${FILENAME}
-cat cinfo.tmp >> ${FILENAME}
-echo "\";" >> ${FILENAME}
-echo "" >> ${FILENAME}
-rm cinfo.tmp
+CMDOUT=`gcc -v 2>&1 | perl -pe 's/\n/\\\n/g'`
+echo "char CI_gcc[] = \""$CMDOUT"\\n\";" >> ${FILENAME}
 
-if command -v git >/dev/null 2>&1
+if command -v git >/dev/null 2>/dev/null
 then
-    len=`git rev-parse --symbolic-full-name|wc -c`+1
-    echo -n "static char CI_gitinfo[${len}] = \"" `git rev-parse --symbolic-full-name` "\";" >>${FILENAME}
-    echo "" >> ${FILENAME}
-    
-    len=`git log --format="%H" -n 1|wc -c`+1
-    echo "static char CI_gitrevision[${len}] = \"" `git log --format="%H" -n 1` "\";" >>${FILENAME}
-    echo "" >> ${FILENAME}
+    echo "char CI_gitinfo[] = \""`git rev-parse --symbolic-full-name`"\";" >>${FILENAME}
+    echo "char CI_gitrevision[] = \""`git log --format="%H" -n 1`"\";" >>${FILENAME}
 else
-    echo -n "static char CI_gitinfo[1] = \"\";" >> ${FILENAME}
-    echo "" >> ${FILENAME}
-
-    echo "static char CI_gitrevision[11] = \""No version"\";" >>${FILENAME}
-    echo "" >> ${FILENAME}
+    echo "char CI_gitinfo[] = \"\";" >> ${FILENAME}
+    echo "char CI_gitrevision[11] = \""No version"\";" >>${FILENAME}
 fi
-
-echo "#endif" >> ${FILENAME}
-echo "" >> ${FILENAME}
-
-rm -f ${LOCKFILE}
