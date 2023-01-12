@@ -1,5 +1,8 @@
+#ifndef AVX2_HIREP_H
+#define AVX2_HIREP_H
+
 #ifdef AVX2_HIREP
-#if (NF == 3) && !defined(REPR_ADJOINT) && !defined(GAUGE_SON)
+#if (NF == 3) && !defined(REPR_IS_REAL)
 #include <immintrin.h>
 #define _suNf_double_multiply_AVX2(mc, mc2, mu, mp, mp2)                                                                                       \
     do                                                                                                                                         \
@@ -85,4 +88,6 @@
     suNf_vector : ({ _suNf_double_multiply_AVX2((mc), (mc2), (mu), (mp), (mp2)); }), \
     default     : ({ _suNf_double_multiply_default(mc, mc2, mu, mp, mp2); }))
 #endif //(NF == 3) && !defined(REPR_ADJOINT) && !defined(GAUGE_SON)
+#endif
+
 #endif

@@ -201,11 +201,6 @@ GLB_VAR(input_logger,logger_var,=init_input_logger(logger_var));
 #define ALLOCATE_REPR_GAUGE_FIELD
 #endif
 
-/* Is the representation real? */
-#if (defined(REPR_ADJOINT) || defined(GAUGE_SON))
-#define REPR_IS_REAL
-#endif
-
 #ifdef PLAQ_WEIGHTS
 GLB_VAR(double,*plaq_weight, =NULL);
 GLB_VAR(double,*rect_weight, =NULL);

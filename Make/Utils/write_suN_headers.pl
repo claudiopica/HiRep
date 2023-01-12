@@ -69,6 +69,7 @@ print "#endif\n";
 write_suN_h($Ng,$fundsuff,$c1,"T");
 
 print "#define NF $Nf\n";
+if ($c2 eq "R") { print "#define REPR_IS_REAL\n"; }
 #system("./write_suN_def.pl $Nf f $c2 T");
 write_suN_h($Nf,$repsuff,$c2,"T");
 

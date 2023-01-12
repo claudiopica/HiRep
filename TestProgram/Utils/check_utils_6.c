@@ -9,7 +9,6 @@
 
 int main(int argc, char *argv[])
 {
-
     int return_value = 0;
 
     spinor_field *ss1;
@@ -63,9 +62,9 @@ int main(int argc, char *argv[])
     global_max(&err, 1);
 
     lprintf("MAIN", 0, "Checking difference between _suNf_double_multiply_default and _suNf_double_multiply_AVX2.\n ");
-    lprintf("MAIN", 0, "Maximal difference = %.14e\n", cabs(err));
+    lprintf("MAIN", 0, "Maximal difference = %.14e\n", fabs(err));
     lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n\n");
-    if (cabs(err) > 10.e-14)
+    if (fabs(err) > 10.e-14)
         return_value++;
 
     finalize_process();
