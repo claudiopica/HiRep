@@ -43,11 +43,10 @@ TestProgram/*/*
 !**/*.pl
 
 #Auto-generated files
-LibHR/Utils/cinfo.h
 Include/Core/suN.h
 Include/Core/suN_types.h
 Include/Core/suN_repr_func.h
 Include/Geometry/gpu_geometry.h
 Make/Utils/autosun/writeREPR
 LibHR/Update/approx_data.db
-LibHR/Utils/suN_exp.c
+LibHR/Utils/cinfo.c

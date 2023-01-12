@@ -3,6 +3,7 @@ use warnings;
 use strict;
 use File::Path qw(make_path);
 use Cwd qw(abs_path);
+use List::MoreUtils qw(uniq);
 # use Data::Dumper;
 
 my $disable_color = 0;
@@ -116,7 +117,7 @@ build $updatedir/approx_data.db: approx_db
 # LibHR/Utils
 # CInfo
 rule cinfo
-  command = cd $outdir && $makedir/Utils/cinfo.sh $makedir $root $MACRO
+  command = cd $outdir && $makedir/Utils/cinfo.sh $makedir $root $MACRO 
   description = $setbg CINFO $setnorm $out
 
 utilsdir = $root/LibHR/Utils/
@@ -194,7 +195,8 @@ sub obj_rules {
 
 sub lib_rules {
     my ($lib_name, @c_objs) = @_;
-    print "build \$builddir/$lib_name: ar @c_objs\n";
+    my @unique_objs = uniq(sort(@c_objs)); #ensure objects are unique and sorted to ensure identical commans line
+    print "build \$builddir/$lib_name: ar @unique_objs\n";
     print "build $lib_name: phony \$builddir/$lib_name\n";
 }
 
