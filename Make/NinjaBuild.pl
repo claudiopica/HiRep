@@ -3,7 +3,6 @@ use warnings;
 use strict;
 use File::Path qw(make_path);
 use Cwd qw(abs_path);
-use List::MoreUtils qw(uniq);
 # use Data::Dumper;
 
 my $disable_color = 0;
@@ -195,7 +194,8 @@ sub obj_rules {
 
 sub lib_rules {
     my ($lib_name, @c_objs) = @_;
-    my @unique_objs = uniq(sort(@c_objs)); #ensure objects are unique and sorted to ensure identical commans line
+    my %obj = map { $_ => 1 } @c_objs;
+    my @unique_objs = sort keys %obj ; #ensure objects are unique and sorted to ensure identical command line
     print "build \$builddir/$lib_name: ar @unique_objs\n";
     print "build $lib_name: phony \$builddir/$lib_name\n";
 }
