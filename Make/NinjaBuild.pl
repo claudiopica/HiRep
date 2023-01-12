@@ -104,14 +104,6 @@ build $coreincdir/suN_repr_func.h: suN_repr $coreincdir/TMPL/suN_repr_func.h.tmp
 build $root/Include/Geometry/gpu_geometry.h: gpu_geometry | $wr_gpugeo
   outdir = $root/Include/Geometry/
 
-# CInfo
-rule cinfo
-  command = cd $outdir && $makedir/Utils/cinfo.sh $makedir $root $MACRO
-  description = $setbg CINFO $setnorm $out
-
-build $root/LibHR/Utils/cinfo.c: cinfo | $makedir/Utils/cinfo.sh
-  outdir = $root/LibHR/Utils/
-
 # LibHR/Update
 updatedir = $root/LibHR/Update/
 rule approx_db
@@ -121,10 +113,17 @@ rule approx_db
 build remez_db: phony $updatedir/approx_data.db
 build $updatedir/approx_data.db: approx_db
 
-## LibHR/Utils
-#utilsdir = $root/LibHR/Utils/
-#build $utilsdir/suN_exp.c: suN_repr $utilsdir/TMPL/suN_exp.c.tmpl | $wr_repr
+# LibHR/Utils
+# CInfo
+rule cinfo
+  command = cd $outdir && $makedir/Utils/cinfo.sh $makedir $root $MACRO
+  description = $setbg CINFO $setnorm $out
 
+utilsdir = $root/LibHR/Utils/
+build $utilsdir/cinfo.c: cinfo | $makedir/Utils/cinfo.sh
+  outdir = $utilsdir
+
+# autogen files
 build generated_files: phony autoheaders remez_db
 
 # Ad hoc rules - these are not build by default
