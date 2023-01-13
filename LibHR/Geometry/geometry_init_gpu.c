@@ -46,6 +46,11 @@ void init_neighbors_gpu()
 
   error_id = cudaMemcpyToSymbol(&Z_EXT_GPU, &Z_EXT, sizeof(int), 0, cudaMemcpyHostToDevice);
   error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error adding Z_EXT to global constant memory.\n");
+
+  #ifdef FERMION_THETA
+  error_id = cudaMemcpyToSymbol(&eitheta_gpu[0], &eitheta[0], sizeof(hr_complex)*4, 0, cudaMemcpyHostToDevice);
+  error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error adding Z_EXT to global constant memory.\n");
+  #endif
   #endif
 }
 

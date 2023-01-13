@@ -10,6 +10,8 @@
 #ifndef LOOP_TOOLS_H
 #define LOOP_TOOLS_H
 
+#if !defined(ROTATED_SF) && !defined(BASIC_SF) && !defined(FERMION_THETA)
+
 #include <stdio.h>
 #include "spinor_field.h"
 #include "Utils/data_storage.h"
@@ -24,5 +26,7 @@ void measure_loops(double* m, int nhits,int conf_num, double precision,int sourc
 
 #ifdef __cplusplus
     }
+#endif
+
 #endif
 #endif

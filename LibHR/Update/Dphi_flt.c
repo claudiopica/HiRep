@@ -72,79 +72,130 @@ unsigned long int getMVM_flt_cpu() {
  * local copy in single precision of global variable
  */
 #if defined(BC_T_THETA) || defined(BC_X_THETA) || defined(BC_Y_THETA) || defined(BC_Z_THETA)
-static  hr_complex_flt eitheta_flt[4]={{1.f,0.f}};
+static  hr_complex_flt eitheta_flt[4];
 #endif
 
 /* r=t*u*s */
 #ifdef BC_T_THETA
 
-#define _suNf_theta_T_multiply(r,u,s)\
-_suNf_multiply(vtmp,(u),(s));\
-_vector_mulc_f((r),eitheta_flt[0],vtmp)
+#define _suNf_theta_T_multiply(r, u, s) \
+  _suNf_multiply(vtmp[0], (u), (s));    \
+  _vector_mulc_f((r), eitheta_flt[0], vtmp[0])
 
-#define _suNf_theta_T_inverse_multiply(r,u,s)\
-_suNf_inverse_multiply(vtmp,(u),(s));\
-_vector_mulc_star_f((r),eitheta_flt[0],vtmp)
+#define _suNf_theta_T_inverse_multiply(r, u, s) \
+  _suNf_inverse_multiply(vtmp[0], (u), (s));    \
+  _vector_mulc_star_f((r), eitheta_flt[0], vtmp[0])
+
+#define _suNf_double_theta_T_multiply(r1, r2, u, s1, s2)    \
+  _suNf_double_multiply(vtmp[0], vtmp[1], (u), (s1), (s2)); \
+  _vector_mulc_f((r1), eitheta_flt[0], vtmp[0]);                \
+  _vector_mulc_f((r2), eitheta_flt[0], vtmp[1])
+
+#define _suNf_double_theta_T_inverse_multiply(r1, r2, u, s1, s2)    \
+  _suNf_double_inverse_multiply(vtmp[0], vtmp[1], (u), (s1), (s2)); \
+  _vector_mulc_star_f((r1), eitheta_flt[0], vtmp[0]);                   \
+  _vector_mulc_star_f((r2), eitheta_flt[0], vtmp[1])
 
 #else
 
-#define _suNf_theta_T_multiply(r,u,s) _suNf_multiply((r),(u),(s))
-#define _suNf_theta_T_inverse_multiply(r,u,s) _suNf_inverse_multiply((r),(u),(s))
+#define _suNf_theta_T_multiply(r, u, s) _suNf_multiply((r), (u), (s))
+#define _suNf_theta_T_inverse_multiply(r, u, s) _suNf_inverse_multiply((r), (u), (s))
+#define _suNf_double_theta_T_multiply(r1, r2, u, s1, s2) _suNf_double_multiply((r1), (r2), (u), (s1), (s2))
+#define _suNf_double_theta_T_inverse_multiply(r1, r2, u, s1, s2) _suNf_double_inverse_multiply((r1), (r2), (u), (s1), (s2))
 
 #endif
 
 /* r=t*u*s */
 #ifdef BC_X_THETA
 
-#define _suNf_theta_X_multiply(r,u,s)\
-_suNf_multiply(vtmp,(u),(s));\
-_vector_mulc_f((r),eitheta_flt[1],vtmp)
+#define _suNf_theta_X_multiply(r, u, s) \
+  _suNf_multiply(vtmp[0], (u), (s));    \
+  _vector_mulc_f((r), eitheta_flt[1], vtmp[0])
 
-#define _suNf_theta_X_inverse_multiply(r,u,s)\
-_suNf_inverse_multiply(vtmp,(u),(s));\
-_vector_mulc_star_f((r),eitheta_flt[1],vtmp)
+#define _suNf_theta_X_inverse_multiply(r, u, s) \
+  _suNf_inverse_multiply(vtmp[0], (u), (s));    \
+  _vector_mulc_star_f((r), eitheta_flt[1], vtmp[0])
+
+#define _suNf_double_theta_X_multiply(r1, r2, u, s1, s2)    \
+  _suNf_double_multiply(vtmp[0], vtmp[1], (u), (s1), (s2)); \
+  _vector_mulc_f((r1), eitheta_flt[1], vtmp[0]);                \
+  _vector_mulc_f((r2), eitheta_flt[1], vtmp[1])
+
+#define _suNf_double_theta_X_inverse_multiply(r1, r2, u, s1, s2)    \
+  _suNf_double_inverse_multiply(vtmp[0], vtmp[1], (u), (s1), (s2)); \
+  _vector_mulc_star_f((r1), eitheta_flt[1], vtmp[0]);                   \
+  _vector_mulc_star_f((r2), eitheta_flt[1], vtmp[1])
 
 #else
 
-#define _suNf_theta_X_multiply(r,u,s) _suNf_multiply((r),(u),(s))
-#define _suNf_theta_X_inverse_multiply(r,u,s) _suNf_inverse_multiply((r),(u),(s))
-
+#define _suNf_theta_X_multiply(r, u, s) _suNf_multiply((r), (u), (s))
+#define _suNf_theta_X_inverse_multiply(r, u, s) _suNf_inverse_multiply((r), (u), (s))
+#define _suNf_double_theta_X_multiply(r1, r2, u, s1, s2) _suNf_double_multiply((r1), (r2), (u), (s1), (s2))
+#define _suNf_double_theta_X_inverse_multiply(r1, r2, u, s1, s2) _suNf_double_inverse_multiply((r1), (r2), (u), (s1), (s2))
 #endif
 
 /* r=t*u*s */
 #ifdef BC_Y_THETA
 
-#define _suNf_theta_Y_multiply(r,u,s)\
-_suNf_multiply(vtmp,(u),(s));\
-_vector_mulc_f((r),eitheta_flt[2],vtmp)
+#define _suNf_theta_Y_multiply(r, u, s) \
+  _suNf_multiply(vtmp[0], (u), (s));    \
+  _vector_mulc_f((r), eitheta_flt[2], vtmp[0])
 
-#define _suNf_theta_Y_inverse_multiply(r,u,s)\
-_suNf_inverse_multiply(vtmp,(u),(s));\
-_vector_mulc_star_f((r),eitheta_flt[2],vtmp)
+#define _suNf_theta_Y_inverse_multiply(r, u, s) \
+  _suNf_inverse_multiply(vtmp[0], (u), (s));    \
+  _vector_mulc_star_f((r), eitheta_flt[2], vtmp[0])
+
+#define _suNf_double_theta_Y_multiply(r1, r2, u, s1, s2)    \
+  _suNf_double_multiply(vtmp[0], vtmp[1], (u), (s1), (s2)); \
+  _vector_mulc_f((r1), eitheta_flt[2], vtmp[0]);                \
+  _vector_mulc_f((r2), eitheta_flt[2], vtmp[1])
+
+#define _suNf_double_theta_Y_inverse_multiply(r1, r2, u, s1, s2)    \
+  _suNf_double_inverse_multiply(vtmp[0], vtmp[1], (u), (s1), (s2)); \
+  _vector_mulc_star_f((r1), eitheta_flt[2], vtmp[0]);                   \
+  _vector_mulc_star_f((r2), eitheta_flt[2], vtmp[1])
 
 #else
 
-#define _suNf_theta_Y_multiply(r,u,s) _suNf_multiply((r),(u),(s))
-#define _suNf_theta_Y_inverse_multiply(r,u,s) _suNf_inverse_multiply((r),(u),(s))
+#define _suNf_theta_Y_multiply(r, u, s) _suNf_multiply((r), (u), (s))
+#define _suNf_theta_Y_inverse_multiply(r, u, s) _suNf_inverse_multiply((r), (u), (s))
+#define _suNf_double_theta_Y_multiply(r1, r2, u, s1, s2) _suNf_double_multiply((r1), (r2), (u), (s1), (s2))
+#define _suNf_double_theta_Y_inverse_multiply(r1, r2, u, s1, s2) _suNf_double_inverse_multiply((r1), (r2), (u), (s1), (s2))
 
 #endif
 
 /* r=t*u*s */
 #ifdef BC_Z_THETA
 
-#define _suNf_theta_Z_multiply(r,u,s)\
-_suNf_multiply(vtmp,(u),(s));\
-_vector_mulc_f((r),eitheta_flt[3],vtmp)
+#define _suNf_theta_Z_multiply(r, u, s) \
+  _suNf_multiply(vtmp[0], (u), (s));    \
+  _vector_mulc_f((r), eitheta_flt[3], vtmp[0])
 
-#define _suNf_theta_Z_inverse_multiply(r,u,s)\
-_suNf_inverse_multiply(vtmp,(u),(s));\
-_vector_mulc_star_f((r),eitheta_flt[3],vtmp)
+#define _suNf_theta_Z_inverse_multiply(r, u, s) \
+  _suNf_inverse_multiply(vtmp[0], (u), (s));    \
+  _vector_mulc_star_f((r), eitheta_flt[3], vtmp[0])
+
+#define _suNf_double_theta_T_multiply(r1, r2, u, s1, s2)    \
+  _suNf_double_multiply(vtmp[0], vtmp[1], (u), (s1), (s2)); \
+  _vector_mulc_f((r1), eitheta_flt[3], vtmp[0]);                \
+  _vector_mulc_f((r2), eitheta_flt[3], vtmp[1])
+
+#define _suNf_double_theta_T_inverse_multiply(r1, r2, u, s1, s2)    \
+  _suNf_double_inverse_multiply(vtmp[0], vtmp[1], (u), (s1), (s2)); \
+  _vector_mulc_star_f((r1), eitheta_flt[3], vtmp[0]);                   \
+  _vector_mulc_star_f((r2), eitheta_flt[3], vtmp[1])
 
 #else
 
-#define _suNf_theta_Z_multiply(r,u,s) _suNf_multiply((r),(u),(s))
-#define _suNf_theta_Z_inverse_multiply(r,u,s) _suNf_inverse_multiply((r),(u),(s))
+#define _suNf_theta_Z_multiply(r, u, s) _suNf_multiply((r), (u), (s))
+#define _suNf_theta_Z_inverse_multiply(r, u, s) _suNf_inverse_multiply((r), (u), (s))
+#define _suNf_double_theta_Z_multiply(r1, r2, u, s1, s2) _suNf_double_multiply((r1), (r2), (u), (s1), (s2))
+#define _suNf_double_theta_Z_inverse_multiply(r1, r2, u, s1, s2) _suNf_double_inverse_multiply((r1), (r2), (u), (s1), (s2))
 
+#endif
+
+#if defined(BC_T_THETA) || defined(BC_X_THETA) || defined(BC_Y_THETA) || defined(BC_Z_THETA)
+#define _USING_THETA
 #endif
 
 

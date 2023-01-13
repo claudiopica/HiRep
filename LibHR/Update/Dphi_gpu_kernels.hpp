@@ -29,27 +29,18 @@ __global__ void Dphi_gpu_inner_kernel(suNf_spinor* __restrict__ out,
   suNf_spinor r;
   _spinor_zero_f(r);
 
-  suNf_hspinor sn;
-  //suNf_hspinor sn_t_plus, sn_t_minus; // .. and so on
-  suNf u;
-  #ifdef FERMION_THETA
-    suNf_vector vtmp;
-  #endif
-
-  int ix, iy;
-  int local_ix, local_iy;
-  local_ix = blockIdx.x*BLOCK_SIZE + threadIdx.x;
+  int local_ix = blockIdx.x*BLOCK_SIZE + threadIdx.x;
   if (local_ix < vol4h) {
-    ix = block_start_ixp + local_ix;
+    int ix = block_start_ixp + local_ix;
 
-    inner_direction(_T_plus,  T_UP_MASK, ix, iup_d, 4*ix);
-    inner_direction(_T_minus, T_DN_MASK, ix, idn_d, 4*ix);
-    inner_direction(_X_plus,  X_UP_MASK, ix, iup_d, 4*ix+1);
-    inner_direction(_X_minus, X_DN_MASK, ix, idn_d, 4*ix+1);
-    inner_direction(_Y_plus,  Y_UP_MASK, ix, iup_d, 4*ix+2);
-    inner_direction(_Y_minus, Y_DN_MASK, ix, idn_d, 4*ix+2);
-    inner_direction(_Z_plus,  Z_UP_MASK, ix, iup_d, 4*ix+3);
-    inner_direction(_Z_minus, Z_DN_MASK, ix, idn_d, 4*ix+3);
+    inner_direction(_T_plus,  T_UP_MASK, ix, iup_d[4*ix]);
+    inner_direction(_T_minus, T_DN_MASK, ix, idn_d[4*ix]);
+    inner_direction(_X_plus,  X_UP_MASK, ix, iup_d[4*ix+1]);
+    inner_direction(_X_minus, X_DN_MASK, ix, idn_d[4*ix+1]);
+    inner_direction(_Y_plus,  Y_UP_MASK, ix, iup_d[4*ix+2]);
+    inner_direction(_Y_minus, Y_DN_MASK, ix, idn_d[4*ix+2]);
+    inner_direction(_Z_plus,  Z_UP_MASK, ix, iup_d[4*ix+3]);
+    inner_direction(_Z_minus, Z_DN_MASK, ix, idn_d[4*ix+3]);
 
     _spinor_mul_f(r, -0.5, r);
     write_gpu_suNf_spinor(vol4h, r, out, local_ix, 0);
@@ -74,28 +65,20 @@ __global__ void Dphi_gpu_boundary_kernel(suNf_spinor* __restrict__ out,
   suNf_spinor res;
   _spinor_zero_f(r);
 
-  suNf_hspinor sn;
-  suNf u;
-  #ifdef FERMION_THETA
-    suNf_vector vtmp;
-  #endif
-
-  int ix, iy;
-  int local_ix, local_iy;
-  local_ix = blockIdx.x*BLOCK_SIZE + threadIdx.x; 
+  int local_ix = blockIdx.x*BLOCK_SIZE + threadIdx.x; 
 
   if (local_ix < vol4h) {
-    ix = local_ix + start_piece;
+    int ix = local_ix + start_piece;
 
     read_gpu_suNf_spinor(vol4h, res, out, local_ix, 0);
-    boundary_calculation(_T_plus,  T_UP_MASK, ix, iup_d, 4*ix);
-    boundary_calculation(_T_minus, T_DN_MASK, ix, idn_d, 4*ix);
-    boundary_calculation(_X_plus,  X_UP_MASK, ix, iup_d, 4*ix+1);
-    boundary_calculation(_X_minus, X_DN_MASK, ix, idn_d, 4*ix+1);
-    boundary_calculation(_Y_plus,  Y_UP_MASK, ix, iup_d, 4*ix+2);
-    boundary_calculation(_Y_minus, Y_DN_MASK, ix, idn_d, 4*ix+2);
-    boundary_calculation(_Z_plus,  Z_UP_MASK, ix, iup_d, 4*ix+3);
-    boundary_calculation(_Z_minus, Z_DN_MASK, ix, idn_d, 4*ix+3);
+    boundary_calculation(_T_plus,  T_UP_MASK, ix, iup_d[4*ix]);
+    boundary_calculation(_T_minus, T_DN_MASK, ix, idn_d[4*ix]);
+    boundary_calculation(_X_plus,  X_UP_MASK, ix, iup_d[4*ix+1]);
+    boundary_calculation(_X_minus, X_DN_MASK, ix, idn_d[4*ix+1]);
+    boundary_calculation(_Y_plus,  Y_UP_MASK, ix, iup_d[4*ix+2]);
+    boundary_calculation(_Y_minus, Y_DN_MASK, ix, idn_d[4*ix+2]);
+    boundary_calculation(_Z_plus,  Z_UP_MASK, ix, iup_d[4*ix+3]);
+    boundary_calculation(_Z_minus, Z_DN_MASK, ix, idn_d[4*ix+3]);
     // TODO: Cannot run two of such kernels at the same time because the kernels reference neighbors in different buffers
 
     _spinor_mul_f(r, -0.5, r);

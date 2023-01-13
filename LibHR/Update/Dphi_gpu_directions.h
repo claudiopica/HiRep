@@ -1,21 +1,23 @@
 #ifndef DIRECTIONS_H
 #define DIRECTIONS_H
 
-#define inner_direction(__macro, __mask, __ix, __nb, __nb_idx) \
+#define inner_direction(__macro, __mask, __ix, __iy) \
       if (imask_gpu[ix]&__mask) { \
-            iy = __nb[__nb_idx]; \
-            local_iy = iy - block_start_iyp; \
+            int local_iy = __iy - block_start_iyp; \
+            suNf_hspinor sn;\
+            suNf u;\
             __macro(vol4h, vol4h); \
       }
 
-#define boundary_calculation(__macro, __mask, __ix, __nb, __nb_idx) \
+#define boundary_calculation(__macro, __mask, __ix, __iy) \
       /*Don't invert, use buffer indices */ \
       /* Or: */ \
       if (!(imask_gpu[ix]&__mask)) { \
-        iy = __nb[__nb_idx]; \
-        local_iy = iy - start; \
+        int local_iy = __iy - start; \
         if (local_iy < buf_stride && local_iy >= 0) { \
-          __macro(buf_stride, vol4h); \
+            suNf_hspinor sn;\
+            suNf u;\
+            __macro(buf_stride, vol4h); \
         } \
       }
 

@@ -2,6 +2,9 @@
  *
  * Computation of the Pseudo scalar scattering lengths
  * VD 2014
+ * 
+ * NOCOMPILE= ROTATED_SF || BASIC_SF
+ * NOCOMPILE= BC_T_THETA || BC_X_THETA || BC_Y_THETA || BC_Z_THETA
  *******************************************************************************/
 #include "libhr.h"
 #include <string.h>

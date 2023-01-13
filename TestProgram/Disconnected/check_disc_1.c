@@ -7,7 +7,9 @@
 * Check of the  disc loops (free case): gauge fixed wall source (type = 1) 
 * VD: DOES NOT WORK.
 * Author: Vincent Drach
-*
+* 
+* NOCOMPILE= ROTATED_SF || BASIC_SF
+* NOCOMPILE= BC_T_THETA || BC_X_THETA || BC_Y_THETA || BC_Z_THETA
 ******************************************************************************/
 
 #include "libhr.h"

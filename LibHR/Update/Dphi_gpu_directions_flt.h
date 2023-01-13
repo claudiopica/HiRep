@@ -1,6 +1,26 @@
 #ifndef DIRECTIONS_FLT_H
 #define DIRECTIONS_FLT_H
 
+#define inner_direction_flt(__macro, __mask, __ix, __iy) \
+      if (imask_gpu[ix]&__mask) { \
+            int local_iy = __iy - block_start_iyp; \
+            suNf_hspinor_flt sn;\
+            suNf_flt u;\
+            __macro(vol4h, vol4h); \
+      }
+
+#define boundary_calculation_flt(__macro, __mask, __ix, __iy) \
+      /*Don't invert, use buffer indices */ \
+      /* Or: */ \
+      if (!(imask_gpu[ix]&__mask)) { \
+        int local_iy = __iy - start; \
+        if (local_iy < buf_stride && local_iy >= 0) { \
+            suNf_hspinor_flt sn;\
+            suNf_flt u;\
+            __macro(buf_stride, vol4h); \
+        } \
+      }
+
 #define _T_plus_flt(__read_stride, __write_stride) \
       read_gpu_suNf_vector_flt(__read_stride, sn.c[0], in, local_iy, 0); \
       read_gpu_suNf_vector_flt(__read_stride, sn.c[1], in, local_iy, 2); \

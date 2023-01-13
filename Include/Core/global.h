@@ -192,7 +192,7 @@ GLB_VAR(double,*rect_weight, =NULL);
 
 /* Theta Boundary conditions */
 #ifdef FERMION_THETA
-GLB_VAR(hr_complex,eitheta[4],={{1.,0.}});
+GLB_VAR(hr_complex,eitheta[4],={1.0,1.0,1.0,1.0});
 #endif
 
 #ifdef MEASURE_FORCE

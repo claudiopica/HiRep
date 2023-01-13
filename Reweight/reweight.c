@@ -73,8 +73,7 @@ void set_theta(double *a)
 #ifdef FERMION_THETA
 	for (int i = 0; i < 4; i++)
 	{
-		eitheta[i].re = cos(a[i]);
-		eitheta[i].im = sin(a[i]);
+		eitheta[i] = cos(a[i])+I*sin(a[i]);
 	}
 #endif
 }

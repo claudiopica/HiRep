@@ -3,6 +3,9 @@
  * Methods to compute disconnected loops
  * Copyright (c) 2014, R. Arthur, V. Drach, A. Hietanen
  * All rights reserved.
+ * 
+ * NOCOMPILE= ROTATED_SF || BASIC_SF
+ * NOCOMPILE= BC_T_THETA || BC_X_THETA || BC_Y_THETA || BC_Z_THETA
  *
  *******************************************************************************/
 
@@ -15,9 +18,11 @@
 #include "Inverters/linear_algebra.h"
 #include "Update/representation.h"
 
+#if ( !defined(ROTATED_SF) && !defined(BASIC_SF) && !defined(FERMION_THETA) )
+
 #define PI 3.141592653589793238462643383279502884197
 
-#if defined(ROTATED_SF) && defined(BASIC_SF)
+#if defined(ROTATED_SF) || defined(BASIC_SF)
 #error This code does not work with the Schroedinger functional !!!
 #endif
 
@@ -621,3 +626,5 @@ void measure_bilinear_loops_spinorfield(spinor_field *prop, spinor_field *source
 			free(corr_im[j][i]);
 		}
 }
+
+#endif 

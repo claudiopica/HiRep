@@ -1,7 +1,7 @@
 /*
  * NOCOMPILE= BASIC_SF
  * NOCOMPILE= ROTATED_SF
- * NOCOMPILE= FERMION_THETA
+ * NOCOMPILE= BC_T_THETA || BC_X_THETA || BC_Y_THETA || BC_Z_THETA
  */
 /*******************************************************************************
  *

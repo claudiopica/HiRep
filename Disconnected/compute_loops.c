@@ -3,6 +3,9 @@
  * Compute some disconnected loops
  * Copyright (c) 2014, R. Arthur, V. Drach, A. Hietanen 
  * All rights reserved.
+ * 
+ * NOCOMPILE= ROTATED_SF || BASIC_SF
+ * NOCOMPILE= BC_T_THETA || BC_X_THETA || BC_Y_THETA || BC_Z_THETA
  *
  *******************************************************************************/
 
@@ -91,11 +94,10 @@ int main(int argc, char *argv[])
 	read_input(rlx_var.read, get_input_filename());
 	strcpy(list_filename, disc_var.configlist);
 	lprintf("MAIN", 0, "list_filename = %s \n", list_filename, disc_var.configlist);
-	if (strcmp(list_filename, "") != 0)
-	{
-		error((list = fopen(list_filename, "r")) == NULL, 1, "main [measure_spectrum.c]",
+
+	error((list = fopen(list_filename, "r")) == NULL, 1, "main [measure_spectrum.c]",
 			  "Failed to open list file\n");
-	}
+
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
 	set_csw(&disc_var.csw);
 #endif
@@ -110,7 +112,6 @@ int main(int argc, char *argv[])
 	i = 0;
 	while (++i)
 	{
-
 		if (list != NULL)
 			if (fscanf(list, "%s", cnfg_filename) == 0 || feof(list))
 				break;
