@@ -1,8 +1,6 @@
 @page supported_features Supported Features
 [TOC]
-# Introduction
-
-## Conventions
+# Conventions {#conventions}
 
 This section summarizes the main formulae that are used for implementing
 the HMC for dynamical Wilson fermions in higher representations. The
@@ -81,7 +79,86 @@ Finally
 0&-1
 \end{pmatrix}\, .\f}
 
-## The Dirac operator
+# Representations
+
+The hermitean generators \f$T^a_f\f$ for the fundamental representation used are of the form:
+\f{equation}{
+\begin{pmatrix} 
+0&1&0&\dots\\
+1&0&0&\dots\\
+0&0&0&\dots\\
+\dots&\dots&\dots&\dots
+\end{pmatrix}\, ,
+\begin{pmatrix} 
+0&i&0&\dots\\
+-i&0&0&\dots\\
+0&0&0&\dots\\
+\dots&\dots&\dots&\dots
+\end{pmatrix}\, ,
+\begin{pmatrix} 
+1&0&0&\dots\\
+0&1&0&\dots\\
+0&0&-2&\dots\\
+\dots&\dots&\dots&\dots
+\end{pmatrix}\, ,
+\f}
+normalized so that \f$T_f=1/2\f$. The generators for the other representations 
+will be obtained in the following.
+
+We first give the explicit form for the representation functions \f$R\f$ which map 
+$U\rightarrow U^R$. We define for each representation an orthonormal base \f$e_R\f$ for 
+the appropriate vector space of matrices. 
+
+For the Adjoint representation we define the base \f$e_{Adj}\f$ for the \f$N\times N\f$ 
+traceless hermitean matrices to be \f$e_{Adj}^a=T^a_f/\sqrt{T_f}\f$, \f$a=1,\dots,N^2-1\f$ 
+(i.e. proportional to the generators of the fundamental representation and 
+normalized to 1.)
+
+For the two-index Symmetric representation the base \f$e^{(ij)}_{S}\f$, with \f$i\le j\f$, for 
+the \f$N\times N\f$ symmetric matrices is given by:
+\f{eqnarray}{
+i\neq j \, ,\,\,\,&e^{(ij)}_S&=\frac{1}{\sqrt{2}}\begin{pmatrix} 
+0&1&0&\dots\\
+1&0&0&\dots\\
+0&0&0&\dots\\
+\dots&\dots&\dots&\dots
+\end{pmatrix}\, , \\
+i=j \, ,\,\,\,&e^{(ii)}_S&=\begin{pmatrix} 
+0&0&0&\dots\\
+0&1&0&\dots\\
+0&0&0&\dots\\
+\dots&\dots&\dots&\dots
+\end{pmatrix}\, , 
+\f}
+where the non zero entries are at position \f$(i,j)\f$, etc.
+
+For the two-index Antisymmetric representation the base \f$e^{(ij)}_{AS}\f$, with \f$i<j\f$, for 
+the \f$N\times N\f$ symmetric matrices is given by:
+\f{equation}{
+e^{(ij)}_{AS}=\frac{1}{\sqrt{2}}\begin{pmatrix} 
+0&1&0&\dots\\
+-1&0&0&\dots\\
+0&0&0&\dots\\
+\dots&\dots&\dots&\dots
+\end{pmatrix}\, , 
+\f}
+where, as above, the non zero entries are at position \f$(i,j)\f$.
+
+The maps \f$R\f$ are explicitly given by:
+\f{eqnarray}{
+(R^{Adj} U)_{ab} &=& U^{Adj}_{ab} = \mathrm{tr\ }\left[ e^a_{Adj} U e^b_{Adj} U^\dagger\right]\,\, , a,b=1,\dots,N^2-1\, ,\\ 
+(R^{S} U)_{(ij)(lk)} &=& U^{S}_{(ij)(lk)} = \mathrm{tr\ }\left[ (e^{(ij)}_{S})^\dagger U e^{(lk)}_S U^T\right]\,\, , i\le j, l\le k\, ,\\ 
+(R^{A} U)_{(ij)(lk)} &=& U^{A}_{(ij)(lk)} = \mathrm{tr\ }\left[ (e^{(ij)}_{A})^\dagger U e^{(lk)}_A U^T\right]\,\, , i< j, l< k\, .
+\f}
+
+The generators \f$T_R^a\f$ used are defined as the image of the generators in the fundamental
+under the differential of the maps \f$R\f$ defined above: \f$T^a_R = R_* T^a_f\f$.
+Explicit expression can easily be worked out form the definition above.
+The invariants \f$T_R\f$ and \f$C_2(R)\f$ for the generators defined in this way are given in 
+Sect. [Conventions](#conventions)
+
+
+# The Dirac operator
 
 The massless Dirac operator is written as in @cite Luscher:1996sc
 
@@ -125,7 +202,7 @@ The fermionic determinant in the path integral can be represented by introducing
 
 \f{equation}{\left(\det D_m\right)^{N_f} = \int \mathcal D \phi \mathcal D \phi^\dagger e^{-\phi^\dagger Q_m^{-N_f} \phi} \equiv \int \mathcal D \phi \mathcal D \phi^\dagger e^{-S_\mathrm{pf}}.\f}
 
-## Force for the HMC molecular dynamics 
+# Forces for the HMC molecular dynamics 
 
 The HMC Hamiltonian is given by
 
@@ -238,7 +315,7 @@ which can be used to rewrite eqs eq.\f$(\ref{eq:PIDOT2})\f$ and eq.\f$(\ref{eq:P
 \dot\pi^a_G(x,\mu) &= - \frac{\beta}{N} P^a_f \left( U(x,\mu) V^\dagger(x,\mu) \right) \, ,\\
 \dot\pi^a_F(x,\mu) &= \frac{T_R}{T_f} P^a_R \left( U^R(x,\mu) \mathrm{tr_{spin}} \left[ \gamma_5 (1-\gamma_\mu) \left\{ \eta(x+\mu)\otimes\xi(x)^\dagger + \xi(x+\mu)\otimes\eta(x)^\dagger \right\} \right] \right)\, . \end{aligned}\label{eq:HFFORCE}\f}
 
-## Checks of the MD force
+### Checks of the MD force
 
 The formulae derived in the previous section can be checked against two
 known examples. The first, and almost trivial, check is obtained by
@@ -252,7 +329,7 @@ SU(\f$ 2\f$) @cite Donini:1996nr. We agree with eq. (16) in
 @cite Donini:1996nr, provided that we exchange the indices \f$ a\f$ and
 \f$ b\f$ in that formula.
 
-## HMC Algorithm
+# HMC Algorithm
 
 Given the action \f$ S(\phi)\f$ of a system of bosonic fields \f$ \phi\f$, our
 goal is to generate a Markov process with fixed probability distribution
@@ -329,7 +406,7 @@ pseudofermions \f$ \bar\eta\f$, \f$ \eta\f$ with the desired probability
 distribution and keeping then fixed during the above HMC configuration
 generation for the remaining bosonic fields \f$ \phi\f$.
 
-## RHMC formulation
+# RHMC formulation
 
 The fermionic part of the HMC Hamiltonian, for \f$ N_f\f$ degenerate quarks
 and \f$ N_{pf}\f$ pseudofermions, can be written as:
@@ -427,7 +504,7 @@ obtained by computing the maximum and minimum eigenvalue of \f$ Q_m^2\f$ on
 each configuration when needed. In our code we update this interval only
 before the metropolis test, while we keep it fixed during the molecular dynamics.
 
-## Even-Odd preconditioning
+# Even-Odd preconditioning
 
 It is a very well know fact that the time spend for a simulation with
 dynamical fermions is dominated by the time required for the inversions

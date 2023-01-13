@@ -91,7 +91,7 @@ rule gpu_geometry
 wr_repr_build = $builddir/Make/Utils/autosun/
 build $wr_repr_build/writeREPR.o: cc $makedir/Utils/autosun/main.cc
   CC = $CXX
-  CFLAGS = -D_${REPR}_ -D_${GAUGE_GROUP}_ -D_PICA_STYLE_ -DNDEBUG -O3
+  CFLAGS = -D_${REPR}_ -D_${GAUGE_GROUP}_ -D_PICA_STYLE_ -DNDEBUG -O2
 build $wr_repr: link $wr_repr_build/writeREPR.o
   LINK = $CXX
   LDFLAGS =

@@ -2,6 +2,6 @@
 * Copyright (c) 2022, Claudio Pica                                          *   
 * All rights reserved.                                                      * 
 \***************************************************************************/
-#define MAIN_PROGRAM
+#define DEF_HIREP_GBL_VAR
 
 #include "global.h"

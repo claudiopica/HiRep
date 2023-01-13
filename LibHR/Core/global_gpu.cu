@@ -3,6 +3,6 @@
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
-#define GPU_MAIN_PROGRAM
+#define DEF_HIREP_GBL_VAR
 
 #include "global_gpu.h"

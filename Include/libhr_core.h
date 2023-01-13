@@ -9,7 +9,7 @@
 //check_options makes some definition used later
 //we include it first here
 #include "check_options.h"
-
+#include "core_utils.h"
 #include "gamma_spinor.h"
 #include "global_gpu.h"
 #include "global.h"

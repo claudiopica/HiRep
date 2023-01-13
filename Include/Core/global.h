@@ -18,14 +18,11 @@
 //because check_options makes some other definitions
 //based on the compilation options 
 #include "check_options.h"
+#include "core_utils.h"
+
 #include "geometry.h"
 #include <stddef.h>
 
-#ifdef MAIN_PROGRAM
-#  define GLB_VAR(type,name,...) type name __VA_ARGS__
-#else
-#  define GLB_VAR(type,name,...) extern type name
-#endif
 
 /* local lattice attributes */
 GLB_VAR(int,T,=0); /* local lattice size in direction T */
@@ -100,19 +97,6 @@ GLB_VAR(int,BLK_T,=3);
 GLB_VAR(int,BLK_X,=3);
 GLB_VAR(int,BLK_Y,=3);
 GLB_VAR(int,BLK_Z,=3);
-
-/* Geometry structures */
-#define _lexi(_T,_X,_Y,_Z,_t,_x,_y,_z) ((((_t)*(_X)+(_x))*(_Y)+(_y))*(_Z)+(_z))
-// #define _index_ext(_T,_X,_Y,_Z,_t,_x,_y,_z,_BT,_BX,_BY,_BZ) _lexi(_T,_X,_Y,_Z,((_t)+(_BT)),((_x)+(_BX))((_y)+(_BY))((_z)+(_BZ)))
-#define ipt_ext(t,x,y,z) ipt[_lexi(T_EXT, X_EXT, Y_EXT, Z_EXT, t, x, y, z)]
-#define ipt(t,x,y,z) ipt_ext((t)+T_BORDER, (x)+X_BORDER, (y)+Y_BORDER, (z)+Z_BORDER)
-#define imask(ix) imask[ix]
-
-// #define ipt(t,x,y,z) ipt[((((t)+T_BORDER)*(X_EXT)+((x)+X_BORDER))*(Y_EXT)+((y)+Y_BORDER))*(Z_EXT)+((z)+Z_BORDER)]
-// #define ipt_ext(t,x,y,z) ipt[(((t)*(X_EXT)+(x))*(Y_EXT)+(y))*(Z_EXT)+(z)]
-#define ipt_4d(t,x) ipt_4d[(t)*(VOL3)+(x)]
-#define iup(site,dir) iup[(site)*4+(dir)]
-#define idn(site,dir) idn[(site)*4+(dir)]
 
 /* Geometry structures */
 GLB_VAR(geometry_descriptor,glattice,={0}); /* global lattice */
