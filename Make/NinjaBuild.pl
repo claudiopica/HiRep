@@ -83,7 +83,7 @@ rule suN_repr
   command = $wr_repr $NG $in > $out 2>/dev/null
   description = $setbg SUN REPRESENTATION $setnorm $out
 
-rule gpu_geometry
+rule strided_reads 
   command = cd $outdir && $wr_gpugeo $NG $REPR $WQUAT $GAUGE_GROUP
   description = $setbg GPU GOMETRY HEADERS $setnorm $out
 
@@ -98,10 +98,10 @@ build $wr_repr: link $wr_repr_build/writeREPR.o
 build writeREPR: phony $wr_repr
 
 # Autoheaders
-build autoheaders: phony $coreincdir/suN.h $coreincdir/suN_types.h $coreincdir/suN_repr_func.h $root/Include/Geometry/gpu_geometry.h
+build autoheaders: phony $coreincdir/suN.h $coreincdir/suN_types.h $coreincdir/suN_repr_func.h $root/Include/Geometry/strided_reads.h $root/LibHR/Utils/cinfo.h
 build $coreincdir/suN.h $coreincdir/suN_types.h: suN_headers | $wr_head
 build $coreincdir/suN_repr_func.h: suN_repr $coreincdir/TMPL/suN_repr_func.h.tmpl | $wr_repr
-build $root/Include/Geometry/gpu_geometry.h: gpu_geometry | $wr_gpugeo
+build $root/Include/Geometry/strided_reads.h: strided_reads | $wr_gpugeo
   outdir = $root/Include/Geometry/
 
 # LibHR/Update

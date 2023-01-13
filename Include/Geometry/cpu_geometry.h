@@ -60,7 +60,7 @@ inline static int safe_mod_fast(int x, int y) {
 #define _GPU_4FIELD_BLK(s,i) (((s)->gpu_ptr) + 4*((s)->type->master_start[(i)]))
 #define _GPU_DFIELD_BLK(s,i,size) (((s)->gpu_ptr) + size*((s)->type->master_start[(i)] - (s)->type->master_shift))
 
-#define _FIELD_BLK(s,i) (((s)->ptr) + ((s)->type->master_start[(i)]) - (s)->type->master_shift))
+#define _FIELD_BLK(s,i) (((s)->ptr) + ((s)->type->master_start[(i)]) - (s)->type->master_shift)
 #define _4FIELD_BLK(s,i) (((s)->ptr) + 4*((s)->type->master_start[(i)] - (s)->type->master_shift))
 #define _DFIELD_BLK(s,i,size) (((s)->ptr) + size*((s)->type->master_start[(i)] - size*(s)->type->master_shift))
 

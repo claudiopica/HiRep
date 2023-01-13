@@ -13,7 +13,8 @@ use strict;
 # Gauge group ... SU(N) or SO(N), possible strings GAUGE_SUN, GAUGE_SON
 my ($Ng,$rep,$su2quat,$gauge_group)=@ARGV;
 
-open STDOUT, ">gpu_geometry.h";
+# open STDOUT, ">gpu_geometry.h";
+open STDOUT, ">strided_reads.h";
 
 
 my $Nf = 0;

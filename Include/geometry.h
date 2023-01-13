@@ -30,6 +30,7 @@
 #include "Geometry/geometry_maskstate.h"
 #include "Geometry/geometry_omp.h"
 #include "Geometry/gpu_geometry.h"
+#include "Geometry/strided_reads.h"
 #include "Geometry/new_geometry.h"
 #include "Geometry/setup.h"
 
