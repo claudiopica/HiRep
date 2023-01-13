@@ -5,6 +5,7 @@
 
 #include "geometry.h"
 #include "libhr_core.h"
+#include "IO/logger.h"
 #include <string.h>
 
 #ifdef MPI_TIMING
