@@ -7,6 +7,7 @@
 #ifdef WITH_GPU
 
 #include "core_utils.h"
+#include "gpu.h"
 
 GLB_VAR(__device__ __constant__ int,T_EXT_GPU);
 GLB_VAR(__device__ __constant__ int,X_EXT_GPU);
