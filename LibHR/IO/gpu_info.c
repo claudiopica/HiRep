@@ -223,7 +223,9 @@ void print_supported_features(cudaDeviceProp device_prop)
     #endif
 
     if (cuda_aware_support) lprintf("GPU_INIT", 10, "MPI implementation CUDA-aware? yes.\n");
-    else lprintf("GPU_INIT", 10, "MPI implementation CUDA-aware? no.\n");
+    else {
+        error(1, 1, __func__, "MPI implementation CUDA-aware? no. Exiting. \n");
+    }
   #endif
 }
 

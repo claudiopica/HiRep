@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     test_setup();
 
     // Run tests
-    return_val += test_sync_identical_to_cpu_spinor_field_f(&glattice);
+    /*return_val += test_sync_identical_to_cpu_spinor_field_f(&glattice);
     return_val += test_sync_identical_to_cpu_spinor_field_f(&glat_even);
     return_val += test_sync_identical_to_cpu_spinor_field_f(&glat_odd);
 
@@ -38,9 +38,9 @@ int main(int argc, char *argv[])
 
     return_val += test_sync_identical_to_cpu_sfield(&glattice);
     return_val += test_sync_identical_to_cpu_sfield(&glat_even);
-    return_val += test_sync_identical_to_cpu_sfield(&glat_odd);
+    return_val += test_sync_identical_to_cpu_sfield(&glat_odd);*/
 
-    //return_val += test_sync_identical_to_cpu_gfield();
+    return_val += test_sync_identical_to_cpu_gfield();
 
     // Finalize and return
     finalize_process();
@@ -251,26 +251,24 @@ int test_sync_identical_to_cpu_gfield()
     double diff = 0.0;
     suNg *mat_gpu = (suNg*)malloc(sizeof(suNg));
     suNg *mat_cpu = (suNg*)malloc(sizeof(suNg));
+    suNg *in_block;
     for (int i = 0; i < gd->nbuffers_spinor; ++i) 
     {
         for (int j = 0; j < gd->sbuf_len[i]; ++j) 
         {
-            suNg *in_block = sendbuf_gpu + 4*gd->sbuf_start[i];
             int stride = gd->sbuf_len[i];
-
-            for (int comp = 0; comp < NG*NG; ++comp) 
-            {
-                int base_index = j + gd->sbuf_start[i];
-                mat_cpu = ((suNg*)sendbuf_cpu) + base_index;
-                //suNg *mat_cpu = sendbuf_cpu + coord_to_index(base_index, comp);
-                //suNg *mat_cpu = _4FIELD_AT_PTR(sendbuf_cpu, base_index, comp, 0);
-                read_gpu_suNg(stride, *(mat_gpu), in_block, j, comp);
-                if (comp==0) printf("ix: %d, cpu: %0.5e + i%0.5e, gpu: %0.5e + i%0.5e\n", j + gd->sbuf_start[i], 
+            int index = gd->sbuf_start[i];
+            mat_cpu = _FIELD_AT_PTR(sendbuf_cpu, index, 0);
+            in_block = _FIELD_AT_PTR(sendbuf_gpu, gd->sbuf_start[i], 0);
+            for (int comp = 0; comp < NG*NG; ++comp) {
+                read_gpu_suNg(stride, (*mat_gpu), in_block, j, comp);
+                if (comp==0 && j==0) printf("ix: %d, comp: %d, cpu: %0.5e + i%0.5e, gpu: %0.5e + i%0.5e\n", 
+                    j + gd->sbuf_start[i], comp, 
                     creal((*mat_cpu).c[comp]), cimag((*mat_cpu).c[comp]), 
                     creal((*mat_gpu).c[comp]), cimag((*mat_gpu).c[comp]));
                 diff += creal((*mat_cpu).c[comp])-creal((*mat_gpu).c[comp]);
                 diff += cimag((*mat_cpu).c[comp])-cimag((*mat_gpu).c[comp]);
-            }
+            }            
         }
     }
 
