@@ -1,19 +1,19 @@
-//TODO this code is chaotic and needs better integration with the concepts in the
-//     new geometry.
-
-#include "./kernel_structure.h"
+#define buffer_index_to_box_index \
+        coord4 c = icoord[__idx_out_global]; \
+        int __idx_in_global = ipt_ext_gpu(c.x[0], c.x[1], c.x[2], c.x[3]); 
 
 #define _DECLARE_KERNEL(_name, _type, _size) \
-    __global__ void box_to_buffer_kernel_##_name(_type* field_in, int stride_in, int start_in, int master_shift_in, \
-                                                _type* field_out, int stride_out, int start_out, int master_shift_out, \
-                                                coord4* icoord, int* ipt_gpu) \
+    __global__ void box_to_buffer_kernel_##_name(kernel_field_input* input, coord4* icoord, int* ipt_gpu) \
     { \
-        _KERNEL_FOR (field_in, stride_in, start_in, master_shift_in, \
-                    field_out, stride_out, start_out, master_shift_out, \
-                    _type, _size) \
+        _KERNEL_FOR (input, _type, _size) \
         { \
             _find_index(buffer_index_to_box_index); \
-            _transfer_site(_type, _size); \
+            \
+            _type site; \
+            for (int comp = 0; comp < (_size); ++comp) { \
+                _IN_FIELD_AT(site, _type, comp); \
+                _WRITE_OUT_FIELD(site, _type, comp); \
+            } \
         } \
     }
 

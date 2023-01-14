@@ -3,10 +3,58 @@
 
 #include "./sync_to_buffer.hpp"
 
-#define _DECLARE_SYNC_BOX(_name, _type, _size) \
+static kernel_field_input* get_even_input(
+    void* lattice, 
+    void* sendbuf, 
+    box_t* srcbox) {
+        kernel_field_input* input;
+        input = (kernel_field_input*)malloc(sizeof(kernel_field_input));
+
+        input->field_in = lattice;
+        input->start_in = geometryBoxes->base_index;
+        input->stride_in = boxEvenVolume(geometryBoxes);
+        input->master_shift_in = 0;
+
+        input->field_out = sendbuf;
+        input->stride_out = boxEvenVolume(srcbox);
+        input->start_out = srcbox->base_index;
+        input->master_shift_out = 0;
+
+        kernel_field_input* d_input;
+        cudaError_t err;
+        cudaMalloc((void**)&d_input, sizeof(kernel_field_input));
+        cudaMemcpy(d_input, input, sizeof(kernel_field_input), cudaMemcpyHostToDevice);
+        return d_input;
+}
+
+static kernel_field_input* get_odd_input(
+    int master_shift,
+    void* lattice, 
+    void* sendbuf, 
+    box_t* srcbox) {
+        kernel_field_input* input;
+        input = (kernel_field_input*)malloc(sizeof(kernel_field_input));
+
+        input->field_in = lattice;
+        input->start_in = geometryBoxes->base_index_odd;
+        input->stride_in = boxOddVolume(geometryBoxes);
+        input->master_shift_in = master_shift;
+
+        input->field_out = sendbuf;
+        input->stride_out = boxOddVolume(srcbox);
+        input->start_out = srcbox->base_index_odd;
+        input->master_shift_out = 0;
+
+        kernel_field_input* d_input;
+        cudaMalloc((void**)&d_input, sizeof(kernel_field_input));
+        cudaMemcpy(d_input, input, sizeof(kernel_field_input), cudaMemcpyHostToDevice);
+        return d_input;
+}
+
+#define _DECLARE_SYNC_BOX(_name) \
     void sync_box_to_buffer_gpu_##_name(geometry_descriptor *gd, \
                                     box_t *src, \
-                                    _type *lattice, \
+                                    void *lattice, \
                                     void *sendbuf) \
     { \
         /* TODO: we do not want to compare pointers */ \
@@ -22,41 +70,28 @@
         cudaMemcpy(d_c, c, glattice.nbuffers_gauge*full_vol*sizeof(coord4), cudaMemcpyHostToDevice); \
         \
         if (gd_t & EVEN) { \
-            const int ixp = 0; \
-            const int buffer_stride = boxEvenVolume(src); \
-            const int buffer_start = src->base_index; \
-            const int grid = (buffer_stride - 1)/BLOCK_SIZE_SYNC + 1; \
-            const int block_stride = gd->master_end[ixp] - gd->master_start[ixp] + 1; \
-            const int block_start = gd->master_start[ixp]; \
-            box_to_buffer_kernel_##_name<<<grid, BLOCK_SIZE_SYNC>>>((_type*)lattice, block_stride, block_start, gd->master_shift, \
-                                                                    (_type*)sendbuf, buffer_stride, buffer_start, 0, d_c, ipt_gpu); \
+            kernel_field_input* input = get_even_input(lattice, sendbuf, src); \
+            const int grid = (boxEvenVolume(src) - 1)/BLOCK_SIZE_SYNC + 1; \
+            box_to_buffer_kernel_##_name<<<grid, BLOCK_SIZE_SYNC>>>(input, d_c, ipt_gpu); \
         } \
         if (gd_t & ODD) { \
-            const int ixp = (gd_t == GLOBAL) ? 1 : 0; \
-            const int buffer_stride = boxOddVolume(src); \
-            const int buffer_start = src->base_index_odd; \
-            const int grid = (buffer_stride - 1)/BLOCK_SIZE_SYNC + 1; \
-            const int block_stride = gd->master_end[ixp] - gd->master_start[ixp] + 1; \
-            const int block_start = gd->master_start[ixp]; \
-            box_to_buffer_kernel_##_name<<<grid, BLOCK_SIZE_SYNC>>>((_type*)lattice, block_stride, block_start, gd->master_shift, \
-                                                                    (_type*)sendbuf, buffer_stride, buffer_start, 0, d_c, ipt_gpu); \
+            kernel_field_input* input = get_odd_input(gd->master_shift, lattice, sendbuf, src); \
+            const int grid = (boxOddVolume(src) - 1)/BLOCK_SIZE_SYNC + 1; \
+            box_to_buffer_kernel_##_name<<<grid, BLOCK_SIZE_SYNC>>>(input, d_c, ipt_gpu); \
         }\
     } 
 
-#define _DECLARE_SYNC_FUNCTIONS(_name, _type, _size, _geom) \
-    _DECLARE_SYNC_BOX(_name, _type, _size) 
+_DECLARE_SYNC_BOX(spinor_field_f);
+_DECLARE_SYNC_BOX(spinor_field_f_flt);
+_DECLARE_SYNC_BOX(sfield);
 
-_DECLARE_SYNC_FUNCTIONS(spinor_field_f, suNf_spinor, 1, spinor);
-_DECLARE_SYNC_FUNCTIONS(spinor_field_f_flt, suNf_spinor_flt, 1, spinor);
-_DECLARE_SYNC_FUNCTIONS(sfield, double, 1, spinor);
-
-_DECLARE_SYNC_FUNCTIONS(gfield, suNg, 4, gauge);
-_DECLARE_SYNC_FUNCTIONS(gfield_flt, suNg_flt, 4, gauge);
-_DECLARE_SYNC_FUNCTIONS(gfield_f, suNf, 4, gauge);
-_DECLARE_SYNC_FUNCTIONS(gfield_f_flt, suNf_flt, 4, gauge);
-_DECLARE_SYNC_FUNCTIONS(suNg_scalar_field, suNg_vector, 1, gauge);
-_DECLARE_SYNC_FUNCTIONS(avfield, suNg_algebra_vector, 4, gauge);
-_DECLARE_SYNC_FUNCTIONS(gtransf, suNg, 1, gauge);
-_DECLARE_SYNC_FUNCTIONS(clover_ldl, ldl_t, 1, gauge);
-_DECLARE_SYNC_FUNCTIONS(clover_term, suNfc, 4, gauge);
-_DECLARE_SYNC_FUNCTIONS(clover_force, suNf, 6, gauge);
+_DECLARE_SYNC_BOX(gfield);
+_DECLARE_SYNC_BOX(gfield_flt);
+_DECLARE_SYNC_BOX(gfield_f);
+_DECLARE_SYNC_BOX(gfield_f_flt);
+_DECLARE_SYNC_BOX(suNg_scalar_field);
+_DECLARE_SYNC_BOX(avfield);
+_DECLARE_SYNC_BOX(gtransf);
+_DECLARE_SYNC_BOX(clover_ldl);
+_DECLARE_SYNC_BOX(clover_term);
+_DECLARE_SYNC_BOX(clover_force);

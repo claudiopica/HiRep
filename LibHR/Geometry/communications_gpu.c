@@ -34,7 +34,7 @@
                 if (f->type==&glattice) nbuffers /= 2;                                                                              \
                 while (L && i < nbuffers)                                                                                           \
                 {                                                                                                                   \
-                    sync_box_to_buffer_gpu_##_name(f->type, L->sendBox, f->gpu_ptr, f->sendbuf_gpu_ptr);                            \
+                    sync_box_to_buffer_gpu_##_name(f->type, L->sendBox, (void*)f->gpu_ptr, (void*)f->sendbuf_gpu_ptr);                            \
                     L=L->next; i++;                                                                                                 \
                 }                                                                                                                   \
             }

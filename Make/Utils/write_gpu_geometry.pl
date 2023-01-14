@@ -86,8 +86,8 @@ sub write_prolog {
  *        than in host memory. Documentation on this can be found in the HiRep 
  *        Development Guide, section GPU Geometry.
 */
-#ifndef GPU_GEOMETRY_H
-#define GPU_GEOMETRY_H
+#ifndef STRIDED_READS_H
+#define STRIDED_READS_H
 
 #ifdef WITH_GPU
 END

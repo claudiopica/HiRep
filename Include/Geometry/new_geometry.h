@@ -40,6 +40,15 @@ enum box_type {
     SENDBUF = 5
 };
 
+// TODO: this should be in geometry.h and geometry descriptor should contain it
+// enum to define geometry type
+// this is a simple bitmask with GLOBAL = EVEN | ODD
+enum gd_type {
+    EVEN   = 1, 
+    ODD    = 2,
+    GLOBAL = 3
+};
+
 //  ----h
 //  ....|  NB: the h[4] is not in the box,   
 //  ....|  i.e. coordinates needs to be l[]<= p[] <h[] 
@@ -50,6 +59,7 @@ typedef struct box_t {
     int base_index;
     int base_index_odd;
     int parity; //0 -> base point is even; 1 -> basepoint is odd
+    enum gd_type gd_t;
     char mask; //tells if the box is a border, e.g. if T_UP_MASK is set the box is in top T border of the extended lattice
     enum box_type type; // tell the type of the box, just a convenience for testing
     int *ipt_ext; //given the cordinate of a point in the box returns an index
@@ -61,22 +71,15 @@ typedef struct box_t {
 //TODO: do we want to add vol, even_vol, odd_vol for avoid recomputing them every time?
 //TODO: do we want to precompute ipt_ext for sendboxes?
 
-// TODO: this should be in geometry.h and geometry descriptor should contain it
-// enum to define geometry type
-// this is a simple bitmask with GLOBAL = EVEN | ODD
-enum gd_type {
-    EVEN   = 1, 
-    ODD    = 2,
-    GLOBAL = 3
-};
+
 
 int boxEvenVolume(box_t *B);
 int boxOddVolume(box_t *B);
 int boxVolume(box_t*);
 
 #define _DECLARE_SYNC_TO_BUFFER(_name, _type) \
-    void sync_box_to_buffer_gpu_##_name(geometry_descriptor*,box_t*,_type*,void*); \
-    void sync_field_to_buffer_##_name(geometry_descriptor*,_type*,void*);
+    void sync_box_to_buffer_gpu_##_name(geometry_descriptor*,box_t*,void*,void*); \
+    void sync_field_to_buffer_##_name(geometry_descriptor*,void*,void*);
 
 _DECLARE_SYNC_TO_BUFFER(spinor_field_f, suNf_spinor);
 _DECLARE_SYNC_TO_BUFFER(spinor_field_f_flt, suNf_spinor_flt);
