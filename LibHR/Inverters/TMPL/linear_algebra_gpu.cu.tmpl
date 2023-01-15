@@ -3,8 +3,36 @@
 * All rights reserved.                                                      *
 \***************************************************************************/
 
+#include "../linear_algebra_gpu_kernels.hpp"
+
+// Error checking
+#if !defined(_SPINOR_FIELD_TYPE)
+#error Missing _SPINOR_FIELD_TYPE in linear_algebra_gpu.cu
+#endif
+#if !defined(_SPINOR_TYPE)
+#error Missing _SPINOR_TYPE in linear_algebra_gpu.cu
+#endif
+#if !defined(_REAL)
+#error Missing _REAL in linear_algebra_gpu.cu
+#endif
+#if !defined(_COMPLEX)
+#error Missing _COMPLEX in linear_algebra_gpu.cu
+#endif
+#if !defined(_SUFFIX)
+#error Missing _SUFFIX in linear_algebra_gpu.cu
+#endif
+
+
+// Internal macro for defining generic functions and alias function pointers
+#define _CONCAT(_name,_suffix) _name ## _suffix
+#define _F_NAME(_name,_suffix) _CONCAT(_name,_suffix)
+#define _GPU_F_NAME(_name,_suffix) _CONCAT(_name,_suffix ## _gpu)
+#define _FUNC_INNER(a,b,_suffix,c) a _GPU_F_NAME(b,_suffix) c
+#define _FUNC(a,b,c) _FUNC_INNER(a,b,_SUFFIX,c)
+
 #define _TOCOMPLEX(sp) ((_COMPLEX *)(sp))
 #define _NCOM (sizeof(_SPINOR_TYPE)/sizeof(_COMPLEX))
+
 
 #define _CUDA_FOR(s,ixp,body) \
   do { \
@@ -18,10 +46,10 @@
   } while(0)
 
 _FUNC(void, spinor_field_copy, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
-_BODY({
+{
   _TWO_SPINORS_MATCHING(s1,s2);
   cudaMemcpy(s1->gpu_ptr,s2->gpu_ptr,s1->type->gsize_spinor*sizeof(_SPINOR_TYPE),cudaMemcpyDeviceToDevice);
-})
+}
 
 /* auxillary functions for GPU reductions */
 #ifndef ALLOC_AUX_GPU
@@ -71,7 +99,7 @@ T global_sum_gpu(T *vector, int size);
 
 /* Re <s1,s2> */
 _FUNC(double, spinor_field_prod_re, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
-_BODY({
+{
   _TWO_SPINORS_MATCHING(s1,s2);
   double res = 0.0;
   double *resPiece;
@@ -86,11 +114,11 @@ _BODY({
 #endif
 
   return res;
-})
+}
 
 /* Im <s1,s2> */
 _FUNC(double, spinor_field_prod_im, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
-_BODY({
+{
   _TWO_SPINORS_MATCHING(s1,s2);
   double res = 0.0;
   double *resPiece;
@@ -105,11 +133,11 @@ _BODY({
 #endif
 
   return res;
-})
+}
 
 /* <s1,s2> */
 _FUNC(hr_complex, spinor_field_prod, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
-_BODY({
+{
   _TWO_SPINORS_MATCHING(s1,s2);
   hr_complex res = 0.0;
   hr_complex *resPiece;
@@ -124,11 +152,11 @@ _BODY({
 #endif
 
   return res;
-})
+}
 
 /* Re <g5*s1,s2> */
 _FUNC(double, spinor_field_g5_prod_re, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
-_BODY({
+{
   _TWO_SPINORS_MATCHING(s1,s2);
   double res = 0.0;
   double *resPiece;
@@ -148,11 +176,11 @@ _BODY({
 #endif
 
   return res;
-})
+}
 
 /* Im <g5*s1,s2> */
 _FUNC(double, spinor_field_g5_prod_im, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
-_BODY({
+{
   _TWO_SPINORS_MATCHING(s1,s2);
   double res = 0.0;
   double *resPiece;
@@ -172,11 +200,11 @@ _BODY({
 #endif
 
   return res;
-})
+}
 
 /* Re <s1,s1> */
 _FUNC(double, spinor_field_sqnorm, (_SPINOR_FIELD_TYPE *s1))
-_BODY({
+{
   double res = 0.0;
   double *resPiece;
 
@@ -190,141 +218,141 @@ _BODY({
 #endif
 
   return res;
-})
+}
 
 /* s1+=r*s2 r real */
 _FUNC(void, spinor_field_mul_add_assign, (_SPINOR_FIELD_TYPE *s1, _REAL r, _SPINOR_FIELD_TYPE *s2))
-_BODY({
+{
   _TWO_SPINORS_MATCHING(s1,s2);
   _CUDA_FOR(s1,ixp,
             (spinor_field_mul_add_assign_gpu<<<grid_size,BLOCK_SIZE>>>(_TOCOMPLEX(_GPU_FIELD_BLK(s1,ixp)),r,_TOCOMPLEX(_GPU_FIELD_BLK(s2,ixp)),N))
   );
-})
+}
 
 /* s1+=c*s2 c complex */
 _FUNC(void, spinor_field_mulc_add_assign, (_SPINOR_FIELD_TYPE *s1, _COMPLEX c, _SPINOR_FIELD_TYPE *s2))
-_BODY({
+{
   _TWO_SPINORS_MATCHING(s1,s2);
   _CUDA_FOR(s1,ixp,
             (spinor_field_mulc_add_assign_gpu<<<grid_size,BLOCK_SIZE>>>(_TOCOMPLEX(_GPU_FIELD_BLK(s1,ixp)),c,_TOCOMPLEX(_GPU_FIELD_BLK(s2,ixp)),N))
   );
-})
+}
 
 /* s1=r*s2 */
 _FUNC(void, spinor_field_mul, (_SPINOR_FIELD_TYPE *s1, _REAL r, _SPINOR_FIELD_TYPE *s2))
-_BODY({
+{
   _TWO_SPINORS_MATCHING(s1,s2);
   _CUDA_FOR(s1,ixp,
             (spinor_field_mul_gpu<<<grid_size,BLOCK_SIZE>>>(_TOCOMPLEX(_GPU_FIELD_BLK(s1,ixp)),r,_TOCOMPLEX(_GPU_FIELD_BLK(s2,ixp)),N))
   );
-})
+}
 
 /* s1=c*s2 c complex */
 _FUNC(void, spinor_field_mulc, (_SPINOR_FIELD_TYPE *s1, _COMPLEX c, _SPINOR_FIELD_TYPE *s2))
-_BODY({
+{
   _TWO_SPINORS_MATCHING(s1,s2);
   _CUDA_FOR(s1,ixp,
             (spinor_field_mulc_gpu<<<grid_size,BLOCK_SIZE>>>(_TOCOMPLEX(_GPU_FIELD_BLK(s1,ixp)),c,_TOCOMPLEX(_GPU_FIELD_BLK(s2,ixp)),N))
   );
-})
+}
 
 /* r=s1+s2 */
 _FUNC(void, spinor_field_add, (_SPINOR_FIELD_TYPE *r, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
-_BODY({
+{
   _TWO_SPINORS_MATCHING(s1,s2);
   _CUDA_FOR(s1,ixp,
             (spinor_field_add_gpu<<<grid_size,BLOCK_SIZE>>>(_TOCOMPLEX(_GPU_FIELD_BLK(r,ixp)),_TOCOMPLEX(_GPU_FIELD_BLK(s1,ixp)),_TOCOMPLEX(_GPU_FIELD_BLK(s2,ixp)),N));
   );
-})
+}
 
 /* r=s1-s2 */
 _FUNC(void, spinor_field_sub, (_SPINOR_FIELD_TYPE *r, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
-_BODY({
+{
   _TWO_SPINORS_MATCHING(s1,s2);
   _CUDA_FOR(s1,ixp,
             (spinor_field_sub_gpu<<<grid_size,BLOCK_SIZE>>>(_TOCOMPLEX(_GPU_FIELD_BLK(r,ixp)),_TOCOMPLEX(_GPU_FIELD_BLK(s1,ixp)),_TOCOMPLEX(_GPU_FIELD_BLK(s2,ixp)),N));
   );
-})
+}
 
 /* s1+=s2 */
 _FUNC(void, spinor_field_add_assign, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
-_BODY({
+{
   _TWO_SPINORS_MATCHING(s1,s2);
   _CUDA_FOR(s1,ixp,
             (spinor_field_add_assign_gpu<<<grid_size,BLOCK_SIZE>>>(_TOCOMPLEX(_GPU_FIELD_BLK(s1,ixp)),_TOCOMPLEX(_GPU_FIELD_BLK(s2,ixp)),N));
   );
-})
+}
 
 /* s1-=s2 */
 _FUNC(void, spinor_field_sub_assign, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
-_BODY({
+{
   _TWO_SPINORS_MATCHING(s1,s2);
   _CUDA_FOR(s1,ixp,
             (spinor_field_sub_assign_gpu<<<grid_size,BLOCK_SIZE>>>(_TOCOMPLEX(_GPU_FIELD_BLK(s1,ixp)),_TOCOMPLEX(_GPU_FIELD_BLK(s2,ixp)),N));
   );
-})
+}
 
 /* s1=0 */
 _FUNC(void, spinor_field_zero, (_SPINOR_FIELD_TYPE *s1))
-_BODY({
+{
   _CUDA_FOR(s1,ixp,
             (spinor_field_zero_gpu<<<grid_size,BLOCK_SIZE>>>(_TOCOMPLEX(_GPU_FIELD_BLK(s1,ixp)),N));
   );
-})
+}
 
 /* s1=-s2 */
 _FUNC(void, spinor_field_minus, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
-_BODY({
+{
   _TWO_SPINORS_MATCHING(s1,s2);
   _CUDA_FOR(s1,ixp,
             (spinor_field_minus_gpu<<<grid_size,BLOCK_SIZE>>>(_TOCOMPLEX(_GPU_FIELD_BLK(s1,ixp)),_TOCOMPLEX(_GPU_FIELD_BLK(s2,ixp)),N));
   );
-})
+}
 
 /* s1=r1*s2+r2*s3 */
 _FUNC(void, spinor_field_lc, (_SPINOR_FIELD_TYPE *s1, _REAL r1, _SPINOR_FIELD_TYPE *s2, _REAL r2, _SPINOR_FIELD_TYPE *s3))
-_BODY({
+{
   _TWO_SPINORS_MATCHING(s1,s2);
   _TWO_SPINORS_MATCHING(s1,s3);
   _CUDA_FOR(s1,ixp,
             (spinor_field_lc_gpu<<<grid_size,BLOCK_SIZE>>>(_TOCOMPLEX(_GPU_FIELD_BLK(s1,ixp)),r1,_TOCOMPLEX(_GPU_FIELD_BLK(s2,ixp)),r2,_TOCOMPLEX(_GPU_FIELD_BLK(s3,ixp)),N));
   );
-})
+}
 
 /* s1+=r1*s2+r2*s3 */
 _FUNC(void, spinor_field_lc_add_assign, (_SPINOR_FIELD_TYPE *s1, _REAL r1, _SPINOR_FIELD_TYPE *s2, _REAL r2, _SPINOR_FIELD_TYPE *s3))
-_BODY({
+{
   _TWO_SPINORS_MATCHING(s1,s2);
   _TWO_SPINORS_MATCHING(s1,s3);
   _CUDA_FOR(s1,ixp,
             (spinor_field_lc_add_assign_gpu<<<grid_size,BLOCK_SIZE>>>(_TOCOMPLEX(_GPU_FIELD_BLK(s1,ixp)),r1,_TOCOMPLEX(_GPU_FIELD_BLK(s2,ixp)),r2,_TOCOMPLEX(_GPU_FIELD_BLK(s3,ixp)),N));
   );
-})
+}
 
 /* s1=c1*s2+c2*s3 c1, c2 complex*/
 _FUNC(void, spinor_field_clc, (_SPINOR_FIELD_TYPE *s1, _COMPLEX c1, _SPINOR_FIELD_TYPE *s2, _COMPLEX c2, _SPINOR_FIELD_TYPE *s3))
-_BODY({
+{
   _TWO_SPINORS_MATCHING(s1,s2);
   _TWO_SPINORS_MATCHING(s1,s3);
   _CUDA_FOR(s1,ixp,
             (spinor_field_clc_gpu<<<grid_size,BLOCK_SIZE>>>(_TOCOMPLEX(_GPU_FIELD_BLK(s1,ixp)),c1,_TOCOMPLEX(_GPU_FIELD_BLK(s2,ixp)),c2,_TOCOMPLEX(_GPU_FIELD_BLK(s3,ixp)),N));
   );
-})
+}
 
 /* s1+=c1*s2+c2*s3 c1, c2 complex*/
 _FUNC(void, spinor_field_clc_add_assign, (_SPINOR_FIELD_TYPE *s1, _COMPLEX c1, _SPINOR_FIELD_TYPE *s2, _COMPLEX c2, _SPINOR_FIELD_TYPE *s3))
-_BODY({
+{
   _TWO_SPINORS_MATCHING(s1,s2);
   _TWO_SPINORS_MATCHING(s1,s3);
   _CUDA_FOR(s1,ixp,
             (spinor_field_clc_add_assign_gpu<<<grid_size,BLOCK_SIZE>>>(_TOCOMPLEX(_GPU_FIELD_BLK(s1,ixp)),c1,_TOCOMPLEX(_GPU_FIELD_BLK(s2,ixp)),c2,_TOCOMPLEX(_GPU_FIELD_BLK(s3,ixp)),N));
   );
-})
+}
 
 
 /* s1=g5*s2  */
 _FUNC(void, spinor_field_g5, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
-_BODY({
+{
    _TWO_SPINORS_MATCHING(s1,s2);
    _PIECE_FOR(s1->type, ixp){
       unsigned int N = s1->type->master_end[ixp] - s1->type->master_start[ixp] + 1;
@@ -334,11 +362,11 @@ _BODY({
       (spinor_field_minus_gpu<<<grid_size,BLOCK_SIZE>>>(_TOCOMPLEX(_GPU_FIELD_BLK(s1,ixp))+N/2,_TOCOMPLEX(_GPU_FIELD_BLK(s2,ixp))+N/2,N/2));
       CudaCheckError();
    }
-})
+}
 
 /* s1=g5*s1  */
 _FUNC(void, spinor_field_g5_assign, (_SPINOR_FIELD_TYPE *s1))
-_BODY({
+{
    _PIECE_FOR(s1->type, ixp){
       unsigned int N = s1->type->master_end[ixp] - s1->type->master_start[ixp] + 1;
       N *= _NCOM;
@@ -346,11 +374,11 @@ _BODY({
       (spinor_field_minus_assign_gpu<<<grid_size,BLOCK_SIZE>>>(_TOCOMPLEX(_GPU_FIELD_BLK(s1,ixp))+N/2,N/2));
       CudaCheckError();
    }
-})
+}
 
 /* s1+=c*g5*s2 c complex */
 _FUNC(void, spinor_field_g5_mulc_add_assign, (_SPINOR_FIELD_TYPE *s1, _COMPLEX c, _SPINOR_FIELD_TYPE *s2))
-_BODY({
+{
    _TWO_SPINORS_MATCHING(s1,s2);
    _PIECE_FOR(s1->type, ixp){
       unsigned int N = s1->type->master_end[ixp] - s1->type->master_start[ixp] + 1;
@@ -360,27 +388,27 @@ _BODY({
       (spinor_field_g5_mulc_add_assign_gpu<<<grid_size,BLOCK_SIZE>>>(_TOCOMPLEX(_GPU_FIELD_BLK(s1,ixp))+N/2,c,_TOCOMPLEX(_GPU_FIELD_BLK(s2,ixp))+N/2,N/2));
       CudaCheckError();
    }
-})
+}
 
 /* tools per eva.c  */
 _FUNC(void, spinor_field_lc1, (_REAL c1, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
-_BODY({
+{
   _TWO_SPINORS_MATCHING(s1,s2);
   _CUDA_FOR(s1,ixp,
             (spinor_field_lc1_gpu<<<grid_size,BLOCK_SIZE>>>(c1,_TOCOMPLEX(_GPU_FIELD_BLK(s1,ixp)),_TOCOMPLEX(_GPU_FIELD_BLK(s2,ixp)),N));
   );
-})
+}
 
 _FUNC(void, spinor_field_lc2, (_REAL c1, _REAL c2, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
-_BODY({
+{
   _TWO_SPINORS_MATCHING(s1,s2);
   _CUDA_FOR(s1,ixp,
             (spinor_field_lc2_gpu<<<grid_size,BLOCK_SIZE>>>(c1,c2,_TOCOMPLEX(_GPU_FIELD_BLK(s1,ixp)),_TOCOMPLEX(_GPU_FIELD_BLK(s2,ixp)),N));
   );
-})
+}
 
 _FUNC(void, spinor_field_lc3, (_REAL c1, _REAL c2, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2, _SPINOR_FIELD_TYPE *s3))
-_BODY({
+{
   _TWO_SPINORS_MATCHING(s1,s2);
   /* c1=-c1; c2=-c2; */
   _REAL cc1=-c1;
@@ -388,18 +416,34 @@ _BODY({
   _CUDA_FOR(s1,ixp,
             (spinor_field_lc3_gpu<<<grid_size,BLOCK_SIZE>>>(cc1,cc2,_TOCOMPLEX(_GPU_FIELD_BLK(s1,ixp)),_TOCOMPLEX(_GPU_FIELD_BLK(s2,ixp)),_TOCOMPLEX(_GPU_FIELD_BLK(s3,ixp)),N));
   );
-})
+}
 
 /* Placeholder functions, there need to be the same definitions in linear_algebra.c.sdtmpl and linear_algebra_gpu.c.sdtmpl */
 _FUNC(void, spinor_field_g0, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
-_BODY({})
+{}
 _FUNC(void, spinor_field_g1, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
-_BODY({})
+{}
 _FUNC(void, spinor_field_g2, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
-_BODY({})
+{}
 _FUNC(void, spinor_field_g3, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
-_BODY({})
+{}
 
 
 #undef _TOCOMPLEX
 #undef _NCOM
+
+//undefine macros
+//internal macros
+#undef _CONCAT
+#undef _F_NAME
+#undef _GPU_F_NAME
+#undef _FUNC_INNER
+#undef _FUNC
+
+//user interface macros
+#undef _SPINOR_FIELD_TYPE
+#undef _SPINOR_TYPE
+#undef _REAL
+#undef _COMPLEX
+#undef _SUFFIX
+

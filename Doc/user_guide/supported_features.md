@@ -106,7 +106,7 @@ normalized so that \f$T_f=1/2\f$. The generators for the other representations
 will be obtained in the following.
 
 We first give the explicit form for the representation functions \f$R\f$ which map 
-$U\rightarrow U^R$. We define for each representation an orthonormal base \f$e_R\f$ for 
+\f$U\rightarrow U^R\f$. We define for each representation an orthonormal base \f$e_R\f$ for 
 the appropriate vector space of matrices. 
 
 For the Adjoint representation we define the base \f$e_{Adj}\f$ for the \f$N\times N\f$ 
@@ -133,7 +133,7 @@ i=j \, ,\,\,\,&e^{(ii)}_S&=\begin{pmatrix}
 where the non zero entries are at position \f$(i,j)\f$, etc.
 
 For the two-index Antisymmetric representation the base \f$e^{(ij)}_{AS}\f$, with \f$i<j\f$, for 
-the \f$N\times N\f$ symmetric matrices is given by:
+the \f$N\times N\f$ antisymmetric matrices is given by:
 \f{equation}{
 e^{(ij)}_{AS}=\frac{1}{\sqrt{2}}\begin{pmatrix} 
 0&1&0&\dots\\

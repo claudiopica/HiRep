@@ -7,63 +7,32 @@
 #define LINEAR_ALGEBRA_H
 
 #include "hr_complex.h"
-#include "suN.h"
 #include "spinor_field.h"
 
 #ifdef __cplusplus
   extern "C" {
 #endif
 
-/*
- * LINEAR ALGEBRA FUNCTIONS ARE DEFINED IN THE TEMPLATE
- *
- * TMPL/linear_algebra.c.sdtmpl
- *
- */
+// Linear Algebra functions are generic
+// They are parametrized over the input types for double/single precision
+// The template is in TMPL/linear_algebra.h.tmpl
 
-/* double precision */
+// double precision 
 #define _SPINOR_FIELD_TYPE spinor_field
+#define _SPINOR_TYPE suNf_spinor
 #define _REAL double
 #define _COMPLEX hr_complex
+#define _SUFFIX _f
+#include "TMPL/linear_algebra.h.tmpl"
 
-// GPU functions
-#ifdef WITH_GPU
-#define _GPU_FUNC(a,b,c) a b##_f_gpu c ;
-#else 
-#define _GPU_FUNC(a,b,c) 
-#endif
-
-// Declare functions and alias function pointers
-#define _FUNC(a,b,c) _GPU_FUNC(a,b,c) a b##_f_cpu c; extern a (*b##_f) c
-#include "./TMPL/linear_algebra.h.sdtmpl"
-#undef _FUNC
-#undef _GPU_FUNC
-
-#undef _SPINOR_FIELD_TYPE
-#undef _REAL
-#undef _COMPLEX
-
-/* single precision */
+// single precision 
 #define _SPINOR_FIELD_TYPE spinor_field_flt
+#define _SPINOR_TYPE suNf_spinor_flt
 #define _REAL float
 #define _COMPLEX hr_complex_flt
+#define _SUFFIX _f_flt
+#include "TMPL/linear_algebra.h.tmpl"
 
-// Declare GPU functions
-#ifdef WITH_GPU
-#define _GPU_FUNC(a,b,c) a b##_f_flt_gpu c ;
-#else 
-#define _GPU_FUNC(a,b,c) 
-#endif
-
-// Declare CPU functions
-#define _FUNC(a,b,c) _GPU_FUNC(a,b,c) a b##_f_flt_cpu c; extern a (*b##_f_flt) c
-#include "./TMPL/linear_algebra.h.sdtmpl"
-#undef _FUNC
-#undef _GPU_FUNC
-
-#undef _SPINOR_FIELD_TYPE
-#undef _REAL
-#undef _COMPLEX
 
 #ifdef __cplusplus
   }

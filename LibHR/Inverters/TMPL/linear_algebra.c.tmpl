@@ -5,6 +5,38 @@
 
 #include <string.h>
 
+// Error checking
+#if !defined(_SPINOR_FIELD_TYPE)
+#error Missing _SPINOR_FIELD_TYPE in linear_algebra.c
+#endif
+#if !defined(_SPINOR_TYPE)
+#error Missing _SPINOR_TYPE in linear_algebra.c
+#endif
+#if !defined(_REAL)
+#error Missing _REAL in linear_algebra.c
+#endif
+#if !defined(_COMPLEX)
+#error Missing _COMPLEX in linear_algebra.c
+#endif
+#if !defined(_SUFFIX)
+#error Missing _SUFFIX in linear_algebra.c
+#endif
+
+
+// Internal macro for defining generic functions and alias function pointers
+#define _CONCAT(_name,_suffix) _name ## _suffix
+#define _F_NAME(_name,_suffix) _CONCAT(_name,_suffix)
+#define _CPU_F_NAME(_name,_suffix) _CONCAT(_name,_suffix ## _cpu)
+#define _GPU_F_NAME(_name,_suffix) _CONCAT(_name,_suffix ## _gpu)
+#define _FUNC_INNER(a,b,_suffix,c) a _CPU_F_NAME(b,_suffix) c
+#ifdef WITH_GPU
+#define _ALIAS_INNER(a,b,_suffix,c) a (*_F_NAME(b,_suffix)) c = _GPU_F_NAME(b,_suffix)
+#else
+#define _ALIAS_INNER(a,b,_suffix,c) a (*_F_NAME(b,_suffix)) c = _CPU_F_NAME(b,_suffix)
+#endif
+#define _FUNC(a,b,c) _ALIAS_INNER(a,b,_SUFFIX,c); _FUNC_INNER(a,b,_SUFFIX,c)
+
+
 /* s1=s2 */
 _FUNC(void, spinor_field_copy, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
 {
@@ -344,4 +376,21 @@ _FUNC(void, spinor_field_lc3, (_REAL c1, _REAL c2, _SPINOR_FIELD_TYPE *s1, _SPIN
         _spinor_minus_f(*_SPINOR_PTR(s3),*_SPINOR_PTR(s3));
     }
 }
+
+//undefine macros
+//internal macros
+#undef _CONCAT
+#undef _F_NAME
+#undef _CPU_F_NAME
+#undef _GPU_F_NAME
+#undef _FUNC_INNER
+#undef _ALIAS_INNER
+#undef _FUNC
+
+//user interface macros
+#undef _SPINOR_FIELD_TYPE
+#undef _SPINOR_TYPE
+#undef _REAL
+#undef _COMPLEX
+#undef _SUFFIX
 
