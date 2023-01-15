@@ -24,7 +24,7 @@ if (not (-e $builddir)) {
 }
 if (not (-s $ninja_file) || $always_generate_ninja) {
      print "Generating Ninja build file [$ninja_file]\n";
-     system("$rootdir/Make/build.pl > $ninja_file");
+     system("$rootdir/Make/build.pl > $ninja_file") or die("Failed to run build.pl: $!");;
 }
 
 my $ninja_cmd = "ninja -C $rootdir -f $ninja_file ";
