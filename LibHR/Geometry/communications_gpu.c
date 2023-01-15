@@ -116,16 +116,16 @@ static inline void zeroes_float(float* flt, int n) {
 
 #else //not WITH_MPI
 
-#define _DECLARE_SYNC_FIELD(_name, _field_type, _site_type, _size, _geom) \
+#define _DECLARE_SYNC_FIELD(_name, _field_type, ...) \
     void sync_gpu_##_name(_field_type *f) {}
 
-#define _DECLARE_START_SENDRECV(_name, _field_type, _site_type, _size, _geom) \
+#define _DECLARE_START_SENDRECV(_name, _field_type, ...) \
     void start_sendrecv_gpu_##_name(_field_type *f) {}
 
-#define _DECLARE_COMPLETE_SENDRECV(_name, _field_type, _site_type, _size, _geom) \
+#define _DECLARE_COMPLETE_SENDRECV(_name, _field_type, ...) \
     void complete_sendrecv_gpu_##_name(_field_type *f) {}
 
-#define _DECLARE_FILL_BUFFERS(_name, _field_type, _site_type, _prec_type, _size, _geom) \
+#define _DECLARE_FILL_BUFFERS(_name, _field_type, ...) \
     void fill_buffers_##_name(_field_type *f) {}
 
 #endif
