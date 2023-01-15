@@ -26,9 +26,9 @@
 #define _F_NAME(_name,_suffix) _CONCAT(_name,_suffix)
 #define _CPU_F_NAME(_name,_suffix) _CONCAT(_name,_suffix ## _cpu)
 #define _GPU_F_NAME(_name,_suffix) _CONCAT(_name,_suffix ## _gpu)
-#define _CPU_FUNC_INNER(a,b,_suffix,c) a _CPU_F_NAME(b,_suffix) c
-#define _GPU_FUNC_INNER(a,b,_suffix,c) a _GPU_F_NAME(b,_suffix) c
-#define _PTR_FUNC_INNER(a,b,_suffix,c) a (*_F_NAME(b,_suffix)) c
+#define _CPU_FUNC_INNER(_type,_name,_suffix,_args) _type _CPU_F_NAME(_name,_suffix) _args
+#define _GPU_FUNC_INNER(_type,_name,_suffix,_args) _type _GPU_F_NAME(_name,_suffix) _args
+#define _PTR_FUNC_INNER(_type,_name,_suffix,_args) extern _type (*_F_NAME(_name,_suffix)) _args
 #ifdef WITH_GPU
 #define _FUNC(a,b,c) _PTR_FUNC_INNER(a,b,_SUFFIX,c); _CPU_FUNC_INNER(a,b,_SUFFIX,c); _GPU_FUNC_INNER(a,b,_SUFFIX,c)
 #else

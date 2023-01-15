@@ -522,11 +522,10 @@ EOF
     "files.associations": {
         "*.h": "c",
         "*.c": "c",
-        "*.[hc].sdtmpl": "c",
-        "*.h.tmpl": "c",
-        "*.hpp": "cuda",
-        "*.cu": "cuda",
-        "*.cu.sdtmpl": "cuda",
+        "*.[hc].tmpl": "c",
+        "*.hpp": "cpp",
+        "*.cu": "cpp",
+        "*.cu.sdtmpl": "cpp",
     }
 }
 EOF

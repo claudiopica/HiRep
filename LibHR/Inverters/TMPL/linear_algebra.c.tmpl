@@ -28,13 +28,13 @@
 #define _F_NAME(_name,_suffix) _CONCAT(_name,_suffix)
 #define _CPU_F_NAME(_name,_suffix) _CONCAT(_name,_suffix ## _cpu)
 #define _GPU_F_NAME(_name,_suffix) _CONCAT(_name,_suffix ## _gpu)
-#define _FUNC_INNER(a,b,_suffix,c) a _CPU_F_NAME(b,_suffix) c
+#define _FUNC_INNER(_type,_name,_suffix,_args) _type _CPU_F_NAME(_name,_suffix) _args
 #ifdef WITH_GPU
-#define _ALIAS_INNER(a,b,_suffix,c) a (*_F_NAME(b,_suffix)) c = _GPU_F_NAME(b,_suffix)
+#define _ALIAS_INNER(_type,_name,_suffix,_args) _type (*_F_NAME(_name,_suffix)) _args = _GPU_F_NAME(_name,_suffix)
 #else
-#define _ALIAS_INNER(a,b,_suffix,c) a (*_F_NAME(b,_suffix)) c = _CPU_F_NAME(b,_suffix)
+#define _ALIAS_INNER(_type,_name,_suffix,_args) _type (*_F_NAME(_name,_suffix)) _args = _CPU_F_NAME(_name,_suffix)
 #endif
-#define _FUNC(a,b,c) _ALIAS_INNER(a,b,_SUFFIX,c); _FUNC_INNER(a,b,_SUFFIX,c)
+#define _FUNC(_type,_name,_args) _ALIAS_INNER(_type,_name,_SUFFIX,_args); _FUNC_INNER(_type,_name,_SUFFIX,_args)
 
 
 /* s1=s2 */

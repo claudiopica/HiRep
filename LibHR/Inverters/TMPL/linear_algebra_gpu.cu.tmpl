@@ -27,8 +27,8 @@
 #define _CONCAT(_name,_suffix) _name ## _suffix
 #define _F_NAME(_name,_suffix) _CONCAT(_name,_suffix)
 #define _GPU_F_NAME(_name,_suffix) _CONCAT(_name,_suffix ## _gpu)
-#define _FUNC_INNER(a,b,_suffix,c) a _GPU_F_NAME(b,_suffix) c
-#define _FUNC(a,b,c) _FUNC_INNER(a,b,_SUFFIX,c)
+#define _FUNC_INNER(_type,_name,_suffix,_args) _type _GPU_F_NAME(_name,_suffix) _args
+#define _FUNC(_type,_name,_args) _FUNC_INNER(_type,_name,_SUFFIX,_args)
 
 #define _TOCOMPLEX(sp) ((_COMPLEX *)(sp))
 #define _NCOM (sizeof(_SPINOR_TYPE)/sizeof(_COMPLEX))
