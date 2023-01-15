@@ -64,7 +64,6 @@ typedef struct box_t {
     int base_index;
     int base_index_odd;
     int parity; //0 -> base point is even; 1 -> basepoint is odd
-    enum gd_type gd_t;
     char mask; //tells if the box is a border, e.g. if T_UP_MASK is set the box is in top T border of the extended lattice
     enum box_type type; // tell the type of the box, just a convenience for testing
     int *ipt_ext; //given the cordinate of a point in the box returns an index

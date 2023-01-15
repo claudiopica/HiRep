@@ -26,13 +26,16 @@
 #include "Geometry/geometry_descriptor.h"
 #include "Geometry/geometry_fuse.h"
 #include "Geometry/geometry_init.h"
-#include "Geometry/geometry_gpu_init.h"
 #include "Geometry/geometry_maskstate.h"
 #include "Geometry/geometry_omp.h"
-#include "Geometry/gpu_geometry.h"
-#include "Geometry/strided_reads.h"
 #include "Geometry/new_geometry.h"
 #include "Geometry/setup.h"
+
+#ifdef WITH_GPU
+    #include "Geometry/geometry_gpu_init.h"
+    #include "Geometry/gpu_geometry.h"
+    #include "Geometry/strided_reads.h"
+#endif
 
 /* this define the width of the borders for parallel dimensions
  * For different actions it must be modified
