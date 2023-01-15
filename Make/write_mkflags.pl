@@ -37,6 +37,7 @@ GetOptions(
   'memory!'      => \(my $mem = 0),
   'force!'       => \(my $force = 0),
   'avx2!'        => \(my $avx2 = 0),
+  'env=s'        => \(my $env = ""),
   'cc=s'         => \(my $cc = "gcc"),
   'mpicc=s'      => \(my $mpicc = "mpicc"),
   'cflags=s'     => \(my $cflags = "-Wall -O3"),
@@ -224,6 +225,7 @@ $mpi && print $fh "MACRO += WITH_MPI\n";
 $gpu && print $fh "MACRO += WITH_GPU\n";
 # write compiler options
 if ($ccache!=0) { $cc="ccache ".$cc; $mpicc="ccache ".$mpicc; }
+print $fh "ENV = $env\n";
 print $fh "CC = $cc\n";
 print $fh "MPICC = $mpicc\n";
 print $fh "CFLAGS = $cflags\n";
@@ -258,6 +260,7 @@ write_mkflags - write flags file for compilation of HiRep
 
   --[no-]mpi          [true]      Use MPI
   --[no-]gpu          [false]     Use GPU acceleration
+  --env               []          Environment variables used for compilation
   --cc                [gcc]       Compiler
   --mpicc             [mpicc]     MPI Compiler
   --cflags            [-Wall -O3] Compilation options

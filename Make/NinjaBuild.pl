@@ -51,13 +51,13 @@ wr_repr = $makedir/Utils/autosun/writeREPR
 wr_gpugeo = $makedir/Utils/write_gpu_geometry.pl
 
 rule cc
-  command = $CC -MMD -MF $out.d $CFLAGS -c $in -o $out
+  command = $ENV $CC -MMD -MF $out.d $CFLAGS -c $in -o $out
   description = $setbg CC $setnorm $out
   depfile = $out.d
   deps = gcc
 
 rule nvcc
-  command = $NVCC -ccbin $CC -MMD -MF $out.d $GPUFLAGS --device-c $in -o $out
+  command = $ENV $NVCC -ccbin $CC -MMD -MF $out.d $GPUFLAGS --device-c $in -o $out
   description = $setbg NVCC $setnorm $out
   depfile = $out.d
   deps = gcc
@@ -67,7 +67,7 @@ rule ar
   description = $setbg AR $setnorm $out
 
 rule link
-  command = $LINK -o $out $in $libs -lm $LDFLAGS
+  command = $ENV $LINK -o $out $in $libs -lm $LDFLAGS
   description = $setbg LINK $setnorm $out 
 
 rule test
