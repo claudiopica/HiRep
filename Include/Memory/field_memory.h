@@ -46,21 +46,21 @@ void afree(void *addr);
 //field_alloc.c
 
 #define _DECLARE_MEMORY_FUNC_GAUGE(_name, _field_type, _site_type, _size, _human_readable) \
-	/** \
+	/** */ \
 	 /** @brief Copy ##_human_readable from the host to the device by synchronizing the GPU */ \
 	 /**        field data with the CPU field data */ \
      /** */ \
      /** @param _field_type		Field to be copied. */ \
 	 /** */ \
         void copy_to_gpu_##_name(_field_type*); \
-	/** \
+	/** */ \
 	 /** @brief Copy ##_human_readable from the device to the host by synchronizing the CPU */ \
 	 /**        field data with the GPU field data */ \
      /** */ \
      /** @param _field_type		 Field to be copied. */ \
 	 /** */ \
         void copy_from_gpu_##_name(_field_type*); \
-	/** \
+	/** */ \
 	 /** @brief Convert ##_human_readable field data host geometry layout to the device */ \
 	 /**        geometry layout. Read more on GPU geometry in the corresponding section */ \
 	 /**        in the development manual. */ \
@@ -70,7 +70,7 @@ void afree(void *addr);
 	 /** @param _field_type		##_human_readable that contains the initial field data. */ \
 	 /** */ \
         void to_gpu_format_##_name(_field_type*, _field_type*); \
-	/**
+	/** */ \
 	 /** @brief Convert ##_human_readable field data device geometry layout to host geometry */ \
 	 /**        layout. Read more on GPU geometry in the corresponding section in the  */ \
 	 /**	    development manual. */ \
@@ -81,13 +81,13 @@ void afree(void *addr);
 	 /** 				        data */ \
 	 /** */ \
         void to_cpu_format_##_name(_field_type*, _field_type*); \
-	/** \
+	/** */ \
 	 /** @brief Free field data, other struct fields and struct pointer of field struct. */ \
      /** */ \
 	 /** @param _field_type		Field to be freed. */ \
 	 /** */ \
         void free_##_name(_field_type*); \
-	/** \
+	/** */ \
 	 /** @brief Allocate field struct pointer */ \
      /** */\
 	 /** @param geometry_descriptor	Underlying lattice geometry to allocate on. */ \
@@ -95,21 +95,21 @@ void afree(void *addr);
         _field_type *alloc_##_name(geometry_descriptor*); \
 
 #define _DECLARE_MEMORY_FUNC_SPINOR(_name, _field_type, _site_type, _size, _human_readable) \
-	/** \
+	/** */ \
 	 /** @brief Copy ##_human_readable from the host to the device by synchronizing the */ \
 	 /**        GPU field data with the CPU field data */ \
 	 /** */ \
 	 /** @param _field_type		Field to be copied. */ \
 	 /** */ \
         void copy_to_gpu_##_name(_field_type*); \
-	/** \
+	/** */ \
 	 /** @brief Copy ##_human_readable from the device to the host by synchronizing the CPU */ \
 	 /**        field data with the GPU field data */ \
 	 /** */ \
 	 /** @param _field_type		Field to be copied. */ \
 	 /** */ \
         void copy_from_gpu_##_name(_field_type*); \
-	/** \
+	/** */ \
 	 /** @brief Convert ##_human_readable field data host geometry layout to device geometry */ \
 	 /**        layout. Read more on GPU geometry in the corresponding section in the */ \
 	 /**         development manual. */ \
@@ -119,7 +119,7 @@ void afree(void *addr);
 	 /** @param _field_type		##_human_readable that contains the initial field data. */ \
 	 /** */ \
         void to_gpu_format_##_name(_field_type*, _field_type*); \
-	/** \
+	/** */ \
 	 /** @brief Convert ##_human_readable field data device geometry layout to host */ \
 	 /** 	  geometry layout. Read more on GPU geometry in the corresponding section */ \
 	 /** 	  in the development manual. */ \
@@ -128,15 +128,15 @@ void afree(void *addr);
 	 /** 				        field data */ \
 	 /** @param _field_type		##_human_readable that contains the initial field */ \
 	 /** 				        data */ \
-	 /**/ \
+	 /** */ \
         void to_cpu_format_##_name(_field_type*, _field_type*); \
-	/** \
+	/** */ \
 	 /** @brief Free field data, other struct fields and struct pointer of field struct. */ \
 	 /** */ \
 	 /** @param _field_type		Field to be freed. */ \
 	 /** */ \
      	void free_##_name(_field_type*); \
-	/** \
+	/** */ \
 	 /** @brief Allocate field struct pointer and struct fields, in particular the field */ \
 	 /**         data arrays. */ \
 	 /** */ \

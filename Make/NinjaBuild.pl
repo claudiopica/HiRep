@@ -98,7 +98,7 @@ build $wr_repr: link $wr_repr_build/writeREPR.o
 build writeREPR: phony $wr_repr
 
 # Autoheaders
-build autoheaders: phony $coreincdir/suN.h $coreincdir/suN_types.h $coreincdir/suN_repr_func.h $root/Include/Geometry/strided_reads.h $root/LibHR/Utils/cinfo.h
+build autoheaders: phony $coreincdir/suN.h $coreincdir/suN_types.h $coreincdir/suN_repr_func.h $root/Include/Geometry/strided_reads.h 
 build $coreincdir/suN.h $coreincdir/suN_types.h: suN_headers | $wr_head
 build $coreincdir/suN_repr_func.h: suN_repr $coreincdir/TMPL/suN_repr_func.h.tmpl | $wr_repr
 build $root/Include/Geometry/strided_reads.h: strided_reads | $wr_gpugeo

@@ -6,6 +6,8 @@
 *
 *******************************************************************************/
 
+// TODO: This test fails for unknown reasons. (SAM)
+
 #include "libhr.h"
 
 static double hmass = 0.1;
@@ -39,6 +41,7 @@ static void transform_u(void)
   }
 
   start_gf_sendrecv(u_gauge);
+  complete_gf_sendrecv(u_gauge);
   represent_gauge_field();
   smear_gauge_field();
 
@@ -110,6 +113,9 @@ int main(int argc, char *argv[])
   copy_to_gpu_spinor_field_f(s0);
   loc_D(s1, s0);
   copy_from_gpu_spinor_field_f(s1);
+  copy_from_gpu_spinor_field_f(s0);
+  spinor_field_zero_f(s2);
+  spinor_field_zero_f(s3);
 
   // Gauge transformation on CPU
   transform_s(s2, s1);
@@ -118,7 +124,6 @@ int main(int argc, char *argv[])
 
   // Copy results to GPU, apply Dirac operator again
   spinor_field_zero_f(s1);
-  copy_to_gpu_spinor_field_f(s1);
   copy_to_gpu_spinor_field_f(s2);
   copy_to_gpu_spinor_field_f(s3);
   loc_D(s1, s3);
@@ -129,7 +134,7 @@ int main(int argc, char *argv[])
   lprintf("MAIN", 0, "Maximal normalized difference = %.2e\n", sqrt(sig));
   lprintf("MAIN", 0, "(should be around 1*10^(-15) or so)\n");
 
-  return_value += check_finiteness(sig);
+  return_value += check_finiteness(sqrt(sig));
   return_value += check_diff_norm(sqrt(sig), 1e-14);
 
   // Free and return
