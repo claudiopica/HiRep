@@ -1,5 +1,5 @@
 /***************************************************************************\
-* Copyright (c) 2008, Claudio Pica                                          *
+* Copyright (c) 2008, 2022, Claudio Pica, Sofie Martins                     *
 * All rights reserved.                                                      *
 \***************************************************************************/
 
@@ -113,18 +113,31 @@ static void init_Dirac() {
  * @param out                 Output spinor field to save result
  */
 static void Dphi_inner_gpu_(spinor_field *out, spinor_field *in) {
-  int grid, iyp, write_stride, start_piece_ixp, start_piece_iyp;
+  int grid, iyp, gauge_ixp, gauge_iyp, write_stride, start_piece_ixp, start_piece_iyp;
   _PIECE_FOR(out->type, ixp)
   {
-      iyp = (ixp+1)%2;
+      if (in->type==&glattice) iyp = (ixp+1)%2;
+      else iyp = 0;
+
+      if (in->type==&glattice) {
+        gauge_ixp = ixp;
+        gauge_iyp = iyp;
+      } else if (in->type==&glat_odd) {
+        gauge_ixp = 0;
+        gauge_iyp = 1;
+      } else if (in->type==&glat_even) {
+        gauge_ixp = 1;
+        gauge_iyp = 0;
+      }
+
       write_stride = out->type->master_end[ixp] - out->type->master_start[ixp] + 1;
       grid = (write_stride-1)/BLOCK_SIZE + 1;
-      start_piece_ixp = in->type->master_start[ixp];
+      start_piece_ixp = out->type->master_start[ixp];
       start_piece_iyp = in->type->master_start[iyp];
 
       Dphi_gpu_inner_kernel<<<grid, BLOCK_SIZE>>>(
             _GPU_FIELD_BLK(out, ixp), _GPU_FIELD_BLK(in, iyp),
-            _GPU_4FIELD_BLK(u_gauge_f, ixp), _GPU_4FIELD_BLK(u_gauge_f, iyp),
+            _GPU_4FIELD_BLK(u_gauge_f, gauge_ixp), _GPU_4FIELD_BLK(u_gauge_f, gauge_iyp),
             iup_gpu, idn_gpu, imask_gpu,
             write_stride, start_piece_ixp, start_piece_iyp);
       CudaCheckError();
@@ -143,19 +156,34 @@ static void Dphi_inner_gpu_(spinor_field *out, spinor_field *in) {
  */
 static void Dphi_boundary_gpu_(spinor_field *out, spinor_field *in) {
   #if defined(WITH_MPI) && defined(WITH_NEW_GEOMETRY)
-  int grid, ixp, block_stride, buffer_stride, block_start, buffer_start;
+  int grid, ixp, gauge_ixp, gauge_i, block_stride, buffer_stride, block_start, buffer_start;
+
   for (int i = 0; i < in->type->nbuffers_spinor; ++i)
   {
-      ixp = (i%2==0);
-      block_stride = in->type->master_end[ixp] - in->type->master_start[ixp] + 1;
-      buffer_stride = in->type->rbuf_len[i];
+      if (out->type==&glat_even) {
+        ixp = 0;
+        gauge_ixp = 0;
+        gauge_i = 2*i+1;
+      } else if (out->type==&glat_odd) {
+        ixp = 0;
+        gauge_ixp = 1;
+        gauge_i = 2*i;
+      } else {
+        ixp = (i%2==0);
+        gauge_ixp = ixp;
+        gauge_i = i;
+      }
+
+      block_stride = out->type->master_end[ixp] - out->type->master_start[ixp] + 1;
+      block_start = out->type->master_start[ixp];
+
+      buffer_stride = in->type->rbuf_len[i];// Different strides for gauge and spinor
       buffer_start = in->type->rbuf_start[i];
       grid = (block_stride-1)/BLOCK_SIZE + 1;
-      block_start = in->type->master_start[ixp];
 
       Dphi_gpu_boundary_kernel<<<grid, BLOCK_SIZE>>>(
             _GPU_FIELD_BLK(out, ixp), _BUF_GPU_FIELD_BLK(in, i),
-            _GPU_4FIELD_BLK(u_gauge_f, ixp), _BUF_GPU_4FIELD_BLK(u_gauge_f, i),
+            _GPU_4FIELD_BLK(u_gauge_f, gauge_ixp), _BUF_GPU_4FIELD_BLK(u_gauge_f, gauge_i),
             iup_gpu, idn_gpu, imask_gpu,
             block_stride, buffer_stride,
             buffer_start, block_start);
@@ -176,7 +204,7 @@ void Dphi_gpu_(spinor_field *out, spinor_field *in)
   _CHECK_GEOMETRY_EO(in, out);
   // TODO: Possibly add: Fields are not null, fields are unequal (SAM)
 
-  init_bc_gpu();
+  //init_bc_gpu();
 
   #ifdef WITH_MPI
     start_sendrecv_gpu_spinor_field_f(in);

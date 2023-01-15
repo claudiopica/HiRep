@@ -1,3 +1,8 @@
+/***************************************************************************\
+* Copyright (c) 2022 Sofie Martins                                          *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
 #include "geometry.h"
 #include "libhr_core.h"
 
@@ -17,7 +22,7 @@ void init_neighbors_gpu()
   error_id = cudaMalloc((void **)&idn_gpu, 4 * N * sizeof(int));
   error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error allocating idn_gpu neighbors array.\n");
 
-  error_id = cudaMalloc((void **)&imask_gpu, 8 * N * sizeof(char));
+  error_id = cudaMalloc((void **)&imask_gpu, N * sizeof(char));
   error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error allocating imask_gpu lookup table.\n");
 
   error_id = cudaMalloc((void **)&ipt_gpu, (X+2*X_BORDER)*(Y+2*Y_BORDER)*(Z+2*Z_BORDER)*(T+2*T_BORDER)*sizeof(int));

@@ -1,3 +1,8 @@
+/***************************************************************************\
+* Copyright (c) 2022, Claudio Pica, Sofie Martins                           *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
 /**
  * @file geometry_check.h
  * @brief Validity checks on the geometry of spinor fields that are passed as 
@@ -7,8 +12,6 @@
 
 #ifndef GEOMETRY_CHECK_H
 #define GEOMETRY_CHECK_H
-
-// TODO: This needs adjustment to the new geometry (SAM)
 
 #include "geometry.h"
 #include "error.h"
@@ -61,26 +64,41 @@
      */
     #define _CHECK_GEOMETRY_EO(s1, s2) \
         do {\
-            int pass1 = (s1)->type==&glattice && (s2)->type==&glattice;\
-            int pass2 = (s1)->type==&glat_odd && (s2)->type==&glat_even;\
-            int pass3 = (s1)->type==&glat_even && (s2)->type==&glat_odd;\
+            int pass1 = (s1)->type == &glattice && (s2)->type == &glattice;\
+            int pass2 = (s1)->type == &glat_odd && (s2)->type == &glat_even;\
+            int pass3 = (s1)->type == &glat_even && (s2)->type == &glat_odd;\
             error(!(pass1 || pass2 || pass3), 1, __FILE__ ": ", \
                     "Incorrect combination of geometries! " \
                     "Need even to odd, odd to even or both defined on the full lattice\n");\
         } while (0)
 
+    /**
+     * @brief Check whether the field is defined on the full lattice.
+     *
+     * @param s1                Field to check
+     */
     #define _CHECK_GEOMETRY_FULL(s1) \
         do { \
             error(s1->type!=&glattice, 1, "Dphi_gpu [Dphi_gpu.c]", \
-            "Spinor is not defined on all the lattice!"); \
+            "Field is not defined on all the lattice!"); \
         } while (0)
 
+    /**
+     * @brief Check whether the field has even parity.
+     *
+     * @param s1                Field to check
+     */
     #define _CHECK_GEOMETRY_EVEN(s1) \
         do { \
             error(s1->type!=&glat_even, 1, "Dphi_gpu [Dphi_gpu.c]", \
             "Spinor needs to be even!"); \
         } while (0)
 
+    /**
+     * @brief Check whether the field has odd parity.
+     *
+     * @param s1                Field to check
+     */
     #define _CHECK_GEOMETRY_ODD(s1) \
         do { \
             error(s1->type!=&glat_odd, 1, "Dphi_gpu [Dphi_gpu.c]", \
@@ -92,7 +110,7 @@
     /**
      * @brief This macro does nothing unless CHECK_SPINOR_MATCHING is defined.
      */
-    #define _TWO_SPINORS_MATCHING(s1,s2) 
+    #define _TWO_SPINORS_MATCHING(s1,s2)
 
     /**
      * @brief This macro does nothing unless CHECK_SPINOR_MATCHING is defined.
@@ -109,10 +127,19 @@
      */
     #define _CHECK_GEOMETRY_EO(s1, s2)
 
+    /**
+     * @brief This macro does nothing unless CHECK_SPINOR_MATCHING is defined.
+     */
     #define _CHECK_GEOMETRY_FULL(s1)
 
+    /**
+     * @brief This macro does nothing unless CHECK_SPINOR_MATCHING is defined.
+     */
     #define _CHECK_GEOMETRY_EVEN(s1)
 
+    /**
+     * @brief This macro does nothing unless CHECK_SPINOR_MATCHING is defined.
+     */
     #define _CHECK_GEOMETRY_ODD(s1)
 
 #endif

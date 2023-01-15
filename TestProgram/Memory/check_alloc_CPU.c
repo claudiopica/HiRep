@@ -1,7 +1,8 @@
 /*******************************************************************************
 *
 * Check that after allocating a field, we can write to and read from it on 
-* the CPU.
+* the CPU. (Test should work both WITH_GPU and !WITH_GPU, but this is
+* important to check, whether the CPU part of the WITH_GPU code works)
 *
 *******************************************************************************/
 

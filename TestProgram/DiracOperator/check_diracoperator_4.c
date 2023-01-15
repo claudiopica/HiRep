@@ -7,6 +7,7 @@
 * NOCOMPILE= BC_Z_ANTIPERIODIC
 * NOCOMPILE= BASIC_SF
 * NOCOMPILE= ROTATED_SF
+* NOCOMPILE= WITH_GPU
 *
 * Testing the spin structure & printing the gamma matrices
 *

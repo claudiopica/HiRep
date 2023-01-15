@@ -1,3 +1,7 @@
+/***************************************************************************\
+* Copyright (c) 2012, 2022, Ari Hietanen, Sofie Martins                     *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
 /**
  * @file geometry_gpu_init.h
  * @brief Initialization functions, that determine all important parameters of the 
@@ -29,6 +33,10 @@
 void init_gpu(input_gpu gpu_var);
 
 // geometry_init_gpu.c
+/**
+ * @brief This function transfers geometry lookup tables and global variables to the 
+ *        device so that they are globally available.
+ */
 void init_neighbors_gpu(void);
 
 #ifdef __cplusplus

@@ -8,6 +8,8 @@
 
 #include "libhr.h"
 
+// TODO: scalar field missing
+
 // Double precision
 int test_bijectivity_gfield();
 int test_bijectivity_gfield_f();
@@ -17,12 +19,12 @@ int test_bijectivity_gtransf();
 int test_bijectivity_clover_ldl();
 int test_bijectivity_clover_term();
 int test_bijectivity_clover_force();
-int test_bijectivity_spinor_field_f();
+int test_bijectivity_spinor_field_f(geometry_descriptor*);
 
 // Single precision
 int test_bijectivity_gfield_flt();
 int test_bijectivity_gfield_f_flt();
-int test_bijectivity_spinor_field_f_flt();
+int test_bijectivity_spinor_field_f_flt(geometry_descriptor*);
 
 int main(int argc, char *argv[]) 
 {
@@ -35,6 +37,8 @@ int main(int argc, char *argv[])
     test_setup();
 
     // Test block
+
+    lprintf("INFO", 0, "\n\n Testing Full Lattice \n\n");
      /* Double precision */
     return_val += test_bijectivity_gfield();
     return_val += test_bijectivity_gfield_f();
@@ -44,12 +48,20 @@ int main(int argc, char *argv[])
     return_val += test_bijectivity_clover_ldl();
     return_val += test_bijectivity_clover_term();
     return_val += test_bijectivity_clover_force();
-    return_val += test_bijectivity_spinor_field_f();
+    return_val += test_bijectivity_spinor_field_f(&glattice);
 
      /* Single precision */
     return_val += test_bijectivity_gfield_flt();
     return_val += test_bijectivity_gfield_f_flt();
-    return_val += test_bijectivity_spinor_field_f_flt();
+    return_val += test_bijectivity_spinor_field_f_flt(&glattice);
+
+    lprintf("INFO", 0, "\n\n Testing Even Lattice \n\n");
+    return_val += test_bijectivity_spinor_field_f(&glat_even);
+    return_val += test_bijectivity_spinor_field_f_flt(&glat_even);
+
+    lprintf("INFO", 0, "\n\n Testing Odd Lattice \n\n");
+    return_val += test_bijectivity_spinor_field_f(&glat_odd);
+    return_val += test_bijectivity_spinor_field_f_flt(&glat_odd);
 
     // Finalize and return
     finalize_process();
@@ -137,13 +149,13 @@ int test_bijectivity_gfield_f()
     return return_val;
 }
 
-int test_bijectivity_spinor_field_f() 
+int test_bijectivity_spinor_field_f(geometry_descriptor *gd) 
 {
     lprintf("INFO", 0, " ====== TEST SPINOR FIELD ======= ");
     int return_val = 0;
     spinor_field *in, *in_copy;
-    in = alloc_spinor_field_f(1, &glattice);
-    in_copy = alloc_spinor_field_f(1, &glattice);
+    in = alloc_spinor_field_f(1, gd);
+    in_copy = alloc_spinor_field_f(1, gd);
 
     gaussian_spinor_field(in);
 
@@ -180,13 +192,13 @@ int test_bijectivity_spinor_field_f()
     return return_val;
 }
 
-int test_bijectivity_spinor_field_f_flt() 
+int test_bijectivity_spinor_field_f_flt(geometry_descriptor *gd) 
 {
     lprintf("INFO", 0, " ====== TEST SPINOR FIELD SINGLE PRECISION ======= ");
     int return_val = 0;
     spinor_field_flt *in, *in_copy;
-    in = alloc_spinor_field_f_flt(1, &glattice);
-    in_copy = alloc_spinor_field_f_flt(1, &glattice);
+    in = alloc_spinor_field_f_flt(1, gd);
+    in_copy = alloc_spinor_field_f_flt(1, gd);
 
     gaussian_spinor_field_flt(in);
 
@@ -303,7 +315,7 @@ int test_bijectivity_gfield_f_flt()
 
 int test_bijectivity_suNg_scalar_field() 
 {
-    lprintf("INFO", 0, " ====== TEST GAUGE FIELD REPRESENTED SINGLE PRECISION ======= ");
+    lprintf("INFO", 0, " ====== TEST SU(NG) SCALAR FIELD ======= ");
     int return_val = 0;
     suNg_scalar_field *in, *in_copy;
     in = alloc_suNg_scalar_field(&glattice);
@@ -343,7 +355,7 @@ int test_bijectivity_suNg_scalar_field()
 
 int test_bijectivity_avfield() 
 {
-    lprintf("INFO", 0, " ====== TEST GAUGE FIELD REPRESENTED SINGLE PRECISION ======= ");
+    lprintf("INFO", 0, " ====== TEST ALGEBRA VECTOR FIELD ======= ");
     int return_val = 0;
     suNg_av_field *in, *in_copy;
     in = alloc_avfield(&glattice);
@@ -383,7 +395,7 @@ int test_bijectivity_avfield()
 
 int test_bijectivity_gtransf() 
 {
-    lprintf("INFO", 0, " ====== TEST GAUGE FIELD REPRESENTED SINGLE PRECISION ======= ");
+    lprintf("INFO", 0, " ====== TEST GAUGE TRANSFORMATION ======= ");
     int return_val = 0;
     suNg_field *in, *in_copy;
     in = alloc_gtransf(&glattice);
@@ -423,7 +435,7 @@ int test_bijectivity_gtransf()
 
 int test_bijectivity_clover_term() 
 {
-    lprintf("INFO", 0, " ====== TEST GAUGE FIELD REPRESENTED SINGLE PRECISION ======= ");
+    lprintf("INFO", 0, " ====== TEST CLOVER TERM ======= ");
     int return_val = 0;
     suNfc_field *in, *in_copy;
     in = alloc_clover_term(&glattice);
@@ -463,7 +475,7 @@ int test_bijectivity_clover_term()
 
 int test_bijectivity_clover_force() 
 {
-    lprintf("INFO", 0, " ====== TEST GAUGE FIELD REPRESENTED SINGLE PRECISION ======= ");
+    lprintf("INFO", 0, " ====== TEST CLOVER FORCE ======= ");
     int return_val = 0;
     suNf_field *in, *in_copy;
     in = alloc_clover_force(&glattice);

@@ -2,6 +2,10 @@
 * Copyright (c) 2022, Claudio Pica                                          *   
 * All rights reserved.                                                      * 
 \***************************************************************************/
+/**
+ * @file error_gpu.h
+ * @brief Error checking for GPU
+ */
 
 #ifndef ERROR_GPU_H
 #define ERROR_GPU_H

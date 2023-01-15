@@ -1,3 +1,13 @@
+/***************************************************************************\
+* Copyright (c) 2022, Claudio Pica, Sofie Martins                           *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
+/**
+ * @file geometry_descriptor.h
+ * @brief Geometry descriptor struct, that contains all necessary information for multi-node/
+ *        multi-GPU calculations.
+ */
 
 #ifndef GEOMETRY_DESCRIPTOR_H
 #define GEOMETRY_DESCRIPTOR_H
@@ -82,8 +92,13 @@
  * 				Array that takes a buffer id and returns an index of the 
  * 				first site in memory that contains a site that is an 
  * 				element of the send buffer piece.
- * FIXME: Complete this...
- *
+ * @var geometry_descriptor::gsize_spinor
+ *        Number of sites allocated for a spinor field
+ * @var geometry_descriptor::gize_gauge
+ *        Number of links allocated for a gauge field
+ * @var geometry_descriptor::fuse_mask
+ * @var geometry_descriptor::fuse_gauge_size
+ * @var geometry_descriptor::fuse_inner_counter
  *
  */
 typedef struct geometry_descriptor {

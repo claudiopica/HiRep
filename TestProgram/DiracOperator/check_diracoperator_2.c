@@ -6,7 +6,7 @@
 * NOCOMPILE= BC_Z_ANTIPERIODIC
 * NOCOMPILE= BASIC_SF
 * NOCOMPILE= ROTATED_SF
-*
+* NOCOMPILE= WITH_GPU
 *
 * Action of the Dirac operator on plane waves
 *

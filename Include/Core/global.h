@@ -132,6 +132,7 @@ typedef enum _mem_t {
 #define BLOCK_SIZE_GLOBAL_SUM 512
 #define BLOCK_SIZE_DIRAC 512
 #define BLOCK_SIZE_DIRAC_FLT 512
+#define BLOCK_SIZE_SYNC 32
 
 GLB_VAR(input_gpu,gpu_var,=init_input_gpu(gpu_var));
 GLB_VAR(int, gpu_id,=0);

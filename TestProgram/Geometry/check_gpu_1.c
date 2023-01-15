@@ -85,4 +85,6 @@ int main(int argc, char *argv[])
     lprintf("GPU TEST",1,"diff 1: %.2e\n",d1);
     double d2=norm_cpu-norm_cpu3;
     lprintf("GPU TEST",1,"diff 2: %.2e\n",d2);
+    finalize_process();
+    return 0;
 }

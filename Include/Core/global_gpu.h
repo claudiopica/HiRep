@@ -1,6 +1,20 @@
+/***************************************************************************\
+* Copyright (c) 2022, Claudio Pica, Sofie Martins                           *
+* All rights reserved.                                                      *
+\***************************************************************************/
+
+/**
+ * @file global_gpu.h
+ * @brief Global variables need to be declared once in the main program
+ *        and then again as extern variables in the files that use them.
+ *        This can be achieved by just including this header 
+ *        with any other modification. A macro will automatically
+ *        declare the variable in the main program without the 
+ *        extern modifier and with it everywhere else.
+ */
+
 // These are device global variables
 // must be declared with __device__ or __constant__
-
 #ifndef GLOBAL_GPU_H
 #define GLOBAL_GPU_H
 

@@ -46,7 +46,8 @@ TestProgram/*/*
 Include/Core/suN.h
 Include/Core/suN_types.h
 Include/Core/suN_repr_func.h
-Include/Geometry/gpu_geometry.h
+Include/Geometry/strided_reads.h
 Make/Utils/autosun/writeREPR
 LibHR/Update/approx_data.db
 LibHR/Utils/cinfo.c
+LibHR/Utils/cinfo.h

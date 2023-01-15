@@ -1,3 +1,8 @@
+/***************************************************************************\
+* Copyright (c) 2008, 2022, Claudio Pica, Sofie Martins                     *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
 #ifndef DIRECTIONS_H
 #define DIRECTIONS_H
 

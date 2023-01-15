@@ -2,12 +2,9 @@
 use strict;
 
 ## TODO: pl script docs clean up
-## Problems: Spinor field layers, scalar fields need separate def
 ## TODO: Possibly it is faster, if we do the cast only once (double*)
 ## Readout with assigning the complex from the doubles might not be ideal, because it 
 ## is a math operation internally while in reality it is just moving memory around.
-## suNfc -- not working for Ad for example
-## TODO: MPI
 
 # Read arguments from MkRules
 # Ng ... Number of Colors
@@ -16,7 +13,8 @@ use strict;
 # Gauge group ... SU(N) or SO(N), possible strings GAUGE_SUN, GAUGE_SON
 my ($Ng,$rep,$su2quat,$gauge_group)=@ARGV;
 
-open STDOUT, ">gpu_geometry.h";
+# open STDOUT, ">gpu_geometry.h";
+open STDOUT, ">strided_reads.h";
 
 
 my $Nf = 0;
@@ -73,7 +71,7 @@ write_epilog();
 
 sub write_prolog {
     print <<END
-/*******************************************************************************\n";
+/*******************************************************************************
 *
 * File gpu_geometry.h
 *
@@ -88,8 +86,8 @@ sub write_prolog {
  *        than in host memory. Documentation on this can be found in the HiRep 
  *        Development Guide, section GPU Geometry.
 */
-#ifndef GPU_GEOMETRY_H
-#define GPU_GEOMETRY_H
+#ifndef STRIDED_READS_H
+#define STRIDED_READS_H
 
 #ifdef WITH_GPU
 END
