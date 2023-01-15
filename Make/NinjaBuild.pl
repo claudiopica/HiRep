@@ -474,9 +474,10 @@ sub parse_logical_expr { # takes expression string and ref to dictionary hash
 sub print_c_cpp_properties {
     my ($rootdir) = @_;
     my $optfile = "$rootdir/.vscode/c_cpp_properties.json";
-    my $compiler = `echo 'command -v ${$options{'CC'}}[0]' | sh`;
+    my $compilerpath = `echo 'command -v ${$options{'CC'}}[0]' | sh`;
     chomp($compiler);
     my $compilermode = "gcc-x64";
+    if ( $compilerpath =~ /clang/ ) { $compilermode = "clang-x64"; }
     
     #make sure path exists
     make_path("$rootdir/.vscode/");
@@ -503,7 +504,7 @@ EOF
     }
     print FH <<EOF;
             ],
-            "compilerPath": "$compiler",
+            "compilerPath": "$compilerpath",
             "intelliSenseMode": "$compilermode",
             "includePath": ["$rootdir/Include","$rootdir/Include/Core"$includelist],
             "cStandard": "c99",

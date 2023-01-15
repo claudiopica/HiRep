@@ -18,6 +18,7 @@ jobs:
       # Ensures that jobs are not cancelled is one job fails
       fail-fast: false
       matrix:
+        compiler: [gcc, clang]
         nc: [2, 3]
         repr: [FUND, ADJ]
         mpi: [-no-mpi, -mpi]
@@ -33,7 +34,7 @@ jobs:
     - name: Download HiRep
       run: wget https://github.com/claudiopica/HiRep/archive/${{ github.sha }}.tar.gz && tar -xvf ${{ github.sha }}.tar.gz --strip-components=1
     - name: Configure HiRep
-      run: ./Make/write_mkflags.pl -f Make/MkFlags.ini -cflags "-Wall -O1" -n ${{ matrix.nc }} -r ${{ matrix.repr }} ${{ matrix.mpi }} ${{ matrix.ecsw }}
+      run: ./Make/write_mkflags.pl -f Make/MkFlags.ini --cc ${{ compiler }} --mpicc "OMPI_CC=${{ compiler }} mpicc" --cflags "-Wall -O1" -n ${{ matrix.nc }} -r ${{ matrix.repr }} ${{ matrix.mpi }} ${{ matrix.ecsw }}
     - name: Build
       run: time ./Make/nj
 
