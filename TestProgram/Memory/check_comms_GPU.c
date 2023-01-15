@@ -8,8 +8,6 @@
 *
 *******************************************************************************/
 
-// TODO: Odd sfield comms & single precision spinor not working
-
 #include "libhr.h"
 #include <string.h>
 

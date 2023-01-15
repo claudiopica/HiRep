@@ -3,18 +3,12 @@
 * NOCOMPILE= !WITH_GPU
 *
 * Check that after allocating a field, we can write to and read from it.
-* This is supposed to be run without MPI as a baseline test
-* Identify problems with MPI allocation using the dedicated memory tests.
 *
 *******************************************************************************/
 
 #include "libhr.h"
 
-// TODO: This test relies on too many high level things.
-//       I am not sure, we can run such a test at all.
-// TODO: Test for GPU whether CPU allocation works, too. The CPU test is not enough because the function names are different
 // TODO: Also do not copy back, but check with GPU norm.
-// TODO: Fix problem with the sfield
 
 // Double precision
 int test_gfield_allocation();

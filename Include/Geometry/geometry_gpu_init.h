@@ -1,3 +1,7 @@
+/***************************************************************************\
+* Copyright (c) 2012, 2022, Ari Hietanen, Sofie Martins                     *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
 /**
  * @file geometry_gpu_init.h
  * @brief Initialization functions, that determine all important parameters of the 

@@ -128,7 +128,7 @@ int test_herm_gpu(spinor_operator S, char *name)
   
   // Apply operator
   S(s3, s1);
-  /*S(s4, s2);
+  S(s4, s2);
 
   // Spinor field sanity checks
   lprintf("RESULT", 0, "s1 NORM %0.2e on GPU\n", sqrt(spinor_field_sqnorm_f(s1)));
@@ -151,7 +151,7 @@ int test_herm_gpu(spinor_operator S, char *name)
   free_spinor_field_f(s1);
   free_spinor_field_f(s2);
   free_spinor_field_f(s3);
-  free_spinor_field_f(s4);*/
+  free_spinor_field_f(s4);
   return return_val;
 }
 

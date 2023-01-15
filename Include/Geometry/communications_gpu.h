@@ -1,5 +1,5 @@
 /***************************************************************************\
-* Copyright (c) 2022, Claudio Pica                                          *   
+* Copyright (c) 2022, Claudio Pica, Sofie Martins                           *   
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
@@ -21,25 +21,25 @@
 
 #define _DECLARE_COMMS(_name, _field_type, _human_readable) \
 /** \
-     @brief Wait for communications between GPUs to finish before continuing. \
-    \
-    @param ##_field_type		##_human_readable that needs to be synchronized \
-                            across nodes \
-    */ \
+    /* @brief Wait for communications between GPUs to finish before continuing. */ \
+    /**/ \
+    /* @param ##_field_type		##_human_readable that needs to be synchronized */ \
+    /*                          across nodes */ \
+    /**/ \
 void complete_sendrecv_gpu_##_name(_field_type*); \
 /** \
-     @brief Fill buffers and start MPI requests to send and receive.\
-    \
-    @param ##_field_type		##_human_readable that needs to be synchronized \
-                            across nodes \
-    */ \
+    /* @brief Fill buffers and start MPI requests to send and receive. */\
+    /**/ \
+    /* @param ##_field_type		##_human_readable that needs to be synchronized */ \
+    /*                          across nodes */ \
+    /**/ \
 void start_sendrecv_gpu_##_name(_field_type*); \
 /** \
- @brief Sync field before communications. This can mean different things \
-        depending on geometry implementation. \
-    \
-    @param ##_field_type       ##_human_readable that needs to be synchronized \
-                            on the local lattice. \
+    /* @brief Sync field before communications. This can mean different things */ \
+    /*    depending on geometry implementation. */ \
+    /**/ \
+    /* @param ##_field_type      ##_human_readable that needs to be synchronized */ \
+    /*                           on the local lattice. */ \
 */ \
 void sync_gpu_##_name(_field_type*); \
 void fill_buffers_##_name(_field_type*); \

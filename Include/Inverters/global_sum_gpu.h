@@ -18,9 +18,9 @@
 * @brief Sums across GPU nodes after finding the local sum (integer)
 *
 * @param vector		Vector with local results
-* @param size		Size of vector
+* @param size		   Size of vector
 *
-* @return int 		Result of sum
+* @return int 		   Result of sum
 */
 int global_sum_gpu_int(int *vector, int size);
 
@@ -28,7 +28,7 @@ int global_sum_gpu_int(int *vector, int size);
 * @brief Sums across GPU nodes after finding the local sum (single precision reals)
 *
 * @param vector		Vector with local results
-* @param size		Size of vector
+* @param size		   Size of vector
 *
 * @return float		Result of sum
 */
@@ -38,7 +38,7 @@ float global_sum_gpu_float(float *vector, int size);
 * @brief Sums across GPU nodes after finding the local sum (double precision reals)
 *
 * @param vector 		Vector with local results
-* @param size		Size of vector
+* @param size		   Size of vector
 *
 * @return double		Result of sum
 */
@@ -48,7 +48,7 @@ double global_sum_gpu_double(double *vector, int size);
 * @brief Sums across GPU nodes after finding the local sum (single precision complex)
 *
 * @param vector 		Vector with local results
-* @param size		Size of vector
+* @param size		   Size of vector
 *
 * @return hr_complex_flt	Result of sum
 */
@@ -58,7 +58,7 @@ hr_complex_flt global_sum_gpu_complex_flt(hr_complex_flt *vector, int size);
 * @brief Sums across GPU nodes after finding the local sum (double precision complex)
 *
 * @param vector		Vector with local results
-* @param size		Size of vector
+* @param size		   Size of vector
 *
 * @return hr_complex	Result of sum
 */

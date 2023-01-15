@@ -1,3 +1,8 @@
+/***************************************************************************\
+* Copyright (c) 2022, Claudio Pica, Sofie Martins                           *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
 /**
  * @file new_geometry.h
  * @brief Functions needed for the new geometry implementation that
@@ -70,7 +75,6 @@ typedef struct box_t {
 } box_t;
 //TODO: do we want to add vol, even_vol, odd_vol for avoid recomputing them every time?
 //TODO: do we want to precompute ipt_ext for sendboxes?
-
 
 
 int boxEvenVolume(box_t *B);

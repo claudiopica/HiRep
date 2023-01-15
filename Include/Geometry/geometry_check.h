@@ -1,3 +1,8 @@
+/***************************************************************************\
+* Copyright (c) 2022, Claudio Pica, Sofie Martins                           *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
 /**
  * @file geometry_check.h
  * @brief Validity checks on the geometry of spinor fields that are passed as 

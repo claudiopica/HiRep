@@ -1,4 +1,7 @@
-// TODO: coord_to_index analogy for fields with dim>1
+/***************************************************************************\
+* Copyright (c) 2022, Claudio Pica, Sofie Martins                           *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
 
 #ifndef GPU_GEOMETRY_H
 #define GPU_GEOMETRY_H

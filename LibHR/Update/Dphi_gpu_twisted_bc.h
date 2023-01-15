@@ -1,3 +1,8 @@
+/***************************************************************************\
+* Copyright (c) 2008, 2022, Claudio Pica, Sofie Martins                     *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
 /**
  * @file twisted_bc.h
  * @brief Macros to encapsulate fermion twisting in the dirac operator.

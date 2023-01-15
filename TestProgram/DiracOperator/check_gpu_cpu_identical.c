@@ -74,8 +74,10 @@ int test_identical(spinor_operator S, spinor_operator S_cpu, char *name)
     lprintf("INFO", 0, "Input spinor field norm CPU: %0.2e\n", spinor_field_sqnorm_f_cpu(s));
     lprintf("INFO", 0, "Input spinor field norm GPU: %0.2e\n", spinor_field_sqnorm_f(s));
 
-    start_sendrecv_gpu_gfield_f(u_gauge_f);
-    complete_sendrecv_gpu_gfield_f(u_gauge_f);
+    #ifdef WITH_MPI
+        start_sendrecv_gpu_gfield_f(u_gauge_f);
+        complete_sendrecv_gpu_gfield_f(u_gauge_f);
+    #endif
 
     S(S_s, s);
     S_cpu(S_s_cpu, s);
@@ -116,8 +118,10 @@ int test_identical_massless(spinor_operator S, spinor_operator S_cpu, char *name
     lprintf("INFO", 0, "Input spinor field norm CPU: %0.2e\n", spinor_field_sqnorm_f_cpu(s));
     lprintf("INFO", 0, "Input spinor field norm GPU: %0.2e\n", spinor_field_sqnorm_f(s));
 
-    start_sendrecv_gpu_gfield_f(u_gauge_f);
-    complete_sendrecv_gpu_gfield_f(u_gauge_f);
+    #ifdef WITH_MPI
+        start_sendrecv_gpu_gfield_f(u_gauge_f);
+        complete_sendrecv_gpu_gfield_f(u_gauge_f);
+    #endif
 
     S(S_s, s);
     S_cpu(S_s_cpu, s);
@@ -156,8 +160,10 @@ int test_identical_flt(spinor_operator_flt S, spinor_operator_flt S_cpu, char *n
     lprintf("INFO", 0, "Input spinor field norm CPU: %0.2e\n", spinor_field_sqnorm_f_flt_cpu(s));
     lprintf("INFO", 0, "Input spinor field norm GPU: %0.2e\n", spinor_field_sqnorm_f_flt(s));
 
-    start_sendrecv_gpu_gfield_f_flt(u_gauge_f_flt);
-    complete_sendrecv_gpu_gfield_f_flt(u_gauge_f_flt);
+    #ifdef WITH_MPI
+        start_sendrecv_gpu_gfield_f_flt(u_gauge_f_flt);
+        complete_sendrecv_gpu_gfield_f_flt(u_gauge_f_flt);
+    #endif
 
     S(S_s, s);
     S_cpu(S_s_cpu, s);

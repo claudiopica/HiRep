@@ -1,3 +1,8 @@
+/***************************************************************************\
+* Copyright (c) 2022, Sofie Martins                                         *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
 #include "spinor_field.h"
 #include "global_gpu.h"
 #include "Geometry/gpu_geometry.h"

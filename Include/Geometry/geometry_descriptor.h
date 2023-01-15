@@ -1,3 +1,8 @@
+/***************************************************************************\
+* Copyright (c) 2022, Claudio Pica, Sofie Martins                           *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
 /**
  * @file geometry_descriptor.h
  * @brief Geometry descriptor struct, that contains all necessary information for multi-node/

@@ -1,3 +1,8 @@
+/***************************************************************************\
+* Copyright (c) 2022 Sofie Martins                                          *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
 /**
  * @file test_utils.h
  * @brief utilities to simplify testing

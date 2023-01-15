@@ -1,3 +1,8 @@
+/***************************************************************************\
+* Copyright (c) 2022, Claudio Pica, Sofie Martins                           *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
 /**
  * @file cpu_geometry.h
  * @brief This file contains macros to load elements of single sites of a field.

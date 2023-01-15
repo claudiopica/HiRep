@@ -9,10 +9,7 @@
 
 #include "libhr.h"
 
-// TODO: get gaussian spinor fields to work with MPI-CUDA
-// TODO: &glat_even, &glat_odd
 // TODO: Test for n > 1
-// TODO: Get scalar fields to pass
 
 // Double precision
 int test_write_read_gauge_field();

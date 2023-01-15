@@ -1,3 +1,8 @@
+/***************************************************************************\
+* Copyright (c) 2022, Sofie Martins                                         *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
 #define buffer_index_to_box_index \
         coord4 c = icoord[__idx_out_global]; \
         int __idx_in_global = ipt_ext_gpu(c.x[0], c.x[1], c.x[2], c.x[3]); 

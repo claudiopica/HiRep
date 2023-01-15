@@ -1,3 +1,8 @@
+/***************************************************************************\
+* Copyright (c) 2012, 2022, Ari Hietanen, Sofie Martins                     *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
 /**
  * @file gpu_info.h
  * @brief Functions that print collective information on cluster 

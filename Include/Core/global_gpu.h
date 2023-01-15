@@ -1,3 +1,8 @@
+/***************************************************************************\
+* Copyright (c) 2022, Claudio Pica, Sofie Martins                           *
+* All rights reserved.                                                      *
+\***************************************************************************/
+
 /**
  * @file global_gpu.h
  * @brief Global variables need to be declared once in the main program
