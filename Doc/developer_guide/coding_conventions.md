@@ -32,8 +32,8 @@ for all field types not only for the `spinor_field`, I could write a macro that 
 
 ```{c}
 #define _DECLARE_USELESS_FUNCTION(_field_type, _site_type) \
-    void declare_things(_field_type* s) {
-        _site_type* site;
+    void declare_things(_field_type* s) { \
+        _site_type* site; \
     }
 
 _DECLARE_USELESS_FUNCTION(spinor_field, suNf_spinor)

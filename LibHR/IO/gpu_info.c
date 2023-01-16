@@ -215,6 +215,11 @@ void print_supported_features(cudaDeviceProp device_prop)
   lprintf("GPU_INIT",10,"Compute Mode:\n");
   lprintf("GPU_INIT",10,"  < %s >\n", sComputeMode[device_prop.computeMode]);
 
+  // Multi-GPU calculations are not supported for the old geometry
+  #if defined(WITH_GPU) && defined(WITH_MPI) && !defined(NEW_GEOMETRY)
+    error(1, 1, __func__, "Legacy geometry not supported for Multi-GPU compilation. Please enable NEW_GEOMETRY in compilation flags. Exiting. ");
+  #endif
+
   #ifdef WITH_MPI
     int cuda_aware_support = 0;
     // TODO: This possibly only works for OpenMPI (SAM)

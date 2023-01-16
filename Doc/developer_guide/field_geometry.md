@@ -1,13 +1,53 @@
 @page geometry Geometry
 [TOC]
-
 # Geometry Properties
 
 Fields living on the four-dimensional lattice are defined to be C arrays of elements using the data structures in the corresponding section. The geometry of the lattice is defined by assigning an index $n$ of the array to each site $(t, x, y, z)$. The mapping between the cartesian coordinates of the local lattice and the array index is given by the macros `iup(n,dir)` and `idn(n,dir)` which, given the index $n$ of the current site, return the index of the site whose cartesian coordinate in direction `dir` is increased or decreased by one respectively. 
 
-## Geometry Descriptor
+In the MPI version of the code the lattice is broken up into local lattices in addition to an even-odd preconditioning forming blocks of data in memory. Each of these blocks then corresponds to a contiguous set of indices. As a result, we need to additionally allocate field memory for buffers that we can use to send and receive information between different cores and nodes. In order to communicate correctly, we need to first fill the buffer of data to be sent. There are two different implementations of this in the code. The legacy geometry only supports compilation without multiple GPUs (WITH_GPU and WITH_MPI cannot be both enabled.). The new geometry supports also multi-GPU simulations.
 
-In the MPI version of the code the lattice is broken up into local lattices in addition to an even-odd preconditioning forming blocks of data in memory. Each of these blocks then corresponds to a contiguous set of indices. As a result, we need to additionally allocate field memory for buffers that we can use to send and receive information between different cores and nodes. In order to communicate correctly, we need to first fill the buffer of data to be sent. The division of the local lattice into blocks, the location of the different buffers and buffer copies are described in the following C structure in `Include/geometry.h`.
+
+## Implemented patterns
+
+### New Geometry
+The division of the local lattice into blocks, the location of the different buffers and buffer copies are described in a global array in `Include/Core/global.h` called `geometryBoxes`. This array contains structs of the type `box_t` located in `Include/Geometry/new_geometry.h`.
+
+```c
+typedef struct box_t {
+    int l[4]; 
+    int h[4];
+    int base_index;
+    int base_index_odd;
+    int parity; 
+    char mask; 
+    enum box_type type; 
+    int *ipt_ext; 
+    coord4 *icoord; 
+    int *icoord_idx; 
+    struct box_t *sendBox; 
+    struct box_t *next; 
+} box_t;
+```
+
+Every one of the boxes in `geometryBoxes` describes the even and odd part of a block or box in memory. The first box will be the master piece of elements that are not communicated, while every later piece in the array will describe a receive buffer. For example, I can find the number of odd sites in the master piece by writing the following code
+
+```c
+int number_of_odd_sites = boxVolumeOdd(geometryBoxes);
+```
+
+I can find the volume of all buffers together, by iterating through the boxes after the first box, which is a master piece. We can iterate by using `next`.
+
+```c
+box_t *L = geometryBoxes->next; // Starts at the second box
+int total_buffer_size = 0;
+while (L->next) {
+    total_buffer_size += boxVolume(L); // Add the full volume which is boxOddVolume + boxEvenVolume
+    L = L->next;
+}
+```
+
+### Legacy Geometry
+ The division of the local lattice into blocks, the location of the different buffers and buffer copies are described in the following C structure in `Include/geometry.h`.
 
 ```c
 typedef struct _geometry_descriptor
@@ -36,18 +76,68 @@ typedef struct _geometry_descriptor
 
 ```
 
+Here the iteration is encode by iterating over the pieces and then buffers, which are identified by an index `ipx`. The total number of pieces is encoded in the corresponding fields of the struct.
 
-### Global Geometry Descriptors
+```c
+geometry_descriptor* gd = &glattice; // For example
+int number_of_odd_inner_sites = 0;
+for (int ixp = 0; ixp < gd->total_spinor_master_pieces; ++ixp) {
+    if (ixp %% 2 == 1) { // Check that the master piece is odd
+        number_of_odd_inner_sites += gd->master_end[ixp] - gd->master_start[ixp] + 1;
+    }
+}
+```
 
-Usually, we want to initialize fields either on the full lattice or only with even or odd parity. In order to do this efficiently, the global geometry descriptors `glattice`, `glat_even` and `glat_odd` are initialized globally on host memory. These can then be used to allocate fields correspondingly 
+The buffer geometry is encoded in the elements `rbuf_*`, `sbuf_*`. We can find, for example, the full buffer volume by using the following code
 
-### Number of Sites
+```c
+geometry_descriptor* gd = &glattice; // For example
+int buffer_volume = 0;
+for (int i = 0; i < gd->nbuffers_spinor; ++i) {
+    buffer_volume += gd->sbuf_len[i]; 
+}
+```
+
+## Global Geometry Descriptors
+Usually, we want to initialize fields either on the full lattice or only with even or odd parity. This is encoded by saving the information in the field struct of the field.
+
+#### New geometry
+We are using an enum `gd_type` to evaluate whether the field is `EVEN`, `ODD` or `GLOBAL`. We can check, whether a field is either of that by direct comparison
+
+```c
+spinor_field_f *s; //Add initialization 
+if (s->parity == EVEN) printf("Field is even.\n");
+if (s->parity == ODD) printf("Field is odd.\n");
+if (s->parity == GLOBAL) printf("Field is defined on all sites.\n");
+```
+
+Further, we can use the numerical values saved in the enum definition, to check whether a field is defined on the even sites (`EVEN` or `GLOBAL`) or on the odd sites (`ODD` or `GLOBAL`).
+
+```c
+spinor_field_f *s; //Add initialization
+if (s->parity & EVEN) printf("Field is defined on even sites.\n");
+if (s->parity & ODD) printf("Field is defined on odd sites.\n");
+```
+
+For the new geometry, we split the lattice into master pieces and receive buffers. In contrast to the legacy geometry described in the next section, we do not need to distinguish between sites that are in the bulk of the lattice and sites that are on the boundary and have neighbors in the receive buffers.
+
+#### Legacy geometry
+The global geometry descriptors `glattice`, `glat_even` and `glat_odd` are initialized globally on host memory. These can then be used to allocate fields correspondingly. We can then query geometry information by using the type field. For example, checking whether a field is even or odd would work in the following way:
+
+```c
+spinor_field_f *s; //Add initialization
+if (s->type == &glattice) printf("Field is even.\n");
+if (s->type == &glat_odd) printf("Field is odd.\n");
+if (s->type == &glat_even) printf("Field is even\n");
+```
+
+##### Number of Sites
 In order to allocate memory for the field data, we need to know how many elementary field types we need to allocate. This is different for fields that are located on the sites or the links of the lattice. Correspondingly, for the given lattice geometry, the number of sites and the number of links are calculated and saved in the fields `gsize_spinor` and `gsize_gauge` respectively.
 
-#### Master Pieces
+##### Master Pieces
 A piece is called _master_ if it does not contain copies of other sites, as for example is the case for buffer pieces. These are copies of sites already stored in a master piece. 
 
-The sites in a master piece can be categorized by their function in computation and communications. 
+For the old geoemtry implementation, the sites in a master piece can be categorized by their function in computation and communications. 
 
 * Bulk elements/inner elements
 	- Function in computation: Computation performed on bulk elements does not need communication because the sites in the bulk only depend on sites on the boundary, which are already accessible from the thread.
@@ -71,7 +161,7 @@ A single boundary communication between two 2D local lattices would accordingly 
 
 Here the boundary elements are being communicated to the respective boundary of the other block. Bulk elements are unaffected.
 
-### Inner Master Pieces
+##### Inner Master Pieces
 The first decomposition of the lattice site is the even-odd preconditioning. This splits  any lattice in two pieces: an even and an odd one. These pieces are stored contiguously in memory meaning that at the first indices one can only read sites of the even lattice and after an offset we are only reading odd sites. For an even-odd preconditioned lattice the number of inner master pieces is therefore two and can be accessed in the variable `inner_master_pieces` of the geometry descriptor. In this context, an _inner_ master piece comprises all sites that are in the _bulk_ of a local lattice of given parity.
 
 Resultingly, there is a shift in the local master piece block that is the starting index of the odd sites. For this, one can use the field `master_shift`. This field contains the offset of a lattice geometry relative to the full lattice. The even lattice is not offset and overlaps with the first half of the full lattice. The odd lattice, however, overlaps with the last half, so it is offset by half the number of lattice points compared to the full lattice. As a result, the odd lattice geometry, saved in the global variables as `&glat_odd` has the `master_shift` agreeing with the first index of the odd block of the full lattice.
@@ -89,7 +179,6 @@ which corresponds to a full lattice being decomposed like the following illustra
  
 ##### Local Master Pieces
 The local master pieces are the pieces of local lattices, the blocks that the lattice is decomposed into to be processed either by a single thread/core or GPU. For example, take a lattice of size $8^3\times 16$ split up with an MPI layout of `1.1.1.2` into two local lattices of size $8^4$. Due to the even-odd preconditioning the blocks are further split up into two. The field `local_master_pieces` identifies the number of local master pieces. In this case the integer saved in `local_master_pieces` is equal to four. This is saved in memory in the following way: First the even parts of the two blocks and then the odd parts. 
-
 
 @image html development_notes/field_geometry/eo_block_decomp.png "Combination of Even-Odd-Preconditioning and Block Decomposition in Memory" width=400px
 @image latex development_notes/field_geometry/eo_block_decomp.png "Combination of Even-Odd-Preconditioning and Block Decomposition in Memory" width=8cm
@@ -134,13 +223,16 @@ The integers
 
 are necessary for optimizing communications between cores on a single node.
 
-### Optimizing Communications
+## Optimizing Communications
 
+The legacy geometry implemented a difficult scheme to make sure, that the sendbuffers that are located on the boundary of the lattice are stored contiguously in memory, so that they can be copied as a single block by MPI. It is, however, simpler, to store the elements of the master pieces in whichever way without distinguishing boundary (send buffers) and inner elements. Therefore, for the new geometry, a sync operation reads out elements from the boundary to a designated sendbuffer which in turn is then send to the other process. This simplifies the field geometry and has minimal impact on performance, which might be compensated by simplifying field operations.
+
+### Legacy Geometry
 As already described the local blocks decompose further into even and odd pieces, sites of the halo, boundary and bulk. We want to access these pieces separately, because they have different roles in computation and communication. Manipulating these different elements in the field data therefore requires different code. However, in order to conserve optimal access patterns, every data access has to be an access to a single block of contiguous memory. When storing all sites in the extended lattice naively, one might have to access multiple blocks of memory for a particular computation or communication step. This negatively impacts memory access performance due to suboptimal bus-utilization, data reuse and automatic caching patterns. The challenge is, therefore, to arrange the sites in memory in such a way that every memory access is an access to a single continguous block of memory.
 
 As a result, we want to store the data in a local block first of all in such a way, that the inner sites are all consecutive, are then followed by boundary elements and finally halo elements/receive buffers. 
 
-##### Boundary and Receive Buffers
+#### Boundary and Receive Buffers
 
 Here in particular the arrangement of the boundary elements is crucial, because different overlapping parts of the boundary are requested by different nodes. At this point, we do not need to worry about the concrete arrangement of points in the bulk, because computations on the inner points can be executed in a single block, a caveat being discussed in the next section.
 
@@ -156,7 +248,7 @@ We arrange memory as in the following 4-by-4 2D example
  * We can now proceed to label the receive buffers. Here we want the memory that we write to again be contiguous. This works out naturally, the receive buffers are 9-10, then 11-12, then 13-14 and finally 15-16.
  * Proceed analogously for the odd lattice. In contrast to the even lattice, we do not have any holes in the numbering.
 
-##### Bulk Arrangement
+#### Bulk Arrangement
 As mentioned above, inner elements are always accessed as a block in memory and therefore the accesses are continguous. However, the order of access can have an impact on L1 and L2 caching and therefore the speed of memory transfer. Caching is optimal, if the bulk elements are subdivided into smaller block elements. This is implemented under the name _path blocking_. The dimensions of the bulk subblocks are stored in the global variables (`Include/global.h`)
 
 ```c
@@ -173,7 +265,7 @@ as `PB_T`, `PB_X`, `PB_Y` and `PB_Z`. On a 6-by-6 2D lattice `PB_X=2` and `PB_Y=
 @image latex development_notes/field_geometry/path_blocking.png "Path Blocking Illustration" width=4cm
 
 
-### Buffer Synchronization
+#### Buffer Synchronization
 For complex decompositions, that are usual in lattice simulations, the blocks have to communicate in a highly non-trivial way. For example decomposing a $32^3\times 64$ lattice into $8^4$ local lattices requires 512 processes to communicate the three dimensional surfaces of each four-dimensional local lattice with all interfacing blocks. In order to perform this communication we need to know both the indices of the sending blocks and map them to the receiving blocks. This information is stored in the arrays `rbuf_from_proc` and `sbuf_to_proc`, which tell us which processes send to which processes by id, and further the arrays `rbuf_start` and `sbuf_start`, which tell us at which index in the local lattice we need to start reading. We can iterate through these arrays to find pairs of sending and receiving processes and perform the communication. The size of the memory transfer is further stored in the array `sbuf_len` and `rbuf_len`.
 
 The number of copies necessary depends on whether the field is a spinor field or gauge field and saved in the fields `nbuffers_spinor` and `nbuffers_gauge`.
