@@ -36,7 +36,7 @@ jobs:
       - name: Include Doxygen in path
         run: echo `pwd`'/doxygen-1.9.4/bin' >>"${GITHUB_PATH}"
 
-      - name: Doxygen build
+      - name: Doxygen build documentation
         run: |
           cd Doc/ && mkdir -p _build/ && doxygen doxygen/Doxyfile
       - name: Deploy
