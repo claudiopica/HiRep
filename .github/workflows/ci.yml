@@ -33,7 +33,7 @@ jobs:
         packages: openmpi-bin openmpi-common libopenmpi3 libopenmpi-dev ninja-build
         version: 1.0
     - name: Setup link to mpirun alternative
-      run: sudo ln -s /usr/bin/mpirun /usr/bin/mpirun.openmpi
+      run: sudo ln -s /usr/bin/mpirun.openmpi /usr/bin/mpirun
 
     - name: Download HiRep
       run: wget https://github.com/claudiopica/HiRep/archive/${{ github.sha }}.tar.gz && tar -xvf ${{ github.sha }}.tar.gz --strip-components=1
