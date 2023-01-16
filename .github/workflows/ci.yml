@@ -30,6 +30,9 @@ jobs:
             repr: ADJ
 
     steps:
+    - name: Download HiRep
+      run: wget https://github.com/claudiopica/HiRep/archive/${{ github.sha }}.tar.gz && tar -xvf ${{ github.sha }}.tar.gz --strip-components=1
+
     - name: Check API rate
       uses: ./.github/action/api-rate
 
@@ -40,11 +43,9 @@ jobs:
         version: 1.0
     - name: Setup link to mpirun alternative
       run: sudo ln -s /usr/bin/mpirun.openmpi /usr/bin/mpirun
-    - name: Set MPI environment
-      run: echo "OMPI_MCA_mca_base_component_show_load_errors=0" >> $GITHUB_ENV
 
-    - name: Download HiRep
-      run: wget https://github.com/claudiopica/HiRep/archive/${{ github.sha }}.tar.gz && tar -xvf ${{ github.sha }}.tar.gz --strip-components=1
     - name: Run Tests
+      env: 
+        OMPI_MCA_mca_base_component_show_load_errors: 0
       run: ./TestProgram/run_tests.sh "Algebra DiracOperator Geometry Inverters Sources StoredConfs Utils Propagator Random SpinorField Update WilsonLoops" --mpicc mpicc.openmpi -cflags "-Wall -O1" -n ${{ matrix.nc }} -r ${{ matrix.repr }} ${{ matrix.mpi }} ${{ matrix.ecsw }}
 
