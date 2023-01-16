@@ -35,7 +35,11 @@ jobs:
     - name: Setup link to mpirun alternative
       run: sudo ln -s /usr/bin/mpirun.openmpi /usr/bin/mpirun
     - name: Update dynamic linker run-time bindings
-      run: sudo ldconfig
+      run: |
+        sudo ldconfig
+        sudo ldconfig -p | grep libpsm_infinipath
+        sudo ls -lR /usr/lib/
+
 
     - name: Download HiRep
       run: wget https://github.com/claudiopica/HiRep/archive/${{ github.sha }}.tar.gz && tar -xvf ${{ github.sha }}.tar.gz --strip-components=1
