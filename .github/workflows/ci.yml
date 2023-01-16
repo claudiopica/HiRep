@@ -38,7 +38,7 @@ jobs:
         }
         while : ; do
           check_rate
-          [[ rate <= 100 ]] || break
+          [[ rate < 100 ]] || break
         done
 
     - name: Install dependencies
