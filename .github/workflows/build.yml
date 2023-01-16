@@ -36,7 +36,9 @@ jobs:
 
     - name: debug
       run: |
-        ls -la /usr/bin/
+        sudo update-alternatives --config mpi
+        sudo update-alternatives --config mpirun
+        sudo update-alternatives --config mpi-x86_64-linux-gnu
         /usr/bin/mpicc --version
     - name: Download HiRep
       run: wget https://github.com/claudiopica/HiRep/archive/${{ github.sha }}.tar.gz && tar -xvf ${{ github.sha }}.tar.gz --strip-components=1
