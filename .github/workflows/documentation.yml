@@ -16,8 +16,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Install dependencies
-        run: |
-          sudo apt-get update && sudo apt-get install -y graphviz texlive-base
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: graphviz texlive-base
+          version: 1.0
 
       - name: Restore Doxygen 1.9.4 from cache
         id: restore-doxygen
@@ -30,7 +32,7 @@ jobs:
         run: |
           wget https://github.com/doxygen/doxygen/releases/download/Release_1_9_4/doxygen-1.9.4.linux.bin.tar.gz
           tar -xzf doxygen-1.9.4.linux.bin.tar.gz
-          
+
       - name: Include Doxygen in path
         run: echo `pwd`'/doxygen-1.9.4/bin' >>"${GITHUB_PATH}"
 
