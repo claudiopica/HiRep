@@ -1455,7 +1455,7 @@ sub write_vector_project {
 sub write_suN_multiply {
   print "/* SU(N) matrix u times SU(N) vector s */\n";
   print "/* r=u*s */\n";
-  print "#define _${dataname}_multiply(r,u,s) \\\n";
+  print "#define _${dataname}_multiply_default(r,u,s) \\\n";
 	if ($N<$Nmax) { #unroll all
 		my ($k)=(0);
 		for(my $i=0;$i<$N;$i++){
@@ -1488,6 +1488,7 @@ sub write_suN_multiply {
 		print "      }\\\n";
 		print "   } while(0) \n\n";
 	}
+  print "#define _${dataname}_multiply(r,u,s)  _${dataname}_multiply_default(r,u,s)\n\n";
 }
 
 sub write_suN_double_multiply {
@@ -1495,15 +1496,15 @@ sub write_suN_double_multiply {
   print "/* r1=u*s1 */\n";
   print "/* r2=u*s2 */\n";
   print "#define _${dataname}_double_multiply_default(r1,r2,u,s1,s2)\\\n";
-  print "      _${dataname}_multiply(r1,u,s1);\\\n";
-  print "      _${dataname}_multiply(r2,u,s2)\n\n";
+  print "      _${dataname}_multiply_default(r1,u,s1);\\\n";
+  print "      _${dataname}_multiply_default(r2,u,s2)\n\n";
   print "#define _${dataname}_double_multiply(r1,r2,u,s1,s2) _${dataname}_double_multiply_default(r1,r2,u,s1,s2)\n\n";
 }
 
 sub write_suNr_multiply {
   print "/* SU(N) matrix u times SU(N) vector s */\n";
   print "/* r=u*s */\n";
-  print "#define _${rdataname}_multiply(r,u,s) \\\n";
+  print "#define _${rdataname}_multiply_default(r,u,s) \\\n";
 	if ($N<$Nmax) { #unroll all
 		my ($k)=(0);
 		for(my $i=0;$i<$N;$i++){
@@ -1536,6 +1537,7 @@ sub write_suNr_multiply {
 		print "      }\\\n";
 		print "   } while(0) \n\n";
 	}
+  print "#define _${rdataname}_multiply(r,u,s) _${rdataname}_multiply_default(r,u,s)\n\n";
 }
 
 sub write_suNr_double_multiply {
@@ -1543,8 +1545,8 @@ sub write_suNr_double_multiply {
   print "/* r1=u*s1 */\n";
   print "/* r2=u*s2 */\n";
   print "#define _${rdataname}_double_multiply_default(r1,r2,u,s1,s2)\\\n";
-  print "      _${rdataname}_multiply(r1,u,s1);\\\n";
-  print "      _${rdataname}_multiply(r2,u,s2)\n\n";
+  print "      _${rdataname}_multiply_default(r1,u,s1);\\\n";
+  print "      _${rdataname}_multiply_default(r2,u,s2)\n\n";
   print "#define _${rdataname}_double_multiply(r1,r2,u,s1,s2) _${rdataname}_double_multiply_default(r1,r2,u,s1,s2)\n\n";
 }
 
@@ -1689,7 +1691,7 @@ if ($N==2) { #fundamental representation
 sub write_suN_inverse_multiply {
 	print "/* SU(N) matrix u^dagger times SU(N) vector s */\n";
 	print "/* r=(u^dagger)*s */\n";
-	print "#define _${dataname}_inverse_multiply(r,u,s) \\\n";
+	print "#define _${dataname}_inverse_multiply_default(r,u,s) \\\n";
 	my $shift=$N*$N-$N-1;
 	if ($N<$Nmax) { #unroll all
 		my ($k)=(0);
@@ -1724,21 +1726,25 @@ sub write_suN_inverse_multiply {
 		print "      }\\\n";
 		print "   } while(0) \n\n";
 	}
+	print "#define _${dataname}_inverse_multiply(r,u,s) _${dataname}_inverse_multiply_default(r,u,s) \n\n";
+
 }
 
 sub write_suN_double_inverse_multiply {
   print "/* SU(N) matrix u^dagger times SU(N) vectors s1,s2 */\n";
   print "/* r1=(u^dagger)*s1 */\n";
   print "/* r2=(u^dagger)*s2 */\n";
-  print "#define _${dataname}_double_inverse_multiply(r1,r2,u,s1,s2)\\\n";
-  print "      _${dataname}_inverse_multiply(r1,u,s1);\\\n";
-  print "      _${dataname}_inverse_multiply(r2,u,s2)\n\n";
+  print "#define _${dataname}_double_inverse_multiply_default(r1,r2,u,s1,s2)\\\n";
+  print "      _${dataname}_inverse_multiply_default(r1,u,s1);\\\n";
+  print "      _${dataname}_inverse_multiply_default(r2,u,s2)\n\n";
+  print "#define _${dataname}_double_inverse_multiply(r1,r2,u,s1,s2) _${dataname}_double_inverse_multiply_default(r1,r2,u,s1,s2)\n\n";
+
 }
 
 sub write_suNr_inverse_multiply {
   print "/* SU(N) matrix u^dagger times SU(N) vector s */\n";
   print "/* r=(u^dagger)*s */\n";
-  print "#define _${rdataname}_inverse_multiply(r,u,s) \\\n";
+  print "#define _${rdataname}_inverse_multiply_default(r,u,s) \\\n";
 	my $shift=$N*$N-$N-1;
 	if ($N<$Nmax) { #unroll all
 		my ($k)=(0);
@@ -1773,15 +1779,17 @@ sub write_suNr_inverse_multiply {
 		print "      }\\\n";
 		print "   } while(0) \n\n";
 	}
+  print "#define _${rdataname}_inverse_multiply(r,u,s) _${rdataname}_inverse_multiply_default(r,u,s) \n\n";
 }
 
 sub write_suNr_double_inverse_multiply {
   print "/* SU(N) matrix u^dagger times SU(N) vectors s1,s2 */\n";
   print "/* r1=(u^dagger)*s1 */\n";
   print "/* r2=(u^dagger)*s2 */\n";
-  print "#define _${rdataname}_double_inverse_multiply(r1,r2,u,s1,s2)\\\n";
-  print "      _${rdataname}_inverse_multiply(r1,u,s1);\\\n";
-  print "      _${rdataname}_inverse_multiply(r2,u,s2)\n\n";
+  print "#define _${rdataname}_double_inverse_multiply_default(r1,r2,u,s1,s2)\\\n";
+  print "      _${rdataname}_inverse_multiply_default(r1,u,s1);\\\n";
+  print "      _${rdataname}_inverse_multiply_default(r2,u,s2)\n\n";
+  print "#define _${rdataname}_double_inverse_multiply(r1,r2,u,s1,s2) _${rdataname}_double_inverse_multiply_default(r1,r2,u,s1,s2)\n\n";
 }
 #
 # MATRIX-MATRIX OPERATIONS

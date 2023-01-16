@@ -636,7 +636,6 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
     } /* SITE_FOR */
   }   /* PIECE FOR */
 }
-#endif
 
 #if (NG == 3) && defined(REPR_FUNDAMENTAL)
 void Dphi_fused_(spinor_field *out, spinor_field *in)
@@ -947,7 +946,7 @@ void Dphi_fused_(spinor_field *out, spinor_field *in)
   } /* FUSE FOR */
 }
 #endif
-
+#endif
 /*
  * this function takes 2 spinors defined on the whole lattice
  */

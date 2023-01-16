@@ -6,25 +6,7 @@
 *
 *******************************************************************************/
 
-#define MAIN_PROGRAM
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <math.h>
-#include "setup.h"
-#include "io.h"
-#include "update.h"
-#include "geometry.h"
-#include "global.h"
-#include "logger.h"
-#include "random.h"
-#include "memory.h"
-#include "dirac.h"
-#include "linear_algebra.h"
-#include "representation.h"
-#include "utils.h"
-#include "communications.h"
+#include "libhr.h"
 
 int main(int argc,char *argv[])
 {

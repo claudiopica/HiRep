@@ -104,6 +104,21 @@ my @libs = ("libhr.a"); #this is for later programs to use
 }
 
 ###############################################################################
+# Benchmarks
+###############################################################################
+{
+  my $topdir = "TestProgram/Benchmarks";
+  my %exes = (
+    "speed_test_diracoperator" => [ "speed_test_diracoperator.c", ],
+    "speed_test_diracoperator_flt" => [ "speed_test_diracoperator_flt.c", ],
+    "speed_test_diracoperator_gpu" => [ "speed_test_diracoperator_gpu.c", ],
+  );
+
+  add_exes($topdir, \%exes, \@libs);
+  # print "default $topdir\n";
+}
+
+###############################################################################
 # Tests
 ###############################################################################
 {
