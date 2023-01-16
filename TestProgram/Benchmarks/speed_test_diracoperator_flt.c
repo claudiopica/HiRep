@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
 
   lprintf("MAIN", 0, "n_warmup = %d\n", n_warmup);
 
-  u_gauge_f_flt = (suNf_field_flt *)u_gauge_flt;
+  u_gauge_f_flt = alloc_gfield_f_flt(&glattice);
 
   /* allocate memory */
   lprintf("MAIN", 0, "Allocating spinor field\n");
@@ -104,6 +104,8 @@ int main(int argc, char *argv[])
           ((double)n_reps * VOLUME * bytesite) / elapsed / 1.e6);
 
   free_spinor_field_f_flt(s0);
+
+  free_gfield_f_flt(u_gauge_f_flt);
 
   finalize_process();
   exit(0);
