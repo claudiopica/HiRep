@@ -34,16 +34,10 @@ jobs:
         packages: openmpi-bin openmpi-common libopenmpi3 libopenmpi-dev ninja-build
         version: 1.0
 
-    - name: debug
-      run: |
-        sudo update-alternatives --config mpi
-        sudo update-alternatives --config mpirun
-        sudo update-alternatives --config mpi-x86_64-linux-gnu
-        /usr/bin/mpicc --version
     - name: Download HiRep
       run: wget https://github.com/claudiopica/HiRep/archive/${{ github.sha }}.tar.gz && tar -xvf ${{ github.sha }}.tar.gz --strip-components=1
     - name: Configure HiRep
-      run: ./Make/write_mkflags.pl -f Make/MkFlags.ini --cc ${{ matrix.compiler }} --env "OMPI_CC=${{ matrix.compiler }}" --cflags "-Wall -O1" -n ${{ matrix.nc }} -r ${{ matrix.repr }} ${{ matrix.mpi }} ${{ matrix.ecsw }}
+      run: ./Make/write_mkflags.pl -f Make/MkFlags.ini --cc ${{ matrix.compiler }} --env "OMPI_CC=${{ matrix.compiler }}" --mpicc mpicc.openmpi --cflags "-Wall -O1" -n ${{ matrix.nc }} -r ${{ matrix.repr }} ${{ matrix.mpi }} ${{ matrix.ecsw }}
     - name: Build
       run: time ./Make/nj
 
