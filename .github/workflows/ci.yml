@@ -37,7 +37,7 @@ jobs:
     - name: Update dynamic linker run-time bindings
       run: |
         sudo ldconfig
-        sudo ldconfig -p | grep libpsm_infinipath
+        sudo ldconfig -p
         sudo ls -lR /usr/lib/
 
 
