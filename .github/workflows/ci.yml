@@ -34,6 +34,8 @@ jobs:
         version: 1.0
     - name: Setup link to mpirun alternative
       run: sudo ln -s /usr/bin/mpirun.openmpi /usr/bin/mpirun
+    - name: Update dynamic linker run-time bindings
+      run: sudo ldconfig
 
     - name: Download HiRep
       run: wget https://github.com/claudiopica/HiRep/archive/${{ github.sha }}.tar.gz && tar -xvf ${{ github.sha }}.tar.gz --strip-components=1
