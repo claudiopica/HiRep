@@ -1,11 +1,17 @@
 name: Check API rate
 description: 'Check current limit on Github api rate, and wait if too low'
+
+inputs:
+  token:
+    description: 'the Github token'
+    required: true
+
 runs:
   using: "composite"
   steps:
     - shell: bash
       env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ inputs.token }}
       run: |
         check_rate() {
           rate=`gh api rate_limit | perl -ne 's/\n//g; m/"rate":{.*?"remaining":([0-9]+).*}/g; print $1;'`

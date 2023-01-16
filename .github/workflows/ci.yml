@@ -35,6 +35,8 @@ jobs:
 
     - name: Check API rate
       uses: ./.github/actions/api-rate
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Install dependencies
       uses: awalsh128/cache-apt-pkgs-action@latest
