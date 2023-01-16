@@ -1,12 +1,12 @@
-/*******************************************************************************
-*
-* File gamma_spinor.h
-*
-* Macros for gamma x spinor
-*
-* 2013 Rudy Arthur, Ari Hietanen
-*
-*******************************************************************************/
+/***************************************************************************\
+* Copyright (c) 2013, Rudy Arthur, Ari Hietanen                             *
+* All rights reserved.                                                      *
+\***************************************************************************/
+
+/**
+ * @file gamma_spinor.h
+ * @brief Macros for gamma x spinor
+ */
 
 #ifndef GAMMA_SPINOR_H
 #define GAMMA_SPINOR_H

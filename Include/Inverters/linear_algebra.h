@@ -3,6 +3,11 @@
 * All rights reserved.                                                      *
 \***************************************************************************/
 
+/**
+ * @file linear_algebra.h
+ * @brief Linear algebra operations on spinors both for CPU and with GPU
+ */
+
 #ifndef LINEAR_ALGEBRA_H
 #define LINEAR_ALGEBRA_H
 

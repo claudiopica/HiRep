@@ -1,3 +1,8 @@
+/**
+ * @file read_action.h
+ * @brief Read in action from input file and parameters
+ */
+
 #ifndef READ_ACTION_H
 #define READ_ACTION_H
 #include "Update/integrators.h"

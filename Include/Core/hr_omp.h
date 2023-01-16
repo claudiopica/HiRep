@@ -3,6 +3,11 @@
  * All rights reserved.                                                      * 
  \***************************************************************************/
 
+ /**
+  * @file hr_omp.h
+  * @brief OpenMP reduction operations for HiRep
+  */
+
 #ifndef HR_OMP_H
 #define HR_OMP_H
 

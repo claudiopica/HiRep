@@ -1,3 +1,9 @@
+/**
+ * @file check_options.h
+ * @brief Validation checks of the input parameters specified in the input file
+ *        and error messages that give instructions how to fix the issue.
+ */
+
 #ifndef CHECK_OPTIONS_H
 #define CHECK_OPTIONS_H
 

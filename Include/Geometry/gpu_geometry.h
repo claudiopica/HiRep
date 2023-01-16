@@ -2,6 +2,11 @@
 * Copyright (c) 2022, Claudio Pica, Sofie Martins                           *   
 * All rights reserved.                                                      * 
 \***************************************************************************/
+/**
+ * @file gpu_geometry
+ * @brief Implementation of geometry macros in (best possible) analogy to 
+ *        the CPU geometry macros.
+ */
 
 #ifndef GPU_GEOMETRY_H
 #define GPU_GEOMETRY_H

@@ -1,3 +1,8 @@
+/**
+ * @file core_utils.h
+ * @brief Macros to declare global variables 
+ */
+
 #ifndef CORE_UTILS_H
 #define CORE_UTILS_H
 

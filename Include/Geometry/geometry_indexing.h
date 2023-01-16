@@ -1,3 +1,8 @@
+/**
+ * @file geometry_indexing.h
+ * @brief Finding indices from coordinates and the other way around
+ */
+
 #ifndef GEOMETRY_INDEXING_H
 #define GEOMETRY_INDEXING_H
 

@@ -1,3 +1,8 @@
+/**
+ * @file avr_plaquette.h
+ * @brief Plaquette evaluation functions
+ */
+
 #ifndef AVR_PLAQUETTE_H
 #define AVR_PLAQUETTE_H
 

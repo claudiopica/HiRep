@@ -53,7 +53,6 @@
 		//
 #endif 
 
-
 /**
  * @brief This macro declares a field struct that contains all necessary 
  *        field data arrays, geometry information and communication handles.
