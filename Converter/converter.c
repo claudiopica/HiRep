@@ -1,12 +1,15 @@
 /*******************************************************************************
-*
-* Converter from different formats
-*
-* NOCOMPILE = WITH_MPI
-*******************************************************************************/
+ *
+ * Converter from different formats
+ *
+ * NOCOMPILE = WITH_MPI
+ *******************************************************************************/
 
 #include "libhr.h"
 #include <string.h>
+#include <stdio.h>
+#include <stdarg.h>
+#define STRLEN 1024
 
 #ifdef WITH_MPI
 #error Please compile without MPI!
@@ -15,7 +18,32 @@
 #define true (0 == 0)
 #define false (0 == 1)
 
-static char error_filename[256] = "err_0";
+void safesprintf(char *str, const char *format, ...)
+{
+  int count = 0;
+  for (int i = 0; i < strlen(format); i++)
+  {
+    if (format[i] != '%')
+      count++;
+  }
+  int nstrings = STRLEN * count + strlen(format);
+
+  va_list args;
+  char *buffer = malloc(nstrings * sizeof(char));
+
+  va_start(args, format);
+  vsprintf(buffer, format, args);
+  va_end(args);
+
+  error(strlen(buffer) > STRLEN, 0, "safesprintf", "Please increase the default string length in converter.c");
+
+  for (int i = 0; i < strlen(buffer); ++i)
+    str[i] = buffer[i];
+
+  free(buffer);
+}
+
+static char error_filename[STRLEN] = "err_0";
 typedef struct format_type
 {
   char name[256];
@@ -76,7 +104,7 @@ typedef struct filename_type
 } filename_type;
 
 filename_type input_filename;
-char output_filename[1024];
+char output_filename[STRLEN];
 format_type *input_format;
 format_type *output_format;
 int check = false;
@@ -335,14 +363,14 @@ static void converter_read_cmdline(int argc, char *argv[])
       print_cmdline_info();
     }
 
-    char tmp[1024];
+    char tmp[STRLEN];
 
     if (ad + 1 >= argc)
     {
       lprintf("ERROR", 0, "Output directory missing.\n");
       print_cmdline_info();
     }
-    sprintf(tmp, "%s/", argv[ad + 1]);
+    safesprintf(tmp, "%s/", argv[ad + 1]);
 
     if (al != 0)
     {
@@ -351,7 +379,7 @@ static void converter_read_cmdline(int argc, char *argv[])
         lprintf("ERROR", 0, "Label missing.\n");
         print_cmdline_info();
       }
-      sprintf(output_filename, "%s%s_", tmp, argv[al + 1]);
+      safesprintf(output_filename, "%s%s_", tmp, argv[al + 1]);
     }
     else
     {
@@ -360,10 +388,10 @@ static void converter_read_cmdline(int argc, char *argv[])
         lprintf("ERROR", 0, "Since I cannot read the label from the input file name, you must use the -l option.\n");
         print_cmdline_info();
       }
-      sprintf(output_filename, "%s%s_", tmp, input_filename.label);
+      safesprintf(output_filename, "%s%s_", tmp, input_filename.label);
     }
 
-    sprintf(tmp, "%s%dx%dx%dx%dnc%d", output_filename, GLB_T, GLB_X, GLB_Y, GLB_Z, NG);
+    safesprintf(tmp, "%s%dx%dx%dx%dnc%d", output_filename, GLB_T, GLB_X, GLB_Y, GLB_Z, NG);
 
     if (input_filename.cnfg_type == QUENCHED_CNFG)
     {
@@ -373,7 +401,7 @@ static void converter_read_cmdline(int argc, char *argv[])
         lprintf("ERROR", 0, "beta missing in input file. This is strange!!!\n");
         print_cmdline_info();
       }
-      sprintf(output_filename, "%sb%.6f", tmp, input_filename.beta);
+      safesprintf(output_filename, "%sb%.6f", tmp, input_filename.beta);
       strcpy(tmp, output_filename);
 
       if (aM != 0)
@@ -389,7 +417,7 @@ static void converter_read_cmdline(int argc, char *argv[])
           lprintf("ERROR", 0, "Representation missing.\n");
           print_cmdline_info();
         }
-        sprintf(output_filename, "%sr%s", tmp, argv[ar + 1]);
+        safesprintf(output_filename, "%sr%s", tmp, argv[ar + 1]);
       }
       else
       {
@@ -398,7 +426,7 @@ static void converter_read_cmdline(int argc, char *argv[])
           lprintf("ERROR", 0, "Since I cannot read the representation from the input file name, you must use the -r option.\n");
           print_cmdline_info();
         }
-        sprintf(output_filename, "%sr%s", tmp, input_filename.repr);
+        safesprintf(output_filename, "%sr%s", tmp, input_filename.repr);
       }
 
       if (input_filename.nf_f == false)
@@ -406,14 +434,14 @@ static void converter_read_cmdline(int argc, char *argv[])
         lprintf("ERROR", 0, "nf missing in input file. This is strange!!!\n");
         print_cmdline_info();
       }
-      sprintf(tmp, "%snf%d", output_filename, input_filename.nf);
+      safesprintf(tmp, "%snf%d", output_filename, input_filename.nf);
 
       if (input_filename.beta_f == false)
       {
         lprintf("ERROR", 0, "beta missing in input file. This is strange!!!\n");
         print_cmdline_info();
       }
-      sprintf(output_filename, "%sb%.6f", tmp, input_filename.beta);
+      safesprintf(output_filename, "%sb%.6f", tmp, input_filename.beta);
 
       if (aM != 0)
       {
@@ -422,7 +450,7 @@ static void converter_read_cmdline(int argc, char *argv[])
           lprintf("ERROR", 0, "Mass missing.\n");
           print_cmdline_info();
         }
-        sprintf(tmp, "%sm%s", output_filename, argv[aM + 1]);
+        safesprintf(tmp, "%sm%s", output_filename, argv[aM + 1]);
       }
       else
       {
@@ -432,9 +460,9 @@ static void converter_read_cmdline(int argc, char *argv[])
           print_cmdline_info();
         }
         if (input_filename.mass_f == true)
-          sprintf(tmp, "%sm%.6f", output_filename, input_filename.mass);
+          safesprintf(tmp, "%sm%.6f", output_filename, input_filename.mass);
         else if (input_filename.kappa_f == true)
-          sprintf(tmp, "%sm%.6f", output_filename, -.5 / input_filename.kappa + 4.);
+          safesprintf(tmp, "%sm%.6f", output_filename, -.5 / input_filename.kappa + 4.);
       }
     }
 
@@ -445,7 +473,7 @@ static void converter_read_cmdline(int argc, char *argv[])
         lprintf("ERROR", 0, "Number missing.\n");
         print_cmdline_info();
       }
-      sprintf(output_filename, "%sn%d", tmp, atoi(argv[an + 1]));
+      safesprintf(output_filename, "%sn%d", tmp, atoi(argv[an + 1]));
     }
     else
     {
@@ -454,7 +482,7 @@ static void converter_read_cmdline(int argc, char *argv[])
         lprintf("ERROR", 0, "Since I cannot read the number from the input file name, you must use the -n option.\n");
         print_cmdline_info();
       }
-      sprintf(output_filename, "%sn%d", tmp, input_filename.n);
+      safesprintf(output_filename, "%sn%d", tmp, input_filename.n);
     }
 
     output_format = NULL;
@@ -500,7 +528,7 @@ static void converter_read_cmdline(int argc, char *argv[])
 
 int main(int argc, char *argv[])
 {
-
+  
   converter_read_cmdline(argc, argv);
 
   RID = 0;
@@ -509,8 +537,8 @@ int main(int argc, char *argv[])
 
   /* logger setup */
   FILE *stderrp;
-  char sbuf[270];
-  sprintf(sbuf, ">>%s.log", output_filename);
+  char sbuf[STRLEN];
+  safesprintf(sbuf, ">>%s.log", output_filename);
   logger_stdout(sbuf);
   stderrp = freopen(error_filename, "w", stderr);
   error(stderrp == NULL, 1, "setup_process [process_init.c]",

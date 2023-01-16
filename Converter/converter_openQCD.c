@@ -10,6 +10,9 @@
 #include "libhr.h"
 #include <string.h>
 #include <ctype.h>
+#include <stdio.h>
+#include <stdarg.h>
+#define STRLEN 1024
 
 #ifdef WITH_MPI
 #error Please compile without MPI!
@@ -17,6 +20,31 @@
 #if !(defined(BC_X_PERIODIC)) || !(defined(BC_Y_PERIODIC)) || !(defined(BC_Z_PERIODIC)) || !(defined(BC_T_PERIODIC))
 #error Please compile with Periodic Boundary Conditions
 #endif
+
+void safesprintf(char *str, const char *format, ...)
+{
+  int count = 0;
+  for (int i = 0; i < strlen(format); i++)
+  {
+    if (format[i] != '%')
+      count++;
+  }
+  int nstrings = STRLEN * count + strlen(format);
+
+  va_list args;
+  char *buffer = malloc(nstrings * sizeof(char));
+
+  va_start(args, format);
+  vsprintf(buffer, format, args);
+  va_end(args);
+
+  error(strlen(buffer) > STRLEN, 0, "safesprintf", "Please increase the default string length in converter.c");
+
+  for (int i = 0; i < strlen(buffer); ++i)
+    str[i] = buffer[i];
+
+  free(buffer);
+}
 
 static void slower(char *str)
 {
@@ -45,9 +73,9 @@ format_type *conf_format;
 
 typedef struct conf_details
 {
-  char cnfgin[256];
-  char cnfgout[256];
-  char type[128];
+  char cnfgin[STRLEN];
+  char cnfgout[STRLEN];
+  char type[STRLEN];
   input_record_t read[3];
 } conf_details;
 
@@ -77,22 +105,22 @@ int main(int argc, char *argv[])
   if (strcmp(conf_info.type, "openqcd_obc") == 0)
   {
     conf_format = format;
-    sprintf(conf_info.cnfgout, "HiRep_obc_%s", conf_info.cnfgin);
+    safesprintf(conf_info.cnfgout, "HiRep_obc_%s", conf_info.cnfgin);
   }
   else if (strcmp(conf_info.type, "openqcd_sf") == 0)
   {
     conf_format = format + 1;
-    sprintf(conf_info.cnfgout, "HiRep_sf_%s", conf_info.cnfgin);
+    safesprintf(conf_info.cnfgout, "HiRep_sf_%s", conf_info.cnfgin);
   }
   else if (strcmp(conf_info.type, "openqcd_pbc") == 0)
   {
     conf_format = format + 2;
-    sprintf(conf_info.cnfgout, "HiRep_pbc_%s", conf_info.cnfgin);
+    safesprintf(conf_info.cnfgout, "HiRep_pbc_%s", conf_info.cnfgin);
   }
   else if (strcmp(conf_info.type, "hirep") == 0)
   {
     conf_format = format + 3;
-    sprintf(conf_info.cnfgout, "openQCD_%s", conf_info.cnfgin);
+    safesprintf(conf_info.cnfgout, "openQCD_%s", conf_info.cnfgin);
   }
   else
   {
