@@ -38,7 +38,8 @@ jobs:
       run: |
         sudo ldconfig
         sudo ldconfig -p
-        sudo ls -lR /usr/lib/
+        sudo ls -l /usr/lib/
+        sudo ls -l /usr/lib/x86_64-linux-gnu/
 
 
     - name: Download HiRep
