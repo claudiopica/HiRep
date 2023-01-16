@@ -25,13 +25,12 @@ jobs:
         with:
           path: doxygen-1.9.4/bin
           key: doxygen-1.9.4
-
       - name: Download Doxygen 1.9.4
         if: steps.restore-doxygen.outputs.cache-hit != 'true'
         run: |
           wget https://github.com/doxygen/doxygen/releases/download/Release_1_9_4/doxygen-1.9.4.linux.bin.tar.gz
           tar -xzf doxygen-1.9.4.linux.bin.tar.gz
-
+          
       - name: Include Doxygen in path
         run: echo `pwd`'/doxygen-1.9.4/bin' >>"${GITHUB_PATH}"
 
