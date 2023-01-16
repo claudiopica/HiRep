@@ -31,14 +31,20 @@ jobs:
 
     steps:
     - name: Check API rates
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         check_rate() {
-          rate=`gh api rate_limit | perl -ne 's/\n//g; m/"rate":{.*?"remaining":(.*?),.*}/g; print $1;'`
+          rate=`gh api rate_limit | perl -ne 's/\n//g; m/"rate":{.*?"remaining":([0-9]+).*}/g; print $1;'`
           echo "Remaining requests: $rate"
         }
         while : ; do
           check_rate
           [[ rate < 100 ]] || break
+          sec=`gh api rate_limit | perl -ne 's/\n//g; m/"rate":{.*?"reset":([0-9]+).*}/g; print $1;'`
+          sec=$(( $sec - `date +%s` ))
+          echo "Sleeping $sec seconds"
+          sleep $sec
         done
 
     - name: Install dependencies
