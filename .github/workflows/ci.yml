@@ -30,6 +30,17 @@ jobs:
             repr: ADJ
 
     steps:
+    - name: Check API rates
+      run: |
+        check_rate() {
+          rate=`gh api rate_limit | perl -ne 's/\n//g; m/"rate":{.*?"remaining":(.*?),.*}/g; print $1;'`
+          echo "Remaining requests: $rate"
+        }
+        while : ; do
+          check_rate
+          [[ rate <= 100 ]] || break
+        done
+
     - name: Install dependencies
       uses: awalsh128/cache-apt-pkgs-action@latest
       with:
