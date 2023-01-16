@@ -78,6 +78,8 @@ int main(int argc, char *argv[])
   elapsed = 0.;
   n_reps /= 10;
   n_reps_trial = n_reps;
+  bcast_int(&n_reps_trial, 1);
+
   do
   {
 
