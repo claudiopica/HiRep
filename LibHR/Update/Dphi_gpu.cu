@@ -104,6 +104,88 @@ static void init_Dirac() {
   }
 }
 
+static kernel_field_input* get_even_input(spinor_field *out, spinor_field *in) {
+  kernel_field_input* input;
+  input = (kernel_field_input*)malloc(sizeof(kernel_field_input));
+
+  input->field_in = in->gpu_ptr;
+  input->master_shift_in = in->type->master_shift;
+  input->start_in = geometryBoxes->base_index;
+  input->stride_in = boxEvenVolume(geometryBoxes);
+
+  input->field_out = out->gpu_ptr;
+  input->master_shift_out = out->type->master_shift;
+  input->start_out = geometryBoxes->base_index_odd;
+  input->stride_out = boxOddVolume(geometryBoxes);
+
+  kernel_field_input* d_input;
+  cudaMalloc((void**)&d_input, sizeof(kernel_field_input));
+  cudaMemcpy(d_input, input, sizeof(kernel_field_input), cudaMemcpyHostToDevice);
+  return d_input;
+}
+
+static kernel_field_input* get_even_buffer_input(spinor_field *out, spinor_field *in, int buffer_idx) {
+  kernel_field_input* input;
+  input = (kernel_field_input*)malloc(sizeof(kernel_field_input));
+
+  input->field_in = in->gpu_ptr;
+  input->start_in = in->type->rbuf_start[buffer_idx];
+  input->stride_in = in->type->rbuf_len[buffer_idx];
+  input->master_shift_in = in->type->master_shift;
+
+  input->field_out = out->gpu_ptr;
+  input->start_out = geometryBoxes->base_index_odd;
+  input->stride_out = boxOddVolume(geometryBoxes);
+  input->master_shift_out = out->type->master_shift;
+
+  kernel_field_input* d_input;
+  cudaMalloc((void**)&d_input, sizeof(kernel_field_input));
+  cudaMemcpy(d_input, input, sizeof(kernel_field_input), cudaMemcpyHostToDevice);
+  return d_input;
+}
+
+static kernel_field_input* get_odd_input(spinor_field *out, spinor_field *in) {
+  kernel_field_input *input;
+  input = (kernel_field_input*)malloc(sizeof(kernel_field_input));
+
+  input->field_in = in->gpu_ptr;
+  input->start_in = geometryBoxes->base_index_odd;
+  input->stride_in = boxOddVolume(geometryBoxes);
+  input->master_shift_in = in->type->master_shift;
+
+  input->field_out = out->gpu_ptr;
+  input->start_out = geometryBoxes->base_index;
+  input->stride_out = boxEvenVolume(geometryBoxes);
+  input->master_shift_out = out->type->master_shift;
+
+  kernel_field_input* d_input;
+  cudaMalloc((void**)&d_input, sizeof(kernel_field_input));
+  cudaMemcpy(d_input, input, sizeof(kernel_field_input), cudaMemcpyHostToDevice);
+  return d_input;
+}
+
+static kernel_field_input* get_odd_buffer_input(spinor_field *out, spinor_field *in, int buffer_idx) {
+  kernel_field_input* input;
+  input = (kernel_field_input*)malloc(sizeof(kernel_field_input));
+  
+  int i = buffer_idx;
+  if (out->type==&glattice) i = buffer_idx+1;
+  input->field_in = in->gpu_ptr;
+  input->start_in = in->type->rbuf_start[i];
+  input->stride_in = in->type->rbuf_len[i];
+  input->master_shift_in = in->type->master_shift;
+
+  input->field_out = out->gpu_ptr;
+  input->start_out = geometryBoxes->base_index;
+  input->stride_out = boxEvenVolume(geometryBoxes);
+  input->master_shift_out = out->type->master_shift;
+
+  kernel_field_input* d_input;
+  cudaMalloc((void**)&d_input, sizeof(kernel_field_input));
+  cudaMemcpy(d_input, input, sizeof(kernel_field_input), cudaMemcpyHostToDevice);
+  return d_input;
+}
+
 /**
  * @brief Applies the Wilson-Dirac operator only where the calculation
  *        does not depend on the communications. Use this calculation
@@ -113,34 +195,22 @@ static void init_Dirac() {
  * @param out                 Output spinor field to save result
  */
 static void Dphi_inner_gpu_(spinor_field *out, spinor_field *in) {
-  int grid, iyp, gauge_ixp, gauge_iyp, write_stride, start_piece_ixp, start_piece_iyp;
-  _PIECE_FOR(out->type, ixp)
-  {
-      if (in->type==&glattice) iyp = (ixp+1)%2;
-      else iyp = 0;
+  enum gd_type gd_t;
+  if (in->type==&glattice) gd_t = GLOBAL;
+  else if (in->type==&glat_odd) gd_t = ODD;
+  else if (in->type==&glat_even) gd_t = EVEN;
 
-      if (in->type==&glattice) {
-        gauge_ixp = ixp;
-        gauge_iyp = iyp;
-      } else if (in->type==&glat_odd) {
-        gauge_ixp = 0;
-        gauge_iyp = 1;
-      } else if (in->type==&glat_even) {
-        gauge_ixp = 1;
-        gauge_iyp = 0;
-      }
-
-      write_stride = out->type->master_end[ixp] - out->type->master_start[ixp] + 1;
-      grid = (write_stride-1)/BLOCK_SIZE + 1;
-      start_piece_ixp = out->type->master_start[ixp];
-      start_piece_iyp = in->type->master_start[iyp];
-
-      Dphi_gpu_inner_kernel<<<grid, BLOCK_SIZE>>>(
-            _GPU_FIELD_BLK(out, ixp), _GPU_FIELD_BLK(in, iyp),
-            _GPU_4FIELD_BLK(u_gauge_f, gauge_ixp), _GPU_4FIELD_BLK(u_gauge_f, gauge_iyp),
-            iup_gpu, idn_gpu, imask_gpu,
-            write_stride, start_piece_ixp, start_piece_iyp);
-      CudaCheckError();
+  if (gd_t & EVEN) {
+    kernel_field_input* input = get_even_input(out, in);
+    int grid = (boxEvenVolume(geometryBoxes)-1)/BLOCK_SIZE + 1;
+    Dphi_gpu_inner_kernel<<<grid, BLOCK_SIZE>>>(input, u_gauge_f->gpu_ptr, iup_gpu, idn_gpu, imask_gpu);
+    CudaCheckError();
+  }
+  if (gd_t & ODD) {
+    kernel_field_input* input = get_odd_input(out, in);
+    int grid = (boxOddVolume(geometryBoxes)-1)/BLOCK_SIZE + 1;
+    Dphi_gpu_inner_kernel<<<grid, BLOCK_SIZE>>>(input, u_gauge_f->gpu_ptr, iup_gpu, idn_gpu, imask_gpu);
+    CudaCheckError();
   }
   cudaDeviceSynchronize();
 }
@@ -155,41 +225,36 @@ static void Dphi_inner_gpu_(spinor_field *out, spinor_field *in) {
  * @param out                 Output spinor field to save result
  */
 static void Dphi_boundary_gpu_(spinor_field *out, spinor_field *in) {
-  #if defined(WITH_MPI) && defined(WITH_NEW_GEOMETRY)
-  int grid, ixp, gauge_ixp, gauge_i, block_stride, buffer_stride, block_start, buffer_start;
+  enum gd_type gd_t;
+  if (in->type==&glattice) gd_t = GLOBAL;
+  else if (in->type==&glat_odd) gd_t = ODD;
+  else if (in->type==&glat_even) gd_t = EVEN;
 
-  for (int i = 0; i < in->type->nbuffers_spinor; ++i)
-  {
-      if (out->type==&glat_even) {
-        ixp = 0;
-        gauge_ixp = 0;
-        gauge_i = 2*i+1;
-      } else if (out->type==&glat_odd) {
-        ixp = 0;
-        gauge_ixp = 1;
-        gauge_i = 2*i;
-      } else {
-        ixp = (i%2==0);
-        gauge_ixp = ixp;
-        gauge_i = i;
-      }
-
-      block_stride = out->type->master_end[ixp] - out->type->master_start[ixp] + 1;
-      block_start = out->type->master_start[ixp];
-
-      buffer_stride = in->type->rbuf_len[i];// Different strides for gauge and spinor
-      buffer_start = in->type->rbuf_start[i];
-      grid = (block_stride-1)/BLOCK_SIZE + 1;
-
-      Dphi_gpu_boundary_kernel<<<grid, BLOCK_SIZE>>>(
-            _GPU_FIELD_BLK(out, ixp), _BUF_GPU_FIELD_BLK(in, i),
-            _GPU_4FIELD_BLK(u_gauge_f, gauge_ixp), _BUF_GPU_4FIELD_BLK(u_gauge_f, gauge_i),
-            iup_gpu, idn_gpu, imask_gpu,
-            block_stride, buffer_stride,
-            buffer_start, block_start);
+  box_t *buffer_box = geometryBoxes->next;
+  int i = 0;
+  int buffer_index;
+  int nbuffers = in->type->nbuffers_spinor;
+  if(gd_t == GLOBAL) nbuffers /= 2;
+  while(buffer_box && i < nbuffers) {
+    if (gd_t == GLOBAL) {
+      buffer_index = 2*i;
+    } else {
+      buffer_index = i;
+    }
+    if (gd_t & EVEN) {
+      kernel_field_input* input = get_even_buffer_input(out, in, buffer_index);
+      int grid = (boxEvenVolume(geometryBoxes)-1)/BLOCK_SIZE + 1;
+      Dphi_gpu_boundary_kernel<<<grid, BLOCK_SIZE>>>(input, u_gauge_f->gpu_ptr, iup_gpu, idn_gpu, imask_gpu);
       CudaCheckError();
+    } 
+    if (gd_t & ODD) {
+      kernel_field_input* input = get_odd_buffer_input(out, in, buffer_index);
+      int grid = (boxOddVolume(geometryBoxes)-1)/BLOCK_SIZE + 1;
+      Dphi_gpu_boundary_kernel<<<grid, BLOCK_SIZE>>>(input, u_gauge_f->gpu_ptr, iup_gpu, idn_gpu, imask_gpu);
+      CudaCheckError();
+    } 
+    buffer_box=buffer_box->next; i++;
   }
-  #endif
 }
 
 /**

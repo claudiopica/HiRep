@@ -32,6 +32,23 @@ typedef struct _kernel_field_input {
 
 #define _GPU_IDX_TO_LOCAL(_in, ix, ixp) ix - (_in)->type->master_start[(ixp)];
 
+
+// TODO: in spinor field -> read by comp, out spinor field -> read full spinor -> this needs to be clarified (SAM)
+#define _IN_SPINOR_FIELD(_site, _comp) \
+            read_gpu_suNf_vector(__stride_in, (_site), __in, __idx_in_local, _comp);
+
+#define _OUT_SPINOR_FIELD(_site) \
+            read_gpu_suNf_spinor(__stride_out, (_site), __out, __idx_out_local, 0);
+
+#define _IN_GAUGE_FIELD(_site, _comp) \
+            read_gpu_suNf(__stride_in, (_site), __in_gauge, __idx_in_local, _comp);
+
+#define _OUT_GAUGE_FIELD(_site, _comp) \
+            read_gpu_suNf(__stride_out, (_site), __out_gauge, __idx_out_local, _comp);
+
+#define _WRITE_OUT_SPINOR_FIELD(_site) \
+            write_gpu_suNf_spinor(__stride_out, (_site), __out, __idx_out_local, 0);
+
 #define _IN_FIELD_AT(_site, _type, _comp) \
             read_gpu_##_type(__stride_in, (_site), __in, __idx_in_local, _comp); 
 
@@ -39,10 +56,10 @@ typedef struct _kernel_field_input {
             read_gpu_##_type(__stride_out, (_site), __out, __idx_out_local, _comp);
 
 #define _IN_BLOCK_GAUGE_AT(_gauge_site, _comp) \
-            read_gpu_##_type(__stride_in, (_site), __out, __idx_in_local, _comp); 
+            read_gpu_##_type(__stride_in, (_site), __in_gauge, __idx_in_local, _comp); 
 
 #define _OUT_BLOCK_GAUGE_AT(_gauge_site, _comp) \
-            read_gpu_##_type(__stride_in, (*_site), __out, __idx_out_local, _comp); 
+            read_gpu_##_type(__stride_in, (*_site), __out_gauge, __idx_out_local, _comp); 
 
 #define _WRITE_OUT_FIELD(_site, _type, _comp) \
             write_gpu_##_type(__stride_out, (_site), __out, __idx_out_local, _comp);
@@ -56,7 +73,7 @@ typedef struct _kernel_field_input {
     int __start_out        = _input->start_out; \
     int __master_shift_out = _input->master_shift_out; \
     int __idx_out_local    = blockIdx.x * BLOCK_SIZE + threadIdx.x; \
-    int __idx_out_global   = __idx_out_local + __start_out - __master_shift_out; \
+    int __idx_out_global   = __idx_out_local + __start_out; \
 
 #define _find_index(__find_in_idx) \
     __find_in_idx; \
@@ -67,23 +84,19 @@ typedef struct _kernel_field_input {
     _type* __out = _DFIELD_AT_PTR(((_type*)_input->field_out), __start_out, 0, __master_shift_out, (_size)); 
 
 #define _offset_gauge_field(_gauge_type, _size, _gauge) \
-    _gauge_type* __in_gauge = _DFIELD_AT_PTR((_gauge_type*)_gauge, __start_in, 0, __master_shift_in, (_size)); \
-    _gauge_type* __out_gauge = _DFIELD_AT_PTR((_gauge_type*)_gauge, __start_out, 0, __master_shift_out, (_size));
+    _gauge_type* __in_gauge = _DFIELD_AT_PTR((_gauge_type*)_gauge, __start_in, 0, 0, (_size)); \
+    _gauge_type* __out_gauge = _DFIELD_AT_PTR((_gauge_type*)_gauge, __start_out, 0, 0, (_size));
 
 #define _KERNEL_FOR(_input, _type, _size) \
     _setup_striding(_input) \
     _offset_fields(_input, _type, _size); \
     if (__idx_out_local < __stride_out)  
 
-#define _KERNEL_FOR_WITH_GAUGE(_field_in, _stride_in, _start_in, _master_shift_in, \
-                            _field_out, _stride_out, _start_out, _master_shift_out, \
-                            _gauge, \
-                            _type, _gauge_type, _size) \
-        _setup_striding(_stride_in, _stride_in, _master_shift_in, \
-                        _stride_out, _start_out, _master_shift_out); \
-        _offset_fields(_type, _size, _field_in, _field_out); \
-        _offset_gauge_field(_gauge_type, _size, _gauge); \
-        if (__idx_out_local < __stride_out)
+#define _KERNEL_FOR_WITH_GAUGE(_input, _gauge, _type, _gauge_type) \
+    _setup_striding(_input) \
+    _offset_fields(_input, _type, 1); \
+    _offset_gauge_field(_gauge_type, 4, _gauge);  \
+    if (__idx_out_local < __stride_out)
 
 
 #endif

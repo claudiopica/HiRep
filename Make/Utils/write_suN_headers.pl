@@ -111,8 +111,8 @@ END
 sub write_prolog_suN {
   print <<END
 /**
- * @file suN.h
- * @brief Type definitions and macros for SU(N) matrices and spinors
+ * \@file suN.h
+ * \@brief Type definitions and macros for SU(N) matrices and spinors
  */
 
 #ifndef SUN_H
@@ -130,8 +130,8 @@ END
 sub write_prolog_suN_types {
   print <<END
 /**
- * @file suN_types.h
- * @brief Type definitions for SU(N) matrices and spinors
+ * \@file suN_types.h
+ * \@brief Type definitions for SU(N) matrices and spinors
  */
 
 #ifndef SUN_TYPES_H
