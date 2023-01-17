@@ -345,7 +345,7 @@
     temp1 = _mm256_add_pd(temp3, temp1);                           \
     _mm256_store_pd((double *)(&mc), temp1);                       \
   } while (0)
-
+  
 #define _double_MVM_2x2C_AVX2(mc, mc2, mu, mp, mp2)                        \
   do                                                                       \
   {                                                                        \
@@ -377,7 +377,7 @@
     temp1 = _mm256_blend_pd(temp1, temp2, 12);                             \
     temp1 = _mm256_add_pd(temp4, temp1);                                   \
     _mm256_store_pd((double *)(&mc), temp3);                               \
-    _mm256_store_pd((double *)(&mc), temp1);                               \
+    _mm256_store_pd((double *)(&mc2), temp1);                               \
   } while (0)
 
 #define _double_MTVM_2x2C_AVX2(mc, mc2, mu, mp, mp2)                                       \
@@ -403,6 +403,7 @@
     temp9 = _mm256_mul_pd(temp6, temp4);                                                   \
     temp10 = _mm256_mul_pd(temp3, temp2);                                                  \
     temp9 = _mm256_addsub_pd(temp9, temp10);                                               \
+    temp6 = _mm256_mul_pd(temp6, temp1);                                                   \
     temp3 = _mm256_mul_pd(temp3, temp5);                                                   \
     temp3 = _mm256_addsub_pd(temp6, temp3);                                                \
     temp6 = _mm256_permute2f128_pd(temp3, temp9, 2);                                       \
