@@ -41,7 +41,7 @@ if ($mpi) {
 my $testdir = dirname($test_file);
 my $testbn = basename($test_file);
 #clean outputs
-system("rm -f debug err_* out_* ${output_file}_* $testdir/.test_failed_$testbn");
+system("cd $testdir && rm -f debug err_* out_* ${output_file}_* $testdir/.test_failed_$testbn");
 
 #runt test in its folder
 my $t0 = [gettimeofday];

@@ -43,10 +43,6 @@ jobs:
         with:
           packages: openmpi-bin openmpi-common libopenmpi3 libopenmpi-dev ninja-build
           version: 1.0
-          execute_install_scripts: true
-
-      - name: debug alternatives
-        run: sudo ls -l /etc/alternatives/ 
       - name: Setup link to mpirun alternative
         run: sudo ln -s /usr/bin/mpirun.openmpi /usr/bin/mpirun
 
