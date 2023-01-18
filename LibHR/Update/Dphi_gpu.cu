@@ -200,19 +200,12 @@ static void Dphi_inner_gpu_(spinor_field *out, spinor_field *in) {
   else if (in->type==&glat_odd) gd_t = ODD;
   else if (in->type==&glat_even) gd_t = EVEN;
 
-  if (gd_t & EVEN) {
-    kernel_field_input* input = get_even_input(out, in);
-    int grid = (boxEvenVolume(geometryBoxes)-1)/BLOCK_SIZE + 1;
-    Dphi_gpu_inner_kernel<<<grid, BLOCK_SIZE>>>(input, u_gauge_f->gpu_ptr, iup_gpu, idn_gpu, imask_gpu);
-    CudaCheckError();
-  }
-  if (gd_t & ODD) {
-    kernel_field_input* input = get_odd_input(out, in);
-    int grid = (boxOddVolume(geometryBoxes)-1)/BLOCK_SIZE + 1;
-    Dphi_gpu_inner_kernel<<<grid, BLOCK_SIZE>>>(input, u_gauge_f->gpu_ptr, iup_gpu, idn_gpu, imask_gpu);
-    CudaCheckError();
-  }
-  cudaDeviceSynchronize();
+  kernel_field_input* input_even = get_even_input(out, in);
+  kernel_field_input* input_odd = get_odd_input(out, in);
+  int grid = (boxEvenVolume(geometryBoxes)-1)/BLOCK_SIZE_DIRAC + 1;
+  Dphi_gpu_inner_kernel<<<grid, BLOCK_SIZE>>>(input_even, input_odd, u_gauge_f->gpu_ptr, iup_gpu, idn_gpu, imask_gpu, gd_t);
+  CudaCheckError();
+  //cudaDeviceSynchronize();
 }
 
 /**
@@ -234,6 +227,9 @@ static void Dphi_boundary_gpu_(spinor_field *out, spinor_field *in) {
   int i = 0;
   int buffer_index;
   int nbuffers = in->type->nbuffers_spinor;
+  int increment = 1;
+  if (gd_t == GLOBAL)
+
   if(gd_t == GLOBAL) nbuffers /= 2;
   while(buffer_box && i < nbuffers) {
     if (gd_t == GLOBAL) {
@@ -241,18 +237,10 @@ static void Dphi_boundary_gpu_(spinor_field *out, spinor_field *in) {
     } else {
       buffer_index = i;
     }
-    if (gd_t & EVEN) {
-      kernel_field_input* input = get_even_buffer_input(out, in, buffer_index);
-      int grid = (boxEvenVolume(geometryBoxes)-1)/BLOCK_SIZE + 1;
-      Dphi_gpu_boundary_kernel<<<grid, BLOCK_SIZE>>>(input, u_gauge_f->gpu_ptr, iup_gpu, idn_gpu, imask_gpu);
-      CudaCheckError();
-    } 
-    if (gd_t & ODD) {
-      kernel_field_input* input = get_odd_buffer_input(out, in, buffer_index);
-      int grid = (boxOddVolume(geometryBoxes)-1)/BLOCK_SIZE + 1;
-      Dphi_gpu_boundary_kernel<<<grid, BLOCK_SIZE>>>(input, u_gauge_f->gpu_ptr, iup_gpu, idn_gpu, imask_gpu);
-      CudaCheckError();
-    } 
+    kernel_field_input* input_even = get_even_buffer_input(out, in, buffer_index);
+    kernel_field_input* input_odd = get_odd_buffer_input(out, in, buffer_index);
+    int grid = (boxEvenVolume(geometryBoxes)-1)/BLOCK_SIZE_DIRAC + 1;
+    Dphi_gpu_boundary_kernel<<<grid, BLOCK_SIZE>>>(input_even, input_odd, u_gauge_f->gpu_ptr, iup_gpu, idn_gpu, imask_gpu, gd_t);
     buffer_box=buffer_box->next; i++;
   }
 }

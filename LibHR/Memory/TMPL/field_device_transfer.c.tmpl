@@ -1,0 +1,61 @@
+/***************************************************************************\
+* Copyright (c) 2023, Sofie Martins                                         *
+* All rights reserved.                                                      *
+\***************************************************************************/
+
+#include <string.h>
+#include "geometry.h"
+
+#if !defined _GEOM_TYPE
+#error Missing _GEOM_TYPE in memory.c
+#endif
+#if !defined(_FIELD_NAME)
+#error Missing _FIELD_NAME in memory.c
+#endif
+#if !defined(_FIELD_TYPE)
+#error Missing _FIELD_TYPE in memory.c
+#endif
+#if !defined(_SITE_TYPE)
+#error Missing _SITE_TYPE in memory.c
+#endif
+#if !defined(_FIELD_DIM)
+#error Missing _FIELD_DIM in memory.c
+#endif
+
+#define CONCAT(_name, _suffix) _name ## _suffix
+#define _F_NAME(_name, _suffix) CONCAT(_name,_suffix)
+#define _F_ARGS(_name,_args) _F_NAME(_name,_FIELD_NAME) _args
+#define _FUNC(_name, _args) void _F_NAME(_name,_FIELD_NAME) _args
+
+#define _N_SITES(_geom) CONCAT(f->type->gsize_,_geom)
+#define _NUMBER_OF_SITES _N_SITES(_GEOM_TYPE)
+#if _IS_SPINOR_LIKE==0
+    #define _ALLOCATE _F_ARGS(alloc_,(f->type))
+#else
+    #define _ALLOCATE _F_ARGS(alloc_,(1,f->type))
+#endif
+
+_FUNC(copy_to_gpu_, (_FIELD_TYPE *f)) {
+    _FIELD_TYPE *tmp = _ALLOCATE;
+    _F_NAME(to_gpu_format_, _FIELD_NAME) (tmp, f);
+    int field_size = _FIELD_DIM * _NUMBER_OF_SITES * sizeof(_SITE_TYPE);
+    cudaMemcpy(f->gpu_ptr, tmp->ptr, field_size, cudaMemcpyHostToDevice);
+    _F_NAME(free_, _FIELD_NAME) (tmp);
+}
+
+_FUNC(copy_from_gpu_, (_FIELD_TYPE *f)) {
+    _FIELD_TYPE *tmp = _ALLOCATE;
+    int field_size = _FIELD_DIM * _NUMBER_OF_SITES * sizeof(_SITE_TYPE);
+    cudaMemcpy(tmp->ptr, f->gpu_ptr, field_size, cudaMemcpyDeviceToHost);
+    _F_NAME(to_cpu_format_, _FIELD_NAME) (f, tmp);
+    _F_NAME(free_, _FIELD_NAME) (tmp);
+}
+
+#undef _FUNC
+#undef CONCAT
+#undef _F_NAME
+#undef _F_ARGS
+#undef _NUMBER_OF_SITES
+#undef _ALLOCATE
+#undef _N_SITES
+
