@@ -55,8 +55,6 @@ void complete_gf_sendrecv_flt(suNg_field_flt *gf) {
   int nreq=2*gf->type->nbuffers_gauge;
 
 #ifdef WITH_NEW_GEOMETRY
-  if (gf_sendrecv_guard!=NULL && gf_sendrecv_guard != gf->comm_req)  
-    error(1, 1, "complete_gf_sendrecv " __FILE__, "More simultaneous communication attempted. Existing...\n");
   gf_sendrecv_guard = NULL;
 #endif
 
@@ -110,6 +108,9 @@ void start_gf_sendrecv_flt(suNg_field_flt *gf) {
   complete_gf_sendrecv_flt(gf);
 
 #ifdef WITH_NEW_GEOMETRY
+  if (gf_sendrecv_guard!=NULL) {
+    error(1, 1, "complete_gf_sendrecv " __FILE__, "More simultaneous communication attempted. Exiting...\n");
+  }
   gf_sendrecv_guard=(void*)gf->comm_req;
 #endif
 
@@ -176,10 +177,6 @@ void complete_sf_sendrecv_flt(spinor_field_flt *sf) {
   int nreq=2*sf->type->nbuffers_spinor;
 
 #ifdef WITH_NEW_GEOMETRY
-  if (sf_sendrecv_guard!=NULL && sf_sendrecv_guard != sf->comm_req) {
-    print_trace();
-    error(1, 1, "complete_sf_sendrecv " __FILE__, "More simultaneous communication attempted. Existing...\n");
-  }
   sf_sendrecv_guard = NULL;
 #endif
 
@@ -228,13 +225,15 @@ void start_sf_sendrecv_flt(spinor_field_flt *sf) {
   int i, mpiret; (void)mpiret; // Remove warning of variable set but not used
   geometry_descriptor *gd=sf->type;
 
-
   /* check communication status */
   /* questo credo che non sia il modo piu' efficiente!!! */
   /* bisognerebbe forse avere una variabile di stato nei campi?? */
   complete_sf_sendrecv_flt(sf);
 
 #ifdef WITH_NEW_GEOMETRY
+  if (sf_sendrecv_guard!=NULL) {
+    error(1, 1, "complete_sf_sendrecv " __FILE__, "More simultaneous communication attempted. Exiting...\n");
+  }
   sf_sendrecv_guard=(void*)sf->comm_req;
 #endif
 
