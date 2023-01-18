@@ -7,6 +7,8 @@
 #include <stddef.h>
 #include <string.h>
 
+#define THREADSIZE 32
+
 // this will include the 4th L2 corner in the geometry
 // it's not needed, was here for testng purposed
 // #define _INCLUDE_UP_UP_L2
@@ -102,7 +104,7 @@ static int index_blocked(
 //  Functions for handling BOXes
 ///////////////////////////////////////////////////////////////////
 
-static const char*bt_names[]={"L0","L1","L2","L3","INNER","SENDBUF"};
+static char const * bt_names[]={"L0","L1","L2","L3","INNER","SENDBUF"};
 
 static coord4 *rb_icoord=NULL; //global lookup table for recv buffers (L3+L2 borders)
 static coord4 *sb_icoord=NULL; //global lookup table for send buffers
@@ -143,9 +145,17 @@ int boxEvenVolume(box_t *B){
     int even_vol=box_vol/2 + (box_vol&(1^(B->parity)));
     return even_vol;
 }
+
 int boxOddVolume(box_t *B){
     const int odd_vol=boxVolume(B)-boxEvenVolume(B);
     return odd_vol;
+}
+
+/// Rounds up val to a multiple of modulo
+static int roundUp(int val, int const modulo) {
+    int const remainder = val % modulo; 
+    if (remainder != 0) { val += modulo-remainder; }
+    return val;
 }
 
 //calculate if the base point of the box is even (0) or odd (1)
@@ -202,12 +212,12 @@ void setBoxListBaseIndex(box_t *B) {
     // count INNER and L3 EVEN part
     while(B && (B->type != L2)) {
         B->base_index = i;
-        const int vol = boxEvenVolume(B);
+        const int vol = roundUp(boxEvenVolume(B), THREADSIZE);
         i += vol;
         //set sendbox
         if(B->type==L3) {
             if (B->sendBox) B->sendBox->base_index=sendbox_i;
-            sendbox_i += boxEvenVolume(B->sendBox);
+            sendbox_i += roundUp(boxEvenVolume(B->sendBox), THREADSIZE);
         }
         B=B->next;
     }
@@ -215,12 +225,12 @@ void setBoxListBaseIndex(box_t *B) {
     B=saveBox; //restart from the beginning of the list
     while(B && (B->type != L2)) {
         B->base_index_odd = i;
-        const int vol = boxOddVolume(B);
+        const int vol = roundUp(boxOddVolume(B), THREADSIZE);
         i += vol;
         //set sendbox
         if(B->type==L3) {
             if (B->sendBox) B->sendBox->base_index_odd=sendbox_i;
-            sendbox_i += boxOddVolume(B->sendBox);
+            sendbox_i += roundUp(boxOddVolume(B->sendBox), THREADSIZE);
         }
         B=B->next;
     }
@@ -229,20 +239,20 @@ void setBoxListBaseIndex(box_t *B) {
     B=saveBox; //restart from the beginning of the list
     while(B) {
         B->base_index = i;
-        const int vol = boxEvenVolume(B);
+        const int vol = roundUp(boxEvenVolume(B), THREADSIZE);
         i += vol;
         if (B->sendBox) B->sendBox->base_index=sendbox_i;
-        sendbox_i += boxEvenVolume(B->sendBox);
+        sendbox_i += roundUp(boxEvenVolume(B->sendBox), THREADSIZE);
         B=B->next;
     }
     //count L2 ODD part
     B=saveBox; //restart from the beginning of the list
     while(B) {
         B->base_index_odd = i;
-        const int vol = boxOddVolume(B);
+        const int vol = roundUp(boxOddVolume(B), THREADSIZE);
         i += vol;
         if (B->sendBox) B->sendBox->base_index_odd=sendbox_i;
-        sendbox_i += boxOddVolume(B->sendBox);
+        sendbox_i += roundUp(boxOddVolume(B->sendBox), THREADSIZE);
         B=B->next;
     }
 
@@ -257,11 +267,6 @@ int isInsideBox(box_t *B, int ix) {
 
 int safe_ipt_ext(int x0_ext, int x1_ext, int x2_ext, int x3_ext) {
     const int ix = ipt_ext(safe_mod(x0_ext,T_EXT),safe_mod(x1_ext,X_EXT),safe_mod(x2_ext,Y_EXT),safe_mod(x3_ext,Z_EXT)); 
-#ifndef NDEBUG
-    if (ix<0 || ix>(T_EXT*X_EXT*Y_EXT*Z_EXT-1)) { 
-        lprintf(LOGTAG,1,"Error3 ix=%d site [%d, %d, %d, %d]\n", ix,safe_mod(x0_ext,T_EXT),safe_mod(x1_ext,X_EXT),safe_mod(x2_ext,Y_EXT),safe_mod(x3_ext,Z_EXT));
-    }
-#endif
     return ix;
 }
 
@@ -288,17 +293,16 @@ static box_t *makeLocalBox(){
                 .sendBox=NULL,
                 // .ipt_ext=NULL,
                 .icoord=NULL,
-                .icoord_idx=NULL,
                 .next=NULL
               };
     setBoxParity(&B);
     return duplicateBox(&B);
 }
 
-//this function create a new box starting from a box B
-//and a mask of directions
-//the box returned corrsponds to a border of the box in the 
-//directions indicated by the mask
+/// this function create a new box starting from a box B
+/// and a mask of directions
+/// the box returned corrsponds to a border of the box in the 
+/// directions indicated by the mask
 static box_t *makeBorderBox(char mask) {
         //check that this is actually a border box otherwise return NULL
         if (mask==0) return NULL;
@@ -348,66 +352,83 @@ static box_t *makeBorderBox(char mask) {
 // iup, idn, imask
 ////////////////////////////////////////////////////////////
 
-// Lattice memory layout is as follows:
-// |<- 0 index EVEN   
-// | EVEN LOCAL VOL | EVEN L3 #1 | ... | EVEN L3 #n |
-// | ODD  LOCAL VOL | ODD  L3 #1 | ... | ODD  L3 #n |
-// and only for the gauge (glattice)
-// | EVEN L2 #1 | ... | EVEN L2 #m |
-// | ODD  L2 #1 | ... | ODD  L2 #m |
-//
-// Send buffers are outside the fields
-// they are organized similarly:
-// | SBUF EVEN L3 #1 | ... | SBUF EVEN L3 #n | 
-// | SBUF ODD  L3 #1 | ... | SBUF ODD  L3 #n | 
-// | SBUF EVEN L2 #1 | ... | SBUF EVEN L2 #m |
-// | SBUF ODD  L2 #1 | ... | SBUF ODD  L2 #m |
-//
-// Send buffers are shared among all fields of same size
-// they are always allocated as glattice 
-// i.e. they contain all L3 and L2 buffers
-// TODO: change this: make sendbuf_alloc take the full size of the sendbuffer, not the size per site
+/// Lattice memory layout is as follows:
+/// |<- 0 index EVEN   
+/// | EVEN LOCAL VOL | EVEN L3 #1 | ... | EVEN L3 #n |
+/// | ODD  LOCAL VOL | ODD  L3 #1 | ... | ODD  L3 #n |
+/// and only for the gauge (glattice)
+/// | EVEN L2 #1 | ... | EVEN L2 #m |
+/// | ODD  L2 #1 | ... | ODD  L2 #m |
+///
+/// Send buffers are outside the fields
+/// they are organized similarly:
+/// | SBUF EVEN L3 #1 | ... | SBUF EVEN L3 #n | 
+/// | SBUF ODD  L3 #1 | ... | SBUF ODD  L3 #n | 
+/// | SBUF EVEN L2 #1 | ... | SBUF EVEN L2 #m |
+/// | SBUF ODD  L2 #1 | ... | SBUF ODD  L2 #m |
+///
+/// Send buffers are shared among all fields of same size
+/// they are always allocated as glattice 
+/// i.e. they contain all L3 and L2 buffers
+/// TODO: change this: make sendbuf_alloc take the full size of the sendbuffer, not the size per site
+
+/// Compute memory size for total=inner + buffers, and buffers only
+static void geometryMemSize(box_t *G, int *total, int *buffers) {
+    *total=roundUp(boxEvenVolume(G), THREADSIZE)+roundUp(boxOddVolume(G), THREADSIZE);
+    *buffers=0;
+    box_t *L=G->next; //first border buffer. L3 are first, then L2
+    while(L) { 
+        *buffers += roundUp(boxEvenVolume(L), THREADSIZE)+roundUp(boxOddVolume(L), THREADSIZE); 
+        L=L->next; 
+    }
+    *total += *buffers;
+}
 
 //allocate memory for global indexes
-// ipt, iup, idn, imask
+// ipt, iup, idn, imask, rb_icoord, sb_icoord
+// ipt size is always T_EXT*X_EXT*Y_EXT*Z_EXT
+// iup, idn, imask and icoords arrays are indexed by the global name
+// their lenght depends on the size of the boxes
 static void index_alloc() {
+    // memory for ipt
     const int ext_volume = T_EXT*X_EXT*Y_EXT*Z_EXT;
-    const int N = (1+2*4)*ext_volume; // 1 for ipt + 4 dir x 2 for iup and idn
-    ipt = (int*)malloc(N * sizeof(*ipt));
-    error((ipt == NULL), 1, __func__ , "Cannot allocate memory for ipt, iup, idn");
-    iup = ipt + ext_volume;
-    idn = iup + (4*ext_volume);
+    ipt = malloc(ext_volume * sizeof(*ipt));
+    error((ipt == NULL), 1, __func__ , "Cannot allocate memory for ipt");
 
-    imask = (char*)malloc(ext_volume * sizeof(*imask));
+    // compute the memory volume for array of indices
+    int main_mem_volume, buf_mem_volume;
+    geometryMemSize(geometryBoxes, &main_mem_volume, &buf_mem_volume);
+
+    // memory for iup, idn
+    iup = malloc(2*4*main_mem_volume*sizeof(*iup));
+    error((iup == NULL), 1, __func__ , "Cannot allocate memory for iup / idown");
+    idn=iup+4*main_mem_volume;
+
+    // memory for iup, idn
+    imask = malloc(main_mem_volume*sizeof(*imask));
     error((imask == NULL), 1, __func__ , "Cannot allocate memory for imask");
-
-    //allocate memory for send/recv buffers icoord
-    int sb_volume=0;
-    box_t *L=geometryBoxes->next; //first border buffer. L3 are first, then L2
-    while(L) { sb_volume += boxVolume(L); L=L->next; }
-    const int rb_volume = sb_volume+boxVolume(geometryBoxes); //TODO: can we not count the INNER volume?
-    rb_icoord=(coord4*)malloc((rb_volume+sb_volume)*sizeof(coord4));
+    
+    // memory for rb_icoord and sb_icoord
+    rb_icoord = malloc((main_mem_volume+buf_mem_volume)*sizeof(*rb_icoord));
     error((rb_icoord == NULL), 1, __func__ , "Cannot allocate memory for send/recv icoord");
-    sb_icoord=rb_icoord+rb_volume;
-
+    sb_icoord=rb_icoord+main_mem_volume;
 }
 
 static void index_free() {
-    if (ipt) {
-        free(ipt);
-        ipt = NULL;
-        iup = NULL;
-        idn = NULL;
-    }
-    if (imask) {
-        free(imask);
-        imask = NULL;
-    }
-    if (rb_icoord) {
-        free(rb_icoord);
-        rb_icoord=NULL;
-        sb_icoord=NULL;
-    }
+    if (ipt) { free(ipt); }
+    ipt = NULL;
+
+    if (iup) { free(iup); }
+    iup = NULL;
+    idn = NULL;
+
+    if (imask) { free(imask); }
+    imask = NULL;
+    
+    if (rb_icoord) { free(rb_icoord); }
+    rb_icoord=NULL;
+    sb_icoord=NULL;
+    
 }
 
 // fill out ipt, iup, idn, imask
@@ -516,8 +537,11 @@ static void enumerate_lattice() {
 #else
     //use memset instead
     //NB: memset only works with 0 and -1 (assuming 2's complement numbers)
-    memset(ipt, -1, sizeof(int)*T_EXT*X_EXT*Y_EXT*Z_EXT*5); //assume ipt, iup and idn are contiguous in memory
-    memset(imask, 0, T_EXT*X_EXT*Y_EXT*Z_EXT); 
+    int main_mem_volume, buf_mem_volume;
+    geometryMemSize(geometryBoxes, &main_mem_volume, &buf_mem_volume);
+    memset(ipt, -1, T_EXT*X_EXT*Y_EXT*Z_EXT*sizeof(*ipt));
+    memset(iup, -1, 2*4*main_mem_volume*sizeof(*iup));
+    memset(imask, 0, main_mem_volume*sizeof(*imask)); 
 #endif
 
     //enumerate points in each box
@@ -538,14 +562,13 @@ static void enumerate_lattice() {
             const int ix = idx + (parity ? b->base_index_odd : b->base_index );
 #ifndef NDEBUG
             if (idx<0 || !(idx<(boxVolume(b)/2))) lprintf(LOGTAG,1,"ERROR in ipt: Volume/2=%d idx=%d  @ (%d, %d, %d, %d)\n", boxVolume(b)/2, idx, x0+b->l[0], x1+b->l[1], x2+b->l[2], x3+b->l[3]);
-            if (ix<0 || ix>(T_EXT*X_EXT*Y_EXT*Z_EXT-1)) lprintf(LOGTAG,1,"ERROR2 ix=%d @ (%d, %d, %d, %d)\n", ix, x0+b->l[0], x1+b->l[1], x2+b->l[2], x3+b->l[3]);
 #endif
             ipt_ext(x0+b->l[0],x1+b->l[1],x2+b->l[2],x3+b->l[3]) = ix;
 
             //fill out rb_icoord
             const coord4 rc = { .x={x0+b->l[0],x1+b->l[1],x2+b->l[2],x3+b->l[3]} } ;
             rb_icoord[ix] = rc;
-            b->icoord = rb_icoord;           
+            b->icoord = rb_icoord; // this could be moved outside the loop
 
             if(b->sendBox) {
                 //fill out sb_icoord
@@ -554,7 +577,7 @@ static void enumerate_lattice() {
                 const int sb_ix = idx + (sb_parity ? SB->base_index_odd : SB->base_index );
                 const coord4 sc = { .x={x0+SB->l[0],x1+SB->l[1],x2+SB->l[2],x3+SB->l[3]} } ;
                 sb_icoord[sb_ix] = sc;           
-                SB->icoord = sb_icoord;           
+                SB->icoord = sb_icoord; // this could be moved outside the loop
             }
         }}}}
 
@@ -571,11 +594,6 @@ static void enumerate_lattice() {
     for (int x3_ext=0;x3_ext<Z_EXT;x3_ext++){
         const int ix = ipt_ext(x0_ext,x1_ext,x2_ext,x3_ext);
         if (ix == INVALID_POINT) continue;
-#ifndef NDEBUG
-        if (ix<0 || ix>(T_EXT*X_EXT*Y_EXT*Z_EXT-1)) {
-            lprintf("GEOMETRY",1,"Error ix=%d site [%d, %d, %d, %d]\n", ix,x0_ext,x1_ext,x2_ext,x3_ext);
-        }
-#endif
 
         char xmask=0; int iy=0;
         iy=safe_ipt_ext(x0_ext+1,x1_ext,x2_ext,x3_ext); iup(ix,0)=iy; if(isInsideBox(geometryBoxes, iy)) xmask |= T_UP_MASK; 
@@ -667,8 +685,6 @@ static void gd_set_copy(geometry_descriptor *gd) {
     gd->copy_shift = 0;
 }
 
-
-
 static void gd_free() {
     gd_free_mem(&glattice);
     gd_free_mem(&glat_even);
@@ -682,14 +698,15 @@ static void gd_init() {
     const int L3_BORDER = 2 * NPAR;
     // Dimension 2 borders. These are for the gauge fields
 #ifdef _INCLUDE_UP_UP_L2
-    const int L2_BORDER = 4*NPAR*(NPAR-1)/2; //TODO: change from 4->3. the last one is not needed actually
+    const int L2_BORDER = 4*NPAR*(NPAR-1)/2;
 #else
-    const int L2_BORDER = 3*NPAR*(NPAR-1)/2; //TODO: change from 4->3. the last one is not needed actually
+    const int L2_BORDER = 3*NPAR*(NPAR-1)/2;
 #endif
 
-    const int volume = boxVolume(geometryBoxes);
-    const int even_volume = boxEvenVolume(geometryBoxes); //VOLUME/2 + ((PSIGN==0)? (VOLUME&1) : 0);
-    const int odd_volume = volume-even_volume;
+    const int even_volume = boxEvenVolume(geometryBoxes);
+    const int odd_volume = boxOddVolume(geometryBoxes);
+    const int memory_even_volume = roundUp(even_volume, THREADSIZE);
+    const int memory_odd_volume = roundUp(odd_volume, THREADSIZE);
 
     lprintf(LOGTAG,50,"L3 BORDERS=%d  L2 BORDERS=%d\n", L3_BORDER, L2_BORDER);
 
@@ -707,8 +724,8 @@ static void gd_init() {
     glattice.master_shift=0;
     glattice.total_gauge_master_pieces=2+2*(L3_BORDER+L2_BORDER);
     glattice.total_spinor_master_pieces=2+2*(L3_BORDER);
-    glattice.gsize_gauge=volume;  //this will be increased in gd_set_boxIndices()
-    glattice.gsize_spinor=volume;  //this will be increased in gd_set_boxIndices()
+    glattice.gsize_gauge=memory_even_volume + memory_odd_volume;  //this will be increased in gd_set_boxIndices()
+    glattice.gsize_spinor=memory_even_volume + memory_odd_volume;  //this will be increased in gd_set_boxIndices()
 
     //set up even lattice
     gd_alloc_mem(&glat_even, L3_BORDER, 1);
@@ -718,12 +735,12 @@ static void gd_init() {
     glat_even.inner_master_pieces = 1;
     glat_even.local_master_pieces = 1;
     glat_even.master_start[0]=geometryBoxes->base_index;
-    glat_even.master_end[0]=glat_even.master_start[0]+even_volume-1;
+    glat_even.master_end[0]=glat_even.master_start[0]+even_volume-1; //TODO: remove this -1, ie. redefine _FOR loops
     glat_even.master_shift=0;
     glat_even.total_gauge_master_pieces=-1; //TODO: can we do better?
     glat_even.total_spinor_master_pieces=1+L3_BORDER;
     glat_even.gsize_gauge=-1;  //TODO: can we do better?
-    glat_even.gsize_spinor=even_volume;  //this will be increased in gd_set_boxIndices()
+    glat_even.gsize_spinor=memory_even_volume;  //this will be increased in gd_set_boxIndices()
     
     //set up odd lattice
     gd_alloc_mem(&glat_odd, L3_BORDER, 1);
@@ -733,12 +750,12 @@ static void gd_init() {
     glat_odd.inner_master_pieces = 1;
     glat_odd.local_master_pieces = 1;
     glat_odd.master_start[0]=geometryBoxes->base_index_odd;
-    glat_odd.master_end[0]=glat_odd.master_start[0]+odd_volume-1;
+    glat_odd.master_end[0]=glat_odd.master_start[0]+odd_volume-1; //TODO: remove this -1, ie. redefine _FOR loops
     glat_odd.master_shift=geometryBoxes->base_index_odd;
     glat_odd.total_gauge_master_pieces=-1; //TODO: can we do better?
     glat_odd.total_spinor_master_pieces=1+L3_BORDER;
     glat_odd.gsize_gauge=-1;  //TODO: can we do better?
-    glat_odd.gsize_spinor=odd_volume;  //this will be increased in gd_set_boxIndices()
+    glat_odd.gsize_spinor=memory_odd_volume;  //this will be increased in gd_set_boxIndices()
 
     //free memory at exit
     atexit(&gd_free);
@@ -749,13 +766,14 @@ static void gd_init() {
 // master_start, master_end
 void gd_set_boxIndices() {
     int ib=0; //index of buffer in geometry descriptor
-    box_t *L=geometryBoxes->next; //first border buffer. L3 are first, then L2
+    box_t *L=geometryBoxes->next; // point to first border buffer. L3 are first, then L2
     while(L) {
         //each box contains an even and odd part
-        const int vol = boxVolume(L);
         //const int sign = boxParity(L);
         const int even_vol = boxEvenVolume(L);
-        const int odd_vol = vol - even_vol;
+        const int odd_vol = boxOddVolume(L);
+        const int memory_even_vol = roundUp(even_vol, THREADSIZE);
+        const int memory_odd_vol = roundUp(odd_vol, THREADSIZE);
         const int send_even_vol = boxEvenVolume(L->sendBox);
         const int send_odd_vol = boxOddVolume(L->sendBox);
         const int recv_proc=nearProc(L->mask);
@@ -785,8 +803,8 @@ void gd_set_boxIndices() {
         glattice.master_start[ib_odd+2]=L->base_index_odd; //+2 because index 0 and 1 is the local master piece
         glattice.master_end[ib_odd+2]=L->base_index_odd+odd_vol-1;
         //add to size 
-        glattice.gsize_gauge+=vol; //send buffers are not included
-        if(L->type==L3) { glattice.gsize_spinor+=vol; }
+        glattice.gsize_gauge+=memory_even_vol+memory_odd_vol; //send buffers are not included
+        if(L->type==L3) { glattice.gsize_spinor+=memory_even_vol+memory_odd_vol; }
 
         //EVEN / ODD geometries contain only L3 borders
         if (L->type==L3) {
@@ -798,7 +816,7 @@ void gd_set_boxIndices() {
             glat_even.sbuf_to_proc[ib]=send_proc;
             glat_even.master_start[ib+1]=L->base_index; //+1 because index 0 is the local master piece
             glat_even.master_end[ib+1]=L->base_index+even_vol-1;
-            glat_even.gsize_spinor+=even_vol;
+            glat_even.gsize_spinor+=memory_even_vol;
 
             glat_odd.rbuf_len[ib]=odd_vol;
             glat_odd.sbuf_len[ib]=send_odd_vol;
@@ -808,7 +826,7 @@ void gd_set_boxIndices() {
             glat_odd.sbuf_to_proc[ib]=send_proc;
             glat_odd.master_start[ib+1]=L->base_index_odd; //+1 because index 0 is the local master piece
             glat_odd.master_end[ib+1]=L->base_index_odd+odd_vol-1;
-            glat_odd.gsize_spinor+=odd_vol; 
+            glat_odd.gsize_spinor+=memory_odd_vol; 
         }
 
         L=L->next; ib++;
@@ -902,7 +920,7 @@ static sb_handle allocSB(size_t bytes_per_site) {
     //otherwise allocate memory
     //gsize_gauge is the local volume + rsend buffers. 
     //We subtract the local volume to obtain rsend buffer size = send buffer size
-    const int nsites = glattice.gsize_gauge - boxVolume(geometryBoxes);
+    const int nsites = glattice.gsize_gauge - roundUp(boxEvenVolume(geometryBoxes), THREADSIZE) - roundUp(boxOddVolume(geometryBoxes), THREADSIZE);
     lprintf(LOGTAG, 10, "Allocating SEND buf: %.1fkB [bytes per site:%zu sites=%d]\n", ((float)(bytes_per_site*nsites)/1024.), bytes_per_site, nsites);
     void *buf = amalloc(nsites*bytes_per_site, ALIGN); 
     error(buf == NULL, 1, __func__ , "Could not allocate memory space for sendbuffer");
@@ -942,10 +960,6 @@ void sendbuf_report() {
         lprintf(LOGTAG, 1, "%d size=%zu\n", i, sb->bytes_per_site);
     }
 }
-
-#ifndef NDEBUG
-static int isSiteParityCorrect(int idx, int parity, box_t *B);  //this is defined below in the testing section
-#endif
 
 //this function fill out MPI send buffers
 //it copies memory corresponding to a box of sites on the lattice 
@@ -1049,8 +1063,7 @@ void define_geometry() {
 //    ██    ██           ██    ██    ██ ██  ██ ██ ██    ██ 
 //    ██    ███████ ███████    ██    ██ ██   ████  ██████  
 
-#ifndef NDEBUG
-
+#if 0
 //checks if a point with given idx and parity has correct ranges
 //in the box.
 static int isSiteParityCorrect(int idx, int parity, box_t *B) {
@@ -1064,21 +1077,17 @@ static int isSiteParityCorrect(int idx, int parity, box_t *B) {
 #endif
 
 static void resetArray(char *array, int len) {
-    for(int i=0;i<len;i++) array[i]=0;
+    for(int i=0;i<len;++i) array[i]=0;
 }
 
 static char *LOGTESTTAG="GEOMETRY TEST";
 
-static int checkArray(char *array, int len, int local_len) {
+static int checkArray(char *array, int local_len) {
     int errors=0;
-    for(int i=0;i<len;i++) {
+    for(int i=0;i<local_len;++i) {
         if (i<local_len && array[i]!=1) {
             errors++;
             lprintf(LOGTESTTAG,1,"ERROR: Local site %d used %d!=1 times\n", i, array[i]);
-        }
-        if (!(i<local_len) && array[i]!=0) {
-            errors++;
-            lprintf(LOGTESTTAG,1,"ERROR: Wrong local site used %d!=1 times\n", i, array[i]);
         }
     }
     return errors;
@@ -1175,10 +1184,9 @@ static int checkBoxNumbers(int boxnumber) {
 }
 
 int test_define_geometry() {
-
-    char *idxcheck;
     const int ext_vol=T_EXT*X_EXT*Y_EXT*Z_EXT;
-    idxcheck=(char*)malloc(ext_vol*sizeof(char));
+    char *idxcheck=malloc(ext_vol*sizeof(*idxcheck)); //this should be at least the size of the max volume of a box
+    const int max_ix = glattice.gsize_gauge;
 
     int total_errors=0;
     
@@ -1217,7 +1225,7 @@ int test_define_geometry() {
             idxcheck[idx]++;
 
             //check that ix has correct range
-            if (ix<0 || !(ix<ext_vol)) { 
+            if (ix<0 || !(ix<max_ix)) { 
                 site_errors++; 
                 lprintf(LOGTESTTAG,1,"Global index out of range: ix=%d ext_vol=%d\n", ix, ext_vol);
             }
@@ -1246,7 +1254,7 @@ int test_define_geometry() {
             errors += site_errors;
         }}}}
 
-        errors+=checkArray(idxcheck,ext_vol,vol);
+        errors+=checkArray(idxcheck,vol);
         lprintf(LOGTESTTAG,1,"Box Errors: %d errors\n", errors);
 
         total_errors += errors;
@@ -1262,3 +1270,23 @@ int test_define_geometry() {
 
     return total_errors;
 }
+
+/// _typename = [ component=N ] _type N=4*3
+/// fields = [site] _typename
+/// 
+/// CPU
+/// site =     | 0           | 1  
+/// component= | 0 1 2 ... N | 0 1 2 ... N 
+///
+/// GPU 
+/// site =     | 0 1 2 ..  31 | 0 1 2 ...  31 |    | 0 1 2 ... 31 || 32 
+/// component= | 0 0 0 ... 0  | 1 1 1 ...  1  | .. | N N N...  N  ||  
+
+/// ix -> ix/32 = blk_ix
+/// loc_ix = ix%32
+/// _type * const ptr = (_type*) __in;
+/// const int blk_size = 32*sizeof(_typename)/sizof(type);
+/// ptr[blk_ix*blk_size+loc_ix]; 
+/// 
+/// read_gpu_suNg(...)
+/// read_gpu(..., lenght, offset)
