@@ -84,7 +84,7 @@ rule suN_repr
   description = $setbg SUN REPRESENTATION $setnorm $out
 
 rule strided_reads 
-  command = cd $outdir && $wr_gpugeo $NG $REPR $WQUAT $GAUGE_GROUP
+  command = cd $outdir && $wr_gpugeo $NG $REPR $WQUAT $GAUGE_GROUP $IS_STRIDE_FIXED
   description = $setbg GPU GOMETRY HEADERS $setnorm $out
 
 # build writeREPR
@@ -293,6 +293,13 @@ sub read_conf {
         $options{'WQUAT'} = [ "1" ] ; 
     } else {
         $options{'WQUAT'} = [ "0" ] ;
+    }
+
+    # stride fixed?
+    if (contains($options{'MACRO'}, "FIXED_STRIDE")) {
+        $options{'IS_STRIDE_FIXED'} = [ "1" ] ;
+    } else {
+        $options{'IS_STRIDE_FIXED'} = [ "0" ] ;
     }
 
     # handle WITH_MPI compiler 

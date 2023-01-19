@@ -58,6 +58,7 @@ _DECLARE_COMMS(gtransf, suNg_field, "Gauge transformation");
 _DECLARE_COMMS(clover_ldl, ldl_field, "Clover ldl field");
 _DECLARE_COMMS(clover_term, suNfc_field, "Clover term");
 _DECLARE_COMMS(clover_force, suNf_field, "Clover force");
+_DECLARE_COMMS(staple_field, suNg_field, "Staple Field");
 
 #undef _DECLARE_COMMS
 

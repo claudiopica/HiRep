@@ -48,7 +48,6 @@
     #define _ALLOCATE _FUNC(_FIELD_TYPE*, alloc_, (unsigned int n, geometry_descriptor *type))
 #endif
 
-
 _FUNC_STATIC(allocate_field_struct_, (unsigned int n, _FIELD_TYPE** f, geometry_descriptor *type)) {
     *f = amalloc(n * sizeof(_FIELD_TYPE), ALIGN);
     error(f == NULL, 1, __func__, "Could not allocate memory space for field structure");

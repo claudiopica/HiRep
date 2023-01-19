@@ -57,77 +57,82 @@ static kernel_field_input* get_odd_input(
         coord4 c = icoord[__idx_out_global]; \
         int __idx_in_global = ipt_ext_gpu(c.x[0], c.x[1], c.x[2], c.x[3]); 
 
-#define _DECLARE_KERNEL(_name, _type, _size) \
-    __global__ void box_to_buffer_kernel_##_name(kernel_field_input* input, coord4* icoord, int* ipt_gpu) \
-    { \
-        _KERNEL_FOR (input, _type, _size) \
-        { \
-            _find_index(buffer_index_to_box_index); \
-            \
-            _type site; \
-            for (int comp = 0; comp < (_size); ++comp) { \
-                _IN_FIELD_AT(site, _type, comp); \
-                _WRITE_OUT_FIELD(site, _type, comp); \
-            } \
-        } \
-    }
+/* Spinor-like fields */
+#define _GEOM_TYPE spinor
 
-_DECLARE_KERNEL(spinor_field_f, suNf_spinor, 1);
-_DECLARE_KERNEL(spinor_field_f_flt, suNf_spinor_flt, 1);
-_DECLARE_KERNEL(sfield, double, 1);
+#define _FIELD_NAME spinor_field_f
+#define _SITE_TYPE suNf_spinor
+#define _FIELD_DIM 1
+#include "TMPL/sync_to_buffer.cu.tmpl"
 
-_DECLARE_KERNEL(gfield, suNg, 4);
-_DECLARE_KERNEL(gfield_f, suNf, 4);
-_DECLARE_KERNEL(gfield_flt, suNg_flt, 4);
-_DECLARE_KERNEL(gfield_f_flt, suNf_flt, 4);
-_DECLARE_KERNEL(suNg_scalar_field, suNg_vector, 1);
-_DECLARE_KERNEL(avfield, suNg_algebra_vector, 4);
-_DECLARE_KERNEL(gtransf, suNg, 1);
-_DECLARE_KERNEL(clover_ldl, ldl_t, 1);
-_DECLARE_KERNEL(clover_term, suNfc, 4);
-_DECLARE_KERNEL(clover_force, suNf, 6);
+#define _FIELD_NAME spinor_field_f_flt
+#define _SITE_TYPE suNf_spinor_flt
+#define _FIELD_DIM 1
+#include "TMPL/sync_to_buffer.cu.tmpl"
 
-#define _DECLARE_SYNC_BOX(_name) \
-    void sync_box_to_buffer_gpu_##_name(geometry_descriptor *gd, \
-                                    box_t *src, \
-                                    void *lattice, \
-                                    void *sendbuf) \
-    { \
-        /* TODO: we do not want to compare pointers */ \
-        enum gd_type gd_t = GLOBAL; \
-        if (gd == &glat_even) gd_t = EVEN; \
-        if (gd == &glat_odd) gd_t = ODD; \
-        \
-        /* icoord array gives coordinates of inner lattice given a sendbuffer index */ \
-        coord4 *c = src->icoord; \
-        coord4 *d_c; \
-        int full_vol = boxVolume(src); \
-        cudaMalloc((void**)&d_c, glattice.nbuffers_gauge*full_vol*sizeof(coord4)); \
-        cudaMemcpy(d_c, c, glattice.nbuffers_gauge*full_vol*sizeof(coord4), cudaMemcpyHostToDevice); \
-        \
-        if (gd_t & EVEN) { \
-            kernel_field_input* input = get_even_input(lattice, sendbuf, src); \
-            const int grid = (boxEvenVolume(src) - 1)/BLOCK_SIZE_SYNC + 1; \
-            box_to_buffer_kernel_##_name<<<grid, BLOCK_SIZE_SYNC>>>(input, d_c, ipt_gpu); \
-        } \
-        if (gd_t & ODD) { \
-            kernel_field_input* input = get_odd_input(gd->master_shift, lattice, sendbuf, src); \
-            const int grid = (boxOddVolume(src) - 1)/BLOCK_SIZE_SYNC + 1; \
-            box_to_buffer_kernel_##_name<<<grid, BLOCK_SIZE_SYNC>>>(input, d_c, ipt_gpu); \
-        }\
-    } 
+#define _FIELD_NAME sfield
+#define _SITE_TYPE double
+#define _FIELD_DIM 1
+#include "TMPL/sync_to_buffer.cu.tmpl"
 
-_DECLARE_SYNC_BOX(spinor_field_f);
-_DECLARE_SYNC_BOX(spinor_field_f_flt);
-_DECLARE_SYNC_BOX(sfield);
+#undef _GEOM_TYPE
 
-_DECLARE_SYNC_BOX(gfield);
-_DECLARE_SYNC_BOX(gfield_flt);
-_DECLARE_SYNC_BOX(gfield_f);
-_DECLARE_SYNC_BOX(gfield_f_flt);
-_DECLARE_SYNC_BOX(suNg_scalar_field);
-_DECLARE_SYNC_BOX(avfield);
-_DECLARE_SYNC_BOX(gtransf);
-_DECLARE_SYNC_BOX(clover_ldl);
-_DECLARE_SYNC_BOX(clover_term);
-_DECLARE_SYNC_BOX(clover_force);
+/* Gauge fields */
+#define _GEOM_TYPE gauge
+
+#define _FIELD_NAME gfield
+#define _SITE_TYPE suNg
+#define _FIELD_DIM 4
+#include "TMPL/sync_to_buffer.cu.tmpl"
+
+#define _FIELD_NAME gfield_flt
+#define _SITE_TYPE suNg_flt
+#define _FIELD_DIM 4
+#include "TMPL/sync_to_buffer.cu.tmpl"
+
+#define _FIELD_NAME gfield_f
+#define _SITE_TYPE suNf
+#define _FIELD_DIM 4
+#include "TMPL/sync_to_buffer.cu.tmpl"
+
+#define _FIELD_NAME gfield_f_flt
+#define _SITE_TYPE suNf_flt
+#define _FIELD_DIM 4
+#include "TMPL/sync_to_buffer.cu.tmpl"
+
+#define _FIELD_NAME suNg_scalar_field
+#define _SITE_TYPE suNg_vector
+#define _FIELD_DIM 1
+#include "TMPL/sync_to_buffer.cu.tmpl"
+
+#define _FIELD_NAME avfield
+#define _SITE_TYPE suNg_algebra_vector
+#define _FIELD_DIM 4
+#include "TMPL/sync_to_buffer.cu.tmpl"
+
+#define _FIELD_NAME gtransf
+#define _SITE_TYPE suNg
+#define _FIELD_DIM 1
+#include "TMPL/sync_to_buffer.cu.tmpl"
+
+#define _FIELD_NAME clover_ldl
+#define _SITE_TYPE ldl_t
+#define _FIELD_DIM 1
+#include "TMPL/sync_to_buffer.cu.tmpl"
+
+#define _FIELD_NAME clover_term
+#define _SITE_TYPE suNfc
+#define _FIELD_DIM 4
+#include "TMPL/sync_to_buffer.cu.tmpl"
+
+#define _FIELD_NAME clover_force
+#define _SITE_TYPE suNf
+#define _FIELD_DIM 6
+#include "TMPL/sync_to_buffer.cu.tmpl"
+
+#define _FIELD_NAME staple_field
+#define _SITE_TYPE suNg
+#define _FIELD_DIM 3
+#include "TMPL/sync_to_buffer.cu.tmpl"
+
+#undef _GEOM_TYPE

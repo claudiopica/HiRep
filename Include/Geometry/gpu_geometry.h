@@ -32,6 +32,9 @@ typedef struct _kernel_field_input {
 
 #define _GPU_IDX_TO_LOCAL(_in, ix, ixp) ix - (_in)->type->master_start[(ixp)];
 
+#define CONCAT(_name, _suffix) _name ## _suffix
+#define _F_NAME(_name, _suffix) CONCAT(_name, _suffix)
+
 
 // TODO: in spinor field -> read by comp, out spinor field -> read full spinor -> this needs to be clarified (SAM)
 #define _IN_SPINOR_FIELD(_site, _comp) \
@@ -50,19 +53,19 @@ typedef struct _kernel_field_input {
             write_gpu_suNf_spinor(__stride_out, (_site), __out, __idx_out_local, 0);
 
 #define _IN_FIELD_AT(_site, _type, _comp) \
-            read_gpu_##_type(__stride_in, (_site), __in, __idx_in_local, _comp); 
+            _F_NAME(read_gpu_,_type)(__stride_in, (_site), __in, __idx_in_local, _comp); 
 
 #define _OUT_FIELD_AT(_site, _comp) \
-            read_gpu_##_type(__stride_out, (_site), __out, __idx_out_local, _comp);
+            _F_NAME(read_gpu_,_type)(__stride_out, (_site), __out, __idx_out_local, _comp);
 
 #define _IN_BLOCK_GAUGE_AT(_gauge_site, _comp) \
-            read_gpu_##_type(__stride_in, (_site), __in_gauge, __idx_in_local, _comp); 
+            _F_NAME(read_gpu_,_type)(__stride_in, (_site), __in_gauge, __idx_in_local, _comp); 
 
 #define _OUT_BLOCK_GAUGE_AT(_gauge_site, _comp) \
-            read_gpu_##_type(__stride_in, (*_site), __out_gauge, __idx_out_local, _comp); 
+            _F_NAME(read_gpu_,_type)(__stride_in, (*_site), __out_gauge, __idx_out_local, _comp); 
 
 #define _WRITE_OUT_FIELD(_site, _type, _comp) \
-            write_gpu_##_type(__stride_out, (_site), __out, __idx_out_local, _comp);
+            _F_NAME(write_gpu_,_type)(__stride_out, (_site), __out, __idx_out_local, _comp);
 
 // TODO cast to void to avoid warnings when something is not needed (SAM)
 #define _setup_striding(_input) \
@@ -99,4 +102,6 @@ typedef struct _kernel_field_input {
     if (__idx_out_local < __stride_out)
 
 
+#undef _F_NAME
+#undef CONCAT
 #endif

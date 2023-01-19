@@ -11,7 +11,7 @@ use strict;
 # rep ... Fermion Representation String Descriptor
 # su2quat ... SU(2) with Quaternions true/false
 # Gauge group ... SU(N) or SO(N), possible strings GAUGE_SUN, GAUGE_SON
-my ($Ng,$rep,$su2quat,$gauge_group)=@ARGV;
+my ($Ng,$rep,$su2quat,$gauge_group,$fixed_stride)=@ARGV;
 
 # open STDOUT, ">gpu_geometry.h";
 open STDOUT, ">strided_reads.h";

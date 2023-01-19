@@ -1,0 +1,68 @@
+/***************************************************************************\
+* Copyright (c) 2023, Sofie Martins                                         *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
+#if !defined _FIELD_NAME
+#error Missing _FIELD_NAME in communications_gpu.c
+#endif
+#if !defined _SITE_TYPE
+#error Missing _SITE_TYPE in communications_gpu.c
+#endif
+#if !defined _FIELD_DIM
+#error Missing _FIELD_DIM in communications_gpu.c
+#endif
+
+#define CONCAT(_name, _suffix) _name ## _suffix
+#define _F_NAME(_name, _suffix) CONCAT(_name, _suffix)
+#define _FUNC(_name, _args) void _F_NAME(_name,_FIELD_NAME) _args
+#define _KERNEL(_name, _args) __global__ void _F_NAME(_name,_FIELD_NAME) _args
+
+_KERNEL(box_to_buffer_kernel_,(kernel_field_input* input, coord4* icoord, int* ipt_gpu)) {
+    _KERNEL_FOR (input, _SITE_TYPE, _FIELD_DIM)
+    {
+        _find_index(buffer_index_to_box_index);
+
+        _SITE_TYPE site;
+        for (int comp = 0; comp < _FIELD_DIM; ++comp) {
+            _IN_FIELD_AT(site, _SITE_TYPE, comp);
+            _WRITE_OUT_FIELD(site, _SITE_TYPE, comp);
+        }
+    }
+}
+
+_FUNC(sync_box_to_buffer_gpu_,(geometry_descriptor *gd, 
+                            box_t *src, 
+                            void *lattice, 
+                            void *sendbuf)) {
+    /* TODO: we do not want to compare pointers */
+    enum gd_type gd_t = GLOBAL;
+    if (gd == &glat_even) gd_t = EVEN;
+    if (gd == &glat_odd) gd_t = ODD;
+
+    /* icoord array gives coordinates of inner lattice given a sendbuffer index */
+    coord4 *c = src->icoord;
+    coord4 *d_c;
+    int full_vol = boxVolume(src);
+    cudaMalloc((void**)&d_c, glattice.nbuffers_gauge*full_vol*sizeof(coord4));
+    cudaMemcpy(d_c, c, glattice.nbuffers_gauge*full_vol*sizeof(coord4), cudaMemcpyHostToDevice);
+
+    if (gd_t & EVEN) {
+        kernel_field_input* input = get_even_input(lattice, sendbuf, src);
+        const int grid = (boxEvenVolume(src) - 1)/BLOCK_SIZE_SYNC + 1;
+        _F_NAME(box_to_buffer_kernel_,_FIELD_NAME)<<<grid, BLOCK_SIZE_SYNC>>>(input, d_c, ipt_gpu);
+    }
+    if (gd_t & ODD) {
+        kernel_field_input* input = get_odd_input(gd->master_shift, lattice, sendbuf, src);
+        const int grid = (boxOddVolume(src) - 1)/BLOCK_SIZE_SYNC + 1;
+        _F_NAME(box_to_buffer_kernel_,_FIELD_NAME)<<<grid, BLOCK_SIZE_SYNC>>>(input, d_c, ipt_gpu);
+    }
+}
+
+#undef _FIELD_NAME
+#undef _SITE_TYPE
+#undef _FIELD_DIM
+#undef CONCAT
+#undef _F_NAME
+#undef _FUNC
+#undef _KERNEL

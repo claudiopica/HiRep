@@ -97,6 +97,7 @@ _DECLARE_SYNC_TO_BUFFER(gtransf, suNg);
 _DECLARE_SYNC_TO_BUFFER(clover_ldl, ldl_t);
 _DECLARE_SYNC_TO_BUFFER(clover_term, suNfc);
 _DECLARE_SYNC_TO_BUFFER(clover_force, suNf);
+_DECLARE_SYNC_TO_BUFFER(staple_field, suNg);
 
 #ifdef __cplusplus
     }

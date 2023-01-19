@@ -1,0 +1,140 @@
+/***************************************************************************\
+* Copyright (c) 2023, Sofie Martins                                         *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+
+#if !defined _FIELD_NAME
+#error Missing _FIELD_NAME in communications_gpu.c
+#endif
+#if !defined _FIELD_TYPE
+#error Missing _FIELD_TYPE in communications_gpu.c
+#endif
+#if !defined _SITE_TYPE
+#error Missing _SITE_TYPE in communications_gpu.c
+#endif
+#if !defined _FIELD_DIM
+#error Missing _FIELD_DIM in communications_gpu.c
+#endif
+#if !defined _GEOM_TYPE
+#error Missing _GEOM_TYPE in communications_gpu.c
+#endif
+#if !defined _COMPLEX
+#error Missing _COMPLEX in communications_gpu.c
+#endif
+#if !defined _MPI_REAL
+#error Missing _MPI_REAL in communications_gpu.c
+#endif
+#if !defined _REAL
+#error Missing _REAL in communications_gpu.c
+#endif
+
+#define CONCAT(_name, _suffix) _name ## _suffix
+#define _F_NAME(_name, _suffix) CONCAT(_name, _suffix)
+#define _FUNC(_name, _args) void _F_NAME(_name,_FIELD_NAME) _args
+
+#define _N_SITES(_geom) CONCAT(f->type->gsize_,_geom)
+#define _NUMBER_OF_SITES _N_SITES(_GEOM_TYPE)
+#define _N_BUFFERS(_geom) CONCAT(f->type->nbuffers_,_geom)
+#define _NUMBER_OF_BUFFERS _N_BUFFERS(_GEOM_TYPE)
+
+_FUNC(sync_gpu_,(_FIELD_TYPE *f)) {
+    #ifdef WITH_MPI
+    error(geometryBoxes==NULL, 1, __func__, "geometryBoxes are not initialized.\n");
+
+    box_t *L = geometryBoxes->next;
+    int i = 0;
+
+    int nbuffers = _NUMBER_OF_BUFFERS;
+    if (f->type==&glattice) nbuffers /= 2;
+    while (L && i < nbuffers)
+    {
+        _F_NAME(sync_box_to_buffer_gpu_,_FIELD_NAME)(f->type, L->sendBox, (void*)f->gpu_ptr, (void*)f->sendbuf_gpu_ptr);
+        L=L->next; i++;
+    }   
+    #endif              
+}
+
+_FUNC(start_sendrecv_gpu_,(_FIELD_TYPE *f)) {
+    #ifdef WITH_MPI
+    _F_NAME(sync_gpu_,_FIELD_NAME)(f);
+    for (int i = 0; i < _NUMBER_OF_BUFFERS; ++i)
+    {
+        int mpi_chunks_per_site = sizeof(_SITE_TYPE)/sizeof(_REAL);
+        /* Data Destination Parameters */
+        _COMPLEX *recv_buffer = (_COMPLEX*)(_BUF_GPU_DFIELD_BLK(f, i, _FIELD_DIM));
+        int recv_proc = f->type->rbuf_from_proc[i];
+        int number_of_sites = f->type->rbuf_len[i];
+        int recv_size_in_dbl = (_FIELD_DIM)*number_of_sites*mpi_chunks_per_site;
+
+        /* Data Origin Parameters */
+        _COMPLEX *send_buffer = (_COMPLEX*)(_DFIELD_AT_PTR(f->sendbuf_gpu_ptr, f->type->sbuf_start[i], 0, 0, _FIELD_DIM));
+        int send_proc = f->type->sbuf_to_proc[i];
+        number_of_sites = f->type->sbuf_len[i];
+        int send_size_in_dbl = (_FIELD_DIM)*number_of_sites*mpi_chunks_per_site;
+
+        /* Communications */
+        MPI_Irecv(recv_buffer, recv_size_in_dbl, _MPI_REAL, recv_proc, i, cart_comm, &(f->comm_req[2*i+1]));
+        MPI_Isend(send_buffer, send_size_in_dbl, _MPI_REAL, send_proc, i, cart_comm, &(f->comm_req[2*i]));
+    }    
+    #endif          
+}
+
+_FUNC(complete_sendrecv_gpu_,(_FIELD_TYPE *f)) {
+    #ifdef WITH_MPI
+    int nreq = 2 * _NUMBER_OF_BUFFERS;
+    if (nreq > 0) 
+    { 
+        MPI_Status status[nreq];
+        MPI_Waitall(nreq, f->comm_req, status);
+    }
+    #endif
+}
+
+_FUNC(fill_buffers_,(_FIELD_TYPE *f)) {
+    #ifdef WITH_MPI
+    for (int i = 0; i < _NUMBER_OF_BUFFERS; ++i)
+    {
+        int chunks_per_site = sizeof(_SITE_TYPE)/sizeof(_REAL);
+        int number_of_sites = f->type->rbuf_len[i];
+        int buffer_length = _FIELD_DIM*number_of_sites*chunks_per_site;
+
+        _REAL* random_array = (_REAL*)malloc(buffer_length*sizeof(_REAL));
+        _REAL* buffer = (_REAL*)(_BUF_GPU_FIELD_BLK(f,i));
+                  
+        _F_NAME(random_,_REAL)(random_array, buffer_length);
+        cudaMemcpy(buffer, random_array, buffer_length*sizeof(_REAL), cudaMemcpyHostToDevice);
+    }       
+    #endif
+}
+
+_FUNC(fill_buffers_with_zeroes_,(_FIELD_TYPE *f)) {
+    #ifdef WITH_MPI
+    for (int i = 0; i < _NUMBER_OF_BUFFERS; ++i)
+        {
+            int chunks_per_site = sizeof(_SITE_TYPE)/sizeof(_REAL);
+            int number_of_sites = f->type->rbuf_len[i];
+            int buffer_length = _FIELD_DIM*number_of_sites*chunks_per_site;
+
+            _REAL* zero_array = (_REAL*)malloc(buffer_length*sizeof(_REAL));
+            _REAL* buffer = (_REAL*)(_BUF_GPU_FIELD_BLK(f,i));
+                          
+            _F_NAME(zeroes_,_REAL)(buffer, buffer_length);
+            cudaMemcpy(buffer, zero_array, buffer_length*sizeof(_REAL), cudaMemcpyHostToDevice);
+        } 
+    #endif   
+}
+
+
+#undef _FIELD_NAME
+#undef _FIELD_TYPE
+#undef _SITE_TYPE
+#undef _FIELD_DIM
+#undef _COMPLEX
+#undef _MPI_REAL
+#undef _REAL
+#undef CONCAT
+#undef _F_NAME
+#undef _N_SITES
+#undef _NUMBER_OF_SITES
+#undef _N_BUFFERS
+#undef _NUMBER_OF_BUFFERS

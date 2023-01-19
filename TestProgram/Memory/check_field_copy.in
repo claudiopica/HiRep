@@ -1,6 +1,6 @@
 // Global variables 
 GLB_T = 8 
-GLB_X = 4
+GLB_X = 4 
 GLB_Y = 4
 GLB_Z = 4
 
