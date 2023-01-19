@@ -210,6 +210,9 @@ GLB_VAR(scalar_field,*ff_pi_mom,=NULL);
 
 GLB_VAR(int,four_fermion_active,=0); // whether four fermion interactions are active
 
+// GPU fixed reading stride
+#define THREADSIZE 32 
+
 #undef GLB_VAR
 
 #endif

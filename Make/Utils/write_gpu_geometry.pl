@@ -49,8 +49,17 @@ my @precision_desc = ("Double Precision", "Single Precision");
 my $basename = "suN";
 my @rep_suffixes = ("g", "f");
 
+my $stride;
+if ($fixed_stride==1) {
+    $stride = "THREADSIZE";
+} else {
+    $stride = "_stride";
+}
+
+
 ### WRITING FILE CONTENTS
 write_prolog();
+write_idx_finder();
 my @a = (0,1);
 for my $prec (@a) {
     for my $repr (@a) {
@@ -97,6 +106,14 @@ sub write_epilog {
     print "\n\n#endif\n#endif";
 }
 
+sub write_idx_finder {
+    if ($fixed_stride==1) {
+        print "#define calc_idx(_idx,_typename,_type) (( _idx / THREADSIZE ) * THREADSIZE ) * sizeof(_typename) / sizeof(_type) + _idx%THREADSIZE\n\n";
+    } else {
+        print "#define calc_idx(_idx,...) _idx\n\n";
+    }
+}
+
 sub write_gpu_spinor {
     my ($prec, $repr) = @_;
     my @dim_vector = ($Ng, $Nf);
@@ -131,14 +148,14 @@ sub write_gpu_spinor {
     print " */\n";
     print "#define read_gpu_${typename}(_stride, _s, _in, _ix, _comp) \\\n";
     print "\tdo { \\\n";
-    print "\t\tint __iz = (_ix); \\\n";
+    print "\t\tint __iz = calc_idx(_ix,${typename},${type}); \\\n";
     for ($comp=0; $comp<3; $comp++) {
         for ($i=0; $i<$N; $i++) {
-            print "\t\t(_s).c\[$comp\].c\[$i\]=(($type*)(_in))\[__iz\]; __iz+=(_stride); \\\n";
+            print "\t\t(_s).c\[$comp\].c\[$i\]=(($type*)(_in))\[__iz\]; __iz+=($stride); \\\n";
         }
     }
     for ($i=0; $i<$N-1; $i++) {
-        print "\t\t(_s).c\[$comp\].c\[$i\]=(($type*)(_in))\[__iz\]; __iz+=(_stride); \\\n";
+        print "\t\t(_s).c\[$comp\].c\[$i\]=(($type*)(_in))\[__iz\]; __iz+=($stride); \\\n";
     }
     print "\t\t(_s).c\[$comp\].c\[$i\]=(($type*)(_in))\[__iz\]; \\\n";
     print "\t} while (0) \n\n";
@@ -154,14 +171,14 @@ sub write_gpu_spinor {
     print " */\n";
     print "#define write_gpu_${typename}(_stride, _s, _out, _ix, _comp) \\\n";
     print "\tdo { \\\n";
-    print "\t\tint __iz = (_ix); \\\n";
+    print "\t\tint __iz = calc_idx(_ix,${typename},${type}); \\\n";
     for ($comp=0; $comp<3; $comp++) {
         for ($i=0; $i<$N; $i++) {
-            print "\t\t(($type*)(_out))\[__iz\]=(_s).c\[$comp\].c\[$i\]; __iz+=(_stride); \\\n";
+            print "\t\t(($type*)(_out))\[__iz\]=(_s).c\[$comp\].c\[$i\]; __iz+=($stride); \\\n";
         }
     }
     for ($i=0; $i<$N-1; $i++) {
-        print "\t\t(($type*)(_out))\[__iz\]=(_s).c\[$comp\].c\[$i\]; __iz+=(_stride); \\\n";
+        print "\t\t(($type*)(_out))\[__iz\]=(_s).c\[$comp\].c\[$i\]; __iz+=($stride); \\\n";
     }
     print "\t\t(($type*)(_out))\[__iz\]=(_s).c\[$comp\].c\[$i\]; \\\n";
     print "\t} while (0) \n\n";
@@ -199,9 +216,9 @@ sub write_gpu_vector {
     print " */\n";
     print "#define read_gpu_${typename}(_stride, _v, _in, _ix, _comp) \\\n";
     print "\tdo { \\\n";
-    print "\t\tint __iz = (_ix) + ((_comp)*$N)*(_stride); \\\n";
+    print "\t\tint __iz = calc_idx(_ix,${typename},${type}) + ((_comp)*$N)*($stride); \\\n";
     for ($i=0; $i<$N-1; $i++) {
-        print "\t\t(_v).c\[$i\]=((${type}*)(_in))\[__iz\]; __iz+=(_stride); \\\n";
+        print "\t\t(_v).c\[$i\]=((${type}*)(_in))\[__iz\]; __iz+=($stride); \\\n";
     }
     print "\t\t(_v).c\[$i\]=((${type}*)(_in))\[__iz\]; \\\n";
     print "\t} while (0) \n\n";
@@ -217,9 +234,9 @@ sub write_gpu_vector {
     print " */\n";
     print "#define write_gpu_${typename}(_stride, _v, _out, _ix, _comp) \\\n";
     print "\tdo { \\\n";
-    print "\t\tint __iz = (_ix) + ((_comp)*$N)*(_stride); \\\n";
+    print "\t\tint __iz = calc_idx(_ix,${typename},${type}) + ((_comp)*$N)*($stride); \\\n";
     for ($i=0; $i<$N-1; $i++) {
-        print "\t\t((${type}*)(_out))\[__iz\]=(_v).c\[$i\]; __iz+=(_stride);\\\n";
+        print "\t\t((${type}*)(_out))\[__iz\]=(_v).c\[$i\]; __iz+=($stride);\\\n";
     }
     print "\t\t((${type}*)(_out))\[__iz\]=(_v).c\[$i\]; \\\n";
     print "\t} while (0) \n\n";
@@ -267,9 +284,9 @@ sub write_gpu_suN {
     print " */\n";
     print "#define read_gpu_${typename}(_stride, _v, _in, _ix, _comp) \\\n";
     print "\tdo { \\\n";
-    print "\t\tint __iz = (_ix) + ((_comp)*$N)*(_stride); \\\n";
+    print "\t\tint __iz = calc_idx(_ix,${typename},${type}) + ((_comp)*$N)*($stride); \\\n";
     for ($i=0; $i<$N-1; $i++) {
-        print "\t\t(_v).c\[$i\]=((${type}*)(_in))\[__iz\]; __iz+=(_stride); \\\n";
+        print "\t\t(_v).c\[$i\]=((${type}*)(_in))\[__iz\]; __iz+=($stride); \\\n";
     }
     print "\t\t(_v).c\[$i\]=((${type}*)(_in))\[__iz\]; \\\n";
     print "\t} while (0) \n\n";
@@ -285,9 +302,9 @@ sub write_gpu_suN {
     print " */\n";
     print "#define write_gpu_${typename}(_stride, _v, _out, _ix, _comp) \\\n";
     print "\tdo { \\\n";
-    print "\t\tint __iz = (_ix) + ((_comp)*$N)*(_stride); \\\n";
+    print "\t\tint __iz = calc_idx(_ix,${typename},${type}) + ((_comp)*$N)*($stride); \\\n";
     for ($i=0; $i<$N-1; $i++) {
-        print "\t\t((${type}*)(_out))\[__iz\]=(_v).c\[$i\]; __iz+=(_stride);\\\n";
+        print "\t\t((${type}*)(_out))\[__iz\]=(_v).c\[$i\]; __iz+=($stride);\\\n";
     }
     print "\t\t((${type}*)(_out))\[__iz\]=(_v).c\[$i\]; \\\n";
     print "\t} while (0) \n\n";
@@ -351,9 +368,9 @@ sub write_gpu_clover_term {
         print " */\n";
         print "#define read_gpu_${typename_alias}(_stride, _v, _in, _ix, _comp) \\\n";
         print "\tdo { \\\n";
-        print "\t\tint __iz = (_ix) + ((_comp)*$N)*(_stride); \\\n";
+        print "\t\tint __iz = calc_idx(_ix,${typename},${type}) + ((_comp)*$N)*($stride); \\\n";
         for ($i=0; $i<$N-1; $i++) {
-            print "\t\t(_v).c\[$i\]=((${type}*)(_in))\[__iz\]; __iz+=(_stride); \\\n";
+            print "\t\t(_v).c\[$i\]=((${type}*)(_in))\[__iz\]; __iz+=($stride); \\\n";
         }
         print "\t\t(_v).c\[$i\]=((${type}*)(_in))\[__iz\]; \\\n";
         print "\t} while (0) \n\n";
@@ -369,9 +386,9 @@ sub write_gpu_clover_term {
         print " */\n";
         print "#define write_gpu_${typename_alias}(_stride, _v, _out, _ix, _comp) \\\n";
         print "\tdo { \\\n";
-        print "\t\tint __iz = (_ix) + ((_comp)*$N)*(_stride); \\\n";
+        print "\t\tint __iz = calc_idx(_ix,${typename},${type}) + ((_comp)*$N)*($stride); \\\n";
         for ($i=0; $i<$N-1; $i++) {
-            print "\t\t((${type}*)(_out))\[__iz\]=(_v).c\[$i\]; __iz+=(_stride);\\\n";
+            print "\t\t((${type}*)(_out))\[__iz\]=(_v).c\[$i\]; __iz+=($stride);\\\n";
         }
         print "\t\t((${type}*)(_out))\[__iz\]=(_v).c\[$i\]; \\\n";
         print "\t} while (0) \n\n";
@@ -431,9 +448,9 @@ sub write_gpu_suN_av {
     print " */\n";
     print "#define read_gpu_${typename}(_stride, _v, _in, _ix, _comp) \\\n";
     print "\tdo { \\\n";
-    print "\t\tint __iz = (_ix) + ((_comp)*$N)*(_stride); \\\n";
+    print "\t\tint __iz = calc_idx(_ix,${typename},${type}) + ((_comp)*$N)*($stride); \\\n";
     for ($i=0; $i<$N-1; $i++) {
-        print "\t\t(_v).c\[$i\]=((${type}*)(_in))\[__iz\]; __iz+=(_stride); \\\n";
+        print "\t\t(_v).c\[$i\]=((${type}*)(_in))\[__iz\]; __iz+=($stride); \\\n";
     }
     print "\t\t(_v).c\[$i\]=((${type}*)(_in))\[__iz\]; \\\n";
     print "\t} while (0) \n\n";
@@ -449,9 +466,9 @@ sub write_gpu_suN_av {
     print " */\n";
     print "#define write_gpu_${typename}(_stride, _v, _out, _ix, _comp) \\\n";
     print "\tdo { \\\n";
-    print "\t\tint __iz = (_ix) + ((_comp)*$N)*(_stride); \\\n";
+    print "\t\tint __iz = calc_idx(_ix,${typename},${type}) + ((_comp)*$N)*($stride); \\\n";
     for ($i=0; $i<$N-1; $i++) {
-        print "\t\t((${type}*)(_out))\[__iz\]=(_v).c\[$i\]; __iz+=(_stride);\\\n";
+        print "\t\t((${type}*)(_out))\[__iz\]=(_v).c\[$i\]; __iz+=($stride);\\\n";
     }
     print "\t\t((${type}*)(_out))\[__iz\]=(_v).c\[$i\]; \\\n";
     print "\t} while (0) \n\n"; 
@@ -515,12 +532,12 @@ sub write_gpu_ldl_field {
     print " */\n";
     print "#define read_gpu_${typename}(_stride, _v, _in, _ix, _comp) \\\n";
     print "\tdo { \\\n";
-    print "\t\tint __iz = (_ix) + ((_comp)*2*$N)*(_stride); \\\n";
+    print "\t\tint __iz = calc_idx(_ix,${typename},${type}) + ((_comp)*2*$N)*($stride); \\\n";
     for ($i=0; $i<$N; $i++) {
-        print "\t\t(_v).up\[$i\]=((${type}*)(_in))\[__iz\]; __iz+=(_stride); \\\n";
+        print "\t\t(_v).up\[$i\]=((${type}*)(_in))\[__iz\]; __iz+=($stride); \\\n";
     }
     for ($i=0; $i<$N-1; $i++) {
-        print "\t\t(_v).dn\[$i\]=((${type}*)(_in))\[__iz\]; __iz+=(_stride); \\\n";
+        print "\t\t(_v).dn\[$i\]=((${type}*)(_in))\[__iz\]; __iz+=($stride); \\\n";
     } 
     print "\t\t(_v).dn\[$i\]=((${type}*)(_in))\[__iz\]; \\\n";
 
@@ -537,12 +554,12 @@ sub write_gpu_ldl_field {
     print " */\n";
     print "#define write_gpu_${typename}(_stride, _v, _out, _ix, _comp) \\\n";
     print "\tdo { \\\n";
-    print "\t\tint __iz = (_ix) + ((_comp)*2*$N)*(_stride); \\\n";
+    print "\t\tint __iz = calc_idx(_ix,${typename},${type}) + ((_comp)*2*$N)*($stride); \\\n";
     for ($i=0; $i<$N; $i++) {
-        print "\t\t((${type}*)(_out))\[__iz\]=(_v).up\[$i\]; __iz+=(_stride);\\\n";
+        print "\t\t((${type}*)(_out))\[__iz\]=(_v).up\[$i\]; __iz+=($stride);\\\n";
     }
     for ($i=0; $i<$N-1; $i++) {
-        print "\t\t((${type}*)(_out))\[__iz\]=(_v).dn\[$i\]; __iz+=(_stride);\\\n";
+        print "\t\t((${type}*)(_out))\[__iz\]=(_v).dn\[$i\]; __iz+=($stride);\\\n";
     }
     print "\t\t((${type}*)(_out))\[__iz\]=(_v).dn\[$i\]; \\\n";
     print "\t} while (0) \n\n";

@@ -7,8 +7,6 @@
 #include <stddef.h>
 #include <string.h>
 
-#define THREADSIZE 32
-
 // this will include the 4th L2 corner in the geometry
 // it's not needed, was here for testng purposed
 // #define _INCLUDE_UP_UP_L2
