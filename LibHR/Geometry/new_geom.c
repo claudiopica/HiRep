@@ -64,10 +64,12 @@ static int index_blocked(
     b3=set_block_size(X3,b3);
 
     //compute coordinates inside block and block coordinates
+    // clang-format off
     xb0=x0%b0; xn0=x0/b0;
     xb1=x1%b1; xn1=x1/b1;
     xb2=x2%b2; xn2=x2/b2;
-    xb3=x3%b3; xn3=x3/b3;   
+    xb3=x3%b3; xn3=x3/b3;
+    // clang-format on   
     // lprintf("INDEX",1,"BLK size used=[%d,%d,%d,%d]\n",b0,b1,b2,b3);
     // lprintf("INDEX",1,"coord =[%d,%d,%d,%d]\n",x0,x1,x2,x3);
     // lprintf("INDEX",1,"inner =[%d,%d,%d,%d]\n",xb0,xb1,xb2,xb3);
@@ -309,6 +311,7 @@ static box_t *makeBorderBox(char mask) {
 
         box_t *b=makeLocalBox(); 
         b->mask=mask; b->type = 4;
+        // clang-format off
         if (mask & T_UP_MASK) { b->l[0] = T+T_BORDER; b->h[0] = T_EXT;    b->type--;} else     
         if (mask & T_DN_MASK) { b->l[0] = 0;          b->h[0] = T_BORDER; b->type--;}     
         if (mask & X_UP_MASK) { b->l[1] = X+X_BORDER; b->h[1] = X_EXT;    b->type--;} else
@@ -316,13 +319,15 @@ static box_t *makeBorderBox(char mask) {
         if (mask & Y_UP_MASK) { b->l[2] = Y+Y_BORDER; b->h[2] = Y_EXT;    b->type--;} else
         if (mask & Y_DN_MASK) { b->l[2] = 0;          b->h[2] = Y_BORDER; b->type--;}     
         if (mask & Z_UP_MASK) { b->l[3] = Z+Z_BORDER; b->h[3] = Z_EXT;    b->type--;} else
-        if (mask & Z_DN_MASK) { b->l[3] = 0;          b->h[3] = Z_BORDER; b->type--;} 
+        if (mask & Z_DN_MASK) { b->l[3] = 0;          b->h[3] = Z_BORDER; b->type--;}
+        // clang-format on
         //TODO: we don't check explicitly that only one of UP and DN bits per directions are set
         setBoxParity(b);
 
         //make sendBox
         box_t *s=makeLocalBox(); 
         s->mask=0; s->type = SENDBUF;
+        // clang-format off
         if (mask & T_UP_MASK) { s->h[0] = 2*T_BORDER; } else     
         if (mask & T_DN_MASK) { s->l[0] = T; }
         if (mask & X_UP_MASK) { s->h[1] = 2*X_BORDER; } else
@@ -330,7 +335,8 @@ static box_t *makeBorderBox(char mask) {
         if (mask & Y_UP_MASK) { s->h[2] = 2*Y_BORDER; } else
         if (mask & Y_DN_MASK) { s->l[2] = Y; }     
         if (mask & Z_UP_MASK) { s->h[3] = 2*Z_BORDER; } else
-        if (mask & Z_DN_MASK) { s->l[3] = Z; } 
+        if (mask & Z_DN_MASK) { s->l[3] = Z; }
+        // clang-format on
         setBoxParity(s);
 
         //link sendBox in b
@@ -596,6 +602,7 @@ static void enumerate_lattice() {
         if (ix == INVALID_POINT) continue;
 
         char xmask=0; int iy=0;
+        // clang-format off
         iy=safe_ipt_ext(x0_ext+1,x1_ext,x2_ext,x3_ext); iup(ix,0)=iy; if(isInsideBox(geometryBoxes, iy)) xmask |= T_UP_MASK; 
         iy=safe_ipt_ext(x0_ext-1,x1_ext,x2_ext,x3_ext); idn(ix,0)=iy; if(isInsideBox(geometryBoxes, iy)) xmask |= T_DN_MASK; 
         iy=safe_ipt_ext(x0_ext,x1_ext+1,x2_ext,x3_ext); iup(ix,1)=iy; if(isInsideBox(geometryBoxes, iy)) xmask |= X_UP_MASK; 
@@ -604,7 +611,7 @@ static void enumerate_lattice() {
         iy=safe_ipt_ext(x0_ext,x1_ext,x2_ext-1,x3_ext); idn(ix,2)=iy; if(isInsideBox(geometryBoxes, iy)) xmask |= Y_DN_MASK; 
         iy=safe_ipt_ext(x0_ext,x1_ext,x2_ext,x3_ext+1); iup(ix,3)=iy; if(isInsideBox(geometryBoxes, iy)) xmask |= Z_UP_MASK; 
         iy=safe_ipt_ext(x0_ext,x1_ext,x2_ext,x3_ext-1); idn(ix,3)=iy; if(isInsideBox(geometryBoxes, iy)) xmask |= Z_DN_MASK; 
-
+        // clang-format on
         imask(ix)=xmask;
 
     }}}}
@@ -656,22 +663,24 @@ static void gd_alloc_mem(geometry_descriptor *gd, int NBuf, int NInner) {
         buf = (int*)malloc((6*NBuf) * sizeof(int));
         error((buf == NULL), 1, __func__ , "Cannot allocate memory");
     }
-
+    // clang-format off
     gd->rbuf_len         = buf; if (buf) buf += NBuf;
     gd->sbuf_len         = buf; if (buf) buf += NBuf;
     gd->sbuf_to_proc     = buf; if (buf) buf += NBuf;
     gd->sbuf_start       = buf; if (buf) buf += NBuf;
     gd->rbuf_from_proc   = buf; if (buf) buf += NBuf;
     gd->rbuf_start       = buf;
+    // clang-format on
 
     buf = NULL;
     if (NInner>0) {
         buf = (int*)malloc((2*(NInner+NBuf)) * sizeof(int));
         error((buf == NULL), 1, __func__ , "Cannot allocate memory");
     }
+    // clang-format off
     gd->master_start     = buf; if (buf) buf += NBuf+NInner; //+1 because of the local lattice box
     gd->master_end       = buf; //same size as master_start
-
+    // clang-format on
 }
 
 // in this geometry we don't need to copy pieces of geometry
