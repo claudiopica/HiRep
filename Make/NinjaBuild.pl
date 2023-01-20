@@ -42,7 +42,7 @@ coreincdir = $root/Include/Core
 AR = ar
 
 INCLUDE = $INCLUDE -I$incdir -I$coreincdir
-CFLAGS = -std=c99 $MACRO $CFLAGS $INCLUDE
+CFLAGS = -std=c11 $MACRO $CFLAGS $INCLUDE
 GPUFLAGS = $MACRO $GPUFLAGS $INCLUDE
 LDFLAGS = -L$builddir $LDFLAGS
 
@@ -331,6 +331,10 @@ sub read_conf {
     push(@{$options{'MACRO'}},"${$options{'GAUGE_GROUP'}}[0]");
     push(@{$options{'MACRO'}},"${$options{'REPR'}}[0]");
     push(@{$options{'MACRO'}},"REPR_NAME=\\\"${$options{'REPR'}}[0]\\\"");
+
+    if ($options{'CC'}[0]=~/\bmpiicc\b/ || $options{'CC'}[0]=~/\bicc\b/) {
+        $disable_color=1;
+    }
 
     #print Dumper(\%options);
     return %options;

@@ -3,9 +3,7 @@ use warnings;
 use strict;
 use Getopt::Long 'HelpMessage';
 use File::Basename qw(dirname basename);
-use Time::HiRes qw( usleep ualarm gettimeofday tv_interval nanosleep
-                    clock_gettime clock_getres clock_nanosleep clock
-                    stat lstat utime);
+use Time::HiRes qw(gettimeofday tv_interval);
 
 GetOptions(
     'test|t=s' => \(my $test_file),
@@ -15,6 +13,11 @@ GetOptions(
 
 my $input_file = "$test_file.in";
 my $output_file = "$test_file.out";
+my $mpirun = "mpirun";
+
+if(defined $ENV{'HIREP_MPIRUN'}) {
+    $mpirun = $ENV{'HIREP_MPIRUN'};
+}
 
 print ("[\e[1m $test_file \e[0m ] ... ");
 my $mpicmd="";
@@ -35,7 +38,7 @@ if ($mpi) {
     my $NP=$NT*$NX*$NY*$NZ;
     # print "NP=$NP ($NT,$NX,$NY,$NZ)\n";
     $ENV{"OMPI_MCA_btl_base_warn_component_unused"}=0;
-    $mpicmd="mpirun -np $NP";
+    $mpicmd="$mpirun -np $NP";
 }
 
 my $testdir = dirname($test_file);
