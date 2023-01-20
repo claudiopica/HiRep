@@ -170,7 +170,7 @@ int test_bijectivity_spinor_field_f(geometry_descriptor *gd)
 
     spinor_field_zero_f_cpu(in);
     lprintf("SANITY CHECK", 0, "CPU copy should be zero in intermediate step: %0.2e\n", spinor_field_sqnorm_f_cpu(in));
-    lprintf("SANITY CHECK", 0, "GPU copy should be equal to ealier in square norms: %0.2e\n", spinor_field_sqnorm_f(in));
+    //lprintf("SANITY CHECK", 0, "GPU copy should be equal to ealier in square norms: %0.2e\n", spinor_field_sqnorm_f(in));
     copy_from_gpu_spinor_field_f(in);
 
     lprintf("SANITY CHECK", 0, "CPU after copying back: %0.2e\n", spinor_field_sqnorm_f_cpu(in));
@@ -213,7 +213,7 @@ int test_bijectivity_spinor_field_f_flt(geometry_descriptor *gd)
 
     spinor_field_zero_f_flt_cpu(in);
     lprintf("SANITY CHECK", 0, "CPU copy should be zero in intermediate step: %0.2e\n", spinor_field_sqnorm_f_flt_cpu(in));
-    lprintf("SANITY CHECK", 0, "GPU copy should be equal to ealier in square norms: %0.2e\n", spinor_field_sqnorm_f_flt(in));
+    //lprintf("SANITY CHECK", 0, "GPU copy should be equal to ealier in square norms: %0.2e\n", spinor_field_sqnorm_f_flt(in));
     copy_from_gpu_spinor_field_f_flt(in);
 
     spinor_field_sub_assign_f_flt_cpu(in, in_copy);

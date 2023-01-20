@@ -7,6 +7,7 @@
 
 #include "inverters.h"
 #include "libhr_core.h"
+#include "geometry.h"
 
 // Linear Algebra functions are generic
 // They are parametrized over the input types for double/single precision

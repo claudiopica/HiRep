@@ -1,251 +1,448 @@
 #ifndef LINEAR_ALGEBRA_GPU_CU
 #define LINEAR_ALGEBRA_GPU_CU
 
+#define _CONCAT(_name,_suffix) _name ## _suffix
+#define _F_NAME(_name,_suffix) _CONCAT(_name,_suffix)
+
+#define spinor_idx(_idx) (_idx/(4*NF*THREADSIZE))*THREADSIZE + _idx % 4*NF*THREADSIZE % THREADSIZE
+
 // Loop over current kernel thread block
 #define CUDA_BLK_FOR(_i,_N) \
    for (int _i = blockIdx.x * blockDim.x + threadIdx.x; \
-        _i < _N;                                        \
+        (_i < ((_N-1)/THREADSIZE + 1)*THREADSIZE) && (spinor_idx(_i) < _N/(4*NF));\
         _i += blockDim.x * gridDim.x)
 
+#ifdef FIXED_STRIDE
+   #define _is_in_second_hspinor(_idx, _piece_size) (_idx/(2*NF*THREADSIZE)) % 2 == 1
+#else
+   #define _is_in_second_hspinor(_idx, _piece_size) _idx > (_piece_size/2)
+#endif
+
+template<typename SITE_TYPE, typename REAL>
+__device__ void read_gpu(int stride, SITE_TYPE *s, SITE_TYPE *in, int ix) {
+    #ifdef FIXED_STRIDE
+        int iz = ((ix / THREADSIZE) * THREADSIZE) * 4*NF  + ix % THREADSIZE;
+    #else
+        int iz = ix;
+    #endif
+    REAL* in_cpx = (REAL*)in;
+    for (int s_comp = 0; s_comp < 4; ++s_comp) {
+        for (int vec_comp = 0; vec_comp < NF; ++vec_comp) {
+            (*s).c[s_comp].c[vec_comp] = in_cpx[iz];
+            iz+=THREADSIZE; 
+        }
+    }
+}
+
+template <typename SITE_TYPE, typename REAL>
+__device__ void write_gpu(int stride, SITE_TYPE s, SITE_TYPE *out, int ix) {
+   #ifdef FIXED_STRIDE
+        int iz = ((ix / THREADSIZE) * THREADSIZE) * 4*NF  + ix % THREADSIZE;
+    #else
+        int iz = ix;
+    #endif
+    REAL * out_cpx = (REAL*)out;
+    for (int s_comp = 0; s_comp < 4; ++s_comp) {
+      for (int vec_comp = 0; vec_comp < NF; ++vec_comp) {
+         out_cpx[iz] = s.c[s_comp].c[vec_comp];
+         iz+=THREADSIZE;
+      }
+    }
+}
+
+
 /* Re <s1,s2> */
-template<typename COMPLEX, typename REAL>
-__global__ void spinor_field_prod_re_gpu(COMPLEX* s1, COMPLEX* s2, REAL* resField, int N)
+template<typename SITE_TYPE, typename REAL, typename COMPLEX>
+__global__ void spinor_field_prod_re_gpu(SITE_TYPE* s1, SITE_TYPE* s2, REAL* resField, int N)
 {
-   CUDA_BLK_FOR(i, N) {
-      resField[i] = _complex_prod_re(s1[i],s2[i]);
+   SITE_TYPE site1;
+   SITE_TYPE site2;
+   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+   if (ix < N) {
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site1, s1, ix);
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site2, s2, ix);
+      _spinor_prod_re_f(resField[ix], site1, site2);
    }
 }
 
 /* Im <s1,s2> */
-template<typename COMPLEX, typename REAL>
-__global__ void spinor_field_prod_im_gpu(COMPLEX* s1, COMPLEX* s2, REAL* resField, int N)
+template<typename SITE_TYPE, typename REAL, typename COMPLEX>
+__global__ void spinor_field_prod_im_gpu(SITE_TYPE *s1, SITE_TYPE *s2, REAL* resField, int N)
 {
-   CUDA_BLK_FOR(i, N) {
-      resField[i]=_complex_prod_im(s1[i],s2[i]);
+   SITE_TYPE site1;
+   SITE_TYPE site2;
+   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+   if (ix < N) {
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site1, s1, ix);
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site2, s2, ix);
+      _spinor_prod_im_f(resField[ix], site1, site2);
    }
 }
 
 /* <s1,s2> */
-template<typename COMPLEX>
-__global__ void spinor_field_prod_gpu(COMPLEX* s1, COMPLEX* s2, hr_complex* resField, int N)
+template<typename SITE_TYPE, typename COMPLEX>
+__global__ void spinor_field_prod_gpu(SITE_TYPE* s1, SITE_TYPE* s2, COMPLEX* resField, int N)
 {
-   CUDA_BLK_FOR(i, N) {
-      resField[i] = _complex_prod(s1[i],s2[i]);
+   SITE_TYPE site1;
+   SITE_TYPE site2;
+   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+   if (ix < N) {
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site1, s1, ix);
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site2, s2, ix);
+      _spinor_prod_f(resField[ix], site1, site2);
    }
 }
 
 /* Re <g5*s1,s2> */
-template<typename COMPLEX, typename REAL>
-__global__ void spinor_field_g5_prod_re_gpu(COMPLEX* s1, COMPLEX* s2, REAL* resField, int N)
+template<typename SITE_TYPE, typename COMPLEX, typename REAL>
+__global__ void spinor_field_g5_prod_re_gpu(SITE_TYPE* s1, SITE_TYPE* s2, REAL* resField, int N)
 {
-   CUDA_BLK_FOR(i, N) {
-      resField[i] = - _complex_prod_re(s1[i],s2[i]);
+   SITE_TYPE site1;
+   SITE_TYPE site2;
+   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+   if (ix < N) {
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site1, s1, ix);
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site2, s2, ix);
+      _spinor_g5_prod_re_f(resField[ix], site1, site2);
    }
 }
 
 /* Im <g5*s1,s2> */
-template<typename COMPLEX, typename REAL>
- __global__ void spinor_field_g5_prod_im_gpu(COMPLEX* s1, COMPLEX* s2, REAL* resField, int N)
+template<typename SITE_TYPE, typename COMPLEX, typename REAL>
+ __global__ void spinor_field_g5_prod_im_gpu(SITE_TYPE* s1, SITE_TYPE* s2, REAL* resField, int N)
 {
-   CUDA_BLK_FOR(i, N) {
-      resField[i] = - _complex_prod_im(s1[i],s2[i]);
+   SITE_TYPE site1;
+   SITE_TYPE site2;
+   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+   if (ix < N) {
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site1, s1, ix);
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site2, s2, ix);
+      _spinor_g5_prod_im_f(resField[ix], site1, site2);
    }
 }
 
 /* Re <s1,s1> */
-template<typename COMPLEX, typename REAL>
-__global__ void spinor_field_sqnorm_gpu(COMPLEX* s1, REAL* resField, int N)
+template<typename SITE_TYPE, typename COMPLEX, typename REAL>
+__global__ void spinor_field_sqnorm_gpu(SITE_TYPE* s1, REAL* resField, int N)
 {
-   CUDA_BLK_FOR(i, N) {
-      resField[i] = _complex_prod_re(s1[i],s1[i]);
+   SITE_TYPE site1;
+   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+   if (ix < N) {
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site1, s1, ix);
+      _spinor_prod_re_f(resField[ix], site1, site1);
    }
 }
 
 /* s1+=r*s2 r real */
-template<typename COMPLEX, typename REAL>
-__global__ void spinor_field_mul_add_assign_gpu(COMPLEX *s1, REAL r, COMPLEX *s2, int N)
+template<typename SITE_TYPE, typename COMPLEX, typename REAL>
+__global__ void spinor_field_mul_add_assign_gpu(SITE_TYPE *s1, REAL r, SITE_TYPE *s2, int N)
 {
-   CUDA_BLK_FOR(i, N) {
-      _complex_mulr_assign(s1[i],r,s2[i]);
-   }
-}
-
-/* s1=r*s2 r real */
-template<typename COMPLEX , typename REAL>
-__global__ void spinor_field_mul_gpu(COMPLEX *s1, REAL r, COMPLEX *s2, int N)
-{
-   CUDA_BLK_FOR(i, N) {
-      _complex_mulr(s1[i],r,s2[i]);
+   SITE_TYPE site1;
+   SITE_TYPE site2;
+   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+   if (ix < N) {
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site1, s1, ix);
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site2, s2, ix);
+      _spinor_mul_add_assign_f(site1, r, site2);
+      write_gpu<SITE_TYPE, COMPLEX>(N, site1, s1, ix);
    }
 }
 
 /* s1+=c*s2 c complex */
-template<typename COMPLEX>
-__global__ void spinor_field_mulc_add_assign_gpu(COMPLEX *s1, COMPLEX c, COMPLEX *s2, int N)
+template<typename SITE_TYPE, typename COMPLEX>
+__global__ void spinor_field_mulc_add_assign_gpu(SITE_TYPE *s1, COMPLEX c, SITE_TYPE *s2, int N)
 {
-   CUDA_BLK_FOR(i, N) {
-      _complex_mul_assign(s1[i],c,s2[i]);
+   SITE_TYPE site1;
+   SITE_TYPE site2;
+   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+   if (ix < N) {
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site1, s1, ix);
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site2, s2, ix);
+      _spinor_mulc_add_assign_f(site1, c, site2);
+      write_gpu<SITE_TYPE, COMPLEX>(N, site1, s1, ix);
+   }
+}
+
+/* s1=r*s2 r real */
+template<typename SITE_TYPE, typename COMPLEX , typename REAL>
+__global__ void spinor_field_mul_gpu(SITE_TYPE *s1, REAL r, SITE_TYPE *s2, int N)
+{
+   SITE_TYPE site1;
+   SITE_TYPE site2;
+   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+   if (ix < N) {
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site2, s2, ix);
+      _spinor_mul_f(site1, r, site2);
+      write_gpu<SITE_TYPE, COMPLEX>(N, site1, s1, ix);
    }
 }
 
 /* s1=c*s2 c complex */
-template<typename COMPLEX>
-__global__ void spinor_field_mulc_gpu(COMPLEX *s1, COMPLEX c, COMPLEX *s2, int N)
+template<typename SITE_TYPE, typename COMPLEX>
+__global__ void spinor_field_mulc_gpu(SITE_TYPE *s1, COMPLEX c, SITE_TYPE *s2, int N)
 {
-   CUDA_BLK_FOR(i, N) {
-      _complex_mul(s1[i],c,s2[i]);
+   SITE_TYPE site1;
+   SITE_TYPE site2;
+   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+   if (ix < N) {
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site2, s2, ix);
+      _spinor_mulc_f(site1, c, site2);
+      write_gpu<SITE_TYPE, COMPLEX>(N, site1, s1, ix);
    }
 }
 
 /* r=s1+s2 */
-template<typename COMPLEX>
-__global__ void spinor_field_add_gpu(COMPLEX *r, COMPLEX *s1, COMPLEX *s2, int N)
+template<typename SITE_TYPE, typename COMPLEX>
+__global__ void spinor_field_add_gpu(SITE_TYPE *r, SITE_TYPE *s1, SITE_TYPE *s2, int N)
 {
-   CUDA_BLK_FOR(i, N) {
-      _complex_add(r[i],s1[i],s2[i]);
+   SITE_TYPE site1;
+   SITE_TYPE site2;
+   SITE_TYPE res;
+   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+   if (ix < N) {
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site1, s1, ix);
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site2, s2, ix);
+      _spinor_add_f(res, site1, site2);
+      write_gpu<SITE_TYPE, COMPLEX>(N, res, r, ix);
    }
 }
 
 /* r=s1-s2 */
-template<typename COMPLEX>
-__global__ void spinor_field_sub_gpu(COMPLEX *r, COMPLEX * s1, COMPLEX *s2, int N)
+template<typename SITE_TYPE, typename COMPLEX>
+__global__ void spinor_field_sub_gpu(SITE_TYPE *r, SITE_TYPE * s1, SITE_TYPE *s2, int N)
 {
-   CUDA_BLK_FOR(i, N) {
-      _complex_sub(r[i],s1[i],s2[i]);
+   SITE_TYPE site1;
+   SITE_TYPE site2;
+   SITE_TYPE res;
+   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+   if (ix < N) {
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site1, s1, ix);
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site2, s2, ix);
+      _spinor_sub_f(res, site1, site2);
+      write_gpu<SITE_TYPE, COMPLEX>(N, res, r, ix);
    }
 }
 
 /* s1+=s2 */
-template<typename COMPLEX>
-__global__ void spinor_field_add_assign_gpu(COMPLEX *s1, COMPLEX *s2, int N)
+template<typename SITE_TYPE, typename COMPLEX>
+__global__ void spinor_field_add_assign_gpu(SITE_TYPE *s1, SITE_TYPE *s2, int N)
 {
-   CUDA_BLK_FOR(i, N) {
-      _complex_add_assign(s1[i],s2[i]);
+   SITE_TYPE site1;
+   SITE_TYPE site2;
+   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+   if (ix < N) {
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site2, s2, ix);
+      _spinor_add_assign_f(site1, site2);
+      write_gpu<SITE_TYPE, COMPLEX>(N, site1, s1, ix);
    }
 }
 
 /* s1-=s2 */
-template<typename COMPLEX>
-__global__ void spinor_field_sub_assign_gpu(COMPLEX* s1, COMPLEX *s2, int N)
+template<typename SITE_TYPE, typename COMPLEX>
+__global__ void spinor_field_sub_assign_gpu(SITE_TYPE* s1, SITE_TYPE *s2, int N)
 {
-   CUDA_BLK_FOR(i, N) {
-      _complex_sub_assign(s1[i],s2[i]);
+   SITE_TYPE site1;
+   SITE_TYPE site2;
+   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+   if (ix < N) {
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site1, s1, ix);
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site2, s2, ix);
+      _spinor_sub_assign_f(site1, site2);
+      write_gpu<SITE_TYPE, COMPLEX>(N, site1, s1, ix);
    }
 }
 
 /* s1=0 */
-template<typename COMPLEX>
-__global__ void spinor_field_zero_gpu(COMPLEX *s1, int N)
+template<typename SITE_TYPE, typename COMPLEX>
+__global__ void spinor_field_zero_gpu(SITE_TYPE *s1, int N)
 {
-   CUDA_BLK_FOR(i, N) {
-      _complex_0(s1[i]);
+   SITE_TYPE site;  
+   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+   if (ix < N) {
+      _spinor_zero_f(site);
+      write_gpu<SITE_TYPE, COMPLEX>(N, site, s1, ix);
    }
 }
 
 /* s1=-s2 */
-template<typename COMPLEX>
-__global__ void spinor_field_minus_gpu(COMPLEX * s1, COMPLEX * s2, int N)
+template<typename SITE_TYPE, typename COMPLEX>
+__global__ void spinor_field_minus_gpu(SITE_TYPE * s1, SITE_TYPE * s2, int N)
 {
-   CUDA_BLK_FOR(i, N) {
-      _complex_minus(s1[i],s2[i]);
+   SITE_TYPE site1;
+   SITE_TYPE site2;
+   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+   if (ix < N) {
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site2, s2, ix);
+      _spinor_minus_f(site1, site2);
+      write_gpu<SITE_TYPE, COMPLEX>(N, site1, s1, ix);
    }
 }
 
 /* s1=-s1 */
-template<typename COMPLEX>
-__global__ void spinor_field_minus_assign_gpu(COMPLEX* s1, int N)
+template<typename SITE_TYPE, typename COMPLEX>
+__global__ void spinor_field_minus_assign_gpu(SITE_TYPE* s1, int N)
 {
-   CUDA_BLK_FOR(i, N) {
-      s1[i] = -s1[i];
+   SITE_TYPE site1;
+   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+   if (ix < N) {
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site1, s1, ix);
+      _spinor_minus_f(site1, site1);
+      write_gpu<SITE_TYPE, COMPLEX>(N, site1, s1, ix);
    }
 }
 
 /* s1=r1*s2+r2*s3 r1,r2 real */
-template<typename COMPLEX , typename REAL>
-__global__ void spinor_field_lc_gpu(COMPLEX *s1, REAL r1, COMPLEX *s2, REAL r2, COMPLEX *s3, int N)
+template<typename SITE_TYPE, typename COMPLEX , typename REAL>
+__global__ void spinor_field_lc_gpu(SITE_TYPE *s1, REAL r1, SITE_TYPE *s2, REAL r2, SITE_TYPE *s3, int N)
 {
-   CUDA_BLK_FOR(i, N) {
-      _complex_rlc(s1[i],r1,s2[i],r2,s3[i]);
+   SITE_TYPE site1;
+   SITE_TYPE site2;
+   SITE_TYPE site3;
+   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+   if (ix < N) {
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site2, s2, ix);
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site3, s3, ix);
+      _spinor_lc_f(site1, r1, site2, r2, site3);
+      write_gpu<SITE_TYPE, COMPLEX>(N, site1, s1, ix);
    }
 }
 
 /* s1+=r1*s2+r2*s3 r1,r2 real */
-template<typename COMPLEX, typename REAL>
-__global__ void spinor_field_lc_add_assign_gpu(COMPLEX *s1, REAL r1, COMPLEX *s2, REAL r2, COMPLEX *s3, int N)
+template<typename SITE_TYPE, typename COMPLEX, typename REAL>
+__global__ void spinor_field_lc_add_assign_gpu(SITE_TYPE *s1, REAL r1, SITE_TYPE *s2, REAL r2, SITE_TYPE *s3, int N)
 {
-   CUDA_BLK_FOR(i, N) {
-      _complex_rlc_assign(s1[i],r1,s2[i],r2,s3[i]);
+   SITE_TYPE site1;
+   SITE_TYPE site2;
+   SITE_TYPE site3;
+   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+   if (ix < N) {
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site1, s1, ix);
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site2, s2, ix);
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site3, s3, ix);
+      _spinor_lc_add_assign_f(site1, r1, site2, r2, site3);
+      write_gpu<SITE_TYPE, COMPLEX>(N, site1, s1, ix);
    }
 }
 
 /* s1=cd1*s2+cd2*s3 cd1, cd2 complex */
-template<typename COMPLEX>
-__global__ void spinor_field_clc_gpu(COMPLEX *s1, COMPLEX c1, COMPLEX *s2, COMPLEX c2, COMPLEX *s3, int N)
+template<typename SITE_TYPE, typename COMPLEX>
+__global__ void spinor_field_clc_gpu(SITE_TYPE *s1, COMPLEX c1, SITE_TYPE *s2, COMPLEX c2, SITE_TYPE *s3, int N)
 {
-   CUDA_BLK_FOR(i, N) {
-      _complex_clc(s1[i],c1,s2[i],c2,s3[i]);
+   SITE_TYPE site1;
+   SITE_TYPE site2;
+   SITE_TYPE site3;
+   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+   if (ix < N) {
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site2, s2, ix);
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site3, s3, ix);
+      _spinor_clc_f(site1, c1, site2, c2, site3);
+      write_gpu<SITE_TYPE, COMPLEX>(N, site1, s1, ix);
    }
 }
 
 /* s1+=cd1*s2+cd2*s3 cd1,cd2 complex */
-template<typename COMPLEX>
-__global__ void spinor_field_clc_add_assign_gpu(COMPLEX *s1, COMPLEX c1, COMPLEX *s2, COMPLEX c2, COMPLEX *s3, int N)
+template<typename SITE_TYPE, typename COMPLEX>
+__global__ void spinor_field_clc_add_assign_gpu(SITE_TYPE *s1, COMPLEX c1, SITE_TYPE *s2, COMPLEX c2, SITE_TYPE *s3, int N)
 {
-   CUDA_BLK_FOR(i, N) {
-      _complex_clc_assign(s1[i],c1,s2[i],c2,s3[i]);
+   SITE_TYPE site1;
+   SITE_TYPE site2;
+   SITE_TYPE site3;
+   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+   if (ix < N) {
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site1, s1, ix);
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site2, s2, ix);
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site3, s3, ix);
+      _spinor_clc_add_assign_f(site1, c1, site2, c2, site3);
+      write_gpu<SITE_TYPE, COMPLEX>(N, site1, s1, ix);
    }
 }
 
 /* s1=g5*s2  */
-template<typename COMPLEX>
-__global__ void spinor_field_g5_gpu(COMPLEX *s1, COMPLEX *s2,int N)
+template<typename SITE_TYPE, typename COMPLEX>
+__global__ void spinor_field_g5_gpu(SITE_TYPE *s1, SITE_TYPE *s2, int N)
 {
-   CUDA_BLK_FOR(i, N) {
-      _complex_minus(s1[i],s2[i]);
+   SITE_TYPE site1;
+   SITE_TYPE site2;
+   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+   if (ix < N) {
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site2, s2, ix);
+      _spinor_g5_f(site1, site2);
+      write_gpu<SITE_TYPE, COMPLEX>(N, site1, s1, ix);
    }
 }
 
 /* s1=g5*s1 */
-template<typename COMPLEX>
-__global__ void spinor_field_g5_assign_gpu(COMPLEX* s1,int N)
+template<typename SITE_TYPE, typename COMPLEX>
+__global__ void spinor_field_g5_assign_gpu(SITE_TYPE* s1, int N)
 {
-   CUDA_BLK_FOR(i, N) {
-      _complex_minus(s1[i],s1[i]);
+   SITE_TYPE site1;
+   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+   if (ix < N) {
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site1, s1, ix);
+      _spinor_g5_assign_f(site1);
+      write_gpu<SITE_TYPE, COMPLEX>(N, site1, s1, ix);
    }
 }
 
 /* s1+=c*g5*s2 c complex  */
-template<typename COMPLEX>
-__global__ void spinor_field_g5_mulc_add_assign_gpu(COMPLEX *s1, COMPLEX c, COMPLEX *s2,int N)
+template<typename SITE_TYPE, typename COMPLEX>
+__global__ void spinor_field_g5_mulc_add_assign_gpu(SITE_TYPE *s1, COMPLEX c, SITE_TYPE *s2, int N)
 {
-   CUDA_BLK_FOR(i, N) {
-      _complex_mul_assign(s1[i],-c,s2[i]);
+   SITE_TYPE site1;
+   SITE_TYPE site2;
+   SITE_TYPE tmp;
+   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+   if (ix < N) {
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site1, s1, ix);
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site2, s2, ix);
+      _spinor_mulc_f(tmp, c, site2);
+      _spinor_g5_f(site2, tmp);
+      _spinor_add_assign_f(site1, site2);
+      write_gpu<SITE_TYPE, COMPLEX>(N, site1, s1, ix);
    }
 }
 
 /* tools per eva.c  */
-template<typename COMPLEX , typename REAL>
-__global__ void spinor_field_lc1_gpu(REAL r, COMPLEX *s1, COMPLEX *s2, int N)
+template<typename SITE_TYPE, typename COMPLEX , typename REAL>
+__global__ void spinor_field_lc1_gpu(REAL r, SITE_TYPE *s1, SITE_TYPE *s2, int N)
 {
-   CUDA_BLK_FOR(i, N) {
-      _complex_mulr_assign(s1[i],r,s2[i]);
+   SITE_TYPE site1;
+   SITE_TYPE site2;
+   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+   if (ix < N) {
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site1, s1, ix);
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site2, s2, ix);
+      _spinor_mul_f(site1, r, site2);
+      write_gpu<SITE_TYPE, COMPLEX>(N, site1, s1, ix);
    }
 }
 
-template<typename COMPLEX, typename REAL>
-__global__ void spinor_field_lc2_gpu(REAL r1, REAL r2, COMPLEX *s1, COMPLEX *s2, int N)
+template<typename SITE_TYPE, typename COMPLEX, typename REAL>
+__global__ void spinor_field_lc2_gpu(REAL r1, REAL r2, SITE_TYPE *s1, SITE_TYPE *s2, int N)
 {
-   CUDA_BLK_FOR(i, N) {
-      _complex_rlc(s1[i],r1,s1[i],r2,s2[i]);
+   SITE_TYPE site1;
+   SITE_TYPE site2;
+   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+   if (ix < N) {
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site1, s1, ix);
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site2, s2, ix);
+      _spinor_lc_f(site1, r1, site1, r2, site2);
    }
 }
 
-template<typename COMPLEX , typename REAL>
-__global__ void spinor_field_lc3_gpu(REAL r1,REAL r2, COMPLEX *s1, COMPLEX *s2, COMPLEX *s3, int N)
+template<typename SITE_TYPE, typename COMPLEX , typename REAL>
+__global__ void spinor_field_lc3_gpu(REAL r1, REAL r2, SITE_TYPE *s1, SITE_TYPE *s2, SITE_TYPE *s3, int N)
 {
-   CUDA_BLK_FOR(i, N) {
-      _complex_rlc_assign(s3[i],r1,s1[i],r2,s2[i]);
-      _complex_minus(s3[i],s3[i]);
+   SITE_TYPE site1;
+   SITE_TYPE site2;
+   SITE_TYPE site3;
+   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+   if (ix < N) {
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site1, s1, ix);
+      read_gpu<SITE_TYPE, COMPLEX>(N, &site2, s2, ix);
+      _spinor_lc_f(site3, r1, site1, r2, site2);
+      _spinor_minus_f(site3, site3);
+      write_gpu<SITE_TYPE, COMPLEX>(N, site3, s3, ix);
    }
 }
 

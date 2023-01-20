@@ -210,8 +210,13 @@ GLB_VAR(scalar_field,*ff_pi_mom,=NULL);
 
 GLB_VAR(int,four_fermion_active,=0); // whether four fermion interactions are active
 
-// GPU fixed reading stride
-#define THREADSIZE 32 
+#ifdef FIXED_STRIDE
+  // GPU fixed reading stride
+  #define THREADSIZE 32 
+#else
+  // Not sure this works for going back to the old striding (SAM)
+  #define THREADSIZE 1
+#endif
 
 #undef GLB_VAR
 
