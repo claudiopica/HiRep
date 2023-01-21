@@ -38,34 +38,40 @@ typedef struct _kernel_field_input {
 
 // TODO: in spinor field -> read by comp, out spinor field -> read full spinor -> this needs to be clarified (SAM)
 #define _IN_SPINOR_FIELD(_site, _comp) \
-            read_gpu_suNf_vector(__stride_in, (_site), __in, __idx_in_local, _comp);
+            read_gpu_suNf_vector(__stride_in, (_site), __in, __idx_in_local, _comp, 4);
 
 #define _OUT_SPINOR_FIELD(_site) \
-            read_gpu_suNf_spinor(__stride_out, (_site), __out, __idx_out_local, 0);
+            read_gpu_suNf_spinor(__stride_out, (_site), __out, __idx_out_local, 0, 1);
 
 #define _IN_GAUGE_FIELD(_site, _comp) \
-            read_gpu_suNf(__stride_in, (_site), __in_gauge, __idx_in_local, _comp);
+            read_gpu_suNf(__stride_in, (_site), __in_gauge, __idx_in_local, _comp, 4);
 
 #define _OUT_GAUGE_FIELD(_site, _comp) \
-            read_gpu_suNf(__stride_out, (_site), __out_gauge, __idx_out_local, _comp);
+            read_gpu_suNf(__stride_out, (_site), __out_gauge, __idx_out_local, _comp, 4);
 
 #define _WRITE_OUT_SPINOR_FIELD(_site) \
-            write_gpu_suNf_spinor(__stride_out, (_site), __out, __idx_out_local, 0);
+            write_gpu_suNf_spinor(__stride_out, (_site), __out, __idx_out_local, 0, 1);
 
 #define _IN_FIELD_AT(_site, _type, _comp) \
-            _F_NAME(read_gpu_,_type)(__stride_in, (_site), __in, __idx_in_local, _comp); 
+            _F_NAME(read_gpu_,_type)(__stride_in, (_site), __in, __idx_in_local, _comp, 1); 
 
 #define _OUT_FIELD_AT(_site, _comp) \
-            _F_NAME(read_gpu_,_type)(__stride_out, (_site), __out, __idx_out_local, _comp);
+            _F_NAME(read_gpu_,_type)(__stride_out, (_site), __out, __idx_out_local, _comp, 1);
 
 #define _IN_BLOCK_GAUGE_AT(_gauge_site, _comp) \
-            _F_NAME(read_gpu_,_type)(__stride_in, (_site), __in_gauge, __idx_in_local, _comp); 
+            _F_NAME(read_gpu_,_type)(__stride_in, (_site), __in_gauge, __idx_in_local, _comp, 4); 
 
 #define _OUT_BLOCK_GAUGE_AT(_gauge_site, _comp) \
-            _F_NAME(read_gpu_,_type)(__stride_in, (*_site), __out_gauge, __idx_out_local, _comp); 
+            _F_NAME(read_gpu_,_type)(__stride_in, (*_site), __out_gauge, __idx_out_local, _comp, 4); 
 
 #define _WRITE_OUT_FIELD(_site, _type, _comp) \
-            _F_NAME(write_gpu_,_type)(__stride_out, (_site), __out, __idx_out_local, _comp);
+            _F_NAME(write_gpu_,_type)(__stride_out, (_site), __out, __idx_out_local, _comp, 1);
+
+#define _IN_DFIELD_AT(_site, _type, _comp, _dim) \
+            _F_NAME(read_gpu_,_type)(__stride_in, (_site), __in, __idx_in_local, _comp, _dim);
+
+#define _WRITE_OUT_DFIELD(_site, _type, _comp, _dim) \
+            _F_NAME(write_gpu_,_type)(__stride_out, (_site), __out, __idx_out_local, _comp, _dim);
 
 // TODO cast to void to avoid warnings when something is not needed (SAM)
 #define _setup_striding(_input) \

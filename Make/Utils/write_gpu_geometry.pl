@@ -108,7 +108,7 @@ sub write_epilog {
 
 sub write_idx_finder {
     if ($fixed_stride==1) {
-        print "#define calc_idx(_idx,_typename,_type) (( _idx / THREADSIZE ) * THREADSIZE ) * sizeof(_typename) / sizeof(_type) + _idx%THREADSIZE\n\n";
+        print "#define calc_idx(_idx,_typename,_type,_dim) (( _idx / THREADSIZE ) * THREADSIZE ) * _dim * sizeof(_typename) / sizeof(_type) + _idx%THREADSIZE\n\n";
     } else {
         print "#define calc_idx(_idx,...) _idx\n\n";
     }
@@ -146,9 +146,9 @@ sub write_gpu_spinor {
     print " * \@param _ix    \t\tIndex at which to read \n";
     print " * \@param _comp  \t\tComponent to read, choose 0 for spinor fields.\n";
     print " */\n";
-    print "#define read_gpu_${typename}(_stride, _s, _in, _ix, _comp) \\\n";
+    print "#define read_gpu_${typename}(_stride, _s, _in, _ix, _comp, _dim) \\\n";
     print "\tdo { \\\n";
-    print "\t\tint __iz = calc_idx(_ix,${typename},${type}); \\\n";
+    print "\t\tint __iz = calc_idx(_ix,${typename},${type},_dim); \\\n";
     for ($comp=0; $comp<3; $comp++) {
         for ($i=0; $i<$N; $i++) {
             print "\t\t(_s).c\[$comp\].c\[$i\]=(($type*)(_in))\[__iz\]; __iz+=($stride); \\\n";
@@ -169,9 +169,9 @@ sub write_gpu_spinor {
     print " * \@param _ix    \t\tIndex at which to write \n";
     print " * \@param _comp  \t\tComponent to write, choose 0 for spinor fields. \n";
     print " */\n";
-    print "#define write_gpu_${typename}(_stride, _s, _out, _ix, _comp) \\\n";
+    print "#define write_gpu_${typename}(_stride, _s, _out, _ix, _comp, _dim) \\\n";
     print "\tdo { \\\n";
-    print "\t\tint __iz = calc_idx(_ix,${typename},${type}); \\\n";
+    print "\t\tint __iz = calc_idx(_ix,${typename},${type},_dim); \\\n";
     for ($comp=0; $comp<3; $comp++) {
         for ($i=0; $i<$N; $i++) {
             print "\t\t(($type*)(_out))\[__iz\]=(_s).c\[$comp\].c\[$i\]; __iz+=($stride); \\\n";
@@ -214,9 +214,9 @@ sub write_gpu_vector {
     print " * \@param _ix    \t\tIndex at which to read \n";
     print " * \@param _comp  \t\tComponent of the ${typename} to read.\n";
     print " */\n";
-    print "#define read_gpu_${typename}(_stride, _v, _in, _ix, _comp) \\\n";
+    print "#define read_gpu_${typename}(_stride, _v, _in, _ix, _comp, _dim) \\\n";
     print "\tdo { \\\n";
-    print "\t\tint __iz = calc_idx(_ix,${typename},${type}) + ((_comp)*$N)*($stride); \\\n";
+    print "\t\tint __iz = calc_idx(_ix,${typename},${type},_dim) + ((_comp)*$N)*($stride); \\\n";
     for ($i=0; $i<$N-1; $i++) {
         print "\t\t(_v).c\[$i\]=((${type}*)(_in))\[__iz\]; __iz+=($stride); \\\n";
     }
@@ -232,9 +232,9 @@ sub write_gpu_vector {
     print " * \@param _ix    \t\tIndex at which to write \n";
     print " * \@param _comp  \t\tComponent of the ${typename} to write. \n";
     print " */\n";
-    print "#define write_gpu_${typename}(_stride, _v, _out, _ix, _comp) \\\n";
+    print "#define write_gpu_${typename}(_stride, _v, _out, _ix, _comp, _dim) \\\n";
     print "\tdo { \\\n";
-    print "\t\tint __iz = calc_idx(_ix,${typename},${type}) + ((_comp)*$N)*($stride); \\\n";
+    print "\t\tint __iz = calc_idx(_ix,${typename},${type},_dim) + ((_comp)*$N)*($stride); \\\n";
     for ($i=0; $i<$N-1; $i++) {
         print "\t\t((${type}*)(_out))\[__iz\]=(_v).c\[$i\]; __iz+=($stride);\\\n";
     }
@@ -282,9 +282,9 @@ sub write_gpu_suN {
     print " * \@param _ix    \t\tIndex at which to read \n";
     print " * \@param _comp  \t\tLink direction to read.\n";
     print " */\n";
-    print "#define read_gpu_${typename}(_stride, _v, _in, _ix, _comp) \\\n";
+    print "#define read_gpu_${typename}(_stride, _v, _in, _ix, _comp, _dim) \\\n";
     print "\tdo { \\\n";
-    print "\t\tint __iz = calc_idx(_ix,${typename},${type}) + ((_comp)*$N)*($stride); \\\n";
+    print "\t\tint __iz = calc_idx(_ix,${typename},${type},_dim) + ((_comp)*$N)*($stride); \\\n";
     for ($i=0; $i<$N-1; $i++) {
         print "\t\t(_v).c\[$i\]=((${type}*)(_in))\[__iz\]; __iz+=($stride); \\\n";
     }
@@ -300,9 +300,9 @@ sub write_gpu_suN {
     print " * \@param _ix    \t\tIndex at which to write \n";
     print " * \@param _comp  \t\tLink direction to write. \n";
     print " */\n";
-    print "#define write_gpu_${typename}(_stride, _v, _out, _ix, _comp) \\\n";
+    print "#define write_gpu_${typename}(_stride, _v, _out, _ix, _comp, _dim) \\\n";
     print "\tdo { \\\n";
-    print "\t\tint __iz = calc_idx(_ix,${typename},${type}) + ((_comp)*$N)*($stride); \\\n";
+    print "\t\tint __iz = calc_idx(_ix,${typename},${type},_dim) + ((_comp)*$N)*($stride); \\\n";
     for ($i=0; $i<$N-1; $i++) {
         print "\t\t((${type}*)(_out))\[__iz\]=(_v).c\[$i\]; __iz+=($stride);\\\n";
     }
@@ -341,8 +341,8 @@ sub write_gpu_clover_term {
         print " * \@param _comp  \t\tComponent to read for argument consistency between different GPU read/write functions.\\\n";
         print "                  \t\tUse this macro here always with _comp=0, because this is for a scalar field!\n";
         print "*/\n";
-        print "#define read_gpu_${typename_alias}(_stride, _v, _in, _ix, _comp) \\\n";
-        print "\t\t\tread_gpu_${typename}((_stride), (_v), (_in), (_ix), (_comp))\n";
+        print "#define read_gpu_${typename_alias}(_stride, _v, _in, _ix, _comp, _dim) \\\n";
+        print "\t\t\tread_gpu_${typename}((_stride), (_v), (_in), (_ix), (_comp), _dim)\n";
 
         # Generate write macro
         print "/**\n";
@@ -354,8 +354,8 @@ sub write_gpu_clover_term {
         print " * \@param _comp  \t\tComponent to write for argument consistency between different GPU read/write functions.\\\n";
         print "                  \t\tUse this macro here always with _comp=0, because this is for a scalar field!\n";
         print " */\n";
-        print "#define write_gpu_${typename_alias}(_stride, _v, _out, _ix, _comp) \\\n";
-        print "\t\t\twrite_gpu_${typename}((_stride), (_v), (_out), (_ix), (_comp))\n";
+        print "#define write_gpu_${typename_alias}(_stride, _v, _out, _ix, _comp, _dim) \\\n";
+        print "\t\t\twrite_gpu_${typename}((_stride), (_v), (_out), (_ix), (_comp), _dim)\n";
     } else {
         # Generate read macro
         print "/**\n";
@@ -366,9 +366,9 @@ sub write_gpu_clover_term {
         print " * \@param _ix    \t\tIndex at which to read \n";
         print " * \@param _comp  \t\tLink direction to read.\n";
         print " */\n";
-        print "#define read_gpu_${typename_alias}(_stride, _v, _in, _ix, _comp) \\\n";
+        print "#define read_gpu_${typename_alias}(_stride, _v, _in, _ix, _comp, _dim) \\\n";
         print "\tdo { \\\n";
-        print "\t\tint __iz = calc_idx(_ix,${typename},${type}) + ((_comp)*$N)*($stride); \\\n";
+        print "\t\tint __iz = calc_idx(_ix,${typename},${type},_dim) + ((_comp)*$N)*($stride); \\\n";
         for ($i=0; $i<$N-1; $i++) {
             print "\t\t(_v).c\[$i\]=((${type}*)(_in))\[__iz\]; __iz+=($stride); \\\n";
         }
@@ -384,9 +384,9 @@ sub write_gpu_clover_term {
         print " * \@param _ix    \t\tIndex at which to write \n";
         print " * \@param _comp  \t\tLink direction to write. \n";
         print " */\n";
-        print "#define write_gpu_${typename_alias}(_stride, _v, _out, _ix, _comp) \\\n";
+        print "#define write_gpu_${typename_alias}(_stride, _v, _out, _ix, _comp, _dim) \\\n";
         print "\tdo { \\\n";
-        print "\t\tint __iz = calc_idx(_ix,${typename},${type}) + ((_comp)*$N)*($stride); \\\n";
+        print "\t\tint __iz = calc_idx(_ix,${typename},${type},_dim) + ((_comp)*$N)*($stride); \\\n";
         for ($i=0; $i<$N-1; $i++) {
             print "\t\t((${type}*)(_out))\[__iz\]=(_v).c\[$i\]; __iz+=($stride);\\\n";
         }
@@ -409,8 +409,8 @@ sub write_su2quat_redefinitions {
         my $typename = $dataname.$precision_suffix;
         my $typenameR = $datanameR.$precision_suffix;
     
-        print "#define write_gpu_${typename}(_stride, _v, _out, _ix, _comp) ";
-        print "write_gpu_${typenameR}(_stride, _v, _out, _ix, _comp)\n\n";
+        print "#define write_gpu_${typename}(_stride, _v, _out, _ix, _comp, _dim) ";
+        print "write_gpu_${typenameR}(_stride, _v, _out, _ix, _comp, _dim)\n\n";
     }
 }
 
@@ -446,9 +446,9 @@ sub write_gpu_suN_av {
     print " * \@param _ix    \t\tIndex at which to read \n";
     print " * \@param _comp  \t\tComponent of the ${typename} to read.\n";
     print " */\n";
-    print "#define read_gpu_${typename}(_stride, _v, _in, _ix, _comp) \\\n";
+    print "#define read_gpu_${typename}(_stride, _v, _in, _ix, _comp, _dim) \\\n";
     print "\tdo { \\\n";
-    print "\t\tint __iz = calc_idx(_ix,${typename},${type}) + ((_comp)*$N)*($stride); \\\n";
+    print "\t\tint __iz = calc_idx(_ix,${typename},${type},_dim) + ((_comp)*$N)*($stride); \\\n";
     for ($i=0; $i<$N-1; $i++) {
         print "\t\t(_v).c\[$i\]=((${type}*)(_in))\[__iz\]; __iz+=($stride); \\\n";
     }
@@ -464,9 +464,9 @@ sub write_gpu_suN_av {
     print " * \@param _ix    \t\tIndex at which to write \n";
     print " * \@param _comp  \t\tComponent of the ${typename} to write. \n";
     print " */\n";
-    print "#define write_gpu_${typename}(_stride, _v, _out, _ix, _comp) \\\n";
+    print "#define write_gpu_${typename}(_stride, _v, _out, _ix, _comp, _dim) \\\n";
     print "\tdo { \\\n";
-    print "\t\tint __iz = calc_idx(_ix,${typename},${type}) + ((_comp)*$N)*($stride); \\\n";
+    print "\t\tint __iz = calc_idx(_ix,${typename},${type},_dim) + ((_comp)*$N)*($stride); \\\n";
     for ($i=0; $i<$N-1; $i++) {
         print "\t\t((${type}*)(_out))\[__iz\]=(_v).c\[$i\]; __iz+=($stride);\\\n";
     }
@@ -492,7 +492,7 @@ sub write_gpu_scalar {
     print " * \@param _ix    \t\tIndex at which to read \n";
     print " * \@param _comp  \t\tComponent of the ${type} to read.\n";
     print " */\n";
-    print "#define read_gpu_${type}(_stride, _v, _in, _ix, _comp) \\\n";
+    print "#define read_gpu_${type}(_stride, _v, _in, _ix, _comp, _dim) \\\n";
     print "\tdo { \\\n";
     print "\t\t(_v)=*((_in)+(_ix));\\\n";
     print "\t} while (0) \n\n";
@@ -506,7 +506,7 @@ sub write_gpu_scalar {
     print " * \@param _ix    \t\tIndex at which to write \n";
     print " * \@param _comp  \t\tComponent of the ${type} to write. \n";
     print " */\n";
-    print "#define write_gpu_${type}(_stride, _v, _out, _ix, _comp) \\\n";
+    print "#define write_gpu_${type}(_stride, _v, _out, _ix, _comp, _dim) \\\n";
     print "\tdo { \\\n";
     print "\t\t(*((_out)+(_ix)))=(_v);\\\n";
     print "\t} while (0) \n\n";
@@ -530,9 +530,9 @@ sub write_gpu_ldl_field {
     print " * \@param _ix    \t\tIndex at which to read \n";
     print " * \@param _comp  \t\tComponent to read for consistency (put 0 for this type).\n";
     print " */\n";
-    print "#define read_gpu_${typename}(_stride, _v, _in, _ix, _comp) \\\n";
+    print "#define read_gpu_${typename}(_stride, _v, _in, _ix, _comp, _dim) \\\n";
     print "\tdo { \\\n";
-    print "\t\tint __iz = calc_idx(_ix,${typename},${type}) + ((_comp)*2*$N)*($stride); \\\n";
+    print "\t\tint __iz = calc_idx(_ix,${typename},${type},_dim) + ((_comp)*2*$N)*($stride); \\\n";
     for ($i=0; $i<$N; $i++) {
         print "\t\t(_v).up\[$i\]=((${type}*)(_in))\[__iz\]; __iz+=($stride); \\\n";
     }
@@ -552,9 +552,9 @@ sub write_gpu_ldl_field {
     print " * \@param _ix    \t\tIndex at which to write \n";
     print " * \@param _comp  \t\tComponent to write for consistency (put 0 for this type).\n";
     print " */\n";
-    print "#define write_gpu_${typename}(_stride, _v, _out, _ix, _comp) \\\n";
+    print "#define write_gpu_${typename}(_stride, _v, _out, _ix, _comp, _dim) \\\n";
     print "\tdo { \\\n";
-    print "\t\tint __iz = calc_idx(_ix,${typename},${type}) + ((_comp)*2*$N)*($stride); \\\n";
+    print "\t\tint __iz = calc_idx(_ix,${typename},${type},_dim) + ((_comp)*2*$N)*($stride); \\\n";
     for ($i=0; $i<$N; $i++) {
         print "\t\t((${type}*)(_out))\[__iz\]=(_v).up\[$i\]; __iz+=($stride);\\\n";
     }

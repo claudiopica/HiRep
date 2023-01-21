@@ -31,7 +31,7 @@ _FUNC(to_gpu_format_, (_FIELD_TYPE *out, _FIELD_TYPE *in)) {
             int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
             for (int comp = 0; comp < _FIELD_DIM; ++comp) {
                 _SITE_TYPE *source = _DFIELD_AT(in, ix, comp, _FIELD_DIM);
-                _F_NAME(write_gpu_,_SITE_TYPE)(stride, (*source), target, ix_loc, comp);
+                _F_NAME(write_gpu_,_SITE_TYPE)(stride, (*source), target, ix_loc, comp, _FIELD_DIM);
             }
         }
     }            
@@ -46,7 +46,7 @@ _FUNC(to_cpu_format_, (_FIELD_TYPE *out, _FIELD_TYPE *in)) {
             int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
             for (int comp = 0; comp < _FIELD_DIM; ++comp) {
                 _SITE_TYPE *target = _DFIELD_AT(out, ix, comp, _FIELD_DIM);
-                _F_NAME(read_gpu_,_SITE_TYPE) (stride, (*target), source, ix_loc, comp);
+                _F_NAME(read_gpu_,_SITE_TYPE) (stride, (*target), source, ix_loc, comp, _FIELD_DIM);
             }
         }
     }          

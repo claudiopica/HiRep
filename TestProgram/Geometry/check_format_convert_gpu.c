@@ -251,7 +251,7 @@ int test_convert_back_forth_gfield_flt()
 
 int test_convert_back_forth_suNg_scalar_field() 
 {
-    lprintf("INFO", 0, " ======= TEST SCALAR FIELD ======= \n");
+    lprintf("INFO", 0, " ======= TEST SU(NG) SCALAR FIELD ======= \n");
 
     // Setup scalar fields
     suNg_scalar_field *in, *tmp, *out;

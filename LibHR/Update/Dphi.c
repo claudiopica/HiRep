@@ -281,6 +281,7 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
         suNf_vector vtmp[2];
 #endif
 
+
         _vector_add_f(psi, (*sp).c[0], (*sp).c[2]);
         _vector_add_f(psi2, (*sp).c[1], (*sp).c[3]);
         _suNf_double_theta_T_multiply(chi, chi2, (*up), psi, psi2);
@@ -361,6 +362,8 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
         suNf_vector vtmp[2];
 #endif
 
+        if (ix==0 && !repeat) printf("+2 iy glb: %d, CPU: %0.2e + i%0.2e\n", iy, creal((*sp).c[0].c[0]), cimag(((*sp).c[0].c[0])));
+
         _vector_add_f(psi, (*sp).c[0], (*sp).c[3]);
         _vector_sub_f(psi2, (*sp).c[1], (*sp).c[2]);
         _suNf_double_theta_Y_multiply(chi, chi2, (*up), psi, psi2);
@@ -381,6 +384,7 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
         suNf_vector vtmp[2];
 #endif
 
+        if (ix==0 && !repeat) printf("-2 iy glb: %d, CPU: %0.2e + i%0.2e\n", iy, creal((*sm).c[0].c[0]), cimag(((*sm).c[0].c[0])));
         _vector_sub_f(psi, (*sm).c[0], (*sm).c[3]);
         _vector_add_f(psi2, (*sm).c[1], (*sm).c[2]);
         _suNf_double_theta_Y_inverse_multiply(chi, chi2, (*um), psi, psi2);

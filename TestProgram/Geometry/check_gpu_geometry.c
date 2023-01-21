@@ -91,8 +91,8 @@ int test_write_read_gauge_field()
             {
                 in_mat = _4FIELD_AT(in, ix, comp);
                 out_mat = _4FIELD_AT(out, ix, comp);
-                write_gpu_suNg(stride, (*in_mat), block_start, ix_loc, comp);
-                read_gpu_suNg(stride, (*out_mat), block_start, ix_loc, comp);
+                write_gpu_suNg(stride, (*in_mat), block_start, ix_loc, comp, 4);
+                read_gpu_suNg(stride, (*out_mat), block_start, ix_loc, comp, 4);
             }
         }
     }
@@ -136,8 +136,8 @@ int test_write_read_gauge_field_flt()
             {
                 in_mat = _4FIELD_AT(in, ix, comp);
                 out_mat = _4FIELD_AT(out, ix, comp);
-                write_gpu_suNg_flt(stride, (*in_mat), block_start, ix_loc, comp);
-                read_gpu_suNg_flt(stride, (*out_mat), block_start, ix_loc, comp);
+                write_gpu_suNg_flt(stride, (*in_mat), block_start, ix_loc, comp, 4);
+                read_gpu_suNg_flt(stride, (*out_mat), block_start, ix_loc, comp, 4);
             }
         }
     }
@@ -180,8 +180,8 @@ int test_write_read_gauge_field_f()
             {
                 in_mat = _4FIELD_AT(in, ix, comp);
                 out_mat = _4FIELD_AT(out, ix, comp);
-                write_gpu_suNf(stride, (*in_mat), block_start, ix_loc, comp);
-                read_gpu_suNf(stride, (*out_mat), block_start, ix_loc, comp);
+                write_gpu_suNf(stride, (*in_mat), block_start, ix_loc, comp, 4);
+                read_gpu_suNf(stride, (*out_mat), block_start, ix_loc, comp, 4);
             }
         }
     }
@@ -225,8 +225,8 @@ int test_write_read_gauge_field_f_flt()
             {
                 in_mat = _4FIELD_AT(in, ix, comp);
                 out_mat = _4FIELD_AT(out, ix, comp);
-                write_gpu_suNf_flt(stride, (*in_mat), block_start, ix_loc, comp);
-                read_gpu_suNf_flt(stride, (*out_mat), block_start, ix_loc, comp);
+                write_gpu_suNf_flt(stride, (*in_mat), block_start, ix_loc, comp, 4);
+                read_gpu_suNf_flt(stride, (*out_mat), block_start, ix_loc, comp, 4);
             }
         }
     }
@@ -269,8 +269,8 @@ int test_write_read_spinor_field_f()
             in_spinor = _FIELD_AT(in, ix);
             out_spinor = _FIELD_AT(out, ix);
             int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
-            write_gpu_suNf_spinor(stride, (*in_spinor), block_start, ix_loc, 0);
-            read_gpu_suNf_spinor(stride, (*out_spinor), block_start, ix_loc, 0);
+            write_gpu_suNf_spinor(stride, (*in_spinor), block_start, ix_loc, 0, 1);
+            read_gpu_suNf_spinor(stride, (*out_spinor), block_start, ix_loc, 0, 1);
         } 
     }
 
@@ -312,8 +312,8 @@ int test_write_read_spinor_field_f_vector_wise()
             int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
             for (int comp = 0; comp < 4; ++comp) 
             {
-                write_gpu_suNf_vector(stride, (*in_spinor).c[comp], block_start, ix_loc, comp);
-                read_gpu_suNf_vector(stride, (*out_spinor).c[comp], block_start, ix_loc, comp);
+                write_gpu_suNf_vector(stride, (*in_spinor).c[comp], block_start, ix_loc, comp, 1);
+                read_gpu_suNf_vector(stride, (*out_spinor).c[comp], block_start, ix_loc, comp, 1);
             }
         } 
     }
@@ -354,8 +354,8 @@ int test_write_read_spinor_field_f_flt()
             in_spinor = _FIELD_AT(in, ix);
             out_spinor = _FIELD_AT(out, ix);
             int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
-            write_gpu_suNf_spinor_flt(stride, (*in_spinor), block_start, ix_loc, 0);
-            read_gpu_suNf_spinor_flt(stride, (*out_spinor), block_start, ix_loc, 0);
+            write_gpu_suNf_spinor_flt(stride, (*in_spinor), block_start, ix_loc, 0, 1);
+            read_gpu_suNf_spinor_flt(stride, (*out_spinor), block_start, ix_loc, 0, 1);
         }
     }
 
@@ -397,8 +397,8 @@ int test_write_read_spinor_field_f_flt_vector_wise()
             int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
             for (int comp = 0; comp < 4; ++comp)
             {
-                write_gpu_suNf_vector_flt(stride, (*in_spinor).c[comp], block_start, ix_loc, comp);
-                read_gpu_suNf_vector_flt(stride, (*out_spinor).c[comp], block_start, ix_loc, comp);
+                write_gpu_suNf_vector_flt(stride, (*in_spinor).c[comp], block_start, ix_loc, comp, 1);
+                read_gpu_suNf_vector_flt(stride, (*out_spinor).c[comp], block_start, ix_loc, comp, 1);
             }
         }
     }
@@ -437,8 +437,8 @@ int test_write_read_sfield()
             int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
             in_site = _FIELD_AT(in, ix);
             out_site = _FIELD_AT(out, ix);
-            write_gpu_double(stride, (*in_site), block_start, ix_loc, 0);
-            read_gpu_double(stride, (*out_site), block_start, ix_loc, 0);
+            write_gpu_double(stride, (*in_site), block_start, ix_loc, 0, 1);
+            read_gpu_double(stride, (*out_site), block_start, ix_loc, 0, 1);
         }
     }
 
@@ -479,8 +479,8 @@ int test_write_read_suNg_scalar_field()
             int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
             in_vec = _FIELD_AT(in, ix);
             out_vec = _FIELD_AT(out, ix);
-            write_gpu_suNg_vector(stride, (*in_vec), block_start, ix_loc, 0);
-            read_gpu_suNg_vector(stride, (*out_vec), block_start, ix_loc, 0);
+            write_gpu_suNg_vector(stride, (*in_vec), block_start, ix_loc, 0, 1);
+            read_gpu_suNg_vector(stride, (*out_vec), block_start, ix_loc, 0, 1);
         }
     }
 
@@ -523,8 +523,8 @@ int test_write_read_avfield()
             {
                 in_mat = _4FIELD_AT(in, ix, comp);
                 out_mat = _4FIELD_AT(out, ix, comp);
-                write_gpu_suNg_algebra_vector(stride, (*in_mat), block_start, ix_loc, comp);
-                read_gpu_suNg_algebra_vector(stride, (*out_mat), block_start, ix_loc, comp);
+                write_gpu_suNg_algebra_vector(stride, (*in_mat), block_start, ix_loc, comp, 4);
+                read_gpu_suNg_algebra_vector(stride, (*out_mat), block_start, ix_loc, comp, 4);
             }
         }
     }
@@ -566,8 +566,8 @@ int test_write_read_gtransf()
             int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
             in_mat = _FIELD_AT(in, ix);
             out_mat = _FIELD_AT(out, ix);
-            write_gpu_suNg(stride, (*in_mat), block_start, ix_loc, 0);
-            read_gpu_suNg(stride, (*out_mat), block_start, ix_loc, 0);
+            write_gpu_suNg(stride, (*in_mat), block_start, ix_loc, 0, 1);
+            read_gpu_suNg(stride, (*out_mat), block_start, ix_loc, 0, 1);
         }
     }
 
@@ -610,8 +610,8 @@ int test_write_read_clover_term()
             {
                 in_mat = _4FIELD_AT(in, ix, comp);
                 out_mat = _4FIELD_AT(out, ix, comp);
-                write_gpu_suNfc(stride, (*in_mat), block_start, ix_loc, comp);
-                read_gpu_suNfc(stride, (*out_mat), block_start, ix_loc, comp);
+                write_gpu_suNfc(stride, (*in_mat), block_start, ix_loc, comp, 4);
+                read_gpu_suNfc(stride, (*out_mat), block_start, ix_loc, comp, 4);
             }
         }
     }
@@ -655,8 +655,8 @@ int test_write_read_clover_force()
             {
                 in_mat = _6FIELD_AT(in, ix, comp);
                 out_mat = _6FIELD_AT(out, ix, comp);
-                write_gpu_suNf(stride, (*in_mat), block_start, ix_loc, comp);
-                read_gpu_suNf(stride, (*out_mat), block_start, ix_loc, comp);
+                write_gpu_suNf(stride, (*in_mat), block_start, ix_loc, comp, 6);
+                read_gpu_suNf(stride, (*out_mat), block_start, ix_loc, comp, 6);
             }
         }
     }
@@ -698,8 +698,8 @@ int test_write_read_clover_ldl()
             int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
             site_in = _FIELD_AT(in, ix);
             site_out = _FIELD_AT(out, ix);
-            write_gpu_ldl_t(stride, (*site_in), block_start, ix_loc, 0);
-            read_gpu_ldl_t(stride, (*site_out), block_start, ix_loc, 0);
+            write_gpu_ldl_t(stride, (*site_in), block_start, ix_loc, 0, 1);
+            read_gpu_ldl_t(stride, (*site_out), block_start, ix_loc, 0, 1);
         }
     }
 

@@ -25,8 +25,8 @@ _KERNEL(box_to_buffer_kernel_,(kernel_field_input* input, coord4* icoord, int* i
 
         _SITE_TYPE site;
         for (int comp = 0; comp < _FIELD_DIM; ++comp) {
-            _IN_FIELD_AT(site, _SITE_TYPE, comp);
-            _WRITE_OUT_FIELD(site, _SITE_TYPE, comp);
+            _IN_DFIELD_AT(site, _SITE_TYPE, comp, _FIELD_DIM);
+            _WRITE_OUT_DFIELD(site, _SITE_TYPE, comp, _FIELD_DIM);
         }
     }
 }

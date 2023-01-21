@@ -47,6 +47,7 @@ __global__ void Dphi_gpu_inner_kernel(kernel_field_input* input_even, kernel_fie
 
       _spinor_mul_f(r, -0.5, r);
       _WRITE_OUT_SPINOR_FIELD(r);
+
     }
   } while (0);
 
@@ -64,10 +65,12 @@ __global__ void Dphi_gpu_inner_kernel(kernel_field_input* input_even, kernel_fie
       inner_direction(_Z_plus,  Z_UP_MASK, iup_on_gpu(3));
       inner_direction(_Z_minus, Z_DN_MASK, idn_on_gpu(3));
 
+      //if (__idx_out_global==0) printf("GPU spinor %0.2e + i%0.2e\n", creal(r.c[0].c[0]), cimag(r.c[0].c[0]));
       _spinor_mul_f(r, -0.5, r);
       _WRITE_OUT_SPINOR_FIELD(r);
     } 
   } while (0);
+
 }
 
 /* Takes an even input spinor and returns an odd spinor */

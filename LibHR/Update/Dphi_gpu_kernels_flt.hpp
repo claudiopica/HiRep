@@ -44,7 +44,7 @@ __global__ void Dphi_gpu_inner_kernel_flt(suNf_spinor_flt* __restrict__ out,
     inner_direction_flt(_Z_minus_flt, Z_DN_MASK, ix, idn_d[4*ix+3]);
 
     _spinor_mul_f(r, -0.5, r);
-    write_gpu_suNf_spinor_flt(vol4h, r, out, local_ix, 0);
+    write_gpu_suNf_spinor_flt(vol4h, r, out, local_ix, 0, 1);
   }
 }
 
@@ -72,7 +72,7 @@ __global__ void Dphi_gpu_boundary_kernel_flt(suNf_spinor_flt* __restrict__ out,
   if (local_ix < vol4h) {
     int ix = local_ix + start_piece;
 
-    read_gpu_suNf_spinor_flt(vol4h, res, out, local_ix, 0);
+    read_gpu_suNf_spinor_flt(vol4h, res, out, local_ix, 0, 1);
     __syncthreads();
     boundary_calculation_flt(_T_plus_flt,  T_UP_MASK, ix, iup_d[4*ix]);
     boundary_calculation_flt(_T_minus_flt, T_DN_MASK, ix, idn_d[4*ix]);
@@ -86,6 +86,6 @@ __global__ void Dphi_gpu_boundary_kernel_flt(suNf_spinor_flt* __restrict__ out,
 
     _spinor_mul_f(r, -0.5, r);
     _spinor_add_assign_f(res, r);
-    write_gpu_suNf_spinor_flt(vol4h, res, out, local_ix, 0);
+    write_gpu_suNf_spinor_flt(vol4h, res, out, local_ix, 0, 1);
   }
 }
