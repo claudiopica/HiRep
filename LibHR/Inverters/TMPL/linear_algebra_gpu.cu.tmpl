@@ -5,7 +5,6 @@
 
 #include "../linear_algebra_gpu_kernels.hpp"
 
-
 // Error checking
 #if !defined(_SPINOR_FIELD_TYPE)
 #error Missing _SPINOR_FIELD_TYPE in linear_algebra_gpu.cu
@@ -22,7 +21,6 @@
 #if !defined(_SUFFIX)
 #error Missing _SUFFIX in linear_algebra_gpu.cu
 #endif
-
 
 // Internal macro for defining generic functions and alias function pointers
 #define _CONCAT(_name,_suffix) _name ## _suffix

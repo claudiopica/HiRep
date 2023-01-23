@@ -5,6 +5,7 @@
 
 #include "geometry.h"
 #include "libhr_core.h"
+#include <string.h>
 
 void init_neighbors_gpu() 
 {
@@ -37,6 +38,7 @@ void init_neighbors_gpu()
   error_id = cudaMemcpy(imask_gpu, imask, N * sizeof(*imask), cudaMemcpyHostToDevice);
   error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error copying imask lookup table to device memory.\n");
 
+
   error_id = cudaMemcpy(ipt_gpu, ipt, (X+2*X_BORDER)*(Y+2*Y_BORDER)*(Z+2*Z_BORDER)*(T+2*T_BORDER)*sizeof(int), cudaMemcpyHostToDevice);
   error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error copying ipt to device memory.\n");
 
@@ -56,6 +58,9 @@ void init_neighbors_gpu()
   error_id = cudaMemcpyToSymbol(&eitheta_gpu[0], &eitheta[0], sizeof(hr_complex)*4, 0, cudaMemcpyHostToDevice);
   error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error adding Z_EXT to global constant memory.\n");
   #endif
+
+  cudaMalloc((void **)&geometryBoxes_gpu, sizeof(box_t));
+  cudaMemcpy(geometryBoxes_gpu, geometryBoxes, sizeof(box_t), cudaMemcpyHostToDevice);
   #endif
 }
 
