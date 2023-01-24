@@ -92,14 +92,15 @@ write_suN_h($Ng,$fundsuff,$c1,"O");
 #system("./write_suN_def.pl $Nf f $c2 O");
 write_suN_h($Nf,$repsuff,$c2,"O");
 
-write_avx_support();
+write_SIMD_support();
 
 write_epilog();
 
-sub write_avx_support {
+sub write_SIMD_support {
   print <<END
 
 #include "avx2_hirep.h"
+#include "SIMD_vector_hirep.h"
 
 END
 }

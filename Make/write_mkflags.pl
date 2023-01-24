@@ -37,6 +37,7 @@ GetOptions(
   'memory!'      => \(my $mem = 0),
   'force!'       => \(my $force = 0),
   'avx2!'        => \(my $avx2 = 0),
+  'vect!'        => \(my $vect = 0),
   'env=s'        => \(my $env = ""),
   'cc=s'         => \(my $cc = "gcc"),
   'mpicc=s'      => \(my $mpicc = "mpicc"),
@@ -219,6 +220,8 @@ $mem && print $fh "MACRO += AMALLOC_MEASURE\n";
 $force && print $fh "MACRO += MEASURE_FORCE\n";
 # write avx2
 $avx2 && print $fh "MACRO += AVX2_HIREP\n";
+# write vect
+$vect && print $fh "MACRO += SIMD_VECTOR_HIREP\n";
 # write mpi
 $mpi && print $fh "MACRO += WITH_MPI\n";
 # write GPU
@@ -287,6 +290,7 @@ write_mkflags - write flags file for compilation of HiRep
   --[no-]unrollrepr   [false]     Unroll group representation functions
 
   --[no-]avx2         [false]     Enable avx2 kernels of (some) linear algebra functions
+  --[no-]vect         [false]     Enable SIMD vectorized kernels of (some) linear algebra functions
   --[no-]checkspinor  [true]      Check spinor field type
   --[no-]mpitiming    [false]     Enable timing of MPI calls
   --[no-]ioflush      [true]      Flush IO after each operations on logs
