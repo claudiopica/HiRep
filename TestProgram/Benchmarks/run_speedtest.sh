@@ -7,7 +7,7 @@ locall=8
 localt=`seq $SMALLEST_T $(( SMALLEST_T*MAXCORE*NSOCKETS ))`
 
 EXEC="speed_test_diracoperator"
-outfile="out_0_n${NODES}"
+outfile="out_n${NODES}"
 reportfile="report_nodes${NODES}"
 
 ((MAXPROC = NSOCKETS * MAXCORE * NODES))
@@ -25,7 +25,7 @@ echo "#!/bin/bash
 #SBATCH -J op_$1               # Job name
 #SBATCH -o job.%j.out         # Name of stdout output file (%j expands to jobId)
 #SBATCH -N $NODES                  # Total number of nodes requested
-#SBATCH --time 48:00:00           # Run time (hh:mm:ss) - 1.5 hours
+#SBATCH --time 0:02:00           # Run time (hh:mm:ss) - 1.5 hours
 #SBATCH --exclusive
 ##SBATCH --qos=scavenger
 # Launch MPI-based executable
@@ -148,9 +148,9 @@ $ifelse (( SLURM_ARRAY_TASK_ID == $counter )) ; then
 export OMP_NUM_THREADS=$ompproc
 rm -f ${outfile}_${NODES}_${npt}_${lct}_${paral}_${ompproc} 
 mpirun -n $((npt * NPX * NPY * NPZ)) --ppn $(((npt * NPX * NPY * NPZ) / NODES))  ./$EXEC -i loc_speed_${NODES}_${npt}_${lct}_${paral}.in -o ${outfile}_${NODES}_${npt}_${lct}_${paral}_${ompproc}
-$parse_out_script -f ${outfile}_${NODES}_${npt}_${lct}_${paral}_${ompproc} -j job.\${SLURM_JOB_ID}.out >>${locreportfile}
+$parse_out_script -n ${outfile}_${NODES}_${npt}_${lct}_${paral}_${ompproc}_0 -j job.\${SLURM_JOB_ID}.out >>${locreportfile}
 EOF
-            echo "$glbt , $((locall * NPX)) , $((locall * NPY)) , $((locall * NPZ)) , $npt , $NPX , $NPY , $NPZ , $lct , $ompproc , $(( ompproc * npt * NPX * NPY * NPZ )) " >>example.csv
+
 			if (( counter == MAXARRAYSIZE - 1 )) ; then
 			    counter=0
 			    echo "fi" >> $jobmpi      

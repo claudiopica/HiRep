@@ -6,12 +6,14 @@ echo "#Number of Threads
 #MPI_size
 #Global size (4x)
 #Local size  (4x)
+#linear algebra kernel (MACRO,AVX2,VECT)
+#geometry type (NEW,OLD)
 #RLXD
 #Flop per site
 #Byte per site
 #Dirac data movement
-#Massless fused Diracoperator (reps, data size in kb, time in msec, GFLOPS, BAND in GB/s)
 #Massless Diracoperator (reps, data size in kb, time in msec, GFLOPS, BAND in GB/s)
+#Massless fused Diracoperator (reps, data size in kb, time in msec, GFLOPS, BAND in GB/s)
 #Job Output"
 }
 
