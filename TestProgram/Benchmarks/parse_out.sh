@@ -49,15 +49,16 @@ shift "$(($OPTIND -1))"
 
 
 awk -v j=$jobname '{
-    if(!support){support="MACRO";nofused=0}
+    if(!support){support="MACRO";nofused=0;geometry="OLD"}
     if($0 ~ /\[SYSTEM\]\[0\]SIMD VECTORIZATION support enabled/){support="VECT" }
     if($0 ~ /\[SYSTEM\]\[0\]AVX2 support enabled/){support="AVX2"}
+if($0 ~ /WITH_NEW_GEOMETRY/){geometry="NEW"}
 if($0 ~ /\[OMP\]\[0\]Number of Threads requested =/) {printf "%s," ,$6}
 if($0 ~ /\[SYSTEM\]\[0\]Gauge group:/) {split($3,a,"(");split(a[2],b,")"); printf "%s," ,b[1]}
 if($0 ~ /\[SYSTEM\]\[0\]\[MPI_ID: 0\]\[MPI_size:/) {split($3,a,"]"); printf "%s," ,a[1]}
 if($0 ~ /\[GEOMETRY_INIT\]\[0\]Global size is/) {split($4,a,"x"); printf "%s,%s,%s,%s," ,a[1],a[2],a[3],a[4]}
 if($0 ~ /\[GEOMETRY_INIT\]\[0\]Local size is/) {split($4,a,"x"); printf "%s,%s,%s,%s," ,a[1],a[2],a[3],a[4]}
-if($0 ~ /\[SETUP_RANDOM\]\[0\]RLXD/){split($2,a,","); split(a[2],b,"]") ; printf "%s,%s," ,support,b[1]}
+if($0 ~ /\[SETUP_RANDOM\]\[0\]RLXD/){split($2,a,","); split(a[2],b,"]") ; printf "%s,%s,%s," ,support,geometry,b[1]}
 if($0 ~ /\[LA TEST\]\[0\]Flop per site =/){ printf "%s," ,$6}
 if($0 ~ /\[LA TEST\]\[0\]Byte per site =/){ printf "%s," ,$6}
 if($0 ~ /\[LA TEST\]\[0\]Dirac data movement =/){ printf "%s," ,$6}
