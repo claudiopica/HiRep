@@ -13,6 +13,7 @@
 
 #include "random.h"
 #include "libhr_core.h"
+#include "memory.h"
 
 void random_u(suNg_field *gf)
 {
@@ -28,7 +29,11 @@ void random_u(suNg_field *gf)
     random_suNg(ptr);
   }
 
-  start_gf_sendrecv(gf);
+  #ifdef WITH_GPU
+    copy_to_gpu_gfield(gf);
+  #endif
+
+  start_sendrecv_gfield(gf);
 }
 
 void random_u_f(suNf_field *gf) 
@@ -45,7 +50,11 @@ void random_u_f(suNf_field *gf)
     random_suNf(ptr);
   }
 
-  //start_gf_sendrecv(gf);
+  #ifdef WITH_GPU
+    copy_to_gpu_gfield_f(gf);
+  #endif
+
+  //start_sendrecv_gfield(gf);
 }
 
 void unit_u(suNg_field *gf)
@@ -65,7 +74,11 @@ void unit_u(suNg_field *gf)
     *(ptr)=unity;
   }
 
-  start_gf_sendrecv(gf);
+  #ifdef WITH_GPU
+    copy_to_gpu_gfield(gf);
+  #endif
+
+  start_sendrecv_gfield(gf);
 
 }
 
@@ -79,8 +92,12 @@ void random_s(suNg_scalar_field *sf)
 		gaussian_suNg_vector(ptr);
 	}
 
-	start_sc_sendrecv(sf);
-	complete_sc_sendrecv(sf);
+  #ifdef WITH_GPU
+    copy_to_gpu_suNg_scalar_field(sf);
+  #endif
+
+	start_sendrecv_suNg_scalar_field(sf);
+	complete_sendrecv_suNg_scalar_field(sf);
 }
 
 void zero_s(suNg_scalar_field *sf)
@@ -96,6 +113,10 @@ void zero_s(suNg_scalar_field *sf)
 		*ptr = zero_vector;
 	}
 
-	start_sc_sendrecv(sf);
-	complete_sc_sendrecv(sf);
+  #ifdef WITH_GPU
+    copy_to_gpu_suNg_scalar_field(sf);
+  #endif
+
+	start_sendrecv_suNg_scalar_field(sf);
+	complete_sendrecv_suNg_scalar_field(sf);
 }

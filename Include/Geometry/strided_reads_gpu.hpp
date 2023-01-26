@@ -3,7 +3,11 @@
 #ifndef STRIDED_READS_GPU_H
 #define STRIDED_READS_GPU_H
 
-#define THREADSIZE 32
+#ifdef FIXED_STRIDE
+    #define THREADSIZE 32
+#else
+    #define THREADSIZE 1
+#endif
 
 #include "libhr_core.h"
 #include "geometry.h"
@@ -15,7 +19,7 @@ __device__ void read_gpu(int stride, SITE_TYPE *s, const FIELD_TYPE *in, int ix,
     #ifdef FIXED_STRIDE
         int iz = ((ix / THREADSIZE) * THREADSIZE) * dim * field_dim  + (ix % THREADSIZE) + ((comp)*n_components)*(THREADSIZE);
     #else
-        int iz = ix ((comp)*n_components)*(THREADSIZE);
+        int iz = ix + ((comp)*n_components)*(THREADSIZE);
     #endif
     COMPLEX* in_cpx = (COMPLEX*)in;
     COMPLEX* in_comp_cpx = (COMPLEX*)s;

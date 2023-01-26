@@ -41,13 +41,13 @@ void update_gauge_field(double dt, void *vpar)
 	{
 		count = 0;
 		project_gauge_field();
-		complete_gf_sendrecv(u_gauge);
+		complete_sendrecv_gfield(u_gauge);
 	}
 	else
 	{
 		count++;
-		start_gf_sendrecv(u_gauge);
-		complete_gf_sendrecv(u_gauge);
+		start_sendrecv_gfield(u_gauge);
+		complete_sendrecv_gfield(u_gauge);
 	}
 
 	represent_gauge_field();
@@ -86,8 +86,8 @@ void update_scalar_field(double dt, void *vpar)
 		_vector_mul_add_assign_g(*_FIELD_AT(s_field,ix), dt, mom_star);
 	}
 
-	start_sc_sendrecv(s_field);
-	complete_sc_sendrecv(s_field);
+	start_sendrecv_suNg_scalar_field(s_field);
+	complete_sendrecv_suNg_scalar_field(s_field);
 
 #ifdef TIMING
 #ifdef TIMING_WITH_BARRIERS

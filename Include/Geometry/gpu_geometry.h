@@ -11,6 +11,8 @@
 #ifndef GPU_GEOMETRY_H
 #define GPU_GEOMETRY_H
 
+#include "new_geometry.h"
+
 //#define __start_in(box) (gd_t == EVEN) ? box->base_index_even : box->base_index_odd
 
 // Output
@@ -36,17 +38,25 @@
 
 #define _stride_in(box, gd_t) ((gd_t == EVEN) ? _box_even_volume(box) : _box_odd_volume(box))
 
-
-
 typedef struct _kernel_field_input {
     void* field_in;
-    int stride_in;
+    int start_in_even;
     int start_in;
+    int base_in[2];
+    int stride_in;
+    int vol_in[2];
     int master_shift_in;
     void* field_out;
     int stride_out;
+    int base_out[2];
     int start_out;
+    int vol_out[2];
     int master_shift_out;
+    void* gauge;
+    int* iup_gpu;
+    int* idn_gpu;
+    char* imask_gpu;
+    enum gd_type gd_in;
 } kernel_field_input;
 
 #define _GPU_FIELD_BLK(s,i) (((s)->gpu_ptr) + ((s)->type->master_start[(i)] - (s)->type->master_shift))

@@ -1,7 +1,5 @@
 /******************************************************************************
 *
-* NOCOMPILE= WITH_GPU
-*
 * Test of hermiticity
 *
 ******************************************************************************/
@@ -83,7 +81,7 @@ int main(int argc, char *argv[])
   random_u(u_gauge);
   lprintf("MAIN", 0, "done.\n");
 
-  start_gf_sendrecv(u_gauge);
+  start_sendrecv_gfield(u_gauge);
 
   represent_gauge_field();
 

@@ -1,7 +1,5 @@
 /*******************************************************************************
 *
-* NOCOMPILE= WITH_GPU
-*
 * Gauge covariance of the Dirac operator
 *
 *******************************************************************************/
@@ -23,10 +21,18 @@ static void random_g(void)
   {
     random_suNg(_FIELD_AT(g, ix));
   }
+
+  #ifdef WITH_GPU
+    copy_to_gpu_gtransf(g);
+  #endif
 }
 
 static void transform_u(void)
 {
+  #ifdef WITH_GPU
+    copy_from_gpu_gfield(u_gauge);
+    copy_from_gpu_gtransf(g);
+  #endif
   _MASTER_FOR(&glattice, ix)
   {
     suNg v;
@@ -39,13 +45,22 @@ static void transform_u(void)
     }
   }
 
-  start_gf_sendrecv(u_gauge);
+  #ifdef WITH_GPU
+    copy_to_gpu_gfield(u_gauge);
+    copy_to_gpu_gfield(g);
+  #endif
+
+  start_sendrecv_gfield(u_gauge);
   represent_gauge_field();
   smear_gauge_field();
 }
 
 static void transform_s(spinor_field *out, spinor_field *in)
 {
+  #ifdef WITH_GPU
+    copy_from_gpu_spinor_field_f(in);
+  #endif
+
   _MASTER_FOR(&glattice, ix)
   {
     suNf_spinor *s = _FIELD_AT(in, ix);
@@ -59,6 +74,10 @@ static void transform_s(spinor_field *out, spinor_field *in)
     _suNf_multiply(r->c[2], gfx, s->c[2]);
     _suNf_multiply(r->c[3], gfx, s->c[3]);
   }
+
+  #ifdef WITH_GPU
+    copy_to_gpu_spinor_field_f(out);
+  #endif
 }
 
 int main(int argc, char *argv[])
@@ -84,7 +103,7 @@ int main(int argc, char *argv[])
   lprintf("MAIN", 0, "Generating a random gauge field... ");
   fflush(stdout);
   random_u(u_gauge);
-  start_gf_sendrecv(u_gauge);
+  start_sendrecv_gfield(u_gauge);
   represent_gauge_field();
   lprintf("MAIN", 0, "done.\n");
 
@@ -99,8 +118,8 @@ int main(int argc, char *argv[])
   lprintf("MAIN", 0, "Generating a random gauge transf... ");
   fflush(stdout);
   random_g();
-  start_gt_sendrecv(g);
-  complete_gt_sendrecv(g);
+  start_sendrecv_gtransf(g);
+  complete_sendrecv_gtransf(g);
   lprintf("MAIN", 0, "done.\n");
 
   lprintf("MAIN", 0, "Gauge covariance of the Dirac operator:\n");

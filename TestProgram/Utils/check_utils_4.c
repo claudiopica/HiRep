@@ -15,8 +15,8 @@ static void random_g(void)
         random_suNg(_FIELD_AT(g, ix));
     }
 
-    start_gt_sendrecv(g);
-    complete_gt_sendrecv(g);
+    start_sendrecv_gtransf(g);
+    complete_sendrecv_gtransf(g);
 }
 
 static void transform_u(void)
@@ -33,7 +33,7 @@ static void transform_u(void)
         }
     }
 
-    start_gf_sendrecv(u_gauge);
+    start_sendrecv_gfield(u_gauge);
     represent_gauge_field();
     // smear_gauge_field();
 }
@@ -42,7 +42,7 @@ static hr_complex spat_avr_0pp_wrk()
 {
     static hr_complex pa, tmp;
     suNg_field *_u = u_gauge_wrk();
-    start_gf_sendrecv(_u);
+    start_sendrecv_gfield(_u);
 
     _OMP_PRAGMA(single)
     {
@@ -55,7 +55,7 @@ static hr_complex spat_avr_0pp_wrk()
         {
             _OMP_PRAGMA(master)
             /* wait for gauge field to be transfered */
-            complete_gf_sendrecv(_u);
+            complete_sendrecv_gfield(_u);
             _OMP_PRAGMA(barrier)
         }
         _SITE_FOR_SUM(&glattice, ixp, ix, pa)
@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
 
     lprintf("MAIN", 0, "Generating a random gauge field... ");
     random_u(u_gauge);
-    start_gf_sendrecv(u_gauge);
+    start_sendrecv_gfield(u_gauge);
     represent_gauge_field();
     lprintf("MAIN", 0, "done.\n\n");
   

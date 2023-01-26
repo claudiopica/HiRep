@@ -230,12 +230,12 @@ U{x,eta} U{x+eta,mu} U{x+mu,eta}^\dag
 
 */
 
-  start_gf_sendrecv(in);
+  start_sendrecv_gfield(in);
 
   _PIECE_FOR(&glattice,ixp) {
     if(ixp==glattice.inner_master_pieces) {
       _OMP_PRAGMA( master )
-      complete_gf_sendrecv(in);
+      complete_sendrecv_gfield(in);
       _OMP_PRAGMA( barrier )
     }
     suNg tmp[3];
@@ -285,12 +285,12 @@ Vbar{x,rho;nu,mu} Vbar{x+rho,mu;rho,nu} Vbar{x+mu,rho;nu,mu}^\dag
 
 */
 
-  for(int i=0;i<24;i++) start_gt_sendrecv(Vbar[i]);
+  for(int i=0;i<24;i++) start_sendrecv_gtransf(Vbar[i]);
 
   _PIECE_FOR(&glattice,ixp) {
     if(ixp==glattice.inner_master_pieces) {
       _OMP_PRAGMA( master )
-      for(int i=0;i<24;i++) complete_gt_sendrecv(Vbar[i]);
+      for(int i=0;i<24;i++) complete_sendrecv_gtransf(Vbar[i]);
       _OMP_PRAGMA( barrier )
     }
     suNg tmp[3];
@@ -340,12 +340,12 @@ Vtilde{x,nu;mu} Vtilde{x+nu,mu;nu} Vtilde{x+mu,nu;mu}^\dag
 
 */
 
-  for(int i=0;i<12;i++) start_gt_sendrecv(Vtilde[i]);
+  for(int i=0;i<12;i++) start_sendrecv_gtransf(Vtilde[i]);
 
   _PIECE_FOR(&glattice,ixp) {
     if(ixp==glattice.inner_master_pieces) {
       _OMP_PRAGMA( master )
-      for(int i=0;i<12;i++) complete_gt_sendrecv(Vtilde[i]);
+      for(int i=0;i<12;i++) complete_sendrecv_gtransf(Vtilde[i]);
       _OMP_PRAGMA( barrier )
     }
     suNg tmp[3];

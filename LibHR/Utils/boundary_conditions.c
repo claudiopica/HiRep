@@ -228,7 +228,7 @@ static void gf_open_BCs();
 
 void apply_BCs_on_fundamental_gauge_field()
 {
-  complete_gf_sendrecv(u_gauge);
+  complete_sendrecv_gfield(u_gauge);
 #if defined(BASIC_SF) || defined(ROTATED_SF)
   gf_SF_BCs(&BCs_pars.gauge_boundary_dn, &BCs_pars.gauge_boundary_up);
 #endif

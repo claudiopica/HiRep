@@ -20,7 +20,6 @@
 #include "geometry.h"
 #include <stddef.h>
 
-
 /* local lattice attributes */
 GLB_VAR(int,T,=0); /* local lattice size in direction T */
 GLB_VAR(int,X,=0); /* local lattice size in direction X */
@@ -108,18 +107,13 @@ GLB_VAR(geometry_descriptor,glat_black,={0});
 
 // new geometry structure
 GLB_VAR(box_t*,geometryBoxes);
+GLB_VAR(box_t*,geometryBoxes_gpu);
 
 #ifdef UPDATE_EO
 #define glat_default glat_even
 #else
 #define glat_default glattice
 #endif
-
-/* Memory */
-typedef enum _mem_t {
-  CPU_MEM = 1<<0,
-  GPU_MEM = 1<<1
-} mem_t;
 
 #ifdef WITH_GPU
 #define STD_MEM_TYPE (CPU_MEM | GPU_MEM)
@@ -132,7 +126,7 @@ typedef enum _mem_t {
 #define BLOCK_SIZE_SYNC 32
 
 GLB_VAR(input_gpu,gpu_var,=init_input_gpu(gpu_var));
-GLB_VAR(int, gpu_id,=0);
+GLB_VAR(int,gpu_id,=0);
 GLB_VAR(int,*ipt_gpu,=NULL);
 GLB_VAR(int,*iup_gpu,=NULL);
 GLB_VAR(int,*idn_gpu,=NULL);
@@ -143,6 +137,15 @@ GLB_VAR(unsigned int, grid_size_max_gpu,=65535);
 #endif
 GLB_VAR(mem_t,std_mem_t, =STD_MEM_TYPE); /* default memory allocation type for fields */
 GLB_VAR(mem_t,alloc_mem_t, =STD_MEM_TYPE); /* memory type requested for allocating fields */
+
+/* Communicate only the CPU or only the GPU copy depending 
+   on compilation variables. This allows also to communicate
+   both for testing purposes.*/
+#ifndef WITH_GPU
+GLB_VAR(comm_t,std_comm_t,=CPU_COMM);
+#else 
+GLB_VAR(comm_t,std_comm_t,=GPU_COMM);
+#endif
 
 /* Gauge field */
 #include "suN_types.h"
@@ -212,7 +215,7 @@ GLB_VAR(int,four_fermion_active,=0); // whether four fermion interactions are ac
 
 #ifdef FIXED_STRIDE
   // GPU fixed reading stride
-  #define THREADSIZE 32 
+  #define THREADSIZE 32
 #else
   // Not sure this works for going back to the old striding (SAM)
   #define THREADSIZE 1

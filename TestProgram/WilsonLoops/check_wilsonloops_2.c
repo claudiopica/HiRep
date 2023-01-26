@@ -16,8 +16,8 @@ int main(int argc,char *argv[])
 
 
   random_u(u_gauge);
-  start_gf_sendrecv(u_gauge);
-  complete_gf_sendrecv(u_gauge);
+  start_sendrecv_gfield(u_gauge);
+  complete_sendrecv_gfield(u_gauge);
 
   hr_complex plaq[T*X*Y*Z][6];
   int t,x,y,z,i,j,k,mu,nu;

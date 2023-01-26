@@ -47,16 +47,16 @@ int main(int argc,char *argv[])
   poly[1]=amalloc(sizeof(suNg)*X*Y*Z,ALIGN);
 
   random_u(u[0]);
-  start_gf_sendrecv(u[0]);
-  complete_gf_sendrecv(u[0]);
+  start_sendrecv_gfield(u[0]);
+  complete_sendrecv_gfield(u[0]);
 
   random_g(g);
-  start_gt_sendrecv(g);
-  complete_gt_sendrecv(g);
+  start_sendrecv_gtransf(g);
+  complete_sendrecv_gtransf(g);
 
   transform_u(u[1],u[0],g);
-  start_gf_sendrecv(u[1]);
-  complete_gf_sendrecv(u[1]);
+  start_sendrecv_gfield(u[1]);
+  complete_sendrecv_gfield(u[1]);
 
   WL_initialize();
 

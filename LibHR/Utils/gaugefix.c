@@ -15,8 +15,8 @@ void unit_gauge(suNg_field *gauge) {
 			_suNg_unit(*_4FIELD_AT(gauge,ix,mu));
 	    }
     }
-  start_gf_sendrecv(gauge);
-  complete_gf_sendrecv(gauge);
+  start_sendrecv_gfield(gauge);
+  complete_sendrecv_gfield(gauge);
 }
 
 suNg_field* g;
@@ -46,8 +46,8 @@ static void gUgmu(suNg_field *gauge){
 	
 	} 
     }
-    start_gf_sendrecv(gauge);
-    complete_gf_sendrecv(gauge);
+    start_sendrecv_gfield(gauge);
+    complete_sendrecv_gfield(gauge);
 }
 
 
@@ -63,8 +63,8 @@ void random_gauge_transform(suNg_field *gauge){
 		*_4FIELD_AT(g,ix,0)=w1;
 	}
 
-	start_gf_sendrecv(g);
-	complete_gf_sendrecv(g);
+	start_sendrecv_gfield(g);
+	complete_sendrecv_gfield(g);
 	gUgmu( gauge );
 }
 
@@ -113,8 +113,8 @@ int t, x, y, z, ix; for (t=0; t<T; t++) for (x=0; x<X; x++) for (y=0; y<Y; y++) 
 		project_to_suNg(u);
 	}
 }
-start_gf_sendrecv(fixed_gauge);
-complete_gf_sendrecv(fixed_gauge);
+start_sendrecv_gfield(fixed_gauge);
+complete_sendrecv_gfield(fixed_gauge);
 
 }
 
@@ -254,8 +254,8 @@ void su2_hit(int fix_dir, int parity, double overrelax, suNg_field *fixed_gauge,
 	    *_4FIELD_AT(g,idx,0) = v2;
 	  } 
 	}
-     start_gf_sendrecv(g);
-     complete_gf_sendrecv(g);
+     start_sendrecv_gfield(g);
+     complete_sendrecv_gfield(g);
 } 
 
 
@@ -299,8 +299,8 @@ double gaugefix(int fix_dir,double overrelax,int max_it,
   // Reunitarize at the end
   if((it % REUNIT) != 0){ reunit(fixed_gauge); }
 
-  start_gf_sendrecv(fixed_gauge);
-  complete_gf_sendrecv(fixed_gauge);
+  start_sendrecv_gfield(fixed_gauge);
+  complete_sendrecv_gfield(fixed_gauge);
 
   new_act = gaugefix_action(fix_dir, fixed_gauge);
   free_g();

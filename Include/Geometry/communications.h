@@ -71,42 +71,42 @@ void bcast_int(int *i, int n);
  *
  * @param suNg_field		Gauge field that needs to be synchronized across nodes.
  */
-void complete_gf_sendrecv(suNg_field*);
+//extern void (*complete_sendrecv_gfield) (suNg_field*);
 
 /**
  * @brief Load buffers and start MPI requests to send and receive.
  *
  * @param suNg_field		Gauge field that needs to be synchronized across nodes.
  */
-void start_gf_sendrecv(suNg_field*);
+//extern void (*start_sendrecv_gfield) (suNg_field*);
 
 /**
  * @brief Wait for communications to finish before continuing.
  *
  * @param spinor_field		Spinor field that needs to be synchronized across nodes.
  */
-void complete_sf_sendrecv(spinor_field*);
+//extern void (*complete_sendrecv_spinor_field_f) (spinor_field*);
 
 /**
  * @brief Load buffers and start MPI requests to send and receive.
  *
  * @param spinor_field 		Spinor field that needs to be synchronized across nodes.
  */
-void start_sf_sendrecv(spinor_field*);
+//extern void (*start_sendrecv_spinor_field_f) (spinor_field*);
 
 /**
  * @brief Wait for communications to finish before continuing.
  *
  * @param suNg_scalar_field	Scalar field that needs to be synchronized across nodes.
  */
-void complete_sc_sendrecv(suNg_scalar_field*);
+//extern void (*complete_sendrecv_suNg_scalar_field) (suNg_scalar_field*);
 
 /**
  * @brief Load buffers and start MPI requests to send and receive.
  *
  * @param suNg_scalar_field 	Scalar field that needs to be synchronized across nodes.
  */
-void start_sc_sendrecv(suNg_scalar_field*);
+//extern void (*start_sendrecv_suNg_scalar_field) (suNg_scalar_field*);
 
 /**
  * @brief Wait for communications to finish before continuing.
@@ -114,7 +114,7 @@ void start_sc_sendrecv(suNg_scalar_field*);
  * @param suNf_field 		Represented gauge field that needs to be synchronized 
  * 				across nodes.
  */
-void complete_clover_force_sendrecv(suNf_field*);
+//extern void (*complete_clover_force_sendrecv) (suNf_field*);
 
 /**
  * @brief Load buffers and start MPI requests to send and receive.
@@ -122,7 +122,7 @@ void complete_clover_force_sendrecv(suNf_field*);
  * @param suNf_field		Represented gauge field that needs to be synchronized 
  * 				across nodes.
  */
-void start_clover_force_sendrecv(suNf_field*);
+//extern void (*start_clover_force_sendrecv) (suNf_field*);
 
 /**
  * @brief Wait for communications to finish before continuing.
@@ -130,7 +130,7 @@ void start_clover_force_sendrecv(suNf_field*);
  * @param suNg_field		Gauge transformation that needs to be synchronized
  * 				across nodes.
  */
-void complete_gt_sendrecv(suNg_field*);
+//extern void (*complete_sendrecv_gtransf) (suNg_field*);
 
 /**
  * @brief Fill buffers and start MPI requests to send and receive.
@@ -138,7 +138,7 @@ void complete_gt_sendrecv(suNg_field*);
  * @param 			Gauge transformation that needs to be synchronized across
  * 				nodes
  */
-void start_gt_sendrecv(suNg_field*);
+//extern void (*start_sendrecv_gtransf) (suNg_field*);
 
 /**
  * @brief Wait for communications to finish before continuing.
@@ -146,7 +146,7 @@ void start_gt_sendrecv(suNg_field*);
  * @param suNg_field_flt	Single precision gauge field that needs to be synchronized
  * 				across nodes.
  */
-void complete_gf_sendrecv_flt(suNg_field_flt*);
+//extern void (*complete_sendrecv_gfield_flt) (suNg_field_flt*);
 
 /**
  * @brief Fill buffers and start MPI requests to send and receive.
@@ -154,7 +154,7 @@ void complete_gf_sendrecv_flt(suNg_field_flt*);
  * @param suNg_field_flt	Single precision gauge field that needs to be synchronized
  * 				across nodes.
  */
-void start_gf_sendrecv_flt(suNg_field_flt*);
+//extern void (*start_sendrecv_gfield_flt) (suNg_field_flt*);
 
 /**
  * @brief Wait for communications to finish before continuing.
@@ -162,7 +162,7 @@ void start_gf_sendrecv_flt(suNg_field_flt*);
  * @param spinor_field_flt	Single precision spinor field that needs to be synchronized
  * 				across nodes.
  */
-void complete_sf_sendrecv_flt(spinor_field_flt*);
+//extern void (*complete_sendrecv_spinor_field_f_flt) (spinor_field_flt*);
 
 /**
  * @brief Fill buffers and start MPI requests to send and receive.
@@ -170,10 +170,7 @@ void complete_sf_sendrecv_flt(spinor_field_flt*);
  * @param spinor_field_flt	Single precision spinor field that needs to be synchronized
  * 				across nodes.
  */
-void start_sf_sendrecv_flt(spinor_field_flt*);
-
-
-void complete_staple_field_sendrecv(suNg_field *);
+//extern void (*start_sendrecv_spinor_field_f_flt) (spinor_field_flt*);
 
 /**
  * @brief Wait for communications to finish before continuing.
@@ -181,7 +178,7 @@ void complete_staple_field_sendrecv(suNg_field *);
  * @param staple field that needs to be synchronized across
  * 				nodes
  */
-void start_staple_field_sendrecv(suNg_field*);
+//extern void (*complete_sendrecv_staple_field) (suNg_field *);
 
 /**
  * @brief Fill buffers and start MPI requests to send and receive.
@@ -189,6 +186,24 @@ void start_staple_field_sendrecv(suNg_field*);
  * @param staple field that needs to be synchronized across
  * 				nodes
  */
+//extern void (*start_sendrecv_staple_field) (suNg_field*);
+
+void complete_sendrecv_gfield_cpu(suNg_field*);
+void start_sendrecv_gfield_cpu(suNg_field*);
+void complete_sendrecv_spinor_field_f_cpu(spinor_field*);
+void start_sendrecv_spinor_field_f_cpu(spinor_field*);
+void complete_sendrecv_suNg_scalar_field_cpu(suNg_scalar_field*);
+void start_sendrecv_suNg_scalar_field_cpu(suNg_scalar_field*);
+void complete_clover_force_sendrecv_cpu(suNf_field*);
+void start_clover_force_sendrecv_cpu(suNf_field*);
+void complete_sendrecv_gtransf_cpu(suNg_field*);
+void start_sendrecv_gtransf_cpu(suNg_field*);
+void complete_sendrecv_gfield_flt_cpu(suNg_field_flt*);
+void start_sendrecv_gfield_flt_cpu(suNg_field_flt*);
+void complete_sendrecv_spinor_field_f_flt_cpu(spinor_field_flt*);
+void start_sendrecv_spinor_field_f_flt_cpu(spinor_field_flt*);
+void complete_sendrecv_staple_field_cpu(suNg_field*);
+void start_sendrecv_staple_field_cpu(suNg_field*);
 
 #ifdef __cplusplus
     }

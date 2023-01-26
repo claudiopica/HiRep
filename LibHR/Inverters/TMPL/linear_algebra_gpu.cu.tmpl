@@ -198,8 +198,7 @@ _FUNC(double, spinor_field_sqnorm, (_SPINOR_FIELD_TYPE *s1))
 
   _CUDA_FOR(s1,ixp,
             resPiece = alloc_double_sum_field(N);
-            (spinor_field_sqnorm_gpu<_SPINOR_TYPE, _COMPLEX, _REAL><<<grid_size,BLOCK_SIZE>>>(_GPU_FIELD_BLK(s1,ixp),
-            resPiece,N));
+            (spinor_field_sqnorm_gpu<_SPINOR_TYPE, _COMPLEX, _REAL><<<grid_size,BLOCK_SIZE>>>(_GPU_FIELD_BLK(s1,ixp), resPiece,N));
             res += global_sum_gpu(resPiece,N);
   );
 #ifdef WITH_MPI

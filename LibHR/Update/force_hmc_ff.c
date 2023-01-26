@@ -204,8 +204,8 @@ void force_hmc_ff(double dt, void *vpar){
 
     if( gauge_field_active ){
     /* reset force stat counters */
-    start_sf_sendrecv(Xs);
-    start_sf_sendrecv(Ys);
+    start_sendrecv_spinor_field_f(Xs);
+    start_sendrecv_spinor_field_f(Ys);
 
     _PIECE_FOR(&glattice,xp) {
       suNg_algebra_vector f;
@@ -216,8 +216,8 @@ void force_hmc_ff(double dt, void *vpar){
       if (xp==glattice.inner_master_pieces) {
         _OMP_PRAGMA( master )
         {
-          complete_sf_sendrecv(Xs);
-          complete_sf_sendrecv(Ys);
+          complete_sendrecv_spinor_field_f(Xs);
+          complete_sendrecv_spinor_field_f(Ys);
         }
         _OMP_PRAGMA( barrier )
       }

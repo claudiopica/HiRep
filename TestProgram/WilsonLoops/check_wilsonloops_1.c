@@ -17,14 +17,14 @@ int main(int argc,char *argv[])
   setup_gauge_fields();
 
   random_u(u_gauge);
-  start_gf_sendrecv(u_gauge);
-  complete_gf_sendrecv(u_gauge);
+  start_sendrecv_gfield(u_gauge);
+  complete_sendrecv_gfield(u_gauge);
 
   WL_initialize();
 
   WL_Hamiltonian_gauge(u_gauge,u_gauge);
-  start_gf_sendrecv(u_gauge);
-  complete_gf_sendrecv(u_gauge);
+  start_sendrecv_gfield(u_gauge);
+  complete_sendrecv_gfield(u_gauge);
 
   double dtmp;
 

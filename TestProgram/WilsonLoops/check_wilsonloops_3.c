@@ -19,8 +19,8 @@ void polyakov_test(suNg* poly, suNg_field* gf) {
     *_FIELD_AT(sh,ipt(t,x,y,z)) = *_4FIELD_AT(gf,ipt(t,x,y,z),0);
   }
 
-  start_gt_sendrecv(sh);
-  complete_gt_sendrecv(sh);
+  start_sendrecv_gtransf(sh);
+  complete_sendrecv_gtransf(sh);
 
   for(int s=0;s<GLB_T;s++) {
     for(int x=0;x<X;x++) for(int y=0;y<Y;y++) for(int z=0;z<Z;z++) {
@@ -32,8 +32,8 @@ void polyakov_test(suNg* poly, suNg_field* gf) {
       int i=ipt(t,x,y,z);
       *_FIELD_AT(sh,i) = *_FIELD_AT(sh,iup(i,0));
     }
-    start_gt_sendrecv(sh);
-    complete_gt_sendrecv(sh);
+    start_sendrecv_gtransf(sh);
+    complete_sendrecv_gtransf(sh);
   }
 
   free_gtransf(sh);
@@ -54,8 +54,8 @@ int main(int argc,char *argv[])
 
 
   random_u(u_gauge);
-  start_gf_sendrecv(u_gauge);
-  complete_gf_sendrecv(u_gauge);
+  start_sendrecv_gfield(u_gauge);
+  complete_sendrecv_gfield(u_gauge);
 
   suNg* poly[2];
   poly[0]=amalloc(sizeof(suNg)*X*Y*Z,ALIGN);

@@ -40,8 +40,8 @@ static void transform_u(void)
     }
   }
 
-  start_gf_sendrecv(u_gauge);
-  complete_gf_sendrecv(u_gauge);
+  start_sendrecv_gfield(u_gauge);
+  complete_sendrecv_gfield(u_gauge);
   represent_gauge_field();
   smear_gauge_field();
 

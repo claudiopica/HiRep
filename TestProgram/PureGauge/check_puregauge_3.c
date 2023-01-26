@@ -129,8 +129,8 @@ static void random_g(suNg_field *g)
    {
       random_suNg(_FIELD_AT(g, ix));
    }
-   start_gt_sendrecv(g);
-   complete_gt_sendrecv(g);
+   start_sendrecv_gtransf(g);
+   complete_sendrecv_gtransf(g);
 }
 
 void loc_unit_gauge(suNg_field *gauge)
@@ -141,8 +141,8 @@ void loc_unit_gauge(suNg_field *gauge)
 
       _suNg_unit(*_FIELD_AT(gauge, ix));
    }
-   start_gt_sendrecv(gauge);
-   complete_gt_sendrecv(gauge);
+   start_sendrecv_gtransf(gauge);
+   complete_sendrecv_gtransf(gauge);
 }
 
 static void transform_gauge(suNg_field *gtransf, suNg_field *gfield)
@@ -158,8 +158,8 @@ static void transform_gauge(suNg_field *gtransf, suNg_field *gfield)
          _suNg_times_suNg(*u, *_FIELD_AT(gtransf, ix), v);
       }
    }
-   start_gf_sendrecv(gfield);
-   complete_gf_sendrecv(gfield);
+   start_sendrecv_gfield(gfield);
+   complete_sendrecv_gfield(gfield);
 }
 
 static void transform_force(suNg_field *gtransf, suNg_av_field *force)
@@ -248,8 +248,8 @@ int test_gcov_lw_force(double beta, double c0, double c1)
       }
    }
    random_u(u_gauge);
-   start_gf_sendrecv(u_gauge);
-   complete_gf_sendrecv(u_gauge);
+   start_sendrecv_gfield(u_gauge);
+   complete_sendrecv_gfield(u_gauge);
 
    lw_force(1., &par);
 
@@ -367,8 +367,8 @@ int test_lw_force(double beta, double c0, double c1)
                         gauss((double *)(&mom), NG * NG - 1);
                         ExpX(eps, &mom, pu_gauge(ix, mu));
                      }
-                     start_gf_sendrecv(u_gauge);
-                     complete_gf_sendrecv(u_gauge);
+                     start_sendrecv_gfield(u_gauge);
+                     complete_sendrecv_gfield(u_gauge);
 
                      double deltaS = 0.;
                      calculate_stfld(NOCOMM);
@@ -393,8 +393,8 @@ int test_lw_force(double beta, double c0, double c1)
                         err = diff;
 
                      memcpy(u_gauge->ptr, u->ptr, 4 * glattice.gsize_gauge * sizeof(suNg));
-                     start_gf_sendrecv(u_gauge);
-                     complete_gf_sendrecv(u_gauge);
+                     start_sendrecv_gfield(u_gauge);
+                     complete_sendrecv_gfield(u_gauge);
                   }
                }
 
@@ -420,8 +420,8 @@ int main(int argc, char *argv[])
    setup_gauge_fields();
 
    random_u(u_gauge);
-   start_gf_sendrecv(u_gauge);
-   complete_gf_sendrecv(u_gauge);
+   start_sendrecv_gfield(u_gauge);
+   complete_sendrecv_gfield(u_gauge);
 
    return_value += test_wilson_action_and_force(1.);
 

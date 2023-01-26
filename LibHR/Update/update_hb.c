@@ -34,7 +34,7 @@ void project_gauge_field(void)
     project_to_suNg(pu_gauge(ix, 3));
   }
 
-  start_gf_sendrecv(u_gauge);
+  start_sendrecv_gfield(u_gauge);
 }
 
 #if defined(BASIC_SF) || defined(ROTATED_SF)
@@ -151,7 +151,7 @@ static void update_all(double *beta, int type)
 #ifdef WITH_MPI
       _OMP_PRAGMA(master)
       {
-        start_gf_sendrecv(u_gauge);
+        start_sendrecv_gfield(u_gauge);
       }
       _OMP_PRAGMA(barrier)
 #endif
@@ -167,7 +167,7 @@ static void update_all(double *beta, int type)
 #ifdef WITH_MPI
       _OMP_PRAGMA(master)
       {
-        complete_gf_sendrecv(u_gauge);
+        complete_sendrecv_gfield(u_gauge);
       }
       _OMP_PRAGMA(barrier)
 #endif
@@ -188,7 +188,7 @@ static void update_all(double *beta, int type)
 #ifdef WITH_MPI
       _OMP_PRAGMA(master)
       {
-        start_gf_sendrecv(u_gauge);
+        start_sendrecv_gfield(u_gauge);
       }
       _OMP_PRAGMA(barrier)
 #endif
@@ -204,7 +204,7 @@ static void update_all(double *beta, int type)
 #ifdef WITH_MPI
       _OMP_PRAGMA(master)
       {
-        complete_gf_sendrecv(u_gauge);
+        complete_sendrecv_gfield(u_gauge);
       }
       _OMP_PRAGMA(barrier)
 #endif
@@ -241,7 +241,7 @@ static void update_all(double *beta, int type)
 #ifdef WITH_MPI
       _OMP_PRAGMA(master)
       {
-        start_gf_sendrecv(u_gauge);
+        start_sendrecv_gfield(u_gauge);
       }
       _OMP_PRAGMA(barrier)
 #endif
@@ -257,7 +257,7 @@ static void update_all(double *beta, int type)
 #ifdef WITH_MPI
       _OMP_PRAGMA(master)
       {
-        complete_gf_sendrecv(u_gauge);
+        complete_sendrecv_gfield(u_gauge);
       }
       _OMP_PRAGMA(barrier)
 #endif
@@ -280,7 +280,7 @@ static void update_all(double *beta, int type)
 #ifdef WITH_MPI
       _OMP_PRAGMA(master)
       {
-        start_gf_sendrecv(u_gauge);
+        start_sendrecv_gfield(u_gauge);
       }
       _OMP_PRAGMA(barrier)
 #endif
@@ -296,7 +296,7 @@ static void update_all(double *beta, int type)
 #ifdef WITH_MPI
       _OMP_PRAGMA(master)
       {
-        complete_gf_sendrecv(u_gauge);
+        complete_sendrecv_gfield(u_gauge);
       }
       _OMP_PRAGMA(barrier)
 #endif
@@ -332,5 +332,5 @@ void update(double *beta, int nhb, int nor)
     update_all(beta, 1);
   }
 
-  start_gf_sendrecv(u_gauge);
+  start_sendrecv_gfield(u_gauge);
 }

@@ -186,7 +186,7 @@ static void update_mh_all(int lev, double *beta, int type)
 #ifdef WITH_MPI
             _OMP_PRAGMA(master)
             {
-                start_gf_sendrecv(u_gauge);
+                start_sendrecv_gfield(u_gauge);
             }
             _OMP_PRAGMA(barrier)
 #endif
@@ -202,7 +202,7 @@ static void update_mh_all(int lev, double *beta, int type)
 #ifdef WITH_MPI
             _OMP_PRAGMA(master)
             {
-                complete_gf_sendrecv(u_gauge);
+                complete_sendrecv_gfield(u_gauge);
             }
             _OMP_PRAGMA(barrier)
 #endif
@@ -225,7 +225,7 @@ static void update_mh_all(int lev, double *beta, int type)
 #ifdef WITH_MPI
             _OMP_PRAGMA(master)
             {
-                start_gf_sendrecv(u_gauge);
+                start_sendrecv_gfield(u_gauge);
             }
             _OMP_PRAGMA(barrier)
 #endif
@@ -241,7 +241,7 @@ static void update_mh_all(int lev, double *beta, int type)
 #ifdef WITH_MPI
             _OMP_PRAGMA(master)
             {
-                complete_gf_sendrecv(u_gauge);
+                complete_sendrecv_gfield(u_gauge);
             }
             _OMP_PRAGMA(barrier)
 #endif
@@ -274,7 +274,7 @@ static void update_mh(int lev, double *beta, int nhb, int nor)
         update_mh_all(lev, beta, 1);
     }
 
-    start_gf_sendrecv(u_gauge);
+    start_sendrecv_gfield(u_gauge);
 }
 
 void set_max_mh_level(int lev)

@@ -14,8 +14,8 @@ static hr_complex **polyf;
 static void all_g_op(hr_complex *pa)
 {
     suNg_field *_u = u_gauge_wrk();
-    start_gf_sendrecv(_u);
-    complete_gf_sendrecv(_u);
+    start_sendrecv_gfield(_u);
+    complete_sendrecv_gfield(_u);
 
     int i;
 
@@ -34,8 +34,8 @@ static void all_g_op(hr_complex *pa)
 static void all_t_op(hr_complex *pa)
 {
     suNg_field *_u = u_gauge_wrk();
-    start_gf_sendrecv(_u);
-    complete_gf_sendrecv(_u);
+    start_sendrecv_gfield(_u);
+    complete_sendrecv_gfield(_u);
 
     int i;
 
@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
 
     lprintf("MAIN", 0, "Generating a random gauge field... ");
     random_u(u_gauge);
-    start_gf_sendrecv(u_gauge);
+    start_sendrecv_gfield(u_gauge);
     represent_gauge_field();
     lprintf("MAIN", 0, "done.\n\n");
 

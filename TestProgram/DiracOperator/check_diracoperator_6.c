@@ -1,7 +1,5 @@
 /*******************************************************************************
 *
-* NOCOMPILE= WITH_GPU
-*
 * coherence of the dirac float with the dirac op
 *
 *******************************************************************************/
@@ -45,7 +43,7 @@ int main(int argc, char *argv[])
 
   random_u(u_gauge);
 
-  start_gf_sendrecv(u_gauge);
+  start_sendrecv_gfield(u_gauge);
 
   represent_gauge_field();
   lprintf("MAIN", 0, "done.\n");
@@ -55,23 +53,25 @@ int main(int argc, char *argv[])
 
   gaussian_spinor_field(s0);
   lprintf("MAIN", 0, "done.\n");
-
-  tau = 1. / sqrt(spinor_field_sqnorm_f_cpu(s0));
-  spinor_field_mul_f_cpu(s0, tau, s0);
+  tau = 1. / sqrt(spinor_field_sqnorm_f(s0));
+  spinor_field_mul_f(s0, tau, s0);
+  lprintf("INFO", 0, "Spinor sqnorm in double precision: %0.2e\n", spinor_field_sqnorm_f(s0));
   assign_sd2s(f0, s0);
+  lprintf("INFO", 0, "Spinor sqnorm in single precision: %0.2e\n", spinor_field_sqnorm_f_flt(f0));
+
 
   assign_ud2u_f();
 
   loc_D(s1, s0);
   loc_D_flt(f1, f0);
 
-  lprintf("INFO", 0, "Spinor sqnorm result double precision: %0.2e\n", spinor_field_sqnorm_f_cpu(s1));
-  lprintf("INFO", 0, "Spinor sqnorm result single precision: %0.2e\n", spinor_field_sqnorm_f_flt_cpu(f1));
+  lprintf("INFO", 0, "Spinor sqnorm result double precision: %0.2e\n", spinor_field_sqnorm_f(s1));
+  lprintf("INFO", 0, "Spinor sqnorm result single precision: %0.2e\n", spinor_field_sqnorm_f_flt(f1));
 
   assign_sd2s(f0, s1);
 
-  spinor_field_mul_add_assign_f_flt_cpu(f0, -1.0, f1);
-  sig = spinor_field_sqnorm_f_flt_cpu(f0);
+  spinor_field_mul_add_assign_f_flt(f0, -1.0, f1);
+  sig = spinor_field_sqnorm_f_flt(f0);
 
   lprintf("MAIN", 0, "Maximal normalized difference = %.2e\n", sqrt(sig));
   lprintf("MAIN", 0, "(should be around 1*10^(-8) or so)\n\n");

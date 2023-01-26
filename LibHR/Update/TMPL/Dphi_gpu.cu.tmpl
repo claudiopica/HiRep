@@ -140,6 +140,32 @@ _FUNC(static void, init_Dirac, ()) {
   }
 }
 
+_FUNC(static kernel_field_input*, init_kernel_input, (_FIELD_TYPE *out, _FIELD_TYPE *in, const _GAUGE_TYPE *u, box_t* box, gd_type gd_t)) {
+  kernel_field_input* input = (kernel_field_input*)malloc(sizeof(kernel_field_input));
+  input->field_in = (void*)in->gpu_ptr;
+  input->field_out = (void*)out->gpu_ptr;
+  input->base_in[0] = box->base_index;
+  input->base_in[1] = box->base_index_odd;
+  input->base_out[0] = geometryBoxes->base_index_odd;
+  input->base_out[1] = geometryBoxes->base_index;
+  input->vol_in[0] = boxEvenVolume(box);
+  input->vol_in[1] = boxOddVolume(box);
+  input->vol_out[0] = boxOddVolume(geometryBoxes);
+  input->vol_out[1] = boxEvenVolume(geometryBoxes);
+  input->master_shift_in = in->type->master_shift;
+  input->master_shift_out = out->type->master_shift;
+  input->gauge = (void*)u;
+  input->iup_gpu = iup_gpu;
+  input->idn_gpu = idn_gpu;
+  input->imask_gpu = imask_gpu;
+  input->gd_in = gd_t;
+
+  kernel_field_input* input_d;
+  cudaMalloc((void**)&input_d, sizeof(kernel_field_input));
+  cudaMemcpy(input_d, input, sizeof(kernel_field_input), cudaMemcpyHostToDevice);
+  return input_d;
+}
+
 /**
  * @brief Applies the Wilson-Dirac operator only where the calculation
  *        does not depend on the communications. Use this calculation
@@ -156,8 +182,9 @@ _FUNC(static void, Dphi_inner, (_FIELD_TYPE *out, _FIELD_TYPE *in)) {
 
   const _GAUGE_TYPE *gauge = GFIELD(u_gauge,_REP_SUFFIX)->gpu_ptr;
   int grid = (boxEvenVolume(geometryBoxes)-1)/BLOCK_SIZE_DIRAC + 1;
-  Dphi_gpu_inner_kernel<_HSPINOR_TYPE, _VECTOR_TYPE, _COMPLEX><<<grid, BLOCK_SIZE_DIRAC>>>( 
-      in->gpu_ptr, out->gpu_ptr, gauge, iup_gpu, idn_gpu, imask_gpu, gd_t, geometryBoxes_gpu);
+  kernel_field_input* input = _GPU_F_NAME(init_kernel_input,_SUFFIX)(out, in, gauge, geometryBoxes, gd_t);
+  Dphi_gpu_inner_kernel<_HSPINOR_TYPE, _VECTOR_TYPE, _COMPLEX, _SPINOR_TYPE, _GAUGE_TYPE><<<grid, BLOCK_SIZE_DIRAC>>>(input);
+      //in->gpu_ptr, out->gpu_ptr, gauge, iup_gpu, idn_gpu, imask_gpu, gd_t, geometryBoxes_gpu);
   CudaCheckError();
   cudaDeviceSynchronize();
 }
@@ -178,19 +205,19 @@ _FUNC(static void, Dphi_boundary, (_FIELD_TYPE *out, _FIELD_TYPE *in)) {
   else if (in->type==&glat_even) gd_t = EVEN;
 
   box_t *buffer_box = geometryBoxes->next;
-  int i = 0;
+  int i = 1;
   int nbuffers = in->type->nbuffers_spinor;
   if(gd_t == GLOBAL) nbuffers /= 2;
   
-  while(buffer_box && i < nbuffers) {
-    box_t* tmp;
-    cudaMalloc((void **)&tmp, sizeof(box_t));
-    cudaMemcpy(tmp, buffer_box, sizeof(box_t), cudaMemcpyHostToDevice);
+  while(buffer_box && i <= nbuffers) {
+    //box_t* tmp;
+    //cudaMalloc((void **)&tmp, sizeof(box_t));
+    //cudaMemcpy(tmp, buffer_box, sizeof(box_t), cudaMemcpyHostToDevice);
 
     const _GAUGE_TYPE *gauge = GFIELD(u_gauge,_REP_SUFFIX)->gpu_ptr;
     int grid = (boxEvenVolume(geometryBoxes)-1)/BLOCK_SIZE_DIRAC + 1;
-    Dphi_gpu_boundary_kernel<_HSPINOR_TYPE, _VECTOR_TYPE, _COMPLEX><<<grid, BLOCK_SIZE_DIRAC>>>( 
-      in->gpu_ptr, out->gpu_ptr, gauge, iup_gpu, idn_gpu, imask_gpu, gd_t, geometryBoxes_gpu, tmp);
+    kernel_field_input* input = _GPU_F_NAME(init_kernel_input,_SUFFIX)(out, in, gauge, buffer_box, gd_t);
+    Dphi_gpu_boundary_kernel<_HSPINOR_TYPE, _VECTOR_TYPE, _COMPLEX, _SPINOR_TYPE, _GAUGE_TYPE><<<grid, BLOCK_SIZE_DIRAC>>>(input);
     buffer_box=buffer_box->next; i++;
   }
 }
@@ -209,13 +236,13 @@ void _GPU_F_NAME_(Dphi,_SUFFIX) (_FIELD_TYPE *out, _FIELD_TYPE *in) {
   //init_bc_gpu();
 
   #ifdef WITH_MPI
-    _F_NAME(start_sendrecv_gpu_,_FIELD_NAME) (in);
+    _F_NAME(start_sendrecv_,_FIELD_NAME) (in);
   #endif
 
   // Mask communication latency with calculating the points
   // that do no rely on communications  
   _GPU_F_NAME(Dphi_inner,_SUFFIX)(out, in);
-  _F_NAME(complete_sendrecv_gpu_,_FIELD_NAME) (in);
+  _F_NAME(complete_sendrecv_,_FIELD_NAME) (in);
 
   // After completion of communications add missing calculations
   // that relied on communications.

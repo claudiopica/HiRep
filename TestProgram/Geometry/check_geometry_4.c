@@ -49,9 +49,9 @@ int main(int argc, char *argv[])
     spinor_field_one_f(even);
     spinor_field_one_f(odd);
 
-    start_sf_sendrecv(in); complete_sf_sendrecv(in); 
-    start_sf_sendrecv(even); complete_sf_sendrecv(even); 
-    start_sf_sendrecv(odd); complete_sf_sendrecv(odd); 
+    start_sendrecv_spinor_field_f(in); complete_sendrecv_spinor_field_f(in); 
+    start_sendrecv_spinor_field_f(even); complete_sendrecv_spinor_field_f(even); 
+    start_sendrecv_spinor_field_f(odd); complete_sendrecv_spinor_field_f(odd); 
 
 
     double in_norm = spinor_field_sqnorm_f(in);

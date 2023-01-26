@@ -61,10 +61,21 @@ _FUNC_STATIC(allocate_cpu_field_data_, (unsigned int n, _FIELD_TYPE *f, geometry
         int field_size  = bytes_per_site * number_of_sites;
         f->ptr = amalloc(field_size, ALIGN);
         error((f->ptr) == NULL, 1,  __func__, "Could not allocate memory space for field (data).");
-        for (int i = 1; i < n; ++i) 
+        for (int i = 1; i < n; ++i) {
             f[i].ptr = f[i-1].ptr + _NUMBER_OF_SITES * _FIELD_DIM;
+        }
     } else {
         for (int i = 0; i < n; ++i) { f[i].ptr = NULL; }
+    }
+}
+
+_FUNC_STATIC(assign_comm_type_, (unsigned int n, _FIELD_TYPE *f)) {
+    for (int i = 0; i < n; ++i) {
+        #ifdef WITH_GPU
+            f[i].comm_type = GPU_COMM;
+        #else
+            f[i].comm_type = CPU_COMM;
+        #endif
     }
 }
 
@@ -123,10 +134,8 @@ _FUNC_STATIC(allocate_mpi_field_data_, (unsigned int n, _FIELD_TYPE *f, geometry
         int number_of_requests = n * 2 * _NUMBER_OF_BUFFERS;
         f->comm_req = amalloc(number_of_requests * sizeof(MPI_Request), ALIGN);
         error((f->comm_req) == NULL, 1, __func__, "Could not allocate memory space for field (MPI).\n");
-        for (int ix = 0; ix < number_of_requests; ++ix)
-            f->comm_req[ix] = MPI_REQUEST_NULL;
-        for (int i = 1; i < n; ++i)
-            f[i].comm_req = f[i-1].comm_req + 2 * _NUMBER_OF_BUFFERS;
+        for (int ix = 0; ix < number_of_requests; ++ix) { f->comm_req[ix] = MPI_REQUEST_NULL; }
+        for (int i = 1; i < n; ++i) { f[i].comm_req = f[i-1].comm_req + 2 * _NUMBER_OF_BUFFERS; }
         for (int i = 0; i < n; ++i) { _F_NAME(allocate_sendbuffer_,_FIELD_NAME)(f, i); }
     } else {  
         f->comm_req = NULL;
@@ -145,8 +154,10 @@ _FUNC(void, free_, (_FIELD_TYPE *f)) {
 
 _ALLOCATE {
     _FIELD_TYPE *f;
+    
     _F_NAME(allocate_field_struct_,_FIELD_NAME) (_n, &f, type);
     _F_NAME(assign_geometry_descriptor_,_FIELD_NAME) (_n, f, type);
+    _F_NAME(assign_comm_type_,_FIELD_NAME) (_n, f);
     _F_NAME(allocate_cpu_field_data_,_FIELD_NAME) (_n, f, type);
 
     #ifdef WITH_GPU

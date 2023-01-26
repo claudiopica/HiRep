@@ -47,23 +47,23 @@ int main(int argc,char *argv[])
   suNg_field* g=alloc_gtransf(&glattice);
 
   random_u(u[0]);
-  start_gf_sendrecv(u[0]);
-  complete_gf_sendrecv(u[0]);
+  start_sendrecv_gfield(u[0]);
+  complete_sendrecv_gfield(u[0]);
 
   random_g(g);
-  start_gt_sendrecv(g);
-  complete_gt_sendrecv(g);
+  start_sendrecv_gtransf(g);
+  complete_sendrecv_gtransf(g);
 
   double HYP_weight[3]={1.,1.,1.};
 
   transform_u(u[1],u[0],g);
-  start_gf_sendrecv(u[1]);
-  complete_gf_sendrecv(u[1]);
+  start_sendrecv_gfield(u[1]);
+  complete_sendrecv_gfield(u[1]);
   HYP_smearing(u[2],u[1],HYP_weight);
 
   HYP_smearing(u[3],u[0],HYP_weight);
-  start_gf_sendrecv(u[3]);
-  complete_gf_sendrecv(u[3]);
+  start_sendrecv_gfield(u[3]);
+  complete_sendrecv_gfield(u[3]);
   transform_u(u[4],u[3],g);
 
 

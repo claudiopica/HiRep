@@ -8,6 +8,7 @@
 #include "Utils/single_double_utils.h"
 #include "Utils/boundary_conditions.h"
 #include <math.h>
+#include "memory.h"
 
 #define XG(m, a, b) ((m) + (a)*NG + (b))
 #define XF(m, a, b) ((m) + (a)*NF + (b))
@@ -387,6 +388,12 @@ void _group_represent_flt(suNf_flt *v, suNg_flt *u)
 
 void represent_gauge_field()
 {
+  #ifdef WITH_GPU
+    copy_from_gpu_gfield(u_gauge);
+    //start_sendrecv_gfield_cpu(u_gauge);
+    //complete_sendrecv_gfield_cpu(u_gauge);
+  #endif
+
 #ifdef WITH_SMEARING
   smear_gauge_field();
 #endif
@@ -413,10 +420,14 @@ void represent_gauge_field()
         _group_represent2(Ru, u);
 #endif
       }
+
+    #ifdef WITH_GPU
+      copy_to_gpu_gfield(u_gauge_f);
+    #endif
   }
 
   /* wait gauge field transfer */
-  complete_gf_sendrecv(u_gauge);
+  complete_sendrecv_gfield(u_gauge);
 
   /* loop on the rest of master sites */
   _OMP_PRAGMA(_omp_parallel)
@@ -444,7 +455,7 @@ void represent_gauge_field()
 #else //ALLOCATE_REPR_GAUGE_FIELD
   static int first_time = 1;
   /* wait gauge field transfer */
-  complete_gf_sendrecv(u_gauge);
+  complete_sendrecv_gfield(u_gauge);
 
   if (first_time)
   {

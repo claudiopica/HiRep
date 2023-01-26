@@ -90,8 +90,8 @@ void create_point_source(spinor_field *source, int tau, int color)
   }
   for (beta = 0; beta < 4; ++beta)
   {
-    start_sf_sendrecv(source + beta);
-    complete_sf_sendrecv(source + beta);
+    start_sendrecv_spinor_field_f(source + beta);
+    complete_sendrecv_spinor_field_f(source + beta);
   }
 }
 // creates point source for the NF color indices.
@@ -118,8 +118,8 @@ void create_full_point_source(spinor_field *source, int tau)
   }
   for (beta = 0; beta < 4 * NF; ++beta)
   {
-    start_sf_sendrecv(source + beta);
-    complete_sf_sendrecv(source + beta);
+    start_sendrecv_spinor_field_f(source + beta);
+    complete_sendrecv_spinor_field_f(source + beta);
   }
 }
 
@@ -140,8 +140,8 @@ void create_point_source_loc(spinor_field *source, int t, int x, int y, int z, i
   }
   for (beta = 0; beta < 4; ++beta)
   {
-    start_sf_sendrecv(source + beta);
-    complete_sf_sendrecv(source + beta);
+    start_sendrecv_spinor_field_f(source + beta);
+    complete_sendrecv_spinor_field_f(source + beta);
   }
 }
 
@@ -331,8 +331,8 @@ void create_noise_source_equal_eo(spinor_field *source)
         }
   for (i = 0; i < 4; ++i)
   {
-    start_sf_sendrecv(source + i);
-    complete_sf_sendrecv(source + i);
+    start_sendrecv_spinor_field_f(source + i);
+    complete_sendrecv_spinor_field_f(source + i);
   }
 }
 
@@ -367,8 +367,8 @@ void create_noise_source_equal_oe(spinor_field *source)
         }
   for (i = 0; i < 4; ++i)
   {
-    start_sf_sendrecv(source + i);
-    complete_sf_sendrecv(source + i);
+    start_sendrecv_spinor_field_f(source + i);
+    complete_sendrecv_spinor_field_f(source + i);
   }
 }
 
@@ -428,8 +428,8 @@ void create_noise_source_equal_col_dil(spinor_field *source, int col)
         }
   for (i = 0; i < 4; ++i)
   {
-    start_sf_sendrecv(source + i);
-    complete_sf_sendrecv(source + i);
+    start_sendrecv_spinor_field_f(source + i);
+    complete_sendrecv_spinor_field_f(source + i);
   }
 }
 
@@ -459,8 +459,8 @@ void create_gauge_fixed_wall_source(spinor_field *source, int tau, int color)
   }
   for (beta = 0; beta < 4; ++beta)
   {
-    start_sf_sendrecv(source + beta);
-    complete_sf_sendrecv(source + beta);
+    start_sendrecv_spinor_field_f(source + beta);
+    complete_sendrecv_spinor_field_f(source + beta);
   }
 }
 
@@ -506,8 +506,8 @@ void create_sequential_source(spinor_field *source, int tf, spinor_field *prop)
   }
   for (beta = 0; beta < 4 * NF; ++beta)
   {
-    start_sf_sendrecv(source + beta);
-    complete_sf_sendrecv(source + beta);
+    start_sendrecv_spinor_field_f(source + beta);
+    complete_sendrecv_spinor_field_f(source + beta);
   }
 }
 
@@ -549,8 +549,8 @@ void create_sequential_source_stoch(spinor_field *source, int tf, spinor_field *
   }
   for (beta = 0; beta < 4; ++beta)
   {
-    start_sf_sendrecv(source + beta);
-    complete_sf_sendrecv(source + beta);
+    start_sendrecv_spinor_field_f(source + beta);
+    complete_sendrecv_spinor_field_f(source + beta);
   }
 }
 
@@ -571,8 +571,8 @@ void create_sequential_source_stoch(spinor_field *source, int tf, spinor_field *
   }
   }
   for (beta=0;beta<4;++beta){
-  start_sf_sendrecv(source + beta);
-  complete_sf_sendrecv(source + beta);
+  start_sendrecv_spinor_field_f(source + beta);
+  complete_sendrecv_spinor_field_f(source + beta);
   }
   }*/
 
@@ -601,8 +601,8 @@ void create_gauge_fixed_momentum_source(spinor_field *source, int pt, int px, in
         }
   for (beta = 0; beta < 4; ++beta)
   {
-    start_sf_sendrecv(source + beta);
-    complete_sf_sendrecv(source + beta);
+    start_sendrecv_spinor_field_f(source + beta);
+    complete_sendrecv_spinor_field_f(source + beta);
   }
 }
 
@@ -635,8 +635,8 @@ void add_momentum(spinor_field *out, spinor_field *in, int px, int py, int pz)
 
   for (beta = 0; beta < 4; ++beta)
   {
-    start_sf_sendrecv(out + beta);
-    complete_sf_sendrecv(out + beta);
+    start_sendrecv_spinor_field_f(out + beta);
+    complete_sendrecv_spinor_field_f(out + beta);
   }
 }
 
@@ -670,8 +670,8 @@ void create_diluted_volume_source(spinor_field *source, int parity_component, in
 
   for (beta = 0; beta < 4; ++beta)
   {
-    start_sf_sendrecv(source + beta);
-    complete_sf_sendrecv(source + beta);
+    start_sendrecv_spinor_field_f(source + beta);
+    complete_sendrecv_spinor_field_f(source + beta);
   }
 }
 

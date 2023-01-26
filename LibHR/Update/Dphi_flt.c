@@ -234,7 +234,7 @@ void Dphi_flt_cpu_(spinor_field_flt * restrict out, spinor_field_flt * restrict 
 #ifdef WITH_MPI
   _OMP_PRAGMA(master)
   {
-    start_sf_sendrecv_flt(in);
+    start_sendrecv_spinor_field_f_flt(in);
   }
   _OMP_BARRIER //why do we need this barrier?
 #endif
@@ -428,7 +428,7 @@ void Dphi_flt_cpu_(spinor_field_flt * restrict out, spinor_field_flt * restrict 
       /* wait for spinor to be transfered */
       _OMP_PRAGMA(master)
       {
-        complete_sf_sendrecv_flt(in);
+        complete_sendrecv_spinor_field_f_flt(in);
       }
       _OMP_BARRIER
     }
@@ -463,13 +463,13 @@ void Dphi_flt_cpu_(spinor_field_flt *out, spinor_field_flt *in)
  
 /************************ loop over all lattice sites *************************/
    /* start communication of input spinor field */
-   start_sf_sendrecv_flt(in);
+   start_sendrecv_spinor_field_f_flt(in);
   
    _PIECE_FOR(out->type,ixp) {
      if(ixp==out->type->inner_master_pieces) {
        _OMP_PRAGMA( master )
        /* wait for spinor to be transfered */
-       complete_sf_sendrecv_flt(in);
+       complete_sendrecv_spinor_field_f_flt(in);
        _OMP_PRAGMA( barrier )
      }
      _SITE_FOR(out->type,ixp,ix) {

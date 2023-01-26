@@ -59,8 +59,22 @@ void init_neighbors_gpu()
   error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error adding Z_EXT to global constant memory.\n");
   #endif
 
-  cudaMalloc((void **)&geometryBoxes_gpu, sizeof(box_t));
-  cudaMemcpy(geometryBoxes_gpu, geometryBoxes, sizeof(box_t), cudaMemcpyHostToDevice);
+  box_t *L = geometryBoxes;
+  int number_of_boxes = 0;
+  do {
+    number_of_boxes++;
+  } while (L=L->next);
+
+  cudaMalloc((void **)&geometryBoxes_gpu, number_of_boxes*sizeof(box_t));
+
+  L = geometryBoxes;
+  int i = 0;
+  do {
+    cudaMemcpy(&geometryBoxes_gpu[i], L, sizeof(box_t), cudaMemcpyHostToDevice);
+    ++i;
+  } while (L=L->next);
+
+  
   #endif
 }
 

@@ -221,8 +221,8 @@ void smear_gauge_field()
 		}
 	}
 
-	start_gf_sendrecv(u_gauge_s);
-	complete_gf_sendrecv(u_gauge_s);
+	start_sendrecv_gfield(u_gauge_s);
+	complete_sendrecv_gfield(u_gauge_s);
 
 #endif
 }
@@ -296,8 +296,8 @@ void smeared_gauge_force(suNg_av_field *force, suNg_av_field *momenta)
 	}
 
 	// Communicate field
-	start_gf_sendrecv(Lt);
-	complete_gf_sendrecv(Lt);
+	start_sendrecv_gfield(Lt);
+	complete_sendrecv_gfield(Lt);
 
 	// Now the derivative of the plaquette
 	_MASTER_FOR(&glattice, ix)

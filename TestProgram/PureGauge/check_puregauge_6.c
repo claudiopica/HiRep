@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
 
   lprintf("MAIN", 0, "Generating a random gauge field... ");
   random_u(u_gauge);
-  start_gf_sendrecv(u_gauge);
+  start_sendrecv_gfield(u_gauge);
   represent_gauge_field();
   lprintf("MAIN", 0, "done.\n\n");
   error(NP_X != 1, 0, "MAIN", "NP_X direction must be 1 for poly_legs measures\n");

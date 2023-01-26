@@ -816,10 +816,10 @@ void force_fermion_core(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, d
 #endif //UPDATE_EO
 
 	// Communicate spinor field
-	start_sf_sendrecv(Xs);
-	complete_sf_sendrecv(Xs);
-	start_sf_sendrecv(Ys);
-	complete_sf_sendrecv(Ys);
+	start_sendrecv_spinor_field_f(Xs);
+	complete_sendrecv_spinor_field_f(Xs);
+	start_sendrecv_spinor_field_f(Ys);
+	complete_sendrecv_spinor_field_f(Ys);
 
 	// HERE!!!!!
 #if defined(WITH_CLOVER)
@@ -947,8 +947,8 @@ void force_fermion_core(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, d
 #endif
 
 	// Communicate spinor field
-	start_sf_sendrecv(Xs);
-	start_sf_sendrecv(Ys);
+	start_sendrecv_spinor_field_f(Xs);
+	start_sendrecv_spinor_field_f(Ys);
 
 	// HERE!!!!!
 #if defined(WITH_CLOVER)
@@ -972,8 +972,8 @@ void force_fermion_core(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, d
 		{
 			_OMP_PRAGMA(master)
 			{
-				complete_sf_sendrecv(Xs);
-				complete_sf_sendrecv(Ys);
+				complete_sendrecv_spinor_field_f(Xs);
+				complete_sendrecv_spinor_field_f(Ys);
 			}
 			_OMP_PRAGMA(barrier)
 		}

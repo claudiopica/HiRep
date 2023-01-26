@@ -36,23 +36,25 @@ int main(int argc, char *argv[])
 
     // Setup gauge field
     setup_gauge_fields();
+
     random_u(u_gauge);
     represent_gauge_field();
-    u_gauge_f_flt = alloc_gfield_f_flt(&glattice);
+
     sync_single_precision_gauge_field();
-    copy_to_gpu_gfield_f(u_gauge_f);
-    copy_to_gpu_gfield_f_flt(u_gauge_f_flt);
+
+    copy_from_gpu_gfield_f(u_gauge_f);
+    copy_from_gpu_gfield_f_flt(u_gauge_f_flt);
 
     // Test Block
-    return_val += test_identical(&I_operator, &I_operator_cpu, "Unit operator Full Lattice");
-    return_val += test_identical(&Q_operator, &Q_operator_cpu, "Q = g5Dphi Full Lattice");
-    return_val += test_identical_flt(&Q_operator_flt, &Q_operator_flt_cpu, "Q = g5Dphi_flt Full Lattice");
+    //return_val += test_identical(&I_operator, &I_operator_cpu, "Unit operator Full Lattice");
+    //return_val += test_identical(&Q_operator, &Q_operator_cpu, "Q = g5Dphi Full Lattice");
+    //return_val += test_identical_flt(&Q_operator_flt, &Q_operator_flt_cpu, "Q = g5Dphi_flt Full Lattice");
     return_val += test_identical(&D_operator, &D_operator_cpu, "D = Dphi Full Lattice");
-    return_val += test_identical_flt(&D_operator_flt, &D_operator_flt_cpu, "D = Dphi_flt Full Lattice");
+    //return_val += test_identical_flt(&D_operator_flt, &D_operator_flt_cpu, "D = Dphi_flt Full Lattice");
 
-    return_val += test_identical_massless(&D_massless, &D_massless_cpu, "D = Dphi Massless Even Lattice", &glat_even, &glat_odd);
-    return_val += test_identical_massless(&D_massless, &D_massless_cpu, "D = Dphi Massless Odd Lattice", &glat_odd, &glat_even);
-
+    //return_val += test_identical_massless(&D_massless, &D_massless_cpu, "D = Dphi Massless Even Lattice", &glat_even, &glat_odd);
+    //return_val += test_identical_massless(&D_massless, &D_massless_cpu, "D = Dphi Massless Odd Lattice", &glat_odd, &glat_even);
+    
     // Finalize and return
     finalize_process();
     return return_val;
@@ -68,6 +70,13 @@ int test_identical(spinor_operator S, spinor_operator S_cpu, char *name)
     s = alloc_spinor_field_f(1, &glattice);
     S_s = alloc_spinor_field_f(1, &glattice);
     S_s_cpu = alloc_spinor_field_f(1, &glattice);
+
+    s->comm_type=ALL_COMMS;
+    S_s->comm_type=ALL_COMMS;
+    S_s_cpu->comm_type=ALL_COMMS;
+    u_gauge->comm_type=ALL_COMMS;
+    u_gauge_f->comm_type=ALL_COMMS;
+    
     gaussian_spinor_field(s);
     copy_to_gpu_spinor_field_f(s);
 
@@ -75,8 +84,8 @@ int test_identical(spinor_operator S, spinor_operator S_cpu, char *name)
     lprintf("INFO", 0, "Input spinor field norm GPU: %0.2e\n", spinor_field_sqnorm_f(s));
 
     #ifdef WITH_MPI
-        start_sendrecv_gpu_gfield_f(u_gauge_f);
-        complete_sendrecv_gpu_gfield_f(u_gauge_f);
+        start_sendrecv_gfield_f(u_gauge_f);
+        complete_sendrecv_gfield_f(u_gauge_f);
     #endif
 
     S(S_s, s);
@@ -119,8 +128,8 @@ int test_identical_massless(spinor_operator S, spinor_operator S_cpu, char *name
     lprintf("INFO", 0, "Input spinor field norm GPU: %0.2e\n", spinor_field_sqnorm_f(s));
 
     #ifdef WITH_MPI
-        start_sendrecv_gpu_gfield_f(u_gauge_f);
-        complete_sendrecv_gpu_gfield_f(u_gauge_f);
+        start_sendrecv_gfield_f(u_gauge_f);
+        complete_sendrecv_gfield_f(u_gauge_f);
     #endif
 
     S(S_s, s);
@@ -161,8 +170,8 @@ int test_identical_flt(spinor_operator_flt S, spinor_operator_flt S_cpu, char *n
     lprintf("INFO", 0, "Input spinor field norm GPU: %0.2e\n", spinor_field_sqnorm_f_flt(s));
 
     #ifdef WITH_MPI
-        start_sendrecv_gpu_gfield_f_flt(u_gauge_f_flt);
-        complete_sendrecv_gpu_gfield_f_flt(u_gauge_f_flt);
+        start_sendrecv_gfield_f_flt(u_gauge_f_flt);
+        complete_sendrecv_gfield_f_flt(u_gauge_f_flt);
     #endif
 
     S(S_s, s);

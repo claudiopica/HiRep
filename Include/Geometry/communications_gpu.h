@@ -13,7 +13,14 @@
 
 #ifdef WITH_GPU
 
+#define _CONCAT_GPU(_name,_suffix) _name ## _suffix ## _gpu
+#define _GPU_F_NAME(_name,_suffix) _CONCAT_GPU(_name,_suffix)
+
+#define CONCAT(_name, _suffix) _name ## _suffix
+#define _F_NAME(_name, _suffix) CONCAT(_name, _suffix)
+
 #include "spinor_field.h"
+#include "geometry.h"
 
 #ifdef __cplusplus
     extern "C" {
@@ -26,14 +33,14 @@
     /* @param ##_field_type		##_human_readable that needs to be synchronized */ \
     /*                          across nodes */ \
     /* */ \
-void complete_sendrecv_gpu_##_name(_field_type*); \
+void _F_NAME(complete_sendrecv_,_name)(_field_type*); \
 /** */ \
     /* @brief Fill buffers and start MPI requests to send and receive. */\
     /* */ \
     /* @param ##_field_type		##_human_readable that needs to be synchronized */ \
     /*                          across nodes */ \
     /* */ \
-void start_sendrecv_gpu_##_name(_field_type*); \
+void _F_NAME(start_sendrecv_,_name)(_field_type*); \
 /** */ \
     /* @brief Sync field before communications. This can mean different things */ \
     /*    depending on geometry implementation. */ \
@@ -41,9 +48,9 @@ void start_sendrecv_gpu_##_name(_field_type*); \
     /* @param ##_field_type      ##_human_readable that needs to be synchronized */ \
     /*                           on the local lattice. */ \
     /* */ \
-void sync_gpu_##_name(_field_type*); \
-void fill_buffers_##_name(_field_type*); \
-void fill_buffers_with_zeroes_##_name(_field_type*); 
+void _GPU_F_NAME(sync_,_name)(_field_type*); \
+void _F_NAME(fill_buffers_,_name)(_field_type*); \
+void _F_NAME(fill_buffers_with_zeroes_,_name)(_field_type*); 
 
 _DECLARE_COMMS(spinor_field_f, spinor_field, "Spinor field");
 _DECLARE_COMMS(spinor_field_f_flt, spinor_field_flt, "Single precision spinor field");
@@ -61,7 +68,10 @@ _DECLARE_COMMS(clover_force, suNf_field, "Clover force");
 _DECLARE_COMMS(staple_field, suNg_field, "Staple Field");
 
 #undef _DECLARE_COMMS
-
+#undef _CONCAT_GPU
+#undef _GPU_F_NAME
+#undef CONCAT
+#undef _F_NAME
 #ifdef __cplusplus
 }
 #endif

@@ -7,7 +7,6 @@
 * NOCOMPILE= BC_Z_ANTIPERIODIC
 * NOCOMPILE= BASIC_SF
 * NOCOMPILE= ROTATED_SF
-* NOCOMPILE= WITH_GPU
 *
 * Testing the spin structure & printing the gamma matrices
 *
@@ -45,6 +44,10 @@ int compute_gamma(int g[4], int ic)
   in = alloc_spinor_field_f(1, &glattice);
   out = alloc_spinor_field_f(1, &glattice);
 
+  #ifdef WITH_GPU
+    copy_to_gpu_gfield(u_gauge);
+  #endif
+
   for (int mu = 0; mu < 4; mu++)
     for (int beta = 0; beta < 4; beta++)
       for (int alpha = 0; alpha < 4; alpha++)
@@ -78,7 +81,8 @@ int compute_gamma(int g[4], int ic)
       int ix = ipt(c[0], c[1], c[2], c[3]);
       _suNg_unit(*_4FIELD_AT(u_gauge, ix, mu));
     }
-    start_gf_sendrecv(u_gauge);
+
+    start_sendrecv_gfield(u_gauge);
     represent_gauge_field();
 
     dbl = 0.;
@@ -228,7 +232,7 @@ int main(int argc, char *argv[])
   random_u(u_gauge);
   lprintf("MAIN", 0, "done.\n");
 
-  start_gf_sendrecv(u_gauge);
+  start_sendrecv_gfield(u_gauge);
 
   represent_gauge_field();
 

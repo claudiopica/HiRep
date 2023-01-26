@@ -236,7 +236,7 @@ static void write_gauge_field_hirep(char filename[], double subs)
   struct timeval start, end, etime;
 
 #ifndef ALLOCATE_REPR_GAUGE_FIELD
-  complete_gf_sendrecv(u_gauge);
+  complete_sendrecv_gfield(u_gauge);
   apply_BCs_on_represented_gauge_field(); //Save the link variables with periodic boundary conditions
 #endif
 
@@ -324,7 +324,7 @@ static void write_gauge_field_hirep(char filename[], double subs)
   lprintf("IO", 0, "Configuration [%s] saved [%ld sec %ld usec]\n", filename, etime.tv_sec, etime.tv_usec);
 
 #ifndef ALLOCATE_REPR_GAUGE_FIELD
-  complete_gf_sendrecv(u_gauge);
+  complete_sendrecv_gfield(u_gauge);
   apply_BCs_on_represented_gauge_field(); //Restore the right boundary conditions
 #endif
 }

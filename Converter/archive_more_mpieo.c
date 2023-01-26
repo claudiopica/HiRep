@@ -304,8 +304,8 @@ void read_gauge_field_mpieo_LE(char filename[])
   free(buff);
 
   /* start sendrecv of global gauge field */
-  start_gf_sendrecv(u_gauge);
-  complete_gf_sendrecv(u_gauge);
+  start_sendrecv_gfield(u_gauge);
+  complete_sendrecv_gfield(u_gauge);
 
   /* check average plaquette */
   testplaq=avr_plaquette();
