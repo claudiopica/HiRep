@@ -1,6 +1,7 @@
 /*******************************************************************************
 *
-* NOCOMPILE = !WITH_MPI && WITH_GPU
+* NOCOMPILE= !WITH_MPI
+* NOCOMPILE= WITH_GPU
 *
 * Check communication of gauge field in T direction
 *

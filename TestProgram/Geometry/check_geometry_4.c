@@ -1,7 +1,5 @@
 /*******************************************************************************
 *
-* NOCOMPILE= WITH_GPU
-*
 * Check communication of gauge field in T direction
 *
 *******************************************************************************/
@@ -27,6 +25,9 @@ void spinor_field_one_f(spinor_field *s1) {
     for (int i=0;i<size;i++) {
         p[i] = 1.0;
     }
+    #ifdef WITH_GPU
+        copy_to_gpu_spinor_field_f(s1);
+    #endif
 }
 
 int main(int argc, char *argv[])

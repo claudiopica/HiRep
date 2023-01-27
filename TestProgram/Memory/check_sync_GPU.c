@@ -92,7 +92,7 @@ int test_sync_identical_to_cpu_spinor_field_f(geometry_descriptor *gd)
     memcpy(sendbuf_cpu, f->sendbuf_ptr, sendbuf_len*sizeof(suNf_spinor));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
-    sync_gpu_spinor_field_f(f);
+    sync_spinor_field_f_gpu(f);
     suNf_spinor* sendbuf_gpu = (suNf_spinor*)malloc(sendbuf_len*sizeof(suNf_spinor));
     cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, sendbuf_len*sizeof(suNf_spinor), cudaMemcpyDeviceToHost);
 
@@ -151,7 +151,7 @@ int test_sync_identical_to_cpu_spinor_field_f_flt(geometry_descriptor *gd)
     memcpy(sendbuf_cpu, f->sendbuf_ptr, sendbuf_len*sizeof(suNf_spinor_flt));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
-    sync_gpu_spinor_field_f_flt(f);
+    sync_spinor_field_f_flt_gpu(f);
     suNf_spinor_flt* sendbuf_gpu = (suNf_spinor_flt*)malloc(sendbuf_len*sizeof(suNf_spinor_flt));
     cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, sendbuf_len*sizeof(suNf_spinor_flt), cudaMemcpyDeviceToHost);
 
@@ -210,7 +210,7 @@ int test_sync_identical_to_cpu_sfield(geometry_descriptor *gd)
     memcpy(sendbuf_cpu, f->sendbuf_ptr, sendbuf_len*sizeof(double));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
-    sync_gpu_sfield(f);
+    sync_sfield_gpu(f);
     double* sendbuf_gpu = (double*)malloc(sendbuf_len*sizeof(double));
     cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, sendbuf_len*sizeof(double), cudaMemcpyDeviceToHost);
 
@@ -261,7 +261,7 @@ int test_sync_identical_to_cpu_gfield()
     memcpy(sendbuf_cpu, f->sendbuf_ptr, 4*sendbuf_len*sizeof(suNg));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
-    sync_gpu_gfield(f);
+    sync_gfield_gpu(f);
     suNg* sendbuf_gpu = (suNg*)malloc(4*sendbuf_len*sizeof(suNg));
     cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, 4*sendbuf_len*sizeof(suNg), cudaMemcpyDeviceToHost);
 
@@ -321,7 +321,7 @@ int test_sync_identical_to_cpu_gfield_f()
     memcpy(sendbuf_cpu, f->sendbuf_ptr, 4*sendbuf_len*sizeof(suNf));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
-    sync_gpu_gfield_f(f);
+    sync_gfield_f_gpu(f);
     suNf* sendbuf_gpu = (suNf*)malloc(4*sendbuf_len*sizeof(suNf));
     cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, 4*sendbuf_len*sizeof(suNf), cudaMemcpyDeviceToHost);
 
@@ -381,7 +381,7 @@ int test_sync_identical_to_cpu_gfield_flt()
     memcpy(sendbuf_cpu, f->sendbuf_ptr, 4*sendbuf_len*sizeof(suNg_flt));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
-    sync_gpu_gfield_flt(f);
+    sync_gfield_flt_gpu(f);
     suNg_flt* sendbuf_gpu = (suNg_flt*)malloc(4*sendbuf_len*sizeof(suNg_flt));
     cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, 4*sendbuf_len*sizeof(suNg_flt), cudaMemcpyDeviceToHost);
 
@@ -441,7 +441,7 @@ int test_sync_identical_to_cpu_gfield_f_flt()
     memcpy(sendbuf_cpu, f->sendbuf_ptr, 4*sendbuf_len*sizeof(suNf_flt));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
-    sync_gpu_gfield_f_flt(f);
+    sync_gfield_f_flt_gpu(f);
     suNf_flt* sendbuf_gpu = (suNf_flt*)malloc(4*sendbuf_len*sizeof(suNf_flt));
     cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, 4*sendbuf_len*sizeof(suNf_flt), cudaMemcpyDeviceToHost);
 
@@ -501,7 +501,7 @@ int test_sync_identical_to_cpu_suNg_scalar_field()
     memcpy(sendbuf_cpu, f->sendbuf_ptr, sendbuf_len*sizeof(suNg_vector));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
-    sync_gpu_suNg_scalar_field(f);
+    sync_suNg_scalar_field_gpu(f);
     suNg_vector* sendbuf_gpu = (suNg_vector*)malloc(sendbuf_len*sizeof(suNg_vector));
     cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, sendbuf_len*sizeof(suNg_vector), cudaMemcpyDeviceToHost);
 
@@ -559,7 +559,7 @@ int test_sync_identical_to_cpu_avfield()
     memcpy(sendbuf_cpu, f->sendbuf_ptr, 4*sendbuf_len*sizeof(suNg_algebra_vector));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
-    sync_gpu_avfield(f);
+    sync_avfield_gpu(f);
     suNg_algebra_vector* sendbuf_gpu = (suNg_algebra_vector*)malloc(4*sendbuf_len*sizeof(suNg_algebra_vector));
     cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, 4*sendbuf_len*sizeof(suNg_algebra_vector), cudaMemcpyDeviceToHost);
 
@@ -617,7 +617,7 @@ int test_sync_identical_to_cpu_gtransf()
     memcpy(sendbuf_cpu, f->sendbuf_ptr, sendbuf_len*sizeof(suNg));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
-    sync_gpu_gtransf(f);
+    sync_gtransf_gpu(f);
     suNg* sendbuf_gpu = (suNg*)malloc(sendbuf_len*sizeof(suNg));
     cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, sendbuf_len*sizeof(suNg), cudaMemcpyDeviceToHost);
 
@@ -674,7 +674,7 @@ int test_sync_identical_to_cpu_clover_ldl()
     memcpy(sendbuf_cpu, f->sendbuf_ptr, sendbuf_len*sizeof(ldl_t));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
-    sync_gpu_clover_ldl(f);
+    sync_clover_ldl_gpu(f);
     ldl_t* sendbuf_gpu = (ldl_t*)malloc(sendbuf_len*sizeof(ldl_t));
     cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, sendbuf_len*sizeof(ldl_t), cudaMemcpyDeviceToHost);
 
@@ -733,7 +733,7 @@ int test_sync_identical_to_cpu_clover_term()
     memcpy(sendbuf_cpu, f->sendbuf_ptr, 4*sendbuf_len*sizeof(suNfc));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
-    sync_gpu_clover_term(f);
+    sync_clover_term_gpu(f);
     suNfc* sendbuf_gpu = (suNfc*)malloc(4*sendbuf_len*sizeof(suNfc));
     cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, 4*sendbuf_len*sizeof(suNfc), cudaMemcpyDeviceToHost);
 
@@ -793,7 +793,7 @@ int test_sync_identical_to_cpu_clover_force()
     memcpy(sendbuf_cpu, f->sendbuf_ptr, 6*sendbuf_len*sizeof(suNf));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
-    sync_gpu_clover_force(f);
+    sync_clover_force_gpu(f);
     suNf* sendbuf_gpu = (suNf*)malloc(6*sendbuf_len*sizeof(suNf));
     cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, 6*sendbuf_len*sizeof(suNf), cudaMemcpyDeviceToHost);
 

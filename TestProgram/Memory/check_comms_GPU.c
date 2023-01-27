@@ -85,8 +85,8 @@ int test_comms_spinor_field_f(geometry_descriptor *gd)
     lprintf("SANITY CHECK", 0, "[In field GPU copy norm unequal zero: %0.2e]\n", sqnorm_start);
     
     // Execute communications
-    start_sendrecv_gpu_spinor_field_f(f);
-    complete_sendrecv_gpu_spinor_field_f(f);
+    start_sendrecv_spinor_field_f(f);
+    complete_sendrecv_spinor_field_f(f);
 
     // Evaluate sqnorm after comms
     double sqnorm_end = spinor_field_sqnorm_f(f);
@@ -116,8 +116,8 @@ int test_comms_spinor_field_f_flt(geometry_descriptor *gd)
     lprintf("SANITY CHECK", 0, "[In field GPU copy norm unequal zero: %0.2e]\n", sqnorm_start);
     
     // Execute communications
-    start_sendrecv_gpu_spinor_field_f_flt(f);
-    complete_sendrecv_gpu_spinor_field_f_flt(f);
+    start_sendrecv_spinor_field_f_flt(f);
+    complete_sendrecv_spinor_field_f_flt(f);
 
     // Evaluate sqnorm after comms
     double sqnorm_end = spinor_field_sqnorm_f_flt(f);
@@ -147,8 +147,8 @@ int test_comms_sfield(geometry_descriptor *gd)
     copy_to_gpu_sfield(f);
     
     // Execute communications
-    start_sendrecv_gpu_sfield(f);
-    complete_sendrecv_gpu_sfield(f);
+    start_sendrecv_sfield(f);
+    complete_sendrecv_sfield(f);
 
     // Evaluate sqnorm after comms
     copy_from_gpu_sfield(f);
@@ -179,8 +179,8 @@ int test_comms_gfield()
     copy_to_gpu_gfield(f);
     
     // Execute communications
-    start_sendrecv_gpu_gfield(f);
-    complete_sendrecv_gpu_gfield(f);
+    start_sendrecv_gfield(f);
+    complete_sendrecv_gfield(f);
 
     // Evaluate sqnorm after comms
     copy_from_gpu_gfield(f);
@@ -211,8 +211,8 @@ int test_comms_gfield_flt()
     copy_to_gpu_gfield_flt(f);
     
     // Execute communications
-    start_sendrecv_gpu_gfield_flt(f);
-    complete_sendrecv_gpu_gfield_flt(f);
+    start_sendrecv_gfield_flt(f);
+    complete_sendrecv_gfield_flt(f);
 
     // Evaluate sqnorm after comms
     copy_from_gpu_gfield_flt(f);
@@ -243,8 +243,8 @@ int test_comms_gfield_f()
     copy_to_gpu_gfield_f(f);
     
     // Execute communications
-    start_sendrecv_gpu_gfield_f(f);
-    complete_sendrecv_gpu_gfield_f(f);
+    start_sendrecv_gfield_f(f);
+    complete_sendrecv_gfield_f(f);
 
     // Evaluate sqnorm after comms
     copy_from_gpu_gfield_f(f);
@@ -275,8 +275,8 @@ int test_comms_gfield_f_flt()
     copy_to_gpu_gfield_f_flt(f);
     
     // Execute communications
-    start_sendrecv_gpu_gfield_f_flt(f);
-    complete_sendrecv_gpu_gfield_f_flt(f);
+    start_sendrecv_gfield_f_flt(f);
+    complete_sendrecv_gfield_f_flt(f);
 
     // Evaluate sqnorm after comms
     copy_from_gpu_gfield_f_flt(f);
@@ -307,8 +307,8 @@ int test_comms_suNg_scalar_field()
     copy_to_gpu_suNg_scalar_field(f);
     
     // Execute communications
-    start_sendrecv_gpu_suNg_scalar_field(f);
-    complete_sendrecv_gpu_suNg_scalar_field(f);
+    start_sendrecv_suNg_scalar_field(f);
+    complete_sendrecv_suNg_scalar_field(f);
 
     // Evaluate sqnorm after comms
     copy_from_gpu_suNg_scalar_field(f);
@@ -339,8 +339,8 @@ int test_comms_avfield()
     copy_to_gpu_avfield(f);
     
     // Execute communications
-    start_sendrecv_gpu_avfield(f);
-    complete_sendrecv_gpu_avfield(f);
+    start_sendrecv_avfield(f);
+    complete_sendrecv_avfield(f);
 
     // Evaluate sqnorm after comms
     copy_from_gpu_avfield(f);
@@ -371,8 +371,8 @@ int test_comms_gtransf()
     copy_to_gpu_gtransf(f);
     
     // Execute communications
-    start_sendrecv_gpu_gtransf(f);
-    complete_sendrecv_gpu_gtransf(f);
+    start_sendrecv_gtransf(f);
+    complete_sendrecv_gtransf(f);
 
     // Evaluate sqnorm after comms
     copy_from_gpu_gtransf(f);
@@ -403,8 +403,8 @@ int test_comms_clover_ldl()
     copy_to_gpu_clover_ldl(f);
     
     // Execute communications
-    start_sendrecv_gpu_clover_ldl(f);
-    complete_sendrecv_gpu_clover_ldl(f);
+    start_sendrecv_clover_ldl(f);
+    complete_sendrecv_clover_ldl(f);
 
     // Evaluate sqnorm after comms
     copy_from_gpu_clover_ldl(f);
@@ -435,8 +435,8 @@ int test_comms_clover_term()
     copy_to_gpu_clover_term(f);
     
     // Execute communications
-    start_sendrecv_gpu_clover_term(f);
-    complete_sendrecv_gpu_clover_term(f);
+    start_sendrecv_clover_term(f);
+    complete_sendrecv_clover_term(f);
 
     // Evaluate sqnorm after comms
     copy_from_gpu_clover_term(f);
@@ -467,8 +467,8 @@ int test_comms_clover_force()
     copy_to_gpu_clover_force(f);
     
     // Execute communications
-    start_sendrecv_gpu_clover_force(f);
-    complete_sendrecv_gpu_clover_force(f);
+    start_sendrecv_clover_force(f);
+    complete_sendrecv_clover_force(f);
 
     // Evaluate sqnorm after comms
     copy_from_gpu_clover_force(f);
