@@ -31,6 +31,8 @@ int main(int argc, char *argv[])
     // Init
     int return_val = 0;
 
+    std_comm_t = ALL_COMMS; // Communications of both the CPU and GPU field copy are necessary
+
     // Setup process and communication
     setup_process(&argc, &argv);
 
@@ -70,12 +72,6 @@ int test_identical(spinor_operator S, spinor_operator S_cpu, char *name)
     s = alloc_spinor_field_f(1, &glattice);
     S_s = alloc_spinor_field_f(1, &glattice);
     S_s_cpu = alloc_spinor_field_f(1, &glattice);
-
-    s->comm_type=ALL_COMMS;
-    S_s->comm_type=ALL_COMMS;
-    S_s_cpu->comm_type=ALL_COMMS;
-    u_gauge->comm_type=ALL_COMMS;
-    u_gauge_f->comm_type=ALL_COMMS;
 
     gaussian_spinor_field(s);
     copy_to_gpu_spinor_field_f(s);
@@ -121,12 +117,6 @@ int test_identical_massless(spinor_operator S, spinor_operator S_cpu, char *name
     S_s = alloc_spinor_field_f(1, gd2);
     S_s_cpu = alloc_spinor_field_f(1, gd2);
 
-    s->comm_type=ALL_COMMS;
-    S_s->comm_type=ALL_COMMS;
-    S_s_cpu->comm_type=ALL_COMMS;
-    u_gauge->comm_type=ALL_COMMS;
-    u_gauge_f->comm_type=ALL_COMMS;
-
     gaussian_spinor_field(s);
     spinor_field_zero_f(S_s);
     copy_to_gpu_spinor_field_f(s);
@@ -170,13 +160,6 @@ int test_identical_flt(spinor_operator_flt S, spinor_operator_flt S_cpu, char *n
     s = alloc_spinor_field_f_flt(1, &glattice);
     S_s = alloc_spinor_field_f_flt(1, &glattice);
     S_s_cpu = alloc_spinor_field_f_flt(1, &glattice);
-
-    s->comm_type=ALL_COMMS;
-    S_s->comm_type=ALL_COMMS;
-    S_s_cpu->comm_type=ALL_COMMS;
-    u_gauge->comm_type=ALL_COMMS;
-    u_gauge_f->comm_type=ALL_COMMS;
-    u_gauge_f_flt->comm_type=ALL_COMMS;
 
     gaussian_spinor_field_flt(s);
     copy_to_gpu_spinor_field_f_flt(s);

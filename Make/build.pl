@@ -136,8 +136,6 @@ my @libs = ("libhr.a"); #this is for later programs to use
   my %exclude = ( Integrators => [ "check_integrator_utils_1.c", ], 
                   Utils => [ "check_utils_3_gb_functions.c", "check_utils_3_tor_functions.c", 
                   ], 
-                  DiracOperator => ["check_diracoperator_1_gpu.c", "check_diracoperator_2_gpu.c", "check_diracoperator_3_gpu.c", "check_diracoperator_6_gpu.c"
-                  ], 
                   Geometry => ["test_com_speed.c", #not a test, this should be a separate exe. It is also broken
                   ], 
   );

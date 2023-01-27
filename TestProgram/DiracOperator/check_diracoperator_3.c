@@ -60,7 +60,8 @@ int test_herm(spinor_operator S, char *name)
     return_val = 1;
   }
   else
-    lprintf("RESULT", 0, "OK ");
+
+  lprintf("RESULT", 0, "OK ");
   lprintf("RESULT", 0, "[norm = %e]\n", tau);
 
   free_spinor_field_f(s1);
@@ -72,9 +73,7 @@ int main(int argc, char *argv[])
   int return_value;
   /* setup process id and communications */
   logger_map("DEBUG", "debug");
-
   setup_process(&argc, &argv);
-
   setup_gauge_fields();
 
   lprintf("MAIN", 0, "Generating a random gauge field... ");
@@ -82,13 +81,10 @@ int main(int argc, char *argv[])
   lprintf("MAIN", 0, "done.\n");
 
   start_sendrecv_gfield(u_gauge);
-
   represent_gauge_field();
-
   return_value=test_herm(&MM, "M");
 
   finalize_process();
-
   return return_value;
 }
 

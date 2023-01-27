@@ -15,7 +15,6 @@
 
 double hmass = 0.1;
 
-
 static suNf_spinor mul_gamma(int mu, suNf_spinor s)
 {
   suNf_spinor r;
@@ -75,9 +74,7 @@ int main(int argc, char *argv[])
 
   /* setup process id and communications */
   logger_map("DEBUG", "debug");
-
   setup_process(&argc, &argv);
-
   setup_gauge_fields();
 
   lprintf("MAIN", 0, "Action of Qhat on plane waves\n");
@@ -223,6 +220,7 @@ int main(int argc, char *argv[])
     complete_sendrecv_spinor_field_f(ps0);
 
     #ifdef WITH_GPU
+    // After copy back to device we need to communicate again
       start_sendrecv_gfield_f(u_gauge_f);
       complete_sendrecv_gfield_f(u_gauge_f);
     #endif

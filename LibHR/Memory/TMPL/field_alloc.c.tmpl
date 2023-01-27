@@ -71,11 +71,7 @@ _FUNC_STATIC(allocate_cpu_field_data_, (unsigned int n, _FIELD_TYPE *f, geometry
 
 _FUNC_STATIC(assign_comm_type_, (unsigned int n, _FIELD_TYPE *f)) {
     for (int i = 0; i < n; ++i) {
-        #ifdef WITH_GPU
-            f[i].comm_type = GPU_COMM;
-        #else
-            f[i].comm_type = CPU_COMM;
-        #endif
+        f[i].comm_type = std_comm_t;
     }
 }
 

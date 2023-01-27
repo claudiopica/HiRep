@@ -11,7 +11,6 @@ static suNg_field *g;
 
 static void loc_D(spinor_field *out, spinor_field *in)
 {
-
   Dphi(hmass, out, in);
 }
 
@@ -21,7 +20,6 @@ static void random_g(void)
   {
     random_suNg(_FIELD_AT(g, ix));
   }
-
   #ifdef WITH_GPU
     copy_to_gpu_gtransf(g);
   #endif
@@ -55,7 +53,6 @@ static void transform_u(void)
   #endif
 
   start_sendrecv_gfield(u_gauge);
-  complete_sendrecv_gfield(u_gauge);
   represent_gauge_field();
   smear_gauge_field();
 }
@@ -64,8 +61,6 @@ static void transform_s(spinor_field *out, spinor_field *in)
 {
   #ifdef WITH_GPU
     copy_from_gpu_spinor_field_f(in);
-    start_sendrecv_spinor_field_f(in);
-    complete_sendrecv_spinor_field_f(in);
   #endif
 
   _MASTER_FOR(&glattice, ix)
@@ -93,11 +88,12 @@ int main(int argc, char *argv[])
   int return_value = 1;
   double sig, tau;
   spinor_field *s0, *s1, *s2, *s3;
+  #ifdef WITH_GPU
+  std_comm_t = ALL_COMMS; // Communications of both the CPU and GPU field copy are necessary
+  #endif
 
   logger_map("DEBUG", "debug");
-
   setup_process(&argc, &argv);
-
   setup_gauge_fields();
 
   /* allocate additional memory */
@@ -106,16 +102,6 @@ int main(int argc, char *argv[])
   s1 = s0 + 1;
   s2 = s1 + 1;
   s3 = s2 + 1;
-  #ifdef WITH_GPU
-  //TODO: Set a default allocation before allocation might be the better pattern (SAM)
-    s0->comm_type = ALL_COMMS;
-    s1->comm_type = ALL_COMMS;
-    s2->comm_type = ALL_COMMS;
-    s3->comm_type = ALL_COMMS;
-    u_gauge->comm_type = ALL_COMMS;
-    u_gauge_f->comm_type = ALL_COMMS;
-    g->comm_type = ALL_COMMS;
-  #endif
 
   lprintf("MAIN", 0, "Generating a random gauge field... ");
   fflush(stdout);
@@ -141,26 +127,11 @@ int main(int argc, char *argv[])
 
   lprintf("MAIN", 0, "Gauge covariance of the Dirac operator:\n");
 
-  #ifdef WITH_GPU
-    start_sendrecv_gfield_f(u_gauge_f);
-    complete_sendrecv_gfield_f(u_gauge_f);
-  #endif
-
   loc_D(s1, s0);
-
   transform_s(s2, s1);
-
   transform_s(s3, s0);
-
   transform_u();
-
   spinor_field_zero_f(s1);
-
-  #ifdef WITH_GPU
-    start_sendrecv_gfield_f(u_gauge_f);
-    complete_sendrecv_gfield_f(u_gauge_f);
-  #endif
-
   loc_D(s1, s3);
 
   spinor_field_mul_add_assign_f(s1, -1.0, s2);

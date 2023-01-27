@@ -472,5 +472,12 @@ void represent_gauge_field()
 #ifdef WITH_GPU
   copy_to_gpu_gfield(u_gauge);
   copy_to_gpu_gfield_f(u_gauge_f);
+  copy_to_gpu_gfield_f_flt(u_gauge_f_flt);
+  start_sendrecv_gfield(u_gauge);
+  complete_sendrecv_gfield(u_gauge);
+  start_sendrecv_gfield_f(u_gauge_f);
+  complete_sendrecv_gfield_f(u_gauge_f);
+  start_sendrecv_gfield_f_flt(u_gauge_f_flt);
+  complete_sendrecv_gfield_f_flt(u_gauge_f_flt);
 #endif
 }

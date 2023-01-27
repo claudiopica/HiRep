@@ -88,6 +88,8 @@ void assign_ud2u_f(void)
 
   #ifdef WITH_GPU
     copy_to_gpu_gfield_f_flt(u_gauge_f_flt);
+    start_sendrecv_gfield_f_flt(u_gauge_f_flt);
+    complete_sendrecv_gfield_f_flt(u_gauge_f_flt);
   #endif
 }
 
@@ -109,6 +111,8 @@ void assign_s2sd(spinor_field *out, spinor_field_flt *in)
 
   #ifdef WITH_GPU
     copy_to_gpu_spinor_field_f(out);
+    start_sendrecv_spinor_field_f(out);
+    complete_sendrecv_spinor_field_f(out);
   #endif
 }
 
@@ -130,5 +134,7 @@ void assign_sd2s(spinor_field_flt *out, spinor_field *in)
 
   #ifdef WITH_GPU
     copy_to_gpu_spinor_field_f_flt(out);
+    start_sendrecv_spinor_field_f_flt(out);
+    complete_sendrecv_spinor_field_f_flt(out);
   #endif
 }
