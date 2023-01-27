@@ -58,6 +58,7 @@ _FUNC(sync_,(_FIELD_TYPE *f)) {
 
 _GPU_FUNC(sync_,(_FIELD_TYPE *f)) {
     #ifdef WITH_MPI
+    #ifdef WITH_GPU
     box_t *L = geometryBoxes->next;
     int i = 0;
 
@@ -68,6 +69,7 @@ _GPU_FUNC(sync_,(_FIELD_TYPE *f)) {
         _F_NAME(sync_box_to_buffer_gpu_,_FIELD_NAME)(f->type, L->sendBox, f->gpu_ptr, f->sendbuf_gpu_ptr);
         L=L->next; i++;
     }   
+    #endif 
     #endif              
 }
 
@@ -85,9 +87,11 @@ _FUNC(start_sendrecv_,(_FIELD_TYPE *f)) {
                 recv_buffer = (_REAL*)(_BUF_DFIELD_BLK(f, i, _FIELD_DIM));
                 send_buffer = (_REAL*)(_DFIELD_AT_PTR(f->sendbuf_ptr, f->type->sbuf_start[i], 0, 0, _FIELD_DIM));
             } else if (comm_type & GPU_COMM) {
+                #ifdef WITH_GPU
                 _GPU_F_NAME(sync_,_FIELD_NAME) (f);
                 recv_buffer = (_REAL*)(_BUF_GPU_DFIELD_BLK(f, i, _FIELD_DIM));
                 send_buffer = (_REAL*)(_DFIELD_AT_PTR(f->sendbuf_gpu_ptr, f->type->sbuf_start[i], 0, 0, _FIELD_DIM));
+                #endif 
             }
 
             /* Data Destination Parameters */
@@ -137,9 +141,11 @@ _FUNC(fill_buffers_,(_FIELD_TYPE *f)) {
                 _F_NAME(random_,_REAL)(random_array, buffer_length);
                 memcpy(buffer, random_array, buffer_length*sizeof(_REAL));
             } else if (comm_type & GPU_COMM) {
+                #ifdef WITH_GPU
                 _REAL* buffer = (_REAL*)(_BUF_GPU_FIELD_BLK(f,i));
                 _F_NAME(random_,_REAL)(random_array, buffer_length);
                 cudaMemcpy(buffer, random_array, buffer_length*sizeof(_REAL), cudaMemcpyHostToDevice);
+                #endif
             }
         }
     }
@@ -161,9 +167,11 @@ _FUNC(fill_buffers_with_zeroes_,(_FIELD_TYPE *f)) {
                 _F_NAME(zeroes_,_REAL)(buffer, buffer_length);
                 memcpy(buffer, zero_array, buffer_length*sizeof(_REAL));
             } else if (comm_type & GPU_COMM) {
+                #ifdef WITH_GPU
                 _REAL* buffer = (_REAL*)(_BUF_GPU_FIELD_BLK(f,i));   
                 _F_NAME(zeroes_,_REAL)(buffer, buffer_length);
                 cudaMemcpy(buffer, zero_array, buffer_length*sizeof(_REAL), cudaMemcpyHostToDevice);
+                #endif
             }
         }
     }

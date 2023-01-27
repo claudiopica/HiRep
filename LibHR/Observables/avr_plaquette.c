@@ -16,6 +16,7 @@
 #include "io.h"
 #include "memory.h"
 #include "utils.h"
+#include "geometry.h"
 
 double plaq(int ix, int mu, int nu)
 {

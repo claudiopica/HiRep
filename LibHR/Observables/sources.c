@@ -9,6 +9,7 @@
 #include "io.h"
 #include "Inverters/linear_algebra.h"
 #include "random.h"
+#include "geometry.h"
 
 #define PI 3.141592653589793238462643383279502884197
 

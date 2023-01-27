@@ -6,6 +6,7 @@
 #include "update.h"
 #include "libhr_core.h"
 #include "utils.h"
+#include "geometry.h"
 
 
 // Project gauge field every 2^_PROJ_BIT changes

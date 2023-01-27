@@ -3,8 +3,6 @@
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
-#ifdef WITH_GPU
-
 #include "memory.h"
 #include "geometry.h"
 #include "libhr_core.h"
@@ -143,5 +141,3 @@
 #undef _FIELD_DIM
 #undef _ALLOCATE
 #undef _n
-
-#endif

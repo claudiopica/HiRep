@@ -18,6 +18,7 @@
 #include "Observables/avr_plaquette.h"
 #include "Random/ranlux.h"
 #include "io.h"
+#include "geometry.h"
 
 void write_gauge_field(char filename[])
 {

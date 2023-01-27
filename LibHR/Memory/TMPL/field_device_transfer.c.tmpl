@@ -3,6 +3,8 @@
 * All rights reserved.                                                      *
 \***************************************************************************/
 
+#ifdef WITH_GPU
+
 #include <string.h>
 #include "geometry.h"
 
@@ -58,4 +60,6 @@ _FUNC(copy_from_gpu_, (_FIELD_TYPE *f)) {
 #undef _NUMBER_OF_SITES
 #undef _ALLOCATE
 #undef _N_SITES
+
+#endif
 

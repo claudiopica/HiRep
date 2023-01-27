@@ -14,6 +14,7 @@
 #include "random.h"
 #include "libhr_core.h"
 #include "memory.h"
+#include "geometry.h"
 
 void random_u(suNg_field *gf)
 {

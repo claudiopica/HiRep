@@ -3,6 +3,8 @@
 * All rights reserved.                                                      *
 \***************************************************************************/
 
+#ifdef WITH_GPU
+
 #include <string.h>
 
 #if !defined(_FIELD_NAME)
@@ -54,3 +56,4 @@ _FUNC(to_cpu_format_, (_FIELD_TYPE *out, _FIELD_TYPE *in)) {
 
 #undef _FUNC
 #undef _F_NAME
+#endif

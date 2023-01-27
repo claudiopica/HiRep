@@ -20,7 +20,6 @@
 
 #include "Geometry/geometry_indexing.h"
 #include "Geometry/communications.h"
-#include "Geometry/communications_gpu.h"
 #include "Geometry/cpu_geometry.h"
 #include "Geometry/geometry_check.h"
 #include "Geometry/geometry_descriptor.h"
@@ -30,6 +29,7 @@
 #include "Geometry/geometry_omp.h"
 #include "Geometry/new_geometry.h"
 #include "Geometry/setup.h"
+#include "Geometry/global_sum.h"
 
 #ifdef WITH_GPU
     #include "Geometry/geometry_gpu_init.h"

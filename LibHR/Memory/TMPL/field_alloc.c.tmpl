@@ -79,13 +79,14 @@ _FUNC_STATIC(assign_geometry_descriptor_, (unsigned int n, _FIELD_TYPE *f, geome
     for (int i = 0; i < n; ++i) { f[i].type = type; }
 }
 
-#ifdef WITH_GPU
-
 _FUNC_STATIC(free_gpu_field_data_, (_FIELD_TYPE *f)) {
+    #ifdef WITH_GPU
     if (f->gpu_ptr != NULL) { cudaFree(f->gpu_ptr); }
+    #endif
 }
 
 _FUNC_STATIC(allocate_gpu_field_data_, (unsigned int n, _FIELD_TYPE *f, geometry_descriptor *type)) {
+    #ifdef WITH_GPU
     if (alloc_mem_t & GPU_MEM) {
         cudaError_t err;
         int bytes_per_site = sizeof(_SITE_TYPE);
@@ -100,10 +101,10 @@ _FUNC_STATIC(allocate_gpu_field_data_, (unsigned int n, _FIELD_TYPE *f, geometry
     } else {
         for (int i = 0; i < n; ++i) { f[i].gpu_ptr = NULL; }
     }
+    #endif
 }
 
-#endif
-
+#ifdef WITH_MPI
 _FUNC_STATIC(allocate_sendbuffer_, (_FIELD_TYPE *f, int i)) {
     #ifdef WITH_NEW_GEOMETRY
         f[i].sendbuf_ptr = sendbuf_alloc(_FIELD_DIM * sizeof(_SITE_TYPE));
@@ -119,13 +120,17 @@ _FUNC_STATIC(allocate_sendbuffer_, (_FIELD_TYPE *f, int i)) {
     #endif
     #endif
 }
+#endif
 
 _FUNC_STATIC(free_mpi_field_data_, (_FIELD_TYPE *f)) {
+    #ifdef WITH_MPI
     if (f->comm_req != NULL) { afree(f->comm_req); }
     // TODO: Deallocate sendbuffers
+    #endif
 }
 
 _FUNC_STATIC(allocate_mpi_field_data_, (unsigned int n, _FIELD_TYPE *f, geometry_descriptor *type)) {
+    #ifdef WITH_MPI
     if (_NUMBER_OF_BUFFERS > 0) {
         int number_of_requests = n * 2 * _NUMBER_OF_BUFFERS;
         f->comm_req = amalloc(number_of_requests * sizeof(MPI_Request), ALIGN);
@@ -136,6 +141,7 @@ _FUNC_STATIC(allocate_mpi_field_data_, (unsigned int n, _FIELD_TYPE *f, geometry
     } else {  
         f->comm_req = NULL;
     }
+    #endif
 }
 
 _FUNC(void, free_, (_FIELD_TYPE *f)) {
@@ -155,15 +161,8 @@ _ALLOCATE {
     _F_NAME(assign_geometry_descriptor_,_FIELD_NAME) (_n, f, type);
     _F_NAME(assign_comm_type_,_FIELD_NAME) (_n, f);
     _F_NAME(allocate_cpu_field_data_,_FIELD_NAME) (_n, f, type);
-
-    #ifdef WITH_GPU
     _F_NAME(allocate_gpu_field_data_,_FIELD_NAME) (_n, f, type);
-    #endif
-
-    #ifdef WITH_MPI
     _F_NAME(allocate_mpi_field_data_,_FIELD_NAME) (_n, f, type);
-    #endif
-
     return f;
 }
 

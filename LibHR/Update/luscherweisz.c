@@ -34,6 +34,7 @@ Core functions:
 #include "io.h"
 #include <string.h>
 #include "utils.h"
+#include "geometry.h"
 
 #define COMM (1 == 1)
 #define NOCOMM (1 == 0)

@@ -8,6 +8,7 @@
 #include "libhr_core.h"
 #include "memory.h"
 #include "utils.h"
+#include "geometry.h"
 
 
 #define _print_avect(a) printf("(%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e)\n", (a).c1, (a).c2, (a).c3, (a).c4, (a).c5, (a).c6, (a).c7, (a).c8)

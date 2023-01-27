@@ -4,6 +4,7 @@
 #include "Utils/HYP_smearing.h"
 #include "io.h"
 #include <string.h>
+#include "geometry.h"
 
 #if defined(ROTATED_SF) && defined(BASIC_SF)
 #error This code does not work with the Schroedinger functional
