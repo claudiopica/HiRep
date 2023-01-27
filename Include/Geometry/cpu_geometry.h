@@ -64,7 +64,7 @@ inline static int safe_mod_fast(int x, int y) {
 
 #define _BUF_FIELD_BLK(s,i) (((s)->ptr) + ((s)->type->rbuf_start[(i)] - (s)->type->master_shift))
 #define _BUF_4FIELD_BLK(s,i) (((s)->ptr) + 4*((s)->type->rbuf_start[(i)]))
-#define _BUF_DFIELD_BLK(s,i,_size) (((s)->ptr) + (_size)*((s)->type->rbuf_start[(i)] - (_size)*(s)->type->master_shift))
+#define _BUF_DFIELD_BLK(s,i,_size) (((s)->ptr) + (_size)*((s)->type->rbuf_start[(i)] - (s)->type->master_shift))
 
 #ifdef __cplusplus
 	}

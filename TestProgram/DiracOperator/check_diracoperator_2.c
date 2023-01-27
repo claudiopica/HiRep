@@ -222,6 +222,11 @@ int main(int argc, char *argv[])
     start_sendrecv_spinor_field_f(ps0);
     complete_sendrecv_spinor_field_f(ps0);
 
+    #ifdef WITH_GPU
+      start_sendrecv_gfield_f(u_gauge_f);
+      complete_sendrecv_gfield_f(u_gauge_f);
+    #endif
+
     Dphi(hmass, ps2, ps0);
 
     start_sendrecv_spinor_field_f(ps1);

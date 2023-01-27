@@ -54,7 +54,7 @@ void random_u_f(suNf_field *gf)
     copy_to_gpu_gfield_f(gf);
   #endif
 
-  //start_sendrecv_gfield(gf);
+  start_sendrecv_gfield_f(gf);
 }
 
 void unit_u(suNg_field *gf)
@@ -79,7 +79,6 @@ void unit_u(suNg_field *gf)
   #endif
 
   start_sendrecv_gfield(gf);
-
 }
 
 void random_s(suNg_scalar_field *sf)

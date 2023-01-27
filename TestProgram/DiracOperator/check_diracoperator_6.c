@@ -31,19 +31,27 @@ int main(int argc, char *argv[])
   setup_process(&argc, &argv);
 
   setup_gauge_fields();
-  u_gauge_f_flt = alloc_gfield_f_flt(&glattice);
 
   s0 = alloc_spinor_field_f(2, &glattice);
   s1 = s0 + 1;
   f0 = alloc_spinor_field_f_flt(2, &glattice);
   f1 = f0 + 1;
+  #ifdef WITH_GPU
+    s0->comm_type = ALL_COMMS;
+    s1->comm_type = ALL_COMMS;
+    f0->comm_type = ALL_COMMS;
+    f1->comm_type = ALL_COMMS;
+    u_gauge->comm_type = ALL_COMMS;
+    u_gauge_f->comm_type = ALL_COMMS;
+    u_gauge_f_flt->comm_type = ALL_COMMS;
+  #endif
 
   lprintf("MAIN", 0, "Generating a random gauge field... ");
   fflush(stdout);
 
   random_u(u_gauge);
 
-  start_sendrecv_gfield(u_gauge);
+  //start_sendrecv_gfield(u_gauge);
 
   represent_gauge_field();
   lprintf("MAIN", 0, "done.\n");
@@ -61,6 +69,13 @@ int main(int argc, char *argv[])
 
 
   assign_ud2u_f();
+
+  #ifdef WITH_GPU
+    start_sendrecv_gfield_f(u_gauge_f);
+    complete_sendrecv_gfield_f(u_gauge_f);
+    start_sendrecv_gfield_f_flt(u_gauge_f_flt);
+    complete_sendrecv_gfield_f_flt(u_gauge_f_flt);
+  #endif
 
   loc_D(s1, s0);
   loc_D_flt(f1, f0);

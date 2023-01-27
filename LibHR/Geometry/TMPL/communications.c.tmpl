@@ -21,9 +21,6 @@
 #if !defined _GEOM_TYPE
 #error Missing _GEOM_TYPE in communications_gpu.c
 #endif
-#if !defined _COMPLEX
-#error Missing _COMPLEX in communications_gpu.c
-#endif
 #if !defined _MPI_REAL
 #error Missing _MPI_REAL in communications_gpu.c
 #endif
@@ -50,9 +47,12 @@
 #define _BUFFER_FOR(_comm_type, _buf_idx) \
         if (f->comm_type & _comm_type) for (int i = 0; i < _NUMBER_OF_BUFFERS; ++i)
 
+
+static void *_F_NAME(sendrecv_guard_,_FIELD_NAME)=NULL;
+
 _FUNC(sync_,(_FIELD_TYPE *f)) {
     #ifdef WITH_MPI
-    sync_field(f->type, _FIELD_DIM*sizeof(*f->ptr), 0, f->ptr, f->sendbuf_ptr);
+    sync_field(f->type, _FIELD_DIM*sizeof(*f->ptr), _IS_SPINOR_LIKE, f->ptr, f->sendbuf_ptr);
     #endif
 }
 
@@ -75,19 +75,19 @@ _FUNC(start_sendrecv_,(_FIELD_TYPE *f)) {
     #ifdef WITH_MPI
     const int mpi_chunks_per_site = sizeof(_SITE_TYPE)/sizeof(_REAL);
 
-    _COMPLEX *recv_buffer;
-    _COMPLEX *send_buffer;
+    _REAL *recv_buffer;
+    _REAL *send_buffer;
     _COMM_TYPE_FOR(comm_type) {
         if (f->comm_type & comm_type) { _F_NAME(complete_sendrecv_,_FIELD_NAME) (f); }
         _BUFFER_FOR(comm_type, _buf_idx) {
             if (comm_type & CPU_COMM) {
                 _F_NAME(sync_,_FIELD_NAME)(f);
-                recv_buffer = (_COMPLEX*)(_BUF_DFIELD_BLK(f, i, _FIELD_DIM));
-                send_buffer = (_COMPLEX*)(_DFIELD_AT_PTR(f->sendbuf_ptr, f->type->sbuf_start[i], 0, 0, _FIELD_DIM));
+                recv_buffer = (_REAL*)(_BUF_DFIELD_BLK(f, i, _FIELD_DIM));
+                send_buffer = (_REAL*)(_DFIELD_AT_PTR(f->sendbuf_ptr, f->type->sbuf_start[i], 0, 0, _FIELD_DIM));
             } else if (comm_type & GPU_COMM) {
                 _GPU_F_NAME(sync_,_FIELD_NAME) (f);
-                recv_buffer = (_COMPLEX*)(_BUF_GPU_DFIELD_BLK(f, i, _FIELD_DIM));
-                send_buffer = (_COMPLEX*)(_DFIELD_AT_PTR(f->sendbuf_gpu_ptr, f->type->sbuf_start[i], 0, 0, _FIELD_DIM));
+                recv_buffer = (_REAL*)(_BUF_GPU_DFIELD_BLK(f, i, _FIELD_DIM));
+                send_buffer = (_REAL*)(_DFIELD_AT_PTR(f->sendbuf_gpu_ptr, f->type->sbuf_start[i], 0, 0, _FIELD_DIM));
             }
 
             /* Data Destination Parameters */
@@ -111,6 +111,9 @@ _FUNC(start_sendrecv_,(_FIELD_TYPE *f)) {
 _FUNC(complete_sendrecv_,(_FIELD_TYPE *f)) {
     #ifdef WITH_MPI
     int nreq = 2 * _NUMBER_OF_BUFFERS;
+    #ifdef WITH_NEW_GEOMETRY
+        _F_NAME(sendrecv_guard_,_FIELD_NAME) = NULL;
+    #endif
     if (nreq > 0) 
     { 
         MPI_Status status[nreq];
@@ -171,7 +174,6 @@ _FUNC(fill_buffers_with_zeroes_,(_FIELD_TYPE *f)) {
 #undef _FIELD_TYPE
 #undef _SITE_TYPE
 #undef _FIELD_DIM
-#undef _COMPLEX
 #undef _MPI_REAL
 #undef _REAL
 #undef CONCAT

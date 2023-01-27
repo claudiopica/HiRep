@@ -9,6 +9,7 @@
 #include "Utils/boundary_conditions.h"
 #include <math.h>
 #include "memory.h"
+#include "geometry.h"
 
 #define XG(m, a, b) ((m) + (a)*NG + (b))
 #define XF(m, a, b) ((m) + (a)*NF + (b))
@@ -390,8 +391,6 @@ void represent_gauge_field()
 {
   #ifdef WITH_GPU
     copy_from_gpu_gfield(u_gauge);
-    //start_sendrecv_gfield_cpu(u_gauge);
-    //complete_sendrecv_gfield_cpu(u_gauge);
   #endif
 
 #ifdef WITH_SMEARING
@@ -420,10 +419,6 @@ void represent_gauge_field()
         _group_represent2(Ru, u);
 #endif
       }
-
-    #ifdef WITH_GPU
-      copy_to_gpu_gfield(u_gauge_f);
-    #endif
   }
 
   /* wait gauge field transfer */
@@ -472,5 +467,10 @@ void represent_gauge_field()
 
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
   compute_clover_term();
+#endif
+
+#ifdef WITH_GPU
+  copy_to_gpu_gfield(u_gauge);
+  copy_to_gpu_gfield_f(u_gauge_f);
 #endif
 }

@@ -32,6 +32,10 @@ static void transform_u(void)
   #ifdef WITH_GPU
     copy_from_gpu_gfield(u_gauge);
     copy_from_gpu_gtransf(g);
+    start_sendrecv_gfield(u_gauge);
+    complete_sendrecv_gfield(u_gauge);
+    start_sendrecv_gtransf(g);
+    complete_sendrecv_gtransf(g);
   #endif
   _MASTER_FOR(&glattice, ix)
   {
@@ -51,6 +55,7 @@ static void transform_u(void)
   #endif
 
   start_sendrecv_gfield(u_gauge);
+  complete_sendrecv_gfield(u_gauge);
   represent_gauge_field();
   smear_gauge_field();
 }
@@ -59,6 +64,8 @@ static void transform_s(spinor_field *out, spinor_field *in)
 {
   #ifdef WITH_GPU
     copy_from_gpu_spinor_field_f(in);
+    start_sendrecv_spinor_field_f(in);
+    complete_sendrecv_spinor_field_f(in);
   #endif
 
   _MASTER_FOR(&glattice, ix)
@@ -99,6 +106,16 @@ int main(int argc, char *argv[])
   s1 = s0 + 1;
   s2 = s1 + 1;
   s3 = s2 + 1;
+  #ifdef WITH_GPU
+  //TODO: Set a default allocation before allocation might be the better pattern (SAM)
+    s0->comm_type = ALL_COMMS;
+    s1->comm_type = ALL_COMMS;
+    s2->comm_type = ALL_COMMS;
+    s3->comm_type = ALL_COMMS;
+    u_gauge->comm_type = ALL_COMMS;
+    u_gauge_f->comm_type = ALL_COMMS;
+    g->comm_type = ALL_COMMS;
+  #endif
 
   lprintf("MAIN", 0, "Generating a random gauge field... ");
   fflush(stdout);
@@ -124,6 +141,11 @@ int main(int argc, char *argv[])
 
   lprintf("MAIN", 0, "Gauge covariance of the Dirac operator:\n");
 
+  #ifdef WITH_GPU
+    start_sendrecv_gfield_f(u_gauge_f);
+    complete_sendrecv_gfield_f(u_gauge_f);
+  #endif
+
   loc_D(s1, s0);
 
   transform_s(s2, s1);
@@ -133,6 +155,11 @@ int main(int argc, char *argv[])
   transform_u();
 
   spinor_field_zero_f(s1);
+
+  #ifdef WITH_GPU
+    start_sendrecv_gfield_f(u_gauge_f);
+    complete_sendrecv_gfield_f(u_gauge_f);
+  #endif
 
   loc_D(s1, s3);
 
