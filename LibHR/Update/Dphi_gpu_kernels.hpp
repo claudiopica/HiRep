@@ -17,9 +17,6 @@ __device__ __constant__ char X_MASK=X_UP_MASK +X_DN_MASK;
 __device__ __constant__ char Y_MASK=Y_UP_MASK +Y_DN_MASK;
 __device__ __constant__ char Z_MASK=Z_UP_MASK +Z_DN_MASK;
 
-#define _KERNEL_PIECE_FOR(_piece) \
-      for (piece = EVEN; piece <= ODD; piece++)
-
 #define _FIND_BUFFER_DIRECTION(_ix, _iy, _mu, _dir, _piece, _input) \
       iy = blockIdx.x * BLOCK_SIZE + threadIdx.x + _input->base_in[piece-1]; \
       const char DIR_MASK = _input->imask_gpu[iy]; \
@@ -27,12 +24,6 @@ __device__ __constant__ char Z_MASK=Z_UP_MASK +Z_DN_MASK;
       const int dir_inverted = _DIR(DIR_MASK); \
       ix = find_neighbor(_input, iy, dir_inverted, mu); \
       dir = !dir_inverted;
-
-#define _CUDA_FOR_BOX_IN(_input, _piece) \
-      if (_input->gd_in & piece) if (blockIdx.x * BLOCK_SIZE + threadIdx.x < _input->vol_in[piece-1])
-
-#define _CUDA_FOR_BOX_OUT(_input, _piece) \
-      if (_input->gd_in & piece) if (blockIdx.x * BLOCK_SIZE + threadIdx.x < _input->vol_out[piece-1])
 
 #define _LOOP_DIRECTIONS(_ix, _iy, _mu, _dir, _input, body) \
       for (_mu = 0; _mu < 4; ++_mu) { \
@@ -227,7 +218,7 @@ __global__ void Dphi_gpu_inner_kernel(kernel_field_input* input) {
       SITE_TYPE* field_in = (SITE_TYPE*)input->field_in;
       GAUGE_TYPE* gauge = (GAUGE_TYPE*)input->gauge;
 
-      int piece, iy, mu, dir;
+      int iy, mu, dir;
       _KERNEL_PIECE_FOR(piece) {
             _CUDA_FOR_BOX_OUT(input, piece) {
                   _spinor_zero_f(r);
@@ -253,7 +244,7 @@ __global__ void Dphi_gpu_boundary_kernel(kernel_field_input* input) {
       SITE_TYPE* field_in = (SITE_TYPE*)input->field_in;
       GAUGE_TYPE *gauge = (GAUGE_TYPE*)input->gauge;
 
-      int iy, ix, piece, mu, dir;
+      int iy, ix, mu, dir;
       _KERNEL_PIECE_FOR(piece) {
             _CUDA_FOR_BOX_IN(input, piece) {
                   _FIND_BUFFER_DIRECTION(ix, iy, my, dir, piece, input);

@@ -15,6 +15,16 @@
 
 //#define __start_in(box) (gd_t == EVEN) ? box->base_index_even : box->base_index_odd
 
+// Kernel loops
+#define _KERNEL_PIECE_FOR(_piece) \
+      for (int _piece = EVEN; _piece <= ODD; _piece++)
+
+#define _CUDA_FOR_BOX_IN(_input, _piece) \
+      if (_input->gd_in & piece) if (blockIdx.x * BLOCK_SIZE + threadIdx.x < _input->vol_in[piece-1])
+
+#define _CUDA_FOR_BOX_OUT(_input, _piece) \
+      if (_input->gd_in & piece) if (blockIdx.x * BLOCK_SIZE + threadIdx.x < _input->vol_out[piece-1])
+
 // Output
 #define _start_out(box, gd_t) ((gd_t == EVEN) ? box->base_index_odd : box->base_index)
 #define _idx_out_local blockIdx.x * BLOCK_SIZE + threadIdx.x

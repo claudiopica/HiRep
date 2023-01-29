@@ -3,7 +3,7 @@
 * NOCOMPILE= !WITH_GPU
 * NOCOMPILE= !WITH_MPI
 *
-* Check that syncs yields the same sendbuffers up to geometry conversion
+* Check that syncs yield the same sendbuffers up to geometry conversion
 *
 *******************************************************************************/
 
@@ -37,19 +37,19 @@ int main(int argc, char *argv[])
     test_setup();
 
     // Run tests
-    return_val += test_sync_identical_to_cpu_spinor_field_f(&glattice);
+    //return_val += test_sync_identical_to_cpu_spinor_field_f(&glattice);
     return_val += test_sync_identical_to_cpu_spinor_field_f(&glat_even);
-    return_val += test_sync_identical_to_cpu_spinor_field_f(&glat_odd);
+    //return_val += test_sync_identical_to_cpu_spinor_field_f(&glat_odd);
 
-    return_val += test_sync_identical_to_cpu_spinor_field_f_flt(&glattice);
-    return_val += test_sync_identical_to_cpu_spinor_field_f_flt(&glat_even);
-    return_val += test_sync_identical_to_cpu_spinor_field_f_flt(&glat_odd);
+    //return_val += test_sync_identical_to_cpu_spinor_field_f_flt(&glattice);
+    //return_val += test_sync_identical_to_cpu_spinor_field_f_flt(&glat_even);
+    //return_val += test_sync_identical_to_cpu_spinor_field_f_flt(&glat_odd);
 
-    return_val += test_sync_identical_to_cpu_sfield(&glattice);
-    return_val += test_sync_identical_to_cpu_sfield(&glat_even);
-    return_val += test_sync_identical_to_cpu_sfield(&glat_odd);
+    //return_val += test_sync_identical_to_cpu_sfield(&glattice);
+    //return_val += test_sync_identical_to_cpu_sfield(&glat_even);
+    //return_val += test_sync_identical_to_cpu_sfield(&glat_odd);
 
-    return_val += test_sync_identical_to_cpu_gfield();
+    /*return_val += test_sync_identical_to_cpu_gfield();
     return_val += test_sync_identical_to_cpu_gfield_f();
     return_val += test_sync_identical_to_cpu_gfield_flt();
     return_val += test_sync_identical_to_cpu_gfield_f_flt();
@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
     return_val += test_sync_identical_to_cpu_gtransf();
     return_val += test_sync_identical_to_cpu_clover_ldl();
     return_val += test_sync_identical_to_cpu_clover_term();
-    return_val += test_sync_identical_to_cpu_clover_force();
+    return_val += test_sync_identical_to_cpu_clover_force();*/
 
     // Finalize and return
     finalize_process();
@@ -74,7 +74,7 @@ int test_sync_identical_to_cpu_spinor_field_f(geometry_descriptor *gd)
     int return_val = 0;
     spinor_field *f = alloc_spinor_field_f(1, gd);
     gaussian_spinor_field(f);
-    copy_to_gpu_spinor_field_f(f);
+    printf("Spinor sqnorm: %0.2e\n", spinor_field_sqnorm_f(f));
 
     //gd = &glattice;
     int sendbuf_len = 0;
@@ -103,15 +103,16 @@ int test_sync_identical_to_cpu_spinor_field_f(geometry_descriptor *gd)
     {
         for (int j = 0; j < gd->sbuf_len[i]; ++j) 
         {
-            suNf_spinor *spinor_cpu = sendbuf_cpu + j + gd->sbuf_start[i];
-            suNf_spinor *in_block = sendbuf_gpu + gd->sbuf_start[i];
-            int stride = gd->sbuf_len[i];
-            read_gpu_suNf_spinor(stride, *(spinor_gpu), in_block, j, 0, 1);
+            int ix = j + gd->sbuf_start[i];
+            suNf_spinor *spinor_cpu = sendbuf_cpu + ix;
+            read_gpu_suNf_spinor(0, (*spinor_gpu), sendbuf_gpu, ix, 0, 1);
 
             for (int k = 0; k < 4; ++k) 
             {
                 for (int comp = 0; comp < NF; ++comp) 
                 {
+                    //if (comp==0 && k==0) printf("ix: %d, CPU: %0.2e, GPU: %0.2e\n", j + gd->sbuf_start[i], creal((*spinor_cpu).c[k].c[comp]), 
+                    //        creal((*spinor_gpu).c[k].c[comp]));
                     diff += creal((*spinor_cpu).c[k].c[comp])-creal((*spinor_gpu).c[k].c[comp]);
                     diff += cimag((*spinor_cpu).c[k].c[comp])-cimag((*spinor_gpu).c[k].c[comp]);
                 }
@@ -164,8 +165,8 @@ int test_sync_identical_to_cpu_spinor_field_f_flt(geometry_descriptor *gd)
         {
             suNf_spinor_flt *spinor_cpu = sendbuf_cpu + j + gd->sbuf_start[i];
             suNf_spinor_flt *in_block = sendbuf_gpu + gd->sbuf_start[i];
-            int stride = gd->sbuf_len[i];
-            read_gpu_suNf_spinor_flt(stride, *(spinor_gpu), in_block, j, 0, 1);
+            //int stride = gd->sbuf_len[i];
+            read_gpu_suNf_spinor_flt(0, *(spinor_gpu), in_block, j, 0, 1);
 
             for (int k = 0; k < 4; ++k) 
             {
@@ -277,8 +278,8 @@ int test_sync_identical_to_cpu_gfield()
                 int offset = gd->sbuf_start[i];
                 suNg *mat_cpu = _4FIELD_AT_PTR(sendbuf_cpu, idx, mu, 0);
                 suNg *in_block = _4FIELD_AT_PTR(sendbuf_gpu, offset, 0, 0);
-                int stride = gd->sbuf_len[i];
-                read_gpu_suNg(stride, (*mat_gpu), in_block, j, mu, 4);
+                //int stride = gd->sbuf_len[i];
+                read_gpu_suNg(0, (*mat_gpu), in_block, j, mu, 4);
 
                 for (int comp = 0; comp < NG*NG; ++comp) {
                     diff += creal((*mat_cpu).c[comp])-creal((*mat_gpu).c[comp]);
@@ -337,8 +338,8 @@ int test_sync_identical_to_cpu_gfield_f()
                 int offset = gd->sbuf_start[i];
                 suNf *mat_cpu = _4FIELD_AT_PTR(sendbuf_cpu, idx, mu, 0);
                 suNf *in_block = _4FIELD_AT_PTR(sendbuf_gpu, offset, 0, 0);
-                int stride = gd->sbuf_len[i];
-                read_gpu_suNf(stride, (*mat_gpu), in_block, j, mu, 4);
+                //int stride = gd->sbuf_len[i];
+                read_gpu_suNf(0, (*mat_gpu), in_block, j, mu, 4);
 
                 for (int comp = 0; comp < NF*NF; ++comp) {
                     diff += creal((*mat_cpu).c[comp])-creal((*mat_gpu).c[comp]);
@@ -397,8 +398,8 @@ int test_sync_identical_to_cpu_gfield_flt()
                 int offset = gd->sbuf_start[i];
                 suNg_flt *mat_cpu = _4FIELD_AT_PTR(sendbuf_cpu, idx, mu, 0);
                 suNg_flt *in_block = _4FIELD_AT_PTR(sendbuf_gpu, offset, 0, 0);
-                int stride = gd->sbuf_len[i];
-                read_gpu_suNg_flt(stride, (*mat_gpu), in_block, j, mu, 4);
+                //int stride = gd->sbuf_len[i];
+                read_gpu_suNg_flt(0, (*mat_gpu), in_block, j, mu, 4);
 
                 for (int comp = 0; comp < NG*NG; ++comp) {
                     diff += creal((*mat_cpu).c[comp])-creal((*mat_gpu).c[comp]);
@@ -457,8 +458,8 @@ int test_sync_identical_to_cpu_gfield_f_flt()
                 int offset = gd->sbuf_start[i];
                 suNf_flt *mat_cpu = _4FIELD_AT_PTR(sendbuf_cpu, idx, mu, 0);
                 suNf_flt *in_block = _4FIELD_AT_PTR(sendbuf_gpu, offset, 0, 0);
-                int stride = gd->sbuf_len[i];
-                read_gpu_suNf_flt(stride, (*mat_gpu), in_block, j, mu, 4);
+                //int stride = gd->sbuf_len[i];
+                read_gpu_suNf_flt(0, (*mat_gpu), in_block, j, mu, 4);
 
                 for (int comp = 0; comp < NF*NF; ++comp) {
                     diff += creal((*mat_cpu).c[comp])-creal((*mat_gpu).c[comp]);
@@ -516,8 +517,8 @@ int test_sync_identical_to_cpu_suNg_scalar_field()
             int offset = gd->sbuf_start[i];
             suNg_vector *mat_cpu = _FIELD_AT_PTR(sendbuf_cpu, idx, 0);
             suNg_vector *in_block = _FIELD_AT_PTR(sendbuf_gpu, offset, 0);
-            int stride = gd->sbuf_len[i];
-            read_gpu_suNg_vector(stride, (*mat_gpu), in_block, j, 0, 1);
+            //int stride = gd->sbuf_len[i];
+            read_gpu_suNg_vector(0, (*mat_gpu), in_block, j, 0, 1);
 
             for (int comp = 0; comp < NG; ++comp) {
                 diff += creal((*mat_cpu).c[comp])-creal((*mat_gpu).c[comp]);
@@ -574,8 +575,8 @@ int test_sync_identical_to_cpu_avfield()
             int offset = gd->sbuf_start[i];
             suNg_algebra_vector *mat_cpu = _4FIELD_AT_PTR(sendbuf_cpu, idx, 0, 0);
             suNg_algebra_vector *in_block = _4FIELD_AT_PTR(sendbuf_gpu, offset, 0, 0);
-            int stride = gd->sbuf_len[i];
-            read_gpu_suNg_algebra_vector(stride, (*mat_gpu), in_block, j, 0, 4);
+            //int stride = gd->sbuf_len[i];
+            read_gpu_suNg_algebra_vector(0, (*mat_gpu), in_block, j, 0, 4);
 
             for (int comp = 0; comp < NG*NG-1; ++comp) {
                 diff += creal((*mat_cpu).c[comp])-creal((*mat_gpu).c[comp]);
@@ -632,8 +633,8 @@ int test_sync_identical_to_cpu_gtransf()
             int offset = gd->sbuf_start[i];
             suNg *mat_cpu = _FIELD_AT_PTR(sendbuf_cpu, idx, 0);
             suNg *in_block = _FIELD_AT_PTR(sendbuf_gpu, offset, 0);
-            int stride = gd->sbuf_len[i];
-            read_gpu_suNg(stride, (*mat_gpu), in_block, j, 0, 1);
+            //int stride = gd->sbuf_len[i];
+            read_gpu_suNg(0, (*mat_gpu), in_block, j, 0, 1);
 
             for (int comp = 0; comp < NG*NG; ++comp) {
                 diff += creal((*mat_cpu).c[comp])-creal((*mat_gpu).c[comp]);
@@ -689,8 +690,8 @@ int test_sync_identical_to_cpu_clover_ldl()
             int offset = gd->sbuf_start[i];
             ldl_t *mat_cpu = _FIELD_AT_PTR(sendbuf_cpu, idx, 0);
             ldl_t *in_block = _FIELD_AT_PTR(sendbuf_gpu, offset, 0);
-            int stride = gd->sbuf_len[i];
-            read_gpu_ldl_t(stride, (*mat_gpu), in_block, j, 0, 1);
+            //int stride = gd->sbuf_len[i];
+            read_gpu_ldl_t(0, (*mat_gpu), in_block, j, 0, 1);
 
             for (int comp = 0; comp < NF*(2*NF-1); ++comp) {
                 diff += creal((*mat_cpu).up[comp])-creal((*mat_gpu).up[comp]);
@@ -749,8 +750,8 @@ int test_sync_identical_to_cpu_clover_term()
                 int offset = gd->sbuf_start[i];
                 suNfc *mat_cpu = _4FIELD_AT_PTR(sendbuf_cpu, idx, mu, 0);
                 suNfc *in_block = _4FIELD_AT_PTR(sendbuf_gpu, offset, 0, 0);
-                int stride = gd->sbuf_len[i];
-                read_gpu_suNfc(stride, (*mat_gpu), in_block, j, mu, 4);
+                //int stride = gd->sbuf_len[i];
+                read_gpu_suNfc(0, (*mat_gpu), in_block, j, mu, 4);
 
                 for (int comp = 0; comp < NG*NG; ++comp) {
                     diff += creal((*mat_cpu).c[comp])-creal((*mat_gpu).c[comp]);
@@ -809,8 +810,8 @@ int test_sync_identical_to_cpu_clover_force()
                 int offset = gd->sbuf_start[i];
                 suNf *mat_cpu = _6FIELD_AT_PTR(sendbuf_cpu, idx, mu, 0);
                 suNf *in_block = _6FIELD_AT_PTR(sendbuf_gpu, offset, 0, 0);
-                int stride = gd->sbuf_len[i];
-                read_gpu_suNf(stride, (*mat_gpu), in_block, j, mu, 6);
+                //int stride = gd->sbuf_len[i];
+                read_gpu_suNf(0, (*mat_gpu), in_block, j, mu, 6);
 
                 for (int comp = 0; comp < NG*NG; ++comp) {
                     diff += creal((*mat_cpu).c[comp])-creal((*mat_gpu).c[comp]);

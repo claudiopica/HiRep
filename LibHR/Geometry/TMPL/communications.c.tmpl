@@ -47,8 +47,9 @@
 #define _BUFFER_FOR(_comm_type, _buf_idx) \
         if (f->comm_type & _comm_type) for (int i = 0; i < _NUMBER_OF_BUFFERS; ++i)
 
-
+#ifdef WITH_NEW_GEOMETRY
 static void *_F_NAME(sendrecv_guard_,_FIELD_NAME)=NULL;
+#endif
 
 _FUNC(sync_,(_FIELD_TYPE *f)) {
     #ifdef WITH_MPI
@@ -66,7 +67,7 @@ _GPU_FUNC(sync_,(_FIELD_TYPE *f)) {
     if (f->type==&glattice) nbuffers /= 2;
     while (L && i < nbuffers)
     {
-        _F_NAME(sync_box_to_buffer_gpu_,_FIELD_NAME)(f->type, L->sendBox, f->gpu_ptr, f->sendbuf_gpu_ptr);
+        _F_NAME(sync_box_to_buffer_gpu_,_FIELD_NAME)(f->type, L->sendBox, f, f->sendbuf_gpu_ptr);
         L=L->next; i++;
     }   
     #endif 
@@ -76,6 +77,10 @@ _GPU_FUNC(sync_,(_FIELD_TYPE *f)) {
 _FUNC(start_sendrecv_,(_FIELD_TYPE *f)) {
     #ifdef WITH_MPI
     const int mpi_chunks_per_site = sizeof(_SITE_TYPE)/sizeof(_REAL);
+
+    #ifdef WITH_NEW_GEOMETRY
+    _F_NAME(sendrecv_guard_,_FIELD_NAME) = (void*)f->comm_req;
+    #endif
 
     _REAL *recv_buffer;
     _REAL *send_buffer;

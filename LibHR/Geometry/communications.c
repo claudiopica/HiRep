@@ -15,8 +15,6 @@
 #define random_double ranlxd
 #define random_float ranlxs
 
-static void *gf_sendrecv_guard=NULL;
-
 static inline void zeroes_double(double* dbl, int n) {
     for (int i = 0; i < n; ++i) { dbl[i] = 0.0; }
 }

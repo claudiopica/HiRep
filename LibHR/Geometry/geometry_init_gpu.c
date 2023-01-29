@@ -63,7 +63,7 @@ void init_neighbors_gpu()
   int number_of_boxes = 0;
   do {
     number_of_boxes++;
-  } while (L=L->next);
+  } while ((L=L->next));
 
   cudaMalloc((void **)&geometryBoxes_gpu, number_of_boxes*sizeof(box_t));
 
@@ -72,7 +72,7 @@ void init_neighbors_gpu()
   do {
     cudaMemcpy(&geometryBoxes_gpu[i], L, sizeof(box_t), cudaMemcpyHostToDevice);
     ++i;
-  } while (L=L->next);
+  } while ((L=L->next));
 
   
   #endif
