@@ -13,6 +13,7 @@
 
 #include "random.h"
 #include "libhr_core.h"
+#include "IO/logger.h"
 
 #define NVEC (32)
 #define NRAN (2 * NVEC)
