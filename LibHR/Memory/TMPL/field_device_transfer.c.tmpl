@@ -45,7 +45,7 @@ _FUNC(void, to_gpu_format_, _FIELD_NAME, (_FIELD_TYPE *out, _FIELD_TYPE *in)) {
     _MASTER_FOR(in->type, ix) {
         for (int comp = 0; comp < _FIELD_DIM; ++comp) {
             _SITE_TYPE *source = _DFIELD_AT(in, ix, comp, _FIELD_DIM);
-            _F_NAME(write_gpu_,_SITE_TYPE) (0, (*source), target, ix-out->type->master_shift, comp, _FIELD_DIM);
+            _GPU_F_NAME(write_,_FIELD_NAME) (source, out, ix, comp);
         }
     }          
 }
@@ -56,7 +56,7 @@ _FUNC(void, to_cpu_format_, _FIELD_NAME, (_FIELD_TYPE *out, _FIELD_TYPE *in)) {
     _MASTER_FOR(in->type, ix) {
         for (int comp = 0; comp < _FIELD_DIM; ++comp) {
             _SITE_TYPE *target = _DFIELD_AT(out, ix, comp, _FIELD_DIM);
-            _F_NAME(read_gpu_,_SITE_TYPE) (0, (*target), source, ix-in->type->master_shift, comp, _FIELD_DIM);
+            _GPU_F_NAME(read_,_FIELD_NAME) (target, in, ix, comp);
         }
     }         
 }
@@ -69,7 +69,6 @@ _FUNC(void, copy_to_gpu_, _FIELD_NAME, (_FIELD_TYPE *f)) {
     err = cudaMemcpy(f->gpu_ptr, tmp->ptr, field_size, cudaMemcpyHostToDevice);
     error(err != cudaSuccess, 1, __func__, "Could not transfer field to device.\n");
     _F_NAME(free_, _FIELD_NAME) (tmp);
-    //printf("sqnorm after copy: %0.2e\n", spinor_field_sqnorm_f(f));
 }
 
 _FUNC(void, copy_from_gpu_, _FIELD_NAME, (_FIELD_TYPE *f)) {

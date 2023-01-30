@@ -11,8 +11,9 @@
 #ifndef LINEAR_ALGEBRA_H
 #define LINEAR_ALGEBRA_H
 
+#include "libhr_core.h"
 #include "hr_complex.h"
-#include "spinor_field.h"
+#include "Utils/generics.h"
 
 #ifdef __cplusplus
   extern "C" {

@@ -23,11 +23,7 @@
 #endif
 
 // Internal macro for defining generic functions and alias function pointers
-#define _CONCAT(_name,_suffix) _name ## _suffix
-#define _F_NAME(_name,_suffix) _CONCAT(_name,_suffix)
-#define _GPU_F_NAME(_name,_suffix) _CONCAT(_name,_suffix ## _gpu)
-#define _FUNC_INNER(_type,_name,_suffix,_args) _type _GPU_F_NAME(_name,_suffix) _args
-#define _FUNC(_type,_name,_args) _FUNC_INNER(_type,_name,_SUFFIX,_args)
+#define _DECLARE(_type,_name,_args) _GPU_FUNC(_type,_name,_SUFFIX,_args)
 
 #define _TOCOMPLEX(sp) ((_COMPLEX *)(sp))
 #define _NCOM (sizeof(_SPINOR_TYPE)/sizeof(_COMPLEX))
@@ -43,7 +39,7 @@
     }	\
   } while(0)
 
-_FUNC(void, spinor_field_copy, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_copy, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
 {
   _TWO_SPINORS_MATCHING(s1,s2);
   cudaMemcpy(s1->gpu_ptr,s2->gpu_ptr,s1->type->gsize_spinor*sizeof(_SPINOR_TYPE),cudaMemcpyDeviceToDevice);
@@ -96,7 +92,7 @@ T global_sum_gpu(T *vector, int size);
 // This function is defined in global_sum_gpu.cu
 
 /* Re <s1,s2> */
-_FUNC(double, spinor_field_prod_re, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(double, spinor_field_prod_re, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
 {
   _TWO_SPINORS_MATCHING(s1,s2);
   double res = 0.0;
@@ -115,7 +111,7 @@ _FUNC(double, spinor_field_prod_re, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE 
 }
 
 /* Im <s1,s2> */
-_FUNC(double, spinor_field_prod_im, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(double, spinor_field_prod_im, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
 {
   _TWO_SPINORS_MATCHING(s1,s2);
   double res = 0.0;
@@ -134,7 +130,7 @@ _FUNC(double, spinor_field_prod_im, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE 
 }
 
 /* <s1,s2> */
-_FUNC(hr_complex, spinor_field_prod, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(hr_complex, spinor_field_prod, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
 {
   _TWO_SPINORS_MATCHING(s1,s2);
   hr_complex res = 0.0;
@@ -153,7 +149,7 @@ _FUNC(hr_complex, spinor_field_prod, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE
 }
 
 /* Re <g5*s1,s2> */
-_FUNC(double, spinor_field_g5_prod_re, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(double, spinor_field_g5_prod_re, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
 {
   _TWO_SPINORS_MATCHING(s1,s2);
   double res = 0.0;
@@ -172,7 +168,7 @@ _FUNC(double, spinor_field_g5_prod_re, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TY
 }
 
 /* Im <g5*s1,s2> */
-_FUNC(double, spinor_field_g5_prod_im, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(double, spinor_field_g5_prod_im, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
 {
   _TWO_SPINORS_MATCHING(s1,s2);
   double res = 0.0;
@@ -191,7 +187,7 @@ _FUNC(double, spinor_field_g5_prod_im, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TY
 }
 
 /* Re <s1,s1> */
-_FUNC(double, spinor_field_sqnorm, (_SPINOR_FIELD_TYPE *s1))
+_DECLARE(double, spinor_field_sqnorm, (_SPINOR_FIELD_TYPE *s1))
 {
   double res = 0.0;
   double *resPiece;
@@ -209,7 +205,7 @@ _FUNC(double, spinor_field_sqnorm, (_SPINOR_FIELD_TYPE *s1))
 }
 
 /* s1+=r*s2 r real */
-_FUNC(void, spinor_field_mul_add_assign, (_SPINOR_FIELD_TYPE *s1, _REAL r, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_mul_add_assign, (_SPINOR_FIELD_TYPE *s1, _REAL r, _SPINOR_FIELD_TYPE *s2))
 {
   _TWO_SPINORS_MATCHING(s1,s2);
   _CUDA_FOR(s1,ixp,
@@ -218,7 +214,7 @@ _FUNC(void, spinor_field_mul_add_assign, (_SPINOR_FIELD_TYPE *s1, _REAL r, _SPIN
 }
 
 /* s1+=c*s2 c complex */
-_FUNC(void, spinor_field_mulc_add_assign, (_SPINOR_FIELD_TYPE *s1, _COMPLEX c, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_mulc_add_assign, (_SPINOR_FIELD_TYPE *s1, _COMPLEX c, _SPINOR_FIELD_TYPE *s2))
 {
   _TWO_SPINORS_MATCHING(s1,s2);
   _CUDA_FOR(s1,ixp,
@@ -227,7 +223,7 @@ _FUNC(void, spinor_field_mulc_add_assign, (_SPINOR_FIELD_TYPE *s1, _COMPLEX c, _
 }
 
 /* s1=r*s2 */
-_FUNC(void, spinor_field_mul, (_SPINOR_FIELD_TYPE *s1, _REAL r, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_mul, (_SPINOR_FIELD_TYPE *s1, _REAL r, _SPINOR_FIELD_TYPE *s2))
 {
   _TWO_SPINORS_MATCHING(s1,s2);
   _CUDA_FOR(s1,ixp,
@@ -236,7 +232,7 @@ _FUNC(void, spinor_field_mul, (_SPINOR_FIELD_TYPE *s1, _REAL r, _SPINOR_FIELD_TY
 }
 
 /* s1=c*s2 c complex */
-_FUNC(void, spinor_field_mulc, (_SPINOR_FIELD_TYPE *s1, _COMPLEX c, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_mulc, (_SPINOR_FIELD_TYPE *s1, _COMPLEX c, _SPINOR_FIELD_TYPE *s2))
 {
   _TWO_SPINORS_MATCHING(s1,s2);
   _CUDA_FOR(s1,ixp,
@@ -245,7 +241,7 @@ _FUNC(void, spinor_field_mulc, (_SPINOR_FIELD_TYPE *s1, _COMPLEX c, _SPINOR_FIEL
 }
 
 /* r=s1+s2 */
-_FUNC(void, spinor_field_add, (_SPINOR_FIELD_TYPE *r, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_add, (_SPINOR_FIELD_TYPE *r, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
 {
   _TWO_SPINORS_MATCHING(s1,s2);
   _CUDA_FOR(s1,ixp,
@@ -254,7 +250,7 @@ _FUNC(void, spinor_field_add, (_SPINOR_FIELD_TYPE *r, _SPINOR_FIELD_TYPE *s1, _S
 }
 
 /* r=s1-s2 */
-_FUNC(void, spinor_field_sub, (_SPINOR_FIELD_TYPE *r, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_sub, (_SPINOR_FIELD_TYPE *r, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
 {
   _TWO_SPINORS_MATCHING(s1,s2);
   _CUDA_FOR(s1,ixp,
@@ -263,7 +259,7 @@ _FUNC(void, spinor_field_sub, (_SPINOR_FIELD_TYPE *r, _SPINOR_FIELD_TYPE *s1, _S
 }
 
 /* s1+=s2 */
-_FUNC(void, spinor_field_add_assign, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_add_assign, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
 {
   _TWO_SPINORS_MATCHING(s1,s2);
   _CUDA_FOR(s1,ixp,
@@ -272,7 +268,7 @@ _FUNC(void, spinor_field_add_assign, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE
 }
 
 /* s1-=s2 */
-_FUNC(void, spinor_field_sub_assign, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_sub_assign, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
 {
   _TWO_SPINORS_MATCHING(s1,s2);
   _CUDA_FOR(s1,ixp,
@@ -281,7 +277,7 @@ _FUNC(void, spinor_field_sub_assign, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE
 }
 
 /* s1=0 */
-_FUNC(void, spinor_field_zero, (_SPINOR_FIELD_TYPE *s1))
+_DECLARE(void, spinor_field_zero, (_SPINOR_FIELD_TYPE *s1))
 {
   _CUDA_FOR(s1,ixp,
             (spinor_field_zero_gpu<_SPINOR_TYPE, _COMPLEX><<<grid_size,BLOCK_SIZE>>>(_GPU_FIELD_BLK(s1,ixp),N));
@@ -289,7 +285,7 @@ _FUNC(void, spinor_field_zero, (_SPINOR_FIELD_TYPE *s1))
 }
 
 /* s1=-s2 */
-_FUNC(void, spinor_field_minus, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_minus, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
 {
   _TWO_SPINORS_MATCHING(s1,s2);
   _CUDA_FOR(s1,ixp,
@@ -298,7 +294,7 @@ _FUNC(void, spinor_field_minus, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
 }
 
 /* s1=-s1 */
-_FUNC(void, spinor_field_minus_assign, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_minus_assign, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
 {
   _CUDA_FOR(s1,ixp,
             (spinor_field_minus_assign_gpu<_SPINOR_TYPE, _COMPLEX><<<grid_size,BLOCK_SIZE>>>(_GPU_FIELD_BLK(s1,ixp), N));
@@ -306,7 +302,7 @@ _FUNC(void, spinor_field_minus_assign, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TY
 }
 
 /* s1=r1*s2+r2*s3 */
-_FUNC(void, spinor_field_lc, (_SPINOR_FIELD_TYPE *s1, _REAL r1, _SPINOR_FIELD_TYPE *s2, _REAL r2, _SPINOR_FIELD_TYPE *s3))
+_DECLARE(void, spinor_field_lc, (_SPINOR_FIELD_TYPE *s1, _REAL r1, _SPINOR_FIELD_TYPE *s2, _REAL r2, _SPINOR_FIELD_TYPE *s3))
 {
   _TWO_SPINORS_MATCHING(s1,s2);
   _TWO_SPINORS_MATCHING(s1,s3);
@@ -316,7 +312,7 @@ _FUNC(void, spinor_field_lc, (_SPINOR_FIELD_TYPE *s1, _REAL r1, _SPINOR_FIELD_TY
 }
 
 /* s1+=r1*s2+r2*s3 */
-_FUNC(void, spinor_field_lc_add_assign, (_SPINOR_FIELD_TYPE *s1, _REAL r1, _SPINOR_FIELD_TYPE *s2, _REAL r2, _SPINOR_FIELD_TYPE *s3))
+_DECLARE(void, spinor_field_lc_add_assign, (_SPINOR_FIELD_TYPE *s1, _REAL r1, _SPINOR_FIELD_TYPE *s2, _REAL r2, _SPINOR_FIELD_TYPE *s3))
 {
   _TWO_SPINORS_MATCHING(s1,s2);
   _TWO_SPINORS_MATCHING(s1,s3);
@@ -326,7 +322,7 @@ _FUNC(void, spinor_field_lc_add_assign, (_SPINOR_FIELD_TYPE *s1, _REAL r1, _SPIN
 }
 
 /* s1=c1*s2+c2*s3 c1, c2 complex*/
-_FUNC(void, spinor_field_clc, (_SPINOR_FIELD_TYPE *s1, _COMPLEX c1, _SPINOR_FIELD_TYPE *s2, _COMPLEX c2, _SPINOR_FIELD_TYPE *s3))
+_DECLARE(void, spinor_field_clc, (_SPINOR_FIELD_TYPE *s1, _COMPLEX c1, _SPINOR_FIELD_TYPE *s2, _COMPLEX c2, _SPINOR_FIELD_TYPE *s3))
 {
   _TWO_SPINORS_MATCHING(s1,s2);
   _TWO_SPINORS_MATCHING(s1,s3);
@@ -336,7 +332,7 @@ _FUNC(void, spinor_field_clc, (_SPINOR_FIELD_TYPE *s1, _COMPLEX c1, _SPINOR_FIEL
 }
 
 /* s1+=c1*s2+c2*s3 c1, c2 complex*/
-_FUNC(void, spinor_field_clc_add_assign, (_SPINOR_FIELD_TYPE *s1, _COMPLEX c1, _SPINOR_FIELD_TYPE *s2, _COMPLEX c2, _SPINOR_FIELD_TYPE *s3))
+_DECLARE(void, spinor_field_clc_add_assign, (_SPINOR_FIELD_TYPE *s1, _COMPLEX c1, _SPINOR_FIELD_TYPE *s2, _COMPLEX c2, _SPINOR_FIELD_TYPE *s3))
 {
   _TWO_SPINORS_MATCHING(s1,s2);
   _TWO_SPINORS_MATCHING(s1,s3);
@@ -346,7 +342,7 @@ _FUNC(void, spinor_field_clc_add_assign, (_SPINOR_FIELD_TYPE *s1, _COMPLEX c1, _
 }
 
 /* s1=g5*s2  */
-_FUNC(void, spinor_field_g5, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_g5, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
 {
   _TWO_SPINORS_MATCHING(s1,s2);
   _CUDA_FOR(s1,ixp,
@@ -355,7 +351,7 @@ _FUNC(void, spinor_field_g5, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
 }
 
 /* s1=g5*s1  */
-_FUNC(void, spinor_field_g5_assign, (_SPINOR_FIELD_TYPE *s1))
+_DECLARE(void, spinor_field_g5_assign, (_SPINOR_FIELD_TYPE *s1))
 {
   _CUDA_FOR(s1,ixp,
              (spinor_field_g5_assign_gpu<_SPINOR_TYPE, _COMPLEX><<<grid_size,BLOCK_SIZE>>>(_GPU_FIELD_BLK(s1,ixp),N))
@@ -363,7 +359,7 @@ _FUNC(void, spinor_field_g5_assign, (_SPINOR_FIELD_TYPE *s1))
 }
 
 /* s1+=c*g5*s2 c complex */
-_FUNC(void, spinor_field_g5_mulc_add_assign, (_SPINOR_FIELD_TYPE *s1, _COMPLEX c, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_g5_mulc_add_assign, (_SPINOR_FIELD_TYPE *s1, _COMPLEX c, _SPINOR_FIELD_TYPE *s2))
 {
    _TWO_SPINORS_MATCHING(s1,s2);
    _CUDA_FOR(s1,ixp,
@@ -372,7 +368,7 @@ _FUNC(void, spinor_field_g5_mulc_add_assign, (_SPINOR_FIELD_TYPE *s1, _COMPLEX c
 }
 
 /* tools per eva.c  */
-_FUNC(void, spinor_field_lc1, (_REAL c1, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_lc1, (_REAL c1, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
 {
   _TWO_SPINORS_MATCHING(s1,s2);
   _CUDA_FOR(s1,ixp,
@@ -380,7 +376,7 @@ _FUNC(void, spinor_field_lc1, (_REAL c1, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_T
   );
 }
 
-_FUNC(void, spinor_field_lc2, (_REAL c1, _REAL c2, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_lc2, (_REAL c1, _REAL c2, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
 {
   _TWO_SPINORS_MATCHING(s1,s2);
   _CUDA_FOR(s1,ixp,
@@ -388,7 +384,7 @@ _FUNC(void, spinor_field_lc2, (_REAL c1, _REAL c2, _SPINOR_FIELD_TYPE *s1, _SPIN
   );
 }
 
-_FUNC(void, spinor_field_lc3, (_REAL c1, _REAL c2, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2, _SPINOR_FIELD_TYPE *s3))
+_DECLARE(void, spinor_field_lc3, (_REAL c1, _REAL c2, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2, _SPINOR_FIELD_TYPE *s3))
 {
   _TWO_SPINORS_MATCHING(s1,s2);
   /* c1=-c1; c2=-c2; */
@@ -400,26 +396,19 @@ _FUNC(void, spinor_field_lc3, (_REAL c1, _REAL c2, _SPINOR_FIELD_TYPE *s1, _SPIN
 }
 
 /* Placeholder functions, there need to be the same definitions in linear_algebra.c.sdtmpl and linear_algebra_gpu.c.sdtmpl */
-_FUNC(void, spinor_field_g0, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_g0, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
 {}
-_FUNC(void, spinor_field_g1, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_g1, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
 {}
-_FUNC(void, spinor_field_g2, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_g2, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
 {}
-_FUNC(void, spinor_field_g3, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_g3, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
 {}
 
-
+//internal macros
+#undef _DECLARE
 #undef _TOCOMPLEX
 #undef _NCOM
-
-//undefine macros
-//internal macros
-#undef _CONCAT
-#undef _F_NAME
-#undef _GPU_F_NAME
-#undef _FUNC_INNER
-#undef _FUNC
 
 //user interface macros
 #undef _SPINOR_FIELD_TYPE

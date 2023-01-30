@@ -3,6 +3,8 @@
 * All rights reserved.                                                      *
 \***************************************************************************/
 
+#include "Utils/generics.h"
+
 #if !defined(_SPINOR_FIELD_TYPE) 
 #error Missing _SPINOR_FIELD_TYPE in Dphi_gpu.cu
 #endif
@@ -10,29 +12,26 @@
 #error Missing _SUFFIX in Dphi_gpu.cu
 #endif
 
-#define _CONCAT(_name,_suffix) _name ## _suffix
-#define _F_NAME(_name,_suffix) _CONCAT(_name,_suffix)
 
-#define _CPU_F_NAME(_name,_suffix) _CONCAT(_name,_suffix ## _cpu)
-#define _GPU_F_NAME(_name,_suffix) _CONCAT(_name,_suffix ## _gpu)
+#define _CPU_F_NAME(_name,_suffix) CONCAT(_name,_suffix ## _cpu)
 #define _CPU_FUNC_INNER(_type,_name,_suffix,_args) _type _CPU_F_NAME(_name,_suffix) _args
 #define _GPU_FUNC_INNER(_type,_name,_suffix,_args) _type _GPU_F_NAME(_name,_suffix) _args
 #define _PTR_FUNC_INNER(_type,_name,_suffix,_args) extern _type (*_F_NAME(_name,_suffix)) _args
 
 #define _CONCAT_(_name,_suffix) _name ## _suffix ## _
 #define _F_NAME_(_name,_suffix) _CONCAT_(_name,_suffix)
-#define _CPU_F_NAME_(_name,_suffix) _CONCAT(_name,_suffix ## _cpu_)
-#define _GPU_F_NAME_(_name,_suffix) _CONCAT(_name,_suffix ## _gpu_)
+#define _CPU_F_NAME_(_name,_suffix) CONCAT(_name,_suffix ## _cpu_)
+#define _GPU_F_NAME_(_name,_suffix) CONCAT(_name,_suffix ## _gpu_)
 #define _CPU_FUNC_INNER_(_type,_name,_suffix,_args) _type _CPU_F_NAME_(_name,_suffix) _args
 #define _GPU_FUNC_INNER_(_type,_name,_suffix,_args) _type _GPU_F_NAME_(_name,_suffix) _args
 #define _PTR_FUNC_INNER_(_type,_name,_suffix,_args) extern _type (*_F_NAME_(_name,_suffix)) _args
 
 #ifdef WITH_GPU
-#define _FUNC(a,b,c) _PTR_FUNC_INNER(a,b,_SUFFIX,c); _CPU_FUNC_INNER(a,b,_SUFFIX,c); _GPU_FUNC_INNER(a,b,_SUFFIX,c)
-#define _FUNC_(a,b,c) _PTR_FUNC_INNER_(a,b,_SUFFIX,c); _CPU_FUNC_INNER_(a,b,_SUFFIX,c); _GPU_FUNC_INNER_(a,b,_SUFFIX,c)
+#define _DECLARE(a,b,c) _PTR_FUNC_INNER(a,b,_SUFFIX,c); _CPU_FUNC_INNER(a,b,_SUFFIX,c); _GPU_FUNC_INNER(a,b,_SUFFIX,c)
+#define _DECLARE_(a,b,c) _PTR_FUNC_INNER_(a,b,_SUFFIX,c); _CPU_FUNC_INNER_(a,b,_SUFFIX,c); _GPU_FUNC_INNER_(a,b,_SUFFIX,c)
 #else
-#define _FUNC(a,b,c) _PTR_FUNC_INNER(a,b,_SUFFIX,c); _CPU_FUNC_INNER(a,b,_SUFFIX,c)
-#define _FUNC_(a,b,c) _PTR_FUNC_INNER_(a,b,_SUFFIX,c); _CPU_FUNC_INNER_(a,b,_SUFFIX,c)
+#define _DECLARE(a,b,c) _PTR_FUNC_INNER(a,b,_SUFFIX,c); _CPU_FUNC_INNER(a,b,_SUFFIX,c)
+#define _DECLARE_(a,b,c) _PTR_FUNC_INNER_(a,b,_SUFFIX,c); _CPU_FUNC_INNER_(a,b,_SUFFIX,c)
 #endif
 
 #ifdef __cplusplus
@@ -40,27 +39,24 @@
 #define restrict __restrict__
 #endif
 
-_FUNC(unsigned long int, getMVM, (void));
-_FUNC_(void, Dphi, (_SPINOR_FIELD_TYPE *restrict out, _SPINOR_FIELD_TYPE *restrict in));
-_FUNC(void, Dphi, (double m0, _SPINOR_FIELD_TYPE *out, _SPINOR_FIELD_TYPE *in));
-_FUNC(void, g5Dphi, (double m0, _SPINOR_FIELD_TYPE *out, _SPINOR_FIELD_TYPE *in));
-_FUNC(void, g5Dphi_sq, (double m0, _SPINOR_FIELD_TYPE *out, _SPINOR_FIELD_TYPE *in));
-_FUNC(void, Dphi_eopre, (double m0, _SPINOR_FIELD_TYPE *out, _SPINOR_FIELD_TYPE *in));
-//_FUNC(void, Dphi_oepre, (double m0, _SPINOR_FIELD_TYPE *out, _SPINOR_FIELD_TYPE *in));
-_FUNC(void, g5Dphi_eopre, (double m0, _SPINOR_FIELD_TYPE *out, _SPINOR_FIELD_TYPE *in));
-_FUNC(void, g5Dphi_eopre_sq, (double m0, _SPINOR_FIELD_TYPE *out, _SPINOR_FIELD_TYPE *in));
+_DECLARE(unsigned long int, getMVM, (void));
+_DECLARE_(void, Dphi, (_SPINOR_FIELD_TYPE *restrict out, _SPINOR_FIELD_TYPE *restrict in));
+_DECLARE(void, Dphi, (double m0, _SPINOR_FIELD_TYPE *out, _SPINOR_FIELD_TYPE *in));
+_DECLARE(void, g5Dphi, (double m0, _SPINOR_FIELD_TYPE *out, _SPINOR_FIELD_TYPE *in));
+_DECLARE(void, g5Dphi_sq, (double m0, _SPINOR_FIELD_TYPE *out, _SPINOR_FIELD_TYPE *in));
+_DECLARE(void, Dphi_eopre, (double m0, _SPINOR_FIELD_TYPE *out, _SPINOR_FIELD_TYPE *in));
+//_DECLARE(void, Dphi_oepre, (double m0, _SPINOR_FIELD_TYPE *out, _SPINOR_FIELD_TYPE *in));
+_DECLARE(void, g5Dphi_eopre, (double m0, _SPINOR_FIELD_TYPE *out, _SPINOR_FIELD_TYPE *in));
+_DECLARE(void, g5Dphi_eopre_sq, (double m0, _SPINOR_FIELD_TYPE *out, _SPINOR_FIELD_TYPE *in));
 
 //undefine macros
 //internal macros
-#undef _CONCAT
-#undef _F_NAME
 #undef _CPU_F_NAME
-#undef _GPU_F_NAME
 #undef _GPU_F_NAME_
 #undef _CPU_FUNC_INNER
 #undef _GPU_FUNC_INNER
 #undef _PTR_FUNC_INNER
-#undef _FUNC
+#undef _DECLARE
 
 //user interface macros
 #undef _SPINOR_FIELD_TYPE

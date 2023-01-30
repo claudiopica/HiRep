@@ -35,30 +35,30 @@ int main(int argc, char *argv[])
     test_setup();
 
     // Double precision test block
-    /*lprintf("INFO", 0, "\n\nFull lattice tests\n\n");
+    lprintf("INFO", 0, "\n\nFull lattice tests\n\n");
     return_val += test_gfield_allocation();
     return_val += test_gfield_f_allocation();
     return_val += test_spinor_field_allocation(&glattice);
     return_val += test_avfield_allocation();
     return_val += test_clover_term_allocation();
     return_val += test_clover_force_allocation();
-    return_val += test_sfield_allocation(&glattice); */
+    return_val += test_sfield_allocation(&glattice); 
 
     // Single precision test block
-    /*return_val += test_gfield_flt_allocation();
+    return_val += test_gfield_flt_allocation();
     return_val += test_gfield_f_flt_allocation();
-    return_val += test_spinor_field_flt_allocation(&glattice);*/
+    return_val += test_spinor_field_flt_allocation(&glattice);
 
     // Spinor-like with even parity
     lprintf("INFO", 0, "\n\n Even parity\n\n");
     return_val += test_spinor_field_allocation(&glat_even);
-    //return_val += test_spinor_field_flt_allocation(&glat_even);
-    //return_val += test_sfield_allocation(&glat_even);
+    return_val += test_spinor_field_flt_allocation(&glat_even);
+    return_val += test_sfield_allocation(&glat_even);
 
     // Spinor-like with odd parity
-    //lprintf("INFO", 0, "\n\n Odd parity\n\n");
-    //return_val += test_spinor_field_allocation(&glat_odd);
-    //return_val += test_spinor_field_flt_allocation(&glat_odd);
+    lprintf("INFO", 0, "\n\n Odd parity\n\n");
+    return_val += test_spinor_field_allocation(&glat_odd);
+    return_val += test_spinor_field_flt_allocation(&glat_odd);
     //return_val += test_sfield_allocation(&glat_odd);
 
     // Finalize and return
@@ -77,7 +77,6 @@ int test_gfield_allocation()
 
     // Copy back and forth
     copy_to_gpu_gfield(f);
-    zero_gfield_cpu(f);
     copy_from_gpu_gfield(f);
 
     // Check that sqnorm is unequal to zero, nan or inf
@@ -108,7 +107,6 @@ int test_gfield_f_allocation()
 
     // Copy back and forth
     copy_to_gpu_gfield_f(f);
-    zero_gfield_f_cpu(f);
     copy_from_gpu_gfield_f(f);
 
     // Check that sqnorm is unequal to zero, nan or inf
@@ -139,7 +137,6 @@ int test_gfield_flt_allocation()
 
     // Copy back and forth
     copy_to_gpu_gfield_flt(f);
-    zero_gfield_flt_cpu(f);
     copy_from_gpu_gfield_flt(f);
 
     // Check that sqnorm is unequal to zero, nan or inf
@@ -170,7 +167,6 @@ int test_gfield_f_flt_allocation()
 
     // Copy back and forth
     copy_to_gpu_gfield_f_flt(f);
-    zero_gfield_f_flt_cpu(f);
     copy_from_gpu_gfield_f_flt(f);
 
     // Check that sqnorm is unequal to zero, nan or inf
@@ -201,7 +197,6 @@ int test_avfield_allocation()
 
     // Copy back and forth
     copy_to_gpu_avfield(f);
-    zero_avfield_cpu(f);
     copy_from_gpu_avfield(f);
 
     // Check that sqnorm is unequal to zero, nan or inf
@@ -232,7 +227,6 @@ int test_gtransf_allocation()
 
     // Copy back and forth
     copy_to_gpu_gtransf(f);
-    zero_gtransf_cpu(f);
     copy_from_gpu_gtransf(f);
 
     // Check that sqnorm is unequal to zero, nan or inf
@@ -263,7 +257,6 @@ int test_clover_term_allocation()
 
     // Copy back and forth
     copy_to_gpu_clover_term(f);
-    zero_clover_term_cpu(f);
     copy_from_gpu_clover_term(f);
 
     // Check that sqnorm is unequal to zero, nan or inf
@@ -294,7 +287,6 @@ int test_clover_force_allocation()
 
     // Copy back and forth
     copy_to_gpu_clover_force(f);
-    zero_clover_force_cpu(f);
     copy_from_gpu_clover_force(f);
 
     // Check that sqnorm is unequal to zero, nan or inf
@@ -325,7 +317,6 @@ int test_spinor_field_allocation(geometry_descriptor *gd)
 
     // Copy back and forth
     copy_to_gpu_spinor_field_f(f);
-    spinor_field_zero_f_cpu(f);
     copy_from_gpu_spinor_field_f(f);
 
     // Check that sqnorm is unequal to zero, nan or inf
@@ -356,11 +347,10 @@ int test_spinor_field_flt_allocation(geometry_descriptor *gd)
 
     // Copy back and forth
     copy_to_gpu_spinor_field_f_flt(f);
-    spinor_field_zero_f_flt_cpu(f);
     copy_from_gpu_spinor_field_f_flt(f);
 
     // Check that sqnorm is unequal to zero, nan or inf
-    double sqnorm = spinor_field_sqnorm_f_flt(f);
+    double sqnorm = spinor_field_sqnorm_f_flt_cpu(f);
     if (!isfinite(sqnorm) || fabs(sqnorm) < 1e-14) {
         lprintf("RESULT", 0, "FAILED\n");
         return_val = 1;
@@ -387,7 +377,6 @@ int test_sfield_allocation(geometry_descriptor *gd)
 
     // Copy back and forth
     copy_to_gpu_sfield(f);
-    //zero_sfield_cpu(f);
     copy_from_gpu_sfield(f);
 
     // Check that sqnorm is unequal to zero, nan or inf

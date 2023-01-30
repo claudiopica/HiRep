@@ -12,6 +12,7 @@
 #define GPU_GEOMETRY_H
 
 #include "new_geometry.h"
+#include "Utils/generics.h"
 
 //#define __start_in(box) (gd_t == EVEN) ? box->base_index_even : box->base_index_odd
 
@@ -79,7 +80,6 @@ typedef struct _kernel_field_input {
 
 #define _GPU_IDX_TO_LOCAL(_in, ix, ixp) ix - (_in)->type->master_start[(ixp)];
 
-#define _F_NAME(_name, _suffix) _name ## _suffix
 
 // TODO: in spinor field -> read by comp, out spinor field -> read full spinor -> this needs to be clarified (SAM)
 #define _IN_SPINOR_FIELD(_site, _comp, _site_type) \
@@ -153,7 +153,5 @@ typedef struct _kernel_field_input {
     if (__idx_out_local < __stride_out)
 
 
-#undef _F_NAME
-#undef CONCAT
 #endif
 #undef local_index

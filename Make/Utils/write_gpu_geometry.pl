@@ -108,9 +108,9 @@ sub write_epilog {
 
 sub write_idx_finder {
     if ($fixed_stride==1) {
-        print "#define calc_idx(_idx,_typename,_type,_dim) (( _idx / THREADSIZE ) * THREADSIZE ) * _dim * sizeof(_typename) / sizeof(_type) + _idx%THREADSIZE\n\n";
+        print "#define calc_idx(_idx,_typename,_type,_dim) (( (_idx) / THREADSIZE ) * THREADSIZE ) * _dim * sizeof(_typename) / sizeof(_type) + (_idx)%THREADSIZE\n\n";
     } else {
-        print "#define calc_idx(_idx,...) _idx\n\n";
+        print "#define calc_idx(_idx,...) (_idx)\n\n";
     }
 }
 

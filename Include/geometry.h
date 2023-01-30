@@ -36,10 +36,7 @@
     #include "Geometry/gpu_geometry.h"
     #include "Geometry/strided_reads.h"
     #include "Geometry/direction.h"
-    
-    #ifdef __cplusplus
-    #include "Geometry/strided_reads_gpu.hpp"
-    #endif
+    #include "Geometry/strided_reads_gpu.h"
 #endif
 
 /* this define the width of the borders for parallel dimensions

@@ -4,6 +4,7 @@
 \***************************************************************************/
 
 #include "Utils/generics.h"
+#include "libhr_core.h"
 
 #if !defined _FIELD_NAME
 #error Missing _FIELD_NAME in communications_gpu.c
@@ -57,8 +58,8 @@ _KERNEL(box_to_buffer_kernel_,(kernel_field_input* input, coord4* icoord, int* i
             int iy = ipt_ext_gpu(c.x[0], c.x[1], c.x[2], c.x[3]);
             _SITE_TYPE site;
             for (int comp = 0; comp < _FIELD_DIM; ++comp) {
-                read_gpu<_COMPLEX>(0, &site, in, iy-input->master_shift_in, comp, _FIELD_DIM);
-                write_gpu<_COMPLEX>(0, &site, out, ix, comp, _FIELD_DIM);
+                read_gpu<_REAL>(0, &site, in, iy-input->master_shift_in, comp, _FIELD_DIM);
+                write_gpu<_REAL>(0, &site, out, ix, comp, _FIELD_DIM);
             }
         }
     }
@@ -92,3 +93,4 @@ _DECLARE(void, sync_box_to_buffer_gpu_,(geometry_descriptor *gd, box_t *src, _FI
 #undef _FIELD_DIM
 #undef _GEOM_TYPE
 #undef _COMPLEX
+#undef _REAL

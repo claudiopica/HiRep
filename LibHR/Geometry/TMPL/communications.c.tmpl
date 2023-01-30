@@ -28,42 +28,35 @@
 #error Missing _REAL in communications_gpu.c
 #endif
 
-#define CONCAT(_name, _suffix) _name ## _suffix
-#define _F_NAME(_name, _suffix) CONCAT(_name, _suffix)
-
-#define _FUNC(_name, _args) void _F_NAME(_name,_FIELD_NAME) _args
+#define _DECLARE(_name, _args) void _F_NAME(_name,_FIELD_NAME) _args
 #define _CONCAT_GPU(_name,_suffix) _name ## _suffix ## _gpu
 #define _GPU_F_NAME(_name,_suffix) _CONCAT_GPU(_name,_suffix)
-#define _GPU_FUNC(_name, _args) void _GPU_F_NAME(_name,_FIELD_NAME) _args
-
-#define _N_SITES(_geom) CONCAT(f->type->gsize_,_geom)
-#define _NUMBER_OF_SITES _N_SITES(_GEOM_TYPE)
-#define _N_BUFFERS(_geom) CONCAT(f->type->nbuffers_,_geom)
-#define _NUMBER_OF_BUFFERS _N_BUFFERS(_GEOM_TYPE)
+#define _GPU_DECLARE(_name, _args) void _GPU_F_NAME(_name,_FIELD_NAME) _args
 
 #define _COMM_TYPE_FOR(_comm_type) \
         for (int _comm_type = CPU_COMM; _comm_type <= GPU_COMM; ++_comm_type)
 
 #define _BUFFER_FOR(_comm_type, _buf_idx) \
-        if (f->comm_type & _comm_type) for (int i = 0; i < _NUMBER_OF_BUFFERS; ++i)
+        if (f->comm_type & _comm_type) for (int i = 0; i < _NUMBER_OF_BUFFERS(_GEOM_TYPE); ++i)
 
 #ifdef WITH_NEW_GEOMETRY
 static void *_F_NAME(sendrecv_guard_,_FIELD_NAME)=NULL;
 #endif
 
-_FUNC(sync_,(_FIELD_TYPE *f)) {
+_DECLARE(sync_,(_FIELD_TYPE *f)) {
     #ifdef WITH_MPI
     sync_field(f->type, _FIELD_DIM*sizeof(*f->ptr), _IS_SPINOR_LIKE, f->ptr, f->sendbuf_ptr);
     #endif
 }
 
-_GPU_FUNC(sync_,(_FIELD_TYPE *f)) {
+_GPU_DECLARE(sync_,(_FIELD_TYPE *f)) {
     #ifdef WITH_MPI
     #ifdef WITH_GPU
     box_t *L = geometryBoxes->next;
     int i = 0;
+    geometry_descriptor *type = f->type;
 
-    int nbuffers = _NUMBER_OF_BUFFERS;
+    int nbuffers = _NUMBER_OF_BUFFERS(_GEOM_TYPE);
     if (f->type==&glattice) nbuffers /= 2;
     while (L && i < nbuffers)
     {
@@ -74,8 +67,9 @@ _GPU_FUNC(sync_,(_FIELD_TYPE *f)) {
     #endif              
 }
 
-_FUNC(start_sendrecv_,(_FIELD_TYPE *f)) {
+_DECLARE(start_sendrecv_,(_FIELD_TYPE *f)) {
     #ifdef WITH_MPI
+    geometry_descriptor *type = f->type;
     const int mpi_chunks_per_site = sizeof(_SITE_TYPE)/sizeof(_REAL);
 
     #ifdef WITH_NEW_GEOMETRY
@@ -117,9 +111,10 @@ _FUNC(start_sendrecv_,(_FIELD_TYPE *f)) {
     #endif       
 }
 
-_FUNC(complete_sendrecv_,(_FIELD_TYPE *f)) {
+_DECLARE(complete_sendrecv_,(_FIELD_TYPE *f)) {
     #ifdef WITH_MPI
-    int nreq = 2 * _NUMBER_OF_BUFFERS;
+    geometry_descriptor *type = f->type;
+    int nreq = 2 * _NUMBER_OF_BUFFERS(_GEOM_TYPE);
     #ifdef WITH_NEW_GEOMETRY
         _F_NAME(sendrecv_guard_,_FIELD_NAME) = NULL;
     #endif
@@ -131,8 +126,9 @@ _FUNC(complete_sendrecv_,(_FIELD_TYPE *f)) {
     #endif
 }
 
-_FUNC(fill_buffers_,(_FIELD_TYPE *f)) {
+_DECLARE(fill_buffers_,(_FIELD_TYPE *f)) {
     #ifdef WITH_MPI
+    geometry_descriptor *type = f->type;
     _COMM_TYPE_FOR(comm_type) {
         _BUFFER_FOR(comm_type, _buf_idx) {
             int chunks_per_site = sizeof(_SITE_TYPE)/sizeof(_REAL);
@@ -157,8 +153,9 @@ _FUNC(fill_buffers_,(_FIELD_TYPE *f)) {
     #endif
 }
 
-_FUNC(fill_buffers_with_zeroes_,(_FIELD_TYPE *f)) {
+_DECLARE(fill_buffers_with_zeroes_,(_FIELD_TYPE *f)) {
     #ifdef WITH_MPI
+    geometry_descriptor *type = f->type;
     _COMM_TYPE_FOR(comm_type) {
         _BUFFER_FOR(comm_type, _buf_idx) {
             int chunks_per_site = sizeof(_SITE_TYPE)/sizeof(_REAL);
@@ -189,9 +186,3 @@ _FUNC(fill_buffers_with_zeroes_,(_FIELD_TYPE *f)) {
 #undef _FIELD_DIM
 #undef _MPI_REAL
 #undef _REAL
-#undef CONCAT
-#undef _F_NAME
-#undef _N_SITES
-#undef _NUMBER_OF_SITES
-#undef _N_BUFFERS
-#undef _NUMBER_OF_BUFFERS

@@ -7,7 +7,6 @@
 #define LIBHR_H
 
 #include "libhr_core.h"
-
 #include "error.h"
 #include "geometry.h"
 #include "inverters.h"

@@ -1,10 +1,8 @@
 #ifndef LINEAR_ALGEBRA_GPU_CU
 #define LINEAR_ALGEBRA_GPU_CU
 
-#include "Geometry/strided_reads_gpu.hpp"
-
-#define _CONCAT(_name,_suffix) _name ## _suffix
-#define _F_NAME(_name,_suffix) _CONCAT(_name,_suffix)
+#include "geometry.h"
+#include "Utils/generics.h"
 
 #define spinor_idx(_idx) (_idx/(4*NF*THREADSIZE))*THREADSIZE + _idx % 4*NF*THREADSIZE % THREADSIZE
 

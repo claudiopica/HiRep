@@ -15,6 +15,7 @@
 
 #include "spinor_field.h"
 #include "Inverters/linear_solvers.h"
+#include "Utils/generics.h"
 
 #ifdef __cplusplus
     extern "C" {
