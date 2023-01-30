@@ -41,7 +41,6 @@
 
 _FUNC(void, to_gpu_format_, _FIELD_NAME, (_FIELD_TYPE *out, _FIELD_TYPE *in)) {
     _CHECK_GEOMETRY_MATCHING(out, in);  
-    _SITE_TYPE *target = out->ptr;
     _MASTER_FOR(in->type, ix) {
         for (int comp = 0; comp < _FIELD_DIM; ++comp) {
             _SITE_TYPE *source = _DFIELD_AT(in, ix, comp, _FIELD_DIM);
@@ -52,7 +51,6 @@ _FUNC(void, to_gpu_format_, _FIELD_NAME, (_FIELD_TYPE *out, _FIELD_TYPE *in)) {
 
 _FUNC(void, to_cpu_format_, _FIELD_NAME, (_FIELD_TYPE *out, _FIELD_TYPE *in)) {
     _CHECK_GEOMETRY_MATCHING(out, in);
-    _SITE_TYPE *source = in->ptr;
     _MASTER_FOR(in->type, ix) {
         for (int comp = 0; comp < _FIELD_DIM; ++comp) {
             _SITE_TYPE *target = _DFIELD_AT(out, ix, comp, _FIELD_DIM);
