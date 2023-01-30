@@ -134,14 +134,15 @@ EOF
                 ((ompproc * npt * NPX * NPY * NPZ < MINPROC)) && continue
         		(( counter+=1 ))
 		        if (( counter == 1)) ; then
-			    (( ARRAYID += 1 ))
-			    jobmpi="job_${NODES}_${ARRAYID}.mpi"
-			    locreportfile="${reportfile}_${ARRAYID}.csv"
-			    print_slurm_header ${NODES}_${ARRAYID} > $jobmpi
-			    $parse_out_script -H > $locreportfile
+			        (( ARRAYID += 1 ))
+			        jobmpi="job_${NODES}_${ARRAYID}.mpi"
+			        locreportfile="${reportfile}_${ARRAYID}.csv"
+
+			        print_slurm_header ${NODES}_${ARRAYID} > $jobmpi
+			        [ ! -f "$locreportfile" ] && $parse_out_script -H > $locreportfile
 		            ifelse="if"
         		else
-			    ifelse="elif"
+			        ifelse="elif"
         		fi
 			cat <<EOF >>$jobmpi
 $ifelse (( SLURM_ARRAY_TASK_ID == $counter )) ; then
@@ -149,8 +150,8 @@ export OMP_NUM_THREADS=$ompproc
 EXECONTROL=\`tail -n1 ${outfile}_${NODES}_${npt}_${lct}_${paral}_${ompproc}_0 | grep -e "Process finalized" | wc -l\`
 if (( EXECONTROL == 0 )) ; then
     mpirun -n $((npt * NPX * NPY * NPZ)) --ppn $(((npt * NPX * NPY * NPZ) / NODES))  ./$EXEC -i loc_speed_${NODES}_${npt}_${lct}_${paral}.in -o ${outfile}_${NODES}_${npt}_${lct}_${paral}_${ompproc}
+    $parse_out_script -n ${outfile}_${NODES}_${npt}_${lct}_${paral}_${ompproc}_0 -j job.\${SLURM_JOB_ID}.out >>${locreportfile}
 fi
-$parse_out_script -n ${outfile}_${NODES}_${npt}_${lct}_${paral}_${ompproc}_0 -j job.\${SLURM_JOB_ID}.out >>${locreportfile}
 EOF
 
 			if (( counter == MAXARRAYSIZE - 1 )) ; then
