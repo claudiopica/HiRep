@@ -18,7 +18,7 @@ parse_out_script="./parse_out.sh"
 
 
 MAXARRAYSIZE=`scontrol show config | grep -e MaxArraySize | awk '{print $3}'`
-rm -rf job_${NODES}_*.mpi report_nodes${NODES}_*.csv
+rm -rf job_${NODES}_*.mpi #report_nodes${NODES}_*.csv
 
 print_slurm_header () {
 echo "#!/bin/bash
@@ -146,8 +146,10 @@ EOF
 			cat <<EOF >>$jobmpi
 $ifelse (( SLURM_ARRAY_TASK_ID == $counter )) ; then
 export OMP_NUM_THREADS=$ompproc
-rm -f ${outfile}_${NODES}_${npt}_${lct}_${paral}_${ompproc} 
-mpirun -n $((npt * NPX * NPY * NPZ)) --ppn $(((npt * NPX * NPY * NPZ) / NODES))  ./$EXEC -i loc_speed_${NODES}_${npt}_${lct}_${paral}.in -o ${outfile}_${NODES}_${npt}_${lct}_${paral}_${ompproc}
+EXECONTROL=`tail -n1 ${outfile}_${NODES}_${npt}_${lct}_${paral}_${ompproc} | grep -e "Process finalized" | wc -l`
+if (( EXECONTROL==0 )) ; then
+    mpirun -n $((npt * NPX * NPY * NPZ)) --ppn $(((npt * NPX * NPY * NPZ) / NODES))  ./$EXEC -i loc_speed_${NODES}_${npt}_${lct}_${paral}.in -o ${outfile}_${NODES}_${npt}_${lct}_${paral}_${ompproc}
+fi
 $parse_out_script -n ${outfile}_${NODES}_${npt}_${lct}_${paral}_${ompproc}_0 -j job.\${SLURM_JOB_ID}.out >>${locreportfile}
 EOF
 
