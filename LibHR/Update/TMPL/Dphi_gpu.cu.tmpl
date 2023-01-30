@@ -11,6 +11,7 @@
 
 
 #include "../Dphi_gpu_kernels.hpp"
+#include "libhr_core.h"
 #include "memory.h"
 #include "inverters.h"
 #include <string.h>
@@ -29,10 +30,13 @@
 #error Missing _HSPINOR_TYPE in Dphi_gpu.cu
 #endif
 #if !defined(_VECTOR_TYPE)
-#error Mmissing _VECTOR_TYPE in Dphi_gpu.cu
+#error Missing _VECTOR_TYPE in Dphi_gpu.cu
 #endif
 #if !defined(_COMPLEX)
 #error Missing _COMPLEX in Dphi_gpu.cu
+#endif
+#if !defined(_REAL)
+#error Missing _REAL in Dphi_gpu.cu
 #endif
 #if !defined(_GAUGE_TYPE)
 #error Missing _GAUGE_TYPE in Dphi_gpu.cu
@@ -124,14 +128,19 @@ _DECLARE(static void, free_mem, ()) {
  */
 _DECLARE(static void, init_Dirac, ()) {
   if (_VAR(init,_SUFFIX)) {
+    // Change standard communication and allocation mode
+    // Since the tmp fields are only allocated on the GPU
+    comm_t current_std_comm_t = std_comm_t;
+    std_comm_t = GPU_COMM;
     alloc_mem_t=GPU_MEM;
-
+    
     _VAR(gtmp,_SUFFIX)=_F_NAME(alloc_,_FIELD_NAME)(1, &glattice);
     _VAR(etmp,_SUFFIX)=_F_NAME(alloc_,_FIELD_NAME)(1, &glat_even);
     _VAR(otmp,_SUFFIX)=_F_NAME(alloc_,_FIELD_NAME)(1, &glat_odd);
 
+    // Reset standard communication and allocation mode
     alloc_mem_t=std_mem_t;
-
+    std_comm_t =current_std_comm_t;
     atexit(&_GPU_F_NAME(free_mem,_SUFFIX));
     _VAR(init,_SUFFIX)=0;
   }
@@ -180,7 +189,7 @@ _DECLARE(static void, Dphi_inner, (_FIELD_TYPE *out, _FIELD_TYPE *in)) {
   const _GAUGE_TYPE *gauge = GFIELD(u_gauge,_REP_SUFFIX)->gpu_ptr;
   int grid = (boxEvenVolume(geometryBoxes)-1)/BLOCK_SIZE_DIRAC + 1;
   kernel_field_input* input = _GPU_F_NAME(init_kernel_input,_SUFFIX)(out, in, gauge, geometryBoxes, gd_t);
-  Dphi_gpu_inner_kernel<_HSPINOR_TYPE, _VECTOR_TYPE, _COMPLEX, _SPINOR_TYPE, _GAUGE_TYPE><<<grid, BLOCK_SIZE_DIRAC>>>(input);
+  Dphi_gpu_inner_kernel<_HSPINOR_TYPE, _REAL, _SPINOR_TYPE, _GAUGE_TYPE><<<grid, BLOCK_SIZE_DIRAC>>>(input);
   CudaCheckError();
   cudaDeviceSynchronize();
 }
@@ -209,7 +218,7 @@ _DECLARE(static void, Dphi_boundary, (_FIELD_TYPE *out, _FIELD_TYPE *in)) {
     const _GAUGE_TYPE *gauge = GFIELD(u_gauge,_REP_SUFFIX)->gpu_ptr;
     int grid = (boxEvenVolume(geometryBoxes)-1)/BLOCK_SIZE_DIRAC + 1;
     kernel_field_input* input = _GPU_F_NAME(init_kernel_input,_SUFFIX)(out, in, gauge, buffer_box, gd_t);
-    Dphi_gpu_boundary_kernel<_HSPINOR_TYPE, _VECTOR_TYPE, _COMPLEX, _SPINOR_TYPE, _GAUGE_TYPE><<<grid, BLOCK_SIZE_DIRAC>>>(input);
+    Dphi_gpu_boundary_kernel<_HSPINOR_TYPE, _REAL, _SPINOR_TYPE, _GAUGE_TYPE><<<grid, BLOCK_SIZE_DIRAC>>>(input);
     buffer_box=buffer_box->next; i++;
   }
 }
@@ -259,6 +268,7 @@ _DECLARE(void, Dphi, (double m0, _FIELD_TYPE *out, _FIELD_TYPE *in)) {
   double rho = 4. + m0;
   _GPU_F_NAME_(Dphi,_SUFFIX) (out, in);
   
+  //_F_NAME(spinor_field_copy,_REP_SUFFIX) (out, in);
   _F_NAME(spinor_field_mul_add_assign,_REP_SUFFIX) (out, rho, in);
 }
 
@@ -435,6 +445,7 @@ _ALIAS_INNER(void,g5Dphi_eopre_sq,_SUFFIX, (double m0, _FIELD_TYPE *out, _FIELD_
 #undef _SUFFIX
 #undef _FIELD_NAME
 #undef _REP_SUFFIX
+#undef _REAL
 
 #undef _VAR
 #undef _GPU_F_NAME_

@@ -44,15 +44,15 @@ __device__ __constant__ char Z_MASK=Z_UP_MASK +Z_DN_MASK;
 #define _DIR(MASK) ((MASK&UP_MASK) ? UP : DOWN)
 #define _MU(MASK) ((MASK&T_MASK) ? 0 : (MASK&X_MASK) ? 1 : (MASK&Y_MASK) ? 2 : 3)   
 
-template<typename HSPINOR_TYPE, typename GAUGE_TYPE, typename COMPLEX, typename SITE_TYPE>
+template<typename HSPINOR_TYPE, class REAL, typename GAUGE_TYPE, typename SITE_TYPE>
 __device__ void evaluate_direction(SITE_TYPE *r, SITE_TYPE *in, GAUGE_TYPE *gauge, int ix, int iy, int mu, int dir, int master_shift) {
     HSPINOR_TYPE sn;
     GAUGE_TYPE u;
     if (mu == 0) {
         if (dir == UP) {
-            in_spinor_field<COMPLEX>(&(sn.c[0]), in, iy-master_shift, 0);
-            in_spinor_field<COMPLEX>(&(sn.c[1]), in, iy-master_shift, 2);
-            in_gauge_field<COMPLEX>(&u, gauge, ix, iy, 0, dir);
+            in_spinor_field<REAL>(&(sn.c[0]), in, iy-master_shift, 0);
+            in_spinor_field<REAL>(&(sn.c[1]), in, iy-master_shift, 2);
+            in_gauge_field<REAL>(&u, gauge, ix, iy, 0, dir);
 
             _vector_add_assign_f(sn.c[0], sn.c[1]);
             _suNf_theta_T_multiply(sn.c[1], u, sn.c[0]);
@@ -60,8 +60,8 @@ __device__ void evaluate_direction(SITE_TYPE *r, SITE_TYPE *in, GAUGE_TYPE *gaug
             _vector_add_assign_f((*r).c[0], sn.c[1]);
             _vector_add_assign_f((*r).c[2], sn.c[1]);
 
-            in_spinor_field<COMPLEX>(&(sn.c[0]), in, iy-master_shift, 1);
-            in_spinor_field<COMPLEX>(&(sn.c[1]), in, iy-master_shift, 3);
+            in_spinor_field<REAL>(&(sn.c[0]), in, iy-master_shift, 1);
+            in_spinor_field<REAL>(&(sn.c[1]), in, iy-master_shift, 3);
             _vector_add_assign_f(sn.c[0], sn.c[1]);
 
             _suNf_theta_T_multiply(sn.c[1], u, sn.c[0]);
@@ -69,9 +69,9 @@ __device__ void evaluate_direction(SITE_TYPE *r, SITE_TYPE *in, GAUGE_TYPE *gaug
             _vector_add_assign_f((*r).c[1], sn.c[1]);
             _vector_add_assign_f((*r).c[3], sn.c[1]); 
         } else {
-            in_spinor_field<COMPLEX>(&(sn.c[0]), in, iy-master_shift, 0);
-            in_spinor_field<COMPLEX>(&(sn.c[1]), in, iy-master_shift, 2);
-            in_gauge_field<COMPLEX>(&u, gauge, ix, iy, 0, dir);
+            in_spinor_field<REAL>(&(sn.c[0]), in, iy-master_shift, 0);
+            in_spinor_field<REAL>(&(sn.c[1]), in, iy-master_shift, 2);
+            in_gauge_field<REAL>(&u, gauge, ix, iy, 0, dir);
 
             _vector_sub_assign_f(sn.c[0], sn.c[1]);  
             _suNf_theta_T_inverse_multiply(sn.c[1], u, sn.c[0]);  
@@ -79,8 +79,8 @@ __device__ void evaluate_direction(SITE_TYPE *r, SITE_TYPE *in, GAUGE_TYPE *gaug
             _vector_add_assign_f((*r).c[0], sn.c[1]);  
             _vector_sub_assign_f((*r).c[2], sn.c[1]);  
         
-            in_spinor_field<COMPLEX>(&(sn.c[0]), in, iy-master_shift, 1);  
-            in_spinor_field<COMPLEX>(&(sn.c[1]), in, iy-master_shift, 3);  
+            in_spinor_field<REAL>(&(sn.c[0]), in, iy-master_shift, 1);  
+            in_spinor_field<REAL>(&(sn.c[1]), in, iy-master_shift, 3);  
             _vector_sub_assign_f(sn.c[0], sn.c[1]);  
         
             _suNf_theta_T_inverse_multiply(sn.c[1], u, sn.c[0]);  
@@ -90,9 +90,9 @@ __device__ void evaluate_direction(SITE_TYPE *r, SITE_TYPE *in, GAUGE_TYPE *gaug
         }
     } else if (mu == 1) {
         if (dir == UP) {
-            in_spinor_field<COMPLEX>(&(sn.c[0]), in, iy-master_shift, 0);  
-            in_spinor_field<COMPLEX>(&(sn.c[1]), in, iy-master_shift, 3);  
-            in_gauge_field<COMPLEX>(&u, gauge, ix, iy, 1, dir);  
+            in_spinor_field<REAL>(&(sn.c[0]), in, iy-master_shift, 0);  
+            in_spinor_field<REAL>(&(sn.c[1]), in, iy-master_shift, 3);  
+            in_gauge_field<REAL>(&u, gauge, ix, iy, 1, dir);  
         
             _vector_i_add_assign_f(sn.c[0], sn.c[1]);  
             _suNf_theta_X_multiply(sn.c[1], u, sn.c[0]);  
@@ -100,8 +100,8 @@ __device__ void evaluate_direction(SITE_TYPE *r, SITE_TYPE *in, GAUGE_TYPE *gaug
             _vector_add_assign_f((*r).c[0], sn.c[1]);  
             _vector_i_sub_assign_f((*r).c[3], sn.c[1]);  
         
-            in_spinor_field<COMPLEX>(&(sn.c[0]), in, iy-master_shift, 1);  
-            in_spinor_field<COMPLEX>(&(sn.c[1]), in, iy-master_shift, 2);  
+            in_spinor_field<REAL>(&(sn.c[0]), in, iy-master_shift, 1);  
+            in_spinor_field<REAL>(&(sn.c[1]), in, iy-master_shift, 2);  
             _vector_i_add_assign_f(sn.c[0], sn.c[1]);  
         
             _suNf_theta_X_multiply(sn.c[1], u, sn.c[0]);  
@@ -109,9 +109,9 @@ __device__ void evaluate_direction(SITE_TYPE *r, SITE_TYPE *in, GAUGE_TYPE *gaug
             _vector_add_assign_f((*r).c[1], sn.c[1]);  
             _vector_i_sub_assign_f((*r).c[2], sn.c[1]); 
         } else {
-            in_spinor_field<COMPLEX>(&(sn.c[0]), in, iy-master_shift, 0);  
-            in_spinor_field<COMPLEX>(&(sn.c[1]), in, iy-master_shift, 3);  
-            in_gauge_field<COMPLEX>(&u, gauge, ix, iy, 1, dir);  
+            in_spinor_field<REAL>(&(sn.c[0]), in, iy-master_shift, 0);  
+            in_spinor_field<REAL>(&(sn.c[1]), in, iy-master_shift, 3);  
+            in_gauge_field<REAL>(&u, gauge, ix, iy, 1, dir);  
         
             _vector_i_sub_assign_f(sn.c[0], sn.c[1]); 
             _suNf_theta_X_inverse_multiply(sn.c[1], u, sn.c[0]); 
@@ -119,8 +119,8 @@ __device__ void evaluate_direction(SITE_TYPE *r, SITE_TYPE *in, GAUGE_TYPE *gaug
             _vector_add_assign_f((*r).c[0], sn.c[1]);  
             _vector_i_add_assign_f((*r).c[3], sn.c[1]);  
         
-            in_spinor_field<COMPLEX>(&(sn.c[0]), in, iy-master_shift, 1);  
-            in_spinor_field<COMPLEX>(&(sn.c[1]), in, iy-master_shift, 2);  
+            in_spinor_field<REAL>(&(sn.c[0]), in, iy-master_shift, 1);  
+            in_spinor_field<REAL>(&(sn.c[1]), in, iy-master_shift, 2);  
             _vector_i_sub_assign_f(sn.c[0], sn.c[1]);  
         
             _suNf_theta_X_inverse_multiply(sn.c[1], u, sn.c[0]);  
@@ -130,18 +130,18 @@ __device__ void evaluate_direction(SITE_TYPE *r, SITE_TYPE *in, GAUGE_TYPE *gaug
         }
     } else if (mu == 2) {
         if (dir == UP) {
-            in_spinor_field<COMPLEX>(&(sn.c[0]), in, iy-master_shift, 0);  
-            in_spinor_field<COMPLEX>(&(sn.c[1]), in, iy-master_shift, 3);  
+            in_spinor_field<REAL>(&(sn.c[0]), in, iy-master_shift, 0);  
+            in_spinor_field<REAL>(&(sn.c[1]), in, iy-master_shift, 3);  
             _vector_add_assign_f(sn.c[0], sn.c[1]);  
         
-            in_gauge_field<COMPLEX>(&u, gauge, ix, iy, 2, dir);  
+            in_gauge_field<REAL>(&u, gauge, ix, iy, 2, dir);  
             _suNf_theta_Y_multiply(sn.c[1], u, sn.c[0]);  
         
             _vector_add_assign_f((*r).c[0], sn.c[1]);  
             _vector_add_assign_f((*r).c[3], sn.c[1]);  
         
-            in_spinor_field<COMPLEX>(&(sn.c[0]), in, iy-master_shift, 1);  
-            in_spinor_field<COMPLEX>(&(sn.c[1]), in, iy-master_shift, 2);  
+            in_spinor_field<REAL>(&(sn.c[0]), in, iy-master_shift, 1);  
+            in_spinor_field<REAL>(&(sn.c[1]), in, iy-master_shift, 2);  
             _vector_sub_assign_f(sn.c[0], sn.c[1]);  
         
             _suNf_theta_Y_multiply(sn.c[1], u, sn.c[0]);  
@@ -149,18 +149,18 @@ __device__ void evaluate_direction(SITE_TYPE *r, SITE_TYPE *in, GAUGE_TYPE *gaug
             _vector_add_assign_f((*r).c[1], sn.c[1]);  
             _vector_sub_assign_f((*r).c[2], sn.c[1]);
         } else {
-            in_spinor_field<COMPLEX>(&(sn.c[0]), in, iy-master_shift, 0);  
-            in_spinor_field<COMPLEX>(&(sn.c[1]), in, iy-master_shift, 3);  
+            in_spinor_field<REAL>(&(sn.c[0]), in, iy-master_shift, 0);  
+            in_spinor_field<REAL>(&(sn.c[1]), in, iy-master_shift, 3);  
             _vector_sub_assign_f(sn.c[0], sn.c[1]);  
         
-            in_gauge_field<COMPLEX>(&u, gauge, ix, iy, 2, dir);  
+            in_gauge_field<REAL>(&u, gauge, ix, iy, 2, dir);  
             _suNf_theta_Y_inverse_multiply(sn.c[1], u, sn.c[0]);  
         
             _vector_add_assign_f((*r).c[0], sn.c[1]);  
             _vector_sub_assign_f((*r).c[3], sn.c[1]);  
         
-            in_spinor_field<COMPLEX>(&(sn.c[0]), in, iy-master_shift, 1);  
-            in_spinor_field<COMPLEX>(&(sn.c[1]), in, iy-master_shift, 2);  
+            in_spinor_field<REAL>(&(sn.c[0]), in, iy-master_shift, 1);  
+            in_spinor_field<REAL>(&(sn.c[1]), in, iy-master_shift, 2);  
             _vector_add_assign_f(sn.c[0], sn.c[1]);  
         
             _suNf_theta_Y_inverse_multiply(sn.c[1], u, sn.c[0]);  
@@ -170,18 +170,18 @@ __device__ void evaluate_direction(SITE_TYPE *r, SITE_TYPE *in, GAUGE_TYPE *gaug
         }
     } else if (mu == 3) {
         if (dir == UP) {
-            in_spinor_field<COMPLEX>(&(sn.c[0]), in, iy-master_shift, 0);  
-            in_spinor_field<COMPLEX>(&(sn.c[1]), in, iy-master_shift, 2);  
+            in_spinor_field<REAL>(&(sn.c[0]), in, iy-master_shift, 0);  
+            in_spinor_field<REAL>(&(sn.c[1]), in, iy-master_shift, 2);  
             _vector_i_add_assign_f(sn.c[0], sn.c[1]);  
         
-            in_gauge_field<COMPLEX>(&u, gauge, ix, iy, 3, dir);  
+            in_gauge_field<REAL>(&u, gauge, ix, iy, 3, dir);  
             _suNf_theta_Z_multiply(sn.c[1], u, sn.c[0]);  
         
             _vector_add_assign_f((*r).c[0], sn.c[1]);  
             _vector_i_sub_assign_f((*r).c[2], sn.c[1]);  
         
-            in_spinor_field<COMPLEX>(&(sn.c[0]), in, iy-master_shift, 1);  
-            in_spinor_field<COMPLEX>(&(sn.c[1]), in, iy-master_shift, 3);  
+            in_spinor_field<REAL>(&(sn.c[0]), in, iy-master_shift, 1);  
+            in_spinor_field<REAL>(&(sn.c[1]), in, iy-master_shift, 3);  
             _vector_i_sub_assign_f(sn.c[0], sn.c[1]);  
         
             _suNf_theta_Z_multiply(sn.c[1], u, sn.c[0]);  
@@ -189,18 +189,18 @@ __device__ void evaluate_direction(SITE_TYPE *r, SITE_TYPE *in, GAUGE_TYPE *gaug
             _vector_add_assign_f((*r).c[1], sn.c[1]);  
             _vector_i_add_assign_f((*r).c[3], sn.c[1]);  
         } else {
-            in_spinor_field<COMPLEX>(&(sn.c[0]), in, iy-master_shift, 0);  
-            in_spinor_field<COMPLEX>(&(sn.c[1]), in, iy-master_shift, 2);  
+            in_spinor_field<REAL>(&(sn.c[0]), in, iy-master_shift, 0);  
+            in_spinor_field<REAL>(&(sn.c[1]), in, iy-master_shift, 2);  
             _vector_i_sub_assign_f(sn.c[0], sn.c[1]);  
         
-            in_gauge_field<COMPLEX>(&u, gauge, ix, iy, 3, dir);  
+            in_gauge_field<REAL>(&u, gauge, ix, iy, 3, dir);  
             _suNf_theta_Z_inverse_multiply(sn.c[1], u, sn.c[0]);  
         
             _vector_add_assign_f((*r).c[0], sn.c[1]);  
             _vector_i_add_assign_f((*r).c[2], sn.c[1]);  
         
-            in_spinor_field<COMPLEX>(&(sn.c[0]), in, iy-master_shift, 1);  
-            in_spinor_field<COMPLEX>(&(sn.c[1]), in, iy-master_shift, 3);  
+            in_spinor_field<REAL>(&(sn.c[0]), in, iy-master_shift, 1);  
+            in_spinor_field<REAL>(&(sn.c[1]), in, iy-master_shift, 3);  
             _vector_i_add_assign_f(sn.c[0], sn.c[1]);  
         
             _suNf_theta_Z_inverse_multiply(sn.c[1], u, sn.c[0]);  
@@ -211,7 +211,7 @@ __device__ void evaluate_direction(SITE_TYPE *r, SITE_TYPE *in, GAUGE_TYPE *gaug
     }     
 }    
 
-template<typename HSPINOR_TYPE, typename VECTOR_TYPE, typename COMPLEX, typename SITE_TYPE, typename GAUGE_TYPE>
+template<typename HSPINOR_TYPE, class REAL, typename SITE_TYPE, typename GAUGE_TYPE>
 __global__ void Dphi_gpu_inner_kernel(kernel_field_input* input) {
       SITE_TYPE r;
       SITE_TYPE* field_out = (SITE_TYPE*)input->field_out;
@@ -225,18 +225,18 @@ __global__ void Dphi_gpu_inner_kernel(kernel_field_input* input) {
                   const int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x + input->base_out[piece-1];
 
                   _LOOP_DIRECTIONS(ix, iy, mu, dir, input,
-                        (evaluate_direction<HSPINOR_TYPE, GAUGE_TYPE, COMPLEX, SITE_TYPE>(&r, field_in, gauge, ix, iy, mu, dir, input->master_shift_in));
+                        (evaluate_direction<HSPINOR_TYPE, REAL, GAUGE_TYPE, SITE_TYPE>(&r, field_in, gauge, ix, iy, mu, dir, input->master_shift_in));
                   )
 
                   _spinor_mul_f(r, -0.5, r);
                   int ix_spinor = ix - input->master_shift_out;
-                  write_out_spinor_field<COMPLEX>(&r, field_out, ix_spinor);
+                  write_out_spinor_field<REAL>(&r, field_out, ix_spinor);
             }
       }
 }
 
 // Cannot run two boundary kernels at the same time -> race condition
-template<typename HSPINOR_TYPE, typename VECTOR_TYPE, typename COMPLEX, typename SITE_TYPE, typename GAUGE_TYPE>
+template<typename HSPINOR_TYPE, class REAL, typename SITE_TYPE, typename GAUGE_TYPE>
 __global__ void Dphi_gpu_boundary_kernel(kernel_field_input* input) {
       SITE_TYPE r;
       SITE_TYPE res;
@@ -249,12 +249,12 @@ __global__ void Dphi_gpu_boundary_kernel(kernel_field_input* input) {
             _CUDA_FOR_BOX_IN(input, piece) {
                   _FIND_BUFFER_DIRECTION(ix, iy, my, dir, piece, input);
                   _spinor_zero_f(r);
-                  evaluate_direction<HSPINOR_TYPE, GAUGE_TYPE, COMPLEX, SITE_TYPE>(&r, field_in, gauge, ix, iy, mu, dir, input->master_shift_in);
+                  evaluate_direction<HSPINOR_TYPE, REAL, GAUGE_TYPE, SITE_TYPE>(&r, field_in, gauge, ix, iy, mu, dir, input->master_shift_in);
                   
                   const int ix_spinor = ix - input->master_shift_out;
-                  in_spinor_field<COMPLEX>(&res, field_out, ix_spinor, 0);
+                  in_spinor_field<REAL>(&res, field_out, ix_spinor, 0);
                   _spinor_mul_add_assign_f(res, -0.5, r);
-                  write_out_spinor_field<COMPLEX>(&res, field_out, ix_spinor);
+                  write_out_spinor_field<REAL>(&res, field_out, ix_spinor);
             }
       }
 }

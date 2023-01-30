@@ -21,6 +21,7 @@
 #define _HSPINOR_TYPE suNf_hspinor
 #define _VECTOR_TYPE suNf_vector
 #define _COMPLEX hr_complex
+#define _REAL double
 #define _GAUGE_TYPE suNf
 #define _SUFFIX 
 #define _REP_SUFFIX _f
@@ -33,6 +34,7 @@
 #define _HSPINOR_TYPE suNf_hspinor_flt
 #define _VECTOR_TYPE suNf_vector_flt
 #define _COMPLEX hr_complex_flt
+#define _REAL float
 #define _GAUGE_TYPE suNf_flt
 #define _SUFFIX _flt
 #define _REP_SUFFIX _f_flt
