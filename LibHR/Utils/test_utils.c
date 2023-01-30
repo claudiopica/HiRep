@@ -566,6 +566,16 @@ void zero_gfield_cpu(suNg_field *f)
     }
 }
 
+void zero_sfield_cpu(scalar_field *f) 
+{
+    int len = f->type->gsize_gauge;
+    double* dbl_ptr = f->ptr;
+    for (int i = 0; i < len; ++i) 
+    {
+        dbl_ptr[i] = 0.0;
+    }
+}
+
 void zero_gfield_f_cpu(suNf_field *f) 
 {
     int len = 4*f->type->gsize_gauge*sizeof(suNf)/sizeof(double);

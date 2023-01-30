@@ -21,6 +21,7 @@ int test_bijectivity_clover_ldl();
 int test_bijectivity_clover_term();
 int test_bijectivity_clover_force();
 int test_bijectivity_spinor_field_f(geometry_descriptor*);
+int test_bijectivity_sfield(geometry_descriptor*);
 
 // Single precision
 int test_bijectivity_gfield_flt();
@@ -50,6 +51,7 @@ int main(int argc, char *argv[])
     return_val += test_bijectivity_clover_term();
     return_val += test_bijectivity_clover_force();
     return_val += test_bijectivity_spinor_field_f(&glattice);
+    return_val += test_bijectivity_sfield(&glattice);
 
      /* Single precision */
     return_val += test_bijectivity_gfield_flt();
@@ -59,10 +61,12 @@ int main(int argc, char *argv[])
     lprintf("INFO", 0, "\n\n Testing Even Lattice \n\n");
     return_val += test_bijectivity_spinor_field_f(&glat_even);
     return_val += test_bijectivity_spinor_field_f_flt(&glat_even);
+    return_val += test_bijectivity_sfield(&glat_even);
 
     lprintf("INFO", 0, "\n\n Testing Odd Lattice \n\n");
     return_val += test_bijectivity_spinor_field_f(&glat_odd);
     return_val += test_bijectivity_spinor_field_f_flt(&glat_odd);
+    return_val += test_bijectivity_sfield(&glat_odd);
 
     // Finalize and return
     finalize_process();
@@ -84,25 +88,14 @@ int test_bijectivity_gfield()
     lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", sqnorm_gfield_cpu(in_copy));
 
     copy_to_gpu_gfield(in);
-
     zero_gfield_cpu(in);
+    fill_buffers_with_zeroes_gfield(in);
     lprintf("SANITY CHECK", 0, "CPU copy should be zero in intermediate step: %0.2e\n", sqnorm_gfield_cpu(in));
     copy_from_gpu_gfield(in);
 
     sub_assign_gfield_cpu(in, in_copy);
     double diff_norm = sqnorm_gfield_cpu(in);
-
-    if (diff_norm != 0) 
-    {
-        lprintf("RESULT", 0, "FAILED\n");
-        return_val = 1;
-    } 
-    else 
-    {
-        lprintf("RESULT", 0, "OK \n");
-        return_val = 0;
-    }
-    lprintf("RESULT", 0, "[Diff norm %0.2e]\n", diff_norm);
+    return_val += check_diff_norm_zero(diff_norm);
 
     free_gfield(in);
     free_gfield(in_copy);
@@ -125,25 +118,14 @@ int test_bijectivity_gfield_f()
     lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", sqnorm_gfield_f_cpu(in_copy));
 
     copy_to_gpu_gfield_f(in);
-
     zero_gfield_f_cpu(in);
+    fill_buffers_with_zeroes_gfield_f(in);
     lprintf("SANITY CHECK", 0, "CPU copy should be zero in intermediate step: %0.2e\n", sqnorm_gfield_f_cpu(in));
     copy_from_gpu_gfield_f(in);
 
     sub_assign_gfield_f_cpu(in, in_copy);
     double diff_norm = sqnorm_gfield_f_cpu(in);
-
-    if (diff_norm != 0) 
-    {
-        lprintf("RESULT", 0, "FAILED\n");
-        return_val = 1;
-    } 
-    else 
-    {
-        lprintf("RESULT", 0, "OK \n");
-        return_val = 0;
-    }
-    lprintf("RESULT", 0, "[Diff norm %0.2e]\n", diff_norm);
+    return_val += check_diff_norm_zero(diff_norm);
 
     free_gfield_f(in);
     free_gfield_f(in_copy);
@@ -165,30 +147,16 @@ int test_bijectivity_spinor_field_f(geometry_descriptor *gd)
     lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", spinor_field_sqnorm_f_cpu(in_copy));
 
     copy_to_gpu_spinor_field_f(in);
-    //start_sendrecv_spinor_field_f(in);
-    //complete_sendrecv_spinor_field_f(in);
-
+    fill_buffers_with_zeroes_spinor_field_f(in);
     spinor_field_zero_f_cpu(in);
     lprintf("SANITY CHECK", 0, "CPU copy should be zero in intermediate step: %0.2e\n", spinor_field_sqnorm_f_cpu(in));
-    //lprintf("SANITY CHECK", 0, "GPU copy should be equal to ealier in square norms: %0.2e\n", spinor_field_sqnorm_f(in));
     copy_from_gpu_spinor_field_f(in);
 
     lprintf("SANITY CHECK", 0, "CPU after copying back: %0.2e\n", spinor_field_sqnorm_f_cpu(in));
 
     spinor_field_sub_assign_f_cpu(in, in_copy);
     double diff_norm = spinor_field_sqnorm_f_cpu(in);
-
-    if (diff_norm != 0) 
-    {
-        lprintf("RESULT", 0, "FAILED\n");
-        return_val = 1;
-    }
-    else 
-    {
-        lprintf("RESULT", 0, "OK \n");
-        return_val = 0;
-    }
-    lprintf("RESULT", 0, "[Diff norm %0.2e]\n", diff_norm);
+    return_val += check_diff_norm_zero(diff_norm);
 
     free_spinor_field_f(in);
     free_spinor_field_f(in_copy);
@@ -210,29 +178,45 @@ int test_bijectivity_spinor_field_f_flt(geometry_descriptor *gd)
     lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", spinor_field_sqnorm_f_flt_cpu(in_copy));
 
     copy_to_gpu_spinor_field_f_flt(in);
-
     spinor_field_zero_f_flt_cpu(in);
+    fill_buffers_with_zeroes_spinor_field_f_flt(in);
     lprintf("SANITY CHECK", 0, "CPU copy should be zero in intermediate step: %0.2e\n", spinor_field_sqnorm_f_flt_cpu(in));
-    //lprintf("SANITY CHECK", 0, "GPU copy should be equal to ealier in square norms: %0.2e\n", spinor_field_sqnorm_f_flt(in));
     copy_from_gpu_spinor_field_f_flt(in);
 
     spinor_field_sub_assign_f_flt_cpu(in, in_copy);
     double diff_norm = spinor_field_sqnorm_f_flt_cpu(in);
-
-    if (diff_norm != 0) 
-    {
-        lprintf("RESULT", 0, "FAILED\n");
-        return_val = 1;
-    }
-    else 
-    {
-        lprintf("RESULT", 0, "OK \n");
-        return_val = 0;
-    }
-    lprintf("RESULT", 0, "[Diff norm %0.2e]\n", diff_norm);
+    return_val += check_diff_norm_zero(diff_norm);
 
     free_spinor_field_f_flt(in);
     free_spinor_field_f_flt(in_copy);
+    return return_val;
+}
+
+int test_bijectivity_sfield(geometry_descriptor *gd) 
+{
+    lprintf("INFO", 0, " ====== TEST SCALAR FIELD ======= ");
+    int return_val = 0;
+    scalar_field *in, *in_copy;
+    in = alloc_sfield(1, gd);
+    in_copy = alloc_sfield(1, gd);
+
+    random_sfield_cpu(in);
+    copy_sfield_cpu(in_copy, in);
+    lprintf("SANITY CHECK", 0, "CPU sqnorm: %0.2e\n", sqnorm_sfield_cpu(in));
+    lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", sqnorm_sfield_cpu(in_copy));
+
+    copy_to_gpu_sfield(in);
+    zero_sfield_cpu(in);
+    fill_buffers_with_zeroes_sfield(in);
+    lprintf("SANITY CHECK", 0, "CPU copy should be zero in intermediate step: %0.2e\n", sqnorm_sfield_cpu(in));
+    copy_from_gpu_sfield(in);
+
+    sub_assign_sfield_cpu(in, in_copy);
+    double diff_norm = sqnorm_sfield_cpu(in);
+    return_val += check_diff_norm_zero(diff_norm);
+
+    free_sfield(in);
+    free_sfield(in_copy);
     return return_val;
 }
 
@@ -251,25 +235,14 @@ int test_bijectivity_gfield_flt()
     lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", sqnorm_gfield_flt_cpu(in_copy));
 
     copy_to_gpu_gfield_flt(in);
-
     zero_gfield_flt_cpu(in);
+    fill_buffers_with_zeroes_gfield_flt(in);
     lprintf("SANITY CHECK", 0, "CPU copy should be zero in intermediate step: %0.2e\n", sqnorm_gfield_flt_cpu(in));
     copy_from_gpu_gfield_flt(in);
 
     sub_assign_gfield_flt_cpu(in, in_copy);
     double diff_norm = sqnorm_gfield_flt_cpu(in);
-
-    if (diff_norm != 0) 
-    {
-        lprintf("RESULT", 0, "FAILED\n");
-        return_val = 1;
-    } 
-    else 
-    {
-        lprintf("RESULT", 0, "OK \n");
-        return_val = 0;
-    }
-    lprintf("RESULT", 0, "[Diff norm %0.2e]\n", diff_norm);
+    return_val += check_diff_norm_zero(diff_norm);
 
     free_gfield_flt(in);
     free_gfield_flt(in_copy);
@@ -291,25 +264,14 @@ int test_bijectivity_gfield_f_flt()
     lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", sqnorm_gfield_f_flt_cpu(in_copy));
 
     copy_to_gpu_gfield_f_flt(in);
-
     zero_gfield_f_flt_cpu(in);
+    fill_buffers_with_zeroes_gfield_f_flt(in);
     lprintf("SANITY CHECK", 0, "CPU copy should be zero in intermediate step: %0.2e\n", sqnorm_gfield_f_flt_cpu(in));
     copy_from_gpu_gfield_f_flt(in);
 
     sub_assign_gfield_f_flt_cpu(in, in_copy);
     double diff_norm = sqnorm_gfield_f_flt_cpu(in);
-
-    if (diff_norm != 0) 
-    {
-        lprintf("RESULT", 0, "FAILED\n");
-        return_val = 1;
-    } 
-    else 
-    {
-        lprintf("RESULT", 0, "OK \n");
-        return_val = 0;
-    }
-    lprintf("RESULT", 0, "[Diff norm %0.2e]\n", diff_norm);
+    return_val += check_diff_norm_zero(diff_norm);
 
     free_gfield_f_flt(in);
     free_gfield_f_flt(in_copy);
@@ -331,25 +293,14 @@ int test_bijectivity_suNg_scalar_field()
     lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", sqnorm_suNg_scalar_field_cpu(in_copy));
 
     copy_to_gpu_suNg_scalar_field(in);
-
     zero_suNg_scalar_field_cpu(in);
+    fill_buffers_with_zeroes_suNg_scalar_field(in);
     lprintf("SANITY CHECK", 0, "CPU copy should be zero in intermediate step: %0.2e\n", sqnorm_suNg_scalar_field_cpu(in));
     copy_from_gpu_suNg_scalar_field(in);
 
     sub_assign_suNg_scalar_field_cpu(in, in_copy);
     double diff_norm = sqnorm_suNg_scalar_field_cpu(in);
-
-    if (diff_norm != 0) 
-    {
-        lprintf("RESULT", 0, "FAILED\n");
-        return_val = 1;
-    } 
-    else 
-    {
-        lprintf("RESULT", 0, "OK \n");
-        return_val = 0;
-    }
-    lprintf("RESULT", 0, "[Diff norm %0.2e]\n", diff_norm);
+    return_val += check_diff_norm_zero(diff_norm);
 
     free_suNg_scalar_field(in);
     free_suNg_scalar_field(in_copy);
@@ -371,25 +322,14 @@ int test_bijectivity_avfield()
     lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", sqnorm_avfield_cpu(in_copy));
 
     copy_to_gpu_avfield(in);
-
     zero_avfield_cpu(in);
+    fill_buffers_with_zeroes_avfield(in);
     lprintf("SANITY CHECK", 0, "CPU copy should be zero in intermediate step: %0.2e\n", sqnorm_avfield_cpu(in));
     copy_from_gpu_avfield(in);
 
     sub_assign_avfield_cpu(in, in_copy);
     double diff_norm = sqnorm_avfield_cpu(in);
-
-    if (diff_norm != 0) 
-    {
-        lprintf("RESULT", 0, "FAILED\n");
-        return_val = 1;
-    } 
-    else 
-    {
-        lprintf("RESULT", 0, "OK \n");
-        return_val = 0;
-    }
-    lprintf("RESULT", 0, "[Diff norm %0.2e]\n", diff_norm);
+    return_val += check_diff_norm_zero(diff_norm);
 
     free_avfield(in);
     free_avfield(in_copy);
@@ -411,25 +351,14 @@ int test_bijectivity_gtransf()
     lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", sqnorm_gtransf_cpu(in_copy));
 
     copy_to_gpu_gtransf(in);
-
     zero_gtransf_cpu(in);
+    fill_buffers_with_zeroes_gtransf(in);
     lprintf("SANITY CHECK", 0, "CPU copy should be zero in intermediate step: %0.2e\n", sqnorm_gtransf_cpu(in));
     copy_from_gpu_gtransf(in);
 
     sub_assign_gtransf_cpu(in, in_copy);
     double diff_norm = sqnorm_gtransf_cpu(in);
-
-    if (diff_norm != 0) 
-    {
-        lprintf("RESULT", 0, "FAILED\n");
-        return_val = 1;
-    } 
-    else 
-    {
-        lprintf("RESULT", 0, "OK \n");
-        return_val = 0;
-    }
-    lprintf("RESULT", 0, "[Diff norm %0.2e]\n", diff_norm);
+    return_val += check_diff_norm_zero(diff_norm);
 
     free_gtransf(in);
     free_gtransf(in_copy);
@@ -451,25 +380,14 @@ int test_bijectivity_clover_term()
     lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", sqnorm_clover_term_cpu(in_copy));
 
     copy_to_gpu_clover_term(in);
-
     zero_clover_term_cpu(in);
+    fill_buffers_with_zeroes_clover_term(in);
     lprintf("SANITY CHECK", 0, "CPU copy should be zero in intermediate step: %0.2e\n", sqnorm_clover_term_cpu(in));
     copy_from_gpu_clover_term(in);
 
     sub_assign_clover_term_cpu(in, in_copy);
     double diff_norm = sqnorm_clover_term_cpu(in);
-
-    if (diff_norm != 0) 
-    {
-        lprintf("RESULT", 0, "FAILED\n");
-        return_val = 1;
-    } 
-    else 
-    {
-        lprintf("RESULT", 0, "OK \n");
-        return_val = 0;
-    }
-    lprintf("RESULT", 0, "[Diff norm %0.2e]\n", diff_norm);
+    return_val += check_diff_norm_zero(diff_norm);
 
     free_clover_term(in);
     free_clover_term(in_copy);
@@ -491,25 +409,14 @@ int test_bijectivity_clover_force()
     lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", sqnorm_clover_force_cpu(in_copy));
 
     copy_to_gpu_clover_force(in);
-
     zero_clover_force_cpu(in);
+    fill_buffers_with_zeroes_clover_force(in);
     lprintf("SANITY CHECK", 0, "CPU copy should be zero in intermediate step: %0.2e\n", sqnorm_clover_force_cpu(in));
     copy_from_gpu_clover_force(in);
 
     sub_assign_clover_force_cpu(in, in_copy);
     double diff_norm = sqnorm_clover_force_cpu(in);
-
-    if (diff_norm != 0) 
-    {
-        lprintf("RESULT", 0, "FAILED\n");
-        return_val = 1;
-    } 
-    else 
-    {
-        lprintf("RESULT", 0, "OK \n");
-        return_val = 0;
-    }
-    lprintf("RESULT", 0, "[Diff norm %0.2e]\n", diff_norm);
+    return_val += check_diff_norm_zero(diff_norm);
 
     free_clover_force(in);
     free_clover_force(in_copy);
@@ -531,25 +438,14 @@ int test_bijectivity_clover_ldl()
     lprintf("SANITY CHECK", 0, "CPU copy sqnorm (should be the same as CPU sqnorm): %0.2e\n", sqnorm_clover_ldl_cpu(in_copy));
 
     copy_to_gpu_clover_ldl(in);
-
     zero_clover_ldl_cpu(in);
+    fill_buffers_with_zeroes_clover_ldl(in);
     lprintf("SANITY CHECK", 0, "CPU copy should be zero in intermediate step: %0.2e\n", sqnorm_clover_ldl_cpu(in));
     copy_from_gpu_clover_ldl(in);
 
     sub_assign_clover_ldl_cpu(in, in_copy);
     double diff_norm = sqnorm_clover_ldl_cpu(in);
-
-    if (diff_norm != 0) 
-    {
-        lprintf("RESULT", 0, "FAILED\n");
-        return_val = 1;
-    } 
-    else
-    {
-        lprintf("RESULT", 0, "OK\n");
-        return_val = 0;
-    }
-    lprintf("RESULT", 0, "[Diff norm %0.2e]\n", diff_norm);
+    return_val += check_diff_norm_zero(diff_norm);
 
     free_clover_ldl(in);
     free_clover_ldl(in_copy);

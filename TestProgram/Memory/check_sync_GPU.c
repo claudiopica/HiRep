@@ -65,6 +65,15 @@ int main(int argc, char *argv[])
     return return_val;
 }
 
+#define sendbuf_length(_len) \
+    _len = 0; \
+    box_t *L = geometryBoxes->next; \
+    int m = 0; \
+    while (L && m < glattice.nbuffers_spinor) { \
+        sendbuf_len += boxVolume(L->sendBox); \
+        L = L->next; m++; \
+    }
+
 int test_sync_identical_to_cpu_spinor_field_f(geometry_descriptor *gd) 
 {
     lprintf("INFO", 0, " ======= TEST SPINOR FIELD ======= \n");
@@ -76,15 +85,8 @@ int test_sync_identical_to_cpu_spinor_field_f(geometry_descriptor *gd)
     gaussian_spinor_field(f);
     copy_to_gpu_spinor_field_f(f);
 
-    //gd = &glattice;
-    int sendbuf_len = 0;
-    box_t *L = geometryBoxes->next;
-    int m = 0;
-    while (L && m < glattice.nbuffers_spinor) 
-    {
-        sendbuf_len += boxVolume(L->sendBox);
-        L=L->next; m++;
-    }
+    int sendbuf_len;
+    sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
     sync_field(gd, sizeof(*(f->ptr)), 1, f->ptr, f->sendbuf_ptr);
@@ -136,13 +138,7 @@ int test_sync_identical_to_cpu_spinor_field_f_flt(geometry_descriptor *gd)
 
     //gd = &glattice;
     int sendbuf_len = 0;
-    box_t *L = geometryBoxes->next;
-    int m = 0;
-    while (L && m < glattice.nbuffers_spinor) 
-    {
-        sendbuf_len += boxVolume(L->sendBox);
-        L=L->next; m++;
-    }
+    sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
     sync_field(gd, sizeof(*(f->ptr)), 1, f->ptr, f->sendbuf_ptr);
@@ -194,13 +190,7 @@ int test_sync_identical_to_cpu_sfield(geometry_descriptor *gd)
 
     //gd = &glattice;
     int sendbuf_len = 0;
-    box_t *L = geometryBoxes->next;
-    int m = 0;
-    while (L && m < glattice.nbuffers_spinor) 
-    {
-        sendbuf_len += boxVolume(L->sendBox);
-        L=L->next; m++;
-    }
+    sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
     sync_field(gd, sizeof(*(f->ptr)), 1, f->ptr, f->sendbuf_ptr);
@@ -245,13 +235,7 @@ int test_sync_identical_to_cpu_gfield()
 
     //gd = &glattice;
     int sendbuf_len = 0;
-    box_t *L = geometryBoxes->next;
-    int m = 0;
-    while (L && m < glattice.nbuffers_gauge) 
-    {
-        sendbuf_len += boxVolume(L->sendBox);
-        L=L->next; m++;
-    }
+    sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
     sync_field(f->type, 4*sizeof(*f->ptr), 0, f->ptr, f->sendbuf_ptr);
@@ -304,13 +288,7 @@ int test_sync_identical_to_cpu_gfield_f()
 
     //gd = &glattice;
     int sendbuf_len = 0;
-    box_t *L = geometryBoxes->next;
-    int m = 0;
-    while (L && m < glattice.nbuffers_gauge) 
-    {
-        sendbuf_len += boxVolume(L->sendBox);
-        L=L->next; m++;
-    }
+    sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
     sync_field(f->type, 4*sizeof(*f->ptr), 0, f->ptr, f->sendbuf_ptr);
@@ -363,13 +341,7 @@ int test_sync_identical_to_cpu_gfield_flt()
 
     //gd = &glattice;
     int sendbuf_len = 0;
-    box_t *L = geometryBoxes->next;
-    int m = 0;
-    while (L && m < glattice.nbuffers_gauge) 
-    {
-        sendbuf_len += boxVolume(L->sendBox);
-        L=L->next; m++;
-    }
+    sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
     sync_field(f->type, 4*sizeof(*f->ptr), 0, f->ptr, f->sendbuf_ptr);
@@ -422,13 +394,7 @@ int test_sync_identical_to_cpu_gfield_f_flt()
 
     //gd = &glattice;
     int sendbuf_len = 0;
-    box_t *L = geometryBoxes->next;
-    int m = 0;
-    while (L && m < glattice.nbuffers_gauge) 
-    {
-        sendbuf_len += boxVolume(L->sendBox);
-        L=L->next; m++;
-    }
+    sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
     sync_field(f->type, 4*sizeof(*f->ptr), 0, f->ptr, f->sendbuf_ptr);
@@ -481,13 +447,7 @@ int test_sync_identical_to_cpu_suNg_scalar_field()
 
     //gd = &glattice;
     int sendbuf_len = 0;
-    box_t *L = geometryBoxes->next;
-    int m = 0;
-    while (L && m < glattice.nbuffers_gauge) 
-    {
-        sendbuf_len += boxVolume(L->sendBox);
-        L=L->next; m++;
-    }
+    sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
     sync_field(f->type, sizeof(*(f->ptr)), 0, f->ptr, f->sendbuf_ptr);
@@ -538,13 +498,7 @@ int test_sync_identical_to_cpu_avfield()
 
     //gd = &glattice;
     int sendbuf_len = 0;
-    box_t *L = geometryBoxes->next;
-    int m = 0;
-    while (L && m < glattice.nbuffers_gauge) 
-    {
-        sendbuf_len += boxVolume(L->sendBox);
-        L=L->next; m++;
-    }
+    sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
     sync_field(f->type, 4*sizeof(*(f->ptr)), 0, f->ptr, f->sendbuf_ptr);
@@ -595,13 +549,7 @@ int test_sync_identical_to_cpu_gtransf()
 
     //gd = &glattice;
     int sendbuf_len = 0;
-    box_t *L = geometryBoxes->next;
-    int m = 0;
-    while (L && m < glattice.nbuffers_gauge) 
-    {
-        sendbuf_len += boxVolume(L->sendBox);
-        L=L->next; m++;
-    }
+    sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
     sync_field(f->type, sizeof(*(f->ptr)), 0, f->ptr, f->sendbuf_ptr);
@@ -651,13 +599,7 @@ int test_sync_identical_to_cpu_clover_ldl()
 
     //gd = &glattice;
     int sendbuf_len = 0;
-    box_t *L = geometryBoxes->next;
-    int m = 0;
-    while (L && m < glattice.nbuffers_gauge) 
-    {
-        sendbuf_len += boxVolume(L->sendBox);
-        L=L->next; m++;
-    }
+    sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
     sync_field(f->type, sizeof(*(f->ptr)), 0, f->ptr, f->sendbuf_ptr);
@@ -709,13 +651,7 @@ int test_sync_identical_to_cpu_clover_term()
 
     //gd = &glattice;
     int sendbuf_len = 0;
-    box_t *L = geometryBoxes->next;
-    int m = 0;
-    while (L && m < glattice.nbuffers_gauge) 
-    {
-        sendbuf_len += boxVolume(L->sendBox);
-        L=L->next; m++;
-    }
+    sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
     sync_field(f->type, 4*sizeof(*f->ptr), 0, f->ptr, f->sendbuf_ptr);
@@ -768,13 +704,7 @@ int test_sync_identical_to_cpu_clover_force()
 
     //gd = &glattice;
     int sendbuf_len = 0;
-    box_t *L = geometryBoxes->next;
-    int m = 0;
-    while (L && m < glattice.nbuffers_gauge) 
-    {
-        sendbuf_len += boxVolume(L->sendBox);
-        L=L->next; m++;
-    }
+    sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
     sync_field(f->type, 6*sizeof(*f->ptr), 0, f->ptr, f->sendbuf_ptr);

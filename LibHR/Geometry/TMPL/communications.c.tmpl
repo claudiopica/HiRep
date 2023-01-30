@@ -143,7 +143,7 @@ _DECLARE(fill_buffers_,(_FIELD_TYPE *f)) {
                 memcpy(buffer, random_array, buffer_length*sizeof(_REAL));
             } else if (comm_type & GPU_COMM) {
                 #ifdef WITH_GPU
-                _REAL* buffer = (_REAL*)(_BUF_GPU_FIELD_BLK(f,i));
+                _REAL* buffer = (_REAL*)(_BUF_GPU_DFIELD_BLK(f, i, _FIELD_DIM));
                 _F_NAME(random_,_REAL)(random_array, buffer_length);
                 cudaMemcpy(buffer, random_array, buffer_length*sizeof(_REAL), cudaMemcpyHostToDevice);
                 #endif
@@ -166,12 +166,12 @@ _DECLARE(fill_buffers_with_zeroes_,(_FIELD_TYPE *f)) {
 
             if (comm_type & CPU_COMM) {
                 _REAL* buffer = (_REAL*)(_BUF_DFIELD_BLK(f, i, _FIELD_DIM));
-                _F_NAME(zeroes_,_REAL)(buffer, buffer_length);
+                _F_NAME(zeroes_,_REAL)(zero_array, buffer_length);
                 memcpy(buffer, zero_array, buffer_length*sizeof(_REAL));
             } else if (comm_type & GPU_COMM) {
                 #ifdef WITH_GPU
-                _REAL* buffer = (_REAL*)(_BUF_GPU_FIELD_BLK(f,i));   
-                _F_NAME(zeroes_,_REAL)(buffer, buffer_length);
+                _REAL* buffer = (_REAL*)(_BUF_GPU_DFIELD_BLK(f, i, _FIELD_DIM));   
+                _F_NAME(zeroes_,_REAL)(zero_array, buffer_length);
                 cudaMemcpy(buffer, zero_array, buffer_length*sizeof(_REAL), cudaMemcpyHostToDevice);
                 #endif
             }
