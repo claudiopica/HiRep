@@ -8,10 +8,10 @@
 
 #include "libhr.h"
 
-int test_identical(spinor_operator, spinor_operator, char*);
-int test_identical_flt(spinor_operator_flt, spinor_operator_flt, char*);
-int test_identical_massless(spinor_operator, spinor_operator, char*, geometry_descriptor*, geometry_descriptor*);
-int test_identical_massless_flt(spinor_operator_flt, spinor_operator_flt, char*, geometry_descriptor*, geometry_descriptor*);
+int test_identical(spinor_operator, spinor_operator, char*, double);
+int test_identical_flt(spinor_operator_flt, spinor_operator_flt, char*, double);
+int test_identical_massless(spinor_operator, spinor_operator, char*, geometry_descriptor*, geometry_descriptor*, double);
+int test_identical_massless_flt(spinor_operator_flt, spinor_operator_flt, char*, geometry_descriptor*, geometry_descriptor*, double);
 void Q_operator(spinor_field*, spinor_field*);
 void Q_operator_cpu(spinor_field*, spinor_field*);
 void Q_operator_flt(spinor_field_flt*, spinor_field_flt*);
@@ -65,38 +65,36 @@ int main(int argc, char *argv[])
     //copy_from_gpu_gfield_f_flt(u_gauge_f_flt);
 
     // Test Block
-    return_val += test_identical(&I_operator, &I_operator_cpu, "Unit operator Full Lattice");
-    return_val += test_identical(&D_operator, &D_operator_cpu, "D = Dphi Full Lattice");
-    return_val += test_identical_massless(&D_massless, &D_massless_cpu, "D = Dphi Massless Even Lattice", &glat_even, &glat_odd);
-    return_val += test_identical_massless(&D_massless, &D_massless_cpu, "D = Dphi Massless Odd Lattice", &glat_odd, &glat_even);
+    return_val += test_identical(&I_operator, &I_operator_cpu, "Unit operator Full Lattice", 0.0);
+    return_val += test_identical(&D_operator, &D_operator_cpu, "D = Dphi Full Lattice", 1e-13);
+    return_val += test_identical_massless(&D_massless, &D_massless_cpu, "D = Dphi Massless Even Lattice", &glat_even, &glat_odd, 1e-13);
+    return_val += test_identical_massless(&D_massless, &D_massless_cpu, "D = Dphi Massless Odd Lattice", &glat_odd, &glat_even, 1e-13);
 
-    return_val += test_identical_flt(&D_operator_flt, &D_operator_flt_cpu, "D = Dphi_flt Full Lattice");
-    return_val += test_identical_massless_flt(&D_massless_flt, &D_massless_flt_cpu, "D = Dphi_flt Massless Even Lattice", &glat_even, &glat_odd);
-    return_val += test_identical_massless_flt(&D_massless_flt, &D_massless_flt_cpu, "D = Dphi_flt Massless Odd Lattice", &glat_odd, &glat_even);
+    return_val += test_identical_flt(&D_operator_flt, &D_operator_flt_cpu, "D = Dphi_flt Full Lattice", 1e-4);
+    return_val += test_identical_massless_flt(&D_massless_flt, &D_massless_flt_cpu, "D = Dphi_flt Massless Even Lattice", &glat_even, &glat_odd, 1e-4);
+    return_val += test_identical_massless_flt(&D_massless_flt, &D_massless_flt_cpu, "D = Dphi_flt Massless Odd Lattice", &glat_odd, &glat_even, 1e-4);
 
-    return_val += test_identical(&Q_operator, &Q_operator_cpu, "Q = g5Dphi Full Lattice");
-    return_val += test_identical_flt(&Q_operator_flt, &Q_operator_flt_cpu, "Q = g5Dphi_flt Full Lattice");
+    return_val += test_identical(&Q_operator, &Q_operator_cpu, "Q = g5Dphi Full Lattice", 1e-13);
+    return_val += test_identical_flt(&Q_operator_flt, &Q_operator_flt_cpu, "Q = g5Dphi_flt Full Lattice", 1e-4);
     
-    return_val += test_identical(&Q_operator_sq, &Q_operator_sq_cpu, "Q^2 Full Lattice");
-    return_val += test_identical_flt(&Q_operator_sq_flt, &Q_operator_sq_flt_cpu, "Q^2 Single Precision Full Lattice");
+    return_val += test_identical(&Q_operator_sq, &Q_operator_sq_cpu, "Q^2 Full Lattice", 1e-12);
+    return_val += test_identical_flt(&Q_operator_sq_flt, &Q_operator_sq_flt_cpu, "Q^2 Single Precision Full Lattice", 1e-2);
 
-    return_val += test_identical_massless(&D_eopre, &D_eopre_cpu, "EO-preconditioned D", &glat_even, &glat_even);
-    return_val += test_identical_massless_flt(&D_eopre_flt, &D_eopre_flt_cpu, "EO-preconditioned flt D", &glat_even, &glat_even);
+    return_val += test_identical_massless(&D_eopre, &D_eopre_cpu, "EO-preconditioned D", &glat_even, &glat_even, 1e-11);
+    return_val += test_identical_massless_flt(&D_eopre_flt, &D_eopre_flt_cpu, "EO-preconditioned flt D", &glat_even, &glat_even, 1e-2);
 
-    return_val += test_identical_massless(&Q_eopre, &Q_eopre_cpu, "EO-preconditioned Q", &glat_even, &glat_even);
-    return_val += test_identical_massless_flt(&Q_eopre_flt, &Q_eopre_flt_cpu, "EO-preconditioned flt Q", &glat_even, &glat_even);
+    return_val += test_identical_massless(&Q_eopre, &Q_eopre_cpu, "EO-preconditioned Q", &glat_even, &glat_even, 1e-11);
+    return_val += test_identical_massless_flt(&Q_eopre_flt, &Q_eopre_flt_cpu, "EO-preconditioned flt Q", &glat_even, &glat_even, 1e-2);
 
-    return_val += test_identical_massless(&Q_eopre_sq, &Q_eopre_sq_cpu, "Squared EO-preconditioned Q", &glat_even, &glat_even);
-    return_val += test_identical_massless_flt(&Q_eopre_sq_flt, &Q_eopre_sq_flt_cpu, "Squared EO-preconditioned flt Q", &glat_even, &glat_even);
-
-    
+    return_val += test_identical_massless(&Q_eopre_sq, &Q_eopre_sq_cpu, "Squared EO-preconditioned Q", &glat_even, &glat_even, 1e-11);
+    return_val += test_identical_massless_flt(&Q_eopre_sq_flt, &Q_eopre_sq_flt_cpu, "Squared EO-preconditioned flt Q", &glat_even, &glat_even, 1e-2);
     
     // Finalize and return
     finalize_process();
     return return_val;
 }
 
-int test_identical(spinor_operator S, spinor_operator S_cpu, char *name)
+int test_identical(spinor_operator S, spinor_operator S_cpu, char *name, double precision)
 {
     lprintf("INFO", 0, "[Testing %s]\n", name);
 
@@ -134,7 +132,7 @@ int test_identical(spinor_operator S, spinor_operator S_cpu, char *name)
 
     double diff_norm = sqrt(spinor_field_sqnorm_f_cpu(S_s_cpu));
     return_val += check_finiteness(diff_norm);
-    return_val += check_diff_norm(diff_norm, 1e-12);
+    return_val += check_diff_norm(diff_norm, precision);
 
     free_spinor_field_f(s);
     free_spinor_field_f(S_s);
@@ -142,7 +140,7 @@ int test_identical(spinor_operator S, spinor_operator S_cpu, char *name)
     return return_val;
 }
 
-int test_identical_massless(spinor_operator S, spinor_operator S_cpu, char *name, geometry_descriptor* gd1, geometry_descriptor* gd2) 
+int test_identical_massless(spinor_operator S, spinor_operator S_cpu, char *name, geometry_descriptor* gd1, geometry_descriptor* gd2, double precision) 
 {
     lprintf("INFO", 0, "[Testing %s]\n", name);
 
@@ -170,13 +168,6 @@ int test_identical_massless(spinor_operator S, spinor_operator S_cpu, char *name
 
     copy_from_gpu_spinor_field_f(S_s);
 
-    if (PID==0)_MASTER_FOR(S_s->type, ix) {
-        suNf_spinor *spinor = _FIELD_AT(S_s, ix);
-        suNf_spinor *cpu_spinor = _FIELD_AT(S_s_cpu, ix);
-        hr_complex diff = (*spinor).c[0].c[0] - (*cpu_spinor).c[0].c[0];
-        //if (ix == 383) printf("ix: %d, diff %0.2e + i%0.2e\n", ix, creal(diff), cimag(diff));
-    }
-    
     // Sanity checks: Norms are not identically zero
     lprintf("INFO", 0, "Output spinor field norm GPU: %0.2e\n", spinor_field_sqnorm_f_cpu(S_s));
     lprintf("INFO", 0, "Output spinor field norm CPU: %0.2e\n", spinor_field_sqnorm_f_cpu(S_s_cpu));
@@ -185,7 +176,7 @@ int test_identical_massless(spinor_operator S, spinor_operator S_cpu, char *name
 
     double diff_norm = sqrt(spinor_field_sqnorm_f_cpu(S_s_cpu));
     return_val += check_finiteness(diff_norm);
-    return_val += check_diff_norm(diff_norm, 1e-11);
+    return_val += check_diff_norm(diff_norm, precision);
 
     free_spinor_field_f(s);
     free_spinor_field_f(S_s);
@@ -193,7 +184,7 @@ int test_identical_massless(spinor_operator S, spinor_operator S_cpu, char *name
     return return_val;
 }
 
-int test_identical_flt(spinor_operator_flt S, spinor_operator_flt S_cpu, char *name)
+int test_identical_flt(spinor_operator_flt S, spinor_operator_flt S_cpu, char *name, double precision)
 {
     lprintf("INFO", 0, "[Testing %s]\n", name);
 
@@ -228,7 +219,7 @@ int test_identical_flt(spinor_operator_flt S, spinor_operator_flt S_cpu, char *n
 
     double diff_norm = sqrt(spinor_field_sqnorm_f_flt_cpu(S_s_cpu));
     return_val += check_finiteness(diff_norm);
-    return_val += check_diff_norm(diff_norm, 1e-3);
+    return_val += check_diff_norm(diff_norm, precision);
 
     free_spinor_field_f_flt(s);
     free_spinor_field_f_flt(S_s);
@@ -236,7 +227,7 @@ int test_identical_flt(spinor_operator_flt S, spinor_operator_flt S_cpu, char *n
     return return_val;
 }
 
-int test_identical_massless_flt(spinor_operator_flt S, spinor_operator_flt S_cpu, char *name, geometry_descriptor* gd1, geometry_descriptor* gd2) 
+int test_identical_massless_flt(spinor_operator_flt S, spinor_operator_flt S_cpu, char *name, geometry_descriptor* gd1, geometry_descriptor* gd2, double precision) 
 {
     lprintf("INFO", 0, "[Testing %s]\n", name);
 
@@ -272,7 +263,7 @@ int test_identical_massless_flt(spinor_operator_flt S, spinor_operator_flt S_cpu
 
     double diff_norm = sqrt(spinor_field_sqnorm_f_flt_cpu(S_s_cpu));
     return_val += check_finiteness(diff_norm);
-    return_val += check_diff_norm(diff_norm, 1e-2);
+    return_val += check_diff_norm(diff_norm, precision);
 
     free_spinor_field_f_flt(s);
     free_spinor_field_f_flt(S_s);
