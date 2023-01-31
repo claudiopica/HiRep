@@ -47,6 +47,8 @@ int test_herm(spinor_operator S, char *name)
   gaussian_spinor_field(s2);
   S(s3, s1);
   S(s4, s2);
+  lprintf("SANITY CHECK", 0, "sqnorm s3: %0.2e\n", spinor_field_sqnorm_f(s3));
+  lprintf("SANITY CHECK", 0, "sqnorm s4: %0.2e\n", spinor_field_sqnorm_f(s4));
 
   tau = spinor_field_prod_re_f(s2, s3);
   tau -= spinor_field_prod_re_f(s4, s1);

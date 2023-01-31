@@ -49,7 +49,7 @@ static void transform_u(void)
 
   #ifdef WITH_GPU
     copy_to_gpu_gfield(u_gauge);
-    copy_to_gpu_gfield(g);
+    copy_to_gpu_gtransf(g);
   #endif
 
   start_sendrecv_gfield(u_gauge);

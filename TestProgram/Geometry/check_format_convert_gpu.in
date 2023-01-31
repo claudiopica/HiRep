@@ -1,8 +1,8 @@
 // Global variables 
 GLB_T = 8 
-GLB_X = 4
-GLB_Y = 4
-GLB_Z = 4
+GLB_X = 7
+GLB_Y = 7
+GLB_Z = 7
 
 NP_T = 2
 NP_X = 1

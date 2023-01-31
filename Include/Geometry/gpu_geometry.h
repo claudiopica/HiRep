@@ -20,10 +20,10 @@
 #define _KERNEL_PIECE_FOR(_piece) \
       for (int _piece = EVEN; _piece <= ODD; _piece++)
 
-#define _CUDA_FOR_BOX_IN(_input, _piece) \
+#define _IF_IN_BOX_IN(_input, _piece) \
       if (_input->gd_in & piece) if (blockIdx.x * BLOCK_SIZE + threadIdx.x < _input->vol_in[piece-1])
 
-#define _CUDA_FOR_BOX_OUT(_input, _piece) \
+#define _IF_IN_BOX_OUT(_input, _piece) \
       if (_input->gd_in & piece) if (blockIdx.x * BLOCK_SIZE + threadIdx.x < _input->vol_out[piece-1])
 
 // Output

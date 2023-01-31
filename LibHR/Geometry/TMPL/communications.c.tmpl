@@ -39,6 +39,9 @@
 #define _BUFFER_FOR(_comm_type, _buf_idx) \
         if (f->comm_type & _comm_type) for (int i = 0; i < _NUMBER_OF_BUFFERS(_GEOM_TYPE); ++i)
 
+// Need to send the rounded up buffer length only for the GPU
+#define round_up_buflen(_val, _comm_type) (_comm_type == GPU_COMM ? ((((_val-1 )/ THREADSIZE) + 1) * THREADSIZE) : _val )
+
 #ifdef WITH_NEW_GEOMETRY
 static void *_F_NAME(sendrecv_guard_,_FIELD_NAME)=NULL;
 #endif
@@ -95,12 +98,12 @@ _DECLARE(start_sendrecv_,(_FIELD_TYPE *f)) {
 
             /* Data Destination Parameters */
             int recv_proc = f->type->rbuf_from_proc[i];
-            int number_of_sites = f->type->rbuf_len[i];
+            int number_of_sites = round_up_buflen((f->type->rbuf_len[i]), comm_type);
             int recv_size_in_dbl = (_FIELD_DIM)*number_of_sites*mpi_chunks_per_site;
 
             /* Data Origin Parameters */
             int send_proc = f->type->sbuf_to_proc[i];
-            number_of_sites = f->type->sbuf_len[i];
+            number_of_sites = round_up_buflen((f->type->sbuf_len[i]), comm_type);
             int send_size_in_dbl = (_FIELD_DIM)*number_of_sites*mpi_chunks_per_site;
 
             /* Communications */
@@ -186,3 +189,4 @@ _DECLARE(fill_buffers_with_zeroes_,(_FIELD_TYPE *f)) {
 #undef _FIELD_DIM
 #undef _MPI_REAL
 #undef _REAL
+#undef round_up_buflen

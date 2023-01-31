@@ -10,11 +10,7 @@
 void init_neighbors_gpu() 
 {
   #ifdef WITH_GPU
-  #ifdef WITH_MPI
-    int N = T_EXT*X_EXT*Y_EXT*Z_EXT;
-  #else
-    int N = T*X*Y*Z;
-  #endif
+  int N = glattice.gsize_gauge;
 
   cudaError_t error_id;
   error_id = cudaMalloc((void **)&iup_gpu, 4 * N * sizeof(int));

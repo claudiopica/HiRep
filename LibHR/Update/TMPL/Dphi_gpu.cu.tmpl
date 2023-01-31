@@ -187,9 +187,9 @@ _DECLARE(static void, Dphi_inner, (_FIELD_TYPE *out, _FIELD_TYPE *in)) {
   else if (in->type==&glat_even) gd_t = EVEN;
 
   const _GAUGE_TYPE *gauge = GFIELD(u_gauge,_REP_SUFFIX)->gpu_ptr;
-  int grid = (boxEvenVolume(geometryBoxes)-1)/BLOCK_SIZE_DIRAC + 1;
+  int grid = (boxEvenVolume(geometryBoxes)-1)/BLOCK_SIZE + 1;
   kernel_field_input* input = _GPU_F_NAME(init_kernel_input,_SUFFIX)(out, in, gauge, geometryBoxes, gd_t);
-  Dphi_gpu_inner_kernel<_HSPINOR_TYPE, _REAL, _SPINOR_TYPE, _GAUGE_TYPE><<<grid, BLOCK_SIZE_DIRAC>>>(input);
+  Dphi_gpu_inner_kernel<_HSPINOR_TYPE, _REAL, _SPINOR_TYPE, _GAUGE_TYPE><<<grid, BLOCK_SIZE>>>(input);
   CudaCheckError();
   cudaDeviceSynchronize();
 }
@@ -216,9 +216,9 @@ _DECLARE(static void, Dphi_boundary, (_FIELD_TYPE *out, _FIELD_TYPE *in)) {
   
   while(buffer_box && i <= nbuffers) {
     const _GAUGE_TYPE *gauge = GFIELD(u_gauge,_REP_SUFFIX)->gpu_ptr;
-    int grid = (boxEvenVolume(geometryBoxes)-1)/BLOCK_SIZE_DIRAC + 1;
+    int grid = (boxEvenVolume(geometryBoxes)-1)/BLOCK_SIZE + 1;
     kernel_field_input* input = _GPU_F_NAME(init_kernel_input,_SUFFIX)(out, in, gauge, buffer_box, gd_t);
-    Dphi_gpu_boundary_kernel<_HSPINOR_TYPE, _REAL, _SPINOR_TYPE, _GAUGE_TYPE><<<grid, BLOCK_SIZE_DIRAC>>>(input);
+    Dphi_gpu_boundary_kernel<_HSPINOR_TYPE, _REAL, _SPINOR_TYPE, _GAUGE_TYPE><<<grid, BLOCK_SIZE>>>(input);
     buffer_box=buffer_box->next; i++;
   }
 }
@@ -241,7 +241,7 @@ void _GPU_F_NAME_(Dphi,_SUFFIX) (_FIELD_TYPE *out, _FIELD_TYPE *in) {
   #endif
 
   // Mask communication latency with calculating the points
-  // that do no rely on communications  
+  // that do not rely on communications  
   _GPU_F_NAME(Dphi_inner,_SUFFIX)(out, in);
   _F_NAME(complete_sendrecv_,_FIELD_NAME) (in);
 
@@ -268,7 +268,6 @@ _DECLARE(void, Dphi, (double m0, _FIELD_TYPE *out, _FIELD_TYPE *in)) {
   double rho = 4. + m0;
   _GPU_F_NAME_(Dphi,_SUFFIX) (out, in);
   
-  //_F_NAME(spinor_field_copy,_REP_SUFFIX) (out, in);
   _F_NAME(spinor_field_mul_add_assign,_REP_SUFFIX) (out, rho, in);
 }
 

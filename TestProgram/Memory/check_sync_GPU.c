@@ -65,14 +65,18 @@ int main(int argc, char *argv[])
     return return_val;
 }
 
+#define round_up(val, modulo) ((val / modulo ) + 1) * modulo;
+
 #define sendbuf_length(_len) \
     _len = 0; \
     box_t *L = geometryBoxes->next; \
     int m = 0; \
     while (L && m < glattice.nbuffers_spinor) { \
-        sendbuf_len += boxVolume(L->sendBox); \
+        sendbuf_len += round_up(boxEvenVolume(L->sendBox), THREADSIZE); \
+        sendbuf_len += round_up(boxOddVolume(L->sendBox), THREADSIZE); \
         L = L->next; m++; \
     }
+
 
 int test_sync_identical_to_cpu_spinor_field_f(geometry_descriptor *gd) 
 {

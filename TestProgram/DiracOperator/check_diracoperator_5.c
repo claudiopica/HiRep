@@ -8,8 +8,6 @@
 
 #include "libhr.h"
 
-// TODO: test more operators
-
 int test_identical(spinor_operator, spinor_operator, char*);
 int test_identical_flt(spinor_operator_flt, spinor_operator_flt, char*);
 int test_identical_massless(spinor_operator, spinor_operator, char*, geometry_descriptor*, geometry_descriptor*);
@@ -115,8 +113,8 @@ int test_identical(spinor_operator S, spinor_operator S_cpu, char *name)
     lprintf("INFO", 0, "Input spinor field norm GPU: %0.2e\n", spinor_field_sqnorm_f(s));
 
     #ifdef WITH_MPI
-        start_sendrecv_gfield_f(u_gauge_f);
-        complete_sendrecv_gfield_f(u_gauge_f);
+    start_sendrecv_gfield_f(u_gauge_f);
+    complete_sendrecv_gfield_f(u_gauge_f);
     #endif
 
     S(S_s, s);
@@ -126,9 +124,8 @@ int test_identical(spinor_operator S, spinor_operator S_cpu, char *name)
     lprintf("INFO", 0, "Output spinor field norm CPU: %0.2e\n", spinor_field_sqnorm_f_cpu(S_s_cpu));
 
 
-    //copy_from_gpu_spinor_field_f(S_s);
     copy_from_gpu_spinor_field_f(S_s);
-    
+
     // Sanity checks: Norms are not identically zero
     lprintf("INFO", 0, "Output spinor field norm GPU: %0.2e\n", spinor_field_sqnorm_f_cpu(S_s));
     lprintf("INFO", 0, "Output spinor field norm CPU: %0.2e\n", spinor_field_sqnorm_f_cpu(S_s_cpu));
@@ -164,14 +161,21 @@ int test_identical_massless(spinor_operator S, spinor_operator S_cpu, char *name
     lprintf("INFO", 0, "Input spinor field norm GPU: %0.2e\n", spinor_field_sqnorm_f(s));
 
     #ifdef WITH_MPI
-        start_sendrecv_gfield_f(u_gauge_f);
-        complete_sendrecv_gfield_f(u_gauge_f);
+    start_sendrecv_gfield_f(u_gauge_f);
+    complete_sendrecv_gfield_f(u_gauge_f);
     #endif
 
     S(S_s, s);
     S_cpu(S_s_cpu, s);
 
     copy_from_gpu_spinor_field_f(S_s);
+
+    if (PID==0)_MASTER_FOR(S_s->type, ix) {
+        suNf_spinor *spinor = _FIELD_AT(S_s, ix);
+        suNf_spinor *cpu_spinor = _FIELD_AT(S_s_cpu, ix);
+        hr_complex diff = (*spinor).c[0].c[0] - (*cpu_spinor).c[0].c[0];
+        //if (ix == 383) printf("ix: %d, diff %0.2e + i%0.2e\n", ix, creal(diff), cimag(diff));
+    }
     
     // Sanity checks: Norms are not identically zero
     lprintf("INFO", 0, "Output spinor field norm GPU: %0.2e\n", spinor_field_sqnorm_f_cpu(S_s));
