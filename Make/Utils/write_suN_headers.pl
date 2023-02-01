@@ -267,6 +267,9 @@ write_vector_prod_re();
 write_vector_prod_im();
 write_vector_mulc_add_assign();
 write_vector_mul_add_assign();
+write_vector_mul_sub_assign();
+write_vector_i_mul_add_assign();
+write_vector_i_mul_sub_assign();
 write_vector_lc();
 write_vector_lc_add_assign();
 write_vector_clc();
@@ -924,6 +927,51 @@ sub write_vector_i_sub_assign {
 	}
 }
 
+sub write_vector_i_mul_add_assign {
+  print "/* r+=i*k*s */\n";
+  print "#define _vector_i_mul_add_assign_${suff}(r,k,s) \\\n";
+  if ($N<$Nmax or $N<(2*$unroll+1) ) { #unroll all
+		for(my $i=0;$i<$N;$i++){
+			print "   _complex_i_add_assign((r).$cname\[$i\],(k)*(s).$cname\[$i\])";
+			if($i==$N-1) { print "\n\n"; } else { print "; \\\n"; }
+		}
+	} else { #partial unroll
+		print "   do { \\\n";
+		print "      int _i;for (_i=0; _i<$vd; ){\\\n";
+		for(my $i=0;$i<$unroll;$i++){
+			print "         _complex_i_add_assign((r).$cname\[_i\],(k)*(s).$cname\[_i\]); ++_i;\\\n";
+		}
+		print "      }\\\n";
+		for(my $i=0;$i<$vr;$i++){
+			print "      _complex_i_add_assign((r).$cname\[_i\],(k)*(s).$cname\[_i\]); ++_i;\\\n";
+		}
+		print "   } while(0) \n\n";
+	}
+}
+
+sub write_vector_i_mul_sub_assign {
+  print "/* r-=i*k*s */\n";
+  print "#define _vector_i_mul_sub_assign_${suff}(r,k,s) \\\n";
+  if ($N<$Nmax or $N<(2*$unroll+1) ) { #unroll all
+		for(my $i=0;$i<$N;$i++){
+			print "   _complex_i_sub_assign((r).$cname\[$i\],(k)*(s).$cname\[$i\])";
+			if($i==$N-1) { print "\n\n"; } else { print "; \\\n"; }
+		}
+	} else { #partial unroll
+		print "   do { \\\n";
+		print "      int _i;for (_i=0; _i<$vd; ){\\\n";
+		for(my $i=0;$i<$unroll;$i++){
+			print "         _complex_i_sub_assign((r).$cname\[_i\],(k)*(s).$cname\[_i\]); ++_i;\\\n";
+		}
+		print "      }\\\n";
+		for(my $i=0;$i<$vr;$i++){
+			print "      _complex_i_sub_assign((r).$cname\[_i\],(k)*(s).$cname\[_i\]); ++_i;\\\n";
+		}
+		print "   } while(0) \n\n";
+	}
+}
+
+
 sub write_vector_prod {
   print "/* k=r^*s */\n";
   print "#define _vector_prod_${suff}(k,r,s) \\\n";
@@ -1145,6 +1193,11 @@ sub write_vector_mul_add_assign {
 		}
 		print "   } while(0) \n\n";
 	}
+}
+
+sub write_vector_mul_sub_assign {
+  print "/* r-=k*s (k real) */\n";
+  print "#define _vector_mul_sub_assign_${suff}(r,k,s) _vector_mul_add_assign_${suff}(r,-(k),s) \n";
 }
 
 

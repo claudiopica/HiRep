@@ -267,10 +267,8 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
 
     _MASTER_FOR(out->type, ix)
     {
-
-      suNf_spinor acc;
-      suNf_spinor *r = &acc;
-      _spinor_zero_f(*r);
+      register suNf_spinor *r = _FIELD_AT(out, ix);
+      if (repeat == 0) { _spinor_zero_f(*r); }
 
       /******************************* direction +0 *********************************/
       if ((!(imask[ix] & T_UP_MASK)) == repeat)
@@ -287,10 +285,10 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
         _vector_add_f(psi2, (*sp).c[1], (*sp).c[3]);
         _suNf_double_theta_T_multiply(chi, chi2, (*up), psi, psi2);
 
-        _vector_add_assign_f((*r).c[0], chi);
-        _vector_add_assign_f((*r).c[2], chi);
-        _vector_add_assign_f((*r).c[1], chi2);
-        _vector_add_assign_f((*r).c[3], chi2);
+        _vector_mul_add_assign_f((*r).c[0], -0.5, chi);
+        _vector_mul_add_assign_f((*r).c[2], -0.5, chi);
+        _vector_mul_add_assign_f((*r).c[1], -0.5, chi2);
+        _vector_mul_add_assign_f((*r).c[3], -0.5, chi2);
       }
       /******************************* direction -0 *********************************/
       if ((!(imask[ix] & T_DN_MASK)) == repeat)
@@ -307,10 +305,10 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
         _vector_sub_f(psi2, (*sm).c[1], (*sm).c[3]);
         _suNf_double_theta_T_inverse_multiply(chi, chi2, (*um), psi, psi2);
 
-        _vector_add_assign_f((*r).c[0], chi);
-        _vector_sub_assign_f((*r).c[2], chi);
-        _vector_add_assign_f((*r).c[1], chi2);
-        _vector_sub_assign_f((*r).c[3], chi2);
+        _vector_mul_add_assign_f((*r).c[0], -0.5, chi);
+        _vector_mul_sub_assign_f((*r).c[2], -0.5, chi);
+        _vector_mul_add_assign_f((*r).c[1], -0.5, chi2);
+        _vector_mul_sub_assign_f((*r).c[3], -0.5, chi2);
       }
       /******************************* direction +1 *********************************/
       if ((!(imask[ix] & X_UP_MASK)) == repeat)
@@ -327,10 +325,10 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
         _vector_i_add_f(psi2, (*sp).c[1], (*sp).c[2]);
         _suNf_double_theta_X_multiply(chi, chi2, (*up), psi, psi2);
 
-        _vector_add_assign_f((*r).c[0], chi);
-        _vector_i_sub_assign_f((*r).c[3], chi);
-        _vector_add_assign_f((*r).c[1], chi2);
-        _vector_i_sub_assign_f((*r).c[2], chi2);
+        _vector_mul_add_assign_f  ((*r).c[0], -0.5, chi);
+        _vector_i_mul_sub_assign_f((*r).c[3], -0.5, chi);
+        _vector_mul_add_assign_f  ((*r).c[1], -0.5, chi2);
+        _vector_i_mul_sub_assign_f((*r).c[2], -0.5, chi2);
       }
       /******************************* direction -1 *********************************/
       if ((!(imask[ix] & X_DN_MASK)) == repeat)
@@ -347,10 +345,10 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
         _vector_i_sub_f(psi2, (*sm).c[1], (*sm).c[2]);
         _suNf_double_theta_X_inverse_multiply(chi, chi2, (*um), psi, psi2);
 
-        _vector_add_assign_f((*r).c[0], chi);
-        _vector_i_add_assign_f((*r).c[3], chi);
-        _vector_add_assign_f((*r).c[1], chi2);
-        _vector_i_add_assign_f((*r).c[2], chi2);
+        _vector_mul_add_assign_f  ((*r).c[0], -0.5, chi);
+        _vector_i_mul_add_assign_f((*r).c[3], -0.5, chi);
+        _vector_mul_add_assign_f  ((*r).c[1], -0.5, chi2);
+        _vector_i_mul_add_assign_f((*r).c[2], -0.5, chi2);
       }
       /******************************* direction +2 *********************************/
       if ((!(imask[ix] & Y_UP_MASK)) == repeat)
@@ -367,10 +365,10 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
         _vector_sub_f(psi2, (*sp).c[1], (*sp).c[2]);
         _suNf_double_theta_Y_multiply(chi, chi2, (*up), psi, psi2);
 
-        _vector_add_assign_f((*r).c[0], chi);
-        _vector_add_assign_f((*r).c[3], chi);
-        _vector_add_assign_f((*r).c[1], chi2);
-        _vector_sub_assign_f((*r).c[2], chi2);
+        _vector_mul_add_assign_f((*r).c[0], -0.5, chi);
+        _vector_mul_add_assign_f((*r).c[3], -0.5, chi);
+        _vector_mul_add_assign_f((*r).c[1], -0.5, chi2);
+        _vector_mul_sub_assign_f((*r).c[2], -0.5, chi2);
       }
       /******************************* direction -2 *********************************/
       if ((!(imask[ix] & Y_DN_MASK)) == repeat)
@@ -387,10 +385,10 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
         _vector_add_f(psi2, (*sm).c[1], (*sm).c[2]);
         _suNf_double_theta_Y_inverse_multiply(chi, chi2, (*um), psi, psi2);
 
-        _vector_add_assign_f((*r).c[0], chi);
-        _vector_sub_assign_f((*r).c[3], chi);
-        _vector_add_assign_f((*r).c[1], chi2);
-        _vector_add_assign_f((*r).c[2], chi2);
+        _vector_mul_add_assign_f((*r).c[0], -0.5, chi);
+        _vector_mul_sub_assign_f((*r).c[3], -0.5, chi);
+        _vector_mul_add_assign_f((*r).c[1], -0.5, chi2);
+        _vector_mul_add_assign_f((*r).c[2], -0.5, chi2);
       }
       /******************************* direction +3 *********************************/
       if ((!(imask[ix] & Z_UP_MASK)) == repeat)
@@ -407,10 +405,10 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
         _vector_i_sub_f(psi2, (*sp).c[1], (*sp).c[3]);
         _suNf_double_theta_Z_multiply(chi, chi2, (*up), psi, psi2);
 
-        _vector_add_assign_f((*r).c[0], chi);
-        _vector_i_sub_assign_f((*r).c[2], chi);
-        _vector_add_assign_f((*r).c[1], chi2);
-        _vector_i_add_assign_f((*r).c[3], chi2);
+        _vector_mul_add_assign_f  ((*r).c[0], -0.5, chi);
+        _vector_i_mul_sub_assign_f((*r).c[2], -0.5, chi);
+        _vector_mul_add_assign_f  ((*r).c[1], -0.5, chi2);
+        _vector_i_mul_add_assign_f((*r).c[3], -0.5, chi2);
       }
       /******************************* direction -3 *********************************/
       if ((!(imask[ix] & Z_DN_MASK)) == repeat)
@@ -427,24 +425,13 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
         _vector_i_add_f(psi2, (*sm).c[1], (*sm).c[3]);
         _suNf_double_theta_Z_inverse_multiply(chi, chi2, (*um), psi, psi2);
 
-        _vector_add_assign_f((*r).c[0], chi);
-        _vector_i_add_assign_f((*r).c[2], chi);
-        _vector_add_assign_f((*r).c[1], chi2);
-        _vector_i_sub_assign_f((*r).c[3], chi2);
+        _vector_mul_add_assign_f  ((*r).c[0], -0.5, chi);
+        _vector_i_mul_add_assign_f((*r).c[2], -0.5, chi);
+        _vector_mul_add_assign_f  ((*r).c[1], -0.5, chi2);
+        _vector_i_mul_sub_assign_f((*r).c[3], -0.5, chi2);
       }
       /******************************** end of loop *********************************/
-      r = _FIELD_AT(out, ix);
-      if (!repeat)
-      {
-        // at first iteration write to output
-        _spinor_mul_f(*r, -0.5, acc);
-      }
-      else
-      {
-        // second iteration accumulate on output
-        _spinor_mul_add_assign_f(*r, -0.5, acc);
-      }
-
+      
     } /* MASTER_FOR */
 
 #ifdef WITH_MPI
