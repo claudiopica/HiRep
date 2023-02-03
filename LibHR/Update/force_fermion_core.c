@@ -274,7 +274,7 @@ static void force_clover_core(double dt)
 	double coeff = dt * (_REPR_NORM2 / _FUND_NORM2) * (1. / 8.) * get_csw();
 
 	// Communicate forces
-	start_clover_force_sendrecv(cl_force);
+	start_sendrecv_clover_force(cl_force);
 
 	// Loop over lattice
 	_PIECE_FOR(&glattice, xp)
@@ -283,7 +283,7 @@ static void force_clover_core(double dt)
 		{
 			_OMP_PRAGMA(master)
 			{
-				complete_clover_force_sendrecv(cl_force);
+				complete_sendrecv_clover_force(cl_force);
 			}
 			_OMP_PRAGMA(barrier)
 		}

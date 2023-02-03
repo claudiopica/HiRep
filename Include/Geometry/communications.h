@@ -4,7 +4,7 @@
 \***************************************************************************/
 
 /**
- * @file communications_gpu.h
+ * @file communications.h
  * @brief Communications to send and receive sites from other nodes using MPI with GPU
  */
 
