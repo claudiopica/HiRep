@@ -1,5 +1,5 @@
 // Global variables 
-GLB_T = 224 
+GLB_T = 32 
 GLB_X = 32 
 GLB_Y = 32
 GLB_Z = 32 
