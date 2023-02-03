@@ -35,6 +35,7 @@ Core functions:
 #include <string.h>
 #include "utils.h"
 #include "geometry.h"
+#include "inverters.h"
 
 #define COMM (1 == 1)
 #define NOCOMM (1 == 0)

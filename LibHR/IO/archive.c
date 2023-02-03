@@ -19,6 +19,7 @@
 #include "Random/ranlux.h"
 #include "io.h"
 #include "geometry.h"
+#include "inverters.h"
 
 void write_gauge_field(char filename[])
 {

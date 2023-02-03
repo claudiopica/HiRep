@@ -9,7 +9,7 @@
 #include "io.h"
 #include "utils.h"
 #include "random.h"
-#include "Inverters/scalarfield_operations.h"
+#include "inverters.h"
 
 /* State quantities for HMC */
 static suNg_field *u_gauge_old = NULL;

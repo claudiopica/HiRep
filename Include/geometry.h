@@ -29,7 +29,6 @@
 #include "Geometry/geometry_omp.h"
 #include "Geometry/new_geometry.h"
 #include "Geometry/setup.h"
-#include "Geometry/global_sum.h"
 
 #ifdef WITH_GPU
     #include "Geometry/geometry_gpu_init.h"

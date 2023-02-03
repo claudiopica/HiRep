@@ -9,9 +9,9 @@
 #include "io.h"
 #include "memory.h"
 #include "utils.h"
-#include "Inverters/linear_algebra.h"
 #include "update.h"
 #include "random.h"
+#include "inverters.h"
 
 static void fix_T_bc(int tau)
 {

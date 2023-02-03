@@ -5,6 +5,7 @@
 #include "memory.h"
 #include "io.h"
 #include "random.h"
+#include "inverters.h"
 
 #define REUNIT 10
 

@@ -7,9 +7,9 @@
 #include "observables.h"
 #include "libhr_core.h"
 #include "io.h"
-#include "Inverters/linear_algebra.h"
 #include "random.h"
 #include "geometry.h"
+#include "inverters.h"
 
 #define PI 3.141592653589793238462643383279502884197
 

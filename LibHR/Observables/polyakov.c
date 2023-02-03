@@ -1,6 +1,7 @@
 #include "observables.h"
 #include "libhr_core.h"
 #include "io.h"
+#include "inverters.h"
 #include <string.h>
 
 #define _MIN(x, y) ((x) > (y) ? (y) : (x))

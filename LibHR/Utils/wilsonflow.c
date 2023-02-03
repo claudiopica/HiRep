@@ -5,6 +5,7 @@
 #include "memory.h"
 #include "Update/copy_gfield.h"
 #include "IO/logger.h"
+#include "inverters.h"
 
 
 #ifndef M_PI

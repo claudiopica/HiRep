@@ -8,8 +8,8 @@
  * @brief Communications to send and receive sites from other nodes using MPI with GPU
  */
 
-#ifndef COMMUNICATIONS_GPU_H
-#define COMMUNICATIONS_GPU_H
+#ifndef COMMUNICATIONS_H
+#define COMMUNICATIONS_H
 
 #include "spinor_field.h"
 #include "geometry.h"

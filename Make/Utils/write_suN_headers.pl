@@ -80,6 +80,20 @@ print "   hr_complex up[$dim_ldl];\n";
 print "   hr_complex dn[$dim_ldl];\n";
 print "} ldl_t;\n";
 
+sub write_halfspinors {
+  print <<END
+
+typedef struct _suNf_hspinor {
+  suNf_vector c[2];
+} suNf_hspinor;
+
+typedef struct _suNf_hspinor_flt {
+    suNf_vector_flt c[2];
+} suNf_hspinor_flt;
+
+END
+}
+
 write_epilog();
 
 open STDOUT, ">suN.h";

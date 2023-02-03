@@ -22,7 +22,6 @@
 #include "suN.h"
 #include "suN_repr_func.h"
 #include "suN_types.h"
-#include "hspinors.h"
 
 #endif
 

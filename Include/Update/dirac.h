@@ -21,6 +21,11 @@
     extern "C" {
 #endif
 
+ enum DIRECTION {
+      UP = 0,
+      DOWN = 1
+};
+
 #define _SPINOR_FIELD_TYPE spinor_field
 #define _SUFFIX 
 #include "TMPL/dirac.h.tmpl"

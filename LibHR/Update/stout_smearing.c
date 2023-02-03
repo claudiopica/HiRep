@@ -7,6 +7,7 @@
 #include "libhr_core.h"
 #include "memory.h"
 #include "io.h"
+#include "inverters.h"
 
 // Smearing parameters
 static double rho_s = -0.2;
