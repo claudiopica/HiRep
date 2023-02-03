@@ -18,14 +18,16 @@ __host__ __device__ void read_gpu(int stride, SITE_TYPE *s, const FIELD_TYPE *in
     const int n_components = sizeof(SITE_TYPE)/sizeof(REAL);
     #ifdef FIXED_STRIDE
         int iz = ((ix / THREADSIZE) * THREADSIZE) * dim * field_dim  + (ix % THREADSIZE) + ((comp)*n_components)*(THREADSIZE);
+        const int _stride = THREADSIZE;
     #else
         int iz = ix + ((comp)*n_components)*(THREADSIZE);
+        const int _stride = stride;
     #endif
     REAL* in_cpx = (REAL*)in;
     REAL* in_comp_cpx = (REAL*)s;
     for (int i = 0; i < n_components; ++i) {
          in_comp_cpx[i] = in_cpx[iz];
-         iz+=THREADSIZE;
+         iz+=_stride;
     }
 }
 
@@ -35,14 +37,16 @@ __host__ __device__ void write_gpu(int stride, SITE_TYPE *s, FIELD_TYPE *out, in
     const int n_components = sizeof(SITE_TYPE)/sizeof(REAL);
     #ifdef FIXED_STRIDE
         int iz = ((ix / THREADSIZE) * THREADSIZE) * dim * field_dim  + (ix % THREADSIZE) + (comp) * n_components *(THREADSIZE);
+        const int _stride = THREADSIZE;
     #else
         int iz = ix + ((comp)*n_components)*(THREADSIZE);
+        const int _stride = stride;
     #endif
     REAL* out_cpx = (REAL*)out;
     REAL* out_comp_cpx = (REAL*)s;
     for (int i = 0; i < n_components; ++i) {
         out_cpx[iz] = out_comp_cpx[i];
-        iz += THREADSIZE;
+        iz += _stride;
     }
 }
 

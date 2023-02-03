@@ -225,6 +225,8 @@ void print_supported_features(cudaDeviceProp device_prop)
     // TODO: This possibly only works for OpenMPI (SAM)
     #if defined(OMPI_HAVE_MPI_EXT_CUDA) && OMPI_HAVE_MPI_EXT_CUDA
       cuda_aware_support = MPIX_Query_cuda_support();
+    #else
+    #error "Your MPI was not installed with CUDA support. This is unsupported in HiRep.\n"
     #endif
 
     if (cuda_aware_support) lprintf("GPU_INIT", 10, "MPI implementation CUDA-aware? yes.\n");

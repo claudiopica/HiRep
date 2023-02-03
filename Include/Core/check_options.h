@@ -220,4 +220,9 @@
 #error Exponential lover term cannot be use simultaneously with the dirac smearing (not yet implemented)
 #endif
 
+// GPU checks
+#if defined(WITH_GPU) && defined(WITH_MPI) && !defined(WITH_NEW_GEOMETRY)
+#error Multi-GPU version does not work with old geometry. Please use new geometry.
+#endif
+
 #endif /* CHECK_OPTIONS_H */

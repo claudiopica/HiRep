@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
   /* Init Monte Carlo */
 
   init_mc_ghmc(&flow, get_input_filename());
-  lprintf("MAIN", 0, "MVM during HMC initialzation: %ld\n", getMVM());
+  lprintf("MAIN", 0, "MVM during HMC initialization: %ld\n", getMVM());
 
   lprintf("MAIN", 0, "Initial plaquette: %1.16e\n", avr_plaquette());
 

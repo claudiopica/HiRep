@@ -5,6 +5,7 @@
 
 #include <string.h>
 #include "geometry.h"
+#include "Utils/generics.h"
 
 #if !defined _FIELD_NAME
 #error Missing _FIELD_NAME in communications_gpu.c
@@ -36,19 +37,31 @@
 #define _COMM_TYPE_FOR(_comm_type) \
         for (int _comm_type = CPU_COMM; _comm_type <= GPU_COMM; ++_comm_type)
 
-#define _BUFFER_FOR(_comm_type, _buf_idx) \
-        if (f->comm_type & _comm_type) for (int i = 0; i < _NUMBER_OF_BUFFERS(_GEOM_TYPE); ++i)
+#define _BUFFER_FOR(_comm_type, _i) \
+        if (f->comm_type & _comm_type) for (int _i = 0; _i < _NUMBER_OF_BUFFERS(_GEOM_TYPE); ++_i)
 
 // Need to send the rounded up buffer length only for the GPU
 #define round_up_buflen(_val, _comm_type) (_comm_type == GPU_COMM ? ((((_val-1 )/ THREADSIZE) + 1) * THREADSIZE) : _val )
 
-#ifdef WITH_NEW_GEOMETRY
+#if defined(WITH_NEW_GEOMETRY) && defined(WITH_MPI)
 static void *_F_NAME(sendrecv_guard_,_FIELD_NAME)=NULL;
 #endif
 
 _DECLARE(sync_,(_FIELD_TYPE *f)) {
     #ifdef WITH_MPI
+    #ifdef WITH_NEW_GEOMETRY
     sync_field(f->type, _FIELD_DIM*sizeof(*f->ptr), _IS_SPINOR_LIKE, f->ptr, f->sendbuf_ptr);
+    #else
+    geometry_descriptor *type = f->type;
+    for (int i = 0; i < _NUMBER_OF_COPIES(_GEOM_TYPE); ++i) {
+        _SITE_TYPE *target = _DFIELD_AT(f, type->copy_to[i], 0, _FIELD_DIM);
+        _SITE_TYPE *source = _DFIELD_AT(f, type->copy_from[i], 0, _FIELD_DIM);
+        //_SITE_TYPE *target = f->ptr + _FIELD_DIM * type->copy_to[i];
+        //_SITE_TYPE *source = f->ptr + _FIELD_DIM * type->copy_from[i];
+        int mem_size = _FIELD_DIM * type->copy_len[i] * sizeof(_SITE_TYPE);
+        memcpy(target, source, mem_size);
+    }
+    #endif 
     #endif
 }
 
@@ -65,7 +78,7 @@ _GPU_DECLARE(sync_,(_FIELD_TYPE *f)) {
     {
         _F_NAME(sync_box_to_buffer_gpu_,_FIELD_NAME)(f->type, L->sendBox, f, f->sendbuf_gpu_ptr);
         L=L->next; i++;
-    }   
+    }  
     #endif 
     #endif              
 }
@@ -76,6 +89,9 @@ _DECLARE(start_sendrecv_,(_FIELD_TYPE *f)) {
     const int mpi_chunks_per_site = sizeof(_SITE_TYPE)/sizeof(_REAL);
 
     #ifdef WITH_NEW_GEOMETRY
+    if (_F_NAME(sendrecv_guard_,_FIELD_NAME)!=NULL) {
+        error(1, 1, __func__, "More simultaneous communication attempted. Exiting...\n");
+    }
     _F_NAME(sendrecv_guard_,_FIELD_NAME) = (void*)f->comm_req;
     #endif
 
@@ -83,11 +99,16 @@ _DECLARE(start_sendrecv_,(_FIELD_TYPE *f)) {
     _REAL *send_buffer;
     _COMM_TYPE_FOR(comm_type) {
         if (f->comm_type & comm_type) { _F_NAME(complete_sendrecv_,_FIELD_NAME) (f); }
-        _BUFFER_FOR(comm_type, _buf_idx) {
+        _BUFFER_FOR(comm_type, i) {
             if (comm_type & CPU_COMM) {
+                #ifndef WITH_NEW_GEOMETRY
+                int master_shift = type->master_shift;
+                #else
+                int master_shift = 0;
+                #endif
                 _F_NAME(sync_,_FIELD_NAME)(f);
                 recv_buffer = (_REAL*)(_BUF_DFIELD_BLK(f, i, _FIELD_DIM));
-                send_buffer = (_REAL*)(_DFIELD_AT_PTR(f->sendbuf_ptr, f->type->sbuf_start[i], 0, 0, _FIELD_DIM));
+                send_buffer = (_REAL*)(_DFIELD_AT_PTR(f->sendbuf_ptr, f->type->sbuf_start[i], 0, master_shift, _FIELD_DIM));
             } else if (comm_type & GPU_COMM) {
                 #ifdef WITH_GPU
                 _GPU_F_NAME(sync_,_FIELD_NAME) (f);
@@ -133,7 +154,7 @@ _DECLARE(fill_buffers_,(_FIELD_TYPE *f)) {
     #ifdef WITH_MPI
     geometry_descriptor *type = f->type;
     _COMM_TYPE_FOR(comm_type) {
-        _BUFFER_FOR(comm_type, _buf_idx) {
+        _BUFFER_FOR(comm_type, i) {
             int chunks_per_site = sizeof(_SITE_TYPE)/sizeof(_REAL);
             int number_of_sites = f->type->rbuf_len[i];
             int buffer_length = _FIELD_DIM*number_of_sites*chunks_per_site;
@@ -160,7 +181,7 @@ _DECLARE(fill_buffers_with_zeroes_,(_FIELD_TYPE *f)) {
     #ifdef WITH_MPI
     geometry_descriptor *type = f->type;
     _COMM_TYPE_FOR(comm_type) {
-        _BUFFER_FOR(comm_type, _buf_idx) {
+        _BUFFER_FOR(comm_type, i) {
             int chunks_per_site = sizeof(_SITE_TYPE)/sizeof(_REAL);
             int number_of_sites = f->type->rbuf_len[i];
             int buffer_length = _FIELD_DIM*number_of_sites*chunks_per_site;

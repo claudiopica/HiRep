@@ -26,5 +26,11 @@
 #define _N_BUFFERS(_geom) CONCAT(type->nbuffers_,_geom)
 #define _NUMBER_OF_BUFFERS(_geom) _N_BUFFERS(_geom)
 
+// Construct number of copies from geom type (old geometry)
+#ifndef WITH_NEW_GEOMETRY
+#define _N_COPIES(_geom) CONCAT(type->ncopies_,_geom)
+#define _NUMBER_OF_COPIES(_geom) _N_COPIES(_geom)
+#endif
+
 #endif
 
