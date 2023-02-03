@@ -3,6 +3,9 @@
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
+/// Headerfile for:
+/// - gpu_info.c
+
 /**
  * @file gpu_info.h
  * @brief Functions that print collective information on cluster 

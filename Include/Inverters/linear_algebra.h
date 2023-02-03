@@ -3,6 +3,10 @@
 * All rights reserved.                                                      *
 \***************************************************************************/
 
+/// Headerfile for:
+/// - linear_algebra.c
+/// - linear_algebra_gpu.cu
+
 /**
  * @file linear_algebra.h
  * @brief Linear algebra operations on spinors both for CPU and with GPU

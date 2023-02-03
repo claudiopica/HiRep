@@ -22,7 +22,7 @@ void gaussian_spinor_field(spinor_field *s)
 	copy_to_gpu_spinor_field_f(s);
 	#endif
 
-	//apply_BCs_on_spinor_field(s);
+	apply_BCs_on_spinor_field(s);
 }
 
 void gaussian_spinor_field_flt(spinor_field_flt *s)

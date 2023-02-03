@@ -11,14 +11,6 @@
  *
  *******************************************************************************/
 #include "libhr.h"
-/*#include "global.h"
-#include "Geometry/communications.h"
-#include "Utils/boundary_conditions.h"
-#include "Utils/timing.h"
-#include "Observables/avr_plaquette.h"
-#include "Random/ranlux.h"
-#include "Inverters/linear_algebra.h"
-#include "io.h"*/
 
 #ifndef NDEBUG
 #  define MPIRET(type) type =

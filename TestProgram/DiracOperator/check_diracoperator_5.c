@@ -14,7 +14,6 @@ int test_identical_massless(spinor_operator, spinor_operator, char*, geometry_de
 int test_identical_massless_flt(spinor_operator_flt, spinor_operator_flt, char*, geometry_descriptor*, geometry_descriptor*, double);
 void Q_operator(spinor_field*, spinor_field*);
 void Q_operator_cpu(spinor_field*, spinor_field*);
-void Q_operator_flt(spinor_field_flt*, spinor_field_flt*);
 void Q_operator_flt_cpu(spinor_field_flt*, spinor_field_flt*);
 void D_operator(spinor_field*, spinor_field*);
 void D_operator_cpu(spinor_field*, spinor_field*);
@@ -70,24 +69,22 @@ int main(int argc, char *argv[])
     return_val += test_identical_massless(&D_massless, &D_massless_cpu, "D = Dphi Massless Even Lattice", &glat_even, &glat_odd, 1e-13);
     return_val += test_identical_massless(&D_massless, &D_massless_cpu, "D = Dphi Massless Odd Lattice", &glat_odd, &glat_even, 1e-13);
 
+    return_val += test_identical(&Q_operator, &Q_operator_cpu, "Q = g5Dphi Full Lattice", 1e-13);
+    return_val += test_identical(&Q_operator_sq, &Q_operator_sq_cpu, "Q^2 Full Lattice", 1e-12);
+    return_val += test_identical_massless(&D_eopre, &D_eopre_cpu, "EO-preconditioned D", &glat_even, &glat_even, 1e-11);
+    return_val += test_identical_massless(&Q_eopre, &Q_eopre_cpu, "EO-preconditioned Q", &glat_even, &glat_even, 1e-11);
+    return_val += test_identical_massless(&Q_eopre_sq, &Q_eopre_sq_cpu, "Squared EO-preconditioned Q", &glat_even, &glat_even, 1e-11);
+
+    #ifdef DPHI_FLT
     return_val += test_identical_flt(&D_operator_flt, &D_operator_flt_cpu, "D = Dphi_flt Full Lattice", 1e-4);
     return_val += test_identical_massless_flt(&D_massless_flt, &D_massless_flt_cpu, "D = Dphi_flt Massless Even Lattice", &glat_even, &glat_odd, 1e-4);
     return_val += test_identical_massless_flt(&D_massless_flt, &D_massless_flt_cpu, "D = Dphi_flt Massless Odd Lattice", &glat_odd, &glat_even, 1e-4);
-
-    return_val += test_identical(&Q_operator, &Q_operator_cpu, "Q = g5Dphi Full Lattice", 1e-13);
     return_val += test_identical_flt(&Q_operator_flt, &Q_operator_flt_cpu, "Q = g5Dphi_flt Full Lattice", 1e-4);
-    
-    return_val += test_identical(&Q_operator_sq, &Q_operator_sq_cpu, "Q^2 Full Lattice", 1e-12);
     return_val += test_identical_flt(&Q_operator_sq_flt, &Q_operator_sq_flt_cpu, "Q^2 Single Precision Full Lattice", 1e-2);
-
-    return_val += test_identical_massless(&D_eopre, &D_eopre_cpu, "EO-preconditioned D", &glat_even, &glat_even, 1e-11);
     return_val += test_identical_massless_flt(&D_eopre_flt, &D_eopre_flt_cpu, "EO-preconditioned flt D", &glat_even, &glat_even, 1e-2);
-
-    return_val += test_identical_massless(&Q_eopre, &Q_eopre_cpu, "EO-preconditioned Q", &glat_even, &glat_even, 1e-11);
     return_val += test_identical_massless_flt(&Q_eopre_flt, &Q_eopre_flt_cpu, "EO-preconditioned flt Q", &glat_even, &glat_even, 1e-2);
-
-    return_val += test_identical_massless(&Q_eopre_sq, &Q_eopre_sq_cpu, "Squared EO-preconditioned Q", &glat_even, &glat_even, 1e-11);
     return_val += test_identical_massless_flt(&Q_eopre_sq_flt, &Q_eopre_sq_flt_cpu, "Squared EO-preconditioned flt Q", &glat_even, &glat_even, 1e-2);
+    #endif 
     
     // Finalize and return
     finalize_process();

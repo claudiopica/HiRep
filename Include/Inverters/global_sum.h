@@ -3,6 +3,10 @@
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
+/// Headerfile for:
+/// - global_sum.c
+/// - global_sum_gpu.c
+
 /**
  * @file global_sum.h
  * @brief Functions for global reduction operations across nodes

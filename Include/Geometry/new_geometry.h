@@ -3,6 +3,10 @@
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
+/// Headerfile for:
+/// - new_geom.c
+/// - sync_to_buffer.cu
+
 /**
  * @file new_geometry.h
  * @brief Functions needed for the new geometry implementation that

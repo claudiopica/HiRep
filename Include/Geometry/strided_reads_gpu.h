@@ -1,3 +1,11 @@
+/***************************************************************************\
+* Copyright (c) 2023, Sofie Martins                                         *
+* All rights reserved.                                                      *
+\***************************************************************************/
+
+/// Headerfile for:
+/// - strided_reads.cu
+
 #ifndef STRIDED_READS_GPU_HPP
 #define STRIDED_READS_GPU_HPP
 

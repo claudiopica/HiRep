@@ -3,6 +3,9 @@
  * All rights reserved.                                                     *
  \**************************************************************************/
 
+/// Headerfile for:
+/// - process_init.c
+
 /**
  * @file setup.h
  * @brief Setup and finalize to run at the beginning and the end of every 

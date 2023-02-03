@@ -3,6 +3,10 @@
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
+/// Headerfile for:
+/// - communications.c
+/// - sync_to_buffer.cu
+
 /**
  * @file communications.h
  * @brief Communications to send and receive sites from other nodes using MPI with GPU
