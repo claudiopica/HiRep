@@ -43,8 +43,6 @@ jobs:
         with:
           packages: openmpi-bin openmpi-common libopenmpi3 libopenmpi-dev ninja-build
           version: 1.0
-      - name: Setup link to mpirun alternative
-        run: sudo ln -s /usr/bin/mpirun.openmpi /usr/bin/mpirun
 
       - name: Run Tests
         env: 
