@@ -69,8 +69,7 @@ typedef struct box_t {
     int base_index_odd;
     int parity; ///< 0 -> base point is even; 1 -> basepoint is odd
     char mask; ///< tells if the box is a border, e.g. if T_UP_MASK is set the box is in top T border of the extended lattice
-    enum box_type type; //> tell the type of the box, just a convenience for testing
-    int *ipt_ext; ///< given the cordinate of a point in the box returns an index
+    enum box_type type; //< the type of the box, just a convenience for testing
     coord4 *icoord; ///< given an index in the box return the 4D coordinates of the point in the box relative to the l[4]
     struct box_t *sendBox; ///< if this is a border corresponding to a Recv buffer, this is the box to copy data from, i.e. corresponding to the Send buffer
     struct box_t *next; ///< link to next box. NULL if last
