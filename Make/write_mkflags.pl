@@ -24,6 +24,7 @@ GetOptions(
   'expclover|e!' => \(my $expclover = 0),
   'eo!'          => \(my $eoprec = 1),
   'newgeo!'      => \(my $newgeo = 0),
+  'fixedstr!'    => \(my $fixedstr = 0),
   'quat|q!'      => \(my $quat = 0),
   'ndebug!'      => \(my $ndebug = 1),
   'dfloat!'      => \(my $dfloat = 0),
@@ -194,12 +195,14 @@ $expclover && print $fh "MACRO += WITH_EXPCLOVER\n";
 $eoprec && print $fh "MACRO += UPDATE_EO\n";
 # write new geometry
 $newgeo && print $fh "MACRO += WITH_NEW_GEOMETRY\n";
+# write fixed stride
+$fixedstr && print $fh "MACRO += FIXED_STRIDE\n";
 # write quaternions 
 $quat && print $fh "MACRO += WITH_QUATERNIONS\n";
 # write ndebug
 $ndebug && print $fh "MACRO += NDEBUG\n";
 # write dphi float
-$dfloat && print $fh "MACRO += DPHI_FLOAT\n";
+$dfloat && print $fh "MACRO += DPHI_FLT\n";
 # write check spinor
 $scheck && print $fh "MACRO += CHECK_SPINOR_MATCHING\n";
 # write mpitiming
@@ -276,6 +279,7 @@ write_mkflags - write flags file for compilation of HiRep
 
   --[no-]eo           [true]      Even-Odd preconditioning
   --[no-]newgeo       [false]     Use new geometry
+  --[no-]fixedstr     [false]     Access memory on GPU using a fixed stride of length 32 instead of piece length
   
   --[no-]twist        [false]     XYZ twisted boundary conditions
   --[no-]sf           [false]     Schrodinger functional b.c.
