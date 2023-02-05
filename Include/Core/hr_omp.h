@@ -30,7 +30,11 @@
 #else //to avoid compilation warnings
 #define _OMP_PRAGMA(s)
 #endif
+
 #define _OMP_BARRIER _OMP_PRAGMA( barrier )
 
+#define _OMP_PARALLEL_FOR \
+_OMP_PRAGMA( _omp_parallel) \
+_OMP_PRAGMA( _omp_for )
 
 #endif

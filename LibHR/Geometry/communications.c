@@ -15,6 +15,7 @@
 #define random_double ranlxd
 #define random_float ranlxs
 
+#ifdef WITH_MPI
 static inline void zeroes_double(double* dbl, int n) {
     for (int i = 0; i < n; ++i) { dbl[i] = 0.0; }
 }
@@ -22,6 +23,7 @@ static inline void zeroes_double(double* dbl, int n) {
 static inline void zeroes_float(float* flt, int n) {
     for (int i = 0; i < n; ++i) { flt[i] = 0.0f; }
 }
+#endif
 
 /* Spinor-like fields */
 #define _GEOM_TYPE spinor

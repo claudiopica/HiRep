@@ -339,6 +339,7 @@ sub read_conf {
     push(@{$options{'MACRO'}},"${$options{'REPR'}}[0]");
     push(@{$options{'MACRO'}},"REPR_NAME=\\\"${$options{'REPR'}}[0]\\\"");
 
+    # icc does not have the output color option 
     if ($options{'CC'}[0]=~/\bmpiicc\b/ || $options{'CC'}[0]=~/\bicc\b/) {
         $disable_color=1;
     }
@@ -529,7 +530,7 @@ EOF
 
     $optfile = "$rootdir/.vscode/settings.json";
     open(FH, '>', $optfile) or die $!;
-    print FH <<EOF;
+    print FH <<'EOF';
 {
     "files.associations": {
         "*.h": "c",
@@ -537,8 +538,13 @@ EOF
         "*.[hc].tmpl": "c",
         "*.hpp": "cpp",
         "*.cu": "cpp",
-        "*.cu.sdtmpl": "cpp",
-    }
+        "*.cu.tmpl": "cpp",
+    },
+    "disasexpl.associations": {
+        "**/*.c": "${workspaceFolder}/build/${relativeFileDirname}/${fileBasenameNoExtension}.s",
+        "**/*.cu": "${workspaceFolder}/build/${relativeFileDirname}/${fileBasenameNoExtension}.s",
+    },
+    "disasexpl.dimUnusedSourceLines": false
 }
 EOF
     close(FH);

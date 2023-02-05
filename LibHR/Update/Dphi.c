@@ -225,8 +225,132 @@ unsigned long int getMVM_cpu()
 #endif
 
 #if defined(BC_T_THETA) || defined(BC_X_THETA) || defined(BC_Y_THETA) || defined(BC_Z_THETA)
-#define _USING_THETA
+#define _USING_THETA suNf_vector vtmp[2]
+#else
+#define _USING_THETA (void)(0)
 #endif
+
+
+// Macros for Dphi directions
+#define DPHI_T_UP(ix, iy, in, r)\
+do {\
+    const suNf_spinor *sp = _FIELD_AT(in, iy);\
+    const suNf *up = pu_gauge_f(ix, 0);\
+    suNf_vector psi, chi, psi2, chi2;\
+    _USING_THETA;\
+    _vector_add_f(psi, (*sp).c[0], (*sp).c[2]);\
+    _vector_add_f(psi2, (*sp).c[1], (*sp).c[3]);\
+    _suNf_double_theta_T_multiply(chi, chi2, (*up), psi, psi2);\
+    _vector_mul_add_assign_f((*r).c[0], -0.5, chi);\
+    _vector_mul_add_assign_f((*r).c[2], -0.5, chi);\
+    _vector_mul_add_assign_f((*r).c[1], -0.5, chi2);\
+    _vector_mul_add_assign_f((*r).c[3], -0.5, chi2);\
+} while(0)
+
+#define DPHI_T_DN(ix, iy, in, r)\
+do {\
+  const suNf_spinor *sm = _FIELD_AT(in, iy);\
+  const suNf *um = pu_gauge_f(iy, 0);\
+  suNf_vector psi, chi, psi2, chi2;\
+  _USING_THETA;\
+  _vector_sub_f(psi, (*sm).c[0], (*sm).c[2]);\
+  _vector_sub_f(psi2, (*sm).c[1], (*sm).c[3]);\
+  _suNf_double_theta_T_inverse_multiply(chi, chi2, (*um), psi, psi2);\
+  _vector_mul_add_assign_f((*r).c[0], -0.5, chi);\
+  _vector_mul_sub_assign_f((*r).c[2], -0.5, chi);\
+  _vector_mul_add_assign_f((*r).c[1], -0.5, chi2);\
+  _vector_mul_sub_assign_f((*r).c[3], -0.5, chi2);\
+} while(0)
+
+#define DPHI_X_UP(ix, iy, in, r)\
+do {\
+  const suNf_spinor *sp = _FIELD_AT(in, iy);\
+  const suNf *up = pu_gauge_f(ix, 1);\
+  suNf_vector psi, chi, psi2, chi2;\
+  _USING_THETA;\
+  _vector_i_add_f(psi, (*sp).c[0], (*sp).c[3]);\
+  _vector_i_add_f(psi2, (*sp).c[1], (*sp).c[2]);\
+  _suNf_double_theta_X_multiply(chi, chi2, (*up), psi, psi2);\
+  _vector_mul_add_assign_f  ((*r).c[0], -0.5, chi);\
+  _vector_i_mul_sub_assign_f((*r).c[3], -0.5, chi);\
+  _vector_mul_add_assign_f  ((*r).c[1], -0.5, chi2);\
+  _vector_i_mul_sub_assign_f((*r).c[2], -0.5, chi2);\
+} while(0)
+
+#define DPHI_X_DN(ix, iy, in, r)\
+do {\
+  const suNf_spinor *sm = _FIELD_AT(in, iy);\
+  const suNf *um = pu_gauge_f(iy, 1);\
+  suNf_vector psi, chi, psi2, chi2;\
+  _USING_THETA;\
+  _vector_i_sub_f(psi, (*sm).c[0], (*sm).c[3]);\
+  _vector_i_sub_f(psi2, (*sm).c[1], (*sm).c[2]);\
+  _suNf_double_theta_X_inverse_multiply(chi, chi2, (*um), psi, psi2);\
+  _vector_mul_add_assign_f  ((*r).c[0], -0.5, chi);\
+  _vector_i_mul_add_assign_f((*r).c[3], -0.5, chi);\
+  _vector_mul_add_assign_f  ((*r).c[1], -0.5, chi2);\
+  _vector_i_mul_add_assign_f((*r).c[2], -0.5, chi2);\
+} while(0)
+
+#define DPHI_Y_UP(ix, iy, in, r)\
+do {\
+  const suNf_spinor *sp = _FIELD_AT(in, iy);\
+  const suNf *up = pu_gauge_f(ix, 2);\
+  suNf_vector psi, chi, psi2, chi2;\
+  _USING_THETA;\
+  _vector_add_f(psi, (*sp).c[0], (*sp).c[3]);\
+  _vector_sub_f(psi2, (*sp).c[1], (*sp).c[2]);\
+  _suNf_double_theta_Y_multiply(chi, chi2, (*up), psi, psi2);\
+  _vector_mul_add_assign_f((*r).c[0], -0.5, chi);\
+  _vector_mul_add_assign_f((*r).c[3], -0.5, chi);\
+  _vector_mul_add_assign_f((*r).c[1], -0.5, chi2);\
+  _vector_mul_sub_assign_f((*r).c[2], -0.5, chi2);\
+} while(0)
+
+#define DPHI_Y_DN(ix, iy, in, r)\
+do {\
+  const suNf_spinor *sm = _FIELD_AT(in, iy);\
+  const suNf *um = pu_gauge_f(iy, 2);\
+  suNf_vector psi, chi, psi2, chi2;\
+  _USING_THETA;\
+  _vector_sub_f(psi, (*sm).c[0], (*sm).c[3]);\
+  _vector_add_f(psi2, (*sm).c[1], (*sm).c[2]);\
+  _suNf_double_theta_Y_inverse_multiply(chi, chi2, (*um), psi, psi2);\
+  _vector_mul_add_assign_f((*r).c[0], -0.5, chi);\
+  _vector_mul_sub_assign_f((*r).c[3], -0.5, chi);\
+  _vector_mul_add_assign_f((*r).c[1], -0.5, chi2);\
+  _vector_mul_add_assign_f((*r).c[2], -0.5, chi2);\
+} while(0)
+
+#define DPHI_Z_UP(ix, iy, in, r)\
+do {\
+  const suNf_spinor *sp = _FIELD_AT(in, iy);\
+  const suNf *up = pu_gauge_f(ix, 3);\
+  suNf_vector psi, chi, psi2, chi2;\
+  _USING_THETA;\
+  _vector_i_add_f(psi, (*sp).c[0], (*sp).c[2]);\
+  _vector_i_sub_f(psi2, (*sp).c[1], (*sp).c[3]);\
+  _suNf_double_theta_Z_multiply(chi, chi2, (*up), psi, psi2);\
+  _vector_mul_add_assign_f  ((*r).c[0], -0.5, chi);\
+  _vector_i_mul_sub_assign_f((*r).c[2], -0.5, chi);\
+  _vector_mul_add_assign_f  ((*r).c[1], -0.5, chi2);\
+  _vector_i_mul_add_assign_f((*r).c[3], -0.5, chi2);\
+} while(0)
+
+#define DPHI_Z_DN(ix, iy, in, r)\
+do {\
+  const suNf_spinor *sm = _FIELD_AT(in, iy);\
+  const suNf *um = pu_gauge_f(iy, 3);\
+  suNf_vector psi, chi, psi2, chi2;\
+  _USING_THETA;\
+  _vector_i_sub_f(psi, (*sm).c[0], (*sm).c[2]);\
+  _vector_i_add_f(psi2, (*sm).c[1], (*sm).c[3]);\
+  _suNf_double_theta_Z_inverse_multiply(chi, chi2, (*um), psi, psi2);\
+  _vector_mul_add_assign_f  ((*r).c[0], -0.5, chi);\
+  _vector_i_mul_add_assign_f((*r).c[2], -0.5, chi);\
+  _vector_mul_add_assign_f  ((*r).c[1], -0.5, chi2);\
+  _vector_i_mul_sub_assign_f((*r).c[3], -0.5, chi2);\
+} while(0)
 
 /*
  * This function defines the massless Dirac operator
@@ -246,11 +370,11 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
 #endif
 
   ++MVMcounter; /* count matrix calls */
-  if (out->type == &glattice)
-    ++MVMcounter;
+  if (out->type == &glattice) { ++MVMcounter; }
 
-    /************************ loop over all lattice sites *************************/
-    /* start communication of input spinor field */
+  const int reps = (out->type->nbuffers_spinor>0)?2:1;
+
+  /* start communication of input spinor field */
 #ifdef WITH_MPI
   _OMP_PRAGMA(master)
   {
@@ -259,7 +383,8 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
   _OMP_BARRIER // why do we need this barrier?
 #endif
 
-      for (int repeat = 0; repeat < 2; repeat++)
+    /************************ loop over all lattice sites *************************/
+  for (int repeat = 0; repeat < reps; repeat++)
   {
     // we repeat the loop over the master lattice twice
     // the second pass we invert the mask
@@ -271,165 +396,45 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
       if (repeat == 0) { _spinor_zero_f(*r); }
 
       /******************************* direction +0 *********************************/
-      if ((!(imask[ix] & T_UP_MASK)) == repeat)
-      {
+      if ((!(imask[ix] & T_UP_MASK)) == repeat) {
         const int iy = iup(ix, 0);
-        const suNf_spinor *sp = _FIELD_AT(in, iy);
-        const suNf *up = pu_gauge_f(ix, 0);
-        suNf_vector psi, chi, psi2, chi2;
-#ifdef _USING_THETA
-        suNf_vector vtmp[2];
-#endif
-        _vector_add_f(psi, (*sp).c[0], (*sp).c[2]);
-        _vector_add_f(psi2, (*sp).c[1], (*sp).c[3]);
-        _suNf_double_theta_T_multiply(chi, chi2, (*up), psi, psi2);
-
-        _vector_mul_add_assign_f((*r).c[0], -0.5, chi);
-        _vector_mul_add_assign_f((*r).c[2], -0.5, chi);
-        _vector_mul_add_assign_f((*r).c[1], -0.5, chi2);
-        _vector_mul_add_assign_f((*r).c[3], -0.5, chi2);
+        DPHI_T_UP(ix, iy, in, r);
       }
       /******************************* direction -0 *********************************/
-      if ((!(imask[ix] & T_DN_MASK)) == repeat)
-      {
+      if ((!(imask[ix] & T_DN_MASK)) == repeat) {
         const int iy = idn(ix, 0);
-        const suNf_spinor *sm = _FIELD_AT(in, iy);
-        const suNf *um = pu_gauge_f(iy, 0);
-        suNf_vector psi, chi, psi2, chi2;
-#ifdef _USING_THETA
-        suNf_vector vtmp[2];
-#endif
-
-        _vector_sub_f(psi, (*sm).c[0], (*sm).c[2]);
-        _vector_sub_f(psi2, (*sm).c[1], (*sm).c[3]);
-        _suNf_double_theta_T_inverse_multiply(chi, chi2, (*um), psi, psi2);
-
-        _vector_mul_add_assign_f((*r).c[0], -0.5, chi);
-        _vector_mul_sub_assign_f((*r).c[2], -0.5, chi);
-        _vector_mul_add_assign_f((*r).c[1], -0.5, chi2);
-        _vector_mul_sub_assign_f((*r).c[3], -0.5, chi2);
+        DPHI_T_DN(ix, iy, in, r);
       }
       /******************************* direction +1 *********************************/
-      if ((!(imask[ix] & X_UP_MASK)) == repeat)
-      {
+      if ((!(imask[ix] & X_UP_MASK)) == repeat) {
         const int iy = iup(ix, 1);
-        const suNf_spinor *sp = _FIELD_AT(in, iy);
-        const suNf *up = pu_gauge_f(ix, 1);
-        suNf_vector psi, chi, psi2, chi2;
-#ifdef _USING_THETA
-        suNf_vector vtmp[2];
-#endif
-
-        _vector_i_add_f(psi, (*sp).c[0], (*sp).c[3]);
-        _vector_i_add_f(psi2, (*sp).c[1], (*sp).c[2]);
-        _suNf_double_theta_X_multiply(chi, chi2, (*up), psi, psi2);
-
-        _vector_mul_add_assign_f  ((*r).c[0], -0.5, chi);
-        _vector_i_mul_sub_assign_f((*r).c[3], -0.5, chi);
-        _vector_mul_add_assign_f  ((*r).c[1], -0.5, chi2);
-        _vector_i_mul_sub_assign_f((*r).c[2], -0.5, chi2);
+        DPHI_X_UP(ix, iy, in, r);
       }
       /******************************* direction -1 *********************************/
-      if ((!(imask[ix] & X_DN_MASK)) == repeat)
-      {
+      if ((!(imask[ix] & X_DN_MASK)) == repeat) {
         const int iy = idn(ix, 1);
-        const suNf_spinor *sm = _FIELD_AT(in, iy);
-        const suNf *um = pu_gauge_f(iy, 1);
-        suNf_vector psi, chi, psi2, chi2;
-#ifdef _USING_THETA
-        suNf_vector vtmp[2];
-#endif
-
-        _vector_i_sub_f(psi, (*sm).c[0], (*sm).c[3]);
-        _vector_i_sub_f(psi2, (*sm).c[1], (*sm).c[2]);
-        _suNf_double_theta_X_inverse_multiply(chi, chi2, (*um), psi, psi2);
-
-        _vector_mul_add_assign_f  ((*r).c[0], -0.5, chi);
-        _vector_i_mul_add_assign_f((*r).c[3], -0.5, chi);
-        _vector_mul_add_assign_f  ((*r).c[1], -0.5, chi2);
-        _vector_i_mul_add_assign_f((*r).c[2], -0.5, chi2);
+        DPHI_X_DN(ix, iy, in, r);
       }
       /******************************* direction +2 *********************************/
-      if ((!(imask[ix] & Y_UP_MASK)) == repeat)
-      {
+      if ((!(imask[ix] & Y_UP_MASK)) == repeat) {
         const int iy = iup(ix, 2);
-        const suNf_spinor *sp = _FIELD_AT(in, iy);
-        const suNf *up = pu_gauge_f(ix, 2);
-        suNf_vector psi, chi, psi2, chi2;
-#ifdef _USING_THETA
-        suNf_vector vtmp[2];
-#endif
-
-        _vector_add_f(psi, (*sp).c[0], (*sp).c[3]);
-        _vector_sub_f(psi2, (*sp).c[1], (*sp).c[2]);
-        _suNf_double_theta_Y_multiply(chi, chi2, (*up), psi, psi2);
-
-        _vector_mul_add_assign_f((*r).c[0], -0.5, chi);
-        _vector_mul_add_assign_f((*r).c[3], -0.5, chi);
-        _vector_mul_add_assign_f((*r).c[1], -0.5, chi2);
-        _vector_mul_sub_assign_f((*r).c[2], -0.5, chi2);
+        DPHI_Y_UP(ix, iy, in, r);
       }
       /******************************* direction -2 *********************************/
-      if ((!(imask[ix] & Y_DN_MASK)) == repeat)
-      {
+      if ((!(imask[ix] & Y_DN_MASK)) == repeat) {
         const int iy = idn(ix, 2);
-        const suNf_spinor *sm = _FIELD_AT(in, iy);
-        const suNf *um = pu_gauge_f(iy, 2);
-        suNf_vector psi, chi, psi2, chi2;
-#ifdef _USING_THETA
-        suNf_vector vtmp[2];
-#endif
-
-        _vector_sub_f(psi, (*sm).c[0], (*sm).c[3]);
-        _vector_add_f(psi2, (*sm).c[1], (*sm).c[2]);
-        _suNf_double_theta_Y_inverse_multiply(chi, chi2, (*um), psi, psi2);
-
-        _vector_mul_add_assign_f((*r).c[0], -0.5, chi);
-        _vector_mul_sub_assign_f((*r).c[3], -0.5, chi);
-        _vector_mul_add_assign_f((*r).c[1], -0.5, chi2);
-        _vector_mul_add_assign_f((*r).c[2], -0.5, chi2);
+        DPHI_Y_DN(ix, iy, in, r);
       }
       /******************************* direction +3 *********************************/
-      if ((!(imask[ix] & Z_UP_MASK)) == repeat)
-      {
+      if ((!(imask[ix] & Z_UP_MASK)) == repeat) {
         const int iy = iup(ix, 3);
-        const suNf_spinor *sp = _FIELD_AT(in, iy);
-        const suNf *up = pu_gauge_f(ix, 3);
-        suNf_vector psi, chi, psi2, chi2;
-#ifdef _USING_THETA
-        suNf_vector vtmp[2];
-#endif
-
-        _vector_i_add_f(psi, (*sp).c[0], (*sp).c[2]);
-        _vector_i_sub_f(psi2, (*sp).c[1], (*sp).c[3]);
-        _suNf_double_theta_Z_multiply(chi, chi2, (*up), psi, psi2);
-
-        _vector_mul_add_assign_f  ((*r).c[0], -0.5, chi);
-        _vector_i_mul_sub_assign_f((*r).c[2], -0.5, chi);
-        _vector_mul_add_assign_f  ((*r).c[1], -0.5, chi2);
-        _vector_i_mul_add_assign_f((*r).c[3], -0.5, chi2);
+        DPHI_Z_UP(ix, iy, in, r);
       }
       /******************************* direction -3 *********************************/
-      if ((!(imask[ix] & Z_DN_MASK)) == repeat)
-      {
+      if ((!(imask[ix] & Z_DN_MASK)) == repeat) {
         const int iy = idn(ix, 3);
-        const suNf_spinor *sm = _FIELD_AT(in, iy);
-        const suNf *um = pu_gauge_f(iy, 3);
-        suNf_vector psi, chi, psi2, chi2;
-#ifdef _USING_THETA
-        suNf_vector vtmp[2];
-#endif
-
-        _vector_i_sub_f(psi, (*sm).c[0], (*sm).c[2]);
-        _vector_i_add_f(psi2, (*sm).c[1], (*sm).c[3]);
-        _suNf_double_theta_Z_inverse_multiply(chi, chi2, (*um), psi, psi2);
-
-        _vector_mul_add_assign_f  ((*r).c[0], -0.5, chi);
-        _vector_i_mul_add_assign_f((*r).c[2], -0.5, chi);
-        _vector_mul_add_assign_f  ((*r).c[1], -0.5, chi2);
-        _vector_i_mul_sub_assign_f((*r).c[3], -0.5, chi2);
+        DPHI_Z_DN(ix, iy, in, r);
       }
-
       /******************************** end of loop *********************************/
       
     } /* MASTER_FOR */
@@ -448,6 +453,184 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
 #endif
   }
 }
+
+void Dphi_cpu_new_(spinor_field *restrict out, spinor_field *restrict in)
+{
+#ifdef CHECK_SPINOR_MATCHING
+  error((in == NULL) || (out == NULL), 1, "Dphi_cpu_ [Dphi.c]",
+        "Attempt to access unallocated memory space");
+  error(in == out, 1, "Dphi_cpu_ [Dphi.c]",
+        "Input and output fields must be different");
+  error(out->type == &glat_even && in->type == &glat_even, 1, "Dphi_cpu_ [Dphi.c]", "Spinors don't match! (1)");
+  error(out->type == &glat_odd && in->type == &glat_odd, 1, "Dphi_cpu_ [Dphi.c]", "Spinors don't match! (2)");
+#endif
+
+  ++MVMcounter; /* count matrix calls */
+  if (out->type == &glattice) { ++MVMcounter; }
+
+    /************************ loop over all lattice sites *************************/
+    /* start communication of input spinor field */
+#ifdef WITH_MPI
+  _OMP_PRAGMA(master)
+  {
+    start_sendrecv_spinor_field_f(in);
+  }
+  _OMP_BARRIER // why do we need this barrier?
+#endif
+
+  // we repeat the loop over the master lattice twice
+  // the second pass we invert the mask
+  // this is achieved with comparing the condition to be different than repeat=0,1
+
+  _MASTER_FOR(out->type, ix)
+  {
+    register suNf_spinor *r = _FIELD_AT(out, ix);
+    _spinor_zero_f(*r); 
+
+      /******************************* direction +0 *********************************/
+      if (imask[ix] & T_UP_MASK) {
+        const int iy = iup(ix, 0);
+        DPHI_T_UP(ix, iy, in, r);
+      }
+      /******************************* direction -0 *********************************/
+      if (imask[ix] & T_DN_MASK) {
+        const int iy = idn(ix, 0);
+        DPHI_T_DN(ix, iy, in, r);
+      }
+      /******************************* direction +1 *********************************/
+      if (imask[ix] & X_UP_MASK) {
+        const int iy = iup(ix, 1);
+        DPHI_X_UP(ix, iy, in, r);
+      }
+      /******************************* direction -1 *********************************/
+      if (imask[ix] & X_DN_MASK) {
+        const int iy = idn(ix, 1);
+        DPHI_X_DN(ix, iy, in, r);
+      }
+      /******************************* direction +2 *********************************/
+      if (imask[ix] & Y_UP_MASK) {
+        const int iy = iup(ix, 2);
+        DPHI_Y_UP(ix, iy, in, r);
+      }
+      /******************************* direction -2 *********************************/
+      if (imask[ix] & Y_DN_MASK) {
+        const int iy = idn(ix, 2);
+        DPHI_Y_DN(ix, iy, in, r);
+      }
+      /******************************* direction +3 *********************************/
+      if (imask[ix] & Z_UP_MASK) {
+        const int iy = iup(ix, 3);
+        DPHI_Z_UP(ix, iy, in, r);
+      }
+      /******************************* direction -3 *********************************/
+      if (imask[ix] & Z_DN_MASK) {
+        const int iy = idn(ix, 3);
+        DPHI_Z_DN(ix, iy, in, r);
+      }
+    /******************************** end of loop *********************************/
+    
+  } /* MASTER_FOR */
+
+#ifdef WITH_MPI
+  // lprintf("MAIN", 0, "Doing complete sendrecv repeat=%d\n",repeat);
+  /* wait for spinor to be transfered */
+  _OMP_PRAGMA(master)
+  {
+    complete_sendrecv_spinor_field_f(in);
+  }
+  _OMP_BARRIER
+#endif
+
+  // loop over receive buffers
+  const geometry_descriptor *intype = in->type;
+  for (int i = 0; i < (intype->nbuffers_spinor); ++i) {
+    //since we don't use the geometry boxes yet
+    //to figure out the direction of the buffer we look at the mask of a point
+    const int r_start = intype->rbuf_start[i];
+    const int r_last = r_start+intype->rbuf_len[i];
+    char dir=imask[r_start];
+    switch (dir)
+    {
+    case (char)T_DN_MASK: // => dir +0
+      _OMP_PARALLEL_FOR
+      for (int iy=r_start; iy<r_last; ++iy) {
+        const int ix = idn(iy, 0);
+        register suNf_spinor *r = _FIELD_AT(out, ix);
+        DPHI_T_UP(ix, iy, in, r);
+      }
+      break;
+
+    case (char)T_UP_MASK: // => dir -0
+      _OMP_PARALLEL_FOR
+      for (int iy=r_start; iy<r_last; ++iy) {
+        const int ix = iup(iy, 0);
+        register suNf_spinor *r = _FIELD_AT(out, ix);
+        DPHI_T_DN(ix, iy, in, r);
+      }
+      break;
+
+    case (char)X_DN_MASK: // => dir +1
+      _OMP_PARALLEL_FOR
+      for (int iy=r_start; iy<r_last; ++iy) {
+        const int ix = idn(iy, 1);
+        register suNf_spinor *r = _FIELD_AT(out, ix);
+        DPHI_X_UP(ix, iy, in, r);
+      }
+      break;
+
+    case (char)X_UP_MASK: // => dir -1
+      _OMP_PARALLEL_FOR
+      for (int iy=r_start; iy<r_last; ++iy) {
+        const int ix = iup(iy, 1);
+        register suNf_spinor *r = _FIELD_AT(out, ix);
+        DPHI_X_DN(ix, iy, in, r);
+      }
+      break;
+
+    case (char)Y_DN_MASK: // => dir +2
+      _OMP_PARALLEL_FOR
+      for (int iy=r_start; iy<r_last; ++iy) {
+        const int ix = idn(iy, 2);
+        register suNf_spinor *r = _FIELD_AT(out, ix);
+        DPHI_Y_UP(ix, iy, in, r);
+      }
+      break;
+
+    case (char)Y_UP_MASK: // => dir -2
+      _OMP_PARALLEL_FOR
+      for (int iy=r_start; iy<r_last; ++iy) {
+        const int ix = iup(iy, 2);
+        register suNf_spinor *r = _FIELD_AT(out, ix);
+        DPHI_Y_DN(ix, iy, in, r);
+      }
+      break;
+
+    case (char)Z_DN_MASK: // => dir +3
+      _OMP_PARALLEL_FOR
+      for (int iy=r_start; iy<r_last; ++iy) {
+        const int ix = idn(iy, 3);
+        register suNf_spinor *r = _FIELD_AT(out, ix);
+        DPHI_Z_UP(ix, iy, in, r);
+      }
+      break;
+
+    case (char)Z_UP_MASK: // => dir -3
+      _OMP_PARALLEL_FOR
+      for (int iy=r_start; iy<r_last; ++iy) {
+        const int ix = iup(iy, 3);
+        register suNf_spinor *r = _FIELD_AT(out, ix);
+        DPHI_Z_DN(ix, iy, in, r);
+      }
+      break;
+
+    default:
+      error(1, 1, "Dphi_cpu_ [Dphi.c]", "Illegal direction in boundary mask!");
+      break;
+    } 
+  } //loop over recv buffers
+
+}
+
 #else
 void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
 {
