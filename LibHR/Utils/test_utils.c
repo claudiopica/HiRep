@@ -7,6 +7,7 @@
 #include "libhr_core.h"
 #include "random.h"
 #include "io.h"
+#include "inverters.h"
 #include <string.h>
 
 // The following functions are primarily for testing purposes

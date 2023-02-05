@@ -16,15 +16,11 @@
 #include "spinor_field.h"
 #include "Inverters/linear_solvers.h"
 #include "Utils/generics.h"
+#include "geometry.h"
 
 #ifdef __cplusplus
     extern "C" {
 #endif
-
- enum DIRECTION {
-      UP = 0,
-      DOWN = 1
-};
 
 #define _SPINOR_FIELD_TYPE spinor_field
 #define _SUFFIX 

@@ -18,6 +18,10 @@
 #include "hr_complex.h"
 #include "spinor_field.h"
 
+#ifdef __cplusplus
+   extern "C" {
+#endif
+
 /**
  * @brief Collects sum results from the local lattices and sums over all nodes (double).
  *
@@ -69,10 +73,6 @@ void bcast_int(int *i, int n);
 
 #ifdef WITH_GPU
 
-#ifdef __cplusplus
-   extern "C" {
-#endif
-
 /**
 * @brief Sums across GPU nodes after finding the local sum (integer)
 *
@@ -123,9 +123,10 @@ hr_complex_flt global_sum_gpu_complex_flt(hr_complex_flt *vector, int size);
 */
 hr_complex global_sum_gpu_complex(hr_complex *vector, int size);
 
-    
+#endif
+
 #ifdef __cplusplus
    }
 #endif
-#endif
+
 #endif 

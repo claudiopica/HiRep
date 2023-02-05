@@ -94,6 +94,8 @@ typedef struct _suNf_hspinor_flt {
 END
 }
 
+write_halfspinors();
+
 write_epilog();
 
 open STDOUT, ">suN.h";

@@ -59,8 +59,7 @@ _DECLARE(void, g5Dphi_eopre_sq, (double m0, _SPINOR_FIELD_TYPE *out, _SPINOR_FIE
 #undef _DECLARE
 
 #ifdef __cplusplus
-//there is no 'restrict' in C++, use an extension
-#undef restrict __restrict__
+#undef restrict
 #endif
 
 //user interface macros

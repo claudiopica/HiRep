@@ -13,6 +13,7 @@ int test_identical_flt(spinor_operator_flt, spinor_operator_flt, char*, double);
 int test_identical_massless(spinor_operator, spinor_operator, char*, geometry_descriptor*, geometry_descriptor*, double);
 int test_identical_massless_flt(spinor_operator_flt, spinor_operator_flt, char*, geometry_descriptor*, geometry_descriptor*, double);
 void Q_operator(spinor_field*, spinor_field*);
+void Q_operator_flt(spinor_field_flt*, spinor_field_flt*);
 void Q_operator_cpu(spinor_field*, spinor_field*);
 void Q_operator_flt_cpu(spinor_field_flt*, spinor_field_flt*);
 void D_operator(spinor_field*, spinor_field*);

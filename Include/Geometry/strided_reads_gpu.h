@@ -18,6 +18,11 @@
 //#include "libhr_core.h"
 #include "geometry.h"
 
+ enum DIRECTION {
+      UP = 0,
+      DOWN = 1
+};
+
 #ifdef __cplusplus
 
 template<typename REAL, typename FIELD_TYPE, typename SITE_TYPE>

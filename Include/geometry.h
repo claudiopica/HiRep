@@ -34,7 +34,6 @@
     #include "Geometry/geometry_gpu_init.h"
     #include "Geometry/gpu_geometry.h"
     #include "Geometry/strided_reads.h"
-    #include "Geometry/direction.h"
     #include "Geometry/strided_reads_gpu.h"
 #endif
 
