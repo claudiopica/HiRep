@@ -56,7 +56,7 @@ _DECLARE_STATIC(allocate_cpu_field_data_,(unsigned int n, _FIELD_TYPE *f, geomet
     if (alloc_mem_t & CPU_MEM) {
         int bytes_per_site = sizeof(_SITE_TYPE);
         int number_of_sites = n * _FIELD_DIM * _NUMBER_OF_SITES(_GEOM_TYPE);
-        int field_size  = bytes_per_site * number_of_sites;
+        size_t field_size  = bytes_per_site * number_of_sites;
         f->ptr = amalloc(field_size, ALIGN);
         error((f->ptr) == NULL, 1,  __func__, "Could not allocate memory space for field (data).");
         for (int i = 1; i < n; ++i) {
@@ -89,7 +89,7 @@ _DECLARE_STATIC(allocate_gpu_field_data_, (unsigned int n, _FIELD_TYPE *f, geome
         cudaError_t err;
         int bytes_per_site = sizeof(_SITE_TYPE);
         int number_of_sites = n * _FIELD_DIM * _NUMBER_OF_SITES(_GEOM_TYPE);
-        int field_size = number_of_sites * bytes_per_site;
+        size_t field_size = number_of_sites * bytes_per_site;
         err = cudaMalloc((void **)&(f->gpu_ptr), field_size);
         error(err != cudaSuccess, 1, __func__, "Could not allocate GPU memory space for field");
         /* For spinors: Map the elements of the spinor arrays to the

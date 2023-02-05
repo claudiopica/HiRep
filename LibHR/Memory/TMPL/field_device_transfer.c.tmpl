@@ -62,7 +62,7 @@ _FUNC(void, to_cpu_format_, _FIELD_NAME, (_FIELD_TYPE *out, _FIELD_TYPE *in)) {
 _FUNC(void, copy_to_gpu_, _FIELD_NAME, (_FIELD_TYPE *f)) {
     _FIELD_TYPE *tmp = _ALLOCATE;
     _F_NAME(to_gpu_format_, _FIELD_NAME) (tmp, f);
-    int field_size = _FIELD_DIM * _NUMBER_OF_SITES(_GEOM_TYPE) * sizeof(_SITE_TYPE);
+    size_t field_size = _FIELD_DIM * _NUMBER_OF_SITES(_GEOM_TYPE) * sizeof(_SITE_TYPE);
     cudaError_t err;
     err = cudaMemcpy(f->gpu_ptr, tmp->ptr, field_size, cudaMemcpyHostToDevice);
     error(err != cudaSuccess, 1, __func__, "Could not transfer field to device.\n");
@@ -71,7 +71,7 @@ _FUNC(void, copy_to_gpu_, _FIELD_NAME, (_FIELD_TYPE *f)) {
 
 _FUNC(void, copy_from_gpu_, _FIELD_NAME, (_FIELD_TYPE *f)) {
     _FIELD_TYPE *tmp = _ALLOCATE;
-    int field_size = _FIELD_DIM * _NUMBER_OF_SITES(_GEOM_TYPE) * sizeof(_SITE_TYPE);
+    size_t field_size = _FIELD_DIM * _NUMBER_OF_SITES(_GEOM_TYPE) * sizeof(_SITE_TYPE);
     cudaError_t err;
     err = cudaMemcpy(tmp->ptr, f->gpu_ptr, field_size, cudaMemcpyDeviceToHost);
     error(err != cudaSuccess, 1, __func__, "Could not transfer field to host.\n");

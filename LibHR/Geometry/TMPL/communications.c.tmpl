@@ -58,7 +58,7 @@ _DECLARE(sync_,(_FIELD_TYPE *f)) {
         _SITE_TYPE *source = _DFIELD_AT(f, type->copy_from[i], 0, _FIELD_DIM);
         //_SITE_TYPE *target = f->ptr + _FIELD_DIM * type->copy_to[i];
         //_SITE_TYPE *source = f->ptr + _FIELD_DIM * type->copy_from[i];
-        int mem_size = _FIELD_DIM * type->copy_len[i] * sizeof(_SITE_TYPE);
+        size_t mem_size = _FIELD_DIM * type->copy_len[i] * sizeof(_SITE_TYPE);
         memcpy(target, source, mem_size);
     }
     #endif 
@@ -120,12 +120,12 @@ _DECLARE(start_sendrecv_,(_FIELD_TYPE *f)) {
             /* Data Destination Parameters */
             int recv_proc = f->type->rbuf_from_proc[i];
             int number_of_sites = round_up_buflen((f->type->rbuf_len[i]), comm_type);
-            int recv_size_in_dbl = (_FIELD_DIM)*number_of_sites*mpi_chunks_per_site;
+            size_t recv_size_in_dbl = (_FIELD_DIM)*number_of_sites*mpi_chunks_per_site;
 
             /* Data Origin Parameters */
             int send_proc = f->type->sbuf_to_proc[i];
             number_of_sites = round_up_buflen((f->type->sbuf_len[i]), comm_type);
-            int send_size_in_dbl = (_FIELD_DIM)*number_of_sites*mpi_chunks_per_site;
+            size_t send_size_in_dbl = (_FIELD_DIM)*number_of_sites*mpi_chunks_per_site;
 
             /* Communications */
             MPI_Irecv(recv_buffer, recv_size_in_dbl, _MPI_REAL, recv_proc, i, cart_comm, &(f->comm_req[2*i+1]));
@@ -157,7 +157,7 @@ _DECLARE(fill_buffers_,(_FIELD_TYPE *f)) {
         _BUFFER_FOR(comm_type, i) {
             int chunks_per_site = sizeof(_SITE_TYPE)/sizeof(_REAL);
             int number_of_sites = f->type->rbuf_len[i];
-            int buffer_length = _FIELD_DIM*number_of_sites*chunks_per_site;
+            size_t buffer_length = _FIELD_DIM*number_of_sites*chunks_per_site;
 
             _REAL* random_array = (_REAL*)malloc(buffer_length*sizeof(_REAL));
 
@@ -184,7 +184,7 @@ _DECLARE(fill_buffers_with_zeroes_,(_FIELD_TYPE *f)) {
         _BUFFER_FOR(comm_type, i) {
             int chunks_per_site = sizeof(_SITE_TYPE)/sizeof(_REAL);
             int number_of_sites = f->type->rbuf_len[i];
-            int buffer_length = _FIELD_DIM*number_of_sites*chunks_per_site;
+            size_t buffer_length = _FIELD_DIM*number_of_sites*chunks_per_site;
 
             _REAL* zero_array = (_REAL*)malloc(buffer_length*sizeof(_REAL));
 
