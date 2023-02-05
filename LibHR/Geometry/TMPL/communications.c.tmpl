@@ -95,8 +95,8 @@ _DECLARE(start_sendrecv_,(_FIELD_TYPE *f)) {
     _F_NAME(sendrecv_guard_,_FIELD_NAME) = (void*)f->comm_req;
     #endif
 
-    _REAL *recv_buffer;
-    _REAL *send_buffer;
+    _REAL *recv_buffer = NULL;
+    _REAL *send_buffer = NULL;
     _COMM_TYPE_FOR(comm_type) {
         if (f->comm_type & comm_type) { _F_NAME(complete_sendrecv_,_FIELD_NAME) (f); }
         _BUFFER_FOR(comm_type, i) {

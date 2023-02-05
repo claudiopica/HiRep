@@ -58,11 +58,6 @@ int main(int argc, char *argv[])
 
     random_u(u_gauge);
     represent_gauge_field();
-    random_u_f(u_gauge_f);
-    assign_ud2u_f();
-
-    //copy_from_gpu_gfield_f(u_gauge_f);
-    //copy_from_gpu_gfield_f_flt(u_gauge_f_flt);
 
     // Test Block
     return_val += test_identical(&I_operator, &I_operator_cpu, "Unit operator Full Lattice", 0.0);

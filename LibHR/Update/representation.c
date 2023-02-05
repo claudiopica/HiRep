@@ -463,7 +463,9 @@ void represent_gauge_field()
     //    apply_BCs_on_represented_gauge_field(); //Already applied when configuration read or initialized
   }
 #endif//ALLOCATE_REPR_GAUGE_FIELD
+  #ifdef DPHI_FLT
   assign_ud2u_f();
+  #endif
 
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
   compute_clover_term();
@@ -472,12 +474,14 @@ void represent_gauge_field()
 #ifdef WITH_GPU
   copy_to_gpu_gfield(u_gauge);
   copy_to_gpu_gfield_f(u_gauge_f);
-  copy_to_gpu_gfield_f_flt(u_gauge_f_flt);
   start_sendrecv_gfield(u_gauge);
   complete_sendrecv_gfield(u_gauge);
   start_sendrecv_gfield_f(u_gauge_f);
   complete_sendrecv_gfield_f(u_gauge_f);
+  #ifdef DPHI_FLT
+  copy_to_gpu_gfield_f_flt(u_gauge_f_flt);
   start_sendrecv_gfield_f_flt(u_gauge_f_flt);
   complete_sendrecv_gfield_f_flt(u_gauge_f_flt);
+  #endif
 #endif
 }
