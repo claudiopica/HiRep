@@ -12,7 +12,6 @@
 #error Missing _SUFFIX in Dphi_gpu.cu
 #endif
 
-
 #define _CPU_F_NAME(_name,_suffix) CONCAT(_name,_suffix ## _cpu)
 #define _CPU_FUNC_INNER(_type,_name,_suffix,_args) _type _CPU_F_NAME(_name,_suffix) _args
 #define _GPU_FUNC_INNER(_type,_name,_suffix,_args) _type _GPU_F_NAME(_name,_suffix) _args
@@ -34,11 +33,6 @@
 #define _DECLARE_(a,b,c) _PTR_FUNC_INNER_(a,b,_SUFFIX,c); _CPU_FUNC_INNER_(a,b,_SUFFIX,c)
 #endif
 
-#ifdef __cplusplus
-//there is no 'restrict' in C++, use an extension
-#define restrict __restrict__
-#endif
-
 _DECLARE(unsigned long int, getMVM, (void));
 _DECLARE_(void, Dphi, (_SPINOR_FIELD_TYPE *restrict out, _SPINOR_FIELD_TYPE *restrict in));
 _DECLARE(void, Dphi, (double m0, _SPINOR_FIELD_TYPE *out, _SPINOR_FIELD_TYPE *in));
@@ -57,10 +51,6 @@ _DECLARE(void, g5Dphi_eopre_sq, (double m0, _SPINOR_FIELD_TYPE *out, _SPINOR_FIE
 #undef _GPU_FUNC_INNER
 #undef _PTR_FUNC_INNER
 #undef _DECLARE
-
-#ifdef __cplusplus
-#undef restrict
-#endif
 
 //user interface macros
 #undef _SPINOR_FIELD_TYPE

@@ -22,6 +22,11 @@
     extern "C" {
 #endif
 
+#ifdef __cplusplus
+//there is no 'restrict' in C++, use an extension
+#define restrict __restrict__
+#endif
+
 #define _SPINOR_FIELD_TYPE spinor_field
 #define _SUFFIX 
 #include "TMPL/dirac.h.tmpl"
