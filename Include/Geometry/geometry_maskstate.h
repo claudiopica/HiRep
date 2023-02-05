@@ -1,3 +1,9 @@
+/**
+ * @file geometry_maskstate.h
+ * @brief Mask structs that can give information on whether neighbors of a given site are located
+ *        in the buffer and require communications first or not.
+ */
+
 #ifndef GEOMETRY_MASKSTATE_H
 #define GEOMETRY_MASKSTATE_H
 #ifdef __cplusplus

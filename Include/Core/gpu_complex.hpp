@@ -3,13 +3,10 @@
 * All rights reserved.                                                      *
 \***************************************************************************/
 
-/*******************************************************************************
-*
-* File gpu_complex.h
-*
-* Type definitions and macros for complex numbers used in C++ and CUDA
-*
-*******************************************************************************/
+/**
+ * @file gpu_complex.h
+ * @brief Type definitions and macros for complex numbers used in C++ and CUDA
+ */
 
 #ifndef GPU_COMPLEX_H
 #define GPU_COMPLEX_H

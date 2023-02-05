@@ -3,6 +3,11 @@
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
+/**
+ * @file archive.h
+ * @brief Read and save configurations
+ */
+
 #ifndef ARCHIVE_H
 #define ARCHIVE_H
 

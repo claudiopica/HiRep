@@ -7,6 +7,7 @@
 #include "libhr_core.h"
 #include "Inverters/linear_algebra.h"
 #include "Utils/boundary_conditions.h"
+#include "memory.h"
 
 void gaussian_spinor_field(spinor_field *s)
 {
@@ -16,6 +17,11 @@ void gaussian_spinor_field(spinor_field *s)
 	}
 	const double c1 = 1. / sqrt(2.);
 	spinor_field_mul_f_cpu(s, c1, s);
+
+	#ifdef WITH_GPU
+	copy_to_gpu_spinor_field_f(s);
+	#endif
+
 	apply_BCs_on_spinor_field(s);
 }
 
@@ -27,6 +33,11 @@ void gaussian_spinor_field_flt(spinor_field_flt *s)
 	}
 	const float c1 = (float)(1. / sqrt(2.));
 	spinor_field_mul_f_flt_cpu(s, c1, s);
+
+	#ifdef WITH_GPU
+	copy_to_gpu_spinor_field_f_flt(s);
+	#endif
+
 	apply_BCs_on_spinor_field_flt(s);
 }
 

@@ -34,6 +34,8 @@ Core functions:
 #include "io.h"
 #include <string.h>
 #include "utils.h"
+#include "geometry.h"
+#include "inverters.h"
 
 #define COMM (1 == 1)
 #define NOCOMM (1 == 0)
@@ -96,8 +98,8 @@ void calculate_stfld(int comm)
 
 		for (int k = 0; k < 8; k++)
 		{
-			start_staple_field_sendrecv(stfld[k]);
-			complete_staple_field_sendrecv(stfld[k]);
+			start_sendrecv_staple_field(stfld[k]);
+			complete_sendrecv_staple_field(stfld[k]);
 			
 		}
 	}

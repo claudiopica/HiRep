@@ -19,6 +19,19 @@
 	#include "hr_mpi.h"
 #endif
 
+/* Communications */
+typedef enum _comm_t {
+  CPU_COMM = 1,
+  GPU_COMM = 2,
+  ALL_COMMS = 3
+} comm_t;
+
+/* Memory */
+typedef enum _mem_t {
+  CPU_MEM = 1<<0,
+  GPU_MEM = 1<<1
+} mem_t;
+
 #ifdef __cplusplus
 	extern "C" {
 #endif
@@ -53,7 +66,6 @@
 		//
 #endif 
 
-
 /**
  * @brief This macro declares a field struct that contains all necessary 
  *        field data arrays, geometry information and communication handles.
@@ -68,6 +80,8 @@
 		geometry_descriptor *type; \
 		_MPI_FIELD_DATA(_type) \
 		_GPU_FIELD_DATA(_type) \
+		comm_t comm_type; \
+		mem_t alloc_t; \
 	} _name
 
 

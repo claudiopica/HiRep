@@ -3,6 +3,11 @@
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
+/**
+ * @file moreio.h
+ * @brief Reading and saving configurations from other lattice libraries
+ */
+
 #ifndef MOREIO_H
 #define MOREIO_H
 

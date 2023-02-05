@@ -254,7 +254,7 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
 #ifdef WITH_MPI
   _OMP_PRAGMA(master)
   {
-    start_sf_sendrecv(in);
+    start_sendrecv_spinor_field_f(in);
   }
   _OMP_BARRIER // why do we need this barrier?
 #endif
@@ -280,7 +280,6 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
 #ifdef _USING_THETA
         suNf_vector vtmp[2];
 #endif
-
         _vector_add_f(psi, (*sp).c[0], (*sp).c[2]);
         _vector_add_f(psi2, (*sp).c[1], (*sp).c[3]);
         _suNf_double_theta_T_multiply(chi, chi2, (*up), psi, psi2);
@@ -430,6 +429,7 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
         _vector_mul_add_assign_f  ((*r).c[1], -0.5, chi2);
         _vector_i_mul_sub_assign_f((*r).c[3], -0.5, chi2);
       }
+
       /******************************** end of loop *********************************/
       
     } /* MASTER_FOR */
@@ -441,7 +441,7 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
       /* wait for spinor to be transfered */
       _OMP_PRAGMA(master)
       {
-        complete_sf_sendrecv(in);
+        complete_sendrecv_spinor_field_f(in);
       }
       _OMP_BARRIER
     }
@@ -468,7 +468,7 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
   /* start communication of input spinor field */
   _OMP_PRAGMA(master)
   {
-    start_sf_sendrecv(in);
+    start_sendrecv_spinor_field_f(in);
   }
   _OMP_BARRIER
 
@@ -480,7 +480,7 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
       /* wait for spinor to be transfered */
       _OMP_PRAGMA(master)
       {
-        complete_sf_sendrecv(in);
+        complete_sendrecv_spinor_field_f(in);
       }
       _OMP_PRAGMA(barrier)
     }
@@ -644,7 +644,7 @@ void Dphi_fused_(spinor_field *out, spinor_field *in)
   /* start communication of input spinor field */
   _OMP_PRAGMA(master)
   {
-    start_sf_sendrecv(in);
+    start_sendrecv_spinor_field_f(in);
   }
   _OMP_BARRIER
 
@@ -794,7 +794,7 @@ void Dphi_fused_(spinor_field *out, spinor_field *in)
 
   _OMP_PRAGMA(master)
   {
-    complete_sf_sendrecv(in);
+    complete_sendrecv_spinor_field_f(in);
   }
   _OMP_PRAGMA(barrier)
 #endif

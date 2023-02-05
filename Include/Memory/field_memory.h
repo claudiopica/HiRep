@@ -4,9 +4,12 @@
 \***************************************************************************/
 /// Headerfile for:
 /// -  amalloc.c
-/// -  field_alloc.c
-/// -  field_convert.c
-/// -  field_device_transfer.c
+/// -  memory.c
+/**
+ * @file field_memory.h
+ * @brief Field allocation, GPU geometry conversion and 
+ *        host-device/device-host copy functions
+ */
 
 #ifndef FIELD_MEMORY_H
 #define FIELD_MEMORY_H

@@ -18,6 +18,9 @@
 #include "Observables/avr_plaquette.h"
 #include "Random/ranlux.h"
 #include "io.h"
+#include "geometry.h"
+//#include "inverters.h"
+#include "Inverters/global_sum.h"
 
 void write_gauge_field(char filename[])
 {
@@ -48,7 +51,7 @@ void write_gauge_field_matrix(char filename[])
 #endif
 
 #ifndef ALLOCATE_REPR_GAUGE_FIELD
-  complete_gf_sendrecv(u_gauge);
+  complete_sendrecv_gfield(u_gauge);
   apply_BCs_on_represented_gauge_field(); //Save the link variables with periodic boundary conditions
 #endif
 
@@ -219,7 +222,7 @@ void write_gauge_field_matrix(char filename[])
 #endif
 
 #ifndef ALLOCATE_REPR_GAUGE_FIELD
-  complete_gf_sendrecv(u_gauge);
+  complete_sendrecv_gfield(u_gauge);
   apply_BCs_on_represented_gauge_field(); //Restore the right boundary conditions
 #endif
 }
@@ -428,8 +431,8 @@ void read_gauge_field_matrix(char filename[])
   free(buff);
 
   /* start sendrecv of global gauge field */
-  start_gf_sendrecv(u_gauge);
-  complete_gf_sendrecv(u_gauge);
+  start_sendrecv_gfield(u_gauge);
+  complete_sendrecv_gfield(u_gauge);
 
   /* check average plaquette */
   testplaq = avr_plaquette();
@@ -747,7 +750,7 @@ void write_scalar_field(char filename[])
 #endif
 
 #ifndef ALLOCATE_REPR_GAUGE_FIELD
-  complete_sc_sendrecv(u_scalar);
+  complete_sendrecv_suNg_scalar_field(u_scalar);
 //  apply_BCs_on_represented_gauge_field(); //Save the link variables with periodic boundary conditions
 #endif
 
@@ -887,7 +890,7 @@ void write_scalar_field(char filename[])
 #endif
 
 #ifndef ALLOCATE_REPR_GAUGE_FIELD
-  complete_sc_sendrecv(u_scalar);
+  complete_sendrecv_suNg_scalar_field(u_scalar);
 #endif
 }
 
@@ -1049,8 +1052,8 @@ void read_scalar_field(char filename[])
   free(buff);
 
   /* start sendrecv of global scalar field */
-  start_sc_sendrecv(u_scalar);
-  complete_sc_sendrecv(u_scalar);
+  start_sendrecv_suNg_scalar_field(u_scalar);
+  complete_sendrecv_suNg_scalar_field(u_scalar);
 
   /* check average plaquette */
   gettimeofday(&end, 0);

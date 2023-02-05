@@ -91,13 +91,13 @@ void shift_fields(int *shift, spinor_field *sin, suNg_field *uin, spinor_field *
 
   if (uin != NULL)
   {
-    start_gf_sendrecv(uin);
-    complete_gf_sendrecv(uin);
+    start_sendrecv_gfield(uin);
+    complete_sendrecv_gfield(uin);
   }
   if (sin != NULL)
   {
-    start_sf_sendrecv(sin);
-    complete_sf_sendrecv(sin);
+    start_sendrecv_spinor_field_f(sin);
+    complete_sendrecv_spinor_field_f(sin);
   }
 
   for (int i = 0; i < total_shift; i++)
@@ -153,13 +153,13 @@ void shift_fields(int *shift, spinor_field *sin, suNg_field *uin, spinor_field *
 
     if (uin != NULL)
     {
-      start_gf_sendrecv(utmp[1]);
-      complete_gf_sendrecv(utmp[1]);
+      start_sendrecv_gfield(utmp[1]);
+      complete_sendrecv_gfield(utmp[1]);
     }
     if (sin != NULL)
     {
-      start_sf_sendrecv(stmp[1]);
-      complete_sf_sendrecv(stmp[1]);
+      start_sendrecv_spinor_field_f(stmp[1]);
+      complete_sendrecv_spinor_field_f(stmp[1]);
     }
 
     if (i % 2 == 0)

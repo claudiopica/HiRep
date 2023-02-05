@@ -5,7 +5,8 @@
 #include "utils.h"
 #include "random.h"
 #include <string.h>
-#include "Inverters/linear_algebra.h"
+#include "geometry.h"
+#include "inverters.h"
 
 /**
  *

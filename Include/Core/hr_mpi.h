@@ -1,10 +1,10 @@
-#ifndef HR_MPI_H
-#define HR_MPI_H
-
 /**
  * @file hr_mpi.h
  * @brief Setup for mpi
  */
+
+#ifndef HR_MPI_H
+#define HR_MPI_H
 
 //For OpenMPI we need to disable the non-standard C++ interface
 //this is enabled by defaults for C++ / CUDA code 

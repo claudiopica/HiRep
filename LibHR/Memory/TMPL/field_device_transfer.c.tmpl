@@ -1,0 +1,88 @@
+/***************************************************************************\
+* Copyright (c) 2023, Sofie Martins                                         *
+* All rights reserved.                                                      *
+\***************************************************************************/
+
+#ifdef WITH_GPU
+
+#include <string.h>
+#include "geometry.h"
+#include "Utils/generics.h"
+#include "error.h"
+
+#if !defined _FIELD_NAME
+#error Missing _FIELD_NAME in memory.c
+#endif
+#if !defined _FIELD_TYPE
+#error Missing _FIELD_TYPE in memory.c
+#endif
+#if !defined _SITE_TYPE
+#error Missing _SITE_TYPE in memory.c
+#endif
+#if !defined _FIELD_DIM
+#error Missing _FIELD_DIM in memory.c
+#endif
+#if !defined _IS_SPINOR_LIKE
+#error Missing _IS_SPINOR_LIKE in memory.c
+#endif
+
+#define _F_ARGS(_name,_suffix,_args) _F_NAME(_name,_FIELD_NAME) _args
+
+// This is necessary, because spinor-like fields have an additional argument
+#if _IS_SPINOR_LIKE==0
+    #define _n 1
+    #define _GEOM_TYPE gauge
+    #define _ALLOCATE _F_ARGS(alloc_,_FIELD_NAME,(f->type))
+#else
+    #define _n n
+    #define _GEOM_TYPE spinor
+    #define _ALLOCATE _F_ARGS(alloc_,_FIELD_NAME,(1,f->type))
+#endif
+
+_FUNC(void, to_gpu_format_, _FIELD_NAME, (_FIELD_TYPE *out, _FIELD_TYPE *in)) {
+    _CHECK_GEOMETRY_MATCHING(out, in);  
+    _MASTER_FOR(in->type, ix) {
+        for (int comp = 0; comp < _FIELD_DIM; ++comp) {
+            _SITE_TYPE *source = _DFIELD_AT(in, ix, comp, _FIELD_DIM);
+            _GPU_F_NAME(write_,_FIELD_NAME) (source, out, ix, comp);
+        }
+    }          
+}
+
+_FUNC(void, to_cpu_format_, _FIELD_NAME, (_FIELD_TYPE *out, _FIELD_TYPE *in)) {
+    _CHECK_GEOMETRY_MATCHING(out, in);
+    _MASTER_FOR(in->type, ix) {
+        for (int comp = 0; comp < _FIELD_DIM; ++comp) {
+            _SITE_TYPE *target = _DFIELD_AT(out, ix, comp, _FIELD_DIM);
+            _GPU_F_NAME(read_,_FIELD_NAME) (target, in, ix, comp);
+        }
+    }         
+}
+
+_FUNC(void, copy_to_gpu_, _FIELD_NAME, (_FIELD_TYPE *f)) {
+    _FIELD_TYPE *tmp = _ALLOCATE;
+    _F_NAME(to_gpu_format_, _FIELD_NAME) (tmp, f);
+    size_t field_size = _FIELD_DIM * _NUMBER_OF_SITES(_GEOM_TYPE) * sizeof(_SITE_TYPE);
+    cudaError_t err;
+    err = cudaMemcpy(f->gpu_ptr, tmp->ptr, field_size, cudaMemcpyHostToDevice);
+    error(err != cudaSuccess, 1, __func__, "Could not transfer field to device.\n");
+    _F_NAME(free_, _FIELD_NAME) (tmp);
+}
+
+_FUNC(void, copy_from_gpu_, _FIELD_NAME, (_FIELD_TYPE *f)) {
+    _FIELD_TYPE *tmp = _ALLOCATE;
+    size_t field_size = _FIELD_DIM * _NUMBER_OF_SITES(_GEOM_TYPE) * sizeof(_SITE_TYPE);
+    cudaError_t err;
+    err = cudaMemcpy(tmp->ptr, f->gpu_ptr, field_size, cudaMemcpyDeviceToHost);
+    error(err != cudaSuccess, 1, __func__, "Could not transfer field to host.\n");
+    _F_NAME(to_cpu_format_, _FIELD_NAME) (f, tmp);
+    _F_NAME(free_, _FIELD_NAME) (tmp);
+}
+
+#undef _F_ARGS
+#undef _ALLOCATE
+#undef _n
+#undef _GEOM_TYPE
+
+#endif
+

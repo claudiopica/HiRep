@@ -1,5 +1,6 @@
 #include "random.h"
 #include "libhr_core.h"
+#include "inverters.h"
 #include <math.h>
 
 //Random array of +/- 1/\sqrt(2)

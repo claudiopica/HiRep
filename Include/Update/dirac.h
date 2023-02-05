@@ -15,6 +15,8 @@
 
 #include "spinor_field.h"
 #include "Inverters/linear_solvers.h"
+#include "Utils/generics.h"
+#include "geometry.h"
 
 #ifdef __cplusplus
     extern "C" {
@@ -25,39 +27,13 @@
 #define restrict __restrict__
 #endif
 
-//global function pointers
-//double precision
-extern unsigned long int (*getMVM) (void);
-extern void (*Dphi_) (spinor_field *restrict out, spinor_field *restrict in);
-extern void (*Dphi) (double m0, spinor_field *out, spinor_field *in);
-extern void (*g5Dphi) (double m0, spinor_field *out, spinor_field *in);
-extern void (*g5Dphi_sq) (double m0, spinor_field *out, spinor_field *in);
-extern void (*Dphi_eopre) (double m0, spinor_field *out, spinor_field *in);
-extern void (*Dphi_oepre) (double m0, spinor_field *out, spinor_field *in);
-extern void (*g5Dphi_eopre) (double m0, spinor_field *out, spinor_field *in);
-extern void (*g5Dphi_eopre_sq) (double m0, spinor_field *out, spinor_field *in);
+#define _SPINOR_FIELD_TYPE spinor_field
+#define _SUFFIX 
+#include "TMPL/dirac.h.tmpl"
 
-//single precision
-extern unsigned long int (*getMVM_flt) (void);
-extern void (*Dphi_flt_) (spinor_field_flt *out, spinor_field_flt *in);
-extern void (*Dphi_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in);
-extern void (*g5Dphi_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in);
-extern void (*g5Dphi_sq_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in);
-extern void (*Dphi_eopre_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in);
-extern void (*Dphi_oepre_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in);
-extern void (*g5Dphi_eopre_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in);
-extern void (*g5Dphi_eopre_sq_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in);
-
-// Dphi.c
-unsigned long int getMVM_cpu(void);
-void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in); //TODO: is this the correct naming?
-void Dphi_cpu(double m0, spinor_field *out, spinor_field *in);
-void g5Dphi_cpu(double m0, spinor_field *out, spinor_field *in);
-void g5Dphi_sq_cpu(double m0, spinor_field *out, spinor_field *in);
-void Dphi_eopre_cpu(double m0, spinor_field *out, spinor_field *in);
-void Dphi_oepre_cpu(double m0, spinor_field *out, spinor_field *in);
-void g5Dphi_eopre_cpu(double m0, spinor_field *out, spinor_field *in);
-void g5Dphi_eopre_sq_cpu(double m0, spinor_field *out, spinor_field *in);
+#define _SPINOR_FIELD_TYPE spinor_field_flt
+#define _SUFFIX _flt
+#include "TMPL/dirac.h.tmpl"
 
 // Dirac operator with twisted mass
 void Qhat_eopre(double m0, double mu, spinor_field *out, spinor_field *in);
@@ -86,31 +62,6 @@ void g5Cphi_eopre(double mass, spinor_field *dptr, spinor_field *sptr);
 void g5Cphi_eopre_sq(double mass, spinor_field *dptr, spinor_field *sptr);
 void Cphi_diag(double mass, spinor_field *dptr, spinor_field *sptr);
 void Cphi_diag_inv(double mass, spinor_field *dptr, spinor_field *sptr);
-#endif
-
-// Dphi_flt.c
-unsigned long int getMVM_flt_cpu();
-void Dphi_flt_cpu_(spinor_field_flt *out, spinor_field_flt *in);
-void Dphi_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in);
-void g5Dphi_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in);
-void g5Dphi_sq_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in);
-void Dphi_eopre_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in);
-void Dphi_oepre_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in);
-void g5Dphi_eopre_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in);
-void g5Dphi_eopre_sq_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in);
-
-// Dphi_gpu.cu
-#ifdef WITH_GPU
-unsigned long int getMVM_gpu();
-void resetMVM_gpu();
-void Dphi_gpu_(spinor_field *out, spinor_field *in); //TODO: is this the correct naming?
-void Dphi_gpu(double m0, spinor_field *out, spinor_field *in);
-void g5Dphi_gpu(double m0, spinor_field *out, spinor_field *in);
-void g5Dphi_sq_gpu(double m0, spinor_field *out, spinor_field *in);
-void Dphi_eopre_gpu(double m0, spinor_field *out, spinor_field *in);
-void Dphi_oepre_gpu(double m0, spinor_field *out, spinor_field *in);
-void g5Dphi_eopre_gpu(double m0, spinor_field *out, spinor_field *in);
-void g5Dphi_eopre_sq_gpu(double m0, spinor_field *out, spinor_field *in);
 #endif
 
 // D_update.c

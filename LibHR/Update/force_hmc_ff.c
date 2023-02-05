@@ -8,6 +8,7 @@
 #include "memory.h"
 #include "inverters.h"
 #include "io.h"
+#include "geometry.h"
 
 
 #define _print_avect(a) printf("(%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e)\n",(a).c1,(a).c2,(a).c3,(a).c4,(a).c5,(a).c6,(a).c7,(a).c8)
@@ -204,8 +205,8 @@ void force_hmc_ff(double dt, void *vpar){
 
     if( gauge_field_active ){
     /* reset force stat counters */
-    start_sf_sendrecv(Xs);
-    start_sf_sendrecv(Ys);
+    start_sendrecv_spinor_field_f(Xs);
+    start_sendrecv_spinor_field_f(Ys);
 
     _PIECE_FOR(&glattice,xp) {
       suNg_algebra_vector f;
@@ -216,8 +217,8 @@ void force_hmc_ff(double dt, void *vpar){
       if (xp==glattice.inner_master_pieces) {
         _OMP_PRAGMA( master )
         {
-          complete_sf_sendrecv(Xs);
-          complete_sf_sendrecv(Ys);
+          complete_sendrecv_spinor_field_f(Xs);
+          complete_sendrecv_spinor_field_f(Ys);
         }
         _OMP_PRAGMA( barrier )
       }

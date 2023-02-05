@@ -7,9 +7,9 @@
 #include "libhr_core.h"
 #include "memory.h"
 #include "io.h"
-#include "Inverters/linear_algebra.h"
 #include "random.h"
 #include "Update/dirac.h"
+#include "inverters.h"
 
 /*#define POINT_TO_ALL*/
 

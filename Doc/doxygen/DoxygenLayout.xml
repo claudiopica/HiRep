@@ -7,11 +7,11 @@
     <tab type="usergroup" visible="yes" url="[none]" title="User Guide">
       <tab type="user" visible="yes" url="@ref input_file" title="Input File Configuration" />
       <tab type="user" visible="yes" url="@ref supported_features" title="Supported Features" />
-      <!-- <tab type="user" visible="yes" url="@ref writing_program" title="Writing a Program" /> -->
       <tab type="user" visible="yes" url="@ref analysis" title="Analysis" />
     </tab>
     <tab type="usergroup" visible="yes" url="[none]" title="Developer Guide">
       <tab type="user" visible="yes" url="@ref coding_conventions" title="Coding Conventions" />
+      <tab type="user" visible="yes" url="@ref build_system" title="Build System" />
       <tab type="user" visible="yes" url="@ref testing_setup" title="Testing Setup" />
       <tab type="user" visible="yes" url="@ref data_structures" title="Data Structures" />
       <tab type="user" visible="yes" url="@ref geometry" title="Geometry" />

@@ -140,7 +140,7 @@ double SF_action(double beta)
 {
   double pa = 0.;
   int ix, iy, iz, index;
-  complete_gf_sendrecv(u_gauge);
+  complete_sendrecv_gfield(u_gauge);
   if (COORD[0] == 0)
   {
     for (ix = 0; ix < X; ++ix)

@@ -1,3 +1,8 @@
+/**
+ * @file test_complex.h
+ * @brief Tests for complex numbers
+ */
+
 #ifndef TEST_COMPLEX_H
 #define TEST_COMPLEX_H
 

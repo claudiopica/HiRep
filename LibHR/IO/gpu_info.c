@@ -215,11 +215,18 @@ void print_supported_features(cudaDeviceProp device_prop)
   lprintf("GPU_INIT",10,"Compute Mode:\n");
   lprintf("GPU_INIT",10,"  < %s >\n", sComputeMode[device_prop.computeMode]);
 
+  // Multi-GPU calculations are not supported for the old geometry
+  #if defined(WITH_GPU) && defined(WITH_MPI) && !defined(WITH_NEW_GEOMETRY)
+    error(1, 1, __func__, "Legacy geometry not supported for Multi-GPU compilation. Please enable WITH_NEW_GEOMETRY in compilation flags. Exiting. ");
+  #endif
+
   #ifdef WITH_MPI
     int cuda_aware_support = 0;
     // TODO: This possibly only works for OpenMPI (SAM)
     #if defined(OMPI_HAVE_MPI_EXT_CUDA) && OMPI_HAVE_MPI_EXT_CUDA
       cuda_aware_support = MPIX_Query_cuda_support();
+    #else
+    #error "Your MPI was not installed with CUDA support. This is unsupported in HiRep.\n"
     #endif
 
     if (cuda_aware_support) lprintf("GPU_INIT", 10, "MPI implementation CUDA-aware? yes.\n");

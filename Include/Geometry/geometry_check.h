@@ -79,7 +79,7 @@
      */
     #define _CHECK_GEOMETRY_FULL(s1) \
         do { \
-            error(s1->type!=&glattice, 1, "Dphi_gpu [Dphi_gpu.c]", \
+            error(s1->type!=&glattice, 1, __func__, \
             "Field is not defined on all the lattice!"); \
         } while (0)
 
@@ -90,7 +90,7 @@
      */
     #define _CHECK_GEOMETRY_EVEN(s1) \
         do { \
-            error(s1->type!=&glat_even, 1, "Dphi_gpu [Dphi_gpu.c]", \
+            error(s1->type!=&glat_even, 1, __func__, \
             "Spinor needs to be even!"); \
         } while (0)
 
@@ -101,7 +101,7 @@
      */
     #define _CHECK_GEOMETRY_ODD(s1) \
         do { \
-            error(s1->type!=&glat_odd, 1, "Dphi_gpu [Dphi_gpu.c]", \
+            error(s1->type!=&glat_odd, 1, __func__, \
             "Spinor needs to be odd!"); \
         } while (0)
 

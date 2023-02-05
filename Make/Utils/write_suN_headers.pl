@@ -80,6 +80,22 @@ print "   hr_complex up[$dim_ldl];\n";
 print "   hr_complex dn[$dim_ldl];\n";
 print "} ldl_t;\n";
 
+sub write_halfspinors {
+  print <<END
+
+typedef struct _suNf_hspinor {
+  suNf_vector c[2];
+} suNf_hspinor;
+
+typedef struct _suNf_hspinor_flt {
+    suNf_vector_flt c[2];
+} suNf_hspinor_flt;
+
+END
+}
+
+write_halfspinors();
+
 write_epilog();
 
 open STDOUT, ">suN.h";
@@ -110,13 +126,10 @@ END
 
 sub write_prolog_suN {
   print <<END
-/*******************************************************************************
-*
-* File suN.h
-*
-* Type definitions and macros for SU(N) matrices and spinors
-*
-*******************************************************************************/
+/**
+ * \@file suN.h
+ * \@brief Type definitions and macros for SU(N) matrices and spinors
+ */
 
 #ifndef SUN_H
 #define SUN_H
@@ -132,13 +145,10 @@ END
 
 sub write_prolog_suN_types {
   print <<END
-/*******************************************************************************
-*
-* File suN_types.h
-*
-* Type definitions for SU(N) matrices and spinors
-*
-*******************************************************************************/
+/**
+ * \@file suN_types.h
+ * \@brief Type definitions for SU(N) matrices and spinors
+ */
 
 #ifndef SUN_TYPES_H
 #define SUN_TYPES_H

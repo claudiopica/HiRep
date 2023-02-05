@@ -109,6 +109,7 @@ my @libs = ("libhr.a"); #this is for later programs to use
 {
   my $topdir = "TestProgram/Benchmarks";
   my %exes = (
+    "speed_test_reading_gpu" => [ "speed_test_reading_gpu.c" ],
     "speed_test_diracoperator" => [ "speed_test_diracoperator.c", ],
     "speed_test_diracoperator_flt" => [ "speed_test_diracoperator_flt.c", ],
     "speed_test_diracoperator_gpu" => [ "speed_test_diracoperator_gpu.c", ],
@@ -134,8 +135,6 @@ my @libs = ("libhr.a"); #this is for later programs to use
 
   my %exclude = ( Integrators => [ "check_integrator_utils_1.c", ], 
                   Utils => [ "check_utils_3_gb_functions.c", "check_utils_3_tor_functions.c", 
-                  ], 
-                  DiracOperator => ["speed_test_diracoperator.c", "speed_test_diracoperator_flt.c", "speed_test_diracoperator_gpu.c", #not a test, this should be a separate exe
                   ], 
                   Geometry => ["test_com_speed.c", #not a test, this should be a separate exe. It is also broken
                   ], 

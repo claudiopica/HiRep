@@ -3,13 +3,10 @@
 * All rights reserved.                                                      *
 \***************************************************************************/
 
-/*******************************************************************************
-*
-* File cpu_complex.h
-*
-* Type definitions and macros for complex numbers used in C
-*
-*******************************************************************************/
+/**
+ * @file cpu_complex.h
+ * @brief Type definitions and macros for complex numbers used in C
+ */
 
 #ifndef CPU_COMPLEX_H
 #define CPU_COMPLEX_H

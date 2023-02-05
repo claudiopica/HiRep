@@ -30,7 +30,7 @@
     * @param r                 output spinor that contains the result of the 
     *                          operation.
     */
-    #define _suNf_theta_T_multiply(r, u, s)\
+    #define _suNf_theta_T_multiply(r, u, s) \
         do {\
             _declare_vtmp(s);\
             _suNf_multiply(_vtmp(s), (u), (s));\

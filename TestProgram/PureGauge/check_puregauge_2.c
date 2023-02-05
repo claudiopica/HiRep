@@ -25,8 +25,8 @@ static void transform(suNg_field* gtransf, suNg_field* gfield)
     }
   }
 
-  start_gf_sendrecv(gfield);
-  complete_gf_sendrecv(gfield);
+  start_sendrecv_gfield(gfield);
+  complete_sendrecv_gfield(gfield);
 }
 
 
@@ -77,15 +77,15 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"Generating a random gauge field... ");
   fflush(stdout);
   random_u(u_gauge);
-  start_gf_sendrecv(u_gauge);
-  complete_gf_sendrecv(u_gauge);
+  start_sendrecv_gfield(u_gauge);
+  complete_sendrecv_gfield(u_gauge);
   lprintf("MAIN",0,"done.\n");
 
   lprintf("MAIN",0,"Generating a random gauge transf... ");
   fflush(stdout);
   random_g(g);
-  start_gt_sendrecv(g);
-  complete_gt_sendrecv(g);
+  start_sendrecv_gtransf(g);
+  complete_sendrecv_gtransf(g);
   lprintf("MAIN",0,"done.\n");
 
   HYP_smearing(u_gauge_1,u_gauge,weight);

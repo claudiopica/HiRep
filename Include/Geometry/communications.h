@@ -1,196 +1,99 @@
 /***************************************************************************\
-* Copyright (c) 2008, 2022, Claudio Pica, Sofie Martins                     *   
+* Copyright (c) 2022, Claudio Pica, Sofie Martins                           *   
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
+/// Headerfile for:
+/// - communications.c
+/// - sync_to_buffer.cu
+
 /**
  * @file communications.h
- * @brief Communications to send and receive sites from other nodes using MPI
+ * @brief Communications to send and receive sites from other nodes using MPI with GPU
  */
 
 #ifndef COMMUNICATIONS_H
 #define COMMUNICATIONS_H
 
 #include "spinor_field.h"
+#include "geometry.h"
+#include "Utils/generics.h"
 
 #ifdef __cplusplus
     extern "C" {
 #endif
 
-/**
- * @brief Collects sum results from the local lattices and sums over all nodes (double).
- *
- * @param d			Pointer that contains the local result
- * @param n			Size of the array
- */
-void global_sum(double *d, int n);
+#define _FIELD_NAME_READABLE "Spinor field"
+#define _FIELD_NAME spinor_field_f
+#define _FIELD_TYPE spinor_field
+#include "TMPL/communications.h.tmpl"
 
-/**
- * @brief Collects sum results from the local lattices and sums over all nodes (integer).
- *
- * @param d			Pointer that contains the local result
- * @param n			Size of the array
- */
-void global_sum_int(int *d, int n);
+#define _FIELD_NAME_READABLE "Single precision spinor field"
+#define _FIELD_NAME spinor_field_f_flt
+#define _FIELD_TYPE spinor_field_flt
+#include "TMPL/communications.h.tmpl"
 
-/**
- * @brief Finds maximum across nodes after finding the local maximum.
- *
- * @param d			Pointer that contains the local result
- * @param n			Size of the array
- */
-void global_max(double *d, int n);
-void global_max_flt(float *d, int n);
+#define _FIELD_NAME_READABLE "Scalar field"
+#define _FIELD_NAME sfield
+#define _FIELD_TYPE scalar_field
+#include "TMPL/communications.h.tmpl"
 
-/**
- * @brief Finds minimum across nodes after finding the local minimum.
- *
- * @param d			Pointer that contains the local result
- * @param n			Size of the array
- */
-void global_min(double *d, int n);
+#define _FIELD_NAME_READABLE "Gauge field"
+#define _FIELD_NAME gfield
+#define _FIELD_TYPE suNg_field
+#include "TMPL/communications.h.tmpl"
 
-/**
- * @brief FIXME: add docs
- *
- * @param d
- * @param n
- */
-void bcast(double *d, int n);
+#define _FIELD_NAME_READABLE "Single precision gauge field"
+#define _FIELD_NAME gfield_flt
+#define _FIELD_TYPE suNg_field_flt
+#include "TMPL/communications.h.tmpl"
 
-/**
- * @brief FIXME: add docs
- *
- * @param i
- * @param n
- */
-void bcast_int(int *i, int n);
+#define _FIELD_NAME_READABLE "Represented gauge field"
+#define _FIELD_NAME gfield_f
+#define _FIELD_TYPE suNf_field
+#include "TMPL/communications.h.tmpl"
 
-/**
- * @brief Wait for communications to finish before continuing.
- *
- * @param suNg_field		Gauge field that needs to be synchronized across nodes.
- */
-void complete_gf_sendrecv(suNg_field*);
+#define _FIELD_NAME_READABLE "Represented single precision gauge field"
+#define _FIELD_NAME gfield_f_flt
+#define _FIELD_TYPE suNf_field_flt
+#include "TMPL/communications.h.tmpl"
 
-/**
- * @brief Load buffers and start MPI requests to send and receive.
- *
- * @param suNg_field		Gauge field that needs to be synchronized across nodes.
- */
-void start_gf_sendrecv(suNg_field*);
+#define _FIELD_NAME_READABLE "SU(NG) scalar field"
+#define _FIELD_NAME suNg_scalar_field
+#define _FIELD_TYPE suNg_scalar_field
+#include "TMPL/communications.h.tmpl"
 
-/**
- * @brief Wait for communications to finish before continuing.
- *
- * @param spinor_field		Spinor field that needs to be synchronized across nodes.
- */
-void complete_sf_sendrecv(spinor_field*);
+#define _FIELD_NAME_READABLE "SU(NG) algebra vector field"
+#define _FIELD_NAME avfield
+#define _FIELD_TYPE suNg_av_field
+#include "TMPL/communications.h.tmpl"
 
-/**
- * @brief Load buffers and start MPI requests to send and receive.
- *
- * @param spinor_field 		Spinor field that needs to be synchronized across nodes.
- */
-void start_sf_sendrecv(spinor_field*);
+#define _FIELD_NAME_READABLE "Gauge transformation"
+#define _FIELD_NAME gtransf
+#define _FIELD_TYPE suNg_field
+#include "TMPL/communications.h.tmpl"
 
-/**
- * @brief Wait for communications to finish before continuing.
- *
- * @param suNg_scalar_field	Scalar field that needs to be synchronized across nodes.
- */
-void complete_sc_sendrecv(suNg_scalar_field*);
+#define _FIELD_NAME_READABLE "Clover ldl field"
+#define _FIELD_NAME clover_ldl
+#define _FIELD_TYPE ldl_field
+#include "TMPL/communications.h.tmpl"
 
-/**
- * @brief Load buffers and start MPI requests to send and receive.
- *
- * @param suNg_scalar_field 	Scalar field that needs to be synchronized across nodes.
- */
-void start_sc_sendrecv(suNg_scalar_field*);
+#define _FIELD_NAME_READABLE "Clover term"
+#define _FIELD_NAME clover_term
+#define _FIELD_TYPE suNfc_field
+#include "TMPL/communications.h.tmpl"
 
-/**
- * @brief Wait for communications to finish before continuing.
- *
- * @param suNf_field 		Represented gauge field that needs to be synchronized 
- * 				across nodes.
- */
-void complete_clover_force_sendrecv(suNf_field*);
+#define _FIELD_NAME_READABLE "Clover force"
+#define _FIELD_NAME clover_force
+#define _FIELD_TYPE suNf_field
+#include "TMPL/communications.h.tmpl"
 
-/**
- * @brief Load buffers and start MPI requests to send and receive.
- *
- * @param suNf_field		Represented gauge field that needs to be synchronized 
- * 				across nodes.
- */
-void start_clover_force_sendrecv(suNf_field*);
-
-/**
- * @brief Wait for communications to finish before continuing.
- *
- * @param suNg_field		Gauge transformation that needs to be synchronized
- * 				across nodes.
- */
-void complete_gt_sendrecv(suNg_field*);
-
-/**
- * @brief Fill buffers and start MPI requests to send and receive.
- *
- * @param 			Gauge transformation that needs to be synchronized across
- * 				nodes
- */
-void start_gt_sendrecv(suNg_field*);
-
-/**
- * @brief Wait for communications to finish before continuing.
- *
- * @param suNg_field_flt	Single precision gauge field that needs to be synchronized
- * 				across nodes.
- */
-void complete_gf_sendrecv_flt(suNg_field_flt*);
-
-/**
- * @brief Fill buffers and start MPI requests to send and receive.
- *
- * @param suNg_field_flt	Single precision gauge field that needs to be synchronized
- * 				across nodes.
- */
-void start_gf_sendrecv_flt(suNg_field_flt*);
-
-/**
- * @brief Wait for communications to finish before continuing.
- *
- * @param spinor_field_flt	Single precision spinor field that needs to be synchronized
- * 				across nodes.
- */
-void complete_sf_sendrecv_flt(spinor_field_flt*);
-
-/**
- * @brief Fill buffers and start MPI requests to send and receive.
- *
- * @param spinor_field_flt	Single precision spinor field that needs to be synchronized
- * 				across nodes.
- */
-void start_sf_sendrecv_flt(spinor_field_flt*);
-
-
-void complete_staple_field_sendrecv(suNg_field *);
-
-/**
- * @brief Wait for communications to finish before continuing.
- *
- * @param staple field that needs to be synchronized across
- * 				nodes
- */
-void start_staple_field_sendrecv(suNg_field*);
-
-/**
- * @brief Fill buffers and start MPI requests to send and receive.
- *
- * @param staple field that needs to be synchronized across
- * 				nodes
- */
+#define _FIELD_NAME_READABLE "Staple field"
+#define _FIELD_NAME staple_field
+#define _FIELD_TYPE suNg_field
+#include "TMPL/communications.h.tmpl"
 
 #ifdef __cplusplus
-    }
+}
 #endif
 #endif 

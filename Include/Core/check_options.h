@@ -1,3 +1,9 @@
+/**
+ * @file check_options.h
+ * @brief Validation checks of the input parameters specified in the input file
+ *        and error messages that give instructions how to fix the issue.
+ */
+
 #ifndef CHECK_OPTIONS_H
 #define CHECK_OPTIONS_H
 
@@ -212,6 +218,11 @@
 
 #if defined(WITH_SMEARING) && defined(WITH_EXPCLOVER)
 #error Exponential lover term cannot be use simultaneously with the dirac smearing (not yet implemented)
+#endif
+
+// GPU checks
+#if defined(WITH_GPU) && defined(WITH_MPI) && !defined(WITH_NEW_GEOMETRY)
+#error Multi-GPU version does not work with old geometry. Please use new geometry.
 #endif
 
 #endif /* CHECK_OPTIONS_H */

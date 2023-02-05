@@ -20,7 +20,6 @@ int test_write_read_gtransf();
 int test_write_read_clover_term();
 int test_write_read_clover_force();
 int test_write_read_spinor_field_f();
-int test_write_read_spinor_field_f_vector_wise();
 int test_write_read_sfield();
 int test_write_read_clover_ldl();
 
@@ -28,7 +27,6 @@ int test_write_read_clover_ldl();
 int test_write_read_gauge_field_flt();
 int test_write_read_gauge_field_f_flt();
 int test_write_read_spinor_field_f_flt();
-int test_write_read_spinor_field_f_flt_vector_wise();
 
 int main(int argc, char *argv[]) 
 {
@@ -51,14 +49,12 @@ int main(int argc, char *argv[])
     return_val += test_write_read_clover_force();
     
     return_val += test_write_read_spinor_field_f();
-    return_val += test_write_read_spinor_field_f_vector_wise();
     return_val += test_write_read_sfield();
     
     //Single Precision Tests
     return_val += test_write_read_gauge_field_flt();
     return_val += test_write_read_gauge_field_f_flt();
     return_val += test_write_read_spinor_field_f_flt();
-    return_val += test_write_read_spinor_field_f_flt_vector_wise();
 
     // Finalize and return
     finalize_process();
@@ -78,22 +74,13 @@ int test_write_read_gauge_field()
     random_u(in); 
     lprintf("SANITY CHECK", 0, "[In field norm unequal zero: %0.2e]\n", sqnorm_gfield_cpu(in));
 
-    suNg *in_mat, *block_start, *out_mat;   
-    int stride = 0; 
-    _PIECE_FOR(in->type, ixp) 
-    {
-        block_start = _4FIELD_BLK(gpu_format, ixp);
-        stride = in->type->master_end[ixp] - in->type->master_end[ixp] +1;
-        _SITE_FOR(in->type, ixp, ix) 
-        {
-            int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
-            for (int comp = 0; comp < 4; comp++) 
-            {
-                in_mat = _4FIELD_AT(in, ix, comp);
-                out_mat = _4FIELD_AT(out, ix, comp);
-                write_gpu_suNg(stride, (*in_mat), block_start, ix_loc, comp);
-                read_gpu_suNg(stride, (*out_mat), block_start, ix_loc, comp);
-            }
+    suNg *in_mat, *out_mat;   
+    _MASTER_FOR(in->type, ix) {
+        for (int comp = 0; comp < 4; comp++) {
+            in_mat = _4FIELD_AT(in, ix, comp);
+            out_mat = _4FIELD_AT(out, ix, comp);
+            write_gfield_gpu(in_mat, gpu_format, ix, comp);
+            read_gfield_gpu(out_mat, gpu_format, ix, comp);
         }
     }
 
@@ -101,8 +88,7 @@ int test_write_read_gauge_field()
     lprintf("SANITY CHECK", 0, "[Sanity check out field norm unequal zero: %0.2e]\n", sqnorm_gfield_cpu(out));
     sub_assign_gfield_cpu(out, in);
     double diff_norm = sqnorm_gfield_cpu(out);
-
-    check_diff_norm_zero(diff_norm);
+    return_val += check_diff_norm_zero(diff_norm);
 
     free_gfield(in);
     free_gfield(out);
@@ -123,22 +109,13 @@ int test_write_read_gauge_field_flt()
     random_gfield_flt_cpu(in);
     lprintf("SANITY CHECK", 0, "[In field norm unequal zero: %0.2e]\n", sqnorm_gfield_flt_cpu(in));
 
-    suNg_flt *in_mat, *block_start, *out_mat;  
-    int stride = 0;  
-    _PIECE_FOR(in->type, ixp) 
-    {
-        block_start = _4FIELD_BLK(gpu_format, ixp);
-        stride = in->type->master_end[ixp] - in->type->master_start[ixp] +1;
-        _SITE_FOR(in->type, ixp, ix) 
-        {
-            int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
-            for (int comp = 0; comp < 4; comp++) 
-            {
-                in_mat = _4FIELD_AT(in, ix, comp);
-                out_mat = _4FIELD_AT(out, ix, comp);
-                write_gpu_suNg_flt(stride, (*in_mat), block_start, ix_loc, comp);
-                read_gpu_suNg_flt(stride, (*out_mat), block_start, ix_loc, comp);
-            }
+    suNg_flt *in_mat, *out_mat;  
+    _MASTER_FOR(in->type, ix) {
+        for (int comp = 0; comp < 4; ++comp) {
+            in_mat = _4FIELD_AT(in, ix, comp);
+            out_mat = _4FIELD_AT(out, ix, comp);
+            write_gfield_flt_gpu(in_mat, gpu_format, ix, comp);
+            read_gfield_flt_gpu(out_mat, gpu_format, ix, comp);
         }
     }
 
@@ -167,22 +144,13 @@ int test_write_read_gauge_field_f()
     random_u_f(in);
     lprintf("SANITY CHECK", 0, "[In field norm unequal zero: %0.2e]\n", sqnorm_gfield_f_cpu(in));
 
-    suNf *in_mat, *block_start, *out_mat;
-    int stride = 0;
-    _PIECE_FOR(in->type, ixp) 
-    {
-        block_start = _4FIELD_BLK(gpu_format, ixp);
-        stride = in->type->master_end[ixp] - in->type->master_start[ixp] + 1;
-        _SITE_FOR(in->type, ixp, ix) 
-        {
-            int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
-            for (int comp = 0; comp < 4; comp++) 
-            {
-                in_mat = _4FIELD_AT(in, ix, comp);
-                out_mat = _4FIELD_AT(out, ix, comp);
-                write_gpu_suNf(stride, (*in_mat), block_start, ix_loc, comp);
-                read_gpu_suNf(stride, (*out_mat), block_start, ix_loc, comp);
-            }
+    suNf *in_mat, *out_mat;
+    _MASTER_FOR(in->type, ix) {
+        for (int comp = 0; comp < 4; ++comp) {
+            in_mat = _4FIELD_AT(in, ix, comp);
+            out_mat = _4FIELD_AT(out, ix, comp);
+            write_gfield_f_gpu(in_mat, gpu_format, ix, comp);
+            read_gfield_f_gpu(out_mat, gpu_format, ix, comp);
         }
     }
 
@@ -212,22 +180,13 @@ int test_write_read_gauge_field_f_flt()
     random_gfield_f_flt_cpu(in);
     lprintf("SANITY CHECK", 0, "[In field norm unequal zero: %0.2e]\n", sqnorm_gfield_f_flt_cpu(in));
 
-    suNf_flt *in_mat, *block_start, *out_mat;
-    int stride = 0;
-    _PIECE_FOR(in->type, ixp) 
-    {
-        block_start = _4FIELD_BLK(gpu_format, ixp);
-        stride = in->type->master_end[ixp] - in->type->master_start[ixp] + 1;
-        _SITE_FOR(in->type, ixp, ix) 
-        {
-            int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
-            for (int comp = 0; comp < 4; comp++) 
-            {
-                in_mat = _4FIELD_AT(in, ix, comp);
-                out_mat = _4FIELD_AT(out, ix, comp);
-                write_gpu_suNf_flt(stride, (*in_mat), block_start, ix_loc, comp);
-                read_gpu_suNf_flt(stride, (*out_mat), block_start, ix_loc, comp);
-            }
+    suNf_flt *in_mat, *out_mat;
+    _MASTER_FOR(in->type, ix) {
+        for (int comp = 0; comp < 4; ++comp) {
+            in_mat = _4FIELD_AT(in, ix, comp);
+            out_mat = _4FIELD_AT(out, ix, comp);
+            write_gfield_f_flt_gpu(in_mat, gpu_format, ix, comp);
+            read_gfield_f_flt_gpu(out_mat, gpu_format, ix, comp);
         }
     }
 
@@ -258,20 +217,12 @@ int test_write_read_spinor_field_f()
 
     lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.2e]\n", spinor_field_sqnorm_f_cpu(in));
 
-    suNf_spinor *in_spinor, *block_start, *out_spinor;
-    int stride = 0;
-    _PIECE_FOR(in->type, ixp)
-    {
-        block_start = _FIELD_BLK(gpu_format, ixp);
-        stride = in->type->master_end[ixp] - in->type->master_start[ixp] + 1;
-        _SITE_FOR(in->type, ixp, ix) 
-        {
-            in_spinor = _FIELD_AT(in, ix);
-            out_spinor = _FIELD_AT(out, ix);
-            int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
-            write_gpu_suNf_spinor(stride, (*in_spinor), block_start, ix_loc, 0);
-            read_gpu_suNf_spinor(stride, (*out_spinor), block_start, ix_loc, 0);
-        } 
+    suNf_spinor *in_spinor, *out_spinor;
+    _MASTER_FOR(in->type, ix) {
+        in_spinor = _FIELD_AT(in, ix);
+        out_spinor = _FIELD_AT(in, ix);
+        write_spinor_field_f_gpu(in_spinor, gpu_format, ix, 0);
+        read_spinor_field_f_gpu(out_spinor, gpu_format, ix, 0);
     }
 
     lprintf("SANITY CHECK", 0, "[Sanity check out field norm unequal zero: %0.2e]\n", spinor_field_sqnorm_f_cpu(out));
@@ -284,51 +235,7 @@ int test_write_read_spinor_field_f()
     free_spinor_field_f(out);
     return return_val;
 }
-
-int test_write_read_spinor_field_f_vector_wise() 
-{
-    lprintf("INFO", 0, " ======= TEST SPINOR FIELD II ======= ");
-    int return_val = 0;
-    spinor_field *in, *gpu_format, *out;
-
-    in = alloc_spinor_field_f(1, &glattice);
-    gpu_format = alloc_spinor_field_f(1, &glattice);
-    out = alloc_spinor_field_f(1, &glattice);
-
-    gaussian_spinor_field(in);
-
-    lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.2e]\n", spinor_field_sqnorm_f_cpu(in));
-
-    suNf_spinor *in_spinor, *block_start, *out_spinor;
-    int stride = 0;
-    _PIECE_FOR(in->type, ixp)
-    {
-        block_start = _FIELD_BLK(gpu_format, ixp);
-        stride = in->type->master_end[ixp] - in->type->master_start[ixp] + 1;
-        _SITE_FOR(in->type, ixp, ix) 
-        {
-            in_spinor = _FIELD_AT(in, ix);
-            out_spinor = _FIELD_AT(out, ix);
-            int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
-            for (int comp = 0; comp < 4; ++comp) 
-            {
-                write_gpu_suNf_vector(stride, (*in_spinor).c[comp], block_start, ix_loc, comp);
-                read_gpu_suNf_vector(stride, (*out_spinor).c[comp], block_start, ix_loc, comp);
-            }
-        } 
-    }
-
-    lprintf("SANITY CHECK", 0, "[Sanity check out field norm unequal zero: %0.2e]\n", spinor_field_sqnorm_f_cpu(out));
-    spinor_field_sub_assign_f_cpu(out, in);
-    double diff_norm = spinor_field_sqnorm_f_cpu(out);
-    check_diff_norm_zero(diff_norm);
-
-    free_spinor_field_f(in);
-    free_spinor_field_f(gpu_format);
-    free_spinor_field_f(out);
-    return return_val;
-}
-
+   
 int test_write_read_spinor_field_f_flt() 
 {
     lprintf("INFO", 0, " ======= TEST SPINOR FIELD SINGLE PRECISION ======= \n");
@@ -343,64 +250,12 @@ int test_write_read_spinor_field_f_flt()
 
     lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.2e]\n", spinor_field_sqnorm_f_flt_cpu(in));
 
-    suNf_spinor_flt *in_spinor, *block_start, *out_spinor;
-    int stride = 0;
-    _PIECE_FOR(in->type, ixp) 
-    {
-        block_start = _FIELD_BLK(gpu_format, ixp);
-        stride = in->type->master_end[ixp] - in->type->master_start[ixp] + 1;
-        _SITE_FOR(in->type, ixp, ix) 
-        {
-            in_spinor = _FIELD_AT(in, ix);
-            out_spinor = _FIELD_AT(out, ix);
-            int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
-            write_gpu_suNf_spinor_flt(stride, (*in_spinor), block_start, ix_loc, 0);
-            read_gpu_suNf_spinor_flt(stride, (*out_spinor), block_start, ix_loc, 0);
-        }
-    }
-
-    lprintf("SANITY CHECK", 0, "[Sanity check out field norm unequal zero: %0.2e]\n", spinor_field_sqnorm_f_flt_cpu(out));
-    spinor_field_sub_assign_f_flt_cpu(out, in);
-    double diff_norm = spinor_field_sqnorm_f_flt_cpu(out);
-    check_diff_norm_zero(diff_norm);
-
-    free_spinor_field_f_flt(in);
-    free_spinor_field_f_flt(gpu_format);
-    free_spinor_field_f_flt(out);
-    return return_val;
-}
-
-int test_write_read_spinor_field_f_flt_vector_wise() 
-{
-    lprintf("INFO", 0, " ======= TEST SPINOR FIELD SINGLE PRECISION II ======= ");
-    int return_val = 0;
-    spinor_field_flt *in, *gpu_format, *out;
-
-    in = alloc_spinor_field_f_flt(1, &glattice);
-    gpu_format = alloc_spinor_field_f_flt(1, &glattice);
-    out = alloc_spinor_field_f_flt(1, &glattice);
-
-    gaussian_spinor_field_flt(in);
-
-    lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.2e]\n", spinor_field_sqnorm_f_flt_cpu(in));
-
-    suNf_spinor_flt *in_spinor, *block_start, *out_spinor;
-    int stride = 0;
-    _PIECE_FOR(in->type, ixp) 
-    {
-        block_start = _FIELD_BLK(gpu_format, ixp);
-        stride = in->type->master_end[ixp] - in->type->master_start[ixp] + 1;
-        _SITE_FOR(in->type, ixp, ix) 
-        {
-            in_spinor = _FIELD_AT(in, ix);
-            out_spinor = _FIELD_AT(out, ix);
-            int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
-            for (int comp = 0; comp < 4; ++comp)
-            {
-                write_gpu_suNf_vector_flt(stride, (*in_spinor).c[comp], block_start, ix_loc, comp);
-                read_gpu_suNf_vector_flt(stride, (*out_spinor).c[comp], block_start, ix_loc, comp);
-            }
-        }
+    suNf_spinor_flt *in_spinor, *out_spinor;
+    _MASTER_FOR(in->type, ix) {
+        in_spinor = _FIELD_AT(in, ix);
+        out_spinor = _FIELD_AT(out, ix);
+        write_spinor_field_f_flt_gpu(in_spinor, gpu_format, ix, 0);
+        read_spinor_field_f_flt_gpu(out_spinor, gpu_format, ix, 0);
     }
 
     lprintf("SANITY CHECK", 0, "[Sanity check out field norm unequal zero: %0.2e]\n", spinor_field_sqnorm_f_flt_cpu(out));
@@ -427,19 +282,12 @@ int test_write_read_sfield()
     random_sfield_cpu(in);
     lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.2e]\n", sqnorm_sfield_cpu(in));
 
-    double *in_site, *block_start, *out_site;
-    _PIECE_FOR(in->type, ixp) 
-    {
-        block_start = _FIELD_BLK(gpu_format, ixp);
-        // int stride = in->type->master_end[ixp] - in->type->master_start[ixp] + 1; //double doesn't use stride
-        _SITE_FOR(in->type, ixp, ix) 
-        {
-            int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
-            in_site = _FIELD_AT(in, ix);
-            out_site = _FIELD_AT(out, ix);
-            write_gpu_double(stride, (*in_site), block_start, ix_loc, 0);
-            read_gpu_double(stride, (*out_site), block_start, ix_loc, 0);
-        }
+    double *in_site, *out_site;
+    _MASTER_FOR(in->type, ix) {
+        in_site = _FIELD_AT(in, ix);
+        out_site = _FIELD_AT(out, ix);
+        write_sfield_gpu(in_site, gpu_format, ix, 0);
+        read_sfield_gpu(out_site, gpu_format, ix, 0);
     }
 
     lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.2e]\n", sqnorm_sfield_cpu(in));
@@ -468,20 +316,12 @@ int test_write_read_suNg_scalar_field()
     random_suNg_scalar_field_cpu(in);
     lprintf("SANITY CHECK", 0, "[In field norm unequal zero: %0.2e]\n", sqnorm_suNg_scalar_field_cpu(in));
 
-    suNg_vector *in_vec, *block_start, *out_vec;
-    int stride = 0;
-    _PIECE_FOR(in->type, ixp) 
-    {
-        block_start = _FIELD_BLK(gpu_format, ixp);
-        stride = in->type->master_end[ixp] - in->type->master_end[ixp] + 1;
-        _SITE_FOR(in->type, ixp, ix) 
-        {
-            int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
-            in_vec = _FIELD_AT(in, ix);
-            out_vec = _FIELD_AT(out, ix);
-            write_gpu_suNg_vector(stride, (*in_vec), block_start, ix_loc, 0);
-            read_gpu_suNg_vector(stride, (*out_vec), block_start, ix_loc, 0);
-        }
+    suNg_vector *in_vec, *out_vec;
+    _MASTER_FOR(in->type, ix) {
+        in_vec = _FIELD_AT(in, ix);
+        out_vec = _FIELD_AT(out, ix);
+        write_suNg_scalar_field_gpu(in_vec, gpu_format, ix, 0);
+        read_suNg_scalar_field_gpu(out_vec, gpu_format, ix, 0);
     }
 
     lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.2e]\n", sqnorm_suNg_scalar_field_cpu(in));
@@ -510,22 +350,13 @@ int test_write_read_avfield()
     random_avfield_cpu(in);
     lprintf("SANITY CHECK", 0, "[In field norm unequal zero: %0.2e]\n", sqnorm_avfield_cpu(in));
 
-    suNg_algebra_vector *in_mat, *block_start, *out_mat;
-    int stride = 0;
-    _PIECE_FOR(in->type, ixp) 
-    {
-        block_start = _4FIELD_BLK(gpu_format, ixp);
-        stride = in->type->master_end[ixp] - in->type->master_end[ixp] + 1;
-        _SITE_FOR(in->type, ixp, ix) 
-        {
-            int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
-            for (int comp = 0; comp < 4; comp++) 
-            {
-                in_mat = _4FIELD_AT(in, ix, comp);
-                out_mat = _4FIELD_AT(out, ix, comp);
-                write_gpu_suNg_algebra_vector(stride, (*in_mat), block_start, ix_loc, comp);
-                read_gpu_suNg_algebra_vector(stride, (*out_mat), block_start, ix_loc, comp);
-            }
+    suNg_algebra_vector *in_mat, *out_mat;
+    _MASTER_FOR(in->type, ix) {
+        for (int comp = 0; comp < 4; ++comp) {
+            in_mat = _4FIELD_AT(in, ix, comp);
+            out_mat = _4FIELD_AT(out, ix, comp);
+            write_avfield_gpu(in_mat, gpu_format, ix, comp);
+            read_avfield_gpu(out_mat, gpu_format, ix, comp);
         }
     }
 
@@ -555,20 +386,12 @@ int test_write_read_gtransf()
     random_gtransf_cpu(in);
     lprintf("SANITY CHECK", 0, "[In field norm unequal zero: %0.2e]\n", sqnorm_gtransf_cpu(in));
 
-    suNg *in_mat, *block_start, *out_mat;
-    int stride = 0;
-    _PIECE_FOR(in->type, ixp) 
-    {
-        block_start = _FIELD_BLK(gpu_format, ixp);
-        stride = in->type->master_end[ixp] - in->type->master_end[ixp] + 1;
-        _SITE_FOR(in->type, ixp, ix) 
-        {
-            int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
-            in_mat = _FIELD_AT(in, ix);
-            out_mat = _FIELD_AT(out, ix);
-            write_gpu_suNg(stride, (*in_mat), block_start, ix_loc, 0);
-            read_gpu_suNg(stride, (*out_mat), block_start, ix_loc, 0);
-        }
+    suNg *in_mat, *out_mat;
+    _MASTER_FOR(in->type, ix) {
+        in_mat = _FIELD_AT(in, ix);
+        out_mat = _FIELD_AT(out, ix);
+        write_gtransf_gpu(in_mat, gpu_format, ix, 0);
+        read_gtransf_gpu(out_mat, gpu_format, ix, 0);
     }
 
     lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.2e]\n", sqnorm_gtransf_cpu(in));
@@ -597,22 +420,13 @@ int test_write_read_clover_term()
     random_clover_term_cpu(in);
     lprintf("SANITY CHECK", 0, "[In field norm unequal zero: %0.2e]\n", sqnorm_clover_term_cpu(in));
 
-    suNfc *in_mat, *block_start, *out_mat;
-    int stride = 0;
-    _PIECE_FOR(in->type, ixp) 
-    {
-        block_start = _4FIELD_BLK(gpu_format, ixp);
-        stride = in->type->master_end[ixp] - in->type->master_end[ixp] + 1;
-        _SITE_FOR(in->type, ixp, ix) 
-        {
-            int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
-            for (int comp = 0; comp < 4; comp++) 
-            {
-                in_mat = _4FIELD_AT(in, ix, comp);
-                out_mat = _4FIELD_AT(out, ix, comp);
-                write_gpu_suNfc(stride, (*in_mat), block_start, ix_loc, comp);
-                read_gpu_suNfc(stride, (*out_mat), block_start, ix_loc, comp);
-            }
+    suNfc *in_mat, *out_mat;
+    _MASTER_FOR(in->type, ix) {
+        for (int comp = 0; comp < 4; ++comp) {
+            in_mat = _4FIELD_AT(in, ix, comp);
+            out_mat = _4FIELD_AT(out, ix, comp);
+            write_clover_term_gpu(in_mat, gpu_format, ix, comp);
+            read_clover_term_gpu(out_mat, gpu_format, ix, comp);
         }
     }
 
@@ -642,22 +456,13 @@ int test_write_read_clover_force()
     random_clover_force_cpu(in);
     lprintf("SANITY CHECK", 0, "[In field norm unequal zero: %0.2e]\n", sqnorm_clover_force_cpu(in));
 
-    suNf *in_mat, *block_start, *out_mat;
-    int stride = 0;
-    _PIECE_FOR(in->type, ixp) 
-    {
-        block_start = _DFIELD_BLK(gpu_format, ixp, 6);
-        stride = in->type->master_end[ixp] - in->type->master_end[ixp] + 1;
-        _SITE_FOR(in->type, ixp, ix) 
-        {
-            int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
-            for (int comp = 0; comp < 6; comp++) 
-            {
-                in_mat = _6FIELD_AT(in, ix, comp);
-                out_mat = _6FIELD_AT(out, ix, comp);
-                write_gpu_suNf(stride, (*in_mat), block_start, ix_loc, comp);
-                read_gpu_suNf(stride, (*out_mat), block_start, ix_loc, comp);
-            }
+    suNf *in_mat, *out_mat;
+    _MASTER_FOR(in->type, ix) {
+        for (int comp = 0; comp < 6; ++comp) {
+            in_mat = _6FIELD_AT(in, ix, comp);
+            out_mat = _6FIELD_AT(out, ix, comp);
+            write_clover_force_gpu(in_mat, gpu_format, ix, comp);
+            read_clover_force_gpu(out_mat, gpu_format, ix, comp);
         }
     }
 
@@ -687,20 +492,12 @@ int test_write_read_clover_ldl()
     random_clover_ldl_cpu(in);
     lprintf("SANITY CHECK", 0, "[In field norm unequal zero: %0.2e]\n", sqnorm_clover_ldl_cpu(in)); // sqnorm Not implemented
 
-    ldl_t *site_in, *block_start, *site_out;
-    int stride = 0;
-    _PIECE_FOR(in->type, ixp) 
-    {
-        block_start = _DFIELD_BLK(gpu_format, ixp, 0);
-        stride = in->type->master_end[ixp] - in->type->master_end[ixp] + 1;
-        _SITE_FOR(in->type, ixp, ix) 
-        {
-            int ix_loc = _GPU_IDX_TO_LOCAL(in, ix, ixp);
-            site_in = _FIELD_AT(in, ix);
-            site_out = _FIELD_AT(out, ix);
-            write_gpu_ldl_t(stride, (*site_in), block_start, ix_loc, 0);
-            read_gpu_ldl_t(stride, (*site_out), block_start, ix_loc, 0);
-        }
+    ldl_t *site_in, *site_out;
+    _MASTER_FOR(in->type, ix) {
+        site_in = _FIELD_AT(in, ix);
+        site_out = _FIELD_AT(out, ix);
+        write_clover_ldl_gpu(site_in, gpu_format, ix, 0);
+        read_clover_ldl_gpu(site_out, gpu_format, ix, 0);
     }
 
     lprintf("SANITY CHECK", 0, "[Sanity check in field norm unequal zero: %0.2e]\n", sqnorm_clover_ldl_cpu(in));

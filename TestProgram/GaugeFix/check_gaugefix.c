@@ -104,20 +104,20 @@ int main(int argc, char *argv[])
   // initialise random gauge field
   lprintf("TEST", 0, "Perform test gauge invariance of the gauge fixing with a random gauge field\n");
   random_u(u_gauge);
-  start_gf_sendrecv(u_gauge);
-  complete_gf_sendrecv(u_gauge);
+  start_sendrecv_gfield(u_gauge);
+  complete_sendrecv_gfield(u_gauge);
 
   // the gauge transformation
   random_g(g);
-  start_gt_sendrecv(g);
-  complete_gt_sendrecv(g);
+  start_sendrecv_gtransf(g);
+  complete_sendrecv_gtransf(g);
 
   p1 = calc_plaq(u_gauge);
   lprintf("TEST", 0, "original gauge plaq %1.14f\n", p1);
 
   transform_u(fixed_gauge, u_gauge, g);
-  start_gf_sendrecv(fixed_gauge);
-  complete_gf_sendrecv(fixed_gauge);
+  start_sendrecv_gfield(fixed_gauge);
+  complete_sendrecv_gfield(fixed_gauge);
 
   p2 = calc_plaq(fixed_gauge);
   lprintf("TEST", 0, "plaq after random gauge tranforamtion %1.14f\n", p2);
@@ -150,20 +150,20 @@ int main(int argc, char *argv[])
   lprintf("TEST", 0, "Perform test gauge invariance of the gauge fixing with a unit gauge field\n");
   // initialise unit gauge field
   unit_gauge(u_gauge);
-  start_gf_sendrecv(u_gauge);
-  complete_gf_sendrecv(u_gauge);
+  start_sendrecv_gfield(u_gauge);
+  complete_sendrecv_gfield(u_gauge);
 
   // the gauge transformation
   random_g(g);
-  start_gt_sendrecv(g);
-  complete_gt_sendrecv(g);
+  start_sendrecv_gtransf(g);
+  complete_sendrecv_gtransf(g);
 
   p1 = calc_plaq(u_gauge);
   lprintf("TEST", 0, "original gauge plaq %1.14f\n", p1);
 
   transform_u(fixed_gauge, u_gauge, g);
-  start_gf_sendrecv(fixed_gauge);
-  complete_gf_sendrecv(fixed_gauge);
+  start_sendrecv_gfield(fixed_gauge);
+  complete_sendrecv_gfield(fixed_gauge);
 
   p2 = calc_plaq(fixed_gauge);
   lprintf("TEST", 0, "plaq after random gauge tranforamtion %1.14f\n", p2);

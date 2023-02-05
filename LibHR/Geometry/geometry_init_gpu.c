@@ -5,15 +5,12 @@
 
 #include "geometry.h"
 #include "libhr_core.h"
+#include <string.h>
 
 void init_neighbors_gpu() 
 {
   #ifdef WITH_GPU
-  #ifdef WITH_MPI
-    int N = T_EXT*X_EXT*Y_EXT*Z_EXT;
-  #else
-    int N = T*X*Y*Z;
-  #endif
+  int N = glattice.gsize_gauge;
 
   cudaError_t error_id;
   error_id = cudaMalloc((void **)&iup_gpu, 4 * N * sizeof(int));
@@ -37,6 +34,7 @@ void init_neighbors_gpu()
   error_id = cudaMemcpy(imask_gpu, imask, N * sizeof(*imask), cudaMemcpyHostToDevice);
   error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error copying imask lookup table to device memory.\n");
 
+
   error_id = cudaMemcpy(ipt_gpu, ipt, (X+2*X_BORDER)*(Y+2*Y_BORDER)*(Z+2*Z_BORDER)*(T+2*T_BORDER)*sizeof(int), cudaMemcpyHostToDevice);
   error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error copying ipt to device memory.\n");
 
@@ -56,6 +54,23 @@ void init_neighbors_gpu()
   error_id = cudaMemcpyToSymbol(&eitheta_gpu[0], &eitheta[0], sizeof(hr_complex)*4, 0, cudaMemcpyHostToDevice);
   error(error_id != cudaSuccess, 1, "init_neighbors_gpu", "Error adding Z_EXT to global constant memory.\n");
   #endif
+
+  box_t *L = geometryBoxes;
+  int number_of_boxes = 0;
+  do {
+    number_of_boxes++;
+  } while ((L=L->next));
+
+  cudaMalloc((void **)&geometryBoxes_gpu, number_of_boxes*sizeof(box_t));
+
+  L = geometryBoxes;
+  int i = 0;
+  do {
+    cudaMemcpy(&geometryBoxes_gpu[i], L, sizeof(box_t), cudaMemcpyHostToDevice);
+    ++i;
+  } while ((L=L->next));
+
+  
   #endif
 }
 

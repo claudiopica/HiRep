@@ -11,6 +11,7 @@
 #include "utils.h"
 #include "inverters.h"
 #include "update.h"
+#include "geometry.h"
 
 #define PI 3.141592653589793238462643383279502884197
 
@@ -271,8 +272,8 @@ static void calc_propagator_eo_core(spinor_field *psi, spinor_field *eta, int so
     if (i & 1)
       ++cgiter; /* count only half of calls. works because the number of sources is even */
   }
-  start_sf_sendrecv(psi);
-  complete_sf_sendrecv(psi);
+  start_sendrecv_spinor_field_f(psi);
+  complete_sendrecv_spinor_field_f(psi);
   lprintf("CALC_PROP", 10, "QMR_eo MVM = %d\n", cgiter);
 }
 #endif
@@ -284,8 +285,8 @@ static void calc_propagator_core(spinor_field *psi, spinor_field *eta, int solve
   error(eta->type != &glattice, 1, "calc_propagator_core [calc_prop.c]", "eta type must be glattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
-  start_sf_sendrecv(eta);
-  complete_sf_sendrecv(eta);
+  start_sendrecv_spinor_field_f(eta);
+  complete_sendrecv_spinor_field_f(eta);
 
   spinor_field qprop_mask_eta;
   spinor_field qprop_mask_psi;
@@ -374,8 +375,8 @@ static void calc_propagator_core(spinor_field *psi, spinor_field *eta, int solve
   ++cgiter; /* One whole call*/
   lprintf("CALC_PROP_CORE", 10, "QMR_eo MVM = %d\n", cgiter);
 
-  start_sf_sendrecv(psi);
-  complete_sf_sendrecv(psi);
+  start_sendrecv_spinor_field_f(psi);
+  complete_sendrecv_spinor_field_f(psi);
 }
 #if defined(WITH_CLOVER) || defined(WITH_EXPCLOVER)
 
@@ -701,8 +702,8 @@ static void calc_propagator_eo_tw_core(spinor_field *psi, spinor_field *eta, int
   ++cgiter; /* One whole call*/
   lprintf("CALC_PROPAGATOR_EO_TW_CORE", 0, "QMR_eo MVM = %d\n", cgiter);
 
-  start_sf_sendrecv(psi);
-  complete_sf_sendrecv(psi);
+  start_sendrecv_spinor_field_f(psi);
+  complete_sendrecv_spinor_field_f(psi);
 
 #ifndef CHECK_SPINOR_MATCHING
   error(psi->type == &glattice, 1, "calc_propagator_eo_tw_core [calc_prop.c]", "incorrect type for the input (psi) spinor");
@@ -733,8 +734,8 @@ void calc_propagator_tw(double *lmass, double mu, spinor_field *psi, spinor_fiel
 
   for (beta = 0; beta < ndilute; ++beta)
   {
-    start_sf_sendrecv(eta + beta);
-    complete_sf_sendrecv(eta + beta);
+    start_sendrecv_spinor_field_f(eta + beta);
+    complete_sendrecv_spinor_field_f(eta + beta);
     for (i = 0; i < n_masses; ++i)
     {
       lprintf("CALC_PROPAGATOR_TW", 10, "n masses=%d, mass = %g\n", n_masses, m[i]);

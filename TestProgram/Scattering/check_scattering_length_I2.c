@@ -80,8 +80,8 @@ void unit_gauge(suNg_field *gauge){
             _suNg_unit(*_4FIELD_AT(gauge,ix,mu));
         }
     }
-    start_gf_sendrecv(gauge);
-    complete_gf_sendrecv(gauge);
+    start_sendrecv_gfield(gauge);
+    complete_sendrecv_gfield(gauge);
 }
 
 typedef struct fourvector{

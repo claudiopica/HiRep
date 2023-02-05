@@ -21,6 +21,8 @@ int main(int argc,char *argv[])
 
   setup_process(&argc,&argv);
   setup_gauge_fields();
+  u_gauge_f_flt = alloc_gfield_f_flt(&glattice);
+
 
   lprintf("MAIN",0,"n_warmup = %d, n_times = %d \n",n_warmup,n_times);
 
@@ -36,10 +38,6 @@ int main(int argc,char *argv[])
   gaussian_spinor_field(s0);
   gaussian_spinor_field(s1);
   lprintf("LA TEST",0,"un sito %lf\n",creal(s0->ptr[2].c[0].c[0]));
-  copy_to_gpu_spinor_field_f(s0);
-  copy_to_gpu_spinor_field_f(s1);
-  copy_to_gpu_spinor_field_f(s2);
-  copy_to_gpu_spinor_field_f(s3);
   //
   //#pragma omp parallel num_threads(1) default(shared)
 //#pragma omp parallel (Not necessary for GPU version? (SAM))
@@ -57,7 +55,8 @@ int main(int argc,char *argv[])
   lprintf("MAIN",0,"Generating a random gauge field... ");
   fflush(stdout);
   random_u(u_gauge);
-  start_gf_sendrecv(u_gauge);
+  start_sendrecv_gfield(u_gauge);
+  complete_sendrecv_gfield(u_gauge);
   represent_gauge_field();
   copy_to_gpu_gfield_f(u_gauge_f);
 
@@ -105,7 +104,7 @@ int main(int argc,char *argv[])
   lprintf("LA TEST",0,"BAND: %1.6g GB/s\n\n",gflops);
   lprintf("LA TEST",0,"DONE!");
 
-
+  
   free_spinor_field_f(s0);
 
   finalize_process();

@@ -134,8 +134,8 @@ void create_sequential_source_point(spinor_field *source, int tf, spinor_field *
 
   for (beta = 0; beta < 4 * NF; ++beta)
   {
-    start_sf_sendrecv(source + beta);
-    complete_sf_sendrecv(source + beta);
+    start_sendrecv_spinor_field_f(source + beta);
+    complete_sendrecv_spinor_field_f(source + beta);
   }
 }
 
@@ -185,8 +185,8 @@ int main(int argc, char *argv[])
 
   lprintf("MAIN", 0, "Generating a random gauge field... ");
   random_u(u_gauge);
-  start_gf_sendrecv(u_gauge);
-  complete_gf_sendrecv(u_gauge);
+  start_sendrecv_gfield(u_gauge);
+  complete_sendrecv_gfield(u_gauge);
   represent_gauge_field();
 
   gettimeofday(&start, 0);

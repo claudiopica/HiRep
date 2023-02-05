@@ -7,7 +7,6 @@
 * NOCOMPILE= BC_Z_ANTIPERIODIC
 * NOCOMPILE= BASIC_SF
 * NOCOMPILE= ROTATED_SF
-* NOCOMPILE= WITH_GPU
 *
 * Testing the spin structure & printing the gamma matrices
 *
@@ -78,7 +77,8 @@ int compute_gamma(int g[4], int ic)
       int ix = ipt(c[0], c[1], c[2], c[3]);
       _suNg_unit(*_4FIELD_AT(u_gauge, ix, mu));
     }
-    start_gf_sendrecv(u_gauge);
+
+    //start_sendrecv_gfield(u_gauge); Non-mpi test
     represent_gauge_field();
 
     dbl = 0.;
@@ -97,19 +97,28 @@ int compute_gamma(int g[4], int ic)
 
     for (int beta = 0; beta < 4; beta++)
     {
-      spinor_field_zero_f(in);
+      spinor_field_zero_f_cpu(in);
       _MASTER_FOR(&glattice, ix)
       {
         _FIELD_AT(in, ix)->c[beta].c[ic] = 1.;
       }
 
-      dbl = spinor_field_sqnorm_f(in);
+      dbl = spinor_field_sqnorm_f_cpu(in);
       if (fabs(dbl - GLB_T * GLB_X * GLB_Y * GLB_Z) > 1.e-14)
         lprintf("ERROR", 0, "source sqnorm=%f\n", dbl);
 
+      #ifdef WITH_GPU
+        copy_to_gpu_spinor_field_f(in);
+        copy_to_gpu_gfield_f(u_gauge_f);
+      #endif
+
       Dphi_(out, in);
 
-      dbl = spinor_field_sqnorm_f(out);
+      #ifdef WITH_GPU
+        copy_from_gpu_spinor_field_f(out);
+      #endif
+
+      dbl = spinor_field_sqnorm_f_cpu(out);
       if (fabs(dbl) < 1.e-14)
         lprintf("ERROR", 0, "vanishing out sqnorm\n");
 
@@ -228,7 +237,7 @@ int main(int argc, char *argv[])
   random_u(u_gauge);
   lprintf("MAIN", 0, "done.\n");
 
-  start_gf_sendrecv(u_gauge);
+  start_sendrecv_gfield(u_gauge);
 
   represent_gauge_field();
 

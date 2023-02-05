@@ -6,7 +6,6 @@
 * NOCOMPILE= BC_Z_ANTIPERIODIC
 * NOCOMPILE= BASIC_SF
 * NOCOMPILE= ROTATED_SF
-* NOCOMPILE= WITH_GPU
 *
 * Action of the Dirac operator on plane waves
 *
@@ -15,7 +14,6 @@
 #include "libhr.h"
 
 double hmass = 0.1;
-
 
 static suNf_spinor mul_gamma(int mu, suNf_spinor s)
 {
@@ -76,21 +74,27 @@ int main(int argc, char *argv[])
 
   /* setup process id and communications */
   logger_map("DEBUG", "debug");
-
   setup_process(&argc, &argv);
-
   setup_gauge_fields();
 
   lprintf("MAIN", 0, "Action of Qhat on plane waves\n");
   lprintf("MAIN", 0, "-----------------------------\n\n");
 
   unit_u(u_gauge);
-  start_gf_sendrecv(u_gauge);
+  start_sendrecv_gfield(u_gauge);
   represent_gauge_field();
 
   ps0 = alloc_spinor_field_f(3, &glattice);
   ps1 = ps0 + 1;
   ps2 = ps1 + 1;
+
+  #ifdef WITH_GPU
+    copy_from_gpu_gfield(u_gauge);
+    copy_from_gpu_gfield_f(u_gauge_f);
+    copy_from_gpu_spinor_field_f(ps0);
+    copy_from_gpu_spinor_field_f(ps1);
+    copy_from_gpu_spinor_field_f(ps2);
+  #endif
 
   pi = 4.0 * atan(1.0);
   n = 10;
@@ -204,13 +208,27 @@ int main(int argc, char *argv[])
             *_FIELD_AT(ps1, ix) = s1;
           }
 
-    start_sf_sendrecv(ps0);
-    complete_sf_sendrecv(ps0);
+    #ifdef WITH_GPU
+      copy_to_gpu_gfield(u_gauge);
+      copy_to_gpu_gfield_f(u_gauge_f);
+      copy_to_gpu_spinor_field_f(ps0);
+      copy_to_gpu_spinor_field_f(ps1);
+      copy_to_gpu_spinor_field_f(ps2);
+    #endif
+
+    start_sendrecv_spinor_field_f(ps0);
+    complete_sendrecv_spinor_field_f(ps0);
+
+    #ifdef WITH_GPU
+    // After copy back to device we need to communicate again
+      start_sendrecv_gfield_f(u_gauge_f);
+      complete_sendrecv_gfield_f(u_gauge_f);
+    #endif
 
     Dphi(hmass, ps2, ps0);
 
-    start_sf_sendrecv(ps1);
-    complete_sf_sendrecv(ps1);
+    start_sendrecv_spinor_field_f(ps1);
+    complete_sendrecv_spinor_field_f(ps1);
 
     spinor_field_mul_add_assign_f(ps1, -1.0, ps2);
     sig = spinor_field_sqnorm_f(ps1) / spinor_field_sqnorm_f(ps0);

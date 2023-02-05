@@ -1,6 +1,7 @@
 /*******************************************************************************
 *
-* NOCOMPILE = !WITH_MPI && WITH_GPU
+* NOCOMPILE= !WITH_MPI
+* NOCOMPILE= WITH_GPU
 *
 * Check communication of gauge field in T direction
 *
@@ -22,9 +23,9 @@ int checkNorm(char *name, double norm_diff) {
 }
 
 #define checkForErrors(_LABEL) \
-    start_sf_sendrecv(in); complete_sf_sendrecv(in); \
-    start_sf_sendrecv(even); complete_sf_sendrecv(even); \
-    start_sf_sendrecv(odd); complete_sf_sendrecv(odd); \
+    start_sendrecv_spinor_field_f(in); complete_sendrecv_spinor_field_f(in); \
+    start_sendrecv_spinor_field_f(even); complete_sendrecv_spinor_field_f(even); \
+    start_sendrecv_spinor_field_f(odd); complete_sendrecv_spinor_field_f(odd); \
     in_diff = spinor_field_sqnorm_f(in)-in_norm; \
     even_diff = spinor_field_sqnorm_f(even)-even_norm; \
     odd_diff = spinor_field_sqnorm_f(odd)-odd_norm; \

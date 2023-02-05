@@ -11,6 +11,7 @@
 #include "utils.h"
 #include "inverters.h"
 #include "update.h"
+#include "geometry.h"
 
 #define PI 3.141592653589793238462643383279502884197
 
@@ -132,8 +133,8 @@ static void calc_propagator_ff_eo_core(spinor_field *psi, spinor_field *eta, int
 
     if(i&1) ++cgiter; /* count only half of calls. Works because the number of sources is even */
   }
-  start_sf_sendrecv(psi);
-  complete_sf_sendrecv(psi);
+  start_sendrecv_spinor_field_f(psi);
+  complete_sendrecv_spinor_field_f(psi);
   lprintf("CALC_PROP",10,"QMR_eo MVM = %d\n",cgiter);
 }
 
@@ -201,8 +202,8 @@ static void calc_propagator_ff_oe_core(spinor_field *psi, spinor_field *eta, int
   }
   cgiter+= QMR_par.n*(1+n_hopping)/2;
 
-  start_sf_sendrecv(psi);
-  complete_sf_sendrecv(psi);
+  start_sendrecv_spinor_field_f(psi);
+  complete_sendrecv_spinor_field_f(psi);
   lprintf("CALC_PROP",10,"QMR_eo MVM = %d\n",cgiter);
 }
 
@@ -243,16 +244,16 @@ static void calc_propagator_ff_hopping_series_core(spinor_field *psi, spinor_fie
 
   lprintf("CALC_PROP",10," MVM = %d\n",cgiter);
   
-  start_sf_sendrecv(psi);
-  complete_sf_sendrecv(psi);
+  start_sendrecv_spinor_field_f(psi);
+  complete_sendrecv_spinor_field_f(psi);
 }
 
 
 
 static void calc_propagator_ff_core(spinor_field *psi, spinor_field *eta, int solver) {
 
-  start_sf_sendrecv(eta);
-  complete_sf_sendrecv(eta);
+  start_sendrecv_spinor_field_f(eta);
+  complete_sendrecv_spinor_field_f(eta);
 
   spinor_field qprop_mask_eta;
   spinor_field qprop_mask_psi;
@@ -316,8 +317,8 @@ static void calc_propagator_ff_core(spinor_field *psi, spinor_field *eta, int so
   lprintf("CALC_PROP_CORE",10,"QMR_eo MVM = %d\n",cgiter);
 
 
-   start_sf_sendrecv(psi);
-   complete_sf_sendrecv(psi);
+   start_sendrecv_spinor_field_f(psi);
+   complete_sendrecv_spinor_field_f(psi);
 
 }
 

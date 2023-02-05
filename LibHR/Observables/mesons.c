@@ -5,6 +5,7 @@
 
 #include "observables.h"
 #include "libhr_core.h"
+#include "inverters.h"
 
 #define _INDEX_(i,s) ( (s)*NF+(i) )
 

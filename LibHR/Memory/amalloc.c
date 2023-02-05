@@ -3,13 +3,10 @@
 * All rights reserved.                                                      *
 \***************************************************************************/
 
-/*******************************************************************************
- *
- * File amalloc.c
- *
- * Align memory (de)allocation functions
- *
- *******************************************************************************/
+/**
+ * @file amalloc.c
+ * @brief Align memory (de)allocation functions
+ */
 
 #include <stdlib.h>
 #include "memory.h"

@@ -5,6 +5,7 @@
 #include "memory.h"
 #include "Update/copy_gfield.h"
 #include "IO/logger.h"
+#include "inverters.h"
 
 
 #ifndef M_PI
@@ -205,8 +206,8 @@ void WilsonFlow1(suNg_field *V, const double epsilon)
     }
   }
 
-  start_gf_sendrecv(V);
-  complete_gf_sendrecv(V);
+  start_sendrecv_gfield(V);
+  complete_sendrecv_gfield(V);
 #if defined(ROTATED_SF) || defined(BASIC_SF)
   apply_BCs_on_fundamental_gauge_field();
 #endif
@@ -255,8 +256,8 @@ int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, 
     }
   }
 
-  start_gf_sendrecv(V);
-  complete_gf_sendrecv(V);
+  start_sendrecv_gfield(V);
+  complete_sendrecv_gfield(V);
 #if defined(ROTATED_SF) || defined(BASIC_SF)
   apply_BCs_on_fundamental_gauge_field();
 #endif
@@ -276,8 +277,8 @@ int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, 
     }
   }
 
-  start_gf_sendrecv(V);
-  complete_gf_sendrecv(V);
+  start_sendrecv_gfield(V);
+  complete_sendrecv_gfield(V);
 #if defined(ROTATED_SF) || defined(BASIC_SF)
   apply_BCs_on_fundamental_gauge_field();
 #endif
@@ -300,11 +301,11 @@ int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, 
     }
   }
 
-  start_gf_sendrecv(V);
-  complete_gf_sendrecv(V);
+  start_sendrecv_gfield(V);
+  complete_sendrecv_gfield(V);
 
-  start_gf_sendrecv(Vprime);
-  complete_gf_sendrecv(Vprime);
+  start_sendrecv_gfield(Vprime);
+  complete_sendrecv_gfield(Vprime);
 
 #if defined(ROTATED_SF) || defined(BASIC_SF)
   apply_BCs_on_fundamental_gauge_field();
@@ -323,8 +324,8 @@ int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, 
     }
   }
 
-  start_gf_sendrecv(V);
-  complete_gf_sendrecv(V);
+  start_sendrecv_gfield(V);
+  complete_sendrecv_gfield(V);
 #if defined(ROTATED_SF) || defined(BASIC_SF)
   apply_BCs_on_fundamental_gauge_field();
 #endif
@@ -363,8 +364,8 @@ void WilsonFlow3(suNg_field *V, const double epsilon)
     }
   }
 
-  start_gf_sendrecv(V);
-  complete_gf_sendrecv(V);
+  start_sendrecv_gfield(V);
+  complete_sendrecv_gfield(V);
 #if defined(ROTATED_SF) || defined(BASIC_SF)
   apply_BCs_on_fundamental_gauge_field();
 #endif
@@ -383,8 +384,8 @@ void WilsonFlow3(suNg_field *V, const double epsilon)
     }
   }
 
-  start_gf_sendrecv(V);
-  complete_gf_sendrecv(V);
+  start_sendrecv_gfield(V);
+  complete_sendrecv_gfield(V);
 #if defined(ROTATED_SF) || defined(BASIC_SF)
   apply_BCs_on_fundamental_gauge_field();
 #endif
@@ -403,8 +404,8 @@ void WilsonFlow3(suNg_field *V, const double epsilon)
     }
   }
 
-  start_gf_sendrecv(V);
-  complete_gf_sendrecv(V);
+  start_sendrecv_gfield(V);
+  complete_sendrecv_gfield(V);
 #if defined(ROTATED_SF) || defined(BASIC_SF)
   apply_BCs_on_fundamental_gauge_field();
 #endif
@@ -422,8 +423,8 @@ void WilsonFlow3(suNg_field *V, const double epsilon)
     }
   }
 
-  start_gf_sendrecv(V);
-  complete_gf_sendrecv(V);
+  start_sendrecv_gfield(V);
+  complete_sendrecv_gfield(V);
 #if defined(ROTATED_SF) || defined(BASIC_SF)
   apply_BCs_on_fundamental_gauge_field();
 #endif

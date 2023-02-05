@@ -65,6 +65,19 @@ int main(int argc, char *argv[])
     return return_val;
 }
 
+#define round_up(val, modulo) ((val / modulo ) + 1) * modulo;
+
+#define sendbuf_length(_len) \
+    _len = 0; \
+    box_t *L = geometryBoxes->next; \
+    int m = 0; \
+    while (L && m < glattice.nbuffers_spinor) { \
+        sendbuf_len += round_up(boxEvenVolume(L->sendBox), THREADSIZE); \
+        sendbuf_len += round_up(boxOddVolume(L->sendBox), THREADSIZE); \
+        L = L->next; m++; \
+    }
+
+
 int test_sync_identical_to_cpu_spinor_field_f(geometry_descriptor *gd) 
 {
     lprintf("INFO", 0, " ======= TEST SPINOR FIELD ======= \n");
@@ -76,15 +89,8 @@ int test_sync_identical_to_cpu_spinor_field_f(geometry_descriptor *gd)
     gaussian_spinor_field(f);
     copy_to_gpu_spinor_field_f(f);
 
-    //gd = &glattice;
-    int sendbuf_len = 0;
-    box_t *L = geometryBoxes->next;
-    int m = 0;
-    while (L && m < glattice.nbuffers_spinor) 
-    {
-        sendbuf_len += boxVolume(L->sendBox);
-        L=L->next; m++;
-    }
+    int sendbuf_len;
+    sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
     sync_field(gd, sizeof(*(f->ptr)), 1, f->ptr, f->sendbuf_ptr);
@@ -92,7 +98,7 @@ int test_sync_identical_to_cpu_spinor_field_f(geometry_descriptor *gd)
     memcpy(sendbuf_cpu, f->sendbuf_ptr, sendbuf_len*sizeof(suNf_spinor));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
-    sync_gpu_spinor_field_f(f);
+    sync_spinor_field_f_gpu(f);
     suNf_spinor* sendbuf_gpu = (suNf_spinor*)malloc(sendbuf_len*sizeof(suNf_spinor));
     cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, sendbuf_len*sizeof(suNf_spinor), cudaMemcpyDeviceToHost);
 
@@ -105,8 +111,7 @@ int test_sync_identical_to_cpu_spinor_field_f(geometry_descriptor *gd)
         {
             suNf_spinor *spinor_cpu = sendbuf_cpu + j + gd->sbuf_start[i];
             suNf_spinor *in_block = sendbuf_gpu + gd->sbuf_start[i];
-            int stride = gd->sbuf_len[i];
-            read_gpu_suNf_spinor(stride, *(spinor_gpu), in_block, j, 0);
+            read_strided_spinor_field_f_gpu(spinor_gpu, in_block, j, 0);
 
             for (int k = 0; k < 4; ++k) 
             {
@@ -137,13 +142,7 @@ int test_sync_identical_to_cpu_spinor_field_f_flt(geometry_descriptor *gd)
 
     //gd = &glattice;
     int sendbuf_len = 0;
-    box_t *L = geometryBoxes->next;
-    int m = 0;
-    while (L && m < glattice.nbuffers_spinor) 
-    {
-        sendbuf_len += boxVolume(L->sendBox);
-        L=L->next; m++;
-    }
+    sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
     sync_field(gd, sizeof(*(f->ptr)), 1, f->ptr, f->sendbuf_ptr);
@@ -151,7 +150,7 @@ int test_sync_identical_to_cpu_spinor_field_f_flt(geometry_descriptor *gd)
     memcpy(sendbuf_cpu, f->sendbuf_ptr, sendbuf_len*sizeof(suNf_spinor_flt));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
-    sync_gpu_spinor_field_f_flt(f);
+    sync_spinor_field_f_flt_gpu(f);
     suNf_spinor_flt* sendbuf_gpu = (suNf_spinor_flt*)malloc(sendbuf_len*sizeof(suNf_spinor_flt));
     cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, sendbuf_len*sizeof(suNf_spinor_flt), cudaMemcpyDeviceToHost);
 
@@ -164,8 +163,7 @@ int test_sync_identical_to_cpu_spinor_field_f_flt(geometry_descriptor *gd)
         {
             suNf_spinor_flt *spinor_cpu = sendbuf_cpu + j + gd->sbuf_start[i];
             suNf_spinor_flt *in_block = sendbuf_gpu + gd->sbuf_start[i];
-            int stride = gd->sbuf_len[i];
-            read_gpu_suNf_spinor_flt(stride, *(spinor_gpu), in_block, j, 0);
+            read_strided_spinor_field_f_flt_gpu(spinor_gpu, in_block, j, 0);
 
             for (int k = 0; k < 4; ++k) 
             {
@@ -196,13 +194,7 @@ int test_sync_identical_to_cpu_sfield(geometry_descriptor *gd)
 
     //gd = &glattice;
     int sendbuf_len = 0;
-    box_t *L = geometryBoxes->next;
-    int m = 0;
-    while (L && m < glattice.nbuffers_spinor) 
-    {
-        sendbuf_len += boxVolume(L->sendBox);
-        L=L->next; m++;
-    }
+    sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
     sync_field(gd, sizeof(*(f->ptr)), 1, f->ptr, f->sendbuf_ptr);
@@ -210,7 +202,7 @@ int test_sync_identical_to_cpu_sfield(geometry_descriptor *gd)
     memcpy(sendbuf_cpu, f->sendbuf_ptr, sendbuf_len*sizeof(double));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
-    sync_gpu_sfield(f);
+    sync_sfield_gpu(f);
     double* sendbuf_gpu = (double*)malloc(sendbuf_len*sizeof(double));
     cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, sendbuf_len*sizeof(double), cudaMemcpyDeviceToHost);
 
@@ -223,7 +215,7 @@ int test_sync_identical_to_cpu_sfield(geometry_descriptor *gd)
         {
             double *spinor_cpu = sendbuf_cpu + j + gd->sbuf_start[i];
             double *in_block = sendbuf_gpu + gd->sbuf_start[i];
-            read_gpu_double(gd->sbuf_len[i], *(spinor_gpu), in_block, j, 0);
+            read_strided_sfield_gpu(spinor_gpu, in_block, j, 0);
             diff = (*spinor_cpu) - (*spinor_gpu);
         }
     }
@@ -247,13 +239,7 @@ int test_sync_identical_to_cpu_gfield()
 
     //gd = &glattice;
     int sendbuf_len = 0;
-    box_t *L = geometryBoxes->next;
-    int m = 0;
-    while (L && m < glattice.nbuffers_gauge) 
-    {
-        sendbuf_len += boxVolume(L->sendBox);
-        L=L->next; m++;
-    }
+    sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
     sync_field(f->type, 4*sizeof(*f->ptr), 0, f->ptr, f->sendbuf_ptr);
@@ -261,7 +247,7 @@ int test_sync_identical_to_cpu_gfield()
     memcpy(sendbuf_cpu, f->sendbuf_ptr, 4*sendbuf_len*sizeof(suNg));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
-    sync_gpu_gfield(f);
+    sync_gfield_gpu(f);
     suNg* sendbuf_gpu = (suNg*)malloc(4*sendbuf_len*sizeof(suNg));
     cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, 4*sendbuf_len*sizeof(suNg), cudaMemcpyDeviceToHost);
 
@@ -277,8 +263,7 @@ int test_sync_identical_to_cpu_gfield()
                 int offset = gd->sbuf_start[i];
                 suNg *mat_cpu = _4FIELD_AT_PTR(sendbuf_cpu, idx, mu, 0);
                 suNg *in_block = _4FIELD_AT_PTR(sendbuf_gpu, offset, 0, 0);
-                int stride = gd->sbuf_len[i];
-                read_gpu_suNg(stride, (*mat_gpu), in_block, j, mu);
+                read_strided_gfield_gpu(mat_gpu, in_block, j, mu);
 
                 for (int comp = 0; comp < NG*NG; ++comp) {
                     diff += creal((*mat_cpu).c[comp])-creal((*mat_gpu).c[comp]);
@@ -307,13 +292,7 @@ int test_sync_identical_to_cpu_gfield_f()
 
     //gd = &glattice;
     int sendbuf_len = 0;
-    box_t *L = geometryBoxes->next;
-    int m = 0;
-    while (L && m < glattice.nbuffers_gauge) 
-    {
-        sendbuf_len += boxVolume(L->sendBox);
-        L=L->next; m++;
-    }
+    sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
     sync_field(f->type, 4*sizeof(*f->ptr), 0, f->ptr, f->sendbuf_ptr);
@@ -321,7 +300,7 @@ int test_sync_identical_to_cpu_gfield_f()
     memcpy(sendbuf_cpu, f->sendbuf_ptr, 4*sendbuf_len*sizeof(suNf));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
-    sync_gpu_gfield_f(f);
+    sync_gfield_f_gpu(f);
     suNf* sendbuf_gpu = (suNf*)malloc(4*sendbuf_len*sizeof(suNf));
     cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, 4*sendbuf_len*sizeof(suNf), cudaMemcpyDeviceToHost);
 
@@ -337,8 +316,7 @@ int test_sync_identical_to_cpu_gfield_f()
                 int offset = gd->sbuf_start[i];
                 suNf *mat_cpu = _4FIELD_AT_PTR(sendbuf_cpu, idx, mu, 0);
                 suNf *in_block = _4FIELD_AT_PTR(sendbuf_gpu, offset, 0, 0);
-                int stride = gd->sbuf_len[i];
-                read_gpu_suNf(stride, (*mat_gpu), in_block, j, mu);
+                read_strided_gfield_f_gpu(mat_gpu, in_block, j, mu);
 
                 for (int comp = 0; comp < NF*NF; ++comp) {
                     diff += creal((*mat_cpu).c[comp])-creal((*mat_gpu).c[comp]);
@@ -367,13 +345,7 @@ int test_sync_identical_to_cpu_gfield_flt()
 
     //gd = &glattice;
     int sendbuf_len = 0;
-    box_t *L = geometryBoxes->next;
-    int m = 0;
-    while (L && m < glattice.nbuffers_gauge) 
-    {
-        sendbuf_len += boxVolume(L->sendBox);
-        L=L->next; m++;
-    }
+    sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
     sync_field(f->type, 4*sizeof(*f->ptr), 0, f->ptr, f->sendbuf_ptr);
@@ -381,7 +353,7 @@ int test_sync_identical_to_cpu_gfield_flt()
     memcpy(sendbuf_cpu, f->sendbuf_ptr, 4*sendbuf_len*sizeof(suNg_flt));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
-    sync_gpu_gfield_flt(f);
+    sync_gfield_flt_gpu(f);
     suNg_flt* sendbuf_gpu = (suNg_flt*)malloc(4*sendbuf_len*sizeof(suNg_flt));
     cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, 4*sendbuf_len*sizeof(suNg_flt), cudaMemcpyDeviceToHost);
 
@@ -397,8 +369,7 @@ int test_sync_identical_to_cpu_gfield_flt()
                 int offset = gd->sbuf_start[i];
                 suNg_flt *mat_cpu = _4FIELD_AT_PTR(sendbuf_cpu, idx, mu, 0);
                 suNg_flt *in_block = _4FIELD_AT_PTR(sendbuf_gpu, offset, 0, 0);
-                int stride = gd->sbuf_len[i];
-                read_gpu_suNg_flt(stride, (*mat_gpu), in_block, j, mu);
+                read_strided_gfield_flt_gpu(mat_gpu, in_block, j, mu);
 
                 for (int comp = 0; comp < NG*NG; ++comp) {
                     diff += creal((*mat_cpu).c[comp])-creal((*mat_gpu).c[comp]);
@@ -427,13 +398,7 @@ int test_sync_identical_to_cpu_gfield_f_flt()
 
     //gd = &glattice;
     int sendbuf_len = 0;
-    box_t *L = geometryBoxes->next;
-    int m = 0;
-    while (L && m < glattice.nbuffers_gauge) 
-    {
-        sendbuf_len += boxVolume(L->sendBox);
-        L=L->next; m++;
-    }
+    sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
     sync_field(f->type, 4*sizeof(*f->ptr), 0, f->ptr, f->sendbuf_ptr);
@@ -441,7 +406,7 @@ int test_sync_identical_to_cpu_gfield_f_flt()
     memcpy(sendbuf_cpu, f->sendbuf_ptr, 4*sendbuf_len*sizeof(suNf_flt));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
-    sync_gpu_gfield_f_flt(f);
+    sync_gfield_f_flt_gpu(f);
     suNf_flt* sendbuf_gpu = (suNf_flt*)malloc(4*sendbuf_len*sizeof(suNf_flt));
     cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, 4*sendbuf_len*sizeof(suNf_flt), cudaMemcpyDeviceToHost);
 
@@ -457,8 +422,7 @@ int test_sync_identical_to_cpu_gfield_f_flt()
                 int offset = gd->sbuf_start[i];
                 suNf_flt *mat_cpu = _4FIELD_AT_PTR(sendbuf_cpu, idx, mu, 0);
                 suNf_flt *in_block = _4FIELD_AT_PTR(sendbuf_gpu, offset, 0, 0);
-                int stride = gd->sbuf_len[i];
-                read_gpu_suNf_flt(stride, (*mat_gpu), in_block, j, mu);
+                read_strided_gfield_f_flt_gpu(mat_gpu, in_block, j, mu);
 
                 for (int comp = 0; comp < NF*NF; ++comp) {
                     diff += creal((*mat_cpu).c[comp])-creal((*mat_gpu).c[comp]);
@@ -487,13 +451,7 @@ int test_sync_identical_to_cpu_suNg_scalar_field()
 
     //gd = &glattice;
     int sendbuf_len = 0;
-    box_t *L = geometryBoxes->next;
-    int m = 0;
-    while (L && m < glattice.nbuffers_gauge) 
-    {
-        sendbuf_len += boxVolume(L->sendBox);
-        L=L->next; m++;
-    }
+    sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
     sync_field(f->type, sizeof(*(f->ptr)), 0, f->ptr, f->sendbuf_ptr);
@@ -501,7 +459,7 @@ int test_sync_identical_to_cpu_suNg_scalar_field()
     memcpy(sendbuf_cpu, f->sendbuf_ptr, sendbuf_len*sizeof(suNg_vector));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
-    sync_gpu_suNg_scalar_field(f);
+    sync_suNg_scalar_field_gpu(f);
     suNg_vector* sendbuf_gpu = (suNg_vector*)malloc(sendbuf_len*sizeof(suNg_vector));
     cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, sendbuf_len*sizeof(suNg_vector), cudaMemcpyDeviceToHost);
 
@@ -516,8 +474,7 @@ int test_sync_identical_to_cpu_suNg_scalar_field()
             int offset = gd->sbuf_start[i];
             suNg_vector *mat_cpu = _FIELD_AT_PTR(sendbuf_cpu, idx, 0);
             suNg_vector *in_block = _FIELD_AT_PTR(sendbuf_gpu, offset, 0);
-            int stride = gd->sbuf_len[i];
-            read_gpu_suNg_vector(stride, (*mat_gpu), in_block, j, 0);
+            read_strided_suNg_scalar_field_gpu(mat_gpu, in_block, j, 0);
 
             for (int comp = 0; comp < NG; ++comp) {
                 diff += creal((*mat_cpu).c[comp])-creal((*mat_gpu).c[comp]);
@@ -545,13 +502,7 @@ int test_sync_identical_to_cpu_avfield()
 
     //gd = &glattice;
     int sendbuf_len = 0;
-    box_t *L = geometryBoxes->next;
-    int m = 0;
-    while (L && m < glattice.nbuffers_gauge) 
-    {
-        sendbuf_len += boxVolume(L->sendBox);
-        L=L->next; m++;
-    }
+    sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
     sync_field(f->type, 4*sizeof(*(f->ptr)), 0, f->ptr, f->sendbuf_ptr);
@@ -559,7 +510,7 @@ int test_sync_identical_to_cpu_avfield()
     memcpy(sendbuf_cpu, f->sendbuf_ptr, 4*sendbuf_len*sizeof(suNg_algebra_vector));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
-    sync_gpu_avfield(f);
+    sync_avfield_gpu(f);
     suNg_algebra_vector* sendbuf_gpu = (suNg_algebra_vector*)malloc(4*sendbuf_len*sizeof(suNg_algebra_vector));
     cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, 4*sendbuf_len*sizeof(suNg_algebra_vector), cudaMemcpyDeviceToHost);
 
@@ -574,8 +525,7 @@ int test_sync_identical_to_cpu_avfield()
             int offset = gd->sbuf_start[i];
             suNg_algebra_vector *mat_cpu = _4FIELD_AT_PTR(sendbuf_cpu, idx, 0, 0);
             suNg_algebra_vector *in_block = _4FIELD_AT_PTR(sendbuf_gpu, offset, 0, 0);
-            int stride = gd->sbuf_len[i];
-            read_gpu_suNg_algebra_vector(stride, (*mat_gpu), in_block, j, 0);
+            read_strided_avfield_gpu(mat_gpu, in_block, j, 0);
 
             for (int comp = 0; comp < NG*NG-1; ++comp) {
                 diff += creal((*mat_cpu).c[comp])-creal((*mat_gpu).c[comp]);
@@ -603,13 +553,7 @@ int test_sync_identical_to_cpu_gtransf()
 
     //gd = &glattice;
     int sendbuf_len = 0;
-    box_t *L = geometryBoxes->next;
-    int m = 0;
-    while (L && m < glattice.nbuffers_gauge) 
-    {
-        sendbuf_len += boxVolume(L->sendBox);
-        L=L->next; m++;
-    }
+    sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
     sync_field(f->type, sizeof(*(f->ptr)), 0, f->ptr, f->sendbuf_ptr);
@@ -617,7 +561,7 @@ int test_sync_identical_to_cpu_gtransf()
     memcpy(sendbuf_cpu, f->sendbuf_ptr, sendbuf_len*sizeof(suNg));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
-    sync_gpu_gtransf(f);
+    sync_gtransf_gpu(f);
     suNg* sendbuf_gpu = (suNg*)malloc(sendbuf_len*sizeof(suNg));
     cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, sendbuf_len*sizeof(suNg), cudaMemcpyDeviceToHost);
 
@@ -632,8 +576,7 @@ int test_sync_identical_to_cpu_gtransf()
             int offset = gd->sbuf_start[i];
             suNg *mat_cpu = _FIELD_AT_PTR(sendbuf_cpu, idx, 0);
             suNg *in_block = _FIELD_AT_PTR(sendbuf_gpu, offset, 0);
-            int stride = gd->sbuf_len[i];
-            read_gpu_suNg(stride, (*mat_gpu), in_block, j, 0);
+            read_strided_gtransf_gpu(mat_gpu, in_block, j, 0);
 
             for (int comp = 0; comp < NG*NG; ++comp) {
                 diff += creal((*mat_cpu).c[comp])-creal((*mat_gpu).c[comp]);
@@ -660,13 +603,7 @@ int test_sync_identical_to_cpu_clover_ldl()
 
     //gd = &glattice;
     int sendbuf_len = 0;
-    box_t *L = geometryBoxes->next;
-    int m = 0;
-    while (L && m < glattice.nbuffers_gauge) 
-    {
-        sendbuf_len += boxVolume(L->sendBox);
-        L=L->next; m++;
-    }
+    sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
     sync_field(f->type, sizeof(*(f->ptr)), 0, f->ptr, f->sendbuf_ptr);
@@ -674,7 +611,7 @@ int test_sync_identical_to_cpu_clover_ldl()
     memcpy(sendbuf_cpu, f->sendbuf_ptr, sendbuf_len*sizeof(ldl_t));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
-    sync_gpu_clover_ldl(f);
+    sync_clover_ldl_gpu(f);
     ldl_t* sendbuf_gpu = (ldl_t*)malloc(sendbuf_len*sizeof(ldl_t));
     cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, sendbuf_len*sizeof(ldl_t), cudaMemcpyDeviceToHost);
 
@@ -689,8 +626,7 @@ int test_sync_identical_to_cpu_clover_ldl()
             int offset = gd->sbuf_start[i];
             ldl_t *mat_cpu = _FIELD_AT_PTR(sendbuf_cpu, idx, 0);
             ldl_t *in_block = _FIELD_AT_PTR(sendbuf_gpu, offset, 0);
-            int stride = gd->sbuf_len[i];
-            read_gpu_ldl_t(stride, (*mat_gpu), in_block, j, 0);
+            read_strided_clover_ldl_gpu(mat_gpu, in_block, j, 0);
 
             for (int comp = 0; comp < NF*(2*NF-1); ++comp) {
                 diff += creal((*mat_cpu).up[comp])-creal((*mat_gpu).up[comp]);
@@ -719,13 +655,7 @@ int test_sync_identical_to_cpu_clover_term()
 
     //gd = &glattice;
     int sendbuf_len = 0;
-    box_t *L = geometryBoxes->next;
-    int m = 0;
-    while (L && m < glattice.nbuffers_gauge) 
-    {
-        sendbuf_len += boxVolume(L->sendBox);
-        L=L->next; m++;
-    }
+    sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
     sync_field(f->type, 4*sizeof(*f->ptr), 0, f->ptr, f->sendbuf_ptr);
@@ -733,7 +663,7 @@ int test_sync_identical_to_cpu_clover_term()
     memcpy(sendbuf_cpu, f->sendbuf_ptr, 4*sendbuf_len*sizeof(suNfc));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
-    sync_gpu_clover_term(f);
+    sync_clover_term_gpu(f);
     suNfc* sendbuf_gpu = (suNfc*)malloc(4*sendbuf_len*sizeof(suNfc));
     cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, 4*sendbuf_len*sizeof(suNfc), cudaMemcpyDeviceToHost);
 
@@ -749,8 +679,7 @@ int test_sync_identical_to_cpu_clover_term()
                 int offset = gd->sbuf_start[i];
                 suNfc *mat_cpu = _4FIELD_AT_PTR(sendbuf_cpu, idx, mu, 0);
                 suNfc *in_block = _4FIELD_AT_PTR(sendbuf_gpu, offset, 0, 0);
-                int stride = gd->sbuf_len[i];
-                read_gpu_suNfc(stride, (*mat_gpu), in_block, j, mu);
+                read_strided_clover_term_gpu(mat_gpu, in_block, j, mu);
 
                 for (int comp = 0; comp < NG*NG; ++comp) {
                     diff += creal((*mat_cpu).c[comp])-creal((*mat_gpu).c[comp]);
@@ -779,13 +708,7 @@ int test_sync_identical_to_cpu_clover_force()
 
     //gd = &glattice;
     int sendbuf_len = 0;
-    box_t *L = geometryBoxes->next;
-    int m = 0;
-    while (L && m < glattice.nbuffers_gauge) 
-    {
-        sendbuf_len += boxVolume(L->sendBox);
-        L=L->next; m++;
-    }
+    sendbuf_length(sendbuf_len);
 
     // Sync to buffer on CPU and save the sendbuffer in an array
     sync_field(f->type, 6*sizeof(*f->ptr), 0, f->ptr, f->sendbuf_ptr);
@@ -793,7 +716,7 @@ int test_sync_identical_to_cpu_clover_force()
     memcpy(sendbuf_cpu, f->sendbuf_ptr, 6*sendbuf_len*sizeof(suNf));
 
     // Sync to buffer on GPU and save the sendbuffer in another array
-    sync_gpu_clover_force(f);
+    sync_clover_force_gpu(f);
     suNf* sendbuf_gpu = (suNf*)malloc(6*sendbuf_len*sizeof(suNf));
     cudaMemcpy(sendbuf_gpu, f->sendbuf_gpu_ptr, 6*sendbuf_len*sizeof(suNf), cudaMemcpyDeviceToHost);
 
@@ -809,8 +732,7 @@ int test_sync_identical_to_cpu_clover_force()
                 int offset = gd->sbuf_start[i];
                 suNf *mat_cpu = _6FIELD_AT_PTR(sendbuf_cpu, idx, mu, 0);
                 suNf *in_block = _6FIELD_AT_PTR(sendbuf_gpu, offset, 0, 0);
-                int stride = gd->sbuf_len[i];
-                read_gpu_suNf(stride, (*mat_gpu), in_block, j, mu);
+                read_strided_clover_force_gpu(mat_gpu, in_block, j, mu);
 
                 for (int comp = 0; comp < NG*NG; ++comp) {
                     diff += creal((*mat_cpu).c[comp])-creal((*mat_gpu).c[comp]);

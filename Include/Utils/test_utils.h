@@ -81,6 +81,7 @@ double sqnorm_clover_force_cpu(suNf_field*);
 
 // SET ZERO
 void zero_gfield_cpu(suNg_field*);
+void zero_sfield_cpu(scalar_field*);
 void zero_gfield_f_cpu(suNf_field*);
 void zero_gfield_flt_cpu(suNg_field_flt*);
 void zero_gfield_f_flt_cpu(suNf_field_flt*);
@@ -90,9 +91,6 @@ void zero_gtransf_cpu(suNg_field*);
 void zero_clover_ldl_cpu(ldl_field*);
 void zero_clover_term_cpu(suNfc_field*);
 void zero_clover_force_cpu(suNf_field*);
-
-// DOUBLE PRECISION TO SINGLE PRECISION
-void sync_single_precision_gauge_field();
 
 #ifdef __cplusplus
     }

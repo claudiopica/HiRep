@@ -1,3 +1,8 @@
+/**
+ * @file scalarfield_operations.h
+ * @brief Linear algebra operations for scalar fields
+ */
+
 #ifndef SCALARFIELD_OPERATIONS_H
 #define SCALARFIELD_OPERATIONS_H
 

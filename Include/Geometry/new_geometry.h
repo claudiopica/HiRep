@@ -3,6 +3,10 @@
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
+/// Headerfile for:
+/// - new_geom.c
+/// - sync_to_buffer.cu
+
 /**
  * @file new_geometry.h
  * @brief Functions needed for the new geometry implementation that
@@ -78,24 +82,24 @@ int boxEvenVolume(box_t *B);
 int boxOddVolume(box_t *B);
 int boxVolume(box_t*);
 
-#define _DECLARE_SYNC_TO_BUFFER(_name, _type) \
-    void sync_box_to_buffer_gpu_##_name(geometry_descriptor*,box_t*,void*,void*); \
-    void sync_field_to_buffer_##_name(geometry_descriptor*,void*,void*);
+#define _DECLARE_SYNC_TO_BUFFER(_name, _field_type, _type) \
+    void sync_box_to_buffer_gpu_##_name(geometry_descriptor*,box_t*,_field_type*,void*);
 
-_DECLARE_SYNC_TO_BUFFER(spinor_field_f, suNf_spinor);
-_DECLARE_SYNC_TO_BUFFER(spinor_field_f_flt, suNf_spinor_flt);
-_DECLARE_SYNC_TO_BUFFER(sfield, double);
+_DECLARE_SYNC_TO_BUFFER(spinor_field_f, spinor_field, suNf_spinor);
+_DECLARE_SYNC_TO_BUFFER(spinor_field_f_flt, spinor_field_flt, suNf_spinor_flt);
+_DECLARE_SYNC_TO_BUFFER(sfield, scalar_field, double);
 
-_DECLARE_SYNC_TO_BUFFER(gfield, suNg);
-_DECLARE_SYNC_TO_BUFFER(gfield_f, suNf);
-_DECLARE_SYNC_TO_BUFFER(gfield_flt, suNg_flt);
-_DECLARE_SYNC_TO_BUFFER(gfield_f_flt, suNf_flt);
-_DECLARE_SYNC_TO_BUFFER(suNg_scalar_field, suNg_vector);
-_DECLARE_SYNC_TO_BUFFER(avfield, suNg_algebra_vector);
-_DECLARE_SYNC_TO_BUFFER(gtransf, suNg);
-_DECLARE_SYNC_TO_BUFFER(clover_ldl, ldl_t);
-_DECLARE_SYNC_TO_BUFFER(clover_term, suNfc);
-_DECLARE_SYNC_TO_BUFFER(clover_force, suNf);
+_DECLARE_SYNC_TO_BUFFER(gfield, suNg_field, suNg);
+_DECLARE_SYNC_TO_BUFFER(gfield_f, suNf_field, suNf);
+_DECLARE_SYNC_TO_BUFFER(gfield_flt, suNg_field_flt, suNg_flt);
+_DECLARE_SYNC_TO_BUFFER(gfield_f_flt, suNf_field_flt, suNf_flt);
+_DECLARE_SYNC_TO_BUFFER(suNg_scalar_field, suNg_scalar_field, suNg_vector);
+_DECLARE_SYNC_TO_BUFFER(avfield, suNg_av_field, suNg_algebra_vector);
+_DECLARE_SYNC_TO_BUFFER(gtransf, suNg_field, suNg);
+_DECLARE_SYNC_TO_BUFFER(clover_ldl, ldl_field, ldl_t);
+_DECLARE_SYNC_TO_BUFFER(clover_term, suNfc_field, suNfc);
+_DECLARE_SYNC_TO_BUFFER(clover_force, suNf_field, suNf);
+_DECLARE_SYNC_TO_BUFFER(staple_field, suNg_field, suNg);
 
 #ifdef __cplusplus
     }

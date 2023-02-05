@@ -4,6 +4,8 @@
 #include "Utils/HYP_smearing.h"
 #include "io.h"
 #include <string.h>
+#include "geometry.h"
+#include "inverters.h"
 
 #if defined(ROTATED_SF) && defined(BASIC_SF)
 #error This code does not work with the Schroedinger functional
@@ -349,13 +351,13 @@ void WL_Hamiltonian_gauge(suNg_field* out, suNg_field* in) {
       }
     }
   }
-  start_gt_sendrecv(ws_gtf[1]);
+  start_sendrecv_gtransf(ws_gtf[1]);
   
   _PIECE_FOR(&glattice,ixp) {
     suNg tmp;
     if(ixp==glattice.inner_master_pieces) {
       _OMP_PRAGMA( master )
-      complete_gt_sendrecv(ws_gtf[1]);
+      complete_sendrecv_gtransf(ws_gtf[1]);
       _OMP_PRAGMA( barrier )
     }
     _SITE_FOR(&glattice,ixp,ix) {
@@ -366,8 +368,8 @@ void WL_Hamiltonian_gauge(suNg_field* out, suNg_field* in) {
     } /* SITE_FOR */
   } /* PIECE FOR */
 
-  start_gf_sendrecv(out);
-  complete_gf_sendrecv(out);
+  start_sendrecv_gfield(out);
+  complete_sendrecv_gfield(out);
 }
 
 

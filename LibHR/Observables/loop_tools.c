@@ -15,8 +15,8 @@
 #include "utils.h"
 #include "memory.h"
 #include "Update/copy_gfield.h"
-#include "Inverters/linear_algebra.h"
 #include "Update/representation.h"
+#include "inverters.h"
 
 #if ( !defined(ROTATED_SF) && !defined(BASIC_SF) && !defined(FERMION_THETA) )
 

@@ -1,7 +1,5 @@
 /*******************************************************************************
 *
-* NOCOMPILE= WITH_GPU
-*
 * Check communication of gauge field in T direction
 *
 *******************************************************************************/
@@ -27,6 +25,9 @@ void spinor_field_one_f(spinor_field *s1) {
     for (int i=0;i<size;i++) {
         p[i] = 1.0;
     }
+    #ifdef WITH_GPU
+        copy_to_gpu_spinor_field_f(s1);
+    #endif
 }
 
 int main(int argc, char *argv[])
@@ -49,9 +50,9 @@ int main(int argc, char *argv[])
     spinor_field_one_f(even);
     spinor_field_one_f(odd);
 
-    start_sf_sendrecv(in); complete_sf_sendrecv(in); 
-    start_sf_sendrecv(even); complete_sf_sendrecv(even); 
-    start_sf_sendrecv(odd); complete_sf_sendrecv(odd); 
+    start_sendrecv_spinor_field_f(in); complete_sendrecv_spinor_field_f(in); 
+    start_sendrecv_spinor_field_f(even); complete_sendrecv_spinor_field_f(even); 
+    start_sendrecv_spinor_field_f(odd); complete_sendrecv_spinor_field_f(odd); 
 
 
     double in_norm = spinor_field_sqnorm_f(in);

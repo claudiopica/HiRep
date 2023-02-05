@@ -3,11 +3,21 @@
 * All rights reserved.                                                      *
 \***************************************************************************/
 
+/// Headerfile for:
+/// - linear_algebra.c
+/// - linear_algebra_gpu.cu
+
+/**
+ * @file linear_algebra.h
+ * @brief Linear algebra operations on spinors both for CPU and with GPU
+ */
+
 #ifndef LINEAR_ALGEBRA_H
 #define LINEAR_ALGEBRA_H
 
+#include "libhr_core.h"
 #include "hr_complex.h"
-#include "spinor_field.h"
+#include "Utils/generics.h"
 
 #ifdef __cplusplus
   extern "C" {

@@ -8,6 +8,7 @@
 #include "libhr_core.h"
 #include "memory.h"
 #include "utils.h"
+#include "geometry.h"
 
 
 #define _print_avect(a) printf("(%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e,%3.5e)\n", (a).c1, (a).c2, (a).c3, (a).c4, (a).c5, (a).c6, (a).c7, (a).c8)
@@ -273,7 +274,7 @@ static void force_clover_core(double dt)
 	double coeff = dt * (_REPR_NORM2 / _FUND_NORM2) * (1. / 8.) * get_csw();
 
 	// Communicate forces
-	start_clover_force_sendrecv(cl_force);
+	start_sendrecv_clover_force(cl_force);
 
 	// Loop over lattice
 	_PIECE_FOR(&glattice, xp)
@@ -282,7 +283,7 @@ static void force_clover_core(double dt)
 		{
 			_OMP_PRAGMA(master)
 			{
-				complete_clover_force_sendrecv(cl_force);
+				complete_sendrecv_clover_force(cl_force);
 			}
 			_OMP_PRAGMA(barrier)
 		}
@@ -816,10 +817,10 @@ void force_fermion_core(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, d
 #endif //UPDATE_EO
 
 	// Communicate spinor field
-	start_sf_sendrecv(Xs);
-	complete_sf_sendrecv(Xs);
-	start_sf_sendrecv(Ys);
-	complete_sf_sendrecv(Ys);
+	start_sendrecv_spinor_field_f(Xs);
+	complete_sendrecv_spinor_field_f(Xs);
+	start_sendrecv_spinor_field_f(Ys);
+	complete_sendrecv_spinor_field_f(Ys);
 
 	// HERE!!!!!
 #if defined(WITH_CLOVER)
@@ -947,8 +948,8 @@ void force_fermion_core(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, d
 #endif
 
 	// Communicate spinor field
-	start_sf_sendrecv(Xs);
-	start_sf_sendrecv(Ys);
+	start_sendrecv_spinor_field_f(Xs);
+	start_sendrecv_spinor_field_f(Ys);
 
 	// HERE!!!!!
 #if defined(WITH_CLOVER)
@@ -972,8 +973,8 @@ void force_fermion_core(spinor_field *Xs, spinor_field *Ys, int auto_fill_odd, d
 		{
 			_OMP_PRAGMA(master)
 			{
-				complete_sf_sendrecv(Xs);
-				complete_sf_sendrecv(Ys);
+				complete_sendrecv_spinor_field_f(Xs);
+				complete_sendrecv_spinor_field_f(Ys);
 			}
 			_OMP_PRAGMA(barrier)
 		}

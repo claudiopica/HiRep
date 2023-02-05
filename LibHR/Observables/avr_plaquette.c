@@ -16,6 +16,8 @@
 #include "io.h"
 #include "memory.h"
 #include "utils.h"
+#include "geometry.h"
+#include "inverters.h"
 
 double plaq(int ix, int mu, int nu)
 {
@@ -95,7 +97,7 @@ double avr_plaquette()
     {
       _OMP_PRAGMA(master)
       /* wait for gauge field to be transfered */
-      complete_gf_sendrecv(u_gauge);
+      complete_sendrecv_gfield(u_gauge);
       _OMP_PRAGMA(barrier)
     }
     _SITE_FOR_SUM(&glattice, ixp, ix, pa)
@@ -181,7 +183,7 @@ void full_plaquette()
     {
       _OMP_PRAGMA(master)
       /* wait for gauge field to be transfered */
-      complete_gf_sendrecv(u_gauge);
+      complete_sendrecv_gfield(u_gauge);
       _OMP_PRAGMA(barrier)
     }
 
@@ -364,7 +366,7 @@ hr_complex avr_plaquette_wrk()
 {
   static hr_complex pa, tmp;
   suNg_field *_u = u_gauge_wrk();
-  start_gf_sendrecv(_u);
+  start_sendrecv_gfield(_u);
 
   _OMP_PRAGMA(single)
   {
@@ -377,7 +379,7 @@ hr_complex avr_plaquette_wrk()
     {
       _OMP_PRAGMA(master)
       /* wait for gauge field to be transfered */
-      complete_gf_sendrecv(_u);
+      complete_sendrecv_gfield(_u);
       _OMP_PRAGMA(barrier)
     }
     _SITE_FOR_SUM(&glattice, ixp, ix, pa)

@@ -1,7 +1,5 @@
 /******************************************************************************
 *
-* NOCOMPILE= WITH_GPU
-*
 * Test of hermiticity
 *
 ******************************************************************************/
@@ -49,6 +47,8 @@ int test_herm(spinor_operator S, char *name)
   gaussian_spinor_field(s2);
   S(s3, s1);
   S(s4, s2);
+  lprintf("SANITY CHECK", 0, "sqnorm s3: %0.2e\n", spinor_field_sqnorm_f(s3));
+  lprintf("SANITY CHECK", 0, "sqnorm s4: %0.2e\n", spinor_field_sqnorm_f(s4));
 
   tau = spinor_field_prod_re_f(s2, s3);
   tau -= spinor_field_prod_re_f(s4, s1);
@@ -62,7 +62,8 @@ int test_herm(spinor_operator S, char *name)
     return_val = 1;
   }
   else
-    lprintf("RESULT", 0, "OK ");
+
+  lprintf("RESULT", 0, "OK ");
   lprintf("RESULT", 0, "[norm = %e]\n", tau);
 
   free_spinor_field_f(s1);
@@ -74,23 +75,18 @@ int main(int argc, char *argv[])
   int return_value;
   /* setup process id and communications */
   logger_map("DEBUG", "debug");
-
   setup_process(&argc, &argv);
-
   setup_gauge_fields();
 
   lprintf("MAIN", 0, "Generating a random gauge field... ");
   random_u(u_gauge);
   lprintf("MAIN", 0, "done.\n");
 
-  start_gf_sendrecv(u_gauge);
-
+  start_sendrecv_gfield(u_gauge);
   represent_gauge_field();
-
   return_value=test_herm(&MM, "M");
 
   finalize_process();
-
   return return_value;
 }
 

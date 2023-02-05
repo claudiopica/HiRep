@@ -1,0 +1,186 @@
+/***************************************************************************\
+* Copyright (c) 2008, 2022, Claudio Pica, Sofie Martins                     *   
+* All rights reserved.                                                      * 
+\***************************************************************************/
+ 
+/**
+ * @file field_alloc.c.tmpl
+ * @brief Generics for allocation and free functions for all fields defined in spinor_field.h
+ */
+
+#include "memory.h"
+#include "libhr_core.h"
+#include "Utils/generics.h"
+
+#if !defined _FIELD_NAME
+#error Missing _FIELD_NAME in memory.c
+#endif
+#if !defined _FIELD_TYPE
+#error Missing _FIELD_TYPE in memory.c
+#endif
+#if !defined _SITE_TYPE
+#error Missing _SITE_TYPE in memory.c
+#endif
+#if !defined _FIELD_DIM
+#error Missing _FIELD_DIM in memory.c
+#endif
+#if !defined _IS_SPINOR_LIKE
+#error Missing _IS_SPINOR_LIKE in memory.c
+#endif
+
+#define _F_ARGS(_name,_args) _FIELD_TYPE* _F_NAME(_name,_FIELD_NAME) _args
+
+// This is necessary, because spinor-like fields have an additional argument 
+// in the allocation function
+#if _IS_SPINOR_LIKE==0
+    #define _n 1
+    #define _GEOM_TYPE gauge
+    #define _ALLOCATE _F_ARGS(alloc_,(geometry_descriptor *type))
+#else
+    #define _n n
+    #define _GEOM_TYPE spinor
+    #define _ALLOCATE _F_ARGS(alloc_,(unsigned int n, geometry_descriptor *type))
+#endif
+
+#define _DECLARE(_name,_args) _FUNC(void, _name, _FIELD_NAME, _args)
+#define _DECLARE_STATIC(_name,_args) _FUNC(static void, _name, _FIELD_NAME, _args)
+#define _CALL(_name) _F_NAME(_name,_FIELD_NAME)
+
+_DECLARE_STATIC(allocate_field_struct_,(unsigned int n, _FIELD_TYPE** f, geometry_descriptor *type)) {
+    *f = amalloc(n * sizeof(_FIELD_TYPE), ALIGN);
+    error(f == NULL, 1, __func__, "Could not allocate memory space for field structure");
+    for (int i = 0; i < n; ++i) { (*f)[i].type = type; }
+}
+
+_DECLARE_STATIC(allocate_cpu_field_data_,(unsigned int n, _FIELD_TYPE *f, geometry_descriptor *type)) {
+    if (alloc_mem_t & CPU_MEM) {
+        int bytes_per_site = sizeof(_SITE_TYPE);
+        int number_of_sites = n * _FIELD_DIM * _NUMBER_OF_SITES(_GEOM_TYPE);
+        size_t field_size  = bytes_per_site * number_of_sites;
+        f->ptr = amalloc(field_size, ALIGN);
+        error((f->ptr) == NULL, 1,  __func__, "Could not allocate memory space for field (data).");
+        for (int i = 1; i < n; ++i) {
+            f[i].ptr = f[i-1].ptr + _NUMBER_OF_SITES(_GEOM_TYPE) * _FIELD_DIM;
+        }
+    } else {
+        for (int i = 0; i < n; ++i) { f[i].ptr = NULL; }
+    }
+}
+
+_DECLARE_STATIC(assign_comm_type_,(unsigned int n, _FIELD_TYPE *f)) {
+    for (int i = 0; i < n; ++i) {
+        f[i].comm_type = std_comm_t;
+    }
+}
+
+_DECLARE_STATIC(assign_geometry_descriptor_,(unsigned int n, _FIELD_TYPE *f, geometry_descriptor *type)) {
+    for (int i = 0; i < n; ++i) { f[i].type = type; }
+}
+
+_DECLARE_STATIC(free_gpu_field_data_,(_FIELD_TYPE *f)) {
+    #ifdef WITH_GPU
+    if (f->gpu_ptr != NULL) { cudaFree(f->gpu_ptr); }
+    #endif
+}
+
+_DECLARE_STATIC(allocate_gpu_field_data_, (unsigned int n, _FIELD_TYPE *f, geometry_descriptor *type)) {
+    #ifdef WITH_GPU
+    if (alloc_mem_t & GPU_MEM) {
+        cudaError_t err;
+        int bytes_per_site = sizeof(_SITE_TYPE);
+        int number_of_sites = n * _FIELD_DIM * _NUMBER_OF_SITES(_GEOM_TYPE);
+        size_t field_size = number_of_sites * bytes_per_site;
+        err = cudaMalloc((void **)&(f->gpu_ptr), field_size);
+        error(err != cudaSuccess, 1, __func__, "Could not allocate GPU memory space for field");
+        /* For spinors: Map the elements of the spinor arrays to the
+        starting points in the previously allocated space */
+        for (int i = 1; i < n; ++i) 
+            f[i].gpu_ptr = f[i-1].gpu_ptr + _NUMBER_OF_SITES(_GEOM_TYPE) * _FIELD_DIM;
+    } else {
+        for (int i = 0; i < n; ++i) { f[i].gpu_ptr = NULL; }
+    }
+    #endif
+}
+
+#ifdef WITH_MPI
+_DECLARE_STATIC(allocate_sendbuffer_,(_FIELD_TYPE *f, int i)) {
+    #ifdef WITH_NEW_GEOMETRY
+        f[i].sendbuf_ptr = sendbuf_alloc(_FIELD_DIM * sizeof(_SITE_TYPE));
+    #else 
+        f[i].sendbuf_ptr = f[i].ptr;
+    #endif
+
+    #ifdef WITH_GPU
+    #ifdef WITH_NEW_GEOMETRY
+        f[i].sendbuf_gpu_ptr = sendbuf_alloc_gpu(_FIELD_DIM * sizeof(_SITE_TYPE));
+    #else
+        f[i].sendbuf_gpu_ptr = f[i].gpu_ptr;
+    #endif
+    #endif
+}
+#endif
+
+_DECLARE_STATIC(free_mpi_field_data_, (_FIELD_TYPE *f)) {
+    #ifdef WITH_MPI
+    if (f->comm_req != NULL) { afree(f->comm_req); }
+    #endif
+}
+
+_DECLARE_STATIC(allocate_mpi_field_data_, (unsigned int n, _FIELD_TYPE *f, geometry_descriptor *type)) {
+    #ifdef WITH_MPI
+    if ((_NUMBER_OF_BUFFERS(_GEOM_TYPE)) > 0) {
+        int number_of_requests = n * 2 * _NUMBER_OF_BUFFERS(_GEOM_TYPE);
+        f->comm_req = amalloc(number_of_requests * sizeof(MPI_Request), ALIGN);
+        error((f->comm_req) == NULL, 1, __func__, "Could not allocate memory space for field (MPI).\n");
+        for (int ix = 0; ix < number_of_requests; ++ix) { f->comm_req[ix] = MPI_REQUEST_NULL; }
+        for (int i = 1; i < n; ++i) { f[i].comm_req = f[i-1].comm_req + 2 * _NUMBER_OF_BUFFERS(_GEOM_TYPE); }
+        for (int i = 0; i < n; ++i) { _CALL(allocate_sendbuffer_)(f, i); }
+    } else {  
+        f->comm_req = NULL;
+    }
+    #endif
+}
+
+_DECLARE(free_, (_FIELD_TYPE *f)) {
+    if (f != NULL) {
+        if (f->ptr != NULL) { afree(f->ptr); }
+        _CALL(free_gpu_field_data_) (f);
+        _CALL(free_mpi_field_data_) (f);
+        afree(f);
+        f = NULL;
+    }
+}
+
+_ALLOCATE {
+    _FIELD_TYPE *f;
+    
+    _F_NAME(allocate_field_struct_,_FIELD_NAME) (_n, &f, type);
+    _F_NAME(assign_geometry_descriptor_,_FIELD_NAME) (_n, f, type);
+    _F_NAME(assign_comm_type_,_FIELD_NAME) (_n, f);
+    _F_NAME(allocate_cpu_field_data_,_FIELD_NAME) (_n, f, type);
+    _F_NAME(allocate_gpu_field_data_,_FIELD_NAME) (_n, f, type);
+    _F_NAME(allocate_mpi_field_data_,_FIELD_NAME) (_n, f, type);
+    return f;
+}
+
+// Local
+#undef _DECLARE
+#undef _DECLARE_STATIC
+#undef _CALL
+#undef _F_ARGS
+#undef _ALLOCATE
+#undef _n
+#undef _GEOM_TYPE
+
+// Template paramters
+#undef _FIELD_NAME
+#undef _FIELD_TYPE
+#undef _SITE_TYPE
+#undef _FIELD_DIM
+#undef _IS_SPINOR_LIKE
+
+
+
+
+
+

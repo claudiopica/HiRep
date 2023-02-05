@@ -8,7 +8,7 @@
 
 #include "Inverters/linear_algebra.h"
 #include "Inverters/linear_solvers.h"
-#include "Inverters/global_sum_gpu.h"
+#include "Inverters/global_sum.h"
 #include "Inverters/precise_sums.h"
 #include "Inverters/scalarfield_operations.h"
 #include "Inverters/test_complex.h"

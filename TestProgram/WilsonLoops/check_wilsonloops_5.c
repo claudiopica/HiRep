@@ -20,8 +20,8 @@ int main(int argc,char *argv[])
   suNg* poly=amalloc(sizeof(suNg)*X*Y*Z,ALIGN);
 
   random_u(u_gauge);
-  start_gf_sendrecv(u_gauge);
-  complete_gf_sendrecv(u_gauge);
+  start_sendrecv_gfield(u_gauge);
+  complete_sendrecv_gfield(u_gauge);
 
   double st_plaq_ave;
   double st_plaq[3];

@@ -7,6 +7,7 @@
 #include "libhr_core.h"
 #include "random.h"
 #include "io.h"
+#include "inverters.h"
 #include <string.h>
 
 // The following functions are primarily for testing purposes
@@ -566,6 +567,16 @@ void zero_gfield_cpu(suNg_field *f)
     }
 }
 
+void zero_sfield_cpu(scalar_field *f) 
+{
+    int len = f->type->gsize_gauge;
+    double* dbl_ptr = f->ptr;
+    for (int i = 0; i < len; ++i) 
+    {
+        dbl_ptr[i] = 0.0;
+    }
+}
+
 void zero_gfield_f_cpu(suNf_field *f) 
 {
     int len = 4*f->type->gsize_gauge*sizeof(suNf)/sizeof(double);
@@ -733,15 +744,6 @@ void random_clover_force_cpu(suNf_field *f)
 {
     int n = 6*f->type->gsize_gauge*sizeof(suNf)/sizeof(double);
     ranlxd((double*)(f->ptr), n);
-}
-
-void sync_single_precision_gauge_field() {
-    float* tmp;
-    double* in = (double*)u_gauge_f->ptr;
-    int len_in_dbl = 4*u_gauge_f->type->gsize_gauge * sizeof(*(u_gauge_f->ptr)) / sizeof(double);
-    tmp = (float*)malloc(len_in_dbl * sizeof(float));
-    for (int i = 0; i < len_in_dbl; ++i) tmp[i] = (float)in[i];
-    memcpy((float*)(u_gauge_f_flt->ptr), tmp, len_in_dbl * sizeof(float));
 }
 
 #ifdef WITH_GPU

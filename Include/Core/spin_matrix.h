@@ -1,11 +1,15 @@
+/***************************************************************************\
+* Copyright (c) 2013, Rudy Arthur, Ari Hietanen                             *
+* All rights reserved.                                                      *
+\***************************************************************************/
+
+/**
+ * @file spin_matrix.h
+ * @brief Type definitions and macros for spin_matrix
+ */
+
+
 /*******************************************************************************
-*
-* File spin_matrix.h
-*
-* Type definitions and macros for spin_matrix
-*
-* 2013 Rudy Arthur, Ari Hietanen
-*
 *
 *  |S_00 S_01| |1| = |S_00| = c[0]
 *  |S_10 S_11| |0|   |S_10|

@@ -53,7 +53,7 @@ static void transform_u(void)
     }
   }
 
-  start_gf_sendrecv(u_gauge);
+  start_sendrecv_gfield(u_gauge);
   represent_gauge_field();
 }
 
@@ -154,8 +154,8 @@ int main(int argc, char *argv[])
 
   g = alloc_gtransf(&glattice);
   random_g();
-  start_gt_sendrecv(g);
-  complete_gt_sendrecv(g);
+  start_sendrecv_gtransf(g);
+  complete_sendrecv_gtransf(g);
 
   SF_quark_propagator(s0, mass, s1, acc);
 

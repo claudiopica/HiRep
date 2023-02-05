@@ -3,6 +3,11 @@
 * All rights reserved.                                                      * 
 \***************************************************************************/
 
+/**
+ * @file logger.h
+ * @brief Simple output logging facility
+ */
+
 #ifndef LOGGER_H
 #define LOGGER_H
 
