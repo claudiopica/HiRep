@@ -20,81 +20,90 @@
 #include "memory.h"
 #include "utils.h"
 
-
 #ifdef ROTATED_SF
 #include "update.h"
 extern rhmc_par _update_par; /* Update/update_rhmc.c */
 #endif /* ROTATED_SF */
 
-
 /*
  * Init of Dphi_flt
  */
 
-static int init=1;
-static spinor_field_flt *gtmp=NULL;
-static spinor_field_flt *etmp=NULL;
-static spinor_field_flt *otmp=NULL;
+static int init = 1;
+static spinor_field_flt *gtmp = NULL;
+static spinor_field_flt *etmp = NULL;
+static spinor_field_flt *otmp = NULL;
 
-static void free_mem() {
-    if (gtmp!=NULL) { free_spinor_field_f_flt(gtmp); gtmp=NULL; }
-    if (etmp!=NULL) { free_spinor_field_f_flt(etmp); etmp=NULL; }
-    if (otmp!=NULL) { free_spinor_field_f_flt(otmp); otmp=NULL; }
-    init=1;
+static void free_mem()
+{
+    if (gtmp != NULL) {
+        free_spinor_field_f_flt(gtmp);
+        gtmp = NULL;
+    }
+    if (etmp != NULL) {
+        free_spinor_field_f_flt(etmp);
+        etmp = NULL;
+    }
+    if (otmp != NULL) {
+        free_spinor_field_f_flt(otmp);
+        otmp = NULL;
+    }
+    init = 1;
 }
 
-static void init_Dirac() {
+static void init_Dirac()
+{
     if (init) {
-        gtmp=alloc_spinor_field_f_flt(1,&glattice);
-        etmp=alloc_spinor_field_f_flt(1,&glat_even);
-        otmp=alloc_spinor_field_f_flt(1,&glat_odd);
+        gtmp = alloc_spinor_field_f_flt(1, &glattice);
+        etmp = alloc_spinor_field_f_flt(1, &glat_even);
+        otmp = alloc_spinor_field_f_flt(1, &glat_odd);
         atexit(&free_mem);
-        init=0;
+        init = 0;
     }
 }
-
 
 /*
  * the following variable is used to keep trace of
  * matrix-vector multoplication.
  * we count how many time the function Dphi_ is called
  */
-static unsigned long int MVMcounter=0;
+static unsigned long int MVMcounter = 0;
 
-unsigned long int getMVM_flt_cpu() {
-	unsigned long int res=MVMcounter>>1; /* divide by two */
-	MVMcounter=0; /* reset counter */
+unsigned long int getMVM_flt_cpu()
+{
+    unsigned long int res = MVMcounter >> 1; /* divide by two */
+    MVMcounter = 0; /* reset counter */
 
-	return res;
+    return res;
 }
 
 /* Theta Boundary conditions 
  * local copy in single precision of global variable
  */
 #if defined(BC_T_THETA) || defined(BC_X_THETA) || defined(BC_Y_THETA) || defined(BC_Z_THETA)
-static  hr_complex_flt eitheta_flt[4];
+static hr_complex_flt eitheta_flt[4];
 #endif
 
 /* r=t*u*s */
 #ifdef BC_T_THETA
 
 #define _suNf_theta_T_multiply(r, u, s) \
-  _suNf_multiply(vtmp[0], (u), (s));    \
-  _vector_mulc_f((r), eitheta_flt[0], vtmp[0])
+    _suNf_multiply(vtmp[0], (u), (s));  \
+    _vector_mulc_f((r), eitheta_flt[0], vtmp[0])
 
 #define _suNf_theta_T_inverse_multiply(r, u, s) \
-  _suNf_inverse_multiply(vtmp[0], (u), (s));    \
-  _vector_mulc_star_f((r), eitheta_flt[0], vtmp[0])
+    _suNf_inverse_multiply(vtmp[0], (u), (s));  \
+    _vector_mulc_star_f((r), eitheta_flt[0], vtmp[0])
 
-#define _suNf_double_theta_T_multiply(r1, r2, u, s1, s2)    \
-  _suNf_double_multiply(vtmp[0], vtmp[1], (u), (s1), (s2)); \
-  _vector_mulc_f((r1), eitheta_flt[0], vtmp[0]);                \
-  _vector_mulc_f((r2), eitheta_flt[0], vtmp[1])
+#define _suNf_double_theta_T_multiply(r1, r2, u, s1, s2)      \
+    _suNf_double_multiply(vtmp[0], vtmp[1], (u), (s1), (s2)); \
+    _vector_mulc_f((r1), eitheta_flt[0], vtmp[0]);            \
+    _vector_mulc_f((r2), eitheta_flt[0], vtmp[1])
 
-#define _suNf_double_theta_T_inverse_multiply(r1, r2, u, s1, s2)    \
-  _suNf_double_inverse_multiply(vtmp[0], vtmp[1], (u), (s1), (s2)); \
-  _vector_mulc_star_f((r1), eitheta_flt[0], vtmp[0]);                   \
-  _vector_mulc_star_f((r2), eitheta_flt[0], vtmp[1])
+#define _suNf_double_theta_T_inverse_multiply(r1, r2, u, s1, s2)      \
+    _suNf_double_inverse_multiply(vtmp[0], vtmp[1], (u), (s1), (s2)); \
+    _vector_mulc_star_f((r1), eitheta_flt[0], vtmp[0]);               \
+    _vector_mulc_star_f((r2), eitheta_flt[0], vtmp[1])
 
 #else
 
@@ -109,22 +118,22 @@ static  hr_complex_flt eitheta_flt[4];
 #ifdef BC_X_THETA
 
 #define _suNf_theta_X_multiply(r, u, s) \
-  _suNf_multiply(vtmp[0], (u), (s));    \
-  _vector_mulc_f((r), eitheta_flt[1], vtmp[0])
+    _suNf_multiply(vtmp[0], (u), (s));  \
+    _vector_mulc_f((r), eitheta_flt[1], vtmp[0])
 
 #define _suNf_theta_X_inverse_multiply(r, u, s) \
-  _suNf_inverse_multiply(vtmp[0], (u), (s));    \
-  _vector_mulc_star_f((r), eitheta_flt[1], vtmp[0])
+    _suNf_inverse_multiply(vtmp[0], (u), (s));  \
+    _vector_mulc_star_f((r), eitheta_flt[1], vtmp[0])
 
-#define _suNf_double_theta_X_multiply(r1, r2, u, s1, s2)    \
-  _suNf_double_multiply(vtmp[0], vtmp[1], (u), (s1), (s2)); \
-  _vector_mulc_f((r1), eitheta_flt[1], vtmp[0]);                \
-  _vector_mulc_f((r2), eitheta_flt[1], vtmp[1])
+#define _suNf_double_theta_X_multiply(r1, r2, u, s1, s2)      \
+    _suNf_double_multiply(vtmp[0], vtmp[1], (u), (s1), (s2)); \
+    _vector_mulc_f((r1), eitheta_flt[1], vtmp[0]);            \
+    _vector_mulc_f((r2), eitheta_flt[1], vtmp[1])
 
-#define _suNf_double_theta_X_inverse_multiply(r1, r2, u, s1, s2)    \
-  _suNf_double_inverse_multiply(vtmp[0], vtmp[1], (u), (s1), (s2)); \
-  _vector_mulc_star_f((r1), eitheta_flt[1], vtmp[0]);                   \
-  _vector_mulc_star_f((r2), eitheta_flt[1], vtmp[1])
+#define _suNf_double_theta_X_inverse_multiply(r1, r2, u, s1, s2)      \
+    _suNf_double_inverse_multiply(vtmp[0], vtmp[1], (u), (s1), (s2)); \
+    _vector_mulc_star_f((r1), eitheta_flt[1], vtmp[0]);               \
+    _vector_mulc_star_f((r2), eitheta_flt[1], vtmp[1])
 
 #else
 
@@ -138,22 +147,22 @@ static  hr_complex_flt eitheta_flt[4];
 #ifdef BC_Y_THETA
 
 #define _suNf_theta_Y_multiply(r, u, s) \
-  _suNf_multiply(vtmp[0], (u), (s));    \
-  _vector_mulc_f((r), eitheta_flt[2], vtmp[0])
+    _suNf_multiply(vtmp[0], (u), (s));  \
+    _vector_mulc_f((r), eitheta_flt[2], vtmp[0])
 
 #define _suNf_theta_Y_inverse_multiply(r, u, s) \
-  _suNf_inverse_multiply(vtmp[0], (u), (s));    \
-  _vector_mulc_star_f((r), eitheta_flt[2], vtmp[0])
+    _suNf_inverse_multiply(vtmp[0], (u), (s));  \
+    _vector_mulc_star_f((r), eitheta_flt[2], vtmp[0])
 
-#define _suNf_double_theta_Y_multiply(r1, r2, u, s1, s2)    \
-  _suNf_double_multiply(vtmp[0], vtmp[1], (u), (s1), (s2)); \
-  _vector_mulc_f((r1), eitheta_flt[2], vtmp[0]);                \
-  _vector_mulc_f((r2), eitheta_flt[2], vtmp[1])
+#define _suNf_double_theta_Y_multiply(r1, r2, u, s1, s2)      \
+    _suNf_double_multiply(vtmp[0], vtmp[1], (u), (s1), (s2)); \
+    _vector_mulc_f((r1), eitheta_flt[2], vtmp[0]);            \
+    _vector_mulc_f((r2), eitheta_flt[2], vtmp[1])
 
-#define _suNf_double_theta_Y_inverse_multiply(r1, r2, u, s1, s2)    \
-  _suNf_double_inverse_multiply(vtmp[0], vtmp[1], (u), (s1), (s2)); \
-  _vector_mulc_star_f((r1), eitheta_flt[2], vtmp[0]);                   \
-  _vector_mulc_star_f((r2), eitheta_flt[2], vtmp[1])
+#define _suNf_double_theta_Y_inverse_multiply(r1, r2, u, s1, s2)      \
+    _suNf_double_inverse_multiply(vtmp[0], vtmp[1], (u), (s1), (s2)); \
+    _vector_mulc_star_f((r1), eitheta_flt[2], vtmp[0]);               \
+    _vector_mulc_star_f((r2), eitheta_flt[2], vtmp[1])
 
 #else
 
@@ -168,22 +177,22 @@ static  hr_complex_flt eitheta_flt[4];
 #ifdef BC_Z_THETA
 
 #define _suNf_theta_Z_multiply(r, u, s) \
-  _suNf_multiply(vtmp[0], (u), (s));    \
-  _vector_mulc_f((r), eitheta_flt[3], vtmp[0])
+    _suNf_multiply(vtmp[0], (u), (s));  \
+    _vector_mulc_f((r), eitheta_flt[3], vtmp[0])
 
 #define _suNf_theta_Z_inverse_multiply(r, u, s) \
-  _suNf_inverse_multiply(vtmp[0], (u), (s));    \
-  _vector_mulc_star_f((r), eitheta_flt[3], vtmp[0])
+    _suNf_inverse_multiply(vtmp[0], (u), (s));  \
+    _vector_mulc_star_f((r), eitheta_flt[3], vtmp[0])
 
-#define _suNf_double_theta_T_multiply(r1, r2, u, s1, s2)    \
-  _suNf_double_multiply(vtmp[0], vtmp[1], (u), (s1), (s2)); \
-  _vector_mulc_f((r1), eitheta_flt[3], vtmp[0]);                \
-  _vector_mulc_f((r2), eitheta_flt[3], vtmp[1])
+#define _suNf_double_theta_T_multiply(r1, r2, u, s1, s2)      \
+    _suNf_double_multiply(vtmp[0], vtmp[1], (u), (s1), (s2)); \
+    _vector_mulc_f((r1), eitheta_flt[3], vtmp[0]);            \
+    _vector_mulc_f((r2), eitheta_flt[3], vtmp[1])
 
-#define _suNf_double_theta_T_inverse_multiply(r1, r2, u, s1, s2)    \
-  _suNf_double_inverse_multiply(vtmp[0], vtmp[1], (u), (s1), (s2)); \
-  _vector_mulc_star_f((r1), eitheta_flt[3], vtmp[0]);                   \
-  _vector_mulc_star_f((r2), eitheta_flt[3], vtmp[1])
+#define _suNf_double_theta_T_inverse_multiply(r1, r2, u, s1, s2)      \
+    _suNf_double_inverse_multiply(vtmp[0], vtmp[1], (u), (s1), (s2)); \
+    _vector_mulc_star_f((r1), eitheta_flt[3], vtmp[0]);               \
+    _vector_mulc_star_f((r2), eitheta_flt[3], vtmp[1])
 
 #else
 
@@ -198,7 +207,6 @@ static  hr_complex_flt eitheta_flt[4];
 #define _USING_THETA
 #endif
 
-
 /*
  * NOTE :
  * here we are making the assumption that the geometry is such that
@@ -206,433 +214,419 @@ static  hr_complex_flt eitheta_flt[4];
  * in the range [VOLUME/2,VOLUME[
  */
 #ifdef WITH_NEW_GEOMETRY
-void Dphi_flt_cpu_(spinor_field_flt * restrict out, spinor_field_flt * restrict in)
+void Dphi_flt_cpu_(spinor_field_flt *restrict out, spinor_field_flt *restrict in)
 {
 #ifdef CHECK_SPINOR_MATCHING
-  error((in == NULL) || (out == NULL), 1, "Dphi_cpu_ [Dphi.c]",
-        "Attempt to access unallocated memory space");
-  error(in == out, 1, "Dphi_cpu_ [Dphi.c]",
-        "Input and output fields must be different");
-  error(out->type == &glat_even && in->type == &glat_even, 1, "Dphi_flt_cpu_ [Dphi_flt.c]", "Spinors don't match! (1)");
-  error(out->type == &glat_odd && in->type == &glat_odd, 1, "Dphi__flt_cpu_ [Dphi_flt.c]", "Spinors don't match! (2)");
-  error(out->type==&glattice && in->type!=&glattice,1, "Dphi_flt_ [Dphi_flt_flt.c]", "Spinors don't match!");
+    error((in == NULL) || (out == NULL), 1, "Dphi_cpu_ [Dphi.c]", "Attempt to access unallocated memory space");
+    error(in == out, 1, "Dphi_cpu_ [Dphi.c]", "Input and output fields must be different");
+    error(out->type == &glat_even && in->type == &glat_even, 1, "Dphi_flt_cpu_ [Dphi_flt.c]", "Spinors don't match! (1)");
+    error(out->type == &glat_odd && in->type == &glat_odd, 1, "Dphi__flt_cpu_ [Dphi_flt.c]", "Spinors don't match! (2)");
+    error(out->type == &glattice && in->type != &glattice, 1, "Dphi_flt_ [Dphi_flt_flt.c]", "Spinors don't match!");
 #endif
 
 #if defined(BC_T_THETA) || defined(BC_X_THETA) || defined(BC_Y_THETA) || defined(BC_Z_THETA)
     /* copy global theta bc to local single-precision copy */
-    eitheta_flt[0]=(hr_complex_flt)eitheta[0];
-    eitheta_flt[1]=(hr_complex_flt)eitheta[1];
-    eitheta_flt[2]=(hr_complex_flt)eitheta[2];
-    eitheta_flt[3]=(hr_complex_flt)eitheta[3];
-#endif   
+    eitheta_flt[0] = (hr_complex_flt)eitheta[0];
+    eitheta_flt[1] = (hr_complex_flt)eitheta[1];
+    eitheta_flt[2] = (hr_complex_flt)eitheta[2];
+    eitheta_flt[3] = (hr_complex_flt)eitheta[3];
+#endif
 
-  ++MVMcounter; /* count matrix calls */
-  if (out->type == &glattice) ++MVMcounter;
+    ++MVMcounter; /* count matrix calls */
+    if (out->type == &glattice) ++MVMcounter;
 
-  /************************ loop over all lattice sites *************************/
-  /* start communication of input spinor field */
+        /************************ loop over all lattice sites *************************/
+        /* start communication of input spinor field */
 #ifdef WITH_MPI
-  _OMP_PRAGMA(master)
-  {
     start_sendrecv_spinor_field_f_flt(in);
-  }
-  _OMP_BARRIER //why do we need this barrier?
 #endif
 
-  for (int repeat=0; repeat<2; repeat++) {
-    //we repeat the loop over the master lattice twice
-    //the second pass we invert the mask
-    //this is achieved with comparing the condition to be different than repeat=0,1 
+    for (int repeat = 0; repeat < 2; repeat++) {
+        //we repeat the loop over the master lattice twice
+        //the second pass we invert the mask
+        //this is achieved with comparing the condition to be different than repeat=0,1
 
-    _MASTER_FOR(out->type, ix) {
+        _MASTER_FOR(out->type, ix) {
+            suNf_spinor_flt acc;
+            suNf_spinor_flt *r = &acc;
+            _spinor_zero_f(*r);
 
-      suNf_spinor_flt acc; 
-      suNf_spinor_flt *r = &acc;
-      _spinor_zero_f(*r);
+            /******************************* direction +0 *********************************/
+            if ((!(imask[ix] & T_UP_MASK)) == repeat) {
+                const int iy = iup(ix, 0);
+                const suNf_spinor_flt *sp = _FIELD_AT(in, iy);
+                const suNf_flt *up = pu_gauge_f_flt(ix, 0);
+                suNf_vector_flt psi, chi, psi2, chi2;
+#ifdef _USING_THETA
+                suNf_vector_flt vtmp[2];
+#endif
 
-      /******************************* direction +0 *********************************/
-      if ((!(imask[ix] & T_UP_MASK)) == repeat) {
-        const int iy = iup(ix, 0);
-        const suNf_spinor_flt *sp = _FIELD_AT(in, iy);
-        const suNf_flt *up = pu_gauge_f_flt(ix, 0);
-        suNf_vector_flt psi, chi, psi2, chi2;
-  #ifdef _USING_THETA
-        suNf_vector_flt vtmp[2];
-  #endif
+                _vector_add_f(psi, (*sp).c[0], (*sp).c[2]);
+                _vector_add_f(psi2, (*sp).c[1], (*sp).c[3]);
+                _suNf_theta_T_multiply(chi, (*up), psi);
+                _suNf_theta_T_multiply(chi2, (*up), psi2);
 
-        _vector_add_f(psi, (*sp).c[0], (*sp).c[2]);
-        _vector_add_f(psi2, (*sp).c[1], (*sp).c[3]);
-        _suNf_theta_T_multiply(chi, (*up), psi);
-        _suNf_theta_T_multiply(chi2, (*up), psi2);
+                _vector_add_assign_f((*r).c[0], chi);
+                _vector_add_assign_f((*r).c[2], chi);
+                _vector_add_assign_f((*r).c[1], chi2);
+                _vector_add_assign_f((*r).c[3], chi2);
+            }
+            /******************************* direction -0 *********************************/
+            if ((!(imask[ix] & T_DN_MASK)) == repeat) {
+                const int iy = idn(ix, 0);
+                const suNf_spinor_flt *sm = _FIELD_AT(in, iy);
+                const suNf_flt *um = pu_gauge_f_flt(iy, 0);
+                suNf_vector_flt psi, chi, psi2, chi2;
+#ifdef _USING_THETA
+                suNf_vector_flt vtmp[2];
+#endif
 
-        _vector_add_assign_f((*r).c[0], chi);
-        _vector_add_assign_f((*r).c[2], chi);
-        _vector_add_assign_f((*r).c[1], chi2);
-        _vector_add_assign_f((*r).c[3], chi2);
-      }
-      /******************************* direction -0 *********************************/
-      if ((!(imask[ix] & T_DN_MASK)) == repeat) {
-        const int iy = idn(ix, 0);
-        const suNf_spinor_flt *sm = _FIELD_AT(in, iy);
-        const suNf_flt *um = pu_gauge_f_flt(iy, 0);
-        suNf_vector_flt psi, chi, psi2, chi2;
-  #ifdef _USING_THETA
-        suNf_vector_flt vtmp[2];
-  #endif
+                _vector_sub_f(psi, (*sm).c[0], (*sm).c[2]);
+                _vector_sub_f(psi2, (*sm).c[1], (*sm).c[3]);
+                _suNf_theta_T_inverse_multiply(chi, (*um), psi);
+                _suNf_theta_T_inverse_multiply(chi2, (*um), psi2);
 
-        _vector_sub_f(psi, (*sm).c[0], (*sm).c[2]);
-        _vector_sub_f(psi2, (*sm).c[1], (*sm).c[3]);
-        _suNf_theta_T_inverse_multiply(chi, (*um), psi);
-        _suNf_theta_T_inverse_multiply(chi2, (*um), psi2);
+                _vector_add_assign_f((*r).c[0], chi);
+                _vector_sub_assign_f((*r).c[2], chi);
+                _vector_add_assign_f((*r).c[1], chi2);
+                _vector_sub_assign_f((*r).c[3], chi2);
+            }
+            /******************************* direction +1 *********************************/
+            if ((!(imask[ix] & X_UP_MASK)) == repeat) {
+                const int iy = iup(ix, 1);
+                const suNf_spinor_flt *sp = _FIELD_AT(in, iy);
+                const suNf_flt *up = pu_gauge_f_flt(ix, 1);
+                suNf_vector_flt psi, chi, psi2, chi2;
+#ifdef _USING_THETA
+                suNf_vector_flt vtmp[2];
+#endif
 
-        _vector_add_assign_f((*r).c[0], chi);
-        _vector_sub_assign_f((*r).c[2], chi);
-        _vector_add_assign_f((*r).c[1], chi2);
-        _vector_sub_assign_f((*r).c[3], chi2);
-      }
-      /******************************* direction +1 *********************************/
-      if ((!(imask[ix] & X_UP_MASK)) == repeat) {
-        const int iy = iup(ix, 1);
-        const suNf_spinor_flt *sp = _FIELD_AT(in, iy);
-        const suNf_flt *up = pu_gauge_f_flt(ix, 1);
-        suNf_vector_flt psi, chi, psi2, chi2;
-  #ifdef _USING_THETA
-        suNf_vector_flt vtmp[2];
-  #endif
+                _vector_i_add_f(psi, (*sp).c[0], (*sp).c[3]);
+                _vector_i_add_f(psi2, (*sp).c[1], (*sp).c[2]);
+                _suNf_theta_X_multiply(chi, (*up), psi);
+                _suNf_theta_X_multiply(chi2, (*up), psi2);
 
-        _vector_i_add_f(psi, (*sp).c[0], (*sp).c[3]);
-        _vector_i_add_f(psi2, (*sp).c[1], (*sp).c[2]);
-        _suNf_theta_X_multiply(chi, (*up), psi);
-        _suNf_theta_X_multiply(chi2, (*up), psi2);
+                _vector_add_assign_f((*r).c[0], chi);
+                _vector_i_sub_assign_f((*r).c[3], chi);
+                _vector_add_assign_f((*r).c[1], chi2);
+                _vector_i_sub_assign_f((*r).c[2], chi2);
+            }
+            /******************************* direction -1 *********************************/
+            if ((!(imask[ix] & X_DN_MASK)) == repeat) {
+                const int iy = idn(ix, 1);
+                const suNf_spinor_flt *sm = _FIELD_AT(in, iy);
+                const suNf_flt *um = pu_gauge_f_flt(iy, 1);
+                suNf_vector_flt psi, chi, psi2, chi2;
+#ifdef _USING_THETA
+                suNf_vector_flt vtmp[2];
+#endif
 
-        _vector_add_assign_f((*r).c[0], chi);
-        _vector_i_sub_assign_f((*r).c[3], chi);
-        _vector_add_assign_f((*r).c[1], chi2);
-        _vector_i_sub_assign_f((*r).c[2], chi2);
-      }
-      /******************************* direction -1 *********************************/
-      if ((!(imask[ix] & X_DN_MASK)) == repeat) {
-        const int iy = idn(ix, 1);
-        const suNf_spinor_flt *sm = _FIELD_AT(in, iy);
-        const suNf_flt *um = pu_gauge_f_flt(iy, 1);
-        suNf_vector_flt psi, chi, psi2, chi2;
-  #ifdef _USING_THETA
-        suNf_vector_flt vtmp[2];
-  #endif
+                _vector_i_sub_f(psi, (*sm).c[0], (*sm).c[3]);
+                _vector_i_sub_f(psi2, (*sm).c[1], (*sm).c[2]);
+                _suNf_theta_X_inverse_multiply(chi, (*um), psi);
+                _suNf_theta_X_inverse_multiply(chi2, (*um), psi2);
 
-        _vector_i_sub_f(psi, (*sm).c[0], (*sm).c[3]);
-        _vector_i_sub_f(psi2, (*sm).c[1], (*sm).c[2]);
-        _suNf_theta_X_inverse_multiply(chi, (*um), psi);
-        _suNf_theta_X_inverse_multiply(chi2, (*um), psi2);
+                _vector_add_assign_f((*r).c[0], chi);
+                _vector_i_add_assign_f((*r).c[3], chi);
+                _vector_add_assign_f((*r).c[1], chi2);
+                _vector_i_add_assign_f((*r).c[2], chi2);
+            }
+            /******************************* direction +2 *********************************/
+            if ((!(imask[ix] & Y_UP_MASK)) == repeat) {
+                const int iy = iup(ix, 2);
+                const suNf_spinor_flt *sp = _FIELD_AT(in, iy);
+                const suNf_flt *up = pu_gauge_f_flt(ix, 2);
+                suNf_vector_flt psi, chi, psi2, chi2;
+#ifdef _USING_THETA
+                suNf_vector_flt vtmp[2];
+#endif
 
-        _vector_add_assign_f((*r).c[0], chi);
-        _vector_i_add_assign_f((*r).c[3], chi);
-        _vector_add_assign_f((*r).c[1], chi2);
-        _vector_i_add_assign_f((*r).c[2], chi2);
-      }
-      /******************************* direction +2 *********************************/
-      if ((!(imask[ix] & Y_UP_MASK)) == repeat) {
-        const int iy = iup(ix, 2);
-        const suNf_spinor_flt *sp = _FIELD_AT(in, iy);
-        const suNf_flt *up = pu_gauge_f_flt(ix, 2);
-        suNf_vector_flt psi, chi, psi2, chi2;
-  #ifdef _USING_THETA
-        suNf_vector_flt vtmp[2];
-  #endif
+                _vector_add_f(psi, (*sp).c[0], (*sp).c[3]);
+                _vector_sub_f(psi2, (*sp).c[1], (*sp).c[2]);
+                _suNf_theta_Y_multiply(chi, (*up), psi);
+                _suNf_theta_Y_multiply(chi2, (*up), psi2);
 
-        _vector_add_f(psi, (*sp).c[0], (*sp).c[3]);
-        _vector_sub_f(psi2, (*sp).c[1], (*sp).c[2]);
-        _suNf_theta_Y_multiply(chi, (*up), psi);
-        _suNf_theta_Y_multiply(chi2, (*up), psi2);
+                _vector_add_assign_f((*r).c[0], chi);
+                _vector_add_assign_f((*r).c[3], chi);
+                _vector_add_assign_f((*r).c[1], chi2);
+                _vector_sub_assign_f((*r).c[2], chi2);
+            }
+            /******************************* direction -2 *********************************/
+            if ((!(imask[ix] & Y_DN_MASK)) == repeat) {
+                const int iy = idn(ix, 2);
+                const suNf_spinor_flt *sm = _FIELD_AT(in, iy);
+                const suNf_flt *um = pu_gauge_f_flt(iy, 2);
+                suNf_vector_flt psi, chi, psi2, chi2;
+#ifdef _USING_THETA
+                suNf_vector_flt vtmp[2];
+#endif
 
-        _vector_add_assign_f((*r).c[0], chi);
-        _vector_add_assign_f((*r).c[3], chi);
-        _vector_add_assign_f((*r).c[1], chi2);
-        _vector_sub_assign_f((*r).c[2], chi2);
-      }
-      /******************************* direction -2 *********************************/
-      if ((!(imask[ix] & Y_DN_MASK)) == repeat) {
-        const int iy = idn(ix, 2);
-        const suNf_spinor_flt *sm = _FIELD_AT(in, iy);
-        const suNf_flt *um = pu_gauge_f_flt(iy, 2);
-        suNf_vector_flt psi, chi, psi2, chi2;
-  #ifdef _USING_THETA
-        suNf_vector_flt vtmp[2];
-  #endif
+                _vector_sub_f(psi, (*sm).c[0], (*sm).c[3]);
+                _vector_add_f(psi2, (*sm).c[1], (*sm).c[2]);
+                _suNf_theta_Y_inverse_multiply(chi, (*um), psi);
+                _suNf_theta_Y_inverse_multiply(chi2, (*um), psi2);
 
-        _vector_sub_f(psi, (*sm).c[0], (*sm).c[3]);
-        _vector_add_f(psi2, (*sm).c[1], (*sm).c[2]);
-        _suNf_theta_Y_inverse_multiply(chi, (*um), psi);
-        _suNf_theta_Y_inverse_multiply(chi2, (*um), psi2);
+                _vector_add_assign_f((*r).c[0], chi);
+                _vector_sub_assign_f((*r).c[3], chi);
+                _vector_add_assign_f((*r).c[1], chi2);
+                _vector_add_assign_f((*r).c[2], chi2);
+            }
+            /******************************* direction +3 *********************************/
+            if ((!(imask[ix] & Z_UP_MASK)) == repeat) {
+                const int iy = iup(ix, 3);
+                const suNf_spinor_flt *sp = _FIELD_AT(in, iy);
+                const suNf_flt *up = pu_gauge_f_flt(ix, 3);
+                suNf_vector_flt psi, chi, psi2, chi2;
+#ifdef _USING_THETA
+                suNf_vector_flt vtmp[2];
+#endif
 
-        _vector_add_assign_f((*r).c[0], chi);
-        _vector_sub_assign_f((*r).c[3], chi);
-        _vector_add_assign_f((*r).c[1], chi2);
-        _vector_add_assign_f((*r).c[2], chi2);
-      }
-      /******************************* direction +3 *********************************/
-      if ((!(imask[ix] & Z_UP_MASK)) == repeat) {
-        const int iy = iup(ix, 3);
-        const suNf_spinor_flt *sp = _FIELD_AT(in, iy);
-        const suNf_flt *up = pu_gauge_f_flt(ix, 3);
-        suNf_vector_flt psi, chi, psi2, chi2;
-  #ifdef _USING_THETA
-        suNf_vector_flt vtmp[2];
-  #endif
+                _vector_i_add_f(psi, (*sp).c[0], (*sp).c[2]);
+                _vector_i_sub_f(psi2, (*sp).c[1], (*sp).c[3]);
+                _suNf_theta_Z_multiply(chi, (*up), psi);
+                _suNf_theta_Z_multiply(chi2, (*up), psi2);
 
-        _vector_i_add_f(psi, (*sp).c[0], (*sp).c[2]);
-        _vector_i_sub_f(psi2, (*sp).c[1], (*sp).c[3]);
-        _suNf_theta_Z_multiply(chi, (*up), psi);
-        _suNf_theta_Z_multiply(chi2, (*up), psi2);
+                _vector_add_assign_f((*r).c[0], chi);
+                _vector_i_sub_assign_f((*r).c[2], chi);
+                _vector_add_assign_f((*r).c[1], chi2);
+                _vector_i_add_assign_f((*r).c[3], chi2);
+            }
+            /******************************* direction -3 *********************************/
+            if ((!(imask[ix] & Z_DN_MASK)) == repeat) {
+                const int iy = idn(ix, 3);
+                const suNf_spinor_flt *sm = _FIELD_AT(in, iy);
+                const suNf_flt *um = pu_gauge_f_flt(iy, 3);
+                suNf_vector_flt psi, chi, psi2, chi2;
+#ifdef _USING_THETA
+                suNf_vector_flt vtmp[2];
+#endif
 
-        _vector_add_assign_f((*r).c[0], chi);
-        _vector_i_sub_assign_f((*r).c[2], chi);
-        _vector_add_assign_f((*r).c[1], chi2);
-        _vector_i_add_assign_f((*r).c[3], chi2);
-      }
-      /******************************* direction -3 *********************************/
-      if ((!(imask[ix] & Z_DN_MASK)) == repeat) {
-        const int iy = idn(ix, 3);
-        const suNf_spinor_flt *sm = _FIELD_AT(in, iy);
-        const suNf_flt *um = pu_gauge_f_flt(iy, 3);
-        suNf_vector_flt psi, chi, psi2, chi2;
-  #ifdef _USING_THETA
-        suNf_vector_flt vtmp[2];
-  #endif
+                _vector_i_sub_f(psi, (*sm).c[0], (*sm).c[2]);
+                _vector_i_add_f(psi2, (*sm).c[1], (*sm).c[3]);
+                _suNf_theta_Z_inverse_multiply(chi, (*um), psi);
+                _suNf_theta_Z_inverse_multiply(chi2, (*um), psi2);
 
-        _vector_i_sub_f(psi, (*sm).c[0], (*sm).c[2]);
-        _vector_i_add_f(psi2, (*sm).c[1], (*sm).c[3]);
-        _suNf_theta_Z_inverse_multiply(chi, (*um), psi);
-        _suNf_theta_Z_inverse_multiply(chi2, (*um), psi2);
+                _vector_add_assign_f((*r).c[0], chi);
+                _vector_i_add_assign_f((*r).c[2], chi);
+                _vector_add_assign_f((*r).c[1], chi2);
+                _vector_i_sub_assign_f((*r).c[3], chi2);
+            }
+            /******************************** end of loop *********************************/
+            r = _FIELD_AT(out, ix);
+            if (!repeat) {
+                // at first iteration write to output
+                _spinor_mul_f(*r, -0.5, acc);
+            } else {
+                //second iteration accumulate on output
+                _spinor_mul_add_assign_f(*r, -0.5, acc);
+            }
 
-        _vector_add_assign_f((*r).c[0], chi);
-        _vector_i_add_assign_f((*r).c[2], chi);
-        _vector_add_assign_f((*r).c[1], chi2);
-        _vector_i_sub_assign_f((*r).c[3], chi2);
-      }
-      /******************************** end of loop *********************************/
-      r = _FIELD_AT(out, ix);
-      if(!repeat) {
-        // at first iteration write to output
-        _spinor_mul_f(*r, -0.5, acc);
-      } else {
-        //second iteration accumulate on output
-        _spinor_mul_add_assign_f(*r, -0.5, acc);
-      }
-
-    } /* MASTER_FOR */
+        } /* MASTER_FOR */
 
 #ifdef WITH_MPI
-    if(!repeat) {
-      // lprintf("MAIN", 0, "Doing complete sendrecv repeat=%d\n",repeat);
-      /* wait for spinor to be transfered */
-      _OMP_PRAGMA(master)
-      {
-        complete_sendrecv_spinor_field_f_flt(in);
-      }
-      _OMP_BARRIER
-    }
+        if (!repeat) {
+            // lprintf("MAIN", 0, "Doing complete sendrecv repeat=%d\n",repeat);
+            /* wait for spinor to be transfered */
+            complete_sendrecv_spinor_field_f_flt(in);
+        }
 #endif
-  }
+    }
 }
 #else
 void Dphi_flt_cpu_(spinor_field_flt *out, spinor_field_flt *in)
 {
-   error((in==NULL)||(out==NULL),1,"Dphi_flt_ [Dphi_flt.c]",
-         "Attempt to access unallocated memory space");
-   
-   error(in==out,1,"Dphi_flt_ [Dphi_flt.c]",
-         "Input and output fields must be different");
+    error((in == NULL) || (out == NULL), 1, "Dphi_flt_ [Dphi_flt.c]", "Attempt to access unallocated memory space");
+
+    error(in == out, 1, "Dphi_flt_ [Dphi_flt.c]", "Input and output fields must be different");
 
 #ifdef CHECK_SPINOR_MATCHING
-   error(out->type==&glat_even && in->type!=&glat_odd,1,"Dphi_flt_ [Dphi_flt.c]", "Spinors don't match!");
-   error(out->type==&glat_odd && in->type!=&glat_even,1,"Dphi_flt_ [Dphi_flt.c]", "Spinors don't match!");
-   error(out->type==&glattice && in->type!=&glattice,1, "Dphi_flt_ [Dphi_flt.c]", "Spinors don't match!");
+    error(out->type == &glat_even && in->type != &glat_odd, 1, "Dphi_flt_ [Dphi_flt.c]", "Spinors don't match!");
+    error(out->type == &glat_odd && in->type != &glat_even, 1, "Dphi_flt_ [Dphi_flt.c]", "Spinors don't match!");
+    error(out->type == &glattice && in->type != &glattice, 1, "Dphi_flt_ [Dphi_flt.c]", "Spinors don't match!");
 #endif /* CHECK_SPINOR_MATCHING */
 
 #if defined(BC_T_THETA) || defined(BC_X_THETA) || defined(BC_Y_THETA) || defined(BC_Z_THETA)
     /* copy global theta bc to local single-precision copy */
-    eitheta_flt[0]=(hr_complex_flt)eitheta[0];
-    eitheta_flt[1]=(hr_complex_flt)eitheta[1];
-    eitheta_flt[2]=(hr_complex_flt)eitheta[2];
-    eitheta_flt[3]=(hr_complex_flt)eitheta[3];
-#endif    
+    eitheta_flt[0] = (hr_complex_flt)eitheta[0];
+    eitheta_flt[1] = (hr_complex_flt)eitheta[1];
+    eitheta_flt[2] = (hr_complex_flt)eitheta[2];
+    eitheta_flt[3] = (hr_complex_flt)eitheta[3];
+#endif
 
     ++MVMcounter; /* count matrix call */
-   if(out->type==&glattice) ++MVMcounter;
- 
-/************************ loop over all lattice sites *************************/
-   /* start communication of input spinor field */
-   start_sendrecv_spinor_field_f_flt(in);
-  
-   _PIECE_FOR(out->type,ixp) {
-     if(ixp==out->type->inner_master_pieces) {
-       _OMP_PRAGMA( master )
-       /* wait for spinor to be transfered */
-       complete_sendrecv_spinor_field_f_flt(in);
-       _OMP_PRAGMA( barrier )
-     }
-     _SITE_FOR(out->type,ixp,ix) {
+    if (out->type == &glattice) ++MVMcounter;
 
-       int iy;
-       suNf_flt *up,*um;
-       suNf_vector_flt psi,chi;
-       suNf_spinor_flt *r=0,*sp,*sm;
+    /************************ loop over all lattice sites *************************/
+    /* start communication of input spinor field */
+    start_sendrecv_spinor_field_f_flt(in);
+
+    _PIECE_FOR(out->type, ixp) {
+        if (ixp == out->type->inner_master_pieces) {
+            _OMP_PRAGMA(master)
+            /* wait for spinor to be transfered */
+            complete_sendrecv_spinor_field_f_flt(in);
+            _OMP_PRAGMA(barrier)
+        }
+        _SITE_FOR(out->type, ixp, ix) {
+            int iy;
+            suNf_flt *up, *um;
+            suNf_vector_flt psi, chi;
+            suNf_spinor_flt *r = 0, *sp, *sm;
 #if defined(BC_T_THETA) || defined(BC_X_THETA) || defined(BC_Y_THETA) || defined(BC_Z_THETA)
-       suNf_vector_flt vtmp;
+            suNf_vector_flt vtmp;
 #endif
-       
-       r=_FIELD_AT(out,ix);
- 
-/******************************* direction +0 *********************************/
-       
-       iy=iup(ix,0);
-       sp=_FIELD_AT(in,iy);
-       up=pu_gauge_f_flt(ix,0);
-       
-       _vector_add_f(psi,(*sp).c[0],(*sp).c[2]);
-       _suNf_theta_T_multiply(chi,(*up),psi);
-       
-       (*r).c[0]=chi;
-       (*r).c[2]=chi;
-       
-       _vector_add_f(psi,(*sp).c[1],(*sp).c[3]);
-       _suNf_theta_T_multiply(chi,(*up),psi);
-       
-       (*r).c[1]=chi;
-       (*r).c[3]=chi;
-       
-/******************************* direction -0 *********************************/
-       
-       iy=idn(ix,0);
-       sm=_FIELD_AT(in,iy);
-       um=pu_gauge_f_flt(iy,0);
-       
-       _vector_sub_f(psi,(*sm).c[0],(*sm).c[2]);
-       _suNf_theta_T_inverse_multiply(chi,(*um),psi);
-       
-       _vector_add_assign_f((*r).c[0],chi);
-       _vector_sub_assign_f((*r).c[2],chi);
-       
-       _vector_sub_f(psi,(*sm).c[1],(*sm).c[3]);
-       _suNf_theta_T_inverse_multiply(chi,(*um),psi);
-       
-       _vector_add_assign_f((*r).c[1],chi);
-       _vector_sub_assign_f((*r).c[3],chi);
-       
-/******************************* direction +1 *********************************/
-       
-       iy=iup(ix,1);
-       sp=_FIELD_AT(in,iy);
-       up=pu_gauge_f_flt(ix,1);
-       
-       _vector_i_add_f(psi,(*sp).c[0],(*sp).c[3]);
-       _suNf_theta_X_multiply(chi,(*up),psi);
-       
-       _vector_add_assign_f((*r).c[0],chi);
-       _vector_i_sub_assign_f((*r).c[3],chi);
-       
-       _vector_i_add_f(psi,(*sp).c[1],(*sp).c[2]);
-       _suNf_theta_X_multiply(chi,(*up),psi);
-       
-       _vector_add_assign_f((*r).c[1],chi);
-       _vector_i_sub_assign_f((*r).c[2],chi);
-       
-/******************************* direction -1 *********************************/
-       
-       iy=idn(ix,1);
-       sm=_FIELD_AT(in,iy);
-       um=pu_gauge_f_flt(iy,1);
-       
-       _vector_i_sub_f(psi,(*sm).c[0],(*sm).c[3]);
-       _suNf_theta_X_inverse_multiply(chi,(*um),psi);
-       
-       _vector_add_assign_f((*r).c[0],chi);
-       _vector_i_add_assign_f((*r).c[3],chi);
-       
-       _vector_i_sub_f(psi,(*sm).c[1],(*sm).c[2]);
-       _suNf_theta_X_inverse_multiply(chi,(*um),psi);
-       
-       _vector_add_assign_f((*r).c[1],chi);
-       _vector_i_add_assign_f((*r).c[2],chi);
-       
-/******************************* direction +2 *********************************/
-       
-       iy=iup(ix,2);
-       sp=_FIELD_AT(in,iy);
-       up=pu_gauge_f_flt(ix,2);
-       
-       _vector_add_f(psi,(*sp).c[0],(*sp).c[3]);
-       _suNf_theta_Y_multiply(chi,(*up),psi);
-       
-       _vector_add_assign_f((*r).c[0],chi);
-       _vector_add_assign_f((*r).c[3],chi);
-       
-       _vector_sub_f(psi,(*sp).c[1],(*sp).c[2]);
-       _suNf_theta_Y_multiply(chi,(*up),psi);
-       
-       _vector_add_assign_f((*r).c[1],chi);
-       _vector_sub_assign_f((*r).c[2],chi);
-       
-/******************************* direction -2 *********************************/
-       
-       iy=idn(ix,2);
-       sm=_FIELD_AT(in,iy);
-       um=pu_gauge_f_flt(iy,2);
-       
-       _vector_sub_f(psi,(*sm).c[0],(*sm).c[3]);
-       _suNf_theta_Y_inverse_multiply(chi,(*um),psi);
-       
-       _vector_add_assign_f((*r).c[0],chi);
-       _vector_sub_assign_f((*r).c[3],chi);
-       
-       _vector_add_f(psi,(*sm).c[1],(*sm).c[2]);
-       _suNf_theta_Y_inverse_multiply(chi,(*um),psi);
-       
-       _vector_add_assign_f((*r).c[1],chi);
-       _vector_add_assign_f((*r).c[2],chi);
 
-/******************************* direction +3 *********************************/
+            r = _FIELD_AT(out, ix);
 
-       iy=iup(ix,3);
-       sp=_FIELD_AT(in,iy);
-       up=pu_gauge_f_flt(ix,3);
-       
-       _vector_i_add_f(psi,(*sp).c[0],(*sp).c[2]);
-       _suNf_theta_Z_multiply(chi,(*up),psi);
-       
-       _vector_add_assign_f((*r).c[0],chi);
-       _vector_i_sub_assign_f((*r).c[2],chi);
-       
-       _vector_i_sub_f(psi,(*sp).c[1],(*sp).c[3]);
-       _suNf_theta_Z_multiply(chi,(*up),psi);
-       
-       _vector_add_assign_f((*r).c[1],chi);
-       _vector_i_add_assign_f((*r).c[3],chi);
-       
-/******************************* direction -3 *********************************/
-       
-       iy=idn(ix,3);
-       sm=_FIELD_AT(in,iy);
-       um=pu_gauge_f_flt(iy,3);
-       
-       _vector_i_sub_f(psi,(*sm).c[0],(*sm).c[2]);
-       _suNf_theta_Z_inverse_multiply(chi,(*um),psi);
-       
-       _vector_add_assign_f((*r).c[0],chi);
-       _vector_i_add_assign_f((*r).c[2],chi);
-       
-       _vector_i_add_f(psi,(*sm).c[1],(*sm).c[3]);
-       _suNf_theta_Z_inverse_multiply(chi,(*um),psi);
-       
-       _vector_add_assign_f((*r).c[1],chi);
-       _vector_i_sub_assign_f((*r).c[3],chi);
-       
-/******************************** end of loop *********************************/
+            /******************************* direction +0 *********************************/
 
-       _spinor_mul_f(*r,-0.5f,*r);
-     } /* SITE_FOR */
-   } /* PIECE FOR */
+            iy = iup(ix, 0);
+            sp = _FIELD_AT(in, iy);
+            up = pu_gauge_f_flt(ix, 0);
+
+            _vector_add_f(psi, (*sp).c[0], (*sp).c[2]);
+            _suNf_theta_T_multiply(chi, (*up), psi);
+
+            (*r).c[0] = chi;
+            (*r).c[2] = chi;
+
+            _vector_add_f(psi, (*sp).c[1], (*sp).c[3]);
+            _suNf_theta_T_multiply(chi, (*up), psi);
+
+            (*r).c[1] = chi;
+            (*r).c[3] = chi;
+
+            /******************************* direction -0 *********************************/
+
+            iy = idn(ix, 0);
+            sm = _FIELD_AT(in, iy);
+            um = pu_gauge_f_flt(iy, 0);
+
+            _vector_sub_f(psi, (*sm).c[0], (*sm).c[2]);
+            _suNf_theta_T_inverse_multiply(chi, (*um), psi);
+
+            _vector_add_assign_f((*r).c[0], chi);
+            _vector_sub_assign_f((*r).c[2], chi);
+
+            _vector_sub_f(psi, (*sm).c[1], (*sm).c[3]);
+            _suNf_theta_T_inverse_multiply(chi, (*um), psi);
+
+            _vector_add_assign_f((*r).c[1], chi);
+            _vector_sub_assign_f((*r).c[3], chi);
+
+            /******************************* direction +1 *********************************/
+
+            iy = iup(ix, 1);
+            sp = _FIELD_AT(in, iy);
+            up = pu_gauge_f_flt(ix, 1);
+
+            _vector_i_add_f(psi, (*sp).c[0], (*sp).c[3]);
+            _suNf_theta_X_multiply(chi, (*up), psi);
+
+            _vector_add_assign_f((*r).c[0], chi);
+            _vector_i_sub_assign_f((*r).c[3], chi);
+
+            _vector_i_add_f(psi, (*sp).c[1], (*sp).c[2]);
+            _suNf_theta_X_multiply(chi, (*up), psi);
+
+            _vector_add_assign_f((*r).c[1], chi);
+            _vector_i_sub_assign_f((*r).c[2], chi);
+
+            /******************************* direction -1 *********************************/
+
+            iy = idn(ix, 1);
+            sm = _FIELD_AT(in, iy);
+            um = pu_gauge_f_flt(iy, 1);
+
+            _vector_i_sub_f(psi, (*sm).c[0], (*sm).c[3]);
+            _suNf_theta_X_inverse_multiply(chi, (*um), psi);
+
+            _vector_add_assign_f((*r).c[0], chi);
+            _vector_i_add_assign_f((*r).c[3], chi);
+
+            _vector_i_sub_f(psi, (*sm).c[1], (*sm).c[2]);
+            _suNf_theta_X_inverse_multiply(chi, (*um), psi);
+
+            _vector_add_assign_f((*r).c[1], chi);
+            _vector_i_add_assign_f((*r).c[2], chi);
+
+            /******************************* direction +2 *********************************/
+
+            iy = iup(ix, 2);
+            sp = _FIELD_AT(in, iy);
+            up = pu_gauge_f_flt(ix, 2);
+
+            _vector_add_f(psi, (*sp).c[0], (*sp).c[3]);
+            _suNf_theta_Y_multiply(chi, (*up), psi);
+
+            _vector_add_assign_f((*r).c[0], chi);
+            _vector_add_assign_f((*r).c[3], chi);
+
+            _vector_sub_f(psi, (*sp).c[1], (*sp).c[2]);
+            _suNf_theta_Y_multiply(chi, (*up), psi);
+
+            _vector_add_assign_f((*r).c[1], chi);
+            _vector_sub_assign_f((*r).c[2], chi);
+
+            /******************************* direction -2 *********************************/
+
+            iy = idn(ix, 2);
+            sm = _FIELD_AT(in, iy);
+            um = pu_gauge_f_flt(iy, 2);
+
+            _vector_sub_f(psi, (*sm).c[0], (*sm).c[3]);
+            _suNf_theta_Y_inverse_multiply(chi, (*um), psi);
+
+            _vector_add_assign_f((*r).c[0], chi);
+            _vector_sub_assign_f((*r).c[3], chi);
+
+            _vector_add_f(psi, (*sm).c[1], (*sm).c[2]);
+            _suNf_theta_Y_inverse_multiply(chi, (*um), psi);
+
+            _vector_add_assign_f((*r).c[1], chi);
+            _vector_add_assign_f((*r).c[2], chi);
+
+            /******************************* direction +3 *********************************/
+
+            iy = iup(ix, 3);
+            sp = _FIELD_AT(in, iy);
+            up = pu_gauge_f_flt(ix, 3);
+
+            _vector_i_add_f(psi, (*sp).c[0], (*sp).c[2]);
+            _suNf_theta_Z_multiply(chi, (*up), psi);
+
+            _vector_add_assign_f((*r).c[0], chi);
+            _vector_i_sub_assign_f((*r).c[2], chi);
+
+            _vector_i_sub_f(psi, (*sp).c[1], (*sp).c[3]);
+            _suNf_theta_Z_multiply(chi, (*up), psi);
+
+            _vector_add_assign_f((*r).c[1], chi);
+            _vector_i_add_assign_f((*r).c[3], chi);
+
+            /******************************* direction -3 *********************************/
+
+            iy = idn(ix, 3);
+            sm = _FIELD_AT(in, iy);
+            um = pu_gauge_f_flt(iy, 3);
+
+            _vector_i_sub_f(psi, (*sm).c[0], (*sm).c[2]);
+            _suNf_theta_Z_inverse_multiply(chi, (*um), psi);
+
+            _vector_add_assign_f((*r).c[0], chi);
+            _vector_i_add_assign_f((*r).c[2], chi);
+
+            _vector_i_add_f(psi, (*sm).c[1], (*sm).c[3]);
+            _suNf_theta_Z_inverse_multiply(chi, (*um), psi);
+
+            _vector_add_assign_f((*r).c[1], chi);
+            _vector_i_sub_assign_f((*r).c[3], chi);
+
+            /******************************** end of loop *********************************/
+
+            _spinor_mul_f(*r, -0.5f, *r);
+        } /* SITE_FOR */
+    } /* PIECE FOR */
 }
 #endif
 
@@ -642,96 +636,94 @@ void Dphi_flt_cpu_(spinor_field_flt *out, spinor_field_flt *in)
  */
 void Dphi_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
 {
-   float rho;
+    float rho;
 #ifdef ROTATED_SF
-    int ix,iy,iz,index;
+    int ix, iy, iz, index;
     suNf_spinor_flt *r, *sp;
     float SFrho;
     suNf_spinor_flt tmp;
 #endif /* ROTATED_SF */
 
-   error((in==NULL)||(out==NULL),1,"Dphi_flt [Dphi_flt.c]",
-         "Attempt to access unallocated memory space");
-   
-   error(in==out,1,"Dphi_flt [Dphi_flt.c]",
-         "Input and output fields must be different");
+    error((in == NULL) || (out == NULL), 1, "Dphi_flt [Dphi_flt.c]", "Attempt to access unallocated memory space");
+
+    error(in == out, 1, "Dphi_flt [Dphi_flt.c]", "Input and output fields must be different");
 
 #ifdef CHECK_SPINOR_MATCHING
-   error(out->type!=&glattice || in->type!=&glattice,1,"Dphi [Dphi.c]", "Spinors are not defined on all the lattice!");
+    error(out->type != &glattice || in->type != &glattice, 1, "Dphi [Dphi.c]", "Spinors are not defined on all the lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
-   apply_BCs_on_spinor_field_flt(in);
-   Dphi_flt_cpu_(out, in);
+    apply_BCs_on_spinor_field_flt(in);
+    Dphi_flt_cpu_(out, in);
 
-   rho=4.f+(float)(m0);
-   spinor_field_mul_add_assign_f_flt_cpu(out,rho,in);
+    rho = 4.f + (float)(m0);
+    spinor_field_mul_add_assign_f_flt_cpu(out, rho, in);
 
 #ifdef ROTATED_SF
-   SFrho=(float)(3.*_update_par.SF_ds+_update_par.SF_zf-4.);
-    
-	if(COORD[0] == 0) {
-		for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
-			index=ipt(1,ix,iy,iz);
-			r=_FIELD_AT(out,index);
-			sp=_FIELD_AT(in,index);
-			_spinor_mul_add_assign_f(*r,SFrho,*sp);
-			
-			_spinor_pminus_f(tmp,*sp);
-			_spinor_g5_assign_f(tmp);
-			if(_update_par.SF_sign==1) {
-				_spinor_i_add_assign_f(*r,tmp);
-			} else {
-				_spinor_i_sub_assign_f(*r,tmp);
-			}
-		}
-	}
-	if(COORD[0] == NP_T-1) {
-		for (ix=0;ix<X;++ix) for (iy=0;iy<Y;++iy) for (iz=0;iz<Z;++iz){
-			index=ipt(T-1,ix,iy,iz);
-			r=_FIELD_AT(out,index);
-            sp=_FIELD_AT(in,index);
-			_spinor_mul_add_assign_f(*r,SFrho,*sp);
-			
-			_spinor_pplus_f(tmp,*sp);
-			_spinor_g5_assign_f(tmp);
-			if(_update_par.SF_sign==1) {
-				_spinor_i_add_assign_f(*r,tmp);
-			} else {
-				_spinor_i_sub_assign_f(*r,tmp);
-			}
-		}
-	}
-#endif 
-  
-   apply_BCs_on_spinor_field_flt(out);
+    SFrho = (float)(3. * _update_par.SF_ds + _update_par.SF_zf - 4.);
+
+    if (COORD[0] == 0) {
+        for (ix = 0; ix < X; ++ix)
+            for (iy = 0; iy < Y; ++iy)
+                for (iz = 0; iz < Z; ++iz) {
+                    index = ipt(1, ix, iy, iz);
+                    r = _FIELD_AT(out, index);
+                    sp = _FIELD_AT(in, index);
+                    _spinor_mul_add_assign_f(*r, SFrho, *sp);
+
+                    _spinor_pminus_f(tmp, *sp);
+                    _spinor_g5_assign_f(tmp);
+                    if (_update_par.SF_sign == 1) {
+                        _spinor_i_add_assign_f(*r, tmp);
+                    } else {
+                        _spinor_i_sub_assign_f(*r, tmp);
+                    }
+                }
+    }
+    if (COORD[0] == NP_T - 1) {
+        for (ix = 0; ix < X; ++ix)
+            for (iy = 0; iy < Y; ++iy)
+                for (iz = 0; iz < Z; ++iz) {
+                    index = ipt(T - 1, ix, iy, iz);
+                    r = _FIELD_AT(out, index);
+                    sp = _FIELD_AT(in, index);
+                    _spinor_mul_add_assign_f(*r, SFrho, *sp);
+
+                    _spinor_pplus_f(tmp, *sp);
+                    _spinor_g5_assign_f(tmp);
+                    if (_update_par.SF_sign == 1) {
+                        _spinor_i_add_assign_f(*r, tmp);
+                    } else {
+                        _spinor_i_sub_assign_f(*r, tmp);
+                    }
+                }
+    }
+#endif
+
+    apply_BCs_on_spinor_field_flt(out);
 }
 
 void g5Dphi_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
 {
-   float rho;
+    float rho;
 
-   error((in==NULL)||(out==NULL),1,"g5Dphi_flt [Dphi_flt.c]",
-         "Attempt to access unallocated memory space");
-   
-   error(in==out,1,"g5Dphi_flt [Dphi_flt.c]",
-         "Input and output fields must be different");
+    error((in == NULL) || (out == NULL), 1, "g5Dphi_flt [Dphi_flt.c]", "Attempt to access unallocated memory space");
+
+    error(in == out, 1, "g5Dphi_flt [Dphi_flt.c]", "Input and output fields must be different");
 
 #ifdef CHECK_SPINOR_MATCHING
-   error(out->type!=&glattice || in->type!=&glattice,1,"g5Dphi [Dphi.c]", "Spinors are not defined on all the lattice!");
+    error(out->type != &glattice || in->type != &glattice, 1, "g5Dphi [Dphi.c]", "Spinors are not defined on all the lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
-   apply_BCs_on_spinor_field_flt(in);
-   
-   Dphi_flt_cpu_(out, in);
-   
-   rho=4.f+(float)(m0);
+    apply_BCs_on_spinor_field_flt(in);
 
-   spinor_field_mul_add_assign_f_flt_cpu(out,rho,in);
-   spinor_field_g5_assign_f_flt_cpu(out);
-   apply_BCs_on_spinor_field_flt(out);
+    Dphi_flt_cpu_(out, in);
+
+    rho = 4.f + (float)(m0);
+
+    spinor_field_mul_add_assign_f_flt_cpu(out, rho, in);
+    spinor_field_g5_assign_f_flt_cpu(out);
+    apply_BCs_on_spinor_field_flt(out);
 }
-
-
 
 /* Even/Odd preconditioned dirac operator
  * this function takes 2 spinors defined on the even lattice
@@ -740,34 +732,35 @@ void g5Dphi_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
  */
 void Dphi_eopre_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
 {
-  float rho;
-  
-  error((in==NULL)||(out==NULL),1,"Dphi_eopre_flt [Dphi_flt.c]",
-	"Attempt to access unallocated memory space");
-  
-  error(in==out,1,"Dphi_eopre_flt [Dphi_flt.c]",
-	"Input and output fields must be different");
-  
+    float rho;
+
+    error((in == NULL) || (out == NULL), 1, "Dphi_eopre_flt [Dphi_flt.c]", "Attempt to access unallocated memory space");
+
+    error(in == out, 1, "Dphi_eopre_flt [Dphi_flt.c]", "Input and output fields must be different");
+
 #ifdef CHECK_SPINOR_MATCHING
-  error(out->type!=&glat_even || in->type!=&glat_even,1,"Dphi_eopre_flt " __FILE__, "Spinors are not defined on even lattice!");
+    error(out->type != &glat_even || in->type != &glat_even, 1, "Dphi_eopre_flt " __FILE__,
+          "Spinors are not defined on even lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
-  /* alloc memory for temporary spinor field */
-  if (init) { init_Dirac(); init=0; }
-  
-  apply_BCs_on_spinor_field_flt(in);
-  Dphi_flt_cpu_(otmp, in);
-  apply_BCs_on_spinor_field_flt(otmp);
-  Dphi_flt_cpu_(out, otmp);
-  
-  rho=4.f+(float)(m0);
-  rho*=-rho; /* this minus sign is taken into account below */
-  
-  spinor_field_mul_add_assign_f_flt_cpu(out,rho,in);
-  spinor_field_minus_f_flt_cpu(out,out);
-  apply_BCs_on_spinor_field_flt(out);
-}
+    /* alloc memory for temporary spinor field */
+    if (init) {
+        init_Dirac();
+        init = 0;
+    }
 
+    apply_BCs_on_spinor_field_flt(in);
+    Dphi_flt_cpu_(otmp, in);
+    apply_BCs_on_spinor_field_flt(otmp);
+    Dphi_flt_cpu_(out, otmp);
+
+    rho = 4.f + (float)(m0);
+    rho *= -rho; /* this minus sign is taken into account below */
+
+    spinor_field_mul_add_assign_f_flt_cpu(out, rho, in);
+    spinor_field_minus_f_flt_cpu(out, out);
+    apply_BCs_on_spinor_field_flt(out);
+}
 
 /* Even/Odd preconditioned dirac operator
  * this function takes 2 spinors defined on the odd lattice
@@ -776,105 +769,103 @@ void Dphi_eopre_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
  */
 void Dphi_oepre_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
 {
-  float rho;
-  
-  error((in==NULL)||(out==NULL),1,"Dphi_oepre_flt [Dphi_flt.c]",
-	"Attempt to access unallocated memory space");
-  
-  error(in==out,1,"Dphi_oepre_flt [Dphi_flt.c]",
-	"Input and output fields must be different");
-  
+    float rho;
+
+    error((in == NULL) || (out == NULL), 1, "Dphi_oepre_flt [Dphi_flt.c]", "Attempt to access unallocated memory space");
+
+    error(in == out, 1, "Dphi_oepre_flt [Dphi_flt.c]", "Input and output fields must be different");
+
 #ifdef CHECK_SPINOR_MATCHING
-  error(out->type!=&glat_odd || in->type!=&glat_odd,1,"Dphi_oepre_flt " __FILE__, "Spinors are not defined on odd lattice!");
+    error(out->type != &glat_odd || in->type != &glat_odd, 1, "Dphi_oepre_flt " __FILE__,
+          "Spinors are not defined on odd lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
-  /* alloc memory for temporary spinor field */
-  if (init) { init_Dirac(); init=0; }
+    /* alloc memory for temporary spinor field */
+    if (init) {
+        init_Dirac();
+        init = 0;
+    }
 
-  apply_BCs_on_spinor_field_flt(in);  
-  Dphi_flt_cpu_(etmp, in);
-  apply_BCs_on_spinor_field_flt(etmp);
-  Dphi_flt_cpu_(out, etmp);
-  
-  rho=4.f+(float)(m0);
-  rho*=-rho; /* this minus sign is taken into account below */
-  
-  spinor_field_mul_add_assign_f_flt_cpu(out,rho,in);
-  spinor_field_minus_f_flt_cpu(out,out);
-  apply_BCs_on_spinor_field_flt(out);
+    apply_BCs_on_spinor_field_flt(in);
+    Dphi_flt_cpu_(etmp, in);
+    apply_BCs_on_spinor_field_flt(etmp);
+    Dphi_flt_cpu_(out, etmp);
+
+    rho = 4.f + (float)(m0);
+    rho *= -rho; /* this minus sign is taken into account below */
+
+    spinor_field_mul_add_assign_f_flt_cpu(out, rho, in);
+    spinor_field_minus_f_flt_cpu(out, out);
+    apply_BCs_on_spinor_field_flt(out);
 }
-
-
 
 void g5Dphi_eopre_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
 {
-  float rho;
-  
-  error((in==NULL)||(out==NULL),1,"g5Dphi_eopre_flt [Dphi_flt.c]",
-	"Attempt to access unallocated memory space");
-  
-  error(in==out,1,"Dphi_eopre_flt [Dphi_flt.c]",
-	"Input and output fields must be different");
-  
+    float rho;
+
+    error((in == NULL) || (out == NULL), 1, "g5Dphi_eopre_flt [Dphi_flt.c]", "Attempt to access unallocated memory space");
+
+    error(in == out, 1, "Dphi_eopre_flt [Dphi_flt.c]", "Input and output fields must be different");
+
 #ifdef CHECK_SPINOR_MATCHING
-  error(out->type!=&glat_even || in->type!=&glat_even,1,"g5Dphi_eopre_flt " __FILE__, "Spinors are not defined on even lattice!");
+    error(out->type != &glat_even || in->type != &glat_even, 1, "g5Dphi_eopre_flt " __FILE__,
+          "Spinors are not defined on even lattice!");
 #endif /* CHECK_SPINOR_MATCHING */
 
-  /* alloc memory for temporary spinor field */
-  if (init) { init_Dirac(); init=0; }
-  
-  apply_BCs_on_spinor_field_flt(in);
-  Dphi_flt_cpu_(otmp, in);
-  apply_BCs_on_spinor_field_flt(otmp);
-  Dphi_flt_cpu_(out, otmp);
-  
-  rho=4.f+(float)(m0);
-  rho*=-rho; /* this minus sign is taken into account below */
-  
-  spinor_field_mul_add_assign_f_flt_cpu(out,rho,in);
-  spinor_field_minus_f_flt_cpu(out,out);
-  spinor_field_g5_assign_f_flt_cpu(out);
-  apply_BCs_on_spinor_field_flt(out);
+    /* alloc memory for temporary spinor field */
+    if (init) {
+        init_Dirac();
+        init = 0;
+    }
+
+    apply_BCs_on_spinor_field_flt(in);
+    Dphi_flt_cpu_(otmp, in);
+    apply_BCs_on_spinor_field_flt(otmp);
+    Dphi_flt_cpu_(out, otmp);
+
+    rho = 4.f + (float)(m0);
+    rho *= -rho; /* this minus sign is taken into account below */
+
+    spinor_field_mul_add_assign_f_flt_cpu(out, rho, in);
+    spinor_field_minus_f_flt_cpu(out, out);
+    spinor_field_g5_assign_f_flt_cpu(out);
+    apply_BCs_on_spinor_field_flt(out);
 }
 
 /* g5Dphi_eopre ^2 */
-void g5Dphi_eopre_sq_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in) {
-  /* alloc memory for temporary spinor field */
-  if (init) { init_Dirac(); init=0; }
+void g5Dphi_eopre_sq_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
+{
+    /* alloc memory for temporary spinor field */
+    if (init) {
+        init_Dirac();
+        init = 0;
+    }
 
-  g5Dphi_eopre_flt_cpu(m0, etmp, in);
-  g5Dphi_eopre_flt_cpu(m0, out, etmp);
-  
+    g5Dphi_eopre_flt_cpu(m0, etmp, in);
+    g5Dphi_eopre_flt_cpu(m0, out, etmp);
 }
 
 /* g5Dhi ^2 */
-void g5Dphi_sq_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in) {
-  /* alloc memory for temporary spinor field */
-  if (init) { init_Dirac(); init=0; }
-  
-  g5Dphi_flt_cpu(m0, gtmp, in);
-  g5Dphi_flt_cpu(m0, out, gtmp);
+void g5Dphi_sq_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
+{
+    /* alloc memory for temporary spinor field */
+    if (init) {
+        init_Dirac();
+        init = 0;
+    }
 
+    g5Dphi_flt_cpu(m0, gtmp, in);
+    g5Dphi_flt_cpu(m0, out, gtmp);
 }
 
 #ifndef WITH_GPU
-unsigned long int(*getMVM_flt)(void)=getMVM_flt_cpu;
-void (*Dphi_flt_) (spinor_field_flt *out, spinor_field_flt *in)=Dphi_flt_cpu_;
-void (*Dphi_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in)=Dphi_flt_cpu;
-void (*g5Dphi_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in)=g5Dphi_flt_cpu;
-void (*g5Dphi_sq_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in)=g5Dphi_sq_flt_cpu;
-void (*Dphi_eopre_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in)=Dphi_eopre_flt_cpu;
-void (*Dphi_oepre_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in)=Dphi_oepre_flt_cpu;
-void (*g5Dphi_eopre_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in)=g5Dphi_eopre_flt_cpu;
-void (*g5Dphi_eopre_sq_flt) (double m0, spinor_field_flt *out, spinor_field_flt *in)=g5Dphi_eopre_sq_flt_cpu;
+unsigned long int (*getMVM_flt)(void) = getMVM_flt_cpu;
+void (*Dphi_flt_)(spinor_field_flt *out, spinor_field_flt *in) = Dphi_flt_cpu_;
+void (*Dphi_flt)(double m0, spinor_field_flt *out, spinor_field_flt *in) = Dphi_flt_cpu;
+void (*g5Dphi_flt)(double m0, spinor_field_flt *out, spinor_field_flt *in) = g5Dphi_flt_cpu;
+void (*g5Dphi_sq_flt)(double m0, spinor_field_flt *out, spinor_field_flt *in) = g5Dphi_sq_flt_cpu;
+void (*Dphi_eopre_flt)(double m0, spinor_field_flt *out, spinor_field_flt *in) = Dphi_eopre_flt_cpu;
+void (*Dphi_oepre_flt)(double m0, spinor_field_flt *out, spinor_field_flt *in) = Dphi_oepre_flt_cpu;
+void (*g5Dphi_eopre_flt)(double m0, spinor_field_flt *out, spinor_field_flt *in) = g5Dphi_eopre_flt_cpu;
+void (*g5Dphi_eopre_sq_flt)(double m0, spinor_field_flt *out, spinor_field_flt *in) = g5Dphi_eopre_sq_flt_cpu;
 #endif //WITH_GPU
-
-
-
-
-
-
-
-
-
-

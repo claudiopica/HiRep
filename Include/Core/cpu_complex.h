@@ -136,13 +136,13 @@ typedef float complex hr_complex_flt;
 * a^*b (a,b complex)
 */
 #define _complex_prod(a,b) \
-   conj(a)*b
+   conj(a)*(b)
 
 /*
 * Re(a^*b) (a,b complex)
 */
 #define _complex_prod_re(a,b) \
-   creal(conj(a)*b)
+   creal(conj(a)*(b))
 
 /*
 * Re((1-a)^*(1-b)) (a,b complex)
@@ -154,7 +154,7 @@ typedef float complex hr_complex_flt;
 * Im(a^*b) (a,b complex)
 */
 #define _complex_prod_im(a,b) \
-   cimag(conj(a)*b)
+   cimag(conj(a)*(b))
 
 /*
 * c+=(a^*b) (a,b,c complex)

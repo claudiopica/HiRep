@@ -22,41 +22,41 @@
 #error Missing _SUFFIX in linear_algebra.c
 #endif
 
-
 // Internal macro for defining generic functions and alias function pointers
-#define _CPU_F_NAME(_name,_suffix) CONCAT(_name,_suffix ## _cpu)
-#define _FUNC_INNER(_type,_name,_suffix,_args) _type _CPU_F_NAME(_name,_suffix) _args
+#define _CPU_F_NAME(_name, _suffix) CONCAT(_name, _suffix##_cpu)
+#define _FUNC_INNER(_type, _name, _suffix, _args) _type _CPU_F_NAME(_name, _suffix) _args
 #ifdef WITH_GPU
-#define _ALIAS_INNER(_type,_name,_suffix,_args) _type (*_F_NAME(_name,_suffix)) _args = _GPU_F_NAME(_name,_suffix)
+#define _ALIAS_INNER(_type, _name, _suffix, _args) _type(*_F_NAME(_name, _suffix)) _args = _GPU_F_NAME(_name, _suffix)
 #else
-#define _ALIAS_INNER(_type,_name,_suffix,_args) _type (*_F_NAME(_name,_suffix)) _args = _CPU_F_NAME(_name,_suffix)
+#define _ALIAS_INNER(_type, _name, _suffix, _args) _type(*_F_NAME(_name, _suffix)) _args = _CPU_F_NAME(_name, _suffix)
 #endif
-#define _DECLARE(_type,_name,_args) _ALIAS_INNER(_type,_name,_SUFFIX,_args); _FUNC_INNER(_type,_name,_SUFFIX,_args)
-
+#define _DECLARE(_type, _name, _args)           \
+    _ALIAS_INNER(_type, _name, _SUFFIX, _args); \
+    _FUNC_INNER(_type, _name, _SUFFIX, _args)
 
 /* s1=s2 */
-_DECLARE(void, spinor_field_copy, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_copy, (_SPINOR_FIELD_TYPE * s1, _SPINOR_FIELD_TYPE *s2))
 {
-    _TWO_SPINORS_MATCHING(s1,s2);
-    memcpy(s1->ptr,s2->ptr,s1->type->gsize_spinor*sizeof(_SPINOR_TYPE));
+    _TWO_SPINORS_MATCHING(s1, s2);
+    memcpy(s1->ptr, s2->ptr, s1->type->gsize_spinor * sizeof(_SPINOR_TYPE));
 }
 
 /* Re <s1,s2> */
-_DECLARE(double, spinor_field_prod_re, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(double, spinor_field_prod_re, (_SPINOR_FIELD_TYPE * s1, _SPINOR_FIELD_TYPE *s2))
 {
     double sum;
-    double c; //sum and compensation term 
-    _OMP_PRAGMA ( single ) {
-        sum = 0.;
-        c = 0.;
-    }
+    double c; //sum and compensation term
 
-    _TWO_SPINORS_FOR_SUM(s1,s2,sum,c) {
+    sum = 0.;
+    c = 0.;
+
+    _TWO_SPINORS_FOR_SUM(s1, s2, sum, c)
+    {
         double prod;
-        _spinor_prod_re_f(prod,*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
+        _spinor_prod_re_f(prod, *_SPINOR_PTR(s1), *_SPINOR_PTR(s2));
         _2Sum_acc(sum, c, prod);
     }
-    sum += c;    
+    sum += c;
 #ifdef WITH_MPI
     global_sum(&sum, 1);
 #endif
@@ -64,313 +64,333 @@ _DECLARE(double, spinor_field_prod_re, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TY
 }
 
 /* Im <s1,s2> */
-_DECLARE(double, spinor_field_prod_im, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(double, spinor_field_prod_im, (_SPINOR_FIELD_TYPE * s1, _SPINOR_FIELD_TYPE *s2))
 {
     double sum;
-    double c; //sum and compensation term 
-    _OMP_PRAGMA ( single ) {
-        sum = 0.; c = 0.;
-    }
+    double c; //sum and compensation term
 
-    _TWO_SPINORS_FOR_SUM(s1,s2,sum,c) {
+    sum = 0.;
+    c = 0.;
+
+    _TWO_SPINORS_FOR_SUM(s1, s2, sum, c)
+    {
         double prod;
-        _spinor_prod_im_f(prod,*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
+        _spinor_prod_im_f(prod, *_SPINOR_PTR(s1), *_SPINOR_PTR(s2));
         _2Sum_acc(sum, c, prod);
     }
     sum += c;
 #ifdef WITH_MPI
-    global_sum(&sum,1);
+    global_sum(&sum, 1);
 #endif
-   return sum;
+    return sum;
 }
 
 /* <s1,s2> */
-_DECLARE(hr_complex, spinor_field_prod, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(hr_complex, spinor_field_prod, (_SPINOR_FIELD_TYPE * s1, _SPINOR_FIELD_TYPE *s2))
 {
     hr_complex sum;
     hr_complex c; //compensation term
-    _OMP_PRAGMA ( single ) {
-        _complex_0(sum); _complex_0(c);
-    }
+    _complex_0(sum);
+    _complex_0(c);
 
-    _TWO_SPINORS_FOR_SUM(s1,s2,sum,c) {
+    _TWO_SPINORS_FOR_SUM(s1, s2, sum, c)
+    {
         hr_complex prod; //needed for OMP threads
-        _spinor_prod_f(prod,*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
-        double s_re = creal(sum); double s_im = cimag(sum);  
-        double c_re = creal(c); double c_im = cimag(c);  
+        _spinor_prod_f(prod, *_SPINOR_PTR(s1), *_SPINOR_PTR(s2));
+        double s_re = creal(sum);
+        double s_im = cimag(sum);
+        double c_re = creal(c);
+        double c_im = cimag(c);
         _2Sum_acc(s_re, c_re, creal(prod));
         _2Sum_acc(s_im, c_im, cimag(prod));
-        sum = s_re + s_im*I;
-        c = c_re + c_im*I;
+        sum = s_re + s_im * I;
+        c = c_re + c_im * I;
     }
     _complex_add_assign(sum, c);
 #ifdef WITH_MPI
-    global_sum((double*)&sum,2);
+    global_sum((double *)&sum, 2);
 #endif
     return sum;
 }
 
 /* Re <g5*s1,s2> */
-_DECLARE(double, spinor_field_g5_prod_re, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(double, spinor_field_g5_prod_re, (_SPINOR_FIELD_TYPE * s1, _SPINOR_FIELD_TYPE *s2))
 {
     double sum;
-    double c; //compensation term 
-    _OMP_PRAGMA ( single ) {
-        sum = 0.; c = 0.;
-    }
+    double c; //compensation term
+    sum = 0.;
+    c = 0.;
 
-    _TWO_SPINORS_FOR_SUM(s1,s2,sum,c) {
+    _TWO_SPINORS_FOR_SUM(s1, s2, sum, c)
+    {
         double prod;
-        _spinor_g5_prod_re_f(prod,*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
+        _spinor_g5_prod_re_f(prod, *_SPINOR_PTR(s1), *_SPINOR_PTR(s2));
         _2Sum_acc(sum, c, prod);
     }
     sum += c;
 #ifdef WITH_MPI
-    global_sum(&sum,1);
+    global_sum(&sum, 1);
 #endif
     return sum;
 }
 
 /* Im <g5*s1,s2> */
-_DECLARE(double, spinor_field_g5_prod_im, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(double, spinor_field_g5_prod_im, (_SPINOR_FIELD_TYPE * s1, _SPINOR_FIELD_TYPE *s2))
 {
     double sum;
-    double c; //compensation term 
-    _OMP_PRAGMA ( single ) {
-        sum = 0.; c = 0.;
-    }
+    double c; //compensation term
+    sum = 0.;
+    c = 0.;
 
-    _TWO_SPINORS_FOR_SUM(s1,s2,sum,c) {
+    _TWO_SPINORS_FOR_SUM(s1, s2, sum, c)
+    {
         double prod;
-        _spinor_g5_prod_im_f(prod,*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
+        _spinor_g5_prod_im_f(prod, *_SPINOR_PTR(s1), *_SPINOR_PTR(s2));
         _2Sum_acc(sum, c, prod);
     }
     sum += c;
 #ifdef WITH_MPI
-    global_sum(&sum,1);
+    global_sum(&sum, 1);
 #endif
     return sum;
 }
 
 /* Re <s1,s1> */
-_DECLARE(double, spinor_field_sqnorm, (_SPINOR_FIELD_TYPE *s1))
+_DECLARE(double, spinor_field_sqnorm, (_SPINOR_FIELD_TYPE * s1))
 {
     double sum;
-    double c; //compensation term 
-    _OMP_PRAGMA ( single ) {
-        sum = 0.; c= 0.;
-    }
-    
-    _ONE_SPINOR_FOR_SUM(s1,sum,c) {
+    double c; //compensation term
+    sum = 0.;
+    c = 0.;
+
+    _ONE_SPINOR_FOR_SUM(s1, sum, c)
+    {
         double prod;
-        _spinor_prod_re_f(prod,*_SPINOR_PTR(s1),*_SPINOR_PTR(s1));
+        _spinor_prod_re_f(prod, *_SPINOR_PTR(s1), *_SPINOR_PTR(s1));
         _2Sum_acc(sum, c, prod);
     }
-    sum += c;    
+    sum += c;
 #ifdef WITH_MPI
-    _OMP_PRAGMA ( master ) {
-        global_sum(&sum,1);
-    }
-    _OMP_BARRIER
+    global_sum(&sum, 1);
 #endif
 
     return sum;
 }
 
 /* s1+=r*s2 r real */
-_DECLARE(void, spinor_field_mul_add_assign, (_SPINOR_FIELD_TYPE *s1, _REAL r, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_mul_add_assign, (_SPINOR_FIELD_TYPE * s1, _REAL r, _SPINOR_FIELD_TYPE *s2))
 {
-    _TWO_SPINORS_FOR(s1,s2) {
-        _spinor_mul_add_assign_f(*_SPINOR_PTR(s1),r,*_SPINOR_PTR(s2));
+    _TWO_SPINORS_FOR(s1, s2)
+    {
+        _spinor_mul_add_assign_f(*_SPINOR_PTR(s1), r, *_SPINOR_PTR(s2));
     }
 }
 
 /* s1+=c*s2 c complex */
-_DECLARE(void, spinor_field_mulc_add_assign, (_SPINOR_FIELD_TYPE *s1, _COMPLEX c, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_mulc_add_assign, (_SPINOR_FIELD_TYPE * s1, _COMPLEX c, _SPINOR_FIELD_TYPE *s2))
 {
-    _TWO_SPINORS_FOR(s1,s2) {
-        _spinor_mulc_add_assign_f(*_SPINOR_PTR(s1),c,*_SPINOR_PTR(s2));
+    _TWO_SPINORS_FOR(s1, s2)
+    {
+        _spinor_mulc_add_assign_f(*_SPINOR_PTR(s1), c, *_SPINOR_PTR(s2));
     }
 }
 
 /* s1+=c*g5*s2 c complex */
-_DECLARE(void, spinor_field_g5_mulc_add_assign, (_SPINOR_FIELD_TYPE *s1, _COMPLEX c, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_g5_mulc_add_assign, (_SPINOR_FIELD_TYPE * s1, _COMPLEX c, _SPINOR_FIELD_TYPE *s2))
 {
     _SPINOR_TYPE tmp;
-    _TWO_SPINORS_FOR(s1,s2) {
-        _spinor_g5_f(tmp,*_SPINOR_PTR(s2));
-        _spinor_mulc_add_assign_f(*_SPINOR_PTR(s1),c,tmp);
+    _TWO_SPINORS_FOR(s1, s2)
+    {
+        _spinor_g5_f(tmp, *_SPINOR_PTR(s2));
+        _spinor_mulc_add_assign_f(*_SPINOR_PTR(s1), c, tmp);
     }
 }
 
-
 /* s1=r*s2 */
-_DECLARE(void, spinor_field_mul, (_SPINOR_FIELD_TYPE *s1, _REAL r, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_mul, (_SPINOR_FIELD_TYPE * s1, _REAL r, _SPINOR_FIELD_TYPE *s2))
 {
-    _TWO_SPINORS_FOR(s1,s2) {
-        _spinor_mul_f(*_SPINOR_PTR(s1),r,*_SPINOR_PTR(s2));
+    _TWO_SPINORS_FOR(s1, s2)
+    {
+        _spinor_mul_f(*_SPINOR_PTR(s1), r, *_SPINOR_PTR(s2));
     }
 }
 
 /* s1=c*s2 c complex */
-_DECLARE(void, spinor_field_mulc, (_SPINOR_FIELD_TYPE *s1, _COMPLEX c, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_mulc, (_SPINOR_FIELD_TYPE * s1, _COMPLEX c, _SPINOR_FIELD_TYPE *s2))
 {
-    _TWO_SPINORS_FOR(s1,s2) {
-        _spinor_mulc_f(*_SPINOR_PTR(s1),c,*_SPINOR_PTR(s2));
+    _TWO_SPINORS_FOR(s1, s2)
+    {
+        _spinor_mulc_f(*_SPINOR_PTR(s1), c, *_SPINOR_PTR(s2));
     }
 }
 
 /* r=s1+s2 */
-_DECLARE(void, spinor_field_add, (_SPINOR_FIELD_TYPE *r, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_add, (_SPINOR_FIELD_TYPE * r, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
 {
-    _THREE_SPINORS_FOR(s1,s2,r) {
-        _spinor_add_f(*_SPINOR_PTR(r),*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
+    _THREE_SPINORS_FOR(s1, s2, r)
+    {
+        _spinor_add_f(*_SPINOR_PTR(r), *_SPINOR_PTR(s1), *_SPINOR_PTR(s2));
     }
 }
 
 /* r=s1-s2 */
-_DECLARE(void, spinor_field_sub, (_SPINOR_FIELD_TYPE *r, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_sub, (_SPINOR_FIELD_TYPE * r, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
 {
-    _THREE_SPINORS_FOR(s1,s2,r) {
-        _spinor_sub_f(*_SPINOR_PTR(r),*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
+    _THREE_SPINORS_FOR(s1, s2, r)
+    {
+        _spinor_sub_f(*_SPINOR_PTR(r), *_SPINOR_PTR(s1), *_SPINOR_PTR(s2));
     }
 }
 
 /* s1+=s2 */
-_DECLARE(void, spinor_field_add_assign, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_add_assign, (_SPINOR_FIELD_TYPE * s1, _SPINOR_FIELD_TYPE *s2))
 {
-    _TWO_SPINORS_FOR(s1,s2) {
-        _spinor_add_assign_f(*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
+    _TWO_SPINORS_FOR(s1, s2)
+    {
+        _spinor_add_assign_f(*_SPINOR_PTR(s1), *_SPINOR_PTR(s2));
     }
 }
 
 /* s1-=s2 */
-_DECLARE(void, spinor_field_sub_assign, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_sub_assign, (_SPINOR_FIELD_TYPE * s1, _SPINOR_FIELD_TYPE *s2))
 {
-    _TWO_SPINORS_FOR(s1,s2) {
-        _spinor_sub_assign_f(*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
+    _TWO_SPINORS_FOR(s1, s2)
+    {
+        _spinor_sub_assign_f(*_SPINOR_PTR(s1), *_SPINOR_PTR(s2));
     }
 }
 
 /* s1=0 */
-_DECLARE(void, spinor_field_zero, (_SPINOR_FIELD_TYPE *s1))
+_DECLARE(void, spinor_field_zero, (_SPINOR_FIELD_TYPE * s1))
 {
-    _ONE_SPINOR_FOR(s1) {
-        _spinor_zero_f(*_SPINOR_PTR(s1));
-    }
+    _ONE_SPINOR_FOR(s1) { _spinor_zero_f(*_SPINOR_PTR(s1)); }
 }
 
 /* s1=-s2 */
-_DECLARE(void, spinor_field_minus, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_minus, (_SPINOR_FIELD_TYPE * s1, _SPINOR_FIELD_TYPE *s2))
 {
-    _TWO_SPINORS_FOR(s1,s2) {
-        _spinor_minus_f(*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
+    _TWO_SPINORS_FOR(s1, s2)
+    {
+        _spinor_minus_f(*_SPINOR_PTR(s1), *_SPINOR_PTR(s2));
     }
 }
 
 /* s1=r1*s2+r2*s3 */
-_DECLARE(void, spinor_field_lc, (_SPINOR_FIELD_TYPE *s1, _REAL r1, _SPINOR_FIELD_TYPE *s2, _REAL r2, _SPINOR_FIELD_TYPE *s3))
+_DECLARE(void, spinor_field_lc, (_SPINOR_FIELD_TYPE * s1, _REAL r1, _SPINOR_FIELD_TYPE *s2, _REAL r2, _SPINOR_FIELD_TYPE *s3))
 {
-    _THREE_SPINORS_FOR(s1,s2,s3) {
-        _spinor_lc_f(*_SPINOR_PTR(s1),r1,*_SPINOR_PTR(s2),r2,*_SPINOR_PTR(s3));
+    _THREE_SPINORS_FOR(s1, s2, s3)
+    {
+        _spinor_lc_f(*_SPINOR_PTR(s1), r1, *_SPINOR_PTR(s2), r2, *_SPINOR_PTR(s3));
     }
 }
 
 /* s1+=r1*s2+r2*s3 */
-_DECLARE(void, spinor_field_lc_add_assign, (_SPINOR_FIELD_TYPE *s1, _REAL r1, _SPINOR_FIELD_TYPE *s2, _REAL r2, _SPINOR_FIELD_TYPE *s3))
+_DECLARE(void, spinor_field_lc_add_assign,
+         (_SPINOR_FIELD_TYPE * s1, _REAL r1, _SPINOR_FIELD_TYPE *s2, _REAL r2, _SPINOR_FIELD_TYPE *s3))
 {
-    _THREE_SPINORS_FOR(s1,s2,s3) {
-        _spinor_lc_add_assign_f(*_SPINOR_PTR(s1),r1,*_SPINOR_PTR(s2),r2,*_SPINOR_PTR(s3));
+    _THREE_SPINORS_FOR(s1, s2, s3)
+    {
+        _spinor_lc_add_assign_f(*_SPINOR_PTR(s1), r1, *_SPINOR_PTR(s2), r2, *_SPINOR_PTR(s3));
     }
 }
 
 /* s1=c1*s2+c2*s3 c1, c2 complex*/
-_DECLARE(void, spinor_field_clc, (_SPINOR_FIELD_TYPE *s1, _COMPLEX c1, _SPINOR_FIELD_TYPE *s2, _COMPLEX c2, _SPINOR_FIELD_TYPE *s3))
+_DECLARE(void, spinor_field_clc,
+         (_SPINOR_FIELD_TYPE * s1, _COMPLEX c1, _SPINOR_FIELD_TYPE *s2, _COMPLEX c2, _SPINOR_FIELD_TYPE *s3))
 {
-    _THREE_SPINORS_FOR(s1,s2,s3) {
-        _spinor_clc_f(*_SPINOR_PTR(s1),c1,*_SPINOR_PTR(s2),c2,*_SPINOR_PTR(s3));
+    _THREE_SPINORS_FOR(s1, s2, s3)
+    {
+        _spinor_clc_f(*_SPINOR_PTR(s1), c1, *_SPINOR_PTR(s2), c2, *_SPINOR_PTR(s3));
     }
 }
 
 /* s1+=c1*s2+c2*s3 c1, c2 complex*/
-_DECLARE(void, spinor_field_clc_add_assign, (_SPINOR_FIELD_TYPE *s1, _COMPLEX c1, _SPINOR_FIELD_TYPE *s2, _COMPLEX c2, _SPINOR_FIELD_TYPE *s3))
+_DECLARE(void, spinor_field_clc_add_assign,
+         (_SPINOR_FIELD_TYPE * s1, _COMPLEX c1, _SPINOR_FIELD_TYPE *s2, _COMPLEX c2, _SPINOR_FIELD_TYPE *s3))
 {
-    _THREE_SPINORS_FOR(s1,s2,s3) {
-        _spinor_clc_add_assign_f(*_SPINOR_PTR(s1),c1,*_SPINOR_PTR(s2),c2,*_SPINOR_PTR(s3));
+    _THREE_SPINORS_FOR(s1, s2, s3)
+    {
+        _spinor_clc_add_assign_f(*_SPINOR_PTR(s1), c1, *_SPINOR_PTR(s2), c2, *_SPINOR_PTR(s3));
     }
 }
 
 /* s1=g5*s2  */
-_DECLARE(void, spinor_field_g5, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_g5, (_SPINOR_FIELD_TYPE * s1, _SPINOR_FIELD_TYPE *s2))
 {
-    _TWO_SPINORS_FOR(s1,s2) {
-        _spinor_g5_f(*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
+    _TWO_SPINORS_FOR(s1, s2)
+    {
+        _spinor_g5_f(*_SPINOR_PTR(s1), *_SPINOR_PTR(s2));
     }
 }
 
 /* s1=g5*s1  */
-_DECLARE(void, spinor_field_g5_assign, (_SPINOR_FIELD_TYPE *s1))
+_DECLARE(void, spinor_field_g5_assign, (_SPINOR_FIELD_TYPE * s1))
 {
-    _ONE_SPINOR_FOR(s1) {
-        _spinor_g5_assign_f(*_SPINOR_PTR(s1));
-    }
+    _ONE_SPINOR_FOR(s1) { _spinor_g5_assign_f(*_SPINOR_PTR(s1)); }
 }
 
 /* s1=g0*s2  */
-_DECLARE(void, spinor_field_g0, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_g0, (_SPINOR_FIELD_TYPE * s1, _SPINOR_FIELD_TYPE *s2))
 {
-    _TWO_SPINORS_FOR(s1,s2) {
-        _spinor_g0_f(*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
+    _TWO_SPINORS_FOR(s1, s2)
+    {
+        _spinor_g0_f(*_SPINOR_PTR(s1), *_SPINOR_PTR(s2));
     }
 }
 
 /* s1=g1*s2  */
-_DECLARE(void, spinor_field_g1, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_g1, (_SPINOR_FIELD_TYPE * s1, _SPINOR_FIELD_TYPE *s2))
 {
-    _TWO_SPINORS_FOR(s1,s2) {
-        _spinor_g1_f(*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
+    _TWO_SPINORS_FOR(s1, s2)
+    {
+        _spinor_g1_f(*_SPINOR_PTR(s1), *_SPINOR_PTR(s2));
     }
 }
 
 /* s1=g2*s2  */
-_DECLARE(void, spinor_field_g2, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_g2, (_SPINOR_FIELD_TYPE * s1, _SPINOR_FIELD_TYPE *s2))
 {
-    _TWO_SPINORS_FOR(s1,s2) {
-        _spinor_g2_f(*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
+    _TWO_SPINORS_FOR(s1, s2)
+    {
+        _spinor_g2_f(*_SPINOR_PTR(s1), *_SPINOR_PTR(s2));
     }
 }
 
 /* s1=g3*s2  */
-_DECLARE(void, spinor_field_g3, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+_DECLARE(void, spinor_field_g3, (_SPINOR_FIELD_TYPE * s1, _SPINOR_FIELD_TYPE *s2))
 {
-    _TWO_SPINORS_FOR(s1,s2) {
-        _spinor_g3_f(*_SPINOR_PTR(s1),*_SPINOR_PTR(s2));
+    _TWO_SPINORS_FOR(s1, s2)
+    {
+        _spinor_g3_f(*_SPINOR_PTR(s1), *_SPINOR_PTR(s2));
     }
 }
 
 /* tools per eva.c  */
 _DECLARE(void, spinor_field_lc1, (_REAL c1, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
 {
-    _TWO_SPINORS_FOR(s1,s2) {
-        _spinor_mul_add_assign_f(*_SPINOR_PTR(s1),c1,*_SPINOR_PTR(s2));
+    _TWO_SPINORS_FOR(s1, s2)
+    {
+        _spinor_mul_add_assign_f(*_SPINOR_PTR(s1), c1, *_SPINOR_PTR(s2));
     }
 }
 
 _DECLARE(void, spinor_field_lc2, (_REAL c1, _REAL c2, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
 {
-    _TWO_SPINORS_FOR(s1,s2) {
-        _spinor_lc_f(*_SPINOR_PTR(s1),c1,*_SPINOR_PTR(s1),c2,*_SPINOR_PTR(s2));
+    _TWO_SPINORS_FOR(s1, s2)
+    {
+        _spinor_lc_f(*_SPINOR_PTR(s1), c1, *_SPINOR_PTR(s1), c2, *_SPINOR_PTR(s2));
     }
 }
 
 _DECLARE(void, spinor_field_lc3, (_REAL c1, _REAL c2, _SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2, _SPINOR_FIELD_TYPE *s3))
 {
-    _REAL cc1=-c1;
-    _REAL cc2=-c2;
+    _REAL cc1 = -c1;
+    _REAL cc2 = -c2;
     /* c1=-c1; c2=-c2; */
-    _THREE_SPINORS_FOR(s1,s2,s3) {
-        _spinor_lc_add_assign_f(*_SPINOR_PTR(s3),cc1,*_SPINOR_PTR(s1),cc2,*_SPINOR_PTR(s2));
-        _spinor_minus_f(*_SPINOR_PTR(s3),*_SPINOR_PTR(s3));
+    _THREE_SPINORS_FOR(s1, s2, s3)
+    {
+        _spinor_lc_add_assign_f(*_SPINOR_PTR(s3), cc1, *_SPINOR_PTR(s1), cc2, *_SPINOR_PTR(s2));
+        _spinor_minus_f(*_SPINOR_PTR(s3), *_SPINOR_PTR(s3));
     }
 }
 
@@ -386,4 +406,3 @@ _DECLARE(void, spinor_field_lc3, (_REAL c1, _REAL c2, _SPINOR_FIELD_TYPE *s1, _S
 #undef _REAL
 #undef _COMPLEX
 #undef _SUFFIX
-

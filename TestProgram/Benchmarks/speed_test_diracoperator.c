@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
     lprintf("MAIN", 0, "Allocating spinor field\n");
     s0 = alloc_spinor_field_f(1, &glattice);
     s1 = alloc_spinor_field_f(2, &glattice);
-#if !defined(WITH_NEW_GEOMETRY)
+#if  (NG == 3) && defined(REPR_FUNDAMENTAL) && !defined(WITH_NEW_GEOMETRY)
     s2 = s1 + 1;
 #endif
     lprintf("MAIN", 0, "Randomizing spinor field...\n");
@@ -42,9 +42,6 @@ int main(int argc, char *argv[])
     _OMP_PRAGMA(_omp_parallel num_threads(1))
     {
         res1 = spinor_field_sqnorm_f(s0);
-
-        _OMP_BARRIER
-
         res2 = spinor_field_sqnorm_f(s1);
     }
 

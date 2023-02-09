@@ -40,7 +40,6 @@ static void suNg_Exp_NG3(suNg *u, suNg *Xin)
 
   if (inverse_fact == NULL)
   {
-    _OMP_BARRIER
     _OMP_PRAGMA(single)
     {
       inverse_fact = malloc(sizeof(double) * (NN + 1));
@@ -91,7 +90,6 @@ static void suNg_Exp_NG4(suNg *u, suNg *Xin)
 
   if (inverse_fact == NULL)
   {
-    _OMP_BARRIER
     _OMP_PRAGMA(single)
     {
       inverse_fact = malloc(sizeof(double) * (NN + 1));
@@ -148,7 +146,6 @@ static void suNg_Exp_NG5(suNg *u, suNg *Xin)
 
   if (inverse_fact == NULL)
   {
-    _OMP_BARRIER
     _OMP_PRAGMA(single)
     {
       inverse_fact = malloc(sizeof(double) * (NN + 1));
@@ -211,7 +208,6 @@ static void suNg_Exp_NG6(suNg *u, suNg *Xin)
 
   if (inverse_fact == NULL)
   {
-    _OMP_BARRIER
     _OMP_PRAGMA(single)
     {
       inverse_fact = malloc(sizeof(double) * (NN + 1));
