@@ -233,7 +233,7 @@ $gpu && print $fh "MACRO += WITH_GPU\n";
 # openMP
 if($omp) {
     $cflags .=" -fopenmp";
-    $ldflags .=" -fopenmp";
+    $ldflags .=" -fopenmp -latomic";
 }
 
 # write compiler options
