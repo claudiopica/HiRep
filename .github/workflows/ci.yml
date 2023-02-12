@@ -44,7 +44,7 @@ jobs:
       - name: Install dependencies
         uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          packages: openmpi-bin openmpi-common libopenmpi3 libopenmpi-dev ninja-build
+          packages: openmpi-bin openmpi-common libopenmpi3 libopenmpi-dev libomp-dev ninja-build
           version: 1.0
 
       - name: Setup link to mpirun alternative
