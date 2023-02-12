@@ -21,11 +21,14 @@ jobs:
         compiler: [gcc, clang]
         nc: [2, 3]
         repr: [FUND, ADJ]
+        openmp: [-no-omp, -omp]
         mpi: [-no-mpi, -mpi]
         ecsw: [-expclover,-no-expclover]
         exclude:
           - nc: 3
             repr: ADJ
+          - mpi: "-mpi"
+            openmp: "-omp"
 
     steps:
       - name: Download HiRep
@@ -43,7 +46,7 @@ jobs:
           version: 1.0
 
       - name: Configure HiRep
-        run: ./Make/write_mkflags.pl -f Make/MkFlags.ini --cc ${{ matrix.compiler }} --env "OMPI_CC=${{ matrix.compiler }}" --mpicc mpicc.openmpi --cflags "-Wall -O1" -n ${{ matrix.nc }} -r ${{ matrix.repr }} ${{ matrix.mpi }} ${{ matrix.ecsw }}
+        run: ./Make/write_mkflags.pl -f Make/MkFlags.ini --cc ${{ matrix.compiler }} --env "OMPI_CC=${{ matrix.compiler }}" --mpicc mpicc.openmpi --cflags "-Wall -O1" -n ${{ matrix.nc }} -r ${{ matrix.repr }} ${{ matrix.mpi }} ${{ matrix.omp }} ${{ matrix.ecsw }}
       - name: Build
         run: time ./Make/nj
 

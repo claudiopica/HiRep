@@ -11,6 +11,7 @@ GetOptions(
   'gauge=s'      => \(my $gauge = 'SUN'),
   'mpi!'         => \(my $mpi = 1),
   'gpu!'         => \(my $gpu = 0),
+  'omp!'         => \(my $omp = 0),
   't=s'          => \(my $TBC = 'P'),
   'x=s'          => \(my $XBC = 'P'),
   'y=s'          => \(my $YBC = 'P'),
@@ -229,6 +230,12 @@ $vect && print $fh "MACRO += SIMD_VECTOR_HIREP\n";
 $mpi && print $fh "MACRO += WITH_MPI\n";
 # write GPU
 $gpu && print $fh "MACRO += WITH_GPU\n";
+# openMP
+if($omp) {
+    $cflags .=" -fopenmp";
+    $ldflags .=" -fopenmp";
+}
+
 # write compiler options
 if ($ccache!=0) { $cc="ccache ".$cc; $mpicc="ccache ".$mpicc; }
 print $fh "ENV = $env\n";
