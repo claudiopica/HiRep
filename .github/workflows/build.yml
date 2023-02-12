@@ -21,14 +21,14 @@ jobs:
         compiler: [gcc, clang]
         nc: [2, 3]
         repr: [FUND, ADJ]
-        openmp: [-no-omp, -omp]
+        omp: [-no-omp, -omp]
         mpi: [-no-mpi, -mpi]
         ecsw: [-expclover,-no-expclover]
         exclude:
           - nc: 3
             repr: ADJ
           - mpi: "-mpi"
-            openmp: "-omp"
+            omp: "-omp"
 
     steps:
       - name: Download HiRep
