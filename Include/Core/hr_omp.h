@@ -25,10 +25,11 @@
 #define _omp_max(...) reduction(max:__VA_ARGS__)
 #define _omp_min(...) reduction(min:__VA_ARGS__)
 
-
+#define hr_threadId() omp_get_thread_num()
 
 #else //to avoid compilation warnings
 #define _OMP_PRAGMA(s)
+#define hr_threadId() ((int)(0))
 #endif
 
 #define _OMP_BARRIER _OMP_PRAGMA( barrier )

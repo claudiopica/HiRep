@@ -20,14 +20,14 @@
 #endif
 
 /* Communications */
-typedef enum _comm_t {
-  CPU_COMM = 1,
-  GPU_COMM = 2,
-  ALL_COMMS = 3
+typedef enum comm_t {
+  CPU_COMM = 1<<0,
+  GPU_COMM = 1<<1
 } comm_t;
+#define ALL_COMMS (CPU_COMM | GPU_COMM)
 
 /* Memory */
-typedef enum _mem_t {
+typedef enum mem_t {
   CPU_MEM = 1<<0,
   GPU_MEM = 1<<1
 } mem_t;

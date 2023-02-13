@@ -1066,9 +1066,8 @@ static void syncBoxToBuffer(enum gd_type gd_t, int bytes_per_site, box_t *src, v
 #endif
     if (gd_t & EVEN) { //EVEN part
         const int vol = boxEvenVolume(src);
-
-        _OMP_PRAGMA(_omp_parallel)
-        _OMP_PRAGMA(_omp_for)
+        
+        _OMP_PARALLEL_FOR
         for (int dix = src->base_index; dix < (src->base_index + vol); dix++) {
             coord4 c = src->icoord[dix];
             int six = ipt_ext(c.x[0], c.x[1], c.x[2], c.x[3]);
@@ -1080,8 +1079,7 @@ static void syncBoxToBuffer(enum gd_type gd_t, int bytes_per_site, box_t *src, v
     if (gd_t & ODD) { //ODD part
         const int vol = boxOddVolume(src);
 
-        _OMP_PRAGMA(_omp_parallel)
-        _OMP_PRAGMA(_omp_for)
+        _OMP_PARALLEL_FOR
         for (int dix = src->base_index_odd; dix < (src->base_index_odd + vol); dix++) {
             coord4 c = src->icoord[dix];
             int six = ipt_ext(c.x[0], c.x[1], c.x[2], c.x[3]);

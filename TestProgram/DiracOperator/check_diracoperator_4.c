@@ -1,6 +1,7 @@
 /******************************************************************************
 *
 * NOCOMPILE= WITH_MPI
+* NOCOMPILE= WITH_GPU
 * NOCOMPILE= BC_T_ANTIPERIODIC
 * NOCOMPILE= BC_X_ANTIPERIODIC
 * NOCOMPILE= BC_Y_ANTIPERIODIC

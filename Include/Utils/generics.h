@@ -19,17 +19,14 @@
 #define _GPU_FUNC(_type, _name, _suffix, _args) _type _GPU_F_NAME(_name,_suffix) _args
 
 // Construct number of sites from geom type
-#define _N_SITES(_geom) CONCAT(f->type->gsize_,_geom)
-#define _NUMBER_OF_SITES(_geom) _N_SITES(_geom)
+#define _NUMBER_OF_SITES(type, _geom) (type)->CONCAT(gsize_, _geom)
 
 // Construct number of buffers from geom type
-#define _N_BUFFERS(_geom) CONCAT(type->nbuffers_,_geom)
-#define _NUMBER_OF_BUFFERS(_geom) _N_BUFFERS(_geom)
+#define _NUMBER_OF_BUFFERS(type, _geom) (type)->CONCAT(nbuffers_, _geom)
 
 // Construct number of copies from geom type (old geometry)
 #ifndef WITH_NEW_GEOMETRY
-#define _N_COPIES(_geom) CONCAT(type->ncopies_,_geom)
-#define _NUMBER_OF_COPIES(_geom) _N_COPIES(_geom)
+#define _NUMBER_OF_COPIES(type, _geom) (type)->CONCAT(ncopies_, _geom)
 #endif
 
 #endif

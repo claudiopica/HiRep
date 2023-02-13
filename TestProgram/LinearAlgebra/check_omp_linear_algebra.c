@@ -182,8 +182,8 @@ int main(int argc, char *argv[])
     cres[1] = spinor_field_prod_f(s0, s1);
     bcast(res, 2);
     lprintf("MAIN", 0, "Max difference for spinor_field_prod_f %.14e.\n(should be around 1*10^(-15) or so)\n\n",
-            cabs(cres[1] - cres[0]) / cabs(res[1]));
-    if (cabs(cres[1] - cres[0]) / cabs(res[1]) > 1.e-14) retval++;
+            cabs(cres[1] - cres[0]) / cabs(cres[1]));
+    if (cabs(cres[1] - cres[0]) / cabs(cres[1]) > 1.e-14) retval++;
 #ifdef _OPENMP
     omp_set_num_threads(max_nthreads);
 #endif

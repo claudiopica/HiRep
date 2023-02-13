@@ -375,7 +375,7 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
         // the second pass we invert the mask
         // this is achieved with comparing the condition to be different than repeat=0,1
 
-        _MASTER_FOR(out->type, ix) {
+        _MASTER_FOR(out->type, ix) { 
             register suNf_spinor *r = _FIELD_AT(out, ix);
             if (repeat == 0) { _spinor_zero_f(*r); }
 
@@ -420,6 +420,9 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
                 DPHI_Z_DN(ix, iy, in, r);
             }
             /******************************** end of loop *********************************/
+#ifdef WITH_MPI
+      if (hr_threadId() == 0) { probe_mpi(); }
+#endif
 
         } /* MASTER_FOR */
 

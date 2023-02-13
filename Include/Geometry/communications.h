@@ -23,6 +23,8 @@
     extern "C" {
 #endif
 
+void probe_mpi(void);
+
 #define _FIELD_NAME_READABLE "Spinor field"
 #define _FIELD_NAME spinor_field_f
 #define _FIELD_TYPE spinor_field

@@ -111,6 +111,7 @@ my @libs = ("libhr.a"); #this is for later programs to use
   my %exes = (
     "speed_test_reading_gpu" => [ "speed_test_reading_gpu.c" ],
     "speed_test_diracoperator" => [ "speed_test_diracoperator.c", ],
+    "speed_test_diracoperator_cp" => [ "speed_test_diracoperator_cp.c", ],
     "speed_test_diracoperator_flt" => [ "speed_test_diracoperator_flt.c", ],
     "speed_test_diracoperator_gpu" => [ "speed_test_diracoperator_gpu.c", ],
   );

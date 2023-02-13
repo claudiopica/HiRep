@@ -81,7 +81,6 @@ int main(int argc, char *argv[])
   lprintf("MAIN", 0, "-----------------------------\n\n");
 
   unit_u(u_gauge);
-  start_sendrecv_gfield(u_gauge);
   represent_gauge_field();
 
   ps0 = alloc_spinor_field_f(3, &glattice);

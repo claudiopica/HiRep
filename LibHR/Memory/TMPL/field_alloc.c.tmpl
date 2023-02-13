@@ -55,12 +55,12 @@ _DECLARE_STATIC(allocate_field_struct_,(unsigned int n, _FIELD_TYPE** f, geometr
 _DECLARE_STATIC(allocate_cpu_field_data_,(unsigned int n, _FIELD_TYPE *f, geometry_descriptor *type)) {
     if (alloc_mem_t & CPU_MEM) {
         int bytes_per_site = sizeof(_SITE_TYPE);
-        int number_of_sites = n * _FIELD_DIM * _NUMBER_OF_SITES(_GEOM_TYPE);
-        size_t field_size  = bytes_per_site * number_of_sites;
+        int number_of_sites = _NUMBER_OF_SITES(f->type, _GEOM_TYPE);
+        size_t field_size  = bytes_per_site * number_of_sites * _FIELD_DIM * n;
         f->ptr = amalloc(field_size, ALIGN);
         error((f->ptr) == NULL, 1,  __func__, "Could not allocate memory space for field (data).");
         for (int i = 1; i < n; ++i) {
-            f[i].ptr = f[i-1].ptr + _NUMBER_OF_SITES(_GEOM_TYPE) * _FIELD_DIM;
+            f[i].ptr = f[i-1].ptr + _NUMBER_OF_SITES(f->type, _GEOM_TYPE) * _FIELD_DIM;
         }
     } else {
         for (int i = 0; i < n; ++i) { f[i].ptr = NULL; }
@@ -88,14 +88,14 @@ _DECLARE_STATIC(allocate_gpu_field_data_, (unsigned int n, _FIELD_TYPE *f, geome
     if (alloc_mem_t & GPU_MEM) {
         cudaError_t err;
         int bytes_per_site = sizeof(_SITE_TYPE);
-        int number_of_sites = n * _FIELD_DIM * _NUMBER_OF_SITES(_GEOM_TYPE);
-        size_t field_size = number_of_sites * bytes_per_site;
+        int number_of_sites = _NUMBER_OF_SITES(f->type, _GEOM_TYPE);
+        size_t field_size = number_of_sites * bytes_per_site * _FIELD_DIM * n;
         err = cudaMalloc((void **)&(f->gpu_ptr), field_size);
         error(err != cudaSuccess, 1, __func__, "Could not allocate GPU memory space for field");
         /* For spinors: Map the elements of the spinor arrays to the
         starting points in the previously allocated space */
         for (int i = 1; i < n; ++i) 
-            f[i].gpu_ptr = f[i-1].gpu_ptr + _NUMBER_OF_SITES(_GEOM_TYPE) * _FIELD_DIM;
+            f[i].gpu_ptr = f[i-1].gpu_ptr + _NUMBER_OF_SITES(f->type, _GEOM_TYPE) * _FIELD_DIM;
     } else {
         for (int i = 0; i < n; ++i) { f[i].gpu_ptr = NULL; }
     }
@@ -128,12 +128,12 @@ _DECLARE_STATIC(free_mpi_field_data_, (_FIELD_TYPE *f)) {
 
 _DECLARE_STATIC(allocate_mpi_field_data_, (unsigned int n, _FIELD_TYPE *f, geometry_descriptor *type)) {
     #ifdef WITH_MPI
-    if ((_NUMBER_OF_BUFFERS(_GEOM_TYPE)) > 0) {
-        int number_of_requests = n * 2 * _NUMBER_OF_BUFFERS(_GEOM_TYPE);
+    if ((_NUMBER_OF_BUFFERS(type, _GEOM_TYPE)) > 0) {
+        int number_of_requests = n * 2 * _NUMBER_OF_BUFFERS(type, _GEOM_TYPE);
         f->comm_req = amalloc(number_of_requests * sizeof(MPI_Request), ALIGN);
         error((f->comm_req) == NULL, 1, __func__, "Could not allocate memory space for field (MPI).\n");
         for (int ix = 0; ix < number_of_requests; ++ix) { f->comm_req[ix] = MPI_REQUEST_NULL; }
-        for (int i = 1; i < n; ++i) { f[i].comm_req = f[i-1].comm_req + 2 * _NUMBER_OF_BUFFERS(_GEOM_TYPE); }
+        for (int i = 1; i < n; ++i) { f[i].comm_req = f[i-1].comm_req + 2 * _NUMBER_OF_BUFFERS(type, _GEOM_TYPE); }
         for (int i = 0; i < n; ++i) { _CALL(allocate_sendbuffer_)(f, i); }
     } else {  
         f->comm_req = NULL;
@@ -178,9 +178,3 @@ _ALLOCATE {
 #undef _SITE_TYPE
 #undef _FIELD_DIM
 #undef _IS_SPINOR_LIKE
-
-
-
-
-
-
