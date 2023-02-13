@@ -107,7 +107,7 @@ my @libs = ("libhr.a"); #this is for later programs to use
 # Benchmarks
 ###############################################################################
 {
-  my $topdir = "TestProgram/Benchmarks";
+  my $topdir = "Benchmarks";
   my %exes = (
     "speed_test_reading_gpu" => [ "speed_test_reading_gpu.c" ],
     "speed_test_diracoperator" => [ "speed_test_diracoperator.c", ],
