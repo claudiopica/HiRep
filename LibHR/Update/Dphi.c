@@ -1411,13 +1411,12 @@ static void Cphi_(double mass, spinor_field *dptr, spinor_field *sptr, int assig
 {
     // Correct mass term
     mass = (4. + mass);
-
-    suNf_vector v1, v2;
-    suNf_spinor *out, *in, tmp;
-    suNfc *s0, *s1, *s2, *s3;
-
     // Loop over local sites
     _MASTER_FOR(dptr->type, ix) {
+        suNf_vector v1, v2;
+        suNf_spinor *out, *in, tmp;
+        suNfc *s0, *s1, *s2, *s3;
+
         // Field pointers
         out = _FIELD_AT(dptr, ix);
         in = _FIELD_AT(sptr, ix);
@@ -1610,16 +1609,15 @@ static void Cphi_(double mass, spinor_field *dptr, spinor_field *sptr, int assig
         mass = 1 / mass;
     }
 
-    suNfc Aplus[4];
-    suNfc Aminus[4];
-
-    suNfc expAplus[4];
-    suNfc expAminus[4];
-
     init_clover_exp();
 
     // Loop over local sites
     _MASTER_FOR(dptr->type, ix) {
+        suNfc Aplus[4];
+        suNfc Aminus[4];
+
+        suNfc expAplus[4];
+        suNfc expAminus[4];
         suNf_vector v1, v2;
         suNf_spinor *out, *in, tmp;
         suNfc *s0, *s1, *s2, *s3;
