@@ -18,6 +18,7 @@ Doc/doxygen/build
 # Files from compilation
 HMC/*
 PureGauge/*
+Benchmarks/*
 GaugeFix/*
 Spectrum/*
 Disconnected/*
