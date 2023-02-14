@@ -6,7 +6,6 @@
 #ifndef OBSERVABLES_H
 #define OBSERVABLES_H
 
-#include "Observables/avr_plaquette.h"
 #include "Observables/calc_prop.h"
 #include "Observables/calc_prop_ff.h"
 #include "Observables/glueballs.h"

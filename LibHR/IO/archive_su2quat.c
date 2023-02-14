@@ -15,7 +15,7 @@
 #include "Geometry/communications.h"
 #include "Utils/boundary_conditions.h"
 #include "Utils/timing.h"
-#include "Observables/avr_plaquette.h"
+#include "Update/avr_plaquette.h"
 #include "Random/ranlux.h"
 #include "io.h"
 #include "geometry.h"

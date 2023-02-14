@@ -5,7 +5,7 @@
 
 #include "update.h"
 #include "libhr_core.h"
-#include "Observables/avr_plaquette.h"
+#include "Update/avr_plaquette.h"
 
 static void pg_gaussian_pf(monomial const *m)
 {

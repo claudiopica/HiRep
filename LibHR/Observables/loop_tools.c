@@ -16,6 +16,7 @@
 #include "memory.h"
 #include "Update/copy_gfield.h"
 #include "Update/representation.h"
+#include "Update/avr_plaquette.h"
 #include "inverters.h"
 
 #if ( !defined(ROTATED_SF) && !defined(BASIC_SF) && !defined(FERMION_THETA) )

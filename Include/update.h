@@ -6,6 +6,7 @@
 #ifndef UPDATE_H
 #define UPDATE_H
 
+#include "Update/avr_plaquette.h"
 #include "Update/cabmar.h"
 #include "Update/clover_tools.h"
 #include "Update/copy_gfield.h"
