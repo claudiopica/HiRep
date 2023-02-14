@@ -86,7 +86,7 @@ my @libs_core = ("libhr.a"); #this is for later programs to use
   print "default libhrobservables.a\n";
 }
 
-my @libs = ("libhr.a","libhrobservables.a");
+my @libs = ("libhrobservables.a", "libhr.a"); #order is important for gcc
 
 ###############################################################################
 # HMC
@@ -150,7 +150,7 @@ my @libs = ("libhr.a","libhrobservables.a");
     "speed_test_diracoperator_gpu" => [ "speed_test_diracoperator_gpu.c", ],
   );
 
-  add_exes($topdir, \%exes, \@libs);
+  add_exes($topdir, \%exes, \@libs_core);
   # print "default $topdir\n";
 }
 
@@ -181,7 +181,7 @@ my @libs = ("libhr.a","libhrobservables.a");
 
   # Put a dir in this list if it only needs to link to libhr core without observables
   my @alt_libs = ( "Algebra", "DiracOperator", "Geometry", "LinearAlgebra", "Memory", "SpinorField", 
-                   "Inverters", "Update", "Integrators",
+                   "Inverters", "Integrators",
   );
 
   for my $dir ( @subdirs ) {
