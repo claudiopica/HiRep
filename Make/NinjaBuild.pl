@@ -339,6 +339,9 @@ sub read_conf {
     push(@{$options{'MACRO'}},"${$options{'REPR'}}[0]");
     push(@{$options{'MACRO'}},"REPR_NAME=\\\"${$options{'REPR'}}[0]\\\"");
 
+    # add definition for POSIX features
+    push(@{$options{'MACRO'}},"_XOPEN_SOURCE=600") unless ($^O eq "darwin");
+
     # icc does not have the output color option 
     if ($options{'CC'}[0]=~/\bmpiicc\b/ || $options{'CC'}[0]=~/\bicc\b/) {
         $disable_color=1;
@@ -519,7 +522,7 @@ EOF
             "compilerPath": "$compilerpath",
             "intelliSenseMode": "$compilermode",
             "includePath": ["$rootdir/Include","$rootdir/Include/Core"$includelist],
-            "cStandard": "c99",
+            "cStandard": "c11",
             "cppStandard": "c++14"
         }
     ],

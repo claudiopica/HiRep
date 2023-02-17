@@ -1,12 +1,6 @@
 #ifndef TIMING_H
 #define TIMING_H
 
-#if __STDC_VERSION__ >= 199901L
-#define _XOPEN_SOURCE 600
-#else
-#define _XOPEN_SOURCE 500
-#endif /* __STDC_VERSION__ */
-
 #include <sys/time.h>
 #include <time.h>
 
@@ -53,6 +47,13 @@ static inline double timer_lap(Timer *t) {
 	double laptime = interval_usec(&l, &(t->lap));
 	t->lap=l;
 	return laptime;
+}
+
+/// @brief returns the timer resolution in microseconds
+static inline double timer_res() {
+	Instant res;
+	clock_getres(CLOCK_MONOTONIC_RAW, &res);
+	return res.tv_sec * 1.e6 + res.tv_nsec * 1.e-3;
 }
 
 

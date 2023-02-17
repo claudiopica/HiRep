@@ -89,6 +89,7 @@ int main(int argc, char *argv[])
         elapsed = timer_lap(&clock); //time in microseconds
         lprintf("LA_TEST", 0, "Timer resolution = %lf usec\n", elapsed);
     }
+    lprintf("LA_TEST", 0, "Nominal timer resolution = %lf usec\n", timer_res());
 
     free_spinor_field_f(s0);
     free_spinor_field_f(s1);
