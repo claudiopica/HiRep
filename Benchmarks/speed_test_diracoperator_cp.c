@@ -11,8 +11,7 @@
 int main(int argc, char *argv[])
 {
     int n_warmup = 100;
-    float time_target = 5000.; //number of milliseconds the benchmark will run
-    struct timeval start, end, etime;
+    double time_target = 5000.; //number of milliseconds the benchmark will run
 
     setup_process(&argc, &argv);
 
@@ -57,26 +56,24 @@ int main(int argc, char *argv[])
 
     // speed test Dirac operator
     lprintf("LA TEST", 0, "Warmup application of the Diracoperator %d times.\n", n_warmup);
-    gettimeofday(&start, 0);
+    Timer clock;
+    timer_set(&clock);
     for (int i = 0; i < n_warmup; ++i) { Dphi_cpu_(s1, s0); }
-    gettimeofday(&end, 0);
-    timeval_subtract(&etime, &end, &start);
-    float elapsed = etime.tv_sec * 1000. + etime.tv_usec * 0.001;
-    int n_reps = (int)((double)(n_warmup * 1.01 * time_target) / elapsed);
+    double elapsed = timer_lap(&clock) * 1.e-3; //time in milliseconds
+    
+    int n_reps = (int)(n_warmup * 1.01 * (time_target / elapsed));
     bcast_int(&n_reps, 1);
 
-    lprintf("LA TEST", 0, "reps: %d , total time: %lf msec, time single: %lf usec\n", n_reps, elapsed,
+    lprintf("LA TEST", 0, "reps: %d , total time: %lf msec, time single: %lf usec\n", n_warmup, elapsed,
             elapsed / n_warmup * 1000.);
 
     lprintf("LA TEST", 0, "\nEvaluating the massless Diracoperator.\n");
     do {
         lprintf("LA TEST", 0, "Trying reps: %d\n", n_reps);
 
-        gettimeofday(&start, 0);
+        elapsed = timer_lap(&clock) * 1.e-3; //time in milliseconds
         for (int i = 0; i < n_reps; ++i) { Dphi_cpu_(s1, s0); }
-        gettimeofday(&end, 0);
-        timeval_subtract(&etime, &end, &start);
-        elapsed = etime.tv_sec * 1000. + etime.tv_usec * 0.001;
+        elapsed = timer_lap(&clock) * 1.e-3; //time in milliseconds
         n_reps = (int)((double)(n_reps * 1.01 * time_target) / elapsed);
         bcast_int(&n_reps, 1);
     } while (elapsed < time_target * .95);
@@ -85,6 +82,13 @@ int main(int argc, char *argv[])
             "Massless Diracoperator reps: %d , total time: %lf msec, time single: %lf usec, GFLOPS: %1.6g , BAND: %1.6g GB/s\n",
             n_reps, elapsed, elapsed / n_reps * 1000., (((double)n_reps * GLB_VOLUME) * flopsite) / elapsed / 1.e6,
             (((double)n_reps * GLB_VOLUME) * bytesite) / elapsed / 1.e6);
+
+    //measure timer resolution
+    for(int i=0; i<1; ++i) {
+        elapsed = timer_lap(&clock); //time in microseconds
+        elapsed = timer_lap(&clock); //time in microseconds
+        lprintf("LA_TEST", 0, "Timer resolution = %lf usec\n", elapsed);
+    }
 
     free_spinor_field_f(s0);
     free_spinor_field_f(s1);
