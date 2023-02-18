@@ -16,11 +16,10 @@ int main(int argc, char *argv[])
 #endif
     double res1, res2;
     spinor_field *s0, *s1;
-    float elapsed;
     int flopsite, bytesite;
     int n_reps, n_reps_trial;
     int n_warmup = 1000;
-    struct timeval start, end, etime;
+    Timer clock;
 
     setup_process(&argc, &argv);
 
@@ -71,14 +70,10 @@ int main(int argc, char *argv[])
 
     // speed test Dirac operator
     lprintf("LA TEST", 0, "Warmup application of the Diracoperator %d times.\n", n_warmup);
-    elapsed = 0;
-    gettimeofday(&start, 0);
 
+    timer_set(&clock);
     for (int i = 0; i < n_warmup; ++i) { Dphi_(s1, s0); }
-
-    gettimeofday(&end, 0);
-    timeval_subtract(&etime, &end, &start);
-    elapsed = etime.tv_sec * 1000. + etime.tv_usec * 0.001;
+    double elapsed = timer_lap(&clock) * 1.e-3; //time in milliseconds
     n_reps = (int)((double)(n_warmup * 200) / elapsed);
 
     lprintf("LA TEST", 0, "\nEvaluating the massless Diracoperator.\n");
@@ -88,13 +83,11 @@ int main(int argc, char *argv[])
 
     bcast_int(&n_reps_trial, 1);
     do {
-        gettimeofday(&start, 0);
 
+        elapsed = timer_lap(&clock) * 1.e-3; //time in milliseconds
         for (int i = 0; i < n_reps_trial; ++i) { Dphi_(s1, s0); }
-
-        gettimeofday(&end, 0);
-        timeval_subtract(&etime, &end, &start);
-        elapsed = etime.tv_sec * 1000. + etime.tv_usec * 0.001;
+        elapsed = timer_lap(&clock) * 1.e-3; //time in milliseconds
+        
         n_reps = n_reps_trial;
         n_reps_trial = (int)((double)(n_reps_trial * 2200) / elapsed);
         bcast_int(&n_reps_trial, 1);
@@ -108,20 +101,17 @@ int main(int argc, char *argv[])
 
     lprintf("LA TEST", 0, "\nEvaluating the massless fused Diracoperator.\n");
 
-    elapsed = 0;
     n_reps_trial = n_reps;
     bcast_int(&n_reps_trial, 1);
 
     do {
-        gettimeofday(&start, 0);
 
+        elapsed = timer_lap(&clock) * 1.e-3; //time in milliseconds
         _OMP_PRAGMA(_omp_parallel)
         {
             for (int i = 0; i < n_reps_trial; ++i) { Dphi_fused_(s1, s0); }
         }
-        gettimeofday(&end, 0);
-        timeval_subtract(&etime, &end, &start);
-        elapsed = etime.tv_sec * 1000. + etime.tv_usec * 0.001;
+        elapsed = timer_lap(&clock) * 1.e-3; //time in milliseconds
         n_reps = n_reps_trial;
         n_reps_trial = (int)((double)(n_reps_trial * 2200) / elapsed);
         bcast_int(&n_reps_trial, 1);

@@ -3,6 +3,7 @@
 
 #include <sys/time.h>
 #include <time.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 	extern "C" {
@@ -11,17 +12,24 @@
 // High resolution timing functions
 typedef struct timespec Instant;
 
-/// @brief return the high resolution clock time
+/// @brief returns the high resolution clock time
 static inline Instant now() {
 	Instant clock;
 	clock_gettime(CLOCK_MONOTONIC_RAW, &clock);
 	return clock;
 }
-/// @brief return the interval in microsecond between start and end
+/// @brief returns the interval in microsecond between start and end
 static inline double interval_usec(Instant const *end, Instant const *start) {
 	return (end->tv_sec - start->tv_sec) * 1.e6  
       + (end->tv_nsec - start->tv_nsec) * 1.e-3;
 }
+
+/// @brief returns the number of nanoseconds between start and end
+static inline uint_fast64_t interval_nsec(Instant const *end, Instant const *start) {
+	return (end->tv_sec - start->tv_sec) * (uint_fast64_t)(1000000000)  
+      + (end->tv_nsec - start->tv_nsec);
+}
+
 
 typedef struct Timer {
 	Instant start;
@@ -35,7 +43,7 @@ static inline void timer_set(Timer *t) {
 	t->lap = n;
 }
 
-/// @brief return the time in microseconds since the timer was started
+/// @brief returns the time in microseconds since the timer was started
 static inline double timer_read(Timer const *t) {
 	Instant const n = now();
 	return interval_usec(&n, &(t->start));
@@ -49,13 +57,12 @@ static inline double timer_lap(Timer *t) {
 	return laptime;
 }
 
-/// @brief returns the timer resolution in microseconds
+/// @brief returns the nominal timer resolution in microseconds
 static inline double timer_res() {
 	Instant res;
 	clock_getres(CLOCK_MONOTONIC_RAW, &res);
 	return res.tv_sec * 1.e6 + res.tv_nsec * 1.e-3;
 }
-
 
 /* old low timing function */
 int timeval_subtract(struct timeval *result, struct timeval *x, struct timeval *y);
