@@ -20,8 +20,6 @@ paral=3
 
 (( MAXGLB_T = ( LLVOL * NODES * MAXCORE *NSOCKETS)/(2**paral * locall**3))) #MAX Global T
 (( MINGLB_T = ( MLVOL * NODES * MAXCORE *NSOCKETS)/(2**paral * locall**3))) #MIN Global T
-echo "MAXGLB_T= $MAXGLB_T"
-echo "MINGLB_T= $MINGLB_T"
 
 
 localt=`seq 4 $(( MAXGLB_T / NODES ))` #range of possible values of local T (4 is the smallest meaningful lattice size)

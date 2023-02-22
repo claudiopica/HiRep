@@ -593,8 +593,12 @@ int g5QMR_fltacc(g5QMR_fltacc_par *par, spinor_operator M, spinor_operator_flt M
             cgiter_minres += MINRES_flt(&Mpar, &Herm_flt, res_flt, out_flt, out_flt);
             spinor_field_g5_f_flt(res_flt, res_flt); /* restore input vector */
         }
-
+#ifdef WITH_FUSE_MASTER_FOR
+        _FUSE_MASTER_FOR(out->type, ix) {
+            _FUSE_IDX(out->type, ix);
+#else
         _MASTER_FOR(out->type, ix) {
+#endif
             for (k = 0; k < 8 * NF; k++) { ((double *)_FIELD_AT(out, ix))[k] += (double)((float *)_FIELD_AT(out_flt, ix))[k]; }
         }
 

@@ -375,7 +375,7 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
         // the second pass we invert the mask
         // this is achieved with comparing the condition to be different than repeat=0,1
 
-        _MASTER_FOR(out->type, ix) { 
+        _MASTER_FOR(out->type, ix) {
             register suNf_spinor *r = _FIELD_AT(out, ix);
             if (repeat == 0) { _spinor_zero_f(*r); }
 
@@ -420,8 +420,8 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
                 DPHI_Z_DN(ix, iy, in, r);
             }
             /******************************** end of loop *********************************/
-#ifdef WITH_MPI
-      if (hr_threadId() == 0) { probe_mpi(); }
+#ifdef WITH_PROBE_MPI
+            if (hr_threadId() == 0) { probe_mpi(); }
 #endif
 
         } /* MASTER_FOR */
@@ -758,12 +758,16 @@ void Dphi_cpu_(spinor_field *restrict out, spinor_field *restrict in)
 
             /******************************** end of loop *********************************/
             _spinor_mul_f(*r, -0.5, *r);
+#ifdef WITH_PROBE_MPI
+            if (hr_threadId() == 0) { probe_mpi(); }
+#endif
+
         } /* SITE_FOR */
     } /* PIECE FOR */
 }
 
 #if (NG == 3) && defined(REPR_FUNDAMENTAL)
-void Dphi_fused_(spinor_field *out, spinor_field *in)
+void Dphi_fused_(spinor_field *restrict out, spinor_field *restrict in)
 {
 #ifdef CHECK_SPINOR_MATCHING
     error((in == NULL) || (out == NULL), 1, "Dphi_fused_ [Dphi.c]", "Attempt to access unallocated memory space");
@@ -772,9 +776,8 @@ void Dphi_fused_(spinor_field *out, spinor_field *in)
     error(out->type == &glat_odd && in->type == &glat_odd, 1, "Dphi_fused_ [Dphi.c]", "Spinors don't match! (2)");
 #endif
 
-    //++MVMcounter; /* count matrix calls */
-    // if (out->type == &glattice)
-    //  ++MVMcounter;
+    ++MVMcounter; /* count matrix calls */
+    if (out->type == &glattice) ++MVMcounter;
     //
     /************************ loop over all lattice sites *************************/
     /* start communication of input spinor field */
@@ -783,7 +786,6 @@ void Dphi_fused_(spinor_field *out, spinor_field *in)
         start_sendrecv_spinor_field_f(in);
     }
 
-    int ix;
     int iy;
     suNf *up, *um;
     suNf_vector psi, chi, psi2, chi2;
@@ -794,7 +796,7 @@ void Dphi_fused_(spinor_field *out, spinor_field *in)
 
     _OMP_PRAGMA(_omp_for nowait)
     for (int _fuse_master_for_ip_ix = 0; _fuse_master_for_ip_ix < (out->type)->fuse_inner_counter; _fuse_master_for_ip_ix++) {
-        ix = _FUSE_IDX(out->type, ix);
+        _FUSE_IDX(out->type, ix);
 
         r = _FIELD_AT(out, ix);
 
@@ -922,6 +924,10 @@ void Dphi_fused_(spinor_field *out, spinor_field *in)
 
         _spinor_mul_f(*r, -0.5, *r);
 
+#ifdef WITH_PROBE_MPI
+        if (hr_threadId() == 0) { probe_mpi(); }
+#endif
+
     } /* FUSE FOR */
 #ifdef WITH_MPI
 
@@ -935,7 +941,7 @@ void Dphi_fused_(spinor_field *out, spinor_field *in)
     _OMP_PRAGMA(_omp_for nowait)
     for (int _fuse_master_for_ip_ix = (out->type)->fuse_inner_counter; _fuse_master_for_ip_ix < (out->type)->fuse_gauge_size;
          _fuse_master_for_ip_ix++) {
-        ix = _FUSE_IDX(out->type, ix);
+        _FUSE_IDX(out->type, ix);
 
         r = _FIELD_AT(out, ix);
 

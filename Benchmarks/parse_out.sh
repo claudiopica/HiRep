@@ -13,7 +13,6 @@ echo "#Number of Threads
 #Byte per site
 #Dirac data movement
 #Massless Diracoperator (reps, data size in kb, time in msec, GFLOPS, BAND in GB/s)
-#Massless fused Diracoperator (reps, data size in kb, time in msec, GFLOPS, BAND in GB/s)
 #Job Output"
 }
 
@@ -49,7 +48,7 @@ shift "$(($OPTIND -1))"
 
 
 awk -v j=$jobname '{
-    if(!support){support="MACRO";nofused=0;geometry="OLD"}
+    if(!support){support="MACRO";geometry="OLD"}
     if($0 ~ /\[SYSTEM\]\[0\]SIMD VECTORIZATION support enabled/){support="VECT" }
     if($0 ~ /\[SYSTEM\]\[0\]AVX2 support enabled/){support="AVX2"}
 if($0 ~ /WITH_NEW_GEOMETRY/){geometry="NEW"}
@@ -63,6 +62,5 @@ if($0 ~ /\[LA TEST\]\[0\]Flop per site =/){ printf "%s," ,$6}
 if($0 ~ /\[LA TEST\]\[0\]Byte per site =/){ printf "%s," ,$6}
 if($0 ~ /\[LA TEST\]\[0\]Dirac data movement =/){ printf "%s," ,$6}
 if($0 ~ /\[LA TEST\]\[0\]Massless Diracoperator reps:/){ printf "%s,%s,%s,%s,%s," ,$5,$8,$11,$14,$17}
-if($0 ~ /\[LA TEST\]\[0\]Massless fused Diracoperator reps:/){ printf "%s,%s,%s,%s,%s," ,$6,$9,$12,$15,$18;nofused=1}
-if($0 ~ /\[SYSTEM\]\[0\]Process finalized./){ if(nofused==0){printf ",,,,,"};printf "%s\n",j}
+if($0 ~ /\[SYSTEM\]\[0\]Process finalized./){ printf "%s\n",j}
     } ' $outputfilename

@@ -40,6 +40,8 @@ GetOptions(
   'force!'       => \(my $force = 0),
   'avx2!'        => \(my $avx2 = 0),
   'vect!'        => \(my $vect = 0),
+  'fuse!'        => \(my $fuse = 0),
+  'probempi!'    => \(my $probempi = 0),
   'env=s'        => \(my $env = ""),
   'cc=s'         => \(my $cc = "gcc"),
   'mpicc=s'      => \(my $mpicc = "mpicc"),
@@ -226,6 +228,10 @@ $force && print $fh "MACRO += MEASURE_FORCE\n";
 $avx2 && print $fh "MACRO += AVX2_HIREP\n";
 # write vect
 $vect && print $fh "MACRO += SIMD_VECTOR_HIREP\n";
+# write fuse
+$fuse && print $fh "MACRO += WITH_FUSE_MASTER_FOR\n";
+# write probe mpi
+$probempi && print $fh "MACRO += WITH_PROBE_MPI\n";
 # write mpi
 $mpi && print $fh "MACRO += WITH_MPI\n";
 # write GPU
@@ -302,6 +308,8 @@ write_mkflags - write flags file for compilation of HiRep
 
   --[no-]avx2         [false]     Enable avx2 kernels of (some) linear algebra functions
   --[no-]vect         [false]     Enable SIMD vectorized kernels of (some) linear algebra functions
+  --[no-]fuse         [false]     Enable use of the fused index in the masterfor
+  --[no-]probempi     [false]     Enable probing of mpi communications in the dirac operator
   --[no-]checkspinor  [true]      Check spinor field type
   --[no-]mpitiming    [false]     Enable timing of MPI calls
   --[no-]ioflush      [true]      Flush IO after each operations on logs
