@@ -26,8 +26,6 @@ void write_spinor_field(char filename[],spinor_field* sp)
   int pid=0;
   int zsize, rz;
   double norm2;
-  struct timeval start, end, etime;
-
 
 #ifdef WITH_MPI
   /* MPI variables */
@@ -54,7 +52,8 @@ void write_spinor_field(char filename[],spinor_field* sp)
   MPI_Comm_group(cart_comm,&cg);
 #endif
 
-  gettimeofday(&start,0);
+  Timer clock;
+  timer_set(&clock);
 
   zsize=GLB_Z/NP_Z; rz=GLB_Z-zsize*NP_Z;
   buff=malloc(sizeof(suNf_spinor)*(GLB_Z/NP_Z+((rz>0)?1:0)));
@@ -145,9 +144,8 @@ void write_spinor_field(char filename[],spinor_field* sp)
   if (PID==0) fclose(fp); 
   free(buff);
 
-  gettimeofday(&end,0);
-  timeval_subtract(&etime,&end,&start);
-  lprintf("IO",0,"Pseudofermion [%s] saved [%ld sec %ld usec]\n",filename,etime.tv_sec,etime.tv_usec);
+  double elapsed_sec = timer_lap(&clock) * 1.e-6; //time in seconds
+  lprintf("IO",0,"Pseudofermion [%s] saved [%lf sec]\n",filename,elapsed_sec);
 
 }
 
@@ -160,8 +158,6 @@ void read_spinor_field(char filename[], spinor_field *sp)
   int pid=0;
   int zsize, rz;
   double norm2, testnorm2;
-  struct timeval start, end, etime;
-
 
 #ifdef WITH_MPI
   /* MPI variables */
@@ -173,8 +169,8 @@ void read_spinor_field(char filename[], spinor_field *sp)
 #endif
 #endif
 
-
-  gettimeofday(&start,0);
+  Timer clock;
+  timer_set(&clock);
 
   if(PID==0) {
     int d[6]={0}; /* contains NG,NF,GLB_T,GLB_X,GLB_Y,GLB_Z */
@@ -303,9 +299,8 @@ void read_spinor_field(char filename[], spinor_field *sp)
     }
   }
 
-  gettimeofday(&end,0);
-  timeval_subtract(&etime,&end,&start);
-  lprintf("IO",0,"Pseudofermion [%s] read [%ld sec %ld usec] Sq. norm=%e\n",filename,etime.tv_sec,etime.tv_usec,testnorm2);
+  double elapsed_sec = timer_lap(&clock) * 1.e-6; //time in seconds
+  lprintf("IO",0,"Pseudofermion [%s] read [%lf sec] Sq. norm=%e\n",filename,elapsed_sec,testnorm2);
 
 }
 

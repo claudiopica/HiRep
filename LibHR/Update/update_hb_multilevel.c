@@ -289,9 +289,9 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
     static hr_complex *one_point_tor;
     static long double norm = 1.0;
     static long double poly_norm;
-    struct timeval start, end, etime;
     int nblocking = nblockingend - nblockingstart + 1;
     static hr_complex **polyf;
+    Timer clock;
 
     if (lev == 0)
     {
@@ -310,7 +310,7 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
             polyf[1] = amalloc(sizeof(hr_complex) * X * Z * T, ALIGN);
             polyf[2] = amalloc(sizeof(hr_complex) * X * Y * T, ALIGN);
         }
-        gettimeofday(&start, 0);
+        timer_set(&clock);
 
         memset(one_point_gb, 0, sizeof(hr_complex) * total_n_glue_op * nblocking * n_active_slices);
         memset(one_point_tor, 0, sizeof(hr_complex) * total_n_tor_op * n_active_slices);
@@ -348,10 +348,8 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
 
     if (lev == 0)
     {
-        gettimeofday(&end, 0);
-
-        timeval_subtract(&etime, &end, &start);
-        lprintf("HB MULTILEVEL", 0, "Update and 1pt measure done [%ld sec %ld usec]\n", etime.tv_sec, etime.tv_usec);
+        double elapsed_sec = timer_lap(&clock) * 1.e-6; //time in seconds
+        lprintf("HB MULTILEVEL", 0, "Update and 1pt measure done [%lf sec]\n", elapsed_sec);
 
 #if total_n_glue_op > 0
 
@@ -379,9 +377,7 @@ void update_hb_multilevel_gb_measure(int lev, double *beta, int nhb, int nor, in
         collect_1pt_torellon_functions(lcor, one_point_tor, polyf);
 #endif
 
-        gettimeofday(&start, 0);
-        timeval_subtract(&etime, &start, &end);
-
-        lprintf("HB MULTILEVEL", 0, "1pt writing done [%ld sec %ld usec]\n", etime.tv_sec, etime.tv_usec);
+        elapsed_sec = timer_lap(&clock) * 1.e-6; //time in seconds
+        lprintf("HB MULTILEVEL", 0, "1pt writing done [%lf sec]\n", elapsed_sec);
     }
 }

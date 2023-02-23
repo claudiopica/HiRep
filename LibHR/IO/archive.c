@@ -39,7 +39,6 @@ void write_gauge_field_matrix(char filename[])
   int pid = 0;
   int zsize, rz;
   double plaq;
-  struct timeval start, end, etime;
 
 #ifdef WITH_MPI
   /* MPI variables */
@@ -76,7 +75,8 @@ void write_gauge_field_matrix(char filename[])
   MPI_Comm_group(cart_comm, &cg);
 #endif
 
-  gettimeofday(&start, 0);
+  Timer clock;
+  timer_set(&clock);
 
   zsize = GLB_Z / NP_Z;
   rz = GLB_Z - zsize * NP_Z;
@@ -213,9 +213,8 @@ void write_gauge_field_matrix(char filename[])
     fclose(fp);
   free(buff);
 
-  gettimeofday(&end, 0);
-  timeval_subtract(&etime, &end, &start);
-  lprintf("IO", 0, "Configuration [%s] saved [%ld sec %ld usec]\n", filename, etime.tv_sec, etime.tv_usec);
+  double elapsed_sec = timer_lap(&clock) * 1.e-6; //time in seconds
+  lprintf("IO", 0, "Configuration [%s] saved [%lf sec]\n", filename, elapsed_sec);
 
 #ifdef WITH_MPI
   MPI_Barrier(GLB_COMM);
@@ -250,7 +249,6 @@ void read_gauge_field_matrix(char filename[])
   int pid = 0;
   int zsize, rz;
   double plaq, testplaq;
-  struct timeval start, end, etime;
 
 #ifdef WITH_MPI
   /* MPI variables */
@@ -261,7 +259,8 @@ void read_gauge_field_matrix(char filename[])
   (void)mpiret;
 #endif
 
-  gettimeofday(&start, 0);
+  Timer clock;
+  timer_set(&clock);
 
   if (PID == 0)
   {
@@ -445,9 +444,8 @@ void read_gauge_field_matrix(char filename[])
     }
   }
 
-  gettimeofday(&end, 0);
-  timeval_subtract(&etime, &end, &start);
-  lprintf("IO", 0, "Configuration [%s] read [%ld sec %ld usec] Plaquette=%e\n", filename, etime.tv_sec, etime.tv_usec, testplaq);
+  double elapsed_sec = timer_lap(&clock) * 1.e-6; //time in seconds
+  lprintf("IO", 0, "Configuration [%s] read [%lf sec] Plaquette=%e\n", filename, elapsed_sec, testplaq);
 
 #ifdef WITH_MPI
   MPI_Barrier(GLB_COMM);
@@ -462,7 +460,7 @@ void write_ranlxd_state(char filename[])
   int *buff = NULL;
   int pid = 0;
   int rsize = 0;
-  struct timeval start, end, etime;
+
 #ifdef WITH_MPI
   /* MPI variables */
   MPI_Group wg, cg;
@@ -490,7 +488,8 @@ void write_ranlxd_state(char filename[])
   MPI_Comm_group(cart_comm, &cg);
 #endif
 
-  gettimeofday(&start, 0);
+  Timer clock;
+  timer_set(&clock);
 
   buff = malloc(sizeof(*buff) * rsize);
 
@@ -572,9 +571,8 @@ void write_ranlxd_state(char filename[])
     fclose(fp);
   free(buff);
 
-  gettimeofday(&end, 0);
-  timeval_subtract(&etime, &end, &start);
-  lprintf("IO", 0, "Ranlxd state [%s] saved [%ld sec %ld usec]\n", filename, etime.tv_sec, etime.tv_usec);
+  double elapsed_sec = timer_lap(&clock) * 1.e-6; //time in seconds
+  lprintf("IO", 0, "Ranlxd state [%s] saved [%lf sec]\n", filename, elapsed_sec);
 
 #ifdef WITH_MPI
   MPI_Barrier(GLB_COMM);
@@ -591,7 +589,7 @@ void read_ranlxd_state(char filename[])
   int *buff = NULL;
   int pid = 0;
   int rsize = 0;
-  struct timeval start, end, etime;
+
 #ifdef WITH_MPI
   /* MPI variables */
   MPI_Group wg, cg;
@@ -601,7 +599,8 @@ void read_ranlxd_state(char filename[])
   (void)mpiret; /*No warning for unused variable. */
 #endif
 
-  gettimeofday(&start, 0);
+  Timer clock;
+  timer_set(&clock);
 
   rsize = rlxd_size();
 
@@ -722,9 +721,8 @@ void read_ranlxd_state(char filename[])
     fclose(fp);
   free(buff);
 
-  gettimeofday(&end, 0);
-  timeval_subtract(&etime, &end, &start);
-  lprintf("IO", 0, "Ranlxd state [%s] read [%ld sec %ld usec]\n", filename, etime.tv_sec, etime.tv_usec);
+  double elapsed_sec = timer_lap(&clock) * 1.e-6; //time in seconds
+  lprintf("IO", 0, "Ranlxd state [%s] read [%lf sec]\n", filename, elapsed_sec);
 
 #ifdef WITH_MPI
   MPI_Barrier(GLB_COMM);
@@ -738,7 +736,6 @@ void write_scalar_field(char filename[])
   double *buff = NULL;
   int pid = 0;
   int zsize, rz;
-  struct timeval start, end, etime;
 
 #ifdef WITH_MPI
   /* MPI variables */
@@ -770,7 +767,8 @@ void write_scalar_field(char filename[])
   MPI_Comm_group(cart_comm, &cg);
 #endif
 
-  gettimeofday(&start, 0);
+  Timer clock;
+  timer_set(&clock);
 
   zsize = GLB_Z / NP_Z;
   rz = GLB_Z - zsize * NP_Z;
@@ -881,9 +879,8 @@ void write_scalar_field(char filename[])
     fclose(fp);
   free(buff);
 
-  gettimeofday(&end, 0);
-  timeval_subtract(&etime, &end, &start);
-  lprintf("IO", 0, "Configuration [%s] saved [%ld sec %ld usec]\n", filename, etime.tv_sec, etime.tv_usec);
+  double elapsed_sec = timer_lap(&clock) * 1.e-6; //time in seconds
+  lprintf("IO", 0, "Configuration [%s] saved [%lf sec]\n", filename, elapsed_sec);
 
 #ifdef WITH_MPI
   MPI_Barrier(GLB_COMM);
@@ -901,7 +898,6 @@ void read_scalar_field(char filename[])
   double *buff = NULL;
   int pid = 0;
   int zsize, rz;
-  struct timeval start, end, etime;
 
 #ifdef WITH_MPI
   /* MPI variables */
@@ -912,7 +908,8 @@ void read_scalar_field(char filename[])
   (void)mpiret;
 #endif
 
-  gettimeofday(&start, 0);
+  Timer clock;
+  timer_set(&clock);
 
   if (PID == 0)
   {
@@ -1051,13 +1048,13 @@ void read_scalar_field(char filename[])
     fclose(fp);
   free(buff);
 
+  double elapsed_sec = timer_lap(&clock) * 1.e-6; //time in seconds
+  lprintf("IO", 0, "Configuration [%s] read [%lf sec]\n", filename, elapsed_sec);
+
   /* start sendrecv of global scalar field */
   start_sendrecv_suNg_scalar_field(u_scalar);
   complete_sendrecv_suNg_scalar_field(u_scalar);
 
-  /* check average plaquette */
-  gettimeofday(&end, 0);
-  timeval_subtract(&etime, &end, &start);
 
 #ifdef WITH_MPI
   MPI_Barrier(GLB_COMM);

@@ -66,7 +66,6 @@ void write_gauge_field_su2q(char filename[])
   int pid = 0;
   int zsize, rz;
   double plaq;
-  struct timeval start, end, etime;
 
 #ifdef WITH_MPI
   /* MPI variables */
@@ -106,7 +105,8 @@ void write_gauge_field_su2q(char filename[])
   MPI_Comm_group(cart_comm, &cg);
 #endif
 
-  gettimeofday(&start, 0);
+  Timer clock;
+  timer_set(&clock);
 
   zsize = GLB_Z / NP_Z;
   rz = GLB_Z - zsize * NP_Z;
@@ -241,9 +241,8 @@ void write_gauge_field_su2q(char filename[])
     fclose(fp);
   free(buff);
 
-  gettimeofday(&end, 0);
-  timeval_subtract(&etime, &end, &start);
-  lprintf("IO", 0, "Configuration [%s] saved [%ld sec %ld usec]\n", filename, etime.tv_sec, etime.tv_usec);
+  double elapsed_sec = timer_lap(&clock) * 1.e-6; //time in seconds
+  lprintf("IO", 0, "Configuration [%s] saved [%lf sec]\n", filename, elapsed_sec);
 
 #ifdef WITH_MPI
   MPI_Barrier(GLB_COMM);
@@ -263,7 +262,6 @@ void read_gauge_field_su2q(char filename[])
   int pid = 0;
   int zsize, rz;
   double plaq, testplaq;
-  struct timeval start, end, etime;
 
 #ifdef WITH_MPI
   /* MPI variables */
@@ -277,7 +275,8 @@ void read_gauge_field_su2q(char filename[])
 
   error((NG != 2), 1, "read_gauge_field_su2q", "This function cannot be called if NG!=2");
 
-  gettimeofday(&start, 0);
+  Timer clock;
+  timer_set(&clock);
 
   if (PID == 0)
   {
@@ -460,9 +459,8 @@ void read_gauge_field_su2q(char filename[])
     }
   }
 
-  gettimeofday(&end, 0);
-  timeval_subtract(&etime, &end, &start);
-  lprintf("IO", 0, "Configuration [%s] read [%ld sec %ld usec] Plaquette=%e\n", filename, etime.tv_sec, etime.tv_usec, testplaq);
+  double elapsed_sec = timer_lap(&clock) * 1.e-6; //time in seconds
+  lprintf("IO", 0, "Configuration [%s] read [%lf sec] Plaquette=%e\n", filename, elapsed_sec, testplaq);
 }
 
 void read_gauge_field_su2(char filename[])

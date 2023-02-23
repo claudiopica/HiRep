@@ -82,8 +82,8 @@ int main(int argc, char *argv[])
 	char list_filename[256] = "";
 	char cnfg_filename[256] = "";
 
-	struct timeval start, end, etime;
-	gettimeofday(&start, 0);
+	Timer clock;
+	timer_set(&clock);
 	/* setup process id and communications */
 
 	setup_process(&argc, &argv);
@@ -147,9 +147,8 @@ int main(int argc, char *argv[])
 	/* close communications */
 	finalize_process();
 
-	gettimeofday(&end, 0);
-	timeval_subtract(&etime, &end, &start);
-	lprintf("TIMING", 0, "Inversions and contractions for configuration  [%s] done [%ld sec %ld usec]\n", cnfg_filename, etime.tv_sec, etime.tv_usec);
+    double elapsed_sec = timer_lap(&clock) * 1.e-6; //time in seconds
+	lprintf("TIMING", 0, "Inversions and contractions for configuration  [%s] done [%lf sec]\n", cnfg_filename, elapsed_sec);
 
 	return 0;
 }

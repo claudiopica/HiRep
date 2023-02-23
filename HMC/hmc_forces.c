@@ -251,7 +251,6 @@ int main(int argc,char *argv[]) {
 
   int i=0;
   while(1){
-    struct timeval start, end, etime; /* for timing */
     double times[num_mon()];
     if (force_ave==NULL){
       force_ave = (double*) malloc(num_mon()*sizeof(double));
@@ -279,34 +278,31 @@ int main(int argc,char *argv[]) {
 
     
 
-    gettimeofday(&start,0);
+    Timer clock;
+    timer_set(&clock);
 
     correct_pf_dist_hmc(); 
     
-    gettimeofday(&end,0);
-    timeval_subtract(&etime,&end,&start);
-    lprintf("MAIN",0,"Configuration %d: Time to correct pseudofermion dist: %ld sec %ld usec\n",i,etime.tv_sec,etime.tv_usec);
+    double elapsed_msec = timer_lap(&clock) * 1.e-3; //time in milliseconds
+    lprintf("MAIN",0,"Configuration %d: Time to correct pseudofermion dist: %lf msec\n",i,elapsed_msec);
 
-    gettimeofday(&start,0);
+    elapsed_msec = timer_lap(&clock) * 1.e-3; //time in milliseconds
     calc_one_force(0);
-    gettimeofday(&end,0);
-    timeval_subtract(&etime,&end,&start);
-    lprintf("MAIN",0,"Time to calculate gauge force: %ld sec %ld usec\n",etime.tv_sec,etime.tv_usec);
-    times[0]=etime.tv_sec + (double) (etime.tv_usec)/1.0e6;
+    elapsed_msec = timer_lap(&clock) * 1.e-3; //time in milliseconds
+    lprintf("MAIN",0,"Time to calculate gauge force: %lf msec\n",elapsed_msec);
+    times[0]=elapsed_msec;
 
-    gettimeofday(&start,0);
+    elapsed_msec = timer_lap(&clock) * 1.e-3; //time in milliseconds
     calc_one_force(1);
-    gettimeofday(&end,0);
-    timeval_subtract(&etime,&end,&start);
-    lprintf("MAIN",0,"Time to calculate fermion force: %ld sec %ld usec\n",etime.tv_sec,etime.tv_usec);
+    elapsed_msec = timer_lap(&clock) * 1.e-3; //time in milliseconds
+    lprintf("MAIN",0,"Time to calculate fermion force: %lf msec %ld usec\n",elapsed_msec);
     times[1]=etime.tv_sec + (double) (etime.tv_usec)/1.0e6;
     for (int k=2;k<num_mon();k++){
-      gettimeofday(&start,0);
+      elapsed_msec = timer_lap(&clock) * 1.e-3; //time in milliseconds
       calc_one_force(k);
-      gettimeofday(&end,0);
-      timeval_subtract(&etime,&end,&start);
-      lprintf("MAIN",0,"Time to calculate HB force %d: %ld sec %ld usec\n",k,etime.tv_sec,etime.tv_usec);
-      times[k]=etime.tv_sec + (double) (etime.tv_usec)/1.0e6;
+      elapsed_msec = timer_lap(&clock) * 1.e-3; //time in milliseconds
+      lprintf("MAIN",0,"Time to calculate HB force %d: %lf msec\n",k,elapsed_msec);
+      times[k]=elapsed_msec;
     }
 
     lprintf("FORCE_SUMMARY",10,"Fermion: is the first monomial defined in the input file and Hasen: are the following ones upto number of monomials\n");

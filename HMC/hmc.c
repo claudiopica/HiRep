@@ -152,10 +152,10 @@ int main(int argc, char *argv[])
   {
     int rr;
     double perc;
-    struct timeval start, end, etime; /* //for trajectory timing */
     lprintf("MAIN", 0, "Trajectory #%d...\n", i);
 
-    gettimeofday(&start, 0);
+    Timer clock;
+    timer_set(&clock);
 
 #ifdef MEASURE_FORCE
     if (force_ave == NULL)
@@ -174,9 +174,8 @@ int main(int argc, char *argv[])
 
     rr = update_ghmc();
 
-    gettimeofday(&end, 0);
-    timeval_subtract(&etime, &end, &start);
-    lprintf("MAIN", 0, "Trajectory #%d: generated in [%ld sec %ld usec]\n", i, etime.tv_sec, etime.tv_usec);
+    double elapsed_sec = timer_lap(&clock) * 1.e-6; //time in seconds
+    lprintf("MAIN", 0, "Trajectory #%d: generated in [%lf sec]\n", i, elapsed_sec);
 
     if (rr < 0)
     {

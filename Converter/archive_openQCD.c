@@ -10,12 +10,12 @@ void read_gauge_field_openQCD(char filename[])
   FILE *fp = NULL;
   int g[4];
   int mu, i, j;
-  struct timeval start, end, etime;
   double test[2 * NG * NG];
   int size[4];
   double readplaq;
 
-  gettimeofday(&start, 0);
+  Timer clock;
+  timer_set(&clock);
 
   error((fp = fopen(filename, "rb")) == NULL, 1, "read_gauge_field_openQCD",
         "Failed to open file for reading");
@@ -75,9 +75,8 @@ void read_gauge_field_openQCD(char filename[])
   else
     lprintf("IO", 0, "Plaquette checksum matches\n Initial plaquette: %1.8e \n", new_plaq);
 
-  gettimeofday(&end, 0);
-  timeval_subtract(&etime, &end, &start);
-  lprintf("IO", 0, "Configuration [%s] read [%ld sec %ld usec]\n", filename, etime.tv_sec, etime.tv_usec);
+  double elapsed_sec = timer_lap(&clock) * 1.e-6; //time in seconds
+  lprintf("IO", 0, "Configuration [%s] read [%lf sec]\n", filename, elapsed_sec);
 }
 
 void read_gauge_field_openQCD_SF(char filename[])
@@ -85,12 +84,12 @@ void read_gauge_field_openQCD_SF(char filename[])
   FILE *fp = NULL;
   int g[4];
   int mu, i, j;
-  struct timeval start, end, etime;
   double test[2 * NG * NG];
   int size[4];
   double readplaq;
 
-  gettimeofday(&start, 0);
+  Timer clock;
+  timer_set(&clock);
 
   error((fp = fopen(filename, "rb")) == NULL, 1, "read_gauge_field_openQCD",
         "Failed to open file for reading");
@@ -153,9 +152,8 @@ void read_gauge_field_openQCD_SF(char filename[])
   else
     lprintf("IO", 0, "Plaquette checksum matches\n Initial plaquette: %1.8e \n", new_plaq);
 
-  gettimeofday(&end, 0);
-  timeval_subtract(&etime, &end, &start);
-  lprintf("IO", 0, "Configuration [%s] read [%ld sec %ld usec]\n", filename, etime.tv_sec, etime.tv_usec);
+  double elapsed_sec = timer_lap(&clock) * 1.e-6; //time in seconds
+  lprintf("IO", 0, "Configuration [%s] read [%lf sec]\n", filename, elapsed_sec);
 }
 
 void write_gauge_field_openQCD(char filename[])
@@ -163,12 +161,12 @@ void write_gauge_field_openQCD(char filename[])
   FILE *fp = NULL;
   int g[4];
   int mu, i, j;
-  struct timeval start, end, etime;
   double test[2 * NG * NG];
   int size[4] = {GLB_T, GLB_X, GLB_Y, GLB_Z};
   double writeplaq = NG * avr_plaquette();
 
-  gettimeofday(&start, 0);
+  Timer clock;
+  timer_set(&clock);
 
   error((fp = fopen(filename, "wb")) == NULL, 1, "write_gauge_field_openQCD",
         "Failed to open file for writing");
@@ -220,10 +218,9 @@ void write_gauge_field_openQCD(char filename[])
 
   fclose(fp);
 
-  gettimeofday(&end, 0);
-  timeval_subtract(&etime, &end, &start);
+  double elapsed_sec = timer_lap(&clock) * 1.e-6; //time in seconds
   lprintf("IO", 0, "Plaquette of the stored configuration: %1.8e\n", writeplaq);
-  lprintf("IO", 0, "Configuration [%s] wrote [%ld sec %ld usec]\n", filename, etime.tv_sec, etime.tv_usec);
+  lprintf("IO", 0, "Configuration [%s] wrote [%lf sec]\n", filename, elapsed_sec);
 }
 
 static void write_gauge_field_hirep(char filename[], double subs)
@@ -233,7 +230,6 @@ static void write_gauge_field_hirep(char filename[], double subs)
   double *buff = NULL;
   int zsize, rz;
   double plaq;
-  struct timeval start, end, etime;
 
 #ifndef ALLOCATE_REPR_GAUGE_FIELD
   complete_sendrecv_gfield(u_gauge);
@@ -264,7 +260,8 @@ static void write_gauge_field_hirep(char filename[], double subs)
         1, "write_gauge_field",
         "Failed to write gauge field plaquette");
 
-  gettimeofday(&start, 0);
+  Timer clock;
+  timer_set(&clock);
 
   zsize = GLB_Z / NP_Z;
   rz = GLB_Z - zsize * NP_Z;
@@ -319,9 +316,8 @@ static void write_gauge_field_hirep(char filename[], double subs)
   fclose(fp);
   free(buff);
 
-  gettimeofday(&end, 0);
-  timeval_subtract(&etime, &end, &start);
-  lprintf("IO", 0, "Configuration [%s] saved [%ld sec %ld usec]\n", filename, etime.tv_sec, etime.tv_usec);
+  double elapsed_sec = timer_lap(&clock) * 1.e-6; //time in seconds
+  lprintf("IO", 0, "Configuration [%s] saved [%lf sec]\n", filename, elapsed_sec);
 
 #ifndef ALLOCATE_REPR_GAUGE_FIELD
   complete_sendrecv_gfield(u_gauge);

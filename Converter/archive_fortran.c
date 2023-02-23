@@ -10,11 +10,11 @@ void read_gauge_field_fortran(char filename[])
   FILE *fp = NULL;
   int g[4];
   int mu, i;
-  struct timeval start, end, etime;
   float test[2 * NG * NG];
   float info[16];
 
-  gettimeofday(&start, 0);
+  Timer clock;
+  timer_set(&clock);
 
   error((fp = fopen(filename, "rb")) == NULL, 1, "read_gauge_field_fortran",
         "Failed to open file for reading");
@@ -44,9 +44,8 @@ void read_gauge_field_fortran(char filename[])
 
   fclose(fp);
   full_plaquette();
-  gettimeofday(&end, 0);
 
-  timeval_subtract(&etime, &end, &start);
-  lprintf("IO", 0, "Configuration [%s] read [%ld sec %ld usec]\n", filename, etime.tv_sec, etime.tv_usec);
+  double elapsed_sec = timer_lap(&clock) * 1.e-6; //time in seconds
+  lprintf("IO", 0, "Configuration [%s] read [%lf sec]\n", filename, elapsed_sec);
   lprintf("IO", 0, "Plaquette eval(%f) read(%f)\n", avr_plaquette(), info[14]);
 }

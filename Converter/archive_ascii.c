@@ -7,71 +7,60 @@
 
 void read_gauge_field_ascii(char filename[])
 {
-  FILE *fp = NULL;
-  int g[4];
-  int alpha, gamma, mu;
-  int counter = 0, counter0 = 0, pointcounter = 0;
-  struct timeval start, end, etime;
-  suNg tmpmat;
-  float re, im;
-  int Vdone[GLB_T][GLB_X][GLB_Y][GLB_Z][4];
+    int counter = 0, counter0 = 0, pointcounter = 0;
+    int Vdone[GLB_T][GLB_X][GLB_Y][GLB_Z][4];
 
-  gettimeofday(&start, 0);
+    Timer clock;
+    timer_set(&clock);
 
-  error((fp = fopen(filename, "r")) == NULL, 1, "read_gauge_field_ascii",
-        "Failed to open file for reading");
+    FILE *fp = fopen(filename, "r");
+    error(fp == NULL, 1, "read_gauge_field_ascii", "Failed to open file for reading");
 
-  for (g[0] = 0; g[0] < GLB_T; g[0]++)
-    for (g[1] = 0; g[1] < GLB_X; g[1]++)
-      for (g[2] = 0; g[2] < GLB_Y; g[2]++)
-        for (g[3] = 0; g[3] < GLB_Z; g[3]++)
-          for (mu = 0; mu < 4; mu++)
-            Vdone[g[0]][g[1]][g[2]][g[3]][mu] = 0;
+    for (int g0 = 0; g0 < GLB_T; g0++)
+        for (int g1 = 0; g1 < GLB_X; g1++)
+            for (int g2 = 0; g2 < GLB_Y; g2++)
+                for (int g3 = 0; g3 < GLB_Z; g3++)
+                    for (int mu = 0; mu < 4; mu++) Vdone[g0][g1][g2][g3][mu] = 0;
 
-  while (1)
-  {
-    /* u( row , col , x , y , z , t , dir) = (re,im) */
-    int hm = fscanf(fp, " %d %d %d %d\n",
-                    &g[0], &g[1], &g[2], &g[3]);
-    if (hm != 4)
-      break;
-    pointcounter++;
-    for (mu = 0; mu < 4; mu++)
-    {
-      for (gamma = 0; gamma < NG; gamma++)
-        for (alpha = 0; alpha < NG; alpha++)
-        {
-          hm = fscanf(fp, " %f %f\n", &re, &im);
-          if (hm != 2)
-            error(0, 1, "read_gauge_field_ascii",
-                  "Bad number of element in the gauge field\n");
-          tmpmat.c[gamma * NG + alpha] = re +I*im;
-          counter++;
+    while (1) {
+        /* u( row , col , x , y , z , t , dir) = (re,im) */
+        int g0, g1, g2, g3;
+        int hm = fscanf(fp, " %d %d %d %d\n", &g0, &g1, &g2, &g3);
+        if (hm != 4) break;
+        pointcounter++;
+        for (int mu = 0; mu < 4; mu++) {
+            register suNg tmpmat;
+
+            for (int gamma = 0; gamma < NG; gamma++)
+                for (int alpha = 0; alpha < NG; alpha++) {
+                    double re, im;
+                    hm = fscanf(fp, " %lf %lf\n", &re, &im);
+                    if (hm != 2) error(0, 1, "read_gauge_field_ascii", "Bad number of element in the gauge field\n");
+                    tmpmat.c[gamma * NG + alpha] = re + I * im;
+                    counter++;
+                }
+            *pu_gauge(ipt(g0 + 1, g1 - 1, g2 - 1, g3 - 1), mu) = tmpmat;
+            Vdone[g0 + 1][g1 - 1][g2 - 1][g3 - 1][mu] = 1;
         }
-      *pu_gauge(ipt(g[0] + 1, g[1] - 1, g[2] - 1, g[3] - 1), mu) = tmpmat;
-      Vdone[g[0] + 1][g[1] - 1][g[2] - 1][g[3] - 1][mu] = 1;
     }
-  }
 
-  for (g[0] = 0; g[0] < GLB_T; g[0]++)
-    for (g[1] = 0; g[1] < GLB_X; g[1]++)
-      for (g[2] = 0; g[2] < GLB_Y; g[2]++)
-        for (g[3] = 0; g[3] < GLB_Z; g[3]++)
-          for (mu = 0; mu < 4; mu++)
-          {
-            if (Vdone[g[0]][g[1]][g[2]][g[3]][mu] == 0)
-            {
-              counter0 += NG * NG;
-              _suNg_zero(*pu_gauge(ipt(g[0], g[1], g[2], g[3]), mu));
-            }
-          }
+    for (int g0 = 0; g0 < GLB_T; g0++)
+        for (int g1 = 0; g1 < GLB_X; g1++)
+            for (int g2 = 0; g2 < GLB_Y; g2++)
+                for (int g3 = 0; g3 < GLB_Z; g3++)
+                    for (int mu = 0; mu < 4; mu++) {
+                        if (Vdone[g0][g1][g2][g3][mu] == 0) {
+                            counter0 += NG * NG;
+                            _suNg_zero(*pu_gauge(ipt(g0, g1, g2, g3), mu));
+                        }
+                    }
 
-  lprintf("IO", 0, "Read %d lines\n", counter + pointcounter);
-  error(counter + counter0 != NG * NG * 4 * GLB_T * GLB_X * GLB_Y * GLB_Z, 1, "read_gauge_field_ascii " __FILE__, "Bad number of lines in file");
+    lprintf("IO", 0, "Read %d lines\n", counter + pointcounter);
+    error(counter + counter0 != NG * NG * 4 * GLB_T * GLB_X * GLB_Y * GLB_Z, 1, "read_gauge_field_ascii " __FILE__,
+          "Bad number of lines in file");
 
-  fclose(fp);
+    fclose(fp);
 
-  gettimeofday(&end, 0);
-  timeval_subtract(&etime, &end, &start);
-  lprintf("IO", 0, "Configuration [%s] read [%ld sec %ld usec]\n", filename, etime.tv_sec, etime.tv_usec);
+    double elapsed_sec = timer_lap(&clock) * 1.e-6; //time in seconds
+    lprintf("IO", 0, "Configuration [%s] read [%lf sec]\n", filename, elapsed_sec);
 }

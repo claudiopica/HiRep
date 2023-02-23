@@ -9,6 +9,7 @@
 #include "random.h"
 #include "io.h"
 #include "memory.h"
+#include "utils.h"
 #include <math.h>
 #include <assert.h>
 
@@ -142,13 +143,11 @@ static int cg_mshift_core(short int *sflags, mshift_par *par, spinor_operator M,
 
 int cg_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field *out){ 
   #ifdef TIMING
-  struct timeval start, end;
-  struct timeval etime;
-  
   #ifdef TIMING_WITH_BARRIERS
   MPI_Barrier(GLB_COMM);
   #endif
-  gettimeofday(&start,0);
+  Timer clock;
+  timer_set(&clock);
   #endif
 
   //  int ix = ipt(0,0,0,0);
@@ -182,9 +181,8 @@ int cg_mshift(mshift_par *par, spinor_operator M, spinor_field *in, spinor_field
   #ifdef TIMING_WITH_BARRIERS
   MPI_Barrier(GLB_COMM);
   #endif
-  gettimeofday(&end,0);
-  timeval_subtract(&etime,&end,&start);
-  lprintf("TIMING",0,"cg_mshift %.6f s\n",1.*etime.tv_sec+1.e-6*etime.tv_usec);
+  double elapsed_sec = timer_lap(&clock) * 1.e-6; //time in seconds
+  lprintf("TIMING",0,"cg_mshift %.6f s\n",elapsed_sec);
   #endif
 
   return cgiter;
