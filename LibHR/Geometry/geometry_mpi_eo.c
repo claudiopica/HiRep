@@ -60,7 +60,7 @@ static int inner[2] = {-1, -1};
 
 static void walk_on_lattice(int id_mask, int eotype, int level, int id_zone, int *bl_start, int *incr, int *bl_width);
 static int init_border(int id_mask, int eotype, int level, int id_zone, int *bl_start, int *incr, int *bl_width, int *match_length);
-static void close_border();
+static void close_border(int i);
 static void set_border_pointer(int actualn, int match_p);
 
 static void set_block(int id_mask, int *bl_s, int *incr, int *bl_w, int pts, int wts, int pxs, int wxs, int pys, int wys, int pzs, int wzs)

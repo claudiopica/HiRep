@@ -839,7 +839,6 @@ static void print_block_info(block_info *b) {
 
 static void search_all_blocks(unsigned int parity, unsigned int mask[4]) {
   block_info tmp;
-  int n;
   
   tmp.index = 0;
   tmp.ninners = 0;
@@ -857,13 +856,11 @@ static void search_all_blocks(unsigned int parity, unsigned int mask[4]) {
   tmp.senders = NULL;
   tmp.receiver = NULL;
   
-  n=0;
   while(1) {
     search_first_block(&tmp);
     if(tmp.start!=NULL) {
       append_block(&tmp);
       tmp.start++;
-      n++;
     } else
       break;
   }
