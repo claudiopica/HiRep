@@ -140,56 +140,59 @@ typedef struct suNg_V {
 #endif //(NF == 3) || (NG == 3)
 
 #if (NF == 3) && !defined(REPR_IS_REAL)
+// clang-format off
 
 #undef _suNf_multiply
-#define _suNf_multiply(mc, mu, mp)                                  \
-    _Generic((mc), suNf_vector                                      \
-             : ({ _MVM_3x3C_SIMD_VEC((mc), (mu), (mp)); }), default \
-             : ({ _suNf_multiply_default(mc, mu, mp); }))
+#define _suNf_multiply(mc, mu, mp)                                         \
+            _Generic((mc),                                                 \
+                suNf_vector : ({ _MVM_3x3C_SIMD_VEC((mc), (mu), (mp)); }), \
+                default : ({ _suNf_multiply_default(mc, mu, mp); }))
+
 #undef _suNf_inverse_multiply
-#define _suNf_inverse_multiply(mc, mu, mp)                           \
-    _Generic((mc), suNf_vector                                       \
-             : ({ _MTVM_3x3C_SIMD_VEC((mc), (mu), (mp)); }), default \
-             : ({ _suNf_inverse_multiply_default(mc, mu, mp); }))
+#define _suNf_inverse_multiply(mc, mu, mp)                              \
+        _Generic((mc),                                                  \
+            suNf_vector : ({ _MTVM_3x3C_SIMD_VEC((mc), (mu), (mp)); }), \
+            default : ({ _suNf_inverse_multiply_default(mc, mu, mp); }))
 
 #undef _suNf_double_multiply
-#define _suNf_double_multiply(mc, mc2, mu, mp, mp2)                                      \
-    _Generic((mc), suNf_vector                                                           \
-             : ({ _double_MVM_3x3C_SIMD_VEC((mc), (mc2), (mu), (mp), (mp2)); }), default \
-             : ({ _suNf_double_multiply_default(mc, mc2, mu, mp, mp2); }))
+#define _suNf_double_multiply(mc, mc2, mu, mp, mp2)                                        \
+        _Generic((mc),                                                                     \
+            suNf_vector : ({ _double_MVM_3x3C_SIMD_VEC((mc), (mc2), (mu), (mp), (mp2)); }),\
+            default : ({ _suNf_double_multiply_default(mc, mc2, mu, mp, mp2); }))
 
 #undef _suNf_double_inverse_multiply
-#define _suNf_double_inverse_multiply(mc, mc2, mu, mp, mp2)                               \
-    _Generic((mc), suNf_vector                                                            \
-             : ({ _double_MTVM_3x3C_SIMD_VEC((mc), (mc2), (mu), (mp), (mp2)); }), default \
-             : ({ _suNf_double_inverse_multiply_default(mc, mc2, mu, mp, mp2); }))
+#define _suNf_double_inverse_multiply(mc, mc2, mu, mp, mp2)                                 \
+        _Generic((mc),                                                                      \
+            suNf_vector : ({ _double_MTVM_3x3C_SIMD_VEC((mc), (mc2), (mu), (mp), (mp2)); }),\
+            default : ({ _suNf_double_inverse_multiply_default(mc, mc2, mu, mp, mp2); }))
 
 #endif //(NF == 3) && !defined(REPR_IS_REAL)
 
 #if (NG == 3)
 #undef _suNg_multiply
-#define _suNg_multiply(mc, mu, mp)                                  \
-    _Generic((mc), suNg_vector                                      \
-             : ({ _MVM_3x3C_SIMD_VEC((mc), (mu), (mp)); }), default \
-             : ({ _suNg_multiply_default(mc, mu, mp); }))
+#define _suNg_multiply(mc, mu, mp)                                    \
+        _Generic((mc),                                                \
+            suNg_vector : ({ _MVM_3x3C_SIMD_VEC((mc), (mu), (mp)); }),\
+            default : ({ _suNg_multiply_default(mc, mu, mp); }))
 
 #undef _suNg_inverse_multiply
-#define _suNg_inverse_multiply(mc, mu, mp)                           \
-    _Generic((mc), suNg_vector                                       \
-             : ({ _MTVM_3x3C_SIMD_VEC((mc), (mu), (mp)); }), default \
-             : ({ _suNg_inverse_multiply_default(mc, mu, mp); }))
+#define _suNg_inverse_multiply(mc, mu, mp)                              \
+        _Generic((mc),                                                  \
+            suNg_vector : ({ _MTVM_3x3C_SIMD_VEC((mc), (mu), (mp)); }), \
+            default : ({ _suNg_inverse_multiply_default(mc, mu, mp); }))
 
 #undef _suNg_double_multiply
-#define _suNg_double_multiply(mc, mc2, mu, mp, mp2)                                      \
-    _Generic((mc), suNg_vector                                                           \
-             : ({ _double_MVM_3x3C_SIMD_VEC((mc), (mc2), (mu), (mp), (mp2)); }), default \
-             : ({ _suNg_double_multiply_default(mc, mc2, mu, mp, mp2); }))
+#define _suNg_double_multiply(mc, mc2, mu, mp, mp2)                                        \
+        _Generic((mc),                                                                     \
+            suNg_vector : ({ _double_MVM_3x3C_SIMD_VEC((mc), (mc2), (mu), (mp), (mp2)); }),\
+            default : ({ _suNg_double_multiply_default(mc, mc2, mu, mp, mp2); }))
 
 #undef _suNg_double_inverse_multiply
-#define _suNg_double_inverse_multiply(mc, mc2, mu, mp, mp2)                               \
-    _Generic((mc), suNg_vector                                                            \
-             : ({ _double_MTVM_3x3C_SIMD_VEC((mc), (mc2), (mu), (mp), (mp2)); }), default \
-             : ({ _suNg_double_inverse_multiply_default(mc, mc2, mu, mp, mp2); }))
+#define _suNg_double_inverse_multiply(mc, mc2, mu, mp, mp2)                                 \
+        _Generic((mc),                                                                      \
+            suNg_vector : ({ _double_MTVM_3x3C_SIMD_VEC((mc), (mc2), (mu), (mp), (mp2)); }),\
+            default : ({ _suNg_double_inverse_multiply_default(mc, mc2, mu, mp, mp2); }))
+// clang-format on
 
 #endif //(NG == 3)
 
