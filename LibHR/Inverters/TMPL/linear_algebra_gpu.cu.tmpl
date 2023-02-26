@@ -1,5 +1,6 @@
 /***************************************************************************\
-* Copyright (c) 2008,2011, Claudio Pica, Ari Hietanen and Ulrik Søndergaard *
+* Copyright (c) 2008-2023                                                   *
+* Claudio Pica, Ari Hietanen, Ulrik Søndergaard, Sofie Martins              *
 * All rights reserved.                                                      *
 \***************************************************************************/
 
@@ -222,6 +223,15 @@ _DECLARE(void, spinor_field_mulc_add_assign, (_SPINOR_FIELD_TYPE *s1, _COMPLEX c
   );
 }
 
+/* s1+=c*g5*s2 c complex */
+_DECLARE(void, spinor_field_g5_mulc_add_assign, (_SPINOR_FIELD_TYPE *s1, _COMPLEX c, _SPINOR_FIELD_TYPE *s2))
+{
+   _TWO_SPINORS_MATCHING(s1,s2);
+   _CUDA_FOR(s1,ixp,
+            (spinor_field_g5_mulc_add_assign_gpu<_REAL><<<grid_size,BLOCK_SIZE>>>(_GPU_FIELD_BLK(s1,ixp),c,_GPU_FIELD_BLK(s2,ixp),N))
+   );
+}
+
 /* s1=r*s2 */
 _DECLARE(void, spinor_field_mul, (_SPINOR_FIELD_TYPE *s1, _REAL r, _SPINOR_FIELD_TYPE *s2))
 {
@@ -293,14 +303,6 @@ _DECLARE(void, spinor_field_minus, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *
   );
 }
 
-/* s1=-s1 */
-_DECLARE(void, spinor_field_minus_assign, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
-{
-  _CUDA_FOR(s1,ixp,
-            (spinor_field_minus_assign_gpu<_REAL><<<grid_size,BLOCK_SIZE>>>(_GPU_FIELD_BLK(s1,ixp), N));
-  );
-}
-
 /* s1=r1*s2+r2*s3 */
 _DECLARE(void, spinor_field_lc, (_SPINOR_FIELD_TYPE *s1, _REAL r1, _SPINOR_FIELD_TYPE *s2, _REAL r2, _SPINOR_FIELD_TYPE *s3))
 {
@@ -350,7 +352,7 @@ _DECLARE(void, spinor_field_g5, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)
   );
 }
 
-/* s1=g5*s1  */
+/* s1+=g5*s1  */
 _DECLARE(void, spinor_field_g5_assign, (_SPINOR_FIELD_TYPE *s1))
 {
   _CUDA_FOR(s1,ixp,
@@ -358,13 +360,28 @@ _DECLARE(void, spinor_field_g5_assign, (_SPINOR_FIELD_TYPE *s1))
   );
 }
 
-/* s1+=c*g5*s2 c complex */
-_DECLARE(void, spinor_field_g5_mulc_add_assign, (_SPINOR_FIELD_TYPE *s1, _COMPLEX c, _SPINOR_FIELD_TYPE *s2))
-{
-   _TWO_SPINORS_MATCHING(s1,s2);
-   _CUDA_FOR(s1,ixp,
-            (spinor_field_g5_mulc_add_assign_gpu<_REAL><<<grid_size,BLOCK_SIZE>>>(_GPU_FIELD_BLK(s1,ixp),c,_GPU_FIELD_BLK(s2,ixp),N))
-   );
+_DECLARE(void, spinor_field_g0, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)) {
+  _CUDA_FOR(s1,ixp,
+            (spinor_field_g0_gpu<_REAL><<<grid_size,BLOCK_SIZE>>>(_GPU_FIELD_BLK(s1,ixp),_GPU_FIELD_BLK(s2,ixp),N))
+  );
+}
+
+_DECLARE(void, spinor_field_g1, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)) {
+  _CUDA_FOR(s1,ixp,
+            (spinor_field_g1_gpu<_REAL><<<grid_size,BLOCK_SIZE>>>(_GPU_FIELD_BLK(s1,ixp),_GPU_FIELD_BLK(s2,ixp),N))
+  );
+}
+
+_DECLARE(void, spinor_field_g2, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)) {
+  _CUDA_FOR(s1,ixp,
+            (spinor_field_g2_gpu<_REAL><<<grid_size,BLOCK_SIZE>>>(_GPU_FIELD_BLK(s1,ixp),_GPU_FIELD_BLK(s2,ixp),N))
+  );
+}
+
+_DECLARE(void, spinor_field_g3, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2)) {
+  _CUDA_FOR(s1,ixp,
+            (spinor_field_g3_gpu<_REAL><<<grid_size,BLOCK_SIZE>>>(_GPU_FIELD_BLK(s1,ixp),_GPU_FIELD_BLK(s2,ixp),N))
+  );
 }
 
 /* tools per eva.c  */
@@ -395,15 +412,14 @@ _DECLARE(void, spinor_field_lc3, (_REAL c1, _REAL c2, _SPINOR_FIELD_TYPE *s1, _S
   );
 }
 
-/* Placeholder functions, there need to be the same definitions in linear_algebra.c.sdtmpl and linear_algebra_gpu.c.sdtmpl */
-_DECLARE(void, spinor_field_g0, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
-{}
-_DECLARE(void, spinor_field_g1, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
-{}
-_DECLARE(void, spinor_field_g2, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
-{}
-_DECLARE(void, spinor_field_g3, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
-{}
+// Extra
+/* s1=-s1 */
+_DECLARE(void, spinor_field_minus_assign, (_SPINOR_FIELD_TYPE *s1, _SPINOR_FIELD_TYPE *s2))
+{
+  _CUDA_FOR(s1,ixp,
+            (spinor_field_minus_assign_gpu<_REAL><<<grid_size,BLOCK_SIZE>>>(_GPU_FIELD_BLK(s1,ixp), N));
+  );
+}
 
 //internal macros
 #undef _DECLARE

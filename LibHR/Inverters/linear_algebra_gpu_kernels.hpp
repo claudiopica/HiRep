@@ -12,12 +12,6 @@
         (_i < ((_N-1)/THREADSIZE + 1)*THREADSIZE) && (spinor_idx(_i) < _N/(4*NF));\
         _i += blockDim.x * gridDim.x)
 
-#ifdef FIXED_STRIDE
-   #define _is_in_second_hspinor(_idx, _piece_size) (_idx/(2*NF*THREADSIZE)) % 2 == 1
-#else
-   #define _is_in_second_hspinor(_idx, _piece_size) _idx > (_piece_size/2)
-#endif
-
 /* Re <s1,s2> */
 template<typename REAL, typename SITE_TYPE>
 __global__ void spinor_field_prod_re_gpu(SITE_TYPE* s1, SITE_TYPE* s2, double* resField, int N)
@@ -126,6 +120,24 @@ __global__ void spinor_field_mulc_add_assign_gpu(SITE_TYPE *s1, COMPLEX c, SITE_
       read_gpu<REAL>(N, &site1, s1, ix, 0, 1);
       read_gpu<REAL>(N, &site2, s2, ix, 0, 1);
       _spinor_mulc_add_assign_f(site1, c, site2);
+      write_gpu<REAL>(N, &site1, s1, ix, 0, 1);
+   }
+}
+
+/* s1+=c*g5*s2 c complex  */
+template<typename REAL, typename SITE_TYPE, typename COMPLEX>
+__global__ void spinor_field_g5_mulc_add_assign_gpu(SITE_TYPE *s1, COMPLEX c, SITE_TYPE *s2, int N)
+{
+   SITE_TYPE site1;
+   SITE_TYPE site2;
+   SITE_TYPE tmp;
+   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+   if (ix < N) {
+      read_gpu<REAL>(N, &site1, s1, ix, 0, 1);
+      read_gpu<REAL>(N, &site2, s2, ix, 0, 1);
+      _spinor_mulc_f(tmp, c, site2);
+      _spinor_g5_f(site2, tmp);
+      _spinor_add_assign_f(site1, site2);
       write_gpu<REAL>(N, &site1, s1, ix, 0, 1);
    }
 }
@@ -246,19 +258,6 @@ __global__ void spinor_field_minus_gpu(SITE_TYPE * s1, SITE_TYPE * s2, int N)
    }
 }
 
-/* s1=-s1 */
-template<typename REAL, typename SITE_TYPE>
-__global__ void spinor_field_minus_assign_gpu(SITE_TYPE* s1, int N)
-{
-   SITE_TYPE site1;
-   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
-   if (ix < N) {
-      read_gpu<REAL>(N, &site1, s1, ix, 0, 1);
-      _spinor_minus_f(site1, site1);
-      write_gpu<REAL>(N, &site1, s1, ix, 0, 1);
-   }
-}
-
 /* s1=r1*s2+r2*s3 r1,r2 real */
 template<typename REAL, typename SITE_TYPE>
 __global__ void spinor_field_lc_gpu(SITE_TYPE *s1, REAL r1, SITE_TYPE *s2, REAL r2, SITE_TYPE *s3, int N)
@@ -352,23 +351,54 @@ __global__ void spinor_field_g5_assign_gpu(SITE_TYPE* s1, int N)
    }
 }
 
-/* s1+=c*g5*s2 c complex  */
-template<typename REAL, typename SITE_TYPE, typename COMPLEX>
-__global__ void spinor_field_g5_mulc_add_assign_gpu(SITE_TYPE *s1, COMPLEX c, SITE_TYPE *s2, int N)
-{
+template<typename REAL, typename SITE_TYPE>
+__global__ void spinor_field_g0_gpu(SITE_TYPE* s1, SITE_TYPE* s2, int N) {
    SITE_TYPE site1;
    SITE_TYPE site2;
-   SITE_TYPE tmp;
    int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
    if (ix < N) {
-      read_gpu<REAL>(N, &site1, s1, ix, 0, 1);
       read_gpu<REAL>(N, &site2, s2, ix, 0, 1);
-      _spinor_mulc_f(tmp, c, site2);
-      _spinor_g5_f(site2, tmp);
-      _spinor_add_assign_f(site1, site2);
+      _spinor_g0_f(site1, site2);
       write_gpu<REAL>(N, &site1, s1, ix, 0, 1);
    }
 }
+
+template<typename REAL, typename SITE_TYPE>
+__global__ void spinor_field_g1_gpu(SITE_TYPE* s1, SITE_TYPE* s2, int N) {
+   SITE_TYPE site1;
+   SITE_TYPE site2;
+   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+   if (ix < N) {
+      read_gpu<REAL>(N, &site2, s2, ix, 0, 1);
+      _spinor_g1_f(site1, site2);
+      write_gpu<REAL>(N, &site1, s1, ix, 0, 1);
+   }
+}
+
+template<typename REAL, typename SITE_TYPE>
+__global__ void spinor_field_g2_gpu(SITE_TYPE* s1, SITE_TYPE* s2, int N) {
+   SITE_TYPE site1;
+   SITE_TYPE site2;
+   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+   if (ix < N) {
+      read_gpu<REAL>(N, &site2, s2, ix, 0, 1);
+      _spinor_g2_f(site1, site2);
+      write_gpu<REAL>(N, &site1, s1, ix, 0, 1);
+   }
+}
+
+template<typename REAL, typename SITE_TYPE>
+__global__ void spinor_field_g3_gpu(SITE_TYPE* s1, SITE_TYPE* s2, int N) {
+   SITE_TYPE site1;
+   SITE_TYPE site2;
+   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+   if (ix < N) {
+      read_gpu<REAL>(N, &site2, s2, ix, 0, 1);
+      _spinor_g3_f(site1, site2);
+      write_gpu<REAL>(N, &site1, s1, ix, 0, 1);
+   }
+}
+
 
 /* tools per eva.c  */
 template<typename SITE_TYPE, typename REAL>
@@ -380,7 +410,7 @@ __global__ void spinor_field_lc1_gpu(REAL r, SITE_TYPE *s1, SITE_TYPE *s2, int N
    if (ix < N) {
       read_gpu<REAL>(N, &site1, s1, ix, 0, 1);
       read_gpu<REAL>(N, &site2, s2, ix, 0, 1);
-      _spinor_mul_f(site1, r, site2);
+      _spinor_mul_add_assign_f(site1, r, site2);
       write_gpu<REAL>(N, &site1, s1, ix, 0, 1);
    }
 }
@@ -395,6 +425,7 @@ __global__ void spinor_field_lc2_gpu(REAL r1, REAL r2, SITE_TYPE *s1, SITE_TYPE 
       read_gpu<REAL>(N, &site1, s1, ix, 0, 1);
       read_gpu<REAL>(N, &site2, s2, ix, 0, 1);
       _spinor_lc_f(site1, r1, site1, r2, site2);
+      write_gpu<REAL>(N, &site1, s1, ix, 0, 1);
    }
 }
 
@@ -408,9 +439,24 @@ __global__ void spinor_field_lc3_gpu(REAL r1, REAL r2, SITE_TYPE *s1, SITE_TYPE 
    if (ix < N) {
       read_gpu<REAL>(N, &site1, s1, ix, 0, 1);
       read_gpu<REAL>(N, &site2, s2, ix, 0, 1);
-      _spinor_lc_f(site3, r1, site1, r2, site2);
+      read_gpu<REAL>(N, &site3, s3, ix, 0, 1);
+      _spinor_lc_add_assign_f(site3, r1, site1, r2, site2);
       _spinor_minus_f(site3, site3);
       write_gpu<REAL>(N, &site3, s3, ix, 0, 1);
+   }
+}
+
+//Extra kernels (not tested, no CPU version)
+/* s1=-s1 */
+template<typename REAL, typename SITE_TYPE>
+__global__ void spinor_field_minus_assign_gpu(SITE_TYPE* s1, int N)
+{
+   SITE_TYPE site1;
+   int ix = blockIdx.x * BLOCK_SIZE + threadIdx.x;
+   if (ix < N) {
+      read_gpu<REAL>(N, &site1, s1, ix, 0, 1);
+      _spinor_minus_f(site1, site1);
+      write_gpu<REAL>(N, &site1, s1, ix, 0, 1);
    }
 }
 
