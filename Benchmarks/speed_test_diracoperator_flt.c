@@ -1,6 +1,7 @@
 /*******************************************************************************
  *
  * NOCOMPILE= WITH_GPU
+ * NOCOMPILE= !DPHI_FLT
  *
  * Speed test of dirac operator for single precision
  *
