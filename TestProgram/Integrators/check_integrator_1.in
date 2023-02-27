@@ -36,7 +36,7 @@ csw = 1.1329500
 SF_background = 1 
 SF_ct = 1.
 
-//needed only for ROTATED_SF
+//needed only for BC_T_SF_ROTATED
 SF_zf = 1.
 SF_ds = 1.
 SF_sign = 1

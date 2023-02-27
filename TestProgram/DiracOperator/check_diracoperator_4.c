@@ -6,8 +6,8 @@
 * NOCOMPILE= BC_X_ANTIPERIODIC
 * NOCOMPILE= BC_Y_ANTIPERIODIC
 * NOCOMPILE= BC_Z_ANTIPERIODIC
-* NOCOMPILE= BASIC_SF
-* NOCOMPILE= ROTATED_SF
+* NOCOMPILE= BC_T_SF
+* NOCOMPILE= BC_T_SF_ROTATED
 *
 * Testing the spin structure & printing the gamma matrices
 *
@@ -23,7 +23,7 @@
 #error This test does not work with antiperiodic boundary conditions
 #endif
 
-#if defined(BASIC_SF) || defined(ROTATED_SF)
+#if defined(BC_T_SF) || defined(BC_T_SF_ROTATED)
 #error This test does not work with SF
 #endif
 

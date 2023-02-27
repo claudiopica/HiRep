@@ -109,7 +109,7 @@ double avr_plaquette()
 
 #ifdef BC_T_OPEN
     pa /= 6.0 * NG * GLB_VOL3 * (GLB_T - 1);
-#elif BASIC_SF
+#elif BC_T_SF
     pa /= 6.0 * NG * GLB_VOL3 * (GLB_T - 2);
 #else
     pa /= 6.0 * NG * GLB_VOLUME;

@@ -1,7 +1,7 @@
 /*******************************************************************************
  *
- * NOCOMPILE= BASIC_SF
- * NOCOMPILE= ROTATED_SF
+ * NOCOMPILE= BC_T_SF
+ * NOCOMPILE= BC_T_SF_ROTATED
  * NOCOMPILE= !NG==3
  * NOCOMPILE= !BC_T_OPEN
  *

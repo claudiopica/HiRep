@@ -80,7 +80,7 @@ void init_ghmc(ghmc_par *par)
   /* copy update parameters */
   update_par = *par;
 
-  //#ifdef ROTATED_SF
+  //#ifdef BC_T_SF_ROTATED
   //  hmc_action_par.SF_ct = _update_par.SF_ct;
   //#endif
   init = 1;

@@ -37,7 +37,7 @@ void project_gauge_field(void)
   start_sendrecv_gfield(u_gauge);
 }
 
-#if defined(BASIC_SF) || defined(ROTATED_SF)
+#if defined(BC_T_SF) || defined(BC_T_SF_ROTATED)
 static void g_up_Dirichlet_BCs()
 {
   int ix, iy, iz, index;
@@ -55,7 +55,7 @@ static void g_up_Dirichlet_BCs()
 }
 #endif
 
-#if defined(BASIC_SF) || defined(ROTATED_SF) || defined(BC_T_MIXED)
+#if defined(BC_T_SF) || defined(BC_T_SF_ROTATED) || defined(BC_T_MIXED)
 static void g_dn_Dirichlet_BCs()
 {
   int ix, iy, iz, index;
@@ -115,7 +115,7 @@ static void init_hb_boundary()
 
   for (int i = 0; i < glattice.gsize_gauge * 4; i++)
     dyn_gauge[i] = 1;
-#if defined(BASIC_SF) || defined(ROTATED_SF)
+#if defined(BC_T_SF) || defined(BC_T_SF_ROTATED)
   g_up_Dirichlet_BCs();
   g_dn_Dirichlet_BCs();
 #endif

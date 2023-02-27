@@ -20,8 +20,8 @@ static double *wf_plaq_weight = NULL;
 
 void WF_initialize()
 {
-#ifdef BC_XYZ_TWISTED
-  error(0 == 0, 0, "WF_initialize", "WF has not yet been setup to work with BC_XYZ_TWISTED enabled");
+#ifdef GAUGE_SPATIAL_TWIST
+  error(0 == 0, 0, "WF_initialize", "WF has not yet been setup to work with GAUGE_SPATIAL_TWIST enabled");
 #endif
 
   if (ws_gf == NULL)
@@ -208,7 +208,7 @@ void WilsonFlow1(suNg_field *V, const double epsilon)
 
   start_sendrecv_gfield(V);
   complete_sendrecv_gfield(V);
-#if defined(ROTATED_SF) || defined(BASIC_SF)
+#if defined(BC_T_SF_ROTATED) || defined(BC_T_SF)
   apply_BCs_on_fundamental_gauge_field();
 #endif
 }
@@ -258,7 +258,7 @@ int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, 
 
   start_sendrecv_gfield(V);
   complete_sendrecv_gfield(V);
-#if defined(ROTATED_SF) || defined(BASIC_SF)
+#if defined(BC_T_SF_ROTATED) || defined(BC_T_SF)
   apply_BCs_on_fundamental_gauge_field();
 #endif
 
@@ -279,7 +279,7 @@ int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, 
 
   start_sendrecv_gfield(V);
   complete_sendrecv_gfield(V);
-#if defined(ROTATED_SF) || defined(BASIC_SF)
+#if defined(BC_T_SF_ROTATED) || defined(BC_T_SF)
   apply_BCs_on_fundamental_gauge_field();
 #endif
 
@@ -307,7 +307,7 @@ int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, 
   start_sendrecv_gfield(Vprime);
   complete_sendrecv_gfield(Vprime);
 
-#if defined(ROTATED_SF) || defined(BASIC_SF)
+#if defined(BC_T_SF_ROTATED) || defined(BC_T_SF)
   apply_BCs_on_fundamental_gauge_field();
 #endif
 
@@ -326,7 +326,7 @@ int WilsonFlow3_adaptative(suNg_field *V, double *epsilon, double *epsilon_new, 
 
   start_sendrecv_gfield(V);
   complete_sendrecv_gfield(V);
-#if defined(ROTATED_SF) || defined(BASIC_SF)
+#if defined(BC_T_SF_ROTATED) || defined(BC_T_SF)
   apply_BCs_on_fundamental_gauge_field();
 #endif
 
@@ -366,7 +366,7 @@ void WilsonFlow3(suNg_field *V, const double epsilon)
 
   start_sendrecv_gfield(V);
   complete_sendrecv_gfield(V);
-#if defined(ROTATED_SF) || defined(BASIC_SF)
+#if defined(BC_T_SF_ROTATED) || defined(BC_T_SF)
   apply_BCs_on_fundamental_gauge_field();
 #endif
 
@@ -386,7 +386,7 @@ void WilsonFlow3(suNg_field *V, const double epsilon)
 
   start_sendrecv_gfield(V);
   complete_sendrecv_gfield(V);
-#if defined(ROTATED_SF) || defined(BASIC_SF)
+#if defined(BC_T_SF_ROTATED) || defined(BC_T_SF)
   apply_BCs_on_fundamental_gauge_field();
 #endif
 
@@ -406,7 +406,7 @@ void WilsonFlow3(suNg_field *V, const double epsilon)
 
   start_sendrecv_gfield(V);
   complete_sendrecv_gfield(V);
-#if defined(ROTATED_SF) || defined(BASIC_SF)
+#if defined(BC_T_SF_ROTATED) || defined(BC_T_SF)
   apply_BCs_on_fundamental_gauge_field();
 #endif
 
@@ -425,7 +425,7 @@ void WilsonFlow3(suNg_field *V, const double epsilon)
 
   start_sendrecv_gfield(V);
   complete_sendrecv_gfield(V);
-#if defined(ROTATED_SF) || defined(BASIC_SF)
+#if defined(BC_T_SF_ROTATED) || defined(BC_T_SF)
   apply_BCs_on_fundamental_gauge_field();
 #endif
 }
@@ -656,7 +656,7 @@ double WF_topo(suNg_field *V)
     t0 = 1;
   if (COORD[0] == NP_T - 1)
     t1 = T - 1;
-#elif (defined(BASIC_SF) || defined(ROTATED_SF))
+#elif (defined(BC_T_SF) || defined(BC_T_SF_ROTATED))
   if (COORD[0] == 0)
     t0 = 2;
 #endif
@@ -742,7 +742,7 @@ static void WF_measure_and_store(suNg_field *V, storage_switch swc, data_storage
   WF_E_T(E, V);
   WF_Esym_T(Esym, V);
 
-#if defined(BASIC_SF) || defined(ROTATED_SF)
+#if defined(BC_T_SF) || defined(BC_T_SF_ROTATED)
   E[0] = E[1] = Esym[0] = Esym[1] = Esym[2] = Esym[3] = 0.0;
   E[2 * GLB_T - 2] = E[2 * GLB_T - 1] = Esym[2 * GLB_T - 2] = Esym[2 * GLB_T - 1] = 0.0;
 #elif defined(BC_T_OPEN)
@@ -779,7 +779,7 @@ static void WF_measure_and_store(suNg_field *V, storage_switch swc, data_storage
     Esymavg[1] += Esym[2 * j + 1];
   }
 
-#if defined(BASIC_SF) || defined(ROTATED_SF)
+#if defined(BC_T_SF) || defined(BC_T_SF_ROTATED)
   Eavg[0] /= GLB_T - 2;
   Eavg[1] /= GLB_T - 3;
   Esymavg[0] /= GLB_T - 3;

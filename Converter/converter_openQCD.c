@@ -4,7 +4,7 @@
 * Code modified by Fernando Romero-Lopez
 *
 * NOCOMPILE = WITH_MPI || !BC_T_PERIODIC || !BC_X_PERIODIC || !BC_Y_PERIODIC || !BC_Z_PERIODIC
-* NOCOMPILE = BASIC_SF || ROTATED_SF
+* NOCOMPILE = BC_T_SF || BC_T_SF_ROTATED
 *******************************************************************************/
 
 #include "libhr.h"

@@ -20,10 +20,10 @@
 #include "memory.h"
 #include "utils.h"
 
-#ifdef ROTATED_SF
+#ifdef BC_T_SF_ROTATED
 #include "update.h"
 extern rhmc_par _update_par; /* Update/update_rhmc.c */
-#endif /* ROTATED_SF */
+#endif /* BC_T_SF_ROTATED */
 
 /*
  * Init of Dphi_flt
@@ -637,12 +637,12 @@ void Dphi_flt_cpu_(spinor_field_flt *out, spinor_field_flt *in)
 void Dphi_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
 {
     float rho;
-#ifdef ROTATED_SF
+#ifdef BC_T_SF_ROTATED
     int ix, iy, iz, index;
     suNf_spinor_flt *r, *sp;
     float SFrho;
     suNf_spinor_flt tmp;
-#endif /* ROTATED_SF */
+#endif /* BC_T_SF_ROTATED */
 
     error((in == NULL) || (out == NULL), 1, "Dphi_flt [Dphi_flt.c]", "Attempt to access unallocated memory space");
 
@@ -658,7 +658,7 @@ void Dphi_flt_cpu(double m0, spinor_field_flt *out, spinor_field_flt *in)
     rho = 4.f + (float)(m0);
     spinor_field_mul_add_assign_f_flt_cpu(out, rho, in);
 
-#ifdef ROTATED_SF
+#ifdef BC_T_SF_ROTATED
     SFrho = (float)(3. * _update_par.SF_ds + _update_par.SF_zf - 4.);
 
     if (COORD[0] == 0) {

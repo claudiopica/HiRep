@@ -11,10 +11,10 @@
 #include "utils.h"
 
 
-#ifdef ROTATED_SF
+#ifdef BC_T_SF_ROTATED
 #include "update.h"
 extern rhmc_par _update_par; /* Update/update_rhmc.c */
-#endif /* ROTATED_SF */
+#endif /* BC_T_SF_ROTATED */
 
 #include "Inverters/scalarfield_operations.h"
 //void spinor_sigma_pi_rho_div_assign(spinor_field *out,scalar_field *sigma,scalar_field *pi,double rho, spinor_field *in);

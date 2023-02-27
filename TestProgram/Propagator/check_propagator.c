@@ -1,6 +1,6 @@
 /*
- * NOCOMPILE= BASIC_SF
- * NOCOMPILE= ROTATED_SF
+ * NOCOMPILE= BC_T_SF
+ * NOCOMPILE= BC_T_SF_ROTATED
  * NOCOMPILE= BC_T_THETA || BC_X_THETA || BC_Y_THETA || BC_Z_THETA
  */
 /*******************************************************************************
@@ -11,7 +11,7 @@
 
 #include "libhr.h"
 
-#if defined(ROTATED_SF) && defined(BASIC_SF)
+#if defined(BC_T_SF_ROTATED) && defined(BC_T_SF)
 #error This code does not work with the Schroedinger functional !!!
 #endif
 

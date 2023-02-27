@@ -68,10 +68,14 @@ int main(int argc, char *argv[])
 #ifdef WITH_FUSE_MASTER_FOR
     _OMP_PRAGMA(_omp_parallel)
     {
-        for (int i = 0; i < n_warmup; ++i) { Dphi_fused_(s1, s0); }
+        for (int i = 0; i < n_warmup; ++i) {
+            Dphi_fused_(s1, s0);
+        }
     }
 #else
-    for (int i = 0; i < n_warmup; ++i) { Dphi_(s1, s0); }
+    for (int i = 0; i < n_warmup; ++i) {
+        Dphi_(s1, s0);
+    }
 #endif
     double elapsed = timer_lap(&clock) * 1.e-3; //time in milliseconds
     n_reps = (int)((double)(n_warmup * 200) / elapsed);
@@ -87,10 +91,14 @@ int main(int argc, char *argv[])
 #ifdef WITH_FUSE_MASTER_FOR
         _OMP_PRAGMA(_omp_parallel)
         {
-            for (int i = 0; i < n_reps_trial; ++i) { Dphi_fused_(s1, s0); }
+            for (int i = 0; i < n_reps_trial; ++i) {
+                Dphi_fused_(s1, s0);
+            }
         }
 #else
-        for (int i = 0; i < n_reps_trial; ++i) { Dphi_(s1, s0); }
+        for (int i = 0; i < n_reps_trial; ++i) {
+            Dphi_(s1, s0);
+        }
 #endif
         elapsed = timer_lap(&clock) * 1.e-3; //time in milliseconds
 

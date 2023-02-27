@@ -34,7 +34,7 @@ SF:beta = 1.0
 //SF_background must be 1 (background) or 0 (no background)
 SF:background = 1 
 
-//needed only for ROTATED_SF
+//needed only for BC_T_SF_ROTATED
 Sf:zf = 0.0
 Sf:ds = 1.0
 Sf:sign = 1

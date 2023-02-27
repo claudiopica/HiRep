@@ -288,10 +288,10 @@ int init_mc_ghmc(hmc_flow *rf, char *ifile)
 	BCs_pars.fermion_twisting_theta[2] = hmc_var.hmc_p.theta[2];
 	BCs_pars.fermion_twisting_theta[3] = hmc_var.hmc_p.theta[3];
 #endif
-#ifdef ROTATED_SF
+#ifdef BC_T_SF_ROTATED
 	BCs_pars.chiSF_boundary_improvement_ds = hmc_var.hmc_p.SF_ds;
 #endif
-#if defined(BASIC_SF) || defined(ROTATED_SF)
+#if defined(BC_T_SF) || defined(BC_T_SF_ROTATED)
 	BCs_pars.gauge_boundary_improvement_ct = hmc_var.hmc_p.SF_ct;
 	error(hmc_var.hmc_p.SF_background != 0 && hmc_var.hmc_p.SF_background != 1, 0, "init_mc_ghmc" __FILE__, "Wrong value of SF_background\n");
 	BCs_pars.SF_BCs = hmc_var.hmc_p.SF_background;

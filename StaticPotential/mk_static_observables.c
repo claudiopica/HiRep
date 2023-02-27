@@ -188,7 +188,7 @@ int main(int argc, char *argv[])
   BCs_pars.fermion_twisting_theta[3] = bcpar_var.theta[3];
 #endif
   BCs_pars.gauge_boundary_improvement_ct = bcpar_var.SF_ct;
-#ifdef ROTATED_SF
+#ifdef BC_T_SF_ROTATED
   BCs_pars.chiSF_boundary_improvement_ds = bcpar_var.SF_ds;
 #endif
   if (strcmp(bcpar_var.SF_bkg, "true") == 0)

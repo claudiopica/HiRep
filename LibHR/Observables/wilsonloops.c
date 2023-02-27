@@ -7,11 +7,11 @@
 #include "geometry.h"
 #include "inverters.h"
 
-#if defined(ROTATED_SF) && defined(BASIC_SF)
+#if defined(BC_T_SF_ROTATED) && defined(BC_T_SF)
 #error This code does not work with the Schroedinger functional
 #endif
 
-#ifdef BC_XYZ_TWISTED
+#ifdef GAUGE_SPATIAL_TWIST
 #error This code does not work with the twisted BCs
 #endif
 

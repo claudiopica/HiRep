@@ -30,7 +30,7 @@ void apply_BCs_on_spinor_field(spinor_field *sp);
 void apply_BCs_on_spinor_field_flt(spinor_field_flt *sp);
 void apply_background_field_zdir(suNg_field *V, double Q, int n);
 void apply_BCs_on_clover_term(suNfc_field *);
-#if defined(BASIC_SF) || defined(ROTATED_SF)
+#if defined(BC_T_SF) || defined(BC_T_SF_ROTATED)
 void SF_classical_solution();
 #endif
 

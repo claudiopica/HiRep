@@ -4,7 +4,7 @@
  * Copyright (c) 2014, R. Arthur, V. Drach, A. Hietanen
  * All rights reserved.
  * 
- * NOCOMPILE= ROTATED_SF || BASIC_SF
+ * NOCOMPILE= BC_T_SF_ROTATED || BC_T_SF
  * NOCOMPILE= BC_T_THETA || BC_X_THETA || BC_Y_THETA || BC_Z_THETA
  *
  *******************************************************************************/
@@ -19,11 +19,11 @@
 #include "Update/avr_plaquette.h"
 #include "inverters.h"
 
-#if ( !defined(ROTATED_SF) && !defined(BASIC_SF) && !defined(FERMION_THETA) )
+#if ( !defined(BC_T_SF_ROTATED) && !defined(BC_T_SF) && !defined(FERMION_THETA) )
 
 #define PI 3.141592653589793238462643383279502884197
 
-#if defined(ROTATED_SF) || defined(BASIC_SF)
+#if defined(BC_T_SF_ROTATED) || defined(BC_T_SF)
 #error This code does not work with the Schroedinger functional !!!
 #endif
 

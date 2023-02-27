@@ -27,7 +27,7 @@ theta_X = 0.0
 theta_Y = 0.0
 theta_Z = 0.0
 
-//needed only if compiled with BASIC or ROTATED_SF 
+//needed only if compiled with BASIC or BC_T_SF_ROTATED 
 sf:ct = 0.945700
 
 //if set to true imposes SF background

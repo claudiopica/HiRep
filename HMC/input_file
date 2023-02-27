@@ -1,9 +1,9 @@
 // Global variables 
-GLB_T = 6
-GLB_X = 4
-GLB_Y = 4
-GLB_Z = 4
-NP_T = 2
+GLB_T = 8
+GLB_X = 8
+GLB_Y = 8
+GLB_Z = 8
+NP_T = 1
 NP_X = 1
 NP_Y = 1
 NP_Z = 1
@@ -18,7 +18,7 @@ rlx_state = rlx_state
 //Logger levels (default = -1)
 log:default = -1
 log:inverter = -1
-log:forcestat = 0
+log:forcestat = -1
 
 //Fermion twisting
 theta_T = 0.
@@ -36,7 +36,7 @@ csw = 1.1329500
 SF_background = 1 
 SF_ct = 1.
 
-//needed only for ROTATED_SF
+//needed only for BC_T_SF_ROTATED
 SF_zf = 1.
 SF_ds = 1.
 SF_sign = 1

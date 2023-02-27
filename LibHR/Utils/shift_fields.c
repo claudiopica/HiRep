@@ -21,7 +21,7 @@ void shift_fields(int *shift, spinor_field *sin, suNg_field *uin, spinor_field *
     error(shift[i] < 0, 1, "shift_fields [shift_fields.c]",
           "Error the shift vector components must all be greater than zero.");
   }
-#if defined(BC_T_OPEN) || defined(ROTATED_SF) || defined(BASIC_SF)
+#if defined(BC_T_OPEN) || defined(BC_T_SF_ROTATED) || defined(BC_T_SF)
   if (shift[0] != 0)
   {
     shift[0] = 0;

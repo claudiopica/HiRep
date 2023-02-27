@@ -357,7 +357,7 @@ _DECLARE(void, g5Dphi_eopre, (double m0, _FIELD_TYPE *out, _FIELD_TYPE *in)) {
   _CHECK_GEOMETRY_EVEN(in);
   _CHECK_GEOMETRY_EVEN(out);
 
-  #if defined(BASIC_SF) || defined(ROTATED_SF)
+  #if defined(BC_T_SF) || defined(BC_T_SF_ROTATED)
     _CALL(SF_spinor_bcs) (in);
   #endif
 
@@ -373,7 +373,7 @@ _DECLARE(void, g5Dphi_eopre, (double m0, _FIELD_TYPE *out, _FIELD_TYPE *in)) {
   _F_NAME(spinor_field_minus,_REP_SUFFIX) (out, out);
   _F_NAME(spinor_field_g5_assign,_REP_SUFFIX) (out);
 
-  #if defined(BASIC_SF) || defined(ROTATED_SF)
+  #if defined(BC_T_SF) || defined(BC_T_SF_ROTATED)
     _F_NAME(SF_spinor_bcs) (out);
   #endif 
 }

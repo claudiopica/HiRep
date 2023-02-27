@@ -9,7 +9,7 @@
 
 /* Boundary conditions */
 
-#ifdef BC_XYZ_TWISTED
+#ifdef GAUGE_SPATIAL_TWIST
 
 #ifndef REPR_ADJOINT
 #error Twisted boundary conditions can be used only with the adjoint representation!!!
@@ -35,13 +35,13 @@
 
 #define PLAQ_WEIGHTS
 
-#if defined(BASIC_SF) || defined(ROTATED_SF)
-#error(BC_XYZ_TWISTED) Twisted BCs cannot be used with Schroedinger functional!!!
+#if defined(BC_T_SF) || defined(BC_T_SF_ROTATED)
+#error(GAUGE_SPATIAL_TWIST) Twisted BCs cannot be used with Schroedinger functional!!!
 #endif
 
 #endif
 
-#ifdef BASIC_SF
+#ifdef BC_T_SF
 
 #undef BC_T_PERIODIC
 #undef BC_T_ANTIPERIODIC
@@ -51,13 +51,13 @@
 
 #define PLAQ_WEIGHTS
 
-#ifdef ROTATED_SF
-#error(BASIC_SF) BASIC_SF and ROTATED_SF cannot be used at the same time!!!
+#ifdef BC_T_SF_ROTATED
+#error(BC_T_SF) BC_T_SF and BC_T_SF_ROTATED cannot be used at the same time!!!
 #endif
 
 #endif
 
-#ifdef ROTATED_SF
+#ifdef BC_T_SF_ROTATED
 
 #undef BC_T_PERIODIC
 #undef BC_T_ANTIPERIODIC
@@ -82,18 +82,18 @@
 
 #define PLAQ_WEIGHTS
 
-#ifdef BASIC_SF
-#error(ROTATED_SF) BASIC_SF and ROTATED_SF cannot be used at the same time!!!
+#ifdef BC_T_SF
+#error(BC_T_SF_ROTATED) BC_T_SF and BC_T_SF_ROTATED cannot be used at the same time!!!
 #endif
 
 #endif
 
-#if defined(HALFBG_SF) && !((NG == 2) && (defined(BASIC_SF) || defined(ROTATED_SF)))
-#error(HALFBG_SF) can be defined only if NG=2 and or BASIC_SF or ROTATED_SF is used!!!
+#if defined(HALFBG_SF) && !((NG == 2) && (defined(BC_T_SF) || defined(BC_T_SF_ROTATED)))
+#error(HALFBG_SF) can be defined only if NG=2 and or BC_T_SF or BC_T_SF_ROTATED is used!!!
 #endif
 
-#if defined(ROTATED_SF) && defined(UPDATE_EO)
-#error ROTATED_SF DOES NOT WORK WITH E/O PRECONDITIONING
+#if defined(BC_T_SF_ROTATED) && defined(UPDATE_EO)
+#error BC_T_SF_ROTATED DOES NOT WORK WITH E/O PRECONDITIONING
 #endif
 
 #ifdef BC_T_ANTIPERIODIC

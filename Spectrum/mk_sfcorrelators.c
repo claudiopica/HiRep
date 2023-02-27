@@ -2,7 +2,7 @@
 *
 * Computation of the SF coupling and observables
 *
-* NOCOMPILE= !(BASIC_SF) || !(ROTATED_SF)
+* NOCOMPILE= !(BC_T_SF) || !(BC_T_SF_ROTATED)
 *******************************************************************************/
 
 #include "libhr.h"
@@ -70,7 +70,7 @@ input_bcpar bcpar_var = init_input_bcpar(bcpar_var);
 
 int main(int argc, char *argv[])
 {
-#if !(defined(BASIC_SF)) && !(defined(ROTATED_SF))
+#if !(defined(BC_T_SF)) && !(defined(BC_T_SF_ROTATED))
   error(1 == 1, 0, "main" __FILE__, "This code is to be used only if some SF BC are defined\n");
 #else
 
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
   lprintf("MAIN", 0, "Config list filename = %s\n", SF_var.configlist);
   lprintf("MAIN", 0, "Inverter precision = %e\n", SF_var.precision);
   lprintf("MAIN", 0, "Mass = %f\n", SF_var.mass);
-#ifdef ROTATED_SF
+#ifdef BC_T_SF_ROTATED
   lprintf("MAIN", 0, "beta = %.8f\n rotatedSF ds = %.8f\n rotatedSF ct = %.8f\n", SF_var.beta, bcpar_var.SF_ds, bcpar_var.SF_ct);
 #else
   lprintf("MAIN", 0, "beta = %.8f ct = %.8f\n", SF_var.beta, bcpar_var.SF_ct);
@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
   BCs_pars.fermion_twisting_theta[3] = bcpar_var.theta[3];
 #endif
   BCs_pars.gauge_boundary_improvement_ct = bcpar_var.SF_ct;
-#ifdef ROTATED_SF
+#ifdef BC_T_SF_ROTATED
   BCs_pars.chiSF_boundary_improvement_ds = bcpar_var.SF_ds;
 #endif
   if (strcmp(SF_var.background, "true") == 0)

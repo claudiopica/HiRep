@@ -1,4 +1,4 @@
-#ifdef ROTATED_SF
+#ifdef BC_T_SF_ROTATED
 #include "observables.h"
 #include "libhr_core.h"
 #include "io.h"

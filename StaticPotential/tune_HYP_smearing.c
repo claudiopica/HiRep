@@ -2,19 +2,19 @@
  *
  * Search the best parameters for the HYP smearing
  * 
- * NOCOMPILE = ROTATED_SF || BASIC_SF || BC_XYZ_TWISTED
+ * NOCOMPILE = BC_T_SF_ROTATED || BC_T_SF || GAUGE_SPATIAL_TWIST
  *
  *******************************************************************************/
 
 #include "libhr.h"
 #include <string.h>
 
-#if defined(ROTATED_SF) && defined(BASIC_SF)
+#if defined(BC_T_SF_ROTATED) && defined(BC_T_SF)
 #error This code does not work with the Schroedinger functional
 #endif
 
-#ifdef BC_XYZ_TWISTED
-#error This code does not work with the twisted BCs
+#ifdef GAUGE_SPATIAL_TWIST
+#error This code does not work with the gauge spatial twist
 #endif
 
 char cnfg_filename[256] = "";

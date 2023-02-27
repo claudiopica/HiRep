@@ -4,7 +4,7 @@
  *
  */
 
-#if defined(GAUGE_SUN) && (defined(BASIC_SF) || defined(ROTATED_SF))
+#if defined(GAUGE_SUN) && (defined(BC_T_SF) || defined(BC_T_SF_ROTATED))
 
 #include "observables.h"
 #include "libhr_core.h"

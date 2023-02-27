@@ -6,18 +6,18 @@
 #include "Update/dirac.h"
  
 
-#ifdef ROTATED_SF
+#ifdef BC_T_SF_ROTATED
 #error This code has never been tested
 #endif
 
-#ifdef ROTATED_SF
+#ifdef BC_T_SF_ROTATED
 #include "update.h"
 
 extern rhmc_par _update_par; /* Update/update_rhmc.c */
 
-#endif /* ROTATED_SF */
+#endif /* BC_T_SF_ROTATED */
 
-#ifdef BASIC_SF
+#ifdef BC_T_SF
 static double hmass;
 static void H_sf(spinor_field *out, spinor_field *in)
 {
@@ -28,7 +28,7 @@ static void H_sf(spinor_field *out, spinor_field *in)
 #endif
 }
 #endif
-#ifdef ROTATED_SF
+#ifdef BC_T_SF_ROTATED
 static double hmass;
 static void H2_sf(spinor_field *out, spinor_field *in)
 {
@@ -42,7 +42,7 @@ static void H2_sf(spinor_field *out, spinor_field *in)
 int SF_quark_propagator(spinor_field *in, double mass, spinor_field *out, double acc)
 {
   int cgiter = 0;
-#ifdef BASIC_SF
+#ifdef BC_T_SF
 
   static MINRES_par MINRESpar;
   hmass = mass;
@@ -50,7 +50,7 @@ int SF_quark_propagator(spinor_field *in, double mass, spinor_field *out, double
   MINRESpar.err2 = acc;
   MINRESpar.max_iter = 0;
   cgiter = MINRES(&MINRESpar, &H_sf, in, out, 0);
-#elif defined(ROTATED_SF)
+#elif defined(BC_T_SF_ROTATED)
 
   static mshift_par inv_par;
   static spinor_field *chi = NULL;
@@ -83,7 +83,7 @@ data_storage_array *SF_PCAC_wall_corr(double mass, double acc, storage_switch sw
 {
   data_storage_array *ret = NULL;
 
-#ifdef BASIC_SF
+#ifdef BC_T_SF
 
   int i, j, ix0, ix1, ix2, ix3;
   double f_P[GLB_T], f_A[GLB_T], g_P[GLB_T], g_A[GLB_T], f_1 = 0, temp;
@@ -332,7 +332,7 @@ data_storage_array *SF_PCAC_wall_corr(double mass, double acc, storage_switch sw
 
   /*   return (double)(f_A[(int)(GLB_T/2)] - f_A[(int)(GLB_T/2)-2])/(4*f_P[(int)((GLB_T/2)-1)]); */
 
-#elif defined(ROTATED_SF)
+#elif defined(BC_T_SF_ROTATED)
 
   static spinor_field *prop_uu = NULL;
   static spinor_field *source = NULL;

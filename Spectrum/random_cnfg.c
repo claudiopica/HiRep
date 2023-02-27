@@ -2,14 +2,14 @@
  *
  * Generate random cnfg
  *
- * NOCOMPILE= ROTATED_SF || BASIC_SF || FERMION_THETA
+ * NOCOMPILE= BC_T_SF_ROTATED || BC_T_SF || FERMION_THETA
  * 
  *******************************************************************************/
 
 #include "libhr.h"
 #include <string.h>
 
-#if defined(ROTATED_SF) && defined(BASIC_SF)
+#if defined(BC_T_SF_ROTATED) && defined(BC_T_SF)
 #error This code does not work with the Schroedinger functional !!!
 #endif
 

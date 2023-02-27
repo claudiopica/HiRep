@@ -7,7 +7,7 @@
 #ifndef ROTATED_CORRS_H
 #define ROTATED_CORRS_H
 
-#ifdef ROTATED_SF
+#ifdef BC_T_SF_ROTATED
 
 #include "spinor_field.h"
 
@@ -75,5 +75,5 @@ void rotated_lXdum(chisf_mem *corr_mem, suNf_spinor *chi, spinor_field *prop_uu,
 #ifdef __cplusplus
 	}
 #endif
-#endif //defined(ROTATED_SF)
+#endif //defined(BC_T_SF_ROTATED)
 #endif //ROTATED_CORRS_H

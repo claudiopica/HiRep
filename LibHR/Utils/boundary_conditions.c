@@ -13,11 +13,11 @@ static int init = 0;
 static BCs_pars_t BCs_pars;
 
 #ifdef PLAQ_WEIGHTS
-#ifdef BC_XYZ_TWISTED
+#ifdef GAUGE_SPATIAL_TWIST
 static void init_plaq_twisted_BCs();
 #endif
 
-#if defined(BASIC_SF) || defined(ROTATED_SF)
+#if defined(BC_T_SF) || defined(BC_T_SF_ROTATED)
 static void init_plaq_SF_BCs(double ct);
 static void init_gf_SF_BCs(suNg *dn, suNg *up);
 #endif
@@ -54,13 +54,13 @@ void init_BCs(BCs_pars_t *pars)
   lprintf("BCS", 0, "Gauge field: "
 #if defined(BC_T_OPEN)
                     "OPEN"
-#elif defined(BASIC_SF) || defined(ROTATED_SF)
+#elif defined(BC_T_SF) || defined(BC_T_SF_ROTATED)
                     "DIRICHLET"
 #else
                     "PERIODIC"
 #endif
                     " x "
-#if defined(BC_XYZ_TWISTED)
+#if defined(GAUGE_SPATIAL_TWIST)
                     "TWISTED TWISTED TWISTED"
 #else
                     "PERIODIC PERIODIC PERIODIC"
@@ -68,9 +68,9 @@ void init_BCs(BCs_pars_t *pars)
                     "\n");
 
   lprintf("BCS", 0, "Fermion fields: "
-#if defined(ROTATED_SF)
+#if defined(BC_T_SF_ROTATED)
                     "OPEN"
-#elif defined(BC_T_OPEN) || defined(BASIC_SF)
+#elif defined(BC_T_OPEN) || defined(BC_T_SF)
                     "DIRICHLET"
 #elif defined(BC_T_ANTIPERIODIC)
                     "ANTIPERIODIC"
@@ -84,7 +84,7 @@ void init_BCs(BCs_pars_t *pars)
                     "ANTIPERIODIC "
 #elif defined(BC_X_THETA)
                     "THETA "
-#elif defined(BC_XYZ_TWISTED)
+#elif defined(GAUGE_SPATIAL_TWIST)
                     "TWISTED "
 #else
                     "PERIODIC "
@@ -93,7 +93,7 @@ void init_BCs(BCs_pars_t *pars)
                     "ANTIPERIODIC "
 #elif defined(BC_Y_THETA)
                     "THETA "
-#elif defined(BC_XYZ_TWISTED)
+#elif defined(GAUGE_SPATIAL_TWIST)
                     "TWISTED "
 #else
                     "PERIODIC "
@@ -102,16 +102,16 @@ void init_BCs(BCs_pars_t *pars)
                     "ANTIPERIODIC"
 #elif defined(BC_Z_THETA)
                     "THETA"
-#elif defined(BC_XYZ_TWISTED)
+#elif defined(GAUGE_SPATIAL_TWIST)
                     "TWISTED"
 #else
                     "PERIODIC"
 #endif
                     "\n");
 
-#if defined(ROTATED_SF)
+#if defined(BC_T_SF_ROTATED)
   lprintf("BCS", 0, "Chirally rotated Schroedinger Functional ds=%e BCs=%d(1=Background, 0=no Background)\n", BCs_pars.chiSF_boundary_improvement_ds, BCs_pars.SF_BCs);
-#elif defined(BASIC_SF)
+#elif defined(BC_T_SF)
   lprintf("BCS", 0, "Basic Schroedinger Functional BCs=%d (1=Background, 0=no Background)\n", BCs_pars.SF_BCs);
 #endif
 
@@ -148,7 +148,7 @@ void init_BCs(BCs_pars_t *pars)
   init_plaq_open_BCs(plaq_weight, rect_weight, BCs_pars.gauge_boundary_improvement_ct, BCs_pars.gauge_boundary_improvement_cs);
 #endif
 
-#if defined(BASIC_SF) || defined(ROTATED_SF)
+#if defined(BC_T_SF) || defined(BC_T_SF_ROTATED)
   lprintf("BCS", 0, "BC gauge boundary term ct=%e\n", BCs_pars.gauge_boundary_improvement_ct);
   if (BCs_pars.SF_BCs == 0)
   {
@@ -160,7 +160,7 @@ void init_BCs(BCs_pars_t *pars)
   init_plaq_SF_BCs(BCs_pars.gauge_boundary_improvement_ct);
 #endif
 
-#ifdef BC_XYZ_TWISTED
+#ifdef GAUGE_SPATIAL_TWIST
   init_plaq_twisted_BCs();
 #endif
 }
@@ -193,7 +193,7 @@ static void sp_Y_antiperiodic_BCs();
 static void sp_Z_antiperiodic_BCs();
 #endif
 /*static void sp_spatial_theta_BCs(double theta);*/
-#ifdef ROTATED_SF
+#ifdef BC_T_SF_ROTATED
 static void chiSF_ds_BT(double ds);
 #endif
 
@@ -211,7 +211,7 @@ void apply_BCs_on_represented_gauge_field()
 #ifdef BC_Z_ANTIPERIODIC
   sp_Z_antiperiodic_BCs();
 #endif
-#ifdef ROTATED_SF
+#ifdef BC_T_SF_ROTATED
 #ifndef ALLOCATE_REPR_GAUGE_FIELD
 #error The represented gauge field must be allocated!!!
 #endif
@@ -219,7 +219,7 @@ void apply_BCs_on_represented_gauge_field()
 #endif
 }
 
-#if defined(BASIC_SF) || defined(ROTATED_SF)
+#if defined(BC_T_SF) || defined(BC_T_SF_ROTATED)
 static void gf_SF_BCs(suNg *dn, suNg *up);
 #endif
 #ifdef BC_T_OPEN
@@ -229,7 +229,7 @@ static void gf_open_BCs();
 void apply_BCs_on_fundamental_gauge_field()
 {
   complete_sendrecv_gfield(u_gauge);
-#if defined(BASIC_SF) || defined(ROTATED_SF)
+#if defined(BC_T_SF) || defined(BC_T_SF_ROTATED)
   gf_SF_BCs(&BCs_pars.gauge_boundary_dn, &BCs_pars.gauge_boundary_up);
 #endif
 #ifdef BC_T_OPEN
@@ -237,7 +237,7 @@ void apply_BCs_on_fundamental_gauge_field()
 #endif
 }
 
-#if defined(BASIC_SF) || defined(ROTATED_SF)
+#if defined(BC_T_SF) || defined(BC_T_SF_ROTATED)
 static void mf_Dirichlet_BCs(suNg_av_field *force);
 #endif
 #ifdef BC_T_OPEN
@@ -246,7 +246,7 @@ static void mf_open_BCs(suNg_av_field *force);
 
 void apply_BCs_on_momentum_field(suNg_av_field *force)
 {
-#if defined(BASIC_SF) || defined(ROTATED_SF)
+#if defined(BC_T_SF) || defined(BC_T_SF_ROTATED)
   mf_Dirichlet_BCs(force);
 #endif
 #ifdef BC_T_OPEN
@@ -254,11 +254,11 @@ void apply_BCs_on_momentum_field(suNg_av_field *force)
 #endif
 }
 
-#if defined(BASIC_SF)
+#if defined(BC_T_SF)
 static void sf_Dirichlet_BCs(spinor_field *sp);
 static void sf_Dirichlet_BCs_flt(spinor_field_flt *sp);
 #endif
-#if defined(ROTATED_SF)
+#if defined(BC_T_SF_ROTATED)
 static void sf_open_BCs(spinor_field *sp);
 static void sf_open_BCs_flt(spinor_field_flt *sp);
 #endif
@@ -269,10 +269,10 @@ static void sf_open_v2_BCs_flt(spinor_field_flt *sf);
 
 void apply_BCs_on_spinor_field(spinor_field *sp)
 {
-#ifdef BASIC_SF
+#ifdef BC_T_SF
   sf_Dirichlet_BCs(sp);
 #endif
-#ifdef ROTATED_SF
+#ifdef BC_T_SF_ROTATED
   sf_open_BCs(sp);
 #endif
 #ifdef BC_T_OPEN
@@ -282,10 +282,10 @@ void apply_BCs_on_spinor_field(spinor_field *sp)
 
 void apply_BCs_on_spinor_field_flt(spinor_field_flt *sp)
 {
-#if defined(BASIC_SF)
+#if defined(BC_T_SF)
   sf_Dirichlet_BCs_flt(sp);
 #endif
-#if defined(ROTATED_SF)
+#if defined(BC_T_SF_ROTATED)
   sf_open_BCs_flt(sp);
 #endif
 #ifdef BC_T_OPEN
@@ -296,7 +296,7 @@ void apply_BCs_on_spinor_field_flt(spinor_field_flt *sp)
 #if (defined(WITH_EXPCLOVER) || defined(WITH_CLOVER)) && defined(BC_T_OPEN)
 static void cl_open_BCs(suNfc_field *);
 #endif
-#if (defined(WITH_EXPCLOVER) || defined(WITH_CLOVER)) && (defined(BASIC_SF) || defined(ROTATED_SF))
+#if (defined(WITH_EXPCLOVER) || defined(WITH_CLOVER)) && (defined(BC_T_SF) || defined(BC_T_SF_ROTATED))
 static void cl_SF_BCs(suNfc_field *);
 #endif
 
@@ -306,7 +306,7 @@ void apply_BCs_on_clover_term(suNfc_field *cl)
   cl_open_BCs(cl);
 #endif
 
-#if (defined(WITH_EXPCLOVER) || defined(WITH_CLOVER)) && (defined(BASIC_SF) || defined(ROTATED_SF))
+#if (defined(WITH_EXPCLOVER) || defined(WITH_CLOVER)) && (defined(BC_T_SF) || defined(BC_T_SF_ROTATED))
   cl_SF_BCs(cl);
 #endif
 }
@@ -432,7 +432,7 @@ static void sp_spatial_theta_BCs(double theta) {
 #endif
 */
 
-#ifdef ROTATED_SF
+#ifdef BC_T_SF_ROTATED
 static void chiSF_ds_BT(double ds)
 {
   if (COORD[0] == 0)
@@ -487,7 +487,7 @@ static void chiSF_ds_BT(double ds)
 #define PI 3.141592653589793238462643383279502884197
 #define ST 1.414213562373095048801688724209698078570
 
-#if defined(BASIC_SF) || defined(ROTATED_SF)
+#if defined(BC_T_SF) || defined(BC_T_SF_ROTATED)
 #ifndef GAUGE_SON
 
 #if NG == 2
@@ -540,7 +540,7 @@ static void init_gf_SF_BCs(suNg *dn, suNg *up)
   for (k = 0; k < NG; k++)
     up->c[(1 + NG) * k] = cos((SF_phi0_up[k] + SF_phi1_up[k] * SF_eta) / (GLB_T - 2)) + I * sin((SF_phi0_up[k] + SF_phi1_up[k] * SF_eta) / (GLB_T - 2));
 
-#if defined(BASIC_SF)
+#if defined(BC_T_SF)
   lprintf("BCS", 0, "SF boundary phases phi0  ( ");
   for (k = 0; k < NG; k++)
     lprintf("BCS", 0, "%lf ", SF_phi0_dn[k] / 2.);
@@ -578,7 +578,7 @@ static void init_gf_SF_BCs(suNg *dn, suNg *up)
 #endif
 #endif
 
-#if defined(BASIC_SF) || defined(ROTATED_SF)
+#if defined(BC_T_SF) || defined(BC_T_SF_ROTATED)
 static void gf_SF_BCs(suNg *dn, suNg *up)
 {
   int index;
@@ -794,7 +794,7 @@ static void gf_open_BCs()
 /* BOUNDARY CONDITIONS TO BE APPLIED ON THE MOMENTUM FIELDS                */
 /***************************************************************************/
 
-#if defined(BASIC_SF) || defined(ROTATED_SF)
+#if defined(BC_T_SF) || defined(BC_T_SF_ROTATED)
 static void mf_Dirichlet_BCs(suNg_av_field *force)
 {
   int ix, iy, iz, index;
@@ -934,7 +934,7 @@ static void mf_open_BCs(suNg_av_field *force)
 /***************************************************************************/
 /* BOUNDARY CONDITIONS TO BE APPLIED ON THE CLOVER TERM                    */
 /***************************************************************************/
-#if (defined(WITH_EXPCLOVER) || defined(WITH_CLOVER)) && (defined(BASIC_SF) || defined(ROTATED_SF))
+#if (defined(WITH_EXPCLOVER) || defined(WITH_CLOVER)) && (defined(BC_T_SF) || defined(BC_T_SF_ROTATED))
 static void cl_SF_BCs(suNfc_field *cl)
 {
   int index;
@@ -1046,7 +1046,7 @@ static void cl_open_BCs(suNfc_field *cl)
 /***************************************************************************/
 /* BOUNDARY CONDITIONS TO BE APPLIED ON THE SPINOR FIELDS                  */
 /***************************************************************************/
-#if defined(BASIC_SF)
+#if defined(BC_T_SF)
 static void sf_Dirichlet_BCs(spinor_field *sp)
 {
   int ix, iy, iz, index;
@@ -1119,7 +1119,7 @@ static void sf_Dirichlet_BCs_flt(spinor_field_flt *sp)
   }
 }
 #endif
-#if defined(ROTATED_SF)
+#if defined(BC_T_SF_ROTATED)
 static void sf_open_BCs(spinor_field *sp)
 {
   int ix, iy, iz, index;
@@ -1267,7 +1267,7 @@ static void sf_open_v2_BCs_flt(spinor_field_flt *sf)
 
 #ifdef PLAQ_WEIGHTS
 
-#ifdef BC_XYZ_TWISTED
+#ifdef GAUGE_SPATIAL_TWIST
 static void init_plaq_twisted_BCs()
 {
   error(plaq_weight == NULL, 1, "init_plaq_twisted_BCs [boundary_conditions.c]",
@@ -1296,7 +1296,7 @@ static void init_plaq_twisted_BCs()
 
   lprintf("BCS", 0, "Twisted BCs. Dirac strings intersecting at ( X , Y , Z ) = ( 1 , 1 , 1 )\n");
 }
-#endif //BC_XYZ_TWISTED
+#endif //GAUGE_SPATIAL_TWIST
 
 void init_plaq_open_BCs(double *lplaq_weight, double *lrect_weight, double ct, double cs)
 {
@@ -1443,7 +1443,7 @@ void init_plaq_open_BCs(double *lplaq_weight, double *lrect_weight, double ct, d
   }
 }
 
-#if defined(BASIC_SF) || defined(ROTATED_SF)
+#if defined(BC_T_SF) || defined(BC_T_SF_ROTATED)
 
 static void init_plaq_SF_BCs(double ct)
 {

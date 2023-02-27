@@ -7,7 +7,7 @@
 #include "libhr.h"
 #include <string.h>
 
-#if defined(ROTATED_SF) && defined(BASIC_SF)
+#if defined(BC_T_SF_ROTATED) && defined(BC_T_SF)
 #error The implementation of the Schroedinger functional has not been tested on this code
 #endif
 

@@ -181,13 +181,13 @@ print $fh "MACRO += $YBC\n";
 # write Z boundary condition
 print $fh "MACRO += $ZBC\n";
 # write twisted boundary condition
-$xyz_twist && print $fh "MACRO += BC_XYZ_TWISTED\n";
+$xyz_twist && print $fh "MACRO += GAUGE_SPATIAL_TWIST\n";
 # write sf boundary condition
-$sfbc && print $fh "MACRO += BASIC_SF\n";
+$sfbc && print $fh "MACRO += BC_T_SF\n";
 # write sf half field boundary condition
 $sfhalfbc && print $fh "MACRO += HALFBG_SF\n";
 # write sf rotated boundary condition
-$sfrotatedbc && print $fh "MACRO += ROTATED_SF\n";
+$sfrotatedbc && print $fh "MACRO += BC_T_SF_ROTATED\n";
 # write smearing
 $smearing && print $fh "MACRO += WITH_SMEARING\n";
 # write clover

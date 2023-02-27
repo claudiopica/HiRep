@@ -12,7 +12,7 @@
 #define MPIRET(type)
 #endif
 
-#if defined(ROTATED_SF) || defined(BASIC_SF) || defined(BC_T_OPEN)
+#if defined(BC_T_SF_ROTATED) || defined(BC_T_SF) || defined(BC_T_OPEN)
 
 void polyakov()
 {

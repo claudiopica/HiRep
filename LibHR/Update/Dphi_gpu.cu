@@ -10,7 +10,7 @@
 #include "update.h"
 #include "memory.h"
 
-#ifdef ROTATED_SF
+#ifdef BC_T_SF_ROTATED
     extern rhmc_par _update_par;
 #endif
 

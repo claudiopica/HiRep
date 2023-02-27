@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * NOCOMPILE= !BASIC_SF
+ * NOCOMPILE= !BC_T_SF
  * NOCOMPILE= !NG==3
  * NOCOMPILE= !WITH_CLOVER
  * NOCOMPILE= !REPR_FUNDAMENTAL

@@ -5,8 +5,8 @@
  * NOCOMPILE= BC_X_ANTIPERIODIC
  * NOCOMPILE= BC_Y_ANTIPERIODIC
  * NOCOMPILE= BC_Z_ANTIPERIODIC
- * NOCOMPILE= BASIC_SF
- * NOCOMPILE= ROTATED_SF
+ * NOCOMPILE= BC_T_SF
+ * NOCOMPILE= BC_T_SF_ROTATED
  * NOCOMPILE= FERMION_THETA
  *
 ******************************************************************************/

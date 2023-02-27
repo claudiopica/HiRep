@@ -29,7 +29,7 @@ sf:background = true
 // if one of the lines of the sf:configlist contains the key "classical" a classical intepolating configuration will be generated
 sf:configlist = list_conf_sf.txt
 
-//needed only for ROTATED_SF
+//needed only for BC_T_SF_ROTATED
 sf:rho_s = 0.0
 sf:rho_t = 0.0
 sf:ds = 1.0

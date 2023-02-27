@@ -10,7 +10,7 @@
 #ifndef LOOP_TOOLS_H
 #define LOOP_TOOLS_H
 
-#if !defined(ROTATED_SF) && !defined(BASIC_SF) && !defined(FERMION_THETA)
+#if !defined(BC_T_SF_ROTATED) && !defined(BC_T_SF) && !defined(FERMION_THETA)
 
 #include <stdio.h>
 #include "spinor_field.h"

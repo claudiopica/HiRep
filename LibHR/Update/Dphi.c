@@ -20,10 +20,10 @@
 #include "memory.h"
 #include "utils.h"
 
-#ifdef ROTATED_SF
+#ifdef BC_T_SF_ROTATED
 #include "update.h"
 extern rhmc_par _update_par; /* Update/update_rhmc.c */
-#endif /* ROTATED_SF */
+#endif /* BC_T_SF_ROTATED */
 
 /*
  * Init of Dphi
@@ -1079,12 +1079,12 @@ void Dphi_fused_(spinor_field *restrict out, spinor_field *restrict in)
 void Dphi_cpu(double m0, spinor_field *out, spinor_field *in)
 {
     double rho;
-#ifdef ROTATED_SF
+#ifdef BC_T_SF_ROTATED
     int ix, iy, iz, index;
     suNf_spinor *r, *sp;
     double SFrho;
     suNf_spinor tmp;
-#endif /* ROTATED_SF */
+#endif /* BC_T_SF_ROTATED */
 
     error((in == NULL) || (out == NULL), 1, "Dphi_cpu [Dphi.c]", "Attempt to access unallocated memory space");
 
@@ -1103,7 +1103,7 @@ void Dphi_cpu(double m0, spinor_field *out, spinor_field *in)
 
     spinor_field_mul_add_assign_f_cpu(out, rho, in);
 
-#ifdef ROTATED_SF
+#ifdef BC_T_SF_ROTATED
     SFrho = 3. * _update_par.SF_ds + _update_par.SF_zf - 4.;
 
     if (COORD[0] == 0) {
@@ -1142,7 +1142,7 @@ void Dphi_cpu(double m0, spinor_field *out, spinor_field *in)
                     }
                 }
     }
-#endif /* ROTATED_SF */
+#endif /* BC_T_SF_ROTATED */
 
     apply_BCs_on_spinor_field(out);
 }
@@ -1150,12 +1150,12 @@ void Dphi_cpu(double m0, spinor_field *out, spinor_field *in)
 void g5Dphi_cpu(double m0, spinor_field *out, spinor_field *in)
 {
     double rho;
-#ifdef ROTATED_SF
+#ifdef BC_T_SF_ROTATED
     int ix, iy, iz, index;
     suNf_spinor *r, *sp;
     double SFrho;
     suNf_spinor tmp;
-#endif /* ROTATED_SF */
+#endif /* BC_T_SF_ROTATED */
 
     error((in == NULL) || (out == NULL), 1, "g5Dphi_cpu [Dphi.c]", "Attempt to access unallocated memory space");
 
@@ -1171,7 +1171,7 @@ void g5Dphi_cpu(double m0, spinor_field *out, spinor_field *in)
     rho = 4. + m0;
     spinor_field_mul_add_assign_f_cpu(out, rho, in);
 
-#ifdef ROTATED_SF
+#ifdef BC_T_SF_ROTATED
     SFrho = 3. * _update_par.SF_ds + _update_par.SF_zf - 4.;
 
     if (COORD[0] == 0) {
@@ -1210,7 +1210,7 @@ void g5Dphi_cpu(double m0, spinor_field *out, spinor_field *in)
                     }
                 }
     }
-#endif /* ROTATED_SF */
+#endif /* BC_T_SF_ROTATED */
 
     spinor_field_g5_assign_f_cpu(out);
 
@@ -1338,7 +1338,7 @@ void g5Dphi_sq_cpu(double m0, spinor_field *out, spinor_field *in)
     /* alloc memory for temporary spinor field */
     if (init_dirac) { init_Dirac(); }
 
-#ifdef ROTATED_SF
+#ifdef BC_T_SF_ROTATED
     /*the switch of the SF_sign is needed to take care of the antihermiticity of the boundary term of the dirac operator*/
     g5Dphi_cpu(m0, gtmp, in);
     _update_par.SF_sign = -_update_par.SF_sign;
@@ -1394,7 +1394,7 @@ void Qhat_eopre_sq(double m0, double mu, spinor_field *out, spinor_field *in)
     /* alloc memory for temporary spinor field */
     if (init_dirac) { init_Dirac(); }
 
-#ifdef ROTATED_SF
+#ifdef BC_T_SF_ROTATED
     /*the switch of the SF_sign is needed to take care of the antihermiticity of the boundary term of the dirac operator*/
     error(1, "Qhat_eopre_sq", __FILE__, "Not implemented\n");
 #else

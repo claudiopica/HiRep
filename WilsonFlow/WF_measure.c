@@ -35,7 +35,7 @@ typedef struct input_WF_meas
 
 input_WF_meas WF_var = init_input_WF_meas(WF_var);
 
-#if defined(BASIC_SF)
+#if defined(BC_T_SF)
 
 typedef struct input_SF
 {
@@ -61,7 +61,7 @@ typedef struct input_SF
 input_SF SF_var = init_input_SF(SF_var);
 
 #endif
-#if defined(ROTATED_SF)
+#if defined(BC_T_SF_ROTATED)
 
 typedef struct input_SF
 {
@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
 
   read_input(WF_var.read, get_input_filename());
 
-#if defined(ROTATED_SF) || defined(BASIC_SF)
+#if defined(BC_T_SF_ROTATED) || defined(BC_T_SF)
   read_input(SF_var.read, get_input_filename());
 #endif
 
@@ -161,9 +161,9 @@ int main(int argc, char *argv[])
   lprintf("MAIN", 0, "WF measurement interval dt : %e\n", dt);
   lprintf("MAIN", 0, "WF integrator type: %d (0=Euler 1=3rd order Runge-Kutta 2=Adaptive 3rd order Runge-Kutta)\n", WF_var.ittype);
 
-#ifdef ROTATED_SF
+#ifdef BC_T_SF_ROTATED
   lprintf("MAIN", 0, "beta = %.8f\n rotatedSF ds = %.8f\n rotatedSF ct = %.8f\n", SF_var.beta, SF_var.ds, SF_var.ct);
-#elif defined(BASIC_SF)
+#elif defined(BC_T_SF)
   lprintf("MAIN", 0, "beta = %.8f ct = %.8f\n", SF_var.beta, SF_var.ct);
 #endif
 
@@ -180,11 +180,11 @@ int main(int argc, char *argv[])
   BCs_pars.fermion_twisting_theta[2] = bcpar_var.theta[2];
   BCs_pars.fermion_twisting_theta[3] = bcpar_var.theta[3];
 #endif
-#if defined(ROTATED_SF) || defined(BASIC_SF)
+#if defined(BC_T_SF_ROTATED) || defined(BC_T_SF)
   BCs_pars.gauge_boundary_improvement_ct = SF_var.ct;
   error(SF_var.background != 0 && SF_var.background != 1, 0, "init_mc_ghmc" __FILE__, "Wrong value of SF_background\n");
   BCs_pars.SF_BCs = SF_var.background;
-#if defined(ROTATED_SF)
+#if defined(BC_T_SF_ROTATED)
   BCs_pars.chiSF_boundary_improvement_ds = SF_var.ds;
 #endif
 #endif
