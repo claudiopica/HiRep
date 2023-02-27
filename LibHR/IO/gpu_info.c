@@ -226,7 +226,7 @@ void print_supported_features(cudaDeviceProp device_prop) {
 */
 void print_performance_metrics() {
   /**
-   * Code snipped based on:
+   * Code snippet based on:
    * https://developer.nvidia.com/blog/how-query-device-properties-and-handle-errors-cuda-cc/
    * Access 2023-02-27
    * 
