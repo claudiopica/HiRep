@@ -138,16 +138,41 @@ int main(int argc, char *argv[]) {
 
     for (int k=0; k<niter; k++) {
         lprintf("TEST",0,"Loop #%d\n=====================================================\n",k);
-        _TEST_LIN_ALG("s2=r*s1", 1, in, in+1,      
-            float r = 10.0;
-            spinor_field_mul_f_flt(out,r,&in[0]);
-            spinor_field_mul_f_flt_cpu(out,r,&in[0]);
+            _TEST_LIN_ALG("s1=s2", 1, in, in+1, 
+            spinor_field_copy_f_flt(out,&in[0]);
+            spinor_field_copy_f_flt_cpu(out,&in[0]);
         );
 
-        _TEST_LIN_ALG("s2=c*s1", 1, in, in+1,      
-            hr_complex_flt c = 2.0+1.0*I;
-            spinor_field_mulc_f_flt(out,c,&in[0]);
-            spinor_field_mulc_f_flt_cpu(out,c,&in[0]);
+        _TEST_RED_OP("Re<s1,s2>", 2, in,
+            float abs1 = spinor_field_prod_re_f_flt(&in[0], &in[1]);
+            float abs2 = spinor_field_prod_re_f_flt_cpu(&in[0], &in[1]);
+        );
+
+        _TEST_RED_OP("Im<s1,s2>", 2, in,
+            float abs1 = spinor_field_prod_im_f_flt(&in[0], &in[1]);
+            float abs2 = spinor_field_prod_im_f_flt_cpu(&in[0], &in[1]);
+        );
+
+        _TEST_RED_OP("<s1,s2>", 2, in,
+            hr_complex c1 = spinor_field_prod_f_flt(&in[0], &in[1]);
+            hr_complex c2 = spinor_field_prod_f_flt_cpu(&in[0], &in[1]);
+            float abs1 = _complex_prod_re(c1,c1);
+            float abs2 = _complex_prod_re(c2,c2);
+        );
+
+        _TEST_RED_OP("Re<g5*s1,s2>", 2, in,
+            float abs1 = spinor_field_g5_prod_re_f_flt(&in[0], &in[1]);
+            float abs2 = spinor_field_g5_prod_re_f_flt_cpu(&in[0], &in[1]);
+        );
+
+        _TEST_RED_OP("Im<g5*s1,s2>", 2, in,
+            float abs1 = spinor_field_g5_prod_im_f_flt(&in[0], &in[1]);
+            float abs2 = spinor_field_g5_prod_im_f_flt_cpu(&in[0], &in[1]);
+        );
+
+        _TEST_RED_OP("|s1|^2", 1, in,
+            float abs1 = spinor_field_sqnorm_f_flt(&in[0]);
+            float abs2 = spinor_field_sqnorm_f_flt_cpu(&in[0]);
         );
 
         _TEST_LIN_ALG("s2+=r*s1", 2, in, in+1,
@@ -160,6 +185,24 @@ int main(int argc, char *argv[]) {
             hr_complex_flt c = 2.0+1.0*I;
             spinor_field_mulc_add_assign_f_flt(out,c,&in[0]);
             spinor_field_mulc_add_assign_f_flt_cpu(out,c,&in[0]);
+        );
+
+        _TEST_LIN_ALG("s2+=c*g5*s1", 2, in, in+1,
+            hr_complex_flt c = 2.f + 3.f*I;
+            spinor_field_g5_mulc_add_assign_f_flt(out,c,&in[0]);
+            spinor_field_g5_mulc_add_assign_f_flt_cpu(out,c,&in[0]);
+        );
+
+        _TEST_LIN_ALG("s2=r*s1", 1, in, in+1,      
+            float r = 10.0;
+            spinor_field_mul_f_flt(out,r,&in[0]);
+            spinor_field_mul_f_flt_cpu(out,r,&in[0]);
+        );
+
+        _TEST_LIN_ALG("s2=c*s1", 1, in, in+1,      
+            hr_complex_flt c = 2.0+1.0*I;
+            spinor_field_mulc_f_flt(out,c,&in[0]);
+            spinor_field_mulc_f_flt_cpu(out,c,&in[0]);
         );
 
         _TEST_LIN_ALG("s3=s1+s2", 2, in, in+2,      
@@ -221,42 +264,49 @@ int main(int argc, char *argv[]) {
             spinor_field_g5_f_flt_cpu(out,&in[0]);
         );
 
-        _TEST_LIN_ALG("s2+=c*g5*s1", 2, in, in+1,
-            hr_complex_flt c = 2.f + 3.f*I;
-            spinor_field_g5_mulc_add_assign_f_flt(out,c,&in[0]);
-            spinor_field_g5_mulc_add_assign_f_flt_cpu(out,c,&in[0]);
+        _TEST_LIN_ALG("s1=g5*s1", 1, in, in, 
+            spinor_field_g5_assign_f_flt(&in[0]);
+            spinor_field_g5_assign_f_flt_cpu(&in[0]);
         );
 
-        _TEST_RED_OP("|s1|^2", 1, in,
-            float abs1 = spinor_field_sqnorm_f_flt(&in[0]);
-            float abs2 = spinor_field_sqnorm_f_flt_cpu(&in[0]);
+        _TEST_LIN_ALG("s1=g0*s2", 1, in, in+1, 
+            spinor_field_g0_f_flt(out, &in[0]);
+            spinor_field_g0_f_flt_cpu(out, &in[0]);
         );
 
-        _TEST_RED_OP("Re<s1,s2>", 2, in,
-            float abs1 = spinor_field_prod_re_f_flt(&in[0], &in[1]);
-            float abs2 = spinor_field_prod_re_f_flt_cpu(&in[0], &in[1]);
+        _TEST_LIN_ALG("s1=g1*s2", 1, in, in+1, 
+            spinor_field_g1_f_flt(out, &in[0]);
+            spinor_field_g1_f_flt_cpu(out, &in[0]);
         );
 
-        _TEST_RED_OP("Im<s1,s2>", 2, in,
-            float abs1 = spinor_field_prod_im_f_flt(&in[0], &in[1]);
-            float abs2 = spinor_field_prod_im_f_flt_cpu(&in[0], &in[1]);
+        _TEST_LIN_ALG("s1=g2*s2", 1, in, in+1, 
+            spinor_field_g2_f_flt(out, &in[0]);
+            spinor_field_g2_f_flt_cpu(out, &in[0]);
         );
 
-        _TEST_RED_OP("<s1,s2>", 2, in,
-            hr_complex c1 = spinor_field_prod_f_flt(&in[0], &in[1]);
-            hr_complex c2 = spinor_field_prod_f_flt_cpu(&in[0], &in[1]);
-            float abs1 = _complex_prod_re(c1,c1);
-            float abs2 = _complex_prod_re(c2,c2);
+        _TEST_LIN_ALG("s1=g3*s2", 1, in, in+1, 
+            spinor_field_g3_f_flt(out, &in[0]);
+            spinor_field_g3_f_flt_cpu(out, &in[0]);
         );
 
-        _TEST_RED_OP("Re<g5*s1,s2>", 2, in,
-            float abs1 = spinor_field_g5_prod_re_f_flt(&in[0], &in[1]);
-            float abs2 = spinor_field_g5_prod_re_f_flt_cpu(&in[0], &in[1]);
+        _TEST_LIN_ALG("lc1", 1, in, in+1, 
+            double c1 = 2.1;
+            spinor_field_lc1_f_flt(c1, out, &in[0]);
+            spinor_field_lc1_f_flt_cpu(c1, out, &in[0]);
         );
 
-        _TEST_RED_OP("Im<g5*s1,s2>", 2, in,
-            float abs1 = spinor_field_g5_prod_im_f_flt(&in[0], &in[1]);
-            float abs2 = spinor_field_g5_prod_im_f_flt_cpu(&in[0], &in[1]);
+        _TEST_LIN_ALG("lc2", 1, in, in+1, 
+            double c1 = 2.4;
+            double c2 = 4.3;
+            spinor_field_lc2_f_flt(c1, c2, out, &in[0]);
+            spinor_field_lc2_f_flt_cpu(c1, c2, out, &in[0]);
+        );
+
+        _TEST_LIN_ALG("lc3", 3, in, in+2, 
+            double c1 = 2.4;
+            double c2 = 4.3;
+            spinor_field_lc3_f_flt(c1, c2, &in[0], &in[1], &in[2]);
+            spinor_field_lc3_f_flt_cpu(c1, c2, &in[0], &in[1], &in[2]);
         );
     }
 
