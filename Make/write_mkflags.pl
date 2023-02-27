@@ -17,9 +17,7 @@ GetOptions(
   'y=s'          => \(my $YBC = 'P'),
   'z=s'          => \(my $ZBC = 'P'),
   'twisted!'     => \(my $xyz_twist = 0),
-  'sf!'          => \(my $sfbc = 0),
   'sfhalf!'      => \(my $sfhalfbc = 0),
-  'sfrotated!'   => \(my $sfrotatedbc = 0),
   'smearing!'    => \(my $smearing = 0),
   'clover|c!'    => \(my $clover = 0),
   'expclover|e!' => \(my $expclover = 0),
@@ -113,8 +111,14 @@ sub validate_t {
         $TBC = "BC_T_THETA"
     } elsif ($TBC eq "O") { 
         $TBC = "BC_T_OPEN"
+    } elsif ($TBC eq "S") { 
+        $TBC = "BC_T_SF"
+    } elsif ($TBC eq "SR") { 
+        $TBC = "BC_T_SF_ROTATED"
+    } elsif ($TBC eq "M") { 
+        $TBC = "BC_T_MIXED"
     } else {
-        print "Error: The T boundary condition representation must be one of the following: P, A, T, O\n";
+        print "Error: The T boundary condition representation must be one of the following: P, A, T, O, S, SR, M\n";
         HelpMessage(1);
     }
 }
@@ -182,12 +186,8 @@ print $fh "MACRO += $YBC\n";
 print $fh "MACRO += $ZBC\n";
 # write twisted boundary condition
 $xyz_twist && print $fh "MACRO += GAUGE_SPATIAL_TWIST\n";
-# write sf boundary condition
-$sfbc && print $fh "MACRO += BC_T_SF\n";
 # write sf half field boundary condition
 $sfhalfbc && print $fh "MACRO += HALFBG_SF\n";
-# write sf rotated boundary condition
-$sfrotatedbc && print $fh "MACRO += BC_T_SF_ROTATED\n";
 # write smearing
 $smearing && print $fh "MACRO += WITH_SMEARING\n";
 # write clover
@@ -272,7 +272,14 @@ write_mkflags - write flags file for compilation of HiRep
   --ng,-n             [2]         Number of colors
   --repr,-r           [FUND]      Fermion representation (FUND, 2S, 2A, ADJ)
   --gauge,-g          [SUN]       Gauge group (SUN, SON)
-  -t                  [P]         T boundary conditions (P, A, T, O)
+                                  P=Periodic
+                                  A=Antiperiodic
+                                  T=Theta
+                                  O=Open
+                                  S=Schrodinger functional
+                                  SR=Rotated schrodinger functional
+                                  M=Open + Schrodinger functional
+  -t                  [P]         T boundary conditions (P, A, T, O ,S ,SR , M)
   -x                  [P]         X boundary conditions (P, A, T)
   -y                  [P]         Y boundary conditions (P, A, T)
   -z                  [P]         Z boundary conditions (P, A, T)
@@ -294,10 +301,8 @@ write_mkflags - write flags file for compilation of HiRep
   --[no-]newgeo       [false]     Use new geometry
   --[no-]fixedstr     [false]     Access memory on GPU using a fixed stride of length 32 instead of piece length
   
-  --[no-]twist        [false]     XYZ twisted boundary conditions
-  --[no-]sf           [false]     Schrodinger functional b.c.
-  --[no-]sfhalf       [false]     Schrodinger functional b.c., half field
-  --[no-]sfrotate     [false]     Rotated Schrodinger functional b.c.
+  --[no-]gauge-twist  [false]     Spatial gauge twist
+  --[no-]sfhalf       [false]     Schrodinger functional half field
   --[no-]smearing     [false]     Smearing action
   --[no-]clover,-c    [false]     Clover improved action
   --[no-]expclover,-e [false]     ExpClover improved action
