@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
     lprintf("LA TEST", 0, "Warmup application of the Diracoperator %d times.\n", n_warmup);
     Timer clock;
     timer_set(&clock);
-    for (int i = 0; i < n_warmup; ++i) { Dphi_cpu_(s1, s0); }
+    for (int i = 0; i < n_warmup; ++i) { Dphi_(s1, s0); }
     double elapsed = timer_lap(&clock) * 1.e-3; //time in milliseconds
     
     int n_reps = (int)(n_warmup * 1.01 * (time_target / elapsed));
@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
         lprintf("LA TEST", 0, "Trying reps: %d\n", n_reps);
 
         elapsed = timer_lap(&clock) * 1.e-3; //time in milliseconds
-        for (int i = 0; i < n_reps; ++i) { Dphi_cpu_(s1, s0); }
+        for (int i = 0; i < n_reps; ++i) { Dphi_(s1, s0); }
         elapsed = timer_lap(&clock) * 1.e-3; //time in milliseconds
         n_reps = (int)((double)(n_reps * 1.01 * time_target) / elapsed);
         bcast_int(&n_reps, 1);

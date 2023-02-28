@@ -143,11 +143,10 @@ my @libs = ("libhrobservables.a", "libhr.a"); #order is important
 {
   my $topdir = "Benchmarks";
   my %exes = (
-    "speed_test_reading_gpu" => [ "speed_test_reading_gpu.c" ],
     "speed_test_diracoperator" => [ "speed_test_diracoperator.c", ],
     "speed_test_diracoperator_cp" => [ "speed_test_diracoperator_cp.c", ],
     "speed_test_diracoperator_flt" => [ "speed_test_diracoperator_flt.c", ],
-    "speed_test_diracoperator_gpu" => [ "speed_test_diracoperator_gpu.c", ],
+    "speed_test_linear_algebra" => [ "speed_test_linear_algebra.c", ],
   );
 
   add_exes($topdir, \%exes, \@libs_core);
