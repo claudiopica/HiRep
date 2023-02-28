@@ -32,8 +32,7 @@ const char *sComputeMode[] = {
  *
  * @param input_gpu             A struct containing parameters on the current GPU.
  */
-void print_device_count_info(input_gpu gpu_var_init) 
-{
+void print_device_count_info(input_gpu gpu_var_init) {
   int device_count;
   cudaGetDeviceCount(&device_count);
   lprintf("GPU_INIT", 0, "GPU_ID = %d\n", gpu_var_init.gpuID);
@@ -46,8 +45,7 @@ void print_device_count_info(input_gpu gpu_var_init)
  *
  * @param input_gpu             A struct containing parameters on the current GPU.
  */
-void print_driver_info(cudaDeviceProp device_prop) 
-{
+void print_software_info(cudaDeviceProp device_prop) {
   int driver_version, runtime_version;
   cudaDriverGetVersion(&driver_version);
   cudaRuntimeGetVersion(&runtime_version);
@@ -61,24 +59,13 @@ void print_driver_info(cudaDeviceProp device_prop)
 }
 
 /**
- * @brief Print CUDA runtime version information
- *
- */
-void print_runtime_info(cudaDeviceProp device_prop) 
-{
-  
-  // TODO: Remove this at some point
-}
-
-/**
  * @brief Print Global memory information including bandwidth 
  *        paramters and supported features
  *
  * @param cudaDeviceProp        A CUDA class containing information on the device.
  * @param input_gpu             A struct containing parameters on the current GPU.
  */
-void print_global_memory_info(cudaDeviceProp device_prop, input_gpu gpu_var_init) 
-{
+void print_global_memory_info(cudaDeviceProp device_prop, input_gpu gpu_var_init) {
   int mem_bus_width;
   int mem_clock;
 
@@ -105,8 +92,7 @@ void print_global_memory_info(cudaDeviceProp device_prop, input_gpu gpu_var_init
  *
  * @param cudaDeviceProp        A CUDA class containing information on the device.
  */
-void print_shared_memory_info(cudaDeviceProp device_prop) 
-{
+void print_shared_memory_info(cudaDeviceProp device_prop) {
   lprintf("GPU_INIT",10,"Total amount of shared memory per block: %dB\n",device_prop.sharedMemPerBlock); 
 }
 
@@ -116,8 +102,7 @@ void print_shared_memory_info(cudaDeviceProp device_prop)
  * @param cudaDeviceProp        A CUDA class containing information on the device.
  * @param input_gpu             A struct containing parameters on the current GPU.
  */
-void print_cache_info(cudaDeviceProp device_prop, input_gpu gpu_var_init) 
-{
+void print_cache_info(cudaDeviceProp device_prop, input_gpu gpu_var_init) {
   int l2_cache_size;
 
   // Query properties
@@ -135,8 +120,7 @@ void print_cache_info(cudaDeviceProp device_prop, input_gpu gpu_var_init)
  *
  * @param cudaDeviceProp        A CUDA class containing information on the device.
  */
-void print_constant_memory_info(cudaDeviceProp device_prop) 
-{
+void print_constant_memory_info(cudaDeviceProp device_prop) {
   lprintf("GPU_INIT",10,"Max Texture dimension size (x,y,z): 1D=(%d), 2D=(%d,%d), 3D=(%d,%d,%d)\n",
 	  device_prop.maxTexture1D, device_prop.maxTexture2D[0], device_prop.maxTexture2D[1],
 	  device_prop.maxTexture3D[0], device_prop.maxTexture3D[1], device_prop.maxTexture3D[2]);
@@ -160,8 +144,7 @@ void print_constant_memory_info(cudaDeviceProp device_prop)
  * @param cudaDeviceProp        A CUDA class containing information on the device.
  * @param input_gpu             A struct containing parameters on the current GPU.
  */
-void print_memory_info(cudaDeviceProp device_prop, input_gpu gpu_var_init) 
-{
+void print_memory_info(cudaDeviceProp device_prop, input_gpu gpu_var_init) {
   print_global_memory_info(device_prop, gpu_var_init);
   print_shared_memory_info(device_prop);
   print_cache_info(device_prop, gpu_var_init);
@@ -174,11 +157,10 @@ void print_memory_info(cudaDeviceProp device_prop, input_gpu gpu_var_init)
  * @param cudaDeviceProp        A CUDA class containing information on the device.
  * @param input_gpu             A struct containing parameters on the current GPU.
  */
-void print_compute_info(cudaDeviceProp device_prop, input_gpu gpu_var_init) 
-{
+void print_compute_info(cudaDeviceProp device_prop, input_gpu gpu_var_init) {
   // Print formatted
   lprintf("GPU_INIT", 10, "Multiprocessors: %d\n", device_prop.multiProcessorCount);
-  lprintf("GPU_INT", 10, "GPU Clock Speed: %.2f GHz\n", device_prop.clockRate * 1e-6f);
+  lprintf("GPU_INIT", 10, "GPU Clock Speed: %.2f GHz\n", device_prop.clockRate * 1e-6f);
   lprintf("GPU_INIT", 10, "Total number of register per block: %dB\n", device_prop.regsPerBlock); 
   lprintf("GPU_INIT",10, "Warp size: %dB\n", device_prop.warpSize); 
   error(device_prop.warpSize!=32, 1, "init_gpu", "Error: warp size 32 assumed in global sum\n");  
@@ -206,8 +188,7 @@ void print_compute_info(cudaDeviceProp device_prop, input_gpu gpu_var_init)
  *
  * @param cudaDeviceProp        A CUDA class containing information on the device.
  */
-void print_supported_features(cudaDeviceProp device_prop) 
-{
+void print_supported_features(cudaDeviceProp device_prop) {
   lprintf("GPU_INIT",10,"Device has ECC support enabled:                %s\n", device_prop.ECCEnabled ? "Yes" : "No");
   lprintf("GPU_INIT",10,"Device is using TCC driver mode:               %s\n", device_prop.tccDriver ? "Yes" : "No");
   lprintf("GPU_INIT",10,"Device supports Unified Addressing (UVA):      %s\n", device_prop.unifiedAddressing ? "Yes" : "No");
@@ -236,6 +217,31 @@ void print_supported_features(cudaDeviceProp device_prop)
   #endif
 }
 
+/**
+ * @brief Prints peak performance metric estimates. 
+ *        This allows to check, whether we are fully utilizing the 
+ *        capabilities of the hardware
+ * 
+ * 
+*/
+void print_performance_metrics() {
+  /**
+   * Code snippet based on:
+   * https://developer.nvidia.com/blog/how-query-device-properties-and-handle-errors-cuda-cc/
+   * Access 2023-02-27
+   * 
+  */
+  int n_devices;
+  cudaGetDeviceCount(&n_devices);
+  double peak_memory_bandwidth = 0;
+  for (int i = 0; i < n_devices; i++) {
+    cudaDeviceProp prop;
+    cudaGetDeviceProperties(&prop, i);
+    peak_memory_bandwidth += 2.0*prop.memoryClockRate*(prop.memoryBusWidth/8)/1.0e6;
+  }
+  lprintf("GPU_INIT",10,"Peak Memory Bandwidth (GB/s): %1.6g\n", peak_memory_bandwidth); 
+}
+
 /*Print out the device info assume CUDART >= 4000*/
 /**
  * @brief Prints all information on hardware, meaning memory, 
@@ -244,12 +250,12 @@ void print_supported_features(cudaDeviceProp device_prop)
  *
  * @param input_gpu             A struct containing parameters on the current GPU.
  */
-void print_hardware_info(cudaDeviceProp device_prop, input_gpu gpu_var_init) 
-{
+void print_hardware_info(cudaDeviceProp device_prop, input_gpu gpu_var_init) {
   lprintf("GPU_INIT", 10, "Device: %s\n", device_prop.name);
 
   print_memory_info(device_prop, gpu_var_init);
   print_compute_info(device_prop, gpu_var_init);
+  print_performance_metrics();
 }
 
 #endif

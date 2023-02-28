@@ -28,16 +28,14 @@ int enable_GPU_peer_to_peer_access();
  * @param input_gpu             A struct containing information on the current active
  *                              GPU
  */ 
-void init_gpu(input_gpu gpu_var_init)
-{
+void init_gpu(input_gpu gpu_var_init) {
   lprintf("GPU_INIT", 0, "Initializing GPU\n");
   struct cudaDeviceProp device_prop;
   cudaGetDeviceProperties(&device_prop, gpu_var_init.gpuID);
 
   // Print GPU info
   print_device_count_info(gpu_var_init);
-  print_driver_info(device_prop);
-  print_runtime_info(device_prop);
+  print_software_info(device_prop);
   print_hardware_info(device_prop, gpu_var_init);
   print_supported_features(device_prop);
 
@@ -54,8 +52,7 @@ void init_gpu(input_gpu gpu_var_init)
  * @param input_gpu             A struct containing information on the current active
  *                              GPU
  */
-void select_GPU(input_gpu gpu_var_init) 
-{
+void select_GPU(input_gpu gpu_var_init) {
   #ifndef WITH_MPI /* For Single GPU -> select device with ID=0 */
     cudaSetDevice(gpu_var_init.gpuID);
     lprintf("GPU_INIT", 0, "Using GPU #%d\n", gpu_var_init.gpuID);
@@ -80,8 +77,7 @@ void select_GPU(input_gpu gpu_var_init)
  * @param input_gpu           A struct containing information on the current active
  *                            GPU
  */
-int enable_GPU_peer_to_peer_access() 
-{
+int enable_GPU_peer_to_peer_access() {
   // TODO: For more than one node we need to use local MPI ranks instead of PIDs (SAM)
   #if defined(WITH_MPI) 
     int device_count = 0;

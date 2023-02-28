@@ -34,15 +34,9 @@ typedef struct cudaDeviceProp cudaDeviceProp;
  */
 void print_device_count_info(input_gpu);
 /**
- * @brief Print CUDA driver version information
+ * @brief Print CUDA software version information (runtime and driver version)
  */
-void print_driver_info(cudaDeviceProp);
-/**
- * @brief Print CUDA runtime version information
- *
- * @param input_gpu             A struct containing parameters on the current GPU.
- */
-void print_runtime_info(cudaDeviceProp);
+void print_software_info(cudaDeviceProp);
 /**
  * @brief Print Global memory information including bandwidth 
  *        paramters and supported features
